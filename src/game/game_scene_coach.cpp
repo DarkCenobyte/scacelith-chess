@@ -597,6 +597,10 @@ void GameScene::refreshCoachVoice() {
     // speech only once the voice is available).
     if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
         coach_->stage->ensureWorker();
+    // Likewise in an analysis (its commentator speaks through the coach's worker): the voice is
+    // heard from the next comment on.
+    if (coachVoiceFiles_ && analysing() && settings().analysisVoice && !(coach_ && coach_->workerStarted))
+        ensureCoachVoiceWorker();
 }
 
 void GameScene::coachModelDownloaded(int fetched) {
@@ -611,6 +615,10 @@ void GameScene::coachModelDownloaded(int fetched) {
     }
     refreshCoachVoice();
 }
+
+coach::Stage& GameScene::coachVoice() { return *coachRuntime().stage; }
+
+void GameScene::ensureCoachVoiceWorker() { coachRuntime().stage->ensureWorker(); }
 
 bool GameScene::coachVoiceExpected() const {
     return coachVoiceFiles_ && !(coach_ && coach_->workerStarted && coach_->worker.failed());
@@ -1303,17 +1311,6 @@ void GameScene::drawCoachSubtitles() {
 // ==============================================================================================
 // The table
 // ==============================================================================================
-
-namespace {
-
-// The hand whose half holds an off-board spot (pos.z > 0 is White's, seat 0), or 'fallback'.
-int handForTrip(const coach::PieceTrip& t, int fallback) {
-    if (t.from.kind != coach::RestKind::Square) return t.from.pos.z > 0.0f ? 0 : 1;
-    if (t.to.kind != coach::RestKind::Square) return t.to.pos.z > 0.0f ? 0 : 1;
-    return fallback;
-}
-
-}  // namespace
 
 void GameScene::runCoachTable(float dt) {
     CoachRuntime& rt = *coach_;

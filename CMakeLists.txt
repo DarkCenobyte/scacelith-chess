@@ -80,7 +80,8 @@ endif()
 # ---------------------------------------------------------------------------------------------
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
-    ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp ${ROOT}/src/coach/*.cpp ${ROOT}/src/tts/*.cpp)
+    ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp ${ROOT}/src/coach/*.cpp ${ROOT}/src/tts/*.cpp
+    ${ROOT}/src/analysis/*.cpp)
 # Engine-free parts of src/game (Elo, observer camera, camera flights, hot-seat handover, scoresheet
 # layout, physical board, the [coach] and [tts] settings, saved games, what the scene saves and their
 # replay, the account pages' data, the in-process fake server): in the core library so the unit tests

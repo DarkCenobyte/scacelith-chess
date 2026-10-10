@@ -1171,6 +1171,21 @@ library.tag.UTCTime = Hora (UTC)
 library.tag.WhiteRatingDiff = Variación Elo de blancas
 library.tag.BlackRatingDiff = Variación Elo de negras
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Análisis
+analysis.menu.title = ANÁLISIS
+analysis.menu.analyse = Analizar
+analysis.menu.paste = Pegar un PGN
+analysis.menu.online = Mis partidas en línea
+analysis.menu.folder = Coloque archivos PGN en esta carpeta para analizarlos: {0}
+analysis.menu.empty.title = Aún no hay partidas guardadas
+analysis.menu.empty.text = Sus partidas aparecen aquí al terminar, igual que los archivos PGN colocados en la carpeta de abajo. También puede pegar una partida copiada como texto PGN.
+analysis.menu.empty.no_folder = Pegue una partida copiada como texto PGN para analizarla.
+analysis.menu.paste.empty = El portapapeles está vacío: copie primero una partida como texto PGN.
+analysis.menu.paste.none = No se encontró ninguna partida de ajedrez en el portapapeles.
+analysis.menu.paste.several = El portapapeles contiene varias partidas: se analiza la primera.
+analysis.menu.gameover = Analizar la partida
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Jugada {0} de {1}
 replay.speed.factor = ×{0}
@@ -1183,6 +1198,31 @@ replay.tip.pause = Pausa (K)
 replay.tip.resume = Reanudar (K)
 replay.tip.forward = Una jugada adelante (L)
 replay.tip.end = Final de la partida (Fin)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMENTARIO
+analysis.hud.accuracy = PRECISIÓN
+analysis.hud.reviewing = Stockfish está analizando la partida… {0}
+analysis.hud.no_engine = No hay motor de ajedrez: las jugadas se muestran sin análisis.
+analysis.hud.no_moves = Esta partida no tiene jugadas.
+analysis.hud.tip.play = Reproducir las jugadas (K)
+analysis.hud.tip.comments_off = Ocultar los comentarios de los momentos clave (N)
+analysis.hud.tip.comments_on = Mostrar los comentarios de los momentos clave (N)
+analysis.hud.tip.voice_off = Silenciar la voz del comentarista (M)
+analysis.hud.tip.voice_on = Oír los comentarios en voz alta (M)
+analysis.hud.tip.voice_missing = La voz no se puede oír: sus archivos no están instalados, o la opción «Opciones > Sonido > Voz del entrenador» está desactivada. Los comentarios se escriben en pantalla.
+analysis.hud.tip.arrows_off = Ocultar las flechas de las mejores jugadas (B)
+analysis.hud.tip.arrows_on = Mostrar las flechas de las mejores jugadas (B)
+analysis.hud.controls.play = Reproducir / pausa
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Mostrar / ocultar los comentarios
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Voz del comentarista sí / no
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Mostrar / ocultar las flechas
 
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----

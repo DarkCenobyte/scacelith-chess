@@ -1,0 +1,167 @@
+# Coach speech (Japanese): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Register: a calm, warm commentator in polite です/ます style; short sentences (subtitles too).
+# Nobody is あなた or 私 here: the players are 白 and 黒 (as assets/i18n/ja.lang). {piece} {t1} {t2}
+# = a piece with its side, "白のナイト" / "黒のクイーン"; {t2:bare} = the piece name alone, after
+# {t1} of the same side ("{t1}と{t2:bare}" = "白のクイーンとルーク": a fork's two targets always
+# belong to one side). Moves and lines are noun phrases in speech, so particles follow them.
+# Counted numbers: {m:move} "3手", {pts:point} "3点", {n:mistake} "2回のミス", {m:blunder}
+# "1回の大悪手", {acc_white:percent} "87%". A ".spoken" key respells for the voice what it may
+# misread: digits and chess kanji in kana (大悪手 だいあくしゅ, 悪手 あくしゅ, 妙手 みょうしゅ,
+# 駒得 こまどく), as review.lang does.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = この対局を一緒に振り返りましょう。
+an.start.2 = この対局を、手順を追って見ていきましょう。
+an.start.3 = これがこの対局です。どう進んだか見てみましょう。
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = この対局は、設定された局面から始まります。順に見ていきましょう。
+an.start.setup.2 = 設定された局面からの対局です。どう進んだか見てみましょう。
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = オープニングは{opening:def}です。
+an.opening.2 = これは{opening:def}です。
+an.book_exit = {move}で、対局は既知の定跡を外れます。
+an.book_exit.2 = {move}が、定跡を外れた最初の手です。
+an.book_exit.3 = 定跡はここ、{move}で終わります。
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move}は大悪手です。
+an.blunder.spoken = {move}はだいあくしゅです。
+an.blunder.2 = ここで{move}は重大なミスです。
+an.blunder.3 = 大悪手：{move}。
+an.blunder.3.spoken = だいあくしゅ：{move}。
+an.mistake = {move}は悪手です。
+an.mistake.spoken = {move}はあくしゅです。
+an.mistake.2 = ここで{move}は正しい手ではありません。
+an.mistake.3 = 悪手：{move}。
+an.mistake.3.spoken = あくしゅ：{move}。
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move}では、そのミスをとがめるチャンスを逃します。
+an.missed_chance.2 = {move}で、チャンスが消えてしまいます。
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = これで{reply}がチェックメイトです。
+an.mate_allowed.one.2 = この手だと{reply}があり、それでチェックメイトです。
+an.mate_allowed = この手だと、{reply}から{m:move}の強制メイトがあります。
+an.mate_allowed.2 = これで、{reply}から始まる{m:move}の強制メイトが生じました。
+an.fork = これで{reply}が{t1}と{t2:bare}をフォークします。
+an.fork.2 = この手だと{reply}があり、{t1}と{t2:bare}が同時に攻められます。
+an.fork.3 = {reply}が{t1}と{t2:bare}を同時に攻めます。
+an.hanging = この手で{piece}の守りがなくなり、{reply}で取られます。
+an.hanging.2 = {piece}に守りがありません：{reply}で取られます。
+an.hanging.3 = 守りのない{piece}を、{reply}があっさり取ります。
+an.material = 続く{line}で、{pts:point}の駒得になります。
+an.material.spoken = 続く{line}で、{pts:point}のこまどくになります。
+an.material.2 = そして{line}で{pts:point}を稼ぎます。
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best}でチェックメイトでした。
+an.mate_missed.one.2 = {best}ならチェックメイトでした。
+an.mate_missed = {best}なら、{m:move}の強制メイトでした。
+an.mate_missed.2 = {best}から始まる、{m:move}の強制メイトがありました。
+an.missed_capture = {best}なら、{piece}をただで取れました。
+an.missed_capture.2 = {piece}には守りがありませんでした：{best}で取れました。
+an.missed_fork = {best}なら、{t1}と{t2:bare}をフォークできました。
+an.missed_fork.2 = {best}がフォークでした：{t1}と{t2:bare}を同時に攻撃します。
+
+# The better move, when nothing above named it.
+an.better = {best}の方が強い手でした。
+an.better.2 = より良いのは{best}でした。
+an.better.3 = エンジンは{best}を推しています。
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move}は妙手：{piece}を捨てます！
+an.brilliant.spoken = {move}はみょうしゅ：{piece}を捨てます！
+an.brilliant.2 = 見事なサクリファイス！{move}で{piece}を差し出します。
+an.brilliant.3 = {move}！{piece}を差し出す妙手です。
+an.brilliant.3.spoken = {move}！{piece}を差し出すみょうしゅです。
+an.brilliant.mate = これで{m:move}の強制メイトになります。
+an.brilliant.mate.2 = しかも{m:move}でメイトを強制します。
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move}だけが優勢を保つ手です。
+an.only.win.2 = 優勢を保てるのは{move}だけです。よく見つけました。
+an.only.hold = {move}だけが互角を保つ手です。
+an.only.hold.2 = ここで局面を支えられるのは{move}だけです。
+an.only.defend = {move}だけが戦いを続けられる手です。
+an.only.defend.2 = ここで粘れるのは{move}だけです。良い守りです。
+an.only.best = {move}は、ここで飛び抜けて強い手です。
+an.only.best.2 = 正確です：{move}は他のどの手よりもずっと強い手です。
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move}は少し不正確です。{best}の方が正確でした。
+an.inaccuracy.2 = 最善ではありません：{move}より{best}の方が正確でした。
+an.interesting = {move}は、{piece}を差し出す面白い発想です。
+an.interesting.2 = 面白い試み：{move}で{piece}を差し出します。
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = 白に{m:move}の強制メイトが生じました。
+an.mate_on.white.2 = ここから、白は{m:move}でメイトを強制できます。
+an.mate_on.black = 黒に{m:move}の強制メイトが生じました。
+an.mate_on.black.2 = ここから、黒は{m:move}でメイトを強制できます。
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = チェックメイト。白の勝ちです。
+an.end.mate.white.2 = これでチェックメイト：白の勝ちです。
+an.end.mate.black = チェックメイト。黒の勝ちです。
+an.end.mate.black.2 = これでチェックメイト：黒の勝ちです。
+an.end.resigned.white = 黒が投了したので、白の勝ちです。
+an.end.resigned.white.2 = 対局はここまで：黒が投了し、白が勝ちました。
+an.end.resigned.black = 白が投了したので、黒の勝ちです。
+an.end.resigned.black.2 = 対局はここまで：白が投了し、黒が勝ちました。
+an.end.timeout.white = 黒の時間が切れたので、白の勝ちです。
+an.end.timeout.white.2 = 時間切れで白の勝ちです。
+an.end.timeout.black = 白の時間が切れたので、黒の勝ちです。
+an.end.timeout.black.2 = 時間切れで黒の勝ちです。
+an.end.win.white = 対局は白の勝ちで終わります。
+an.end.win.white.2 = 白の勝ちです。
+an.end.win.black = 対局は黒の勝ちで終わります。
+an.end.win.black.2 = 黒の勝ちです。
+an.end.stalemate = ステイルメイト：引き分けです。
+an.end.stalemate.2 = ステイルメイトなので、対局は引き分けです。
+an.end.draw.agreement = 両者が引き分けに合意しました。
+an.end.draw.agreement.2 = 合意による引き分けで対局が終わります。
+an.end.draw.repetition = 同じ局面の繰り返しで引き分けです。
+an.end.draw.repetition.2 = 同じ局面がまた現れました：引き分けです。
+an.end.draw.fifty = 50手ルールで引き分けです。
+an.end.draw.fifty.spoken = ごじゅってルールで引き分けです。
+an.end.draw.fifty.2 = 駒取りもポーンの手もないまま50手：引き分けです。
+an.end.draw.fifty.2.spoken = 駒取りもポーンの手もないままごじゅって：引き分けです。
+an.end.draw.seventy_five = 75手ルールで引き分けです。
+an.end.draw.seventy_five.spoken = ななじゅうごてルールで引き分けです。
+an.end.draw.seventy_five.2 = 駒取りもポーンの手もないまま75手：引き分けです。
+an.end.draw.seventy_five.2.spoken = 駒取りもポーンの手もないままななじゅうごて：引き分けです。
+an.end.draw.material = もうメイトはできません：引き分けです。
+an.end.draw.material.2 = どちらもメイトできないので、引き分けです。
+an.end.draw = 対局は引き分けで終わります。
+an.end.draw.2 = 引き分けです。
+an.end.unfinished = 対局はここで、未完のまま止まります。
+an.end.unfinished.2 = 対局はここまで：最後まで指されませんでした。
+an.end.accuracy = 精度：白{acc_white:percent}、黒{acc_black:percent}。
+an.end.accuracy.2 = 白は精度{acc_white:percent}、黒は{acc_black:percent}で指しました。
+an.end.clean.white = 白にはミスも大悪手もありませんでした。
+an.end.clean.white.spoken = 白にはミスもだいあくしゅもありませんでした。
+an.end.clean.white.2 = 白の指し手には大きな誤りがありませんでした。
+an.end.clean.black = 黒にはミスも大悪手もありませんでした。
+an.end.clean.black.spoken = 黒にはミスもだいあくしゅもありませんでした。
+an.end.clean.black.2 = 黒の指し手には大きな誤りがありませんでした。
+an.end.mistakes.white = 白には{n:mistake}があり、大悪手はありませんでした。
+an.end.mistakes.white.spoken = 白には{n:mistake}があり、だいあくしゅはありませんでした。
+an.end.mistakes.white.2 = 白：{n:mistake}、大悪手なし。
+an.end.mistakes.white.2.spoken = 白：{n:mistake}、だいあくしゅなし。
+an.end.mistakes.black = 黒には{n:mistake}があり、大悪手はありませんでした。
+an.end.mistakes.black.spoken = 黒には{n:mistake}があり、だいあくしゅはありませんでした。
+an.end.mistakes.black.2 = 黒：{n:mistake}、大悪手なし。
+an.end.mistakes.black.2.spoken = 黒：{n:mistake}、だいあくしゅなし。
+an.end.blunders.white = 白には{m:blunder}がありました。
+an.end.blunders.white.2 = 白：{m:blunder}。
+an.end.blunders.black = 黒には{m:blunder}がありました。
+an.end.blunders.black.2 = 黒：{m:blunder}。
+an.end.errors.white = 白には{n:mistake}と{m:blunder}がありました。
+an.end.errors.white.2 = 白：{n:mistake}と{m:blunder}。
+an.end.errors.black = 黒には{n:mistake}と{m:blunder}がありました。
+an.end.errors.black.2 = 黒：{n:mistake}と{m:blunder}。

@@ -1,0 +1,154 @@
+# Coach speech (Ukrainian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (see its header for every placeholder: read it first).
+#
+# Rules the lines follow (see common.lang and review.lang):
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "ти" or "я" here: the players are "білі" and "чорні" (lowercase inside a sentence, as
+#   assets/i18n/uk.lang). A piece comes with its side: {piece} {t1} {t2} = "білий кінь", "чорна
+#   тура"; forms from common.lang: acc gen dat ins loc pron_acc ("його" / "її"). A piece placeholder
+#   is never the subject of a past tense, a short adjective or a participle ("{piece} без захисту",
+#   "у {piece:gen} не було захисту").
+# - A move ({move}, {best}, {reply}, {line}) stands in the nominative: as a subject in the present
+#   tense, after a dash or a colon, after "було", or after the word "хід" / "відповідь" in
+#   apposition ("Хід {best} давав мат", "ходом {move}"); never right after a preposition, never as a
+#   verb's object, never the subject of a past tense.
+# - Mate in N: "мат {m:in_move}" ("мат у 3 ходи"); accuracy {acc_white:pct} ("87 %"); counts
+#   {n:mistake} "2 помилки", {m:blunder} "1 груба помилка" (nominative: "у білих {n:mistake}").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Згадаймо цю партію разом.
+an.start.2 = Розберімо цю партію хід за ходом.
+an.start.3 = Ось партія. Подивімося, як вона йшла.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Ця партія починається із заданої позиції. Розберімо її.
+an.start.setup.2 = Партія із заданої позиції. Подивімося, як вона йшла.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Дебют — {opening:def}.
+an.opening.2 = Це {opening:def}.
+an.book_exit = Ходом {move} партія виходить за межі відомої теорії.
+an.book_exit.2 = {move} — перший хід поза дебютною теорією.
+an.book_exit.3 = Дебютна теорія закінчується тут: {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} — груба помилка.
+an.blunder.2 = Тут {move} — серйозна помилка.
+an.blunder.3 = Груба помилка: {move}.
+an.mistake = {move} — помилка.
+an.mistake.2 = {move} — тут неправильний хід.
+an.mistake.3 = Помилка: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} пропускає нагоду покарати за цю помилку.
+an.missed_chance.2 = Хід {move} — і нагоду втрачено.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Тепер {reply} — мат.
+an.mate_allowed.one.2 = Цей хід дозволяє відповідь {reply}, і це мат.
+an.mate_allowed = Це допускає форсований мат {m:in_move}, перший хід — {reply}.
+an.mate_allowed.2 = Тепер є форсований мат {m:in_move}, і починається він ходом {reply}.
+an.fork = Тепер {reply} — вилка на {t1:acc} й {t2:acc}.
+an.fork.2 = Цей хід дозволяє відповідь {reply}, що атакує одразу {t1:acc} й {t2:acc}.
+an.fork.3 = {reply} атакує водночас {t1:acc} й {t2:acc}.
+an.hanging = Цей хід лишає {piece:acc} без захисту, і {reply} цим користується.
+an.hanging.2 = {piece} без захисту: {reply} виграє {piece:pron_acc}.
+an.hanging.3 = {reply} просто забирає {piece:acc}: захисту не було.
+an.material = Відповідь {line} виграє матеріал: {pts:point}.
+an.material.2 = Далі {line} виграє {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Хід {best} давав мат.
+an.mate_missed.one.2 = Хід {best} поставив би мат.
+an.mate_missed = Хід {best} форсував би мат {m:in_move}.
+an.mate_missed.2 = Був форсований мат {m:in_move}, перший хід — {best}.
+an.missed_capture = Хід {best} виграв би {piece:acc} задарма.
+an.missed_capture.2 = У {piece:gen} не було захисту: хід {best} забрав би {piece:pron_acc}.
+an.missed_fork = Хід {best} зробив би вилку на {t1:acc} й {t2:acc}.
+an.missed_fork.2 = Хід {best} давав вилку: удар по {t1:loc} й {t2:loc}.
+
+# The better move, when nothing above named it.
+an.better = Сильніше було {best}.
+an.better.2 = Краще було {best}.
+an.better.3 = Шахова програма радить хід {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} — блискучий хід: жертва {piece:gen}!
+an.brilliant.2 = Блискуча жертва! {move} віддає {piece:acc}.
+an.brilliant.3 = {move}! Блискучий хід із жертвою {piece:gen}.
+an.brilliant.mate = Це веде до форсованого мату {m:in_move}.
+an.brilliant.mate.2 = І мат {m:in_move} неминучий.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} — єдиний хід, що зберігає перевагу.
+an.only.win.2 = Лише {move} утримує тут перевагу. Добре знайдено.
+an.only.hold = {move} — єдиний хід, що зберігає рівновагу.
+an.only.hold.2 = Лише {move} тримає тут позицію.
+an.only.defend = {move} — єдиний хід, що продовжує боротьбу.
+an.only.defend.2 = Лише {move} зберігає тут шанси. Добрий захист.
+an.only.best = {move} — тут найсильніший хід, і з великим відривом.
+an.only.best.2 = Точно: {move} набагато сильніший за все інше.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} — невелика неточність: точніше було {best}.
+an.inaccuracy.2 = Не зовсім найкращий хід: точніше було {best}, а не {move}.
+an.interesting = {move} — цікава ідея з жертвою {piece:gen}.
+an.interesting.2 = Цікава спроба: {move} віддає {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Тепер у білих форсований мат {m:in_move}.
+an.mate_on.white.2 = Звідси білі можуть форсувати мат {m:in_move}.
+an.mate_on.black = Тепер у чорних форсований мат {m:in_move}.
+an.mate_on.black.2 = Звідси чорні можуть форсувати мат {m:in_move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Мат. Білі виграють партію.
+an.end.mate.white.2 = І це мат: білі перемагають.
+an.end.mate.black = Мат. Чорні виграють партію.
+an.end.mate.black.2 = І це мат: чорні перемагають.
+an.end.resigned.white = Чорні здалися, тож білі виграють партію.
+an.end.resigned.white.2 = Тут партія закінчується: чорні здаються, і білі перемагають.
+an.end.resigned.black = Білі здалися, тож чорні виграють партію.
+an.end.resigned.black.2 = Тут партія закінчується: білі здаються, і чорні перемагають.
+an.end.timeout.white = У чорних скінчився час, тож білі перемагають.
+an.end.timeout.white.2 = Білі виграють за часом.
+an.end.timeout.black = У білих скінчився час, тож чорні перемагають.
+an.end.timeout.black.2 = Чорні виграють за часом.
+an.end.win.white = Партія закінчується перемогою білих.
+an.end.win.white.2 = Білі виграють партію.
+an.end.win.black = Партія закінчується перемогою чорних.
+an.end.win.black.2 = Чорні виграють партію.
+an.end.stalemate = Пат: партія закінчується внічию.
+an.end.stalemate.2 = Це пат, тож партія завершується нічиєю.
+an.end.draw.agreement = Суперники погодилися на нічию.
+an.end.draw.agreement.2 = Партія закінчується нічиєю за згодою.
+an.end.draw.repetition = Нічия через повторення позиції.
+an.end.draw.repetition.2 = Та сама позиція повторилася: нічия.
+an.end.draw.fifty = Нічия за правилом п’ятдесяти ходів.
+an.end.draw.fifty.2 = П’ятдесят ходів без взяття й ходу пішака: нічия.
+an.end.draw.seventy_five = Нічия за правилом сімдесяти п’яти ходів.
+an.end.draw.seventy_five.2 = Сімдесят п’ять ходів без взяття й ходу пішака: нічия.
+an.end.draw.material = Мат уже неможливий: нічия.
+an.end.draw.material.2 = Жодна зі сторін уже не може поставити мат, тож нічия.
+an.end.draw = Партія закінчується внічию.
+an.end.draw.2 = Нічия.
+an.end.unfinished = Партія обривається тут, вона не закінчена.
+an.end.unfinished.2 = Тут партія зупиняється: її не дограли.
+an.end.accuracy = Точність: {acc_white:pct} у білих, {acc_black:pct} у чорних.
+an.end.accuracy.2 = Білі зіграли з точністю {acc_white:pct}, чорні — {acc_black:pct}.
+an.end.clean.white = Білі не припустилися ні помилок, ні грубих помилок.
+an.end.clean.white.2 = Гра білих минула без серйозних помилок.
+an.end.clean.black = Чорні не припустилися ні помилок, ні грубих помилок.
+an.end.clean.black.2 = Гра чорних минула без серйозних помилок.
+an.end.mistakes.white = У білих {n:mistake} і жодної грубої помилки.
+an.end.mistakes.white.2 = Білі: {n:mistake}, грубих помилок немає.
+an.end.mistakes.black = У чорних {n:mistake} і жодної грубої помилки.
+an.end.mistakes.black.2 = Чорні: {n:mistake}, грубих помилок немає.
+an.end.blunders.white = У білих {m:blunder}.
+an.end.blunders.white.2 = Білі: {m:blunder}.
+an.end.blunders.black = У чорних {m:blunder}.
+an.end.blunders.black.2 = Чорні: {m:blunder}.
+an.end.errors.white = У білих {n:mistake} і {m:blunder}.
+an.end.errors.white.2 = Білі: {n:mistake} і {m:blunder}.
+an.end.errors.black = У чорних {n:mistake} і {m:blunder}.
+an.end.errors.black.2 = Чорні: {n:mistake} і {m:blunder}.

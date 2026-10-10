@@ -18,9 +18,15 @@ namespace detail {
 MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back);
 // Coach page (ui_coach.cpp), same contract as watchPage: returns StartCoach on Start.
 MenuAction coachPage(CoachSetup& setup, float t, bool opened, bool& back);
-// "Saved games" page (ui_library.cpp), same contract as watchPage: returns StartReplay on Replay
-// (setup.replay names the game).
+// "Saved games" page (ui_library.cpp), same contract as watchPage: returns StartReplay on Replay,
+// StartAnalysis on Analyse (setup.replay names the game).
 MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back);
+// The Analysis page (ui_library.cpp: the saved games page in another mode), same contract: returns
+// StartAnalysis on Analyse (setup.replay names the game) or on a game pasted as PGN text
+// (setup.replay.pgn holds it, its path empty); sets 'onlineGames' when My online games is pressed
+// (signed in: the online page's game history). Shown without a folder too (setup.folder empty: a
+// pasted game only).
+MenuAction analysisPage(LibrarySetup& setup, float t, bool opened, bool& back, bool& onlineGames);
 // Stops the library's listing worker and waits for it (ui::shutdown, before the program exits).
 void libraryShutdown();
 // The player's Elo under the title menu, from x (the start edge: left, or right in a right-to-left

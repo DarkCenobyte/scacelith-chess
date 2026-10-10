@@ -21,6 +21,8 @@ struct Arg {
     chess::PieceType piece = chess::NoPiece;
     chess::Color color = chess::White;
     bool own = false;                          // Piece: belongs to the listener (the human): "your" forms
+    bool bySide = false;                       // Piece: named by its side, not by its owner's role
+                                               // ("White's knight": owner.white.* / owner.black.* forms)
     chess::Square square = chess::NoSquare;    // Piece: where it stands (for pointing); Square: the square
     std::string san, uci;                      // Move (san without figurines; the catalog adds them);
                                                // Moves: 'san' holds a line, space-separated SAN ("Nxe5 dxe5 Qg4")
@@ -31,6 +33,10 @@ struct Arg {
 
     static Arg ofPiece(chess::PieceType t, chess::Color c, bool own, chess::Square on = chess::NoSquare) {
         Arg a; a.kind = Kind::Piece; a.piece = t; a.color = c; a.own = own; a.square = on; return a;
+    }
+    // A piece of the analysis mode's commentary, where nobody is "you" or "me": "White's knight".
+    static Arg ofSidePiece(chess::PieceType t, chess::Color c, chess::Square on = chess::NoSquare) {
+        Arg a = ofPiece(t, c, false, on); a.bySide = true; return a;
     }
     static Arg ofSquare(chess::Square s) { Arg a; a.kind = Kind::Square; a.square = s; return a; }
     static Arg ofMove(const std::string& san, const std::string& uci) {

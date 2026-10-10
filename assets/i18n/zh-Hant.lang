@@ -1171,6 +1171,21 @@ library.tag.UTCTime = 時間（UTC）
 library.tag.WhiteRatingDiff = 白方等級分變化
 library.tag.BlackRatingDiff = 黑方等級分變化
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = 分析
+analysis.menu.title = 分析
+analysis.menu.analyse = 分析
+analysis.menu.paste = 貼上 PGN
+analysis.menu.online = 我的線上對局
+analysis.menu.folder = 把 PGN 檔案放進這個資料夾即可分析：{0}
+analysis.menu.empty.title = 尚無已儲存的對局
+analysis.menu.empty.text = 你的對局結束後會出現在這裡，放進下方資料夾的 PGN 檔案也一樣。你也可以貼上以 PGN 文字複製的對局。
+analysis.menu.empty.no_folder = 貼上以 PGN 文字複製的對局即可分析。
+analysis.menu.paste.empty = 剪貼簿是空的：請先以 PGN 文字複製一盤對局。
+analysis.menu.paste.none = 剪貼簿中找不到西洋棋對局。
+analysis.menu.paste.several = 剪貼簿中有多盤對局：將分析第一盤。
+analysis.menu.gameover = 分析本局
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = 第 {0} 回合，共 {1} 回合
 replay.speed.factor = ×{0}
@@ -1183,6 +1198,31 @@ replay.tip.pause = 暫停（K）
 replay.tip.resume = 繼續（K）
 replay.tip.forward = 前進一步（L）
 replay.tip.end = 對局結束（End）
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = 解說
+analysis.hud.accuracy = 準確率
+analysis.hud.reviewing = Stockfish 正在分析對局…{0}
+analysis.hud.no_engine = 沒有西洋棋引擎：著法將不經分析顯示。
+analysis.hud.no_moves = 這盤對局沒有著法。
+analysis.hud.tip.play = 播放著法（K）
+analysis.hud.tip.comments_off = 隱藏關鍵時刻的解說（N）
+analysis.hud.tip.comments_on = 顯示關鍵時刻的解說（N）
+analysis.hud.tip.voice_off = 關閉解說員的語音（M）
+analysis.hud.tip.voice_on = 朗讀解說（M）
+analysis.hud.tip.voice_missing = 無法播放語音：語音檔案尚未安裝，或「選項 > 聲音 > 教練語音」已關閉。解說以文字顯示在畫面上。
+analysis.hud.tip.arrows_off = 隱藏更佳著法的箭頭（B）
+analysis.hud.tip.arrows_on = 顯示更佳著法的箭頭（B）
+analysis.hud.controls.play = 播放 / 暫停
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = 顯示 / 隱藏解說
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = 解說員語音 開 / 關
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = 顯示 / 隱藏箭頭
 
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----

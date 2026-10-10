@@ -1172,6 +1172,21 @@ library.tag.UTCTime = Час (UTC)
 library.tag.WhiteRatingDiff = Зміна рейтингу білих
 library.tag.BlackRatingDiff = Зміна рейтингу чорних
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Аналіз
+analysis.menu.title = АНАЛІЗ
+analysis.menu.analyse = Аналіз
+analysis.menu.paste = Вставити PGN
+analysis.menu.online = Мої онлайн-партії
+analysis.menu.folder = Покладіть файли PGN у цю теку, щоб проаналізувати їх: {0}
+analysis.menu.empty.title = Збережених партій поки немає
+analysis.menu.empty.text = Ваші партії з’являться тут після завершення, як і файли PGN з теки нижче. Можна також вставити партію, скопійовану як текст PGN.
+analysis.menu.empty.no_folder = Вставте партію, скопійовану як текст PGN, щоб проаналізувати її.
+analysis.menu.paste.empty = Буфер обміну порожній: спершу скопіюйте партію як текст PGN.
+analysis.menu.paste.none = У буфері обміну не знайдено шахової партії.
+analysis.menu.paste.several = У буфері обміну кілька партій: аналізується перша.
+analysis.menu.gameover = Аналіз партії
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Хід {0} з {1}
 replay.speed.factor = ×{0}
@@ -1184,6 +1199,31 @@ replay.tip.pause = Пауза (K)
 replay.tip.resume = Продовжити (K)
 replay.tip.forward = Хід вперед (L)
 replay.tip.end = Кінець партії (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = КОМЕНТАР
+analysis.hud.accuracy = ТОЧНІСТЬ
+analysis.hud.reviewing = Stockfish аналізує партію… {0}
+analysis.hud.no_engine = Шаховий рушій недоступний: ходи показано без аналізу.
+analysis.hud.no_moves = У цій партії немає ходів.
+analysis.hud.tip.play = Програти ходи (K)
+analysis.hud.tip.comments_off = Приховати коментарі до ключових моментів (N)
+analysis.hud.tip.comments_on = Показати коментарі до ключових моментів (N)
+analysis.hud.tip.voice_off = Вимкнути голос коментатора (M)
+analysis.hud.tip.voice_on = Чути коментарі вголос (M)
+analysis.hud.tip.voice_missing = Голос не звучить: його файли не встановлено, або параметр «Налаштування > Звук > Голос тренера» вимкнено. Коментарі показано текстом на екрані.
+analysis.hud.tip.arrows_off = Приховати стрілки кращих ходів (B)
+analysis.hud.tip.arrows_on = Показати стрілки кращих ходів (B)
+analysis.hud.controls.play = Відтворення / пауза
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Показати / приховати коментарі
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Голос коментатора увімк. / вимк.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Показати / приховати стрілки
 
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----

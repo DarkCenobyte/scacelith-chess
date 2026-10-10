@@ -3,10 +3,16 @@
 // the page is open (a game saved meanwhile, a file dropped in the folder: only new or changed
 // files are read again), newest first, with a filter by mode. The selected game shows its
 // players, result, opening, every tag and its moves in figurine notation. Replay returns
-// StartReplay; Delete asks first and deletes files of one game only; Open folder shows the folder
-// in the system's file manager. Save as GIF (signed in to an online server) sends the game's PGN
-// text to the server (POST /gif, game::OnlineSession::savePgnGif) and saves the animated GIF it
-// draws to <app data>/gif/; the folder's line shows it being made, then its path and Open folder.
+// StartReplay, Analyse StartAnalysis; Delete asks first and deletes files of one game only; Open
+// folder shows the folder in the system's file manager. Save as GIF (signed in to an online
+// server) sends the game's PGN text to the server (POST /gif, game::OnlineSession::savePgnGif) and
+// saves the animated GIF it draws to <app data>/gif/; the folder's line shows it being made, then
+// its path and Open folder.
+// The Analysis page is the same page in another mode: the same list and details (the same
+// selection and filter), Analyse as its main action (StartAnalysis), Paste a PGN (the first game of
+// the clipboard's text, checked with the PGN reader: StartAnalysis with its text), My online games
+// when signed in (the online page's game history), and the folder's line says where to put PGN
+// files; no Delete nor Save as GIF there.
 // Same look as ui_coach.cpp; mirrored with im::flip / im::flipX in a right-to-left language.
 #include "ui.h"
 #include "ui_draw.h"
@@ -381,6 +387,8 @@ struct LibraryState {
     std::unordered_map<std::string, std::string> openings;  // contentKey -> opening ("" = none)
     int openingsGen = -1;              // i18n::generation() of 'openings'
     bool debugGif = false;             // debug::libraryGif(): press Save as GIF at the next chance
+    bool debugClipboardSet = false;    // debug::setClipboard(): Paste a PGN reads debugClipboard
+    std::string debugClipboard;
 };
 // Never destroyed: a static's destructor would join a listing still running at exit (after the
 // objects it uses may be gone); libraryShutdown() stops it first instead.
@@ -392,7 +400,7 @@ LibraryState& lib() {
 constexpr double kRelistSeconds = 2.0;
 
 void requestListing(LibraryState& s) {
-    if (s.pending.valid()) return;
+    if (s.pending.valid() || s.folder.empty()) return;  // no folder (the Analysis page without one)
     s.cancel = false;
     s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel, s.gen, s.listed ? s.listing.print : 0);
 }
@@ -798,15 +806,118 @@ void gifLine(const game::GifSaver& gif, const Rect& p, float maxW, float y) {
     }
 }
 
+// ---- The footer -------------------------------------------------------------------------------------------
+// A button of the footer: from the start side, in the middle of the room the others leave, or from
+// the end side (the end side's in their order on screen, the last one at the end).
+enum class FooterSide { Start, Middle, End };
+struct FooterButton {
+    int id;
+    std::string label;                 // with its id, as the button is drawn
+    FooterSide side;
+    Rect r;                            // laid out, before im::flip
+};
+// The narrowest width at which a button shows the label whole (shrunk as far as it goes), 'most'
+// when even that one does not.
+float fittingWidth(const std::string& label, float most) {
+    if (!im::buttonLabelFits(label, most)) return most;
+    float lo = 40.0f, hi = most;
+    while (hi - lo > 1.0f) {
+        const float mid = (lo + hi) * 0.5f;
+        if (im::buttonLabelFits(label, mid)) hi = mid;
+        else lo = mid;
+    }
+    return std::ceil(hi);
+}
+// Lays the buttons out in [x0, x1] at y, 'gap' apart: as wide as each other (236 at most, or as wide
+// as they can be in a narrower window) when every label shows whole at that width; else each as
+// wide as its label needs and the room left shared between them (a 5:4 window in a language of
+// long labels); else (no room for that either) as wide as each other, their labels cut.
+void layoutFooter(std::vector<FooterButton>& bs, float x0, float x1, float y, float h, float gap) {
+    const size_t n = bs.size();
+    if (n == 0) return;
+    const float room = x1 - x0 - float(n - 1) * gap, most = 236.0f;
+    const float uniform = std::min(most, std::floor(room / float(n)));
+    std::vector<float> w(n, uniform);
+    bool whole = true;
+    for (const FooterButton& b : bs) whole = whole && im::buttonLabelFits(b.label, uniform);
+    if (!whole) {
+        float need = 0.0f;
+        for (size_t i = 0; i < n; ++i) need += w[i] = fittingWidth(bs[i].label, most);
+        if (need <= room) {
+            const float extra = std::floor((room - need) / float(n));
+            for (float& wi : w) wi = std::min(most, wi + extra);
+        } else {
+            std::fill(w.begin(), w.end(), uniform);
+        }
+    }
+    float xs = x0, xe = x1;
+    for (size_t i = 0; i < n; ++i)
+        if (bs[i].side == FooterSide::Start) {
+            bs[i].r = Rect(xs, y, w[i], h);
+            xs += w[i] + gap;
+        }
+    for (size_t i = n; i-- > 0;)
+        if (bs[i].side == FooterSide::End) {
+            xe -= w[i];
+            bs[i].r = Rect(xe, y, w[i], h);
+            xe -= gap;
+        }
+    // The middle one centred in the room between the two groups, keeping its gaps.
+    for (size_t i = 0; i < n; ++i)
+        if (bs[i].side == FooterSide::Middle) {
+            const float mw = std::min(w[i], xe - xs);
+            bs[i].r = Rect((xs + xe) * 0.5f - mw * 0.5f, y, mw, h);
+        }
+}
+
+// ---- Paste a PGN (the Analysis page) ---------------------------------------------------------------------
+// The clipboard's text is untrusted: read with the PGN reader's caps, those of a server's PGN
+// (4 MiB), and two games at most (enough to know there are several). The game analysed is the
+// first one that reads without error and has a move; its own text (tags and movetext, the bytes
+// the reader names) is handed over. A notice says why nothing is analysed (an empty clipboard,
+// no game in it), or that the first of several games is.
+bool pastedGame(const std::string& clip, std::string& pgnOut) {
+    bool blank = true;
+    for (char c : clip)
+        if (!std::isspace(static_cast<unsigned char>(c))) blank = false;
+    if (blank) {
+        notify(T("analysis.menu.paste.empty"), 4.0f);
+        return false;
+    }
+    chess::pgn::Limits limits;
+    limits.maxBytes = archive::kMaxServerPgnBytes;
+    limits.maxGames = 2;
+    const chess::pgn::Result<chess::pgn::ParsedGame> r = chess::pgn::read(clip, limits);
+    for (const chess::pgn::ParsedGame& g : r.games) {
+        if (!g.ok() || g.record.plies.empty() || g.offset >= clip.size()) continue;
+        pgnOut = clip.substr(g.offset, g.length);
+        const bool several = r.games.size() > 1 || r.truncated;
+        LOGI("analysis: a pasted game of %d plies (%d bytes)%s", int(g.record.plies.size()), int(pgnOut.size()),
+             several ? ", the first of several" : "");
+        if (several) notify(T("analysis.menu.paste.several"), 5.0f);
+        return true;
+    }
+    // Sizes only: the text (and the reader's errors, which quote it) may be anything the player
+    // copied, a password included.
+    LOGI("analysis: no game in the pasted text (%d bytes, %d games read)", int(clip.size()), int(r.games.size()));
+    notify(T("analysis.menu.paste.none"), 4.0f);
+    return false;
+}
+
 }  // namespace
 
 // ==== The page ===========================================================================================
 namespace detail {
+namespace {
 
-MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
+// The Saved games page, or the Analysis page ('analysis': see the top of the file). onlineGames:
+// set when My online games is pressed (Analysis page).
+MenuAction gamesPage(LibrarySetup& setup, float t, bool opened, bool& back, bool analysis, bool& onlineGames) {
     LibraryState& s = lib();
     vec2 v = gfx::viewSize();
     MenuAction act = MenuAction::None;
+    // The Analysis page shows without a folder of saved games too (a pasted PGN needs none).
+    const bool hasFolder = !setup.folder.empty();
 
     // ---- The listing: at once when the page opens (a short wait spares a flash of "Reading"), then
     // again every few seconds.
@@ -851,8 +962,9 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     const archive::Entry* cur = sel >= 0 ? &all[size_t(shown[size_t(sel)])] : nullptr;
     if (cur) loadDetails(s, *cur);
 
-    const bool folderError = s.listed && !s.listing.stats.error.empty();
-    const bool emptyFolder = s.listed && !folderError && all.empty();
+    const bool folderError = hasFolder && s.listed && !s.listing.stats.error.empty();
+    const bool emptyFolder = !hasFolder || (s.listed && !folderError && all.empty());
+    const bool reading = hasFolder && !s.listed;
 
     dimBackground(t);
     float w = std::min(1480.0f, v.x - 80.0f), h = 940.0f;
@@ -860,8 +972,8 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     if (s.confirmDelete) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle(T("library.title"), p.cx(), p.y + 78.0f);
-    im::pushId("library");
+    im::pageTitle(T(analysis ? "analysis.menu.title" : "library.title"), p.cx(), p.y + 78.0f);
+    im::pushId(analysis ? "analysis" : "library");
 
     // The list first in the reading direction (on the right in a right-to-left language).
     const float pad = 64.0f, gap = 72.0f;
@@ -870,21 +982,22 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     const float dx = im::flip(p, Rect(p.x + pad + listW + gap, 0, detW, 0)).x;
     const Rect lcol(lx, 0, listW, 0), dcol(dx, 0, detW, 0);
     const float top = p.y + 150.0f;
-    // The footer's five buttons (Back, Open folder, Save as GIF, Delete, Replay): 236 wide, or as
-    // wide as five can be in a narrower window (5:4), so that Save as GIF keeps its gaps.
+    // The footer's buttons (layoutFooter).
     const float bh = 58.0f, bgap = 20.0f;
-    const float bw = std::min(236.0f, std::floor((p.w - 2.0f * pad - 4.0f * bgap) / 5.0f));
     const float by = p.b() - 52.0f - bh;
     const float bottom = by - 76.0f;  // under the columns: the folder line, then the footer rule
     im::Id defaultFocus = 0;
-    bool replay = false, askDelete = false;
+    // 'open': the page's main action (Replay, Analyse on the Analysis page), also a double click or
+    // Enter on the selected game.
+    bool open = false, analyse = false, askDelete = false;
 
-    if (!s.listed || folderError || emptyFolder) {
+    if (reading || folderError || emptyFolder) {
         // ---- Nothing to list: reading, the folder cannot be read, or no game yet.
         Rect area(p.x + pad, top, p.w - 2.0f * pad, bottom - top);
-        if (!s.listed) message(area, T("library.reading"), std::string(), gold);
+        if (reading) message(area, T("library.reading"), std::string(), gold);
         else if (folderError) message(area, T("library.error.folder"), i18n::ltr(s.listing.stats.error), danger);
-        else message(area, T("library.empty.title"), T("library.empty.text"), goldBright);
+        else if (!analysis) message(area, T("library.empty.title"), T("library.empty.text"), goldBright);
+        else message(area, T("analysis.menu.empty.title"), T(hasFolder ? "analysis.menu.empty.text" : "analysis.menu.empty.no_folder"), goldBright);
     } else {
         gfx::vline(p.cx() + (im::rtl() ? -1.0f : 1.0f) * (listW - detW) * 0.5f, top, bottom - 10.0f, withAlpha(gold, 0.12f));
 
@@ -919,7 +1032,8 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         } else {
             // The selection: one row at a time with the arrows (the focus moves from row to row and
             // the selection follows it), a page with PageUp / PageDown, the ends with Home / End
-            // (no other control of the page uses these keys). Delete asks to delete it.
+            // (no other control of the page uses these keys). Delete asks to delete it (not on the
+            // Analysis page, which deletes nothing).
             auto select = [&](int i, bool focus) {
                 sel = i;
                 s.selected = entryKey(all[size_t(shown[size_t(i)])]);
@@ -935,7 +1049,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 if (im::keyPressed(plat::KEY_PAGEUP)) moveTo = std::max(0, sel - page);
                 if (im::keyPressed(plat::KEY_HOME)) moveTo = 0;
                 if (im::keyPressed(plat::KEY_END)) moveTo = n - 1;
-                if (im::keyPressed(plat::KEY_DELETE) && cur && !cur->fileError) askDelete = true;
+                if (!analysis && im::keyPressed(plat::KEY_DELETE) && cur && !cur->fileError) askDelete = true;
                 if (moveTo >= 0 && moveTo != sel) {
                     select(moveTo, true);
                     im::sound(Sound::Tick);
@@ -965,7 +1079,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 if (it.focused && im::keyboardMode() && key != s.selected) newSel = key;
                 if (it.focused && revealed && key == s.selected && !visible) select(i, false);
                 if (it.clicked) {
-                    if (s.lastClick == key && im::time() - s.lastClickTime < 0.45) replay = true;
+                    if (s.lastClick == key && im::time() - s.lastClickTime < 0.45) open = true;
                     s.lastClick = key;
                     s.lastClickTime = im::time();
                     if (key != s.selected) {
@@ -973,7 +1087,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                         clickedRow = true;
                     }
                 } else if (it.activated && key == s.selected) {
-                    replay = true;  // Enter on the selected game
+                    open = true;  // Enter on the selected game
                 }
                 if (!visible) return;
                 const std::string ck = contentKey(e);
@@ -1029,38 +1143,67 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         }
     }
 
-    // ---- The folder (or the selected game's GIF), then the footer: Back, Open folder, Save as GIF,
-    // Delete, Replay.
+    // ---- The folder (or the selected game's GIF), then the footer.
     game::OnlineSession& se = game::onlineSession();
     const game::GifSaver& gif = se.gif();
     const bool detailsShown = cur && cur->error.empty() && s.details.key == contentKey(*cur) && s.details.ok;
     const std::string gifKey = cur ? gifOwner(*cur) : std::string();
-    const bool gifMine = cur && gif.owner() == gifKey;
+    const bool gifMine = !analysis && cur && gif.owner() == gifKey;
+    // Signed in to an online server, on this run or an earlier one (the online page resumes it).
+    const bool signedIn = se.signedIn() || se.hasSavedSession();
     if (gifMine && gif.stage() != game::GifSaver::Stage::Idle) {
         gifLine(gif, p, p.w - 2.0f * pad, by - 44.0f);
         se.gifShown(gifKey);
-    } else {
+    } else if (hasFolder) {
+        // The folder; on the Analysis page, as the place where PGN files are put to be analysed.
         TextStyle fs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.9f), HAlign::Center);
-        std::string line = i18n::trf("library.folder", {i18n::ltr(s.folder)});
+        std::string line = i18n::trf(analysis ? "analysis.menu.folder" : "library.folder", {i18n::ltr(s.folder)});
         fs.size = gfx::fitSize(line, fs, p.w - 2.0f * pad, 0.8f);
         if (gfx::textWidth(line, fs) > p.w - 2.0f * pad) line = elide(line, fs, p.w - 2.0f * pad);
         gfx::text(line, p.cx(), by - 44.0f, fs);
     }
     gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, by - 26.0f, withAlpha(gold, 0.25f), 0.3f);
+    // The footer: Back, Open folder, Save as GIF in the middle, then Delete, Analyse (the same game
+    // in the Analysis mode) and Replay on the Saved games page; Back, Open folder, Paste a PGN (in
+    // the middle when My online games follows it, signed in), Analyse on the Analysis page.
+    enum { kBack, kFolder, kGif, kDelete, kAnalyse, kReplay, kPaste, kOnline };
+    std::vector<FooterButton> foot;
+    auto add = [&](int id, const char* key, FooterSide side) { foot.push_back(FooterButton{id, L(key), side, Rect()}); };
+    add(kBack, "common.back", FooterSide::Start);
+    if (hasFolder) add(kFolder, "library.open_folder", FooterSide::Start);
+    if (analysis) {
+        add(kPaste, "analysis.menu.paste", signedIn ? FooterSide::Middle : FooterSide::End);
+        if (signedIn) add(kOnline, "analysis.menu.online", FooterSide::End);
+        add(kAnalyse, "analysis.menu.analyse", FooterSide::End);
+    } else {
+        add(kGif, "gif.save", FooterSide::Middle);
+        add(kDelete, "library.delete", FooterSide::End);
+        add(kAnalyse, "analysis.menu.analyse", FooterSide::End);
+        add(kReplay, "library.replay", FooterSide::End);
+    }
+    layoutFooter(foot, p.x + pad, p.r() - pad, by, bh, bgap);
+    auto at = [&](int id) {
+        for (const FooterButton& b : foot)
+            if (b.id == id) return im::flip(p, b.r);
+        return Rect();
+    };
     im::Id backId = im::makeId("##common.back");
-    bool backPressed = im::button(L("common.back"), im::flip(p, Rect(p.x + pad, by, bw, bh)), im::ButtonKind::Secondary);
-    if (im::button(L("library.open_folder"), im::flip(p, Rect(p.x + pad + bw + bgap, by, bw, bh)), im::ButtonKind::Secondary)) {
+    bool backPressed = im::button(L("common.back"), at(kBack), im::ButtonKind::Secondary);
+    if (hasFolder && im::button(L("library.open_folder"), at(kFolder), im::ButtonKind::Secondary)) {
         archive::makeFolder(s.folder);
         if (!plat::openInFileManager(s.folder)) notify(T("library.open_failed"));
     }
-    const bool canReplay = detailsShown;
-    {
+    const bool canOpen = detailsShown;
+    bool paste = false;
+    bool canDelete = false;
+    if (analysis) {
+        paste = im::button(L("analysis.menu.paste"), at(kPaste), im::ButtonKind::Secondary);
+        if (signedIn && im::button(L("analysis.menu.online"), at(kOnline), im::ButtonKind::Secondary)) onlineGames = true;
+        if (im::button(L("analysis.menu.analyse"), at(kAnalyse), im::ButtonKind::Primary, canOpen)) open = true;
+    } else {
         // Save as GIF, between Open folder and Delete: the server draws it, so it needs an account of
         // an online server signed in (the disabled button's tooltip says so), and one GIF at a time.
-        const float leftEnd = p.x + pad + 2.0f * bw + bgap, rightStart = p.r() - pad - 2.0f * bw - bgap;
-        const float gw = std::min(bw, rightStart - leftEnd - 2.0f * bgap);
-        const Rect gifR = im::flip(p, Rect((leftEnd + rightStart) * 0.5f - gw * 0.5f, by, gw, bh));
-        const bool signedIn = se.signedIn() || se.hasSavedSession();   // signed in on an earlier run too
+        const Rect gifR = at(kGif);
         bool pressed = false;
         if (!signedIn) {
             im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.sign_in_first"), p);
@@ -1080,28 +1223,44 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 if (debugPress) se.runMock(4000);  // the fake server's answer and the file, this frame
             }
         }
+        // A game of a file of several games cannot be deleted from here: Delete says so when pressed
+        // (a disabled button could not explain it).
+        canDelete = cur && !cur->fileError;
+        if (im::button(L("library.delete"), at(kDelete), im::ButtonKind::Secondary, canDelete)) askDelete = true;
+        if (askDelete && canDelete && !cur->removable() && !s.confirmDelete) {
+            notify(i18n::trn("library.delete.several", cur->games), 5.0f);
+            askDelete = false;
+        }
+        analyse = im::button(L("analysis.menu.analyse"), at(kAnalyse), im::ButtonKind::Secondary, canOpen);
+        if (im::button(L("library.replay"), at(kReplay), im::ButtonKind::Primary, canOpen)) open = true;
     }
-    // A game of a file of several games cannot be deleted from here: Delete says so when pressed
-    // (a disabled button could not explain it).
-    const bool canDelete = cur && !cur->fileError;
-    if (im::button(L("library.delete"), im::flip(p, Rect(p.r() - pad - 2.0f * bw - bgap, by, bw, bh)), im::ButtonKind::Secondary, canDelete))
-        askDelete = true;
-    if (askDelete && canDelete && !cur->removable() && !s.confirmDelete) {
-        notify(i18n::trn("library.delete.several", cur->games), 5.0f);
-        askDelete = false;
-    }
-    if (im::button(L("library.replay"), im::flip(p, Rect(p.r() - pad - bw, by, bw, bh)), im::ButtonKind::Primary, canReplay))
-        replay = true;
     im::setDefaultFocus(defaultFocus ? defaultFocus : backId);
     im::popId();
     gfx::popAlpha();
     if (s.confirmDelete) im::popBlock();
 
-    if (replay && canReplay && !s.confirmDelete) {
+    if (analysis && open) analyse = true;   // the Analysis page's main action
+    if (!s.confirmDelete && canOpen && analyse) {
         setup.replay.path = cur->path;
         setup.replay.game = cur->index;
+        setup.replay.pgn.clear();
+        LOGI("%s: analyse %s, game %d", analysis ? "analysis" : "library", cur->file.c_str(), cur->index + 1);
+        act = MenuAction::StartAnalysis;
+    } else if (!s.confirmDelete && canOpen && open) {
+        setup.replay.path = cur->path;
+        setup.replay.game = cur->index;
+        setup.replay.pgn.clear();
         LOGI("library: replay %s, game %d", cur->file.c_str(), cur->index + 1);
         act = MenuAction::StartReplay;
+    }
+    if (paste && act == MenuAction::None) {
+        std::string pgn;
+        if (pastedGame(s.debugClipboardSet ? s.debugClipboard : plat::clipboardText(), pgn)) {
+            setup.replay.path.clear();
+            setup.replay.game = 0;
+            setup.replay.pgn = std::move(pgn);
+            act = MenuAction::StartAnalysis;
+        }
     }
     if (askDelete && canDelete && cur->removable() && !s.confirmDelete) {
         s.confirmDelete = true;
@@ -1152,6 +1311,17 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     return act;
 }
 
+}  // namespace
+
+MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
+    bool onlineGames = false;
+    return gamesPage(setup, t, opened, back, false, onlineGames);
+}
+
+MenuAction analysisPage(LibrarySetup& setup, float t, bool opened, bool& back, bool& onlineGames) {
+    return gamesPage(setup, t, opened, back, true, onlineGames);
+}
+
 void libraryShutdown() {
     LibraryState& s = lib();
     if (!s.pending.valid()) return;
@@ -1164,6 +1334,10 @@ void libraryShutdown() {
 
 namespace debug {
 void libraryGif() { lib().debugGif = true; }
+void setClipboard(const std::string& text) {
+    lib().debugClipboardSet = true;
+    lib().debugClipboard = text;
+}
 }  // namespace debug
 
 }  // namespace ui

@@ -498,7 +498,7 @@ std::string Catalog::renderArg(Ctx& c, const Arg& a, const std::string& form) co
 std::string Catalog::renderPiece(Ctx& c, const Arg& a, const std::string& form) const {
     std::string type = pieceName(a.piece);
     if (type.empty()) return std::string();
-    std::string owner = a.own ? "your" : "my";
+    std::string owner = a.bySide ? (a.color == chess::White ? "white" : "black") : a.own ? "your" : "my";
     std::string f = form.empty() ? "nom" : form;
     Ctx local = c;
     local.en = c.L;   // grammar never mixes languages: fall back to the nominative of this language

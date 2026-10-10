@@ -53,6 +53,35 @@ struct CoachMark {
     float age = 0.0f;             // seconds since the mark appeared (drives its arrival and pulse)
 };
 
+// Analysis mode: what the review shows on the board (World::submitAnalysisMarks,
+// shaders/materials/analysis_marker.glsl). Semi-transparent, in the symbol's colour
+// (analysis::nagColor), no shadows, not reflected:
+//   Tint:  a soft wash of colour over square 'sq' (the destination of the move judged), with a
+//          thin brighter rim, fading in over 0.3 s.
+//   Arrow: a broad flat arrow on the board from 'from' to 'to' (through the centre of 'via' for a
+//          knight's L), drawn from its start to its tip in 0.35 s: the better move (green). It
+//          starts at the edge of the piece on 'from' and stops short of the centre of 'to'.
+//   Badge: the "pastille": a round semi-transparent disc in the symbol's colour bearing the
+//          symbol (glyph: "!!", "!", "!?", "?!", "?", "??", drawn in the shader), standing upright and
+//          always facing the camera (a billboard), hovering at the corner of square 'sq' above the
+//          height of the tallest piece's shoulder, about 22 mm across; it pops in (scale 0.6 -> 1
+//          with a small overshoot over 0.25 s). Depth-tested against the scene like any object.
+struct AnalysisMark {
+    enum Kind { Tint, Arrow, Badge } kind = Tint;
+    chess::Square sq = chess::NoSquare;                                                // Tint, Badge
+    chess::Square from = chess::NoSquare, via = chess::NoSquare, to = chess::NoSquare;  // Arrow
+    int glyph = 0;                // Badge: the symbol as analysis::Nag (1 ! 2 ? 3 !! 4 ?? 5 !? 6 ?!)
+    m::vec3 color{1, 1, 1};       // linear RGB (analysis::nagColor / betterMoveColor)
+    float strength = 1.0f;        // [0,1]; animate it for the fade in and out
+    float age = 0.0f;             // seconds since the mark appeared (its arrival)
+};
+
+// --analysis-marks-test (game_scene.h): a fixed set of the review's marks (the ?? badge and tint
+// on e5, a dark square, the !! badge and tint on f3, a light one, the four other badges on c4,
+// d4, g1 and b8, the better move's arrows d2-d4 and b1-c3 through b3), 'seconds' after the first
+// appeared; the others follow it 0.15 s apart.
+std::vector<AnalysisMark> analysisMarksTestSet(float seconds);
+
 class World {
 public:
     World();
@@ -107,6 +136,11 @@ public:
     void submitPieces(render::Renderer& r, const PhysicalBoard& board, const std::vector<PieceHighlight>* highlights);
     // Squares and arrows the coach shows, after the pieces (any number; strength 0 skips a mark).
     void submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& marks);
+
+    // ---- Analysis mode ----------------------------------------------------------------------------
+    // The review's marks, after the pieces (any number; strength 0 skips a mark). The badges face
+    // 'camera' (the view's position this frame).
+    void submitAnalysisMarks(render::Renderer& r, const std::vector<AnalysisMark>& marks, const m::vec3& camera);
 
 private:
     struct Impl;

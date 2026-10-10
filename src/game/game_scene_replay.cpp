@@ -238,8 +238,10 @@ void GameScene::setReplayPosition(int ply) {
     newScoresheets();
     scorekeeper_.setDetails(replaySheetDetails());
     scorekeeper_.writeHeaderInstantly();
+    // An analysis: the whole game is on the sheets, wherever the board stands.
     std::vector<std::string> sheetMoves(size_t(replaySheetOffset()), std::string("..."));
-    sheetMoves.insert(sheetMoves.end(), game_.sanMoves().begin(), game_.sanMoves().end());
+    const std::vector<std::string>& written = analysing() ? analysedMoves() : game_.sanMoves();
+    sheetMoves.insert(sheetMoves.end(), written.begin(), written.end());
     if (!sheetMoves.empty()) scorekeeper_.writeMovesInstantly(sheetMoves);
     // The lever is down on the side of the player who moved last.
     Color moved = opposite(game_.position().sideToMove());
@@ -251,7 +253,7 @@ void GameScene::setReplayPosition(int ply) {
         stateTime_ = 0.0f;
         gameOverShown_ = endHandshakeDone_ = false;
     }
-    scorekeeper_.startRecording();
+    if (!analysing()) scorekeeper_.startRecording();
     turn_ = Turn::None;
     beginTurn();
     if (followEyes_) {

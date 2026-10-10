@@ -34,10 +34,13 @@ void serverLine(const gfx::Rect& p, bool showConnection);
 // A form row of the panel at y (advanced to the next row), 'inset' from both sides.
 gfx::Rect formRow(const gfx::Rect& p, float& y, float inset = 90.0f);
 // The footer: Back on the start side, the primary action on the end side, a rule above them.
+// The primary action is the page's submit button (Enter in its last text field, im::ITEM_SUBMIT)
+// unless 'submit' is false (another button of the page sends what its field holds).
 constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
 float footerY(const gfx::Rect& p);
 bool backButton(const gfx::Rect& p, const char* key = "common.back", bool enabled = true);
-bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW);
+bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW,
+                   bool submit = true);
 void footerRule(const gfx::Rect& p);
 // A quiet link-like button centered at cx.
 bool linkButton(const char* key, float cx, float y, bool enabled = true);
@@ -71,7 +74,8 @@ enum class AccountNav {
 
 // One frame of an account page. t = appearance, fresh = first frame on it. 'library' is the saved
 // games folder of the menu (nullptr / empty folder: no Save nor Replay); Replay fills
-// library->replay and sets 'act' to StartReplay. note: a line for the page navigated to.
+// library->replay and sets 'act' to StartReplay, Analyse fills library->replay.pgn (nullptr: no
+// Analyse) and sets it to StartAnalysis. note: a line for the page navigated to.
 AccountNav accountPage(AccountPage page, float t, bool fresh, LibrarySetup* library, MenuAction& act, std::string& note);
 // Every frame of the online page, before its sub-page: takes the answers the account pages wait
 // for (they arrive on any page). current: the account page shown, nullptr on the others. SignIn
@@ -80,9 +84,9 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
 // Entering the account pages from the account page (forms and messages emptied).
 void accountReset(AccountPage page);
 // Viewer: the page in a given state ("history", "game", "game-gif" (its GIF saved), "game-gif-making",
-// "game-saving" (its PGN on the way), "game-saved" (its PGN written to the saved games), "devices",
-// "email", "email-sent", "export", "export-done", "delete"), its data fetched from the in-process
-// fake server.
+// "game-saving" (its PGN on the way), "game-saved" (its PGN written to the saved games),
+// "game-analysing" (Analyse pressed: its PGN on the way), "devices", "email", "email-sent",
+// "export", "export-done", "delete"), its data fetched from the in-process fake server.
 bool accountDebugOpen(const std::string& sub, AccountPage& page);
 
 }  // namespace onl

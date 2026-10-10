@@ -84,10 +84,12 @@ std::vector<std::string> parityProblems(const Catalog& c, const std::string& lan
 }
 
 // Every form a language's sentences ask for must exist: a counted noun (count.<form>), an opening
-// form (opening.*.<form>), or a piece form that resolves for all six pieces and both owners.
+// form (opening.*.<form>), or a piece form that resolves for all six pieces and both owners. The
+// Analysis mode names a piece by its side (Arg::ofSidePiece): every form its lines ask for, the
+// nominative included, must also resolve for the owners "white" and "black".
 std::vector<std::string> formProblems(const Catalog& c, const std::string& lang) {
     std::vector<std::string> out;
-    std::set<std::string> forms, openingForms;
+    std::set<std::string> forms, sideForms, openingForms;
     for (const std::string& topic : c.topics(lang)) {
         for (const std::string& k : c.keys(lang, topic)) {
             if (topic == "openings") {
@@ -96,26 +98,32 @@ std::vector<std::string> formProblems(const Catalog& c, const std::string& lang)
                 continue;
             }
             for (auto& p : placeholders(*c.find(lang, k)))
-                for (auto& f : p.second)
+                for (auto& f : p.second) {
                     if (!f.empty()) forms.insert(f);
+                    if (topic == "analysis") sideForms.insert(f.empty() ? "nom" : f);
+                }
         }
     }
     static const char* const kTypes[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
-    for (const std::string& f : forms) {
-        if (c.has(lang, "count." + f) || openingForms.count(f) || f == "letters") continue;
-        std::string missing;
-        for (std::string owner : {"your", "my"}) {
-            for (std::string type : kTypes) {
-                if (c.has(lang, "phrase." + owner + "." + type + "." + f)) continue;
-                const std::string* g = c.find(lang, "piece." + type + ".gender");
-                bool noun = c.has(lang, "piece." + type + "." + f);
-                bool pat = c.has(lang, "owner." + owner + "." + f) ||
-                           (g && c.has(lang, "owner." + owner + "." + f + "." + *g));
-                if (!noun || !pat) missing = owner + " " + type;
+    auto check = [&](const std::set<std::string>& fs, std::initializer_list<const char*> owners) {
+        for (const std::string& f : fs) {
+            if (c.has(lang, "count." + f) || openingForms.count(f) || f == "letters") continue;
+            std::string missing;
+            for (std::string owner : owners) {
+                for (std::string type : kTypes) {
+                    if (c.has(lang, "phrase." + owner + "." + type + "." + f)) continue;
+                    const std::string* g = c.find(lang, "piece." + type + ".gender");
+                    bool noun = c.has(lang, "piece." + type + "." + f);
+                    bool pat = c.has(lang, "owner." + owner + "." + f) ||
+                               (g && c.has(lang, "owner." + owner + "." + f + "." + *g));
+                    if (!noun || !pat) missing = owner + " " + type;
+                }
             }
+            if (!missing.empty()) out.push_back(lang + ": form '" + f + "' is missing for " + missing);
         }
-        if (!missing.empty()) out.push_back(lang + ": form '" + f + "' is missing for " + missing);
-    }
+    };
+    check(forms, {"your", "my"});
+    check(sideForms, {"white", "black"});
     return out;
 }
 

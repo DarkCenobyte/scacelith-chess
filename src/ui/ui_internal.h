@@ -68,7 +68,8 @@ namespace debug {
 // Same order as the menu's own page list (cast by value): new pages go at the end.
 enum class MenuPage {
     Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6, Coach = 7, Licences = 8,
-    Library = 9  // "Saved games" (needs a LibrarySetup::folder)
+    Library = 9,  // "Saved games" (needs a LibrarySetup::folder)
+    Analysis = 10
 };
 void openMenuPage(MenuPage page);   // next mainMenu() call starts on this page
 // Next mainMenu() call starts on the online page's sub-page 'sub' (see debug::openOnlinePage).
@@ -80,6 +81,9 @@ void showModelLicence();            // the next modelPrompt() opens on the licen
 // The next frame of Saved games with a game shown presses its Save as GIF (signed in to the
 // in-process fake server with a virtual clock: the GIF is made and written before that frame ends).
 void libraryGif();
+// The Analysis page's Paste a PGN reads this text instead of the system clipboard (the X11 layer
+// has none).
+void setClipboard(const std::string& text);
 }  // namespace debug
 
 }  // namespace ui

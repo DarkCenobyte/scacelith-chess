@@ -286,13 +286,16 @@ float subtitleDuration(const std::string& text, float audioSeconds) {
 
 void subtitles(const Subtitle& s) {
     // The last line stays while it fades out after the game cleared it.
-    static std::string last;
-    static float lastBottom = 0.0f, shown = 0.0f;
+    static std::string last, lastTag;
+    static float lastBottom = 0.0f, lastLeft = 0.0f, lastRight = 0.0f, shown = 0.0f;
     static bool lastSpeaker = true;
     if (!s.text.empty()) {
         last = s.text;
         lastBottom = s.bottom;
         lastSpeaker = s.speaker;
+        lastTag = s.tag;
+        lastLeft = s.spanLeft;
+        lastRight = s.spanRight;
         float in = m::saturate(s.age / 0.18f);
         float out = s.duration > 0.0f ? m::saturate((s.duration + 0.35f - s.age) / 0.35f) : 1.0f;
         shown = ease(in) * ease(out);
@@ -304,8 +307,11 @@ void subtitles(const Subtitle& s) {
     vec2 v = gfx::viewSize();
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_OVERLAY);
+    // Centred in the span given (the analysis: between its bar and its panel), else the window.
+    const bool span = lastRight > lastLeft + 1.0f;
+    const float left = span ? lastLeft : 0.0f, right = span ? lastRight : v.x;
     // Two lines at most: a longer text is set smaller (the coach's lines are written to fit).
-    float maxW = std::min(1100.0f, v.x - 240.0f);
+    float maxW = std::max(300.0f, std::min(1100.0f, right - left - (span ? 180.0f : 240.0f)));
     TextStyle ts = style(font::FACE_TEXT, 31.0f, withAlpha(ivory, a), HAlign::Center);
     int lines = gfx::wrapLineCount(last, maxW, ts);
     if (lines > 2) {
@@ -316,11 +322,11 @@ void subtitles(const Subtitle& s) {
     float textW = gfx::wrapWidth(last, maxW, ts);
     float pw = std::max(420.0f, textW + 160.0f), ph = float(lines) * lh + 34.0f;
     float bottom = lastBottom > 0.0f ? lastBottom : v.y - 96.0f;
-    Rect plate(v.x * 0.5f - pw * 0.5f, bottom - ph + (1.0f - a) * 6.0f, pw, ph);
+    Rect plate((left + right) * 0.5f - pw * 0.5f, bottom - ph + (1.0f - a) * 6.0f, pw, ph);
     // The band of the notifications: a dark core fading at both ends, two gold hairlines.
     band(plate, a, 0.74f, std::min(0.22f, 140.0f / pw));
     if (lastSpeaker) {  // "COACH", as printed on the robot's torso, set into the top hairline
-        std::string tag = T("coach.speaker");
+        std::string tag = lastTag.empty() ? T("coach.speaker") : lastTag;
         // Capitals carry the Latin and Cyrillic tag at 16; Arabic and CJK, without them, need more.
         bool caps = true;
         for (char32_t c : uni::decode(tag))

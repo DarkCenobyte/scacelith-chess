@@ -81,6 +81,7 @@ enum ItemFlags : uint32_t {
     ITEM_HORIZONTAL = 1u << 2,  // consumes Left/Right while focused (sliders, steppers, selectors)
     ITEM_SILENT = 1u << 3,      // no hover sound
     ITEM_MOUSE_ONLY = 1u << 4,  // never takes keyboard focus (HUD buttons: Space/Enter belong to the game)
+    ITEM_SUBMIT = 1u << 5,      // the page's submit button: Enter in its last text field activates it
 };
 
 // ---- Reading direction ------------------------------------------------------------------------------
@@ -138,6 +139,10 @@ bool selectorRow(const std::string& label, int& index, const std::vector<std::st
                  bool enabled = true);
 // Single-line text input row (label, then an edit box). Click the box or press Enter on the row to
 // type; Enter or Tab keeps the text, Esc restores it, and moving the focus away ends the edit.
+// The text fields of a page (those drawn enabled, outside a blocked layer, in drawing order) form
+// one form: Tab goes to the next one and starts its edit (Shift+Tab the previous one, wrapping
+// around; with no field being edited, the one after the focused item, or the first), Enter goes
+// to the next one too, and in the last one submits the page: its ITEM_SUBMIT button activates.
 // Editing: typed Unicode text (IME results included), caret by mouse, Left/Right (visual
 // order), Home/End, Backspace/Delete, Ctrl+V. maxChars counts characters (codepoints).
 // textStyle (optional) draws the text, e.g. in a handwriting; the box is sized from the row.

@@ -1,0 +1,152 @@
+# Coach speech: the commentary of the Analysis mode (src/analysis/commentary.cpp), said by the voice
+# and shown as subtitles while a finished game is replayed. German. Every language has exactly the
+# English keys (and the same variants). Read the header of en/analysis.lang for the placeholders.
+#
+# German notes:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "du" or "ich" here: the players are "Weiß" and "Schwarz" (as assets/i18n/de.lang).
+#   A piece comes with its side: {piece} {t1} {t2} = "der weiße Springer", "die schwarze Dame";
+#   cases from common.lang: {piece:acc} "den weißen Springer", {t1:dat}, {piece:gen}.
+# - No pronoun refers back to a {piece}/{t1}/{t2} (er/sie/ihn depend on the piece): the lines
+#   rephrase ("schlägt zu", "greift zu").
+# - No piece placeholder starts a full sentence after a colon (the program capitalises a piece only
+#   after . ! ?): such sentences use a full stop instead.
+# - Numbers before a noun use the count forms of common.lang: {m:move_dat} "in drei Zügen",
+#   {pts:point_acc} "einen Punkt", {n:mistake_acc} "einen Fehler", {acc_white:percent} "87 Prozent".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Schauen wir uns diese Partie gemeinsam an.
+an.start.2 = Gehen wir diese Partie Zug für Zug durch.
+an.start.3 = Hier ist die Partie. Sehen wir, wie sie verlaufen ist.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Diese Partie beginnt in einer aufgebauten Stellung. Gehen wir sie durch.
+an.start.setup.2 = Eine Partie aus einer aufgebauten Stellung. Sehen wir, wie sie verlaufen ist.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Die Eröffnung ist {opening:def}.
+an.opening.2 = Das ist {opening:def}.
+an.book_exit = Mit {move} verlässt die Partie die bekannte Eröffnungstheorie.
+an.book_exit.2 = {move} ist der erste Zug außerhalb der Theorie.
+an.book_exit.3 = Hier endet die Eröffnungstheorie, mit {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} ist ein grober Fehler.
+an.blunder.2 = Hier ist {move} ein schwerer Fehler.
+an.blunder.3 = Ein Patzer: {move}.
+an.mistake = {move} ist ein Fehler.
+an.mistake.2 = {move} ist hier nicht der richtige Zug.
+an.mistake.3 = Ein Fehler: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} verpasst die Chance, diesen Fehler zu bestrafen.
+an.missed_chance.2 = Mit {move} ist die Chance vertan.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Jetzt ist {reply} matt.
+an.mate_allowed.one.2 = Das erlaubt {reply}, und das ist matt.
+an.mate_allowed = Das erlaubt ein forciertes Matt in {m:move_dat}, beginnend mit {reply}.
+an.mate_allowed.2 = Jetzt gibt es ein forciertes Matt in {m:move_dat}, mit {reply} als erstem Zug.
+an.fork = Jetzt gabelt {reply} {t1:acc} und {t2:acc}.
+an.fork.2 = Das erlaubt {reply}, mit einem Angriff auf {t1:acc} und {t2:acc} zugleich.
+an.fork.3 = {reply} trifft {t1:acc} und {t2:acc} gleichzeitig.
+an.hanging = Das lässt {piece:acc} ungedeckt, und {reply} greift zu.
+an.hanging.2 = {piece} steht ohne Verteidiger da. {reply} nimmt das Geschenk an.
+an.hanging.3 = {reply} holt sich einfach {piece:acc}. Es gab keinen Verteidiger.
+an.material = Die Antwort {line} gewinnt {pts:point_acc} an Material.
+an.material.2 = Danach gewinnt {line} {pts:point_acc}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Mit {best} war es matt.
+an.mate_missed.one.2 = {best} wäre matt gewesen.
+an.mate_missed = {best} hätte Matt in {m:move_dat} erzwungen.
+an.mate_missed.2 = Es gab ein forciertes Matt in {m:move_dat}, beginnend mit {best}.
+an.missed_capture = {best} hätte {piece:acc} umsonst gewonnen.
+an.missed_capture.2 = {piece} hatte keinen Verteidiger. {best} hätte zugegriffen.
+an.missed_fork = {best} hätte {t1:acc} und {t2:acc} gegabelt.
+an.missed_fork.2 = {best} war eine Gabel gegen {t1:acc} und {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = {best} war stärker.
+an.better.2 = Besser war {best}.
+an.better.3 = Die Engine bevorzugt {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} ist brillant: Der Zug opfert {piece:acc}!
+an.brilliant.2 = Ein brillantes Opfer! {move} bietet {piece:acc} an.
+an.brilliant.3 = {move}! Ein brillanter Zug, der {piece:acc} anbietet.
+an.brilliant.mate = Das führt zu einem forcierten Matt in {m:move_dat}.
+an.brilliant.mate.2 = Und das erzwingt Matt in {m:move_dat}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} ist der einzige Zug, der den Vorteil hält.
+an.only.win.2 = Nur {move} behält hier den Vorteil. Gut gefunden.
+an.only.hold = {move} ist der einzige Zug, der das Gleichgewicht hält.
+an.only.hold.2 = Nur {move} hält hier die Stellung.
+an.only.defend = {move} ist der einzige Zug, der den Kampf am Leben hält.
+an.only.defend.2 = Nur {move} hält die Partie hier offen. Gute Verteidigung.
+an.only.best = {move} ist hier mit Abstand der stärkste Zug.
+an.only.best.2 = Präzise: {move} ist viel stärker als alles andere.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} ist etwas ungenau: {best} war präziser.
+an.inaccuracy.2 = Nicht ganz der beste Zug: {best} war genauer als {move}.
+an.interesting = {move} ist eine interessante Idee, die {piece:acc} anbietet.
+an.interesting.2 = Ein interessanter Versuch: {move} gibt {piece:acc} her.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Weiß hat jetzt ein forciertes Matt in {m:move_dat}.
+an.mate_on.white.2 = Ab hier kann Weiß Matt in {m:move_dat} erzwingen.
+an.mate_on.black = Schwarz hat jetzt ein forciertes Matt in {m:move_dat}.
+an.mate_on.black.2 = Ab hier kann Schwarz Matt in {m:move_dat} erzwingen.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Schachmatt. Weiß gewinnt die Partie.
+an.end.mate.white.2 = Und das ist schachmatt: Weiß gewinnt.
+an.end.mate.black = Schachmatt. Schwarz gewinnt die Partie.
+an.end.mate.black.2 = Und das ist schachmatt: Schwarz gewinnt.
+an.end.resigned.white = Schwarz hat aufgegeben, also gewinnt Weiß die Partie.
+an.end.resigned.white.2 = Hier endet die Partie: Schwarz gibt auf, und Weiß gewinnt.
+an.end.resigned.black = Weiß hat aufgegeben, also gewinnt Schwarz die Partie.
+an.end.resigned.black.2 = Hier endet die Partie: Weiß gibt auf, und Schwarz gewinnt.
+an.end.timeout.white = Schwarz hat die Zeit überschritten, also gewinnt Weiß.
+an.end.timeout.white.2 = Weiß gewinnt auf Zeit.
+an.end.timeout.black = Weiß hat die Zeit überschritten, also gewinnt Schwarz.
+an.end.timeout.black.2 = Schwarz gewinnt auf Zeit.
+an.end.win.white = Die Partie endet mit einem Sieg für Weiß.
+an.end.win.white.2 = Weiß gewinnt die Partie.
+an.end.win.black = Die Partie endet mit einem Sieg für Schwarz.
+an.end.win.black.2 = Schwarz gewinnt die Partie.
+an.end.stalemate = Patt: Die Partie endet remis.
+an.end.stalemate.2 = Das ist Patt, also endet die Partie remis.
+an.end.draw.agreement = Die Spieler haben sich auf Remis geeinigt.
+an.end.draw.agreement.2 = Die Partie endet remis durch Vereinbarung.
+an.end.draw.repetition = Die Partie endet remis durch Stellungswiederholung.
+an.end.draw.repetition.2 = Dieselbe Stellung ist wieder da: Remis.
+an.end.draw.fifty = Die Partie endet remis nach der Fünfzig-Züge-Regel.
+an.end.draw.fifty.2 = Fünfzig Züge ohne Schlagen und ohne Bauernzug: Remis.
+an.end.draw.seventy_five = Die Partie endet remis nach der Fünfundsiebzig-Züge-Regel.
+an.end.draw.seventy_five.2 = Fünfundsiebzig Züge ohne Schlagen und ohne Bauernzug: Remis.
+an.end.draw.material = Ein Matt ist nicht mehr möglich: Die Partie endet remis.
+an.end.draw.material.2 = Keine Seite kann mehr mattsetzen, also ist es remis.
+an.end.draw = Die Partie endet remis.
+an.end.draw.2 = Remis.
+an.end.unfinished = Die Partie bricht hier ab, ohne Ergebnis.
+an.end.unfinished.2 = Hier hört die Partie auf: Sie wurde nicht zu Ende gespielt.
+an.end.accuracy = Genauigkeit: {acc_white:percent} für Weiß, {acc_black:percent} für Schwarz.
+an.end.accuracy.2 = Weiß spielte mit {acc_white:percent} Genauigkeit, Schwarz mit {acc_black:percent}.
+an.end.clean.white = Weiß hat weder Fehler noch grobe Fehler gemacht.
+an.end.clean.white.2 = Das Spiel von Weiß blieb frei von ernsten Fehlern.
+an.end.clean.black = Schwarz hat weder Fehler noch grobe Fehler gemacht.
+an.end.clean.black.2 = Das Spiel von Schwarz blieb frei von ernsten Fehlern.
+an.end.mistakes.white = Weiß hat {n:mistake_acc} gemacht, aber keinen groben Fehler.
+an.end.mistakes.white.2 = Für Weiß: {n:mistake}, kein grober Fehler.
+an.end.mistakes.black = Schwarz hat {n:mistake_acc} gemacht, aber keinen groben Fehler.
+an.end.mistakes.black.2 = Für Schwarz: {n:mistake}, kein grober Fehler.
+an.end.blunders.white = Weiß hat {m:blunder_acc} gemacht.
+an.end.blunders.white.2 = Für Weiß: {m:blunder}.
+an.end.blunders.black = Schwarz hat {m:blunder_acc} gemacht.
+an.end.blunders.black.2 = Für Schwarz: {m:blunder}.
+an.end.errors.white = Weiß hat {n:mistake_acc} und {m:blunder_acc} gemacht.
+an.end.errors.white.2 = Für Weiß: {n:mistake} und {m:blunder}.
+an.end.errors.black = Schwarz hat {n:mistake_acc} und {m:blunder_acc} gemacht.
+an.end.errors.black.2 = Für Schwarz: {n:mistake} und {m:blunder}.

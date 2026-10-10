@@ -95,7 +95,12 @@ enum class MenuAction {
     Report,         // online: report the opponent (Esc menu, game over card)
     StartCoach,     // Coach page: Start (the CoachSetup holds the choice)
     TakeBack,       // coach game, Esc menu: take back the player's last move
-    StartReplay     // "Saved games" page: Replay (LibrarySetup::replay holds the game)
+    StartReplay,    // "Saved games" page: Replay (LibrarySetup::replay holds the game)
+    // Analysis of a game: from the Analysis page, the Saved games page or a game of the online
+    // history (LibrarySetup::replay holds the game: a file, or the PGN text itself), and from the
+    // game over card of a game just played ("Analyse the game", GameOverExtras::analyse: the
+    // scene analyses the game it holds)
+    StartAnalysis
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -117,7 +122,8 @@ int promotionPicker(bool playerIsWhite);
 // Transient message (arbiter, "Draw offer declined", ...), shown for 'seconds'.
 void notify(const std::string& message, float seconds = 3.0f);
 void drawNotifications();
-// End of game card: result line ("1-0", "½-½"), reason, move count. Returns Rematch or BackToMainMenu.
+// End of game card: result line ("1-0", "½-½"), reason, move count. Returns Rematch or BackToMainMenu
+// (and StartAnalysis, Report with the extras below).
 // The card can be folded away by the player to look at the final position.
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount = -1);
 // Additions to the end of game card.
@@ -127,6 +133,9 @@ struct GameOverExtras {
     std::string primaryLabel;  // replaces "Rematch" (watched game: "Watch again")
     bool primaryDisabled = false;  // online: rematch requested / declined
     std::string reportLabel;   // online: quiet "Report opponent" button (returns Report), "" = none
+    // "Analyse the game" (returns StartAnalysis): a game just played (against Stockfish, the
+    // coach, on one PC, online). Choosing it declines the rematch.
+    bool analyse = false;
 };
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount,
                     const GameOverExtras& extras);
@@ -139,8 +148,10 @@ bool optionsOpen();
 // stores the brightness in game::settings(), Esc keeps the stored one; both complete it
 // (Settings::brightnessCalibrated), save the .ini and go on to the title page.
 void openBrightnessCalibration();
-// The next mainMenu() call opens on the "Saved games" page (back from a replay); on the title page
-// when that call has no library.
+// The next mainMenu() call opens on the page the last replay or analysis was chosen on: the
+// "Saved games" page, the Analysis page, or the online history's game (back from a replay or an
+// analysis); on the title page when that call has no library for the "Saved games" page, or after
+// an analysis chosen on the game over card.
 void openSavedGames();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
@@ -162,6 +173,9 @@ struct ViewerHud {
     float speedAge = 1e9f;       // seconds since the speed changed
     bool replay = false;         // a saved game replayed: its keys head the controls hint, and the
                                  // labels above leave room for its bar (replayBar)
+    bool analysis = false;       // a game analysed (analysisHud): no players' labels (its panel
+                                 // names them), the controls hint right of its evaluation bar and
+                                 // headed by the analysis keys
 };
 void viewerHud(const ViewerHud& hud);
 
@@ -234,6 +248,11 @@ struct Subtitle {
     float bottom = 0.0f;         // lowest y the plate may use (reference px); 0 = 96 above the bottom
                                  // edge. Pass v.y - 110 while the folded game over bar is shown.
     bool speaker = true;         // "COACH" tag above the text
+    std::string tag;             // replaces the "COACH" tag ("" = coach.speaker); the analysis
+                                 // passes analysis.hud.speaker
+    // The horizontal span the plate centres in and wraps its text to (reference px): the analysis
+    // passes AnalysisHudResult::freeLeft / freeRight. Both 0 = the window.
+    float spanLeft = 0.0f, spanRight = 0.0f;
 };
 void subtitles(const Subtitle& s);
 // How long a subtitle should stay: the audio length or the time needed to read the text,
@@ -310,6 +329,9 @@ void setCoachEntryHook(std::function<void()> hook);
 struct ReplaySetup {
     std::string path;            // the .pgn file
     int game = 0;                // the game's index in the file (0 = the first)
+    // StartAnalysis only: the PGN text of the game when it comes from no file (a game of the
+    // online history, a PGN pasted on the Analysis page); 'path' is then empty.
+    std::string pgn;
 };
 struct LibrarySetup {
     std::string folder;          // the pgn folder (plat::appDataDirectory() + "pgn/"); "" = no
@@ -326,8 +348,76 @@ struct LibrarySetup {
 // The "Watch a Game" entry fills 'watch' (returns StartWatching on its Start), the "Coach" entry
 // fills 'coach' (returns StartCoach on its Start; see CoachSetup), and the "Saved games" entry
 // returns StartReplay on Replay ('library.replay' then names the game; no such entry when
-// library.folder is empty).
+// library.folder is empty). The "Analysis" entry (after "Saved games") opens the Analysis page:
+// the saved games to choose from, a PGN pasted from the clipboard, the online history when signed
+// in; its Analyse returns StartAnalysis ('library.replay' names the game, or holds its PGN text).
+// The Saved games page and the online history's game page have an Analyse button too.
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library);
+
+// ---- Analysis mode (ui_analysis.cpp) ------------------------------------------------------------
+// The overlay of a game being analysed, over the 3D table (the viewer's camera keys still move
+// the view; the HUD is mouse driven, the keyboard is the game's):
+//   - left edge: the evaluation bar, the whole height of the window but its margins, White's part
+//     light and Black's dark, the boundary gliding to each new value, the figure ("+1.3", "M3")
+//     written at the end of the side that leads;
+//   - right edge: a panel with the players, the result and the opening, the move list (numbered
+//     rows, White's and Black's moves side by side, figurine notation, each move followed by its
+//     symbol in the symbol's colour; the move that led to the position on the board highlighted
+//     and kept in view; the wheel scrolls it; a click on a move goes to the position after it).
+//     Every move's cell carries, very discreetly in its background, the evaluation bar as it stood
+//     after that move: its light and dark parts and their boundary, in the same orientation;
+//   - under the list: the review's summary (each side's accuracy and its ??, ?, ?! counts) once
+//     known, the review's progress while it runs, and the controls: start, one move back,
+//     play / pause, one move forward, end, then the toggles of the comments, of the voice and of
+//     the arrows (icon buttons with tooltips naming their keys).
+struct AnalysisMove {
+    std::string san;             // SAN with English letters ("Nf3"); shown in figurines
+    int nag = 0;                 // analysis::Nag (0 none, 1 !, 2 ?, 3 !!, 4 ??, 5 !?, 6 ?!)
+    bool known = false;          // the evaluation after it is known (its cell's gauge shows)
+    float white = 0.5f;          // White's share of the bar after it (its cell's gauge)
+};
+struct AnalysisHud {
+    bool visible = true;         // H hides it with the viewer overlay
+    // The evaluation bar.
+    bool evalKnown = false;      // false: the bar shows even, without a figure
+    float evalWhite = 0.5f;      // White's share, 0..1
+    std::string evalText;        // "+1.3", "-0.4", "M3", "-M2", "1-0"
+    bool whiteBottom = true;     // White's part at the bottom (false: the player had Black)
+    // The list.
+    std::string white, black;    // the players as the record names them, with their ratings
+    std::string result;          // "1-0", "0-1", "½-½", "*"
+    std::string opening;         // the opening's name ("" = none known)
+    std::vector<AnalysisMove> moves;   // by ply
+    int firstMoveNumber = 1;     // the record's number of its first move (a FEN game: 40)
+    bool blackFirst = false;     // its first move is Black's ("40... Kd7")
+    int current = 0;             // plies on the board (0 = the start position, nothing highlighted)
+    // The summary.
+    bool summaryKnown = false;
+    double accuracy[2] = {0.0, 0.0};   // White, Black
+    int counts[2][7] = {};       // White, Black: moves by analysis::Nag
+    // The review.
+    float progress = 1.0f;       // 0..1; below 1 a line says the engine is at work
+    bool engineMissing = false;  // no engine: a line says the moves are shown without analysis
+    // The controls' state.
+    bool playing = false;        // the moves follow one another (the middle button pauses)
+    bool atStart = false, atEnd = false;   // greys start / back, forward / end
+    bool commentsOn = true;
+    bool voiceOn = true;
+    bool voiceAvailable = false; // the voice can be heard (its model is there): else its toggle is
+                                 // greyed, with a tooltip saying why
+    bool arrowsOn = true;
+};
+enum class AnalysisAction { None, GoTo, Start, Back, TogglePlay, Forward, End, ToggleComments, ToggleVoice, ToggleArrows };
+struct AnalysisHudResult {
+    AnalysisAction action = AnalysisAction::None;
+    int position = -1;           // GoTo: the position wanted (plies on the board: a click on ply i
+                                 // gives i + 1)
+    // The span between the bar (or the viewer's controls hint, when viewerHud drew it this frame)
+    // and the panel (reference px, left < right), for the subtitles (Subtitle::spanLeft /
+    // spanRight); both 0 while the HUD is hidden (the window is free).
+    float freeLeft = 0.0f, freeRight = 0.0f;
+};
+AnalysisHudResult analysisHud(const AnalysisHud& hud);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
 // Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on

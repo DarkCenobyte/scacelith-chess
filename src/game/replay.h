@@ -73,6 +73,8 @@ public:
     int64_t turnMs(int i, Speed s) const;
     // The think time the clock shows for ply i (the whole of it, even when the wait is capped).
     int64_t shownThinkMs(int i) const { return plies_[size_t(i)].thinkMs; }
+    // c's clock with 'ply' moves played (-1 = unknown).
+    int64_t clockAfter(chess::Color c, int ply) const;
     const Options& options() const { return options_; }
 
 private:
@@ -98,6 +100,9 @@ struct ClockView {
     int64_t ms[2] = {0, 0};              // White, Black
     int running = -1;                    // 0 White, 1 Black, -1 none (paused, finished, a move being set)
 };
+// Both clocks as they stood with 'ply' moves played, nothing running (the Analysis mode, whose
+// steps are no turns of the game).
+ClockView clocksAt(const Timeline& timeline, int ply);
 
 class ReplayClock {
 public:

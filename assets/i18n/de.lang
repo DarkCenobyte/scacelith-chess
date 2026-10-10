@@ -1171,6 +1171,21 @@ library.tag.UTCTime = Uhrzeit (UTC)
 library.tag.WhiteRatingDiff = Wertungsänderung Weiß
 library.tag.BlackRatingDiff = Wertungsänderung Schwarz
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyse
+analysis.menu.title = ANALYSE
+analysis.menu.analyse = Analysieren
+analysis.menu.paste = PGN einfügen
+analysis.menu.online = Meine Online-Partien
+analysis.menu.folder = Legen Sie PGN-Dateien in diesen Ordner, um sie zu analysieren: {0}
+analysis.menu.empty.title = Noch keine gespeicherten Partien
+analysis.menu.empty.text = Ihre Partien erscheinen hier, sobald sie beendet sind, ebenso die PGN-Dateien im Ordner unten. Sie können auch eine als PGN-Text kopierte Partie einfügen.
+analysis.menu.empty.no_folder = Fügen Sie eine als PGN-Text kopierte Partie ein, um sie zu analysieren.
+analysis.menu.paste.empty = Die Zwischenablage ist leer: Kopieren Sie zuerst eine Partie als PGN-Text.
+analysis.menu.paste.none = In der Zwischenablage wurde keine Schachpartie gefunden.
+analysis.menu.paste.several = Die Zwischenablage enthält mehrere Partien: Die erste wird analysiert.
+analysis.menu.gameover = Partie analysieren
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Zug {0} von {1}
 replay.speed.factor = ×{0}
@@ -1183,6 +1198,31 @@ replay.tip.pause = Pause (K)
 replay.tip.resume = Fortsetzen (K)
 replay.tip.forward = Einen Zug vor (L)
 replay.tip.end = Ende der Partie (Ende)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAR
+analysis.hud.accuracy = GENAUIGKEIT
+analysis.hud.reviewing = Stockfish analysiert die Partie… {0}
+analysis.hud.no_engine = Keine Schach-Engine: Die Züge werden ohne Analyse gezeigt.
+analysis.hud.no_moves = Diese Partie enthält keine Züge.
+analysis.hud.tip.play = Züge abspielen (K)
+analysis.hud.tip.comments_off = Kommentare zu den Schlüsselmomenten ausblenden (N)
+analysis.hud.tip.comments_on = Kommentare zu den Schlüsselmomenten einblenden (N)
+analysis.hud.tip.voice_off = Stimme des Kommentators stummschalten (M)
+analysis.hud.tip.voice_on = Kommentare vorlesen lassen (M)
+analysis.hud.tip.voice_missing = Die Stimme ist nicht zu hören: Die Sprachdateien sind nicht installiert, oder „Optionen > Ton > Stimme des Trainers“ ist aus. Die Kommentare erscheinen als Text auf dem Bildschirm.
+analysis.hud.tip.arrows_off = Pfeile der besseren Züge ausblenden (B)
+analysis.hud.tip.arrows_on = Pfeile der besseren Züge einblenden (B)
+analysis.hud.controls.play = Abspielen / Pause
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Kommentare ein- / ausblenden
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Stimme des Kommentators an / aus
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Pfeile ein- / ausblenden
 
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----

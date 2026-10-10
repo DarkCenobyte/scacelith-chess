@@ -1172,6 +1172,21 @@ library.tag.UTCTime = Время (UTC)
 library.tag.WhiteRatingDiff = Изменение рейтинга белых
 library.tag.BlackRatingDiff = Изменение рейтинга чёрных
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Анализ
+analysis.menu.title = АНАЛИЗ
+analysis.menu.analyse = Анализ
+analysis.menu.paste = Вставить PGN
+analysis.menu.online = Мои онлайн-партии
+analysis.menu.folder = Положите файлы PGN в эту папку, чтобы проанализировать их: {0}
+analysis.menu.empty.title = Сохранённых партий пока нет
+analysis.menu.empty.text = Ваши партии появятся здесь после их окончания, как и файлы PGN из папки ниже. Можно также вставить партию, скопированную как текст PGN.
+analysis.menu.empty.no_folder = Вставьте партию, скопированную как текст PGN, чтобы проанализировать её.
+analysis.menu.paste.empty = Буфер обмена пуст: сначала скопируйте партию как текст PGN.
+analysis.menu.paste.none = В буфере обмена не найдено шахматной партии.
+analysis.menu.paste.several = В буфере обмена несколько партий: анализируется первая.
+analysis.menu.gameover = Анализ партии
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Ход {0} из {1}
 replay.speed.factor = ×{0}
@@ -1184,6 +1199,31 @@ replay.tip.pause = Пауза (K)
 replay.tip.resume = Продолжить (K)
 replay.tip.forward = Ход вперёд (L)
 replay.tip.end = Конец партии (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = КОММЕНТАРИЙ
+analysis.hud.accuracy = ТОЧНОСТЬ
+analysis.hud.reviewing = Stockfish анализирует партию… {0}
+analysis.hud.no_engine = Шахматный движок недоступен: ходы показаны без анализа.
+analysis.hud.no_moves = В этой партии нет ходов.
+analysis.hud.tip.play = Проиграть ходы (K)
+analysis.hud.tip.comments_off = Скрыть комментарии к ключевым моментам (N)
+analysis.hud.tip.comments_on = Показать комментарии к ключевым моментам (N)
+analysis.hud.tip.voice_off = Выключить голос комментатора (M)
+analysis.hud.tip.voice_on = Слышать комментарии вслух (M)
+analysis.hud.tip.voice_missing = Голос не звучит: его файлы не установлены, или параметр «Настройки > Звук > Голос тренера» выключен. Комментарии показаны текстом на экране.
+analysis.hud.tip.arrows_off = Скрыть стрелки лучших ходов (B)
+analysis.hud.tip.arrows_on = Показать стрелки лучших ходов (B)
+analysis.hud.controls.play = Воспроизведение / пауза
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Показать / скрыть комментарии
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Голос комментатора вкл. / выкл.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Показать / скрыть стрелки
 
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----

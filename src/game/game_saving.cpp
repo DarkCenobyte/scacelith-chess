@@ -32,7 +32,8 @@ archive::Mode archiveMode(GameMode mode, bool directMatch) {
     case GameMode::HotSeat: return archive::Mode::HotSeat;
     case GameMode::Online: return directMatch ? archive::Mode::Direct : archive::Mode::Server;
     case GameMode::Watch:
-    case GameMode::Replay: return archive::Mode::Watch;
+    case GameMode::Replay:
+    case GameMode::Analysis: return archive::Mode::Watch;
     }
     return archive::Mode::Watch;
 }

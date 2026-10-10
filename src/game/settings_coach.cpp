@@ -61,6 +61,10 @@ void readCoachSettings(const IniFile& ini, Settings& s) {
     s.ttsArch = ini.getString("tts.arch", s.ttsArch);
     if (s.ttsArch.empty()) s.ttsArch = "auto";
     s.coachVoice = ini.getBool("coach.voice", s.coachVoice);  // the voice model download (W12)
+    s.coachVoiceOffered = ini.getBool("coach.voice_offered", s.coachVoiceOffered);
+    s.analysisComments = ini.getBool("analysis.comments", s.analysisComments);
+    s.analysisVoice = ini.getBool("analysis.voice", s.analysisVoice);
+    s.analysisArrows = ini.getBool("analysis.arrows", s.analysisArrows);
 }
 
 void writeCoachSettings(IniFile& ini, const Settings& s) {
@@ -76,6 +80,10 @@ void writeCoachSettings(IniFile& ini, const Settings& s) {
     ini.setInt("tts.steps", s.ttsSteps);
     ini.set("tts.arch", s.ttsArch);
     ini.setBool("coach.voice", s.coachVoice);  // the voice model download (W12)
+    ini.setBool("coach.voice_offered", s.coachVoiceOffered);
+    ini.setBool("analysis.comments", s.analysisComments);
+    ini.setBool("analysis.voice", s.analysisVoice);
+    ini.setBool("analysis.arrows", s.analysisArrows);
 }
 
 }  // namespace game

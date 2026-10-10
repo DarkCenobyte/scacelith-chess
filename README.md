@@ -192,6 +192,41 @@ remembered (`[viewer]` in the settings file).
 The players claim and offer draws like the opponent of a normal game (repetition, fifty moves, an
 equal position late in the game), and the game over card offers to watch another game.
 
+## Analysis
+
+**Analysis** on the title page lists your saved games with the PGN files put in their folder
+(the page says where; **Open folder** shows it), and **Paste a PGN** analyses a game copied as
+PGN text (the first one when the clipboard holds several). When you are signed in, **My online
+games** opens your history on the server, where each game's page has **Analyse** too, as does
+**Saved games** next to Replay and the game over card (**Analyse the game**: after a game against
+Stockfish, the coach, a friend on the same PC or online; it declines a rematch).
+
+The game is set on the table (its starting position; its final one after **Analyse the game**) and
+Stockfish reviews it in the background, first quickly (the bar and the symbols appear within
+seconds), then in depth; a game opened again shows its review at once (the evaluations are kept for
+the 200 games last analysed, in the game's folder of application data, `analysis\`).
+
+- **The evaluation bar** on the left shows who stands better in the position on the board, with the
+  score (or the mate) at the leading side's end.
+- **The move panel** on the right lists the moves with their symbols: **!!** brilliant, **!** the
+  only good move, **!?** interesting, **?!** inaccuracy, **?** mistake, **??** blunder. Behind each
+  move, a faint band shows where the bar stood after it. Under the moves, each side's accuracy and
+  count of each symbol. Click a move to go to the position after it: the next or the previous move
+  is played (or taken back) by the robots' hands; further away, the board is set at once.
+- **On the board**, the square a move landed on carries its symbol on a coloured disc, and after an
+  inaccuracy, a mistake or a blunder a green arrow shows the better move.
+- **Comments** on the key moments (the opening, the mistakes and what they allowed or missed, the
+  brilliant and only moves, the end and each side's accuracy) are spoken by the coach's voice when
+  its model is installed, and shown as subtitles. Opening an analysis with the voice on but its
+  model missing offers the download once, unless the Coach page or the options offered it before.
+- **K** (or the play button): play the game on, move by move, pausing for the comments. **J / L**:
+  one move back / forward. **Home / End**: the start / the end. **N**: comments on or off. **M**:
+  voice on or off (subtitles only). **B**: arrows on or off. These choices are remembered
+  (`[analysis]` in the settings file).
+- The camera is free as when watching a game (**W A S D**, the mouse, **0 – 9** for the
+  viewpoints, **H** hides the controls and the panels). **Esc**: menu; the main menu goes back to
+  the page the analysis was chosen on.
+
 ## Online play
 
 **Play Online** on the title page plays people through a Scacelith server, still in the first
@@ -285,6 +320,11 @@ or on the mark, or keep the keyboard focus on the row for a moment, to read it.
 - **Ignore opponent's head movements** (Options > Gameplay, off by default): in online games and
   direct matches the opponent's robot looks where its player looks; with this option it moves
   its head by itself, as against Stockfish.
+
+In the forms of the menus (signing in, creating an account, the account's changes, names, server
+settings), **Tab** goes to the next field and starts typing there (**Shift+Tab** the previous one),
+and **Enter** goes on to the next field too, or in the last one sends the form, as its main button
+would: type the password, press Enter, and you are signed in.
 
 The first start opens on a brightness calibration: three squares, black on the left, mid grey and
 white on the right, each with a black knight, drawn exactly as the 3D hall would show them at the
@@ -387,7 +427,26 @@ stage without the session: a line spoken and subtitled, the coach pointing at g1
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
-the takeback card by itself after 1.5 s, for runs with `--play`.
+the takeback card by itself after 1.5 s, for runs with `--play`. `--analysis-marks-test` puts a
+fixed set of the Analysis mode's marks on the board once the pieces stand (tints, the six symbols'
+badges, the better move's arrows, straight and a knight's), arriving one after another.
+
+Analysis menus: `--scene ui --ui-screen analysis-page|analysis-page-online|library-analyse` shows
+the Analysis page and the Saved games page (on sample games written to `pgn-viewer-sample/` in the
+user data folder unless `--ui-library <folder>` is given; `--ui-clipboard <file>` stands in for the
+clipboard), `gameover-analyse|gameover-analyse-coach|gameover-analyse-online|gameover-analyse-folded`
+the game over card with Analyse the game, and `online-game-analysing` a history game fetching its
+PGN for the analysis.
+
+Analysis mode: `--analyse <file.pgn>` opens that file's first game (`--game N`: its Nth, from 1) in
+the Analysis mode at once, on the starting position unless `--analysis-at N` names another (the
+position after N plies); `--replay-keys` drives it (`J,L,K,Home,End,N,M,B`, `Goto:N` clicks the
+panel's position N, `Wait:S` waits S seconds, `Leave` goes back to the menu), and with `--shot`
+the review uses shallow depths so that a screenshot shows a finished review. The Analysis mode's
+overlay has its UI viewer screens: `--scene ui --ui-screen analysis-hud` (a game
+halfway, its review done, a commentary subtitle that `--ui-text <text>` replaces), `analysis-hud-review`
+(early on, the review at work), `analysis-hud-fen` (set up from a FEN, Black's move first) and
+`analysis-hud-noengine`.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 

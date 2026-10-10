@@ -29,6 +29,12 @@ owner.your.nom = 你的{piece}
 owner.my.nom = 我的{piece}
 owner.your.bare = {piece}
 owner.my.bare = {piece}
+# The Analysis mode names a piece by its side, nobody being 你 or 我 there: 白方的马 / 黑方的后;
+# bare as above ("{t1}和{t2:bare}" = 白方的王和后: a fork's two targets are always one side's).
+owner.white.nom = 白方的{piece}
+owner.black.nom = 黑方的{piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
 
 # ---- Squares, files and ranks (spoken: the English values, unused) ----------------------------------
 square.spoken = {file} {rank}

@@ -4,6 +4,8 @@
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/materials/material_library.h"
+#include "../render/post/display_transform.h"
+#include "../render/post/postfx.h"
 #include "../scene/board.h"
 #include "../scene/clock_model.h"
 #include "../scene/furniture.h"
@@ -24,7 +26,7 @@ namespace game {
 namespace {
 enum ObjectIds : uint32_t {
     OBJ_HALL = 1, OBJ_TABLE = 2, OBJ_CHAIR = 3, OBJ_BOARD = 10, OBJ_CLOCK = 20, OBJ_LEVER = 21,
-    OBJ_MARKER = 30, OBJ_PIECE = 100, OBJ_ROBOT = 1000, OBJ_COACH_MARK = 2000
+    OBJ_MARKER = 30, OBJ_PIECE = 100, OBJ_ROBOT = 1000, OBJ_COACH_MARK = 2000, OBJ_ANALYSIS_MARK = 2500
 };
 
 // The coach's light (Coach mode highlights and marks): a cobalt azure, the blue of the "COACH"
@@ -121,11 +123,17 @@ struct World::Impl {
     character::GpuRobot robot;
     Mesh markerQuad;
     Material markerMat;
-    // Coach mode: the coach's chest marking, its seat, and the material and unit quad of its marks.
+    // Coach mode: the coach's chest marking, its seat, and the material of its marks.
     character::ChestMarking coachMarking;
     int coachSeat = -1;
     Material coachMarkMat;
-    Mesh coachQuad;
+    // The unit quad (1 m, flat, uv over it) the coach's marks and the review's flat marks are drawn
+    // on, scaled to cover each.
+    Mesh markQuad;
+    // Analysis mode: the material of the review's marks, and the badges' quad (sorted nearer than
+    // it stands, see loadStep).
+    Material analysisMarkMat;
+    Mesh badgeQuad;
     // Board coordinates: the frame's material with the inlaid labels, their atlas, on/off.
     Material frameCoordMat;
     GLuint coordTex = 0;
@@ -158,7 +166,8 @@ World::~World() {
     impl_->robot.destroy();
     impl_->markerQuad.destroy();
     impl_->coachMarking.destroy();
-    impl_->coachQuad.destroy();
+    impl_->markQuad.destroy();
+    impl_->badgeQuad.destroy();
     if (impl_->coordTex) glDeleteTextures(1, &impl_->coordTex);
 }
 
@@ -195,7 +204,27 @@ bool World::loadStep(bool wait) {
         w.coachMarkMat.castShadow = false;
         w.coachMarkMat.params[0] = vec4(kCoachLight, 1.9f);
         w.coachMarkMat.params[1] = vec4(0.34f, 0.24f, 0.0f, 0.45f);
-        w.coachQuad.upload(prim::plane(1.0f, 1.0f, 1, 1, 1.0f), "coach_mark");
+        w.markQuad.upload(prim::plane(1.0f, 1.0f, 1, 1, 1.0f), "mark");
+        // The review's marks (analysis_marker.glsl). The tint: a wash about as strong as a
+        // tournament app's move highlight (half the board shows through), lit like a coloured glaze
+        // (levels after exposure: on a dark square well above the black marble, or it would vanish);
+        // a rim a little stronger. The arrow: four fifths opaque. The badge: tinted glass, 85 %
+        // opaque (the rest of the light behind it passes in its hue, so its colour holds over a
+        // sunlit square), the symbol white at the level of sunlit white marble.
+        w.analysisMarkMat.name = "analysis_marker";
+        w.analysisMarkMat.surface = "shaders/materials/analysis_marker.glsl";
+        w.analysisMarkMat.transparent = true;
+        w.analysisMarkMat.castShadow = false;
+        w.analysisMarkMat.params[0] = vec4(0.42f, 0.90f, 2.4f, 0.55f);
+        w.analysisMarkMat.params[1] = vec4(1.6f, 0.25f, 0.80f, 1.8f);
+        w.analysisMarkMat.params[2] = vec4(0.85f, 0.35f, 2.4f, 0.35f);
+        // A badge hovers above the board, so a flat mark under it on screen (a tint, an arrow) lies
+        // behind it; transparents are drawn back to front by the centre of their bounds, and an
+        // arrow's centre can be nearer than a badge's. The badge quad's bounds reach 0.3 m along its
+        // normal (towards the camera, see submitAnalysisMarks): it sorts 15 cm nearer than it is,
+        // after the flat marks.
+        w.badgeQuad.upload(prim::plane(1.0f, 1.0f, 1, 1, 1.0f), "analysis_badge");
+        w.badgeQuad.bounds.add(vec3(0.0f, 0.3f, 0.0f));
         break;
     }
     case 1: {
@@ -280,9 +309,10 @@ void World::setupRenderer(render::Renderer& r) {
     materials::getMutable(MaterialId::BoardSquareLight).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardSquareDark).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardFrame).planarReflector = w.reflBoard;
-    // Markers and coach marks (transparent, main view only) first show during play.
+    // Markers, coach marks and the review's marks (transparent, main view only) first show during play.
     r.warmProgram(w.markerMat, render::PassId::Main);
     r.warmProgram(w.coachMarkMat, render::PassId::Main);
+    r.warmProgram(w.analysisMarkMat, render::PassId::Main);
 }
 
 void World::setClockSide(bool positiveX) {
@@ -469,7 +499,7 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
     for (const CoachMark& mk : marks) {
         if (mk.strength <= 0.0f) continue;
         render::DrawItem d;
-        d.mesh = &w.coachQuad;
+        d.mesh = &w.markQuad;
         d.material = &w.coachMarkMat;
         d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_COACH_MARK + n;
@@ -510,6 +540,186 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         r.submit(d);
         ++n;
     }
+}
+
+// ---- Analysis mode --------------------------------------------------------------------------------
+
+namespace {
+// The radiance after exposure that the final display transform (tonemap.frag, with the frame's
+// grade) shows as the linear sRGB colour 'target': a multiplicative fixed-point iteration per
+// channel, which settles in about 16 steps. Colours beyond AgX's reach (the most saturated
+// oranges, yellows and cyans) come out as near as it gets, a little paler.
+vec3 radianceShownAs(vec3 target, const PostSettings& ps) {
+    vec3 x = target;
+    for (int it = 0; it < 20; ++it) {
+        vec3 shown = render::displayTransform(x, ps.contrast, ps.saturation, ps.splitTone);
+        for (int k = 0; k < 3; ++k) x[k] = clamp(x[k] * std::max(target[k], 1e-3f) / std::max(shown[k], 1e-3f), 1e-4f, 16.0f);
+    }
+    return x;
+}
+
+// Scale of a badge popping in: 0.6 -> 1 in 0.25 s, overshooting by ~6 % on the way (an ease-out
+// with a back swing).
+float badgePop(float age) {
+    float t = clamp(age / 0.25f, 0.0f, 1.0f) - 1.0f;
+    constexpr float kBack = 2.2f;
+    return 0.6f + 0.4f * (1.0f + (kBack + 1.0f) * t * t * t + kBack * t * t);
+}
+}  // namespace
+
+void World::submitAnalysisMarks(render::Renderer& r, const std::vector<AnalysisMark>& marks, const vec3& camera) {
+    Impl& w = *impl_;
+    // Arrow geometry (m), more than twice the coach's: a 12.5 mm shaft and a 28 mm wide head, in
+    // the proportions a chess site draws on a 55 mm square. Like the coach's it starts at the edge
+    // of the widest piece base (the king's 20 mm); its tip stops 11 mm short of the target's centre.
+    constexpr float kStartClear = 0.021f, kTipClear = 0.011f;
+    constexpr float kShaftHalf = 0.00625f, kHeadLen = 0.021f, kHeadHalf = 0.014f;
+    constexpr float kGrowTime = 0.35f;
+    // Badge: 26 mm across (about 28 px at 720p mid-board from the player's chair, 24 on the far
+    // rank), its centre 73 mm above the board: its lower edge just above the king's shoulder (the
+    // collar under its crown, at 58 mm). Over a corner of the square, 39 mm from the axis of any
+    // piece around that corner: no piece reaches that far at that height (the widest, the king's
+    // crown, 12 mm), so a badge never cuts into one.
+    constexpr float kBadgeDiameter = 0.026f, kBadgeHeight = 0.073f;
+    constexpr float kBadgeQuad = 1.08f;   // quad half side / disc radius: room for the anti-aliasing
+    const float yTint = layout::BOARD_TOP_Y + 0.00045f;   // a hair above the game markers (+0.4 mm)
+    const float yArrow = layout::BOARD_TOP_Y + 0.0006f;   // above the tints
+    const PostSettings& ps = r.post().settings;
+    uint32_t n = 0;
+    for (const AnalysisMark& mk : marks) {
+        if (mk.strength <= 0.0f) continue;
+        render::DrawItem d;
+        d.mesh = &w.markQuad;
+        d.material = &w.analysisMarkMat;
+        d.flags = render::DRAW_NO_REFLECTION;
+        d.objectId = OBJ_ANALYSIS_MARK + n;
+        float strength = std::min(mk.strength, 1.0f), age = std::max(mk.age, 0.0f);
+        vec3 radiance = radianceShownAs(max(mk.color, vec3(0.0f)), ps);
+        if (mk.kind == AnalysisMark::Tint) {
+            if (mk.sq == NoSquare) continue;
+            vec3 c = layout::squareCenter(mk.sq);
+            float size = layout::SQUARE_SIZE * 1.04f;
+            bool light = ((mk.sq & 7) + (mk.sq >> 3)) & 1;   // a1 is dark
+            d.model = translate(vec3(c.x, yTint, c.z)) * scale(vec3(size, 1.0f, size));
+            d.inst[0] = vec4(0.0f, strength, age, 0.0f);
+            d.inst[1] = vec4(c.x, c.z, layout::SQUARE_SIZE * 0.5f, light ? 1.0f : 0.0f);
+            d.inst[2] = vec4(radiance, 0.0f);
+        } else if (mk.kind == AnalysisMark::Arrow) {
+            if (mk.from == NoSquare || mk.to == NoSquare || mk.from == mk.to) continue;
+            vec3 f3 = layout::squareCenter(mk.from), t3 = layout::squareCenter(mk.to);
+            vec2 from(f3.x, f3.z), to(t3.x, t3.z), via = from;
+            bool corner = mk.via != NoSquare && mk.via != mk.from && mk.via != mk.to;
+            if (corner) {
+                vec3 v3 = layout::squareCenter(mk.via);
+                via = vec2(v3.x, v3.z);
+            }
+            vec2 firstDir = normalize((corner ? via : to) - from);
+            vec2 lastDir = normalize(to - (corner ? via : from));
+            vec2 start = from + firstDir * kStartClear;
+            vec2 tip = to - lastDir * kTipClear;
+            // The quad covers the whole arrow; the shader gets the part grown so far: the arrow
+            // runs out from its tail, its head in front (eased out, as a hand drawing it slows
+            // down onto the square), round the corner of a knight's L.
+            vec2 lo = min(min(start, corner ? via : start), tip), hi = max(max(start, corner ? via : start), tip);
+            lo = lo - vec2(kHeadHalf + 0.002f);
+            hi = hi + vec2(kHeadHalf + 0.002f);
+            float l1 = corner ? length(via - start) : 0.0f, l2 = length(tip - (corner ? via : start));
+            float g = 1.0f - clamp(age / kGrowTime, 0.0f, 1.0f);
+            float grown = (1.0f - g * g * g) * (l1 + l2);
+            if (grown < 0.001f) continue;
+            vec2 nowCorner = start, nowTip = start + firstDir * grown;
+            if (corner && grown > l1) {
+                nowCorner = via;
+                nowTip = via + lastDir * (grown - l1);
+            }
+            vec2 c = (lo + hi) * 0.5f, size = hi - lo;
+            d.model = translate(vec3(c.x, yArrow, c.y)) * scale(vec3(size.x, 1.0f, size.y));
+            d.inst[0] = vec4(1.0f, strength, age, kHeadHalf);
+            d.inst[1] = vec4(start.x, start.y, nowCorner.x, nowCorner.y);
+            d.inst[2] = vec4(nowTip.x, nowTip.y, kShaftHalf, kHeadLen);
+            d.inst[3] = vec4(radiance, 0.0f);
+        } else {
+            if (mk.sq == NoSquare || mk.glyph < 1 || mk.glyph > 6) continue;
+            vec3 sq = layout::squareCenter(mk.sq);
+            // Which corner: the one that shows the badge at the upper right of the piece's head,
+            // clear of it, as the camera sees the square. The right-hand ones (as the camera
+            // faces the square). From a chair or an observer's usual height, the near one: raised
+            // to the shoulder it shows just right of the head (the far one would float two
+            // squares above, by the neighbour's head). Looking down from straight above, the
+            // height no longer lifts it on screen: the far one, slid to as the view steepens
+            // (between 55 and 80 degrees down; looking straight down: as if from White's side).
+            vec2 ahead(sq.x - camera.x, sq.z - camera.z);
+            float across = length(ahead);
+            ahead = across > 0.01f ? ahead / across : vec2(0.0f, -1.0f);
+            vec2 right(-ahead.y, ahead.x);
+            float down = std::atan2(camera.y - layout::BOARD_TOP_Y, across);
+            float farSide = 2.0f * smoothstep(55.0f * DEG, 80.0f * DEG, down) - 1.0f;
+            vec2 at = vec2(sq.x, sq.z) + (ahead * farSide + right) * (layout::SQUARE_SIZE * 0.5f);
+            vec3 c(at.x, layout::BOARD_TOP_Y + kBadgeHeight, at.y);
+            // Billboard: the quad's normal (local +Y) towards the camera, its uv's up (local -Z)
+            // the world's up as seen from there, so the symbol stands upright.
+            vec3 nrm = normalize(camera - c);
+            vec3 up = vec3(0.0f, 1.0f, 0.0f) - nrm * nrm.y;
+            up = length(up) > 1e-3f ? normalize(up) : vec3(ahead.x, 0.0f, ahead.y);
+            vec3 side = cross(up, nrm);
+            float s = kBadgeDiameter * kBadgeQuad * badgePop(age);
+            d.mesh = &w.badgeQuad;
+            d.model = mat4(vec4(side * s, 0.0f), vec4(nrm, 0.0f), vec4(-up * s, 0.0f), vec4(c, 1.0f));
+            d.inst[0] = vec4(2.0f, strength, age, 0.0f);
+            d.inst[1] = vec4(float(mk.glyph), kBadgeQuad, 0.0f, 0.0f);
+            d.inst[2] = vec4(radiance, 0.0f);
+        }
+        r.submit(d);
+        ++n;
+    }
+}
+
+std::vector<AnalysisMark> analysisMarksTestSet(float seconds) {
+    auto srgb = [](uint32_t hex) {
+        auto lin = [](uint32_t v) {
+            float c = float(v & 0xFFu) / 255.0f;
+            return c <= 0.04045f ? c / 12.92f : std::pow((c + 0.055f) / 1.055f, 2.4f);
+        };
+        return vec3(lin(hex >> 16), lin(hex >> 8), lin(hex));
+    };
+    // The palette of the symbols (analysis::nagColor) and the better move's green.
+    const vec3 blunder = srgb(0xCA3431), mistake = srgb(0xE58F2A), dubious = srgb(0xF7C045);
+    const vec3 interesting = srgb(0xB57FD6), good = srgb(0x5C8BB0), brilliant = srgb(0x1BACA6);
+    const vec3 better = srgb(0x81B64C);
+    std::vector<AnalysisMark> marks;
+    auto add = [&](AnalysisMark::Kind kind, const char* sq, int glyph, vec3 color) {
+        AnalysisMark mk;
+        mk.kind = kind;
+        mk.sq = parseSquare(sq);
+        mk.glyph = glyph;
+        mk.color = color;
+        marks.push_back(mk);
+    };
+    auto arrow = [&](const char* from, const char* via, const char* to) {
+        AnalysisMark mk;
+        mk.kind = AnalysisMark::Arrow;
+        mk.from = parseSquare(from);
+        mk.via = via ? parseSquare(via) : NoSquare;
+        mk.to = parseSquare(to);
+        mk.color = better;
+        marks.push_back(mk);
+    };
+    add(AnalysisMark::Tint, "e5", 0, blunder);
+    add(AnalysisMark::Badge, "e5", 4, blunder);       // ??
+    add(AnalysisMark::Badge, "f3", 3, brilliant);     // !!
+    add(AnalysisMark::Tint, "f3", 0, brilliant);
+    add(AnalysisMark::Badge, "c4", 5, interesting);   // !?
+    add(AnalysisMark::Badge, "d4", 6, dubious);       // ?!
+    add(AnalysisMark::Badge, "g1", 1, good);          // !
+    add(AnalysisMark::Badge, "b8", 2, mistake);       // ?
+    arrow("d2", nullptr, "d4");
+    arrow("b1", "b3", "c3");   // a knight's L: its long leg first
+    // Their arrivals staggered by 0.15 s.
+    for (size_t k = 0; k < marks.size(); ++k) {
+        marks[k].age = seconds - 0.15f * float(k);
+        marks[k].strength = marks[k].age >= 0.0f ? 1.0f : 0.0f;
+    }
+    return marks;
 }
 
 }  // namespace game
