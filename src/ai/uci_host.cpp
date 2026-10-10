@@ -266,9 +266,16 @@ void UciHost::setArchLimit(const std::string& arch) {
     if (arch == s_->archLimit) return;
     // Takes effect at the next acquire(); a running session keeps its variant.
     if (!stockfish_embedded_limit_arch(arch.c_str())) {
+#if defined(__aarch64__) && defined(__APPLE__)
+        LOGW("ai: unknown engine.arch \"%s\" (auto or apple-silicon), keeping %s", arch.c_str(), s_->archLimit.c_str());
+#elif defined(__aarch64__)
+        LOGW("ai: unknown engine.arch \"%s\" (auto or one of armv8, armv8-dotprod), keeping %s", arch.c_str(),
+             s_->archLimit.c_str());
+#else
         LOGW("ai: unknown engine.arch \"%s\" (auto or one of x86-64, x86-64-sse41-popcnt, x86-64-avx2, "
              "x86-64-avxvnni, x86-64-avx512icl), keeping %s",
              arch.c_str(), s_->archLimit.c_str());
+#endif
         return;
     }
     s_->archLimit = arch;

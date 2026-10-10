@@ -73,7 +73,8 @@ struct Settings {
     int engineThreads = 1;
     int engineHashMB = 64;
     // Stockfish instruction-set variant: "auto" = the best this CPU runs, or a variant name capping
-    // it, e.g. "x86-64-sse41-popcnt" (troubleshooting; ai::Engine::setArchLimit)
+    // it, e.g. "x86-64-sse41-popcnt", or "armv8" on Linux aarch64 (troubleshooting;
+    // ai::Engine::setArchLimit)
     std::string engineArch = "auto";
     bool humanizeThinking = true; // spend realistic time before moving
     // [player] the human's rating (elo.h), updated after every rated game against Stockfish
@@ -180,7 +181,8 @@ struct Settings {
     // (-1 = the default teacher voice, else an index into the model's voices), flow-matching steps
     // (Options > Audio > Voice quality: kTtsStepsMin..kTtsStepsMax; each step costs about a fifth
     // of a line's synthesis time at the default) and the kernels' instruction set ("auto", or a cap
-    // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
+    // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; neon, scalar on aarch64;
+    // tts::setArchCap).
     static constexpr int kTtsStepsMin = 4, kTtsStepsMax = 9, kTtsStepsDefault = 5;
     int ttsThreads = 0;
     int ttsVoice = -1;

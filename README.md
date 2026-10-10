@@ -221,7 +221,7 @@ Maximum (9), Medium (5) by default: a higher level gives a slightly cleaner voic
 to compute, so the coach starts each line a little later. It is greyed out until a voice model is
 installed. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
 `voice` (-1 = the default voice), `steps` (the voice quality) and `arch` (`auto`, or `avx512`,
-`avxvnni`, `avx2`, `sse2`, `scalar` when troubleshooting).
+`avxvnni`, `avx2`, `sse2`, `scalar` when troubleshooting; `neon`, `scalar` on ARM).
 
 ## Watch a Game
 
@@ -409,7 +409,8 @@ fallback); `--lang <code>` overrides the language for one session.
 ## Building
 
 Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 13; on Windows,
-MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish variants), and
+MinGW-w64 GCC with POSIX threads; Clang cannot build the isolated Stockfish variants, and macOS
+builds a single one with Apple clang), and
 Python 3 for the instruction-set audits and the Windows exception table check that run at every
 build (a Windows Release build, the shipped exe, does not configure without it; other builds skip
 them with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files
@@ -419,7 +420,8 @@ linked, and a Linux Release build links libstdc++ and libgcc in, so that
 the executable runs on other distributions than the build machine's. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
-instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
+instruction set, from plain x86-64 to AVX-512 (on Linux aarch64: ARMv8-A, and with the dot
+product), and the game runs the best one the CPU supports;
 `-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
 quicker local builds (see `third_party/stockfish/README.scacelith.md`). The first configure also
 downloads the coach's voice model (seven files, 399 MB, from Supertone's repository on Hugging
@@ -442,8 +444,11 @@ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja -C build
 ./build/scacelith_tests
 
-# Linux aarch64: the same commands, natively on an aarch64 system (or cross-compiled with
-# -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux-gnu.cmake, the tests under qemu-aarch64; docs/PORTS.md)
+# Linux aarch64: the same commands natively on an aarch64 system, or cross-compiled from Linux
+# x86-64 with the tests under qemu-user (see docs/PORTS.md)
+cmake -B build-arm64 -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux-gnu.cmake -DCMAKE_BUILD_TYPE=Release
+ninja -C build-arm64
+qemu-aarch64 -L /usr/aarch64-linux-gnu build-arm64/scacelith_tests
 
 # macOS on Apple Silicon (experimental; Xcode's Clang, Homebrew; see tools/macos/README.md)
 tools/macos/build-deps.sh     # Mesa, the Vulkan loader and OpenSSL -> build-macos-deps/prefix (once)

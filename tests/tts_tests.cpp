@@ -41,6 +41,10 @@
 #include <vector>
 #ifdef _WIN32
 #include <direct.h>
+#elif defined(__APPLE__)
+#include <pthread.h>
+#include <pthread/qos.h>
+#include <unistd.h>
 #else
 #include <sys/resource.h>
 #include <sys/syscall.h>
@@ -1638,8 +1642,14 @@ TEST(tts_kernels_all_levels) {
 }
 
 TEST(tts_arch_cap) {
+#if defined(__aarch64__)
+    CHECK(tts::setArchCap("neon"));
+    CHECK_EQ(std::string(tts::activeArch()), std::string("neon"));
+    CHECK(!tts::setArchCap("sse2"));
+#else
     CHECK(tts::setArchCap("sse2"));
     CHECK_EQ(std::string(tts::activeArch()), std::string("sse2"));
+#endif
     CHECK(tts::setArchCap("scalar"));
     CHECK_EQ(std::string(tts::activeArch()), std::string("scalar"));
     CHECK(!tts::setArchCap("mmx"));
@@ -1677,7 +1687,29 @@ TEST(tts_thread_pool) {
             CHECK_EQ(count.load(), 64);
         }
     }
-#ifndef _WIN32
+#if defined(__APPLE__)
+    // macOS: a lowered thread runs 5 steps below its quality-of-service class's priority, and so
+    // does one started by an already lowered thread; the calling thread keeps its own.
+    auto relativePriority = [] {
+        qos_class_t qos = QOS_CLASS_UNSPECIFIED;
+        int relative = 0;
+        pthread_get_qos_class_np(pthread_self(), &qos, &relative);
+        return relative;
+    };
+    int before = relativePriority();
+    int lowered = 0, nested = 0;
+    std::thread([&] {
+        tts::lowerThreadPriority();
+        lowered = relativePriority();
+        std::thread([&] {
+            tts::lowerThreadPriority();
+            nested = relativePriority();
+        }).join();
+    }).join();
+    CHECK_EQ(lowered, -5);
+    CHECK_EQ(nested, -5);
+    CHECK_EQ(relativePriority(), before);
+#elif !defined(_WIN32)
     // Linux: a lowered thread runs at the process's nice + 5 (at most 19), and so does one started
     // by an already lowered thread.
     auto threadNice = [] { return getpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid))); };
@@ -2440,7 +2472,9 @@ TEST(tts_perf) {
     // The best kernel set of this CPU, and AVX2 (the common desktop case) when it is not the best.
     // SCACELITH_TTS_PERF_ARCH=sse2,avx2 measures the given sets instead.
     std::vector<std::string> arches = {"auto"};
+#if !defined(__aarch64__)
     if (tts::kern::active().level > tts::kern::kAvx2 && tts::kern::cpuRuns(tts::kern::kAvx2)) arches.push_back("avx2");
+#endif
     if (const char* list = std::getenv("SCACELITH_TTS_PERF_ARCH")) {
         arches.clear();
         std::string l = list;
