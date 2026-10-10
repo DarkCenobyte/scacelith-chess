@@ -403,6 +403,26 @@ struct ClockFreeze {
     bool holds(double nowMs, int pingMs, bool reconnecting) const { return clockFreezeHolds(nowMs - sentMs, pingMs, reconnecting); }
 };
 
+// A move the authority refused as rate limited (its message bucket, or a game host far behind
+// that bounds its inbox): the game's state is asked for again after a pause, and the snapshot's
+// resend sends the move (resendPendingMove). The pause keeps a refused Resync from coming back at
+// once: a refusal answered at once would empty the message bucket and close the connection as a
+// flood. A refusal while a retry waits changes nothing.
+struct MoveRetry {
+    static constexpr double kPauseMs = 1500.0;
+    double atMs = 0.0;  // localMs() of the retry, 0: none
+    void refused(double nowMs) {
+        if (atMs <= 0.0) atMs = nowMs + kPauseMs;
+    }
+    // True once when the retry is due (and forgets it).
+    bool due(double nowMs) {
+        if (atMs <= 0.0 || nowMs < atMs) return false;
+        atMs = 0.0;
+        return true;
+    }
+    void clear() { atMs = 0.0; }
+};
+
 // After a snapshot (typically at a reconnection): true when the authority has every move of the
 // local game but my pending one, the game goes on and it is still my turn there. The same {ply,
 // move} is then sent again (a duplicate is answered with the original MoveMade) instead of the

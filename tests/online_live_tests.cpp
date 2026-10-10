@@ -820,3 +820,22 @@ TEST(live_saved_pin_dropped_with_the_pin_field) {
     applied.pinnedSha256.clear();
     CHECK(!live::savedPinDropped(ep, applied, true));
 }
+
+TEST(live_move_retry_after_a_rate_limited_refusal) {
+    live::MoveRetry r;
+    CHECK(!r.due(0.0));
+    r.refused(10000.0);
+    CHECK(!r.due(10000.0));
+    CHECK(!r.due(10000.0 + live::MoveRetry::kPauseMs - 1.0));
+    // A second refusal while the retry waits (the Resync refused too) does not push it back.
+    r.refused(11000.0);
+    CHECK(r.due(10000.0 + live::MoveRetry::kPauseMs));
+    CHECK(!r.due(20000.0));  // once
+    // The Resync refused in turn: a new pause, never an answer at once.
+    r.refused(11600.0);
+    CHECK(!r.due(11600.0));
+    CHECK(r.due(11600.0 + live::MoveRetry::kPauseMs));
+    r.refused(30000.0);
+    r.clear();  // a new game
+    CHECK(!r.due(40000.0));
+}

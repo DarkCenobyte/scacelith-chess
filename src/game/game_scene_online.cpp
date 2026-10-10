@@ -143,6 +143,7 @@ void GameScene::setupOnlineGame() {
     humanColor_ = og_.you == 1 ? Black : White;
     remoteQueue_.clear();
     pendingPly_ = -1;
+    moveRetry_.clear();
     pendingMove_ = 0;
     recordedPly_ = 0;
     pressedPly_ = remotePly_ = -1;
@@ -253,6 +254,11 @@ void GameScene::updateOnline(float dt) {
     if (link_->reconnecting()) remoteFresh_ = false;  // a gesture from before our reconnection is stale
     sendOnlineGesture(dt);
     updateStances(dt);
+    if (moveRetry_.due(localMs()) && pendingPly_ >= 0 && !link_->reconnecting()) {
+        // The reconnection's own snapshot sends the move when the connection is being restored.
+        LOGI("online: move %d not taken in (rate limited): asking for the game's state", pendingPly_ + 1);
+        link_->requestResync();
+    }
     settleRemoteTakeBack();
     if (state_ != State::Playing) return;
     // --touch with --start-online: the hand goes to that piece once the handshake is over.
@@ -365,12 +371,10 @@ void GameScene::onlineEvent(const net::Event& e) {
         ui::notify(eventErrorText(e), 4.0f);
         if (e.code == kErrDrawOfferLimit) myDrawOffer_ = false;
         // A move the authority could not take in (RateLimited: the connection's message bucket,
-        // or a game host far behind that bounds its inbox): a snapshot shows what it has, and the
-        // pending move goes again from there (onlineSnapshot, live::resendPendingMove).
-        if (e.code == int(net::proto::ErrorCode::RateLimited) && pendingPly_ >= 0 && link_) {
-            LOGI("online: move %d not taken in (rate limited): asking for the game's state", pendingPly_ + 1);
-            link_->requestResync();
-        }
+        // or a game host far behind that bounds its inbox): a snapshot shows what it has, after a
+        // pause, and the pending move goes again from there (updateOnline, onlineSnapshot,
+        // live::resendPendingMove).
+        if (e.code == int(net::proto::ErrorCode::RateLimited) && pendingPly_ >= 0) moveRetry_.refused(localMs());
         break;
     default: break;
     }
