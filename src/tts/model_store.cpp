@@ -117,6 +117,8 @@ void setModelFolder(const std::string& dir) {
 std::string downloadUserAgent() {
 #ifdef _WIN32
     return std::string("Scacelith/") + SCACELITH_VERSION + " (Windows)";
+#elif defined(__APPLE__)
+    return std::string("Scacelith/") + SCACELITH_VERSION + " (macOS)";
 #else
     return std::string("Scacelith/") + SCACELITH_VERSION + " (Linux)";
 #endif

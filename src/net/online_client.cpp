@@ -136,6 +136,8 @@ bool validHostName(const std::string& h) {
 std::string clientString() {
 #ifdef _WIN32
     return std::string("Scacelith/") + SCACELITH_VERSION + " win64";
+#elif defined(__APPLE__)
+    return std::string("Scacelith/") + SCACELITH_VERSION + " macos";
 #else
     return std::string("Scacelith/") + SCACELITH_VERSION + " linux";
 #endif
@@ -885,7 +887,7 @@ struct OnlineClient::Impl {
         }
         ev.ok = true;
         ev.error.clear();
-        // Kept outside the system keyring (Linux): the player is told, once per run.
+        // Kept outside the system keyring (Linux, macOS): the player is told, once per run.
         if (creds.firstNotice(kept)) ev.sessionNotice = kept == CredentialStore::Kept::Memory ? "memory" : "file";
     }
 

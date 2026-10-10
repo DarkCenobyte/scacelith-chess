@@ -19,7 +19,7 @@
 // prompt (left to the player: see Call::unlock).
 #include "credential_store.h"
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 #include "../core/log.h"
 
 #include <cstddef>
@@ -35,6 +35,10 @@ namespace net {
 #ifdef _WIN32
 
 Keyring* secretServiceKeyring() { return nullptr; }   // DPAPI protects the file (credential_store.cpp)
+
+#elif defined(__APPLE__)
+
+Keyring* secretServiceKeyring() { return nullptr; }   // the keychain keeps the tokens (keychain.cpp)
 
 #else
 

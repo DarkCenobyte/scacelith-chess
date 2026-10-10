@@ -20,19 +20,25 @@ std::wstring moduleFileName(const std::function<unsigned long(wchar_t* buffer, u
 #endif
 
 std::string exeDirectory();        // directory of the running executable, trailing separator
-// The per-user folder of the settings (created; private, 0700, on Linux): %APPDATA%\scacelith\ on
-// Windows, $XDG_CONFIG_HOME/scacelith/ (default ~/.config/scacelith/) on Linux, as a canonical path
-// there.
+// The per-user folder of the settings (created; private, 0700, on Linux and macOS):
+// %APPDATA%\scacelith\ on Windows, $XDG_CONFIG_HOME/scacelith/ (default ~/.config/scacelith/) on
+// Linux, ~/Library/Application Support/scacelith/ on macOS, as a canonical path there.
 std::string userDataDirectory();
 // The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():
 // %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
-// on Linux, as a canonical path there. The coach's voice model lives in its "coach" subfolder
-// (src/tts/model_store.h).
+// on Linux, as a canonical path there; userDataDirectory() on macOS. The coach's voice model lives
+// in its "coach" subfolder (src/tts/model_store.h).
 std::string appDataDirectory();
 // Where Scacelith.ini, the saved logins and the log go: userDataDirectory(), unless a Scacelith.ini
 // stands next to the executable (a portable install; also where versions up to 1.0.0-beta.1 put
-// it) or the user data directory cannot be written: then the executable's folder.
+// it) or the user data directory cannot be written: then the executable's folder. Never the
+// executable's folder of a macOS application bundle (insideAppBundle).
 std::string settingsDirectory();
+#ifdef __APPLE__
+// 'dir' (with its trailing separator) is the executable's folder of an application bundle,
+// "<...>.app/Contents/MacOS/".
+bool insideAppBundle(const std::string& dir);
+#endif
 bool fileExists(const std::string& path);
 bool directoryWritable(const std::string& dir);
 bool readFile(const std::string& path, std::string& out, size_t maxBytes);
@@ -41,7 +47,7 @@ bool readFile(const std::string& path, std::string& out, size_t maxBytes);
 // for up to a second, as by renameFile().
 bool writeFileAtomic(const std::string& path, const std::string& data, bool privateFile);
 bool removeFile(const std::string& path);
-// Opens an https:// URL in the default browser (ShellExecuteW / xdg-open). The caller checks
+// Opens an https:// URL in the default browser (ShellExecuteW / xdg-open / open). The caller checks
 // the URL; this refuses anything that is not http(s) anyway.
 bool openBrowser(const std::string& url);
 #ifndef _WIN32
@@ -49,7 +55,8 @@ bool openBrowser(const std::string& url);
 // pid (-1: it could not be started); the caller reaps it. Its SIGPIPE has the default action: the
 // game ignores that signal (main.cpp), an ignored signal stays ignored across exec, and the programs
 // it starts (xdg-open's shell pipelines, a browser, a file manager) do not expect that. Every
-// program the game starts goes through here (openBrowser, plat::openInFileManager).
+// program the game starts goes through here (openBrowser, plat::openInFileManager). macOS: the
+// program inherits the standard descriptors only (POSIX_SPAWN_CLOEXEC_DEFAULT).
 int spawnProgram(char* const argv[]);
 #endif
 
