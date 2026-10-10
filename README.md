@@ -8,7 +8,8 @@ real-time material shaders, physically based lighting.
 ## Installing
 
 The [releases](https://github.com/DarkCenobyte/scacelith-chess/releases) hold the game for Windows
-x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built in.
+x64, Linux x86-64 and Linux aarch64, and an experimental build for Apple Silicon Macs; all need a
+GPU with OpenGL 4.6 (the Mac build brings its own), and Stockfish 19 is built in.
 
 - **Windows**: unpack `Scacelith-<version>-windows-x64.zip` anywhere and run `Scacelith.exe` (or
   download the executable alone).
@@ -22,6 +23,16 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   asks for its password when you sign in or connect), otherwise to a file only you can read: the
   game says so after the sign-in, and Options > Online server can keep them until the game closes
   instead (`install.sh` says when libsecret is missing, and the log says why the file is used).
+- **Linux on 64-bit Arm**: `Scacelith-<version>-linux-aarch64.tar.gz`, the same as above, for an
+  aarch64 system with a GPU driver of OpenGL 4.6: NVIDIA (Jetson Orin, discrete cards), AMD
+  discrete cards, Asahi Linux on Apple M1/M2. A Raspberry Pi 4 or 5 cannot run it (OpenGL 3.1).
+- **macOS (experimental)**: `Scacelith-<version>-macos-arm64-experimental.dmg`, for Apple Silicon
+  Macs (M1 or later) with macOS 26 or later; Intel Macs are not supported. Open it and drag
+  Scacelith to Applications. macOS offers no OpenGL 4.6, so the app carries Mesa's (Zink on the
+  KosmicKrisp Vulkan driver, over Metal); this build is new and less tested than the others. It is
+  not signed by a registered Apple developer: the first time, macOS refuses to open it, and
+  **System Settings > Privacy & Security > Open Anyway** lets it (or `xattr -dr
+  com.apple.quarantine /Applications/Scacelith.app` in a terminal).
 
 ## Playing
 
@@ -431,6 +442,17 @@ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja -C build
 ./build/scacelith_tests
 
+# Linux aarch64: the same commands, natively on an aarch64 system (or cross-compiled with
+# -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux-gnu.cmake, the tests under qemu-aarch64; docs/PORTS.md)
+
+# macOS on Apple Silicon (experimental; Xcode's Clang, Homebrew; see tools/macos/README.md)
+tools/macos/build-deps.sh     # Mesa, the Vulkan loader and OpenSSL -> build-macos-deps/prefix (once)
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      -DOPENSSL_ROOT_DIR="$PWD/build-macos-deps/prefix/openssl"
+ninja -C build && ./build/scacelith_tests
+tools/macos/make-app.sh build build-macos-deps/prefix build-macos/Scacelith.app
+tools/macos/make-dmg.sh build-macos/Scacelith.app
+
 # The Windows tests under Wine (ninja -C build-win scacelith_tests first)
 tools/test_win.sh             # [filter-substring]
 
@@ -536,30 +558,38 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 GitHub Actions builds and tests every push to master and every pull request
 (`.github/workflows/ci.yml`): the Linux build and its unit tests (the coach's voice model
-required: its tests must run and pass), the same tests built with
+required: its tests must run and pass), the same on a 64-bit Arm runner (Linux aarch64), the same
+tests built with
 AddressSanitizer and UBSan, the Windows build cross-compiled with MinGW-w64 and its unit tests
-under Wine (all as above), the contract with the dedicated
+under Wine (all as above), the experimental macOS build (on an Apple Silicon runner with macOS 26:
+the bundled Mesa, built once and cached, the game, its unit tests, the app and its disk image,
+then a headless screenshot whose failure is only reported; a failure of this job does not fail
+the run), the contract with the dedicated
 server and the live online tests against it, and a lint of the workflows (actionlint and zizmor).
 The server is the commit pinned in `tools/interop/server-revision`, so that a run of a game commit
 always tests the same pair (a manual run of the workflow takes another branch of the server as
 `server-revision`, for a change made on both sides); a weekly run checks the contract against the
 server's master instead. Move the pin forward with every change of the contract; the server pins
-this game the same way. The Windows executable of each run is kept for 14 days as a workflow
-artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped C++ code
+this game the same way. The Windows executable and the macOS disk image of each run are kept for
+14 days as workflow artifacts, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped C++ code
 (without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
 
 The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.0`) and, for a
 pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.2`); `cmake -P cmake/version.cmake` prints it
 in full. Pushing the tag `v` + that version (`v1.0.0-beta.2`) publishes a release: the release
 workflow (`.github/workflows/release.yml`) checks that the tag matches the version, runs the CI
-again on the tagged commit, builds the game from scratch (no compiler cache) for Windows x64 and
-for Linux x86-64 (on Ubuntu 22.04, the oldest toolchain supported, where the unit tests run again
-and the executable is checked to need only system libraries and glibc 2.34), attests the build
+again on the tagged commit, builds the game from scratch (no compiler cache) for Windows x64, for
+Linux x86-64 and Linux aarch64 (on Ubuntu 22.04, the oldest toolchain supported, where the unit
+tests run again and the executable is checked to need only system libraries and glibc 2.34) and
+for macOS on Apple Silicon (the bundled Mesa, Vulkan loader and OpenSSL included; experimental: if
+that job fails, the release is published without the disk image), attests the build
 provenance of the files with actions/attest and publishes a GitHub release (a pre-release when the
 version has a suffix) with `Scacelith-<version>-windows-x64.zip` (the executable, its licence and
 the licence texts of what it embeds), the Windows executable alone,
 `Scacelith-<version>-linux-x86_64.tar.gz` (the executable, its launcher and icons, `install.sh`
-and the same licences) and `SHA256SUMS`. Started by hand, the
+and the same licences), `Scacelith-<version>-linux-aarch64.tar.gz` (the same for aarch64),
+`Scacelith-<version>-macos-arm64-experimental.dmg` (the app, signed ad hoc, with the licences of
+what it carries) and `SHA256SUMS`. Started by hand, the
 workflow builds the same files and keeps them as workflow artifacts without publishing anything,
 unless it runs on a tag with "Publish" ticked. To check a downloaded file with the GitHub CLI:
 
@@ -568,7 +598,8 @@ gh attestation verify Scacelith-1.0.0-beta.2-windows-x64.zip --repo DarkCenobyte
 ```
 
 Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by
-commit SHA); the code vendored in `third_party/` is updated by hand.
+commit SHA); the code vendored in `third_party/` and the sources of the macOS build
+(`tools/macos/README.md`) are updated by hand.
 
 ## Licence
 
@@ -615,6 +646,22 @@ fonts, of Stockfish's authors, of the QR code generator and of the opening names
   also links the [MinGW-w64](https://www.mingw-w64.org) runtime (ZPL-2.1 and other permissive
   licences, parts in the public domain) and winpthreads (MIT and BSD-3-Clause).
 
+### Shipped with the macOS app
+
+The macOS app (`Contents/Frameworks`) carries, built from source by `tools/macos/build-deps.sh`
+and listed with their versions in `Contents/Resources/macOS-dependencies.txt`:
+- **[Mesa](https://mesa3d.org)** 26.2.4 (its EGL, the Zink OpenGL driver and the KosmicKrisp Vulkan
+  driver, with the patches of `tools/macos/mesa-patches/`): MIT and other permissive licences, ©
+  the Mesa authors; it compiles in
+  [SPIRV-Tools](https://github.com/KhronosGroup/SPIRV-Tools) (Apache-2.0, © The Khronos Group
+  Inc.).
+- **The [Vulkan loader](https://github.com/KhronosGroup/Vulkan-Loader)** 1.4: Apache-2.0, © The
+  Khronos Group Inc., Valve Corporation, LunarG, Inc.
+- **[OpenSSL](https://www.openssl.org)** 3.6 (linked into the executable): Apache-2.0, © The
+  OpenSSL Project Authors.
+
+Their licence texts are in the app's `Contents/Resources/licences/`.
+
 ### Code adapted from other projects
 
 These parts of the game's own code follow published code closely:
@@ -650,7 +697,8 @@ These parts of the game's own code follow published code closely:
 On Linux the game uses the system's GNU C Library (LGPL-2.1-or-later), OpenSSL 3 (Apache-2.0),
 libX11 (MIT/X11), OpenGL library (libglvnd, MIT) and graphics driver, ALSA (libasound,
 LGPL-2.1-or-later, loaded at run time) and libsecret (LGPL-2.1-or-later, loaded at run time when
-present, with GLib); on Windows, the system's DLLs.
+present, with GLib); on Windows, the system's DLLs; on macOS, the system's frameworks and
+libraries.
 
 ### Downloaded at the player's request
 
