@@ -17,10 +17,11 @@
 //     Every sentence is proved by the board or the engine: "would be checkmate" only when the
 //     answer mates on the board, "That's stalemate" only on the board, "it takes longer" only when
 //     the engine still sees a mate, longer than the position asks;
-//   - hints only on request: the H key (requestHint) at any time the position waits, or the
-//     coach's offer, a question with a card, after every kHintOfferAfter wrong moves at one move.
-//     Step 1 the piece (or the square when that piece is the only one that can move), 2 the square,
-//     3 the move shown by hand (challengeHint);
+//   - hints only on request: the H key (requestHint) at any time the position waits (in a
+//     play-out, given once the engine named the move; a move made meanwhile drops the request), or
+//     the coach's offer, a question with a card, after every kHintOfferAfter wrong moves at one
+//     move when a hint can be given. Step 1 the piece (or the square when that piece is the only
+//     one that can move), 2 the square, 3 the move shown by hand (challengeHint);
 //   - after the last position, the closing words; then the session wants the handshake.
 // Nothing is recorded: no review, no appraisal, no history; the game's moves are the board's only.
 #pragma once

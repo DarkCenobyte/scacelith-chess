@@ -2,12 +2,14 @@
 // format (parse, write, the errors it reports), the mirror of a position, the hint steps, the moves
 // a line accepts; a run on the fake Stage and Analyst (tests/coach_fakes.h): positions one after
 // the other with the coach's move into them, a wrong move answered with the move on the board and
-// taken back, no hint unless asked (the offer after three wrong moves, its card, H at any time:
-// the piece, the square, the move shown), a play-out judged by the engine and by the board
-// (stalemate, mate), the coach's answer that ends a play-out on the board (a hold solved once,
-// nothing left waiting); the embedded book: it parses with no error, every set has its texts, every
-// line ends with the player's move (in checkmate for the mate sets); a whole set solved through
-// the session: completed, the handshake wanted, nothing recorded.
+// taken back, no hint unless asked (the offer after three wrong moves, its card, H at any time: the
+// piece, the square, the move shown), a play-out judged by the engine and by the board (stalemate,
+// mate), the coach's answer that ends a play-out on the board (a hold solved once, nothing left
+// waiting; a mate said as one), a play-out's hint never given late (asked for, then a move made
+// before its analysis came back) nor offered without a move to show; the embedded book: it parses
+// with no error, every set has its texts, every line ends with the player's move (in checkmate for
+// the mate sets); a whole set solved through the session: completed, the handshake wanted, nothing
+// recorded.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -193,9 +195,10 @@ TEST(challenge_book_reports_bad_lines) {
         "line b 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a8 g8f8\n"            // ends with the coach's move
         "line c 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a9\n"                 // not a move
         "play d | 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1 | hold\n"                             // hold without moves
+        "play f | 7k/8/6K1/8/8/8/8/5B2 w - - 0 1 | mate\n"                             // no mate possible
         "line e 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a8\n",
         &errors);
-    CHECK_EQ(errors.size(), size_t(4));
+    CHECK_EQ(errors.size(), size_t(5));
     CHECK_EQ(b.challenges().size(), size_t(1));
     CHECK_EQ(b.challenges()[0].positions.size(), size_t(1));
     CHECK_EQ(b.challenges()[0].positions[0].source, std::string("e"));
@@ -488,6 +491,85 @@ TEST(challenge_run_play_out_answer_draws_on_the_board) {
     CHECK_EQ(t.stage.count("playLessonMove"), 0);
     CHECK_EQ(t.queued("ch.solved"), 0);
     CHECK(!t.run.completed());
+    checkRenders(t.lines);
+}
+
+// A play-out move the coach answers with checkmate (a back-rank mate): said as a mate, proved by
+// the board ("would be checkmate"), whatever the goal; the move taken back, waiting again.
+TEST(challenge_run_play_out_answer_mates_on_the_board) {
+    const char* fen = "r5k1/5ppp/8/7N/8/8/5PPP/6K1 w - - 0 1";
+    for (const char* goal : {"mate", "hold 10"}) {
+        const char* id = std::string(goal) == "mate" ? "kq" : "kp_hold";
+        const ChallengeBook b =
+            ChallengeBook::parse(std::string("challenge ") + id + " endgames 2\nplay t:m | " + fen + " | " + goal + "\n");
+        Run t;
+        t.analyst.results[fenAfter(fen, "h5f4") + "|A0"] = mateAnalysis(1, "a8a1");   // the coach mates in 1
+        t.start(bookChallenge(b, id));
+        CHECK(t.ready());
+        t.move("h5f4");
+        CHECK(t.backAndWaiting(0));
+        CHECK_EQ(t.queued("ch.wrong.mate"), 1);
+        CHECK_EQ(t.queued("ch.wrong.loses"), 0);
+        CHECK_EQ(t.stage.all("demoMove").back().text, std::string("a8a1"));
+        CHECK_EQ(t.stage.count("playLessonMove"), 0);
+        CHECK(!t.run.completed());
+        checkRenders(t.lines);
+    }
+}
+
+// A hint asked for while the play-out's analysis runs, then a move made before it came back: the
+// hint was about the position left, so it is dropped (never said while the move is judged, nor
+// after the coach's answer, on another board); H gives one at the next wait.
+TEST(challenge_run_play_out_hint_asked_then_moved) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e2") + "|A0"] = mateAnalysis(-1, "h8g8");
+    t.analyst.delay = 1 << 20;   // the hint's analysis of the start position does not come back
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    CHECK(t.run.hintAvailable(t.game));
+    t.run.requestHint(t.game);
+    CHECK(!t.run.hintAvailable(t.game));   // asked for, on its way
+    t.analyst.delay = 3;
+    t.move("f1e2");   // the move stops the hint's analysis: its move comes back at once
+    CHECK(t.ready());
+    CHECK_EQ(t.game.moves().size(), size_t(2));
+    t.until([] { return false; }, 5.0f);
+    CHECK_EQ(t.queued("ch.hint"), 0);
+    CHECK_EQ(t.stage.count("demoMove"), 0);
+    // At the next wait, H gives the hint of the new position.
+    CHECK(t.until([&] { return t.run.hintAvailable(t.game); }, 60.0f));
+    t.run.requestHint(t.game);
+    CHECK(t.until([&] { return t.queued("ch.hint") == 1; }, 30.0f));
+    checkRenders(t.lines);
+}
+
+// A play-out whose hint analysis came back without a move (twice): no hint can be given, so none
+// is offered after the wrong moves (the offer would get no hint after a yes).
+TEST(challenge_run_play_out_no_hint_offer_without_a_move) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+    chess::Position start;
+    start.setFEN(fen);
+    Run t;
+    ai::Analysis failed;
+    failed.ok = false;
+    t.analyst.results[start.fen() + "|A0"] = failed;
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    CHECK(t.until([&] { return t.analyst.count("A0", start.fen()) == 2 && t.analyst.idle(); }, 30.0f));
+    CHECK(!t.run.hintAvailable(t.game));
+    for (int i = 0; i < kHintOfferAfter; ++i) {
+        t.move("f1a1");   // the win goes (the fake engine's level line)
+        CHECK(t.backAndWaiting(0));
+    }
+    t.until([] { return false; }, 5.0f);
+    CHECK_EQ(t.queued("ch.wrong.draw"), kHintOfferAfter);
+    CHECK_EQ(t.queued("ch.offer"), 0);
+    CHECK_EQ(t.queued("ch.try_again"), kHintOfferAfter);
+    CHECK(!t.run.offerOpen());
+    CHECK(t.run.playerMayMove(t.game));
     checkRenders(t.lines);
 }
 
