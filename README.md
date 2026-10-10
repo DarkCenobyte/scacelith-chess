@@ -1,7 +1,8 @@
 # Scacelith builds
 
-Prebuilt binaries: the game for Windows in `windows/` and for Linux on 64-bit Arm in
-`linux-aarch64/`, the dedicated server for Linux in `linux-server/`. This branch only holds
+Prebuilt binaries: the game for Windows in `windows/`, for Linux on 64-bit Arm in
+`linux-aarch64/` and, once, for Linux x86-64 in `linux-x86_64/`, the dedicated server for Linux
+in `linux-server/`. This branch only holds
 binaries; the source code is on `master`. The experimental macOS disk image is built by GitHub
 Actions only (the artifact of the CI's macOS job, or a release).
 
@@ -276,6 +277,25 @@ Actions only (the artifact of the CI's macOS job, or a release).
   been run on an Arm GPU by the build.
 - SHA-256 of the archive: `856a2092f8327b420c0bfa33b255445fe6846ba25554a0b35718a6baf961bf68`
 - SHA-256 of the executable: `4f5ec585c36baf3a42c3e1f68cb79d607beece97af4f8d205e187ff8c3f880e1`
+
+## linux-x86_64/Scacelith-2026-10-10-audit-final-linux-x86_64.tar.gz
+
+- The game for Linux x86-64: the executable `scacelith` (133 MB), `install.sh` (adds it to the
+  applications menu), its icons, the licences and a README (archive of 97 MB). A one-off test
+  build: Linux x86-64 games otherwise come from the releases.
+- Source: the same commit `f147ee9` of pull request #30 as
+  `windows/Scacelith-2026-10-10-audit-final.zip`.
+- Needs a GPU with OpenGL 4.6, X11 or XWayland, glibc 2.38 and OpenSSL 3 (Ubuntu 24.04, Debian
+  13, Fedora 40 or later). It links only libX11, libGL, OpenSSL and glibc (libasound and
+  libsecret are loaded when present). The release workflow builds the same game on Ubuntu 22.04,
+  for glibc 2.34.
+- Stockfish 19 in five builds (the game runs the fastest one the CPU supports) and its NNUE
+  network are embedded; the coach's voice is downloaded by the game.
+- Built with GCC 13 (Release) on Ubuntu 24.04. Its test program passes on the same machine (886
+  tests, 24 skipped), as in the pull request's CI on the same source. It has not been run on a
+  real GPU by the build.
+- SHA-256 of the archive: `643552630496704c1f90418b6a4684fcd01c90a74f28bfc7489514afea21e5cd`
+- SHA-256 of the executable: `ec40024df2b43b84ab7c9f75eaf6d848cd1f4ba8fb7e9947a8e8014595a08c80`
 
 ## linux-server/scacelith-server-2026-10-03
 
