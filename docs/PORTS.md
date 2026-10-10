@@ -54,22 +54,34 @@ other targets, so that the work can start from it.
 - OpenGL 4.6 on aarch64 means NVIDIA (Jetson Orin, discrete GPUs), AMD discrete GPUs or Asahi Linux
   on Apple M1/M2. A Raspberry Pi 4/5 (V3D, desktop GL 3.1) cannot run the game.
 
-**What does not build or run today**
-- Stockfish: `SF_ALL_VARIANTS` (`third_party/stockfish/CMakeLists.txt`) and the `SF_ISA_*` flags are
-  x86-64 only (`-msse2`, `-mavx2`...: the cross build stops on all five variants). Stockfish 19 has
-  ARM targets (armv8: NEON; armv8-dotprod: `-march=armv8.2-a+dotprod`, NEON dot product); the
-  runtime choice would read `getauxval(AT_HWCAP) & HWCAP_ASIMDDP`. The variant isolation
-  (`cmake/isolate.cmake`) is ELF-generic; the instruction-set audit (`tools/isa_audit.py`) is x86
-  only and must be skipped or adapted.
-- TTS: the kernels are SSE2/AVX2/AVX-VNNI/AVX-512 (`src/tts/kernels_*.cpp`), the dispatch reads
-  cpuid (`src/tts/cpu.cpp`) and `src/tts/threads.cpp` uses `_mm_getcsr` unconditionally; a NEON or
-  portable kernel set and an aarch64 dispatch are needed, and the TTS instruction-set audit in
-  `CMakeLists.txt` is x86 only.
-- Audio: `DenormalGuard` (`src/audio/dsp.h`) does nothing on aarch64; set FPCR.FZ (bit 24) with
-  `mrs`/`msr fpcr` there (the audio tests assert that no denormal reaches the output).
-- GCC contracts `a*b+c` into `fmadd` by default on aarch64: results are not bitwise identical to
-  x86-64; tests with tolerances are fine, bit-exact ones may need `-ffp-contract=off`.
-- `char` is unsigned on aarch64 Linux: check any code that assumes it is signed.
+**What builds and runs** (cross build, checked under qemu-user)
+- Stockfish: two variants, `armv8` (NEON, `-march=armv8-a`) and `armv8-dotprod`
+  (`-march=armv8.2-a+dotprod`, NEON dot product: Cortex-A55/A75 and later, Neoverse N1, Apple M1),
+  isolated as on x86-64 (`cmake/isolate.cmake` is ELF-generic). `scacelith/cpu.cpp` takes the second
+  when `getauxval(AT_HWCAP) & HWCAP_ASIMDDP`; `engine.arch` names them. The instruction-set audit
+  has an aarch64 mode (`tools/isa_audit.py --arch aarch64`, see
+  `third_party/stockfish/README.scacelith.md`).
+- TTS: a NEON kernel table (`src/tts/kernels_neon.cpp`, the shared kernels of `kernels_impl.h`) next
+  to the scalar reference (`kernels_scalar.h`, the same as on x86-64). NEON is part of ARMv8-A, so
+  there is nothing to check at run time and no TTS instruction-set audit; `tts.arch` takes `scalar`
+  or `neon`, and the worker threads set FPCR.FZ where x86-64 sets MXCSR's FTZ and DAZ.
+- Audio: `DenormalGuard` (`src/audio/dsp.h`) sets FPCR.FZ (bit 24) with `mrs`/`msr fpcr`.
+- `fmadd` contraction: every float comparison of the tests has a tolerance, nothing needed
+  `-ffp-contract=off`. Unsigned `char`: nothing found that depends on its sign.
+- Tests under `qemu-aarch64` (Release, no voice model): everything passes but five tests that
+  measure time or rely on what qemu-user does not emulate: `audio_mixer_cpu_cost`,
+  `pgn_long_lines_take_linear_time` and `game_review_engine_scholars_mate` (time limits),
+  `audio_live_engine_init_shutdown` (a bank refresh expected within a delay) and
+  `net_sigpipe_spawned_program_default` (qemu's `posix_spawn` reports no failure to execute a
+  missing program). To be run on an aarch64 machine.
+
+**Still to do**
+- The release job: `ubuntu-22.04-arm` as the x86-64 one runs `ubuntu-22.04`, the same Release
+  flags (GCC 11's default `-march=armv8-a` with `-moutline-atomics`: libgcc's atomics take LSE at
+  run time; `-static-libstdc++ -static-libgcc` link libgcc's helpers in), and the same checks with
+  `ld-linux-aarch64.so.1` in the list of allowed libraries. A cross build against Ubuntu 24.04's
+  arm64 glibc (2.39) needs `GLIBC_2.38` symbols: only a build on 22.04 keeps the 2.34 floor.
+- A CI job and the AppImage (above).
 
 ## macOS (Apple Silicon)
 
@@ -78,8 +90,15 @@ Not possible as a build job alone; it is a port:
   (post-processing, probes), direct state access, SSBOs, image load/store, `glClipControl`, texture
   views and multi-draw indirect: a Metal renderer (or a GL-on-Metal translation layer) is needed.
 - No Cocoa platform layer (window, GL context, input, high DPI) and no CoreAudio backend.
-- The Stockfish variant isolation handles ELF and PE only, and the build requires GNU binutils;
-  macOS uses Mach-O and Apple's linker. OpenSSL is not part of macOS.
+- OpenSSL is not part of macOS.
+- In place, not yet compiled on a Mac: Stockfish as one variant, `apple-silicon` (the
+  `armv8-dotprod` flags: every Apple Silicon CPU has the dot product), built with Apple clang and
+  not isolated (the isolation needs GNU binutils and ELF or PE; with one variant nothing can leak,
+  and its static initialisers run at program start), so without the audit; the embedded network
+  (INCBIN) and the embedded files (`cmake/embed.cmake`) in Mach-O sections; the TTS NEON table and
+  FPCR.FZ in the audio and TTS threads as on Linux aarch64; the TTS workers' lower priority through
+  their QoS class (`pthread_set_qos_class_self_np`, as `setpriority` applies to the whole process
+  on macOS).
 - Distribution needs Developer ID signing and notarization (a paid Apple account and repository
   secrets).
 - The icon for it: `res/icons/png/scacelith-1024.png` and the smaller PNGs make the `.icns` with

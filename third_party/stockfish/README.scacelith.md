@@ -86,13 +86,15 @@ so upstream code is compiled as is but sees them first:
   `nnue/network.cpp` then only declares the embedded network) and, on Linux, `-fno-gnu-unique`
   (see isolation below). The UCI command `compiler` reports the variant's `ARCH`.
 * The network is embedded once, by `scacelith/nnue_incbin.cpp`, with Stockfish's own
-  `INCBIN(EmbeddedNNUE, EvalFileDefaultName)` (an assembler `.incbin`, works with Linux GCC and
-  MinGW-w64 GCC), which is what `nnue/network.cpp` does in a single-architecture build. The
+  `INCBIN(EmbeddedNNUE, EvalFileDefaultName)` (an assembler `.incbin`, works with Linux GCC,
+  MinGW-w64 GCC and Apple clang), which is what `nnue/network.cpp` does in a single-architecture
+  build. The
   assembler resolves the network's relative path itself, so that file gets `-Wa,-I<this>/src`, and
   it depends on the `.nnue` file for rebuilds.
-* The dispatcher, the network and the Win32 wrapper are compiled once with the default x86-64
-  flags and without the forced includes, so they run on any x86-64 CPU.
-* `SCACELITH_SF_VARIANTS` (a CMake cache list) selects the variants; the default is all five. Each
+* The dispatcher, the network and the Win32 wrapper are compiled once with the target's default
+  flags (x86-64, ARMv8-A) and without the forced includes, so they run on any CPU of the target.
+* `SCACELITH_SF_VARIANTS` (a CMake cache list) selects the variants; the default is all five (on
+  ARM, those of [ARM](#arm-linux-aarch64-and-macos)). Each
   is a full Stockfish compile: `-DSCACELITH_SF_VARIANTS=x86-64-sse41-popcnt` (or whichever variant
   the developer's CPU runs best) makes quicker local builds. The dispatcher only knows the variants
   that were built; without `x86-64` a CPU below every built variant cannot run the engine, and the
@@ -214,6 +216,45 @@ after its link (`tools/check_pdata.py` at the repository root).
   well (qemu does not emulate AVX-512), all with the same `bench` node counts. The Windows AI tests
   pass on Penryn and Nehalem, and `ai_variants_play_identically` on Haswell. The build machine's
   CPU gets `x86-64-avx512icl`, natively and under Wine, and runs all five variants.
+
+### ARM: Linux aarch64 and macOS
+
+Linux aarch64 has two variants, with upstream's flags for those `ARCH`s plus an explicit
+`-march=armv8-a` for the first (GCC's default, written out so that a global `-march` cannot raise
+it), audit levels 0 and 1, and the dispatch of upstream's `universal/entry_arm64.cpp`:
+
+| Variant | CPUs | Checked at run time | Flags |
+|---|---|---|---|
+| `armv8` | every ARMv8-A CPU (Cortex-A53, A72: Raspberry Pi 3 and 4) | nothing: NEON is part of ARMv8-A | `-DUSE_POPCNT -DUSE_NEON=8 -march=armv8-a` |
+| `armv8-dotprod` | Cortex-A55, A75, A76 and later (Raspberry Pi 5), Neoverse N1 and later, Apple M1 and later (Asahi Linux) | `HWCAP_ASIMDDP` in `getauxval(AT_HWCAP)` (the kernel's report of the NEON dot product) | `-DUSE_POPCNT -DUSE_NEON=8 -DUSE_NEON_DOTPROD -march=armv8.2-a+dotprod` |
+
+* **Isolation and dispatch**: as on x86-64 Linux (ELF). `-march=armv8.2-a` also lets GCC use the
+  LSE atomics, the rounding doubling multiply-accumulates (RDM) and CRC32 in `armv8-dotprod`: the
+  audit counts them with the dot product at level 1. `ai_variants_play_identically` passes under
+  `qemu-aarch64` (which emulates the dot product), so both variants were run; their speeds are to
+  be measured on an aarch64 machine.
+* **Audit** (`tools/isa_audit.py --arch aarch64`, objdump of the aarch64 binutils). Instructions
+  are classified by mnemonic (level 1: `sdot`/`udot`, LSE `cas`/`casp`/`swp`/`ld<op>`/`st<op>`
+  and their acquire/release, byte and halfword forms, `sqrdmlah`/`sqrdmlsh`, `crc32*`). The
+  references are the branches and calls, the pointers in data (`R_AARCH64_RELATIVE` and
+  `IRELATIVE`), and the `adrp` pages completed by an `add` or a load: an `adrp` + `add` is a
+  reference to its address, an `adrp` + `ldr` from the GOT a reference to the GOT slot's target. A
+  page is forgotten at a branch target, after an unconditional branch or a return, on a write to
+  its register, and in the caller-saved registers after a call, so that a stale page is never
+  completed. GCC's outline atomics (`-moutline-atomics`, the default on aarch64 Linux) are libgcc
+  functions (`__aarch64_cas4_acq_rel`, ...) that test `__aarch64_have_lse_atomics` and use LSE
+  only when the CPU has it: those of `libgcc.a` count as baseline, and the report gives their
+  number. Result: no finding (1,396 functions, 49,319 references in the probe); it fails when
+  given level 0 for `armv8-dotprod` or no exemption for the dispatcher.
+* **macOS (Apple Silicon)**: one variant, `apple-silicon` (upstream's name, the flags of
+  `armv8-dotprod`: every Apple Silicon CPU has the dot product), compiled with Apple clang
+  (`-fconstexpr-steps` in place of GCC's `-fconstexpr-ops-limit`; no `-fno-ipa-cp-clone`) and not
+  isolated: `cmake/isolate.cmake` needs GNU binutils and ELF or PE, and with a single variant no
+  copy of an inline function can be taken for another. Its objects go into the library as they are,
+  its static initialisers run at program start (`sf_variants.h`: `SCACELITH_SF_ISOLATED` is 0, the
+  dispatcher has no initialiser table to run), and there is no audit. INCBIN puts the network in
+  `__DATA,__const` with Mach-O's leading underscore (`INCBIN_SILENCE_BITCODE_WARNING`: incbin.h
+  takes `TARGET_OS_IPHONE` as defined, while macOS defines it as 0). Not yet compiled on a Mac.
 
 ## Running in-process
 
