@@ -2948,3 +2948,274 @@ TEST(direct_guest_retries_once_without_host_confirmation) {
     const Event* end = guest.last(Event::Kind::GameEnd);
     CHECK(end && end->game.reason == int(P::EndReason::ServerAborted));
 }
+
+// ---- stances (protocol minor 2) -----------------------------------------------------------------
+
+namespace {
+
+// The OpponentStance values a peer got, in order.
+std::vector<int> stancesOf(const Peer& p) {
+    std::vector<int> v;
+    for (const Event& e : p.events)
+        if (e.kind == Event::Kind::OpponentStance) v.push_back(e.stance);
+    return v;
+}
+
+// Hosts a match and joins it with a guest written by hand whose Hello announces 'minor'; the
+// host's Welcome must answer that minor (the lower of the two).
+bool joinRawMinor(Peer& host, RawGuest& raw, uint16_t minor, P::GameSnapshot& snap) {
+    Peer nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    if (!waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; })) return false;
+    DirectInvite inv = host.dm.invite();
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.minor = minor;
+    hello.client = "Scacelith test";
+    hello.token = "direct:Raw      ";
+    P::Welcome w;
+    return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && w.minor == minor && raw.waitFor(snap, 5000);
+}
+
+// The Welcome of a host written by hand, of protocol minor 'minor' and keepalive 'gestureIdleMs'.
+bool sendWelcomeMinor(RawHost& raw, const direct::Authority& auth, uint16_t minor, uint16_t gestureIdleMs) {
+    P::Welcome w;
+    w.proto = P::kProtocolVersion;
+    w.minor = minor;
+    w.serverTime = sock::epochMs();
+    w.userId = 2;
+    w.username = "Bob";
+    w.serverName = "Alice";
+    w.heartbeatMs = 2000;
+    w.clientPingMs = 2000;
+    w.maxMsgPerSec = 40;
+    w.activeGame = auth.gameId();
+    w.gestureRate = 10;
+    w.gestureBurst = 20;
+    w.gestureIdleMs = gestureIdleMs;
+    return raw.send(w);
+}
+
+}  // namespace
+
+TEST(direct_loopback_stances) {
+    // Host and guest of minor 2: each side's stance reaches the other as an OpponentStance of the
+    // game (in order, 'game' not filled in), at once and then every keepalive (1 s) while not
+    // Seated, a return to Seated once. The authority never sees them: no Error comes back. A
+    // standing stance goes again both ways once the link is back after a failure; once the game
+    // is over nothing goes.
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    Relay relay;
+    CHECK(relay.start(inv.port));
+    guest.dm.join("127.0.0.1", relay.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    REQUIRE(guest.dm.currentGame() && host.dm.currentGame());
+    const uint64_t id = guest.dm.currentGame()->id;
+    CHECK_EQ(host.dm.currentGame()->id, id);
+
+    host.dm.sendStance(0);   // Seated: nothing to say
+    guest.dm.sendStance(0);
+    host.dm.sendStance(1);
+    CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::OpponentStance) == 1; }));
+    const Event* e = guest.last(Event::Kind::OpponentStance);
+    CHECK(e && e->gameId == id && e->game.id == 0 && e->stance == 1);
+    guest.dm.sendStance(2);
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::OpponentStance) == 1; }));
+    e = host.last(Event::Kind::OpponentStance);
+    CHECK(e && e->gameId == id && e->game.id == 0 && e->stance == 2);
+
+    // Refreshed every second while standing, both ways (the stance given every frame meanwhile).
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(waitUntil(host, guest, [&] {
+        host.dm.sendStance(1);
+        guest.dm.sendStance(2);
+        return guest.count(Event::Kind::OpponentStance) >= 3 && host.count(Event::Kind::OpponentStance) >= 3;
+    }, 4000));
+    const double span = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    CHECK(span > 1500.0 && span < 3500.0);
+    CHECK(stancesOf(guest) == std::vector<int>({1, 1, 1}));
+    CHECK(stancesOf(host) == std::vector<int>({2, 2, 2}));
+
+    // Back to Seated: once.
+    host.dm.sendStance(0);
+    guest.dm.sendStance(0);
+    CHECK(waitUntil(host, guest, [&] { return stancesOf(guest).back() == 0 && stancesOf(host).back() == 0; }));
+    const size_t hn = stancesOf(host).size(), gn = stancesOf(guest).size();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    host.drain();
+    guest.drain();
+    CHECK_EQ(stancesOf(host).size(), hn);
+    CHECK_EQ(stancesOf(guest).size(), gn);
+    CHECK_EQ(host.count(Event::Kind::ServerError), 0);
+    CHECK_EQ(guest.count(Event::Kind::ServerError), 0);
+
+    // Both standing when the network fails: once the guest is back, each stance goes again.
+    host.dm.sendStance(3);
+    guest.dm.sendStance(1);
+    CHECK(waitUntil(host, guest, [&] { return stancesOf(guest).back() == 3 && stancesOf(host).back() == 1; }));
+    relay.cut();
+    CHECK(waitUntil(host, guest, [&] { return guest.hasConn(ConnState::Reconnecting); }));
+    // The stance 'value' among the events after the last one 'mark' accepts.
+    auto stanceAfter = [](const Peer& p, Event::Kind mark, int value) {
+        size_t from = p.events.size();
+        for (size_t i = 0; i < p.events.size(); ++i)
+            if (p.events[i].kind == mark && (mark != Event::Kind::GameEvent ||
+                                             p.events[i].gameEventKind == int(P::GameEventKind::PlayerReconnected)))
+                from = i;
+        for (size_t i = from; i < p.events.size(); ++i)
+            if (p.events[i].kind == Event::Kind::OpponentStance && p.events[i].stance == value) return true;
+        return false;
+    };
+    // The host hears the guest's after the guest is back (PlayerReconnected), the guest the host's
+    // after the snapshot of its return.
+    CHECK(waitUntil(host, guest, [&] {
+        return guest.count(Event::Kind::GameSnapshot) == 2 && stanceAfter(host, Event::Kind::GameEvent, 1) &&
+               stanceAfter(guest, Event::Kind::GameSnapshot, 3);
+    }, 15000));
+    CHECK_EQ(host.count(Event::Kind::ServerError), 0);
+    CHECK_EQ(guest.count(Event::Kind::ServerError), 0);
+
+    // The game is over: nothing more, either way.
+    host.dm.resign();
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) && guest.count(Event::Kind::GameEnd); }));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    host.drain();
+    guest.drain();
+    const size_t hEnd = stancesOf(host).size(), gEnd = stancesOf(guest).size();
+    host.dm.sendStance(2);
+    guest.dm.sendStance(3);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    host.drain();
+    guest.drain();
+    CHECK_EQ(stancesOf(host).size(), hEnd);
+    CHECK_EQ(stancesOf(guest).size(), gEnd);
+}
+
+TEST(direct_host_stance_to_guests_by_minor) {
+    // A guest of minor 0 or 1 gets no Stance from the host (its codec has no such message), and
+    // one it sends anyway is ignored without an Error. A guest of minor 2 gets the host's at once
+    // and every keepalive; its own C_Stance becomes an OpponentStance, taken before the authority
+    // (never answered), unless malformed or for another game; C_Stance counts towards the flood
+    // limit like any message.
+    for (uint16_t minor : {uint16_t(0), uint16_t(1)}) {
+        Peer host;
+        RawGuest raw;
+        P::GameSnapshot snap;
+        REQUIRE(joinRawMinor(host, raw, minor, snap));
+        host.drain();
+        host.dm.sendStance(1);
+        P::S_Stance got;
+        CHECK(!raw.waitFor(got, 1500));
+        P::C_Stance mine;
+        mine.game = snap.game;
+        mine.stance = P::Stance::SideLeft;
+        CHECK(raw.send(mine));
+        P::C_Ping ping;
+        ping.nonce = 31;
+        CHECK(raw.send(ping));
+        P::S_Pong pong;
+        CHECK(raw.waitFor(pong, 5000));
+        CHECK_EQ(raw.errors, 0);
+        host.drain();
+        CHECK_EQ(host.count(Event::Kind::OpponentStance), 0);
+    }
+
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    REQUIRE(joinRawMinor(host, raw, 2, snap));
+    host.drain();
+    host.dm.sendStance(2);
+    P::S_Stance got;
+    CHECK(raw.waitFor(got, 2000));
+    CHECK(got.game == snap.game && got.stance == P::Stance::SideLeft);
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(raw.waitFor(got, 2000));   // the refresh
+    const double gap = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    CHECK(gap > 700.0 && gap < 1500.0);
+    CHECK(got.game == snap.game && got.stance == P::Stance::SideLeft);
+
+    P::C_Stance s;
+    s.game = snap.game;
+    s.stance = P::Stance::SideRight;
+    CHECK(raw.send(s));
+    s.stance = P::Stance(9);   // malformed: a value of no minor of this codec
+    CHECK(raw.send(s));
+    s.stance = P::Stance::Standing;
+    s.game = snap.game + 1;    // another game
+    CHECK(raw.send(s));
+    P::C_Ping ping;
+    ping.nonce = 32;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));
+    CHECK_EQ(raw.errors, 0);   // never answered
+    host.drain();
+    CHECK(stancesOf(host) == std::vector<int>({3}));
+    const Event* e = host.last(Event::Kind::OpponentStance);
+    CHECK(e && e->gameId == snap.game);
+    CHECK(host.dm.currentGame() && host.dm.currentGame()->moves.empty() && host.dm.currentGame()->blackConnected);
+
+    // Fifty at once: the flood limit closes the link, as for any message.
+    s.game = snap.game;
+    for (int i = 0; i < 50; ++i) {
+        s.stance = P::Stance(1 + i % 3);
+        raw.send(s);   // the last ones may find the link closed
+    }
+    P::Error err;
+    CHECK(raw.waitFor(err, 5000));
+    CHECK(err.code == P::ErrorCode::Flood && err.fatal);
+}
+
+TEST(direct_guest_stance_to_hosts_by_minor) {
+    // A host of minor 1 gets no Stance from the guest (it would answer the unknown message with an
+    // Error). Back with a host of minor 2 (its Welcome after a reconnection), a stance other than
+    // Seated goes at once, before any keepalive (10 s here); the host's S_Stance becomes an
+    // OpponentStance with its value as it came, for the game shown only.
+    RawHost raw;
+    REQUIRE(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    REQUIRE(out.toGuest.size() == 1);
+    Peer guest, nobody;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK_EQ(int(hello.minor), int(P::kMinor));
+    CHECK(sendWelcomeMinor(raw, auth, 1, 10000) && raw.sendBytes(out.toGuest[0]));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    guest.dm.sendStance(1);
+    P::C_Stance got;
+    CHECK(!raw.waitFor(got, 1500));
+    CHECK_EQ(raw.errors, 0);
+
+    raw.drop();   // the link fails; the guest comes back to a host of minor 2
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasConn(ConnState::Reconnecting); }));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(sendWelcomeMinor(raw, auth, 2, 10000) && raw.sendBytes(out.toGuest[0]));
+    CHECK(raw.waitFor(got, 2000));
+    const double after = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    CHECK(after < 1000.0);
+    CHECK(got.game == auth.gameId() && got.stance == P::Stance::Standing && got.seq > 1);
+
+    P::S_Stance s;
+    s.game = auth.gameId();
+    s.stance = P::Stance::SideLeft;
+    CHECK(raw.send(s));
+    s.stance = P::Stance(6);   // a later minor's
+    CHECK(raw.send(s));
+    s.game = auth.gameId() + 1;
+    s.stance = P::Stance::Standing;
+    CHECK(raw.send(s));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::OpponentStance) == 2; }));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    guest.drain();
+    CHECK(stancesOf(guest) == std::vector<int>({2, 6}));
+    const Event* e = guest.last(Event::Kind::OpponentStance);
+    CHECK(e && e->gameId == auth.gameId() && e->game.id == 0);
+}
