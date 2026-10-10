@@ -504,6 +504,8 @@ options.online.test = Probar la conexión
 options.online.test_ok = {0}: conectado, compatible con esta versión.
 options.online.test_incompatible = {0}: conectado, pero necesita otra versión de Scacelith.
 options.online.in_game = No se puede cambiar de servidor durante una partida en línea.
+options.online.remember_session = Recordar mi sesión si el llavero del sistema no está disponible
+options.online.remember_session.help = Cuando ningún llavero del sistema (GNOME Keyring, KWallet…) puede guardar su sesión, se guarda en un archivo que solo su cuenta de usuario puede leer. Cualquiera que pueda leer sus archivos, o una copia de ellos como una copia de seguridad, podría usar esa sesión. Desactivado: la sesión sigue iniciada hasta que se cierra el juego. Puede cerrar la sesión de cualquier dispositivo desde Dispositivos con sesión iniciada, en su cuenta.
 
 # Sign in, create an account
 online.signin.lead = Inicie sesión en {0} para jugar en línea contra otras personas.
@@ -626,6 +628,8 @@ online.account.delete = Eliminar la cuenta
 
 # Play
 online.play.signed_in = Sesión iniciada como {0}
+online.session.file = Ningún llavero del sistema pudo guardar su sesión: se recuerda en un archivo que solo su cuenta de usuario puede leer (Opciones > Servidor en línea).
+online.session.memory = Ningún llavero del sistema pudo guardar su sesión, y no se guarda en ningún archivo: la sesión sigue iniciada hasta que se cierra el juego (Opciones > Servidor en línea).
 online.play.find_section = BUSCAR RIVAL
 online.play.friend_section = JUGAR CON UN AMIGO
 online.play.mode = Partida

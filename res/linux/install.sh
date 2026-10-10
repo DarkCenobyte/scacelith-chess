@@ -41,5 +41,5 @@ libsecret_found() {
     return 1
 }
 if ! libsecret_found; then
-    echo "Note: libsecret-1.so.0 not found: the saved logins will be kept in ${XDG_CONFIG_HOME:-$HOME/.config}/scacelith/ instead of the desktop keyring (install libsecret-1-0 on Debian/Ubuntu, libsecret on Fedora/Arch)."
+    echo "Note: libsecret-1.so.0 not found: the saved logins will be kept in a file only you can read in ${XDG_CONFIG_HOME:-$HOME/.config}/scacelith/ instead of the desktop keyring, or only until the game closes if you turn off \"Remember my sign-in when the system keyring is unavailable\" in Options > Online server (install libsecret-1-0 on Debian/Ubuntu, libsecret on Fedora/Arch)."
 fi

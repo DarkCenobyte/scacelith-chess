@@ -111,6 +111,9 @@ struct Settings {
     int onlineApiPort = 443;          // HTTPS API (Scacelith servers use 443 for both by default)
     int onlineWsPort = 0;             // WSS; 0 = the API port
     std::string onlinePin;            // SHA-256 of a self-signed community server's certificate
+    // Linux: a session no system keyring can keep stays in the credentials file (0600), else in
+    // memory until the game quits (net::setFileSessionsAllowed; Options > Online).
+    bool onlineRememberWithoutKeyring = true;
     // Last choices of the online pages
     std::string onlineCategory = "5+3";
     bool onlineRated = true;

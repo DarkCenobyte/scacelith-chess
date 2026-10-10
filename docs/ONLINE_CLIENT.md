@@ -133,17 +133,57 @@ encrypted again for the new one; on Linux a token the system keyring keeps is fo
 origin, and moves to an item of the new one the first time it is read). Only the official host of
 the build moves, never a community server.
 
+### Where the sessions are kept
+
 Where the saved sessions are kept (`net/credential_store.h`): on Windows in `Scacelith.credentials`,
 each token encrypted with DPAPI for the Windows account. On Linux the system keyring keeps the
 tokens when there is one (the Secret Service: GNOME Keyring, KWallet, KeePassXC...; libsecret is
 loaded at run time, `src/net/secret_service.cpp`), and the file only names their items
-(`keyring:`); a token an earlier version wrote in the file moves to the keyring the first time it is
-read while the keyring is unlocked. Without a usable keyring (no libsecret, no D-Bus session, no
-Secret Service or default collection) or with `SCACELITH_KEYRING=off` in the environment, the
-tokens stay in the file in the clear (`bound:`), protected only by its permissions (0600, in a 0700
-folder), and the log says why once (the first time a token is saved there or read from there).
-Logout, a session the server refused and a deleted account remove the keyring item with the
-reference.
+(`keyring:`); a token kept in the file or in memory (below) moves to the keyring the first time it
+is read while the keyring works and is unlocked. Logout, a session the server refused and a deleted
+account remove the keyring item with the reference.
+
+When no keyring can keep a sign-in's token on Linux (no libsecret, no D-Bus session, no Secret
+Service or default collection, `SCACELITH_KEYRING=off`, a locked keyring whose unlock prompt was
+dismissed or not answered in time, the game quitting during the sign-in):
+
+- **By default, the file.** The token goes to `Scacelith.credentials`, bound to its server's origin
+  but in the clear (`bound:`). The file must be 0600 in a 0700 folder: the store checks both at
+  every read and write of the file and closes them when they are more open (ssh's rule; the log
+  says so). When that cannot be done (another owner, a read-only file system, the user's home
+  folder, whose permissions the game never changes: a credentials file beside an `--ini` there),
+  no token in the clear is read from or written to that file: a sign-in's token is kept in memory
+  for the run, and a token the file held is not used and is erased at the next write. The player
+  is told once per run, after the sign-in ("No system keyring could keep your sign-in: it is
+  remembered in a file that only your user account can read"), and the log says why.
+- **Option off: memory only.** Options > Online server, "Remember my sign-in when the system
+  keyring is unavailable" (on by default; Linux only; `online.remember_without_keyring` in
+  `Scacelith.ini`, `net::setFileSessionsAllowed`). Off, the token lives in memory until the game
+  quits: the file keeps the record (user name, server id, pin) without any token, so nothing
+  decodable is written. A token the file already holds (an earlier version's, or one saved while
+  the option was on) is moved to memory and erased from the file, at the next start or at once
+  when the option is applied; turning the option on again writes the token kept in memory back to
+  the file. The player is told once per run that the sign-in lasts until the game closes.
+
+**An accepted risk (audit A08).** The audit finding A08 (October 2026) proposed keeping such
+sessions in memory by default. The project keeps the private file as the default instead,
+deliberately, for these reasons:
+
+- A process running as the same user can read an unlocked keyring over D-Bus anyway (GNOME
+  Keyring's Secret Service, for one, does not tell its callers apart), as it can read a 0600 file:
+  against that user's own processes the keyring adds little. The residual gap the file opens is its
+  copies: a backup, a synchronised or copied home folder, a disk read from another system.
+- What the file holds is a session token, never a password: the server can revoke it (Signed-in
+  devices, Sign out everywhere, a password change), and it is bound to the server's origin.
+- Desktops without a usable keyring are common (window managers without a Secret Service, Wayland
+  sessions where gnome-keyring is not unlocked, a keyring prompt dismissed): memory by default would
+  make every start of the game a new sign-in there.
+
+The trade-off is visible (the notice after the sign-in, the option with its tooltip: "Anyone who
+can read your files, or a copy of them such as a backup, could use that session"), and a player who
+does not accept it turns the option off. A test with a real GNOME Keyring or KWallet prompt is
+still to be made by hand: the tests of the store use a fake keyring
+(`tests/net_tests.cpp`, `net_credentials_*`), and the Secret Service tests are skipped in CI.
 
 A locked keyring is unlocked through the desktop's own prompt (libsecret's `secret_service_unlock`:
 the Secret Service shows it), asked from a network thread, never the game's, and one at a time: when
@@ -156,10 +196,10 @@ the prompt itself stays on the desktop until answered (withdrawing it with the S
 `Dismiss` makes gnome-keyring-daemon abort, up to version 48 at least), and unlocks the keyring if
 answered later. Once a prompt was dismissed, left unanswered or failed (a desktop without a
 prompter dismisses it at once), none is shown again during the run except for a new sign-in. Then
-the sign-in's token stays in the file and moves to the keyring once that is unlocked (a later run),
-a read finds no session this time but keeps the reference (the game offers to sign in; the session
-comes back once the keyring is unlocked), and a removal leaves the item in the keyring (the log
-says so).
+the sign-in's token goes where a token goes without a keyring (the file, or memory: above) and moves
+to the keyring once that is unlocked, a read finds no session this time but keeps the reference
+(the game offers to sign in; the session comes back once the keyring is unlocked), and a removal
+leaves the item in the keyring (the log says so).
 
 ## Account API
 

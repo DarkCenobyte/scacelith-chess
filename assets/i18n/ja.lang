@@ -505,6 +505,8 @@ options.online.test = 接続テスト
 options.online.test_ok = {0}：接続しました。このバージョンに対応しています。
 options.online.test_incompatible = {0}：接続しましたが、別のバージョンのScacelithが必要です。
 options.online.in_game = オンライン対局中はサーバーを変更できません。
+options.online.remember_session = システムのキーリングが使えないときもログイン状態を保存する
+options.online.remember_session.help = システムのキーリング（GNOME Keyring、KWallet など）でセッションを保管できないとき、あなたのユーザーアカウントだけが読めるファイルに保存します。あなたのファイルやそのコピー（バックアップなど）を読める人は、このセッションを使えてしまいます。オフ：ゲームを閉じるまでログインしたままになります。どのデバイスも、アカウントの「ログイン中のデバイス」からログアウトできます。
 
 # Sign in, create an account
 online.signin.lead = {0}にログインして、オンラインで対局しましょう。
@@ -627,6 +629,8 @@ online.account.delete = アカウントを削除
 
 # Play
 online.play.signed_in = {0}としてログイン中
+online.session.file = システムのキーリングでログイン状態を保管できませんでした。あなたのユーザーアカウントだけが読めるファイルに保存しています（設定 > サーバー）。
+online.session.memory = システムのキーリングでログイン状態を保管できず、ファイルにも保存していません。ゲームを閉じるまでログインしたままです（設定 > サーバー）。
 online.play.find_section = 対戦相手を探す
 online.play.friend_section = 友人と対局
 online.play.mode = 対局

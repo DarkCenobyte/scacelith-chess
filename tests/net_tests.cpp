@@ -58,6 +58,7 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include <filesystem>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -1190,8 +1191,14 @@ TEST(net_sys_write_file_atomic_waits_for_another_program) {
 // =============================================================================================
 
 namespace {
+// In a folder of their own, private as the store wants it (0700; credential_store.h): never beside
+// the executable, whose folder's permissions the store would close.
 std::string tempCredentialPath(const char* tag) {
-    std::string p = net::sys::exeDirectory() + "net-test-" + tag + ".credentials";
+    const std::string dir = net::sys::exeDirectory() + "net-test-credentials/";
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    std::filesystem::permissions(dir, std::filesystem::perms::owner_all, ec);
+    std::string p = dir + "net-test-" + tag + ".credentials";
     net::sys::removeFile(p);
     return p;
 }
@@ -1845,12 +1852,14 @@ TEST(net_credentials_keyring_does_not_block) {
     reader.join();
     CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::milliseconds(500));
     CHECK(out.token.empty());
-    // Interrupted: a new token is not kept at all (never in the file instead).
+    // Interrupted: a new token goes where a token goes without a keyring (the file, by default:
+    // audit A08), not into the keyring.
     c.token = "sct_" + std::string(43, 'Z');
-    bool stored = true;
-    CHECK(!s.put(c, &stored));
-    CHECK(!stored);
-    CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+    bool stored = false;
+    CHECK(s.put(c, &stored));
+    CHECK(stored);
+    CHECK(hasPrefix(fileToken(path, A), kFilePrefix));
+    CHECK(!k.holds(c.token));
 }
 
 namespace {
@@ -1984,8 +1993,8 @@ TEST(net_credentials_keyring_unlock_dismissed) {
 }
 
 // An unanswered prompt goes after the store's timeout (the sign-in's token then in the file, and
-// no prompt again for reads), and at once with interrupt() (the client shutting down), which keeps
-// nothing.
+// no prompt again for reads), and at once with interrupt() (the client shutting down): a read then
+// keeps the reference, a sign-in's token goes to the file as without a keyring.
 TEST(net_credentials_keyring_unlock_timeout) {
     std::string path = tempCredentialPath("keyring-timeout");
     RemovedAtEnd removed{path};
@@ -2041,14 +2050,14 @@ TEST(net_credentials_keyring_unlock_timeout) {
         CHECK_EQ(k.prompts.load(), 2);
     }
     {
-        // A sign-in's prompt: interrupted, its token is kept nowhere (never in the file instead).
+        // A sign-in's prompt: interrupted, its token goes to the file (the fallback, audit A08).
         net::CredentialStore s(path);
         s.setKeyring(&k);
         net::Credential c;
         c.origin = C;
         c.username = "carol";
         c.token = tokenC;
-        bool stored = true, saved = true;
+        bool stored = false, saved = false;
         std::thread signer([&] { saved = s.put(c, &stored); });
         auto t0 = std::chrono::steady_clock::now();
         while (!k.prompting && msSince(t0) < 5000) std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -2057,12 +2066,288 @@ TEST(net_credentials_keyring_unlock_timeout) {
         s.interrupt();
         signer.join();
         CHECK(msSince(t0) < 500);
-        CHECK(!saved);
-        CHECK(!stored);
-        CHECK(fileToken(path, C).empty());
+        CHECK(saved);
+        CHECK(stored);
+        CHECK(hasPrefix(fileToken(path, C), kFilePrefix));
         CHECK(!k.holds(tokenC));
     }
 }
+
+#ifndef _WIN32
+// ---- Linux without a keyring (audit A08: the file by default, memory when not allowed) ----
+
+namespace {
+unsigned modeOf(const std::string& path) {
+    struct stat st;
+    return stat(path.c_str(), &st) == 0 ? unsigned(st.st_mode & 0777) : 0u;
+}
+
+std::string folderOf(const std::string& path) { return path.substr(0, path.find_last_of('/')); }
+
+// setFileSessionsAllowed for one test (the process default, on, at its end).
+struct FileSessions {
+    explicit FileSessions(bool allowed) { net::setFileSessionsAllowed(allowed); }
+    ~FileSessions() { net::setFileSessionsAllowed(true); }
+};
+
+// HOME for one test (the store never changes the permissions of the home folder).
+struct HomeAt {
+    std::string before;
+    bool had = false;
+    explicit HomeAt(const std::string& dir) {
+        const char* h = std::getenv("HOME");
+        had = h != nullptr;
+        if (h) before = h;
+        setenv("HOME", dir.c_str(), 1);
+    }
+    ~HomeAt() {
+        if (had) setenv("HOME", before.c_str(), 1);
+        else unsetenv("HOME");
+    }
+};
+
+// A sign-in's put(): what it kept and where.
+net::CredentialStore::Kept signInKept(net::CredentialStore& s, const std::string& origin, const std::string& token) {
+    net::Credential c;
+    c.origin = origin;
+    c.username = "alice";
+    c.token = token;
+    bool stored = false;
+    net::CredentialStore::Kept kept = net::CredentialStore::Kept::None;
+    s.put(c, &stored, &kept);
+    CHECK(stored);
+    return kept;
+}
+
+// The file holds no form of the token: neither in the clear nor in the file's own format.
+bool fileHoldsNoToken(const std::string& path, const std::string& token) {
+    std::string text;
+    net::sys::readFile(path, text, 1 << 20);
+    return text.find(token) == std::string::npos && text.find("bound:") == std::string::npos;
+}
+}  // namespace
+
+// No keyring can keep a sign-in's token (none, failing, locked with its prompt dismissed or not
+// answered in time, the client shutting down): by default it goes to the file, 0600 in a 0700
+// folder, readable at once, and the player is told once per run (firstNotice); it moves to the
+// keyring at a read once that works.
+TEST(net_credentials_no_keyring_file_by_default) {
+    std::string path = tempCredentialPath("no-keyring-file");
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443";
+    struct Case {
+        const char* what;
+        std::function<void(FakeKeyring&, net::CredentialStore&)> setUp;
+    };
+    const Case cases[] = {
+        {"absent", [](FakeKeyring&, net::CredentialStore& s) { s.setKeyring(nullptr); }},
+        {"failing", [](FakeKeyring& k, net::CredentialStore& s) { s.setKeyring(&k); k.available = false; }},
+        {"locked, unlock refused", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             k.locked = true;
+             k.answer = FakeKeyring::Answer::Dismiss;
+         }},
+        {"locked, unlock expired", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             s.setUnlockTimeout(100);
+             k.locked = true;
+             k.answer = FakeKeyring::Answer::Ignore;
+         }},
+        {"shutting down", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             s.interrupt();
+         }},
+    };
+    for (const Case& c : cases) {
+        std::fprintf(stderr, "  %s\n", c.what);
+        net::sys::removeFile(path);
+        FakeKeyring k;
+        net::CredentialStore s(path);
+        c.setUp(k, s);
+        const std::string token = "sct_" + std::string(43, 'F');
+        CHECK(signInKept(s, A, token) == Kept::File);
+        CHECK(hasPrefix(fileToken(path, A), "bound:"));
+        CHECK_EQ(modeOf(path), 0600u);
+        CHECK_EQ(modeOf(folderOf(path)), 0700u);
+        CHECK(!k.holds(token));
+        CHECK(s.firstNotice(Kept::File));    // the sign-in's notice, once a run
+        CHECK(!s.firstNotice(Kept::File));
+        CHECK(!s.firstNotice(Kept::Keyring));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);
+        CHECK(signInKept(s, A, token + "2") == Kept::File);
+        CHECK(!s.firstNotice(Kept::File));
+    }
+    // The keyring works again: the file's token moves there at its next read.
+    FakeKeyring k;
+    net::CredentialStore s(path);
+    s.setKeyring(&k);
+    net::Credential out;
+    CHECK(s.get(A, out) && out.token == "sct_" + std::string(43, 'F') + "2");
+    CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+    CHECK(fileHoldsNoToken(path, out.token));
+    // With a working keyring nothing is said.
+    CHECK(signInKept(s, A, "sct_" + std::string(43, 'G')) == Kept::Keyring);
+    CHECK(!s.firstNotice(Kept::Keyring));
+}
+
+// The option off: a token no keyring keeps lives in memory until the game quits (the file's record
+// has no token: nothing decodable is written), the player is told once; a token an earlier version
+// (or the option on) left in the file is moved to memory and erased from the file, at once when
+// the option changes; on again, the token in memory goes back to the file; and it moves to the
+// keyring once that works.
+TEST(net_credentials_file_sessions_off) {
+    std::string path = tempCredentialPath("file-sessions-off");
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    {
+        FileSessions off(false);
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.firstNotice(Kept::Memory));
+        CHECK(!s.firstNotice(Kept::Memory));
+        CHECK(fileHoldsNoToken(path, tokenA));
+        CHECK_EQ(fileToken(path, A), std::string());
+        CHECK_EQ(s.username(A), std::string("alice"));
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        // A token a server refused, a logout: gone from memory too.
+        CHECK(s.clearToken(A, tokenA));
+        CHECK(!s.hasToken(A));
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.clearToken(A));
+        CHECK(!s.hasToken(A));
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+    }
+    {
+        net::CredentialStore s(path);   // the next run: signed out, the name kept
+        s.setKeyring(nullptr);
+        CHECK(!s.hasToken(A));
+        CHECK_EQ(s.username(A), std::string("alice"));
+    }
+    // A token in the file (an earlier version's, or saved while the option was on), with the option
+    // off at the next start: in memory for this run, erased from the file at once.
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+    }
+    CHECK(hasPrefix(fileToken(path, B), "bound:"));
+    {
+        FileSessions off(false);
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(s.hasToken(B));
+        CHECK(fileHoldsNoToken(path, tokenB));
+        net::Credential out;
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    CHECK(fileHoldsNoToken(path, tokenB));
+    // Changed while the game runs: off erases the file's token at once (the session stays for this
+    // run), on writes it back.
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+        {
+            FileSessions off(false);
+            CHECK(fileHoldsNoToken(path, tokenB));
+            CHECK(s.hasToken(B));
+            net::Credential out;
+            CHECK(s.get(B, out) && out.token == tokenB);
+        }
+        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        net::Credential out;
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    // In memory, the keyring working again: the token moves there.
+    {
+        FileSessions off(false);
+        FakeKeyring k;
+        k.available = false;
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        k.available = true;
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        CHECK(k.holds(tokenA, A));
+        CHECK(s.get(A, out) && out.token == tokenA);
+    }
+}
+
+// Permissions more open than 0600 / 0700 (a copied or restored file, a umask): repaired at the
+// next read or write, and said in the log; the session goes on.
+TEST(net_credentials_file_permissions_repaired) {
+    std::string path = tempCredentialPath("perm-repaired");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'R');
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, A, token) == net::CredentialStore::Kept::File);
+    }
+    REQUIRE(chmod(path.c_str(), 0644) == 0);
+    REQUIRE(chmod(folderOf(path).c_str(), 0755) == 0);
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(s.hasToken(A));
+        CHECK_EQ(modeOf(path), 0600u);
+        CHECK_EQ(modeOf(folderOf(path)), 0700u);
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);
+        // Opened again while the game runs: closed again at the next write.
+        REQUIRE(chmod(path.c_str(), 0664) == 0);
+        CHECK(signInKept(s, A, token) == net::CredentialStore::Kept::File);
+        CHECK_EQ(modeOf(path), 0600u);
+    }
+}
+
+// Permissions that cannot be repaired (here: the home folder, which the store never changes): no
+// token in the clear is read from that file or written to it. A sign-in's token is kept in memory
+// for this run, and one the file held is not used and erased at the next write.
+TEST(net_credentials_file_permissions_unrepairable) {
+    const std::string dir = net::sys::exeDirectory() + "net-test-open-home/";
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    const std::string path = dir + "Scacelith.credentials";
+    net::sys::removeFile(path);
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    REQUIRE(chmod(dir.c_str(), 0700) == 0);
+    {
+        net::CredentialStore s(path);   // private for now: B's token in the file
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+    }
+    REQUIRE(chmod(dir.c_str(), 0755) == 0);
+    {
+        HomeAt home(dir.substr(0, dir.size() - 1));
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(!s.hasToken(B));                      // open to other users: not used
+        net::Credential out;
+        CHECK(s.get(B, out));
+        CHECK(out.token.empty());
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.firstNotice(Kept::Memory));
+        CHECK(fileHoldsNoToken(path, tokenA));      // and B's is erased by that write
+        CHECK(fileHoldsNoToken(path, tokenB));
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK_EQ(modeOf(dir.substr(0, dir.size() - 1)), 0755u);   // left alone
+    }
+    chmod(dir.c_str(), 0700);
+}
+#endif
 
 #ifndef _WIN32
 namespace {
@@ -3284,6 +3569,11 @@ TEST(net_online_client_loopback) {
         c.login("alice", "pw");      // 428 -> proof of work -> 200
         CHECK(waitEvent(c, K::LoginResult, ev, 20000));
         CHECK(ev.ok);
+#ifndef _WIN32
+        CHECK_EQ(ev.sessionNotice, std::string("file"));   // the tests have no keyring: said once
+#else
+        CHECK(ev.sessionNotice.empty());                    // DPAPI
+#endif
         CHECK_EQ(ev.account.username, std::string("alice"));
         CHECK_EQ(ev.account.userId, 7u);
         CHECK_EQ(srv.powAccepted.load(), 1);

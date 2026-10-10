@@ -28,6 +28,7 @@
 #include "game/game_archive.h"
 #include "game/settings.h"
 #include "i18n/i18n.h"
+#include "net/credential_store.h"
 #include "net/net_sys.h"
 #include "net/online_client.h"
 #include "scacelith_version.h"
@@ -100,6 +101,8 @@ static int runApp(std::vector<std::string> args) {
     std::string iniPath = ctx.argValue("--ini", homeDir + "Scacelith.ini");
     game::Settings& settings = game::settings();
     settings.load(iniPath);
+    // Linux: where a session no system keyring can keep goes (Options > Online).
+    net::setFileSessionsAllowed(settings.onlineRememberWithoutKeyring);
     // Online logins (one per server, DPAPI-protected) live next to an explicit --ini file;
     // otherwise in the user data dir (net::OnlineClient's default).
     if (!ctx.argValue("--ini").empty()) {

@@ -54,6 +54,8 @@ jobs:
 
       # The coach's voice model (399 MB, seven files from Hugging Face) that the first configure
       # downloads for the TTS tests (third_party/supertonic3/supertonic3.cmake checks their SHA-256).
+      # This job requires it: without the files, or with one that does not verify, the configure
+      # fails, and the tests that need the model must run and pass.
       - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -69,14 +71,34 @@ jobs:
 
       - name: Configure
         run: >-
-          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSCACELITH_SUPERTONIC_REQUIRED=ON
           -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Build
         run: ninja -C build
 
+      # --require=tts-model: a test that skips for want of the voice model fails, and so does a run
+      # where none passed with it (tests/test.h).
       - name: Unit tests
-        run: ./build/scacelith_tests
+        shell: bash
+        run: ./build/scacelith_tests --require=tts-model 2>&1 | tee build/unit-tests.log
+
+      # Apart from the exit code: the reference tests of the voice model (the real files against the
+      # manifest, the text front end, each stage and the end-to-end synthesis against the reference
+      # outputs, the synthesizer, the worker) are in the log as run and passed.
+      - name: Check that the voice model's reference tests ran
+        shell: bash
+        run: |
+          missing=0
+          for t in model_store_real_files tts_text_frontend_matches_reference tts_stage_duration_and_text_encoder \
+                   tts_stage_vector_estimator tts_stage_vocoder_and_end_to_end tts_stage_every_level \
+                   tts_synthesizer_output tts_worker; do
+            if ! grep -q "^\[ OK \] $t (" build/unit-tests.log; then
+              echo "::error::$t did not run and pass with the voice model"
+              missing=1
+            fi
+          done
+          exit "$missing"
 
       - name: Compiler cache statistics
         if: always()

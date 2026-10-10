@@ -6,7 +6,8 @@
 // key, restore and the cache files (round trip, damaged / foreign / oversized files, the 200-file
 // trim), the comments (a piece left hanging, a mate allowed or missed, the opening left, the end of
 // the game, determinism, silence on quiet moves, every key in the English catalog, every mark
-// anchored on its line), and one short game reviewed by the embedded engine.
+// anchored on its line), and one short game reviewed by the embedded engine. The comments waited
+// for on a first review (the urgent searches, CommentWait) are in analysis_comment_wait_tests.cpp.
 #include "test.h"
 
 #include "ai/analysis.h"
@@ -1235,7 +1236,7 @@ TEST(game_review_comment_ready_and_deterministic) {
     r.accept(2, an(r, 2, {{-330, "g1f1"}}));
     r.accept(3, an(r, 3, {{330, "g8f8"}}));
     CHECK(c.ready(r, 3));
-    CHECK(!c.ready(r, 4));   // the final position waits for the whole review
+    CHECK(!c.ready(r, 4));   // the final position waits for its own evaluation (not the whole review)
     r.accept(4, an(r, 4, {{-330, "f1e2"}}));
     CHECK(c.ready(r, 4));
     CHECK(!c.ready(r, 5));

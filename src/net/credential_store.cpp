@@ -3,16 +3,23 @@
 #include "json.h"
 #include "net_sys.h"
 #include "../core/log.h"
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
+#else
+#include <cerrno>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 namespace net {
@@ -29,9 +36,23 @@ const char kPrefix[] = "bound:";
 // A token the keyring keeps: the file holds this prefix and the id of its item (32 hex digits, a
 // random value that tells nothing about the token).
 const char kKeyringPrefix[] = "keyring:";
+// A token kept in memory only (Linux, CredentialStore::held_): never written, the file's record has
+// no token.
+const char kMemoryPrefix[] = "memory:";
 
 bool inKeyring(const std::string& blob) { return blob.compare(0, sizeof(kKeyringPrefix) - 1, kKeyringPrefix) == 0; }
 std::string itemId(const std::string& blob) { return blob.substr(sizeof(kKeyringPrefix) - 1); }
+bool inMemory(const std::string& blob) { return blob.compare(0, sizeof(kMemoryPrefix) - 1, kMemoryPrefix) == 0; }
+// A token the file holds itself ("bound:" on Linux, "dpapi:" on Windows).
+bool inFile(const std::string& blob) { return !blob.empty() && !inKeyring(blob) && !inMemory(blob); }
+
+// setFileSessionsAllowed, and the stores it applies to at once.
+std::atomic<bool> g_fileSessions{true};
+std::mutex g_storesMu;
+std::vector<CredentialStore*>& liveStores() {
+    static std::vector<CredentialStore*> v;
+    return v;
+}
 
 std::string newItemId() {
     uint8_t b[16];
@@ -52,14 +73,51 @@ void noteFileFallback(const std::string& why, const std::string& path) {
 #ifndef _WIN32
     static std::atomic<bool> said{false};
     if (said.exchange(true)) return;
-    LOGW("net: the saved sessions are kept in %s in the clear, protected only by the file's permissions, not in the "
-         "system keyring: %s",
+    LOGW("net: the saved sessions are kept in %s in the clear, protected by the file's permissions (0600 in a 0700 "
+         "folder), not in the system keyring: %s",
          path.c_str(), why.c_str());
 #else
     (void)why;
     (void)path;
 #endif
 }
+
+#ifndef _WIN32
+std::string folderOf(const std::string& path) {
+    const size_t cut = path.find_last_of('/');
+    if (cut == std::string::npos) return ".";
+    return cut == 0 ? std::string("/") : path.substr(0, cut);
+}
+
+// ssh's rule for a file of secrets: nothing for the group or the others (a folder 0700, a file
+// 0600), repaired when it is more open (the log says so). False, with why, when it is more open
+// and cannot be repaired (another owner, a read-only file system), or cannot be checked; the
+// user's home folder and the root are never changed (a credentials file beside an --ini there),
+// and count as such. A file not written yet is private.
+bool makePrivate(const std::string& p, bool folder, std::string& why) {
+    struct stat st;
+    if (stat(p.c_str(), &st) != 0) {
+        if (!folder && errno == ENOENT) return true;
+        why = p + ": " + std::strerror(errno);
+        return false;
+    }
+    if ((st.st_mode & 077) == 0) return true;
+    const unsigned mode = unsigned(st.st_mode & 0777), want = folder ? 0700u : 0600u;
+    bool spared = folder && p == "/";
+    const char* home = std::getenv("HOME");
+    struct stat hs;
+    if (folder && home && home[0] && stat(home, &hs) == 0 && hs.st_dev == st.st_dev && hs.st_ino == st.st_ino) spared = true;
+    char m[16];
+    std::snprintf(m, sizeof m, "%03o", mode);
+    if (spared || st.st_uid != geteuid() || chmod(p.c_str(), mode_t(want)) != 0) {
+        why = p + " is open to other users (mode " + m + ")" +
+              (spared ? ": the game leaves the permissions of that folder alone" : " and the game cannot change that");
+        return false;
+    }
+    LOGW("net: %s was open to other users (mode %s): set to %03o", p.c_str(), m, want);
+    return true;
+}
+#endif
 
 // The keyring could not say what it keeps (or did not remove an item).
 bool unanswered(Keyring::Result r) {
@@ -107,6 +165,17 @@ std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=o
 }  // namespace
 
 Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
+
+void setFileSessionsAllowed(bool allowed) {
+    if (g_fileSessions.exchange(allowed) == allowed) return;
+    std::lock_guard<std::mutex> stores(g_storesMu);
+    for (CredentialStore* s : liveStores()) {
+        std::lock_guard<std::mutex> lk(s->mu_);
+        if (s->loaded_) s->reconcileLocked();
+    }
+}
+
+bool fileSessionsAllowed() { return g_fileSessions.load(); }
 
 // ---- token protection ----
 
@@ -166,13 +235,27 @@ std::string CredentialStore::defaultPath() {
     return sys::settingsDirectory() + kFileName;   // with Scacelith.ini
 }
 
-CredentialStore::CredentialStore(std::string path) : path_(std::move(path)) {}
+CredentialStore::CredentialStore(std::string path) : path_(std::move(path)) {
+    std::lock_guard<std::mutex> stores(g_storesMu);
+    liveStores().push_back(this);
+}
+
+CredentialStore::~CredentialStore() {
+    {
+        std::lock_guard<std::mutex> stores(g_storesMu);
+        auto& v = liveStores();
+        v.erase(std::remove(v.begin(), v.end(), this), v.end());
+    }
+    for (auto& h : held_) wipe(h.second);
+}
 
 void CredentialStore::setPath(const std::string& path) {
     std::lock_guard<std::mutex> lk(mu_);
     path_ = path;
     loaded_ = false;
     records_.clear();
+    for (auto& h : held_) wipe(h.second);
+    held_.clear();
 }
 
 std::string CredentialStore::path() const {
@@ -200,10 +283,12 @@ void CredentialStore::loadLocked() const {
         rec.serverId = r["serverId"].asString();
         rec.pin = r["pin"].asString();
         rec.tokenBlob = r["token"].asString();
+        if (inMemory(rec.tokenBlob)) rec.tokenBlob.clear();          // never written by the game
         if (rec.origin.empty() || findLocked(rec.origin)) continue;   // one record per origin
         records_.push_back(std::move(rec));
     }
     applyMovesLocked();
+    reconcileLocked();
 }
 
 void CredentialStore::applyMovesLocked() const {
@@ -218,7 +303,7 @@ void CredentialStore::applyMovesLocked() const {
         // is (no keyring call while the file loads, on any thread): its item names the old origin,
         // where read() finds it through this rule, and get() moves it to an item of the new one.
         std::string token, blob;
-        if (inKeyring(r->tokenBlob))
+        if (inKeyring(r->tokenBlob) || inMemory(r->tokenBlob))
             blob = r->tokenBlob;
         else if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token))
             blob = protectToken(mv.second, token);
@@ -239,16 +324,25 @@ void CredentialStore::addOriginMove(const std::string& from, const std::string& 
 }
 
 bool CredentialStore::saveLocked() const {
+    // The permissions first (repaired when more open): a file open to other users for good keeps no
+    // token in the clear (those it held are not used this run: readLocked).
+    const bool closed = privateLocked();
     json::Value doc = json::Value::object();
     doc.set("version", 1);
     json::Value& list = doc.set("records", json::Value::array());
-    for (const Record& r : records_) {
+    for (Record& r : records_) {
+        if (!closed && inFile(r.tokenBlob)) {
+            LOGW("net: the saved session of %s is erased from %s, which other users can read", r.origin.c_str(), path_.c_str());
+            r.tokenBlob.clear();
+            r.unreadable = false;
+            r.checked = true;
+        }
         json::Value o = json::Value::object();
         o.set("origin", r.origin);
         o.set("username", r.username);
         o.set("serverId", r.serverId);
         o.set("pin", r.pin);
-        o.set("token", r.tokenBlob);
+        o.set("token", inMemory(r.tokenBlob) ? std::string() : r.tokenBlob);
         list.push(std::move(o));
     }
     std::string text = doc.dump();
@@ -281,7 +375,7 @@ bool CredentialStore::get(const std::string& origin, Credential& out, bool unloc
         out.pinnedSha256 = r->pin;
         if (r->tokenBlob.empty()) return true;
         if (!inKeyring(r->tokenBlob)) {
-            // In the file: read here. The keyring takes it once that works.
+            // In the file or in memory: read here. The keyring takes it once that works.
             if (readLocked(*r, out.token)) blob = r->tokenBlob;
         } else {
             blob = r->tokenBlob;
@@ -329,11 +423,87 @@ bool CredentialStore::hasToken(const std::string& origin) const {
 
 bool CredentialStore::readLocked(Record& r, std::string& token) const {
     // Said once; from then on hasToken() is false (the game offers to sign in, not to resume).
-    bool readable = unprotectToken(r.origin, r.tokenBlob, token);
-    if (!readable && !r.unreadable) LOGW("net: the saved session of %s cannot be decrypted here", r.origin.c_str());
+    bool readable = false;
+    token.clear();
+    if (inMemory(r.tokenBlob)) {
+        auto it = held_.find(r.tokenBlob);
+        readable = it != held_.end() && !it->second.empty();
+        if (readable) token = it->second;
+    } else if (!privateLocked()) {
+        // Open to other users for good: a token in the clear there is not used.
+        if (!r.unreadable) LOGW("net: the saved session of %s in %s is not used: other users can read it", r.origin.c_str(), path_.c_str());
+    } else {
+        readable = unprotectToken(r.origin, r.tokenBlob, token);
+        if (!readable && !r.unreadable) LOGW("net: the saved session of %s cannot be decrypted here", r.origin.c_str());
+    }
     r.unreadable = !readable;
     r.checked = true;
     return readable;
+}
+
+bool CredentialStore::privateLocked() const {
+#ifdef _WIN32
+    return true;
+#else
+    if (path_.empty()) path_ = defaultPath();
+    std::string why;
+    const bool closed = makePrivate(folderOf(path_), true, why) && makePrivate(path_, false, why);
+    if (!closed && !openWarned_) LOGW("net: no session is kept in the clear in %s: %s", path_.c_str(), why.c_str());
+    openWarned_ = !closed;
+    return closed;
+#endif
+}
+
+std::string CredentialStore::holdLocked(const std::string& token) const {
+    const std::string blob = kMemoryPrefix + std::to_string(++heldSeq_);
+    held_[blob] = token;
+    return blob;
+}
+
+void CredentialStore::dropLocked(const std::string& blob) const {
+    auto it = held_.find(blob);
+    if (it == held_.end()) return;
+    wipe(it->second);
+    held_.erase(it);
+}
+
+void CredentialStore::reconcileLocked() const {
+#ifndef _WIN32
+    const bool allowed = fileSessionsAllowed();
+    bool changed = false, closed = true, checked = false;
+    for (Record& r : records_) {
+        const bool file = inFile(r.tokenBlob), memory = inMemory(r.tokenBlob);
+        if (allowed ? !memory : !file) continue;
+        if (!checked) {
+            closed = privateLocked();
+            checked = true;
+        }
+        if (file) {
+            // The player does not allow the file: the token moves to memory (unread when the file is
+            // open to other users), and is erased from the file.
+            std::string token;
+            r.tokenBlob = closed && unprotectToken(r.origin, r.tokenBlob, token) ? holdLocked(token) : std::string();
+            wipe(token);
+            r.checked = false;
+            r.unreadable = false;
+            LOGI("net: the saved session of %s is erased from %s (Options > Online): %s", r.origin.c_str(), path_.c_str(),
+                 r.tokenBlob.empty() ? "signed out" : "kept in memory until the game quits");
+            changed = true;
+        } else if (closed) {
+            // Allowed again (or the file closed since): the token kept in memory goes to the file.
+            auto it = held_.find(r.tokenBlob);
+            const std::string blob = it == held_.end() ? std::string() : protectToken(r.origin, it->second);
+            if (blob.empty()) continue;
+            dropLocked(r.tokenBlob);
+            r.tokenBlob = blob;   // read from the record this run, whether the file is written or not
+            r.checked = false;
+            r.unreadable = false;
+            noteFileFallback("Options > Online allows it", path_);
+            changed = true;
+        }
+    }
+    if (changed && !saveLocked()) LOGW("net: %s could not be written: the sessions it holds stay as they were", path_.c_str());
+#endif
 }
 
 // ---- the keyring (under ioMu_, never mu_: the game thread's calls do not wait for it) ----
@@ -393,9 +563,8 @@ bool CredentialStore::unlock(Keyring& k, const std::string& origin, const std::s
     return false;
 }
 
-// The blob that keeps a token: a keyring item when the keyring takes it, else the file's own
-// format. "" when it could not be kept (DPAPI failed, or interrupt()). Only a sign-in saves a token
-// (put): a locked keyring is worth a prompt then, even after one declined.
+// Only a sign-in saves a token (put): a locked keyring is worth a prompt then, even after one
+// declined. Without a keyring that takes it (none, failing, locked, interrupt()), the fallback.
 std::string CredentialStore::protect(const std::string& origin, const std::string& token) const {
     Keyring* k = keyring();
     std::string why = noKeyring();
@@ -409,16 +578,40 @@ std::string CredentialStore::protect(const std::string& origin, const std::strin
             res = afterUnlock(*k, res, origin, std::string(), Prompt::Always, [&] { return k->store(origin, id, token, &cancel_, why); });
         }
         if (res == Keyring::Result::Ok) return kKeyringPrefix + id;
-        if (res == Keyring::Result::Cancelled) return std::string();
+        if (res == Keyring::Result::Cancelled) why = "the game is closing";
         if (res == Keyring::Result::Locked) {
             // Said at each sign-in: the keyring takes it once unlocked (migrate(), at a read).
-            LOGW("net: the session of %s is kept in %s for now (%s): it moves to the system keyring once that is unlocked",
-                 origin.c_str(), path().c_str(), why.c_str());
-            return protectToken(origin, token);
+            LOGW("net: the system keyring is locked (%s): the session of %s moves there once it is unlocked", why.c_str(),
+                 origin.c_str());
+            why = "the system keyring is locked";
         }
     }
-    noteFileFallback(why, path());
+    return fallback(origin, token, why);
+}
+
+// The file (DPAPI on Windows; in the clear on Linux, when the player allows it and the file is
+// private), else memory: put() holds the token.
+std::string CredentialStore::fallback(const std::string& origin, const std::string& token, const std::string& why) const {
+#ifdef _WIN32
+    (void)why;
     return protectToken(origin, token);
+#else
+    bool allowed = fileSessionsAllowed(), closed = false;
+    std::string at;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        if (allowed) closed = privateLocked();
+        at = path_;
+    }
+    if (allowed && closed) {
+        noteFileFallback(why, at);
+        return protectToken(origin, token);
+    }
+    LOGW("net: the session of %s is kept in memory until the game quits, not in the system keyring (%s) nor in %s (%s)",
+         origin.c_str(), why.c_str(), at.c_str(), allowed ? "other users can read it" : "not allowed by Options > Online");
+    return kMemoryPrefix;
+#endif
 }
 
 std::vector<std::string> CredentialStore::movedFrom(const std::string& origin) const {
@@ -434,7 +627,14 @@ bool CredentialStore::read(const std::string& origin, const std::string& blob, P
     token.clear();
     if (itemOrigin) *itemOrigin = origin;
     Keyring::Result res = Keyring::Result::Missing;
-    if (!inKeyring(blob)) {
+    if (inMemory(blob)) {
+        std::lock_guard<std::mutex> lk(mu_);
+        auto it = held_.find(blob);
+        if (it != held_.end()) {
+            token = it->second;
+            res = Keyring::Result::Ok;
+        }
+    } else if (!inKeyring(blob)) {
         if (unprotectToken(origin, blob, token)) res = Keyring::Result::Ok;
     } else if (Keyring* k = keyring()) {
         const std::string id = itemId(blob);
@@ -465,16 +665,16 @@ bool CredentialStore::read(const std::string& origin, const std::string& blob, P
     return false;
 }
 
-// A token the file holds goes to the keyring, and a moved record's item becomes one of its new
-// origin: the record then points to the new item. Nothing changes when the keyring does not take
-// it (never a prompt here: background work), or when the file cannot be written (the new item is
-// removed).
+// A token the file or memory holds goes to the keyring, and a moved record's item becomes one of
+// its new origin: the record then points to the new item. Nothing changes when the keyring does not
+// take it (never a prompt here: background work), or when the file cannot be written (the new item
+// is removed).
 void CredentialStore::migrate(const std::string& origin, const std::string& blob, const std::string& token,
                               const std::string& itemOrigin) const {
     Keyring* k = keyring();
     if (cancel_.cancelled()) return;
     if (!k) {
-        noteFileFallback(noKeyring(), path());
+        if (inFile(blob)) noteFileFallback(noKeyring(), path());
         return;
     }
     const std::string id = newItemId();
@@ -482,7 +682,7 @@ void CredentialStore::migrate(const std::string& origin, const std::string& blob
     if (id.empty()) return;
     const Keyring::Result res = k->store(origin, id, token, &cancel_, why);
     if (res != Keyring::Result::Ok) {
-        if (res != Keyring::Result::Cancelled && !inKeyring(blob)) noteFileFallback(why, path());
+        if (res != Keyring::Result::Cancelled && inFile(blob)) noteFileFallback(why, path());
         return;
     }
     bool saved = false;
@@ -492,7 +692,8 @@ void CredentialStore::migrate(const std::string& origin, const std::string& blob
         if (r && r->tokenBlob == blob) {
             r->tokenBlob = kKeyringPrefix + id;
             saved = saveLocked();
-            if (!saved) r->tokenBlob = blob;   // the file still holds it
+            if (!saved) r->tokenBlob = blob;   // the file (or memory) still holds it
+            else if (inMemory(blob)) dropLocked(blob);
         }
     }
     if (!saved) {
@@ -508,6 +709,11 @@ void CredentialStore::migrate(const std::string& origin, const std::string& blob
 
 // A logout, a forgotten server, a replaced token: a locked keyring is worth a prompt (Prompt::Once).
 void CredentialStore::forget(const std::string& origin, const std::string& blob) const {
+    if (inMemory(blob)) {
+        std::lock_guard<std::mutex> lk(mu_);
+        dropLocked(blob);
+        return;
+    }
     if (!inKeyring(blob)) return;
     Keyring* k = keyring();
     if (!k) return;
@@ -538,8 +744,9 @@ std::string CredentialStore::pin(const std::string& origin) const {
     return r ? r->pin : std::string();
 }
 
-bool CredentialStore::put(const Credential& c, bool* stored) {
+bool CredentialStore::put(const Credential& c, bool* stored, Kept* kept) {
     if (stored) *stored = false;
+    if (kept) *kept = Kept::None;
     if (c.origin.empty()) return false;
     std::lock_guard<std::mutex> io(ioMu_);
     std::string blob;
@@ -553,6 +760,7 @@ bool CredentialStore::put(const Credential& c, bool* stored) {
     {
         std::lock_guard<std::mutex> lk(mu_);
         loadLocked();
+        if (inMemory(blob)) blob = holdLocked(c.token);
         Record* r = findLocked(c.origin);
         if (!r) {
             records_.push_back(Record());
@@ -567,10 +775,24 @@ bool CredentialStore::put(const Credential& c, bool* stored) {
         r->unreadable = false;
         r->checked = true;
         saved = saveLocked();
+        // Where it is now (a file that turned out open to other users dropped it: saveLocked).
+        if (kept && !r->tokenBlob.empty())
+            *kept = inKeyring(r->tokenBlob) ? Kept::Keyring : inMemory(r->tokenBlob) ? Kept::Memory : Kept::File;
     }
-    // The previous token's item, once the file no longer points to it.
-    if (saved && old != blob) forget(c.origin, old);
+    // The previous token's item (or the token kept in memory), once the file no longer points to it.
+    if (old != blob && (saved || inMemory(old))) forget(c.origin, old);
     return saved;
+}
+
+bool CredentialStore::firstNotice(Kept kept) const {
+#ifdef _WIN32
+    (void)kept;
+    return false;
+#else
+    if (kept == Kept::File) return !noticedFile_.exchange(true);
+    if (kept == Kept::Memory) return !noticedMemory_.exchange(true);
+    return false;
+#endif
 }
 
 bool CredentialStore::clearToken(const std::string& origin) {
@@ -586,7 +808,7 @@ bool CredentialStore::clearToken(const std::string& origin) {
         r->tokenBlob.clear();
         saved = saveLocked();
     }
-    if (saved) forget(origin, old);
+    if (saved || inMemory(old)) forget(origin, old);
     return saved;
 }
 
@@ -617,7 +839,7 @@ bool CredentialStore::clearToken(const std::string& origin, const std::string& t
         r->tokenBlob.clear();
         ok = saveLocked();
     }
-    if (ok) forget(origin, blob);
+    if (ok || inMemory(blob)) forget(origin, blob);
     return ok;
 }
 
@@ -645,7 +867,7 @@ bool CredentialStore::erase(const std::string& origin) {
                 break;
             }
     }
-    if (saved) forget(origin, old);
+    if (saved || inMemory(old)) forget(origin, old);
     return saved;
 }
 

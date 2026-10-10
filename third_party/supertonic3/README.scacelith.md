@@ -179,8 +179,17 @@ the next configure), then copies them.
 |---|---|---|
 | `SCACELITH_SUPERTONIC_DIR` | `$ENV{SCACELITH_SUPERTONIC_DIR}` | Local copy of the repository (`onnx/`, `voice_styles/`) or a folder holding the seven files themselves; used instead of the download when set |
 | `SCACELITH_SUPERTONIC_DOWNLOAD` | `ON` | Download the files from Hugging Face when no local copy is given |
+| `SCACELITH_SUPERTONIC_REQUIRED` | `OFF` | Make the model mandatory: a missing file (no local copy, the download off or failing from both sources) stops the configure step, and the copy in `${CMAKE_BINARY_DIR}/coach/` is checked against its SHA-256 again at each configure |
 
 Without the files the configure step warns, the build succeeds and the TTS tests that need the
-model are skipped; a file of the local copy whose SHA-256 differs stops the configure step.
+model are skipped (a development build offline); a file of the local copy whose SHA-256 differs
+stops the configure step. The CI's Linux job requires the model on both sides: it configures with
+`-DSCACELITH_SUPERTONIC_REQUIRED=ON`, and runs the tests with `scacelith_tests --require=tts-model`
+(or `SCACELITH_TESTS_REQUIRE=tts-model` in the environment; `tests/test.h`): a test that skips for
+want of the model (`SKIP_WITHOUT`: no files, or files that do not load) is then a failure, and so
+is a run where no test passed with the model; the runner lists those that did. A further step
+checks the log for the reference tests by name (`model_store_real_files`, the `tts_stage_*` tests
+against `tests/data/tts/ref_en.bin`, `tts_text_frontend_matches_reference`,
+`tts_synthesizer_output`, `tts_worker`), apart from the exit code.
 `SCACELITH_SUPERTONIC_ARCHIVE` (the sherpa-onnx archive of the old model) no longer exists. There
 is no option to embed the model in the executable.

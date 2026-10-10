@@ -504,6 +504,8 @@ options.online.test = 測試連線
 options.online.test_ok = {0}：已連線，與此版本相容。
 options.online.test_incompatible = {0}：已連線，但需要其他版本的 Scacelith。
 options.online.in_game = 線上對局期間無法變更伺服器。
+options.online.remember_session = 系統金鑰圈無法使用時記住我的登入
+options.online.remember_session.help = 當沒有系統金鑰圈（GNOME Keyring、KWallet 等）能保存你的工作階段時，它會儲存在一個只有你的系統使用者才能讀取的檔案中。任何能讀取你的檔案或其副本（例如備份）的人都可能使用這個工作階段。關閉：在遊戲關閉前保持登入。你可以在帳號的「已登入的裝置」中登出任何裝置。
 
 # Sign in, create an account
 online.signin.lead = 登入 {0}，與其他棋手線上對弈。
@@ -626,6 +628,8 @@ online.account.delete = 刪除帳號
 
 # Play
 online.play.signed_in = 已登入：{0}
+online.session.file = 沒有系統金鑰圈能保存你的登入：它已記在一個只有你的系統使用者才能讀取的檔案中（選項 > 伺服器）。
+online.session.memory = 沒有系統金鑰圈能保存你的登入，它也沒有儲存在任何檔案中：在遊戲關閉前保持登入（選項 > 伺服器）。
 online.play.find_section = 尋找對手
 online.play.friend_section = 與朋友對弈
 online.play.mode = 對局

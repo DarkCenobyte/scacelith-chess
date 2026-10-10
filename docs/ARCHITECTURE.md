@@ -257,13 +257,18 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
 `GameMode::Analysis` is a replay (`replaying()` is true) of a finished game with Stockfish's review
 on top. The pieces of it:
 
-* **`analysis::GameReview`** (`src/analysis/review.h`) decides which positions to analyse next (a
-  quick pass, then a deep one, around the position on the board first), takes the results and
-  makes the verdicts (symbols, the better move, the bar, each side's accuracy). The scene sends its
-  requests to `ai::Engine` at a lower priority than any game's search.
+* **`analysis::GameReview`** (`src/analysis/review.h`) decides which positions to analyse next (the
+  urgent ones first: those the comment waited for needs final, quick then deep; then a quick pass
+  and a deep one, around the position on the board first), takes the results and makes the
+  verdicts (symbols, the better move, the bar, each side's accuracy). The scene sends its requests
+  to `ai::Engine` at a lower priority than any game's search.
 * **`analysis::Commentator`** (`commentary.h`) picks the key moments once their positions are final
-  and writes each as a `coach::Script` of `Say` beats (with marks), named by side
-  (`coach::Arg::ofSidePiece`: "White's knight", nobody is "you").
+  (`needs()`: the position and the three before it, never the whole review; the final position's
+  accuracy account follows apart once the review is complete) and writes each as a `coach::Script`
+  of `Say` beats (with marks), named by side (`coach::Arg::ofSidePiece`: "White's knight", nobody
+  is "you"). **`analysis::CommentWait`** keeps the comment a forward step asked for while its
+  position stays on the board, however long the review takes, and hands it out exactly once (Play
+  waits for it); a step elsewhere drops it.
 * **`src/game/game_scene_analysis.cpp`** holds the mode's part of the scene (`AnalysisRuntime`):
   it loads the game, pumps the review, saves it through `analysis::saveCache` when the player
   leaves, steps through the game (one move: the robots' hands, `playRobotMove` forward and the
