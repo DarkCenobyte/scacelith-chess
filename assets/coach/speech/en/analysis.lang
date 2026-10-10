@@ -1,0 +1,160 @@
+# Coach speech: the commentary of the Analysis mode (src/analysis/commentary.cpp), said by the
+# voice and shown as subtitles while a finished game is replayed. English is the reference language.
+# Same syntax as assets/i18n: "key = value", '#' comments.
+#
+# Translators, read this first:
+# - "key", "key.2", "key.3" are alternative phrasings of the same message; keep the same number.
+# - The tone: a calm, warm commentator going through the game with the player. Short sentences
+#   (they are subtitles too), nothing harsh about the players.
+# - Nobody is "you" or "I" here: the players are White and Black, named by their colour only.
+#   A key ending in ".white" or ".black" says something about that side: write the colour's name
+#   the way your language needs it in that sentence.
+# - Placeholders are filled by the program; keep every placeholder of the English line (word order
+#   is free). Squares and arrows light up on the board while they are said.
+#     {move}             the move the comment is about: "Nf3" (spoken "knight f3")
+#     {best}             the engine's better move; {reply} the answer it allows
+#     {line}             a few moves in a row: "Nxe5 dxe5 Qg4"
+#     {piece} {t1} {t2}  a piece WITH its side: "White's knight" (common.lang, owner.white/black)
+#     {opening}          the name of an opening; "{opening:def}" with its article ("the Sicilian Defense")
+#     {m}                a number of moves before mate ("mate in {m}"); {pts} points of material,
+#                        "{pts:point}" says "3 points" (common.lang, count.point)
+#     {n} {m} in an.end.*  counts: "{n:mistake}" says "2 mistakes", "{m:blunder}" "1 blunder"
+#     {acc_white} {acc_black}  accuracy in percent, whole numbers
+#   Never write "White's" or "Black's" before {piece}, {t1}, {t2}: the side is already in them.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Let's look back at this game together.
+an.start.2 = Let's go through this game, move by move.
+an.start.3 = Here is the game. Let's see how it went.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = This game starts from a set-up position. Let's go through it.
+an.start.setup.2 = A game from a set-up position. Let's see how it went.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = The opening is {opening:def}.
+an.opening.2 = This is {opening:def}.
+an.book_exit = With {move}, the game leaves known opening theory.
+an.book_exit.2 = {move} is the first move out of the opening book.
+an.book_exit.3 = Opening theory ends here, with {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} is a blunder.
+an.blunder.2 = Here {move} is a serious mistake.
+an.blunder.3 = A blunder: {move}.
+an.mistake = {move} is a mistake.
+an.mistake.2 = {move} is not the right move here.
+an.mistake.3 = A mistake: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} misses the chance to punish it.
+an.missed_chance.2 = With {move}, the chance slips away.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Now {reply} is checkmate.
+an.mate_allowed.one.2 = It allows {reply}, and that's checkmate.
+an.mate_allowed = It allows a forced mate in {m}, starting with {reply}.
+an.mate_allowed.2 = Now there is a forced mate in {m}, beginning with {reply}.
+an.fork = Now {reply} forks {t1} and {t2}.
+an.fork.2 = It allows {reply}, attacking {t1} and {t2} at once.
+an.fork.3 = {reply} hits {t1} and {t2} at the same time.
+an.hanging = It leaves {piece} unprotected, and {reply} takes it.
+an.hanging.2 = {piece} is left without a defender: {reply} wins it.
+an.hanging.3 = {reply} simply takes {piece}, which had no defender.
+an.material = The reply {line} wins {pts:point} of material.
+an.material.2 = Then {line} wins {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best} was checkmate.
+an.mate_missed.one.2 = {best} would have been checkmate.
+an.mate_missed = {best} would have forced mate in {m}.
+an.mate_missed.2 = There was a forced mate in {m}, starting with {best}.
+an.missed_capture = {best} would have won {piece} for free.
+an.missed_capture.2 = {piece} had no defender: {best} would have taken it.
+an.missed_fork = {best} would have forked {t1} and {t2}.
+an.missed_fork.2 = {best} was a fork, attacking {t1} and {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} was stronger.
+an.better.2 = Better was {best}.
+an.better.3 = The engine prefers {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} is brilliant: it gives up {piece}!
+an.brilliant.2 = A brilliant sacrifice! {move} offers {piece}.
+an.brilliant.3 = {move}! A brilliant move that offers {piece}.
+an.brilliant.mate = It leads to a forced mate in {m}.
+an.brilliant.mate.2 = And it forces mate in {m}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} is the only move that keeps the advantage.
+an.only.win.2 = Only {move} keeps the edge here. Well found.
+an.only.hold = {move} is the only move that keeps the balance.
+an.only.hold.2 = Only {move} holds the position here.
+an.only.defend = {move} is the only move that keeps the fight going.
+an.only.defend.2 = Only {move} keeps the game alive here. Good defence.
+an.only.best = {move} is by far the strongest move here.
+an.only.best.2 = Precise: {move} is much stronger than anything else.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} is a little imprecise: {best} was more accurate.
+an.inaccuracy.2 = Not quite the best: {best} was more precise than {move}.
+an.interesting = {move} is an interesting idea, offering {piece}.
+an.interesting.2 = An interesting try: {move} gives up {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = White now has a forced mate in {m}.
+an.mate_on.white.2 = From here, White can force mate in {m}.
+an.mate_on.black = Black now has a forced mate in {m}.
+an.mate_on.black.2 = From here, Black can force mate in {m}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Checkmate. White wins the game.
+an.end.mate.white.2 = And that's checkmate: White wins.
+an.end.mate.black = Checkmate. Black wins the game.
+an.end.mate.black.2 = And that's checkmate: Black wins.
+an.end.resigned.white = Black resigned, so White wins the game.
+an.end.resigned.white.2 = The game ends here: Black resigned, and White wins.
+an.end.resigned.black = White resigned, so Black wins the game.
+an.end.resigned.black.2 = The game ends here: White resigned, and Black wins.
+an.end.timeout.white = Black ran out of time, so White wins.
+an.end.timeout.white.2 = White wins on time.
+an.end.timeout.black = White ran out of time, so Black wins.
+an.end.timeout.black.2 = Black wins on time.
+an.end.win.white = The game ends in a win for White.
+an.end.win.white.2 = White wins the game.
+an.end.win.black = The game ends in a win for Black.
+an.end.win.black.2 = Black wins the game.
+an.end.stalemate = Stalemate: the game is drawn.
+an.end.stalemate.2 = It's stalemate, so the game ends in a draw.
+an.end.draw.agreement = The players agreed to a draw.
+an.end.draw.agreement.2 = The game ends in a draw by agreement.
+an.end.draw.repetition = The game is drawn by repetition.
+an.end.draw.repetition.2 = The same position came back again: a draw.
+an.end.draw.fifty = The game is drawn by the fifty-move rule.
+an.end.draw.fifty.2 = Fifty moves without a capture or a pawn move: a draw.
+an.end.draw.seventy_five = The game is drawn by the seventy-five-move rule.
+an.end.draw.seventy_five.2 = Seventy-five moves without a capture or a pawn move: a draw.
+an.end.draw.material = Checkmate is no longer possible: the game is drawn.
+an.end.draw.material.2 = Neither side can checkmate any more, so it's a draw.
+an.end.draw = The game ends in a draw.
+an.end.draw.2 = A draw.
+an.end.unfinished = The game stops here, unfinished.
+an.end.unfinished.2 = That's where the game stops: it was not finished.
+an.end.accuracy = Accuracy: {acc_white} percent for White, {acc_black} for Black.
+an.end.accuracy.2 = White played at {acc_white} percent accuracy, Black at {acc_black}.
+an.end.clean.white = White made no mistakes or blunders.
+an.end.clean.white.2 = White's play was free of serious errors.
+an.end.clean.black = Black made no mistakes or blunders.
+an.end.clean.black.2 = Black's play was free of serious errors.
+an.end.mistakes.white = White made {n:mistake}, and no blunder.
+an.end.mistakes.white.2 = For White: {n:mistake}, no blunder.
+an.end.mistakes.black = Black made {n:mistake}, and no blunder.
+an.end.mistakes.black.2 = For Black: {n:mistake}, no blunder.
+an.end.blunders.white = White made {m:blunder}.
+an.end.blunders.white.2 = For White: {m:blunder}.
+an.end.blunders.black = Black made {m:blunder}.
+an.end.blunders.black.2 = For Black: {m:blunder}.
+an.end.errors.white = White made {n:mistake} and {m:blunder}.
+an.end.errors.white.2 = For White: {n:mistake} and {m:blunder}.
+an.end.errors.black = Black made {n:mistake} and {m:blunder}.
+an.end.errors.black.2 = For Black: {n:mistake} and {m:blunder}.
