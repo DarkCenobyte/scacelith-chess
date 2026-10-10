@@ -4,8 +4,13 @@
 // Not part of the public API (see animator.h).
 //
 // Everything is planned in CHARACTER space (+Y up, +Z forward, +X = character's left, origin at
-// the pelvis joint). The root never moves, so character space is inertial; world inputs (pieces,
-// clock, partner) are converted once when a task starts.
+// the SEATED pelvis joint). That frame never moves, so character space is inertial; world inputs
+// (pieces, clock, partner) are converted once when a task starts. Tasks only run while the robot
+// is seated. A stance (animator_stance.cpp) moves the body inside character space: 'body' maps
+// the space the pelvis bone, the spine, the arms and the head are solved in (BODY space, origin at
+// the pelvis joint wherever it is, turned by the body's yaw) to character space. It is the
+// identity while seated, so every seated pose is exactly what it was before stances existed; the
+// solver globals G are in body space.
 //
 // Left-handed play (Animator::init with Side::Left) runs this right-handed solver in a world
 // mirrored about X = 0 (both players sit on that plane): hands[1] ("right") is always the playing
@@ -732,9 +737,7 @@ using namespace detail;
 // ---------------------------------------------------------------------------------------------
 struct Animator::Impl {
     const Skeleton* sk = nullptr;
-    // ---- stance (animator_stance.cpp; placeholder until the stance motion lands)
-    Stance stanceTarget = Stance::Seated;
-    vec3 pelvisWorld{0, 0, 0};
+    vec3 pelvisWorld{0, 0, 0};   // the SEATED pelvis joint: origin of character space (solver world)
     float facing = 1.0f;
     quat rootQ;
     mat4 root, invRoot;
@@ -867,6 +870,15 @@ struct Animator::Impl {
     vec3 toChar(vec3 w) const { return transformPoint(invRoot, w); }
     vec3 toWorld(vec3 c) const { return transformPoint(root, c); }
     quat qToChar(quat w) const { return normalize(conjugate(rootQ) * w); }
+    // Body space (where G lives) <-> character space and the world (see the header comment).
+    mat4 body, invBody;            // body -> character space, its inverse (identity while seated)
+    quat bodyQ;                    // body yaw (rotation of 'body')
+    vec3 bodyToChar(vec3 b) const { return transformPoint(body, b); }
+    vec3 charToBody(vec3 c) const { return transformPoint(invBody, c); }
+    vec3 bodyToWorld(vec3 b) const { return toWorld(transformPoint(body, b)); }
+    vec3 worldToBody(vec3 w) const { return transformPoint(invBody, toChar(w)); }
+    quat bodyWorldQ() const { return normalize(rootQ * bodyQ); }   // body space -> world rotation
+    HandSample handToBody(const HandSample& c) const;              // a character-space hand target
 
     mat4 localMat(const Pose& p, int b) const { return toMat4(p.local[b], sk->restOffset[b]); }
     void fkChain(const Pose& p, int from, int to) {  // bones [from, to] in index order
@@ -1609,6 +1621,91 @@ struct Animator::Impl {
         return keepsCutWayBack(t, start) ? std::max(taskDuration(t), shakeRestAt - start) : taskDuration(t);
     }
     void writingSpine(SpineParams& sp, const HandSample& hl);
+
+    // ==========================================================================================
+    // Stances (animator_stance.cpp): the robot pushes its chair back and gets up, stands in front
+    // of it, walks round the table corner to an end of the table and back, and sits down again.
+    // One LEG at a time (Rise, Sit, Walk between two spots), planned in character space when it
+    // starts: the pelvis path and the body's yaw, the trunk, the chair, the feet (planted, or
+    // swinging from one frame to the next) and the hands (a path through hand poses).
+    // ==========================================================================================
+    enum class HandPose : uint8_t {
+        Seat,       // the seated hand (its motion: resting, writing...)
+        Table,      // palm flat on the table near its edge, pushing (character space: it stays put)
+        Thigh,      // palm on the thigh above the knee (rising, sitting down)
+        Side,       // the arm hanging beside the hip (on the way to / from the back)
+        BackSide,   // behind the hip
+        Behind      // hands clasped behind the back (standing and walking)
+    };
+    struct HandMove {              // the hand goes through 'path' over [t0, t1] (leg time)
+        float t0 = 0.0f, t1 = 0.0f;
+        std::vector<HandPose> path;
+    };
+    struct FootSwing {             // a foot lifted at t0 and set down at t1 (leg time)
+        float t0 = 0.0f, t1 = 0.0f;
+        mat4 to;                   // the flat foot frame it lands on (character space)
+        float lift = 0.035f;       // height of the arc
+        float roll = 0.0f;         // walking: heel off before the lift, heel strike (fraction of the full roll)
+    };
+    struct StanceLeg {
+        enum Kind { Rise, Sit, Walk } kind = Rise;
+        Stance from = Stance::Seated, to = Stance::Standing;
+        float start = 0.0f, T = 0.0f;
+        float rate = 240.0f;                 // samples per second of the two curves below
+        std::vector<vec4> pel;               // pelvis joint (character space) and body yaw
+        std::vector<vec4> trunk;             // hip flexion, spine flexion, chair slide, standing weight
+        mat4 foot0[2];                       // feet at the start ([0] left, [1] right: the solver's bones)
+        std::vector<FootSwing> steps[2];
+        HandPose hand0 = HandPose::Behind;   // the hands before their first move
+        std::vector<HandMove> hands[2];      // [0] the solver's left hand, [1] its right hand
+        std::vector<TimedEvent> events;      // Footstep / ChairPushed / ChairPulled (pos: solver world)
+        float seatIn = 0.0f, seatOut = 0.0f; // Rise: the seated pose blends out over [0, seatIn]; Sit: in over [seatOut, T]
+    };
+    // The body at a time (stanceFrame): where the pelvis joint is, the body's yaw, the trunk, the
+    // feet, and how much of the seated pose is left.
+    struct StanceFrame {
+        bool active = false;       // the body is not exactly in its seated pose
+        vec3 pelvis{0, 0, 0};      // pelvis joint, character space
+        float yaw = 0.0f;          // body yaw (about +Y, + = turned to the character's left)
+        float hipFlex = 0.0f, spineFlex = 0.0f, slide = 0.0f;
+        float standW = 0.0f;       // 0 seated .. 1 standing (a look down bends the back, wider head range)
+        float seatW = 1.0f;        // weight of the seated spine, legs and hands (Rise start / Sit end)
+        mat4 foot[2];              // foot bones (character space)
+        const StanceLeg* leg = nullptr;
+        float lt = 0.0f;           // time in the leg
+    };
+    Stance stanceTarget = Stance::Seated;   // asked for (setStance; the real body's left / right)
+    Stance stanceAt = Stance::Seated;       // the spot reached last
+    std::shared_ptr<StanceLeg> leg;         // the leg under way (none: still at stanceAt)
+    float stanceSince = 0.0f;               // when the robot came to stanceAt
+    bool penPutForStance = false;           // the stance laid the pen down: picked up again when seated
+    bool seatedNow() const { return stanceAt == Stance::Seated && !leg; }
+    bool stanceBusy() const { return leg != nullptr || stanceAt != stanceTarget; }
+    StanceFrame stanceFrame(float t) const;
+    void setBody(vec3 pelvisC, float yaw);
+    void spotChar(Stance s, vec3& pelvisC, float& yaw) const;
+    mat4 standFoot(int i, vec3 pelvisC, float yaw) const;   // foot i of a robot standing still
+    void seatedFeet(mat4 out[2]) const;                      // the feet of the seated pose
+    mat4 footAt(const StanceLeg& L, int i, float lt) const;
+    bool nextStanceBoundary(float& t) const;
+    void stepStance(std::vector<Event>& ev);                 // ends the leg due at 'time', starts the next
+    void startLeg(Stance to);
+    void planRiseSit(StanceLeg& L, bool sit);
+    void planWalk(StanceLeg& L, Stance from, Stance to);
+    void fireStanceDue(float upTo, std::vector<Event>& ev);
+    // Spine, pelvis and legs of a robot out of its seat (evaluate): blends the seated spine
+    // params towards the stance's, returns the extra hip flexion; solveLegs puts the feet on
+    // their frames.
+    float stanceSpine(const StanceFrame& f, SpineParams& sp, float lookPitch, float idleFlex, float idleTwist, float idleSide) const;
+    void solveLegs(Pose& p, const StanceFrame& f);
+    float pelvisDrop(const Pose& p, const StanceFrame& f) const;
+    // Hand targets (body space; G must hold this frame's spine and legs).
+    HandSample stanceHand(Side s, const StanceFrame& f, const HandSample& seatB) const;
+    HandSample handPoseSample(Side s, HandPose hp, const StanceFrame& f, const HandSample& seatB) const;
+    HandSample tableHand(Side s) const;                      // character space
+    // Head pitch range and the share of a look taken by the back while standing.
+    float headPitchMin(float standW) const;
+    float standW = 0.0f;                                     // at the last evaluate()
 };
 
 // The path of a Trace (character space): the index tip rests on waypoint i from arrive[i] to

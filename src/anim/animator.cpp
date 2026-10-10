@@ -939,12 +939,15 @@ void Animator::Impl::liftForearm(Hand& h) {
 // =============================================================================================
 // Pose evaluation
 // =============================================================================================
-vec3 Animator::Impl::headPointWorld() const { return toWorld(transformPoint(G[Head], vec3(0, 0.08f, 0.07f))); }
+vec3 Animator::Impl::headPointWorld() const { return bodyToWorld(transformPoint(G[Head], vec3(0, 0.08f, 0.07f))); }
 
 void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     for (int i = 0; i < BoneCount; ++i) pose.local[i] = quat();
-    pose.rootPosition = pelvisWorld;
-    pose.rootRotation = rootQ;
+    // Out of the seat, the body moves inside character space (animator_stance.cpp); seated, sf is
+    // inactive and the body frame the identity.
+    StanceFrame sf = stanceFrame(t);
+    setBody(sf.pelvis, sf.yaw);
+    if (&pose == &poseI) standW = sf.standW;
     reachShort = 0;
     wristClamp = 0;
     pronClamp = 0;
@@ -965,7 +968,7 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // Forward bend of the thinking poses and of setLean (at most 0.2 rad from the hips); speaking
     // leans in a little more, a touch further on the stressed syllables.
     const float flex = thinkLean + 0.2f * lean + 0.022f * speechEnv + 0.02f * speechStress;
-    SpineParams sp = solveSpine(pose, hr.p, flex, idleFlex, idleTwist, idleSide);
+    SpineParams sp = solveSpine(pose, sf.active ? charToBody(hr.p) : hr.p, flex, idleFlex, idleTwist, idleSide);
     const bool shaking = mirrored && running && cur.type == TaskType::Handshake;
     if (shaking || (mirrored && t < wr.suspendUntil)) {
         // Left-handed player shaking hands with the solver's left hand: the torso follows that
@@ -984,14 +987,32 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // The writing hand at work: lean/turn a little towards the sheet, and keep it within reach
     // whatever the playing hand does.
     writingSpine(sp, hlMotion);
+    // The head's pitch (body yaw frame): a standing robot may look further down, its back bending.
+    const float ovPitchNow = clamp(ovPitch, headPitchMin(sf.standW), 30.0f * DEG);
+    float hipExtra = 0.0f;
+    if (sf.active) hipExtra = stanceSpine(sf, sp, headOverride ? ovPitchNow : headPitch + gestPitch, idleFlex, idleTwist, idleSide);
     applySpine(pose, sp);
+    if (sf.active) {
+        pose.local[Pelvis] = normalize(qx(hipExtra) * pose.local[Pelvis]);
+        const float drop = pelvisDrop(pose, sf);
+        if (drop > 0.0f) {
+            sf.pelvis.y -= drop;
+            setBody(sf.pelvis, sf.yaw);
+        }
+    }
+    pose.rootPosition = toWorld(sf.pelvis);
+    pose.rootRotation = sf.active ? bodyWorldQ() : rootQ;
     fkChain(pose, Pelvis, Spine2);
+    if (sf.active) {
+        solveLegs(pose, sf);
+        fkChain(pose, ThighL, FootR);
+    }
 
     // ---- head / neck
     quat chest = rotOf(G[Spine2]);
     quat desired;
     if (headOverride) {
-        desired = qy(ovYaw) * qx(-ovPitch);
+        desired = qy(ovYaw) * qx(-ovPitchNow);
     } else {
         // (Nods and head shakes on top of the smoothed gaze angles.)
         desired = qy(headYaw + gestYaw) * qx(-(headPitch + gestPitch));
@@ -1009,7 +1030,7 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     } else {
         float w = sacDur > 0 ? clamp(sacT / sacDur, 0.0f, 1.0f) : 1.0f;
         vec3 fixW = lerp(fixFrom, fixTo, minJerk(w)) + microOffset;
-        vec3 fixC = toChar(fixW);
+        vec3 fixC = worldToBody(fixW);
         float yawSum = 0, pitchSum = 0;
         for (int e = 0; e < 2; ++e) {
             Bone eb = e == 0 ? EyeL : EyeR;
@@ -1046,6 +1067,11 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     const Hand& rh = right();
     if (length2(rh.pinCarry) > 0.0f && t >= rh.pinCarryStart && t < rh.pinCarryStart + 0.25f)
         hr.p += rh.pinCarry * (1.0f - minJerk((t - rh.pinCarryStart) / 0.25f));
+    if (sf.active) {
+        // Out of the seat: the hand targets in body space, the stance's hand poses over them.
+        hr = stanceHand(Side::Right, sf, handToBody(hr));
+        hl = stanceHand(Side::Left, sf, handToBody(hl));
+    }
     solveArm(pose, Side::Right, hr.p, hr.q, hr.elbow);
     vec3 pinShift(0.0f);
     if (hr.pinW > 0.0f) {
@@ -1165,13 +1191,15 @@ void Animator::Impl::updateGaze(float dt) {
         vec3 hands = toWorld(shakeHand().motion.sample(time).p);
         target = lerp(target, lerp(face, hands, gl * 0.8f), w);
     }
-    vec3 headW = toWorld(transformPoint(G[Neck], vec3(0, 0.12f, 0.05f)));
-    vec3 dc = rotate(conjugate(rootQ), target - headW);
+    // (Angles in the body's yaw frame: a standing robot's body may face anywhere.)
+    vec3 headW = bodyToWorld(transformPoint(G[Neck], vec3(0, 0.12f, 0.05f)));
+    vec3 dc = rotate(conjugate(bodyWorldQ()), target - headW);
     float yaw = std::atan2(dc.x, std::max(1e-3f, dc.z));
     float pitch = std::atan2(dc.y, length(vec3(dc.x, 0, dc.z)));
-    // Head takes most of large rotations, the eyes the rest.
+    // Head takes most of large rotations, the eyes the rest; standing, the head (and the back)
+    // takes more of a look down at the board.
     float hy = yaw * (0.55f + 0.30f * smoothstep(0.0f, 0.6f, std::fabs(yaw)));
-    float hp = pitch * 0.62f;
+    float hp = pitch * (standW > 0.0f ? lerp(0.62f, 0.85f, standW) : 0.62f);
     // Micro head motion (AI only).
     hy += 0.008f * std::sin(t * 0.9f + seed) + 0.004f * std::sin(t * 2.3f);
     hp += 0.007f * std::sin(t * 0.7f + seed * 2.0f) + 0.003f * std::sin(t * 1.9f);
@@ -1181,7 +1209,7 @@ void Animator::Impl::updateGaze(float dt) {
     // shakes are added after the spring, see gestYaw).
     updateSpeech(dt, hy, hp);
     hy = clamp(hy, -70.0f * DEG, 70.0f * DEG);
-    hp = clamp(hp, -45.0f * DEG, 30.0f * DEG);
+    hp = clamp(hp, headPitchMin(standW), 30.0f * DEG);
     // Critically damped spring towards the target angles (sub-stepped).
     const float w0 = 11.0f;
     int n = std::max(1, int(std::ceil(dt / (1.0f / 240.0f))));
@@ -1279,7 +1307,8 @@ void Animator::Impl::updateIdle(float dt) {
     Hand& L = left();
     bool rightFree = !running && queue.empty() && R.heldId < 0 && R.capId < 0 && rightIdle;
     int desired = 0;
-    if (thinking) {
+    // (The idle chin poses are for a seated robot with nothing else in mind.)
+    if (thinking && seatedNow() && stanceTarget == Stance::Seated) {
         thinkTimer -= dt;
         if (thinkTimer <= 0.0f) {
             float r = rng.uniform();
@@ -1489,6 +1518,7 @@ void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side pla
     I.rootQ = I.facing > 0 ? axisAngle(vec3(0, 1, 0), PI) : quat();
     I.root = toMat4(I.rootQ, I.pelvisWorld);   // (rootQ is a turn about Y: the same mirrored)
     I.invRoot = inverseAffine(I.root);
+    I.setBody(vec3(0.0f), 0.0f);               // seated
     I.L1 = length(sk.restOffset[ForeArmR]);
     I.L2 = length(sk.restOffset[HandR]);
     I.seed = I.facing > 0 ? 0.37f : 0.81f;
@@ -1547,6 +1577,8 @@ void Animator::setRestHand(vec3 worldPos) {
 }
 
 void Animator::enqueue(const Task& t) {
+    // A task for a robot out of its seat: it sits down first (tasks start only while seated).
+    if (!impl_->seatedNow()) impl_->stanceTarget = Stance::Seated;
     Task c = t;
     c.position = impl_->mw(t.position);   // into the solver's world
     for (vec3& p : c.path) p = impl_->mw(p);
@@ -1555,7 +1587,8 @@ void Animator::enqueue(const Task& t) {
 void Animator::enqueue(const std::vector<Task>& tasks) {
     for (auto& t : tasks) enqueue(t);
 }
-bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
+// (A stance change under way or waiting counts: the robot is not ready for anything else yet.)
+bool Animator::busy() const { return impl_->running || !impl_->queue.empty() || impl_->stanceBusy(); }
 bool Animator::runningTask(TaskType type) const { return impl_->running && impl_->cur.type == type; }
 void Animator::cancelTasks() {
     Impl& I = *impl_;
@@ -1588,10 +1621,11 @@ void Animator::setHeadOverride(bool enabled, float yaw, float pitch) {
     Impl& I = *impl_;
     if (I.mirrored) yaw = -yaw;   // the solver's left is the character's right
     yaw = clamp(yaw, -70.0f * DEG, 70.0f * DEG);
-    pitch = clamp(pitch, -45.0f * DEG, 30.0f * DEG);
+    // (Down to -45 degrees seated; standing, further: evaluate() applies the range of the moment.)
+    pitch = clamp(pitch, I.headPitchMin(1.0f), 30.0f * DEG);
     if (!enabled && I.headOverride) {   // hand over smoothly to the gaze controller
         I.headYaw = I.ovYaw;
-        I.headPitch = I.ovPitch;
+        I.headPitch = clamp(I.ovPitch, I.headPitchMin(I.standW), 30.0f * DEG);
         I.headYawV = I.headPitchV = 0.0f;
     }
     I.headOverride = enabled;
@@ -1601,7 +1635,7 @@ void Animator::setHeadOverride(bool enabled, float yaw, float pitch) {
 void Animator::headAngles(float& yaw, float& pitch) const {
     const Impl& I = *impl_;
     yaw = I.headOverride ? I.ovYaw : I.headYaw + I.gestYaw;
-    pitch = I.headOverride ? I.ovPitch : I.headPitch + I.gestPitch;
+    pitch = I.headOverride ? clamp(I.ovPitch, I.headPitchMin(I.standW), 30.0f * DEG) : I.headPitch + I.gestPitch;
     if (I.mirrored) yaw = -yaw;   // back from the solver's side to the character's
 }
 void Animator::setLean(float lean) { impl_->leanTarget = clamp(lean, 0.0f, 1.0f); }
@@ -1627,18 +1661,20 @@ void Animator::update(float dt, std::vector<Event>& events) {
     I.timeD += dt;
     const float tEnd = float(I.timeD);
     const size_t ev0 = events.size();
-    // Two task machines (playing hand, writing hand), stepped through their boundaries in time
-    // order so each task starts exactly when the previous one of its hand ends.
+    // Two task machines (playing hand, writing hand) and the stance's legs, stepped through their
+    // boundaries in time order so each task starts exactly when the previous one of its hand ends
+    // (or when the robot is back in its seat: tasks start only while seated).
     for (int guard = 0; guard < 512; ++guard) {
         const float never = 1e30f;
-        float tm = never, tw = never;
+        float tm = never, tw = never, ts = never;
         if (I.running) tm = I.curStart + I.curT;
-        else if (!I.queue.empty()) tm = std::max(I.time, I.startAfterCut(I.queue.front()));   // (the hand holds meanwhile)
+        else if (!I.queue.empty() && I.seatedNow()) tm = std::max(I.time, I.startAfterCut(I.queue.front()));   // (the hand holds meanwhile)
         if (!I.nextWriteBoundary(tw)) tw = never;
-        const float tn = std::min(tm, tw);
+        if (!I.nextStanceBoundary(ts)) ts = never;
+        const float tn = std::min(tm, std::min(tw, ts));
         if (tn > tEnd) break;
         I.time = std::max(I.time, tn);
-        if (tm <= tw) {
+        if (tm <= tw && tm <= ts) {
             if (I.running) {
                 I.finishTask(events);
             } else {
@@ -1646,12 +1682,16 @@ void Animator::update(float dt, std::vector<Event>& events) {
                 I.queue.pop_front();
                 I.startTask(t, events);
             }
-        } else {
+        } else if (tw <= ts) {
             I.stepWriting(events);
+        } else {
+            I.fireStanceDue(I.time, events);
+            I.stepStance(events);
         }
     }
     if (I.running) I.fireDue(tEnd, events);
     if (I.wr.running) I.fireWriteDue(tEnd, events);
+    I.fireStanceDue(tEnd, events);
     I.time = tEnd;
     // Body lean towards the sheet and eyes on the pen while the writing hand works.
     {
