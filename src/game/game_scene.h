@@ -503,6 +503,9 @@ private:
     // player's (the hot-seat handover; --handover-preview also freezes the clock until it lands).
     void followEyesAfterMove(int seat);
     int headNearCamera(m::vec3 p) const;      // seat whose head contains p (drawn headless), or -1
+    // Analysis mode: the seat whose head stands between the camera at p and the board's centre (a
+    // robot leaning in to play, seen from behind it: drawn headless, the board stays in view), or -1.
+    int headBeforeBoard(m::vec3 p) const;
     float observerFocus(const render::Camera& cam) const;
     float firstPersonFocus(const m::Ray& gaze) const;  // distance the player's eyes focus at
 

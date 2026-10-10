@@ -125,6 +125,7 @@ struct AnalysisRuntime {
     int commentPos = -1;                      // a forward step reached it: its comment, once decided
     float commentWait = 0.0f;
     bool commented = false;                   // the last step's comment was played (Play's pause)
+    bool welcomed = false;                    // the start's comment ("Let's look back at this game")
 
     // The narrator's voice (the TTS worker is the coach's: GameScene::coachVoice()).
     audio::VoiceId voice;
@@ -488,6 +489,14 @@ void GameScene::setupAnalysis() {
     if (a.target > 0) setReplayPosition(a.target);
     a.marksPos = a.target;
     a.marksAge = 1.0f;
+    // Opened at the start: the commentator's welcome (a game opened elsewhere hears it when Play
+    // starts from the start).
+    a.welcomed = false;
+    if (a.target == 0 && settings().analysisComments) {
+        a.welcomed = true;
+        a.commentPos = 0;
+        a.commentWait = kCommentWaitStep;
+    }
 
     // The view: from the player's side, above the board (unless --cam says otherwise).
     if (!pendingCamArg_) {
@@ -830,6 +839,13 @@ bool GameScene::analysisKey(const std::string& key) {
     if (key == "K") {
         a.playing = !a.playing && a.target < plies;
         a.still = kPlayPause;   // the first move at once
+        if (a.playing && a.target == 0 && int(game_.moves().size()) == 0 && !a.welcomed && s.analysisComments &&
+            a.step == AnalysisRuntime::Step::None) {
+            // From the start: the welcome first, the first move once it is said.
+            a.welcomed = true;
+            a.commentPos = 0;
+            a.commentWait = kCommentWaitPlay;
+        }
     } else if (key == "J" || key == "L") {
         a.playing = false;      // stepping pauses
         analysisGoTo(a.target + (key == "L" ? 1 : -1));

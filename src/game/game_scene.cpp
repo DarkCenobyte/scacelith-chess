@@ -2563,6 +2563,7 @@ void GameScene::render(AppContext& ctx, float dt) {
     int headless = -1;  // the robot the camera is in: drawn without its head
     if (observer) {
         headless = headNearCamera(cam.position);
+        if (headless < 0 && analysing()) headless = headBeforeBoard(cam.position);
     } else if (firstPerson) {
         // In the eyes of the player (hot-seat: of the player at the table); during a hot-seat
         // flight, whichever head the camera passes through.
@@ -2862,6 +2863,21 @@ int GameScene::headNearCamera(vec3 p) const {
         mat4 e = anim_[seat].eyeCameraTransform();
         vec3 centre = e.c[3].xyz() + normalize(e.c[2].xyz()) * 0.06f;  // +Z: behind the eyes
         if (length(p - centre) < 0.16f) return seat;
+    }
+    return -1;
+}
+
+int GameScene::headBeforeBoard(vec3 p) const {
+    const vec3 board(0.0f, layout::BOARD_TOP_Y, 0.0f);
+    const vec3 d = board - p;
+    const float len2 = dot(d, d);
+    if (len2 < 1e-6f) return -1;
+    for (int seat = 0; seat < 2; ++seat) {
+        mat4 e = anim_[seat].eyeCameraTransform();
+        vec3 centre = e.c[3].xyz() + normalize(e.c[2].xyz()) * 0.06f;  // +Z: behind the eyes
+        float t = dot(centre - p, d) / len2;
+        if (t <= 0.0f || t >= 1.0f) continue;
+        if (length(centre - (p + d * t)) < 0.24f) return seat;
     }
     return -1;
 }
