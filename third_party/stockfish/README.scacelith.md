@@ -254,7 +254,10 @@ it), audit levels 0 and 1, and the dispatch of upstream's `universal/entry_arm64
   its static initialisers run at program start (`sf_variants.h`: `SCACELITH_SF_ISOLATED` is 0, the
   dispatcher has no initialiser table to run), and there is no audit. INCBIN puts the network in
   `__DATA,__const` with Mach-O's leading underscore (`INCBIN_SILENCE_BITCODE_WARNING`: incbin.h
-  takes `TARGET_OS_IPHONE` as defined, while macOS defines it as 0). Not yet compiled on a Mac.
+  takes `TARGET_OS_IPHONE` as defined, while macOS defines it as 0). Not yet compiled on a Mac;
+  the same arrangement (this CMake branch, upstream clang 18, the dispatcher's macOS branch) built
+  for Linux aarch64 runs under `qemu-aarch64` and searches the 2,497,913 nodes of `bench 16 1 13`,
+  as every x86-64 variant does.
 
 ## Running in-process
 
