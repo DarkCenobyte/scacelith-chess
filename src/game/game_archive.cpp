@@ -125,6 +125,14 @@ bool deleteFile(const std::string& path) { return DeleteFileW(widen(path).c_str(
 unsigned processId() { return unsigned(GetCurrentProcessId()); }
 const char kSeparator = '\\';
 #else
+// The modification time in milliseconds (macOS has st_mtimespec for POSIX's st_mtim).
+static int64_t modifiedMs(const struct stat& st) {
+#ifdef __APPLE__
+    return int64_t(st.st_mtimespec.tv_sec) * 1000 + st.st_mtimespec.tv_nsec / 1000000;
+#else
+    return int64_t(st.st_mtim.tv_sec) * 1000 + st.st_mtim.tv_nsec / 1000000;
+#endif
+}
 int listFolder(const std::string& dir, std::vector<FileInfo>& out, std::string& err) {
     DIR* d = opendir(dir.empty() ? "." : dir.c_str());
     if (!d) {
@@ -138,7 +146,7 @@ int listFolder(const std::string& dir, std::vector<FileInfo>& out, std::string& 
         struct stat st;
         if (stat(joinPath(dir, f.name).c_str(), &st) != 0 || !S_ISREG(st.st_mode)) continue;
         f.size = uint64_t(st.st_size);
-        f.timeMs = int64_t(st.st_mtim.tv_sec) * 1000 + st.st_mtim.tv_nsec / 1000000;
+        f.timeMs = modifiedMs(st);
         out.push_back(f);
     }
     closedir(d);
@@ -148,7 +156,7 @@ bool statFile(const std::string& path, FileInfo& f) {
     struct stat st;
     if (stat(path.c_str(), &st) != 0 || !S_ISREG(st.st_mode)) return false;
     f.size = uint64_t(st.st_size);
-    f.timeMs = int64_t(st.st_mtim.tv_sec) * 1000 + st.st_mtim.tv_nsec / 1000000;
+    f.timeMs = modifiedMs(st);
     return true;
 }
 FILE* openFile(const std::string& path, const char* mode) { return std::fopen(path.c_str(), mode[0] == 'r' ? "rb" : "wb"); }
