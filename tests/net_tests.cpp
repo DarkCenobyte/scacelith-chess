@@ -7434,9 +7434,11 @@ TEST(net_tls_pinned_post_manual) {
 // HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
 //   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password>[:<keepalive ms>] ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects (the gesture keepalive of the server's Welcome must be
-// <keepalive ms> when given), queues rated 3+2, plays legal moves for 12 plies (posHash from its
-// own chess::Position FEN) and resigns; the result and the rating update must come back from the
-// server. The account API has its own live check (tests/net_live_account_tests.cpp).
+// <keepalive ms> when given), queues rated 3+2, stands up for a moment and sits down again
+// (protocol minor 2: the harness checks that the bot heard both), plays legal moves for 12 plies
+// (posHash from its own chess::Position FEN) and resigns; the result, the bot standing up while it
+// waits (OpponentStance) and the rating update must come back from the server. The account API
+// has its own live check (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
@@ -7498,11 +7500,17 @@ TEST(net_live_server_game) {
         }
     };
     sync(ev.game);
-    int sent = -1, confirmed = 0;
+    int sent = -1, confirmed = 0, opponentStanding = 0, opponentSeated = 0;
     bool ended = false, resigned = false;
     net::Event end;
-    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
+    // Standing for 0.8 s from the start, then seated; no move of mine before the stance had time
+    // to go (the client sends a change 250 ms after the previous one at the earliest).
+    const auto start = std::chrono::steady_clock::now();
+    const auto sitAt = start + std::chrono::milliseconds(800), playAt = sitAt + std::chrono::milliseconds(400);
+    auto deadline = start + std::chrono::seconds(60);
     while (!ended && std::chrono::steady_clock::now() < deadline) {
+        const auto now = std::chrono::steady_clock::now();
+        c.sendStance(gameId, uint8_t(now < sitAt ? net::proto::Stance::Standing : net::proto::Stance::Seated));
         net::Event e;
         while (c.poll(e)) {
             if (e.kind == net::Event::Kind::MoveMade || e.kind == net::Event::Kind::GameSnapshot) {
@@ -7516,10 +7524,13 @@ TEST(net_live_server_game) {
                 end = e;
             } else if (e.kind == net::Event::Kind::ServerError) {
                 std::fprintf(stderr, "  server error %d '%s'\n", e.code, e.error.c_str());
+            } else if (e.kind == net::Event::Kind::OpponentStance && e.gameId == gameId) {
+                if (e.stance == int(net::proto::Stance::Standing)) ++opponentStanding;
+                if (e.stance == int(net::proto::Stance::Seated)) ++opponentSeated;
             }
         }
         int ply = int(mirror.moves().size());
-        if (!ended && ply % 2 == you && sent < ply) {
+        if (!ended && ply % 2 == you && sent < ply && now >= playAt) {
             if (ply >= 12 && !resigned) {
                 c.resign(gameId);
                 resigned = true;
@@ -7535,10 +7546,13 @@ TEST(net_live_server_game) {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
-    std::fprintf(stderr, "  plies %zu, own moves confirmed %d, ended %d (status %d reason %d)\n", mirror.moves().size(), confirmed,
-                 int(ended), end.game.status, end.game.reason);
+    std::fprintf(stderr, "  plies %zu, own moves confirmed %d, ended %d (status %d reason %d), the bot stood up %d times, sat down %d\n",
+                 mirror.moves().size(), confirmed, int(ended), end.game.status, end.game.reason, opponentStanding, opponentSeated);
     CHECK(ended);
     CHECK(confirmed >= 6);
+    // The bot stands after each of its moves and sits down before the next one.
+    CHECK(opponentStanding >= 3);
+    CHECK(opponentSeated >= 2);
     CHECK_EQ(end.game.reason, int(net::proto::EndReason::Resignation));
     CHECK_EQ(end.game.status, you == 0 ? int(net::proto::GameStatus::BlackWins) : int(net::proto::GameStatus::WhiteWins));
     CHECK(waitEvent(c, net::Event::Kind::RatingUpdate, ev, 10000, &seen));
