@@ -19,6 +19,7 @@
 #include "coach/catalog.h"
 #include "core/embedded.h"
 #include "i18n/i18n.h"
+#include "i18n/unicode.h"
 #include "net/net_sys.h"
 
 #include <algorithm>
@@ -1262,6 +1263,84 @@ TEST(game_review_comment_keys_in_english) {
     std::fprintf(stderr, "  %s | %s\n", written.c_str(), spoken.c_str());
     CHECK_EQ(written.compare(0, 40, "It leaves White's queen unprotected, and"), 0);
     CHECK_EQ(spoken.compare(0, 41, "White's queen is left without a defender:"), 0);
+}
+
+// Every language with coach speech has every analysis line, and each variant renders cleanly,
+// written and spoken, for pieces of both sides and counts that take every plural form: no
+// placeholder left, no English side ("White's") in another language (a missing piece form falls
+// back to English), at most two subtitle lines, no bare square spoken.
+TEST(game_review_comment_keys_in_every_language) {
+    coach::Catalog cat;
+    CHECK(cat.load());
+    const std::regex bareSquare("(^|[^A-Za-z0-9])[a-h][1-8]([^A-Za-z0-9]|$)");
+    // Display columns of a subtitle: CJK characters take two, the marks of Arabic none.
+    auto columns = [](const std::string& s) {
+        int w = 0;
+        for (char32_t c : uni::decode(s)) {
+            if (c == 0x200E) continue;
+            const bool wide = (c >= 0x1100 && c <= 0x115F) || (c >= 0x2E80 && c <= 0xA4CF) ||
+                              (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0xF900 && c <= 0xFAFF) || (c >= 0xFF00 && c <= 0xFF60);
+            w += wide ? 2 : 1;
+        }
+        return w;
+    };
+    struct SidePiece { PieceType type; Color color; const char* on; PieceType other; };
+    const SidePiece pieces[] = {{Queen, White, "d1", Rook},  {Rook, Black, "a8", Queen}, {Knight, White, "c3", Rook},
+                                {Pawn, Black, "e5", Rook},   {Bishop, White, "c4", Queen}, {King, Black, "e8", Rook}};
+    int languages = 0, renders = 0;
+    for (const std::string& lang : cat.languages()) {
+        const std::vector<std::string> topics = cat.topics(lang);
+        if (std::find(topics.begin(), topics.end(), "common") == topics.end()) continue;   // openings only
+        ++languages;
+        for (const std::string& k : cat.keys("en", "analysis")) {
+            if (k.size() > 7 && k.compare(k.size() - 7, 7, ".spoken") == 0) continue;
+            if (!cat.has(lang, k)) {
+                std::fprintf(stderr, "  %s: missing %s\n", lang.c_str(), k.c_str());
+                CHECK(false);
+                continue;
+            }
+            const std::string* v = cat.find("en", k);
+            REQUIRE(v != nullptr);
+            const size_t dot = k.rfind('.');
+            const bool variant = dot != std::string::npos && std::isdigit((unsigned char)k[dot + 1]);
+            const int n = variant ? std::atoi(k.c_str() + dot + 1) : 1;
+            const std::set<std::string> names = placeholders(*v);
+            const bool hasPiece = names.count("piece") || names.count("t1");
+            const bool hasCount = names.count("m") || names.count("n") || names.count("pts");
+            for (const SidePiece& p : pieces) {
+                for (int count : {1, 2, 5, 21}) {
+                    coach::Line l;
+                    l.key = variant ? k.substr(0, dot) : k;
+                    for (const std::string& name : names) {
+                        if (name == "move") l.with(name, coach::Arg::ofMove("Nf3", "g1f3"));
+                        else if (name == "best") l.with(name, coach::Arg::ofMove("Qxf7+", "h5f7"));
+                        else if (name == "reply") l.with(name, coach::Arg::ofMove("Nxe5", "c6e5"));
+                        else if (name == "line") l.with(name, coach::Arg::ofMoves("Nxe5 dxe5 Qg4"));
+                        else if (name == "piece" || name == "t1") l.with(name, coach::Arg::ofSidePiece(p.type, p.color, sq(p.on)));
+                        else if (name == "t2") l.with(name, coach::Arg::ofSidePiece(p.other, p.color));
+                        else if (name == "opening") l.with(name, coach::Arg::ofOpening("family:sicilian"));
+                        else l.with(name, coach::Arg::ofNumber(count));
+                    }
+                    for (bool spoken : {false, true}) {
+                        const coach::Catalog::Rendered out = cat.renderVariant(l, lang, spoken, n);
+                        ++renders;
+                        const std::string& t = out.text;
+                        bool ok = out.variant == n && !t.empty() && t.find('{') == std::string::npos;
+                        if ((spoken ? coach::speechLanguage(lang) : lang) != "en")
+                            ok = ok && t.find("White's") == std::string::npos && t.find("Black's") == std::string::npos;
+                        if (!spoken) ok = ok && columns(t) <= 160;
+                        if (spoken) ok = ok && !std::regex_search(t, bareSquare);
+                        if (!ok) std::fprintf(stderr, "  %s %s (%s): %s\n", lang.c_str(), k.c_str(), spoken ? "spoken" : "written", t.c_str());
+                        CHECK(ok);
+                    }
+                    if (!hasCount) break;
+                }
+                if (!hasPiece) break;
+            }
+        }
+    }
+    CHECK(languages >= 10);
+    CHECK(renders > 2000);
 }
 
 // ---- With the embedded engine -------------------------------------------------------------------------

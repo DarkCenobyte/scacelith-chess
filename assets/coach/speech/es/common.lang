@@ -23,6 +23,14 @@ piece.king.gender = m
 # change with the gender, so one pattern serves every piece. Never put an article before them.
 owner.your.nom = tu {piece}
 owner.my.nom = mi {piece}
+# The Analysis mode names a piece by its side, nobody being "tú" or "yo" there: "el caballo
+# blanco", "la torre negra" (owner.white.* / owner.black.*, the article and the adjective agree with
+# the piece). Unlike {your} / {my} these carry the article: the analysis lines never put "a" or "de"
+# right before them ("al", "del" cannot be formed).
+owner.white.nom = el {piece} blanco
+owner.white.nom.f = la {piece} blanca
+owner.black.nom = el {piece} negro
+owner.black.nom.f = la {piece} negra
 # Object pronoun standing for the piece of the placeholder, "lo" or "la", written joined to the
 # verb as Spanish does: "¡Captúra{my:lo}!" = "¡Captúralo!" / "¡Captúrala!",
 # "para capturar{my:lo}" = "para capturarlo" / "para capturarla".

@@ -1,0 +1,151 @@
+# Coach speech (Simplified Chinese, mainland): the commentary of the Analysis mode
+# (src/analysis/commentary.cpp), shown as subtitles while a finished game is replayed. Same keys and
+# variants as assets/coach/speech/en/analysis.lang (its header documents every placeholder).
+# Subtitle text only: the voice speaks the English line of the same key and variant, so each
+# variant translates its English twin.
+#
+# Nobody is 你 or 我 here: the players are 白方 and 黑方 (as assets/i18n/zh-Hans.lang).
+# {piece} {t1} {t2} = a piece with its side ("白方的马"); never write 白方的 / 黑方的 in front of
+# them. {t2:bare} = the piece alone, after {t1} of the same side ("{t1}和{t2:bare}" = 白方的王和后).
+# {move} {best} {reply} = moves ("♘f3"); {line} = a few moves; {opening:def} = an opening name;
+# {m:move} = "3步"; {pts:point} = "3分"; {n:mistake} = "2步错着"; {m:blunder} = "1步漏着";
+# {acc_white} {acc_black} = plain numbers. No space between Chinese and a move or digit.
+# Terms: 漏着 (blunder), 错着 (mistake), 不精确 (inaccurate), 捉双 (fork), 弃子 (sacrifice),
+# 将死, 逼和, 和棋, 认输, 超时, 准确率, 引擎.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = 我们一起来回顾这盘棋。
+an.start.2 = 我们一步一步地来看这盘棋。
+an.start.3 = 这就是这盘棋。来看看它是怎么下的。
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = 这盘棋从一个摆好的局面开始。我们一起来看。
+an.start.setup.2 = 一盘从摆好的局面开始的棋。来看看它是怎么下的。
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = 开局是{opening:def}。
+an.opening.2 = 这是{opening:def}。
+an.book_exit = 走了{move}，对局离开了已知的开局理论。
+an.book_exit.2 = {move}是脱离开局谱的第一步。
+an.book_exit.3 = 开局理论到这里结束，就在{move}。
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move}是一步漏着。
+an.blunder.2 = 这里的{move}是个严重的错误。
+an.blunder.3 = 漏着：{move}。
+an.mistake = {move}是一步错着。
+an.mistake.2 = {move}在这里不是正确的着法。
+an.mistake.3 = 错着：{move}。
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move}错过了惩罚那步错着的机会。
+an.missed_chance.2 = 走了{move}，机会就溜走了。
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = 现在{reply}就是将死。
+an.mate_allowed.one.2 = 这步让对方可以走{reply}，直接将死。
+an.mate_allowed = 这步让对方有{m:move}强制将死，从{reply}开始。
+an.mate_allowed.2 = 现在出现了{m:move}强制将死，第一步是{reply}。
+an.fork = 现在{reply}捉双{t1}和{t2:bare}。
+an.fork.2 = 这步让对方走{reply}，同时攻击{t1}和{t2:bare}。
+an.fork.3 = {reply}同时打到{t1}和{t2:bare}。
+an.hanging = 这步让{piece}失去了保护，{reply}把它吃掉。
+an.hanging.2 = {piece}没有保护：{reply}把它吃掉。
+an.hanging.3 = {reply}直接吃掉{piece}，它没有任何保护。
+an.material = 应着{line}赢得{pts:point}的子力。
+an.material.2 = 接着{line}赢得{pts:point}。
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best}就是将死。
+an.mate_missed.one.2 = {best}本可以直接将死。
+an.mate_missed = {best}本可以{m:move}强制将死。
+an.mate_missed.2 = 本来有{m:move}强制将死，从{best}开始。
+an.missed_capture = {best}本可以白吃{piece}。
+an.missed_capture.2 = {piece}没有保护：{best}本可以吃掉它。
+an.missed_fork = {best}本可以捉双{t1}和{t2:bare}。
+an.missed_fork.2 = {best}是一步捉双，同时攻击{t1}和{t2:bare}。
+
+# The better move, when nothing above named it.
+an.better = {best}更强。
+an.better.2 = 更好的是{best}。
+an.better.3 = 引擎更推荐{best}。
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move}妙极了：它弃掉了{piece}！
+an.brilliant.2 = 精彩的弃子！{move}送出了{piece}。
+an.brilliant.3 = {move}！一步送出{piece}的妙着。
+an.brilliant.mate = 它会导致{m:move}强制将死。
+an.brilliant.mate.2 = 而且它能{m:move}强制将死。
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move}是唯一保持优势的着法。
+an.only.win.2 = 这里只有{move}能保持优势。找得好。
+an.only.hold = {move}是唯一保持均势的着法。
+an.only.hold.2 = 这里只有{move}能守住局面。
+an.only.defend = {move}是唯一能让战斗继续的着法。
+an.only.defend.2 = 这里只有{move}能让这盘棋继续下去。防守得好。
+an.only.best = {move}是这里遥遥领先的最强着法。
+an.only.best.2 = 精准：{move}比其他所有着法都强得多。
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move}有点不精确：{best}更准确。
+an.inaccuracy.2 = 不算最佳：{best}比{move}更精确。
+an.interesting = {move}是个有趣的想法，送出了{piece}。
+an.interesting.2 = 有趣的尝试：{move}弃掉了{piece}。
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = 白方现在有{m:move}强制将死。
+an.mate_on.white.2 = 从这里开始，白方可以{m:move}强制将死。
+an.mate_on.black = 黑方现在有{m:move}强制将死。
+an.mate_on.black.2 = 从这里开始，黑方可以{m:move}强制将死。
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = 将死。白方赢得这盘棋。
+an.end.mate.white.2 = 这就是将死：白方获胜。
+an.end.mate.black = 将死。黑方赢得这盘棋。
+an.end.mate.black.2 = 这就是将死：黑方获胜。
+an.end.resigned.white = 黑方认输，所以白方赢得这盘棋。
+an.end.resigned.white.2 = 对局到此结束：黑方认输，白方获胜。
+an.end.resigned.black = 白方认输，所以黑方赢得这盘棋。
+an.end.resigned.black.2 = 对局到此结束：白方认输，黑方获胜。
+an.end.timeout.white = 黑方超时，所以白方获胜。
+an.end.timeout.white.2 = 白方因对方超时获胜。
+an.end.timeout.black = 白方超时，所以黑方获胜。
+an.end.timeout.black.2 = 黑方因对方超时获胜。
+an.end.win.white = 这盘棋以白方获胜告终。
+an.end.win.white.2 = 白方赢得这盘棋。
+an.end.win.black = 这盘棋以黑方获胜告终。
+an.end.win.black.2 = 黑方赢得这盘棋。
+an.end.stalemate = 逼和：这盘棋是和棋。
+an.end.stalemate.2 = 这是逼和，所以对局以和棋结束。
+an.end.draw.agreement = 双方同意和棋。
+an.end.draw.agreement.2 = 对局以协议和棋结束。
+an.end.draw.repetition = 对局因重复局面成和。
+an.end.draw.repetition.2 = 同样的局面再次出现：和棋。
+an.end.draw.fifty = 对局按五十回合规则成和。
+an.end.draw.fifty.2 = 五十回合没有吃子也没有走兵：和棋。
+an.end.draw.seventy_five = 对局按七十五回合规则成和。
+an.end.draw.seventy_five.2 = 七十五回合没有吃子也没有走兵：和棋。
+an.end.draw.material = 已经不可能将死：这盘棋是和棋。
+an.end.draw.material.2 = 双方都无法再将死对方，所以是和棋。
+an.end.draw = 对局以和棋结束。
+an.end.draw.2 = 和棋。
+an.end.unfinished = 对局停在这里，没有下完。
+an.end.unfinished.2 = 对局就停在这里：这盘棋没有下完。
+an.end.accuracy = 准确率：白方{acc_white}%，黑方{acc_black}%。
+an.end.accuracy.2 = 白方的准确率是{acc_white}%，黑方是{acc_black}%。
+an.end.clean.white = 白方没有错着，也没有漏着。
+an.end.clean.white.2 = 白方的着法没有严重失误。
+an.end.clean.black = 黑方没有错着，也没有漏着。
+an.end.clean.black.2 = 黑方的着法没有严重失误。
+an.end.mistakes.white = 白方有{n:mistake}，没有漏着。
+an.end.mistakes.white.2 = 白方：{n:mistake}，没有漏着。
+an.end.mistakes.black = 黑方有{n:mistake}，没有漏着。
+an.end.mistakes.black.2 = 黑方：{n:mistake}，没有漏着。
+an.end.blunders.white = 白方有{m:blunder}。
+an.end.blunders.white.2 = 白方：{m:blunder}。
+an.end.blunders.black = 黑方有{m:blunder}。
+an.end.blunders.black.2 = 黑方：{m:blunder}。
+an.end.errors.white = 白方有{n:mistake}和{m:blunder}。
+an.end.errors.white.2 = 白方：{n:mistake}和{m:blunder}。
+an.end.errors.black = 黑方有{n:mistake}和{m:blunder}。
+an.end.errors.black.2 = 黑方：{n:mistake}和{m:blunder}。

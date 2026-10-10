@@ -1,0 +1,152 @@
+# Coach speech (Spanish): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Spanish:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tú" or "yo" here: the players are "las blancas" and "las negras" (lowercase inside a
+#   sentence, as assets/i18n/es.lang). A piece comes with its side and its article: {piece} {t1}
+#   {t2} = "el caballo blanco", "la torre negra" (common.lang, owner.white / owner.black). Never "a"
+#   or "de" right before them ("al", "del" cannot be formed): targets of an attack follow "contra"
+#   or "sobre"; capturar, ganar, entregar, ofrecer take no "a". No pronoun, adjective or participle
+#   agreeing with them: the neuter "lo aprovecha" suits any piece.
+# - Counted numbers (common.lang): {m:move} "mate en tres jugadas", {pts:point} "3 puntos",
+#   {n:mistake} "2 errores", {m:blunder} "un error grave"; "{acc_black:num}" says a bare number
+#   ("cien", where {acc_black} says "ciento").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Repasemos juntos esta partida.
+an.start.2 = Recorramos esta partida, jugada a jugada.
+an.start.3 = Aquí está la partida. Veamos cómo fue.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Esta partida empieza desde una posición preparada. Vamos a repasarla.
+an.start.setup.2 = Una partida desde una posición preparada. Veamos cómo fue.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = La apertura es {opening:def}.
+an.opening.2 = Esto es {opening:def}.
+an.book_exit = Con {move}, la partida sale de la teoría conocida.
+an.book_exit.2 = {move} es la primera jugada fuera de la teoría de aperturas.
+an.book_exit.3 = La teoría termina aquí, con {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} es un error grave.
+an.blunder.2 = Aquí {move} es un error muy serio.
+an.blunder.3 = Un error grave: {move}.
+an.mistake = {move} es un error.
+an.mistake.2 = {move} no es la jugada correcta aquí.
+an.mistake.3 = Un error: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} desaprovecha la ocasión de castigar ese error.
+an.missed_chance.2 = Con {move}, la oportunidad se escapa.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Ahora {reply} es jaque mate.
+an.mate_allowed.one.2 = Permite {reply}, y eso es jaque mate.
+an.mate_allowed = Permite un mate forzado en {m:move}, empezando por {reply}.
+an.mate_allowed.2 = Ahora hay un mate forzado en {m:move}, que empieza con {reply}.
+an.fork = Ahora {reply} hace una horquilla contra {t1} y {t2}.
+an.fork.2 = Permite {reply}, un ataque doble contra {t1} y {t2}.
+an.fork.3 = {reply} lanza un ataque doble sobre {t1} y {t2}.
+an.hanging = Deja {piece} sin protección, y {reply} lo aprovecha.
+an.hanging.2 = {piece} se queda sin defensor, y {reply} no perdona.
+an.hanging.3 = {reply} captura sin más {piece}, que no tenía defensor.
+an.material = La respuesta {line} gana {pts:point} de material.
+an.material.2 = Después, {line} gana {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best} era jaque mate.
+an.mate_missed.one.2 = {best} habría sido jaque mate.
+an.mate_missed = {best} habría forzado el mate en {m:move}.
+an.mate_missed.2 = Había un mate forzado en {m:move}, empezando por {best}.
+an.missed_capture = {best} habría ganado {piece} gratis.
+an.missed_capture.2 = {piece} no tenía defensor, y {best} lo habría aprovechado.
+an.missed_fork = {best} habría hecho una horquilla contra {t1} y {t2}.
+an.missed_fork.2 = {best} era una horquilla, con ataque doble sobre {t1} y {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} era más fuerte.
+an.better.2 = Era mejor {best}.
+an.better.3 = El motor prefiere {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = ¡{move} es brillante: entrega {piece}!
+an.brilliant.2 = ¡Un sacrificio brillante! {move} ofrece {piece}.
+an.brilliant.3 = ¡{move}! Una jugada brillante que ofrece {piece}.
+an.brilliant.mate = Lleva a un mate forzado en {m:move}.
+an.brilliant.mate.2 = Y fuerza el mate en {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} es la única jugada que mantiene la ventaja.
+an.only.win.2 = Solo {move} conserva aquí la ventaja. Buen hallazgo.
+an.only.hold = {move} es la única jugada que mantiene el equilibrio.
+an.only.hold.2 = Solo {move} sostiene aquí la posición.
+an.only.defend = {move} es la única jugada que mantiene viva la lucha.
+an.only.defend.2 = Solo {move} mantiene aquí la partida con vida. Buena defensa.
+an.only.best = {move} es, con diferencia, la mejor jugada aquí.
+an.only.best.2 = Jugada precisa: {move} es mucho más fuerte que todo lo demás.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} es una pequeña imprecisión: {best} era lo más exacto.
+an.inaccuracy.2 = No es del todo lo mejor: lo más preciso era {best}, no {move}.
+an.interesting = {move} es una idea interesante, que ofrece {piece}.
+an.interesting.2 = Un intento interesante: {move} entrega {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Las blancas tienen ahora un mate forzado en {m:move}.
+an.mate_on.white.2 = Desde aquí, las blancas pueden forzar el mate en {m:move}.
+an.mate_on.black = Las negras tienen ahora un mate forzado en {m:move}.
+an.mate_on.black.2 = Desde aquí, las negras pueden forzar el mate en {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Jaque mate. Las blancas ganan la partida.
+an.end.mate.white.2 = Y es jaque mate: ganan las blancas.
+an.end.mate.black = Jaque mate. Las negras ganan la partida.
+an.end.mate.black.2 = Y es jaque mate: ganan las negras.
+an.end.resigned.white = Las negras han abandonado, así que ganan las blancas.
+an.end.resigned.white.2 = La partida termina aquí: las negras abandonan y ganan las blancas.
+an.end.resigned.black = Las blancas han abandonado, así que ganan las negras.
+an.end.resigned.black.2 = La partida termina aquí: las blancas abandonan y ganan las negras.
+an.end.timeout.white = Las negras se han quedado sin tiempo, así que ganan las blancas.
+an.end.timeout.white.2 = Las blancas ganan por tiempo.
+an.end.timeout.black = Las blancas se han quedado sin tiempo, así que ganan las negras.
+an.end.timeout.black.2 = Las negras ganan por tiempo.
+an.end.win.white = La partida termina con victoria de las blancas.
+an.end.win.white.2 = Las blancas ganan la partida.
+an.end.win.black = La partida termina con victoria de las negras.
+an.end.win.black.2 = Las negras ganan la partida.
+an.end.stalemate = Rey ahogado: la partida es tablas.
+an.end.stalemate.2 = Es rey ahogado, así que la partida termina en tablas.
+an.end.draw.agreement = Los jugadores han acordado tablas.
+an.end.draw.agreement.2 = La partida termina en tablas de mutuo acuerdo.
+an.end.draw.repetition = La partida es tablas por repetición.
+an.end.draw.repetition.2 = La misma posición ha vuelto a aparecer: tablas.
+an.end.draw.fifty = La partida es tablas por la regla de los cincuenta movimientos.
+an.end.draw.fifty.2 = Cincuenta jugadas sin captura ni movimiento de peón: tablas.
+an.end.draw.seventy_five = La partida es tablas por la regla de los setenta y cinco movimientos.
+an.end.draw.seventy_five.2 = Setenta y cinco jugadas sin captura ni movimiento de peón: tablas.
+an.end.draw.material = Ya no es posible dar mate: la partida es tablas.
+an.end.draw.material.2 = Ningún bando puede dar mate ya, así que son tablas.
+an.end.draw = La partida termina en tablas.
+an.end.draw.2 = Tablas.
+an.end.unfinished = La partida se detiene aquí, sin terminar.
+an.end.unfinished.2 = Aquí se detiene la partida: no llegó a terminarse.
+an.end.accuracy = Precisión: {acc_white} por ciento para las blancas, {acc_black:num} para las negras.
+an.end.accuracy.2 = Las blancas han jugado con un {acc_white:num} por ciento de precisión; las negras, con un {acc_black:num}.
+an.end.clean.white = Las blancas no han cometido errores ni errores graves.
+an.end.clean.white.2 = Las blancas han jugado sin errores serios.
+an.end.clean.black = Las negras no han cometido errores ni errores graves.
+an.end.clean.black.2 = Las negras han jugado sin errores serios.
+an.end.mistakes.white = Las blancas han cometido {n:mistake} y ningún error grave.
+an.end.mistakes.white.2 = Para las blancas: {n:mistake}, ningún error grave.
+an.end.mistakes.black = Las negras han cometido {n:mistake} y ningún error grave.
+an.end.mistakes.black.2 = Para las negras: {n:mistake}, ningún error grave.
+an.end.blunders.white = Las blancas han cometido {m:blunder}.
+an.end.blunders.white.2 = Para las blancas: {m:blunder}.
+an.end.blunders.black = Las negras han cometido {m:blunder}.
+an.end.blunders.black.2 = Para las negras: {m:blunder}.
+an.end.errors.white = Las blancas han cometido {n:mistake} y {m:blunder}.
+an.end.errors.white.2 = Para las blancas: {n:mistake} y {m:blunder}.
+an.end.errors.black = Las negras han cometido {n:mistake} y {m:blunder}.
+an.end.errors.black.2 = Para las negras: {n:mistake} y {m:blunder}.

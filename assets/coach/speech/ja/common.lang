@@ -27,6 +27,12 @@ owner.your.nom = あなたの{piece}
 owner.my.nom = 私の{piece}
 owner.your.bare = {piece}
 owner.my.bare = {piece}
+# The Analysis mode names a piece by its side, nobody being あなた or 私 there: 白のナイト /
+# 黒のクイーン; bare as above ("{t1}と{t2:bare}" = 白のクイーンとルーク).
+owner.white.nom = 白の{piece}
+owner.black.nom = 黒の{piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # Written squares stay "e4". The voice reads a Latin letter + digit badly ("a8" gets an English

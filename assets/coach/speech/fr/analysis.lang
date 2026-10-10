@@ -1,0 +1,152 @@
+# Coach speech (French): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for French:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tu" or "je" here: the players are "les Blancs" and "les Noirs" (capitalised, as
+#   assets/i18n/fr.lang). A piece comes with its side: {piece} {t1} {t2} = "le cavalier blanc",
+#   "la dame noire" (common.lang, owner.white / owner.black). Never "à" or "de" right before them
+#   ("au", "du"), and no pronoun or participle that would agree with them: "s’en empare", "en
+#   profite" suit any piece.
+# - Counted numbers (common.lang): {m:move} "mat en 3 coups", {pts:point} "3 points",
+#   {n:mistake} "2 erreurs", {m:blunder} "1 gaffe".
+# - Never "nulle" alone in speech (it sounds like "nul"): "partie nulle", "la nulle".
+# - Typography: no-break space before : ; ? ! and typographic apostrophes, as the other French files.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Revenons ensemble sur cette partie.
+an.start.2 = Parcourons cette partie, coup par coup.
+an.start.3 = Voici la partie. Voyons comment elle s’est déroulée.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Cette partie commence dans une position particulière. Parcourons-la.
+an.start.setup.2 = Une partie jouée depuis une position particulière. Voyons comment elle s’est déroulée.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = L’ouverture est {opening:def}.
+an.opening.2 = C’est {opening:def}.
+an.book_exit = Avec {move}, la partie sort de la théorie connue.
+an.book_exit.2 = {move} est le premier coup hors de la théorie des ouvertures.
+an.book_exit.3 = La théorie s’arrête ici, avec {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} est une gaffe.
+an.blunder.2 = Ici, {move} est une grave erreur.
+an.blunder.3 = Une gaffe : {move}.
+an.mistake = {move} est une erreur.
+an.mistake.2 = {move} n’est pas le bon coup ici.
+an.mistake.3 = Une erreur : {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} laisse passer l’occasion de punir cette erreur.
+an.missed_chance.2 = Avec {move}, l’occasion s’envole.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Maintenant, {reply} est échec et mat.
+an.mate_allowed.one.2 = Ce coup permet {reply}, et c’est échec et mat.
+an.mate_allowed = Ce coup permet un mat forcé en {m:move}, qui commence par {reply}.
+an.mate_allowed.2 = Il y a maintenant un mat forcé en {m:move}, à commencer par {reply}.
+an.fork = Maintenant, {reply} fait une fourchette sur {t1} et {t2}.
+an.fork.2 = Ce coup permet {reply}, qui attaque à la fois {t1} et {t2}.
+an.fork.3 = {reply} attaque {t1} et {t2} en même temps.
+an.hanging = Ce coup laisse {piece} sans protection, et {reply} s’en empare.
+an.hanging.2 = {piece} n’a plus de défenseur, et {reply} en profite.
+an.hanging.3 = {reply} rafle tout simplement {piece}, qui n’avait aucun défenseur.
+an.material = La réponse {line} gagne {pts:point} de matériel.
+an.material.2 = Ensuite, {line} gagne {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best} était échec et mat.
+an.mate_missed.one.2 = {best} aurait été échec et mat.
+an.mate_missed = {best} aurait forcé le mat en {m:move}.
+an.mate_missed.2 = Il y avait un mat forcé en {m:move}, qui commençait par {best}.
+an.missed_capture = {best} aurait gagné {piece} gratuitement.
+an.missed_capture.2 = {piece} n’avait aucun défenseur : {best} pouvait s’en emparer.
+an.missed_fork = {best} aurait fait une fourchette sur {t1} et {t2}.
+an.missed_fork.2 = {best} était une fourchette, qui attaquait {t1} et {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} était plus fort.
+an.better.2 = Mieux valait {best}.
+an.better.3 = Le moteur préfère {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} est brillant : ce coup sacrifie {piece} !
+an.brilliant.2 = Un sacrifice brillant ! {move} offre {piece}.
+an.brilliant.3 = {move} ! Un coup brillant, qui offre {piece}.
+an.brilliant.mate = Il mène à un mat forcé en {m:move}.
+an.brilliant.mate.2 = Et il force le mat en {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} est le seul coup qui garde l’avantage.
+an.only.win.2 = Seul {move} conserve l’avantage ici. Bien trouvé.
+an.only.hold = {move} est le seul coup qui maintient l’équilibre.
+an.only.hold.2 = Seul {move} tient la position ici.
+an.only.defend = {move} est le seul coup qui prolonge la lutte.
+an.only.defend.2 = Seul {move} garde la partie en vie ici. Belle défense.
+an.only.best = {move} est de loin le meilleur coup ici.
+an.only.best.2 = Précis : {move} est bien plus fort que tout le reste.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} est un peu imprécis : {best} était plus juste.
+an.inaccuracy.2 = Pas tout à fait le meilleur coup : {best} était plus précis que {move}.
+an.interesting = {move} est une idée intéressante, qui offre {piece}.
+an.interesting.2 = Un essai intéressant : {move} sacrifie {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Les Blancs ont maintenant un mat forcé en {m:move}.
+an.mate_on.white.2 = À partir d’ici, les Blancs peuvent forcer le mat en {m:move}.
+an.mate_on.black = Les Noirs ont maintenant un mat forcé en {m:move}.
+an.mate_on.black.2 = À partir d’ici, les Noirs peuvent forcer le mat en {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Échec et mat. Les Blancs gagnent la partie.
+an.end.mate.white.2 = Et c’est échec et mat : les Blancs gagnent.
+an.end.mate.black = Échec et mat. Les Noirs gagnent la partie.
+an.end.mate.black.2 = Et c’est échec et mat : les Noirs gagnent.
+an.end.resigned.white = Les Noirs ont abandonné, donc les Blancs gagnent la partie.
+an.end.resigned.white.2 = La partie s’arrête ici : les Noirs abandonnent, et les Blancs gagnent.
+an.end.resigned.black = Les Blancs ont abandonné, donc les Noirs gagnent la partie.
+an.end.resigned.black.2 = La partie s’arrête ici : les Blancs abandonnent, et les Noirs gagnent.
+an.end.timeout.white = Les Noirs sont tombés au temps, donc les Blancs gagnent.
+an.end.timeout.white.2 = Les Blancs gagnent au temps.
+an.end.timeout.black = Les Blancs sont tombés au temps, donc les Noirs gagnent.
+an.end.timeout.black.2 = Les Noirs gagnent au temps.
+an.end.win.white = La partie se termine par une victoire des Blancs.
+an.end.win.white.2 = Les Blancs gagnent la partie.
+an.end.win.black = La partie se termine par une victoire des Noirs.
+an.end.win.black.2 = Les Noirs gagnent la partie.
+an.end.stalemate = Pat : la partie est nulle.
+an.end.stalemate.2 = C’est pat, donc la partie se termine sur la nulle.
+an.end.draw.agreement = Les joueurs se sont mis d’accord sur la nulle.
+an.end.draw.agreement.2 = La partie est nulle, d’un commun accord.
+an.end.draw.repetition = La partie est nulle par répétition.
+an.end.draw.repetition.2 = La même position est revenue : partie nulle.
+an.end.draw.fifty = La partie est nulle par la règle des cinquante coups.
+an.end.draw.fifty.2 = Cinquante coups sans prise ni coup de pion : partie nulle.
+an.end.draw.seventy_five = La partie est nulle par la règle des soixante-quinze coups.
+an.end.draw.seventy_five.2 = Soixante-quinze coups sans prise ni coup de pion : partie nulle.
+an.end.draw.material = Le mat n’est plus possible : la partie est nulle.
+an.end.draw.material.2 = Plus aucun camp ne peut mater, donc la partie est nulle.
+an.end.draw = La partie se termine sur la nulle.
+an.end.draw.2 = Partie nulle.
+an.end.unfinished = La partie s’arrête ici, inachevée.
+an.end.unfinished.2 = C’est ici que la partie s’arrête : elle n’était pas terminée.
+an.end.accuracy = Précision : {acc_white} pour cent pour les Blancs, {acc_black} pour les Noirs.
+an.end.accuracy.2 = Les Blancs ont joué à {acc_white} pour cent de précision, les Noirs à {acc_black}.
+an.end.clean.white = Les Blancs n’ont commis ni erreur ni gaffe.
+an.end.clean.white.2 = Le jeu des Blancs est resté sans erreur sérieuse.
+an.end.clean.black = Les Noirs n’ont commis ni erreur ni gaffe.
+an.end.clean.black.2 = Le jeu des Noirs est resté sans erreur sérieuse.
+an.end.mistakes.white = Les Blancs ont commis {n:mistake}, mais aucune gaffe.
+an.end.mistakes.white.2 = Pour les Blancs : {n:mistake}, aucune gaffe.
+an.end.mistakes.black = Les Noirs ont commis {n:mistake}, mais aucune gaffe.
+an.end.mistakes.black.2 = Pour les Noirs : {n:mistake}, aucune gaffe.
+an.end.blunders.white = Les Blancs ont commis {m:blunder}.
+an.end.blunders.white.2 = Pour les Blancs : {m:blunder}.
+an.end.blunders.black = Les Noirs ont commis {m:blunder}.
+an.end.blunders.black.2 = Pour les Noirs : {m:blunder}.
+an.end.errors.white = Les Blancs ont commis {n:mistake} et {m:blunder}.
+an.end.errors.white.2 = Pour les Blancs : {n:mistake} et {m:blunder}.
+an.end.errors.black = Les Noirs ont commis {n:mistake} et {m:blunder}.
+an.end.errors.black.2 = Pour les Noirs : {n:mistake} et {m:blunder}.

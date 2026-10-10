@@ -183,6 +183,37 @@ owner.my.refl_ins.f = своєю {piece}
 # The English keys (every language defines them); Ukrainian uses the gendered patterns above.
 owner.your.nom = твій {piece}
 owner.my.nom = мій {piece}
+# The Analysis mode names a piece by its side, nobody being "ти" or "я" there: "білий кінь",
+# "чорна тура", by case and gender (a masculine piece's accusative is its genitive, as above);
+# pron_acc as for the other owners ("його" / "її").
+owner.white.nom.m = білий {piece}
+owner.white.nom.f = біла {piece}
+owner.white.acc.m = білого {piece}
+owner.white.acc.f = білу {piece}
+owner.white.gen.m = білого {piece}
+owner.white.gen.f = білої {piece}
+owner.white.dat.m = білому {piece}
+owner.white.dat.f = білій {piece}
+owner.white.ins.m = білим {piece}
+owner.white.ins.f = білою {piece}
+owner.white.loc.m = білому {piece}
+owner.white.loc.f = білій {piece}
+owner.black.nom.m = чорний {piece}
+owner.black.nom.f = чорна {piece}
+owner.black.acc.m = чорного {piece}
+owner.black.acc.f = чорну {piece}
+owner.black.gen.m = чорного {piece}
+owner.black.gen.f = чорної {piece}
+owner.black.dat.m = чорному {piece}
+owner.black.dat.f = чорній {piece}
+owner.black.ins.m = чорним {piece}
+owner.black.ins.f = чорною {piece}
+owner.black.loc.m = чорному {piece}
+owner.black.loc.f = чорній {piece}
+owner.white.pron_acc = {piece}
+owner.black.pron_acc = {piece}
+owner.white.nom = білий {piece}
+owner.black.nom = чорний {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice drops Latin letters: file letters are Cyrillic letter names, as in the opening texts

@@ -1,0 +1,154 @@
+# Coach speech (Arabic, Modern Standard Arabic): the commentary of the Analysis mode
+# (src/analysis/commentary.cpp), said by the voice and shown as subtitles while a finished game is
+# replayed. Same keys and variants as assets/coach/speech/en/analysis.lang; its header documents
+# every placeholder (read it first).
+#
+# Register: a calm, warm commentator going through the game; short sentences (subtitles too).
+# Nobody is "you" or "I" here: the players are الأبيض and الأسود (masculine, as assets/i18n/ar.lang).
+# Pieces: {piece} {t1} {t2} carry their side ("الحصان الأبيض", "الوزير الأسود") and are all
+# masculine, so every verb, adjective and pronoun about them is masculine ("يسقط", "له"). A
+# preposition is glued to them ("ب{piece}" = بالحصان الأبيض), never "ل".
+# Moves ({move} {best} {reply} {line}) are spoken as "الحصان إلى إف ثلاثة": as in review.lang, no
+# verb has a move as its subject; the lines use "نقلة {best} كانت...", "مع {best} ...", "بعد
+# {move} ...", a nominal sentence ("{move} خطأ فادح") or a colon.
+# Counts: "{m:move}" = نقلتين / ثلاث نقلات, "{pts:point}" (after "بقيمة"), "{n:mistake}",
+# "{m:blunder}"; the dual and "خطأ واحد" are genitive, so every count follows a preposition.
+# {opening:def} is the definite opening name; most names start with "افتتاح" or "الدفاع", so the
+# lines never say "الافتتاح هو {opening:def}".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = لنستعرض هذه المباراة معًا.
+an.start.2 = لنتابع هذه المباراة نقلةً بنقلة.
+an.start.3 = هذه هي المباراة. لنرَ كيف جرت.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = تبدأ هذه المباراة من وضعية مُعدّة على الرقعة. لنستعرضها.
+an.start.setup.2 = مباراة تبدأ من وضعية مُعدّة. لنرَ كيف جرت.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = على الرقعة الآن {opening:def}.
+an.opening.2 = هذا هو {opening:def}.
+an.book_exit = مع {move} تخرج المباراة من النظرية المعروفة.
+an.book_exit.2 = {move}: أول نقلة خارج نظرية الافتتاح.
+an.book_exit.3 = هنا تنتهي نظرية الافتتاح، مع {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} خطأ فادح.
+an.blunder.2 = {move} هنا خطأ جسيم.
+an.blunder.3 = خطأ فادح: {move}.
+an.mistake = {move} خطأ.
+an.mistake.2 = نقلة {move} ليست النقلة الصحيحة هنا.
+an.mistake.3 = خطأ: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = مع {move} تضيع فرصة معاقبة ذلك الخطأ.
+an.missed_chance.2 = بعد {move} تفلت الفرصة.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = الآن {reply}: كش مات.
+an.mate_allowed.one.2 = هذه النقلة تسمح بنقلة {reply}، وهي كش مات.
+an.mate_allowed = هذه النقلة تسمح بكش مات إجباري في {m:move}، بدءًا من {reply}.
+an.mate_allowed.2 = الآن هناك كش مات إجباري في {m:move}، يبدأ بنقلة {reply}.
+an.fork = الآن {reply}: شوكة على {t1} و{t2}.
+an.fork.2 = هذه النقلة تسمح بنقلة {reply}، التي تهاجم {t1} و{t2} في آن واحد.
+an.fork.3 = {reply}: هجوم على {t1} و{t2} معًا.
+an.hanging = هذه النقلة تترك {piece} بلا حماية، وبعد {reply} يضيع.
+an.hanging.2 = {piece} بلا مدافع: مع {reply} يسقط.
+an.hanging.3 = مع {reply} يضيع {piece} ببساطة، فلم يكن له مدافع.
+an.material = الرد {line} يكسب مادة بقيمة {pts:point}.
+an.material.2 = وبعد {line} مكسب بقيمة {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = نقلة {best} كانت كش مات.
+an.mate_missed.one.2 = لو لُعبت نقلة {best} لكان كش مات.
+an.mate_missed = نقلة {best} كانت تفرض كش مات في {m:move}.
+an.mate_missed.2 = كان هناك كش مات إجباري في {m:move}، بدءًا من {best}.
+an.missed_capture = نقلة {best} كانت ستربح {piece} بلا مقابل.
+an.missed_capture.2 = {piece} كان بلا مدافع: مع {best} كان سيسقط.
+an.missed_fork = نقلة {best} كانت ستوقع {t1} و{t2} في شوكة.
+an.missed_fork.2 = نقلة {best} كانت شوكة تهاجم {t1} و{t2}.
+
+# The better move, when nothing above named it.
+an.better = نقلة {best} كانت أقوى.
+an.better.2 = الأفضل كان {best}.
+an.better.3 = المحرّك يفضّل {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} نقلة عبقرية: تضحية ب{piece}!
+an.brilliant.2 = تضحية عبقرية! مع {move} يُقدَّم {piece}.
+an.brilliant.3 = {move}! نقلة عبقرية تضحّي ب{piece}.
+an.brilliant.mate = وهي تقود إلى كش مات إجباري في {m:move}.
+an.brilliant.mate.2 = وتفرض كش مات في {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} هي النقلة الوحيدة التي تحافظ على الأفضلية.
+an.only.win.2 = لا شيء غير {move} يحافظ على التفوق هنا. اكتشاف جيد.
+an.only.hold = {move} هي النقلة الوحيدة التي تحافظ على التوازن.
+an.only.hold.2 = لا شيء غير {move} يحفظ الموقف هنا.
+an.only.defend = {move} هي النقلة الوحيدة التي تُبقي المعركة قائمة.
+an.only.defend.2 = لا شيء غير {move} يُبقي المباراة حيّة هنا. دفاع جيد.
+an.only.best = {move} هي أقوى نقلة هنا بفارق كبير.
+an.only.best.2 = بدقة: {move} أقوى بكثير من أي نقلة أخرى.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} نقلة غير دقيقة قليلًا: نقلة {best} كانت أدقّ.
+an.inaccuracy.2 = ليست الأفضل تمامًا: {best} أدقّ من {move}.
+an.interesting = {move} فكرة مثيرة للاهتمام: تضحية ب{piece}.
+an.interesting.2 = محاولة مثيرة للاهتمام: مع {move} يُعرض {piece} للأخذ.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = لدى الأبيض الآن كش مات إجباري في {m:move}.
+an.mate_on.white.2 = من هنا يستطيع الأبيض فرض كش مات في {m:move}.
+an.mate_on.black = لدى الأسود الآن كش مات إجباري في {m:move}.
+an.mate_on.black.2 = من هنا يستطيع الأسود فرض كش مات في {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = كش مات. الأبيض يفوز بالمباراة.
+an.end.mate.white.2 = وهذا كش مات: فاز الأبيض.
+an.end.mate.black = كش مات. الأسود يفوز بالمباراة.
+an.end.mate.black.2 = وهذا كش مات: فاز الأسود.
+an.end.resigned.white = استسلم الأسود، فالفوز للأبيض.
+an.end.resigned.white.2 = تنتهي المباراة هنا: استسلم الأسود، وفاز الأبيض.
+an.end.resigned.black = استسلم الأبيض، فالفوز للأسود.
+an.end.resigned.black.2 = تنتهي المباراة هنا: استسلم الأبيض، وفاز الأسود.
+an.end.timeout.white = نفد وقت الأسود، فالفوز للأبيض.
+an.end.timeout.white.2 = فاز الأبيض بالوقت.
+an.end.timeout.black = نفد وقت الأبيض، فالفوز للأسود.
+an.end.timeout.black.2 = فاز الأسود بالوقت.
+an.end.win.white = تنتهي المباراة بفوز الأبيض.
+an.end.win.white.2 = الأبيض يفوز بالمباراة.
+an.end.win.black = تنتهي المباراة بفوز الأسود.
+an.end.win.black.2 = الأسود يفوز بالمباراة.
+an.end.stalemate = جمود: المباراة تعادل.
+an.end.stalemate.2 = إنه جمود، فتنتهي المباراة بالتعادل.
+an.end.draw.agreement = اتفق اللاعبان على التعادل.
+an.end.draw.agreement.2 = تنتهي المباراة بالتعادل بالاتفاق.
+an.end.draw.repetition = المباراة تعادل بالتكرار.
+an.end.draw.repetition.2 = عادت الوضعية نفسها مرة أخرى: تعادل.
+an.end.draw.fifty = المباراة تعادل بقاعدة الخمسين نقلة.
+an.end.draw.fifty.2 = خمسون نقلة بلا أخذ ولا نقلة بيدق: تعادل.
+an.end.draw.seventy_five = المباراة تعادل بقاعدة الخمس والسبعين نقلة.
+an.end.draw.seventy_five.2 = خمس وسبعون نقلة بلا أخذ ولا نقلة بيدق: تعادل.
+an.end.draw.material = لم يعد كش مات ممكنًا: المباراة تعادل.
+an.end.draw.material.2 = لا يستطيع أي طرف الإماتة بعد الآن، فهي تعادل.
+an.end.draw = تنتهي المباراة بالتعادل.
+an.end.draw.2 = تعادل.
+an.end.unfinished = تتوقف المباراة هنا، دون أن تكتمل.
+an.end.unfinished.2 = هنا تتوقف المباراة: لم تُستكمل.
+an.end.accuracy = الدقة: {acc_white} بالمئة للأبيض، و{acc_black} للأسود.
+an.end.accuracy.2 = لعب الأبيض بدقة {acc_white} بالمئة، والأسود بدقة {acc_black}.
+an.end.clean.white = لم يرتكب الأبيض أي خطأ أو خطأ فادح.
+an.end.clean.white.2 = خلا لعب الأبيض من الأخطاء الجسيمة.
+an.end.clean.black = لم يرتكب الأسود أي خطأ أو خطأ فادح.
+an.end.clean.black.2 = خلا لعب الأسود من الأخطاء الجسيمة.
+an.end.mistakes.white = اقتصرت أخطاء الأبيض على {n:mistake}، دون أي خطأ فادح.
+an.end.mistakes.white.2 = وقع الأبيض في {n:mistake}، بلا خطأ فادح.
+an.end.mistakes.black = اقتصرت أخطاء الأسود على {n:mistake}، دون أي خطأ فادح.
+an.end.mistakes.black.2 = وقع الأسود في {n:mistake}، بلا خطأ فادح.
+an.end.blunders.white = تعثّر الأبيض في {m:blunder}.
+an.end.blunders.white.2 = وقع الأبيض في {m:blunder}.
+an.end.blunders.black = تعثّر الأسود في {m:blunder}.
+an.end.blunders.black.2 = وقع الأسود في {m:blunder}.
+an.end.errors.white = توزّعت أخطاء الأبيض بين {n:mistake} و{m:blunder}.
+an.end.errors.white.2 = وقع الأبيض في {n:mistake} و{m:blunder}.
+an.end.errors.black = توزّعت أخطاء الأسود بين {n:mistake} و{m:blunder}.
+an.end.errors.black.2 = وقع الأسود في {n:mistake} و{m:blunder}.

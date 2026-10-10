@@ -39,6 +39,11 @@ owner.your.nom = {piece}ك
 owner.my.nom = {piece}ي
 phrase.your.king.nom = ملِكك
 phrase.my.king.nom = ملِكي
+# The Analysis mode names a piece by its side, nobody being "you" or "I" there: the article and
+# the (masculine) colour adjective, "الحصان الأبيض", "الوزير الأسود". A preposition is glued to it
+# ("ب{piece}" = بالحصان الأبيض); never "ل" ("لال" must be written "لل").
+owner.white.nom = ال{piece} الأبيض
+owner.black.nom = ال{piece} الأسود
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice drops Latin letters and reads digits in English: file letters are spelled as Arabic
