@@ -11,8 +11,8 @@
 // Input: positions in pixels from the top-left corner of the content view. Letters follow the
 // keyboard layout (charactersIgnoringModifiers, as the X11 layer's keysyms), the other keys their
 // physical position (virtual key codes, the same on every layout); Option is Alt. Command is the
-// system's: Command+Q quits, the other Command shortcuts type nothing and reach the game as the
-// key alone. Text comes from the input context (interpretKeyEvents: dead keys, input methods).
+// system's: Command+Q quits, Command+V pastes in the game's fields (KEY_LCMD/KEY_RCMD), the other
+// Command shortcuts type nothing and reach the game as the key alone. Text comes from the input context (interpretKeyEvents: dead keys, input methods).
 #ifdef __APPLE__
 #import <AppKit/AppKit.h>
 #import <CoreGraphics/CoreGraphics.h>
@@ -124,6 +124,7 @@ const CodeKey kCodeKeys[] = {
     {0x7B, KEY_LEFT}, {0x7C, KEY_RIGHT}, {0x7E, KEY_UP}, {0x7D, KEY_DOWN}, {0x73, KEY_HOME}, {0x77, KEY_END},
     {0x74, KEY_PAGEUP}, {0x79, KEY_PAGEDOWN},
     {0x38, KEY_LSHIFT}, {0x3C, KEY_RSHIFT}, {0x3B, KEY_LCTRL}, {0x3E, KEY_RCTRL}, {0x3A, KEY_LALT}, {0x3D, KEY_RALT},
+    {0x37, KEY_LCMD}, {0x36, KEY_RCMD},
     {0x7A, KEY_F1}, {0x78, KEY_F2}, {0x63, KEY_F3}, {0x76, KEY_F4}, {0x60, KEY_F5}, {0x61, KEY_F6}, {0x62, KEY_F7},
     {0x64, KEY_F8}, {0x65, KEY_F9}, {0x6D, KEY_F10}, {0x67, KEY_F11}, {0x6F, KEY_F12},
 };
@@ -174,6 +175,7 @@ void modifierEvent(NSEvent* e) {
         {0x38, KEY_LSHIFT, NSEventModifierFlagShift, 0x0002, 0x0006}, {0x3C, KEY_RSHIFT, NSEventModifierFlagShift, 0x0004, 0x0006},
         {0x3B, KEY_LCTRL, NSEventModifierFlagControl, 0x0001, 0x2001}, {0x3E, KEY_RCTRL, NSEventModifierFlagControl, 0x2000, 0x2001},
         {0x3A, KEY_LALT, NSEventModifierFlagOption, 0x0020, 0x0060}, {0x3D, KEY_RALT, NSEventModifierFlagOption, 0x0040, 0x0060},
+        {0x37, KEY_LCMD, NSEventModifierFlagCommand, 0x0008, 0x0018}, {0x36, KEY_RCMD, NSEventModifierFlagCommand, 0x0010, 0x0018},
     };
     const NSUInteger flags = NSUInteger(e.modifierFlags);
     for (const Modifier& m : kModifiers) {
@@ -446,7 +448,7 @@ void present(const macgl::Frame& f) {
 - (void)keyDown:(NSEvent*)event {
     const bool shortcut = (event.modifierFlags & (NSEventModifierFlagCommand | NSEventModifierFlagControl)) != 0;
     const bool composing = _marked.length > 0;
-    // Shortcuts type nothing (Control+V pastes in the game's fields).
+    // Shortcuts type nothing (Control+V or Command+V pastes in the game's fields).
     if (!shortcut) [self interpretKeyEvents:@[ event ]];
     // A key the input method took for its composition (a dead key, a candidate list's arrows and
     // Return) is not the game's.
