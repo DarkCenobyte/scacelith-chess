@@ -43,15 +43,15 @@ Beat say(const Line& l, Look look = Look::Player, std::vector<Gesture> g = {}, s
     return b;
 }
 
+// A board beat. Space may cut a demonstration's line or hurry a rewind, never remove the
+// position, the lead or an answer of the line: the player's wait stands on them (audit N04).
 Beat tableBeat(BeatKind kind, const std::string& uci = std::string()) {
     Beat b;
     b.kind = kind;
     b.uci = uci;
     b.look = Look::Board;
-    if (kind == BeatKind::Rewind) {
-        b.count = 1;
-        b.skippable = false;
-    }
+    b.skippable = kind == BeatKind::DemoMove;
+    if (kind == BeatKind::Rewind) b.count = 1;
     return b;
 }
 
@@ -188,10 +188,8 @@ struct ChallengeRun::Impl {
         } else {
             s.push_back(say(line(pos + 1 == int(ch.positions.size()) ? "ch.last" : "ch.next")));
         }
-        Beat set;
-        set.kind = BeatKind::SetPosition;
+        Beat set = tableBeat(BeatKind::SetPosition);
         set.fen = p.fen;
-        set.look = Look::Board;
         s.push_back(set);
         if (!p.lead.empty()) {
             if (!leadSaid) s.push_back(say(line("ch.lead.first")));

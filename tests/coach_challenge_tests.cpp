@@ -6,10 +6,12 @@
 // piece, the square, the move shown), a play-out judged by the engine and by the board (stalemate,
 // mate), the coach's answer that ends a play-out on the board (a hold solved once, nothing left
 // waiting; a mate said as one), a play-out's hint never given late (asked for, then a move made
-// before its analysis came back) nor offered without a move to show; the embedded book: it parses
-// with no error, every set has its texts, every line ends with the player's move (in checkmate for
-// the mate sets); a whole set solved through the session: completed, the handshake wanted, nothing
-// recorded.
+// before its analysis came back) nor offered without a move to show; Space never removing a
+// position's set-up, its lead or a coach's answer (in Prepare or Running, at every frame); the
+// embedded book: it parses with no error, every set has its texts, every line ends with the
+// player's move (in checkmate for the mate sets); a whole set solved through the session, with and
+// without Space at every frame: each move awaited on its board, completed, the handshake wanted,
+// nothing recorded.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -75,6 +77,7 @@ struct Run {
     ChallengeRun run;
     chess::Game game;
     float dt = 1.0f / 60.0f;
+    bool space = false;   // Space at every frame (the session's skip: the running beat only)
     std::vector<Line> lines;
 
     Run() {
@@ -89,6 +92,7 @@ struct Run {
     }
     void start(const Challenge& ch, int from = 0) { run.start(ch, director, stage, analyst, from); }
     void step() {
+        if (space) director.skipCurrent();
         stage.advance(dt);
         if (stage.lessonMoves > 0) {
             stage.lessonMoves = 0;
@@ -123,6 +127,26 @@ struct Run {
         return until([&] { return game.moves().size() == plies && run.playerMayMove(game); }, 60.0f);
     }
 };
+
+bool boardIs(const chess::Game& game, const std::string& fen) {
+    chess::Position p;
+    p.setFEN(fen);
+    return game.position().samePosition(p);
+}
+
+// The player's move k of a line is awaited on the board the line expects (the set-up, the lead
+// and the coach's answers all on it), White to move, the solution legal there.
+void checkLineBoard(const chess::Game& game, const ChallengePosition& p, int k) {
+    chess::Position want;
+    CHECK(p.beforeMove(k, want));
+    const chess::Position& have = game.position();
+    if (!have.samePosition(want))
+        std::fprintf(stderr, "  %s, move %d: %s, not %s\n", p.source.c_str(), k + 1, have.fen().c_str(),
+                     want.fen().c_str());
+    CHECK(have.samePosition(want));
+    CHECK(have.sideToMove() == chess::White);
+    CHECK(have.parseUCI(p.line[size_t(2 * k)]).valid());
+}
 
 // Every line renders, written and spoken, every variant, in every language that has the key,
 // without a placeholder left.
@@ -573,6 +597,88 @@ TEST(challenge_run_play_out_no_hint_offer_without_a_move) {
     checkRenders(t.lines);
 }
 
+// Audit N04: Space while a position was being set up (the intro's hand still going back) dropped
+// the SetPosition: the wait came on the board left before, where the solution is not legal. The
+// audit's probe (the first position of the embedded mate1, no voice), then the whole set with
+// Space at every frame: each position set up, its lead played, the set completed.
+TEST(challenge_run_space_keeps_the_set_up) {
+    const Challenge& ch = bookChallenge(ChallengeBook::shared(), "mate1");
+    CHECK(!ch.positions.empty());
+    if (ch.positions.empty()) return;
+    {
+        const ChallengePosition& p = ch.positions.front();
+        Run t;
+        t.stage.voice = false;
+        t.start(ch);
+        CHECK(t.until([&] { return t.stage.count("endGestures") > 0; }, 30.0f));
+        CHECK_EQ(t.stage.count("setPosition"), 0);
+        CHECK(t.stage.bodyBusy());
+        CHECK(!t.director.skippable());   // the set-up waits for the hand: nothing to skip
+        t.director.skipCurrent();
+        CHECK(t.ready());
+        CHECK_EQ(t.stage.count("setPosition"), 1);
+        CHECK_EQ(t.stage.count("playLessonMove"), p.lead.empty() ? 0 : 1);
+        checkLineBoard(t.game, p, 0);
+    }
+    Run t;
+    t.stage.voice = false;
+    t.space = true;
+    t.start(ch);
+    int leads = 0;
+    for (const ChallengePosition& p : ch.positions) {
+        leads += p.lead.empty() ? 0 : 1;
+        for (int k = 0; k < p.playerMoves(); ++k) {
+            CHECK(t.ready());
+            checkLineBoard(t.game, p, k);
+            t.move(p.line[size_t(2 * k)].c_str());
+        }
+    }
+    CHECK(t.run.completed());
+    CHECK_EQ(t.stage.count("setPosition"), int(ch.positions.size()));
+    CHECK_EQ(t.stage.count("playLessonMove"), leads);
+}
+
+// Space at every frame, through a lead, an answer of the line, the coach's answer in a play-out
+// and the moves to the next position: every board action stands (audit N04).
+TEST(challenge_run_space_at_every_frame) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    {
+        const Challenge& ch = bookChallenge(b, "mate1");
+        Run t;
+        t.space = true;
+        t.start(ch);
+        for (const ChallengePosition& p : ch.positions) {
+            for (int k = 0; k < p.playerMoves(); ++k) {
+                CHECK(t.ready());
+                checkLineBoard(t.game, p, k);
+                t.move(p.line[size_t(2 * k)].c_str());
+            }
+        }
+        CHECK(t.run.completed());
+        CHECK_EQ(t.stage.count("setPosition"), 2);
+        const auto played = t.stage.all("playLessonMove");   // the lead, the line's answer
+        CHECK(played.size() == 2 && played[0].text == "a2c3" && played[1].text == "g8f8");
+    }
+    {
+        const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+        Run t;
+        t.space = true;
+        t.analyst.results[fenAfter(fen, "f1e2") + "|A0"] = mateAnalysis(-1, "h8g8");
+        t.start(bookChallenge(b, "kq"));
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, fen));
+        t.move("f1e2");
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, fenAfter(fenAfter(fen, "f1e2").c_str(), "h8g8")));
+        t.move("e2e8");
+        CHECK(t.until([&] { return t.run.position() == 1; }, 30.0f));
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, "8/8/8/4k3/4p3/8/8/4K3 w - - 0 1"));
+        CHECK_EQ(t.stage.count("setPosition"), 2);
+        CHECK_EQ(t.stage.count("playLessonMove"), 1);
+    }
+}
+
 TEST(challenge_book_embedded) {
     const ChallengeBook& b = ChallengeBook::shared();
     std::vector<std::string> errors;
@@ -605,7 +711,8 @@ TEST(challenge_book_embedded) {
 }
 
 TEST(challenge_session_whole_set) {
-    // The first set of the embedded book made of lines only, solved through the session.
+    // The first set of the embedded book made of lines only, solved through the session; again with
+    // Space (the session's skip) at every frame.
     const ChallengeBook& b = ChallengeBook::shared();
     const Challenge* pick = nullptr;
     for (const Challenge& c : b.challenges()) {
@@ -618,62 +725,66 @@ TEST(challenge_session_whole_set) {
     }
     CHECK(pick != nullptr);
     if (!pick) return;
-    fake::Stage stage;
-    fake::Analyst analyst;
-    Session session;
-    chess::Game game;
-    game.setEndDetection(false);
-    stage.game = &game;
-    std::vector<Line> lines;
-    session.director().setObserver([&](const Beat& bt) {
-        if (!bt.line.key.empty()) lines.push_back(bt.line);
-    });
-    SessionConfig cfg;
-    cfg.level = 3;
-    cfg.human = chess::Black;   // ignored: the challenges are played with White
-    cfg.challenge = pick->id;
-    session.start(stage, analyst, game, cfg);
-    CHECK(session.challengeMode());
-    CHECK_EQ(session.challengePositions(), int(pick->positions.size()));
-    CHECK(session.offerIsHint());
-    const float dt = 1.0f / 60.0f;
-    auto step = [&] {
-        stage.advance(dt);
-        if (stage.lessonMoves > 0) {
-            stage.lessonMoves = 0;
-            session.onMove(game);
+    for (bool space : {false, true}) {
+        fake::Stage stage;
+        fake::Analyst analyst;
+        Session session;
+        chess::Game game;
+        game.setEndDetection(false);
+        stage.game = &game;
+        std::vector<Line> lines;
+        session.director().setObserver([&](const Beat& bt) {
+            if (!bt.line.key.empty()) lines.push_back(bt.line);
+        });
+        SessionConfig cfg;
+        cfg.level = 3;
+        cfg.human = chess::Black;   // ignored: the challenges are played with White
+        cfg.challenge = pick->id;
+        session.start(stage, analyst, game, cfg);
+        CHECK(session.challengeMode());
+        CHECK_EQ(session.challengePositions(), int(pick->positions.size()));
+        CHECK(session.offerIsHint());
+        const float dt = 1.0f / 60.0f;
+        auto step = [&] {
+            if (space) session.skip();
+            stage.advance(dt);
+            if (stage.lessonMoves > 0) {
+                stage.lessonMoves = 0;
+                session.onMove(game);
+            }
+            session.update(game, dt);
+        };
+        auto until = [&](const std::function<bool()>& cond, float seconds) {
+            for (float t = 0.0f; t < seconds; t += dt) {
+                if (cond()) return true;
+                step();
+            }
+            return cond();
+        };
+        for (size_t i = 0; i < pick->positions.size(); ++i) {
+            const ChallengePosition& p = pick->positions[i];
+            for (int k = 0; k < p.playerMoves(); ++k) {
+                CHECK(until([&] { return session.playerMayMove(game); }, 120.0f));
+                CHECK_EQ(session.challengePosition(), int(i));
+                CHECK(session.hintAvailable(game));
+                CHECK(!session.canTakeBack(game));
+                CHECK(session.coachMayMove());
+                checkLineBoard(game, p, k);
+                const chess::Move m = game.position().parseUCI(p.line[size_t(2 * k)]);
+                CHECK(m.valid());
+                if (!m.valid()) return;
+                game.play(m);
+                session.onMove(game);
+            }
         }
-        session.update(game, dt);
-    };
-    auto until = [&](const std::function<bool()>& cond, float seconds) {
-        for (float t = 0.0f; t < seconds; t += dt) {
-            if (cond()) return true;
-            step();
-        }
-        return cond();
-    };
-    for (size_t i = 0; i < pick->positions.size(); ++i) {
-        const ChallengePosition& p = pick->positions[i];
-        for (int k = 0; k < p.playerMoves(); ++k) {
-            CHECK(until([&] { return session.playerMayMove(game); }, 120.0f));
-            CHECK_EQ(session.challengePosition(), int(i));
-            CHECK(session.hintAvailable(game));
-            CHECK(!session.canTakeBack(game));
-            CHECK(session.coachMayMove());
-            const chess::Move m = game.position().parseUCI(p.line[size_t(2 * k)]);
-            CHECK(m.valid());
-            if (!m.valid()) return;
-            game.play(m);
-            session.onMove(game);
-        }
+        CHECK(session.challengeCompleted());
+        CHECK(until([&] { return session.handshakeWanted(); }, 120.0f));
+        session.onHandshakeDone(game);
+        CHECK(session.finished());
+        CHECK(session.history().empty());
+        CHECK_EQ(analyst.asked.size(), size_t(0));   // right moves need no engine
+        checkRenders(lines);
     }
-    CHECK(session.challengeCompleted());
-    CHECK(until([&] { return session.handshakeWanted(); }, 120.0f));
-    session.onHandshakeDone(game);
-    CHECK(session.finished());
-    CHECK(session.history().empty());
-    CHECK_EQ(analyst.asked.size(), size_t(0));   // right moves need no engine
-    checkRenders(lines);
 }
 
 TEST(challenge_speech_renders_everywhere) {
