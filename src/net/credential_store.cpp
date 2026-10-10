@@ -4,8 +4,11 @@
 #include "net_sys.h"
 #include "../core/log.h"
 #include <atomic>
+#include <chrono>
+#include <condition_variable>
 #include <cstdlib>
 #include <cstring>
+#include <thread>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,26 +46,64 @@ void wipe(std::string& s) {
     s.clear();
 }
 
-// Linux: why the sessions stay in the file, said once per run.
+// Linux: why the sessions stay in the file, said once per run (the first time a token is saved
+// there, or read from there without moving to the keyring).
 void noteFileFallback(const std::string& why, const std::string& path) {
 #ifndef _WIN32
     static std::atomic<bool> said{false};
     if (said.exchange(true)) return;
-    LOGW("net: no system keyring for the saved sessions (%s): they are written to %s in the clear, protected only by "
-         "the file's permissions",
-         why.c_str(), path.c_str());
+    LOGW("net: the saved sessions are kept in %s in the clear, protected only by the file's permissions, not in the "
+         "system keyring: %s",
+         path.c_str(), why.c_str());
 #else
     (void)why;
     (void)path;
 #endif
 }
-}  // namespace
 
-namespace {
+// The keyring could not say what it keeps (or did not remove an item).
+bool unanswered(Keyring::Result r) {
+    return r == Keyring::Result::Locked || r == Keyring::Result::Unavailable || r == Keyring::Result::Cancelled;
+}
+bool notRemoved(Keyring::Result r) { return r == Keyring::Result::Locked || r == Keyring::Result::Unavailable; }
+
+// The token of an unlock prompt: it fires after ms, or with parent (the store's interrupt()).
+class Deadline {
+public:
+    Deadline(CancelToken& parent, int ms)
+        : link_(&parent, [this] { token_.cancel(); }), timer_([this, ms] {
+              std::unique_lock<std::mutex> lk(mu_);
+              if (!cv_.wait_for(lk, std::chrono::milliseconds(ms), [this] { return done_; })) token_.cancel();
+          }) {}
+    ~Deadline() {
+        {
+            std::lock_guard<std::mutex> lk(mu_);
+            done_ = true;
+        }
+        cv_.notify_all();
+        timer_.join();
+        link_.clear();
+    }
+    Deadline(const Deadline&) = delete;
+    Deadline& operator=(const Deadline&) = delete;
+    CancelToken* token() { return &token_; }
+
+private:
+    CancelToken token_;
+    std::mutex mu_;
+    std::condition_variable cv_;
+    bool done_ = false;
+    AbortGuard link_;
+    std::thread timer_;
+};
+
 bool keyringOff() {
     const char* env = std::getenv("SCACELITH_KEYRING");
     return env && std::strcmp(env, "off") == 0;
 }
+
+// Why there is no keyring (the store has none: keyring()).
+std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded"; }
 }  // namespace
 
 Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
@@ -225,7 +266,7 @@ CredentialStore::Record* CredentialStore::findLocked(const std::string& origin) 
     return nullptr;
 }
 
-bool CredentialStore::get(const std::string& origin, Credential& out) const {
+bool CredentialStore::get(const std::string& origin, Credential& out, bool unlock) const {
     std::lock_guard<std::mutex> io(ioMu_);
     std::string blob;
     {
@@ -252,14 +293,17 @@ bool CredentialStore::get(const std::string& origin, Credential& out) const {
         return true;
     }
     std::string why, itemOrigin;
-    const bool readable = read(origin, blob, out.token, why, &itemOrigin);
+    Keyring::Result status = Keyring::Result::Ok;
+    const bool readable = read(origin, blob, unlock ? Prompt::Once : Prompt::Never, out.token, why, &itemOrigin, &status);
+    // Locked, and not asked: a read that needs the token may still ask, so it is still a session.
+    const bool unreadable = !readable && !(status == Keyring::Result::Locked && !unlockDeclined_);
     {
         std::lock_guard<std::mutex> lk(mu_);
         Record* r = findLocked(origin);
         if (r && r->tokenBlob == blob) {
             // Said once; hasToken() follows the last read (an unlocked keyring makes it readable again).
-            if (!readable && !r->unreadable) LOGW("net: the saved session of %s is not readable from the system keyring (%s)", origin.c_str(), why.c_str());
-            r->unreadable = !readable;
+            if (unreadable && !r->unreadable) LOGW("net: the saved session of %s is not readable from the system keyring (%s)", origin.c_str(), why.c_str());
+            r->unreadable = unreadable;
             r->checked = true;
         }
     }
@@ -308,19 +352,70 @@ void CredentialStore::setKeyring(Keyring* keyring) {
     keyringSet_ = true;
 }
 
+void CredentialStore::setUnlockTimeout(int ms) {
+    std::lock_guard<std::mutex> io(ioMu_);
+    unlockTimeoutMs_ = ms > 0 ? ms : 1;
+}
+
 void CredentialStore::interrupt() { cancel_.cancel(); }
 
+template <typename Again>
+Keyring::Result CredentialStore::afterUnlock(Keyring& k, Keyring::Result res, const std::string& origin, const std::string& id,
+                                             Prompt prompt, Again again) const {
+    if (res != Keyring::Result::Locked || prompt == Prompt::Never || (prompt == Prompt::Once && unlockDeclined_)) return res;
+    if (!unlock(k, origin, id)) return cancel_.cancelled() ? Keyring::Result::Cancelled : res;
+    res = again();
+    if (res == Keyring::Result::Locked) unlockDeclined_ = true;   // unlocked, and still locked: not asked again
+    return res;
+}
+
+// One prompt at a time (ioMu_), off the game thread (the store's keyring calls run on the network
+// threads). Not shown again this run once dismissed, unanswered or failing (unlockDeclined_), but by
+// a sign-in (Prompt::Always), whose prompt unlocked clears that.
+bool CredentialStore::unlock(Keyring& k, const std::string& origin, const std::string& id) const {
+    LOGI("net: the system keyring is locked: asking the desktop to unlock it");
+    std::string why;
+    Keyring::Result res;
+    {
+        Deadline deadline(cancel_, unlockTimeoutMs_);
+        res = k.unlock(origin, id, deadline.token(), why);
+    }
+    if (res == Keyring::Result::Missing) return true;   // the item went meanwhile: the call says so
+    if (res == Keyring::Result::Ok) {
+        unlockDeclined_ = false;
+        LOGI("net: the system keyring is unlocked");
+        return true;
+    }
+    if (cancel_.cancelled()) return false;               // shutting down: nothing to remember
+    if (res == Keyring::Result::Cancelled) why = "the unlock prompt was not answered in time";
+    unlockDeclined_ = true;
+    LOGW("net: the system keyring stays locked (%s): no other unlock prompt this run, except for a sign-in", why.c_str());
+    return false;
+}
+
 // The blob that keeps a token: a keyring item when the keyring takes it, else the file's own
-// format. "" when it could not be kept (DPAPI failed, or interrupt()).
+// format. "" when it could not be kept (DPAPI failed, or interrupt()). Only a sign-in saves a token
+// (put): a locked keyring is worth a prompt then, even after one declined.
 std::string CredentialStore::protect(const std::string& origin, const std::string& token) const {
     Keyring* k = keyring();
-    std::string why = keyringOff() ? "SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded";
+    std::string why = noKeyring();
     if (k) {
         const std::string id = newItemId();
-        const Keyring::Result res = id.empty() ? Keyring::Result::Unavailable : k->store(origin, id, token, &cancel_, why);
+        Keyring::Result res = Keyring::Result::Unavailable;
+        if (id.empty()) {
+            why = "no random id";
+        } else {
+            res = k->store(origin, id, token, &cancel_, why);
+            res = afterUnlock(*k, res, origin, std::string(), Prompt::Always, [&] { return k->store(origin, id, token, &cancel_, why); });
+        }
         if (res == Keyring::Result::Ok) return kKeyringPrefix + id;
         if (res == Keyring::Result::Cancelled) return std::string();
-        if (id.empty()) why = "no random id";
+        if (res == Keyring::Result::Locked) {
+            // Said at each sign-in: the keyring takes it once unlocked (migrate(), at a read).
+            LOGW("net: the session of %s is kept in %s for now (%s): it moves to the system keyring once that is unlocked",
+                 origin.c_str(), path().c_str(), why.c_str());
+            return protectToken(origin, token);
+        }
     }
     noteFileFallback(why, path());
     return protectToken(origin, token);
@@ -334,48 +429,62 @@ std::vector<std::string> CredentialStore::movedFrom(const std::string& origin) c
     return from;
 }
 
-bool CredentialStore::read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
-                           std::string* itemOrigin, bool* unanswered) const {
+bool CredentialStore::read(const std::string& origin, const std::string& blob, Prompt prompt, std::string& token,
+                           std::string& why, std::string* itemOrigin, Keyring::Result* status) const {
     token.clear();
     if (itemOrigin) *itemOrigin = origin;
-    if (unanswered) *unanswered = false;
-    if (!inKeyring(blob)) return unprotectToken(origin, blob, token);
-    Keyring* k = keyring();
-    if (!k) {
-        why = "no keyring";
-        if (unanswered) *unanswered = true;
-        return false;
-    }
-    const std::string id = itemId(blob);
-    Keyring::Result res = k->lookup(origin, id, token, &cancel_, why);
-    // A record an origin move gave this origin: its item still names the former one. Only there,
-    // so that a reference copied into another record still finds nothing.
-    if (res == Keyring::Result::Missing) {
-        for (const std::string& from : movedFrom(origin)) {
-            res = k->lookup(from, id, token, &cancel_, why);
-            if (res == Keyring::Result::Missing) continue;
-            if (itemOrigin) *itemOrigin = from;
-            break;
+    Keyring::Result res = Keyring::Result::Missing;
+    if (!inKeyring(blob)) {
+        if (unprotectToken(origin, blob, token)) res = Keyring::Result::Ok;
+    } else if (Keyring* k = keyring()) {
+        const std::string id = itemId(blob);
+        std::string at = origin;
+        res = k->lookup(origin, id, token, &cancel_, why);
+        // A record an origin move gave this origin: its item still names the former one. Only there,
+        // so that a reference copied into another record still finds nothing.
+        if (res == Keyring::Result::Missing) {
+            for (const std::string& from : movedFrom(origin)) {
+                res = k->lookup(from, id, token, &cancel_, why);
+                if (res == Keyring::Result::Missing) continue;
+                at = from;
+                break;
+            }
         }
+        res = afterUnlock(*k, res, at, id, prompt, [&] { return k->lookup(at, id, token, &cancel_, why); });
+        if (itemOrigin) *itemOrigin = at;
+        if (res == Keyring::Result::Missing) why = "no such item";
+        if (res == Keyring::Result::Cancelled) why = "interrupted";
+    } else {
+        why = "no keyring";
+        res = Keyring::Result::Unavailable;
     }
-    if (res == Keyring::Result::Missing) why = "no such item";
-    if (res == Keyring::Result::Cancelled) why = "interrupted";
-    if (unanswered) *unanswered = res == Keyring::Result::Unavailable || res == Keyring::Result::Cancelled;
-    if (res == Keyring::Result::Ok && !token.empty()) return true;
+    if (res == Keyring::Result::Ok && token.empty()) res = Keyring::Result::Missing;
+    if (status) *status = res;
+    if (res == Keyring::Result::Ok) return true;
     wipe(token);
     return false;
 }
 
 // A token the file holds goes to the keyring, and a moved record's item becomes one of its new
 // origin: the record then points to the new item. Nothing changes when the keyring does not take
-// it, or when the file cannot be written (the new item is removed).
+// it (never a prompt here: background work), or when the file cannot be written (the new item is
+// removed).
 void CredentialStore::migrate(const std::string& origin, const std::string& blob, const std::string& token,
                               const std::string& itemOrigin) const {
     Keyring* k = keyring();
-    if (!k || cancel_.cancelled()) return;
+    if (cancel_.cancelled()) return;
+    if (!k) {
+        noteFileFallback(noKeyring(), path());
+        return;
+    }
     const std::string id = newItemId();
     std::string why;
-    if (id.empty() || k->store(origin, id, token, &cancel_, why) != Keyring::Result::Ok) return;
+    if (id.empty()) return;
+    const Keyring::Result res = k->store(origin, id, token, &cancel_, why);
+    if (res != Keyring::Result::Ok) {
+        if (res != Keyring::Result::Cancelled && !inKeyring(blob)) noteFileFallback(why, path());
+        return;
+    }
     bool saved = false;
     {
         std::lock_guard<std::mutex> lk(mu_);
@@ -387,28 +496,32 @@ void CredentialStore::migrate(const std::string& origin, const std::string& blob
         }
     }
     if (!saved) {
-        if (k->remove(origin, id, &cancel_, why) == Keyring::Result::Unavailable)
+        if (notRemoved(k->remove(origin, id, &cancel_, why)))
             LOGW("net: a copy of the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
     } else if (inKeyring(blob)) {
-        if (k->remove(itemOrigin, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+        if (notRemoved(k->remove(itemOrigin, itemId(blob), &cancel_, why)))
             LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", itemOrigin.c_str(), why.c_str());
     } else {
         LOGI("net: the saved session of %s moved to the system keyring", origin.c_str());
     }
 }
 
+// A logout, a forgotten server, a replaced token: a locked keyring is worth a prompt (Prompt::Once).
 void CredentialStore::forget(const std::string& origin, const std::string& blob) const {
     if (!inKeyring(blob)) return;
     Keyring* k = keyring();
     if (!k) return;
-    std::string why;
-    if (k->remove(origin, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
-        LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
+    const std::string id = itemId(blob);
+    auto removeAt = [&](const std::string& at) {
+        std::string why;
+        Keyring::Result res = k->remove(at, id, &cancel_, why);
+        res = afterUnlock(*k, res, at, id, Prompt::Once, [&] { return k->remove(at, id, &cancel_, why); });
+        if (notRemoved(res)) LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", at.c_str(), why.c_str());
+    };
+    removeAt(origin);
     // A moved record not read since: its item names the former origin (its id is random: it can
     // only be this one).
-    for (const std::string& from : movedFrom(origin))
-        if (k->remove(from, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
-            LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", from.c_str(), why.c_str());
+    for (const std::string& from : movedFrom(origin)) removeAt(from);
 }
 
 std::string CredentialStore::username(const std::string& origin) const {
@@ -488,14 +601,14 @@ bool CredentialStore::clearToken(const std::string& origin, const std::string& t
         blob = r->tokenBlob;
     }
     std::string saved, why;
-    bool unanswered = false;
-    const bool readable = read(origin, blob, saved, why, nullptr, &unanswered);
+    Keyring::Result status = Keyring::Result::Ok;
+    const bool readable = read(origin, blob, Prompt::Never, saved, why, nullptr, &status);
     const bool another = readable && saved != token;
     wipe(saved);
     if (another) return true;   // another one since
     // The keyring cannot say which token it keeps (locked, failing, interrupted): the reference
     // stays, since it may name one saved since. A refused token is cleared at its next refusal.
-    if (unanswered) return false;
+    if (unanswered(status)) return false;
     bool ok;
     {
         std::lock_guard<std::mutex> lk(mu_);

@@ -18,8 +18,9 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   Debian 12, Fedora 36, RHEL 9 and later), X11 or Wayland with XWayland, and plays its sound
   through ALSA (`libasound2`; PulseAudio and PipeWire through their ALSA plugins). Without
   `libasound2` or a sound device the game runs silent, the coach in subtitles. Saved logins go to
-  the desktop's keyring through libsecret (`libsecret-1-0`) when it is installed and unlocked,
-  otherwise to a file only you can read.
+  the desktop's keyring through libsecret (`libsecret-1-0`) when it is installed (a locked keyring
+  asks for its password when you sign in or connect), otherwise to a file only you can read
+  (`install.sh` says when libsecret is missing, and the log says why the file is used).
 
 ## Playing
 
@@ -264,7 +265,9 @@ Settings are stored in `Scacelith.ini` in `%APPDATA%\scacelith\` (on Linux
 `$XDG_CONFIG_HOME/scacelith/`, by default `~/.config/scacelith/`), with the saved logins
 (`Scacelith.credentials`) and the log (`scacelith.log`). Their session tokens are encrypted for the
 Windows account; on Linux the desktop's keyring keeps them (GNOME Keyring, KWallet or another
-Secret Service, through libsecret when it is installed), or, without an unlocked one, the file
+Secret Service, through libsecret when it is installed; a locked keyring is unlocked through the
+desktop's own prompt when you sign in, connect or sign out, and a dismissed prompt is not shown
+again until the next sign-in or start), or, without a keyring or while it stays locked, the file
 itself in the clear, readable by its owner only ([docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md)). A `Scacelith.ini` next to the executable
 makes a portable install (versions up to 1.0.0-beta.1 put it there): the game then keeps all three
 in the executable's folder, as it also does when the user folder cannot be written. A file given with `--ini <file>` is read and written there only, with the

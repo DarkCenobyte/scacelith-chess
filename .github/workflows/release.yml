@@ -255,8 +255,9 @@ jobs:
           ./install.sh --uninstall removes it. The settings, saved logins and log are kept in
           \$XDG_CONFIG_HOME/scacelith/, by default ~/.config/scacelith/ (next to the executable
           instead when a Scacelith.ini stands there); the logins' session tokens go to the desktop's
-          keyring through libsecret (libsecret-1-0) when one is unlocked, otherwise they stay in that
-          folder, readable by their owner only.
+          keyring through libsecret (libsecret-1-0) when there is one (a locked keyring asks for its
+          password when you sign in or connect), otherwise they stay in that folder, readable by
+          their owner only.
 
           Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
           Scacelith is free software under the GNU General Public License v3.0 (LICENSE). The licence
@@ -369,7 +370,8 @@ jobs:
           - **Linux x86-64**: \`Scacelith-$VERSION-linux-x86_64.tar.gz\` (the executable, its launcher
             and icons, \`install.sh\` to add it to the applications menu, and the licences). Needs
             glibc 2.34 and OpenSSL 3 (Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9 and later) and X11 or
-            XWayland; the sound goes through ALSA (PulseAudio and PipeWire included).
+            XWayland; the sound goes through ALSA (PulseAudio and PipeWire included), and the saved
+            logins' tokens go to the desktop keyring through libsecret (libsecret-1-0) when available.
 
           Every file is built by the release workflow from tag \`$TAG\`, and its build provenance is
           attested. To check a download with the GitHub CLI:

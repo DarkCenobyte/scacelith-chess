@@ -636,8 +636,10 @@ struct OnlineClient::Impl {
         bool sentToken = false;
         std::string token;
         if (call.auth != Auth::None) {
+            // A call that needs the session may have the keyring unlocked (its prompt); an optional
+            // token is not worth one.
             Credential c;
-            if (creds.get(e.origin(), c) && !c.token.empty()) {
+            if (creds.get(e.origin(), c, call.auth == Auth::Required) && !c.token.empty()) {
                 token = c.token;
                 req.headers.emplace_back("Authorization", "Bearer " + c.token);
                 sentToken = true;
@@ -1088,8 +1090,8 @@ struct OnlineClient::Impl {
         const ServerEndpoint e = rt.ep;
         if (!e.valid()) { stopWanting(ConnState::Offline, "invalid_server"); return; }
         if (connState.load() != int(ConnState::Reconnecting)) setState(ConnState::Connecting);
-        Credential c;
-        if (!creds.get(e.origin(), c) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "not_logged_in"); return; }
+        Credential c;   // the keyring may be asked to unlock (its prompt): the session is needed now
+        if (!creds.get(e.origin(), c, true) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "not_logged_in"); return; }
         if (!plausibleToken(c.token)) { creds.clearToken(e.origin()); stopWanting(ConnState::Unauthorized, "not_logged_in"); return; }
 
         // /api/v1/info (compatibility, wsPath): read again, unless an automatic reconnection can
@@ -1109,7 +1111,7 @@ struct OnlineClient::Impl {
                 return;
             }
             if (!info.compatible) { stopWanting(ConnState::Incompatible, "incompatible"); return; }
-            if (!creds.get(e.origin(), c) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "server_changed"); return; }
+            if (!creds.get(e.origin(), c, true) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "server_changed"); return; }
             std::string path = a.body["wsPath"].asString("/ws");
             bool pathOk = !path.empty() && path[0] == '/' && path.size() < 128;
             for (char ch : path) pathOk = pathOk && ch > ' ' && ch <= '~';
@@ -1764,9 +1766,11 @@ void OnlineClient::registerAccount(const std::string& username, const std::strin
         ev.account.username = username;
         ev.account.emailVerified = a.ok() && a.body["status"].asString() == "ready";
         if (a.ok()) {
+            // The new account's name for the sign-in form, unless a session is saved there (also one
+            // a locked keyring keeps, not read here).
             Credential c;
             d->creds.get(e.origin(), c);
-            if (c.token.empty()) {
+            if (c.token.empty() && !d->creds.hasToken(e.origin())) {
                 c.origin = e.origin();
                 c.username = username;
                 d->creds.put(c);

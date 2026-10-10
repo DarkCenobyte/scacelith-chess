@@ -25,3 +25,21 @@ mkdir -p "$data/applications"
 EXE=$exe awk '/^Exec=/ { print "Exec=\"" ENVIRON["EXE"] "\""; next } { print }' \
     "$here/share/applications/scacelith.desktop" > "$data/applications/scacelith.desktop"
 echo "Scacelith installed: $bin/scacelith, with its launcher in the applications menu."
+# The saved logins' tokens go to the desktop keyring through libsecret, which the game loads at run
+# time when present: a notice, not an error, when it cannot be found (ldconfig's cache, else the
+# usual library folders: ldconfig is not on every user's PATH, nor everywhere).
+libsecret_found() {
+    for ldconfig in "$(command -v ldconfig || true)" /sbin/ldconfig /usr/sbin/ldconfig; do
+        if [ -n "$ldconfig" ] && [ -x "$ldconfig" ]; then
+            "$ldconfig" -p 2>/dev/null | grep -q 'libsecret-1\.so\.0 (libc6,x86-64)' && return 0
+            break
+        fi
+    done
+    for dir in /usr/lib/x86_64-linux-gnu /lib/x86_64-linux-gnu /usr/lib64 /lib64 /usr/lib /lib /usr/local/lib; do
+        [ -e "$dir/libsecret-1.so.0" ] && return 0
+    done
+    return 1
+}
+if ! libsecret_found; then
+    echo "Note: libsecret-1.so.0 not found: the saved logins will be kept in ${XDG_CONFIG_HOME:-$HOME/.config}/scacelith/ instead of the desktop keyring (install libsecret-1-0 on Debian/Ubuntu, libsecret on Fedora/Arch)."
+fi
