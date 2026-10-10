@@ -152,6 +152,26 @@ struct Settings {
     std::vector<CoachGame> coachHistory;
     bool coachAccuracyExplained = false;
     int coachLessonChapter = 0;
+    // The Coach page's tab (0 Training, 1 Challenges) and the challenge last chosen on it
+    // (coach::Challenge::id, "" = none yet), stored when the player presses Start.
+    int coachTab = 0;
+    std::string coachChallenge;
+    // The challenges completed (every position of the set solved, hints allowed), by id, each
+    // once, in the order they were completed: the Coach page marks them with a check. Ids the
+    // game no longer knows are kept (a later version may list them again). Nothing else of the
+    // challenges is remembered.
+    std::vector<std::string> coachChallengesDone;
+    bool coachChallengeDone(const std::string& id) const {
+        for (const std::string& d : coachChallengesDone)
+            if (d == id) return true;
+        return false;
+    }
+    // Adds 'id' to the completed challenges; false when it was there already (nothing to save).
+    bool markCoachChallengeDone(const std::string& id) {
+        if (id.empty() || coachChallengeDone(id)) return false;
+        coachChallengesDone.push_back(id);
+        return true;
+    }
     // [tts] the coach's voice (src/tts): threads of one synthesis (0 = automatic: 2), the voice
     // (-1 = the default teacher voice, else an index into the model's voices), flow-matching steps
     // (Options > Audio > Voice quality: kTtsStepsMin..kTtsStepsMax; each step costs about a fifth
@@ -216,6 +236,10 @@ Settings& settings();
 // history is one line of "level:result:accuracy" entries, oldest first ("3:1:81.4 3:-1:-").
 std::string encodeCoachHistory(const std::vector<Settings::CoachGame>& games);
 std::vector<Settings::CoachGame> decodeCoachHistory(const std::string& text);
+// [coach] challenges_done: the ids separated by commas ("mate1,fork"). Decoding trims the spaces
+// around each id and drops the empty ones and the repeats.
+std::string encodeChallengeIds(const std::vector<std::string>& ids);
+std::vector<std::string> decodeChallengeIds(const std::string& text);
 void readCoachSettings(const IniFile& ini, Settings& s);
 void writeCoachSettings(IniFile& ini, const Settings& s);
 
