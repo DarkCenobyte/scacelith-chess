@@ -161,10 +161,18 @@ bool keyringOff() {
 }
 
 // Why there is no keyring (the store has none: keyring()).
+#ifdef __APPLE__
+std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "no keychain"; }
+#else
 std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded"; }
+#endif
 }  // namespace
 
+#ifdef __APPLE__
+Keyring* defaultKeyring() { return keyringOff() ? nullptr : keychainKeyring(); }
+#else
 Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
+#endif
 
 void setFileSessionsAllowed(bool allowed) {
     if (g_fileSessions.exchange(allowed) == allowed) return;
@@ -306,7 +314,11 @@ void CredentialStore::applyMovesLocked() const {
         if (inKeyring(r->tokenBlob) || inMemory(r->tokenBlob))
             blob = r->tokenBlob;
         else if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token))
+#ifdef __APPLE__
+            blob = holdLocked(token);   // never written to the file there (kFileSessions)
+#else
             blob = protectToken(mv.second, token);
+#endif
         wipe(token);
         r->origin = mv.second;
         r->tokenBlob = blob;
@@ -469,7 +481,8 @@ void CredentialStore::dropLocked(const std::string& blob) const {
 
 void CredentialStore::reconcileLocked() const {
 #ifndef _WIN32
-    const bool allowed = fileSessionsAllowed();
+    // macOS: never in the file (kFileSessions), whatever the option says.
+    const bool allowed = kFileSessions && fileSessionsAllowed();
     bool changed = false, closed = true, checked = false;
     for (Record& r : records_) {
         const bool file = inFile(r.tokenBlob), memory = inMemory(r.tokenBlob);
@@ -595,6 +608,11 @@ std::string CredentialStore::fallback(const std::string& origin, const std::stri
 #ifdef _WIN32
     (void)why;
     return protectToken(origin, token);
+#elif defined(__APPLE__)
+    // Never in the file there (kFileSessions): memory, until the game quits.
+    (void)token;
+    LOGW("net: the session of %s is kept in memory until the game quits, not in the keychain (%s)", origin.c_str(), why.c_str());
+    return kMemoryPrefix;
 #else
     bool allowed = fileSessionsAllowed(), closed = false;
     std::string at;

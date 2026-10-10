@@ -26,6 +26,10 @@
 //     only, until the game quits ("memory:" records are written without their token). A token an
 //     earlier run left in the file is then moved to memory (unread when the file is open to other
 //     users) and erased from the file.
+//   - macOS: in the user's keychain (Keyring below: keychainKeyring(), keychain.cpp), as on Linux;
+//     when the keychain cannot keep it, in memory only, whatever setFileSessionsAllowed says: a
+//     token is never written to the file there ("bound:" tokens that a copied Linux file holds are
+//     moved to memory, then to the keychain).
 // Either way get(origin) only ever returns a token that was saved for that origin. The choice of the
 // file by default is an accepted risk (audit A08): docs/ONLINE_CLIENT.md, "Where the sessions are
 // kept".
@@ -63,9 +67,9 @@
 
 namespace net {
 
-// The system's secret store, where a Linux build keeps the session tokens. Each item is found by
-// its origin and an id the store makes for it (new for every token). The tests give a store a
-// fake one (CredentialStore::setKeyring).
+// The system's secret store, where a Linux or macOS build keeps the session tokens. Each item is
+// found by its origin and an id the store makes for it (new for every token). The tests give a
+// store a fake one (CredentialStore::setKeyring).
 class Keyring {
 public:
     enum class Result {
@@ -95,18 +99,30 @@ public:
 
 // The Secret Service (org.freedesktop.secrets over the D-Bus session bus) through libsecret,
 // loaded at run time: the game is not linked with it (libsecret-1.so.0, secret_service.cpp).
-// nullptr on Windows and when the library cannot be loaded. Only unlock() prompts: the other calls
-// find a locked keyring Locked, and one without a default collection Unavailable.
+// nullptr on Windows, on macOS and when the library cannot be loaded. Only unlock() prompts: the
+// other calls find a locked keyring Locked, and one without a default collection Unavailable.
 Keyring* secretServiceKeyring();
-// The keyring new stores use: secretServiceKeyring(), or none with SCACELITH_KEYRING=off in the
-// environment (the unit tests run so: tests/test_main.cpp).
+#ifdef __APPLE__
+// The user's keychain (Security framework, keychain.cpp). Only unlock() prompts: the other calls
+// find a locked keychain, or an item that does not let this build read it, Locked.
+Keyring* keychainKeyring();
+#endif
+// The keyring new stores use: secretServiceKeyring() (macOS: keychainKeyring()), or none with
+// SCACELITH_KEYRING=off in the environment (the unit tests run so: tests/test_main.cpp).
 Keyring* defaultKeyring();
+// Whether a session no keyring can keep may go to the credentials file at all (Windows: DPAPI;
+// Linux: in the clear, when setFileSessionsAllowed allows it). Never on macOS: memory only.
+#ifdef __APPLE__
+constexpr bool kFileSessions = false;
+#else
+constexpr bool kFileSessions = true;
+#endif
 // Linux: whether the stores may keep a session no keyring can keep in their file (in the clear,
 // 0600; the note above), or only in memory until the game quits. The game's option "Remember my
 // sign-in when the system keyring is unavailable" (game::Settings::onlineRememberWithoutKeyring),
 // on by default. Applied at once to every store already loaded: off, the tokens their files hold
 // move to memory and are erased from the files; on, the tokens kept in memory go to the files.
-// No effect on Windows (DPAPI).
+// No effect on Windows (DPAPI) nor on macOS (never in the file: kFileSessions).
 void setFileSessionsAllowed(bool allowed);
 bool fileSessionsAllowed();
 
