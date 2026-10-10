@@ -287,6 +287,9 @@ struct State {
     float t = 0.0f;
     Sub afterGame = Sub::SignIn;
     bool haveAfterGame = false;
+    // The Analysis page's My online games: to the history at the next opening (toHistory), whose
+    // Back then leaves the page (fromAnalysis, while the history or one of its games shows).
+    bool toHistory = false, fromAnalysis = false;
     std::string forced;
     bool leave = false;
     // forms
@@ -1935,6 +1938,8 @@ void signOutEverywhere() {
 
 bool onlineGameStarting() { return game::onlineSession().gameReady(); }
 
+void openOnlineHistory() { O.toHistory = true; }
+
 MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     game::OnlineSession& s = ses();
     MenuAction act = MenuAction::None;
@@ -1944,6 +1949,15 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
         if (!s.signedIn()) s.api().cancelSso();
         if (!O.forced.empty()) {
             // set by debug::openOnlinePage
+        } else if (O.toHistory) {
+            if (!s.serverConfigured()) {
+                setSub(Sub::NoServer);
+            } else {
+                if (!s.signedIn()) s.resume();
+                if (s.signedIn()) openAccountPage(Sub::History);
+                else setSub(Sub::SignIn);
+            }
+            O.fromAnalysis = true;
         } else if (O.haveAfterGame) {
             setSub(O.afterGame);
         } else if (!s.serverConfigured()) {
@@ -1952,8 +1966,10 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
             if (!s.signedIn()) s.resume();
             setSub(s.signedIn() ? Sub::Play : Sub::SignIn);
         }
+        if (O.forced.empty() && !O.toHistory && !O.haveAfterGame) O.fromAnalysis = false;
         O.forced.clear();
         O.haveAfterGame = false;
+        O.toHistory = false;
         if (s.serverConfigured() && !s.infoKnown() && !s.busy(Kind::ServerInfoResult)) s.refreshInfo();
     }
     pumpResults();
@@ -2017,6 +2033,10 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
         AccountNav nav = accountPage(page, pt, fresh, library, act, note);
         switch (nav) {
         case AccountNav::Account:
+            if (O.fromAnalysis && page == AccountPage::History) {
+                O.leave = true;   // the history opened from the Analysis page: back to it
+                break;
+            }
             setSub(Sub::Account);
             O.note = note;
             break;
@@ -2032,8 +2052,8 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
             break;
         case AccountNav::Stay: break;
         }
-        // A replay started from a game of the history: back to that game after it.
-        if (act == MenuAction::StartReplay) {
+        // A replay or an analysis started from a game of the history: back to that game after it.
+        if (act == MenuAction::StartReplay || act == MenuAction::StartAnalysis) {
             O.afterGame = Sub::Game;
             O.haveAfterGame = true;
         }
@@ -2050,6 +2070,7 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     im::popId();
     im::popId();
     if (fresh && O.fresh) O.fresh = false;
+    if (O.sub != Sub::History && O.sub != Sub::Game) O.fromAnalysis = false;   // elsewhere: Back as usual
     if (O.leave) {
         O.leave = false;
         if (isSso(O.sub) && !s.signedIn()) s.api().cancelSso();

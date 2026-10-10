@@ -1172,6 +1172,21 @@ library.tag.UTCTime = Heure (UTC)
 library.tag.WhiteRatingDiff = Variation Elo des Blancs
 library.tag.BlackRatingDiff = Variation Elo des Noirs
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyse
+analysis.menu.title = ANALYSE
+analysis.menu.analyse = Analyser
+analysis.menu.paste = Coller un PGN
+analysis.menu.online = Mes parties en ligne
+analysis.menu.folder = Déposez des fichiers PGN dans ce dossier pour les analyser : {0}
+analysis.menu.empty.title = Aucune partie sauvegardée
+analysis.menu.empty.text = Vos parties apparaissent ici une fois terminées, de même que les fichiers PGN déposés dans le dossier ci-dessous. Vous pouvez aussi coller une partie copiée au format PGN.
+analysis.menu.empty.no_folder = Collez une partie copiée au format PGN pour l’analyser.
+analysis.menu.paste.empty = Le presse-papiers est vide : copiez d’abord une partie au format PGN.
+analysis.menu.paste.none = Aucune partie d’échecs n’a été trouvée dans le presse-papiers.
+analysis.menu.paste.several = Le presse-papiers contient plusieurs parties : la première est analysée.
+analysis.menu.gameover = Analyser la partie
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Coup {0} sur {1}
 replay.speed.factor = ×{0}

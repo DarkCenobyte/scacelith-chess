@@ -1171,6 +1171,21 @@ library.tag.UTCTime = 時間（UTC）
 library.tag.WhiteRatingDiff = 白方等級分變化
 library.tag.BlackRatingDiff = 黑方等級分變化
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = 分析
+analysis.menu.title = 分析
+analysis.menu.analyse = 分析
+analysis.menu.paste = 貼上 PGN
+analysis.menu.online = 我的線上對局
+analysis.menu.folder = 把 PGN 檔案放進這個資料夾即可分析：{0}
+analysis.menu.empty.title = 尚無已儲存的對局
+analysis.menu.empty.text = 你的對局結束後會出現在這裡，放進下方資料夾的 PGN 檔案也一樣。你也可以貼上以 PGN 文字複製的對局。
+analysis.menu.empty.no_folder = 貼上以 PGN 文字複製的對局即可分析。
+analysis.menu.paste.empty = 剪貼簿是空的：請先以 PGN 文字複製一盤對局。
+analysis.menu.paste.none = 剪貼簿中找不到西洋棋對局。
+analysis.menu.paste.several = 剪貼簿中有多盤對局：將分析第一盤。
+analysis.menu.gameover = 分析本局
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = 第 {0} 回合，共 {1} 回合
 replay.speed.factor = ×{0}

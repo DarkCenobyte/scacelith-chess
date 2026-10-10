@@ -122,7 +122,8 @@ int promotionPicker(bool playerIsWhite);
 // Transient message (arbiter, "Draw offer declined", ...), shown for 'seconds'.
 void notify(const std::string& message, float seconds = 3.0f);
 void drawNotifications();
-// End of game card: result line ("1-0", "½-½"), reason, move count. Returns Rematch or BackToMainMenu.
+// End of game card: result line ("1-0", "½-½"), reason, move count. Returns Rematch or BackToMainMenu
+// (and StartAnalysis, Report with the extras below).
 // The card can be folded away by the player to look at the final position.
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount = -1);
 // Additions to the end of game card.
@@ -147,8 +148,10 @@ bool optionsOpen();
 // stores the brightness in game::settings(), Esc keeps the stored one; both complete it
 // (Settings::brightnessCalibrated), save the .ini and go on to the title page.
 void openBrightnessCalibration();
-// The next mainMenu() call opens on the "Saved games" page (back from a replay); on the title page
-// when that call has no library.
+// The next mainMenu() call opens on the page the last replay or analysis was chosen on: the
+// "Saved games" page, the Analysis page, or the online history's game (back from a replay or an
+// analysis); on the title page when that call has no library for the "Saved games" page, or after
+// an analysis chosen on the game over card.
 void openSavedGames();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);

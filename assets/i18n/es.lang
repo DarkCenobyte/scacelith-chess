@@ -1171,6 +1171,21 @@ library.tag.UTCTime = Hora (UTC)
 library.tag.WhiteRatingDiff = Variación Elo de blancas
 library.tag.BlackRatingDiff = Variación Elo de negras
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Análisis
+analysis.menu.title = ANÁLISIS
+analysis.menu.analyse = Analizar
+analysis.menu.paste = Pegar un PGN
+analysis.menu.online = Mis partidas en línea
+analysis.menu.folder = Coloque archivos PGN en esta carpeta para analizarlos: {0}
+analysis.menu.empty.title = Aún no hay partidas guardadas
+analysis.menu.empty.text = Sus partidas aparecen aquí al terminar, igual que los archivos PGN colocados en la carpeta de abajo. También puede pegar una partida copiada como texto PGN.
+analysis.menu.empty.no_folder = Pegue una partida copiada como texto PGN para analizarla.
+analysis.menu.paste.empty = El portapapeles está vacío: copie primero una partida como texto PGN.
+analysis.menu.paste.none = No se encontró ninguna partida de ajedrez en el portapapeles.
+analysis.menu.paste.several = El portapapeles contiene varias partidas: se analiza la primera.
+analysis.menu.gameover = Analizar la partida
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Jugada {0} de {1}
 replay.speed.factor = ×{0}

@@ -1171,6 +1171,21 @@ library.tag.UTCTime = Uhrzeit (UTC)
 library.tag.WhiteRatingDiff = Wertungsänderung Weiß
 library.tag.BlackRatingDiff = Wertungsänderung Schwarz
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyse
+analysis.menu.title = ANALYSE
+analysis.menu.analyse = Analysieren
+analysis.menu.paste = PGN einfügen
+analysis.menu.online = Meine Online-Partien
+analysis.menu.folder = Legen Sie PGN-Dateien in diesen Ordner, um sie zu analysieren: {0}
+analysis.menu.empty.title = Noch keine gespeicherten Partien
+analysis.menu.empty.text = Ihre Partien erscheinen hier, sobald sie beendet sind, ebenso die PGN-Dateien im Ordner unten. Sie können auch eine als PGN-Text kopierte Partie einfügen.
+analysis.menu.empty.no_folder = Fügen Sie eine als PGN-Text kopierte Partie ein, um sie zu analysieren.
+analysis.menu.paste.empty = Die Zwischenablage ist leer: Kopieren Sie zuerst eine Partie als PGN-Text.
+analysis.menu.paste.none = In der Zwischenablage wurde keine Schachpartie gefunden.
+analysis.menu.paste.several = Die Zwischenablage enthält mehrere Partien: Die erste wird analysiert.
+analysis.menu.gameover = Partie analysieren
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Zug {0} von {1}
 replay.speed.factor = ×{0}

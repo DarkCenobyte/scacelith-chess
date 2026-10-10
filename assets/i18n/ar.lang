@@ -1176,6 +1176,21 @@ library.tag.UTCTime = الوقت (UTC)
 library.tag.WhiteRatingDiff = تغيّر تصنيف الأبيض
 library.tag.BlackRatingDiff = تغيّر تصنيف الأسود
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = التحليل
+analysis.menu.title = التحليل
+analysis.menu.analyse = تحليل
+analysis.menu.paste = لصق PGN
+analysis.menu.online = مبارياتي عبر الإنترنت
+analysis.menu.folder = ضع ملفات PGN في هذا المجلد لتحليلها: {0}
+analysis.menu.empty.title = لا توجد مباريات محفوظة بعد
+analysis.menu.empty.text = تظهر هنا مبارياتك بعد انتهائها، وكذلك ملفات PGN الموضوعة في المجلد أدناه. يمكنك أيضًا لصق مباراة منسوخة بصيغة PGN.
+analysis.menu.empty.no_folder = الصق مباراة منسوخة بصيغة PGN لتحليلها.
+analysis.menu.paste.empty = الحافظة فارغة: انسخ مباراة بصيغة PGN أولًا.
+analysis.menu.paste.none = لم يُعثر على أي مباراة شطرنج في الحافظة.
+analysis.menu.paste.several = تحتوي الحافظة على عدة مباريات: تُحلَّل الأولى.
+analysis.menu.gameover = تحليل المباراة
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = النقلة {0} من {1}
 replay.speed.factor = ×{0}

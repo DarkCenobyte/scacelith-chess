@@ -1172,6 +1172,21 @@ library.tag.UTCTime = Время (UTC)
 library.tag.WhiteRatingDiff = Изменение рейтинга белых
 library.tag.BlackRatingDiff = Изменение рейтинга чёрных
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Анализ
+analysis.menu.title = АНАЛИЗ
+analysis.menu.analyse = Анализ
+analysis.menu.paste = Вставить PGN
+analysis.menu.online = Мои онлайн-партии
+analysis.menu.folder = Положите файлы PGN в эту папку, чтобы проанализировать их: {0}
+analysis.menu.empty.title = Сохранённых партий пока нет
+analysis.menu.empty.text = Ваши партии появятся здесь после их окончания, как и файлы PGN из папки ниже. Можно также вставить партию, скопированную как текст PGN.
+analysis.menu.empty.no_folder = Вставьте партию, скопированную как текст PGN, чтобы проанализировать её.
+analysis.menu.paste.empty = Буфер обмена пуст: сначала скопируйте партию как текст PGN.
+analysis.menu.paste.none = В буфере обмена не найдено шахматной партии.
+analysis.menu.paste.several = В буфере обмена несколько партий: анализируется первая.
+analysis.menu.gameover = Анализ партии
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Ход {0} из {1}
 replay.speed.factor = ×{0}

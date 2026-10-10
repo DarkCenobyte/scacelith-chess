@@ -40,7 +40,7 @@ namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
 // debug::MenuPage casts to this by value: new pages go at the end, in both lists.
-enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, Coach, Licences, Library };
+enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, Coach, Licences, Library, Analysis };
 
 struct OptionsState {
     game::Settings work;
@@ -64,7 +64,11 @@ struct State {
     float creditsScroll = 0.0f, creditsScrollTarget = 0.0f;
     bool resumeOnline = false;      // an online game started from the online page: back to it after
     bool optionsToOnline = false;   // Options opened from the online page: back to it on close
-    bool replayFromOnline = false;  // a replay started from the online page (a game of the history)
+    // The page a replay or an analysis was started from (Saved games, Analysis, the online page's
+    // game of the history): openSavedGames() comes back to it. Title after an analysis chosen on
+    // the game over card.
+    Page replayFrom = Page::Library;
+    Page onlineBackTo = Page::Title;   // the page the online page goes back to (Analysis: My online games)
     // options (shared by both menus)
     OptionsState opt;
     int forcedTab = -1;
@@ -645,7 +649,8 @@ bool optionsPage(MenuAction& act) {
 }
 
 // ---- Title page -----------------------------------------------------------------------------------
-// library: the "Saved games" entry (a LibrarySetup::folder was given).
+// library: the "Saved games" entry (a LibrarySetup::folder was given). The "Analysis" entry after
+// it is always there (a game pasted as PGN text needs no folder).
 MenuAction titlePage(float t, bool library) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
@@ -684,11 +689,11 @@ MenuAction titlePage(float t, bool library) {
     TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
     gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
-    // Seven entries (eight with "Saved games", a little closer), then the player's rating and the
+    // Eight entries (nine with "Saved games", a little closer), then the player's rating and the
     // version line at the bottom.
-    const int entries = library ? 8 : 7;
-    float ey = (library ? 424.0f : 444.0f) + slide;
-    float eh = library ? 56.0f : 60.0f, ew = 440.0f, step = library ? 62.0f : 68.0f;
+    const int entries = library ? 9 : 8;
+    float ey = (library ? 416.0f : 424.0f) + slide;
+    float eh = library ? 52.0f : 56.0f, ew = 440.0f, step = library ? 56.0f : 62.0f;
     int k = 0;
     auto entry = [&]() { return im::flip(sr, Rect(x, ey + float(k++) * step, ew, eh)); };
     im::pushId("title");
@@ -704,6 +709,7 @@ MenuAction titlePage(float t, bool library) {
     }
     if (im::menuEntry(L("menu.online"), entry())) {
         setPage(Page::Online);
+        S.onlineBackTo = Page::Title;
         im::sound(Sound::Open);
     }
     if (im::menuEntry(L("menu.watch"), entry())) {
@@ -712,6 +718,10 @@ MenuAction titlePage(float t, bool library) {
     }
     if (library && im::menuEntry(L("menu.library"), entry())) {
         setPage(Page::Library);
+        im::sound(Sound::Open);
+    }
+    if (im::menuEntry(L("analysis.menu.entry"), entry())) {
+        setPage(Page::Analysis);
         im::sound(Sound::Open);
     }
     if (im::menuEntry(L("menu.options"), entry())) {
@@ -726,7 +736,7 @@ MenuAction titlePage(float t, bool library) {
     im::setDefaultFocus(first);
     im::popId();
 
-    detail::titleRating(im::flipX(sr, x), ey + float(entries - 1) * step + (library ? 120.0f : 126.0f));
+    detail::titleRating(im::flipX(sr, x), ey + float(entries - 1) * step + (library ? 114.0f : 120.0f));
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
     gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
     // The voice of Coach mode is credited in the other bottom corner, on the version's baseline
@@ -1530,10 +1540,12 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
 void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
-// Back from a replay: the saved games, or the online page's game it was started from.
+// Back from a replay or an analysis: the page it was started from (the saved games, the Analysis
+// page, the online page's game of the history), the title page after an analysis of a game just
+// played.
 void openSavedGames() {
-    S.forcedPage = int(S.replayFromOnline ? Page::Online : Page::Library);
-    S.replayFromOnline = false;
+    S.forcedPage = int(S.replayFrom);
+    S.replayFrom = Page::Library;
 }
 
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library) {
@@ -1545,6 +1557,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
     if (appear || S.forcedPage >= 0) {
         setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
         if (S.page == Page::Library && !hasLibrary) setPage(Page::Title);
+        if (S.page == Page::Online && S.forcedPage < 0) S.onlineBackTo = Page::Title;  // after an online game
         if (S.page == Page::Options) openOptions();
         if (S.page == Page::Calibration) openCalibration();
         S.forcedPage = -1;
@@ -1580,9 +1593,14 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
             break;
         }
         case Page::Online: {
+            // The library always: a game of the history is analysed without a folder of saved games
+            // (its folder, when empty, says there is none to save to or replay from).
             bool back = false;
-            act = detail::onlinePage(hasLibrary ? &library : nullptr, ease(S.pageT), fresh, back);
-            if (back) setPage(Page::Title);
+            act = detail::onlinePage(&library, ease(S.pageT), fresh, back);
+            if (back) {
+                setPage(S.onlineBackTo);
+                S.onlineBackTo = Page::Title;
+            }
             break;
         }
         case Page::Calibration:
@@ -1594,6 +1612,19 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
             if (back || !hasLibrary) setPage(Page::Title);
             break;
         }
+        case Page::Analysis: {  // the saved games, a pasted PGN, the online history (ui_library.cpp)
+            bool back = false, onlineGames = false;
+            act = detail::analysisPage(library, ease(S.pageT), fresh, back, onlineGames);
+            if (back) setPage(Page::Title);
+            if (onlineGames && act == MenuAction::None) {
+                // The online page on the game history; its Back comes back here.
+                detail::openOnlineHistory();
+                setPage(Page::Online);
+                S.onlineBackTo = Page::Analysis;
+                im::sound(Sound::Open);
+            }
+            break;
+        }
     }
     // Online: challenge cards on every page once signed in (not over the calibration), the ping on
     // the online page. A game that starts from the online page brings the menu back to it afterwards.
@@ -1601,9 +1632,9 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching || act == MenuAction::StartCoach) setPage(Page::Title);
-    if (act == MenuAction::StartReplay) {
-        // After the replay, openSavedGames() comes back to the page it started from.
-        S.replayFromOnline = S.page == Page::Online;
+    if (act == MenuAction::StartReplay || act == MenuAction::StartAnalysis) {
+        // After the replay or the analysis, openSavedGames() comes back to the page it started from.
+        S.replayFrom = S.page;
         setPage(Page::Title);
     }
     return act;
@@ -1840,9 +1871,20 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         S.goFolded = !S.goFolded;
         im::sound(S.goFolded ? Sound::Close : Sound::Open);
     }
+    // "Analyse the game" (GameOverExtras::analyse): a third button between Main menu and Rematch,
+    // the three as wide as the longest label needs (240 to 300), in a card widened to hold them,
+    // and a quiet one before Show on the folded bar.
+    const bool analyse = S.goExtras.analyse;
+    std::string primary = S.goExtras.primaryLabel.empty() ? L("gameover.rematch") : S.goExtras.primaryLabel + "##gameover.rematch";
+    const float bw = !analyse ? 250.0f
+                              : m::clamp(std::max({im::buttonWidthFor(L("common.main_menu")), im::buttonWidthFor(L("analysis.menu.gameover")),
+                                                   im::buttonWidthFor(primary)}),
+                                         240.0f, 300.0f);
+    const float bgap = analyse ? 24.0f : 28.0f;
     if (fold < 0.999f) {
         float ct = t * (1.0f - fold);
-        float w = 700.0f, h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f);
+        float w = analyse ? std::max(700.0f, 3.0f * bw + 2.0f * bgap + 132.0f) : 700.0f;
+        float h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f);
         Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + 60.0f + (1.0f - t) * 20.0f + fold * 40.0f, w, h);
         im::captureMouseRect(p);
         gfx::Layer prev = gfx::layer();
@@ -1874,14 +1916,16 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         ls.size = gfx::fitSize(line, ls, w - 60.0f);
         gfx::text(line, p.cx(), p.y + 238.0f, ls);
         if (!S.goExtras.detail.empty()) detail::gameOverDetail(S.goExtras.detail, p.cx(), p.y + 276.0f);
-        float bw = 250.0f, bh = 56.0f, gap = 28.0f;
-        float by = p.b() - 44.0f - bh;
-        if (im::button(L("common.main_menu"), im::flip(p, Rect(p.cx() - gap * 0.5f - bw, by, bw, bh)), im::ButtonKind::Secondary))
-            act = MenuAction::BackToMainMenu;
-        std::string primary = S.goExtras.primaryLabel.empty() ? L("gameover.rematch") : S.goExtras.primaryLabel + "##gameover.rematch";
+        // Main menu, (Analyse the game,) Rematch: centred, the primary one on the end side.
+        const float bh = 56.0f, gap = bgap;
+        const float by = p.b() - 44.0f - bh;
+        const int nb = analyse ? 3 : 2;
+        const float bx0 = p.cx() - (float(nb) * bw + float(nb - 1) * gap) * 0.5f;
+        auto slot = [&](int i) { return im::flip(p, Rect(bx0 + float(i) * (bw + gap), by, bw, bh)); };
+        if (im::button(L("common.main_menu"), slot(0), im::ButtonKind::Secondary)) act = MenuAction::BackToMainMenu;
+        if (analyse && im::button(L("analysis.menu.gameover"), slot(1), im::ButtonKind::Secondary)) act = MenuAction::StartAnalysis;
         im::Id rematchId = im::makeId("##gameover.rematch");
-        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary, !S.goExtras.primaryDisabled))
-            act = MenuAction::Rematch;
+        if (im::button(primary, slot(nb - 1), im::ButtonKind::Primary, !S.goExtras.primaryDisabled)) act = MenuAction::Rematch;
         im::setDefaultFocus(S.goExtras.primaryDisabled ? im::makeId("##common.main_menu") : rematchId);
         if (!S.goExtras.reportLabel.empty()) {  // online: report the opponent (start corner, quiet)
             TextStyle rq = style(font::FACE_ITALIC, kSmall, muted);
@@ -1904,7 +1948,11 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         TextStyle bs = style(font::FACE_TITLE, 22.0f, ivory, im::startAlign(), 0.14f);
         std::string summary = res + "  \xC2\xB7  " + upper(reason);
         float sw = gfx::textWidth(summary, bs);
-        float w = sw + 300.0f, h = 64.0f;
+        // The quiet "Analyse the game" before Show (as wide as its label).
+        TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
+        const std::string analyseLabel = T("analysis.menu.gameover");
+        const float aw = analyse ? std::max(150.0f, gfx::textWidth(analyseLabel, qs) + 36.0f) : 0.0f;
+        float w = sw + 300.0f + (analyse ? aw + 12.0f : 0.0f), h = 64.0f;
         Rect bar(v.x * 0.5f - w * 0.5f, v.y - h - 36.0f + (1.0f - fold) * 20.0f, w, h);
         im::captureMouseRect(bar);
         gfx::pushAlpha(bt);
@@ -1912,6 +1960,9 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         if (blockBar) im::pushBlock();
         im::panel(bar);
         gfx::text(summary, im::flipX(bar, bar.x + 40.0f), baselineCentered(bar, bs), bs);
+        if (analyse && im::button(analyseLabel + "##gameover.analyse.bar", im::flip(bar, Rect(bar.r() - 162.0f - aw, bar.y + 12.0f, aw, 40.0f)),
+                                  im::ButtonKind::Quiet))
+            act = MenuAction::StartAnalysis;
         if (im::button(L("gameover.show"), im::flip(bar, Rect(bar.r() - 150.0f, bar.y + 12.0f, 120.0f, 40.0f)), im::ButtonKind::Quiet)) {
             S.goFolded = false;
             im::sound(Sound::Open);
@@ -1921,6 +1972,8 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
     }
     im::popId();
     if (act != MenuAction::None) im::sound(Sound::Click);
+    // An analysis of the game just played: back from it (openSavedGames), the title page.
+    if (act == MenuAction::StartAnalysis) S.replayFrom = Page::Title;
     return act;
 }
 
