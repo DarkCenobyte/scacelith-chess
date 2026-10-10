@@ -355,9 +355,12 @@ struct Event {
         RatingUpdate,         // ratingWhite/ratingBlack before/after
         Notice,               // noticeCode, arg (shutdown, ban, cooldown...)
         ServerError,          // code (net::proto::ErrorCode), fatal, gameId
-        OpponentGesture       // gesture, gameId: the opponent's live gestures in the current game
+        OpponentGesture,      // gesture, gameId: the opponent's live gestures in the current game
                               // (cosmetic; 'game' is not filled in, a newer one replaces one still
                               // queued)
+        OpponentStance        // stance, gameId: the opponent's stance in the current game (protocol
+                              // minor 2; cosmetic, 'game' is not filled in; in order with the
+                              // game events, none replaced)
     };
     Kind kind = Kind::ServerInfoResult;
     bool ok = false;
@@ -383,6 +386,7 @@ struct Event {
     struct Rating { int before = 0, after = 0, games = 0; bool provisional = false; } ratingWhite, ratingBlack;
     int noticeCode = 0; double noticeArg = 0;
     Gesture gesture;
+    int stance = 0;                   // OpponentStance: net::proto::Stance value (anim::stanceFromCode)
     // account API
     GamesPage gamesPage;
     GameDetails gameDetails;
@@ -394,6 +398,10 @@ struct Event {
     // is signed out. The error is then "unauthorized", or none when a public read was asked again
     // without the token and answered (fetchGame, downloadPgn).
     bool sessionLost = false;
+    // LoginResult ok (Linux): where the session was kept when no system keyring could keep it, the
+    // first time this run for each (CredentialStore::firstNotice): "file" (the credentials file,
+    // only the player's account can read it) or "memory" (until the game quits); "" otherwise.
+    std::string sessionNotice;
     // HTTPS results: the origin (ServerEndpoint::origin()) of the server the command went to, the
     // one in use when it was given; "" for the realtime events. An answer that arrives after
     // setServer() chose another server names the previous one.
@@ -542,6 +550,13 @@ public:
     // (gestureKeepaliveMs); kGestureKeepaliveMinMs before any. The scene sends a Gesture at least
     // this often and counts the opponent's timeouts in it (game/online_live.h).
     int gestureKeepaliveMs() const;
+    // The player's stance in game gameId (protocol minor 2, net/gesture.h and net/stance.h): sent
+    // when it changes (250 ms apart at least) and, while not Seated, again every gesture keepalive,
+    // whatever Welcome.gestureRate says; again after each Welcome when it is not Seated. Nothing
+    // while the negotiated minor (Welcome.minor) is below 2, while not Online, or for another game
+    // than the one of the last GameSnapshot or one that is over; the latest is kept meanwhile. The
+    // opponent's arrive as OpponentStance events. Cheap enough to call every frame.
+    void sendStance(uint64_t gameId, uint8_t stance);
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

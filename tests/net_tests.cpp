@@ -58,6 +58,7 @@
 #include <functional>
 #include <map>
 #include <mutex>
+#include <filesystem>
 #include <thread>
 #include <type_traits>
 #include <vector>
@@ -301,7 +302,8 @@ bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
 
 TEST(net_protocol_constants) {
     CHECK_EQ(pr::kProtocolVersion, 1);
-    CHECK_EQ(pr::kMinor, 1);   // minor 1: EndReason::ResignationVsInsufficient
+    CHECK_EQ(pr::kMinor, 2);   // minor 1: EndReason::ResignationVsInsufficient; minor 2: Stance
+    CHECK_EQ(int(net::kStanceMinMinor), 2);
     CHECK_EQ(pr::kCaps, uint64_t(0));
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
     CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
@@ -313,6 +315,15 @@ TEST(net_protocol_constants) {
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
     CHECK_EQ(int(pr::MsgType::C_Gesture), 0x28);
     CHECK_EQ(int(pr::MsgType::S_Gesture), 0xA6);
+    CHECK_EQ(int(pr::MsgType::C_Stance), 0x29);
+    CHECK_EQ(int(pr::MsgType::S_Stance), 0xA7);
+    CHECK(pr::isClientType(uint8_t(pr::MsgType::C_Stance)) && !pr::isClientType(uint8_t(pr::MsgType::S_Stance)));
+    CHECK_EQ(int(pr::Stance::Seated), 0);
+    CHECK_EQ(int(pr::Stance::Standing), 1);
+    CHECK_EQ(int(pr::Stance::SideLeft), 2);
+    CHECK_EQ(int(pr::Stance::SideRight), 3);
+    CHECK(!pr::isValid(pr::Stance(4)));
+    CHECK_EQ(std::string(pr::messageName(pr::MsgType::C_Stance)), std::string("C_Stance"));
     CHECK_EQ(int(pr::GestureFlag::Glance), 1);
     CHECK_EQ(int(pr::GestureFlag::Promoting), 2);
     CHECK_EQ(int(pr::GestureFlag::Side), 4);
@@ -1180,8 +1191,14 @@ TEST(net_sys_write_file_atomic_waits_for_another_program) {
 // =============================================================================================
 
 namespace {
+// In a folder of their own, private as the store wants it (0700; credential_store.h): never beside
+// the executable, whose folder's permissions the store would close.
 std::string tempCredentialPath(const char* tag) {
-    std::string p = net::sys::exeDirectory() + "net-test-" + tag + ".credentials";
+    const std::string dir = net::sys::exeDirectory() + "net-test-credentials/";
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    std::filesystem::permissions(dir, std::filesystem::perms::owner_all, ec);
+    std::string p = dir + "net-test-" + tag + ".credentials";
     net::sys::removeFile(p);
     return p;
 }
@@ -1835,12 +1852,14 @@ TEST(net_credentials_keyring_does_not_block) {
     reader.join();
     CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::milliseconds(500));
     CHECK(out.token.empty());
-    // Interrupted: a new token is not kept at all (never in the file instead).
+    // Interrupted: a new token goes where a token goes without a keyring (the file, by default:
+    // audit A08), not into the keyring.
     c.token = "sct_" + std::string(43, 'Z');
-    bool stored = true;
-    CHECK(!s.put(c, &stored));
-    CHECK(!stored);
-    CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+    bool stored = false;
+    CHECK(s.put(c, &stored));
+    CHECK(stored);
+    CHECK(hasPrefix(fileToken(path, A), kFilePrefix));
+    CHECK(!k.holds(c.token));
 }
 
 namespace {
@@ -1974,8 +1993,8 @@ TEST(net_credentials_keyring_unlock_dismissed) {
 }
 
 // An unanswered prompt goes after the store's timeout (the sign-in's token then in the file, and
-// no prompt again for reads), and at once with interrupt() (the client shutting down), which keeps
-// nothing.
+// no prompt again for reads), and at once with interrupt() (the client shutting down): a read then
+// keeps the reference, a sign-in's token goes to the file as without a keyring.
 TEST(net_credentials_keyring_unlock_timeout) {
     std::string path = tempCredentialPath("keyring-timeout");
     RemovedAtEnd removed{path};
@@ -2031,14 +2050,14 @@ TEST(net_credentials_keyring_unlock_timeout) {
         CHECK_EQ(k.prompts.load(), 2);
     }
     {
-        // A sign-in's prompt: interrupted, its token is kept nowhere (never in the file instead).
+        // A sign-in's prompt: interrupted, its token goes to the file (the fallback, audit A08).
         net::CredentialStore s(path);
         s.setKeyring(&k);
         net::Credential c;
         c.origin = C;
         c.username = "carol";
         c.token = tokenC;
-        bool stored = true, saved = true;
+        bool stored = false, saved = false;
         std::thread signer([&] { saved = s.put(c, &stored); });
         auto t0 = std::chrono::steady_clock::now();
         while (!k.prompting && msSince(t0) < 5000) std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -2047,12 +2066,288 @@ TEST(net_credentials_keyring_unlock_timeout) {
         s.interrupt();
         signer.join();
         CHECK(msSince(t0) < 500);
-        CHECK(!saved);
-        CHECK(!stored);
-        CHECK(fileToken(path, C).empty());
+        CHECK(saved);
+        CHECK(stored);
+        CHECK(hasPrefix(fileToken(path, C), kFilePrefix));
         CHECK(!k.holds(tokenC));
     }
 }
+
+#ifndef _WIN32
+// ---- Linux without a keyring (audit A08: the file by default, memory when not allowed) ----
+
+namespace {
+unsigned modeOf(const std::string& path) {
+    struct stat st;
+    return stat(path.c_str(), &st) == 0 ? unsigned(st.st_mode & 0777) : 0u;
+}
+
+std::string folderOf(const std::string& path) { return path.substr(0, path.find_last_of('/')); }
+
+// setFileSessionsAllowed for one test (the process default, on, at its end).
+struct FileSessions {
+    explicit FileSessions(bool allowed) { net::setFileSessionsAllowed(allowed); }
+    ~FileSessions() { net::setFileSessionsAllowed(true); }
+};
+
+// HOME for one test (the store never changes the permissions of the home folder).
+struct HomeAt {
+    std::string before;
+    bool had = false;
+    explicit HomeAt(const std::string& dir) {
+        const char* h = std::getenv("HOME");
+        had = h != nullptr;
+        if (h) before = h;
+        setenv("HOME", dir.c_str(), 1);
+    }
+    ~HomeAt() {
+        if (had) setenv("HOME", before.c_str(), 1);
+        else unsetenv("HOME");
+    }
+};
+
+// A sign-in's put(): what it kept and where.
+net::CredentialStore::Kept signInKept(net::CredentialStore& s, const std::string& origin, const std::string& token) {
+    net::Credential c;
+    c.origin = origin;
+    c.username = "alice";
+    c.token = token;
+    bool stored = false;
+    net::CredentialStore::Kept kept = net::CredentialStore::Kept::None;
+    s.put(c, &stored, &kept);
+    CHECK(stored);
+    return kept;
+}
+
+// The file holds no form of the token: neither in the clear nor in the file's own format.
+bool fileHoldsNoToken(const std::string& path, const std::string& token) {
+    std::string text;
+    net::sys::readFile(path, text, 1 << 20);
+    return text.find(token) == std::string::npos && text.find("bound:") == std::string::npos;
+}
+}  // namespace
+
+// No keyring can keep a sign-in's token (none, failing, locked with its prompt dismissed or not
+// answered in time, the client shutting down): by default it goes to the file, 0600 in a 0700
+// folder, readable at once, and the player is told once per run (firstNotice); it moves to the
+// keyring at a read once that works.
+TEST(net_credentials_no_keyring_file_by_default) {
+    std::string path = tempCredentialPath("no-keyring-file");
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443";
+    struct Case {
+        const char* what;
+        std::function<void(FakeKeyring&, net::CredentialStore&)> setUp;
+    };
+    const Case cases[] = {
+        {"absent", [](FakeKeyring&, net::CredentialStore& s) { s.setKeyring(nullptr); }},
+        {"failing", [](FakeKeyring& k, net::CredentialStore& s) { s.setKeyring(&k); k.available = false; }},
+        {"locked, unlock refused", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             k.locked = true;
+             k.answer = FakeKeyring::Answer::Dismiss;
+         }},
+        {"locked, unlock expired", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             s.setUnlockTimeout(100);
+             k.locked = true;
+             k.answer = FakeKeyring::Answer::Ignore;
+         }},
+        {"shutting down", [](FakeKeyring& k, net::CredentialStore& s) {
+             s.setKeyring(&k);
+             s.interrupt();
+         }},
+    };
+    for (const Case& c : cases) {
+        std::fprintf(stderr, "  %s\n", c.what);
+        net::sys::removeFile(path);
+        FakeKeyring k;
+        net::CredentialStore s(path);
+        c.setUp(k, s);
+        const std::string token = "sct_" + std::string(43, 'F');
+        CHECK(signInKept(s, A, token) == Kept::File);
+        CHECK(hasPrefix(fileToken(path, A), "bound:"));
+        CHECK_EQ(modeOf(path), 0600u);
+        CHECK_EQ(modeOf(folderOf(path)), 0700u);
+        CHECK(!k.holds(token));
+        CHECK(s.firstNotice(Kept::File));    // the sign-in's notice, once a run
+        CHECK(!s.firstNotice(Kept::File));
+        CHECK(!s.firstNotice(Kept::Keyring));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);
+        CHECK(signInKept(s, A, token + "2") == Kept::File);
+        CHECK(!s.firstNotice(Kept::File));
+    }
+    // The keyring works again: the file's token moves there at its next read.
+    FakeKeyring k;
+    net::CredentialStore s(path);
+    s.setKeyring(&k);
+    net::Credential out;
+    CHECK(s.get(A, out) && out.token == "sct_" + std::string(43, 'F') + "2");
+    CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+    CHECK(fileHoldsNoToken(path, out.token));
+    // With a working keyring nothing is said.
+    CHECK(signInKept(s, A, "sct_" + std::string(43, 'G')) == Kept::Keyring);
+    CHECK(!s.firstNotice(Kept::Keyring));
+}
+
+// The option off: a token no keyring keeps lives in memory until the game quits (the file's record
+// has no token: nothing decodable is written), the player is told once; a token an earlier version
+// (or the option on) left in the file is moved to memory and erased from the file, at once when
+// the option changes; on again, the token in memory goes back to the file; and it moves to the
+// keyring once that works.
+TEST(net_credentials_file_sessions_off) {
+    std::string path = tempCredentialPath("file-sessions-off");
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    {
+        FileSessions off(false);
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.firstNotice(Kept::Memory));
+        CHECK(!s.firstNotice(Kept::Memory));
+        CHECK(fileHoldsNoToken(path, tokenA));
+        CHECK_EQ(fileToken(path, A), std::string());
+        CHECK_EQ(s.username(A), std::string("alice"));
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        // A token a server refused, a logout: gone from memory too.
+        CHECK(s.clearToken(A, tokenA));
+        CHECK(!s.hasToken(A));
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.clearToken(A));
+        CHECK(!s.hasToken(A));
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+    }
+    {
+        net::CredentialStore s(path);   // the next run: signed out, the name kept
+        s.setKeyring(nullptr);
+        CHECK(!s.hasToken(A));
+        CHECK_EQ(s.username(A), std::string("alice"));
+    }
+    // A token in the file (an earlier version's, or saved while the option was on), with the option
+    // off at the next start: in memory for this run, erased from the file at once.
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+    }
+    CHECK(hasPrefix(fileToken(path, B), "bound:"));
+    {
+        FileSessions off(false);
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(s.hasToken(B));
+        CHECK(fileHoldsNoToken(path, tokenB));
+        net::Credential out;
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    CHECK(fileHoldsNoToken(path, tokenB));
+    // Changed while the game runs: off erases the file's token at once (the session stays for this
+    // run), on writes it back.
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+        {
+            FileSessions off(false);
+            CHECK(fileHoldsNoToken(path, tokenB));
+            CHECK(s.hasToken(B));
+            net::Credential out;
+            CHECK(s.get(B, out) && out.token == tokenB);
+        }
+        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        net::Credential out;
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    // In memory, the keyring working again: the token moves there.
+    {
+        FileSessions off(false);
+        FakeKeyring k;
+        k.available = false;
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        k.available = true;
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        CHECK(k.holds(tokenA, A));
+        CHECK(s.get(A, out) && out.token == tokenA);
+    }
+}
+
+// Permissions more open than 0600 / 0700 (a copied or restored file, a umask): repaired at the
+// next read or write, and said in the log; the session goes on.
+TEST(net_credentials_file_permissions_repaired) {
+    std::string path = tempCredentialPath("perm-repaired");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'R');
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, A, token) == net::CredentialStore::Kept::File);
+    }
+    REQUIRE(chmod(path.c_str(), 0644) == 0);
+    REQUIRE(chmod(folderOf(path).c_str(), 0755) == 0);
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(s.hasToken(A));
+        CHECK_EQ(modeOf(path), 0600u);
+        CHECK_EQ(modeOf(folderOf(path)), 0700u);
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);
+        // Opened again while the game runs: closed again at the next write.
+        REQUIRE(chmod(path.c_str(), 0664) == 0);
+        CHECK(signInKept(s, A, token) == net::CredentialStore::Kept::File);
+        CHECK_EQ(modeOf(path), 0600u);
+    }
+}
+
+// Permissions that cannot be repaired (here: the home folder, which the store never changes): no
+// token in the clear is read from that file or written to it. A sign-in's token is kept in memory
+// for this run, and one the file held is not used and erased at the next write.
+TEST(net_credentials_file_permissions_unrepairable) {
+    const std::string dir = net::sys::exeDirectory() + "net-test-open-home/";
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    const std::string path = dir + "Scacelith.credentials";
+    net::sys::removeFile(path);
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    REQUIRE(chmod(dir.c_str(), 0700) == 0);
+    {
+        net::CredentialStore s(path);   // private for now: B's token in the file
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, B, tokenB) == Kept::File);
+    }
+    REQUIRE(chmod(dir.c_str(), 0755) == 0);
+    {
+        HomeAt home(dir.substr(0, dir.size() - 1));
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(!s.hasToken(B));                      // open to other users: not used
+        net::Credential out;
+        CHECK(s.get(B, out));
+        CHECK(out.token.empty());
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.firstNotice(Kept::Memory));
+        CHECK(fileHoldsNoToken(path, tokenA));      // and B's is erased by that write
+        CHECK(fileHoldsNoToken(path, tokenB));
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK_EQ(modeOf(dir.substr(0, dir.size() - 1)), 0755u);   // left alone
+    }
+    chmod(dir.c_str(), 0700);
+}
+#endif
 
 #ifndef _WIN32
 namespace {
@@ -2644,6 +2939,17 @@ public:
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
     std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
+    std::atomic<uint16_t> serverMinor{pr::kMinor};            // the server's minor (Welcome: the lower of the two)
+
+    // The C_Stance frames received, with their arrival time.
+    struct StanceIn {
+        pr::C_Stance m;
+        std::chrono::steady_clock::time_point at;
+    };
+    std::vector<StanceIn> stances() {
+        std::lock_guard<std::mutex> lk(gestureMu_);
+        return stances_;
+    }
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -2790,6 +3096,7 @@ private:
     std::mutex gameMu_;
     std::mutex gestureMu_;
     std::vector<GestureIn> gestures_;
+    std::vector<StanceIn> stances_;
     std::mutex scriptMu_;
     std::deque<int> script_;
     std::atomic<uint32_t> gseq_{1};
@@ -3036,7 +3343,7 @@ private:
                 }
                 pr::Welcome w;
                 w.proto = pr::kProtocolVersion;
-                w.minor = std::min(m.minor, pr::kMinor);
+                w.minor = std::min(m.minor, serverMinor.load());
                 w.caps = m.caps & pr::kCaps;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
@@ -3126,6 +3433,11 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 std::lock_guard<std::mutex> lk(gestureMu_);
                 gestures_.push_back({m, std::chrono::steady_clock::now()});
+            } else if (t == pr::MsgType::C_Stance) {
+                pr::C_Stance m;
+                if (!pr::decode(p, n, m)) return;
+                std::lock_guard<std::mutex> lk(gestureMu_);
+                stances_.push_back({m, std::chrono::steady_clock::now()});
             } else if (t == pr::MsgType::Resync) {
                 pr::Resync m;
                 if (!pr::decode(p, n, m)) return;
@@ -3257,6 +3569,11 @@ TEST(net_online_client_loopback) {
         c.login("alice", "pw");      // 428 -> proof of work -> 200
         CHECK(waitEvent(c, K::LoginResult, ev, 20000));
         CHECK(ev.ok);
+#ifndef _WIN32
+        CHECK_EQ(ev.sessionNotice, std::string("file"));   // the tests have no keyring: said once
+#else
+        CHECK(ev.sessionNotice.empty());                    // DPAPI
+#endif
         CHECK_EQ(ev.account.username, std::string("alice"));
         CHECK_EQ(ev.account.userId, 7u);
         CHECK_EQ(srv.powAccepted.load(), 1);
@@ -4027,6 +4344,178 @@ void gestureDownScenario(PacingRig& r) {
              "online again: the next one goes");
 }
 
+// The C_Stance frames the server got, from index 'from' on.
+std::vector<FakeServer::StanceIn> stancesFrom(PacingRig& r, size_t from) {
+    auto v = r.srv.stances();
+    return std::vector<FakeServer::StanceIn>(v.begin() + long(std::min(from, v.size())), v.end());
+}
+double msBetween(std::chrono::steady_clock::time_point a, std::chrono::steady_clock::time_point b) {
+    return std::chrono::duration<double, std::milli>(b - a).count();
+}
+
+// A server of minor 2 that relays no gestures (Welcome.gestureRate 0, gestureIdleMs 0: the
+// keepalive is 1 s). The player's stance goes when it changes and, while not Seated, every
+// keepalive all the same; numbered with the other messages; changes a quarter of a second apart at
+// least, the latest last; a return to Seated once; nothing for another game, nor once the game is
+// over. The opponent's S_Stance becomes OpponentStance events, in order, its value as it came.
+void stanceScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.c->sendStance(77, 0);
+    r.sleepMs(400);
+    r.expect(r.srv.stances().empty(), "Seated at first: nothing to say");
+
+    // Standing: at once, then every keepalive (the gestures' rate is 0).
+    auto t0 = std::chrono::steady_clock::now();
+    r.c->sendStance(77, 1);
+    r.expect(r.until([&] { return r.srv.stances().size() == 1; }, 1000), "Standing goes");
+    auto first = r.srv.stances();
+    r.expect(!first.empty() && msBetween(t0, first[0].at) < 300.0, "at once");
+    for (int i = 0; i < 100; ++i) {   // every frame: no more for that
+        r.c->sendStance(77, 1);
+        r.sleepMs(10);
+    }
+    r.expect(r.until([&] { return r.srv.stances().size() >= 4; }, 3000), "refreshed while standing");
+    auto v = r.srv.stances();
+    bool everySecond = true, standing = true;
+    for (size_t i = 0; i < v.size(); ++i) {
+        standing = standing && v[i].m.game == 77 && v[i].m.stance == pr::Stance::Standing;
+        if (i > 0) {
+            const double gap = msBetween(v[i - 1].at, v[i].at);
+            everySecond = everySecond && gap > 850.0 && gap < 1400.0;
+        }
+    }
+    r.expect(standing, "Standing, game 77, every time");
+    r.expect(everySecond, "every keepalive (1 s)");
+
+    // Keys tapped every 20 ms for 0.6 s: messages a quarter of a second apart at least, the latest
+    // one (SideRight) last.
+    size_t mark = r.srv.stances().size();
+    auto tTap = std::chrono::steady_clock::now();
+    for (int i = 0; i < 30; ++i) {
+        r.c->sendStance(77, uint8_t(1 + i % 3));
+        r.sleepMs(20);
+    }
+    r.c->sendStance(77, 3);
+    r.expect(r.until([&] {
+                 auto x = stancesFrom(r, mark);
+                 return !x.empty() && x.back().m.stance == pr::Stance::SideRight && msBetween(tTap, x.back().at) > 600.0;
+             }, 1500),
+             "the latest stance last");
+    auto taps = stancesFrom(r, mark);
+    bool paced = true;
+    for (size_t i = 1; i < taps.size(); ++i) paced = paced && msBetween(taps[i - 1].at, taps[i].at) > 200.0;
+    r.expect(paced, "a quarter of a second apart (" + std::to_string(taps.size()) + " messages)");
+    r.expect(taps.size() <= 5, "no burst (" + std::to_string(taps.size()) + ")");
+
+    // Another game: nothing (not even the current game's stance meanwhile).
+    r.sleepMs(300);
+    mark = r.srv.stances().size();
+    r.c->sendStance(78, 2);
+    r.sleepMs(1300);
+    r.expect(stancesFrom(r, mark).empty(), "nothing for another game");
+
+    // Back to Seated in game 77: once.
+    mark = r.srv.stances().size();
+    r.c->sendStance(77, 0);
+    r.expect(r.until([&] { return stancesFrom(r, mark).size() == 1; }, 1000), "Seated goes");
+    r.sleepMs(1500);
+    auto seated = stancesFrom(r, mark);
+    r.expect(seated.size() == 1 && seated[0].m.stance == pr::Stance::Seated, "Seated once, never refreshed");
+    r.expect(r.srv.seqOk.load(), "one numbering for every message");
+
+    // The opponent's: in order, each value as it came (6: a later minor's), this game's only.
+    while (r.c->poll(ev)) {
+    }
+    pr::S_Stance s;
+    s.game = 77;
+    for (int code : {1, 2, 6, 0}) {
+        s.stance = pr::Stance(code);
+        r.srv.sendToClients(s);
+    }
+    s.game = 99;
+    s.stance = pr::Stance::Standing;
+    r.srv.sendToClients(s);
+    r.sleepMs(600);
+    std::vector<int> got;
+    bool shape = true;
+    while (r.c->poll(ev)) {
+        if (ev.kind != K::OpponentStance) continue;
+        got.push_back(ev.stance);
+        shape = shape && ev.gameId == 77 && ev.game.id == 0 && ev.ok;
+    }
+    r.expect(got == std::vector<int>({1, 2, 6, 0}), "OpponentStance in order, as they came (" + std::to_string(got.size()) + ")");
+    r.expect(shape, "for game 77, without a copy of the game");
+
+    // Once the game is over, nothing goes.
+    r.c->resign(77);
+    r.expect(waitEvent(*r.c, K::GameEnd, ev, 5000), "the game ends");
+    mark = r.srv.stances().size();
+    r.c->sendStance(77, 1);
+    r.sleepMs(1300);
+    r.expect(stancesFrom(r, mark).empty(), "nothing once the game is over");
+}
+
+// A server of minor 1 (Welcome.minor 1): no Stance ever goes, the connection and the numbering
+// stay as they are.
+void stanceOldServerScenario(PacingRig& r) {
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    for (uint8_t s : {1, 2, 3, 1}) {
+        r.c->sendStance(77, s);
+        r.sleepMs(400);
+    }
+    r.sleepMs(1200);
+    r.expect(r.srv.stances().empty(), "no Stance to a server of minor 1");
+    r.expect(r.c->state() == net::ConnState::Online, "still online");
+    r.c->sendGesture(77, net::Gesture());
+    r.expect(r.until([&] { return r.srv.gestures().size() == 1; }, 1000), "the gestures still go");
+    r.expect(r.srv.seqOk.load(), "the numbering has no gap");
+}
+
+// A stance other than Seated goes again at once after a reconnection (the keepalive is 10 s
+// here: no refresh would come so soon), the one of the moment (changed while the connection was
+// down); Seated does not. Nothing goes while the connection is down.
+void stanceReconnectScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(r.c->gestureKeepaliveMs() == 10000, "a keepalive of 10 s");
+    r.c->sendStance(77, 2);
+    r.expect(r.until([&] { return r.srv.stances().size() == 1; }, 1000), "SideLeft goes");
+
+    r.srv.upgradeStatus.store(502);
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting");
+    r.c->sendStance(77, 1);   // changed meanwhile
+    r.sleepMs(300);
+    r.expect(r.srv.stances().size() == 1, "nothing while the connection is down");
+    r.srv.upgradeStatus.store(0);
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back: Welcome");
+    auto back = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.stances().size() == 2; }, 1500), "the stance goes again");
+    auto v = r.srv.stances();
+    r.expect(v.size() == 2 && v[1].m.stance == pr::Stance::Standing && v[1].m.game == 77, "the one of the moment");
+    r.expect(v.size() == 2 && msBetween(back, v[1].at) < 1000.0, "at once, not at the keepalive");
+
+    // The same stance, unchanged across a second outage: again at once.
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting again");
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back again");
+    r.expect(r.until([&] { return r.srv.stances().size() == 3; }, 1500), "Standing again after the second Welcome");
+
+    // Seated: sent once, and not after the next reconnection.
+    r.c->sendStance(77, 0);
+    r.expect(r.until([&] { return r.srv.stances().size() == 4; }, 1000), "Seated goes");
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting a third time");
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back a third time");
+    r.sleepMs(1200);
+    r.expect(r.srv.stances().size() == 4, "Seated: nothing after the Welcome");
+    r.expect(r.srv.seqOk.load(), "one numbering for every message");
+}
+
 // Game events apply in gseq order (PROTOCOL.md, "Ordering: gseq"): the next one applies and its
 // gseq becomes the state's; one the state already holds (an event of the snapshot, a MoveMade sent
 // again) is ignored, without a Resync; one beyond the next is not applied, and the client asks for
@@ -4167,6 +4656,22 @@ TEST(net_online_client_gestures) {
     rigs[2].srv.gestureIdleMs.store(30000);
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
+    runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// The player's stance through OnlineClient (protocol minor 2): on change and, while not Seated,
+// every keepalive whatever the gesture rate, paced, for the current game while it goes on, again
+// after a reconnection; none to a server of minor 1; the opponent's as OpponentStance events.
+TEST(net_online_client_stances) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    constexpr int kRigs = 3;
+    PacingRig rigs[kRigs];
+    rigs[1].srv.serverMinor.store(1);
+    rigs[1].srv.gestureRate.store(10);
+    rigs[1].srv.gestureBurst.store(20);
+    rigs[2].srv.gestureIdleMs.store(10000);
+    const char* tags[kRigs] = {"stance", "stance-minor1", "stance-reconnect"};
+    void (*scenarios[kRigs])(PacingRig&) = {stanceScenario, stanceOldServerScenario, stanceReconnectScenario};
     runRigs(rigs, tags, scenarios, kRigs);
 }
 
@@ -6929,9 +7434,11 @@ TEST(net_tls_pinned_post_manual) {
 // HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
 //   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password>[:<keepalive ms>] ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects (the gesture keepalive of the server's Welcome must be
-// <keepalive ms> when given), queues rated 3+2, plays legal moves for 12 plies (posHash from its
-// own chess::Position FEN) and resigns; the result and the rating update must come back from the
-// server. The account API has its own live check (tests/net_live_account_tests.cpp).
+// <keepalive ms> when given), queues rated 3+2, stands up for a moment and sits down again
+// (protocol minor 2: the harness checks that the bot heard both), plays legal moves for 12 plies
+// (posHash from its own chess::Position FEN) and resigns; the result, the bot standing up while it
+// waits (OpponentStance) and the rating update must come back from the server. The account API
+// has its own live check (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
@@ -6993,11 +7500,17 @@ TEST(net_live_server_game) {
         }
     };
     sync(ev.game);
-    int sent = -1, confirmed = 0;
+    int sent = -1, confirmed = 0, opponentStanding = 0, opponentSeated = 0;
     bool ended = false, resigned = false;
     net::Event end;
-    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
+    // Standing for 0.8 s from the start, then seated; no move of mine before the stance had time
+    // to go (the client sends a change 250 ms after the previous one at the earliest).
+    const auto start = std::chrono::steady_clock::now();
+    const auto sitAt = start + std::chrono::milliseconds(800), playAt = sitAt + std::chrono::milliseconds(400);
+    auto deadline = start + std::chrono::seconds(60);
     while (!ended && std::chrono::steady_clock::now() < deadline) {
+        const auto now = std::chrono::steady_clock::now();
+        c.sendStance(gameId, uint8_t(now < sitAt ? net::proto::Stance::Standing : net::proto::Stance::Seated));
         net::Event e;
         while (c.poll(e)) {
             if (e.kind == net::Event::Kind::MoveMade || e.kind == net::Event::Kind::GameSnapshot) {
@@ -7011,10 +7524,13 @@ TEST(net_live_server_game) {
                 end = e;
             } else if (e.kind == net::Event::Kind::ServerError) {
                 std::fprintf(stderr, "  server error %d '%s'\n", e.code, e.error.c_str());
+            } else if (e.kind == net::Event::Kind::OpponentStance && e.gameId == gameId) {
+                if (e.stance == int(net::proto::Stance::Standing)) ++opponentStanding;
+                if (e.stance == int(net::proto::Stance::Seated)) ++opponentSeated;
             }
         }
         int ply = int(mirror.moves().size());
-        if (!ended && ply % 2 == you && sent < ply) {
+        if (!ended && ply % 2 == you && sent < ply && now >= playAt) {
             if (ply >= 12 && !resigned) {
                 c.resign(gameId);
                 resigned = true;
@@ -7030,10 +7546,13 @@ TEST(net_live_server_game) {
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
-    std::fprintf(stderr, "  plies %zu, own moves confirmed %d, ended %d (status %d reason %d)\n", mirror.moves().size(), confirmed,
-                 int(ended), end.game.status, end.game.reason);
+    std::fprintf(stderr, "  plies %zu, own moves confirmed %d, ended %d (status %d reason %d), the bot stood up %d times, sat down %d\n",
+                 mirror.moves().size(), confirmed, int(ended), end.game.status, end.game.reason, opponentStanding, opponentSeated);
     CHECK(ended);
     CHECK(confirmed >= 6);
+    // The bot stands after each of its moves and sits down before the next one.
+    CHECK(opponentStanding >= 3);
+    CHECK(opponentSeated >= 2);
     CHECK_EQ(end.game.reason, int(net::proto::EndReason::Resignation));
     CHECK_EQ(end.game.status, you == 0 ? int(net::proto::GameStatus::BlackWins) : int(net::proto::GameStatus::WhiteWins));
     CHECK(waitEvent(c, net::Event::Kind::RatingUpdate, ev, 10000, &seen));

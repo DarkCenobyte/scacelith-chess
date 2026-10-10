@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <map>
 #include <string>
 
 #ifdef _WIN32
@@ -13,6 +14,8 @@ namespace testing {
 std::vector<Case>& registry() { static std::vector<Case> r; return r; }
 int g_failures = 0;
 std::string g_skip;
+std::string g_skipWithout;
+std::vector<std::string> g_uses;
 }  // namespace testing
 
 namespace {
@@ -56,7 +59,32 @@ const char* nonAsciiNamesRefused() {
 }  // namespace
 
 int main(int argc, char** argv) {
-    const char* filter = argc > 1 ? argv[1] : nullptr;
+    // The prerequisites this run requires (SKIP_WITHOUT, testing::uses: test.h), from the
+    // environment and the command line; the first other argument filters the tests by name.
+    std::map<std::string, std::vector<std::string>> required;   // each one: the tests that passed with it
+    auto require = [&](const std::string& list) {
+        size_t at = 0;
+        while (at <= list.size()) {
+            size_t comma = list.find(',', at);
+            if (comma == std::string::npos) comma = list.size();
+            if (comma > at) required[list.substr(at, comma - at)];
+            at = comma + 1;
+        }
+    };
+    if (const char* env = std::getenv("SCACELITH_TESTS_REQUIRE")) require(env);
+    const char* filter = nullptr;
+    for (int i = 1; i < argc; ++i) {
+        const std::string arg = argv[i];
+        if (arg.rfind("--require=", 0) == 0) {
+            require(arg.substr(10));
+        } else if (arg.rfind("--", 0) == 0) {
+            std::fprintf(stderr, "unknown option %s (scacelith_tests [--require=WHAT[,WHAT...]] [filter-substring])\n",
+                         argv[i]);
+            return 2;
+        } else if (!filter) {
+            filter = argv[i];
+        }
+    }
     const char* note = nullptr;
 #ifdef _WIN32
     note = nonAsciiNamesRefused();
@@ -76,6 +104,8 @@ int main(int argc, char** argv) {
         if (filter && !std::strstr(c.name, filter)) continue;
         int before = testing::g_failures;
         testing::g_skip.clear();
+        testing::g_skipWithout.clear();
+        testing::g_uses.clear();
         auto t0 = std::chrono::steady_clock::now();
         // An exception out of a test fails that test; the others still run.
         try {
@@ -89,11 +119,23 @@ int main(int argc, char** argv) {
         }
         double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
         bool ok = testing::g_failures == before;
+        if (ok && !testing::g_skip.empty() && required.count(testing::g_skipWithout)) {
+            // Skipped without a prerequisite this run requires: a failure.
+            std::fprintf(stderr, "  %s is required (--require=%s): %s\n", testing::g_skipWithout.c_str(),
+                         testing::g_skipWithout.c_str(), testing::g_skip.c_str());
+            ok = false;
+        }
         if (ok && !testing::g_skip.empty()) {
             std::fprintf(stderr, "[SKIP] %s (%s)\n", c.name, testing::g_skip.c_str());
             ++skipped;
         } else {
             std::fprintf(stderr, "[%s] %s (%.1f ms)\n", ok ? " OK " : "FAIL", c.name, ms);
+        }
+        if (ok && testing::g_skip.empty()) {
+            for (const std::string& what : testing::g_uses) {
+                auto it = required.find(what);
+                if (it != required.end() && (it->second.empty() || it->second.back() != c.name)) it->second.push_back(c.name);
+            }
         }
         ++run;
         if (!ok) ++failedCases;
@@ -106,5 +148,18 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "no test name contains \"%s\"\n", filter);
         return 2;
     }
-    return failedCases ? 1 : 0;
+    // A required prerequisite no test passed with (none uses it, a typo, a filter that left them
+    // out): the run did not check what it was asked to.
+    bool unmet = false;
+    for (const auto& r : required) {
+        if (r.second.empty()) {
+            std::fprintf(stderr, "required %s: no test passed with it\n", r.first.c_str());
+            unmet = true;
+            continue;
+        }
+        std::string names;
+        for (const std::string& n : r.second) names += (names.empty() ? "" : ", ") + n;
+        std::fprintf(stderr, "required %s: %zu test(s) passed with it: %s\n", r.first.c_str(), r.second.size(), names.c_str());
+    }
+    return failedCases || unmet ? 1 : 0;
 }

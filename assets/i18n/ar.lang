@@ -132,6 +132,12 @@ controls.look.keys = الزر الأيمن مع الإمساك
 controls.look = النظر حولك
 controls.sheet.keys = S
 controls.sheet = النظر إلى ورقة تسجيلك ثم العودة
+controls.stand.keys = ↑
+controls.stand = الوقوف أمام كرسيك
+controls.side.keys = →  /  ←
+controls.side = الوقوف عند الطرف الأيسر / الأيمن للطاولة
+controls.sit.keys = ↓
+controls.sit = العودة إلى الجلوس (لا يلعب إلا الجالس)
 controls.moves.keys = Tab
 controls.moves = إظهار قائمة النقلات أو إخفاؤها
 controls.menu.keys = Esc
@@ -324,6 +330,10 @@ notify.manual_clock = في هذه المباراة، اضغط على الساع�
 notify.illegal = نقلة غير قانونية.
 notify.cannot_move = لا يمكن لعب هذه النقلة.
 notify.move_first = العب نقلتك قبل الضغط على الساعة.
+notify.stance.sit_to_play = اجلس مجددًا لتلعب (السهم السفلي).
+notify.stance.first = تستمر الساعة في العمل وأنت واقف. السهم السفلي: العودة إلى الجلوس.
+notify.stance.first_untimed = لا تلعب إلا وأنت جالس. السهم السفلي: العودة إلى الجلوس.
+notify.stance.finish_move = أكمل نقلتك أولًا.
 notify.draw_already_offered = لقد عرضت التعادل في هذه النقلة من قبل.
 notify.draw_accepted = يقبل خصمك التعادل.
 notify.draw_declined = يرفض خصمك عرض التعادل.
@@ -519,6 +529,8 @@ options.online.test = اختبار الاتصال
 options.online.test_ok = تم الاتصال بـ {0}، وهو متوافق مع هذا الإصدار.
 options.online.test_incompatible = تم الاتصال بـ {0}، لكنه يتطلب إصدارًا آخر من Scacelith.
 options.online.in_game = لا يمكن تغيير الخادم أثناء مباراة عبر الإنترنت.
+options.online.remember_session = تذكّر تسجيل دخولي عند تعذّر استخدام حلقة مفاتيح النظام
+options.online.remember_session.help = عندما لا تستطيع أي حلقة مفاتيح للنظام (GNOME Keyring وKWallet…) الاحتفاظ بجلستك، تُحفَظ في ملف لا يقرؤه إلا حساب المستخدم الخاص بك على النظام. يمكن لأي شخص يستطيع قراءة ملفاتك، أو نسخة منها مثل نسخة احتياطية، أن يستخدم تلك الجلسة. عند الإيقاف: تبقى مسجّل الدخول حتى إغلاق اللعبة. يمكنك تسجيل خروج أي جهاز من «الأجهزة المسجَّل الدخول منها» في حسابك.
 
 # Sign in, create an account
 online.signin.lead = سجّل الدخول إلى {0} لتلعب مع آخرين عبر الإنترنت.
@@ -641,6 +653,8 @@ online.account.delete = حذف الحساب
 
 # Play
 online.play.signed_in = مسجّل الدخول باسم {0}
+online.session.file = تعذّر على حلقة مفاتيح النظام الاحتفاظ بتسجيل دخولك: حُفِظ في ملف لا يقرؤه إلا حساب المستخدم الخاص بك على النظام (الخيارات > الخادم).
+online.session.memory = تعذّر على حلقة مفاتيح النظام الاحتفاظ بتسجيل دخولك، ولم يُحفَظ في أي ملف: تبقى مسجّل الدخول حتى إغلاق اللعبة (الخيارات > الخادم).
 online.play.find_section = البحث عن خصم
 online.play.friend_section = اللعب مع صديق
 online.play.mode = المباراة

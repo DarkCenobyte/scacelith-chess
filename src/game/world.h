@@ -115,7 +115,14 @@ public:
 
     render::Environment environment(float time) const;
 
+    // The hall, the table, the board and the chairs. A chair pushed back (setChairSlide) moves:
+    // the chairs are drawn as moving objects (motion vectors, the live shadow pass), while a copy
+    // that never moves stays in their place for the light probes only, so that a player getting up
+    // does not bake the probes again.
     void submitStatic(render::Renderer& r);
+    // How far the chair of a seat (0 = White's, +Z) is pushed back from its place, metres along
+    // the seat's backward direction (anim::Animator::chairSlide), for the next submitStatic.
+    void setChairSlide(int seat, float metres);
     void submitPieces(render::Renderer& r, const PhysicalBoard& board);
     void submitClock(render::Renderer& r, const ClockDisplay& d);
     // seat: 0 = White's chair (+Z), 1 = Black's chair (-Z). armSeeThrough in [0,1] fades the arm
@@ -148,6 +155,8 @@ private:
     bool clockPosX_ = true;
     float prevLeverAngle_ = 0.0f;
     bool hasPrevLever_ = false;
+    float chairSlide_[2] = {0.0f, 0.0f};
+    float prevChairSlide_[2] = {0.0f, 0.0f};
 };
 
 }  // namespace game

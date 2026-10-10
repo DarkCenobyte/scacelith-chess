@@ -17,6 +17,20 @@
 // placed first and pressed 0.6-1.0 s later. Silent while it is away and once the game is over.
 // The local player's gestures are accepted and ignored.
 //
+// It gets up now and then (OpponentStance, protocol minor 2): sometimes while the local player
+// thinks (from its fifth ply on, with a minute on its clock), sometimes during a long think of
+// its own (from the seventh, with a minute and a half, its think lengthened to fit), it stands in
+// front of its chair, maybe walks to an end of the table (SideLeft / SideRight) and back, looks at
+// the board a few seconds and sits down again; when the local player moves meanwhile it comes back
+// at once. A stance other than Seated is sent again every second (the keepalive of the fakes'
+// Welcome) and again after our own reconnection; Seated once. Its hand reaches for a piece only
+// once its robot is seated again (2 s after its Seated, 2.5 s more from an end of the table, then
+// a quarter of a second), so never while it stands or holds a piece; while it stands its head
+// looks at the board only (never Glance nor Side), its angles relative to its standing body (the
+// eye over anim::stanceSpot). It sits down silently when the game ends or it leaves (the local
+// player's client shows it seated then). forceOpponentStance() holds one stance instead.
+// The local player's stance is accepted and ignored.
+//
 // The account API (the server's docs/API.md) answers like the server: a game history made
 // from the account's name (the same ~45 games every time: legal moves, every kind of ending,
 // clocks that follow the time control, ratings that lead to the account's ones; the games played
@@ -71,6 +85,12 @@ uint32_t digest(const std::string& fen);
 // 'seconds', or our own realtime connection drops for 'seconds'.
 void opponentDrop(int seconds);
 void connectionDrop(int seconds);
+// --mock-stance and its developer key: the fake opponent holds stance 'stance' (0 Seated,
+// 1 Standing, 2 SideLeft, 3 SideRight, those of net::proto::Stance) from now on, its hand first
+// finishing a move it has begun; -1 gives it back its own outings (it comes back to its chair
+// then). Held away from its chair it never plays: its clock runs (it may lose on time). Out of
+// range values are clamped. Holds for every game of the fakes until changed.
+void forceOpponentStance(int stance);
 // --online-manual-clock (with --online-mock): the games of the fakes, direct matches included,
 // have autoPress = false, so a move goes only when its player presses the clock. Off by default.
 void useManualClock(bool on);
@@ -140,6 +160,7 @@ public:
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
     void sendGesture(uint64_t gameId, const Gesture& g);
+    void sendStance(uint64_t gameId, uint8_t stance);
     int gestureKeepaliveMs() const { return kGestureKeepaliveMinMs; }   // a Welcome with gestureIdleMs 1000
     bool poll(Event& out);
 
@@ -173,6 +194,7 @@ public:
     void requestResync();
     void rematch(bool accept);
     void sendGesture(const Gesture& g);
+    void sendStance(uint8_t stance);
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;

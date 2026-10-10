@@ -67,7 +67,7 @@ static Skeleton buildRobotSkeleton() {
     for (int side = 0; side < 2; ++side) {
         float sx = side == 0 ? 1.0f : -1.0f;
         Bone t = side == 0 ? ThighL : ThighR;
-        set(t, Pelvis, {sx * 0.095f, -0.03f, 0.0f}, 0.44f);
+        set(t, Pelvis, {sx * 0.080f, -0.03f, 0.0f}, 0.44f);
         set(Bone(t + 1), t, {0, 0, 0.44f}, 0.44f);
         set(Bone(t + 2), Bone(t + 1), {0, -0.44f, 0}, 0.19f);
     }

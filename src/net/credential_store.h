@@ -12,13 +12,23 @@
 //     another origin's record cannot be decrypted there ("dpapi:").
 //   - Linux: in the system keyring when there is one (Keyring below: the Secret Service, GNOME
 //     Keyring, KWallet, KeePassXC...), one item per token found by its origin and a random id; the
-//     file holds only "keyring:" and that id. A token the file still holds in the format below
-//     moves to the keyring the first time it is read while the keyring works (and is unlocked).
-//   - Linux without a usable keyring (none installed or running, no D-Bus session,
-//     SCACELITH_KEYRING=off), or with a locked one the player did not unlock (below): in the file,
-//     bound to its origin but in the clear ("bound:", base64url of origin + '\n' + token),
-//     protected only by the file's permissions (0600, in a 0700 folder). The log says why.
-// Either way get(origin) only ever returns a token that was saved for that origin.
+//     file holds only "keyring:" and that id. A token kept as below moves to the keyring the first
+//     time it is read while the keyring works (and is unlocked).
+//   - Linux when no keyring can keep it (none installed or running, no D-Bus session,
+//     SCACELITH_KEYRING=off, a locked one the player did not unlock (below), the client shutting
+//     down): by default in the file, bound to its origin but in the clear ("bound:", base64url of
+//     origin + '\n' + token), protected by the file's permissions: the file 0600 in a 0700 folder,
+//     checked at every read and write of the file and repaired when they are more open (ssh's rule;
+//     the log says so). Where they cannot be repaired, no token in the clear is read from or
+//     written to that file. The player is told once per run (firstNotice: the sign-in's notice).
+//   - Linux with the option "Remember my sign-in when the system keyring is unavailable" off
+//     (Options > Online; setFileSessionsAllowed), or a file that cannot be made private: in memory
+//     only, until the game quits ("memory:" records are written without their token). A token an
+//     earlier run left in the file is then moved to memory (unread when the file is open to other
+//     users) and erased from the file.
+// Either way get(origin) only ever returns a token that was saved for that origin. The choice of the
+// file by default is an accepted risk (audit A08): docs/ONLINE_CLIENT.md, "Where the sessions are
+// kept".
 //
 // A locked keyring (Linux): the store asks the desktop to unlock it (the Secret Service shows its
 // own prompt) when a sign-in saves a token (put), when a token is needed now (get with unlock: a
@@ -27,9 +37,9 @@
 // The store waits kUnlockTimeoutMs at most for the answer, and stops waiting at interrupt() (the
 // prompt stays on the desktop: answered later, it still unlocks the keyring). One dismissed,
 // unanswered or failing is not shown again this run, except for a new sign-in: that sign-in's token
-// then stays in the file (it moves to the keyring at a read once the keyring is unlocked), a read
-// finds no session this time (the reference stays: hasToken() is false until a read succeeds),
-// and a removal leaves the item (the log says so).
+// then goes where a token goes without a keyring (above: it moves to the keyring at a read once the
+// keyring is unlocked), a read finds no session this time (the reference stays: hasToken() is false
+// until a read succeeds), and a removal leaves the item (the log says so).
 //
 // Thread-safe. The file is read on first use and rewritten atomically on changes. The calls the
 // game thread makes (hasToken, username, pin, origins) never wait for the keyring: its calls
@@ -44,6 +54,8 @@
 // read). Never for a community server: the client registers no other move.
 #pragma once
 #include "transport.h"   // CancelToken
+#include <atomic>
+#include <map>
 #include <mutex>
 #include <string>
 #include <utility>
@@ -89,6 +101,14 @@ Keyring* secretServiceKeyring();
 // The keyring new stores use: secretServiceKeyring(), or none with SCACELITH_KEYRING=off in the
 // environment (the unit tests run so: tests/test_main.cpp).
 Keyring* defaultKeyring();
+// Linux: whether the stores may keep a session no keyring can keep in their file (in the clear,
+// 0600; the note above), or only in memory until the game quits. The game's option "Remember my
+// sign-in when the system keyring is unavailable" (game::Settings::onlineRememberWithoutKeyring),
+// on by default. Applied at once to every store already loaded: off, the tokens their files hold
+// move to memory and are erased from the files; on, the tokens kept in memory go to the files.
+// No effect on Windows (DPAPI).
+void setFileSessionsAllowed(bool allowed);
+bool fileSessionsAllowed();
 
 struct Credential {
     std::string origin;
@@ -101,6 +121,9 @@ struct Credential {
 class CredentialStore {
 public:
     explicit CredentialStore(std::string path = std::string());   // "" = defaultPath()
+    ~CredentialStore();
+    CredentialStore(const CredentialStore&) = delete;
+    CredentialStore& operator=(const CredentialStore&) = delete;
     static std::string defaultPath();
     void setPath(const std::string& path);       // switches file (reloaded on next use)
     std::string path() const;
@@ -118,10 +141,18 @@ public:
     std::string username(const std::string& origin) const;
     std::string pin(const std::string& origin) const;   // the saved pin (without decrypting the token)
 
+    // Where put() kept a token: nowhere (no token, or put() failed), in the system keyring, in the
+    // file (Windows: DPAPI; Linux: in the clear, no keyring could keep it), or in memory until the
+    // game quits (Linux: no keyring could keep it, and the file may not).
+    enum class Kept { None, Keyring, File, Memory };
     // Creates or replaces c.origin's record and saves the file. False when the token could not be
     // protected (nothing changed: *stored false) or the file not written (*stored true: the record
     // holds for this run).
-    bool put(const Credential& c, bool* stored = nullptr);
+    bool put(const Credential& c, bool* stored = nullptr, Kept* kept = nullptr);
+    // Whether the player is to be told where a sign-in's token was kept: true the first time this
+    // run (per store) that put() kept one outside the keyring on Linux (File or Memory, each once);
+    // false for the keyring and on Windows.
+    bool firstNotice(Kept kept) const;
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin
     // The same, only while the saved token is 'token' (the one a server refused): a token saved
     // since (a new sign-in on another thread) is kept, and so is one the keyring cannot show now
@@ -141,8 +172,9 @@ public:
     // How long an unlock prompt waits for the player (kUnlockTimeoutMs; the tests shorten it).
     void setUnlockTimeout(int ms);
     static constexpr int kUnlockTimeoutMs = 60000;
-    // Ends a keyring call in progress (an unlock prompt too) and makes the next ones fail at once,
-    // without falling back to the file (the client is shutting down: OnlineClient's destructor).
+    // Ends a keyring call in progress (an unlock prompt too) and makes the next ones fail at once
+    // (the client is shutting down: OnlineClient's destructor). A sign-in's token then goes where a
+    // token goes without a keyring (the note above); reads and removals keep the files as they are.
     void interrupt();
 
 private:
@@ -164,6 +196,11 @@ private:
     // asks again).
     mutable bool unlockDeclined_ = false;
     int unlockTimeoutMs_ = kUnlockTimeoutMs;
+    // Under mu_: the tokens kept in memory only (Linux), by their records' "memory:" blobs.
+    mutable std::map<std::string, std::string> held_;
+    mutable unsigned heldSeq_ = 0;
+    mutable bool openWarned_ = false;   // under mu_: the file was said open to other users
+    mutable std::atomic<bool> noticedFile_{false}, noticedMemory_{false};   // firstNotice
 
     // When a keyring call that finds the keyring locked asks the desktop to unlock it.
     enum class Prompt {
@@ -176,11 +213,23 @@ private:
     void applyMovesLocked() const;
     bool saveLocked() const;
     Record* findLocked(const std::string& origin) const;
-    bool readLocked(Record& r, std::string& token) const;   // decrypts r's file-held token, notes the outcome
+    bool readLocked(Record& r, std::string& token) const;   // reads r's token from the file or memory, notes the outcome
+    // Linux: whether the file may hold a token in the clear (its folder 0700, itself 0600, repaired
+    // when more open). Always true on Windows.
+    bool privateLocked() const;
+    std::string holdLocked(const std::string& token) const;   // keeps token in memory: its "memory:" blob
+    void dropLocked(const std::string& blob) const;           // forgets a token kept in memory
+    // The records follow setFileSessionsAllowed (and the file's permissions): see there.
+    void reconcileLocked() const;
+    friend void setFileSessionsAllowed(bool allowed);
     std::vector<std::string> movedFrom(const std::string& origin) const;   // the moves' sources for origin
     // Under ioMu_, not mu_ (they may call the keyring):
     Keyring* keyring() const;
+    // The blob that keeps a sign-in's token: a keyring item, else fallback(). "" when it could not
+    // be kept at all (DPAPI failed). A "memory:" blob is held by put().
     std::string protect(const std::string& origin, const std::string& token) const;
+    // Where a token no keyring keeps goes: the file, else (Linux) memory (kMemoryPrefix alone).
+    std::string fallback(const std::string& origin, const std::string& token, const std::string& why) const;
     // *itemOrigin: the origin the keyring item was found under (a moved record's is its former one).
     // *status: Ok with the token; Missing when it is not there or cannot be read at all; Locked,
     // Unavailable or Cancelled when the keyring could not say what it keeps.

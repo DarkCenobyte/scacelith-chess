@@ -1,7 +1,7 @@
 // The game review (see review.h): the positions of a game and their evaluations, the order of the
-// searches (quick pass, deep pass, the board's surroundings first), the verdicts and their symbols,
-// the evaluation bar, each side's summary with lichess's game accuracy, and the key a review is
-// cached under.
+// searches (the urgent positions, then the quick pass and the deep pass, the board's surroundings
+// first), the verdicts and their symbols, the evaluation bar, each side's summary with lichess's
+// game accuracy, and the key a review is cached under.
 #include "analysis/review.h"
 
 #include "analysis/review_facts.h"
@@ -262,27 +262,17 @@ const PositionEval& GameReview::position(int i) const {
     return evals_[size_t(i)];
 }
 
-bool GameReview::nextRequest(int focus, ai::AnalysisRequest& out, int& position) {
+bool GameReview::nextRequest(int focus, ai::AnalysisRequest& out, int& position, const std::vector<int>& urgent) {
     const int n = int(evals_.size());
     if (n == 0) return false;
     focus = std::clamp(focus, 0, n - 1);
-    for (const bool deep : {false, true}) {
-        auto wanted = [&](int i) {
-            if (i < 0 || i >= n || pending_[size_t(i)]) return false;
-            const PositionEval& e = evals_[size_t(i)];
-            if (e.final || e.failed) return false;
-            return deep ? e.depth > 0 : e.depth == 0;
-        };
-        int pick = -1;
-        // The board's position and its surroundings (focus, focus + 1, focus - 1, focus + 2 ...),
-        // then the rest from the start.
-        for (int d = 0; d <= kAround && pick < 0; ++d) {
-            if (wanted(focus + d)) pick = focus + d;
-            else if (d > 0 && wanted(focus - d)) pick = focus - d;
-        }
-        for (int i = 0; i < n && pick < 0; ++i)
-            if (wanted(i)) pick = i;
-        if (pick < 0) continue;
+    auto wanted = [&](int i, bool deep) {
+        if (i < 0 || i >= n || pending_[size_t(i)]) return false;
+        const PositionEval& e = evals_[size_t(i)];
+        if (e.final || e.failed) return false;
+        return deep ? e.depth > 0 : e.depth == 0;
+    };
+    auto hand = [&](int pick, bool deep) {
         out = coach::detail::requestAt(game_, size_t(pick));
         out.multiPV = settings_.multiPV;
         out.depth = deep ? settings_.deepDepth : settings_.quickDepth;
@@ -291,6 +281,23 @@ bool GameReview::nextRequest(int focus, ai::AnalysisRequest& out, int& position)
         pending_[size_t(pick)] = true;
         position = pick;
         return true;
+    };
+    // The urgent positions first, to the deep pass: their quick searches (the bar and the symbols
+    // within a second), then their deep ones.
+    for (const bool deep : {false, true})
+        for (const int i : urgent)
+            if (wanted(i, deep)) return hand(i, deep);
+    for (const bool deep : {false, true}) {
+        int pick = -1;
+        // The board's position and its surroundings (focus, focus + 1, focus - 1, focus + 2 ...),
+        // then the rest from the start.
+        for (int d = 0; d <= kAround && pick < 0; ++d) {
+            if (wanted(focus + d, deep)) pick = focus + d;
+            else if (d > 0 && wanted(focus - d, deep)) pick = focus - d;
+        }
+        for (int i = 0; i < n && pick < 0; ++i)
+            if (wanted(i, deep)) pick = i;
+        if (pick >= 0) return hand(pick, deep);
     }
     return false;
 }

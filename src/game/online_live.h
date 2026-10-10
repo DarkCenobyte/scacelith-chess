@@ -9,6 +9,29 @@
 //     stay valid (in keepalives: their client sends at the same interval), the pace of the robot's
 //     hand (one step at a time, whatever their rate), what becomes of its live work when their
 //     move comes, and the spring the robot's head follows them with.
+//   - Stances (protocol minor 2, the Stance message; net/gesture.h and net/stance.h have the
+//     wire rules). What the scene does with them:
+//       Mine: GameLink::sendStance(uint8_t(stance)) every frame of the game played, with the
+//       stance my robot is going to (Animator::stanceTarget(): the opponent's robot starts its
+//       own move as soon as mine does), Seated once the game is over. The network layer sends only
+//       changes (250 ms apart at least), refreshes a stance other than Seated every keepalive and
+//       sends it again after a reconnection; nothing to a peer of an earlier minor. My Gesture
+//       keeps flowing while I stand: its yaw and pitch are then relative to my body (which faces
+//       the board from every stance), its hand idle, and neither Glance nor Side is set
+//       (buildGesture with glance = side = false).
+//       Theirs: a StanceTracker (below). heard(e.stance) on each OpponentStance of the game
+//       played; heard(Seated) on their MoveMade, before their move is queued (only a seated
+//       player plays); reset() on a new game, at its end (GameEnd), when they leave
+//       (PlayerDisconnected) and when our own link is lost (Reconnecting, Offline): they show
+//       seated until told otherwise, and their client sends a standing stance again once the link
+//       is back. advance(dt) every frame. current(keepaliveMs) is the stance to give their robot
+//       (Animator::setStance when it differs from the one given last): a stance other than Seated
+//       not refreshed for net::kStanceExpiryKeepalives keepalives reads as Seated, and so does a
+//       value a later minor may add. remoteHandApplies(): the piece fields of their gestures move
+//       the robot's hand only while it is seated and shown Seated. remoteHeadFlags(): Glance and
+//       Side of their gestures (and the Side mirror of the yaw) only while shown Seated. With no
+//       head of theirs to follow (headActive false: the ignore option, stale gestures, a server
+//       that relays none), a standing robot looks at the board (the Animator's own look).
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
@@ -20,6 +43,7 @@
 //   - When the pin saved at sign-in no longer applies (Options' pin field emptied): on Apply and
 //     for "Test connection" alike.
 #pragma once
+#include "../anim/stance.h"
 #include "../chess/chess.h"
 #include "../math/math.h"
 #include "../net/gesture.h"
@@ -149,6 +173,62 @@ inline float keepaliveSeconds(int keepaliveMs) { return float(net::gestureKeepal
 inline float headTimeout(int keepaliveMs) { return kHeadTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
 inline float holdTimeout(int keepaliveMs) { return kHoldTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
 inline float placedTimeout(int keepaliveMs) { return kPlacedTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
+
+// How long a stance other than Seated holds without a refresh (s): kStanceExpiryKeepalives
+// keepalives of the link (5 s at the shortest keepalive, the default). Their client refreshes it
+// every keepalive: four in a row lost or late, and it is taken for a client gone quiet.
+inline float stanceExpiry(int keepaliveMs) { return float(net::kStanceExpiryKeepalives) * keepaliveSeconds(keepaliveMs); }
+
+// The opponent's stance as this client shows it (protocol minor 2, net/gesture.h): the latest
+// OpponentStance (or the Seated of their MoveMade); back to Seated once stanceExpiry passes
+// without one while it is not Seated; an unknown value (a later minor's) reads as Seated. reset()
+// at a new game, at its end, when they leave and when our link is lost (the top of this file has
+// the scene's whole use of it). Starts Seated.
+class StanceTracker {
+public:
+    void reset() {
+        code_ = 0;
+        age_ = 0.0f;
+    }
+    // An OpponentStance event (its raw value), or Seated for their MoveMade.
+    void heard(int code) {
+        code_ = code;
+        age_ = 0.0f;
+    }
+    // Every frame (seconds; nothing for a negative or NaN step).
+    void advance(float dt) {
+        if (dt > 0.0f) age_ = std::min(age_ + dt, 1.0e6f);
+    }
+    // The stance their robot shows now.
+    anim::Stance current(int keepaliveMs) const {
+        anim::Stance s = anim::stanceFromCode(code_);
+        return s != anim::Stance::Seated && expired(keepaliveMs) ? anim::Stance::Seated : s;
+    }
+    // A stance other than Seated left without a refresh for too long (current() is then Seated).
+    bool expired(int keepaliveMs) const {
+        return anim::stanceFromCode(code_) != anim::Stance::Seated && age_ >= stanceExpiry(keepaliveMs);
+    }
+    int code() const { return code_; }   // the latest value heard, as it came
+    float age() const { return age_; }   // seconds since it came
+
+private:
+    int code_ = 0;
+    float age_ = 0.0f;
+};
+
+// The piece fields of the opponent's gestures (touch, aim, placed) move their robot's hand only
+// while it is seated (Animator::seated()) and they are shown Seated: a standing player touches
+// nothing, and a hand task queued while the robot stands would sit it down (the Animator's safety
+// net for their move) against what their client says.
+inline bool remoteHandApplies(anim::Stance shown, bool robotSeated) { return robotSeated && shown == anim::Stance::Seated; }
+
+// The flags of the opponent's gesture that apply to their robot's head: Glance and Side (the look
+// beside the board, whose yaw the receiver mirrors) only while they are shown Seated; their client
+// never sets them standing, and a look relative to a standing body is never mirrored.
+inline uint8_t remoteHeadFlags(uint8_t flags, anim::Stance shown) {
+    if (shown == anim::Stance::Seated) return flags;
+    return uint8_t(flags & ~(net::proto::GestureFlag::Glance | net::proto::GestureFlag::Side));
+}
 
 // The local state that decides whether the piece fields of the opponent's latest gesture apply
 // (touch, aim, placed): only to the move being prepared, never to one already known.
@@ -321,6 +401,26 @@ struct ClockFreeze {
         shownMs = clockMs;
     }
     bool holds(double nowMs, int pingMs, bool reconnecting) const { return clockFreezeHolds(nowMs - sentMs, pingMs, reconnecting); }
+};
+
+// A move the authority refused as rate limited (its message bucket, or a game host far behind
+// that bounds its inbox): the game's state is asked for again after a pause, and the snapshot's
+// resend sends the move (resendPendingMove). The pause keeps a refused Resync from coming back at
+// once: a refusal answered at once would empty the message bucket and close the connection as a
+// flood. A refusal while a retry waits changes nothing.
+struct MoveRetry {
+    static constexpr double kPauseMs = 1500.0;
+    double atMs = 0.0;  // localMs() of the retry, 0: none
+    void refused(double nowMs) {
+        if (atMs <= 0.0) atMs = nowMs + kPauseMs;
+    }
+    // True once when the retry is due (and forgets it).
+    bool due(double nowMs) {
+        if (atMs <= 0.0 || nowMs < atMs) return false;
+        atMs = 0.0;
+        return true;
+    }
+    void clear() { atMs = 0.0; }
 };
 
 // After a snapshot (typically at a reconnection): true when the authority has every move of the

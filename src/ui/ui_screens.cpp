@@ -18,6 +18,7 @@
 #include "../game/scoresheet_layout.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
+#include "../net/credential_store.h"
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include "../render/post/display_transform.h"
@@ -436,10 +437,13 @@ bool optionsPage(MenuAction& act) {
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
-    // Rows from under the tabs to above the buttons: the nine rows of Gameplay and of Controls are
-    // closer, and the eight of Audio (nine when it shows the voice model's update).
+    // Rows from under the tabs to above the buttons: the nine rows of Gameplay are closer, and the
+    // eight of Audio (nine when it shows the voice model's update); the twelve lines of Controls
+    // closer still.
     const VoiceUpdateRow voiceUpdate = o.tab == 2 ? detail::voiceUpdateRow() : VoiceUpdateRow();
-    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 || o.tab == 6 || voiceUpdate.show ? 52.0f : o.tab == 2 ? 56.0f : 60.0f;
+    constexpr int kControlsTab = detail::kOnlineOptionsTab + 1;
+    float rx = p.x + 70.0f, rw = p.w - 140.0f,
+          rh = o.tab == kControlsTab ? 40.0f : o.tab == 3 || voiceUpdate.show ? 52.0f : o.tab == 2 ? 56.0f : 60.0f;
     float y = p.y + 200.0f;
     auto row = [&]() {
         Rect r(rx, y, rw, rh - 4.0f);
@@ -648,6 +652,9 @@ bool optionsPage(MenuAction& act) {
                 {"controls.clock.keys", "controls.clock"},
                 {"controls.look.keys", "controls.look"},
                 {"controls.sheet.keys", "controls.sheet"},
+                {"controls.stand.keys", "controls.stand"},
+                {"controls.side.keys", "controls.side"},
+                {"controls.sit.keys", "controls.sit"},
                 {"controls.moves.keys", "controls.moves"},
                 {"controls.menu.keys", "controls.menu"},
                 {"controls.coach_skip.keys", "controls.coach_skip"},
@@ -709,6 +716,8 @@ bool optionsPage(MenuAction& act) {
         game::settings().save();
         // Another server: its own sign-in (credentials are kept per server by the network layer).
         if (detail::onlineServerChanged(before, game::settings())) game::onlineSession().applyServer();
+        // Linux: a session no keyring keeps, in the file or in memory (applied at once to the saved ones).
+        net::setFileSessionsAllowed(game::settings().onlineRememberWithoutKeyring);
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
         im::sound(Sound::Confirm);

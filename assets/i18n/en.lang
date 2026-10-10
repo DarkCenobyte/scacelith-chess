@@ -137,6 +137,12 @@ controls.look.keys = Right mouse, hold
 controls.look = Look around
 controls.sheet.keys = S
 controls.sheet = Look at your scoresheet, and back
+controls.stand.keys = ↑
+controls.stand = Stand up in front of your chair
+controls.side.keys = ←  /  →
+controls.side = Stand at the left / right end of the table
+controls.sit.keys = ↓
+controls.sit = Sit back down (you play only seated)
 controls.moves.keys = Tab
 controls.moves = Show or hide the move list
 controls.menu.keys = Esc
@@ -329,6 +335,10 @@ notify.manual_clock = Press the clock yourself after each move in this game.
 notify.illegal = Illegal move.
 notify.cannot_move = That move cannot be made.
 notify.move_first = Make your move before pressing the clock.
+notify.stance.sit_to_play = Sit back down to play (Down arrow).
+notify.stance.first = The clock keeps running while you stand. Down arrow: sit back down.
+notify.stance.first_untimed = You play only from your chair. Down arrow: sit back down.
+notify.stance.finish_move = Finish your move first.
 notify.draw_already_offered = You have already offered a draw this move.
 notify.draw_accepted = Your opponent accepts the draw.
 notify.draw_declined = Your opponent declines the draw offer.
@@ -524,6 +534,8 @@ options.online.test = Test connection
 options.online.test_ok = {0}: connected, compatible with this version.
 options.online.test_incompatible = {0}: connected, but it needs another version of Scacelith.
 options.online.in_game = The server cannot be changed during an online game.
+options.online.remember_session = Remember my sign-in when the system keyring is unavailable
+options.online.remember_session.help = When no system keyring (GNOME Keyring, KWallet…) can keep your session, it is saved in a file that only your user account can read. Anyone who can read your files, or a copy of them such as a backup, could use that session. Off: you stay signed in until the game closes. You can sign out any device from Signed-in devices, in your account.
 
 # Sign in, create an account
 online.signin.lead = Sign in to {0} to play people online.
@@ -648,6 +660,8 @@ online.account.delete = Delete account
 
 # Play
 online.play.signed_in = Signed in as {0}
+online.session.file = No system keyring could keep your sign-in: it is remembered in a file that only your user account can read (Options > Online server).
+online.session.memory = No system keyring could keep your sign-in, and it is not saved in a file: you stay signed in until the game closes (Options > Online server).
 online.play.find_section = FIND AN OPPONENT
 online.play.friend_section = PLAY A FRIEND
 online.play.mode = Game

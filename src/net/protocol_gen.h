@@ -33,9 +33,9 @@ namespace net {
 namespace proto {
 
 constexpr uint16_t kProtocolVersion = 1;   // Hello.proto, Welcome.proto
-constexpr uint16_t kMinor = 1;             // the minor this codec speaks
+constexpr uint16_t kMinor = 2;             // the minor this codec speaks
 constexpr uint64_t kCaps = 0x0ull;           // capability bits this codec knows
-constexpr uint32_t kFingerprint = 0x6e6c4989u;   // schema fingerprint (informational)
+constexpr uint32_t kFingerprint = 0xc649140fu;   // schema fingerprint (informational)
 constexpr const char* kWsSubprotocol = "scacelith.rt1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 // Largest client message, in bytes (type byte included). The server refuses a larger WebSocket message from
@@ -86,6 +86,7 @@ enum class ErrorCode : uint8_t {   // open
     MatchmakingCooldown = 207, InvalidTimeControl = 208, RematchUnavailable = 209,
     RatedRepeatLimit = 210, ProtocolViolation = 240, Flood = 241, CheatDetected = 242,
 };
+enum class Stance : uint8_t { Seated = 0, Standing = 1, SideLeft = 2, SideRight = 3 };   // open
 
 // Membership of the schema enums, and their value names ("?" when not a member).
 bool isValid(Color v);
@@ -97,6 +98,7 @@ bool isValid(QueueState v);
 bool isValid(ChallengeState v);
 bool isValid(NoticeCode v);
 bool isValid(ErrorCode v);
+bool isValid(Stance v);
 const char* enumName(Color v);
 const char* enumName(ColorPref v);
 const char* enumName(GameStatus v);
@@ -106,6 +108,7 @@ const char* enumName(QueueState v);
 const char* enumName(ChallengeState v);
 const char* enumName(NoticeCode v);
 const char* enumName(ErrorCode v);
+const char* enumName(Stance v);
 
 // MoveMade.flags: the move as played.
 namespace MoveFlag {
@@ -176,6 +179,7 @@ enum class MsgType : uint8_t {
     Resync = 0x26,
     Rematch = 0x27,
     C_Gesture = 0x28,
+    C_Stance = 0x29,
     Welcome = 0x80,
     Error = 0x81,
     S_Ping = 0x82,
@@ -192,6 +196,7 @@ enum class MsgType : uint8_t {
     GameEnd = 0xA4,
     RatingUpdate = 0xA5,
     S_Gesture = 0xA6,
+    S_Stance = 0xA7,
 };
 const char* messageName(MsgType t);     // "Move", "S_Ping"...; nullptr when unknown
 inline bool isClientType(uint8_t t) { return t >= 0x01 && t <= 0x7F; }
@@ -394,6 +399,20 @@ struct C_Gesture {
     int32_t pitch = 0;  // min -1571, max 1571
     uint8_t lean = 0;  // max 100
 };
+// Minor 2: the player's stance in game `game` (seated, or standing to look at the board), relayed to the
+// opponent byte for byte (server Stance) when the opponent's session is of minor 2 or later, and never
+// answered, stored or looked at beyond decoding. Sent when it changes and, while not Seated, again at least
+// every gesture keepalive (Welcome.gestureIdleMs clamped to 1000..10000 ms, so 1000 ms when gestureRate is
+// 0): a receiver that hears no Stance for 5 keepalives shows the player seated. It travels whatever
+// gestureRate says (the head of a player whose gestures are not relayed looks at the board). Cosmetic, never
+// authoritative.
+struct C_Stance {
+    static constexpr MsgType kType = MsgType::C_Stance;
+    static constexpr bool kClientToServer = true;
+    uint32_t seq = 0;
+    uint64_t game = 0;
+    Stance stance = Stance::Seated;
+};
 // Hello accepted. Its first three fields (proto, minor, caps) are frozen for every version. When activeGame
 // != 0 a GameSnapshot of that game follows.
 struct Welcome {
@@ -592,6 +611,14 @@ struct S_Gesture {
     int32_t pitch = 0;  // min -1571, max 1571
     uint8_t lean = 0;  // max 100
 };
+// Minor 2: the opponent's stance: the client Stance without its seq, byte for byte. Cosmetic, never
+// authoritative; sessions of minor 0 and 1 never receive it.
+struct S_Stance {
+    static constexpr MsgType kType = MsgType::S_Stance;
+    static constexpr bool kClientToServer = false;
+    uint64_t game = 0;
+    Stance stance = Stance::Seated;
+};
 
 // ---- codec ----
 bool valid(const PlayerInfo& s);
@@ -654,6 +681,9 @@ bool valid(const Rematch& m);
 void encode(const C_Gesture& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, C_Gesture& out);
 bool valid(const C_Gesture& m);
+void encode(const C_Stance& m, std::vector<uint8_t>& out);
+bool decode(const uint8_t* p, size_t n, C_Stance& out);
+bool valid(const C_Stance& m);
 void encode(const Welcome& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, Welcome& out);
 bool valid(const Welcome& m);
@@ -702,6 +732,9 @@ bool valid(const RatingUpdate& m);
 void encode(const S_Gesture& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, S_Gesture& out);
 bool valid(const S_Gesture& m);
+void encode(const S_Stance& m, std::vector<uint8_t>& out);
+bool decode(const uint8_t* p, size_t n, S_Stance& out);
+bool valid(const S_Stance& m);
 bool decodeHello(const uint8_t* p, size_t n, Hello& out);
 
 // ---- reflection (tests, logs): v(name, field) for every field, in wire order ----
@@ -936,6 +969,16 @@ template <class V> void visitFields(const C_Gesture& m, V&& v) {
     v("yaw", m.yaw);
     v("pitch", m.pitch);
     v("lean", m.lean);
+}
+template <class V> void visitFields(C_Stance& m, V&& v) {
+    v("seq", m.seq);
+    v("game", m.game);
+    v("stance", m.stance);
+}
+template <class V> void visitFields(const C_Stance& m, V&& v) {
+    v("seq", m.seq);
+    v("game", m.game);
+    v("stance", m.stance);
 }
 template <class V> void visitFields(Welcome& m, V&& v) {
     v("proto", m.proto);
@@ -1221,6 +1264,14 @@ template <class V> void visitFields(const S_Gesture& m, V&& v) {
     v("pitch", m.pitch);
     v("lean", m.lean);
 }
+template <class V> void visitFields(S_Stance& m, V&& v) {
+    v("game", m.game);
+    v("stance", m.stance);
+}
+template <class V> void visitFields(const S_Stance& m, V&& v) {
+    v("game", m.game);
+    v("stance", m.stance);
+}
 
 // Calls f(msg) with a default-constructed message of type t; false when t is unknown.
 template <class F> bool withMessage(MsgType t, F&& f) {
@@ -1244,6 +1295,7 @@ template <class F> bool withMessage(MsgType t, F&& f) {
     case MsgType::Resync: { Resync m; f(m); return true; }
     case MsgType::Rematch: { Rematch m; f(m); return true; }
     case MsgType::C_Gesture: { C_Gesture m; f(m); return true; }
+    case MsgType::C_Stance: { C_Stance m; f(m); return true; }
     case MsgType::Welcome: { Welcome m; f(m); return true; }
     case MsgType::Error: { Error m; f(m); return true; }
     case MsgType::S_Ping: { S_Ping m; f(m); return true; }
@@ -1260,6 +1312,7 @@ template <class F> bool withMessage(MsgType t, F&& f) {
     case MsgType::GameEnd: { GameEnd m; f(m); return true; }
     case MsgType::RatingUpdate: { RatingUpdate m; f(m); return true; }
     case MsgType::S_Gesture: { S_Gesture m; f(m); return true; }
+    case MsgType::S_Stance: { S_Stance m; f(m); return true; }
     }
     return false;
 }

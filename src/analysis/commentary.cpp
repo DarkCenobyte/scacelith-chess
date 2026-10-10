@@ -532,7 +532,11 @@ int endLines(const GameReview& r, const GameInfo& info, Comment& out) {
         key = "an.end.unfinished";
     }
     out.lines.push_back(say(key));
+    return 3;
+}
 
+// Each side's accuracy and errors, from the whole review (final: complete()).
+void summaryLines(const GameReview& r, Comment& out) {
     const SideSummary s[2] = {r.summary(White), r.summary(Black)};
     // Accuracy means little over a handful of moves.
     if (s[0].moves >= 5 && s[1].moves >= 5)
@@ -552,7 +556,6 @@ int endLines(const GameReview& r, const GameInfo& info, Comment& out) {
                                     .with("n", Arg::ofNumber(mistakes))
                                     .with("m", Arg::ofNumber(blunders)));
     }
-    return 3;
 }
 
 // ---- A position's comment, before the crowding rule --------------------------------------------------
@@ -571,7 +574,10 @@ Comment build(const GameReview& r, const GameInfo& info, int p) {
         weight = std::max(weight, moveLines(r, p, c, said));
         weight = std::max(weight, mateOnLines(r, p, c, said));
     }
-    if (p == r.plies()) weight = std::max(weight, endLines(r, info, c));
+    if (p == r.plies()) {
+        weight = std::max(weight, endLines(r, info, c));
+        if (r.complete()) summaryLines(r, c);   // else apart, once it is (Commentator::summaryAt)
+    }
     c.weight = c.lines.empty() ? 0 : weight;
     return c;
 }
@@ -580,17 +586,21 @@ Comment build(const GameReview& r, const GameInfo& info, int p) {
 
 void Commentator::reset(const GameInfo& info) { info_ = info; }
 
-bool Commentator::ready(const GameReview& review, int p) const {
-    if (p < 0 || p > review.plies()) return false;
-    if (p == review.plies() && !review.complete()) return false;
-    if (p == 0) return true;   // the opening words need no evaluation
+std::vector<int> Commentator::needs(const GameReview& review, int p) const {
+    std::vector<int> out;
+    if (p <= 0 || p > review.plies()) return out;   // the opening words need no evaluation
     // The plies a comment reads (the move, the opponent's move before it for a chance missed, and
     // the comments of the two positions before for the crowding rule): positions p - 3 .. p.
-    for (int i = std::max(0, p - 3); i <= p; ++i) {
+    for (int i = p; i >= std::max(0, p - 3); --i) {
         const PositionEval& e = review.position(i);
-        if (!e.final && !e.failed) return false;
+        if (!e.final && !e.failed) out.push_back(i);
     }
-    return true;
+    return out;
+}
+
+bool Commentator::ready(const GameReview& review, int p) const {
+    if (p < 0 || p > review.plies()) return false;
+    return needs(review, p).empty();
 }
 
 Comment Commentator::commentAt(const GameReview& review, int p) const {
@@ -605,6 +615,53 @@ Comment Commentator::commentAt(const GameReview& review, int p) const {
                 return none;
             }
     return c;
+}
+
+Comment Commentator::summaryAt(const GameReview& review) const {
+    Comment c;
+    c.position = review.plies();
+    if (review.plies() == 0 || !review.complete()) return c;
+    summaryLines(review, c);
+    c.weight = c.lines.empty() ? 0 : 3;
+    return c;
+}
+
+// ---- The comment the board waits for -------------------------------------------------------------
+
+void CommentWait::ask(int position) {
+    pos_ = position;
+    comment_ = position >= 0;
+}
+
+void CommentWait::clear() {
+    pos_ = -1;
+    comment_ = false;
+}
+
+std::vector<int> CommentWait::urgent(const GameReview& review, const Commentator& c) const {
+    if (!waitingComment()) return {};   // the final accounts wait for the whole review: no shortcut
+    return c.needs(review, pos_);
+}
+
+bool CommentWait::poll(const GameReview& review, const Commentator& c, int board, bool speaking, Comment& out) {
+    if (pos_ < 0) return false;
+    if (board != pos_ || pos_ > review.plies()) {   // the board moved on: no longer its moment
+        clear();
+        return false;
+    }
+    if (comment_) {
+        if (!c.ready(review, pos_)) return false;
+        out = c.commentAt(review, pos_);
+        comment_ = false;
+        // The final position's accounts, when the review was not complete yet: they follow.
+        if (pos_ != review.plies() || pos_ == 0 || review.complete()) pos_ = -1;
+        return !out.empty();
+    }
+    // The final accounts: once the review is complete and the comment before them said.
+    if (speaking || !review.complete()) return false;
+    out = c.summaryAt(review);
+    clear();
+    return !out.empty();
 }
 
 std::vector<std::string> Commentator::keys() {

@@ -1,5 +1,6 @@
 // Fake server and fake direct-match peer (see online_mock.h).
 #include "online_mock.h"
+#include "../anim/stance.h"
 #include "../chess/chess.h"
 #include "../chess/pgn.h"
 #include "../core/log.h"
@@ -29,6 +30,7 @@ bool g_virtual = false;
 double g_virtualMs = 1790596800000.0;  // 2026-09-28 12:00 UTC
 int g_opponentDrop = 0, g_connectionDrop = 0;  // pending developer requests (seconds)
 bool g_manualClock = false;                    // --online-manual-clock: games with autoPress off
+int g_forcedStance = -1;                       // forceOpponentStance: -1 automatic, else held
 
 double wallMs() {
     using namespace std::chrono;
@@ -735,6 +737,19 @@ struct Room {
     double nextLookAt = 0, nextFocusAt = 0, clockLookUntil = 0, glanceUntil = 0;
     int focus = 27;                   // the square its eyes rest on
     float headYaw = 0.0f, headPitch = -0.6f, headLean = 0.0f;
+    // Its stance (protocol minor 2, net/gesture.h): now and then it gets up to look at the board
+    // standing, in front of its chair or from an end of the table, while the local player thinks
+    // or during a long think of its own, and sits back down in time: its hand reaches for a piece
+    // only once its robot is seated again, kRiseMs after its Seated (kWalkMs more from an end of
+    // the table), so never while it stands. forceOpponentStance() holds one instead.
+    static constexpr double kRiseMs = 2000.0;            // its robot gets up, or sits back down
+    static constexpr double kWalkMs = 2500.0;            // from the front of its chair to an end of the table
+    static constexpr double kStanceRefreshMs = 1000.0;   // the keepalive of the fakes' Welcome
+    static constexpr double kSeatedLeadMs = 250.0;       // seated this long at least before its hand moves
+    int stance = 0;                   // the stance it sent last (the one the local robot shows)
+    double stanceSentAt = -1e300;     // when it sent it (again every keepalive while not Seated)
+    double seatedAt = 0;              // when its robot is seated again after its last Seated
+    std::deque<std::pair<double, int>> outing;   // its next stances (time, stance), the last one Seated
 
     int opp() const { return 1 - me; }
     int toMove() const { return int(chess.position().sideToMove()); }
@@ -771,6 +786,120 @@ struct Room {
         emit(e, kOneWay);
     }
 
+    // ---- its stance ----
+    void emitStance(double now) {
+        Event e;
+        e.kind = Event::Kind::OpponentStance;
+        e.ok = true;
+        e.gameId = g.id;
+        e.stance = stance;
+        emit(e, kOneWay);
+        stanceSentAt = now;
+    }
+    void setStance(int s, double now) {
+        if (s == stance) return;
+        if (s == 0) seatedAt = now + (stance >= 2 ? kWalkMs : 0.0) + kRiseMs;   // through the front of its chair
+        stance = s;
+        emitStance(now);
+    }
+    // Seated at once without a word: the game ended or the fake left (the local player's client
+    // shows it seated then, as a real client sends nothing more).
+    void sitSilently() {
+        outing.clear();
+        stance = 0;
+    }
+    // An outing from 'from': up in front of its chair, maybe to an end of the table and back,
+    // 'lookMs' looking at the board, and down. Returns when its robot is seated again.
+    double planOuting(double from, bool side, double lookMs) {
+        outing.clear();
+        double t = from;
+        outing.push_back({t, 1});
+        t += kRiseMs;
+        if (side) {
+            t += double(looks.range(300.0f, 1200.0f));
+            outing.push_back({t, looks.uniform() < 0.5f ? 2 : 3});
+            t += kWalkMs + lookMs;
+            outing.push_back({t, 1});
+            t += kWalkMs + double(looks.range(200.0f, 800.0f));
+        } else {
+            t += lookMs;
+        }
+        outing.push_back({t, 0});
+        return t + kRiseMs;
+    }
+    // Back to its chair at once (its turn came while it was up): returns when it is seated again.
+    double comeBack(double now) {
+        outing.clear();
+        if (stance >= 2) {
+            setStance(1, now);
+            outing.push_back({now + kWalkMs, 0});
+            return now + kWalkMs + kRiseMs;
+        }
+        if (stance == 1) setStance(0, now);
+        return std::max(now, seatedAt);
+    }
+    // Its hand is on its move: from the touch to the move on the board (and its clock press).
+    bool handBusy(double now) const {
+        return toMove() == opp() && plan.move != 0 && ((plan.touchAt >= 0 && now >= plan.touchAt) || pressAt >= 0);
+    }
+    void delayMove(double d) {
+        oppMoveAt += d;
+        plan.touchAt += d;
+        plan.aimAt += d;
+        if (plan.hesitateAt >= 0) plan.hesitateAt += d;
+        if (plan.promoAt >= 0) plan.promoAt += d;
+    }
+    // The local player's turn begins: now and then the fake gets up a little later (after its
+    // look at the clock and at its scoresheet), when its clock leaves room for that.
+    void maybeStandUp(double now) {
+        if (g_forcedStance >= 0 || stance != 0 || !outing.empty()) return;
+        if (g.moves.size() < 4 || double(ms(opp())) < 60000.0 || looks.uniform() >= 0.25f) return;
+        const double from = std::max(now, seatedAt + 1000.0) + double(looks.range(2600.0f, 6000.0f));
+        planOuting(from, looks.uniform() < 0.45f, double(looks.range(2500.0f, 6000.0f)));
+    }
+    // Its own turn: back to its chair if it was up meanwhile, or now and then up for a while
+    // during a long think ('t', made longer for it), all within its thinking time.
+    void standDuringItsThink(double now, double& t) {
+        if (stance != 0 || !outing.empty()) {
+            comeBack(now);
+            return;
+        }
+        const double left = double(ms(opp()));
+        if (g_forcedStance >= 0 || now < seatedAt || g.moves.size() < 6 || left < 90000.0 || looks.uniform() >= 0.2f) return;
+        const bool side = looks.uniform() < 0.4f;
+        const double seated = planOuting(now + double(looks.range(500.0f, 1500.0f)), side, double(looks.range(2000.0f, 4500.0f)));
+        const double need = seated - now + double(looks.range(1500.0f, 2500.0f));   // then a moment seated
+        if (need > left * 0.25) {
+            outing.clear();
+            return;
+        }
+        t = std::max(t, need);
+    }
+    // Every tick: the forced stance (once its hand is free), else the outing's next steps; a
+    // stance other than Seated sent again every keepalive; its move put off until it is seated.
+    void stanceTick(double now) {
+        const int forced = g_forcedStance;
+        if (forced >= 0) {
+            outing.clear();
+            if (forced != stance && !handBusy(now)) setStance(forced, now);
+        } else {
+            if (stance != 0 && outing.empty()) comeBack(now);   // a forced stance was lifted
+            while (!outing.empty() && now >= outing.front().first) {
+                const int s = outing.front().second;
+                outing.pop_front();
+                setStance(s, now);
+            }
+        }
+        if (stance != 0 && now - stanceSentAt >= kStanceRefreshMs) emitStance(now);
+        if (toMove() != opp() || plan.move == 0 || oppMoveAt < 0 || plan.touchAt < 0 || now >= plan.touchAt) return;
+        const bool away = forced > 0 || (stance != 0 && outing.empty());
+        const double ready = away ? HUGE_VAL : !outing.empty() ? outing.back().first + kRiseMs : seatedAt;
+        const double need = std::isfinite(ready) ? ready + kSeatedLeadMs : now + 1000.0;
+        if (plan.touchAt < need) delayMove(need - plan.touchAt);
+    }
+    // After our own reconnection: a stance other than Seated goes again at once.
+    void resendStance() { stanceSentAt = -1e300; }
+
     void start(double now) {
         g.moves.clear();
         g.running = 2;
@@ -786,6 +915,9 @@ struct Room {
         firstDeadline = now + kFirstMoveMs;
         chess.reset();
         looks.seedWith(g.id);
+        sitSilently();
+        seatedAt = 0;
+        stanceSentAt = -1e300;
         sendSnapshot();
         schedule(now);
     }
@@ -793,7 +925,11 @@ struct Room {
     void schedule(double now) {
         oppMoveAt = pressAt = -1;
         plan = Plan();
-        if (over || toMove() != opp()) return;
+        if (over) return;
+        if (toMove() != opp()) {
+            maybeStandUp(now);
+            return;
+        }
         int ply = int(g.moves.size());
         double t;
         if (ply < 2) {
@@ -806,6 +942,7 @@ struct Room {
             t = std::clamp(t, 450.0, 14000.0);
             t = std::min(t, std::max(150.0, left * 0.5));
         }
+        standDuringItsThink(now, t);
         oppMoveAt = now + t;
         planMove(now, t);
     }
@@ -879,6 +1016,22 @@ struct Room {
         yaw = std::atan2(-dx, -dz);   // > 0 to the left
         pitch = std::atan2(dy, std::sqrt(dx * dx + dz * dz));
     }
+    // Standing, its eyes are above the spot of its stance (anim/stance.h, as White sees the table)
+    // and its look is relative to its body, which faces the board (net/gesture.h).
+    static constexpr float kStandEyeAbovePelvis = 0.665f;
+    static constexpr float kStandEyeForward = 0.08f;
+    static m::vec3 standingEye(const anim::StanceSpot& spot) {
+        return spot.pelvis + m::vec3(0.0f, kStandEyeAbovePelvis, 0.0f) + spot.forward * kStandEyeForward;
+    }
+    void lookFromStance(const m::vec3& p, float& yaw, float& pitch) const {
+        if (stance == 0) return lookAt(p, yaw, pitch);
+        const anim::StanceSpot spot = anim::stanceSpot(anim::stanceFromCode(stance), 1.0f);
+        const m::vec3 d = p - standingEye(spot);
+        const m::vec3 left(spot.forward.z, 0.0f, -spot.forward.x);
+        const float ahead = d.x * spot.forward.x + d.z * spot.forward.z, aside = d.x * left.x + d.z * left.z;
+        yaw = std::atan2(aside, ahead);   // > 0 to the left
+        pitch = std::atan2(d.y, std::sqrt(ahead * ahead + aside * aside));
+    }
     // A square its eyes rest on for a while: a piece that can move, or where it could go (its own
     // while it thinks, the local player's while it waits), now and then its planned move.
     int pickFocus() {
@@ -891,7 +1044,8 @@ struct Room {
 
     // The fake's gesture: at once when its hand changes, otherwise at 4-6 Hz for its head, which
     // turns towards the piece in hand (then where it is aimed), its clock after pressing it, its
-    // scoresheet after a move, or wanders over the board; it leans in while it thinks.
+    // scoresheet after a move, or wanders over the board; it leans in while it thinks. Standing,
+    // its look wanders over the board only (never Glance nor Side), relative to its body.
     void gestures(double now) {
         if (oppAway) return;
         Gesture h = hand(now);
@@ -899,15 +1053,16 @@ struct Room {
                              (h.flags & proto::GestureFlag::Promoting) != (sent.flags & proto::GestureFlag::Promoting);
         if (!changed && now < nextLookAt) return;
         const bool thinking = toMove() == opp();
+        const bool seated = stance == 0;
         m::vec3 target;
         float leanTo = 0.2f;
         if (h.touch != Gesture::kNoSquare) {
             target = seatSquare(h.aim != Gesture::kNoSquare ? h.aim : h.touch);
             leanTo = 0.6f;
-        } else if (now < clockLookUntil) {
+        } else if (seated && now < clockLookUntil) {
             target = m::vec3(layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT, layout::CLOCK_Z);
             h.flags |= proto::GestureFlag::Side;
-        } else if (now < glanceUntil) {
+        } else if (seated && now < glanceUntil) {
             target = m::vec3(-layout::SCORESHEET_X, layout::TABLE_TOP_Y, layout::SCORESHEET_Z);
             h.flags |= proto::GestureFlag::Glance | proto::GestureFlag::Side;
         } else {
@@ -916,10 +1071,10 @@ struct Room {
                 nextFocusAt = now + double(looks.range(700.0f, 1600.0f));
             }
             target = seatSquare(focus);
-            leanTo = thinking ? 0.6f : 0.25f;
+            leanTo = !seated ? 0.35f : thinking ? 0.6f : 0.25f;
         }
         float yaw, pitch;
-        lookAt(target, yaw, pitch);
+        lookFromStance(target, yaw, pitch);
         headYaw += (yaw - headYaw) * 0.6f + looks.range(-0.015f, 0.015f);
         headPitch += (pitch - headPitch) * 0.6f + looks.range(-0.01f, 0.01f);
         headLean += (leanTo - headLean) * 0.12f;
@@ -1072,6 +1227,7 @@ struct Room {
         g.firstMoveMs = 0;
         over = true;
         oppMoveAt = drawAnswerAt = -1;
+        sitSilently();
         rematchExpires = now + 60000.0;
         emit(gameEvent(Event::Kind::GameEnd), kOneWay);
         if (onEnd) onEnd(*this);
@@ -1104,6 +1260,7 @@ struct Room {
                 event(PlayerReconnected, opp(), 0);
                 schedule(now);
             }
+            if (!oppAway) stanceTick(now);
             if (!oppAway && oppMoveAt >= 0 && now >= oppMoveAt && toMove() == opp()) {
                 oppMoveAt = -1;
                 if (g.autoPress) {
@@ -1219,6 +1376,7 @@ struct Room {
     void opponentLeaves(int seconds, double now) {
         if (over || oppAway) return;
         oppAway = true;
+        sitSilently();
         oppAwayUntil = now + seconds * 1000.0;
         oppGraceEnd = now + g.graceMs;
         (opp() == 0 ? g.whiteConnected : g.blackConnected) = false;
@@ -1447,6 +1605,7 @@ uint32_t digest(const std::string& fen) {
 }
 
 void opponentDrop(int seconds) { g_opponentDrop = std::max(1, seconds); }
+void forceOpponentStance(int stance) { g_forcedStance = std::clamp(stance, -1, 3); }
 void connectionDrop(int seconds) { g_connectionDrop = std::max(1, seconds); }
 void useManualClock(bool on) { g_manualClock = on; }
 bool manualClock() { return g_manualClock; }
@@ -1732,7 +1891,10 @@ struct FakeServer::Impl {
         w.account = account;
         w.serverName = "Scacelith (mock server)";
         rt(w, 1.0);
-        if (room && !room->over) room->sendSnapshot(2.0);
+        if (room && !room->over) {
+            room->sendSnapshot(2.0);
+            room->resendStance();   // a stance other than Seated goes again (after the snapshot)
+        }
         idleSince = lastNow;
     }
 
@@ -2764,6 +2926,7 @@ void FakeServer::rematch(uint64_t id, bool accept) {
     if (I.room && I.room->g.id == id) I.room->rematch(accept, I.lastNow);
 }
 void FakeServer::sendGesture(uint64_t, const Gesture&) {}   // the fake opponent does not watch
+void FakeServer::sendStance(uint64_t, uint8_t) {}
 
 bool FakeServer::poll(Event& out) {
     Impl& I = *impl_;
@@ -2968,6 +3131,7 @@ void FakeDirect::abortGame() { if (impl_->room) impl_->room->abort(nowMs()); }
 void FakeDirect::requestResync() { if (impl_->room) impl_->room->sendSnapshot(); }
 void FakeDirect::rematch(bool accept) { if (impl_->room) impl_->room->rematch(accept, nowMs()); }
 void FakeDirect::sendGesture(const Gesture&) {}   // the fake friend does not watch
+void FakeDirect::sendStance(uint8_t) {}
 const OnlineGame* FakeDirect::currentGame() const { return impl_->hasDelivered ? &impl_->delivered : nullptr; }
 int FakeDirect::pingMs() const { return impl_->state == DirectMatch::State::Playing ? 12 : -1; }
 double FakeDirect::serverNowMs() const { return nowMs(); }

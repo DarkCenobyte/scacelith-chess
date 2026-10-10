@@ -13,14 +13,17 @@
 //     away, the board is set at once behind a short dip of the lights (setReplayPosition): the one
 //     place in the game where the board changes without the robots' hands. Steps asked for while
 //     one runs are queued; a far jump cuts it short. Play (K) steps forward by itself, waiting for
-//     each comment to be said.
-//   - The review (analysis::GameReview) asks the scene's Stockfish for every position, the ones
-//     around the board first (a quick pass, then a deep one); its evaluations are kept in
+//     each comment to be decided and said.
+//   - The review (analysis::GameReview) asks the scene's Stockfish for every position: first those
+//     the comment waited for needs final (and, playing, the next position's), then the ones around
+//     the board (a quick pass, then a deep one); its evaluations are kept in
 //     <application data>/analysis/ (analysis/cache.h), so a game opened again shows them at once.
 //   - The commentator (analysis::Commentator) speaks on the key moments when a forward step
-//     reaches them, through a coach::Director performing on an AnalysisStage: the coach's TTS
-//     worker (one model loaded), a centred narrator's voice, the subtitles; its marks light in the
-//     coach's colours. N switches the comments off, M the voice, B the arrows of the better moves.
+//     reaches them: the comment waits for its evaluations as long as its position stays on the
+//     board (analysis::CommentWait), never said from provisional ones, never twice. It speaks
+//     through a coach::Director performing on an AnalysisStage: the coach's TTS worker (one model
+//     loaded), a centred narrator's voice, the subtitles; its marks light in the coach's colours.
+//     N switches the comments off, M the voice, B the arrows of the better moves.
 //   - The board shows the move that led to it: its symbol as a badge with a tint of its square, and
 //     the better move's arrow when the move was an inaccuracy, a mistake or a blunder.
 //   - The scoresheets carry the whole game from the start (the players wrote it); the clocks show
@@ -61,9 +64,6 @@ namespace {
 
 // Play: the stillness between two moves, without a comment and after one.
 constexpr float kPlayPause = 1.2f, kPlayPauseAfterComment = 0.8f;
-// A comment waits for the review of its moves at most this long (stepping by hand, and playing:
-// the review then follows the board, the comment comes within a few seconds).
-constexpr float kCommentWaitStep = 2.5f, kCommentWaitPlay = 12.0f;
 // A board set at once: the dip of the lights (setReplayPosition's is 0.4).
 constexpr float kJumpDip = 0.3f;
 // The review's searches in screenshot runs (--shot with --warp): short, and waited for, so that
@@ -122,8 +122,7 @@ struct AnalysisRuntime {
     // Comments.
     std::unique_ptr<AnalysisStage> stage;
     coach::Director director;
-    int commentPos = -1;                      // a forward step reached it: its comment, once decided
-    float commentWait = 0.0f;
+    analysis::CommentWait comments;           // a forward step reached it: its comment, once decided
     bool commented = false;                   // the last step's comment was played (Play's pause)
     bool welcomed = false;                    // the start's comment ("Let's look back at this game")
 
@@ -482,7 +481,7 @@ void GameScene::setupAnalysis() {
     a.step = AnalysisRuntime::Step::None;
     a.playing = false;
     a.still = 0.0f;
-    a.commentPos = -1;
+    a.comments.clear();
     a.subText.clear();
     int at = analysisAtArg_ >= 0 && round_ == 1 ? analysisAtArg_ : analysisAtEnd_ ? int(a.moves.size()) : 0;
     analysisAtEnd_ = false;
@@ -495,8 +494,7 @@ void GameScene::setupAnalysis() {
     a.welcomed = false;
     if (a.target == 0 && settings().analysisComments) {
         a.welcomed = true;
-        a.commentPos = 0;
-        a.commentWait = kCommentWaitStep;
+        a.comments.ask(0);
     }
 
     // The view: from the player's side, above the board (unless --cam says otherwise).
@@ -531,7 +529,7 @@ void GameScene::leaveAnalysis() {
     a.playing = false;
     a.step = AnalysisRuntime::Step::None;
     a.trips.clear();
-    a.commentPos = -1;
+    a.comments.clear();
     a.markPieces.clear();
     a.loaded = false;
 }
@@ -582,13 +580,19 @@ void GameScene::updateAnalysis(float dt) {
     const int plies = int(a.moves.size());
     auto handsIdle = [&] { return dest_.empty() && !anim_[0].busy() && !anim_[1].busy(); };
 
-    // ---- The review: one search at a time, the board's surroundings first.
+    // ---- The review: one search at a time, what the comment waited for needs first, then the
+    // board's surroundings.
     if (engineOk_) {
         int focus = int(game_.moves().size());
         if (!a.request) {
+            std::vector<int> urgent = a.comments.urgent(a.review, a.commentator);
+            // Playing: the next position's comment too, decided by the time its move is played.
+            if (a.playing && settings().analysisComments && focus < plies)
+                for (const int i : a.commentator.needs(a.review, focus + 1))
+                    if (std::find(urgent.begin(), urgent.end(), i) == urgent.end()) urgent.push_back(i);
             ai::AnalysisRequest req;
             int p = -1;
-            if (a.review.nextRequest(focus, req, p)) {
+            if (a.review.nextRequest(focus, req, p, urgent)) {
                 req.priority = -1;   // background work: never ahead of anything else
                 a.request = engine_.requestAnalysis(req);
                 a.requestPos = p;
@@ -679,31 +683,22 @@ void GameScene::updateAnalysis(float dt) {
         } else if (a.playing) {
             if (cur >= plies) {
                 a.playing = false;
-            } else if (a.commentPos < 0 && a.director.idle()) {
+            } else if (!a.comments.waitingComment() && a.director.idle()) {
                 a.still += dt;
                 if (a.still >= (a.commented ? kPlayPauseAfterComment : kPlayPause)) analysisGoTo(cur + 1);
             }
         }
     }
 
-    // ---- A comment waiting for the review of its moves.
-    if (a.commentPos >= 0) {
-        if (a.commentPos != int(game_.moves().size()) || !settings().analysisComments) {
-            a.commentPos = -1;
-        } else if (a.commentator.ready(a.review, a.commentPos)) {
-            analysis::Comment c = a.commentator.commentAt(a.review, a.commentPos);
-            if (!c.empty()) {
-                LOGI("analysis: comment at position %d (%d line%s)", a.commentPos, int(c.lines.size()), c.lines.size() == 1 ? "" : "s");
-                a.director.play(scriptOf(c));
-                a.commented = true;
-            }
-            a.commentPos = -1;
-        } else {
-            a.commentWait -= dt;
-            if (a.commentWait <= 0.0f) {
-                LOGI("analysis: the comment at position %d is left out (its review is not there yet)", a.commentPos);
-                a.commentPos = -1;
-            }
+    // ---- A comment waiting for the review of its moves: as long as its position is on the board.
+    if (a.comments.waiting()) {
+        analysis::Comment c;
+        if (!settings().analysisComments) {
+            a.comments.clear();
+        } else if (a.comments.poll(a.review, a.commentator, int(game_.moves().size()), !a.director.idle(), c)) {
+            LOGI("analysis: comment at position %d (%d line%s)", c.position, int(c.lines.size()), c.lines.size() == 1 ? "" : "s");
+            a.director.play(scriptOf(c));
+            a.commented = true;
         }
     }
 
@@ -755,7 +750,7 @@ void GameScene::analysisGoTo(int position) {
         return;
     }
     a.director.clear();
-    a.commentPos = -1;
+    a.comments.clear();
     a.still = 0.0f;
     a.commented = false;
     if (std::abs(position - cur) == 1 && a.step == AnalysisRuntime::Step::None && turn_ != Turn::AiMoving) {
@@ -828,10 +823,7 @@ void GameScene::analysisStepDone(bool forward) {
     a.still = 0.0f;
     a.commented = false;
     // A move played forward: its comment, once its review allows (never on a step back).
-    if (forward && cur > 0 && settings().analysisComments && engineOk_) {
-        a.commentPos = cur;
-        a.commentWait = a.playing ? kCommentWaitPlay : kCommentWaitStep;
-    }
+    if (forward && cur > 0 && settings().analysisComments && engineOk_) a.comments.ask(cur);
 }
 
 void GameScene::completeAnalysisMove(int seat, const Arbiter::Verdict& v) {
@@ -884,8 +876,7 @@ bool GameScene::analysisKey(const std::string& key) {
             a.step == AnalysisRuntime::Step::None) {
             // From the start: the welcome first, the first move once it is said.
             a.welcomed = true;
-            a.commentPos = 0;
-            a.commentWait = kCommentWaitPlay;
+            a.comments.ask(0);
         }
     } else if (key == "J" || key == "L") {
         a.playing = false;      // stepping pauses
@@ -900,7 +891,7 @@ bool GameScene::analysisKey(const std::string& key) {
         s.analysisComments = !s.analysisComments;
         if (!s.analysisComments) {
             a.director.clear();
-            a.commentPos = -1;
+            a.comments.clear();
         }
         s.save();
     } else if (key == "M") {

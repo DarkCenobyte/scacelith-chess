@@ -40,10 +40,26 @@
 //                   side below) | shakew | shakeb (down White's / Black's forearm) | shakeq (three-quarter view
 //                   from above); the shake* close-ups follow the two clasped hands through the pumps
 //   --only 0|1      draw White's (0) or Black's (1) robot only
-//   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
+//   --robot         draw the real porcelain robot instead of the capsule robots (slower start), with
+//                   the game's own table and chairs
 //   --solo          draw only the pieces held or within 6 cm of a playing index fingertip
 //   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
 //                   the log)
+// Stances (the 'stance' timeline: both robots idle at the table, no hand tasks; the chairs are drawn
+// where the robots pushed them):
+//   --stance s      White's stance from 0.3 s on: standing | side-left | side-right | seated
+//   --stances list  a script of stance changes, "t:who:stance,..." (who: w | b), e.g.
+//                   "0.3:w:standing,2.6:w:side-left,6:w:seated"; with --time t the shot freezes the
+//                   moment t (mid-rise, mid-walk...)
+//   --left w|b|wb   that robot plays with its left hand (its pose mirrored)
+//   --head p        White's head driven as a first-person player's: pitch p degrees (yaw 0)
+//   --pen           both robots pick up their pens first (a stance change lays it down again)
+//   --cam ex,ey,ez,tx,ty,tz[,fov]  a camera of its own: eye, target (world) and vertical fov (degrees)
+// Views for the stances: opp | oppb (White / Black seen from the other seat's eyes; the robot whose
+// eyes they are is not drawn), q3 | q3b (front three-quarter view of White / Black), q3r (rear
+// three-quarter view of White), end (the table's -X end, from beyond it), topw (the whole floor
+// round the table from above), stand | standb (White standing at its chair, from its left / from
+// behind), hips (White's hips and thighs from over the table).
 // Keys: Space pause, R restart, V next view, S slow motion, Escape quit (White's head follows the
 // action by itself).
 #include "../app/orbit_camera.h"
@@ -54,8 +70,11 @@
 #include "../render/materials/material_library.h"
 #include "../render/mesh.h"
 #include "../render/post/postfx.h"
+#include "../scene/furniture.h"
+#include "../scene/model.h"
 #include "animator.h"
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <deque>
@@ -520,7 +539,7 @@ vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the 
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
                         "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock",
                         "coachhand", "coachhands", "coachhandt", "shakex", "shakexl", "shakeu", "shaked", "shakew", "shakeb",
-                        "shakeq"};
+                        "shakeq", "opp", "oppb", "q3", "q3b", "end", "q3r", "topw", "stand", "standb", "hips"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -534,12 +553,33 @@ public:
         for (int i = 0; i < kViewCount; ++i)
             if (v == kViews[i]) view_ = i;
         demo_ = ctx.argValue("--demo", "default");
-        if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo" && demo_ != "coach") demo_ = "default";
+        stanceScript_ = ctx.argValue("--stances", "");
+        if (ctx.hasArg("--stance"))
+            stanceScript_ = "0.3:w:" + ctx.argValue("--stance", "standing") + (stanceScript_.empty() ? "" : "," + stanceScript_);
+        lefties_ = ctx.argValue("--left", "");
+        penStart_ = ctx.hasArg("--pen");
+        if (ctx.hasArg("--head")) {
+            headDriven_ = true;
+            headDrivenPitch_ = float(std::atof(ctx.argValue("--head", "0").c_str())) * DEG;
+        }
+        if (ctx.hasArg("--cam")) {
+            float v[7] = {0, 0, 0, 0, 0, 0, 40};
+            if (std::sscanf(ctx.argValue("--cam", "").c_str(), "%f,%f,%f,%f,%f,%f,%f", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6]) >= 6) {
+                customCam_ = true;
+                camPos_ = vec3(v[0], v[1], v[2]);
+                camTarget_ = vec3(v[3], v[4], v[5]);
+                camFov_ = v[6];
+            }
+        }
+        if (!stanceScript_.empty()) demo_ = "stance";
+        if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo" && demo_ != "coach" && demo_ != "stance") demo_ = "default";
         if (ctx.hasArg("--robot")) {
             robot_ = true;
             materials::init();
             character::setupRobotMaterials();
             gpuRobot_.upload(character::buildRobot());
+            tableModel_.upload(furniture::buildTable());
+            chairModel_.upload(furniture::buildChair());
         }
         if (ctx.hasArg("--selftest")) {
             selfTest();
@@ -594,10 +634,30 @@ public:
             r.submit(d);
         };
         draw(floor_, floorMat_, mat4(), 1, render::DRAW_STATIC);
-        draw(table_, tableMat_, mat4(), 2, render::DRAW_STATIC | render::DRAW_CAST_SHADOW);
+        // With --robot, the game's own furniture (the collision tests are written against it).
+        auto drawModel = [&](const GpuModel& gm, const mat4& model, uint32_t id) {
+            for (auto& p : gm.parts) {
+                render::DrawItem d;
+                d.mesh = &p.mesh;
+                d.material = &materials::get(p.material);
+                d.model = model;
+                for (int k = 0; k < 4; ++k) d.inst[k] = p.inst[k];
+                d.flags = p.flags;
+                d.objectId = id;
+                r.submit(d);
+            }
+        };
+        if (robot_) drawModel(tableModel_, mat4(), 2);
+        else draw(table_, tableMat_, mat4(), 2, render::DRAW_STATIC | render::DRAW_CAST_SHADOW);
         draw(boardLight_, boardLightMat_, mat4(), 3, render::DRAW_STATIC | render::DRAW_CAST_SHADOW);
         draw(boardDark_, boardDarkMat_, mat4(), 4, render::DRAW_STATIC);
-        draw(chairs_, tableMat_, mat4(), 5, render::DRAW_STATIC | render::DRAW_CAST_SHADOW);
+        for (int a = 0; a < 2; ++a) {
+            // Each chair where its robot pushed it (White's, at +Z, faces -Z).
+            const float zs = a == 0 ? 1.0f : -1.0f;
+            const mat4 at = translate(vec3(0.0f, 0.0f, zs * (layout::CHAIR_Z + anim_[a].chairSlide()))) * rotateY(a == 0 ? PI : 0.0f);
+            if (robot_) drawModel(chairModel_, at, 5);
+            else draw(chairs_, tableMat_, at, 5, render::DRAW_CAST_SHADOW);
+        }
         draw(clock_, clockMat_, mat4(), 6);
         for (int i = 0; i < 2; ++i) {
             float down = (clockSide_ == i) ? -0.004f : 0.0f;
@@ -610,6 +670,7 @@ public:
         if (sheets_) renderSheets(draw);
         for (int a = 0; a < 2; ++a) {
             if (only_ == 1 - a) continue;
+            if ((view_ == 36 && a == 1) || (view_ == 37 && a == 0)) continue;   // the viewer's own robot
             // Last frame's bones give the moving parts their own motion vectors (as in the game), so
             // the temporal filters (TAA, GTAO, SSR) keep their history on a moving hand.
             const mat4* g = anim_[a].globals();
@@ -642,13 +703,12 @@ private:
             dark.append(prim::box({layout::SQUARE_SIZE * 0.5f, 0.0004f, layout::SQUARE_SIZE * 0.5f}), translate(c));
         }
         boardDark_.upload(dark, "board-dark");
+        // One chair in its own space (as furniture::buildChair: the seat over the origin, facing +Z),
+        // drawn per seat where its robot pushed it.
         MeshData ch;
-        for (int s = 0; s < 2; ++s) {
-            float z = (s == 0 ? 1.0f : -1.0f) * layout::CHAIR_Z;
-            ch.append(rbox({0, layout::SEAT_HEIGHT - 0.03f, z}, {0.22f, 0.03f, 0.21f}, 0.01f));
-            ch.append(rbox({0, layout::SEAT_HEIGHT * 0.5f - 0.03f, z}, {0.03f, layout::SEAT_HEIGHT * 0.5f - 0.03f, 0.03f}, 0.005f));
-            ch.append(rbox({0, layout::SEAT_HEIGHT + 0.27f, z + (s == 0 ? 0.21f : -0.21f)}, {0.21f, 0.24f, 0.02f}, 0.01f));
-        }
+        ch.append(rbox({0, layout::SEAT_HEIGHT - 0.03f, 0.0f}, {0.22f, 0.03f, 0.21f}, 0.01f));
+        ch.append(rbox({0, layout::SEAT_HEIGHT * 0.5f - 0.03f, 0.0f}, {0.03f, layout::SEAT_HEIGHT * 0.5f - 0.03f, 0.03f}, 0.005f));
+        ch.append(rbox({0, layout::SEAT_HEIGHT + 0.27f, -0.21f}, {0.21f, 0.24f, 0.02f}, 0.01f));
         chairs_.upload(ch, "chairs");
         clock_.upload(rbox({layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT * 0.5f, layout::CLOCK_Z},
                            {layout::CLOCK_DEPTH * 0.5f, layout::CLOCK_HEIGHT * 0.5f, layout::CLOCK_WIDTH * 0.5f}, 0.006f),
@@ -819,11 +879,14 @@ private:
     void reset() {
         hasPrevGlobals_[0] = hasPrevGlobals_[1] = false;
         initialPieces(pieces_);
-        const bool lefty = demo_ != "default";   // the game's layout: Black's clock is on its left
-        sheets_ = demo_ == "lefty";
+        const bool stance = demo_ == "stance";
+        const bool lefty = demo_ != "default" && !stance;   // the game's layout: Black's clock is on its left
+        sheets_ = demo_ == "lefty" || (stance && penStart_);
         const float pz = layout::PLAYER_PELVIS_Z, py = layout::PLAYER_PELVIS_Y;
-        anim_[0].init(*sk_, vec3(0, py, pz), 1.0f);
-        anim_[1].init(*sk_, vec3(0, py, -pz), -1.0f, lefty ? Side::Left : Side::Right);
+        const bool leftW = stance && lefties_.find('w') != std::string::npos;
+        const bool leftB = lefty || (stance && lefties_.find('b') != std::string::npos);
+        anim_[0].init(*sk_, vec3(0, py, pz), 1.0f, leftW ? Side::Left : Side::Right);
+        anim_[1].init(*sk_, vec3(0, py, -pz), -1.0f, leftB ? Side::Left : Side::Right);
         if (lefty) {
             // As the game does: the playing hands rest on the clock side, in front of the body.
             anim_[0].setRestHand(vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, layout::REST_HAND_Z));
@@ -842,6 +905,7 @@ private:
         chainArmed_ = false;
         if (demo_ == "lefty") scriptLefty();
         if (demo_ == "coach") scriptCoach();
+        if (demo_ == "stance") scriptStance();
         if (demo_ == "lcastle") {
             pieces_[29].xf = pieces_[30].xf = translate(vec3(3.0f, 0.0f, 0.0f));   // f8, g8 gone
             at(0.5f, [this] {
@@ -1007,6 +1071,38 @@ private:
         w.pageCorner = [a](float s) { return pageCorner(a, s); };
         anim_[a].setWritingRest(rowBase(a, 0, 0) + padFrame(a).up * 0.004f);
         anim_[a].enqueueWriting(w);
+    }
+    // ---- the stance timeline: "t:who:stance,..." (see the header comment)
+    static bool parseStance(const std::string& n, anim::Stance& out) {
+        if (n == "seated") out = anim::Stance::Seated;
+        else if (n == "standing") out = anim::Stance::Standing;
+        else if (n == "side-left") out = anim::Stance::SideLeft;
+        else if (n == "side-right") out = anim::Stance::SideRight;
+        else return false;
+        return true;
+    }
+    void scriptStance() {
+        if (penStart_) at(0.0f, [this] { pickPen(0); pickPen(1); });
+        size_t pos = 0;
+        while (pos < stanceScript_.size()) {
+            size_t end = stanceScript_.find(',', pos);
+            if (end == std::string::npos) end = stanceScript_.size();
+            const std::string item = stanceScript_.substr(pos, end - pos);
+            pos = end + 1;
+            const size_t c1 = item.find(':');
+            const size_t c2 = c1 == std::string::npos ? c1 : item.find(':', c1 + 1);
+            anim::Stance st = anim::Stance::Seated;
+            if (c2 == std::string::npos || !parseStance(item.substr(c2 + 1), st)) {
+                LOGW("anim viewer: bad stance step '%s' (t:who:stance)", item.c_str());
+                continue;
+            }
+            const float t = float(std::atof(item.substr(0, c1).c_str()));
+            const int who = item.substr(c1 + 1, c2 - c1 - 1) == "b" ? 1 : 0;
+            at(t, [this, who, st] {
+                anim_[who].setStance(st);
+                LOGI("anim viewer: %s asks for stance %d at t=%.3f", who ? "Black" : "White", int(st), simTime_);
+            });
+        }
     }
     // The game's layout: White right-handed, Black left-handed, both write with the other hand.
     void scriptLefty() {
@@ -1252,6 +1348,17 @@ private:
                 case EventType::HandshakeClasp:
                     LOGI("anim viewer: handshake clasp (%d) at t=%.4f", a, e.time);
                     break;
+                case EventType::Footstep:
+                case EventType::ChairPushed:
+                case EventType::ChairPulled:
+                case EventType::StanceReached:
+                    LOGI("anim viewer: %s %s at t=%.4f (%.3f %.3f %.3f) tag %d", a ? "Black" : "White",
+                         e.type == EventType::Footstep      ? "footstep"
+                         : e.type == EventType::ChairPushed ? "pushes its chair back"
+                         : e.type == EventType::ChairPulled ? "draws its chair in"
+                                                            : "reaches its stance",
+                         e.time, e.position.x, e.position.y, e.position.z, e.tag);
+                    break;
                 case EventType::PenPicked:
                 case EventType::PenPut:
                     if (e.type == EventType::PenPut) sheet_[a].penTable = e.transform;
@@ -1277,6 +1384,17 @@ private:
     void step(float dt) {
         simTime_ += dt;
         script();
+        if (demo_ == "stance") {
+            // No hand tasks: the robots look about by themselves (White as a first-person player
+            // with --head), and their pens follow them as in the lefty timeline.
+            if (headDriven_) anim_[0].setHeadOverride(true, 0.0f, headDrivenPitch_);
+            for (int a = 0; a < 2; ++a) {
+                std::vector<anim::Event> ev;
+                anim_[a].update(dt, ev);
+                handleEvents(a, ev);
+            }
+            return;
+        }
         if (demo_ == "coach") {
             // The coach looks at the player (its gestures take its eyes to their targets), speaks
             // with the synthetic envelope; the player watches the coach's hand, else its face.
@@ -1496,6 +1614,10 @@ private:
             c.lookAt(target, up);
             focus_ = length(target - pos);
         };
+        if (customCam_) {
+            look(camPos_, camTarget_, camFov_);
+            return c;
+        }
         switch (view_) {
             case 0: look({1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
             case 1: look({-1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
@@ -1623,6 +1745,25 @@ private:
                 }
                 break;
             }
+            case 36:
+            case 37: {
+                // One seat's robot seen from the other seat's eyes (what an online opponent sees).
+                const float zs = view_ == 36 ? 1.0f : -1.0f;   // the robot looked at sits on this side
+                look({0.0f, 1.23f, -zs * (layout::PLAYER_PELVIS_Z - 0.08f)}, {0.0f, 1.12f, zs * 0.40f}, 64);
+                break;
+            }
+            case 38:
+            case 39: {   // front three-quarter view of White's / Black's robot
+                const float zs = view_ == 38 ? 1.0f : -1.0f;
+                look({-1.75f * zs, 1.50f, -zs * 0.95f}, {-0.20f * zs, 0.95f, zs * 0.45f}, 46);
+                break;
+            }
+            case 40: look({-2.70f, 1.40f, -0.55f}, {-0.50f, 0.85f, 0.25f}, 50); break;
+            case 41: look({-1.55f, 1.45f, 2.10f}, {-0.15f, 0.92f, 0.45f}, 46); break;
+            case 42: look({0.0f, 4.20f, 0.30f}, {0.0f, 0.0f, 0.30f}, 44, vec3(0, 0, -1)); break;
+            case 43: look({-2.30f, 1.10f, 1.00f}, {0.0f, 0.92f, 0.72f}, 46); break;   // White standing, from its left
+            case 44: look({0.55f, 1.25f, 2.60f}, {0.0f, 0.95f, 0.72f}, 46); break;    // White standing, from behind
+            case 45: look({-0.55f, 0.95f, 0.05f}, {0.0f, 0.80f, 0.70f}, 40); break;   // White's hips, from over the table
             default: {
                 render::Camera oc = orbit_.camera();
                 focus_ = orbit_.distance;
@@ -1654,6 +1795,13 @@ private:
     std::string demo_ = "default";
     bool robot_ = false;
     character::GpuRobot gpuRobot_;
+    GpuModel tableModel_, chairModel_;
+    std::string stanceScript_, lefties_;           // the 'stance' timeline's options
+    bool headDriven_ = false, penStart_ = false;
+    float headDrivenPitch_ = 0.0f;
+    bool customCam_ = false;                       // --cam
+    vec3 camPos_{0, 0, 0}, camTarget_{0, 0, 0};
+    float camFov_ = 40.0f;
     Mesh padMesh_, lineMesh_, penMesh_, inkMesh_[2], pageMesh_[2], pageFlat_[2];
     Material paperMat_, lineMat_, inkMat_, penMat_;
 

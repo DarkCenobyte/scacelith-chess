@@ -53,6 +53,14 @@
 // the commentator's comments on the key moments (voice and subtitles). K plays / pauses, J / L one
 // move back / forward, Home / End, N the comments, M the voice, B the arrows.
 //
+// Standing up (anim/stance.h, the rules in stance_control.h): during a game the first-person
+// player gets up with the arrow keys (Up: in front of the chair, Left / Right: at that end of the
+// table, Down: back in the chair). Only a seated player plays: standing, nothing on the board or
+// the clock answers (a notice says to sit down), the scoresheet waits, the clock keeps running.
+// The view rides the robot's eyes and aims at the board from wherever it stands. Online the
+// opponent sees the robot get up (GameLink::sendStance) and their robot does the same. At the end
+// of a game everyone sits back down before the handshake.
+//
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
@@ -88,6 +96,9 @@
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
 //                           --touch <square> touches that piece once the handshake is over
 //   --start-online direct   with --online-mock: a direct match against the fakes' friend
+//   --mock-stance standing|side-left|side-right   with --online-mock: the fake opponent stands
+//                           there (net::mock::forceOpponentStance; F11 in a mock game cycles it:
+//                           its own outings, standing, left, right, seated)
 //   --play-then a,b,...     once the --play moves are made, the player picks these in the Esc menu,
 //                           one per turn: resign, leave (Main menu), takeback (coach games)
 //   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
@@ -98,6 +109,8 @@
 //                           position N; --replay-keys J,L,K,Home,End,N,M,B,Goto:N,Wait:S,Leave)
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
+//   --stance standing|side-left|side-right   the local first-person player takes that stance
+//                           once the game is Playing and the --play moves are made (screenshots)
 //   --calibrate             the brightness calibration before the title page, as on a first start
 #pragma once
 #include "../ai/engine.h"
@@ -117,6 +130,7 @@
 #include "physical_board.h"
 #include "replay.h"
 #include "scorekeeper.h"
+#include "stance_control.h"
 #include "turn.h"
 #include "world.h"
 #include <ctime>
@@ -229,6 +243,20 @@ private:
     void completeMove(int seat);
     void answerAiDrawOffer(int offeringSeat);
     void handleEvents(int seat, std::vector<anim::Event>& events);
+
+    // ---- standing up (stance_control.h) ----
+    // The seat's player may play: its robot is in the chair and not asked to get up.
+    bool seatMayPlay(int seat) const;
+    // The seat's stance target (anim::Animator::setStance), its scoresheet's hold at once (a move
+    // recorded later in the same frame waits for the robot to sit down).
+    void setSeatStance(int seat, anim::Stance target);
+    // The seat's writing waits while it may not play or hot-seat holds it (Scorekeeper::setHold).
+    void syncWritingHold(int seat);
+    void setHotSeatHold(int seat, bool hold);
+    // The arrow keys of the first-person player, and --stance (Playing, once per frame).
+    void updateStanceInput();
+    void applyStanceArg();
+    void noticeSitToPlay();                    // the player tried to play standing (rate-limited)
 
     // ---- physical actions ----
     void humanTouch(int pieceId);
@@ -370,6 +398,10 @@ private:
     bool remoteMoveQueued(int ply) const;     // the opponent's MoveMade of that ply waits for the robot
     void settleRemoteTakeBack();
     bool driveRemoteHead(float dt);
+    // Stances (protocol minor 2): mine to the authority, the opponent's on their robot (once per
+    // frame, inside updateOnline); 'seated' sets theirs to Seated at once (their move, the end).
+    void updateStances(float dt);
+    void opponentSeated();
     void recordOnline(int ply);               // scoresheets: every move up to 'ply'
     void onlineResult();                      // result texts of og_ (endGame)
     void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
@@ -602,6 +634,9 @@ private:
         // has been below it since the last reset, and the lift goes into pitch when a drag starts.
         bool lookUpArmed = false;
         float lookUpLift = 0.0f;
+        // Standing (stance_control.h): 0 = the seated base look, 1 = the look at the board's
+        // centre from the eyes; yaw and pitch are offsets from that base.
+        float standBlend = 0.0f;
     };
     Look look_[2];
     // S: the player whose eyes are the view looks at their own scoresheet. One state for the
@@ -619,6 +654,14 @@ private:
     m::Rng rng_{1};
     float armSeeThrough_ = 0.0f;   // player's playing arm: 0 opaque .. 1 see-through (piece in hand)
     int armSeeThroughSeat_ = 0;    // whose arm it is (the player who carried the piece)
+
+    // Standing up (stance_control.h)
+    bool hotSeatHold_[2] = {false, false};   // hot-seat's own hold of each scoresheet (with the stance's)
+    bool stoodThisGame_ = false;             // the first stand of a game has had its notice
+    stance::NoticeLimiter sitNotice_{2.5f};   // "Sit back down to play"
+    stance::NoticeLimiter busyNotice_{2.5f};  // "Finish your move first"
+    anim::Stance stanceArg_ = anim::Stance::Seated;   // --stance
+    bool stanceArgPending_ = false;           // --stance not applied yet (once per run)
 
     // Viewer mode
     ObserverCamera observer_;
@@ -702,6 +745,7 @@ private:
     std::string pendingFen_;            // the position before it (the authority checks its digest)
     uint32_t pendingThinkMs_ = 0;
     live::ClockFreeze clockFreeze_;     // my clock display while my move is on its way
+    live::MoveRetry moveRetry_;         // my move refused as rate limited: the state asked for again
     ClockDisplay leaveClock_;           // the clock as the game was left (the fade to the menu)
     bool virtualTime_ = false;          // screenshots, --warp: localMs() follows the simulated time
     // Manual clock press (og_.autoPress off): my move stands on the board until my press.
@@ -736,6 +780,9 @@ private:
     bool remoteHeadOn_ = false;         // the opponent's head drives their robot's (head override)
     bool remoteGlancing_ = false;       // they look at their scoresheet: their writing hand waits aside
     float remoteGlanceBlend_ = 0.0f;
+    live::StanceTracker stanceTracker_; // the opponent's stance (OpponentStance events)
+    anim::Stance remoteShown_ = anim::Stance::Seated;   // the stance their robot is given (updateStances)
+    int mockStance_ = -1;               // --mock-stance / F11: the fake opponent's held stance (-1: its own)
     bool resync_ = false;               // rebuild once the robots are idle
     bool rebuildFade_ = false;
     bool endPending_ = false;           // GameEnd received, shown once the moves are played

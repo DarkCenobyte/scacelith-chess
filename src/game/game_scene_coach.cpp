@@ -1221,7 +1221,10 @@ void GameScene::coachHudFrame() {
     const int acceptKey = hud.hintOffer ? int('H') : int(plat::KEY_BACKSPACE);
     if (hud.offer && act == ui::CoachHudAction::None && !ui::wantsKeyboard() && in.keyPressed[acceptKey])
         act = ui::CoachHudAction::TakeBack;
-    if (hud.offer && act == ui::CoachHudAction::None && in.mousePressed[plat::MOUSE_LEFT] && !ui::wantsMouse() && !dragging_) {
+    // Standing up (stances), the player answers neither way: the hands wait until seated again.
+    bool mayPlay = seatMayPlay(inputSeat());
+    if (hud.offer && act == ui::CoachHudAction::None && in.mousePressed[plat::MOUSE_LEFT] && !ui::wantsMouse() && !dragging_ &&
+        mayPlay) {
         int pid = pickPiece(mouseRay());
         const PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
         if (p && p->color == humanColor_) {
@@ -1231,6 +1234,11 @@ void GameScene::coachHudFrame() {
             rt.offerShown = false;
             if (rt.sessionRunning) rt.session.onPlayerActive();
         }
+    }
+    if (act == ui::CoachHudAction::TakeBack && !mayPlay) {
+        // The moves go back by hand: sit down first.
+        noticeSitToPlay();
+        act = ui::CoachHudAction::None;
     }
     if (act != ui::CoachHudAction::None) {
         bool accept = act == ui::CoachHudAction::TakeBack;

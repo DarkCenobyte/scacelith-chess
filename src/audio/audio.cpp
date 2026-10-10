@@ -657,6 +657,8 @@ m::vec3 defaultPosition(Sfx s) {
         case Sfx::Handshake: return m::vec3(0.0f, 1.0f, 0.0f);
         case Sfx::ServoShort: return m::vec3(0.2f, 1.1f, -0.55f);   // opponent's right shoulder
         case Sfx::ChairCreak: return m::vec3(0.0f, layout::SEAT_HEIGHT, -layout::CHAIR_Z);
+        case Sfx::Footstep: return m::vec3(0.3f, 0.0f, -layout::CHAIR_Z);              // the opponent getting up
+        case Sfx::ChairSlide: return m::vec3(0.0f, 0.0f, -layout::CHAIR_Z - 0.15f);   // their chair's legs
         case Sfx::PenWrite:
         case Sfx::PenTap:
         case Sfx::PageTurn:

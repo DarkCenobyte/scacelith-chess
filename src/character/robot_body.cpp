@@ -3,8 +3,10 @@
 // Joint scheme: every articulation is a dark ball (RobotJoint) centred on the child bone's pivot.
 // Both porcelain shells end in concave sockets around it with a small gap; the flexion side of
 // each rim is bevelled so hinge-like joints (elbow, knee, ankle) can fold without the shells
-// meeting. Hips are the exception: the pelvis carries a convex porcelain hip cover and the thigh a
-// concave cup around it (ball-jointed doll style), so the hip never opens in any direction.
+// meeting. Hips are the exception (ball-jointed doll style): the thigh ends in a porcelain ball
+// around the hip pivot and the pelvis covers it from above, behind and outside, leaving room for
+// every way the thigh turns (seated, rising, standing, walking). Turning in place, the ball never
+// opens a gap, whatever the pose.
 #include "robot_build.h"
 
 using namespace m;
@@ -18,7 +20,8 @@ constexpr float kGap = 0.0010f;  // clearance between a shell and the ball it wr
 // Joint radii shared by the parts that meet at a joint.
 constexpr float kShoulderBall = 0.0300f;
 constexpr float kElbowBall = 0.0255f;
-constexpr float kHipCover = 0.0600f;   // convex hip cover of the pelvis around the hip pivot
+constexpr float kHipBall = 0.0680f;  // the thigh's porcelain ball round the hip pivot
+constexpr float kHipGap = 0.0030f;   // the pelvis socket stands off the thigh's ball (a visible seam)
 constexpr float kKneeBall = 0.0340f;
 constexpr float kKneeCap = kKneeBall + kGap + 0.0100f;  // outer radius of the knee cap shell
 constexpr float kAnkleBall = 0.0255f;
@@ -104,8 +107,8 @@ float thighShell(const vec3& p) {
     d = sdf::smin(d, sdf::ellipsoid(p - vec3(-0.004f, 0.018f, 0.20f), vec3(0.052f, 0.040f, 0.15f)), 0.03f);
     d = sdf::smax(d, p.x - 0.058f, 0.03f);
     d = sdf::smax(d, -(p.y + 0.066f), 0.03f);
-    // Hip: concave cup around the pelvis' hip cover.
-    d = sdf::smax(d, (kHipCover + kGap) - length(p), 0.003f);
+    // Hip: the ball the thigh turns on, inside the pelvis' socket.
+    d = sdf::smin(d, sdf::sphere(p, kHipBall), 0.006f);
     // Knee: a sleeve over the shin's knee cap, lips a little past the pivot, underside bevelled.
     vec3 k = p - kKnee;
     d = sdf::smin(d, sdf::sphere(k, kKneeCap + kGap + 0.0050f), 0.016f);  // cuff: the wall never gets thin
@@ -152,22 +155,42 @@ float footShell(const vec3& p) {
 }
 
 // ---- torso ---------------------------------------------------------------------------------------
+// The room a thigh needs (hip space, the left hip: +X outwards): its tube, from the hip's pivot
+// plane on, turned through the range of the animations (flexion from slightly behind straight down
+// to forward seated, a little in and out). Inner side flat, as the thigh's.
+float legRoom(const vec3& h) {
+    constexpr float kFlex0 = -8.0f * DEG, kFlex1 = 95.0f * DEG, kAbd0 = -8.0f * DEG, kAbd1 = 10.0f * DEG;
+    constexpr float kOut = 0.077f, kIn = 0.064f, kFrontBack = 0.070f;
+    const float r = std::max(length(h), 1e-6f);
+    const float flex = clamp(std::atan2(h.z, -h.y), kFlex0, kFlex1);
+    const float abd = clamp(std::asin(clamp(h.x / r, -1.0f, 1.0f)), kAbd0, kAbd1);
+    const vec3 u(std::sin(abd), -std::cos(abd) * std::cos(flex), std::cos(abd) * std::sin(flex));
+    const float along = dot(h, u);
+    const vec3 v = h - u * along;
+    const vec3 ex = normalize(vec3(1, 0, 0) - u * u.x);
+    const float px = dot(v, ex), py = length(v - ex * px);
+    const float rx = px > 0.0f ? kOut : kIn;
+    const float tube = (length(vec2(px / rx, py / kFrontBack)) - 1.0f) * std::min(rx, kFrontBack);
+    return std::max(tube, -along);
+}
+
 float pelvisShell(const vec3& p) {
     float d = sdf::roundBox(p - vec3(0, -0.028f, -0.018f), vec3(0.125f, 0.068f, 0.086f), 0.055f);
     float ax = std::fabs(p.x);
     vec3 pm(ax, p.y, p.z);
-    // Buttocks and hip covers (convex spheres the thigh cups turn around).
+    vec3 h = pm - kHip;
+    // Buttocks, and the hips' flare over the outer side of the balls.
     d = sdf::smin(d, sdf::ellipsoid(pm - vec3(0.060f, -0.050f, -0.050f), vec3(0.068f, 0.050f, 0.062f)), 0.03f);
-    d = sdf::smin(d, sdf::sphere(pm - kHip, kHipCover), 0.02f);
+    d = sdf::smin(d, sdf::ellipsoid(h - vec3(0.010f, 0.010f, -0.010f), vec3(0.086f, 0.074f, 0.082f)), 0.03f);
     // Seat contact is flat.
     d = sdf::smax(d, -(p.y + 0.098f), 0.02f);  // 2 mm above the seat top: no coplanar contact
     // Waist: taper towards the core, open on top.
     d = sdf::smax(d, p.y - 0.080f, 0.012f);
-    // Room for the thighs: remove the thigh tube beyond the hip cover.
-    vec3 h = pm - kHip;
-    float tube = std::max(length(vec2(h.x, h.y * 1.1f)) - 0.078f, -h.z);
-    float thighRoom = sdf::smax(tube, (kHipCover + kGap) - length(h), 0.004f);
-    d = sdf::smax(d, -thighRoom, 0.004f);
+    // Hip sockets around the balls, and room for the thighs.
+    d = sdf::smax(d, (kHipBall + kHipGap) - length(h), 0.004f);
+    d = sdf::smax(d, -legRoom(h), 0.008f);
+    // The crotch ends between the balls, rounded.
+    d = sdf::smax(d, -std::max(ax - 0.030f, p.y + 0.062f), 0.010f);
     return d;
 }
 
@@ -293,7 +316,7 @@ void buildTorso(Sink& s) {
         PorcelainLook look;
         look.seams[0] = seamPlane(vec3(0, 1, -0.4f), vec3(0, 0.02f, 0.06f));
         s.addPorcelain("pelvis", Pelvis, [] {
-            return sdf::meshVolume(pelvisShell, {vec3(0, -0.03f, -0.02f)}, vol("pelvis", vec3(0, 1, 0), 0.0024f, 0.00016f, 0.020f));
+            return sdf::meshVolume(pelvisShell, {vec3(0, -0.03f, -0.02f)}, vol("pelvis", vec3(0, 1, 0), 0.0018f, 0.00014f, 0.016f));
         }, false, look);
     }
     s.addJoint("waist", Spine1, [] {

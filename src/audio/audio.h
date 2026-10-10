@@ -44,6 +44,9 @@ enum class Sfx {
     PenTap,          // ballpoint tip touching the paper (tiny tick through the pad)
     PageTurn,        // page pinched at its corner, lifted and swung over the top edge (~1 s)
     PageFlap,        // the turned page landing face down on the stack
+    // Additive: a player standing up (anim/stance.h).
+    Footstep,        // a robot's soft-soled step on the marble floor (heel, then the ball of the foot)
+    ChairSlide,      // a chair pushed back or drawn in, its wooden legs sliding over the floor
     Count
 };
 

@@ -3,4 +3,4 @@
 # tools/interop/check-game.sh on this checkout and the live online tests against it. Move it forward
 # together with every change of the contract (protocol, shared fixtures, chess rules), to a server
 # commit that passes both. The server pins this game the same way (its tools/interop/game-revision).
-693ed341a34fca50a3b9598ee9507de2d3a7840f
+1f0dcc5fa88307d5e79448261737f9f141783fe1

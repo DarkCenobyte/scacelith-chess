@@ -14,8 +14,11 @@
 // symbols appear within seconds, then the deep pass (Settings::deepDepth) that makes them final.
 // Each pass serves the positions around the one on the board first (focus, focus + 1, focus - 1,
 // focus + 2 ...), then the rest from the start: nextRequest() is asked again after every result,
-// so following the player as they move about the game costs nothing. A position without a legal
-// move (checkmate, stalemate) needs no search: it is known from the start.
+// so following the player as they move about the game costs nothing. Ahead of both passes come
+// the urgent positions the caller names: those the comment waited for on the board needs final
+// (Commentator::needs), quick then deep, so that it never waits for the whole quick pass of a
+// long game. A position without a legal move (checkmate, stalemate) needs no search: it is known
+// from the start.
 //
 // Move classes and symbols (verdict()):
 //   - coach::judge (lichess win-percentage model) gives the class from the best move's score and
@@ -135,9 +138,11 @@ public:
     const chess::Game& game() const { return game_; }   // the whole game (SAN, positions)
 
     // The next search to run: the request and the position it is for. 'focus' is the position on
-    // the board. False when every position is final (or failed). A position already handed out and
+    // the board; 'urgent' the positions wanted final before anything else, in order (the comment
+    // waited for: their quick searches first, then their deep ones; out-of-range entries are
+    // ignored). False when every position is final (or failed). A position already handed out and
     // not answered yet is not handed out again until accept() or fail() comes for it.
-    bool nextRequest(int focus, ai::AnalysisRequest& out, int& position);
+    bool nextRequest(int focus, ai::AnalysisRequest& out, int& position, const std::vector<int>& urgent = {});
     void accept(int position, const ai::Analysis& a);   // a result (ok false = fail)
     void fail(int position);                            // never analysable: left out
     // A pending request was dropped (the scene cancelled it): the position can be handed out again.

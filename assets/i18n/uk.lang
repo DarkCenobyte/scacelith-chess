@@ -130,6 +130,12 @@ controls.look.keys = Права кнопка, утримувати
 controls.look = Роззирнутися
 controls.sheet.keys = S
 controls.sheet = Подивитися на свій бланк і назад
+controls.stand.keys = ↑
+controls.stand = Підвестися перед своїм стільцем
+controls.side.keys = ←  /  →
+controls.side = Стати біля лівого / правого кінця стола
+controls.sit.keys = ↓
+controls.sit = Сісти назад (грають лише сидячи)
 controls.moves.keys = Tab
 controls.moves = Показати або сховати ходи
 controls.menu.keys = Esc
@@ -322,6 +328,10 @@ notify.manual_clock = У цій партії натискайте на годи�
 notify.illegal = Неможливий хід.
 notify.cannot_move = Такий хід зробити не можна.
 notify.move_first = Зробіть хід, перш ніж натискати на годинник.
+notify.stance.sit_to_play = Сядьте, щоб грати (стрілка вниз).
+notify.stance.first = Годинник іде, поки ви стоїте. Стрілка вниз: сісти назад.
+notify.stance.first_untimed = Грати можна лише сидячи. Стрілка вниз: сісти назад.
+notify.stance.finish_move = Спершу завершіть хід.
 notify.draw_already_offered = Ви вже пропонували нічию на цьому ході.
 notify.draw_accepted = Суперник погоджується на нічию.
 notify.draw_declined = Суперник відхиляє пропозицію нічиєї.
@@ -515,6 +525,8 @@ options.online.test = Перевірити зв’язок
 options.online.test_ok = {0}: підключено, сумісний із цією версією.
 options.online.test_incompatible = {0}: підключено, але потрібна інша версія Scacelith.
 options.online.in_game = Сервер не можна змінити під час онлайн-партії.
+options.online.remember_session = Запам’ятовувати вхід, якщо системна в’язка ключів недоступна
+options.online.remember_session.help = Якщо жодна системна в’язка ключів (GNOME Keyring, KWallet…) не може зберегти ваш сеанс, він зберігається у файлі, який може прочитати лише ваш обліковий запис у системі. Будь-хто, хто може прочитати ваші файли або їхню копію (наприклад, резервну), зможе скористатися цим сеансом. Вимкнено: вхід діє до закриття гри. Завершити сеанс будь-якого пристрою можна в розділі «Активні сеанси» вашого облікового запису.
 
 # Sign in, create an account
 online.signin.lead = Увійдіть на {0}, щоб грати з людьми онлайн.
@@ -637,6 +649,8 @@ online.account.delete = Видалити обліковий запис
 
 # Play
 online.play.signed_in = Ви увійшли як {0}
+online.session.file = Системна в’язка ключів не змогла зберегти ваш вхід: його запам’ятано у файлі, який може прочитати лише ваш обліковий запис у системі (Налаштування > Онлайн-сервер).
+online.session.memory = Системна в’язка ключів не змогла зберегти ваш вхід, і його не збережено в жодному файлі: вхід діє до закриття гри (Налаштування > Онлайн-сервер).
 online.play.find_section = ПОШУК СУПЕРНИКА
 online.play.friend_section = ГРА З ДРУГОМ
 online.play.mode = Партія

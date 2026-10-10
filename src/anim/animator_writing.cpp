@@ -1050,7 +1050,7 @@ bool Animator::Impl::nextWriteBoundary(float& t) const {
         t = wr.start + wr.T;
         return true;
     }
-    if (wr.queue.empty()) return false;
+    if (wr.queue.empty() || !seatedNow()) return false;   // (tasks start only while seated)
     t = std::max(time, wr.suspendUntil);
     return true;
 }
@@ -1240,6 +1240,7 @@ void Animator::setWritingRest(vec3 worldPos) {
 
 void Animator::enqueueWriting(const WriteTask& t) {
     Impl& I = *impl_;
+    if (!I.seatedNow()) I.stanceTarget = Stance::Seated;   // it sits down first (see enqueue)
     WriteTask c = t;   // into the solver's world
     c.frame = I.mm(t.frame);
     for (PenKey& k : c.path) k.tip = I.mw(k.tip);

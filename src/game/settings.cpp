@@ -121,6 +121,7 @@ bool Settings::load(const std::string& p) {
     onlineApiPort = std::clamp(ini.getInt("online.api_port", onlineApiPort), 1, 65535);
     onlineWsPort = std::clamp(ini.getInt("online.ws_port", onlineWsPort), 0, 65535);
     onlinePin = ini.getString("online.pinned_sha256", onlinePin);
+    onlineRememberWithoutKeyring = ini.getBool("online.remember_without_keyring", onlineRememberWithoutKeyring);
     onlineCategory = ini.getString("online.category", onlineCategory);
     onlineRated = ini.getBool("online.rated", onlineRated);
     onlineColor = std::clamp(ini.getInt("online.color", onlineColor), 0, 2);
@@ -276,6 +277,7 @@ bool Settings::save() const {
     ini.setInt("online.api_port", onlineApiPort);
     ini.setInt("online.ws_port", onlineWsPort);
     ini.set("online.pinned_sha256", onlinePin);
+    ini.setBool("online.remember_without_keyring", onlineRememberWithoutKeyring);
     ini.set("online.category", onlineCategory);
     ini.setBool("online.rated", onlineRated);
     ini.setInt("online.color", onlineColor);

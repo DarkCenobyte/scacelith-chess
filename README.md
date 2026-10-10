@@ -19,8 +19,9 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   through ALSA (`libasound2`; PulseAudio and PipeWire through their ALSA plugins). Without
   `libasound2` or a sound device the game runs silent, the coach in subtitles. Saved logins go to
   the desktop's keyring through libsecret (`libsecret-1-0`) when it is installed (a locked keyring
-  asks for its password when you sign in or connect), otherwise to a file only you can read
-  (`install.sh` says when libsecret is missing, and the log says why the file is used).
+  asks for its password when you sign in or connect), otherwise to a file only you can read: the
+  game says so after the sign-in, and Options > Online server can keep them until the game closes
+  instead (`install.sh` says when libsecret is missing, and the log says why the file is used).
 
 ## Playing
 
@@ -42,6 +43,14 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   or **C**: look at the board again.
 - **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
   **C** or a look around).
+- **Up arrow**: stand up in front of your chair and look down at the board. **Left / Right
+  arrow**: walk round to that end of the table (your own left and right) and look at the board
+  from the side; the arrows take you from one spot to another without sitting down. **Down
+  arrow**: sit back down. You can get up on either player's turn once your hand is free (not
+  with a piece in hand). Only a seated player plays: standing, you cannot touch a piece or press
+  the clock, your scoresheet waits, and the clock keeps running. The look around, the lean and
+  **C** still work. At the end of a game everyone sits back down for the handshake. Online, your
+  opponent sees your robot get up, and you see theirs.
 - **Tab**: move list. **Esc**: menu (offer or claim a draw, resign, options).
 
 At the table the game draws its own pointer, which shows what a click will do: a gold ring over a
@@ -316,8 +325,10 @@ Development: `--online-mock` replaces the network with an in-process fake server
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
 error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
 opponent is a random mover whose hands and head move like a player's; `--online-manual-clock`
-leaves the clock press to the players, and `--play e2e4,...` makes your moves). In a mock game F9
-makes the opponent disconnect for a while and F10 drops your own connection. `--scene ui
+leaves the clock press to the players, `--mock-stance standing|side-left|side-right` keeps the
+opponent standing, and `--play e2e4,...` makes your moves). In a mock game F9 makes the opponent
+disconnect for a while, F10 drops your own connection and F11 makes the opponent stand, go to an
+end of the table or sit (in turn). `--scene ui
 --ui-screen online-play` (and the other `online-*` and `direct-*` screens listed in
 `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
 [docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with
@@ -333,7 +344,9 @@ Windows account; on Linux the desktop's keyring keeps them (GNOME Keyring, KWall
 Secret Service, through libsecret when it is installed; a locked keyring is unlocked through the
 desktop's own prompt when you sign in, connect or sign out, and a dismissed prompt is not shown
 again until the next sign-in or start), or, without a keyring or while it stays locked, the file
-itself in the clear, readable by its owner only ([docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md)). A `Scacelith.ini` next to the executable
+itself in the clear, readable by its owner only (0600 in a 0700 folder, repaired when more open;
+"Remember my sign-in when the system keyring is unavailable" off in Options > Online server: in
+memory until the game closes; [docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md#where-the-sessions-are-kept)). A `Scacelith.ini` next to the executable
 makes a portable install (versions up to 1.0.0-beta.1 put it there): the game then keeps all three
 in the executable's folder, as it also does when the user folder cannot be written. A file given with `--ini <file>` is read and written there only, with the
 logins beside it (the log warns when it cannot be written). All of them are
@@ -403,7 +416,10 @@ Face) into the build folder, for the unit tests and `--coach-dir build/coach`:
 `-DSCACELITH_SUPERTONIC_DIR=<folder>` takes a local copy instead (a copy of the repository, with
 `onnx/` and `voice_styles/`, or a folder holding the seven files), and
 `-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests that need the model are then
-skipped; see `third_party/supertonic3/README.scacelith.md`).
+skipped; see `third_party/supertonic3/README.scacelith.md`). `-DSCACELITH_SUPERTONIC_REQUIRED=ON`
+makes a missing or unverifiable model file a configure error, and
+`./build/scacelith_tests --require=tts-model` fails a test that skips for want of the model, and a
+run where none passed with it (the CI's Linux job does both).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -463,7 +479,9 @@ normal game), `--handover-preview` (watching through the players' eyes with the 
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
 `--warp <seconds>` (with `--shot`: simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
-up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
+up at the opponent), `--glance` (start looking at the scoresheet), `--stance
+standing|side-left|side-right` (the player gets up once the game is played and the `--play` moves
+are made), `--calibrate` (the brightness
 calibration before the title page, as on a first start) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
@@ -517,7 +535,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 ### Continuous integration and releases
 
 GitHub Actions builds and tests every push to master and every pull request
-(`.github/workflows/ci.yml`): the Linux build and its unit tests, the same tests built with
+(`.github/workflows/ci.yml`): the Linux build and its unit tests (the coach's voice model
+required: its tests must run and pass), the same tests built with
 AddressSanitizer and UBSan, the Windows build cross-compiled with MinGW-w64 and its unit tests
 under Wine (all as above), the contract with the dedicated
 server and the live online tests against it, and a lint of the workflows (actionlint and zizmor).

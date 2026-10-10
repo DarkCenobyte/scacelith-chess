@@ -129,6 +129,12 @@ controls.look.keys = Rechte Maustaste halten
 controls.look = Umsehen
 controls.sheet.keys = S
 controls.sheet = Auf Ihr Partieformular schauen und zurück
+controls.stand.keys = ↑
+controls.stand = Vor Ihrem Stuhl aufstehen
+controls.side.keys = ←  /  →
+controls.side = Ans linke / rechte Tischende gehen
+controls.sit.keys = ↓
+controls.sit = Wieder hinsetzen (gezogen wird nur im Sitzen)
 controls.moves.keys = Tab
 controls.moves = Zugliste ein- oder ausblenden
 controls.menu.keys = Esc
@@ -321,6 +327,10 @@ notify.manual_clock = Drücken Sie in dieser Partie nach jedem Zug selbst die Uh
 notify.illegal = Regelwidriger Zug.
 notify.cannot_move = Dieser Zug ist nicht möglich.
 notify.move_first = Ziehen Sie, bevor Sie die Uhr drücken.
+notify.stance.sit_to_play = Setzen Sie sich wieder, um zu ziehen (Pfeil nach unten).
+notify.stance.first = Die Uhr läuft weiter, während Sie stehen. Pfeil nach unten: wieder hinsetzen.
+notify.stance.first_untimed = Gezogen wird nur im Sitzen. Pfeil nach unten: wieder hinsetzen.
+notify.stance.finish_move = Beenden Sie zuerst Ihren Zug.
 notify.draw_already_offered = Sie haben in diesem Zug bereits Remis angeboten.
 notify.draw_accepted = Ihr Gegner nimmt das Remis an.
 notify.draw_declined = Ihr Gegner lehnt das Remisangebot ab.
@@ -514,6 +524,8 @@ options.online.test = Verbindung testen
 options.online.test_ok = {0}: verbunden, mit dieser Version kompatibel.
 options.online.test_incompatible = {0}: verbunden, benötigt aber eine andere Version von Scacelith.
 options.online.in_game = Während einer Online-Partie kann der Server nicht gewechselt werden.
+options.online.remember_session = Anmeldung merken, wenn kein Systemschlüsselbund verfügbar ist
+options.online.remember_session.help = Wenn kein Systemschlüsselbund (GNOME Keyring, KWallet…) Ihre Sitzung aufbewahren kann, wird sie in einer Datei gespeichert, die nur Ihr Benutzerkonto lesen kann. Wer Ihre Dateien oder eine Kopie davon (etwa eine Sicherung) lesen kann, könnte diese Sitzung verwenden. Aus: Sie bleiben angemeldet, bis das Spiel geschlossen wird. Unter „Angemeldete Geräte“ in Ihrem Konto können Sie jedes Gerät abmelden.
 
 # Sign in, create an account
 online.signin.lead = Melden Sie sich bei {0} an, um online gegen andere zu spielen.
@@ -636,6 +648,8 @@ online.account.delete = Konto löschen
 
 # Play
 online.play.signed_in = Angemeldet als {0}
+online.session.file = Kein Systemschlüsselbund konnte Ihre Anmeldung aufbewahren: Sie wird in einer Datei gespeichert, die nur Ihr Benutzerkonto lesen kann (Optionen > Online-Server).
+online.session.memory = Kein Systemschlüsselbund konnte Ihre Anmeldung aufbewahren, und sie wird in keiner Datei gespeichert: Sie bleiben angemeldet, bis das Spiel geschlossen wird (Optionen > Online-Server).
 online.play.find_section = GEGNER FINDEN
 online.play.friend_section = GEGEN FREUNDE SPIELEN
 online.play.mode = Partie

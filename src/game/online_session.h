@@ -8,7 +8,8 @@
 //     (saveGameGif / savePgnGif), whose files the session writes when the server answers;
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
-//     included: only those of the game being played, the latest one replacing one still queued.
+//     included: only those of the game being played, the latest one replacing one still queued;
+//     and the opponent's stance (OpponentStance, protocol minor 2), in order with the others.
 // With --online-mock the in-process fakes of online_mock.h replace the network layer;
 // --online-manual-clock then makes their games autoPress = false (the moves wait for a clock
 // press). Tokens never pass through here: the network layer stores them per server.
@@ -84,6 +85,7 @@ public:
     virtual void requestResync(uint64_t gameId) = 0;
     virtual void rematch(uint64_t gameId, bool accept) = 0;
     virtual void sendGesture(uint64_t gameId, const net::Gesture& g) = 0;
+    virtual void sendStance(uint64_t gameId, uint8_t stance) = 0;
     virtual int gestureKeepaliveMs() const = 0;
     virtual bool poll(net::Event& out) = 0;
 };
@@ -109,6 +111,7 @@ public:
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
     virtual void sendGesture(const net::Gesture& g) = 0;
+    virtual void sendStance(uint8_t stance) = 0;
     virtual int pingMs() const = 0;
     virtual double serverNowMs() const = 0;
     virtual int gestureKeepaliveMs() const = 0;

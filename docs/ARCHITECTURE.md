@@ -101,8 +101,8 @@ roughness), b = Charlie sheen directional albedo. Units 16..23 (`TEXUNIT_SKY`, `
 `TEXUNIT_NOISE`, `TEXUNIT_GLOBAL0`..) are reserved and not bound.
 
 **Sun shadows.** `RenderSettings::shadowCascades` (2 or 3) cascades fitted to fixed receiver
-regions (`Renderer::setShadowRegions`, finest first; default: table + seated players, the area
-around the table, the whole hall incl. walls) — not to the view frustum. The depth range of every
+regions (`Renderer::setShadowRegions`, finest first; default: table + players seated or standing
+up (|x| 1.20, 1.85 m high), the area around the table, the whole hall incl. walls) — not to the view frustum. The depth range of every
 cascade covers `Renderer::setSceneBounds` (default: hall + thick walls) and depth clamp is on, so
 casters between the sun and the table (window walls) are never lost. `DRAW_STATIC` casters are
 cached per cascade (`staticShadowCache`, re-rendered on `invalidateStatic()` / sun move), dynamic
@@ -121,6 +121,9 @@ that submits draw items (empty loading frames are skipped), on `invalidateStatic
 moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
 × 2 bounces at 128², the High preset, on llvmpipe). Shading blends priority probes first, then the grid with
 normalised radial kernels (continuous everywhere), box-projected specular from the two strongest.
+Something that only sometimes moves (the chairs, pushed back by a player standing up) is drawn as a
+dynamic item and once more at its usual place as `DRAW_STATIC | DRAW_HIDDEN_MAIN` without
+`DRAW_CAST_SHADOW`: a copy only the probes see, so moving it never re-bakes them.
 
 **Planar reflections.** `PlanarReflector` gains `bounds` (skip when off screen + scissor to its
 screen rectangle) and `minObjectSize` (skip objects whose radius / distance is smaller in the
@@ -277,13 +280,18 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
 `GameMode::Analysis` is a replay (`replaying()` is true) of a finished game with Stockfish's review
 on top. The pieces of it:
 
-* **`analysis::GameReview`** (`src/analysis/review.h`) decides which positions to analyse next (a
-  quick pass, then a deep one, around the position on the board first), takes the results and
-  makes the verdicts (symbols, the better move, the bar, each side's accuracy). The scene sends its
-  requests to `ai::Engine` at a lower priority than any game's search.
+* **`analysis::GameReview`** (`src/analysis/review.h`) decides which positions to analyse next (the
+  urgent ones first: those the comment waited for needs final, quick then deep; then a quick pass
+  and a deep one, around the position on the board first), takes the results and makes the
+  verdicts (symbols, the better move, the bar, each side's accuracy). The scene sends its requests
+  to `ai::Engine` at a lower priority than any game's search.
 * **`analysis::Commentator`** (`commentary.h`) picks the key moments once their positions are final
-  and writes each as a `coach::Script` of `Say` beats (with marks), named by side
-  (`coach::Arg::ofSidePiece`: "White's knight", nobody is "you").
+  (`needs()`: the position and the three before it, never the whole review; the final position's
+  accuracy account follows apart once the review is complete) and writes each as a `coach::Script`
+  of `Say` beats (with marks), named by side (`coach::Arg::ofSidePiece`: "White's knight", nobody
+  is "you"). **`analysis::CommentWait`** keeps the comment a forward step asked for while its
+  position stays on the board, however long the review takes, and hands it out exactly once (Play
+  waits for it); a step elsewhere drops it.
 * **`src/game/game_scene_analysis.cpp`** holds the mode's part of the scene (`AnalysisRuntime`):
   it loads the game, pumps the review, saves it through `analysis::saveCache` when the player
   leaves, steps through the game (one move: the robots' hands, `playRobotMove` forward and the

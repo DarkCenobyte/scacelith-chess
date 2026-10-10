@@ -531,6 +531,70 @@ std::vector<float> chairCreak(Rng& r) {
     return finish(out);
 }
 
+// The hall's floor under a foot or a chair leg: marble tiles bonded to a concrete slab. No plate
+// rings (the slab is massive and the bond damps the tiles): a few low-mid modes of the tile on
+// its mortar, Q ~ 3-8, the energy below ~1 kHz.
+Modes floorModes(Rng& r) {
+    return jittered(r, {95.0f, 150.0f, 235.0f, 380.0f, 640.0f, 1050.0f, 1700.0f}, {0.7f, 1.0f, 0.9f, 0.6f, 0.4f, 0.25f, 0.12f},
+                    3.0f, 8.0f, 0.08f);
+}
+
+// A robot's step on the marble floor (a player getting up and walking round the table). The sole
+// is a soft pad: the heel lands in a few milliseconds (no click: the floor's damped thud, a faint
+// tick of the leg's porcelain shell through its joints), the ball of the foot follows a tenth of a
+// second later, lighter, and the pad scuffs the polished stone as the weight rolls over it.
+std::vector<float> footstep(Rng& r) {
+    Buf out(0.45f);
+    const float t0 = 0.003f;
+    Modes floor = floorModes(r);
+    float weight = r.range(0.8f, 1.2f);
+    Excitation heel(out.n()), both(out.n());
+    heel.pulse(t0, r.range(3.0e-3f, 5.5e-3f), weight);
+    both.mixFrom(heel, 1.0f);
+    float tb = t0 + r.range(0.07f, 0.13f);
+    both.pulse(tb, r.range(2.5e-3f, 4.5e-3f), weight * r.range(0.3f, 0.55f));
+    renderModes(out, both, floor, 1.0f);
+    Excitation tick(out.n());
+    tick.pulse(t0 + r.range(0.0f, 1.0e-3f), 0.15e-3f, 0.03f * weight);
+    renderModes(out, tick, porcelainModes(r, 60.0f, 140.0f), 0.35f);
+    noiseBurst(out, r, {t0 + r.range(0.012f, 0.03f), r.range(0.01f, 0.02f), r.range(0.03f, 0.06f), r.range(0.10f, 0.16f),
+                        r.range(0.12f, 0.2f), r.range(500.0f, 800.0f), r.range(3000.0f, 4500.0f), 0.4f, r.range(150.0f, 400.0f)});
+    return finish(out, 50.0f);
+}
+
+// A chair pushed back from the table or drawn in again, its oak legs sliding over the marble: each
+// pair of legs sticks and slips (a train of slip events whose rate follows the sliding speed, a
+// smooth bell over the push), the rear pair more loaded and at its own rate (a rough, beating
+// scrape). The slips drive the chair's wood resonances (as in chairCreak) and the floor; a band of
+// granular friction noise rides on top.
+std::vector<float> chairSlide(Rng& r) {
+    float dur = r.range(0.45f, 0.7f);
+    Buf out(dur + 0.4f);
+    Modes wood = jittered(r, {210.0f, 380.0f, 620.0f, 930.0f, 1350.0f, 1900.0f, 2700.0f},
+                          {0.5f, 1.0f, 0.9f, 0.7f, 0.5f, 0.33f, 0.2f}, 10.0f, 25.0f, 0.1f);
+    Modes floor = floorModes(r);
+    Excitation ex(out.n());
+    const float t0 = 0.004f;
+    for (int pair = 0; pair < 2; ++pair) {
+        float rate0 = r.range(90.0f, 200.0f) * (pair == 0 ? 1.0f : r.range(1.15f, 1.4f));
+        float load = pair == 0 ? 1.0f : r.range(0.4f, 0.7f);
+        SlowRandom wob;
+        wob.init(r, -1.0f, 1.0f, 0.04f, 0.12f);
+        float t = t0 + r.range(0.0f, 0.02f);
+        while (t < t0 + dur) {
+            float speed = std::sin(kPi * clampf((t - t0) / dur, 0.0f, 1.0f));
+            float rate = std::max(25.0f, rate0 * (0.45f + 0.55f * speed) * (1.0f + 0.12f * wob.step(r, 1.0f / rate0)));
+            if (r.chance(0.85f)) ex.pulse(t, r.range(0.2e-3f, 0.5e-3f), load * std::sqrt(speed) * r.range(0.6f, 1.3f));
+            t += r.range(0.85f, 1.15f) / rate;
+        }
+    }
+    renderModes(out, ex, wood, 1.0f);
+    renderModes(out, ex, floor, 0.5f);
+    noiseBurst(out, r, {t0, dur * 0.2f, dur * 0.6f, dur, r.range(0.3f, 0.45f), r.range(400.0f, 700.0f), r.range(2500.0f, 3800.0f),
+                        0.7f, r.range(120.0f, 300.0f)});
+    return finish(out, 60.0f, 0.03f);
+}
+
 std::vector<float> uiHover(Rng& r) {
     Buf out(0.08f);
     Excitation e(out.n());
@@ -767,6 +831,8 @@ const SfxInfo& sfxInfo(Sfx s) {
         {"pen_tap", dbToGain(-30.0f), 0.18f, 0.05f, 2.0f, false},
         {"page_turn", dbToGain(-20.0f), 0.25f, 0.04f, 1.5f, false},
         {"page_flap", dbToGain(-19.0f), 0.25f, 0.04f, 1.5f, false},
+        {"footstep", dbToGain(-21.0f), 0.3f, 0.05f, 2.0f, false},
+        {"chair_slide", dbToGain(-21.0f), 0.3f, 0.04f, 1.5f, false},
     };
     int i = int(s);
     if (i < 0 || i >= int(Sfx::Count)) i = 0;
@@ -794,6 +860,8 @@ std::vector<float> synthesize(Sfx s, uint32_t seed) {
         case Sfx::PenTap: return penTap(r);
         case Sfx::PageTurn: return pageTurn(r);
         case Sfx::PageFlap: return pageFlap(r);
+        case Sfx::Footstep: return footstep(r);
+        case Sfx::ChairSlide: return chairSlide(r);
         default: return std::vector<float>(64, 0.0f);
     }
 }

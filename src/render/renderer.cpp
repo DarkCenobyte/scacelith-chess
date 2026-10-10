@@ -140,8 +140,12 @@ void Renderer::defaultLightingLayout() {
     sceneBounds_.add(vec3(HALL_MIN_X - wt, -0.2f, HALL_MIN_Z - wt));
     sceneBounds_.add(vec3(HALL_MAX_X + wt, HALL_HEIGHT + 0.8f, HALL_MAX_Z + wt));
     AABB regions[3];
-    regions[0].add(vec3(-0.85f, 0.0f, -1.15f));      // table + seated players
-    regions[0].add(vec3(0.85f, 1.70f, 1.15f));
+    // The finest cascade: the table and the players, seated or standing (anim/stance.h: in front of
+    // the chair at |z| 0.70, the head up to about 1.80 m; at an end of the table at |x| 0.88, the
+    // shoulders and hands out to about 1.15). Wider than the seated players alone needed (|x|
+    // 0.85, 1.70 m high): about 0.83 mm per texel instead of 0.72 at 4096 (1.70 / 1.48 at 2048).
+    regions[0].add(vec3(-1.20f, 0.0f, -1.15f));
+    regions[0].add(vec3(1.20f, 1.85f, 1.15f));
     regions[1].add(vec3(-3.2f, 0.0f, -3.4f));        // chairs, floor around the table
     regions[1].add(vec3(3.2f, 2.6f, 3.4f));
     regions[2] = sceneBounds_;                        // the whole hall and its thick walls

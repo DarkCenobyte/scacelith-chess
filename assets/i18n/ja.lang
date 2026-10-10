@@ -129,6 +129,12 @@ controls.look.keys = 右ボタンを押したまま
 controls.look = 周りを見る
 controls.sheet.keys = S
 controls.sheet = 自分の棋譜用紙を見る／戻る
+controls.stand.keys = ↑
+controls.stand = 椅子の前で立ち上がる
+controls.side.keys = ←  /  →
+controls.side = テーブルの左端／右端に立つ
+controls.sit.keys = ↓
+controls.sit = 席に戻る（指せるのは座っているときだけ）
 controls.moves.keys = Tab
 controls.moves = 棋譜の表示・非表示
 controls.menu.keys = Esc
@@ -321,6 +327,10 @@ notify.manual_clock = この対局では、毎手自分で時計を押してく�
 notify.illegal = 反則手です。
 notify.cannot_move = その手は指せません。
 notify.move_first = 時計を押す前に指してください。
+notify.stance.sit_to_play = 指すには席に戻ってください（下矢印キー）。
+notify.stance.first = 立っている間も時計は進みます。下矢印キー：席に戻る。
+notify.stance.first_untimed = 指せるのは座っているときだけです。下矢印キー：席に戻る。
+notify.stance.finish_move = 先に指し手を終えてください。
 notify.draw_already_offered = この手番ではすでに引き分けを提案しています。
 notify.draw_accepted = 相手が引き分けに応じました。
 notify.draw_declined = 相手は引き分けの提案を断りました。
@@ -515,6 +525,8 @@ options.online.test = 接続テスト
 options.online.test_ok = {0}：接続しました。このバージョンに対応しています。
 options.online.test_incompatible = {0}：接続しましたが、別のバージョンのScacelithが必要です。
 options.online.in_game = オンライン対局中はサーバーを変更できません。
+options.online.remember_session = システムのキーリングが使えないときもログイン状態を保存する
+options.online.remember_session.help = システムのキーリング（GNOME Keyring、KWallet など）でセッションを保管できないとき、あなたのユーザーアカウントだけが読めるファイルに保存します。あなたのファイルやそのコピー（バックアップなど）を読める人は、このセッションを使えてしまいます。オフ：ゲームを閉じるまでログインしたままになります。どのデバイスも、アカウントの「ログイン中のデバイス」からログアウトできます。
 
 # Sign in, create an account
 online.signin.lead = {0}にログインして、オンラインで対局しましょう。
@@ -637,6 +649,8 @@ online.account.delete = アカウントを削除
 
 # Play
 online.play.signed_in = {0}としてログイン中
+online.session.file = システムのキーリングでログイン状態を保管できませんでした。あなたのユーザーアカウントだけが読めるファイルに保存しています（設定 > サーバー）。
+online.session.memory = システムのキーリングでログイン状態を保管できず、ファイルにも保存していません。ゲームを閉じるまでログインしたままです（設定 > サーバー）。
 online.play.find_section = 対戦相手を探す
 online.play.friend_section = 友人と対局
 online.play.mode = 対局
