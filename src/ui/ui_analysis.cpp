@@ -302,7 +302,7 @@ float header(const AnalysisHud& hud, const Rect& p, const Rect& in) {
         const float room = in.r() - nx - (scw > 0.0f ? scw + 14.0f : 0.0f);
         TextStyle ns = name;
         ns.color = moving ? ivory : ivoryDim;
-        ns.size = gfx::fitSize(*names[i], ns, room, 0.85f);
+        ns.size = gfx::fitSize(*names[i], ns, room, 0.78f);
         gfx::text(im::elideToFit(*names[i], ns, room), im::flipX(p, nx), y + 1.0f, ns);
         if (!score[i].empty()) gfx::text(score[i], im::flipX(p, in.r()), y + 1.0f, sc);
     }
@@ -345,16 +345,18 @@ bool moveCell(const AnalysisMove& mv, int ply, const Rect& cell, bool current, b
         gfx::stroke(cell, withAlpha(gold, 0.45f * it.hoverT), 0.0f, 2.0f);
     }
     TextStyle ms = style(font::FACE_TEXT, 24.0f, current ? goldBright : theme::mix(ivory, goldBright, 0.6f * it.hoverT));
-    ms.dir = 0;
-    const float base = baselineCentered(cell, ms) + it.pressT;
+    TextStyle ss = style(font::FACE_TEXT, 22.0f, nagColour(mv.nag));
+    ms.dir = ss.dir = 0;
+    ss.weight = 0.6f;
+    const std::string san = coach::figurineSan(mv.san);
+    const char* sym = nagSymbol(mv.nag);
+    // A long move ("exd8=♕+!!" in a narrow window) is set a little smaller to stay in its cell.
+    const float room = cell.w - 14.0f - (*sym ? gfx::textWidth(sym, ss) + 2.0f : 0.0f);
+    ms.size = gfx::fitSize(san, ms, room, 0.8f);
+    const float base = baselineCentered(cell, style(font::FACE_TEXT, 24.0f, ivory)) + it.pressT;
     const float x = cell.x + 10.0f;
-    const float w = gfx::text(coach::figurineSan(mv.san), x, base, ms);
-    if (const char* sym = nagSymbol(mv.nag); *sym) {
-        TextStyle ss = style(font::FACE_TEXT, 22.0f, nagColour(mv.nag));
-        ss.dir = 0;
-        ss.weight = 0.6f;
-        gfx::text(sym, x + w + 2.0f, base, ss);
-    }
+    const float w = gfx::text(san, x, base, ms);
+    if (*sym) gfx::text(sym, x + w + 2.0f, base, ss);
     if (it.activated) im::sound(Sound::Click);
     return it.activated;
 }
@@ -582,12 +584,14 @@ AnalysisHudResult analysisHud(const AnalysisHud& hud) {
     const AnalysisAction act = controls(hud, in, controlsY, bs, gap);
     if (act != AnalysisAction::None) res.action = act;
 
-    // The subtitles' span: between the bar and the panel, right of the viewer's controls hint
-    // (bottom left) when it is drawn.
+    // The subtitles' span: between the bar and the panel, and right of the viewer's controls hint
+    // (bottom left) when it is drawn and leaves room enough for two lines of a comment (a narrow
+    // window, a long language: the plate rather goes over the hint than in a column of words).
     res.freeLeft = bar.r() + kGap;
-    const Rect hint = detail::viewerControlsRect();
-    if (hint.w > 0.0f && hint.cx() < v.x * 0.5f) res.freeLeft = std::max(res.freeLeft, hint.r() + kGap);
     res.freeRight = p.x - kGap;
+    const Rect hint = detail::viewerControlsRect();
+    if (hint.w > 0.0f && hint.cx() < v.x * 0.5f && res.freeRight - (hint.r() + kGap) >= 640.0f)
+        res.freeLeft = std::max(res.freeLeft, hint.r() + kGap);
     gfx::setLayer(prev);
     return res;
 }
