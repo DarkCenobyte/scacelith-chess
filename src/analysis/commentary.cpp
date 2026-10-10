@@ -60,6 +60,13 @@ Arg sidePiece(const Position& p, Square s) {
     return Arg::ofSidePiece(pc.type, pc.color, s);
 }
 Arg moveArg(const LineStep& s) { return coach::detail::moveArg(s); }
+// The mate itself, named in a line that says "is checkmate": without its '#', which the voice would
+// read as a second "checkmate" ("queen takes f7, checkmate, was checkmate").
+Arg mateMoveArg(const LineStep& s) {
+    Arg a = moveArg(s);
+    while (!a.san.empty() && (a.san.back() == '#' || a.san.back() == '+')) a.san.pop_back();
+    return a;
+}
 
 // Targets of a fork, the king first, then by value (a1 first on ties).
 std::vector<Square> byValue(const Position& p, uint64_t set) {
@@ -143,7 +150,7 @@ bool mateAllowed(const MoveCtx& c, Comment& out, Said& said) {
         l = say("an.mate_allowed");
         l.with("m", Arg::ofNumber(n));
     }
-    l.with("reply", moveArg(r0));
+    l.with("reply", n == 1 ? mateMoveArg(r0) : moveArg(r0));
     out.lines.push_back(l);
     markArrow(out, r0.piece, r0.move.from, r0.move.to, "reply");
     said.mate = true;
@@ -228,7 +235,7 @@ bool mateMissed(const MoveCtx& c, Comment& out, Said& said) {
         l = say("an.mate_missed");
         l.with("m", Arg::ofNumber(n));
     }
-    l.with("best", moveArg(b0));
+    l.with("best", n == 1 ? mateMoveArg(b0) : moveArg(b0));
     out.lines.push_back(l);
     markArrow(out, b0.piece, b0.move.from, b0.move.to, "best");
     said.best = said.mate = true;

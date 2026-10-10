@@ -493,7 +493,7 @@ void GameScene::setupAnalysis() {
     if (!pendingCamArg_) {
         pendingViewpoint_ = -1;
         const float f = analysisWhiteBottom_ ? 1.0f : -1.0f;
-        observer_.setPose(CameraPose::looking(vec3(-0.06f * f, 1.47f, 0.50f * f), vec3(0.035f * f, layout::BOARD_TOP_Y, -0.02f * f),
+        observer_.setPose(CameraPose::looking(vec3(-0.06f * f, 1.47f, 0.50f * f), vec3(-0.045f * f, layout::BOARD_TOP_Y, -0.02f * f),
                                               kFov));
         cameraCut_ = true;
     }

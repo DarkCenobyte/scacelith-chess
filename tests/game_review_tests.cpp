@@ -987,7 +987,7 @@ TEST(game_review_comment_mates) {
     CHECK(hasLine(k, "an.blunder"));
     const coach::Line* m = lineOf(k, "an.mate_allowed.one");
     REQUIRE(m != nullptr);
-    CHECK_EQ(m->arg("reply")->san, std::string("Rd8#"));
+    CHECK_EQ(m->arg("reply")->san, std::string("Rd8"));   // "is checkmate" says the '#'
     CHECK(hasMark(k, coach::Mark::Kind::Arrow, sq("d1"), sq("d8")));
     CHECK(hasLine(k, "an.better"));
     CHECK(!hasLine(k, "an.mate_on.white"));   // already said
@@ -1012,7 +1012,7 @@ TEST(game_review_comment_mates) {
     checkComment(k, "mate missed");
     const coach::Line* mm = lineOf(k, "an.mate_missed.one");
     REQUIRE(mm != nullptr);
-    CHECK_EQ(mm->arg("best")->san, std::string("Rd8#"));
+    CHECK_EQ(mm->arg("best")->san, std::string("Rd8"));
     CHECK(!hasLine(k, "an.better"));
     // A longer mate missed names its length; a mate appearing without a mistake is announced.
     r = reviewOf(recordOf(kBackRankWhite, {"h3", "h6", "Kh2"}));
@@ -1405,7 +1405,12 @@ TEST(game_review_engine_scholars_mate) {
     const Comment blunder = c.commentAt(r, 6);
     const coach::Line* m = lineOf(blunder, "an.mate_allowed.one");
     REQUIRE(m != nullptr);
-    CHECK_EQ(m->arg("reply")->san, std::string("Qxf7#"));
+    // The mate named without its '#': the line says "is checkmate" once.
+    CHECK_EQ(m->arg("reply")->san, std::string("Qxf7"));
+    const std::string spoken = coach::Catalog::shared().renderVariant(*m, "en", true, 1).text;
+    const size_t first = spoken.find("checkmate");
+    CHECK(first != std::string::npos);
+    CHECK(spoken.find("checkmate", first + 1) == std::string::npos);
     CHECK(!hasLine(blunder, "an.book_exit"));   // a blunder out of the book: named once, as a blunder
     const Comment end = c.commentAt(r, 7);
     REQUIRE(!end.lines.empty());
