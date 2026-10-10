@@ -363,9 +363,11 @@ void GameScene::enterMenu() {
         link_ = nullptr;
     }
     if (analysing()) {
-        // Back from an analysis: the evaluations saved, silence; the title page.
+        // Back from an analysis: the evaluations saved, silence; the menu opens on the page it was
+        // chosen on (the title page after the analysis of a game just played).
         leaveAnalysis();
         mode_ = GameMode::Play;
+        ui::openSavedGames();
     }
     if (replaying()) {
         // Back from a replay: the menu opens on the saved games, where it was chosen.
