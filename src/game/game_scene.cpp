@@ -1436,6 +1436,7 @@ void GameScene::updatePlaying(float dt) {
         updateReplay(dt);
         return;
     }
+    applyStanceArg();
     // Clock (online: the server's, see onlineClockDisplay()): the real time, not the capped dt
     if (clock_.isRunning() && !online()) {
         hotseat::advanceClock(clock_, clockAccumMs_, clockDt_, clockFrozen_);
@@ -1559,6 +1560,18 @@ void GameScene::noticeSitToPlay() {
     if (sitNotice_.allow(time_)) ui::notify(i18n::tr("notify.stance.sit_to_play"), 3.0f);
 }
 
+// --stance (screenshots): once the scripted moves are made, as the key would (no notice). From the
+// game's simulation, so that a --warp gets the player there before the first frame.
+void GameScene::applyStanceArg() {
+    int seat = firstPersonSeat();
+    if (!stanceArgPending_ || seat < 0 || state_ != State::Playing) return;
+    if (scriptPos_ < script_.size() || paused_ || (hotSeat() && handover_.active()) || !stance::handsFree(turn_)) return;
+    stanceArgPending_ = false;
+    stoodThisGame_ = true;
+    setSeatStance(seat, stanceArg_);
+    LOGI("--stance: seat %d asks for stance %d", seat, int(stanceArg_));
+}
+
 void GameScene::updateStanceInput() {
     int seat = firstPersonSeat();
     if (seat < 0 || state_ != State::Playing) return;
@@ -1567,14 +1580,6 @@ void GameScene::updateStanceInput() {
     c.firstPerson = true;
     c.turn = turn_;
     c.target = anim_[seat].stanceTarget();
-    // --stance (screenshots): once the scripted moves are made, as the key would (no notice).
-    if (stanceArgPending_ && scriptPos_ >= script_.size() && !paused_ && !(hotSeat() && handover_.active()) &&
-        stance::handsFree(turn_)) {
-        stanceArgPending_ = false;
-        stoodThisGame_ = true;
-        setSeatStance(seat, stanceArg_);
-        LOGI("--stance: seat %d asks for stance %d", seat, int(stanceArg_));
-    }
     // The keyboard is the game's: no Esc menu, no field or dialog holding it (ui::wantsKeyboard),
     // no card waiting for the player's answer (a draw offer), no hot-seat handover nor the buttons
     // of the previous turn still held, an online game not ending and its report dialog closed.

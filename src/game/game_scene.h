@@ -255,6 +255,7 @@ private:
     void setHotSeatHold(int seat, bool hold);
     // The arrow keys of the first-person player, and --stance (Playing, once per frame).
     void updateStanceInput();
+    void applyStanceArg();
     void noticeSitToPlay();                    // the player tried to play standing (rate-limited)
 
     // ---- physical actions ----
