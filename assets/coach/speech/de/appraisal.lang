@@ -54,6 +54,7 @@ theme.bad_trade = gut wählen, welche Figuren du tauschst
 theme.opening = Figuren entwickeln und früh rochieren
 theme.endgame = den König einsetzen und Freibauern vorschieben
 theme.positional = deine schlechteste Figur verbessern
+theme.material = vor dem Ziehen prüfen, was ich mit meinen nächsten Zügen gewinnen kann
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = Schachmatt! Du hast gewonnen. Gut gespielt!

@@ -54,6 +54,7 @@ theme.bad_trade = どの駒を交換するか、よく選ぶこと
 theme.opening = 駒を展開して、早めにキャスリングすること
 theme.endgame = キングを使い、じゃまのないポーンを進めること
 theme.positional = 一番働いていない駒を活用すること
+theme.material = 指す前に、私の次の手で何を取られるか確かめること
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = チェックメイト！あなたの勝ちです。お見事！

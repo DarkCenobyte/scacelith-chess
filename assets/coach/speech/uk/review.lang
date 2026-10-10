@@ -58,13 +58,13 @@ ann.mate.coach.3 = Боюся, це мат.
 
 # ---- Verdicts (the first sentence about a bad move) --------------------------------------------
 ex.verdict.blunder.b1 = Ой! Через цей хід ти щось утрачаєш.
-ex.verdict.blunder.b1.2 = Обережно! Зараз покажу, що може статися.
+ex.verdict.blunder.b1.2 = Обережно! Цей хід може дорого коштувати.
 ex.verdict.blunder.b1.3 = Ой, зачекай. З цим ходом щось не так.
-ex.verdict.blunder.b2 = Хм, із цим ходом є проблема. Дивись.
-ex.verdict.blunder.b2.2 = Це помилка. Дивись.
-ex.verdict.blunder.b2.3 = Обережно, за цей хід доведеться заплатити. Подивись.
+ex.verdict.blunder.b2 = Хм, із цим ходом є проблема.
+ex.verdict.blunder.b2.2 = Це велика помилка.
+ex.verdict.blunder.b2.3 = Обережно, за цей хід доведеться заплатити.
 ex.verdict.blunder.b3 = Це груба помилка.
-ex.verdict.blunder.b3.2 = {move} — помилка. Ось чому.
+ex.verdict.blunder.b3.2 = {move} — справжня помилка.
 ex.verdict.blunder.b3.3 = Ой, {move} — серйозна помилка.
 ex.verdict.blunder.b4 = {move} — груба помилка.
 ex.verdict.blunder.b4.2 = {move} — серйозна помилка.
@@ -75,11 +75,11 @@ ex.verdict.blunder.b5.3 = {move} — дорога помилка.
 ex.verdict.blunder.b6 = {move} — серйозна помилка.
 ex.verdict.blunder.b6.2 = {move} — груба помилка.
 ex.verdict.blunder.b6.3 = {move}? Груба помилка.
-ex.verdict.mistake.b3 = Не найкращий хід. Ось чому.
+ex.verdict.mistake.b3 = Це не дуже вдалий хід.
 ex.verdict.mistake.b3.2 = Хм, у ходу {move} є слабке місце.
-ex.verdict.mistake.b3.3 = Це помилка. Зараз покажу.
+ex.verdict.mistake.b3.3 = Це помилка.
 ex.verdict.mistake.b4 = {move} — помилка.
-ex.verdict.mistake.b4.2 = {move} — не найкращий хід. Ось чому.
+ex.verdict.mistake.b4.2 = {move} — слабкий хід.
 ex.verdict.mistake.b4.3 = Це помилка.
 ex.verdict.mistake.b5 = {move} — явна помилка.
 ex.verdict.mistake.b5.2 = {move} — помилка.
@@ -87,7 +87,11 @@ ex.verdict.mistake.b5.3 = {move} — поганий хід.
 ex.verdict.mistake.b6 = {move} — помилка.
 ex.verdict.mistake.b6.2 = {move}? Помилка.
 ex.verdict.mistake.b6.3 = Не {move}.
-# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Непогано, але трохи краще було {best}.
+ex.verdict.inaccuracy.b3.2 = Трохи точніше було {best}.
+ex.verdict.inaccuracy.b3.3 = Невеличка неточність: тут краще було {best}.
 ex.verdict.inaccuracy.b4 = Неточно: сильніше було {best}.
 ex.verdict.inaccuracy.b4.2 = Невелика неточність. Трохи краще було {best}.
 ex.verdict.inaccuracy.b4.3 = Не зовсім найкращий хід: точніше було {best}.
@@ -97,12 +101,6 @@ ex.verdict.inaccuracy.b5.3 = Точніше було {best}, ніж {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточність; {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Краще {best}.
-ex.verdict.imprecise.b4 = {move} — неточний хід. Ось чому.
-ex.verdict.imprecise.b4.2 = {move} — не зовсім точний хід.
-ex.verdict.imprecise.b5 = {move} — неточний хід.
-ex.verdict.imprecise.b5.2 = {move} — неточність.
-ex.verdict.imprecise.b6 = {move} — неточність.
-ex.verdict.imprecise.b6.2 = {move}? Неточно.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Ой, зачекай! Тут був гарний хід.
 ex.verdict.missed.b1.2 = Подивись ще раз! Був кращий хід.
@@ -190,6 +188,31 @@ demo.your.back.3 = І ти відповідаєш взяттям.
 demo.your.king = Твій король мусить відійти.
 demo.your.king.2 = Королю доводиться відступити на {sq}.
 demo.your.king.3 = Твій король тікає на {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Тепер {t1:acc} вже не врятувати.
+ex.point.piece.2 = І {t1} пропадає.
+ex.point.piece.3 = Далі пропадає {t1}.
+ex.point.two = Під ударом і {t1}, і {t2}: одна з них пропаде.
+ex.point.two.2 = Тепер я атакую {t1:acc} й {t2:acc}. Обидві фігури не врятувати.
+ex.point.mate = А тепер {reply} — мат.
+ex.point.mate.2 = Далі — {reply}, і це мат.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Бачиш? Тепер у тебе на {pts:point} менше.
+ex.result.b1.2 = Ось так ти втрачаєш {pts:point}.
+ex.result.b2 = Зрештою ти втрачаєш {pts:point}.
+ex.result.b2.2 = Тепер у тебе мінус {pts:point}.
+ex.result.b3 = Це коштує тобі {pts:point}.
+ex.result.b3.2 = Зрештою в тебе на {pts:point} менше.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Щось можна забрати у відповідь, але в тебе все одно на {pts:point} менше.
+ex.result_back.b1.2 = Трохи можна відіграти, але ти все одно втрачаєш {pts:point}.
+ex.result_back.b2 = Частину можна відіграти, але в тебе все одно мінус {pts:point}.
+ex.result_back.b2.2 = Навіть після взяття у відповідь ти втрачаєш {pts:point}.
+ex.result_back.b3 = Навіть після твого взяття у відповідь у тебе мінус {pts:point}.
+ex.result_back.b3.2 = Ти дещо відіграєш, але це все одно коштує тобі {pts:point}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = А тут, на {sq}, у тебе з’явився б новий ферзь.
 demo.promote.2 = Потім {your} доходить до {sq} і стає ферзем.
@@ -312,10 +335,13 @@ ex.fork.b5.3 = Після ходу {reply} я атакую і {t1:acc}, і {t2:a
 ex.fork.b6 = {reply} — вилка.
 ex.fork.b6.2 = {move} допускає вилку {reply}.
 ex.fork.b6.3 = {reply}, вилка.
-# After the one-move demonstration (level 1).
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = Урятувати вдасться лише одну фігуру: {t1} або {t2}.
 ex.fork.tail.b1.2 = Тепер я атакую дві фігури одразу: {t1:acc} й {t2:acc}. Це вилка!
 ex.fork.tail.b1.3 = Бачиш? Під ударом і {t1}, і {t2}. Одну з них я заберу.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:dat} треба вийти з-під шаху, тож я беру {t1:acc}.
+ex.fork.tail_king.2 = Шах! {your:dat} доводиться відійти, і {t1} пропадає.
 ex.fork.more.b3 = Перш ніж ходити, глянь на поле {sq}: звідти {my} може зробити вилку.
 ex.fork.more.b3.2 = Стеж за полем {sq}. Звідти {my} робить вилку.
 ex.fork.tip.knight = Остерігайся стрибків коня біля свого короля й ферзя!
@@ -364,7 +390,7 @@ ex.skewer.b6.2 = {reply}: удар по лінії.
 ex.pin.b1 = {my} може піти на {sq}. Тоді {your} застрягне перед {t1:ins}.
 ex.pin.b1.2 = Стеж за {my:ins} на {sq}: {your} застрягає перед {t1:ins}.
 ex.pin.b1.3 = {my} може зв’язати {your:acc} з {t1:ins}. Тоді я виграю {your:pron_acc}.
-ex.pin.b2 = Зв’язка: {your} не може ходити, бо за {your:pron_ins} стоїть {t1}.
+ex.pin.b2 = Зв’язка: {your} застрягає перед {t1:ins}.
 ex.pin.b2.2 = {your:acc} зв’язано з {t1:ins}. Тепер я можу {your:pron_acc} виграти.
 ex.pin.b2.3 = Тепер {your} не може зрушити з місця: позаду {t1}. Це зв’язка.
 ex.pin.b3 = {your} потрапляє під зв’язку з {t1:ins}, і я {your:pron_acc} виграю.
@@ -379,7 +405,7 @@ ex.pin.b6 = {reply} зв’язує.
 ex.pin.b6.2 = {reply}, зв’язка.
 # The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
 ex.pin_defender.b1 = {your:acc} зв’язано: {your:pron} не захищає поле {sq}, бо позаду {t1}.
-ex.pin_defender.b1.2 = Дивись: {your} не може захистити поле {sq}, бо інакше пропаде {t1}.
+ex.pin_defender.b1.2 = Дивись: {your} насправді не може захистити поле {sq}, бо позаду {t1}.
 ex.pin_defender.b2 = {your:acc} зв’язано з {t1:ins}, тож у поля {sq} немає справжнього захисника.
 ex.pin_defender.b2.2 = Зв’язана фігура — поганий захисник. {your} не прикриє поле {sq}: позаду {t1}.
 ex.pin_defender.b3 = {your:acc} зв’язано з {t1:ins}; насправді {your:pron} не захищає поле {sq}.
@@ -512,6 +538,22 @@ ex.exchange_cheap.b5 = {your:acc} на {sq} легко атакувати деш
 ex.exchange_cheap.b5.2 = {reply} виграє матеріал на {sq}: під ударом {your}.
 ex.exchange_cheap.b6 = {reply} виграє {your:acc} на {sq}.
 ex.exchange_cheap.b6.2 = {line}: {your} на {sq} пропадає.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Обережно: тепер я можу виграти {t1:acc}.
+ex.material.b1.2 = Після цього ходу {t1} у небезпеці. Я можу {t1:pron_acc} виграти.
+ex.material.b2 = Цей хід дає мені змогу виграти {t1:acc}.
+ex.material.b2.2 = Тепер {t1} у біді, і я {t1:pron_acc} виграю.
+ex.material.b3 = {move} втрачає матеріал: {line}, і в тебе мінус {pts:point}.
+ex.material.b3.2 = {line} — і в тебе на {pts:point} менше.
+ex.material.b4 = {move} коштує матеріалу: {line}, і ти втрачаєш {pts:point}.
+ex.material.b4.2 = {line} — і в тебе мінус {pts:point}.
+ex.material.b5 = {move} віддає матеріал: {line}.
+ex.material.b5.2 = {line} — і я виграю {pts:point}.
+ex.material.b6 = {line}, і я виграв {pts:point}.
+ex.material.b6.2 = {move} втрачає {pts:point}: {line}.
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
 ex.missed_capture.b1 = Бачиш? {my} на {sq} без захисту. Можна було взяти {my:pron_acc} {your:bare_ins}.

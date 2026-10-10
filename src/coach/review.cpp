@@ -107,22 +107,25 @@ const char* exTypeName(ExType t) {
     case ExType::Opening: return "opening";
     case ExType::Endgame: return "endgame";
     case ExType::Positional: return "positional";
+    case ExType::Material: return "material";
     }
     return "none";
 }
 
 Band band(int level) {
     level = std::clamp(level, 1, 6);
-    // level, demo, mate line, missed mate, lookahead, sentences, remarks/10, praise every, offer cap, pause
-    // Level 2 shows three plies: the coach's move, the human's best answer and what the coach does
-    // then (two would stop on the human's move), and so a mate in two it announces.
+    // level, full demo, demo, line, mate line, missed mate, lookahead, sentences, remarks/10, praise
+    // every, offer cap, pause. Beginners see the whole sequence (a fork, the escape and the capture:
+    // three plies, five with a check and a recapture; a mate in two at level 1, in three at levels 2-3);
+    // from level 4 the demonstration stops where the problem stands (a mate in three: the four plies
+    // before the mate).
     static const Band kBands[6] = {
-        {1, 1, 1, 1, 2, 3, 5, 3, -1, 0.80f},
-        {2, 3, 3, 2, 3, 3, 4, 4, -1, 0.60f},
-        {3, 3, 3, 2, 4, 4, 3, 5, -1, 0.50f},
-        {4, 4, 3, 3, 5, 4, 3, 6, 5, 0.45f},
-        {5, 6, 5, 4, 7, 3, 2, 8, 3, 0.35f},
-        {6, 8, 7, 5, 9, 2, 2, 8, 2, 0.35f},
+        {1, true, 5, 1, 3, 1, 2, 3, 5, 3, -1, 0.80f},
+        {2, true, 7, 3, 5, 2, 3, 3, 4, 4, -1, 0.60f},
+        {3, true, 7, 3, 5, 2, 4, 4, 3, 5, -1, 0.50f},
+        {4, false, 4, 4, 7, 3, 5, 4, 3, 6, 5, 0.45f},
+        {5, false, 4, 6, 7, 4, 7, 3, 2, 8, 3, 0.35f},
+        {6, false, 4, 8, 7, 5, 9, 2, 2, 8, 2, 0.35f},
     };
     return kBands[level - 1];
 }
@@ -225,20 +228,45 @@ void limitPointing(Beat& b) {
     b.gestures.swap(kept);
 }
 
-int Ctx::lossAfter(int plies) const {
-    const int n = std::min<int>(plies, int(r.size()));
-    if (n <= 0) return 0;
-    int l = base - r[size_t(n - 1)].balance;
-    if (n < int(r.size())) l = std::min(l, base - r[size_t(n)].balance);
-    else if (rEnd.sideToMove() == human) l -= bestCapturePoints(rEnd, human);
-    return l;
-}
+int Ctx::lossAfter(int plies) const { return heldLoss(r, size_t(std::max(0, plies)), base, human, rEnd); }
 
 int Ctx::lossWithin(int plies) const {
     int worst = 0;
     const int n = std::min<int>(plies, int(r.size()));
     for (int i = 1; i <= n; ++i) worst = std::max(worst, lossAfter(i));
     return worst;
+}
+
+bool Ctx::lossExplains(int lost, bool pawn) const {
+    // A piece for two pawns is a loss when the best move loses nothing; when it loses something too,
+    // the move must lose two points more (one for a pawn).
+    const int need = pawn || bestLoss == 0 ? 1 : 2;
+    if (lost < need || lost - bestLoss < need) return false;
+    return lost >= 3 || 250 * lost >= dropCp;
+}
+
+bool Ctx::concreteLoss(int plies) const {
+    if (lossWithin(plies) - bestLoss >= 2) return true;
+    for (int i = 0; i < int(r.size()) && i < plies; ++i)
+        if (r[size_t(i)].mate && r[size_t(i)].mover == coach) return true;
+    return false;
+}
+
+int heldLoss(const std::vector<LineStep>& line, size_t plies, int base, Color pov, const Position& end) {
+    const size_t n = std::min(plies, line.size());
+    if (n == 0) return 0;
+    int l = base - line[n - 1].balance;
+    if (n < line.size()) {
+        // pov's capture on the next ply, taken back on the one after, is an exchange: counted whole.
+        size_t m = n;
+        if (line[n].mover == pov && line[n].captured != NoPiece && n + 1 < line.size() &&
+            line[n + 1].captured != NoPiece && line[n + 1].move.to == line[n].move.to)
+            m = n + 1;
+        l = std::min(l, base - line[m].balance);
+    } else if (end.sideToMove() == pov) {
+        l -= bestCapturePoints(end, pov);
+    }
+    return l;
 }
 
 int heldGain(const std::vector<LineStep>& line, size_t plies, int base, Color pov, const Position& end) {
@@ -342,24 +370,97 @@ Line narration(const Ctx& c, const Position& before, const LineStep& st, int i) 
 
 }  // namespace
 
-int demoLength(const Ctx& c, const Explanation& ex) {
-    const int cap = ex.type == ExType::MateAllowed ? std::max(c.b.demoPlies, c.b.mateLinePlies) : c.b.demoPlies;
-    const int line = int(c.r.size());
-    int n = std::min({ex.demoPlies, line, cap});
-    if (n > 0) {
-        const LineStep& last = c.r[size_t(n - 1)];
-        if (last.mover == c.human && last.captured == NoPiece && last.promotion == NoPiece) {
-            if (n < line && n < cap) ++n;   // the coach's next move (the line alternates)
-            else --n;
-        }
+namespace {
+
+// The plies of c.r before the first move of the human's that promotes (the table has no spare queen
+// for the human: a demonstration never goes past it), the whole line when none does.
+int beforeHumanPromotion(const Ctx& c) {
+    for (int i = 0; i < int(c.r.size()); ++i)
+        if (c.r[size_t(i)].mover == c.human && c.r[size_t(i)].promotion != NoPiece) return i;
+    return int(c.r.size());
+}
+
+Position afterPlies(const Ctx& c, int plies) {
+    Position q = c.p1;
+    for (int i = 0; i < plies && i < int(c.r.size()); ++i) q.makeMove(c.r[size_t(i)].move);
+    return q;
+}
+
+// The human's pieces among ex.targets that stand at the position after 'plies' plies of c.r, the
+// king aside (a check is said by the detector's own lines).
+std::vector<Square> standingTargets(const Ctx& c, const Explanation& ex, const Position& q) {
+    std::vector<Square> out;
+    for (Square t : ex.targets) {
+        const Piece pc = q.at(t);
+        if (!pc.empty() && pc.color == c.human && pc.type != King && out.size() < 2) out.push_back(t);
     }
-    return n;
+    return out;
+}
+
+// The coach points at the problem where a demonstration stops before the last capture: the mate
+// that comes next, else the pieces that fall (ex.targets), said with the pieces where they stand.
+bool designation(const Ctx& c, const Explanation& ex, const Position& q, Beat& out) {
+    const int k = ex.demoPlies;
+    if (ex.mate) {
+        if (k >= int(c.r.size()) || !c.r[size_t(k)].mate || c.r[size_t(k)].mover != c.coach) return false;
+        const LineStep& m = c.r[size_t(k)];
+        out = sayBeat("ex.point.mate", Look::Target, c.ply);
+        // The line says "checkmate" itself: the move without its '#' (else spoken twice).
+        std::string san = m.san;
+        if (!san.empty() && san.back() == '#') san.pop_back();
+        out.line.with("reply", Arg::ofMove(san, m.uci));
+        traceMove(out, m.piece, m.move.from, m.move.to, "reply");
+        return true;
+    }
+    const std::vector<Square> ts = standingTargets(c, ex, q);
+    if (ts.empty()) return false;
+    out = sayBeat(ts.size() >= 2 ? "ex.point.two" : "ex.point.piece", Look::Target, c.ply);
+    out.line.with("t1", pieceArg(q, ts[0], c.human));
+    pointPiece(out, ts[0], "t1", true);
+    if (ts.size() >= 2) {
+        out.line.with("t2", pieceArg(q, ts[1], c.human));
+        pointPiece(out, ts[1], "t2", true);
+    }
+    return true;
+}
+
+}  // namespace
+
+void planDemo(const Ctx& c, Explanation& ex) {
+    ex.demoPlies = 0;
+    ex.full = false;
+    if (ex.missed || c.r.empty() || c.r[0].mover != c.coach || ex.fullPlies <= 0) return;
+    const int reach = std::min(int(c.r.size()), beforeHumanPromotion(c));
+    // Levels 1-3: the whole sequence, when the level can follow it.
+    const int fullCap = ex.mate ? c.b.mateLinePlies : c.b.demoPlies;
+    if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap)) {
+        ex.full = true;
+        ex.demoPlies = ex.fullPlies;
+        return;
+    }
+    // A mate in one is the problem itself: shown at every level.
+    if (ex.mate && ex.fullPlies == 1 && reach >= 1) {
+        ex.full = true;
+        ex.demoPlies = 1;
+        return;
+    }
+    // Up to where the problem stands, and the coach points at what comes next.
+    if (ex.threatPlies <= 0 || ex.threatPlies >= ex.fullPlies || ex.threatPlies > std::min(reach, c.b.demoPlies)) return;
+    ex.demoPlies = ex.threatPlies;
+    Beat b;
+    if (ex.threatTail.empty() && !designation(c, ex, afterPlies(c, ex.threatPlies), b)) ex.demoPlies = 0;
+}
+
+int demoLength(const Ctx& c, const Explanation& ex) {
+    const int cap = ex.mate ? std::max(c.b.demoPlies, c.b.mateLinePlies) : c.b.demoPlies;
+    return std::max(0, std::min({ex.demoPlies, int(c.r.size()), cap}));
 }
 
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
     int shown = 0;
     Position pos = c.p1;
     const int plies = demoLength(c, ex);
+    bool stopped = false;
     for (int i = 0; i < plies; ++i) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover == c.human && st.promotion != NoPiece) {
@@ -369,6 +470,7 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
             b.line.with("sq", Arg::ofSquare(st.move.to)).with("your", pieceArg(pos, st.move.from, c.human));
             pointSquare(b, st.move.to, "sq");
             s.push_back(b);
+            stopped = true;
             break;
         }
         Beat d;
@@ -386,9 +488,32 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
         s.push_back(pause);
         pos.makeMove(st.move);
         ++shown;
+        // A full demonstration says what stands on the board once the problem is there (the fork,
+        // the pin), then plays on.
+        if (ex.full && shown == ex.threatPlies && shown < plies)
+            for (const Beat& t : ex.threatTail) s.push_back(t);
     }
-    if (shown > 0 && shown == ex.demoPlies)
-        for (const Beat& t : ex.tail) s.push_back(t);
+    if (shown > 0 && !stopped && shown == ex.demoPlies) {
+        if (ex.full) {
+            // The end of the sequence: the detector's closing lines, else what the human has lost
+            // (a single capture says it by itself: "I take your knight").
+            if (!ex.tail.empty()) {
+                for (const Beat& t : ex.tail) s.push_back(t);
+            } else if (!ex.mate && shown >= 2 && ex.lost >= 1 && c.level <= 3) {
+                // The human, to move, may still take something back: the board shows more than is
+                // lost for good, and the line says so ("you can take back, but ...").
+                const bool back = pos.sideToMove() == c.human && c.base - materialBalance(pos, c.human) > ex.lost;
+                Beat b = sayBeat(bandKey(back ? "ex.result_back" : "ex.result", c.level), Look::Player, c.ply);
+                b.line.with("pts", Arg::ofNumber(ex.lost));
+                s.push_back(b);
+            }
+        } else if (!ex.threatTail.empty()) {
+            for (const Beat& t : ex.threatTail) s.push_back(t);
+        } else {
+            Beat b;
+            if (designation(c, ex, pos, b)) s.push_back(b);
+        }
+    }
     if (shown > 0) {
         Beat r;
         r.kind = BeatKind::Rewind;
@@ -652,12 +777,25 @@ Review Reviewer::review(const ReviewInput& in) {
             break;
         }
     c.loss = c.lossWithin(bd.lookahead);
+    {
+        // What is still lost near the end of the best line's first 8 plies (an exchange with an
+        // in-between move loses nothing).
+        const size_t w = std::min<size_t>(8, c.best.size());
+        int lost = w > 0 ? heldLoss(c.best, w, c.base, human_, c.bestEnd) : 0;
+        for (size_t i = w > 2 ? w - 2 : 1; i < w; ++i) lost = std::min(lost, heldLoss(c.best, i, c.base, human_, c.bestEnd));
+        c.bestLoss = std::max(0, lost);
+    }
+    // whiteCp(s, true): the side to move's (the human's) centipawns.
+    c.dropCp = std::max(0, whiteCp(c.l1->score, true) - whiteCp(c.lp->score, true));
     v.materialSwing = heldGain(c.playedLine, 3, c.base, human_, c.playedEnd);
 
     // ---- What to say ----
     Explanation ex;
     const bool found = findExplanation(c, ex);
-    if (found) v.exType = ex.type;
+    if (found) {
+        v.exType = ex.type;
+        planDemo(c, ex);
+    }
     const bool topMove = cls == MoveClass::Best || cls == MoveClass::Excellent ||
                          ((cls == MoveClass::Book || cls == MoveClass::Forced) && c.j.delta < 2.0);
     const bool fault = cls == MoveClass::Inaccuracy || cls == MoveClass::Mistake || cls == MoveClass::Blunder;
@@ -665,13 +803,39 @@ Review Reviewer::review(const ReviewInput& in) {
     const bool decidedLoss = c.j.wBest <= 10.0;
     const bool mateType = ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed;
     const bool missedPiece = ex.type == ExType::MissedCapture && ex.offer;   // levels 1-2, a piece of 3+
+    // A reason the coach can give: what the move allows or misses on the board, a king left open, a
+    // lost ending; not the positional fallback (it only names the better move).
+    const bool reason = found && ex.type != ExType::Positional;
+    // Still better after the move: a costly move without a reason the board shows only gets a word
+    // about the better move, never a blunder or mistake verdict that a player still ahead cannot see.
+    const bool stillBetter = c.j.wPlayed >= 60.0;
 
     bool voice = false;
     bool isRemark = false;   // counts against the unsolicited-remarks cap
+    // A dubious move (an inaccuracy, or a costly move with no reason to show while still better):
+    // at most a short word about the better move, levels 3-6, never a scenario, a demonstration or
+    // an offer.
+    bool slip = false;
+    // A piece or more lost on the board in a position already one-sided (the win percentage barely
+    // moves): shown as the mistake it is, without a verdict or an offer.
+    const bool materialType = ex.type == ExType::Fork || ex.type == ExType::Discovered || ex.type == ExType::Skewer ||
+                              ex.type == ExType::Pin || ex.type == ExType::Trapped || ex.type == ExType::BackRank ||
+                              ex.type == ExType::Hanging || ex.type == ExType::Exchange || ex.type == ExType::Material;
+    const bool hiddenLoss = cls == MoveClass::Inaccuracy && found && materialType && ex.lost >= 3;
     if (found && ex.type == ExType::Stalemate) voice = true;
     else if (found && ex.type == ExType::MateMissed) voice = true;   // the detector checks the band's limit
     else if (missedPiece) voice = true;
-    else if (fault) {
+    else if (hiddenLoss) {
+        voice = true;
+        isRemark = true;
+    } else if (cls == MoveClass::Inaccuracy || (fault && !reason && stillBetter)) {
+        // Never for a move that loses material: "a bit better" would play it down.
+        slip = level_ >= 3 && !c.isBest && !c.best.empty() && !c.concreteLoss(8) &&
+               (cls != MoveClass::Inaccuracy ||
+                ((level_ == 6 || c.j.delta >= 7.0) && humanMoves_ - lastSlip_ >= 3));
+        voice = slip;
+        isRemark = true;
+    } else if (fault) {
         switch (level_) {
         case 1: voice = cls == MoveClass::Blunder && found && ex.concrete; break;
         case 2:
@@ -679,13 +843,7 @@ Review Reviewer::review(const ReviewInput& in) {
                     (cls == MoveClass::Mistake && found && ex.concrete && c.lossWithin(2) >= 1);
             isRemark = cls != MoveClass::Blunder;
             break;
-        case 3: voice = cls != MoveClass::Inaccuracy; isRemark = cls == MoveClass::Mistake; break;
-        case 4:
-            // Inaccuracies only with a clear, concrete principle (and within the remarks cap).
-            voice = cls != MoveClass::Inaccuracy || (found && ex.type != ExType::Positional);
-            isRemark = cls != MoveClass::Blunder;
-            break;
-        case 5: voice = cls != MoveClass::Inaccuracy || c.j.delta >= 7.0; isRemark = cls != MoveClass::Blunder; break;
+        case 3: voice = true; isRemark = cls == MoveClass::Mistake; break;
         default: voice = true; isRemark = cls != MoveClass::Blunder; break;
         }
     }
@@ -694,6 +852,7 @@ Review Reviewer::review(const ReviewInput& in) {
     if (voice && (cls == MoveClass::Forced || cls == MoveClass::Book) && !mateType && ex.type != ExType::Stalemate) voice = false;
     if (voice && isRemark && !remarkAllowed()) voice = false;
     if (voice && retry && out.takeback.same) voice = false;
+    if (!voice) slip = false;
     // A principle instead (opening, technique): never a fault claim, Low priority, once per game each.
     Explanation tipEx;
     bool tip = false;
@@ -717,13 +876,24 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     }
 
-    if (voice) {
+    if (slip) {
+        // "Inaccurate: Nf3 was more precise", the better move traced.
+        v.voiced = true;
+        noteRemark();
+        lastSlip_ = humanMoves_;
+        Beat vb = sayBeat(bandKey("ex.verdict.inaccuracy", level_), Look::Target, ply);
+        vb.line.with("move", Arg::ofMove(c.playedSan, c.playedUci)).with("best", moveArg(c.best[0]));
+        traceMove(vb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
+        s.push_back(vb);
+    } else if (voice) {
         v.voiced = true;
         if (isRemark) noteRemark();
-        // Offer policy: every voiced blunder, and the cases the detector flags per level (a mate
-        // within the band's limit, stalemate when winning, a free piece of 3+ points missed at
-        // levels 1-2).
-        bool offer = cls == MoveClass::Blunder || ex.offer;
+        // Offer policy: a voiced blunder whose reason the coach shows on the board (not to a player
+        // still clearly ahead), and the cases the detector flags per level (a mate within the band's
+        // limit, stalemate when winning, a free piece of 3+ points missed at levels 1-2).
+        // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
+        const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
+        bool offer = (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) || (ex.offer && !hiddenLoss && !wonAnyway);
         if (bd.offerCap >= 0 && offers_ >= bd.offerCap && !(ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed))
             offer = false;
         if (!offersEnabled_) offer = false;
@@ -731,7 +901,8 @@ Review Reviewer::review(const ReviewInput& in) {
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
         if (g.isOver()) offer = false;   // the move (or a draw meanwhile) ended the game: nothing to take back
 
-        // Sentence budget: verdict, cause, tail, tip, better move (demo narration, rewind and offer excluded).
+        // Sentence budget: verdict, cause, tip, better move (the demonstration's own lines, the rewind
+        // and the offer excluded).
         const bool wantBetter = level_ >= 3 && !ex.includesBest && !c.isBest && !c.best.empty() &&
                                 ex.type != ExType::MateMissed && ex.type != ExType::MissedCapture &&
                                 ex.type != ExType::MissedFork;
@@ -740,52 +911,34 @@ Review Reviewer::review(const ReviewInput& in) {
         // No verdict for a move that is not a fault (a slower mate at levels 5-6, a free piece
         // missed with a small loss at levels 1-2 gets the "missed" one): the cause says it all.
         if (ex.missed && level_ <= 2) verdictKey = bandKey("ex.verdict.missed", level_);
+        else if (wonAnyway || hiddenLoss) verdictKey.clear();
         else if (cls == MoveClass::Blunder) {
             verdictKey = bandKey("ex.verdict.blunder", level_);
             shake = true;
         } else if (cls == MoveClass::Mistake) {
             if (level_ >= 3) verdictKey = bandKey("ex.verdict.mistake", level_);   // level 2: one sentence only
-        } else if (cls == MoveClass::Inaccuracy) {
-            // Never called a mistake: the appraisal counts it as an inaccuracy.
-            if (level_ >= 4 && (!found || ex.type == ExType::Positional)) verdictKey = bandKey("ex.verdict.inaccuracy", level_);
-            else if (level_ >= 4) verdictKey = bandKey("ex.verdict.imprecise", level_);
         }
-        const bool verdictNamesBest = verdictKey.rfind("ex.verdict.inaccuracy", 0) == 0;
         int budget = bd.sentences - (verdictKey.empty() ? 0 : 1);
-        std::vector<Beat> cause = ex.cause, tail = ex.tail, tip = ex.tip;
+        std::vector<Beat> cause = ex.cause, tip = ex.tip;
+        Explanation shown = ex;
         if (level_ == 2 && cls == MoveClass::Mistake) {   // "one sentence"
             if (cause.size() > 1) cause.resize(1);
-            tail.clear();
             tip.clear();
         }
-        const bool better = wantBetter && !verdictNamesBest && (cause.empty() || budget >= 2);
+        const bool better = wantBetter && (cause.empty() || budget >= 2);
         if (better) --budget;
-        std::vector<Beat> useCause, useTail, useTip;
-        for (size_t i = 0; i < cause.size() && budget > 0 && i < 1; ++i, --budget) useCause.push_back(cause[i]);
-        // Tail lines: when the demonstration shows every ply planned (the human's promotion
-        // aside, appendDemo stops there).
-        const int demoShown = demoLength(c, ex);
-        bool demoFull = demoShown > 0 && demoShown == ex.demoPlies && c.r[0].mover != human_;
-        for (int i = 0; demoFull && i < demoShown; ++i)
-            if (c.r[size_t(i)].mover == human_ && c.r[size_t(i)].promotion != NoPiece) demoFull = false;
-        if (demoFull)
-            for (size_t i = 0; i < tail.size() && budget > 0; ++i, --budget) useTail.push_back(tail[i]);
-        for (size_t i = 1; i < cause.size() && budget > 0; ++i, --budget) useCause.push_back(cause[i]);
+        std::vector<Beat> useCause, useTip;
+        for (size_t i = 0; i < cause.size() && budget > 0; ++i, --budget) useCause.push_back(cause[i]);
         for (size_t i = 0; i < tip.size() && budget > 0; ++i, --budget) useTip.push_back(tip[i]);
 
         if (!verdictKey.empty()) {
             Beat vb = sayBeat(verdictKey, Look::Player, ply);
             vb.line.with("move", Arg::ofMove(c.playedSan, c.playedUci));
             if (!c.best.empty()) vb.line.with("best", moveArg(c.best[0]));
-            if (verdictNamesBest && !c.best.empty()) {
-                vb.look = Look::Target;
-                traceMove(vb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
-            } else if (shake) {
-                vb.gestures.push_back(Gesture{GestureKind::ShakeHead, NoSquare, {}, "", 0.0f, false});
-            }
+            if (shake) vb.gestures.push_back(Gesture{GestureKind::ShakeHead, NoSquare, {}, "", 0.0f, false});
             s.push_back(vb);
         }
-        const bool demo = ex.demoPlies > 0 && !c.r.empty();
+        const bool demo = shown.demoPlies > 0 && !c.r.empty();
         for (Beat b : useCause) {
             if (demo)
                 for (Mark& m : b.marks) m.untilRewind = true;
@@ -793,9 +946,8 @@ Review Reviewer::review(const ReviewInput& in) {
             s.push_back(b);
         }
         if (demo) {
-            Explanation shown = ex;
-            shown.tail = useTail;
             for (Beat& t : shown.tail) limitPointing(t);
+            for (Beat& t : shown.threatTail) limitPointing(t);
             appendDemo(c, shown, s);
         }
         for (Beat b : useTip) {
@@ -805,7 +957,7 @@ Review Reviewer::review(const ReviewInput& in) {
         if (better) {
             // {line} is what follows {best} ("Nf3, with the idea d4 c5"), never {best} again; level 5
             // names that idea, so without a continuation it says the level-4 line instead.
-            std::string idea = sanLine(c.best, 1, size_t(std::max(1, std::min(4, bd.demoPlies) - 1)));
+            std::string idea = sanLine(c.best, 1, size_t(std::max(1, std::min(4, bd.linePlies) - 1)));
             Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
             bb.line.with("best", moveArg(c.best[0]))
                 .with("move", Arg::ofMove(c.playedSan, c.playedUci))

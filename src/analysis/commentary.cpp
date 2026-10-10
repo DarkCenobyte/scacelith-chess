@@ -107,6 +107,76 @@ struct MoveCtx {
         for (int i = 1; i <= n && i <= int(best.size()); ++i) g = std::max(g, bestGain(i));
         return g;
     }
+
+    // What the mover has lost for good after the first n plies of 'reply', from the position before
+    // the move (a capture the move made counts), as coach::detail::heldLoss measures it: the mover's
+    // recapture on the next ply undoes it, not a capture there that is taken back on the ply after.
+    int moverLoss(int n) const {
+        const int size = int(reply.size());
+        n = std::min(n, size);
+        const int base = coach::materialBalance(before, opp);
+        if (n <= 0) return coach::materialBalance(after, opp) - base;
+        int l = reply[size_t(n - 1)].balance - base;
+        if (n < size) {
+            int m = n;
+            if (reply[size_t(n)].mover == mover && reply[size_t(n)].captured != NoPiece && n + 1 < size &&
+                reply[size_t(n + 1)].captured != NoPiece && reply[size_t(n + 1)].move.to == reply[size_t(n)].move.to)
+                m = n + 1;
+            l = std::min(l, reply[size_t(m)].balance - base);
+        } else if (replyEnd.sideToMove() == mover) {
+            l -= coach::bestCapturePoints(replyEnd, mover);
+        }
+        return l;
+    }
+    int bestLoss = 0;   // what the mover is still down near the end of the best line's first 8 plies
+    int dropCp = 0;     // the mover's centipawns after the best move minus after the move played
+    // Whether losing 'lost' points is why the move is bad (coach::detail::Ctx::lossExplains): a
+    // real loss, one the best move avoids, and the size of the engine's drop.
+    bool explains(int lost) const {
+        const int need = bestLoss == 0 ? 1 : 2;
+        if (lost < need || lost - bestLoss < need) return false;
+        return lost >= 3 || 250 * lost >= dropCp;
+    }
+    // The loss the opponent's capture at ply k of 'reply' settles (with the mover's recapture when it
+    // comes next), where the mover cannot take back enough at once and is still down by as much four
+    // plies later, more than before that capture; 0 when it does not explain the move.
+    int settledLoss(int k, int* plies = nullptr) const {
+        const int n = int(reply.size());
+        if (k < 0 || k >= n || reply[size_t(k)].mover != opp || reply[size_t(k)].captured == NoPiece) return 0;
+        Position q = after;
+        for (int i = 0; i <= k; ++i) q.makeMove(reply[size_t(i)].move);
+        const int already = k > 0 ? moverLoss(k) : 0;
+        // The mover's recapture on the next ply is part of the sequence (said with it).
+        const bool retake = k + 1 < n && reply[size_t(k + 1)].mover == mover && reply[size_t(k + 1)].captured != NoPiece &&
+                            reply[size_t(k + 1)].move.to == reply[size_t(k)].move.to;
+        for (int p = k + 1; p <= std::min(n, k + 2); ++p) {
+            if (p > k + 1) q.makeMove(reply[size_t(p - 1)].move);
+            if (retake && p == k + 1) continue;
+            const LineStep& st = reply[size_t(p - 1)];
+            if (st.captured == NoPiece || st.mate) continue;
+            const int board = coach::materialBalance(q, opp) - coach::materialBalance(before, opp);
+            int l = board;
+            if (q.sideToMove() == mover) l -= coach::bestCapturePoints(q, mover);
+            // What the mover could take back at once is taken off, unless that loss would not
+            // explain the move and the line shows the take-back never comes (the board's loss then);
+            // the capture at k must add to what was lost before it.
+            const int held = p < n ? moverLoss(std::min(n, p + 4)) : l;
+            if (held > l && p < n && reply[size_t(p)].mover == mover && reply[size_t(p)].captured == NoPiece &&
+                !(l > already && explains(l))) {
+                // Four plies later, the board still shows as much lost, whatever the mover could take then.
+                const int at = std::min(n, p + 4);
+                Position later = q;
+                for (int i = p; i < at; ++i) later.makeMove(reply[size_t(i)].move);
+                int still = coach::materialBalance(later, opp) - coach::materialBalance(before, opp);
+                if (later.sideToMove() == mover) still -= coach::bestCapturePoints(later, mover);
+                l = std::max(l, std::min({board, held, still}));
+            }
+            if (l <= already || !explains(l) || !explains(held)) continue;
+            if (plies) *plies = p;
+            return l;
+        }
+        return 0;
+    }
 };
 
 MoveCtx contextOf(const GameReview& r, int ply) {
@@ -124,7 +194,14 @@ MoveCtx contextOf(const GameReview& r, int ply) {
     c.replyEnd = coach::detail::lineEnd(c.after, c.reply);
     c.best = coach::replayLine(c.before, c.e0->pv, c.mover, 16);
     c.bestEnd = coach::detail::lineEnd(c.before, c.best);
-    c.j = coach::judge(c.e0->best, c.v.playedBest ? c.e0->best : c.e1->best.flipped(), c.v.playedBest);
+    const ai::Score played = c.v.playedBest ? c.e0->best : c.e1->best.flipped();
+    c.j = coach::judge(c.e0->best, played, c.v.playedBest);
+    c.dropCp = std::max(0, coach::detail::whiteCp(c.e0->best, true) - coach::detail::whiteCp(played, true));
+    const size_t w = std::min<size_t>(8, c.best.size());
+    const int base = coach::materialBalance(c.before, c.mover);
+    int lost = w > 0 ? coach::detail::heldLoss(c.best, w, base, c.mover, c.bestEnd) : 0;
+    for (size_t i = w > 2 ? w - 2 : 1; i < w; ++i) lost = std::min(lost, coach::detail::heldLoss(c.best, i, base, c.mover, c.bestEnd));
+    c.bestLoss = std::max(0, lost);
     return c;
 }
 
@@ -157,7 +234,8 @@ bool mateAllowed(const MoveCtx& c, Comment& out, Said& said) {
     return true;
 }
 
-// The reply forks two of the mover's pieces, the line takes one of them and keeps material for it.
+// The reply forks two of the mover's pieces, and the line takes one of them, that very piece, soon
+// after: a loss that explains the move (MoveCtx::settledLoss; a capture the move made counts).
 bool forkAllowed(const MoveCtx& c, Comment& out) {
     if (c.reply.size() < 3 || c.reply[0].mover != c.opp) return false;
     const LineStep& r0 = c.reply[0];
@@ -165,13 +243,18 @@ bool forkAllowed(const MoveCtx& c, Comment& out) {
     p2.makeMove(r0.move);
     const uint64_t targets = coach::forkTargets(p2, r0.move.to);
     if (squareCount(targets) < 2) return false;
-    bool taken = false;
-    for (size_t i = 2; i < c.reply.size() && i <= 6; i += 2)
-        if (c.reply[i].captured != NoPiece && coach::detail::hasBit(targets, c.reply[i].move.to)) taken = true;
-    int gain = 0;
-    for (int n = 1; n <= 7 && n <= int(c.reply.size()); ++n) gain = std::max(gain, c.replyGain(n));
-    if (!taken || gain < 2) return false;
-    const std::vector<Square> ts = byValue(p2, targets);
+    Square taken = NoSquare;
+    for (size_t i = 2; i < c.reply.size() && i <= 4 && taken == NoSquare; i += 2) {
+        const LineStep& st = c.reply[i];
+        if (st.captured == NoPiece || !coach::detail::hasBit(targets, st.move.to)) continue;
+        bool stays = true;   // the target did not move away (another piece took its square)
+        for (size_t j = 1; j < i; ++j)
+            if (c.reply[j].mover == c.mover && c.reply[j].move.from == st.move.to) stays = false;
+        if (stays && c.settledLoss(int(i)) > 0) taken = st.move.to;
+    }
+    if (taken == NoSquare) return false;
+    std::vector<Square> ts = byValue(p2, targets);
+    if (ts[0] != taken && ts[1] != taken) ts[1] = taken;   // the piece that falls is named
     coach::Line l = say("an.fork");
     l.with("reply", moveArg(r0)).with("t1", sidePiece(p2, ts[0])).with("t2", sidePiece(p2, ts[1]));
     out.lines.push_back(l);
@@ -182,7 +265,8 @@ bool forkAllowed(const MoveCtx& c, Comment& out) {
     return true;
 }
 
-// A piece of the mover's has no defender, and the reply takes the whole of it for good.
+// A piece of the mover's has no defender, and the reply takes the whole of it, a loss that explains
+// the move (counted from before it).
 bool hanging(const MoveCtx& c, Comment& out) {
     if (c.reply.empty() || c.reply[0].mover != c.opp) return false;
     const LineStep& r0 = c.reply[0];
@@ -190,7 +274,7 @@ bool hanging(const MoveCtx& c, Comment& out) {
         return false;
     const Square s = r0.move.to;
     if (!coach::isUndefended(c.after, s) || coach::seePoints(c.after, r0.move) < points(r0.captured)) return false;
-    if (c.replyGain(1) < 2) return false;
+    if (c.settledLoss(0) <= 0) return false;
     coach::Line l = say("an.hanging");
     l.with("piece", sidePiece(c.after, s)).with("reply", moveArg(r0));
     out.lines.push_back(l);
@@ -199,19 +283,13 @@ bool hanging(const MoveCtx& c, Comment& out) {
     return true;
 }
 
-// Material the engine's line wins and keeps, within 4 plies: "{line} wins {pts}".
+// Material the engine's line wins and keeps, within 4 plies, as much as the move costs and more than
+// the best move loses: "{line} wins {pts}" (net, from before the move).
 bool materialLine(const MoveCtx& c, Comment& out) {
     if (c.reply.empty() || c.reply[0].mover != c.opp) return false;
     int plies = 0, gain = 0;
-    for (int n = 1; n <= 4 && n <= int(c.reply.size()); ++n) {
-        const int g = c.replyGain(n);
-        if (g >= 2) {
-            plies = n;
-            gain = g;
-            break;
-        }
-    }
-    if (plies == 0) return false;
+    for (int k = 0; k < 4 && k < int(c.reply.size()) && plies == 0; ++k) gain = c.settledLoss(k, &plies);
+    if (plies == 0 || gain <= 0) return false;
     coach::Line l = say("an.material");
     l.with("line", Arg::ofMoves(coach::sanLine(c.reply, 0, size_t(plies)))).with("pts", Arg::ofNumber(gain));
     out.lines.push_back(l);

@@ -115,12 +115,18 @@ bool startsWith(const std::string& s, const char* prefix) { return s.rfind(prefi
 
 // Say lines counted against the level's sentence budget: demonstration narration (and the
 // promotion stop), the rewind, the offer and the retry reactions are not.
+// The Say lines a band's sentence budget counts: not the demonstration's own lines (from its first
+// move to the rewind: the narration, what the table now shows, what falls next).
 int sentences(const Script& s) {
     int n = 0;
-    for (const Beat& b : s)
-        if (b.kind == BeatKind::Say && !b.line.key.empty() && !startsWith(b.line.key, "demo.") &&
+    bool inDemo = false;
+    for (const Beat& b : s) {
+        if (b.kind == BeatKind::DemoMove) inDemo = true;
+        if (b.kind == BeatKind::Rewind) inDemo = false;
+        if (b.kind == BeatKind::Say && !inDemo && !b.line.key.empty() && !startsWith(b.line.key, "demo.") &&
             !startsWith(b.line.key, "tb."))
             ++n;
+    }
     return n;
 }
 
@@ -250,9 +256,11 @@ Review reviewOf(Reviewer& rv, const Game& g, const ai::Analysis& a0, bool inBook
 
 // The worked example: 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 4.Nxe5, refuted by 4...Qg5 (fork of e5 and g2).
 Game forkGame() { return gameOf(nullptr, {"e4", "e5", "Nf3", "Nc6", "Bc4", "Nd4", "Nxe5"}); }
+// The engine's lines (depth 16): 4...Qg5 forks the knight and g2; 5.Bxf7+ Kd8 6.O-O Qxe5 wins the
+// knight for two pawns.
 ai::Analysis forkA0() {
-    return analysisOf({pvl(40, "f3d4 e5d4 e1g1 g8f6"), pvl(20, "e1g1 d7d6 f3d4 e5d4"),
-                       pvl(-350, "f3e5 d8g5 e5f7 g5g2 h1f1 g2e4 c4e2 d4f3")});
+    return analysisOf({pvl(138, "f3d4 e5d4 e1g1 c7c6 f1e1 d7d6"), pvl(125, "e1g1 d4f3 d1f3 d8f6 f3g3 d7d6"),
+                       pvl(-90, "f3e5 d8g5 c4f7 e8d8 e1g1 g5e5 c2c3 d4e6 d2d3 g7g5")});
 }
 
 // A knight left en prise: 1.Nd5?? exd5.
@@ -322,12 +330,18 @@ TEST(coach_review_classification_thresholds) {
 }
 
 TEST(coach_review_bands) {
-    // Demonstration depth per level: 1 at level 1 ... 8 at level 6 (level 2: the coach's move, the
-    // answer and the coach's next move, never stopping on the human's move).
-    const int demo[6] = {1, 3, 3, 4, 6, 8};
+    // Levels 1-3 play the whole sequence on the table (up to 5, 7, 7 plies); levels 4-6 play up to
+    // the problem (4 plies at most) and point at what comes next. The lines said in words grow with
+    // the level.
+    const bool full[6] = {true, true, true, false, false, false};
+    const int demo[6] = {5, 7, 7, 4, 4, 4};
+    const int words[6] = {1, 3, 3, 4, 6, 8};
     for (int l = 1; l <= 6; ++l) {
         CHECK_EQ(band(l).level, l);
+        CHECK_EQ(band(l).fullDemo, full[l - 1]);
         CHECK_EQ(band(l).demoPlies, demo[l - 1]);
+        CHECK_EQ(band(l).linePlies, words[l - 1]);
+        CHECK(band(l).mateLinePlies >= 3);   // a mate in two is always shown in full
         CHECK(band(l).sentences >= 2 && band(l).sentences <= 4);
     }
     CHECK_EQ(band(0).level, 1);
@@ -384,10 +398,9 @@ TEST(coach_review_fork_worked_example) {
         CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
         CHECK_EQ(r.verdict.exType, ExType::Fork);   // before king safety / positional (ExType order)
         CHECK(r.verdict.voiced);
+        CHECK(r.offersTakeback);
         checkScript(r.script, where);
-        // Level 4's lines say "after {line}, you've lost {pts}": after Qxg2 White is still a pawn up
-        // (the fork wins by mate, later), so level 4 says the fork with level 5's lines.
-        const std::string key = "ex.fork.b" + std::to_string(level == 4 ? 5 : level);
+        const std::string key = "ex.fork.b" + std::to_string(level);
         const Beat* cause = beatWithKey(r.script, key);
         CHECK(cause != nullptr);
         if (!cause) {
@@ -402,10 +415,25 @@ TEST(coach_review_fork_worked_example) {
             CHECK_EQ(t2->square, sq("g2"));
             CHECK(t1->own && t2->own);
         }
-        // Demonstration: 1 ply at level 1, then up to 3 plies capped by the level's depth.
+        // Levels 1-3: the whole sequence, Qg5 Bxf7+ Kd8 O-O Qxe5, then what it cost (a knight for two
+        // pawns: one point). Levels 4-6: Qg5, then the coach points at what falls.
         const int shown = demoMoves(r.script);
-        CHECK(shown >= 1 && shown <= band(level).demoPlies);
-        CHECK_EQ(shown, level == 1 ? 1 : std::min(3, band(level).demoPlies));
+        CHECK_EQ(shown, level <= 3 ? 5 : 1);
+        bool took = false;
+        for (const Beat& b : r.script)
+            if (b.kind == BeatKind::DemoMove && b.uci == "g5e5") took = true;
+        CHECK_EQ(took, level <= 3);
+        if (level <= 3) {
+            const Beat* res = beatWithKey(r.script, "ex.result.b" + std::to_string(level));
+            CHECK(res != nullptr);
+            if (res && res->line.arg("pts")) CHECK_EQ(res->line.arg("pts")->number, 1);
+        } else {
+            CHECK(hasKey(r.script, "ex.point.two"));
+        }
+        if (level == 4) {
+            const Arg* pts = cause->line.arg("pts");
+            CHECK(pts && pts->number == 1);
+        }
         CHECK(sentences(r.script) <= band(level).sentences);
         if (level == 1) {
             CHECK(hasKey(r.script, "ex.fork.tail.b1"));
@@ -461,7 +489,10 @@ TEST(coach_review_mate_missed) {
         CHECK_EQ(demoMoves(r.script), 0);   // the table shows the position after the move: trace only
         checkScript(r.script, where);
         if (level <= 2) CHECK(hasKey(r.script, "ex.verdict.missed.b" + std::to_string(level)));
-        CHECK(r.offersTakeback);
+        // Still winning by far after Kf1: from level 3, the mate is said without a verdict or an offer.
+        if (level >= 3)
+            for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.verdict."));
+        CHECK_EQ(r.offersTakeback, level <= 2);
         if (level == 1) {
             g.undo(1);
             Script hint = rv.takebackAccepted(g);
@@ -526,55 +557,136 @@ TEST(coach_review_demo_stops_before_promotion) {
     CHECK(!s.empty() && s.back().kind == BeatKind::Rewind);
     if (!s.empty()) CHECK_EQ(s.back().count, 1);
 
-    // Never deeper than the level: level 2 shows at most 3 plies of a 4-ply line.
-    c.level = 2;
-    c.b = band(2);
+    // Never deeper than the level: level 4 shows at most 4 plies of a 5-ply line.
+    c.level = 4;
+    c.b = band(4);
     CHECK(c.p1.setFEN("4k3/8/8/8/8/7r/1P6/4K3 b - - 0 1"));
-    c.r = replayLine(c.p1, {"h3h4", "b2b4", "e8d7", "b4b5"}, White);
+    c.r = replayLine(c.p1, {"h3h4", "b2b4", "e8d7", "b4b5", "d7c7"}, White);
+    ex.demoPlies = 5;
     Script s2;
     detail::appendDemo(c, ex, s2);
     checkScript(s2, "depth cap");
-    CHECK_EQ(demoMoves(s2), 3);
-    if (!s2.empty()) CHECK_EQ(s2.back().count, 3);
+    CHECK_EQ(demoMoves(s2), 4);
+    if (!s2.empty()) CHECK_EQ(s2.back().count, 4);
 }
 
-TEST(coach_review_demo_ends_on_the_coach_move) {
-    // A demonstration that would stop on a quiet move of the player's ("say you play your queen
-    // there", then the pieces go back) shows the coach's next move when the level allows it, else
-    // stops one move earlier.
+TEST(coach_review_demo_plan_per_level) {
+    // One loss: 1...Rh2 attacks the knight, 2.Ka7 Rxb2 takes it. Levels 1-3 play the whole sequence;
+    // levels 4-6 play the rook's move, then point at the knight; a sequence longer than the level's
+    // demonstrations is played up to the problem instead.
     detail::Ctx c;
     c.human = White;
     c.coach = Black;
     c.ply = 20;
-    CHECK(c.p1.setFEN("4k3/8/8/8/8/7r/1P6/4K3 b - - 0 1"));
-    c.r = replayLine(c.p1, {"h3h4", "b2b4", "e8d7", "b4b5", "d7c7"}, White);
-    CHECK_EQ(c.r.size(), size_t(5));
-    detail::Explanation ex;
-    ex.demoPlies = 4;
-    for (int level : {4, 5}) {
+    CHECK(c.p1.setFEN("K3k3/8/8/8/8/7r/1N6/8 b - - 0 1"));
+    c.base = materialBalance(c.p1, White);
+    c.r = replayLine(c.p1, {"h3h2", "a8a7", "h2b2", "a7a6"}, White);
+    CHECK_EQ(c.r.size(), size_t(4));
+    for (int level = 1; level <= 6; ++level) {
         c.level = level;
         c.b = band(level);
+        detail::Explanation ex;
+        ex.fullPlies = 3;     // the knight taken, for good
+        ex.threatPlies = 1;   // the rook attacks it
+        ex.lost = 3;
+        ex.targets = {sq("b2")};
+        detail::planDemo(c, ex);
+        CHECK_EQ(ex.full, level <= 3);
+        CHECK_EQ(ex.demoPlies, level <= 3 ? 3 : 1);
         Script s;
         detail::appendDemo(c, ex, s);
-        checkScript(s, "ends on the coach");
-        const int want = level == 4 ? 3 : 5;   // level 4: 4 plies at most; level 5: up to 6
-        CHECK_EQ(detail::demoLength(c, ex), want);
-        CHECK_EQ(demoMoves(s), want);
-        if (!s.empty()) CHECK_EQ(s.back().count, want);
+        checkScript(s, "demo plan");
+        CHECK_EQ(demoMoves(s), ex.demoPlies);
+        if (level <= 3) {
+            CHECK(hasKey(s, "ex.result.b" + std::to_string(level)));
+        } else {
+            const Beat* point = beatWithKey(s, "ex.point.piece");
+            CHECK(point != nullptr);
+            if (point) {
+                const Arg* t1 = point->line.arg("t1");
+                CHECK(t1 && t1->square == sq("b2") && t1->piece == Knight);
+            }
+        }
+        CHECK(!s.empty() && s.back().kind == BeatKind::Rewind);
     }
-    // Level 2 never stops after two plies (its depth is three).
-    c.level = 2;
-    c.b = band(2);
-    ex.demoPlies = 2;
-    CHECK_EQ(detail::demoLength(c, ex), 3);
-    // The player's recapture may end it: the exchange is complete.
+    // Where the sequence ends, the player could still take a pawn back: the line says so, with
+    // what is lost even then.
+    c.level = 1;
+    c.b = band(1);
+    {
+        detail::Ctx d = c;
+        CHECK(d.p1.setFEN("K3k3/8/8/2p5/3P4/7r/1N6/8 b - - 0 1"));
+        d.base = materialBalance(d.p1, White);
+        d.r = replayLine(d.p1, {"h3h2", "a8a7", "h2b2", "d4c5"}, White);
+        detail::Explanation back;
+        back.fullPlies = 3;
+        back.threatPlies = 1;
+        back.lost = 2;
+        back.targets = {sq("b2")};
+        detail::planDemo(d, back);
+        Script sb;
+        detail::appendDemo(d, back, sb);
+        checkScript(sb, "result back");
+        CHECK_EQ(demoMoves(sb), 3);
+        CHECK(hasKey(sb, "ex.result_back.b1"));
+    }
+    // A sequence longer than the level's demonstrations: up to the problem, then the pointing.
+    c.level = 1;
+    c.b = band(1);
+    detail::Explanation lng;
+    lng.fullPlies = 7;
+    lng.threatPlies = 1;
+    lng.lost = 3;
+    lng.targets = {sq("b2")};
+    detail::planDemo(c, lng);
+    CHECK(!lng.full);
+    CHECK_EQ(lng.demoPlies, 1);
+    // A mate in one is shown at every level, nothing else to point at.
+    for (int level : {1, 4, 6}) {
+        c.level = level;
+        c.b = band(level);
+        detail::Explanation m;
+        m.fullPlies = 1;
+        m.mate = true;
+        detail::planDemo(c, m);
+        CHECK(m.full);
+        CHECK_EQ(m.demoPlies, 1);
+    }
+    // Nothing that stands on the board to point at, no threat line: words only (levels 4-6).
+    c.level = 5;
+    c.b = band(5);
+    detail::Explanation none;
+    none.fullPlies = 3;
+    none.threatPlies = 0;
+    detail::planDemo(c, none);
+    CHECK_EQ(none.demoPlies, 0);
+}
+
+TEST(coach_review_demo_length_caps) {
+    detail::Ctx c;
+    c.human = White;
+    c.coach = Black;
+    CHECK(c.p1.setFEN("4k3/8/8/8/8/7r/1P6/4K3 b - - 0 1"));
+    c.r = replayLine(c.p1, {"h3h4", "b2b4", "e8d7", "b4b5", "d7c7"}, White);
+    detail::Explanation ex;
+    ex.demoPlies = 5;
+    const int want[6] = {5, 5, 5, 4, 4, 4};
+    for (int level = 1; level <= 6; ++level) {
+        c.level = level;
+        c.b = band(level);
+        CHECK_EQ(detail::demoLength(c, ex), want[level - 1]);
+    }
+    // A mating line goes as far as the level's mates (level 4: up to a mate in four).
     c.level = 4;
     c.b = band(4);
-    CHECK(c.p1.setFEN("4k3/8/8/8/8/2B4r/1P6/4K3 b - - 0 1"));
-    c.r = replayLine(c.p1, {"h3c3", "b2c3", "e8d7"}, White);
-    CHECK_EQ(c.r.size(), size_t(3));
-    ex.demoPlies = 2;
-    CHECK_EQ(detail::demoLength(c, ex), 2);
+    ex.mate = true;
+    CHECK_EQ(detail::demoLength(c, ex), 5);
+    // Never past the end of the line.
+    ex.mate = false;
+    ex.demoPlies = 9;
+    c.level = 2;
+    c.b = band(2);
+    CHECK_EQ(detail::demoLength(c, ex), 5);
 }
 
 TEST(coach_review_mate_in_two_shown_at_level_2) {
@@ -631,7 +743,7 @@ Game gameOf(const char* fen, const std::vector<const char*>& sans) {
 std::vector<Scenario> scenarios() {
     return {
         {"discovered", "6k1/1b3ppp/8/3n4/8/8/PP6/1K5R w - - 0 1", {"Kc2"}, White,
-         {pvl(0, "h1e1 g8f8"), pvl(-600, "b1c2 d5e3 c2d3 b7h1")}, ExType::Discovered, 1, 6},
+         {pvl(0, "h1e1 g8f8"), pvl(-250, "b1c2 d5e3 c2d3 b7h1")}, ExType::Discovered, 1, 6},
         {"skewer", "r5k1/5ppp/8/8/7R/2K5/5PP1/8 w - - 0 1", {"Kc4"}, White,
          {pvl(-50, "c3d3 g8f8"), pvl(-600, "c3c4 a8a4 c4d5 a4h4")}, ExType::Skewer, 1, 6},
         {"pin", "r5k1/5ppp/8/8/8/2N5/7P/4K3 w - - 0 1", {"Ne4"}, White,
@@ -744,6 +856,68 @@ ai::Analysis g3A0(const char* played) {
 }
 
 }  // namespace
+
+TEST(coach_review_small_loss_never_explains_a_collapse) {
+    // The discovered attack of the table, but the engine says the move loses six pawns: the exchange
+    // it wins back (two points) is not why. No material reason is given for it, at any level.
+    const ai::Analysis a0 = analysisOf({pvl(0, "h1e1 g8f8"), pvl(-600, "b1c2 d5e3 c2d3 b7h1")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("6k1/1b3ppp/8/3n4/8/8/PP6/1K5R w - - 0 1", {"Kc2"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "collapse b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::Discovered && r.verdict.exType != ExType::Material &&
+              r.verdict.exType != ExType::Hanging && r.verdict.exType != ExType::Exchange);
+        for (const Beat& b : r.script)
+            if (const Arg* pts = b.line.arg("pts")) CHECK(pts->number >= 3);
+    }
+}
+
+TEST(coach_review_rook_lost_in_a_lost_position) {
+    // From a recorded game (depth 18): 16.Kg2? Nxg3+ 17.Kxg3 Qxh1 loses the exchange and more, in a
+    // position already lost (W% 16 -> 10: an inaccuracy by the numbers). The rook falls for good:
+    // shown as what it is, never as "a small slip", without a verdict and without an offer.
+    const std::vector<const char*> moves = {"d4", "d5", "e3", "Nf6", "Bb5+", "Bd7", "Bxd7+", "Nbxd7", "f4", "Rc8",
+                                            "c4", "dxc4", "Na3", "Nb6", "Bd2", "Qd5", "b3", "cxb3", "axb3", "Ne4",
+                                            "g3", "e6", "Bc1", "Qa5+", "Kf1", "Qd5", "Nc4", "Rd8", "Ne5", "a6", "Kg2"};
+    const ai::Analysis a0 = analysisOf({pvl(-447, "d1f3 f8d6 e5g4 c7c5 a1a5 f7f5 g4f2 e8g8 f1g2 b6d7"),
+                                        pvl(-468, "d1c2 f7f6 e5f3 c7c5 a1a5 g7g5 f4g5 f6g5"),
+                                        pvl(-486, "e5f3 f8b4 f1g2 e8g8 d1c2 c7c5 d4c5 d8c8")});
+    const ai::Analysis a1 = analysisOf({pvl(-582, "f1g2 e4g3 g2g3 d5h1 e5f3 g7g5 f4g5 h7h6 e3e4 h8g8 a1a2 h6g5")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(nullptr, moves);
+        Reviewer rv;
+        rv.reset(level, White);
+        ReviewInput in;
+        in.game = &g;
+        in.before = &a0;
+        in.played = &a1;
+        Review r = rv.review(in);
+        char where[32];
+        std::snprintf(where, sizeof where, "rook lost b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
+        CHECK(r.verdict.voiced);
+        CHECK(!r.offersTakeback);
+        for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.verdict."));
+        if (level <= 3) {
+            // The whole sequence: the knight's capture, the king's, the rook taken; three points net.
+            CHECK_EQ(demoMoves(r.script), 3);
+            const Beat* res = beatWithKey(r.script, "ex.result.b" + std::to_string(level));
+            CHECK(res != nullptr);
+            if (res && res->line.arg("pts")) CHECK_EQ(res->line.arg("pts")->number, 3);
+        } else {
+            // Up to the problem, then the rook on h1 is pointed at.
+            CHECK(demoMoves(r.script) >= 1 && demoMoves(r.script) <= 2);
+            const Beat* point = beatWithKey(r.script, "ex.point.piece");
+            CHECK(point != nullptr);
+            if (point && point->line.arg("t1")) CHECK_EQ(point->line.arg("t1")->square, sq("h1"));
+        }
+    }
+}
 
 TEST(coach_review_discovered_attack_behind_an_even_trade) {
     // The engine's full line: Nxd2 Qxd2 Qxh1. The trade on d2 is even (3 points each, whatever the
@@ -1000,18 +1174,33 @@ TEST(coach_review_stalemate_trick_needs_the_sacrifice) {
 }
 
 TEST(coach_review_inaccuracy_is_not_called_a_mistake) {
-    // 1.a4 leaves the b4 pawn to the rook: an inaccuracy (the appraisal counts it so) with a concrete
-    // cause. Level 4 voices it with an "inaccurate" verdict, never the mistake's.
+    // 1.a4 leaves the b4 pawn to the rook: an inaccuracy (the appraisal counts it so). It is never
+    // called a mistake, never played out on the table nor offered back; level 6 says the better move
+    // in one short line, levels 3-5 only for a larger slip (this one is small), levels 1-2 never.
     const char* fen = "1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1";
-    Game g = gameOf(fen, {"a4"});
-    Reviewer rv;
-    rv.reset(4, White);
-    Review r = reviewOf(rv, g, analysisOf({pvl(100, "g1f1 g8f8"), pvl(30, "a3a4 b8b4 g1f1")}));
-    checkScript(r.script, "imprecise b4");
-    CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
-    CHECK_EQ(r.verdict.exType, ExType::Hanging);
-    CHECK(hasKey(r.script, "ex.verdict.imprecise.b4"));
-    CHECK(!hasKeyPrefix(r.script, "ex.verdict.mistake"));
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"a4"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(100, "g1f1 g8f8"), pvl(30, "a3a4 b8b4 g1f1")}));
+        char where[32];
+        std::snprintf(where, sizeof where, "inaccuracy b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
+        CHECK(!hasKeyPrefix(r.script, "ex.verdict.mistake"));
+        CHECK(!hasKeyPrefix(r.script, "ex.verdict.blunder"));
+        CHECK_EQ(demoMoves(r.script), 0);
+        CHECK(!r.offersTakeback);
+        CHECK_EQ(r.script.size(), size_t(level == 6 ? 1 : 0));
+        if (level == 6) {
+            const Beat* slip = beatWithKey(r.script, "ex.verdict.inaccuracy.b6");
+            CHECK(slip != nullptr);
+            if (slip) {
+                const Arg* best = slip->line.arg("best");
+                CHECK(best && best->uci == "g1f1");
+            }
+        }
+    }
 }
 
 TEST(coach_review_score_bound_is_rescored) {
@@ -1578,9 +1767,9 @@ TEST(coach_review_every_key_exists) {
     // Every message the review can say, per level range (families with a ".b<level>" suffix).
     struct Family { const char* key; int from, to; };
     const Family families[] = {
-        {"ex.verdict.blunder", 1, 6}, {"ex.verdict.mistake", 3, 6}, {"ex.verdict.inaccuracy", 4, 6},
-        {"ex.verdict.imprecise", 4, 6},
+        {"ex.verdict.blunder", 1, 6}, {"ex.verdict.mistake", 3, 6}, {"ex.verdict.inaccuracy", 3, 6},
         {"ex.verdict.missed", 1, 2}, {"ex.better", 3, 6}, {"ex.rewind", 1, 4}, {"ex.offer", 1, 6},
+        {"ex.result", 1, 3}, {"ex.result_back", 1, 3}, {"ex.material", 1, 6},
         {"ex.mate_allowed", 1, 6}, {"ex.mate_missed", 1, 6}, {"ex.mate_delayed", 5, 6}, {"ex.stalemate", 1, 6},
         {"ex.stalemate_trick", 1, 6}, {"ex.fork", 1, 6}, {"ex.discovered", 1, 6}, {"ex.skewer", 1, 6},
         {"ex.pin", 1, 6}, {"ex.pin_defender", 1, 6}, {"ex.trapped", 1, 6}, {"ex.back_rank", 1, 6},
@@ -1600,7 +1789,8 @@ TEST(coach_review_every_key_exists) {
         "ann.mate.human.b1", "ann.mate.human", "ann.mate.coach.b1", "ann.mate.coach", "demo.move", "demo.my.move",
         "demo.my.take", "demo.my.check", "demo.my.mate", "demo.your.move", "demo.your.take", "demo.your.back",
         "demo.your.king", "demo.promote", "ex.mate_allowed.tail.b1", "ex.mate_allowed.pattern",
-        "ex.mate_allowed.tip.b3", "ex.stalemate.tip.b1", "ex.fork.tail.b1", "ex.fork.more.b3", "ex.fork.tip.knight",
+        "ex.mate_allowed.tip.b3", "ex.stalemate.tip.b1", "ex.fork.tail.b1", "ex.fork.tail_king", "ex.fork.more.b3",
+        "ex.fork.tip.knight", "ex.point.piece", "ex.point.two", "ex.point.mate",
         "ex.trapped.tip.b1", "ex.back_rank.tip.b1", "ex.hanging.tip.b1", "name.pattern.back_rank",
         "name.pattern.smothered", "name.pattern.support", "name.pattern.ladder", "name.pattern.epaulette",
         "tip.mate_technique.b1", "tip.fifty.b1", "tip.repetition.b1", "praise.sacrifice", "praise.fork.b2",
@@ -1736,11 +1926,16 @@ TEST(coach_review_engine_worked_example) {
         const Arg* my = cause->line.arg("my");
         CHECK(my && my->piece == Queen);
     }
-    CHECK_EQ(demoMoves(r.script), 1);
-    bool qg5 = false;
+    // Level 1: the whole sequence on the table, the queen's move first and the knight taken last.
+    std::vector<std::string> demo;
     for (const Beat& b : r.script)
-        if (b.kind == BeatKind::DemoMove && b.uci == "d8g5") qg5 = true;
-    CHECK(qg5);
+        if (b.kind == BeatKind::DemoMove) demo.push_back(b.uci);
+    CHECK(demo.size() >= 3 && demo.size() <= size_t(band(1).demoPlies));
+    if (!demo.empty()) {
+        CHECK_EQ(demo.front(), std::string("d8g5"));
+        CHECK(demo.back().size() >= 4 && demo.back().compare(2, 2, "e5") == 0);
+    }
+    CHECK(hasKey(r.script, "ex.result.b1"));
 }
 
 #endif
