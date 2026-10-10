@@ -199,6 +199,26 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 - SHA-256 of the exe: `3d274a577b065274c80dbb8d02d17ca750d9d72fd2db748753e7f6fd353d96ea`
 - SHA-256 of the zip: `cd4c9e5286bf83bb12030bf0b09b671b063be630d497d7dde6de01c5646c270d`
 
+## windows/Scacelith-2026-10-10-points-de-vue.zip
+
+- Holds `Scacelith-2026-10-10-points-de-vue.exe` (133 MB, zipped to 96 MB).
+- Source: branch `claude/standing-viewpoints-iru8qq` at commit `735a472` (pull request #28, not
+  merged yet), which includes `master` up to pull request #27 (graphics presets).
+- Contents: standing viewpoints during a game. Up arrow: stand in front of the chair; Left / Right
+  arrow: walk to that end of the table; Down arrow: sit back down. The clock keeps running and only
+  a seated player plays. Online (protocol v1.2, server pull request #5 of
+  `DarkCenobyte/scacelith-chess-server`) the opponent's robot stands and walks too; against a
+  server still on protocol v1.1 everything else works and the stances are simply not relayed.
+  Also the game-side fixes of the 2026-10-10 audit (N01 analysis comments, A08 Linux sign-in
+  file, N02 CI voice model) and a move refused by a busy server sent again.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (846 tests, 12
+  skipped), with the live check against the server of pull request #5; it has not been run on real
+  Windows hardware by the build.
+- SHA-256 of the exe: `835611075ce6615622b5983235dfc8b40c7cda043704b7f8a079d9d6ec1e8447`
+- SHA-256 of the zip: `26f6041888aa4c1d3b05aa8e7b2687f257e1706a41ceddf6de07889ce3a02772`
+
 ## linux-server/scacelith-server-2026-10-03
 
 - The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
