@@ -41,10 +41,10 @@ an.missed_chance = {move} laisse passer l’occasion de punir cette erreur.
 an.missed_chance.2 = Avec {move}, l’occasion s’envole.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = Maintenant, {reply} est échec et mat.
-an.mate_allowed.one.2 = Ce coup permet {reply}, et c’est échec et mat.
-an.mate_allowed = Ce coup permet un mat forcé en {m:move}, qui commence par {reply}.
-an.mate_allowed.2 = Il y a maintenant un mat forcé en {m:move}, à commencer par {reply}.
+an.mate_allowed.one = Maintenant, {reply:nomate} est échec et mat.
+an.mate_allowed.one.2 = Ce coup permet {reply:nomate}, et c’est échec et mat.
+an.mate_allowed = Ce coup permet un mat forcé en {m:move}, qui commence par {reply:nomate}.
+an.mate_allowed.2 = Il y a maintenant un mat forcé en {m:move}, à commencer par {reply:nomate}.
 an.fork = Maintenant, {reply} fait une fourchette sur {t1} et {t2}.
 an.fork.2 = Ce coup permet {reply}, qui attaque à la fois {t1} et {t2}.
 an.fork.3 = {reply} attaque {t1} et {t2} en même temps.
@@ -55,10 +55,10 @@ an.material = La réponse {line} gagne {pts:point} de matériel.
 an.material.2 = Ensuite, {line} gagne {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = {best} était échec et mat.
-an.mate_missed.one.2 = {best} aurait été échec et mat.
-an.mate_missed = {best} aurait forcé le mat en {m:move}.
-an.mate_missed.2 = Il y avait un mat forcé en {m:move}, qui commençait par {best}.
+an.mate_missed.one = {best:nomate} était échec et mat.
+an.mate_missed.one.2 = {best:nomate} aurait été échec et mat.
+an.mate_missed = {best:nomate} aurait forcé le mat en {m:move}.
+an.mate_missed.2 = Il y avait un mat forcé en {m:move}, qui commençait par {best:nomate}.
 an.missed_capture = {best} aurait gagné {piece} gratuitement.
 an.missed_capture.2 = {piece} n’avait aucun défenseur : {best} pouvait s’en emparer.
 an.missed_fork = {best} aurait fait une fourchette sur {t1} et {t2}.

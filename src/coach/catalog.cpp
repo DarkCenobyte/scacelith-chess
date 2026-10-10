@@ -484,7 +484,7 @@ std::string Catalog::renderArg(Ctx& c, const Arg& a, const std::string& form) co
     case Arg::Kind::Piece: return renderPiece(c, a, form);
     case Arg::Kind::Square: return renderSquare(c, a.square);
     case Arg::Kind::Move: return renderMove(c, a.san, form, nullptr);
-    case Arg::Kind::Moves: return renderMoves(c, a.san);
+    case Arg::Kind::Moves: return renderMoves(c, a.san, form);
     case Arg::Kind::Number: return renderNumber(c, a.number, form);
     case Arg::Kind::Eval: return renderEval(c, a);
     case Arg::Kind::Opening: return renderOpening(c, a.text, form);
@@ -577,13 +577,17 @@ std::string Catalog::renderMove(Ctx& c, const std::string& san, const std::strin
         if (m.promotion != chess::NoPiece)
             base = pattern(c, "move.promotion", {{"move", base}, {"piece", noun(m.promotion)}});
     }
-    if (m.mate) base = pattern(c, "move.mate", {{"move", base}});
-    else if (m.check) base = pattern(c, "move.check", {{"move", base}});
+    // "nomate": the sentence says the mate itself ("{best:nomate} was checkmate"), the move does not.
+    if (m.mate) {
+        if (form != "nomate") base = pattern(c, "move.mate", {{"move", base}});
+    } else if (m.check) {
+        base = pattern(c, "move.check", {{"move", base}});
+    }
     if (prevTo) *prevTo = m.to;
     return base;
 }
 
-std::string Catalog::renderMoves(Ctx& c, const std::string& line) const {
+std::string Catalog::renderMoves(Ctx& c, const std::string& line, const std::string& form) const {
     std::vector<std::string> tokens;
     size_t p = 0;
     while (p < line.size()) {
@@ -612,7 +616,7 @@ std::string Catalog::renderMoves(Ctx& c, const std::string& line) const {
     std::string acc;
     chess::Square prev = chess::NoSquare;
     for (auto& t : tokens) {
-        std::string m = renderMove(c, t, "", &prev);
+        std::string m = renderMove(c, t, form == "nomate" ? form : std::string(), &prev);
         acc = acc.empty() ? m : pattern(c, "moves.join", {{"a", acc}, {"b", m}});
     }
     return acc;

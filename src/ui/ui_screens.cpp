@@ -69,6 +69,7 @@ struct State {
     // the game over card.
     Page replayFrom = Page::Library;
     Page onlineBackTo = Page::Title;   // the page the online page goes back to (Analysis: My online games)
+    uint64_t titleFrame = 0;           // the last frame mainMenu() drew the title page (titlePageShown)
     // options (shared by both menus)
     OptionsState opt;
     int forcedTab = -1;
@@ -1580,6 +1581,8 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
+bool titlePageShown() { return S.titleFrame != 0 && S.titleFrame == im::frame(); }
+
 void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
 // Back from a replay or an analysis: the page it was started from (the saved games, the Analysis
 // page, the online page's game of the history), the title page after an analysis of a game just
@@ -1667,6 +1670,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
             break;
         }
     }
+    if (S.page == Page::Title) S.titleFrame = im::frame();
     // Online: challenge cards on every page once signed in (not over the calibration), the ping on
     // the online page. A game that starts from the online page brings the menu back to it afterwards.
     if (S.page != Page::Calibration) detail::onlineMenuOverlay(S.page == Page::Online);

@@ -43,10 +43,10 @@ an.missed_chance = مع {move} تضيع فرصة معاقبة ذلك الخطأ.
 an.missed_chance.2 = بعد {move} تفلت الفرصة.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = الآن {reply}: كش مات.
-an.mate_allowed.one.2 = هذه النقلة تسمح بنقلة {reply}، وهي كش مات.
-an.mate_allowed = هذه النقلة تسمح بكش مات إجباري في {m:move}، بدءًا من {reply}.
-an.mate_allowed.2 = الآن هناك كش مات إجباري في {m:move}، يبدأ بنقلة {reply}.
+an.mate_allowed.one = الآن {reply:nomate}: كش مات.
+an.mate_allowed.one.2 = هذه النقلة تسمح بنقلة {reply:nomate}، وهي كش مات.
+an.mate_allowed = هذه النقلة تسمح بكش مات إجباري في {m:move}، بدءًا من {reply:nomate}.
+an.mate_allowed.2 = الآن هناك كش مات إجباري في {m:move}، يبدأ بنقلة {reply:nomate}.
 an.fork = الآن {reply}: شوكة على {t1} و{t2}.
 an.fork.2 = هذه النقلة تسمح بنقلة {reply}، التي تهاجم {t1} و{t2} في آن واحد.
 an.fork.3 = {reply}: هجوم على {t1} و{t2} معًا.
@@ -57,10 +57,10 @@ an.material = الرد {line} يكسب مادة بقيمة {pts:point}.
 an.material.2 = وبعد {line} مكسب بقيمة {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = نقلة {best} كانت كش مات.
-an.mate_missed.one.2 = لو لُعبت نقلة {best} لكان كش مات.
-an.mate_missed = نقلة {best} كانت تفرض كش مات في {m:move}.
-an.mate_missed.2 = كان هناك كش مات إجباري في {m:move}، بدءًا من {best}.
+an.mate_missed.one = نقلة {best:nomate} كانت كش مات.
+an.mate_missed.one.2 = لو لُعبت نقلة {best:nomate} لكان كش مات.
+an.mate_missed = نقلة {best:nomate} كانت تفرض كش مات في {m:move}.
+an.mate_missed.2 = كان هناك كش مات إجباري في {m:move}، بدءًا من {best:nomate}.
 an.missed_capture = نقلة {best} كانت ستربح {piece} بلا مقابل.
 an.missed_capture.2 = {piece} كان بلا مدافع: مع {best} كان سيسقط.
 an.missed_fork = نقلة {best} كانت ستوقع {t1} و{t2} في شوكة.

@@ -77,6 +77,9 @@ move.castle_long.spoken = castles queenside
 move.promotion.spoken = {move}, promoting to a {piece}
 move.check.spoken = {move}, check
 move.mate.spoken = {move}, checkmate
+# A line that says the mate itself uses "{best:nomate}" (or {line:nomate}, {reply:nomate}): the voice
+# then says the mating move without "checkmate" ("{best:nomate} was checkmate", not "... checkmate
+# was checkmate"). Written moves keep their "#".
 # Two moves of a line: {a} = the moves so far, {b} = the next one.
 moves.join.spoken = {a}, {b}
 

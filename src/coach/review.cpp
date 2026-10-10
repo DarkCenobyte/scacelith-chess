@@ -405,10 +405,7 @@ bool designation(const Ctx& c, const Explanation& ex, const Position& q, Beat& o
         if (k >= int(c.r.size()) || !c.r[size_t(k)].mate || c.r[size_t(k)].mover != c.coach) return false;
         const LineStep& m = c.r[size_t(k)];
         out = sayBeat("ex.point.mate", Look::Target, c.ply);
-        // The line says "checkmate" itself: the move without its '#' (else spoken twice).
-        std::string san = m.san;
-        if (!san.empty() && san.back() == '#') san.pop_back();
-        out.line.with("reply", Arg::ofMove(san, m.uci));
+        out.line.with("reply", moveArg(m));
         traceMove(out, m.piece, m.move.from, m.move.to, "reply");
         return true;
     }

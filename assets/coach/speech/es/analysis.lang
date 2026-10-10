@@ -41,10 +41,10 @@ an.missed_chance = {move} desaprovecha la ocasión de castigar ese error.
 an.missed_chance.2 = Con {move}, la oportunidad se escapa.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = Ahora {reply} es jaque mate.
-an.mate_allowed.one.2 = Permite {reply}, y eso es jaque mate.
-an.mate_allowed = Permite un mate forzado en {m:move}, empezando por {reply}.
-an.mate_allowed.2 = Ahora hay un mate forzado en {m:move}, que empieza con {reply}.
+an.mate_allowed.one = Ahora {reply:nomate} es jaque mate.
+an.mate_allowed.one.2 = Permite {reply:nomate}, y eso es jaque mate.
+an.mate_allowed = Permite un mate forzado en {m:move}, empezando por {reply:nomate}.
+an.mate_allowed.2 = Ahora hay un mate forzado en {m:move}, que empieza con {reply:nomate}.
 an.fork = Ahora {reply} hace una horquilla contra {t1} y {t2}.
 an.fork.2 = Permite {reply}, un ataque doble contra {t1} y {t2}.
 an.fork.3 = {reply} lanza un ataque doble sobre {t1} y {t2}.
@@ -55,10 +55,10 @@ an.material = La respuesta {line} gana {pts:point} de material.
 an.material.2 = Después, {line} gana {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = {best} era jaque mate.
-an.mate_missed.one.2 = {best} habría sido jaque mate.
-an.mate_missed = {best} habría forzado el mate en {m:move}.
-an.mate_missed.2 = Había un mate forzado en {m:move}, empezando por {best}.
+an.mate_missed.one = {best:nomate} era jaque mate.
+an.mate_missed.one.2 = {best:nomate} habría sido jaque mate.
+an.mate_missed = {best:nomate} habría forzado el mate en {m:move}.
+an.mate_missed.2 = Había un mate forzado en {m:move}, empezando por {best:nomate}.
 an.missed_capture = {best} habría ganado {piece} gratis.
 an.missed_capture.2 = {piece} no tenía defensor, y {best} lo habría aprovechado.
 an.missed_fork = {best} habría hecho una horquilla contra {t1} y {t2}.
