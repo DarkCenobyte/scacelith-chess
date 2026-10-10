@@ -14,6 +14,7 @@
 // (an offer: until it is answered).
 #include "session.h"
 #include "catalog.h"
+#include "challenge_run.h"
 #include "events.h"
 #include "lesson.h"
 #include "openings.h"
@@ -167,6 +168,8 @@ struct Session::Impl {
         int reactFrames = 0;
         uint64_t illegalScript = 0;
         int takebackTo = -1;          // a takeback asked of the stage: the game goes back to this many plies
+        // A challenge (run).
+        bool challenge = false;
     };
 
     SessionConfig config;
@@ -176,7 +179,8 @@ struct Session::Impl {
     Reviewer reviewer;
     Appraisal appraisal;
     OpeningAnnouncer announcer;
-    std::unique_ptr<Lesson> lesson;
+    std::unique_ptr<Lesson> lesson;      // the rules lesson; a challenge's illegal-move explanations
+    std::unique_ptr<ChallengeRun> run;   // a challenge
     std::vector<GameRecord> history;
     bool accuracyExplained = false;
     Game g;
@@ -420,6 +424,10 @@ struct Session::Impl {
     }
 
     void answerOffer(const chess::Game* game, bool accept, bool playedOn) {
+        if (g.challenge) {
+            run->answerOffer(accept);
+            return;
+        }
         if (g.level == 0 || !director.offerOpen()) return;
         director.closeOffer();
         const int ply = g.offerPly;
@@ -548,12 +556,12 @@ struct Session::Impl {
     }
 
     bool coachMayMove() const {
-        if (g.level == 0) return true;
+        if (g.level == 0 || g.challenge) return true;
         return g.review == ReviewState::None && !director.offerOpen() && g.takebackTo < 0;
     }
 
     void gameOver(const chess::Game& game, bool humanResigned) {
-        if (g.over || g.level == 0) return;
+        if (g.over || g.level == 0 || g.challenge) return;
         g.over = true;
         g.resigned = humanResigned;
         if (humanResigned) {   // no more explanations of a game the player gave up
@@ -606,7 +614,7 @@ struct Session::Impl {
     void handshakeDone(const chess::Game& game) {
         if (g.handshakeDone) return;
         g.handshakeDone = true;
-        if (g.level == 0) {
+        if (g.level == 0 || g.challenge) {
             g.done = true;
             return;
         }
@@ -741,6 +749,20 @@ void Session::start(Stage& stage, Analyst& analyst, const chess::Game& game, con
     d.g.human = d.g.level == 0 ? chess::White : config.human;
     if (d.g.level == 0) d.config.director.speed = kLessonSpeechSpeed;
     installOpeningResolver();
+
+    const Challenge* ch = config.challenge.empty() ? nullptr : ChallengeBook::shared().find(config.challenge);
+    if (!config.challenge.empty() && !ch) LOGW("coach: no challenge '%s': a coach game instead", config.challenge.c_str());
+    if (ch && !ch->positions.empty()) {
+        d.g.challenge = true;
+        d.g.level = 1;   // no lesson path (level 0) applies
+        d.g.human = chess::White;
+        d.config.director.speed = 1.0f;
+        d.director.reset(&stage, d.config.director);
+        if (!d.lesson) d.lesson.reset(new Lesson());   // why a move is illegal
+        if (!d.run) d.run.reset(new ChallengeRun());
+        d.run->start(*ch, d.director, stage, analyst, config.challengePosition);
+        return;
+    }
     d.director.reset(&stage, d.config.director);
 
     if (d.g.level == 0) {
@@ -766,6 +788,7 @@ void Session::stop() {
     Impl& d = *d_;
     if (!d.g.started) return;
     d.director.clear();
+    if (d.run) d.run->stop();
     if (d.analyst) d.analyst->cancelAnalysis(0);
     d.g.jobs.clear();
     d.g.started = false;
@@ -774,7 +797,8 @@ void Session::stop() {
 void Session::update(const chess::Game& game, float dt) {
     Impl& d = *d_;
     if (!d.g.started) return;
-    if (d.g.level == 0) d.updateLesson(game, dt);
+    if (d.g.challenge) d.run->update(game, dt);
+    else if (d.g.level == 0) d.updateLesson(game, dt);
     else d.updateGame(game, dt);
     d.director.update(dt, int(game.moves().size()));
 }
@@ -784,7 +808,8 @@ void Session::setPaused(bool paused) { d_->director.setPaused(paused); }
 void Session::onMove(const chess::Game& game) {
     Impl& d = *d_;
     if (!d.g.started) return;
-    if (d.g.level == 0) d.lessonMove(game);
+    if (d.g.challenge) d.run->onMove(game);
+    else if (d.g.level == 0) d.lessonMove(game);
     else d.onMove(game);
 }
 
@@ -793,14 +818,16 @@ void Session::onPlayerActive() {
     if (!d.g.started) return;
     d.director.playerActed();
     d.g.idle = 0.0f;
-    if (d.director.offerOpen()) d.answerOffer(nullptr, false, true);   // touching a piece: play on
+    if (d.g.challenge) d.run->onPlayerActive();   // touching a piece: no hint
+    else if (d.director.offerOpen()) d.answerOffer(nullptr, false, true);   // touching a piece: play on
 }
 
 void Session::onIllegalAttempt(const chess::Game& game, chess::Square from, chess::Square to) {
     Impl& d = *d_;
-    if (!d.g.started || d.g.level != 0 || d.director.pending(d.g.illegalScript)) return;
+    if (!d.g.started || (d.g.level != 0 && !d.g.challenge) || d.director.pending(d.g.illegalScript)) return;
     int expect = -1;
-    if (!d.director.waitingMove(&expect)) expect = -1;
+    // A challenge's waits are no lesson expectations: the reason alone.
+    if (d.g.challenge || !d.director.waitingMove(&expect)) expect = -1;
     d.g.idle = 0.0f;
     const Script s = d.lesson->explainIllegal(expect, game.position(), from, to);
     if (s.empty()) return;
@@ -814,7 +841,7 @@ void Session::onOfferAnswer(const chess::Game& game, bool accept) {
 
 bool Session::canTakeBack(const chess::Game& game) const {
     const Impl& d = *d_;
-    return d.g.started && d.g.level > 0 && !d.g.over && !game.isOver() && d.lastHumanPly(game) >= 0;
+    return d.g.started && d.g.level > 0 && !d.g.challenge && !d.g.over && !game.isOver() && d.lastHumanPly(game) >= 0;
 }
 
 void Session::onTakeBackRequested(const chess::Game& game) {
@@ -847,7 +874,7 @@ void Session::skip() {
     Impl& d = *d_;
     if (!d.g.started) return;
     // A lesson chapter is one script: Space skips the line being said, never the exercises after it.
-    if (d.g.level == 0) d.director.skipCurrent();
+    if (d.g.level == 0 || d.g.challenge) d.director.skipCurrent();
     else d.director.skip();
 }
 
@@ -867,6 +894,7 @@ bool Session::coachMayMove() const { return d_->coachMayMove(); }
 bool Session::playerMayMove(const chess::Game& game) const {
     const Impl& d = *d_;
     if (!d.g.started) return false;
+    if (d.g.challenge) return d.run->playerMayMove(game);
     if (d.g.level == 0)
         return d.g.react == Impl::React::None && game.position().sideToMove() == chess::White && d.director.waitingMove();
     return !d.g.over && !game.isOver() && game.position().sideToMove() == d.g.human && !d.director.offerOpen();
@@ -875,6 +903,7 @@ bool Session::playerMayMove(const chess::Game& game) const {
 bool Session::handshakeWanted() const {
     const Impl& d = *d_;
     if (!d.g.started || d.g.handshakeDone) return false;
+    if (d.g.challenge) return d.run->finished();
     if (d.g.level == 0) return d.g.lessonDone && !d.director.pending(d.g.chapterScript);
     return d.g.endScript != 0 && !d.director.pending(d.g.endScript);
 }
@@ -896,6 +925,23 @@ bool Session::accuracyExplained() const { return d_->accuracyExplained; }
 int Session::suggestedLevel() const { return d_->g.suggested; }
 int Session::lessonChapter() const { return d_->g.lessonDone ? 0 : d_->g.chapter; }
 bool Session::lessonCompleted() const { return d_->g.lessonDone; }
+bool Session::challengeMode() const { return d_->g.challenge; }
+int Session::challengePosition() const { return d_->g.challenge ? d_->run->position() : 0; }
+int Session::challengePositions() const { return d_->g.challenge ? d_->run->positions() : 0; }
+bool Session::challengeCompleted() const { return d_->g.challenge && d_->run->completed(); }
+
+bool Session::hintAvailable(const chess::Game& game) const {
+    const Impl& d = *d_;
+    return d.g.started && d.g.challenge && d.run->hintAvailable(game);
+}
+
+void Session::onHintRequested(const chess::Game& game) {
+    Impl& d = *d_;
+    if (d.g.started && d.g.challenge) d.run->requestHint(game);
+}
+
+bool Session::offerIsHint() const { return d_->g.challenge; }
+
 Director& Session::director() { return d_->director; }
 const Director& Session::director() const { return d_->director; }
 
