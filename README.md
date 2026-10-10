@@ -149,6 +149,26 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 - SHA-256 of the exe: `e0af731147ea3a22a7ea7bc55b28d7776a245ab79c50651c29001a7d2aeed2c0`
 - SHA-256 of the zip: `19efc5587911a826c6ceb71b72c6f35fefca76ef47b661b94da953e93927ac8d`
 
+## windows/Scacelith-2026-10-10-supertonic3.zip
+
+- Holds `Scacelith-2026-10-10-supertonic3.exe` (132 MB, zipped to 96 MB).
+- Source: branch `claude/supertonic3-official-yjzrfn` at commit `898a660` (pull request #22, not
+  merged yet), based on `master` at `d40961a` (Analysis mode, pull request #21).
+- Contents: the coach speaks with Supertone's official Supertonic 3 release (fp32, 398.7 MB,
+  OpenRAIL-M licence) instead of sherpa-onnx's 8-bit conversion. The game downloads its seven files
+  one after the other from huggingface.co/Supertone/supertonic-3 (fallback: the same files on
+  supertone-oss-archive/supertonic-3), each checked against its SHA-256, into
+  `%APPDATA%\scacelith\coach\`. A player who has the old model keeps it working: the update is
+  offered once at start-up, then from the "Voice model" row in Options > Audio, and it deletes the
+  old files before writing the new ones. Options > Audio also has a "Voice quality" slider (4 to 9
+  synthesis steps, 5 by default).
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (793 tests, 12
+  skipped); it has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `69fc1e647e543bcd148acdaed0c25de2bad4533d6209db4538736f5525faad49`
+- SHA-256 of the zip: `321f36956ec3a93fc94c3505b19d2d936640ce1761504de454b8fbc6fbc5f72f`
+
 ## linux-server/scacelith-server-2026-10-03
 
 - The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
