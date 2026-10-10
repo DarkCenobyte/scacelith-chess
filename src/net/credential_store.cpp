@@ -12,6 +12,10 @@
 #include <cstring>
 #include <thread>
 #include <vector>
+#ifdef __APPLE__
+#include <map>
+#include <mutex>
+#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -166,10 +170,60 @@ std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=o
 #else
 std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded"; }
 #endif
+
+#ifdef __APPLE__
+// SCACELITH_KEYRING=memory: a keyring in this process's memory instead of the user's keychain, for
+// the unit tests (tests/test_main.cpp). A token never goes to the credentials file there: the
+// stores and clients of the tests find the sessions that others kept through it instead, until the
+// process ends. Never locked, never unavailable.
+bool keyringInMemory() {
+    const char* env = std::getenv("SCACELITH_KEYRING");
+    return env && std::strcmp(env, "memory") == 0;
+}
+
+class MemoryKeyring final : public Keyring {
+public:
+    Result store(const std::string& origin, const std::string& id, const std::string& secret, CancelToken* cancel,
+                 std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        items_[origin + '\n' + id] = secret;
+        return Result::Ok;
+    }
+    Result lookup(const std::string& origin, const std::string& id, std::string& secret, CancelToken* cancel,
+                  std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        const auto it = items_.find(origin + '\n' + id);
+        if (it == items_.end()) return Result::Missing;
+        secret = it->second;
+        return Result::Ok;
+    }
+    Result remove(const std::string& origin, const std::string& id, CancelToken* cancel, std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        items_.erase(origin + '\n' + id);
+        return Result::Ok;
+    }
+    Result unlock(const std::string&, const std::string&, CancelToken* cancel, std::string&) override {
+        return cancel && cancel->cancelled() ? Result::Cancelled : Result::Ok;
+    }
+
+private:
+    std::mutex mu_;
+    std::map<std::string, std::string> items_;   // "<origin>\n<id>": the secret
+};
+#endif
 }  // namespace
 
 #ifdef __APPLE__
-Keyring* defaultKeyring() { return keyringOff() ? nullptr : keychainKeyring(); }
+Keyring* defaultKeyring() {
+    if (keyringInMemory()) {
+        static Keyring* const memory = new MemoryKeyring();   // never destroyed, as the keychain's
+        return memory;
+    }
+    return keyringOff() ? nullptr : keychainKeyring();
+}
 #else
 Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
 #endif

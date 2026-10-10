@@ -108,7 +108,9 @@ Keyring* secretServiceKeyring();
 Keyring* keychainKeyring();
 #endif
 // The keyring new stores use: secretServiceKeyring() (macOS: keychainKeyring()), or none with
-// SCACELITH_KEYRING=off in the environment (the unit tests run so: tests/test_main.cpp).
+// SCACELITH_KEYRING=off in the environment (the unit tests run so: tests/test_main.cpp; on macOS,
+// which keeps no session in the file, they run with SCACELITH_KEYRING=memory: a keyring in the
+// process's memory, never the user's keychain).
 Keyring* defaultKeyring();
 // Whether a session no keyring can keep may go to the credentials file at all (Windows: DPAPI;
 // Linux: in the clear, when setFileSessionsAllowed allows it). Never on macOS: memory only.
