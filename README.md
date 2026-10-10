@@ -184,6 +184,21 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 - SHA-256 of the exe: `7164d799652427d15262851adc861d764b14f0212418081e2ca1b0035adaca87`
 - SHA-256 of the zip: `dfe6de8a7cdc6355d3a6c271ca1606d91e6c666c39a67a95283dbe6f8684049d`
 
+## windows/Scacelith-2026-10-10-capture.zip
+
+- Holds `Scacelith-2026-10-10-capture.exe` (132 MB, zipped to 96 MB).
+- Source: branch `claude/screenshot-freeze-19zdgd` at commit `9fce275` (pull request #24, not
+  merged yet), based on `master` at `dcee8b6` (pull request #22 merged).
+- Contents: everything in the `supertonic3` build above, with the borderless fullscreen window kept
+  composed by Windows: Win+Shift+S and the Snipping Tool capture the current frame instead of an
+  old one (the menu, or the previous capture). Without pull request #23's voice quality levels.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (797 tests, 21
+  skipped); it has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `3d274a577b065274c80dbb8d02d17ca750d9d72fd2db748753e7f6fd353d96ea`
+- SHA-256 of the zip: `cd4c9e5286bf83bb12030bf0b09b671b063be630d497d7dde6de01c5646c270d`
+
 ## linux-server/scacelith-server-2026-10-03
 
 - The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
