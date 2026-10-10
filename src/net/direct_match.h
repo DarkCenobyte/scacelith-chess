@@ -32,14 +32,23 @@
 //     drops a guest's Gesture beyond that rate or for another game; Gestures never count towards
 //     the flood limit. A received one becomes an OpponentGesture event (the latest replaces one
 //     still queued).
+//   - Stances (sendStance, protocol minor 2; net/stance.h has the rules) go straight to the other
+//     player too, when the player's stance changes and, while not Seated, every keepalive: the
+//     host sends S_Stance to a guest whose Welcome negotiated minor 2 or later, the guest C_Stance
+//     to a host whose Welcome says minor 2 or later (a host of minor 1 would answer the unknown
+//     message with an Error). The host takes the guest's C_Stance before the authority, which never
+//     sees it (counted towards the flood limit, never answered nor kept). Each side sends its
+//     stance again once the link is back, when it is not Seated. A received one becomes an
+//     OpponentStance event, in order with the game events.
 //
 // The host's game is the authority, exactly like the dedicated server is for online games: it
 // validates the guest's move intents with chess::Position, runs the clocks and decides the
 // result. Both sides then speak the same binary protocol as online play (net::proto messages,
 // protocol/PROTOCOL.md) inside an encrypted channel, and DirectMatch emits
 // the same net::Event values as OnlineClient (GameSnapshot, MoveMade, MoveRejected, GameEvent,
-// GameEnd, ConnectionChanged, ServerError, OpponentGesture), so the 3D scene plays a direct match
-// with the online game code. The host's own moves go through the same authority (no special path).
+// GameEnd, ConnectionChanged, ServerError, OpponentGesture, OpponentStance), so the 3D scene plays
+// a direct match with the online game code. The host's own moves go through the same authority
+// (no special path).
 //
 // Secure channel (docs/DIRECT_MATCH.md has the full specification):
 //   - The join code: 12 characters from "23456789ABCDEFGHJKMNPQRSTUVWXYZ" (~60 bits), shown as
@@ -152,8 +161,10 @@ public:
     // (cosmetic; the latest state only, paced, dropped while the link is down). Cheap enough to
     // call every frame.
     void sendGesture(const Gesture& g);
-    // The local player's stance (protocol minor 2, net/gesture.h): sent when it changes and, while
-    // not Seated, again every gesture keepalive; nothing to a peer of a minor below 2.
+    // The local player's stance in the current game (protocol minor 2, net/gesture.h and
+    // net/stance.h): sent when it changes (250 ms apart at least) and, while not Seated, again
+    // every gesture keepalive; again when the link comes back. Nothing to a peer of a minor below
+    // 2, nor once the game is over; kept while the link is down. Cheap enough to call every frame.
     void sendStance(uint8_t stance);
     const OnlineGame* currentGame() const;
     int pingMs() const;

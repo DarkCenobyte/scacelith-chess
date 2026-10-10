@@ -13,7 +13,7 @@ is not part of this repository: it lives in
 | File | Role |
 |---|---|
 | `src/game/online_session.h/.cpp` | `game::OnlineSession` (one per process, `onlineSession()`): the only code that polls `net::OnlineClient` and `net::DirectMatch`. Keeps what the menus show (server info, account, connection, matchmaking, challenges, cooldown and ban) and hands a started game to the scene. |
-| `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, live gestures, report, ping, server clock), for a server game or a direct match alike. |
+| `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, live gestures, stance, report, ping, server clock), for a server game or a direct match alike. |
 | `src/game/game_scene_online.cpp` | `GameMode::Online` in the 3D scene: the remote player's robot, move sending, server clocks, resync, end of game. |
 | `src/game/online_mock.h/.cpp` | In-process fakes of the server and of a direct-match friend (`--online-mock`). |
 | `src/ui/ui_screens_online.cpp` | The "Play Online" page and its sub-pages, Options > Online server. |
@@ -43,8 +43,8 @@ games). It drains both network objects and sorts the events:
   new game (matchmaking, challenge, private game, rematch, direct match): `gameReady()` becomes
   true, the menu (or the game over card) fades to the table, and the scene calls
   `takeGame(snapshot)`, which returns the `GameLink`. Later events of that game come out of
-  `nextGameEvent()`, the opponent's live gestures (`OpponentGesture`, below) included; events of
-  another game are dropped.
+  `nextGameEvent()`, the opponent's live gestures and stances (`OpponentGesture`,
+  `OpponentStance`, below) included; events of another game are dropped.
 
 **Live gestures** (`src/net/gesture.h` has the full rules). The scene describes its player's hand
 and head with a `net::Gesture` and calls `GameLink::sendGesture()` as often as it likes (every
@@ -72,6 +72,35 @@ frame is fine): the network layer keeps only the latest one and paces them.
   is not filled in: a gesture never changes the game state). Only those of the current game are
   kept, and a newer one replaces one the scene has not taken yet, in the network layer and in the
   session's queue alike.
+
+**Stances** (protocol minor 2; `src/net/gesture.h`, `src/net/stance.h`). A player may get up
+during a game to look at the board standing, in front of their chair (Standing) or from an end of
+the table (SideLeft, SideRight: their own left and right seen from the seat). The scene calls
+`GameLink::sendStance(stance)` (a `net::proto::Stance` value, those of `anim::Stance`) as often as
+it likes; `net::StanceSender`, shared by `OnlineClient` and `DirectMatch` and unit-tested on its
+own, decides what goes:
+
+- A change goes at once, two messages at least 250 ms apart (`kStanceMinIntervalMs`: a player
+  who taps the keys sends the latest stance a quarter of a second later, never a burst; `C_Stance`
+  counts towards the server's message limit and shares the numbering of the other commands).
+- A stance other than Seated goes again every keepalive (`gestureKeepaliveMs()`, whatever
+  `Welcome.gestureRate` says, 0 included), so that it does not expire on the other side; a return
+  to Seated goes once.
+- After a new link (every `Welcome`, so after each reconnection) a stance other than Seated goes
+  again at once: the other side shows the player seated until told otherwise. Nothing is kept for
+  later while the link cannot carry it: the current stance goes when it can again.
+- Every game starts seated on both sides: a stance sent for an earlier game never counts for the
+  next one.
+- Nothing goes while not `Online`, to a server whose `Welcome.minor` is below 2
+  (`net::kStanceMinMinor`; the negotiated minor is the lower of the two), for another game than
+  the one of the last `GameSnapshot`, or once that game is over.
+- The opponent's stance arrives as `OpponentStance` events with `gameId` and `stance` (the raw
+  value: one a later minor may add is kept, and the scene reads it as Seated). Unlike gestures,
+  they are not replaced by newer ones: they come out of `nextGameEvent()` in order with the
+  other events of the game (a few per second at most).
+- The server relays a player's `C_Stance` to the opponent as `S_Stance`, without answering it
+  and without storing it (a stance is not part of the game state). Server games and direct
+  matches follow the same rules (`docs/DIRECT_MATCH.md`).
 
 `ServerError` events that name the current game (or carry a game error code 100-112) go to the
 game; the others become toasts. An error with code 0 and `error == "offline"` (a command sent
@@ -330,6 +359,22 @@ same as against Stockfish, with these differences:
     against Stockfish returns, looking at the piece their robot holds, if any. Options >
     Gameplay > "Ignore opponent's head movements" turns the head and the lean off; the piece
     gestures still play.
+- **Stances** (the rules and their tests: `src/game/online_live.h`,
+  `tests/online_live_tests.cpp`). Hot-seat and Stockfish games send and receive none.
+  - Mine: `GameLink::sendStance()` every frame of the game played, with the stance my robot is
+    going to (the opponent's robot starts its own move as soon as mine does), Seated once the
+    game is over. While I stand my gesture keeps flowing: its look is relative to my body (which
+    faces the board from every stance), its hand idle, without `Glance` or `Side`.
+  - Theirs: a `live::StanceTracker` hears each `OpponentStance` of the game played, and Seated
+    with their `MoveMade` (before the move is queued: only a seated player plays). It is reset
+    (seated) at a new game, at its end, when they disconnect and when our own link is lost: their
+    client sends a standing stance again once the link is back. A stance other than Seated not
+    refreshed for 5 keepalives (`net::kStanceExpiryKeepalives`, 5 s by default) reads as Seated,
+    and so does a value a later minor may add. Their gestures' piece fields move the robot's hand
+    only while it is seated and shown Seated (`live::remoteHandApplies`); `Glance` and `Side`
+    (and the mirror of a `Side` look) apply only while shown Seated (`live::remoteHeadFlags`):
+    standing, their look is relative to the robot's body. With no head of theirs to follow, a
+    standing robot looks at the board.
 - **Clocks.** The server's values, extrapolated with `serverNowMs()` for the side to move. The
   local clock never flags: a clock at zero shows 0.0 until the server's `GameEnd`.
 - **Rejected move / disagreeing snapshot.** Once the robots are idle, the board, the game and the
@@ -399,6 +444,16 @@ the page) closes the match, which removes the port mapping.
   third of the moves, then at its own 250-400 ms before; with `autoPress` off the move is put
   down first (`placed`) and its `MoveMade` comes 0.6-1.0 s later. It is silent while away (F9)
   and once the game is over.
+- It gets up now and then (`OpponentStance`): in about a quarter of my turns (from its fifth ply
+  on, with a minute on its clock) and in about a fifth of its long thinks (from the seventh, with
+  a minute and a half), it stands in front of its chair, sometimes walks to an end of the table
+  and back, looks at the board a few seconds and sits down; when I move meanwhile it comes back
+  at once. Its stance goes again every second while it stands and after our reconnection; its
+  hand reaches for a piece only 2.25 s after its Seated (2.5 s more from an end of the table), so
+  never while it stands; standing, its head looks at the board from its standing eyes and never
+  at its clock or scoresheet. `net::mock::forceOpponentStance(stance)` holds a stance (0-3; -1
+  gives it back its own outings): held away from its chair it never plays and its clock runs.
+  `tests/online_mock_stance_tests.cpp` plays against it on the virtual clock.
 - `--start-online [category]` signs in and plays the first opponent found (at once with the
   fakes); `--touch <square>` then touches that piece once the handshake is over, and
   `--play e2e4,d2d3,...` makes my moves by hand (touch, carry, clock press), so that the fake's

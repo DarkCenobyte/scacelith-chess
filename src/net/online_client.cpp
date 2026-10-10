@@ -42,6 +42,12 @@
 //     GameSnapshot, is dropped: the next one carries the whole state again. Welcome.gestureIdleMs
 //     (the server's GESTURE_IDLE_MS), clamped to 1 s .. 10 s, is the scene's keepalive
 //     (gestureKeepaliveMs()).
+//   - The player's stance (sendStance, protocol minor 2; net/stance.h has the rules): C_Stance,
+//     numbered and counted like any message, when it changes (a quarter of a second apart at
+//     least) and, while not Seated, again every gesture keepalive whatever Welcome.gestureRate
+//     says; after every Welcome a stance other than Seated goes again. Only to a server whose
+//     Welcome negotiated minor 2 or later, while Online, for the game of the last GameSnapshot
+//     while it is ongoing. The game thread's latest stance is kept while the connection is down.
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -55,6 +61,7 @@
 #include "json.h"
 #include "net_sys.h"
 #include "protocol_gen.h"
+#include "stance.h"
 #include "transport.h"
 #include "../core/log.h"
 #include "scacelith_version.h"
@@ -386,6 +393,9 @@ struct OnlineClient::Impl {
     bool stopping = false, rtWake = false;
     // The latest Gesture of the game thread, until net-rt sends or drops it (flushGesture).
     struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
+    // The player's latest stance and its game, from the game thread (sendStance); net-rt sends it
+    // when its rules say (flushStance). Kept while the connection is down.
+    struct StanceIn { uint64_t game = 0; uint8_t stance = 0; } stanceIn;
     std::atomic<bool> stopFlag{false};
     std::atomic<int> connState{int(ConnState::Offline)};
     std::atomic<int> ping{-1};
@@ -464,6 +474,8 @@ struct OnlineClient::Impl {
         OnlineGame game;
         struct Pending { uint64_t game = 0; int ply = -1; uint16_t move = 0; } pending;
         GestureBucket gestures;                           // Welcome.gestureRate / gestureBurst
+        uint16_t minor = 0;                               // the minor the last Welcome negotiated
+        StanceSender stance;                              // when the player's stance goes (flushStance)
     } rt;
 
     Impl() {
@@ -1292,6 +1304,10 @@ struct OnlineClient::Impl {
             rt.restarting = false;
             rt.gestures.reset(steadyMs(), m.gestureRate, gestureSendCapacity(m.gestureBurst));
             gestureKeepalive.store(net::gestureKeepaliveMs(m.gestureIdleMs));
+            // The minor both sides speak (the server answers the lower of the two). The stance
+            // goes again on this new link: the opponent's client showed us seated meanwhile.
+            rt.minor = std::min(m.minor, pr::kMinor);
+            rt.stance.linkUp();
             if (rt.info.valid) rt.info.proven = true;
             if (!rt.haveOffset) clockOffset.store(m.serverTime - localEpochMs());
             setState(ConnState::Online);
@@ -1527,9 +1543,47 @@ struct OnlineClient::Impl {
             postGesture(std::move(ev));
             break;
         }
+        case pr::MsgType::S_Stance: {
+            // The opponent's stance (minor 2), its raw value: one a later minor adds is kept, and
+            // the scene shows it as Seated (anim::stanceFromCode). In order with the game events.
+            pr::S_Stance m;
+            if (!pr::decode(p, n, m)) return bad();
+            if (m.game == 0 || m.game != rt.game.id) break;   // not the game shown
+            Event ev;
+            ev.kind = Event::Kind::OpponentStance;
+            ev.ok = true;
+            ev.gameId = m.game;
+            ev.stance = int(m.stance);
+            post(std::move(ev));
+            break;
+        }
         default:
             break;
         }
+    }
+
+    // Whether the player's stance in 'game' may go on this connection: Online, a minor that has
+    // the Stance message, and the game of the last GameSnapshot, still ongoing.
+    bool stanceUsable(uint64_t game) const {
+        return rt.ws && rt.welcomed && rt.minor >= kStanceMinMinor && game != 0 && game == rt.game.id &&
+               rt.game.status == int(pr::GameStatus::Ongoing);
+    }
+
+    // The game thread's latest stance: sent when it changed (paced) or, while not Seated, at the
+    // keepalive (net/stance.h); nextRtDeadline wakes the loop for those.
+    void flushStance() {
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            rt.stance.set(stanceIn.game, stanceIn.stance);
+        }
+        if (!stanceUsable(rt.stance.game())) return;
+        const double now = steadyMs();
+        if (!rt.stance.due(now, gestureKeepalive.load())) return;
+        pr::C_Stance m;
+        m.game = rt.stance.game();
+        m.stance = pr::Stance(rt.stance.stance());
+        send(m);
+        rt.stance.sent(now);   // a link that fails meanwhile sends it again after its Welcome
     }
 
     // The game thread's latest Gesture: sent when its bucket has a token, otherwise left for
@@ -1603,6 +1657,12 @@ struct OnlineClient::Impl {
             double wait = std::ceil(rt.gestures.readyAtMs(now) - now);
             t = std::min(t, Clock::now() + std::chrono::milliseconds(int64_t(wait)));
         }
+        StanceSender stance = rt.stance;   // with the game thread's latest (mu is held)
+        stance.set(stanceIn.game, stanceIn.stance);
+        if (stanceUsable(stance.game())) {
+            double wait = std::ceil(stance.nextAtMs(gestureKeepalive.load()) - steadyMs());
+            if (wait < 60000.0) t = std::min(t, Clock::now() + std::chrono::milliseconds(int64_t(std::max(0.0, wait))));
+        }
         return t;
     }
 
@@ -1631,6 +1691,8 @@ struct OnlineClient::Impl {
                     onClosed(code, reason);
                 }
             }
+            // After reading: a Welcome just read sends a stance other than Seated again at once.
+            if (rt.ws) flushStance();
             Clock::time_point now = Clock::now();
             if (rt.ws) {
                 // Liveness: the server pings about every heartbeatMs. When nothing came for 1.5
@@ -2816,7 +2878,19 @@ void OnlineClient::rematch(uint64_t gameId, bool accept) {
     });
 }
 
-void OnlineClient::sendStance(uint64_t, uint8_t) {}   // placeholder: the Stance relay lands next
+void OnlineClient::sendStance(uint64_t gameId, uint8_t stance) {
+    Impl* d = impl_.get();
+    bool wake;
+    {
+        std::lock_guard<std::mutex> lk(d->mu);
+        // Kept whatever the connection: net-rt sends it when it may (flushStance).
+        wake = d->stanceIn.game != gameId || d->stanceIn.stance != stance;
+        d->stanceIn.game = gameId;
+        d->stanceIn.stance = stance;
+        if (wake) d->rtWake = true;
+    }
+    if (wake) d->rtCv.notify_one();
+}
 
 void OnlineClient::sendGesture(uint64_t gameId, const Gesture& g) {
     Impl* d = impl_.get();
