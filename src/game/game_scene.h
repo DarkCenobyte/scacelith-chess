@@ -3,8 +3,8 @@
 // one PC, each from their own robot's eyes, see docs/MULTIPLAYER_PLAN.md), online play (a player
 // of the Scacelith server or of a direct match sits in the other chair, see
 // game_scene_online.cpp), the viewer mode (two Stockfish players watched from a free, invisible
-// camera), the replay of a saved game (game_scene_replay.cpp), the player's Elo, animations,
-// audio and UI.
+// camera), the replay of a saved game (game_scene_replay.cpp), the Analysis mode
+// (game_scene_analysis.cpp), the player's Elo, animations, audio and UI.
 //
 // Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human,
 // Stockfish or Remote; a hot-seat game has two Humans), the name and Elo written on the
@@ -45,6 +45,14 @@
 // its result card at the end. K pauses, J / L step back / forward, Shift+J / Shift+L slower /
 // faster, Home / End the start / the end; the same as mouse buttons on the overlay.
 //
+// Analysis (game_scene_analysis.cpp): a game reviewed by Stockfish (src/analysis), opened from
+// the Analysis page, the Saved games page, the online history or the game over card of a game just
+// played. A replay the player steps through: one move forward played by a robot, one move back
+// taken back by hand, further set at once behind a dip; the evaluation bar and the move list
+// (ui::analysisHud), the symbols and better-move arrows on the board (World::submitAnalysisMarks),
+// the commentator's comments on the key moments (voice and subtitles). K plays / pauses, J / L one
+// move back / forward, Home / End, N the comments, M the voice, B the arrows.
+//
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
@@ -84,6 +92,8 @@
 //                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused;
 //                           --replay-keys K,L,J,Shift+L,Home,End,... presses these keys in turn,
 //                           each once the board is still; Leave: Esc and "Main menu")
+//   --analyse <file.pgn>    skip the menu: analyse a game (--game N; --analysis-at N opens it at
+//                           position N; --replay-keys J,L,K,Home,End,N,M,B,Goto:N,Wait:S,Leave)
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 //   --calibrate             the brightness calibration before the title page, as on a first start

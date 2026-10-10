@@ -1035,7 +1035,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
             // The Analysis page's game (a saved game, or the PGN text of a pasted or online game).
             if (loadAnalysis(library_.replay)) {
                 mode_ = GameMode::Analysis;
-                analysisWhiteBottom_ = true;
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
             }

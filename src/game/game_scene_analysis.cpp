@@ -286,13 +286,26 @@ AnalysisRuntime& GameScene::analysisRuntime() {
 // ==============================================================================================
 
 bool GameScene::loadAnalysis(const ui::ReplaySetup& choice) {
-    if (!choice.path.empty()) return loadReplay(choice.path, choice.game);
+    // The player's side at the bottom of the bar and in front of the camera: Black's when the
+    // record names them as Black (on this PC, or signed in to the online server).
+    auto sideOfPlayer = [this]() {
+        const std::string black = replayRecord_.tag("Black"), white = replayRecord_.tag("White");
+        const std::string me = localPlayerName(), online = onlineSession().savedUsername();
+        bool mine = (black == me || (!online.empty() && black == online)) && white != me && white != online;
+        analysisWhiteBottom_ = !mine;
+    };
+    if (!choice.path.empty()) {
+        if (!loadReplay(choice.path, choice.game)) return false;
+        sideOfPlayer();
+        return true;
+    }
     // A PGN text (pasted, or a game of the online history): its first game read without error.
     chess::pgn::Result<chess::pgn::ParsedGame> r = chess::pgn::read(choice.pgn);
     std::string error = r.error;
     for (chess::pgn::ParsedGame& g : r.games) {
         if (g.ok()) {
             replayRecord_ = std::move(g.record);
+            sideOfPlayer();
             return true;
         }
         if (error.empty()) error = g.error.text();
