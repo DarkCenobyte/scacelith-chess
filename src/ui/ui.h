@@ -325,12 +325,15 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& v);
 // voice download prompt hooks in here: game::coachModelInit). nullptr = none.
 void setCoachEntryHook(std::function<void()> hook);
 // Options > Audio, under Coach voice: the row that updates the old INT8 voice model to the
-// official one. 'query' says whether it shows (the old model is installed) and with which size;
-// 'open' is called by its button (the game opens the update prompt). Set by game::coachModelInit.
+// official one. 'query' says whether it shows (the old model is installed) and with which size,
+// and whether the Voice quality row is on; 'open' is called by its button (the game opens the
+// update prompt). Set by game::coachModelInit.
 struct VoiceUpdateRow {
     bool show = false;
     bool running = false;          // a download is under way: the button is off
     double bytes = 0.0;            // the size on the button
+    bool modelInstalled = false;   // a voice model (official or old INT8) is there and no download
+                                   // runs: Voice quality can be set (greyed out otherwise)
 };
 void setVoiceUpdateHooks(std::function<VoiceUpdateRow()> query, std::function<void()> open);
 

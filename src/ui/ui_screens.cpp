@@ -536,16 +536,22 @@ bool optionsPage(MenuAction& act) {
                     detail::openVoiceUpdate();
             }
             // Voice quality: the flow-matching steps of each line (more: a cleaner voice, later), on
-            // a slider of whole steps; its help gives the default.
+            // a slider of whole steps named by level; its help gives the default. Greyed out until
+            // a voice model is installed (the official one or the old INT8 one), as with the voice off.
             {
                 using game::Settings;
+                static const char* const kLevels[] = {"options.voice_quality.low",  "options.voice_quality.medium",
+                                                      "options.voice_quality.high", "options.voice_quality.very_high",
+                                                      "options.voice_quality.ultra", "options.voice_quality.max"};
+                static_assert(sizeof kLevels / sizeof kLevels[0] == Settings::kTtsStepsMax - Settings::kTtsStepsMin + 1,
+                              "one name per step count");
                 float steps = float(std::clamp(s.ttsSteps, Settings::kTtsStepsMin, Settings::kTtsStepsMax));
-                auto stepsText = [](float v) {
-                    const int n = int(std::lround(v));
-                    return i18n::trn("options.voice_quality.steps", n, {std::to_string(n)});
+                auto levelText = [](float v) {
+                    const int n = std::clamp(int(std::lround(v)), Settings::kTtsStepsMin, Settings::kTtsStepsMax);
+                    return T(kLevels[n - Settings::kTtsStepsMin]);
                 };
                 if (im::sliderRow(L("options.voice_quality"), steps, float(Settings::kTtsStepsMin), float(Settings::kTtsStepsMax),
-                                  1.0f, stepsText, row(), s.coachVoice))
+                                  1.0f, levelText, row(), s.coachVoice && voiceUpdate.modelInstalled))
                     s.ttsSteps = int(std::lround(steps));
                 im::tooltip(T("options.voice_quality.help"));
             }

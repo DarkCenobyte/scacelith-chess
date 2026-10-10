@@ -13,6 +13,8 @@
 //     title page), coach-download-hub / coach-download-archive / coach-download-removing /
 //     coach-download-failed (the progress panel; archive and removing over the
 //     title page); options-voice-update: Options > Audio with the update row of the old model;
+//     options-novoice: Options > Audio without a voice model (Voice quality greyed out; "options"
+//     shows it with the model installed);
 //     coach-flow: the real thing over the title page (game/coach_model.h: the
 //     Coach entry's prompt, a real download into --coach-dir <folder>, the panel, the notices)
 //   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
@@ -306,9 +308,18 @@ public:
             s.timeControlPreset = -1;
             ui::debug::openMenuPage(ui::debug::MenuPage::NewGame);
         }
-        if (screen == "options") {
+        if (screen == "options" || screen == "options-novoice") {
+            // The voice model installed, or not (sample hooks).
+            const bool installed = screen == "options";
+            ui::setVoiceUpdateHooks(
+                [installed] {
+                    ui::VoiceUpdateRow r;
+                    r.modelInstalled = installed;
+                    return r;
+                },
+                nullptr);
             ui::debug::openMenuPage(ui::debug::MenuPage::Options);
-            ui::debug::setOptionsTab(tab_);
+            ui::debug::setOptionsTab(installed ? tab_ : 2);
         }
         if (screen == "options-voice-update") {
             // Options > Audio with the row that updates the old INT8 voice model (sample hooks).
@@ -317,6 +328,7 @@ public:
                     ui::VoiceUpdateRow r;
                     r.show = true;
                     r.bytes = double(tts::supertonicManifest().totalBytes());
+                    r.modelInstalled = true;
                     return r;
                 },
                 [] { LOGI("ui viewer: voice model update requested"); });
@@ -599,7 +611,8 @@ public:
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
-        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "options-voice-update" || s == "credits" ||
+        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "options-novoice" ||
+            s == "options-voice-update" || s == "credits" ||
             s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
             s == "library-empty" || s == "library-analyse" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
             a = ui::mainMenu(setup_, watch_, coach_, library_);
