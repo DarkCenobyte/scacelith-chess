@@ -42,6 +42,21 @@ using socklen = socklen_t;
 static int S(Handle h) { return h; }
 #endif
 
+#ifdef __APPLE__
+// macOS has no MSG_NOSIGNAL: every socket made here gets SO_NOSIGPIPE instead (noSigPipe), so that
+// a send to a peer that has gone fails with EPIPE rather than raise SIGPIPE. Nor has it
+// SOCK_CLOEXEC or accept4: close-on-exec is set right after (the programs the game starts inherit
+// no descriptor anyway: net::sys::spawnProgram).
+static constexpr int kSendNoSignal = 0;
+static void noSigPipe(int h) {
+    int on = 1;
+    setsockopt(h, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof on);
+}
+static void closeOnExec(int h) { fcntl(h, F_SETFD, FD_CLOEXEC); }
+#elif !defined(_WIN32)
+static constexpr int kSendNoSignal = MSG_NOSIGNAL;
+#endif
+
 bool startup() {
 #ifdef _WIN32
     static std::once_flag once;
@@ -338,6 +353,9 @@ Handle openTcp(int family) {
     startup();
     Handle h = Handle(socket(family, SOCK_STREAM, IPPROTO_TCP));
     if (h == kInvalid) return kInvalid;
+#ifdef __APPLE__
+    noSigPipe(h);
+#endif
     if (!setNonBlocking(h)) { closeSocket(h); return kInvalid; }
     setNoDelay(h);
     return h;
@@ -347,6 +365,9 @@ Handle openUdpV4() {
     startup();
     Handle h = Handle(socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP));
     if (h == kInvalid) return kInvalid;
+#ifdef __APPLE__
+    noSigPipe(h);
+#endif
     if (!setNonBlocking(h)) { closeSocket(h); return kInvalid; }
     return h;
 }
@@ -417,6 +438,12 @@ Handle listenLoopbackV4(uint16_t& port, std::string& err) {
     SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
     BOOL on = TRUE;
     setsockopt(S(h), SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<const char*>(&on), sizeof on);
+#elif defined(__APPLE__)
+    // Close-on-exec as soon as it is made (and spawnProgram hands no descriptor to the browser).
+    Handle h = Handle(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP));
+    if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
+    closeOnExec(h);
+    noSigPipe(h);
 #else
     // Close-on-exec from its creation: posix_spawnp (net::sys) would hand it to the browser.
     Handle h = Handle(socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP));
@@ -440,6 +467,12 @@ Handle acceptOne(Handle listener, Endpoint* peer, bool noInherit) {
 #ifdef _WIN32
     Handle h = Handle(::accept(S(listener), SA(tmp), &l));
     if (h != kInvalid && noInherit) SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
+#elif defined(__APPLE__)
+    Handle h = Handle(::accept(listener, SA(tmp), &l));
+    if (h != kInvalid) {
+        if (noInherit) closeOnExec(h);
+        noSigPipe(h);
+    }
 #else
     Handle h = Handle(::accept4(listener, SA(tmp), &l, noInherit ? SOCK_CLOEXEC : 0));
 #endif
@@ -496,7 +529,7 @@ int sendSome(Handle h, const uint8_t* p, size_t n) {
 #ifdef _WIN32
     int r = ::send(S(h), reinterpret_cast<const char*>(p), int(std::min<size_t>(n, 1 << 20)), 0);
 #else
-    ssize_t r = ::send(h, p, n, MSG_NOSIGNAL);
+    ssize_t r = ::send(h, p, n, kSendNoSignal);
 #endif
     if (r >= 0) return int(r);
     return isWouldBlock(lastError()) ? 0 : -1;
@@ -518,7 +551,7 @@ int sendTo(Handle h, const uint8_t* p, size_t n, const Endpoint& to) {
 #ifdef _WIN32
     int r = ::sendto(S(h), reinterpret_cast<const char*>(p), int(n), 0, SA(to), to.len);
 #else
-    ssize_t r = ::sendto(h, p, n, MSG_NOSIGNAL, SA(to), socklen(to.len));
+    ssize_t r = ::sendto(h, p, n, kSendNoSignal, SA(to), socklen(to.len));
 #endif
     if (r >= 0) return int(r);
     return isWouldBlock(lastError()) ? 0 : -1;
