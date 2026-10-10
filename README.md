@@ -202,8 +202,8 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 ## windows/Scacelith-2026-10-10-points-de-vue.zip
 
 - Holds `Scacelith-2026-10-10-points-de-vue.exe` (133 MB, zipped to 96 MB).
-- Source: branch `claude/standing-viewpoints-iru8qq` at commit `8816fbb` (pull request #28, not
-  merged yet), which includes `master` up to pull request #27 (graphics presets).
+- Source: branch `claude/standing-viewpoints-iru8qq` at commit `66e21f6` (pull request #28, not
+  merged yet), which includes `master` up to pull request #26 (coach challenges).
 - Contents: standing viewpoints during a game. Up arrow: stand in front of the chair; Left / Right
   arrow: walk to that end of the table; Down arrow: sit back down. The clock keeps running and only
   a seated player plays. Online (protocol v1.2, server pull request #5 of
@@ -212,15 +212,15 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
   Also the game-side fixes of the 2026-10-10 audit (N01 analysis comments, A08 Linux sign-in
   file, N02 CI voice model) and a move refused by a busy server sent again. The robot's thighs turn
   on porcelain balls inside the pelvis (hips 1.5 cm closer, no hollow over a standing robot's
-  thigh). This file replaces the builds of commits `735a472` and `134671a`, still in this branch's
-  history.
+  thigh). This file replaces the builds of commits `735a472`, `134671a` and `8816fbb`, still in this
+  branch's history.
 - Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
   embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
-- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (846 tests, 12
-  skipped), with the live check against the server of pull request #5; it has not been run on real
-  Windows hardware by the build.
-- SHA-256 of the exe: `b9dc9d3c4f3f83bc9b8d2d4b86b965f2e85bdd6c12846f34c838a253c226b86b`
-- SHA-256 of the zip: `ec01b35200927cf3ce79b575a07908f1026f3e9ad2e6ed48c9b27e416267fd13`
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (858 tests, 12
+  skipped); the live check against the server of pull request #5 passes in the pull request's CI.
+  It has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `2912c089f8bfab2d43ef0475c28f12d7a782656dfe02c5103b6d870e1054d1f5`
+- SHA-256 of the zip: `d0e7d73994fe59caf6be1fdbcec81fa8ffb62033f6553dbaa6ad72c2a4a771e4`
 
 ## linux-server/scacelith-server-2026-10-03
 
