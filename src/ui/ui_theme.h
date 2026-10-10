@@ -21,6 +21,7 @@ constexpr vec4 panelTop{0.060f, 0.052f, 0.047f, 0.90f};
 constexpr vec4 panelBottom{0.030f, 0.026f, 0.024f, 0.93f};
 constexpr vec4 black{0.0f, 0.0f, 0.0f, 1.0f};
 constexpr vec4 danger{0.780f, 0.360f, 0.300f, 1.0f};
+constexpr vec4 green{0.470f, 0.750f, 0.435f, 1.0f};   // done: the check mark of a completed challenge
 
 inline vec4 withAlpha(vec4 c, float a) { return {c.x, c.y, c.z, c.w * a}; }
 inline vec4 mix(vec4 a, vec4 b, float t) { return a + (b - a) * t; }

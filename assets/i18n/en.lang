@@ -127,6 +127,8 @@ controls.coach_skip.keys = Space
 controls.coach_skip = Coach: skip what the coach says
 controls.coach_takeback.keys = Backspace
 controls.coach_takeback = Coach: take the move back when offered
+controls.coach_hint.keys = H
+controls.coach_hint = Coach challenges: ask for a hint
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = BRIGHTNESS
@@ -1063,6 +1065,111 @@ coach.gameover.unrated = This game with the coach is not rated.
 coach.lesson.done = WELL DONE
 coach.lesson.done.line = You now know the rules of chess.
 coach.lesson.next = First game
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Training
+coach.tab.challenges = Challenges
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = CHECKMATES
+challenge.group.tactics = TACTICS
+challenge.group.defence = DEFENCE
+challenge.group.endgames = ENDGAMES
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mate in one
+challenge.mate1.desc = One move, and it's checkmate.
+challenge.mate1.detail = Look at every check first: one of them leaves the king no square, no block and no capture.
+challenge.mate2.name = Mate in two
+challenge.mate2.desc = A move that leaves no defence, then mate.
+challenge.mate2.detail = The first move is often a check or a sacrifice that takes a square away from the king. The coach defends as well as it can.
+challenge.mate3.name = Mate in three
+challenge.mate3.desc = Longer forcing lines.
+challenge.mate3.detail = Checks, captures and threats, three moves deep. Calculate the coach's best answer at each step before you touch a piece.
+challenge.backrank.name = Back-rank mates
+challenge.backrank.desc = A king trapped behind its own pawns.
+challenge.backrank.detail = When the pawns in front of a castled king have not moved, a rook or a queen on the last rank can be checkmate. Remove or distract the defenders first.
+challenge.patterns.name = Mating patterns
+challenge.patterns.desc = Smothered mate, Anastasia, Arabian and other classics.
+challenge.patterns.detail = Famous mating nets that come back again and again. Learn to recognise the pieces' set-up and the final blow.
+challenge.hanging.name = Free pieces
+challenge.hanging.desc = Spot what is left unprotected.
+challenge.hanging.detail = A piece or a pawn that nobody defends can simply be taken. Check what each of the coach's pieces is guarded by.
+challenge.fork.name = Forks
+challenge.fork.desc = One piece attacks two at once.
+challenge.fork.detail = Knights, pawns, queens and even kings can fork. The opponent can only save one of the two targets.
+challenge.pin.name = Pins
+challenge.pin.desc = A piece that cannot move without losing what stands behind it.
+challenge.pin.detail = Pin a piece to its king or to a more valuable piece, then attack it again, or use the fact that it cannot move.
+challenge.skewer.name = Skewers
+challenge.skewer.desc = Attack a valuable piece and win the one behind it.
+challenge.skewer.detail = The reverse of a pin: the more valuable piece stands in front, must move away, and uncovers the piece behind it.
+challenge.discovered.name = Discovered attacks
+challenge.discovered.desc = Move one piece to unleash another.
+challenge.discovered.detail = When a piece steps out of a line, the piece behind it attacks. With check, or with a double check, the opponent has no time to answer both threats.
+challenge.deflection.name = Deflection and decoy
+challenge.deflection.desc = Lure a defender away, or onto a fatal square.
+challenge.deflection.detail = A defender that has two jobs cannot do both. Attack it, offer it something, or force a piece onto the square where it will be lost.
+challenge.intermezzo.name = In-between moves
+challenge.intermezzo.desc = Don't recapture at once: there is something stronger.
+challenge.intermezzo.detail = Before the expected move, a check or a bigger threat in between changes everything.
+challenge.trapped.name = Trapped pieces
+challenge.trapped.desc = A piece with no safe square left.
+challenge.trapped.detail = Take away the last escape squares of a piece, then win it.
+challenge.promotion.name = Promotion
+challenge.promotion.desc = Push a pawn through to the last rank.
+challenge.promotion.detail = Advanced pawns are worth a lot. Clear the way, deflect the blockers, and make a new queen.
+challenge.quiet.name = Quiet moves
+challenge.quiet.desc = The winning move is neither a check nor a capture.
+challenge.quiet.detail = Sometimes the strongest move just prepares a threat that cannot be parried. The hardest kind to see.
+challenge.opening.name = Opening traps
+challenge.opening.desc = Punish early mistakes.
+challenge.opening.detail = Positions from the first moves of real games, where one careless move can be exploited at once.
+challenge.escape.name = Find the escape
+challenge.escape.desc = Your king is in danger: one move saves it.
+challenge.escape.detail = Every other move loses. Look at all the checks and threats against your king, then find the only way out.
+challenge.defend.name = Defensive moves
+challenge.defend.desc = Parry the threat without losing material.
+challenge.defend.detail = The coach threatens something. Find the precise move that keeps everything together.
+challenge.kq.name = Queen and king against king
+challenge.kq.desc = Checkmate with the queen.
+challenge.kq.detail = Push the lone king to the edge with your queen, bring your own king closer, and beware of stalemate. The coach defends with its best moves.
+challenge.kr.name = Rook and king against king
+challenge.kr.desc = Checkmate with the rook.
+challenge.kr.detail = The rook cuts the king off, rank by rank; your king takes the opposition. The coach defends with its best moves.
+challenge.kp.name = King and pawn against king
+challenge.kp.desc = Win the opposition and promote.
+challenge.kp.detail = Lead with your king, not the pawn. Take the opposition and make a queen that the coach cannot catch.
+challenge.kp_hold.name = Stop the pawn
+challenge.kp_hold.desc = A lone king against king and pawn: hold the draw.
+challenge.kp_hold.detail = Stand in front of the pawn and keep the opposition. Hold for ten moves.
+challenge.rook.name = Rook endgames
+challenge.rook.desc = The Lucena bridge and the Philidor defence.
+challenge.rook.detail = The two positions every player should know: how to win with a pawn on the seventh rank, and how to defend with the rook on the third.
+challenge.endgame.name = Endgame tactics
+challenge.endgame.desc = Few pieces, sharp ideas.
+challenge.endgame.detail = Pawn races, breakthroughs and rook endgames from real games.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} position|{0} positions
+coach.challenge.done = Completed
+coach.challenge.start = Start
+coach.challenge.note.white = You play White; the coach sets up each position on the board.
+coach.challenge.note.hint = Stuck? Press H for a hint. After a few tries, the coach will offer one.
+coach.challenge.note.unsaved = Challenges are not rated or saved; a check mark shows the ones you have completed.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = CHALLENGE COMPLETE
+coach.challenge.complete.line = You solved every position.
+coach.challenge.next = Next challenge
+coach.challenge.again = Again
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = A HINT?
+coach.hint.text = The coach offers you a hint.
+coach.hint.hint = H gives the hint. Touching a piece keeps looking.
+coach.hint.accept = Hint
+coach.hint.decline = No, thanks
+coach.hint.key = Hint
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.

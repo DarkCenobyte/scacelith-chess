@@ -4,8 +4,10 @@
 //                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo|
 //                                     calibration (first start; the slider starts at the .ini's
 //                                     brightness)
-//   coach mode: coach (the coach page), coach-novoice (the same without the voice files), licences
-//     (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
+//   coach mode: coach (the coach page), coach-novoice (the same without the voice files),
+//     coach-challenges (its Challenges tab; sample sets marked completed when the .ini has none),
+//     licences (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
+//     coach-hint (a challenge: the hint offer card, the hint and skip keys, the progress band),
 //     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
 //     coach-gameover, coach-lesson-done
 //   coach voice download (sample figures): coach-download (the prompt over the Coach page),
@@ -338,8 +340,14 @@ public:
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
         if (screen == "licences") ui::debug::openMenuPage(ui::debug::MenuPage::Licences);
         if (screen == "coach" || screen == "coach-novoice") {
-            ui::debug::openMenuPage(ui::debug::MenuPage::Coach);
+            ui::openCoachPage(0);
             coach_.voiceAvailable = screen == "coach";
+        }
+        if (screen == "coach-challenges") {
+            // A few sets marked as completed when the settings have none, for their check marks.
+            if (s.coachChallengesDone.empty()) s.coachChallengesDone = {"mate1", "backrank", "hanging", "fork", "kq"};
+            ui::openCoachPage(1);
+            coach_.voiceAvailable = true;
         }
         if (screen == "coach-flow") {
             if (!coachDir_.empty()) tts::setModelDirectory(coachDir_);
@@ -613,7 +621,7 @@ public:
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "options-novoice" ||
             s == "options-voice-update" || s == "credits" ||
-            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "coach-challenges" || s == "licences" || s == "library" ||
             s == "library-empty" || s == "library-analyse" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
             a = ui::mainMenu(setup_, watch_, coach_, library_);
             if (a == ui::MenuAction::StartReplay)
@@ -622,16 +630,21 @@ public:
                 LOGI("ui viewer: analysis of %s, game %d, %d bytes of PGN text",
                      library_.replay.path.empty() ? "a PGN text" : library_.replay.path.c_str(), library_.replay.game,
                      int(library_.replay.pgn.size()));
-        } else if (s == "coach-hud" || s == "coach-subtitle") {
+        } else if (s == "coach-hud" || s == "coach-subtitle" || s == "coach-hint") {
             ui::Subtitle sub;
-            sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
+            sub.text = text_.empty() ? i18n::tr(s == "coach-hint" ? "coach.hint.text" : "coach.offer.text") : text_;
             sub.age = 1.0f;
             sub.duration = ui::subtitleDuration(sub.text, 4.0f);
             ui::subtitles(sub);
-            if (s == "coach-hud") {
+            if (s == "coach-hud" || s == "coach-hint") {
                 ui::CoachHud hud;
                 hud.offer = true;
                 hud.skippable = true;
+                if (s == "coach-hint") {  // a challenge: the hint offer, the hint key, the progress
+                    hud.hintOffer = true;
+                    hud.hintKey = true;
+                    hud.progress = ui::challengeProgress("fork", 2, 6);
+                }
                 ui::CoachHudAction ca = ui::coachHud(hud);
                 if (ca != ui::CoachHudAction::None) LOGI("ui viewer: coach hud -> %d", int(ca));
             }
