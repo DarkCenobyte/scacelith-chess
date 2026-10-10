@@ -518,6 +518,96 @@ TEST(live_gesture_timeouts_scale_with_the_keepalive) {
     }
 }
 
+// The opponent's stance (protocol minor 2): the latest one heard, Seated at first; a standing
+// stance holds while it is refreshed (their client sends it every keepalive) and reads as Seated
+// once kStanceExpiryKeepalives keepalives pass without one; Seated never expires; an unknown value
+// reads as Seated; reset() and their MoveMade (heard Seated) sit them down at once.
+TEST(live_stance_tracker_expires_without_refresh) {
+    using anim::Stance;
+    constexpr int kKeepalive = 1000;
+    CHECK(near(live::stanceExpiry(kKeepalive), 5.0f));
+    CHECK(near(live::stanceExpiry(0), 5.0f));        // gestureIdleMs 0: the shortest keepalive
+    CHECK(near(live::stanceExpiry(4000), 20.0f));
+    CHECK(near(live::stanceExpiry(30000), 50.0f));   // clamped like the keepalive
+    live::StanceTracker t;
+    CHECK(t.current(kKeepalive) == Stance::Seated);
+    CHECK(!t.expired(kKeepalive));
+
+    t.heard(int(Stance::Standing));
+    CHECK(t.current(kKeepalive) == Stance::Standing);
+    // Refreshed every keepalive (late by half of one at times): it holds for a minute.
+    for (int i = 0; i < 40; ++i) {
+        for (int f = 0; f < 15; ++f) t.advance(0.1f);
+        CHECK(t.current(kKeepalive) == Stance::Standing);
+        t.heard(int(Stance::Standing));
+    }
+    // Four refreshes lost in a row: still standing; the fifth too, and it reads as seated.
+    t.advance(4.9f);
+    CHECK(t.current(kKeepalive) == Stance::Standing && !t.expired(kKeepalive));
+    t.advance(0.15f);
+    CHECK(t.current(kKeepalive) == Stance::Seated && t.expired(kKeepalive));
+    CHECK_EQ(t.code(), int(Stance::Standing));   // what came is kept
+    // A refresh that comes at last stands them up again.
+    t.heard(int(Stance::SideLeft));
+    CHECK(t.current(kKeepalive) == Stance::SideLeft);
+    CHECK(near(t.age(), 0.0f));
+    // A longer keepalive holds it longer.
+    t.advance(19.0f);
+    CHECK(t.current(4000) == Stance::SideLeft);
+    CHECK(t.current(kKeepalive) == Stance::Seated);
+    t.advance(1.5f);
+    CHECK(t.current(4000) == Stance::Seated);
+
+    // Seated never expires; steps that are not time change nothing.
+    t.heard(int(Stance::Seated));
+    t.advance(3600.0f);
+    CHECK(t.current(kKeepalive) == Stance::Seated && !t.expired(kKeepalive));
+    t.heard(int(Stance::SideRight));
+    t.advance(-5.0f);
+    t.advance(std::nanf(""));
+    CHECK(near(t.age(), 0.0f));
+    CHECK(t.current(kKeepalive) == Stance::SideRight);
+
+    // Their MoveMade: they play seated (the scene hears Seated before queuing the move).
+    t.heard(int(Stance::Seated));
+    CHECK(t.current(kKeepalive) == Stance::Seated);
+
+    // Values a later minor may add, and garbage: Seated, never expiring, but kept as they came.
+    for (int code : {4, 7, 255, -1, 1000}) {
+        t.heard(code);
+        CHECK(t.current(kKeepalive) == Stance::Seated);
+        CHECK_EQ(t.code(), code);
+        t.advance(10.0f);
+        CHECK(!t.expired(kKeepalive));
+    }
+
+    // reset(): a new game, its end, their leaving, our link lost.
+    t.heard(int(Stance::Standing));
+    t.advance(1.0f);
+    t.reset();
+    CHECK(t.current(kKeepalive) == Stance::Seated);
+    CHECK_EQ(t.code(), 0);
+    CHECK(near(t.age(), 0.0f));
+}
+
+// While they stand, their gestures move the robot's head only: the piece fields need a seated
+// robot shown Seated, and Glance and Side (with the Side mirror of the yaw) apply seated only.
+TEST(live_stance_gates_the_opponents_hand_and_head_flags) {
+    using anim::Stance;
+    CHECK(live::remoteHandApplies(Stance::Seated, true));
+    CHECK(!live::remoteHandApplies(Stance::Seated, false));   // still sitting down
+    CHECK(!live::remoteHandApplies(Stance::Standing, true));  // about to rise
+    CHECK(!live::remoteHandApplies(Stance::SideLeft, false));
+    CHECK(!live::remoteHandApplies(Stance::SideRight, false));
+    const uint8_t all = uint8_t(flag::Glance | flag::Promoting | flag::Side);
+    CHECK_EQ(int(live::remoteHeadFlags(all, Stance::Seated)), int(all));
+    for (Stance s : {Stance::Standing, Stance::SideLeft, Stance::SideRight}) {
+        CHECK_EQ(int(live::remoteHeadFlags(all, s)), int(flag::Promoting));
+        CHECK_EQ(int(live::remoteHeadFlags(flag::Side, s)), 0);
+        CHECK_EQ(int(live::remoteHeadFlags(0, s)), 0);
+    }
+}
+
 TEST(live_head_spring_follows_without_overshoot) {
     live::HeadSpring s;
     s.snap(0.1f, -0.2f);
