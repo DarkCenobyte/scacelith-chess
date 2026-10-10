@@ -968,7 +968,9 @@ TEST(model_store_resumes_and_cancels) {
 TEST(model_store_real_files) {
     const std::string dir = net::sys::exeDirectory() + "coach/";
     const tts::ModelManifest& m = tts::supertonicManifest();
-    if (tts::modelStatus(m, dir) == tts::ModelStatus::Missing) SKIP("no model files in <build>/coach/");
+    // Required with --require=tts-model (tests/test.h; the CI's Linux job).
+    if (tts::modelStatus(m, dir) == tts::ModelStatus::Missing) SKIP_WITHOUT("tts-model", "no model files in <build>/coach/");
+    testing::uses("tts-model");
     CHECK_EQ(int(tts::modelStatus(m, dir)), int(tts::ModelStatus::Ready));
     CHECK_EQ(int(tts::installedModel(dir)), int(tts::ModelKind::Official));
     std::vector<std::string> bad;

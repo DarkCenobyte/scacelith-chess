@@ -4,11 +4,15 @@
 # ${CMAKE_BINARY_DIR}/coach/ for the unit tests and for runs with --coach-dir build/coach: it takes
 # the files from a local copy of the Hugging Face repository or downloads them from it one by one
 # (each checked against its SHA-256), and verifies every file. Without them the build still
-# succeeds; the TTS tests that need the model are skipped. See README.scacelith.md in this folder.
+# succeeds; the TTS tests that need the model are skipped (a run of the tests can require them:
+# scacelith_tests --require=tts-model, tests/test.h). See README.scacelith.md in this folder.
 #
 #   -DSCACELITH_SUPERTONIC_DIR=/path/to/supertonic-3   (a copy of the repository: onnx/, voice_styles/;
 #                                                       or a folder holding the files themselves)
 #   -DSCACELITH_SUPERTONIC_DOWNLOAD=OFF   (never download; default ON)
+#   -DSCACELITH_SUPERTONIC_REQUIRED=ON    (a missing or unverifiable file is a configure error, and
+#                                          the copy in the build folder is checked again at each
+#                                          configure; default OFF; the CI's Linux job)
 # The first defaults to the environment variable of the same name. The release package holds the
 # executable only.
 
@@ -31,6 +35,7 @@ set(SUPERTONIC3_FILES
 set(SCACELITH_SUPERTONIC_DIR "$ENV{SCACELITH_SUPERTONIC_DIR}" CACHE PATH
     "Local copy of the Supertonic 3 repository (empty: download the files into the build folder)")
 option(SCACELITH_SUPERTONIC_DOWNLOAD "Download the Supertonic 3 model files when no local copy is given" ON)
+option(SCACELITH_SUPERTONIC_REQUIRED "Fail the configure when the Supertonic 3 model files are missing or do not verify" OFF)
 
 set(SUPERTONIC3_OUT ${CMAKE_BINARY_DIR}/coach)
 set(SUPERTONIC3_AVAILABLE OFF)
@@ -79,16 +84,23 @@ function(supertonic3_prepare)
             endif()
         endif()
         if(NOT src OR NOT EXISTS ${src})
-            message(WARNING "Supertonic 3: ${name} (${remote}) is missing")
+            set(SUPERTONIC3_MISSING "${name} (${remote}) is missing from ${src_used}" PARENT_SCOPE)
             return()
         endif()
-        # 2. Verify and copy it (again only when the source changed).
+        # 2. Verify and copy it (again only when the source changed). Required, the copy the tests
+        # read is verified at each configure as well.
         if(NOT EXISTS ${SUPERTONIC3_OUT}/${name} OR ${src} IS_NEWER_THAN ${SUPERTONIC3_OUT}/${name})
             file(SHA256 ${src} hash)
             if(NOT hash STREQUAL expected)
                 message(FATAL_ERROR "Supertonic 3: ${src} has SHA-256 ${hash}, expected ${expected}")
             endif()
             file(COPY_FILE ${src} ${SUPERTONIC3_OUT}/${name})
+        elseif(SCACELITH_SUPERTONIC_REQUIRED)
+            file(SHA256 ${SUPERTONIC3_OUT}/${name} hash)
+            if(NOT hash STREQUAL expected)
+                message(FATAL_ERROR "Supertonic 3: ${SUPERTONIC3_OUT}/${name} has SHA-256 ${hash}, expected ${expected} "
+                                    "(delete it: the next configure copies it again)")
+            endif()
         endif()
     endwhile()
     # The notices the game writes beside the files it downloads (tts::writeFolderNotices): the model
@@ -106,7 +118,13 @@ endfunction()
 supertonic3_prepare()
 if(SUPERTONIC3_AVAILABLE)
     message(STATUS "Supertonic 3: model files in ${SUPERTONIC3_OUT}")
+elseif(SCACELITH_SUPERTONIC_REQUIRED)
+    message(FATAL_ERROR "Supertonic 3: ${SUPERTONIC3_MISSING}, and SCACELITH_SUPERTONIC_REQUIRED is ON: the TTS tests "
+                        "must run with the model files. Give a local copy (SCACELITH_SUPERTONIC_DIR) or let the "
+                        "configure download them (SCACELITH_SUPERTONIC_DOWNLOAD=ON, Hugging Face reachable); see "
+                        "third_party/supertonic3/README.scacelith.md.")
 else()
+    message(WARNING "Supertonic 3: ${SUPERTONIC3_MISSING}")
     message(WARNING "Supertonic 3: no development copy of the model files; the TTS tests that need them are skipped "
                     "(the game downloads them itself). Set SCACELITH_SUPERTONIC_DIR "
                     "(see third_party/supertonic3/README.scacelith.md).")

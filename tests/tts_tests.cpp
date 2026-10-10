@@ -274,7 +274,12 @@ bool loadDump(const std::string& rel, Dump& d) {
 
 std::string modelDir() { return net::sys::exeDirectory() + "coach/"; }
 
-// The synthesizer shared by the model tests (loaded once), or nullptr when the model is absent.
+// What the model tests skip without (SKIP_WITHOUT): a run with --require=tts-model fails them
+// instead, and fails when none of them passed (tests/test.h; the CI's Linux job).
+const char* const kModel = "tts-model";
+
+// The synthesizer shared by the model tests (loaded once), or nullptr when the model is absent or
+// does not load. A test that gets it has the model (testing::uses).
 tts::Synthesizer* model() {
     static std::unique_ptr<tts::Synthesizer> s;
     static bool tried = false;
@@ -285,6 +290,7 @@ tts::Synthesizer* model() {
         if (p->loadFrom(modelDir(), &err)) s = std::move(p);
         else std::fprintf(stderr, "  (model not loaded: %s)\n", err.c_str());
     }
+    if (s) testing::uses(kModel);
     return s.get();
 }
 
@@ -1730,7 +1736,7 @@ TEST(tts_text_preprocess) {
 
 TEST(tts_text_frontend_matches_reference) {
     tts::Synthesizer* s = model();
-    if (!s) SKIP("no model files in " + modelDir());
+    if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     Dump d;
     CHECK(loadDump("tests/data/tts/frontend.bin", d));
     int cases = 0;
@@ -1997,7 +2003,7 @@ TEST(tts_model_layout_choice) {
 
 TEST(tts_stage_duration_and_text_encoder) {
     StageFixture f;
-    if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
+    if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
     CHECK(tts::text::indices(tts::text::preprocess("Good move, well played.", "en"), e.indexer()) == f.ids);
     std::string err;
@@ -2047,7 +2053,7 @@ Tensor veStep(const StageFixture& f, const tts::ExecContext& ctx, int step) {
 
 TEST(tts_stage_vector_estimator) {
     StageFixture f;
-    if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
+    if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
     // Every step from the reference's previous latent (isolates the error of one step).
     double worst = 1e9;
@@ -2070,7 +2076,7 @@ TEST(tts_stage_vector_estimator) {
 
 TEST(tts_stage_vocoder_and_end_to_end) {
     StageFixture f;
-    if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
+    if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
     std::string err;
     Tensor wav;
@@ -2109,7 +2115,7 @@ TEST(tts_stage_vocoder_and_end_to_end) {
 TEST(tts_stage_every_level) {
     // One vector estimator step and the vocoder with every kernel set (same results to rounding).
     StageFixture f;
-    if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
+    if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
     for (int level : levelsRun()) {
         tts::ExecContext ctx;
@@ -2131,7 +2137,7 @@ TEST(tts_stage_every_level) {
 // ------------------------------------------------------------------------------------------------
 TEST(tts_synthesizer_output) {
     tts::Synthesizer* s = model();
-    if (!s) SKIP("no model files in " + modelDir());
+    if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     CHECK_EQ(s->sampleRate(), 44100);
     // The official model brings the game's voice alone, the old one all ten.
     CHECK_EQ(s->voiceCount(), s->engine()->kind() == tts::ModelKind::Legacy ? 10 : 1);
@@ -2254,8 +2260,9 @@ TEST(tts_worker) {
         // No model: requests are refused and stop() still joins.
         CHECK_EQ(w.request("Hello.", "en"), 0u);
         w.stop();
-        SKIP("worker without model files (failed() path checked)");
+        SKIP_WITHOUT(kModel, "worker without model files (failed() path checked)");
     }
+    testing::uses(kModel);
     // Priorities: a long request first, then a low and a high one queued behind it.
     uint32_t first = w.request("This first sentence keeps the worker busy for a little while.", "en", 0, 1);
     uint32_t low = w.request("Low priority.", "en", 0, 2);
@@ -2325,7 +2332,7 @@ TEST(tts_worker) {
 // table, as damaged contents of a downloaded file would): the warm-up gives no samples and the
 // worker fails (failed() and warmUpFailed()), taking no request. Missing files fail the load.
 TEST(tts_worker_warm_up_failure) {
-    if (!model()) SKIP("no model files in " + modelDir());
+    if (!model()) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     const std::string dir = net::sys::exeDirectory() + "ttstest-warmup/";
     CHECK(net::sys::makeDirectories(dir));
     // The files of the layout the build's copy holds. The big ones are links to it (copies where
@@ -2428,7 +2435,7 @@ long statusKb(const char* key) {
 TEST(tts_perf) {
     if (!std::getenv("SCACELITH_TTS_PERF")) SKIP("SCACELITH_TTS_PERF not set");
     tts::Synthesizer* s = model();
-    if (!s) SKIP("no model files in " + modelDir());
+    if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     const char* text = "Good move, well played. Now the knight goes to f3.";
     // The best kernel set of this CPU, and AVX2 (the common desktop case) when it is not the best.
     // SCACELITH_TTS_PERF_ARCH=sse2,avx2 measures the given sets instead.
@@ -2542,7 +2549,7 @@ TEST(tts_samples) {
     const char* dir = std::getenv("SCACELITH_TTS_SAMPLES");
     if (!dir) SKIP("SCACELITH_TTS_SAMPLES not set");
     tts::Synthesizer* s = model();
-    if (!s) SKIP("no model files in " + modelDir());
+    if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     // Texts from a file instead of the built-in lines: "lang<TAB>name<TAB>text" per line, where
     // lang may carry a voice ("en:M3"; default voice otherwise). The noise seed is the game's
     // default (derived from the text), so the files sound as the game will play them.
@@ -2619,7 +2626,7 @@ TEST(tts_node_diff) {
     const char* stage = std::getenv("SCACELITH_TTS_NODE_STAGE");
     if (!dumpPath || !stage) SKIP("SCACELITH_TTS_NODE_DUMP or SCACELITH_TTS_NODE_STAGE not set");
     StageFixture f;
-    if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
+    if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     std::string bytes;
     Dump nodes;
     CHECK(net::sys::readFile(dumpPath, bytes, 1u << 31) && nodes.parse(bytes));

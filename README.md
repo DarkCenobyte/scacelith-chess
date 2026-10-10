@@ -380,7 +380,10 @@ Face) into the build folder, for the unit tests and `--coach-dir build/coach`:
 `-DSCACELITH_SUPERTONIC_DIR=<folder>` takes a local copy instead (a copy of the repository, with
 `onnx/` and `voice_styles/`, or a folder holding the seven files), and
 `-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests that need the model are then
-skipped; see `third_party/supertonic3/README.scacelith.md`).
+skipped; see `third_party/supertonic3/README.scacelith.md`). `-DSCACELITH_SUPERTONIC_REQUIRED=ON`
+makes a missing or unverifiable model file a configure error, and
+`./build/scacelith_tests --require=tts-model` fails a test that skips for want of the model, and a
+run where none passed with it (the CI's Linux job does both).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -481,7 +484,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 ### Continuous integration and releases
 
 GitHub Actions builds and tests every push to master and every pull request
-(`.github/workflows/ci.yml`): the Linux build and its unit tests, the same tests built with
+(`.github/workflows/ci.yml`): the Linux build and its unit tests (the coach's voice model
+required: its tests must run and pass), the same tests built with
 AddressSanitizer and UBSan, the Windows build cross-compiled with MinGW-w64 and its unit tests
 under Wine (all as above), the contract with the dedicated
 server and the live online tests against it, and a lint of the workflows (actionlint and zizmor).
