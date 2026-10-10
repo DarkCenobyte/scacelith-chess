@@ -1,0 +1,27 @@
+# Coach mode challenges (src/coach/challenge.h): sets of positions, each training one skill.
+# Made by tools/challenges/select.py from candidates and checked by tools/challenge_audit with the
+# embedded Stockfish, which also writes the accepted alternatives: change the candidates or the
+# hand-written positions in tools/challenges/, then run the audit again rather than editing here.
+#
+#   challenge <id> <group> <level>
+#       A set, in menu order. <group>: mates, tactics, defence, endgames. <level>: difficulty 1..5.
+#       Texts: challenge.<id>.name / .desc / .detail in assets/i18n; ch.intro.<id> and
+#       ch.task.<id> in assets/coach/speech/<lang>/challenge.lang.
+#   line <source> <rating> | <fen> | <lead> | <moves> [| also <k>=<uci>,<uci> ...]
+#       A position with a known solution. <lead>: the coach's move into it (Black, UCI), "-" when
+#       White moves at once. <moves>: the solution from White's move on, the coach's answers in
+#       between (UCI), ending with White's move. also: other moves accepted at the player's k-th
+#       move (0-based; only at the last one: the positions have one solution up to there).
+#   play <source> | <fen> | mate|promote|hold [<moves>]
+#       An endgame played out against Stockfish, White to move: checkmate the coach, promote a pawn
+#       with the win kept, or hold the draw for <moves> moves.
+#
+# The player always plays White: positions where Black was to move are mirrored (a "/m" after the
+# source). Sources: lichess:<id> is https://lichess.org/training/<id> (the Lichess puzzle
+# database, public domain, CC0); scacelith:<name> was written for the game.
+
+challenge mate1 mates 1
+line lichess:0000H/m 1554 | r1bq1rk1/1ppn1p2/p2bN2p/3n4/2BQP2B/8/PP3PPP/R4RK1 b - - 1 15 | d8h4 | d4g7
+
+challenge kq endgames 1
+play scacelith:kq1 | 8/8/8/3k4/8/8/8/Q3K3 w - - 0 1 | mate
