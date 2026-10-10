@@ -21,6 +21,7 @@
 
 #include <arpa/inet.h>
 #include <csignal>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <poll.h>
 #include <sys/socket.h>
@@ -99,7 +100,13 @@ struct TlsServer {
         X509_free(cert);
         EVP_PKEY_free(key);
         if (!ok) return false;
+#ifdef __APPLE__
+        // No SOCK_CLOEXEC there: set right after.
+        listener = ::socket(AF_INET, SOCK_STREAM, 0);
+        if (listener >= 0) fcntl(listener, F_SETFD, FD_CLOEXEC);
+#else
         listener = ::socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+#endif
         sockaddr_in a{};
         a.sin_family = AF_INET;
         a.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
@@ -121,7 +128,12 @@ struct Peer {
     bool accept(const TlsServer& srv) {
         pollfd p{srv.listener, POLLIN, 0};
         if (::poll(&p, 1, 5000) != 1) return false;
+#ifdef __APPLE__
+        fd = ::accept(srv.listener, nullptr, nullptr);   // no accept4 there
+        if (fd >= 0) fcntl(fd, F_SETFD, FD_CLOEXEC);
+#else
         fd = ::accept4(srv.listener, nullptr, nullptr, SOCK_CLOEXEC);
+#endif
         if (fd < 0) return false;
         timeval tv{5, 0};
         setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
