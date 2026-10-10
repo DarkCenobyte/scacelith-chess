@@ -15,7 +15,7 @@ layout(std140, binding = 2) uniform LightingUBO {
     vec4 sunTOA;                            // rgb top-of-atmosphere solar illuminance (pre-exposed), w viewer altitude (km)
     vec4 skyParams2;                        // x cloud coverage, y cloud time (s), z mie density scale, w sky intensity
     vec4 planarInfo[4];                     // x enabled, y max lod, z width, w height (texels)
-    vec4 lightingMisc;                      // x specular AA strength, y shadow blend band, z ambient intensity, w unused
+    vec4 lightingMisc;                      // x specular AA strength, y shadow blend band, z ambient intensity, w shadow filter (0 PCF .. 3)
     vec4 probeSH[MAX_LIGHT_PROBES * 9];     // L2 SH of irradiance / PI (cosine-convolved, windowed), GPU-written
     vec4 skySH[9];                          // unused (nothing projects the sky any more), keeps the layout
 } lighting;

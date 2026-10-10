@@ -230,9 +230,8 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.fullscreen = src.fullscreen;
     dst.vsync = src.vsync;
     dst.renderScale = src.renderScale;
-    dst.quality = src.quality;
-    dst.motionBlur = src.motionBlur;
-    dst.depthOfField = src.depthOfField;
+    dst.graphicsPreset = src.graphicsPreset;
+    dst.graphicsLevels = src.graphicsLevels;
     dst.brightness = src.brightness;
     dst.masterVolume = src.masterVolume;
     dst.effectsVolume = src.effectsVolume;
@@ -260,8 +259,8 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
 bool sameOptions(const game::Settings& a, const game::Settings& b) {
     auto feq = [](float x, float y) { return std::fabs(x - y) < 1e-4f; };
     return a.displayWidth == b.displayWidth && a.displayHeight == b.displayHeight && a.fullscreen == b.fullscreen &&
-           a.vsync == b.vsync && feq(a.renderScale, b.renderScale) && a.quality == b.quality && a.motionBlur == b.motionBlur &&
-           a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
+           a.vsync == b.vsync && feq(a.renderScale, b.renderScale) && a.graphicsPreset == b.graphicsPreset &&
+           a.graphicsLevels == b.graphicsLevels && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            feq(a.voiceVolume, b.voiceVolume) && a.subtitles == b.subtitles && a.coachVoice == b.coachVoice &&
            a.ttsSteps == b.ttsSteps && a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
@@ -497,16 +496,43 @@ bool optionsPage(MenuAction& act) {
             break;
         }
         case 1: {
-            int q = std::clamp(s.quality, 0, 3);
-            if (im::selectorRow(L("options.quality"), q,
-                                {T("options.quality.low"), T("options.quality.medium"), T("options.quality.high"), T("options.quality.ultra")},
-                                row()))
-                s.quality = q;
+            // Preset: sets every option below at once; Custom keeps them as they are. Changing an
+            // option shows the preset that has the new levels, or Custom.
+            int preset = std::clamp(s.graphicsPreset, 0, int(game::PresetCustom));
+            if (im::selectorRow(L("options.quality"), preset,
+                                {T("options.quality.very_low"), T("options.quality.low"), T("options.quality.medium"),
+                                 T("options.quality.high"), T("options.quality.ultra"), T("options.quality.custom")},
+                                row())) {
+                s.graphicsPreset = preset;
+                if (preset != game::PresetCustom) s.graphicsLevels = game::presetLevels(preset);
+            }
             im::tooltip(T("options.quality.help"));
-            im::toggleRow(L("options.motion_blur"), s.motionBlur, row());
-            im::tooltip(T("options.motion_blur.help"));
-            im::toggleRow(L("options.depth_of_field"), s.depthOfField, row());
-            im::tooltip(T("options.depth_of_field.help"));
+            // The options in two columns: the light on the start side, the camera and the
+            // geometry on the other (spatial focus: Up and Down stay in a column).
+            const int perColumn = (game::GfxOptionCount + 1) / 2;
+            const float gap = 24.0f, cw = (rw - gap) * 0.5f, top = y + 8.0f;
+            for (int i = 0; i < game::GfxOptionCount; ++i) {
+                const int column = i / perColumn, line = i % perColumn;
+                Rect r = im::flip(p, Rect(rx + float(column) * (cw + gap), top + float(line) * rh, cw, rh - 4.0f));
+                const std::string key = std::string("options.") + game::graphicsOptionKey(i);
+                int& level = s.graphicsLevels[size_t(i)];
+                const int count = game::graphicsLevelCount(i);
+                bool changed = false;
+                if (count == 2) {
+                    bool on = level > 0;
+                    if (im::toggleRow(L(key.c_str()), on, r)) {
+                        level = on ? 1 : 0;
+                        changed = true;
+                    }
+                } else {
+                    std::vector<std::string> names;
+                    for (int l = 0; l < count; ++l) names.push_back(T(game::graphicsLevelLabel(i, l)));
+                    changed = im::selectorRow(L(key.c_str()), level, names, r, true, 170.0f);
+                }
+                im::tooltip(T((key + ".help").c_str()));
+                if (changed) s.graphicsPreset = game::matchingPreset(s.graphicsLevels);
+            }
+            y = top + float(perColumn) * rh + 8.0f;
             im::sliderRow(L("options.brightness"), s.brightness, -2.0f, 2.0f, 0.1f, brightnessText, row());
             im::tooltip(T("options.brightness.help"));
             break;

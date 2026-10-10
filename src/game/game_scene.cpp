@@ -968,7 +968,7 @@ void GameScene::applySettings(bool displayToo) {
         PostSettings& ps = ctx_->renderer->post().settings;
         // A seated player's eyes: gentle depth of field, only far objects soften (the exposure and
         // the f-number are set each frame by render()).
-        applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
+        applyDofPreset(ps, s.graphicsLevels[GfxDepthOfField] > 0 ? DofPreset::Subtle : DofPreset::Off);
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);

@@ -12,14 +12,7 @@ Settings& settings() {
     return s;
 }
 
-render::RenderSettings Settings::renderSettings() const {
-    render::RenderSettings r;
-    r.applyPreset(render::Quality(std::clamp(quality, 0, 3)));
-    r.renderScale = std::clamp(renderScale, 0.5f, 2.0f);
-    if (!motionBlur) r.motionBlur = false;
-    if (!depthOfField) r.dof = false;
-    return r;
-}
+render::RenderSettings Settings::renderSettings() const { return renderSettingsFor(graphicsLevels, renderScale); }
 
 namespace {
 // The fallback of a settings file, "" when it has none: the file of a portable install, next to
@@ -57,9 +50,7 @@ bool Settings::load(const std::string& p) {
     vsync = ini.getBool("display.vsync", vsync);
     renderScale = ini.getFloat("display.render_scale", renderScale);
     if (std::isnan(renderScale)) renderScale = 1.0f;  // passes std::clamp, then int(w * NaN) is undefined
-    quality = ini.getInt("graphics.quality", quality);
-    motionBlur = ini.getBool("graphics.motion_blur", motionBlur);
-    depthOfField = ini.getBool("graphics.depth_of_field", depthOfField);
+    readGraphicsSettings(ini, graphicsPreset, graphicsLevels);
     brightness = ini.getFloat("graphics.brightness", brightness);
     // Absent from a file written before the calibration existed: its player has chosen already.
     brightnessCalibrated = ini.getBool("graphics.brightness_calibrated", true);
@@ -228,9 +219,7 @@ bool Settings::save() const {
     ini.setBool("display.fullscreen", fullscreen);
     ini.setBool("display.vsync", vsync);
     ini.setFloat("display.render_scale", renderScale);
-    ini.setInt("graphics.quality", quality);
-    ini.setBool("graphics.motion_blur", motionBlur);
-    ini.setBool("graphics.depth_of_field", depthOfField);
+    writeGraphicsSettings(ini, graphicsPreset, graphicsLevels);
     ini.setFloat("graphics.brightness", brightness);
     ini.setBool("graphics.brightness_calibrated", brightnessCalibrated);
     ini.setFloat("audio.master_volume", masterVolume);

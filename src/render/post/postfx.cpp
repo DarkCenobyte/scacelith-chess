@@ -70,6 +70,7 @@ struct PostFX::Impl {
     bool frameOpen = false;          // computeAO ran for the current frame
     bool aoValid = false, ssrValid = false, volValid = false, taaValid = false, expoValid = false;
     int quality = 2;
+    int motes = 0;                   // dust motes drawn at the volumetric light's sample row
     PostUBOData u{};
 
     void destroyTargets() {
@@ -221,7 +222,14 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     if (s.ssr || s.debugView == 2 || s.debugView == 7) ensureSSR();
     if ((s.volumetrics && in.shadowArray != 0) || s.debugView == 3) ensureVolumetrics();
     if (s.dof || s.debugView == 4) ensureDOF();
-    const QualityParams& q = kQuality[quality];
+    // Each effect's own row of the table (PostSettings::*Quality), else the overall one.
+    auto row = [this](int level) -> const QualityParams& { return kQuality[std::clamp(level >= 0 ? level : quality, 0, 3)]; };
+    const QualityParams& qAO = row(s.aoQuality);
+    const QualityParams& qSSR = row(s.ssrQuality);
+    const QualityParams& qVol = row(s.volumetricQuality);
+    const QualityParams& qMB = row(s.motionBlurQuality);
+    const QualityParams& qDOF = row(s.dofQuality);
+    motes = qVol.motes;
     const render::FrameUBOData& f = *in.frame;
     int bw = in.backbufferW > 0 ? in.backbufferW : w, bh = in.backbufferH > 0 ? in.backbufferH : h;
     float res = float(h) / 1080.0f;
@@ -232,14 +240,14 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     // readers continuous. The counter itself never wraps.
     u.timing = vec4(in.dt, float(frameCounter & 0x7FFFFFu), f.cameraPos.w, res);
     u.ao = vec4(s.aoRadius, s.aoPower, 0.22f * float(hh), aoValid ? 1.0f : 0.0f);
-    u.aoB = vec4(float(q.aoSlices), float(q.aoSteps), 0.62f, 0.0f);
-    u.ssr = vec4(s.ssrMaxRoughness, s.ssrThickness, s.ssrIntensity, float(q.ssrIterations));
+    u.aoB = vec4(float(qAO.aoSlices), float(qAO.aoSteps), 0.62f, 0.0f);
+    u.ssr = vec4(s.ssrMaxRoughness, s.ssrThickness, s.ssrIntensity, float(qSSR.ssrIterations));
     u.ssrB = vec4(0.08f, float(std::min(gpu::mipCount(w, h) - 1, 8)), ssrValid ? 1.0f : 0.0f, 0.3f);  // HiZ levels
     u.vol = vec4(s.volumetricDensity, s.volumetricAnisotropy, s.volumetricAmbient, s.volumetricMaxDistance);
-    u.volB = vec4(float(q.volSteps), s.volumetricNoise, volValid ? 1.0f : 0.0f, s.dustMotes);
+    u.volB = vec4(float(qVol.volSteps), s.volumetricNoise, volValid ? 1.0f : 0.0f, s.dustMotes);
     u.volC = vec4(0.022f, 0.007f, -0.013f, 0.34f);
     u.taa = vec4(taaValid ? 1.0f : 0.0f, s.taaSharpness, 1.0f, 0.0f);
-    u.mb = vec4(s.motionBlurShutter, float(mbTile), float(q.mbSamples & ~1), float(mbTile));
+    u.mb = vec4(s.motionBlurShutter, float(mbTile), float(qMB.mbSamples & ~1), float(mbTile));
     // Thin-lens CoC scale (see dof_common.glsl). proj[1][1] = 1 / tan(fovY / 2).
     {
         float p11 = std::max(f.proj.c[1].y, 1e-3f);
@@ -248,7 +256,7 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
         float zf = std::max(s.dofFocusDistance, 0.05f) * 1000.0f;
         float aperture = focal / std::max(s.dofFStop, 0.5f);
         float scale = 0.5f * aperture * focal / std::max(zf - focal, 1.0f) / sensor * float(h);
-        u.dof = vec4(std::max(s.dofFocusDistance, 0.05f), scale, std::clamp(s.dofMaxRadius, 0.0f, 16.0f) * res, q.dofStep);
+        u.dof = vec4(std::max(s.dofFocusDistance, 0.05f), scale, std::clamp(s.dofMaxRadius, 0.0f, 16.0f) * res, qDOF.dofStep);
     }
     u.bloom = vec4(s.bloomIntensity, s.bloomScatter, float(bloomDown.levels), 0.0f);
     u.expo = vec4(s.exposureCompensation, s.autoExposure ? 1.0f : 0.0f, s.autoExposureMinEV, s.autoExposureMaxEV);
@@ -402,7 +410,7 @@ void PostFX::Impl::drawMotes(const PostInputs& in, const PostSettings& s, gpu::T
     bindTex(kShadowUnit, in.shadowArray);
     glBindSampler(kShadowUnit, shadowSampler);
     glBindVertexArray(vao);
-    int count = int(float(kQuality[quality].motes) * std::min(s.dustMotes, 2.0f));
+    int count = int(float(motes) * std::min(s.dustMotes, 2.0f));
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
     glBindSampler(kShadowUnit, 0);
     glDisable(GL_BLEND);

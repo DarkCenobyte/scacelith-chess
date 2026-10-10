@@ -796,11 +796,10 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
 }
 
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
-                 bool enabled) {
+                 bool enabled, float valueW) {
     Item it = item(makeId(label), r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
     int n = int(options.size());
     int old = index;
-    float valueW = 250.0f;
     Rect box = flip(r, Rect(r.r() - 22.0f - valueW, r.y, valueW, r.h));
     Rect rl(box.x - 8, r.y, 40, r.h), rr(box.r() - 32, r.y, 40, r.h);
     // The options run in the reading direction: in a right-to-left UI the left arrow goes forward.

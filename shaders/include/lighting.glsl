@@ -106,6 +106,19 @@ SunShadowResult evalSunShadow(vec3 posWS, vec3 nGeom, vec2 pixel, float extraBlu
     r.visibility = s4 * 0.25;
     return r;
 #else
+    // Filter of Options > Graphics > Shadows (RenderSettings::shadowFilter): 0 a bilinear 4-tap
+    // PCF without penumbra search, 1..3 PCSS with more and more taps.
+    int filterLevel = int(lighting.lightingMisc.w + 0.5);
+    if (filterLevel <= 0) {
+        vec2 spread = 1.5 * texelUV + extraBlurM / sc.xy;
+        float s4 = 0.0;
+        for (int k = 0; k < 4; ++k) {
+            vec2 o = (vec2(k & 1, k >> 1) - 0.5) * spread;
+            s4 += texture(uShadowMap, vec4(uvz.xy + o, layer, zr + dot(o, grad)));
+        }
+        r.visibility = s4 * 0.25;
+        return r;
+    }
     float rot = dither * TAU;
     float tanT = lighting.sunParams.y;
 #if defined(PASS_PLANAR)
@@ -116,7 +129,7 @@ SunShadowResult evalSunShadow(vec3 posWS, vec3 nGeom, vec2 pixel, float extraBlu
     // plane, so the search region is (distance to near plane) * tan(sun radius), capped.
     float searchM = clamp(zr * sc.z * tanT, texel * 2.0, texel * 40.0);
     vec2 searchUV = searchM / sc.xy;
-    const int NB = 12;
+    int NB = filterLevel == 1 ? 8 : filterLevel == 2 ? 12 : 16;
     float zSum = 0.0, nBlk = 0.0;
     for (int k = 0; k < NB; ++k) {
         vec2 o = vogelDisk(k, NB, rot) * searchUV;
@@ -134,7 +147,8 @@ SunShadowResult evalSunShadow(vec3 posWS, vec3 nGeom, vec2 pixel, float extraBlu
     }
     float filterM = clamp(penumbraM + extraBlurM, texel * 1.25, texel * 48.0);
     // Wide penumbrae (thin far blockers: transoms, mullions) get more taps, contact shadows fewer.
-    int NP = filterM > texel * 8.0 ? 32 : 16;
+    bool wide = filterM > texel * 8.0;
+    int NP = filterLevel == 1 ? (wide ? 16 : 8) : filterLevel == 2 ? (wide ? 32 : 16) : (wide ? 48 : 24);
 #endif
     vec2 fUV = filterM / sc.xy;
     float rot2 = rot + 2.1;

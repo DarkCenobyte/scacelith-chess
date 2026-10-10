@@ -135,8 +135,9 @@ bool sliderRow(const std::string& label, float& value, float lo, float hi, float
                const std::function<std::string(float)>& format, const Rect& r, bool enabled = true);
 bool stepperRow(const std::string& label, int& index, int count, const std::function<std::string(int)>& format,
                 const Rect& r, bool enabled = true);
+// valueW: width of the selector's box (the arrows and the value) at the end of the row.
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
-                 bool enabled = true);
+                 bool enabled = true, float valueW = 250.0f);
 // Single-line text input row (label, then an edit box). Click the box or press Enter on the row to
 // type; Enter or Tab keeps the text, Esc restores it, and moving the focus away ends the edit.
 // The text fields of a page (those drawn enabled, outside a blocked layer, in drawing order) form

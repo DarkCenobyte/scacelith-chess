@@ -20,7 +20,7 @@ struct LightingUBOData {
     m::vec4 sunTOA;                             // rgb TOA solar illuminance (pre-exposed), w viewer altitude (km)
     m::vec4 skyParams2;                         // x cloud coverage, y cloud time, z mie scale, w sky intensity
     m::vec4 planarInfo[4];                      // x enabled, y max lod, z width, w height
-    m::vec4 lightingMisc;                       // x specular AA, y cascade blend band (uv), z ambient intensity
+    m::vec4 lightingMisc;                       // x specular AA, y cascade blend band (uv), z ambient intensity, w shadow filter (RenderSettings::shadowFilter)
     // Written on the GPU (compute), copied from the SH storage buffer.
     m::vec4 probeSH[MAX_LIGHT_PROBES * 9];
     m::vec4 skySH[9];                           // unused (nothing projects the sky any more), keeps the layout
