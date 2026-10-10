@@ -52,6 +52,7 @@ theme.bad_trade = bien choisir les pièces à échanger
 theme.opening = sortir tes pièces et roquer tôt
 theme.endgame = activer ton roi et pousser tes pions passés
 theme.positional = améliorer ta plus mauvaise pièce
+theme.material = vérifier ce que mes prochains coups peuvent gagner avant de jouer
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = Échec et mat ! Tu as gagné. Bien joué !

@@ -2690,8 +2690,9 @@ void GameScene::renderOverlay(AppContext&, float) {
         ui::moveList(game_.sanMoves(), inGame && showMoveList_);
     }
     if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
-    // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
-    drawModelDownload();
+    // The coach's voice model: its download prompt, progress panel and notices (coach_model.h); the
+    // start-up offer of the old model's update waits for the title page (after the loading screen).
+    drawModelDownload(state_ == State::Menu && ui::titlePageShown());
     int fetched = 0;
     if (coachModelInstalled(&fetched)) coachModelDownloaded(fetched);   // heard from the coach's next line on
     ui::drawNotifications();

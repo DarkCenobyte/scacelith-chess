@@ -33,6 +33,21 @@ struct Ctx {
     int base = 0;                            // the human's material lead at p0 (points)
     int gain = -1;                           // plies of r after which the human is 2+ points down for good (-1: never)
     int loss = 0;                            // points the human is down for good within the lookahead
+    // What the best move costs: what the human is still down near the end of the best line's first
+    // 8 plies (from p0). A loss the best move suffers too is no reason the move played was bad.
+    int bestLoss = 0;
+    // How much the move costs in the engine's eyes: the human's centipawns after the best move minus
+    // after the move played (mates as +-1000).
+    int dropCp = 0;
+    // Whether losing 'lost' points (for good, from p0) is the reason the move is bad: a real loss
+    // (1 point when the best move loses nothing or the reason is about a pawn, else 2), one the best
+    // move avoids (by as much), and one the size of the problem (3 points or more; else at least 40 %
+    // of the engine's drop): a pawn named for a collapse would hide what really goes wrong.
+    bool lossExplains(int lost, bool pawn = false) const;
+    // The refutation loses material for good, beyond what the best move loses, within its first
+    // 'plies' plies: a reason that is about something else (king safety, the endgame, a better plan)
+    // would not be the real one.
+    bool concreteLoss(int plies) const;
     // Points the human is down for good after the first 'plies' plies of r (relative to p0): a
     // recapture on the next ply undoes a loss, and where r stops, so does the exchange the human can
     // still win on the board (a line cut short right after a capture proves nothing).
@@ -45,6 +60,11 @@ struct Ctx {
 // is the position where the line stops): a gain the next ply takes back is none, and where the
 // line stops, the side to move still takes back what an exchange on the board wins it.
 int heldGain(const std::vector<LineStep>& line, size_t plies, int base, chess::Color pov, const chess::Position& end);
+// pov's material loss, for good, after the first 'plies' plies of 'line' (relative to 'base'): a
+// recapture on the next ply undoes it (not a capture there that is taken back on the ply after: that
+// exchange counts whole), and where the line stops, so does what the side to move, when it is pov,
+// takes back at once.
+int heldLoss(const std::vector<LineStep>& line, size_t plies, int base, chess::Color pov, const chess::Position& end);
 // The position after the whole of 'line', played from 'start'.
 chess::Position lineEnd(const chess::Position& start, const std::vector<LineStep>& line);
 // Where the engine's refutation stops early (a search cut short reports short lines), the natural
@@ -62,12 +82,26 @@ void extendRefutation(std::vector<LineStep>& r, const chess::Position& p1, chess
 int guessLossBound(const ai::Score& best, const ai::Score& played);
 
 // A chosen explanation: the lines that say why (with pointing), the demonstration, the policy bits.
+// A detector tells what its sequence is (fullPlies, threatPlies, lost, targets); planDemo() decides,
+// per level, how much of it the table shows.
 struct Explanation {
     ExType type = ExType::None;
     std::vector<Beat> cause;   // said before the demonstration (the table shows p1)
-    std::vector<Beat> tail;    // said after the demonstration, when it shows all demoPlies (pieces where they stand then)
+    std::vector<Beat> tail;    // said after the whole sequence (full demonstrations; pieces where they stand then)
+    // Said once the problem stands on the table (after threatPlies plies): in the middle of a full
+    // demonstration, or at the end of one that stops there; pieces where they stand then.
+    std::vector<Beat> threatTail;
     std::vector<Beat> tip;     // said after the rewind (no pointing at pieces a demonstration moved)
-    int demoPlies = 0;         // plies of Ctx::r shown on the table
+    // The sequence: plies of Ctx::r until the material is lost for good (the capture, and the
+    // human's recapture when it follows) or the mate is given; the plies until the problem stands
+    // on the board (the fork, the pin, the move before the mate; 0 when it already stands on p1);
+    // the points lost then (from p0); the pieces that fall (squares after threatPlies plies, the
+    // human's king for a mate) and whether the problem is a mate.
+    int fullPlies = 0, threatPlies = 0, lost = 0;
+    std::vector<chess::Square> targets;
+    bool mate = false;
+    bool full = false;         // planDemo(): the demonstration plays the whole sequence
+    int demoPlies = 0;         // plies of Ctx::r shown on the table (planDemo())
     bool offer = false;        // the takeback is offered whatever the class (mates, stalemate, missed pieces)
     bool concrete = false;     // the cause lies within the band's reach (the level 1-2 voice threshold)
     int tipBit = -1;           // which principle (Reviewer::tipsSaid_)
@@ -108,15 +142,18 @@ bool findExplanation(const Ctx& c, Explanation& out);
 // Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 
-// Plies of c.r a demonstration shows: ex.demoPlies within the line and the band's depth (a mating
-// line within the band's mateLinePlies), ending on what the coach does. A quiet move of the human's
-// is never the last one (one more ply when the band allows it, else one less): stopping there reads
-// as advice ("say you play your queen to e3", then the pieces go back) and hides the point. A
-// recapture or a promotion of the human's may end it.
+// How much of the sequence the table shows (Explanation::demoPlies, full): levels 1-3 the whole of it
+// (fullPlies, within the band's demoPlies; a mate within mateLinePlies), else, and from level 4, up
+// to where the problem stands (threatPlies, within the band's demoPlies; then the coach points at
+// it); else nothing (the lines say it in words). Never a demonstration that stops before the point
+// it makes, and never past the line the engine (or the board) proves.
+void planDemo(const Ctx& c, Explanation& ex);
+// Plies of c.r the demonstration shows (ex.demoPlies within the line).
 int demoLength(const Ctx& c, const Explanation& ex);
 // Demonstration beats for the first demoLength() plies of c.r (stops before a promotion of the
-// human's colour and points at the square instead), followed by the tail lines when every planned
-// ply was shown, and the rewind of exactly the moves shown.
+// human's colour and points at the square instead), with the threat lines once the problem stands
+// and the closing lines once every planned ply was shown (the detector's, else a generic one: what
+// was lost, or what falls next), and the rewind of exactly the moves shown.
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s);
 
 }  // namespace detail

@@ -41,10 +41,10 @@ an.missed_chance = {move} verpasst die Chance, diesen Fehler zu bestrafen.
 an.missed_chance.2 = Mit {move} ist die Chance vertan.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = Jetzt ist {reply} matt.
-an.mate_allowed.one.2 = Das erlaubt {reply}, und das ist matt.
-an.mate_allowed = Das erlaubt ein forciertes Matt in {m:move_dat}, beginnend mit {reply}.
-an.mate_allowed.2 = Jetzt gibt es ein forciertes Matt in {m:move_dat}, mit {reply} als erstem Zug.
+an.mate_allowed.one = Jetzt ist {reply:nomate} matt.
+an.mate_allowed.one.2 = Das erlaubt {reply:nomate}, und das ist matt.
+an.mate_allowed = Das erlaubt ein forciertes Matt in {m:move_dat}, beginnend mit {reply:nomate}.
+an.mate_allowed.2 = Jetzt gibt es ein forciertes Matt in {m:move_dat}, mit {reply:nomate} als erstem Zug.
 an.fork = Jetzt gabelt {reply} {t1:acc} und {t2:acc}.
 an.fork.2 = Das erlaubt {reply}, mit einem Angriff auf {t1:acc} und {t2:acc} zugleich.
 an.fork.3 = {reply} trifft {t1:acc} und {t2:acc} gleichzeitig.
@@ -55,10 +55,10 @@ an.material = Die Antwort {line} gewinnt {pts:point_acc} an Material.
 an.material.2 = Danach gewinnt {line} {pts:point_acc}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = Mit {best} war es matt.
-an.mate_missed.one.2 = {best} wäre matt gewesen.
-an.mate_missed = {best} hätte Matt in {m:move_dat} erzwungen.
-an.mate_missed.2 = Es gab ein forciertes Matt in {m:move_dat}, beginnend mit {best}.
+an.mate_missed.one = Mit {best:nomate} war es matt.
+an.mate_missed.one.2 = {best:nomate} wäre matt gewesen.
+an.mate_missed = {best:nomate} hätte Matt in {m:move_dat} erzwungen.
+an.mate_missed.2 = Es gab ein forciertes Matt in {m:move_dat}, beginnend mit {best:nomate}.
 an.missed_capture = {best} hätte {piece:acc} umsonst gewonnen.
 an.missed_capture.2 = {piece} hatte keinen Verteidiger. {best} hätte zugegriffen.
 an.missed_fork = {best} hätte {t1:acc} und {t2:acc} gegabelt.

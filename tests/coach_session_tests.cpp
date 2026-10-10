@@ -677,8 +677,8 @@ TEST(coach_session_no_offer_once_the_game_is_over) {
     }
 }
 
-// The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when
-// it was played, not a fresh full search asked once the game is over.
+// The human's mate before the turn's A0 is in: the review of that move uses that A0 (still searching when
+// it was played), not a fresh full search asked once the game is over.
 TEST(coach_session_game_over_keeps_the_review_analyses) {
     Table t;
     t.game.resetFromFEN(kMateFen);

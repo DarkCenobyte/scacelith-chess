@@ -247,6 +247,15 @@ if(TEST_SOURCES)
     endif()
 endif()
 
+# The coach's audit (tools/coach_audit/audit.h): the review of real games' moves at every level,
+# each claim checked against the board. A development tool, built on request: ninja coach_audit.
+if(TARGET stockfish_embedded AND NOT WIN32)
+    file(GLOB COACH_AUDIT_SOURCES CONFIGURE_DEPENDS ${ROOT}/tools/coach_audit/*.cpp)
+    add_executable(coach_audit EXCLUDE_FROM_ALL ${COACH_AUDIT_SOURCES})
+    target_compile_options(coach_audit PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+    target_link_libraries(coach_audit PRIVATE scacelith_core)
+endif()
+
 # Windows: the exception table (.pdata) of each exe is checked after its link when Python is
 # available (tools/check_pdata.py). Windows and Wine binary-search it to unwind every C++ throw:
 # the build fails if its entries are unsorted, overlap or point at bad unwind data, or if libgcc's

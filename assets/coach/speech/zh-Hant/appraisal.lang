@@ -53,6 +53,7 @@ theme.bad_trade = 想清楚該兌掉哪些子
 theme.opening = 出子並盡早王車易位
 theme.endgame = 用好你的王，推進通路兵
 theme.positional = 改善你位置最差的棋子
+theme.material = 走棋前先看看我接下來能吃掉什麼
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = 將死！你贏了。下得好！

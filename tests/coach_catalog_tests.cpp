@@ -107,7 +107,7 @@ std::vector<std::string> formProblems(const Catalog& c, const std::string& lang)
     static const char* const kTypes[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
     auto check = [&](const std::set<std::string>& fs, std::initializer_list<const char*> owners) {
         for (const std::string& f : fs) {
-            if (c.has(lang, "count." + f) || openingForms.count(f) || f == "letters") continue;
+            if (c.has(lang, "count." + f) || openingForms.count(f) || f == "letters" || f == "nomate") continue;
             std::string missing;
             for (std::string owner : owners) {
                 for (std::string type : kTypes) {
@@ -280,7 +280,8 @@ TEST(coach_catalog_pieces_squares_numbers) {
 
 TEST(coach_catalog_moves_and_lines) {
     Catalog c;
-    testCatalog(c, "m = Play {move}.\nl = The line: {line}.\nw = Like {move:letters}.\n");
+    testCatalog(c, "m = Play {move}.\nl = The line: {line}.\nw = Like {move:letters}.\n"
+                   "n = Then {move:nomate} is checkmate.\nk = Mate after {line:nomate}.\n");
     auto mv = [&](const std::string& san) { Line x = line("m"); x.with("move", Arg::ofMove(san, "")); return x; };
     CHECK_EQ(written(c, mv("Nf3")), std::string("Play \xE2\x99\x98" "f3."));
     CHECK_EQ(spoken(c, mv("Nf3")), std::string("Play knight eff three."));
@@ -299,6 +300,17 @@ TEST(coach_catalog_moves_and_lines) {
     CHECK_EQ(spoken(c, mv("Qxf7#")), std::string("Play queen takes eff seven, checkmate."));
     CHECK_EQ(written(c, mv("Qxf7#")), std::string("Play \xE2\x99\x95xf7#."));
     CHECK_EQ(written(c, mv("Bxc4")), std::string("Play \xE2\x99\x97xc4."));
+    // "nomate": the sentence says the mate, the voice does not repeat it (written moves keep "#").
+    Line nm = line("n");
+    nm.with("move", Arg::ofMove("Qxf7#", ""));
+    CHECK_EQ(spoken(c, nm), std::string("Then queen takes eff seven is checkmate."));
+    CHECK_EQ(written(c, nm), std::string("Then \xE2\x99\x95xf7# is checkmate."));
+    Line nc = line("n");
+    nc.with("move", Arg::ofMove("Qxf7+", ""));
+    CHECK_EQ(spoken(c, nc), std::string("Then queen takes eff seven, check is checkmate."));
+    Line nl = line("k");
+    nl.with("line", Arg::ofMoves("Qh5 g6 Qxf7#"));
+    CHECK_EQ(spoken(c, nl), std::string("Mate after queen aitch five, gee six, queen takes eff seven."));
     CHECK_EQ(written(c, mv("bxc4")), std::string("Play bxc4."));
     Line let = line("w");
     let.with("move", Arg::ofMove("Nf3", "g1f3"));

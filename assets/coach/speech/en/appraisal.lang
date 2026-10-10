@@ -59,6 +59,7 @@ theme.bad_trade = choosing which pieces to trade
 theme.opening = developing your pieces and castling early
 theme.endgame = using your king and pushing passed pawns
 theme.positional = improving your worst piece
+theme.material = checking what my next moves can win before you play
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = Checkmate! You won. Well played!

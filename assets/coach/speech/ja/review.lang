@@ -60,14 +60,14 @@ ann.mate.coach.3 = 残念ですが、チェックメイトです。
 
 # ---- Verdicts (the first sentence about a bad move) --------------------------------------------
 ex.verdict.blunder.b1 = おっと！その手だと、何かを失ってしまいます。
-ex.verdict.blunder.b1.2 = 気をつけて！これから何が起きるか見せますね。
+ex.verdict.blunder.b1.2 = 気をつけて！その手は高くつきますよ。
 ex.verdict.blunder.b1.3 = あっ、ちょっと待ってください。その手には問題があります。
-ex.verdict.blunder.b2 = うーん、その手には問題があります。見てください。
-ex.verdict.blunder.b2.2 = それはミスです。見ていてください。
-ex.verdict.blunder.b2.3 = 気をつけて、その手は損をします。見てください。
+ex.verdict.blunder.b2 = うーん、その手には問題があります。
+ex.verdict.blunder.b2.2 = それは大きなミスです。
+ex.verdict.blunder.b2.3 = 気をつけて、その手は損をします。
 ex.verdict.blunder.b3 = それは大悪手です。
 ex.verdict.blunder.b3.spoken = それはだいあくしゅです。
-ex.verdict.blunder.b3.2 = {move}はミスです。理由を説明しますね。
+ex.verdict.blunder.b3.2 = {move}は明らかなミスです。
 ex.verdict.blunder.b3.3 = 痛い、{move}は大きなミスです。
 ex.verdict.blunder.b4 = {move}は大悪手です。
 ex.verdict.blunder.b4.spoken = {move}はだいあくしゅです。
@@ -84,12 +84,12 @@ ex.verdict.blunder.b6.2 = {move}は大悪手。
 ex.verdict.blunder.b6.2.spoken = {move}はだいあくしゅ。
 ex.verdict.blunder.b6.3 = {move}？大悪手。
 ex.verdict.blunder.b6.3.spoken = {move}？だいあくしゅ。
-ex.verdict.mistake.b3 = 最善ではありません。理由はこうです。
+ex.verdict.mistake.b3 = それは良い手ではありません。
 ex.verdict.mistake.b3.2 = うーん、{move}には問題があります。
-ex.verdict.mistake.b3.3 = それはミスです。説明しますね。
+ex.verdict.mistake.b3.3 = それはミスです。
 ex.verdict.mistake.b4 = {move}は悪手です。
 ex.verdict.mistake.b4.spoken = {move}はあくしゅです。
-ex.verdict.mistake.b4.2 = {move}は良くありません。理由はこうです。
+ex.verdict.mistake.b4.2 = {move}は良くありません。
 ex.verdict.mistake.b4.3 = それはミスです。
 ex.verdict.mistake.b5 = {move}ははっきりしたミスです。
 ex.verdict.mistake.b5.2 = {move}は悪手です。
@@ -99,7 +99,11 @@ ex.verdict.mistake.b6 = {move}は悪手。
 ex.verdict.mistake.b6.spoken = {move}はあくしゅ。
 ex.verdict.mistake.b6.2 = {move}？ミス。
 ex.verdict.mistake.b6.3 = {move}は違います。
-# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = 悪くはありませんが、{best}の方が少し良かったです。
+ex.verdict.inaccuracy.b3.2 = {best}の方が少し正確でした。
+ex.verdict.inaccuracy.b3.3 = 小さなミスです。ここは{best}の方が良かったです。
 ex.verdict.inaccuracy.b4 = 少し不正確です。{best}の方が正確でした。
 ex.verdict.inaccuracy.b4.2 = 小さな疑問手です。{best}が少し良かったです。
 ex.verdict.inaccuracy.b4.2.spoken = 小さなぎもんしゅです。{best}が少し良かったです。
@@ -110,15 +114,6 @@ ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
 ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
 ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
-ex.verdict.imprecise.b4 = {move}は疑問手です。理由はこうです。
-ex.verdict.imprecise.b4.spoken = {move}はぎもんしゅです。理由はこうです。
-ex.verdict.imprecise.b4.2 = {move}は少し不正確です。
-ex.verdict.imprecise.b5 = {move}は不正確です。
-ex.verdict.imprecise.b5.2 = {move}は疑問手。
-ex.verdict.imprecise.b5.2.spoken = {move}はぎもんしゅ。
-ex.verdict.imprecise.b6 = {move}は不正確。
-ex.verdict.imprecise.b6.2 = {move}？疑問手。
-ex.verdict.imprecise.b6.2.spoken = {move}？ぎもんしゅ。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = あれ？いい手を見逃しましたよ。
 ex.verdict.missed.b1.2 = もう一度見てみましょう！もっと良い手がありました。
@@ -206,6 +201,33 @@ demo.your.back.3 = そして取り返します。
 demo.your.king = あなたのキングは動くしかありません。
 demo.your.king.2 = キングは{sq}へ逃げるしかありません。
 demo.your.king.3 = あなたのキングは{sq}へ逃げます。
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = これで{t1}は助かりません。
+ex.point.piece.2 = そして{t1}が取られます。
+ex.point.piece.3 = 次に{t1}が落ちます。
+ex.point.two = {t1}と{t2:bare}が両方攻められています。どちらかが取られます。
+ex.point.two.2 = 今、私が{t1}と{t2:bare}を攻めています。両方は助けられません。
+ex.point.mate = そして、{reply:nomate}でチェックメイトです。
+ex.point.mate.2 = 次は{reply:nomate}、これでチェックメイトです。
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = わかりましたか？これで{pts:point}の損です。
+ex.result.b1.2 = こうして{pts:point}を失ってしまいます。
+ex.result.b2 = 結局、{pts:point}を失いました。
+ex.result.b2.2 = これで{pts:point}の損になります。
+ex.result.b3 = その手で{pts:point}損をします。
+ex.result.b3.2 = 最後は{pts:point}の駒損です。
+ex.result.b3.2.spoken = 最後は{pts:point}のこまぞんです。
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = 少し取り返せますが、それでも{pts:point}の損です。
+ex.result_back.b1.2 = 少しは取り返せますが、{pts:point}は失ったままです。
+ex.result_back.b2 = いくらか取り返せますが、まだ{pts:point}の損です。
+ex.result_back.b2.2 = 取り返しても、{pts:point}を失っています。
+ex.result_back.b3 = 取り返したあとも、{pts:point}の駒損です。
+ex.result_back.b3.spoken = 取り返したあとも、{pts:point}のこまぞんです。
+ex.result_back.b3.2 = 少し取り返せますが、結局{pts:point}の損です。
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = そしてここ、{sq}で新しいクイーンができます。
 demo.promote.2 = そして{your}が{sq}まで進み、クイーンになります。
@@ -220,18 +242,18 @@ ex.mate_allowed.b2 = この手だと、{m:move}で{your}をチェックメイト
 ex.mate_allowed.b2.2 = これで{your}を{m:move}でチェックメイトできます。見てください。
 ex.mate_allowed.b2.3 = 気をつけて！{your}が危ない。{m:move}でチェックメイトです。
 # b3 b4 b6 ({line} is pointed at).
-ex.mate_allowed.b3 = この手だと、{m:move}でメイトです：{line}。
-ex.mate_allowed.b3.2 = このあと、私は{m:move}でメイトできます：{line}。
-ex.mate_allowed.b3.3 = あなたのキングがメイトされます：{line}。
-ex.mate_allowed.b4 = {move}では、強制メイトがあります：{line}。
-ex.mate_allowed.b4.2 = この手だと、{m:move}でメイトされます：{line}。
-ex.mate_allowed.b4.3 = {move}のあと、{line}でメイトです。
+ex.mate_allowed.b3 = この手だと、{m:move}でメイトです：{line:nomate}。
+ex.mate_allowed.b3.2 = このあと、私は{m:move}でメイトできます：{line:nomate}。
+ex.mate_allowed.b3.3 = あなたのキングがメイトされます：{line:nomate}。
+ex.mate_allowed.b4 = {move}では、強制メイトがあります：{line:nomate}。
+ex.mate_allowed.b4.2 = この手だと、{m:move}でメイトされます：{line:nomate}。
+ex.mate_allowed.b4.3 = {move}のあと、{line:nomate}でメイトです。
 ex.mate_allowed.b5 = {move}では、{m:move}の強制メイトがあります。
 ex.mate_allowed.b5.2 = これは{m:move}でメイトされる手です。
 ex.mate_allowed.b5.3 = これで{m:move}の強制メイトが生じました。
-ex.mate_allowed.b6 = {m:move}でメイト：{line}。
-ex.mate_allowed.b6.2 = {line}、メイト。
-ex.mate_allowed.b6.3 = {line}でメイト。
+ex.mate_allowed.b6 = {m:move}でメイト：{line:nomate}。
+ex.mate_allowed.b6.2 = {line:nomate}、メイト。
+ex.mate_allowed.b6.3 = {line:nomate}でメイト。
 # After the one-move demonstration ({your} = the king).
 ex.mate_allowed.tail.b1 = 見てください。{your}には逃げるマスがもうありません。
 ex.mate_allowed.tail.b1.2 = わかりますか？{your}は攻められていて、逃げられません。
@@ -250,31 +272,31 @@ name.pattern.ladder = はしごメイト
 name.pattern.epaulette = エポレットメイト
 
 # ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
-ex.mate_missed.b1 = {best}なら、{my}をチェックメイトできました！
-ex.mate_missed.b1.2 = {best}でチェックメイトでした！{my}は逃げられませんでした。
-ex.mate_missed.b1.3 = 見て！{best}で{my}をチェックメイトできていました。
-ex.mate_missed.b2 = {best}から、{m:move}でチェックメイトできました。
-ex.mate_missed.b2.2 = {best}で、{m:move}のチェックメイトでした！
-ex.mate_missed.b2.3 = {best}で、私をチェックメイトできましたよ。
-ex.mate_missed.b3 = {m:move}でメイトがありました。{best}です。
-ex.mate_missed.b3.2 = {best}から{m:move}でメイト：{line}。
-ex.mate_missed.b3.3 = {best}から始まる、{m:move}のメイトがありました。
-ex.mate_missed.b4 = メイトを見逃しました：{line}。初手は{best}。
-ex.mate_missed.b4.spoken = メイトを見逃しました：{line}。しょては{best}。
-ex.mate_missed.b4.2 = {best}で{m:move}の強制メイトでした。
-ex.mate_missed.b4.3 = {best}で、{m:move}のメイトがありました。
-ex.mate_missed.b5 = {best}で{m:move}のメイト：{line}。
-ex.mate_missed.b5.2 = {m:move}のメイトを見逃しました。初手は{best}。
-ex.mate_missed.b5.2.spoken = {m:move}のメイトを見逃しました。しょては{best}。
-ex.mate_missed.b5.3 = 強制メイトがありました：{best}。
-ex.mate_missed.b6 = {best}でメイト：{line}。
-ex.mate_missed.b6.2 = {best}で{m:move}のメイト。
-ex.mate_missed.b6.3 = {best}、{m:move}でメイト。
+ex.mate_missed.b1 = {best:nomate}なら、{my}をチェックメイトできました！
+ex.mate_missed.b1.2 = {best:nomate}でチェックメイトでした！{my}は逃げられませんでした。
+ex.mate_missed.b1.3 = 見て！{best:nomate}で{my}をチェックメイトできていました。
+ex.mate_missed.b2 = {best:nomate}から、{m:move}でチェックメイトできました。
+ex.mate_missed.b2.2 = {best:nomate}で、{m:move}のチェックメイトでした！
+ex.mate_missed.b2.3 = {best:nomate}で、私をチェックメイトできましたよ。
+ex.mate_missed.b3 = {m:move}でメイトがありました。{best:nomate}です。
+ex.mate_missed.b3.2 = {best:nomate}から{m:move}でメイト：{line:nomate}。
+ex.mate_missed.b3.3 = {best:nomate}から始まる、{m:move}のメイトがありました。
+ex.mate_missed.b4 = メイトを見逃しました：{line:nomate}。初手は{best:nomate}。
+ex.mate_missed.b4.spoken = メイトを見逃しました：{line:nomate}。しょては{best:nomate}。
+ex.mate_missed.b4.2 = {best:nomate}で{m:move}の強制メイトでした。
+ex.mate_missed.b4.3 = {best:nomate}で、{m:move}のメイトがありました。
+ex.mate_missed.b5 = {best:nomate}で{m:move}のメイト：{line:nomate}。
+ex.mate_missed.b5.2 = {m:move}のメイトを見逃しました。初手は{best:nomate}。
+ex.mate_missed.b5.2.spoken = {m:move}のメイトを見逃しました。しょては{best:nomate}。
+ex.mate_missed.b5.3 = 強制メイトがありました：{best:nomate}。
+ex.mate_missed.b6 = {best:nomate}でメイト：{line:nomate}。
+ex.mate_missed.b6.2 = {best:nomate}で{m:move}のメイト。
+ex.mate_missed.b6.3 = {best:nomate}、{m:move}でメイト。
 # Both moves mate, the played one much later (levels 5-6).
-ex.mate_delayed.b5 = {best}の方が速く、{m:move}でメイトでした。
-ex.mate_delayed.b5.2 = {best}なら、もっと早く{m:move}でメイトでした。
-ex.mate_delayed.b6 = {best}なら{m:move}でメイト。
-ex.mate_delayed.b6.2 = 最短は{best}、{m:move}でメイト。
+ex.mate_delayed.b5 = {best:nomate}の方が速く、{m:move}でメイトでした。
+ex.mate_delayed.b5.2 = {best:nomate}なら、もっと早く{m:move}でメイトでした。
+ex.mate_delayed.b6 = {best:nomate}なら{m:move}でメイト。
+ex.mate_delayed.b6.2 = 最短は{best:nomate}、{m:move}でメイト。
 
 # ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
 ex.stalemate.b1 = あっ、ステイルメイト！{my}は動けず、チェックでもないので引き分けです。
@@ -333,11 +355,14 @@ ex.fork.b6 = {reply}でフォーク。
 ex.fork.b6.2 = {move}には{reply}、フォーク。
 ex.fork.b6.3 = {reply}、両取り。
 ex.fork.b6.3.spoken = {reply}、りょうどり。
-# After the one-move demonstration (level 1).
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = 助けられるのはどちらか一つ。{t1}か{t2:bare}です。
 ex.fork.tail.b1.2 = 今、{t1}と{t2:bare}を同時に攻めています。これが両取りです！
 ex.fork.tail.b1.2.spoken = 今、{t1}と{t2:bare}を同時に攻めています。これがりょうどりです！
 ex.fork.tail.b1.3 = ほら、{t1}も{t2:bare}も攻められています。どちらかが取られます。
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your}はチェックをかわすしかありません。だから{t1:bare}を取ります。
+ex.fork.tail_king.2 = チェック！{your}が動くしかないので、{t1:bare}が取られます。
 ex.fork.more.b3 = 指す前に{sq}を確かめましょう。{my}がフォークできるマスです。
 ex.fork.more.b3.2 = {sq}のマスに注意。そこから{my}がフォークします。
 ex.fork.tip.knight = キングやクイーンの近くに跳んでくるナイトに注意！
@@ -388,7 +413,7 @@ ex.skewer.b6.2 = {reply}、スキュア。
 ex.pin.b1 = {my}が{sq}へ行くと、{your}は{t1:bare}の前で動けなくなります。
 ex.pin.b1.2 = {sq}の{my}に注目。{your}が{t1:bare}の前で動けなくなります。
 ex.pin.b1.3 = {my}で{your}を{t1:bare}にピンして、取れます。
-ex.pin.b2 = ピン：後ろに{t1:bare}がいるので、{your}は動けません。
+ex.pin.b2 = ピン：{your}は{t1:bare}の前にくぎづけです。
 ex.pin.b2.2 = {your}は{t1:bare}にピンされています。だから私が取れます。
 ex.pin.b2.3 = これで{your}は{t1:bare}の前で動けません。これがピンです。
 ex.pin.b3 = {your}が{t1:bare}にピンされ、私が取ります。
@@ -405,7 +430,7 @@ ex.pin.b6 = {reply}でピン。
 ex.pin.b6.2 = {reply}、ピン。
 # The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
 ex.pin_defender.b1 = {your}はピンされていて、{sq}を守れません。後ろに{t1:bare}がいます。
-ex.pin_defender.b1.2 = 見て。{your}は{sq}を守れません。{t1:bare}を取られてしまうからです。
+ex.pin_defender.b1.2 = 見て。{your}は{sq}を本当は守れません。後ろに{t1:bare}がいるからです。
 ex.pin_defender.b2 = {your}は{t1:bare}にピンされて、{sq}を本当は守れません。
 ex.pin_defender.b2.2 = ピンされた駒は頼れません。{your}は{sq}を守れず、後ろに{t1:bare}。
 ex.pin_defender.b3 = {your}は{t1:bare}にピンされ、{sq}を守れていません。
@@ -547,6 +572,27 @@ ex.exchange_cheap.b5.2 = {reply}で、{sq}の{your}に対して駒得。
 ex.exchange_cheap.b5.2.spoken = {reply}で、{sq}の{your}に対してこまどく。
 ex.exchange_cheap.b6 = {reply}で{sq}の{your}が落ちます。
 ex.exchange_cheap.b6.2 = {line}：{sq}の{your}が失われます。
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = 気をつけて。これで私が{t1}を取れます。
+ex.material.b1.2 = その手で{t1}が危なくなります。私が取れます。
+ex.material.b2 = この手で、私が{t1}を取れるようになります。
+ex.material.b2.2 = これで{t1}が危なくなり、私が取ります。
+ex.material.b3 = {move}で駒を損します：{line}のあと、{pts:point}を失っています。
+ex.material.b3.2 = {line}のあと、{pts:point}の損です。
+ex.material.b4 = {move}は駒損：{line}で{pts:point}を失います。
+ex.material.b4.spoken = {move}はこまぞん：{line}で{pts:point}を失います。
+ex.material.b4.2 = {line}のあと、{pts:point}の駒損です。
+ex.material.b4.2.spoken = {line}のあと、{pts:point}のこまぞんです。
+ex.material.b5 = {move}で駒損：{line}。
+ex.material.b5.spoken = {move}でこまぞん：{line}。
+ex.material.b5.2 = {line}で私が{pts:point}の駒得。
+ex.material.b5.2.spoken = {line}で私が{pts:point}のこまどく。
+ex.material.b6 = {line}、私が{pts:point}得。
+ex.material.b6.spoken = {line}、私が{pts:point}とく。
+ex.material.b6.2 = {move}で{pts:point}損：{line}。
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
 ex.missed_capture.b1 = 気づきましたか？{sq}の{my}はただでした。{your}で取れましたよ。

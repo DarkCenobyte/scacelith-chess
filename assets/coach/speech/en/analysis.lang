@@ -49,10 +49,10 @@ an.missed_chance = {move} misses the chance to punish that error.
 an.missed_chance.2 = With {move}, the chance slips away.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = Now {reply} is checkmate.
-an.mate_allowed.one.2 = It allows {reply}, and that's checkmate.
-an.mate_allowed = It allows a forced mate in {m}, starting with {reply}.
-an.mate_allowed.2 = Now there is a forced mate in {m}, beginning with {reply}.
+an.mate_allowed.one = Now {reply:nomate} is checkmate.
+an.mate_allowed.one.2 = It allows {reply:nomate}, and that's checkmate.
+an.mate_allowed = It allows a forced mate in {m}, starting with {reply:nomate}.
+an.mate_allowed.2 = Now there is a forced mate in {m}, beginning with {reply:nomate}.
 an.fork = Now {reply} forks {t1} and {t2}.
 an.fork.2 = It allows {reply}, attacking {t1} and {t2} at once.
 an.fork.3 = {reply} hits {t1} and {t2} at the same time.
@@ -63,10 +63,10 @@ an.material = The reply {line} wins {pts:point} of material.
 an.material.2 = Then {line} wins {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = {best} was checkmate.
-an.mate_missed.one.2 = {best} would have been checkmate.
-an.mate_missed = {best} would have forced mate in {m}.
-an.mate_missed.2 = There was a forced mate in {m}, starting with {best}.
+an.mate_missed.one = {best:nomate} was checkmate.
+an.mate_missed.one.2 = {best:nomate} would have been checkmate.
+an.mate_missed = {best:nomate} would have forced mate in {m}.
+an.mate_missed.2 = There was a forced mate in {m}, starting with {best:nomate}.
 an.missed_capture = {best} would have won {piece} for free.
 an.missed_capture.2 = {piece} had no defender: {best} would have taken it.
 an.missed_fork = {best} would have forked {t1} and {t2}.
