@@ -47,6 +47,32 @@ std::vector<Settings::CoachGame> decodeCoachHistory(const std::string& text) {
     return out;
 }
 
+std::string encodeChallengeIds(const std::vector<std::string>& ids) {
+    std::string out;
+    for (const std::string& id : ids) {
+        if (id.empty()) continue;
+        if (!out.empty()) out += ',';
+        out += id;
+    }
+    return out;
+}
+
+std::vector<std::string> decodeChallengeIds(const std::string& text) {
+    std::vector<std::string> out;
+    size_t i = 0;
+    while (i <= text.size()) {
+        size_t end = text.find(',', i);
+        if (end == std::string::npos) end = text.size();
+        std::string id = text.substr(i, end - i);
+        i = end + 1;
+        size_t a = id.find_first_not_of(" \t"), b = id.find_last_not_of(" \t");
+        if (a == std::string::npos) continue;
+        id = id.substr(a, b - a + 1);
+        if (std::find(out.begin(), out.end(), id) == out.end()) out.push_back(id);
+    }
+    return out;
+}
+
 void readCoachSettings(const IniFile& ini, Settings& s) {
     s.coachLevel = std::max(0, ini.getInt("coach.level", s.coachLevel));  // the UI clamps to its list
     s.coachColour = std::clamp(ini.getInt("coach.colour", s.coachColour), 0, 2);
@@ -55,6 +81,9 @@ void readCoachSettings(const IniFile& ini, Settings& s) {
     if (ini.has("coach.history")) s.coachHistory = decodeCoachHistory(ini.getString("coach.history"));
     s.coachAccuracyExplained = ini.getBool("coach.accuracy_explained", s.coachAccuracyExplained);
     s.coachLessonChapter = std::max(0, ini.getInt("coach.lesson_chapter", s.coachLessonChapter));
+    s.coachTab = std::clamp(ini.getInt("coach.tab", s.coachTab), 0, 1);
+    s.coachChallenge = ini.getString("coach.challenge", s.coachChallenge);
+    if (ini.has("coach.challenges_done")) s.coachChallengesDone = decodeChallengeIds(ini.getString("coach.challenges_done"));
     s.ttsThreads = std::clamp(ini.getInt("tts.threads", s.ttsThreads), 0, 16);
     s.ttsVoice = std::max(-1, ini.getInt("tts.voice", s.ttsVoice));
     s.ttsSteps = std::clamp(ini.getInt("tts.steps", s.ttsSteps), Settings::kTtsStepsMin, Settings::kTtsStepsMax);
@@ -76,6 +105,9 @@ void writeCoachSettings(IniFile& ini, const Settings& s) {
     ini.set("coach.history", encodeCoachHistory(s.coachHistory));
     ini.setBool("coach.accuracy_explained", s.coachAccuracyExplained);
     ini.setInt("coach.lesson_chapter", s.coachLessonChapter);
+    ini.setInt("coach.tab", s.coachTab);
+    ini.set("coach.challenge", s.coachChallenge);
+    ini.set("coach.challenges_done", encodeChallengeIds(s.coachChallengesDone));
     ini.setInt("tts.threads", s.ttsThreads);
     ini.setInt("tts.voice", s.ttsVoice);
     ini.setInt("tts.steps", s.ttsSteps);

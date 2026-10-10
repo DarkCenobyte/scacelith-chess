@@ -126,6 +126,7 @@ count.inaccuracy = {n}步不精确着法
 count.game = {n}盘棋
 count.time = {n}次
 count.square = {n}格
+count.position = {n}个局面
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.

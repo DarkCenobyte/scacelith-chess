@@ -45,7 +45,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/ui` | SDF text (lazy atlas, font fallback, Arabic joining + bidi via `text_shape.h`), widgets (mirrored for RTL), menus |
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |
 | `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
-| `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
+| `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, the challenges, rewinds by hand (`rewind.h`) |
 | `src/analysis` | Analysis mode's brain, engine-free and GL-free: the review of a whole game (`review.h`: two passes over its positions, the annotation symbols, accuracy), the commentary on its key moments (`commentary.h`, lines in `assets/coach/speech/<lang>/analysis.lang`) and the cache of reviews (`cache.h`) |
 | `src/tts` | Text-to-speech for the coach's voice (Supertonic 3: Supertone's official fp32 ONNX graphs, run by an in-house ONNX interpreter with per-ISA kernels, no onnxruntime; the old INT8 conversion by sherpa-onnx that earlier versions downloaded still loads, `model.h`), a worker thread; `model_store.h`: the model's seven files (manifest with sizes, SHA-256 and repository paths; the old model's manifest too), its folder (`<application data>/coach/`, `--coach-dir` overrides it) and the download job (file by file from Supertone's repository on Hugging Face, else from Supertone's archive copy there, both at pinned revisions; it deletes the old model's files first) |
 | `src/net` | Online play, engine-free (in the core library, unit-tested): the client of the dedicated server (`online_client.h`: HTTPS API and secure WebSocket, WinHTTP on Windows, OpenSSL in Linux builds), the realtime protocol v1 codec generated from `protocol/scacelith-v1.json` (`protocol_gen.h`), per-server credentials, the Google sign-in's loopback redirect, direct matches (secure channel, the host's authority, UPnP) and file downloads; see [ONLINE_CLIENT.md](ONLINE_CLIENT.md) and [DIRECT_MATCH.md](DIRECT_MATCH.md) |
@@ -251,10 +251,29 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
   results (`history`, `accuracyExplained`, the suggested level, the lesson's chapter) are saved in
   `[coach]`. The rules lesson has no end-of-game flow of its own: when its last chapter is said,
   the session wants the handshake and the scene ends the lesson (`endLesson`).
-* **Settings.** `[coach]` (level, colour, alternating colour, history, lesson chapter...) and
-  `[tts]` are read and written by `src/game/settings_coach.cpp` (core library, unit-tested).
-  The command line (`--start --coach`, `--coach-level`, `--coach-colour`, `--coach-dir`,
-  `--coach-stage-test`, `--coach-auto-answer`) is parsed by `src/game/coach_args.h`.
+* **Challenges.** The Coach page's Challenges tab lists short sets of positions, each training
+  one skill (mates in one to three, forks, pins, the escape of a king in danger, basic endgames;
+  `src/coach/challenge.h`). The sets are in `assets/coach/challenges/challenges.txt`, made by
+  `tools/challenges/` from the Lichess puzzle database (CC0) and hand-written endgames, and checked
+  by `tools/challenge_audit` with the embedded Stockfish. A challenge is a coach game with
+  `SessionConfig::challenge` set: the session hands it to a `coach::ChallengeRun`
+  (`challenge_run.h`), which plays the positions one after the other with the lesson's beats
+  (`SetPosition`, the coach's move into the position as a `PlayMove`, a `WaitMove`), judges a
+  line's moves against its solution at once and a play-out's moves (an endgame against Stockfish)
+  with the Analyst, answers a wrong move with the move on the board (`Stage::takeBack` after the
+  coach's answer), and gives hints only when asked: the H key at any time the position waits, or
+  the hint offer (the takeback card, `CoachHud::hintOffer`) after every third wrong move at one
+  move. The scene treats a challenge like the rules lesson (`GameScene::drill()`: no scoresheet,
+  clock, rating, draw or resignation, the game never ends by itself, relaxed touch-move, illegal
+  placements refused and explained) and saves nothing but its completion
+  (`Settings::coachChallengesDone`, the Coach page's check marks); its end card offers the next
+  challenge, and Main menu goes back to the Challenges tab (`ui::openCoachPage(1)`).
+* **Settings.** `[coach]` (level, colour, alternating colour, history, lesson chapter, the Coach
+  page's tab, the challenges completed...) and `[tts]` are read and written by
+  `src/game/settings_coach.cpp` (core library, unit-tested). The command line (`--start --coach`,
+  `--coach-level`, `--coach-colour`, `--coach-challenge`, `--coach-challenge-position`,
+  `--coach-dir`, `--coach-stage-test`, `--coach-auto-answer`) is parsed by
+  `src/game/coach_args.h`.
 
 ## Analysis mode
 

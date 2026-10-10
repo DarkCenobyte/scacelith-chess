@@ -1,0 +1,132 @@
+# Coach speech: the challenges (src/coach/challenge_run.cpp). English is the reference; every
+# language has exactly these keys (and the same variants).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 positions", count.position in
+#            common.lang), "{n:move}" likewise
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "checkmate" (the line says it)
+#   {your}   one of the player's pieces ("your knight"); the coach points at it on that word
+#   {sq}     a square; the coach points at it on that word
+# The player always has the white pieces. The coach speaks informally to the player.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mate in one. {n:position}, and each time a single move checkmates. Look at every check.
+ch.intro.mate2 = Mate in two. {n:position}: your first move must leave me no defence, then you mate.
+ch.intro.mate3 = Mate in three. {n:position}. Checks, captures and threats: work out my best answer each time.
+ch.intro.backrank = Back-rank mates. {n:position} where a king is trapped behind its own pawns.
+ch.intro.patterns = Mating patterns. {n:position} with classic mating nets. Recognise the pattern, then strike.
+ch.intro.hanging = Free pieces. {n:position}: something of mine is left unprotected. Find it and take it.
+ch.intro.fork = Forks. {n:position}: find the move that attacks two things at once.
+ch.intro.pin = Pins. {n:position}: pin a piece, or make use of a pin.
+ch.intro.skewer = Skewers. {n:position}: attack a valuable piece and win what stands behind it.
+ch.intro.discovered = Discovered attacks. {n:position}: move one piece to unleash another.
+ch.intro.deflection = Deflection and decoy. {n:position}: lure a defender away, or onto a fatal square.
+ch.intro.intermezzo = In-between moves. {n:position}: before the obvious move, find a stronger one.
+ch.intro.trapped = Trapped pieces. {n:position}: one of my pieces has nowhere safe to go. Win it.
+ch.intro.promotion = Promotion. {n:position} where an advanced pawn decides the game.
+ch.intro.quiet = Quiet moves. {n:position}: the winning move is neither a check nor a capture.
+ch.intro.opening = Opening traps. {n:position} from the first moves of real games. Punish my mistake.
+ch.intro.escape = Find the escape. {n:position}: your king is in danger, and only one move saves it.
+ch.intro.defend = Defensive moves. {n:position}: find the one move that keeps your position together.
+ch.intro.kq = Queen and king against king. {n:position}: checkmate my king. Mind the stalemate.
+ch.intro.kr = Rook and king against king. {n:position}: checkmate my king, one step at a time.
+ch.intro.kp = King and pawn against king. {n:position}: make a queen. Lead with your king.
+ch.intro.kp_hold = Stop the pawn. {n:position}: you only have your king. Hold the draw.
+ch.intro.rook = Rook endgames. {n:position}: build the bridge to promote, and hold the draw with the Philidor defence.
+ch.intro.endgame = Endgame tactics. {n:position} with few pieces and sharp ideas.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Mate in {n}.
+ch.task.mate.2 = Find the mate in {n}.
+ch.task.hanging = Something is left unprotected.
+ch.task.hanging.2 = What can you take for free?
+ch.task.fork = Find the fork.
+ch.task.fork.2 = Look for a fork.
+ch.task.pin = A pin is the key here.
+ch.task.skewer = A skewer wins here.
+ch.task.discovered = A discovered attack wins here.
+ch.task.deflection = Overload or decoy a defender.
+ch.task.intermezzo = Look for an in-between move.
+ch.task.trapped = One of my pieces can't escape. Win it.
+ch.task.promotion = Use your advanced pawn.
+ch.task.quiet = The winning move is a quiet one.
+ch.task.opening = Punish my last move.
+ch.task.escape = Save your king: only one move works.
+ch.task.defend = Find the only good move.
+ch.task.endgame = Find the best move.
+ch.task.default = Find the best move.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Checkmate my king. I'll defend as well as I can.
+ch.task.play.promote = Promote your pawn, and keep the win. I'll try to stop you.
+ch.task.play.hold = Hold the draw for {n:move}. I'll try to win.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = These positions come from real games. I play the last move, then it's your turn.
+ch.lead.first.2 = Each position comes from a real game: I play the move that led to it, then you play.
+ch.next = Next position.
+ch.next.2 = Here's the next one.
+ch.next.3 = On to the next one.
+ch.last = The last position.
+ch.last.2 = And now the last one.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Good.
+ch.good.2 = Yes.
+ch.good.3 = Right.
+ch.good.4 = Exactly.
+# The position is solved.
+ch.solved = That's it! Well done.
+ch.solved.2 = Exactly right.
+ch.solved.3 = Very good.
+ch.solved.mate = Checkmate! Well done.
+ch.solved.mate.2 = And that's mate. Very good.
+ch.solved.mate.3 = Checkmate. Nicely done.
+ch.solved.promote = A new queen, and the win is safe. Well done.
+ch.solved.hold = The draw holds. Well defended!
+ch.solved.draw = A draw on the board. Well defended!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Not this one: I'd answer {move}.
+ch.wrong.reply.2 = Not quite: I'd reply {move}.
+ch.wrong.reply.3 = Then I'd play {move}.
+ch.wrong.mate = Careful: {move:nomate} would be checkmate.
+ch.wrong.mate.2 = Watch out: I'd answer {move:nomate}, and that's mate.
+ch.wrong.mated = Careful: after {move}, I can force mate in {m}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = That mates too, but it takes longer. There's a faster way.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = That mates too, but I have another move in mind. Look again.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Not bad, but there's something stronger. Look again.
+ch.wrong.weaker.2 = That's playable, but you can do better.
+ch.wrong.stalemate = Stalemate! My king can't move, and that's only a draw.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Not this one: after {move}, I can hold the draw.
+ch.wrong.loses = Careful: after {move}, I'd be winning.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = That's not it.
+ch.try_again = Try again.
+ch.try_again.2 = Have another look.
+ch.try_again.3 = Look again.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Would you like a hint?
+ch.offer.2 = Shall I give you a hint?
+ch.no_hint = All right. Keep looking.
+ch.no_hint.2 = Fine, take your time.
+ch.hint.piece = Look at {your}.
+ch.hint.piece.2 = Think about {your}.
+ch.hint.square = Look at {sq}.
+ch.hint.square.2 = The key square is {sq}.
+ch.hint.square.3 = Keep an eye on {sq}.
+ch.hint.show = Here's the move. Watch.
+ch.hint.show.2 = Let me show you. Watch.
+ch.hint.now = Now you play it.
+ch.hint.now.2 = Your turn: play it.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = That's the whole challenge. Well done!
+ch.complete.2 = Every position solved. Well done!

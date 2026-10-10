@@ -185,6 +185,7 @@ number.decimal.spoken = {int} coma {frac}
 # Spanish plural rule (assets/i18n): one (exactly 1) | other. Masculine nouns say their number with
 # the form "m" ("un error", "veintiún puntos"), feminine nouns with "f" ("una jugada").
 count.move = {n:f} jugada|{n:f} jugadas
+count.position = {n:f} posición|{n:f} posiciones
 count.point = {n:m} punto|{n:m} puntos
 count.pawn = {n:m} peón|{n:m} peones
 count.piece = {n:f} pieza|{n:f} piezas

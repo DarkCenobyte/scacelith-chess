@@ -1,0 +1,137 @@
+# Coach speech (Simplified Chinese, mainland): the challenges (src/coach/challenge_run.cpp). Same
+# keys and variants as assets/coach/speech/en/challenge.lang. Subtitle text only: the voice speaks
+# the English line of the same key and variant, so each variant translates its English twin, and
+# there are no ".spoken" overrides here.
+#
+# Placeholders (see the English header):
+#   {n:position}  the number of positions with its noun: "6个局面" (count.position in common.lang)
+#   {n}           a plain number ("{n}步杀"); {n:move} "10步" (count.move)
+#   {move}        one of the coach's moves ("♘f3"); "{move:nomate}" without the mate sign (the line
+#                 says 将死)
+#   {your}        one of the player's pieces with its owner ("你的马"): never write 你的 in front
+#   {sq}          a square, written "e4" with no space around it
+# The coach says 你. Terms as in review.lang and assets/i18n/zh-Hans.lang: 将死, 逼和, 底线杀, 闷杀,
+# 捉双, 牵制, 串击, 闪击, 引离 / 引入 (deflection / decoy), 超负荷 (overload), 中间着 (in-between
+# move), 静着 (quiet move), 升变, 对王, 车残局, "{n}步杀" (mate in n).
+# The player always has the white pieces.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = 一步杀。一共{n:position}，每次只要一步就能将死。把每一步将军都看一遍。
+ch.intro.mate2 = 两步杀。一共{n:position}：你的第一步要让我无法防守，然后将死我。
+ch.intro.mate3 = 三步杀。一共{n:position}。将军、吃子和威胁：每一步都要算出我的最佳应着。
+ch.intro.backrank = 底线杀。一共{n:position}，王都被自己的兵困在后面。
+ch.intro.patterns = 将杀模式。一共{n:position}，都是经典的杀网。认出模式，然后出击。
+ch.intro.hanging = 白吃的子。一共{n:position}：我有个子没有保护。找到它，吃掉它。
+ch.intro.fork = 捉双。一共{n:position}：找出同时攻击两个目标的那步棋。
+ch.intro.pin = 牵制。一共{n:position}：牵制一个子，或者利用牵制。
+ch.intro.skewer = 串击。一共{n:position}：攻击一个价值高的子，赢得它后面的子。
+ch.intro.discovered = 闪击。一共{n:position}：走开一个子，放出另一个子的攻击。
+ch.intro.deflection = 引离与引入。一共{n:position}：把防守的子引开，或者引到致命的格子上。
+ch.intro.intermezzo = 中间着。一共{n:position}：先别走那步显而易见的棋，找一步更强的。
+ch.intro.trapped = 被困的子。一共{n:position}：我的一个子无处可逃。把它吃掉。
+ch.intro.promotion = 升变。一共{n:position}，都由一个冲在前面的兵决定胜负。
+ch.intro.quiet = 静着。一共{n:position}：制胜的一着既不是将军，也不是吃子。
+ch.intro.opening = 开局陷阱。一共{n:position}，都来自真实对局的开头几步。惩罚我的错误吧。
+ch.intro.escape = 寻找生路。一共{n:position}：你的王有危险，只有一步棋能救它。
+ch.intro.defend = 防守着法。一共{n:position}：找出那唯一能守住局面的一步。
+ch.intro.kq = 王和后对王。一共{n:position}：将死我的王。小心逼和。
+ch.intro.kr = 王和车对王。一共{n:position}：一步一步地将死我的王。
+ch.intro.kp = 王和兵对王。一共{n:position}：升出一个后。让王走在前面。
+ch.intro.kp_hold = 拦住兵。一共{n:position}：你只有一个王。守住和棋。
+ch.intro.rook = 车残局。一共{n:position}：搭桥来升变，再用菲利多尔防御守住和棋。
+ch.intro.endgame = 残局战术。一共{n:position}，子力不多，招法犀利。
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = {n}步杀。
+ch.task.mate.2 = 找出{n}步杀。
+ch.task.hanging = 有个子没有保护。
+ch.task.hanging.2 = 有什么可以白吃？
+ch.task.fork = 找出捉双。
+ch.task.fork.2 = 找找有没有捉双。
+ch.task.pin = 这里的关键是牵制。
+ch.task.skewer = 这里用串击可以得子。
+ch.task.discovered = 这里用闪击可以得子。
+ch.task.deflection = 让防守的子超负荷，或者把它引到不利的格子上。
+ch.task.intermezzo = 找一步中间着。
+ch.task.trapped = 我的一个子逃不掉了。把它吃掉。
+ch.task.promotion = 利用你冲在前面的兵。
+ch.task.quiet = 制胜的是一步静着。
+ch.task.opening = 惩罚我的上一步棋。
+ch.task.escape = 救你的王：只有一步棋可行。
+ch.task.defend = 找出唯一的好棋。
+ch.task.endgame = 找出最佳着法。
+ch.task.default = 找出最佳着法。
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = 将死我的王。我会尽全力防守。
+ch.task.play.promote = 让你的兵升变，并保住胜利。我会设法拦住你。
+ch.task.play.hold = 守住和棋，坚持{n:move}。我会争取赢棋。
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = 这些局面都来自真实对局。我先走最后一步，然后轮到你。
+ch.lead.first.2 = 每个局面都来自真实对局：我先走出形成这个局面的那步棋，然后你来走。
+ch.next = 下一个局面。
+ch.next.2 = 这是下一个。
+ch.next.3 = 我们继续下一个。
+ch.last = 最后一个局面。
+ch.last.2 = 现在是最后一个了。
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = 好。
+ch.good.2 = 对。
+ch.good.3 = 没错。
+ch.good.4 = 正是这样。
+# The position is solved.
+ch.solved = 就是这样！干得好。
+ch.solved.2 = 完全正确。
+ch.solved.3 = 很好。
+ch.solved.mate = 将死！干得好。
+ch.solved.mate.2 = 将死了。很好。
+ch.solved.mate.3 = 将死。漂亮。
+ch.solved.promote = 一个新后，胜利稳了。干得好。
+ch.solved.hold = 和棋守住了。防守得好！
+ch.solved.draw = 棋盘上已成和棋。防守得好！
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = 不是这步：我会走{move}应对。
+ch.wrong.reply.2 = 不太对：我会走{move}回应。
+ch.wrong.reply.3 = 那样我就走{move}。
+ch.wrong.mate = 小心：{move:nomate}就是将死。
+ch.wrong.mate.2 = 当心：我会走{move:nomate}，那就将死了。
+ch.wrong.mated = 小心：{move}之后，我可以{m:move}强制将死。
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = 这样也能将死，但要多走几步。还有更快的走法。
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = 这样也能将死，但我想的是另一步。再看看。
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = 不错，但还有更强的。再看看。
+ch.wrong.weaker.2 = 这步可以走，但你能走得更好。
+ch.wrong.stalemate = 逼和！我的王动不了，这只是和棋。
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = 不是这步：{move}之后，我能守住和棋。
+ch.wrong.loses = 小心：{move}之后，我就要赢了。
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = 不是这步。
+ch.try_again = 再试一次。
+ch.try_again.2 = 再仔细看一看。
+ch.try_again.3 = 再看看。
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = 要不要提示？
+ch.offer.2 = 要我给你一点提示吗？
+ch.no_hint = 好的。继续找吧。
+ch.no_hint.2 = 行，慢慢来。
+ch.hint.piece = 看看{your}。
+ch.hint.piece.2 = 想想{your}。
+ch.hint.square = 看看{sq}。
+ch.hint.square.2 = 关键的格子是{sq}。
+ch.hint.square.3 = 留意{sq}。
+ch.hint.show = 就是这步棋。看好了。
+ch.hint.show.2 = 我来演示一下。看好了。
+ch.hint.now = 现在你来走。
+ch.hint.now.2 = 轮到你了：走这步棋。
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = 整个挑战完成了。干得好！
+ch.complete.2 = 每个局面都解出来了。干得好！

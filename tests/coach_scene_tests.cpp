@@ -106,6 +106,9 @@ TEST(coach_settings_round_trip) {
     a.coachHistory = {{5, 1, 88.2}, {5, 0, -1.0}};
     a.coachAccuracyExplained = true;
     a.coachLessonChapter = 7;
+    a.coachTab = 1;
+    a.coachChallenge = "fork";
+    a.coachChallengesDone = {"mate1", "fork", "gone_since"};  // an id the game no longer knows is kept
     a.ttsThreads = 3;
     a.ttsVoice = 6;
     a.ttsSteps = 8;
@@ -128,6 +131,10 @@ TEST(coach_settings_round_trip) {
     CHECK(b.coachHistory[1].accuracy < 0.0);
     CHECK(b.coachAccuracyExplained);
     CHECK_EQ(b.coachLessonChapter, 7);
+    CHECK_EQ(b.coachTab, 1);
+    CHECK_EQ(b.coachChallenge, std::string("fork"));
+    CHECK(b.coachChallengesDone == a.coachChallengesDone);
+    CHECK_EQ(out.getString("coach.challenges_done"), std::string("mate1,fork,gone_since"));
     CHECK_EQ(b.ttsThreads, 3);
     CHECK_EQ(b.ttsVoice, 6);
     CHECK_EQ(b.ttsSteps, 8);
@@ -152,8 +159,44 @@ TEST(coach_settings_round_trip) {
     CHECK(c.coachHistory.empty());
     CHECK(!c.coachAccuracyExplained);
     CHECK_EQ(c.coachLessonChapter, 0);
+    CHECK_EQ(c.coachTab, 0);
+    CHECK(c.coachChallenge.empty());
+    CHECK(c.coachChallengesDone.empty());
     CHECK_EQ(c.ttsThreads, 0);
     CHECK_EQ(c.ttsVoice, -1);
     CHECK_EQ(c.ttsSteps, 5);
     CHECK_EQ(c.ttsArch, std::string("auto"));
+}
+
+// The completed challenges: each id once, spaces and empty entries dropped (a hand-edited file),
+// a tab out of range brought back to Training or Challenges.
+TEST(coach_settings_challenges) {
+    std::vector<std::string> ids = game::decodeChallengeIds(" mate1 , fork,,mate1,  ,kq ,fork");
+    CHECK(ids == std::vector<std::string>({"mate1", "fork", "kq"}));
+    CHECK(game::decodeChallengeIds("").empty());
+    CHECK(game::decodeChallengeIds(" , ,").empty());
+    CHECK_EQ(game::encodeChallengeIds(ids), std::string("mate1,fork,kq"));
+    CHECK_EQ(game::encodeChallengeIds({}), std::string());
+    game::Settings s;
+    CHECK(!s.coachChallengeDone("mate1"));
+    CHECK(s.markCoachChallengeDone("mate1"));
+    CHECK(!s.markCoachChallengeDone("mate1"));  // already there: nothing to save
+    CHECK(!s.markCoachChallengeDone(""));
+    CHECK(s.markCoachChallengeDone("fork"));
+    CHECK(s.coachChallengeDone("mate1") && s.coachChallengeDone("fork") && !s.coachChallengeDone("kq"));
+    CHECK_EQ(int(s.coachChallengesDone.size()), 2);
+    for (int tab : {-3, 0, 1, 2}) {
+        IniFile e;
+        e.setInt("coach.tab", tab);
+        game::Settings d;
+        game::readCoachSettings(e, d);
+        CHECK_EQ(d.coachTab, std::clamp(tab, 0, 1));
+    }
+    // An empty list written and read back stays empty.
+    IniFile out;
+    game::writeCoachSettings(out, game::Settings());
+    game::Settings back;
+    back.coachChallengesDone = {"stale"};
+    game::readCoachSettings(out, back);
+    CHECK(back.coachChallengesDone.empty());
 }

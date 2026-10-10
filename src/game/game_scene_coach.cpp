@@ -16,6 +16,7 @@
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../coach/catalog.h"
+#include "../coach/challenge.h"
 #include "../coach/lesson.h"
 #include "../coach/openings.h"
 #include "../coach/pacing.h"
@@ -578,11 +579,12 @@ GameScene::~GameScene() {
     if (coach_) coach_->session.stop();
 }
 
-bool GameScene::legalHints() const { return settings().showLegalMoves || lesson(); }
+bool GameScene::legalHints() const { return settings().showLegalMoves || drill(); }
 
 void GameScene::initCoachArgs() {
     coachArgs_ = parseCoachArgs(ctx_->args);
     for (const std::string& p : coachArgs_.problems) LOGW("command line: %s", p.c_str());
+    if (coachArgs_.start) coachChallenge_ = coachArgs_.challenge;
     if (!coachArgs_.dir.empty()) tts::setModelDirectory(coachArgs_.dir);
     coachModelInit();   // the voice model download: the Coach entry's prompt (coach_model.h)
     // A download that replaces the old INT8 model deletes its files: the worker that maps them stops
@@ -664,17 +666,26 @@ void GameScene::setupCoachGame() {
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
     rt.test = coachArgs_.stageTest;
-    // The rules lesson is played with White; so is the stage test unless told otherwise (its line
-    // points at White's g1 knight).
-    humanColor_ = coachLevel_ == 0 || (rt.test && coachArgs_.colour < 0) ? White : Color(colour);
+    // A challenge this version does not know (a newer .ini, a typo on the command line): the
+    // Training tab's game instead.
+    if (!coachChallenge_.empty() && !coach::ChallengeBook::shared().find(coachChallenge_)) {
+        LOGW("coach: no challenge '%s', a coach game instead", coachChallenge_.c_str());
+        coachChallenge_.clear();
+    }
+    // The rules lesson and the challenges are played with White; so is the stage test unless told
+    // otherwise (its line points at White's g1 knight).
+    humanColor_ = coachLevel_ == 0 || challenge() || (rt.test && coachArgs_.colour < 0) ? White : Color(colour);
     rt.seed = (uint64_t(rng_.next()) << 32) | rng_.next();
     rt.testKind = ctx_->argValue("--coach-stage-test");
     if (rt.testKind.compare(0, 2, "--") == 0) rt.testKind.clear();
     rt.testStep = 0;
     rt.testTime = 0.0f;
     rt.forceSubtitles = rt.test;
-    LOGI("New game (coach): level %d%s, human plays %s%s", coachLevel_, coachLevel_ == 0 ? " (the rules lesson)" : "",
-         humanColor_ == White ? "White" : "Black", rt.test ? ", stage test" : "");
+    if (challenge())
+        LOGI("New game (coach): the challenge '%s'%s", coachChallenge_.c_str(), rt.test ? ", stage test" : "");
+    else
+        LOGI("New game (coach): level %d%s, human plays %s%s", coachLevel_, coachLevel_ == 0 ? " (the rules lesson)" : "",
+             humanColor_ == White ? "White" : "Black", rt.test ? ", stage test" : "");
 }
 
 void GameScene::configureCoachSeats() {
@@ -710,7 +721,7 @@ void GameScene::startCoachGame() {
     CoachRuntime& rt = coachRuntime();
     Settings& s = settings();
     // Alternating colours: the next coach game is played with the other colour.
-    if (coachLevel_ > 0 && coachArgs_.colour < 0 && s.coachColour == 2 && !rt.test) {
+    if (coachLevel_ > 0 && !challenge() && coachArgs_.colour < 0 && s.coachColour == 2 && !rt.test) {
         s.coachNextColour = humanColor_ == White ? 1 : 0;
         s.save();
     }
@@ -722,7 +733,9 @@ void GameScene::startCoachGame() {
     c.human = humanColor_;
     c.director.uiLanguage = i18n::language();
     c.director.subtitles = s.subtitles;
-    c.director.speed = speechSpeed(coachLevel_);
+    c.director.speed = challenge() ? 1.0f : speechSpeed(coachLevel_);
+    c.challenge = coachChallenge_;
+    c.challengePosition = coachArgs_.challengePosition;
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
@@ -797,8 +810,9 @@ void GameScene::coachMoveCompleted() {
     rt.demoPos = game_.position();
     rt.demoBefore.clear();
     if (rt.sessionRunning) rt.session.onMove(game_);
-    // The lesson's positions may end (a mate exercise): it has no end-of-game flow of its own.
-    if (!lesson() && game_.status() != GameStatus::Ongoing) {
+    // The lesson's and the challenges' positions may end (a mate exercise): they have no
+    // end-of-game flow of their own.
+    if (!drill() && game_.status() != GameStatus::Ongoing) {
         endGame();
         return;
     }
@@ -836,6 +850,55 @@ void GameScene::endLesson() {
     coachArgs_.level = -1;
 }
 
+void GameScene::endChallenge() {
+    CoachRuntime& rt = coachRuntime();
+    LOGI("coach: the challenge '%s' is over", coachChallenge_.c_str());
+    saveChallengeDone();
+    if (turn_ == Turn::HumanTouched) humanRelease();
+    turn_ = Turn::None;
+    state_ = State::GameOver;
+    stateTime_ = 0.0f;
+    gameOverShown_ = false;
+    endHandshakeDone_ = false;
+    rt.handshakeReported = false;
+    resultText_ = i18n::tr("coach.challenge.complete");
+    reasonText_ = ui::challengeName(coachChallenge_);
+    playerWon_ = true;
+    isDraw_ = false;
+}
+
+void GameScene::saveChallengeDone() {
+    if (!coach_ || !coach_->sessionRunning || !coach_->session.challengeCompleted()) return;
+    Settings& s = settings();
+    if (s.markCoachChallengeDone(coachChallenge_)) {
+        LOGI("coach: the challenge '%s' is completed (%d of them)", coachChallenge_.c_str(), int(s.coachChallengesDone.size()));
+        s.save();
+    }
+}
+
+void GameScene::nextChallenge() {
+    // The next set in the Coach page's order that is not completed yet (after this one, then from
+    // the top); all of them completed: simply the next one.
+    const auto& all = coach::ChallengeBook::shared().challenges();
+    const int n = int(all.size());
+    const int at = coach::ChallengeBook::shared().indexOf(coachChallenge_);
+    if (n == 0 || at < 0) return;
+    std::string next = all[size_t((at + 1) % n)].id;
+    for (int k = 1; k < n; ++k) {
+        const std::string& id = all[size_t((at + k) % n)].id;
+        if (!settings().coachChallengeDone(id)) {
+            next = id;
+            break;
+        }
+    }
+    LOGI("coach: next challenge '%s'", next.c_str());
+    coachChallenge_ = next;
+    coachArgs_.challengePosition = 0;
+    Settings& s = settings();
+    s.coachChallenge = next;   // the Coach page shows it selected
+    s.save();
+}
+
 bool GameScene::coachHandshakeWanted() const {
     if (!coach_ || !coach_->sessionRunning) return true;
     if (coach_->jobRunning || !coach_->jobs.empty()) return false;   // the table is put back first
@@ -852,6 +915,10 @@ void GameScene::persistCoachResults() {
     if (!coach_ || coach_->resultsSaved || !coach_->sessionRunning) return;
     CoachRuntime& rt = *coach_;
     rt.resultsSaved = true;
+    if (challenge()) {   // its completion only: no history, no level
+        saveChallengeDone();
+        return;
+    }
     Settings& s = settings();
     s.coachHistory.clear();
     for (const coach::GameRecord& g : rt.session.history()) s.coachHistory.push_back({g.level, g.result, g.accuracy});
@@ -909,7 +976,7 @@ void GameScene::coachIllegalAttempt(Square from, Square to) {
 }
 
 bool GameScene::coachCanTakeBack() const {
-    if (!coach_ || !coach_->sessionRunning || lesson()) return false;
+    if (!coach_ || !coach_->sessionRunning || drill()) return false;
     const CoachRuntime& rt = *coach_;
     if (rt.jobRunning || !rt.jobs.empty() || turn_ == Turn::AiMoving || turn_ == Turn::HumanPlacing ||
         turn_ == Turn::HumanPromotion || turn_ == Turn::HumanPlaced || !rt.session.canTakeBack(game_))
@@ -1093,8 +1160,8 @@ void GameScene::updateCoach(float dt) {
         stage.mouth(pos, facing);
         audio::setVoicePose(rt.voice, pos, facing);
     }
-    // Board coordinates: the option, forced on for the lesson and the first levels.
-    world_.setBoardCoordinates(settings().showCoordinates || coachLevel_ <= 2);
+    // Board coordinates: the option, forced on for the lesson, the first levels and the challenges.
+    world_.setBoardCoordinates(settings().showCoordinates || coachLevel_ <= 2 || challenge());
 
     // The end of the game: the handshake once wanted (simulate enqueues it), then the appraisal.
     if (state_ == State::GameOver && endHandshakeDone_ && !rt.handshakeReported && !anim_[0].busy() && !anim_[1].busy() &&
@@ -1104,7 +1171,13 @@ void GameScene::updateCoach(float dt) {
         if (rt.sessionRunning) rt.session.onHandshakeDone(game_);
     }
     if (state_ == State::GameOver && coachEndCardReady()) persistCoachResults();
-    if (lesson() && state_ == State::Playing && rt.sessionRunning && rt.session.handshakeWanted()) endLesson();
+    // A challenge's completion is kept as soon as the last position is solved (leaving during the
+    // closing words loses nothing).
+    if (challenge() && rt.sessionRunning && rt.session.challengeCompleted()) saveChallengeDone();
+    if (drill() && state_ == State::Playing && rt.sessionRunning && rt.session.handshakeWanted()) {
+        if (challenge()) endChallenge();
+        else endLesson();
+    }
 }
 
 void GameScene::coachGazeTarget(vec3& target) {
@@ -1133,13 +1206,20 @@ void GameScene::coachHudFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachHud hud;
     hud.offer = rt.offerShown || (rt.sessionRunning && rt.session.offerOpen());
+    hud.hintOffer = rt.sessionRunning && rt.session.offerIsHint();
     hud.skippable = rt.skipHint || (rt.sessionRunning && rt.session.director().skippable());
     bool cardUp = state_ == State::GameOver && gameOverShown_ && !ui::gameOverFolded();
     if (cardUp) hud.skippable = false;
+    if (challenge() && rt.sessionRunning && state_ == State::Playing) {
+        hud.hintKey = !hud.offer && (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) && rt.session.hintAvailable(game_);
+        hud.progress = ui::challengeProgress(coachChallenge_, rt.session.challengePosition(), rt.session.challengePositions());
+    }
     ui::CoachHudAction act = ui::coachHud(hud);
     const plat::Input& in = plat::input();
-    // Backspace takes the move back; touching one of your pieces plays on (the card's own words).
-    if (hud.offer && act == ui::CoachHudAction::None && !ui::wantsKeyboard() && in.keyPressed[plat::KEY_BACKSPACE])
+    // Backspace takes the move back (H gives the hint); touching one of your pieces plays on, or
+    // keeps looking (the card's own words).
+    const int acceptKey = hud.hintOffer ? int('H') : int(plat::KEY_BACKSPACE);
+    if (hud.offer && act == ui::CoachHudAction::None && !ui::wantsKeyboard() && in.keyPressed[acceptKey])
         act = ui::CoachHudAction::TakeBack;
     // Standing up (stances), the player answers neither way: the hands wait until seated again.
     bool mayPlay = seatMayPlay(inputSeat());
@@ -1150,7 +1230,7 @@ void GameScene::coachHudFrame() {
         if (p && p->color == humanColor_) {
             // Touching a piece plays on (the session's own "Let's play on"); the touch itself then
             // goes through below, the card gone.
-            LOGI("coach: takeback offer declined (a piece touched)");
+            LOGI("coach: %s offer declined (a piece touched)", hud.hintOffer ? "hint" : "takeback");
             rt.offerShown = false;
             if (rt.sessionRunning) rt.session.onPlayerActive();
         }
@@ -1162,9 +1242,15 @@ void GameScene::coachHudFrame() {
     }
     if (act != ui::CoachHudAction::None) {
         bool accept = act == ui::CoachHudAction::TakeBack;
-        LOGI("coach: takeback offer %s", accept ? "accepted" : "declined");
+        LOGI("coach: %s offer %s", hud.hintOffer ? "hint" : "takeback", accept ? "accepted" : "declined");
         rt.offerShown = false;
         if (rt.sessionRunning) rt.session.onOfferAnswer(game_, accept);
+    } else if (hud.hintKey && !ui::wantsKeyboard() && in.keyPressed['H']) {
+        // A challenge: H asks for a hint whenever the position waits (the coach never gives one
+        // unasked). A piece in hand goes back first: the coach may show the move.
+        LOGI("coach: hint asked (H)");
+        if (turn_ == Turn::HumanTouched) humanRelease();
+        rt.session.onHintRequested(game_);
     }
     // Space skips what the coach says (never the clock: a coach game has none to press).
     if (!cardUp && !ui::wantsKeyboard() && in.keyPressed[plat::KEY_SPACE]) {
@@ -1177,9 +1263,9 @@ void GameScene::coachPauseMenuFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachPause cp;
     cp.canTakeBack = coachCanTakeBack();
-    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
-    cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
-    cp.canResign = !lesson();
+    cp.canOfferDraw = !drill() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
+    cp.canClaimDraw = !drill() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
+    cp.canResign = !drill();
     cp.resignDraws = !game_.position().canColorMate(chess::opposite(humanColor_));
     // Greyed while a move is on its way (or taken back), which the end of the game would cut off.
     cp.mayEndGame = quietTurn();
@@ -1217,9 +1303,11 @@ void GameScene::coachPauseMenuFrame() {
     }
     case ui::MenuAction::BackToMainMenu:
         // A coach game is never rated: leaving abandons it (the lesson resumes at its chapter).
-        // It is saved unfinished ("*"; never the rules lesson).
+        // It is saved unfinished ("*"; never the rules lesson nor a challenge, which goes back to
+        // the list of challenges).
         paused_ = false;
         archiveGame(game_.isOver());
+        if (challenge()) ui::openCoachPage(1);
         leaveCoachGame();
         clock_.stop();
         state_ = State::FadeToMenu;
@@ -1482,7 +1570,7 @@ void GameScene::runCoachTable(float dt) {
                 moveClockMs_.resize(game_.moves().size());
                 plyElapsedMs_ = 0.0;
                 arbiter_.reset(game_);
-                if (!lesson() && !scorekeeper_.dropMoves(n - k))
+                if (!drill() && !scorekeeper_.dropMoves(n - k))
                     LOGW("coach: takeback of %d plies: a scoresheet has begun writing them already", k);
                 turn_ = Turn::CoachTable;
                 aiRequested_ = aiHasMove_ = false;

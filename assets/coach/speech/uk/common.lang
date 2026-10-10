@@ -321,6 +321,7 @@ number.decimal.spoken = {int} кома {frac}
 # number words in that case. Feminine nouns say their number with the form "f", neuter ones with
 # "neut". After 2-4 Ukrainian adjectives stay in the nominative plural: "дві грубі помилки".
 count.move = {n} хід|{n} ходи|{n} ходів
+count.position = {n:f} позиція|{n:f} позиції|{n:f} позицій
 count.point = {n:neut} очко|{n:neut} очки|{n:neut} очок
 count.pawn = {n} пішак|{n} пішаки|{n} пішаків
 count.piece = {n:f} фігура|{n:f} фігури|{n:f} фігур

@@ -100,7 +100,8 @@ enum class MenuAction {
     // history (LibrarySetup::replay holds the game: a file, or the PGN text itself), and from the
     // game over card of a game just played ("Analyse the game", GameOverExtras::analyse: the
     // scene analyses the game it holds)
-    StartAnalysis
+    StartAnalysis,
+    StartChallenge  // Coach page, Challenges tab: Start (CoachSetup::challenge names the set)
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -155,6 +156,9 @@ void openBrightnessCalibration();
 // analysis); on the title page when that call has no library for the "Saved games" page, or after
 // an analysis chosen on the game over card.
 void openSavedGames();
+// The next mainMenu() call opens on the Coach page, on the tab 'tab' (0 Training, 1 Challenges:
+// back from a challenge), its choices read from game::settings() as when the player opens it.
+void openCoachPage(int tab);
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
 // Loading screen while shaders/probes/textures are prepared (progress 0..1).
@@ -214,9 +218,10 @@ enum class HotSeatAction { None, AcceptDraw, DeclineDraw };
 HotSeatAction hotSeatHud(const HotSeatHud& hud);
 
 // ---- Coach mode (ui_coach.cpp) ------------------------------------------------------------------
-// The coach page (title entry "Coach"), the coach's subtitles, the takeback offer card and the Esc
-// menu of a coach game. Names, descriptions and texts of the levels come from assets/i18n
-// (coach.level.<n>.name / .desc / .detail).
+// The coach page (title entry "Coach": the Training and Challenges tabs), the coach's subtitles,
+// the takeback (or hint) offer card and the Esc menu of a coach game. Names, descriptions and
+// texts of the levels and of the challenges come from assets/i18n (coach.level.<n>.name / .desc /
+// .detail, challenge.<id>.name / .desc / .detail, challenge.group.<group>).
 //
 // Levels, index = level: 0 is the interactive lesson on the rules, then the player's Elo bands.
 struct CoachLevelInfo {
@@ -229,10 +234,17 @@ void setCoachLevels(const std::vector<CoachLevelInfo>& levels);
 
 // Choices of the coach page. The page starts from game::settings() [coach] and writes them back
 // (and saves the .ini) on Start.
+//
+// The page has two tabs. Training: the level and the colour of a game with the coach (Start
+// returns StartCoach). Challenges: the sets of positions of coach::ChallengeBook::shared(), by
+// group, each with its difficulty and a check mark once completed
+// (Settings::coachChallengesDone); Start returns StartChallenge, 'challenge' naming the set.
 struct CoachSetup {
+    int tab = 0;                 // 0 Training, 1 Challenges
     int level = 1;               // index into the coach levels: 0 = the rules lesson
     int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
                                  // lesson is always played with White: Settings::coachPlayerColour)
+    std::string challenge;       // the challenge selected (coach::Challenge::id)
     // Set by the game before mainMenu(): false when the coach's voice files (tts::modelFolder(),
     // <application data>/coach/) are missing or failed to load. The page then says in one line that
     // the coach will speak through subtitles only.
@@ -266,13 +278,28 @@ float subtitleDuration(const std::string& text, float audioSeconds);
 // appraisal at the end of the game). The card's buttons are mouse only: the keyboard stays with
 // the game, which reads the keys itself (Backspace accepts, as the Controls tab says; Space never
 // answers the card, it skips the coach's talk; touching a piece plays on).
+//
+// In a challenge, the same card offers a hint (hintOffer: its title, text, key line and buttons
+// become coach.hint.*; the game reads H to accept; "Hint" still returns TakeBack, "No, thanks"
+// PlayOn), the "H  Hint" key cap shows while the player may ask for a hint, and a band at the top
+// centre says where the player is in the set.
 struct CoachHud {
     bool offer = false;          // show the takeback card
-    std::string offerText;       // its question ("" = coach.offer.text)
+    std::string offerText;       // its question ("" = coach.offer.text, coach.hint.text with hintOffer)
+    bool hintOffer = false;      // the card offers a hint instead of a takeback
     bool skippable = false;      // show the skip hint (bottom, start side)
+    bool hintKey = false;        // show the hint key cap (bottom, start side; above the skip hint
+                                 // when both show)
+    std::string progress;        // the band at the top centre, drawn in capitals ("" = none):
+                                 // challengeProgress() gives "Forks  ·  3 / 6"
 };
 enum class CoachHudAction { None, TakeBack, PlayOn };
 CoachHudAction coachHud(const CoachHud& hud);
+// A challenge's name in the UI language (challenge.<id>.name in assets/i18n; the id when it has
+// none), and the HUD's progress line: the name, then the position being solved (0-based 'index')
+// out of 'count' ("Forks  ·  3 / 6").
+std::string challengeName(const std::string& id);
+std::string challengeProgress(const std::string& id, int index, int count);
 
 // Esc menu of a coach game: Resume, Take back (last move), Offer draw, Claim draw, Resign,
 // Options, Main menu (confirmed). Entries whose flag is false are left out (Resume, Options and
@@ -365,7 +392,8 @@ struct LibrarySetup {
 // The title page also shows the player's Elo (game::settings() [player]) and the New Game page
 // shows it next to the opponent list.
 // The "Watch a Game" entry fills 'watch' (returns StartWatching on its Start), the "Coach" entry
-// fills 'coach' (returns StartCoach on its Start; see CoachSetup), and the "Saved games" entry
+// fills 'coach' (returns StartCoach on its Start, StartChallenge on the Start of its Challenges
+// tab; see CoachSetup), and the "Saved games" entry
 // returns StartReplay on Replay ('library.replay' then names the game; no such entry when
 // library.folder is empty). The "Analysis" entry (after "Saved games") opens the Analysis page:
 // the saved games to choose from, a PGN pasted from the clipboard, the online history when signed

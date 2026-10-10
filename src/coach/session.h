@@ -9,7 +9,9 @@
 //     coach's move: its remarks and threat warnings;
 //   - the takeback offer's answer, the player's takeback requests, draw answers;
 //   - game end: closing words, the handshake (played by the scene), the appraisal (skippable);
-//   - level 0: the lesson's chapters, WaitMove judging, illegal-move explanations, idle hints.
+//   - level 0: the lesson's chapters, WaitMove judging, illegal-move explanations, idle hints;
+//   - a challenge (SessionConfig::challenge): its positions one after the other, the moves judged,
+//     hints on request (coach/challenge_run.h), illegal-move explanations as in the lesson.
 // Engine-free and GL-free: the world is reached through coach::Stage and coach::Analyst.
 #pragma once
 #include "appraisal.h"
@@ -31,6 +33,10 @@ struct SessionConfig {
     std::vector<GameRecord> history;      // earlier coach games, oldest first (suggestLevel)
     bool accuracyExplained = false;       // the appraisal has already explained what accuracy is
     int lessonChapter = 0;                // level 0: resume at this chapter (0 = from the start)
+    // A challenge (coach/challenge.h) instead of a game: its id ("" = none). The level is then
+    // ignored, the human plays White, and nothing is recorded (history() is unchanged).
+    std::string challenge;
+    int challengePosition = 0;            // begin at this position, 0-based (tests, screenshots)
 };
 
 class Session {
@@ -87,6 +93,15 @@ public:
     int suggestedLevel() const;                    // 0 = no suggestion
     int lessonChapter() const;                     // the chapter to resume at
     bool lessonCompleted() const;
+
+    // ---- Challenges ---------------------------------------------------------------------------------
+    bool challengeMode() const;                    // a challenge runs (its id was found)
+    int challengePosition() const;                 // the position played, 0-based
+    int challengePositions() const;
+    bool challengeCompleted() const;               // every position solved
+    bool hintAvailable(const chess::Game& game) const;   // H would give a hint now
+    void onHintRequested(const chess::Game& game);       // H
+    bool offerIsHint() const;                      // the offer card is the hint offer (Yes = a hint)
 
     Director& director();
     const Director& director() const;
