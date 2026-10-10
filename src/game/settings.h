@@ -157,7 +157,7 @@ struct Settings {
     // (Options > Audio > Voice quality: kTtsStepsMin..kTtsStepsMax; each step costs about a fifth
     // of a line's synthesis time at the default) and the kernels' instruction set ("auto", or a cap
     // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
-    static constexpr int kTtsStepsMin = 4, kTtsStepsMax = 10, kTtsStepsDefault = 5;
+    static constexpr int kTtsStepsMin = 4, kTtsStepsMax = 9, kTtsStepsDefault = 5;
     int ttsThreads = 0;
     int ttsVoice = -1;
     int ttsSteps = kTtsStepsDefault;
