@@ -32,7 +32,9 @@ constexpr float kStandSpotZ = 0.70f;        // |z| of the pelvis standing in fro
 constexpr float kStandPelvisY = 0.995f;     // pelvis height of the robot standing, knees almost straight
 constexpr float kSideSpotX = 0.88f;         // |x| of the pelvis at an end of the table
 constexpr float kSideSpotZ = 0.28f;         // |z| of the pelvis there, on the player's own half
-constexpr float kChairSlideMax = 0.36f;     // how far the robot pushes its chair back to stand up
+// How far the robot pushes its chair back to stand up: 0.40 leaves the standing calves ~5 cm in
+// front of the seat edge (0.36 left about 1 cm, the knees being slightly bent).
+constexpr float kChairSlideMax = 0.40f;
 
 struct StanceSpot {
     m::vec3 pelvis;

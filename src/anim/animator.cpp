@@ -1194,7 +1194,10 @@ void Animator::Impl::updateGaze(float dt) {
     // (Angles in the body's yaw frame: a standing robot's body may face anywhere.)
     vec3 headW = bodyToWorld(transformPoint(G[Neck], vec3(0, 0.12f, 0.05f)));
     vec3 dc = rotate(conjugate(bodyWorldQ()), target - headW);
-    float yaw = std::atan2(dc.x, std::max(1e-3f, dc.z));
+    // (A target behind the head is looked at over the shoulder the head is already turned to:
+    // a walking robot turning its back to the board does not swing its head across.)
+    float yaw = std::atan2(dc.x, dc.z);
+    if (std::fabs(yaw) > 0.5f * PI) yaw = clamp(headYaw + wrapPi(yaw - headYaw), -0.5f * PI, 0.5f * PI);
     float pitch = std::atan2(dc.y, length(vec3(dc.x, 0, dc.z)));
     // Head takes most of large rotations, the eyes the rest; standing, the head (and the back)
     // takes more of a look down at the board.

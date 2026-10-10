@@ -52,6 +52,8 @@ constexpr float kWalkSide = 0.080f;       // walking: ankles this far off the pe
 constexpr float kLegSoft = 0.876f;        // hip-ankle distance from which the pelvis comes down a little
 constexpr float kLegMax = 0.8795f;        // ... so it never exceeds this (the leg is 0.88 straight)
 constexpr float kLegPlan = 0.868f;        // what the walk plans for (the knees never lock)
+// The table's legs (their axes, world |x| and |z|: scene/furniture.h, TABLE_LEG_X / TABLE_LEG_Z).
+constexpr float kTableLegX = 0.513f, kTableLegZ = 0.343f;
 
 // Rise (Seated -> Standing), seconds: the hands go to the table edge and push the robot back with
 // its chair while the feet are drawn back under the knees, then it leans forward and rises over
@@ -59,13 +61,14 @@ constexpr float kLegPlan = 0.868f;        // what the walk plans for (the knees 
 // forward from the back first).
 constexpr float kRiseT = 1.60f;
 constexpr float kSitHold = 0.15f;
-constexpr float kPushAt = 0.10f, kPushT = 0.55f;   // the chair slides back
+constexpr float kPushAt = 0.08f, kPushT = 0.70f;   // the chair slides back
 constexpr float kForwardAt = 0.62f, kForwardT = 0.80f;   // the pelvis comes forward over the feet
 constexpr float kUpAt = 0.82f, kUpT = 0.78f;       // and rises
 // Walk: steps every kStepPeriod, each foot swinging kStepSwing (the rest is double support).
 constexpr float kStepPeriod = 0.47f, kStepSwing = 0.36f, kFirstLift = 0.05f, kStepLength = 0.34f;
 constexpr float kWalkSettle = 0.20f;      // after the last landing
 constexpr float kWalkDip = 0.018f;        // pelvis lower while walking (the knees soften)
+constexpr float kWalkTurnT = 1.10f;       // the body turns into the way / to the spot's facing over this long
 
 // Looking down standing: below this pitch, the back takes kLookBack of the rest.
 constexpr float kLookBendFrom = 30.0f * DEG, kLookBack = 0.85f;
@@ -147,6 +150,13 @@ mat4 Animator::Impl::standFoot(int i, vec3 pelvisC, float yaw) const {
     return toMat4(qy(yaw + sx * kToeOut), a);
 }
 
+// A Footstep's position: the sole's centre of a landed foot frame, on the floor (solver world).
+vec3 Animator::Impl::soleOnFloor(const mat4& footC) const {
+    vec3 w = toWorld(transformPoint(footC, vec3(0.0f, -kAnkleY, kSoleZ)));
+    w.y = 0.0f;
+    return w;
+}
+
 void Animator::Impl::seatedFeet(mat4 out[2]) const {
     Pose p;
     applySpine(p, SpineParams());   // (the seated legs do not depend on the spine's flexion)
@@ -159,24 +169,54 @@ void Animator::Impl::seatedFeet(mat4 out[2]) const {
 // =============================================================================================
 // The body at a time
 // =============================================================================================
-mat4 Animator::Impl::footAt(const StanceLeg& L, int i, float lt) const {
+mat4 Animator::Impl::footAt(const StanceLeg& L, int i, float lt, vec3* knee) const {
+    auto ahead = [](const mat4& f) {
+        vec3 d = transformDir(f, vec3(0, 0, 1));
+        d.y = 0.0f;
+        return safeNormalize(d, vec3(0, 0, 1));
+    };
+    auto out = [&](const mat4& f) {
+        if (knee) *knee = ahead(f);
+        return f;
+    };
     mat4 cur = L.foot0[i];
     for (const FootSwing& s : L.steps[i]) {
-        if (lt < s.t0 - kRollOffT || (s.roll <= 0.0f && lt <= s.t0)) return cur;
-        if (lt <= s.t0) return pivotFoot(cur, kBall, s.roll * kRollOff * smootherstep((lt - (s.t0 - kRollOffT)) / kRollOffT));
+        if (lt < s.t0 - kRollOffT || (s.roll <= 0.0f && lt <= s.t0)) return out(cur);
+        if (lt <= s.t0) return out(pivotFoot(cur, kBall, s.roll * kRollOff * smootherstep((lt - (s.t0 - kRollOffT)) / kRollOffT)));
         if (lt < s.t1) {
             // The swing: from the rolled-off foot to the heel strike, a low arc in between.
             const float u = (lt - s.t0) / std::max(1e-4f, s.t1 - s.t0), w = smootherstep(u);
             const mat4 a = pivotFoot(cur, kBall, s.roll * kRollOff), b = pivotFoot(s.to, kHeel, -s.roll * kRollOn);
             vec3 p = lerp(a.translation(), b.translation(), w);
-            p.y += s.lift * bump(u, 0.45f);
+            // The lift grows as u^2 from both ends, the travel as u^3: the foot leaves the floor
+            // before it moves and stops moving before it lands (no sliding on the floor).
+            const float hu = 4.0f * u * (1.0f - u);
+            p.y += s.lift * hu * hu;
+            p += s.side * bump(u, s.sideAt);
             // (The pitch leads the yaw a little: the toes come up early, ready for the strike.)
-            return toMat4(qslerp(rotOf(a), rotOf(b), smootherstep(std::min(1.0f, u * 1.15f))), p);
+            const mat4 f = toMat4(qslerp(rotOf(a), rotOf(b), smootherstep(std::min(1.0f, u * 1.15f))), p);
+            if (knee) {
+                // A swinging knee goes the way the foot travels (a step that turns the foot
+                // towards the table does not throw the knee at it), unless the foot steps back
+                // (the way the body faces).
+                vec3 tr = b.translation() - a.translation();
+                tr.y = 0.0f;
+                const float d = length(tr);
+                vec3 k = ahead(f);
+                if (d > 0.03f) {
+                    const float by = sampleCurve(L.pel, L.rate, lt).w;
+                    tr = tr * (1.0f / d);
+                    const float fw = std::max(0.0f, dot(tr, vec3(std::sin(by), 0.0f, std::cos(by))));
+                    k = safeNormalize(k + tr * (3.0f * hu * hu * fw), k);
+                }
+                *knee = k;
+            }
+            return f;
         }
         cur = s.to;
-        if (s.roll > 0.0f && lt < s.t1 + kRollOnT) return pivotFoot(cur, kHeel, -s.roll * kRollOn * (1.0f - smootherstep((lt - s.t1) / kRollOnT)));
+        if (s.roll > 0.0f && lt < s.t1 + kRollOnT) return out(pivotFoot(cur, kHeel, -s.roll * kRollOn * (1.0f - smootherstep((lt - s.t1) / kRollOnT))));
     }
-    return cur;
+    return out(cur);
 }
 
 Animator::Impl::StanceFrame Animator::Impl::stanceFrame(float t) const {
@@ -191,7 +231,10 @@ Animator::Impl::StanceFrame Animator::Impl::stanceFrame(float t) const {
         if (stanceAt == Stance::Seated) return f;
         f.active = true;
         spotChar(stanceAt, f.pelvis, f.yaw);
-        for (int i = 0; i < 2; ++i) f.foot[i] = standFoot(i, f.pelvis, f.yaw);
+        for (int i = 0; i < 2; ++i) {
+            f.foot[i] = standFoot(i, f.pelvis, f.yaw);
+            f.knee[i] = rotate(qy(f.yaw + (i == 0 ? kToeOut : -kToeOut)), vec3(0, 0, 1));
+        }
         f.pelvis += rotate(qy(f.yaw), vec3(sway(stanceSince, 1e30f), 0.0f, 0.0f));
         f.slide = kChairSlideMax;
         f.standW = 1.0f;
@@ -213,7 +256,7 @@ Animator::Impl::StanceFrame Animator::Impl::stanceFrame(float t) const {
     if (L.kind == StanceLeg::Rise && f.lt < L.seatIn) f.seatW = 1.0f - smootherstep(f.lt / L.seatIn);
     if (L.kind == StanceLeg::Sit && f.lt > L.seatOut) f.seatW = smootherstep((f.lt - L.seatOut) / (L.T - L.seatOut));
     if (L.kind != StanceLeg::Rise) f.pelvis += rotate(qy(f.yaw), vec3(sway(stanceSince, L.start), 0.0f, 0.0f));
-    for (int i = 0; i < 2; ++i) f.foot[i] = footAt(L, i, f.lt);
+    for (int i = 0; i < 2; ++i) f.foot[i] = footAt(L, i, f.lt, &f.knee[i]);
     // At the very ends of a Rise / Sit the body is exactly the seated one.
     if ((L.kind == StanceLeg::Rise && f.lt <= 0.0f) || (L.kind == StanceLeg::Sit && f.lt >= L.T)) f.active = false;
     return f;
@@ -228,7 +271,9 @@ float Animator::Impl::stanceSpine(const StanceFrame& f, SpineParams& sp, float l
     // A look further down than the neck comfortably takes bends the back: mostly from the hips
     // (the pelvis pitches over the legs), the rest in the spine. setLean bends further over the
     // board. Speaking leans in a little, as seated.
-    const float bend = f.standW * kLookBack * std::max(0.0f, -lookPitch - kLookBendFrom);
+    // (A soft start, quadratic over the first 12 degrees: the back does not jerk into motion.)
+    const float x = -lookPitch - kLookBendFrom, k = 12.0f * DEG;
+    const float bend = f.standW * kLookBack * (x <= 0.0f ? 0.0f : x < k ? x * x / (2.0f * k) : x - 0.5f * k);
     const float leanBend = f.standW * kStandLean * lean;
     SpineParams st;
     st.flex = f.spineFlex + 0.40f * bend + idleFlex + 0.022f * speechEnv + 0.02f * speechStress;
@@ -273,8 +318,9 @@ void Animator::Impl::solveLegs(Pose& p, const StanceFrame& f) {
         const float Dc = clamp(D, std::fabs(a - b) + 1e-3f, (a + b) * 0.9999f);
         const float cosA = clamp((a * a + Dc * Dc - b * b) / (2.0f * a * Dc), -1.0f, 1.0f);
         const float sinA = std::sqrt(std::max(0.0f, 1.0f - cosA * cosA));
-        // The knee bends forward along the foot (a little up: seated, the knee is above the line).
-        vec3 pole = transformDir(footB, vec3(0.0f, 0.3f, 1.0f));
+        // The knee bends forward along the foot, or the way a swinging foot travels (a little
+        // up: seated, the knee is above the line).
+        vec3 pole = rotate(conjugate(bodyQ), f.knee[i]) + vec3(0.0f, 0.3f, 0.0f);
         vec3 pp = perp(normalize(pole), u);
         if (length(pp) < 1e-3f) pp = perp(rotate(pel, vec3(0, 0, 1)), u);
         pp = safeNormalize(pp, vec3(0, 0, 1));
@@ -397,10 +443,13 @@ HandSample Animator::Impl::stanceHand(Side s, const StanceFrame& f, const HandSa
             out = k[i];
             out.p = (p1 * 2.0f + (p2 - p0) * v + (p0 * 2.0f - p1 * 5.0f + p2 * 4.0f - p3) * v2 + (p1 * 3.0f - p0 - p2 * 3.0f + p3) * v3) * 0.5f;
             // Leaving or reaching the table / the seated hand: up a little on the way (no finger
-            // drags over the cloth).
-            const bool low = m->path[i] == HandPose::Table || m->path[i] == HandPose::Seat || m->path[i + 1] == HandPose::Table ||
-                             m->path[i + 1] == HandPose::Seat;
-            if (low) out.p.y += 0.025f * bump(v, 0.45f);
+            // drags over the cloth); between the table and a thigh, up early off the table (late
+            // onto it), the wrist and forearm well clear of its edge.
+            const HandPose a = m->path[i], b = m->path[i + 1];
+            if ((a == HandPose::Table && b == HandPose::Thigh) || (a == HandPose::Thigh && b == HandPose::Table))
+                out.p.y += 0.045f * bump(v, a == HandPose::Table ? 0.32f : 0.68f);
+            else if (a == HandPose::Table || a == HandPose::Seat || b == HandPose::Table || b == HandPose::Seat)
+                out.p.y += 0.025f * bump(v, 0.45f);
             const float w = smootherstep(v);
             out.q = qslerp(k[i].q, k[i + 1].q, w);
             out.f = fpLerp(k[i].f, k[i + 1].f, w);
@@ -443,7 +492,7 @@ void Animator::Impl::planRiseSit(StanceLeg& L, bool sit) {
         const float slide = slideAt(r);
         // The pelvis rides back with the chair, comes forward over the feet and rises. While the
         // hips pitch forward on the seat they come up a little (the buttocks roll forward).
-        const float hip = rise(r, 0.50f, 1.00f, kRiseT, 0.62f);
+        const float hip = rise(r, 0.32f, 1.00f, kRiseT, 0.62f);
         vec3 p(spot.x * ramp(r, kForwardAt, kForwardT), spot.y * ramp(r, kUpAt, kUpT),
                -slide + (spot.z + S) * ramp(r, kForwardAt, kForwardT));
         p.y += 0.022f * std::sin(std::min(hip, 0.62f)) * (1.0f - ramp(r, kUpAt, 0.3f));
@@ -461,7 +510,7 @@ void Animator::Impl::planRiseSit(StanceLeg& L, bool sit) {
         sw.lift = 0.035f;
         L.foot0[i] = sit ? standF[i] : seatF[i];
         L.steps[i].push_back(sw);
-        TimedEvent e{sw.t1, EventType::Footstep, ActNone, false, true, toWorld(transformPoint(sw.to, vec3(0, -kAnkleY, kSoleZ)))};
+        TimedEvent e{sw.t1, EventType::Footstep, ActNone, false, true, soleOnFloor(sw.to)};
         L.events.push_back(e);
     }
     // The chair: pushed back (Rise) / drawn in (Sit) from the seat's centre.
@@ -478,7 +527,7 @@ void Animator::Impl::planRiseSit(StanceLeg& L, bool sit) {
         const float d = hi == 0 ? 0.03f : 0.0f;
         struct M { float r0, r1; std::vector<HandPose> path; };
         const M rm[3] = {{0.0f + d, 0.24f + d, {HandPose::Seat, HandPose::Table}},
-                         {0.42f + d, 0.76f + d, {HandPose::Table, HandPose::Thigh}},
+                         {0.36f + d, 0.72f + d, {HandPose::Table, HandPose::Thigh}},
                          {1.08f, kRiseT, {HandPose::Thigh, HandPose::Side, HandPose::BackSide, HandPose::Behind}}};
         for (const M& m : rm) {
             HandMove hm;
@@ -510,18 +559,20 @@ void Animator::Impl::planWalk(StanceLeg& L, Stance from, Stance to) {
     spotChar(to, P1, yaw1);
     // The way round the table corner (character space, the robot's left end; mirrored for the
     // right end): along the front of the chair, a little towards the table to keep the calves
-    // clear of the seat's front edge, past the corner, then towards the end of the table.
+    // clear of the seat's front edge, past the corner, then towards the end of the table. Back
+    // from the end, the robot first turns away from the table and steps out round the corner
+    // (the foot it had on the table's side then never swings past the table leg).
     const Stance side = from == Stance::Standing ? to : from;
     vec3 sideP;
     float sideYaw;
     spotChar(side, sideP, sideYaw);
     const float s = sideP.x >= 0.0f ? 1.0f : -1.0f;
     std::vector<vec3> pts = {P0};
-    const vec3 via[3] = {vec3(s * 0.30f, 0.0f, -0.050f), vec3(s * 0.64f, 0.0f, -0.040f), vec3(s * 0.85f, 0.0f, 0.110f)};
-    if (from == Stance::Standing)
-        for (const vec3& v : via) pts.push_back(v);
-    else
-        for (int i = 2; i >= 0; --i) pts.push_back(via[i]);
+    if (from == Stance::Standing) {
+        for (vec3 v : {vec3(0.30f, 0.0f, -0.035f), vec3(0.66f, 0.0f, -0.045f), vec3(0.87f, 0.0f, 0.100f)}) pts.push_back(vec3(s * v.x, 0.0f, v.z));
+    } else {
+        for (vec3 v : {vec3(0.94f, 0.0f, 0.070f), vec3(0.66f, 0.0f, -0.055f), vec3(0.30f, 0.0f, -0.035f)}) pts.push_back(vec3(s * v.x, 0.0f, v.z));
+    }
     pts.push_back(P1);
     for (vec3& p : pts) p.y = 0.0f;
     // Dense polyline along a centripetal Catmull-Rom through the points, with its arc length.
@@ -573,26 +624,51 @@ void Animator::Impl::planWalk(StanceLeg& L, Stance from, Stance to) {
         }
         for (float& p : prog) p = acc > 0.0f ? p / acc * len : 0.0f;
     }
-    // Body yaw: from the start's towards the way's direction, and to the end's over the last steps.
+    // Body yaw: from the start's towards the way ahead, and to the end's over the last steps.
+    // The way ahead is the chord to a point 30 cm further on (the body turns once into a bend
+    // instead of following each of its wiggles) and the yaw is smoothed over ~0.25 s: the
+    // polyline's own corners would make the body (and the first person camera) judder.
     std::vector<float> tangent(static_cast<size_t>(n));
     {
         float prev = yaw0;
         for (int k = 0; k < n; ++k) {
-            vec3 d;
-            along(std::max(prog[size_t(k)], 0.02f), &d);
-            const float a = wrapNear(std::atan2(d.x, d.z), prev);
-            tangent[size_t(k)] = a;
-            prev = a;
+            const float b = std::min(len, prog[size_t(k)] + 0.30f), a = std::max(0.0f, b - 0.35f);
+            const vec3 d = along(b, nullptr) - along(a, nullptr);
+            const float h = wrapNear(std::atan2(d.x, d.z), prev);
+            tangent[size_t(k)] = h;
+            prev = h;
         }
     }
     const float endYaw = wrapNear(yaw1, tangent.back());
     L.pel.resize(size_t(n));
+    std::vector<float> yaws(static_cast<size_t>(n));
     for (int k = 0; k < n; ++k) {
         const float t = float(k) / L.rate;
-        float yaw = lerp(yaw0, tangent[size_t(k)], ramp(t, 0.0f, 0.60f));
-        yaw = lerp(yaw, endYaw, ramp(t, Tw - 0.80f, 0.80f));
+        const float yaw = lerp(yaw0, tangent[size_t(k)], ramp(t, 0.0f, kWalkTurnT));
+        yaws[size_t(k)] = lerp(yaw, endYaw, ramp(t, Tw - kWalkTurnT, kWalkTurnT));
+    }
+    {
+        const int w = std::max(1, int(0.08f * L.rate));
+        std::vector<float> sm(yaws.size());
+        for (int k = 0; k < n; ++k) {
+            float acc = 0.0f, wsum = 0.0f;
+            for (int j = -3 * w; j <= 3 * w; ++j) {
+                const float g = std::exp(-0.5f * float(j * j) / float(w * w));
+                acc += g * yaws[size_t(std::min(n - 1, std::max(0, k + j)))];
+                wsum += g;
+            }
+            sm[size_t(k)] = acc / wsum;
+        }
+        // The ends exactly on the spots' yaws.
+        const float e0 = yaw0 - sm.front(), e1 = endYaw - sm.back();
+        for (int k = 0; k < n; ++k) {
+            const float t = float(k) / L.rate;
+            yaws[size_t(k)] = sm[size_t(k)] + e0 * (1.0f - ramp(t, 0.0f, 0.3f)) + e1 * ramp(t, L.T - 0.35f, 0.3f);
+        }
+    }
+    for (int k = 0; k < n; ++k) {
         const vec3 p = along(prog[size_t(k)], nullptr);
-        L.pel[size_t(k)] = vec4(p.x, 0.0f, p.z, yaw);
+        L.pel[size_t(k)] = vec4(p.x, 0.0f, p.z, yaws[size_t(k)]);
     }
     auto pelAt = [&](float t) { return sampleCurve(L.pel, L.rate, t); };
     // Feet.
@@ -623,7 +699,7 @@ void Animator::Impl::planWalk(StanceLeg& L, Stance from, Stance to) {
         sw.lift = 0.045f;
         sw.roll = (k == 0 || k >= nSteps - 1) ? 0.4f : 1.0f;
         L.steps[i].push_back(sw);
-        TimedEvent e{sw.t1, EventType::Footstep, ActNone, false, true, toWorld(transformPoint(sw.to, vec3(0, -kAnkleY, kSoleZ)))};
+        TimedEvent e{sw.t1, EventType::Footstep, ActNone, false, true, soleOnFloor(sw.to)};
         L.events.push_back(e);
     }
     // Pelvis height: lower while walking, and wherever a leg would have to stretch, low enough
@@ -679,6 +755,71 @@ void Animator::Impl::planWalk(StanceLeg& L, Stance from, Stance to) {
     L.hand0 = HandPose::Behind;
 }
 
+// A swinging foot goes straight from where it lifts to where it lands; on a turn that line can
+// pass the planted foot too close or on its far side (the legs would cross). Where it does, the
+// swing makes a sideways detour on its own side (the body's side of that foot), largest where
+// it passes the planted ankle.
+void Animator::Impl::clearSwings(StanceLeg& L) const {
+    constexpr float kClear = 0.13f;   // ankle to ankle, sideways, as the feet pass
+    for (int i = 0; i < 2; ++i) {
+        const float sx = i == 0 ? 1.0f : -1.0f;
+        mat4 cur = L.foot0[i];
+        for (FootSwing& s : L.steps[i]) {
+            const float mid = 0.5f * (s.t0 + s.t1);
+            const vec3 A = cur.translation(), B = s.to.translation(), C = footAt(L, 1 - i, mid).translation();
+            vec3 l = transformDir(cur, vec3(sx, 0, 0)) + transformDir(s.to, vec3(sx, 0, 0));
+            l.y = 0.0f;
+            l = safeNormalize(l, vec3(sx, 0, 0));
+            vec3 AB = B - A;
+            AB.y = 0.0f;
+            const float len2 = dot(AB, AB);
+            const float u = len2 > 1e-8f ? clamp(dot(vec3(C.x - A.x, 0, C.z - A.z), AB) / len2, 0.0f, 1.0f) : 0.5f;
+            const vec3 P = A + AB * u;
+            const float lat = dot(vec3(P.x - C.x, 0, P.z - C.z), l);
+            if (lat < kClear) {
+                s.side = l * std::min(0.10f, kClear - lat);
+                // The swing's time at which the (smootherstep) progress reaches u.
+                float lo = 0.0f, hi = 1.0f;
+                for (int k = 0; k < 24; ++k) {
+                    const float m = 0.5f * (lo + hi);
+                    (smootherstep(m) < u ? lo : hi) = m;
+                }
+                s.sideAt = clamp(0.5f * (lo + hi), 0.3f, 0.7f);
+            }
+            // The table legs: the foot (ankle to toe) keeps clear of them, swinging out round one
+            // it would brush (the step leaving an end of the table passes the corner's leg).
+            constexpr float kLegClear = 0.105f;   // leg centre to the foot's axis
+            float worst = kLegClear, worstU = 0.5f;
+            vec3 away(0.0f);
+            for (float lx : {-kTableLegX, kTableLegX})
+                for (float lz : {-kTableLegZ, kTableLegZ}) {
+                    const vec3 leg = toChar(vec3(lx, 0.0f, lz));
+                    for (int k = 1; k < 20; ++k) {
+                        const float u = float(k) / 20.0f;
+                        const mat4 f = footAt(L, i, s.t0 + u * (s.t1 - s.t0));
+                        const vec3 an = f.translation(), toe = transformPoint(f, vec3(0.0f, 0.0f, 0.15f));
+                        vec3 at = an, d = toe - an;
+                        d.y = 0.0f;
+                        const float dl2 = dot(d, d);
+                        if (dl2 > 1e-8f) at = an + d * clamp(dot(vec3(leg.x - an.x, 0, leg.z - an.z), d) / dl2, 0.0f, 1.0f);
+                        vec3 off(at.x - leg.x, 0.0f, at.z - leg.z);
+                        const float dist = length(off);
+                        if (dist < worst) {
+                            worst = dist;
+                            worstU = u;
+                            away = safeNormalize(off, vec3(1, 0, 0));
+                        }
+                    }
+                }
+            if (worst < kLegClear) {
+                s.side = s.side + away * (kLegClear - worst) * 1.15f;
+                s.sideAt = clamp(worstU, 0.3f, 0.7f);
+            }
+            cur = s.to;
+        }
+    }
+}
+
 // =============================================================================================
 // The leg machine
 // =============================================================================================
@@ -697,6 +838,7 @@ void Animator::Impl::startLeg(Stance to) {
         L->kind = StanceLeg::Walk;
         planWalk(*L, stanceAt, to);
     }
+    clearSwings(*L);
     for (TimedEvent& e : L->events) e.t += time;
     leg = L;
     if (debugLog) LOGI("anim: stance %d -> %d (%.2f s) at t=%.3f", int(L->from), int(L->to), L->T, time);
@@ -738,10 +880,15 @@ void Animator::Impl::stepStance(std::vector<Event>& ev) {
         leg.reset();
         stanceSince = time;
         if (stanceAt == stanceTarget) {
+            // ('position': the floor under the pelvis.)
+            vec3 pc;
+            float yaw;
+            spotChar(stanceAt, pc, yaw);
             Event e;
             e.type = EventType::StanceReached;
             e.time = time;
             e.tag = int(stanceAt);
+            e.position = toWorld(vec3(pc.x, -pelvisWorld.y, pc.z));
             ev.push_back(e);
         }
         if (stanceAt == Stance::Seated && stanceTarget == Stance::Seated && penPutForStance) {

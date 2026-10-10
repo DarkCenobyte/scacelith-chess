@@ -1646,6 +1646,8 @@ struct Animator::Impl {
         mat4 to;                   // the flat foot frame it lands on (character space)
         float lift = 0.035f;       // height of the arc
         float roll = 0.0f;         // walking: heel off before the lift, heel strike (fraction of the full roll)
+        vec3 side{0, 0, 0};        // sideways detour round the planted foot (character space, at its peak)
+        float sideAt = 0.5f;       // swing time (0..1) of the detour's peak
     };
     struct StanceLeg {
         enum Kind { Rise, Sit, Walk } kind = Rise;
@@ -1671,6 +1673,7 @@ struct Animator::Impl {
         float standW = 0.0f;       // 0 seated .. 1 standing (a look down bends the back, wider head range)
         float seatW = 1.0f;        // weight of the seated spine, legs and hands (Rise start / Sit end)
         mat4 foot[2];              // foot bones (character space)
+        vec3 knee[2];              // where the knees bend towards (character space, horizontal)
         const StanceLeg* leg = nullptr;
         float lt = 0.0f;           // time in the leg
     };
@@ -1686,12 +1689,16 @@ struct Animator::Impl {
     void spotChar(Stance s, vec3& pelvisC, float& yaw) const;
     mat4 standFoot(int i, vec3 pelvisC, float yaw) const;   // foot i of a robot standing still
     void seatedFeet(mat4 out[2]) const;                      // the feet of the seated pose
-    mat4 footAt(const StanceLeg& L, int i, float lt) const;
+    vec3 soleOnFloor(const mat4& footC) const;               // a Footstep's position (solver world)
+    // Foot i's frame at leg time lt; 'knee' (optional): the direction its knee bends towards
+    // (character space, horizontal).
+    mat4 footAt(const StanceLeg& L, int i, float lt, vec3* knee = nullptr) const;
     bool nextStanceBoundary(float& t) const;
     void stepStance(std::vector<Event>& ev);                 // ends the leg due at 'time', starts the next
     void startLeg(Stance to);
     void planRiseSit(StanceLeg& L, bool sit);
     void planWalk(StanceLeg& L, Stance from, Stance to);
+    void clearSwings(StanceLeg& L) const;                    // swings pass the planted foot on their own side
     void fireStanceDue(float upTo, std::vector<Event>& ev);
     // Spine, pelvis and legs of a robot out of its seat (evaluate): blends the seated spine
     // params towards the stance's, returns the extra hip flexion; solveLegs puts the feet on
