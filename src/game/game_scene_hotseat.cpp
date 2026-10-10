@@ -12,7 +12,10 @@
 //     turns to that player's own look (each seat keeps its yaw, pitch and lean).
 //   - Scoresheets: each player writes their own sheet in their own hand. The mover records the
 //     move at once; the next player records it once the view has reached them, unless they touch
-//     a piece first: it is then written after their own move.
+//     a piece first: it is then written after their own move. This hold (setHotSeatHold) adds to
+//     the one of a player standing (syncWritingHold): a sheet writes when neither holds it.
+//   - Standing up (the arrow keys) is the player to move's; they sit down again to play, so the
+//     view always goes over from a seated player to a seated one.
 //   - Draw offers go with a move (FIDE 9.1.2): offered from the Esc menu, shown to the opponent as
 //     a card when the view reaches them, declined by touching a piece. Resignation (Esc menu) is
 //     the player to move's, confirmed with their name.
@@ -238,7 +241,7 @@ void GameScene::updateHotSeatTurn(float dt) {
             // released when this player's move is completed, completeMove).
             writeGrace_ = 0.0f;
         } else if (writeGrace_ <= 0.0f) {
-            scorekeeper_.setHold(inputSeat(), false);  // records the opponent's move now
+            setHotSeatHold(inputSeat(), false);  // records the opponent's move now (once seated)
         }
     }
 }
@@ -249,6 +252,7 @@ void GameScene::updateScript(float dt) {
     if (scriptPos_ >= script_.size() && scriptThenPos_ >= scriptThen_.size()) return;
     if (hotSeat() && handover_.active()) return;
     if (anim_[inputSeat()].busy()) return;
+    if (!seatMayPlay(inputSeat())) return;   // the scripted player is standing: no move, no menu
     if (coach() && !coachMayTouch()) return;  // the coach has the floor (or its hands the table)
     if (scriptPos_ >= script_.size()) {
         // --play-then: the player opens the Esc menu and picks the next choice (menuChoice).

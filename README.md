@@ -42,6 +42,14 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   or **C**: look at the board again.
 - **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
   **C** or a look around).
+- **Up arrow**: stand up in front of your chair and look down at the board. **Left / Right
+  arrow**: walk round to that end of the table (your own left and right) and look at the board
+  from the side; the arrows take you from one spot to another without sitting down. **Down
+  arrow**: sit back down. You can get up on either player's turn once your hand is free (not
+  with a piece in hand). Only a seated player plays: standing, you cannot touch a piece or press
+  the clock, your scoresheet waits, and the clock keeps running. The look around, the lean and
+  **C** still work. At the end of a game everyone sits back down for the handshake. Online, your
+  opponent sees your robot get up, and you see theirs.
 - **Tab**: move list. **Esc**: menu (offer or claim a draw, resign, options).
 
 At the table the game draws its own pointer, which shows what a click will do: a gold ring over a
@@ -412,7 +420,9 @@ normal game), `--handover-preview` (watching through the players' eyes with the 
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
 `--warp <seconds>` (with `--shot`: simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
-up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
+up at the opponent), `--glance` (start looking at the scoresheet), `--stance
+standing|side-left|side-right` (the player gets up once the game is played and the `--play` moves
+are made), `--calibrate` (the brightness
 calibration before the title page, as on a first start) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name

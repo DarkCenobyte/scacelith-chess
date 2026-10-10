@@ -132,6 +132,11 @@ bool GameScene::init(AppContext& ctx) {
             mouseOverridePos_ = vec2(float(std::atof(c[0].c_str())), float(std::atof(c[1].c_str())));
         }
     }
+    // --stance standing|side-left|side-right: the player gets up once the game is played.
+    if (ctx.hasArg("--stance")) {
+        stanceArgPending_ = stance::parseStanceArg(ctx.argValue("--stance"), stanceArg_);
+        if (!stanceArgPending_) LOGW("--stance: '%s' is not standing, side-left or side-right", ctx.argValue("--stance").c_str());
+    }
 
     Settings& s = settings();
     setup_.difficulty = s.difficultyPreset;
@@ -582,6 +587,11 @@ void GameScene::setupNewGame() {
         anim_[aiSeat()].setHeadOverride(false);
     }
     for (Look& l : look_) l = Look();
+    // Everyone is seated at a new game (the animators were set up again above).
+    for (bool& h : hotSeatHold_) h = false;
+    stoodThisGame_ = false;
+    sitNotice_.reset();
+    busyNotice_.reset();
     cameraCut_ = true;
     handover_.cancel();
     inputGate_.reset();
@@ -790,6 +800,14 @@ void GameScene::endGame() {
     }
     // So is the online opponent's piece held live (a move they put down is taken back).
     if (online()) cancelRemoteLive();
+    // Whatever ended the game, a player standing sits back down by themselves: the result is
+    // written and the hands shaken from the chairs (the end handshake waits for both, simulate).
+    // The scoresheets' holds are lifted by finishGame below.
+    if (online()) stanceTracker_.reset();
+    for (int seat = 0; seat < 2; ++seat) {
+        hotSeatHold_[seat] = false;
+        setSeatStance(seat, anim::Stance::Seated);
+    }
     clock_.stop();
     turn_ = Turn::None;
     state_ = State::GameOver;
@@ -1200,13 +1218,16 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     default: break;
     }
+    // The arrow keys: get up, go to an end of the table, sit back down (every mode with a player
+    // at the table, either player's turn).
+    updateStanceInput();
     if (online() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
         drawOnlineHud();
     if (hotSeat() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
         drawHotSeatHud();
-    if (!isHumanTurn() || (hotSeat() && inputBlocked_)) {
-        // Nobody aims: the opponent's turn, or (hot-seat) the view going over to the next player
-        // and the buttons still held by the previous one.
+    if (!isHumanTurn() || (hotSeat() && inputBlocked_) || !seatMayPlay(inputSeat())) {
+        // Nobody aims: the opponent's turn, (hot-seat) the view going over to the next player
+        // and the buttons still held by the previous one, or the player standing.
         hoverId_ = -1;
         aimSq_ = NoSquare;
         clockHover_ = false;
@@ -1311,8 +1332,10 @@ void GameScene::simulate(float dt) {
         if (state_ != State::GameOver) break;
         // The result is written and the pens laid down first (a writing hand may be the right one).
         // The coach shakes hands once its closing words are said (Session::handshakeWanted).
+        // A player who stood sits back down first (endGame), so both shake hands from their chairs.
         if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy() &&
-            !anim_[0].writingBusy() && !anim_[1].writingBusy() && (!coach() || coachHandshakeWanted())) {
+            !anim_[0].writingBusy() && !anim_[1].writingBusy() && anim_[0].seated() && anim_[1].seated() &&
+            (!coach() || coachHandshakeWanted())) {
             anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
             h0.partner = &anim_[1];
             h1.partner = &anim_[0];
@@ -1332,6 +1355,13 @@ void GameScene::simulate(float dt) {
     float leverSpeed = 1.0f / 0.07f;
     leverSide_ += clamp(leverTarget_ - leverSide_, -leverSpeed * dt, leverSpeed * dt);
 
+    // Only a game being played has players standing: once it is over (whatever ended it, an online
+    // GameEnd waiting for the last move included), on the way to the menu or to the next game,
+    // both robots sit back down; the end handshake waits for them.
+    if (state_ != State::Loading && (state_ != State::Playing || (online() && endPending_)))
+        for (int seat = 0; seat < 2; ++seat)
+            if (anim_[seat].stanceTarget() != anim::Stance::Seated) setSeatStance(seat, anim::Stance::Seated);
+
     // Characters (frozen while the game is paused).
     bool frozen = paused_ && state_ == State::Playing && !online();
     bool firstPerson = state_ != State::Menu && state_ != State::Loading && state_ != State::FadeToGame;
@@ -1349,6 +1379,9 @@ void GameScene::simulate(float dt) {
             anim_[seat].update(dt, events_);
             handleEvents(seat, events_);
         }
+        // A robot back in its chair catches up with its scoresheet; one the animator sent back to
+        // its chair by itself (a task queued for its hands) holds it until seated.
+        for (int seat = 0; seat < 2; ++seat) syncWritingHold(seat);
         scorekeeper_.update();
     }
     // Coach mode: the session, the coach's voice and body, its hands on the table.
@@ -1437,11 +1470,16 @@ void GameScene::updatePlaying(float dt) {
                     int seat = inputSeat();
                     anim_[seat].enqueue(task(anim::TaskType::Retract));
                     completeMove(seat);
-                } else if (pressQueued_) {
+                } else if (pressQueued_ && seatMayPlay(inputSeat())) {
                     humanPressClock();
                 }
             }
         }
+        break;
+    case Turn::HumanPlaced:
+        // A press queued while the player could not press (standing, which the hands' work never
+        // leaves them doing: a safety net) goes once they are back in their chair.
+        if (pressQueued_ && !untimed() && seatMayPlay(inputSeat())) humanPressClock();
         break;
     case Turn::HumanPromotion: {
         if (paused_) break;
@@ -1494,9 +1532,93 @@ void GameScene::updatePlaying(float dt) {
 // Human player
 // =============================================================================================
 
+// ---- standing up (stance_control.h) ----
+
+bool GameScene::seatMayPlay(int seat) const {
+    const anim::Animator& a = anim_[seat & 1];
+    return stance::mayPlay(a.seated(), a.stanceTarget());
+}
+
+void GameScene::setSeatStance(int seat, anim::Stance target) {
+    seat &= 1;
+    if (anim_[seat].stanceTarget() != target) anim_[seat].setStance(target);
+    syncWritingHold(seat);
+}
+
+void GameScene::syncWritingHold(int seat) {
+    seat &= 1;
+    scorekeeper_.setHold(seat, stance::holdWriting(anim_[seat].seated(), anim_[seat].stanceTarget(), hotSeatHold_[seat]));
+}
+
+void GameScene::setHotSeatHold(int seat, bool hold) {
+    hotSeatHold_[seat & 1] = hold;
+    syncWritingHold(seat);
+}
+
+void GameScene::noticeSitToPlay() {
+    if (sitNotice_.allow(time_)) ui::notify(i18n::tr("notify.stance.sit_to_play"), 3.0f);
+}
+
+void GameScene::updateStanceInput() {
+    int seat = firstPersonSeat();
+    if (seat < 0 || state_ != State::Playing) return;
+    const plat::Input& in = plat::input();
+    stance::KeyContext c;
+    c.firstPerson = true;
+    c.turn = turn_;
+    c.target = anim_[seat].stanceTarget();
+    // --stance (screenshots): once the scripted moves are made, as the key would (no notice).
+    if (stanceArgPending_ && scriptPos_ >= script_.size() && !paused_ && !(hotSeat() && handover_.active()) &&
+        stance::handsFree(turn_)) {
+        stanceArgPending_ = false;
+        stoodThisGame_ = true;
+        setSeatStance(seat, stanceArg_);
+        LOGI("--stance: seat %d asks for stance %d", seat, int(stanceArg_));
+    }
+    // The keyboard is the game's: no Esc menu, no field or dialog holding it (ui::wantsKeyboard),
+    // no card waiting for the player's answer (a draw offer), no hot-seat handover nor the buttons
+    // of the previous turn still held, an online game not ending and its report dialog closed.
+    bool cardUp = (hotSeat() && drawCardFor_ >= 0 && drawCardFor_ == inputSeat()) || (online() && drawOffered_);
+    c.playing = !paused_ && !ui::wantsKeyboard() && !cardUp && !(hotSeat() && (handover_.active() || inputBlocked_)) &&
+                !(online() && (reportOpen_ || endPending_ || og_.status != 0));
+    using stance::Key;
+    Key key = in.keyPressed[plat::KEY_DOWN]    ? Key::Down
+              : in.keyPressed[plat::KEY_UP]    ? Key::Up
+              : in.keyPressed[plat::KEY_LEFT]  ? Key::Left
+              : in.keyPressed[plat::KEY_RIGHT] ? Key::Right
+                                               : Key::None;
+    stance::Decision d = stance::decide(key, c);
+    if (d.verdict == stance::Verdict::HandsBusy) {
+        if (busyNotice_.allow(time_)) ui::notify(i18n::tr("notify.stance.finish_move"), 3.0f);
+        return;
+    }
+    if (d.verdict != stance::Verdict::Change) return;
+    setSeatStance(seat, d.target);
+    LOGI("Stance: seat %d asks for stance %d", seat, int(d.target));
+    if (d.target != anim::Stance::Seated && !stoodThisGame_) {
+        // The first time in a game: the clock does not wait, and how to get back.
+        stoodThisGame_ = true;
+        ui::notify(i18n::tr(untimed() ? "notify.stance.first_untimed" : "notify.stance.first"), 5.0f);
+    }
+}
+
 void GameScene::updateHumanInput() {
     const plat::Input& in = plat::input();
     Ray ray = mouseRay();
+    if (!seatMayPlay(inputSeat())) {
+        // Only a seated player plays: standing (or asked to get up), nothing on the board or the
+        // clock answers. A try at it (a click on a piece or the clock, Space) gets a reminder.
+        hoverId_ = -1;
+        aimSq_ = NoSquare;
+        aimLegal_ = false;
+        clockHover_ = false;
+        pressTouched_ = false;
+        bool space = in.keyPressed[plat::KEY_SPACE] && !ui::wantsKeyboard() && !coach();   // the coach's Space skips its words
+        bool click = in.mousePressed[plat::MOUSE_LEFT] && !ui::wantsMouse() && !dragging_ &&
+                     (pickPiece(ray) >= 0 || (!untimed() && world_.rayHitsClock(ray)));
+        if (space || click) noticeSitToPlay();
+        return;
+    }
     float tPiece = 1e30f;
     int pid = pickPiece(ray, &tPiece);
     PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
@@ -1727,6 +1849,8 @@ void GameScene::humanPressClock() {
     }
     if (turn_ != Turn::HumanPlaced) return;
     int seat = inputSeat();
+    // Standing, the hand does not reach the clock (a press queued stays queued, updatePlaying).
+    if (!seatMayPlay(seat)) return;
     int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
     anim_[seat].enqueue({task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)), task(anim::TaskType::Retract)});
     pressQueued_ = false;
@@ -2034,6 +2158,11 @@ void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
         case anim::EventType::HandshakeClasp:
             if (seat == 0) audio::play(audio::Sfx::Handshake, vec3(0, layout::BOARD_TOP_Y + 0.22f, 0), 0.9f);
             break;
+        // Standing up and walking round the table: soft steps on the marble, the chair's legs
+        // sliding over the floor (drawn in again a little higher: the push and the pull differ).
+        case anim::EventType::Footstep: audio::play(audio::Sfx::Footstep, e.position, 0.8f); break;
+        case anim::EventType::ChairPushed: audio::play(audio::Sfx::ChairSlide, e.position, 0.9f, 1.0f); break;
+        case anim::EventType::ChairPulled: audio::play(audio::Sfx::ChairSlide, e.position, 0.75f, 1.06f); break;
         default: break;
         }
     }
@@ -2096,8 +2225,8 @@ void GameScene::completeMove(int seat) {
         if (hotSeat()) {
             // The mover records their move at once (after the opponent's, if that one waited);
             // the next player records it once the view has reached them (updateHotSeatTurn).
-            scorekeeper_.setHold(seat, false);
-            scorekeeper_.setHold(1 - seat, true);
+            setHotSeatHold(seat, false);
+            setHotSeatHold(1 - seat, true);
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         // Coach mode: the player's move and the coach's reply stay off the sheets until the
@@ -2276,6 +2405,22 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     int seat = firstPersonSeat();
     if (seat < 0) return;
     Look& L = look_[seat];
+    // Standing (stance_control.h): the base look, straight ahead and down at the board from the
+    // chair, turns to the board's centre from wherever the eyes are as the robot leaves its chair
+    // (in the body's frame: the robot faces the board from every spot, setHeadOverride's angles
+    // are relative to it), and back as it sits down. The look's own offsets (right button, C, the
+    // pointer's drift) apply on top of it, and a standing look goes further down (the animator
+    // bends the back). Not seated, or asked to get up: no glance at the scoresheet, no look-up band.
+    const anim::Animator& body = anim_[seat];
+    L.standBlend = stance::advanceLookBlend(L.standBlend, !body.seated(), dt);
+    stance::Angles seatedLook{0.0f, kBaseGazePitch}, boardLook = seatedLook;
+    if (L.standBlend > 0.0f) {
+        vec3 toBoard = vec3(0.0f, layout::BOARD_TOP_Y, 0.0f) - body.eyeCameraTransform().c[3].xyz();
+        boardLook = stance::bodyAngles(rotate(conjugate(body.pose().rootRotation), toBoard));
+    }
+    const stance::Angles base = stance::baseLook(seatedLook, boardLook, L.standBlend);
+    const bool standing = !seatMayPlay(seat);
+    if (standing) glance_ = false;
     // Hot-seat: nobody looks around during the handover or with a button held from the previous turn.
     bool handingOver = hotSeat() && handover_.active();
     bool canLook = (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake || state_ == State::GameOver) &&
@@ -2300,13 +2445,14 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
             glance_ = false;
         }
         if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
-        // S: a look at your own scoresheet, out of sight on the table beside you, and back.
-        if (!watching() && in.keyPressed['S'] && keys) glance_ = !glance_;
+        // S: a look at your own scoresheet, out of sight on the table beside you, and back (from
+        // the chair only).
+        if (!watching() && in.keyPressed['S'] && keys && !standing) glance_ = !glance_;
     }
     if (dragging_ && glanceBlend_ > 0.0f) {
         // Looking around from the scoresheet starts from where the eyes are.
-        L.yaw = L.gazeYaw;
-        L.pitch = L.gazePitch - kBaseGazePitch;
+        L.yaw = L.gazeYaw - base.yaw;
+        L.pitch = L.gazePitch - base.pitch;
         glance_ = false;
         glanceBlend_ = 0.0f;
     }
@@ -2321,14 +2467,16 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
         L.pitch -= in.mouseDY * k * (s.invertLook ? -1.0f : 1.0f);
     }
     L.yaw = clamp(L.yaw, -1.45f, 1.45f);
-    L.pitch = clamp(L.pitch, -1.1f - kBaseGazePitch, 0.75f - kBaseGazePitch);
+    L.pitch = clamp(L.pitch, stance::pitchMin(L.standBlend) - base.pitch, stance::kPitchMax - base.pitch);
     // The gaze drifts a little towards the cursor, like eyes following the hand; not while a piece
     // is in hand, when the board must stay still under the pointer that aims at a square, nor
     // during a hot-seat handover. At the top of the window it rises to the opponent's face
     // (look_up.h): once the pointer has been below the band since the look was last reset (a new
     // game, a turn, a look with the right button, C), so that a pointer left there does not lift
     // the view, and not with a menu or a card under the pointer. --mouse (screenshots) arms it.
+    // The band is measured for a seated player: none while the look is not the seated one.
     float cx = 0.0f, cy = 0.0f, up = 0.0f;
+    const bool seatedLookOnly = L.standBlend <= 0.0f;
     bool aiming = turn_ == Turn::HumanTouched || turn_ == Turn::HumanPlacing;
     bool pointer = mouseOverride_ || (in.mouseInWindow && !ctx_->screenshotMode);
     if (!dragging_ && !aiming && !handingOver && pointer && plat::width() > 0) {
@@ -2337,14 +2485,14 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
         cx = clamp(c.x / float(plat::width()) - 0.5f, -0.5f, 0.5f);
         cy = clamp(v - 0.5f, -0.5f, 0.5f);
         if (v > lookUpBandStart(L.pitch) || mouseOverride_) L.lookUpArmed = true;
-        if (L.lookUpArmed && canLook && !uiBlocks && !ui::wantsMouse()) up = lookUpWeight(v, L.pitch);
+        if (L.lookUpArmed && canLook && !uiBlocks && !ui::wantsMouse() && seatedLookOnly) up = lookUpWeight(v, L.pitch);
     }
-    float targetYaw = L.yaw - cx * 0.11f;
-    float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
+    float targetYaw = base.yaw + L.yaw - cx * 0.11f;
+    float basePitch = base.pitch + L.pitch - cy * 0.08f;
     L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
     // The coach talking to the player: the view rises to its face as the pointer rests (the
     // weight is coachFaceLift_, eased in updateCoach).
-    if (coach() && coachFaceLift_ > 0.0f && !dragging_)
+    if (coach() && coachFaceLift_ > 0.0f && !dragging_ && seatedLookOnly)
         L.lookUpLift = std::max(L.lookUpLift, lookUpLift(smootherstep(coachFaceLift_), basePitch, L.leanSmooth));
     float targetPitch = basePitch + L.lookUpLift;
     glanceBlend_ = clamp(glanceBlend_ + (glance_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
@@ -2365,7 +2513,9 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     L.gazePitch += (targetPitch - L.gazePitch) * k;
     L.leanSmooth += (L.lean - L.leanSmooth) * (1.0f - std::exp(-dt * 5.0f));
     L.headYaw = clamp(L.gazeYaw, -kHeadYawLimit, kHeadYawLimit);
-    L.headPitch = clamp(L.gazePitch, kHeadPitchDown, kHeadPitchUp);
+    // Seated the neck stops at kHeadPitchDown (the eyes do the rest); standing the head is handed
+    // the whole look down, which the animator reaches by bending the back.
+    L.headPitch = clamp(L.gazePitch, std::min(kHeadPitchDown, stance::headPitchMin(L.standBlend)), kHeadPitchUp);
     anim_[seat].setHeadOverride(true, L.headYaw, L.headPitch);
 }
 
@@ -2464,6 +2614,7 @@ void GameScene::updateGaze(float dt) {
 std::vector<Marker> GameScene::markers() const {
     std::vector<Marker> out;
     if (state_ != State::Playing || paused_ || (hotSeat() && handover_.active())) return out;
+    if (!seatMayPlay(inputSeat())) return out;   // standing: nothing on the board answers
     // The piece under the pointer that a click would take (Idle, or a switch when the touched
     // piece cannot move).
     if ((turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) && hoverId_ >= 0) {
@@ -2498,8 +2649,10 @@ bool GameScene::gameCursorShown() const {
 }
 
 ui::GameCursor GameScene::gameCursorKind() const {
-    // Hot-seat: dimmed until the buttons held by the previous player are released.
-    if (state_ != State::Playing || !isHumanTurn() || (hotSeat() && inputBlocked_)) return ui::GameCursor::Waiting;
+    // Hot-seat: dimmed until the buttons held by the previous player are released. Standing (or
+    // asked to get up): dimmed until seated again.
+    if (state_ != State::Playing || !isHumanTurn() || (hotSeat() && inputBlocked_) || !seatMayPlay(inputSeat()))
+        return ui::GameCursor::Waiting;
     switch (turn_) {
     case Turn::HumanIdle: return hoverId_ >= 0 ? ui::GameCursor::Piece : ui::GameCursor::Idle;
     case Turn::HumanTouched:
@@ -2625,6 +2778,8 @@ void GameScene::render(AppContext& ctx, float dt) {
         std::vector<AnalysisMark> analysisMarkList;
         if (coach()) coachMarks(highlights, coachMarkList);
         if (analysing()) analysisMarks(analysisMarkList, highlights, coachMarkList);
+        // A player standing has pushed their chair back (anim::Animator::chairSlide).
+        for (int seat = 0; seat < 2; ++seat) world_.setChairSlide(seat, anim_[seat].chairSlide());
         world_.submitStatic(r);
         world_.submitPieces(r, board_, highlights.empty() ? nullptr : &highlights);
         world_.submitClock(r, clockDisplay());
