@@ -247,7 +247,7 @@ struct Subtitle {
     bool speaker = true;         // "COACH" tag above the text
     std::string tag;             // replaces the "COACH" tag ("" = coach.speaker); the analysis
                                  // passes analysis.hud.speaker
-    // The horizontal span the plate centres in (reference px), and keeps within: the analysis
+    // The horizontal span the plate centres in and wraps its text to (reference px): the analysis
     // passes AnalysisHudResult::freeLeft / freeRight. Both 0 = the window.
     float spanLeft = 0.0f, spanRight = 0.0f;
 };
