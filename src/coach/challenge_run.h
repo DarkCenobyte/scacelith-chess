@@ -9,7 +9,9 @@
 //   - the player's move: a line is judged against the solution at once (ChallengePosition::accepts);
 //     a right move gets a nod and the coach's answer from the line, the last one the praise. A
 //     play-out move is judged by Stockfish (the position after it, the coach to move): it must keep
-//     the win (mate, promote) or the draw (hold); the same analysis gives the coach's reply;
+//     the win (mate, promote) or the draw (hold); the same analysis gives the coach's reply. A
+//     reply that draws on the board (stalemate, no mating material) solves a hold once played,
+//     with no wait after it: no position is ever waited in without a move to make;
 //   - a wrong move: Stockfish's best answer is played by hand while the coach says it ("Not this
 //     one: I'd answer Qxd1."), taken back with the player's move, and the same WaitMove waits again.
 //     Every sentence is proved by the board or the engine: "would be checkmate" only when the

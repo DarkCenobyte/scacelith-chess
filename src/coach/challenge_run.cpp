@@ -386,13 +386,26 @@ struct ChallengeRun::Impl {
             break;
         case ChallengeGoal::Line: break;
         }
-        // Kept: the coach answers with the engine's move, and the next move waits.
+        // Kept: the coach answers with the engine's move, and the next move waits. An answer that
+        // ends the play-out on the board gets no wait (no move, or no mate, is left after it): a
+        // hold is solved by it, the win of the other goals is gone (the engine said otherwise).
+        Position next = judged;
+        next.makeMove(next.parseUCI(a.bestMove));
+        const bool over = !next.hasLegalMove() || next.hasInsufficientMaterial();
+        if (over && (p.goal != ChallengeGoal::Hold || next.isCheckmate())) {
+            wrong(answerScript(next.isCheckmate() ? "ch.wrong.loses" : "ch.wrong.draw", a.bestMove));
+            return;
+        }
         director->endWait();
         ++move;
         Script s;
         s.push_back(tableBeat(BeatKind::PlayMove, a.bestMove));
-        Position next = judged;
-        next.makeMove(next.parseUCI(a.bestMove));
+        if (over) {
+            // The coach's answer draws (stalemate, no mating material): held once it is played.
+            play(s);
+            solved("ch.solved.draw");
+            return;
+        }
         beginMove(next, s);
         play(s);
     }
@@ -564,17 +577,9 @@ void ChallengeRun::onMove(const chess::Game& game) {
     Impl& d = *d_;
     const size_t n = game.moves().size();
     if (!d.running || d.completed || n == 0) return;
-    if (game.positionAt(n - 1).sideToMove() == White) {
-        d.onPlayerMove(game);
-        return;
-    }
-    // The coach's own move (the lead, an answer): a play-out drawn on the board after it is held.
-    const ChallengePosition& p = d.cur();
-    const Position& now = game.position();
-    if (p.goal == ChallengeGoal::Hold && (now.isStalemate() || now.hasInsufficientMaterial()) && d.waitingHere()) {
-        d.director->endWait();
-        d.solved("ch.solved.draw");
-    }
+    // The coach's own moves (the lead, an answer) need nothing: an answer that ends a play-out on
+    // the board was settled when it was chosen (Impl::judged_), before its move was queued.
+    if (game.positionAt(n - 1).sideToMove() == White) d.onPlayerMove(game);
 }
 
 void ChallengeRun::onPlayerActive() {

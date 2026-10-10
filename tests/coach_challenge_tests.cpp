@@ -4,7 +4,8 @@
 // the other with the coach's move into them, a wrong move answered with the move on the board and
 // taken back, no hint unless asked (the offer after three wrong moves, its card, H at any time:
 // the piece, the square, the move shown), a play-out judged by the engine and by the board
-// (stalemate, mate); the embedded book: it parses with no error, every set has its texts, every
+// (stalemate, mate), the coach's answer that ends a play-out on the board (a hold solved once,
+// nothing left waiting); the embedded book: it parses with no error, every set has its texts, every
 // line ends with the player's move (in checkmate for the mate sets); a whole set solved through
 // the session: completed, the handshake wanted, nothing recorded.
 #include "test.h"
@@ -47,6 +48,13 @@ ai::Analysis mateAnalysis(int mate, const char* best) {
     l.pv.push_back(best);
     a.lines.push_back(l);
     a.bestMove = best;
+    return a;
+}
+
+// A level line (no mate, cp 0): the draw holds, whoever is to move; 'best' is the coach's answer.
+ai::Analysis levelAnalysis(const char* best) {
+    ai::Analysis a = mateAnalysis(0, best);
+    a.depth = a.lines.front().depth = 22;
     return a;
 }
 
@@ -384,6 +392,101 @@ TEST(challenge_run_play_out) {
     CHECK(t.queued("ch.solved.mate") == 1);
     CHECK(t.ready());
     CHECK(t.queued("ch.task.play.hold") == 1);
+    CHECK(!t.run.completed());
+    checkRenders(t.lines);
+}
+
+// N03: a hold whose last position the coach's answer stalemates (the board has no move left for
+// the player): solved once, with no wait on that position, and the challenge completed.
+TEST(challenge_run_hold_coach_stalemates_last_position) {
+    const char* fen = "8/8/8/8/4k3/8/4p3/5K2 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e1") + "|A0"] = levelAnalysis("e4e3");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("f1e1");
+    CHECK(t.until([&] { return t.run.finished(); }, 120.0f));
+    CHECK(t.run.completed());
+    CHECK_EQ(t.stage.all("playLessonMove").back().text, std::string("e4e3"));
+    CHECK(t.game.position().isStalemate());
+    // Nothing waits any more, and nothing is said twice.
+    t.until([] { return false; }, 10.0f);
+    CHECK(!t.run.playerMayMove(t.game));
+    CHECK(!t.director.waitingMove());
+    CHECK(t.director.idle());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.complete"), 1);
+    CHECK_EQ(t.queued("ch.wrong"), 0);
+    CHECK_EQ(t.run.position(), 0);
+    checkRenders(t.lines);
+}
+
+// N03: the same stalemate with a position after it: solved once, then the next position waits for
+// the player's move, on its own board.
+TEST(challenge_run_hold_coach_stalemates_next_position) {
+    const char* fen = "8/8/8/8/4k3/8/4p3/5K2 w - - 0 1";
+    const char* second = "8/8/8/4p3/4k3/8/8/3K4 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen +
+                                                 " | hold 10\nplay t:hold2 | " + second + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e1") + "|A0"] = levelAnalysis("e4e3");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("f1e1");
+    CHECK(t.until([&] { return t.run.position() == 1 && t.run.playerMayMove(t.game); }, 120.0f));
+    CHECK(!t.run.completed());
+    chess::Position start;
+    start.setFEN(second);
+    CHECK(t.game.position().samePosition(start));
+    CHECK(t.game.position().hasLegalMove());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.last"), 1);
+    CHECK_EQ(t.queued("ch.task.play.hold"), 2);
+    CHECK_EQ(t.queued("ch.complete"), 0);
+    checkRenders(t.lines);
+}
+
+// N03: the coach's answer leaves no mating material (K+B v K): a draw on the board, the hold
+// solved once, with no wait after it.
+TEST(challenge_run_hold_coach_leaves_no_mating_material) {
+    const char* fen = "4k3/8/8/1b6/8/8/P7/4K3 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "a2a4") + "|A0"] = levelAnalysis("b5a4");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("a2a4");
+    CHECK(t.until([&] { return t.run.finished(); }, 120.0f));
+    CHECK(t.game.position().hasInsufficientMaterial());
+    CHECK(t.game.position().hasLegalMove());
+    t.until([] { return false; }, 10.0f);
+    CHECK(!t.run.playerMayMove(t.game));
+    CHECK(!t.director.waitingMove());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.complete"), 1);
+    checkRenders(t.lines);
+}
+
+// A mate play-out whose kept move the coach answers into a dead draw (the engine said the win was
+// kept): the win is gone on the board, so the move is wrong: answer shown, taken back, waiting
+// again, never a wait on the drawn board.
+TEST(challenge_run_play_out_answer_draws_on_the_board) {
+    const char* fen = "7k/8/8/8/8/8/8/K5Q1 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kq endgames 1\nplay t:kq | ") + fen + " | mate\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "g1g8") + "|A0"] = mateAnalysis(-5, "h8g8");
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    t.move("g1g8");
+    CHECK(t.backAndWaiting(0));
+    CHECK_EQ(t.queued("ch.wrong.draw"), 1);
+    CHECK_EQ(t.stage.all("demoMove").back().text, std::string("h8g8"));
+    CHECK_EQ(t.stage.count("playLessonMove"), 0);
+    CHECK_EQ(t.queued("ch.solved"), 0);
     CHECK(!t.run.completed());
     checkRenders(t.lines);
 }
