@@ -28,6 +28,12 @@ struct SideAccuracy {
 };
 SideAccuracy gameAccuracy(const std::vector<int>& cpsWhiteAfterEachPly, chess::Color firstMover = chess::White,
                           int startCp = 15);
+// The volatility weights of that accuracy: one per move of a series of W% values (White's view,
+// the position before the first move first, one value per position): the standard deviation of
+// the W% in the window of positions the move belongs to (a tenth of the game, 2 to 8 positions),
+// clamped to 0.5..12. Fewer than two values: none. The analysis mode's summary (analysis/review.h)
+// weighs its moves' accuracy with them.
+std::vector<double> accuracyWeights(const std::vector<double>& winPercents);
 
 // The accuracy players of a rating typically reach (the server's anti-cheat priors: 600 -> 65,
 // 1000 -> 71, 1500 -> 79, 2000 -> 86, 2500 -> 91, linear in between), and the rating of a level.

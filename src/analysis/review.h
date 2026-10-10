@@ -25,11 +25,13 @@
 //     points), the mover not losing afterwards (W% >= 50) and not already winning outright before
 //     (W% < 90); never in the opening book, never a recapture.
 //   - !  (Good, "the only move"): the best move, the second best line at least 12 W% points worse,
-//     more than one legal move, not a recapture nor a forced reply to a check that leaves one
-//     sensible answer, and the game not already decided (best W% between 8 and 92); not in book.
+//     more than one legal move, not a recapture, not the capture of material the previous move
+//     gave away, nor a forced reply to a check that leaves one sensible answer, and the game not
+//     already decided (best W% between 8 and 92); not in book.
 //   - !? (Interesting): not the best move, within 5 W% points of it (Good or better), and it gives
 //     material away as for !!.
-//   - Book moves (the position after them is in coach::OpeningBook) get no symbol.
+//   - Book moves (the position after them is in coach::OpeningBook) get no symbol, unless they are
+//     blunders: the book holds traps and losing lines too (1.f3 e5 2.g4?? Qh4#, "Fool's Mate").
 // A verdict is shown from the quick pass on (provisional), final once both of its positions have
 // had the deep pass.
 #pragma once
@@ -144,7 +146,7 @@ public:
     const PositionEval& position(int i) const;
     Verdict verdict(int ply) const;
     EvalBar bar(int position) const;
-    float progress() const;        // 0..1: positions final / positions
+    float progress() const;        // 0..1: positions final (or failed) / positions
     bool complete() const;         // every position final or failed
     SideSummary summary(chess::Color c) const;
     const Settings& settings() const { return settings_; }
@@ -164,6 +166,15 @@ private:
     std::vector<PositionEval> evals_;
     std::vector<bool> pending_;
     std::vector<bool> inBook_;     // position i is in the opening book
+    // The board facts of each ply the symbols use, fixed for the game (reset()): the evaluations
+    // only decide which of them count, so verdict() stays cheap enough for every frame.
+    struct PlyFacts {
+        bool gives = false;        // the move gives material away (Verdict::sacrifice)
+        bool recapture = false;    // coach::isRecapture
+        bool forcedReply = false;  // a reply to a check that leaves one sensible answer at most
+        bool takesGift = false;    // a capture right after a move that gave material away
+    };
+    std::vector<PlyFacts> facts_;
 };
 
 }  // namespace analysis
