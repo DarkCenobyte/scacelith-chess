@@ -18,7 +18,7 @@ constexpr float kGap = 0.0010f;  // clearance between a shell and the ball it wr
 // Joint radii shared by the parts that meet at a joint.
 constexpr float kShoulderBall = 0.0300f;
 constexpr float kElbowBall = 0.0255f;
-constexpr float kHipCover = 0.0600f;   // convex hip cover of the pelvis around the hip pivot
+constexpr float kHipCover = 0.0740f;   // convex hip cover of the pelvis around the hip pivot
 constexpr float kKneeBall = 0.0340f;
 constexpr float kKneeCap = kKneeBall + kGap + 0.0100f;  // outer radius of the knee cap shell
 constexpr float kAnkleBall = 0.0255f;
