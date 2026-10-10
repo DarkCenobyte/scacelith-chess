@@ -7,6 +7,7 @@ project(Scacelith VERSION ${SCACELITH_VERSION_CORE} LANGUAGES C CXX)
 # Build configuration
 #   Windows (shipping):  cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 #   Linux (tests only):  cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+#   Linux aarch64 (cross, tests under qemu-aarch64): cmake -B build-arm64 -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux-gnu.cmake -DCMAKE_BUILD_TYPE=Release
 #   Quicker local builds: add -DSCACELITH_SF_VARIANTS=x86-64-avx2 (or another variant this CPU
 #   runs) to compile Stockfish once instead of once per instruction set (third_party/stockfish)
 # ---------------------------------------------------------------------------------------------
@@ -75,17 +76,24 @@ if(SCACELITH_STOCKFISH)
     endif()
     # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
     # another compiler, or LLVM's ld/objcopy/objdump/nm, would fail deep in the build instead of here.
-    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
-    endif()
-    foreach(tool LINKER OBJCOPY OBJDUMP NM)
-        if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
-            execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
-            if(NOT tool_version MATCHES "^GNU ")
-                message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
-            endif()
+    # macOS builds its single variant with Apple clang and does not isolate it (Mach-O).
+    if(APPLE)
+        if(NOT CMAKE_CXX_COMPILER_ID MATCHES "^(AppleClang|Clang)$")
+            message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish needs Apple clang on macOS (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
         endif()
-    endforeach()
+    else()
+        if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+        endif()
+        foreach(tool LINKER OBJCOPY OBJDUMP NM)
+            if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
+                execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
+                if(NOT tool_version MATCHES "^GNU ")
+                    message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+                endif()
+            endif()
+        endforeach()
+    endif()
     add_subdirectory(third_party/stockfish)
 endif()
 

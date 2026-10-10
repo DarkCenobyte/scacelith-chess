@@ -68,8 +68,9 @@ public:
     // Instruction-set variant of the Stockfish build used by the next start() (Scacelith.ini
     // engine.arch, for troubleshooting): "auto" (the default) is the best one this CPU runs; a
     // Stockfish ARCH name ("x86-64", "x86-64-sse41-popcnt", "x86-64-avx2", "x86-64-avxvnni",
-    // "x86-64-avx512icl") caps the choice, never above what the CPU runs. An unknown name is logged
-    // and ignored. The variant is written to the log at every start.
+    // "x86-64-avx512icl"; on Linux aarch64 "armv8", "armv8-dotprod"; on macOS "apple-silicon")
+    // caps the choice, never above what the CPU runs. An unknown name is logged and ignored. The
+    // variant is written to the log at every start.
     static void setArchLimit(const std::string& arch);
     // Only one Engine can run at a time (the engine reads and writes the process's std::cin /
     // std::cout): start() on a second instance returns false until the first one is shut down.
