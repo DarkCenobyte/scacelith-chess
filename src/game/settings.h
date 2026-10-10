@@ -28,8 +28,8 @@ struct Settings {
     float renderScale = 1.0f;
     // [graphics] Options > Graphics: a preset (Very low .. Ultra, graphics_quality.h) sets every
     // level; Custom keeps the player's own ([graphics_custom]).
-    int graphicsPreset = PresetHigh;
-    GraphicsLevels graphicsLevels = presetLevels(PresetHigh);
+    int graphicsPreset = kDefaultGraphicsPreset;
+    GraphicsLevels graphicsLevels = presetLevels(kDefaultGraphicsPreset);
     float brightness = 0.0f;      // exposure compensation (EV)
     // The brightness calibration was completed (Continue or Esc on its page). Until then every
     // start opens on it (screenshot runs excepted), however the previous runs ended. A settings
@@ -73,7 +73,8 @@ struct Settings {
     int engineThreads = 1;
     int engineHashMB = 64;
     // Stockfish instruction-set variant: "auto" = the best this CPU runs, or a variant name capping
-    // it, e.g. "x86-64-sse41-popcnt" (troubleshooting; ai::Engine::setArchLimit)
+    // it, e.g. "x86-64-sse41-popcnt", or "armv8" on Linux aarch64 (troubleshooting;
+    // ai::Engine::setArchLimit)
     std::string engineArch = "auto";
     bool humanizeThinking = true; // spend realistic time before moving
     // [player] the human's rating (elo.h), updated after every rated game against Stockfish
@@ -180,7 +181,8 @@ struct Settings {
     // (-1 = the default teacher voice, else an index into the model's voices), flow-matching steps
     // (Options > Audio > Voice quality: kTtsStepsMin..kTtsStepsMax; each step costs about a fifth
     // of a line's synthesis time at the default) and the kernels' instruction set ("auto", or a cap
-    // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
+    // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; neon, scalar on aarch64;
+    // tts::setArchCap).
     static constexpr int kTtsStepsMin = 4, kTtsStepsMax = 9, kTtsStepsDefault = 5;
     int ttsThreads = 0;
     int ttsVoice = -1;

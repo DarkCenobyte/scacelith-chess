@@ -41,6 +41,7 @@
 #include "net/net_sys.h"
 #include "net/online_client.h"
 #include "net/protocol_gen.h"
+#include "net/stance.h"
 #include "net/transport.h"
 
 #include <algorithm>
@@ -1042,6 +1043,64 @@ struct ScopedEnv {
     }
 };
 
+#ifdef __APPLE__
+// macOS: the user data folder (the settings, logins and log, and the game's data files) is
+// ~/Library/Application Support/scacelith/, created private, 0700, with its missing parents.
+TEST(net_sys_user_data_directory_private) {
+    const std::string home = net::sys::exeDirectory() + "net-test-home-" + std::to_string(getpid());
+    REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
+    ScopedEnv homeEnv("HOME", home.c_str());
+    struct stat st {};
+    const std::string support = home + "/Library/Application Support/";
+    const std::string d = net::sys::userDataDirectory();
+    CHECK_EQ(d, support + "scacelith/");
+    CHECK(stat(d.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
+    CHECK_EQ(int(st.st_mode & 0777), 0700);
+    CHECK_EQ(net::sys::appDataDirectory(), d);
+    rmdir(d.c_str());
+    rmdir(support.c_str());
+    rmdir((home + "/Library").c_str());
+    rmdir(home.c_str());
+}
+
+// The settings, logins and log go to the user data folder, unless a Scacelith.ini next to the
+// executable makes a portable install, or the user data folder cannot be written; never to the
+// executable's folder of an application bundle.
+TEST(net_sys_settings_directory) {
+    const std::string exe = net::sys::exeDirectory(), ini = exe + "Scacelith.ini";
+    if (net::sys::fileExists(ini)) SKIP("a Scacelith.ini already stands next to the test executable");
+    const std::string home = exe + "net-test-settings-home-" + std::to_string(getpid());
+    REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
+    ScopedEnv homeEnv("HOME", home.c_str());
+    const std::string support = home + "/Library/Application Support/", data = support + "scacelith/";
+    CHECK_EQ(net::sys::settingsDirectory(), data);
+    CHECK_EQ(net::CredentialStore::defaultPath(), data + "Scacelith.credentials");
+    CHECK(net::sys::writeFileAtomic(ini, "[display]\n", false));
+    CHECK_EQ(net::sys::settingsDirectory(), exe);   // portable
+    CHECK_EQ(net::CredentialStore::defaultPath(), exe + "Scacelith.credentials");
+    std::remove(ini.c_str());
+    if (getuid() != 0) {   // root writes anywhere
+        CHECK(chmod(data.c_str(), 0500) == 0);
+        CHECK_EQ(net::sys::settingsDirectory(), exe);   // the user folder cannot be written
+        chmod(data.c_str(), 0700);
+    }
+    rmdir(data.c_str());
+    rmdir(support.c_str());
+    rmdir((home + "/Library").c_str());
+    rmdir(home.c_str());
+}
+
+// The executable's folder of an application bundle, whatever the case of its names.
+TEST(net_sys_inside_app_bundle) {
+    CHECK(net::sys::insideAppBundle("/Applications/Scacelith.app/Contents/MacOS/"));
+    CHECK(net::sys::insideAppBundle("/Users/x/Desktop/scacelith.APP/contents/macos/"));
+    CHECK(!net::sys::insideAppBundle("/Applications/Scacelith.app/Contents/MacOS"));
+    CHECK(!net::sys::insideAppBundle("/Applications/Scacelith/Contents/MacOS/"));
+    CHECK(!net::sys::insideAppBundle("/Applications/Scacelith.app/Contents/Resources/"));
+    CHECK(!net::sys::insideAppBundle(".app/Contents/MacOS/"));
+    CHECK(!net::sys::insideAppBundle(net::sys::exeDirectory()));   // the tests run from the build folder
+}
+#else
 // The user data folder (the settings, logins and log) follows the XDG base directory rule: it is
 // created private, 0700, in $XDG_CONFIG_HOME when that is an absolute path (its missing parents
 // too), else in $HOME/.config.
@@ -1103,6 +1162,7 @@ TEST(net_sys_settings_directory) {
     rmdir((home + "/.config").c_str());
     rmdir(home.c_str());
 }
+#endif  // __APPLE__
 #endif
 
 // =============================================================================================
@@ -1313,7 +1373,8 @@ TEST(net_credentials_undecryptable_token) {
         CHECK(!s.hasToken(B));
         std::string text;
         CHECK(net::sys::readFile(path, text, 1 << 20));
-        CHECK(text.find(blob) != std::string::npos);   // the file is left as it is
+        // The file is left as it is (macOS: no token stays in the file, B's is erased, A's in memory).
+        CHECK((text.find(blob) != std::string::npos) == net::kFileSessions);
         // A new sign-in there replaces it.
         out.token = tokenB;
         CHECK(s.put(out));
@@ -1536,6 +1597,14 @@ const char kFilePrefix[] = "dpapi:";
 const char kFilePrefix[] = "bound:";
 #endif
 
+// A token kept without a keyring (none, failing, locked, the client shutting down): in the file
+// (kFilePrefix), or, on macOS, which writes no token to the file (net::kFileSessions), in the
+// store's memory, the file's record then without one.
+bool keptWithoutKeyring(const std::string& path, const std::string& origin) {
+    const std::string t = fileToken(path, origin);
+    return net::kFileSessions ? hasPrefix(t, kFilePrefix) : t.empty();
+}
+
 }  // namespace
 
 // With a keyring the file holds only a reference to the token's item: a new item for every token,
@@ -1670,6 +1739,7 @@ TEST(net_credentials_keyring_clear_refused_unanswered) {
 // A token the file holds (an earlier version's, or one saved while the keyring was missing or
 // locked) moves to the keyring the first time it is read while the keyring works, and only then.
 TEST(net_credentials_keyring_migration) {
+    if (!net::kFileSessions) SKIP("no token is written to the file here (net_credentials_never_in_the_file)");
     std::string path = tempCredentialPath("keyring-migrate");
     RemovedAtEnd removed{path};
     const std::string A = "a.example.org:443", B = "b.example.org:443";
@@ -1853,12 +1923,12 @@ TEST(net_credentials_keyring_does_not_block) {
     CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::milliseconds(500));
     CHECK(out.token.empty());
     // Interrupted: a new token goes where a token goes without a keyring (the file, by default:
-    // audit A08), not into the keyring.
+    // audit A08; memory on macOS), not into the keyring.
     c.token = "sct_" + std::string(43, 'Z');
     bool stored = false;
     CHECK(s.put(c, &stored));
     CHECK(stored);
-    CHECK(hasPrefix(fileToken(path, A), kFilePrefix));
+    CHECK(keptWithoutKeyring(path, A));
     CHECK(!k.holds(c.token));
 }
 
@@ -1956,8 +2026,8 @@ TEST(net_credentials_keyring_unlock_dismissed) {
         CHECK(k.holds(tokenC, C));
         signIn(s, B, tokenB);                       // a new sign-in asks again: dismissed, in the file
         CHECK_EQ(k.prompts.load(), 2);
-        CHECK(hasPrefix(fileToken(path, B), kFilePrefix));
-        CHECK(s.get(B, out, true) && out.token == tokenB);   // from the file, no prompt
+        CHECK(keptWithoutKeyring(path, B));
+        CHECK(s.get(B, out, true) && out.token == tokenB);   // from the file (macOS: memory), no prompt
         CHECK(s.get(A, out, true));
         CHECK(out.token.empty());
         CHECK_EQ(k.prompts.load(), 2);
@@ -1969,9 +2039,13 @@ TEST(net_credentials_keyring_unlock_dismissed) {
         s.setKeyring(&k);
         net::Credential out;
         CHECK(s.get(A, out, true) && out.token == tokenA);   // the session is back
-        CHECK(s.get(B, out) && out.token == tokenB);         // and B's token moves to the keyring
-        CHECK(hasPrefix(fileToken(path, B), "keyring:"));
-        CHECK(k.holds(tokenB, B));
+        if (net::kFileSessions) {
+            CHECK(s.get(B, out) && out.token == tokenB);     // and B's token moves to the keyring
+            CHECK(hasPrefix(fileToken(path, B), "keyring:"));
+            CHECK(k.holds(tokenB, B));
+        } else {
+            CHECK(!s.hasToken(B));                           // macOS: in memory for that run only
+        }
         CHECK_EQ(k.prompts.load(), 2);
     }
     k.locked = true;
@@ -2022,7 +2096,7 @@ TEST(net_credentials_keyring_unlock_timeout) {
         CHECK(ms >= 250 && ms < 3000);
         CHECK_EQ(k.prompts.load(), 1);
         CHECK(!k.prompting);
-        CHECK(hasPrefix(fileToken(path, B), kFilePrefix));
+        CHECK(keptWithoutKeyring(path, B));
         t0 = std::chrono::steady_clock::now();
         net::Credential out;
         CHECK(s.get(A, out, true));                 // not asked again
@@ -2068,7 +2142,7 @@ TEST(net_credentials_keyring_unlock_timeout) {
         CHECK(msSince(t0) < 500);
         CHECK(saved);
         CHECK(stored);
-        CHECK(hasPrefix(fileToken(path, C), kFilePrefix));
+        CHECK(keptWithoutKeyring(path, C));
         CHECK(!k.holds(tokenC));
     }
 }
@@ -2132,6 +2206,7 @@ bool fileHoldsNoToken(const std::string& path, const std::string& token) {
 // folder, readable at once, and the player is told once per run (firstNotice); it moves to the
 // keyring at a read once that works.
 TEST(net_credentials_no_keyring_file_by_default) {
+    if (!net::kFileSessions) SKIP("no token is written to the file here (net_credentials_never_in_the_file)");
     std::string path = tempCredentialPath("no-keyring-file");
     RemovedAtEnd removed{path};
     using Kept = net::CredentialStore::Kept;
@@ -2198,6 +2273,7 @@ TEST(net_credentials_no_keyring_file_by_default) {
 // the option changes; on again, the token in memory goes back to the file; and it moves to the
 // keyring once that works.
 TEST(net_credentials_file_sessions_off) {
+    if (!net::kFileSessions) SKIP("no token is written to the file here (net_credentials_never_in_the_file)");
     std::string path = tempCredentialPath("file-sessions-off");
     RemovedAtEnd removed{path};
     using Kept = net::CredentialStore::Kept;
@@ -2285,6 +2361,7 @@ TEST(net_credentials_file_sessions_off) {
 // Permissions more open than 0600 / 0700 (a copied or restored file, a umask): repaired at the
 // next read or write, and said in the log; the session goes on.
 TEST(net_credentials_file_permissions_repaired) {
+    if (!net::kFileSessions) SKIP("no token is written to the file here (net_credentials_never_in_the_file)");
     std::string path = tempCredentialPath("perm-repaired");
     RemovedAtEnd removed{path};
     const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'R');
@@ -2314,6 +2391,7 @@ TEST(net_credentials_file_permissions_repaired) {
 // token in the clear is read from that file or written to it. A sign-in's token is kept in memory
 // for this run, and one the file held is not used and erased at the next write.
 TEST(net_credentials_file_permissions_unrepairable) {
+    if (!net::kFileSessions) SKIP("no token is written to the file here (net_credentials_never_in_the_file)");
     const std::string dir = net::sys::exeDirectory() + "net-test-open-home/";
     std::error_code ec;
     std::filesystem::create_directories(dir, ec);
@@ -2346,6 +2424,87 @@ TEST(net_credentials_file_permissions_unrepairable) {
         CHECK_EQ(modeOf(dir.substr(0, dir.size() - 1)), 0755u);   // left alone
     }
     chmod(dir.c_str(), 0700);
+}
+
+// macOS writes no token to the file (net::kFileSessions), whatever the option says: a token no
+// keyring keeps lives in memory until the game quits, the player told once; the tokens a Linux
+// build left in a copied file leave it at once, for memory, and move to the keyring when it works.
+TEST(net_credentials_never_in_the_file) {
+    if (net::kFileSessions) SKIP("this build keeps a session no keyring takes in the file");
+    std::string path = tempCredentialPath("never-in-the-file");
+    RemovedAtEnd removed{path};
+    using Kept = net::CredentialStore::Kept;
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    {
+        FileSessions on(true);                      // no effect here
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(signInKept(s, A, tokenA) == Kept::Memory);
+        CHECK(s.firstNotice(Kept::Memory));
+        CHECK(!s.firstNotice(Kept::Memory));
+        CHECK(fileHoldsNoToken(path, tokenA));
+        CHECK_EQ(fileToken(path, A), std::string());
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+    }
+    {
+        net::CredentialStore s(path);               // the next run: signed out, the name kept
+        s.setKeyring(nullptr);
+        CHECK(!s.hasToken(A));
+        CHECK_EQ(s.username(A), std::string("alice"));
+    }
+    // A Linux build's file: its tokens in the file's own format.
+    auto linuxFile = [&] {
+        Value doc = Value::object();
+        doc.set("version", 1);
+        Value& records = doc.set("records", Value::array());
+        for (const auto& [origin, token] : {std::make_pair(A, tokenA), std::make_pair(B, tokenB)}) {
+            Value r = Value::object();
+            r.set("origin", origin);
+            r.set("username", "alice");
+            r.set("token", net::protectToken(origin, token));
+            records.push(r);
+        }
+        CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
+        CHECK(hasPrefix(fileToken(path, A), "bound:"));
+    };
+    linuxFile();
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        CHECK(s.hasToken(A));
+        CHECK(fileHoldsNoToken(path, tokenA));
+        CHECK(fileHoldsNoToken(path, tokenB));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    linuxFile();
+    FakeKeyring k;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        CHECK(s.hasToken(A));
+        CHECK(fileHoldsNoToken(path, tokenA));
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        CHECK(k.holds(tokenA, A));
+        CHECK(s.get(B, out) && out.token == tokenB);
+        CHECK(hasPrefix(fileToken(path, B), "keyring:"));
+        CHECK(k.holds(tokenB, B));
+    }
+    {
+        net::CredentialStore s(path);               // the next run: from the keyring
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(s.get(B, out) && out.token == tokenB);
+        CHECK(fileHoldsNoToken(path, tokenA));
+        CHECK(fileHoldsNoToken(path, tokenB));
+    }
 }
 #endif
 
@@ -2894,6 +3053,11 @@ bool sendAll(Sock s, const void* data, size_t n) {
     while (n) {
 #ifdef _WIN32
         int r = ::send(s, p, int(n), 0);
+#elif defined(__APPLE__)
+        // No MSG_NOSIGNAL there: a peer that has gone must not raise SIGPIPE either.
+        int on = 1;
+        setsockopt(s, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof on);
+        ssize_t r = ::send(s, p, n, 0);
 #else
         ssize_t r = ::send(s, p, n, MSG_NOSIGNAL);
 #endif
@@ -2964,7 +3128,7 @@ public:
     // What the next upgrades get, in order, before upgradeStatus applies again: an HTTP status
     // that refuses the upgrade, kUpgradeOk, or kShutdownAtHello (101, then Error{ShuttingDown} +
     // close 4008 in answer to Hello, like a draining server).
-    static constexpr int kUpgradeOk = 0, kShutdownAtHello = -1;
+    [[maybe_unused]] static constexpr int kUpgradeOk = 0, kShutdownAtHello = -1;
     void scriptUpgrades(std::initializer_list<int> steps) {
         std::lock_guard<std::mutex> lk(scriptMu_);
         script_.assign(steps.begin(), steps.end());
@@ -3570,7 +3734,11 @@ TEST(net_online_client_loopback) {
         CHECK(waitEvent(c, K::LoginResult, ev, 20000));
         CHECK(ev.ok);
 #ifndef _WIN32
-        CHECK_EQ(ev.sessionNotice, std::string("file"));   // the tests have no keyring: said once
+        if (net::kFileSessions) {
+            CHECK_EQ(ev.sessionNotice, std::string("file"));   // the tests have no keyring: said once
+        } else {
+            CHECK(ev.sessionNotice.empty());                    // macOS: the tests' keyring in memory
+        }
 #else
         CHECK(ev.sessionNotice.empty());                    // DPAPI
 #endif
@@ -4398,6 +4566,7 @@ void stanceScenario(PacingRig& r) {
         r.sleepMs(20);
     }
     r.c->sendStance(77, 3);
+    const double tapMs = msBetween(tTap, std::chrono::steady_clock::now());
     r.expect(r.until([&] {
                  auto x = stancesFrom(r, mark);
                  return !x.empty() && x.back().m.stance == pr::Stance::SideRight && msBetween(tTap, x.back().at) > 600.0;
@@ -4407,7 +4576,11 @@ void stanceScenario(PacingRig& r) {
     bool paced = true;
     for (size_t i = 1; i < taps.size(); ++i) paced = paced && msBetween(taps[i - 1].at, taps[i].at) > 200.0;
     r.expect(paced, "a quarter of a second apart (" + std::to_string(taps.size()) + " messages)");
-    r.expect(taps.size() <= 5, "no burst (" + std::to_string(taps.size()) + ")");
+    // At most one message per quarter of a second of tapping, plus the first and the last: 5 for
+    // the 0.6 s planned (a loaded machine's sleeps can stretch the tapping, as on macOS runners).
+    const size_t most = size_t(tapMs / double(net::kStanceMinIntervalMs)) + 3;
+    r.expect(taps.size() <= most, "no burst (" + std::to_string(taps.size()) + " in " +
+                                      std::to_string(int(tapMs)) + " ms of tapping)");
 
     // Another game: nothing (not even the current game's stance meanwhile).
     r.sleepMs(300);

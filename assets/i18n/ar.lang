@@ -70,6 +70,7 @@ options.volumetric_light = الضوء الحجمي
 options.volumetric_light.help = حزم من ضوء الشمس تخترق هواء القاعة المغبرّ، وذرات الغبار المتلألئة فيها.
 options.tessellation = التبليط
 options.tessellation.help = حواف ملساء لمنحنيات القطع حين تُرى عن قرب.
+options.tessellation.unavailable = غير متاح: برنامج تشغيل الرسوميات هذا لا يدعم التبليط.
 options.antialiasing = تنعيم الحواف
 options.antialiasing.help = ينعّم الحواف المسنّنة واللمعات المتراقصة. إيقاف: صورة أحدّ لكنها مسنّنة، وتبدو بعض التأثيرات محبّبة.
 options.depth_of_field = عمق الميدان
@@ -1410,6 +1411,7 @@ gif.wait.both = {0} و{1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = تعذّر تشغيل OpenGL 4.6. يُرجى تحديث برنامج تشغيل بطاقة الرسوميات.
+error.opengl_macos = تعذّر تشغيل OpenGL 4.6 على جهاز Mac هذا. يتطلب Scacelith شريحة Apple silicon (M1 أو أحدث) ونظام macOS 26 أو أحدث، ولا يعمل داخل آلة افتراضية.
 error.renderer = تعذّر تشغيل محرّك العرض.
 error.scene = تعذّر تحميل المشهد.
 error.log_file = التفاصيل في ملف السجل: {0}

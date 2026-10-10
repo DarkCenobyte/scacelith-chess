@@ -2250,9 +2250,10 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         gs.size = gfx::fitSize(T("options.online.in_game"), gs, tw, 0.7f);
         gfx::text(T("options.online.in_game"), im::flipX(tcolF, tcolF.x), tr.y + 34.0f, gs);
     }
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
     // Linux: a session no system keyring can keep (net/credential_store.h), in a file only the
-    // player's account can read, or in memory until the game quits. Windows keeps it with DPAPI.
+    // player's account can read, or in memory until the game quits. Windows keeps it with DPAPI,
+    // macOS in the Keychain only (in memory without it).
     y += 10.0f;
     im::toggleRow(L("options.online.remember_session"), s.onlineRememberWithoutKeyring, row(rh));
     im::tooltip(T("options.online.remember_session.help"));

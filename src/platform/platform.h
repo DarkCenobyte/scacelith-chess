@@ -1,6 +1,7 @@
 // Platform layer: one window with an OpenGL 4.6 core context, input, timing and paths.
-// Implementations: platform_win32.cpp (the shipping target) and platform_x11.cpp (Linux, used
-// for automated tests and headless screenshots under Xvfb).
+// Implementations: platform_win32.cpp (the shipping target), platform_x11.cpp (Linux, used for
+// automated tests and headless screenshots under Xvfb) and platform_cocoa.mm (macOS on Apple
+// silicon: OpenGL through Mesa's Zink over KosmicKrisp, see macos_gl.h).
 #pragma once
 #include <cstdint>
 #include <string>
@@ -48,6 +49,7 @@ enum Key : int {
     KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_HOME, KEY_END, KEY_PAGEUP, KEY_PAGEDOWN,
     KEY_LSHIFT, KEY_RSHIFT, KEY_LCTRL, KEY_RCTRL, KEY_LALT, KEY_RALT,
     KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12,
+    KEY_LCMD, KEY_RCMD,        // Command, reported by the macOS layer only (Command+V pastes there)
     KEY_COUNT
 };
 enum MouseButton { MOUSE_LEFT = 0, MOUSE_RIGHT = 1, MOUSE_MIDDLE = 2, MOUSE_BUTTON_COUNT = 3 };
@@ -85,8 +87,8 @@ std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with t
 // The per-user folder of the game's data files, "scacelith", created if missing, with trailing
 // separator; each kind of data has its subfolder there ("coach" = the coach's voice model).
 // Windows: %APPDATA%\scacelith\ (Roaming). Linux: $XDG_DATA_HOME/scacelith/, by default
-// ~/.local/share/scacelith/ (the settings stay in userDataDirectory(), ~/.config/scacelith/). A macOS port
-// would use ~/Library/Application Support/scacelith/.
+// ~/.local/share/scacelith/ (the settings stay in userDataDirectory(), ~/.config/scacelith/). macOS:
+// ~/Library/Application Support/scacelith/, userDataDirectory() too.
 std::string appDataDirectory();
 void messageBox(const char* title, const char* text, bool rtl = false);  // rtl: right-to-left text (Arabic)
 uint64_t randomSeed();           // non-deterministic seed from the OS
@@ -98,7 +100,8 @@ std::string clipboardText();
 bool openClipboard(void* owner);
 #endif
 // The user's interface language as a locale tag ("fr-FR", "zh-TW", "de_DE.UTF-8"), "" when
-// unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG.
+// unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG; macOS: the first of
+// the user's preferred languages ("fr-FR", "zh-Hant-TW").
 std::string systemLanguage();
 // Command line arguments after the program name, UTF-8 (for modules that read an option before
 // a scene exists, e.g. --lang).
@@ -106,7 +109,8 @@ std::vector<std::string> commandLine();
 
 // ---- Saved games (the library page) -----------------------------------------------------------
 // Shows a folder (or opens a file) in the system's file manager: ShellExecuteW "open" on Windows,
-// xdg-open on Linux (started directly, no shell). Returns at once; false when it could not start.
+// xdg-open on Linux (started directly, no shell), open(1) on macOS. Returns at once; false when it
+// could not start.
 bool openInFileManager(const std::string& path);
 
 }  // namespace plat

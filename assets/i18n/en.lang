@@ -75,6 +75,7 @@ options.volumetric_light = Light shafts
 options.volumetric_light.help = Beams of sunlight through the dusty air of the hall, and the motes glinting in them.
 options.tessellation = Tessellation
 options.tessellation.help = Smooth outlines on the curves of the pieces seen up close.
+options.tessellation.unavailable = Not available: this graphics driver does not support tessellation.
 options.antialiasing = Anti-aliasing
 options.antialiasing.help = Smooths jagged edges and shimmering highlights. Off: sharper but jagged, and some effects look grainy.
 options.depth_of_field = Depth of field
@@ -1424,6 +1425,7 @@ gif.wait.both = {0} and {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = Could not start OpenGL 4.6. Please update your graphics driver.
+error.opengl_macos = Could not start OpenGL 4.6 on this Mac. Scacelith needs Apple silicon (M1 or later) and macOS 26 or later, and does not run in a virtual machine.
 error.renderer = The renderer could not be started.
 error.scene = The scene could not be loaded.
 error.log_file = Details are in the log file: {0}

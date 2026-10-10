@@ -3,6 +3,8 @@
 //   * Windows: WASAPI shared mode, event driven (backend_wasapi.cpp)
 //   * Linux: ALSA, libasound.so.2 loaded at run time (also PulseAudio and PipeWire through their
 //     ALSA plugins), the null backend when it is missing or no device opens (backend_alsa.cpp)
+//   * macOS: CoreAudio, the DefaultOutput audio unit (backend_coreaudio.cpp), the null backend
+//     when it cannot be made
 //   * elsewhere, and on request: the null backend, consuming at real-time pace, optionally
 //     dumping to a WAV file (backend_null.cpp)
 // Environment: SCACELITH_AUDIO=null forces the null backend (the unit tests and the screenshot

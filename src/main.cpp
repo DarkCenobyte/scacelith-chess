@@ -22,6 +22,7 @@
 #include "core/ini.h"
 #include "core/log.h"
 #include "gl/gl46.h"
+#include "gl/gl_context.h"
 #include "platform/platform.h"
 #include "render/renderer.h"
 #include "render/shader.h"
@@ -131,9 +132,17 @@ static int runApp(std::vector<std::string> args) {
     wd.debugContext = ctx.hasArg("--debug-gl");
     if (!plat::init(wd)) {
         LOGE("could not initialise OpenGL 4.6");  // plat::init has logged the reason
+#ifdef __APPLE__
+        // No graphics driver to update on a Mac: the bundled Zink over KosmicKrisp needs an Apple
+        // GPU with Metal 4 (Apple silicon, macOS 26), which a virtual machine's GPU is not.
+        startupError("error.opengl_macos", logPath);
+#else
         startupError("error.opengl", logPath);
+#endif
         return 1;
     }
+    // What the driver cannot do is off whatever the preset, and greyed out in Options > Graphics.
+    game::setGraphicsOptionAvailable(game::GfxTessellation, gl46::caps().tessellation);
 
     render::Renderer renderer;
     render::setRenderer(&renderer);

@@ -4,6 +4,7 @@
 #include "core/embedded.h"
 #include "core/ini.h"
 #include "game/graphics_quality.h"
+#include "gl/gl_quirks.h"
 #include "i18n/i18n.h"
 #include <set>
 
@@ -101,10 +102,15 @@ TEST(graphics_settings_from_old_files) {
     int preset = -1;
     GraphicsLevels levels{};
     {
-        IniFile ini;  // no [graphics] at all: High, the old default
+        IniFile ini;  // no [graphics] at all: a first start, High (Low on macOS)
         readGraphicsSettings(ini, preset, levels);
+        CHECK_EQ(preset, kDefaultGraphicsPreset);
+        CHECK(levels == presetLevels(kDefaultGraphicsPreset));
+#ifdef __APPLE__
+        CHECK_EQ(preset, int(PresetLow));
+#else
         CHECK_EQ(preset, int(PresetHigh));
-        CHECK(levels == presetLevels(PresetHigh));
+#endif
     }
     for (int q = 0; q < 4; ++q) {
         IniFile ini;
@@ -189,7 +195,7 @@ TEST(graphics_settings_round_trip) {
         ini.setInt("graphics.preset", 42);
         readGraphicsSettings(ini, preset, levels);
         CHECK_EQ(preset, int(PresetCustom));
-        CHECK(levels == presetLevels(PresetHigh));  // no [graphics_custom]: High's levels
+        CHECK(levels == presetLevels(kDefaultGraphicsPreset));  // no [graphics_custom]: the default preset's levels
     }
     {
         IniFile ini;
@@ -200,6 +206,26 @@ TEST(graphics_settings_round_trip) {
         CHECK_EQ(levels[GfxReflections], graphicsLevelCount(GfxReflections) - 1);
         CHECK_EQ(levels[GfxBloom], 0);
     }
+}
+
+// A driver without tessellation (macOS on some Mesa versions): off whatever the preset or the
+// player's own level, which are kept as they are (High still reads as High).
+TEST(graphics_unavailable_option_forced_off) {
+    CHECK(graphicsOptionAvailable(GfxTessellation));
+    setGraphicsOptionAvailable(GfxTessellation, false);
+    CHECK(!graphicsOptionAvailable(GfxTessellation));
+    for (int p = 0; p < PresetCustom; ++p) {
+        const render::RenderSettings r = renderSettingsFor(presetLevels(p), 1.0f);
+        CHECK(!r.tessellation);
+        CHECK_EQ(r.bloom, presetLevels(p)[GfxBloom] > 0);
+    }
+    GraphicsLevels custom = presetLevels(PresetLow);
+    custom[GfxTessellation] = 1;
+    CHECK(!renderSettingsFor(custom, 1.0f).tessellation);
+    CHECK_EQ(matchingPreset(presetLevels(PresetHigh)), int(PresetHigh));
+    setGraphicsOptionAvailable(GfxTessellation, true);
+    CHECK(renderSettingsFor(presetLevels(PresetHigh), 1.0f).tessellation);
+    CHECK(graphicsOptionAvailable(-1) && graphicsOptionAvailable(GfxOptionCount));
 }
 
 // Every option and level shown in Options > Graphics has its English text (the other languages
@@ -216,8 +242,22 @@ TEST(graphics_options_translated) {
         CHECK(keys.insert(key).second);
         CHECK(have.count("options." + key) == 1);
         CHECK(have.count("options." + key + ".help") == 1);
+        if (o == GfxTessellation) CHECK(have.count("options." + key + ".unavailable") == 1);
         for (int l = 0; l < graphicsLevelCount(o); ++l) CHECK(have.count(graphicsLevelLabel(o, l)) == 1);
     }
     for (const char* k : {"options.quality", "options.quality.help", "options.quality.very_low", "options.quality.custom"})
         CHECK(have.count(k) == 1);
+}
+
+// Drivers that list tessellation but draw nothing with it (src/gl/gl_quirks.h), by the renderer
+// string their GL_RENDERER gives.
+TEST(gl_tessellation_quirk_renderers) {
+    CHECK(gl46::tessellationBroken("zink Vulkan 1.4(Apple M3 Pro (MESA_KOSMICKRISP))"));
+    CHECK(gl46::tessellationBroken("zink Vulkan 1.4(Apple M1 (MESA_KOSMICKRISP))"));
+    CHECK(!gl46::tessellationBroken("zink Vulkan 1.4(NVIDIA GeForce RTX 4070 (NVIDIA_PROPRIETARY))"));
+    CHECK(!gl46::tessellationBroken("zink Vulkan 1.3(llvmpipe (LLVM 19.1.7, 256 bits) (MESA_LLVMPIPE))"));
+    CHECK(!gl46::tessellationBroken("AMD Radeon RX 570 Series (radeonsi, polaris10, LLVM 19.1.7, DRM 3.61)"));
+    CHECK(!gl46::tessellationBroken("NVIDIA GeForce RTX 4070/PCIe/SSE2"));
+    CHECK(!gl46::tessellationBroken("llvmpipe (LLVM 19.1.7, 256 bits)"));
+    CHECK(!gl46::tessellationBroken(nullptr));
 }

@@ -151,7 +151,7 @@ private:
 
 std::unique_ptr<Backend> createNullBackend() { return std::unique_ptr<Backend>(new NullBackend()); }
 
-#ifndef __linux__   // Linux: backend_alsa.cpp
+#if !defined(__linux__) && !defined(__APPLE__)   // Linux: backend_alsa.cpp; macOS: backend_coreaudio.cpp
 std::unique_ptr<Backend> createBackend() { return createNullBackend(); }
 #endif
 

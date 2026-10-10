@@ -2,7 +2,7 @@
 // game): 0 = table + players (PCSS contact hardening at ~0.6 mm texels), 1 = around the table,
 // 2 = the whole hall including the thick window walls. Each cascade's depth range spans the whole
 // scene towards the sun so every caster (window mullions, reveals) is included; depth clamping
-// catches the rest. DRAW_STATIC casters are cached per cascade and only re-rendered when the sun
+// catches the rest (without it, the range is stretched to the nearest caster). DRAW_STATIC casters are cached per cascade and only re-rendered when the sun
 // moves or invalidateStatic() is called; each frame copies the cache and adds dynamic casters.
 #pragma once
 #include "../gpu.h"

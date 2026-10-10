@@ -67,6 +67,7 @@ options.volumetric_light = 体积光
 options.volumetric_light.help = 阳光穿过大厅里满是尘埃的空气形成的光柱，以及在光中闪烁的微尘。
 options.tessellation = 曲面细分
 options.tessellation.help = 近看棋子时，其曲线的轮廓更加平滑。
+options.tessellation.unavailable = 不可用：此图形驱动程序不支持曲面细分。
 options.antialiasing = 抗锯齿
 options.antialiasing.help = 平滑锯齿状的边缘和闪烁的高光。关闭：画面更锐利但有锯齿，部分效果会显得有颗粒感。
 options.depth_of_field = 景深
@@ -1405,6 +1406,7 @@ gif.wait.both = {0} {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = 无法启动 OpenGL 4.6。请更新显卡驱动程序。
+error.opengl_macos = 无法在此 Mac 上启动 OpenGL 4.6。Scacelith 需要 Apple 芯片（M1 或更新）和 macOS 26 或更高版本，且无法在虚拟机中运行。
 error.renderer = 无法启动渲染器。
 error.scene = 无法加载场景。
 error.log_file = 详细信息见日志文件：{0}

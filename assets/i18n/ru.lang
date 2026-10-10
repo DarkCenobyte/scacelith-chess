@@ -68,6 +68,7 @@ options.volumetric_light = Объёмный свет
 options.volumetric_light.help = Солнечные лучи в пыльном воздухе зала и пылинки, сверкающие в них.
 options.tessellation = Тесселяция
 options.tessellation.help = Гладкие контуры на изгибах фигур, видимых вблизи.
+options.tessellation.unavailable = Недоступно: этот графический драйвер не поддерживает тесселяцию.
 options.antialiasing = Сглаживание
 options.antialiasing.help = Сглаживает зубчатые края и мерцающие блики. Выкл.: чётче, но с «лесенкой», и некоторые эффекты выглядят зернистыми.
 options.depth_of_field = Глубина резкости
@@ -1406,6 +1407,7 @@ gif.wait.both = {0} и {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = Не удалось запустить OpenGL 4.6. Обновите драйвер видеокарты.
+error.opengl_macos = Не удалось запустить OpenGL 4.6 на этом Mac. Для Scacelith нужен процессор Apple silicon (M1 или новее) и macOS 26 или новее; в виртуальной машине игра не работает.
 error.renderer = Не удалось запустить рендерер.
 error.scene = Не удалось загрузить сцену.
 error.log_file = Подробности в файле журнала: {0}

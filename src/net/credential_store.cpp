@@ -12,6 +12,10 @@
 #include <cstring>
 #include <thread>
 #include <vector>
+#ifdef __APPLE__
+#include <map>
+#include <mutex>
+#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -161,10 +165,68 @@ bool keyringOff() {
 }
 
 // Why there is no keyring (the store has none: keyring()).
+#ifdef __APPLE__
+std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "no keychain"; }
+#else
 std::string noKeyring() { return keyringOff() ? "disabled by SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded"; }
+#endif
+
+#ifdef __APPLE__
+// SCACELITH_KEYRING=memory: a keyring in this process's memory instead of the user's keychain, for
+// the unit tests (tests/test_main.cpp). A token never goes to the credentials file there: the
+// stores and clients of the tests find the sessions that others kept through it instead, until the
+// process ends. Never locked, never unavailable.
+bool keyringInMemory() {
+    const char* env = std::getenv("SCACELITH_KEYRING");
+    return env && std::strcmp(env, "memory") == 0;
+}
+
+class MemoryKeyring final : public Keyring {
+public:
+    Result store(const std::string& origin, const std::string& id, const std::string& secret, CancelToken* cancel,
+                 std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        items_[origin + '\n' + id] = secret;
+        return Result::Ok;
+    }
+    Result lookup(const std::string& origin, const std::string& id, std::string& secret, CancelToken* cancel,
+                  std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        const auto it = items_.find(origin + '\n' + id);
+        if (it == items_.end()) return Result::Missing;
+        secret = it->second;
+        return Result::Ok;
+    }
+    Result remove(const std::string& origin, const std::string& id, CancelToken* cancel, std::string&) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        std::lock_guard<std::mutex> lk(mu_);
+        items_.erase(origin + '\n' + id);
+        return Result::Ok;
+    }
+    Result unlock(const std::string&, const std::string&, CancelToken* cancel, std::string&) override {
+        return cancel && cancel->cancelled() ? Result::Cancelled : Result::Ok;
+    }
+
+private:
+    std::mutex mu_;
+    std::map<std::string, std::string> items_;   // "<origin>\n<id>": the secret
+};
+#endif
 }  // namespace
 
+#ifdef __APPLE__
+Keyring* defaultKeyring() {
+    if (keyringInMemory()) {
+        static Keyring* const memory = new MemoryKeyring();   // never destroyed, as the keychain's
+        return memory;
+    }
+    return keyringOff() ? nullptr : keychainKeyring();
+}
+#else
 Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
+#endif
 
 void setFileSessionsAllowed(bool allowed) {
     if (g_fileSessions.exchange(allowed) == allowed) return;
@@ -306,7 +368,11 @@ void CredentialStore::applyMovesLocked() const {
         if (inKeyring(r->tokenBlob) || inMemory(r->tokenBlob))
             blob = r->tokenBlob;
         else if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token))
+#ifdef __APPLE__
+            blob = holdLocked(token);   // never written to the file there (kFileSessions)
+#else
             blob = protectToken(mv.second, token);
+#endif
         wipe(token);
         r->origin = mv.second;
         r->tokenBlob = blob;
@@ -469,7 +535,8 @@ void CredentialStore::dropLocked(const std::string& blob) const {
 
 void CredentialStore::reconcileLocked() const {
 #ifndef _WIN32
-    const bool allowed = fileSessionsAllowed();
+    // macOS: never in the file (kFileSessions), whatever the option says.
+    const bool allowed = kFileSessions && fileSessionsAllowed();
     bool changed = false, closed = true, checked = false;
     for (Record& r : records_) {
         const bool file = inFile(r.tokenBlob), memory = inMemory(r.tokenBlob);
@@ -595,6 +662,11 @@ std::string CredentialStore::fallback(const std::string& origin, const std::stri
 #ifdef _WIN32
     (void)why;
     return protectToken(origin, token);
+#elif defined(__APPLE__)
+    // Never in the file there (kFileSessions): memory, until the game quits.
+    (void)token;
+    LOGW("net: the session of %s is kept in memory until the game quits, not in the keychain (%s)", origin.c_str(), why.c_str());
+    return kMemoryPrefix;
 #else
     bool allowed = fileSessionsAllowed(), closed = false;
     std::string at;

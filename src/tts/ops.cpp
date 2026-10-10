@@ -9,7 +9,11 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#if defined(__aarch64__)
+#include <arm_neon.h>
+#else
 #include <xmmintrin.h>
+#endif
 
 namespace tts {
 namespace {
@@ -1284,6 +1288,24 @@ bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x0, Tensor* out, st
     int64_t n = x.count();
     // minps/maxps(x, acc) select exactly as std::min/max(acc, x) do: a NaN never replaces acc and
     // -0 never replaces the +0 start, so lanes reduced in any order give the scalar loop's bits.
+#if defined(__aarch64__)
+    // NEON's fmin/fmax propagate NaN and order -0 below +0: the same selection is made with
+    // compares (x < acc, x > acc), which are false for NaN and for -0 against +0.
+    auto vmin = [](float32x4_t x, float32x4_t acc) { return vbslq_f32(vcltq_f32(x, acc), x, acc); };
+    auto vmax = [](float32x4_t x, float32x4_t acc) { return vbslq_f32(vcgtq_f32(x, acc), x, acc); };
+    float32x4_t mn0 = vdupq_n_f32(0.0f), mn1 = mn0, mx0 = mn0, mx1 = mn0;
+    int64_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        float32x4_t a = vld1q_f32(p + i), b = vld1q_f32(p + i + 4);
+        mn0 = vmin(a, mn0);
+        mn1 = vmin(b, mn1);
+        mx0 = vmax(a, mx0);
+        mx1 = vmax(b, mx1);
+    }
+    alignas(16) float lanes[8];
+    vst1q_f32(lanes, vmin(mn0, mn1));
+    vst1q_f32(lanes + 4, vmax(mx0, mx1));
+#else
     __m128 mn0 = _mm_setzero_ps(), mn1 = mn0, mx0 = mn0, mx1 = mn0;
     int64_t i = 0;
     for (; i + 8 <= n; i += 8) {
@@ -1296,6 +1318,7 @@ bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x0, Tensor* out, st
     alignas(16) float lanes[8];
     _mm_store_ps(lanes, _mm_min_ps(mn0, mn1));
     _mm_store_ps(lanes + 4, _mm_max_ps(mx0, mx1));
+#endif
     float mn = 0.0f, mx = 0.0f;
     for (int l = 0; l < 4; ++l) {
         mn = std::min(mn, lanes[l]);

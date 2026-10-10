@@ -1,12 +1,19 @@
 cmake_minimum_required(VERSION 3.21)
 # The version: cmake/version.cmake (SCACELITH_VERSION_CORE for project(), SCACELITH_VERSION in full).
 include(cmake/version.cmake)
+# macOS: Apple silicon only, macOS 26 or later (Metal 4, which OpenGL runs on there: see
+# src/platform/macos_gl.h). Set before project(), which reads them.
+if(CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "Minimum macOS version (26.0 or later)")
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "macOS architecture (arm64 only)")
+endif()
 project(Scacelith VERSION ${SCACELITH_VERSION_CORE} LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------------------------
 # Build configuration
 #   Windows (shipping):  cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 #   Linux (tests only):  cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+#   Linux aarch64 (cross, tests under qemu-aarch64): cmake -B build-arm64 -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-linux-gnu.cmake -DCMAKE_BUILD_TYPE=Release
 #   Quicker local builds: add -DSCACELITH_SF_VARIANTS=x86-64-avx2 (or another variant this CPU
 #   runs) to compile Stockfish once instead of once per instruction set (third_party/stockfish)
 # ---------------------------------------------------------------------------------------------
@@ -25,9 +32,40 @@ set(SCACELITH_SANITIZE "" CACHE STRING "Sanitizers for a test build (e.g. addres
 set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+# Target architecture: x86-64 (Windows and Linux, the shipped builds) or 64-bit ARM (Linux aarch64,
+# and macOS on Apple silicon only), where Stockfish has its ARM variants (third_party/stockfish)
+# and the text-to-speech its NEON kernels (src/tts/kernels.h). docs/PORTS.md has the details.
+if(APPLE)
+    if(NOT (CMAKE_OSX_ARCHITECTURES STREQUAL "arm64" OR
+            (NOT CMAKE_OSX_ARCHITECTURES AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")))
+        message(FATAL_ERROR "macOS builds are for Apple silicon only: build on an arm64 Mac, or set CMAKE_OSX_ARCHITECTURES=arm64 (not ${CMAKE_OSX_ARCHITECTURES}${CMAKE_SYSTEM_PROCESSOR})")
+    endif()
+    set(SCACELITH_ARM64 ON)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+    set(SCACELITH_ARM64 ON)
+else()
+    set(SCACELITH_ARM64 OFF)
+endif()
 if(WIN32)
     enable_language(RC)
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN UNICODE _UNICODE)
+endif()
+if(APPLE)
+    # The Cocoa platform layer is Objective-C++ (src/platform/platform_cocoa.mm). OpenSSL 3 is linked
+    # statically: macOS has none (-DOPENSSL_ROOT_DIR=<an arm64 build of it>).
+    if(CMAKE_OSX_ARCHITECTURES)
+        set(mac_archs "${CMAKE_OSX_ARCHITECTURES}")
+    else()
+        set(mac_archs "${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+    if(NOT mac_archs STREQUAL "arm64")
+        message(FATAL_ERROR "macOS builds are for Apple silicon only: arm64, not '${mac_archs}' (-DCMAKE_OSX_ARCHITECTURES=arm64)")
+    endif()
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 26.0)
+        message(FATAL_ERROR "macOS builds need macOS 26 or later, not '${CMAKE_OSX_DEPLOYMENT_TARGET}' (-DCMAKE_OSX_DEPLOYMENT_TARGET=26.0)")
+    endif()
+    enable_language(OBJCXX)
+    set(OPENSSL_USE_STATIC_LIBS ON)
 endif()
 if(SCACELITH_SANITIZE)
     if(WIN32)
@@ -61,17 +99,24 @@ if(SCACELITH_STOCKFISH)
     endif()
     # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
     # another compiler, or LLVM's ld/objcopy/objdump/nm, would fail deep in the build instead of here.
-    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
-    endif()
-    foreach(tool LINKER OBJCOPY OBJDUMP NM)
-        if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
-            execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
-            if(NOT tool_version MATCHES "^GNU ")
-                message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
-            endif()
+    # macOS builds its single variant with Apple clang and does not isolate it (Mach-O).
+    if(APPLE)
+        if(NOT CMAKE_CXX_COMPILER_ID MATCHES "^(AppleClang|Clang)$")
+            message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish needs Apple clang on macOS (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
         endif()
-    endforeach()
+    else()
+        if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+        endif()
+        foreach(tool LINKER OBJCOPY OBJDUMP NM)
+            if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
+                execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
+                if(NOT tool_version MATCHES "^GNU ")
+                    message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+                endif()
+            endif()
+        endforeach()
+    endif()
     add_subdirectory(third_party/stockfish)
 endif()
 
@@ -92,6 +137,13 @@ set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cp
     ${ROOT}/src/game/game_saving.cpp ${ROOT}/src/game/replay.cpp ${ROOT}/src/game/online_account.cpp
     ${ROOT}/src/game/online_mock.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
+# The TTS kernels of the target's instruction sets (src/tts/kernels.h).
+if(SCACELITH_ARM64)
+    list(REMOVE_ITEM CORE_SOURCES ${ROOT}/src/tts/kernels_sse2.cpp ${ROOT}/src/tts/kernels_avx2.cpp
+         ${ROOT}/src/tts/kernels_avxvnni.cpp ${ROOT}/src/tts/kernels_avx512.cpp)
+else()
+    list(REMOVE_ITEM CORE_SOURCES ${ROOT}/src/tts/kernels_neon.cpp)
+endif()
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 # The full version (cmake/version.cmake), for every module (generated/scacelith_version.h).
 configure_file(${ROOT}/cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith_version.h @ONLY)
@@ -112,29 +164,41 @@ else()
     # src/net/secret_service.cpp; in libc from glibc 2.34)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
 endif()
+if(APPLE)
+    # The CoreAudio output (src/audio/backend_coreaudio.cpp), the Keychain (src/net/keychain.cpp) and
+    # the system's trust anchors (src/net/transport_openssl.cpp).
+    target_link_libraries(scacelith_core PUBLIC "-framework AudioToolbox" "-framework AudioUnit" "-framework CoreAudio"
+                          "-framework CoreFoundation" "-framework Security")
+endif()
 # Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at
 # run time (src/tts/kernels.h); everything else is baseline x86-64. MinGW does not align the stack
 # to 32 bytes for AVX spills (GCC bug 54412): the assembler turns aligned vector moves into
 # unaligned ones in those units. The model files are prepared by third_party/supertonic3.
-set(TTS_AVX2_FLAGS -O3 -mavx2 -mfma)
-set(TTS_AVXVNNI_FLAGS ${TTS_AVX2_FLAGS} -mavxvnni)
-set(TTS_AVX512_FLAGS ${TTS_AVX2_FLAGS} -mavx512f -mavx512bw -mavx512vl -mavx512dq -mavx512vnni)
-if(WIN32)
-    foreach(v TTS_AVX2_FLAGS TTS_AVXVNNI_FLAGS TTS_AVX512_FLAGS)
-        list(APPEND ${v} -Wa,-muse-unaligned-vector-move)
-    endforeach()
+# On 64-bit ARM the NEON kernels are baseline code (kernels_neon.cpp), like everything else.
+if(SCACELITH_ARM64)
+    set_source_files_properties(${ROOT}/src/tts/kernels_neon.cpp PROPERTIES COMPILE_OPTIONS "-O3")
+else()
+    set(TTS_AVX2_FLAGS -O3 -mavx2 -mfma)
+    set(TTS_AVXVNNI_FLAGS ${TTS_AVX2_FLAGS} -mavxvnni)
+    set(TTS_AVX512_FLAGS ${TTS_AVX2_FLAGS} -mavx512f -mavx512bw -mavx512vl -mavx512dq -mavx512vnni)
+    if(WIN32)
+        foreach(v TTS_AVX2_FLAGS TTS_AVXVNNI_FLAGS TTS_AVX512_FLAGS)
+            list(APPEND ${v} -Wa,-muse-unaligned-vector-move)
+        endforeach()
+    endif()
+    set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_OPTIONS "-O3")
+    set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
+    set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
+    set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
 endif()
-set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_OPTIONS "-O3")
 # The interpreter's element-wise loops: at -O2 GCC's vectorizer refuses every loop that needs a
 # run-time alias check. Never add fast-math options: the bit-exact audio depends on their absence.
 set_source_files_properties(${ROOT}/src/tts/ops.cpp PROPERTIES COMPILE_OPTIONS "-O3")
-set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
-set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
-set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
-# Audit of those units (Stockfish's tools/isa_audit.py, part of the build when Python is available):
-# a small program links the TTS runtime like the game does, and the build fails if its disassembly
-# shows an instruction above baseline outside the kernel units, one above a unit's level inside it,
-# or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
+# Audit of the x86 units (Stockfish's tools/isa_audit.py, part of the build when Python is
+# available): a small program links the TTS runtime like the game does, and the build fails if its
+# disassembly shows an instruction above baseline outside the kernel units, one above a unit's
+# level inside it, or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
+# 64-bit ARM has no kernel unit above baseline: nothing to audit.
 find_package(Python3 COMPONENTS Interpreter)
 # The shipped exe (a Windows Release build) is never built without the instruction-set audits and
 # the .pdata check below; other builds skip them with a warning.
@@ -142,7 +206,9 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)   # as $<CONFIG:Release> compar
 if(WIN32 AND build_type STREQUAL "RELEASE" AND NOT Python3_Interpreter_FOUND)
     message(FATAL_ERROR "Python 3 not found: a Windows Release build needs it for the instruction-set audits and the .pdata check")
 endif()
-if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
+if(SCACELITH_ARM64)
+    # (no TTS instruction-set audit)
+elseif(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
     add_executable(tts_isa_probe ${ROOT}/tools/tts_isa_probe.cpp)
     target_link_libraries(tts_isa_probe PRIVATE scacelith_core)
     target_link_options(tts_isa_probe PRIVATE -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/tts_isa_probe.map)
@@ -205,6 +271,12 @@ if(WIN32)
         OBJECT_DEPENDS "${SCACELITH_ICON_ICO};${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest")
     list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)
 endif()
+if(APPLE)
+    # The Cocoa layer instead of the X11 one, with automatic reference counting.
+    list(REMOVE_ITEM GAME_SOURCES ${ROOT}/src/platform/platform_x11.cpp ${ROOT}/src/platform/platform_win32.cpp)
+    set_source_files_properties(${ROOT}/src/platform/platform_cocoa.mm PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
+    list(APPEND GAME_EXTRA ${ROOT}/src/platform/platform_cocoa.mm)
+endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
 target_link_libraries(scacelith PRIVATE scacelith_core)
@@ -217,6 +289,13 @@ if(WIN32)
         target_link_options(scacelith PRIVATE -mwindows)
     endif()
     set_target_properties(scacelith PROPERTIES OUTPUT_NAME "Scacelith")
+elseif(APPLE)
+    # No OpenGL library is linked: Mesa's libEGL (Zink over KosmicKrisp) is loaded at run time from
+    # the bundle's Contents/Frameworks (src/platform/macos_gl.cpp), which the rpath names for the
+    # libraries it loads in turn.
+    target_link_libraries(scacelith PRIVATE "-framework Cocoa" "-framework CoreGraphics" "-framework Metal"
+                          "-framework QuartzCore")
+    target_link_options(scacelith PRIVATE "LINKER:-rpath,@executable_path/../Frameworks")
 else()
     find_package(X11 REQUIRED)
     target_link_libraries(scacelith PRIVATE X11 GL dl)

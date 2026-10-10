@@ -2264,6 +2264,9 @@ void FakeServer::Impl::ensureDevices() {
 #ifdef _WIN32
     const char* here = "Scacelith/" SCACELITH_VERSION " win64";
     const char* other = "Scacelith/" SCACELITH_VERSION " linux";
+#elif defined(__APPLE__)
+    const char* here = "Scacelith/" SCACELITH_VERSION " macos";
+    const char* other = "Scacelith/" SCACELITH_VERSION " win64";
 #else
     const char* here = "Scacelith/" SCACELITH_VERSION " linux";
     const char* other = "Scacelith/" SCACELITH_VERSION " win64";

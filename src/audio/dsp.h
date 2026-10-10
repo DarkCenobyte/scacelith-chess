@@ -24,6 +24,19 @@ struct DenormalGuard {
     unsigned csr;
     DenormalGuard() : csr(_mm_getcsr()) { _mm_setcsr(csr | 0x8040u); }
     ~DenormalGuard() { _mm_setcsr(csr); }
+#elif defined(__aarch64__)
+    // AArch64 (Linux, macOS): FPCR.FZ (bit 24) flushes the denormal inputs and results of single and
+    // double precision operations to zero, what MXCSR's FTZ and DAZ do together on x86. The
+    // "memory" clobber keeps the loads and stores of the guarded code on their side of the switch.
+    uint64_t fpcr;
+    DenormalGuard() : fpcr(readFpcr()) { writeFpcr(fpcr | (uint64_t(1) << 24)); }
+    ~DenormalGuard() { writeFpcr(fpcr); }
+    static uint64_t readFpcr() {
+        uint64_t v;
+        __asm__ __volatile__("mrs %0, fpcr" : "=r"(v) : : "memory");
+        return v;
+    }
+    static void writeFpcr(uint64_t v) { __asm__ __volatile__("msr fpcr, %0" : : "r"(v) : "memory"); }
 #else
     DenormalGuard() = default;
 #endif

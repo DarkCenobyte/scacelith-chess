@@ -961,7 +961,8 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
             // Czech, Slovak, Hungarian and Croatian layouts.
             bool ctrl = (in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL]) && !in.keyDown[plat::KEY_LALT] &&
                         !in.keyDown[plat::KEY_RALT];
-            if (ctrl && in.keyPressed['V']) {
+            bool cmd = in.keyDown[plat::KEY_LCMD] || in.keyDown[plat::KEY_RCMD];  // macOS
+            if ((ctrl || cmd) && in.keyPressed['V']) {
                 // Decoded only as far as it fits: a huge clipboard costs no more than a name.
                 const std::string clip = room > 0 ? plat::clipboardText() : std::string();
                 for (size_t i = 0; i < clip.size() && int(typed.size()) < room;) {

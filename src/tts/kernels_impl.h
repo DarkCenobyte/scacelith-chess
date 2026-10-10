@@ -7,18 +7,25 @@
 //   copySign, abs, cmpGt, select, cvtI8 / cvtU8 (W bytes to floats), sqrtScalar;
 //   izero, iset1, ibcast32 (broadcast 4 bytes), iload, iloadu, istore, istoreu, iadd, storeU8
 //   (W int32 in 0..255 to bytes), madd16 (pmaddwd), and dpbusd (u8 x s8 dot of 4, VNNI units only).
-// SSE2 intrinsics may be used directly (every unit has them), wider ones only through V.
+// SSE2 intrinsics may be used directly (every unit has them), wider ones only through V. On
+// aarch64 the same goes for NEON (<arm_neon.h>, part of every ARMv8-A CPU): its only units are
+// baseline code (kernels_neon.cpp).
 //
 // Rules that keep instruction-set code confined to its unit (no isolate step as Stockfish has):
 // this header and the AVX units include only <immintrin.h>, <cstddef> and <cstdint>; everything
 // is in an anonymous namespace (internal linkage, never a merged COMDAT copy); no std:: templates
 // or library calls (math is done with the polynomials below); the only external symbols of a unit
-// are the tts::kern::table*() functions returning plain data. The baseline unit
-// (kernels_sse2.cpp) is compiled with the normal flags and may use the standard library.
+// are the tts::kern::table*() functions returning plain data. The baseline units
+// (kernels_sse2.cpp, kernels_neon.cpp) are compiled with the normal flags and may use the standard
+// library.
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#if defined(__aarch64__)
+#include <arm_neon.h>
+#else
 #include <immintrin.h>
+#endif
 
 namespace {
 
@@ -358,6 +365,21 @@ inline void kPackIntA16(const uint8_t* A, ptrdiff_t lda, int rows, int K, bool i
 }
 
 // Two rows of 8 bytes widened to int16 (zero point removed) and interleaved: 8 (k0, k1) pairs.
+#if defined(__aarch64__)
+inline void widenPair8(const uint8_t* r0, const uint8_t* r1, bool isUnsigned, int zp, int16_t* d) {
+    uint8x8_t a = vld1_u8(r0), b = vld1_u8(r1);
+    int16x8x2_t xy;
+    if (isUnsigned) {
+        int16x8_t vz = vdupq_n_s16(int16_t(zp));
+        xy.val[0] = vsubq_s16(vreinterpretq_s16_u16(vmovl_u8(a)), vz);
+        xy.val[1] = vsubq_s16(vreinterpretq_s16_u16(vmovl_u8(b)), vz);
+    } else {
+        xy.val[0] = vmovl_s8(vreinterpret_s8_u8(a));
+        xy.val[1] = vmovl_s8(vreinterpret_s8_u8(b));
+    }
+    vst2q_s16(d, xy);   // x0 y0 x1 y1 ... x7 y7
+}
+#else
 inline void widenPair8(const uint8_t* r0, const uint8_t* r1, bool isUnsigned, int zp, int16_t* d) {
     long long a, b;
     __builtin_memcpy(&a, r0, 8);
@@ -374,6 +396,7 @@ inline void widenPair8(const uint8_t* r0, const uint8_t* r1, bool isUnsigned, in
     _mm_storeu_si128(reinterpret_cast<__m128i*>(d), _mm_unpacklo_epi16(x, y));
     _mm_storeu_si128(reinterpret_cast<__m128i*>(d + 8), _mm_unpackhi_epi16(x, y));
 }
+#endif
 
 template <class V, int NR>
 void kPackIntB16(const uint8_t* B, ptrdiff_t ldb, int K, int cols, bool isUnsigned, int zp, void* Bp) {
@@ -434,6 +457,16 @@ inline void kPackIntA8(const uint8_t* A, ptrdiff_t lda, int rows, int K, bool, i
 }
 
 // Four rows of 16 bytes interleaved: 16 groups of (k0, k1, k2, k3).
+#if defined(__aarch64__)
+inline void interleave4x16(const uint8_t* r0, const uint8_t* r1, const uint8_t* r2, const uint8_t* r3, uint8_t* d) {
+    uint8x16x4_t v;
+    v.val[0] = vld1q_u8(r0);
+    v.val[1] = vld1q_u8(r1);
+    v.val[2] = vld1q_u8(r2);
+    v.val[3] = vld1q_u8(r3);
+    vst4q_u8(d, v);
+}
+#else
 inline void interleave4x16(const uint8_t* r0, const uint8_t* r1, const uint8_t* r2, const uint8_t* r3, uint8_t* d) {
     __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(r0));
     __m128i b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(r1));
@@ -447,6 +480,7 @@ inline void interleave4x16(const uint8_t* r0, const uint8_t* r1, const uint8_t* 
     _mm_storeu_si128(o + 2, _mm_unpacklo_epi16(ab1, ce1));
     _mm_storeu_si128(o + 3, _mm_unpackhi_epi16(ab1, ce1));
 }
+#endif
 
 template <class V, int NR>
 void kPackIntB8(const uint8_t* B, ptrdiff_t ldb, int K, int cols, bool, int, void* Bp) {

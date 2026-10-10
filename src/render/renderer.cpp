@@ -7,6 +7,7 @@
 #include "post/postfx.h"
 #include "shader.h"
 #include "../game/layout.h"
+#include "../gl/gl_context.h"
 #include <algorithm>
 #include <cstring>
 
@@ -78,6 +79,7 @@ static GLuint g_samplerShadowCmp = 0, g_samplerShadowRaw = 0;
 
 bool Renderer::init(const RenderSettings& s) {
     settings_ = s;
+    settings_.tessellation = s.tessellation && gl46::caps().tessellation;  // whatever the preset says
     gpu::ensureBuffer(frameUbo_, sizeof(FrameUBOData));
     gpu::ensureBuffer(drawSsbo_, sizeof(DrawDataGPU) * 256);
     gpu::ensureBuffer(lightSsbo_, sizeof(PointLight) * 16);
@@ -230,6 +232,7 @@ void Renderer::setSettings(const RenderSettings& s) {
                          s.lightProbes != settings_.lightProbes;
     bool planarChanged = s.planarReflections != settings_.planarReflections || s.planarDivisor != settings_.planarDivisor;
     settings_ = s;
+    settings_.tessellation = s.tessellation && gl46::caps().tessellation;
     if (shadowsChanged && frameUbo_.id) shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
     if (probesChanged && frameUbo_.id) {
         std::vector<LightProbeDesc> keep = probes_->probes();

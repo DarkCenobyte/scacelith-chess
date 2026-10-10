@@ -1,6 +1,7 @@
 // Small persistent thread pool for the TTS runtime: the calling thread plus (threads - 1) helpers
 // that sleep between jobs. Helpers run at below-normal priority with flush-to-zero /
-// denormals-are-zero set (MXCSR is per thread); the caller sets its own (see FpGuard).
+// denormals-are-zero set (MXCSR, or FPCR.FZ on aarch64, is per thread); the caller sets its own
+// (see FpGuard).
 #pragma once
 #include <atomic>
 #include <condition_variable>
@@ -14,12 +15,16 @@
 namespace tts {
 
 // Lowers the priority of the calling thread below normal (Windows THREAD_PRIORITY_BELOW_NORMAL,
-// Linux nice +5 for this thread only).
+// Linux nice +5 for this thread only, macOS 5 steps lower within the thread's quality of service).
 void lowerThreadPriority();
 
 // Flush-to-zero / denormals-are-zero for the current thread, restored on destruction.
 struct FpGuard {
-    unsigned csr;
+#if defined(__aarch64__)
+    uint64_t csr;   // FPCR
+#else
+    unsigned csr;   // MXCSR
+#endif
     FpGuard();
     ~FpGuard();
     FpGuard(const FpGuard&) = delete;

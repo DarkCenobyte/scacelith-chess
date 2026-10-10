@@ -68,6 +68,7 @@ options.volumetric_light = Rayons de lumière
 options.volumetric_light.help = Des rayons de soleil dans l’air poussiéreux de la salle, et les grains de poussière qui y scintillent.
 options.tessellation = Tessellation
 options.tessellation.help = Des contours lisses sur les courbes des pièces vues de près.
+options.tessellation.unavailable = Indisponible : ce pilote graphique ne gère pas la tessellation.
 options.antialiasing = Anticrénelage
 options.antialiasing.help = Lisse les bords en escalier et le scintillement des reflets. Désactivé : plus net mais crénelé, et certains effets paraissent granuleux.
 options.depth_of_field = Profondeur de champ
@@ -1406,6 +1407,7 @@ gif.wait.both = {0} et {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = Impossible de démarrer OpenGL 4.6. Veuillez mettre à jour le pilote de votre carte graphique.
+error.opengl_macos = Impossible de démarrer OpenGL 4.6 sur ce Mac. Scacelith nécessite une puce Apple silicon (M1 ou plus récente) et macOS 26 ou plus récent, et ne fonctionne pas dans une machine virtuelle.
 error.renderer = Le moteur de rendu n’a pas pu démarrer.
 error.scene = La scène n’a pas pu être chargée.
 error.log_file = Les détails se trouvent dans le fichier journal : {0}

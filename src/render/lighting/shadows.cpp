@@ -1,6 +1,7 @@
 #include "shadows.h"
 #include "lighting_data.h"
 #include "../renderer.h"
+#include "../../gl/gl_context.h"
 #include <cstring>
 
 using namespace m;
@@ -48,6 +49,10 @@ void SunShadows::fit(Renderer& r, vec3 sunDir) {
     // Light "up": world +Y projected (falls back to +X for a sun near the zenith).
     vec3 up = std::fabs(L.y) > 0.98f ? vec3(1, 0, 0) : vec3(0, 1, 0);
     const AABB& scene = r.sceneBounds_;
+    // Without depth clamping (macOS: gl46::caps()) a caster in front of the near plane would be
+    // clipped away, its shadow with it: the range then also starts at the frame's nearest caster
+    // (in half-metre steps, so that a moving one does not invalidate the static cache each frame).
+    const bool fitCasters = !gl46::caps().depthClamp;
     for (int c = 0; c < cascades_; ++c) {
         // With 2 cascades use the finest and the coarsest region.
         int ri = regionCount_ <= 0 ? 0 : (cascades_ == 2 && regionCount_ == 3 && c == 1 ? 2 : std::min(c, regionCount_ - 1));
@@ -64,6 +69,14 @@ void SunShadows::fit(Renderer& r, vec3 sunDir) {
             vec3 s((k & 1) ? scene.hi.x : scene.lo.x, (k & 2) ? scene.hi.y : scene.lo.y, (k & 4) ? scene.hi.z : scene.lo.z);
             vec3 w = transformPoint(V, s);
             d0 = std::min(d0, -w.z); d1 = std::max(d1, -w.z);
+        }
+        if (fitCasters) {
+            for (const Renderer::Item& it : r.items_) {
+                const Material& mat = *it.d.material;
+                if (mat.transparent || !mat.castShadow || !(it.d.flags & DRAW_CAST_SHADOW)) continue;
+                d0 = std::min(d0, -transformPoint(V, it.center).z - it.radius);
+            }
+            d0 = std::floor(d0 * 2.0f) * 0.5f;
         }
         // Pad for the widest PCSS kernel (48 texels) plus a margin.
         float ext = std::max(x1 - x0, y1 - y0);
@@ -105,7 +118,7 @@ void SunShadows::render(Renderer& r, vec3 sunDir, float softness, bool staticDir
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_CLAMP);
+    if (gl46::caps().depthClamp) glEnable(GL_DEPTH_CLAMP);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.25f, 2.0f);
     glViewport(0, 0, size_, size_);
@@ -154,7 +167,7 @@ void SunShadows::render(Renderer& r, vec3 sunDir, float softness, bool staticDir
         }
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
-    glDisable(GL_DEPTH_CLAMP);
+    if (gl46::caps().depthClamp) glDisable(GL_DEPTH_CLAMP);
 }
 
 }  // namespace lighting

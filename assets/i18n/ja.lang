@@ -67,6 +67,7 @@ options.volumetric_light = ボリュームライト
 options.volumetric_light.help = 広間のほこりっぽい空気に差し込む日差しの筋と、その中できらめくちり。
 options.tessellation = テッセレーション
 options.tessellation.help = 近くで見た駒の曲線を、滑らかな輪郭で描きます。
+options.tessellation.unavailable = 使用できません：このグラフィックドライバーはテッセレーションに対応していません。
 options.antialiasing = アンチエイリアス
 options.antialiasing.help = ギザギザの輪郭やちらつくハイライトを滑らかにします。オフ：くっきりしますがギザギザが目立ち、一部の効果が粗く見えます。
 options.depth_of_field = 被写界深度
@@ -1406,6 +1407,7 @@ gif.wait.both = {0}{1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = OpenGL 4.6 を起動できませんでした。グラフィックドライバーを更新してください。
+error.opengl_macos = この Mac では OpenGL 4.6 を起動できませんでした。Scacelith には Apple シリコン（M1 以降）と macOS 26 以降が必要で、仮想マシンでは動作しません。
 error.renderer = レンダラーを起動できませんでした。
 error.scene = シーンを読み込めませんでした。
 error.log_file = 詳細はログファイルに記録されています：{0}

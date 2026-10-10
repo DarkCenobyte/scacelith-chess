@@ -18,6 +18,12 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#ifdef __APPLE__
+#include <cctype>
+#include <cstring>
+#include <mach-o/dyld.h>
+#include <pwd.h>
+#endif
 extern char** environ;
 #endif
 
@@ -175,8 +181,25 @@ bool makeDirectories(const std::string& dir) {
     return CreateDirectoryW(widen(d).c_str(), nullptr) != 0 || directoryExists(d);
 }
 
-#else  // POSIX (Linux)
+#else  // POSIX (Linux, macOS)
 
+#ifdef __APPLE__
+std::string exeDirectory() {
+    // The executable's path as dyld knows it (maybe through a symbolic link, or with "." parts),
+    // resolved to its real path.
+    std::string path(PATH_MAX, '\0');
+    uint32_t size = uint32_t(path.size());
+    if (_NSGetExecutablePath(&path[0], &size) != 0) {   // too small: size is the length needed
+        path.assign(size_t(size) + 1, '\0');
+        if (_NSGetExecutablePath(&path[0], &size) != 0) return "./";
+    }
+    path.resize(std::strlen(path.c_str()));
+    char real[PATH_MAX];
+    if (realpath(path.c_str(), real)) path = real;
+    const size_t cut = path.find_last_of('/');
+    return cut == std::string::npos ? std::string("./") : path.substr(0, cut + 1);
+}
+#else
 std::string exeDirectory() {
     char buf[PATH_MAX];
     ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
@@ -185,6 +208,7 @@ std::string exeDirectory() {
     std::string s(buf);
     return s.substr(0, s.find_last_of('/') + 1);
 }
+#endif
 
 // A per-user folder from the environment (just created), resolved once to its canonical path
 // (weakly_canonical: absolute, no "." or ".." parts, no symbolic link where it exists), the one the
@@ -199,6 +223,32 @@ static std::string canonicalDirectory(const std::string& dir) {
     return d;
 }
 
+#ifdef __APPLE__
+// macOS: one folder for the settings, the saved logins, the log and the game's data files, as
+// Windows has: ~/Library/Application Support/scacelith/, private (0700) as on Linux. The home
+// folder is $HOME, else the user database's.
+std::string userDataDirectory() {
+    std::string base;
+    if (const char* home = getenv("HOME"); home && home[0] == '/') {
+        base = home;
+    } else {
+        passwd pw{};
+        passwd* found = nullptr;
+        char buf[4096];
+        if (getpwuid_r(getuid(), &pw, buf, sizeof buf, &found) == 0 && found && found->pw_dir && found->pw_dir[0] == '/')
+            base = found->pw_dir;
+    }
+    if (base.empty()) return exeDirectory();
+    if (base.back() != '/') base += '/';
+    base += "Library/Application Support/";
+    makeDirectories(base);
+    const std::string d = base + "scacelith/";
+    mkdir(d.c_str(), 0700);
+    return canonicalDirectory(d);
+}
+
+std::string appDataDirectory() { return userDataDirectory(); }
+#else
 std::string userDataDirectory() {
     // The XDG base directory rule: $XDG_CONFIG_HOME when it is an absolute path (a relative one is
     // ignored), else ~/.config. Its scacelith folder is private (it holds the saved logins).
@@ -226,6 +276,7 @@ std::string appDataDirectory() {
     makeDirectories(d);
     return canonicalDirectory(d);
 }
+#endif
 
 bool fileExists(const std::string& path) {
     struct stat st;
@@ -282,18 +333,36 @@ int spawnProgram(char* const argv[]) {
     sigaddset(&dfl, SIGPIPE);
     pid_t pid = -1;
     int spawned = posix_spawnattr_setsigdefault(&attr, &dfl);
+#ifdef __APPLE__
+    // macOS has no SOCK_CLOEXEC nor accept4: the child gets the standard descriptors that are open
+    // and nothing else (POSIX_SPAWN_CLOEXEC_DEFAULT), whatever the game opened without O_CLOEXEC.
+    posix_spawn_file_actions_t actions;
+    const bool haveActions = posix_spawn_file_actions_init(&actions) == 0;
+    if (!haveActions) spawned = -1;
+    for (int fd = 0; fd <= 2 && spawned == 0; ++fd)
+        if (fcntl(fd, F_GETFD) != -1) spawned = posix_spawn_file_actions_addinherit_np(&actions, fd);
+    if (spawned == 0) spawned = posix_spawnattr_setflags(&attr, short(POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_CLOEXEC_DEFAULT));
+    if (spawned == 0) spawned = posix_spawnp(&pid, argv[0], &actions, &attr, argv, environ);
+    if (haveActions) posix_spawn_file_actions_destroy(&actions);
+#else
     if (spawned == 0) spawned = posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSIGDEF);
     if (spawned == 0) spawned = posix_spawnp(&pid, argv[0], nullptr, &attr, argv, environ);
+#endif
     posix_spawnattr_destroy(&attr);
     return spawned == 0 ? int(pid) : -1;
 }
 
 bool openBrowser(const std::string& url) {
     if (url.compare(0, 8, "https://") != 0 && url.compare(0, 7, "http://") != 0) return false;
+#ifdef __APPLE__
+    char* argv[] = {const_cast<char*>("/usr/bin/open"), const_cast<char*>(url.c_str()), nullptr};
+#else
     char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(url.c_str()), nullptr};
+#endif
     const pid_t pid = spawnProgram(argv);
     if (pid < 0) return false;
     // xdg-open returns quickly (it detaches the browser); reap it so no zombie stays behind.
+    // open(1) returns once LaunchServices has the URL.
     int status = 0;
     waitpid(pid, &status, 0);
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
@@ -330,8 +399,24 @@ bool makeDirectories(const std::string& dir) {
 
 #endif
 
+#ifdef __APPLE__
+bool insideAppBundle(const std::string& dir) {
+    static const char kTail[] = ".app/Contents/MacOS/";
+    const size_t n = sizeof(kTail) - 1;
+    if (dir.size() <= n) return false;
+    for (size_t i = 0; i < n; ++i)
+        if (std::tolower((unsigned char)dir[dir.size() - n + i]) != std::tolower((unsigned char)kTail[i])) return false;
+    return true;
+}
+#endif
+
 std::string settingsDirectory() {
     const std::string exe = exeDirectory();
+#ifdef __APPLE__
+    // An application bundle is no portable install: Gatekeeper runs a quarantined app from a
+    // random read-only copy (App Translocation), and an update replaces the whole bundle.
+    if (insideAppBundle(exe)) return userDataDirectory();
+#endif
     if (fileExists(exe + "Scacelith.ini")) return exe;   // portable
     const std::string data = userDataDirectory();
     return directoryWritable(data) ? data : exe;
