@@ -241,6 +241,24 @@ Actions only (the artifact of the CI's macOS job, or a release).
 - SHA-256 of the exe: `a2331cc169d06256cb801cfa62594040a4495af1170fb969c46e6d3a12ad8d6f`
 - SHA-256 of the zip: `6f80dbcb3c56cb8481ebea85ce148805c2ccfa5a8e93822daf13e11462f63a45`
 
+## windows/Scacelith-2026-10-10-audit-final.zip
+
+- Holds `Scacelith-2026-10-10-audit-final.exe` (133 MB, zipped to 96 MB).
+- Source: branch `claude/audit-n03-a10-5gbp56` at commit `f147ee9` (pull request #30, not merged
+  yet), based on `master` at `60f3b5b` (pull request #29 merged).
+- Contents: the game-side fix of the final third-party audit (N03): in a "hold the draw" coach
+  challenge, a coach's answer that stalemates the player or leaves no mating material ends the
+  position as held (it used to wait for a move that did not exist). Also, in the challenges: a
+  hint asked for while the engine was still looking is dropped when the player moves first
+  (it used to come late, about the position left), no hint is offered when none can be given,
+  and a move the coach answers with checkmate is told as a mate.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine in the pull
+  request's CI on the same source. It has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `03706fc5bf35649127e09af6f4478f2cca38182d7af2a958ded6980de9a57ecf`
+- SHA-256 of the zip: `f50a8b9b7fb41ec0c156dd9c787fae52c3833812893ad29aac4491525adf3e1d`
+
 ## linux-aarch64/Scacelith-2026-10-10-linux-aarch64.tar.gz
 
 - The game for Linux on 64-bit Arm: the executable `scacelith` (130 MB), `install.sh` (adds it to
@@ -273,6 +291,26 @@ Actions only (the artifact of the CI's macOS job, or a release).
   x86_64-unknown-linux-musl`). Its test suites pass (1,468 Rust tests), and the game's client
   passed the live checks against this very binary, on Linux and under Wine.
 - SHA-256: `ab406fc8eeeaf62c09b4b84643577f0cb6022eadcbcc58b30e889898e1ef995e`
+
+## linux-server/scacelith-server-2026-10-10-audit-final
+
+- The dedicated server (`scacelith-server` 0.9.1, 14 MB): a static x86-64 executable (musl) that
+  runs on any x86-64 Linux, whatever its C library, with SQLite built in.
+- Source: `DarkCenobyte/scacelith-chess-server`, branch `claude/audit-n03-a10-5gbp56` at commit
+  `c510a05` (pull request #6, not merged yet), based on `master` at `32ec176` (pull request #5
+  merged: realtime protocol v1.2, standing viewpoints).
+- Contents: the server-side fix of the final third-party audit (A10 residual): a player who
+  reconnects over and over to a game whose host lags behind no longer piles up attach and detach
+  messages in that host's inbox (at most two per player's game wait there; a newer connection
+  waits for its game in its own task, tried again every 200 ms). New metric
+  `scacelith_game_attach_deferred_total`. Same database and configuration as the earlier builds;
+  protocol unchanged.
+- Install it as `/usr/local/bin/scacelith-server` and follow `docs/DEPLOY.md` of the server
+  repository.
+- Built with Rust 1.99.0 (`cargo build --release --locked -p scacelith-server --target
+  x86_64-unknown-linux-musl`). Its test suites pass (`cargo test --workspace`, locally and in the
+  pull request's CI), as do the contract and live tests with the game.
+- SHA-256: `f3d43b0bafb89be083fb9c1b5d44c902dc5c700b62a06fbc667ff281ce45517a`
 
 Licence: GPL-3.0 (see `LICENSE` on `master`; the dedicated server is GPL-3.0-or-later); the source of
 each build is the commit named above.
