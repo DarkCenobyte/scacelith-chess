@@ -34,6 +34,13 @@ using GraphicsLevels = std::array<int, GfxOptionCount>;
 // Presets, in Options > Graphics order. Very low sets every option to its lowest level and Ultra
 // to its highest; Custom is the player's own levels.
 enum GraphicsPreset { PresetVeryLow, PresetLow, PresetMedium, PresetHigh, PresetUltra, PresetCustom, GraphicsPresetCount };
+// The preset of a first start (no settings file, or one without [graphics]). Low on macOS, where
+// the GPU of a MacBook draws through Zink over KosmicKrisp at the Retina panel's resolution.
+#ifdef __APPLE__
+constexpr int kDefaultGraphicsPreset = PresetLow;
+#else
+constexpr int kDefaultGraphicsPreset = PresetHigh;
+#endif
 
 // Number of levels of an option (2 for the on/off ones).
 int graphicsLevelCount(int option);

@@ -28,8 +28,8 @@ struct Settings {
     float renderScale = 1.0f;
     // [graphics] Options > Graphics: a preset (Very low .. Ultra, graphics_quality.h) sets every
     // level; Custom keeps the player's own ([graphics_custom]).
-    int graphicsPreset = PresetHigh;
-    GraphicsLevels graphicsLevels = presetLevels(PresetHigh);
+    int graphicsPreset = kDefaultGraphicsPreset;
+    GraphicsLevels graphicsLevels = presetLevels(kDefaultGraphicsPreset);
     float brightness = 0.0f;      // exposure compensation (EV)
     // The brightness calibration was completed (Continue or Esc on its page). Until then every
     // start opens on it (screenshot runs excepted), however the previous runs ended. A settings

@@ -1,5 +1,6 @@
 #include "gl_context.h"
 #include "gl46.h"
+#include "gl_quirks.h"
 #include "../core/log.h"
 #include <cstdlib>
 #include <cstring>
@@ -26,9 +27,9 @@ bool hasExtension(const char* name) {
     return false;
 }
 
-// Whether the comma-separated list in SCACELITH_GL_DISABLE names this feature.
-bool disabledByEnv(const char* feature) {
-    const char* env = std::getenv("SCACELITH_GL_DISABLE");
+// Whether the comma-separated list in the environment variable 'var' names this feature.
+bool namedInEnv(const char* var, const char* feature) {
+    const char* env = std::getenv(var);
     if (!env) return false;
     const std::string list = std::string(",") + env + ",";
     return list.find(std::string(",") + feature + ",") != std::string::npos;
@@ -58,9 +59,20 @@ void detectCaps() {
         glDisable(GL_DEPTH_CLAMP);
     }
     drainErrors();
-    if (disabledByEnv("tessellation")) g_caps.tessellation = false;
-    if (disabledByEnv("depth_clamp")) g_caps.depthClamp = false;
-    if (!g_caps.tessellation) LOGW("GL: no tessellation on this driver: turned off whatever the graphics settings say");
+    const char* renderer = (const char*)glGetString(GL_RENDERER);
+    if (g_caps.tessellation && tessellationBroken(renderer)) {
+        if (namedInEnv("SCACELITH_GL_FORCE", "tessellation")) {
+            LOGW("GL: tessellation is known to draw nothing on this driver; kept on (SCACELITH_GL_FORCE)");
+        } else {
+            g_caps.tessellation = false;
+            LOGW("GL: tessellation is listed but known to draw nothing on this driver: turned off whatever the "
+                 "graphics settings say (SCACELITH_GL_FORCE=tessellation keeps it on)");
+        }
+    } else if (!g_caps.tessellation) {
+        LOGW("GL: no tessellation on this driver: turned off whatever the graphics settings say");
+    }
+    if (namedInEnv("SCACELITH_GL_DISABLE", "tessellation")) g_caps.tessellation = false;
+    if (namedInEnv("SCACELITH_GL_DISABLE", "depth_clamp")) g_caps.depthClamp = false;
     if (!g_caps.depthClamp) LOGW("GL: no depth clamping on this driver: sun shadow cascades are fitted to every caster");
 
     // Extensions behind the core features the engine uses: a driver whose 4.6 is forced may

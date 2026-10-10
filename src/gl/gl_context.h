@@ -15,6 +15,8 @@ void afterContextCreated(bool debug);
 // 4.6 only because the game forces it (MESA_GL_VERSION_OVERRIDE), without tessellation on some
 // versions and never with depth clamping. So each one is read from the extension list, then
 // probed when the list leaves it out (some drivers do not list the extensions promoted to core).
+// A driver known to list a feature it draws wrong does not get it either (gl_quirks.h:
+// tessellation on Zink over KosmicKrisp), unless SCACELITH_GL_FORCE names it.
 // SCACELITH_GL_DISABLE=tessellation,depth_clamp turns them off on any driver, to test the
 // fallbacks. All true until afterContextCreated() has run.
 struct Caps {

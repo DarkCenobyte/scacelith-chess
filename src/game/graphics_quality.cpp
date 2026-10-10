@@ -125,6 +125,12 @@ render::RenderSettings renderSettingsFor(const GraphicsLevels& in, float renderS
 }
 
 void readGraphicsSettings(const IniFile& ini, int& preset, GraphicsLevels& levels) {
+    if (!ini.has("graphics.preset") && !ini.has("graphics.quality")) {
+        // No [graphics] at all: a first start.
+        preset = kDefaultGraphicsPreset;
+        levels = presetLevels(preset);
+        return;
+    }
     if (!ini.has("graphics.preset")) {
         // A file from before the presets: quality 0..3 was Low..Ultra, and the two switches could
         // turn off the motion blur and the depth of field of any of them.
@@ -142,12 +148,12 @@ void readGraphicsSettings(const IniFile& ini, int& preset, GraphicsLevels& level
         if (changed) preset = PresetCustom;
         return;
     }
-    preset = std::clamp(ini.getInt("graphics.preset", PresetHigh), 0, int(PresetCustom));
+    preset = std::clamp(ini.getInt("graphics.preset", kDefaultGraphicsPreset), 0, int(PresetCustom));
     if (preset != PresetCustom) {
         levels = presetLevels(preset);
         return;
     }
-    const GraphicsLevels base = presetLevels(PresetHigh);
+    const GraphicsLevels base = presetLevels(kDefaultGraphicsPreset);
     for (int i = 0; i < GfxOptionCount; ++i)
         levels[size_t(i)] = ini.getInt(std::string("graphics_custom.") + kOptions[i].key, base[size_t(i)]);
     levels = clampLevels(levels);

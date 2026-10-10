@@ -98,7 +98,12 @@ out are in [`tools/macos/README.md`](../tools/macos/README.md). What shaped it:
   game), no depth clamping, and KosmicKrisp before Mesa 26.2 no tessellation. The engine reads
   those features from the extension list (`gl46::caps()`, `src/gl/gl_context.h`): without
   tessellation it is off whatever the preset and greyed out in Options > Graphics; without depth
-  clamping the sun shadow cascades are stretched to the nearest caster.
+  clamping the sun shadow cascades are stretched to the nearest caster. KosmicKrisp in Mesa 26.2
+  lists tessellation, but the tessellated pieces and robots come out empty (Apple M3 Pro): the
+  engine treats that driver as having none (`src/gl/gl_quirks.h`; `SCACELITH_GL_FORCE=tessellation`
+  keeps it on, to try a newer Mesa).
+- A first start on a Mac uses the Low graphics preset (High elsewhere): the game draws at the
+  Retina panel's full resolution, through Zink and KosmicKrisp.
 - The platform layer (window, input, high DPI) and the audio backend are macOS-specific code.
 - Stockfish is one variant, `apple-silicon` (the `armv8-dotprod` flags: every Apple Silicon CPU has
   the dot product), built with Apple clang and not isolated (the isolation needs GNU binutils and
