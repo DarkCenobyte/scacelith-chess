@@ -20,6 +20,7 @@
 //   - When the pin saved at sign-in no longer applies (Options' pin field emptied): on Apply and
 //     for "Test connection" alike.
 #pragma once
+#include "../anim/stance.h"
 #include "../chess/chess.h"
 #include "../math/math.h"
 #include "../net/gesture.h"
@@ -149,6 +150,27 @@ inline float keepaliveSeconds(int keepaliveMs) { return float(net::gestureKeepal
 inline float headTimeout(int keepaliveMs) { return kHeadTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
 inline float holdTimeout(int keepaliveMs) { return kHoldTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
 inline float placedTimeout(int keepaliveMs) { return kPlacedTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
+
+// The opponent's stance as this client shows it (protocol minor 2, net/gesture.h): the latest
+// OpponentStance; back to Seated once net::kStanceExpiryKeepalives keepalives pass without one
+// while it is not Seated (their client refreshes a standing stance at every keepalive); an
+// unknown value reads as Seated. reset() at a new game, at its end and when the link is lost.
+class StanceTracker {
+public:
+    void reset() { code_ = 0; age_ = 0.0f; }
+    void heard(int code) { code_ = code; age_ = 0.0f; }   // an OpponentStance event
+    void advance(float dt) { age_ += dt; }                 // every frame
+    anim::Stance current(int keepaliveMs) const {
+        anim::Stance s = anim::stanceFromCode(code_);
+        if (s != anim::Stance::Seated && age_ > float(net::kStanceExpiryKeepalives) * keepaliveSeconds(keepaliveMs))
+            return anim::Stance::Seated;
+        return s;
+    }
+
+private:
+    int code_ = 0;
+    float age_ = 0.0f;
+};
 
 // The local state that decides whether the piece fields of the opponent's latest gesture apply
 // (touch, aim, placed): only to the move being prepared, never to one already known.
