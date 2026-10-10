@@ -301,7 +301,8 @@ bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
 
 TEST(net_protocol_constants) {
     CHECK_EQ(pr::kProtocolVersion, 1);
-    CHECK_EQ(pr::kMinor, 1);   // minor 1: EndReason::ResignationVsInsufficient
+    CHECK_EQ(pr::kMinor, 2);   // minor 1: EndReason::ResignationVsInsufficient; minor 2: Stance
+    CHECK_EQ(int(net::kStanceMinMinor), 2);
     CHECK_EQ(pr::kCaps, uint64_t(0));
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
     CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
@@ -313,6 +314,15 @@ TEST(net_protocol_constants) {
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
     CHECK_EQ(int(pr::MsgType::C_Gesture), 0x28);
     CHECK_EQ(int(pr::MsgType::S_Gesture), 0xA6);
+    CHECK_EQ(int(pr::MsgType::C_Stance), 0x29);
+    CHECK_EQ(int(pr::MsgType::S_Stance), 0xA7);
+    CHECK(pr::isClientType(uint8_t(pr::MsgType::C_Stance)) && !pr::isClientType(uint8_t(pr::MsgType::S_Stance)));
+    CHECK_EQ(int(pr::Stance::Seated), 0);
+    CHECK_EQ(int(pr::Stance::Standing), 1);
+    CHECK_EQ(int(pr::Stance::SideLeft), 2);
+    CHECK_EQ(int(pr::Stance::SideRight), 3);
+    CHECK(!pr::isValid(pr::Stance(4)));
+    CHECK_EQ(std::string(pr::messageName(pr::MsgType::C_Stance)), std::string("C_Stance"));
     CHECK_EQ(int(pr::GestureFlag::Glance), 1);
     CHECK_EQ(int(pr::GestureFlag::Promoting), 2);
     CHECK_EQ(int(pr::GestureFlag::Side), 4);

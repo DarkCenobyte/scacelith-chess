@@ -201,7 +201,7 @@ private:
 
 bool isGameEvent(Kind k) {
     return k == Kind::GameSnapshot || k == Kind::MoveMade || k == Kind::MoveRejected || k == Kind::GameEvent ||
-           k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
+           k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture || k == Kind::OpponentStance;
 }
 
 // Protocol values (realtime protocol v1: protocol/scacelith-v1.json,

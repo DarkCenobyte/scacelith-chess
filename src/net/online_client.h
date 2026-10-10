@@ -359,7 +359,8 @@ struct Event {
                               // (cosmetic; 'game' is not filled in, a newer one replaces one still
                               // queued)
         OpponentStance        // stance, gameId: the opponent's stance in the current game (protocol
-                              // minor 2; cosmetic, 'game' is not filled in)
+                              // minor 2; cosmetic, 'game' is not filled in; in order with the
+                              // game events, none replaced)
     };
     Kind kind = Kind::ServerInfoResult;
     bool ok = false;
@@ -545,9 +546,12 @@ public:
     // (gestureKeepaliveMs); kGestureKeepaliveMinMs before any. The scene sends a Gesture at least
     // this often and counts the opponent's timeouts in it (game/online_live.h).
     int gestureKeepaliveMs() const;
-    // The player's stance in game gameId (protocol minor 2, net/gesture.h): sent when it changes
-    // and, while not Seated, again every gesture keepalive; nothing while the negotiated minor is
-    // below 2. The opponent's arrive as OpponentStance events. Cheap enough to call every frame.
+    // The player's stance in game gameId (protocol minor 2, net/gesture.h and net/stance.h): sent
+    // when it changes (250 ms apart at least) and, while not Seated, again every gesture keepalive,
+    // whatever Welcome.gestureRate says; again after each Welcome when it is not Seated. Nothing
+    // while the negotiated minor (Welcome.minor) is below 2, while not Online, or for another game
+    // than the one of the last GameSnapshot or one that is over; the latest is kept meanwhile. The
+    // opponent's arrive as OpponentStance events. Cheap enough to call every frame.
     void sendStance(uint64_t gameId, uint8_t stance);
 
     // Drains one event; call until it returns false, once per frame.
