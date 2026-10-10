@@ -84,6 +84,7 @@ public:
     virtual void requestResync(uint64_t gameId) = 0;
     virtual void rematch(uint64_t gameId, bool accept) = 0;
     virtual void sendGesture(uint64_t gameId, const net::Gesture& g) = 0;
+    virtual void sendStance(uint64_t gameId, uint8_t stance) = 0;
     virtual int gestureKeepaliveMs() const = 0;
     virtual bool poll(net::Event& out) = 0;
 };
@@ -109,6 +110,7 @@ public:
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
     virtual void sendGesture(const net::Gesture& g) = 0;
+    virtual void sendStance(uint8_t stance) = 0;
     virtual int pingMs() const = 0;
     virtual double serverNowMs() const = 0;
     virtual int gestureKeepaliveMs() const = 0;

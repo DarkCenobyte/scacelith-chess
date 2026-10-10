@@ -84,6 +84,7 @@ public:
     void requestResync(uint64_t id) override { c_->requestResync(id); }
     void rematch(uint64_t id, bool accept) override { c_->rematch(id, accept); }
     void sendGesture(uint64_t id, const net::Gesture& g) override { c_->sendGesture(id, g); }
+    void sendStance(uint64_t id, uint8_t stance) override { c_->sendStance(id, stance); }
     int gestureKeepaliveMs() const override { return c_->gestureKeepaliveMs(); }
     bool poll(net::Event& out) override { return c_->poll(out); }
 
@@ -118,6 +119,7 @@ public:
     void requestResync() override { d_->requestResync(); }
     void rematch(bool accept) override { d_->rematch(accept); }
     void sendGesture(const net::Gesture& g) override { d_->sendGesture(g); }
+    void sendStance(uint8_t stance) override { d_->sendStance(stance); }
     int pingMs() const override { return d_->pingMs(); }
     double serverNowMs() const override { return d_->serverNowMs(); }
     int gestureKeepaliveMs() const override { return d_->gestureKeepaliveMs(); }
@@ -145,6 +147,7 @@ public:
     void requestResync() override { api_.requestResync(id_); }
     void rematch(bool accept) override { api_.rematch(id_, accept); }
     void sendGesture(const net::Gesture& g) override { api_.sendGesture(id_, g); }
+    void sendStance(uint8_t stance) override { api_.sendStance(id_, stance); }
     int gestureKeepaliveMs() const override { return api_.gestureKeepaliveMs(); }
     bool canReport() const override { return true; }
     void report(const std::string& u, const std::string& cat, const std::string& comment) override {
@@ -179,6 +182,7 @@ public:
     void requestResync() override { d_.requestResync(); }
     void rematch(bool accept) override { d_.rematch(accept); }
     void sendGesture(const net::Gesture& g) override { d_.sendGesture(g); }
+    void sendStance(uint8_t stance) override { d_.sendStance(stance); }
     int gestureKeepaliveMs() const override { return d_.gestureKeepaliveMs(); }
     bool canReport() const override { return false; }
     void report(const std::string&, const std::string&, const std::string&) override {}

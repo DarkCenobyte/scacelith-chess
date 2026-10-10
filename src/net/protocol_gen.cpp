@@ -296,6 +296,25 @@ const char* enumName(ErrorCode v) {
     }
     return "?";
 }
+bool isValid(Stance v) {
+    switch (v) {
+    case Stance::Seated:
+    case Stance::Standing:
+    case Stance::SideLeft:
+    case Stance::SideRight:
+        return true;
+    }
+    return false;
+}
+const char* enumName(Stance v) {
+    switch (v) {
+    case Stance::Seated: return "Seated";
+    case Stance::Standing: return "Standing";
+    case Stance::SideLeft: return "SideLeft";
+    case Stance::SideRight: return "SideRight";
+    }
+    return "?";
+}
 
 uint16_t closeCodeFor(ErrorCode code) {
     const unsigned c = unsigned(code);
@@ -337,6 +356,7 @@ const char* messageName(MsgType t) {
     case MsgType::Resync: return "Resync";
     case MsgType::Rematch: return "Rematch";
     case MsgType::C_Gesture: return "C_Gesture";
+    case MsgType::C_Stance: return "C_Stance";
     case MsgType::Welcome: return "Welcome";
     case MsgType::Error: return "Error";
     case MsgType::S_Ping: return "S_Ping";
@@ -353,6 +373,7 @@ const char* messageName(MsgType t) {
     case MsgType::GameEnd: return "GameEnd";
     case MsgType::RatingUpdate: return "RatingUpdate";
     case MsgType::S_Gesture: return "S_Gesture";
+    case MsgType::S_Stance: return "S_Stance";
     }
     return nullptr;
 }
@@ -686,6 +707,11 @@ bool getFields(Reader& r, C_Gesture& out) {
            r.i32(out.pitch, -1571, 1571) &&
            r.u8(out.lean, 0u, 100u);
 }
+bool getFields(Reader& r, C_Stance& out) {
+    return r.u32(out.seq, 0u, 0xffffffffu) &&
+           r.id53(out.game) &&
+           r.enumeration(out.stance, true);
+}
 bool getFields(Reader& r, Welcome& out) {
     return r.u16(out.proto, 0u, 65535u) &&
            r.u16(out.minor, 0u, 65535u) &&
@@ -827,6 +853,10 @@ bool getFields(Reader& r, S_Gesture& out) {
            r.i32(out.yaw, -3142, 3142) &&
            r.i32(out.pitch, -1571, 1571) &&
            r.u8(out.lean, 0u, 100u);
+}
+bool getFields(Reader& r, S_Stance& out) {
+    return r.id53(out.game) &&
+           r.enumeration(out.stance, true);
 }
 }  // namespace
 
@@ -1131,6 +1161,21 @@ bool valid(const C_Gesture& m) {
            m.yaw >= -3142 && m.yaw <= 3142 &&
            m.pitch >= -1571 && m.pitch <= 1571 &&
            m.lean <= 100u;
+}
+void encode(const C_Stance& m, std::vector<uint8_t>& out) {
+    Writer w(out);
+    w.u8(uint8_t(MsgType::C_Stance));
+    w.u32(m.seq);
+    w.u64(m.game);
+    w.u8(uint8_t(m.stance));
+}
+bool decode(const uint8_t* p, size_t n, C_Stance& out) {
+    Reader r(p, n, false);
+    return r.type(MsgType::C_Stance) && getFields(r, out) && r.end();
+}
+bool valid(const C_Stance& m) {
+    return m.game < kId53Limit &&
+           isValid(m.stance);
 }
 void encode(const Welcome& m, std::vector<uint8_t>& out) {
     Writer w(out);
@@ -1473,6 +1518,20 @@ bool valid(const S_Gesture& m) {
            m.yaw >= -3142 && m.yaw <= 3142 &&
            m.pitch >= -1571 && m.pitch <= 1571 &&
            m.lean <= 100u;
+}
+void encode(const S_Stance& m, std::vector<uint8_t>& out) {
+    Writer w(out);
+    w.u8(uint8_t(MsgType::S_Stance));
+    w.u64(m.game);
+    w.u8(uint8_t(m.stance));
+}
+bool decode(const uint8_t* p, size_t n, S_Stance& out) {
+    Reader r(p, n, true);
+    return r.type(MsgType::S_Stance) && getFields(r, out) && r.end();
+}
+bool valid(const S_Stance& m) {
+    return m.game < kId53Limit &&
+           isValid(m.stance);
 }
 bool decodeHello(const uint8_t* p, size_t n, Hello& out) {
     HelloPrefix prefix;

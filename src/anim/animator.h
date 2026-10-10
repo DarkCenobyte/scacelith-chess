@@ -31,6 +31,7 @@
 // SCACELITH_ANIM_DEBUG (set to any value) logs the planning, SCACELITH_ANIM_ARMTRACE (set) logs
 // joint-limit clamps.
 #pragma once
+#include "stance.h"
 #include "../character/skeleton.h"
 #include "../math/math.h"
 #include <cstdint>
@@ -169,7 +170,12 @@ enum class EventType {
                        // Gesture only reports GestureBeat
     TraceCorner,       // the tip is over an inner waypoint of the path
     TraceDone,         // the tip is over the last waypoint
-    GestureBeat        // the stroke of a Gesture (arrival of Present / Open, each Beat down-stroke)
+    GestureBeat,       // the stroke of a Gesture (arrival of Present / Open, each Beat down-stroke)
+    // Stances (setStance)
+    Footstep,          // a foot lands on the floor ('position' = the sole's centre)
+    ChairPushed,       // the robot starts pushing its chair back ('position' = the seat's centre)
+    ChairPulled,       // the robot starts drawing its chair back in ('position' = the seat's centre)
+    StanceReached      // the robot stands still at the stance asked for (tag = int(Stance))
 };
 struct Event {
     EventType type;
@@ -361,6 +367,23 @@ public:
     // override is in character space); the eyes move forward and down with the chest.
     void setLean(float lean);
     void setThinking(bool thinking);                     // idle variations (chin on hand, etc.)
+
+    // ---- Stances (anim/stance.h)
+    // The stance to reach. The robot goes there by Standing (it rises in front of its chair, which
+    // it pushes back first, and draws the chair in again as it sits down), so SideLeft -> SideRight
+    // passes in front of the chair. A change asked for while the robot moves applies from the next
+    // spot it reaches. Tasks of either hand (moves, clock presses, handshakes, coach gestures,
+    // writing) start only while seated(): queuing one while the robot is not seated sets the target
+    // back to Seated (the robot sits down first), and a stance asked for while tasks are pending or
+    // running waits until both queues are empty. Head: setHeadOverride's angles stay relative to
+    // the body, which faces the board from every stance; while the robot stands, a look further
+    // down than the head allows bends the back.
+    void setStance(Stance target);
+    Stance stanceTarget() const;
+    Stance stance() const;            // where the robot is, or the stance it is leaving while it moves
+    bool seated() const;              // in the chair, drawn in, no stance change under way
+    bool stanceMoving() const;        // a stance change is under way
+    float chairSlide() const;         // how far the chair is pushed back from its place, metres
 
     void update(float dt, std::vector<Event>& events);   // advances tasks, IK, idle; appends events
 

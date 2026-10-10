@@ -1588,6 +1588,8 @@ void DirectMatch::abortGame() { postSimple(*impl_, Command::Kind::Abort, false);
 void DirectMatch::requestResync() { postSimple(*impl_, Command::Kind::Resync, false); }
 void DirectMatch::rematch(bool accept) { postSimple(*impl_, Command::Kind::Rematch, accept); }
 
+void DirectMatch::sendStance(uint8_t) {}   // placeholder: the Stance relay lands next
+
 void DirectMatch::sendGesture(const Gesture& g) {
     std::lock_guard<std::mutex> lk(impl_->m);
     if (impl_->cur && impl_->haveView) impl_->cur->postGesture(impl_->view.id, g);

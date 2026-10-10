@@ -355,9 +355,11 @@ struct Event {
         RatingUpdate,         // ratingWhite/ratingBlack before/after
         Notice,               // noticeCode, arg (shutdown, ban, cooldown...)
         ServerError,          // code (net::proto::ErrorCode), fatal, gameId
-        OpponentGesture       // gesture, gameId: the opponent's live gestures in the current game
+        OpponentGesture,      // gesture, gameId: the opponent's live gestures in the current game
                               // (cosmetic; 'game' is not filled in, a newer one replaces one still
                               // queued)
+        OpponentStance        // stance, gameId: the opponent's stance in the current game (protocol
+                              // minor 2; cosmetic, 'game' is not filled in)
     };
     Kind kind = Kind::ServerInfoResult;
     bool ok = false;
@@ -383,6 +385,7 @@ struct Event {
     struct Rating { int before = 0, after = 0, games = 0; bool provisional = false; } ratingWhite, ratingBlack;
     int noticeCode = 0; double noticeArg = 0;
     Gesture gesture;
+    int stance = 0;                   // OpponentStance: net::proto::Stance value (anim::stanceFromCode)
     // account API
     GamesPage gamesPage;
     GameDetails gameDetails;
@@ -542,6 +545,10 @@ public:
     // (gestureKeepaliveMs); kGestureKeepaliveMinMs before any. The scene sends a Gesture at least
     // this often and counts the opponent's timeouts in it (game/online_live.h).
     int gestureKeepaliveMs() const;
+    // The player's stance in game gameId (protocol minor 2, net/gesture.h): sent when it changes
+    // and, while not Seated, again every gesture keepalive; nothing while the negotiated minor is
+    // below 2. The opponent's arrive as OpponentStance events. Cheap enough to call every frame.
+    void sendStance(uint64_t gameId, uint8_t stance);
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

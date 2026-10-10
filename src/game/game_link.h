@@ -34,6 +34,11 @@ public:
     // The gesture keepalive (ms, net::gestureKeepaliveMs of the authority's Welcome.gestureIdleMs):
     // the scene sends a gesture at least this often, and so does the opponent's client.
     virtual int gestureKeepaliveMs() const = 0;
+    // The local player's stance (anim::Stance values, net/gesture.h): the network layer sends it
+    // when it changes and refreshes it while not Seated, so it may be called every frame; nothing
+    // goes to an authority or peer of a protocol minor below 2. The opponent's come back as
+    // OpponentStance events of this game.
+    virtual void sendStance(uint8_t stance) = 0;
     // Report the opponent (server games only): category "cheating", "abuse" or "other".
     virtual bool canReport() const = 0;
     virtual void report(const std::string& username, const std::string& category, const std::string& comment) = 0;

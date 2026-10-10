@@ -732,6 +732,8 @@ using namespace detail;
 // ---------------------------------------------------------------------------------------------
 struct Animator::Impl {
     const Skeleton* sk = nullptr;
+    // ---- stance (animator_stance.cpp; placeholder until the stance motion lands)
+    Stance stanceTarget = Stance::Seated;
     vec3 pelvisWorld{0, 0, 0};
     float facing = 1.0f;
     quat rootQ;

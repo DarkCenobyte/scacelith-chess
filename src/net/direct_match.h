@@ -152,6 +152,9 @@ public:
     // (cosmetic; the latest state only, paced, dropped while the link is down). Cheap enough to
     // call every frame.
     void sendGesture(const Gesture& g);
+    // The local player's stance (protocol minor 2, net/gesture.h): sent when it changes and, while
+    // not Seated, again every gesture keepalive; nothing to a peer of a minor below 2.
+    void sendStance(uint8_t stance);
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;       // the host's clock (the host: its own)

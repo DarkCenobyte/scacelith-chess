@@ -2816,6 +2816,8 @@ void OnlineClient::rematch(uint64_t gameId, bool accept) {
     });
 }
 
+void OnlineClient::sendStance(uint64_t, uint8_t) {}   // placeholder: the Stance relay lands next
+
 void OnlineClient::sendGesture(uint64_t gameId, const Gesture& g) {
     Impl* d = impl_.get();
     if (d->connState.load() != int(ConnState::Online)) return;   // nothing kept for a reconnection

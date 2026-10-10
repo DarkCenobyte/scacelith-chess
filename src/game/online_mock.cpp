@@ -2764,6 +2764,7 @@ void FakeServer::rematch(uint64_t id, bool accept) {
     if (I.room && I.room->g.id == id) I.room->rematch(accept, I.lastNow);
 }
 void FakeServer::sendGesture(uint64_t, const Gesture&) {}   // the fake opponent does not watch
+void FakeServer::sendStance(uint64_t, uint8_t) {}
 
 bool FakeServer::poll(Event& out) {
     Impl& I = *impl_;
@@ -2968,6 +2969,7 @@ void FakeDirect::abortGame() { if (impl_->room) impl_->room->abort(nowMs()); }
 void FakeDirect::requestResync() { if (impl_->room) impl_->room->sendSnapshot(); }
 void FakeDirect::rematch(bool accept) { if (impl_->room) impl_->room->rematch(accept, nowMs()); }
 void FakeDirect::sendGesture(const Gesture&) {}   // the fake friend does not watch
+void FakeDirect::sendStance(uint8_t) {}
 const OnlineGame* FakeDirect::currentGame() const { return impl_->hasDelivered ? &impl_->delivered : nullptr; }
 int FakeDirect::pingMs() const { return impl_->state == DirectMatch::State::Playing ? 12 : -1; }
 double FakeDirect::serverNowMs() const { return nowMs(); }

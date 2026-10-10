@@ -162,4 +162,12 @@ inline int gestureKeepaliveMs(int announced) {
                                               : announced > kGestureKeepaliveMaxMs ? kGestureKeepaliveMaxMs : announced;
 }
 
+// The player's stance (protocol minor 2, the Stance message; the values of net::proto::Stance and
+// anim::Stance: 0 Seated, 1 Standing, 2 SideLeft, 3 SideRight). A client sends its player's stance
+// when it changes and, while not Seated, again at least every gesture keepalive, whatever
+// Welcome.gestureRate says; a receiver that hears none for kStanceExpiryKeepalives keepalives shows
+// the player seated. Sessions of a minor below kStanceMinMinor neither send nor receive it.
+constexpr int kStanceMinMinor = 2;
+constexpr int kStanceExpiryKeepalives = 5;
+
 }  // namespace net
