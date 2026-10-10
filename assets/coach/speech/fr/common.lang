@@ -23,6 +23,13 @@ owner.your.nom = ton {piece}
 owner.your.nom.f = ta {piece}
 owner.my.nom = mon {piece}
 owner.my.nom.f = ma {piece}
+# The Analysis mode names a piece by its side, nobody being "tu" or "je" there: "le cavalier
+# blanc", "la dame noire" (owner.white.* / owner.black.*, the article and the adjective agree with
+# the piece). The analysis lines never put "à" or "de" right before such a piece ("au", "du").
+owner.white.nom = le {piece} blanc
+owner.white.nom.f = la {piece} blanche
+owner.black.nom = le {piece} noir
+owner.black.nom.f = la {piece} noire
 # Pronouns standing for the piece of the placeholder, so that a sentence agrees with any piece:
 #   {your:il} / {my:il} = subject pronoun, "il" or "elle" ("Voici ta tour. Elle se déplace...")
 #   {your:le} / {my:le} = direct object pronoun before a consonant, "le" or "la" ("Prends-la !")

@@ -1,0 +1,151 @@
+# Coach speech (Russian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Russian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "ты" or "я" here: the players are "белые" and "чёрные" (lowercase inside a sentence,
+#   as assets/i18n/ru.lang). A piece comes with its side: {piece} {t1} {t2} = "белый конь",
+#   "чёрная ладья"; forms from common.lang: acc gen dat ins pre pron_acc ("его" / "её").
+# - Rules of review.lang: no past tense, short adjective or participle with a piece placeholder as
+#   subject (its gender varies): "без защиты", "у {piece:gen} не было защиты". A move as subject of a
+#   past tense is preceded by "ход" ("Ход {best} давал мат").
+# - Counted numbers (common.lang): {m:move} "мат в 3 хода", {pts:point} "3 очка", {n:mistake}
+#   "2 ошибки", {m:blunder} "1 зевок" (nominative: "у белых {n:mistake}"), {acc_white:percent} "87%".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Вспомним эту партию вместе.
+an.start.2 = Разберём эту партию ход за ходом.
+an.start.3 = Вот партия. Посмотрим, как она шла.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Эта партия начинается с заданной позиции. Разберём её.
+an.start.setup.2 = Партия из заданной позиции. Посмотрим, как она шла.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Дебют — {opening:def}.
+an.opening.2 = Это {opening:def}.
+an.book_exit = Ходом {move} партия выходит из известной теории.
+an.book_exit.2 = {move} — первый ход вне дебютной теории.
+an.book_exit.3 = Здесь дебютная теория заканчивается: {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} — зевок.
+an.blunder.2 = Здесь {move} — серьёзная ошибка.
+an.blunder.3 = Зевок: {move}.
+an.mistake = {move} — ошибка.
+an.mistake.2 = {move} — здесь неверный ход.
+an.mistake.3 = Ошибка: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} упускает шанс наказать за эту ошибку.
+an.missed_chance.2 = После хода {move} шанс упущен.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Теперь {reply} — мат.
+an.mate_allowed.one.2 = Этот ход допускает {reply}, и это мат.
+an.mate_allowed = Это допускает форсированный мат в {m:move}, начиная с хода {reply}.
+an.mate_allowed.2 = Теперь есть форсированный мат в {m:move}, первый ход — {reply}.
+an.fork = Теперь {reply} — вилка {t1:dat} и {t2:dat}.
+an.fork.2 = Это допускает {reply} с нападением сразу на {t1:acc} и {t2:acc}.
+an.fork.3 = {reply} нападает одновременно на {t1:acc} и {t2:acc}.
+an.hanging = Этот ход оставляет {piece:acc} без защиты, и {reply} этим пользуется.
+an.hanging.2 = {piece} остаётся без защиты: {reply} {piece:pron_acc} выигрывает.
+an.hanging.3 = {reply} просто забирает {piece:acc}: защиты не было.
+an.material = Ответ {line} выигрывает материал: {pts:point}.
+an.material.2 = Затем {line} выигрывает {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Ход {best} давал мат.
+an.mate_missed.one.2 = Ход {best} поставил бы мат.
+an.mate_missed = Ход {best} форсировал бы мат в {m:move}.
+an.mate_missed.2 = Был форсированный мат в {m:move}, начиная с хода {best}.
+an.missed_capture = Ход {best} выиграл бы {piece:acc} даром.
+an.missed_capture.2 = У {piece:gen} не было защиты: ход {best} забрал бы {piece:pron_acc}.
+an.missed_fork = Ход {best} дал бы вилку {t1:dat} и {t2:dat}.
+an.missed_fork.2 = Ход {best} давал вилку: удар сразу по {t1:dat} и {t2:dat}.
+
+# The better move, when nothing above named it.
+an.better = Сильнее было {best}.
+an.better.2 = Лучше было {best}.
+an.better.3 = Компьютер предпочитает {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} — блестящий ход: жертва {piece:gen}!
+an.brilliant.2 = Блестящая жертва! {move} отдаёт {piece:acc}.
+an.brilliant.3 = {move}! Блестящий ход с жертвой {piece:gen}.
+an.brilliant.mate = Это ведёт к форсированному мату в {m:move}.
+an.brilliant.mate.2 = И мат в {m:move} неизбежен.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} — единственный ход, сохраняющий преимущество.
+an.only.win.2 = Только {move} сохраняет здесь перевес. Хорошо найдено.
+an.only.hold = {move} — единственный ход, сохраняющий равновесие.
+an.only.hold.2 = Только {move} удерживает здесь позицию.
+an.only.defend = {move} — единственный ход, продолжающий борьбу.
+an.only.defend.2 = Только {move} сохраняет здесь шансы. Хорошая защита.
+an.only.best = {move} — здесь сильнейший ход, и с большим запасом.
+an.only.best.2 = Точно: {move} намного сильнее всего остального.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} — небольшая неточность: точнее было {best}.
+an.inaccuracy.2 = Не самый точный ход: точнее было {best}, а не {move}.
+an.interesting = {move} — интересная идея с жертвой {piece:gen}.
+an.interesting.2 = Интересная попытка: {move} отдаёт {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = У белых теперь форсированный мат в {m:move}.
+an.mate_on.white.2 = Отсюда белые могут форсировать мат в {m:move}.
+an.mate_on.black = У чёрных теперь форсированный мат в {m:move}.
+an.mate_on.black.2 = Отсюда чёрные могут форсировать мат в {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Мат. Белые выигрывают партию.
+an.end.mate.white.2 = И это мат: белые побеждают.
+an.end.mate.black = Мат. Чёрные выигрывают партию.
+an.end.mate.black.2 = И это мат: чёрные побеждают.
+an.end.resigned.white = Чёрные сдались, поэтому белые выигрывают партию.
+an.end.resigned.white.2 = Здесь партия заканчивается: чёрные сдаются, и белые побеждают.
+an.end.resigned.black = Белые сдались, поэтому чёрные выигрывают партию.
+an.end.resigned.black.2 = Здесь партия заканчивается: белые сдаются, и чёрные побеждают.
+an.end.timeout.white = У чёрных истекло время, поэтому белые побеждают.
+an.end.timeout.white.2 = Белые выигрывают по времени.
+an.end.timeout.black = У белых истекло время, поэтому чёрные побеждают.
+an.end.timeout.black.2 = Чёрные выигрывают по времени.
+an.end.win.white = Партия заканчивается победой белых.
+an.end.win.white.2 = Белые выигрывают партию.
+an.end.win.black = Партия заканчивается победой чёрных.
+an.end.win.black.2 = Чёрные выигрывают партию.
+an.end.stalemate = Пат: партия заканчивается вничью.
+an.end.stalemate.2 = Это пат, так что партия завершается ничьей.
+an.end.draw.agreement = Соперники согласились на ничью.
+an.end.draw.agreement.2 = Партия заканчивается ничьей по соглашению.
+an.end.draw.repetition = Ничья из-за повторения позиции.
+an.end.draw.repetition.2 = Та же позиция повторилась: ничья.
+an.end.draw.fifty = Ничья по правилу пятидесяти ходов.
+an.end.draw.fifty.2 = Пятьдесят ходов без взятий и ходов пешками: ничья.
+an.end.draw.seventy_five = Ничья по правилу семидесяти пяти ходов.
+an.end.draw.seventy_five.2 = Семьдесят пять ходов без взятий и ходов пешками: ничья.
+an.end.draw.material = Мат больше невозможен: ничья.
+an.end.draw.material.2 = Ни одна из сторон уже не может поставить мат, так что ничья.
+an.end.draw = Партия заканчивается вничью.
+an.end.draw.2 = Ничья.
+an.end.unfinished = Партия обрывается здесь, она не закончена.
+an.end.unfinished.2 = На этом партия прерывается: её не доиграли.
+an.end.accuracy = Точность: {acc_white:percent} у белых, {acc_black:percent} у чёрных.
+an.end.accuracy.2 = Белые сыграли с точностью {acc_white:percent}, чёрные — {acc_black:percent}.
+an.end.clean.white = Белые не допустили ни ошибок, ни зевков.
+an.end.clean.white.2 = Игра белых обошлась без серьёзных ошибок.
+an.end.clean.black = Чёрные не допустили ни ошибок, ни зевков.
+an.end.clean.black.2 = Игра чёрных обошлась без серьёзных ошибок.
+an.end.mistakes.white = У белых {n:mistake} и ни одного зевка.
+an.end.mistakes.white.2 = Белые: {n:mistake}, зевков нет.
+an.end.mistakes.black = У чёрных {n:mistake} и ни одного зевка.
+an.end.mistakes.black.2 = Чёрные: {n:mistake}, зевков нет.
+an.end.blunders.white = У белых {m:blunder}.
+an.end.blunders.white.2 = Белые: {m:blunder}.
+an.end.blunders.black = У чёрных {m:blunder}.
+an.end.blunders.black.2 = Чёрные: {m:blunder}.
+an.end.errors.white = У белых {n:mistake} и {m:blunder}.
+an.end.errors.white.2 = Белые: {n:mistake} и {m:blunder}.
+an.end.errors.black = У чёрных {n:mistake} и {m:blunder}.
+an.end.errors.black.2 = Чёрные: {n:mistake} и {m:blunder}.

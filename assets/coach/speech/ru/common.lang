@@ -117,6 +117,37 @@ owner.my.pron_acc = {piece}
 # The English keys (every language defines them); Russian uses the gendered patterns above.
 owner.your.nom = твой {piece}
 owner.my.nom = мой {piece}
+# The Analysis mode names a piece by its side, nobody being "ты" or "я" there: "белый конь",
+# "чёрная ладья", by case and gender (an animate piece's accusative is its genitive, as above);
+# pron_acc as for the other owners ("его" / "её").
+owner.white.nom.m = белый {piece}
+owner.white.nom.f = белая {piece}
+owner.white.acc.m = белого {piece}
+owner.white.acc.f = белую {piece}
+owner.white.gen.m = белого {piece}
+owner.white.gen.f = белой {piece}
+owner.white.dat.m = белому {piece}
+owner.white.dat.f = белой {piece}
+owner.white.ins.m = белым {piece}
+owner.white.ins.f = белой {piece}
+owner.white.pre.m = белом {piece}
+owner.white.pre.f = белой {piece}
+owner.black.nom.m = чёрный {piece}
+owner.black.nom.f = чёрная {piece}
+owner.black.acc.m = чёрного {piece}
+owner.black.acc.f = чёрную {piece}
+owner.black.gen.m = чёрного {piece}
+owner.black.gen.f = чёрной {piece}
+owner.black.dat.m = чёрному {piece}
+owner.black.dat.f = чёрной {piece}
+owner.black.ins.m = чёрным {piece}
+owner.black.ins.f = чёрной {piece}
+owner.black.pre.m = чёрном {piece}
+owner.black.pre.f = чёрной {piece}
+owner.white.pron_acc = {piece}
+owner.black.pron_acc = {piece}
+owner.white.nom = белый {piece}
+owner.black.nom = чёрный {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice drops Latin letters: file letters are Cyrillic letter names, as in the opening texts

@@ -57,6 +57,26 @@ owner.my.gen.f = meiner {piece}
 # The English keys (every language defines them); German uses the gendered patterns above.
 owner.your.nom = dein {piece}
 owner.my.nom = mein {piece}
+# The Analysis mode names a piece by its side, nobody being "du" or "ich" there: "der weiße
+# Springer", "die schwarze Dame", with the article and the adjective ending of each case.
+owner.white.nom.m = der weiße {piece}
+owner.white.nom.f = die weiße {piece}
+owner.white.acc.m = den weißen {piece}
+owner.white.acc.f = die weiße {piece}
+owner.white.dat.m = dem weißen {piece}
+owner.white.dat.f = der weißen {piece}
+owner.white.gen.m = des weißen {piece}
+owner.white.gen.f = der weißen {piece}
+owner.black.nom.m = der schwarze {piece}
+owner.black.nom.f = die schwarze {piece}
+owner.black.acc.m = den schwarzen {piece}
+owner.black.acc.f = die schwarze {piece}
+owner.black.dat.m = dem schwarzen {piece}
+owner.black.dat.f = der schwarzen {piece}
+owner.black.gen.m = des schwarzen {piece}
+owner.black.gen.f = der schwarzen {piece}
+owner.white.nom = der weiße {piece}
+owner.black.nom = der schwarze {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # File letters spelled for the voice. The voice tests found that f must be written "eff" and h "ha"
