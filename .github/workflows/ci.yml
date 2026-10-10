@@ -401,9 +401,11 @@ jobs:
           tools/macos/make-dmg.sh dist/Scacelith.app "dist/Scacelith-$version-macos-arm64-experimental.dmg"
 
       # A first frame from the bundled app, on the runner's virtual GPU (Apple's paravirtualized
-      # graphics): unproven, as Metal 4 there may not be what KosmicKrisp needs; for now its
-      # failure is only reported (continue-on-error) and its log printed. A run still going after
-      # six minutes is sampled (its threads' stacks, printed and uploaded), then stopped.
+      # graphics). KosmicKrisp does not support that GPU: the Vulkan loader finds no device, so the
+      # app stops at its "Could not start OpenGL 4.6" message box after loading its EGL and its
+      # Vulkan driver. That outcome is reported as a notice; any other failure (a crash, a missing
+      # library, no screenshot) fails the step, which only warns (continue-on-error). A run still
+      # going after six minutes is sampled (its threads' stacks, printed and uploaded), then stopped.
       - name: Smoke run of the app (headless screenshot)
         continue-on-error: true
         timeout-minutes: 10
@@ -411,7 +413,6 @@ jobs:
           SCACELITH_AUDIO: "null"
           VK_LOADER_DEBUG: error,warn
         run: |
-          system_profiler SPDisplaysDataType < /dev/null || true
           mkdir -p smoke
           status=0
           dist/Scacelith.app/Contents/MacOS/Scacelith --scene game --shot "$PWD/smoke/smoke.png" \
@@ -419,10 +420,14 @@ jobs:
           pid=$!
           for ((t = 0; t < 360; t += 5)); do
             kill -0 "$pid" 2> /dev/null || break
+            # The message box of a failed start waits for a click that never comes.
+            grep -q 'could not initialise OpenGL 4.6' smoke/smoke.log && break
             sleep 5
           done
           if kill -0 "$pid" 2> /dev/null; then
-            sample "$pid" 5 -mayDie -file smoke/sample.txt > /dev/null 2>&1 || true
+            if ! grep -q 'could not initialise OpenGL 4.6' smoke/smoke.log; then
+              sample "$pid" 5 -mayDie -file smoke/sample.txt > /dev/null 2>&1 || true
+            fi
             kill -TERM "$pid" 2> /dev/null || true
             sleep 3
             kill -KILL "$pid" 2> /dev/null || true
@@ -437,10 +442,16 @@ jobs:
             head -n 600 smoke/sample.txt
             echo "::endgroup::"
           fi
-          if [[ $status -ne 0 || ! -f smoke/smoke.png ]]; then
-            echo "::warning::the smoke run failed (exit code $status): see its log above"
-            exit 1
+          if [[ $status -eq 0 && -f smoke/smoke.png ]]; then
+            exit 0
           fi
+          if grep -q 'Failed to detect any valid GPUs' smoke/smoke.log &&
+             grep -q 'gl: EGL from .*/Scacelith.app/Contents/Frameworks/libEGL' smoke/smoke.log; then
+            echo "::notice::the runner's virtual GPU is not one KosmicKrisp supports: the app loaded its EGL and its Vulkan driver, then reported that no supported GPU was found (a Mac with Apple silicon is needed to draw a frame)"
+            exit 0
+          fi
+          echo "::warning::the smoke run failed (exit code $status): see its log above"
+          exit 1
 
       - name: Upload the smoke run's screenshot and log
         if: always()

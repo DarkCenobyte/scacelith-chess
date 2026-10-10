@@ -1406,6 +1406,7 @@ gif.wait.both = {0} y {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = No se pudo iniciar OpenGL 4.6. Actualice el controlador de su tarjeta gráfica.
+error.opengl_macos = No se pudo iniciar OpenGL 4.6 en este Mac. Scacelith necesita Apple silicon (M1 o posterior) y macOS 26 o posterior, y no funciona en una máquina virtual.
 error.renderer = No se pudo iniciar el motor de renderizado.
 error.scene = No se pudo cargar la escena.
 error.log_file = Encontrará los detalles en el archivo de registro: {0}

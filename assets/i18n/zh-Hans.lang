@@ -1406,6 +1406,7 @@ gif.wait.both = {0} {1}
 
 # ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
 error.opengl = 无法启动 OpenGL 4.6。请更新显卡驱动程序。
+error.opengl_macos = 无法在此 Mac 上启动 OpenGL 4.6。Scacelith 需要 Apple 芯片（M1 或更新）和 macOS 26 或更高版本，且无法在虚拟机中运行。
 error.renderer = 无法启动渲染器。
 error.scene = 无法加载场景。
 error.log_file = 详细信息见日志文件：{0}
