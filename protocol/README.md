@@ -9,7 +9,7 @@ which is the source of every file here.
 |---|---|
 | [PROTOCOL.md](PROTOCOL.md) | the specification: transport, encoding, connection lifecycle, games, clocks, gestures, every message |
 | `scacelith-v1.json` | the schema, single source of the server's Rust codec and of the game's C++ codec (`src/net/protocol_gen.h`, `.cpp`) |
-| `frozen/v1.0.json`, `frozen/v1.1.json` | the wire of the released minors 1.0 and 1.1: later minors may only add to them |
+| `frozen/v1.0.json`, `frozen/v1.1.json`, `frozen/v1.2.json` | the wire of the released minors 1.0, 1.1 and 1.2: later minors may only add to them |
 | `protocol-vectors.json` | the golden vectors, read by `tests/net_tests.cpp` (`net_protocol_vectors`) |
 
 Do not edit these files, nor `src/net/protocol_gen.h` and `src/net/protocol_gen.cpp`, by hand: the
