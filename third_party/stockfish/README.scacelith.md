@@ -244,8 +244,17 @@ it), audit levels 0 and 1, and the dispatch of upstream's `universal/entry_arm64
   completed. GCC's outline atomics (`-moutline-atomics`, the default on aarch64 Linux) are libgcc
   functions (`__aarch64_cas4_acq_rel`, ...) that test `__aarch64_have_lse_atomics` and use LSE
   only when the CPU has it: those of `libgcc.a` count as baseline, and the report gives their
-  number. Result: no finding (1,396 functions, 49,319 references in the probe); it fails when
-  given level 0 for `armv8-dotprod` or no exemption for the dispatcher.
+  number. The linker's own code is attributed as well: the Cortex-A53 erratum 843419 workaround
+  (on by default in Debian's and Ubuntu's GCC) moves a load that follows an `adrp` at the end of
+  a 4 KB page into a veneer (`e843419@...`) that branches back, in a stub section that begins
+  with a branch over itself. Where that happens depends on the layout of the code: none of these
+  stubs lands in a variant with Ubuntu 24.04's GCC 13, two do in `armv8-dotprod` with Ubuntu
+  22.04's GCC 11 (the release build). The audit cuts the stubs at their symbols, and a piece
+  whose references all go into one variant counts as that variant's code: its instructions at
+  that variant's level, and a reference into it from outside the variant as a violation. Result:
+  no finding (GCC 13: 1,396 functions, 49,319 references in the probe; GCC 11: 1,400 functions,
+  47,659 references, the two stubs counted as `armv8-dotprod`); it fails when given level 0 for
+  `armv8-dotprod`, no exemption for the dispatcher, or a call from outside into such a stub.
 * **macOS (Apple Silicon)**: one variant, `apple-silicon` (upstream's name, the flags of
   `armv8-dotprod`: every Apple Silicon CPU has the dot product), compiled with Apple clang
   (`-fconstexpr-steps` in place of GCC's `-fconstexpr-ops-limit`; no `-fno-ipa-cp-clone`) and not

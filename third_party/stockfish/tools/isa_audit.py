@@ -19,10 +19,13 @@ With --arch aarch64, EXE is a position-independent aarch64 ELF executable and th
 except libgcc's outline atomics (__aarch64_cas4_acq ...), which take LSE only when the CPU has it
 and count as baseline.
 Every function of the disassembly is attributed to the object it came from (link map) and given
-the highest class among its instructions. Every reference to code is collected: direct calls and
-jumps, RIP-relative operands (aarch64: ADRP + ADD pairs, and the GOT entries ADRP + LDR pairs
-read), and pointers stored in data (ELF: relative dynamic relocations; PE: 64-bit base
-relocations). The audit fails (exit status 1) when
+the highest class among its instructions. The linker's own code ("linker stubs" in the map; on
+aarch64 the veneers of the Cortex-A53 erratum 843419 workaround and the branch over their section)
+is cut at its symbols, and a piece whose references all go into one variant's object counts as
+that variant's code. Every reference to code is collected: direct calls and jumps, RIP-relative
+operands (aarch64: ADRP + ADD pairs, and the GOT entries ADRP + LDR pairs read), and pointers
+stored in data (ELF: relative dynamic relocations; PE: 64-bit base relocations). The audit fails
+(exit status 1) when
   * a variant's object is missing from the map, or holds a function above its level;
   * a function outside the variants is above level 0: code shared with the rest of the program
     (inline functions, templates) compiled with a variant's flags would crash other CPUs;
@@ -351,7 +354,13 @@ def main():
         k = bisect.bisect_right(starts, address) - 1
         return ranges[k] if k >= 0 and address < ranges[k][1] else None
 
+    # Pieces of linker stubs counted as a variant's code: sorted starts, and (start, end, object).
+    piece_starts, pieces = [], []
+
     def owner(address):
+        k = bisect.bisect_right(piece_starts, address) - 1
+        if k >= 0 and address < pieces[k][1]:
+            return pieces[k][2]
         r = range_at(address)
         return r[2] if r else '?'
 
@@ -399,9 +408,32 @@ def main():
         k = bisect.bisect_right(starts_f, address) - 1
         return functions[k] if k >= 0 else None
 
+    # GNU ld writes code of its own into stub sections ("linker stubs" in the map). On aarch64, the
+    # Cortex-A53 erratum 843419 workaround (on by default in Debian's and Ubuntu's GCC) moves a load
+    # that follows an ADRP at the end of a 4 KB page into a veneer (e843419@...) that runs it and
+    # branches back, and the section begins with a branch over itself to the code that follows; it
+    # depends on where the code lands, so a compiler release can bring it or take it away. Such
+    # code is cut at its symbols: a piece whose references all go into one variant's object is
+    # that variant's code (its instructions count at the variant's level, and a reference to it
+    # from outside the variant is a violation like any other); any other piece stays outside.
+    for start, end, obj, _ in ranges:
+        if obj != 'linker stubs':
+            continue
+        cuts = [start] + [f[0] for f in functions if start < f[0] < end] + [end]
+        for a, b in zip(cuts, cuts[1:]):
+            targets = {owner(t) for s, t, _ in refs if a <= s < b}
+            if len(targets) == 1 and variant_of(next(iter(targets))) is not None:
+                pieces.append((a, b, targets.pop()))
+    pieces.sort()
+    piece_starts[:] = [p[0] for p in pieces]
+
     lines = []
     if arch == 'aarch64':
         lines.append('== libgcc outline atomics counted as baseline (LSE chosen at run time): %d' % outline_atomics)
+    lines.append('== linker stubs counted as the variant they branch into: %d' % len(pieces))
+    for a, b, obj in pieces[:40]:
+        f = function_at(a)
+        lines.append('  %#x-%#x %-24s -> %s' % (a, b, f[1][:24] if f and f[0] == a else '(no symbol)', short(obj)))
     per_object = collections.defaultdict(lambda: [0, 0, 0, 0])
     for f in functions:
         per_object[owner(f[0])][f[2]] += 1
@@ -437,12 +469,13 @@ def main():
         r = range_at(target)
         if r is None or not r[3].startswith('.text'):
             continue
-        variant = variant_of(r[2])
+        target_owner = owner(target)
+        variant = variant_of(target_owner)
         source_owner = owner(source)
-        if variant is None or source_owner == r[2]:
+        if variant is None or source_owner == target_owner:
             continue
         callee = function_at(target)
-        key = (short(source_owner), kind, short(r[2]), callee[1][:90] if callee else hex(target))
+        key = (short(source_owner), kind, short(target_owner), callee[1][:90] if callee else hex(target))
         if any(a.search(source_owner) for a in allow):
             allowed[key] += 1
         else:
