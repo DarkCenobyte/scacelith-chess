@@ -443,6 +443,9 @@ ninja -C build-win            # -> build-win/Scacelith.exe
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja -C build
 ./build/scacelith_tests
+# The X11 desktop tests (clipboard, input method, focus, fullscreen) on an Xvfb of their own,
+# without then with a window manager (apt install xvfb openbox)
+tools/test_x11.sh build
 
 # Linux aarch64: the same commands natively on an aarch64 system, or cross-compiled from Linux
 # x86-64 with the tests under qemu-user (see docs/PORTS.md)
@@ -563,7 +566,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 GitHub Actions builds and tests every push to master and every pull request
 (`.github/workflows/ci.yml`): the Linux build and its unit tests (the coach's voice model
-required: its tests must run and pass), the same on a 64-bit Arm runner (Linux aarch64), the same
+required: its tests must run and pass; the X11 desktop tests under Xvfb, without and with the
+openbox window manager), the same on a 64-bit Arm runner (Linux aarch64), the same
 tests built with
 AddressSanitizer and UBSan, the Windows build cross-compiled with MinGW-w64 and its unit tests
 under Wine (all as above), the experimental macOS build (on an Apple Silicon runner with macOS 26:

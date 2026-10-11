@@ -18,7 +18,7 @@ is not part of this repository: it lives in
 | `src/game/online_mock.h/.cpp` | In-process fakes of the server and of a direct-match friend (`--online-mock`). |
 | `src/ui/ui_screens_online.cpp` | The "Play Online" page and its sub-pages, Options > Online server. |
 | `src/ui/ui_online_hud.cpp` | Ping indicator, in-game overlay, online Esc menu, report dialog, challenge cards. |
-| `src/ui/ui_qr.cpp`, `ui_clipboard.cpp` | QR code of the two-factor setup (`third_party/qrcodegen`), copy to the Windows clipboard. |
+| `src/ui/ui_qr.cpp`, `ui_clipboard.cpp` | QR code of the two-factor setup (`third_party/qrcodegen`), copy to the clipboard (Windows here; X11 and macOS through `plat::setClipboardText`). |
 
 ## Session
 

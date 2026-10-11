@@ -13,7 +13,7 @@ per-user application folder (`plat::appDataDirectory()`: `%APPDATA%\scacelith\` 
 ## Build
 
 ```sh
-# Linux dev/test build (X11 + GLX, used for unit tests and headless screenshots)
+# Linux build (X11 + GLX: the Linux desktop game, the unit tests and headless screenshots)
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && ninja -C build
 # Windows x64 exe (cross-compiled)
 cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release && ninja -C build-win
@@ -22,13 +22,15 @@ cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake 
 Headless screenshots (Xvfb + Mesa llvmpipe with `MESA_GL_VERSION_OVERRIDE=4.6`):
 `tools/shot.sh <scene> out.png [frames] [WxH]` (Linux build) and `tools/shot_win.sh` (the real
 Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
-`SCACELITH_DUMP_SHADERS=<dir>` (an existing folder) to dump preprocessed GLSL.
+`SCACELITH_DUMP_SHADERS=<dir>` (an existing folder) to dump preprocessed GLSL. `tools/test_x11.sh`
+runs the X11 desktop tests (`tests/x11_desktop_tests.cpp`) on an Xvfb of their own, without then
+with openbox.
 
 ## Modules
 
 | Dir | Role |
 |---|---|
-| `src/platform` | Win32 (+X11 for tests) window, GL 4.6 context, input, timing |
+| `src/platform` | Win32, X11 (+`x11_desktop`: clipboard, input method, fullscreen) and Cocoa windows, GL 4.6 context, input, timing |
 | `src/gl` | Generated GL 4.6 loader (`tools/gen_gl_loader.py`) |
 | `src/math` | vec/mat/quat, reverse-Z projections, rays (conventions in `math.h`) |
 | `src/core` | log, ini, embedded files, PNG writer |

@@ -1,7 +1,8 @@
 // Platform layer: one window with an OpenGL 4.6 core context, input, timing and paths.
-// Implementations: platform_win32.cpp (the shipping target), platform_x11.cpp (Linux, used for
-// automated tests and headless screenshots under Xvfb) and platform_cocoa.mm (macOS on Apple
-// silicon: OpenGL through Mesa's Zink over KosmicKrisp, see macos_gl.h).
+// Implementations: platform_win32.cpp (Windows), platform_x11.cpp (the Linux desktop, through
+// XWayland on Wayland, with x11_desktop.cpp; also the tests and headless screenshots under Xvfb) and
+// platform_cocoa.mm (macOS on Apple silicon: OpenGL through Mesa's Zink over KosmicKrisp, see
+// macos_gl.h).
 #pragma once
 #include <cstdint>
 #include <string>
@@ -92,12 +93,19 @@ std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with t
 std::string appDataDirectory();
 void messageBox(const char* title, const char* text, bool rtl = false);  // rtl: right-to-left text (Arabic)
 uint64_t randomSeed();           // non-deterministic seed from the OS
-// Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
+// Text on the system clipboard as UTF-8 ("" when there is none). X11: the CLIPBOARD selection, ""
+// also when its owner does not answer within a second or holds more than 4 MB.
 std::string clipboardText();
 #ifdef _WIN32
 // OpenClipboard for 'owner' (an HWND), tried up to 5 times 5 ms apart: a clipboard manager or the
 // clipboard history may hold the clipboard for a moment. CloseClipboard() after a success.
 bool openClipboard(void* owner);
+#else
+// Puts text on the system clipboard (Windows: ui_clipboard.cpp). 'sensitive' (recovery codes):
+// marked for clipboard managers to keep out of their history (X11: x-kde-passwordManagerHint, and
+// not handed over to the clipboard manager at exit; macOS: org.nspasteboard.ConcealedType). X11: the
+// game owns the CLIPBOARD selection and serves it from pumpEvents().
+bool setClipboardText(const std::string& utf8, bool sensitive);
 #endif
 // The user's interface language as a locale tag ("fr-FR", "zh-TW", "de_DE.UTF-8"), "" when
 // unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG; macOS: the first of

@@ -1,5 +1,5 @@
-// Copy to the system clipboard (the direct-match invitation, recovery codes). Windows only: the
-// X11 layer serves tests and screenshots, where copying reports that it is unavailable.
+// Copy to the system clipboard (the direct-match invitation, recovery codes): CF_UNICODETEXT on
+// Windows, the platform layer elsewhere (the X11 CLIPBOARD selection, NSPasteboard).
 #include "ui_screens_online.h"
 #include "../platform/platform.h"
 #ifdef _WIN32
@@ -62,9 +62,7 @@ bool setClipboardText(const std::string& text, bool sensitive) {
     if (!ok) GlobalFree(mem);  // on success the clipboard owns the memory
     return ok;
 #else
-    (void)text;
-    (void)sensitive;
-    return false;
+    return plat::setClipboardText(text, sensitive);
 #endif
 }
 

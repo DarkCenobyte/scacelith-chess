@@ -1,7 +1,10 @@
-// Linux/X11 + GLX platform layer (also headless screenshots under
-// Xvfb with Mesa llvmpipe: export MESA_GL_VERSION_OVERRIDE=4.6 MESA_GLSL_VERSION_OVERRIDE=460).
+// Linux/X11 + GLX platform layer: the Linux desktop game (XWayland on a Wayland desktop), and
+// headless screenshots under Xvfb with Mesa llvmpipe (export MESA_GL_VERSION_OVERRIDE=4.6
+// MESA_GLSL_VERSION_OVERRIDE=460). The clipboard, text input, keys and fullscreen state are in
+// x11_desktop.cpp.
 #ifndef _WIN32
 #include "platform.h"
+#include "x11_desktop.h"
 #include "../gl/gl_context.h"
 #include "../core/embedded.h"
 #include "../core/image.h"
@@ -11,7 +14,6 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
 #include <GL/glx.h>
 #include <time.h>
 #include <unistd.h>
@@ -30,55 +32,28 @@ namespace {
 Display* g_dpy;
 Window g_win;
 GLXContext g_ctx;
-Atom g_wmDelete;
+Atom g_wmProtocols, g_wmDelete;
 int g_width, g_height;
-DisplayMode g_mode = DisplayMode::Windowed;   // the mode and windowed size last asked for
-int g_windowedW, g_windowedH;
+int g_windowedW, g_windowedH;  // the windowed size last asked for
 bool g_quit, g_focus = true, g_captured, g_cursorVisible = true;
 Input g_input;
 timespec g_t0;
 Cursor g_blankCursor;
 float g_lastX, g_lastY;
+Time g_lastTime;  // of the last input event: what the clipboard requests name (ICCCM)
+x11::Clipboard g_clipboard;
+x11::Keyboard g_keyboard;
+x11::Fullscreen g_fullscreen;
 
-void setKey(int k, bool down) {
-    if (k <= 0 || k >= KEY_COUNT) return;
-    if (down) g_input.keyPressed[k] = true;
-    else if (g_input.keyDown[k]) g_input.keyReleased[k] = true;
-    g_input.keyDown[k] = down;
-}
-void setButton(int b, bool down) {
-    if (down && !g_input.mouseDown[b]) g_input.mousePressed[b] = true;
-    if (!down && g_input.mouseDown[b]) g_input.mouseReleased[b] = true;
-    g_input.mouseDown[b] = down;
-}
-int mapKeysym(KeySym ks) {
-    if (ks >= XK_a && ks <= XK_z) return int('A' + (ks - XK_a));
-    if (ks >= XK_A && ks <= XK_Z) return int('A' + (ks - XK_A));
-    if (ks >= XK_0 && ks <= XK_9) return int('0' + (ks - XK_0));
-    if (ks >= XK_F1 && ks <= XK_F12) return KEY_F1 + int(ks - XK_F1);
-    switch (ks) {
-        case XK_space: return KEY_SPACE;
-        case XK_Escape: return KEY_ESCAPE;
-        case XK_Return: case XK_KP_Enter: return KEY_ENTER;
-        case XK_Tab: return KEY_TAB;
-        case XK_BackSpace: return KEY_BACKSPACE;
-        case XK_Delete: return KEY_DELETE;
-        case XK_Left: return KEY_LEFT;
-        case XK_Right: return KEY_RIGHT;
-        case XK_Up: return KEY_UP;
-        case XK_Down: return KEY_DOWN;
-        case XK_Home: return KEY_HOME;
-        case XK_End: return KEY_END;
-        case XK_Page_Up: return KEY_PAGEUP;
-        case XK_Page_Down: return KEY_PAGEDOWN;
-        case XK_Shift_L: return KEY_LSHIFT;
-        case XK_Shift_R: return KEY_RSHIFT;
-        case XK_Control_L: return KEY_LCTRL;
-        case XK_Control_R: return KEY_RCTRL;
-        case XK_Alt_L: return KEY_LALT;
-        case XK_Alt_R: return KEY_RALT;
+void noteTime(const XEvent& e) {
+    switch (e.type) {
+        case KeyPress: case KeyRelease: g_lastTime = e.xkey.time; break;
+        case ButtonPress: case ButtonRelease: g_lastTime = e.xbutton.time; break;
+        case MotionNotify: g_lastTime = e.xmotion.time; break;
+        case EnterNotify: case LeaveNotify: g_lastTime = e.xcrossing.time; break;
+        case PropertyNotify: g_lastTime = e.xproperty.time; break;
+        default: break;
     }
-    return KEY_UNKNOWN;
 }
 void* getProc(const char* name) { return (void*)glXGetProcAddressARB((const GLubyte*)name); }
 
@@ -108,6 +83,8 @@ void setIdentity(const char* title) {
 
 bool init(const WindowDesc& desc) {
     clock_gettime(CLOCK_MONOTONIC, &g_t0);
+    // The input method's locale (LC_CTYPE only), before the display is opened.
+    x11::setTextLocale();
     g_dpy = XOpenDisplay(nullptr);
     if (!g_dpy) { LOGE("cannot open X display (is DISPLAY set / Xvfb running?)"); return false; }
     int screen = DefaultScreen(g_dpy);
@@ -123,24 +100,33 @@ bool init(const WindowDesc& desc) {
     Window root = RootWindow(g_dpy, screen);
     XSetWindowAttributes swa{};
     swa.colormap = XCreateColormap(g_dpy, root, vi->visual, AllocNone);
+    // PropertyChangeMask: the clipboard's transfers and the window manager's fullscreen state.
     swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask |
-                     PointerMotionMask | StructureNotifyMask | FocusChangeMask | EnterWindowMask | LeaveWindowMask;
-    g_width = desc.width;
-    g_height = desc.height;
-    g_mode = desc.mode;
-    g_windowedW = desc.width;
-    g_windowedH = desc.height;
-    if (desc.mode == DisplayMode::Borderless) {
-        g_width = DisplayWidth(g_dpy, screen);
-        g_height = DisplayHeight(g_dpy, screen);
-    }
-    g_win = XCreateWindow(g_dpy, root, 0, 0, g_width, g_height, 0, vi->depth, InputOutput, vi->visual,
-                          CWColormap | CWEventMask, &swa);
+                     PointerMotionMask | StructureNotifyMask | FocusChangeMask | EnterWindowMask | LeaveWindowMask |
+                     PropertyChangeMask;
+    g_width = g_windowedW = desc.width;
+    g_height = g_windowedH = desc.height;
+    // Created at the windowed size, which the window manager restores when it leaves fullscreen.
+    g_win = XCreateWindow(g_dpy, root, 0, 0, unsigned(g_width), unsigned(g_height), 0, vi->depth, InputOutput,
+                          vi->visual, CWColormap | CWEventMask, &swa);
     XFree(vi);
     XStoreName(g_dpy, g_win, desc.title);
+    g_wmProtocols = XInternAtom(g_dpy, "WM_PROTOCOLS", False);
     g_wmDelete = XInternAtom(g_dpy, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(g_dpy, g_win, &g_wmDelete, 1);
     setIdentity(desc.title);
+    g_clipboard.attach(g_dpy, g_win);
+    g_fullscreen.attach(g_dpy, g_win);
+    if (desc.mode == DisplayMode::Borderless) {
+        g_fullscreen.start();
+        // Without a window manager the window covers the screen at once; with one, its
+        // ConfigureNotify gives the size.
+        if (!g_fullscreen.managed()) {
+            g_width = DisplayWidth(g_dpy, screen);
+            g_height = DisplayHeight(g_dpy, screen);
+        }
+    }
+    g_keyboard.open(g_dpy, g_win);
     if (!desc.hidden) XMapWindow(g_dpy, g_win);
 
     auto createCtx = (PFN_glXCreateContextAttribsARB)glXGetProcAddressARB((const GLubyte*)"glXCreateContextAttribsARB");
@@ -167,6 +153,9 @@ bool init(const WindowDesc& desc) {
 
 void shutdown() {
     if (!g_dpy) return;
+    // Copied text stays on the clipboard once the game has quit when a clipboard manager runs.
+    g_clipboard.handOver(1000);
+    g_keyboard.close();
     glXMakeCurrent(g_dpy, None, nullptr);
     if (g_ctx) glXDestroyContext(g_dpy, g_ctx);
     XDestroyWindow(g_dpy, g_win);
@@ -183,38 +172,20 @@ bool pumpEvents() {
     while (XPending(g_dpy)) {
         XEvent e;
         XNextEvent(g_dpy, &e);
+        noteTime(e);
+        // The input method's events, the keys and the typed text; then the clipboard's requests, the
+        // window manager's fullscreen state and the focus (which releases the keys held when lost).
+        if (g_keyboard.event(e, g_input) || g_clipboard.event(e) || g_fullscreen.event(e) ||
+            x11::focusEvent(e, g_win, g_keyboard, g_input, g_focus))
+            continue;
         switch (e.type) {
             case ClientMessage:
-                if ((Atom)e.xclient.data.l[0] == g_wmDelete) g_quit = true;
+                if (e.xclient.message_type == g_wmProtocols && Atom(e.xclient.data.l[0]) == g_wmDelete) g_quit = true;
                 break;
             case ConfigureNotify:
                 g_width = e.xconfigure.width;
                 g_height = e.xconfigure.height;
                 break;
-            case FocusIn: g_focus = true; break;
-            case FocusOut: g_focus = false; break;
-            case KeyPress: case KeyRelease: {
-                bool down = e.type == KeyPress;
-                if (!down && XEventsQueued(g_dpy, QueuedAfterReading)) {  // swallow auto-repeat release
-                    XEvent nx;
-                    XPeekEvent(g_dpy, &nx);
-                    if (nx.type == KeyPress && nx.xkey.time == e.xkey.time && nx.xkey.keycode == e.xkey.keycode) break;
-                }
-                char txt[8] = {};
-                KeySym ks = 0;
-                int len = XLookupString(&e.xkey, txt, sizeof(txt), &ks, nullptr);
-                setKey(mapKeysym(ks), down);
-                // Basic text input (no input method): Latin-1 keysyms are their codepoint and
-                // 0x01xxxxxx keysyms carry a Unicode codepoint (other layouts, xdotool type).
-                uint32_t cp = 0;
-                if ((ks >= 0x20 && ks <= 0x7E) || (ks >= 0xA0 && ks <= 0xFF)) cp = uint32_t(ks);
-                else if ((ks & 0xFF000000UL) == 0x01000000UL) cp = uint32_t(ks & 0x00FFFFFFUL);
-                if (len == 1 && (unsigned char)txt[0] >= 32 && (unsigned char)txt[0] < 127) cp = (unsigned char)txt[0];
-                if (e.xkey.state & (ControlMask | Mod1Mask)) cp = 0;  // shortcuts (Ctrl+V) type nothing
-                if (down && cp >= 32 && cp != 127 && g_input.textCount < int(sizeof(g_input.text) / sizeof(g_input.text[0])))
-                    g_input.text[g_input.textCount++] = cp;
-                break;
-            }
             case MotionNotify: {
                 float x = float(e.xmotion.x), y = float(e.xmotion.y);
                 if (g_captured) {
@@ -233,9 +204,9 @@ bool pumpEvents() {
             case ButtonPress: case ButtonRelease: {
                 bool down = e.type == ButtonPress;
                 switch (e.xbutton.button) {
-                    case 1: setButton(MOUSE_LEFT, down); break;
-                    case 2: setButton(MOUSE_MIDDLE, down); break;
-                    case 3: setButton(MOUSE_RIGHT, down); break;
+                    case 1: x11::setButton(g_input, MOUSE_LEFT, down); break;
+                    case 2: x11::setButton(g_input, MOUSE_MIDDLE, down); break;
+                    case 3: x11::setButton(g_input, MOUSE_RIGHT, down); break;
                     case 4: if (down) g_input.wheel += 1; break;
                     case 5: if (down) g_input.wheel -= 1; break;
                 }
@@ -255,11 +226,17 @@ void setVsync(bool on) {
     if (fn) fn(g_dpy, g_win, on ? 1 : 0);
 }
 void setDisplayMode(DisplayMode mode, int w, int h) {
-    // Unchanged (Options applied for another setting): the window keeps its size, as on Windows.
-    if (mode == g_mode && (mode == DisplayMode::Borderless || (w == g_windowedW && h == g_windowedH))) return;
-    g_mode = mode;
-    if (mode == DisplayMode::Windowed) { g_windowedW = w; g_windowedH = h; }
-    XResizeWindow(g_dpy, g_win, w, h);
+    // Fullscreen is the window manager's _NET_WM_STATE_FULLSCREEN (x11_desktop.h): its monitor,
+    // without decorations, and the windowed geometry back when it ends.
+    const bool full = mode == DisplayMode::Borderless;
+    // Unchanged (Options applied for another setting): the window keeps its size, as on Windows,
+    // and a state the player changed through the window manager stays.
+    if (full == g_fullscreen.wanted() && (full || (w == g_windowedW && h == g_windowedH))) return;
+    if (!full) {
+        g_windowedW = w;
+        g_windowedH = h;
+    }
+    g_fullscreen.set(full, g_windowedW, g_windowedH);
 }
 int width() { return g_width; }
 int height() { return g_height; }
@@ -294,7 +271,10 @@ uint64_t randomSeed() {
     clock_gettime(CLOCK_REALTIME, &t);
     return uint64_t(t.tv_nsec) * 2654435761ULL ^ uint64_t(t.tv_sec) ^ (uint64_t(getpid()) << 32);
 }
-std::string clipboardText() { return ""; }  // the X11 layer serves tests and screenshots only
+std::string clipboardText() { return g_dpy ? g_clipboard.text(g_lastTime) : std::string(); }
+bool setClipboardText(const std::string& utf8, bool sensitive) {
+    return g_dpy && g_clipboard.setText(utf8, sensitive, g_lastTime);
+}
 std::string systemLanguage() {
     for (const char* var : {"LC_ALL", "LC_MESSAGES", "LANG"}) {
         const char* v = getenv(var);

@@ -324,6 +324,13 @@ if(TEST_SOURCES)
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)
         target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
+    elseif(NOT APPLE)
+        # The X11 layer's desktop side (clipboard, input method, focus, fullscreen), which
+        # tests/x11_desktop_tests.cpp runs against an X server when DISPLAY is set
+        # (tools/test_x11.sh: Xvfb, without and with a window manager).
+        find_package(X11 REQUIRED)
+        target_sources(scacelith_tests PRIVATE ${ROOT}/src/platform/x11_desktop.cpp)
+        target_link_libraries(scacelith_tests PRIVATE X11)
     endif()
 endif()
 
