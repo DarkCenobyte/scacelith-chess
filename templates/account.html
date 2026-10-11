@@ -74,6 +74,7 @@
             <input id="sso-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="64" required aria-describedby="sso-username-hint">
             <p class="hint" id="sso-username-hint" data-username-hint>{{t:account.register.username_hint}}</p>
           </div>
+          <p class="form-note"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg><span>{{t:account.register.legal_note}} <a href="{{v:home}}legal/#privacy">{{t:account.register.legal_link}}</a></span></p>
           <p class="form-error" role="alert" data-error hidden></p>
           <button class="btn btn-gold btn-block" type="submit" data-submit>{{t:account.google.username_submit}}</button>
           <p class="form-links"><a href="#signin" data-goto="signin">{{t:account.common.back}}</a></p>
