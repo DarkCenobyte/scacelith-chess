@@ -287,6 +287,16 @@
       "use_recovery": "Usar un código de recuperación en su lugar",
       "submit": "Confirmar"
     },
+    "google": {
+      "or": "o",
+      "button": "Iniciar sesión con Google",
+      "username_title": "Elija su nombre de usuario",
+      "username_text": "Su cuenta de Google es nueva en este servidor. Elija el nombre que verán los demás jugadores: no se podrá cambiar más adelante.",
+      "username_submit": "Crear mi cuenta",
+      "link_title": "Vincular su cuenta de Google",
+      "link_submit": "Vincular e iniciar sesión",
+      "returning": "Iniciando sesión con Google…"
+    },
     "register": {
       "tab": "Crear una cuenta",
       "title": "Una cuenta gratuita",
@@ -452,7 +462,19 @@
       "render_failed": "El servidor no ha podido dibujar este GIF.",
       "invalid_game": "Esta partida no existe.",
       "invalid_player": "Introduzca un nombre de usuario: de 2 a 24 letras, cifras, _, . o -.",
-      "player_not_found": "No hay ningún jugador con este nombre."
+      "player_not_found": "No hay ningún jugador con este nombre.",
+      "sso_cancelled": "Se canceló el inicio de sesión con Google.",
+      "sso_mismatch": "Este inicio de sesión con Google no se empezó en esta pestaña o ya se usó. Vuelva a intentarlo.",
+      "sso_expired": "Este inicio de sesión con Google ha caducado. Vuelva a intentarlo.",
+      "invalid_verifier": "Este inicio de sesión con Google se empezó en otra pestaña u otro navegador. Vuelva a empezar desde esta página.",
+      "sso_email_unverified": "Google no ha confirmado la dirección de correo de esta cuenta de Google.",
+      "sso_account_exists": "Una cuenta ya usa esta dirección de correo, pero no tiene contraseña con la que vincular Google. Asígnele una con «¿Olvidó su contraseña?» y vuelva a iniciar sesión con Google.",
+      "sso_failed": "No se pudo completar el inicio de sesión con Google. Vuelva a intentarlo.",
+      "sso_disabled": "El inicio de sesión con Google no está disponible en este servidor.",
+      "sso_already_linked": "Esta cuenta de Google ya está vinculada a otra cuenta.",
+      "account_disabled": "Esta cuenta ya no se puede usar.",
+      "sso_storage": "Su navegador bloquea el almacenamiento de este sitio, que el inicio de sesión con Google necesita. Permítalo o inicie sesión con su contraseña.",
+      "sso_url": "El servidor respondió con una dirección de Google inesperada, así que se detuvo el inicio de sesión con Google."
     },
     "time": {
       "seconds": {
@@ -639,7 +661,9 @@
       "username": "Nombre de usuario",
       "password_rules": "Al menos {min} caracteres, sin su nombre de usuario ni su correo electrónico.",
       "password_note": "Se cerrará la sesión en sus otros dispositivos; en este seguirá iniciada.",
-      "signin_label": "Iniciar sesión"
+      "signin_label": "Iniciar sesión",
+      "google_link_text": "La cuenta {name} ya usa esta dirección de correo. Introduzca su contraseña una sola vez para vincularla con Google; después bastará con «Iniciar sesión con Google».",
+      "auth_foot_google": "Una sola cuenta en el servidor oficial, para el juego y para este sitio. ¿La creó con Google en el juego? Inicie sesión con Google también aquí."
     },
     "players": {
       "since": "Miembro desde el {date}",

@@ -1592,6 +1592,28 @@ input::placeholder { color: #6e5d43; }
 .auth-tabs .tab { flex: 1; white-space: normal; text-align: center; line-height: 1.3; }
 .auth-panel { display: grid; grid-template-columns: minmax(0, 1fr); }
 .auth-foot { margin-top: 1.6rem; padding-top: 1.1rem; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--faint); text-align: center; }
+/* Sign in with Google: Google's dark button (its colours, its "G", a plain sans-serif face) in the
+   shape of the site's buttons, under an "or" rule. */
+.sso { display: grid; gap: 1.05rem; }
+.sso-or { display: flex; align-items: center; gap: 0.9rem; font-family: var(--font-display); font-size: 0.74rem; letter-spacing: var(--track); text-transform: uppercase; color: var(--faint); }
+.sso-or::before, .sso-or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+:lang(ar) .sso-or, :lang(ja) .sso-or, :lang(zh-Hans) .sso-or, :lang(zh-Hant) .sso-or { font-size: 0.92rem; letter-spacing: 0; }
+.btn-google {
+  gap: 12px;
+  color: #e3e3e3;
+  background: #131314;
+  border-color: #8e918f;
+  font-family: Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+:lang(ar) .btn-google, :lang(ja) .btn-google, :lang(zh-Hans) .btn-google, :lang(zh-Hant) .btn-google { font-size: 0.95rem; font-weight: 500; }
+.btn-google:hover { color: #e3e3e3; background: #262628; border-color: #c4c7c5; }
+.btn-google .google-mark { width: 20px; height: 20px; flex: none; }
+.btn-google.is-busy .google-mark { visibility: hidden; }
+.btn-google.is-busy::after { border-color: #e3e3e3 #e3e3e3 transparent transparent; }
 
 /* Dashboard */
 .profile-head { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem 1.4rem; margin-bottom: 1.6rem; }

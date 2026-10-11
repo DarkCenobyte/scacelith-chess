@@ -287,6 +287,16 @@
       "use_recovery": "Utiliser plutôt un code de récupération",
       "submit": "Valider"
     },
+    "google": {
+      "or": "ou",
+      "button": "Se connecter avec Google",
+      "username_title": "Choisissez votre nom d’utilisateur",
+      "username_text": "Votre compte Google est nouveau sur ce serveur. Choisissez le nom que verront les autres joueurs : il ne pourra plus être changé.",
+      "username_submit": "Créer mon compte",
+      "link_title": "Associer votre compte Google",
+      "link_submit": "Associer et se connecter",
+      "returning": "Connexion avec Google…"
+    },
     "register": {
       "tab": "Créer un compte",
       "title": "Un compte gratuit",
@@ -452,7 +462,19 @@
       "render_failed": "Le serveur n’a pas pu dessiner ce GIF.",
       "invalid_game": "Cette partie n’existe pas.",
       "invalid_player": "Saisissez un nom d’utilisateur : de 2 à 24 lettres, chiffres, _, . ou -.",
-      "player_not_found": "Aucun joueur ne porte ce nom."
+      "player_not_found": "Aucun joueur ne porte ce nom.",
+      "sso_cancelled": "La connexion avec Google a été annulée.",
+      "sso_mismatch": "Cette connexion avec Google n’a pas été lancée dans cet onglet, ou a déjà servi. Réessayez.",
+      "sso_expired": "Cette connexion avec Google a expiré. Réessayez.",
+      "invalid_verifier": "Cette connexion avec Google a été lancée dans un autre onglet ou un autre navigateur. Recommencez depuis cette page.",
+      "sso_email_unverified": "Google n’a pas confirmé l’adresse e-mail de ce compte Google.",
+      "sso_account_exists": "Un compte utilise déjà cette adresse e-mail, mais il n’a pas de mot de passe auquel associer Google. Donnez-lui-en un avec « Mot de passe oublié ? », puis reconnectez-vous avec Google.",
+      "sso_failed": "La connexion avec Google n’a pas pu aboutir. Réessayez.",
+      "sso_disabled": "La connexion avec Google n’est pas proposée sur ce serveur.",
+      "sso_already_linked": "Ce compte Google est déjà associé à un autre compte.",
+      "account_disabled": "Ce compte ne peut plus être utilisé.",
+      "sso_storage": "Votre navigateur bloque le stockage de ce site, dont la connexion avec Google a besoin. Autorisez-le, ou connectez-vous avec votre mot de passe.",
+      "sso_url": "Le serveur a répondu avec une adresse Google inattendue : la connexion avec Google a été interrompue."
     },
     "time": {
       "seconds": {
@@ -639,7 +661,9 @@
       "username": "Nom d’utilisateur",
       "password_rules": "Au moins {min} caractères, sans votre nom d’utilisateur ni votre e-mail.",
       "password_note": "Vos autres appareils sont déconnectés ; celui-ci reste connecté.",
-      "signin_label": "Se connecter"
+      "signin_label": "Se connecter",
+      "google_link_text": "Le compte {name} utilise déjà cette adresse e-mail. Saisissez son mot de passe une seule fois pour l’associer à Google ; ensuite, « Se connecter avec Google » suffira.",
+      "auth_foot_google": "Un seul compte sur le serveur officiel, pour le jeu et pour ce site. Vous l’avez créé avec Google dans le jeu ? Connectez-vous ici aussi avec Google."
     },
     "players": {
       "since": "Membre depuis le {date}",

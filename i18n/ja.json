@@ -287,6 +287,16 @@
       "use_recovery": "代わりにリカバリーコードを使う",
       "submit": "確認"
     },
+    "google": {
+      "or": "または",
+      "button": "Googleでログイン",
+      "username_title": "ユーザー名を選んでください",
+      "username_text": "このGoogleアカウントはこのサーバーでは新規です。他のプレイヤーに表示される名前を選んでください。あとから変更することはできません。",
+      "username_submit": "アカウントを作成",
+      "link_title": "Googleアカウントを連携",
+      "link_submit": "連携してログイン",
+      "returning": "Googleでログインしています…"
+    },
     "register": {
       "tab": "アカウントを作成",
       "title": "無料アカウント",
@@ -452,7 +462,19 @@
       "render_failed": "サーバーはこのGIFを描画できませんでした。",
       "invalid_game": "この対局は存在しません。",
       "invalid_player": "ユーザー名を入力してください（英字、数字、_、.、-の2～24文字）。",
-      "player_not_found": "この名前のプレイヤーは見つかりません。"
+      "player_not_found": "この名前のプレイヤーは見つかりません。",
+      "sso_cancelled": "Googleでのログインはキャンセルされました。",
+      "sso_mismatch": "このGoogleログインはこのタブで開始されたものではないか、すでに使用されています。もう一度お試しください。",
+      "sso_expired": "このGoogleログインの有効期限が切れました。もう一度お試しください。",
+      "invalid_verifier": "このGoogleログインは別のタブまたは別のブラウザーで開始されました。このページからやり直してください。",
+      "sso_email_unverified": "このGoogleアカウントのメールアドレスは、Googleによって確認されていません。",
+      "sso_account_exists": "このメールアドレスを使うアカウントがすでにありますが、Googleと連携するためのパスワードが設定されていません。「パスワードをお忘れですか？」でパスワードを設定してから、もう一度Googleでログインしてください。",
+      "sso_failed": "Googleでのログインを完了できませんでした。もう一度お試しください。",
+      "sso_disabled": "このサーバーではGoogleでのログインを利用できません。",
+      "sso_already_linked": "このGoogleアカウントはすでに別のアカウントと連携しています。",
+      "account_disabled": "このアカウントはもう使用できません。",
+      "sso_storage": "お使いのブラウザーがこのサイトのストレージをブロックしています。Googleでのログインにはストレージが必要です。許可するか、パスワードでログインしてください。",
+      "sso_url": "サーバーから想定外のGoogleのアドレスが返されたため、Googleでのログインを中止しました。"
     },
     "time": {
       "seconds": {
@@ -631,7 +653,9 @@
       "username": "ユーザー名",
       "password_rules": "{min}文字以上で、ユーザー名やメールアドレスを含まないもの。",
       "password_note": "他のデバイスはログアウトされ、このデバイスはログインしたままになります。",
-      "signin_label": "ログイン"
+      "signin_label": "ログイン",
+      "google_link_text": "このメールアドレスはすでにアカウント「{name}」で使われています。Googleと連携するために、そのパスワードを一度だけ入力してください。以後は「Googleでログイン」だけでログインできます。",
+      "auth_foot_google": "公式サーバーのアカウントは1つで、ゲームとこのサイトの両方で使えます。ゲーム内でGoogleを使って作成した場合は、ここでもGoogleでログインできます。"
     },
     "players": {
       "since": "登録日：{date}",

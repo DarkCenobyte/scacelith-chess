@@ -1,14 +1,15 @@
-// The account page: signing in (with two-factor authentication), creating an account (with the
-// server's proof of work), password recovery, and once signed in the player's information,
-// ratings, game history, devices and settings.
+// The account page: signing in (with two-factor authentication, or with Google), creating an
+// account (with the server's proof of work), password recovery, and once signed in the player's
+// information, ratings, game history, devices and settings.
 
 import "./site.js";
 import { onReady } from "./site.js";
 import { $, $$, h, icon, clear, showView } from "./lib/dom.js";
-import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
+import { t, fmt, pageUrl, ltr, lang } from "./lib/i18n.js";
 import { api, withPow, ApiError, fileNameOf } from "./lib/api.js";
 import { getSession, setSession, clearSession, updateUser, onSessionChange, requestSession } from "./lib/session.js";
 import { toast, errorMessage, showMessage, setBusy, isBusy, initTabs, initReveal, saveBlob, fieldError } from "./lib/ui.js";
+import * as store from "./lib/store.js";
 import { renderRatings } from "./lib/ratings.js";
 import { gameList } from "./lib/games.js";
 
@@ -39,13 +40,16 @@ function loadInfo() {
     info = i;
     for (const el of $$("[data-server-name]")) if (i.name) el.textContent = i.name;
     const l = limits();
-    const hint = $("[data-username-hint]");
-    if (hint) hint.textContent = t("js.errors.username_format", { min: l.usernameMin, max: l.usernameMax });
+    for (const hint of $$("[data-username-hint]")) hint.textContent = t("js.errors.username_format", { min: l.usernameMin, max: l.usernameMax });
     const pwHint = $("[data-password-hint]");
     if (pwHint) pwHint.textContent = t("js.account.password_rules", { min: l.passwordMinLength });
     if (i.registration === "closed") {
       $("[data-registration-closed]").hidden = false;
       $('[data-form="register"] [data-submit]').disabled = true;
+    }
+    if (i.sso?.googleWeb === true) {
+      for (const el of $$("[data-google]")) el.hidden = false;
+      $("[data-auth-foot]").textContent = t("js.account.auth_foot_google");
     }
     return i;
   }).catch((e) => {
@@ -94,6 +98,16 @@ const raw = (form, name) => form.elements[name]?.value ?? "";
 const utf8Length = (s) => new TextEncoder().encode(s).length;
 const looksLikeEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 
+function usernameOk(username, l) {
+  let pattern;
+  try {
+    pattern = new RegExp(l.usernamePattern);
+  } catch {
+    pattern = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+  }
+  return username.length >= l.usernameMin && username.length <= l.usernameMax && pattern.test(username);
+}
+
 /* ============================================================================ signed out */
 
 let selectAuthTab = null;
@@ -112,13 +126,36 @@ function showAuthPanel(name, { focus = true } = {}) {
     }
     for (const p of panels) $(`[data-panel="${p}"]`).hidden = p !== name;
   }
-  if (name === "signin") {
-    $('[data-form="signin"]').hidden = false;
-    $('[data-form="mfa"]').hidden = true;
-  }
+  if (name === "signin") showSigninStep("signin");
   const hash = name === "signin" ? "" : `#${name}`;
   if (location.hash !== hash) history.replaceState(null, "", hash || location.pathname + location.search);
   if (focus) $(`[data-panel="${name}"] input:not([type=checkbox])`)?.focus();
+}
+
+/** Shows one step of the sign-in panel: the password, the second factor, or a step of Google sign-in. */
+function showSigninStep(name) {
+  for (const form of $$('[data-panel="signin"] form')) form.hidden = form.dataset.form !== name;
+  return $(`[data-form="${name}"]`);
+}
+
+function setMfaMode(recovery) {
+  $("[data-mfa-label]").textContent = t(recovery ? "js.account.mfa_recovery" : "js.account.mfa_app");
+  $("[data-mfa-text]").textContent = t(recovery ? "js.account.mfa_recovery_text" : "js.account.mfa_app_text");
+  const input = $('[data-form="mfa"]').elements.code;
+  input.inputMode = recovery ? "text" : "numeric";
+  input.autocomplete = recovery ? "off" : "one-time-code";
+  input.value = "";
+}
+
+/** The second factor, after a password or a Google sign-in. */
+function askMfa(token, remember) {
+  mfaToken = token;
+  mfaRemember = remember;
+  const mfa = showSigninStep("mfa");
+  resetMessages(mfa);
+  mfa.reset();
+  setMfaMode(false);
+  mfa.elements.code.focus();
 }
 
 function initAuth() {
@@ -167,14 +204,7 @@ function initAuth() {
       const res = await withPow((pow) => api("/auth/login", { method: "POST", body: pow ? { ...body, pow } : body }));
       mfaRemember = signin.elements.remember.checked;
       if (res.mfaRequired) {
-        mfaToken = res.mfaToken;
-        signin.hidden = true;
-        const mfa = $('[data-form="mfa"]');
-        resetMessages(mfa);
-        mfa.reset();
-        setMfaMode(false);
-        mfa.hidden = false;
-        mfa.elements.code.focus();
+        askMfa(res.mfaToken, mfaRemember);
       } else {
         completeSignIn(res, mfaRemember);
         signin.reset();
@@ -193,14 +223,6 @@ function initAuth() {
 
   /* second factor */
   const mfa = $('[data-form="mfa"]');
-  const setMfaMode = (recovery) => {
-    $("[data-mfa-label]").textContent = t(recovery ? "js.account.mfa_recovery" : "js.account.mfa_app");
-    $("[data-mfa-text]").textContent = t(recovery ? "js.account.mfa_recovery_text" : "js.account.mfa_app_text");
-    const input = mfa.elements.code;
-    input.inputMode = recovery ? "text" : "numeric";
-    input.autocomplete = recovery ? "off" : "one-time-code";
-    input.value = "";
-  };
   $("[data-mfa-recovery]").addEventListener("change", (event) => {
     setMfaMode(event.target.checked);
     mfa.elements.code.focus();
@@ -245,13 +267,7 @@ function initAuth() {
     const email = value(register, "email");
     const password = raw(register, "password");
     const confirm = raw(register, "confirm");
-    let pattern;
-    try {
-      pattern = new RegExp(l.usernamePattern);
-    } catch {
-      pattern = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
-    }
-    if (username.length < l.usernameMin || username.length > l.usernameMax || !pattern.test(username)) {
+    if (!usernameOk(username, l)) {
       return fail(register, t("js.errors.username_format", { min: l.usernameMin, max: l.usernameMax }), register.elements.username);
     }
     if (!looksLikeEmail(email)) return fail(register, t("js.errors.email_format"), register.elements.email);
@@ -319,6 +335,8 @@ function initAuth() {
       }
     });
   }
+
+  initGoogle();
 }
 
 // Where the visitor was going before signing in: a dashboard tab (#games) or the GIF page.
@@ -356,6 +374,201 @@ function showAuth(message, { focus = false } = {}) {
   const name = location.hash.slice(1);
   showAuthPanel(["register", "forgot", "resend"].includes(name) ? name : "signin", { focus: focus || leaving });
   if (message) showMessage($('[data-form="signin"] [data-error]'), message);
+}
+
+/* ============================================================================ Google sign-in */
+
+// A plain navigation to Google and back, with nothing loaded from Google: this page makes a PKCE
+// pair, the server's start answer gives Google's address, and Google sends the browser back to
+// /account/google/ (assets/js/sso-return.js), which hands its answer to this page. The attempt and
+// the answer are kept in this tab's sessionStorage, and each is used once.
+const GOOGLE_ATTEMPT = "scacelith.sso.attempt";
+const GOOGLE_RETURN = "scacelith.sso.return";
+let ssoTicket = null;
+let linkTicket = null;
+let googleRemember = false;
+
+const base64url = (bytes) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+/** Whether the address from the server goes to Google, and brings the browser back to this site. */
+function googleUrlOk(authUrl, state) {
+  try {
+    const url = new URL(authUrl);
+    const redirect = url.searchParams.getAll("redirect_uri");
+    return url.origin === "https://accounts.google.com" && redirect.length === 1
+      && new URL(redirect[0]).origin === location.origin && url.searchParams.get("state") === state;
+  } catch {
+    return false;
+  }
+}
+
+async function startGoogle(button) {
+  if (isBusy(button)) return;
+  const form = button.closest("form");
+  resetMessages(form);
+  setBusy(button, true);
+  try {
+    const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    const res = await api("/auth/sso/google/web/start", { method: "POST", body: { codeChallenge: base64url(new Uint8Array(digest)) } });
+    if (!googleUrlOk(res?.authUrl, res?.state)) {
+      fail(form, t("js.errors.sso_url"));
+    } else if (!store.set(GOOGLE_ATTEMPT, {
+      attemptId: res.attemptId, verifier, state: res.state, lang,
+      remember: $('[data-form="signin"]').elements.remember.checked,
+      search: location.search, createdAt: Date.now(), expiresIn: res.expiresIn,
+    }, "session")) {
+      fail(form, t("js.errors.sso_storage"));
+    } else {
+      store.remove(GOOGLE_RETURN, "session");
+      location.assign(res.authUrl);
+      return; // the button stays busy while the browser leaves
+    }
+  } catch (e) {
+    fail(form, errorMessage(e));
+  }
+  setBusy(button, false);
+}
+
+/** Google's answer, kept by /account/google/, and this tab's attempt: both are taken once. */
+function takeGoogleReturn() {
+  const answer = store.get(GOOGLE_RETURN, "session");
+  if (!answer) return null;
+  const attempt = store.get(GOOGLE_ATTEMPT, "session");
+  store.remove(GOOGLE_RETURN, "session");
+  store.remove(GOOGLE_ATTEMPT, "session");
+  return { answer, attempt };
+}
+
+async function finishGoogle({ answer, attempt }) {
+  const signin = $('[data-form="signin"]');
+  const button = $("[data-google-start]", signin);
+  // Back from Google: its button shows the work even before the server's information arrives.
+  $("[data-google]", signin).hidden = false;
+  if (answer.error) return fail(signin, t(answer.error === "access_denied" ? "js.errors.sso_cancelled" : "js.errors.sso_failed"));
+  // Nothing goes to the server for an answer that this tab's attempt did not ask for.
+  if (!attempt || typeof answer.state !== "string" || answer.state !== attempt.state || typeof answer.code !== "string") {
+    return fail(signin, t("js.errors.sso_mismatch"));
+  }
+  if (!(Date.now() - attempt.createdAt < (attempt.expiresIn || 600) * 1000)) return fail(signin, t("js.errors.sso_expired"));
+  googleRemember = Boolean(attempt.remember);
+  signin.elements.remember.checked = googleRemember;
+  setBusy(button, true);
+  signingIn = true;
+  try {
+    const body = { attemptId: attempt.attemptId, codeVerifier: attempt.verifier, state: answer.state, code: answer.code, clientLabel: clientLabel() };
+    if (answer.iss) body.iss = answer.iss;
+    const res = await api("/auth/sso/google/finish", { method: "POST", body });
+    if (res?.needsUsername) {
+      ssoTicket = res.ssoTicket;
+      const form = showSigninStep("sso-username");
+      resetMessages(form);
+      form.reset();
+      form.elements.username.value = res.suggestedUsername || "";
+      form.elements.username.focus();
+    } else if (res?.needsPassword) {
+      linkTicket = res.linkTicket;
+      const form = showSigninStep("sso-link");
+      resetMessages(form);
+      form.reset();
+      $("[data-link-text]", form).textContent = t("js.account.google_link_text", { name: res.username });
+      form.elements.username.value = res.username;
+      form.elements.password.focus();
+    } else if (res?.mfaRequired) {
+      askMfa(res.mfaToken, googleRemember);
+    } else if (res?.token) {
+      completeSignIn(res, googleRemember);
+    } else {
+      fail(signin, t("js.errors.sso_failed"));
+    }
+  } catch (e) {
+    fail(signin, errorMessage(e));
+  } finally {
+    signingIn = false;
+    setBusy(button, false);
+  }
+}
+
+function initGoogle() {
+  for (const button of $$("[data-google-start]")) button.addEventListener("click", () => startGoogle(button));
+  // Back from Google's page with the Back button, this page may come back from the cache as it left.
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) for (const button of $$("[data-google-start]")) setBusy(button, false);
+  });
+  const signin = $('[data-form="signin"]');
+  // A step that cannot go on: the sign-in form again, with the reason.
+  const restart = (e) => {
+    showAuthPanel("signin");
+    fail(signin, errorMessage(e));
+  };
+
+  /* a first Google sign-in: the user name of the new account */
+  const named = $('[data-form="sso-username"]');
+  named.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (isBusy(formParts(named).submit)) return;
+    resetMessages(named);
+    const l = limits();
+    const username = value(named, "username");
+    if (!usernameOk(username, l)) {
+      return fail(named, t("js.errors.username_format", { min: l.usernameMin, max: l.usernameMax }), named.elements.username);
+    }
+    const { submit } = formParts(named);
+    setBusy(submit, true);
+    signingIn = true;
+    try {
+      const res = await api("/auth/sso/complete", { method: "POST", body: { ssoTicket, username, clientLabel: clientLabel() } });
+      ssoTicket = null;
+      named.reset();
+      completeSignIn(res, googleRemember);
+    } catch (e) {
+      // Another name can be tried with the same ticket; the other refusals end this sign-in.
+      if (e instanceof ApiError && (e.code === "invalid_username" || e.code === "username_taken")) {
+        fail(named, errorMessage(e), named.elements.username);
+      } else if (e instanceof ApiError && ["sso_expired", "sso_already_linked", "email_taken", "registration_closed"].includes(e.code)) {
+        restart(e);
+      } else {
+        fail(named, errorMessage(e));
+      }
+    } finally {
+      signingIn = false;
+      setBusy(submit, false);
+    }
+  });
+
+  /* an account with a password uses the Google address: its password links them, once */
+  const link = $('[data-form="sso-link"]');
+  link.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (isBusy(formParts(link).submit)) return;
+    resetMessages(link);
+    const password = raw(link, "password");
+    if (!password) return fail(link, t("js.errors.required"), link.elements.password);
+    const { submit } = formParts(link);
+    setBusy(submit, true);
+    signingIn = true;
+    try {
+      const body = { linkTicket, password, clientLabel: clientLabel() };
+      const res = await withPow((pow) => api("/auth/sso/google/link", { method: "POST", body: pow ? { ...body, pow } : body }));
+      linkTicket = null;
+      link.reset();
+      // With two-factor authentication on, the link is stored once the code passes.
+      if (res.mfaRequired) askMfa(res.mfaToken, googleRemember);
+      else completeSignIn(res, googleRemember);
+    } catch (e) {
+      if (e instanceof ApiError && e.code === "invalid_credentials") {
+        fail(link, t("js.errors.invalid_password"), link.elements.password);
+      } else if (e instanceof ApiError && (e.code === "sso_expired" || e.code === "sso_already_linked")) {
+        link.reset();
+        restart(e);
+      } else {
+        fail(link, errorMessage(e));
+      }
+    } finally {
+      signingIn = false;
+      setBusy(submit, false);
+    }
+  });
 }
 
 /* ============================================================================ signed in */
@@ -750,8 +963,13 @@ onReady(() => {
     else if (view === "dashboard") selectDashTab(["games", "devices", "settings"].includes(name) ? name : "overview");
   });
 
+  // Back from Google (/account/google/): its answer is taken before anything else, used or not.
+  const google = takeGoogleReturn();
   if (getSession()) {
     showDashboard();
+  } else if (google) {
+    showAuth();
+    finishGoogle(google);
   } else {
     showAuth();
     requestSession(350).then((s) => {
