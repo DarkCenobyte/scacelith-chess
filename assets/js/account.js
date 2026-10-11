@@ -591,7 +591,7 @@ function renderMe() {
   const badges = clear($("[data-me-badges]"));
   if (u.emailVerified) badges.append(badge(t("js.account.badge_verified"), "badge-ok", "check"));
   if (u.mfaEnabled) badges.append(badge(t("js.account.badge_mfa"), "badge-ok", "shield"));
-  if (u.googleLinked) badges.append(badge(t("js.account.badge_google"), "", null));
+  if (u.googleLinked) badges.append(badge(t("js.account.badge_google"), "badge-ok", "link"));
 
   const ban = $("[data-me-ban]");
   if (me.ban) {

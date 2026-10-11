@@ -1637,6 +1637,8 @@ input::placeholder { color: #6e5d43; }
 [dir="rtl"] .profile-name { text-align: right; }
 .profile-sub { color: var(--muted); }
 .badges { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+/* Each badge a flex item: one that starts with text sits on the same line as one that starts with an icon. */
+.badges > li { display: flex; }
 .dashboard-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .dash-tabs { margin-bottom: 1.6rem; }
 .overview-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 1.2rem; }
