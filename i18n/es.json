@@ -44,7 +44,7 @@
     "lead": "Tome asiento ante una mesa de nogal encerado, en una sala real bañada por el sol. Al otro lado del tablero, un robot de porcelana impulsado por Stockfish espera su primera jugada.",
     "watch": "Ver el tráiler",
     "meta": "Software libre · Windows, Linux, macOS (experimental) · Tarjeta gráfica con OpenGL 4.6",
-    "caption": "Captura del juego: la pantalla de título"
+    "caption": "Captura del juego: la sala real"
   },
   "highlights": {
     "engine": "Motor OpenGL 4.6 propio",
@@ -123,13 +123,25 @@
       "alt": "La pantalla de título: el menú de Scacelith junto a dos robots que juegan al ajedrez en la sala.",
       "caption": "La pantalla de título"
     },
+    "coach": {
+      "alt": "El entrenador, un robot de porcelana con «COACH» en el pecho, saluda desde el otro lado del tablero; lo que dice también aparece subtitulado.",
+      "caption": "Entrenador"
+    },
+    "challenges": {
+      "alt": "El menú «Desafíos del entrenador»: series de mates y tácticas con su dificultad y las ya completadas, junto a la descripción de la serie seleccionada.",
+      "caption": "Desafíos del entrenador"
+    },
+    "analysis": {
+      "alt": "El modo Análisis: la barra de evaluación, una flecha dibujada en el tablero, las jugadas comentadas con la precisión de cada bando y la lista de controles.",
+      "caption": "Análisis"
+    },
+    "game": {
+      "alt": "Vista lateral: un robot alarga el brazo por encima de la mesa para mover una pieza mientras el otro espera; las piezas capturadas están junto al tablero.",
+      "caption": "Ver una partida"
+    },
     "hall": {
       "alt": "Dos robots frente a frente a ambos lados del tablero, en sillones de terciopelo rojo, bajo altos ventanales.",
       "caption": "La sala real"
-    },
-    "board": {
-      "alt": "El tablero visto desde arriba, con el reloj de ajedrez y la mano de un robot que se acerca a una pieza.",
-      "caption": "Ante el tablero"
     },
     "opponent": {
       "alt": "Primer plano del rival, un robot de porcelana, con la cabeza inclinada hacia el tablero.",
@@ -139,7 +151,7 @@
       "alt": "La mano de un robot anota las jugadas en la planilla con una pluma estilográfica.",
       "caption": "La planilla"
     },
-    "note": "Versión de desarrollo. La interfaz de estas imágenes está en francés.",
+    "note": "Versión 1.0.0. La interfaz de estas imágenes está en inglés.",
     "viewer": "Visor de imágenes",
     "close": "Cerrar",
     "previous": "Imagen anterior",

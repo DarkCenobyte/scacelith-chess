@@ -44,7 +44,7 @@
     "lead": "Nehmen Sie Platz an einem gewachsten Nussbaumtisch, in einem sonnendurchfluteten königlichen Saal. Auf der anderen Seite des Bretts wartet ein von Stockfish gesteuerter Porzellanroboter auf Ihren ersten Zug.",
     "watch": "Trailer ansehen",
     "meta": "Freie Software · Windows, Linux, macOS (experimentell) · Grafikkarte mit OpenGL 4.6",
-    "caption": "Im Spiel aufgenommen: der Titelbildschirm"
+    "caption": "Im Spiel aufgenommen: der königliche Saal"
   },
   "highlights": {
     "engine": "Eigene OpenGL-4.6-Engine",
@@ -123,13 +123,25 @@
       "alt": "Der Titelbildschirm: das Scacelith-Menü neben zwei Robotern, die im Saal Schach spielen.",
       "caption": "Der Titelbildschirm"
     },
+    "coach": {
+      "alt": "Der Trainer, ein Porzellanroboter mit „COACH“ auf der Brust, grüßt von der anderen Seite des Bretts herüber; was er sagt, erscheint auch als Untertitel.",
+      "caption": "Trainer"
+    },
+    "challenges": {
+      "alt": "Das Menü „Trainer-Aufgaben“: Serien von Matt- und Taktikaufgaben mit Angabe des Schwierigkeitsgrads und der bereits abgeschlossenen, neben der Beschreibung der ausgewählten Serie.",
+      "caption": "Trainer-Aufgaben"
+    },
+    "analysis": {
+      "alt": "Der Analysemodus: der Bewertungsbalken, ein auf das Brett gezeichneter Pfeil, die kommentierten Züge mit der Genauigkeit beider Seiten und die Liste der Steuerbefehle.",
+      "caption": "Analyse"
+    },
+    "game": {
+      "alt": "Von der Seite gesehen greift ein Roboter über den Tisch, um eine Figur zu ziehen, während der andere wartet; die geschlagenen Figuren stehen neben dem Brett.",
+      "caption": "Partie ansehen"
+    },
     "hall": {
       "alt": "Zwei Roboter sitzen einander in roten Samtsesseln am Schachbrett gegenüber, unter hohen Fenstern.",
       "caption": "Der königliche Saal"
-    },
-    "board": {
-      "alt": "Das Brett von oben, mit der Schachuhr und der Hand eines Roboters, die nach einer Figur greift.",
-      "caption": "Am Brett"
     },
     "opponent": {
       "alt": "Nahaufnahme des gegnerischen Porzellanroboters, den Kopf zum Brett gesenkt.",
@@ -139,7 +151,7 @@
       "alt": "Die Hand eines Roboters notiert die Züge mit einem Füllfederhalter auf dem Partieformular.",
       "caption": "Das Partieformular"
     },
-    "note": "Entwicklungsversion. Die Oberfläche auf diesen Bildern ist auf Französisch.",
+    "note": "Version 1.0.0. Die Oberfläche auf diesen Bildern ist auf Englisch.",
     "viewer": "Bildbetrachter",
     "close": "Schließen",
     "previous": "Vorheriges Bild",
