@@ -32,7 +32,8 @@ export function outcomeFor(game, color) {
 export function reasonText(game) {
   const key = `js.game.reason.${game.reason}`;
   const text = t(key);
-  return text === key ? game.termination || t("js.game.termination_unknown") : text;
+  // A reason newer than this site: a plain end of game, as the API asks (its result says the rest).
+  return text === key ? t("js.game.termination_unknown") : text;
 }
 
 function scores(game) {

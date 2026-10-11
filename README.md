@@ -99,12 +99,22 @@ the API address (`tools/site.json`) updates the policy at the next build.
 
 Downloads: the menus read the newest release of
 [DarkCenobyte/scacelith-chess](https://github.com/DarkCenobyte/scacelith-chess/releases) from the
-GitHub API (`/releases/latest`, or the newest pre-release while there is no stable one) and sort its
-files by system from their names (`…-windows-x64.zip`, `…-linux-….AppImage`, `…-macos-….dmg`...).
-New systems appear by themselves when a release carries their files. When the GitHub API cannot be
-reached (it allows 60 requests per hour and address), the menus fall back to the release written in
-`tools/site.json` (`fallbackRelease`, the current version when the site was built): update it there
-after a release, then build, so that the fallback stays recent.
+GitHub API (`/releases/latest`: the newest release that is neither a draft nor a pre-release) and
+sort its files by system from their names (`…-windows-x64.zip`, `…-linux-x86_64.tar.gz`,
+`…-linux-aarch64.tar.gz`, `…-macos-arm64-experimental.dmg`...), and by processor (`x64`, `x86_64`,
+`arm64`, `aarch64`) when a system has builds for several. A file whose name says `experimental` is
+marked so, and so is its system when all its files are. New systems appear by themselves when a
+release carries their files. The last entry of the menus is the source code: GitHub's ZIP archive
+of the release's tag (`https://github.com/DarkCenobyte/scacelith-chess/archive/refs/tags/<tag>.zip`).
+
+When the GitHub API cannot be reached (it allows 60 requests per hour and address), the menus fall
+back to the release written in `tools/site.json` (`fallbackRelease`, the newest release when the
+site was built). After a release is published, update it and build:
+
+```sh
+python3 tools/build.py --update-release   # fallbackRelease from GitHub's newest release
+python3 tools/build.py
+```
 
 ## Publishing
 

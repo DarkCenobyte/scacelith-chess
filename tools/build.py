@@ -4,6 +4,9 @@
     python3 tools/build.py                 # writes <lang>/..., index.html, 404.html, sitemap.xml
     python3 tools/build.py --check         # checks the translations and that the output is up to date
     python3 tools/build.py --todo de       # i18n/de.todo.json: the English strings missing in de.json
+    python3 tools/build.py --update-release
+                                           # tools/site.json's fallbackRelease from GitHub's newest
+                                           # release (then build again)
     python3 tools/build.py --out DIR --api http://127.0.0.1:8443/api/v1
                                            # a complete copy of the site in DIR, for local testing
 
@@ -20,7 +23,8 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = ROOT / "templates"
@@ -285,7 +289,7 @@ class Site:
                 "inLanguage": code,
                 "genre": ["Chess"],
                 "gamePlatform": "PC",
-                "operatingSystem": "Windows",
+                "operatingSystem": "Windows, Linux, macOS",
                 "applicationCategory": "GameApplication",
                 "playMode": ["SinglePlayer", "MultiPlayer"],
                 "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -301,8 +305,14 @@ class Site:
                           + "</script>")
         fallback = self.cfg.get("fallbackRelease") or {}
         release_json = script_json(fallback)
+        tag = fallback.get("tag") or ""
+        if not tag:
+            raise BuildError("tools/site.json: fallbackRelease has no tag")
         return {
             "release_json": release_json,
+            "release_tag": tag,
+            "source_url": f"https://github.com/{self.cfg['releasesRepo']}/archive/refs/tags/{quote(tag, safe='')}.zip",
+            "release_eyebrow": lookup(strings, "js.download.eyebrow_release").replace("{version}", tag.lstrip("v")),
             "title": title,
             "description": description,
             "head_extra": head_extra,
@@ -407,6 +417,31 @@ class Site:
         return "\n".join(lines) + "\n"
 
 
+def update_release() -> str:
+    """Writes the newest release of GitHub ("latest": neither a draft nor a pre-release) into
+    tools/site.json as fallbackRelease, the release the download menus show when the GitHub API
+    cannot be reached."""
+    path = ROOT / "tools" / "site.json"
+    cfg = load_json(path)
+    url = f"https://api.github.com/repos/{cfg['releasesRepo']}/releases/latest"
+    request = Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "scacelith-site-build"})
+    try:
+        with urlopen(request, timeout=30) as answer:
+            raw = json.loads(answer.read().decode("utf-8"))
+    except (OSError, ValueError) as e:
+        raise BuildError(f"{url}: {e}") from None
+    if not raw.get("tag_name"):
+        raise BuildError(f"{url}: no release")
+    cfg["fallbackRelease"] = {
+        "tag": raw["tag_name"],
+        "name": raw.get("name") or raw["tag_name"],
+        "published": raw.get("published_at"),
+        "assets": [{"name": a["name"], "size": a["size"]} for a in raw.get("assets", []) if a.get("state") == "uploaded"],
+    }
+    path.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return f"tools/site.json: fallbackRelease is now {raw['tag_name']} ({len(cfg['fallbackRelease']['assets'])} files)"
+
+
 def tidy(text: str) -> str:
     """Drops the blank lines and trailing spaces that the templates leave."""
     lines = [line.rstrip() for line in text.splitlines()]
@@ -423,8 +458,13 @@ def main() -> int:
     parser.add_argument("--out", metavar="DIR", help="build a complete copy of the site in DIR")
     parser.add_argument("--api", metavar="URL", help="another API base URL (local testing only)")
     parser.add_argument("--only", metavar="LANGS", help="comma-separated languages (local testing only, with --out)")
+    parser.add_argument("--update-release", action="store_true",
+                        help="set tools/site.json's fallbackRelease to GitHub's newest release")
     args = parser.parse_args()
     try:
+        if args.update_release:
+            print(update_release())
+            return 0
         if args.only and not args.out:
             raise BuildError("--only is for local copies only: use it with --out")
         only = args.only.split(",") if args.only else None

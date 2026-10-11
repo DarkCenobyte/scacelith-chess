@@ -7,7 +7,7 @@
   </div>
   <div class="shell hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow hero-eyebrow"><span class="diamond" aria-hidden="true"></span><span data-release-eyebrow>{{t:hero.eyebrow}}</span></p>
+      <p class="eyebrow hero-eyebrow"><span class="diamond" aria-hidden="true"></span><span data-release-eyebrow>{{v:release_eyebrow}}</span></p>
       <h1 class="hero-title" id="hero-title">Scacelith</h1>
       <div class="ornament-rule" aria-hidden="true"><span class="diamond"></span></div>
       <p class="hero-tagline">{{t:brand.tagline}}</p>
@@ -93,6 +93,14 @@
       <li class="mode">
         <h3 class="mode-name">{{t:modes.coach.name}}</h3>
         <p class="mode-text">{{t:modes.coach.text}}</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">{{t:modes.challenges.name}}</h3>
+        <p class="mode-text">{{t:modes.challenges.text}}</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">{{t:modes.analysis.name}}</h3>
+        <p class="mode-text">{{t:modes.analysis.text}}</p>
       </li>
       <li class="mode">
         <h3 class="mode-name">{{t:modes.online.name}}</h3>
@@ -247,7 +255,6 @@
         </header>
         <p class="release-line" data-release-line>
           <span class="release-name" data-release-name>{{t:download.latest}}</span>
-          <span class="badge badge-beta" data-release-pre hidden>{{t:download.prerelease}}</span>
           <span class="release-date" data-release-date></span>
         </p>
         <div class="button-row">
@@ -272,8 +279,9 @@
             <div class="platform-files" data-platform-files><a class="text-link" href="{{v:releases_url}}">{{t:download.see_release}}</a></div>
           </li>
           <li class="platform" data-platform="macos">
-            <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-apple"></use></svg><h3 class="platform-name">macOS</h3><span class="platform-state" data-platform-state></span></div>
+            <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-apple"></use></svg><h3 class="platform-name">macOS</h3><span class="platform-state" data-platform-state><span class="badge badge-accent">{{t:download.experimental}}</span></span></div>
             <div class="platform-files" data-platform-files><a class="text-link" href="{{v:releases_url}}">{{t:download.see_release}}</a></div>
+            <p class="platform-note" data-platform-note>{{t:download.macos_note}}</p>
           </li>
           <li class="platform" data-platform="linux">
             <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-linux"></use></svg><h3 class="platform-name">Linux</h3><span class="platform-state" data-platform-state></span></div>

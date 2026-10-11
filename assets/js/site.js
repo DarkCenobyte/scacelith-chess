@@ -4,7 +4,7 @@ import { $, $$, h, icon, clear } from "./lib/dom.js";
 import { t, fmt, lang, pageUrl } from "./lib/i18n.js";
 import * as store from "./lib/store.js";
 import { getSession, onSessionChange, requestSession } from "./lib/session.js";
-import { latestRelease, detectOS, filesFor, OSES, RELEASES_URL } from "./lib/releases.js";
+import { latestRelease, detectOS, filesFor, archesOf, OSES, RELEASES_URL } from "./lib/releases.js";
 import { initMenus, copyText, toast } from "./lib/ui.js";
 
 const page = document.documentElement.dataset.page;
@@ -137,11 +137,37 @@ export const releaseReady = new Promise((resolve) => {
 });
 const OS_ICON = { windows: "windows", macos: "apple", linux: "linux" };
 
-function fileLabel(asset) {
-  if (asset.kind === "exe") return `${t("js.download.exe")} (.exe)`;
-  if (asset.kind === "zip") return `${t("js.download.zip")} (.zip)`;
+/** What a file is: its format, or its processor when the system has builds for several. */
+export function fileTitle(asset, files) {
+  if (archesOf(files).length > 1 && asset.arch) return t(`js.download.arch_${asset.arch}`);
+  if (asset.kind === "exe") return t("js.download.exe");
+  if (asset.kind === "zip") return t("js.download.zip");
+  if (asset.kind === "dmg") return t("js.download.dmg");
+  if (asset.kind === "tar.gz" || asset.kind === "tar.xz" || asset.kind === "7z") return t("js.download.archive");
   if (asset.kind === "file") return asset.name;
-  return `${t("js.download.file")} (.${asset.kind})`;
+  return t("js.download.file");
+}
+
+/** A file's format and size: ".zip · 91 MB" (the format alone for a file of unknown size). */
+export function fileDetail(asset) {
+  const ext = asset.kind === "file" ? "" : `.${asset.kind}`;
+  if (!Number.isFinite(asset.size)) return ext;
+  return ext ? `${ext} · ${fmt.bytes(asset.size)}` : fmt.bytes(asset.size);
+}
+
+/** The line under a system's name: the processors and system versions its files are for. */
+export function systemNote(os, files) {
+  const arches = archesOf(files);
+  if (os === "macos" && arches.length === 1 && arches[0] === "arm64") return t("js.download.macos_arm64");
+  if (arches.length > 1) return t("js.download.several_arches");
+  if (arches[0] === "x64") return t("js.download.x64");
+  return t("js.download.available");
+}
+
+/** The "Experimental" tag of a system whose files are all experimental builds (after a space). */
+export function experimentalFlag(files) {
+  if (!files.length || !files.every((f) => f.experimental)) return null;
+  return [" ", h("span", { class: "os-flag" }, t("js.download.experimental"))];
 }
 
 function renderDownloadMenus(release) {
@@ -156,21 +182,25 @@ function renderDownloadMenus(release) {
       const head = h("div", { class: "os-group-head" },
         icon(OS_ICON[os], "os-icon"),
         h("span", { class: "os-text" },
-          h("span", { class: "os-name", dataset: { current: t("js.download.your_system") } }, OS_LABEL[os]),
-          h("span", { class: "os-meta" }, files.length ? (files[0].arch === "x64" ? t("js.download.x64") : t("js.download.available")) : t("js.download.unavailable"))));
+          h("span", { class: "os-name", dataset: { current: t("js.download.your_system") } }, OS_LABEL[os], experimentalFlag(files)),
+          h("span", { class: "os-meta" }, files.length ? systemNote(os, files) : t("js.download.unavailable"))));
       const group = h("li", { class: `os-group${files.length ? "" : " is-unavailable"}${current ? " is-current" : ""}` }, head);
       if (files.length) {
         group.append(h("ul", { class: "os-files" }, files.map((f) =>
           h("li", null, h("a", { class: "os-file", href: f.url, rel: "noopener" },
-            h("span", { class: "os-file-name" }, icon("download"), fileLabel(f)),
-            h("span", { class: "os-file-size" }, fmt.bytes(f.size)))))));
+            h("span", { class: "os-file-name" }, icon("download"), fileTitle(f, files)),
+            h("span", { class: "os-file-size" }, fileDetail(f)))))));
       }
       list.append(group);
     }
-    const label = $("[data-release-label]", menu);
-    if (label) {
-      clear(label).append(h("bdi", null, release.name), release.prerelease ? ` · ${t("js.download.prerelease_short")}` : "");
+    const source = $("[data-source-link]", menu);
+    if (source && release.source) {
+      source.href = release.source;
+      const meta = $("[data-source-meta]", source);
+      if (meta) clear(meta).append(`${t("js.download.zip")} · `, h("bdi", null, release.tag));
     }
+    const label = $("[data-release-label]", menu);
+    if (label) clear(label).append(h("bdi", null, release.name));
     const link = $("[data-release-link]", menu);
     if (link) link.href = RELEASES_URL;
   }

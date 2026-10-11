@@ -536,6 +536,11 @@ function initSettings() {
     return body;
   };
   const needMfa = (form) => me?.user?.mfaEnabled && !value(form, "code");
+  // Two-step verification turned on elsewhere (in the game) since this page read the account:
+  // read it again, which shows the code fields, before pointing at one.
+  const showMfaFields = async (e) => {
+    if (e?.code === "mfa_code_required" && !me?.user?.mfaEnabled) await loadMe().catch(() => null);
+  };
 
   const password = $('[data-form="password"]');
   password.addEventListener("submit", async (event) => {
@@ -579,6 +584,7 @@ function initSettings() {
       loadMe().catch(() => null);
     } catch (e) {
       const field = { invalid_email: "newEmail", same_email: "newEmail", email_taken: "newEmail", invalid_password: "password", invalid_code: "code", mfa_code_required: "code" }[e.code];
+      await showMfaFields(e);
       fail(email, errorMessage(e), field ? email.elements[field] : null);
     } finally {
       setBusy(submit, false);
@@ -602,6 +608,7 @@ function initSettings() {
       showMessage(success, t("js.account.export_done"));
     } catch (e) {
       const field = { invalid_password: "password", invalid_code: "code", mfa_code_required: "code" }[e.code];
+      await showMfaFields(e);
       fail(exportForm, errorMessage(e), field ? exportForm.elements[field] : null);
     } finally {
       setBusy(submit, false);
@@ -625,6 +632,7 @@ function initSettings() {
       toast(t("js.account.deleted"), { type: "ok", timeout: 7000 });
     } catch (e) {
       const field = { invalid_password: "password", invalid_code: "code", mfa_code_required: "code" }[e.code];
+      await showMfaFields(e);
       fail(del, errorMessage(e), field ? del.elements[field] : null);
     } finally {
       setBusy(submit, false);

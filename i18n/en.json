@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — photorealistic chess, played in first person",
-      "description": "Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you."
+      "description": "Free photorealistic chess in first person for Windows, Linux and macOS: Stockfish 19, a coach, game analysis and online play in a royal hall."
     },
     "players": {
       "title": "Leaderboard and players — Scacelith",
-      "description": "The best players of the official Scacelith server in every time control, their ratings and their latest games."
+      "description": "The best players of the official Scacelith server in every rated time control, their ratings and their latest games."
     },
     "account": {
       "title": "Your account — Scacelith",
@@ -37,16 +37,15 @@
   },
   "hero": {
     "image_alt": "Two porcelain robots play chess at a walnut table in a sunlit marble hall.",
-    "eyebrow": "Public beta",
     "lead": "Take your seat at a waxed walnut table in a sunlit royal hall. Across the board, a porcelain robot driven by Stockfish waits for your first move.",
     "watch": "Watch the trailer",
-    "meta": "Free software · Windows 64-bit · Graphics card with OpenGL 4.6",
+    "meta": "Free software · Windows, Linux, macOS (experimental) · Graphics card with OpenGL 4.6",
     "caption": "Captured in the game: the title screen"
   },
   "highlights": {
     "engine": "In-house OpenGL 4.6 engine",
     "stockfish": "Stockfish 19 built in",
-    "rules": "FIDE ratings",
+    "rules": "FIDE rules",
     "online": "Online play",
     "languages": "Ten languages"
   },
@@ -56,11 +55,11 @@
     "lead": "Scacelith brings back what makes a real game: the hall, the silence, the clock, an opponent who looks at you, and the rituals of the tournament.",
     "presence": {
       "title": "In the first person",
-      "text": "You see through your robot's eyes. Look around the hall, lean towards the board, look up at your opponent, or glance at the scoresheet beside you."
+      "text": "You see through your robot's eyes: look around the hall, lean over the board, look up at your opponent, glance at your scoresheet, or stand and walk to an end of the table."
     },
     "ritual": {
       "title": "Tournament rules",
-      "text": "A piece you touch must be moved. Your hand presses the clock to complete the move. An illegal move brings the arbiter, and a second one loses the game."
+      "text": "A piece you touch must be moved, and your hand presses the clock to complete the move. With the move hints off, the arbiter penalises an illegal move, and a second one loses the game."
     },
     "scoresheet": {
       "title": "Written by hand",
@@ -68,11 +67,11 @@
     },
     "opponent": {
       "title": "A worthy opponent",
-      "text": "Stockfish 19 at your level, from Novice (800) to full strength (3500), with a rating computed by the FIDE rules after every game."
+      "text": "Stockfish 19 at your level, from Novice (800) to Stockfish Max (3500), with a rating computed by the FIDE rules after every game."
     },
     "engine": {
       "title": "Built for this game",
-      "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections."
+      "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections. Quality presets, from Very low to Ultra, fit it to your graphics card."
     },
     "languages": {
       "title": "Ten languages",
@@ -89,11 +88,19 @@
     },
     "coach": {
       "name": "Coach",
-      "text": "A teacher sits across from you, plays at your level and talks you through the game: threats, good moves, mistakes. From the rules of chess to expert level, with a synthesised voice."
+      "text": "A teacher sits across from you, plays at your level and talks you through the game: threats, good moves, mistakes, playing out with its own hand what a mistake costs. From the rules of chess to expert level, with a voice synthesised on your computer."
+    },
+    "challenges": {
+      "name": "Coach Challenges",
+      "text": "Short sets of positions, each training one skill: mates in one to three, forks, pins and other tactics, defence, and the basic endgames against the coach. Hints only when you ask, and a green check for every set you complete."
+    },
+    "analysis": {
+      "name": "Analysis",
+      "text": "Stockfish reviews your saved games, your online games or any PGN: an evaluation bar, the key moves marked from brilliant to blunder, the better move drawn as an arrow, and comments aloud and in subtitles. The robots' hands play the moves as you step through."
     },
     "online": {
       "name": "Play Online",
-      "text": "Real opponents through a Scacelith server: rated games, matchmaking, challenges and private games. Your opponent's robot moves with them, live."
+      "text": "Real opponents through a Scacelith server: rated games, matchmaking, challenges and private games, or a direct match between two computers. Your opponent's robot moves with them, live."
     },
     "watch": {
       "name": "Watch a Game",
@@ -139,7 +146,7 @@
     "title": "Scacelith <em>in motion</em>",
     "play": "Play the trailer",
     "soon_title": "The trailer is coming soon",
-    "soon_text": "In the meantime, take a seat: the beta is ready to download.",
+    "soon_text": "In the meantime, take a seat: the game is ready to download.",
     "privacy": "The video is played by YouTube (youtube-nocookie.com) once you press play.",
     "open_youtube": "Watch on YouTube"
   },
@@ -147,11 +154,11 @@
     "eyebrow": "Online",
     "title": "Real opponents,<br><em>the same hall.</em>",
     "lead": "Sign in to the official server from the game and play people from everywhere, still in the first person.",
-    "point_rated": "Rated games in every official time control, with a FIDE rating for each.",
-    "point_match": "Matchmaking, challenges by name, private games with a code, and direct matches between two computers.",
+    "point_rated": "Rated games in every official time control, each with its own rating, computed by FIDE's rules.",
+    "point_match": "Matchmaking, challenges by name and private games with a code; or a direct match between two computers, with no server or account.",
     "point_fair": "Fair play: automatic checks, engine analysis of finished games and player reports.",
     "point_history": "Your game history on this site: download each game as PGN or as an animated GIF.",
-    "point_open": "Anyone can run a community server: the server and its API are free software.",
+    "point_open": "Anyone can run a community server: the server is free software, and its API is documented.",
     "create": "Create an account",
     "signin": "Sign in",
     "server_title": "The official server",
@@ -170,19 +177,22 @@
     "see_release": "See the release on GitHub",
     "latest": "Scacelith",
     "all_releases": "All releases",
+    "experimental": "Experimental",
+    "source": "Source code",
+    "source_zip": "ZIP archive",
     "eyebrow": "Download",
     "title": "Take your seat.<br><em>Free, and open source.</em>",
-    "lead": "No installer: download, unzip, and run Scacelith.exe. Every file is built from its tagged source by GitHub Actions, with an attested build provenance.",
-    "prerelease": "Beta",
+    "lead": "Unpack and play: no installer on Windows or Linux, and a drag to Applications on a Mac. Every file is built from its tagged source by GitHub Actions, with an attested build provenance.",
     "notes": "Release notes",
+    "macos_note": "For Apple Silicon Macs (M1 or later) with macOS 26 or later, not in a virtual machine; newer and less tested than the other builds. The app is not signed by a registered Apple developer: the first time, open it from System Settings › Privacy & Security › Open Anyway.",
     "req_system": "System",
-    "req_system_value": "Windows, 64-bit (x64)",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 or aarch64) with glibc 2.34, OpenSSL 3 and X11 or XWayland, such as Ubuntu 22.04 or Debian 12; macOS 26 or later on Apple Silicon (experimental)",
     "req_gpu": "Graphics",
-    "req_gpu_value": "A graphics card with OpenGL 4.6 and an up-to-date driver",
+    "req_gpu_value": "A graphics card with OpenGL 4.6 and an up-to-date driver (on a Mac, the game brings its own OpenGL)",
     "req_included": "Included",
     "req_included_value": "Stockfish 19 and its neural network: play offline right away",
     "req_network": "Internet",
-    "req_network_value": "For online play, GIFs, and the coach's voice (an optional download of about 145 MB)",
+    "req_network_value": "For online play, GIFs, and the voice of the coach and of the analysis (an optional download of about 399 MB)",
     "req_licence": "Licence",
     "req_licence_value": "GNU General Public License v3",
     "verify_title": "Check your download",
@@ -194,12 +204,12 @@
     "title": "Credits and <em>thanks</em>",
     "engine_head": "Chess engine",
     "engine": "Stockfish 19, by the Stockfish developers (GNU GPL v3). Its neural network was trained on data provided by the Leela Chess Zero project (Open Database License).",
-    "voice_head": "Coach voice",
-    "voice": "Synthetic speech generated by Supertonic 3 for Coach Mode. Supertonic 3 is a model by Supertone, used under the OpenRAIL-M licence.",
+    "voice_head": "Voice",
+    "voice": "Supertonic 3 by Supertone, under the BigScience Open RAIL-M licence: downloaded at your request, it speaks for the coach and the analysis, on your computer.",
     "fonts_head": "Typefaces",
-    "fonts": "EB Garamond by Georg Duffner, Cinzel by Natanael Gama and Amiri by Khaled Hosny (SIL Open Font License); chess figures from GNU FreeFont.",
-    "openings_head": "Openings",
-    "openings": "Opening names from the chess-openings database of lichess.org, dedicated to the public domain (CC0).",
+    "fonts": "EB Garamond by Georg Duffner, Cinzel by Natanael Gama and Amiri by Khaled Hosny; handwriting in Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One and LXGW WenKai (all SIL Open Font License); chess figures from GNU FreeFont.",
+    "openings_head": "Openings and puzzles",
+    "openings": "Opening names from the chess-openings database of lichess.org, and the puzzles of the coach's challenges from the Lichess puzzle database, both dedicated to the public domain (CC0).",
     "quote": "“Chess is the art of analysis.”",
     "quote_author": "Mikhail Botvinnik"
   },
@@ -213,7 +223,7 @@
     "server_source": "The server on GitHub",
     "releases": "Releases",
     "licence": "Licence (GPL v3)",
-    "credits": "Stockfish is a trademark of its developers. YouTube is a trademark of Google LLC. Windows is a trademark of Microsoft Corporation.",
+    "credits": "Stockfish is a trademark of its developers. YouTube is a trademark of Google LLC. Windows is a trademark of Microsoft Corporation. macOS is a trademark of Apple Inc. Linux is the registered trademark of Linus Torvalds. OpenGL is a registered trademark of Hewlett Packard Enterprise.",
     "legal": "Scacelith",
     "made": "This site uses no cookies and no trackers."
   },
@@ -451,22 +461,28 @@
     "download": {
       "exe": "Executable",
       "zip": "ZIP archive",
+      "dmg": "Disk image",
+      "archive": "Archive",
       "file": "File",
       "unavailable": "Not available",
       "your_system": "Your system",
-      "eyebrow_beta": "Public beta · {version}",
       "eyebrow_release": "Version {version}",
       "published": "Published on {date}",
       "unreachable": "GitHub cannot be reached right now: see the releases page.",
       "available": "Available",
       "verify_file": "the file",
       "no_build": "No build of the game for {os} at the moment.",
-      "prerelease_short": "beta",
-      "x64": "64-bit (x64)"
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD or Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 or later",
+      "experimental": "Experimental"
     },
     "server": {
       "online": "Online",
       "offline": "Unreachable",
+      "busy": "Busy",
       "open": "Open",
       "closed": "Closed",
       "updated": "Updated {time}",
@@ -528,6 +544,7 @@
         "11": "50-move rule (claimed)",
         "12": "Draw by agreement",
         "13": "Second illegal move, but the opponent cannot checkmate",
+        "14": "Resignation, but the opponent cannot checkmate",
         "20": "Abandoned (disconnected for too long)",
         "21": "Abandoned, but the opponent cannot checkmate",
         "22": "Game aborted",

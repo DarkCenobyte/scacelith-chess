@@ -2,10 +2,10 @@
 // files of the newest release.
 
 import "./site.js";
-import { onReady, releaseReady } from "./site.js";
+import { onReady, releaseReady, fileTitle, fileDetail } from "./site.js";
 import { $, $$, h, icon, clear } from "./lib/dom.js";
 import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
-import { api } from "./lib/api.js";
+import { api, ApiError } from "./lib/api.js";
 import { getSession, onSessionChange } from "./lib/session.js";
 import { detectOS, filesFor, OSES } from "./lib/releases.js";
 import { ratingText } from "./lib/ratings.js";
@@ -127,15 +127,25 @@ async function initServer() {
   const select = $("[data-mini-category]", card);
   const board = $("[data-mini-board]", card);
 
+  // A server that answers 429 or 503 is up but busy: say so, and ask again a few times.
   let info;
-  try {
-    info = await api("/info", { timeout: 12000 });
-  } catch {
-    status.classList.add("is-offline");
-    statusText.textContent = t("js.server.offline");
-    clear(board).append(h("li", { class: "placeholder" }, t("js.server.error")));
-    return;
+  for (let attempt = 1; !info; attempt++) {
+    try {
+      info = await api("/info", { timeout: 12000 });
+    } catch (e) {
+      const busy = e instanceof ApiError && (e.status === 429 || e.status === 503);
+      status.classList.toggle("is-busy", busy);
+      status.classList.toggle("is-offline", !busy);
+      statusText.textContent = t(busy ? "js.server.busy" : "js.server.offline");
+      if (!busy || attempt >= 4) {
+        clear(board).append(h("li", { class: "placeholder" }, t("js.server.error")));
+        return;
+      }
+      const wait = Math.min(Math.max(e.retryAfter ?? 5, 1), 30);
+      await new Promise((resolve) => setTimeout(resolve, wait * 1000));
+    }
   }
+  status.classList.remove("is-busy", "is-offline");
   status.classList.add("is-online");
   statusText.textContent = t("js.server.online");
   for (const el of $$("[data-server-name]")) if (info.name) el.textContent = info.name;
@@ -207,7 +217,6 @@ const OS_LABEL = { windows: "Windows", macos: "macOS", linux: "Linux" };
 function renderRelease(release) {
   const eyebrow = $("[data-release-eyebrow]");
   const name = $("[data-release-name]");
-  const pre = $("[data-release-pre]");
   const date = $("[data-release-date]");
   const notes = $("[data-release-notes]");
   const sums = $("[data-sums-link]");
@@ -220,9 +229,8 @@ function renderRelease(release) {
     if (name) name.textContent = t("js.download.unreachable");
     return;
   }
-  if (eyebrow) eyebrow.textContent = t(release.prerelease ? "js.download.eyebrow_beta" : "js.download.eyebrow_release", { version: release.version });
+  if (eyebrow) eyebrow.textContent = t("js.download.eyebrow_release", { version: release.version });
   if (name) name.textContent = release.name;
-  if (pre) pre.hidden = !release.prerelease;
   if (date && release.published) {
     date.textContent = t("js.download.published", { date: fmt.date(release.published) });
   }
@@ -237,20 +245,26 @@ function renderRelease(release) {
     const files = filesFor(release, os);
     const state = $("[data-platform-state]", card);
     const box = clear($("[data-platform-files]", card));
+    const note = $("[data-platform-note]", card);
     card.classList.toggle("is-unavailable", !files.length);
     clear(state);
     if (files.length) {
-      state.append(h("span", { class: "badge badge-ok" }, icon("check"), t("js.download.available")));
+      const experimental = files.every((f) => f.experimental);
+      state.append(experimental
+        ? h("span", { class: "badge badge-accent" }, t("js.download.experimental"))
+        : h("span", { class: "badge badge-ok" }, icon("check"), t("js.download.available")));
       if (os === visitor) state.append(" ", h("span", { class: "badge" }, t("js.download.your_system")));
       files.forEach((f, i) => {
         verifyFile ||= f.name;
         box.append(h("a", { class: `btn ${i === 0 ? "btn-gold" : "btn-ghost"} file-button`, href: f.url, rel: "noopener" },
-          h("span", { class: "file-button-row" }, icon("download"), f.kind === "exe" ? t("js.download.exe") : f.kind === "zip" ? t("js.download.zip") : f.name),
-          h("span", { class: "file-size" }, `.${f.kind} · ${fmt.bytes(f.size)}`)));
+          h("span", { class: "file-button-row" }, icon("download"), fileTitle(f, files)),
+          h("span", { class: "file-size" }, fileDetail(f))));
       });
+      if (note) note.hidden = false;
     } else {
       state.append(h("span", { class: "badge badge-muted" }, t("js.download.unavailable")));
       box.append(h("span", null, t("js.download.no_build", { os: OS_LABEL[os] })));
+      if (note) note.hidden = true;
     }
   }
   if (verify && verifyFile) {

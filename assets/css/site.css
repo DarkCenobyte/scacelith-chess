@@ -433,6 +433,7 @@ html.is-framed body { visibility: hidden !important; }
    Menus (details/summary): language and download */
 
 .menu { position: relative; }
+.menu[open] { z-index: 90; }
 .menu > summary { list-style: none; }
 .menu > summary::-webkit-details-marker { display: none; }
 .menu > summary .chevron { transition: transform 0.2s var(--ease); }
@@ -473,6 +474,7 @@ html.is-framed body { visibility: hidden !important; }
   to { opacity: 1; transform: none; }
 }
 
+.download-panel { min-width: min(360px, calc(100vw - 32px)); }
 .os-list { list-style: none; display: grid; gap: 2px; }
 .os-item, .os-group-head {
   display: flex;
@@ -516,6 +518,25 @@ a.os-item:hover, a.os-item:focus-visible { background: rgba(201, 164, 92, 0.12);
 .os-file .icon { color: var(--gold); }
 .os-file-name { display: inline-flex; align-items: center; gap: 0.55rem; }
 .os-file-size { color: var(--faint); font-size: 0.88rem; font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.os-flag {
+  display: inline-block;
+  margin-inline-start: 0.15em;
+  padding: 0.05em 0.5em;
+  border: 1px solid rgba(226, 196, 135, 0.6);
+  border-radius: 999px;
+  background: rgba(201, 164, 92, 0.12);
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-2);
+  vertical-align: 0.2em;
+  white-space: nowrap;
+}
+:lang(ar) .os-flag, :lang(ja) .os-flag, :lang(zh-Hans) .os-flag, :lang(zh-Hant) .os-flag { font-size: 0.8rem; letter-spacing: 0; }
+/* The source code, after the systems, set apart by a rule. */
+.os-source { position: relative; margin-top: 0.5rem; }
+.os-source::before { content: ""; position: absolute; inset-inline: 0.65rem; top: -0.3rem; border-top: 1px solid var(--line); }
 
 /* --------------------------------------------------------------------------------------------
    Header */
@@ -706,6 +727,8 @@ body.nav-open .site-header::before { background: rgba(18, 13, 9, 0.98); }
   padding-block: calc(var(--header-h) + 3rem) 5.5rem;
   overflow-x: clip;
   isolation: isolate;
+  /* Above the sections that follow, which an open download menu may reach over. */
+  z-index: 1;
 }
 .hero-media {
   position: absolute;
@@ -1148,6 +1171,8 @@ body.nav-open .site-header::before { background: rgba(18, 13, 9, 0.98); }
 .status.is-online .status-dot { background: #8fc46a; box-shadow: 0 0 0 0 rgba(143, 196, 106, 0.6); animation: pulse 2.4s infinite; }
 .status.is-offline { color: var(--danger); }
 .status.is-offline .status-dot { background: var(--danger); }
+.status.is-busy { color: var(--gold-2); }
+.status.is-busy .status-dot { background: var(--gold); }
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(143, 196, 106, 0.55); }
   70% { box-shadow: 0 0 0 8px rgba(143, 196, 106, 0); }
@@ -1223,7 +1248,7 @@ select option { background: #241a12; color: var(--ivory); }
 }
 :lang(ar) .badge, :lang(ja) .badge, :lang(zh-Hans) .badge, :lang(zh-Hant) .badge { font-size: 0.86rem; letter-spacing: 0; }
 .badge .icon { width: 1.05em; height: 1.05em; }
-.badge-beta { border-color: rgba(226, 196, 135, 0.6); background: rgba(201, 164, 92, 0.12); }
+.badge-accent { border-color: rgba(226, 196, 135, 0.6); background: rgba(201, 164, 92, 0.12); }
 .badge-ok { color: var(--ok); border-color: rgba(143, 196, 106, 0.45); }
 .badge-muted { color: var(--faint); border-color: var(--line); }
 .badge-danger { color: var(--danger); border-color: rgba(212, 112, 95, 0.5); }
@@ -1250,6 +1275,8 @@ select option { background: #241a12; color: var(--ivory); }
 .platform-files { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.9rem; }
 .platform-files:empty { display: none; }
 .platform.is-unavailable .platform-files { margin-top: 0.4rem; color: var(--faint); font-size: 0.98rem; }
+.platform-note { margin-top: 0.8rem; color: var(--muted); font-size: 0.95rem; }
+.platform-note[hidden] { display: none; }
 .file-button { flex-direction: column; align-items: flex-start; gap: 0.15rem; min-height: 0; padding: 0.7rem 1rem; }
 .file-button .file-size { font-family: var(--font-body); font-size: 0.88rem; font-weight: 400; letter-spacing: 0; text-transform: none; opacity: 0.85; }
 .file-button-row { display: inline-flex; align-items: center; gap: 0.5rem; }
