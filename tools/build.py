@@ -26,6 +26,8 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES = ROOT / "templates"
 I18N = ROOT / "i18n"
 STATIC = ["assets", "config.js", "CNAME", "robots.txt", ".nojekyll"]
+# The redirect URI of the server's Google client for this site: https://scacelith.com/account/google/
+GOOGLE_RETURN = "account/google/"
 
 PLURAL_KEYS = {"zero", "one", "two", "few", "many", "other"}
 # The plural categories each language needs (CLDR), for the strings of the "js" tree that depend
@@ -351,6 +353,7 @@ class Site:
                 out[f"{code}/{page['path']}index.html"] = tidy(text)
         out["index.html"] = tidy(self.root_page())
         out["404.html"] = tidy(self.not_found_page())
+        out[f"{GOOGLE_RETURN}index.html"] = tidy(self.google_return_page())
         out["sitemap.xml"] = self.sitemap()
         return out
 
@@ -389,6 +392,14 @@ class Site:
         data = script_json(messages)
         # GitHub Pages serves 404.html at any depth: links and assets are absolute from the site root.
         return self.small_page("404.html", {"root": "/", "chooser": self.chooser("/", ""), "notfound_json": data})
+
+    def google_return_page(self) -> str:
+        """The page Google sends the browser back to after "Sign in with Google", one for every
+        language: its script opens the account page in the language the sign-in started from."""
+        root = "../" * GOOGLE_RETURN.count("/")
+        return self.small_page("sso-return.html", {
+            "root": root, "chooser": self.chooser(root, "account/"), "langs_json": json.dumps(self.codes),
+        })
 
     def sitemap(self) -> str:
         lines = ['<?xml version="1.0" encoding="UTF-8"?>',

@@ -273,6 +273,16 @@
       "use_recovery": "改用恢复码",
       "submit": "确认"
     },
+    "google": {
+      "or": "或",
+      "button": "使用 Google 账号登录",
+      "username_title": "选择你的用户名",
+      "username_text": "你的 Google 账号是第一次在此服务器上使用。请选择其他棋手将看到的名称：之后无法更改。",
+      "username_submit": "创建我的账号",
+      "link_title": "关联你的 Google 账号",
+      "link_submit": "关联并登录",
+      "returning": "正在使用 Google 登录…"
+    },
     "register": {
       "tab": "创建账号",
       "title": "免费账号",
@@ -436,7 +446,19 @@
       "render_failed": "服务器无法绘制此 GIF。",
       "invalid_game": "此对局不存在。",
       "invalid_player": "请输入用户名：2 到 24 个字符，可使用字母、数字、_、. 或 -。",
-      "player_not_found": "找不到此名称的棋手。"
+      "player_not_found": "找不到此名称的棋手。",
+      "sso_cancelled": "Google 登录已取消。",
+      "sso_mismatch": "此次 Google 登录不是在此标签页中发起的，或已被使用过。请重试。",
+      "sso_expired": "此次 Google 登录已过期。请重试。",
+      "invalid_verifier": "此次 Google 登录是在另一个标签页或浏览器中发起的。请从此页面重新开始。",
+      "sso_email_unverified": "Google 尚未确认此 Google 账号的电子邮箱地址。",
+      "sso_account_exists": "已有账号在使用此电子邮箱地址，但它没有可用于关联 Google 的密码。请先通过“忘记密码？”为它设置密码，再重新使用 Google 登录。",
+      "sso_failed": "无法完成 Google 登录。请重试。",
+      "sso_disabled": "此服务器不提供 Google 登录。",
+      "sso_already_linked": "此 Google 账号已关联到另一个账号。",
+      "account_disabled": "此账号已无法使用。",
+      "sso_storage": "你的浏览器阻止了本网站的存储，而 Google 登录需要它。请允许存储，或使用密码登录。",
+      "sso_url": "服务器返回了意外的 Google 地址，因此已停止 Google 登录。"
     },
     "time": {
       "seconds": {
@@ -608,7 +630,9 @@
       "username": "用户名",
       "password_rules": "至少 {min} 个字符，不得包含你的用户名或电子邮箱。",
       "password_note": "你的其他设备将退出登录，当前设备保持登录。",
-      "signin_label": "登录"
+      "signin_label": "登录",
+      "google_link_text": "账号 {name} 已在使用此电子邮箱地址。请输入该账号的密码一次，将它与 Google 关联；之后只需“使用 Google 账号登录”即可。",
+      "auth_foot_google": "官方服务器上的同一个账号，可同时用于游戏和本网站。在游戏中用 Google 创建了账号？在这里也用 Google 登录即可。"
     },
     "players": {
       "since": "注册于 {date}",

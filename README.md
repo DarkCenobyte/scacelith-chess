@@ -48,6 +48,7 @@ description (`gallery` in `i18n/<lang>.json`) and run `python3 tools/build.py`.
 | `<lang>/account/` | Sign-in, sign-up, password recovery, and the signed-in player's account, generated |
 | `<lang>/gif/` | Opened in a new tab by a game's GIF button (`?id=<game>`), generated |
 | `404.html`, `sitemap.xml` | Generated |
+| `account/google/` | Where Google sends the visitor back after "Sign in with Google", for every language: `assets/js/sso-return.js` hands Google's answer to the account page of the language the sign-in started from, generated |
 | `config.js` | The trailer (see above) |
 | `templates/` | The pages, with `{{t:key}}` for the translations (`templates/partials/` for the shared parts) |
 | `i18n/<lang>.json` | The strings of each language; `en.json` is the source of all others |
@@ -96,6 +97,13 @@ browser (`sessionStorage`, or `localStorage` with "Keep me signed in"); no cooki
 carry a strict Content Security Policy: scripts and styles from this site only, connections to the
 API and to `api.github.com` (the releases) only, frames from `youtube-nocookie.com` only. Changing
 the API address (`tools/site.json`) updates the policy at the next build.
+
+"Sign in with Google" shows when the server's `GET /info` says `sso.googleWeb: true`. It loads
+nothing from Google: the account page makes a PKCE pair, asks the server to start
+(`POST /auth/sso/google/web/start`), and goes to the Google address of the answer; Google sends the
+browser back to `https://scacelith.com/account/google/`, which must be the redirect URI of the
+server's Google client ("Web application"), and the account page finishes with the server. The
+attempt and Google's answer are kept in the tab's `sessionStorage` until they are used.
 
 Downloads: the menus read the newest release of
 [DarkCenobyte/scacelith-chess](https://github.com/DarkCenobyte/scacelith-chess/releases) from the

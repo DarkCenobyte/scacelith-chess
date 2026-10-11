@@ -273,6 +273,16 @@
       "use_recovery": "Stattdessen einen Wiederherstellungscode verwenden",
       "submit": "Bestätigen"
     },
+    "google": {
+      "or": "oder",
+      "button": "Mit Google anmelden",
+      "username_title": "Wählen Sie Ihren Benutzernamen",
+      "username_text": "Ihr Google-Konto ist neu auf diesem Server. Wählen Sie den Namen, den andere Spieler sehen: Er lässt sich später nicht mehr ändern.",
+      "username_submit": "Mein Konto erstellen",
+      "link_title": "Google-Konto verknüpfen",
+      "link_submit": "Verknüpfen und anmelden",
+      "returning": "Anmeldung mit Google…"
+    },
     "register": {
       "tab": "Konto erstellen",
       "title": "Ein kostenloses Konto",
@@ -436,7 +446,19 @@
       "render_failed": "Der Server konnte dieses GIF nicht zeichnen.",
       "invalid_game": "Diese Partie existiert nicht.",
       "invalid_player": "Geben Sie einen Benutzernamen ein: 2 bis 24 Buchstaben, Ziffern, _, . oder -.",
-      "player_not_found": "Kein Spieler mit diesem Namen."
+      "player_not_found": "Kein Spieler mit diesem Namen.",
+      "sso_cancelled": "Die Anmeldung mit Google wurde abgebrochen.",
+      "sso_mismatch": "Diese Anmeldung mit Google wurde nicht in diesem Tab gestartet oder bereits verwendet. Versuchen Sie es erneut.",
+      "sso_expired": "Diese Anmeldung mit Google ist abgelaufen. Versuchen Sie es erneut.",
+      "invalid_verifier": "Diese Anmeldung mit Google wurde in einem anderen Tab oder Browser gestartet. Beginnen Sie auf dieser Seite neu.",
+      "sso_email_unverified": "Google hat die E-Mail-Adresse dieses Google-Kontos nicht bestätigt.",
+      "sso_account_exists": "Ein Konto verwendet bereits diese E-Mail-Adresse, hat aber kein Passwort, mit dem sich Google verknüpfen lässt. Legen Sie mit „Passwort vergessen?“ eines fest und melden Sie sich dann erneut mit Google an.",
+      "sso_failed": "Die Anmeldung mit Google konnte nicht abgeschlossen werden. Versuchen Sie es erneut.",
+      "sso_disabled": "Die Anmeldung mit Google ist auf diesem Server nicht verfügbar.",
+      "sso_already_linked": "Dieses Google-Konto ist bereits mit einem anderen Konto verknüpft.",
+      "account_disabled": "Dieses Konto kann nicht mehr verwendet werden.",
+      "sso_storage": "Ihr Browser blockiert den Speicher dieser Website, den die Anmeldung mit Google benötigt. Lassen Sie ihn zu oder melden Sie sich mit Ihrem Passwort an.",
+      "sso_url": "Der Server hat mit einer unerwarteten Google-Adresse geantwortet, daher wurde die Anmeldung mit Google abgebrochen."
     },
     "time": {
       "seconds": {
@@ -612,7 +634,9 @@
       "username": "Benutzername",
       "password_rules": "Mindestens {min} Zeichen, ohne Ihren Benutzernamen oder Ihre E-Mail-Adresse.",
       "password_note": "Ihre anderen Geräte werden abgemeldet, dieses bleibt angemeldet.",
-      "signin_label": "Anmelden"
+      "signin_label": "Anmelden",
+      "google_link_text": "Das Konto {name} verwendet bereits diese E-Mail-Adresse. Geben Sie einmalig sein Passwort ein, um es mit Google zu verknüpfen; danach genügt „Mit Google anmelden“.",
+      "auth_foot_google": "Ein einziges Konto auf dem offiziellen Server, für das Spiel und diese Website. Sie haben es im Spiel mit Google erstellt? Melden Sie sich auch hier mit Google an."
     },
     "players": {
       "since": "Mitglied seit dem {date}",
