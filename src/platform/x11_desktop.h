@@ -133,7 +133,7 @@ private:
     bool focused_ = false;
     bool waiting_ = false;  // for the session's input method to start (Xlib's own composes meanwhile)
     bool reopen_ = false;   // the input method went away, or the session's started: opened again at the next event
-    int keyOf_[256] = {};          // the key each keycode's press reported (its release releases it)
+    int keyOf_[256] = {};          // the key each held keycode's first press reported (its repeats and release keep it)
     uint32_t pressTime_[256] = {}; // the last press reported per keycode (input methods send some twice)
     char position_[256] = {};      // keycode -> US letter or digit at that position, 0 for none
 };

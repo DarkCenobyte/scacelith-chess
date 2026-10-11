@@ -854,6 +854,49 @@ TEST(x11_shortcut_keys_on_other_layouts) {
     pump(t.dpy, t.kb, t.in);
     CHECK(!t.in.keyDown['V']);
     CHECK(t.in.keyReleased['V']);
+    // Held while the layout changes, then auto-repeated (audit N12): the repeats and the release
+    // are still the first press's key.
+    map.set(v, XK_Cyrillic_em, XK_Cyrillic_EM);
+    t.in = plat::Input{};
+    sendKey(t.dpy, t.win, v, 0, t.time + 10, true);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(t.in.keyDown['V']);
+    map.set(v, XK_b, XK_B);
+    newFrame(t.in);
+    sendKey(t.dpy, t.win, v, 0, t.time + 40, true);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(t.in.keyPressed['V']);
+    CHECK(!t.in.keyDown['B']);
+    sendKey(t.dpy, t.win, v, 0, t.time + 70, true);
+    sendKey(t.dpy, t.win, v, 0, t.time + 80, false);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(!t.in.keyDown['V']);
+    CHECK(t.in.keyReleased['V']);
+    CHECK(!t.in.keyDown['B']);
+    // The next press follows the layout of now.
+    sendKey(t.dpy, t.win, v, 0, t.time + 90, true);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(t.in.keyDown['B']);
+    // Its release goes to another window (Alt+Tab); after the focus comes back, a press follows
+    // the layout of then.
+    XEvent out{};
+    out.xfocus.type = FocusOut;
+    out.xfocus.window = t.win;
+    out.xfocus.detail = NotifyNonlinear;
+    bool focused = true;
+    CHECK(x11::focusEvent(out, t.win, t.kb, t.in, focused));
+    CHECK(!t.in.keyDown['B']);
+    map.set(v, XK_Cyrillic_em, XK_Cyrillic_EM);
+    XEvent in = out;
+    in.xfocus.type = FocusIn;
+    CHECK(x11::focusEvent(in, t.win, t.kb, t.in, focused));
+    sendKey(t.dpy, t.win, v, 0, t.time + 100, true);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(t.in.keyDown['V']);
+    CHECK(!t.in.keyDown['B']);
+    sendKey(t.dpy, t.win, v, 0, t.time + 110, false);
+    pump(t.dpy, t.kb, t.in);
+    CHECK(!t.in.keyDown['V']);
 }
 
 // ---- Focus ------------------------------------------------------------------------------------

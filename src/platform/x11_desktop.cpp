@@ -618,6 +618,9 @@ void Keyboard::destroyed(XIM, XPointer self, XPointer) {
 
 void Keyboard::focus(bool focused) {
     focused_ = focused;
+    // The releases of the keys held now go to another window: the next press of each key starts
+    // afresh, in the layout of then.
+    if (!focused) std::memset(keyOf_, 0, sizeof(keyOf_));
     if (!ic_) return;
     if (focused) XSetICFocus(ic_);
     else XUnsetICFocus(ic_);
@@ -682,7 +685,10 @@ bool Keyboard::event(XEvent& e, Input& in) {
             const bool again = ic_ && t != 0 && last != 0 && !(t - last != 0 && t - last < 0x80000000u);
             if (!again) {
                 pressTime_[keycode] = t;
-                keyOf_[keycode] = shortcutKey(keycode, e.xkey.state);
+                // An auto-repeat of a key still down reports the key its first press did, though
+                // the layout may have changed since: the release then lets that key go.
+                if (!keyOf_[keycode] || !in.keyDown[keyOf_[keycode]])
+                    keyOf_[keycode] = shortcutKey(keycode, e.xkey.state);
                 setKey(in, keyOf_[keycode], true);
             }
         }
