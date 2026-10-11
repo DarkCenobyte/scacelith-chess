@@ -92,6 +92,8 @@ std::string checkPosition(const ChallengePosition& c) {
     } else {
         if (!c.line.empty()) return "a play-out has no line";
         if (c.goal == ChallengeGoal::Hold && c.moves <= 0) return "hold needs a number of moves";
+        // Nothing to play out: no side can mate any more (a goal never reached, a hold over at once).
+        if (p.hasInsufficientMaterial()) return "a play-out on a dead position";
     }
     return std::string();
 }

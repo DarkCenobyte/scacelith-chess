@@ -43,15 +43,15 @@ Beat say(const Line& l, Look look = Look::Player, std::vector<Gesture> g = {}, s
     return b;
 }
 
+// A board beat. Space may cut a demonstration's line or hurry a rewind, never remove the
+// position, the lead or an answer of the line: the player's wait stands on them (audit N04).
 Beat tableBeat(BeatKind kind, const std::string& uci = std::string()) {
     Beat b;
     b.kind = kind;
     b.uci = uci;
     b.look = Look::Board;
-    if (kind == BeatKind::Rewind) {
-        b.count = 1;
-        b.skippable = false;
-    }
+    b.skippable = kind == BeatKind::DemoMove;
+    if (kind == BeatKind::Rewind) b.count = 1;
     return b;
 }
 
@@ -188,10 +188,8 @@ struct ChallengeRun::Impl {
         } else {
             s.push_back(say(line(pos + 1 == int(ch.positions.size()) ? "ch.last" : "ch.next")));
         }
-        Beat set;
-        set.kind = BeatKind::SetPosition;
+        Beat set = tableBeat(BeatKind::SetPosition);
         set.fen = p.fen;
-        set.look = Look::Board;
         s.push_back(set);
         if (!p.lead.empty()) {
             if (!leadSaid) s.push_back(say(line("ch.lead.first")));
@@ -237,6 +235,9 @@ struct ChallengeRun::Impl {
             return;
         }
         if (offer) closeOffer();
+        // A hint asked for before the play-out's analysis came back is about the position the
+        // player has just left: dropped (H asks again at the next wait).
+        hintWanted = false;
         played = before.toUCI(game.moves().back());
         judged = game.position();
         promoted = game.moves().back().promotion != NoPiece;
@@ -356,6 +357,13 @@ struct ChallengeRun::Impl {
             wrong(Script{say(line("ch.wrong.plain"), Look::Player)});
             return;
         }
+        // The coach's answer, on the board: one that mates is said as such, whatever the goal.
+        Position next = judged;
+        next.makeMove(next.parseUCI(a.bestMove));
+        if (next.isCheckmate()) {
+            wrong(answerScript("ch.wrong.mate", a.bestMove));
+            return;
+        }
         const double e = w.expected();
         const bool winning = w.mate > 0 || (w.mate == 0 && e >= kWinKept);
         const bool lost = w.mate < 0 || (w.mate == 0 && 1.0 - e >= kDrawLost);
@@ -386,13 +394,24 @@ struct ChallengeRun::Impl {
             break;
         case ChallengeGoal::Line: break;
         }
-        // Kept: the coach answers with the engine's move, and the next move waits.
+        // Kept: the coach answers with the engine's move, and the next move waits. An answer that
+        // draws on the board (no move, or no mate, is left after it) gets no wait: a hold is solved
+        // by it, the win of the other goals is gone (the engine said otherwise).
+        const bool over = !next.hasLegalMove() || next.hasInsufficientMaterial();
+        if (over && p.goal != ChallengeGoal::Hold) {
+            wrong(answerScript("ch.wrong.draw", a.bestMove));
+            return;
+        }
         director->endWait();
         ++move;
         Script s;
         s.push_back(tableBeat(BeatKind::PlayMove, a.bestMove));
-        Position next = judged;
-        next.makeMove(next.parseUCI(a.bestMove));
+        if (over) {
+            // The coach's answer draws (stalemate, no mating material): held once it is played.
+            play(s);
+            solved("ch.solved.draw");
+            return;
+        }
         beginMove(next, s);
         play(s);
     }
@@ -422,8 +441,10 @@ struct ChallengeRun::Impl {
     }
 
     // The hints this move has: the offer stops once the move has been shown (H still shows it again).
+    // A play-out's move not known yet has its three steps while its analysis runs, none without it
+    // (no engine, or no move came back): no hint is offered that would never come.
     int hintSteps() const {
-        if (hintMove.empty()) return cur().playOut() ? 3 : 0;   // a play-out's move is not known yet
+        if (hintMove.empty()) return cur().playOut() && hintJob ? 3 : 0;
         return challengeHintSteps(waitPos, hintMove);
     }
 
@@ -531,7 +552,7 @@ void ChallengeRun::stop() {
     d.running = false;
 }
 
-void ChallengeRun::update(const chess::Game&, float dt) {
+void ChallengeRun::update(const chess::Game& game, float dt) {
     Impl& d = *d_;
     if (!d.running) return;
     d.updateReaction();
@@ -552,10 +573,14 @@ void ChallengeRun::update(const chess::Game&, float dt) {
             d.hintJob = 0;
             if (a.ok && !a.bestMove.empty() && d.waitPos.parseUCI(a.bestMove).valid()) d.hintMove = a.bestMove;
             else if (d.hintRetries++ < 1) d.askHintMove();   // stopped before it began: once more
-            if (d.hintWanted && !d.hintMove.empty() && d.waitingHere()) d.giveHint();
             if (!d.hintJob && d.hintMove.empty()) d.hintWanted = false;   // no move to hint at
         }
     }
+    // A hint asked for before its move was known: given once it is, while the move waits on its own
+    // board with nothing else going on.
+    if (d.hintWanted && !d.hintMove.empty() && d.waitingHere() && d.react == Impl::React::None &&
+        d.judge == Impl::Judge::None && game.position().samePosition(d.waitPos))
+        d.giveHint();
     // The offer was dropped (skipped, cleared): no card any more.
     if (d.offer && !d.director->pending(d.offerScript)) d.offer = false;
 }
@@ -564,17 +589,9 @@ void ChallengeRun::onMove(const chess::Game& game) {
     Impl& d = *d_;
     const size_t n = game.moves().size();
     if (!d.running || d.completed || n == 0) return;
-    if (game.positionAt(n - 1).sideToMove() == White) {
-        d.onPlayerMove(game);
-        return;
-    }
-    // The coach's own move (the lead, an answer): a play-out drawn on the board after it is held.
-    const ChallengePosition& p = d.cur();
-    const Position& now = game.position();
-    if (p.goal == ChallengeGoal::Hold && (now.isStalemate() || now.hasInsufficientMaterial()) && d.waitingHere()) {
-        d.director->endWait();
-        d.solved("ch.solved.draw");
-    }
+    // The coach's own moves (the lead, an answer) need nothing: an answer that ends a play-out on
+    // the board was settled when it was chosen (Impl::judged_), before its move was queued.
+    if (game.positionAt(n - 1).sideToMove() == White) d.onPlayerMove(game);
 }
 
 void ChallengeRun::onPlayerActive() {

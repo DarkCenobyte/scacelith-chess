@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- The macOS app bundle's Info.plist. tools/macos/make-app.sh fills in the version of
-     cmake/version.cmake: in full (1.0.0-beta.2) in the texts, MAJOR.MINOR.PATCH in the version
-     keys, which take numbers only. -->
+     cmake/version.cmake: in full (1.0.0, or 1.0.0-beta.2 for a pre-release) in the texts,
+     MAJOR.MINOR.PATCH in the version keys, which take numbers only. -->
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>

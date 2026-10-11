@@ -299,7 +299,7 @@ def mock_applications_icon(size):
     return icon
 
 
-def preview(background, out_dir, version="1.0.0-beta.2"):
+def preview(background, out_dir, version="1.0.0"):
     """The Finder window as it should look, at 2x: title bar, icons, names (light and dark)."""
     os.makedirs(out_dir, exist_ok=True)
     app_icon = Image.open(os.path.join(ROOT, "res", "icons", "png", "scacelith-256.png")).convert("RGBA")

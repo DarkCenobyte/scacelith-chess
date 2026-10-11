@@ -2,7 +2,7 @@
 // the written and the spoken rendering, synthesis ahead and lines chained without a gap, gesture
 // apexes and marks on their words, marks held after the line and kept until the rewind, Urgent
 // lines cutting at a pause, stale and acted-upon Low lines dropped, Space (skip, the offer's card,
-// the rewind only hurried), pause, the voice-less mode, a voice the stage refuses, the takeback
+// the rewind only hurried, a position or a move on the board never removed), pause, the voice-less mode, a voice the stage refuses, the takeback
 // offer, WaitMove with lines said on top of it, and clear() putting the demonstration back.
 #include "test.h"
 #include "coach_fakes.h"
@@ -438,6 +438,71 @@ TEST(coach_director_skip) {
         CHECK(!rig.dir.skippable());
         rig.dir.skip();
         CHECK_EQ(rig.stage.count("voice.stop"), 0);
+    }
+}
+
+// Audit N04: Space never removes a SetPosition or PlayMove (whatever the script's flag says), in
+// Prepare (the hand still busy) or Running (the table busy): the wait after them stands on the
+// board they leave.
+TEST(coach_director_space_keeps_board_actions) {
+    auto withHand = [](const char* key) {
+        Beat b = say(key);
+        Gesture g;
+        g.kind = GestureKind::Open;
+        b.gestures.push_back(g);
+        return b;
+    };
+    Beat set;
+    set.kind = BeatKind::SetPosition;
+    set.fen = "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1";
+    Beat play;
+    play.kind = BeatKind::PlayMove;
+    play.uci = "e2e4";
+    const Script script{withHand("event.your_move"), set, withHand("event.play_on"), play, waitMove(1)};
+    CHECK(set.skippable && play.skippable);   // the default: the director keeps them anyway
+    // Each in Prepare, then in Running, with both kinds of Space.
+    for (bool rest : {false, true}) {
+        Rig rig;
+        rig.stage.retract = 0.5f;
+        rig.dir.play(script);
+        auto press = [&] { rest ? rig.dir.skip() : rig.dir.skipCurrent(); };
+        CHECK(rig.until([&] { return rig.stage.count("endGestures") > 0; }, 10.0f));
+        rig.step();
+        CHECK(rig.stage.bodyBusy());
+        CHECK_EQ(rig.stage.count("setPosition"), 0);
+        CHECK(!rig.dir.skippable());   // the position waits for the hand: no Space hint
+        press();
+        CHECK(rig.until([&] { return rig.stage.count("setPosition") > 0; }, 5.0f));
+        CHECK(rig.stage.tableBusy());
+        CHECK(!rig.dir.skippable());
+        press();
+        CHECK(rig.until([&] { return rig.stage.count("endGestures") > 1; }, 20.0f));
+        rig.step();
+        CHECK(rig.stage.bodyBusy());
+        CHECK_EQ(rig.stage.count("playLessonMove"), 0);
+        CHECK(!rig.dir.skippable());
+        press();
+        CHECK(rig.until([&] { return rig.stage.count("playLessonMove") > 0; }, 5.0f));
+        CHECK(rig.stage.tableBusy());
+        CHECK(!rig.dir.skippable());
+        press();
+        CHECK(rig.until([&] { return rig.dir.waitingMove(); }, 10.0f));
+        CHECK_EQ(rig.stage.count("setPosition"), 1);
+        const auto played = rig.stage.all("playLessonMove");
+        CHECK(played.size() == 1 && played[0].text == "e2e4");
+    }
+    // Space at every frame: the lines go, the position and the move stay.
+    for (bool rest : {false, true}) {
+        Rig rig;
+        rig.dir.play(script);
+        CHECK(rig.until(
+            [&] {
+                rest ? rig.dir.skip() : rig.dir.skipCurrent();
+                return rig.dir.waitingMove();
+            },
+            20.0f));
+        CHECK_EQ(rig.stage.count("setPosition"), 1);
+        CHECK_EQ(rig.stage.count("playLessonMove"), 1);
     }
 }
 

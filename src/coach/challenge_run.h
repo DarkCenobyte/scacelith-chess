@@ -9,16 +9,19 @@
 //   - the player's move: a line is judged against the solution at once (ChallengePosition::accepts);
 //     a right move gets a nod and the coach's answer from the line, the last one the praise. A
 //     play-out move is judged by Stockfish (the position after it, the coach to move): it must keep
-//     the win (mate, promote) or the draw (hold); the same analysis gives the coach's reply;
+//     the win (mate, promote) or the draw (hold); the same analysis gives the coach's reply. A
+//     reply that draws on the board (stalemate, no mating material) solves a hold once played,
+//     with no wait after it: no position is ever waited in without a move to make;
 //   - a wrong move: Stockfish's best answer is played by hand while the coach says it ("Not this
 //     one: I'd answer Qxd1."), taken back with the player's move, and the same WaitMove waits again.
 //     Every sentence is proved by the board or the engine: "would be checkmate" only when the
 //     answer mates on the board, "That's stalemate" only on the board, "it takes longer" only when
 //     the engine still sees a mate, longer than the position asks;
-//   - hints only on request: the H key (requestHint) at any time the position waits, or the
-//     coach's offer, a question with a card, after every kHintOfferAfter wrong moves at one move.
-//     Step 1 the piece (or the square when that piece is the only one that can move), 2 the square,
-//     3 the move shown by hand (challengeHint);
+//   - hints only on request: the H key (requestHint) at any time the position waits (in a
+//     play-out, given once the engine named the move; a move made meanwhile drops the request), or
+//     the coach's offer, a question with a card, after every kHintOfferAfter wrong moves at one
+//     move when a hint can be given. Step 1 the piece (or the square when that piece is the only
+//     one that can move), 2 the square, 3 the move shown by hand (challengeHint);
 //   - after the last position, the closing words; then the session wants the handshake.
 // Nothing is recorded: no review, no appraisal, no history; the game's moves are the board's only.
 #pragma once

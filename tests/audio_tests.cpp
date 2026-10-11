@@ -671,8 +671,8 @@ TEST(audio_queue_mpmc_stress) {
 }
 
 TEST(audio_mixer_cpu_cost) {
-#ifdef SCACELITH_SANITIZED
-    SKIP("a sanitizer build: its timings mean nothing");
+#if defined(SCACELITH_SANITIZED) || defined(SCACELITH_COVERAGE_BUILD)
+    SKIP("an instrumented build (sanitizers, coverage): its timings mean nothing");
 #endif
     using namespace audio;
     Mixer m(9u);

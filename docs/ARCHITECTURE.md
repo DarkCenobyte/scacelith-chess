@@ -13,7 +13,7 @@ per-user application folder (`plat::appDataDirectory()`: `%APPDATA%\scacelith\` 
 ## Build
 
 ```sh
-# Linux dev/test build (X11 + GLX, used for unit tests and headless screenshots)
+# Linux build (X11 + GLX: the Linux desktop game, the unit tests and headless screenshots)
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release && ninja -C build
 # Windows x64 exe (cross-compiled)
 cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release && ninja -C build-win
@@ -22,13 +22,15 @@ cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake 
 Headless screenshots (Xvfb + Mesa llvmpipe with `MESA_GL_VERSION_OVERRIDE=4.6`):
 `tools/shot.sh <scene> out.png [frames] [WxH]` (Linux build) and `tools/shot_win.sh` (the real
 Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
-`SCACELITH_DUMP_SHADERS=<dir>` (an existing folder) to dump preprocessed GLSL.
+`SCACELITH_DUMP_SHADERS=<dir>` (an existing folder) to dump preprocessed GLSL. `tools/test_x11.sh`
+runs the X11 desktop tests (`tests/x11_desktop_tests.cpp`) on an Xvfb of their own, without then
+with openbox.
 
 ## Modules
 
 | Dir | Role |
 |---|---|
-| `src/platform` | Win32 (+X11 for tests) window, GL 4.6 context, input, timing |
+| `src/platform` | Win32, X11 (+`x11_desktop`: clipboard, input method, fullscreen) and Cocoa windows, GL 4.6 context, input, timing |
 | `src/gl` | Generated GL 4.6 loader (`tools/gen_gl_loader.py`) |
 | `src/math` | vec/mat/quat, reverse-Z projections, rays (conventions in `math.h`) |
 | `src/core` | log, ini, embedded files, PNG writer |
@@ -51,7 +53,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/net` | Online play, engine-free (in the core library, unit-tested): the client of the dedicated server (`online_client.h`: HTTPS API and secure WebSocket, WinHTTP on Windows, OpenSSL in Linux builds), the realtime protocol v1 codec generated from `protocol/scacelith-v1.json` (`protocol_gen.h`), per-server credentials, the Google sign-in's loopback redirect, direct matches (secure channel, the host's authority, UPnP) and file downloads; see [ONLINE_CLIENT.md](ONLINE_CLIENT.md) and [DIRECT_MATCH.md](DIRECT_MATCH.md) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 | `protocol/` | The realtime protocol v1 shared with the online server: copies of its schema, frozen manifests, specification (`PROTOCOL.md`) and golden vectors, written by the server's `protogen` (the server itself is [DarkCenobyte/scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server)) |
-| `.github/` | Continuous integration, releases and CodeQL scanning (GitHub Actions), Dependabot; see the README's "Continuous integration and releases" |
+| `.github/` | Continuous integration, releases, CodeQL scanning and test coverage (GitHub Actions), Dependabot; see DEVELOPMENT.md, "Continuous integration and releases" |
 
 ## Rendering contracts
 

@@ -21,6 +21,7 @@
 
 #include "platform.h"
 #include "macos_gl.h"
+#include "staging_ring.h"
 #include "../core/log.h"
 #include "../net/net_sys.h"
 
@@ -68,7 +69,7 @@ CAMetalLayer* g_layer;
 id<MTLDevice> g_device;
 id<MTLCommandQueue> g_queue;
 id<MTLBuffer> g_staging[kStagingBuffers];
-int g_stagingIndex;
+StagingRing<kStagingBuffers> g_stagingRing;   // which staging buffer no command buffer in flight reads
 dispatch_semaphore_t g_inflight;
 CGColorSpaceRef g_colorSpace;   // the layer's (sRGB), kept for the process's life
 
@@ -334,18 +335,25 @@ void startApplication(const char* title) {
 
 // ---- Present --------------------------------------------------------------------------------------
 // The frame read back from GL into the layer: a staging buffer (shared memory), then a blit into
-// the next drawable, presented.
+// the next drawable, presented. The staging buffer is one that no command buffer in flight reads
+// (staging_ring.h): a present that submits nothing (no drawable) leaves its buffer free.
 void present(const macgl::Frame& f) {
     if (dispatch_semaphore_wait(g_inflight, dispatch_time(DISPATCH_TIME_NOW, kStagingWaitNs)) != 0) {
         macgl::releaseFrame();
         return;
     }
+    const int slot = g_stagingRing.acquire();
+    if (slot < 0) {  // not while this token is held (staging_ring.h)
+        macgl::releaseFrame();
+        dispatch_semaphore_signal(g_inflight);
+        return;
+    }
     const NSUInteger bytes = NSUInteger(f.stride) * NSUInteger(f.height);
-    id<MTLBuffer> buffer = g_staging[g_stagingIndex];
+    id<MTLBuffer> buffer = g_staging[slot];
     if (!buffer || buffer.length < bytes) {
         // Written by the CPU only: write-combined.
         buffer = [g_device newBufferWithLength:bytes options:MTLResourceStorageModeShared | MTLResourceCPUCacheModeWriteCombined];
-        g_staging[g_stagingIndex] = buffer;
+        g_staging[slot] = buffer;
     }
     if (!buffer) {
         macgl::releaseFrame();
@@ -354,13 +362,13 @@ void present(const macgl::Frame& f) {
     }
     std::memcpy([buffer contents], f.pixels, bytes);
     macgl::releaseFrame();
-    g_stagingIndex = (g_stagingIndex + 1) % kStagingBuffers;
 
     const CGSize size = CGSizeMake(f.width, f.height);
     if (!CGSizeEqualToSize(g_layer.drawableSize, size)) g_layer.drawableSize = size;
     id<CAMetalDrawable> drawable = [g_layer nextDrawable];
     id<MTLCommandBuffer> commands = drawable ? [g_queue commandBuffer] : nil;
     if (!commands) {
+        // Nothing submitted: the buffer stays free, and the rotation where it was.
         dispatch_semaphore_signal(g_inflight);
         return;
     }
@@ -380,9 +388,12 @@ void present(const macgl::Frame& f) {
     [blit endEncoding];
     [commands presentDrawable:drawable];
     dispatch_semaphore_t inflight = g_inflight;
+    // The buffer is free again before the token is given back.
     [commands addCompletedHandler:^(id<MTLCommandBuffer>) {
+      g_stagingRing.completed(slot);
       dispatch_semaphore_signal(inflight);
     }];
+    g_stagingRing.submitted(slot);
     [commands commit];
 }
 
@@ -785,6 +796,19 @@ uint64_t randomSeed() { return (uint64_t(arc4random()) << 32) | uint64_t(arc4ran
 std::string clipboardText() {
     @autoreleasepool {
         return utf8([[NSPasteboard generalPasteboard] stringForType:NSPasteboardTypeString]);
+    }
+}
+
+bool setClipboardText(const std::string& text, bool sensitive) {
+    @autoreleasepool {
+        NSString* s = [[NSString alloc] initWithBytes:text.data() length:text.size() encoding:NSUTF8StringEncoding];
+        if (!s) return false;
+        NSPasteboard* pb = [NSPasteboard generalPasteboard];
+        [pb clearContents];
+        // org.nspasteboard.ConcealedType (nspasteboard.org): clipboard managers keep the text out of
+        // their history.
+        if (sensitive) [pb setData:[NSData data] forType:@"org.nspasteboard.ConcealedType"];
+        return [pb setString:s forType:NSPasteboardTypeString];
     }
 }
 

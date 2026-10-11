@@ -1,5 +1,5 @@
 # Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
-# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as the README's
+# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as docs/DEVELOPMENT.md's
 # "Building" section describes; on Linux aarch64; on macOS (Apple Silicon, experimental) with its
 # app and disk image; the contract with the dedicated server pinned in
 # tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
@@ -51,7 +51,8 @@ jobs:
       - name: Install the build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
+          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev \
+            xvfb openbox
 
       # The coach's voice model (399 MB, seven files from Hugging Face) that the first configure
       # downloads for the TTS tests (third_party/supertonic3/supertonic3.cmake checks their SHA-256).
@@ -100,6 +101,14 @@ jobs:
             fi
           done
           exit "$missing"
+
+      # The X11 layer's desktop side against a real X server (tests/x11_desktop_tests.cpp, skipped
+      # above): the clipboard between clients, the input method (dead keys, Compose, Cyrillic,
+      # Arabic, Greek), shortcut keys on other layouts, focus loss, and fullscreen. On an Xvfb of
+      # its own, without a window manager, then with openbox (EWMH fullscreen); --require=x11 and
+      # x11-wm fail a test that skips for want of either.
+      - name: X11 desktop tests
+        run: tools/test_x11.sh build
 
       - name: Compiler cache statistics
         if: always()

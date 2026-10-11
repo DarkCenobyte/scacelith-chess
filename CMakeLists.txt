@@ -29,6 +29,11 @@ option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
 # Runtime checks for the unit tests on Linux (GCC or Clang): -DSCACELITH_SANITIZE=address,undefined
 # builds everything with those sanitizers, every finding fatal; the tests that measure time skip.
 set(SCACELITH_SANITIZE "" CACHE STRING "Sanitizers for a test build (e.g. address,undefined; empty = none)")
+# Test coverage on Linux (GCC): -DSCACELITH_COVERAGE=ON instruments the game's own code (the core
+# modules, the game and the sources the unit tests compile) for gcov, not Stockfish, built apart;
+# gcovr reads the counters after a test run, the code of the game that no test runs counted as not
+# covered (.github/workflows/coverage.yml). The tests that measure time skip.
+option(SCACELITH_COVERAGE "Linux test build: instrument the game's code for gcov (test coverage)" OFF)
 set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -74,6 +79,14 @@ if(SCACELITH_SANITIZE)
     add_compile_options(-fsanitize=${SCACELITH_SANITIZE} -fno-sanitize-recover=all -fno-omit-frame-pointer)
     add_link_options(-fsanitize=${SCACELITH_SANITIZE})
     add_compile_definitions(SCACELITH_SANITIZED)
+endif()
+set(COVERAGE_FLAGS "")
+if(SCACELITH_COVERAGE)
+    if(WIN32 OR APPLE OR NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(FATAL_ERROR "SCACELITH_COVERAGE is for the Linux test build with GCC")
+    endif()
+    # Atomic counters: the tests run threads (the audio, the coach's voice, the engine's callbacks).
+    set(COVERAGE_FLAGS --coverage -fprofile-update=atomic)
 endif()
 include(cmake/embed.cmake)
 
@@ -151,7 +164,10 @@ target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party
 # <KHR/khrplatform.h> of third_party/khronos/GL/glcorearb.h (src/gl/gl46.h): the bundled copy, not
 # the system's (libgl-dev), which a tests-only build may lack.
 target_include_directories(scacelith_core SYSTEM PUBLIC ${ROOT}/third_party/khronos)
-target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
+if(SCACELITH_COVERAGE)
+    target_link_options(scacelith_core INTERFACE --coverage)  # gcov's runtime, for every user
+endif()
 if(TARGET stockfish_embedded)
     target_link_libraries(scacelith_core PUBLIC stockfish_embedded)
     target_compile_definitions(scacelith_core PUBLIC SCACELITH_HAS_STOCKFISH=1)
@@ -278,7 +294,7 @@ if(APPLE)
     list(APPEND GAME_EXTRA ${ROOT}/src/platform/platform_cocoa.mm)
 endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
-target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
 target_link_libraries(scacelith PRIVATE scacelith_core)
 if(WIN32)
     target_link_libraries(scacelith PRIVATE opengl32 gdi32 user32 shell32 dwmapi)
@@ -320,10 +336,20 @@ if(TEST_SOURCES)
     # The pieces' picking outlines, from the chess set's meshes (CPU only).
     target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/piece_silhouette.cpp ${ROOT}/src/scene/pieces.cpp
                    ${ROOT}/src/scene/piece_profile.cpp ${ROOT}/src/scene/sdf_mesher.cpp)
-    target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+    target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
+    if(SCACELITH_COVERAGE)
+        target_compile_definitions(scacelith_tests PRIVATE SCACELITH_COVERAGE_BUILD)
+    endif()
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)
         target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
+    elseif(NOT APPLE)
+        # The X11 layer's desktop side (clipboard, input method, focus, fullscreen), which
+        # tests/x11_desktop_tests.cpp runs against an X server when DISPLAY is set
+        # (tools/test_x11.sh: Xvfb, without and with a window manager).
+        find_package(X11 REQUIRED)
+        target_sources(scacelith_tests PRIVATE ${ROOT}/src/platform/x11_desktop.cpp)
+        target_link_libraries(scacelith_tests PRIVATE X11)
     endif()
 endif()
 
