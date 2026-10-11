@@ -8,7 +8,7 @@ screenshots, and how the continuous integration and the releases work; the
 
 ## Building
 
-Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 13; on Windows,
+Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 11 and 13; on Windows,
 MinGW-w64 GCC with POSIX threads; Clang cannot build the isolated Stockfish variants, and macOS
 builds a single one with Apple clang), and
 Python 3 for the instruction-set audits and the Windows exception table check that run at every

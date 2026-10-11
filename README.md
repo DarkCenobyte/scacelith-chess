@@ -74,7 +74,7 @@ GPU with OpenGL 4.6 (the Mac build brings its own), and Stockfish 19 is built in
 
 ## Building
 
-You need CMake 3.21 or later, Ninja, GCC with GNU binutils (tested with GCC 13; for Windows,
+You need CMake 3.21 or later, Ninja, GCC with GNU binutils (tested with GCC 11 and 13; for Windows,
 MinGW-w64 GCC with POSIX threads) and Python 3; the Linux build also needs the OpenSSL 3, X11 and
 OpenGL development files. Stockfish 19 is in the repository (`third_party/stockfish/`) and is
 built with the game. The first configure downloads the coach's voice model (399 MB, from
