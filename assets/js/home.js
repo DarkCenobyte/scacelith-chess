@@ -2,10 +2,11 @@
 // files of the newest release.
 
 import "./site.js";
-import { onReady, releaseReady } from "./site.js";
+import "../vendor/iframemanager/iframemanager.js";
+import { onReady, releaseReady, fileTitle, fileDetail } from "./site.js";
 import { $, $$, h, icon, clear } from "./lib/dom.js";
 import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
-import { api } from "./lib/api.js";
+import { api, ApiError } from "./lib/api.js";
 import { getSession, onSessionChange } from "./lib/session.js";
 import { detectOS, filesFor, OSES } from "./lib/releases.js";
 import { ratingText } from "./lib/ratings.js";
@@ -86,35 +87,51 @@ export function youtubeId(value) {
   return null;
 }
 
+/** Text made safe for the notice, which iframemanager writes as HTML. */
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+}
+
+/**
+ * The trailer stays a picture until the visitor accepts YouTube's player: iframemanager
+ * (assets/vendor/iframemanager, MIT) shows the notice over it and only then creates the
+ * youtube-nocookie.com frame. The answer is not remembered: iframemanager's "always allow"
+ * button would set a cookie, and this site sets none.
+ */
 function initTrailer() {
   const box = $("[data-video]");
-  if (!box) return;
+  if (!box || typeof window.iframemanager !== "function") return;
   const config = window.SCACELITH || {};
   const id = youtubeId(config.trailer);
-  const play = $("[data-video-play]", box);
-  const soon = $("[data-video-soon]", box);
   const note = $("[data-video-note]");
   if (!id) return;
   for (const link of $$("[data-trailer-link]")) link.hidden = false;
-  soon.hidden = true;
-  play.hidden = false;
   note.hidden = false;
   $("[data-video-external]").href = `https://www.youtube.com/watch?v=${id}`;
+  const params = new URLSearchParams({ autoplay: "1", rel: "0", playsinline: "1", hl: document.documentElement.lang });
   const start = Number.parseInt(config.trailerStart, 10);
-  play.addEventListener("click", () => {
-    const params = new URLSearchParams({ autoplay: "1", rel: "0", modestbranding: "1", playsinline: "1", hl: document.documentElement.lang });
-    if (Number.isFinite(start) && start > 0) params.set("start", String(start));
-    const frame = h("iframe", {
-      src: `https://www.youtube-nocookie.com/embed/${id}?${params}`,
-      title: t("js.trailer.title"),
-      allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
-      allowfullscreen: true,
-      referrerpolicy: "strict-origin-when-cross-origin",
-    });
-    clear(box);
-    box.append(frame);
-    frame.focus();
-  }, { once: true });
+  if (Number.isFinite(start) && start > 0) params.set("start", String(start));
+  const poster = new URL(`${document.documentElement.dataset.root || ""}assets/img/hero.webp`, location.href).href;
+  clear(box).append(h("div", { class: "video-consent", dataset: { service: "youtube", id, title: escapeHtml(t("js.trailer.title")), thumbnail: poster } }));
+  const notice = `${escapeHtml(t("js.trailer.notice"))} <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">${escapeHtml(t("js.trailer.google_privacy"))}</a>`;
+  window.iframemanager().run({
+    currLang: "page",
+    services: {
+      youtube: {
+        embedUrl: "https://www.youtube-nocookie.com/embed/{data-id}",
+        iframe: {
+          title: t("js.trailer.title"),
+          allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+          allowfullscreen: "",
+          referrerpolicy: "strict-origin-when-cross-origin",
+          params: params.toString(),
+          // The button that had the focus is gone: the player takes it once its fade-in ends.
+          onload: (_, frame) => setTimeout(() => frame.focus(), 500),
+        },
+        languages: { page: { notice, loadBtn: t("js.trailer.accept") } },
+      },
+    },
+  });
 }
 
 /* ---------------------------------------------------------------------------- server and leaderboard */
@@ -127,15 +144,25 @@ async function initServer() {
   const select = $("[data-mini-category]", card);
   const board = $("[data-mini-board]", card);
 
+  // A server that answers 429 or 503 is up but busy: say so, and ask again a few times.
   let info;
-  try {
-    info = await api("/info", { timeout: 12000 });
-  } catch {
-    status.classList.add("is-offline");
-    statusText.textContent = t("js.server.offline");
-    clear(board).append(h("li", { class: "placeholder" }, t("js.server.error")));
-    return;
+  for (let attempt = 1; !info; attempt++) {
+    try {
+      info = await api("/info", { timeout: 12000 });
+    } catch (e) {
+      const busy = e instanceof ApiError && (e.status === 429 || e.status === 503);
+      status.classList.toggle("is-busy", busy);
+      status.classList.toggle("is-offline", !busy);
+      statusText.textContent = t(busy ? "js.server.busy" : "js.server.offline");
+      if (!busy || attempt >= 4) {
+        clear(board).append(h("li", { class: "placeholder" }, t("js.server.error")));
+        return;
+      }
+      const wait = Math.min(Math.max(e.retryAfter ?? 5, 1), 30);
+      await new Promise((resolve) => setTimeout(resolve, wait * 1000));
+    }
   }
+  status.classList.remove("is-busy", "is-offline");
   status.classList.add("is-online");
   statusText.textContent = t("js.server.online");
   for (const el of $$("[data-server-name]")) if (info.name) el.textContent = info.name;
@@ -207,7 +234,6 @@ const OS_LABEL = { windows: "Windows", macos: "macOS", linux: "Linux" };
 function renderRelease(release) {
   const eyebrow = $("[data-release-eyebrow]");
   const name = $("[data-release-name]");
-  const pre = $("[data-release-pre]");
   const date = $("[data-release-date]");
   const notes = $("[data-release-notes]");
   const sums = $("[data-sums-link]");
@@ -220,9 +246,8 @@ function renderRelease(release) {
     if (name) name.textContent = t("js.download.unreachable");
     return;
   }
-  if (eyebrow) eyebrow.textContent = t(release.prerelease ? "js.download.eyebrow_beta" : "js.download.eyebrow_release", { version: release.version });
+  if (eyebrow) eyebrow.textContent = t("js.download.eyebrow_release", { version: release.version });
   if (name) name.textContent = release.name;
-  if (pre) pre.hidden = !release.prerelease;
   if (date && release.published) {
     date.textContent = t("js.download.published", { date: fmt.date(release.published) });
   }
@@ -237,20 +262,26 @@ function renderRelease(release) {
     const files = filesFor(release, os);
     const state = $("[data-platform-state]", card);
     const box = clear($("[data-platform-files]", card));
+    const note = $("[data-platform-note]", card);
     card.classList.toggle("is-unavailable", !files.length);
     clear(state);
     if (files.length) {
-      state.append(h("span", { class: "badge badge-ok" }, icon("check"), t("js.download.available")));
+      const experimental = files.every((f) => f.experimental);
+      state.append(experimental
+        ? h("span", { class: "badge badge-accent" }, t("js.download.experimental"))
+        : h("span", { class: "badge badge-ok" }, icon("check"), t("js.download.available")));
       if (os === visitor) state.append(" ", h("span", { class: "badge" }, t("js.download.your_system")));
       files.forEach((f, i) => {
         verifyFile ||= f.name;
         box.append(h("a", { class: `btn ${i === 0 ? "btn-gold" : "btn-ghost"} file-button`, href: f.url, rel: "noopener" },
-          h("span", { class: "file-button-row" }, icon("download"), f.kind === "exe" ? t("js.download.exe") : f.kind === "zip" ? t("js.download.zip") : f.name),
-          h("span", { class: "file-size" }, `.${f.kind} · ${fmt.bytes(f.size)}`)));
+          h("span", { class: "file-button-row" }, icon("download"), fileTitle(f, files)),
+          h("span", { class: "file-size" }, fileDetail(f))));
       });
+      if (note) note.hidden = false;
     } else {
       state.append(h("span", { class: "badge badge-muted" }, t("js.download.unavailable")));
       box.append(h("span", null, t("js.download.no_build", { os: OS_LABEL[os] })));
+      if (note) note.hidden = true;
     }
   }
   if (verify && verifyFile) {

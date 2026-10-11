@@ -5,22 +5,33 @@
   "serverRepo": "DarkCenobyte/scacelith-chess-server",
   "docsUrl": "https://docs.scacelith.com/",
   "fallbackRelease": {
-    "tag": "v1.0.0-beta.1",
-    "name": "Scacelith 1.0.0-beta.1",
-    "prerelease": true,
-    "published": "2026-10-03T23:14:47Z",
+    "tag": "v1.0.0",
+    "name": "Scacelith 1.0.0",
+    "published": "2026-10-11T14:01:33Z",
     "assets": [
       {
-        "name": "Scacelith-1.0.0-beta.1-windows-x64.exe",
-        "size": 131602944
+        "name": "Scacelith-1.0.0-linux-aarch64.tar.gz",
+        "size": 95113523
       },
       {
-        "name": "Scacelith-1.0.0-beta.1-windows-x64.zip",
-        "size": 95159654
+        "name": "Scacelith-1.0.0-linux-x86_64.tar.gz",
+        "size": 96318391
+      },
+      {
+        "name": "Scacelith-1.0.0-macos-arm64-experimental.dmg",
+        "size": 109408086
+      },
+      {
+        "name": "Scacelith-1.0.0-windows-x64.exe",
+        "size": 132992512
+      },
+      {
+        "name": "Scacelith-1.0.0-windows-x64.zip",
+        "size": 95817804
       },
       {
         "name": "SHA256SUMS",
-        "size": 210
+        "size": 512
       }
     ]
   },
@@ -116,6 +127,13 @@
       "path": "gif/",
       "template": "gif.html",
       "index": false
+    },
+    {
+      "key": "legal",
+      "path": "legal/",
+      "template": "legal.html",
+      "index": true
     }
-  ]
+  ],
+  "contact": "contact@scacelith.com"
 }

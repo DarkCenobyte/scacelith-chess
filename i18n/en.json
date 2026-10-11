@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — photorealistic chess, played in first person",
-      "description": "Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you."
+      "description": "Free photorealistic chess in first person for Windows, Linux and macOS: Stockfish 19, a coach, game analysis and online play in a royal hall."
     },
     "players": {
       "title": "Leaderboard and players — Scacelith",
-      "description": "The best players of the official Scacelith server in every time control, their ratings and their latest games."
+      "description": "The best players of the official Scacelith server in every rated time control, their ratings and their latest games."
     },
     "account": {
       "title": "Your account — Scacelith",
@@ -15,6 +15,10 @@
     "gif": {
       "title": "Animated GIF — Scacelith",
       "description": "An animated GIF of a Scacelith game."
+    },
+    "legal": {
+      "title": "Legal notice, privacy and terms of use — Scacelith",
+      "description": "Who publishes and hosts Scacelith, what the website, the game and the official server do with personal data, your rights, and the rules of the official server."
     }
   },
   "brand": {
@@ -37,16 +41,15 @@
   },
   "hero": {
     "image_alt": "Two porcelain robots play chess at a walnut table in a sunlit marble hall.",
-    "eyebrow": "Public beta",
     "lead": "Take your seat at a waxed walnut table in a sunlit royal hall. Across the board, a porcelain robot driven by Stockfish waits for your first move.",
     "watch": "Watch the trailer",
-    "meta": "Free software · Windows 64-bit · Graphics card with OpenGL 4.6",
-    "caption": "Captured in the game: the title screen"
+    "meta": "Free software · Windows, Linux, macOS (experimental) · Graphics card with OpenGL 4.6",
+    "caption": "Captured in the game: the royal hall"
   },
   "highlights": {
     "engine": "In-house OpenGL 4.6 engine",
     "stockfish": "Stockfish 19 built in",
-    "rules": "FIDE ratings",
+    "rules": "FIDE rules",
     "online": "Online play",
     "languages": "Ten languages"
   },
@@ -56,11 +59,11 @@
     "lead": "Scacelith brings back what makes a real game: the hall, the silence, the clock, an opponent who looks at you, and the rituals of the tournament.",
     "presence": {
       "title": "In the first person",
-      "text": "You see through your robot's eyes. Look around the hall, lean towards the board, look up at your opponent, or glance at the scoresheet beside you."
+      "text": "You see through your robot's eyes: look around the hall, lean over the board, look up at your opponent, glance at your scoresheet, or stand and walk to an end of the table."
     },
     "ritual": {
       "title": "Tournament rules",
-      "text": "A piece you touch must be moved. Your hand presses the clock to complete the move. An illegal move brings the arbiter, and a second one loses the game."
+      "text": "A piece you touch must be moved, and your hand presses the clock to complete the move. With the move hints off, the arbiter penalises an illegal move, and a second one loses the game."
     },
     "scoresheet": {
       "title": "Written by hand",
@@ -68,11 +71,11 @@
     },
     "opponent": {
       "title": "A worthy opponent",
-      "text": "Stockfish 19 at your level, from Novice (800) to full strength (3500), with a rating computed by the FIDE rules after every game."
+      "text": "Stockfish 19 at your level, from Novice (800) to Stockfish Max (3500), with a rating computed by the FIDE rules after every game."
     },
     "engine": {
       "title": "Built for this game",
-      "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections."
+      "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections. Quality presets, from Very low to Ultra, fit it to your graphics card."
     },
     "languages": {
       "title": "Ten languages",
@@ -89,11 +92,19 @@
     },
     "coach": {
       "name": "Coach",
-      "text": "A teacher sits across from you, plays at your level and talks you through the game: threats, good moves, mistakes. From the rules of chess to expert level, with a synthesised voice."
+      "text": "A teacher sits across from you, plays at your level and talks you through the game: threats, good moves, mistakes, playing out with its own hand what a mistake costs. From the rules of chess to expert level, with a voice synthesised on your computer."
+    },
+    "challenges": {
+      "name": "Coach Challenges",
+      "text": "Short sets of positions, each training one skill: mates in one to three, forks, pins and other tactics, defence, and the basic endgames against the coach. Hints only when you ask, and a green check for every set you complete."
+    },
+    "analysis": {
+      "name": "Analysis",
+      "text": "Stockfish reviews your saved games, your online games or any PGN: an evaluation bar, the key moves marked from brilliant to blunder, the better move drawn as an arrow, and comments aloud and in subtitles. The robots' hands play the moves as you step through."
     },
     "online": {
       "name": "Play Online",
-      "text": "Real opponents through a Scacelith server: rated games, matchmaking, challenges and private games. Your opponent's robot moves with them, live."
+      "text": "Real opponents through a Scacelith server: rated games, matchmaking, challenges and private games, or a direct match between two computers. Your opponent's robot moves with them, live."
     },
     "watch": {
       "name": "Watch a Game",
@@ -112,13 +123,25 @@
       "alt": "The title screen: the Scacelith menu beside two robots playing chess in the hall.",
       "caption": "The title screen"
     },
+    "coach": {
+      "alt": "The coach, a porcelain robot with “COACH” on its chest, greets you across the board; what it says also appears as a subtitle.",
+      "caption": "Coach"
+    },
+    "challenges": {
+      "alt": "The Coach Challenges menu: sets of checkmates and tactics with their difficulty and the ones already completed, beside the description of the selected set.",
+      "caption": "Coach Challenges"
+    },
+    "analysis": {
+      "alt": "Analysis mode: the evaluation bar, an arrow drawn on the board, the annotated moves with each side's accuracy, and the list of controls.",
+      "caption": "Analysis"
+    },
+    "game": {
+      "alt": "Seen from the side, one robot reaches across the table to move a piece while the other waits; the captured pieces stand beside the board.",
+      "caption": "Watch a Game"
+    },
     "hall": {
       "alt": "Two robots face each other across the chessboard, in red velvet chairs, under tall windows.",
       "caption": "The royal hall"
-    },
-    "board": {
-      "alt": "The board seen from above, with the chess clock and a robot's hand reaching for a piece.",
-      "caption": "At the board"
     },
     "opponent": {
       "alt": "Close-up of the porcelain robot opponent, its head lowered towards the board.",
@@ -128,7 +151,7 @@
       "alt": "A robot's hand writes the moves on the scoresheet with a fountain pen.",
       "caption": "The scoresheet"
     },
-    "note": "Development build. The interface in these pictures is in French.",
+    "note": "Version 1.0.0. The interface in these pictures is in English.",
     "viewer": "Picture viewer",
     "close": "Close",
     "previous": "Previous picture",
@@ -137,21 +160,20 @@
   "trailer": {
     "eyebrow": "Trailer",
     "title": "Scacelith <em>in motion</em>",
-    "play": "Play the trailer",
     "soon_title": "The trailer is coming soon",
-    "soon_text": "In the meantime, take a seat: the beta is ready to download.",
-    "privacy": "The video is played by YouTube (youtube-nocookie.com) once you press play.",
+    "soon_text": "In the meantime, take a seat: the game is ready to download.",
+    "privacy": "Nothing is loaded from YouTube until you accept its player.",
     "open_youtube": "Watch on YouTube"
   },
   "online": {
     "eyebrow": "Online",
     "title": "Real opponents,<br><em>the same hall.</em>",
     "lead": "Sign in to the official server from the game and play people from everywhere, still in the first person.",
-    "point_rated": "Rated games in every official time control, with a FIDE rating for each.",
-    "point_match": "Matchmaking, challenges by name, private games with a code, and direct matches between two computers.",
+    "point_rated": "Rated games in every official time control, each with its own rating, computed by FIDE's rules.",
+    "point_match": "Matchmaking, challenges by name and private games with a code; or a direct match between two computers, with no server or account.",
     "point_fair": "Fair play: automatic checks, engine analysis of finished games and player reports.",
     "point_history": "Your game history on this site: download each game as PGN or as an animated GIF.",
-    "point_open": "Anyone can run a community server: the server and its API are free software.",
+    "point_open": "Anyone can run a community server: the server is free software, and its API is documented.",
     "create": "Create an account",
     "signin": "Sign in",
     "server_title": "The official server",
@@ -170,19 +192,22 @@
     "see_release": "See the release on GitHub",
     "latest": "Scacelith",
     "all_releases": "All releases",
+    "experimental": "Experimental",
+    "source": "Source code",
+    "source_zip": "ZIP archive",
     "eyebrow": "Download",
     "title": "Take your seat.<br><em>Free, and open source.</em>",
-    "lead": "No installer: download, unzip, and run Scacelith.exe. Every file is built from its tagged source by GitHub Actions, with an attested build provenance.",
-    "prerelease": "Beta",
+    "lead": "Unpack and play: no installer on Windows or Linux, and a drag to Applications on a Mac. Every file is built from its tagged source by GitHub Actions, with an attested build provenance.",
     "notes": "Release notes",
+    "macos_note": "For Apple Silicon Macs (M1 or later) with macOS 26 or later, not in a virtual machine; newer and less tested than the other builds. The app is not signed by a registered Apple developer: the first time, open it from System Settings › Privacy & Security › Open Anyway.",
     "req_system": "System",
-    "req_system_value": "Windows, 64-bit (x64)",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 or aarch64) with glibc 2.34, OpenSSL 3 and X11 or XWayland, such as Ubuntu 22.04 or Debian 12; macOS 26 or later on Apple Silicon (experimental)",
     "req_gpu": "Graphics",
-    "req_gpu_value": "A graphics card with OpenGL 4.6 and an up-to-date driver",
+    "req_gpu_value": "A graphics card with OpenGL 4.6 and an up-to-date driver (on a Mac, the game brings its own OpenGL)",
     "req_included": "Included",
     "req_included_value": "Stockfish 19 and its neural network: play offline right away",
     "req_network": "Internet",
-    "req_network_value": "For online play, GIFs, and the coach's voice (an optional download of about 145 MB)",
+    "req_network_value": "For online play, GIFs, and the voice of the coach and of the analysis (an optional download of about 399 MB)",
     "req_licence": "Licence",
     "req_licence_value": "GNU General Public License v3",
     "verify_title": "Check your download",
@@ -194,12 +219,12 @@
     "title": "Credits and <em>thanks</em>",
     "engine_head": "Chess engine",
     "engine": "Stockfish 19, by the Stockfish developers (GNU GPL v3). Its neural network was trained on data provided by the Leela Chess Zero project (Open Database License).",
-    "voice_head": "Coach voice",
-    "voice": "Synthetic speech generated by Supertonic 3 for Coach Mode. Supertonic 3 is a model by Supertone, used under the OpenRAIL-M licence.",
+    "voice_head": "Voice",
+    "voice": "Supertonic 3 by Supertone, under the BigScience Open RAIL-M licence: downloaded at your request, it speaks for the coach and the analysis, on your computer.",
     "fonts_head": "Typefaces",
-    "fonts": "EB Garamond by Georg Duffner, Cinzel by Natanael Gama and Amiri by Khaled Hosny (SIL Open Font License); chess figures from GNU FreeFont.",
-    "openings_head": "Openings",
-    "openings": "Opening names from the chess-openings database of lichess.org, dedicated to the public domain (CC0).",
+    "fonts": "EB Garamond by Georg Duffner, Cinzel by Natanael Gama and Amiri by Khaled Hosny; handwriting in Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One and LXGW WenKai (all SIL Open Font License); chess figures from GNU FreeFont.",
+    "openings_head": "Openings and puzzles",
+    "openings": "Opening names from the chess-openings database of lichess.org, and the puzzles of the coach's challenges from the Lichess puzzle database, both dedicated to the public domain (CC0).",
     "quote": "“Chess is the art of analysis.”",
     "quote_author": "Mikhail Botvinnik"
   },
@@ -213,9 +238,10 @@
     "server_source": "The server on GitHub",
     "releases": "Releases",
     "licence": "Licence (GPL v3)",
-    "credits": "Stockfish is a trademark of its developers. YouTube is a trademark of Google LLC. Windows is a trademark of Microsoft Corporation.",
+    "credits": "Stockfish is a trademark of its developers. YouTube is a trademark of Google LLC. Windows is a trademark of Microsoft Corporation. macOS is a trademark of Apple Inc. Linux is the registered trademark of Linus Torvalds. OpenGL is a registered trademark of Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "This site uses no cookies and no trackers."
+    "made": "This site sets no cookies and uses no trackers; YouTube's player loads only if you accept it.",
+    "legal_link": "Legal notice, privacy and terms"
   },
   "common": {
     "copy": "Copy",
@@ -294,7 +320,9 @@
       "done_title": "Check your e-mail",
       "done_text": "We sent a confirmation link to your address. Open it to create your account, then sign in.",
       "done_hint": "The link is valid for 24 hours. Nothing in your inbox? Check your spam folder, or ask for the e-mail again.",
-      "go_signin": "Go to sign-in"
+      "go_signin": "Go to sign-in",
+      "legal_note": "Your user name, ratings and games will be public. By creating an account, you accept the terms of use.",
+      "legal_link": "Privacy and terms of use"
     },
     "forgot": {
       "title": "Forgot password",
@@ -473,22 +501,28 @@
     "download": {
       "exe": "Executable",
       "zip": "ZIP archive",
+      "dmg": "Disk image",
+      "archive": "Archive",
       "file": "File",
       "unavailable": "Not available",
       "your_system": "Your system",
-      "eyebrow_beta": "Public beta · {version}",
       "eyebrow_release": "Version {version}",
       "published": "Published on {date}",
       "unreachable": "GitHub cannot be reached right now: see the releases page.",
       "available": "Available",
       "verify_file": "the file",
       "no_build": "No build of the game for {os} at the moment.",
-      "prerelease_short": "beta",
-      "x64": "64-bit (x64)"
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD or Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 or later",
+      "experimental": "Experimental"
     },
     "server": {
       "online": "Online",
       "offline": "Unreachable",
+      "busy": "Busy",
       "open": "Open",
       "closed": "Closed",
       "updated": "Updated {time}",
@@ -550,6 +584,7 @@
         "11": "50-move rule (claimed)",
         "12": "Draw by agreement",
         "13": "Second illegal move, but the opponent cannot checkmate",
+        "14": "Resignation, but the opponent cannot checkmate",
         "20": "Abandoned (disconnected for too long)",
         "21": "Abandoned, but the opponent cannot checkmate",
         "22": "Game aborted",
@@ -670,7 +705,105 @@
       "signin": "Sign in"
     },
     "trailer": {
-      "title": "Scacelith trailer"
+      "title": "Scacelith trailer",
+      "notice": "This video is hosted by YouTube. Playing it here loads Google's player, which receives your IP address and may store cookies or other trackers on your device.",
+      "accept": "Accept and play",
+      "google_privacy": "Google's privacy policy"
     }
+  },
+  "legal": {
+    "eyebrow": "Legal",
+    "title": "Legal notice, privacy and terms of use",
+    "lead": "Who publishes and hosts Scacelith, what happens to your data on this website, in the game and on the official server, and the rules for playing there.",
+    "updated": "Last updated: 11 October 2026",
+    "toc": "On this page",
+    "notice": {
+      "title": "Legal notice",
+      "publisher_label": "Publisher",
+      "publisher": "Scacelith is published by a private individual, on a non-professional basis. As French law allows (article 1-1 II of law no. 2004-575 of 21 June 2004), the publisher's identity is not shown here; it is known to the hosting provider.",
+      "contact_label": "Contact",
+      "contact": "For any question about this website, the official server or your data.",
+      "host_server": "Official game server and account data",
+      "host_server_note": "Servers in France.",
+      "host_site": "This website and the API documentation (GitHub Pages)",
+      "host_domain": "Domain name registrar",
+      "licence_label": "Licence",
+      "licence": "The game and its server are free software under the GNU General Public License v3, with public source code:",
+      "game_source": "the game",
+      "server_source": "the server",
+      "phone": "Phone"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "intro": "Scacelith shows no advertising, sells no data and measures no audience. Personal data is used only to run this website and the official server, as described below. The controller is the publisher, reachable at the contact address above.",
+      "site_title": "On this website",
+      "site_hosting": "GitHub hosts the site and, like any web host, records visitors' IP addresses for security purposes.",
+      "github_privacy": "GitHub's privacy statement",
+      "site_requests": "To show the newest release, your browser asks GitHub's API (api.github.com); to show the server's status, the leaderboard, players and your account, it asks the official server (caissa.scacelith.com). Both receive your IP address, as with any request.",
+      "site_storage": "The site sets no cookies and has no analytics. It keeps in your browser only your choice of language and, once you sign in, your session: for the current tab only, or on this device if you tick “Keep me signed in”. A Google sign-in also keeps its one-time codes in the current tab until they are used. All of this is needed for the site to work, and only the official server receives the session and the codes.",
+      "site_trailer": "The trailer is a YouTube video. Nothing is loaded from YouTube until you press “Accept and play”; YouTube (Google) then receives your IP address and may store cookies or other trackers on your device. Your answer is not remembered: the question comes back at your next visit.",
+      "site_google": "“Sign in with Google” on the Account page loads nothing from Google until you press it. Your browser then goes to Google's sign-in page (accounts.google.com), and Google sends it back to this site with a one-time code that the site hands to the official server. Google receives your IP address and what you enter on its page, under its own policy.",
+      "google_privacy": "Google's privacy policy",
+      "game_title": "In the game",
+      "game_local": "The game keeps its settings, your local results and your sign-in on your computer. The sign-in is kept in the system's secure store: DPAPI on Windows, the Keychain on macOS, the Secret Service keyring on Linux, or else a file that only your user account can read.",
+      "game_network": "It sends nothing on its own: no telemetry, no update check. It connects to the official server only when you open the online page, to Hugging Face only when you download the coach's voice, and, for a direct match, to your opponent's computer, which then knows your IP address (the game may also open a port on your router with UPnP).",
+      "account_title": "Your account on the official server",
+      "account_intro": "Creating an account, in the game or on this website, and playing online send the following data to the official server, hosted by OVH in France:",
+      "data_account": "<strong>Account:</strong> user name, e-mail address, password (stored only as an Argon2id hash), two-step verification secret (encrypted) and recovery codes (hashed), sign-up date and date of last sign-in.",
+      "data_google": "<strong>Sign in with Google:</strong> Google sends your Google account identifier, your e-mail address and your name. The server keeps the identifier and the address, and uses the name only to suggest a user name.",
+      "data_sessions": "<strong>Signed-in devices:</strong> for each sign-in, the name of the device (the game's version and system, such as “Scacelith/1.0.0 win64”, or the browser and system for this website), the IP address and the dates of use.",
+      "data_games": "<strong>Games and ratings:</strong> every online game (players, moves, time spent on each move, result, dates) and your ratings. During a game, the movements of your head and hand are relayed live to your opponent and never stored.",
+      "data_security": "<strong>Security log:</strong> sign-ins, failed attempts and changes to the account, with the IP address.",
+      "data_fairplay": "<strong>Fair play:</strong> reports filed by you or about you, with their comment; abandoned and missed games; sanctions; and the checks run on games, from forged or impossible moves to statistics from the Stockfish engine.",
+      "basis_title": "Why, and on what legal basis",
+      "basis_contract": "Running your account and online play (sign-in, matches, ratings, game records, the e-mails the service sends): the service you sign up for (article 6(1)(b) GDPR).",
+      "basis_security": "Protecting accounts and the server, and keeping games fair (security log, IP addresses, fair-play checks, sanctions): the legitimate interest of the publisher and of the players (article 6(1)(f) GDPR).",
+      "basis_trailer": "Playing the trailer from YouTube: your consent, given with the button (article 6(1)(a) GDPR).",
+      "public_title": "What everyone can see",
+      "public": "Your user name, sign-up date, ratings and full list of games, with every move, are public: on this website, through the server's API and in each game's PGN. Your e-mail address, devices, sign-ins, sanctions and fair-play records are never shown. You can refuse direct challenges, but games cannot be hidden.",
+      "auto_title": "Automatic decisions",
+      "auto": "Some breaches of the game's protocol, such as a forged message or a move that is impossible in the position, are certain proof of cheating: the server then forfeits the game, bans the account for 24 hours, removes it from the leaderboard and gives back the points its opponents lost to it in the last 60 days. Three games abandoned, aborted or missed in 24 hours pause rated matchmaking for 15 minutes, then longer. Engine statistics never lead to a sanction on their own: a person decides. You can ask for any decision to be reviewed at the contact address.",
+      "recipients_title": "Who receives your data",
+      "recipient_ovh": "OVH SAS hosts the server and its data, in France.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) sends the server's e-mails: it receives your address, your user name and the message.",
+      "recipient_google": "Google receives what your browser sends it when you choose to sign in with Google, under its own privacy policy.",
+      "recipient_staff": "The server's administrator and moderators see account and fair-play data to run the service.",
+      "recipient_players": "Other players see what is public, and your opponent sees your moves and movements during a game.",
+      "recipient_none": "No one else: no data is sold, rented or used for advertising.",
+      "transfers": "Account data stays in France. GitHub, Google and Porkbun (which forwards messages sent to the contact address) are based in the United States: what they receive falls under their own policies and their safeguards for transfers out of the European Union.",
+      "retention_title": "How long it is kept",
+      "ret_account": "<strong>Account:</strong> until you delete it. A sign-up whose address is never confirmed is deleted after 24 hours.",
+      "ret_sessions": "<strong>Signed-in devices:</strong> until you sign out, after 30 days without use, and after 90 days at most.",
+      "ret_ip": "<strong>IP addresses:</strong> erased after 30 days. The server's logs keep only shortened addresses.",
+      "ret_security": "<strong>Security log:</strong> 90 days.",
+      "ret_conduct": "<strong>Abandoned and missed games:</strong> 30 days.",
+      "ret_games": "<strong>Games and ratings:</strong> as long as the server keeps its game records, which are also your opponents' records. Once your account is deleted, your name in them is replaced by “deleted#” and a number.",
+      "ret_fairplay": "<strong>Sanctions, reports and fair-play results:</strong> kept, so that banned players cannot simply come back and other players stay protected. Once your account is deleted, they remain linked only to its number.",
+      "ret_backups": "<strong>Backups:</strong> deleted data can remain for a short time in the server's backup copy, until it is replaced.",
+      "ret_contact": "<strong>Messages to the contact address:</strong> as long as needed to answer them.",
+      "rights_title": "Your rights",
+      "rights": "You can access, correct, erase and export your data, restrict its use and object to it (articles 15 to 21 GDPR).",
+      "rights_self": "Most of this is in your account, in the game or on this website's Account page: download your account data as a JSON file, change your e-mail address or password, sign out other devices, or delete the account at once.",
+      "rights_google": "An account created with Google has no password: to export or delete it, first give it one with “Forgot password?”.",
+      "rights_mail": "For anything else, including data the export does not contain (fair-play checks, reports about you), write to the contact address. You will get an answer within one month.",
+      "rights_cnil": "If you think your rights are not respected, you can lodge a complaint with the CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) or with the data protection authority of your country.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Terms of use",
+      "intro": "These terms apply to the official server (caissa.scacelith.com) and to the account pages of this website. Creating an account or playing on the official server means accepting them.",
+      "service": "<strong>A free service.</strong> The game is free software, free of charge. The official server is offered free of charge and as is, with no guarantee of availability: it can change, stop for a while or close.",
+      "account": "<strong>Your account.</strong> You are responsible for what is done with it and for keeping its password secret. Write to the contact address at once if you think someone else uses it.",
+      "username": "<strong>Your user name</strong> is public: it must not be offensive or hateful, impersonate someone or reveal anyone's personal data.",
+      "fair": "<strong>Fair play.</strong> During a rated game, no help from a chess engine, another person or any other tool. No modified game client, forged messages or deliberate overloading of the server.",
+      "conduct": "<strong>Finish your games.</strong> Abandoning or aborting games, or missing games you were matched for, three times in 24 hours pauses rated matchmaking for a while.",
+      "reports": "<strong>Reports</strong> must be made in good faith. To report a player or illegal content, such as an offensive user name, use the report button of a game or write to the contact address.",
+      "sanctions": "<strong>Sanctions.</strong> Breaking these rules can lead to a forfeit, a warning, a ban and removal from the leaderboard; points lost to a cheater are given back to their opponents. Only certain proof of cheating is sanctioned automatically; anything else is decided by a person. You can contest a sanction at the contact address.",
+      "liability": "<strong>Liability.</strong> Within the limits allowed by law, the publisher is not liable for interruptions of the service or for the loss of games, ratings or data.",
+      "end": "<strong>Ending.</strong> You can delete your account at any time. An account that breaks these terms can be banned.",
+      "changes": "<strong>Changes.</strong> These terms can change; the date at the top of this page shows the current version, and playing on after a change means accepting it.",
+      "law": "<strong>Law.</strong> These terms are governed by French law. In case of a dispute, write first to the contact address to find a solution together."
+    },
+    "version_note": "This page exists in several languages; if they differ, the French version prevails."
   }
 }

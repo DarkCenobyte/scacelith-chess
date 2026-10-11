@@ -4,7 +4,7 @@ window.SCACELITH = {
   // The trailer shown in the "Trailer" section of the home page, in every language: a YouTube
   // video id ("dQw4w9WgXcQ") or a YouTube link (https://www.youtube.com/watch?v=..., https://youtu.be/...).
   // Leave it empty to show "The trailer is coming soon".
-  trailer: "",
+  trailer: "https://www.youtube.com/watch?v=Q4PPTB_8AtM",
 
   // Optional: the second at which the trailer starts.
   trailerStart: 0,

@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — les échecs photoréalistes, à la première personne",
-      "description": "Échecs photoréalistes et gratuits pour Windows, à la première personne dans une salle royale : Stockfish 19, un coach et des adversaires en ligne."
+      "description": "Échecs photoréalistes gratuits à la première personne pour Windows, Linux et macOS : Stockfish 19, un coach, l’analyse et le jeu en ligne dans une salle royale."
     },
     "players": {
       "title": "Classement et joueurs — Scacelith",
-      "description": "Les meilleurs joueurs du serveur officiel de Scacelith dans chaque cadence, leurs classements et leurs dernières parties."
+      "description": "Les meilleurs joueurs du serveur officiel de Scacelith dans chaque cadence classée, leurs classements et leurs dernières parties."
     },
     "account": {
       "title": "Votre compte — Scacelith",
@@ -15,6 +15,10 @@
     "gif": {
       "title": "GIF animé — Scacelith",
       "description": "Un GIF animé d’une partie de Scacelith."
+    },
+    "legal": {
+      "title": "Mentions légales, confidentialité et conditions d’utilisation — Scacelith",
+      "description": "Qui édite et héberge Scacelith, ce que le site, le jeu et le serveur officiel font des données personnelles, vos droits et les règles du serveur officiel."
     }
   },
   "brand": {
@@ -37,16 +41,15 @@
   },
   "hero": {
     "image_alt": "Deux robots de porcelaine jouent aux échecs à une table de noyer, dans une salle de marbre baignée de soleil.",
-    "eyebrow": "Bêta publique",
     "lead": "Prenez place à une table de noyer ciré, dans une salle royale baignée de soleil. De l’autre côté de l’échiquier, un robot de porcelaine animé par Stockfish attend votre premier coup.",
     "watch": "Voir la bande-annonce",
-    "meta": "Logiciel libre · Windows 64 bits · Carte graphique OpenGL 4.6",
-    "caption": "Capturé dans le jeu : l’écran titre"
+    "meta": "Logiciel libre · Windows, Linux, macOS (expérimental) · Carte graphique OpenGL 4.6",
+    "caption": "Capturé dans le jeu : la salle royale"
   },
   "highlights": {
     "engine": "Moteur OpenGL 4.6 maison",
     "stockfish": "Stockfish 19 intégré",
-    "rules": "Classement FIDE",
+    "rules": "Règles de la FIDE",
     "online": "Jeu en ligne",
     "languages": "Dix langues"
   },
@@ -56,11 +59,11 @@
     "lead": "Scacelith fait revivre ce qui fait une vraie partie : la salle, le silence, la pendule, un adversaire qui vous regarde, et les rituels du tournoi.",
     "presence": {
       "title": "À la première personne",
-      "text": "Vous voyez par les yeux de votre robot. Regardez autour de vous, penchez-vous vers l’échiquier, levez les yeux vers votre adversaire ou jetez un œil à la feuille de partie posée à côté de vous."
+      "text": "Vous voyez par les yeux de votre robot : regardez autour de vous, penchez-vous sur l’échiquier, levez les yeux vers votre adversaire, jetez un œil à votre feuille de partie, ou mettez-vous debout et allez jusqu’au bout de la table."
     },
     "ritual": {
       "title": "Les règles du tournoi",
-      "text": "Pièce touchée, pièce jouée. Votre main appuie sur la pendule pour terminer le coup. Un coup illégal fait venir l’arbitre, et un second fait perdre la partie."
+      "text": "Pièce touchée, pièce jouée ; votre main appuie sur la pendule pour terminer le coup. Sans l’affichage des coups légaux, l’arbitre sanctionne un coup illégal, et un second fait perdre la partie."
     },
     "scoresheet": {
       "title": "Écrite à la main",
@@ -68,11 +71,11 @@
     },
     "opponent": {
       "title": "Un adversaire à votre mesure",
-      "text": "Stockfish 19 à votre niveau, du Novice (800) à sa pleine force (3 500), avec un classement calculé selon les règles de la FIDE après chaque partie."
+      "text": "Stockfish 19 à votre niveau, du Novice (800) à Stockfish Max (3 500), avec un classement calculé selon les règles de la FIDE après chaque partie."
     },
     "engine": {
       "title": "Conçu pour ce jeu",
-      "text": "Un moteur écrit de zéro : éclairage physique, marbre, bois ciré, porcelaine et laiton, le soleil à travers les fenêtres, ombres douces et reflets."
+      "text": "Un moteur écrit de zéro : éclairage physique, marbre, bois ciré, porcelaine et laiton, le soleil à travers les fenêtres, ombres douces et reflets. Des préréglages de qualité, de Très basse à Ultra, l’adaptent à votre carte graphique."
     },
     "languages": {
       "title": "Dix langues",
@@ -89,11 +92,19 @@
     },
     "coach": {
       "name": "Coach",
-      "text": "Un professeur s’assoit face à vous, joue à votre niveau et commente la partie : menaces, bons coups, erreurs. Des règles des échecs jusqu’au niveau expert, avec une voix de synthèse."
+      "text": "Un professeur s’assoit face à vous, joue à votre niveau et commente la partie : menaces, bons coups, erreurs, dont il montre de sa propre main ce qu’elles coûtent. Des règles des échecs jusqu’au niveau expert, avec une voix de synthèse produite sur votre ordinateur."
+    },
+    "challenges": {
+      "name": "Défis du coach",
+      "text": "De courtes séries de positions, chacune consacrée à une compétence : mats en un à trois coups, fourchettes, clouages et autres tactiques, défense, et les finales élémentaires face au coach. Des indices seulement quand vous les demandez, et une coche verte pour chaque série terminée."
+    },
+    "analysis": {
+      "name": "Analyse",
+      "text": "Stockfish passe en revue vos parties sauvegardées, vos parties en ligne ou n’importe quel PGN : une barre d’évaluation, les coups clés annotés, du coup brillant à la gaffe, le meilleur coup tracé d’une flèche, et des commentaires à voix haute et en sous-titres. Les mains des robots jouent les coups à mesure que vous avancez dans la partie."
     },
     "online": {
       "name": "Jouer en ligne",
-      "text": "De vrais adversaires via un serveur Scacelith : parties classées, recherche d’adversaire, défis et parties privées. Le robot de votre adversaire bouge avec lui, en direct."
+      "text": "De vrais adversaires via un serveur Scacelith : parties classées, recherche d’adversaire, défis et parties privées, ou une partie directe entre deux ordinateurs. Le robot de votre adversaire bouge avec lui, en direct."
     },
     "watch": {
       "name": "Regarder une partie",
@@ -112,13 +123,25 @@
       "alt": "L’écran titre : le menu de Scacelith à côté de deux robots qui jouent aux échecs dans la salle.",
       "caption": "L’écran titre"
     },
+    "coach": {
+      "alt": "Le coach, un robot de porcelaine portant « COACH » sur le torse, vous accueille de l’autre côté de l’échiquier ; ses paroles s’affichent aussi en sous-titre.",
+      "caption": "Coach"
+    },
+    "challenges": {
+      "alt": "Le menu des défis du coach : des séries de mats et de tactiques avec leur difficulté et celles déjà réussies, à côté de la description de la série choisie.",
+      "caption": "Défis du coach"
+    },
+    "analysis": {
+      "alt": "Le mode Analyse : la barre d’évaluation, une flèche tracée sur l’échiquier, les coups annotés avec la précision de chaque camp, et la liste des commandes.",
+      "caption": "Analyse"
+    },
+    "game": {
+      "alt": "Vue de côté, un robot tend le bras au-dessus de la table pour jouer une pièce pendant que l’autre attend ; les pièces prises sont posées à côté de l’échiquier.",
+      "caption": "Regarder une partie"
+    },
     "hall": {
       "alt": "Deux robots face à face de part et d’autre de l’échiquier, dans des fauteuils de velours rouge, sous de hautes fenêtres.",
       "caption": "La salle royale"
-    },
-    "board": {
-      "alt": "L’échiquier vu de dessus, avec la pendule et la main d’un robot qui s’avance vers une pièce.",
-      "caption": "À l’échiquier"
     },
     "opponent": {
       "alt": "Gros plan sur l’adversaire, un robot de porcelaine, la tête penchée vers l’échiquier.",
@@ -128,7 +151,7 @@
       "alt": "La main d’un robot note les coups sur la feuille de partie avec un stylo-plume.",
       "caption": "La feuille de partie"
     },
-    "note": "Version de développement. L’interface visible sur ces images est en français.",
+    "note": "Version 1.0.0. L’interface visible sur ces images est en anglais.",
     "viewer": "Visionneuse d’images",
     "close": "Fermer",
     "previous": "Image précédente",
@@ -137,21 +160,20 @@
   "trailer": {
     "eyebrow": "Bande-annonce",
     "title": "Scacelith <em>en mouvement</em>",
-    "play": "Lancer la bande-annonce",
     "soon_title": "La bande-annonce arrive bientôt",
-    "soon_text": "En attendant, prenez place : la bêta est prête à être téléchargée.",
-    "privacy": "La vidéo est lue par YouTube (youtube-nocookie.com) une fois que vous appuyez sur lecture.",
+    "soon_text": "En attendant, prenez place : le jeu est prêt à être téléchargé.",
+    "privacy": "Rien n’est chargé depuis YouTube tant que vous n’avez pas accepté son lecteur.",
     "open_youtube": "Voir sur YouTube"
   },
   "online": {
     "eyebrow": "En ligne",
     "title": "De vrais adversaires,<br><em>la même salle.</em>",
     "lead": "Connectez-vous au serveur officiel depuis le jeu et affrontez des joueurs du monde entier, toujours à la première personne.",
-    "point_rated": "Des parties classées dans chaque cadence officielle, avec un classement FIDE pour chacune.",
-    "point_match": "Recherche d’adversaire, défis par nom, parties privées avec un code et parties directes entre deux ordinateurs.",
+    "point_rated": "Des parties classées dans chaque cadence officielle, chacune avec son propre classement, calculé selon les règles de la FIDE.",
+    "point_match": "Recherche d’adversaire, défis par nom et parties privées avec un code ; ou une partie directe entre deux ordinateurs, sans serveur ni compte.",
     "point_fair": "Fair-play : contrôles automatiques, analyse des parties terminées par un moteur et signalements des joueurs.",
     "point_history": "Votre historique de parties sur ce site : téléchargez chaque partie en PGN ou en GIF animé.",
-    "point_open": "Chacun peut héberger un serveur communautaire : le serveur et son API sont des logiciels libres.",
+    "point_open": "Chacun peut héberger un serveur communautaire : le serveur est un logiciel libre, et son API est documentée.",
     "create": "Créer un compte",
     "signin": "Se connecter",
     "server_title": "Le serveur officiel",
@@ -170,19 +192,22 @@
     "see_release": "Voir la version sur GitHub",
     "latest": "Scacelith",
     "all_releases": "Toutes les versions",
+    "experimental": "Expérimental",
+    "source": "Code source",
+    "source_zip": "Archive ZIP",
     "eyebrow": "Téléchargement",
     "title": "Prenez place.<br><em>Gratuit et libre.</em>",
-    "lead": "Pas d’installation : téléchargez, décompressez et lancez Scacelith.exe. Chaque fichier est construit à partir de ses sources étiquetées par GitHub Actions, avec une provenance attestée.",
-    "prerelease": "Bêta",
+    "lead": "Décompressez et jouez : pas d’installation sous Windows ni sous Linux, et un simple glisser-déposer dans Applications sur Mac. Chaque fichier est construit à partir de ses sources étiquetées par GitHub Actions, avec une provenance attestée.",
     "notes": "Notes de version",
+    "macos_note": "Pour les Mac Apple Silicon (M1 ou plus récent) sous macOS 26 ou ultérieur, hors machine virtuelle ; cette version est plus récente et moins éprouvée que les autres. L’application n’est pas signée par un développeur Apple enregistré : la première fois, ouvrez-la depuis Réglages Système › Confidentialité et sécurité › Ouvrir quand même.",
     "req_system": "Système",
-    "req_system_value": "Windows, 64 bits (x64)",
+    "req_system_value": "Windows 64 bits (x64) ; Linux 64 bits (x86-64 ou aarch64) avec glibc 2.34, OpenSSL 3 et X11 ou XWayland, comme Ubuntu 22.04 ou Debian 12 ; macOS 26 ou ultérieur sur Apple Silicon (expérimental)",
     "req_gpu": "Graphismes",
-    "req_gpu_value": "Une carte graphique OpenGL 4.6 avec un pilote à jour",
+    "req_gpu_value": "Une carte graphique OpenGL 4.6 avec un pilote à jour (sur Mac, le jeu embarque son propre OpenGL)",
     "req_included": "Inclus",
     "req_included_value": "Stockfish 19 et son réseau neuronal : jouez hors ligne tout de suite",
     "req_network": "Internet",
-    "req_network_value": "Pour le jeu en ligne, les GIF et la voix du coach (un téléchargement facultatif d’environ 145 Mo)",
+    "req_network_value": "Pour le jeu en ligne, les GIF et la voix du coach et de l’analyse (un téléchargement facultatif d’environ 399 Mo)",
     "req_licence": "Licence",
     "req_licence_value": "Licence publique générale GNU v3",
     "verify_title": "Vérifiez votre téléchargement",
@@ -194,12 +219,12 @@
     "title": "Crédits et <em>remerciements</em>",
     "engine_head": "Moteur d’échecs",
     "engine": "Stockfish 19, par les développeurs de Stockfish (GNU GPL v3). Son réseau neuronal a été entraîné sur des données fournies par le projet Leela Chess Zero (Open Database License).",
-    "voice_head": "Voix du coach",
-    "voice": "Synthèse vocale générée par Supertonic 3 pour le mode Coach. Supertonic 3 est un modèle de Supertone, utilisé sous la licence OpenRAIL-M.",
+    "voice_head": "Voix",
+    "voice": "Supertonic 3 de Supertone, sous la licence BigScience Open RAIL-M : téléchargé à votre demande, il prête sa voix au coach et à l’analyse, sur votre ordinateur.",
     "fonts_head": "Polices",
-    "fonts": "EB Garamond par Georg Duffner, Cinzel par Natanael Gama et Amiri par Khaled Hosny (SIL Open Font License) ; figurines d’échecs de GNU FreeFont.",
-    "openings_head": "Ouvertures",
-    "openings": "Noms des ouvertures tirés de la base chess-openings de lichess.org, versée dans le domaine public (CC0).",
+    "fonts": "EB Garamond par Georg Duffner, Cinzel par Natanael Gama et Amiri par Khaled Hosny ; écriture manuscrite en Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One et LXGW WenKai (toutes sous SIL Open Font License) ; figurines d’échecs de GNU FreeFont.",
+    "openings_head": "Ouvertures et problèmes",
+    "openings": "Noms des ouvertures tirés de la base chess-openings de lichess.org, et problèmes des défis du coach issus de la base de problèmes de Lichess, toutes deux versées dans le domaine public (CC0).",
     "quote": "« Les échecs sont l’art de l’analyse. »",
     "quote_author": "Mikhaïl Botvinnik"
   },
@@ -213,9 +238,10 @@
     "server_source": "Le serveur sur GitHub",
     "releases": "Versions",
     "licence": "Licence (GPL v3)",
-    "credits": "Stockfish est une marque de ses développeurs. YouTube est une marque de Google LLC. Windows est une marque de Microsoft Corporation.",
+    "credits": "Stockfish est une marque de ses développeurs. YouTube est une marque de Google LLC. Windows est une marque de Microsoft Corporation. macOS est une marque d’Apple Inc. Linux est la marque déposée de Linus Torvalds. OpenGL est une marque déposée de Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "Ce site n’utilise ni cookies ni traceurs."
+    "made": "Ce site ne dépose aucun cookie et n’utilise aucun traceur ; le lecteur YouTube ne se charge que si vous l’acceptez.",
+    "legal_link": "Mentions légales, confidentialité et conditions"
   },
   "common": {
     "copy": "Copier",
@@ -294,7 +320,9 @@
       "done_title": "Consultez vos e-mails",
       "done_text": "Nous avons envoyé un lien de confirmation à votre adresse. Ouvrez-le pour créer votre compte, puis connectez-vous.",
       "done_hint": "Le lien est valable 24 heures. Rien dans votre boîte de réception ? Regardez dans vos indésirables, ou demandez un nouvel e-mail.",
-      "go_signin": "Aller à la connexion"
+      "go_signin": "Aller à la connexion",
+      "legal_note": "Votre pseudo, vos classements et vos parties seront publics. En créant un compte, vous acceptez les conditions d’utilisation.",
+      "legal_link": "Confidentialité et conditions d’utilisation"
     },
     "forgot": {
       "title": "Mot de passe oublié",
@@ -475,22 +503,28 @@
     "download": {
       "exe": "Exécutable",
       "zip": "Archive ZIP",
+      "dmg": "Image disque",
+      "archive": "Archive",
       "file": "Fichier",
       "unavailable": "Non disponible",
       "your_system": "Votre système",
-      "eyebrow_beta": "Bêta publique · {version}",
       "eyebrow_release": "Version {version}",
       "published": "Publiée le {date}",
       "unreachable": "GitHub est injoignable pour le moment : consultez la page des versions.",
       "available": "Disponible",
       "verify_file": "le fichier",
       "no_build": "Pas de version du jeu pour {os} pour le moment.",
-      "prerelease_short": "bêta",
-      "x64": "64 bits (x64)"
+      "x64": "64 bits (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bits, Intel / AMD ou Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 ou ultérieur",
+      "experimental": "Expérimental"
     },
     "server": {
       "online": "En ligne",
       "offline": "Injoignable",
+      "busy": "Occupé",
       "open": "Ouvertes",
       "closed": "Fermées",
       "updated": "Mis à jour {time}",
@@ -554,6 +588,7 @@
         "11": "Règle des 50 coups (réclamée)",
         "12": "Nulle par accord mutuel",
         "13": "Second coup illégal, mais l’adversaire ne peut pas mater",
+        "14": "Abandon, mais l’adversaire ne peut pas mater",
         "20": "Partie quittée (déconnexion trop longue)",
         "21": "Partie quittée, mais l’adversaire ne peut pas mater",
         "22": "Partie annulée",
@@ -674,7 +709,105 @@
       "signin": "Se connecter"
     },
     "trailer": {
-      "title": "Bande-annonce de Scacelith"
+      "title": "Bande-annonce de Scacelith",
+      "notice": "Cette vidéo est hébergée par YouTube. La lire ici charge le lecteur de Google, qui reçoit votre adresse IP et peut déposer des cookies ou d’autres traceurs sur votre appareil.",
+      "accept": "Accepter et lire",
+      "google_privacy": "Règles de confidentialité de Google"
     }
+  },
+  "legal": {
+    "eyebrow": "Informations légales",
+    "title": "Mentions légales, confidentialité et conditions d’utilisation",
+    "lead": "Qui édite et héberge Scacelith, ce que deviennent vos données sur ce site, dans le jeu et sur le serveur officiel, et les règles pour y jouer.",
+    "updated": "Dernière mise à jour : 11 octobre 2026",
+    "toc": "Sur cette page",
+    "notice": {
+      "title": "Mentions légales",
+      "publisher_label": "Éditeur",
+      "publisher": "Scacelith est édité par un particulier, à titre non professionnel. Comme la loi le permet (article 1-1 II de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique), l’identité de l’éditeur n’est pas publiée ici ; elle est connue de l’hébergeur.",
+      "contact_label": "Contact",
+      "contact": "Pour toute question sur ce site, le serveur officiel ou vos données.",
+      "host_server": "Serveur de jeu officiel et données des comptes",
+      "host_server_note": "Serveurs situés en France.",
+      "host_site": "Ce site et la documentation de l’API (GitHub Pages)",
+      "host_domain": "Bureau d’enregistrement du nom de domaine",
+      "licence_label": "Licence",
+      "licence": "Le jeu et son serveur sont des logiciels libres sous licence publique générale GNU v3, au code source public :",
+      "game_source": "le jeu",
+      "server_source": "le serveur",
+      "phone": "Tél."
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "intro": "Scacelith n’affiche aucune publicité, ne vend aucune donnée et ne mesure pas son audience. Les données personnelles servent uniquement à faire fonctionner ce site et le serveur officiel, comme décrit ci-dessous. Le responsable du traitement est l’éditeur, joignable à l’adresse de contact ci-dessus.",
+      "site_title": "Sur ce site",
+      "site_hosting": "GitHub héberge le site et, comme tout hébergeur web, enregistre l’adresse IP des visiteurs à des fins de sécurité.",
+      "github_privacy": "Déclaration de confidentialité de GitHub",
+      "site_requests": "Pour afficher la dernière version, votre navigateur interroge l’API de GitHub (api.github.com) ; pour afficher l’état du serveur, le classement, les joueurs et votre compte, il interroge le serveur officiel (caissa.scacelith.com). Tous deux reçoivent votre adresse IP, comme pour toute requête.",
+      "site_storage": "Le site ne dépose aucun cookie et ne mesure pas l’audience. Il ne garde dans votre navigateur que la langue choisie et, une fois connecté, votre session : pour l’onglet en cours seulement, ou sur cet appareil si vous cochez « Rester connecté sur cet appareil ». Une connexion avec Google y garde aussi ses codes à usage unique, dans l’onglet en cours, jusqu’à leur utilisation. Tout cela est nécessaire au fonctionnement du site, et seul le serveur officiel reçoit la session et les codes.",
+      "site_trailer": "La bande-annonce est une vidéo YouTube. Rien n’est chargé depuis YouTube avant que vous appuyiez sur « Accepter et lire » ; YouTube (Google) reçoit alors votre adresse IP et peut déposer des cookies ou d’autres traceurs sur votre appareil. Votre réponse n’est pas mémorisée : la question revient à votre prochaine visite.",
+      "site_google": "Le bouton « Se connecter avec Google » de la page Compte ne charge rien depuis Google avant que vous cliquiez dessus. Votre navigateur va alors sur la page de connexion de Google (accounts.google.com), puis Google le renvoie vers ce site avec un code à usage unique que le site transmet au serveur officiel. Google reçoit votre adresse IP et ce que vous saisissez sur sa page, selon sa propre politique.",
+      "google_privacy": "Règles de confidentialité de Google",
+      "game_title": "Dans le jeu",
+      "game_local": "Le jeu garde ses réglages, vos résultats locaux et votre connexion sur votre ordinateur. La connexion est conservée dans le coffre sécurisé du système : DPAPI sous Windows, le Trousseau sous macOS, le trousseau Secret Service sous Linux, ou à défaut un fichier que seul votre compte utilisateur peut lire.",
+      "game_network": "Il n’envoie rien de lui-même : ni télémétrie, ni recherche de mise à jour. Il se connecte au serveur officiel seulement quand vous ouvrez la page en ligne, à Hugging Face seulement quand vous téléchargez la voix du coach et, pour une partie directe, à l’ordinateur de votre adversaire, qui connaît alors votre adresse IP (le jeu peut aussi ouvrir un port sur votre box avec UPnP).",
+      "account_title": "Votre compte sur le serveur officiel",
+      "account_intro": "Créer un compte, dans le jeu ou sur ce site, et jouer en ligne envoient les données suivantes au serveur officiel, hébergé par OVH en France :",
+      "data_account": "<strong>Compte :</strong> pseudo, adresse e-mail, mot de passe (conservé uniquement sous forme d’empreinte Argon2id), secret de la validation en deux étapes (chiffré) et codes de secours (sous forme d’empreintes), date d’inscription et date de dernière connexion.",
+      "data_google": "<strong>Connexion avec Google :</strong> Google transmet l’identifiant de votre compte Google, votre adresse e-mail et votre nom. Le serveur garde l’identifiant et l’adresse, et n’utilise le nom que pour proposer un pseudo.",
+      "data_sessions": "<strong>Appareils connectés :</strong> pour chaque connexion, le nom de l’appareil (la version du jeu et le système, par exemple « Scacelith/1.0.0 win64 », ou le navigateur et le système pour ce site), l’adresse IP et les dates d’utilisation.",
+      "data_games": "<strong>Parties et classements :</strong> chaque partie en ligne (joueurs, coups, temps passé sur chaque coup, résultat, dates) et vos classements. Pendant une partie, les mouvements de votre tête et de votre main sont relayés en direct à votre adversaire et jamais conservés.",
+      "data_security": "<strong>Journal de sécurité :</strong> connexions, tentatives échouées et modifications du compte, avec l’adresse IP.",
+      "data_fairplay": "<strong>Jeu loyal :</strong> signalements faits par vous ou à votre sujet, avec leur commentaire ; parties abandonnées ou manquées ; sanctions ; et contrôles des parties, des coups falsifiés ou impossibles jusqu’aux statistiques du moteur Stockfish.",
+      "basis_title": "Pourquoi, et sur quelle base légale",
+      "basis_contract": "Faire fonctionner votre compte et le jeu en ligne (connexion, appariements, classements, historique des parties, e-mails envoyés par le service) : c’est le service auquel vous vous inscrivez (article 6.1.b du RGPD).",
+      "basis_security": "Protéger les comptes et le serveur, et garantir des parties loyales (journal de sécurité, adresses IP, contrôles, sanctions) : l’intérêt légitime de l’éditeur et des joueurs (article 6.1.f du RGPD).",
+      "basis_trailer": "Lire la bande-annonce depuis YouTube : votre consentement, donné avec le bouton (article 6.1.a du RGPD).",
+      "public_title": "Ce que tout le monde peut voir",
+      "public": "Votre pseudo, votre date d’inscription, vos classements et la liste complète de vos parties, coup par coup, sont publics : sur ce site, par l’API du serveur et dans le PGN de chaque partie. Votre adresse e-mail, vos appareils, vos connexions, vos sanctions et les contrôles de jeu loyal ne sont jamais affichés. Vous pouvez refuser les défis directs, mais les parties ne peuvent pas être masquées.",
+      "auto_title": "Décisions automatiques",
+      "auto": "Certaines violations du protocole du jeu, comme un message falsifié ou un coup impossible dans la position, sont une preuve certaine de triche : le serveur donne alors la partie perdue, bannit le compte pendant 24 heures, le retire du classement et rend à ses adversaires les points perdus contre lui au cours des 60 derniers jours. Trois parties abandonnées, annulées ou manquées en 24 heures suspendent les appariements classés pendant 15 minutes, puis plus longtemps. Les statistiques du moteur n’entraînent jamais de sanction à elles seules : une personne décide. Vous pouvez demander le réexamen de toute décision à l’adresse de contact.",
+      "recipients_title": "Qui reçoit vos données",
+      "recipient_ovh": "OVH SAS héberge le serveur et ses données, en France.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l’Évêque, 75008 Paris, France) envoie les e-mails du serveur : elle reçoit votre adresse, votre pseudo et le message.",
+      "recipient_google": "Google reçoit ce que votre navigateur lui envoie quand vous choisissez de vous connecter avec Google, selon ses propres règles de confidentialité.",
+      "recipient_staff": "L’administrateur et les modérateurs du serveur voient les données des comptes et de jeu loyal pour faire fonctionner le service.",
+      "recipient_players": "Les autres joueurs voient ce qui est public, et votre adversaire voit vos coups et vos mouvements pendant une partie.",
+      "recipient_none": "Personne d’autre : aucune donnée n’est vendue, louée ni utilisée à des fins publicitaires.",
+      "transfers": "Les données des comptes restent en France. GitHub, Google et Porkbun (qui transfère les messages envoyés à l’adresse de contact) sont établis aux États-Unis : ce qu’ils reçoivent relève de leurs propres règles et de leurs garanties pour les transferts hors de l’Union européenne.",
+      "retention_title": "Durées de conservation",
+      "ret_account": "<strong>Compte :</strong> jusqu’à sa suppression par vous. Une inscription dont l’adresse n’est jamais confirmée est supprimée au bout de 24 heures.",
+      "ret_sessions": "<strong>Appareils connectés :</strong> jusqu’à la déconnexion, après 30 jours sans utilisation, et au plus 90 jours.",
+      "ret_ip": "<strong>Adresses IP :</strong> effacées au bout de 30 jours. Les journaux du serveur ne gardent que des adresses tronquées.",
+      "ret_security": "<strong>Journal de sécurité :</strong> 90 jours.",
+      "ret_conduct": "<strong>Parties abandonnées ou manquées :</strong> 30 jours.",
+      "ret_games": "<strong>Parties et classements :</strong> aussi longtemps que le serveur conserve l’historique des parties, qui est aussi celui de vos adversaires. Après la suppression de votre compte, votre nom y est remplacé par « deleted# » suivi d’un numéro.",
+      "ret_fairplay": "<strong>Sanctions, signalements et résultats des contrôles :</strong> conservés, pour qu’un joueur banni ne puisse pas simplement revenir et que les autres joueurs restent protégés. Après la suppression de votre compte, ils ne sont plus liés qu’à son numéro.",
+      "ret_backups": "<strong>Sauvegardes :</strong> une donnée supprimée peut subsister peu de temps dans la copie de sauvegarde du serveur, jusqu’à son remplacement.",
+      "ret_contact": "<strong>Messages envoyés à l’adresse de contact :</strong> le temps nécessaire pour y répondre.",
+      "rights_title": "Vos droits",
+      "rights": "Vous pouvez accéder à vos données, les rectifier, les effacer et les exporter, en limiter l’utilisation et vous y opposer (articles 15 à 21 du RGPD).",
+      "rights_self": "L’essentiel se fait depuis votre compte, dans le jeu ou sur la page Compte de ce site : télécharger les données de votre compte dans un fichier JSON, changer votre adresse e-mail ou votre mot de passe, déconnecter vos autres appareils, ou supprimer le compte immédiatement.",
+      "rights_google": "Un compte créé avec Google n’a pas de mot de passe : pour l’exporter ou le supprimer, donnez-lui d’abord un mot de passe avec « Mot de passe oublié ? ».",
+      "rights_mail": "Pour tout le reste, y compris les données que l’export ne contient pas (contrôles de jeu loyal, signalements vous concernant), écrivez à l’adresse de contact. Vous recevrez une réponse sous un mois.",
+      "rights_cnil": "Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07) ou à l’autorité de protection des données de votre pays.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "intro": "Ces conditions s’appliquent au serveur officiel (caissa.scacelith.com) et aux pages de compte de ce site. Créer un compte ou jouer sur le serveur officiel vaut acceptation de ces conditions.",
+      "service": "<strong>Un service gratuit.</strong> Le jeu est un logiciel libre et gratuit. Le serveur officiel est proposé gratuitement et en l’état, sans garantie de disponibilité : il peut évoluer, s’interrompre un temps ou fermer.",
+      "account": "<strong>Votre compte.</strong> Vous êtes responsable de son utilisation et de la confidentialité de son mot de passe. Écrivez sans attendre à l’adresse de contact si vous pensez que quelqu’un d’autre l’utilise.",
+      "username": "<strong>Votre pseudo</strong> est public : il ne doit être ni injurieux ni haineux, ni usurper l’identité de quelqu’un, ni révéler les données personnelles de qui que ce soit.",
+      "fair": "<strong>Jeu loyal.</strong> Pendant une partie classée, aucune aide d’un moteur d’échecs, d’une autre personne ou de tout autre outil. Pas de client de jeu modifié, de messages falsifiés ni de surcharge volontaire du serveur.",
+      "conduct": "<strong>Finissez vos parties.</strong> Abandonner ou annuler des parties, ou manquer des parties pour lesquelles vous avez été apparié, trois fois en 24 heures suspend un temps les appariements classés.",
+      "reports": "<strong>Les signalements</strong> doivent être faits de bonne foi. Pour signaler un joueur ou un contenu illicite, comme un pseudo injurieux, utilisez le bouton de signalement d’une partie ou écrivez à l’adresse de contact.",
+      "sanctions": "<strong>Sanctions.</strong> Enfreindre ces règles peut entraîner une partie perdue, un avertissement, un bannissement et le retrait du classement ; les points perdus contre un tricheur sont rendus à ses adversaires. Seule une preuve certaine de triche est sanctionnée automatiquement ; tout le reste est décidé par une personne. Vous pouvez contester une sanction à l’adresse de contact.",
+      "liability": "<strong>Responsabilité.</strong> Dans les limites permises par la loi, l’éditeur n’est pas responsable des interruptions du service ni de la perte de parties, de classements ou de données.",
+      "end": "<strong>Fin.</strong> Vous pouvez supprimer votre compte à tout moment. Un compte qui enfreint ces conditions peut être banni.",
+      "changes": "<strong>Modifications.</strong> Ces conditions peuvent évoluer ; la date en haut de cette page indique la version en vigueur, et continuer à jouer après une modification vaut acceptation.",
+      "law": "<strong>Droit applicable.</strong> Ces conditions sont régies par le droit français. En cas de litige, écrivez d’abord à l’adresse de contact pour trouver ensemble une solution."
+    },
+    "version_note": "Cette page existe en plusieurs langues ; en cas de différence, la version française fait foi."
   }
 }

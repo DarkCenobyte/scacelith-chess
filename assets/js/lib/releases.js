@@ -1,11 +1,10 @@
-// The newest release of the game on GitHub and its files, sorted by operating system.
-// GitHub's "latest" release never includes pre-releases, so when there is none (a beta), the
-// newest published release of the list is used instead.
+// The newest release of the game on GitHub and its files, sorted by operating system, and the
+// source code of its tag.
 
 import * as store from "./store.js";
 
 const REPO = document.documentElement.dataset.repo || "DarkCenobyte/scacelith-chess";
-const CACHE_KEY = "scacelith.release.v1";
+const CACHE_KEY = "scacelith.release.v2";
 const CACHE_MS = 15 * 60 * 1000;
 export const RELEASES_URL = `https://github.com/${REPO}/releases`;
 export const OSES = ["windows", "macos", "linux"];
@@ -34,6 +33,11 @@ function archOf(name) {
   return null;
 }
 
+/** GitHub's ZIP archive of the source code at a tag (the "Source code (zip)" of a release). */
+export function sourceZipUrl(tag) {
+  return `https://github.com/${REPO}/archive/refs/tags/${encodeURIComponent(tag)}.zip`;
+}
+
 function normalize(release) {
   const assets = (release.assets || [])
     .filter((a) => a && a.state !== "starter" && a.browser_download_url)
@@ -44,6 +48,8 @@ function normalize(release) {
       os: osOf(a.name),
       kind: kindOf(a.name),
       arch: archOf(a.name),
+      // A build published as experimental says so in its name (…-macos-arm64-experimental.dmg).
+      experimental: /(^|[-_.])experimental([-_.]|$)/i.test(a.name),
       digest: a.digest || null,
     }));
   const tag = release.tag_name || "";
@@ -51,9 +57,9 @@ function normalize(release) {
     tag,
     version: tag.replace(/^v/, ""),
     name: release.name || tag,
-    prerelease: Boolean(release.prerelease),
     published: Date.parse(release.published_at || release.created_at || "") || null,
     url: release.html_url || `${RELEASES_URL}/tag/${encodeURIComponent(tag)}`,
+    source: tag ? sourceZipUrl(tag) : null,
     assets,
     sums: assets.find((a) => /sha256sums/i.test(a.name)) || null,
   };
@@ -84,7 +90,6 @@ function fallbackRelease() {
       ...normalize({
         tag_name: f.tag,
         name: f.name,
-        prerelease: f.prerelease,
         published_at: f.published,
         assets: f.assets.map((a) => ({ name: a.name, size: a.size, browser_download_url: base + encodeURIComponent(a.name), state: "uploaded" })),
       }),
@@ -95,24 +100,19 @@ function fallbackRelease() {
   }
 }
 
-/** The newest release (cached for a quarter of an hour), else the one known at build time. */
+/**
+ * The newest release (cached for a quarter of an hour), else the one known at build time. GitHub's
+ * "latest" release is the newest one that is neither a draft nor a pre-release.
+ */
 export function latestRelease() {
   if (pending) return pending;
   const cached = store.get(CACHE_KEY);
   if (cached && cached.at > Date.now() - CACHE_MS && cached.release?.tag) return (pending = Promise.resolve(cached.release));
   pending = (async () => {
-    let raw = null;
     const latest = await github("/releases/latest");
-    if (latest.ok) raw = await latest.json().catch(() => null);
-    else if (latest.status !== 404) throw new Error(`GitHub ${latest.status}`);
-    if (!raw?.tag_name) {
-      // No "latest" release (only pre-releases so far): the newest published one of the list.
-      const list = await github("/releases?per_page=10");
-      if (!list.ok) throw new Error(`GitHub ${list.status}`);
-      const all = await list.json().catch(() => null);
-      raw = (Array.isArray(all) ? all : []).find((r) => r && !r.draft && r.tag_name) || null;
-    }
-    if (!raw) throw new Error("no release");
+    if (!latest.ok) throw new Error(`GitHub ${latest.status}`);
+    const raw = await latest.json().catch(() => null);
+    if (!raw?.tag_name) throw new Error("no release");
     const release = normalize(raw);
     store.set(CACHE_KEY, { at: Date.now(), release });
     return release;
@@ -138,10 +138,19 @@ export function detectOS() {
   return null;
 }
 
-/** The files of one system, the preferred format first (the ZIP with its licence, then the rest). */
+/**
+ * The files of one system, the preferred format first (the ZIP with its licence, then the rest),
+ * and of one format the x86-64 build before the Arm one.
+ */
 export function filesFor(release, os) {
   const order = ["zip", "exe", "msi", "dmg", "pkg", "appimage", "deb", "rpm", "flatpak", "tar.gz", "tar.xz", "7z", "file"];
+  const archOrder = ["x64", "universal", "arm64", null];
   return release.assets
     .filter((a) => a.os === os)
-    .sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind));
+    .sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind) || archOrder.indexOf(a.arch) - archOrder.indexOf(b.arch));
+}
+
+/** The processor architectures of a list of files, without repeats ("x64", "arm64"...). */
+export function archesOf(files) {
+  return [...new Set(files.map((f) => f.arch).filter(Boolean))];
 }

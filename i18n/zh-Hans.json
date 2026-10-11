@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — 照片级写实的第一人称国际象棋",
-      "description": "免费的照片级写实国际象棋，适用于 Windows：在皇家大厅里以第一人称对弈，Stockfish 19、教练和在线对手等你挑战。"
+      "description": "免费的照片级写实国际象棋，适用于 Windows、Linux 和 macOS：在皇家大厅里以第一人称对弈，Stockfish 19、教练、对局分析和在线对局一应俱全。"
     },
     "players": {
       "title": "排行榜和棋手 — Scacelith",
-      "description": "Scacelith 官方服务器上每种用时的顶尖棋手、他们的等级分和最近的对局。"
+      "description": "Scacelith 官方服务器上每种计分用时的顶尖棋手、他们的等级分和最近的对局。"
     },
     "account": {
       "title": "你的账号 — Scacelith",
@@ -15,6 +15,10 @@
     "gif": {
       "title": "GIF 动图 — Scacelith",
       "description": "一局 Scacelith 对局的 GIF 动图。"
+    },
+    "legal": {
+      "title": "法律声明、隐私和使用条款 — Scacelith",
+      "description": "Scacelith 由谁发布和托管，网站、游戏和官方服务器如何处理个人数据，你的权利，以及官方服务器的规则。"
     }
   },
   "brand": {
@@ -37,16 +41,15 @@
   },
   "hero": {
     "image_alt": "在洒满阳光的大理石大厅里，两个瓷制机器人正在胡桃木桌前下国际象棋。",
-    "eyebrow": "公测版",
     "lead": "走进洒满阳光的皇家大厅，在打过蜡的胡桃木桌前落座。棋盘对面，一个由 Stockfish 驱动的瓷制机器人正等着你走出第一步。",
     "watch": "观看预告片",
-    "meta": "自由软件 · Windows 64 位 · 支持 OpenGL 4.6 的显卡",
-    "caption": "游戏内截图：标题画面"
+    "meta": "自由软件 · Windows、Linux、macOS（实验性） · 支持 OpenGL 4.6 的显卡",
+    "caption": "游戏内截图：皇家大厅"
   },
   "highlights": {
     "engine": "自主开发的 OpenGL 4.6 引擎",
     "stockfish": "内置 Stockfish 19",
-    "rules": "FIDE 等级分",
+    "rules": "遵循 FIDE 规则",
     "online": "在线对局",
     "languages": "十种语言"
   },
@@ -56,11 +59,11 @@
     "lead": "Scacelith 重现了真实对局的种种要素：大厅、寂静、棋钟、注视着你的对手，以及锦标赛的仪式感。",
     "presence": {
       "title": "第一人称视角",
-      "text": "你透过自己机器人的双眼观看一切。环顾大厅，俯身靠近棋盘，抬头看向对手，或瞥一眼身旁的对局记录表。"
+      "text": "你透过自己机器人的双眼观看一切：环顾大厅，俯身靠近棋盘，抬头看向对手，瞥一眼自己的对局记录表，或起身走到桌子的一端。"
     },
     "ritual": {
       "title": "比赛规则",
-      "text": "摸子即须走子。你的手按下棋钟，这步棋才算完成。一旦走出违例着法，裁判就会出面；第二次违例即判负。"
+      "text": "摸子即须走子。你的手按下棋钟，这步棋才算完成。关闭“显示合法着法”时，违例着法会受到裁判处罚；第二次违例即判负。"
     },
     "scoresheet": {
       "title": "亲笔记录",
@@ -68,11 +71,11 @@
     },
     "opponent": {
       "title": "旗鼓相当的对手",
-      "text": "与你水平相当的 Stockfish 19，从新手（800）到满级（3500），每局结束后都按 FIDE 规则计算等级分。"
+      "text": "与你水平相当的 Stockfish 19，从新手（800）到 Stockfish 满级（3500），每局结束后都按 FIDE 规则计算等级分。"
     },
     "engine": {
       "title": "为本作量身打造",
-      "text": "从零编写的引擎：基于物理的光照，大理石、打蜡的木材、瓷与黄铜，透窗而入的阳光，柔和的阴影与反射。"
+      "text": "从零编写的引擎：基于物理的光照，大理石、打蜡的木材、瓷与黄铜，透窗而入的阳光，柔和的阴影与反射。从“极低”到“极高”的画质预设，可让它适配你的显卡。"
     },
     "languages": {
       "title": "十种语言",
@@ -89,11 +92,19 @@
     },
     "coach": {
       "name": "教练",
-      "text": "一位老师坐在你对面，以你的水平与你对弈，并为你讲解棋局：威胁、好棋、失误。从国际象棋规则到专家水平，配有合成语音（英语发音，附中文字幕）。"
+      "text": "一位老师坐在你对面，以你的水平与你对弈，并为你讲解棋局：威胁、好棋、失误，还会亲手在棋盘上演示失误的代价。从国际象棋规则到专家水平，配有在你的电脑上合成的语音（英语发音，附中文字幕）。"
+    },
+    "challenges": {
+      "name": "教练挑战",
+      "text": "一组组简短的局面练习，每组专练一项技能：一步杀到三步杀，捉双、牵制等战术，防守，以及对阵教练的基本残局。提示只在你请求时给出，每完成一组就会打上一个绿色的勾。"
+    },
+    "analysis": {
+      "name": "分析",
+      "text": "Stockfish 会分析你已保存的对局、在线对局或任意 PGN：评估条、从妙着到漏着的关键着法标注、以箭头标出的更佳着法，以及语音和字幕解说。你逐步浏览时，机器人会亲手走出每一步。"
     },
     "online": {
       "name": "在线对局",
-      "text": "通过 Scacelith 服务器与真人对手对弈：计分对局、匹配对手、挑战和私人对局。对手的机器人会实时同步其一举一动。"
+      "text": "通过 Scacelith 服务器与真人对手对弈：计分对局、匹配对手、挑战和私人对局；也可以在两台电脑之间直连对局。对手的机器人会实时同步其一举一动。"
     },
     "watch": {
       "name": "观看对局",
@@ -112,13 +123,25 @@
       "alt": "标题画面：Scacelith 的菜单旁，两个机器人正在大厅里下国际象棋。",
       "caption": "标题画面"
     },
+    "coach": {
+      "alt": "教练是一个胸前印有“COACH”字样的瓷制机器人，正隔着棋盘向你问好；它说的话也会显示为字幕。",
+      "caption": "教练"
+    },
+    "challenges": {
+      "alt": "“教练挑战”菜单：将杀与战术题组列表，标有难度和已完成的部分，旁边是所选题组的说明。",
+      "caption": "教练挑战"
+    },
+    "analysis": {
+      "alt": "分析模式：评估条、棋盘上画出的箭头、带注释的着法和双方的准确度，以及操作方式列表。",
+      "caption": "分析"
+    },
+    "game": {
+      "alt": "从侧面看，一个机器人把手伸过桌面去移动一枚棋子，另一个则在等待；被吃掉的棋子立在棋盘旁边。",
+      "caption": "观看对局"
+    },
     "hall": {
       "alt": "高大的窗户下，两个机器人坐在红色天鹅绒椅子上，隔着棋盘相对。",
       "caption": "皇家大厅"
-    },
-    "board": {
-      "alt": "俯视棋盘，旁边是棋钟，一只机器人的手正伸向一枚棋子。",
-      "caption": "棋盘前"
     },
     "opponent": {
       "alt": "瓷制机器人对手的特写，它正低头看着棋盘。",
@@ -128,7 +151,7 @@
       "alt": "一只机器人的手正用钢笔在记录表上写下着法。",
       "caption": "对局记录表"
     },
-    "note": "开发版本。图中的界面为法语。",
+    "note": "版本 1.0.0。图中的界面为英语。",
     "viewer": "图片查看器",
     "close": "关闭",
     "previous": "上一张图片",
@@ -137,21 +160,20 @@
   "trailer": {
     "eyebrow": "预告片",
     "title": "Scacelith <em>动态影像</em>",
-    "play": "播放预告片",
     "soon_title": "预告片即将推出",
-    "soon_text": "在那之前，不妨先入座：测试版已可下载。",
-    "privacy": "点击播放后，视频才会由 YouTube（youtube-nocookie.com）播放。",
+    "soon_text": "在那之前，不妨先入座：游戏已可下载。",
+    "privacy": "在你同意使用其播放器之前，不会从 YouTube 加载任何内容。",
     "open_youtube": "在 YouTube 上观看"
   },
   "online": {
     "eyebrow": "在线",
     "title": "真实的对手，<br><em>同一座大厅。</em>",
     "lead": "在游戏中登录官方服务器，与来自世界各地的棋手对弈，依然是第一人称视角。",
-    "point_rated": "所有官方用时均可进行计分对局，每种用时各有一个 FIDE 等级分。",
-    "point_match": "匹配对手、按用户名发起挑战、凭代码进行私人对局，以及两台电脑之间的直连对局。",
+    "point_rated": "所有官方用时均可进行计分对局，每种用时各有独立的等级分，按 FIDE 规则计算。",
+    "point_match": "匹配对手、按用户名发起挑战、凭代码进行私人对局；也可以在两台电脑之间直连对局，无需服务器或账号。",
     "point_fair": "公平对弈：自动检查、由引擎分析已结束的对局，以及棋手举报。",
     "point_history": "在本网站查看你的对局记录：每局都可下载为 PGN 或 GIF 动图。",
-    "point_open": "任何人都可以运行社区服务器：服务器及其 API 都是自由软件。",
+    "point_open": "任何人都可以运行社区服务器：服务器是自由软件，其 API 也有公开文档。",
     "create": "创建账号",
     "signin": "登录",
     "server_title": "官方服务器",
@@ -170,19 +192,22 @@
     "see_release": "在 GitHub 上查看发行版",
     "latest": "Scacelith",
     "all_releases": "全部发行版",
+    "experimental": "实验性",
+    "source": "源代码",
+    "source_zip": "ZIP 压缩包",
     "eyebrow": "下载",
     "title": "请入座。<br><em>免费，而且开源。</em>",
-    "lead": "无需安装：下载、解压，然后运行 Scacelith.exe。每个文件都由 GitHub Actions 根据对应标签的源代码构建，并附有构建来源证明。",
-    "prerelease": "测试版",
+    "lead": "解压即玩：Windows 和 Linux 无需安装，Mac 上只需拖到“应用程序”文件夹。每个文件都由 GitHub Actions 根据对应标签的源代码构建，并附有构建来源证明。",
     "notes": "发行说明",
+    "macos_note": "适用于搭载 Apple Silicon（M1 或更新芯片）、运行 macOS 26 或更高版本的 Mac，不支持在虚拟机中运行；此版本比其他版本更新，测试也较少。此 App 未经注册的 Apple 开发者签名：首次打开时，请前往“系统设置 › 隐私与安全性 › 仍要打开”。",
     "req_system": "系统",
-    "req_system_value": "Windows 64 位（x64）",
+    "req_system_value": "Windows 64 位（x64）；Linux 64 位（x86-64 或 aarch64），需 glibc 2.34、OpenSSL 3 以及 X11 或 XWayland，例如 Ubuntu 22.04 或 Debian 12；Apple Silicon 上的 macOS 26 或更高版本（实验性）",
     "req_gpu": "显卡",
-    "req_gpu_value": "支持 OpenGL 4.6 的显卡及最新驱动程序",
+    "req_gpu_value": "支持 OpenGL 4.6 的显卡及最新驱动程序（在 Mac 上，游戏自带 OpenGL）",
     "req_included": "内含",
     "req_included_value": "Stockfish 19 及其神经网络：开箱即可离线对弈",
     "req_network": "网络",
-    "req_network_value": "用于在线对局、GIF 和教练语音（可选下载，约 145 MB）",
+    "req_network_value": "用于在线对局、GIF，以及教练和分析的语音（可选下载，约 399 MB）",
     "req_licence": "许可证",
     "req_licence_value": "GNU 通用公共许可证第 3 版",
     "verify_title": "校验下载的文件",
@@ -194,12 +219,12 @@
     "title": "制作人员与<em>致谢</em>",
     "engine_head": "国际象棋引擎",
     "engine": "Stockfish 19，由 Stockfish 开发者制作（GNU GPL v3）。其神经网络使用 Leela Chess Zero 项目提供的数据训练（开放数据库许可协议）。",
-    "voice_head": "教练语音",
-    "voice": "教练模式的合成语音由 Supertonic 3 生成。Supertonic 3 是 Supertone 公司的模型，依据 OpenRAIL-M 许可证使用。",
+    "voice_head": "语音",
+    "voice": "Supertone 的 Supertonic 3，依据 BigScience Open RAIL-M 许可证使用：应你的要求下载后，在你的电脑上为教练和分析发声。",
     "fonts_head": "字体",
-    "fonts": "Georg Duffner 设计的 EB Garamond、Natanael Gama 设计的 Cinzel 和 Khaled Hosny 设计的 Amiri，均采用 SIL Open Font License；棋子符号来自 GNU FreeFont。",
-    "openings_head": "开局",
-    "openings": "开局名称来自 lichess.org 的 chess-openings 数据库，已贡献至公有领域（CC0）。",
+    "fonts": "Georg Duffner 设计的 EB Garamond、Natanael Gama 设计的 Cinzel 和 Khaled Hosny 设计的 Amiri；手写字体为 Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One 和 LXGW WenKai（均采用 SIL Open Font License）；棋子符号来自 GNU FreeFont。",
+    "openings_head": "开局与谜题",
+    "openings": "开局名称来自 lichess.org 的 chess-openings 数据库，教练挑战中的谜题来自 Lichess 谜题数据库，两者均已贡献至公有领域（CC0）。",
     "quote": "“国际象棋是分析的艺术。”",
     "quote_author": "米哈伊尔·博特温尼克"
   },
@@ -213,9 +238,10 @@
     "server_source": "GitHub 上的服务器",
     "releases": "发行版",
     "licence": "许可证（GPL v3）",
-    "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。",
+    "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。macOS 是 Apple Inc. 的商标。Linux 是 Linus Torvalds 的注册商标。OpenGL 是 Hewlett Packard Enterprise 的注册商标。",
     "legal": "Scacelith",
-    "made": "本网站不使用 Cookie，也不使用任何跟踪器。"
+    "made": "本网站不设置 Cookie，也不使用任何跟踪器；只有在你同意后才会加载 YouTube 播放器。",
+    "legal_link": "法律声明、隐私和条款"
   },
   "common": {
     "copy": "复制",
@@ -294,7 +320,9 @@
       "done_title": "请查收邮件",
       "done_text": "我们已向你的邮箱发送了一个确认链接。打开链接即可创建账号，然后登录。",
       "done_hint": "该链接 24 小时内有效。收件箱里没有？请检查垃圾邮件文件夹，或重新获取邮件。",
-      "go_signin": "前往登录"
+      "go_signin": "前往登录",
+      "legal_note": "你的用户名、等级分和对局将会公开。创建账号即表示你接受使用条款。",
+      "legal_link": "隐私和使用条款"
     },
     "forgot": {
       "title": "忘记密码",
@@ -471,22 +499,28 @@
     "download": {
       "exe": "可执行文件",
       "zip": "ZIP 压缩包",
+      "dmg": "磁盘映像",
+      "archive": "压缩包",
       "file": "文件",
       "unavailable": "不可用",
       "your_system": "你的系统",
-      "eyebrow_beta": "公测版 · {version}",
       "eyebrow_release": "版本 {version}",
       "published": "发布于 {date}",
       "unreachable": "目前无法连接 GitHub：请查看发行版页面。",
       "available": "可下载",
       "verify_file": "该文件",
       "no_build": "目前还没有适用于 {os} 的游戏版本。",
-      "prerelease_short": "测试版",
-      "x64": "64 位（x64）"
+      "x64": "64 位（x64）",
+      "arch_x64": "Intel / AMD（x86-64）",
+      "arch_arm64": "Arm（aarch64）",
+      "several_arches": "64 位，Intel / AMD 或 Arm",
+      "macos_arm64": "Apple Silicon，macOS 26 或更高版本",
+      "experimental": "实验性"
     },
     "server": {
       "online": "在线",
       "offline": "无法连接",
+      "busy": "繁忙",
       "open": "开放",
       "closed": "关闭",
       "updated": "最后更新：{time}",
@@ -546,6 +580,7 @@
         "11": "五十回合规则（提出要求）",
         "12": "协议和棋",
         "13": "第二次违例着法，但对方无法将死",
+        "14": "认输，但对方无法将死",
         "20": "离开对局（断线时间过长）",
         "21": "离开对局，但对方无法将死",
         "22": "对局中止",
@@ -666,7 +701,105 @@
       "signin": "登录"
     },
     "trailer": {
-      "title": "Scacelith 预告片"
+      "title": "Scacelith 预告片",
+      "notice": "此视频托管在 YouTube 上。在此播放会加载 Google 的播放器：它会收到你的 IP 地址，并可能在你的设备上存储 Cookie 或其他跟踪器。",
+      "accept": "同意并播放",
+      "google_privacy": "Google 隐私权政策"
     }
+  },
+  "legal": {
+    "eyebrow": "法律信息",
+    "title": "法律声明、隐私和使用条款",
+    "lead": "Scacelith 由谁发布和托管，你的数据在本网站、游戏中和官方服务器上会如何处理，以及在官方服务器上对弈的规则。",
+    "updated": "最后更新：2026年10月11日",
+    "toc": "本页内容",
+    "notice": {
+      "title": "法律声明",
+      "publisher_label": "发布者",
+      "publisher": "Scacelith 由一名个人以非职业身份发布。经法国法律许可（2004 年 6 月 21 日第 2004-575 号法律第 1-1 条第 II 款），发布者的身份不在此公开；托管服务商知悉其身份。",
+      "contact_label": "联系方式",
+      "contact": "用于咨询与本网站、官方服务器或你的数据有关的任何问题。",
+      "host_server": "官方游戏服务器和账号数据",
+      "host_server_note": "服务器位于法国。",
+      "host_site": "本网站和 API 文档（GitHub Pages）",
+      "host_domain": "域名注册商",
+      "licence_label": "许可证",
+      "licence": "游戏及其服务器均为采用 GNU 通用公共许可证第 3 版的自由软件，源代码公开：",
+      "game_source": "游戏",
+      "server_source": "服务器",
+      "phone": "电话"
+    },
+    "privacy": {
+      "title": "隐私",
+      "intro": "Scacelith 不展示任何广告，不出售任何数据，也不统计访问量。个人数据仅用于运行本网站和官方服务器，详见下文。数据控制者为发布者，可通过上方的联系邮箱与其联系。",
+      "site_title": "在本网站上",
+      "site_hosting": "本网站由 GitHub 托管；与所有网站托管服务商一样，GitHub 会出于安全目的记录访问者的 IP 地址。",
+      "github_privacy": "GitHub 隐私声明",
+      "site_requests": "为显示最新发行版，你的浏览器会向 GitHub 的 API（api.github.com）发出请求；为显示服务器状态、排行榜、棋手和你的账号，它会向官方服务器（caissa.scacelith.com）发出请求。与任何请求一样，两者都会收到你的 IP 地址。",
+      "site_storage": "本网站不设置 Cookie，也不做访问统计。它只在你的浏览器中保存你选择的语言，以及你登录后的会话：仅限当前标签页，或者在你勾选“在此设备上保持登录”时保存在此设备上。使用 Google 登录时，还会在当前标签页中保存一次性代码，直到它们被使用。这些都是网站正常运行所必需的，且只有官方服务器会收到会话和这些代码。",
+      "site_trailer": "预告片是一段 YouTube 视频。在你按下“同意并播放”之前，不会从 YouTube 加载任何内容；按下后，YouTube（Google）会收到你的 IP 地址，并可能在你的设备上存储 Cookie 或其他跟踪器。你的选择不会被记住：下次访问时会再次询问。",
+      "site_google": "在你按下“账号”页面上的“使用 Google 账号登录”之前，不会从 Google 加载任何内容。按下后，你的浏览器会前往 Google 的登录页面（accounts.google.com），随后 Google 会带着一个一次性代码把浏览器送回本网站，本网站再把该代码交给官方服务器。Google 会按照其自己的政策，收到你的 IP 地址以及你在其页面上输入的内容。",
+      "google_privacy": "Google 隐私权政策",
+      "game_title": "在游戏中",
+      "game_local": "游戏会在你的电脑上保存其设置、你的本地战绩和你的登录状态。登录状态保存在系统的安全存储中：Windows 上为 DPAPI，macOS 上为钥匙串，Linux 上为 Secret Service 密钥环；如果都不可用，则保存在一个只有你的系统用户才能读取的文件中。",
+      "game_network": "游戏不会自行发送任何数据：没有遥测，也不检查更新。只有在你打开“在线对局”页面时，它才会连接官方服务器；只有在你下载教练语音时，它才会连接 Hugging Face；进行直连对局时，它会连接对手的电脑，对手因此会得知你的 IP 地址（游戏还可能通过 UPnP 在你的路由器上打开端口）。",
+      "account_title": "你在官方服务器上的账号",
+      "account_intro": "在游戏中或本网站上创建账号以及在线对弈时，以下数据会发送到由 OVH 在法国托管的官方服务器：",
+      "data_account": "<strong>账号：</strong>用户名、电子邮箱地址、密码（仅以 Argon2id 哈希值的形式存储）、双重验证密钥（已加密）和恢复码（已哈希处理）、注册日期和上次登录日期。",
+      "data_google": "<strong>使用 Google 登录：</strong>Google 会发送你的 Google 账号标识符、电子邮箱地址和姓名。服务器保存标识符和邮箱地址，姓名仅用于为你推荐用户名。",
+      "data_sessions": "<strong>已登录的设备：</strong>每次登录对应的设备名称（游戏的版本和系统，例如“Scacelith/1.0.0 win64”；在本网站上则为浏览器和系统）、IP 地址和使用日期。",
+      "data_games": "<strong>对局和等级分：</strong>每一局在线对局（棋手、着法、每步用时、结果、日期）以及你的等级分。对局过程中，你的头部和手部动作会实时转发给对手，且从不存储。",
+      "data_security": "<strong>安全日志：</strong>登录、失败的尝试和账号变更，以及相应的 IP 地址。",
+      "data_fairplay": "<strong>公平对弈：</strong>你提交的或针对你的举报及其备注；放弃和错过的对局；处罚；以及对对局进行的检查，从伪造或不可能的着法到 Stockfish 引擎的统计数据。",
+      "basis_title": "处理目的和法律依据",
+      "basis_contract": "运行你的账号和在线对局（登录、匹配、等级分、对局记录、服务发送的电子邮件）：这是你注册使用的服务（《通用数据保护条例》(GDPR) 第 6 条第 1 款 (b) 项）。",
+      "basis_security": "保护账号和服务器，确保对局公平（安全日志、IP 地址、公平对弈检查、处罚）：发布者和棋手的正当利益（GDPR 第 6 条第 1 款 (f) 项）。",
+      "basis_trailer": "从 YouTube 播放预告片：你通过按钮表示的同意（GDPR 第 6 条第 1 款 (a) 项）。",
+      "public_title": "所有人都能看到的内容",
+      "public": "你的用户名、注册日期、等级分以及包含每一步着法的完整对局列表都是公开的，可在本网站上、通过服务器的 API 以及在每局对局的 PGN 中查看。你的电子邮箱地址、设备、登录记录、处罚和公平对弈检查记录从不显示。你可以拒绝直接挑战，但无法隐藏对局。",
+      "auto_title": "自动化决策",
+      "auto": "某些违反游戏通信协议的行为，例如伪造的消息或在当前局面下不可能走出的着法，是确凿的作弊证据：此时服务器会判相关账号本局告负，将其封禁 24 小时并从排行榜中移除，同时把其对手在过去 60 天内输给它的等级分退还给对手。24 小时内放弃、中止或错过三局对局，将暂停计分匹配 15 分钟，此后暂停时间会更长。仅凭引擎统计数据绝不会导致处罚：须由人来决定。你可以通过联系邮箱要求复核任何决定。",
+      "recipients_title": "谁会收到你的数据",
+      "recipient_ovh": "OVH SAS 在法国托管服务器及其数据。",
+      "recipient_scaleway": "Scaleway SAS（8 rue de la Ville-l'Évêque, 75008 Paris, France）负责发送服务器的电子邮件：它会收到你的邮箱地址、用户名和邮件内容。",
+      "recipient_google": "当你选择使用 Google 登录时，Google 会收到你的浏览器发送给它的内容，并受其自身的隐私权政策约束。",
+      "recipient_staff": "服务器的管理员和审核员会查看账号数据和公平对弈数据，以运营本服务。",
+      "recipient_players": "其他棋手可以看到公开的内容；对局中，你的对手会看到你的着法和动作。",
+      "recipient_none": "除此之外没有其他人：任何数据都不会被出售、出租或用于广告。",
+      "transfers": "账号数据保留在法国。GitHub、Google 和 Porkbun（负责转发发送到联系邮箱的邮件）位于美国：它们收到的数据受其自身政策以及它们为向欧盟以外传输数据所采取的保障措施约束。",
+      "retention_title": "保存期限",
+      "ret_account": "<strong>账号：</strong>保存至你将其删除为止。邮箱地址始终未经确认的注册会在 24 小时后删除。",
+      "ret_sessions": "<strong>已登录的设备：</strong>保存至你退出登录为止；闲置 30 天后删除；最长保存 90 天。",
+      "ret_ip": "<strong>IP 地址：</strong>30 天后删除。服务器日志只保留截短的地址。",
+      "ret_security": "<strong>安全日志：</strong>90 天。",
+      "ret_conduct": "<strong>放弃和错过的对局：</strong>30 天。",
+      "ret_games": "<strong>对局和等级分：</strong>服务器保留对局记录多久，就保存多久；这些记录同时也是你对手的记录。你的账号删除后，其中你的名字会替换为“deleted#”加一个编号。",
+      "ret_fairplay": "<strong>处罚、举报和公平对弈检查结果：</strong>予以保留，以免被封禁的棋手轻易卷土重来，并持续保护其他棋手。你的账号删除后，这些数据只与该账号的编号关联。",
+      "ret_backups": "<strong>备份：</strong>已删除的数据可能会在服务器的备份副本中短暂留存，直到该副本被替换。",
+      "ret_contact": "<strong>发送到联系邮箱的邮件：</strong>保存至答复所需的期限为止。",
+      "rights_title": "你的权利",
+      "rights": "你可以查阅、更正、删除和导出你的数据，限制其使用，或反对其使用（GDPR 第 15 条至第 21 条）。",
+      "rights_self": "其中大部分都可以在你的账号中自行完成，无论是在游戏中还是在本网站的“账号”页面：将账号数据下载为 JSON 文件、修改电子邮箱地址或密码、让其他设备退出登录，或立即删除账号。",
+      "rights_google": "使用 Google 创建的账号没有密码：要导出或删除该账号，请先通过“忘记密码？”为其设置密码。",
+      "rights_mail": "其他任何请求，包括导出文件中不含的数据（公平对弈检查、针对你的举报），请写信至联系邮箱。你将在一个月内收到答复。",
+      "rights_cnil": "如果你认为自己的权利未得到尊重，可以向 CNIL（3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France）或你所在国家的数据保护机构提出投诉。",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "使用条款",
+      "intro": "本条款适用于官方服务器（caissa.scacelith.com）和本网站的账号页面。创建账号或在官方服务器上对弈，即表示你接受本条款。",
+      "service": "<strong>免费服务。</strong>本游戏是免费的自由软件。官方服务器免费并按现状提供，不保证可用性：它可能会变更、暂时中断或关闭。",
+      "account": "<strong>你的账号。</strong>你须对账号的使用情况及其密码的保密负责。如果你认为有他人在使用你的账号，请立即写信至联系邮箱。",
+      "username": "<strong>你的用户名</strong>是公开的：不得带有侮辱性或仇恨性，不得冒充他人，也不得泄露任何人的个人数据。",
+      "fair": "<strong>公平对弈。</strong>在计分对局中，不得借助国际象棋引擎、他人或任何其他工具。不得使用修改过的游戏客户端、伪造消息或故意使服务器过载。",
+      "conduct": "<strong>下完你的对局。</strong>24 小时内累计三次放弃或中止对局，或错过为你匹配的对局，计分匹配将暂停一段时间。",
+      "reports": "<strong>举报</strong>必须出于善意。如需举报某位棋手或违法内容（例如侮辱性的用户名），请使用对局中的“举报对手”按钮，或写信至联系邮箱。",
+      "sanctions": "<strong>处罚。</strong>违反这些规则可能导致判负、警告、封禁以及从排行榜中移除；输给作弊者的等级分会退还给其对手。只有确凿的作弊证据才会被自动处罚；其他一切均由人来决定。你可以通过联系邮箱对处罚提出申诉。",
+      "liability": "<strong>责任。</strong>在法律允许的范围内，发布者不对服务中断或对局、等级分、数据的丢失承担责任。",
+      "end": "<strong>终止。</strong>你可以随时删除你的账号。违反本条款的账号可能会被封禁。",
+      "changes": "<strong>变更。</strong>本条款可能会变更；本页顶部的日期表示当前版本，变更后继续对弈即表示你接受变更。",
+      "law": "<strong>适用法律。</strong>本条款受法国法律管辖。如发生争议，请先写信至联系邮箱，以便共同寻求解决方案。"
+    },
+    "version_note": "本页面提供多种语言版本；如各版本之间存在差异，以法语版本为准。"
   }
 }

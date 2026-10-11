@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — 照片級擬真西洋棋，以第一人稱對弈",
-      "description": "免費的照片級擬真西洋棋，適用於 Windows：在皇家大廳以第一人稱對弈，Stockfish 19、教練與線上對手等著你。"
+      "description": "免費的照片級擬真西洋棋，適用於 Windows、Linux 與 macOS：在皇家大廳以第一人稱對弈，Stockfish 19、教練、對局分析與線上對局一應俱全。"
     },
     "players": {
       "title": "排行榜與棋手 — Scacelith",
-      "description": "Scacelith 官方伺服器各時限的頂尖棋手，以及他們的等級分與最近的對局。"
+      "description": "Scacelith 官方伺服器各計分時限的頂尖棋手，以及他們的等級分與最近的對局。"
     },
     "account": {
       "title": "你的帳號 — Scacelith",
@@ -15,6 +15,10 @@
     "gif": {
       "title": "GIF 動畫 — Scacelith",
       "description": "一局 Scacelith 對局的 GIF 動畫。"
+    },
+    "legal": {
+      "title": "法律聲明、隱私權與使用條款 — Scacelith",
+      "description": "Scacelith 由誰發布及代管，網站、遊戲與官方伺服器如何處理個人資料，你的權利，以及官方伺服器的規則。"
     }
   },
   "brand": {
@@ -37,16 +41,15 @@
   },
   "hero": {
     "image_alt": "在灑滿陽光的大理石大廳裡，兩個瓷製機器人在胡桃木桌前下西洋棋。",
-    "eyebrow": "公開測試版",
     "lead": "在灑滿陽光的皇家大廳裡，於上蠟的胡桃木桌前入座。棋盤對面，一個由 Stockfish 驅動的瓷製機器人，正等著你走出第一步。",
     "watch": "觀看預告片",
-    "meta": "自由軟體 · Windows 64 位元 · 支援 OpenGL 4.6 的顯示卡",
-    "caption": "遊戲實機截圖：標題畫面"
+    "meta": "自由軟體 · Windows、Linux、macOS（實驗性） · 支援 OpenGL 4.6 的顯示卡",
+    "caption": "遊戲實機截圖：皇家大廳"
   },
   "highlights": {
     "engine": "自行開發的 OpenGL 4.6 引擎",
     "stockfish": "內建 Stockfish 19",
-    "rules": "FIDE 等級分",
+    "rules": "遵循 FIDE 規則",
     "online": "線上對局",
     "languages": "十種語言"
   },
@@ -56,11 +59,11 @@
     "lead": "Scacelith 找回了真實對局的一切：大廳、寂靜、棋鐘、注視著你的對手，還有棋賽的種種儀式。",
     "presence": {
       "title": "第一人稱視角",
-      "text": "你透過機器人的雙眼看見一切。環顧大廳、俯身靠近棋盤、抬頭望向對手，或瞄一眼身旁的對局記錄表。"
+      "text": "你透過機器人的雙眼看見一切：環顧大廳、俯身靠近棋盤、抬頭望向對手、瞄一眼自己的對局記錄表，或起身走到桌子的一端。"
     },
     "ritual": {
       "title": "比賽規則",
-      "text": "摸了哪顆棋子，就得走哪顆。你要親手按下棋鐘，才算走完一步。走出違例著法，裁判就會前來；第二次違例便判負。"
+      "text": "摸了哪顆棋子，就得走哪顆。你要親手按下棋鐘，才算走完一步。關閉「顯示合法著法」時，違例著法會受到裁判處罰；第二次違例便判負。"
     },
     "scoresheet": {
       "title": "親筆書寫",
@@ -68,11 +71,11 @@
     },
     "opponent": {
       "title": "旗鼓相當的對手",
-      "text": "Stockfish 19 配合你的程度出招，從新手（800）到棋力全開（3500）；每局結束後，都會依 FIDE 規則計算你的等級分。"
+      "text": "Stockfish 19 配合你的程度出招，從新手（800）到 Stockfish 滿級（3500）；每局結束後，都會依 FIDE 規則計算你的等級分。"
     },
     "engine": {
       "title": "為這款遊戲而生",
-      "text": "從零打造的引擎：基於物理的光照、大理石、上蠟的木材、瓷器與黃銅，穿窗而入的陽光，柔和的陰影與倒影。"
+      "text": "從零打造的引擎：基於物理的光照、大理石、上蠟的木材、瓷器與黃銅，穿窗而入的陽光，柔和的陰影與倒影。從「極低」到「極高」的畫質預設，能依你的顯示卡調整。"
     },
     "languages": {
       "title": "十種語言",
@@ -89,11 +92,19 @@
     },
     "coach": {
       "name": "教練",
-      "text": "一位老師坐在你對面，配合你的程度與你對弈，並為你講解整盤棋：威脅、好棋與失誤。從西洋棋規則一路到專家程度，搭配合成語音（英語發音，附中文字幕）。"
+      "text": "一位老師坐在你對面，配合你的程度與你對弈，並為你講解整盤棋：威脅、好棋與失誤，還會親手在棋盤上示範失誤的代價。從西洋棋規則一路到專家程度，搭配在你電腦上合成的語音（英語發音，附中文字幕）。"
+    },
+    "challenges": {
+      "name": "教練挑戰",
+      "text": "一組組簡短的局面練習，每組專練一項技能：一步殺到三步殺，捉雙、牽制等戰術，防守，以及對陣教練的基本殘局。只有在你要求時才給提示，每完成一組就會打上綠色的勾。"
+    },
+    "analysis": {
+      "name": "分析",
+      "text": "Stockfish 會分析你已儲存的對局、線上對局或任何 PGN：評估條、從妙著到漏著的關鍵著法標記、以箭頭標出的更佳著法，以及語音與字幕解說。你逐步瀏覽時，機器人會親手走出每一步。"
     },
     "online": {
       "name": "線上對局",
-      "text": "透過 Scacelith 伺服器與真人對手對弈：計分對局、自動配對、挑戰與私人對局。對手的機器人會即時重現對方的一舉一動。"
+      "text": "透過 Scacelith 伺服器與真人對手對弈：計分對局、自動配對、挑戰與私人對局；也能在兩台電腦之間直連對局。對手的機器人會即時重現對方的一舉一動。"
     },
     "watch": {
       "name": "觀看對局",
@@ -112,13 +123,25 @@
       "alt": "標題畫面：Scacelith 選單旁，兩個機器人正在大廳裡下西洋棋。",
       "caption": "標題畫面"
     },
+    "coach": {
+      "alt": "教練是一個胸前印有「COACH」字樣的瓷製機器人，正隔著棋盤向你問好；它說的話也會顯示為字幕。",
+      "caption": "教練"
+    },
+    "challenges": {
+      "alt": "「教練挑戰」選單：將死與戰術題組清單，標有難度和已完成的部分，旁邊是所選題組的說明。",
+      "caption": "教練挑戰"
+    },
+    "analysis": {
+      "alt": "分析模式：評估條、棋盤上畫出的箭頭、附註解的著法與雙方的準確度，以及操作方式清單。",
+      "caption": "分析"
+    },
+    "game": {
+      "alt": "從側面看，一個機器人把手伸過桌面去移動一枚棋子，另一個則在等待；被吃掉的棋子立在棋盤旁邊。",
+      "caption": "觀看對局"
+    },
     "hall": {
       "alt": "高窗之下，兩個機器人坐在紅色天鵝絨扶手椅上，隔著棋盤相對。",
       "caption": "皇家大廳"
-    },
-    "board": {
-      "alt": "從上方俯瞰的棋盤，旁邊是棋鐘，一隻機器人的手正伸向一顆棋子。",
-      "caption": "棋盤前"
     },
     "opponent": {
       "alt": "瓷製機器人對手的特寫，它正低頭望向棋盤。",
@@ -128,7 +151,7 @@
       "alt": "一隻機器人的手正用鋼筆在對局記錄表上寫下著法。",
       "caption": "對局記錄表"
     },
-    "note": "開發中版本。這些圖片中的介面為法文。",
+    "note": "版本 1.0.0。這些圖片中的介面為英文。",
     "viewer": "圖片檢視器",
     "close": "關閉",
     "previous": "上一張圖片",
@@ -137,10 +160,9 @@
   "trailer": {
     "eyebrow": "預告片",
     "title": "看 Scacelith <em>動起來</em>",
-    "play": "播放預告片",
     "soon_title": "預告片即將推出",
-    "soon_text": "在那之前，先入座吧：測試版已經可以下載。",
-    "privacy": "影片會在你按下播放後，由 YouTube（youtube-nocookie.com）播放。",
+    "soon_text": "在那之前，先入座吧：遊戲已經可以下載。",
+    "privacy": "在你同意使用其播放器之前，不會從 YouTube 載入任何內容。",
     "open_youtube": "在 YouTube 上觀看"
   },
   "online": {
@@ -148,10 +170,10 @@
     "title": "真實的對手，<br><em>同一座大廳。</em>",
     "lead": "在遊戲中登入官方伺服器，與來自世界各地的棋手對弈，依然是第一人稱視角。",
     "point_rated": "每個官方時限都有計分對局，各自擁有依 FIDE 規則計算的等級分。",
-    "point_match": "自動配對、指名挑戰、憑代碼加入的私人對局，以及兩台電腦之間的直連對局。",
+    "point_match": "自動配對、指名挑戰、憑代碼加入的私人對局；或是兩台電腦之間的直連對局，不需伺服器或帳號。",
     "point_fair": "公平對弈：自動檢查、以引擎分析已結束的對局，以及棋手檢舉。",
     "point_history": "在本網站查看你的對局紀錄：每一局都能以 PGN 或 GIF 動畫下載。",
-    "point_open": "任何人都能架設社群伺服器：伺服器及其 API 都是自由軟體。",
+    "point_open": "任何人都能架設社群伺服器：伺服器是自由軟體，其 API 也有公開文件。",
     "create": "建立帳號",
     "signin": "登入",
     "server_title": "官方伺服器",
@@ -170,19 +192,22 @@
     "see_release": "在 GitHub 上查看此版本",
     "latest": "Scacelith",
     "all_releases": "所有版本",
+    "experimental": "實驗性",
+    "source": "原始碼",
+    "source_zip": "ZIP 壓縮檔",
     "eyebrow": "下載",
     "title": "請入座。<br><em>免費，而且開放原始碼。</em>",
-    "lead": "免安裝：下載、解壓縮後執行 Scacelith.exe 即可。每個檔案都由 GitHub Actions 從標記版本的原始碼建置，並附有經認證的建置來源證明。",
-    "prerelease": "測試版",
+    "lead": "解壓縮就能玩：Windows 與 Linux 免安裝，Mac 上只要拖到「應用程式」檔案夾。每個檔案都由 GitHub Actions 從標記版本的原始碼建置，並附有經認證的建置來源證明。",
     "notes": "版本資訊",
+    "macos_note": "適用於搭載 Apple Silicon（M1 或後續晶片）、執行 macOS 26 或以上版本的 Mac，不支援在虛擬機器中執行；此版本比其他版本更新，測試也較少。此 App 未經已註冊的 Apple 開發者簽署：第一次開啟時，請前往「系統設定 › 隱私權與安全性 › 強制打開」。",
     "req_system": "系統",
-    "req_system_value": "Windows 64 位元（x64）",
+    "req_system_value": "Windows 64 位元（x64）；Linux 64 位元（x86-64 或 aarch64），需具備 glibc 2.34、OpenSSL 3 以及 X11 或 XWayland，例如 Ubuntu 22.04 或 Debian 12；Apple Silicon 上的 macOS 26 或以上版本（實驗性）",
     "req_gpu": "顯示卡",
-    "req_gpu_value": "支援 OpenGL 4.6 的顯示卡，並安裝最新的驅動程式",
+    "req_gpu_value": "支援 OpenGL 4.6 的顯示卡，並安裝最新的驅動程式（在 Mac 上，遊戲自帶 OpenGL）",
     "req_included": "內含",
     "req_included_value": "Stockfish 19 及其神經網路：馬上就能離線對弈",
     "req_network": "網路",
-    "req_network_value": "用於線上對局、GIF 與教練語音（選擇性下載，約 145 MB）",
+    "req_network_value": "用於線上對局、GIF，以及教練與分析的語音（選擇性下載，約 399 MB）",
     "req_licence": "授權",
     "req_licence_value": "GNU 通用公共授權條款第 3 版",
     "verify_title": "驗證下載的檔案",
@@ -194,12 +219,12 @@
     "title": "製作群與<em>致謝</em>",
     "engine_head": "西洋棋引擎",
     "engine": "Stockfish 19，由 Stockfish 開發者製作（GNU GPL v3）。其神經網路使用 Leela Chess Zero 專案依開放資料庫授權條款（ODbL）提供的資料訓練。",
-    "voice_head": "教練語音",
-    "voice": "教練模式的合成語音由 Supertonic 3 生成。Supertonic 3 是 Supertone 公司的模型，依 OpenRAIL-M 授權條款使用。",
+    "voice_head": "語音",
+    "voice": "Supertone 的 Supertonic 3，依 BigScience Open RAIL-M 授權條款使用：應你的要求下載後，在你的電腦上為教練與分析發聲。",
     "fonts_head": "字型",
-    "fonts": "EB Garamond 由 Georg Duffner 設計，Cinzel 由 Natanael Gama 設計，Amiri 由 Khaled Hosny 設計（皆採 SIL Open Font License）；棋子符號來自 GNU FreeFont。",
-    "openings_head": "開局",
-    "openings": "開局名稱取自 lichess.org 的 chess-openings 資料庫，已貢獻至公有領域（CC0）。",
+    "fonts": "EB Garamond 由 Georg Duffner 設計，Cinzel 由 Natanael Gama 設計，Amiri 由 Khaled Hosny 設計；手寫字型為 Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One 與 LXGW WenKai（皆採 SIL Open Font License）；棋子符號來自 GNU FreeFont。",
+    "openings_head": "開局與謎題",
+    "openings": "開局名稱取自 lichess.org 的 chess-openings 資料庫，教練挑戰的謎題則取自 Lichess 謎題資料庫，兩者皆已貢獻至公有領域（CC0）。",
     "quote": "「西洋棋是分析的藝術。」",
     "quote_author": "米哈伊爾·鮑特溫尼克"
   },
@@ -213,9 +238,10 @@
     "server_source": "GitHub 上的伺服器",
     "releases": "版本發布",
     "licence": "授權條款（GPL v3）",
-    "credits": "Stockfish 是其開發者的商標。YouTube 是 Google LLC 的商標。Windows 是 Microsoft Corporation 的商標。",
+    "credits": "Stockfish 是其開發者的商標。YouTube 是 Google LLC 的商標。Windows 是 Microsoft Corporation 的商標。macOS 是 Apple Inc. 的商標。Linux 是 Linus Torvalds 的註冊商標。OpenGL 是 Hewlett Packard Enterprise 的註冊商標。",
     "legal": "Scacelith",
-    "made": "本網站不使用 Cookie，也不使用任何追蹤器。"
+    "made": "本網站不設定 Cookie，也不使用任何追蹤器；只有在你同意後才會載入 YouTube 播放器。",
+    "legal_link": "法律聲明、隱私權與條款"
   },
   "common": {
     "copy": "複製",
@@ -294,7 +320,9 @@
       "done_title": "請查看你的電子郵件",
       "done_text": "我們已將確認連結寄到你的信箱。請開啟連結以建立帳號，然後再登入。",
       "done_hint": "連結的有效期限為 24 小時。收件匣裡沒有看到？請檢查垃圾郵件匣，或要求重新寄送。",
-      "go_signin": "前往登入"
+      "go_signin": "前往登入",
+      "legal_note": "你的使用者名稱、等級分與對局將會公開。建立帳號即表示你接受使用條款。",
+      "legal_link": "隱私權與使用條款"
     },
     "forgot": {
       "title": "忘記密碼",
@@ -471,22 +499,28 @@
     "download": {
       "exe": "執行檔",
       "zip": "ZIP 壓縮檔",
+      "dmg": "磁碟映像檔",
+      "archive": "壓縮檔",
       "file": "檔案",
       "unavailable": "尚未提供",
       "your_system": "你的系統",
-      "eyebrow_beta": "公開測試版 · {version}",
       "eyebrow_release": "版本 {version}",
       "published": "{date}發布",
       "unreachable": "目前無法連線到 GitHub：請查看版本發布頁面。",
       "available": "可下載",
       "verify_file": "檔案",
       "no_build": "目前沒有適用於 {os} 的遊戲版本。",
-      "prerelease_short": "測試版",
-      "x64": "64 位元（x64）"
+      "x64": "64 位元（x64）",
+      "arch_x64": "Intel / AMD（x86-64）",
+      "arch_arm64": "Arm（aarch64）",
+      "several_arches": "64 位元，Intel / AMD 或 Arm",
+      "macos_arm64": "Apple Silicon，macOS 26 或以上版本",
+      "experimental": "實驗性"
     },
     "server": {
       "online": "線上",
       "offline": "無法連線",
+      "busy": "忙碌中",
       "open": "開放中",
       "closed": "已關閉",
       "updated": "最後更新：{time}",
@@ -546,6 +580,7 @@
         "11": "五十回合規則（提出要求）",
         "12": "協議和棋",
         "13": "第二次違例著法，但對方無法將死",
+        "14": "認輸，但對方無法將死",
         "20": "離開對局（斷線過久）",
         "21": "離開對局，但對方無法將死",
         "22": "對局中止",
@@ -666,7 +701,105 @@
       "signin": "登入"
     },
     "trailer": {
-      "title": "Scacelith 預告片"
+      "title": "Scacelith 預告片",
+      "notice": "此影片由 YouTube 代管。在此播放會載入 Google 的播放器：它會收到你的 IP 位址，並可能在你的裝置上儲存 Cookie 或其他追蹤器。",
+      "accept": "同意並播放",
+      "google_privacy": "Google 隱私權政策"
     }
+  },
+  "legal": {
+    "eyebrow": "法律資訊",
+    "title": "法律聲明、隱私權與使用條款",
+    "lead": "Scacelith 由誰發布及代管，你的資料在本網站、遊戲中與官方伺服器上會如何處理，以及在官方伺服器上對弈的規則。",
+    "updated": "最後更新：2026年10月11日",
+    "toc": "本頁內容",
+    "notice": {
+      "title": "法律聲明",
+      "publisher_label": "發布者",
+      "publisher": "Scacelith 由一名個人以非職業身分發布。經法國法律許可（2004 年 6 月 21 日第 2004-575 號法律第 1-1 條第 II 項），發布者的身分不在此公開；代管業者知悉其身分。",
+      "contact_label": "聯絡方式",
+      "contact": "可用於詢問與本網站、官方伺服器或你的資料有關的任何問題。",
+      "host_server": "官方遊戲伺服器與帳號資料",
+      "host_server_note": "伺服器位於法國。",
+      "host_site": "本網站與 API 文件（GitHub Pages）",
+      "host_domain": "網域名稱註冊商",
+      "licence_label": "授權",
+      "licence": "遊戲及其伺服器皆為採用 GNU 通用公共授權條款第 3 版的自由軟體，原始碼公開：",
+      "game_source": "遊戲",
+      "server_source": "伺服器",
+      "phone": "電話"
+    },
+    "privacy": {
+      "title": "隱私權",
+      "intro": "Scacelith 不顯示任何廣告、不販售任何資料，也不做流量統計。個人資料僅用於運作本網站與官方伺服器，詳見下文。資料控管者為發布者，可透過上方的聯絡信箱與其聯繫。",
+      "site_title": "在本網站上",
+      "site_hosting": "本網站由 GitHub 代管；如同所有網站代管業者，GitHub 會基於安全目的記錄訪客的 IP 位址。",
+      "github_privacy": "GitHub 隱私權聲明",
+      "site_requests": "為了顯示最新版本，你的瀏覽器會向 GitHub 的 API（api.github.com）發出要求；為了顯示伺服器狀態、排行榜、棋手與你的帳號，則會向官方伺服器（caissa.scacelith.com）發出要求。如同任何要求，兩者都會收到你的 IP 位址。",
+      "site_storage": "本網站不設定 Cookie，也不做流量統計。它只會在你的瀏覽器中保存你選擇的語言，以及你登入後的工作階段：僅限目前的分頁，或在你勾選「在此裝置上保持登入」時保存在此裝置上。使用 Google 登入時，還會在目前的分頁中保存一次性代碼，直到使用為止。這些都是網站運作所必需的，而只有官方伺服器會收到工作階段與這些代碼。",
+      "site_trailer": "預告片是一段 YouTube 影片。在你按下「同意並播放」之前，不會從 YouTube 載入任何內容；按下後，YouTube（Google）會收到你的 IP 位址，並可能在你的裝置上儲存 Cookie 或其他追蹤器。你的選擇不會被記住：下次造訪時會再次詢問。",
+      "site_google": "在你按下「帳號」頁面上的「使用 Google 帳戶登入」之前，不會從 Google 載入任何內容。按下後，你的瀏覽器會前往 Google 的登入頁面（accounts.google.com），接著 Google 會帶著一個一次性代碼將瀏覽器導回本網站，本網站再將該代碼交給官方伺服器。Google 會依其自身的政策，收到你的 IP 位址以及你在其頁面上輸入的內容。",
+      "google_privacy": "Google 隱私權政策",
+      "game_title": "在遊戲中",
+      "game_local": "遊戲會在你的電腦上保存其設定、你的本機戰績與你的登入狀態。登入狀態保存在系統的安全儲存區中：Windows 上為 DPAPI，macOS 上為鑰匙圈，Linux 上為 Secret Service 金鑰圈；若皆無法使用，則保存在一個只有你的系統使用者才能讀取的檔案中。",
+      "game_network": "遊戲不會自行傳送任何資料：沒有遙測，也不檢查更新。只有在你開啟「線上對局」頁面時，它才會連線到官方伺服器；只有在你下載教練語音時，才會連線到 Hugging Face；進行直連對局時，則會連線到對手的電腦，對手因此會得知你的 IP 位址（遊戲也可能透過 UPnP 在你的路由器上開啟連接埠）。",
+      "account_title": "你在官方伺服器上的帳號",
+      "account_intro": "在遊戲中或本網站上建立帳號，以及進行線上對局時，以下資料會傳送到由 OVH 在法國代管的官方伺服器：",
+      "data_account": "<strong>帳號：</strong>使用者名稱、電子郵件地址、密碼（僅以 Argon2id 雜湊值儲存）、雙重驗證金鑰（已加密）與復原碼（已雜湊）、註冊日期與上次登入日期。",
+      "data_google": "<strong>使用 Google 登入：</strong>Google 會傳送你的 Google 帳號識別碼、電子郵件地址與姓名。伺服器會保存識別碼與電子郵件地址，姓名僅用於建議使用者名稱。",
+      "data_sessions": "<strong>已登入的裝置：</strong>每次登入對應的裝置名稱（遊戲版本與系統，例如「Scacelith/1.0.0 win64」；在本網站上則為瀏覽器與系統）、IP 位址與使用日期。",
+      "data_games": "<strong>對局與等級分：</strong>每一局線上對局（棋手、著法、每步用時、結果、日期）以及你的等級分。對局期間，你的頭部與手部動作會即時轉送給對手，且絕不儲存。",
+      "data_security": "<strong>安全記錄：</strong>登入、失敗的嘗試與帳號變更，以及相應的 IP 位址。",
+      "data_fairplay": "<strong>公平對弈：</strong>你提出的或針對你的檢舉及其備註；放棄與錯過的對局；處分；以及對對局所做的檢查，從偽造或不可能的著法到 Stockfish 引擎的統計數據。",
+      "basis_title": "處理目的與法律依據",
+      "basis_contract": "運作你的帳號與線上對局（登入、配對、等級分、對局紀錄、服務寄出的電子郵件）：這是你註冊使用的服務（《一般資料保護規則》(GDPR) 第 6 條第 1 項 (b) 款）。",
+      "basis_security": "保護帳號與伺服器，並確保對局公平（安全記錄、IP 位址、公平對弈檢查、處分）：發布者與棋手的正當利益（GDPR 第 6 條第 1 項 (f) 款）。",
+      "basis_trailer": "從 YouTube 播放預告片：你透過按鈕表示的同意（GDPR 第 6 條第 1 項 (a) 款）。",
+      "public_title": "所有人都能看到的內容",
+      "public": "你的使用者名稱、註冊日期、等級分，以及包含每一步著法的完整對局列表都是公開的，可在本網站上、透過伺服器的 API，以及在每局對局的 PGN 中查看。你的電子郵件地址、裝置、登入記錄、處分與公平對弈檢查記錄絕不會顯示。你可以拒絕指名挑戰，但對局無法隱藏。",
+      "auto_title": "自動化決策",
+      "auto": "某些違反遊戲通訊協定的行為，例如偽造的訊息，或在當前局面下不可能走出的著法，是確鑿的作弊證據：此時伺服器會判相關帳號本局落敗，將其停權 24 小時並從排行榜中移除，同時把其對手在過去 60 天內輸給它的等級分退還給對手。24 小時內放棄、中止或錯過三局對局，會暫停計分配對 15 分鐘，之後暫停的時間會更長。僅憑引擎統計數據絕不會導致處分：須由人來決定。你可以透過聯絡信箱，要求重新審查任何決定。",
+      "recipients_title": "誰會收到你的資料",
+      "recipient_ovh": "OVH SAS 在法國代管伺服器及其資料。",
+      "recipient_scaleway": "Scaleway SAS（8 rue de la Ville-l'Évêque, 75008 Paris, France）負責寄送伺服器的電子郵件：它會收到你的電子郵件地址、使用者名稱與郵件內容。",
+      "recipient_google": "當你選擇使用 Google 登入時，Google 會收到你的瀏覽器傳送給它的內容，並適用 Google 自己的隱私權政策。",
+      "recipient_staff": "伺服器的管理員與審核人員會查看帳號資料與公平對弈資料，以營運本服務。",
+      "recipient_players": "其他棋手可以看到公開的內容；對局期間，你的對手會看到你的著法與動作。",
+      "recipient_none": "除此之外沒有其他人：任何資料都不會被出售、出租或用於廣告。",
+      "transfers": "帳號資料留存於法國。GitHub、Google 與 Porkbun（負責轉寄寄到聯絡信箱的郵件）位於美國：它們收到的資料，適用其自身的政策，以及它們為將資料傳輸至歐盟以外所採取的保障措施。",
+      "retention_title": "保存期限",
+      "ret_account": "<strong>帳號：</strong>保存至你將其刪除為止。電子郵件地址始終未經確認的註冊，會在 24 小時後刪除。",
+      "ret_sessions": "<strong>已登入的裝置：</strong>保存至你登出為止；閒置 30 天後刪除；最長保存 90 天。",
+      "ret_ip": "<strong>IP 位址：</strong>30 天後刪除。伺服器日誌只保留截短的位址。",
+      "ret_security": "<strong>安全記錄：</strong>90 天。",
+      "ret_conduct": "<strong>放棄與錯過的對局：</strong>30 天。",
+      "ret_games": "<strong>對局與等級分：</strong>伺服器保留對局紀錄多久，就保存多久；這些紀錄同時也是你對手的紀錄。你的帳號刪除後，其中你的名稱會改為「deleted#」加上一個編號。",
+      "ret_fairplay": "<strong>處分、檢舉與公平對弈檢查結果：</strong>予以保留，以免遭停權的棋手輕易捲土重來，並讓其他棋手持續受到保護。你的帳號刪除後，這些資料只會與該帳號的編號相關聯。",
+      "ret_backups": "<strong>備份：</strong>已刪除的資料可能會在伺服器的備份副本中短暫留存，直到該副本被取代。",
+      "ret_contact": "<strong>寄到聯絡信箱的郵件：</strong>保存至回覆所需的期間為止。",
+      "rights_title": "你的權利",
+      "rights": "你可以查閱、更正、刪除與匯出你的資料，限制其使用，或反對其使用（GDPR 第 15 條至第 21 條）。",
+      "rights_self": "其中大部分都能在你的帳號中自行完成，無論是在遊戲中還是在本網站的「帳號」頁面：將帳號資料下載為 JSON 檔案、變更電子郵件地址或密碼、登出其他裝置，或立即刪除帳號。",
+      "rights_google": "使用 Google 建立的帳號沒有密碼：若要匯出或刪除此帳號，請先透過「忘記密碼？」為它設定密碼。",
+      "rights_mail": "其他任何要求，包括匯出檔案中未包含的資料（公平對弈檢查、針對你的檢舉），請寫信至聯絡信箱。你會在一個月內收到回覆。",
+      "rights_cnil": "如果你認為自己的權利未獲尊重，可以向 CNIL（3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France）或你所在國家的資料保護機關提出申訴。",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "使用條款",
+      "intro": "本條款適用於官方伺服器（caissa.scacelith.com）及本網站的帳號頁面。建立帳號或在官方伺服器上對弈，即表示你接受本條款。",
+      "service": "<strong>免費服務。</strong>本遊戲是免費的自由軟體。官方伺服器免費並依現狀提供，不保證可用性：它可能會變動、暫時中斷或關閉。",
+      "account": "<strong>你的帳號。</strong>你須為帳號的使用情形及其密碼的保密負責。如果你認為有他人在使用你的帳號，請立即寫信至聯絡信箱。",
+      "username": "<strong>你的使用者名稱</strong>是公開的：不得帶有侮辱或仇恨意味，不得冒用他人身分，也不得洩露任何人的個人資料。",
+      "fair": "<strong>公平對弈。</strong>在計分對局中，不得藉助西洋棋引擎、他人或任何其他工具。不得使用修改過的遊戲用戶端、偽造訊息，或蓄意讓伺服器超載。",
+      "conduct": "<strong>下完你的對局。</strong>24 小時內累計三次放棄或中止對局，或錯過為你配對的對局，計分配對將暫停一段時間。",
+      "reports": "<strong>檢舉</strong>必須出於善意。如需檢舉某位棋手或違法內容（例如侮辱性的使用者名稱），請使用對局中的「檢舉對手」按鈕，或寫信至聯絡信箱。",
+      "sanctions": "<strong>處分。</strong>違反這些規則可能導致判負、警告、停權以及從排行榜中移除；輸給作弊者的等級分會退還給其對手。只有確鑿的作弊證據才會自動處分；其他一切皆由人來決定。你可以透過聯絡信箱對處分提出申訴。",
+      "liability": "<strong>責任。</strong>在法律允許的範圍內，發布者不對服務中斷，或對局、等級分、資料的遺失負責。",
+      "end": "<strong>終止。</strong>你可以隨時刪除你的帳號。違反本條款的帳號可能會遭停權。",
+      "changes": "<strong>變更。</strong>本條款可能會變更；本頁頂端的日期代表目前的版本，變更後繼續對弈，即表示你接受該變更。",
+      "law": "<strong>適用法律。</strong>本條款受法國法律管轄。如發生爭議，請先寫信至聯絡信箱，共同尋求解決之道。"
+    },
+    "version_note": "本頁面提供多種語言版本；若各版本內容有所出入，以法文版本為準。"
   }
 }
