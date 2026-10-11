@@ -1,5 +1,5 @@
 # Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
-# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as the README's
+# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as docs/DEVELOPMENT.md's
 # "Building" section describes; on Linux aarch64; on macOS (Apple Silicon, experimental) with its
 # app and disk image; the contract with the dedicated server pinned in
 # tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
