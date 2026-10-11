@@ -1,0 +1,141 @@
+<section class="page-head page-head-compact" aria-labelledby="page-title">
+  <div class="page-head-media" aria-hidden="true"></div>
+  <div class="shell">
+    <p class="eyebrow"><span class="diamond" aria-hidden="true"></span>{{t:legal.eyebrow}}</p>
+    <h1 class="page-title" id="page-title">{{t:legal.title}}</h1>
+    <p class="page-lead">{{t:legal.lead}}</p>
+    <p class="legal-updated">{{t:legal.updated}}</p>
+  </div>
+</section>
+
+<div class="shell page-body legal-body">
+  <nav class="legal-toc" aria-label="{{t:legal.toc}}">
+    <a href="#notice">{{t:legal.notice.title}}</a>
+    <a href="#privacy">{{t:legal.privacy.title}}</a>
+    <a href="#terms">{{t:legal.terms.title}}</a>
+  </nav>
+
+  <article class="legal">
+    <section id="notice" aria-labelledby="notice-title">
+      <h2 class="legal-title" id="notice-title">{{t:legal.notice.title}}</h2>
+      <dl class="legal-facts">
+        <div>
+          <dt>{{t:legal.notice.publisher_label}}</dt>
+          <dd>{{t:legal.notice.publisher}}</dd>
+        </div>
+        <div>
+          <dt>{{t:legal.notice.contact_label}}</dt>
+          <dd><a href="mailto:{{v:contact}}"><bdi dir="ltr">{{v:contact}}</bdi></a><br>{{t:legal.notice.contact}}</dd>
+        </div>
+        <div>
+          <dt>{{t:legal.notice.host_server}}</dt>
+          <dd><strong>OVH SAS</strong><br><bdi dir="ltr">2 rue Kellermann, 59100 Roubaix, France</bdi><br>{{t:legal.notice.phone}} <bdi dir="ltr">+33 9 72 10 10 07</bdi> · <a href="https://www.ovhcloud.com/" rel="noopener">ovhcloud.com</a><br>{{t:legal.notice.host_server_note}}</dd>
+        </div>
+        <div>
+          <dt>{{t:legal.notice.host_site}}</dt>
+          <dd><strong>GitHub, Inc.</strong><br><bdi dir="ltr">88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States</bdi><br>{{t:legal.notice.phone}} <bdi dir="ltr">+1 877 448 4820</bdi> · <a href="https://github.com/" rel="noopener">github.com</a></dd>
+        </div>
+        <div>
+          <dt>{{t:legal.notice.host_domain}}</dt>
+          <dd><strong>Porkbun LLC</strong><br><bdi dir="ltr">21370 SW Langer Farms Parkway, Suite 142-429, Sherwood, OR 97140, United States</bdi><br>{{t:legal.notice.phone}} <bdi dir="ltr">+1 855 767 5286</bdi> · <a href="https://porkbun.com/" rel="noopener">porkbun.com</a></dd>
+        </div>
+        <div>
+          <dt>{{t:legal.notice.licence_label}}</dt>
+          <dd>{{t:legal.notice.licence}} <a href="{{v:repo_url}}" rel="noopener">{{t:legal.notice.game_source}}</a>, <a href="{{v:server_repo_url}}" rel="noopener">{{t:legal.notice.server_source}}</a>.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section id="privacy" aria-labelledby="privacy-title">
+      <h2 class="legal-title" id="privacy-title">{{t:legal.privacy.title}}</h2>
+      <p>{{t:legal.privacy.intro}}</p>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.site_title}}</h3>
+      <ul class="legal-list">
+        <li>{{t:legal.privacy.site_hosting}} <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">{{t:legal.privacy.github_privacy}}</a></li>
+        <li>{{t:legal.privacy.site_requests}}</li>
+        <li>{{t:legal.privacy.site_storage}}</li>
+        <li>{{t:legal.privacy.site_trailer}} <a href="https://policies.google.com/privacy" rel="noopener">{{t:legal.privacy.google_privacy}}</a></li>
+      </ul>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.game_title}}</h3>
+      <p>{{t:legal.privacy.game_local}}</p>
+      <p>{{t:legal.privacy.game_network}}</p>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.account_title}}</h3>
+      <p>{{t:legal.privacy.account_intro}}</p>
+      <ul class="legal-list">
+        <li>{{h:legal.privacy.data_account}}</li>
+        <li>{{h:legal.privacy.data_google}}</li>
+        <li>{{h:legal.privacy.data_sessions}}</li>
+        <li>{{h:legal.privacy.data_games}}</li>
+        <li>{{h:legal.privacy.data_security}}</li>
+        <li>{{h:legal.privacy.data_fairplay}}</li>
+      </ul>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.basis_title}}</h3>
+      <ul class="legal-list">
+        <li>{{t:legal.privacy.basis_contract}}</li>
+        <li>{{t:legal.privacy.basis_security}}</li>
+        <li>{{t:legal.privacy.basis_trailer}}</li>
+      </ul>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.public_title}}</h3>
+      <p>{{t:legal.privacy.public}}</p>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.auto_title}}</h3>
+      <p>{{t:legal.privacy.auto}}</p>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.recipients_title}}</h3>
+      <ul class="legal-list">
+        <li>{{t:legal.privacy.recipient_ovh}}</li>
+        <li>{{t:legal.privacy.recipient_scaleway}}</li>
+        <li>{{t:legal.privacy.recipient_google}}</li>
+        <li>{{t:legal.privacy.recipient_staff}}</li>
+        <li>{{t:legal.privacy.recipient_players}}</li>
+        <li>{{t:legal.privacy.recipient_none}}</li>
+      </ul>
+      <p>{{t:legal.privacy.transfers}}</p>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.retention_title}}</h3>
+      <ul class="legal-list">
+        <li>{{h:legal.privacy.ret_account}}</li>
+        <li>{{h:legal.privacy.ret_sessions}}</li>
+        <li>{{h:legal.privacy.ret_ip}}</li>
+        <li>{{h:legal.privacy.ret_security}}</li>
+        <li>{{h:legal.privacy.ret_conduct}}</li>
+        <li>{{h:legal.privacy.ret_games}}</li>
+        <li>{{h:legal.privacy.ret_fairplay}}</li>
+        <li>{{h:legal.privacy.ret_backups}}</li>
+        <li>{{h:legal.privacy.ret_contact}}</li>
+      </ul>
+
+      <h3 class="legal-subtitle">{{t:legal.privacy.rights_title}}</h3>
+      <p>{{t:legal.privacy.rights}}</p>
+      <p>{{t:legal.privacy.rights_self}} <a href="{{v:home}}account/">{{t:nav.account}}</a></p>
+      <p>{{t:legal.privacy.rights_google}}</p>
+      <p>{{t:legal.privacy.rights_mail}} <a href="mailto:{{v:contact}}"><bdi dir="ltr">{{v:contact}}</bdi></a></p>
+      <p>{{t:legal.privacy.rights_cnil}} <a href="https://www.cnil.fr/" rel="noopener">{{t:legal.privacy.cnil_link}}</a></p>
+    </section>
+
+    <section id="terms" aria-labelledby="terms-title">
+      <h2 class="legal-title" id="terms-title">{{t:legal.terms.title}}</h2>
+      <p>{{t:legal.terms.intro}}</p>
+      <ul class="legal-list">
+        <li>{{h:legal.terms.service}}</li>
+        <li>{{h:legal.terms.account}}</li>
+        <li>{{h:legal.terms.username}}</li>
+        <li>{{h:legal.terms.fair}}</li>
+        <li>{{h:legal.terms.conduct}}</li>
+        <li>{{h:legal.terms.reports}}</li>
+        <li>{{h:legal.terms.sanctions}}</li>
+        <li>{{h:legal.terms.liability}}</li>
+        <li>{{h:legal.terms.end}}</li>
+        <li>{{h:legal.terms.changes}}</li>
+        <li>{{h:legal.terms.law}}</li>
+      </ul>
+    </section>
+
+    <p class="legal-version">{{t:legal.version_note}}</p>
+  </article>
+</div>

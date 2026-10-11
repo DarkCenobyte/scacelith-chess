@@ -15,6 +15,10 @@
     "gif": {
       "title": "GIF animé — Scacelith",
       "description": "Un GIF animé d’une partie de Scacelith."
+    },
+    "legal": {
+      "title": "Mentions légales, confidentialité et conditions d’utilisation — Scacelith",
+      "description": "Qui édite et héberge Scacelith, ce que le site, le jeu et le serveur officiel font des données personnelles, vos droits et les règles du serveur officiel."
     }
   },
   "brand": {
@@ -224,7 +228,8 @@
     "licence": "Licence (GPL v3)",
     "credits": "Stockfish est une marque de ses développeurs. YouTube est une marque de Google LLC. Windows est une marque de Microsoft Corporation. macOS est une marque d’Apple Inc. Linux est la marque déposée de Linus Torvalds. OpenGL est une marque déposée de Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "Ce site ne dépose aucun cookie et n’utilise aucun traceur ; le lecteur YouTube ne se charge que si vous l’acceptez."
+    "made": "Ce site ne dépose aucun cookie et n’utilise aucun traceur ; le lecteur YouTube ne se charge que si vous l’acceptez.",
+    "legal_link": "Mentions légales, confidentialité et conditions"
   },
   "common": {
     "copy": "Copier",
@@ -293,7 +298,9 @@
       "done_title": "Consultez vos e-mails",
       "done_text": "Nous avons envoyé un lien de confirmation à votre adresse. Ouvrez-le pour créer votre compte, puis connectez-vous.",
       "done_hint": "Le lien est valable 24 heures. Rien dans votre boîte de réception ? Regardez dans vos indésirables, ou demandez un nouvel e-mail.",
-      "go_signin": "Aller à la connexion"
+      "go_signin": "Aller à la connexion",
+      "legal_note": "Votre pseudo, vos classements et vos parties seront publics. En créant un compte, vous acceptez les conditions d’utilisation.",
+      "legal_link": "Confidentialité et conditions d’utilisation"
     },
     "forgot": {
       "title": "Mot de passe oublié",
@@ -671,5 +678,99 @@
       "accept": "Accepter et lire",
       "google_privacy": "Règles de confidentialité de Google"
     }
+  },
+  "legal": {
+    "eyebrow": "Informations légales",
+    "title": "Mentions légales, confidentialité et conditions d’utilisation",
+    "lead": "Qui édite et héberge Scacelith, ce que deviennent vos données sur ce site, dans le jeu et sur le serveur officiel, et les règles pour y jouer.",
+    "updated": "Dernière mise à jour : 11 octobre 2026",
+    "toc": "Sur cette page",
+    "notice": {
+      "title": "Mentions légales",
+      "publisher_label": "Éditeur",
+      "publisher": "Scacelith est édité par un particulier, à titre non professionnel. Comme la loi le permet (article 1-1 II de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l’économie numérique), l’identité de l’éditeur n’est pas publiée ici ; elle est connue de l’hébergeur.",
+      "contact_label": "Contact",
+      "contact": "Pour toute question sur ce site, le serveur officiel ou vos données.",
+      "host_server": "Serveur de jeu officiel et données des comptes",
+      "host_server_note": "Serveurs situés en France.",
+      "host_site": "Ce site et la documentation de l’API (GitHub Pages)",
+      "host_domain": "Bureau d’enregistrement du nom de domaine",
+      "licence_label": "Licence",
+      "licence": "Le jeu et son serveur sont des logiciels libres sous licence publique générale GNU v3, au code source public :",
+      "game_source": "le jeu",
+      "server_source": "le serveur",
+      "phone": "Tél."
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "intro": "Scacelith n’affiche aucune publicité, ne vend aucune donnée et ne mesure pas son audience. Les données personnelles servent uniquement à faire fonctionner ce site et le serveur officiel, comme décrit ci-dessous. Le responsable du traitement est l’éditeur, joignable à l’adresse de contact ci-dessus.",
+      "site_title": "Sur ce site",
+      "site_hosting": "GitHub héberge le site et, comme tout hébergeur web, enregistre l’adresse IP des visiteurs à des fins de sécurité.",
+      "github_privacy": "Déclaration de confidentialité de GitHub",
+      "site_requests": "Pour afficher la dernière version, votre navigateur interroge l’API de GitHub (api.github.com) ; pour afficher l’état du serveur, le classement, les joueurs et votre compte, il interroge le serveur officiel (caissa.scacelith.com). Tous deux reçoivent votre adresse IP, comme pour toute requête.",
+      "site_storage": "Le site ne dépose aucun cookie et ne mesure pas l’audience. Il ne garde dans votre navigateur que la langue choisie et, une fois connecté, votre session : pour l’onglet en cours seulement, ou sur cet appareil si vous cochez « Rester connecté sur cet appareil ». Les deux sont nécessaires au fonctionnement du site, et la session n’est envoyée qu’au serveur officiel.",
+      "site_trailer": "La bande-annonce est une vidéo YouTube. Rien n’est chargé depuis YouTube avant que vous appuyiez sur « Accepter et lire » ; YouTube (Google) reçoit alors votre adresse IP et peut déposer des cookies ou d’autres traceurs sur votre appareil. Votre réponse n’est pas mémorisée : la question revient à votre prochaine visite.",
+      "google_privacy": "Règles de confidentialité de Google",
+      "game_title": "Dans le jeu",
+      "game_local": "Le jeu garde ses réglages, vos résultats locaux et votre connexion sur votre ordinateur. La connexion est conservée dans le coffre sécurisé du système : DPAPI sous Windows, le Trousseau sous macOS, le trousseau Secret Service sous Linux, ou à défaut un fichier que seul votre compte utilisateur peut lire.",
+      "game_network": "Il n’envoie rien de lui-même : ni télémétrie, ni recherche de mise à jour. Il se connecte au serveur officiel seulement quand vous ouvrez la page en ligne, à Hugging Face seulement quand vous téléchargez la voix du coach et, pour une partie directe, à l’ordinateur de votre adversaire, qui connaît alors votre adresse IP (le jeu peut aussi ouvrir un port sur votre box avec UPnP).",
+      "account_title": "Votre compte sur le serveur officiel",
+      "account_intro": "Créer un compte, dans le jeu ou sur ce site, et jouer en ligne envoient les données suivantes au serveur officiel, hébergé par OVH en France :",
+      "data_account": "<strong>Compte :</strong> pseudo, adresse e-mail, mot de passe (conservé uniquement sous forme d’empreinte Argon2id), secret de la validation en deux étapes (chiffré) et codes de secours (sous forme d’empreintes), date d’inscription et date de dernière connexion.",
+      "data_google": "<strong>Connexion avec Google :</strong> Google transmet l’identifiant de votre compte Google, votre adresse e-mail et votre nom. Le serveur garde l’identifiant et l’adresse, et n’utilise le nom que pour proposer un pseudo.",
+      "data_sessions": "<strong>Appareils connectés :</strong> pour chaque connexion, le nom de l’appareil (la version du jeu et le système, par exemple « Scacelith/1.0.0 win64 », ou le navigateur et le système pour ce site), l’adresse IP et les dates d’utilisation.",
+      "data_games": "<strong>Parties et classements :</strong> chaque partie en ligne (joueurs, coups, temps passé sur chaque coup, résultat, dates) et vos classements. Pendant une partie, les mouvements de votre tête et de votre main sont relayés en direct à votre adversaire et jamais conservés.",
+      "data_security": "<strong>Journal de sécurité :</strong> connexions, tentatives échouées et modifications du compte, avec l’adresse IP.",
+      "data_fairplay": "<strong>Jeu loyal :</strong> signalements faits par vous ou à votre sujet, avec leur commentaire ; parties abandonnées ou manquées ; sanctions ; et contrôles des parties, des coups falsifiés ou impossibles jusqu’aux statistiques du moteur Stockfish.",
+      "basis_title": "Pourquoi, et sur quelle base légale",
+      "basis_contract": "Faire fonctionner votre compte et le jeu en ligne (connexion, appariements, classements, historique des parties, e-mails envoyés par le service) : c’est le service auquel vous vous inscrivez (article 6.1.b du RGPD).",
+      "basis_security": "Protéger les comptes et le serveur, et garantir des parties loyales (journal de sécurité, adresses IP, contrôles, sanctions) : l’intérêt légitime de l’éditeur et des joueurs (article 6.1.f du RGPD).",
+      "basis_trailer": "Lire la bande-annonce depuis YouTube : votre consentement, donné avec le bouton (article 6.1.a du RGPD).",
+      "public_title": "Ce que tout le monde peut voir",
+      "public": "Votre pseudo, votre date d’inscription, vos classements et la liste complète de vos parties, coup par coup, sont publics : sur ce site, par l’API du serveur et dans le PGN de chaque partie. Votre adresse e-mail, vos appareils, vos connexions, vos sanctions et les contrôles de jeu loyal ne sont jamais affichés. Vous pouvez refuser les défis directs, mais les parties ne peuvent pas être masquées.",
+      "auto_title": "Décisions automatiques",
+      "auto": "Certaines violations du protocole du jeu, comme un message falsifié ou un coup impossible dans la position, sont une preuve certaine de triche : le serveur donne alors la partie perdue, bannit le compte pendant 24 heures, le retire du classement et rend à ses adversaires les points perdus contre lui au cours des 60 derniers jours. Trois parties abandonnées, annulées ou manquées en 24 heures suspendent les appariements classés pendant 15 minutes, puis plus longtemps. Les statistiques du moteur n’entraînent jamais de sanction à elles seules : une personne décide. Vous pouvez demander le réexamen de toute décision à l’adresse de contact.",
+      "recipients_title": "Qui reçoit vos données",
+      "recipient_ovh": "OVH SAS héberge le serveur et ses données, en France.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l’Évêque, 75008 Paris, France) envoie les e-mails du serveur : elle reçoit votre adresse, votre pseudo et le message.",
+      "recipient_google": "Google reçoit ce que votre navigateur lui envoie quand vous choisissez de vous connecter avec Google, selon ses propres règles de confidentialité.",
+      "recipient_staff": "L’administrateur et les modérateurs du serveur voient les données des comptes et de jeu loyal pour faire fonctionner le service.",
+      "recipient_players": "Les autres joueurs voient ce qui est public, et votre adversaire voit vos coups et vos mouvements pendant une partie.",
+      "recipient_none": "Personne d’autre : aucune donnée n’est vendue, louée ni utilisée à des fins publicitaires.",
+      "transfers": "Les données des comptes restent en France. GitHub, Google et Porkbun (qui transfère les messages envoyés à l’adresse de contact) sont établis aux États-Unis : ce qu’ils reçoivent relève de leurs propres règles et de leurs garanties pour les transferts hors de l’Union européenne.",
+      "retention_title": "Durées de conservation",
+      "ret_account": "<strong>Compte :</strong> jusqu’à sa suppression par vous. Une inscription dont l’adresse n’est jamais confirmée est supprimée au bout de 24 heures.",
+      "ret_sessions": "<strong>Appareils connectés :</strong> jusqu’à la déconnexion, après 30 jours sans utilisation, et au plus 90 jours.",
+      "ret_ip": "<strong>Adresses IP :</strong> effacées au bout de 30 jours. Les journaux du serveur ne gardent que des adresses tronquées.",
+      "ret_security": "<strong>Journal de sécurité :</strong> 90 jours.",
+      "ret_conduct": "<strong>Parties abandonnées ou manquées :</strong> 30 jours.",
+      "ret_games": "<strong>Parties et classements :</strong> aussi longtemps que le serveur conserve l’historique des parties, qui est aussi celui de vos adversaires. Après la suppression de votre compte, votre nom y est remplacé par « deleted# » suivi d’un numéro.",
+      "ret_fairplay": "<strong>Sanctions, signalements et résultats des contrôles :</strong> conservés, pour qu’un joueur banni ne puisse pas simplement revenir et que les autres joueurs restent protégés. Après la suppression de votre compte, ils ne sont plus liés qu’à son numéro.",
+      "ret_backups": "<strong>Sauvegardes :</strong> une donnée supprimée peut subsister peu de temps dans la copie de sauvegarde du serveur, jusqu’à son remplacement.",
+      "ret_contact": "<strong>Messages envoyés à l’adresse de contact :</strong> le temps nécessaire pour y répondre.",
+      "rights_title": "Vos droits",
+      "rights": "Vous pouvez accéder à vos données, les rectifier, les effacer et les exporter, en limiter l’utilisation et vous y opposer (articles 15 à 21 du RGPD).",
+      "rights_self": "L’essentiel se fait depuis votre compte, dans le jeu ou sur la page Compte de ce site : télécharger les données de votre compte dans un fichier JSON, changer votre adresse e-mail ou votre mot de passe, déconnecter vos autres appareils, ou supprimer le compte immédiatement.",
+      "rights_google": "Un compte créé avec Google n’a pas de mot de passe : pour l’exporter ou le supprimer, donnez-lui d’abord un mot de passe avec « Mot de passe oublié ? ».",
+      "rights_mail": "Pour tout le reste, y compris les données que l’export ne contient pas (contrôles de jeu loyal, signalements vous concernant), écrivez à l’adresse de contact. Vous recevrez une réponse sous un mois.",
+      "rights_cnil": "Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07) ou à l’autorité de protection des données de votre pays.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "intro": "Ces conditions s’appliquent au serveur officiel (caissa.scacelith.com) et aux pages de compte de ce site. Créer un compte ou jouer sur le serveur officiel vaut acceptation de ces conditions.",
+      "service": "<strong>Un service gratuit.</strong> Le jeu est un logiciel libre et gratuit. Le serveur officiel est proposé gratuitement et en l’état, sans garantie de disponibilité : il peut évoluer, s’interrompre un temps ou fermer.",
+      "account": "<strong>Votre compte.</strong> Vous êtes responsable de son utilisation et de la confidentialité de son mot de passe. Écrivez sans attendre à l’adresse de contact si vous pensez que quelqu’un d’autre l’utilise.",
+      "username": "<strong>Votre pseudo</strong> est public : il ne doit être ni injurieux ni haineux, ni usurper l’identité de quelqu’un, ni révéler les données personnelles de qui que ce soit.",
+      "fair": "<strong>Jeu loyal.</strong> Pendant une partie classée, aucune aide d’un moteur d’échecs, d’une autre personne ou de tout autre outil. Pas de client de jeu modifié, de messages falsifiés ni de surcharge volontaire du serveur.",
+      "conduct": "<strong>Finissez vos parties.</strong> Abandonner ou annuler des parties, ou manquer des parties pour lesquelles vous avez été apparié, trois fois en 24 heures suspend un temps les appariements classés.",
+      "reports": "<strong>Les signalements</strong> doivent être faits de bonne foi. Pour signaler un joueur ou un contenu illicite, comme un pseudo injurieux, utilisez le bouton de signalement d’une partie ou écrivez à l’adresse de contact.",
+      "sanctions": "<strong>Sanctions.</strong> Enfreindre ces règles peut entraîner une partie perdue, un avertissement, un bannissement et le retrait du classement ; les points perdus contre un tricheur sont rendus à ses adversaires. Seule une preuve certaine de triche est sanctionnée automatiquement ; tout le reste est décidé par une personne. Vous pouvez contester une sanction à l’adresse de contact.",
+      "liability": "<strong>Responsabilité.</strong> Dans les limites permises par la loi, l’éditeur n’est pas responsable des interruptions du service ni de la perte de parties, de classements ou de données.",
+      "end": "<strong>Fin.</strong> Vous pouvez supprimer votre compte à tout moment. Un compte qui enfreint ces conditions peut être banni.",
+      "changes": "<strong>Modifications.</strong> Ces conditions peuvent évoluer ; la date en haut de cette page indique la version en vigueur, et continuer à jouer après une modification vaut acceptation.",
+      "law": "<strong>Droit applicable.</strong> Ces conditions sont régies par le droit français. En cas de litige, écrivez d’abord à l’adresse de contact pour trouver ensemble une solution."
+    },
+    "version_note": "Cette page existe en plusieurs langues ; en cas de différence, la version française fait foi."
   }
 }

@@ -120,6 +120,12 @@
       "path": "gif/",
       "template": "gif.html",
       "index": false
+    },
+    {
+      "key": "legal",
+      "path": "legal/",
+      "template": "legal.html",
+      "index": true
     }
   ],
   "contact": "contact@scacelith.com"
