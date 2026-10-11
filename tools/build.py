@@ -300,7 +300,9 @@ class Site:
             version = (self.cfg.get("fallbackRelease") or {}).get("tag", "").lstrip("v")
             if version:
                 data["softwareVersion"] = version
-            head_extra = ('<script type="application/ld+json">'
+            # The trailer's consent notice (assets/js/home.js).
+            head_extra = (f'<link rel="stylesheet" href="{root}assets/vendor/iframemanager/iframemanager.css">\n'
+                          + '<script type="application/ld+json">'
                           + script_json(data)
                           + "</script>")
         fallback = self.cfg.get("fallbackRelease") or {}
@@ -336,6 +338,7 @@ class Site:
             "releases_url": f"https://github.com/{self.cfg['releasesRepo']}/releases",
             "server_repo_url": f"https://github.com/{self.cfg['serverRepo']}",
             "docs_url": f"{self.cfg['docsUrl']}{code}/",
+            "contact": self.cfg["contact"],
             "csp": self.csp(),
             "robots": "index, follow" if page["index"] else "noindex, follow",
             "alternates": alternates,

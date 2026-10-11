@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "Tráiler",
     "title": "Scacelith <em>en movimiento</em>",
-    "play": "Reproducir el tráiler",
     "soon_title": "El tráiler llegará pronto",
     "soon_text": "Mientras tanto, tome asiento: el juego ya está listo para descargar.",
-    "privacy": "El vídeo se reproduce a través de YouTube (youtube-nocookie.com) cuando pulse el botón de reproducción.",
+    "privacy": "No se carga nada de YouTube hasta que usted acepte su reproductor.",
     "open_youtube": "Ver en YouTube"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "Licencia (GPL v3)",
     "credits": "Stockfish es una marca de sus desarrolladores. YouTube es una marca de Google LLC. Windows es una marca de Microsoft Corporation. macOS es una marca de Apple Inc. Linux es una marca registrada de Linus Torvalds. OpenGL es una marca registrada de Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "Este sitio no usa cookies ni rastreadores."
+    "made": "Este sitio no instala cookies ni usa rastreadores; el reproductor de YouTube solo se carga si usted lo acepta."
   },
   "common": {
     "copy": "Copiar",
@@ -667,7 +666,10 @@
       "signin": "Iniciar sesión"
     },
     "trailer": {
-      "title": "Tráiler de Scacelith"
+      "title": "Tráiler de Scacelith",
+      "notice": "Este vídeo está alojado en YouTube. Reproducirlo aquí carga el reproductor de Google, que recibe su dirección IP y puede guardar cookies u otros rastreadores en su dispositivo.",
+      "accept": "Aceptar y reproducir",
+      "google_privacy": "Política de privacidad de Google"
     }
   }
 }

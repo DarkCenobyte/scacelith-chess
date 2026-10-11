@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "العرض الدعائي",
     "title": "Scacelith <em>بالصوت والصورة</em>",
-    "play": "تشغيل العرض الدعائي",
     "soon_title": "العرض الدعائي قادم قريبًا",
     "soon_text": "وحتى ذلك الحين، تفضّل بالجلوس: اللعبة جاهزة للتنزيل.",
-    "privacy": "يُشغَّل الفيديو عبر YouTube (youtube-nocookie.com) بمجرد ضغطك على زر التشغيل.",
+    "privacy": "لا يُحمَّل أي شيء من YouTube قبل أن تقبل مشغّله.",
     "open_youtube": "المشاهدة على YouTube"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "الرخصة (GPL v3)",
     "credits": "Stockfish علامة تجارية لمطوّريه. وYouTube علامة تجارية لشركة Google LLC. وWindows علامة تجارية لشركة Microsoft Corporation. وmacOS علامة تجارية لشركة Apple Inc. وLinux علامة تجارية مسجّلة باسم Linus Torvalds. وOpenGL علامة تجارية مسجّلة لشركة Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "لا يستخدم هذا الموقع ملفات تعريف الارتباط ولا أدوات تتبّع."
+    "made": "لا يضع هذا الموقع ملفات تعريف ارتباط ولا يستخدم أدوات تتبّع؛ ولا يُحمَّل مشغّل YouTube إلا إذا قبلته."
   },
   "common": {
     "copy": "نسخ",
@@ -679,7 +678,10 @@
       "signin": "تسجيل الدخول"
     },
     "trailer": {
-      "title": "العرض الدعائي للعبة Scacelith"
+      "title": "العرض الدعائي للعبة Scacelith",
+      "notice": "هذا الفيديو مستضاف على YouTube. يؤدي تشغيله هنا إلى تحميل مشغّل Google الذي يتلقى عنوان IP الخاص بك وقد يخزّن ملفات تعريف الارتباط أو أدوات تتبّع أخرى على جهازك.",
+      "accept": "قبول وتشغيل",
+      "google_privacy": "سياسة خصوصية Google"
     }
   }
 }

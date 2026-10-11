@@ -2,6 +2,7 @@
 // files of the newest release.
 
 import "./site.js";
+import "../vendor/iframemanager/iframemanager.js";
 import { onReady, releaseReady, fileTitle, fileDetail } from "./site.js";
 import { $, $$, h, icon, clear } from "./lib/dom.js";
 import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
@@ -86,35 +87,51 @@ export function youtubeId(value) {
   return null;
 }
 
+/** Text made safe for the notice, which iframemanager writes as HTML. */
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+}
+
+/**
+ * The trailer stays a picture until the visitor accepts YouTube's player: iframemanager
+ * (assets/vendor/iframemanager, MIT) shows the notice over it and only then creates the
+ * youtube-nocookie.com frame. The answer is not remembered: iframemanager's "always allow"
+ * button would set a cookie, and this site sets none.
+ */
 function initTrailer() {
   const box = $("[data-video]");
-  if (!box) return;
+  if (!box || typeof window.iframemanager !== "function") return;
   const config = window.SCACELITH || {};
   const id = youtubeId(config.trailer);
-  const play = $("[data-video-play]", box);
-  const soon = $("[data-video-soon]", box);
   const note = $("[data-video-note]");
   if (!id) return;
   for (const link of $$("[data-trailer-link]")) link.hidden = false;
-  soon.hidden = true;
-  play.hidden = false;
   note.hidden = false;
   $("[data-video-external]").href = `https://www.youtube.com/watch?v=${id}`;
+  const params = new URLSearchParams({ autoplay: "1", rel: "0", playsinline: "1", hl: document.documentElement.lang });
   const start = Number.parseInt(config.trailerStart, 10);
-  play.addEventListener("click", () => {
-    const params = new URLSearchParams({ autoplay: "1", rel: "0", modestbranding: "1", playsinline: "1", hl: document.documentElement.lang });
-    if (Number.isFinite(start) && start > 0) params.set("start", String(start));
-    const frame = h("iframe", {
-      src: `https://www.youtube-nocookie.com/embed/${id}?${params}`,
-      title: t("js.trailer.title"),
-      allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
-      allowfullscreen: true,
-      referrerpolicy: "strict-origin-when-cross-origin",
-    });
-    clear(box);
-    box.append(frame);
-    frame.focus();
-  }, { once: true });
+  if (Number.isFinite(start) && start > 0) params.set("start", String(start));
+  const poster = new URL(`${document.documentElement.dataset.root || ""}assets/img/hero.webp`, location.href).href;
+  clear(box).append(h("div", { class: "video-consent", dataset: { service: "youtube", id, title: escapeHtml(t("js.trailer.title")), thumbnail: poster } }));
+  const notice = `${escapeHtml(t("js.trailer.notice"))} <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">${escapeHtml(t("js.trailer.google_privacy"))}</a>`;
+  window.iframemanager().run({
+    currLang: "page",
+    services: {
+      youtube: {
+        embedUrl: "https://www.youtube-nocookie.com/embed/{data-id}",
+        iframe: {
+          title: t("js.trailer.title"),
+          allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+          allowfullscreen: "",
+          referrerpolicy: "strict-origin-when-cross-origin",
+          params: params.toString(),
+          // The button that had the focus is gone: the player takes it once its fade-in ends.
+          onload: (_, frame) => setTimeout(() => frame.focus(), 500),
+        },
+        languages: { page: { notice, loadBtn: t("js.trailer.accept") } },
+      },
+    },
+  });
 }
 
 /* ---------------------------------------------------------------------------- server and leaderboard */

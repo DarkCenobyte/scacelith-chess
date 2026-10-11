@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "预告片",
     "title": "Scacelith <em>动态影像</em>",
-    "play": "播放预告片",
     "soon_title": "预告片即将推出",
     "soon_text": "在那之前，不妨先入座：游戏已可下载。",
-    "privacy": "点击播放后，视频才会由 YouTube（youtube-nocookie.com）播放。",
+    "privacy": "在你同意使用其播放器之前，不会从 YouTube 加载任何内容。",
     "open_youtube": "在 YouTube 上观看"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "许可证（GPL v3）",
     "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。macOS 是 Apple Inc. 的商标。Linux 是 Linus Torvalds 的注册商标。OpenGL 是 Hewlett Packard Enterprise 的注册商标。",
     "legal": "Scacelith",
-    "made": "本网站不使用 Cookie，也不使用任何跟踪器。"
+    "made": "本网站不设置 Cookie，也不使用任何跟踪器；只有在你同意后才会加载 YouTube 播放器。"
   },
   "common": {
     "copy": "复制",
@@ -659,7 +658,10 @@
       "signin": "登录"
     },
     "trailer": {
-      "title": "Scacelith 预告片"
+      "title": "Scacelith 预告片",
+      "notice": "此视频托管在 YouTube 上。在此播放会加载 Google 的播放器：它会收到你的 IP 地址，并可能在你的设备上存储 Cookie 或其他跟踪器。",
+      "accept": "同意并播放",
+      "google_privacy": "Google 隐私权政策"
     }
   }
 }

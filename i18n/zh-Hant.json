@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "預告片",
     "title": "看 Scacelith <em>動起來</em>",
-    "play": "播放預告片",
     "soon_title": "預告片即將推出",
     "soon_text": "在那之前，先入座吧：遊戲已經可以下載。",
-    "privacy": "影片會在你按下播放後，由 YouTube（youtube-nocookie.com）播放。",
+    "privacy": "在你同意使用其播放器之前，不會從 YouTube 載入任何內容。",
     "open_youtube": "在 YouTube 上觀看"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "授權條款（GPL v3）",
     "credits": "Stockfish 是其開發者的商標。YouTube 是 Google LLC 的商標。Windows 是 Microsoft Corporation 的商標。macOS 是 Apple Inc. 的商標。Linux 是 Linus Torvalds 的註冊商標。OpenGL 是 Hewlett Packard Enterprise 的註冊商標。",
     "legal": "Scacelith",
-    "made": "本網站不使用 Cookie，也不使用任何追蹤器。"
+    "made": "本網站不設定 Cookie，也不使用任何追蹤器；只有在你同意後才會載入 YouTube 播放器。"
   },
   "common": {
     "copy": "複製",
@@ -659,7 +658,10 @@
       "signin": "登入"
     },
     "trailer": {
-      "title": "Scacelith 預告片"
+      "title": "Scacelith 預告片",
+      "notice": "此影片由 YouTube 代管。在此播放會載入 Google 的播放器：它會收到你的 IP 位址，並可能在你的裝置上儲存 Cookie 或其他追蹤器。",
+      "accept": "同意並播放",
+      "google_privacy": "Google 隱私權政策"
     }
   }
 }

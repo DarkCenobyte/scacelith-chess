@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "トレーラー",
     "title": "<em>動き出す</em>Scacelith",
-    "play": "トレーラーを再生",
     "soon_title": "トレーラーは近日公開",
     "soon_text": "それまでは、どうぞお席へ。ゲームはすでにダウンロードできます。",
-    "privacy": "動画は、再生ボタンを押した時点でYouTube（youtube-nocookie.com）から再生されます。",
+    "privacy": "プレーヤーに同意するまで、YouTubeからは何も読み込まれません。",
     "open_youtube": "YouTubeで見る"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "ライセンス（GPL v3）",
     "credits": "StockfishはStockfish開発者の商標です。YouTubeはGoogle LLCの商標です。WindowsはMicrosoft Corporationの商標です。macOSはApple Inc.の商標です。LinuxはLinus Torvaldsの登録商標です。OpenGLはHewlett Packard Enterpriseの登録商標です。",
     "legal": "Scacelith",
-    "made": "このサイトはCookieもトラッカーも使用していません。"
+    "made": "このサイトはCookieを設定せず、トラッカーも使用しません。YouTubeのプレーヤーは同意した場合にのみ読み込まれます。"
   },
   "common": {
     "copy": "コピー",
@@ -659,7 +658,10 @@
       "signin": "ログイン"
     },
     "trailer": {
-      "title": "Scacelithのトレーラー"
+      "title": "Scacelithのトレーラー",
+      "notice": "この動画はYouTubeでホストされています。ここで再生するとGoogleのプレーヤーが読み込まれ、IPアドレスがGoogleに送信されるほか、Cookieなどのトラッカーが端末に保存されることがあります。",
+      "accept": "同意して再生",
+      "google_privacy": "Googleのプライバシーポリシー"
     }
   }
 }

@@ -144,10 +144,9 @@
   "trailer": {
     "eyebrow": "Трейлер",
     "title": "Scacelith <em>в движении</em>",
-    "play": "Запустить трейлер",
     "soon_title": "Трейлер скоро появится",
     "soon_text": "А пока займите своё место: игра уже готова к скачиванию.",
-    "privacy": "Видео воспроизводится через YouTube (youtube-nocookie.com) только после того, как вы нажмёте кнопку воспроизведения.",
+    "privacy": "Пока вы не примете плеер YouTube, с YouTube ничего не загружается.",
     "open_youtube": "Смотреть на YouTube"
   },
   "online": {
@@ -225,7 +224,7 @@
     "licence": "Лицензия (GPL v3)",
     "credits": "Stockfish — товарный знак его разработчиков. YouTube — товарный знак Google LLC. Windows — товарный знак Microsoft Corporation. macOS — товарный знак Apple Inc. Linux — зарегистрированный товарный знак Linus Torvalds. OpenGL — зарегистрированный товарный знак Hewlett Packard Enterprise.",
     "legal": "Scacelith",
-    "made": "Этот сайт не использует ни файлов cookie, ни трекеров."
+    "made": "Этот сайт не устанавливает файлы cookie и не использует трекеры; плеер YouTube загружается, только если вы его примете."
   },
   "common": {
     "copy": "Копировать",
@@ -671,7 +670,10 @@
       "signin": "Войти"
     },
     "trailer": {
-      "title": "Трейлер Scacelith"
+      "title": "Трейлер Scacelith",
+      "notice": "Это видео размещено на YouTube. Если воспроизвести его здесь, загрузится плеер Google: он получит ваш IP-адрес и может сохранить на вашем устройстве файлы cookie или другие трекеры.",
+      "accept": "Принять и смотреть",
+      "google_privacy": "Политика конфиденциальности Google"
     }
   }
 }
