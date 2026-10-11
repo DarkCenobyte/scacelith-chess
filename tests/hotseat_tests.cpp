@@ -45,29 +45,25 @@ TEST(hotseat_input_seat_is_the_seat_to_move) {
 }
 
 TEST(hotseat_clock_side_and_playing_hands) {
-    using game::hotseat::clockOnPositiveX;
     using game::hotseat::playsLeftHanded;
-    // White sits at +Z facing -Z: its right is +X.
-    CHECK(clockOnPositiveX(0));
-    CHECK(!clockOnPositiveX(1));
-    // Clock at White's right: White plays right-handed, Black (clock on its left) left-handed.
-    CHECK(!playsLeftHanded(0, clockOnPositiveX(0)));
-    CHECK(playsLeftHanded(1, clockOnPositiveX(0)));
-    // Clock at Black's right: the other way round.
-    CHECK(playsLeftHanded(0, clockOnPositiveX(1)));
-    CHECK(!playsLeftHanded(1, clockOnPositiveX(1)));
-    // In a hot-seat game exactly one player plays left-handed.
-    for (int side = 0; side < 2; ++side)
-        CHECK(playsLeftHanded(0, clockOnPositiveX(side)) != playsLeftHanded(1, clockOnPositiveX(side)));
+    // White sits at +Z facing -Z: its right is +X. Clock at +X, where every game puts it
+    // (opposite the windows): White plays right-handed, Black (clock on its left) left-handed.
+    CHECK(layout::CLOCK_ON_POSITIVE_X);
+    CHECK(!playsLeftHanded(0, layout::CLOCK_ON_POSITIVE_X));
+    CHECK(playsLeftHanded(1, layout::CLOCK_ON_POSITIVE_X));
+    // Clock at -X (the scoresheet viewer's --clock-left): the other way round.
+    CHECK(playsLeftHanded(0, false));
+    CHECK(!playsLeftHanded(1, false));
+    // Exactly one player plays left-handed.
+    for (int posX = 0; posX < 2; ++posX) CHECK(playsLeftHanded(0, posX == 1) != playsLeftHanded(1, posX == 1));
 }
 
-TEST(hotseat_rematch_swaps_colours_and_keeps_hands) {
+TEST(hotseat_rematch_swaps_colours_and_hands) {
     game::hotseat::Players p;
     p.names[0] = "Alice";
     p.names[1] = "Bob";
     p.hands[0] = 0;
     p.hands[1] = 2;
-    p.clockRightOf = 1;  // Bob's right: Alice (White) is left-handed
     p.rated = true;
     game::hotseat::Players q = p.swapped();
     CHECK_EQ(q.names[0], std::string("Bob"));
@@ -75,19 +71,15 @@ TEST(hotseat_rematch_swaps_colours_and_keeps_hands) {
     CHECK_EQ(q.hands[0], 2);
     CHECK_EQ(q.hands[1], 0);
     CHECK(q.rated);
-    // Each person keeps the hand they play with: the clock follows its player.
-    using game::hotseat::clockOnPositiveX;
+    // The clock stays opposite the windows: Alice played right-handed with White, and plays
+    // left-handed with Black.
     using game::hotseat::playsLeftHanded;
-    bool aliceBefore = playsLeftHanded(0, clockOnPositiveX(p.clockRightOf));
-    bool aliceAfter = playsLeftHanded(1, clockOnPositiveX(q.clockRightOf));
-    CHECK(aliceBefore);
-    CHECK_EQ(aliceBefore, aliceAfter);
-    CHECK_EQ(q.names[q.clockRightOf], std::string("Bob"));
+    CHECK(!playsLeftHanded(0, layout::CLOCK_ON_POSITIVE_X));
+    CHECK(playsLeftHanded(1, layout::CLOCK_ON_POSITIVE_X));
     // Two rematches: the first set-up again.
     game::hotseat::Players r = q.swapped();
     CHECK_EQ(r.names[0], p.names[0]);
     CHECK_EQ(r.hands[1], p.hands[1]);
-    CHECK_EQ(r.clockRightOf, p.clockRightOf);
 }
 
 // ---- Clock and handover -----------------------------------------------------------------------------

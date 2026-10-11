@@ -174,13 +174,16 @@ hot-seat one of the two players is therefore always "left-handed" in first perso
 - A preference could put the clock on the side that suits the hand of the player with White (or
   of profile 1).
 
-*Implemented:* the New Game page puts the clock at White's or Black's right (`[hotseat]
-clock_right_of`, `--clock-right white|black`) and names the player who will play left-handed.
+*Implemented:* the New Game page names the player who will play left-handed.
 `hotseat::playsLeftHanded()` gives each seat's playing hand; the look state (`GameScene::Look`:
-yaw, pitch, gaze smoothing, lean) is per seat, restored when the view reaches that seat. The rematch
-swaps the colours and the clock side, so each player keeps the same hand. Checked with scripted
-games (`--play`) with the clock on either side: touch, carry, captures, castling and the clock
-press with either hand, and the writing with the other.
+yaw, pitch, gaze smoothing, lean) is per seat, restored when the view reaches that seat. Checked
+with scripted games (`--play`) with the clock on either side: touch, carry, captures, castling and
+the clock press with either hand, and the writing with the other.
+
+*Since 1.0.1:* the clock always stands opposite the windows, at +X (`layout::CLOCK_ON_POSITIVE_X`),
+its displays facing them, in every mode: the New Game page no longer offers the clock side (the
+`[hotseat] clock_right_of` setting and `--clock-right` are gone). White plays right-handed and
+Black left-handed, and the rematch, which swaps the colours, swaps the playing hands with them.
 
 ## Input
 
@@ -249,7 +252,7 @@ widens; a cut lets it end while the view darkens).
 8. Done: the left hand plays when the clock is on the player's left (`hotseat::playsLeftHanded()`).
 
 Command line, for tests and screenshots: `--start --hotseat [--white-name N] [--black-name N]
-[--clock-right white|black] [--rated] [--handover <s>]`, and `--play e2e4,e7e5,...` (moves played
+[--rated] [--handover <s>]`, and `--play e2e4,e7e5,...` (moves played
 by hand for the side to move, one after the other, the way a player would). With `--no-intro` and
 `--warp <s>`, the hand-over starts about 1.7 s after the start with `--play e2e4` and lands 1.6 s
 later. The UI viewer has `--ui-screen newgame-hotseat|hotseat-hud|hotseat-confirm|hotseat-gameover`.

@@ -91,7 +91,6 @@ struct Settings {
     // [hotseat] last choices of the two-player game (New Game > Human, same PC), by colour
     std::string hotseatNames[2];  // "" = the Options > Player name for White, "Player 2" (translated) for Black
     int hotseatHands[2] = {-1, -1};  // ui::font::HandStyle; -1 = the Options > Player hand / another one
-    int hotseatClockRightOf = 0;  // the clock stands at White's (0) or Black's (1) right
     bool hotseatRated = false;    // rated between the two names (localPlayers), friendly by default
     // [local_player_N] ratings of the rated hot-seat games, by name
     std::vector<LocalPlayer> localPlayers;

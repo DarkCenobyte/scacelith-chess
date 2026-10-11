@@ -1237,20 +1237,21 @@ float loudest50msDb(const std::vector<float>& s) {
 
 }  // namespace
 
-// A human game as GameScene sets it up, for both colours of the human: the clock at his right, his
-// head driven by the first-person camera, both players recording 1. e4 Nf6 on their own pad while
-// his playing hand presses the clock, updated with the fixed 60 Hz step of --shot / --warp. On his
-// pad the pen is picked up and follows the path, the ink comes where the tip has passed, every
-// stroke puts the pen down on time, and its PenDown sound (what Scorekeeper::onEvent hands to
-// audio::playPenStroke) lasts the whole stroke. From his head (the listener at his eyes, default
-// volumes) his own pen is heard clearly: louder than his opponent's, below a piece being placed.
+// A human game as GameScene sets it up, for both colours of the human: the clock opposite the
+// windows (at White's right, at Black's left), his head driven by the first-person camera, both
+// players recording 1. e4 Nf6 on their own pad while his playing hand presses the clock, updated
+// with the fixed 60 Hz step of --shot / --warp. On his pad the pen is picked up and follows the
+// path, the ink comes where the tip has passed, every stroke puts the pen down on time, and its
+// PenDown sound (what Scorekeeper::onEvent hands to audio::playPenStroke) lasts the whole stroke.
+// From his head (the listener at his eyes, default volumes) his own pen is heard clearly: louder
+// than his opponent's, below a piece being placed.
 TEST(anim_own_scoresheet_writing_heard_first_person) {
     using anim::EventType;
     const float dt = 1.0f / 60.0f;
     const float kHumanGazePitch = -0.62f;   // GameScene: looking down at the board from the chair
     const int spf = 800;                    // 48 kHz frames per update
     for (int human = 0; human < 2; ++human) {
-        const bool clockPosX = human == 0;  // the clock stands at the human player's right
+        const bool clockPosX = layout::CLOCK_ON_POSITIVE_X;  // whatever colour the human plays
         anim::Animator an[2];
         sh::PadFrame pad[2];
         std::vector<SheetEntry> entries[2];
@@ -1291,7 +1292,8 @@ TEST(anim_own_scoresheet_writing_heard_first_person) {
                 start += anim::writeTaskDuration(w);
             }
         }
-        CHECK(an[human].writingHand() == character::Side::Left);   // his pad lies at his left
+        // His pad lies opposite the clock: at his left with White, at his right with Black.
+        CHECK(an[human].writingHand() == (human == 0 ? character::Side::Left : character::Side::Right));
         an[human].setHeadOverride(true, 0.0f, kHumanGazePitch);
         an[1 - human].lookAt(m::vec3(0, layout::BOARD_TOP_Y, 0));
         // His playing hand is busy meanwhile: it presses the clock while he writes.

@@ -314,7 +314,6 @@ void loadSetupFromSettings(NewGameSetup& s) {
         s.names[i] = g.hotseatNames[i].empty() ? hotSeatDefaultName(i) : g.hotseatNames[i];
         s.hands[i] = g.hotseatHands[i] >= 0 ? g.hotseatHands[i] : hotSeatDefaultHand(i);
     }
-    s.clockRightOf = std::clamp(g.hotseatClockRightOf, 0, 1);
     s.rated = g.hotseatRated;
 }
 void storeSetupToSettings(const NewGameSetup& s) {
@@ -336,7 +335,6 @@ void storeSetupToSettings(const NewGameSetup& s) {
         g.hotseatNames[i] = s.names[i] == hotSeatDefaultName(i) ? std::string() : s.names[i];
         g.hotseatHands[i] = s.hands[i] == hotSeatDefaultHand(i) ? -1 : s.hands[i];
     }
-    g.hotseatClockRightOf = s.clockRightOf;
     g.hotseatRated = s.rated;
     g.save();
 }
@@ -953,7 +951,6 @@ void hotSeatColumn(NewGameSetup& setup, float x, float w, float y) {
             if (im::button(L("hotseat.swap"), im::flip(col, Rect(x + w - bw, y - 2.0f, bw, 40.0f)), im::ButtonKind::Quiet)) {
                 std::swap(setup.names[0], setup.names[1]);
                 std::swap(setup.hands[0], setup.hands[1]);
-                setup.clockRightOf = 1 - setup.clockRightOf;  // each keeps the hand they play with
                 im::sound(Sound::Toggle);
             }
             y += 46.0f;
@@ -962,13 +959,9 @@ void hotSeatColumn(NewGameSetup& setup, float x, float w, float y) {
     gfx::hlineFade(x, x + w, y + 4.0f, withAlpha(gold, 0.25f), 0.25f);
     y += 18.0f;
     std::string white = hotSeatName(setup, 0), black = hotSeatName(setup, 1);
-    int side = std::clamp(setup.clockRightOf, 0, 1);
-    if (im::selectorRow(L("hotseat.clock"), side,
-                        {i18n::trf("hotseat.clock_right_of", {white}), i18n::trf("hotseat.clock_right_of", {black})}, row()))
-        setup.clockRightOf = side;
-    im::tooltip(T("hotseat.clock.help"));
+    // The clock stands opposite the windows, at White's right (game/layout.h).
     TextStyle note = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::startAlign());
-    std::string lefty = i18n::trf("hotseat.left_hand", {side == 0 ? black : white});
+    std::string lefty = i18n::trf("hotseat.left_hand", {black});
     note.size = gfx::fitSize(lefty, note, w - 30.0f);
     gfx::diamond(vec2(im::flipX(col, x + 6.0f), y + 4.0f), 3.0f, withAlpha(gold, 0.7f));
     gfx::text(lefty, im::flipX(col, x + 22.0f), y + 11.0f, note);

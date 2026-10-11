@@ -29,7 +29,7 @@
 //       not refreshed for net::kStanceExpiryKeepalives keepalives reads as Seated, and so does a
 //       value a later minor may add. remoteHandApplies(): the piece fields of their gestures move
 //       the robot's hand only while it is seated and shown Seated. remoteHeadFlags(): Glance and
-//       Side of their gestures (and the Side mirror of the yaw) only while shown Seated. With no
+//       Side of their gestures (and the Side mapping of the yaw) only while shown Seated. With no
 //       head of theirs to follow (headActive false: the ignore option, stale gestures, a server
 //       that relays none), a standing robot looks at the board (the Animator's own look).
 //   - My clock display while my move is on its way, and the resend of a move the authority never
@@ -143,8 +143,7 @@ inline bool gestureDue(const net::Gesture& last, const net::Gesture& now, double
 }
 
 // The Side flag: the look (a ray from the eyes) falls on the table top beside the board, where the
-// clock, the captured pieces and the scoresheets lie. Those are mirrored between the two clients
-// (each puts the clock at its own player's right), so the receiver turns such a look the other way.
+// clock, the captured pieces and the scoresheets lie.
 inline bool lookBesideBoard(m::vec3 origin, m::vec3 dir) {
     float t = m::rayPlane(m::Ray{origin, dir}, m::vec3(0, layout::TABLE_TOP_Y, 0), m::vec3(0, 1, 0));
     if (!(t > 0.0f)) return false;
@@ -152,6 +151,16 @@ inline bool lookBesideBoard(m::vec3 origin, m::vec3 dir) {
     return std::fabs(p.x) > 0.5f * layout::BOARD_SIZE && std::fabs(p.x) <= 0.5f * layout::TABLE_WIDTH &&
            std::fabs(p.z) <= 0.5f * layout::TABLE_DEPTH;
 }
+
+// The yaw of a Side look between a seat and the wire, the same mapping both ways. On the wire it is
+// the look of a player whose clock stands at their right (protocol 1's convention, from the
+// clients before 1.0.1, which put the clock at their own player's right and negated every Side
+// look received). Since 1.0.1 the clock stands at +X whatever the colours (layout.h), so Black has
+// it at their left. Sending, 'clockAtRight' is whether my clock is at my right; receiving, whether
+// the clock stands at the right of the sender's robot on this table. Only a seat with the clock at
+// its left turns such a look the other way: a 1.0.0 opponent's look lands on our copy of what they
+// looked at, and ours on theirs.
+inline float sideLookYaw(float yaw, bool side, bool clockAtRight) { return side && !clockAtRight ? -yaw : yaw; }
 
 // =============================================================================================
 // The opponent's gestures
@@ -223,7 +232,7 @@ private:
 inline bool remoteHandApplies(anim::Stance shown, bool robotSeated) { return robotSeated && shown == anim::Stance::Seated; }
 
 // The flags of the opponent's gesture that apply to their robot's head: Glance and Side (the look
-// beside the board, whose yaw the receiver mirrors) only while they are shown Seated; their client
+// beside the board, whose yaw sideLookYaw maps) only while they are shown Seated; their client
 // never sets them standing, and a look relative to a standing body is never mirrored.
 inline uint8_t remoteHeadFlags(uint8_t flags, anim::Stance shown) {
     if (shown == anim::Stance::Seated) return flags;

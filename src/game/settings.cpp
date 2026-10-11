@@ -92,7 +92,6 @@ bool Settings::load(const std::string& p) {
         hotseatHands[i] = std::clamp(ini.getInt(std::string("hotseat.") + side + "_hand", hotseatHands[i]), -1,
                                      int(ui::font::HAND_STYLE_COUNT) - 1);
     }
-    hotseatClockRightOf = std::clamp(ini.getInt("hotseat.clock_right_of", hotseatClockRightOf), 0, 1);
     hotseatRated = ini.getBool("hotseat.rated", hotseatRated);
     localPlayers.clear();
     // Every player save() wrote. A section removed by hand leaves a gap: skipped within the first
@@ -257,7 +256,6 @@ bool Settings::save() const {
     ini.set("hotseat.black_name", hotseatNames[1]);
     ini.setInt("hotseat.white_hand", hotseatHands[0]);
     ini.setInt("hotseat.black_hand", hotseatHands[1]);
-    ini.setInt("hotseat.clock_right_of", hotseatClockRightOf);
     ini.setBool("hotseat.rated", hotseatRated);
     for (size_t i = 0; i < localPlayers.size(); ++i) {
         const LocalPlayer& p = localPlayers[i];

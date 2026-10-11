@@ -717,6 +717,8 @@ void GameScene::sendOnlineGesture(float dt) {
     bool side = seated && live::lookBesideBoard(eye, rotate(q, vec3(0, 0, -1)));
     net::Gesture g = live::buildGesture(hand, int(game_.moves().size()), L.gazeYaw, L.gazePitch, L.leanSmooth, glance_ && seated, side,
                                         gestureBuiltAny_ ? &gestureBuilt_ : nullptr);
+    // A look beside the board goes as if my clock stood at my right (net/gesture.h).
+    g.yaw = live::sideLookYaw(g.yaw, (g.flags & net::proto::GestureFlag::Side) != 0, seats_[seat].playHand == character::Side::Right);
     gestureBuilt_ = g;
     gestureBuiltAny_ = true;
     gestureSinceMs_ += double(dt) * 1000.0;
@@ -886,9 +888,9 @@ bool GameScene::driveRemoteHead(float dt) {
     bool following = (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver) &&
                      link_ && live::headActive(remoteAge_, remoteFresh_, settings().ignoreOpponentHead, opponentAway_, link_->reconnecting(),
                                                link_->gestureKeepaliveMs());
-    // Their clock stands at their right on their screen, not here: the robot's own look follows its
-    // hand to this clock. Their robot out of its chair (stance_control.h): their head when it comes
-    // (its angles relative to the body, which faces the board), else a look at the board.
+    // While it presses the clock, the robot's own look follows its hand. Their robot out of its
+    // chair (stance_control.h): their head when it comes (its angles relative to the body, which
+    // faces the board), else a look at the board.
     // Glance and Side count only while they are shown seated (live::remoteHeadFlags).
     const bool standing = !anim_[r].seated();
     const uint8_t flags = live::remoteHeadFlags(g.flags, remoteShown_);
@@ -909,9 +911,10 @@ bool GameScene::driveRemoteHead(float dt) {
         remoteHead_.snap(yaw, pitch);
         remoteHeadOn_ = true;
     }
-    // What lies beside the board is mirrored between the two clients: a look there turns the
-    // other way here (seated only: standing, nothing is mirrored).
-    float yaw = (flags & net::proto::GestureFlag::Side) ? -g.yaw : g.yaw;
+    // A look beside the board came as if their clock stood at their right: it turns the other way
+    // here when this table has it at their robot's left (net/gesture.h; seated only: standing,
+    // nothing is mirrored).
+    float yaw = live::sideLookYaw(g.yaw, (flags & net::proto::GestureFlag::Side) != 0, seats_[r].playHand == character::Side::Right);
     float pitch = g.pitch;
     if (remoteGlanceBlend_ > 0.0f) {
         // Their scoresheet: this robot looks at its own pad here, as the local glance does.

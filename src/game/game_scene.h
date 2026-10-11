@@ -9,9 +9,9 @@
 // Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human,
 // Stockfish or Remote; a hot-seat game has two Humans), the name and Elo written on the
 // scoresheets, its engine settings and its playing hand: the hand on the clock side plays and
-// presses the clock, the other one writes. The clock stands at the human's right in a game against
-// Stockfish, where the New Game page puts it in a hot-seat game (the other player then plays
-// left-handed), at White's right (+X) when watching.
+// presses the clock, the other one writes. The clock stands at +X in every mode, opposite the
+// windows (layout::CLOCK_ON_POSITIVE_X): at White's right, so the player with Black, human or not,
+// plays left-handed.
 //
 // Hot-seat: the seat to move has the mouse and keyboard and the view from its robot's eyes. After
 // the clock press (untimed: once the move is made) the view flies to the other player's eyes (or
@@ -76,7 +76,7 @@
 //   --analysis-marks-test   once the pieces stand, the review's marks (a fixed set: tint, badges,
 //                           arrows; World::submitAnalysisMarks) arrive on the board
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
-//                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
+//                           --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
 //                           carry, clock press unless untimed; the promotion piece as a fifth
 //                           letter), online too

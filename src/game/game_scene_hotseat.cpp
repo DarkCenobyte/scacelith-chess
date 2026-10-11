@@ -80,7 +80,6 @@ void GameScene::initHotSeatArgs() {
         setup_.names[i] = s.hotseatNames[i];  // "" = the default (setupNewGame)
         setup_.hands[i] = s.hotseatHands[i];  // -1 = the default
     }
-    setup_.clockRightOf = s.hotseatClockRightOf;
     setup_.rated = s.hotseatRated;
     const AppContext& ctx = *ctx_;
     if (ctx.hasArg("--handover")) handoverArg_ = std::clamp(float(std::atof(ctx.argValue("--handover").c_str())), 0.0f, 2.0f);
@@ -105,13 +104,10 @@ void GameScene::initHotSeatArgs() {
         a = b + 1;
     }
     if (!ctx.hasArg("--hotseat")) return;
-    // --start --hotseat [--white-name N] [--black-name N] [--clock-right white|black] [--rated]
+    // --start --hotseat [--white-name N] [--black-name N] [--rated]
     setup_.opponent = 1;
     if (ctx.hasArg("--white-name")) setup_.names[0] = ctx.argValue("--white-name");
     if (ctx.hasArg("--black-name")) setup_.names[1] = ctx.argValue("--black-name");
-    std::string clock = ctx.argValue("--clock-right");
-    if (clock == "white") setup_.clockRightOf = 0;
-    if (clock == "black") setup_.clockRightOf = 1;
     if (ctx.hasArg("--rated")) setup_.rated = true;
 }
 
@@ -143,7 +139,6 @@ void GameScene::swapHotSeatColours() {
         s.hotseatNames[i] = p.names[i];
         s.hotseatHands[i] = p.hands[i];
     }
-    setup_.clockRightOf = s.hotseatClockRightOf = p.clockRightOf;
     s.save();
 }
 

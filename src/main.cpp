@@ -14,8 +14,7 @@
 //   --start-online [cat]  game scene: skip the menu, sign in and play the first opponent found
 //                         in category "cat" (default 5+3). See src/game/game_scene.h.
 //   --start --hotseat     game scene: skip the menu, two players on one PC (--white-name,
-//                         --black-name, --clock-right, --rated, --handover, --play: see
-//                         src/game/game_scene.h).
+//                         --black-name, --rated, --handover, --play: see src/game/game_scene.h).
 #include "app/scene.h"
 #include "core/embedded.h"
 #include "core/image.h"

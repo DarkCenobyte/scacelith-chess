@@ -53,8 +53,9 @@ illegal move loses the game.
 As in tournaments, both players record the game on their own scoresheet, a pad lying on the side
 of the table opposite the clock. Right after every clock press each player writes the move down
 with the hand on the pad side, while the other hand stays free to play and press the clock, so
-keeping score never costs clock time. The player whose clock stands on the left therefore plays
-with the left hand and writes with the right. The header is filled in when the game starts (event
+keeping score never costs clock time. The clock always stands on the side of the table away from
+the windows, its displays facing them so that the daylight falls on them: the player with Black,
+who has it on their left, therefore plays with the left hand and writes with the right. The header is filled in when the game starts (event
 "Scacelith", date, round, the players' names and ratings: your name from Options > Player,
 "Human" by default (translated with the interface), and "Stockfish"), a full page of 40 moves is turned over the top of the pad,
 and the result is written before the final handshake. You hear the pen on the paper and the page
@@ -92,9 +93,9 @@ FIDE rates a month's games together.
 
 Set **Opponent** to **Human, same PC** on the new game page to play a friend at the same computer,
 each from their own robot's eyes. The page asks for both names (White defaults to your name from
-Options > Player, Black to "Player 2"), each player's handwriting, the time control, the side of
-the clock (at White's or at Black's right: the player whose clock is on their left plays with the
-left hand), and whether the game is rated. **Swap colours** exchanges the two players.
+Options > Player, Black to "Player 2"), each player's handwriting, the time control and whether
+the game is rated (the player with Black, who has the clock on their left, plays with the left
+hand). **Swap colours** exchanges the two players.
 
 - The player to move has the mouse and the keyboard, with the same rules as against Stockfish
   (touch-move, pressing the clock by hand, the arbiter, the claims in the Esc menu).

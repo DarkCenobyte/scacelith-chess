@@ -22,9 +22,13 @@
 //   ahead and level, yaw > 0 to the left, pitch < 0 down), lean 0..1 (the mouse wheel lean
 //   towards the board). flags: Glance while the player looks at their own scoresheet; Side when
 //   the look falls on the table beside the board (the clock, the captured pieces or the
-//   scoresheet, Glance included). Each client puts the clock at its own player's right, so what
-//   lies beside the board is mirrored between the two clients: the receiver negates the yaw of
-//   a Side look (or aims the head at its own copy of the thing looked at).
+//   scoresheet, Glance included). The yaw of a Side look keeps protocol 1's convention: it is
+//   sent as if the clock stood at the sender's right, where clients before 1.0.1 put it, and the
+//   receiver, whose clock stood at its own player's right, negates it (or aims the head at its
+//   own copy of the thing looked at). Since 1.0.1 the clock stands at +X for both players
+//   (game/layout.h): a player whose clock is at their left negates their Side yaw before sending
+//   it, and a receiver negates it only for a robot whose clock is at its left
+//   (live::sideLookYaw), so that 1.0.0 and 1.0.1 clients read each other's looks right.
 // A client sends a Gesture when this state changes, when the head moved noticeably, and at least
 // once per keepalive while nothing changes (Welcome.gestureIdleMs, gestureKeepaliveMs below); the
 // network layer keeps only the latest one and paces them (OnlineClient::sendGesture,
