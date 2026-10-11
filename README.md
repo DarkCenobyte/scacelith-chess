@@ -20,8 +20,12 @@ window.SCACELITH = {
 };
 ```
 
-No build is needed. Until a video is set, the section says the trailer is coming soon. The video is
-loaded from `youtube-nocookie.com` only when the visitor presses play.
+No build is needed. Until a video is set, the section says the trailer is coming soon. Nothing is
+loaded from YouTube until the visitor accepts its player: a notice over the poster says what Google's
+player receives and stores, with one button, "Accept and play", and only then is the
+`youtube-nocookie.com` frame created. The notice comes from
+[iframemanager](https://github.com/orestbida/iframemanager) 1.3.0 (MIT), kept in
+`assets/vendor/iframemanager/`; the answer is not remembered, so the site still sets no cookie.
 
 ## Replacing the screenshots
 
@@ -47,15 +51,17 @@ description (`gallery` in `i18n/<lang>.json`) and run `python3 tools/build.py`.
 | `<lang>/players/` | Leaderboard and public profiles (`?u=<name>`, `?c=<time control>`), generated |
 | `<lang>/account/` | Sign-in, sign-up, password recovery, and the signed-in player's account, generated |
 | `<lang>/gif/` | Opened in a new tab by a game's GIF button (`?id=<game>`), generated |
+| `<lang>/legal/` | Legal notice, privacy and terms of use (`#notice`, `#privacy`, `#terms`), generated; update its "Last updated" date (`legal.updated`) in every language when its text changes |
 | `404.html`, `sitemap.xml` | Generated |
 | `config.js` | The trailer (see above) |
 | `templates/` | The pages, with `{{t:key}}` for the translations (`templates/partials/` for the shared parts) |
 | `i18n/<lang>.json` | The strings of each language; `en.json` is the source of all others |
-| `tools/site.json` | Site address, API address, repositories, languages and pages |
+| `tools/site.json` | Site address, API address, repositories, contact address of the legal page, languages and pages |
 | `tools/build.py` | Generates the pages and checks the translations |
 | `tools/screenshots.sh` | Converts a screenshot into the site's picture files (ImageMagick) |
 | `assets/css/site.css` | The stylesheet |
-| `assets/js/` | One module per page (`home.js`, `players.js`, `account.js`, `gif.js`), the shared `site.js`, and `lib/` |
+| `assets/js/` | One module per page (`home.js`, `players.js`, `account.js`, `gif.js`, `legal.js`), the shared `site.js`, and `lib/` |
+| `assets/vendor/iframemanager/` | The trailer's consent notice (iframemanager 1.3.0, MIT, unmodified) |
 | `assets/js/pow-worker.js` | The proof-of-work solver of the sign-up (SHA-256, in a worker) |
 | `assets/fonts/` | The game's typefaces (Cinzel, EB Garamond, Amiri, SIL OFL 1.1) and its chess figures (GNU FreeFont), subset to woff2, with their licences |
 | `assets/img/`, `assets/icons/` | Screenshots captured in the game, and the game's icon |

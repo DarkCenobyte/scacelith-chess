@@ -280,4 +280,144 @@
     <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/players/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/players/"/>
   </url>
+  <url>
+    <loc>https://scacelith.com/en/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/fr/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/de/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/es/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/uk/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/ru/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/ar/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/ja/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/zh-Hans/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
+  <url>
+    <loc>https://scacelith.com/zh-Hant/legal/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://scacelith.com/en/legal/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/legal/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://scacelith.com/de/legal/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://scacelith.com/es/legal/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/legal/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/legal/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/legal/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/legal/"/>
+  </url>
 </urlset>
