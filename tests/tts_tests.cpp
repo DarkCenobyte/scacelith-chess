@@ -2269,6 +2269,15 @@ TEST(tts_finish_pcm_non_finite) {
     CHECK(peak > 0.1f && peak <= 0.8913f);
 }
 
+// The waits of the worker test. An instrumented build (sanitizers, coverage) synthesizes several
+// times slower, and slower again on a CPU without AVX-512: on such a coverage runner, three short
+// requests took more than the 120 s a normal build is given.
+#if defined(SCACELITH_SANITIZED) || defined(SCACELITH_COVERAGE_BUILD)
+constexpr double kWorkerWaitScale = 5.0;
+#else
+constexpr double kWorkerWaitScale = 1.0;
+#endif
+
 TEST(tts_worker) {
     // The worker loads from the model store's folder: the build's development copy here.
     tts::setModelFolder(modelDir());
@@ -2280,6 +2289,7 @@ TEST(tts_worker) {
     o.threads = 2;
     CHECK(w.start(o));
     auto waitFor = [](const std::function<bool()>& pred, double seconds) {
+        seconds *= kWorkerWaitScale;
         auto t0 = std::chrono::steady_clock::now();
         while (!pred()) {
             if (std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() > seconds) return false;
