@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — 照片级写实的第一人称国际象棋",
-      "description": "免费的照片级写实国际象棋，适用于 Windows：在皇家大厅里以第一人称对弈，Stockfish 19、教练和在线对手等你挑战。"
+      "description": "免费的照片级写实国际象棋，适用于 Windows、Linux 和 macOS：在皇家大厅里以第一人称对弈，Stockfish 19、教练、对局分析和在线对局一应俱全。"
     },
     "players": {
       "title": "排行榜和棋手 — Scacelith",
-      "description": "Scacelith 官方服务器上每种用时的顶尖棋手、他们的等级分和最近的对局。"
+      "description": "Scacelith 官方服务器上每种计分用时的顶尖棋手、他们的等级分和最近的对局。"
     },
     "account": {
       "title": "你的账号 — Scacelith",
@@ -37,16 +37,15 @@
   },
   "hero": {
     "image_alt": "在洒满阳光的大理石大厅里，两个瓷制机器人正在胡桃木桌前下国际象棋。",
-    "eyebrow": "公测版",
     "lead": "走进洒满阳光的皇家大厅，在打过蜡的胡桃木桌前落座。棋盘对面，一个由 Stockfish 驱动的瓷制机器人正等着你走出第一步。",
     "watch": "观看预告片",
-    "meta": "自由软件 · Windows 64 位 · 支持 OpenGL 4.6 的显卡",
+    "meta": "自由软件 · Windows、Linux、macOS（实验性） · 支持 OpenGL 4.6 的显卡",
     "caption": "游戏内截图：标题画面"
   },
   "highlights": {
     "engine": "自主开发的 OpenGL 4.6 引擎",
     "stockfish": "内置 Stockfish 19",
-    "rules": "FIDE 等级分",
+    "rules": "遵循 FIDE 规则",
     "online": "在线对局",
     "languages": "十种语言"
   },
@@ -56,11 +55,11 @@
     "lead": "Scacelith 重现了真实对局的种种要素：大厅、寂静、棋钟、注视着你的对手，以及锦标赛的仪式感。",
     "presence": {
       "title": "第一人称视角",
-      "text": "你透过自己机器人的双眼观看一切。环顾大厅，俯身靠近棋盘，抬头看向对手，或瞥一眼身旁的对局记录表。"
+      "text": "你透过自己机器人的双眼观看一切：环顾大厅，俯身靠近棋盘，抬头看向对手，瞥一眼自己的对局记录表，或起身走到桌子的一端。"
     },
     "ritual": {
       "title": "比赛规则",
-      "text": "摸子即须走子。你的手按下棋钟，这步棋才算完成。一旦走出违例着法，裁判就会出面；第二次违例即判负。"
+      "text": "摸子即须走子。你的手按下棋钟，这步棋才算完成。关闭“显示合法着法”时，违例着法会受到裁判处罚；第二次违例即判负。"
     },
     "scoresheet": {
       "title": "亲笔记录",
@@ -68,11 +67,11 @@
     },
     "opponent": {
       "title": "旗鼓相当的对手",
-      "text": "与你水平相当的 Stockfish 19，从新手（800）到满级（3500），每局结束后都按 FIDE 规则计算等级分。"
+      "text": "与你水平相当的 Stockfish 19，从新手（800）到 Stockfish 满级（3500），每局结束后都按 FIDE 规则计算等级分。"
     },
     "engine": {
       "title": "为本作量身打造",
-      "text": "从零编写的引擎：基于物理的光照，大理石、打蜡的木材、瓷与黄铜，透窗而入的阳光，柔和的阴影与反射。"
+      "text": "从零编写的引擎：基于物理的光照，大理石、打蜡的木材、瓷与黄铜，透窗而入的阳光，柔和的阴影与反射。从“极低”到“极高”的画质预设，可让它适配你的显卡。"
     },
     "languages": {
       "title": "十种语言",
@@ -89,11 +88,19 @@
     },
     "coach": {
       "name": "教练",
-      "text": "一位老师坐在你对面，以你的水平与你对弈，并为你讲解棋局：威胁、好棋、失误。从国际象棋规则到专家水平，配有合成语音（英语发音，附中文字幕）。"
+      "text": "一位老师坐在你对面，以你的水平与你对弈，并为你讲解棋局：威胁、好棋、失误，还会亲手在棋盘上演示失误的代价。从国际象棋规则到专家水平，配有在你的电脑上合成的语音（英语发音，附中文字幕）。"
+    },
+    "challenges": {
+      "name": "教练挑战",
+      "text": "一组组简短的局面练习，每组专练一项技能：一步杀到三步杀，捉双、牵制等战术，防守，以及对阵教练的基本残局。提示只在你请求时给出，每完成一组就会打上一个绿色的勾。"
+    },
+    "analysis": {
+      "name": "分析",
+      "text": "Stockfish 会分析你已保存的对局、在线对局或任意 PGN：评估条、从妙着到漏着的关键着法标注、以箭头标出的更佳着法，以及语音和字幕解说。你逐步浏览时，机器人会亲手走出每一步。"
     },
     "online": {
       "name": "在线对局",
-      "text": "通过 Scacelith 服务器与真人对手对弈：计分对局、匹配对手、挑战和私人对局。对手的机器人会实时同步其一举一动。"
+      "text": "通过 Scacelith 服务器与真人对手对弈：计分对局、匹配对手、挑战和私人对局；也可以在两台电脑之间直连对局。对手的机器人会实时同步其一举一动。"
     },
     "watch": {
       "name": "观看对局",
@@ -139,7 +146,7 @@
     "title": "Scacelith <em>动态影像</em>",
     "play": "播放预告片",
     "soon_title": "预告片即将推出",
-    "soon_text": "在那之前，不妨先入座：测试版已可下载。",
+    "soon_text": "在那之前，不妨先入座：游戏已可下载。",
     "privacy": "点击播放后，视频才会由 YouTube（youtube-nocookie.com）播放。",
     "open_youtube": "在 YouTube 上观看"
   },
@@ -147,11 +154,11 @@
     "eyebrow": "在线",
     "title": "真实的对手，<br><em>同一座大厅。</em>",
     "lead": "在游戏中登录官方服务器，与来自世界各地的棋手对弈，依然是第一人称视角。",
-    "point_rated": "所有官方用时均可进行计分对局，每种用时各有一个 FIDE 等级分。",
-    "point_match": "匹配对手、按用户名发起挑战、凭代码进行私人对局，以及两台电脑之间的直连对局。",
+    "point_rated": "所有官方用时均可进行计分对局，每种用时各有独立的等级分，按 FIDE 规则计算。",
+    "point_match": "匹配对手、按用户名发起挑战、凭代码进行私人对局；也可以在两台电脑之间直连对局，无需服务器或账号。",
     "point_fair": "公平对弈：自动检查、由引擎分析已结束的对局，以及棋手举报。",
     "point_history": "在本网站查看你的对局记录：每局都可下载为 PGN 或 GIF 动图。",
-    "point_open": "任何人都可以运行社区服务器：服务器及其 API 都是自由软件。",
+    "point_open": "任何人都可以运行社区服务器：服务器是自由软件，其 API 也有公开文档。",
     "create": "创建账号",
     "signin": "登录",
     "server_title": "官方服务器",
@@ -170,19 +177,22 @@
     "see_release": "在 GitHub 上查看发行版",
     "latest": "Scacelith",
     "all_releases": "全部发行版",
+    "experimental": "实验性",
+    "source": "源代码",
+    "source_zip": "ZIP 压缩包",
     "eyebrow": "下载",
     "title": "请入座。<br><em>免费，而且开源。</em>",
-    "lead": "无需安装：下载、解压，然后运行 Scacelith.exe。每个文件都由 GitHub Actions 根据对应标签的源代码构建，并附有构建来源证明。",
-    "prerelease": "测试版",
+    "lead": "解压即玩：Windows 和 Linux 无需安装，Mac 上只需拖到“应用程序”文件夹。每个文件都由 GitHub Actions 根据对应标签的源代码构建，并附有构建来源证明。",
     "notes": "发行说明",
+    "macos_note": "适用于搭载 Apple Silicon（M1 或更新芯片）、运行 macOS 26 或更高版本的 Mac，不支持在虚拟机中运行；此版本比其他版本更新，测试也较少。此 App 未经注册的 Apple 开发者签名：首次打开时，请前往“系统设置 › 隐私与安全性 › 仍要打开”。",
     "req_system": "系统",
-    "req_system_value": "Windows 64 位（x64）",
+    "req_system_value": "Windows 64 位（x64）；Linux 64 位（x86-64 或 aarch64），需 glibc 2.34、OpenSSL 3 以及 X11 或 XWayland，例如 Ubuntu 22.04 或 Debian 12；Apple Silicon 上的 macOS 26 或更高版本（实验性）",
     "req_gpu": "显卡",
-    "req_gpu_value": "支持 OpenGL 4.6 的显卡及最新驱动程序",
+    "req_gpu_value": "支持 OpenGL 4.6 的显卡及最新驱动程序（在 Mac 上，游戏自带 OpenGL）",
     "req_included": "内含",
     "req_included_value": "Stockfish 19 及其神经网络：开箱即可离线对弈",
     "req_network": "网络",
-    "req_network_value": "用于在线对局、GIF 和教练语音（可选下载，约 145 MB）",
+    "req_network_value": "用于在线对局、GIF，以及教练和分析的语音（可选下载，约 399 MB）",
     "req_licence": "许可证",
     "req_licence_value": "GNU 通用公共许可证第 3 版",
     "verify_title": "校验下载的文件",
@@ -194,12 +204,12 @@
     "title": "制作人员与<em>致谢</em>",
     "engine_head": "国际象棋引擎",
     "engine": "Stockfish 19，由 Stockfish 开发者制作（GNU GPL v3）。其神经网络使用 Leela Chess Zero 项目提供的数据训练（开放数据库许可协议）。",
-    "voice_head": "教练语音",
-    "voice": "教练模式的合成语音由 Supertonic 3 生成。Supertonic 3 是 Supertone 公司的模型，依据 OpenRAIL-M 许可证使用。",
+    "voice_head": "语音",
+    "voice": "Supertone 的 Supertonic 3，依据 BigScience Open RAIL-M 许可证使用：应你的要求下载后，在你的电脑上为教练和分析发声。",
     "fonts_head": "字体",
-    "fonts": "Georg Duffner 设计的 EB Garamond、Natanael Gama 设计的 Cinzel 和 Khaled Hosny 设计的 Amiri，均采用 SIL Open Font License；棋子符号来自 GNU FreeFont。",
-    "openings_head": "开局",
-    "openings": "开局名称来自 lichess.org 的 chess-openings 数据库，已贡献至公有领域（CC0）。",
+    "fonts": "Georg Duffner 设计的 EB Garamond、Natanael Gama 设计的 Cinzel 和 Khaled Hosny 设计的 Amiri；手写字体为 Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One 和 LXGW WenKai（均采用 SIL Open Font License）；棋子符号来自 GNU FreeFont。",
+    "openings_head": "开局与谜题",
+    "openings": "开局名称来自 lichess.org 的 chess-openings 数据库，教练挑战中的谜题来自 Lichess 谜题数据库，两者均已贡献至公有领域（CC0）。",
     "quote": "“国际象棋是分析的艺术。”",
     "quote_author": "米哈伊尔·博特温尼克"
   },
@@ -213,7 +223,7 @@
     "server_source": "GitHub 上的服务器",
     "releases": "发行版",
     "licence": "许可证（GPL v3）",
-    "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。",
+    "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。macOS 是 Apple Inc. 的商标。Linux 是 Linus Torvalds 的注册商标。OpenGL 是 Hewlett Packard Enterprise 的注册商标。",
     "legal": "Scacelith",
     "made": "本网站不使用 Cookie，也不使用任何跟踪器。"
   },
@@ -449,22 +459,28 @@
     "download": {
       "exe": "可执行文件",
       "zip": "ZIP 压缩包",
+      "dmg": "磁盘映像",
+      "archive": "压缩包",
       "file": "文件",
       "unavailable": "不可用",
       "your_system": "你的系统",
-      "eyebrow_beta": "公测版 · {version}",
       "eyebrow_release": "版本 {version}",
       "published": "发布于 {date}",
       "unreachable": "目前无法连接 GitHub：请查看发行版页面。",
       "available": "可下载",
       "verify_file": "该文件",
       "no_build": "目前还没有适用于 {os} 的游戏版本。",
-      "prerelease_short": "测试版",
-      "x64": "64 位（x64）"
+      "x64": "64 位（x64）",
+      "arch_x64": "Intel / AMD（x86-64）",
+      "arch_arm64": "Arm（aarch64）",
+      "several_arches": "64 位，Intel / AMD 或 Arm",
+      "macos_arm64": "Apple Silicon，macOS 26 或更高版本",
+      "experimental": "实验性"
     },
     "server": {
       "online": "在线",
       "offline": "无法连接",
+      "busy": "繁忙",
       "open": "开放",
       "closed": "关闭",
       "updated": "最后更新：{time}",
@@ -524,6 +540,7 @@
         "11": "五十回合规则（提出要求）",
         "12": "协议和棋",
         "13": "第二次违例着法，但对方无法将死",
+        "14": "认输，但对方无法将死",
         "20": "离开对局（断线时间过长）",
         "21": "离开对局，但对方无法将死",
         "22": "对局中止",

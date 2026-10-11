@@ -148,11 +148,14 @@ export function fileTitle(asset, files) {
   return t("js.download.file");
 }
 
-/** A file's format and size: ".zip · 91 MB" (the format alone for a file of unknown size). */
+/**
+ * A file's format and size: ".zip · 91 MB" (the format alone for a file of unknown size). The
+ * format is isolated left to right, so that its dot stays in front of it in Arabic.
+ */
 export function fileDetail(asset) {
-  const ext = asset.kind === "file" ? "" : `.${asset.kind}`;
+  const ext = asset.kind === "file" ? null : h("bdi", { dir: "ltr" }, `.${asset.kind}`);
   if (!Number.isFinite(asset.size)) return ext;
-  return ext ? `${ext} · ${fmt.bytes(asset.size)}` : fmt.bytes(asset.size);
+  return ext ? [ext, ` · ${fmt.bytes(asset.size)}`] : fmt.bytes(asset.size);
 }
 
 /** The line under a system's name: the processors and system versions its files are for. */

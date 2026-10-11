@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — fotorealistisches Schach aus der Ich-Perspektive",
-      "description": "Kostenloses fotorealistisches Schach für Windows, aus der Ich-Perspektive im königlichen Saal: Stockfish 19, Trainer und Online-Gegner erwarten Sie."
+      "description": "Kostenloses fotorealistisches Schach aus der Ich-Perspektive für Windows, Linux und macOS: Stockfish 19, Trainer, Analyse und Online-Spiel im königlichen Saal."
     },
     "players": {
       "title": "Rangliste und Spieler — Scacelith",
-      "description": "Die besten Spieler des offiziellen Scacelith-Servers in jeder Bedenkzeit, ihre Wertungen und ihre letzten Partien."
+      "description": "Die besten Spieler des offiziellen Scacelith-Servers in jeder gewerteten Bedenkzeit, ihre Wertungen und ihre letzten Partien."
     },
     "account": {
       "title": "Ihr Konto — Scacelith",
@@ -37,16 +37,15 @@
   },
   "hero": {
     "image_alt": "Zwei Porzellanroboter spielen an einem Nussbaumtisch in einem sonnendurchfluteten Marmorsaal Schach.",
-    "eyebrow": "Öffentliche Beta",
     "lead": "Nehmen Sie Platz an einem gewachsten Nussbaumtisch, in einem sonnendurchfluteten königlichen Saal. Auf der anderen Seite des Bretts wartet ein von Stockfish gesteuerter Porzellanroboter auf Ihren ersten Zug.",
     "watch": "Trailer ansehen",
-    "meta": "Freie Software · Windows, 64 Bit · Grafikkarte mit OpenGL 4.6",
+    "meta": "Freie Software · Windows, Linux, macOS (experimentell) · Grafikkarte mit OpenGL 4.6",
     "caption": "Im Spiel aufgenommen: der Titelbildschirm"
   },
   "highlights": {
     "engine": "Eigene OpenGL-4.6-Engine",
     "stockfish": "Stockfish 19 integriert",
-    "rules": "Elo nach FIDE-Regeln",
+    "rules": "FIDE-Regeln",
     "online": "Online-Spiel",
     "languages": "Zehn Sprachen"
   },
@@ -56,11 +55,11 @@
     "lead": "Scacelith bringt zurück, was eine echte Partie ausmacht: den Saal, die Stille, die Uhr, einen Gegner, der Sie ansieht, und die Rituale des Turniers.",
     "presence": {
       "title": "Aus der Ich-Perspektive",
-      "text": "Sie sehen durch die Augen Ihres Roboters. Schauen Sie sich im Saal um, beugen Sie sich über das Brett, blicken Sie zu Ihrem Gegner auf oder werfen Sie einen Blick auf das Partieformular neben Ihnen."
+      "text": "Sie sehen durch die Augen Ihres Roboters: Schauen Sie sich im Saal um, beugen Sie sich über das Brett, blicken Sie zu Ihrem Gegner auf, werfen Sie einen Blick auf Ihr Partieformular, oder stehen Sie auf und gehen Sie an ein Ende des Tisches."
     },
     "ritual": {
       "title": "Turnierregeln",
-      "text": "Berührt – geführt. Ihre Hand drückt die Uhr, um den Zug abzuschließen. Ein regelwidriger Zug ruft den Schiedsrichter herbei, ein zweiter kostet die Partie."
+      "text": "Berührt – geführt; Ihre Hand drückt die Uhr, um den Zug abzuschließen. Ohne die Anzeige legaler Züge ahndet der Schiedsrichter einen regelwidrigen Zug, ein zweiter kostet die Partie."
     },
     "scoresheet": {
       "title": "Von Hand notiert",
@@ -68,11 +67,11 @@
     },
     "opponent": {
       "title": "Ein würdiger Gegner",
-      "text": "Stockfish 19 auf Ihrem Niveau, vom Neuling (800) bis zur vollen Spielstärke (3500), mit einer Wertung, die nach jeder Partie gemäß den FIDE-Regeln berechnet wird."
+      "text": "Stockfish 19 auf Ihrem Niveau, vom Neuling (800) bis Stockfish Max (3500), mit einer Wertung, die nach jeder Partie gemäß den FIDE-Regeln berechnet wird."
     },
     "engine": {
       "title": "Für dieses Spiel gebaut",
-      "text": "Eine von Grund auf neu geschriebene Engine: physikalisch basiertes Licht, Marmor, gewachstes Holz, Porzellan und Messing, Sonnenlicht durch die Fenster, weiche Schatten und Spiegelungen."
+      "text": "Eine von Grund auf neu geschriebene Engine: physikalisch basiertes Licht, Marmor, gewachstes Holz, Porzellan und Messing, Sonnenlicht durch die Fenster, weiche Schatten und Spiegelungen. Qualitätsstufen von „Sehr niedrig“ bis „Ultra“ passen sie an Ihre Grafikkarte an."
     },
     "languages": {
       "title": "Zehn Sprachen",
@@ -89,11 +88,19 @@
     },
     "coach": {
       "name": "Trainer",
-      "text": "Ein Lehrer sitzt Ihnen gegenüber, spielt auf Ihrem Niveau und erklärt Ihnen die Partie: Drohungen, gute Züge, Fehler. Von den Schachregeln bis zum Expertenniveau, mit synthetischer Stimme."
+      "text": "Ein Lehrer sitzt Ihnen gegenüber, spielt auf Ihrem Niveau und erklärt Ihnen die Partie: Drohungen, gute Züge, Fehler – und was ein Fehler kostet, spielt er mit eigener Hand vor. Von den Schachregeln bis zum Expertenniveau, mit einer Stimme, die auf Ihrem Computer erzeugt wird."
+    },
+    "challenges": {
+      "name": "Trainer-Aufgaben",
+      "text": "Kurze Serien von Stellungen, die jeweils eine Fähigkeit trainieren: Matt in ein bis drei Zügen, Gabeln, Fesselungen und andere taktische Motive, Verteidigung und die elementaren Endspiele gegen den Trainer. Tipps nur auf Wunsch und ein grünes Häkchen für jede geschaffte Serie."
+    },
+    "analysis": {
+      "name": "Analyse",
+      "text": "Stockfish analysiert Ihre gespeicherten Partien, Ihre Online-Partien oder jede Partie im PGN-Format: ein Bewertungsbalken, die Schlüsselzüge markiert von brillant bis Patzer, der bessere Zug als Pfeil eingezeichnet und Kommentare, gesprochen und als Untertitel. Während Sie Zug für Zug vorgehen, führen die Hände der Roboter die Züge aus."
     },
     "online": {
       "name": "Online spielen",
-      "text": "Echte Gegner über einen Scacelith-Server: gewertete Partien, Gegnersuche, Herausforderungen und private Partien. Der Roboter Ihres Gegners bewegt sich live mit ihm."
+      "text": "Echte Gegner über einen Scacelith-Server: gewertete Partien, Gegnersuche, Herausforderungen und private Partien, oder eine Direktpartie zwischen zwei Computern. Der Roboter Ihres Gegners bewegt sich live mit ihm."
     },
     "watch": {
       "name": "Partie ansehen",
@@ -139,7 +146,7 @@
     "title": "Scacelith <em>in Bewegung</em>",
     "play": "Trailer abspielen",
     "soon_title": "Der Trailer erscheint in Kürze",
-    "soon_text": "Nehmen Sie in der Zwischenzeit Platz: Die Beta steht zum Download bereit.",
+    "soon_text": "Nehmen Sie in der Zwischenzeit Platz: Das Spiel steht zum Download bereit.",
     "privacy": "Das Video wird von YouTube (youtube-nocookie.com) abgespielt, sobald Sie es starten.",
     "open_youtube": "Auf YouTube ansehen"
   },
@@ -147,11 +154,11 @@
     "eyebrow": "Online",
     "title": "Echte Gegner,<br><em>derselbe Saal.</em>",
     "lead": "Melden Sie sich im Spiel beim offiziellen Server an und spielen Sie gegen Gegner aus aller Welt – auch hier aus der Ich-Perspektive.",
-    "point_rated": "Gewertete Partien in jeder offiziellen Bedenkzeit, mit je einer eigenen Wertung nach FIDE-Regeln.",
-    "point_match": "Gegnersuche, Herausforderungen per Namen, private Partien mit Code und Direktpartien zwischen zwei Computern.",
+    "point_rated": "Gewertete Partien in jeder offiziellen Bedenkzeit, mit je einer eigenen Wertung, berechnet nach den FIDE-Regeln.",
+    "point_match": "Gegnersuche, Herausforderungen per Namen und private Partien mit Code; oder eine Direktpartie zwischen zwei Computern, ohne Server und ohne Konto.",
     "point_fair": "Fairplay: automatische Prüfungen, Engine-Analyse beendeter Partien und Meldungen von Spielern.",
     "point_history": "Ihr Partieverlauf auf dieser Website: Laden Sie jede Partie als PGN oder als animiertes GIF herunter.",
-    "point_open": "Jeder kann einen Community-Server betreiben: Der Server und seine API sind freie Software.",
+    "point_open": "Jeder kann einen Community-Server betreiben: Der Server ist freie Software, und seine API ist dokumentiert.",
     "create": "Konto erstellen",
     "signin": "Anmelden",
     "server_title": "Der offizielle Server",
@@ -170,19 +177,22 @@
     "see_release": "Version auf GitHub ansehen",
     "latest": "Scacelith",
     "all_releases": "Alle Versionen",
+    "experimental": "Experimentell",
+    "source": "Quellcode",
+    "source_zip": "ZIP-Archiv",
     "eyebrow": "Download",
     "title": "Nehmen Sie Platz.<br><em>Kostenlos und quelloffen.</em>",
-    "lead": "Kein Installationsprogramm: herunterladen, entpacken und Scacelith.exe starten. Jede Datei wird von GitHub Actions aus ihrem getaggten Quellcode gebaut, mit bescheinigter Build-Herkunft.",
-    "prerelease": "Beta",
+    "lead": "Entpacken und spielen: kein Installationsprogramm unter Windows oder Linux, und auf dem Mac einfach in den Ordner „Programme“ ziehen. Jede Datei wird von GitHub Actions aus ihrem getaggten Quellcode gebaut, mit bescheinigter Build-Herkunft.",
     "notes": "Versionshinweise",
+    "macos_note": "Für Macs mit Apple Silicon (M1 oder neuer) und macOS 26 oder höher, nicht in einer virtuellen Maschine; neuer und weniger getestet als die anderen Versionen. Die App ist nicht von einem registrierten Apple-Entwickler signiert: Öffnen Sie sie beim ersten Mal über Systemeinstellungen › Datenschutz & Sicherheit › Dennoch öffnen.",
     "req_system": "System",
-    "req_system_value": "Windows, 64 Bit (x64)",
+    "req_system_value": "Windows 64 Bit (x64); Linux 64 Bit (x86-64 oder aarch64) mit glibc 2.34, OpenSSL 3 und X11 oder XWayland, etwa Ubuntu 22.04 oder Debian 12; macOS 26 oder höher auf Apple Silicon (experimentell)",
     "req_gpu": "Grafik",
-    "req_gpu_value": "Eine Grafikkarte mit OpenGL 4.6 und aktuellem Treiber",
+    "req_gpu_value": "Eine Grafikkarte mit OpenGL 4.6 und aktuellem Treiber (auf dem Mac bringt das Spiel sein eigenes OpenGL mit)",
     "req_included": "Enthalten",
     "req_included_value": "Stockfish 19 und sein neuronales Netz: sofort offline spielen",
     "req_network": "Internet",
-    "req_network_value": "Für das Online-Spiel, GIFs und die Stimme des Trainers (optionaler Download von etwa 145 MB)",
+    "req_network_value": "Für das Online-Spiel, GIFs und die Stimme des Trainers und der Analyse (optionaler Download von etwa 399 MB)",
     "req_licence": "Lizenz",
     "req_licence_value": "GNU General Public License v3",
     "verify_title": "Download überprüfen",
@@ -194,12 +204,12 @@
     "title": "Mitwirkende und <em>Dank</em>",
     "engine_head": "Schach-Engine",
     "engine": "Stockfish 19, von den Stockfish-Entwicklern (GNU GPL v3). Sein neuronales Netz wurde mit Daten des Projekts Leela Chess Zero trainiert (Open Database License).",
-    "voice_head": "Stimme des Trainers",
-    "voice": "Synthetische Sprache, erzeugt mit Supertonic 3 für den Trainer-Modus. Supertonic 3 ist ein Modell von Supertone und wird unter der OpenRAIL-M-Lizenz verwendet.",
+    "voice_head": "Stimme",
+    "voice": "Supertonic 3 von Supertone, unter der Lizenz BigScience Open RAIL-M: Auf Ihren Wunsch heruntergeladen, leiht es dem Trainer und der Analyse seine Stimme, auf Ihrem Computer.",
     "fonts_head": "Schriften",
-    "fonts": "EB Garamond von Georg Duffner, Cinzel von Natanael Gama und Amiri von Khaled Hosny (SIL Open Font License); Schachfiguren aus GNU FreeFont.",
-    "openings_head": "Eröffnungen",
-    "openings": "Eröffnungsnamen aus der Datenbank chess-openings von lichess.org, gemeinfrei gestellt (CC0).",
+    "fonts": "EB Garamond von Georg Duffner, Cinzel von Natanael Gama und Amiri von Khaled Hosny; Handschriften in Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One und LXGW WenKai (alle unter SIL Open Font License); Schachfiguren aus GNU FreeFont.",
+    "openings_head": "Eröffnungen und Aufgaben",
+    "openings": "Eröffnungsnamen aus der Datenbank chess-openings von lichess.org und die Stellungen der Trainer-Aufgaben aus der Aufgabendatenbank von Lichess, beide gemeinfrei gestellt (CC0).",
     "quote": "„Schach ist die Kunst der Analyse.“",
     "quote_author": "Michail Botwinnik"
   },
@@ -213,7 +223,7 @@
     "server_source": "Der Server auf GitHub",
     "releases": "Versionen",
     "licence": "Lizenz (GPL v3)",
-    "credits": "Stockfish ist eine Marke seiner Entwickler. YouTube ist eine Marke der Google LLC. Windows ist eine Marke der Microsoft Corporation.",
+    "credits": "Stockfish ist eine Marke seiner Entwickler. YouTube ist eine Marke der Google LLC. Windows ist eine Marke der Microsoft Corporation. macOS ist eine Marke der Apple Inc. Linux ist eine eingetragene Marke von Linus Torvalds. OpenGL ist eine eingetragene Marke von Hewlett Packard Enterprise.",
     "legal": "Scacelith",
     "made": "Diese Website verwendet weder Cookies noch Tracker."
   },
@@ -451,22 +461,28 @@
     "download": {
       "exe": "Ausführbare Datei",
       "zip": "ZIP-Archiv",
+      "dmg": "Festplattenimage",
+      "archive": "Archiv",
       "file": "Datei",
       "unavailable": "Nicht verfügbar",
       "your_system": "Ihr System",
-      "eyebrow_beta": "Öffentliche Beta · {version}",
       "eyebrow_release": "Version {version}",
       "published": "Veröffentlicht am {date}",
       "unreachable": "GitHub ist gerade nicht erreichbar: Sehen Sie auf der Versionsseite nach.",
       "available": "Verfügbar",
       "verify_file": "die Datei",
       "no_build": "Derzeit gibt es keine Version des Spiels für {os}.",
-      "prerelease_short": "Beta",
-      "x64": "64 Bit (x64)"
+      "x64": "64 Bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 Bit, Intel / AMD oder Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 oder höher",
+      "experimental": "Experimentell"
     },
     "server": {
       "online": "Online",
       "offline": "Nicht erreichbar",
+      "busy": "Ausgelastet",
       "open": "Offen",
       "closed": "Geschlossen",
       "updated": "Aktualisiert {time}",
@@ -528,6 +544,7 @@
         "11": "50-Züge-Regel (reklamiert)",
         "12": "Remis durch Vereinbarung",
         "13": "Zweiter regelwidriger Zug, aber der Gegner kann nicht mattsetzen",
+        "14": "Aufgabe, aber der Gegner kann nicht mattsetzen",
         "20": "Partie verlassen (zu lange getrennt)",
         "21": "Partie verlassen, aber der Gegner kann nicht mattsetzen",
         "22": "Partie abgebrochen",

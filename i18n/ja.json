@@ -2,11 +2,11 @@
   "pages": {
     "home": {
       "title": "Scacelith — 一人称で指す、フォトリアルなチェス",
-      "description": "Windows用のフォトリアルな無料チェス。王宮の広間で一人称で指せます。Stockfish 19、コーチ、オンラインの対戦相手があなたを待っています。"
+      "description": "Windows、Linux、macOS用のフォトリアルな無料チェス。王宮の広間で一人称で指せます。Stockfish 19、コーチ、対局の分析、オンライン対局を搭載。"
     },
     "players": {
       "title": "ランキングとプレイヤー — Scacelith",
-      "description": "Scacelith公式サーバーの持ち時間ごとのトッププレイヤーと、そのレーティングや最近の対局。"
+      "description": "Scacelith公式サーバーの、レーティング戦の持ち時間ごとのトッププレイヤーと、そのレーティングや最近の対局。"
     },
     "account": {
       "title": "アカウント — Scacelith",
@@ -37,16 +37,15 @@
   },
   "hero": {
     "image_alt": "陽光の差し込む大理石の広間で、2体の磁器のロボットがクルミ材のテーブルを挟んでチェスを指している。",
-    "eyebrow": "パブリックベータ",
     "lead": "陽光の差し込む王宮の広間で、蜜蝋で磨かれたクルミ材のテーブルに着きましょう。盤の向こうでは、Stockfishが操る磁器のロボットがあなたの初手を待っています。",
     "watch": "トレーラーを見る",
-    "meta": "フリーソフトウェア · Windows 64ビット · OpenGL 4.6対応グラフィックカード",
+    "meta": "フリーソフトウェア · Windows、Linux、macOS（試験版） · OpenGL 4.6対応グラフィックカード",
     "caption": "ゲーム内で撮影：タイトル画面"
   },
   "highlights": {
     "engine": "独自開発のOpenGL 4.6エンジン",
     "stockfish": "Stockfish 19を内蔵",
-    "rules": "FIDE方式のレーティング",
+    "rules": "FIDEルールに準拠",
     "online": "オンライン対局",
     "languages": "10言語に対応"
   },
@@ -56,11 +55,11 @@
     "lead": "Scacelithは、本物の対局を形づくるものをよみがえらせます。広間、静寂、対局時計、あなたを見つめる相手、そして大会ならではの作法。",
     "presence": {
       "title": "一人称視点",
-      "text": "あなたは自分のロボットの目を通して世界を見ます。広間を見回し、盤に身を乗り出し、顔を上げて相手を見つめ、傍らの棋譜用紙に目をやることもできます。"
+      "text": "あなたは自分のロボットの目を通して世界を見ます。広間を見回し、盤に身を乗り出し、顔を上げて相手を見つめ、自分の棋譜用紙に目をやり、立ち上がってテーブルの端まで歩くこともできます。"
     },
     "ritual": {
       "title": "大会のルール",
-      "text": "触れた駒は動かさなければなりません。自分の手で時計を押して、はじめて一手が完了します。反則手を指すとアービターが現れ、2回目の反則手で負けになります。"
+      "text": "触れた駒は動かさなければなりません。自分の手で時計を押して、はじめて一手が完了します。「合法手を表示」をオフにすると、反則手はアービターに罰せられ、2回目の反則手で負けになります。"
     },
     "scoresheet": {
       "title": "手書きの棋譜",
@@ -68,11 +67,11 @@
     },
     "opponent": {
       "title": "手ごたえのある相手",
-      "text": "入門（800）から最強（3500）まで、あなたのレベルに合わせたStockfish 19と対局できます。対局のたびに、FIDEの規則に従ってレーティングが計算されます。"
+      "text": "入門（800）からStockfish 最強（3500）まで、あなたのレベルに合わせたStockfish 19と対局できます。対局のたびに、FIDEの規則に従ってレーティングが計算されます。"
     },
     "engine": {
       "title": "このゲームのために開発",
-      "text": "一から書き上げたエンジン。物理ベースのライティング、大理石、磨き込まれた木、磁器と真鍮、窓から差し込む陽光、柔らかな影と映り込み。"
+      "text": "一から書き上げたエンジン。物理ベースのライティング、大理石、磨き込まれた木、磁器と真鍮、窓から差し込む陽光、柔らかな影と映り込み。「最低」から「最高」までの画質プリセットで、お使いのグラフィックカードに合わせられます。"
     },
     "languages": {
       "title": "10言語",
@@ -89,11 +88,19 @@
     },
     "coach": {
       "name": "コーチ",
-      "text": "先生が向かいに座り、あなたのレベルで指しながら、脅威や好手、ミスを解説してくれます。レベルはチェスのルールからエキスパートまで。声は合成音声です。"
+      "text": "先生が向かいに座り、あなたのレベルで指しながら、脅威や好手、ミスを解説してくれます。ミスが何を招くのかも、自らの手で指して見せてくれます。レベルはチェスのルールからエキスパートまで。声はお使いのコンピューター上で合成されます。"
+    },
+    "challenges": {
+      "name": "コーチのチャレンジ",
+      "text": "それぞれ1つのスキルを鍛える、短い問題集。1～3手メイト、フォークやピンなどの戦術、守り、そしてコーチを相手にした基本のエンドゲーム。ヒントは求めたときだけ表示され、達成した問題集には緑のチェックマークがつきます。"
+    },
+    "analysis": {
+      "name": "分析",
+      "text": "Stockfishが、保存した対局、オンライン対局、あらゆるPGNを解析します。評価値バー、妙手から大悪手まで印のついた重要な手、矢印で示されるより良い手、そして音声と字幕による解説。一手ずつ進めると、ロボットの手が駒を動かします。"
     },
     "online": {
       "name": "オンライン対局",
-      "text": "Scacelithサーバーを通じて本物の相手と対局できます。レーティング戦、マッチング、対局の申し込み、プライベート対局。相手のロボットは、相手の動きに合わせてリアルタイムに動きます。"
+      "text": "Scacelithサーバーを通じて本物の相手と対局できます。レーティング戦、マッチング、対局の申し込み、プライベート対局。2台のコンピューター間で直接対局することもできます。相手のロボットは、相手の動きに合わせてリアルタイムに動きます。"
     },
     "watch": {
       "name": "対局を観戦",
@@ -139,7 +146,7 @@
     "title": "<em>動き出す</em>Scacelith",
     "play": "トレーラーを再生",
     "soon_title": "トレーラーは近日公開",
-    "soon_text": "それまでは、どうぞお席へ。ベータ版はすでにダウンロードできます。",
+    "soon_text": "それまでは、どうぞお席へ。ゲームはすでにダウンロードできます。",
     "privacy": "動画は、再生ボタンを押した時点でYouTube（youtube-nocookie.com）から再生されます。",
     "open_youtube": "YouTubeで見る"
   },
@@ -147,11 +154,11 @@
     "eyebrow": "オンライン",
     "title": "本物の相手と、<br><em>同じ広間で。</em>",
     "lead": "ゲームから公式サーバーにログインし、世界中のプレイヤーと対局しましょう。もちろん一人称のままで。",
-    "point_rated": "公式の持ち時間ごとにレーティング戦があり、それぞれにFIDE方式のレーティングがつきます。",
-    "point_match": "マッチング、名前を指定した対局の申し込み、コードを使ったプライベート対局、2台のコンピューター間のダイレクト対局。",
+    "point_rated": "公式の持ち時間ごとにレーティング戦があり、それぞれ別々のレーティングがFIDEの規則に従って計算されます。",
+    "point_match": "マッチング、名前を指定した対局の申し込み、コードを使ったプライベート対局。サーバーもアカウントも不要な、2台のコンピューター間のダイレクト対局も。",
     "point_fair": "フェアプレー：自動チェック、終局後のエンジン解析、プレイヤーからの報告。",
     "point_history": "このサイトで対局履歴を確認でき、各対局をPGNまたはアニメーションGIFでダウンロードできます。",
-    "point_open": "誰でもコミュニティサーバーを運営できます。サーバーとそのAPIはフリーソフトウェアです。",
+    "point_open": "誰でもコミュニティサーバーを運営できます。サーバーはフリーソフトウェアで、APIのドキュメントも公開されています。",
     "create": "アカウントを作成",
     "signin": "ログイン",
     "server_title": "公式サーバー",
@@ -170,19 +177,22 @@
     "see_release": "GitHubでリリースを見る",
     "latest": "Scacelith",
     "all_releases": "すべてのリリース",
+    "experimental": "試験版",
+    "source": "ソースコード",
+    "source_zip": "ZIPアーカイブ",
     "eyebrow": "ダウンロード",
     "title": "さあ、席へ。<br><em>無料で、オープンソース。</em>",
-    "lead": "インストールは不要です。ダウンロードして展開し、Scacelith.exeを実行するだけです。すべてのファイルはタグ付きのソースからGitHub Actionsでビルドされ、ビルドの来歴が証明されています。",
-    "prerelease": "ベータ",
+    "lead": "展開すればすぐに遊べます。WindowsとLinuxではインストール不要、Macでは「アプリケーション」にドラッグするだけです。すべてのファイルはタグ付きのソースからGitHub Actionsでビルドされ、ビルドの来歴が証明されています。",
     "notes": "リリースノート",
+    "macos_note": "macOS 26以降を搭載したApple SiliconのMac（M1以降）用です。仮想マシンには対応していません。他のビルドより新しく、テストもまだ十分ではありません。このアプリにはAppleに登録された開発者の署名がないため、初回は「システム設定 › プライバシーとセキュリティ › このまま開く」から開いてください。",
     "req_system": "システム",
-    "req_system_value": "Windows 64ビット（x64）",
+    "req_system_value": "Windows 64ビット（x64）。Linux 64ビット（x86-64またはaarch64）：glibc 2.34、OpenSSL 3、X11またはXWaylandが必要（Ubuntu 22.04、Debian 12など）。Apple Silicon上のmacOS 26以降（試験版）。",
     "req_gpu": "グラフィック",
-    "req_gpu_value": "OpenGL 4.6対応のグラフィックカードと最新のドライバー",
+    "req_gpu_value": "OpenGL 4.6対応のグラフィックカードと最新のドライバー（Macでは、ゲームが独自のOpenGLを同梱しています）",
     "req_included": "同梱",
     "req_included_value": "Stockfish 19とそのニューラルネットワーク：すぐにオフラインで対局できます",
     "req_network": "インターネット",
-    "req_network_value": "オンライン対局、GIF、コーチの音声に必要（音声は約145MBで、ダウンロードは任意）",
+    "req_network_value": "オンライン対局、GIF、コーチと分析の音声に必要（音声は約399MBで、ダウンロードは任意）",
     "req_licence": "ライセンス",
     "req_licence_value": "GNU一般公衆利用許諾書 第3版",
     "verify_title": "ダウンロードを検証",
@@ -194,12 +204,12 @@
     "title": "クレジットと<em>謝辞</em>",
     "engine_head": "チェスエンジン",
     "engine": "Stockfish 19（Stockfish開発者による。GNU GPL v3）。そのニューラルネットワークは、Leela Chess Zeroプロジェクトが提供するデータ（Open Database License）で学習されています。",
-    "voice_head": "コーチの声",
-    "voice": "コーチモードの合成音声はSupertonic 3で生成しています。Supertonic 3はSupertoneのモデルで、OpenRAIL-Mライセンスの下で使用しています。",
+    "voice_head": "音声",
+    "voice": "SupertoneのSupertonic 3（BigScience Open RAIL-Mライセンス）。ご希望に応じてダウンロードされ、お使いのコンピューター上でコーチと分析の声を担当します。",
     "fonts_head": "書体",
-    "fonts": "EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。いずれもSIL Open Font License。チェスの駒の記号はGNU FreeFontより。",
-    "openings_head": "オープニング",
-    "openings": "オープニング名はlichess.orgのchess-openingsデータベース（CC0、パブリックドメイン）によります。",
+    "fonts": "EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。手書き文字はCaveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、LXGW WenKai。いずれもSIL Open Font License。チェスの駒の記号はGNU FreeFontより。",
+    "openings_head": "オープニングとパズル",
+    "openings": "オープニング名はlichess.orgのchess-openingsデータベース、コーチのチャレンジのパズルはLichessのパズルデータベースによります（いずれもCC0、パブリックドメイン）。",
     "quote": "「チェスとは分析の芸術である。」",
     "quote_author": "ミハイル・ボトヴィニク"
   },
@@ -213,7 +223,7 @@
     "server_source": "サーバー（GitHub）",
     "releases": "リリース",
     "licence": "ライセンス（GPL v3）",
-    "credits": "StockfishはStockfish開発者の商標です。YouTubeはGoogle LLCの商標です。WindowsはMicrosoft Corporationの商標です。",
+    "credits": "StockfishはStockfish開発者の商標です。YouTubeはGoogle LLCの商標です。WindowsはMicrosoft Corporationの商標です。macOSはApple Inc.の商標です。LinuxはLinus Torvaldsの登録商標です。OpenGLはHewlett Packard Enterpriseの登録商標です。",
     "legal": "Scacelith",
     "made": "このサイトはCookieもトラッカーも使用していません。"
   },
@@ -449,22 +459,28 @@
     "download": {
       "exe": "実行ファイル",
       "zip": "ZIPアーカイブ",
+      "dmg": "ディスクイメージ",
+      "archive": "アーカイブ",
       "file": "ファイル",
       "unavailable": "未対応",
       "your_system": "お使いのシステム",
-      "eyebrow_beta": "パブリックベータ · {version}",
       "eyebrow_release": "バージョン {version}",
       "published": "{date}公開",
       "unreachable": "現在GitHubに接続できません。リリースページをご覧ください。",
       "available": "利用可能",
       "verify_file": "ファイル",
       "no_build": "現在、{os}版のゲームはありません。",
-      "prerelease_short": "ベータ",
-      "x64": "64ビット（x64）"
+      "x64": "64ビット（x64）",
+      "arch_x64": "Intel / AMD（x86-64）",
+      "arch_arm64": "Arm（aarch64）",
+      "several_arches": "64ビット、Intel / AMDまたはArm",
+      "macos_arm64": "Apple Silicon、macOS 26以降",
+      "experimental": "試験版"
     },
     "server": {
       "online": "オンライン",
       "offline": "接続不可",
+      "busy": "混雑中",
       "open": "受付中",
       "closed": "停止中",
       "updated": "更新：{time}",
@@ -524,6 +540,7 @@
         "11": "50手ルール（申告）",
         "12": "合意による引き分け",
         "13": "2回目の反則手、ただし相手はメイトできない",
+        "14": "投了、ただし相手はメイトできない",
         "20": "対局放棄（長時間の切断）",
         "21": "対局放棄、ただし相手はメイトできない",
         "22": "対局中止",
