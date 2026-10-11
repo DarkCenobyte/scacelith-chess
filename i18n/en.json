@@ -273,6 +273,16 @@
       "use_recovery": "Use a recovery code instead",
       "submit": "Confirm"
     },
+    "google": {
+      "or": "or",
+      "button": "Sign in with Google",
+      "username_title": "Choose your user name",
+      "username_text": "Your Google account is new to this server. Choose the name other players will see: it cannot be changed later.",
+      "username_submit": "Create my account",
+      "link_title": "Link your Google account",
+      "link_submit": "Link and sign in",
+      "returning": "Signing in with Google…"
+    },
     "register": {
       "tab": "Create an account",
       "title": "A free account",
@@ -436,7 +446,19 @@
       "render_failed": "The server could not draw this GIF.",
       "invalid_game": "This game does not exist.",
       "invalid_player": "Enter a user name: 2 to 24 letters, digits, _, . or -.",
-      "player_not_found": "No player with this name."
+      "player_not_found": "No player with this name.",
+      "sso_cancelled": "Google sign-in was cancelled.",
+      "sso_mismatch": "This Google sign-in was not started in this tab, or was already used. Try again.",
+      "sso_expired": "This Google sign-in has expired. Try again.",
+      "invalid_verifier": "This Google sign-in was started in another tab or browser. Start again from this page.",
+      "sso_email_unverified": "Google has not confirmed the e-mail address of this Google account.",
+      "sso_account_exists": "An account already uses this e-mail address, but it has no password to link Google with. Give it one with “Forgot password?”, then sign in with Google again.",
+      "sso_failed": "Google sign-in could not be completed. Try again.",
+      "sso_disabled": "Google sign-in is not available on this server.",
+      "sso_already_linked": "This Google account is already linked to another account.",
+      "account_disabled": "This account can no longer be used.",
+      "sso_storage": "Your browser blocks this site's storage, which Google sign-in needs. Allow it, or sign in with your password.",
+      "sso_url": "The server answered with an unexpected Google address, so Google sign-in was stopped."
     },
     "time": {
       "seconds": {
@@ -612,7 +634,9 @@
       "username": "User name",
       "password_rules": "At least {min} characters, without your user name or e-mail.",
       "password_note": "Your other devices are signed out, and this one stays signed in.",
-      "signin_label": "Sign in"
+      "signin_label": "Sign in",
+      "google_link_text": "The account {name} already uses this e-mail address. Enter its password once to link it to Google; after that, “Sign in with Google” is enough.",
+      "auth_foot_google": "One account on the official server, for the game and this site. Created it with Google in the game? Sign in with Google here too."
     },
     "players": {
       "since": "Member since {date}",
