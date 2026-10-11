@@ -39,10 +39,15 @@ bool enabled() {
     return v && *v && std::strcmp(v, "0") != 0;
 }
 
+// Xvfb now and then resets a new connection while it closes earlier ones (ECONNRESET): retried.
 Display* openDisplay() {
     static const bool threads = XInitThreads() != 0;  // each client below has its own connection
     (void)threads;
-    return XOpenDisplay(nullptr);
+    for (int attempt = 0; attempt < 50; ++attempt) {
+        if (Display* dpy = XOpenDisplay(nullptr)) return dpy;
+        usleep(10000);
+    }
+    return nullptr;
 }
 
 struct Connection {
@@ -858,44 +863,71 @@ TEST(x11_focus_loss_releases_held_keys_and_buttons) {
     x11::setTextLocale();
     Typing t(dpy);
     t.open();
-    const Window other = makeWindow(dpy, 100, 100);
+    // The other application's window, which the window manager leaves alone (it would give it the
+    // keyboard as it maps).
+    XSetWindowAttributes oa{};
+    oa.override_redirect = True;
+    const Window other = XCreateWindow(dpy, DefaultRootWindow(dpy), 300, 0, 100, 100, 0, CopyFromParent, InputOutput,
+                                       CopyFromParent, CWOverrideRedirect, &oa);
     REQUIRE(mapAndWait(dpy, other));
     bool focused = false;
-    auto pumpFocus = [&](bool want) {
+    // Every event through the keyboard, then the focus, as pumpEvents() does.
+    auto drain = [&] {
+        XSync(dpy, False);
+        while (XPending(dpy)) {
+            XEvent e;
+            XNextEvent(dpy, &e);
+            if (!t.kb.event(e, t.in)) x11::focusEvent(e, t.win, t.kb, t.in, focused);
+        }
+    };
+    // Gives 'target' the keyboard until the focus events agree, for 100 ms on end. The request is
+    // made again every 100 ms: a window manager may move the focus meanwhile (openbox does when a
+    // window maps or the focused one goes away).
+    auto focusOn = [&](Window target) {
+        const bool want = target == t.win;
         const auto end = Clock::now() + 3s;
+        auto ask = Clock::now();
+        Clock::time_point since{};
         while (Clock::now() < end) {
-            XSync(dpy, False);
-            while (XPending(dpy)) {
-                XEvent e;
-                XNextEvent(dpy, &e);
-                if (!t.kb.event(e, t.in)) x11::focusEvent(e, t.win, t.kb, t.in, focused);
+            if (Clock::now() >= ask) {
+                XSetInputFocus(dpy, target, RevertToParent, CurrentTime);
+                ask = Clock::now() + 100ms;
             }
-            if (focused == want) return true;
+            drain();
+            Window has = None;
+            int revert = 0;
+            XGetInputFocus(dpy, &has, &revert);
+            if (focused != want || has != target)
+                since = Clock::time_point{};
+            else if (since == Clock::time_point{})
+                since = Clock::now();
+            else if (Clock::now() - since >= 100ms)
+                return true;
             usleep(2000);
         }
         return false;
     };
-    XSetInputFocus(dpy, t.win, RevertToParent, CurrentTime);
-    REQUIRE(pumpFocus(true));
+    // From a known state: the other window first, then the game's.
+    REQUIRE(focusOn(other));
+    REQUIRE(focusOn(t.win));
     // W held to walk in the observer view, Shift held, the right button held to look around.
     const KeyCode w = XKeysymToKeycode(dpy, XK_w), shift = XKeysymToKeycode(dpy, XK_Shift_L);
     sendKey(dpy, t.win, shift, 0, 7000, true);
     sendKey(dpy, t.win, w, ShiftMask, 7010, true);
     x11::setButton(t.in, plat::MOUSE_RIGHT, true);
-    pump(dpy, t.kb, t.in);
+    drain();
+    REQUIRE(focused);
     REQUIRE(t.in.keyDown['W'] && t.in.keyDown[plat::KEY_LSHIFT]);
     newFrame(t.in);
     // Alt+Tab: another window has the keyboard, and the releases go there.
-    XSetInputFocus(dpy, other, RevertToParent, CurrentTime);
-    REQUIRE(pumpFocus(false));
+    REQUIRE(focusOn(other));
     CHECK(!t.in.keyDown['W']);
     CHECK(t.in.keyReleased['W']);
     CHECK(!t.in.keyDown[plat::KEY_LSHIFT]);
     CHECK(t.in.keyReleased[plat::KEY_LSHIFT]);
     CHECK(!t.in.mouseDown[plat::MOUSE_RIGHT]);
     CHECK(t.in.mouseReleased[plat::MOUSE_RIGHT]);
-    XSetInputFocus(dpy, t.win, RevertToParent, CurrentTime);
-    CHECK(pumpFocus(true));
+    CHECK(focusOn(t.win));
     XDestroyWindow(dpy, other);
 }
 
