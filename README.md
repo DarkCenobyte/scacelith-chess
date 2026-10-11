@@ -33,9 +33,9 @@ The pictures are plain files in `assets/img/`: replace them and commit, no build
 
 | File | Where it shows |
 | --- | --- |
-| `hero.webp`, `hero-960.webp` | The top of the home page, the trailer's poster, the header of the inner pages and the language page: a scene without interface text, about 2:1 |
+| `hero.webp`, `hero-960.webp` | The top of the home page, the trailer's poster, the header of the inner pages and the language page: a scene without interface text (16:9 or wider), shown cropped; its caption is `hero.caption` |
 | `og-scacelith.jpg` | The picture of link previews (1200 x 630) |
-| `title-screen`, `the-grand-hall`, `at-the-board`, `the-opponent`, `the-scoresheet` | The gallery, in this order: `<name>.webp` is the full picture of the viewer, `<name>-1000.webp` its 1000 px thumbnail (shown in a 16:9 frame) |
+| `title-screen`, `the-coach`, `coach-challenges`, `analysis-mode`, `watching-a-game`, `the-opponent`, `the-grand-hall`, `the-scoresheet` | The gallery, in this order (the first one large, four beside it, three below): `<name>.webp` is the full picture of the viewer, `<name>-1000.webp` its 1000 px thumbnail (shown in a 16:9 frame) |
 
 `tools/screenshots.sh <name> <picture>` makes these files from a PNG, JPEG or WebP with
 ImageMagick (`tools/screenshots.sh` alone lists the names). Without it, any editor will do: WebP,

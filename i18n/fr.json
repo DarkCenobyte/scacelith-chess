@@ -44,7 +44,7 @@
     "lead": "Prenez place à une table de noyer ciré, dans une salle royale baignée de soleil. De l’autre côté de l’échiquier, un robot de porcelaine animé par Stockfish attend votre premier coup.",
     "watch": "Voir la bande-annonce",
     "meta": "Logiciel libre · Windows, Linux, macOS (expérimental) · Carte graphique OpenGL 4.6",
-    "caption": "Capturé dans le jeu : l’écran titre"
+    "caption": "Capturé dans le jeu : la salle royale"
   },
   "highlights": {
     "engine": "Moteur OpenGL 4.6 maison",
@@ -123,13 +123,25 @@
       "alt": "L’écran titre : le menu de Scacelith à côté de deux robots qui jouent aux échecs dans la salle.",
       "caption": "L’écran titre"
     },
+    "coach": {
+      "alt": "Le coach, un robot de porcelaine portant « COACH » sur le torse, vous accueille de l’autre côté de l’échiquier ; ses paroles s’affichent aussi en sous-titre.",
+      "caption": "Coach"
+    },
+    "challenges": {
+      "alt": "Le menu des défis du coach : des séries de mats et de tactiques avec leur difficulté et celles déjà réussies, à côté de la description de la série choisie.",
+      "caption": "Défis du coach"
+    },
+    "analysis": {
+      "alt": "Le mode Analyse : la barre d’évaluation, une flèche tracée sur l’échiquier, les coups annotés avec la précision de chaque camp, et la liste des commandes.",
+      "caption": "Analyse"
+    },
+    "game": {
+      "alt": "Vue de côté, un robot tend le bras au-dessus de la table pour jouer une pièce pendant que l’autre attend ; les pièces prises sont posées à côté de l’échiquier.",
+      "caption": "Regarder une partie"
+    },
     "hall": {
       "alt": "Deux robots face à face de part et d’autre de l’échiquier, dans des fauteuils de velours rouge, sous de hautes fenêtres.",
       "caption": "La salle royale"
-    },
-    "board": {
-      "alt": "L’échiquier vu de dessus, avec la pendule et la main d’un robot qui s’avance vers une pièce.",
-      "caption": "À l’échiquier"
     },
     "opponent": {
       "alt": "Gros plan sur l’adversaire, un robot de porcelaine, la tête penchée vers l’échiquier.",
@@ -139,7 +151,7 @@
       "alt": "La main d’un robot note les coups sur la feuille de partie avec un stylo-plume.",
       "caption": "La feuille de partie"
     },
-    "note": "Version de développement. L’interface visible sur ces images est en français.",
+    "note": "Version 1.0.0. L’interface visible sur ces images est en anglais.",
     "viewer": "Visionneuse d’images",
     "close": "Fermer",
     "previous": "Image précédente",

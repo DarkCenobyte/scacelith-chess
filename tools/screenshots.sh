@@ -6,10 +6,11 @@
 #   tools/screenshots.sh the-grand-hall  ~/Pictures/hall.png
 #   tools/screenshots.sh hero            ~/Pictures/scene-without-text.png
 #
-# Gallery names (home page, in this order): title-screen, the-grand-hall, at-the-board,
-# the-opponent, the-scoresheet. Each gets assets/img/<name>.webp (the full picture, at most
-# 2560 px wide, shown in the viewer) and assets/img/<name>-1000.webp (the thumbnail, 1000 px
-# wide). The thumbnails are shown in 16:9 frames: other proportions are cropped at the edges.
+# Gallery names (home page, in this order): title-screen, the-coach, coach-challenges,
+# analysis-mode, watching-a-game, the-opponent, the-grand-hall, the-scoresheet. Each gets
+# assets/img/<name>.webp (the full picture, at most 2560 px wide, shown in the viewer) and
+# assets/img/<name>-1000.webp (the thumbnail, 1000 px wide). The thumbnails are shown in 16:9
+# frames: other proportions are cropped at the edges.
 #
 # "hero" is the large picture at the top of the home page, also the background of the
 # language page and of the inner pages' headers: a scene without interface text, ideally about
@@ -23,7 +24,7 @@
 set -eu
 
 if [ $# -ne 2 ]; then
-  sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
   exit 2
 fi
 name=$1
@@ -42,7 +43,7 @@ webp() { # source width quality target
 }
 
 case "$name" in
-  title-screen|the-grand-hall|at-the-board|the-opponent|the-scoresheet)
+  title-screen|the-coach|coach-challenges|analysis-mode|watching-a-game|the-opponent|the-grand-hall|the-scoresheet)
     webp "$src" 2560 82 "$out/$name.webp"
     webp "$src" 1000 80 "$out/$name-1000.webp"
     ;;
@@ -52,7 +53,7 @@ case "$name" in
     "$IM" "$src" -auto-orient -strip -resize 1200x630^ -gravity center -extent 1200x630 -quality 85 "$out/og-scacelith.jpg"
     ;;
   *)
-    echo "unknown name: $name (title-screen, the-grand-hall, at-the-board, the-opponent, the-scoresheet or hero)" >&2
+    echo "unknown name: $name (a gallery name above, or hero)" >&2
     exit 2
     ;;
 esac

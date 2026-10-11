@@ -44,7 +44,7 @@
     "lead": "Take your seat at a waxed walnut table in a sunlit royal hall. Across the board, a porcelain robot driven by Stockfish waits for your first move.",
     "watch": "Watch the trailer",
     "meta": "Free software · Windows, Linux, macOS (experimental) · Graphics card with OpenGL 4.6",
-    "caption": "Captured in the game: the title screen"
+    "caption": "Captured in the game: the royal hall"
   },
   "highlights": {
     "engine": "In-house OpenGL 4.6 engine",
@@ -123,13 +123,25 @@
       "alt": "The title screen: the Scacelith menu beside two robots playing chess in the hall.",
       "caption": "The title screen"
     },
+    "coach": {
+      "alt": "The coach, a porcelain robot with “COACH” on its chest, greets you across the board; what it says also appears as a subtitle.",
+      "caption": "Coach"
+    },
+    "challenges": {
+      "alt": "The Coach Challenges menu: sets of checkmates and tactics with their difficulty and the ones already completed, beside the description of the selected set.",
+      "caption": "Coach Challenges"
+    },
+    "analysis": {
+      "alt": "Analysis mode: the evaluation bar, an arrow drawn on the board, the annotated moves with each side's accuracy, and the list of controls.",
+      "caption": "Analysis"
+    },
+    "game": {
+      "alt": "Seen from the side, one robot reaches across the table to move a piece while the other waits; the captured pieces stand beside the board.",
+      "caption": "Watch a Game"
+    },
     "hall": {
       "alt": "Two robots face each other across the chessboard, in red velvet chairs, under tall windows.",
       "caption": "The royal hall"
-    },
-    "board": {
-      "alt": "The board seen from above, with the chess clock and a robot's hand reaching for a piece.",
-      "caption": "At the board"
     },
     "opponent": {
       "alt": "Close-up of the porcelain robot opponent, its head lowered towards the board.",
@@ -139,7 +151,7 @@
       "alt": "A robot's hand writes the moves on the scoresheet with a fountain pen.",
       "caption": "The scoresheet"
     },
-    "note": "Development build. The interface in these pictures is in French.",
+    "note": "Version 1.0.0. The interface in these pictures is in English.",
     "viewer": "Picture viewer",
     "close": "Close",
     "previous": "Previous picture",
