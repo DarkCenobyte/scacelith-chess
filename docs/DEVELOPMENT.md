@@ -87,9 +87,10 @@ gcovr --root . --filter 'src/' --txt build-cov            # apt install gcovr
 
 The Coverage workflow (`.github/workflows/coverage.yml`) does the same on every pull request and
 every push to master, with the coach's voice model, and shows the line, function and branch
-coverage in the run's summary. On master it also writes the line coverage to `coverage.json` on
-the `badges` branch (one commit, replaced at each run), which the README's coverage badge reads
-through shields.io.
+coverage in the run's summary. On master it also writes the line coverage to the `badges` branch
+(one commit, replaced at each run) as `coverage.svg`, the README's coverage badge, drawn like a
+shields.io badge by `tools/coverage_badge.py`, and `coverage.json`, the same as a shields.io endpoint
+badge. The README's other fixed badges are files of `docs/badges/` ([why and how](badges/README.md)).
 
 ## Audit tools
 
