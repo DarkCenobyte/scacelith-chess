@@ -123,11 +123,13 @@ jobs:
 
   # The same build and tests on Linux aarch64 (GitHub's Arm runner), Stockfish built for the Arm
   # instruction sets and the coach's voice on its NEON kernels; the voice model is required here
-  # too.
+  # too. Ubuntu 22.04 like the aarch64 release build (GCC 11, binutils 2.38): the code tested is
+  # the code shipped, and the linker's layout (Stockfish audit: erratum 843419 veneers) the same.
+  # GCC 13 is tested by the x86-64 jobs.
   linux-aarch64:
     name: Linux aarch64 build and tests
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     timeout-minutes: 60
     permissions:
       contents: read
@@ -141,7 +143,7 @@ jobs:
       - name: Install the build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
+          sudo apt-get install -y --no-install-recommends cmake ninja-build ccache libssl-dev libx11-dev libgl-dev
 
       - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

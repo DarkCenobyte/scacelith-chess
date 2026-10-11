@@ -45,10 +45,12 @@ what was found while preparing these targets, so that the remaining work can sta
 ## Linux aarch64
 
 **Build and test environment**
-- The CI builds and tests it on `ubuntu-24.04-arm` (the `linux-aarch64` job of `ci.yml`), the
-  release on `ubuntu-22.04-arm` (GCC 11, binutils 2.38, OpenSSL 3.0.2: the same glibc 2.34 floor
-  as the x86-64 archive), both free GitHub runners for public repositories. The release archive is
-  `Scacelith-<version>-linux-aarch64.tar.gz`, laid out as the x86-64 one.
+- The CI (the `linux-aarch64` job of `ci.yml`) and the release both build and test it on
+  `ubuntu-22.04-arm` (GCC 11, binutils 2.38, OpenSSL 3.0.2: the same glibc 2.34 floor as the
+  x86-64 archive), a free GitHub runner for public repositories. The CI used Ubuntu 24.04 (GCC 13)
+  until the v1.0.0 release failed: with GCC 11 the linker placed two erratum 843419 veneers in
+  `armv8-dotprod`, which only the release build met (`third_party/stockfish/README.scacelith.md`).
+  The release archive is `Scacelith-<version>-linux-aarch64.tar.gz`, laid out as the x86-64 one.
 - Locally, cross-compile with `cmake/aarch64-linux-gnu.cmake` (Debian/Ubuntu multiarch: `dpkg
   --add-architecture arm64`, the arm64 sources from ports.ubuntu.com, `g++-aarch64-linux-gnu`,
   `libssl-dev:arm64 libx11-dev:arm64 libgl-dev:arm64`) and run the tests under `qemu-aarch64 -L
