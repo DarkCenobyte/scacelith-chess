@@ -404,6 +404,7 @@ struct OnlineClient::Impl {
     std::atomic<int> gestureKeepalive{kGestureKeepaliveMinMs};   // gestureKeepaliveMs(Welcome.gestureIdleMs)
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
+    std::atomic<uint32_t> requests{0};            // the last number given to a lobby request (nextRequest)
     // Bumped by setServer() when the origin changes: a proof of work for a server that is no
     // longer the one in use is abandoned (request()). Then the flags of net-http and net-gif are
     // raised (by ~Impl too): each stops the proof of work in progress on its thread, and each proof
@@ -478,7 +479,23 @@ struct OnlineClient::Impl {
         GestureBucket gestures;                           // Welcome.gestureRate / gestureBurst
         uint16_t minor = 0;                               // the minor the last Welcome negotiated
         StanceSender stance;                              // when the player's stance goes (flushStance)
+        // The challenge requests sent on this connection (ChallengeCreate, ChallengeCancel) whose
+        // Ack or Error has not come, in the order sent: the answers that name them (answered(),
+        // named()).
+        struct Asked {
+            uint32_t seq = 0, request = 0;
+            bool creation = false;                        // a ChallengeCreate: its terms follow
+            bool isPrivate = false, rated = false;
+            int baseSec = 0, incSec = 0;
+        };
+        std::deque<Asked> asked;
     } rt;
+
+    // The number of a lobby request (OnlineClient::challenge...): never 0, given on the caller's thread.
+    uint32_t nextRequest() {
+        uint32_t r = requests.fetch_add(1) + 1;
+        return r ? r : requests.fetch_add(1) + 1;
+    }
 
     Impl() {
         // The official server moved from port 44664 to 443: a session saved for the former
@@ -1041,10 +1058,47 @@ struct OnlineClient::Impl {
         send(m);
     }
 
-    void localError(const char* what) {
+    // A challenge request as sendGame, numbered: its local refusal carries its number, and once sent
+    // it waits in rt.asked for its answer. One the socket no longer takes is "offline" too.
+    template <class M> void sendAsked(M m, Rt::Asked a) {
+        if (!rt.ws || !rt.welcomed) { localError("offline", a.request); return; }
+        if (!pr::valid(m)) { localError("invalid_request", a.request); return; }
+        if (!send(m)) { localError("offline", a.request); return; }
+        a.seq = m.seq;
+        rt.asked.push_back(a);
+    }
+
+    // The Ack or Error of the message numbered 'ref' on this connection: the number of the challenge
+    // request it answers (no longer waiting), 0 for another message.
+    uint32_t answered(uint32_t ref) {
+        if (ref == 0) return 0;
+        auto it = std::find_if(rt.asked.begin(), rt.asked.end(), [ref](const Rt::Asked& a) { return a.seq == ref; });
+        if (it == rt.asked.end()) return 0;
+        const uint32_t request = it->request;
+        rt.asked.erase(it);
+        return request;
+    }
+
+    // A ChallengeStatus Pending: the server sends it only to the challenge's creator, right after
+    // creating it and before its Ack, and handles a connection's lobby requests in order (one it
+    // refuses before that order gets its Error at once). So it names the first creation still
+    // waiting here, when the terms are the same; else it comes from a creation of an earlier
+    // connection (0).
+    uint32_t named(const pr::ChallengeStatus& m) {
+        auto it = std::find_if(rt.asked.begin(), rt.asked.end(), [](const Rt::Asked& a) { return a.creation; });
+        if (it == rt.asked.end() || it->isPrivate != m.target.empty() || it->rated != m.rated ||
+            it->baseSec != int(m.baseSec) || it->incSec != int(m.incSec))
+            return 0;
+        const uint32_t request = it->request;
+        rt.asked.erase(it);
+        return request;
+    }
+
+    void localError(const char* what, uint32_t request = 0) {
         Event ev;
         ev.kind = Event::Kind::ServerError;
         ev.error = what;
+        ev.request = request;
         post(ev);
     }
 
@@ -1058,6 +1112,7 @@ struct OnlineClient::Impl {
         rt.badFrames = 0;
         rt.helloToken.clear();
         rt.welcomed = false;
+        rt.asked.clear();   // their answers would come on this connection only
         rt.samples.clear();
         rt.rttEma = -1;
         ping.store(-1);
@@ -1196,6 +1251,7 @@ struct OnlineClient::Impl {
         }
         rt.ws = std::move(ws);
         rt.seq = 0;
+        rt.asked.clear();
         rt.welcomed = false;
         rt.lastFatal = 0;
         rt.shutdownNotice = false;
@@ -1339,6 +1395,7 @@ struct OnlineClient::Impl {
             ev.fatal = m.fatal;
             ev.gameId = m.game;
             ev.error = pr::enumName(m.code);
+            ev.request = answered(m.ref);
             post(ev);
             break;
         }
@@ -1356,8 +1413,12 @@ struct OnlineClient::Impl {
             onPong(m);
             break;
         }
-        case pr::MsgType::Ack:
+        case pr::MsgType::Ack: {
+            pr::Ack m;
+            if (!pr::decode(p, n, m)) return bad();
+            answered(m.ref);
             break;
+        }
         case pr::MsgType::Notice: {
             pr::Notice m;
             if (!pr::decode(p, n, m)) return bad();
@@ -1418,6 +1479,7 @@ struct OnlineClient::Impl {
             ev.challengeBaseSec = m.baseSec;
             ev.challengeIncSec = m.incSec;
             ev.challengeRated = m.rated;
+            if (m.state == pr::ChallengeState::Pending) ev.request = named(m);
             post(ev);
             break;
         }
@@ -2756,11 +2818,12 @@ void OnlineClient::leaveQueue() {
     d->realtime([d] { d->sendGame(pr::QueueLeave()); });
 }
 
-void OnlineClient::challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) {
+uint32_t OnlineClient::challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) {
     Impl* d = impl_.get();
-    d->realtime([d, username, baseSec, incSec, rated, colorPref] {
+    const uint32_t request = d->nextRequest();
+    d->realtime([d, request, username, baseSec, incSec, rated, colorPref] {
         if (username.empty() || baseSec < 0 || baseSec > 65535 || incSec < 0 || incSec > 255 || colorPref < 0 || colorPref > 2) {
-            d->localError("invalid_request");
+            d->localError("invalid_request", request);
             return;
         }
         pr::ChallengeCreate m;
@@ -2769,15 +2832,23 @@ void OnlineClient::challenge(const std::string& username, int baseSec, int incSe
         m.incSec = uint8_t(incSec);
         m.rated = rated;
         m.color = pr::ColorPref(colorPref);
-        d->sendGame(m);
+        Impl::Rt::Asked a;
+        a.request = request;
+        a.creation = true;
+        a.rated = rated;
+        a.baseSec = baseSec;
+        a.incSec = incSec;
+        d->sendAsked(m, a);
     });
+    return request;
 }
 
-void OnlineClient::createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) {
+uint32_t OnlineClient::createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) {
     Impl* d = impl_.get();
-    d->realtime([d, baseSec, incSec, rated, colorPref] {
+    const uint32_t request = d->nextRequest();
+    d->realtime([d, request, baseSec, incSec, rated, colorPref] {
         if (baseSec < 0 || baseSec > 65535 || incSec < 0 || incSec > 255 || colorPref < 0 || colorPref > 2) {
-            d->localError("invalid_request");
+            d->localError("invalid_request", request);
             return;
         }
         pr::ChallengeCreate m;
@@ -2785,8 +2856,16 @@ void OnlineClient::createPrivateGame(int baseSec, int incSec, bool rated, int co
         m.incSec = uint8_t(incSec);
         m.rated = rated;
         m.color = pr::ColorPref(colorPref);
-        d->sendGame(m);
+        Impl::Rt::Asked a;
+        a.request = request;
+        a.creation = true;
+        a.isPrivate = true;
+        a.rated = rated;
+        a.baseSec = baseSec;
+        a.incSec = incSec;
+        d->sendAsked(m, a);
     });
+    return request;
 }
 
 void OnlineClient::joinPrivateGame(const std::string& code) {
@@ -2819,13 +2898,17 @@ void OnlineClient::declineChallenge(uint32_t id) {
     });
 }
 
-void OnlineClient::cancelChallenge(uint32_t id) {
+uint32_t OnlineClient::cancelChallenge(uint32_t id) {
     Impl* d = impl_.get();
-    d->realtime([d, id] {
+    const uint32_t request = d->nextRequest();
+    d->realtime([d, request, id] {
         pr::ChallengeCancel m;
         m.id = id;
-        d->sendGame(m);
+        Impl::Rt::Asked a;
+        a.request = request;
+        d->sendAsked(m, a);
     });
+    return request;
 }
 
 void OnlineClient::sendMove(uint64_t gameId, int ply, uint16_t move, const std::string& fen, uint32_t thinkMs, bool drawOffer) {

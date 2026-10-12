@@ -35,8 +35,10 @@
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
-//   - Which realtime errors belong to the game being played, which refuse the challenge being
-//     created, and which refuse a search (OnlineSession's handling of them).
+//   - Which realtime errors belong to the game being played, and which refuse a search
+//     (OnlineSession's handling of them).
+//   - Which challenge of mine the server's answers are about (MyChallenge): only the one shown
+//     stays open on the server.
 //   - Which game a realtime message is about, whether a RatingUpdate rates the game shown, and
 //     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing); the
 //     late messages of an earlier game the scene ignores all the same.
@@ -484,17 +486,6 @@ inline bool gameError(int code) {
            code != int(E::InvalidCategory);
 }
 
-// The refusals of a challenge or private game being created, which come before any status gives it
-// an id (UserUnavailable and RatedRepeatLimit may also answer a challenge accepted or a code
-// joined). The other errors of 200..210 answer other commands (a QueueJoin, a challenge accepted or
-// declined, a rematch): a challenge of mine still pending stays.
-inline bool challengeRefused(int code) {
-    using E = net::proto::ErrorCode;
-    return code == int(E::UserUnavailable) || code == int(E::ChallengeLimit) || code == int(E::CannotChallengeSelf) ||
-           code == int(E::RatedRequiresOfficialTc) || code == int(E::InvalidTimeControl) ||
-           code == int(E::RatedRepeatLimit);
-}
-
 // The refusals of a QueueJoin, which end the search it began (AlreadyInGame and InvalidCategory
 // may also answer a challenge accepted or joined).
 inline bool queueRefused(int code) {
@@ -502,6 +493,153 @@ inline bool queueRefused(int code) {
     return code == int(E::QueueNotAllowed) || code == int(E::MatchmakingCooldown) || code == int(E::AlreadyInGame) ||
            code == int(E::InvalidCategory);
 }
+
+// =============================================================================================
+// My challenge
+// =============================================================================================
+
+// The challenge or private game of mine that the menus show (OnlineSession::outgoing()).
+struct Outgoing {
+    bool active = false;
+    uint32_t id = 0;                            // the server's, 0 until its Pending names it
+    std::string target, code;                   // target "": a private game, its code once named
+    int baseSec = 0, incSec = 0;
+    bool rated = false;
+    uint32_t request = 0;                       // the number of its creation (net::OnlineClient::challenge)
+};
+
+// Which challenge of mine the server's answers are about; OnlineSession applies what it says. The
+// network layer numbers each creation and cancellation it sends and gives that number
+// (net::Event::request) to the answers it ties to one: the ServerError refusing it, and the
+// ChallengeStatus Pending naming the challenge a creation made (the server tells only its creator
+// Pending, once). Hence:
+//   - only the challenge shown stays open on the server. A creation cancelled or replaced before
+//     its Pending came is cancelled when that Pending comes, and so is a Pending that no creation of
+//     the connection explains (request 0: one sent on a connection since lost). The challenge shown
+//     takes the id and code of its own Pending only;
+//   - a refusal ends the creation shown only when it carries its number. That of a creation given
+//     up, and that of a cancellation sent without the player asking (quietCancel: the challenge was
+//     already gone, ChallengeNotFound), show nothing.
+class MyChallenge {
+public:
+    const Outgoing& shown() const { return shown_; }
+
+    // A creation sent ('request': its number), shown from now on. The caller cancelled the one shown
+    // before, if any (cancel()).
+    void created(uint32_t request, const std::string& target, int baseSec, int incSec, bool rated) {
+        drop();
+        shown_.active = true;
+        shown_.request = request;
+        shown_.target = target;
+        shown_.baseSec = baseSec;
+        shown_.incSec = incSec;
+        shown_.rated = rated;
+    }
+
+    // The player cancels the challenge shown: the id to send ChallengeCancel for, 0 when there is
+    // nothing to send now (none shown, or not named yet: cancelled when its Pending comes).
+    uint32_t cancel() {
+        const uint32_t id = shown_.active ? shown_.id : 0;
+        drop();
+        return id;
+    }
+
+    // The challenge shown is no longer shown, nothing sent (a game started, the account deleted):
+    // if its Pending is still to come, it cancels it.
+    void drop() {
+        if (shown_.active && shown_.id == 0) quiet(shown_.request);
+        shown_ = Outgoing();
+    }
+
+    // A cancellation the player did not ask for ('request': its number): its refusal shows nothing.
+    void quietCancel(uint32_t request) { quiet(request); }
+
+    // A new connection (Welcome): the server dropped my challenges when it saw the previous one close,
+    // unless this one came first. The challenge shown is no longer shown; the id to cancel (quietly)
+    // in case it is still open, 0 when it had none. The answers of the previous connection never
+    // come: a late Pending of one of its creations carries no request.
+    uint32_t newConnection() {
+        const uint32_t id = shown_.active ? shown_.id : 0;
+        shown_ = Outgoing();
+        quiet_.clear();
+        return id;
+    }
+
+    // Another server, or signed out of the account: nothing of mine to follow.
+    void reset() {
+        shown_ = Outgoing();
+        quiet_.clear();
+    }
+
+    // What a ChallengeStatus means for my challenges.
+    struct Status {
+        bool mine = false;      // about a challenge of mine; else about one received (or nothing)
+        uint32_t cancel = 0;    // a challenge of mine to cancel now (quietCancel), not the one shown
+        int ended = -1;         // the challenge shown ended in this state (Accepted, Declined...)
+        std::string target;     // ...whose target this was
+    };
+    Status status(const net::Event& e) {
+        using S = net::proto::ChallengeState;
+        Status st;
+        if (e.challengeState == int(S::Pending)) {
+            // Only a creator is told Pending: a challenge of mine.
+            st.mine = true;
+            const bool shownNamed = shown_.active && shown_.id != 0 && shown_.id == e.challengeId;
+            if (shown_.active && shown_.id == 0 && e.request != 0 && e.request == shown_.request) {
+                shown_.id = e.challengeId;
+                shown_.code = e.challengeCode;
+            } else if (!shownNamed) {
+                forget(e.request);   // a creation given up: answered
+                st.cancel = e.challengeId;
+            }
+            return st;
+        }
+        if (shown_.active && shown_.id != 0 && shown_.id == e.challengeId) {
+            st.mine = true;
+            st.ended = e.challengeState;
+            st.target = shown_.target;
+            shown_ = Outgoing();
+        }
+        return st;
+    }
+
+    // What a ServerError means for my challenges.
+    enum class Answer {
+        Other,      // not the answer of a challenge request of mine, or that of a cancel asked for
+        Refused,    // the refusal of the creation shown: no longer shown
+        Quiet,      // the answer of a creation given up or of a quiet cancellation: nothing to show
+    };
+    Answer error(const net::Event& e) {
+        if (e.request == 0) return Answer::Other;
+        if (shown_.active && shown_.id == 0 && e.request == shown_.request) {
+            shown_ = Outgoing();
+            return Answer::Refused;
+        }
+        return forget(e.request) ? Answer::Quiet : Answer::Other;
+    }
+
+    // Requests whose answer would show nothing, waiting for it (tests).
+    size_t quietWaiting() const { return quiet_.size(); }
+
+private:
+    // A quiet cancellation answered with Ack sends nothing back: the oldest are forgotten past this.
+    static constexpr size_t kQuietMax = 32;
+
+    void quiet(uint32_t request) {
+        if (request == 0) return;
+        if (quiet_.size() >= kQuietMax) quiet_.erase(quiet_.begin());
+        quiet_.push_back(request);
+    }
+    bool forget(uint32_t request) {
+        auto it = std::find(quiet_.begin(), quiet_.end(), request);
+        if (request == 0 || it == quiet_.end()) return false;
+        quiet_.erase(it);
+        return true;
+    }
+
+    Outgoing shown_;
+    std::vector<uint32_t> quiet_;
+};
 
 // =============================================================================================
 // Routing

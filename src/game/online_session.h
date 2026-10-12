@@ -70,12 +70,13 @@ public:
     virtual double serverNowMs() const = 0;
     virtual void joinQueue(const std::string& category, bool rated) = 0;
     virtual void leaveQueue() = 0;
-    virtual void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) = 0;
-    virtual void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) = 0;
+    // The number of the request (net::Event::request of its answers).
+    virtual uint32_t challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) = 0;
+    virtual uint32_t createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) = 0;
     virtual void joinPrivateGame(const std::string& code) = 0;
     virtual void acceptChallenge(uint32_t id) = 0;
     virtual void declineChallenge(uint32_t id) = 0;
-    virtual void cancelChallenge(uint32_t id) = 0;
+    virtual uint32_t cancelChallenge(uint32_t id) = 0;
     virtual void sendMove(uint64_t gameId, int ply, uint16_t move, const std::string& fen, uint32_t thinkMs, bool drawOffer) = 0;
     virtual void resign(uint64_t gameId) = 0;
     virtual void offerDraw(uint64_t gameId) = 0;
@@ -220,14 +221,10 @@ public:
     const Queue& queue() const { return queue_; }
     void findOpponent(const std::string& category, bool rated);
     void cancelSearch();
-    struct Outgoing {                           // our challenge or private game
-        bool active = false;
-        uint32_t id = 0;
-        std::string target, code;
-        int baseSec = 0, incSec = 0;
-        bool rated = false;
-    };
-    const Outgoing& outgoing() const { return outgoing_; }
+    using Outgoing = live::Outgoing;            // our challenge or private game
+    const Outgoing& outgoing() const { return outgoing_.shown(); }
+    // One challenge of ours at a time: a new one cancels the one shown. Only the one shown stays
+    // open on the server (live::MyChallenge).
     void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
     void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
     void joinPrivateGame(const std::string& code);
@@ -299,11 +296,9 @@ private:
 
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;
-    Outgoing outgoing_;
-    std::vector<Outgoing> cancelledEarly_;      // cancelled before the server named them: cancelled then
+    live::MyChallenge outgoing_;
     bool joining_ = false;
     std::vector<Incoming> incoming_;
-    bool quietNotFound_ = false;                // the next ChallengeNotFound answers a reconnection's cancel
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
     bool inGame_ = false;
