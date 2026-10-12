@@ -698,7 +698,9 @@ int reviewMain(const Options& o) {
             if (explained && v.cls == MoveClass::Inaccuracy && demo &&
                 worstLoss(c.playedLine, c.p0, c.human, c.base, 9) < 3)
                 f.push_back({"INACCURACY_DEMO", exTypeName(t)});
-            if (offer && v.cls == MoveClass::Inaccuracy && !(level <= 2 && t == ExType::MissedCapture))
+            // Levels 1-2 offer a free piece or a mate missed back whatever it costs (review.cpp).
+            if (offer && v.cls == MoveClass::Inaccuracy &&
+                !(level <= 2 && (t == ExType::MissedCapture || t == ExType::MateMissed)))
                 f.push_back({"OFFER_INACCURACY", exTypeName(t)});
             if (offer && v.cls != MoveClass::Blunder && t != ExType::MateAllowed && t != ExType::MateMissed &&
                 t != ExType::Stalemate && t != ExType::MissedCapture)
