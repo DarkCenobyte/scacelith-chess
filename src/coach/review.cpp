@@ -1014,6 +1014,10 @@ Review Reviewer::review(const ReviewInput& in) {
             offeredHint_ = ex.hintSquare;
             out.offersTakeback = true;
             v.offered = true;
+        } else if (demo && !g.isOver()) {
+            // The pieces are back and no takeback is offered: the coach's real move comes next, said
+            // so that the player does not take it for more of the demonstration.
+            s.push_back(sayBeat("demo.play_on", Look::Player, ply));
         }
     } else if (tip) {
         // A principle, said as a tip (Low priority).

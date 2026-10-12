@@ -202,6 +202,10 @@ demo.my.first.attacked.2 = {my}は攻撃されています。だから{your}を�
 # Levels 4-6.
 demo.first = まず{move}。{t1}はあとで。
 demo.first.2 = さきに{move}。{t1}はそのままです。
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = では、私の手を指します。
+demo.play_on.2 = これが私の本当の手です。
+demo.play_on.3 = では、本番の一手です。
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = {your}を{sq}へ動かすとします。
 demo.your.move.2 = たとえば、{your}を{sq}へ。

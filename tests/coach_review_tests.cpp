@@ -201,6 +201,17 @@ void checkScript(const Script& s, const char* where) {
         }
     }
     CHECK_EQ(pendingDemo, 0);   // every demonstration is taken back
+    // "Let's play on": last, after a demonstration taken back, never with a takeback card.
+    for (size_t i = 0; i < s.size(); ++i) {
+        if (s[i].line.key != "demo.play_on") continue;
+        bool rewound = false, offered = false;
+        for (const Beat& b : s) {
+            rewound = rewound || b.kind == BeatKind::Rewind;
+            offered = offered || b.kind == BeatKind::OfferTakeback;
+        }
+        if (i + 1 != s.size() || !rewound || offered) std::fprintf(stderr, "  %s: misplaced demo.play_on\n", where);
+        CHECK(i + 1 == s.size() && rewound && !offered);
+    }
 }
 
 void dump(const Script& s) {
@@ -349,6 +360,27 @@ TEST(coach_review_bands) {
 }
 
 // ---- Explanations --------------------------------------------------------------------------------
+
+TEST(coach_review_play_on_after_a_demonstration_without_offer) {
+    // 1.Nd5?? exd5 when already losing: a mistake by the numbers, shown at level 3 with no takeback
+    // card. The coach says that its real move comes next.
+    Game g = gameOf(kHangFen, {"Nd5"});
+    Reviewer rv;
+    rv.reset(3, White);
+    const Review r = reviewOf(rv, g, analysisOf({pvl(-400, "g1f1 g8f8"), pvl(-730, "c3d5 e6d5 g1f1")}));
+    checkScript(r.script, "play on");
+    CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+    CHECK(!r.offersTakeback);
+    CHECK(demoMoves(r.script) > 0);
+    CHECK(!r.script.empty() && r.script.back().line.key == "demo.play_on");
+    // With the card (a blunder), the card ends the script.
+    Game h = gameOf(kHangFen, {"Nd5"});
+    Reviewer rh;
+    rh.reset(3, White);
+    const Review o = reviewOf(rh, h, hangA0());
+    CHECK(o.offersTakeback);
+    CHECK(!hasKey(o.script, "demo.play_on"));
+}
 
 TEST(coach_review_hanging_level1) {
     Game g = gameOf(kHangFen, {"Nd5"});
@@ -1880,7 +1912,7 @@ TEST(coach_review_every_key_exists) {
         "ann.mate.human.b1", "ann.mate.human", "ann.mate.coach.b1", "ann.mate.coach", "demo.move", "demo.my.move",
         "demo.my.take", "demo.my.check", "demo.my.mate", "demo.your.move", "demo.your.take", "demo.your.back",
         "demo.my.first.take", "demo.my.first.check", "demo.my.first.check_move", "demo.my.first.move",
-        "demo.my.first.attacked", "demo.first",
+        "demo.my.first.attacked", "demo.first", "demo.play_on",
         "demo.your.king", "demo.promote", "ex.mate_allowed.tail.b1", "ex.mate_allowed.pattern",
         "ex.mate_allowed.tip.b3", "ex.stalemate.tip.b1", "ex.fork.tail.b1", "ex.fork.tail_king", "ex.fork.more.b3",
         "ex.fork.tip.knight", "ex.point.piece", "ex.point.two", "ex.point.mate",

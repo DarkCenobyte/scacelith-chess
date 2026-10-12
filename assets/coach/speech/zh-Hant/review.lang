@@ -185,6 +185,10 @@ demo.my.first.attacked.2 = {my}正被攻擊：它先吃掉{your}。
 # Levels 4-6.
 demo.first = 先走{move}：{t1}可以等一等。
 demo.first.2 = 首先{move}。{t1}還會在那裡。
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = 現在我走我的棋。
+demo.play_on.2 = 這才是我真正的一步。
+demo.play_on.3 = 現在我真的走棋了。
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = 你會把{your:bare}走到{sq}。
 demo.your.move.2 = 假設你把{your:bare}走到{sq}。

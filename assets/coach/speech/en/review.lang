@@ -190,6 +190,10 @@ demo.my.first.attacked.2 = {my} is under attack: it grabs {your} first.
 # Levels 4-6, the same in-between move.
 demo.first = {move} first: {t1} can wait.
 demo.first.2 = First {move}. {t1} will still be there.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Now I play my move.
+demo.play_on.2 = Here is my real move.
+demo.play_on.3 = And now, my move for real.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = You would move {your} to {sq}.
 demo.your.move.2 = Say you play {your} to {sq}.

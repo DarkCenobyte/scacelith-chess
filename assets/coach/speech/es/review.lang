@@ -183,6 +183,10 @@ demo.my.first.attacked.2 = {my} está amenazad{my:o}: antes de nada se lleva {yo
 # Levels 4-6.
 demo.first = Primero {move}: {t1} puede esperar.
 demo.first.2 = Antes, {move}. {t1} seguirá ahí.
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = Ahora hago mi jugada.
+demo.play_on.2 = Esta es mi jugada de verdad.
+demo.play_on.3 = Y ahora juego de verdad.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = Tú llevarías {your} a {sq}.
 demo.your.move.2 = Supón que llevas {your} a {sq}.

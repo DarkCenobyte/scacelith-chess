@@ -147,7 +147,9 @@ your colour (White, Black, or alternating from one game to the next); the choice
   to explain the mistake), else the coach only names the better move. A move that costs a little
   is called a small slip, never a mistake with a made-up line. After a blunder it has shown, it
   offers to take your move back: **Take back** or **Backspace** accepts, **Play on** or touching
-  one of your pieces declines.
+  one of your pieces declines. When it shows a line without that offer (a mistake rather than a
+  blunder, a game you still clearly win, the level's offers used up), it says that its own move
+  comes next once the pieces are back.
 - **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
   move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
   draw, resign, options, main menu (abandons the game).
