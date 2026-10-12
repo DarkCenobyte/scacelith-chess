@@ -89,7 +89,8 @@ int worstLoss(const std::vector<LineStep>& line, const Position& start, Color hu
 
 bool isMaterialType(ExType t) {
     return t == ExType::Fork || t == ExType::Discovered || t == ExType::Skewer || t == ExType::Pin ||
-           t == ExType::Trapped || t == ExType::BackRank || t == ExType::Hanging || t == ExType::Exchange;
+           t == ExType::Trapped || t == ExType::BackRank || t == ExType::Hanging || t == ExType::Exchange ||
+           t == ExType::Material;
 }
 bool isGenericType(ExType t) {
     return t == ExType::Endgame || t == ExType::KingSafety || t == ExType::Positional || t == ExType::Opening ||

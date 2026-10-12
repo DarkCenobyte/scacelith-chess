@@ -454,6 +454,81 @@ TEST(coach_review_a_trade_is_not_the_piece_lost) {
     }
 }
 
+TEST(coach_review_a_loss_the_better_move_suffers_too_is_no_reason) {
+    // From a mined game (depth 18): 14.Nf6+ Kg7? leaves the bishop on f3 to Bxf3, but 14...exf6 gives it
+    // up too (and wins the knight): the bishop is no reason Kg7 is bad.
+    const ai::Analysis a0 = analysisOf({pvl(-79, "e7f6 g2f3 a8c8 f1d1 a5c6 f3c6 c8c6 d1d4 f8e8 c1d2"),
+                                        pvl(-549, "g8g7 g2f3 a8c8 f6e4 d6d5 e4d2 d5c4 b3b4 a5c6 c1c4")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("r2q1rk1/p3pp1p/1p1p1Np1/n7/2Pp4/1P3bP1/P3PPBP/R1Q2RK1 b - - 0 14", {"Kg7"});
+        Reviewer rv;
+        rv.reset(level, Black);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "given up anyway b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::Hanging);
+        CHECK(r.verdict.exType != ExType::Material);
+        for (const Beat& b : r.script) CHECK(b.kind != BeatKind::DemoMove);
+    }
+}
+
+TEST(coach_review_a_gambit_pawn_is_no_material_lost) {
+    // From a mined game: 3.f4 exf4 4.Nf3. White could take back (exf4) and nothing captures at once; the
+    // engine prefers the gambit. "f4 loses material: after exf4, you've lost 1 point" would be wrong.
+    const ai::Analysis a0 = analysisOf({pvl(10, "b1c3 g8f6 g1f3 f8b4 d1c2 d7d6 d2d3 e8g8 c1d2 f8e8"),
+                                        pvl(-127, "f2f4 e5f4 g1f3 g8f6 d2d4 f4e3 f1d3 d7d5 e1g1 f8e7")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("r1bqkbnr/pppp1ppp/2n5/4p3/2P5/4P3/PP1P1PPP/RNBQKBNR w KQkq - 0 3", {"f4"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "gambit b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::Material);
+        for (const Beat& b : r.script) CHECK(b.line.key.rfind("ex.material.", 0) != 0);
+    }
+}
+
+TEST(coach_review_endgame_king_is_not_exposed_by_pawns_around_it) {
+    // From a mined game: 49.Re7? lets the d-pawn run (Rd6, d2, d1=Q). Black's pawns and rook around the
+    // white king on c3 are no attack on it: never "your king is exposed".
+    const ai::Analysis a0 = analysisOf({pvl(549, "d1f3 d8c8 f7b7 g8f8 b7b5 f8e7 f3d5 e7f6 b5b7 f6f5"),
+                                        pvl(54, "f7e7 d8d6 g3g4 h5g4 d1g4 d3d2 e7b7 d2d1q g4d1 d6e6")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("3r2k1/5R2/4P1p1/1p5p/2p4P/2Kp2P1/8/3B4 w - - 3 49", {"Re7"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "endgame king b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::KingSafety);
+    }
+}
+
+TEST(coach_review_level5_line_is_more_than_the_move) {
+    // 10...Qd5? A level-5 sentence that names a line ("Qd7 was stronger: Qd7 bxc3 Nxc6") never names the
+    // better move alone as its line ("Qd7 was stronger: Qd7.").
+    const ai::Analysis a0 = analysisOf({pvl(-149, "d8d7 b2c3 b8c6 d1f3 a8c8 e1g1 f8e7 d4c5 e7c5 f1d1"),
+                                        pvl(-554, "d8d5 c6b4 e8d8 b4d5 c3d1 d5f4 d1f2 e1f2 c5d4 h1d1")});
+    Game g = gameOf("rn1qkb1r/p4ppp/1pN1p3/1Bp5/3P4/2n5/PPP2PPP/R1BQK2R b KQkq - 0 10", {"Qd5"});
+    Reviewer rv;
+    rv.reset(5, Black);
+    const Review r = reviewOf(rv, g, a0);
+    checkScript(r.script, "line b5");
+    bool positional = false;
+    for (const Beat& b : r.script) {
+        if (b.line.key.rfind("ex.positional.", 0) != 0) continue;
+        positional = true;
+        const Arg* l = b.line.arg("line");
+        // The level-5 sentences name the line from the better move on; level 4's do not.
+        if (b.line.key.rfind("ex.positional.b5", 0) == 0) CHECK(l && l->san.find(' ') != std::string::npos);
+    }
+    CHECK(positional);
+}
+
 TEST(coach_review_hanging_level1) {
     Game g = gameOf(kHangFen, {"Nd5"});
     Reviewer rv;

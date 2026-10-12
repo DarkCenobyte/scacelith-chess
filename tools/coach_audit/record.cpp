@@ -85,7 +85,8 @@ bool leavesMaterial(const Game& before, const Move& m, int points = 2) {
     return coach::bestCapturePoints(p, p.sideToMove()) >= points;
 }
 
-// A move that costs 8 to 20 win-% points at depth 10 (every legal move searched), picked at random;
+// A move that costs 10.5 to 14.5 win-% points at depth 12 (every legal move searched; the review,
+// deeper, mostly agrees it is a mistake), picked at random;
 // an invalid move when there is none.
 Move mistakeMove(ai::Engine& e, const Game& g, std::mt19937& rng) {
     ai::AnalysisRequest r;
@@ -93,14 +94,14 @@ Move mistakeMove(ai::Engine& e, const Game& g, std::mt19937& rng) {
     r.startFen = s.isStandardStart() ? std::string() : s.fen();
     r.moves = g.uciMoves();
     r.multiPV = std::min(64, int(g.position().legalMoves().size()));
-    r.depth = 10;
+    r.depth = 12;
     const ai::Analysis a = analyse(e, r);
     if (!a.ok || a.lines.size() < 2) return Move{};
     const double best = coach::winPercent(a.lines[0].score);
     std::vector<Move> picks;
     for (const ai::PvLine& l : a.lines) {
         const double cost = best - coach::winPercent(l.score);
-        if (!l.pv.empty() && cost >= 8.0 && cost <= 20.0) picks.push_back(g.position().parseUCI(l.pv[0]));
+        if (!l.pv.empty() && cost >= 10.5 && cost <= 14.5) picks.push_back(g.position().parseUCI(l.pv[0]));
     }
     return picks.empty() ? Move{} : picks[rng() % picks.size()];
 }
