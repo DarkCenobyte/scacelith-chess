@@ -264,7 +264,8 @@ moves.join.spoken = {a}, {b}
 # ---- Respellings (spoken) ------------------------------------------------------------------------
 # Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). The voice puts the stress
 # of nouns whose stress moves to the ending on the stem ("ко́ня", "сло́ном", "пі́шака", "хо́ди"): they carry a
-# stress mark (U+0301, which the voice follows) on the right vowel.
+# stress mark (U+0301, which the voice follows) on the right vowel. Unmarked, "ферзем" is read like the
+# Russian "ферзём".
 respell.коня = коня́
 respell.коней = коне́й
 respell.слона = слона́
@@ -277,6 +278,8 @@ respell.пішаки = пішаки́
 respell.пішаків = пішакі́в
 respell.пішаками = пішака́ми
 respell.тура = тура́
+respell.ферзя = ферзя́
+respell.ферзем = ферзе́м
 respell.ферзів = ферзі́в
 respell.королю = королю́
 respell.ходи = ходи́
