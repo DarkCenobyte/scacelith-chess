@@ -1683,6 +1683,7 @@ struct FakeServer::Impl {
     bool hasDelivered = false;
     uint32_t nextId = 100;
     uint32_t seq = 0;
+    uint32_t requests = 0;            // the last challenge request numbered (net::Event::request)
 
     bool online() const { return conn == ConnState::Online; }
     bool hostHas(const char* w) const { return contains(ep.host, w); }
@@ -1851,9 +1852,10 @@ struct FakeServer::Impl {
         e.queued = uint32_t(3 + rng.rangeInt(0, 9));
         rt(e);
     }
-    void challengeStatus(int state) {
+    void challengeStatus(int state, uint32_t request = 0) {
         Event e;
         e.kind = Event::Kind::ChallengeStatus;
+        e.request = request;
         e.challengeId = outgoing.id;
         e.challengeState = state;
         e.challengeTarget = outgoing.target;
@@ -1863,10 +1865,11 @@ struct FakeServer::Impl {
         e.challengeRated = outgoing.rated;
         rt(e);
     }
-    void serverError(int code) {
+    void serverError(int code, uint32_t request = 0) {
         Event e;
         e.kind = Event::Kind::ServerError;
         e.code = code;
+        e.request = request;
         rt(e);
     }
 
@@ -2809,13 +2812,19 @@ void FakeServer::leaveQueue() {
     I.queued = false;
     I.queueStatus(0);
 }
-void FakeServer::challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) {
+uint32_t FakeServer::challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) {
     Impl& I = *impl_;
+    const uint32_t request = ++I.requests;
     I.lastNow = nowMs();
-    if (!I.online()) return;
-    if (lower(username) == lower(I.account.username)) return I.serverError(ErrCannotChallengeSelf);
-    if (baseSec < 15 || baseSec > 10800 || incSec < 0 || incSec > 180) return I.serverError(ErrInvalidTimeControl);
-    if (rated && categoryOf(baseSec, incSec) == "custom") return I.serverError(ErrRatedRequiresOfficialTc);
+    if (!I.online()) return request;
+    int refused = 0;
+    if (lower(username) == lower(I.account.username)) refused = ErrCannotChallengeSelf;
+    else if (baseSec < 15 || baseSec > 10800 || incSec < 0 || incSec > 180) refused = ErrInvalidTimeControl;
+    else if (rated && categoryOf(baseSec, incSec) == "custom") refused = ErrRatedRequiresOfficialTc;
+    if (refused) {
+        I.serverError(refused, request);
+        return request;
+    }
     I.outgoing = Impl::Outgoing();
     I.outgoing.active = true;
     I.outgoing.id = ++I.nextId;
@@ -2826,14 +2835,22 @@ void FakeServer::challenge(const std::string& username, int baseSec, int incSec,
     I.outgoing.color = colorPref;
     bool away = contains(username, "away") || contains(username, "nobody");
     I.outgoing.acceptAt = away ? 0.0 : I.lastNow + 2500.0;
-    I.challengeStatus(away ? 5 : 0);
-    if (away) I.outgoing.active = false;
+    I.challengeStatus(0, request);
+    if (away) {  // the target left at once
+        I.outgoing.active = false;
+        I.challengeStatus(5);
+    }
+    return request;
 }
-void FakeServer::createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) {
+uint32_t FakeServer::createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) {
     Impl& I = *impl_;
+    const uint32_t request = ++I.requests;
     I.lastNow = nowMs();
-    if (!I.online()) return;
-    if (rated && categoryOf(baseSec, incSec) == "custom") return I.serverError(ErrRatedRequiresOfficialTc);
+    if (!I.online()) return request;
+    if (rated && categoryOf(baseSec, incSec) == "custom") {
+        I.serverError(ErrRatedRequiresOfficialTc, request);
+        return request;
+    }
     static const char* alpha = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
     std::string code;
     for (int i = 0; i < 6; ++i) code += alpha[I.rng.rangeInt(0, 30)];
@@ -2846,7 +2863,8 @@ void FakeServer::createPrivateGame(int baseSec, int incSec, bool rated, int colo
     I.outgoing.rated = rated;
     I.outgoing.color = colorPref;
     I.outgoing.acceptAt = I.lastNow + 6000.0;
-    I.challengeStatus(0);
+    I.challengeStatus(0, request);
+    return request;
 }
 void FakeServer::joinPrivateGame(const std::string& code) {
     Impl& I = *impl_;
@@ -2877,12 +2895,17 @@ void FakeServer::declineChallenge(uint32_t id) {
     Impl& I = *impl_;
     if (I.incoming.active && I.incoming.id == id) I.incoming.active = false;
 }
-void FakeServer::cancelChallenge(uint32_t id) {
+uint32_t FakeServer::cancelChallenge(uint32_t id) {
     Impl& I = *impl_;
+    const uint32_t request = ++I.requests;
     I.lastNow = nowMs();
-    if (!I.outgoing.active || I.outgoing.id != id) return I.serverError(int(proto::ErrorCode::ChallengeNotFound));
+    if (!I.outgoing.active || I.outgoing.id != id) {
+        I.serverError(int(proto::ErrorCode::ChallengeNotFound), request);
+        return request;
+    }
     I.outgoing.active = false;
     I.challengeStatus(3);
+    return request;
 }
 
 void FakeServer::sendMove(uint64_t gameId, int ply, uint16_t move, const std::string& fen, uint32_t, bool drawOffer) {

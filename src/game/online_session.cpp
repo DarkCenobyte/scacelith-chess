@@ -67,12 +67,12 @@ public:
     double serverNowMs() const override { return c_->serverNowMs(); }
     void joinQueue(const std::string& cat, bool rated) override { c_->joinQueue(cat, rated); }
     void leaveQueue() override { c_->leaveQueue(); }
-    void challenge(const std::string& u, int b, int i, bool r, int col) override { c_->challenge(u, b, i, r, col); }
-    void createPrivateGame(int b, int i, bool r, int col) override { c_->createPrivateGame(b, i, r, col); }
+    uint32_t challenge(const std::string& u, int b, int i, bool r, int col) override { return c_->challenge(u, b, i, r, col); }
+    uint32_t createPrivateGame(int b, int i, bool r, int col) override { return c_->createPrivateGame(b, i, r, col); }
     void joinPrivateGame(const std::string& code) override { c_->joinPrivateGame(code); }
     void acceptChallenge(uint32_t id) override { c_->acceptChallenge(id); }
     void declineChallenge(uint32_t id) override { c_->declineChallenge(id); }
-    void cancelChallenge(uint32_t id) override { c_->cancelChallenge(id); }
+    uint32_t cancelChallenge(uint32_t id) override { return c_->cancelChallenge(id); }
     void sendMove(uint64_t id, int ply, uint16_t mv, const std::string& fen, uint32_t think, bool offer) override {
         c_->sendMove(id, ply, mv, fen, think, offer);
     }
@@ -314,8 +314,7 @@ void OnlineSession::applyServer() {
     data_.clear();
     conn_ = api_->state();
     queue_ = Queue();
-    outgoing_ = Outgoing();
-    cancelledEarly_.clear();
+    outgoing_.reset();
     joining_ = false;
     incoming_.clear();
     answers_.setServer(ep.origin());
@@ -513,22 +512,15 @@ void OnlineSession::cancelSearch() {
 }
 
 void OnlineSession::challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref) {
-    api().challenge(username, baseSec, incSec, rated, colorPref);
-    outgoing_ = Outgoing();
-    outgoing_.active = true;
-    outgoing_.target = username;
-    outgoing_.baseSec = baseSec;
-    outgoing_.incSec = incSec;
-    outgoing_.rated = rated;
+    cancelOutgoing();
+    const uint32_t request = api().challenge(username, baseSec, incSec, rated, colorPref);
+    outgoing_.created(request, username, baseSec, incSec, rated);
 }
 
 void OnlineSession::createPrivateGame(int baseSec, int incSec, bool rated, int colorPref) {
-    api().createPrivateGame(baseSec, incSec, rated, colorPref);
-    outgoing_ = Outgoing();
-    outgoing_.active = true;
-    outgoing_.baseSec = baseSec;
-    outgoing_.incSec = incSec;
-    outgoing_.rated = rated;
+    cancelOutgoing();
+    const uint32_t request = api().createPrivateGame(baseSec, incSec, rated, colorPref);
+    outgoing_.created(request, std::string(), baseSec, incSec, rated);
 }
 
 void OnlineSession::joinPrivateGame(const std::string& code) {
@@ -537,15 +529,11 @@ void OnlineSession::joinPrivateGame(const std::string& code) {
 }
 
 void OnlineSession::cancelOutgoing() {
-    if (!outgoing_.active) return;
-    if (outgoing_.id) api().cancelChallenge(outgoing_.id);
-    else cancelledEarly_.push_back(outgoing_);  // its id comes with its Pending status
-    outgoing_ = Outgoing();
-    quietNotFound_ = false;  // a ChallengeNotFound now may answer this cancel
+    // Not named yet: cancelled when its Pending comes (live::MyChallenge).
+    if (const uint32_t id = outgoing_.cancel()) api().cancelChallenge(id);
 }
 
 void OnlineSession::answerChallenge(uint32_t id, bool accept) {
-    quietNotFound_ = false;  // a ChallengeNotFound now may answer this
     if (accept) {
         cancelSearch();
         // A direct match being hosted or joined would start a second game over this one.
@@ -792,7 +780,7 @@ void OnlineSession::handleServer(net::Event& e) {
         if (e.kind == Kind::AccountDeleted && e.ok) {
             // The network layer erased the session and stopped the realtime connection.
             queue_ = Queue();
-            outgoing_ = Outgoing();
+            outgoing_.reset();
             incoming_.clear();
             resetAccountState();
             LOGI("online: account deleted");
@@ -846,14 +834,8 @@ void OnlineSession::handleServer(net::Event& e) {
         // (telling only the other party), unless we came back first. Ours is cancelled either way,
         // the ChallengeNotFound of one already dropped not shown; the ones received just expire
         // for their challengers.
-        if (outgoing_.active) {
-            if (outgoing_.id) {
-                api_->cancelChallenge(outgoing_.id);
-                quietNotFound_ = true;
-            }
-            outgoing_ = Outgoing();
-            ui::notify(i18n::tr("online.challenge.lost"), 4.0f);
-        }
+        if (outgoing_.shown().active) ui::notify(i18n::tr("online.challenge.lost"), 4.0f);
+        if (const uint32_t id = outgoing_.newConnection()) outgoing_.quietCancel(api_->cancelChallenge(id));
         incoming_.clear();
         break;
     case Kind::QueueStatus:
@@ -882,34 +864,17 @@ void OnlineSession::handleServer(net::Event& e) {
         break;
     }
     case Kind::ChallengeStatus: {
-        bool mine = outgoing_.active && (outgoing_.id == 0 || outgoing_.id == e.challengeId) &&
-                    !std::any_of(incoming_.begin(), incoming_.end(), [&](const Incoming& c) { return c.id == e.challengeId; });
-        if (mine) {
-            outgoing_.id = e.challengeId;
-            if (!e.challengeCode.empty()) outgoing_.code = e.challengeCode;
-            if (e.challengeState == ChDeclined) ui::notify(i18n::trf("online.challenge.declined", {outgoing_.target}), 4.0f);
-            if (e.challengeState == ChExpired) ui::notify(i18n::tr("online.challenge.expired"), 4.0f);
-            if (e.challengeState == ChUnavailable) ui::notify(i18n::trf("online.challenge.unavailable", {outgoing_.target}), 4.0f);
-            if (e.challengeState != ChPending) outgoing_ = Outgoing();
-        } else {
+        // Ours, named or ended; one of ours no longer shown (cancelled before the server named it,
+        // or created on a connection since lost) is cancelled now, not left open for an acceptance.
+        const live::MyChallenge::Status st = outgoing_.status(e);
+        if (st.cancel) outgoing_.quietCancel(api().cancelChallenge(st.cancel));
+        if (st.ended == ChDeclined) ui::notify(i18n::trf("online.challenge.declined", {st.target}), 4.0f);
+        if (st.ended == ChExpired) ui::notify(i18n::tr("online.challenge.expired"), 4.0f);
+        if (st.ended == ChUnavailable) ui::notify(i18n::trf("online.challenge.unavailable", {st.target}), 4.0f);
+        if (!st.mine)
             incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(),
                                            [&](const Incoming& c) { return c.id == e.challengeId; }),
                             incoming_.end());
-            // Only its creator is told Pending: a challenge of ours cancelled before the server named
-            // it (same target and terms) is cancelled now, not left live for an acceptance.
-            if (e.challengeState == ChPending) {
-                auto same = [&](const Outgoing& o) {
-                    return o.baseSec == e.challengeBaseSec && o.incSec == e.challengeIncSec && o.rated == e.challengeRated &&
-                           std::equal(o.target.begin(), o.target.end(), e.challengeTarget.begin(), e.challengeTarget.end(),
-                                      [](char a, char b) { return std::tolower(uint8_t(a)) == std::tolower(uint8_t(b)); });
-                };
-                auto early = std::find_if(cancelledEarly_.begin(), cancelledEarly_.end(), same);
-                if (early != cancelledEarly_.end()) {
-                    api().cancelChallenge(e.challengeId);
-                    cancelledEarly_.erase(early);
-                }
-            }
-        }
         break;
     }
     case Kind::Notice:
@@ -938,21 +903,22 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         break;
     case Kind::ServerError:
-        joining_ = false;  // a join is answered by its game or by an error
-        if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
-            routeGame(e, LinkKind::Server);
-            break;
+        if (e.request != 0) {
+            // The answer of a challenge request of ours: the refusal of the creation shown (no
+            // longer shown) or of a cancel the player asked for is shown, the others are not.
+            if (outgoing_.error(e) == live::MyChallenge::Answer::Quiet) break;
+        } else {
+            joining_ = false;  // a join is answered by its game or by an error
+            if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
+                routeGame(e, LinkKind::Server);
+                break;
+            }
+            if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
+            if (live::queueRefused(e.code)) queue_.searching = false;  // a QueueJoin refused: no search
         }
-        if (e.code == kErrChallengeNotFound && quietNotFound_) {
-            quietNotFound_ = false;
-            break;
-        }
-        if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
-        if (live::queueRefused(e.code)) queue_.searching = false;  // a QueueJoin refused: no search
-        if (outgoing_.active && outgoing_.id == 0 && live::challengeRefused(e.code)) outgoing_ = Outgoing();
         if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
             queue_.searching = false;
-            outgoing_ = Outgoing();
+            outgoing_.drop();
         }
         ui::notify(eventErrorText(e), 4.5f);
         break;
@@ -979,7 +945,7 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
         gameReady_ = true;
         gameEvents_.clear();
         queue_.searching = false;
-        outgoing_ = Outgoing();
+        outgoing_.drop();
         joining_ = false;
         LOGI("online: game %llu ready (%s)", (unsigned long long)id, from == LinkKind::Direct ? "direct" : "server");
         return;

@@ -35,6 +35,7 @@
 #include "chess/chess.h"
 #include "core/log.h"
 #include "game/online_account.h"
+#include "game/online_live.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
 #include "net/json.h"
@@ -3104,6 +3105,17 @@ public:
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
     std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
     std::atomic<uint16_t> serverMinor{pr::kMinor};            // the server's minor (Welcome: the lower of the two)
+    // Challenges (ChallengeCreate, ChallengeCancel), answered as the server's lobby does, in order:
+    // a Pending then Ack{ref}, or Error{ref}. A target "nobody" is unavailable; a target "flood" is
+    // refused at once with RateLimited, ahead of the requests still waiting (the server's limit
+    // of lobby requests in flight answers before its lobby). With holdNext, the next creation is
+    // answered only when another one comes, just before it.
+    std::atomic<bool> holdNext{false};
+    std::atomic<int> challengeCancels{0};
+    std::vector<uint32_t> openChallenges() {
+        std::lock_guard<std::mutex> lk(challengeMu_);
+        return challengesOpen_;
+    }
 
     // The C_Stance frames received, with their arrival time.
     struct StanceIn {
@@ -3265,6 +3277,9 @@ private:
     std::deque<int> script_;
     std::atomic<uint32_t> gseq_{1};
     std::vector<pr::MoveRec> gameMoves_;
+    std::mutex challengeMu_;
+    std::vector<uint32_t> challengesOpen_;                    // the challenges created and not cancelled
+    uint32_t lastChallenge_ = 40;
     std::string gameCategory_;
     bool gameRated_ = false;
 
@@ -3457,6 +3472,7 @@ private:
         }
         std::atomic<uint32_t>& gseq = gseq_;   // game sequence, kept across connections
         uint32_t lastSeq = 0;                   // the client numbers its messages from Hello = 1
+        std::vector<pr::ChallengeCreate> held;  // creations not answered yet (holdNext)
         char tmp[8192];
         for (;;) {
             // One frame (client frames are masked).
@@ -3607,6 +3623,43 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 ++resyncs;
                 sendSnapshot(s, gseq);
+            } else if (t == pr::MsgType::ChallengeCreate) {
+                pr::ChallengeCreate m;
+                if (!pr::decode(p, n, m)) return;
+                if (m.target == "flood") {
+                    pr::Error e;
+                    e.ref = m.seq;
+                    e.code = pr::ErrorCode::RateLimited;
+                    sendMsg(s, e);
+                    continue;
+                }
+                for (const pr::ChallengeCreate& h : held) answerChallenge(s, h);
+                held.clear();
+                if (holdNext.exchange(false)) held.push_back(m);
+                else answerChallenge(s, m);
+            } else if (t == pr::MsgType::ChallengeCancel) {
+                pr::ChallengeCancel m;
+                if (!pr::decode(p, n, m)) return;
+                ++challengeCancels;
+                bool found = false;
+                {
+                    std::lock_guard<std::mutex> lk(challengeMu_);
+                    auto it = std::find(challengesOpen_.begin(), challengesOpen_.end(), m.id);
+                    if (it != challengesOpen_.end()) {
+                        challengesOpen_.erase(it);
+                        found = true;
+                    }
+                }
+                if (found) {
+                    pr::Ack a;
+                    a.ref = m.seq;
+                    sendMsg(s, a);
+                } else {
+                    pr::Error e;
+                    e.ref = m.seq;
+                    e.code = pr::ErrorCode::ChallengeNotFound;
+                    sendMsg(s, e);
+                }
             } else if (t == pr::MsgType::Resign) {
                 pr::Resign m;
                 if (!pr::decode(p, n, m)) return;
@@ -3622,6 +3675,32 @@ private:
                 activeGame.store(0);
             }
         }
+    }
+
+    void answerChallenge(Sock s, const pr::ChallengeCreate& m) {
+        if (m.target == "nobody") {
+            pr::Error e;
+            e.ref = m.seq;
+            e.code = pr::ErrorCode::UserUnavailable;
+            sendMsg(s, e);
+            return;
+        }
+        pr::ChallengeStatus st;
+        {
+            std::lock_guard<std::mutex> lk(challengeMu_);
+            st.id = ++lastChallenge_;
+            challengesOpen_.push_back(st.id);
+        }
+        st.state = pr::ChallengeState::Pending;
+        st.target = m.target;
+        if (m.target.empty()) st.code = "CODE" + std::to_string(st.id);
+        st.baseSec = m.baseSec;
+        st.incSec = m.incSec;
+        st.rated = m.rated;
+        sendMsg(s, st);
+        pr::Ack a;
+        a.ref = m.seq;
+        sendMsg(s, a);
     }
 
     void sendSnapshot(Sock s, uint32_t gseq) {
@@ -4919,6 +4998,140 @@ TEST(net_online_client_refusal_keeps_a_newer_session) {
 // (a 401 erases the token, size caps, malformed answers); the realtime connection stops when the
 // account is deleted; the saved session of the official server's former port moves to 443.
 // =============================================================================================
+
+// The answers of the challenge requests carry their number (Event::request): the Error refusing
+// one (matched by its ref, even ahead of an earlier request still waiting), the Pending of a
+// creation (the first one waiting, with the same terms), the local "offline". A Pending no
+// creation explains carries 0; an Ack posts nothing.
+TEST(net_online_client_challenge_answers_carry_their_request) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    using K = net::Event::Kind;
+    PacingRig r;
+    REQUIRE(r.start("challenge-requests"));
+    net::OnlineClient& c = *r.c;
+    net::Event ev;
+    std::vector<net::Event> seen;
+    const uint32_t bob = c.challenge("bob", 300, 0, false, 0);
+    CHECK(bob != 0);
+    CHECK(waitEvent(c, K::ChallengeStatus, ev, 5000, &seen));
+    CHECK_EQ(ev.request, bob);
+    CHECK_EQ(ev.challengeState, int(pr::ChallengeState::Pending));
+    const uint32_t bobId = ev.challengeId;
+
+    // A creation waiting while the next one is refused at once: each answer finds its own.
+    r.srv.holdNext.store(true);
+    const uint32_t slow = c.challenge("carol", 180, 2, true, 0);
+    const uint32_t flood = c.challenge("flood", 180, 2, true, 0);
+    CHECK(waitEvent(c, K::ServerError, ev, 5000, &seen));
+    CHECK_EQ(ev.request, flood);
+    CHECK_EQ(ev.code, int(pr::ErrorCode::RateLimited));
+    // A Pending that is no creation's (other terms) while carol's waits: 0.
+    pr::ChallengeStatus foreign;
+    foreign.id = 500;
+    foreign.target = "dave";
+    foreign.baseSec = 600;
+    r.srv.sendToClients(foreign);
+    CHECK(waitEvent(c, K::ChallengeStatus, ev, 5000, &seen));
+    CHECK_EQ(ev.challengeId, 500u);
+    CHECK_EQ(ev.request, 0u);
+    const uint32_t privateGame = c.createPrivateGame(180, 2, true, 0);   // carol's is answered first
+    CHECK(waitEvent(c, K::ChallengeStatus, ev, 5000, &seen));
+    CHECK_EQ(ev.request, slow);
+    CHECK(ev.challengeTarget == "carol");
+    CHECK(waitEvent(c, K::ChallengeStatus, ev, 5000, &seen));
+    CHECK_EQ(ev.request, privateGame);
+    CHECK(!ev.challengeCode.empty());
+
+    const uint32_t nobody = c.challenge("nobody", 300, 0, false, 0);
+    CHECK(waitEvent(c, K::ServerError, ev, 5000, &seen));
+    CHECK_EQ(ev.request, nobody);
+    CHECK_EQ(ev.code, int(pr::ErrorCode::UserUnavailable));
+
+    // Cancels: the one answered with Ack posts nothing, the refused one carries its number.
+    const uint32_t cancelled = c.cancelChallenge(bobId);
+    const uint32_t unknown = c.cancelChallenge(4242);
+    CHECK(cancelled != unknown);
+    CHECK(waitEvent(c, K::ServerError, ev, 5000, &seen));
+    CHECK_EQ(ev.request, unknown);
+    CHECK_EQ(ev.code, int(pr::ErrorCode::ChallengeNotFound));
+    CHECK_EQ(r.srv.challengeCancels.load(), 2);
+    for (const net::Event& e : seen) CHECK(e.kind != K::ServerError || e.request != cancelled);
+    CHECK(r.srv.seqOk.load());
+
+    // Offline: refused here, with the number.
+    c.disconnect();
+    CHECK(r.stateIs(net::ConnState::Offline, 5000));
+    const uint32_t offline = c.createPrivateGame(300, 0, false, 0);
+    CHECK(waitEvent(c, K::ServerError, ev, 5000, &seen));
+    CHECK_EQ(ev.request, offline);
+    CHECK(ev.error == "offline");
+    const uint32_t offlineCancel = c.cancelChallenge(7);
+    CHECK(waitEvent(c, K::ServerError, ev, 5000, &seen));
+    CHECK_EQ(ev.request, offlineCancel);
+}
+
+// The audit's N13 sequences end to end: net::OnlineClient against the fake server, the answers
+// applied as OnlineSession applies them (live::MyChallenge). A challenge (or a private game)
+// cancelled before its Pending, then another one made with that Pending still to come: the one
+// given up is cancelled when it is named, and only the one shown stays open on the server.
+TEST(net_online_client_challenge_given_up_before_its_pending) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    using K = net::Event::Kind;
+    for (const bool privateGames : {false, true}) {
+        PacingRig r;
+        REQUIRE(r.start(privateGames ? "challenge-private" : "challenge-direct"));
+        net::OnlineClient& c = *r.c;
+        game::live::MyChallenge my;
+        std::vector<uint32_t> cancels;
+        auto create = [&](const std::string& target) {
+            if (const uint32_t id = my.cancel()) c.cancelChallenge(id);
+            const uint32_t request = privateGames ? c.createPrivateGame(300, 0, false, 0) : c.challenge(target, 300, 0, false, 0);
+            my.created(request, privateGames ? std::string() : target, 300, 0, false);
+        };
+        // The events until the server has answered the creations sent, applied as OnlineSession does.
+        auto drain = [&](size_t open) {
+            const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+            while (std::chrono::steady_clock::now() < end) {
+                net::Event e;
+                while (c.poll(e)) {
+                    if (e.kind == K::ChallengeStatus) {
+                        const game::live::MyChallenge::Status st = my.status(e);
+                        if (st.cancel) {
+                            cancels.push_back(st.cancel);
+                            my.quietCancel(c.cancelChallenge(st.cancel));
+                        }
+                    } else if (e.kind == K::ServerError) {
+                        CHECK(my.error(e) == game::live::MyChallenge::Answer::Quiet);
+                    }
+                }
+                if (my.shown().id != 0 && r.srv.openChallenges().size() == open && r.srv.challengeCancels.load() == int(cancels.size()))
+                    return;
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
+        };
+        r.srv.holdNext.store(true);
+        create("alice");
+        my.cancel();        // before its Pending: nothing to send yet
+        create("bob");      // the server answers alice's creation, then this one
+        drain(1);
+        const std::vector<uint32_t> open = r.srv.openChallenges();
+        CHECK_EQ(open.size(), size_t(1));
+        CHECK_EQ(cancels.size(), size_t(1));
+        CHECK(my.shown().active);
+        if (open.size() == 1 && cancels.size() == 1) {
+            CHECK_EQ(my.shown().id, open[0]);      // the one shown is the one open
+            CHECK(cancels[0] != open[0]);          // the one given up was cancelled
+            CHECK(my.shown().target == (privateGames ? "" : "bob"));
+            if (privateGames) CHECK(my.shown().code == "CODE" + std::to_string(open[0]));
+        }
+        // The player cancels what is shown: nothing stays open.
+        if (const uint32_t id = my.cancel()) c.cancelChallenge(id);
+        const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!r.srv.openChallenges().empty() && std::chrono::steady_clock::now() < end)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK(r.srv.openChallenges().empty());
+    }
+}
 
 namespace {
 

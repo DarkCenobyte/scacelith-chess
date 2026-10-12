@@ -145,12 +145,13 @@ public:
     double serverNowMs() const;
     void joinQueue(const std::string& category, bool rated);
     void leaveQueue();
-    void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
-    void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
+    // The challenge requests return their number, as net::OnlineClient's do (net::Event::request).
+    uint32_t challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
+    uint32_t createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
     void joinPrivateGame(const std::string& code);
     void acceptChallenge(uint32_t id);
     void declineChallenge(uint32_t id);
-    void cancelChallenge(uint32_t id);
+    uint32_t cancelChallenge(uint32_t id);
     void sendMove(uint64_t gameId, int ply, uint16_t move, const std::string& fen, uint32_t thinkMs, bool drawOffer);
     void resign(uint64_t gameId);
     void offerDraw(uint64_t gameId);

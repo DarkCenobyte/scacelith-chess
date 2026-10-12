@@ -106,6 +106,17 @@ own, decides what goes:
 game; the others become toasts. An error with code 0 and `error == "offline"` (a command sent
 while not connected, dropped by the network layer) clears the search and the pending challenge.
 
+Challenge requests (`challenge`, `createPrivateGame`, `cancelChallenge`) return a request number,
+and the network layer tags their answers with it (`Event::request`): the `ServerError` whose
+`ref` is the request's message, and the `ChallengeStatus` Pending that names a creation (only its
+creator is told Pending, before the `Ack` of that request; the oldest creation still unanswered
+with the same terms). The session keeps one challenge of ours open at a time
+(`live::MyChallenge`): a challenge given up before the server named it (cancelled, replaced by a
+new challenge or private game, or created on a connection since lost) is cancelled as soon as its
+Pending comes, so an older creation never takes the place of the one shown and none stays open
+for an acceptance. A refusal ends only the creation it answers, and the answers to the cancels
+the session sends on its own are not shown.
+
 The server in use comes from `[online]` in the settings: the official server
 (`net::officialServer()`, `caissa.scacelith.com` on port 443, the HTTPS port: API
 `https://caissa.scacelith.com/api/v1` and WebSocket `wss://caissa.scacelith.com/ws`) unless

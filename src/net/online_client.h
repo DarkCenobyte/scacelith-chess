@@ -378,6 +378,7 @@ struct Event {
     // challenges
     uint32_t challengeId = 0; int challengeState = 0; PlayerInfo challenger; std::string challengeTarget, challengeCode;
     int challengeBaseSec = 0, challengeIncSec = 0; bool challengeRated = false; int challengeColor = 0; uint32_t challengeExpiresMs = 0;
+    uint32_t request = 0;             // the challenge request answered (ChallengeStatus Pending, ServerError), 0: none
     // game
     OnlineGame game;                  // copy of the state after this event
     int ply = 0; uint16_t move = 0; uint8_t flags = 0; uint32_t spentMs = 0; bool mine = false;
@@ -525,12 +526,18 @@ public:
     double serverNowMs() const;                  // estimate of the server clock (for clock display)
     void joinQueue(const std::string& category, bool rated);
     void leaveQueue();
-    void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
-    void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);  // code in ChallengeStatus
+    // A challenge created (by name, or a private game, whose code comes in ChallengeStatus) or
+    // cancelled is a lobby request, which the server answers once with Ack or Error (PROTOCOL.md
+    // "Lobby requests"). These return the request's number (never 0); the events answering it carry
+    // it in Event::request: the ServerError refusing it (a local "offline" or "invalid_request" too)
+    // and, for a creation, the ChallengeStatus Pending naming the challenge made. A Pending that no
+    // creation of this connection explains (one of a connection since lost) carries 0.
+    uint32_t challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
+    uint32_t createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
     void joinPrivateGame(const std::string& code);
     void acceptChallenge(uint32_t id);
     void declineChallenge(uint32_t id);
-    void cancelChallenge(uint32_t id);
+    uint32_t cancelChallenge(uint32_t id);
     // Sends the move intent at once (call it when the destination is chosen, before animating).
     // fen = the position the move is played in (for posHash); thinkMs = local time since the turn began.
     void sendMove(uint64_t gameId, int ply, uint16_t move, const std::string& fen, uint32_t thinkMs, bool drawOffer);

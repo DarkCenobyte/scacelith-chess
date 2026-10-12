@@ -3,8 +3,9 @@
 // opponent's gestures (when their piece fields apply, which squares and moves are valid, the pace
 // of their robot's hand and its live work at their move, even under a flood of gestures, the
 // timeouts, the head's spring), my clock's freeze and the resend of my move after a
-// reconnection, the RatingRestored notice held back during a game, and the realtime errors that
-// belong to a game or refuse a challenge being created.
+// reconnection, the RatingRestored notice held back during a game, the realtime errors that
+// belong to a game or refuse a search, and which challenge of mine the server's answers are about
+// (live::MyChallenge, the audit's N13 scenarios).
 #include "test.h"
 #include "anim/animator.h"
 #include "chess/chess.h"
@@ -774,20 +775,253 @@ TEST(live_game_errors_leave_the_menus_refusals_out) {
     CHECK(!live::gameError(207));
 }
 
-TEST(live_challenge_refusals_are_only_those_of_its_creation) {
-    for (int code : {202, 203, 204, 206, 208, 210}) CHECK(live::challengeRefused(code));
-    // QueueNotAllowed and MatchmakingCooldown answer a QueueJoin, ChallengeNotFound an accept, a
-    // decline or a cancel, CodeInvalid a code joined, RematchUnavailable a rematch.
-    for (int code : {200, 201, 205, 207, 209}) CHECK(!live::challengeRefused(code));
-    CHECK(!live::challengeRefused(0));
-    CHECK(!live::challengeRefused(106));
-}
-
 TEST(live_queue_refusals_end_the_search) {
     // QueueNotAllowed, MatchmakingCooldown, AlreadyInGame and InvalidCategory refuse a QueueJoin.
     for (int code : {200, 207, 106, 107}) CHECK(live::queueRefused(code));
     // The refusals of a challenge, a code joined, a rematch and the game errors leave it.
     for (int code : {0, 100, 105, 108, 201, 202, 203, 204, 205, 206, 208, 209, 210}) CHECK(!live::queueRefused(code));
+}
+
+// ---- My challenge ------------------------------------------------------------------------------
+
+namespace {
+
+using CS = net::proto::ChallengeState;
+using EC = net::proto::ErrorCode;
+
+// OnlineSession's challenge commands and its handling of the answers (live::MyChallenge), against a
+// server that keeps every challenge it created open until it is cancelled (the real one keeps up
+// to three of a player's, and tells nothing but Ack to the creator who cancels one). The test
+// delivers the server's answers in the order the audit's scenarios give, with the request numbers
+// the network layer ties to them.
+struct ChallengeDesk {
+    live::MyChallenge my;
+    uint32_t requests = 0;
+    std::vector<uint32_t> cancels;      // ChallengeCancel ids sent, in order
+    std::vector<uint32_t> open;         // the challenges open on the server
+    int shownErrors = 0;                // ServerErrors the menus showed
+
+    uint32_t send(uint32_t cancelId = 0) {
+        if (cancelId) {
+            cancels.push_back(cancelId);
+            open.erase(std::remove(open.begin(), open.end(), cancelId), open.end());
+        }
+        return ++requests;
+    }
+    // OnlineSession::challenge and createPrivateGame (target ""): the one shown is cancelled first.
+    uint32_t create(const std::string& target, int baseSec = 300, int incSec = 0, bool rated = false) {
+        cancel();
+        const uint32_t request = send();
+        my.created(request, target, baseSec, incSec, rated);
+        return request;
+    }
+    // OnlineSession::cancelOutgoing.
+    void cancel() {
+        if (const uint32_t id = my.cancel()) send(id);
+    }
+    // A new connection (OnlineSession's Welcome): whether the "challenge lost" notice shows.
+    bool welcome() {
+        const bool lost = my.shown().active;
+        if (const uint32_t id = my.newConnection()) my.quietCancel(send(id));
+        return lost;
+    }
+    // A ChallengeStatus (Pending: the challenge 'id' was created and is open).
+    live::MyChallenge::Status status(uint32_t id, CS state, uint32_t request = 0, const std::string& target = "",
+                                     const std::string& code = "") {
+        net::Event e;
+        e.kind = net::Event::Kind::ChallengeStatus;
+        e.challengeId = id;
+        e.challengeState = int(state);
+        e.challengeTarget = target;
+        e.challengeCode = code;
+        e.challengeBaseSec = 300;
+        e.request = request;
+        if (state == CS::Pending) open.push_back(id);
+        const live::MyChallenge::Status st = my.status(e);
+        if (st.cancel) my.quietCancel(send(st.cancel));
+        return st;
+    }
+    // A ServerError answering the request (0: another command's); whether the menus show it.
+    bool error(uint32_t request, EC code) {
+        net::Event e;
+        e.kind = net::Event::Kind::ServerError;
+        e.code = int(code);
+        e.request = request;
+        const bool shown = my.error(e) != live::MyChallenge::Answer::Quiet;
+        shownErrors += shown;
+        return shown;
+    }
+};
+
+}  // namespace
+
+TEST(live_my_challenge_cancelled_before_its_pending_is_cancelled_when_it_comes) {
+    ChallengeDesk d;
+    const uint32_t alice = d.create("Alice");
+    d.cancel();
+    CHECK(!d.my.shown().active);
+    CHECK(d.cancels.empty());  // no id yet
+    CHECK(d.status(1, CS::Pending, alice, "Alice").mine);
+    CHECK(d.cancels == std::vector<uint32_t>{1});
+    CHECK(d.open.empty());
+    CHECK(!d.my.shown().active);
+    // The challenge was accepted meanwhile: the refusal of that cancel is not shown.
+    CHECK(!d.error(d.requests, EC::ChallengeNotFound));
+    CHECK_EQ(d.my.quietWaiting(), size_t(0));
+}
+
+// N13, first variant: a challenge to Alice cancelled before its Pending, then one to Bob. Alice's
+// Pending comes first: it is cancelled, and never names the challenge shown (Bob's).
+TEST(live_my_challenge_a_new_challenge_never_takes_the_id_of_one_given_up) {
+    ChallengeDesk d;
+    const uint32_t alice = d.create("Alice");
+    d.cancel();
+    const uint32_t bob = d.create("Bob");
+    d.status(1, CS::Pending, alice, "Alice");
+    CHECK(d.cancels == std::vector<uint32_t>{1});
+    CHECK(d.my.shown().active && d.my.shown().target == "Bob");
+    CHECK_EQ(d.my.shown().id, 0u);
+    d.status(2, CS::Pending, bob, "Bob");
+    CHECK_EQ(d.my.shown().id, 2u);
+    CHECK(d.open == std::vector<uint32_t>{2});
+    // The player cancels Bob's challenge: id 2, the one open.
+    d.cancel();
+    CHECK(d.cancels == (std::vector<uint32_t>{1, 2}));
+    CHECK(d.open.empty());
+    CHECK_EQ(d.shownErrors, 0);
+}
+
+// N13, second variant: two private games with the same terms. The first one's Pending (its code)
+// is cancelled; the code shown is the second one's, which stays open.
+TEST(live_my_challenge_two_private_games_with_the_same_terms) {
+    ChallengeDesk d;
+    const uint32_t first = d.create("");
+    d.cancel();
+    const uint32_t second = d.create("");
+    d.status(1, CS::Pending, first, "", "AAAAAA");
+    CHECK(d.cancels == std::vector<uint32_t>{1});
+    CHECK(d.my.shown().active && d.my.shown().code.empty());
+    d.status(2, CS::Pending, second, "", "BBBBBB");
+    CHECK(d.my.shown().active);
+    CHECK_EQ(d.my.shown().id, 2u);
+    CHECK(d.my.shown().code == "BBBBBB");
+    CHECK(d.cancels == std::vector<uint32_t>{1});  // the second one is not cancelled
+    CHECK(d.open == std::vector<uint32_t>{2});
+    // The same with the answers the other way round (the server answers in order, but a Pending
+    // of the first could also never come: the second one names only its own).
+    ChallengeDesk r;
+    const uint32_t a = r.create("");
+    r.cancel();
+    const uint32_t b = r.create("");
+    r.status(8, CS::Pending, b, "", "CCCCCC");
+    CHECK_EQ(r.my.shown().id, 8u);
+    CHECK(r.my.shown().code == "CCCCCC");
+    r.status(7, CS::Pending, a, "", "DDDDDD");
+    CHECK(r.cancels == std::vector<uint32_t>{7});
+    CHECK_EQ(r.my.shown().id, 8u);
+    CHECK(r.my.shown().code == "CCCCCC");
+    CHECK(r.open == std::vector<uint32_t>{8});
+}
+
+// A refusal ends only the creation it answers: that of a creation given up shows nothing and
+// leaves the one shown, that of the one shown ends it. An error of another command changes nothing.
+TEST(live_my_challenge_refusals_end_only_their_own_creation) {
+    ChallengeDesk d;
+    const uint32_t alice = d.create("Alice");
+    d.cancel();
+    const uint32_t bob = d.create("Bob");
+    CHECK(!d.error(alice, EC::UserUnavailable));
+    CHECK(d.my.shown().active && d.my.shown().target == "Bob");
+    CHECK(d.error(0, EC::ChallengeNotFound));  // an accept or a decline of mine: shown
+    CHECK(d.error(0, EC::RateLimited));
+    CHECK(d.my.shown().active && d.my.shown().target == "Bob");
+    CHECK(d.error(bob, EC::ChallengeLimit));
+    CHECK(!d.my.shown().active);
+    CHECK(d.cancels.empty());
+    CHECK_EQ(d.my.quietWaiting(), size_t(0));
+    // A Pending no creation explains (request 0) is one of mine all the same: cancelled.
+    const uint32_t carol = d.create("Carol");
+    d.status(9, CS::Pending, 0, "Dave");
+    CHECK(d.cancels == std::vector<uint32_t>{9});
+    CHECK(d.my.shown().active && d.my.shown().target == "Carol" && d.my.shown().id == 0);
+    d.status(10, CS::Pending, carol, "Carol");
+    CHECK_EQ(d.my.shown().id, 10u);
+    CHECK(d.open == std::vector<uint32_t>{10});
+    // The refusal of a cancel the player asked for is shown (the challenge was already gone).
+    d.cancel();
+    CHECK(d.error(d.requests, EC::ChallengeNotFound));
+}
+
+// A reconnection during the sequence: the challenge shown is cancelled quietly (named) or
+// forgotten (not named: the server never got it, or dropped it with the connection); a Pending of
+// a creation of the previous connection, which carries no request, is cancelled.
+TEST(live_my_challenge_across_a_reconnection) {
+    ChallengeDesk d;
+    const uint32_t bob = d.create("Bob");
+    d.status(1, CS::Pending, bob, "Bob");
+    CHECK(d.welcome());
+    CHECK(d.cancels == std::vector<uint32_t>{1});
+    CHECK(!d.my.shown().active);
+    CHECK(!d.error(d.requests, EC::ChallengeNotFound));  // dropped with the connection already
+    // Created, then the connection is lost before its Pending.
+    d.create("Carol");
+    CHECK(d.welcome());
+    CHECK(d.cancels == std::vector<uint32_t>{1});
+    CHECK(!d.welcome());  // nothing shown any more
+    const uint32_t dave = d.create("Dave");
+    d.status(2, CS::Pending, 0, "Carol");  // Carol's, late, on the new connection
+    CHECK(d.cancels == (std::vector<uint32_t>{1, 2}));
+    d.status(3, CS::Pending, dave, "Dave");
+    CHECK_EQ(d.my.shown().id, 3u);
+    CHECK(d.open == std::vector<uint32_t>{3});
+    // A cancel quiet on the previous connection: its number means nothing on this one.
+    ChallengeDesk q;
+    const uint32_t eve = q.create("Eve");
+    q.cancel();
+    q.welcome();
+    CHECK_EQ(q.my.quietWaiting(), size_t(0));
+    CHECK(!q.my.shown().active && eve != 0);
+}
+
+TEST(live_my_challenge_ends_with_its_status_and_leaves_the_received_ones) {
+    ChallengeDesk d;
+    const uint32_t bob = d.create("Bob");
+    d.status(5, CS::Pending, bob, "bob");
+    // A status of a challenge received (cancelled by its challenger): not mine.
+    CHECK(!d.status(77, CS::Cancelled).mine);
+    CHECK(d.my.shown().active);
+    const live::MyChallenge::Status st = d.status(5, CS::Declined);
+    CHECK(st.mine);
+    CHECK_EQ(st.ended, int(CS::Declined));
+    CHECK(st.target == "Bob");
+    CHECK(!d.my.shown().active);
+    // One of mine given up and named since: its later statuses are not about the one shown.
+    const uint32_t carol = d.create("Carol");
+    d.cancel();
+    const uint32_t dave = d.create("Dave");
+    d.status(6, CS::Pending, carol, "Carol");
+    d.status(7, CS::Pending, dave, "Dave");
+    const live::MyChallenge::Status late = d.status(6, CS::Expired);
+    CHECK(!late.mine);
+    CHECK_EQ(late.ended, -1);
+    CHECK_EQ(d.my.shown().id, 7u);
+    // A new challenge while one is shown cancels it first.
+    d.create("Eve");
+    CHECK(d.cancels == (std::vector<uint32_t>{6, 7}));
+}
+
+TEST(live_my_challenge_keeps_a_bounded_list_of_quiet_answers) {
+    ChallengeDesk d;
+    for (int i = 0; i < 100; ++i) {
+        d.create("Bob");
+        d.cancel();
+    }
+    CHECK_EQ(d.my.quietWaiting(), size_t(32));
+    // The oldest are forgotten: their refusal would show (a toast, nothing else).
+    CHECK(d.error(1, EC::UserUnavailable));
+    CHECK(!d.error(100, EC::UserUnavailable));
+    d.my.reset();
+    CHECK_EQ(d.my.quietWaiting(), size_t(0));
 }
 
 TEST(live_routing_follows_the_game_a_message_names) {
