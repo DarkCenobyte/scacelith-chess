@@ -98,7 +98,10 @@ comments say against the board: `coach_audit record --out games.rec --pgn games.
 `--selfplay N`) stores the engine's analyses of every move, then `coach_audit review --in games.rec`
 replays each move through the coach at every level and `coach_audit commentary --in games.rec`
 through the Analysis comments, each flagging a claim the board does not bear out (a demonstration
-that stops before its point, a piece named that was traded back, a loss the best move suffers too).
+that stops before its point, a piece named that was traded back, a loss the best move suffers too,
+a line shown or said that leaves a bigger piece en prise without winning as much back).
+`record --material-only` keeps only the moves that leave material en prise, and `--hang-rate R`
+makes the weak "human" of `--selfplay` hang a piece on that share of its moves.
 See `tools/coach_audit/audit.h`.
 
 The positions of the coach's challenges are picked from Lichess puzzle rows by
