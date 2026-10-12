@@ -167,6 +167,20 @@ demo.my.check.3 = {my} ينتقل إلى {sq}، كش!
 demo.my.mate = {my} إلى {sq}. كش مات.
 demo.my.mate.2 = و{my} إلى {sq}: كش مات.
 demo.my.mate.3 = {my} ينتقل إلى {sq}. هذا كش مات.
+# Levels 1-3, the coach's in-between move ({t1}: the bigger piece taken next).
+demo.my.first.take = أولًا، {my} يأخذ {your}. {t1} يمكنه الانتظار.
+demo.my.first.take.2 = {my} يأخذ {your} أولًا. {t1} سيبقى مكانه.
+demo.my.first.check = {my} يأخذ {your}، وهذا كش! {t1} يمكنه الانتظار.
+demo.my.first.check.2 = أولًا يأخذ {my} {your} مع كش. {t1} سيبقى مكانه.
+demo.my.first.check_move = أولًا، كش ب{my} من {sq}. {t1} يمكنه الانتظار.
+demo.my.first.check_move.2 = {my} ينتقل إلى {sq}: الكش أولًا! {t1} سيبقى مكانه.
+demo.my.first.move = أولًا، {my} ينتقل إلى {sq}. {t1} يمكنه الانتظار.
+demo.my.first.move.2 = {my} إلى {sq} أولًا. {t1} سيبقى مكانه.
+demo.my.first.attacked = {my} مُهاجَم، لذلك يأخذ {your} أولًا.
+demo.my.first.attacked.2 = {my} تحت الهجوم: يأخذ {your} قبل كل شيء.
+# Levels 4-6.
+demo.first = {move} أولًا: {t1} يمكنه الانتظار.
+demo.first.2 = أولًا {move}. {t1} سيبقى مكانه.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = نقلتك: {your} إلى {sq}.
 demo.your.move.2 = لنفترض أن {your} انتقل إلى {sq}.

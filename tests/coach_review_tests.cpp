@@ -1618,6 +1618,97 @@ TEST(coach_review_pin_defender_freed_by_the_capture) {
     }
 }
 
+TEST(coach_review_in_between_move_is_explained) {
+    // 24...Qa4?? 25.Nxe7+ Kh8 26.Nxa4: the knight takes the bishop with check before the queen. The
+    // demonstration plays all three moves and says why the queen waits.
+    const char* fen = "3r1rk1/pp1qbbp1/n4p1p/2pP1N2/1P2PP2/P1N3P1/4QR1P/R1B3K1 b - - 1 24";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"Qa4"});
+        Reviewer rv;
+        rv.reset(level, Black);
+        const ai::Analysis a0 = analysisOf({pvl(-90, "f7g6 f5e7 d7e7 b4b5 a6b8"),
+                                            pvl(-1050, "d7a4 f5e7 g8h8 c3a4 f8e8 a4c5")});
+        const Review r = reviewOf(rv, g, a0);
+        char where[48];
+        std::snprintf(where, sizeof where, "in-between b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        std::vector<std::string> demo;
+        for (const Beat& b : r.script)
+            if (b.kind == BeatKind::DemoMove) demo.push_back(b.uci);
+        // Every demonstration that starts with the check goes on to the queen.
+        if (!demo.empty()) {
+            const std::vector<std::string> want = {"f5e7", "g8h8", "c3a4"};
+            CHECK(demo == want);
+            CHECK(hasKey(r.script, level <= 3 ? "demo.my.first.check" : "demo.first"));
+        }
+        if (level <= 3) CHECK(!demo.empty());
+    }
+    // The narration alone, from the line: "my knight takes your bishop, and it's check! Your queen
+    // can wait"; the coach's queen attacked first: "my queen is attacked, so it takes ... first".
+    detail::Ctx c;
+    c.human = Black;
+    c.coach = White;
+    c.ply = 47;
+    CHECK(c.p1.setFEN("3r1rk1/pp2bbp1/n4p1p/2pP1N2/qP2PP2/P1N3P1/4QR1P/R1B3K1 w - - 2 25"));
+    c.r = replayLine(c.p1, {"f5e7", "g8h8", "c3a4"}, Black);
+    detail::Explanation ex;
+    ex.demoPlies = 3;
+    for (int level : {2, 5}) {
+        c.level = level;
+        c.b = band(level);
+        Script s;
+        detail::appendDemo(c, ex, s);
+        checkScript(s, "in-between narration");
+        const Beat* first = beatWithKey(s, level == 2 ? "demo.my.first.check" : "demo.first");
+        CHECK(first != nullptr);
+        if (first) {
+            CHECK(first->line.arg("t1") != nullptr);
+            CHECK_EQ(first->uci, std::string("f5e7"));
+        }
+        if (level == 2) CHECK(hasKey(s, "demo.my.take"));
+    }
+    // The coach's rook on a8 is attacked by the queen: it takes the knight on a3 first, then ...exd5.
+    CHECK(c.p1.setFEN("r5k1/5ppp/4p3/3Q4/8/N7/5PPP/6K1 b - - 0 1"));
+    c.human = White;
+    c.coach = Black;
+    c.level = 2;
+    c.b = band(2);
+    c.r = replayLine(c.p1, {"a8a3", "g1h1", "e6d5"}, White);
+    {
+        Script s;
+        detail::appendDemo(c, ex, s);
+        checkScript(s, "in-between attacked");
+        CHECK(hasKey(s, "demo.my.first.attacked"));
+    }
+    // A quiet move first: "first, my king goes to f8; your queen can wait".
+    c.r = replayLine(c.p1, {"g8f8", "g1h1", "e6d5"}, White);
+    {
+        Script s;
+        detail::appendDemo(c, ex, s);
+        checkScript(s, "in-between quiet");
+        CHECK(hasKey(s, "demo.my.first.move"));
+    }
+}
+
+TEST(coach_review_never_shows_a_queen_left_standing) {
+    // 1.h3?? leaves the queen on d5 to ...exd5 and the knight on a3 to ...Rxa3 (1.Qa2 saved both).
+    // The engine's line takes the knight and lets the queen walk away (2.Qb7): whatever its reason,
+    // the table would show the coach ignoring a free queen. The coach never plays that capture.
+    const char* fen = "r5k1/5ppp/4p3/3Q4/8/N7/5PPP/6K1 w - - 0 1";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"h3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(20, "d5a2 g8f8"), pvl(-330, "h2h3 a8a3 d5b7 a3a1 g1h2")});
+        const Review r = reviewOf(rv, g, a0);
+        char where[48];
+        std::snprintf(where, sizeof where, "queen left b%d", level);
+        checkScript(r.script, where);
+        for (const Beat& b : r.script) CHECK(b.uci != "a8a3" && b.uci != "d5b7");
+    }
+}
+
 TEST(coach_review_promotion_race_names_the_queening_pawn) {
     // ...cxb2 and ...b1=Q: the pawn that queens stands on c3 now (b7 is another pawn on the b-file).
     for (int level : {2, 3}) {
@@ -1788,6 +1879,8 @@ TEST(coach_review_every_key_exists) {
         "ann.check.human.b1", "ann.check.human", "ann.check.coach", "ann.check.coach.first", "ann.double_check.coach", "ann.double_check.human",
         "ann.mate.human.b1", "ann.mate.human", "ann.mate.coach.b1", "ann.mate.coach", "demo.move", "demo.my.move",
         "demo.my.take", "demo.my.check", "demo.my.mate", "demo.your.move", "demo.your.take", "demo.your.back",
+        "demo.my.first.take", "demo.my.first.check", "demo.my.first.check_move", "demo.my.first.move",
+        "demo.my.first.attacked", "demo.first",
         "demo.your.king", "demo.promote", "ex.mate_allowed.tail.b1", "ex.mate_allowed.pattern",
         "ex.mate_allowed.tip.b3", "ex.stalemate.tip.b1", "ex.fork.tail.b1", "ex.fork.tail_king", "ex.fork.more.b3",
         "ex.fork.tip.knight", "ex.point.piece", "ex.point.two", "ex.point.mate",

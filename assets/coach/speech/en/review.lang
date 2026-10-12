@@ -174,6 +174,22 @@ demo.my.check.3 = {my} to {sq}, check!
 demo.my.mate = {my} goes to {sq}. Checkmate.
 demo.my.mate.2 = And {my} to {sq} is checkmate.
 demo.my.mate.3 = {my} to {sq}. That's checkmate.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = First, {my} takes {your}. {t1} can wait.
+demo.my.first.take.2 = {my} takes {your} first. {t1} will still be there.
+demo.my.first.check = {my} takes {your}, and it's check! {t1} can wait.
+demo.my.first.check.2 = First {my} takes {your}, with check. {t1} will still be there.
+demo.my.first.check_move = First, check with {my} on {sq}. {t1} can wait.
+demo.my.first.check_move.2 = {my} goes to {sq}: check first! {t1} will still be there.
+demo.my.first.move = First, {my} goes to {sq}. {t1} can wait.
+demo.my.first.move.2 = {my} to {sq} first. {t1} will still be there.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} is attacked, so it takes {your} first.
+demo.my.first.attacked.2 = {my} is under attack: it grabs {your} first.
+# Levels 4-6, the same in-between move.
+demo.first = {move} first: {t1} can wait.
+demo.first.2 = First {move}. {t1} will still be there.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = You would move {your} to {sq}.
 demo.your.move.2 = Say you play {your} to {sq}.

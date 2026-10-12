@@ -1,7 +1,12 @@
 // coach_audit: an audit of the coach's review (src/coach/review.h) and of the Analysis mode's
 // commentary (src/analysis/commentary.h) against the board.
 //   coach_audit record --out FILE [--pgn FILE]... [--selfplay N --seed S] [--depth D] [--threads T]
-//       runs the analyses a Coach game asks for on every move of the human side (embedded Stockfish)
+//                      [--material-only] [--hang-rate R]
+//       runs the analyses a Coach game asks for on every move of the human side (embedded Stockfish);
+//       --material-only: only the moves after which the coach can win 2 points or more by exchange
+//       (the moves whose review shows a loss, a few times quicker to gather); --hang-rate R: in
+//       self-play, the "human" plays with probability R a random move that leaves 3 points or more
+//       to win by exchange (when one exists), for audits of the coach's demonstrations
 //   coach_audit review --in FILE [--level L] [--out FILE] [--all]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
@@ -30,6 +35,8 @@ struct Options {
     int maxPlies = 160;
     int level = 0;          // review: 0 = every level
     bool all = false;       // review: print every reviewed move, not only those with a script
+    bool materialOnly = false;   // record: only the moves that leave material to win (2 points or more)
+    double hangRate = 0.0;       // record, self-play: share of the human's moves that leave 3+ points to win
 };
 
 // One human move and its analyses.

@@ -168,6 +168,20 @@ demo.my.check.3 = {my} en {sq}, échec !
 demo.my.mate = {my} va en {sq}. Échec et mat.
 demo.my.mate.2 = Et {my} en {sq}, c’est échec et mat.
 demo.my.mate.3 = {my} en {sq}. C’est échec et mat.
+# Levels 1-3, the coach's in-between move ({t1}: the bigger piece taken next).
+demo.my.first.take = D’abord, {my} prend {your}. {t1} peut attendre.
+demo.my.first.take.2 = {my} prend d’abord {your}. {t1} sera encore là.
+demo.my.first.check = {my} prend {your}, et c’est échec ! {t1} peut attendre.
+demo.my.first.check.2 = D’abord {my} prend {your}, avec échec. {t1} sera encore là.
+demo.my.first.check_move = D’abord, échec avec {my} en {sq}. {t1} peut attendre.
+demo.my.first.check_move.2 = {my} va en {sq} : d’abord l’échec ! {t1} sera encore là.
+demo.my.first.move = D’abord, {my} va en {sq}. {t1} peut attendre.
+demo.my.first.move.2 = {my} en {sq} d’abord. {t1} sera encore là.
+demo.my.first.attacked = {my} est attaqué{my:e}, alors {my:il} prend d’abord {your}.
+demo.my.first.attacked.2 = {my} est menacé{my:e} : {my:il} prend {your} avant tout.
+# Levels 4-6.
+demo.first = D’abord {move} : {t1} peut attendre.
+demo.first.2 = {move} d’abord. {t1} sera encore là.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = Tu jouerais {your} en {sq}.
 demo.your.move.2 = Disons que tu joues {your} en {sq}.

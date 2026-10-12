@@ -27,7 +27,8 @@ void put(Line& l, const std::string& name, const Arg& a) {
 size_t refutationLength(const Ctx& c) {
     int n = c.gain > 0 ? c.gain : 3;
     n = std::clamp(n, 2, c.b.linePlies + 1);
-    return size_t(std::min<int>(n, int(c.r.size())));
+    // A move that leaves a bigger prize is said with the capture that wins as much back (wonBackAt).
+    return size_t(c.followable(std::min<int>(n, int(c.r.size())), true));
 }
 
 // A line with the arguments every explanation may use: the move, the better move, the reply, the
@@ -136,6 +137,9 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
     for (int p = retake ? k + 2 : k + 1; p <= std::min({n, k + 2, cap}) && plies == 0; ++p) {
         const LineStep& st = c.r[size_t(p - 1)];
         if (st.captured == NoPiece || st.mate) continue;
+        // Never a sequence that stops after a move that leaves a bigger prize and before the capture
+        // that wins as much back ("I take your knight with check", the queen still en prise).
+        if (c.followable(p, false) < p) continue;
         const Position q = afterR(c, p);
         const int board = c.base - st.balance;
         int l = board;
@@ -946,8 +950,9 @@ Square pawnOrigin(const std::vector<LineStep>& line, int i) {
 bool promotionRace(const Ctx& c, Explanation& out) {
     if (!endgamePhase(c) || c.j.delta < 5.0) return false;
     const Square hk = c.p1.kingSquare(c.human);
-    // (a) The coach queens along the refutation.
-    for (int i = 0; i < int(c.r.size()) && i < c.b.lookahead + 2; ++i) {
+    // (a) The coach queens along the refutation (the part a player can follow).
+    const int reach = c.followable(c.b.lookahead + 2, true);
+    for (int i = 0; i < reach; ++i) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover != c.coach || st.promotion == NoPiece) continue;
         const Square prom = st.move.to;
@@ -1010,9 +1015,11 @@ bool promotionRace(const Ctx& c, Explanation& out) {
 // Sections 14-18 say what the move does to the position: never when the line loses material or
 // mates (a concrete loss is the reason; when no detector can name it, the better move says enough).
 bool kingSafety(const Ctx& c, Explanation& out) {
-    if (c.j.delta < 5.0 || c.concreteLoss(8) || c.r.empty()) return false;
+    // The checks counted and the line said: the part of the refutation a player can follow.
+    const int reach = c.followable(c.b.lookahead + 2, true);
+    if (c.j.delta < 5.0 || c.concreteLoss(8) || reach == 0) return false;
     int checks = 0;
-    for (int i = 0; i < int(c.r.size()) && i < c.b.lookahead + 2; ++i)
+    for (int i = 0; i < reach; ++i)
         if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].check) ++checks;
     const bool zone = kingZoneAttacks(c.p1, c.human) >= 3;
     if (checks < 2 && !zone) return false;
@@ -1064,7 +1071,7 @@ bool badTrade(const Ctx& c, Explanation& out) {
             ex.concrete = true;
             ex.fullPlies = plies;   // the trades, shown at level 3
             Beat b = bandLine(c, "ex.bad_trade", Look::Board);
-            put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(std::max(plies, 2)))));
+            put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(c.followable(std::max(plies, 2), true)))));
             ex.cause.push_back(b);
             out = ex;
             return true;
@@ -1117,7 +1124,7 @@ bool endgame(const Ctx& c, Explanation& out) {
     put(b.line, "your", pieceArg(c.p1, k, c.human));
     const Square prom = b0.piece == Pawn ? promotionSquare(c.p0, b0.move.from) : NoSquare;
     put(b.line, "sq", Arg::ofSquare(prom != NoSquare ? prom : b0.move.to));
-    put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(std::min(4, c.b.linePlies)))));
+    put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(c.followableBest(std::min(4, c.b.linePlies))))));
     put(b.line, "eval", evalArg(c.l1->score));
     if (c.level == 1 && family == "ex.push_passed") pointSquare(b, prom, "sq");
     else if (c.level <= 2 && family == "ex.king_active") pointPiece(b, k, "your", true);
@@ -1135,7 +1142,7 @@ bool positional(const Ctx& c, Explanation& out) {
     ex.type = ExType::Positional;
     ex.includesBest = true;
     Beat b = bandLine(c, "ex.positional");
-    put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(std::min(4, c.b.linePlies)))));
+    put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(c.followableBest(std::min(4, c.b.linePlies))))));
     put(b.line, "eval", evalArg(c.l1->score));
     traceMove(b, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
     ex.cause.push_back(b);

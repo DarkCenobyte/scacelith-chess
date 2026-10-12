@@ -609,6 +609,8 @@ std::vector<LineStep> replayLine(const Position& start, const std::vector<std::s
         s.piece = pc.type;
         s.captured = (m.flags & MoveEnPassant) ? Pawn : p.at(m.to).type;
         s.promotion = (m.flags & MovePromotion) ? m.promotion : NoPiece;
+        s.prize = prizeLeft(p, m);
+        if (s.prize != NoSquare) s.prizeType = p.at(s.prize).type;
         p.makeMove(m);
         s.check = p.inCheck();
         const bool legal = p.hasLegalMove();
@@ -628,6 +630,83 @@ std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t coun
         out += steps[i].san;
     }
     return out;
+}
+
+Square prizeLeft(const Position& before, const Move& m) {
+    const PieceType took = (m.flags & MoveEnPassant) ? Pawn : before.at(m.to).type;   // NoPiece: a quiet move
+    int gain = took != NoPiece ? seePoints(before, m) : 0;
+    if (m.flags & MovePromotion) gain = std::max(gain, kPiecePoints[m.promotion] - 1);
+    Square prize = NoSquare;
+    int most = gain + 2;
+    for (const Move& x : before.legalMoves()) {
+        const Piece t = before.at(x.to);
+        if (t.empty() || kPiecePoints[t.type] <= kPiecePoints[took]) continue;
+        if (x.promotion != NoPiece && x.promotion != Queen) continue;
+        const int g = seePoints(before, x);
+        if (g > most) {
+            most = g;
+            prize = x.to;
+        }
+    }
+    if (prize == NoSquare) return NoSquare;
+    Position after = before;
+    after.makeMove(m);
+    return after.isCheckmate() ? NoSquare : prize;
+}
+
+bool isInBetween(const std::vector<LineStep>& line, size_t k) {
+    if (k + 2 >= line.size()) return false;
+    const LineStep& a = line[k];
+    if (a.prize == NoSquare) return false;
+    const LineStep &reply = line[k + 1], &take = line[k + 2];
+    return reply.move.from != a.prize && take.mover == a.mover && take.move.to == a.prize &&
+           take.captured == a.prizeType && !(take.move.flags & MoveEnPassant);
+}
+
+size_t wonBackAt(const std::vector<LineStep>& line, size_t k) {
+    constexpr size_t kNone = size_t(-1);
+    const LineStep& a = line[k];
+    if (a.prize == NoSquare) return kNone;
+    if (isInBetween(line, k)) return k + 2;
+    const int worth = kPiecePoints[a.prizeType];
+    const bool forcing = a.captured != NoPiece || a.check;
+    // The mover's next moves, at most three: checks until the capture.
+    for (size_t j = k + 2; j < line.size() && j <= k + 6; j += 2) {
+        const LineStep& b = line[j];
+        const bool same = j == k + 2 && b.move.from == a.move.to;   // the piece that just moved
+        if (b.captured != NoPiece && kPiecePoints[b.captured] >= worth && (forcing || same)) return j;
+        if (!forcing || !b.check) return kNone;
+    }
+    return kNone;
+}
+
+size_t followablePlies(const std::vector<LineStep>& line, size_t want, bool extend) {
+    constexpr size_t kNone = size_t(-1);
+    size_t limit = std::min(want, line.size());
+    // A mate or a stalemate the part shows: the moves before it ignore material on purpose (the
+    // defence too: it only delays the mate). One further along the line is not seen.
+    size_t mateAt = kNone;
+    for (size_t i = 0; i < limit && mateAt == kNone; ++i)
+        if (line[i].mate || line[i].stalemate) mateAt = i;
+    // The first move of a win-back still under way, and the ply of its capture.
+    size_t open = kNone, until = 0;
+    for (size_t i = 0; i < limit; ++i) {
+        if (open != kNone && i > until) open = kNone;
+        const LineStep& st = line[i];
+        if (st.prize == NoSquare || (mateAt != kNone && i < mateAt)) continue;
+        const size_t back = wonBackAt(line, i);
+        if (back != kNone) {
+            if (open == kNone) open = i;
+            until = std::max(until, back);
+            if (back >= limit) {
+                if (!extend) return open;
+                limit = back + 1;   // within the line (wonBackAt); the plies up to it are checked too
+            }
+            continue;
+        }
+        return open != kNone ? open : i;
+    }
+    return limit;
 }
 
 Square knightCorner(Square from, Square to) {

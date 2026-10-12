@@ -230,6 +230,14 @@ void limitPointing(Beat& b) {
 
 int Ctx::lossAfter(int plies) const { return heldLoss(r, size_t(std::max(0, plies)), base, human, rEnd); }
 
+int Ctx::followable(int want, bool extend) const {
+    return int(followablePlies(r, size_t(std::max(0, want)), extend));
+}
+
+int Ctx::followableBest(int want) const {
+    return std::max(std::min(want, 1), int(followablePlies(best, size_t(std::max(0, want)), true)));
+}
+
 int Ctx::lossWithin(int plies) const {
     int worst = 0;
     const int n = std::min<int>(plies, int(r.size()));
@@ -338,12 +346,30 @@ namespace {
 
 Line narration(const Ctx& c, const Position& before, const LineStep& st, int i) {
     Line l;
+    // The coach's in-between move says why the bigger prize waits ({t1}: it is taken next).
+    const bool between = st.mover == c.coach && isInBetween(c.r, size_t(i));
     if (c.level >= 4) {
-        l.key = "demo.move";
+        l.key = between ? "demo.first" : "demo.move";
         l.with("move", moveArg(st));
+        if (between) l.with("t1", pieceArg(before, st.prize, c.human));
         return l;
     }
     const Square capSq = (st.move.flags & MoveEnPassant) ? Square(st.move.to + (st.mover == White ? -8 : 8)) : st.move.to;
+    if (between) {
+        // "My queen is attacked, so it takes your bishop first" (the piece would be lost anyway),
+        // "my knight takes your rook, with check: your queen can wait", "first, check with my rook",
+        // "first, my bishop goes to f5".
+        l.with("my", pieceArg(before, st.move.from, c.human)).with("sq", Arg::ofSquare(st.move.to));
+        l.with("t1", pieceArg(before, st.prize, c.human));
+        if (st.captured == NoPiece) {
+            l.key = st.check ? "demo.my.first.check_move" : "demo.my.first.move";
+        } else {
+            l.with("your", Arg::ofPiece(st.captured, c.human, true, capSq));
+            const bool attacked = seeSquarePoints(before, st.move.from, c.human) > 0;
+            l.key = attacked ? "demo.my.first.attacked" : st.check ? "demo.my.first.check" : "demo.my.first.take";
+        }
+        return l;
+    }
     if (st.mover == c.coach) {
         l.with("my", pieceArg(before, st.move.from, c.human)).with("sq", Arg::ofSquare(st.move.to));
         if (st.mate) l.key = "demo.my.mate";
@@ -427,10 +453,11 @@ void planDemo(const Ctx& c, Explanation& ex) {
     ex.demoPlies = 0;
     ex.full = false;
     if (ex.missed || c.r.empty() || c.r[0].mover != c.coach || ex.fullPlies <= 0) return;
-    const int reach = std::min(int(c.r.size()), beforeHumanPromotion(c));
+    // Never past a move the player could not follow (Ctx::followable).
+    const int reach = std::min({int(c.r.size()), beforeHumanPromotion(c), c.followable(int(c.r.size()), true)});
     // Levels 1-3: the whole sequence, when the level can follow it.
     const int fullCap = ex.mate ? c.b.mateLinePlies : c.b.demoPlies;
-    if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap)) {
+    if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap) && c.followable(ex.fullPlies, false) == ex.fullPlies) {
         ex.full = true;
         ex.demoPlies = ex.fullPlies;
         return;
@@ -442,7 +469,9 @@ void planDemo(const Ctx& c, Explanation& ex) {
         return;
     }
     // Up to where the problem stands, and the coach points at what comes next.
-    if (ex.threatPlies <= 0 || ex.threatPlies >= ex.fullPlies || ex.threatPlies > std::min(reach, c.b.demoPlies)) return;
+    if (ex.threatPlies <= 0 || ex.threatPlies >= ex.fullPlies || ex.threatPlies > std::min(reach, c.b.demoPlies) ||
+        c.followable(ex.threatPlies, false) < ex.threatPlies)
+        return;
     ex.demoPlies = ex.threatPlies;
     Beat b;
     if (ex.threatTail.empty() && !designation(c, ex, afterPlies(c, ex.threatPlies), b)) ex.demoPlies = 0;
@@ -954,7 +983,11 @@ Review Reviewer::review(const ReviewInput& in) {
         if (better) {
             // {line} is what follows {best} ("Nf3, with the idea d4 c5"), never {best} again; level 5
             // names that idea, so without a continuation it says the level-4 line instead.
-            std::string idea = sanLine(c.best, 1, size_t(std::max(1, std::min(4, bd.linePlies) - 1)));
+            // Never past a move the player could not follow, a win-back with its capture
+            // (followablePlies).
+            const size_t ideaPlies = size_t(std::max(1, std::min(4, bd.linePlies) - 1));
+            const size_t sayable = followablePlies(c.best, 1 + ideaPlies, true);
+            std::string idea = sanLine(c.best, 1, sayable > 0 ? sayable - 1 : 0);
             Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
             bb.line.with("best", moveArg(c.best[0]))
                 .with("move", Arg::ofMove(c.playedSan, c.playedUci))
