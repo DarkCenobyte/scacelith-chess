@@ -283,6 +283,10 @@ float subtitleDuration(const std::string& text, float audioSeconds);
 // become coach.hint.*; the game reads H to accept; "Hint" still returns TakeBack, "No, thanks"
 // PlayOn), the "H  Hint" key cap shows while the player may ask for a hint, and a band at the top
 // centre says where the player is in the set.
+//
+// At levels 4-6 the takebacks the coach offers per game are counted: "Takebacks left: N" stays in
+// the bottom start corner through the game, the key caps above it, and the card repeats the count
+// when accepting it uses one.
 struct CoachHud {
     bool offer = false;          // show the takeback card
     std::string offerText;       // its question ("" = coach.offer.text, coach.hint.text with hintOffer)
@@ -290,6 +294,9 @@ struct CoachHud {
     bool skippable = false;      // show the skip hint (bottom, start side)
     bool hintKey = false;        // show the hint key cap (bottom, start side; above the skip hint
                                  // when both show)
+    int takebacksLeft = -1;      // "Takebacks left: N" (bottom, start side; under the key caps);
+                                 // -1 = not shown
+    bool offerCount = false;     // the takeback card shows that count too (accepting it uses one)
     std::string progress;        // the band at the top centre, drawn in capitals ("" = none):
                                  // challengeProgress() gives "Forks  ·  3 / 6"
 };

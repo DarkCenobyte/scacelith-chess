@@ -1072,6 +1072,9 @@ coach.offer.text = 教練提議收回你的上一步棋，好讓你另找一步�
 coach.offer.hint = 按退格鍵悔棋。觸碰任何棋子即繼續對局。
 coach.offer.accept = 悔棋
 coach.offer.decline = 繼續
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = 剩餘悔棋次數：{0}
 coach.pause.take_back = 悔一步棋
 coach.pause.take_back.help = 收回你的上一步棋；如果教練已經應著，也一併收回。
 coach.confirm.resign = 要認輸這盤棋嗎？教練將被判為勝方。

@@ -7,6 +7,7 @@
 //   coach mode: coach (the coach page), coach-novoice (the same without the voice files),
 //     coach-challenges (its Challenges tab; sample sets marked completed when the .ini has none),
 //     licences (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
+//     coach-hud-count (the same at levels 4-6: the takebacks left in the corner and on the card),
 //     coach-hint (a challenge: the hint offer card, the hint and skip keys, the progress band),
 //     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
 //     coach-gameover, coach-lesson-done
@@ -630,16 +631,20 @@ public:
                 LOGI("ui viewer: analysis of %s, game %d, %d bytes of PGN text",
                      library_.replay.path.empty() ? "a PGN text" : library_.replay.path.c_str(), library_.replay.game,
                      int(library_.replay.pgn.size()));
-        } else if (s == "coach-hud" || s == "coach-subtitle" || s == "coach-hint") {
+        } else if (s == "coach-hud" || s == "coach-hud-count" || s == "coach-subtitle" || s == "coach-hint") {
             ui::Subtitle sub;
             sub.text = text_.empty() ? i18n::tr(s == "coach-hint" ? "coach.hint.text" : "coach.offer.text") : text_;
             sub.age = 1.0f;
             sub.duration = ui::subtitleDuration(sub.text, 4.0f);
             ui::subtitles(sub);
-            if (s == "coach-hud" || s == "coach-hint") {
+            if (s == "coach-hud" || s == "coach-hud-count" || s == "coach-hint") {
                 ui::CoachHud hud;
                 hud.offer = true;
                 hud.skippable = true;
+                if (s == "coach-hud-count") {  // levels 4-6: two takebacks left, the card uses one
+                    hud.takebacksLeft = 2;
+                    hud.offerCount = true;
+                }
                 if (s == "coach-hint") {  // a challenge: the hint offer, the hint key, the progress
                     hud.hintOffer = true;
                     hud.hintKey = true;

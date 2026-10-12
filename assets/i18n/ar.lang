@@ -1077,6 +1077,9 @@ coach.offer.text = يعرض عليك المدرّب استرجاع نقلتك ا
 coach.offer.hint = مفتاح Backspace يسترجعها. لمس أي قطعة يعني متابعة اللعب.
 coach.offer.accept = استرجاع
 coach.offer.decline = متابعة اللعب
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = مرات الاسترجاع المتبقية: {0}
 coach.pause.take_back = استرجاع نقلتي
 coach.pause.take_back.help = يسترجع نقلتك الأخيرة، وردّ المدرّب إن كان قد لعب.
 coach.confirm.resign = هل تستسلم في هذه المباراة؟ سيُعلَن المدرّب فائزًا.

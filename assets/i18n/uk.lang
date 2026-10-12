@@ -1073,6 +1073,9 @@ coach.offer.text = Тренер пропонує повернути ваш ос�
 coach.offer.hint = Backspace — повернути. Торкнутися фігури — грати далі.
 coach.offer.accept = Повернути
 coach.offer.decline = Грати далі
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Залишилося повернень ходу: {0}
 coach.pause.take_back = Повернути мій хід
 coach.pause.take_back.help = Скасовує ваш останній хід, а також відповідь тренера, якщо він уже зробив хід.
 coach.confirm.resign = Здати цю партію? Переможцем буде оголошено тренера.

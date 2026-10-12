@@ -1072,6 +1072,9 @@ coach.offer.text = El entrenador le ofrece deshacer su última jugada para que b
 coach.offer.hint = Retroceso la deshace. Tocar una pieza es seguir jugando.
 coach.offer.accept = Deshacer
 coach.offer.decline = Seguir
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Jugadas que aún puede deshacer: {0}
 coach.pause.take_back = Deshacer mi jugada
 coach.pause.take_back.help = Deshace su última jugada, y la respuesta del entrenador si ya ha jugado.
 coach.confirm.resign = ¿Abandonar esta partida? El entrenador será declarado ganador.

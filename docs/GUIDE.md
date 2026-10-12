@@ -149,9 +149,13 @@ your colour (White, Black, or alternating from one game to the next); the choice
   what the best move loses, and enough to explain the mistake), else the coach only names the
   better move. A move that costs a little is called a small slip, never a mistake with a made-up
   line. After a blunder it has shown, it offers to take your move back: **Take back** or
-  **Backspace** accepts, **Play on** or touching one of your pieces declines. When it shows a line
-  without that offer (a mistake rather than a blunder, a game you still clearly win, the level's
-  offers used up), it says that its own move comes next once the pieces are back.
+  **Backspace** accepts, **Play on** or touching one of your pieces declines. At levels 4 to 6 these
+  takebacks are counted, 5, 3 and 2 a game: only the offers you accept use one (never the offer
+  after a mate allowed or missed, nor the menu's own takeback), and "Takebacks left" in the bottom
+  corner, under the key hints, and on the offer card shows how many remain. Once they are used up,
+  the coach says so, once, and offers no more takebacks in that game. When it shows a line without
+  that offer (a mistake rather than a blunder, a game you still clearly win, the level's takebacks
+  used up), it says that its own move comes next once the pieces are back.
 - **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
   move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
   draw, resign, options, main menu (abandons the game).

@@ -198,6 +198,7 @@ TEST(i18n_coach_texts) {
         CHECK(has("credits.voice.licence", "Supertone"));
         CHECK(has("credits.openings", "lichess"));
         CHECK(has("credits.openings", "CC0"));
+        CHECK(has("coach.takebacks_left", "{0}"));   // the count, levels 4-6 (one form: a label)
         CHECK(got["controls.coach_skip.keys"] != got["controls.coach_takeback.keys"]);
         // No "natural language" option: the coach speaks from its own sentences only.
         for (auto& kv : entries) CHECK(kv.first.find("natural") == std::string::npos);
