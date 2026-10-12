@@ -91,8 +91,8 @@ EPONYM_LATIN = {
 }
 
 # Spoken squares and files. Files are said by their letter's name, ranks as number words (as file.*.spoken and
-# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "eu" and "huite": the voice says a lone "e" too
-# briefly and reads "huit" as "hui").
+# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "eu", "sisse" and "huite": the voice says a lone
+# "e" too briefly, reads "six" as "sixe" and "huit" as "hui").
 FILE_WORDS = {
     'en': ['ay', 'bee', 'see', 'dee', 'ee', 'eff', 'gee', 'aitch'],
     'fr': ['a', 'bé', 'cé', 'dé', 'eu', 'effe', 'gé', 'ache'],
@@ -105,7 +105,7 @@ FILE_WORDS = {
 }
 RANK_WORDS = {
     'en': ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'],
-    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huite'],
+    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'sisse', 'sept', 'huite'],
     'de': ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht'],
     'es': ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'],
     'ru': ['один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь'],
