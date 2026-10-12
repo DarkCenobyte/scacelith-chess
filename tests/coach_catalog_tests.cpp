@@ -432,7 +432,7 @@ TEST(coach_catalog_respellings) {
     Line b = line("b");
     b.with("n", Arg::ofNumber(8));
     Catalog::Rendered rb = c.renderVariant(b, "fr", true, 1);
-    CHECK_EQ(rb.text, std::string("Huit coups, au coup huite. Mon huite, dix-huite\xC2\xA0!"));
+    CHECK_EQ(rb.text, std::string("Huit coups, au cou huite. Mon huite, dix-huite\xC2\xA0!"));
     CHECK_EQ(rb.text.substr(size_t(rb.anchor("@")), 6), std::string("huite,"));
     Line l = line("c");
     l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false)).with("sq", Arg::ofSquare(chess::parseSquare("e8")));

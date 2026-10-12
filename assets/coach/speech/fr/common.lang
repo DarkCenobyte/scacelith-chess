@@ -133,7 +133,8 @@ respell.dix.pause = disse
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. 21-99 compose as "{tens}-{units}" except where French does not (et un,
-# soixante-dix, quatre-vingts): those are listed. The form "f" is the feminine ("une pièce",
+# soixante-dix, quatre-vingts): those are listed. The voice reads "dix-sept", "dix-huit" and "dix-neuf"
+# with a k ("dixe-neuf"): they are spelled as heard ("di-sept", "dize-huit", "dize-neuf"). The form "f" is the feminine ("une pièce",
 # "vingt et une parties"): number.<n>.f.spoken, used by the feminine counted nouns below.
 number.0.spoken = zéro
 number.1.spoken = un
@@ -153,9 +154,9 @@ number.13.spoken = treize
 number.14.spoken = quatorze
 number.15.spoken = quinze
 number.16.spoken = seize
-number.17.spoken = dix-sept
-number.18.spoken = dix-huit
-number.19.spoken = dix-neuf
+number.17.spoken = di-sept
+number.18.spoken = dize-huit
+number.19.spoken = dize-neuf
 number.20.spoken = vingt
 number.21.spoken = vingt et un
 number.21.f.spoken = vingt et une
@@ -178,9 +179,9 @@ number.73.spoken = soixante-treize
 number.74.spoken = soixante-quatorze
 number.75.spoken = soixante-quinze
 number.76.spoken = soixante-seize
-number.77.spoken = soixante-dix-sept
-number.78.spoken = soixante-dix-huit
-number.79.spoken = soixante-dix-neuf
+number.77.spoken = soixante-di-sept
+number.78.spoken = soixante-dize-huit
+number.79.spoken = soixante-dize-neuf
 number.80.spoken = quatre-vingts
 number.81.spoken = quatre-vingt-un
 number.81.f.spoken = quatre-vingt-une
@@ -199,9 +200,9 @@ number.93.spoken = quatre-vingt-treize
 number.94.spoken = quatre-vingt-quatorze
 number.95.spoken = quatre-vingt-quinze
 number.96.spoken = quatre-vingt-seize
-number.97.spoken = quatre-vingt-dix-sept
-number.98.spoken = quatre-vingt-dix-huit
-number.99.spoken = quatre-vingt-dix-neuf
+number.97.spoken = quatre-vingt-di-sept
+number.98.spoken = quatre-vingt-dize-huit
+number.99.spoken = quatre-vingt-dize-neuf
 number.100.spoken = cent
 number.tens.spoken = {tens}-{units}
 number.hundreds.spoken = {n} cent

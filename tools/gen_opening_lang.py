@@ -114,6 +114,11 @@ RANK_WORDS = {
     'ja': ['いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち'],
 }
 SQUARE_SEP = {'ja': ''}
+# Words the voice misreads, said otherwise in speech (as respell.* in assets/coach/speech/<code>/common.lang, which
+# the catalog applies to whole words only): French "dix-neuvième" is read with a k ("dixe-neuvième").
+SPOKEN_WORDS = {
+    'fr': {'dix-neuvième': 'dize-neuvième'},
+}
 # A file named by its letter next to its noun ("the c-file", "la colonne c", "c-Linie", "cファイル").
 FILE_PATTERNS = {
     'en': (r'\b([a-h])-(files?|pawns?)\b', lambda m, w: w[m.group(1)] + ' ' + m.group(2)),
@@ -232,6 +237,8 @@ def spoken(lang, text, respell):
             t = t.replace(k, respell[k])
     if lang in ('ru', 'uk'):
         t = NAME_DASH_RE.sub(r'\1-\2', t)
+    for k, v in SPOKEN_WORDS.get(lang, {}).items():
+        t = t.replace(k, v)
     fw = dict(zip('abcdefgh', FILE_WORDS[lang]))
     pat = FILE_PATTERNS.get(lang)
     if pat:
