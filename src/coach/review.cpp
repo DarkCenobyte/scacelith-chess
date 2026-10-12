@@ -250,7 +250,9 @@ bool Ctx::lossExplains(int lost, bool pawn) const {
     // the move must lose two points more (one for a pawn).
     const int need = pawn || bestLoss == 0 ? 1 : 2;
     if (lost < need || lost - bestLoss < need) return false;
-    return lost >= 3 || 250 * lost >= dropCp;
+    // A pawn explains a drop of up to 2.5 pawns; a piece for a pawn (or the exchange) up to 8: the
+    // engine counts a minor piece well above three pawns, more so with the position it leaves.
+    return lost >= 3 || (lost >= 2 ? 400 : 250) * lost >= dropCp;
 }
 
 bool Ctx::concreteLoss(int plies) const {

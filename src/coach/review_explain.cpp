@@ -132,8 +132,15 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
     const bool retake = k + 1 < n && c.r[size_t(k + 1)].mover == c.human && c.r[size_t(k + 1)].captured != NoPiece &&
                         c.r[size_t(k + 1)].move.to == c.r[size_t(k)].move.to && k + 2 <= cap;
     // What the human had lost already: the capture at k (with the recapture) must add to it, else it
-    // is a trade on the way and not where the loss comes from.
-    const int already = k > 0 ? c.lossAfter(k) : 0;
+    // is a trade on the way and not where the loss comes from. A trade the human starts on that very
+    // square just before is the same ("you take my rook, I take yours"): what was lost counts from
+    // before it (not when the human's capture there takes back one of the coach's).
+    const auto capturesOn = [&](int i, Color who, Square sq) {
+        return i >= 0 && c.r[size_t(i)].mover == who && c.r[size_t(i)].captured != NoPiece && c.r[size_t(i)].move.to == sq;
+    };
+    const Square at = c.r[size_t(k)].move.to;
+    const bool tradeBack = capturesOn(k - 1, c.human, at) && !capturesOn(k - 2, c.coach, at);
+    const int already = k > 0 ? c.lossAfter(tradeBack ? k - 1 : k) : 0;
     for (int p = retake ? k + 2 : k + 1; p <= std::min({n, k + 2, cap}) && plies == 0; ++p) {
         const LineStep& st = c.r[size_t(p - 1)];
         if (st.captured == NoPiece || st.mate) continue;
@@ -149,8 +156,12 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
         // and the line shows the take-back never comes (the human's next move takes nothing, and the
         // loss holds): then what the board shows.
         const int held = p < n ? c.lossAfter(std::min(n, p + 4)) : l;
-        if (held > l && p < n && c.r[size_t(p)].mover == c.human && c.r[size_t(p)].captured == NoPiece &&
-            !(l > already && c.lossExplains(l, pawn))) {
+        // The human's next move along the line takes nothing, or what it takes is taken back at once.
+        const bool noTakeBack = p < n && c.r[size_t(p)].mover == c.human &&
+                                (c.r[size_t(p)].captured == NoPiece ||
+                                 (p + 1 < n && c.r[size_t(p + 1)].captured != NoPiece &&
+                                  c.r[size_t(p + 1)].move.to == c.r[size_t(p)].move.to));
+        if (held > l && noTakeBack && !(l > already && c.lossExplains(l, pawn))) {
             // Four plies later, the board still shows as much lost, whatever the human could take then.
             const int at = std::min(n, p + 4);
             const Position later = afterR(c, at);

@@ -382,6 +382,43 @@ TEST(coach_review_play_on_after_a_demonstration_without_offer) {
     CHECK(!hasKey(o.script, "demo.play_on"));
 }
 
+TEST(coach_review_bishop_for_a_pawn_is_explained) {
+    // From a recorded game (depth 18): 8...Bxh3?? 9.Bxh3 gives the bishop for a pawn, and the engine
+    // counts 7.5 pawns with the pin it leaves on c8. The two points are the reason at every level.
+    const ai::Analysis a0 = analysisOf({pvl(-19, "g4d7 b3d1 a5a4 f1g2 e8g8"),
+                                        pvl(-773, "g4h3 f1h3 b8d7 a1d1 c8d8 e3c1 e8g8 a2a4 c7c6 e2e3")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("rnq1k2r/1pp1ppbp/3p1np1/p7/2PP2b1/1QN1BNPP/PP2PP2/R3KB1R b KQkq - 0 8", {"Bxh3"});
+        Reviewer rv;
+        rv.reset(level, Black);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "bishop for a pawn b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.exType, ExType::Exchange);
+        CHECK(r.offersTakeback);
+    }
+}
+
+TEST(coach_review_a_trade_is_not_the_piece_lost) {
+    // From a recorded game (depth 18): 24...Re6?? 25.Bxf8 hxg4 26.hxg4 Bxg4 27.f3 Rxe2+ 28.Kxe2 loses
+    // the bishop on f8; the rooks are only traded. No line says the rook is what falls.
+    const ai::Analysis a0 = analysisOf({pvl(413, "e7e2 c3e2 f5e4 f2f3 e4f3 e1g1"),
+                                        pvl(-249, "e7e6 a3f8 h5g4 h3g4 f5g4 f2f3 e6e2 e1e2 g4e6 f8d6")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("r3kb2/p3r3/1pp3p1/5b1p/P5P1/B1N4P/4RP2/4K2R b Kq - 0 24", {"Re6"});
+        Reviewer rv;
+        rv.reset(level, Black);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "trade b%d", level);
+        checkScript(r.script, where);
+        for (const Beat& b : r.script)
+            if (const Arg* t = b.line.arg("t1")) CHECK(t->piece != Rook);
+        CHECK(r.verdict.exType != ExType::Material);
+    }
+}
+
 TEST(coach_review_hanging_level1) {
     Game g = gameOf(kHangFen, {"Nd5"});
     Reviewer rv;
@@ -890,9 +927,10 @@ ai::Analysis g3A0(const char* played) {
 }  // namespace
 
 TEST(coach_review_small_loss_never_explains_a_collapse) {
-    // The discovered attack of the table, but the engine says the move loses six pawns: the exchange
-    // it wins back (two points) is not why. No material reason is given for it, at any level.
-    const ai::Analysis a0 = analysisOf({pvl(0, "h1e1 g8f8"), pvl(-600, "b1c2 d5e3 c2d3 b7h1")});
+    // The discovered attack of the table, but the engine says the move loses nine pawns: the exchange
+    // it wins back (two points, at most eight pawns of a drop) is not why. No material reason is
+    // given for it, at any level.
+    const ai::Analysis a0 = analysisOf({pvl(0, "h1e1 g8f8"), pvl(-900, "b1c2 d5e3 c2d3 b7h1")});
     for (int level = 1; level <= 6; ++level) {
         Game g = gameOf("6k1/1b3ppp/8/3n4/8/8/PP6/1K5R w - - 0 1", {"Kc2"});
         Reviewer rv;

@@ -775,7 +775,9 @@ int reviewMain(const Options& o) {
                 if (demo) named = shownLoss(c, demoPlies);
                 for (const Beat& b : rev.script)
                     if (const Arg* p = b.line.arg("pts")) named = std::max(named, p->number);
-                if (named < 3 && named * 250 < drop)
+                // The same measure as the coach's (Ctx::lossExplains): a pawn for 2.5 pawns of the
+                // drop, a piece for a pawn (or the exchange) for 8.
+                if (named < 3 && named * (named >= 2 ? 400 : 250) < drop)
                     f.push_back({"INSUFFICIENT", "names " + std::to_string(named) + " points for a drop of " +
                                                      std::to_string(drop) + " cp"});
             }
