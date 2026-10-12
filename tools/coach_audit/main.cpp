@@ -27,6 +27,8 @@ int main(int argc, char** argv) {
         else if (a == "--all") o.all = true;
         else if (a == "--material-only") o.materialOnly = true;
         else if (a == "--hang-rate") o.hangRate = std::atof(next().c_str());
+        else if (a == "--verify") o.verify = std::atoi(next().c_str());
+        else if (a == "--cache") o.cache = next();
         else {
             std::fprintf(stderr, "unknown option %s\n", a.c_str());
             return 2;
