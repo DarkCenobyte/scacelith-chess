@@ -901,3 +901,7 @@ tb.fixed.2 = Better.
 tb.fixed.3 = Good correction.
 tb.same = The same move again? All right, let's see.
 tb.same.2 = You like that move. Let's play it out.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = No more takebacks this game, I'm afraid.
+tb.none_left.2 = You have no takebacks left in this game.

@@ -899,3 +899,7 @@ tb.fixed.2 = أفضل.
 tb.fixed.3 = تصحيح جيد.
 tb.same = النقلة نفسها مرة أخرى؟ حسنًا، لنرَ.
 tb.same.2 = يبدو أن هذه النقلة تعجبك. لنكمل بها.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = للأسف، لا مزيد من استرجاع النقلات في هذه المباراة.
+tb.none_left.2 = لم يعد بإمكانك استرجاع أي نقلة في هذه المباراة.

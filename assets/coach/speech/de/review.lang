@@ -893,3 +893,7 @@ tb.fixed.2 = Besser.
 tb.fixed.3 = Gute Korrektur.
 tb.same = Wieder derselbe Zug? Na gut, schauen wir mal.
 tb.same.2 = Du magst diesen Zug. Gut, spielen wir weiter.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = In dieser Partie gibt es leider keine Rücknahme mehr.
+tb.none_left.2 = Du hast in dieser Partie keine Rücknahmen mehr.

@@ -894,3 +894,7 @@ tb.fixed.2 = Mieux.
 tb.fixed.3 = Bonne correction.
 tb.same = Encore le même coup ? D’accord, voyons.
 tb.same.2 = Tu tiens à ce coup. Jouons-le.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Plus de reprise possible dans cette partie, hélas.
+tb.none_left.2 = Tu n’as plus de reprise dans cette partie.

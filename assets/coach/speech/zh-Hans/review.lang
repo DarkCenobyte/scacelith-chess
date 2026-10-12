@@ -894,3 +894,7 @@ tb.fixed.2 = 更好了。
 tb.fixed.3 = 改得好。
 tb.same = 还是这步？好吧，我们看看。
 tb.same.2 = 你很喜欢这步棋。那就走下去看看。
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = 很遗憾，这盘棋不能再悔棋了。
+tb.none_left.2 = 这盘棋你的悔棋次数已经用完了。

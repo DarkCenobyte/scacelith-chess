@@ -86,6 +86,11 @@ public:
     void onHandshakeDone(const chess::Game& game); // then the appraisal (level 0: the lesson ends)
     bool finished() const;                         // everything is said: show the end-of-game menu
     bool offerOpen() const;                        // show the takeback card (Stage::showTakebackOffer too)
+    // Levels 4-6 of a game: how many more of the coach's takeback offers the player may accept this
+    // game (Reviewer::takebacksLeft), shown at the bottom of the screen and on the card. -1 at levels
+    // 1-3, in the lesson and in a challenge (no count to show).
+    int takebacksLeft() const;
+    bool offerUsesTakeback() const;                // the open card, accepted, uses one of them
 
     // ---- Results to persist (Settings [coach]) ------------------------------------------------------
     const std::vector<GameRecord>& history() const;   // with the game just finished appended

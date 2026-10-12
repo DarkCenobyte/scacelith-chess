@@ -895,3 +895,7 @@ tb.fixed.2 = Mejor.
 tb.fixed.3 = Buena corrección.
 tb.same = ¿Otra vez la misma jugada? De acuerdo, veamos.
 tb.same.2 = Te gusta esa jugada. Veamos cómo sale.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Me temo que en esta partida ya no puedes deshacer más jugadas.
+tb.none_left.2 = Ya no puedes deshacer ninguna jugada más en esta partida.

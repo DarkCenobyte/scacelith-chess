@@ -3,8 +3,9 @@
 // past the player's promotion, rewind of exactly the moves shown), the English lines (every key the
 // scripts use exists, every placeholder has an argument, every gesture and mark anchor is a
 // placeholder of every variant, at most three pointing gestures, the sentence budget per level),
-// praise only for the best moves and its rate limit, takebacks, announcements, threat warnings,
-// analysis requests; and, with the embedded engine, the worked example (the fork of 4...Qg5).
+// praise only for the best moves and its rate limit, takebacks (and their count at levels 4-6),
+// announcements, threat warnings, analysis requests; and, with the embedded engine, the worked
+// example (the fork of 4...Qg5).
 #include "test.h"
 
 #include "ai/analysis.h"
@@ -1491,6 +1492,115 @@ TEST(coach_review_takeback_flow) {
     CHECK(noOffer.verdict.voiced);
     CHECK(!noOffer.offersTakeback);
     for (const Beat& b : noOffer.script) CHECK(b.kind != BeatKind::OfferTakeback);
+}
+
+TEST(coach_review_takeback_cap_counts_accepted_takebacks) {
+    // Level 6 allows two takebacks a game (Band::offerCap). Only those the player accepts count: a
+    // card declined costs nothing, and a mate is offered and taken back whatever the count. Past the
+    // cap, a blunder is shown without a card and the coach says once that no takeback is left,
+    // where the card would have been: before "Now I play my move", which stays last.
+    const int cap = band(6).offerCap;
+    CHECK_EQ(cap, 2);
+    CHECK_EQ(band(4).offerCap, 5);
+    CHECK_EQ(band(5).offerCap, 3);
+    for (int level = 1; level <= 3; ++level) {
+        Reviewer rv;
+        rv.reset(level, White);
+        CHECK_EQ(rv.takebacksLeft(), -1);   // no cap
+    }
+    Reviewer off;
+    off.reset(6, White, false);
+    CHECK_EQ(off.takebacksLeft(), -1);   // no offers at all
+
+    // Two forks at their own plies (two offers per ply is another limit): 4.Nxe5 Qg5 (ply 6) and
+    // 1.d4 exd3 e.p. (ply 0). Two mates: 1.a3 Rd1+ 2.Rxd1 Rxd1# (ply 0), and 1.f3 a6 2.h3, missing
+    // 2.Rd8+ Rxd8 3.Rxd8# (ply 2).
+    const char* epFen = "6k1/4rppp/8/8/4p3/8/2RPN1PP/6K1 w - - 0 1";
+    const ai::Analysis epA0 = analysisOf({pvl(0, "g1f1 g8f8"), pvl(-380, "d2d4 e4d3 c2c1 d3e2")});
+    const char* mateFen = "3r2k1/3r1ppp/8/8/8/8/P4PPP/2R3K1 w - - 0 1";
+    const ai::Analysis mateA0 =
+        analysisOf({pvl(-20, "h2h3 d7d2"), pvl(-30, "g2g3 d7d2"), pvl(0, "a2a3 d7d1 c1d1 d8d1", -2)});
+    const char* missFen = "2r3k1/p4ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1";
+    const ai::Analysis missA0 = analysisOf({pvl(0, "d2d8 c8d8 d1d8", 2), pvl(100, "h2h3 a6a5")});
+    struct Step {
+        const char* name;
+        int kind;          // 0: the fork after the opening, 1: the en passant fork, 2: the mate allowed, 3: the mate missed
+        bool accept;
+        bool offered;
+        int leftAfter;
+    };
+    const Step steps[] = {
+        {"fork declined", 0, false, true, 2},
+        {"en passant fork declined", 1, false, true, 2},
+        {"third card, accepted", 0, true, true, 1},
+        {"fourth card, accepted", 1, true, true, 0},
+        {"fork past the cap", 0, false, false, 0},
+        {"mate allowed past the cap", 2, true, true, 0},
+        {"mate missed past the cap", 3, true, true, 0},
+        {"fork again past the cap", 0, false, false, 0},
+    };
+    Reviewer rv;
+    rv.reset(6, White);
+    CHECK_EQ(rv.takebacksLeft(), cap);
+    int noneLeft = 0;
+    for (const Step& st : steps) {
+        Game g = st.kind == 0   ? forkGame()
+                 : st.kind == 1 ? gameOf(epFen, {"d4"})
+                 : st.kind == 2 ? gameOf(mateFen, {"a3"})
+                                : gameOf(missFen, {"f3", "a6", "h3"});
+        const ai::Analysis a0 = st.kind == 0 ? forkA0() : st.kind == 1 ? epA0 : st.kind == 2 ? mateA0 : missA0;
+        const int before = rv.takebacksLeft();
+        const Review r = reviewOf(rv, g, a0);
+        checkScript(r.script, st.name);
+        CHECK(sentences(r.script) <= band(6).sentences);
+        if (r.offersTakeback != st.offered) {
+            std::fprintf(stderr, "  %s: offer %d\n", st.name, int(r.offersTakeback));
+            dump(r.script);
+        }
+        CHECK_EQ(r.offersTakeback, st.offered);
+        CHECK_EQ(rv.takebacksLeft(), before);   // an offer made uses nothing
+        if (st.kind == 2) CHECK_EQ(r.verdict.exType, ExType::MateAllowed);
+        if (st.kind == 3) CHECK_EQ(r.verdict.exType, ExType::MateMissed);
+        if (r.offersTakeback) {
+            CHECK_EQ(rv.offerUsesTakeback(), st.kind <= 1);
+            if (st.accept) {
+                CHECK(g.undo(1));
+                rv.takebackAccepted(g);
+            } else {
+                rv.takebackDeclined();
+            }
+        }
+        CHECK_EQ(rv.takebacksLeft(), st.leftAfter);
+        // Past the cap, a fork: shown, then the coach's move; "no takeback left" said the first
+        // time only, right before it.
+        if (!st.offered) {
+            CHECK(demoMoves(r.script) > 0);
+            CHECK(!r.script.empty() && r.script.back().line.key == "demo.play_on");
+            const bool said = hasKey(r.script, "tb.none_left");
+            if (said) {
+                CHECK(r.script.size() >= 2 && r.script[r.script.size() - 2].line.key == "tb.none_left");
+                CHECK(r.script[r.script.size() - 2].look == Look::Player);
+            }
+            noneLeft += said ? 1 : 0;
+        } else {
+            CHECK(!hasKey(r.script, "tb.none_left"));
+        }
+    }
+    CHECK_EQ(noneLeft, 1);
+    CHECK_EQ(rv.offersMade(), 6);
+
+    // The pause menu's takeback of an offered move (fromOffer false) is judged the same way, but
+    // uses none of the level's takebacks.
+    Reviewer menu;
+    menu.reset(6, White);
+    Game g = gameOf(epFen, {"d4"});
+    CHECK(reviewOf(menu, g, epA0).offersTakeback);
+    menu.takebackDeclined();
+    CHECK(g.undo(1));
+    menu.takebackAccepted(g, false);
+    CHECK_EQ(menu.takebacksLeft(), cap);
+    g.play(g.position().parseSAN("Kf1"));
+    CHECK(reviewOf(menu, g, epA0).isRetry);
 }
 
 TEST(coach_review_unjudged_without_engine) {

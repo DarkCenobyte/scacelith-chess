@@ -984,3 +984,7 @@ tb.fixed.2 = 良くなりました。
 tb.fixed.3 = いい修正です。
 tb.same = また同じ手ですか？わかりました、見てみましょう。
 tb.same.2 = その手が好きなんですね。では、指し進めましょう。
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = 残念ですが、この対局ではもう手を戻せません。
+tb.none_left.2 = この対局では、手を戻せる回数がもう残っていません。

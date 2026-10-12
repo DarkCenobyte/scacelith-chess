@@ -901,3 +901,7 @@ tb.fixed.2 = Краще.
 tb.fixed.3 = Добре виправлено.
 tb.same = Знову той самий хід? Гаразд, подивимося.
 tb.same.2 = Тобі подобається цей хід. Зіграймо його.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = На жаль, більше повернути хід у цій партії не можна.
+tb.none_left.2 = Повернення ходів у цій партії закінчилися.

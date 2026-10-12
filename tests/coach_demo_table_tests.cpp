@@ -13,7 +13,7 @@
 // hold beside the board exactly the game's own captures and promoted pawns, and no takeback card
 // may be up. The reviews run to the end, with every answer to the card; cut short by Space, the
 // pause menu's takeback, a resignation or a draw at sampled frames; twice in one game; and in the
-// cases the offer policy leaves without a card.
+// cases the offer policy leaves without a card (the level's takebacks used up among them).
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -23,6 +23,7 @@
 #include "coach/session.h"
 #include "game/physical_board.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <deque>
@@ -953,18 +954,21 @@ TEST(coach_demo_table_no_card_after_some_demonstrations) {
     CHECK_EQ(runs, 6 + 5 + 3 + 3);
 }
 
-// The offer cap of levels 4-6 (band(): 5, 3 and 2 offers a game, declined ones counted): past it a
-// blunder is still demonstrated, without a card (review.cpp; mates are not capped). The two forks
-// alternate, each at its own ply (two offers per ply is another limit).
-TEST(coach_demo_table_offer_cap_leaves_the_demonstration) {
+// The takeback cap of levels 4-6 (band(): 5, 3 and 2 takebacks a game, only those the player
+// accepts counted): declined, the card comes back every time; accepted, past the cap a blunder is
+// still demonstrated, without a card, the coach saying once that no takeback is left before its
+// "Now I play my move" (review.cpp; mates are not capped). The two forks alternate, each at its own
+// ply (two offers per ply is another limit).
+TEST(coach_demo_table_takeback_cap_leaves_the_demonstration) {
     const std::vector<Blunder> all = blunders();
     const Blunder* forks[2] = {blunderNamed(all, "en passant fork"), blunderNamed(all, "fork after an opening")};
     if (!forks[0] || !forks[1]) return;
     for (int level = 4; level <= 6; ++level) {
         const int cap = level == 4 ? 5 : level == 5 ? 3 : 2;
-        Reviewer rv;
-        rv.reset(level, chess::White);
-        for (int i = 0; i <= cap; ++i) {
+        Reviewer declining, accepting;
+        declining.reset(level, chess::White);
+        accepting.reset(level, chess::White);
+        for (int i = 0; i <= cap + 1; ++i) {
             const Blunder& b = *forks[i % 2];
             Game g;
             if (b.fen) CHECK(g.resetFromFEN(b.fen));
@@ -974,16 +978,94 @@ TEST(coach_demo_table_offer_cap_leaves_the_demonstration) {
             ReviewInput in;
             in.game = &g;
             in.before = &a0;
-            const Review r = rv.review(in);
-            int demos = 0;
-            for (const Beat& beat : r.script) demos += beat.kind == BeatKind::DemoMove ? 1 : 0;
-            if (demos == 0 || r.offersTakeback != (i < cap))
-                std::fprintf(stderr, "  level %d, blunder %d: %d demonstration moves, offer %d\n", level, i + 1, demos,
-                             int(r.offersTakeback));
+            CHECK(declining.review(in).offersTakeback);
+            declining.takebackDeclined();
+            CHECK_EQ(declining.takebacksLeft(), cap);
+            CHECK_EQ(accepting.takebacksLeft(), std::max(0, cap - i));
+            const Review r = accepting.review(in);
+            int demos = 0, noneLeft = -1;
+            for (size_t k = 0; k < r.script.size(); ++k) {
+                demos += r.script[k].kind == BeatKind::DemoMove ? 1 : 0;
+                if (r.script[k].line.key == "tb.none_left") noneLeft = int(k);
+            }
+            if (demos == 0 || r.offersTakeback != (i < cap) || (noneLeft >= 0) != (i == cap))
+                std::fprintf(stderr, "  level %d, blunder %d: %d demonstration moves, offer %d, \"none left\" at %d\n", level,
+                             i + 1, demos, int(r.offersTakeback), noneLeft);
             CHECK(demos > 0);
             CHECK_EQ(r.offersTakeback, i < cap);
-            rv.takebackDeclined();
+            CHECK_EQ(noneLeft >= 0, i == cap);
+            if (r.offersTakeback) {
+                g.undo(1);
+                accepting.takebackAccepted(g);
+            } else {
+                CHECK(!r.script.empty() && r.script.back().line.key == "demo.play_on");
+                if (noneLeft >= 0) CHECK_EQ(noneLeft, int(r.script.size()) - 2);
+            }
         }
+        CHECK_EQ(accepting.takebacksLeft(), 0);
     }
+}
+
+// Level 6 (two takebacks a game) through the table: the en passant fork offered and taken back at
+// plies 0 and 2 (the kings step aside and back in between), then played a third time at ply 4,
+// shown without a card. The count the HUD shows (Session::takebacksLeft) stays while a card is up
+// and drops when it is accepted; the third review says that no takeback is left, then "Now I play
+// my move", and the coach plays once the line is back.
+TEST(coach_demo_table_takebacks_run_out) {
+    const std::vector<Blunder> all = blunders();
+    const Blunder* fork = blunderNamed(all, "en passant fork");
+    if (!fork) return;
+    const std::vector<const char*> steps = {"g1f1", "g8f8", "f1g1", "f8g8"};
+    Scene s;
+    Game roots;
+    CHECK(roots.resetFromFEN(fork->fen));
+    s.analyst.results[roots.position().fen() + "|A0"] = analysisOf(fork->a0);
+    roots.play(roots.position().parseUCI(steps[0]));
+    roots.play(roots.position().parseUCI(steps[1]));
+    s.analyst.results[roots.position().fen() + "|A0"] =
+        analysisOf({pvl(0, "f1g1 f8g8"), pvl(-380, "d2d4 e4d3 c2c1 d3e2")});
+    roots.play(roots.position().parseUCI(steps[2]));
+    roots.play(roots.position().parseUCI(steps[3]));
+    s.analyst.results[roots.position().fen() + "|A0"] = analysisOf(fork->a0);
+    s.start(fork->fen, 6, chess::White);
+    CHECK(s.quiet());
+    CHECK_EQ(s.session.takebacksLeft(), 2);
+    for (int round = 0; round < 2; ++round) {
+        CHECK(s.humanMove(fork->played));
+        CHECK(s.until([&] { return s.session.offerOpen() || !s.coachHolds(); }, 180.0f));
+        CHECK(s.session.offerOpen());
+        if (!s.session.offerOpen()) return;
+        CHECK_EQ(s.session.takebacksLeft(), 2 - round);   // the card shows the count before the answer
+        CHECK(s.session.offerUsesTakeback());
+        s.session.onOfferAnswer(s.game, true);
+        CHECK_EQ(s.session.takebacksLeft(), 1 - round);
+        CHECK(s.until([&] { return s.humanMayMove(); }, 60.0f));
+        CHECK(s.tableShowsGame());
+        CHECK(s.humanMove(steps[size_t(2 * round)]));
+        CHECK(s.coachReply(steps[size_t(2 * round + 1)]));
+        CHECK(s.quiet());
+    }
+    CHECK_EQ(s.game.moves().size(), size_t(4));
+    CHECK(!s.queued("tb.none_left"));
+    const size_t said = s.lines.size();
+    const int demosBefore = s.stage.demoMoves;
+    CHECK(s.humanMove(fork->played));
+    CHECK(s.until([&] { return !s.coachHolds(); }, 180.0f));
+    CHECK(!s.session.offerOpen());
+    CHECK(s.coachReply(fork->reply));
+    CHECK(s.quiet());
+    CHECK_EQ(s.offersShown, 2);
+    CHECK_EQ(s.session.takebacksLeft(), 0);
+    CHECK_EQ(s.queuedCount("tb.none_left"), 1);
+    CHECK(s.stage.demoMoves > demosBefore);
+    // The third review's lines: "none left" right before "Now I play my move".
+    size_t noneLeft = s.lines.size(), playOn = s.lines.size();
+    for (size_t i = said; i < s.lines.size(); ++i) {
+        if (s.lines[i].key == "tb.none_left") noneLeft = i;
+        if (s.lines[i].key == "demo.play_on") playOn = i;
+    }
+    CHECK(noneLeft < s.lines.size() && playOn == noneLeft + 1);
+    CHECK(s.tableShowsGame());
+    s.checkTable();
 }
 

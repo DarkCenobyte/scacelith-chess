@@ -1,16 +1,17 @@
 // The coach's session (src/coach/session.*) on the fake Stage and Analyst (tests/coach_fakes.h):
 // a blunder reviewed, demonstrated and offered back (accepted: Stage::takeBack(1), the retry judged
 // against it; declined: the answer and the encouragement), the coach's reply held while the review
-// runs, "Your move." after an explanation without an offer, the pause menu's takeback, opening
-// names, turn-taking lines, the end of a game (closing words, handshake, appraisal, Space skipping
-// it), and a chapter of the rules lesson (a wrong move answered and taken back, an illegal attempt
-// explained, the right move, an idle hint). Every line the session emits renders, in every
-// language that has its key, without a leftover placeholder. A game without an engine: the
-// blunder unjudged, the coach's reply not held.
+// runs, "Your move." after an explanation without an offer, the pause menu's takeback, the count of
+// takebacks left at levels 4-6, opening names, turn-taking lines, the end of a game (closing words,
+// handshake, appraisal, Space skipping it), and a chapter of the rules lesson (a wrong move answered
+// and taken back, an illegal attempt explained, the right move, an idle hint). Every line the
+// session emits renders, in every language that has its key, without a leftover placeholder. A
+// game without an engine: the blunder unjudged, the coach's reply not held.
 #include "test.h"
 #include "coach_fakes.h"
 
 #include "coach/catalog.h"
+#include "coach/challenge.h"
 #include "coach/lesson.h"
 #include "coach/session.h"
 
@@ -595,6 +596,78 @@ TEST(coach_session_accuracy_explained_when_said) {
         CHECK_EQ(t.session.accuracyExplained(), !space);
         CHECK_EQ(t.said("appraisal.num.acc_explain.b3"), !space);
     }
+}
+
+// Levels 4-6: the count of takebacks the HUD shows (Session::takebacksLeft, Band::offerCap) drops
+// only when the card is accepted: not when it opens, not when it is declined, not for the pause
+// menu's takeback of an offered move. Levels 1-3, the rules lesson and a challenge show none.
+TEST(coach_session_takebacks_left) {
+    for (int level = 0; level <= 6; ++level) {
+        Table t;
+        hangTable(t);
+        t.start(levelConfig(level));
+        CHECK_EQ(t.session.takebacksLeft(), level >= 4 ? band(level).offerCap : -1);
+        CHECK(!t.session.offerUsesTakeback());
+    }
+    const std::vector<Challenge>& challenges = ChallengeBook::shared().challenges();
+    CHECK(!challenges.empty());
+    if (!challenges.empty()) {
+        Table c;
+        c.game.setEndDetection(false);
+        SessionConfig cfg = levelConfig(6);
+        cfg.challenge = challenges.front().id;
+        c.start(cfg);
+        CHECK(c.session.challengeMode());
+        CHECK_EQ(c.session.takebacksLeft(), -1);
+    }
+
+    // 1.d4?? exd3 e.p. forks the rook and the knight (level 5: three takebacks).
+    const char* fen = "6k1/4rppp/8/8/4p3/8/2RPN1PP/6K1 w - - 0 1";
+    chess::Game later;
+    later.resetFromFEN(fen);
+    later.play(later.position().parseUCI("g1f1"));
+    later.play(later.position().parseUCI("g8f8"));
+    Table t;
+    t.game.resetFromFEN(fen);
+    t.analyst.results[fenOf(fen) + "|A0"] = analysisOf({pvl(0, "g1f1 g8f8"), pvl(-380, "d2d4 e4d3 c2c1 d3e2")});
+    t.analyst.results[later.position().fen() + "|A0"] = analysisOf({pvl(0, "f1g1 f8g8"), pvl(-380, "d2d4 e4d3 c2c1 d3e2")});
+    t.start(levelConfig(5));
+    CHECK(t.quiet());
+    CHECK_EQ(t.session.takebacksLeft(), 3);
+
+    // Declined: nothing used.
+    t.move("d2d4");
+    CHECK(t.until([&] { return t.session.offerOpen(); }, 60.0f));
+    CHECK_EQ(t.session.takebacksLeft(), 3);
+    CHECK(t.session.offerUsesTakeback());
+    t.session.onOfferAnswer(t.game, false);
+    CHECK_EQ(t.session.takebacksLeft(), 3);
+    CHECK(!t.session.offerUsesTakeback());
+    CHECK(t.reply("e4d3"));
+    CHECK(t.quiet());
+
+    // That move taken back from the pause menu: the replay is judged against it, nothing used.
+    CHECK(t.session.canTakeBack(t.game));
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    CHECK_EQ(t.session.takebacksLeft(), 3);
+    t.move("g1f1");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK(t.queued("tb.fixed"));
+    CHECK(t.reply("g8f8"));
+    CHECK(t.quiet());
+
+    // Accepted: one used, as soon as the card is answered.
+    t.move("d2d4");
+    CHECK(t.until([&] { return t.session.offerOpen(); }, 60.0f));
+    CHECK_EQ(t.session.takebacksLeft(), 3);
+    t.session.onOfferAnswer(t.game, true);
+    CHECK_EQ(t.session.takebacksLeft(), 2);
+    CHECK(t.until([&] { return t.game.moves().size() == 2 && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    CHECK_EQ(t.session.takebacksLeft(), 2);
+    checkRenders(t.lines);
 }
 
 // No takeback is offered for a finished game: stalemate while winning by the human's own move is

@@ -594,6 +594,10 @@ ai::PvLine terminalLine(const Position& p1, const std::string& uci) {
     return l;
 }
 
+// A mate allowed or missed is offered back whatever the level's count of takebacks
+// (Band::offerCap), and taking it back does not use one.
+bool mateOffer(ExType t) { return t == ExType::MateAllowed || t == ExType::MateMissed; }
+
 }  // namespace
 
 void Reviewer::reset(int level, Color human, bool offersEnabled) {
@@ -922,12 +926,14 @@ Review Reviewer::review(const ReviewInput& in) {
         // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
         const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
         bool offer = (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) || (ex.offer && !hiddenLoss && !wonAnyway);
-        if (bd.offerCap >= 0 && offers_ >= bd.offerCap && !(ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed))
-            offer = false;
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
         if (g.isOver()) offer = false;   // the move (or a draw meanwhile) ended the game: nothing to take back
+        // Levels 4-6: no offer once the player has taken back the level's count of moves (an offer
+        // declined costs nothing). The coach says so, once, where the offer would have been.
+        const bool noneLeft = offer && bd.offerCap >= 0 && takebacks_ >= bd.offerCap && !mateOffer(ex.type);
+        if (noneLeft) offer = false;
 
         // Sentence budget: verdict, cause, tip, better move (the demonstration's own lines, the rewind
         // and the offer excluded).
@@ -1016,10 +1022,16 @@ Review Reviewer::review(const ReviewInput& in) {
             offeredHint_ = ex.hintSquare;
             out.offersTakeback = true;
             v.offered = true;
-        } else if (demo && !g.isOver()) {
-            // The pieces are back and no takeback is offered: the coach's real move comes next, said
-            // so that the player does not take it for more of the demonstration.
-            s.push_back(sayBeat("demo.play_on", Look::Player, ply));
+        } else {
+            if (noneLeft && !noneLeftSaid_) {
+                s.push_back(sayBeat("tb.none_left", Look::Player, ply));
+                noneLeftSaid_ = true;
+            }
+            if (demo && !g.isOver()) {
+                // The pieces are back and no takeback is offered: the coach's real move comes next,
+                // said last so that the player does not take it for more of the demonstration.
+                s.push_back(sayBeat("demo.play_on", Look::Player, ply));
+            }
         }
     } else if (tip) {
         // A principle, said as a tip (Low priority).
@@ -1171,11 +1183,13 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before) {
     return s;
 }
 
-Script Reviewer::takebackAccepted(const Game& g) {
+Script Reviewer::takebackAccepted(const Game& g, bool fromOffer) {
     Script s;
     if (offered_.ply < 0) return s;
     retryPending_ = true;
     retry_ = offered_;
+    // The card answered yes: one of the level's takebacks gone (levels 4-6, not for a mate).
+    if (fromOffer && offerUsesTakeback()) ++takebacks_;
     if (level_ > 2) return s;
     const int ply = int(g.moves().size());
     const Position& p = g.position();
@@ -1203,6 +1217,16 @@ Script Reviewer::takebackAccepted(const Game& g) {
 
 void Reviewer::takebackDeclined() {
     retryPending_ = false;
+}
+
+int Reviewer::takebacksLeft() const {
+    const int cap = band(level_).offerCap;
+    if (cap < 0 || !offersEnabled_) return -1;
+    return std::max(0, cap - takebacks_);
+}
+
+bool Reviewer::offerUsesTakeback() const {
+    return offered_.ply >= 0 && band(level_).offerCap >= 0 && !mateOffer(offered_.firstType);
 }
 
 }  // namespace coach
