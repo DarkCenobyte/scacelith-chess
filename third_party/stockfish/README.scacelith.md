@@ -366,7 +366,8 @@ Stockfish offers nothing below `UCI_Elo 1320` (= Skill Level 0), so the three pr
 combine Stockfish's own knobs. They were first calibrated with Stockfish 16 self-play (the labels'
 scale, below); for Stockfish 19 each new setting was matched directly against the Stockfish 16
 preset it replaces (target 0 Elo), so the presets keep the strengths their labels were chosen for.
-All matches use standalone `x86-64-sse41-popcnt` builds of the two tags and `tools/sf_match.py`
+The Novice and the Beginner were then re-spaced against human-like play
+([below](#against-human-like-play-maia)). All matches use standalone `x86-64-sse41-popcnt` builds of the two tags and `tools/sf_match.py`
 (which documents the protocol): games from the start position, colours alternating, Threads 1 and
 Hash 64 (as in the game), python-chess applies the rules, and a Stockfish 19 referee adjudicates
 games still running at 300 plies with a depth-12 evaluation (|eval| > 3 pawns = win). Results are
@@ -468,15 +469,82 @@ presets their estimates: Novice (S0 d1, MPV 7, classical eval) 750-840, Beginner
 ~1015, Casual (S0 d1) ~1165. The hash-table effect is mostly saturated at 30 ms per move (+40 at
 100 ms), so taking "S0 at 30 ms" as Stockfish's 1320 may put them up to ~40 Elo too high.
 
+#### Against human-like play (Maia)
+
+`UCI_Elo` is an engine calibration: Stockfish fitted its levels on games against versions of the
+Stash engine at 120 s + 1 s, anchored within about 100 Elo to CCRL Blitz (the fit's commit,
+[vondele/Stockfish@a08b8d4](https://github.com/vondele/Stockfish/commit/a08b8d4e9711c2), and the
+`UCI_Elo` entry of Stockfish's wiki). No calibration of its levels against people exists; the
+Stockfish FAQ calls rating Stockfish against humans "virtually impossible". The gaps measured above
+are also between very erratic engines, which need not be the gaps a person sees.
+
+So the presets were also matched against [Maia](https://github.com/CSSLab/maia-chess)
+(McIlroy-Young et al., KDD 2020): Lc0 networks trained on Lichess games to play the average move of
+players rated 1100, 1500 and 1900, run at `go nodes 1` (no search), as the Maia bots on Lichess are.
+Those bots (maia1, maia5, maia9) have ratings measured against people: Lichess snapshots of recent
+years range about 1430-1560 (maia1), 1620-1790 (maia5) and 1530-1850 (maia9), blitz and rapid.
+Protocol: `tools/sf_match.py --openings tools/sf_match_openings.txt` (50 common human openings,
+each played with both colours, since Maia always plays the same move in the same position), Lc0
+0.31.2 (BLAS backend, 1 thread) with `maia-1100/1500/1900.pb.gz`, Stockfish 19 (a standalone
+`x86-64-avx2` build of this tree) with each preset's settings, the `UCI_Elo` presets at
+`movetime 250`, Threads 1, Hash 64 and the referee as above. 4,800 games in all; the ratings are a
+maximum-likelihood fit of all of them (draws as half points), relative to Maia 1100, with 95%
+intervals, and every pairing scored within its interval of the fit:
+
+| Player | Settings | Games | Elo vs Maia 1100 |
+|---|---|---:|---:|
+| Novice | S0 d1, MPV 20 (coach level 0) | 400 | -379 +-56 |
+| | S0 d1, MPV 14 | 400 | -328 +-50 |
+| former Novice | S0 d1, MPV 9 | 200 | -331 +-79 |
+| | S0 d1, MPV 12 (coach level 1) | 400 | -310 +-49 |
+| | S0 d1, MPV 8 / 7 / 6 | 300 each | -292 / -258 / -235 (+-50) |
+| Beginner | S1 d1, MPV 8 | 300 | -207 +-46 |
+| | S0 d2, MPV 5 | 400 | -199 +-45 |
+| | S1 d2, MPV 7 | 400 | -137 +-42 |
+| former Beginner | S1 d1, MPV 6 | 200 | -98 +-55 |
+| | S1 d2, MPV 6 | 400 | -80 +-40 |
+| Casual | S1 d2, MPV 5 | 300 | -26 +-49 |
+| Maia 1500 | | | +81 +-35 |
+| Club Player | UCI_Elo 1500 | 300 | +180 +-51 |
+| Maia 1900 | | | +219 +-62 |
+| Advanced | UCI_Elo 1800 | 200 | +437 +-79 |
+
+Findings:
+
+* **Club Player and Advanced**, which use Stockfish's calibration as is, are 257 apart (labels:
+  300) and fit their labels (below).
+* **MultiPV saturates against Maia**: from 9 to 20 lines it costs ~50 (Stockfish 19 self-play:
+  ~135), so the Novice cannot go much lower than MultiPV 20 with these knobs. **Depth 2 is worth
+  little**: S1 d2 is ~20 above S1 d1 at MultiPV 6 (self-play: ~97), as Maia does not punish the
+  blunders that depth 2 avoids as surely as Stockfish does. So the former Beginner was only ~70
+  below the Casual (labels: 200, self-play: 217).
+* Hence the Novice now takes MultiPV 20 and the Beginner S1 d1 MultiPV 8: 172 and 181 below the
+  next preset, then 206 (Casual to Club Player) and 257. With the one offset that best fits the
+  five labels (Maia 1100 = 1259), each plays within ~100 of its label: Novice ~880, Beginner
+  ~1050, Casual ~1235, Club Player ~1440, Advanced ~1695 (the former Novice and Beginner: +95 and
+  +130 above their labels, the Beginner about the Casual's strength).
+* **Human ratings**: on that offset Maia 1100 is ~1260 on the labels' scale, while the three bots'
+  Lichess ratings put it at ~1520 on Lichess (1440-1620 depending on the snapshot). Published
+  comparisons put FIDE ratings roughly 100 to 300 below Lichess ratings at these levels (the
+  [ChessGoals](https://chessgoals.com/rating-comparison/) survey, regressions on FIDE-rated Lichess
+  players), so FIDE ~1260 is consistent, within the conversion's +-150-200. Above Advanced no Maia
+  is strong enough to check; Expert to Grandmaster rest on Stockfish's calibration alone.
+* Limits: Maia is a proxy for people (it never calculates, so it misses tactics that people of its
+  rating sometimes see, and its bots' ratings include people exploiting their determinism), and
+  ratings between handicapped players are only roughly transitive.
+
 #### Resulting presets
 
-| Preset | Settings | Estimate |
-|---|---|---|
-| Novice (~800) | Skill 0, depth 1, MultiPV 9 | 750-840 |
-| Beginner (~1000) | Skill 1, depth 1, MultiPV 6 | ~1010 |
-| Casual (~1200) | Skill 1, depth 2, MultiPV 5 | ~1175 |
-| Club Player ... Grandmaster | UCI_Elo 1500 / 1800 / 2100 / 2400 / 2700 | Stockfish's calibration (as with Stockfish 16 within ~40, measured from 1500 to 2100) |
-| Stockfish Max | full strength | ~3500 (1 thread) |
+| Preset | Settings | Against Maia (labels' offset) | `estimateElo` (engine scale) |
+|---|---|---|---|
+| Novice (~800) | Skill 0, depth 1, MultiPV 20 | ~880 | 669 |
+| Beginner (~1000) | Skill 1, depth 1, MultiPV 8 | ~1050 | 878 |
+| Casual (~1200) | Skill 1, depth 2, MultiPV 5 | ~1235 | 1174 |
+| Club Player ... Grandmaster | UCI_Elo 1500 / 1800 / 2100 / 2400 / 2700 | ~1440, ~1695 (Club Player, Advanced) | Stockfish's calibration (as with Stockfish 16 within ~40, measured from 1500 to 2100) |
+| Stockfish Max | full strength | | ~3500 (1 thread) |
 
-These are engine ratings on Stockfish's CCRL-anchored scale; human (FIDE or online) ratings are
-not the same scale, so the labels are approximate by nature.
+Stockfish's ratings are on its CCRL-anchored engine scale and human (FIDE or online) ratings are
+not the same scale, so the labels are approximate by nature: the check against Maia puts the
+presets from 800 to 1800 within ~100 of their labels on one common scale, and that scale within
+~150-200 of FIDE's. The coach's levels 0 to 2 use the Novice's settings, MultiPV 12 (~70 above the
+Novice) and the Beginner's (`src/ai/presets.cpp`).

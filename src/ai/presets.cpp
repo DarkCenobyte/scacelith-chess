@@ -32,6 +32,15 @@
 //  * Level: under a depth cap the level still counts, as the pick keeps (8 + 2L) / 128 of the score
 //    differences against the noise: level 1 at depth 1 is ~95 Elo stronger than level 0 at depth 1
 //    with the same MultiPV.
+//
+// Against human-like play the gaps are not the same. Stockfish's own calibration is engine against
+// engine, and no human calibration of its levels exists, so the presets were also matched against
+// Maia (Lc0 networks trained to play the average move of Lichess players of a given rating, whose
+// Lichess bots have human-measured ratings; README.scacelith.md). There, Club Player and Advanced
+// sit about where their labels put them, but MultiPV saturates (9 to 20 lines: ~50 Elo, not ~150)
+// and the old Beginner (Skill 1, depth 1, MultiPV 6) was only ~70 below the Casual. So the weak
+// presets are spaced on that scale: the Novice takes MultiPV 20, near the floor of these knobs,
+// and the Beginner MultiPV 8, half-way between it and the Casual.
 #include "ai/behavior.h"
 
 #include <algorithm>
@@ -111,15 +120,19 @@ int Engine::estimateElo(const EngineSettings& s) {
     return std::max(elo, 100);
 }
 
-// Each weak preset was matched against the Stockfish 16 preset it replaces (the labels' scale):
-// Novice -2, Beginner -6, Casual +13 Elo (+-15-21), so they keep their strengths: Novice ~750-840,
-// Beginner ~1010, Casual ~1175. Stockfish 19 against Stockfish 16 at the same UCI_Elo (250 ms per
-// move): 1500 -22, 1800 +12, 2100 +22 (+-35-40). The labels are Stockfish's (engine, CCRL-anchored)
-// scale, not FIDE ratings.
+// From Club Player up the labels are Stockfish's calibration (engine, CCRL-anchored); Stockfish 19
+// against Stockfish 16 at the same UCI_Elo (250 ms per move): 1500 -22, 1800 +12, 2100 +22
+// (+-35-40). Against Maia (Elo relative to Maia 1100, +-40-80): Novice -379, Beginner -207, Casual
+// -26, Club Player +180, Advanced +437 (the former Novice -331, Beginner -98). With the one offset
+// that best fits the five labels, each plays within ~100 of its label: Novice +80, Beginner +50,
+// Casual +35, Club Player -60, Advanced -105 (with the former Novice and Beginner: +95 and +130).
+// The Maia bots' Lichess ratings, converted to FIDE, agree with that offset within the
+// conversion's +-150-200 (README.scacelith.md). estimateElo() stays on the engine scale, ~120-130
+// under the Novice's and the Beginner's labels.
 const std::vector<Preset>& presets() {
     static const std::vector<Preset> list = {
-        {"Novice", "Just learned the moves: hangs pieces and misses simple threats.", 800, shallowSkill(0, 1, 9)},
-        {"Beginner", "Knows the basics, but still blunders material regularly.", 1000, shallowSkill(1, 1, 6)},
+        {"Novice", "Just learned the moves: hangs pieces and misses simple threats.", 800, shallowSkill(0, 1, 20)},
+        {"Beginner", "Knows the basics, but still blunders material regularly.", 1000, shallowSkill(1, 1, 8)},
         {"Casual", "A relaxed evening opponent: sensible moves, frequent mistakes.", 1200, shallowSkill(1, 2, 5)},
         {"Club Player", "Solid club player who punishes obvious blunders.", 1500, limited(1500)},
         {"Advanced", "Strong club player with good tactical vision.", 1800, limited(1800)},
@@ -140,11 +153,11 @@ int presetElo(int index, const EngineSettings& custom) {
 
 // Coach mode levels: the coach plays a little below the top of the student's band, on the presets'
 // scale (the labels above), from the same measurements:
-//  0  rules lesson (scripted)  Skill 0, depth 1, MultiPV 20  ~650   estimate 1320-185-466 = 669; S0 d1 MPV 20
-//                                                                   is ~135 below the Novice (-449 vs -315)
-//  1  First steps (600-900)    Skill 0, depth 1, MultiPV 12  ~750   estimate 759; ~75 below the Novice
-//                                                                   (S0 d1: MPV 12 -389, MPV 9 -315)
-//  2  Beginner (900-1200)      the Beginner preset           ~1000  measured -6 against its Stockfish 16 self
+//  0  rules lesson (scripted)  Skill 0, depth 1, MultiPV 20  ~800   the Novice preset, near the floor of
+//                                                                   these knobs (estimate 669, engine scale)
+//  1  First steps (600-900)    Skill 0, depth 1, MultiPV 12  ~850   against Maia +69 (+-75) above the
+//                                                                   Novice (estimate 759, engine scale)
+//  2  Beginner (900-1200)      the Beginner preset           ~1000  against Maia, as the presets above
 //  3  Improver (1200-1500)     UCI_Elo 1400                  ~1300  see below
 //  4  Club player (1500-1800)  UCI_Elo 1650                  ~1650  Stockfish 19 vs 16: 1500 -22, 1800 +12
 //  5  Strong club (1800-2100)  UCI_Elo 1950                  ~1950  1800 +12, 2100 +22
@@ -161,7 +174,7 @@ EngineSettings coachLevelSettings(int level) {
     switch (std::clamp(level, 0, kCoachLevels - 1)) {
     case 0: return shallowSkill(0, 1, 20);
     case 1: return shallowSkill(0, 1, 12);
-    case 2: return shallowSkill(1, 1, 6);  // = presets()[1], the Beginner
+    case 2: return shallowSkill(1, 1, 8);  // = presets()[1], the Beginner
     case 3: return limited(1400);
     case 4: return limited(1650);
     case 5: return limited(1950);
@@ -170,7 +183,7 @@ EngineSettings coachLevelSettings(int level) {
 }
 
 int coachLevelElo(int level) {
-    static const int elo[kCoachLevels] = {650, 750, 1000, 1300, 1650, 1950, 2300};
+    static const int elo[kCoachLevels] = {800, 850, 1000, 1300, 1650, 1950, 2300};
     return elo[std::clamp(level, 0, kCoachLevels - 1)];
 }
 

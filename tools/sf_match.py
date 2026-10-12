@@ -10,6 +10,7 @@ ARCH=x86-64-sse41-popcnt` in its src/). The game's embedded engine has no UCI ex
         --a ENGINE [--a-name NAME] [--a-opt NAME=VALUE ...] [--a-go ARGS]
         --b ENGINE [--b-name NAME] [--b-opt NAME=VALUE ...] [--b-go ARGS]
         [--common-opt NAME=VALUE ...] [--ref-depth 12] [--max-plies 300] [--win-cp 300] [--event TEXT]
+        [--openings FILE]
     tools/sf_match.py pool --a-name NAME FILE.pgn [FILE.pgn ...]
 
 For example the Novice (Stockfish 19) against the Stockfish 16 Novice it replaced:
@@ -20,11 +21,24 @@ For example the Novice (Stockfish 19) against the Stockfish 16 Novice it replace
         --b sf16/src/stockfish --b-name "SF16 Novice" --b-opt "Skill Level=0" --b-opt MultiPV=7 \
         --b-opt "Use NNUE=false" --b-go "depth 1"
 
+A preset against Maia (Lc0 at "go nodes 1" with a Maia network, https://github.com/CSSLab/maia-chess;
+README.scacelith.md, "Against human-like play"). Maia always plays the same move in the same
+position, so the games start from the human openings of tools/sf_match_openings.txt; Lc0 answers
+the common Hash option with "error Unknown option: Hash", which is harmless:
+
+    OPENBLAS_NUM_THREADS=1 tools/sf_match.py play --games 100 --pgn beginner-maia1100.pgn \
+        --referee sf19/src/stockfish --openings tools/sf_match_openings.txt \
+        --a sf19/src/stockfish --a-name Beginner --a-opt "Skill Level=1" --a-opt MultiPV=8 --a-go "depth 1" \
+        --b lc0/build/release/lc0 --b-name "Maia 1100" --b-opt WeightsFile=maia-1100.pb.gz \
+        --b-opt Backend=blas --b-go "nodes 1"
+
 Protocol of "play":
   * Each engine is its own process, set up with Threads 1 and Hash 64 (as the game plays), any
     --common-opt, then its own --a-opt / --b-opt; both get "ucinewgame" before every game.
-  * Games start from the initial position; A has White in the odd games, B in the even ones. Every
-    move is one "go" with the side's arguments (--a-go / --b-go, e.g. "depth 1" or "movetime 250").
+  * Games start from the initial position, or with --openings from the lines of that file in turn,
+    each played twice (A with White, then with Black); A has White in the odd games, B in the even
+    ones. Every move is one "go" with the side's arguments (--a-go / --b-go, e.g. "depth 1" or
+    "movetime 250").
   * python-chess checks every move (an illegal one stops the match) and ends the game on
     checkmate, stalemate, insufficient material, the 50-move rule or a threefold repetition.
   * Adjudication: a game still running after --max-plies plies goes to the referee engine, which
@@ -127,10 +141,32 @@ def parse_options(items):
     return out
 
 
-def play_game(white, black, referee, args):
-    """Plays one game; returns (final board, result, how it ended)."""
+def read_openings(path):
+    """The lines of an openings file (moves in SAN, one line per opening; # starts a comment), as UCI
+    move lists."""
+    openings = []
+    with open(path) as f:
+        for n, line in enumerate(f, 1):
+            line = line.split("#")[0].split()
+            if not line:
+                continue
+            board = chess.Board()
+            try:
+                openings.append([board.push_san(san).uci() for san in line])
+            except ValueError as e:
+                sys.exit(f"{path}:{n}: {e}")
+    if not openings:
+        sys.exit(f"{path}: no opening")
+    return openings
+
+
+def play_game(white, black, referee, args, opening=()):
+    """Plays one game from the opening's moves; returns (final board, result, how it ended)."""
     board = chess.Board()
     moves = []
+    for uci in opening:
+        board.push_uci(uci)
+        moves.append(uci)
     white.new_game()
     black.new_game()
     while True:
@@ -225,6 +261,7 @@ def play(args):
     if first >= args.games:
         print(tally.summary() + "  (already complete)", flush=True)
         return
+    openings = read_openings(args.openings) if args.openings else [[]]
     common = parse_options(args.common_opt)
     engines = []
     try:
@@ -239,7 +276,7 @@ def play(args):
             for g in range(first, args.games):
                 a_white = g % 2 == 0
                 white, black = (a, b) if a_white else (b, a)
-                board, result, why = play_game(white, black, referee, args)
+                board, result, why = play_game(white, black, referee, args, openings[g // 2 % len(openings)])
                 game = chess.pgn.Game.from_board(board)
                 game.headers["Event"] = args.event or f"{args.a_name} vs {args.b_name}"
                 game.headers["Round"] = str(g + 1)
@@ -286,6 +323,8 @@ def main():
     p.add_argument("--common-opt", action="append", default=["Threads=1", "Hash=64"], metavar="NAME=VALUE",
                    help="UCI option for all three engines (repeatable; added to Threads=1 and Hash=64)")
     p.add_argument("--event", default="", help='PGN event (default "A vs B")')
+    p.add_argument("--openings", help="start the games from these openings (SAN, one per line), "
+                                      "each played with both colours")
     p.set_defaults(run=play)
     q = sub.add_parser("pool", help="print A's result over the games of several PGN files")
     q.add_argument("--a-name", required=True, help="the player whose result is printed")

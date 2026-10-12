@@ -45,7 +45,7 @@ constexpr int kMateScore = 100000;
 // Untimed game and no depth/nodes/movetime in the settings: search time per move. The humanised
 // thinking time (2..12 s) runs concurrently, so this rarely delays the game.
 constexpr int kUntimedFullMs = 3000;    // full strength
-constexpr int kUntimedLimitedMs = 1000; // Skill / UCI_Elo handicap (Stockfish calibrated UCI_Elo at 60s+0.6s)
+constexpr int kUntimedLimitedMs = 1000; // Skill / UCI_Elo handicap (Stockfish calibrated UCI_Elo at 120s+1s)
 constexpr int kUntimedSafetyMs = 30000; // untimed game with only a depth/nodes cap
 // Analysis limits (AnalysisRequest), clamped: Stockfish's MultiPV option stops at MAX_MOVES (256),
 // its iterative deepening at MAX_PLY (246).

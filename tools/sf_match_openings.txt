@@ -1,0 +1,54 @@
+# Openings for tools/sf_match.py --openings: 50 common human openings, six plies each (SAN, one
+# per line, # starts a comment). Each is played twice, once with each colour, so that an engine
+# that always plays the same move in the same position (Maia at "go nodes 1") does not repeat
+# its games. Used for the matches against Maia in third_party/stockfish/README.scacelith.md.
+e4 e5 Nf3 Nc6 Bb5 a6     # Ruy Lopez
+e4 e5 Nf3 Nc6 Bc4 Bc5    # Italian Game
+e4 e5 Nf3 Nc6 d4 exd4    # Scotch Game
+e4 e5 Nf3 Nf6 Nxe5 d6    # Petrov Defence
+e4 e5 Nc3 Nf6 f4 d5      # Vienna Game
+e4 e5 f4 exf4 Nf3 g5     # King's Gambit Accepted
+e4 c5 Nf3 d6 d4 cxd4     # Sicilian, Open (2...d6)
+e4 c5 Nf3 Nc6 d4 cxd4    # Sicilian, Open (2...Nc6)
+e4 c5 Nf3 e6 d4 cxd4     # Sicilian, Open (2...e6)
+e4 c5 Nc3 Nc6 g3 g6      # Sicilian, Closed
+e4 c5 c3 Nf6 e5 Nd5      # Sicilian, Alapin
+e4 e6 d4 d5 Nc3 Bb4      # French, Winawer
+e4 e6 d4 d5 e5 c5        # French, Advance
+e4 c6 d4 d5 Nc3 dxe4     # Caro-Kann, Main Line
+e4 c6 d4 d5 e5 Bf5       # Caro-Kann, Advance
+e4 d5 exd5 Qxd5 Nc3 Qa5  # Scandinavian
+e4 d6 d4 Nf6 Nc3 g6      # Pirc Defence
+e4 Nf6 e5 Nd5 d4 d6      # Alekhine Defence
+e4 g6 d4 Bg7 Nc3 d6      # Modern Defence
+d4 d5 c4 e6 Nc3 Nf6      # Queen's Gambit Declined
+d4 d5 c4 dxc4 Nf3 Nf6    # Queen's Gambit Accepted
+d4 d5 c4 c6 Nf3 Nf6      # Slav Defence
+d4 Nf6 c4 g6 Nc3 Bg7     # King's Indian Defence
+d4 Nf6 c4 e6 Nc3 Bb4     # Nimzo-Indian Defence
+d4 Nf6 c4 e6 Nf3 b6      # Queen's Indian Defence
+d4 Nf6 c4 c5 d5 e6       # Benoni Defence
+d4 Nf6 c4 g6 Nc3 d5      # Gruenfeld Defence
+d4 f5 g3 Nf6 Bg2 g6      # Dutch, Leningrad
+d4 d5 Bf4 Nf6 e3 e6      # London System
+d4 Nf6 Bf4 g6 e3 Bg7     # London System against the King's Indian
+d4 d5 Nf3 Nf6 e3 e6      # Colle System
+c4 e5 Nc3 Nf6 Nf3 Nc6    # English, Four Knights
+c4 c5 Nc3 Nc6 g3 g6      # English, Symmetrical
+c4 Nf6 Nc3 e6 e4 d5      # English, Mikenas
+Nf3 d5 g3 Nf6 Bg2 e6     # Reti Opening
+Nf3 Nf6 c4 g6 Nc3 Bg7    # English, King's Indian set-up
+e4 e5 Nf3 d6 d4 exd4     # Philidor Defence
+e4 e5 Bc4 Nf6 d3 c6      # Bishop's Opening
+e4 e5 Nf3 Nc6 Nc3 Nf6    # Four Knights Game
+e4 c5 Nf3 d6 Bb5+ Bd7    # Sicilian, Moscow
+e4 e6 d4 d5 exd5 exd5    # French, Exchange
+d4 e6 c4 Bb4+ Bd2 Qe7    # Keres Defence
+b3 e5 Bb2 Nc6 e3 d5      # Larsen Opening
+f4 d5 Nf3 g6 e3 Bg7      # Bird Opening
+g3 d5 Bg2 Nf6 Nf3 c6     # King's Fianchetto Opening
+e4 e5 Nf3 Nc6 Bc4 Nf6    # Two Knights Defence
+e4 c5 d4 cxd4 c3 dxc3    # Smith-Morra Gambit
+e4 e5 d4 exd4 Qxd4 Nc6   # Centre Game
+d4 Nf6 Nf3 e6 Bg5 h6     # Torre Attack
+d4 d5 c4 e5 dxe5 d4      # Albin Counter-Gambit
