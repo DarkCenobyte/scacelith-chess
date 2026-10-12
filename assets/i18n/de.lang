@@ -1072,6 +1072,9 @@ coach.offer.text = Der Trainer bietet an, Ihren letzten Zug zurückzunehmen, dam
 coach.offer.hint = Die Rücktaste nimmt ihn zurück. Wer eine Figur berührt, spielt weiter.
 coach.offer.accept = Zurücknehmen
 coach.offer.decline = Weiterspielen
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Verbleibende Rücknahmen: {0}
 coach.pause.take_back = Meinen Zug zurücknehmen
 coach.pause.take_back.help = Nimmt Ihren letzten Zug zurück, und die Antwort des Trainers, falls er schon gezogen hat.
 coach.confirm.resign = Diese Partie aufgeben? Der Trainer wird zum Sieger erklärt.

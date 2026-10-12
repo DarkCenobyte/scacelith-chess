@@ -166,6 +166,24 @@ demo.my.check.3 = {my} nach {sq}, Schach!
 demo.my.mate = {my} zieht nach {sq}. Schachmatt.
 demo.my.mate.2 = Und {my} setzt auf {sq} matt.
 demo.my.mate.3 = {my} nach {sq}. Das ist Schachmatt.
+# Levels 1-3, the coach's in-between move ({t1}: the bigger piece taken next).
+demo.my.first.take = Zuerst schlägt {my} {your:acc}. {t1} kann warten.
+demo.my.first.take.2 = {my} schlägt zuerst {your:acc}. {t1} läuft nicht weg.
+demo.my.first.check = {my} schlägt {your:acc}, und das ist Schach! {t1} kann warten.
+demo.my.first.check.2 = Zuerst schlägt {my} {your:acc}, mit Schach. {t1} läuft nicht weg.
+demo.my.first.check_move = Zuerst Schach mit {my:dat} auf {sq}. {t1} kann warten.
+demo.my.first.check_move.2 = {my} zieht nach {sq}, erst einmal Schach! {t1} läuft nicht weg.
+demo.my.first.move = Zuerst zieht {my} nach {sq}. {t1} kann warten.
+demo.my.first.move.2 = Erst {my} nach {sq}. {t1} läuft nicht weg.
+demo.my.first.attacked = {my} wird angegriffen, also schlägt die Figur zuerst {your:acc}.
+demo.my.first.attacked.2 = {my} steht unter Angriff. Deshalb schlägt die Figur vorher {your:acc}.
+# Levels 4-6.
+demo.first = Zuerst {move}. {t1} kann warten.
+demo.first.2 = Erst {move}. {t1} läuft nicht weg.
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = Jetzt spiele ich meinen Zug.
+demo.play_on.2 = Hier ist mein echter Zug.
+demo.play_on.3 = Und jetzt ziehe ich wirklich.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = Du würdest {your:acc} nach {sq} ziehen.
 demo.your.move.2 = Angenommen, du ziehst {your:acc} nach {sq}.
@@ -875,3 +893,7 @@ tb.fixed.2 = Besser.
 tb.fixed.3 = Gute Korrektur.
 tb.same = Wieder derselbe Zug? Na gut, schauen wir mal.
 tb.same.2 = Du magst diesen Zug. Gut, spielen wir weiter.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = In dieser Partie gibt es leider keine Rücknahme mehr.
+tb.none_left.2 = Du hast in dieser Partie keine Rücknahmen mehr.

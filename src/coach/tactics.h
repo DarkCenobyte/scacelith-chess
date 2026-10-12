@@ -151,11 +151,41 @@ struct LineStep {
     bool check = false, mate = false, stalemate = false;
     int balance = 0;             // materialBalance(after, pov): the listener's material lead after the ply
     bool guessed = false;        // not the engine's: a natural reply added where its line stopped
+    // A bigger prize the move leaves standing (prizeLeft): the square of that piece of the other
+    // side's and its type, before the move; NoSquare when there is none.
+    chess::Square prize = chess::NoSquare;
+    chess::PieceType prizeType = chess::NoPiece;
 };
 // The legal prefix of 'uci' from 'start' (at most maxPlies), the balance seen by 'pov'.
 std::vector<LineStep> replayLine(const chess::Position& start, const std::vector<std::string>& uci, chess::Color pov,
                                  int maxPlies = 64);
 std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t count);   // "Nxe5 dxe5 Qg4"
+
+// A bigger prize left standing: the side to move in 'before' could win, by exchange, a piece of the
+// other side's worth more points than what 'm' takes, by 3 points more than 'm' wins at least (a
+// knight taken while the queen is en prise, a quiet move that ignores a free rook). The square of
+// that piece (the most it wins), else NoSquare; never for a move that mates. A player watching the
+// line sees the queen left there, whatever the engine's reason (a piece that cannot escape anyway, a
+// counter-attack after the capture).
+chess::Square prizeLeft(const chess::Position& before, const chess::Move& m);
+// line[k] is an in-between move: it leaves a bigger prize (LineStep::prize) and the same side takes
+// that very piece with its next move (the reply in between does not move it): "first I take your
+// knight with check, your queen can wait".
+bool isInBetween(const std::vector<LineStep>& line, size_t k);
+// Where the side that played line[k], a move that leaves a bigger prize (LineStep::prize), wins at
+// least as much back: the ply of its capture of that piece (an in-between move), else of a piece
+// worth as many points or more within its next three moves, all checks before that capture, line[k]
+// itself a capture or a check (a desperado, a series of checks that ends on a rook), or with its
+// very next move, made by the piece line[k] moved (a threat: "...f5, then ...fxe4"). size_t(-1)
+// when it does not: a player watching the line sees the bigger prize ignored.
+size_t wonBackAt(const std::vector<LineStep>& line, size_t k);
+// How many plies of 'line', at most 'want', can be shown or said to a player who follows them move
+// by move: up to the first move that leaves a bigger prize standing (LineStep::prize), which the
+// player would not understand, unless a mate or a stalemate ends the part later (material no
+// longer counts) or the move's side wins as much back within the part (wonBackAt). 'extend': a part
+// that would stop before such a win-back is complete goes on to its capture when the line allows
+// it; else it stops before the move that left the prize.
+size_t followablePlies(const std::vector<LineStep>& line, size_t want, bool extend);
 
 // Squares a finger passes over for a move of a piece of type t, in order, 'to' last: a slider the
 // squares in between, a knight an L (long leg first: g1-f3 gives g2 g3 f3), a king or a pawn just

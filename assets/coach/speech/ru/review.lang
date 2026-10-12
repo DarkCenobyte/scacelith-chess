@@ -166,6 +166,24 @@ demo.my.check.3 = {my} на {sq}, шах!
 demo.my.mate = {my} идёт на {sq}. Мат.
 demo.my.mate.2 = И {my} на {sq} — это мат.
 demo.my.mate.3 = {my} на {sq}. Это мат.
+# Levels 1-3, the coach's in-between move ({t1}: the bigger piece taken next).
+demo.my.first.take = Сначала {my} бьёт {your:acc}. {t1} подождёт.
+demo.my.first.take.2 = {my} сперва забирает {your:acc}. {t1} никуда не денется.
+demo.my.first.check = {my} бьёт {your:acc}, и это шах! {t1} подождёт.
+demo.my.first.check.2 = Сначала {my} забирает {your:acc} с шахом. {t1} никуда не денется.
+demo.my.first.check_move = Сначала шах: {my} на {sq}. {t1} подождёт.
+demo.my.first.check_move.2 = {my} идёт на {sq}, сначала шах! {t1} никуда не денется.
+demo.my.first.move = Сначала {my} идёт на {sq}. {t1} подождёт.
+demo.my.first.move.2 = Сперва {my} на {sq}. {t1} никуда не денется.
+demo.my.first.attacked = {my} под ударом, поэтому сначала бьёт {your:acc}.
+demo.my.first.attacked.2 = {my} под ударом, так что {my:pron} сперва забирает {your:acc}.
+# Levels 4-6.
+demo.first = Сначала {move}: {t1} подождёт.
+demo.first.2 = Сперва {move}. {t1} никуда не денется.
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = Теперь я делаю свой ход.
+demo.play_on.2 = А вот мой настоящий ход.
+demo.play_on.3 = А теперь хожу по-настоящему.
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = Ты ходишь {your:bare_ins} на {sq}.
 demo.your.move.2 = Допустим, {your} идёт на {sq}.
@@ -874,3 +892,7 @@ tb.fixed.2 = Лучше.
 tb.fixed.3 = Хорошее исправление.
 tb.same = Опять тот же ход? Ладно, посмотрим.
 tb.same.2 = Тебе нравится этот ход. Что ж, сыграем.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Увы, больше вернуть ход в этой партии нельзя.
+tb.none_left.2 = Возвраты ходов в этой партии закончились.

@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <set>
 #include <sstream>
 
@@ -88,7 +89,8 @@ int worstLoss(const std::vector<LineStep>& line, const Position& start, Color hu
 
 bool isMaterialType(ExType t) {
     return t == ExType::Fork || t == ExType::Discovered || t == ExType::Skewer || t == ExType::Pin ||
-           t == ExType::Trapped || t == ExType::BackRank || t == ExType::Hanging || t == ExType::Exchange;
+           t == ExType::Trapped || t == ExType::BackRank || t == ExType::Hanging || t == ExType::Exchange ||
+           t == ExType::Material;
 }
 bool isGenericType(ExType t) {
     return t == ExType::Endgame || t == ExType::KingSafety || t == ExType::Positional || t == ExType::Opening ||
@@ -309,6 +311,139 @@ void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     }
 }
 
+// The capture a move leaves for later: its mover could win a piece worth more than what the move
+// takes, by 3 points more at least by exchange (the best such capture), else an invalid move.
+Move biggerPrize(const Position& before, const Move& m) {
+    const Piece victim = before.at((m.flags & MoveEnPassant) ? Square(m.to + (before.sideToMove() == White ? -8 : 8)) : m.to);
+    const int took = victim.empty() ? 0 : kPiecePoints[victim.type];
+    const int gain = victim.empty() ? 0 : seePoints(before, m);
+    Move prize;
+    int most = gain + 2;
+    for (const Move& x : before.legalMoves()) {
+        const Piece t = before.at(x.to);
+        if (t.empty() || kPiecePoints[t.type] <= took) continue;
+        const int g = seePoints(before, x);
+        if (g > most) {
+            most = g;
+            prize = x;
+        }
+    }
+    return prize;
+}
+
+// The side that played moves[i] (pos[i] before it) wins 'worth' points or more back along the line:
+// it takes a piece worth that much within its next three moves, all checks before that capture,
+// moves[i] itself a capture or a check; or with its very next move, made by the piece moves[i] moved
+// (it attacked it).
+bool winsBack(const std::vector<Position>& pos, const std::vector<Move>& moves, size_t i, int worth) {
+    const bool forcing = pos[i + 1].inCheck() || !pos[i].at(moves[i].to).empty();
+    for (size_t j = i + 2; j < moves.size() && j <= i + 6; j += 2) {
+        const Piece victim = pos[j].at(moves[j].to);
+        if (!victim.empty() && kPiecePoints[victim.type] >= worth &&
+            (forcing || (j == i + 2 && moves[j].from == moves[i].to)))
+            return true;
+        if (!forcing || !pos[j + 1].inCheck()) return false;
+    }
+    return false;
+}
+
+// A line the coach shows (a demonstration from p1: 'keys' holds each move's narration) or says: no
+// move may leave a bigger prize standing, which a player would see as the queen ignored whatever
+// the engine's reason, unless a mate or a stalemate ends the line (material no longer counts), or
+// its side wins as much back along the line (winsBack). The coach's in-between move (it takes that
+// very piece with its next move) is said as such in a demonstration (demo.first, demo.my.first.*). 'skipFirst': the line starts with the engine's best move, said whatever it leaves.
+void checkLinePrize(const Position& start, const std::vector<Move>& moves, const std::vector<std::string>* keys,
+                    const std::string& where, bool skipFirst, std::vector<Finding>& out) {
+    std::vector<Position> pos{start};
+    for (const Move& m : moves) {
+        Position q = pos.back();
+        q.makeMove(m);
+        pos.push_back(q);
+    }
+    if (pos.back().isCheckmate() || pos.back().isStalemate()) return;
+    for (size_t i = skipFirst ? 1 : 0; i < moves.size(); ++i) {
+        const Position& before = pos[i];
+        const Move prize = biggerPrize(before, moves[i]);
+        if (!prize.valid() || pos[i + 1].isCheckmate()) continue;
+        const bool check = pos[i + 1].inCheck();
+        const bool between = i + 2 < moves.size() && moves[i + 1].from != prize.to &&
+                             moves[i + 2].to == prize.to && pos[i + 2].at(prize.to) == before.at(prize.to);
+        const std::string what = before.toSAN(moves[i]) + (check ? " (check)" : "") + " while " + before.toSAN(prize) +
+                                 " wins a " + pieceName(before.at(prize.to).type);
+        if (!between && !winsBack(pos, moves, i, kPiecePoints[before.at(prize.to).type])) {
+            out.push_back({"PRIZE_IGNORED", where + ": " + what});
+        } else if (between && keys && i % 2 == 0 && i < keys->size() && (*keys)[i].rfind("demo.first", 0) != 0 &&
+                   (*keys)[i].rfind("demo.my.first", 0) != 0) {
+            out.push_back({"IN_BETWEEN_UNSAID", where + ": " + what + ", narrated " + (*keys)[i]});
+        }
+    }
+}
+
+// The {line} a Say beat says: where it starts (the table, p1, or the position before the move, p0;
+// the better move's idea after that move) and its moves; 'fromBest': it starts with the engine's best
+// move. False when the beat says no line.
+bool saidLine(const Ctx& c, const Beat& b, Position& start, std::vector<Move>& moves, bool& fromBest) {
+    const Arg* line = b.line.arg("line");
+    if (!line || line->san.empty()) return false;
+    bool said = false;
+    for (const std::string& v : variantsOf(b.line.key)) said = said || usesPlaceholder(v, "line");
+    if (!said) return false;
+    // The better move's idea ({line} after {best}) starts after the better move; the other lines
+    // from the table (p1), or the position before the move (p0).
+    std::vector<Position> starts{c.p1, c.p0};
+    if (b.line.key.rfind("ex.better.", 0) == 0) {
+        if (c.bestLine.empty()) return false;
+        starts = {c.p0};
+        starts[0].makeMove(c.bestLine[0].move);
+    }
+    for (size_t k = 0; k < starts.size(); ++k) {
+        Position end;
+        int plies = 0;
+        if (!replaySan(starts[k], line->san, end, plies)) continue;
+        moves.clear();
+        Position q = starts[k];
+        std::istringstream in(line->san);
+        std::string s;
+        while (in >> s) {
+            moves.push_back(q.parseSAN(s));
+            q.makeMove(moves.back());
+        }
+        fromBest = k == 1 && !c.bestLine.empty() && moves[0] == c.bestLine[0].move;
+        start = starts[k];
+        return true;
+    }
+    return false;
+}
+
+// Every {line} said in a Say beat.
+void checkLinePrizes(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    Position start;
+    std::vector<Move> moves;
+    bool fromBest = false;
+    if (saidLine(c, b, start, moves, fromBest))
+        checkLinePrize(start, moves, nullptr, b.line.key + " {line}", fromBest, out);
+}
+
+// Every move of a line shown or said is one its side would play: the engine at a fixed depth
+// (MoveJudge) finds no move there better by 10 win percentage points or more (an error from 20). The
+// engine's best move a line starts with ('skipFirst') is not judged.
+void checkLinePlausible(MoveJudge& judge, const Position& start, const std::vector<Move>& moves,
+                        const std::string& where, bool skipFirst, std::vector<Finding>& out) {
+    Position q = start;
+    for (size_t i = 0; i < moves.size(); ++i) {
+        std::string best;
+        const double cost = i == 0 && skipFirst ? 0.0 : judge.cost(q, moves[i], &best);
+        if (cost >= 10.0) {
+            const Move bm = q.parseUCI(best);
+            char detail[256];
+            std::snprintf(detail, sizeof detail, "%s: %s (ply %zu) gives away %.0f%%, best %s", where.c_str(),
+                          q.toSAN(moves[i]).c_str(), i + 1, cost, bm.valid() ? q.toSAN(bm).c_str() : best.c_str());
+            out.push_back({"UNLIKELY", detail, cost >= 20.0});
+        }
+        q.makeMove(moves[i]);
+    }
+}
+
 void checkMateCount(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.find("mate") == std::string::npos) return;
@@ -395,6 +530,11 @@ int reviewMain(const Options& o) {
     Catalog::shared().load();
     FILE* out = o.out.empty() ? stdout : files::create(o.out.c_str());   // mode 0644, whatever the umask
     if (!out) return 1;
+    std::unique_ptr<MoveJudge> judge;
+    if (o.verify > 0) {
+        judge.reset(new MoveJudge(o.verify, o.threads, o.cache));
+        if (!judge->ok()) std::fprintf(stderr, "engine unavailable: moves judged from the cache only\n");
+    }
     Stats st;
     for (size_t ri = 0; ri < recs.size(); ++ri) {
         const Record& r = recs[ri];
@@ -415,6 +555,24 @@ int reviewMain(const Options& o) {
             ++st.reviews;
             const PlyVerdict& v = rev.verdict;
             std::vector<Finding> f;
+
+            // The demonstration's moves, none of them leaving a bigger prize standing unexplained.
+            {
+                Position q = c.p1;
+                std::vector<Move> moves;
+                std::vector<std::string> keys;
+                for (const Beat& b : rev.script) {
+                    if (b.kind == BeatKind::Rewind) break;
+                    if (b.kind != BeatKind::DemoMove) continue;
+                    const Move m = q.parseUCI(b.uci);
+                    if (!m.valid()) break;
+                    moves.push_back(m);
+                    keys.push_back(b.line.key);
+                    q.makeMove(m);
+                }
+                checkLinePrize(c.p1, moves, &keys, "demo", false, f);
+                if (judge) checkLinePlausible(*judge, c.p1, moves, "demo", false, f);
+            }
 
             // Simulate the script on the table.
             Position table = c.p1;
@@ -437,6 +595,18 @@ int reviewMain(const Options& o) {
                     checkFree(c, b, f);
                     checkFork(c, b, f);
                     checkMateCount(c, b, f);
+                    checkLinePrizes(c, b, f);
+                    if (judge) {
+                        Position start;
+                        std::vector<Move> moves;
+                        bool fromBest = false;
+                        if (saidLine(c, b, start, moves, fromBest)) {
+                            // A line from p0 may start with the move played (the fault itself) or the
+                            // better move: neither is judged.
+                            const bool fromPlayed = start.fen() == c.p0.fen() && moves[0] == c.p0.parseUCI(r.played);
+                            checkLinePlausible(*judge, start, moves, b.line.key + " {line}", fromBest || fromPlayed, f);
+                        }
+                    }
                     if (b.line.key.rfind("ex.verdict.", 0) == 0) verdictKey = b.line.key;
                     if (b.line.key.rfind("ex.result.", 0) == 0 || b.line.key.rfind("ex.result_back.", 0) == 0) {
                         const Arg* pts = b.line.arg("pts");
@@ -520,14 +690,18 @@ int reviewMain(const Options& o) {
                     f.push_back({"DEMO_SHORT", std::string(exTypeName(t)) + ": demo ends with the human " +
                                                    std::to_string(lost) + " down, no mate, nothing pointed at"});
             }
-            if (explained && !demo && level <= 2 && (isMaterialType(t) || t == ExType::MateAllowed) && fault)
+            // A mistake (not a blunder) is said in words by design (review.cpp): only blunders.
+            if (explained && !demo && level <= 2 && (isMaterialType(t) || t == ExType::MateAllowed) &&
+                v.cls == MoveClass::Blunder)
                 f.push_back({"NO_DEMO_BEGINNER", exTypeName(t), false});
 
             // Policy: small slips are not dramatised.
             if (explained && v.cls == MoveClass::Inaccuracy && demo &&
                 worstLoss(c.playedLine, c.p0, c.human, c.base, 9) < 3)
                 f.push_back({"INACCURACY_DEMO", exTypeName(t)});
-            if (offer && v.cls == MoveClass::Inaccuracy && !(level <= 2 && t == ExType::MissedCapture))
+            // Levels 1-2 offer a free piece or a mate missed back whatever it costs (review.cpp).
+            if (offer && v.cls == MoveClass::Inaccuracy &&
+                !(level <= 2 && (t == ExType::MissedCapture || t == ExType::MateMissed)))
                 f.push_back({"OFFER_INACCURACY", exTypeName(t)});
             if (offer && v.cls != MoveClass::Blunder && t != ExType::MateAllowed && t != ExType::MateMissed &&
                 t != ExType::Stalemate && t != ExType::MissedCapture)
@@ -561,6 +735,43 @@ int reviewMain(const Options& o) {
                                                        std::to_string(refLoss) + (mated ? " (mate)" : "")});
             }
 
+            // An explanation where one is due: a blunder the player can still repair (not lost before
+            // it, not still winning after it) after which the engine's line wins material for good or
+            // mates (or that misses such a win), and no line of the coach's says why. Levels 1-2 stay
+            // silent by design when the reason lies beyond the level's reach: counted, not an error.
+            if (v.cls == MoveClass::Blunder && v.wBest > 10.0 && v.wPlayed < 75.0 && !explained && c.lp) {
+                const int bestLoss = worstLoss(c.bestLine, c.p0, c.human, c.base, 8);
+                const int refLoss = worstLoss(c.playedLine, c.p0, c.human, c.base, 9);
+                const int bestGain = worstLoss(c.bestLine, c.p0, c.coach, -c.base, 8);
+                bool mated = false, mates = false;
+                for (const LineStep& s : c.playedLine)
+                    if (s.mate && s.mover == c.coach) mated = true;
+                for (const LineStep& s : c.bestLine)
+                    if (s.mate && s.mover == c.human) mates = true;
+                std::string what = mated ? "the played line mates" :
+                                   refLoss - bestLoss >= 2 ? "the played line loses " + std::to_string(refLoss - bestLoss) :
+                                   mates ? "the best line mates" :
+                                   bestGain >= 3 ? "the best line wins " + std::to_string(bestGain) : "";
+                if (!what.empty())
+                    f.push_back({"UNEXPLAINED", what + (rev.script.empty() ? ", nothing said" : ", no reason said"), false});
+            }
+
+            // What a {line} names goes as far as the point it makes: a material reason's line ends
+            // with the human down (for good) or mated.
+            if (explained && isMaterialType(t))
+                for (const Beat& b : rev.script) {
+                    Position start;
+                    std::vector<Move> moves;
+                    bool fromBest = false;
+                    if (b.kind != BeatKind::Say || b.line.key.rfind("ex.better.", 0) == 0 ||
+                        !saidLine(c, b, start, moves, fromBest) || fromBest)
+                        continue;
+                    Position q = start;
+                    for (const Move& m : moves) q.makeMove(m);
+                    if (!q.isCheckmate() && heldLossAt(q, c.human, c.base) < 1)
+                        f.push_back({"LINE_SHORT", b.line.key + " {line} ends with nothing lost"});
+                }
+
             // A material reason that names much less than the engine's drop understates the problem.
             if (explained && fault && isMaterialType(t) && c.lp) {
                 const int sign = c.human == White ? 1 : -1;
@@ -569,7 +780,9 @@ int reviewMain(const Options& o) {
                 if (demo) named = shownLoss(c, demoPlies);
                 for (const Beat& b : rev.script)
                     if (const Arg* p = b.line.arg("pts")) named = std::max(named, p->number);
-                if (named < 3 && named * 250 < drop)
+                // The same measure as the coach's (Ctx::lossExplains): a pawn for 2.5 pawns of the
+                // drop, a piece for a pawn (or the exchange) for 8.
+                if (named < 3 && named * (named >= 2 ? 400 : 250) < drop)
                     f.push_back({"INSUFFICIENT", "names " + std::to_string(named) + " points for a drop of " +
                                                      std::to_string(drop) + " cp"});
             }

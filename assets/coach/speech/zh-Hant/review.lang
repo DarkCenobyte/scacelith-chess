@@ -171,6 +171,24 @@ demo.my.check.3 = {my}到{sq}，將軍！
 demo.my.mate = {my}走到{sq}。將死。
 demo.my.mate.2 = {my}走到{sq}，就將死了。
 demo.my.mate.3 = {my}到{sq}。這是將死。
+# Levels 1-3, the coach's in-between move ({t1}: the bigger piece taken next).
+demo.my.first.take = 首先，{my}吃掉{your}。{t1}可以等一等。
+demo.my.first.take.2 = {my}先吃掉{your}。{t1}還會在那裡。
+demo.my.first.check = {my}吃掉{your}，而且是將軍！{t1}可以等一等。
+demo.my.first.check.2 = 首先{my}吃掉{your}，同時將軍。{t1}還會在那裡。
+demo.my.first.check_move = 首先，用{my}在{sq}將軍。{t1}可以等一等。
+demo.my.first.check_move.2 = {my}走到{sq}：先將軍！{t1}還會在那裡。
+demo.my.first.move = 首先，{my}走到{sq}。{t1}可以等一等。
+demo.my.first.move.2 = 先把{my}走到{sq}。{t1}還會在那裡。
+demo.my.first.attacked = {my}受到攻擊，所以先吃掉{your}。
+demo.my.first.attacked.2 = {my}正被攻擊：它先吃掉{your}。
+# Levels 4-6.
+demo.first = 先走{move}：{t1}可以等一等。
+demo.first.2 = 首先{move}。{t1}還會在那裡。
+# After the rewind, no takeback offered: the coach's real move comes next.
+demo.play_on = 現在我走我的棋。
+demo.play_on.2 = 這才是我真正的一步。
+demo.play_on.3 = 現在我真的走棋了。
 # Levels 1-3, the player's moves (what they would play).
 demo.your.move = 你會把{your:bare}走到{sq}。
 demo.your.move.2 = 假設你把{your:bare}走到{sq}。
@@ -878,3 +896,7 @@ tb.fixed.2 = 更好了。
 tb.fixed.3 = 改得好。
 tb.same = 又是同一步？好吧，我們看看。
 tb.same.2 = 你很喜歡這步棋。那就走下去吧。
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = 很遺憾，這盤棋不能再悔棋了。
+tb.none_left.2 = 這盤棋你的悔棋次數已經用完了。

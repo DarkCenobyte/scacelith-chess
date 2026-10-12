@@ -858,7 +858,8 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     d.takenBack(after);
     d.g.takebackTo = human;
     Script s = takebackScript(true, human);
-    if (offered) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
+    // The replay is judged against it, but the pause menu's takeback uses none of the level's.
+    if (offered) append(s, d.reviewer.takebackAccepted(after, false));
     d.play(s);
 }
 
@@ -919,6 +920,16 @@ bool Session::finished() const {
 }
 
 bool Session::offerOpen() const { return d_->director.offerOpen(); }
+
+int Session::takebacksLeft() const {
+    const Impl& d = *d_;
+    if (!d.g.started || d.g.level == 0 || d.g.challenge) return -1;
+    return d.reviewer.takebacksLeft();
+}
+
+bool Session::offerUsesTakeback() const {
+    return takebacksLeft() >= 0 && d_->director.offerOpen() && d_->reviewer.offerUsesTakeback();
+}
 
 const std::vector<GameRecord>& Session::history() const { return d_->history; }
 bool Session::accuracyExplained() const { return d_->accuracyExplained; }

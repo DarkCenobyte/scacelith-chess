@@ -342,6 +342,89 @@ TEST(coach_tactics_move_facts_and_lines) {
     CHECK_EQ(line[4].balance, materialBalance(p1, White) + 1 - 2);
 }
 
+TEST(coach_tactics_prize_left_and_in_between) {
+    // The queen on d5 hangs to exd5 and the knight on a3 to Rxa3.
+    Position p = fen("r5k1/5ppp/4p3/3Q4/8/N7/5PPP/6K1 b - - 0 1");
+    CHECK_EQ(prizeLeft(p, san(p, "Rxa3")), sq("d5"));   // a knight taken, the queen left
+    CHECK_EQ(prizeLeft(p, san(p, "Kf8")), sq("d5"));    // a quiet move ignores it too
+    CHECK_EQ(prizeLeft(p, san(p, "exd5")), NoSquare);
+    // Never for a move that mates (Ra1# with the queen en prise on h4).
+    Position m = fen("r5k1/5p1p/8/6p1/7Q/8/5PPP/6K1 b - - 0 1");
+    CHECK_EQ(prizeLeft(m, san(m, "Ra1")), NoSquare);
+    CHECK_EQ(prizeLeft(m, san(m, "Ra2")), sq("h4"));
+    // replayLine keeps the prize. Rxa3 Kh1 exd5: the rook's capture comes first, the queen next.
+    const std::vector<LineStep> between = replayLine(p, {"a8a3", "g1h1", "e6d5"}, White);
+    CHECK_EQ(between.size(), size_t(3));
+    CHECK_EQ(between[0].prize, sq("d5"));
+    CHECK_EQ(between[0].prizeType, Queen);
+    CHECK_EQ(between[2].prize, NoSquare);
+    CHECK(isInBetween(between, 0));
+    CHECK(!isInBetween(between, 1));
+    // Rxa3 Qe4 (the queen walks away): no in-between move, the capture of a3 ignores the queen.
+    const std::vector<LineStep> ignored = replayLine(p, {"a8a3", "d5e4", "g8f8"}, White);
+    CHECK(!isInBetween(ignored, 0));
+    // A quiet move too, when the queen falls next ("first my king goes to f8, your queen can wait");
+    // not when the queen walks away.
+    const std::vector<LineStep> quiet = replayLine(p, {"g8f8", "g1h1", "e6d5"}, White);
+    CHECK(isInBetween(quiet, 0));
+    const std::vector<LineStep> away = replayLine(p, {"g8f8", "d5e4", "f8g8"}, White);
+    CHECK(!isInBetween(away, 0));
+    // The capture of #351: Nxe7+ Kh8 Nxa4, the check first, then the queen.
+    Position q = fen("3r1rk1/pp1qbbp1/n4p1p/2pP1N2/1P2PP2/P1N3P1/4QR1P/R1B3K1 b - - 1 24");
+    q.makeMove(san(q, "Qa4"));
+    const std::vector<LineStep> check = replayLine(q, {"f5e7", "g8h8", "c3a4"}, Black);
+    CHECK_EQ(check[0].prize, sq("a4"));
+    CHECK(check[0].check);
+    CHECK(isInBetween(check, 0));
+
+    // Winning as much back: the in-between moves, never a move after which the queen gets away.
+    CHECK_EQ(wonBackAt(between, 0), size_t(2));
+    CHECK_EQ(wonBackAt(quiet, 0), size_t(2));
+    CHECK_EQ(wonBackAt(ignored, 0), size_t(-1));
+    CHECK_EQ(wonBackAt(away, 0), size_t(-1));
+    // A threat: 19.Bxh6 f5! leaves the bishop to ...gxh6, but the pawn attacks the queen and takes it.
+    Position t = fen("r2q1rk1/3n1pp1/4p2B/ppbnN3/2p1Q2P/P5P1/NP2PPK1/2RR4 b - - 0 19");
+    const std::vector<LineStep> threat = replayLine(t, {"f7f5", "d1d5", "f5e4"}, White);
+    CHECK_EQ(threat[0].prize, sq("h6"));
+    CHECK_EQ(wonBackAt(threat, 0), size_t(2));
+    CHECK_EQ(followablePlies(threat, 2, true), size_t(3));
+    // Checks that end on a bigger capture: 58...Qe2 59.Rc8+ Kh7 60.Qf5+ g6 61.Qxd7+ (the knight was free
+    // at once; the checks come first).
+    Position k = fen("7k/1p1n2p1/8/1P1Q3p/8/8/p3q2P/2R4K w - - 2 59");
+    const std::vector<LineStep> checks = replayLine(k, {"c1c8", "h8h7", "d5f5", "g7g6", "f5d7"}, Black);
+    CHECK_EQ(checks[0].prize, sq("d7"));
+    CHECK_EQ(wonBackAt(checks, 0), size_t(4));
+    CHECK_EQ(followablePlies(checks, 5, true), size_t(5));
+    CHECK_EQ(followablePlies(checks, 3, false), size_t(0));
+    CHECK_EQ(followablePlies(checks, 3, true), size_t(5));
+
+    // followablePlies: where a line stops being followable.
+    CHECK_EQ(followablePlies(ignored, 3, true), size_t(0));
+    CHECK_EQ(followablePlies(away, 3, true), size_t(0));
+    // ...Kf8 Kh1 exd5: the reply leaves the rook on a8 to Qxa8+, and the in-between move goes with it.
+    CHECK_EQ(followablePlies(quiet, 3, true), size_t(0));
+    CHECK_EQ(followablePlies(between, 3, false), size_t(3));
+    // A part that stops between the in-between move and its capture: cut before it, or extended.
+    CHECK_EQ(followablePlies(between, 1, false), size_t(0));
+    CHECK_EQ(followablePlies(between, 1, true), size_t(3));
+    CHECK_EQ(followablePlies(between, 2, true), size_t(3));
+    // A line that ends before the capture cannot be extended.
+    const std::vector<LineStep> cut(between.begin(), between.begin() + 2);
+    CHECK_EQ(followablePlies(cut, 2, true), size_t(0));
+    // A mate within the part: material no longer counts. One past the part does not excuse it.
+    std::vector<LineStep> mate = ignored;
+    mate[2].mate = true;
+    CHECK_EQ(followablePlies(mate, 3, true), size_t(3));
+    CHECK_EQ(followablePlies(mate, 2, true), size_t(0));
+    // Either side's move counts: past ...Kf8 (its prize cleared here), Kh1 leaves the rook on a8 to
+    // Qxa8+. The moves before it are followable.
+    std::vector<LineStep> later = quiet;
+    later[0].prize = NoSquare;
+    CHECK_EQ(later[1].prize, sq("a8"));
+    CHECK_EQ(followablePlies(later, 3, true), size_t(1));
+    CHECK_EQ(followablePlies(later, 1, true), size_t(1));
+}
+
 TEST(coach_tactics_paths) {
     const std::vector<Square> n = movePath(Knight, sq("g1"), sq("f3"));
     CHECK_EQ(n.size(), size_t(3));

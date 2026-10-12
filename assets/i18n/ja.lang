@@ -1073,6 +1073,9 @@ coach.offer.text = もっと良い手を探せるように、コーチが最後�
 coach.offer.hint = Backspace で戻します。駒に触れるとそのまま続けます。
 coach.offer.accept = 手を戻す
 coach.offer.decline = 続ける
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = 手を戻せる回数：あと{0}回
 coach.pause.take_back = 自分の手を戻す
 coach.pause.take_back.help = 最後の手を戻します。コーチがすでに応じていれば、その手も戻します。
 coach.confirm.resign = この対局を投了しますか？コーチの勝ちになります。

@@ -1214,6 +1214,13 @@ void GameScene::coachHudFrame() {
         hud.hintKey = !hud.offer && (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) && rt.session.hintAvailable(game_);
         hud.progress = ui::challengeProgress(coachChallenge_, rt.session.challengePosition(), rt.session.challengePositions());
     }
+    // Levels 4-6: the takebacks the player may still accept, until the game ends (the session says
+    // -1 at levels 1-3, in the lesson and in a challenge). The card repeats the count when
+    // accepting it uses one.
+    if (rt.sessionRunning && state_ == State::Playing) {
+        hud.takebacksLeft = rt.session.takebacksLeft();
+        hud.offerCount = hud.offer && rt.session.offerUsesTakeback();
+    }
     ui::CoachHudAction act = ui::coachHud(hud);
     const plat::Input& in = plat::input();
     // Backspace takes the move back (H gives the hint); touching one of your pieces plays on, or

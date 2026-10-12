@@ -646,6 +646,19 @@ void keyHint(const Rect& screen, const std::string& key, const std::string& acti
     gfx::text(action, im::flipX(screen, x + kw + 16.0f), base, as);
 }
 
+// A line of the corner without a key ("Takebacks left: 3"): the actions' style and shadow, from
+// where the key caps begin.
+void cornerNote(const Rect& screen, const std::string& text, float base, float a) {
+    TextStyle as = style(font::FACE_ITALIC, 21.0f, withAlpha(ivoryDim, a), im::startAlign());
+    float x = 56.0f;
+    float aw = gfx::textWidth(text, as);
+    Rect back(x - 16.0f, base - 36.0f, aw + 32.0f, 52.0f);
+    gfx::radial(vec2(im::flip(screen, back).cx(), back.cy()), vec2(back.w * 0.75f, back.h * 1.2f), vec4(0, 0, 0, 0.45f * a), 0.0f, 1.0f);
+    gfx::text(text, im::flipX(screen, x), base, as);
+}
+
+std::string takebacksLeftText(int n) { return i18n::trf("coach.takebacks_left", {num(n)}); }
+
 }  // namespace
 
 CoachHudAction coachHud(const CoachHud& hud) {
@@ -675,6 +688,18 @@ CoachHudAction coachHud(const CoachHud& hud) {
         gfx::text(text, r.cx(), r.cy() + gfx::capHeight(ps) * 0.5f, ps);
     }
 
+    // "Takebacks left: 3" (levels 4-6), the bottom line of the start corner for the whole game: the
+    // key caps that come and go stack above it, so it never moves.
+    float base = v.y - 46.0f;
+    im::Anim& ta = im::anim(im::makeId("##coach.takebacks"));
+    ta.v[0] = im::approach(ta.v[0], hud.takebacksLeft >= 0 ? 1.0f : 0.0f, hud.takebacksLeft >= 0 ? 6.0f : 10.0f);
+    static int lastLeft = 0;  // kept while the line fades out
+    if (hud.takebacksLeft >= 0) lastLeft = hud.takebacksLeft;
+    if (ta.v[0] > 0.01f) {
+        cornerNote(screen, takebacksLeftText(lastLeft), base, ease(ta.v[0]));
+        base -= 46.0f * ease(ta.v[0]);
+    }
+
     // "Space  Skip", bottom start corner, while the coach says or shows something skippable; above
     // it (or in its place) "H  Hint" while the player may ask for a hint in a challenge.
     im::Anim& sa = im::anim(im::makeId("##coach.skiphint"));
@@ -687,7 +712,6 @@ CoachHudAction coachHud(const CoachHud& hud) {
         float skipW = std::max(64.0f, gfx::textWidth(skipKey, ks) + 26.0f), hintW = std::max(64.0f, gfx::textWidth(hintKey, ks) + 26.0f);
         // Stacked, the two caps take the same width so that their actions line up.
         float both = std::min(sa.v[0], ha.v[0]), wide = std::max(skipW, hintW);
-        float base = v.y - 46.0f;
         if (sa.v[0] > 0.01f) keyHint(screen, skipKey, T("coach.skip"), base, m::lerp(skipW, wide, both), ease(sa.v[0]));
         if (ha.v[0] > 0.01f)
             keyHint(screen, hintKey, T("coach.hint.key"), base - 50.0f * ease(sa.v[0]), m::lerp(hintW, wide, both), ease(ha.v[0]));
@@ -699,18 +723,22 @@ CoachHudAction coachHud(const CoachHud& hud) {
     oa.v[0] = im::approach(oa.v[0], hud.offer ? 1.0f : 0.0f, 10.0f);
     static std::string lastText;  // kept while the card fades out
     static bool lastHint = false;
+    static int lastCount = -1;    // the takebacks left it shows (-1: none), as before the answer
     if (hud.offer) {
         lastHint = hud.hintOffer;
         lastText = !hud.offerText.empty() ? hud.offerText : T(lastHint ? "coach.hint.text" : "coach.offer.text");
+        lastCount = hud.offerCount && !hud.hintOffer ? hud.takebacksLeft : -1;
     }
     if (oa.v[0] > 0.01f) {
         const std::string title = T(lastHint ? "coach.hint.title" : "coach.offer.title");
         const std::string keys = T(lastHint ? "coach.hint.hint" : "coach.offer.hint");
+        const std::string count = lastCount >= 0 ? takebacksLeftText(lastCount) : std::string();
         float t = ease(oa.v[0]);
         float w = 480.0f;
         TextStyle ts = style(font::FACE_ITALIC, kSmall, ivory, HAlign::Center);
         int lines = std::min(3, gfx::wrapLineCount(lastText, w - 60.0f, ts));
-        float h = 190.0f + 28.0f * float(lines);
+        float countH = count.empty() ? 0.0f : 30.0f;
+        float h = 190.0f + 28.0f * float(lines) + countH;
         Rect r = im::flip(screen, Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
         im::occlude(r);
@@ -723,6 +751,12 @@ CoachHudAction coachHud(const CoachHud& hud) {
         im::ornamentRule(r.cx(), r.y + 62.0f, 90.0f);
         gfx::textWrapped(lastText, r.cx(), r.y + 96.0f, w - 60.0f, ts, 28.0f);
         float y = r.y + 96.0f + 28.0f * float(lines);
+        if (!count.empty()) {
+            TextStyle cs = style(font::FACE_TEXT, 18.0f, gold, HAlign::Center);
+            cs.size = gfx::fitSize(count, cs, w - 40.0f, 0.75f);
+            gfx::text(count, r.cx(), y + 4.0f, cs);
+            y += countH;
+        }
         TextStyle hs = style(font::FACE_ITALIC, 18.0f, muted, HAlign::Center);
         hs.size = gfx::fitSize(keys, hs, w - 40.0f, 0.75f);
         gfx::text(keys, r.cx(), y + 4.0f, hs);

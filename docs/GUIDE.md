@@ -140,14 +140,24 @@ your colour (White, Black, or alternating from one game to the next); the choice
   option apply as in a normal game.
 - After your move the coach may say what it saw: a threat, a good move, a mistake. It points at
   the pieces and squares it talks about, which light up in blue on the board, and it can show a
-  line by playing it with its own hand, then put the pieces back. At levels 1 to 3 it plays the
-  whole sequence, down to the piece lost or the mate, and says what it cost; from level 4 it plays
-  up to where the problem stands and points at what falls next. A reason is given only when the
-  board proves it (the material really lost for good, beyond what the best move loses, and enough
-  to explain the mistake), else the coach only names the better move. A move that costs a little
-  is called a small slip, never a mistake with a made-up line. After a blunder it has shown, it
-  offers to take your move back: **Take back** or **Backspace** accepts, **Play on** or touching
-  one of your pieces declines.
+  line by playing it with its own hand, then put the pieces back. A line never leaves a bigger
+  piece en prise to take a smaller one; when the coach plays another move first (a check, a
+  capture, a threat), it wins at least as much back, and says so when the bigger piece only has to
+  wait. At levels 1 to 3 it plays the whole sequence, down to the piece lost or the mate, and says
+  what it cost; from level 4 it plays up to where the problem stands and points at what falls
+  next. A reason is given only when the board proves it (the material really lost for good, beyond
+  what the best move loses, and enough to explain the mistake), else the coach only names the
+  better move. A move that costs a little is called a small slip, never a mistake with a made-up
+  line. A mistake (less than a blunder) is explained in words only, without playing the line: the
+  coach then plays its own move, and you answer it. After a blunder it has shown, it offers to take
+  your move back: **Take back** or
+  **Backspace** accepts, **Play on** or touching one of your pieces declines. At levels 4 to 6 these
+  takebacks are counted, 5, 3 and 2 a game: only the offers you accept use one (never the offer
+  after a mate allowed or missed, nor the menu's own takeback), and "Takebacks left" in the bottom
+  corner, under the key hints, and on the offer card shows how many remain. Once they are used up,
+  the coach says so, once, and offers no more takebacks in that game. When it shows a line without
+  that offer (a game you still clearly win, the level's takebacks used up), it says that its own
+  move comes next once the pieces are back.
 - **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
   move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
   draw, resign, options, main menu (abandons the game).

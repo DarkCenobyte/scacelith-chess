@@ -54,6 +54,15 @@ struct Ctx {
     int lossAfter(int plies) const;
     // The most the human is down for good after any of the first 'plies' plies of r.
     int lossWithin(int plies) const;
+    // The plies of r, at most 'want', the coach can show or say (followablePlies): never a move that
+    // leaves a bigger prize standing (a knight taken while the queen is en prise: whatever the
+    // engine's reason, the table would show the queen ignored), unless its side wins as much back
+    // (an in-between move, checks that end on a bigger capture: wonBackAt), which comes with that
+    // capture: 'extend' goes on to it, else the part stops before the move. r itself is the
+    // engine's line, whole: what is lost along it is counted on all of it.
+    int followable(int want, bool extend) const;
+    // The plies of the best line, at most 'want', the coach can say (at least its first move).
+    int followableBest(int want) const;
 };
 
 // pov's material change, for good, after the first 'plies' plies of 'line' (relative to 'base'; 'end'

@@ -1084,6 +1084,9 @@ coach.offer.text = The coach offers to take your last move back, so that you can
 coach.offer.hint = Backspace takes it back. Touching a piece plays on.
 coach.offer.accept = Take back
 coach.offer.decline = Play on
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Takebacks left: {0}
 coach.pause.take_back = Take back my move
 coach.pause.take_back.help = Takes back your last move, and the coach's reply if it has already played.
 coach.confirm.resign = Resign this game? The coach will be declared the winner.

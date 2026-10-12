@@ -1073,6 +1073,9 @@ coach.offer.text = Тренер предлагает взять ваш посл�
 coach.offer.hint = Backspace — взять назад. Коснуться фигуры — играть дальше.
 coach.offer.accept = Взять назад
 coach.offer.decline = Играть дальше
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Осталось возвратов хода: {0}
 coach.pause.take_back = Взять мой ход назад
 coach.pause.take_back.help = Отменяет ваш последний ход, а также ответ тренера, если он уже сходил.
 coach.confirm.resign = Сдать эту партию? Победителем будет объявлен тренер.

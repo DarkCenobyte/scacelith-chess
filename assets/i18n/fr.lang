@@ -1073,6 +1073,9 @@ coach.offer.text = Le coach vous propose de reprendre votre dernier coup, pour e
 coach.offer.hint = Retour arrière pour le reprendre. Toucher une pièce, c’est continuer.
 coach.offer.accept = Reprendre
 coach.offer.decline = Continuer
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Reprises restantes : {0}
 coach.pause.take_back = Reprendre mon coup
 coach.pause.take_back.help = Reprend votre dernier coup, et la réponse du coach s’il l’a déjà jouée.
 coach.confirm.resign = Abandonner cette partie ? Le coach sera déclaré vainqueur.

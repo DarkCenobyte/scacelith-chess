@@ -127,7 +127,7 @@ struct Band {
     int sentences = 3;          // Say lines per explanation (demo narration, rewind and offer excluded)
     int remarksPer10 = 5;       // unsolicited remarks (praise, tips, mistakes) per 10 human moves
     int praiseEvery = 3;        // at most one praise per this many human moves
-    int offerCap = -1;          // takeback offers per game (-1: no cap)
+    int offerCap = -1;          // takebacks the player may accept per game (-1: no cap)
     float demoPause = 0.8f;     // pause after a demonstration move lands
 };
 Band band(int level);           // clamped to 1..6
@@ -186,11 +186,20 @@ public:
     // The player's answer to an offer. Accepted: call after Game::undo(1); returns the hint
     // (levels 1-2) and remembers the move so the replay is judged against it. Declined: nothing
     // is said by the review (the director says the events line) and nothing is remembered.
-    Script takebackAccepted(const chess::Game& g);
+    // fromOffer: the player took the card. The pause menu's takeback of an offered move passes
+    // false: the replay is judged the same way, but the level's takebacks (Band::offerCap) count
+    // only those the coach offered and the player accepted.
+    Script takebackAccepted(const chess::Game& g, bool fromOffer = true);
     void takebackDeclined();
 
     int offersMade() const { return offers_; }
     int humanMoves() const { return humanMoves_; }
+    // Levels 4-6: the takebacks the player may still accept this game (Band::offerCap less those
+    // accepted; an offer about a mate is made and taken back whatever the count). -1 without a cap
+    // (levels 1-3) or without offers.
+    int takebacksLeft() const;
+    // The last offer, accepted, uses one of those takebacks (a capped level, not a mate's offer).
+    bool offerUsesTakeback() const;
 
 private:
     int level_ = 1;
@@ -201,6 +210,8 @@ private:
     int lastSlip_ = -1000;            // humanMoves_ at the last inaccuracy remarked on
     std::deque<int> remarks_;         // humanMoves_ of each unsolicited remark (sliding window of 10)
     int offers_ = 0;
+    int takebacks_ = 0;               // offers accepted that count against Band::offerCap
+    bool noneLeftSaid_ = false;       // "no more takebacks this game" (once per game)
     bool brilliantDone_ = false;
     int bookPraises_ = 0;
     bool castlePraised_ = false;

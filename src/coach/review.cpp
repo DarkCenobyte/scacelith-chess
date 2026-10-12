@@ -230,6 +230,14 @@ void limitPointing(Beat& b) {
 
 int Ctx::lossAfter(int plies) const { return heldLoss(r, size_t(std::max(0, plies)), base, human, rEnd); }
 
+int Ctx::followable(int want, bool extend) const {
+    return int(followablePlies(r, size_t(std::max(0, want)), extend));
+}
+
+int Ctx::followableBest(int want) const {
+    return std::max(std::min(want, 1), int(followablePlies(best, size_t(std::max(0, want)), true)));
+}
+
 int Ctx::lossWithin(int plies) const {
     int worst = 0;
     const int n = std::min<int>(plies, int(r.size()));
@@ -242,7 +250,9 @@ bool Ctx::lossExplains(int lost, bool pawn) const {
     // the move must lose two points more (one for a pawn).
     const int need = pawn || bestLoss == 0 ? 1 : 2;
     if (lost < need || lost - bestLoss < need) return false;
-    return lost >= 3 || 250 * lost >= dropCp;
+    // A pawn explains a drop of up to 2.5 pawns; a piece for a pawn (or the exchange) up to 8: the
+    // engine counts a minor piece well above three pawns, more so with the position it leaves.
+    return lost >= 3 || (lost >= 2 ? 400 : 250) * lost >= dropCp;
 }
 
 bool Ctx::concreteLoss(int plies) const {
@@ -338,12 +348,30 @@ namespace {
 
 Line narration(const Ctx& c, const Position& before, const LineStep& st, int i) {
     Line l;
+    // The coach's in-between move says why the bigger prize waits ({t1}: it is taken next).
+    const bool between = st.mover == c.coach && isInBetween(c.r, size_t(i));
     if (c.level >= 4) {
-        l.key = "demo.move";
+        l.key = between ? "demo.first" : "demo.move";
         l.with("move", moveArg(st));
+        if (between) l.with("t1", pieceArg(before, st.prize, c.human));
         return l;
     }
     const Square capSq = (st.move.flags & MoveEnPassant) ? Square(st.move.to + (st.mover == White ? -8 : 8)) : st.move.to;
+    if (between) {
+        // "My queen is attacked, so it takes your bishop first" (the piece would be lost anyway),
+        // "my knight takes your rook, with check: your queen can wait", "first, check with my rook",
+        // "first, my bishop goes to f5".
+        l.with("my", pieceArg(before, st.move.from, c.human)).with("sq", Arg::ofSquare(st.move.to));
+        l.with("t1", pieceArg(before, st.prize, c.human));
+        if (st.captured == NoPiece) {
+            l.key = st.check ? "demo.my.first.check_move" : "demo.my.first.move";
+        } else {
+            l.with("your", Arg::ofPiece(st.captured, c.human, true, capSq));
+            const bool attacked = seeSquarePoints(before, st.move.from, c.human) > 0;
+            l.key = attacked ? "demo.my.first.attacked" : st.check ? "demo.my.first.check" : "demo.my.first.take";
+        }
+        return l;
+    }
     if (st.mover == c.coach) {
         l.with("my", pieceArg(before, st.move.from, c.human)).with("sq", Arg::ofSquare(st.move.to));
         if (st.mate) l.key = "demo.my.mate";
@@ -427,10 +455,11 @@ void planDemo(const Ctx& c, Explanation& ex) {
     ex.demoPlies = 0;
     ex.full = false;
     if (ex.missed || c.r.empty() || c.r[0].mover != c.coach || ex.fullPlies <= 0) return;
-    const int reach = std::min(int(c.r.size()), beforeHumanPromotion(c));
+    // Never past a move the player could not follow (Ctx::followable).
+    const int reach = std::min({int(c.r.size()), beforeHumanPromotion(c), c.followable(int(c.r.size()), true)});
     // Levels 1-3: the whole sequence, when the level can follow it.
     const int fullCap = ex.mate ? c.b.mateLinePlies : c.b.demoPlies;
-    if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap)) {
+    if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap) && c.followable(ex.fullPlies, false) == ex.fullPlies) {
         ex.full = true;
         ex.demoPlies = ex.fullPlies;
         return;
@@ -442,7 +471,9 @@ void planDemo(const Ctx& c, Explanation& ex) {
         return;
     }
     // Up to where the problem stands, and the coach points at what comes next.
-    if (ex.threatPlies <= 0 || ex.threatPlies >= ex.fullPlies || ex.threatPlies > std::min(reach, c.b.demoPlies)) return;
+    if (ex.threatPlies <= 0 || ex.threatPlies >= ex.fullPlies || ex.threatPlies > std::min(reach, c.b.demoPlies) ||
+        c.followable(ex.threatPlies, false) < ex.threatPlies)
+        return;
     ex.demoPlies = ex.threatPlies;
     Beat b;
     if (ex.threatTail.empty() && !designation(c, ex, afterPlies(c, ex.threatPlies), b)) ex.demoPlies = 0;
@@ -562,6 +593,10 @@ ai::PvLine terminalLine(const Position& p1, const std::string& uci) {
     else l.score.cp = 0;
     return l;
 }
+
+// A mate allowed or missed is offered back whatever the level's count of takebacks
+// (Band::offerCap), and taking it back does not use one.
+bool mateOffer(ExType t) { return t == ExType::MateAllowed || t == ExType::MateMissed; }
 
 }  // namespace
 
@@ -849,6 +884,10 @@ Review Reviewer::review(const ReviewInput& in) {
     if (voice && (cls == MoveClass::Forced || cls == MoveClass::Book) && !mateType && ex.type != ExType::Stalemate) voice = false;
     if (voice && isRemark && !remarkAllowed()) voice = false;
     if (voice && retry && out.takeback.same) voice = false;
+    // A mistake, not a blunder, with a reason the board shows: said in words, without a
+    // demonstration (nor a takeback); the coach then plays its move and the player answers it.
+    // Mates and a piece lost while the game stays one-sided (hiddenLoss) are still shown.
+    const bool spoken = cls == MoveClass::Mistake && reason && !hiddenLoss && !mateType && ex.type != ExType::Stalemate;
     if (!voice) slip = false;
     // A principle instead (opening, technique): never a fault claim, Low priority, once per game each.
     Explanation tipEx;
@@ -891,12 +930,14 @@ Review Reviewer::review(const ReviewInput& in) {
         // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
         const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
         bool offer = (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) || (ex.offer && !hiddenLoss && !wonAnyway);
-        if (bd.offerCap >= 0 && offers_ >= bd.offerCap && !(ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed))
-            offer = false;
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
         if (g.isOver()) offer = false;   // the move (or a draw meanwhile) ended the game: nothing to take back
+        // Levels 4-6: no offer once the player has taken back the level's count of moves (an offer
+        // declined costs nothing). The coach says so, once, where the offer would have been.
+        const bool noneLeft = offer && bd.offerCap >= 0 && takebacks_ >= bd.offerCap && !mateOffer(ex.type);
+        if (noneLeft) offer = false;
 
         // Sentence budget: verdict, cause, tip, better move (the demonstration's own lines, the rewind
         // and the offer excluded).
@@ -918,6 +959,7 @@ Review Reviewer::review(const ReviewInput& in) {
         int budget = bd.sentences - (verdictKey.empty() ? 0 : 1);
         std::vector<Beat> cause = ex.cause, tip = ex.tip;
         Explanation shown = ex;
+        if (spoken) shown.demoPlies = 0;
         if (level_ == 2 && cls == MoveClass::Mistake) {   // "one sentence"
             if (cause.size() > 1) cause.resize(1);
             tip.clear();
@@ -954,7 +996,11 @@ Review Reviewer::review(const ReviewInput& in) {
         if (better) {
             // {line} is what follows {best} ("Nf3, with the idea d4 c5"), never {best} again; level 5
             // names that idea, so without a continuation it says the level-4 line instead.
-            std::string idea = sanLine(c.best, 1, size_t(std::max(1, std::min(4, bd.linePlies) - 1)));
+            // Never past a move the player could not follow, a win-back with its capture
+            // (followablePlies).
+            const size_t ideaPlies = size_t(std::max(1, std::min(4, bd.linePlies) - 1));
+            const size_t sayable = followablePlies(c.best, 1 + ideaPlies, true);
+            std::string idea = sanLine(c.best, 1, sayable > 0 ? sayable - 1 : 0);
             Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
             bb.line.with("best", moveArg(c.best[0]))
                 .with("move", Arg::ofMove(c.playedSan, c.playedUci))
@@ -981,6 +1027,16 @@ Review Reviewer::review(const ReviewInput& in) {
             offeredHint_ = ex.hintSquare;
             out.offersTakeback = true;
             v.offered = true;
+        } else {
+            if (noneLeft && !noneLeftSaid_) {
+                s.push_back(sayBeat("tb.none_left", Look::Player, ply));
+                noneLeftSaid_ = true;
+            }
+            if (demo && !g.isOver()) {
+                // The pieces are back and no takeback is offered: the coach's real move comes next,
+                // said last so that the player does not take it for more of the demonstration.
+                s.push_back(sayBeat("demo.play_on", Look::Player, ply));
+            }
         }
     } else if (tip) {
         // A principle, said as a tip (Low priority).
@@ -1132,11 +1188,13 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before) {
     return s;
 }
 
-Script Reviewer::takebackAccepted(const Game& g) {
+Script Reviewer::takebackAccepted(const Game& g, bool fromOffer) {
     Script s;
     if (offered_.ply < 0) return s;
     retryPending_ = true;
     retry_ = offered_;
+    // The card answered yes: one of the level's takebacks gone (levels 4-6, not for a mate).
+    if (fromOffer && offerUsesTakeback()) ++takebacks_;
     if (level_ > 2) return s;
     const int ply = int(g.moves().size());
     const Position& p = g.position();
@@ -1164,6 +1222,16 @@ Script Reviewer::takebackAccepted(const Game& g) {
 
 void Reviewer::takebackDeclined() {
     retryPending_ = false;
+}
+
+int Reviewer::takebacksLeft() const {
+    const int cap = band(level_).offerCap;
+    if (cap < 0 || !offersEnabled_) return -1;
+    return std::max(0, cap - takebacks_);
+}
+
+bool Reviewer::offerUsesTakeback() const {
+    return offered_.ply >= 0 && band(level_).offerCap >= 0 && !mateOffer(offered_.firstType);
 }
 
 }  // namespace coach
