@@ -119,6 +119,20 @@ move.check.spoken = {move}, Schach
 move.mate.spoken = {move}, Schachmatt
 moves.join.spoken = {a}, {b}
 
+# ---- Respellings (spoken) ----------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). Loanwords keep their
+# German chess pronunciation: "Remis" without its s (the voice says "Remies"), "en passant" the French
+# way (the voice says "ein Passant"), "Fianchetto" with a k (the voice says "Fiantschetto"); the
+# Slovene name "Pirc" ends in "z" (the voice says "Pirk").
+respell.remis = remie
+respell.en = ang
+respell.passant = passang
+respell.fianchetto = fianketto
+respell.fianchettos = fiankettos
+respell.fianchettiert = fiankettiert
+respell.fianchettieren = fiankettieren
+respell.pirc = pirz
+
 # ---- Numbers -------------------------------------------------------------------------------------
 # German writes numbers under a million as one word: 21-99 as "{units}und{tens}" ("dreiundzwanzig");
 # the numbers ending in one are spelled out ("einundzwanzig", not "einsundzwanzig").
