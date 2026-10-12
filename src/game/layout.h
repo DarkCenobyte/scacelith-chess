@@ -4,10 +4,10 @@
 //     (rank 1 at +Z). White sits at +Z looking towards -Z; Black sits at -Z looking towards +Z.
 //   * Floor at y = 0. Table top at TABLE_TOP_Y, board playing surface at BOARD_TOP_Y.
 //   * The hall's three tall windows are in the -X wall (White's left, Black's right).
-//   * The chess clock stands on the table at the human player's right-hand side in a game against
-//     Stockfish, the coach or a remote opponent (x = +CLOCK_OFFSET_X when the human plays White,
-//     -CLOCK_OFFSET_X when Black), where the New Game page puts it in a hot-seat game, and at
-//     White's right (+X) when watching or replaying (GameScene::setupNewGame).
+//   * The chess clock always stands on the table at +X, on the side away from the windows, its
+//     displays facing them: lit from the front, never against the light, whichever colour the
+//     human plays and in every mode (CLOCK_ON_POSITIVE_X). White therefore has it at its right
+//     hand and Black at its left, and both clients of an online game set up the same table.
 #pragma once
 #include "../math/math.h"
 #include <cmath>
@@ -124,6 +124,12 @@ inline m::vec2 captureSlot(int k) {
 }
 
 // ---- Clock -----------------------------------------------------------------------------------
+// The side of the table holding the clock in every game: +X, opposite the window wall
+// (HALL_MIN_X), so that the light falls on its displays (they face the board, towards -X). Before
+// 1.0.1 it stood at the human player's right, which put it against the light when they played
+// Black. The World, the PhysicalBoard and the scoresheets still take either side (the scoresheet
+// viewer's --clock-left).
+constexpr bool CLOCK_ON_POSITIVE_X = true;
 constexpr float CLOCK_OFFSET_X = 0.405f;     // |x| of the clock centre
 constexpr float CLOCK_Z = 0.0f;              // centred between the players
 constexpr float CLOCK_WIDTH = 0.19f;         // along Z (faces the side), displays face each player

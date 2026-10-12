@@ -9,7 +9,6 @@ Players Players::swapped() const {
     Players p = *this;
     std::swap(p.names[0], p.names[1]);
     std::swap(p.hands[0], p.hands[1]);
-    p.clockRightOf = 1 - (clockRightOf & 1);
     return p;
 }
 

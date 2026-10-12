@@ -217,13 +217,13 @@ void GameScene::finishLoading() {
     // The loading screen's frames went through the renderer with an empty scene: the static sun
     // shadows and the light probes are baked again from the world, on the first frame that draws it.
     ctx_->renderer->invalidateStatic();
-    if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
+    if (!scorekeeper_.init(layout::CLOCK_ON_POSITIVE_X)) LOGW("scoresheets unavailable");
     ai::Engine::setArchLimit(settings().engineArch);
     engineOk_ = engine_.start();
     if (!engineOk_) LOGW("Stockfish is unavailable: the opponent will play random legal moves");
     initAnimators();
-    board_.reset(true);
-    world_.setClockSide(true);
+    board_.reset(layout::CLOCK_ON_POSITIVE_X);
+    world_.setClockSide(layout::CLOCK_ON_POSITIVE_X);
     clock_.setup(chosenTimeControl());
     if (!startOnline_.empty()) {
         // --start-online: straight to the table once an opponent is found (at once with the fakes).
@@ -398,8 +398,8 @@ void GameScene::enterMenu() {
     game_.setEndDetection(true);
     game_.reset();
     arbiter_.reset(game_);
-    board_.reset(true);
-    world_.setClockSide(true);
+    board_.reset(layout::CLOCK_ON_POSITIVE_X);
+    world_.setClockSide(layout::CLOCK_ON_POSITIVE_X);
     clock_.setup(chosenTimeControl());
     leverSide_ = leverTarget_ = -1.0f;
     dest_.clear();
@@ -504,11 +504,9 @@ void GameScene::setupNewGame() {
             hsPlayers_.hands[i] = hand >= 0 ? std::clamp(hand, 0, int(ui::font::HAND_STYLE_COUNT) - 1)
                                             : i == 0 ? mine : (mine + 1) % int(ui::font::HAND_STYLE_COUNT);
         }
-        hsPlayers_.clockRightOf = std::clamp(setup_.clockRightOf, 0, 1);
         hsPlayers_.rated = setup_.rated;
-        LOGI("New game (hot-seat): %s (White) vs %s (Black), %s, clock at %s's right, %s", hsPlayers_.names[0].c_str(),
-             hsPlayers_.names[1].c_str(), chosenTimeControl().label().c_str(), hsPlayers_.names[hsPlayers_.clockRightOf].c_str(),
-             hsPlayers_.rated ? "rated" : "friendly");
+        LOGI("New game (hot-seat): %s (White) vs %s (Black), %s, %s", hsPlayers_.names[0].c_str(), hsPlayers_.names[1].c_str(),
+             chosenTimeControl().label().c_str(), hsPlayers_.rated ? "rated" : "friendly");
     } else {
         humanColor_ = s.nextColor < 0 ? (rng_.uniform() < 0.5f ? White : Black) : Color(s.nextColor & 1);
         std::string forced = ctx_->argValue("--human");
@@ -527,9 +525,9 @@ void GameScene::setupNewGame() {
     if (replaying() && !replayRecord_.fen.empty() && !game_.resetFromFEN(replayRecord_.fen))
         LOGW("replay: the start position '%s' cannot be set up", replayRecord_.fen.c_str());
     arbiter_.reset(game_);
-    // At the human player's right hand; at White's right when watching; where the New Game page
-    // put it in a hot-seat game.
-    bool clockPosX = hotSeat() ? hotseat::clockOnPositiveX(hsPlayers_.clockRightOf) : (watching() || humanColor_ == White);
+    // Opposite the windows in every mode, whichever colour the human plays (layout.h): the
+    // player with Black has it at their left and plays with the left hand.
+    const bool clockPosX = layout::CLOCK_ON_POSITIVE_X;
     world_.setClockSide(clockPosX);
     board_.reset(clockPosX);
     if (replaying() && !replayRecord_.fen.empty()) board_.syncTo(game_.position());  // a FEN game

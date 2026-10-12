@@ -16,19 +16,18 @@ namespace hotseat {
 // online, the seat to move in a hot-seat game.
 inline int inputSeat(bool hotSeat, int humanSeat, int seatToMove) { return hotSeat ? (seatToMove & 1) : (humanSeat & 1); }
 
-// Seat 0 (White) sits at +Z facing -Z, so its right is +X; Black's right is -X.
-inline bool clockOnPositiveX(int clockRightOfSeat) { return (clockRightOfSeat & 1) == 0; }
 // The seat whose clock stands on its left plays (moves and presses the clock) with its left hand,
-// and writes with its right one.
+// and writes with its right one. Seat 0 (White) sits at +Z facing -Z, so its right is +X; Black's
+// right is -X. With the clock opposite the windows, at +X (layout.h), Black plays left-handed.
 inline bool playsLeftHanded(int seat, bool clockOnPositiveX) { return ((seat & 1) == 0) != clockOnPositiveX; }
 
 // The two players of a hot-seat game, by colour (0 White, 1 Black), as the New Game page set them.
 struct Players {
     std::string names[2];
     int hands[2] = {0, 1};  // handwriting of each (ui::font::HandStyle)
-    int clockRightOf = 0;   // colour at whose right the clock stands (FIDE 6.5: the arbiter decides)
     bool rated = false;     // rated between the two names (local ratings, not the rating against Stockfish)
-    // The rematch: colours swapped. The clock follows its player, so each keeps their hand.
+    // The rematch: colours swapped. The clock stays opposite the windows, so the playing hands
+    // change with the colours.
     Players swapped() const;
 };
 

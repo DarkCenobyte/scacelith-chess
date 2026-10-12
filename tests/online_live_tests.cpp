@@ -232,6 +232,65 @@ TEST(live_side_look_falls_on_the_table_beside_the_board) {
     CHECK(!live::lookBesideBoard(kEye, normalize(vec3(0.5f, 0.3f, -1.0f))));
 }
 
+// A Side look reaches the receiver's copy of what the sender looked at, between any two clients:
+// 1.0.0 (the clock at its own player's right, Side yaws sent as they are and always negated when
+// received) and 1.0.1 (the clock at +X for both players, live::sideLookYaw both ways), with the
+// sender playing either colour. A look at the board is never touched.
+TEST(live_side_look_lands_on_the_same_thing_on_both_tables) {
+    struct Client {
+        bool v101;
+        int human;   // the seat of its player (0 White)
+        bool clockPosX() const { return v101 ? layout::CLOCK_ON_POSITIVE_X : human == 0; }
+        bool clockAtRight(int seat) const { return (seat == 0) == clockPosX(); }
+        float send(float yaw, bool side) const { return v101 ? live::sideLookYaw(yaw, side, clockAtRight(human)) : yaw; }
+        float receive(float wire, bool side) const {
+            const int robot = 1 - human;
+            return v101 ? live::sideLookYaw(wire, side, clockAtRight(robot)) : side ? -wire : wire;
+        }
+        // What lies beside the board on this table: the clock, a capture slot of the seat's half
+        // (clock side), the seat's own scoresheet (the other side).
+        vec3 clock() const { return vec3(clockPosX() ? layout::CLOCK_OFFSET_X : -layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y, layout::CLOCK_Z); }
+        vec3 capture(int seat) const {
+            const vec2 s = layout::captureSlot(0);
+            return vec3(clockPosX() ? s.x : -s.x, layout::TABLE_TOP_Y, seat == 0 ? s.y : -s.y);
+        }
+        vec3 pad(int seat) const {
+            return vec3(clockPosX() ? -layout::SCORESHEET_X : layout::SCORESHEET_X, layout::TABLE_TOP_Y,
+                        seat == 0 ? layout::SCORESHEET_Z : -layout::SCORESHEET_Z);
+        }
+    };
+    // The seat-relative yaw from a seated player's eyes to a point (> 0 to the left).
+    auto yawFrom = [](int seat, vec3 p) {
+        const float zs = seat == 0 ? 1.0f : -1.0f;   // the seat faces -Z * zs
+        const vec3 d = p - vec3(0.0f, layout::EYE_HEIGHT, zs * layout::PLAYER_PELVIS_Z);
+        return std::atan2(-zs * d.x, -zs * d.z);
+    };
+    int cases = 0;
+    for (int senderV = 0; senderV < 2; ++senderV)
+        for (int receiverV = 0; receiverV < 2; ++receiverV)
+            for (int seat = 0; seat < 2; ++seat) {
+                const Client from{senderV == 1, seat}, to{receiverV == 1, 1 - seat};
+                for (int what = 0; what < 3; ++what) {
+                    const vec3 there = what == 0 ? from.clock() : what == 1 ? from.capture(seat) : from.pad(seat);
+                    const vec3 here = what == 0 ? to.clock() : what == 1 ? to.capture(seat) : to.pad(seat);
+                    const float wire = from.send(yawFrom(seat, there), true);
+                    const float shown = to.receive(wire, true);
+                    if (!near(shown, yawFrom(seat, here)))
+                        std::fprintf(stderr, "  %s %s -> %s, thing %d: yaw %.3f, wanted %.3f\n", seat == 0 ? "White" : "Black",
+                                     senderV ? "1.0.1" : "1.0.0", receiverV ? "1.0.1" : "1.0.0", what, shown, yawFrom(seat, here));
+                    CHECK(near(shown, yawFrom(seat, here)));
+                    ++cases;
+                }
+                // A look at the board (not Side) goes and comes as it is.
+                const float board = yawFrom(seat, layout::squareCenter(2, 5));
+                CHECK(near(to.receive(from.send(board, false), false), board));
+            }
+    CHECK_EQ(cases, 24);
+    // Two 1.0.1 clients set up the same table.
+    const Client white{true, 0}, black{true, 1};
+    CHECK_EQ(white.clockPosX(), black.clockPosX());
+}
+
 // ---- The opponent's gestures -------------------------------------------------------------------
 
 TEST(live_piece_fields_apply_only_to_the_move_being_prepared) {

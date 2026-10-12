@@ -63,7 +63,7 @@ public:
         ctx_ = &ctx;
         while (!world_.loadStep(true)) {}
         world_.setupRenderer(*ctx.renderer);
-        world_.setClockSide(true);
+        world_.setClockSide(layout::CLOCK_ON_POSITIVE_X);
         human_ = std::atoi(ctx.argValue("--human", "0").c_str()) == 1 ? 1 : 0;
         coach_ = 1 - human_;
         if (!ctx.hasArg("--no-marking")) world_.setCoachSeat(coach_);

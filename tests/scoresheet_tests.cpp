@@ -294,6 +294,18 @@ TEST(scoresheet_pen_path) {
         CHECK(std::fabs(markSplit(cp, -2.9f) - smallSplit) < 1e-4f);
 }
 
+// Every game puts the clock opposite the windows (the -X wall), its displays facing them: both
+// players' pads lie on the window side, each in front of its owner, whatever colour the human plays.
+TEST(scoresheet_pads_lie_on_the_window_side) {
+    CHECK(layout::CLOCK_ON_POSITIVE_X);
+    CHECK(layout::HALL_MIN_X < 0.0f);   // the window wall
+    for (int owner = 0; owner < 2; ++owner) {
+        const PadFrame f = padFrame(owner, layout::CLOCK_ON_POSITIVE_X);
+        CHECK(f.center.x < 0.0f);
+        CHECK((f.center.z > 0.0f) == (owner == 0));
+    }
+}
+
 TEST(scoresheet_pad_placement) {
     const float tableX = 0.5f * layout::TABLE_WIDTH, tableZ = 0.5f * layout::TABLE_DEPTH;
     const float boardHalf = 0.5f * layout::BOARD_SIZE;

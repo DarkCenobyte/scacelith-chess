@@ -80,11 +80,11 @@ struct NewGameSetup {
     bool limitElo = false;
     int elo = 1800, depth = 0, moveTimeMs = 0, nodes = 0;
     // Hot-seat (opponent 1), by colour (0 White, 1 Black): the players' names as written on the
-    // scoresheets (never empty once the page has run), their handwriting (font::HandStyle), the
-    // colour at whose right the clock stands (the other player plays left-handed), rated or friendly.
+    // scoresheets (never empty once the page has run), their handwriting (font::HandStyle), rated
+    // or friendly. The clock stands opposite the windows, at White's right (game/layout.h): Black
+    // plays left-handed.
     std::string names[2];
     int hands[2] = {0, 1};
-    int clockRightOf = 0;
     bool rated = false;
 };
 

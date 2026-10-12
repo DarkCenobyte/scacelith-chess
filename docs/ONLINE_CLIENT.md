@@ -392,9 +392,12 @@ same as against Stockfish, with these differences:
     back: once the hands are idle the board is set up from the game again, behind a short dip.
   - Their head: while their last gesture is under 2.5 keepalives old (2.5 s by default) and both
     players are connected, the robot's head follows their look with a critically damped spring
-    and leans with them. A `Side` look turns the other way here (each client puts the clock at
-    its own player's right, so what lies beside the board is mirrored), and a `Glance` turns the
-    head to the robot's own scoresheet on this table, its writing hand waiting aside meanwhile.
+    and leans with them. A `Side` look comes as if their clock stood at their right (protocol 1's
+    convention, from the clients before 1.0.1, which put the clock at their own player's right):
+    since 1.0.1 both clients put it at +X, opposite the windows, so it turns the other way here
+    only on a robot with the clock at its left (Black), and mine is sent turned the other way when
+    I play Black (`live::sideLookYaw`). A `Glance` turns the head to the robot's own scoresheet on
+    this table, its writing hand waiting aside meanwhile.
     While it presses the clock, its eyes follow its hand. Otherwise the automatic gaze of a game
     against Stockfish returns, looking at the piece their robot holds, if any. Options >
     Gameplay > "Ignore opponent's head movements" turns the head and the lean off; the piece

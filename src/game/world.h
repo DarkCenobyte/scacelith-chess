@@ -100,8 +100,8 @@ public:
     // the markers' programs).
     void setupRenderer(render::Renderer& r);
 
-    // The side of the table the chess clock stands on (layout.h: at the human player's right, where
-    // the New Game page puts it in a hot-seat game, at White's right when watching or replaying).
+    // The side of the table the chess clock stands on (layout.h: +X in every game, opposite the
+    // windows; -X only for the scoresheet viewer's --clock-left).
     void setClockSide(bool positiveX);
     bool clockOnPositiveX() const { return clockPosX_; }
     m::mat4 clockTransform() const;
