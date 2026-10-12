@@ -41,6 +41,9 @@ struct Options {
     bool all = false;       // review: print every reviewed move, not only those with a script
     bool materialOnly = false;   // record: only the moves that leave material to win (2 points or more)
     double hangRate = 0.0;       // record, self-play: share of the human's moves that leave 3+ points to win
+    double mistakeRate = 0.0;    // record, self-play: share of the human's moves picked among those that
+                                 // cost 8 to 20 win-% points at depth 10 (around the mistake band)
+    bool mistakesOnly = false;   // record, self-play: only the moves picked so (with --mistake-rate)
     int verify = 0;              // review: depth of the engine's check of every move shown or said (0 = none)
     std::string cache;           // review --verify: the verdicts kept between runs
 };

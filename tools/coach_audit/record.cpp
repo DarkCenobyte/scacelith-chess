@@ -85,6 +85,26 @@ bool leavesMaterial(const Game& before, const Move& m, int points = 2) {
     return coach::bestCapturePoints(p, p.sideToMove()) >= points;
 }
 
+// A move that costs 8 to 20 win-% points at depth 10 (every legal move searched), picked at random;
+// an invalid move when there is none.
+Move mistakeMove(ai::Engine& e, const Game& g, std::mt19937& rng) {
+    ai::AnalysisRequest r;
+    const Position& s = g.startPosition();
+    r.startFen = s.isStandardStart() ? std::string() : s.fen();
+    r.moves = g.uciMoves();
+    r.multiPV = std::min(64, int(g.position().legalMoves().size()));
+    r.depth = 10;
+    const ai::Analysis a = analyse(e, r);
+    if (!a.ok || a.lines.size() < 2) return Move{};
+    const double best = coach::winPercent(a.lines[0].score);
+    std::vector<Move> picks;
+    for (const ai::PvLine& l : a.lines) {
+        const double cost = best - coach::winPercent(l.score);
+        if (!l.pv.empty() && cost >= 8.0 && cost <= 20.0) picks.push_back(g.position().parseUCI(l.pv[0]));
+    }
+    return picks.empty() ? Move{} : picks[rng() % picks.size()];
+}
+
 ai::EngineSettings humanSettings(std::mt19937& rng) {
     ai::EngineSettings s;
     s.humanize = false;
@@ -173,6 +193,12 @@ int recordMain(const Options& o) {
                     if (leavesMaterial(g, x, 3)) hangs.push_back(x);
                 if (!hangs.empty()) m = hangs[rng() % hangs.size()];
             }
+            bool picked = false;
+            if (!m.valid() && humanTurn && o.mistakeRate > 0 &&
+                std::uniform_real_distribution<double>(0, 1)(rng) < o.mistakeRate) {
+                m = mistakeMove(e, g, rng);
+                picked = m.valid();
+            }
             if (!m.valid() && humanTurn && randomMove > 0 &&
                 std::uniform_real_distribution<double>(0, 1)(rng) < randomMove) {
                 const std::vector<Move> legal = g.position().legalMoves();
@@ -184,7 +210,8 @@ int recordMain(const Options& o) {
                 m = g.position().parseUCI(uci);
             }
             if (!m.valid()) break;
-            if (humanTurn && (!o.materialOnly || leavesMaterial(g, m))) emit(recordMove(e, g, m, o.depth));
+            if (humanTurn && (!o.materialOnly || leavesMaterial(g, m)) && (!o.mistakesOnly || picked))
+                emit(recordMove(e, g, m, o.depth));
             g.play(m);
             ++plies;
         }

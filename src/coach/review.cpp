@@ -884,6 +884,10 @@ Review Reviewer::review(const ReviewInput& in) {
     if (voice && (cls == MoveClass::Forced || cls == MoveClass::Book) && !mateType && ex.type != ExType::Stalemate) voice = false;
     if (voice && isRemark && !remarkAllowed()) voice = false;
     if (voice && retry && out.takeback.same) voice = false;
+    // A mistake, not a blunder, with a reason the board shows: said in words, without a
+    // demonstration (nor a takeback); the coach then plays its move and the player answers it.
+    // Mates and a piece lost while the game stays one-sided (hiddenLoss) are still shown.
+    const bool spoken = cls == MoveClass::Mistake && reason && !hiddenLoss && !mateType && ex.type != ExType::Stalemate;
     if (!voice) slip = false;
     // A principle instead (opening, technique): never a fault claim, Low priority, once per game each.
     Explanation tipEx;
@@ -955,6 +959,7 @@ Review Reviewer::review(const ReviewInput& in) {
         int budget = bd.sentences - (verdictKey.empty() ? 0 : 1);
         std::vector<Beat> cause = ex.cause, tip = ex.tip;
         Explanation shown = ex;
+        if (spoken) shown.demoPlies = 0;
         if (level_ == 2 && cls == MoveClass::Mistake) {   // "one sentence"
             if (cause.size() > 1) cause.resize(1);
             tip.clear();

@@ -363,24 +363,58 @@ TEST(coach_review_bands) {
 // ---- Explanations --------------------------------------------------------------------------------
 
 TEST(coach_review_play_on_after_a_demonstration_without_offer) {
-    // 1.Nd5?? exd5 when already losing: a mistake by the numbers, shown at level 3 with no takeback
-    // card. The coach says that its real move comes next.
-    Game g = gameOf(kHangFen, {"Nd5"});
+    // 1.Nd5?? exd5 while still clearly ahead (W% 92 -> 76): a blunder, shown at level 3 with no
+    // takeback card (none from 75 on). The coach says that its real move comes next.
+    const char* fen = "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1";
+    Game g = gameOf(fen, {"Nd5"});
     Reviewer rv;
     rv.reset(3, White);
-    const Review r = reviewOf(rv, g, analysisOf({pvl(-400, "g1f1 g8f8"), pvl(-730, "c3d5 e6d5 g1f1")}));
+    const Review r = reviewOf(rv, g, analysisOf({pvl(650, "g1f1 g8f8"), pvl(320, "c3d5 e6d5 g1f1")}));
     checkScript(r.script, "play on");
-    CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+    CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
     CHECK(!r.offersTakeback);
     CHECK(demoMoves(r.script) > 0);
     CHECK(!r.script.empty() && r.script.back().line.key == "demo.play_on");
-    // With the card (a blunder), the card ends the script.
+    // With the card (a blunder that loses the game's balance), the card ends the script.
     Game h = gameOf(kHangFen, {"Nd5"});
     Reviewer rh;
     rh.reset(3, White);
     const Review o = reviewOf(rh, h, hangA0());
     CHECK(o.offersTakeback);
     CHECK(!hasKey(o.script, "demo.play_on"));
+}
+
+TEST(coach_review_mistake_explained_without_demonstration) {
+    // 1.Nd5? exd5 when already losing: a mistake by the numbers, not a blunder. Said in words (the
+    // verdict at levels 3-6, then why), without a demonstration, a card or "Now I play my move": the
+    // coach's next move is its real one.
+    for (int level = 2; level <= 6; ++level) {
+        Game g = gameOf(kHangFen, {"Nd5"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, analysisOf({pvl(-400, "g1f1 g8f8"), pvl(-730, "c3d5 e6d5 g1f1")}));
+        char where[32];
+        std::snprintf(where, sizeof where, "mistake b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+        CHECK_EQ(r.verdict.exType, ExType::Hanging);
+        CHECK(r.verdict.voiced);
+        CHECK(!r.offersTakeback);
+        CHECK_EQ(demoMoves(r.script), 0);
+        CHECK(!hasKey(r.script, "demo.play_on"));
+        CHECK_EQ(hasKey(r.script, "ex.verdict.mistake.b" + std::to_string(level)), level >= 3);
+        const Beat* cause = nullptr;
+        for (const Beat& b : r.script)
+            if (startsWith(b.line.key, "ex.hanging")) cause = &b;
+        CHECK(cause != nullptr);
+        if (cause) {
+            bool pointed = false;
+            for (const Gesture& gs : cause->gestures)
+                if (gs.kind == GestureKind::PointPiece && gs.square == sq("d5")) pointed = true;
+            CHECK(pointed);
+            for (const Mark& m : cause->marks) CHECK(!m.untilRewind);   // no rewind to wait for
+        }
+    }
 }
 
 TEST(coach_review_bishop_for_a_pawn_is_explained) {

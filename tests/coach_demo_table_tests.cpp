@@ -884,14 +884,6 @@ std::vector<NoCard> noCards() {
         v.push_back(c);
     }
     {
-        // The en passant fork already a piece down (W% 19 -> 7): a mistake, not a blunder. Its
-        // demonstration is the blunder's, its offer none (review.cpp: only blunders and the
-        // detectors' own cases are offered).
-        NoCard c{"a mistake already behind", "6k1/4rppp/8/8/4p3/8/2RPN1PP/6K1 w - - 0 1", {"d2d4"}, {}, "e4d3", 2, 6};
-        c.results[c.fen + "|A0"] = analysisOf({pvl(-400, "g1f1 g8f8"), pvl(-700, "d2d4 e4d3 c2c1 d3e2")});
-        v.push_back(c);
-    }
-    {
         // A blunder that leaves the human still clearly ahead (W% 92 -> 76): no offer from 75 on.
         NoCard c{"a blunder still ahead", "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1", {"c3d5"}, {}, "e6d5", 1, 3};
         c.results[c.fen + "|A0"] = analysisOf({pvl(650, "g1f1 g8f8"), pvl(320, "c3d5 e6d5 g1f1")});
@@ -951,7 +943,40 @@ TEST(coach_demo_table_no_card_after_some_demonstrations) {
             ++runs;
         }
     }
-    CHECK_EQ(runs, 6 + 5 + 3 + 3);
+    CHECK_EQ(runs, 6 + 3 + 3);
+}
+
+// A mistake, not a blunder (the en passant fork already a piece down, W% 19 -> 7): said in words
+// (the verdict at levels 3-6, then the fork), without a demonstration or a card. The coach then plays
+// its move on the table, and the player answers it ("Your move.").
+TEST(coach_demo_table_mistake_said_then_played) {
+    const std::string fen = "6k1/4rppp/8/8/4p3/8/2RPN1PP/6K1 w - - 0 1";
+    for (int level = 2; level <= 6; ++level) {
+        Scene s;
+        s.analyst.results[fen + "|A0"] = analysisOf({pvl(-400, "g1f1 g8f8"), pvl(-700, "d2d4 e4d3 c2c1 d3e2")});
+        s.start(fen.c_str(), level, chess::White);
+        const int before = s.stage.demoMoves;
+        CHECK(s.humanMove("d2d4"));
+        CHECK(s.until([&] { return !s.coachHolds(); }, 180.0f));
+        CHECK(!s.session.offerOpen());
+        bool fork = false, verdict = false;
+        for (const Line& l : s.lines) {
+            fork = fork || l.key.rfind("ex.fork.", 0) == 0;
+            verdict = verdict || l.key.rfind("ex.verdict.mistake.", 0) == 0;
+        }
+        CHECK(fork);
+        CHECK_EQ(verdict, level >= 3);
+        const size_t said = s.lines.size();
+        CHECK(s.coachReply("e4d3"));
+        CHECK(s.quiet());
+        CHECK_EQ(s.stage.demoMoves - before, 0);
+        CHECK_EQ(s.offersShown, 0);
+        bool yourMove = false;
+        for (size_t i = said; i < s.lines.size(); ++i) yourMove = yourMove || s.lines[i].key == "event.your_move";
+        CHECK(yourMove);
+        CHECK(s.tableShowsGame());
+        s.checkTable();
+    }
 }
 
 // The takeback cap of levels 4-6 (band(): 5, 3 and 2 takebacks a game, only those the player

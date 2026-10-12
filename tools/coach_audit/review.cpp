@@ -689,7 +689,9 @@ int reviewMain(const Options& o) {
                     f.push_back({"DEMO_SHORT", std::string(exTypeName(t)) + ": demo ends with the human " +
                                                    std::to_string(lost) + " down, no mate, nothing pointed at"});
             }
-            if (explained && !demo && level <= 2 && (isMaterialType(t) || t == ExType::MateAllowed) && fault)
+            // A mistake (not a blunder) is said in words by design (review.cpp): only blunders.
+            if (explained && !demo && level <= 2 && (isMaterialType(t) || t == ExType::MateAllowed) &&
+                v.cls == MoveClass::Blunder)
                 f.push_back({"NO_DEMO_BEGINNER", exTypeName(t), false});
 
             // Policy: small slips are not dramatised.
