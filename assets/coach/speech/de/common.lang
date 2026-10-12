@@ -119,7 +119,7 @@ move.check.spoken = {move}, Schach
 move.mate.spoken = {move}, Schachmatt
 moves.join.spoken = {a}, {b}
 
-# ---- Respellings (spoken) ----------------------------------------------------------------------------
+# ---- Respellings (spoken) ------------------------------------------------------------------------
 # Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). Loanwords keep their
 # German chess pronunciation: "Remis" without its s (the voice says "Remies"), "en passant" the French
 # way (the voice says "ein Passant"), "Fianchetto" with a k (the voice says "Fiantschetto"); the

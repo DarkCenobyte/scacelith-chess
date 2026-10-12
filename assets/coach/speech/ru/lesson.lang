@@ -78,7 +78,7 @@ lesson.welcome.square2 = А это — {sq}.
 lesson.welcome.kings = Вот два короля. Твой стоит на {sq}, мой — на {sq2}.
 lesson.welcome.ask = Твой ход: передвинь короля на одно поле вперёд, на {sq}.
 lesson.welcome.wrong = Это {to}. А нужно поле {sq}: буква e, цифра два.
-lesson.welcome.wrong.spoken = Это {to}. А нужно поле {sq}: буква е, цифра два.
+lesson.welcome.wrong.spoken = Это {to}. А нужно поле {sq}: буква йе, цифра два.
 lesson.welcome.ok = Отлично. Твой король стоит на {sq}.
 
 # ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------

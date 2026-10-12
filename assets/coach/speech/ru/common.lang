@@ -152,12 +152,13 @@ owner.black.nom = чёрный {piece}
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice drops Latin letters: file letters are Cyrillic letter names, as in the opening texts
 # (tools/gen_opening_lang.py): e4 = "е четыре", f5 = "эф пять", a8 = "а восемь", h7 = "аш семь".
+# The letter "е" is spelled "йе" as it sounds: alone, the voice reads it "и" ("ход и пять").
 square.spoken = {file} {rank}
 file.a.spoken = а
 file.b.spoken = бэ
 file.c.spoken = цэ
 file.d.spoken = дэ
-file.e.spoken = е
+file.e.spoken = йе
 file.f.spoken = эф
 file.g.spoken = жэ
 file.h.spoken = аш
@@ -190,6 +191,35 @@ move.promotion.spoken = {move}, превращение: {piece}
 move.check.spoken = {move}, шах
 move.mate.spoken = {move}, мат
 moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). The voice puts the stress
+# of nouns whose stress moves to the ending on the stem ("ко́ня", "сло́ном", "ла́дья", "хо́дов"): they carry a
+# stress mark (U+0301, which the voice follows) on the right vowel. Homographs stay unmarked (ладьи, хода,
+# ходу, доски, стоит: the stress depends on the meaning).
+respell.коня = коня́
+respell.конями = коня́ми
+respell.слона = слона́
+respell.слону = слону́
+respell.слоном = слоно́м
+respell.слоны = слоны́
+respell.слонов = слоно́в
+respell.ладья = ладья́
+respell.ладье = ладье́
+respell.ладью = ладью́
+respell.ладьями = ладья́ми
+respell.ладей = ладе́й
+respell.ферзя = ферзя́
+respell.ферзи = ферзи́
+respell.ходы = ходы́
+respell.ходов = ходо́в
+respell.ходам = хода́м
+respell.фигур = фигу́р
+respell.ничья = ничья́
+respell.ничью = ничью́
+respell.доской = доско́й
+respell.выигрывает = выи́грывает
+respell.выигрывают = выи́грывают
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words (nominative). 21-99 compose as "{tens} {units}" ("двадцать три"), 101-999 as
