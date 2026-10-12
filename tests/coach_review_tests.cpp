@@ -1211,6 +1211,24 @@ TEST(coach_review_cheaper_attacker_still_explained) {
     }
 }
 
+TEST(coach_review_queen_taken_by_a_pawn_is_the_cheaper_attacker) {
+    // From a mined game: 33.Qc4? dxc4. Two attackers against one defender is true, but a pawn takes the
+    // queen whatever defends it: the reason is the cheaper attacker, not the count.
+    const ai::Analysis a0 = analysisOf({pvl(-519, "f4d3 b5d3 c3d3 a5a4 b3c2 a3d3 c2d3 b7b2 a1b1 a4a3"),
+                                        pvl(-995, "c3c4 d5c4 b3c2 e7d6 e1g1 g7f8 c2e4 a5a4 g2g3 e6e5")});
+    for (int level = 2; level <= 6; ++level) {
+        Game g = gameOf("1r6/1r2bpk1/2p1p1p1/pb1p4/3P1N1p/qBQ1P2P/P4PP1/R3R2K w - - 4 33", {"Qc4"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "queen to a pawn b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.exType, ExType::Exchange);
+        CHECK(beatWithKey(r.script, "ex.exchange_cheap.b" + std::to_string(level)) != nullptr);
+    }
+}
+
 TEST(coach_review_battery_counts_in_the_exchange) {
     // 1.c4?? leaves the bishop on d4 defended by the knight alone, against the bishop on b6 and the
     // queen behind it: Bxd4 Nxd4 Qxd4 wins it. The count says 2 attackers against 1 defender.

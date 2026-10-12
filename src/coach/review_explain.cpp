@@ -129,8 +129,8 @@ bool takeBackFails(const Position& q, Color human, int least) {
 }
 
 // The piece the coach takes at ply k of r stood there before the move, and the better move gives it
-// up too: the coach takes it there early along the best line (nothing having moved to or from that
-// square before) and it is not taken back at once. Its loss is then no reason the move is bad (the
+// up too: the coach takes it there within the first ten plies of the best line (nothing having moved
+// to or from that square before) and it is not taken back at once. Its loss is then no reason the move is bad (the
 // best line pays for it otherwise).
 bool bestGivesUp(const Ctx& c, int k) {
     const Square on = c.r[size_t(k)].move.to;
@@ -139,7 +139,7 @@ bool bestGivesUp(const Ctx& c, int k) {
         return false;
     for (int j = 0; j < k; ++j)
         if (c.r[size_t(j)].move.to == on || c.r[size_t(j)].move.from == on) return false;
-    for (size_t i = 0; i < c.best.size() && i < 4; ++i) {
+    for (size_t i = 0; i < c.best.size() && i < 10; ++i) {
         const LineStep& st = c.best[i];
         if (st.mover == c.coach && st.move.to == on && st.captured == was.type)
             return !(i + 1 < c.best.size() && c.best[i + 1].captured != NoPiece && c.best[i + 1].move.to == on);
@@ -829,16 +829,17 @@ bool exchange(const Ctx& c, Explanation& out) {
         family = "ex.exchange_capture";
         n = points(victim);
         n2 = points(c.f.captured);
+    } else if (points(r0.piece) < points(victim)) {
+        // "{your} is worth {n}, {my} only {n2}": cheaper in points, not only in centipawns. Before the
+        // count: a pawn that takes a queen wins it however many defend it.
+        family = "ex.exchange_cheap";
+        n = points(victim);
+        n2 = points(r0.piece);
     } else if (squareCount(att) > squareCount(def) && def != 0) {
         // "I attack it {n} times, you defend it {n2} times".
         family = "ex.exchange_count";
         n = squareCount(att);
         n2 = squareCount(def);
-    } else if (points(r0.piece) < points(victim)) {
-        // "{your} is worth {n}, {my} only {n2}": cheaper in points, not only in centipawns.
-        family = "ex.exchange_cheap";
-        n = points(victim);
-        n2 = points(r0.piece);
     } else {
         return false;
     }
