@@ -862,23 +862,30 @@ Review Reviewer::review(const ReviewInput& in) {
             break;
         }
     c.loss = c.lossWithin(bd.lookahead);
-    {
-        // What is still lost at the end of the best line's first 8 plies, read where the line
-        // settles: the human's capture the coach takes back on the next ply is a whole exchange, and
-        // a loss the human wins back within four more plies (an in-between check first) is none.
-        const size_t w = std::min<size_t>(8, c.best.size());
-        auto settled = [&](size_t j) {
-            if (j < c.best.size() && c.best[j - 1].mover == human_ && c.best[j - 1].captured != NoPiece &&
-                c.best[j].mover != human_ && c.best[j].captured != NoPiece && c.best[j].move.to == c.best[j - 1].move.to)
-                ++j;
-            int l = c.base - c.best[j - 1].balance;
-            if (j == c.best.size() && c.bestEnd.sideToMove() == human_ && c.bestEnd.hasLegalMove())
-                l -= bestCapturePoints(c.bestEnd, human_);
-            return l;
-        };
-        int lost = w > 0 ? settled(w) : 0;
-        for (size_t j = w + 1; w > 0 && j <= std::min(c.best.size(), w + 4); ++j) lost = std::min(lost, settled(j));
-        c.bestLoss = std::max(0, lost);
+    // What the human is down after the first j plies of a line from p0, read where it settles: the
+    // human's capture the coach takes back on the next ply is a whole exchange, and where the line
+    // stops, the human to move takes back what it can at once.
+    const auto settled = [&](const std::vector<LineStep>& line, const Position& end, size_t j) {
+        if (j < line.size() && line[j - 1].mover == human_ && line[j - 1].captured != NoPiece &&
+            line[j].mover != human_ && line[j].captured != NoPiece && line[j].move.to == line[j - 1].move.to)
+            ++j;
+        int l = c.base - line[j - 1].balance;
+        if (j == line.size() && end.sideToMove() == human_ && end.hasLegalMove()) l -= bestCapturePoints(end, human_);
+        return l;
+    };
+    // ... and the least of that and the next four plies (a loss won back by then, an in-between
+    // check first, is none).
+    const auto settledFor = [&](const std::vector<LineStep>& line, const Position& end, size_t i) {
+        int l = settled(line, end, i);
+        for (size_t j = i + 1; j <= std::min(line.size(), i + 4); ++j) l = std::min(l, settled(line, end, j));
+        return l;
+    };
+    // What is still lost at the end of the best line's first 8 plies.
+    if (!c.best.empty()) c.bestLoss = std::max(0, settledFor(c.best, c.bestEnd, std::min<size_t>(8, c.best.size())));
+    if (c.playedLine.size() >= 8) {
+        c.playedLoss = 0;
+        for (size_t i = 1; i <= 9 && i <= c.playedLine.size(); ++i)
+            c.playedLoss = std::max(c.playedLoss, settledFor(c.playedLine, c.playedEnd, i));
     }
     // whiteCp(s, true): the side to move's (the human's) centipawns.
     c.dropCp = std::max(0, whiteCp(c.l1->score, true) - whiteCp(c.lp->score, true));
@@ -938,11 +945,18 @@ Review Reviewer::review(const ReviewInput& in) {
         voice = slip;
         isRemark = true;
     } else if (fault) {
+        // Level 2 says a mistake (in words, no demonstration) when the coach wins something at once,
+        // within two plies: the reason's own sequence, or a loss the coach still holds four plies
+        // later (an exchange there counted whole). A pawn taken and won back while the reason is about
+        // a piece that falls later would have the table show the wrong piece.
+        bool keptAtOnce = ex.fullPlies <= 2;
+        for (int i = 1; i <= std::min(2, int(c.r.size())); ++i)
+            keptAtOnce = keptAtOnce || (c.lossAfter(i) >= 1 && c.lossAfter(std::min(int(c.r.size()), i + 4)) >= 1);
         switch (level_) {
         case 1: voice = cls == MoveClass::Blunder && ((found && ex.concrete) || hintOnly); break;
         case 2:
             voice = (cls == MoveClass::Blunder && ((found && ex.concrete) || hintOnly)) ||
-                    (cls == MoveClass::Mistake && found && ex.concrete && c.lossWithin(2) >= 1);
+                    (cls == MoveClass::Mistake && found && ex.concrete && c.lossWithin(2) >= 1 && keptAtOnce);
             isRemark = cls != MoveClass::Blunder;
             break;
         case 3: voice = true; isRemark = cls == MoveClass::Mistake; break;
@@ -1072,7 +1086,8 @@ Review Reviewer::review(const ReviewInput& in) {
             const Square on = b0.move.from == c.played.from ? c.played.to : b0.move.from;
             const Piece pc = c.p1.at(on);
             if (offer && pc.color == human_ && (pc.type == b0.piece || on == c.played.to)) {
-                Beat hb = sayBeat(bandKey("ex.hint", level_), Look::Target, ply);
+                // "... one that wins material", when that is plainly why the move was a blunder.
+                Beat hb = sayBeat(bandKey(missedGain(c) > 0 ? "ex.hint.gain" : "ex.hint", level_), Look::Target, ply);
                 hb.line.with("your", pieceArg(c.p1, on, human_));
                 pointPiece(hb, on, "your", true);
                 cause.push_back(hb);

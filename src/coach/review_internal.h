@@ -37,6 +37,10 @@ struct Ctx {
     // plies (from p0), where the line settles (an exchange completed; what the human wins back within
     // four more plies taken off). A loss the best move suffers too is no reason the move played was bad.
     int bestLoss = 0;
+    // What the move played loses for good along its own line (the deeper search's, from p0): the
+    // most the human is down after any of its first 9 plies and still four plies later. -1 when that
+    // line is too short to tell.
+    int playedLoss = -1;
     // How much the move costs in the engine's eyes: the human's centipawns after the best move minus
     // after the move played (mates as +-1000).
     int dropCp = 0;
@@ -162,6 +166,11 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 // The tip findTip gives is about a won game drawn by repetition or the fifty-move rule: then it is
 // the reason the move costs so much.
 bool drawTip(const Ctx& c, uint32_t tipsSaid);
+// What a blunder without a reason missed: the points the better move wins for good (where its line
+// settles) when the move played neither wins nor loses any along its own, and those points explain
+// the drop by themselves (0: none, or not that plain). A hint can then say the better move wins
+// material without naming it.
+int missedGain(const Ctx& c);
 
 // How much of the sequence the table shows (Explanation::demoPlies, full): levels 1-3 the whole of it
 // (fullPlies, within the band's demoPlies; a mate within mateLinePlies), else, and from level 4, up

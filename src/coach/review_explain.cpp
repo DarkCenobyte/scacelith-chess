@@ -299,6 +299,15 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
         return i >= 0 && c.r[size_t(i)].mover == who && c.r[size_t(i)].captured != NoPiece && c.r[size_t(i)].move.to == sq;
     };
     const Square at = c.r[size_t(k)].move.to;
+    // A reason that names only this capture's target, when the coach's reply itself takes as much
+    // at once on another square (the human's capture right after it counted): that capture is the
+    // story ("cxd3" took a pawn, and forks two pieces: the pawn on b3 the bishop behind it wins next
+    // is not what the move costs).
+    if (targetOnly && k > 0 && c.r[0].captured != NoPiece && c.r[0].move.to != at) {
+        const size_t once = n > 1 && c.r[1].mover == c.human && c.r[1].captured != NoPiece ? 1 : 0;
+        const int atOnce = c.base - c.r[once].balance;
+        if (atOnce >= 1 && atOnce >= points(c.r[size_t(k)].captured)) return false;
+    }
     const bool tradeBack = capturesOn(k - 1, c.human, at) && !capturesOn(k - 2, c.coach, at);
     const int already = k > 0 ? c.lossAfter(tradeBack ? k - 1 : k) : 0;
     // Whether material changed hands before ply k on another square than this capture's.
@@ -348,6 +357,10 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
         int heldBack = held;
         for (int j = p + 5; j <= std::min(n, p + 8); ++j) heldBack = std::max(heldBack, std::min(l, c.lossAfter(j)));
         if (l <= already || !c.lossExplains(l, pawn) || !c.lossExplains(heldBack, pawn)) continue;
+        // When the better move loses material too, what this line costs beyond it must hold along
+        // the move's own deeper line as well: the refutation may be a shallower search's, with a
+        // defence that loses more (Kc7 e6+ Qd6 loses the rook; e6+ Rf4, the deeper line's, less).
+        if (c.bestLoss > 0 && c.playedLoss >= 0 && !c.lossExplains(std::min(l, c.playedLoss), pawn)) continue;
         // A reason that names only this capture's target: what was lost before it on other squares
         // is the reason when it explains the move by itself and this capture adds no more ("Nxb3"
         // took the queen: the pawn a discovered attack wins next is not it).
@@ -1525,6 +1538,58 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
 bool drawTip(const Ctx& c, uint32_t tipsSaid) {
     Explanation t;
     return findTip(c, tipsSaid, t) && (t.tipBit == Fifty || t.tipBit == Repetition);
+}
+
+namespace {
+// The human's lead from c.base along a line, read as bestLoss reads a loss: after the line's first
+// 'from' plies, where it settles (a capture taken back on the next ply is a whole exchange; where the
+// line stops, the coach to move takes what it can at once), and over the next four plies: the least
+// (what the coach wins back by then was never won) and the most. False when a mate, a stalemate or
+// a promotion comes into the line: the points would not tell what happens.
+struct Lead {
+    const Ctx& c;
+    const std::vector<LineStep>& line;
+    const Position& end;
+    bool plain() const {
+        for (const LineStep& st : line)
+            if (st.mate || st.stalemate || st.promotion != NoPiece) return false;
+        return true;
+    }
+    int at(size_t j) const {
+        if (j < line.size() && line[j - 1].captured != NoPiece && line[j].captured != NoPiece &&
+            line[j].move.to == line[j - 1].move.to)
+            ++j;
+        int g = line[j - 1].balance - c.base;
+        if (j == line.size() && end.sideToMove() == c.coach && end.hasLegalMove()) g -= bestCapturePoints(end, c.coach);
+        return g;
+    }
+    void window(size_t from, int& least, int& most) const {
+        least = most = at(from);
+        for (size_t j = from + 1; j <= std::min(line.size(), from + 4); ++j) {
+            least = std::min(least, at(j));
+            most = std::max(most, at(j));
+        }
+    }
+};
+}  // namespace
+
+int missedGain(const Ctx& c) {
+    if (c.best.empty() || c.isBest || c.bestLoss > 0 || c.losesMaterial(8)) return 0;
+    const Lead best{c, c.best, c.bestEnd}, played{c, c.playedLine, c.playedEnd};
+    if (!best.plain() || !played.plain()) return 0;
+    // Where the best line settles after 8 plies, as bestLoss is read.
+    int won = 0, most = 0;
+    best.window(std::min<size_t>(8, c.best.size()), won, most);
+    if (won < 1) return 0;
+    // The move played wins nothing for good along its own line (not even a pawn it takes at once
+    // and gives back later) and loses nothing.
+    for (size_t i = 1; i <= std::min<size_t>(12, c.playedLine.size()); ++i) {
+        int least = 0, high = 0;
+        played.window(i, least, high);
+        if (least > 0 || high < 0) return 0;
+    }
+    // As Ctx::lossExplains: a pawn explains a drop of up to 2.5 pawns, 2 points up to 8.
+    return won >= 3 || (won >= 2 ? 400 : 250) * won >= c.dropCp ? won : 0;
 }
 
 }  // namespace detail

@@ -906,6 +906,20 @@ int reviewMain(const Options& o) {
                                                    c.bestLine[0].san});
             }
 
+            // A hint that says the better move wins material: its line still has the human ahead
+            // where it settles (after 8 plies, the next four read too), and the move played wins
+            // and loses nothing for good along its own line.
+            for (const Beat& b : rev.script) {
+                if (b.line.key.rfind("ex.hint.gain.", 0) != 0) continue;
+                const int bestGain = settledLoss(c.bestLine, c.p0, c.coach, -c.base, 8);
+                const int playedGain = lastingLoss(c.playedLine, c.p0, c.coach, -c.base, 12);
+                const int playedLoss = lastingLoss(c.playedLine, c.p0, c.human, c.base, 12);
+                if (bestGain < 1 || playedGain > 0 || playedLoss > 0)
+                    f.push_back({"HINT_GAIN", b.line.key + ": the best line wins " + std::to_string(bestGain) +
+                                                  ", the played line wins " + std::to_string(playedGain) +
+                                                  " and loses " + std::to_string(playedLoss)});
+            }
+
             // The loss the explanation names is one the best move avoids: where the best line settles
             // (what is traded back is no loss), and the named piece not given up by the best line too.
             if (explained && fault && (isMaterialType(t) || isGenericType(t)) && c.lp) {

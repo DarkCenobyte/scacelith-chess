@@ -139,6 +139,20 @@ ex.hint.b6 = {your} had better.
 ex.hint.b6.2 = Look at {your} again.
 ex.hint.move = There was a better move.
 ex.hint.move.2 = You had a better move there.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} had a better move. It wins material.
+ex.hint.gain.b1.2 = There was a better move with {your}. It wins material.
+ex.hint.gain.b2 = {your} had a better move. It wins material.
+ex.hint.gain.b2.2 = There was a move with {your} that wins material.
+ex.hint.gain.b3 = {your} had a better move, one that wins material.
+ex.hint.gain.b3.2 = There was a move with {your} that wins material.
+ex.hint.gain.b4 = {your} had a move that wins material.
+ex.hint.gain.b4.2 = Look again at {your}: it had a move that wins material.
+ex.hint.gain.b5 = {your} had a stronger move, one that wins material.
+ex.hint.gain.b5.2 = There was a move with {your} that wins material.
+ex.hint.gain.b6 = {your} had a move that wins material.
+ex.hint.gain.b6.2 = Look at {your} again: there was material to win.
 # Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
 # when none can be made); levels 3-6 say ex.better.
 ex.reveal.b1 = The better move was {your} to {sq}.

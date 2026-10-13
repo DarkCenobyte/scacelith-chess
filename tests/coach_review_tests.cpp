@@ -1342,6 +1342,158 @@ TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     }
 }
 
+namespace {
+
+// A self-play game (depth 16): 19.Be5?? runs into 19...d3, hitting the queen on e2, and the queen
+// on d6 gets away; 19.Bxd6 took it for the bishop, and the rook on c4 fell next. 19.Be5 wins and
+// loses nothing along its own line.
+const char* kBe5Record =
+    "rec w f4e5 startpos ; c2c4 c7c5 g2g3 b8c6 d2d3 e7e6 b1c3 h7h6 e2e4 g7g6 c1e3 b7b6 f1g2 g8f6 g1e2 c8b7 d3d4 f6g4 e3f4 c6d4 e2d4 c5d4 c3b5 f8b4 e1f1 d8e7 b5c7 e8d8 d1g4 a8c8 c7b5 c8c4 g4e2 e7c5 b5d6 c5d6\n"
+    "an a0 1 1 0 16 f4d6 3\n"
+    "ln 1 16 826 0 0 0 E f4d6 b4d6 e2c4 e6e5 a2a3 g6g5 f1e1 d8e7 c4e2 h8c8 e2d3 f7f5 a1d1\n"
+    "ln 2 16 591 0 0 0 E e2c4 d6c5 c4c5 b6c5 a2a3 b4a5 b2b4 a5b6 b4c5 b6c5 f4e5\n"
+    "ln 3 16 -83 0 0 0 E b2b3 d4d3 e2b2 d6d4 b2d4 c4d4 f4e5 b4c3 e5f6 d8e8 a1d1 h8f8 a2a3 g6g5\n"
+    "an a1 1 1 0 16 f4e5 1\n"
+    "ln 1 16 -625 0 0 0 E f4e5 d4d3 e5f6 d8c7 e2d1 h8c8 a2a3 b4c5 f6c3 f7f6 a1c1 c7b8 e4e5 f6e5 c3e5 d6e5 c1c4 c8f8\n"
+    "an a2 1 0 0 14 d4d3 2\n"
+    "ln 1 14 591 0 0 0 E d4d3 e5f6 d8c7 e2d1 h8c8 a2a3 e6e5 a3b4 d6f6 d1d3 c7b8 d3d7\n"
+    "ln 2 14 474 0 0 0 E d6c6 f1g1 h8f8 e5g7 f7f5 a2a3 b4e7 h2h4 f5e4 g7f8 e7f8 g1h2\n"
+    "an a3 1 1 0 6 f4d6 1\n"
+    "ln 1 6 826 0 0 0 E f4d6 b4d6 e2c4 e6e5 a2a3 g6g5\n"
+    "end\n";
+
+// A self-play game (depth 16): 18...g5? 19.fxg5 Nh7 20.Nd5 Qxg5 21.Qf3 Bb7 22.Nxc7+ costs the pawn
+// on c7; the pawn on g5 that 19.fxg5 takes at once is won back on move 20.
+const char* kG5Record =
+    "rec b g6g5 startpos ; e2e4 e7e5 g1f3 g8f6 b1c3 f8d6 f1e2 h7h6 d2d4 e5d4 f3d4 d6e5 d4f5 e5c3 b2c3 g7g6 f5g3 d7d6 h2h3 d8e7 c1b2 h6h5 c3c4 h5h4 g3f1 b8c6 a1b1 h8g8 e2d3 b7b6 f1e3 c6e5 f2f4 e5d3 c2d3\n"
+    "an a0 1 0 0 16 c8b7 3\n"
+    "ln 1 16 -177 0 0 0 E c8b7 d1a4 e7d7 a4a3 f6h5 e1g1 f7f5 e3d5 a7a5 a3b3 b7d5 c4d5 g6g5 f4g5 g8g5 f1f5 g5f5 e4f5\n"
+    "ln 2 16 -258 0 0 0 E a7a5 d1c2 c8b7 e1g1 e8c8 b2d4 f6d7 e3d5 e7e6 c2b2 b7c6 f4f5 g6f5 e4f5 e6e8 f1e1 d7e5 d4b6 c6d5 c4d5 c7b6 b2b6 e5f3 g1f1 e8e1 b1e1 f3e1 b6c6 c8b8\n"
+    "ln 3 16 -268 0 0 0 E g8f8 e1g1 c8b7 a2a4 a7a5 b2d4 e8c8 d1b3 f6d7 e3d5 b7d5 c4d5 d7c5 b3c4 f7f6 f1c1 c8b7 d4c5 d6c5 c4c5 e7c5 c1c5\n"
+    "an a1 1 0 0 16 g6g5 1\n"
+    "ln 1 16 -365 0 0 0 E g6g5 f4g5 f6h7 e3d5 e7g5 d1f3 c8b7 d5c7 e8d8 c7a8 g5a5 e1f1 a5a2 f1f2 g8g3 f3e2\n"
+    "an a2 1 1 0 14 f4g5 2\n"
+    "ln 1 14 390 0 0 0 E f4g5 f6d7 e1g1 e7g5 e3g4 d7e5 g4f6 e8d8 f6g8 c8h3 f1f2 h3g4\n"
+    "ln 2 14 214 0 0 0 E h1f1 c8e6 f4f5 e6d7 b2f6 e7f6 e3d5 f6d8 f5f6 g5g4 d5e7 g8h8 h3g4 h4h3 g2h3 h8h3 g4g5\n"
+    "an a3 1 0 0 6 c8b7 1\n"
+    "ln 1 6 -177 0 0 0 E c8b7 d1a4 e7d7 a4a3 d7e7\n"
+    "end\n";
+
+// A self-play game (depth 18): 40...Kc7?? 41.e6+, a discovered check. The after-move search (depth
+// 14) answers 41...Qd6 42.Qxd6+ Kxd6 43.exf7, the rook lost; the deeper line for the move answers
+// 41...Rf4 and loses less, and the better 40...Ke7 loses a knight too.
+const char* kKc7Record =
+    "rec b d8c7 startpos ; g1f3 c7c6 c2c4 d7d6 e2e4 e7e5 d2d3 d8a5 c1d2 a5a6 b2b4 c8g4 f1e2 c6c5 b4c5 b8d7 e1g1 d6c5 b1c3 g8f6 a2a4 a6c6 f3g5 h7h6 f2f3 g4h5 g2g4 f8e7 g5h7 h8h7 g4h5 g7g6 a4a5 a7a6 h5g6 h7h8 g6f7 e8f8 c3d5 h8h7 d1e1 h7g7 g1h1 b7b5 f3f4 f6d5 f4e5 d5c7 f1g1 b5b4 e1f2 e7g5 f2g3 c7e6 d2g5 h6g5 a1f1 b4b3 e2g4 b3b2 g3h3 f8e7 g1g2 b2b1q f7f8r e6f4 f8f4 b1b3 f4f5 b3c3 f1b1 a8f8 f5f8 d7f8 h3f3 g7f7 f3g3 e7d8 b1b8\n"
+    "an a0 1 0 0 18 d8e7 3\n"
+    "ln 1 18 -31 0 0 0 E d8e7 b8b1 f8g6 g4f5 c3e5 g3g5 c6f6 g5g6 f6g6 g2g6 e5f4 b1b7 e7f8\n"
+    "ln 2 18 -593 0 0 0 E d8c7 e5e6 f7f4 e6e7 c3a1 g2g1 a1g1 h1g1 c6a4 b8b1 f8g6 g4h5 g6e7 g3g5\n"
+    "ln 3 18 -1199 0 0 0 E c6c8 b8c8 d8e7 c8c7 e7d8 c7f7 f8g6 e5e6 c3a1 g2g1 a1e5 f7d7 d8e8 g3e5 g6e5 g4h5 e8f8\n"
+    "an a2 1 1 0 14 e5e6 2\n"
+    "ln 1 14 760 0 0 0 E e5e6 c6d6 g3d6 c7d6 e6f7 f8d7 f7f8q d7f8 b8f8 d6e7 f8f1 c3d3 g2e2 d3c4\n"
+    "ln 2 14 568 0 0 0 E b8c8 c7b7 c8c6 f7f1 g2g1 f1g1 g3g1 b7c6 g1f1 f8d7 e5e6 c3f6 f1f6 d7f6 e6e7 c6d6 h1g2 d6e7 g2f3 f6d7 g4d7 e7d7 f3e2\n"
+    "an a3 1 0 0 6 d8e7 1\n"
+    "ln 1 6 -31 0 0 0 E d8e7 b8b1 f8g6 g4f5 c3e5 g3g5 c6f6\n"
+    "end\n";
+
+// A self-play game (depth 16): 17.Qc2? cxd3 takes a pawn and forks the queen and the knight; the
+// bishop behind the pawn then takes the pawn on b3 (17...cxd3 18.Qa2 Bxb3), before 20...dxe2.
+const char* kQc2Record =
+    "rec w d1c2 startpos ; c2c4 d7d6 b1c3 c7c6 c3e4 e7e5 e2e3 f7f5 e4c3 c8e6 d1c2 g8f6 c2d3 c6c5 a2a4 b8c6 c3d5 g7g6 d3b3 f8g7 d2d3 c6a5 d5f6 g7f6 b3d1 e8g8 g1e2 d6d5 b2b3 f5f4 f2f3 d5c4\n"
+    "an a0 1 1 0 16 b3c4 3\n"
+    "ln 1 16 -456 0 0 0 E b3c4 f4e3 a1a3 d8b6 e2c3 b6b4 e1e2 a8d8 c3e4 a5c4 d1b3 f6e7 b3a2 d8d4 a3b3 c4d2 b3b4 e6a2 b4d4\n"
+    "ln 2 16 -553 0 0 0 E d3c4 d8b6 e3e4 a8d8 d1c2 a5b3 a1b1 b6a5 e1f2 b3c1 c2c1 d8d2 b1b7 f8d8 b7b2 d2d3\n"
+    "ln 3 16 -755 0 0 0 E e3f4 c4d3 a1b1 d3e2 f1e2 e5f4 e1g1 f6d4 g1h1 a5c6 c1a3 g6g5\n"
+    "an a1 1 1 0 16 d1c2 1\n"
+    "ln 1 16 -1010 0 0 0 E d1c2 c4d3 c2a2 e6b3 a2b1 d3e2 f1e2 f6h4 g2g3 h4e7\n"
+    "an a2 1 0 0 14 c4d3 2\n"
+    "ln 1 14 979 0 0 0 E c4d3 c2a2 a5b3 a1b1 c5c4 c1d2 f6h4 g2g3 f4e3\n"
+    "ln 2 14 935 0 0 0 E a5b3 d3c4 b3a1 c2a2 f4e3 c1e3 e5e4 e2f4 f6c3 e1f2 d8d1 f4e6 d1e1 f2g1 e1e3 a2f2 e3f2 g1f2\n"
+    "an a3 1 1 0 6 b3c4 1\n"
+    "ln 1 6 -456 0 0 0 E b3c4 f4e3 a1a3 d8b6 e2c3 b6b4\n"
+    "end\n";
+
+}  // namespace
+
+TEST(coach_review_hint_says_the_better_move_wins_material) {
+    // 19.Be5?? with no reason the coach can give: the hint says the bishop had a move that wins
+    // material (19.Bxd6 takes the queen), without naming it.
+    const Recorded rc = recorded(kBe5Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[48];
+        std::snprintf(where, sizeof where, "Be5 gain b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        CHECK(r.offersTakeback);
+        const Beat* h = beatWithKey(r.script, "ex.hint.gain.b" + std::to_string(level));
+        CHECK(h != nullptr);
+        if (h && h->line.arg("your")) {
+            CHECK_EQ(h->line.arg("your")->piece, Bishop);
+            CHECK_EQ(h->line.arg("your")->square, sq("e5"));   // the bishop that moved, where it stands
+        }
+        CHECK(!hasKey(r.script, "ex.hint.b" + std::to_string(level)));
+        CHECK(!hasKeyPrefix(r.script, "ex.better") && !hasKeyPrefix(r.script, "ex.reveal"));
+    }
+    // Kd2: the better move wins nothing either (both lose the rook): the plain hint.
+    const Recorded kd2 = recorded(kKd2Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        CHECK(!hasKeyPrefix(reviewRecorded(rv, kd2, level).script, "ex.hint.gain"));
+    }
+}
+
+TEST(coach_review_level2_mistake_names_what_falls_at_once) {
+    // 18...g5? 19.fxg5 takes a pawn at once, won back on move 20; what the move costs is the pawn
+    // on c7, seven plies on. Level 2 says a mistake in words only when what falls at once stays
+    // lost: "this move lets me win your pawn" with the arrow on fxg5 would point at the wrong pawn.
+    const Recorded rc = recorded(kG5Record);
+    Reviewer rv;
+    const Review r = reviewRecorded(rv, rc, 2);
+    checkScript(r.script, "g5 b2");
+    CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+    CHECK(!r.verdict.voiced);
+    CHECK(!hasKeyPrefix(r.script, "ex.material"));
+    // Level 3 says the whole line, as it goes.
+    Reviewer rv3;
+    const Review r3 = reviewRecorded(rv3, rc, 3);
+    checkScript(r3.script, "g5 b3");
+    CHECK(hasKeyPrefix(r3.script, "ex.material.b3"));
+}
+
+TEST(coach_review_loss_the_better_move_shares_holds_on_the_deeper_line) {
+    // 40...Kc7??: the after-move line's defence loses the rook (5 points), but the better move loses
+    // a knight as well, and the deeper line for the move loses less: no material reason (nor the
+    // discovered check that would come with it), at any level.
+    const Recorded rc = recorded(kKc7Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[32];
+        std::snprintf(where, sizeof where, "Kc7 b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        CHECK(r.verdict.exType != ExType::Material && r.verdict.exType != ExType::Discovered);
+        CHECK(!hasKeyPrefix(r.script, "ex.material") && !hasKeyPrefix(r.script, "ex.discovered"));
+    }
+}
+
+TEST(coach_review_motif_target_behind_the_reply_capture) {
+    // 17.Qc2? cxd3: the reply takes a pawn itself; the pawn on b3 the bishop behind it takes next is
+    // no more than that. "A discovered attack hits your pawn" would not say what the move costs.
+    const Recorded rc = recorded(kQc2Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[32];
+        std::snprintf(where, sizeof where, "Qc2 b%d", level);
+        checkScript(r.script, where);
+        CHECK(!hasKeyPrefix(r.script, "ex.discovered"));
+        // Levels 3-6 say the line and what it costs.
+        if (level >= 3) CHECK(hasKeyPrefix(r.script, ("ex.material.b" + std::to_string(level)).c_str()));
+    }
+}
+
 TEST(coach_review_recorded_reasons_hold) {
     // Recorded moves (tools/coach_audit corpora, depth 18) the coach once explained wrong.
     struct Case {
