@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
         else if (a == "--max-plies") o.maxPlies = std::atoi(next().c_str());
         else if (a == "--level") o.level = std::atoi(next().c_str());
         else if (a == "--all") o.all = true;
+        else if (a == "--sequence") o.sequence = true;
         else if (a == "--material-only") o.materialOnly = true;
         else if (a == "--hang-rate") o.hangRate = std::atof(next().c_str());
         else if (a == "--mistake-rate") o.mistakeRate = std::atof(next().c_str());

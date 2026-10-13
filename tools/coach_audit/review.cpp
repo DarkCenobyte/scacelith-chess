@@ -739,14 +739,46 @@ int reviewMain(const Options& o) {
         if (!judge->ok()) std::fprintf(stderr, "engine unavailable: moves judged from the cache only\n");
     }
     Stats st;
+    // --sequence: the Reviewers of the game under way, per level and side.
+    std::map<std::pair<int, int>, Reviewer> seq;
+    std::string seqGame;
+    auto printScript = [&](const char* kind, const Script& s) {
+        for (const Beat& b : s)
+            if (!b.line.key.empty()) std::fprintf(out, "  %s [%s] %s\n", kind, b.line.key.c_str(), render(b.line).c_str());
+    };
     for (size_t ri = 0; ri < recs.size(); ++ri) {
         const Record& r = recs[ri];
+        if (o.sequence) {
+            const std::string game = r.tag.substr(0, r.tag.find(" ply "));
+            if (game != seqGame) seq.clear();
+            seqGame = game;
+        }
         for (int level = 1; level <= 6; ++level) {
             if (o.level && level != o.level) continue;
             Ctx c;
             if (!buildCtx(r, level, c)) continue;
-            Reviewer rv;
-            rv.reset(level, c.human);
+            Reviewer single;
+            Reviewer* rvp = &single;
+            Script pre;   // --sequence: the other side's move, as the coach's
+            if (o.sequence) {
+                const auto key = std::make_pair(level, int(c.human));
+                auto it = seq.find(key);
+                if (it == seq.end()) {
+                    it = seq.emplace(key, Reviewer()).first;
+                    it->second.reset(level, c.human);
+                }
+                rvp = &it->second;
+                Game before = c.g;
+                before.undo(1);
+                if (!before.moves().empty()) {
+                    for (const Beat& b : rvp->announce(before)) pre.push_back(b);
+                    for (const Beat& b : rvp->coachMoved(before, &r.a0)) pre.push_back(b);
+                }
+                for (const Beat& b : rvp->announce(c.g)) pre.push_back(b);
+            } else {
+                single.reset(level, c.human);
+            }
+            Reviewer& rv = *rvp;
             ReviewInput ri2;
             ri2.game = &c.g;
             ri2.before = &r.a0;
@@ -756,6 +788,13 @@ int reviewMain(const Options& o) {
             ri2.inBook = OpeningBook::instance().lookup(c.p1.hash());
             const Review rev = rv.review(ri2);
             ++st.reviews;
+            Script declined;   // --sequence: the game goes on as played
+            if (o.sequence)
+                for (const Beat& b : rev.script)
+                    if (b.kind == BeatKind::OfferTakeback) {
+                        declined = rv.takebackDeclined();
+                        break;
+                    }
             const PlyVerdict& v = rev.verdict;
             std::vector<Finding> f;
 
@@ -1225,7 +1264,7 @@ int reviewMain(const Options& o) {
                 ++st.codes[x.code];
                 anyError = anyError || x.error;
             }
-            if (rev.script.empty() && !o.all && f.empty()) continue;
+            if (rev.script.empty() && pre.empty() && declined.empty() && !o.all && f.empty()) continue;
 
             // The transcript.
             std::fprintf(out, "=== #%zu L%d %s %s  %s\n", ri, level, c.human == White ? "W" : "B",
@@ -1237,6 +1276,7 @@ int reviewMain(const Options& o) {
             std::fprintf(out, "  best line: %s\n", sanLine(c.bestLine, 0, std::min<size_t>(10, c.bestLine.size())).c_str());
             std::fprintf(out, "  played line: %s\n",
                          sanLine(c.playedLine, 0, std::min<size_t>(10, c.playedLine.size())).c_str());
+            printScript("PRE ", pre);
             for (const Beat& b : rev.script) {
                 switch (b.kind) {
                 case BeatKind::Say:
@@ -1255,6 +1295,7 @@ int reviewMain(const Options& o) {
                 default: break;
                 }
             }
+            printScript("DECL", declined);
             for (const Finding& x : f)
                 std::fprintf(out, "  %s %s: %s\n", x.error ? "!!" : "..", x.code.c_str(), x.detail.c_str());
         }

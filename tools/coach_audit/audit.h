@@ -18,11 +18,15 @@
 //       points or more at depth 10 (each position searched once), tagged with the game's site,
 //       ratings and time control; a game with an AuditPlies tag (ply numbers from 1, a sample's
 //       picks) gives those plies only, without the scan, its AuditTag added to their tag
-//   coach_audit review --in FILE [--level L] [--out FILE] [--all]
+//   coach_audit review --in FILE [--level L] [--out FILE] [--all] [--sequence]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
 //       before the problem it announces, a piece named on the wrong square, a loss the best move
 //       suffers too, a takeback offered for a small slip...
+//       --sequence: the records of one game (a PGN game recorded without --min-drop: every move, in
+//       order) through one Reviewer per level and side, kept from move to move as in a Coach game:
+//       the other side's moves played as the coach's (announced, remarked on: PRE lines), every
+//       offer declined (DECL lines)
 //       --verify D [--threads T] [--cache FILE]: also every move the coach shows or says, judged by
 //       the engine at depth D (verify.cpp: what it costs its mover against the best move there;
 //       the cache keeps the verdicts between runs)
@@ -50,6 +54,7 @@ struct Options {
     int maxPlies = 160;
     int level = 0;          // review: 0 = every level
     bool all = false;       // review: print every reviewed move, not only those with a script
+    bool sequence = false;  // review: one Reviewer per level and side through each game's records
     bool materialOnly = false;   // record: only the moves that leave material to win (2 points or more)
     double hangRate = 0.0;       // record, self-play: share of the human's moves that leave 3+ points to win
     double mistakeRate = 0.0;    // record, self-play: share of the human's moves picked among those that
