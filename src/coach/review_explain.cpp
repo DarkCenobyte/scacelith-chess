@@ -1028,6 +1028,10 @@ bool exchange(const Ctx& c, Explanation& out) {
     if (last >= 0 && c.r[size_t(last)].mover != c.coach) --last;
     Explanation ex;
     if (!settleLoss(c, last, 0, ex)) return false;
+    // The piece on the square has to be worth the drop: some phrasings name it and nothing else
+    // ("g5 is attacked 2 times and defended 1 time"), and the queen defending it, lost in the
+    // exchange (g5? Bxg5 Qxg5 Nxg5), is the line's to say (materialLine).
+    if (!c.lossExplains(points(victim), victim == Pawn)) return false;
     // The count says who really takes part: a slider behind another (a battery) counts, a piece pinned
     // to its king off the line does not.
     const uint64_t all = exchangeParticipants(c.p1, s, false);

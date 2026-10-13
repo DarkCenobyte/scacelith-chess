@@ -1937,6 +1937,35 @@ TEST(coach_review_human_context_cases) {
             CHECK(!hasKeyPrefix(r.script, "praise.brilliant"));
         }
     }
+    {
+        // Game fjkoMaKT (Lichess, 2016): 16...g5? Bxg5 Qxg5 Nxg5. The queen defending the pawn falls
+        // in the exchange: never "g5 is attacked 2 times and defended 1 time" alone (a pawn named for
+        // a queen lost); the queen is named from level 2.
+        const Recorded rc = recorded(
+         "rec b g7g5 startpos ; e2e4 b8c6 g1f3 e7e5 f1c4 g8f6 f3g5 d7d5 e4d5 f6d5 g5f7 e8f7 d1f3 d8f6 c4d5 c8e6 d5e6 f7e6 f3b3 e6d7 e1g1 f8d6 b1c3 a8b8 d2d3 c6d4 b3a4 c7c6 c3e4 f6h4 g1h1\n"
+         "tag game https://lichess.org/fjkoMaKT 1377/1283 300+4 ply 32 lc 30?!,32??,33n,38s eco C57 open Italian_Game grp common\n"
+         "an a0 1 0 0 16 a7a6 3\n"
+         "ln 1 16 -472 0 0 0 E a7a6 c1e3 d4f5 a4c4 h4h5 a1e1 h5g6 e4d6 f5d6 c4b4 h8f8 b4b6 b8e8 e3c5 f8f4 h1g1 f4h4\n"
+         "ln 2 16 -497 0 0 0 E h4h5 c1e3 d4f3 h2h3 a7a6 e4d6 d7d6 a4b4 d6e6 e3a7 a6a5 b4b6 b8f8 b6b7 f8f4 b7c6 e6f7\n"
+         "ln 3 16 -505 0 0 0 E a7a5 c2c3 b7b5 a4d1 d4e6 c1e3 d6e7 d1c2 d7e8 a2a4 h4h5 a4b5 b8b5\n"
+         "an a1 1 0 0 16 g7g5 1\n"
+         "ln 1 16 -854 0 0 0 E g7g5 c1g5 h4g5 e4g5 h8g8 f2f4 e5f4 a4d4 g8g5 h2h3 g5g6 c2c3 a7a6 f1f4\n"
+         "an a2 1 1 0 14 c1g5 2\n"
+         "ln 1 14 881 0 0 0 E c1g5 h4h2 h1h2 h7h6 g5h4 d6c7 a4a7 h8f8 a7c5 d4f3 g2f3\n"
+         "ln 2 14 747 0 0 0 E c2c3 d4f3 g2f3 h8g8 f1g1 g5g4 g1g3\n"
+         "an a3 1 0 0 6 a7a6 1\n"
+         "ln 1 6 -472 0 0 0 E a7a6 c1e3 d4f5 a4c4 h4h5 a1e1\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "g5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+            if (level >= 2) CHECK_EQ(r.verdict.exType, ExType::Material);
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
