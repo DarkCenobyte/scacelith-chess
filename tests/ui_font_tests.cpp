@@ -297,18 +297,15 @@ TEST(ui_font_preset_names_and_lists) {
     ui::setDifficultyList({});
     ui::setTimeControlList({});
     ui::setResolutionList({});
-    ui::setCoachLevels({});
     CHECK_EQ(ui::detail::data().difficulties.size(), saved.difficulties.size());
     CHECK_EQ(ui::detail::data().timeControls.size(), saved.timeControls.size());
     ui::setDifficultyList({{"Rookie", "New to chess.", 900}, {"Custom", "Your own engine settings.", 0}});
     ui::setTimeControlList({"Unlimited", "5+0"});
     ui::setResolutionList({{1280, 720}});
-    ui::setCoachLevels({{0, 0}, {800, 0}});
     ui::setVersionString("9.9.9-test");
     CHECK_EQ(ui::detail::data().difficulties.size(), size_t(2));
     CHECK_EQ(ui::detail::data().timeControls[1], std::string("5+0"));
     CHECK_EQ(ui::detail::data().resolutions.size(), size_t(1));
-    CHECK_EQ(ui::detail::data().coachLevels.size(), size_t(2));
     CHECK_EQ(ui::detail::data().version, std::string("9.9.9-test"));
     ui::detail::data() = saved;
 }
