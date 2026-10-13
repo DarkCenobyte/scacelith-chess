@@ -1838,6 +1838,53 @@ TEST(coach_review_human_context_cases) {
             }
         }
     }
+    {
+        // Games m6k7ae5v and xgc5lr64 (Lichess, 2013): a free piece not taken at once. 27...Qxd5 Nxd5
+        // Rxd8 still takes the knight (never "you missed a free piece"); 16.fxe4 Nf6 lets it go (said
+        // to a beginner).
+        const Recorded later = recorded(
+         "rec b e5d5 startpos ; e2e4 c7c5 b2b4 c5b4 a2a3 e7e5 a3b4 f8b4 c2c3 b4e7 d2d4 d7d6 f1d3 g8f6 g1e2 b8c6 e1g1 e8g8 g1h1 e5d4 c3d4 d6d5 e4e5 f6e4 d3e4 d5e4 c1e3 c8f5 e2g3 f5g6 b1c3 f7f5 g3e2 c6a5 d4d5 a5c4 e3f4 e7g5 d5d6 g5f4 e2f4 c4e5 d1d5 e5f7 d6d7 d8f6 c3b5 a7a6 b5c7 a8d8 f4e6 f6e5 e6d8\n"
+         "tag game https://lichess.org/m6k7ae5v 2095/2224 180+4 ply 54 drop 8.1\n"
+         "an a0 1 0 0 16 f8d8 3\n"
+         "ln 1 16 -170 0 0 0 E f8d8 d5b7 d8d7 a1d1 d7d8 b7c6 d8c8 d1d7 f5f4 c6b7 c8f8 c7d5 f7g5 b7b4 g5e6 d5e7 g8h8 d7d5 e5f6 e7g6 f6g6 d5e5 f4f3 g2g4 g6g4\n"
+         "ln 2 16 -231 0 0 0 E e5d5 c7d5 f8d8 d5b6 f7e5 a1c1 g8f8 c1c7 g6f7 h1g1 f7e6 f1d1 f8e7 c7b7 e5d3 b7a7 e6d7 d1a1 d3c5 a1c1 e7d6 b6c4 d6e6 c4e3 e6d6 c1d1 d6c6\n"
+         "ln 3 16 -708 0 0 0 E e5c7 d8e6 c7c6 f1d1 f7d8 e6f8 c6d5 d1d5 g8f8 d5e5 g6f7 a1d1\n"
+         "an a2 1 1 0 14 c7d5 2\n"
+         "ln 1 14 213 0 0 0 E c7d5 f8d8 d5b6 f7e5 a1c1 g8f8 c1c7 g6f7 c7b7 f7e6 f1d1 e5d3 h1g1 f8e7 d1a1 d3c5 b7c7 c5d7 a1a6\n"
+         "ln 2 14 -631 0 0 0 E f1d1 d5d1 a1d1 f7d8 f2f3 g8f7 g2g4 e4e3\n"
+         "an a3 1 0 0 6 f8d8 1\n"
+         "ln 1 6 -203 0 0 0 E f8d8 d5b7 d8d7 f1d1 f7d8 b7c8\n"
+         "end\n");
+        const Recorded gone = recorded(
+         "rec w f3e4 startpos ; e2e4 e7e5 g1f3 d7d6 d2d4 e5d4 f3d4 c7c5 f1b5 c8d7 b5d7 d8d7 d4f5 g7g6 f5e3 b8c6 c2c3 f8g7 e3d5 g8f6 d1e2 e8c8 e1g1 h8e8 f2f3 f6d5 c1d2 f7f5 e2d3 f5e4\n"
+         "tag game https://lichess.org/xgc5lr64 1549/1419 900+15 ply 31 drop 5.8\n"
+         "an a0 1 1 0 16 d3d5 3\n"
+         "ln 1 16 -588 0 0 0 E d3d5 e8e5 d5b3 e4e3 d2e1 e3e2 f1f2 d6d5 f3f4 e5e3 b1d2 d5d4 a1c1 d4d3 b3c4 e3e8\n"
+         "ln 2 16 -671 0 0 0 E f3e4 d5f6 d2g5 c6e5 d3c2 e8e6 b1d2 d8e8 g5f6 g7f6 a2a4 f6d8\n"
+         "ln 3 16 -862 0 0 0 E d3c4 d5b6 c4e2 e4e3 d2e1 d7f7 b1a3 g7f8 a3b5 a7a6 e1h4 d8d7\n"
+         "an a2 1 0 0 14 d5f6 2\n"
+         "ln 1 14 671 0 0 0 E d5f6 d2g5 c6e5 d3c2 e8e6 b1a3 c8b8 g5f6 e6f6 f1f6 g7f6 c2d2 d6d5 e4d5 f6e7\n"
+         "ln 2 14 662 0 0 0 E d5e7 d3b5 c6e5 b5d7 d8d7 f1e1 e7c6 b1a3 a7a6 d2f4 g6g5 f4g5 b7b5 a1d1\n"
+         "an a3 1 1 0 6 d3d5 1\n"
+         "ln 1 6 -588 0 0 0 E d3d5 e8e5 d5b3 e4e3 d2e1 g6g5\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            char where[32];
+            {
+                Reviewer rv;
+                const Review r = reviewRecorded(rv, later, level);
+                std::snprintf(where, sizeof where, "Qxd5 b%d", level);
+                checkScript(r.script, where);
+                CHECK(r.verdict.exType != ExType::MissedCapture);
+                CHECK(!hasKeyPrefix(r.script, "ex.missed_capture"));
+            }
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, gone, level);
+            std::snprintf(where, sizeof where, "fxe4 b%d", level);
+            checkScript(r.script, where);
+            if (level <= 2) CHECK_EQ(r.verdict.exType, ExType::MissedCapture);
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

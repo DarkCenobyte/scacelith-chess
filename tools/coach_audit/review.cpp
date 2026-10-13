@@ -367,6 +367,15 @@ void checkFree(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     if (!target || target->square == NoSquare) return;
     if (!isUndefended(p, target->square))
         out.push_back({"NOT_FREE", k + ": " + squareName(target->square) + " has a defender"});
+    if (!missed) return;
+    // Taken along the played line all the same (after a check or a trade): nothing was missed.
+    for (size_t i = 1; i < c.refut.size() && i <= 5; i += 2) {
+        if (c.refut[i - 1].move.from == target->square) break;
+        if (c.refut[i].mover == c.human && c.refut[i].move.to == target->square && c.refut[i].captured == target->piece) {
+            out.push_back({"MISSED_TAKEN", k + ": " + squareName(target->square) + " is taken along the line all the same"});
+            break;
+        }
+    }
 }
 
 void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
