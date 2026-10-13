@@ -91,6 +91,11 @@ GLuint atlasTexture();
 int atlasGeneration();
 // Builds the given (face, codepoint) glyphs now, on worker threads (e.g. a language's UI strings).
 void prewarm(const std::vector<std::pair<int, uint32_t>>& glyphs);
+// On: the glyphs built from then on are kept (their distance fields, by face and code point), and
+// the atlases built after it copy them instead of building them again (seconds of CPU for a whole
+// atlas). For the unit tests, which start many scenes in one process; the game builds one atlas
+// per run and leaves it off. Off frees the kept glyphs.
+void keepBuiltGlyphs(bool on);
 // Call once per frame before drawing: uploads glyphs added since the last call.
 void flushUploads();
 

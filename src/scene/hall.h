@@ -114,6 +114,10 @@ struct BuildStats {
 // Whole room: floor, walls, windows, curtains, tapestries, ceiling, chandelier, doors, props and
 // the exterior terrace. Part names start with "hall_".
 Model buildHall(BuildStats* stats = nullptr);
+// On: the next hall buildHall() builds without stats is kept, and the calls after it get a copy of
+// that one instead of building another. For the unit tests, which start many scenes in one
+// process; the game builds one hall per scene and leaves it off. Off frees the copy.
+void keepBuiltHall(bool on);
 
 // Suggested sun direction (towards the sun) for the hall: low afternoon sun from the -X side so
 // the windows cast long patches on the floor in front of and beside the table.

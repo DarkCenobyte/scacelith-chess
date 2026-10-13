@@ -22,3 +22,7 @@ struct PieceMeshes {
 
 // pieceType: 1 Pawn, 2 Knight, 3 Bishop, 4 Rook, 5 Queen, 6 King (chess::PieceType values).
 PieceMeshes buildPiece(int pieceType);
+// On: the pieces buildPiece() builds are kept, and the calls after it get a copy of the kept one
+// of their type instead of building another. For the unit tests, which start many scenes in one
+// process; the game builds one set per scene and leaves it off. Off frees the copies.
+void keepBuiltPieces(bool on);

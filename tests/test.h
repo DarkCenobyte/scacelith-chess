@@ -18,19 +18,21 @@
 #include <vector>
 
 namespace testing {
-struct Case { const char* name; std::function<void()> fn; };
+struct Case { const char* name; std::function<void()> fn; const char* file; };
 std::vector<Case>& registry();
 extern int g_failures;
 extern std::string g_skip;  // why the running test was skipped, "" when it was not
 extern std::string g_skipWithout;          // the prerequisite it was skipped without (SKIP_WITHOUT)
 extern std::vector<std::string> g_uses;    // the prerequisites it has (uses)
 inline void uses(const std::string& what) { g_uses.push_back(what); }
-struct Registrar { Registrar(const char* n, std::function<void()> f) { registry().push_back({n, std::move(f)}); } };
+struct Registrar {
+    Registrar(const char* n, std::function<void()> f, const char* file) { registry().push_back({n, std::move(f), file}); }
+};
 }  // namespace testing
 
 #define TEST(NAME)                                                        \
     static void test_##NAME();                                            \
-    static testing::Registrar reg_##NAME(#NAME, test_##NAME);             \
+    static testing::Registrar reg_##NAME(#NAME, test_##NAME, __FILE__);   \
     static void test_##NAME()
 
 #define CHECK(COND)                                                                          \

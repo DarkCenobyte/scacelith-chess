@@ -1,7 +1,8 @@
 # Test coverage of the game's own code (src/): the unit tests and the X11 desktop tests of a Linux
 # build instrumented for gcov (CMakeLists.txt, SCACELITH_COVERAGE; Stockfish, built apart, is not
-# counted), measured by gcovr. The game is built too, so that the code no test runs (the renderer,
-# the scenes, the menus) counts as not covered. The coach voice's audio synthesis is left out: its
+# counted), measured by gcovr. The game is built too, so that the code no test runs counts as not
+# covered (the unit tests run the scenes, the menus and the renderer on a null OpenGL: tests/headless.h).
+# The coach voice's audio synthesis is left out: its
 # tests skip in this build (tests/tts_tests.cpp; instrumented, they took 13 to 50 minutes of the
 # run, the other CI jobs run them) and its code (src/tts but the text front end and the model
 # store) is not measured. The run's summary shows the line, function and

@@ -7,6 +7,7 @@
 #include "../game/layout.h"
 #include <chrono>
 #include <cmath>
+#include <mutex>
 #include <unordered_map>
 
 using namespace m;
@@ -462,12 +463,22 @@ MeshData buildKnight() {
 
 }  // namespace
 
+namespace {
+std::mutex g_keptMu;
+bool g_keep = false;
+PieceMeshes g_kept[7];   // by type, the pieces built while g_keep is on (empty until then)
+}  // namespace
+
 PieceMeshes buildPiece(int type) {
     double t0 = nowSec();
     PieceMeshes pm;
     if (type < 1 || type > 6) {
         LOGW("buildPiece: invalid piece type %d", type);
         return pm;
+    }
+    {
+        std::lock_guard<std::mutex> lk(g_keptMu);
+        if (g_keep && !g_kept[type].body.indices.empty()) return g_kept[type];
     }
     switch (type) {
         case 1: pm.body = buildPawn(); break;
@@ -485,5 +496,14 @@ PieceMeshes buildPiece(int type) {
     setAxialTangents(pm.felt);
     LOGI("pieces: type %d built: %d tris body, %d tris felt, %.1f ms", type, int(pm.body.indices.size() / 3), int(pm.felt.indices.size() / 3),
          (nowSec() - t0) * 1000.0);
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    if (g_keep && g_kept[type].body.indices.empty()) g_kept[type] = pm;
     return pm;
+}
+
+void keepBuiltPieces(bool on) {
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    g_keep = on;
+    if (!on)
+        for (PieceMeshes& pm : g_kept) pm = PieceMeshes();
 }

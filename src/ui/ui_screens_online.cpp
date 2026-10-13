@@ -1700,7 +1700,8 @@ void pageDirectHost(float t) {
     // Connection column.
     im::sectionLabel(T("online.direct.connection"), rx, top + 8.0f, colW);
     float cy = top + 36.0f;
-    if (O.hostPortText.empty()) O.hostPortText = std::to_string(gs.directPort);
+    // Set on the way in (pageDirect): emptied by the player, the field stays empty (its placeholder
+    // and the port range line show) until they type a port.
     std::string portText = O.hostPortText;
     if (im::formField(L("online.direct.port"), portText, Rect(rx, cy, colW, 56.0f), 5, im::FIELD_LTR, "47100"))
         O.hostPortText = digitsOnly(portText);
