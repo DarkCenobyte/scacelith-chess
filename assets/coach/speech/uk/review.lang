@@ -569,7 +569,7 @@ ex.hanging.tip.b1.2 = Корисна звичка: після кожного х�
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured.
-ex.exchange_capture.b1 = {your} бере фігуру, але {my} б’є у відповідь. Ти втрачаєш більше.
+ex.exchange_capture.b1 = {your} бере, але {my} б’є у відповідь. Ти втрачаєш більше.
 ex.exchange_capture.b1.2 = {my} б’є у відповідь. {your} коштує {n:point}, а ти отримуєш лише {n2:point}.
 ex.exchange_capture.b1.3 = Обережно: {my} може забрати {your:acc} у відповідь. Це поганий розмін.
 ex.exchange_capture.b2 = Обережно з розмінами: {your} коштує {n:point}. {my} б’є, а тобі — лише {n2:point}.

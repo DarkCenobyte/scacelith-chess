@@ -560,7 +560,7 @@ ex.hanging.tip.b1.2 = Хорошая привычка: после каждого
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured.
-ex.exchange_capture.b1 = {your} берёт фигуру, но {my} бьёт в ответ. На этом размене ты теряешь очки.
+ex.exchange_capture.b1 = {your} берёт, но {my} бьёт в ответ. На этом размене ты теряешь очки.
 ex.exchange_capture.b1.2 = {my} бьёт в ответ. {your} стоит {n:point}, а взамен только {n2:point}.
 ex.exchange_capture.b1.3 = Осторожно: {my} может взять {your:acc} в ответ. Это плохой размен.
 ex.exchange_capture.b2 = Осторожно: {your} стоит {n:point}. {my} бьёт в ответ, а у тебя только {n2:point}.

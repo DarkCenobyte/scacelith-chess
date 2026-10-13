@@ -329,6 +329,19 @@ void checkWon(const Ctx& c, const Beat& b, size_t from, std::vector<Finding>& ou
                        b.line.key == "ex.point.piece";
     const Arg* t1 = b.line.arg("t1");
     if (!claim || !t1 || t1->square == NoSquare) return;
+    // "Can't be saved", the human to move: the line still costs the human, for good, from where it
+    // is said (Nxe5 dxe5 Bxb5 costs nothing more from Nxe5 on: the bishop could move away).
+    Position said = c.p1;
+    for (size_t i = 0; i < from && i < c.refut.size(); ++i) said.makeMove(c.refut[i].move);
+    if (b.line.key == "ex.point.piece" && said.sideToMove() == c.human) {
+        const int then = c.base - materialBalance(said, c.human);
+        int worst = then;
+        for (size_t n = from + 1; n <= std::min(c.refut.size(), from + 6); ++n)
+            worst = std::max(worst, settledLoss(c.refut, c.p1, c.human, c.base, n));
+        if (worst - then < std::min(2, kPiecePoints[t1->piece]))
+            out.push_back({"POINT_NO_LOSS", b.line.key + ": the line costs " + std::to_string(worst - then) +
+                                                " more from there, the " + pieceName(t1->piece) + " could be saved"});
+    }
     // Follow the piece along the line from where it stands on the table, or where the demonstration
     // stopped (ex.point.piece: its square then; found by matching the piece along the line).
     if (b.line.key != "ex.point.piece") from = 0;
@@ -377,16 +390,36 @@ void checkFree(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
         }
     }
     // Free means kept: the better line still holds the piece's worth after the reply (an exchange
-    // there read where it ends), and the move played does not win as much along its own line.
-    const int worth = kPiecePoints[target->piece] - 1;
+    // there read where it ends), and the move played does not win as much along its own line. A
+    // piece within a point of its worth, a pawn whole.
+    const int worth = std::max(1, kPiecePoints[target->piece] - 1);
     if (-lossAt(c.bestLine, c.p0, c.human, c.base, 2) < worth)
         out.push_back({"MISSED_NOT_FREE", k + ": the reply to the capture takes material back at once"});
+    // Won and kept through the next replies (Bxd6 Nxf3+ Qxf3 Qxd6 wins nothing in the end).
     for (size_t n = 1; n <= 3; n += 2) {
-        if (-lossAt(c.playedLine, c.p0, c.human, c.base, n) >= worth) {
+        int kept = -lossAt(c.playedLine, c.p0, c.human, c.base, n);
+        for (size_t j = n + 1; j <= std::min(c.playedLine.size(), n + 3); ++j)
+            kept = std::min(kept, -lossAt(c.playedLine, c.p0, c.human, c.base, j));
+        if (kept >= worth) {
             out.push_back({"MISSED_GAINED", k + ": the move played wins as much along its line"});
             break;
         }
     }
+}
+
+// A trapped piece: the reply does not take one of its attackers (a second attacker then wins it, a
+// fork rather than a trap).
+void checkTrapped(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.trapped.", 0) != 0 || k.rfind("ex.trapped.tip", 0) == 0 || c.refut.size() < 2) return;
+    const Arg* target = b.line.arg("your");
+    if (!target || target->square == NoSquare) return;
+    Position p2 = c.p1;
+    p2.makeMove(c.refut[0].move);
+    const LineStep& reply = c.refut[1];
+    if (reply.mover == c.human && reply.captured != NoPiece &&
+        (p2.attackersTo(target->square, c.coach) & squareBit(reply.move.to)))
+        out.push_back({"TRAPPED_ATTACKER_TAKEN", k + ": the reply takes a piece attacking " + squareName(target->square)});
 }
 
 // A sacrifice praised: the move gives up material by exchange, or the player is still 2 points down
@@ -394,11 +427,85 @@ void checkFree(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
 void checkSacrifice(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.rfind("praise.sacrifice", 0) != 0 && k.rfind("praise.brilliant", 0) != 0) return;
+    // Given up by exchange: a legal capture there wins the coach two points more than the move took.
     const Move m = c.p0.parseUCI(c.rec->played);
-    if (m.valid() && seePoints(c.p0, m) <= -2) return;
+    if (m.valid()) {
+        int back = 0;
+        for (const Move& r : c.p1.legalMoves())
+            if (r.to == m.to && (r.flags & MoveCapture)) back = std::max(back, seePoints(c.p1, r));
+        const Piece took = c.p0.at(m.to);
+        if (back - (took.empty() ? 0 : kPiecePoints[took.type]) >= 2) return;
+    }
     const size_t n = c.playedLine.size();
     const bool down = n >= 3 ? c.playedLine[2].balance <= c.base - 2 : n == 2 && c.playedLine[1].balance <= c.base - 2;
     if (!down) out.push_back({"SACRIFICE_NONE", k + ": nothing is given up after the player's next move"});
+}
+
+// "You saved your piece": nothing of the player's is left en prise once it moved (Rb1 out of the
+// queen's reach while the queen on b3 still hangs to a rook).
+void checkSaved(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.saved", 0) != 0) return;
+    const uint64_t left = hangingPieces(c.p1, c.human, false);
+    if (left) out.push_back({"SAVED_OTHER_HANGS", k + ": " + squareName(Square(__builtin_ctzll(left))) + " still hangs"});
+}
+
+// Praise in a lost position (best line at 10 % or less) only for the move the lines prefer: the win
+// chances no longer tell the other moves apart.
+void checkPraiseLost(const Ctx& c, const PlyVerdict& v, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.", 0) != 0 || v.wBest > 10.0 || c.bestLine.empty()) return;
+    if (c.bestLine[0].move != c.p0.parseUCI(c.rec->played))
+        out.push_back({"PRAISE_LOST_NOT_BEST", k + " at " + std::to_string(int(v.wBest)) + " %"});
+}
+
+// A line that is only the move named beside it ("Missed mate: Qxa7#, starting with Qxa7#"); a mate
+// in one said by the lines made for longer mates ("You had mate in 1 move, starting with Qxa7#").
+void checkLineRepeats(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const Arg* m = b.line.arg("m");
+    if (b.line.key.rfind("ex.mate_missed.b", 0) == 0 && b.line.key != "ex.mate_missed.b1" && m && m->number == 1)
+        out.push_back({"MATE_ONE_WORDING", b.line.key});
+    const Arg* ln = b.line.arg("line");
+    if (!ln || ln->kind != Arg::Kind::Moves || ln->san.find(' ') != std::string::npos) return;
+    // The idea after the better move holds the player's next move, not my reply alone.
+    if (b.line.key.rfind("ex.better.b5", 0) == 0) {
+        if (!ln->san.empty()) out.push_back({"IDEA_ONE_MOVE", b.line.key + ": " + ln->san});
+        return;
+    }
+    auto bare = [](std::string t) {
+        while (!t.empty() && (t.back() == '+' || t.back() == '#')) t.pop_back();
+        return t;
+    };
+    // The better move, the same move from the same position (a line that starts after the move
+    // played may name another move the same way: Bxh3 answered by Bxh3).
+    const Arg* mv = b.line.arg("best");
+    if (!mv || bare(mv->san) != bare(ln->san) || c.p0.parseSAN(ln->san) != c.p0.parseUCI(mv->uci)) return;
+    for (const std::string& v : variantsOf(b.line.key))
+        if (usesPlaceholder(v, "line") && usesPlaceholder(v, "best")) {
+            out.push_back({"LINE_REPEATS_MOVE", b.line.key + ": " + ln->san});
+            return;
+        }
+}
+
+// The king said exposed or weakened: the coach checks it within its first three moves of the
+// refutation, and a line said holds such a check (the lines start with the coach's reply, so its
+// moves are the even ones).
+void checkKingLine(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.king_exposed.", 0) != 0 && k.rfind("ex.king_shield.", 0) != 0) return;
+    bool checked = false;
+    for (size_t i = 0; i < c.refut.size() && i < 6; ++i) checked = checked || (c.refut[i].mover == c.coach && c.refut[i].check);
+    if (!checked) out.push_back({"KING_NO_CHECK", k});
+    const Arg* ln = b.line.arg("line");
+    if (!ln) return;
+    bool lineUsed = false;
+    for (const std::string& v : variantsOf(k)) lineUsed = lineUsed || usesPlaceholder(v, "line");
+    if (!lineUsed) return;
+    std::istringstream in(ln->san);
+    std::string san;
+    for (int i = 0; in >> san; ++i)
+        if (i % 2 == 0 && (san.back() == '+' || san.back() == '#')) return;
+    out.push_back({"KING_LINE_NO_CHECK", k + ": " + ln->san});
 }
 
 void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
@@ -811,6 +918,15 @@ int reviewMain(const Options& o) {
                                 c.p0.at(your->square).type != your->piece || c.p0.at(my->square).type != my->piece ||
                                 !(c.p0.attackersTo(your->square, c.coach) & squareBit(my->square)))
                                 preF.push_back({"THREAT_PIECE", b.line.key + ": no such attack on the board"});
+                            // A capture the coach could make next (the turn passed): not by a pinned piece.
+                            Position q = c.p0;
+                            bool legal = false;
+                            if (my && your && q.passTurn())
+                                for (const Move& m : q.legalMoves()) legal = legal || (m.from == my->square && m.to == your->square);
+                            else if (my && your)
+                                legal = !(c.p0.pinned(c.coach) & squareBit(my->square));
+                            if (my && your && !legal)
+                                preF.push_back({"THREAT_PINNED", b.line.key + ": " + squareName(my->square) + " cannot take"});
                         }
                         // "My last move was a mistake": the human's best line keeps 2 points more
                         // than before the coach's move, four plies on (the capture answered).
@@ -884,7 +1000,12 @@ int reviewMain(const Options& o) {
                     checkPts(c, b, f);
                     checkWon(c, b, size_t(demoPlies), f);
                     checkFree(c, b, f);
+                    checkTrapped(c, b, f);
                     checkSacrifice(c, b, f);
+                    checkSaved(c, b, f);
+                    checkPraiseLost(c, v, b, f);
+                    checkLineRepeats(c, b, f);
+                    checkKingLine(c, b, f);
                     checkFork(c, b, f);
                     checkMateCount(c, b, f);
                     checkLinePrizes(c, b, f);

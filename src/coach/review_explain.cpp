@@ -537,11 +537,13 @@ bool mateMissed(const Ctx& c, Explanation& out) {
     // of level 2 say it with the first move only.
     const size_t plies = size_t(2 * n - 1);
     const bool lineKnown = c.best.size() >= plies && c.best[plies - 1].mate;
+    // Mate in one: the move is the whole line, said once (never "Qxa7#, starting with Qxa7#").
     Beat b = delayed     ? bandLine(c, "ex.mate_delayed")
+             : n == 1    ? line(c, "ex.mate_missed.b1")
              : lineKnown ? bandLine(c, "ex.mate_missed")
                          : line(c, c.level == 1 ? "ex.mate_missed.b1" : "ex.mate_missed.b2");
     put(b.line, "m", Arg::ofNumber(n));
-    if (lineKnown) put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, plies)));
+    if (lineKnown && n > 1) put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, plies)));
     const Square ck = c.p1.kingSquare(c.coach);
     put(b.line, "my", pieceArg(c.p1, ck, c.human));
     const LineStep& m = c.best[0];
@@ -716,11 +718,20 @@ bool discovered(const Ctx& c, Explanation& out) {
     // "Nxd5 allows the discovered attack fxg7+" would leave out the queen or the rook that falls;
     // the material reason says the line instead.
     if (!c.b.fullDemo || c.j.cls == MoveClass::Mistake) return false;
+    // What the checking move takes at once (with the human's capture right after it) is no prize of
+    // the check: the line must win more than that (Nxh5+ took a pawn, and one more falls later).
+    Position once = afterR(c, 1);
+    if (c.r.size() >= 2 && c.r[1].mover == c.human && c.r[1].captured != NoPiece) once.makeMove(c.r[1].move);
+    const int lostAtOnce = c.base - materialBalance(once, c.human);
     for (const Discovery& d : all) {
         if (!d.check) continue;
         for (int k = 1; k < int(c.r.size()) && k <= motifReach(c); ++k) {
             Explanation ex;
             if (!settleLoss(c, k, 1, ex, true)) continue;
+            if (lostAtOnce >= 1 && ex.lost - lostAtOnce <= lostAtOnce) continue;
+            // Shown to the end, or not said.
+            planDemo(c, ex);
+            if (!ex.full || ex.demoPlies != ex.fullPlies) continue;
             ex.type = ExType::Discovered;
             ex.concrete = true;
             ex.hintSquare = c.p1.kingSquare(c.human);
@@ -878,8 +889,12 @@ bool trapped(const Ctx& c, Explanation& out) {
     const int reach = trapReach(c);
     Square x = NoSquare;
     Explanation ex;
+    // A piece whose attacker the reply takes is not trapped: a second attacker wins it, a fork
+    // (Ndxe6 fxe6 Nxe6, the rook on f8 and the queen both hit).
+    const bool attackerTaken = c.r.size() >= 2 && c.r[1].mover == c.human && c.r[1].captured != NoPiece;
     for (Square s : squaresOf(p2.pieces(c.human) & ~(p2.pieces(Pawn) | p2.pieces(King))))
-        if (isTrapped(p2, s) && settleLoss(c, takenLater(c, s, reach), 1, ex, true)) {
+        if (isTrapped(p2, s) && !(attackerTaken && hasBit(p2.attackersTo(s, c.coach), c.r[1].move.to)) &&
+            settleLoss(c, takenLater(c, s, reach), 1, ex, true)) {
             x = s;
             break;
         }
@@ -1163,13 +1178,20 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     if (takenLater(c.playedLine, 1) || takenLater(c.r, 0)) return false;
     if (c.f.captured != NoPiece && c.f.seePts >= points(yt) - 1) return false;   // took as much elsewhere
     // Free means kept: a reply that takes as much back at once (hxg4 exf4, the player's own bishop
-    // left en prise) makes it a trade; a capture the player takes straight back counts whole.
+    // left en prise) makes it a trade; a capture the player takes straight back counts whole. A
+    // piece within a point of its worth, a pawn whole.
+    const int worth = std::max(1, points(yt) - 1);
     const size_t kept = c.best.size() >= 3 && c.best[1].captured != NoPiece && c.best[2].captured != NoPiece &&
                         c.best[2].move.to == c.best[1].move.to ? 3 : 2;
-    if (heldGain(c.best, kept, c.base, c.human, c.bestEnd) < points(yt) - 1) return false;
+    if (heldGain(c.best, kept, c.base, c.human, c.bestEnd) < worth) return false;
     // The move played wins as much along its line (cxd5 Bxb2+ Kxb2: the bishop taken on b2 instead).
     for (size_t i = 1; i <= 3; i += 2)
-        if (heldGain(c.playedLine, i, c.base, c.human, c.playedEnd) >= points(yt) - 1) return false;
+        if (heldGain(c.playedLine, i, c.base, c.human, c.playedEnd) >= worth) return false;
+    // A line that stops before the player's next move with as much still there to take (Nd5+ Kc6,
+    // the bishop on c8 still loose; what went wrong is elsewhere, a repetition).
+    if (c.playedLine.size() < 3 && c.playedEnd.sideToMove() == c.human && c.playedEnd.hasLegalMove() &&
+        materialBalance(c.playedEnd, c.human) + bestCapturePoints(c.playedEnd, c.human) - c.base >= worth)
+        return false;
     // A move that loses as much as the piece missed: the loss is the story (materialLine).
     if (c.concreteLoss(8) && c.lossWithin(8) >= points(yt)) return false;
     const bool bigPiece = points(yt) >= 3;
@@ -1323,9 +1345,15 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     // Never for a move that loses material: the king's safety may be why it is lost (a take-back
     // that opens the king), but the coach cannot show it.
     if (c.j.delta < 5.0 || c.concreteLoss(8) || c.losesMaterial(8) || reach == 0) return false;
-    int checks = 0;
+    int checks = 0, firstCheck = -1;
     for (int i = 0; i < reach; ++i)
-        if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].check) ++checks;
+        if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].check) {
+            ++checks;
+            if (firstCheck < 0) firstCheck = i;
+        }
+    // No check of mine within three of my moves: nothing shows the king in danger (Qxe4+ Kd8, and
+    // the checks that follow are all the player's own; the better move wins, the king is not why).
+    if (firstCheck < 0 || firstCheck >= 6) return false;
     // Pawns and a rook around a king in an endgame are no danger to it (an active king is the norm).
     const bool zone = !endgamePhase(c) && kingZoneAttacks(c.p1, c.human) >= 3;
     if (checks < 2 && !zone) return false;
@@ -1353,6 +1381,8 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     ex.concrete = true;
     const Square k1 = c.p1.kingSquare(c.human);
     Beat b = bandLine(c, shield ? "ex.king_shield" : "ex.king_exposed");
+    // The line said reaches my first check at least.
+    put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, std::max(refutationLength(c), size_t(firstCheck + 1)))));
     put(b.line, "your", pieceArg(c.p1, k1, c.human));
     put(b.line, "sq", Arg::ofSquare(shield ? c.played.from : k1));
     pointPiece(b, k1, "your", true);
@@ -1422,9 +1452,10 @@ bool endgame(const Ctx& c, Explanation& out) {
         const int df = std::abs(fileOf(a) - fileOf(d)), dr = std::abs(rankOf(a) - rankOf(d));
         if ((df == 0 && dr == 2) || (dr == 0 && df == 2)) family = "ex.opposition";
     }
-    // Push the passed pawn.
+    // Push the passed pawn: the lines say it runs and decides, so only when the push keeps a clear
+    // edge (a6 that only holds the balance, the bishop and rook still in play, is no run to a8).
     if (family.empty() && b0.piece == Pawn && isPassed(c.p0, b0.move.from) &&
-        !(c.f.piece == Pawn && c.played.from == b0.move.from))
+        !(c.f.piece == Pawn && c.played.from == b0.move.from) && c.j.wBest >= 60.0)
         family = "ex.push_passed";
     // Bring the king forward.
     if (family.empty() && b0.piece == King && b0.captured == NoPiece && c.f.piece != King) {

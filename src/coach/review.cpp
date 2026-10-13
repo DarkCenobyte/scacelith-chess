@@ -462,6 +462,13 @@ bool designation(const Ctx& c, const Explanation& ex, const Position& q, Beat& o
     }
     const std::vector<Square> ts = standingTargets(c, ex, q);
     if (ts.empty()) return false;
+    // "Can't be saved" with the human to move: only for what the line still costs from here. A piece
+    // the coach takes while the human wins as much meanwhile (Nxe5 dxe5 Bxb5, a pawn lost in all)
+    // could move away.
+    int cheapest = points(Queen);
+    for (Square t : ts) cheapest = std::min(cheapest, points(q.at(t).type));
+    if (q.sideToMove() == c.human && ex.lost - (c.base - materialBalance(q, c.human)) < std::min(2, cheapest))
+        return false;
     out = sayBeat(ts.size() >= 2 ? "ex.point.two" : "ex.point.piece", Look::Target, c.ply);
     out.line.with("t1", pieceArg(q, ts[0], c.human));
     pointPiece(out, ts[0], "t1", true);
@@ -1116,10 +1123,11 @@ Review Reviewer::review(const ReviewInput& in) {
             }
             // {line} is what follows {best}, never {best} again; level 5 names that idea, so without
             // a continuation it says the level-4 line instead. Never past a move the player could not
-            // follow, a win-back with its capture (followablePlies).
+            // follow, a win-back with its capture (followablePlies). An idea holds the player's own
+            // next move: my reply alone is none ("Nxg5, with the idea Nxg5").
             const size_t ideaPlies = size_t(std::max(1, std::min(4, bd.linePlies) - 1));
             const size_t sayable = followablePlies(c.best, 1 + ideaPlies, true);
-            std::string idea = sanLine(c.best, 1, sayable > 0 ? sayable - 1 : 0);
+            std::string idea = sayable >= 3 ? sanLine(c.best, 1, sayable - 1) : std::string();
             Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
             bb.line.with("best", moveArg(c.best[0]))
                 .with("move", Arg::ofMove(c.playedSan, c.playedUci))
@@ -1247,6 +1255,9 @@ Review Reviewer::review(const ReviewInput& in) {
         const int legal = int(c.p0.legalMoves().size());
         const double w1 = c.j.wBest, w2 = c.l2 ? winPercent(c.l2->score) : w1;
         const bool decided = w1 >= 90.0 && !(c.p1.isCheckmate() || (c.l1->score.mate > 0 && c.isBest));
+        // Lost already: the win chances no longer tell the moves apart (Rb1 four pawns worse than Rf3,
+        // both near 2 %), so only the move the lines prefer earns praise.
+        const bool lostAnyway = w1 <= 10.0 && !c.isBest;
         const bool recapture = isRecapture(g, size_t(c.ply));
         const bool tricky = in.shallow && in.shallow->ok && !in.shallow->bestMove.empty() && in.shallow->bestMove != c.playedUci;
         auto lineGain = [&](size_t plies) {
@@ -1262,7 +1273,13 @@ Review Reviewer::review(const ReviewInput& in) {
         // (31...Rxe6 32.Rxe6 Qxe6 wins a pawn: no sacrifice).
         const bool downAfter = c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2 &&
                                (c.playedLine.size() < 3 || c.playedLine[2].balance <= c.base - 2);
-        const bool sacrifice = !promoSoon && (c.f.seePts <= -2 || downAfter);
+        // Or given up by exchange, starting with a capture the coach can legally make: Bf5 against a
+        // bishop pinned on e6 (Bxf5 is illegal), Ne5 against a knight pinned on c6, offer nothing.
+        int takenBack = 0;
+        for (const Move& m : c.p1.legalMoves())
+            if (m.to == c.played.to && (m.flags & MoveCapture)) takenBack = std::max(takenBack, seePoints(c.p1, m));
+        const int byExchange = takenBack - (c.f.captured != NoPiece ? points(c.f.captured) : 0);
+        const bool sacrifice = !promoSoon && ((c.f.seePts <= -2 && byExchange >= 2) || downAfter);
         // A capture that wins the whole piece ("for free"); at levels 1-2 the lines also say it had
         // no protector.
         const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
@@ -1272,7 +1289,7 @@ Review Reviewer::review(const ReviewInput& in) {
         double lastW = -1.0;   // the human's W% after their previous judged move
         for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
         std::string key;
-        if (!c.p1.isCheckmate() && !recapture && !decided && !v.hastensMate && cls != MoveClass::Forced) {
+        if (!c.p1.isCheckmate() && !recapture && !decided && !lostAnyway && !v.hastensMate && cls != MoveClass::Forced) {
             if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && w1 <= 85.0 && c.j.wPlayed >= 50.0) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;
@@ -1299,7 +1316,8 @@ Review Reviewer::review(const ReviewInput& in) {
                 key = "praise.castle.b1";
                 castlePraised_ = true;
             } else if (level_ == 1 && hasBit(hangingPieces(c.p0, human_, true), c.played.from) &&
-                       !hasBit(hangingPieces(c.p1, human_, true), c.played.to)) {
+                       !hangingPieces(c.p1, human_, false)) {
+                // Saved only when nothing else is left en prise (Rb1 while the queen on b3 hangs to a rook).
                 key = "praise.saved.b1";
             } else if (level_ <= 2 && in.inBook && bookPraises_ < 2) {
                 key = "praise.book.b1";
@@ -1371,18 +1389,31 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before) {
         noteRemark();
         return s;
     }
-    // New threats against the human's pieces (level 1: 3+ points; level 2: the queen).
+    // New threats against the human's pieces (level 1: 3+ points; level 2: the queen), by a capture
+    // the coach could make next: never by a piece pinned to its king.
+    Position turn = now;
+    const bool passed = turn.passTurn();
+    const std::vector<Move> next = passed ? turn.legalMoves() : std::vector<Move>();
+    auto takers = [&](Square t) {
+        uint64_t out = 0;
+        for (Square a : squaresOf(now.attackersTo(t, coach))) {
+            bool legal = !passed && !hasBit(now.pinned(coach), a);
+            for (const Move& m : next) legal = legal || (m.from == a && m.to == t);
+            if (legal) out |= squareBit(a);
+        }
+        return out;
+    };
     const uint64_t fresh = hangingPieces(now, human_, true) & ~hangingPieces(prev, human_, true);
     Square target = NoSquare;
     for (Square t : squaresOf(fresh)) {
         const PieceType tt = now.at(t).type;
         if (level_ == 2 && tt != Queen) continue;
-        if (points(tt) < 3) continue;
+        if (points(tt) < 3 || !takers(t)) continue;
         if (target == NoSquare || points(tt) > points(now.at(target).type)) target = t;
     }
     if (target == NoSquare) return s;
     // The attacker: the coach's moved piece when it is one of them, else the cheapest.
-    const uint64_t attackers = now.attackersTo(target, coach);
+    const uint64_t attackers = takers(target);
     Square att = hasBit(attackers, g.moves().back().to) ? g.moves().back().to : NoSquare;
     if (att == NoSquare)
         for (Square a : squaresOf(attackers))
