@@ -1339,11 +1339,19 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before) {
         const uint64_t hung = hangingPieces(now, coach, true) & ~hangingPieces(prev, coach, true);
         const Move bm = now.parseUCI(before->lines[0].pv[0]);
         // What the coach's move took counts against it: a piece taken back after it took as much
-        // (16.Nxg4 Nxg4) is a trade, not a mistake.
+        // (16.Nxg4 Nxg4) is a trade, not a mistake. And the move cost the coach as much as a mistake:
+        // the player's W% now 10 points above what it was after their own last move (an exchange
+        // that wins the piece back, Rxa2 Qxa2 dxc5, costs nothing).
         const Move last = g.moves().back();
         const int took = points(prev.at(last.to).type);
+        const double lastW = ply >= 1 && size_t(ply - 1) < humanW_.size() ? humanW_[size_t(ply - 1)] : -1.0;
+        const bool costly = lastW >= 0.0 && winPercent(before->lines[0].score) - lastW >= 10.0;
+        // The engine's line keeps the material: 2 points more than before the coach's move once four
+        // plies are played (Qxc5 hxg4, a knight for a knight, punishes nothing).
+        const std::vector<LineStep> line = replayLine(now, before->lines[0].pv, human_, 4);
+        const bool kept = !line.empty() && line.back().balance - materialBalance(prev, human_) >= 2;
         if (bm.valid() && hasBit(hung, bm.to) && points(now.at(bm.to).type) >= 3 && seePoints(now, bm) - took >= 2 &&
-            remarkAllowed()) {
+            costly && kept && remarkAllowed()) {
             Beat b = sayBeat("threat.punish.b1", Look::Player, ply, Priority::Low);
             b.gestures.push_back(Gesture{GestureKind::Open, NoSquare, {}, "", 0.0f, false});
             s.push_back(b);

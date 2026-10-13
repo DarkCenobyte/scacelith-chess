@@ -3153,24 +3153,25 @@ TEST(coach_review_threat_warnings) {
 }
 
 TEST(coach_review_punish_hint_needs_a_real_loss) {
-    // "My last move was a mistake. Can you punish it?" (level 1): the coach's knight left to be taken
-    // for nothing...
-    {
-        Game g = gameOf("4k3/8/5n2/8/8/8/5N2/4K3 b - - 0 1", {"Ng4"});
+    // "My last move was a mistake. Can you punish it?" (level 1): the player's move judged first (its
+    // W% kept), then the coach's move with the analysis of the player's next turn.
+    auto hint = [](const char* coachMove, int cpAfter, const char* pv, const char* fen = "4k3/8/5n2/8/6B1/8/5N2/4K3 w - - 0 1") {
         Reviewer rv;
         rv.reset(1, White);
-        const ai::Analysis a0 = analysisOf({pvl(300, "f2g4 e8e7")});
-        CHECK(hasKey(rv.coachMoved(g, &a0), "threat.punish.b1"));
-    }
-    // ...never after a trade: the knight took a bishop, and taking it back only evens the material
-    // (16.Nxg4 Nxg4 in a 2016 Lichess game).
-    {
-        Game g = gameOf("4k3/8/5n2/8/6B1/8/5N2/4K3 b - - 0 1", {"Nxg4"});
-        Reviewer rv;
-        rv.reset(1, White);
-        const ai::Analysis a0 = analysisOf({pvl(0, "f2g4 e8e7")});
-        CHECK(!hasKey(rv.coachMoved(g, &a0), "threat.punish.b1"));
-    }
+        reviewOf(rv, gameOf(fen, {"Kd1"}), analysisOf({pvl(0, "e1d1 e8e7"), pvl(0, "e1e2 e8e7")}));
+        const ai::Analysis a0 = analysisOf({pvl(cpAfter, pv)});
+        return hasKey(rv.coachMoved(gameOf(fen, {"Kd1", coachMove}), &a0), "threat.punish.b1");
+    };
+    // The coach's knight left to be taken for nothing, the player's game much better for it.
+    CHECK(hint("Ne4", 300, "f2e4 e8e7"));
+    // A trade: the knight took a bishop, taking it back only evens the material (16.Nxg4 Nxg4 in a
+    // 2016 Lichess game), whatever the score says.
+    CHECK(!hint("Nxg4", 300, "f2g4 e8e7"));
+    // The capture is there but the move costs the coach nothing (an exchange that wins the piece
+    // back, as Rxa2 Qxa2 dxc5 in self-play): no mistake.
+    CHECK(!hint("Ne4", 0, "f2e4 e8e7"));
+    // Taken, then won back: Nxe4 leaves the bishop on g4 to ...Bxg4+ (a knight for a bishop).
+    CHECK(!hint("Ne4", 300, "f2e4 c8g4", "2b1k3/8/5n2/8/6B1/8/5N2/4K3 w - - 0 1"));
 }
 
 // ---- Regressions ---------------------------------------------------------------------------------

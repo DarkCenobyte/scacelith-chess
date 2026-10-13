@@ -792,12 +792,21 @@ int reviewMain(const Options& o) {
                     for (const Beat& b : rvp->announce(before)) pre.push_back(b);
                     for (const Beat& b : rvp->coachMoved(before, &r.a0)) {
                         pre.push_back(b);
+                        // "My knight is attacking your queen": it does, on the board the player sees.
+                        if (b.line.key.rfind("threat.piece", 0) == 0) {
+                            const Arg* my = b.line.arg("my");
+                            const Arg* your = b.line.arg("your");
+                            if (!my || !your || c.p0.at(your->square).color != c.human ||
+                                c.p0.at(your->square).type != your->piece || c.p0.at(my->square).type != my->piece ||
+                                !(c.p0.attackersTo(your->square, c.coach) & squareBit(my->square)))
+                                preF.push_back({"THREAT_PIECE", b.line.key + ": no such attack on the board"});
+                        }
                         // "My last move was a mistake": the human's best line keeps 2 points more
-                        // than before the coach's move, once the coach has answered the capture.
+                        // than before the coach's move, four plies on (the capture answered).
                         if (b.line.key != "threat.punish.b1" || !r.a0.ok || r.a0.lines.empty()) continue;
                         const int start = materialBalance(before.positionAt(before.moves().size() - 1), c.human);
                         const std::vector<LineStep> l = replayLine(c.p0, r.a0.lines[0].pv, c.human, 16);
-                        const int kept = l.size() >= 2 ? l[1].balance : l.empty() ? start : l[0].balance;
+                        const int kept = l.empty() ? start : l[std::min<size_t>(3, l.size() - 1)].balance;
                         if (kept - start < 2)
                             preF.push_back({"PUNISH_NONE", "threat.punish.b1: the best line keeps " +
                                                                std::to_string(kept - start) + " points from before my move"});
