@@ -509,11 +509,12 @@ TEST(coach_review_endgame_king_is_not_exposed_by_pawns_around_it) {
 }
 
 TEST(coach_review_level5_line_is_more_than_the_move) {
-    // 10...Qd5? A level-5 sentence that names a line ("Qd7 was stronger: Qd7 bxc3 Nxc6") never names the
-    // better move alone as its line ("Qd7 was stronger: Qd7.").
+    // 10...Qd6? (a quiet move: the same trades as the better 10...Qd7, nothing lost). A level-5
+    // sentence that names a line ("Qd7 was stronger: Qd7 bxc3 Nxc6") never names the better move
+    // alone as its line ("Qd7 was stronger: Qd7.").
     const ai::Analysis a0 = analysisOf({pvl(-149, "d8d7 b2c3 b8c6 d1f3 a8c8 e1g1 f8e7 d4c5 e7c5 f1d1"),
-                                        pvl(-554, "d8d5 c6b4 e8d8 b4d5 c3d1 d5f4 d1f2 e1f2 c5d4 h1d1")});
-    Game g = gameOf("rn1qkb1r/p4ppp/1pN1p3/1Bp5/3P4/2n5/PPP2PPP/R1BQK2R b KQkq - 0 10", {"Qd5"});
+                                        pvl(-330, "d8d6 b2c3 b8c6 d1f3 a8c8 c1f4 d6d5 f3d5 e6d5")});
+    Game g = gameOf("rn1qkb1r/p4ppp/1pN1p3/1Bp5/3P4/2n5/PPP2PPP/R1BQK2R b KQkq - 0 10", {"Qd6"});
     Reviewer rv;
     rv.reset(5, Black);
     const Review r = reviewOf(rv, g, a0);
@@ -1020,6 +1021,81 @@ Game gameOfUci(const char* moves) {
     return g;
 }
 
+// A human move recorded by tools/coach_audit (its records file, audit.h): "rec <w|b> <played>
+// <startfen|startpos> ; <moves...>", then "an <slot> <ok> <wtm> <nolegal> <depth> <best> <lines>"
+// with its "ln <multipv> <depth> <cp> <mate> <matedNow> <matesNow> <bound> <pv...>" lines, "end".
+struct Recorded {
+    Game g;   // the played move is the last one
+    Color human = White;
+    ai::Analysis a0, a1, a2, a3;
+    bool hasA1 = false, hasA2 = false;
+};
+
+Recorded recorded(const char* text) {
+    Recorded rc;
+    std::istringstream in(text);
+    std::string line, played;
+    ai::Analysis* an = nullptr;
+    while (std::getline(in, line)) {
+        std::istringstream ls(line);
+        std::string tag;
+        ls >> tag;
+        if (tag == "rec") {
+            std::string side, fen, m;
+            ls >> side >> played;
+            rc.human = side == "w" ? White : Black;
+            while (ls >> m && m != ";") fen += (fen.empty() ? "" : " ") + m;
+            if (fen != "startpos") CHECK(rc.g.resetFromFEN(fen));
+            while (ls >> m) {
+                const Move mv = rc.g.position().parseUCI(m);
+                CHECK(mv.valid());
+                if (mv.valid()) rc.g.play(mv);
+            }
+        } else if (tag == "an") {
+            std::string slot, best;
+            int ok = 0, wtm = 0, nl = 0;
+            size_t n = 0;
+            ai::Analysis a;
+            ls >> slot >> ok >> wtm >> nl >> a.depth >> best >> n;
+            a.ok = ok != 0;
+            a.whiteToMove = wtm != 0;
+            a.noLegalMove = nl != 0;
+            a.bestMove = best == "-" ? std::string() : best;
+            an = slot == "a0" ? &rc.a0 : slot == "a1" ? &rc.a1 : slot == "a2" ? &rc.a2 : &rc.a3;
+            rc.hasA1 = rc.hasA1 || slot == "a1";
+            rc.hasA2 = rc.hasA2 || slot == "a2";
+            *an = a;
+        } else if (tag == "ln" && an) {
+            ai::PvLine l;
+            int mn = 0, ms = 0;
+            char b = 'E';
+            ls >> l.multipv >> l.depth >> l.score.cp >> l.score.mate >> mn >> ms >> b;
+            l.score.matedNow = mn != 0;
+            l.score.matesNow = ms != 0;
+            l.score.bound = b == 'L' ? ai::Score::Bound::Lower : b == 'U' ? ai::Score::Bound::Upper : ai::Score::Bound::Exact;
+            std::string m;
+            while (ls >> m) l.pv.push_back(m);
+            an->lines.push_back(l);
+        }
+    }
+    const Move m = rc.g.position().parseUCI(played);
+    CHECK(m.valid());
+    if (m.valid()) rc.g.play(m);
+    return rc;
+}
+
+// The review at 'level', with the analyses a Coach game asks for there (as coach_audit replays it).
+Review reviewRecorded(Reviewer& rv, const Recorded& rc, int level) {
+    rv.reset(level, rc.human);
+    ReviewInput in;
+    in.game = &rc.g;
+    in.before = &rc.a0;
+    in.played = rc.hasA1 ? &rc.a1 : nullptr;
+    in.after = level >= 4 && rc.hasA2 ? &rc.a2 : nullptr;
+    in.shallow = level == 3 || level == 4 ? &rc.a3 : nullptr;
+    return rv.review(in);
+}
+
 bool hasKeyPrefix(const Script& s, const char* prefix) {
     for (const std::string& k : keysOf(s))
         if (startsWith(k, prefix)) return true;
@@ -1033,6 +1109,39 @@ const char* kG3Game =
 ai::Analysis g3A0(const char* played) {
     return analysisOf({pvl(-60, "g1f3 e4d2 d1d2"), pvl(-90, "g1e2 e4d2 d1d2"), pvl(-620, played)});
 }
+
+// Olivier's game, as recorded (coach level 2, depth 18): 11.g3?? Nxd2, and the engine's line goes on
+// 12.Nf3 Nxf3+, the bishop given up: 12.Qxd2 would uncover the rook on h1 to ...Qxh1.
+const char* kG3Record =
+    "rec w g2g3 startpos ; d2d4 d7d5 e2e3 g8f6 f1b5 c8d7 b5d7 b8d7 f2f4 a8c8 c2c4 d5c4 b1a3 d7b6 c1d2 d8d5 b2b3 c4b3 a2b3 f6e4\n"
+    "an a0 1 1 0 18 g1f3 3\n"
+    "ln 1 18 -171 0 0 0 E g1f3 a7a6 d1c2 e4d2 c2d2 e7e6 e1g1 f8e7 d2d3 e8g8 a3c4 d5d8 c4b6 c7b6 g2g4 d8d5 g1f2 b6b5 g4g5\n"
+    "ln 2 18 -194 0 0 0 E a3c4 b6c4 b3c4 d5c4 g1f3 a7a6 f3e5 c4d5 a1a5 b7b5 d2b4 c7c5 b4c5 f7f6 e5d3 e4c5 d3c5 d5g2 h1f1 e7e6 d1e2 g2e2 e1e2 f8c5 d4c5 c8c6 f1a1 e8f7 a5a6 c6c5\n"
+    "ln 3 18 -202 0 0 0 E b3b4 e7e6 g1f3 f8e7 d1c2 e4d2 c2d2 e8g8 e1g1 d5e4 f1b1 b6d5 a3c4 a7a6 b1b3 b7b5 c4e5 d5b4 b3b4 e7b4\n"
+    "an a1 1 1 0 18 g2g3 1\n"
+    "ln 1 18 -793 0 0 0 E g2g3 e4d2 g1f3 d2f3 e1f2 f3d4 d1d4 d5d4 e3d4 e7e6 a3c4 c8b8 a1a7 b6d5 h1c1 g7g6 f2f3\n"
+    "an a2 1 0 0 14 e4d2 2\n"
+    "ln 1 14 819 0 0 0 E e4d2 g1f3 d2f3 e1f2 f3d4 d1d4 d5d4 e3d4 e7e6 a3c4 c8a8 c4b6 c7b6 a1c1 f8d6 d4d5 d6c5 c1c5 b6c5\n"
+    "ln 2 14 575 0 0 0 E e4g3 h2g3 d5h1 e1f2 g7g5 f4g5 h1h2 f2f3 h7h6 g5g6 f7g6 g1e2 h2h5 g3g4\n"
+    "an a3 1 1 0 6 g1f3 1\n"
+    "ln 1 6 -171 0 0 0 E g1f3 a7a6 d1c2 e4d2 c2d2 e7e6 e1g1 f8e7 d2d3\n"
+    "end\n";
+
+// From Olivier's games (depth 18): 21.Kd2?? Rxd3+ 22.Kxd3 Qxa1 loses the rook, but 21.Kc2 (the best
+// move) loses as much after ...Qxh2+ and ...hxg5: no material reason holds, and the king's safety
+// would not be the reason either.
+const char* kKd2Record =
+    "rec w c1d2 startpos ; e2e4 e7e5 f2f3 g8f6 g1e2 d7d5 d2d3 f8c5 e2c3 c8e6 e4d5 e6h3 g2h3 e8g8 c3b5 f6d5 d1e2 d8h4 e1d1 f8d8 b1c3 c7c6 b5a3 a7a5 c3d5 d8d5 c2c4 d5d6 e2e5 b8a6 c1g5 h4h5 d1c2 a6b4 c2c1 h5f3 e5c5 b4d3 f1d3 f3h1\n"
+    "an a0 1 1 0 18 c1c2 3\n"
+    "ln 1 18 241 0 0 0 E c1c2 h1h2 c2c3 h7h6 a1d1 h6g5 c5d6 h2d6 d3h7 g8h7 d1d6 a8e8 c3d2 f7f5 a3c2 f5f4 c2e1 e8e3 d6d3 e3e8 d3a3\n"
+    "ln 2 18 -173 0 0 0 E c1d2 d6d3 d2d3 h1a1 d3c2 a1f1 h3h4 f1g2 g5d2 g2e4 c2c1 h7h6 c5f2 a5a4 d2c3 a8d8 b2b3 d8d3 c1b2 a4b3 a2b3 d3h3\n"
+    "ln 3 18 -1199 0 0 0 E c5g1 h1g1 c1c2 g1f2 g5d2 d6d3 a1d1 a8d8 a3b1 a5a4 a2a3 h7h6 c2c1 f2d4 h3h4 d4c4 b1c3\n"
+    "an a2 1 0 0 14 d6d3 2\n"
+    "ln 1 14 173 0 0 0 E d6d3 d2d3 h1a1 d3c2 a1f1 h3h4 f1g2 g5d2 g2e4 c2c1 h7h6 c5f2 a5a4 d2c3 a8d8\n"
+    "ln 2 14 -250 0 0 0 E h1h2 d2c3 h7h6 a1d1 h6g5 c5d6 h2d6 d3h7 g8h7 d1d6 a8e8 c3d2 f7f5 a3c2 f5f4 c2e1 e8e3 d6d3 e3e8 d3a3 h7g6 e1f3 e8h8 f3e5 g6f6 e5g4 f6g6 g4f2\n"
+    "an a3 1 1 0 6 c1c2 1\n"
+    "ln 1 6 241 0 0 0 E c1c2 h1h2 c2c3 b7b5 c4b5 d6d5 c5e3 c6b5 a3b5\n"
+    "end\n";
 
 }  // namespace
 
@@ -1119,9 +1228,242 @@ TEST(coach_review_discovered_attack_behind_an_even_trade) {
             CHECK_EQ(r.verdict.exType, ExType::Discovered);
             CHECK(r.verdict.voiced);
             CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+            CHECK(!hasKeyPrefix(r.script, "ex.retake"));   // the line itself shows the take-back
             const Beat* cause = beatWithKey(r.script, "ex.discovered.b" + std::to_string(level));
             CHECK(cause != nullptr);
             if (cause && cause->line.arg("t1")) CHECK_EQ(cause->line.arg("t1")->square, sq("h1"));
+        }
+    }
+}
+
+TEST(coach_review_failed_take_back_is_explained) {
+    // Where the engine's line leaves the bishop on d2 (the human does not take back), the coach says
+    // why the take-back fails: "if you take back with Qxd2, Qxh1 takes your rook". Levels 1-3 at the
+    // end of the demonstration (before the rewind), levels 4-6 right after the cause.
+    const Recorded rc = recorded(kG3Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[48];
+        std::snprintf(where, sizeof where, "g3 retake b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        CHECK(r.verdict.voiced);
+        int retake = -1, cause = -1, lastDemo = -1, rewind = -1;
+        for (size_t i = 0; i < r.script.size(); ++i) {
+            const Beat& b = r.script[i];
+            if (b.line.key == "ex.retake.b" + std::to_string(level)) retake = int(i);
+            if (b.line.key == "ex.material.b" + std::to_string(level)) cause = int(i);
+            if (b.kind == BeatKind::DemoMove) lastDemo = int(i);
+            if (b.kind == BeatKind::Rewind) rewind = int(i);
+            if (b.kind == BeatKind::DemoMove) CHECK_EQ(b.uci, std::string("e4d2"));   // never the take-back
+        }
+        CHECK(retake >= 0 && cause >= 0);
+        if (retake < 0) {
+            dump(r.script);
+            continue;
+        }
+        if (level <= 3) CHECK(lastDemo >= 0 && lastDemo < retake && retake < rewind);
+        else CHECK_EQ(retake, cause + 1);
+        const Line& l = r.script[size_t(retake)].line;
+        CHECK(l.arg("move") && l.arg("move")->uci == "d1d2");
+        CHECK(l.arg("reply") && l.arg("reply")->uci == "d5h1");
+        CHECK(l.arg("your2") && l.arg("your2")->piece == Queen && l.arg("your2")->square == sq("d1"));
+        CHECK(l.arg("my") && l.arg("my")->piece == Queen && l.arg("my")->square == sq("d5"));
+        CHECK(l.arg("your") && l.arg("your")->piece == Rook && l.arg("your")->square == sq("h1"));
+    }
+}
+
+TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
+    // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
+    // better move, never the move itself while the takeback is offered.
+    const Recorded rc = recorded(kKd2Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[48];
+        std::snprintf(where, sizeof where, "Kd2 hint b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        CHECK_EQ(r.verdict.exType, ExType::None);
+        CHECK(r.offersTakeback);
+        CHECK(hasKey(r.script, "ex.verdict.blunder.b" + std::to_string(level)));
+        const Beat* h = beatWithKey(r.script, "ex.hint.b" + std::to_string(level));
+        CHECK(h != nullptr);
+        if (h && h->line.arg("your")) {
+            CHECK_EQ(h->line.arg("your")->piece, King);
+            CHECK_EQ(h->line.arg("your")->square, sq("d2"));   // where the king stands now
+        }
+        CHECK(!hasKeyPrefix(r.script, "ex.better") && !hasKeyPrefix(r.script, "ex.reveal"));
+        for (const Beat& b : r.script)
+            for (const Gesture& gs : b.gestures) CHECK(gs.path.empty() || gs.path.back() != sq("c2"));
+    }
+    for (int level : {1, 4}) {
+        // Accepted: the hint points at the king, back on c1 (levels 1-2); the better move found is
+        // praised as the one the coach had in mind.
+        Recorded game = recorded(kKd2Record);
+        Reviewer rv;
+        CHECK(reviewRecorded(rv, game, level).offersTakeback);
+        CHECK(game.g.undo(1));
+        const Script hint = rv.takebackAccepted(game.g);
+        if (level <= 2) {
+            const Beat* hb = beatWithKey(hint, "tb.hint.b1");
+            CHECK(hb != nullptr);
+            if (hb && hb->line.arg("your")) CHECK_EQ(hb->line.arg("your")->square, sq("c1"));
+        }
+        game.g.play(game.g.position().parseUCI("c1c2"));
+        Review found = reviewOf(rv, game.g, game.a0);
+        CHECK(found.isRetry && found.takeback.found);
+        CHECK(!found.script.empty());
+        if (!found.script.empty())
+            CHECK_EQ(found.script.front().line.key, std::string(level <= 2 ? "tb.found.b1" : "tb.found"));
+        checkScript(found.script, "Kd2 found");
+
+        // Declined: the better move is said then.
+        Reviewer rv2;
+        reviewRecorded(rv2, rc, level);
+        const Script reveal = rv2.takebackDeclined();
+        checkScript(reveal, "Kd2 reveal");
+        CHECK_EQ(reveal.size(), size_t(1));
+        if (level <= 2) {
+            const Beat* b = beatWithKey(reveal, "ex.reveal.b" + std::to_string(level));
+            CHECK(b != nullptr);
+            if (b) CHECK(b->line.arg("sq") && b->line.arg("sq")->square == sq("c2"));
+        } else {
+            const Beat* b = beatWithKey(reveal, "ex.better.b" + std::to_string(level));
+            CHECK(b != nullptr);
+            if (b) CHECK(b->line.arg("best") && b->line.arg("best")->uci == "c1c2");
+        }
+        CHECK(rv2.takebackDeclined().empty());   // said once
+    }
+}
+
+TEST(coach_review_recorded_reasons_hold) {
+    // Recorded moves (tools/coach_audit corpora, depth 18) the coach once explained wrong.
+    struct Case {
+        const char* what;
+        const char* rec;
+        ExType want, never;   // want None: any reason, never None: no type excluded
+        int pts;              // the points the cause names (0: not checked)
+    };
+    const Case cases[] = {
+        // 4...Qg4?? 5.Qxg4: the queen itself falls, never "a pin" of a smaller piece behind it.
+        {"mat_all_580",
+         "rec b h4g4 startpos ; e2e4 e7e5 f1c4 f8c5 b1c3 d8h4 d1f3\n"
+         "an a0 1 0 0 18 g8f6 3\n"
+         "ln 1 18 -44 0 0 0 E g8f6 h2h3 b8c6 g1e2 e8g8 g2g3 h4h5 g3g4 h5h4 d2d3 d7d6 c1d2 c6b4 e1c1 h4f2 f3f2 c5f2 d1f1\n"
+         "ln 2 18 -163 0 0 0 E h4f6 d2d4 f6f3 g1f3 e5d4 c3d5 c5b6 c1f4 d7d6 e4e5 b8c6 d5b6 a7b6 e5d6 c7d6 e1c1 c8g4 h1e1 e8d7 f3d4 g4d1\n"
+         "ln 3 18 -206 0 0 0 E e8d8 f3f7 h4f6 g1f3 f6f7 c4f7 b8c6 d2d3 g8f6 e1g1 d7d6 c3a4 c5b6 f7b3 b6a5 a4c3 c8g4 f3g5 d8d7 f2f3 g4h5 c1e3 h7h6\n"
+         "an a1 1 0 0 18 h4g4 1\n"
+         "ln 1 18 -996 0 0 0 E h4g4 f3g4 g8e7 g4g7 h8f8 g7e5 b8c6 e5c5 d7d6 c5e3\n"
+         "an a2 1 1 0 14 f3g4 2\n"
+         "ln 1 14 1006 0 0 0 E f3g4 g8e7 g4g7 h8f8 c3b5 b8a6 d2d4 c5b4 c2c3\n"
+         "ln 2 14 936 0 0 0 E c4f7 e8f8 f3g4 g8f6 g4f3 d7d5 f7d5 c7c6 c3a4 c8g4\n"
+         "an a3 1 0 0 6 g8f6 1\n"
+         "ln 1 6 -44 0 0 0 E g8f6 h2h3 b8c6 g1e2 e8g8 g2g3\n"
+         "end\n",
+         ExType::Hanging, ExType::Pin, 9},
+        // 22...Rxg2+?? gives up the rook, but so does the best line (22...e5 23.dxe5 ... Rxg2):
+        // no exchange reason, only the verdict and a hint.
+        {"mat_all_14",
+         "rec b g8g2 startpos ; g1f3 d7d5 e2e3 c7c6 c2c4 e7e6 b2b3 h7h6 c1b2 b7b6 c4d5 c6d5 f3e5 a7a6 d1f3 g8f6 f3g3 c8b7 f1d3 b8d7 h2h4 d7e5 b2e5 f6d7 e5d4 d7c5 d4c5 f8c5 b3b4 c5d6 g3g7 e8e7 f2f4 a8c8 e1g1 h8g8 g7d4 c8c4 d3c4 e7f8 c4d3 d6e7 f4f5\n"
+         "an a0 1 0 0 18 e6e5 3\n"
+         "ln 1 18 -262 0 0 0 E e6e5 d4e5 e7d6 e5d4 d8c7 d4f6 d6h2 g1f2 g8g2 f2g2 c7g3 g2h1 d5d4 e3e4 g3h3 f6h8 f8e7 f5f6 e7d7 f1f2 b7c6\n"
+         "ln 2 18 -369 0 0 0 E e7f6 d4f4 e6e5 f4h2 e5e4 d3e2 f6a1 b1c3 a1b2 h2f4 d5d4 c3a4 d4d3 e2h5 b2f6 f1c1 b7a8\n"
+         "ln 3 18 -696 0 0 0 E b7c8 f5e6 c8e6 d3f5 e6f5 f1f5 d8c8 d4f4 c8c1 f4f1 c1f1 f5f1\n"
+         "an a1 1 0 0 18 g8g2 1\n"
+         "ln 1 18 -806 0 0 0 E g8g2 g1g2 e6e5 d4e5 e7f6 e5f4 f8g7 f1f3 h6h5 b1c3 g7h7 g2f1 d5d4\n"
+         "an a2 1 1 0 14 g1g2 2\n"
+         "ln 1 14 796 0 0 0 E g1g2 e6e5 d4e5 e7f6 e5f4 f8e7 g2h3 d8d6 f4d6 e7d6 b1a3 f6e5 f1g1 b7c8 a3b5 a6b5 a1f1\n"
+         "ln 2 14 258 0 0 0 E g1h1 e6e5 d4e5 e7f6 e5f4 g2g7 b1c3 d5d4 d3e4 f6e5 f4h6 d4c3 e4b7 d8d2\n"
+         "an a3 1 0 0 6 e6e5 1\n"
+         "ln 1 6 -262 0 0 0 E e6e5 d4e5 e7d6 e5d4 d8c7 d4f6\n"
+         "end\n",
+         ExType::None, ExType::Exchange, 0},
+        // 39.Rf5? loses material along the engine's line: never "a better position" for it.
+        {"mis_b_160",
+         "rec w f2f5 startpos ; e2e4 c7c5 g1e2 d7d6 d2d4 g8f6 e4e5 f6d7 e5e6 f7e6 e2f4 d7f6 a2a4 b8c6 f4e2 g7g6 f2f4 f8h6 d4c5 e8g8 c5d6 e6e5 b1c3 f6g4 d6d7 c8d7 c3a2 d8c7 h2h3 g4f6 d1d7 c7a5 d7d2 a5b6 a4a5 b6c7 e2c3 e5f4 f1c4 g8h8 e1g1 c6a5 c4d3 c7c5 f1f2 a5c4 b2b4 c5c7 h3h4 c4d2 c1b2 f4f3 f2d2 h6e3 g1h1 f3g2 d2g2 e3d4 c3b5 c7d7 a2c3 d4c3 b5c3 d7h3 g2h2 h3f3 h1g1 f3e3 h2f2 a8d8 c3e4 h8g7 a1f1 d8d5 g1g2 d5d4\n"
+         "an a0 1 1 0 18 f2f4 3\n"
+         "ln 1 18 -502 0 0 0 E f2f4 d4b4 b2c3 b4e4 f4e4 e3c5 c3d4 c5c6 g2g1 f8f7 f1f2 g7g8 e4f4 g8f8 d4b2 b7b5 d3b5\n"
+         "ln 2 18 -533 0 0 0 E f2f3 d4e4 f3e3 e4e3 f1a1 a7a6 b4b5 a6b5 a1a5 g7f7 b2d4 e3e1 a5b5 f8c8\n"
+         "ln 3 18 -533 0 0 0 E b2c1 e3e4 d3e4 d4e4 h4h5 f8c8 b4b5 e4g4 g2h3 c8c3 f2f3 g4c4 h5h6 g7f7 c1g5 c3f3 f1f3 c4c2\n"
+         "an a1 1 1 0 18 f2f5 1\n"
+         "ln 1 18 -936 0 0 0 E f2f5 d4e4 f5f3 e4g4 g2h3 e3e6 b2c3 g4h4 h3g2 h4g4 g2f2 e6d7 d3e2 g7g8\n"
+         "an a2 1 0 0 14 d4e4 2\n"
+         "ln 1 14 961 0 0 0 E d4e4 d3e4 e3e4 f5f3 f8c8 f1f2 g7g8 b4b5 c8c2 b2f6 c2f2 g2f2 e7f6 f3g3 e4h4\n"
+         "ln 2 14 879 0 0 0 E g6f5 b2c1 e3e4 d3e4 d4e4 g2h3 g7f7 f1f5 e4b4 f5g5 b4e4 g5g3 b7b5\n"
+         "an a3 1 1 0 6 f2f4 1\n"
+         "ln 1 6 -496 0 0 0 E f2f4 d4d3 c2d3 e3d3 f1f3 d3c2 f3f2\n"
+         "end\n",
+         ExType::None, ExType::Positional, 0},
+        // 8...Qe7?? 9.Qxc8+: the bishop on c8 is simply taken, with check (no back-rank reason).
+        {"mat_all_1020",
+         "rec b d8e7 startpos ; c2c3 c7c6 e2e4 d7d6 a2a4 g8f6 g1e2 f6e4 e2f4 g7g6 d2d3 e4f6 h2h3 e7e5 d1g4\n"
+         "an a0 1 0 0 18 c8g4 3\n"
+         "ln 1 18 1012 0 0 0 E c8g4 h3g4 e5f4 f1e2 g6g5 e1g1 f8g7 e2d1 b7b5 f1e1 e8f8 c1d2 a7a6 d1e2\n"
+         "ln 2 18 989 0 0 0 E f6g4 h3g4 e5f4 g4g5 d8g5 f1e2 e8d7 e1d2 g5g2\n"
+         "ln 3 18 832 0 0 0 E f8g7 g4f3 e5f4 c1f4 e8g8 b1d2 c6c5 f4e3 b8c6\n"
+         "an a1 1 0 0 18 d8e7 1\n"
+         "ln 1 18 -600 0 0 0 E d8e7 g4c8 e7d8 c8d8 e8d8 f4e2 b8d7 d3d4 f8g7 g2g3 e5d4 c3d4 f6d5 e1d1 a7a5 a1a3 d7b6 a3f3 f7f5 b1c3\n"
+         "an a2 1 1 0 14 g4c8 2\n"
+         "ln 1 14 600 0 0 0 E g4c8 e7d8 c8d8 e8d8 f4e2 b8d7 d3d4 f8g7 g2g3 e5d4 c3d4 f6d5 e1d1 a7a5\n"
+         "ln 2 14 -681 0 0 0 E f4g6 c8g4 g6e7 g4e6 e7c6 b8c6 b1a3 f6d5 g2g4 h7h5 g4g5 d5e7\n"
+         "an a3 1 0 0 6 c8g4 1\n"
+         "ln 1 6 1012 0 0 0 E c8g4 h3g4 e5f4 f1e2 g6g5 c3c4\n"
+         "end\n",
+         ExType::Hanging, ExType::BackRank, 3},
+        // 34.c6?? Kxc6: the rook is lost for the bishop (no back-rank reason).
+        {"mat_all_29",
+         "rec w c5c6 startpos ; d2d4 c7c6 b1c3 h7h5 e2e4 g8f6 g1f3 d7d5 e4e5 f6g8 h2h3 g7g6 f1e2 c8f5 f3h4 f5c8 c1f4 e7e6 h4f3 a7a5 e1g1 g8h6 c3a4 h6f5 e2d3 b7b6 f4g5 f8e7 d1d2 b8d7 g5e7 d8e7 f1d1 f5h4 f3e1 e7b4 d2f4 h4g2 e1g2 g6g5 c2c3 h8g8 b2b3 g5f4 c3b4 f4f3 d1c1 b6b5 a4c5 d7c5 c1c5 g8g2 g1h1 g2f2 a2a4 f2d2 c5c3 e8e7 b4a5 b5b4 c3c5 e7d7 d3f1 d2b2\n"
+         "an a0 1 1 0 18 a1c1 3\n"
+         "ln 1 18 -347 0 0 0 E a1c1 c8b7 a5a6 b7a6 c5c6 a6f1 c6c7 d7e8 c1f1 b2b3 c7b7 e8f8 h3h4 b3a3 a4a5 a8a5 b7b8 f8e7 b8b7 e7d8 b7b4 a5a7 h1h2 d8e7 h2g3 f3f2 g3f2 a3h3 f2g2 h3h4\n"
+         "ln 2 18 -364 0 0 0 E c5c1 b2b3 c1b1 b3b1 a1b1 d7c7 b1b4 a8a5 h1g1 c8a6 h3h4 a6f1 g1f1 a5a6 f1f2 a6b6 b4b6 c7b6 f2f3 c6c5 d4c5 b6c5 f3e3\n"
+         "ln 3 18 -365 0 0 0 E h3h4 b2b3 a1c1 c8b7 a5a6 b7a6 c5c6 a6f1 c6c7 d7e8 c1f1 a8b8 h1g1 e8f8\n"
+         "an a1 1 1 0 18 c5c6 1\n"
+         "ln 1 18 -754 0 0 0 E c5c6 d7c6 a1c1 c6d7 f1b5 d7d8 c1c6 b2b1 h1h2 a8a5 c6d6 d8c7 d6c6 c7b7 c6c5 b1b2 h2g3\n"
+         "an a2 1 0 0 14 d7c6 2\n"
+         "ln 1 14 750 0 0 0 E d7c6 a1c1 c6d7 f1b5 d7d8 c1g1 a8a5 g1g7 b2b3 h1g1 a5a7 g7g8 d8c7 g8g7\n"
+         "ln 2 14 -33 0 0 0 E d7e8 a5a6 b2b3 f1b5 e8d8 a1c1 b3c3 c6c3 b4c3\n"
+         "an a3 1 1 0 6 a1c1 1\n"
+         "ln 1 6 -347 0 0 0 E a1c1 c8b7 a5a6 b7a6 c5c6 a6f1\n"
+         "end\n",
+         ExType::Exchange, ExType::BackRank, 0},
+        // 14...a5? cxd4: White's Qxh5 stood before the move, so it is no reason a take-back fails.
+        {"mis_a_229",
+         "rec b a7a5 startpos ; h2h3 c7c5 b1a3 g8f6 d2d3 b8c6 c2c3 f6d5 c1g5 h7h6 g5c1 h8g8 a3c4 h6h5 e2e4 d5b6 c1f4 g7g5 f4g3 b6c4 b2b3 d7d5 d3c4 d5d4 g3h2 f8g7 a1c1\n"
+         "an a0 1 0 0 18 d8a5 3\n"
+         "ln 1 18 470 0 0 0 E d8a5 f1d3 d4c3 g1e2 c8e6 e1g1 e8c8 e4e5 g5g4 h3h4 g7e5 h2e5 c6e5 c1c3 e5f3 g1h1 a5c7 g2f3 g4f3 e2g3\n"
+         "ln 2 18 325 0 0 0 E g5g4 d1d2 g4h3 g2h3 e7e5 g1e2 g7f8 h1g1 g8g1 e2g1 c8e6 f1g2 a7a5 g1f3 f7f6 h2g3 d8d7 g3h4 d7g7 e1f1 a5a4 h4g3\n"
+         "ln 3 18 315 0 0 0 E c8e6 c3d4 d8a5 d1d2 a5d2 e1d2 g7d4 f1e2 e8c8 d2e1 h5h4 g1f3 d4b2 c1d1 d8d1 e2d1\n"
+         "an a1 1 0 0 18 a7a5 1\n"
+         "ln 1 18 236 0 0 0 E a7a5 c3d4 a5a4 d4c5 d8a5 d1d2 a5d2 e1d2 a4b3 a2b3 c6d4 c1b1 a8a2 d2c3 d4c6 e4e5 c6e5 h2e5 g7e5 c3b4 e5c7 b4c3 c8f5 b1d1 c7a5 b3b4 a2a3 c3b2 a5b4 d1d5\n"
+         "an a2 1 1 0 14 c3d4 2\n"
+         "ln 1 14 -237 0 0 0 E c3d4 a5a4 d4c5 d8a5 d1d2 a4b3 a2b3 a5d2 e1d2 c6d4 c1b1 a8a2 d2d1 a2f2 g1e2 d4e2 f1e2 f2g2 b3b4 g7d4 b1b3 g5g4 b3d3\n"
+         "ln 2 14 -282 0 0 0 E f1e2 a5a4 e2h5 g8h8 g2g4 c8e6 g1f3 d4c3 e1g1\n"
+         "an a3 1 0 0 6 d8a5 1\n"
+         "ln 1 6 470 0 0 0 E d8a5 f1d3 d4c3 g1e2 c8e6 e1g1\n"
+         "end\n",
+         ExType::None, ExType::None, 0},
+    };
+    for (const Case& k : cases) {
+        const Recorded rc = recorded(k.rec);
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[64];
+            std::snprintf(where, sizeof where, "%s b%d", k.what, level);
+            checkScript(r.script, where);
+            if (k.want != ExType::None && r.verdict.voiced) CHECK_EQ(r.verdict.exType, k.want);
+            if (k.never != ExType::None) CHECK(r.verdict.exType != k.never);
+            CHECK(!hasKeyPrefix(r.script, "ex.retake"));
+            if (k.pts > 0 && r.verdict.voiced)
+                for (const Beat& b : r.script)
+                    if (const Arg* pts = b.line.arg("pts")) CHECK_EQ(pts->number, k.pts);
+            if ((k.want != ExType::None && r.verdict.exType != k.want) ||
+                (k.never != ExType::None && r.verdict.exType == k.never)) {
+                std::fprintf(stderr, "  %s: %s\n", where, exTypeName(r.verdict.exType));
+                dump(r.script);
+            }
         }
     }
 }
@@ -1148,7 +1490,8 @@ TEST(coach_review_short_refutation_is_completed_on_the_board) {
         CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
     }
     // Without the capture behind it (no rook on h1), the short line proves nothing: no exchange is
-    // blamed and, at levels 1-2, nothing is said rather than a false cause.
+    // blamed and, at levels 1-2, no cause is given rather than a false one (at most the verdict and
+    // a hint).
     const char* noRook = "2r1kb1r/ppp1pppp/1n6/3q4/3PnP2/NP2P3/3B2PP/R2QK1N1 w Qk - 0 11";
     for (int level = 1; level <= 6; ++level) {
         Game g = gameOf(noRook, {"g3"});
@@ -1160,7 +1503,7 @@ TEST(coach_review_short_refutation_is_completed_on_the_board) {
         checkScript(r.script, where);
         CHECK(r.verdict.exType != ExType::Exchange);
         CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
-        if (level <= 2) CHECK(!r.verdict.voiced);
+        if (level <= 2) CHECK(!r.verdict.voiced || r.verdict.exType == ExType::None);
     }
 }
 
