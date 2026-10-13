@@ -635,7 +635,8 @@ std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t coun
 Square prizeLeft(const Position& before, const Move& m) {
     const PieceType took = (m.flags & MoveEnPassant) ? Pawn : before.at(m.to).type;   // NoPiece: a quiet move
     int gain = took != NoPiece ? seePoints(before, m) : 0;
-    if (m.flags & MovePromotion) gain = std::max(gain, kPiecePoints[m.promotion] - 1);
+    // A promotion wins the new piece, unless it is taken at once ("d8=Q Rxd8" wins nothing).
+    if (m.flags & MovePromotion) gain = std::max(gain, seePoints(before, m));
     Square prize = NoSquare;
     int most = gain + 2;
     for (const Move& x : before.legalMoves()) {

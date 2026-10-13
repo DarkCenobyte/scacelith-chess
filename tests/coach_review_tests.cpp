@@ -1412,6 +1412,23 @@ const char* kQc2Record =
     "ln 1 6 -456 0 0 0 E b3c4 f4e3 a1a3 d8b6 e2c3 b6b4\n"
     "end\n";
 
+// A self-play game (depth 16): 15...a6? Bxd7+ Kxd7 dxe6+ Kc7 Rxd4 costs ten points, but the queen
+// on d4 was lost anyway: 15...Qxd1+ gives it up for a rook and the bishop on b5.
+const char* kA6Record =
+    "rec b a7a6 startpos ; e2e4 c7c5 b1c3 b8c6 g1f3 g8f6 d2d4 d7d5 c3d5 f6e4 f1c4 e7e6 d5c3 d8a5 e1g1 e4c3 b2c3 c5d4 c3d4 a5c3 d1e2 c3a1 d4d5 c6d4 f3d4 a1d4 c4b5 c8d7 f1d1\n"
+    "an a0 1 0 0 16 d4d1 3\n"
+    "ln 1 16 298 0 0 0 E d4d1 e2d1 d7b5 d5e6 b5c6 d1h5 e8c8 e6f7 d8d7 c1b2 b7b6 h2h4 c8b7 h5f5 d7d1 g1h2 d1d5 f5g4\n"
+    "ln 2 16 0 0 0 0 E d4c5 b5d7 e8d7 d5e6 d7e8 e6f7 e8f7 e2f3 f7e8 c1a3 c5e5 f3b7 a8d8 b7c6 e8f7 c6b7\n"
+    "ln 3 16 -188 0 0 0 E d4b4 b5d7 e8d7 d5e6 d7c6 a2a3 b4b5 e2e4 c6b6 a3a4 b5b4 c1e3 b6c7 e3f4 c7b6 e4d3 a7a5 f4d2 b4b2 d2e3 f8c5 e3c5 b6c5\n"
+    "an a1 1 0 0 16 a7a6 1\n"
+    "ln 1 16 -918 0 0 0 E a7a6 b5d7 e8d7 d5e6 d7c7 d1d4 a8e8 c1f4 c7b6 f4e3 e8e6\n"
+    "an a2 1 1 0 14 b5d7 2\n"
+    "ln 1 14 916 0 0 0 E b5d7 e8d7 d5e6 d7c7 d1d4 a8e8 c1f4 c7b6 f4e3 f8c5\n"
+    "ln 2 14 532 0 0 0 E d1d4 d7b5 c2c4 b5d7 c1b2\n"
+    "an a3 1 0 0 6 d4d1 1\n"
+    "ln 1 6 186 0 0 0 E d4d1 e2d1 d7b5 d5e6 b5c6 d1h5\n"
+    "end\n";
+
 }  // namespace
 
 TEST(coach_review_hint_says_the_better_move_wins_material) {
@@ -1490,6 +1507,24 @@ TEST(coach_review_motif_target_behind_the_reply_capture) {
         checkScript(r.script, where);
         CHECK(!hasKeyPrefix(r.script, "ex.discovered"));
         // Levels 3-6 say the line and what it costs.
+        if (level >= 3) CHECK(hasKeyPrefix(r.script, ("ex.material.b" + std::to_string(level)).c_str()));
+    }
+}
+
+TEST(coach_review_material_never_names_a_piece_the_better_move_gives_up) {
+    // 15...a6?: the line takes the queen, but so does the better move's ("Qxd1+ Qxd1"): never "now
+    // I can win your queen", nor the queen pointed at. Levels 3-6 say the line and its ten points.
+    const Recorded rc = recorded(kA6Record);
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        const Review r = reviewRecorded(rv, rc, level);
+        char where[32];
+        std::snprintf(where, sizeof where, "a6 b%d", level);
+        checkScript(r.script, where);
+        for (const Beat& b : r.script) {
+            if (b.line.key.rfind("ex.material.", 0) != 0) continue;
+            for (const auto& a : b.line.args) CHECK(!(a.second.kind == Arg::Kind::Piece && a.second.piece == Queen));
+        }
         if (level >= 3) CHECK(hasKeyPrefix(r.script, ("ex.material.b" + std::to_string(level)).c_str()));
     }
 }
@@ -1717,6 +1752,23 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 -99 0 0 0 E d8d7 a4d7 e2f1q e1f1\n"
          "end\n",
          ExType::Material, ExType::BackRank, 0},
+        // 45...Nc3? d8=Q Rxd8 Rxc3: the new queen is taken at once (the rook guards d8), so no
+        // "your king is too far"; the promotion is the in-between move before the knight falls.
+        {"g_369_149",
+         "rec b b5c3 startpos ; d2d4 e7e6 c2c4 f8b4 b1c3 c7c5 d4c5 g8f6 g1f3 b8a6 d1c2 d8c7 a2a3 b4c3 b2c3 a6c5 a3a4 d7d6 g2g3 c8d7 f3d2 d7c6 e2e4 a7a6 f2f3 h7h5 a4a5 a8d8 d2b3 c6a4 a1b1 c5b3 c2a2 b3c5 a2a4 c5a4 b1b4 c7d7 b4b7 a4c5 b7d7 c5d7 e1f2 h8f8 c1g5 e6e5 c4c5 d8a8 g5f6 d7f6 f1a6 a8a6 c5d6 a6d6 a5a6 e8e7 a6a7 d6d4 c3d4 f8a8 d4d5 e7d6 h1a1 f6e8 f2e3 d6c7 f3f4 c7b7 e3f3 b7b6 f4e5 e8c7 g3g4 h5g4 f3g3 c7b5 e5e6 f7f6 e6e7 b6c7 a1c1 c7d6 g3f4 d6e7 d5d6 e7e6 d6d7 g7g5 f4e3\n"
+         "an a0 1 0 0 18 e6d7 3\n"
+         "ln 1 18 406 0 0 0 E e6d7 c1b1 b5d6 b1a1 d6c8 a1d1 d7e7 d1c1 c8a7 c1a1 e7f7 a1a6 f7g6 e4e5 a8f8 a6a7 f8e8 a7a6 e8e5 e3f2 e5e4 f2g1 e4b4\n"
+         "ln 2 18 298 0 0 0 E b5a7 c1a1 e6d7 a1a5 d7c7 a5a6 f6f5 e4f5 a8e8 e3f2 a7c6 a6a4 c6e5 a4a7 c7d6 a7a6 d6e7\n"
+         "ln 3 18 -410 0 0 0 E a8d8 c1c8 b5a7 c8d8 a7c6 d8a8 e6d7 a8a6 g4g3 h2h3 f6f5 e4f5 c6e5 e3e4 g3g2 a6a1 e5c4 a1g1 d7e7 g1g2 e7f6 g2a2 c4d6 e4f3 f6f5 a2a5 f5f6 f3g4\n"
+         "an a1 1 0 0 18 b5c3 1\n"
+         "ln 1 18 -581 0 0 0 E b5c3 d7d8q a8d8 c1c3 g4g3 h2g3 d8a8 c3c6 e6e7 c6a6 e7d8 e3f2 d8c7 a6f6 a8a7 f6f7 c7b8 f7a7 b8a7 f2f3 a7b6 f3g4 b6c6 g4g5\n"
+         "an a2 1 1 0 14 d7d8r 2\n"
+         "ln 1 14 570 0 0 0 E d7d8r a8d8 c1c3 g4g3 h2g3 f6f5 c3c6 e6d7 c6a6 f5f4 g3f4 g5f4 e3f4 d8f8 f4e5 f8a8 e5f6 a8f8 f6g6 f8a8 g6f7 d7c7 e4e5 c7b7 a6a3 a8a7 a3a7 b7a7 f7g6 a7b7 e5e6\n"
+         "ln 2 14 567 0 0 0 E d7d8q a8d8 c1c3 g4g3 h2g3 f6f5 c3a3 f5f4 g3f4 g5f4 e3f4 d8f8 f4e3 f8c8\n"
+         "an a3 1 0 0 6 e6d7 1\n"
+         "ln 1 6 406 0 0 0 E e6d7 c1b1 b5d6 b1a1 d6c8 a1d1 d7e7\n"
+         "end\n",
+         ExType::None, ExType::PromotionRace, 0},
     };
     for (const Case& k : cases) {
         const Recorded rc = recorded(k.rec);

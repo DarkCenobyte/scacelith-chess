@@ -1062,6 +1062,13 @@ bool materialLine(const Ctx& c, Explanation& out) {
             const Square on = (st.move.flags & MoveEnPassant) ? NoSquare : squareBefore(c, st.move.to, k, 0);
             if (on != NoSquare && c.p1.at(on).color == c.human && c.p1.at(on).type == st.captured) named = on;
         }
+        // A piece the better move gives up too, its line down for good, is not named (nor pointed
+        // at) as what the move loses: "now I can win your queen" when Qxd1+ gives it up for a rook.
+        // Levels 1-2 need the name.
+        if (named != NoSquare && c.bestLoss >= 1 && bestGivesUp(c, named == c.played.to ? c.played.from : named) > 0) {
+            if (c.level <= 2) continue;
+            named = NoSquare;
+        }
         // Levels 1-2 name the piece and show the whole sequence (a claim the table does not show
         // would be lost on a beginner).
         // The piece named is the reason by itself ("I can win your pawn" for two pawns lost says too little).
@@ -1199,6 +1206,10 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         int pawnSteps = std::abs(rankOf(prom) - rankOf(pawn));
         if (rankOf(pawn) == (c.coach == White ? 1 : 6)) pawnSteps -= 1;   // the double step saves a move
         if (kingSteps <= pawnSteps) continue;
+        // Nor when another piece of the human's guards the square: the new queen is taken there
+        // ("d8=Q Rxd8"), and the king is not why the pawn goes through.
+        const Position before = afterR(c, i);
+        if (before.attackersTo(prom, c.human) & ~before.pieces(c.human, King)) continue;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.concrete = true;

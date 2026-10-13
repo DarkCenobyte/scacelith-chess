@@ -935,7 +935,8 @@ int reviewMain(const Options& o) {
                             const Arg& x = a.second;
                             if (b.kind != BeatKind::Say || x.kind != Arg::Kind::Piece || x.color != c.human ||
                                 x.square == NoSquare || x.piece == King || b.line.key.rfind("ex.better.", 0) == 0 ||
-                                b.line.key.rfind("ex.hint.", 0) == 0 || b.line.key.rfind("ex.reveal.", 0) == 0)
+                                b.line.key.rfind("ex.hint.", 0) == 0 || b.line.key.rfind("ex.reveal.", 0) == 0 ||
+                                (b.line.key.rfind("ex.retake.", 0) == 0 && a.first == "your2"))   // the taker
                                 continue;
                             const Move pm = c.p0.parseUCI(c.rec->played);
                             const Square onP0 = x.square == pm.to && c.p0.at(pm.from).type == x.piece ? pm.from : x.square;
