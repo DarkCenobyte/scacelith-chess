@@ -991,8 +991,11 @@ int reviewMain(const Options& o) {
                                 b.line.key.rfind("ex.hint.", 0) == 0 || b.line.key.rfind("ex.reveal.", 0) == 0 ||
                                 (b.line.key.rfind("ex.retake.", 0) == 0 && a.first == "your2") ||   // the taker
                                 // A bad capture says what the capturing piece is traded for ("your queen
-                                // for 3"), whatever the better move trades it for.
-                                (b.line.key.rfind("ex.exchange_capture.", 0) == 0 && a.first == "your"))
+                                // for 3"), whatever the better move trades it for; a count names the
+                                // piece on the square the exchange is about (the loss is the exchange's,
+                                // checked above), whatever the better move does with it later.
+                                (b.line.key.rfind("ex.exchange_capture.", 0) == 0 && a.first == "your") ||
+                                (b.line.key.rfind("ex.exchange_count.", 0) == 0 && a.first == "your"))
                                 continue;
                             const Move pm = c.p0.parseUCI(c.rec->played);
                             const Square onP0 = x.square == pm.to && c.p0.at(pm.from).type == x.piece ? pm.from : x.square;
