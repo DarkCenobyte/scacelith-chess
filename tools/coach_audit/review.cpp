@@ -560,8 +560,8 @@ int heldLossNet(const Ctx& c, const Position& end) {
     return lost - best;
 }
 
-// The retake line (ex.retake.*): where the sequence the cause names stops (its {line}, else the
-// first prefix of the refutation where the move is legal, the human to move), {move} is a capture
+// The retake line (ex.retake.*): where the sequence the cause names stops (its {line} or the
+// demonstration, else the first prefix of the refutation where the move is legal, the human to move), {move} is a capture
 // by {your2}, {reply} then a capture by {my} that takes {your}, after which the human is still down
 // what the cause names (a point at least). Every other take-back worth a point there loses as much
 // at once too. True when the line holds (LINE_SHORT then reads the table after both moves).
@@ -1062,7 +1062,11 @@ int reviewMain(const Options& o) {
                 for (const Beat& b : rev.script)
                     if (b.kind == BeatKind::Say && b.line.key.rfind("ex.retake.", 0) == 0) {
                         retakeSaid = true;
-                        retakeHolds = checkRetake(c, b, named, lineSaid ? &lineEnd : nullptr, judge.get(), f);
+                        // Where the sequence stops: the line said, else the demonstration's last move.
+                        Position shownEnd = c.p1;
+                        for (int i = 0; i < demoPlies && i < int(c.refut.size()); ++i) shownEnd.makeMove(c.refut[size_t(i)].move);
+                        retakeHolds = checkRetake(c, b, named, lineSaid ? &lineEnd : demoPlies > 0 ? &shownEnd : nullptr,
+                                                  judge.get(), f);
                     }
                 if (retakeSaid && !(explained && isMaterialType(t)))
                     f.push_back({"RETAKE_UNDUE", std::string(exTypeName(t)) + (explained ? "" : ", no reason said")});
