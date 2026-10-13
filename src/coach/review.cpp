@@ -1005,10 +1005,12 @@ Review Reviewer::review(const ReviewInput& in) {
     // Mates are still shown.
     const bool spoken = cls == MoveClass::Mistake && reason && !mateType && ex.type != ExType::Stalemate;
     if (!voice) slip = dubious = false;
-    // A principle instead (opening, technique): never a fault claim, Low priority, once per game each.
+    // A principle instead (opening, technique): never a fault claim, Low priority, once per game each;
+    // never for a top move (the coach would fault its own choice: Be2, blocking a bishop on the queen,
+    // is no "bishop moved twice").
     Explanation tipEx;
     bool tip = false;
-    if (!voice && !(retry && out.takeback.same) && !decidedLoss && !decidedWin && remarkAllowed())
+    if (!voice && !topMove && !(retry && out.takeback.same) && !decidedLoss && !decidedWin && remarkAllowed())
         tip = findTip(c, tipsSaid_, tipEx) && (level_ <= 3 || c.j.delta >= 10.0);
 
     Script s;

@@ -1885,6 +1885,31 @@ TEST(coach_review_human_context_cases) {
             if (level <= 2) CHECK_EQ(r.verdict.exType, ExType::MissedCapture);
         }
     }
+    {
+        // Game pyc4n7sp (Lichess, 2013): 8.Be2, a top move (it blocks the bishop on g4's attack on the
+        // queen), never "you moved your bishop twice".
+        const Recorded rc = recorded(
+         "rec w d3e2 startpos ; d2d4 d7d5 e2e3 c8f5 f1d3 d8d7 g2g4 f5g4 f2f3 g4f5 e3e4 d5e4 f3e4 f5g4\n"
+         "tag game https://lichess.org/pyc4n7sp 1193/1215 300+4 ply 15 drop 7.1\n"
+         "an a0 1 1 0 16 g1f3 3\n"
+         "ln 1 16 -99 0 0 0 E g1f3 b8c6 c2c3 e8c8 b1d2 e7e5 d4d5 f7f5 d3e2 c6b8 f3e5 g4e2 e5d7 e2d1 d7f8 d8f8 e1d1 g8f6 c3c4 f5e4 h1e1 f8e8 b2b3 h8f8 c1a3 f8f7 a3c5 b8d7 c5d4 d7e5 d1c2 e5f3 d2f3 e4f3 e1e6 e8f8\n"
+         "ln 2 16 -101 0 0 0 E d3e2 g4e2 d1e2 b8c6 d4d5 c6d4 e2g2 e7e6 c1e3 d4b5 g1e2 e6d5 b1c3 b5c3 e2c3 d5e4 g2e4 d7e6 e4e6 f7e6 e1c1 g8f6\n"
+         "ln 3 16 -163 0 0 0 E d1d2 b8c6 h2h3 g4h5 d4d5 c6e5 d3e2 h5e2 d2e2 e7e6 b1c3 e6d5 c1f4 e5g6 e4d5 f8e7 f4h2 g8f6 e1c1\n"
+         "an a2 1 0 0 14 g4e2 2\n"
+         "ln 1 14 109 0 0 0 E g4e2 d1e2 b8c6 c2c3 e7e5 d4d5 c6e7 c3c4 g8f6 g1f3 e7g6 c1d2 d7g4 b1c3 g6f4 e2f1 f4g2 e1e2\n"
+         "ln 2 14 55 0 0 0 E h7h5 g1f3 g4f3 e2f3 e7e5 d4d5 d7e7 d1e2 b8d7 c1e3 g7g6 b1a3\n"
+         "an a3 1 1 0 6 g1f3 1\n"
+         "ln 1 6 -99 0 0 0 E g1f3 b8c6 c2c3 e8c8 b1d2 e7e5\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Be2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "tip."));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
