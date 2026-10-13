@@ -1258,8 +1258,11 @@ Review Reviewer::review(const ReviewInput& in) {
         bool promoSoon = false;
         for (size_t i = 0; i < c.playedLine.size() && i < 2; ++i)
             if (c.playedLine[i].promotion != NoPiece) promoSoon = true;
-        const bool sacrifice = !promoSoon && (c.f.seePts <= -2 ||
-                                              (c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2));
+        // Material given up for good: down after the reply and still down after the player's next move
+        // (31...Rxe6 32.Rxe6 Qxe6 wins a pawn: no sacrifice).
+        const bool downAfter = c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2 &&
+                               (c.playedLine.size() < 3 || c.playedLine[2].balance <= c.base - 2);
+        const bool sacrifice = !promoSoon && (c.f.seePts <= -2 || downAfter);
         // A capture that wins the whole piece ("for free"); at levels 1-2 the lines also say it had
         // no protector.
         const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&

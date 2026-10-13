@@ -1910,6 +1910,33 @@ TEST(coach_review_human_context_cases) {
             CHECK(!hasKeyPrefix(r.script, "tip."));
         }
     }
+    {
+        // Game 5ai0tjzu (Lichess, 2013): 9.Bd3 Bxd3 10.Qxd3, a trade of bishops. The bishop taken is
+        // taken back at once: never "you gave up a piece" or a brilliant sacrifice.
+        const Recorded rc = recorded(
+         "rec w f1d3 startpos ; e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 d2d4 d7d6 f2f4 g7g5 g1f3 g5g4 f3g5 d6e5 f4e5 c8f5\n"
+         "tag game https://lichess.org/5ai0tjzu 2025/2294 180+0 ply 17 drop 6.0\n"
+         "an a0 1 1 0 16 f1d3 3\n"
+         "ln 1 16 228 0 0 0 E f1d3 f5d3 d1d3 e7e6 e1g1 b8c6 g5f7 d8d4 d3d4 c6d4 f7h8 d4c2 h8f7 c2a1 f7g5 f8e7 b1c3 e7g5 c1g5 a1c2 c3b5 a8c8 b5a7 c8a8\n"
+         "ln 2 16 193 0 0 0 E c4c5 h7h6 g5f7 e8f7 c5b6 e7e6 b1c3 a7b6 c1e3 b8c6 f1c4 f7g7 e1g1 f8e7 d1d2 e7g5 a1d1 d8e7 c3e2 a8d8 e3g5 h6g5 d2e3 h8f8 e2g3 f5g6 f1f8 d8f8\n"
+         "ln 3 16 163 0 0 0 E b1c3 b8c6 c4c5 h7h6 g5e4 b6d5 f1b5 d8d7 e1g1 a7a6 b5a4 e8c8 a4c6 b7c6 c3d5 d7d5\n"
+         "an a2 1 0 0 14 f5d3 2\n"
+         "ln 1 14 -230 0 0 0 E f5d3 d1d3 e7e6 e1g1 b8c6 g5f7 d8d4 d3d4 c6d4 f7h8 d4c2 h8f7 c2a1 f7g5 f8e7 b1c3 b6c4 g5e6 e8d7 c3b5 c7c6 b5c7\n"
+         "ln 2 14 -300 0 0 0 E h7h6 e5e6 h6g5 e6f7 e8f7 d3f5 b8c6 d4d5 c6e5 f5e6 f7e8 c4c5 b6d5 d1d5 d8d5 e6d5 e5d3 e1e2 d3c1 h1c1\n"
+         "an a3 1 1 0 6 f1d3 1\n"
+         "ln 1 6 228 0 0 0 E f1d3 f5d3 d1d3 e7e6 e1g1 b8c6\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bd3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!r.verdict.brilliant);
+            CHECK(!hasKeyPrefix(r.script, "praise.sacrifice"));
+            CHECK(!hasKeyPrefix(r.script, "praise.brilliant"));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

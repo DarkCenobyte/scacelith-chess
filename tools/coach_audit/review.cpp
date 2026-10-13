@@ -378,6 +378,18 @@ void checkFree(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     }
 }
 
+// A sacrifice praised: the move gives up material by exchange, or the player is still 2 points down
+// after the reply and their own next move along the played line (a capture won straight back is none).
+void checkSacrifice(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.sacrifice", 0) != 0 && k.rfind("praise.brilliant", 0) != 0) return;
+    const Move m = c.p0.parseUCI(c.rec->played);
+    if (m.valid() && seePoints(c.p0, m) <= -2) return;
+    const size_t n = c.playedLine.size();
+    const bool down = n >= 3 ? c.playedLine[2].balance <= c.base - 2 : n == 2 && c.playedLine[1].balance <= c.base - 2;
+    if (!down) out.push_back({"SACRIFICE_NONE", k + ": nothing is given up after the player's next move"});
+}
+
 void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     const bool allowed = k.rfind("ex.fork.b", 0) == 0, missed = k.rfind("ex.missed_fork", 0) == 0;
@@ -835,6 +847,7 @@ int reviewMain(const Options& o) {
                     checkPts(c, b, f);
                     checkWon(c, b, size_t(demoPlies), f);
                     checkFree(c, b, f);
+                    checkSacrifice(c, b, f);
                     checkFork(c, b, f);
                     checkMateCount(c, b, f);
                     checkLinePrizes(c, b, f);
