@@ -1584,10 +1584,11 @@ bool drawTip(const Ctx& c, uint32_t tipsSaid) {
 
 namespace {
 // The human's lead from c.base along a line, read as bestLoss reads a loss: after the line's first
-// 'from' plies, where it settles (a capture taken back on the next ply is a whole exchange; where the
-// line stops, the coach to move takes what it can at once), and over the next four plies: the least
-// (what the coach wins back by then was never won) and the most. False when a mate, a stalemate or
-// a promotion comes into the line: the points would not tell what happens.
+// 'from' plies, where it settles (captures on one square, one after the other, are one exchange read
+// where it ends: Nxh2 Nxh2 Bxh2+ Kxh2; where the line stops, the coach to move takes what it can at
+// once), and over the next four plies: the least (what the coach wins back by then was never won)
+// and the most. False when a mate, a stalemate or a promotion comes into the line: the points would
+// not tell what happens.
 struct Lead {
     const Ctx& c;
     const std::vector<LineStep>& line;
@@ -1598,8 +1599,8 @@ struct Lead {
         return true;
     }
     int at(size_t j) const {
-        if (j < line.size() && line[j - 1].captured != NoPiece && line[j].captured != NoPiece &&
-            line[j].move.to == line[j - 1].move.to)
+        while (j < line.size() && line[j - 1].captured != NoPiece && line[j].captured != NoPiece &&
+               line[j].move.to == line[j - 1].move.to)
             ++j;
         int g = line[j - 1].balance - c.base;
         if (j == line.size() && end.sideToMove() == c.coach && end.hasLegalMove()) g -= bestCapturePoints(end, c.coach);

@@ -257,6 +257,7 @@ bool Ctx::lossExplains(int lost, bool pawn) const {
 }
 
 bool Ctx::losesMaterial(int plies) const {
+    if (playedLoss > bestLoss) return true;
     const int n = std::min<int>(plies, int(r.size()));
     for (int i = 1; i <= n; ++i)
         if (lossAfter(i) > bestLoss && lossAfter(std::min(int(r.size()), i + 4)) > bestLoss) return true;

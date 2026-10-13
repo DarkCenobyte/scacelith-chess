@@ -55,8 +55,10 @@ struct Ctx {
     // would not be the real one.
     bool concreteLoss(int plies) const;
     // The refutation leaves the human down for good, beyond what the best move costs, after one of
-    // its first 'plies' plies and still four plies later: a "better position" or a better plan is
-    // then never the reason (the material is), even when no detector can name how it goes.
+    // its first 'plies' plies and still four plies later, or the move played's own line does
+    // (playedLoss: the two searches can go different ways, Nb1 hxg4 ... Rxc7+ Qxc7 Qxc7+ Kxc7 losing
+    // the exchange where the refutation loses it two plies later): a "better position" or a better
+    // plan is then never the reason (the material is), even when no detector can name how it goes.
     bool losesMaterial(int plies) const;
     // Points the human is down for good after the first 'plies' plies of r (relative to p0): a
     // recapture on the next ply undoes a loss, and where r stops, so does the exchange the human can

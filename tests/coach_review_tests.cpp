@@ -1481,6 +1481,60 @@ TEST(coach_review_bad_move_series_cases) {
             CHECK(!hasKeyPrefix(r.script, "ex.discovered"));
         }
     }
+    {
+        // 13.g4? 13.Bxb5 wins a pawn, but 13.g4's own line gives White material too (e3 fxe3 ...
+        // Nxh2 Nxh2 Bxh2+ Kxh2 Qh4+: two points for an attack, the exchange on h2 read where it ends).
+        // "It wins material" would not tell the moves apart: the hint names the bishop, no more.
+        const Recorded rc = recorded(
+         "rec w g2g4 startpos ; c2c3 d7d5 g1f3 b8c6 e2e3 g8f6 d1a4 c8d7 a4c2 e7e5 d2d4 e5e4 f3d2 a7a5 c3c4 b7b5 c4d5 c6b4 c2d1 c7c5 b1c3 c5d4 e3d4 b4d5\n"
+         "an a0 1 1 0 16 f1b5 3\n"
+         "ln 1 16 7 0 0 0 E f1b5 f8b4 b5d7 d8d7 c3d5 d7d5 e1g1 e8g8 d2b1 a8b8 b1c3 b4c3 b2c3 d5c4 d1c2\n"
+         "ln 2 16 -12 0 0 0 E c3d5 f6d5 d1b3 d5c7 f1e2 a5a4 b3g3 a8a6 d4d5 e4e3 g3e3 f8e7 e3d4 e8g8 d2e4 d7f5 e1g1 d8d5 d4d5 c7d5 e2b5\n"
+         "ln 3 16 -30 0 0 0 E c3e4 f6e4 d2e4 f8b4 c1d2 e8g8 f1d3 d5f4 d2b4 a5b4 e1g1 b4b3 a2a3 b5b4 d1d2 f4d3 d2d3 b4a3 d3b3 d7e6 b3c2 a3a2 e4c5 d8d4\n"
+         "an a1 1 1 0 16 g2g4 1\n"
+         "ln 1 16 -215 0 0 0 E g2g4 e4e3 f2e3 a8c8 f1d3 f6g4 e1g1 d5c3 b2c3 f8d6 d2f3 g4h2 f3h2 d6h2 g1h2 d8h4 h2g1 c8c3 d1f3\n"
+         "an a2 1 0 0 14 e4e3 2\n"
+         "ln 1 14 224 0 0 0 E e4e3 f2e3 f8b4 d1f3 d5c3 g4g5 a8a6 b2c3 b4c3 a1b1 e8g8 f1b5 a6b6 b5d7 b6b1 e1g1\n"
+         "ln 2 14 216 0 0 0 E d5c3 b2c3 e4e3 f2e3 f6g4 d1f3 a8a6 h2h3 a6f6 f3b7 f6b6 b7f3 g4e3 f3e3 b6e6 d2e4\n"
+         "an a3 1 1 0 6 f1b5 1\n"
+         "ln 1 6 7 0 0 0 E f1b5 f8b4 b5d7 d8d7 c3d5 d7d5\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "g4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.hint.gain"));
+        }
+    }
+    {
+        // 14.Nb1? hxg4 Rc3 f5 Qc2 Nd4 Rxc7+ Qxc7 Qxc7+ Kxc7: the move's own line loses the exchange
+        // (the refutation only two plies past what it reads): never "e3 keeps a better position".
+        const Recorded rc = recorded(
+         "rec w c3b1 startpos ; c2c4 e7e5 b2b3 g8f6 c1b2 b8c6 b1c3 d7d5 c4d5 f6d5 g1f3 c8f5 h2h3 e5e4 g2g4 f5g6 f3h2 h7h5 a1c1 d8d7 f1g2 d5f4 g2e4 e8c8 e4g6 f4g6\n"
+         "an a0 1 1 0 16 e2e3 3\n"
+         "ln 1 16 -357 0 0 0 E e2e3 c6b4 d2d4 h5g4 a2a3 h8h3 a3b4 f8d6 e1d2 d6h2 d2c2 h2d6 h1g1 f7f5 b4b5 c8b8 d1e2 g6h4\n"
+         "ln 2 16 -381 0 0 0 E g4h5 h8h5 h2f3 g6f4 h3h4 d8e8 e1f1 d7g4 h1h2 f8d6 e2e3 f4d3 h2g2 g4f5 c1b1 g7g6 a2a3 c6e5\n"
+         "ln 3 16 -409 0 0 0 E f2f3 f8e7 c3e4 h5g4 h3g4 e7d6 b2g7 h8h2 h1h2 d6h2 g7f6 d8e8 d1c2 g6e5 f6e5 h2e5 e4c5 d7e7 c2f5 c8b8 e2e3\n"
+         "an a1 1 1 0 16 c3b1 1\n"
+         "ln 1 16 -626 0 0 0 E c3b1 h5g4 c1c3 f7f5 d1c2 c6d4 c3c7 d7c7 c2c7 c8c7 h3g4 c7b8 b2d4 d8d4 g4f5 g6f4\n"
+         "an a2 1 0 0 14 h5g4 2\n"
+         "ln 1 14 642 0 0 0 E h5g4 c1c3 g6f4 h3g4 f8d6 e2e3 f4d5 f2f4 d5c3 b2c3 f7f6 d1f3 d6b4 h2f1 h8h1 f3h1\n"
+         "ln 2 14 470 0 0 0 E d8e8 c1c4 b7b5 c4c2 c6b4 c2c3 g6f4 e1f1 b4d5\n"
+         "an a3 1 1 0 6 e2e3 1\n"
+         "ln 1 6 -357 0 0 0 E e2e3 c6b4 d2d4 h5g4 h2g4 f7f5\n"
+         "end\n");
+        for (int level = 4; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nb1 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::Positional);
+            CHECK(!hasKeyPrefix(r.script, "ex.positional"));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
