@@ -107,8 +107,14 @@ int main(int argc, char** argv) {
 #endif
 #endif
     int run = 0, failedCases = 0, skipped = 0;
+    const char* lastFile = nullptr;
     for (auto& c : testing::registry()) {
         if (filter && !std::strstr(c.name, filter)) continue;
+        // The App the tests of one file shared (headless.h) goes before the next file's tests: its
+        // scene holds the engine and other one-owner systems they may start. The files' order
+        // differs between platforms (MinGW runs the static initialisers in reverse).
+        if (lastFile && std::strcmp(lastFile, c.file) != 0) headless::stopShared();
+        lastFile = c.file;
         int before = testing::g_failures;
         testing::g_skip.clear();
         testing::g_skipWithout.clear();
@@ -147,7 +153,7 @@ int main(int argc, char** argv) {
         ++run;
         if (!ok) ++failedCases;
     }
-    // The App the headless tests shared (headless.h), while the game's statics are still there.
+    // The last file's shared App, while the game's statics are still there.
     headless::stopShared();
     if (skipped) std::fprintf(stderr, "%d test(s), %d failed, %d skipped\n", run, failedCases, skipped);
     else std::fprintf(stderr, "%d test(s), %d failed\n", run, failedCases);

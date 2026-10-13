@@ -89,8 +89,9 @@ private:
 
 // One App for the tests of a file that can share it (starting one builds the font atlas and the
 // world: seconds under gcov): started with 'args' on the first call, and started again only when a
-// later call passes other args. Stopped by stopShared(), which the test runner calls after the last
-// test (before the game's statics go). nullptr when it does not start.
+// later call passes other args. Stopped by stopShared(), which the test runner calls before the
+// first test of another file (the App's scene holds the engine and other one-owner systems) and
+// after the last test (before the game's statics go). nullptr when it does not start.
 App* shared(const std::vector<std::string>& args = {});
 void stopShared();
 
