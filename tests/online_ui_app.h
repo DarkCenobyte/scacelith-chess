@@ -185,7 +185,7 @@ inline std::vector<ui::im::TracedItem> bare(headless::App& app, float h) {
 }
 
 // Opens the Esc menu of the game being played (Esc does nothing before the game is Playing).
-inline bool pause(headless::App& app, int tries = 120) {
+inline bool openPause(headless::App& app, int tries = 120) {
     for (int i = 0; i < tries; ++i) {
         if (app.hasLabel("Resume")) return true;
         app.key(plat::KEY_ESCAPE);

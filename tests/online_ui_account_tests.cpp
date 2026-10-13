@@ -12,6 +12,7 @@
 #include "online_ui_app.h"
 #include "game/online_account.h"
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -43,7 +44,7 @@ std::vector<ui::im::TracedItem> rows(headless::App& app) { return bare(app, 48.0
 
 // Moves the selector labelled 'label' by 'steps' (Right, or Left when negative), from the keyboard
 // once it has the focus (a click on its label).
-void select(headless::App& app, const std::string& label, int steps) {
+void stepSelector(headless::App& app, const std::string& label, int steps) {
     const ui::im::TracedItem* it = app.find(label);
     if (!it) return;
     const ui::gfx::Rect r = it->r;
@@ -112,30 +113,30 @@ TEST(online_ui_history_and_a_game_of_it) {
     CHECK_EQ(pager().page().games[0].id, newest);
 
     // Rated games only, then casual ones only, then all again.
-    select(*app, "Games", 1);
+    stepSelector(*app, "Games", 1);
     REQUIRE(historyLoaded(*app));
     const int rated = pager().page().total;
     for (const net::GameSummary& g : pager().page().games) CHECK(g.rated);
-    select(*app, "Games", 1);
+    stepSelector(*app, "Games", 1);
     REQUIRE(historyLoaded(*app));
     const int casual = pager().page().total;
     for (const net::GameSummary& g : pager().page().games) CHECK(!g.rated);
     CHECK_EQ(rated + casual, total);
-    select(*app, "Games", -2);
+    stepSelector(*app, "Games", -2);
     REQUIRE(historyLoaded(*app));
     CHECK_EQ(pager().page().total, total);
     // Won, lost, drawn: each game of those pages ended that way for the player.
     const game::Outcome outcomes[] = {game::Outcome::Win, game::Outcome::Loss, game::Outcome::Draw};
     int decided = 0;
     for (game::Outcome o : outcomes) {
-        select(*app, "Result", 1);
+        stepSelector(*app, "Result", 1);
         REQUIRE(historyLoaded(*app));
         decided += pager().page().total;
         for (const net::GameSummary& g : pager().page().games) CHECK(game::outcomeOf(g) == o);
         CHECK_EQ(rows(*app).size(), std::min(pager().page().games.size(), size_t(10)));
     }
     CHECK(decided <= total);                      // aborted games are in none of them
-    select(*app, "Result", -3);
+    stepSelector(*app, "Result", -3);
     REQUIRE(historyLoaded(*app));
     CHECK_EQ(pager().page().total, total);
 

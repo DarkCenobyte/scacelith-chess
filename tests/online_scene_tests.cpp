@@ -3,13 +3,16 @@
 // searching card, its Cancel), a challenge with the colour chosen, a private game, a challenge
 // received in the menus, a direct match hosted and joined; in the game, the human's move sent
 // (--play e2e4 with White), the opponent's moves, the Esc menu of an online game (abort before the
-// first move, resign after it, offer a draw, report the opponent, leave), the opponent's absence and
-// our own lost connection (the fakes' developer keys F9 and F10, F11 its stance), and the game over
-// card (the rematch, the report). What the server recorded is read back from the account's game
-// history; what the pages show, from their buttons.
+// first move, resign after it, offer a draw, report the opponent, its Options with the server
+// locked, leave), the move list, the opponent's absence and our own lost connection (the fakes'
+// developer keys F9 and F10, F11 its stance), and the game over card (folded, the rematch, the
+// report). What the server recorded is read back from the account's game history, the saved games
+// and the invitation copied from the App's folder and the test platform's clipboard; what the
+// pages show, from their buttons.
 #include "online_ui_app.h"
 #include "game/online_mock.h"
 #include "net/protocol_gen.h"
+#include "ui/ui.h"
 
 #include <filesystem>
 #include <string>
@@ -45,7 +48,7 @@ bool challenge(headless::App& app, const std::string& who, int colour) {
 // Leaves the game being played from its Esc menu ("Leave the game", then the confirmation, which
 // aborts before the first move and resigns after it); true once back on the Play page.
 bool leaveGame(headless::App& app) {
-    if (!pause(app) || !app.clickLabel("Leave the game")) return false;
+    if (!openPause(app) || !app.clickLabel("Leave the game")) return false;
     if (!app.clickLabel("Abort and leave") && !app.clickLabel("Resign and leave")) return false;
     return app.runUntil([&] { return ses().link() == nullptr && app.hasLabel("Find opponent"); }, 600);
 }
@@ -89,7 +92,7 @@ TEST(online_scene_matchmaking_search_then_abort) {
     CHECK_EQ(s.link()->eventName(), std::string("Scacelith (mock server)"));
     CHECK(s.pingMs() > 0);
 
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     CHECK(app->hasLabel("Abort the game"));
     CHECK(!app->hasLabel("Resign"));
     CHECK(app->hasLabel("Report opponent"));
@@ -98,7 +101,7 @@ TEST(online_scene_matchmaking_search_then_abort) {
     REQUIRE(app->clickLabel("Resume"));
     app->frames(2);
     CHECK(!app->hasLabel("Resume"));
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     REQUIRE(app->clickLabel("Abort the game"));
     REQUIRE(gameOverCard(*app));
     CHECK(app->hasLabel("Report opponent"));
@@ -154,7 +157,7 @@ TEST(online_scene_challenge_with_white_resign_and_rematch) {
 
     // The scripted first move, then the opponent's answer (its first move comes within 2.4 s).
     app->frames(300);
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     CHECK(app->hasLabel("Resign"));            // the first move is made: no abort any more
     CHECK(!app->hasLabel("Abort the game"));
     REQUIRE(app->clickLabel("Resume"));
@@ -176,7 +179,27 @@ TEST(online_scene_challenge_with_white_resign_and_rematch) {
     app->key(plat::KEY_F11);
     app->frames(900);           // the opponent is back (20 s after leaving)
 
-    REQUIRE(pause(*app));
+    // The Esc menu's Options, on their Online server tab: no server change during a game.
+    REQUIRE(openPause(*app));
+    REQUIRE(app->clickLabel("Options"));
+    REQUIRE(app->waitForLabel("Apply", 60));
+    for (int i = 0; i < 8 && !app->hasLabel("Test connection"); ++i) app->key(plat::KEY_PAGEDOWN);
+    REQUIRE(app->hasLabel("Test connection"));
+    CHECK(!enabled(*app, "Test connection"));
+    REQUIRE(app->clickLabel("Back"));
+    REQUIRE(app->waitForLabel("Resume", 60));
+    // Resign asked, then cancelled; the move list (Tab) shown and hidden.
+    REQUIRE(app->clickLabel("Resign"));
+    REQUIRE(app->clickLabel("Cancel"));
+    app->frames(10);
+    CHECK(!app->hasLabel("Cancel"));
+    REQUIRE(app->clickLabel("Resume"));
+    app->key(plat::KEY_TAB);
+    app->frames(10);
+    app->key(plat::KEY_TAB);
+    CHECK(s.link() != nullptr);                 // still playing
+
+    REQUIRE(openPause(*app));
     REQUIRE(app->clickLabel("Resign"));
     CHECK(app->hasLabel("Cancel"));            // the confirmation
     REQUIRE(clickLast(*app, "Resign"));
@@ -227,7 +250,7 @@ TEST(online_scene_challenge_with_black_report_waits_for_the_end) {
     REQUIRE(challenge(*app, "Opponent_B", 2));
     app->frames(240);   // the opponent's first move
 
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     REQUIRE(app->clickLabel("Report opponent"));
     REQUIRE(app->waitForLabel("Send report", 30));
     // The reason: Abusive behaviour (the selector's right arrow, with the keyboard).
@@ -237,19 +260,29 @@ TEST(online_scene_challenge_with_black_report_waits_for_the_end) {
     app->key(plat::KEY_RIGHT);
     REQUIRE(fill(*app, "Comment", "Rude"));
     REQUIRE(app->clickLabel("Send report"));
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     CHECK(!app->hasLabel("Report opponent"));   // queued until the end of the game
     CHECK(app->hasLabel("Abort the game"));
     REQUIRE(app->clickLabel("Offer draw"));
     app->frames(240);                            // the opponent's answer (a decline, or the draw)
     if (!app->hasLabel("Main menu")) {
-        REQUIRE(pause(*app));
+        REQUIRE(openPause(*app));
         CHECK(!enabled(*app, "Offer draw") || app->hasLabel("Offer draw"));
         REQUIRE(app->clickLabel("Abort the game"));
     }
     REQUIRE(gameOverCard(*app));
     app->frames(120);                            // the report goes 1.2 s after the end
     CHECK(!app->hasLabel("Report opponent"));
+    // The card folded to look at the board (Tab: the move list), then shown again.
+    REQUIRE(app->clickLabel("View the board"));
+    REQUIRE(app->waitForLabel("Show", 60));
+    CHECK(ui::gameOverFolded());
+    app->key(plat::KEY_TAB);
+    app->key(plat::KEY_TAB);
+    REQUIRE(app->clickLabel("Show"));
+    app->frames(30);
+    CHECK(!ui::gameOverFolded());
+    REQUIRE(app->hasLabel("Main menu"));
     REQUIRE(app->clickLabel("Main menu"));
     REQUIRE(app->runUntil([&] { return app->hasLabel("Find opponent"); }, 300));
     const std::vector<net::GameSummary> games = history(*app);
@@ -337,7 +370,7 @@ static bool toDirectPage(headless::App& app) {
 // The Esc menu's way out of a direct match; true once back on the Direct match page (where the
 // menu comes back after a direct match).
 static bool leaveDirectGame(headless::App& app) {
-    if (!pause(app) || !app.clickLabel("Leave the game")) return false;
+    if (!openPause(app) || !app.clickLabel("Leave the game")) return false;
     if (!app.clickLabel("Abort and leave") && !app.clickLabel("Resign and leave")) return false;
     return app.runUntil([&] { return ses().link() == nullptr && bare(app, 100.0f).size() == 2; }, 600);
 }
@@ -382,7 +415,7 @@ TEST(online_scene_direct_match_hosted) {
     CHECK(!s.link()->canReport());
     CHECK_EQ(s.pingMs(), 12);
     app->frames(300);                            // e2e4, and the friend's answer
-    REQUIRE(pause(*app));
+    REQUIRE(openPause(*app));
     CHECK(!app->hasLabel("Report opponent"));
     REQUIRE(app->clickLabel("Resign"));
     REQUIRE(clickLast(*app, "Resign"));
