@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <fstream>
 #include <random>
+#include <set>
 #include <sstream>
 #include <thread>
 
@@ -260,10 +261,17 @@ int recordMain(const Options& o) {
             e.newGame();
             const std::string tag = "game " + pg.record.tag("Site") + " " + pg.record.tag("WhiteElo") + "/" +
                                     pg.record.tag("BlackElo") + " " + pg.record.tag("TimeControl");
+            // A sample's picks: the plies its AuditPlies tag lists (from 1), recorded without the
+            // --min-drop scan, its AuditTag added to their tag.
+            std::set<size_t> picks;
+            {
+                std::istringstream ps(pg.record.tag("AuditPlies"));
+                for (size_t n; ps >> n;) picks.insert(n);
+            }
             // --min-drop: every position searched once (depth 10), a move's cost read from the
             // positions before and after it.
             std::vector<double> win;
-            if (o.minDrop > 0) {
+            if (o.minDrop > 0 && picks.empty()) {
                 Game scan = g;
                 win.push_back(winAt(e, scan));
                 for (const pgn::Ply& ply : pg.record.plies) {
@@ -278,17 +286,24 @@ int recordMain(const Options& o) {
                 const Color mover = g.position().sideToMove();
                 const bool human = mover == White ? !coachWhite : !coachBlack;
                 double drop = 0.0;
-                if (o.minDrop > 0) {
+                if (o.minDrop > 0 && picks.empty()) {
                     if (i + 1 >= win.size() || win[i] < 0 || win[i + 1] < 0) break;
                     drop = win[i] - (100.0 - win[i + 1]);
                 }
-                if (human && (!o.materialOnly || leavesMaterial(g, m)) && (o.minDrop <= 0 || drop >= o.minDrop)) {
+                if (!picks.empty()) {
+                    if (human && picks.count(i + 1)) {
+                        Record r = recordMove(e, g, m, o.depth);
+                        r.tag = tag + " ply " + std::to_string(i + 1) + " " + pg.record.tag("AuditTag");
+                        emit(r);
+                    }
+                } else if (human && (!o.materialOnly || leavesMaterial(g, m)) && (o.minDrop <= 0 || drop >= o.minDrop)) {
                     Record r = recordMove(e, g, m, o.depth);
                     char d[48];
                     std::snprintf(d, sizeof d, " ply %zu drop %.1f", i + 1, drop);
                     r.tag = tag + d;
                     emit(r);
                 }
+                if (!picks.empty() && i + 1 >= *picks.rbegin()) break;
                 if (!g.play(m)) break;
             }
             std::fprintf(stderr, "pgn %s: %d records\n", path.c_str(), written);

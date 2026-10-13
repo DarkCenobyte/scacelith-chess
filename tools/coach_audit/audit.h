@@ -16,7 +16,8 @@
 //       blundered into it, the side to move in its FEN being the human), tagged with the puzzle's
 //       id, rating and themes; --min-drop D: of the PGN games' moves, only those that cost D win-%
 //       points or more at depth 10 (each position searched once), tagged with the game's site,
-//       ratings and time control
+//       ratings and time control; a game with an AuditPlies tag (ply numbers from 1, a sample's
+//       picks) gives those plies only, without the scan, its AuditTag added to their tag
 //   coach_audit review --in FILE [--level L] [--out FILE] [--all]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops

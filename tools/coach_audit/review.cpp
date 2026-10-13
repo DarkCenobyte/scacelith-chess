@@ -977,7 +977,9 @@ int reviewMain(const Options& o) {
                 // A loss the best line wins back later than the windows read (Nxd4 Bh5+ Bg6 Bxg6+
                 // hxg6 Bxd4; Bxc8 ... Bxa1 Rxa1 Qxc8) is none: the best line is not down where it ends.
                 const int bestEndLoss = endLoss(c.bestLine, c.p0, c.human, c.base);
-                if (isMaterialType(t) && bestLoss >= 2 && bestEndLoss >= 2 && refLoss - bestLoss < 2)
+                // Nor one it takes back after in-between checks ("fxg8=Q Qg3+ Kc2 d3+ Kd1 Rxg8"):
+                // the least of the two is what the best line loses.
+                if (isMaterialType(t) && bestLoss >= 2 && bestEndLoss >= 2 && refLoss - std::min(bestLoss, bestEndLoss) < 2)
                     f.push_back({"AVOIDABLE?", "best line loses " + std::to_string(bestLoss) + ", played line " +
                                                    std::to_string(refLoss)});
                 if (isMaterialType(t) && bestLoss >= 1)
@@ -995,7 +997,10 @@ int reviewMain(const Options& o) {
                             const Move pm = c.p0.parseUCI(c.rec->played);
                             const Square onP0 = x.square == pm.to && c.p0.at(pm.from).type == x.piece ? pm.from : x.square;
                             if (c.p0.at(onP0).type != x.piece || c.p0.at(onP0).color != c.human) continue;
-                            if (std::min({lostAnyway(c.bestLine, c.p0, c.human, onP0), bestLoss, bestEndLoss}) >= 1)
+                            // A piece traded for as much elsewhere ("Rxe5 Bxh8") is not given up: the
+                            // best line must lose about what the piece is worth (a pawn's point, else two).
+                            const int anyway = lostAnyway(c.bestLine, c.p0, c.human, onP0);
+                            if (anyway >= 1 && std::min(bestLoss, bestEndLoss) >= std::min(anyway, 2))
                                 f.push_back({"AVOIDABLE?", b.line.key + " {" + a.first + "} " + pieceName(x.piece) +
                                                                " on " + squareName(onP0) + " is given up by the best line too"});
                         }
