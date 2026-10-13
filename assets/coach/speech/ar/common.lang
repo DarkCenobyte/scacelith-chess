@@ -48,9 +48,10 @@ owner.black.nom = ال{piece} الأسود
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice drops Latin letters and reads digits in English: file letters are spelled as Arabic
 # letter names and ranks are number words, as in the opening texts: e4 = "إي أربعة", f5 = "إف
-# خمسة", a8 = "إيه ثمانية", h7 = "إتش سبعة". Ranks keep the citation form (اثنان).
+# خمسة", a8 = "أيه ثمانية", h7 = "إتش سبعة". Ranks keep the citation form (اثنان).
+# "a" is "أيه" (ay), not "إيه": the voice reads "إيه" as "īh", heard as "e" ("بـ إيه ستة" taken for e6).
 square.spoken = {file} {rank}
-file.a.spoken = إيه
+file.a.spoken = أيه
 file.b.spoken = بي
 file.c.spoken = سي
 file.d.spoken = دي

@@ -5,7 +5,7 @@
 # is masculine, so "it" is always ـه / هو); {sq}, {sq2}, {to}, {esc} = squares; {move} = a move.
 # {@}, {@2}, {@3} are invisible marks placed right before the word the coach points at.
 # Literal Latin letters (files a-h, the knight's L) are dropped by the voice: those lines have a
-# ".spoken" version with the Arabic letter names of the opening texts (إيه، إي، إتش، إل).
+# ".spoken" version with the Arabic letter names of the opening texts (أيه، إي، إتش، إل).
 # "ملِك" carries a kasra in the possessives (ملِكي، ملِكك) and "رخّ" a shadda (رخّي، رخّك), as in
 # common.lang, so that neither the reader nor the voice mistakes them for other words.
 
@@ -68,7 +68,7 @@ lesson.welcome.hello = مرحبًا! أنا مدرّبك. لنتعلّم قوا�
 lesson.welcome.board = هذه رقعة الشطرنج: أربعة وستون مربعًا، فاتحة وداكنة، في ثمانية صفوف من ثمانية.
 lesson.welcome.light = مربع الزاوية على {@}يمينك فاتح دائمًا. تذكّر: الفاتح على اليمين.
 lesson.welcome.files = تُسمّى الخطوط العمودية أعمدة، ولها حروف، من {@}a إلى {@2}h.
-lesson.welcome.files.spoken = تُسمّى الخطوط العمودية أعمدة، ولها حروف، من {@}إيه إلى {@2}إتش.
+lesson.welcome.files.spoken = تُسمّى الخطوط العمودية أعمدة، ولها حروف، من {@}أيه إلى {@2}إتش.
 lesson.welcome.ranks = وتُسمّى الخطوط الأفقية صفوفًا، ولها أرقام، من {@}واحد إلى {@2}ثمانية، بدءًا من جهتك.
 lesson.welcome.square = يُسمّى كل مربع بحرفه ثم برقمه. هذا المربع هو {sq}.
 lesson.welcome.square2 = وهذا هو {sq}.

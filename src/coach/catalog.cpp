@@ -785,6 +785,7 @@ void Catalog::respell(const Language& L, Rendered& r) {
                 size_t n = end;
                 while (n < t.size() && uni::isSpace(t[n])) ++n;
                 if (n < t.size() && isWordChar(t[n])) continue;   // a word follows: no pause
+                if (n == end && n + 1 < t.size() && t[n] == U'-' && isWordChar(t[n + 1])) continue;   // "dix-huit"
             }
             hit = &rs;
             break;
