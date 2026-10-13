@@ -292,6 +292,7 @@ lesson.talk.release = 新しいマスで駒から手を離したら、その手�
 lesson.talk.sheet = 大会では、両者がすべての手を{@}棋譜用紙に書きます。
 lesson.talk.notation = 駒の頭文字とマスを、{move:letters}のように書きます。ポーンはマスだけです。
 lesson.talk.robot = あなたのロボットが、代わりに棋譜をつけます。速い対局では記録は不要です。
+lesson.talk.robot.spoken = あなたのロボットが、かわりに棋譜をつけます。速い対局では記録は不要です。
 lesson.talk.handshake = 対局は握手に始まり握手に終わります。挨拶と感謝のしるしです。
 lesson.talk.polite = 勝っても負けても礼儀正しく。相手の考慮中は邪魔をしないように。
 lesson.talk.tips = コツは3つ。{@}センターを押さえ、{@2}ナイトとビショップを出し、{@3}早めにキャスリング。

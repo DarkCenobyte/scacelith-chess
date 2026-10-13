@@ -91,21 +91,23 @@ EPONYM_LATIN = {
 }
 
 # Spoken squares and files. Files are said by their letter's name, ranks as number words (as file.*.spoken and
-# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "eu" and "huite": the voice says a lone "e" too
-# briefly and reads "huit" as "hui").
+# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "euh", "sisse" and "huite": the voice says a lone
+# "e" too briefly and "eu" like "u", reads "six" as "sixe" and "huit" as "hui"; Russian "йе" and Ukrainian "е́" with a
+# stress mark: the voice reads a lone Russian "е" as "и" and swallows the Ukrainian one; Arabic "أيه" for "a": "إيه"
+# sounds like "e").
 FILE_WORDS = {
     'en': ['ay', 'bee', 'see', 'dee', 'ee', 'eff', 'gee', 'aitch'],
-    'fr': ['a', 'bé', 'cé', 'dé', 'eu', 'effe', 'gé', 'ache'],
+    'fr': ['a', 'bé', 'cé', 'dé', 'euh', 'effe', 'gé', 'ache'],
     'de': ['a', 'be', 'ce', 'de', 'e', 'ef', 'ge', 'ha'],
     'es': ['a', 'be', 'ce', 'de', 'e', 'efe', 'ge', 'hache'],
-    'ru': ['а', 'бэ', 'цэ', 'дэ', 'е', 'эф', 'жэ', 'аш'],
-    'uk': ['а', 'бе', 'це', 'де', 'е', 'еф', 'же', 'аш'],
-    'ar': ['إيه', 'بي', 'سي', 'دي', 'إي', 'إف', 'جي', 'إتش'],
+    'ru': ['а', 'бэ', 'цэ', 'дэ', 'йе', 'эф', 'жэ', 'аш'],
+    'uk': ['а', 'бе', 'це', 'де', 'е́', 'еф', 'же', 'аш'],
+    'ar': ['أيه', 'بي', 'سي', 'دي', 'إي', 'إف', 'جي', 'إتش'],
     'ja': ['エー', 'ビー', 'シー', 'ディー', 'イー', 'エフ', 'ジー', 'エイチ'],
 }
 RANK_WORDS = {
     'en': ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'],
-    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huite'],
+    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'sisse', 'sept', 'huite'],
     'de': ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht'],
     'es': ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'],
     'ru': ['один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь'],
@@ -114,6 +116,13 @@ RANK_WORDS = {
     'ja': ['いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち'],
 }
 SQUARE_SEP = {'ja': ''}
+# Words the voice misreads, said otherwise in speech (as respell.* in assets/coach/speech/<code>/common.lang, which
+# the catalog applies to whole words only): French "dix-neuvième" is read with a k ("dixe-neuvième"); Japanese
+# "代わり" is read "たわり", and "一マス"/"二マス" are said "ひとマス"/"ふたマス" (as count.square.spoken).
+SPOKEN_WORDS = {
+    'fr': {'dix-neuvième': 'dize-neuvième'},
+    'ja': {'代わり': 'かわり', '一マス': 'ひとマス', '二マス': 'ふたマス'},
+}
 # A file named by its letter next to its noun ("the c-file", "la colonne c", "c-Linie", "cファイル").
 FILE_PATTERNS = {
     'en': (r'\b([a-h])-(files?|pawns?)\b', lambda m, w: w[m.group(1)] + ' ' + m.group(2)),
@@ -232,6 +241,8 @@ def spoken(lang, text, respell):
             t = t.replace(k, respell[k])
     if lang in ('ru', 'uk'):
         t = NAME_DASH_RE.sub(r'\1-\2', t)
+    for k, v in SPOKEN_WORDS.get(lang, {}).items():
+        t = t.replace(k, v)
     fw = dict(zip('abcdefgh', FILE_WORDS[lang]))
     pat = FILE_PATTERNS.get(lang)
     if pat:

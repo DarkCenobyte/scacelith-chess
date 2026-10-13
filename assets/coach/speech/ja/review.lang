@@ -126,6 +126,7 @@ ex.verdict.missed.b2.3 = おっと、そこにはすごくいい手がありま�
 ex.better.b3 = {best}の方が良い手でした。
 ex.better.b3.2 = より良いのは{best}でした。
 ex.better.b3.3 = 代わりに{best}が良かったですね。
+ex.better.b3.3.spoken = かわりに{best}が良かったですね。
 ex.better.b4 = {best}の方が強い手でした。
 ex.better.b4.2 = {best}が正しい手でした。
 ex.better.b4.3 = 良いのは{best}でした。
@@ -134,6 +135,7 @@ ex.better.b5.2 = {best}が正解でした：{line}。
 ex.better.b5.3 = {best}の方が良く、続きは{line}です。
 ex.better.b6 = {best}：{eval}。
 ex.better.b6.2 = 代わりに{best}、{eval}。
+ex.better.b6.2.spoken = かわりに{best}、{eval}。
 ex.better.b6.3 = {best}なら{eval}。
 
 # ---- A blunder without a reason the coach can give reliably --------------------------------------

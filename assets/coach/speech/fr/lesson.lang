@@ -76,7 +76,7 @@ lesson.welcome.square2 = Et celle-là, c’est {sq}.
 lesson.welcome.kings = Voici les deux rois. Le tien est en {sq}, le mien en {sq2}.
 lesson.welcome.ask = À toi : avance ton roi d’une case, en {sq}.
 lesson.welcome.wrong = Ça, c’est {to}. On veut {sq} : la lettre e, le chiffre deux.
-lesson.welcome.wrong.spoken = Ça, c’est {to}. On veut {sq} : la lettre eu, le chiffre deux.
+lesson.welcome.wrong.spoken = Ça, c’est {to}. On veut {sq} : la lettre euh, le chiffre deux.
 lesson.welcome.ok = Parfait. Ton roi est en {sq}.
 
 # ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------

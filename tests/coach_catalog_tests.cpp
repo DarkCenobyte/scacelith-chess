@@ -50,8 +50,8 @@ std::vector<std::string> parityProblems(const Catalog& c, const std::string& lan
         std::vector<std::string> enKeys = c.keys("en", topic), keys = c.keys(lang, topic);
         std::set<std::string> have(keys.begin(), keys.end());
         std::set<std::string> want;
-        for (auto& k : enKeys)
-            if (topic == "common" || !endsWith(k, ".spoken")) want.insert(k);
+        for (auto& k : enKeys)   // respell.* lists are each language's own words
+            if (!startsWith(k, "respell.") && (topic == "common" || !endsWith(k, ".spoken"))) want.insert(k);
         for (auto& k : want) {
             if (!have.count(k)) { out.push_back(lang + "/" + topic + ": missing " + k); continue; }
             const std::string* ev = c.find("en", k);
@@ -432,13 +432,13 @@ TEST(coach_catalog_respellings) {
     Line b = line("b");
     b.with("n", Arg::ofNumber(8));
     Catalog::Rendered rb = c.renderVariant(b, "fr", true, 1);
-    CHECK_EQ(rb.text, std::string("Huit coups, au coup huite. Mon huite, dix-huite\xC2\xA0!"));
+    CHECK_EQ(rb.text, std::string("Huit coups, au cou huite. Mon huite, dix-huite\xC2\xA0!"));
     CHECK_EQ(rb.text.substr(size_t(rb.anchor("@")), 6), std::string("huite,"));
     Line l = line("c");
     l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false)).with("sq", Arg::ofSquare(chess::parseSquare("e8")));
     Catalog::Rendered rc = c.renderVariant(l, "fr", true, 1);
-    CHECK_EQ(rc.text, std::string("Ma tour va en eu huite, et c’est matte."));
-    CHECK_EQ(rc.text.substr(size_t(rc.anchor("sq")), 8), std::string("eu huite"));
+    CHECK_EQ(rc.text, std::string("Ma tour va en euh huite, et c’est matte."));
+    CHECK_EQ(rc.text.substr(size_t(rc.anchor("sq")), 9), std::string("euh huite"));
     // Other languages keep their words.
     c.addFile("de", "test", "a = Matt in {n:move}, {@}mat.\nb = x\nc = x\n");
     CHECK(spoken(c, a, "de").find(" mat.") != std::string::npos);
