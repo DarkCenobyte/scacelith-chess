@@ -87,6 +87,71 @@ int worstLoss(const std::vector<LineStep>& line, const Position& start, Color hu
     return worst;
 }
 
+// The human's loss after the first 'plies' plies of a line played from 'start' (relative to
+// 'base'): the human's capture there that the other side takes back on the next ply is a whole
+// exchange, and where the line stops with the human to move, what the human takes back at once is
+// taken off.
+int lossAt(const std::vector<LineStep>& line, const Position& start, Color human, int base, size_t plies) {
+    if (plies > 0 && plies < line.size() && line[plies - 1].mover == human && line[plies - 1].captured != NoPiece &&
+        line[plies].mover != human && line[plies].captured != NoPiece && line[plies].move.to == line[plies - 1].move.to)
+        ++plies;
+    Position q = start;
+    for (size_t i = 0; i < plies && i < line.size(); ++i) q.makeMove(line[i].move);
+    return plies >= line.size() || plies == 0 ? heldLossAt(q, human, base) : base - materialBalance(q, human);
+}
+
+// Where a line settles after its first 'plies' plies: the least loss from there to four plies
+// later (what the human wins back meanwhile, an in-between check first, was no loss).
+int settledLoss(const std::vector<LineStep>& line, const Position& start, Color human, int base, size_t plies) {
+    plies = std::min(plies, line.size());
+    int l = lossAt(line, start, human, base, plies);
+    for (size_t j = plies + 1; j <= std::min(line.size(), plies + 4); ++j) l = std::min(l, lossAt(line, start, human, base, j));
+    return l;
+}
+
+// The most the human is down for good along the first 'plies' plies of a line, a loss counted only
+// where it still holds (settledLoss) four plies later.
+int lastingLoss(const std::vector<LineStep>& line, const Position& start, Color human, int base, size_t plies) {
+    int worst = 0;
+    for (size_t i = 1; i <= std::min(plies, line.size()); ++i) worst = std::max(worst, settledLoss(line, start, human, base, i));
+    return worst;
+}
+
+// The points of the human's piece that stands on 'onP0' before the move that the best line gives up
+// too: the other side takes it within ten plies (the piece followed as it moves) and the captures on
+// that square right after do not win as much back; what the piece took on its way is taken off. 0
+// when it survives or is traded.
+int lostAnyway(const std::vector<LineStep>& best, const Position& p0, Color human, Square onP0) {
+    const Piece was = p0.at(onP0);
+    if (was.empty() || was.color != human) return 0;
+    Square at = onP0;
+    int took = 0;
+    for (size_t i = 0; i < best.size() && i < 10; ++i) {
+        const LineStep& st = best[i];
+        if (st.mover == human) {
+            if (st.move.from == at) {
+                at = st.move.to;
+                took += kPiecePoints[st.captured];
+            } else if (st.piece == King && (st.move.flags & (MoveCastleKing | MoveCastleQueen))) {
+                const int rank = rankOf(st.move.to);
+                const bool kingSide = fileOf(st.move.to) == 6;
+                if (at == makeSquare(kingSide ? 7 : 0, rank)) at = makeSquare(kingSide ? 5 : 3, rank);
+            }
+            continue;
+        }
+        const Square on = (st.move.flags & MoveEnPassant) ? Square(st.move.to + (human == White ? 8 : -8)) : st.move.to;
+        if (st.captured == NoPiece || on != at) continue;
+        int net = kPiecePoints[st.captured];
+        for (size_t j = i + 1, last = i; j < best.size() && j <= last + 3; ++j) {
+            if (best[j].captured == NoPiece || best[j].move.to != st.move.to) continue;
+            net += best[j].mover == human ? -kPiecePoints[best[j].captured] : kPiecePoints[best[j].captured];
+            last = j;
+        }
+        return std::max(0, std::min(net, int(kPiecePoints[st.captured])) - took);
+    }
+    return 0;
+}
+
 bool isMaterialType(ExType t) {
     return t == ExType::Fork || t == ExType::Discovered || t == ExType::Skewer || t == ExType::Pin ||
            t == ExType::Trapped || t == ExType::BackRank || t == ExType::Hanging || t == ExType::Exchange ||
@@ -150,7 +215,7 @@ std::string marksText(const Beat& b) {
 void checkPieceArgs(const Ctx& c, const Beat& b, const Position& table, bool demoNarration,
                     std::vector<Finding>& out) {
     const bool missedFamily = b.line.key.rfind("ex.missed", 0) == 0 || b.line.key.rfind("ex.mate_missed", 0) == 0 ||
-                              b.line.key.rfind("ex.promotion_missed", 0) == 0;
+                              b.line.key.rfind("ex.promotion_missed", 0) == 0 || b.line.key.rfind("ex.reveal", 0) == 0;
     for (const auto& a : b.line.args) {
         const Arg& x = a.second;
         if (x.kind != Arg::Kind::Piece) continue;
@@ -444,6 +509,100 @@ void checkLinePlausible(MoveJudge& judge, const Position& start, const std::vect
     }
 }
 
+// What the capture 'm' (legal in 'now') already won in 'before' with the same side to move: the
+// same piece taking the same piece on the same squares (0 when it was no such move then).
+int standingSee(const Position& before, const Position& now, const Move& m) {
+    if (before.at(m.from) != now.at(m.from) || before.at(m.to) != now.at(m.to) ||
+        before.sideToMove() != now.sideToMove())
+        return 0;
+    for (const Move& x : before.legalMoves())
+        if (x.from == m.from && x.to == m.to && x.promotion == m.promotion) return std::max(0, seePoints(before, x));
+    return 0;
+}
+
+// heldLossAt, where a capture the human could make before the move (p0) as well takes nothing back
+// (the loss counts from p0, where it stood too).
+int heldLossNet(const Ctx& c, const Position& end) {
+    int lost = c.base - materialBalance(end, c.human);
+    if (end.sideToMove() != c.human || !end.hasLegalMove()) return lost;
+    int best = 0;
+    for (const Move& m : end.legalMoves())
+        if ((m.flags & MoveCapture) && (m.promotion == NoPiece || m.promotion == Queen))
+            best = std::max(best, seePoints(end, m) - standingSee(c.p0, end, m));
+    return lost - best;
+}
+
+// The retake line (ex.retake.*): where the sequence the cause names stops (its {line}, else the
+// first prefix of the refutation where the move is legal, the human to move), {move} is a capture
+// by {your2}, {reply} then a capture by {my} that takes {your}, after which the human is still down
+// what the cause names (a point at least). Every other take-back worth a point there loses as much
+// at once too. True when the line holds (LINE_SHORT then reads the table after both moves).
+bool checkRetake(const Ctx& c, const Beat& b, int named, const Position* lineEnd, MoveJudge* judge,
+                 std::vector<Finding>& out) {
+    const Arg* mv = b.line.arg("move");
+    const Arg* rp = b.line.arg("reply");
+    if (!mv || !rp) {
+        out.push_back({"RETAKE_ARGS", b.line.key});
+        return false;
+    }
+    std::vector<Position> qs;
+    if (lineEnd) qs.push_back(*lineEnd);
+    Position q = c.p1;
+    for (size_t i = 0; i < c.refut.size() && i < 12; ++i) {
+        q.makeMove(c.refut[i].move);
+        if (q.sideToMove() == c.human) qs.push_back(q);
+    }
+    for (const Position& at : qs) {
+        const Move take = at.parseUCI(mv->uci);
+        if (!take.valid() || at.sideToMove() != c.human) continue;
+        if (!(take.flags & MoveCapture)) {
+            out.push_back({"RETAKE_ILLEGAL", b.line.key + " " + mv->san + " takes nothing"});
+            return false;
+        }
+        Position after = at;
+        after.makeMove(take);
+        const Move hit = after.parseUCI(rp->uci);
+        if (!hit.valid() || !(hit.flags & MoveCapture)) {
+            out.push_back({"RETAKE_ILLEGAL", b.line.key + " " + rp->san + " after " + mv->san});
+            return false;
+        }
+        const Square lostOn = (hit.flags & MoveEnPassant) ? Square(hit.to + (c.human == White ? -8 : 8)) : hit.to;
+        const Arg* your = b.line.arg("your");
+        const Arg* your2 = b.line.arg("your2");
+        const Arg* my = b.line.arg("my");
+        if ((your && (your->piece != after.at(lostOn).type || after.at(lostOn).color != c.human)) ||
+            (your2 && your2->piece != at.at(take.from).type) || (my && my->piece != after.at(hit.from).type))
+            out.push_back({"RETAKE_PIECES", b.line.key + " " + mv->san + " " + rp->san});
+        Position end = after;
+        end.makeMove(hit);
+        const int left = heldLossNet(c, end);
+        if (left < std::max(1, named))
+            out.push_back({"RETAKE_SHORT", b.line.key + " " + mv->san + " " + rp->san + " leaves the human " +
+                                               std::to_string(left) + " down, " + std::to_string(named) + " named"});
+        for (const Move& m : at.legalMoves()) {
+            if (!(m.flags & MoveCapture) || m == take || (m.promotion != NoPiece && m.promotion != Queen)) continue;
+            const int took = seePoints(at, m) - standingSee(c.p0, at, m);
+            if (took < 1) continue;
+            Position a2 = at;
+            a2.makeMove(m);
+            if (bestCapturePoints(a2, c.coach) < took)
+                out.push_back({"RETAKE_OTHER", b.line.key + ": " + at.toSAN(m) + " takes back " + std::to_string(took)});
+        }
+        if (judge) {
+            std::string best;
+            const double cost = judge->cost(at, take, &best);
+            if (cost < 5.0) {
+                const Move bm = at.parseUCI(best);
+                out.push_back({"RETAKE_WORKS", b.line.key + " " + mv->san + " costs only " + std::to_string(int(cost)) +
+                                                   "%, best " + (bm.valid() ? at.toSAN(bm) : best)});
+            }
+        }
+        return left >= 1;
+    }
+    out.push_back({"RETAKE_ILLEGAL", b.line.key + " " + mv->san + " is no move where the sequence stops"});
+    return false;
+}
+
 void checkMateCount(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.find("mate") == std::string::npos) return;
@@ -657,7 +816,8 @@ int reviewMain(const Options& o) {
             for (const Beat& b : rev.script) {
                 const std::string& k = b.line.key;
                 if (b.kind == BeatKind::Say && k.rfind("ex.", 0) == 0 && k.rfind("ex.verdict.", 0) != 0 &&
-                    k.rfind("ex.better.", 0) != 0 && k.rfind("ex.point.", 0) != 0 && k.rfind("ex.result.", 0) != 0)
+                    k.rfind("ex.better.", 0) != 0 && k.rfind("ex.point.", 0) != 0 && k.rfind("ex.result.", 0) != 0 &&
+                    k.rfind("ex.hint.", 0) != 0 && k.rfind("ex.reveal.", 0) != 0)
                     causeSaid = true;
             }
             const bool explained = v.voiced && v.exType != ExType::None && causeSaid && !v.praised;
@@ -718,19 +878,65 @@ int reviewMain(const Options& o) {
                         break;
                     }
 
-            // The loss the explanation names is one the best move avoids.
+            // The hint names the piece the better move moves (where it stands now), and the reveal
+            // that move itself; neither is said without a better move.
+            for (const Beat& b : rev.script) {
+                const bool hint = b.line.key.rfind("ex.hint.", 0) == 0, reveal = b.line.key.rfind("ex.reveal.", 0) == 0;
+                if (!hint && !reveal) continue;
+                if (c.bestLine.empty() || v.cls != MoveClass::Blunder) {
+                    f.push_back({"HINT_UNDUE", b.line.key});
+                    continue;
+                }
+                const Move bm = c.bestLine[0].move;
+                const Arg* your = b.line.arg("your");
+                const Move pm = c.p0.parseUCI(c.rec->played);
+                const Square want = hint && bm.from == pm.from ? pm.to : bm.from;
+                if (your && (your->piece != c.bestLine[0].piece || your->square != want))
+                    f.push_back({"HINT_PIECE", b.line.key + " names " + pieceName(your->piece) + " on " +
+                                                   squareName(your->square) + ", the better move is " + c.bestLine[0].san});
+                if (const Arg* sq = b.line.arg("sq"); reveal && sq && sq->square != bm.to)
+                    f.push_back({"HINT_PIECE", b.line.key + " names " + squareName(sq->square) + ", the better move is " +
+                                                   c.bestLine[0].san});
+            }
+
+            // The loss the explanation names is one the best move avoids: where the best line settles
+            // (what is traded back is no loss), and the named piece not given up by the best line too.
             if (explained && fault && (isMaterialType(t) || isGenericType(t)) && c.lp) {
-                const int bestLoss = worstLoss(c.bestLine, c.p0, c.human, c.base, 8);
-                const int refLoss = worstLoss(c.playedLine, c.p0, c.human, c.base, 9);
+                const int bestLoss = lastingLoss(c.bestLine, c.p0, c.human, c.base, 8);
+                const int refLoss = lastingLoss(c.playedLine, c.p0, c.human, c.base, 9);
                 if (isMaterialType(t) && bestLoss >= 2 && refLoss - bestLoss < 2)
                     f.push_back({"AVOIDABLE?", "best line loses " + std::to_string(bestLoss) + ", played line " +
                                                    std::to_string(refLoss)});
+                if (isMaterialType(t) && bestLoss >= 1)
+                    for (const Beat& b : rev.script)
+                        for (const auto& a : b.line.args) {
+                            const Arg& x = a.second;
+                            if (b.kind != BeatKind::Say || x.kind != Arg::Kind::Piece || x.color != c.human ||
+                                x.square == NoSquare || x.piece == King || b.line.key.rfind("ex.better.", 0) == 0 ||
+                                b.line.key.rfind("ex.hint.", 0) == 0 || b.line.key.rfind("ex.reveal.", 0) == 0)
+                                continue;
+                            const Move pm = c.p0.parseUCI(c.rec->played);
+                            const Square onP0 = x.square == pm.to && c.p0.at(pm.from).type == x.piece ? pm.from : x.square;
+                            if (c.p0.at(onP0).type != x.piece || c.p0.at(onP0).color != c.human) continue;
+                            if (std::min(lostAnyway(c.bestLine, c.p0, c.human, onP0), bestLoss) >= 1)
+                                f.push_back({"AVOIDABLE?", b.line.key + " {" + a.first + "} " + pieceName(x.piece) +
+                                                               " on " + squareName(onP0) + " is given up by the best line too"});
+                        }
                 bool mated = false;
                 for (const LineStep& s : c.playedLine)
                     if (s.mate && s.mover == c.coach) mated = true;
-                // King safety is about mates: only a material loss makes it the wrong reason.
+                // King safety is about mates: only a material loss makes it the wrong reason, one the
+                // coach's own refutation shows too (where it shows the take-back, the king exposed
+                // after it is what that line says).
+                int coachLoss = refLoss;
+                if (t == ExType::KingSafety) {
+                    std::vector<LineStep> line;
+                    if (!c.playedLine.empty()) line.push_back(c.playedLine[0]);
+                    line.insert(line.end(), c.refut.begin(), c.refut.end());
+                    coachLoss = lastingLoss(line, c.p0, c.human, c.base, 9);
+                }
                 if (isGenericType(t) && (v.cls != MoveClass::Inaccuracy) &&
-                    (refLoss - bestLoss >= 2 || (mated && t != ExType::KingSafety)))
+                    (std::min(refLoss, coachLoss) - bestLoss >= 2 || (mated && t != ExType::KingSafety)))
                     f.push_back({"GENERIC_REASON", std::string(exTypeName(t)) + " while the played line loses " +
                                                        std::to_string(refLoss) + (mated ? " (mate)" : "")});
             }
@@ -740,8 +946,8 @@ int reviewMain(const Options& o) {
             // mates (or that misses such a win), and no line of the coach's says why. Levels 1-2 stay
             // silent by design when the reason lies beyond the level's reach: counted, not an error.
             if (v.cls == MoveClass::Blunder && v.wBest > 10.0 && v.wPlayed < 75.0 && !explained && c.lp) {
-                const int bestLoss = worstLoss(c.bestLine, c.p0, c.human, c.base, 8);
-                const int refLoss = worstLoss(c.playedLine, c.p0, c.human, c.base, 9);
+                const int bestLoss = lastingLoss(c.bestLine, c.p0, c.human, c.base, 8);
+                const int refLoss = lastingLoss(c.playedLine, c.p0, c.human, c.base, 9);
                 const int bestGain = worstLoss(c.bestLine, c.p0, c.coach, -c.base, 8);
                 bool mated = false, mates = false;
                 for (const LineStep& s : c.playedLine)
@@ -757,20 +963,71 @@ int reviewMain(const Options& o) {
             }
 
             // What a {line} names goes as far as the point it makes: a material reason's line ends
-            // with the human down (for good) or mated.
-            if (explained && isMaterialType(t))
+            // with the human down (for good) or mated, or the retake line says why the take-back
+            // the table shows there fails (checkRetake).
+            {
+                bool lineSaid = false;
+                Position lineEnd;
+                int named = 0;
                 for (const Beat& b : rev.script) {
+                    if (const Arg* p = b.line.arg("pts"); p && b.line.key.rfind("ex.retake.", 0) != 0) named = std::max(named, p->number);
                     Position start;
                     std::vector<Move> moves;
                     bool fromBest = false;
                     if (b.kind != BeatKind::Say || b.line.key.rfind("ex.better.", 0) == 0 ||
-                        !saidLine(c, b, start, moves, fromBest) || fromBest)
+                        !saidLine(c, b, start, moves, fromBest) || fromBest || lineSaid)
                         continue;
-                    Position q = start;
-                    for (const Move& m : moves) q.makeMove(m);
-                    if (!q.isCheckmate() && heldLossAt(q, c.human, c.base) < 1)
-                        f.push_back({"LINE_SHORT", b.line.key + " {line} ends with nothing lost"});
+                    lineSaid = true;
+                    lineEnd = start;
+                    for (const Move& m : moves) lineEnd.makeMove(m);
                 }
+                bool retakeHolds = false, retakeSaid = false;
+                for (const Beat& b : rev.script)
+                    if (b.kind == BeatKind::Say && b.line.key.rfind("ex.retake.", 0) == 0) {
+                        retakeSaid = true;
+                        retakeHolds = checkRetake(c, b, named, lineSaid ? &lineEnd : nullptr, judge.get(), f);
+                    }
+                if (retakeSaid && !(explained && isMaterialType(t)))
+                    f.push_back({"RETAKE_UNDUE", std::string(exTypeName(t)) + (explained ? "" : ", no reason said")});
+                if (explained && isMaterialType(t) && lineSaid && !retakeHolds && !lineEnd.isCheckmate() &&
+                    heldLossNet(c, lineEnd) < 1)
+                    f.push_back({"LINE_SHORT", "{line} ends with nothing lost"});
+            }
+
+            // A reason that names a target (a motif; a level 1-2 "I can win your pawn") while the
+            // coach's reply itself takes another piece, as much or more, for good: that capture is the story ("Nxb3"
+            // took the queen; "Qxc6" took a loose bishop, the fork on two pawns came after).
+            if (explained && fault && (isMaterialType(t) && t != ExType::Hanging && t != ExType::Exchange) &&
+                !c.refut.empty() && c.refut[0].mover == c.coach && c.refut[0].captured != NoPiece) {
+                bool saysPts = false, named = false;
+                int target = 0;
+                const Square took = (c.refut[0].move.flags & MoveEnPassant)
+                                        ? Square(c.refut[0].move.to + (c.human == White ? 8 : -8))
+                                        : c.refut[0].move.to;
+                for (const Beat& b : rev.script) {
+                    const std::string& k = b.line.key;
+                    if (b.kind != BeatKind::Say || k.rfind("ex.", 0) != 0 || k.rfind("ex.verdict.", 0) == 0 ||
+                        k.rfind("ex.better.", 0) == 0 || k.rfind("ex.retake.", 0) == 0 || k.rfind("ex.result", 0) == 0)
+                        continue;
+                    for (const std::string& vt : variantsOf(k)) saysPts = saysPts || usesPlaceholder(vt, "pts");
+                    for (const char* n : {"t1", "t2", "your"})
+                        if (const Arg* a = b.line.arg(n); a && a->kind == Arg::Kind::Piece && a->color == c.human && a->piece != King) {
+                            target = std::max(target, int(kPiecePoints[a->piece]));
+                            named = named || a->square == took;
+                        }
+                }
+                // What the human is down then (from p0: the move's own capture counts), after the
+                // human's capture right after it (anywhere: "gxf4 cxb4" trades the queens).
+                Position q = c.p1;
+                q.makeMove(c.refut[0].move);
+                if (c.refut.size() >= 2 && c.refut[1].mover == c.human && c.refut[1].captured != NoPiece)
+                    q.makeMove(c.refut[1].move);
+                const int lostAtOnce = c.base - materialBalance(q, c.human);
+                if (lostAtOnce >= 1 && lostAtOnce >= target && !named && !(t == ExType::Material && saysPts))
+                    f.push_back({"MOTIF_BEHIND_CAPTURE", std::string(exTypeName(t)) + " names " + std::to_string(target) +
+                                                              " points, " + c.refut[0].san + " takes " +
+                                                              std::to_string(lostAtOnce) + " at once"});
+            }
 
             // A material reason that names much less than the engine's drop understates the problem.
             if (explained && fault && isMaterialType(t) && c.lp) {
@@ -778,8 +1035,21 @@ int reviewMain(const Options& o) {
                 const int drop = sign * (v.cpWhiteBefore - v.cpWhiteAfter);
                 int named = 0;
                 if (demo) named = shownLoss(c, demoPlies);
-                for (const Beat& b : rev.script)
-                    if (const Arg* p = b.line.arg("pts")) named = std::max(named, p->number);
+                // The points a reason says (where its phrasings say {pts}), else the pieces it names
+                // as lost or attacked.
+                for (const Beat& b : rev.script) {
+                    const std::string& k = b.line.key;
+                    if (b.kind != BeatKind::Say || k.rfind("ex.", 0) != 0 || k.rfind("ex.better.", 0) == 0 ||
+                        k.rfind("ex.hint.", 0) == 0 || k.rfind("ex.reveal.", 0) == 0 || k.rfind("ex.retake.", 0) == 0)
+                        continue;
+                    bool saysPts = false;
+                    for (const std::string& v : variantsOf(k)) saysPts = saysPts || usesPlaceholder(v, "pts");
+                    if (const Arg* p = b.line.arg("pts"); p && saysPts) named = std::max(named, p->number);
+                    for (const char* t : {"t1", "t2", "your"})
+                        if (const Arg* a = b.line.arg(t); a && a->kind == Arg::Kind::Piece && a->color == c.human &&
+                                                          a->piece != King)
+                            named = std::max(named, kPiecePoints[a->piece]);
+                }
                 // The same measure as the coach's (Ctx::lossExplains): a pawn for 2.5 pawns of the
                 // drop, a piece for a pawn (or the exchange) for 8.
                 if (named < 3 && named * (named >= 2 ? 400 : 250) < drop)
