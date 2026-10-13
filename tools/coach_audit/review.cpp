@@ -589,13 +589,20 @@ bool checkRetake(const Ctx& c, const Beat& b, int named, const Position* lineEnd
                 out.push_back({"RETAKE_OTHER", b.line.key + ": " + at.toSAN(m) + " takes back " + std::to_string(took)});
         }
         if (judge) {
+            // The answer is real: the coach's capture is as good as its best move after the
+            // take-back (one the engine refutes would make the take-back work). Where the take-back
+            // is the engine's own choice there, every move loses as much: said, but counted.
             std::string best;
-            const double cost = judge->cost(at, take, &best);
-            if (cost < 5.0) {
-                const Move bm = at.parseUCI(best);
-                out.push_back({"RETAKE_WORKS", b.line.key + " " + mv->san + " costs only " + std::to_string(int(cost)) +
-                                                   "%, best " + (bm.valid() ? at.toSAN(bm) : best)});
+            const double cost = judge->cost(after, hit, &best);
+            if (cost >= 5.0) {
+                const Move bm = after.parseUCI(best);
+                out.push_back({"RETAKE_WORKS", b.line.key + " " + mv->san + " " + rp->san + " costs the coach " +
+                                                   std::to_string(int(cost)) + "%, best " +
+                                                   (bm.valid() ? after.toSAN(bm) : best)});
             }
+            std::string bestTake;
+            if (judge->cost(at, take, &bestTake) == 0.0 && bestTake == mv->uci)
+                out.push_back({"RETAKE_BEST", b.line.key + " " + mv->san + " is the best move there", false});
         }
         return left >= 1;
     }
