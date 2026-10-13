@@ -184,6 +184,52 @@ public:
             if (!it.label.empty()) out.push_back(it.label);
         return out;
     }
+    // The last widget showing 'label' (a dialog's button over the page's, drawn after it).
+    const ui::im::TracedItem* findLast(const std::string& label) const {
+        const ui::im::TracedItem* found = nullptr;
+        for (const auto& it : items())
+            if (it.label == label) found = &it;
+        return found;
+    }
+    bool clickLast(const std::string& label) {
+        const ui::im::TracedItem* it = findLast(label);
+        if (!it) return false;
+        const ui::gfx::Rect r = it->r;
+        clickRect(r);
+        return true;
+    }
+    bool disabled(const std::string& label) const {
+        const ui::im::TracedItem* it = find(label);
+        return it && (it->flags & ui::im::ITEM_DISABLED) != 0;
+    }
+    // The widgets without a label (list rows, grid cells, icon buttons) that 'keep' selects, in
+    // drawing order.
+    std::vector<ui::gfx::Rect> bare(const std::function<bool(const ui::im::TracedItem&)>& keep) const {
+        std::vector<ui::gfx::Rect> out;
+        for (const auto& it : items())
+            if (it.label.empty() && keep(it)) out.push_back(it.r);
+        return out;
+    }
+    // A click at the centre of r, then one more frame.
+    void clickRect(const ui::gfx::Rect& r) {
+        clickAt(r.cx(), r.cy());
+        frame();
+    }
+    // Moves the mouse onto a form row's label: the row takes the focus (the arrows then step it)
+    // without the click a value would take.
+    bool focusRow(const std::string& label) {
+        const ui::im::TracedItem* it = find(label);
+        if (!it) return false;
+        const ui::gfx::Rect r = it->r;
+        move(r.x + 14.0f, r.cy());
+        return true;
+    }
+    // A row focused, then 'key' pressed 'times' times.
+    bool nudge(const std::string& label, int key, int times = 1) {
+        if (!focusRow(label)) return false;
+        for (int i = 0; i < times; ++i) press(key);
+        return true;
+    }
 };
 
 // Records the UI sounds while it lives (ui::setSoundCallback); none are played afterwards.

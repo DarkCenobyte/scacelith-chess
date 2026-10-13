@@ -74,50 +74,11 @@ struct Restore {
 // The time a page takes to slide in (0.35 s) and a little more: its widgets stand still afterwards.
 void settle(uitest::Driver& d) { d.frames(30); }
 
-// Moves the mouse onto a form row's label: the row takes the focus (the arrows then step it)
-// without the click a value would take.
-bool focusRow(uitest::Driver& d, const std::string& label) {
-    const ui::im::TracedItem* it = d.find(label);
-    if (!it) return false;
-    const Rect r = it->r;
-    d.move(r.x + 14.0f, r.cy());
-    return true;
-}
-bool nudge(uitest::Driver& d, const std::string& label, int key, int times = 1) {
-    if (!focusRow(d, label)) return false;
-    for (int i = 0; i < times; ++i) d.press(key);
-    return true;
-}
-bool disabled(const uitest::Driver& d, const std::string& label) {
-    const ui::im::TracedItem* it = d.find(label);
-    return it && (it->flags & ui::im::ITEM_DISABLED) != 0;
-}
-// The last widget of the frame showing 'label' (a dialog's button over the page's).
-const ui::im::TracedItem* findLast(const uitest::Driver& d, const std::string& label) {
-    const ui::im::TracedItem* found = nullptr;
-    for (const auto& it : d.items())
-        if (it.label == label) found = &it;
-    return found;
-}
-bool clickLast(uitest::Driver& d, const std::string& label) {
-    const ui::im::TracedItem* it = findLast(d, label);
-    if (!it) return false;
-    const Rect r = it->r;
-    d.clickAt(r.cx(), r.cy());
-    d.frame();
-    return true;
-}
-// The widgets without a label (list rows, time control cells) that 'keep' selects, in drawing order.
+// The widgets without a label (list rows, time control cells) whose rectangle 'keep' selects.
 std::vector<Rect> bare(const uitest::Driver& d, const std::function<bool(const Rect&)>& keep) {
-    std::vector<Rect> out;
-    for (const auto& it : d.items())
-        if (it.label.empty() && keep(it.r)) out.push_back(it.r);
-    return out;
+    return d.bare([&](const ui::im::TracedItem& it) { return keep(it.r); });
 }
-void clickRect(uitest::Driver& d, const Rect& r) {
-    d.clickAt(r.cx(), r.cy());
-    d.frame();
-}
+
 // A text field's text replaced: a click at the end of its box, Backspace until it is empty, the
 // new text typed, then a click on an empty corner ends the edit.
 bool retype(uitest::Driver& d, const std::string& label, const std::string& text) {
@@ -223,10 +184,10 @@ TEST(ui_screens_new_game_presets_and_time_controls) {
     REQUIRE(rows.size() == 10u);
     const std::vector<Rect> cells = bare(d, [&](const Rect& r) { return r.x > col.r() && r.h == 66.0f; });
     REQUIRE(cells.size() == 13u);   // the twelve presets and Custom
-    clickRect(d, rows[4]);
+    d.clickRect(rows[4]);
     CHECK_EQ(m.setup.difficulty, 4);
     CHECK(sounds.count(ui::Sound::Toggle) >= 1);
-    clickRect(d, cells[7]);
+    d.clickRect(cells[7]);
     CHECK_EQ(m.setup.timeControl, 7);
     CHECK(!d.has(T("engine.skill")));
     CHECK(!d.has(T("tc.base_time")));
@@ -271,26 +232,26 @@ TEST(ui_screens_new_game_custom_engine_and_clock) {
     const Rect col = d.find(T("newgame.opponent_kind"))->r;
     std::vector<Rect> rows = bare(d, [&](const Rect& r) { return r.x == col.x && r.w == col.w; });
     REQUIRE(rows.size() == 10u);
-    clickRect(d, rows[9]);
+    d.clickRect(rows[9]);
     settle(d);
     CHECK_EQ(m.setup.difficulty, 9);
     for (const char* key : {"engine.skill", "engine.limit_elo", "engine.elo", "engine.depth", "engine.move_time", "engine.nodes"})
         CHECK(d.has(T(key)));
-    CHECK(!disabled(d, T("engine.skill")));
-    CHECK(disabled(d, T("engine.elo")));
-    REQUIRE(nudge(d, T("engine.skill"), plat::KEY_RIGHT, 2));
+    CHECK(!d.disabled(T("engine.skill")));
+    CHECK(d.disabled(T("engine.elo")));
+    REQUIRE(d.nudge(T("engine.skill"), plat::KEY_RIGHT, 2));
     CHECK_EQ(m.setup.skillLevel, game::settings().customSkillLevel + 2);
     REQUIRE(d.click(T("engine.limit_elo")));
     CHECK(m.setup.limitElo);
-    CHECK(disabled(d, T("engine.skill")));
-    CHECK(!disabled(d, T("engine.elo")));
-    REQUIRE(nudge(d, T("engine.elo"), plat::KEY_RIGHT, 3));
+    CHECK(d.disabled(T("engine.skill")));
+    CHECK(!d.disabled(T("engine.elo")));
+    REQUIRE(d.nudge(T("engine.elo"), plat::KEY_RIGHT, 3));
     CHECK_EQ(m.setup.elo, 1830);
-    REQUIRE(nudge(d, T("engine.depth"), plat::KEY_RIGHT, 3));
+    REQUIRE(d.nudge(T("engine.depth"), plat::KEY_RIGHT, 3));
     CHECK_EQ(m.setup.depth, 3);
-    REQUIRE(nudge(d, T("engine.move_time"), plat::KEY_RIGHT, 2));
+    REQUIRE(d.nudge(T("engine.move_time"), plat::KEY_RIGHT, 2));
     CHECK_EQ(m.setup.moveTimeMs, ui::detail::moveTimeValues()[2]);
-    REQUIRE(nudge(d, T("engine.nodes"), plat::KEY_RIGHT, 1));
+    REQUIRE(d.nudge(T("engine.nodes"), plat::KEY_RIGHT, 1));
     CHECK_EQ(m.setup.nodes, ui::detail::nodeValues()[1]);
     // The folded rows: the list no longer fits, the wheel scrolls it.
     rows = bare(d, [&](const Rect& r) { return r.x == col.x && r.w == col.w; });
@@ -308,15 +269,15 @@ TEST(ui_screens_new_game_custom_engine_and_clock) {
     // A custom clock.
     const std::vector<Rect> cells = bare(d, [&](const Rect& r) { return r.x > col.r() && r.h == 66.0f; });
     REQUIRE(cells.size() == 13u);
-    clickRect(d, cells.back());
+    d.clickRect(cells.back());
     settle(d);
     CHECK_EQ(m.setup.timeControl, -1);
-    REQUIRE(nudge(d, T("tc.base_time"), plat::KEY_RIGHT, 1));
+    REQUIRE(d.nudge(T("tc.base_time"), plat::KEY_RIGHT, 1));
     const auto& bases = ui::detail::baseTimeValues();
     CHECK_EQ(m.setup.customBaseSeconds, bases[size_t(ui::detail::nearestIndex(bases, 600) + 1)]);
-    REQUIRE(nudge(d, T("tc.increment"), plat::KEY_LEFT, 5));
+    REQUIRE(d.nudge(T("tc.increment"), plat::KEY_LEFT, 5));
     CHECK_EQ(m.setup.customIncrementSeconds, 0);
-    REQUIRE(nudge(d, T("tc.delay"), plat::KEY_RIGHT, 2));
+    REQUIRE(d.nudge(T("tc.delay"), plat::KEY_RIGHT, 2));
     CHECK_EQ(m.setup.customDelaySeconds, 2);
     REQUIRE(d.click(T("newgame.start")));
     CHECK_EQ(m.count(MenuAction::StartGame), 1);
@@ -356,7 +317,7 @@ TEST(ui_screens_new_game_two_players) {
     REQUIRE(d.click(T("menu.new_game")));
     settle(d);
     CHECK(!d.has(T("hotseat.swap")));
-    REQUIRE(nudge(d, T("newgame.opponent_kind"), plat::KEY_RIGHT));
+    REQUIRE(d.nudge(T("newgame.opponent_kind"), plat::KEY_RIGHT));
     settle(d);
     CHECK_EQ(m.setup.opponent, 1);
     CHECK(d.has(T("hotseat.white_player")));
@@ -371,7 +332,7 @@ TEST(ui_screens_new_game_two_players) {
     CHECK_EQ(m.setup.names[0], std::string("Alice"));
     REQUIRE(retype(d, T("hotseat.black_player"), "  "));
     CHECK_EQ(m.setup.names[1], std::string("  "));
-    REQUIRE(nudge(d, T("player.handwriting"), plat::KEY_RIGHT, 2));
+    REQUIRE(d.nudge(T("player.handwriting"), plat::KEY_RIGHT, 2));
     CHECK_EQ(m.setup.hands[0], int(font::HAND_BADSCRIPT));
     REQUIRE(d.click(T("hotseat.swap")));
     CHECK_EQ(m.setup.names[1], std::string("Alice"));
@@ -395,7 +356,7 @@ TEST(ui_screens_new_game_two_players) {
     REQUIRE(d.click(T("menu.new_game")));
     settle(d);
     CHECK_EQ(m.setup.names[1], std::string("Alice"));
-    REQUIRE(nudge(d, T("newgame.opponent_kind"), plat::KEY_LEFT));
+    REQUIRE(d.nudge(T("newgame.opponent_kind"), plat::KEY_LEFT));
     settle(d);
     CHECK_EQ(m.setup.opponent, 0);
     CHECK(!d.has(T("hotseat.swap")));
@@ -425,13 +386,13 @@ TEST(ui_screens_options_display_and_language) {
     settle(d);
     CHECK(ui::optionsOpen());
     CHECK(d.has(T("options.language")));
-    CHECK(disabled(d, T("common.apply")));
-    CHECK(disabled(d, T("options.window_size")));
+    CHECK(d.disabled(T("common.apply")));
+    CHECK(d.disabled(T("options.window_size")));
     // The language, step by step to Arabic. The frame of a switch still shows the old language's
     // labels: the row is found again after one more frame.
     auto language = [&](int key) {
         d.frame();
-        return nudge(d, T("options.language"), key);
+        return d.nudge(T("options.language"), key);
     };
     const std::vector<i18n::Language>& langs = i18n::languages();
     const int en = i18n::languageIndex("en");
@@ -451,16 +412,16 @@ TEST(ui_screens_options_display_and_language) {
     REQUIRE(i18n::language() == "en");
     CHECK_EQ(g.language, std::string("en"));
     d.frames(2);
-    CHECK(disabled(d, T("common.apply")));   // the language is no pending change
+    CHECK(d.disabled(T("common.apply")));   // the language is no pending change
     // Windowed: the size can be chosen.
-    REQUIRE(nudge(d, T("options.display_mode"), plat::KEY_RIGHT));
+    REQUIRE(d.nudge(T("options.display_mode"), plat::KEY_RIGHT));
     d.frame();   // the page reads the pending changes as a frame begins
-    CHECK(!disabled(d, T("options.window_size")));
-    CHECK(!disabled(d, T("common.apply")));
-    REQUIRE(nudge(d, T("options.window_size"), plat::KEY_RIGHT));   // already the last entry (its own size)
-    REQUIRE(nudge(d, T("options.window_size"), plat::KEY_LEFT));
+    CHECK(!d.disabled(T("options.window_size")));
+    CHECK(!d.disabled(T("common.apply")));
+    REQUIRE(d.nudge(T("options.window_size"), plat::KEY_RIGHT));   // already the last entry (its own size)
+    REQUIRE(d.nudge(T("options.window_size"), plat::KEY_LEFT));
     REQUIRE(d.click(T("options.vsync")));
-    REQUIRE(nudge(d, T("options.render_scale"), plat::KEY_LEFT, 2));
+    REQUIRE(d.nudge(T("options.render_scale"), plat::KEY_LEFT, 2));
     CHECK(g.fullscreen);   // nothing applied yet
     REQUIRE(d.click(T("common.apply")));
     CHECK_EQ(m.count(MenuAction::OptionsChanged), 1);
@@ -469,7 +430,7 @@ TEST(ui_screens_options_display_and_language) {
     CHECK_EQ(g.displayHeight, 1080);
     CHECK(!g.vsync);
     CHECK(std::fabs(g.renderScale - 0.9f) < 1e-4f);
-    CHECK(disabled(d, T("common.apply")));
+    CHECK(d.disabled(T("common.apply")));
     REQUIRE(d.click(T("common.back")));
     CHECK(d.has(T("menu.new_game")));
     CHECK(ui::optionsOpen());   // still true the frame after (the game reads it one frame late)
@@ -520,7 +481,7 @@ TEST(ui_screens_options_unsaved_changes) {
     REQUIRE(d.click(T("options.invert_look")));
     d.press(plat::KEY_ESCAPE);
     d.frames(2);
-    REQUIRE(clickLast(d, T("common.apply")));
+    REQUIRE(d.clickLast(T("common.apply")));
     d.frame();
     CHECK(g.invertLook);
     CHECK_EQ(m.count(MenuAction::OptionsChanged), 1);
@@ -546,12 +507,12 @@ TEST(ui_screens_options_graphics) {
     REQUIRE(d.click(T("menu.options")));
     settle(d);
     REQUIRE(d.has(T("options.quality")));
-    CHECK(disabled(d, T("options.tessellation")));
-    CHECK(!disabled(d, T("options.bloom")));
-    REQUIRE(nudge(d, T("options.quality"), plat::KEY_RIGHT));   // High
+    CHECK(d.disabled(T("options.tessellation")));
+    CHECK(!d.disabled(T("options.bloom")));
+    REQUIRE(d.nudge(T("options.quality"), plat::KEY_RIGHT));   // High
     REQUIRE(d.click(T("options.bloom")));                       // High without bloom: Custom
-    REQUIRE(nudge(d, T("options.shadows"), plat::KEY_LEFT));
-    REQUIRE(nudge(d, T("options.brightness"), plat::KEY_RIGHT, 3));
+    REQUIRE(d.nudge(T("options.shadows"), plat::KEY_LEFT));
+    REQUIRE(d.nudge(T("options.brightness"), plat::KEY_RIGHT, 3));
     REQUIRE(d.click(T("common.apply")));
     CHECK_EQ(m.count(MenuAction::OptionsChanged), 1);
     game::GraphicsLevels want = game::presetLevels(game::PresetHigh);
@@ -561,7 +522,7 @@ TEST(ui_screens_options_graphics) {
     CHECK_EQ(g.graphicsPreset, game::matchingPreset(want));
     CHECK(std::fabs(g.brightness - 0.3f) < 1e-4f);
     // Back to a preset: every level follows.
-    REQUIRE(nudge(d, T("options.quality"), plat::KEY_LEFT, 6));
+    REQUIRE(d.nudge(T("options.quality"), plat::KEY_LEFT, 6));
     REQUIRE(d.click(T("common.apply")));
     CHECK_EQ(g.graphicsPreset, int(game::PresetVeryLow));
     CHECK(g.graphicsLevels == game::presetLevels(game::PresetVeryLow));
@@ -589,18 +550,18 @@ TEST(ui_screens_options_audio) {
     REQUIRE(d.click(T("menu.options")));
     settle(d);
     REQUIRE(d.has(T("options.master_volume")));
-    CHECK(disabled(d, T("options.voice_volume")));
-    CHECK(!disabled(d, T("options.ambience_volume")));
-    REQUIRE(nudge(d, T("options.master_volume"), plat::KEY_RIGHT, 2));
-    REQUIRE(nudge(d, T("options.effects"), plat::KEY_LEFT, 1));
-    REQUIRE(nudge(d, T("options.ambience_volume"), plat::KEY_LEFT, 4));
+    CHECK(d.disabled(T("options.voice_volume")));
+    CHECK(!d.disabled(T("options.ambience_volume")));
+    REQUIRE(d.nudge(T("options.master_volume"), plat::KEY_RIGHT, 2));
+    REQUIRE(d.nudge(T("options.effects"), plat::KEY_LEFT, 1));
+    REQUIRE(d.nudge(T("options.ambience_volume"), plat::KEY_LEFT, 4));
     REQUIRE(d.click(T("options.ambience")));
-    CHECK(disabled(d, T("options.ambience_volume")));
-    REQUIRE(nudge(d, T("options.ambience_volume"), plat::KEY_LEFT, 4));   // off: it stays
+    CHECK(d.disabled(T("options.ambience_volume")));
+    REQUIRE(d.nudge(T("options.ambience_volume"), plat::KEY_LEFT, 4));   // off: it stays
     REQUIRE(d.click(T("options.coach_voice")));
-    CHECK(!disabled(d, T("options.voice_volume")));
-    REQUIRE(nudge(d, T("options.voice_volume"), plat::KEY_LEFT, 3));
-    REQUIRE(nudge(d, T("options.subtitles"), plat::KEY_RIGHT, 2));
+    CHECK(!d.disabled(T("options.voice_volume")));
+    REQUIRE(d.nudge(T("options.voice_volume"), plat::KEY_LEFT, 3));
+    REQUIRE(d.nudge(T("options.subtitles"), plat::KEY_RIGHT, 2));
     REQUIRE(d.click(T("common.apply")));
     CHECK_EQ(m.count(MenuAction::OptionsChanged), 1);
     CHECK(std::fabs(g.masterVolume - 0.6f) < 1e-4f);
@@ -638,13 +599,13 @@ TEST(ui_screens_options_gameplay_and_player) {
     REQUIRE(d.click(T("options.thinking_time")));
     REQUIRE(d.click(T("options.ignore_head")));
     REQUIRE(d.click(T("options.game_cursor")));
-    REQUIRE(nudge(d, T("options.mouse_sensitivity"), plat::KEY_RIGHT, 4));
-    REQUIRE(nudge(d, T("options.handover"), plat::KEY_LEFT, 10));   // down to the instant cut
+    REQUIRE(d.nudge(T("options.mouse_sensitivity"), plat::KEY_RIGHT, 4));
+    REQUIRE(d.nudge(T("options.handover"), plat::KEY_LEFT, 10));   // down to the instant cut
     d.press(plat::KEY_PAGEDOWN);
     d.frames(2);
     REQUIRE(d.has(T("player.name")));
     REQUIRE(retype(d, T("player.name"), "\xD0\x90\xD0\xBD\xD0\xBD\xD0\xB0 \xE7\x8E\x8B"));   // "Анна 王"
-    REQUIRE(nudge(d, T("player.handwriting"), plat::KEY_RIGHT));
+    REQUIRE(d.nudge(T("player.handwriting"), plat::KEY_RIGHT));
     REQUIRE(d.click(T("options.save_games")));
     d.press(plat::KEY_PAGEDOWN);   // Online (the online worker's rows)
     d.frames(2);
@@ -703,9 +664,9 @@ TEST(ui_screens_credits_and_licences) {
     const std::vector<Rect> rows = bare(d, [](const Rect& r) { return r.x < 700.0f && r.y > 150.0f && r.h > 20.0f; });
     REQUIRE(rows.size() >= 10u);
     const int toggles = sounds.count(ui::Sound::Toggle);
-    clickRect(d, rows[2]);
+    d.clickRect(rows[2]);
     CHECK_EQ(sounds.count(ui::Sound::Toggle), toggles + 1);
-    clickRect(d, rows[2]);   // already selected
+    d.clickRect(rows[2]);   // already selected
     CHECK_EQ(sounds.count(ui::Sound::Toggle), toggles + 1);
     // The keyboard: each row it reaches is selected.
     ui::im::setKeyboardMode(true);
@@ -751,8 +712,8 @@ TEST(ui_screens_watch_a_game) {
     // Rows of 52 (two columns of nine presets), cells of 64 (13 time controls).
     std::vector<Rect> rows = bare(d, [](const Rect& r) { return r.h == 48.0f; });
     REQUIRE(rows.size() == 18u);
-    clickRect(d, rows[1]);        // White: Beginner
-    clickRect(d, rows[9 + 7]);    // Black: Grandmaster
+    d.clickRect(rows[1]);        // White: Beginner
+    d.clickRect(rows[9 + 7]);    // Black: Grandmaster
     CHECK_EQ(m.watch.whitePreset, 1);
     CHECK_EQ(m.watch.blackPreset, 7);
     REQUIRE(d.click(T("viewer.swap")));
@@ -760,14 +721,14 @@ TEST(ui_screens_watch_a_game) {
     CHECK_EQ(m.watch.blackPreset, 1);
     const std::vector<Rect> cells = bare(d, [](const Rect& r) { return r.h == 64.0f; });
     REQUIRE(cells.size() == 13u);
-    clickRect(d, cells[3]);
+    d.clickRect(cells[3]);
     CHECK_EQ(m.watch.timeControl, 3);
-    clickRect(d, cells.back());
+    d.clickRect(cells.back());
     settle(d);
     CHECK_EQ(m.watch.timeControl, -1);
-    REQUIRE(nudge(d, T("viewer.base_time"), plat::KEY_RIGHT));
-    REQUIRE(nudge(d, T("viewer.increment"), plat::KEY_RIGHT, 2));
-    REQUIRE(nudge(d, T("viewer.delay"), plat::KEY_RIGHT, 1));
+    REQUIRE(d.nudge(T("viewer.base_time"), plat::KEY_RIGHT));
+    REQUIRE(d.nudge(T("viewer.increment"), plat::KEY_RIGHT, 2));
+    REQUIRE(d.nudge(T("viewer.delay"), plat::KEY_RIGHT, 1));
     CHECK_EQ(m.watch.customIncrementSeconds, 5);
     CHECK_EQ(m.watch.customDelaySeconds, 1);
     REQUIRE(d.click(T("viewer.start")));
@@ -803,7 +764,7 @@ TEST(ui_screens_brightness_calibration) {
     d.frames(3);
     CHECK(!ui::titlePageShown());
     REQUIRE(d.has(T("calibration.continue")));
-    REQUIRE(nudge(d, T("options.brightness"), plat::KEY_LEFT, 7));
+    REQUIRE(d.nudge(T("options.brightness"), plat::KEY_LEFT, 7));
     REQUIRE(d.click(T("calibration.continue")));
     CHECK(std::fabs(g.brightness - (-0.2f)) < 1e-4f);
     CHECK(g.brightnessCalibrated);
@@ -812,7 +773,7 @@ TEST(ui_screens_brightness_calibration) {
     g.brightnessCalibrated = false;
     ui::openBrightnessCalibration();
     d.frames(3);
-    REQUIRE(nudge(d, T("options.brightness"), plat::KEY_RIGHT, 5));
+    REQUIRE(d.nudge(T("options.brightness"), plat::KEY_RIGHT, 5));
     d.press(plat::KEY_ESCAPE);
     d.frame();
     CHECK(std::fabs(g.brightness - (-0.2f)) < 1e-4f);
