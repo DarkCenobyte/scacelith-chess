@@ -23,8 +23,9 @@
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
 //       before the problem it announces, a piece named on the wrong square, a loss the best move
 //       suffers too, a takeback offered for a small slip...
-//       --sequence: the records of one game (a PGN game recorded without --min-drop: every move, in
-//       order) through one Reviewer per level and side, kept from move to move as in a Coach game:
+//       --sequence: the records of each game (a PGN game recorded without --min-drop, a self-play
+//       game: each record continuing the last one's moves) through one Reviewer per level and side,
+//       kept from move to move as in a Coach game:
 //       the other side's moves played as the coach's (announced, remarked on: PRE lines), every
 //       offer declined (DECL lines)
 //       --verify D [--threads T] [--cache FILE]: also every move the coach shows or says, judged by

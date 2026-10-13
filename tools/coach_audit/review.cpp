@@ -753,7 +753,8 @@ int reviewMain(const Options& o) {
     Stats st;
     // --sequence: the Reviewers of the game under way, per level and side.
     std::map<std::pair<int, int>, Reviewer> seq;
-    std::string seqGame;
+    std::string seqStart;
+    std::vector<std::string> seqMoves;   // the last record's moves and its move played
     auto printScript = [&](const char* kind, const Script& s) {
         for (const Beat& b : s)
             if (!b.line.key.empty()) std::fprintf(out, "  %s [%s] %s\n", kind, b.line.key.c_str(), render(b.line).c_str());
@@ -761,9 +762,13 @@ int reviewMain(const Options& o) {
     for (size_t ri = 0; ri < recs.size(); ++ri) {
         const Record& r = recs[ri];
         if (o.sequence) {
-            const std::string game = r.tag.substr(0, r.tag.find(" ply "));
-            if (game != seqGame) seq.clear();
-            seqGame = game;
+            // A new game unless this record continues the last one's moves.
+            const bool goesOn = r.startFen == seqStart && seqMoves.size() <= r.moves.size() &&
+                                std::equal(seqMoves.begin(), seqMoves.end(), r.moves.begin());
+            if (!goesOn) seq.clear();
+            seqStart = r.startFen;
+            seqMoves = r.moves;
+            seqMoves.push_back(r.played);
         }
         for (int level = 1; level <= 6; ++level) {
             if (o.level && level != o.level) continue;
