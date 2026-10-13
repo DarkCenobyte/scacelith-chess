@@ -1687,6 +1687,34 @@ TEST(coach_review_human_context_cases) {
             CHECK(!hasKeyPrefix(r.script, "ex.retake"));
         }
     }
+    {
+        // Puzzle TxYos: 51...h3? Rxa6 Kd8 Ra8+ Ke7 Rxg8. The king has e7 when the check comes: the
+        // rook falls to a skewer, never "your king has no escape square" (no back-rank reason).
+        const Recorded rc = recorded(
+         "rec b h4h3 2k3r1/8/pKP5/6p1/R4p1p/8/8/8 b - - 1 51 ;\n"
+         "tag puzzle TxYos 1487 crushing endgame exposedKing long rookEndgame skewer\n"
+         "an a0 1 0 0 16 c8d8 3\n"
+         "ln 1 16 425 0 0 0 E c8d8 b6b7 d8e7 c6c7 h4h3 a4a2 g5g4 a2e2 e7f6 e2d2 g4g3 d2d6 f6e5 d6d8 g8g7 d8e8 e5f5 e8f8 f5e4\n"
+         "ln 2 16 0 0 0 0 E g8g6 a4a6 c8d8 b6b7 g6g7 b7b6\n"
+         "ln 3 16 0 0 0 0 E c8b8 a4a6 g8g6 a6a5 h4h3 a5f5 g6g8 f5a5 g8g6\n"
+         "an a1 1 0 0 16 h4h3 1\n"
+         "ln 1 16 -1514 0 0 0 E h4h3 a4a6 c8d8 a6a8 d8e7 a8g8 e7f6 c6c7 h3h2 g8h8 h2h1q h8h1 f6e7 h1h2 e7d7 h2h8 d7e7 c7c8q\n"
+         "an a2 1 1 0 14 a4a6 2\n"
+         "ln 1 14 1519 0 0 0 E a4a6 c8d8 a6a8 d8e7 a8g8 e7f6 c6c7 h3h2 g8h8 h2h1q h8h1 f6e7 h1h8 e7f6 c7c8q f6e5 c8c5 e5f6 h8h1\n"
+         "ln 2 14 -299 0 0 0 E a4a3 h3h2 a3h3 g5g4 h3h7 g4g3 h7c7 c8d8\n"
+         "an a3 1 0 0 6 c8d8 1\n"
+         "ln 1 6 349 0 0 0 E c8d8 a4a5 d8e7 c6c7 e7f6 a5a4\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "h3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::BackRank);
+            CHECK(!hasKeyPrefix(r.script, "ex.back_rank"));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

@@ -1111,9 +1111,9 @@ int reviewMain(const Options& o) {
                 if (c.refut.size() >= 2 && c.refut[1].mover == c.human && c.refut[1].captured != NoPiece)
                     q.makeMove(c.refut[1].move);
                 const int lostAtOnce = c.base - materialBalance(q, c.human);
-                // A check the motif names (a discovered check, a fork with check): its prize is what
+                // A check the motif names (a discovered check, a fork with check, a back-rank check): its prize is what
                 // the line wins after the reply's own capture.
-                if (kingNamed && (t == ExType::Discovered || t == ExType::Fork || t == ExType::Skewer))
+                if (kingNamed && (t == ExType::Discovered || t == ExType::Fork || t == ExType::Skewer || t == ExType::BackRank))
                     target = std::max(target, lastingLoss(c.playedLine, c.p0, c.human, c.base, 9) - lostAtOnce);
                 if (lostAtOnce >= 1 && lostAtOnce >= target && !named && !(t == ExType::Material && saysPts))
                     f.push_back({"MOTIF_BEHIND_CAPTURE", std::string(exTypeName(t)) + " names " + std::to_string(target) +

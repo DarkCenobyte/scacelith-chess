@@ -919,6 +919,9 @@ bool backRank(const Ctx& c, Explanation& out) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover != c.coach || !(st.piece == Rook || st.piece == Queen) || rankOf(st.move.to) != home || !st.check)
             continue;
+        // The king still has no air when the check comes: one that stepped where it has some
+        // ("h3? Rxa6 Kd8 Ra8+ Ke7 Rxg8") loses to a skewer, not to its back rank.
+        if (i > 0 && !backRankWeak(afterR(c, i), c.human)) continue;
         // The lines say the check wins material: the line wins it, for good, after the check.
         Explanation ex;
         bool won = false;
