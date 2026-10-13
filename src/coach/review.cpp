@@ -449,6 +449,24 @@ bool tradedLater(const Ctx& c, int from, Square sq) {
     return false;
 }
 
+// Whether the side to move in 'p' can legally take on 'sq' (a pinned knight cannot take back).
+bool legalCaptureOn(const Position& p, Square sq) {
+    for (const Move& m : p.legalMoves())
+        if (m.to == sq && (m.flags & MoveCapture)) return true;
+    return false;
+}
+
+// Whether the piece on 'sq' in 'p' (its side to move) could be won where it stands: with the turn
+// passed, a legal capture there wins material. A defender behind the attacker counts (Rf3xf1 Rxf1
+// through f3 wins nothing), and an attacker pinned to its king takes nothing.
+bool wonWhereItStood(const Position& p, Square sq) {
+    Position q = p;
+    if (!q.passTurn()) return false;
+    for (const Move& m : q.legalMoves())
+        if (m.to == sq && (m.flags & MoveCapture) && seePoints(q, m) > 0) return true;
+    return false;
+}
+
 // The human's pieces among ex.targets that stand at the position after 'plies' plies of c.r, the
 // king aside (a check is said by the detector's own lines), nor one traded later along the line
 // ("now your queen can't be saved" when the queens are traded).
@@ -1298,13 +1316,29 @@ Review Reviewer::review(const ReviewInput& in) {
         const bool wonBack = c.playedLine.size() >= 3 && c.playedLine[1].captured != NoPiece &&
                              c.playedLine[1].move.to == c.played.to && c.playedLine[2].captured != NoPiece &&
                              c.playedLine[2].move.to != c.played.to && c.playedLine[2].balance >= c.base - 1;
-        const bool sacrifice = !promoSoon && !wonBack && ((c.f.seePts <= -2 && byExchange >= 2) || downAfter);
+        // Given up by exchange only when the reply takes it: a piece the coach leaves, because taking
+        // costs more (Nxf2 Kxf2 Rxd2+ wins the bishop back), is given up by nobody.
+        const bool accepted = c.playedLine.size() >= 2 && c.playedLine[1].move.to == c.played.to &&
+                              c.playedLine[1].captured != NoPiece;
+        // Nor is a loss the move did not cause: the reply takes elsewhere what was en prise already
+        // (Ne2 Bxh1 Rxh1, the rook trapped on h1 before the move, which only saves two points).
+        const bool lostBefore = c.playedLine.size() >= 2 && c.playedLine[1].captured != NoPiece &&
+                                c.playedLine[1].move.to != c.played.to &&
+                                hasBit(hangingPieces(c.p0, human_, false), c.playedLine[1].move.to);
+        const bool sacrifice = !promoSoon && !wonBack &&
+                               ((c.f.seePts <= -2 && byExchange >= 2 && accepted) || (downAfter && !lostBefore));
         // A capture that wins the whole piece ("for free"); at levels 1-2 the lines also say it had
         // no protector.
         const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
                                  c.f.seePts >= points(c.f.captured);
         const bool unprotected = c.f.captured != NoPiece && !c.p0.attackersTo(c.f.capturedOn, c.coach);
         const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
+        // A fork praised wins one of the pieces it hits: the player's next move along the played line
+        // takes a forked piece, not a pawn. Nd3+ Qxd3 Qxd3 wins the queen that took the knight (a
+        // decoy), not the pawn on b2 the knight hit; Rxc7+ Rd7 exd7 wins the rook put in the way.
+        const bool forkWins = c.playedLine.size() >= 3 && c.playedLine[2].mover == human_ &&
+                              c.playedLine[2].captured != NoPiece && c.playedLine[2].captured != Pawn &&
+                              hasBit(c.f.forks, c.playedLine[2].move.to);
         double lastW = -1.0;   // the human's W% after their previous judged move
         for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
         std::string key;
@@ -1319,7 +1353,7 @@ Review Reviewer::review(const ReviewInput& in) {
                 v.great = true;
             } else if (level_ >= 2 && only) {
                 key = bandKey("praise.only", level_);
-            } else if (level_ >= 2 && squareCount(c.f.forks) >= 2 && lineGain(4) >= 2) {
+            } else if (level_ >= 2 && squareCount(c.f.forks) >= 2 && forkWins && lineGain(4) >= 2) {
                 key = level_ == 2 ? "praise.fork.b2" : "praise.fork.b3";
             } else if (level_ <= 2 && freeCapture && unprotected) {
                 key = bandKey("praise.capture", level_);
@@ -1327,16 +1361,18 @@ Review Reviewer::review(const ReviewInput& in) {
             } else if (level_ <= 3 && c.isBest && (lineGain(3) >= 2 || c.l1->score.mate > 0 || only) && (level_ < 3 || tricky)) {
                 key = bandKey("praise.best", level_);
             } else if (level_ <= 3 && c.base >= 3 && c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
-                       c.f.seePts == 0) {
+                       c.f.seePts == 0 && legalCaptureOn(c.p1, c.played.to)) {
                 key = bandKey("praise.trade", level_);
             } else if ((level_ == 3 || level_ == 4) && c.j.delta < 2.0 && c.f.captured == NoPiece && !c.f.check && tricky) {
                 key = bandKey("praise.excellent", level_);
             } else if (level_ == 1 && (c.f.castleKing || c.f.castleQueen) && !castlePraised_) {
                 key = "praise.castle.b1";
                 castlePraised_ = true;
-            } else if (level_ == 1 && hasBit(hangingPieces(c.p0, human_, true), c.played.from) &&
+            } else if (level_ == 1 && c.p0.at(c.played.from).type != Pawn &&
+                       hasBit(hangingPieces(c.p0, human_, true), c.played.from) && wonWhereItStood(c.p0, c.played.from) &&
                        !hangingPieces(c.p1, human_, false)) {
-                // Saved only when nothing else is left en prise (Rb1 while the queen on b3 hangs to a rook).
+                // Saved only when nothing else is left en prise (Rb1 while the queen on b3 hangs to a rook),
+                // and only a piece: the line says "piece", and a pawn is none.
                 key = "praise.saved.b1";
             } else if (level_ <= 2 && in.inBook && bookPraises_ < 2) {
                 key = "praise.book.b1";

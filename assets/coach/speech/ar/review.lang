@@ -564,7 +564,7 @@ ex.hanging.tip.b1.2 = عادة جيدة: بعد كل نقلة، تفقّد أي�
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured (said with نقاط: "{n:point}").
-ex.exchange_capture.b1 = أخذ {your} قطعة، لكن {my} يستردّ. هذا التبادل يكلّفك نقاطًا.
+ex.exchange_capture.b1 = أخذ {your}، لكن {my} يستردّ. هذا التبادل يكلّفك نقاطًا.
 ex.exchange_capture.b1.2 = {my} يستردّ. {your} يساوي {n:point}، ولم تحصل إلا على {n2:point}.
 ex.exchange_capture.b1.3 = انتبه: يستطيع {my} أن يستردّ بأخذ {your}. هذا تبادل سيئ.
 ex.exchange_capture.b2 = انتبه عند التبادل: {your} يساوي {n:point}. {my} يستردّ، ولم تكسب إلا {n2:point}.
@@ -626,7 +626,7 @@ ex.material.b6.2 = مع {move} تخسر {pts:point}: {line}.
 ex.missed_capture.b1 = انظر! {my} في {sq} كان بلا حماية. كان بإمكان {your} أخذه.
 ex.missed_capture.b1.2 = لاحظ: {my} لم يكن محميًّا، وكان {your} قادرًا على أخذه.
 ex.missed_capture.b1.3 = {my} في {sq} لم يكن محميًّا. كان {your} يستطيع اقتناصه!
-ex.missed_capture.b2 = فاتتك قطعة مجانية: مع {best} تربح {my}.
+ex.missed_capture.b2 = فاتتك فرصة أخذ مجاني: مع {best} تربح {my}.
 ex.missed_capture.b2.2 = {my} كان بلا حماية في {sq}: {best}. في المرة القادمة، اقتنصه!
 ex.missed_capture.b2.3 = مع {best} كان بإمكانك ربح {my} مجانًا.
 ex.missed_capture.b3 = نقلة {best} كانت ستربح {my} بلا مقابل.

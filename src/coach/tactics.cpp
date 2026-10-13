@@ -422,8 +422,19 @@ MatePattern classifyMate(const Position& mated) {
     if (ct == Knight && (around & ~mated.pieces(c)) == 0) return MatePattern::Smothered;
     const int home = c == White ? 0 : 7, fwd = c == White ? 1 : -1;
     const bool heavy = ct == Rook || ct == Queen;
-    if (rankOf(k) == home && heavy && rankOf(cs) == home && (around & rankMask(home + fwd) & mated.pieces(c)))
-        return MatePattern::BackRank;
+    // Back rank: the king shut in by its own pieces. Every square in front of it holds one of them,
+    // or is empty and covered by the checker alone (Qe8# against Kg8 with pawns on g7 and h7: the
+    // queen covers f7 too). A square another attacker covers or holds makes it a mating net (Qxf1#
+    // against Kh1 with a bishop of the mating side on h2), not a back-rank mate.
+    if (rankOf(k) == home && heavy && rankOf(cs) == home && (around & rankMask(home + fwd) & mated.pieces(c))) {
+        const U64 occ = mated.occupancy() & ~bit(k);
+        bool shut = true;
+        for (U64 f = around & rankMask(home + fwd) & ~mated.pieces(c); f; f &= f - 1) {
+            const Square s = lowest(f);
+            if (!mated.at(s).empty() || (mated.attackersTo(s, occ) & mated.pieces(them) & ~bit(cs))) shut = false;
+        }
+        if (shut) return MatePattern::BackRank;
+    }
     if (ct == Queen && (around & bit(cs)) && mated.attackersTo(cs, them)) return MatePattern::Support;
     if (heavy) {
         // Ladder: the king on an edge line, checked along it, the next line inward held by another heavy piece.

@@ -434,8 +434,9 @@ void checkTrapped(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
         out.push_back({"TRAPPED_ATTACKER_TAKEN", k + ": the reply takes a piece attacking " + squareName(target->square)});
 }
 
-// A sacrifice praised: the move gives up material by exchange, or the player is still 2 points down
-// after the reply and their own next move along the played line (a capture won straight back is none).
+// A sacrifice praised: the move gives up material by exchange and the reply takes it, or the player is
+// still 2 points down after the reply and their own next move along the played line (a capture won
+// straight back is none, nor a unit taken that the coach could win before the move).
 void checkSacrifice(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.rfind("praise.sacrifice", 0) != 0 && k.rfind("praise.brilliant", 0) != 0) return;
@@ -447,26 +448,106 @@ void checkSacrifice(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
         out.push_back({"SACRIFICE_WON_BACK", k + ": " + c.playedLine[2].san + " wins it back at once"});
         return;
     }
-    // Given up by exchange: a legal capture there wins the coach two points more than the move took.
+    // Given up by exchange: a legal capture there wins the coach two points more than the move took,
+    // and the reply makes it (Nxf2 left alone, Kxf2 Rxd2+ winning the bishop back, is none).
     if (m.valid()) {
         int back = 0;
         for (const Move& r : c.p1.legalMoves())
             if (r.to == m.to && (r.flags & MoveCapture)) back = std::max(back, seePoints(c.p1, r));
         const Piece took = c.p0.at(m.to);
-        if (back - (took.empty() ? 0 : kPiecePoints[took.type]) >= 2) return;
+        const bool accepted = c.playedLine.size() >= 2 && c.playedLine[1].move.to == m.to && c.playedLine[1].captured != NoPiece;
+        if (back - (took.empty() ? 0 : kPiecePoints[took.type]) >= 2 && accepted) return;
     }
     const size_t n = c.playedLine.size();
     const bool down = n >= 3 ? c.playedLine[2].balance <= c.base - 2 : n == 2 && c.playedLine[1].balance <= c.base - 2;
-    if (!down) out.push_back({"SACRIFICE_NONE", k + ": nothing is given up after the player's next move"});
+    if (!down) {
+        out.push_back({"SACRIFICE_NONE", k + ": nothing is given up after the player's next move"});
+        return;
+    }
+    // The reply takes elsewhere a unit the coach could already win before the move, the turn passed:
+    // a loss the move did not cause (Ne2 Bxh1 Rxh1, the rook trapped on h1).
+    if (m.valid() && n >= 2 && c.playedLine[1].captured != NoPiece && c.playedLine[1].move.to != m.to) {
+        Position q = c.p0;
+        if (q.passTurn())
+            for (const Move& x : q.legalMoves())
+                if (x.to == c.playedLine[1].move.to && (x.flags & MoveCapture) && seePoints(q, x) > 0) {
+                    out.push_back({"SACRIFICE_HUNG_BEFORE", k + ": " + squareName(x.to) + " was en prise before the move"});
+                    break;
+                }
+    }
 }
 
-// "You saved your piece": nothing of the player's is left en prise once it moved (Rb1 out of the
-// queen's reach while the queen on b3 still hangs to a rook).
+// "You saved your piece": a piece, not a pawn, that the coach could win where it stood, and nothing
+// of the player's left en prise once it moved (Rb1 out of the queen's reach while the queen on b3
+// still hangs to a rook).
 void checkSaved(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.rfind("praise.saved", 0) != 0) return;
     const uint64_t left = hangingPieces(c.p1, c.human, false);
     if (left) out.push_back({"SAVED_OTHER_HANGS", k + ": " + squareName(Square(__builtin_ctzll(left))) + " still hangs"});
+    const Move m = c.p0.parseUCI(c.rec->played);
+    if (!m.valid()) return;
+    const PieceType t = c.p0.at(m.from).type;
+    if (t == Pawn) out.push_back({"SAVED_PAWN", k + ": the unit on " + squareName(m.from) + " is a pawn"});
+    // Attacked where it stood: with the turn passed, a legal capture there wins material.
+    Position q = c.p0;
+    if (q.passTurn()) {
+        int win = 0;
+        for (const Move& x : q.legalMoves())
+            if (x.to == m.from && (x.flags & MoveCapture)) win = std::max(win, seePoints(q, x));
+        if (win <= 0) out.push_back({"SAVED_NOT_ATTACKED", k + ": nothing wins the " + pieceName(t) + " on " + squareName(m.from)});
+    }
+}
+
+// "Nice fork": the move attacks two of the coach's units or more, and the player's next move along
+// the played line takes one of them, not a pawn (Nd3+ Qxd3 Qxd3 wins the queen that took the knight,
+// a decoy; Rxc7+ Rd7 exd7 the rook put in the way).
+void checkPraiseFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.fork", 0) != 0) return;
+    const Move m = c.p0.parseUCI(c.rec->played);
+    if (!m.valid()) return;
+    const uint64_t hit = c.p1.attacksFrom(m.to) & c.p1.pieces(c.coach);
+    if (__builtin_popcountll(hit) < 2) out.push_back({"FORK_PRAISE_ONE_TARGET", k + ": " + squareName(m.to) + " attacks one unit"});
+    const bool taken = c.playedLine.size() >= 3 && c.playedLine[2].mover == c.human && c.playedLine[2].captured != NoPiece &&
+                       (hit & squareBit(c.playedLine[2].move.to));
+    if (!taken) out.push_back({"FORK_PRAISE_NOT_WON", k + ": the next move takes no unit the move attacks"});
+    else if (c.playedLine[2].captured == Pawn) out.push_back({"FORK_PRAISE_PAWN", k + ": the unit taken is a pawn"});
+}
+
+// "You took my knight for free" / "it was loose": the move takes a unit, and the coach has no legal
+// capture back on that square.
+void checkPraiseCapture(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.capture", 0) != 0) return;
+    const Move m = c.p0.parseUCI(c.rec->played);
+    if (!m.valid()) return;
+    if (c.p0.at(m.to).empty()) {
+        out.push_back({"CAPTURE_NONE", k + ": " + c.rec->played + " takes nothing"});
+        return;
+    }
+    for (const Move& x : c.p1.legalMoves())
+        if (x.to == m.to && (x.flags & MoveCapture)) {
+            out.push_back({"CAPTURE_TAKEN_BACK", k + ": " + squareName(x.from) + " takes back on " + squareName(m.to)});
+            break;
+        }
+}
+
+// "Good trade: you're ahead": the player is 2 points up or more before the move, and the move takes a
+// unit the coach can take back (a trade, not a piece won).
+void checkPraiseTrade(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("praise.trade", 0) != 0) return;
+    const Move m = c.p0.parseUCI(c.rec->played);
+    if (!m.valid()) return;
+    if (c.base < 2) out.push_back({"TRADE_NOT_AHEAD", k + ": the balance is " + std::to_string(c.base)});
+    if (c.p0.at(m.to).empty()) {
+        out.push_back({"TRADE_NO_CAPTURE", k + ": " + c.rec->played + " takes nothing"});
+        return;
+    }
+    bool back = false;
+    for (const Move& x : c.p1.legalMoves()) back = back || (x.to == m.to && (x.flags & MoveCapture));
+    if (!back) out.push_back({"TRADE_NOT_TAKEN_BACK", k + ": nothing takes back on " + squareName(m.to)});
 }
 
 // Praise in a lost position (best line at 10 % or less) only for the move the lines prefer: the win
@@ -645,6 +726,566 @@ void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
         else if (q.at(t->square).type != t->piece)
             out.push_back({"FORK_TARGET_PIECE", k + ": " + squareName(t->square)});
     }
+}
+
+// ---- Tactical motifs said about the coach's reply (skewer, pin, discovered attack, back rank, a
+// cheaper attacker, a bad trade) and the mate patterns named: each read again on the board ----------
+
+bool isLinePiece(PieceType t) { return t == Bishop || t == Rook || t == Queen; }
+
+// The first piece standing past 'via' on the line that runs from 'from' through 'via' (rank, file or
+// diagonal), NoSquare when the two squares are not on one line or the line leaves the board first.
+Square nextOnLine(const Position& p, Square from, Square via) {
+    const int df = fileOf(via) - fileOf(from), dr = rankOf(via) - rankOf(from);
+    if ((df == 0 && dr == 0) || (df != 0 && dr != 0 && std::abs(df) != std::abs(dr))) return NoSquare;
+    const int sf = (df > 0) - (df < 0), sr = (dr > 0) - (dr < 0);
+    for (int f = fileOf(via) + sf, r = rankOf(via) + sr; f >= 0 && f < 8 && r >= 0 && r < 8; f += sf, r += sr)
+        if (!p.at(makeSquare(f, r)).empty()) return makeSquare(f, r);
+    return NoSquare;
+}
+
+// The coach's reply a line says ({reply}, legal in p1), else the refutation's first move.
+Move saidReply(const Ctx& c, const Beat& b) {
+    if (const Arg* rp = b.line.arg("reply"); rp && !rp->uci.empty()) return c.p1.parseUCI(rp->uci);
+    return c.refut.empty() ? Move() : c.refut[0].move;
+}
+
+// The ply of the refutation where the coach captures the human's piece that stands on 'sq' after
+// the first 'from' plies (the piece followed as it moves), -1 when it is not taken within 'plies'
+// more plies; 'by' gets the square the capturing piece came from.
+int takenAt(const Ctx& c, Square sq, int from, int plies, Square* by = nullptr) {
+    for (int i = from; i < int(c.refut.size()) && i < from + plies; ++i) {
+        const LineStep& st = c.refut[size_t(i)];
+        const Square on = (st.move.flags & MoveEnPassant) ? Square(st.move.to + (c.human == White ? 8 : -8)) : st.move.to;
+        if (st.mover == c.human && st.move.from == sq) sq = st.move.to;
+        else if (st.mover == c.coach && on == sq && st.captured != NoPiece) {
+            if (by) *by = st.move.from;
+            return i;
+        }
+    }
+    return -1;
+}
+
+// What the coach keeps of the piece it takes at ply 'i' of the refutation: its points, less what the
+// human takes back on that square with the next ply.
+int keptAt(const Ctx& c, int i) {
+    const LineStep& st = c.refut[size_t(i)];
+    int kept = kPiecePoints[st.captured];
+    if (i + 1 < int(c.refut.size())) {
+        const LineStep& back = c.refut[size_t(i + 1)];
+        if (back.mover == c.human && back.captured != NoPiece && back.move.to == st.move.to) kept -= kPiecePoints[back.captured];
+    }
+    return kept;
+}
+
+// "{reply} skewers {t1} and {t2}" (ex.skewer.*): the coach's reply moves {my} (where the line names
+// it), a bishop, a rook or a queen, to a square from which it attacks {t1} along a line; the first
+// piece past {t1} on that line is {t2}; both are the human's; {t1} is the king or worth at least as
+// much as {t2} (a cheaper piece in front is a pin, not a skewer). "When it moves, I take {t2}": the
+// refutation takes {t2} (followed as it moves) within six plies after the reply, the skewering piece
+// still on the board (taken first, it skewered nothing: SKEWER_PIECE_TAKEN), best by that piece itself
+// (another piece collecting {t2}: a warning).
+void checkSkewer(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.skewer.", 0) != 0) return;
+    const Arg* t1 = b.line.arg("t1");
+    const Arg* t2 = b.line.arg("t2");
+    const Arg* my = b.line.arg("my");
+    const Move m = saidReply(c, b);
+    if (!t1 || !t2 || t1->square == NoSquare || t2->square == NoSquare || !m.valid()) {
+        out.push_back({"SKEWER_ARGS", k});
+        return;
+    }
+    if (my && my->square != NoSquare && my->square != m.from)
+        out.push_back({"SKEWER_MOVER", k + ": {my} on " + squareName(my->square) + ", the reply moves " + squareName(m.from)});
+    Position p2 = c.p1;
+    p2.makeMove(m);
+    const Piece a = p2.at(m.to);
+    const std::string reply = c.p1.toSAN(m);
+    if (!isLinePiece(a.type)) {
+        out.push_back({"SKEWER_NOT_LINE_PIECE", k + ": " + reply + " moves a " + pieceName(a.type)});
+    } else if (!(p2.attacksFrom(m.to) & squareBit(t1->square))) {
+        out.push_back({"SKEWER_NO_LINE", k + ": after " + reply + " the " + pieceName(a.type) + " does not attack " +
+                                             squareName(t1->square)});
+    } else {
+        const Square behind = nextOnLine(p2, m.to, t1->square);
+        if (behind != t2->square)
+            out.push_back({"SKEWER_NOT_BEHIND", k + ": past " + squareName(t1->square) + " the line meets " +
+                                                    (behind == NoSquare ? std::string("nothing") : squareName(behind)) +
+                                                    ", not " + squareName(t2->square)});
+    }
+    for (const Arg* t : {t1, t2}) {
+        const Piece on = p2.at(t->square);
+        if (on.color != c.human || on.type != t->piece || on.empty())
+            out.push_back({"SKEWER_TARGET", k + ": " + squareName(t->square) + " holds no " + pieceName(t->piece) + " of the human's"});
+    }
+    if (t1->piece != King && kPiecePoints[t1->piece] < kPiecePoints[t2->piece])
+        out.push_back({"SKEWER_FRONT_CHEAPER", k + ": the " + pieceName(t1->piece) + " in front is worth less than the " +
+                                                   pieceName(t2->piece) + " behind (a pin)"});
+    // The skewering piece followed along the line: it is the one that takes {t2}.
+    Square by = NoSquare;
+    const int at = takenAt(c, t2->square, 1, 6, &by);
+    if (at < 0) {
+        out.push_back({"SKEWER_BEHIND_KEPT", k + ": the line never takes the " + pieceName(t2->piece) + " on " +
+                                                 squareName(t2->square)});
+        return;
+    }
+    // Taken first itself (Bg4+ Kxg4 Qxe2+: the king took the bishop, a deflection; Qxb1+ Nxb1 Rc1+:
+    // a trade, then another skewer), the skewering piece wins nothing: an error. Alive, it may leave
+    // the capture to another piece (Qh1+ Kf2 Rxf6+ Ke3 Rxf1): a warning.
+    Square skewerer = m.to;
+    bool lost = false;
+    for (int i = 1; i < at && !lost; ++i) {
+        const LineStep& st = c.refut[size_t(i)];
+        if (st.mover == c.coach && st.move.from == skewerer) skewerer = st.move.to;
+        else if (st.mover == c.human && st.move.to == skewerer && st.captured != NoPiece) lost = true;
+    }
+    if (lost)
+        out.push_back({"SKEWER_PIECE_TAKEN", k + ": " + reply + " is taken before " + c.refut[size_t(at)].san + " wins the " +
+                                                 pieceName(t2->piece)});
+    else if (by != skewerer)
+        out.push_back({"SKEWER_OTHER_TAKER", k + ": " + c.refut[size_t(at)].san + " takes the " + pieceName(t2->piece) +
+                                                 ", not the skewering piece", false});
+}
+
+// 'p' with the piece on 's' taken off the board (through the FEN); 'p' itself when that leaves no
+// valid position.
+Position withoutPiece(const Position& p, Square s) {
+    std::string fen = p.fen();
+    const size_t end = fen.find(' ');
+    std::string board;
+    for (char ch : fen.substr(0, end)) {
+        if (ch >= '1' && ch <= '8') board.append(size_t(ch - '0'), '1');
+        else board.push_back(ch);
+    }
+    // FEN ranks run 8 to 1, files a to h; '/' separates them.
+    const int rank = s / 8, file = s % 8;
+    size_t at = 0;
+    for (int r = 7; r > rank; --r) at = board.find('/', at) + 1;
+    board[at + size_t(file)] = '1';
+    std::string packed;
+    int run = 0;
+    for (char ch : board) {
+        if (ch == '1') { ++run; continue; }
+        if (run) packed.push_back(char('0' + run)), run = 0;
+        packed.push_back(ch);
+    }
+    if (run) packed.push_back(char('0' + run));
+    Position q;
+    return q.setFEN(packed + fen.substr(end)) ? q : p;
+}
+
+// "{your} is pinned to {t1}" (ex.pin.*; ex.pin_defender has its own checks): after the coach's reply
+// a coach bishop, rook or queen stands on {sq}, attacks {your} along a line, and the first piece past
+// {your} on that line is {t1}, the king or a piece worth more than {your} (a pin that costs something
+// when the piece steps aside); {your} cannot take the pinner without losing by it. The phrasings
+// where the reply itself pins ("{my} can go to {sq}", "{reply} pins") have the reply land on {sq}
+// (from {my}'s square). Below a king, the pin bites: {your} stepping off the line lets the pinner win
+// the piece behind. "I win it", "the pinned piece falls": the refutation takes {your} within six plies
+// after the reply, the human does not take back as much there at once, and the pinner is still on the
+// board then (taken first, the pin is not what wins the piece).
+void checkPin(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.pin.", 0) != 0) return;
+    const Arg* your = b.line.arg("your");
+    const Arg* t1 = b.line.arg("t1");
+    const Arg* sq = b.line.arg("sq");
+    const Arg* my = b.line.arg("my");
+    const Move m = saidReply(c, b);
+    if (!your || !t1 || !sq || your->square == NoSquare || t1->square == NoSquare || sq->square == NoSquare || !m.valid()) {
+        out.push_back({"PIN_ARGS", k});
+        return;
+    }
+    const std::string reply = c.p1.toSAN(m);
+    // b1: "{my} can go to {sq}"; b4-b6: "{reply} pins".
+    const bool replyPins = k.rfind("ex.pin.b1", 0) == 0 || k.rfind("ex.pin.b4", 0) == 0 || k.rfind("ex.pin.b5", 0) == 0 ||
+                           k.rfind("ex.pin.b6", 0) == 0;
+    if (replyPins && m.to != sq->square)
+        out.push_back({"PIN_NOT_REPLY", k + ": " + reply + " does not go to " + squareName(sq->square)});
+    if (k.rfind("ex.pin.b1", 0) == 0 && my && my->square != m.from)
+        out.push_back({"PIN_NOT_REPLY", k + ": {my} on " + squareName(my->square) + ", " + reply + " moves " + squareName(m.from)});
+    Position p2 = c.p1;
+    p2.makeMove(m);
+    const Piece pinner = p2.at(sq->square);
+    if (pinner.empty() || pinner.color != c.coach || !isLinePiece(pinner.type)) {
+        out.push_back({"PIN_NO_PINNER", k + ": after " + reply + " " + squareName(sq->square) + " holds no bishop, rook or queen of mine"});
+        return;
+    }
+    if (!(p2.attacksFrom(sq->square) & squareBit(your->square))) {
+        out.push_back({"PIN_NO_LINE", k + ": after " + reply + " the " + pieceName(pinner.type) + " on " + squareName(sq->square) +
+                                          " does not attack " + squareName(your->square)});
+        return;
+    }
+    const Square behind = nextOnLine(p2, sq->square, your->square);
+    if (behind != t1->square || p2.at(behind).color != c.human || p2.at(behind).type != t1->piece)
+        out.push_back({"PIN_NOT_BEHIND", k + ": past " + squareName(your->square) + " the line meets " +
+                                             (behind == NoSquare ? std::string("nothing") : squareName(behind)) + ", not " +
+                                             squareName(t1->square)});
+    if (t1->piece != King && kPiecePoints[t1->piece] <= kPiecePoints[your->piece])
+        out.push_back({"PIN_BEHIND_CHEAP", k + ": the " + pieceName(t1->piece) + " behind is worth no more than the pinned " +
+                                               pieceName(your->piece)});
+    // The pinned piece takes its pinner and comes out even or better: no pin.
+    if (p2.sideToMove() == c.human)
+        for (const Move& x : p2.legalMovesFrom(your->square))
+            if (x.to == sq->square && seePoints(p2, x) >= 0) {
+                out.push_back({"PIN_BREAKS", k + ": " + p2.toSAN(x) + " takes the pinner"});
+                break;
+            }
+    // A pin to a piece other than the king bites: wherever the pinned piece steps off the line (when
+    // it can), the pinner then wins material taking the piece behind (a pawn "pinned" by a queen to a
+    // knight the rook guards is free to go: Qxb8 Rxb8 loses the queen).
+    if (t1->piece != King && behind == t1->square) {
+        const uint64_t line = squaresBetween(sq->square, t1->square) | squareBit(sq->square);
+        bool offLine = false, bites = false;
+        for (const Move& x : p2.legalMovesFrom(your->square)) {
+            if (line & squareBit(x.to)) continue;
+            offLine = true;
+            Position q = p2;
+            q.makeMove(x);
+            const Move take = q.findLegal(sq->square, t1->square, Queen);
+            if (take.valid() && seePoints(q, take) >= 1) bites = true;
+        }
+        if (offLine && !bites)
+            out.push_back({"PIN_NO_BITE", k + ": the " + pieceName(your->piece) + " can step off the line, the " +
+                                              pieceName(pinner.type) + " then wins nothing taking the " + pieceName(t1->piece)});
+    }
+    // The pin holds something back: with the pinner off the board, the pinned piece has a legal move
+    // off the line (a pawn on a file with nothing to take only pushes along it; it is not stuck).
+    if (behind == t1->square) {
+        const Position free = withoutPiece(p2, sq->square);
+        const uint64_t line = squaresBetween(sq->square, t1->square) | squareBit(sq->square);
+        bool offLine = false;
+        for (const Move& x : free.legalMovesFrom(your->square))
+            if (!(line & squareBit(x.to))) offLine = true;
+        if (free.sideToMove() == c.human && !offLine)
+            out.push_back({"PIN_GOES_NOWHERE", k + ": the " + pieceName(your->piece) + " has no move off the line, pin or not"});
+    }
+    const int at = takenAt(c, your->square, 1, 6);
+    if (at < 0) {
+        out.push_back({"PIN_NOT_WON", k + ": the line never takes the pinned " + pieceName(your->piece)});
+        return;
+    }
+    if (keptAt(c, at) <= 0)
+        out.push_back({"PIN_TRADED", k + ": " + c.refut[size_t(at)].san + " is taken back with " + c.refut[size_t(at + 1)].san});
+    // The pinner taken before the pinned piece falls (Qf6+ Qxf6 exf6+ Kf7 fxg7): another piece wins it,
+    // the pin did not.
+    Square pinnerAt = sq->square;
+    for (int i = 1; i < at; ++i) {
+        const LineStep& st = c.refut[size_t(i)];
+        if (st.mover == c.coach && st.move.from == pinnerAt) pinnerAt = st.move.to;
+        else if (st.mover == c.human && st.move.to == pinnerAt && st.captured != NoPiece) {
+            out.push_back({"PIN_PINNER_TAKEN", k + ": " + st.san + " takes the pinner before " + c.refut[size_t(at)].san +
+                                                   " wins the " + pieceName(your->piece)});
+            break;
+        }
+    }
+}
+
+// "{my} moves away and {my2} attacks {t1}" / "{reply} uncovers an attack on {t1}" (ex.discovered.*):
+// in p1, {my2} is a coach bishop, rook or queen on one line with {t1}, and {my} is the only piece
+// between them; the reply moves {my}, and then {my2} attacks {t1}. A target other than the king is
+// won: the refutation takes it within six plies after the reply.
+void checkDiscovered(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.discovered.", 0) != 0) return;
+    const Arg* my = b.line.arg("my");
+    const Arg* my2 = b.line.arg("my2");
+    const Arg* t1 = b.line.arg("t1");
+    const Move m = saidReply(c, b);
+    if (!my || !my2 || !t1 || my->square == NoSquare || my2->square == NoSquare || t1->square == NoSquare || !m.valid()) {
+        out.push_back({"DISCOVERED_ARGS", k});
+        return;
+    }
+    const std::string reply = c.p1.toSAN(m);
+    if (m.from != my->square)
+        out.push_back({"DISCOVERED_MOVER", k + ": {my} on " + squareName(my->square) + ", " + reply + " moves " + squareName(m.from)});
+    const Piece slider = c.p1.at(my2->square);
+    if (slider.color != c.coach || !isLinePiece(slider.type)) {
+        out.push_back({"DISCOVERED_NOT_LINE_PIECE", k + ": " + squareName(my2->square) + " holds no bishop, rook or queen of mine"});
+        return;
+    }
+    // On one of the slider's lines (an empty board), {my} the only piece between.
+    const uint64_t between = squaresBetween(my2->square, t1->square);
+    if (!(attacksOf(slider.type, slider.color, my2->square, 0) & squareBit(t1->square)) ||
+        (between & c.p1.occupancy()) != squareBit(my->square))
+        out.push_back({"DISCOVERED_NOT_BLOCKED", k + ": in p1 " + squareName(my->square) + " is not the one piece between " +
+                                                     squareName(my2->square) + " and " + squareName(t1->square)});
+    Position p2 = c.p1;
+    p2.makeMove(m);
+    if (!(p2.attacksFrom(my2->square) & squareBit(t1->square)) || p2.at(t1->square).color != c.human ||
+        p2.at(t1->square).type != t1->piece)
+        out.push_back({"DISCOVERED_NO_ATTACK", k + ": after " + reply + " " + squareName(my2->square) + " does not attack the " +
+                                                   pieceName(t1->piece) + " on " + squareName(t1->square)});
+    if (t1->piece == King) return;
+    Square by = NoSquare;
+    const int at = takenAt(c, t1->square, 1, 6, &by);
+    if (at < 0) {
+        out.push_back({"DISCOVERED_NOT_TAKEN", k + ": the line never takes the " + pieceName(t1->piece) + " on " +
+                                                   squareName(t1->square)});
+        return;
+    }
+    // The uncovered piece taken before the target falls: another attack wins it (a warning).
+    Square sliderAt = my2->square;
+    for (int i = 1; i < at; ++i) {
+        const LineStep& st = c.refut[size_t(i)];
+        if (st.mover == c.coach && st.move.from == sliderAt) sliderAt = st.move.to;
+        else if (st.mover == c.human && st.move.to == sliderAt && st.captured != NoPiece) {
+            out.push_back({"DISCOVERED_SLIDER_TAKEN", k + ": " + st.san + " takes the " + pieceName(slider.type) + " before " +
+                                                          c.refut[size_t(at)].san + " wins the " + pieceName(t1->piece), false});
+            break;
+        }
+    }
+}
+
+// The squares in front of c's king standing on its first rank: next to it on the second rank.
+uint64_t frontOfKing(const Position& p, Color c) {
+    const Square ks = p.kingSquare(c);
+    const int up = c == White ? 1 : -1;
+    uint64_t s = 0;
+    for (int df = -1; df <= 1; ++df) {
+        const int f = fileOf(ks) + df, r = rankOf(ks) + up;
+        if (f >= 0 && f < 8 && r >= 0 && r < 8) s |= squareBit(makeSquare(f, r));
+    }
+    return s;
+}
+
+// The back rank (ex.back_rank.*): in p1 the human's king stands on its first rank and every square
+// in front of it holds its own piece or is attacked by the coach (no air); a coach rook or queen
+// ({my}'s kind) lands on {sq}, on that rank, with check among the coach's first four moves of the
+// refutation, and the king then has no legal move off its first rank. Level 1's "locked in by its
+// pawns", "behind its pawns": the squares in front of the king hold its own pawns.
+void checkBackRank(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.back_rank.b", 0) != 0) return;
+    const Arg* sq = b.line.arg("sq");
+    const Arg* my = b.line.arg("my");
+    const Square ks = c.p1.kingSquare(c.human);
+    const int home = c.human == White ? 0 : 7;
+    if (rankOf(ks) != home) {
+        out.push_back({"BACK_RANK_KING_OFF", k + ": the king stands on " + squareName(ks)});
+        return;
+    }
+    const uint64_t front = frontOfKing(c.p1, c.human);
+    const uint64_t occ = c.p1.occupancy() & ~squareBit(ks);
+    for (Square s : squaresOf(front)) {
+        const Piece on = c.p1.at(s);
+        if (!on.empty() && on.color == c.human) continue;
+        if (c.p1.attackersTo(s, occ) & c.p1.pieces(c.coach)) continue;
+        out.push_back({"BACK_RANK_AIR", k + ": the king can step to " + squareName(s)});
+        break;
+    }
+    if (k.rfind("ex.back_rank.b1", 0) == 0 && (front & c.p1.pieces(c.human, Pawn)) != front)
+        out.push_back({"BACK_RANK_PAWNS", k + ": the squares in front of the king do not all hold its pawns"});
+    if (!sq || sq->square == NoSquare) return;
+    if (rankOf(sq->square) != home) out.push_back({"BACK_RANK_SQ", k + ": " + squareName(sq->square) + " is off the king's first rank"});
+    Position q = c.p1;
+    for (size_t i = 0; i < c.refut.size() && i < 8; ++i) {
+        const LineStep& st = c.refut[i];
+        q.makeMove(st.move);
+        if (st.mover != c.coach || st.move.to != sq->square || !(st.piece == Rook || st.piece == Queen) || !q.inCheck()) continue;
+        if (my && my->piece != st.piece)
+            out.push_back({"BACK_RANK_PIECE", k + ": {my} is a " + pieceName(my->piece) + ", " + st.san + " moves a " + pieceName(st.piece)});
+        const Square kq = q.kingSquare(c.human);
+        for (const Move& x : q.legalMovesFrom(kq))
+            if (rankOf(x.to) != home) {
+                out.push_back({"BACK_RANK_ESCAPES", k + ": after " + st.san + " the king steps out with " + q.toSAN(x)});
+                break;
+            }
+        return;
+    }
+    out.push_back({"BACK_RANK_NO_CHECK", k + ": no rook or queen of mine checks on " + squareName(sq->square) + " in the line"});
+}
+
+// "Give your king a little window: move one pawn in front of it" (ex.back_rank.tip.*): the human's
+// king stands on its first rank behind its own pawns (every square in front of it holds one), and one
+// of them can step forward.
+void checkBackRankTip(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.back_rank.tip", 0) != 0) return;
+    const Square ks = c.p1.kingSquare(c.human);
+    const int home = c.human == White ? 0 : 7, up = c.human == White ? 8 : -8;
+    const uint64_t front = frontOfKing(c.p1, c.human);
+    if (rankOf(ks) != home || (front & c.p1.pieces(c.human, Pawn)) != front) {
+        out.push_back({"BACK_RANK_TIP_PAWNS", k + ": the king on " + squareName(ks) + " is not behind a row of its pawns"});
+        return;
+    }
+    bool push = false;
+    for (Square s : squaresOf(front)) push = push || c.p1.at(Square(s + up)).empty();
+    if (!push) out.push_back({"BACK_RANK_TIP_BLOCKED", k + ": no pawn in front of the king can step forward"});
+}
+
+// "{your} on {sq} is attacked by a cheaper piece" (ex.exchange_cheap.*): in p1 {my}, a coach piece
+// worth fewer points than {your}, has a legal capture of {your} on {sq}; {n} and {n2} are their
+// points; the {reply} the phrasings name is that capture.
+void checkExchangeCheap(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.exchange_cheap.", 0) != 0) return;
+    const Arg* your = b.line.arg("your");
+    const Arg* my = b.line.arg("my");
+    const Arg* sq = b.line.arg("sq");
+    if (!your || !my || !sq || my->square == NoSquare || sq->square == NoSquare) {
+        out.push_back({"CHEAP_ARGS", k});
+        return;
+    }
+    const Piece victim = c.p1.at(sq->square), attacker = c.p1.at(my->square);
+    if (victim.empty() || victim.color != c.human || victim.type != your->piece || attacker.empty() || attacker.color != c.coach ||
+        attacker.type != my->piece)
+        out.push_back({"CHEAP_PIECES", k + ": the board has a " + pieceName(attacker.type) + " on " + squareName(my->square) +
+                                           " and a " + pieceName(victim.type) + " on " + squareName(sq->square)});
+    if (kPiecePoints[attacker.type] >= kPiecePoints[victim.type])
+        out.push_back({"CHEAP_NOT_CHEAPER", k + ": a " + pieceName(attacker.type) + " takes a " + pieceName(victim.type)});
+    if (!c.p1.findLegal(my->square, sq->square, Queen).valid())
+        out.push_back({"CHEAP_NO_CAPTURE", k + ": " + squareName(my->square) + " cannot take on " + squareName(sq->square)});
+    const Arg* n = b.line.arg("n");
+    const Arg* n2 = b.line.arg("n2");
+    if ((n && n->number != kPiecePoints[victim.type]) || (n2 && n2->number != kPiecePoints[attacker.type]))
+        out.push_back({"CHEAP_NUMBERS", k + ": " + std::to_string(n ? n->number : -1) + " and " + std::to_string(n2 ? n2->number : -1)});
+    const Move m = saidReply(c, b);
+    if (m.valid() && (m.from != my->square || m.to != sq->square))
+        out.push_back({"CHEAP_REPLY", k + ": the reply " + c.p1.toSAN(m) + " is not " + squareName(my->square) + "x" +
+                                          squareName(sq->square)});
+}
+
+// "This trade leads to a pawn ending that I win" (ex.bad_trade.*): the {line} said (from the table)
+// ends with kings and pawns alone; a phrasing without a line, the refutation reaches such an ending
+// within its first ten plies. "That I win", "lost": the engine gives the human 25 % at most after
+// the move (a warning). "This trade", "Trading into", "Wrong trade" (b3, b4, b5): the move itself
+// takes something or is taken on its square by the reply.
+void checkBadTrade(const Ctx& c, const PlyVerdict& v, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.bad_trade.", 0) != 0) return;
+    const auto piecesLeft = [](const Position& p) {
+        return p.occupancy() & ~(p.pieces(Pawn) | p.pieces(King));
+    };
+    const Arg* ln = b.line.arg("line");
+    Position end;
+    int plies = 0;
+    if (ln && !ln->san.empty() && replaySan(c.p1, ln->san, end, plies)) {
+        if (piecesLeft(end))
+            out.push_back({"BAD_TRADE_NOT_PAWN_ENDING", k + ": pieces are left after " + ln->san});
+    } else {
+        Position q = c.p1;
+        bool reached = !piecesLeft(q);
+        for (size_t i = 0; i < c.refut.size() && i < 10 && !reached; ++i) {
+            q.makeMove(c.refut[i].move);
+            reached = !piecesLeft(q);
+        }
+        if (!reached) out.push_back({"BAD_TRADE_NOT_PAWN_ENDING", k + ": the line reaches no pawn ending"});
+    }
+    if (v.wPlayed > 25.0)
+        out.push_back({"BAD_TRADE_NOT_LOST", k + ": the human keeps " + std::to_string(int(v.wPlayed)) + " %", false});
+    // The phrasings that call the move itself a trade ("This trade leads to...", "Trading into this
+    // pawn ending loses", "Wrong trade"): b3, b4 and b5.
+    const bool callsMoveTrade = k.rfind("ex.bad_trade.b3", 0) == 0 || k.rfind("ex.bad_trade.b4", 0) == 0 ||
+                                k.rfind("ex.bad_trade.b5", 0) == 0;
+    const Move pm = c.p0.parseUCI(c.rec->played);
+    const bool takes = pm.valid() && !c.p0.at(pm.to).empty();
+    const bool takenBack = !c.refut.empty() && c.refut[0].captured != NoPiece && c.refut[0].move.to == pm.to;
+    if (callsMoveTrade && !takes && !takenBack)
+        out.push_back({"BAD_TRADE_NO_TRADE", k + ": " + c.p0.toSAN(pm) + " takes nothing and is not taken; the line " +
+                                                 (ln ? ln->san : std::string()) + " trades"});
+}
+
+// The mate pattern named (ex.mate_allowed.pattern, {text} = name.pattern.*), read on the mated
+// position: the refutation played from the table until it mates. One checker always, and:
+//   back rank: the king on its first rank, the checker a rook or a queen on that rank, every square
+//     in front of the king held by its own pieces (PATTERN_BACK_RANK_OPEN when two or more of them
+//     are open or one holds a piece of the mating side, _HELPED when one is open and another piece
+//     of the mating side covers it, _CHECKER, a warning, when the checker alone covers the open ones);
+//   smothered: the checker a knight, every square next to the king held by its own pieces;
+//   support: the checker a queen next to the king, defended by another piece of the mating side;
+//   ladder: the king on an edge rank or file, the checker a rook or a queen on that edge line, and
+//     another rook or queen of the mating side on the next line inward guarding a square of it next
+//     to the king;
+//   epaulette: the checker on the king's file, the squares on both sides of the king on its rank
+//     held by its own pieces.
+void checkMatePattern(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    const Arg* text = b.line.arg("text");
+    if (k.rfind("ex.mate_allowed.pattern", 0) != 0 || !text || text->text.rfind("name.pattern.", 0) != 0) return;
+    const std::string name = text->text.substr(13);
+    Position q = c.p1;
+    bool mated = q.isCheckmate();
+    for (size_t i = 0; i < c.refut.size() && !mated; ++i) {
+        q.makeMove(c.refut[i].move);
+        mated = q.isCheckmate();
+    }
+    if (!mated) {
+        out.push_back({"PATTERN_NO_MATE", k + " " + name + ": the line never mates"});
+        return;
+    }
+    const Color loser = q.sideToMove(), winner = opposite(loser);
+    const Square ks = q.kingSquare(loser);
+    const uint64_t checkers = q.checkers();
+    if (squareCount(checkers) != 1) {
+        out.push_back({"PATTERN_SHAPE", k + " " + name + ": a double check (" + q.fen() + ")"});
+        return;
+    }
+    const Square cs = squaresOf(checkers)[0];
+    const PieceType ct = q.at(cs).type;
+    const uint64_t around = attacksOf(King, loser, ks, 0);
+    const uint64_t own = q.pieces(loser);
+    const int home = loser == White ? 0 : 7;
+    bool ok = true;
+    std::string why;
+    bool soft = false;   // a back-rank mate the checker alone completes: a warning, not an error
+    bool helped = false;
+    if (name == "back_rank") {
+        const uint64_t front = frontOfKing(q, loser);
+        const bool shape = rankOf(ks) == home && (ct == Rook || ct == Queen) && rankOf(cs) == home;
+        ok = shape && (front & own) == front;
+        // The shape, but a square in front of the king shut by the mating side, not by its own piece:
+        // by the checker alone (Qf8# against Kh8 and h7, the queen covering g7: often called so), or
+        // by another piece of the mating side or one standing there (a mating net, no back-rank mate).
+        // One open square held by another piece of the mating side (Qb8# against Kg8, f7 h7, the
+        // bishop on h6 covering g7): helped, an error by the definition, the mildest case.
+        if (shape && !ok) {
+            soft = true;
+            bool held = false;
+            const uint64_t occ = q.occupancy() & ~squareBit(ks);
+            for (Square s : squaresOf(front & ~own)) {
+                const uint64_t by = q.attackersTo(s, occ) & q.pieces(winner);
+                if (!q.at(s).empty() || (by & ~squareBit(cs))) soft = false;
+                if (q.at(s).empty() && (by & ~squareBit(cs))) held = true;
+            }
+            helped = !soft && held && squareCount(front & ~own) == 1;
+            why = soft     ? "the checker alone covers the open squares in front of the king"
+                  : helped ? "one square in front of the king is open, held by another piece"
+                           : "squares in front of the king are open or taken by the mating side";
+        }
+    } else if (name == "smothered") {
+        ok = ct == Knight && (around & ~own) == 0;
+    } else if (name == "support") {
+        ok = ct == Queen && (around & squareBit(cs)) && (q.attackersTo(cs, winner) != 0);
+    } else if (name == "ladder") {
+        const int kf = fileOf(ks), kr = rankOf(ks);
+        const uint64_t heavy = (q.pieces(winner, Rook) | q.pieces(winner, Queen)) & ~squareBit(cs);
+        ok = false;
+        if ((ct == Rook || ct == Queen) && (kr == 0 || kr == 7) && rankOf(cs) == kr) {
+            const int inner = kr == 0 ? 1 : 6;
+            for (Square s : squaresOf(heavy))
+                if (rankOf(s) == inner && (q.attacksFrom(s) & around & (0xFFULL << (8 * inner)))) ok = true;
+        }
+        if ((ct == Rook || ct == Queen) && (kf == 0 || kf == 7) && fileOf(cs) == kf) {
+            const int inner = kf == 0 ? 1 : 6;
+            for (Square s : squaresOf(heavy))
+                if (fileOf(s) == inner && (q.attacksFrom(s) & around & (0x0101010101010101ULL << inner))) ok = true;
+        }
+    } else if (name == "epaulette") {
+        const int kf = fileOf(ks), kr = rankOf(ks);
+        ok = kf > 0 && kf < 7 && fileOf(cs) == kf && q.at(makeSquare(kf - 1, kr)).color == loser &&
+             !q.at(makeSquare(kf - 1, kr)).empty() && q.at(makeSquare(kf + 1, kr)).color == loser &&
+             !q.at(makeSquare(kf + 1, kr)).empty();
+    } else {
+        out.push_back({"PATTERN_UNKNOWN", k + " " + name});
+        return;
+    }
+    if (!ok)
+        out.push_back({why.empty() ? "PATTERN_SHAPE" : soft ? "PATTERN_BACK_RANK_CHECKER"
+                                                     : helped ? "PATTERN_BACK_RANK_HELPED" : "PATTERN_BACK_RANK_OPEN",
+                       k + " " + name + ": " + pieceName(ct) + " on " + squareName(cs) + " mates the king on " + squareName(ks) +
+                           (why.empty() ? "" : ", " + why) + " (" + q.fen() + ")",
+                       !soft});
 }
 
 // The capture a move leaves for later: its mover could win a piece worth more than what the move
@@ -915,6 +1556,377 @@ void checkMateCount(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     }
 }
 
+// ---- Endgame technique and draws ------------------------------------------------------------------
+
+// Whether any English phrasing of the key holds 'word', or says the placeholder 'name'.
+bool anyVariantHas(const std::string& key, const std::string& word) {
+    for (const std::string& v : variantsOf(key))
+        if (v.find(word) != std::string::npos) return true;
+    return false;
+}
+bool anyVariantUses(const std::string& key, const std::string& name) {
+    for (const std::string& v : variantsOf(key))
+        if (usesPlaceholder(v, name)) return true;
+    return false;
+}
+
+// Plays a space-separated SAN line from 'start': every position on the way (pos[0] = start) and every
+// move; false when a move does not parse.
+bool playLine(const Position& start, const std::string& line, std::vector<Position>& pos, std::vector<Move>& moves) {
+    pos.assign(1, start);
+    moves.clear();
+    std::istringstream in(line);
+    for (std::string s; in >> s;) {
+        const Move m = pos.back().parseSAN(s);
+        if (!m.valid()) return false;
+        Position q = pos.back();
+        q.makeMove(m);
+        moves.push_back(m);
+        pos.push_back(q);
+    }
+    return true;
+}
+
+// The coach is stalemated in 'p': the coach to move, not in check, without a single legal move.
+bool coachStalemated(const Ctx& c, const Position& p) {
+    return p.sideToMove() == c.coach && !p.inCheck() && p.legalMoves().empty();
+}
+
+// The human was winning before the move, as the board shows it: the best line mates, or the human
+// is 3 points ahead before the move or where the best line ends.
+bool humanWinning(const Ctx& c) {
+    for (const LineStep& s : c.bestLine)
+        if (s.mate && s.mover == c.human) return true;
+    return c.base >= 3 || (!c.bestLine.empty() && materialBalance(c.bestEnd, c.human) >= 3);
+}
+
+// "Stalemate: my king has no legal move" (ex.stalemate, its tip too): the move played leaves the coach
+// to move, not in check, with no legal move; {my} is the coach's king where it stands. A line that
+// says a win was thrown away ("You were winning!", "a won game") needs the human winning before it.
+void checkStalemate(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.stalemate.", 0) != 0) return;
+    if (!coachStalemated(c, c.p1))
+        out.push_back({"STALEMATE_NONE", k + ": after " + c.rec->played + " the coach " +
+                                             (c.p1.inCheck() ? "is in check" : "still has a legal move")});
+    if (k.rfind("ex.stalemate.tip", 0) == 0) return;
+    const Arg* my = b.line.arg("my");
+    if (!my || my->piece != King || my->color != c.coach || my->square != c.p1.kingSquare(c.coach))
+        out.push_back({"STALEMATE_NOT_KING", k + ": {my} is not the coach's king"});
+    if ((anyVariantHas(k, "win") || anyVariantHas(k, "won ")) && !humanWinning(c))
+        out.push_back({"STALEMATE_NOT_WINNING", k + ": the human was not winning on the board (" +
+                                                    std::to_string(c.base) + " points, best line " +
+                                                    sanLine(c.bestLine, 0, std::min<size_t>(6, c.bestLine.size())) + ")"});
+}
+
+// The stalemate trick (ex.stalemate_trick): its {line}, from the table, ends with the coach to move
+// and stalemated, the human having taken material on the way (the coach gives its pieces away); {my}
+// is the coach's king. The coach is the side that is losing (behind in material on the table), and
+// the human cannot step aside: each of the human's moves along the line is its only legal move, an
+// answer to a check, or takes the piece the coach just moved.
+void checkStalemateTrick(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.stalemate_trick.", 0) != 0) return;
+    const Arg* my = b.line.arg("my");
+    if (!my || my->piece != King || my->color != c.coach || my->square != c.p1.kingSquare(c.coach))
+        out.push_back({"STALEMATE_TRICK_NOT_KING", k + ": {my} is not the coach's king"});
+    const Arg* ln = b.line.arg("line");
+    std::vector<Position> pos;
+    std::vector<Move> moves;
+    if (!ln || !playLine(c.p1, ln->san, pos, moves) || moves.empty()) {
+        out.push_back({"STALEMATE_TRICK_LINE", k + ": {line} " + (ln ? ln->san : std::string("missing")) + " does not play"});
+        return;
+    }
+    if (!coachStalemated(c, pos.back()))
+        out.push_back({"STALEMATE_TRICK_NONE", k + ": " + ln->san + " ends without the coach stalemated"});
+    bool took = false;
+    for (size_t i = 0; i < moves.size(); ++i) {
+        const Position& before = pos[i];
+        if (before.sideToMove() != c.human) continue;
+        const bool capture = !before.at(moves[i].to).empty() || (moves[i].flags & MoveEnPassant);
+        took = took || capture;
+        const bool only = before.legalMoves().size() == 1;
+        const bool takesMover = capture && i > 0 && moves[i].to == moves[i - 1].to;
+        if (!only && !before.inCheck() && !takesMover)
+            out.push_back({"STALEMATE_TRICK_UNFORCED", k + ": in " + ln->san + ", " + before.toSAN(moves[i]) +
+                                                           " is a free choice of the human's"});
+    }
+    if (!took) out.push_back({"STALEMATE_TRICK_NOTHING_GIVEN", k + ": the human takes nothing along " + ln->san});
+    if (materialBalance(c.p1, c.human) < 1)
+        out.push_back({"STALEMATE_TRICK_NOT_BEHIND", k + ": the coach is not behind in material on the table (" +
+                                                         std::to_string(materialBalance(c.p1, c.human)) + ")"});
+}
+
+// Moves a pawn on 'from' needs to reach the last rank of its colour: the rank distance, one less from
+// its first square when the double step is open.
+int pawnMovesTo(const Position& p, Square from, Color side) {
+    const int last = side == White ? 7 : 0, start = side == White ? 1 : 6, up = side == White ? 1 : -1;
+    int n = std::abs(last - rankOf(from));
+    if (rankOf(from) == start && p.at(makeSquare(fileOf(from), start + up)).empty() &&
+        p.at(makeSquare(fileOf(from), start + 2 * up)).empty())
+        n -= 1;
+    return n;
+}
+
+int kingSteps(Square a, Square b) { return std::max(std::abs(fileOf(a) - fileOf(b)), std::abs(rankOf(a) - rankOf(b))); }
+
+// The coach's pawn race (ex.promotion): {sq} is on the coach's last rank, and the coach promotes there
+// along the refutation, with the very pawn {my} names (followed from its square on the table, not
+// taken on the way), and the human does not take the new piece at once. {your}, the human's king, is
+// outside the square: more king steps to {sq} than moves the pawn needs, the coach to move ({n} says
+// those moves, or the squares when a phrasing says "squares"; {n2} the king's steps). A {line} said
+// reaches the promotion.
+void checkPromotion(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.promotion.", 0) != 0) return;
+    const Arg* sq = b.line.arg("sq");
+    const Arg* my = b.line.arg("my");
+    const Arg* your = b.line.arg("your");
+    if (!sq || sq->square == NoSquare || !my || my->square == NoSquare || !your || your->square == NoSquare) {
+        out.push_back({"PROMOTION_ARGS", k});
+        return;
+    }
+    const Square to = sq->square;
+    if (rankOf(to) != (c.coach == White ? 7 : 0))
+        out.push_back({"PROMOTION_SQ", k + ": " + squareName(to) + " is not on the coach's last rank"});
+    if (c.p1.at(my->square) != Piece{Pawn, c.coach})
+        out.push_back({"PROMOTION_PAWN", k + ": no pawn of the coach's on " + squareName(my->square)});
+    // The pawn followed along the refutation.
+    Square at = my->square;
+    int promotedAt = -1;
+    bool samePawn = false;
+    for (size_t i = 0; i < c.refut.size(); ++i) {
+        const LineStep& st = c.refut[i];
+        const bool mine = st.mover == c.coach && st.move.from == at;
+        if (mine) at = st.move.to;
+        else if (st.mover == c.human && st.move.to == at) at = NoSquare;
+        if (st.mover == c.coach && st.promotion != NoPiece && st.move.to == to) {
+            promotedAt = int(i);
+            samePawn = mine;
+            break;
+        }
+    }
+    if (promotedAt < 0) {
+        out.push_back({"PROMOTION_NONE", k + ": the coach never promotes on " + squareName(to) + " along " +
+                                             sanLine(c.refut, 0, c.refut.size())});
+        return;
+    }
+    if (!samePawn)
+        out.push_back({"PROMOTION_OTHER_PAWN", k + ": the pawn on " + squareName(my->square) + " is not the one that queens on " +
+                                                   squareName(to)});
+    // A line that under-promotes while a phrasing says "queen": queening was there too (counted).
+    if (c.refut[size_t(promotedAt)].promotion != Queen && anyVariantHas(k, "queen"))
+        out.push_back({"PROMOTION_UNDER", k + ": the line promotes to a " + pieceName(c.refut[size_t(promotedAt)].promotion) +
+                                              " (" + c.refut[size_t(promotedAt)].san + "), a phrasing says queen", false});
+    if (size_t(promotedAt + 1) < c.refut.size() && c.refut[size_t(promotedAt + 1)].move.to == to &&
+        c.refut[size_t(promotedAt + 1)].mover == c.human)
+        out.push_back({"PROMOTION_CAUGHT", k + ": " + c.refut[size_t(promotedAt + 1)].san + " takes the new piece"});
+    // The rule of the square, the coach to move on the table.
+    const Square hk = c.p1.kingSquare(c.human);
+    if (your->square != hk) out.push_back({"PROMOTION_KING", k + ": {your} is not the human's king"});
+    const int need = pawnMovesTo(c.p1, my->square, c.coach), steps = kingSteps(hk, to);
+    if (steps <= need)
+        out.push_back({"PROMOTION_IN_SQUARE", k + ": the king on " + squareName(hk) + " is " + std::to_string(steps) +
+                                                  " steps from " + squareName(to) + ", the pawn needs " + std::to_string(need)});
+    for (const std::string& v : variantsOf(k)) {
+        const Arg* n = b.line.arg("n");
+        const Arg* n2 = b.line.arg("n2");
+        const int squares = std::abs(rankOf(to) - rankOf(my->square));
+        if (usesPlaceholder(v, "n") && n) {
+            const bool saysSquares = v.find("squares from") != std::string::npos;
+            if (n->number != (saysSquares ? squares : need))
+                out.push_back({"PROMOTION_COUNT", k + ": {n} = " + std::to_string(n->number) + ", the pawn is " +
+                                                      std::to_string(squares) + " squares and " + std::to_string(need) +
+                                                      " moves away: \"" + v + "\""});
+        }
+        if (usesPlaceholder(v, "n2") && n2 && n2->number != steps)
+            out.push_back({"PROMOTION_COUNT", k + ": {n2} = " + std::to_string(n2->number) + ", the king needs " +
+                                                  std::to_string(steps)});
+    }
+    if (anyVariantUses(k, "line")) {
+        const Arg* ln = b.line.arg("line");
+        std::vector<Position> pos;
+        std::vector<Move> moves;
+        bool reached = false;
+        if (ln && playLine(c.p1, ln->san, pos, moves))
+            for (size_t i = 0; i < moves.size(); ++i)
+                reached = reached || (pos[i].sideToMove() == c.coach && moves[i].promotion != NoPiece && moves[i].to == to);
+        if (!reached)
+            out.push_back({"PROMOTION_LINE_SHORT", k + ": {line} " + (ln ? ln->san : std::string("missing")) +
+                                                       " stops before the promotion on " + squareName(to)});
+    }
+}
+
+// "Your pawn could have run to {sq}" (ex.promotion_missed): the best line from before the move has a
+// pawn of the human's promote on {sq}; where a phrasing says it queens or wins a race ("queen",
+// "race", "first", "yours"), the new piece stays there (taken at once, it won no race: lost, or a
+// decoy the human takes back at once). The played line does not promote there as soon and keep it.
+void checkPromotionMissed(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.promotion_missed.", 0) != 0) return;
+    const Arg* sq = b.line.arg("sq");
+    if (!sq || sq->square == NoSquare) {
+        out.push_back({"PROMOTION_ARGS", k});
+        return;
+    }
+    // The first promotion of the human's on {sq} along a line; 'kept': the next ply does not take the
+    // new piece there.
+    const auto promotesAt = [&](const std::vector<LineStep>& line, bool& kept) {
+        for (size_t i = 0; i < line.size(); ++i)
+            if (line[i].mover == c.human && line[i].promotion != NoPiece && line[i].move.to == sq->square) {
+                kept = !(i + 1 < line.size() && line[i + 1].move.to == sq->square && line[i + 1].captured != NoPiece);
+                return int(i);
+            }
+        return -1;
+    };
+    bool bestKept = false, playedKept = false;
+    const int best = promotesAt(c.bestLine, bestKept), played = promotesAt(c.playedLine, playedKept);
+    if (best < 0)
+        out.push_back({"PROMOTION_MISSED_NONE", k + ": the best line " + sanLine(c.bestLine, 0, c.bestLine.size()) +
+                                                    " never promotes on " + squareName(sq->square)});
+    else if (!bestKept && (anyVariantHas(k, "queen") || anyVariantHas(k, "race") || anyVariantHas(k, "first") ||
+                           anyVariantHas(k, "yours"))) {
+        const bool back = size_t(best) + 2 < c.bestLine.size() && c.bestLine[size_t(best) + 2].move.to == sq->square &&
+                          c.bestLine[size_t(best) + 2].captured != NoPiece;
+        out.push_back({back ? "PROMOTION_MISSED_DEFLECTION" : "PROMOTION_MISSED_TAKEN",
+                       k + ": " + sanLine(c.bestLine, size_t(best), back ? 3 : 2) + " along the best line: the new piece is taken at once" +
+                           (back ? " and taken back" : "")});
+    }
+    else if (played >= 0 && playedKept && played <= best)
+        out.push_back({"PROMOTION_MISSED_PLAYED", k + ": the played line promotes on " + squareName(sq->square) +
+                                                      " as soon (" + sanLine(c.playedLine, 0, size_t(played) + 1) + ")"});
+}
+
+// "Push the passed pawn" (ex.push_passed): {best}, legal before the move, moves a pawn of the human's
+// straight up its file; that pawn is passed (no pawn of the coach's ahead of it on its file or the two
+// next to it); {sq} is the last-rank square of its file.
+void checkPushPassed(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.push_passed.", 0) != 0) return;
+    const Arg* best = b.line.arg("best");
+    const Move m = best ? c.p0.parseUCI(best->uci) : Move();
+    if (!m.valid() || c.p0.at(m.from) != Piece{Pawn, c.human}) {
+        out.push_back({"PUSH_NOT_PAWN", k + ": {best} " + (best ? best->san : std::string("missing")) + " moves no pawn of the human's"});
+        return;
+    }
+    if (fileOf(m.to) != fileOf(m.from))
+        out.push_back({"PUSH_CAPTURE", k + ": " + best->san + " leaves the pawn's file"});
+    const int up = c.human == White ? 1 : -1;
+    for (Square s : squaresOf(c.p0.pieces(c.coach, Pawn)))
+        if (std::abs(fileOf(s) - fileOf(m.from)) <= 1 && (rankOf(s) - rankOf(m.from)) * up > 0) {
+            out.push_back({"PUSH_NOT_PASSED", k + ": the pawn on " + squareName(m.from) + " has the coach's pawn on " +
+                                                  squareName(s) + " ahead"});
+            break;
+        }
+    const Arg* sq = b.line.arg("sq");
+    const Square last = makeSquare(fileOf(m.to), c.human == White ? 7 : 0);
+    if (anyVariantUses(k, "sq") && (!sq || sq->square != last))
+        out.push_back({"PUSH_SQ", k + ": {sq} " + (sq ? squareName(sq->square) : std::string("missing")) + ", the pawn queens on " +
+                                      squareName(last)});
+}
+
+// "Bring your king to the centre / forward" (ex.king_active): {best}, legal before the move, is a king
+// move of the human's that ends nearer the middle of the board than it starts; where a phrasing says
+// "forward", the king also steps toward the coach's side.
+void checkKingActive(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.king_active.", 0) != 0) return;
+    const Arg* best = b.line.arg("best");
+    const Move m = best ? c.p0.parseUCI(best->uci) : Move();
+    if (!m.valid() || c.p0.at(m.from) != Piece{King, c.human}) {
+        out.push_back({"KING_ACTIVE_NOT_KING", k + ": {best} " + (best ? best->san : std::string("missing")) + " is no king move"});
+        return;
+    }
+    // Twice the distance to the board's middle point, squared.
+    auto far = [](Square s) {
+        const int x = 2 * fileOf(s) - 7, y = 2 * rankOf(s) - 7;
+        return x * x + y * y;
+    };
+    if (far(m.to) >= far(m.from))
+        out.push_back({"KING_ACTIVE_NOT_CENTRE", k + ": " + best->san + " goes no nearer the centre"});
+    // "Forward": a step back toward the human's own side contradicts it; a step along the rank only
+    // stretches it (counted, not an error).
+    const int up = c.human == White ? 1 : -1, ahead = (rankOf(m.to) - rankOf(m.from)) * up;
+    if (anyVariantHas(k, "forward") && ahead < 0)
+        out.push_back({"KING_ACTIVE_BACKWARD", k + ": " + best->san + " steps back, a phrasing says \"forward\""});
+    else if (anyVariantHas(k, "forward") && ahead == 0)
+        out.push_back({"KING_ACTIVE_SIDEWAYS", k + ": " + best->san + " steps sideways, a phrasing says \"forward\"", false});
+}
+
+// "Kd5 takes the opposition" (ex.opposition): {best}, legal before the move, is a king move of the
+// human's after which the two kings stand on one file or one rank with one square between them, the
+// coach to move; the move played did not leave the kings so (it would hold the opposition too).
+void checkOpposition(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("ex.opposition.", 0) != 0) return;
+    const Arg* best = b.line.arg("best");
+    const Move m = best ? c.p0.parseUCI(best->uci) : Move();
+    if (!m.valid() || c.p0.at(m.from) != Piece{King, c.human}) {
+        out.push_back({"OPPOSITION_NOT_KING", k + ": {best} " + (best ? best->san : std::string("missing")) + " is no king move"});
+        return;
+    }
+    auto facing = [&](const Position& p) {
+        const Square a = p.kingSquare(White), d = p.kingSquare(Black);
+        const int df = std::abs(fileOf(a) - fileOf(d)), dr = std::abs(rankOf(a) - rankOf(d));
+        return p.sideToMove() == c.coach && ((df == 0 && dr == 2) || (dr == 0 && df == 2));
+    };
+    Position q = c.p0;
+    q.makeMove(m);
+    if (!facing(q)) out.push_back({"OPPOSITION_NONE", k + ": after " + best->san + " the kings do not face each other"});
+    if (facing(c.p1)) out.push_back({"OPPOSITION_PLAYED_TOO", k + ": the move played leaves the kings facing too"});
+}
+
+// "Careful: fifty moves without a capture or a pawn move is a draw" (tip.fifty): the plies since the
+// last capture or pawn move, counted on the game's own moves (from the start position's clock), are
+// near the limit: 80 at least (ten moves left at most), and fewer than 100 (else the draw is there).
+void checkFiftyTip(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("tip.fifty.", 0) != 0) return;
+    int clock = c.g.positionAt(0).halfmoveClock();
+    for (size_t i = 0; i < c.g.moves().size(); ++i) {
+        const Position& p = c.g.positionAt(i);
+        const Move& m = c.g.moves()[i];
+        const bool reset = p.at(m.from).type == Pawn || !p.at(m.to).empty();
+        clock = reset ? 0 : clock + 1;
+    }
+    if (clock < 80 || clock >= 100)
+        out.push_back({"FIFTY_CLOCK", k + ": " + std::to_string(clock) + " plies without a capture or a pawn move"});
+}
+
+// "If the same position comes a third time, it's a draw" (tip.repetition): the position after the
+// move stood on the board exactly once before in the game (placement, side to move, castling rights,
+// en passant square: the first four fields of the FEN).
+void checkRepetitionTip(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("tip.repetition.", 0) != 0) return;
+    auto id = [](const Position& p) {
+        const std::string f = p.fen();
+        size_t at = 0;
+        for (int i = 0; i < 4 && at != std::string::npos; ++i) at = f.find(' ', at + 1);
+        return f.substr(0, at);
+    };
+    const std::string now = id(c.p1);
+    int seen = 0;
+    for (size_t i = 0; i <= c.g.moves().size(); ++i) seen += id(c.g.positionAt(i)) == now;
+    if (seen != 2) out.push_back({"REPETITION_COUNT", k + ": the position stands " + std::to_string(seen) + " times in the game"});
+}
+
+// "With a lone king left, push it to the edge, then checkmate" (tip.mate_technique): after the move
+// the coach has its king alone, and the human has the material to force a mate (a queen, a rook, a
+// pawn, a bishop and a knight, or bishops on both colours).
+void checkMateTechnique(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+    const std::string& k = b.line.key;
+    if (k.rfind("tip.mate_technique.", 0) != 0) return;
+    if (c.p1.pieces(c.coach) != c.p1.pieces(c.coach, King))
+        out.push_back({"MATE_TECH_NOT_LONE", k + ": the coach has more than its king"});
+    const Color h = c.human;
+    bool light = false, dark = false;
+    for (Square s : squaresOf(c.p1.pieces(h, Bishop))) ((fileOf(s) + rankOf(s)) % 2 ? light : dark) = true;
+    const bool enough = c.p1.pieces(h, Queen) || c.p1.pieces(h, Rook) || c.p1.pieces(h, Pawn) || (light && dark) ||
+                        ((light || dark) && c.p1.pieces(h, Knight));
+    if (!enough) out.push_back({"MATE_TECH_NO_MATERIAL", k + ": the human has no material to force a mate"});
+}
+
 }  // namespace
 
 // ---- One move at one level ---------------------------------------------------------------------------
@@ -1043,6 +2055,23 @@ int reviewMain(const Options& o) {
                             if (my && your && !legal)
                                 preF.push_back({"THREAT_PINNED", b.line.key + ": " + squareName(my->square) + " cannot take"});
                         }
+                        // "I'm threatening checkmate on g1": with the turn passed, the piece named mates
+                        // there at once.
+                        if (b.line.key.rfind("threat.mate", 0) == 0) {
+                            const Arg* sq = b.line.arg("sq");
+                            const Arg* my = b.line.arg("my");
+                            Position q = c.p0;
+                            if (sq && q.passTurn()) {
+                                bool mates = false;
+                                for (const Move& m : q.legalMoves()) {
+                                    if (m.to != sq->square || (my && my->square != NoSquare && m.from != my->square)) continue;
+                                    Position r2 = q;
+                                    r2.makeMove(m);
+                                    mates = mates || r2.isCheckmate();
+                                }
+                                if (!mates) preF.push_back({"MATE_THREAT_NONE", b.line.key + ": no mate on " + squareName(sq->square)});
+                            }
+                        }
                         // "My last move was a mistake": the human's best line keeps 2 points more
                         // than before the coach's move, four plies on (the capture answered).
                         if (b.line.key != "threat.punish.b1" || !r.a0.ok || r.a0.lines.empty()) continue;
@@ -1118,13 +2147,34 @@ int reviewMain(const Options& o) {
                     checkTrapped(c, b, f);
                     checkSacrifice(c, b, f);
                     checkSaved(c, b, f);
+                    checkPraiseFork(c, b, f);
+                    checkPraiseCapture(c, b, f);
+                    checkPraiseTrade(c, b, f);
                     checkPraiseLost(c, v, b, f);
                     checkLineRepeats(c, b, f);
                     checkKingLine(c, b, f);
                     checkGivenAway(c, v, b, demoPlies, f);
                     checkBishopPair(c, v, b, f);
                     checkFork(c, b, f);
+                    checkSkewer(c, b, f);
+                    checkPin(c, b, f);
+                    checkDiscovered(c, b, f);
+                    checkBackRank(c, b, f);
+                    checkBackRankTip(c, b, f);
+                    checkExchangeCheap(c, b, f);
+                    checkBadTrade(c, v, b, f);
+                    checkMatePattern(c, b, f);
                     checkMateCount(c, b, f);
+                    checkStalemate(c, b, f);
+                    checkStalemateTrick(c, b, f);
+                    checkPromotion(c, b, f);
+                    checkPromotionMissed(c, b, f);
+                    checkPushPassed(c, b, f);
+                    checkKingActive(c, b, f);
+                    checkOpposition(c, b, f);
+                    checkFiftyTip(c, b, f);
+                    checkRepetitionTip(c, b, f);
+                    checkMateTechnique(c, b, f);
                     checkLinePrizes(c, b, f);
                     if (judge) {
                         Position start;

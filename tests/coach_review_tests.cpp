@@ -2612,6 +2612,796 @@ TEST(coach_review_whole_game_cases) {
     }
 }
 
+// Whole games of the June 2015 sample, each move reviewed in turn: what they showed.
+TEST(coach_review_whole_game_2015_cases) {
+    {
+        // Game K7jp59pT: 29...Nd3+ Qxd3 Qxd3, the knight checking the king and hitting b2. What it
+        // wins is the queen that took it (a decoy), not a piece it hit: never "Nice fork".
+        const Recorded rc = recorded(
+         "rec b e5d3 startpos ; a2a4 e7e5 d2d4 e5e4 f2f3 e4f3 g1f3 d7d6 c2c4 c8g4 h2h3 g4f3 g2f3 b8c6 d4d5 c6e5 h3h4 e5c4 c1g5 f7f6 g5c1 g8e7 d1b3 c4a5 b3b5 d8d7 b5a5 b7b6 a5d2 h7h5 f1h3 f6f5 e2e4 g7g6 e4f5 e7f5 d2e2 f8e7 c1g5 f5d4 e2d2 d4f3 e1e2 d7h3 d2d1 h3g2 e2e3 e7g5 e3d3 f3e5 d3c3 g2g3 c3c2 h8f8 h4g5 f8f2 c2c1\n"
+         "tag game https://lichess.org/K7jp59pT 870/1266 420+0 ply 58 drop 0.0\n"
+         "an a0 1 0 0 16 e5d3 3\n"
+         "ln 1 16 0 5 0 0 E e5d3 d1d3 g3d3 h1e1 e8f8 e1e8 a8e8 b1a3 f2f1\n"
+         "ln 2 16 874 0 0 0 E e8c8 a1a3 g3f4 b1d2 e5c4 a3d3 c4d2 d3d2 d8e8 a4a5 e8e2 h1h4 e2d2 h4f4 d2d1 c1d1 f2f4 a5a6\n"
+         "ln 3 16 866 0 0 0 E g3f4 b1d2 e8c8 a1a3 e5c4 a3d3 c4d2 d3d2 d8e8 a4a5 e8e2 h1h4 e2d2 d1e1\n"
+         "an a2 1 1 0 14 d1d3 1\n"
+         "ln 1 14 0 -4 0 0 E d1d3 g3d3 h1e1 e8f8 e1e8 a8e8 b1a3 f2f1\n"
+         "an a3 1 0 0 6 e5d3 1\n"
+         "ln 1 6 0 5 0 0 E e5d3 d1d3 g3d3 h1e1 e8f8 e1e8 a8e8 b1a3 f2f1\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nd3+ b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.fork"));
+        }
+    }
+    {
+        // Game 4AhL4m9O: 28.Rxc7+ Rd7 exd7, the rook checking the king and hitting the bishop on b7.
+        // What it wins is the rook put in the way, not the bishop: never "Nice fork".
+        const Recorded rc = recorded(
+         "rec w c3c7 startpos ; f2f4 d7d5 d2d4 f7f5 g1f3 g8f6 e2e3 f6e4 f1d3 e7e6 e1g1 b8c6 f3e5 c6e5 f4e5 b7b6 d3e4 d5e4 d1h5 g7g6 h5d1 d8g5 c2c4 c8b7 b1c3 a7a6 c3e2 e8c8 a2a4 h7h5 b2b3 h5h4 e2f4 h4h3 g2g3 d8e8 c1a3 f8a3 a1a3 c8d7 b3b4 d7e7 f1f2 e7f7 d4d5 e6d5 c4d5 e8d8 e5e6 f7f6 a3c3 h8h7 d1d4 f6e7\n"
+         "tag game https://lichess.org/4AhL4m9O 1755/1718 600+0 ply 55 drop 0.0\n"
+         "an a0 1 1 0 16 c3c7 3\n"
+         "ln 1 16 0 7 0 0 E c3c7 d8d7 e6d7 g5f4 f2f4 e7d8 d4f6 h7e7 f6h8 e7e8 h8e8 d8c7 d7d8q\n"
+         "ln 2 16 1049 0 0 0 E d5d6 e7f8 c3c7 f8g8 e6e7 d8a8 c7b7 h7f7\n"
+         "ln 3 16 837 0 0 0 E f2d2 e7d6 a4a5 d8h8 a5b6 g5g4 d4c5 d6e5 e6e7\n"
+         "an a2 1 0 0 14 d8d7 2\n"
+         "ln 1 14 0 -6 0 0 E d8d7 e6d7 g5g3 h2g3 h3h2 g1h1 b7d5 d4d5 e7d8 f4e6 d8e7 d7d8q\n"
+         "ln 2 14 0 -6 0 0 E e7d6 d4b6 d6e5 b6d4 e5d6 d4c5 d6e5 d5d6 b7d5 c5d5 e5f6 d5d4\n"
+         "an a3 1 1 0 6 c3c7 1\n"
+         "ln 1 6 0 7 0 0 E c3c7 d8d7 e6d7 g5f4 f2f4 e7d8 d4f6 h7e7 f6h8 e7e8 h8e8 d8c7 d7d8q\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rxc7+ b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.fork"));
+        }
+    }
+    {
+        // Game xc4QOWVE: 33...Rxg2+ Kf1 Rxh2, the rook checking the king and taking the knight it hit
+        // on h2 next: a fork that wins a piece it forked, still praised from level 2.
+        const Recorded rc = recorded(
+         "rec b g4g2 startpos ; e2e4 b8c6 g1f3 e7e6 d2d4 g8f6 e4e5 f6d5 f1b5 f8e7 b5c6 b7c6 e1g1 c8a6 f1e1 e8g8 b2b3 a8b8 c2c4 d5b6 c4c5 b6d5 c1d2 d7d6 e5d6 c7d6 c5d6 e7d6 f3e5 d8c7 b1c3 f7f6 c3d5 e6d5 e5g4 f8e8 g4e3 d6h2 g1h1 h2f4 e3g4 f6f5 e1e8 b8e8 g4e3 c7f7 d1f3 e8e4 g2g3 f4g5 a1g1 f5f4 e3g4 a6e2 f3g2 f7h5 g4h2 f4f3 g3g4 f3g2 g1g2 e4g4 d2g5 e2f3 h1g1\n"
+         "tag game https://lichess.org/xc4QOWVE 1472/1344 540+2 ply 66 drop 0.0\n"
+         "an a0 1 0 0 16 g4g2 3\n"
+         "ln 1 16 0 4 0 0 E g4g2 g1f1 g2h2 f1e1 h5g5 b3b4 h2h1\n"
+         "ln 2 16 1668 0 0 0 E f3g2 f2f3 g4g5 g1f2 h5h2 f2e3 g2f3 e3d3 f3e4 d3c3 h2c2 c3b4 c2d2 b4c5 d2a5 c5d6\n"
+         "ln 3 16 1173 0 0 0 E g4g5 h2f3 g5g2 g1g2 h5g4 g2f1 g4f3 b3b4 f3d1 f1g2 d1g4 g2h2 g4f3\n"
+         "an a2 1 1 0 14 g1f1 2\n"
+         "ln 1 14 0 -3 0 0 E g1f1 g2h2 f1e1 h5g5 b3b4 h2h1\n"
+         "ln 2 14 0 -1 0 0 E g1h1 g2g5\n"
+         "an a3 1 0 0 6 f3g2 1\n"
+         "ln 1 6 1583 0 0 0 E f3g2 g5f4 g4f4 a2a3 g2e4 f2f3\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rxg2+ b%d", level);
+            checkScript(r.script, where);
+            if (level >= 2) CHECK(hasKeyPrefix(r.script, "praise.fork"));
+        }
+    }
+    {
+        // Game EsvL5qui: 3...e4, the pawn on e5 out of the d-pawn's reach. A pawn is no piece:
+        // never "You saved your piece".
+        const Recorded rc = recorded(
+         "rec b e5e4 startpos ; c2c3 e7e5 e2e3 d7d5 d2d4\n"
+         "tag game https://lichess.org/EsvL5qui 1465/1723 600+0 ply 6 drop 0.0\n"
+         "an a0 1 0 0 16 b8c6 3\n"
+         "ln 1 16 37 0 0 0 E b8c6 g1f3 e5e4 f3d2 f7f5 c3c4 g8f6 b1c3 c8e6 f1e2 d8d7 e1g1 d5c4 d2c4 e8c8 a2a3 c8b8\n"
+         "ln 2 16 35 0 0 0 E e5e4 c3c4 c7c6 b1c3 g8f6 g1e2 b8a6 c4d5 c6d5 c1d2 a6c7 d1b3 f8e7 c3b5 c7b5 b3b5 c8d7 b5b7\n"
+         "ln 3 16 25 0 0 0 E b8d7 c3c4 g8f6 b1c3 e5d4 e3d4 f8b4 f1d3 d5c4 d1e2 d8e7 d3c4 d7b6 e2e7 b4e7 c4b3 e8g8 g1f3 a7a5\n"
+         "an a2 1 1 0 14 c3c4 2\n"
+         "ln 1 14 -36 0 0 0 E c3c4 c7c6 b1c3 g8f6 g1e2 b8a6 c4d5 c6d5 e2f4 a6c7 f4h5 f6h5 d1h5 f8e7 f2f3 e8g8 f3e4 d5e4\n"
+         "ln 2 14 -36 0 0 0 E g1e2 c7c6 c3c4 g8f6 b1c3 b8a6 c4d5 c6d5 e2f4 a6c7 f4h5 f6h5 d1h5 f8e7 f2f3 e8g8 f3e4 d5e4 f1c4\n"
+         "an a3 1 0 0 6 e5e4 1\n"
+         "ln 1 6 44 0 0 0 E e5e4 c3c4 c7c6 b1c3 g8f6 g1e2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "e4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.saved"));
+        }
+    }
+    {
+        // Game XNllRQZw: 14.Ne2 Bxh1 Rxh1, the rook on h1 trapped before the move: Ne2 lets the other
+        // rook take back and saves two points. Nothing is given up: never "you gave up a piece".
+        const Recorded rc = recorded(
+         "rec w g1e2 startpos ; d2d4 d7d5 b1c3 g8f6 c1g5 c7c6 g5f6 g7f6 e2e4 f8h6 d1h5 h6g7 e4d5 c6d5 h5d5 d8d5 c3d5 b8a6 f1a6 b7a6 d5c7 e8d7 c7a8 c8b7 e1c1 b7g2\n"
+         "tag game https://lichess.org/XNllRQZw 1896/2064 60+0 ply 27 drop 0.0\n"
+         "an a0 1 1 0 16 g1e2 3\n"
+         "ln 1 16 151 0 0 0 E g1e2 g2h1 d1h1 f6f5 h1g1 g7f6 c2c4 h8c8 b2b3 e7e6 c1c2 a6a5 c2d3\n"
+         "ln 2 16 0 0 0 0 E a8b6 a7b6 g1e2 g2h1 d1h1 g7h6 f2f4 h8g8 c1d2 g8g4 d2e3 g4h4 e3f3 h4h3 f3g2 h3h5\n"
+         "ln 3 16 -3 0 0 0 E a8c7 g2h1 c7a6 g7h6 c1b1 h8g8 a6c5 d7c7 g1e2 h1f3 d1g1 g8g5\n"
+         "an a2 1 0 0 14 g2h1 2\n"
+         "ln 1 14 -142 0 0 0 E g2h1 d1h1 f6f5 c2c3 g7f6 c1c2 h8a8 h1g1 a6a5 e2c1 d7d6 c1d3 e7e6 c2b3 a8c8\n"
+         "ln 2 14 -213 0 0 0 E g7h6 c1b1 g2h1 d1h1 h8a8 h1g1 a8c8 c2c3 c8c6 b1c2 c6e6 e2g3 h6f4 c2d3 e6b6 b2b3 b6b5 g1e1 b5a5 a2a4 a5g5 e1e4 e7e5 d4d5 f4g3 h2g3 a6a5 c3c4\n"
+         "an a3 1 1 0 6 g1e2 1\n"
+         "ln 1 6 151 0 0 0 E g1e2 g2h1 d1h1 f6f5 c2c3\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Ne2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.sacrifice"));
+            CHECK(!hasKeyPrefix(r.script, "praise.brilliant"));
+        }
+    }
+    {
+        // Game zy4Jf4DJ: 19...Nxf2, the knight left alone (Be1): Kxf2 Rxd2+ would win the bishop back
+        // with a pawn up. A piece the coach does not take is no sacrifice.
+        const Recorded rc = recorded(
+         "rec b d3f2 startpos ; d2d4 d7d5 c2c4 c7c6 b1c3 g8f6 g1f3 d5c4 a2a4 c8f5 e2e3 e7e6 f1c4 f8b4 e1g1 e8g8 c4d3 f5d3 d1d3 c6c5 f1d1 b8c6 d4c5 d8d3 d1d3 f8d8 d3d8 a8d8 g1f1 b4c5 f1e2 c6b4 c1d2 b4d3 a1b1 e6e5 f3g5\n"
+         "tag game https://lichess.org/zy4Jf4DJ 2156/2353 600+0 ply 38 drop 0.0\n"
+         "an a0 1 0 0 16 d3f2 3\n"
+         "ln 1 16 29 0 0 0 E d3f2 d2e1 f2g4 g5e4 c5b6 e4f6 g7f6 e3e4 g4e3 e1d2 e3c2 c3d5 c2d4 e2f1 g8g7 b2b4 d8c8 a4a5 b6d8 d2e3 c8c4 g2g4 b7b6 a5a6 d4b5\n"
+         "ln 2 16 0 0 0 0 E c5b4 f2f3 b7b6 g5e4 f6e4 c3e4 f7f5 d2b4 d3b4 e4f2 d8c8 b1d1 g8f7 f2d3 b4d3 d1d3 c8c2 d3d2 c2c7 d2d8 c7c2 d8d2\n"
+         "ln 3 16 -7 0 0 0 E c5e7 f2f3 f6e8 g5h3 e8c7 g2g4 f7f6 c3e4 c7a6 h3f2 d3f2 e4f2 d8c8 b2b3 g8f7 f2d3\n"
+         "an a2 1 1 0 14 d2e1 2\n"
+         "ln 1 14 -22 0 0 0 E d2e1 f2g4 g5e4 c5b6 e4f6 g7f6 e3e4 g4e3 e1d2 e3c2 c3d5 c2d4 e2f1 d4b3\n"
+         "ln 2 14 -73 0 0 0 E b1f1 f2d3 c3e4 c5e7 d2c3 f6e4 g5e4 d8d7 g2g4 f7f6 h2h4 g8f7 f1g1\n"
+         "an a3 1 0 0 6 d3f2 1\n"
+         "ln 1 6 29 0 0 0 E d3f2 d2e1 f2g4 g5e4 c5b6 e4f6 g7f6\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nxf2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.sacrifice"));
+            CHECK(!hasKeyPrefix(r.script, "praise.brilliant"));
+        }
+    }
+}
+
+// Lines the motif checks of coach_audit found wrong across the whole corpus (each claim checked on the
+// board: a promotion race, a pawn that could have queened, a king brought forward).
+TEST(coach_review_motif_check_cases) {
+    {
+        // 2016 game: 45.Kg4? Ne5+ Kg3 Rxa6 ... a1=Q. The line said with the race reaches the queening:
+        // never "Ne5+ Kg3 Rxa6, queening on a1" while the pawn is still on a5.
+        const Recorded rc = recorded(
+         "rec w g3g4 startpos ; c2c4 e7e5 b1c3 d7d6 g2g3 g8f6 f1g2 f8e7 b2b3 e8g8 c1b2 c7c6 d2d4 h7h6 g1f3 e5e4 f3d2 d6d5 d2f1 e7d6 f1e3 f6g4 e3g4 c8g4 c4d5 c6d5 c3d5 d8a5 d5c3 d6b4 a1c1 a5a2 b2a1 f7f5 h2h3 g4h5 g3g4 f5g4 e1g1 b4c3 c1c3 g4h3 c3c2 a2b3 g2e4 b8c6 f2f3 b3e3 g1h1 a8e8 d4d5 e8e4 f1g1 e4e7 d5d6 e7d7 d1d5 f8f7 d5h5 d7d6 h5h3 e3e6 h3g3 d6d5 c2c4 d5g5 c4g4 g5g4 g3g4 e6e2 a1g7 e2f3 g4f3 f7f3 g7h6 g8h7 g1g7 h7h6 g7b7 a7a5 b7b6 f3f6 b6a6 h6g7 h1g2 g7f7 g2g3 f7e7\n"
+         "tag game https://lichess.org/PWnnhyAi 2310/2229 300+0 ply 89 lc 72s,84?!,88n,89?? eco A21 open English_Opening grp common\n"
+         "an a0 1 1 0 16 a6a8 3\n"
+         "ln 1 16 -458 0 0 0 E a6a8 f6f7 g3g4 e7e6 a8a6 e6d6 g4g5 d6d5 a6a5 c6a5 g5g6 d5e6\n"
+         "ln 2 16 -458 0 0 0 E a6b6 e7d6 b6a6 f6f7 g3g4 d6d5 a6a5 c6a5 g4g5 d5e5 g5g6 f7d7 g6h6\n"
+         "ln 3 16 -458 0 0 0 E g3h4 e7d6 h4g4 d6d5 g4g5 f6f7 g5g6 f7a7 a6a5 c6a5 g6f6 a7d7 f6f5 d7f7 f5g6 d5e6 g6g5 f7f6\n"
+         "an a1 1 1 0 16 g3g4 1\n"
+         "ln 1 16 -1277 0 0 0 E g3g4 c6e5 g4g3 f6a6 g3f4 e5f7 f4e3 a5a4 e3d2 a4a3 d2c2 a3a2 c2b3 a2a1q b3c2 f7e5 c2d2\n"
+         "an a2 1 0 0 14 c6e5 2\n"
+         "ln 1 14 1247 0 0 0 E c6e5 g4g3 f6a6 g3f4 a5a4 f4e5 a4a3 e5d5 a3a2 d5c4 a2a1q c4d3 a6a3 d3c4 a3c3 c4d5 a1b2 d5e4\n"
+         "ln 2 14 456 0 0 0 E e7f7 g4g3 f7e7 a6a8 e7d6\n"
+         "an a3 1 1 0 6 g3h4 1\n"
+         "ln 1 6 -394 0 0 0 E g3h4 e7d6 h4g5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Kg4 b%d", level);
+            checkScript(r.script, where);
+            for (const Beat& b : r.script)
+                if (startsWith(b.line.key, "ex.promotion."))
+                    if (const Arg* l = b.line.arg("line")) CHECK(l->san.find('=') != std::string::npos);
+        }
+    }
+    {
+        // Puzzle (clearance): 46.Qc3? Rh1 h4 c1=Q Qxc1 Rxc1. The queen on c3 takes the new queen at
+        // once (the pawn hid the file): the king being far is not why White loses. No race.
+        const Recorded rc = recorded(
+         "rec w c8c3 2Q5/6pk/6pp/p7/P4P2/6P1/2p2K1P/2r5 w - - 1 46 ;\n"
+         "tag puzzle kLIyt 1702 advancedPawn clearance crushing endgame long promotion queenRookEndgame\n"
+         "an a0 1 1 0 16 f2g2 3\n"
+         "ln 1 16 717 0 0 0 E f2g2 h6h5 c8c4 c1d1 c4c2 d1d5 c2c4 d5f5 h2h3 h7h6 c4c8 h6h7 c8c7\n"
+         "ln 2 16 706 0 0 0 E c8c6 h6h5 f2g2 h5h4 g3g4 h4h3 g2h3 c1f1 c6c2 f1f4 h3h4 f4d4\n"
+         "ln 3 16 663 0 0 0 E f4f5 g6f5 c8f5 g7g6 f5c8 h7g7 f2g2 g6g5 c8c3 g7g8 c3b2\n"
+         "an a1 1 1 0 16 c8c3 1\n"
+         "ln 1 16 -747 0 0 0 E c8c3 c1h1 h2h4 c2c1q c3c1 h1c1 g3g4 c1c4 f2f3 c4a4 h4h5 g6h5 f3e2 a4f4 g4h5\n"
+         "an a2 1 0 0 14 c1h1 2\n"
+         "ln 1 14 747 0 0 0 E c1h1 h2h4 c2c1q c3c1 h1c1 g3g4 h6h5 g4h5 g6h5 f2f3\n"
+         "ln 2 14 -687 0 0 0 E h7h8 c3c8 h8h7 f2g2 h6h5 c8c3 h5h4 g3g4\n"
+         "an a3 1 1 0 6 f2g2 1\n"
+         "ln 1 6 706 0 0 0 E f2g2 h6h5 c8c3 h5h4 g3g4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Qc3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.promotion."));
+        }
+    }
+    {
+        // Puzzle (deflection): 52...Rc2? where a1=R Rxa1 Kc8: the rook on a5 sees a1 through the pawn,
+        // a new queen falls as the rook does. Never "your pawn could have become a queen".
+        const Recorded rc = recorded(
+         "rec b c4c2 3k4/8/3K4/R2P4/2r5/8/p7/8 b - - 1 52 ;\n"
+         "tag puzzle ayp6w 1432 crushing deflection endgame master rookEndgame short\n"
+         "an a0 1 0 0 16 a2a1r 3\n"
+         "ln 1 16 -16 0 0 0 E a2a1r a5a1 d8c8 a1a8 c8b7 a8a2 c4d4 a2b2 b7c8 b2c2 c8d8 c2h2 d8c8 h2h8 c8b7 h8h1 d4g4 h1h7 b7b6 d6e6 g4g6 e6d7\n"
+         "ln 2 16 -18 0 0 0 E d8c8 a5a2 c4h4 a2a8 c8b7 a8e8 h4d4 e8e7 b7c8 e7c7 c8b8 c7c1 d4h4 d6c6 b8c8 c1g1 h4c4 c6d6\n"
+         "ln 3 16 -18 0 0 0 E a2a1q a5a1 d8c8 a1a8 c8b7 a8a2 c4d4 a2b2 b7c8 b2c2 c8d8 c2h2 d8c8 h2h8 c8b7 h8h7 b7c8 h7c7 c8d8\n"
+         "an a1 1 0 0 16 c4c2 1\n"
+         "ln 1 16 -397 0 0 0 E c4c2 a5a8 c2c8 a8a2 c8b8 d6e6 b8b3 a2a8 d8c7 d5d6 c7b7 a8e8 b3e3 e6f7 e3d3\n"
+         "an a2 1 1 0 14 a5a8 2\n"
+         "ln 1 14 397 0 0 0 E a5a8 c2c8 a8a2 c8b8 d6e6 b8b1 a2a8 d8c7 d5d6 c7b7 a8e8 b1e1 e6f7 e1f1 f7e7\n"
+         "ln 2 14 0 0 0 0 E a5a6 d8c8 a6a3 c8b7 a3b3 b7c8\n"
+         "an a3 1 0 0 6 a2a1q 1\n"
+         "ln 1 6 -15 0 0 0 E a2a1q a5a1 d8c8 a1a8 c8b7 a8a2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rc2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.promotion_missed"));
+        }
+    }
+    {
+        // 53.h7? where b7 Rd8 b8=Q Rxb8 Bxb8 wins the rook by a deflection: the queen does not stay,
+        // never "b7 wins the race to b8".
+        const Recorded rc = recorded(
+         "rec w h6h7 startpos ; d2d4 d7d6 e2e4 g8f6 f1b5 c7c6 b5a4 e7e6 b1c3 a7a6 d1h5 f6h5 g1f3 b7b6 f3e5 d6d5 e5g4 f8b4 g2g3 e8d7 g4e5 d7c7 c1g5 d8e8 h1g1 f7f6 e5c6 b8c6 g5h4 a8a7 e4d5 h7h6 e1c1 g7g5 h4g5 c7b8 g5d2 b4c3 b2c3 e8e7 a4c6 e7a3 c1b1 h8h7 g3g4 a3e7 g1e1 a7c7 d5d6 e7d6 d4d5 d6a3 d5d6 c7c6 e1e4 c6d6 e4d4 e6e5 d1f1 d6d4 c3d4 a3h3 f1c1 h5g7 d2b4 b8c7 c1g1 h3f1 b1b2 f1g1 d4d5 g1c1 b2c1 h7h8 b4f8 a6a5 f8g7 h8h7 a2a4 c8a6 h2h4 a6e2 g7f6 c7d6 g4g5 b6b5 c2c4 h7f7 h4h5 f7c7 g5h6 c7c4 c1d2 c4c8 a4b5 e2h5 d2d3 h5g6 d3d2 g6f5 f6e5 d6e7 b5b6 c8a8\n"
+         "an a0 1 1 0 18 b6b7 3\n"
+         "ln 1 18 621 0 0 0 E b6b7 a8d8 b7b8q d8b8 e5b8 e7f6 b8f4 f5e4 d5d6 f6e6 d2c3 a5a4 c3b4 e4c2 f4e5 c2b1 b4a4 e6e5\n"
+         "ln 2 18 442 0 0 0 E d2c3 f5c8 h6h7 c8b7 c3d4 a8d8 h7h8q d8h8 e5h8 a5a4 f2f4 a4a3 f4f5 b7a8 h8e5 a3a2 f5f6 e7d7 d4c5 a8b7 e5a1 b7a8 d5d6 d7e6 b6b7 a8b7 c5b6 e6d6 b6b7 d6d7 b7b6\n"
+         "ln 3 18 426 0 0 0 E d2e3 a8d8 b6b7 a5a4 b7b8q d8b8 e5b8 f5b1 b8e5 a4a3 e3f4 b1h7 f4g5 h7e4 f2f4 e4h7 f4f5\n"
+         "an a1 1 1 0 18 h6h7 1\n"
+         "ln 1 18 76 0 0 0 E h6h7 f5h7 b6b7 a8d8 d2c3 h7g8 e5c7 d8e8 d5d6 e7d7 b7b8q e8b8 c7b8 g8f7 f2f4 f7e8 f4f5 d7c8 c3b2 c8b8 f5f6 e8h5 f6f7 h5f7 d6d7\n"
+         "an a2 1 0 0 14 f5h7 2\n"
+         "ln 1 14 -63 0 0 0 E f5h7 b6b7 a8d8 d2c3 h7g8 e5c7 d8e8 c3d4 e7f6 b7b8q e8b8 c7b8 f6f5 b8c7 a5a4 c7d6 g8f7 d6a3 f5f4 a3c1 f4f3 d5d6 f7e8\n"
+         "ln 2 14 -117 0 0 0 E e7d7 h7h8q a8h8 e5h8 f5e4 d2c3 e4d5 c3d4 d5g2 d4c5 a5a4 c5b5 g2c6 b5a6 a4a3 h8a1 d7e6 a6a7 a3a2\n"
+         "an a3 1 1 0 6 b6b7 1\n"
+         "ln 1 6 621 0 0 0 E b6b7 a8d8 b7b8q d8b8 e5b8 f5c8\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "h7 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.promotion_missed"));
+        }
+    }
+    {
+        // Self-play: 65...Rc2+ Rxc2 f1=Q queens at once and keeps the queen, before Re1 Rc2 Re2 Rxe2
+        // f1=Q: the race is no reason to prefer Re1.
+        const Recorded rc = recorded(
+         "rec b e2c2 startpos ; e2e3 c7c6 d2d4 g7g6 h2h3 d7d5 f1e2 f8g7 b1d2 c8f5 a2a3 g8f6 c2c3 a7a5 a3a4 d8c7 b2b3 h7h5 g1f3 e7e6 c1a3 f6e4 d1c1 b8d7 a1a2 a8a7 a2c2 c7d8 e1g1 g7f8 f1d1 e4f2 g1f2 f8a3 c1a3 d8e7 c2a2 e7a3 a2a3 g6g5 a3a1 e6e5 f3g1 g5g4 c3c4 e8e7 d1e1 f5e6 a1d1 h8g8 e2f1 h5h4 d2b1 g4g3 f2e2 e5e4 e2d2 f7f5 d2c2 d5c4 f1c4 d7f6 c2d2 b7b5 c4e6 g8g5 d2c1 e7d6 g1e2 a7h7 e2f4 h7a7 a4b5 a5a4 b5b6 a4a3 d1d2 a3a2 d2a2 a7e7 b1c3 f6d5 f4d5 e7h7 a2a1 c6d5 e6c8 h7c7 b6c7 d6c6 a1a6 c6c7 c3b5 c7b8 b5d6 g5g8 d6c4 g8g7 a6b6 b8a8 b3b4 g7a7 b4b5 f5f4 c1b2 d5c4 c8d7 c4c3 b2c3 a7d7 b6h6 f4f3 e1d1 d7c7 c3b4 f3f2 h6h8 a8b7 h8h6 c7c2 h6h7 b7c8 d1f1 c2b2 b4c5 b2a2 d4d5 a2e2 f1c1\n"
+         "an a0 1 0 0 16 e2e1 3\n"
+         "ln 1 16 -496 0 0 0 E e2e1 c1c2 e1e2 c2e2 f2f1q e2c2 f1b1 c2c4 b1f1 d5d6 c8d8 h7a7 f1d3 b5b6 d3e3 c5c6 e3b3\n"
+         "ln 2 16 -1472 0 0 0 E e2c2 c1c2 f2f1q c5b6 c8d8 c2c7 f1f6 b6b7 d8e8 c7c8 f6d8 h7h8 e8f7 c8d8 f7g7\n"
+         "ln 3 16 -2325 0 0 0 E f2f1q c1f1 e2f2 f1a1 f2c2 c5b6 c8d8 a1a8 c2c8 h7h8 d8e7 a8c8 e7f7 b6c6 f7g6 c8g8 g6f6 b5b6 f6f7 g8c8\n"
+         "an a2 1 1 0 14 c1c2 2\n"
+         "ln 1 14 1472 0 0 0 E c1c2 f2f1q c5b6 c8d8 c2c7 f1f6 b6b7 d8e8 c7c8 f6d8 h7h8 e8e7 c8d8\n"
+         "ln 2 14 -509 0 0 0 E c5d4 c2c1 h7h8 c8b7 h8h7 b7b6 h7h6 b6b5 h6f6 c1d1 d4e4\n"
+         "an a3 1 0 0 6 e2e1 1\n"
+         "ln 1 6 -542 0 0 0 E e2e1 c1c2 e1e2 c2e2 f2f1q e2a2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rc2+ b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.promotion_missed"));
+        }
+    }
+    {
+        // Puzzle (quiet move): 45.b4? where Kb3 steps back from a4 (nearer the middle, a rank back):
+        // never "bring your king forward".
+        const Recorded rc = recorded(
+         "rec w b2b4 8/8/4k2p/6p1/K4p2/8/PP4PP/8 w - - 0 45 ;\n"
+         "tag puzzle haAKJ 1566 advancedPawn crushing endgame pawnEndgame quietMove veryLong\n"
+         "an a0 1 1 0 16 a4b3 3\n"
+         "ln 1 16 513 0 0 0 E a4b3 e6d5 b3c3 g5g4 c3d3 h6h5 a2a4 h5h4 d3e2 d5c6 h2h3 f4f3 g2f3 g4h3\n"
+         "ln 2 16 513 0 0 0 E a4b4 e6d5 b4c3 g5g4 c3d3 h6h5 a2a4 h5h4 d3e2 f4f3 g2f3\n"
+         "ln 3 16 0 0 0 0 E a4b5 e6d5 b5b4 d5d4 a2a4 g5g4 a4a5 f4f3 g2f3 g4f3 a5a6 f3f2 a6a7 f2f1q a7a8q f1f7\n"
+         "an a1 1 1 0 16 b2b4 1\n"
+         "ln 1 16 -755 0 0 0 E b2b4 g5g4 b4b5 f4f3 g2f3 g4f3 a4a5 f3f2 b5b6 e6d6 b6b7 d6c7 b7b8q c7b8\n"
+         "an a2 1 0 0 14 g5g4 2\n"
+         "ln 1 14 763 0 0 0 E g5g4 a4b5 f4f3 g2f3 g4f3 a2a4 f3f2 b5b6 f2f1q b4b5 f1g1 b6a6\n"
+         "ln 2 14 -7 0 0 0 E h6h5 a4b3 g5g4 b3c2 h5h4 c2d2 f4f3 g2g3 h4g3 h2g3 e6d6 a2a3 d6c6 d2e3 c6b5 e3f2 b5a6\n"
+         "an a3 1 1 0 6 a4b3 1\n"
+         "ln 1 6 513 0 0 0 E a4b3 e6d5 b3c3 g5g4 c3d3 h6h5 a2a4 h5h4 d3e2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "b4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.king_active"));
+        }
+    }
+}
+
+// Tactical motifs said only where the line plays them out: the skewering piece takes behind the
+// front piece, a pinned piece has somewhere to go and the pin wins something, a bad trade is a
+// trade, and a back-rank mate or danger has the king shut in by its own pieces.
+TEST(coach_review_tactic_motif_check_cases) {
+    const auto namesBackRank = [](const Script& s) {
+        for (const Beat& b : s)
+            if (b.line.key == "ex.mate_allowed.pattern" && b.line.arg("text") &&
+                b.line.arg("text")->text == "name.pattern.back_rank")
+                return true;
+        return false;
+    };
+    {
+        // Puzzle (attraction): 39.Qe2? Bg4+ Kxg4 Qxe2+. The king takes the bishop: the queen falls to a
+        // deflection, not to a skewer by the bishop.
+        const Recorded rc = recorded(
+         "rec w e5e2 5k2/p7/4b3/3pQ1N1/8/2P2K2/PP4P1/3q4 w - - 10 39 ;\n"
+         "tag puzzle WlQu6 1136 attraction crushing deflection endgame short\n"
+         "an a0 1 1 0 16 f3f4 3\n"
+         "ln 1 16 510 0 0 0 E f3f4 d1f1 f4g3 f1d3 g3h2 e6d7 b2b4 d3g6 e5d5 f8e7 d5e4 g6e4 g5e4 d7c6 e4d2 e7d6 h2g3 d6e5\n"
+         "ln 2 16 490 0 0 0 E f3g3 d1d3 g3h2 e6d7 b2b4 d3g6 e5d5 f8e7 d5e4 g6e4 g5e4 d7c6 e4d2 e7d6 a2a3 c6d7 h2g3 d6e5 d2f3 e5f5\n"
+         "ln 3 16 478 0 0 0 E f3f2 e6d7 b2b4 f8g8 a2a3 d1d2 f2g3 d2d3 g5f3 g8f8 e5d6 f8e8 d6f6 d7c8 f6e5 e8d7\n"
+         "an a1 1 1 0 16 e5e2 1\n"
+         "ln 1 16 -755 0 0 0 E e5e2 e6g4 f3g4 d1e2 g5f3 f8e7 g4h3 e2b2 f3d4 e7f6 h3g3 b2c3 d4f3 c3c4 g3h3 f6e7 g2g4\n"
+         "an a2 1 0 0 14 e6g4 2\n"
+         "ln 1 14 754 0 0 0 E e6g4 f3g4 d1e2 g5f3 f8e7 g4f4 e2b2 f3d4 e7f6 d4f3 b2c3 g2g4 c3c4 f4e3 c4a2 e3d3\n"
+         "ln 2 14 -551 0 0 0 E d1e2 f3e2 e6g4 e2e3 f8g7 g5f3 g4f3 g2f3 g7f6 e3d4 a7a5 a2a4\n"
+         "an a3 1 1 0 6 f3f4 1\n"
+         "ln 1 6 507 0 0 0 E f3f4 d1f1 f4g3 f1d3 g3h2 e6d7 b2b4 d3g6 e5d5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Qe2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.skewer."));
+        }
+    }
+    {
+        // Puzzle (deflection): 39...Bd4? Rd7+ Kc5. Levels 1-3 follow the recorded line's Nxd4: the
+        // knight takes the bishop, not the rook that checks, so no "when it moves, I take your bishop
+        // behind it". Levels 4-6 show the strongest reply, Rd7+ Kc5 Rxd4: the rook takes, a skewer.
+        const Recorded rc = recorded(
+         "rec b f6d4 r7/pR6/4pb2/3k1p2/8/5N1P/P5P1/5K2 b - - 3 39 ;\n"
+         "tag puzzle JTD8e 1296 advantage deflection endgame short skewer\n"
+         "an a0 1 0 0 16 e6e5 3\n"
+         "ln 1 16 3 0 0 0 E e6e5 g2g4 f5g4 h3g4 e5e4 g4g5 f6c3 f3h2 d5e6 f1e2 a8c8 h2g4\n"
+         "ln 2 16 0 0 0 0 E a7a5 b7b5 d5e4 b5b6 e4d5 b6b5\n"
+         "ln 3 16 0 0 0 0 E a8c8 b7d7 d5e4 d7d6 c8c1 f1f2 c1c2 f2f1\n"
+         "an a1 1 0 0 16 f6d4 1\n"
+         "ln 1 16 -627 0 0 0 E f6d4 b7d7 d5c5 f3d4 e6e5 d4f3 e5e4 f3d4 f5f4 d4e6 c5c6\n"
+         "an a2 1 1 0 14 b7d7 2\n"
+         "ln 1 14 645 0 0 0 E b7d7 d5c5 d7d4 e6e5 d4a4 c5b5 a4a3 a8c8 f3e5 c8c1 f1f2\n"
+         "ln 2 14 2 0 0 0 E f1e2 d4c5 b7d7 c5d6 g2g4 a8h8 f3g5 f5g4 h3g4\n"
+         "an a3 1 0 0 6 e6e5 1\n"
+         "ln 1 6 3 0 0 0 E e6e5 g2g4 f5g4 h3g4 e5e4 g4g5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bd4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(hasKeyPrefix(r.script, "ex.skewer.") == (level >= 4));
+        }
+    }
+    {
+        // 2015 game (control): 31.Nf4? Bc1+ Kf2 Bxf4. The bishop checks and takes the knight behind the
+        // king itself: still a skewer.
+        const Recorded rc = recorded(
+         "rec w e6f4 startpos ; e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 c8d7 f1b5 b8c6 b5c6 d7c6 d4c6 b7c6 b1c3 g8f6 e4e5 d6e5 d1d8 a8d8 e1g1 g7g6 c1g5 f8g7 a1d1 e8g8 g5f6 g7f6 c3e4 f6g7 h2h4 d8d4 d1d4 e5d4 g2g4 f8d8 g4g5 d8d5 f1e1 d5e5 f2f3 c6c5 c2c3 g8h8 g1f2 d4c3 e4c3 e5e1 f2e1 g7e5 e1f2 h8g7 f2e3 f7f6 c3e4 f6f5 e4c5 e5b2 c5e6 g7f7\n"
+         "tag game https://lichess.org/OGVNg39H 1290/1360 120+0 ply 61 drop 0.0\n"
+         "an a0 1 1 0 16 e6d8 3\n"
+         "ln 1 16 -257 0 0 0 E e6d8 f7e8 d8c6 a7a6 e3d3 b2a3 d3d4 a3d6 c6e5 e7e6 a2a4\n"
+         "ln 2 16 -455 0 0 0 E e6c7 b2e5 c7a6 f7e6 a6b4 e5d6 b4d3 e6d5 f3f4 a7a5 e3f3 e7e6 d3f2\n"
+         "ln 3 16 -455 0 0 0 E e6c5 e7e5 c5d7 b2d4 e3d3 f7e7 d7f6 h7h5 f6d5 e7e6 d5f4 e6f7 f4g2 d4f2 a2a4\n"
+         "an a1 1 1 0 16 e6f4 1\n"
+         "ln 1 16 -725 0 0 0 E e6f4 b2c1 e3f2 c1f4 f2g2 f7e6 a2a4 e6e5 g2h3 f4d2 h4h5 e5f4 h3h4 d2e3 a4a5\n"
+         "an a2 1 0 0 14 b2c1 2\n"
+         "ln 1 14 727 0 0 0 E b2c1 e3f2 c1f4 f2g2 f7e6 g2h3 e6e5 h4h5 f4c1 a2a4 e5f4 h5g6 h7g6 h3h4\n"
+         "ln 2 14 423 0 0 0 E e7e5 f4d5 f7e6 d5c7 e6d6 c7e8 d6e7 e8f6 h7h5 a2a4 b2d4 e3e2 d4b6 e2f1 e7e6 f6h7\n"
+         "an a3 1 1 0 6 e6d8 1\n"
+         "ln 1 6 -245 0 0 0 E e6d8 f7e8 d8c6 a7a6 a2a4 b2c3 f3f4 a6a5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nf4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(hasKeyPrefix(r.script, "ex.skewer."));
+        }
+    }
+    {
+        // 2015 game: 31...Ng7? Qf6+ Qxf6 exf6+ Kf7 fxg7. The queen that would pin the knight is taken
+        // first; the pawn wins the knight, not the pin.
+        const Recorded rc = recorded(
+         "rec b e6g7 startpos ; e2e4 g7g6 d2d4 e7e6 f1c4 c7c6 g1f3 f8b4 c2c3 b4d6 e4e5 d6e7 e1g1 d8b6 c1g5 b6b2 b1d2 b2c3 a1c1 c3a5 g5e7 g8e7 d2e4 e8g8 e4f6 g8g7 f3h4 h7h5 c4e2 e7f5 h4f5 e6f5 e2h5 a5a2 h5f3 d7d5 c1c2 a2a5 d1d3 a5c7 f3h5 f8h8 d3f3 b8d7 f6d5 c7d8 d5f4 d7f8 c2d2 a7a5 g2g3 f8e6 h5g6 d8g5 g6f7 g5h6 f4h5 g7f7 f3f5 f7e7 g3g4\n"
+         "tag game https://lichess.org/35Fyr0mU 1274/1211 1200+10 ply 62 drop 0.0\n"
+         "an a0 1 0 0 16 h6d2 3\n"
+         "ln 1 16 516 0 0 0 E h6d2 f5f6 e7d7 f6h8 d7c7 h5g7 d2d4 g7e6 c8e6 h8a8 d4g4 g1h1 e6d5 f2f3 d5f3 f1f3 g4f3 h1g1 f3d5\n"
+         "ln 2 16 419 0 0 0 E e6c7 f5f6 h6f6 h5f6 c8e6 f2f4 e6c4 f1c1 b7b5 f4f5 a5a4 g4g5 h8h4 h2h3 a4a3 g5g6 c7d5 f6g4 h4h3\n"
+         "ln 3 16 408 0 0 0 E e6g5 e5e6 c8e6 f5c5 e7d8 d2b2 g5f3 g1g2 f3h4 g2g1 h8h7 b2e2 h4f3 g1h1\n"
+         "an a1 1 0 0 16 e6g7 1\n"
+         "ln 1 16 -22 0 0 0 E e6g7 f5f6 h6f6 e5f6 e7f7 f6g7 h8h6 h2h3 c8e6 f1e1 f7g8 d2e2 e6f7 h5g3 a5a4 e2e7 b7b5 g4g5 h6h4 g5g6 f7g6 e1e6 g6f7\n"
+         "an a2 1 1 0 14 f5f6 2\n"
+         "ln 1 14 15 0 0 0 E f5f6 h6f6 e5f6 e7f7 f6g7 h8h6 f2f3 c8e6 f1e1 e6c4 h5g3 h6e6 e1b1\n"
+         "ln 2 14 -546 0 0 0 E f5f3 g7h5 g4h5 c8e6 d4d5 e6d5 d2d5 h8g8 g1h1 c6d5 f3a3 e7e8\n"
+         "an a3 1 0 0 6 h6d2 1\n"
+         "ln 1 6 516 0 0 0 E h6d2 f5f6 e7d7 f6h8 d7c7 h5g7\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Ng7 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.pin."));
+        }
+    }
+    {
+        // Lichess game: 7.Bxf6? Qxf6 Ngf3 Qxb2. The b2 pawn is free to step off the long diagonal: Qxa1
+        // Qxa1 would lose the queen. It is simply undefended, not pinned.
+        const Recorded rc = recorded(
+         "rec w c3f6 startpos ; e2e4 e7e6 d2d3 f8b4 c1d2 a7a5 d2c3 g8f6 b1d2 e8g8 a2a3 b4c5\n"
+         "tag game https://lichess.org/ocvmm68q 1295/1120 720+0 ply 13 drop 23.2\n"
+         "an a0 1 1 0 16 d3d4 3\n"
+         "ln 1 16 1 0 0 0 E d3d4 c5e7 g1f3 b7b6 f1d3 c8a6 d3a6 b8a6 e1g1 d7d5 f1e1 c7c5 d1e2 f8e8 h2h3 h7h6\n"
+         "ln 2 16 1 0 0 0 E b2b4 c5e7 g1f3 b7b5 f1e2 b8c6 e1g1 a5b4 a3b4 a8a1 d1a1 c6b4 a1b2 c7c5 d3d4 d8c7 e2b5 c8a6 b5a6 b4a6 f1a1 c5d4 c3d4\n"
+         "ln 3 16 0 0 0 0 E g1f3 c5e7 b2b4 b7b5 f1e2 b8c6 b4a5 c6a5 d1b1 c7c6 e1g1 a5b7 c3b4 d7d6 f1e1 e6e5\n"
+         "an a1 1 1 0 16 c3f6 1\n"
+         "ln 1 16 -233 0 0 0 E c3f6 d8f6 g1f3 f6b2 a1b1 b2a3 d3d4 c5e7 b1b3 a3a2 b3b1 d7d5 f1d3 b8c6\n"
+         "an a2 1 0 0 14 d8f6 2\n"
+         "ln 1 14 215 0 0 0 E d8f6 g1f3 f6b2 a1b1 b2a3 d3d4 c5e7 b1b3 a3a2 b3b1 d7d5 f1d3 a2a3 h2h4\n"
+         "ln 2 14 -92 0 0 0 E g7f6 d1h5 f6f5 e4f5 e6f5 g1e2 d7d5 d3d4 c5e7 e1c1\n"
+         "an a3 1 1 0 6 g1f3 1\n"
+         "ln 1 6 6 0 0 0 E g1f3 c5e7 b2b4 d7d5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bxf6 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.pin."));
+        }
+    }
+    {
+        // 2015 game: 27...c3? Ke2 f5 Kd3 f4 Rxc3. The pawn on c3 has nothing to take and only pushes
+        // along the file: it is attacked twice, not "pinned to your rook".
+        const Recorded rc = recorded(
+         "rec b c4c3 startpos ; e2e4 e7e5 g1f3 b8c6 b1c3 g8f6 d2d4 e5d4 f3d4 f8b4 d4c6 b7c6 f1d3 d7d5 e4d5 c6d5 d1e2 d8e7 e2e7 e8e7 h2h3 c7c6 c1e3 h8e8 e1g1 e7f8 f1e1 h7h6 e3f4 a7a5 e1e2 c8a6 e2e8 f6e8 c3a4 a6d3 c2d3 b4d6 f4d6 e8d6 a1c1 a8a6 a4c5 a6a7 c5b3 a7c7 b3a5 c6c5 b2b4 c5c4 d3c4 d5c4 g1f1\n"
+         "tag game https://lichess.org/BZi86Aao 2505/2138 600+10 ply 54 drop 0.0\n"
+         "an a0 1 0 0 16 f8e7 3\n"
+         "ln 1 16 -271 0 0 0 E f8e7 f1e2 e7e6 e2d1 h6h5 a2a4 e6d5 d1c2 d6c8 c1d1 d5e6 d1d4\n"
+         "ln 2 16 -284 0 0 0 E g7g5 a2a4 f8e7 f1e2 e7e6 e2d2 e6d5 c1d1 d5e6 d1e1 e6d5 d2c2 d6c8 e1d1 d5e6 d1d4\n"
+         "ln 3 16 -340 0 0 0 E f7f5 a2a4 f8e7 f1e2 e7e6 e2d2 e6d5 c1d1 d5e6 d2c3 d6e4 c3c2 e4d6 c2b2 g7g5 d1e1 e6d5 f2f3\n"
+         "an a1 1 0 0 16 c4c3 1\n"
+         "ln 1 16 -477 0 0 0 E c4c3 f1e2 f7f5 e2d3 f5f4 c1c3 c7d7 d3c2 d6e4 c3c8 f8e7 a5c4 d7d4 b4b5\n"
+         "an a2 1 1 0 14 f1e2 2\n"
+         "ln 1 14 457 0 0 0 E f1e2 f7f5 e2d3 f5f4 c1c3 c7c3 d3c3 d6e4 c3c4 e4f2 b4b5 f8e7 a2a4 e7d7\n"
+         "ln 2 14 196 0 0 0 E f1e1 d6b5 a2a4 b5d4 b4b5 c7c5\n"
+         "an a3 1 0 0 6 f8e7 1\n"
+         "ln 1 6 -271 0 0 0 E f8e7 f1e2 e7e6 e2d1 h6h5 a2a4 e6d5 d1c2 d6c8 c1d1 d5e6\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "c3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.pin."));
+        }
+    }
+    {
+        // Puzzle (control): 30.Rd4? Bc5 Kf1 Bxd4. The rook pinned to the king is lost: still a pin.
+        const Recorded rc = recorded(
+         "rec w d2d4 8/4bppp/4k3/4P3/pp3P2/8/PP1R2PP/6K1 w - - 1 30 ;\n"
+         "tag puzzle NNGjn 818 crushing endgame pin short\n"
+         "an a0 1 1 0 16 g1f2 3\n"
+         "ln 1 16 574 0 0 0 E g1f2 h7h6 f2f3 h6h5 f3e4 g7g6 e4d4 f7f5 e5f6 e6f6\n"
+         "ln 2 16 573 0 0 0 E g1f1 f7f5 e5f6 e7f6 f1e2 e6f5 e2f3 h7h5 g2g3 g7g6 d2d5 f5e6 d5a5 b4b3 a2b3\n"
+         "ln 3 16 572 0 0 0 E g2g3 g7g5 g1g2 g5g4 d2c2 f7f5 e5f6 e7f6 c2c4 f6e7 h2h3 h7h5 h3g4 h5g4 c4e4 e6f6\n"
+         "an a1 1 1 0 16 d2d4 1\n"
+         "ln 1 16 -650 0 0 0 E d2d4 e7c5 g1f1 c5d4 b2b3 a4b3 a2b3 e6f5 g2g3 f5e4 f1e2 h7h5 e2e1\n"
+         "an a2 1 0 0 14 e7c5 2\n"
+         "ln 1 14 650 0 0 0 E e7c5 g1f1 c5d4 b2b3 a4b3 a2b3 e6f5 g2g3 f5e4 f1e2 h7h5 e2f1 e4f3 f1e1 f3e3\n"
+         "ln 2 14 -460 0 0 0 E a4a3 d4d2 b4b3 b2a3 e7a3 a2b3 a3c1 d2d6 e6e7 g1f1\n"
+         "an a3 1 1 0 6 g1f2 1\n"
+         "ln 1 6 574 0 0 0 E g1f2 f7f5 e5f6 e7f6 f2f3 b4b3\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rd4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(hasKeyPrefix(r.script, "ex.pin."));
+        }
+    }
+    {
+        // Puzzle (rook endgame): 43...a5? Rc8+ Rf8 Rxf8+ Kxf8 Kxh7. a5 trades nothing; White forces the
+        // trade into the pawn ending: levels 3-5 never call a5 a trade.
+        const Recorded rc = recorded(
+         "rec b a7a5 6k1/p4r1p/7K/6P1/2R5/8/8/8 b - - 4 43 ;\n"
+         "tag puzzle iDYg1 1153 crushing endgame rookEndgame veryLong\n"
+         "an a0 1 0 0 16 f7f8 3\n"
+         "ln 1 16 0 0 0 0 E f7f8 c4c7 f8b8 c7g7 g8h8 g7h7 h8g8 h7g7 g8h8 g7a7 h8g8 a7g7 g8h8\n"
+         "ln 2 16 0 0 0 0 E f7f3 c4c8 g8f7 c8c7 f7g8\n"
+         "ln 3 16 -1 0 0 0 E f7f2 c4c8 g8f7 c8c7 f7g8 c7g7 g8h8 g7h7 h8g8 h7g7 g8h8 g7a7 f2f8 a7h7 h8g8 h7g7 g8h8\n"
+         "an a1 1 0 0 16 a7a5 1\n"
+         "ln 1 16 -559 0 0 0 E a7a5 c4c8 f7f8 c8f8 g8f8 h6h7 f8e7 g5g6 e7d6 g6g7 d6c5 g7g8q c5c6 h7h6 c6d6 g8c4 d6d7 h6g5 d7e7 g5f4 e7f6 c4a2\n"
+         "an a2 1 1 0 14 c4c8 2\n"
+         "ln 1 14 559 0 0 0 E c4c8 f7f8 c8f8 g8f8 h6h7 f8e7 g5g6 e7d6 g6g7 d6c5 g7g8q c5c6 h7h6 c6c5 h6g5\n"
+         "ln 2 14 6 0 0 0 E g5g6 h7g6 h6g6 f7f8 g6g5 f8b8\n"
+         "an a3 1 0 0 6 f7f8 1\n"
+         "ln 1 6 0 0 0 0 E f7f8 c4c7 f8b8 c7g7 g8h8 g7h7 h8g8\n"
+         "end\n"
+        );
+        for (int level = 3; level <= 5; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "a5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.bad_trade."));
+        }
+    }
+    {
+        // 2016 sample: 33...Rf7? Qh8+ Ke7. The king steps out of the back rank after the check: no
+        // "back-rank danger".
+        const Recorded rc = recorded(
+         "rec b e7f7 startpos ; e2e4 e7e5 f1c4 g8f6 b1c3 f8c5 h2h3 e8g8 g1e2 g8h8 d2d3 d7d6 c1e3 b7b6 e3c5 b6c5 e1g1 c8b7 f2f4 e5f4 e2f4 b8d7 f4h5 f6h5 d1h5 f7f6 f1f4 d7e5 f4h4 h7h6 a1f1 d8e7 c3d5 b7d5 c4d5 a8b8 d5b3 b8b5 c2c4 b5b3 a2b3 e5d3 h5g6 f8f7 f1a1 d3e5 g6f5 e5c6 a1a6 c6d4 f5d5 c7c6 d5h5 e7b7 a6a3 f7e7 h5g6 b7b4 h4h6 g7h6 g6h6 h8g8 h6g6 g8f8 g6f6\n"
+         "tag game https://lichess.org/X9mc6TYx 2027/1863 540+0 ply 66 lc 52?,53n,66??,73s eco C26 open Vienna_Game grp common\n"
+         "an a0 1 0 0 16 f8e8 3\n"
+         "ln 1 16 0 0 0 0 E f8e8 f6h8 e8f7 h8h7 f7f8 h7h6 f8g8 h6g6 e7g7 g6e8 g8h7 e8h5 h7g8\n"
+         "ln 2 16 0 0 0 0 E f8g8 f6g6 e7g7 g6e8 g8h7 e8h5 h7g8\n"
+         "ln 3 16 0 -7 0 0 E e7f7 f6h8 f8e7 a3a7 b4b7 a7b7 e7e6 h8e8 e6f6 b7f7 f6g6 e8g8 g6h6 f7h7\n"
+         "an a2 1 1 0 14 f6h8 2\n"
+         "ln 1 14 0 7 0 0 E f6h8 f8e7 a3a7 b4b7 a7b7 e7e6 h8e8 e6f6 b7f7 f6g6 e8g8 g6h6 f7h7\n"
+         "ln 2 14 0 0 0 0 E f6d6 f8g7 d6g3 g7h8 g3h4 h8g7 h4g3\n"
+         "an a3 1 0 0 6 f8g8 1\n"
+         "ln 1 6 0 0 0 0 E f8g8 f6g6 e7g7 g6e8 g8h7 e8h5 h7g8\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rf7 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.back_rank."));
+        }
+    }
+    {
+        // 2015 game: 28...fxe6? Rf8#. f7 is open, the king is mated on g8 by a rook it could have run
+        // from without it: no "back-rank mate" name.
+        const Recorded rc = recorded(
+         "rec b f7e6 startpos ; d2d4 g8f6 c2c4 e7e6 b1c3 f8b4 d1c2 e8g8 a2a3 b4c3 c2c3 b7b6 c1g5 c8b7 f2f3 h7h6 g5h4 d7d5 a1c1 b8d7 e2e4 c7c5 e4e5 f6e4 h4d8 e4c3 b2c3 a8d8 f1d3 a7a6 g1e2 b6b5 c4d5 c5c4 d3b1 b7d5 e1g1 d7b6 f3f4 b6a4 f4f5 e6f5 f1f5 f8e8 c1f1 d8d7 b1c2 a4b2 e2f4 d5e6 f4e6 e8e6 d4d5 e6e7 e5e6\n"
+         "tag game https://lichess.org/6g6I21fh 1411/1609 2700+45 ply 56 drop 0.0\n"
+         "an a0 1 0 0 16 d7a7 3\n"
+         "ln 1 16 -178 0 0 0 E d7a7 c2e4 b2a4 f5f3 a4c5 e4f5 f7e6 f5g6 a7a8 d5e6 a8d8 h2h4 c5e6 g6f7 g8h8 f3e3 d8d6 h4h5 d6b6 f7g6 h8g8 f1e1 b6d6 g1h2 d6b6 e3e5 b6d6 h2g3 d6c6 g6e4\n"
+         "ln 2 16 -316 0 0 0 E d7b7 c2e4 b7a7 f5f3 b2a4 e4f5 a4c5 d5d6 e7e6 f5e6 c5e6 f3e3 a7d7 f1d1 g8f8 a3a4 g7g6\n"
+         "ln 3 16 -591 0 0 0 E d7d8 f5f7 e7f7 f1f7 b2d3 f7d7 d8e8 e6e7 g8f7 d5d6 a6a5 d7d8 a5a4 c2d1 e8d8 e7d8q\n"
+         "an a1 1 0 0 16 f7e6 1\n"
+         "ln 1 16 0 -1 0 0 E f7e6 f5f8\n"
+         "an a2 1 1 0 14 f5f8 2\n"
+         "ln 1 14 0 1 0 0 E f5f8\n"
+         "ln 2 14 76 0 0 0 E d5e6 d7d8 c2e4 b2a4 f1f3 d8d1 g1f2 d1d2 f2f1 d2d8 f5f7 e7f7 f3f7 a4c3\n"
+         "an a3 1 0 0 6 d7a7 1\n"
+         "ln 1 6 -178 0 0 0 E d7a7 c2e4 b2a4 f5f3 a4c5 e4f5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "fxe6 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!namesBackRank(r.script));
+        }
+    }
+    {
+        // 2016 sample: 17.Bf5? Bh2+ Kh1 Qxf1#. The bishop on h2 shuts the king in, not its own pawns:
+        // no "back-rank mate" name.
+        const Recorded rc = recorded(
+         "rec w d3f5 startpos ; e2e4 e7e6 g1f3 d7d5 e4d5 e6d5 d2d4 g8f6 f1e2 f8d6 e1g1 h7h6 c2c4 c7c6 c4c5 d6c7 f1e1 e8g8 e2d3 c8g4 b1d2 b8d7 d1c2 f8e8 h2h3 e8e1 f3e1 d8e7 h3g4 e7e1 d2f1 f6g4\n"
+         "tag game https://lichess.org/w0FfLIwf 1961/1986 180+0 ply 33 lc 25s,29?!,33??,34n eco C00 open French_Defense grp common\n"
+         "an a0 1 1 0 16 a1b1 3\n"
+         "ln 1 16 -157 0 0 0 E a1b1 d7f8 g2g3 e1e7 c2e2 e7e2 d3e2 g4f6 c1e3 f8e6 b2b4 a7a6 a2a4 g7g6 f1d2 h6h5 d2b3 f6e4 e2d3 e4c3\n"
+         "ln 2 16 -172 0 0 0 E g2g3 d7f8 b2b4 h6h5 f2f3 g4f6 c1d2 e1e8 a1e1 e8d8 e1e2\n"
+         "ln 3 16 -182 0 0 0 E c2e2 e1e2 d3e2 h6h5 f1e3 g4e3 c1e3 g7g6 a2a4 d7f8 b2b4 a7a6 a1b1 f8e6 g2g3 f7f5\n"
+         "an a1 1 1 0 16 d3f5 1\n"
+         "ln 1 16 0 -2 0 0 E d3f5 c7h2 g1h1 e1f1\n"
+         "an a2 1 0 0 14 c7h2 2\n"
+         "ln 1 14 0 2 0 0 E c7h2 g1h1 e1f1\n"
+         "ln 2 14 256 0 0 0 E g4h2 f5d3 h2f1 d3f1 d7f6 a1b1 c7h2 g1h2 e1f1 c1f4 f1c4 c2c4 d5c4\n"
+         "an a3 1 1 0 6 a1b1 1\n"
+         "ln 1 6 -151 0 0 0 E a1b1 d7f8 f2f3 g4f6 c1e3 e1h4 c2f2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bf5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!namesBackRank(r.script));
+        }
+    }
+    {
+        // Puzzle (control): 25.Rxe2? Rxc1+ Re1 Rxe1#. The king on g1 behind its own f2, g2 and h2
+        // pawns: a back-rank mate, named at level 2.
+        const Recorded rc = recorded(
+         "rec w e1e2 6k1/1p4pp/pb3p2/4p3/1P2N3/P3P3/2r1nPPP/2B1R1K1 w - - 7 25 ;\n"
+         "tag puzzle c5cSB 836 backRankMate endgame hangingPiece mate mateIn2 short\n"
+         "an a0 1 1 0 16 g1f1 3\n"
+         "ln 1 16 -557 0 0 0 E g1f1 e2c1 g2g4 c1a2 e1d1 a2c3 e4c3 c2c3 a3a4 b6c7 e3e4 b7b5 a4a5 c3c4 d1d7 g8f8 g4g5 f6g5 f1g2\n"
+         "ln 2 16 -656 0 0 0 E g1h1 e2c1 e1d1 f6f5 d1d2 c2d2 e4d2 c1d3 h1g1 e5e4 g1f1 b6c7 f2f3 d3e5\n"
+         "ln 3 16 0 -2 0 0 E e1e2 c2c1 e2e1 c1e1\n"
+         "an a2 1 0 0 14 c2c1 2\n"
+         "ln 1 14 0 2 0 0 E c2c1 e2e1 c1e1\n"
+         "ln 2 14 43 0 0 0 E c2e2 c1d2 b6d4 a3a4 d4b2 g1f1 e2d2 e4d2\n"
+         "an a3 1 1 0 6 g1f1 1\n"
+         "ln 1 6 -557 0 0 0 E g1f1 e2c1 g2g4 c1a2 e1d1 a2c3\n"
+         "end\n"
+        );
+        for (int level = 2; level <= 2; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rxe2 b%d", level);
+            checkScript(r.script, where);
+            CHECK(namesBackRank(r.script));
+        }
+    }
+    {
+        // Lichess game: 8.Bg3? Qb6 Nbd2 Qxb2. The b2 pawn only pushes along the file, with nothing to
+        // take: it is undefended, not pinned to the knight. The loss is said with its line, so the
+        // take-back answer after it ("exd6 fails to Qxc3") follows moves said.
+        const Recorded rc = recorded(
+         "rec w f4g3 startpos ; c2c3 c7c6 e2e4 g7g6 d2d4 a7a5 g1f3 a5a4 e4e5 d7d6 c1f4 c8f5 h2h3 f8h6\n"
+         "an a0 1 1 0 16 f4h6 3\n"
+         "ln 1 16 99 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1c4 b8d7 e1g1 d6d5 c4e2 e7e6 c1e3 h7h6 g2g4 f5e4 b1d2 g8e7\n"
+         "ln 2 16 8 0 0 0 E f4h2 d6e5 f3e5 b8d7 e5g4 h6g7 b1a3 f5g4 h3g4 h7h5 g4h5 h8h5 f1e2 h5h8\n"
+         "ln 3 16 8 0 0 0 E f4d2 d6e5 d4e5 f5e4 f1c4 e4f3 d1f3 e7e6 f3e2\n"
+         "an a1 1 1 0 16 f4g3 1\n"
+         "ln 1 16 -44 0 0 0 E f4g3 d8b6 b1d2 b6b2 a1c1 d6d5 g3h4 h6d2 d1d2 a4a3 f1e2 b8d7 e1g1 b2d2 f3d2 h7h5 c3c4 d5c4 d2c4 f5e6 f1e1\n"
+         "an a2 1 0 0 14 d8b6 2\n"
+         "ln 1 14 28 0 0 0 E d8b6 b1d2 b6b2 f1e2 d6d5 a1c1 b2a2 e1g1 a2b2 e5e6 g8f6 e6f7 e8f7 g3h2\n"
+         "ln 2 14 -5 0 0 0 E d6e5 f3e5 g8f6 f1d3 f5e6 e1g1 b8d7\n"
+         "an a3 1 1 0 6 f4h6 1\n"
+         "ln 1 6 53 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1e2 d6e5 f3e5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bg3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.pin."));
+            if (hasKeyPrefix(r.script, "ex.retake")) CHECK(hasKeyPrefix(r.script, "ex.material."));
+        }
+    }
+}
+
+// Praise that speaks of an exchange stands on legal captures: a piece "saved" could have been won
+// where it stood (a pinned attacker or a defender behind the attacker says otherwise), and a
+// "good trade" is one the coach can legally take back.
+TEST(coach_review_praise_needs_legal_captures) {
+    {
+        // 2016 sample: 24.Nfg5. The rook on f8 that "attacks" the knight on f3 is pinned to its king by
+        // the rook on c8: the knight was never in danger, so nothing was saved.
+        const Recorded rc = recorded(
+         "rec w f3g5 startpos ; d2d4 e7e6 c2c4 g8f6 g1f3 c7c5 d4d5 e6d5 c4d5 d8a5 c1d2 a5b6 b1c3 b6b2 c3a4 b2a3 e2e4 f6e4 d2c1 a3b4 c1d2 e4d2 f3d2 b4d4 a1c1 d4d5 f1c4 d5g2 d1e2 f8e7 h1f1 g2g5 a4c5 e8g8 c5e4 g5e5 d2f3 e7b4 e1d1 e5a5 c4f7 f8f7 c1c8 f7f8 e2c4 g8h8\n"
+         "tag game https://lichess.org/CP95gCsl 1750/1830 1200+8 ply 47 lc 14??,22s,47?!,48n eco E10 open Blumenfeld_Countergambit_#2 grp exotic\n"
+         "an a0 1 1 0 16 e4g5 3\n"
+         "ln 1 16 0 0 0 0 E e4g5 g7g6 c4d4 h8g8 c8f8 b4f8 d4c4 g8h8 c4d4\n"
+         "ln 2 16 0 0 0 0 E c8f8 b4f8 f3g5 h7h6 f1g1 a5f5 g5f7 h8h7 e4g5 h6g5 g1g5 f5h3 g5e5 d7d5 c4d5 h3f1 e5e1 f1f2 f7g5 h7h6 g5f7\n"
+         "ln 3 16 0 0 0 0 E f3g5 h7h6 c8f8 b4f8 f1g1 a5f5 g5f7 h8h7 e4g5 h6g5 g1g5 f5h3 g5e5 d7d5 c4d5 h3f1 e5e1 f1f2 f7g5 h7h6 g5f7 h6h7\n"
+         "an a2 1 0 0 14 h7h6 2\n"
+         "ln 1 14 0 0 0 0 E h7h6 c8f8 b4f8 f1g1 a5f5 g5f7 h8h7 e4g5 h6g5 g1g5 f5h3 g5e5 f8e7\n"
+         "ln 2 14 -38 0 0 0 E d7d5 c8f8 b4f8 g5f7 h8g8 f7h6 g7h6 e4f6 g8f7 f6d5 a5c5 c4f4 f7e6 d5c7 e6d7 c7a8 f8d6 f4g4 d7d8\n"
+         "an a3 1 1 0 6 e4g5 1\n"
+         "ln 1 6 0 0 0 0 E e4g5 g7g6 c4d4 h8g8 d4c4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 1; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nfg5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKey(r.script, "praise.saved.b1"));
+        }
+    }
+    {
+        // Self-play: 74.Bc4. Rf3xf1 would meet Rxf1 through f3: the bishop on f1 was defended from
+        // behind the attacker and lost nothing where it stood, so nothing was saved.
+        const Recorded rc = recorded(
+         "rec w f1c4 startpos ; c2c3 c7c6 d2d4 d7d5 d1c2 d8c7 g2g3 e7e6 f1g2 f8d6 g1f3 g8f6 e1g1 h7h6 b2b3 b8d7 b1d2 b7b6 c3c4 e8g8 f1d1 f8d8 e2e3 a7a5 c1b2 c8a6 e3e4 d6e7 c4d5 d7f8 d5c6 a5a4 a2a3 a4b3 c2c3 a6b5 f3e5 e7d6 d2c4 d6e5 c4e5 f6d7 a3a4 b5e2 d1d2 d7e5 d2e2 c7c6 c3b3 c6c4 b3b5 a8a4 b5c4 a4a1 c4c1 a1c1 b2c1 d8c8 c1b2 e5d7 g1f1 g7g5 f1e1 b6b5 g2f1 d7b6 f2f3 b5b4 e2e3 b6a4 f1e2 a4b2 e3b3 b2a4 e2b5 c8a8 b5c6 a8a6 c6b5 a6a5 b5e8 a4b6 b3b4 a5a6 e1e2 a6a2 e2e3 a2a3 e3e2 f8d7 e8d7 a3a2 e2f1 a2a6 d7c6 g8g7 f3f4 a6a1 f1g2 b6c8 b4a4 a1b1 d4d5 b1b2 g2h1 b2c2 a4a8 c2c1 h1g2 c8e7 c6d7 e6d5 a8e8 e7g8 e8c8 c1b1 e4d5 b1b2 g2f3 b2h2 d5d6 g8f6 d7b5 h2d2 c8c6 d2b2 c6c5 b2d2 g3g4 g5f4 f3f4 d2d6 c5c4 d6d3 b5c6 h6h5 f4g5 d3h3 c6g2 h3b3 g2f1 b3g3 c4d4 h5g4 d4f4 g3f3\n"
+         "an a0 1 1 0 16 f4f3 3\n"
+         "ln 1 16 1 0 0 0 E f4f3 g4f3 g5f4 f3f2 f4f3 f6d5 f3f2 f7f5 f2f3 g7f6 f1e2 f6g5 e2f1\n"
+         "ln 2 16 -5 0 0 0 E f1a6 f3a3 f4f6 a3a5 f6f5 a5a6 g5g4 a6g6 g4h5 g6h6 h5g4 h6d6 f5f4\n"
+         "ln 3 16 -11 0 0 0 E f1e2 f3e3 e2g4 e3g3 f4f6 g3g4 g5g4 g7f6 g4f4 f6e6 f4e4 f7f6 e4f4 f6f5 f4e3 e6e5 e3f3 f5f4 f3f2\n"
+         "an a1 1 1 0 16 f1c4 1\n"
+         "ln 1 16 -15 0 0 0 E f1c4 f3c3 f4f6 c3c4 f6f2 g4g3 f2g2 c4c6 g2g3 c6g6 g5f4 g6g3 f4g3 g7f6 g3f4 f6e6 f4e4 f7f6 e4f4 f6f5 f4e3 e6e5 e3f3 f5f4 f3f2 e5e4 f2e2\n"
+         "an a2 1 0 0 14 f3c3 2\n"
+         "ln 1 14 15 0 0 0 E f3c3 f4f6 c3c4 f6f2 g4g3 f2g2 c4c6 g2g3 c6g6 g5h4 g6g3 h4g3 g7f6 g3f4 f6e6 f4e4\n"
+         "ln 2 14 1 0 0 0 E f3f4 g5f4 g7g6 c4e2 g6h6 f4f5 g4g3 e2f3 f6h5 f3g2 h5g7 f5f4 f7f5 f4g3 g7e6 g2f1 f5f4 g3g4\n"
+         "an a3 1 1 0 6 f4f3 1\n"
+         "ln 1 6 1 0 0 0 E f4f3 g4f3 g5f4 f3f2 f4f3 f6d5 f3f2\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 1; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bc4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKey(r.script, "praise.saved.b1"));
+        }
+    }
+    {
+        // Self-play: 33.Rxf6 cxd4 Qxd7#. The knight on d7 that would take back is pinned by the queen on
+        // b7, and e5 guards f6 from the king: nothing takes back, no "good trade".
+        const Recorded rc = recorded(
+         "rec w g6f6 startpos ; e2e4 c7c6 g1f3 g8f6 d2d3 h7h6 e4e5 f6h7 d3d4 a7a6 b1c3 d8c7 c1e3 d7d5 a2a3 c8f5 f3h4 e7e6 a1c1 c7d8 h4f5 d8b6 f5d6 e8e7 f1c4 b6b2 d1d2 g7g6 c4e2 b2c3 e3g5 f7f6 d2c3 h8g8 g5f4 f6f5 d6c8 e7d7 c8b6 d7e7 b6a8 g6g5 c3b4 e7d8 b4b6 d8e7 f4g5 h7g5 h1g1 b8d7 b6b7 g5e4 e2d3 g8g2 g1g2 a6a5 c1a1 f5f4 a3a4 f4f3 g2g6 c6c5 d3b5 e4f6\n"
+         "an a0 1 1 0 16 g6f6 3\n"
+         "ln 1 16 0 2 0 0 E g6f6 c5d4 b7d7\n"
+         "ln 2 16 0 6 0 0 E d4c5 e7f7 g6f6 f7g8 b7d7 h6h5 d7f7 g8h8 f7f8 h8h7 b5d3\n"
+         "ln 3 16 0 6 0 0 E b7a7 e7f7 g6f6 f7g8 a7d7 h6h5 f6g6 g8h8 d7f7 c5d4 f7g8\n"
+         "an a2 1 0 0 14 c5c4 2\n"
+         "ln 1 14 0 -1 0 0 E c5c4 b7d7\n"
+         "ln 2 14 0 -1 0 0 E h6h5 b7d7\n"
+         "an a3 1 1 0 6 g6f6 1\n"
+         "ln 1 6 0 2 0 0 E g6f6 c5d4 b7d7\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 3; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rxf6 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "praise.trade"));
+        }
+    }
+}
+
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
     // better move, never the move itself while the takeback is offered.
@@ -3054,23 +3844,6 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 -488 0 0 0 E g6h7 g2h1 a7a8 f4h3 a8h8 f1g1\n"
          "end\n",
          ExType::Material, ExType::Discovered, 0},
-        // 8.Bg3? Qb6 Nbd2 Qxb2: a mistake said in words ("I win your pawn"); "if you take back with
-        // exd6, Qxc3 takes your pawn" would stand after moves never said.
-        {"g_1041_7",
-         "rec w f4g3 startpos ; c2c3 c7c6 e2e4 g7g6 d2d4 a7a5 g1f3 a5a4 e4e5 d7d6 c1f4 c8f5 h2h3 f8h6\n"
-         "an a0 1 1 0 16 f4h6 3\n"
-         "ln 1 16 99 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1c4 b8d7 e1g1 d6d5 c4e2 e7e6 c1e3 h7h6 g2g4 f5e4 b1d2 g8e7\n"
-         "ln 2 16 8 0 0 0 E f4h2 d6e5 f3e5 b8d7 e5g4 h6g7 b1a3 f5g4 h3g4 h7h5 g4h5 h8h5 f1e2 h5h8\n"
-         "ln 3 16 8 0 0 0 E f4d2 d6e5 d4e5 f5e4 f1c4 e4f3 d1f3 e7e6 f3e2\n"
-         "an a1 1 1 0 16 f4g3 1\n"
-         "ln 1 16 -44 0 0 0 E f4g3 d8b6 b1d2 b6b2 a1c1 d6d5 g3h4 h6d2 d1d2 a4a3 f1e2 b8d7 e1g1 b2d2 f3d2 h7h5 c3c4 d5c4 d2c4 f5e6 f1e1\n"
-         "an a2 1 0 0 14 d8b6 2\n"
-         "ln 1 14 28 0 0 0 E d8b6 b1d2 b6b2 f1e2 d6d5 a1c1 b2a2 e1g1 a2b2 e5e6 g8f6 e6f7 e8f7 g3h2\n"
-         "ln 2 14 -5 0 0 0 E d6e5 f3e5 g8f6 f1d3 f5e6 e1g1 b8d7\n"
-         "an a3 1 1 0 6 f4h6 1\n"
-         "ln 1 6 53 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1e2 d6e5 f3e5\n"
-         "end\n",
-         ExType::Pin, ExType::None, 0},
         // 26...Kg8? Rxf4 Nxf4 Rxd8+ Rxd8: the rook takes the queen however it is defended; the check
         // on the back rank is not why.
         {"g_1041_189",

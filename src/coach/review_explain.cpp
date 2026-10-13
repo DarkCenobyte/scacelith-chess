@@ -799,6 +799,16 @@ bool discovered(const Ctx& c, Explanation& out) {
     return false;
 }
 
+// Whether the coach's piece on 'sq' after r[0] stays there, not taken, through ply 'at' of r.
+bool standsUntil(const Ctx& c, Square sq, int at) {
+    for (int j = 1; j < at && j < int(c.r.size()); ++j) {
+        const LineStep& st = c.r[size_t(j)];
+        if (st.mover == c.coach && st.move.from == sq) return false;
+        if (st.mover == c.human && st.move.to == sq) return false;
+    }
+    return true;
+}
+
 // ---- 6. Skewer ----
 bool skewer(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
@@ -809,6 +819,10 @@ bool skewer(const Ctx& c, Explanation& out) {
         if (sk.attacker != r0.move.to) continue;
         const int at = coachTakesAt(c, sk.behind, motifReach(c));
         if (at < 0 || !stays(c, sk.behind, 1, at)) continue;
+        // "When it moves, I take {t2} behind it": the skewering piece itself takes, standing on its
+        // square until then. Taken first (Bg4+ Kxg4 Qxe2+), or another piece taking (Rd7+ Kc5 Nxd4),
+        // the line wins by something else.
+        if (!standsUntil(c, r0.move.to, at) || c.r[size_t(at)].move.from != r0.move.to) continue;
         Explanation ex;
         if (!settleLoss(c, at, 1, ex, true)) continue;
         ex.type = ExType::Skewer;
@@ -831,6 +845,42 @@ bool skewer(const Ctx& c, Explanation& out) {
     return false;
 }
 
+// Whether a pin holds something back in 'p' (the pinned side to move): the pinned piece has
+// somewhere to go off the line, the pin set aside (a pawn on a file with nothing to take only
+// pushes along it: not stuck), and below a king the pin bites, some step off the line letting the
+// pinner win material taking the piece behind (a queen taking a rook the queen guards wins nothing).
+bool pinHolds(const Position& p, const Pin& pn) {
+    const uint64_t line = squaresBetween(pn.pinner, pn.behind) | squareBit(pn.pinner);
+    const Piece pc = p.at(pn.pinned);
+    uint64_t to = p.attacksFrom(pn.pinned) & ~p.pieces(pc.color);
+    if (pc.type == Pawn) {
+        to = p.attacksFrom(pn.pinned) & p.pieces(opposite(pc.color));
+        const int r = rankOf(pn.pinned) + (pc.color == White ? 1 : -1);
+        if (r >= 0 && r < 8 && p.at(makeSquare(fileOf(pn.pinned), r)).empty()) to |= squareBit(makeSquare(fileOf(pn.pinned), r));
+    }
+    if (!(to & ~line)) return false;
+    if (pn.absolute) return true;
+    for (const Move& m : p.legalMovesFrom(pn.pinned)) {
+        if (hasBit(line, m.to)) continue;
+        Position q = p;
+        q.makeMove(m);
+        const Move take = q.findLegal(pn.pinner, pn.behind, Queen);
+        if (take.valid() && seePoints(q, take) >= 1) return true;
+    }
+    return false;
+}
+
+// Whether the pinner (on 'sq' after r[0], followed as it moves) is still on the board when ply
+// 'at' of r wins the pinned piece: taken first (Qf6+ Qxf6 exf6+ Kf7 fxg7), the pin did not win it.
+bool pinnerLives(const Ctx& c, Square sq, int at) {
+    for (int j = 1; j < at && j < int(c.r.size()); ++j) {
+        const LineStep& st = c.r[size_t(j)];
+        if (st.mover == c.coach && st.move.from == sq) sq = st.move.to;
+        else if (st.mover == c.human && st.move.to == sq && st.captured != NoPiece) return false;
+    }
+    return true;
+}
+
 // ---- 7. Pin ----
 bool pin(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
@@ -850,6 +900,7 @@ bool pin(const Ctx& c, Explanation& out) {
         if (!fresh && pn.pinner != r0.move.to && (c.level == 1 || c.level >= 4)) continue;
         const int at = coachTakesAt(c, pn.pinned, reach);
         if (at < 0 || !stays(c, pn.pinned, 1, at)) continue;
+        if (!pinHolds(p2, pn) || !pinnerLives(c, pn.pinner, at)) continue;
         Explanation ex;
         if (!settleLoss(c, at, 1, ex, true)) continue;
         ex.type = ExType::Pin;
@@ -985,6 +1036,14 @@ bool backRank(const Ctx& c, Explanation& out) {
         // The king still has no air when the check comes: one that stepped where it has some
         // ("h3? Rxa6 Kd8 Ra8+ Ke7 Rxg8") loses to a skewer, not to its back rank.
         if (i > 0 && !backRankWeak(afterR(c, i), c.human)) continue;
+        // Nor when the check itself opens a way out: the checker was what covered the king's squares
+        // ("Qh8+ Ke7", the queen gone from f6): the king leaves its first rank, and what the line wins
+        // then comes another way.
+        const Position checked = afterR(c, i + 1);
+        bool escapes = rankOf(checked.kingSquare(c.human)) != home;
+        for (const Move& m : checked.legalMovesFrom(checked.kingSquare(c.human)))
+            if (rankOf(m.to) != home) escapes = true;
+        if (escapes) continue;
         // The lines say the check wins material: the line wins it, for good, after the check.
         Explanation ex;
         bool won = false;
@@ -1348,9 +1407,14 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         if (rankOf(pawn) == (c.coach == White ? 1 : 6)) pawnSteps -= 1;   // the double step saves a move
         if (kingSteps <= pawnSteps) continue;
         // Nor when another piece of the human's guards the square: the new queen is taken there
-        // ("d8=Q Rxd8"), and the king is not why the pawn goes through.
+        // ("d8=Q Rxd8"), and the king is not why the pawn goes through. Looked at once the pawn has
+        // queened, since the pawn on the seventh rank hides a rook behind it on the file (c1=Q Rxc1),
+        // and never when the line takes the new piece at once.
         const Position before = afterR(c, i);
+        const Position queened = afterR(c, i + 1);
         if (before.attackersTo(prom, c.human) & ~before.pieces(c.human, King)) continue;
+        if (queened.attackersTo(prom, c.human) & ~queened.pieces(c.human, King)) continue;
+        if (i + 1 < int(c.r.size()) && c.r[size_t(i + 1)].mover == c.human && c.r[size_t(i + 1)].move.to == prom) continue;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.concrete = true;
@@ -1361,6 +1425,7 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         put(b.line, "my", pieceArg(c.p1, pawn, c.human));
         put(b.line, "n", Arg::ofNumber(pawnSteps));
         put(b.line, "n2", Arg::ofNumber(kingSteps));
+        put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(i + 1))));   // said up to the queening
         traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke from the pawn to the square
         pointPiece(b, hk, "your");
         ex.includesBest = c.level == 6;
@@ -1376,6 +1441,20 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         if (c.f.piece == Pawn &&
             (c.played.from == pawnOrigin(c.best, i) || fileOf(c.played.from) == fileOf(st.move.to)))
             return false;
+        // The lines say the pawn queens: the new piece stays (b8=Q Rxb8 Bxb8 wins the rook by a
+        // deflection, a1=R Rxa1 nothing; neither is a pawn that runs).
+        if (i + 1 < int(c.best.size()) && c.best[size_t(i + 1)].mover == c.coach && c.best[size_t(i + 1)].move.to == st.move.to)
+            continue;
+        // Nor is it missed when the move played queens there as soon and keeps the piece (Rc2+ Rxc2
+        // f1=Q where Re1 Rc2 Re2 Rxe2 f1=Q comes later).
+        bool queensToo = false;
+        for (int j = 0; j <= i && j < int(c.playedLine.size()); ++j) {
+            const LineStep& q = c.playedLine[size_t(j)];
+            if (q.mover == c.human && q.promotion != NoPiece && q.move.to == st.move.to &&
+                !(j + 1 < int(c.playedLine.size()) && c.playedLine[size_t(j + 1)].move.to == q.move.to))
+                queensToo = true;
+        }
+        if (queensToo) return false;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.missed = true;
@@ -1476,7 +1555,11 @@ bool badTrade(const Ctx& c, Explanation& out) {
                 plies = i + 1;
             }
         }
-        if (pawnEnding) {
+        // Levels 3-5 call the move a trade ("This trade leads to...", "Wrong trade"): it captures, or
+        // the reply takes it where it landed. Kf3 Rd3+ Kf2 Rxg3 Kxg3 is my trade, forced, not yours.
+        const bool trades = c.f.captured != NoPiece ||
+                            (!c.r.empty() && c.r[0].move.to == c.played.to && c.r[0].captured != NoPiece);
+        if (pawnEnding && (trades || c.level >= 6)) {
             Explanation ex;
             ex.type = ExType::BadTrade;
             ex.concrete = true;
@@ -1536,7 +1619,10 @@ bool endgame(const Ctx& c, Explanation& out) {
         auto centre = [](Square s) {
             return std::max(std::abs(2 * fileOf(s) - 7), std::abs(2 * rankOf(s) - 7));
         };
-        if (centre(b0.move.to) < centre(b0.move.from)) family = "ex.king_active";
+        // The lines say "forward": a step toward my side of the board, not back nor sideways (Kb3
+        // from a4 is nearer the middle, and a step back).
+        const bool forward = c.human == White ? rankOf(b0.move.to) > rankOf(b0.move.from) : rankOf(b0.move.to) < rankOf(b0.move.from);
+        if (forward && centre(b0.move.to) < centre(b0.move.from)) family = "ex.king_active";
     }
     if (family.empty()) return false;
     // A level-5 sentence names the line; when only the move itself can be followed, level 4's.
