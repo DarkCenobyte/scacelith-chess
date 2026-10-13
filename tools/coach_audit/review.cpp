@@ -118,11 +118,13 @@ int lastingLoss(const std::vector<LineStep>& line, const Position& start, Color 
     return worst;
 }
 
-// What the human is down where a line ends: the worse of its last two plies (a capture the line
-// stops on before the take-back counts as not made yet).
+// What the human is down where a line ends: with the human to move, what the human takes at once
+// taken off (lossAt); else the worse of the last two plies (the human's capture the line stops on
+// counts as not made, the take-back not shown).
 int endLoss(const std::vector<LineStep>& line, const Position& start, Color human, int base) {
     if (line.empty()) return 0;
-    return std::max(lossAt(line, start, human, base, line.size() - 1), lossAt(line, start, human, base, line.size()));
+    const int atEnd = lossAt(line, start, human, base, line.size());
+    return line.back().mover != human ? atEnd : std::max(atEnd, lossAt(line, start, human, base, line.size() - 1));
 }
 
 // The points of the human's piece that stands on 'onP0' before the move that the best line gives up

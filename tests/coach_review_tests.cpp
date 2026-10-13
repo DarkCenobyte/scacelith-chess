@@ -1535,6 +1535,38 @@ TEST(coach_review_bad_move_series_cases) {
             CHECK(!hasKeyPrefix(r.script, "ex.positional"));
         }
     }
+    {
+        // 16...Bb7? Rxg4: the pawn falls after 16...Nb4 too (... Rxg4 e5 Kc3 exd4 exd4 Rxd4 Rxd4
+        // Bxd4 Kxd4, the exchange on d4 read where it ends): never "I can win your pawn" as the
+        // reason, at any level.
+        const Recorded rc = recorded(
+         "rec b c6b7 startpos ; c2c4 g8f6 b1c3 d7d5 d1a4 c8d7 a4b3 d5d4 c3d5 e7e6 d5f6 d8f6 b3b7 d7c6 b7c7 g7g5 c7c8 f6d8 c8d8 e8d8 h2h4 g5g4 e2e3 f8g7 h4h5 d4e3 d2e3 b8a6 h5h6 g7e5 h1h4\n"
+         "an a0 1 0 0 16 a6b4 3\n"
+         "ln 1 16 -60 0 0 0 E a6b4 e1d2 d8e7 g1e2 a8d8 e2d4 e5f6 h4g4 e6e5 d2c3 e5d4 e3d4 d8d4 g4d4 f6d4 c3d4 b4c2 d4d3\n"
+         "ln 2 16 -65 0 0 0 E f7f5 g1e2 a6b4 e1d2 e5f6 h4h1 c6e4 e2d4 d8e7 f2f3 e4b7 d2e2 h8d8 f3g4 f5g4 c1d2 b4c6 d2c3 c6d4 e3d4 f6d4 h1h4 d4c3\n"
+         "ln 3 16 -69 0 0 0 E h8g8 g1e2 a6b4 e1d2 c6e4 e2d4 e5d4 e3d4 b4c2 a1b1 c2a3 b2a3 e4b1 d2c3 a8b8 c1f4\n"
+         "an a1 1 0 0 16 c6b7 1\n"
+         "ln 1 16 -239 0 0 0 E c6b7 h4g4 a6b4 e1e2 f7f5 g4d4 d8e7 d4d2 e5f6 g1f3 a7a5 f3d4 a5a4 f2f3 h8g8 e2f2 g8g6 f2g1 g6h6 a2a3\n"
+         "an a2 1 1 0 14 h4g4 2\n"
+         "ln 1 14 234 0 0 0 E h4g4 a6b4 e1e2 f7f5 g4d4 e5d4 e3d4 h8g8 c1d2 b4c2 d2a5 d8e7 a1d1 a8c8\n"
+         "ln 2 14 210 0 0 0 E c1d2 f7f5 a1d1 d8e7 g1e2 a6c5 d2b4 h8c8 e2c1 e7f6 b4c5 c8c5 c1d3 c5c7 d3e5 f6e5 b2b4 b7e4 h4h5 a8b8 b4b5 e5f6 d1d4\n"
+         "an a3 1 0 0 6 a6b4 1\n"
+         "ln 1 6 -60 0 0 0 E a6b4 e1d2 d8e7 g1e2 a8d8 e2d4\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bb7 b%d", level);
+            checkScript(r.script, where);
+            for (const Beat& b : r.script) {
+                if (startsWith(b.line.key, "ex.hint.") || startsWith(b.line.key, "ex.reveal.") ||
+                    startsWith(b.line.key, "ex.better."))
+                    continue;
+                for (const auto& a : b.line.args) CHECK(!(a.second.kind == Arg::Kind::Piece && a.second.square == sq("g4")));
+            }
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

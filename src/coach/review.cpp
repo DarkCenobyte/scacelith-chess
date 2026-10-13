@@ -864,12 +864,13 @@ Review Reviewer::review(const ReviewInput& in) {
             break;
         }
     c.loss = c.lossWithin(bd.lookahead);
-    // What the human is down after the first j plies of a line from p0, read where it settles: the
-    // human's capture the coach takes back on the next ply is a whole exchange, and where the line
+    // What the human is down after the first j plies of a line from p0, read where it settles: a
+    // capture taken back on the next ply is a whole exchange, and so are the captures on that square
+    // that follow at once (exd4 exd4 Rxd4 Rxd4 Bxd4 Kxd4: read where it ends), and where the line
     // stops, the human to move takes back what it can at once.
     const auto settled = [&](const std::vector<LineStep>& line, const Position& end, size_t j) {
-        if (j < line.size() && line[j - 1].mover == human_ && line[j - 1].captured != NoPiece &&
-            line[j].mover != human_ && line[j].captured != NoPiece && line[j].move.to == line[j - 1].move.to)
+        while (j < line.size() && line[j - 1].captured != NoPiece && line[j].captured != NoPiece &&
+               line[j].move.to == line[j - 1].move.to)
             ++j;
         int l = c.base - line[j - 1].balance;
         if (j == line.size() && end.sideToMove() == human_ && end.hasLegalMove()) l -= bestCapturePoints(end, human_);
