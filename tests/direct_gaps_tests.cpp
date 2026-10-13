@@ -482,6 +482,8 @@ TEST(direct_gaps_host_four_handshakes_at_a_time) {
     CHECK(fifth.waitClosed(3000));
     for (auto& c : silent) CHECK(!c->waitClosed(1));
     silent.clear();
+    // Once the host has seen them go (no handshake left), the guest gets in.
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
     guest.dm.join("127.0.0.1", inv.port, inv.code, "Bob");
     CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) == 1 && guest.count(Event::Kind::GameSnapshot) == 1; }));
 }
