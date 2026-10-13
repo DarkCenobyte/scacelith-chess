@@ -50,8 +50,8 @@ std::vector<std::string> parityProblems(const Catalog& c, const std::string& lan
         std::vector<std::string> enKeys = c.keys("en", topic), keys = c.keys(lang, topic);
         std::set<std::string> have(keys.begin(), keys.end());
         std::set<std::string> want;
-        for (auto& k : enKeys)
-            if (topic == "common" || !endsWith(k, ".spoken")) want.insert(k);
+        for (auto& k : enKeys)   // respell.* lists are each language's own words
+            if (!startsWith(k, "respell.") && (topic == "common" || !endsWith(k, ".spoken"))) want.insert(k);
         for (auto& k : want) {
             if (!have.count(k)) { out.push_back(lang + "/" + topic + ": missing " + k); continue; }
             const std::string* ev = c.find("en", k);

@@ -83,6 +83,12 @@ move.mate.spoken = {move}, checkmate
 # Two moves of a line: {a} = the moves so far, {b} = the next one.
 moves.join.spoken = {a}, {b}
 
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). "en passant" is said
+# the French way, as dictionaries give it ("ahn pa-SAHN"); as written the voice says "in passant".
+respell.en = ahn
+respell.passant = pahssahn
+
 # ---- Numbers -------------------------------------------------------------------------------------
 # Written numbers are digits. The voice reads number words: number.<n>.spoken for any n you need
 # (a missing one is composed: number.tens for 21-99, number.hundreds and number.hundreds_rest for
