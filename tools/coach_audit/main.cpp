@@ -35,6 +35,8 @@ int main(int argc, char** argv) {
             o.bands.push_back({lo, std::atof(next().c_str())});
         }
         else if (a == "--stop") o.stop = next();
+        else if (a == "--puzzles") o.puzzles.push_back(next());
+        else if (a == "--min-drop") o.minDrop = std::atof(next().c_str());
         else if (a == "--verify") o.verify = std::atoi(next().c_str());
         else if (a == "--cache") o.cache = next();
         else {

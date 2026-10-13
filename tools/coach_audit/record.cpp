@@ -110,6 +110,33 @@ Move badMove(ai::Engine& e, const Game& g, std::mt19937& rng, const std::vector<
     return picks.empty() ? Move{} : picks[rng() % picks.size()];
 }
 
+// The side to move's win percentage in the position after the game's moves, at depth 10 (-1 when
+// the search fails; 0 or 100 when the game is over).
+double winAt(ai::Engine& e, const Game& g) {
+    if (g.position().isCheckmate()) return 0.0;
+    if (g.isOver()) return 50.0;
+    ai::AnalysisRequest r;
+    const Position& s = g.startPosition();
+    r.startFen = s.isStandardStart() ? std::string() : s.fen();
+    r.moves = g.uciMoves();
+    r.multiPV = 1;
+    r.depth = 10;
+    const ai::Analysis a = analyse(e, r);
+    return a.ok && !a.lines.empty() ? coach::winPercent(a.lines[0].score) : -1.0;
+}
+
+// One field of a comma-separated line (no quoting in the puzzle CSV).
+std::string csvField(const std::string& line, int n) {
+    size_t at = 0;
+    for (int i = 0; i < n; ++i) {
+        at = line.find(',', at);
+        if (at == std::string::npos) return std::string();
+        ++at;
+    }
+    const size_t end = line.find(',', at);
+    return line.substr(at, end == std::string::npos ? std::string::npos : end - at);
+}
+
 ai::EngineSettings humanSettings(std::mt19937& rng) {
     ai::EngineSettings s;
     s.humanize = false;
@@ -188,6 +215,32 @@ int recordMain(const Options& o) {
         std::fprintf(stderr, "positions %s: %d records\n", path.c_str(), written - before);
     }
 
+    // Lichess puzzles (PuzzleId,FEN,Moves,Rating,RatingDeviation,Popularity,NbPlays,Themes,...): the
+    // FEN is the position before the move that loses, the first of Moves, which the side to move
+    // played in a real game; the rest is the refutation.
+    for (const std::string& path : o.puzzles) {
+        std::ifstream in(path, std::ios::binary);
+        std::string line;
+        const int before = written;
+        while (std::getline(in, line) && !stopped()) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+            const std::string fen = csvField(line, 1), moves = csvField(line, 2);
+            Game g;
+            if (fen.empty() || moves.empty() || !g.resetFromFEN(fen) || g.isOver()) continue;
+            const Move m = g.position().parseUCI(moves.substr(0, moves.find(' ')));
+            if (!m.valid()) continue;
+            ai::EngineSettings host;
+            host.hashMB = 64;
+            host.threads = o.threads;
+            e.configure(host);
+            e.newGame();
+            Record r = recordMove(e, g, m, o.depth);
+            r.tag = "puzzle " + csvField(line, 0) + " " + csvField(line, 3) + " " + csvField(line, 7);
+            emit(r);
+        }
+        std::fprintf(stderr, "puzzles %s: %d records\n", path.c_str(), written - before);
+    }
+
     // PGN games.
     for (const std::string& path : o.pgns) {
         std::ifstream in(path, std::ios::binary);
@@ -205,12 +258,37 @@ int recordMain(const Options& o) {
             host.threads = o.threads;
             e.configure(host);
             e.newGame();
-            for (size_t i = 0; i < pg.record.plies.size(); ++i) {
+            const std::string tag = "game " + pg.record.tag("Site") + " " + pg.record.tag("WhiteElo") + "/" +
+                                    pg.record.tag("BlackElo") + " " + pg.record.tag("TimeControl");
+            // --min-drop: every position searched once (depth 10), a move's cost read from the
+            // positions before and after it.
+            std::vector<double> win;
+            if (o.minDrop > 0) {
+                Game scan = g;
+                win.push_back(winAt(e, scan));
+                for (const pgn::Ply& ply : pg.record.plies) {
+                    const Move m = scan.position().parseSAN(ply.san);
+                    if (!m.valid() || !scan.play(m) || stopped()) break;
+                    win.push_back(winAt(e, scan));
+                }
+            }
+            for (size_t i = 0; i < pg.record.plies.size() && !stopped(); ++i) {
                 const Move m = g.position().parseSAN(pg.record.plies[i].san);
                 if (!m.valid()) break;
                 const Color mover = g.position().sideToMove();
                 const bool human = mover == White ? !coachWhite : !coachBlack;
-                if (human && (!o.materialOnly || leavesMaterial(g, m))) emit(recordMove(e, g, m, o.depth));
+                double drop = 0.0;
+                if (o.minDrop > 0) {
+                    if (i + 1 >= win.size() || win[i] < 0 || win[i + 1] < 0) break;
+                    drop = win[i] - (100.0 - win[i + 1]);
+                }
+                if (human && (!o.materialOnly || leavesMaterial(g, m)) && (o.minDrop <= 0 || drop >= o.minDrop)) {
+                    Record r = recordMove(e, g, m, o.depth);
+                    char d[48];
+                    std::snprintf(d, sizeof d, " ply %zu drop %.1f", i + 1, drop);
+                    r.tag = tag + d;
+                    emit(r);
+                }
                 if (!g.play(m)) break;
             }
             std::fprintf(stderr, "pgn %s: %d records\n", path.c_str(), written);

@@ -88,16 +88,12 @@ int worstLoss(const std::vector<LineStep>& line, const Position& start, Color hu
 }
 
 // The human's loss after the first 'plies' plies of a line played from 'start' (relative to
-// 'base'): the human's capture there that the other side takes back on the next ply is a whole
-// exchange, and so are the captures on that square that follow it at once (Bxa6 ... Rxa6 Rxa6 Nxa6:
-// the exchange read where it ends); where the line stops with the human to move, what the human
-// takes back at once is taken off.
+// 'base'): a capture there that the other side takes back on the next ply is a whole exchange, and
+// so are the captures on that square that follow it at once (Bxa6 ... Rxa6 Rxa6 Nxa6: the exchange
+// read where it ends); where the line stops with the human to move, what the human takes back at
+// once is taken off.
 int lossAt(const std::vector<LineStep>& line, const Position& start, Color human, int base, size_t plies) {
-    if (plies > 0 && plies < line.size() && line[plies - 1].mover == human && line[plies - 1].captured != NoPiece &&
-        line[plies].mover != human && line[plies].captured != NoPiece && line[plies].move.to == line[plies - 1].move.to)
-        ++plies;
-    while (plies > 1 && plies < line.size() && line[plies - 1].captured != NoPiece &&
-           line[plies - 2].captured != NoPiece && line[plies - 2].move.to == line[plies - 1].move.to &&
+    while (plies > 0 && plies < line.size() && line[plies - 1].captured != NoPiece &&
            line[plies].captured != NoPiece && line[plies].move.to == line[plies - 1].move.to)
         ++plies;
     Position q = start;
@@ -120,6 +116,13 @@ int lastingLoss(const std::vector<LineStep>& line, const Position& start, Color 
     int worst = 0;
     for (size_t i = 1; i <= std::min(plies, line.size()); ++i) worst = std::max(worst, settledLoss(line, start, human, base, i));
     return worst;
+}
+
+// What the human is down where a line ends: the worse of its last two plies (a capture the line
+// stops on before the take-back counts as not made yet).
+int endLoss(const std::vector<LineStep>& line, const Position& start, Color human, int base) {
+    if (line.empty()) return 0;
+    return std::max(lossAt(line, start, human, base, line.size() - 1), lossAt(line, start, human, base, line.size()));
 }
 
 // The points of the human's piece that stands on 'onP0' before the move that the best line gives up
@@ -336,7 +339,8 @@ void checkWon(const Ctx& c, const Beat& b, size_t from, std::vector<Finding>& ou
         const LineStep& st = c.refut[i];
         if (at != NoSquare) {
             if (st.mover == c.human && st.move.from == at) at = st.move.to;
-            else if (st.mover == c.coach && st.move.to == at && st.captured != NoPiece) {
+            else if (st.mover == c.coach && st.captured != NoPiece &&
+                     ((st.move.flags & MoveEnPassant) ? Square(st.move.to + (c.human == White ? 8 : -8)) : st.move.to) == at) {
                 const int back = st.promotion != NoPiece ? kPiecePoints[Pawn]
                                  : i + 1 < c.refut.size() ? kPiecePoints[c.refut[i + 1].captured] : 0;
                 const bool traded = i + 1 < c.refut.size() && c.refut[i + 1].mover == c.human &&
@@ -533,14 +537,24 @@ int standingSee(const Position& before, const Position& now, const Move& m) {
 }
 
 // heldLossAt, where a capture the human could make before the move (p0) as well takes nothing back
-// (the loss counts from p0, where it stood too).
+// (the loss counts from p0, where it stood too), nor one after which the other side wins as much
+// with a capture elsewhere.
 int heldLossNet(const Ctx& c, const Position& end) {
     int lost = c.base - materialBalance(end, c.human);
     if (end.sideToMove() != c.human || !end.hasLegalMove()) return lost;
     int best = 0;
-    for (const Move& m : end.legalMoves())
-        if ((m.flags & MoveCapture) && (m.promotion == NoPiece || m.promotion == Queen))
-            best = std::max(best, seePoints(end, m) - standingSee(c.p0, end, m));
+    for (const Move& m : end.legalMoves()) {
+        if (!(m.flags & MoveCapture) || (m.promotion != NoPiece && m.promotion != Queen)) continue;
+        const int won = seePoints(end, m) - standingSee(c.p0, end, m);
+        int gain = won;
+        if (gain <= best) continue;
+        // No take-back while the other side then wins as much elsewhere (a queen left attacked).
+        Position after = end;
+        after.makeMove(m);
+        for (const Move& x : after.legalMoves())
+            if ((x.flags & MoveCapture) && x.to != m.to) gain = std::min(gain, won - seePoints(after, x));
+        best = std::max(best, gain);
+    }
     return lost - best;
 }
 
@@ -958,7 +972,10 @@ int reviewMain(const Options& o) {
             if (explained && fault && (isMaterialType(t) || isGenericType(t)) && c.lp) {
                 const int bestLoss = lastingLoss(c.bestLine, c.p0, c.human, c.base, 8);
                 const int refLoss = lastingLoss(c.playedLine, c.p0, c.human, c.base, 9);
-                if (isMaterialType(t) && bestLoss >= 2 && refLoss - bestLoss < 2)
+                // A loss the best line wins back later than the windows read (Nxd4 Bh5+ Bg6 Bxg6+
+                // hxg6 Bxd4; Bxc8 ... Bxa1 Rxa1 Qxc8) is none: the best line is not down where it ends.
+                const int bestEndLoss = endLoss(c.bestLine, c.p0, c.human, c.base);
+                if (isMaterialType(t) && bestLoss >= 2 && bestEndLoss >= 2 && refLoss - bestLoss < 2)
                     f.push_back({"AVOIDABLE?", "best line loses " + std::to_string(bestLoss) + ", played line " +
                                                    std::to_string(refLoss)});
                 if (isMaterialType(t) && bestLoss >= 1)
@@ -968,12 +985,15 @@ int reviewMain(const Options& o) {
                             if (b.kind != BeatKind::Say || x.kind != Arg::Kind::Piece || x.color != c.human ||
                                 x.square == NoSquare || x.piece == King || b.line.key.rfind("ex.better.", 0) == 0 ||
                                 b.line.key.rfind("ex.hint.", 0) == 0 || b.line.key.rfind("ex.reveal.", 0) == 0 ||
-                                (b.line.key.rfind("ex.retake.", 0) == 0 && a.first == "your2"))   // the taker
+                                (b.line.key.rfind("ex.retake.", 0) == 0 && a.first == "your2") ||   // the taker
+                                // A bad capture says what the capturing piece is traded for ("your queen
+                                // for 3"), whatever the better move trades it for.
+                                (b.line.key.rfind("ex.exchange_capture.", 0) == 0 && a.first == "your"))
                                 continue;
                             const Move pm = c.p0.parseUCI(c.rec->played);
                             const Square onP0 = x.square == pm.to && c.p0.at(pm.from).type == x.piece ? pm.from : x.square;
                             if (c.p0.at(onP0).type != x.piece || c.p0.at(onP0).color != c.human) continue;
-                            if (std::min(lostAnyway(c.bestLine, c.p0, c.human, onP0), bestLoss) >= 1)
+                            if (std::min({lostAnyway(c.bestLine, c.p0, c.human, onP0), bestLoss, bestEndLoss}) >= 1)
                                 f.push_back({"AVOIDABLE?", b.line.key + " {" + a.first + "} " + pieceName(x.piece) +
                                                                " on " + squareName(onP0) + " is given up by the best line too"});
                         }
@@ -1065,6 +1085,9 @@ int reviewMain(const Options& o) {
                         k.rfind("ex.better.", 0) == 0 || k.rfind("ex.retake.", 0) == 0 || k.rfind("ex.result", 0) == 0)
                         continue;
                     for (const std::string& vt : variantsOf(k)) saysPts = saysPts || usesPlaceholder(vt, "pts");
+                    // "It cannot protect f3": the square a pinned defender no longer guards.
+                    if (const Arg* a = b.line.arg("sq"); a && k.rfind("ex.pin_defender.", 0) == 0 && a->square == took)
+                        named = true;
                     for (const char* n : {"t1", "t2", "your"})
                         if (const Arg* a = b.line.arg(n); a && a->kind == Arg::Kind::Piece && a->color == c.human) {
                             if (a->piece == King) {
@@ -1108,6 +1131,21 @@ int reviewMain(const Options& o) {
                     bool saysPts = false;
                     for (const std::string& v : variantsOf(k)) saysPts = saysPts || usesPlaceholder(v, "pts");
                     if (const Arg* p = b.line.arg("pts"); p && saysPts) named = std::max(named, p->number);
+                    // The piece a pinned defender no longer guards ("so f3 is not really defended").
+                    if (const Arg* a = b.line.arg("sq"); a && k.rfind("ex.pin_defender.", 0) == 0 && a->square != NoSquare &&
+                                                         c.p1.at(a->square).color == c.human)
+                        named = std::max(named, kPiecePoints[c.p1.at(a->square).type]);
+                    // A line said from the table: what it leaves the human down where it stops (the
+                    // human, to move then, taking back what it can at once).
+                    Position start, end;
+                    std::vector<Move> moves;
+                    bool fromBest = false;
+                    if (b.line.key.rfind("ex.better.", 0) != 0 && saidLine(c, b, start, moves, fromBest) && !fromBest &&
+                        start.fen() == c.p1.fen()) {
+                        end = start;
+                        for (const Move& m : moves) end.makeMove(m);
+                        named = std::max(named, heldLossAt(end, c.human, c.base));
+                    }
                     for (const char* t : {"t1", "t2", "your"})
                         if (const Arg* a = b.line.arg(t); a && a->kind == Arg::Kind::Piece && a->color == c.human &&
                                                           a->piece != King)
@@ -1132,6 +1170,7 @@ int reviewMain(const Options& o) {
             // The transcript.
             std::fprintf(out, "=== #%zu L%d %s %s  %s\n", ri, level, c.human == White ? "W" : "B",
                          c.p0.fen().c_str(), anyError ? "ERROR" : (f.empty() ? "" : "warn"));
+            if (!c.rec->tag.empty()) std::fprintf(out, "  tag %s\n", c.rec->tag.c_str());
             std::fprintf(out, "  move %s  class %s  W%% %.1f -> %.1f (d %.1f)  best %s  ex %s%s%s\n", v.san.c_str(),
                          className(v.cls), v.wBest, v.wPlayed, v.delta, v.bestSan.c_str(), exTypeName(t),
                          v.voiced ? " voiced" : "", v.offered ? " offer" : "");
