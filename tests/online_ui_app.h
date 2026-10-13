@@ -203,15 +203,17 @@ inline bool toSignInPage(headless::App& app) {
     return app.hasLabel("Sign in");
 }
 
-// From the title page: Play Online, then signs in as 'name' (the fakes take any password) and
-// waits for the realtime connection. True once the Play page shows, connected.
-inline bool signIn(headless::App& app, const std::string& name) {
+// On the sign-in page: signs in as 'name' (the fakes take any password but "wrong") and waits for
+// the realtime connection. True once the Play page shows, connected.
+inline bool signInHere(headless::App& app, const std::string& name) {
     game::OnlineSession& s = game::onlineSession();
-    if (!toSignInPage(app)) return false;
     if (!fill(app, "User name or e-mail", name) || !fill(app, "Password", "correct horse battery")) return false;
     if (!app.clickLabel("Sign in")) return false;
     return app.runUntil([&] { return s.signedIn() && s.conn() == net::ConnState::Online && app.hasLabel("Find opponent"); }, 300);
 }
+
+// From the title page: Play Online, then signs in as 'name' (signInHere).
+inline bool signIn(headless::App& app, const std::string& name) { return toSignInPage(app) && signInHere(app, name); }
 
 // Back to the title page from the online pages (Back until it shows).
 inline bool toTitle(headless::App& app) {
@@ -222,9 +224,12 @@ inline bool toTitle(headless::App& app) {
     return app.hasLabel("Play Online");
 }
 
-// Runs the frames until the session's answer of kind 'k' has come (busy() no more).
+// Runs the frames until the session's answer of kind 'k' has come (busy() no more), then two more:
+// the answer may come after the page of that frame was drawn, which takes it at the next one.
 inline bool answered(headless::App& app, Kind k, int frames = 300) {
-    return app.runUntil([&] { return !game::onlineSession().busy(k); }, frames);
+    if (!app.runUntil([&] { return !game::onlineSession().busy(k); }, frames)) return false;
+    app.frames(2);
+    return true;
 }
 
 // The newest games of the account's history, fetched through the session (its first page).

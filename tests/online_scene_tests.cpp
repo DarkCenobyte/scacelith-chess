@@ -371,7 +371,12 @@ TEST(online_scene_direct_match_hosted) {
     CHECK_EQ(inv.publicAddress, std::string("203.0.113.47"));
     CHECK_EQ(inv.code.size(), size_t(14));
     CHECK(s.direct().isHost());
-    REQUIRE(app->clickLabel("Copy"));            // no clipboard here: a notice says so
+    fakeplat::record().clipboard.clear();
+    REQUIRE(app->clickLabel("Copy"));
+#if !defined(_WIN32)   // the test platform's clipboard (Windows' own is not faked: the copy fails, a notice says so)
+    CHECK_EQ(fakeplat::record().clipboard, "203.0.113.47:47123 " + inv.code);
+    CHECK(!fakeplat::record().clipboardSensitive);
+#endif
     REQUIRE(gameStarts(*app, 400));
     CHECK(s.link()->kind() == game::LinkKind::Direct);
     CHECK(!s.link()->canReport());
@@ -419,7 +424,10 @@ TEST(online_scene_direct_match_joined) {
     CHECK(app->hasLabel("Back"));
     CHECK(s.direct().state() == net::DirectMatch::State::Idle);
     REQUIRE(fill(*app, "Code", "", 16));
-    REQUIRE(fill(*app, "Address", "192.168.1.23:47100 ABCD-EFGH-JKMN"));
+    // The host's invitation pasted (Ctrl+V) into the emptied address field.
+    fakeplat::record().clipboard = "192.168.1.23:47100 ABCD-EFGH-JKMN";
+    REQUIRE(fill(*app, "Address", ""));
+    app->key('V', false, true);
     REQUIRE(enabled(*app, "Join"));
     REQUIRE(app->clickLabel("Join"));
     CHECK_EQ(game::settings().directAddress, std::string("192.168.1.23"));
