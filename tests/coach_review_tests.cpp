@@ -1966,6 +1966,61 @@ TEST(coach_review_human_context_cases) {
             if (level >= 2) CHECK_EQ(r.verdict.exType, ExType::Material);
         }
     }
+    {
+        // A free piece not taken, while the move played wins as much or the piece was no gift:
+        // 24...Nxe2+ Rxe2 Rxe2 (game 0szRcnvs, Lichess 2016) and 13.cxd5 Bxb2+ Kxb2 win as much as the
+        // piece left; after 11.hxg4 exf4 the bishop on f4 falls at once. Never "you missed a free piece".
+        const Recorded nxe2 = recorded(
+         "rec b g3e2 startpos ; g2g3 d7d5 f1g2 c7c6 d2d3 c8g4 b1d2 e7e5 h2h3 g4h5 b2b3 b8d7 a2a3 f8d6 c1b2 f7f5 g1f3 g8f6 e1g1 e8g8 d1c1 d8e7 f1e1 e5e4 f3d4 h5g6 c2c4 e4e3 d2f1 e3f2 g1f2 a8e8 f2g1 f6h5 c4d5 h5g3 d5c6 b7c6 c1c6 d7e5 c6b7 e7g5 b7d5 e5f7 d4e6 g5h4 e6f8\n"
+         "tag game https://lichess.org/0szRcnvs 2594/2436 180+0 ply 48 lc 41s,48?,56n,57?! eco A00 open Hungarian_Opening grp common\n"
+         "an a0 1 0 0 16 g8f8 3\n"
+         "ln 1 16 -222 0 0 0 E g8f8 e2e3 g3h5 b2c3 e8d8 d5c4 f5f4 c3a5 d8b8 a5c7 d6c7 c4c7 b8e8 c7c5 f8g8 e3f4 e8e1 a1e1 h4e1 c5c8 f7d8 c8d8 e1e8 g2d5 g8h8 d8e8 g6e8 f4f5 h5f4 d5c4 f4h3 g1g2 h3f4 g2f3 g7g5\n"
+         "ln 2 16 -267 0 0 0 E d6f8 f1g3 h4g3 d5f3 g3g5 b2c1 g5f6 c1d2 f7g5 f3f2 f8d6 d2f4 d6f4 f2f4 g5e6\n"
+         "ln 3 16 -288 0 0 0 E g3e2 e1e2 e8e2 f8e6 h7h6 b2g7 e2e6 d5e6 g8g7 g1h1 d6e5 a1c1 h4f2 d3d4 f2d4 c1c6 e5f6 e6e3 d4b2 e3a7 b2b3 a7e3\n"
+         "an a2 1 1 0 14 e1e2 2\n"
+         "ln 1 14 288 0 0 0 E e1e2 e8e2 f8e6 h7h5 b2c3 f5f4 b3b4 g6d3 e6d4 f4f3 d4e2 d3e2 d5a8 g8h7 g2f3\n"
+         "ln 2 14 -88 0 0 0 E g1h1 d6f8 a1d1 f5f4 f1d2 e2g3 h1h2\n"
+         "an a3 1 0 0 6 g8f8 1\n"
+         "ln 1 6 -222 0 0 0 E g8f8 e2e3 g3h5 b2c3 e8d8 d5c4\n"
+         "end\n");
+        const Recorded cxd5 = recorded(
+         "rec w c4d5 startpos ; c2c4 e7e5 e2e3 d7d5 d2d4 f8b4 b1c3 e5d4 d1a4 d8d7 a4d7 e8d7 e3d4 g8e7 c1d2 b8c6 g1f3 d7d8 e1c1 c8g4 f1e2 h8e8 d2g5 b4c3\n"
+         "an a0 1 1 0 16 b2c3 3\n"
+         "ln 1 16 -7 0 0 0 E b2c3 f7f6 g5d2 e7f5 h2h3 g4f3 e2f3 d5c4 h3h4 f5d6 d2f4 d8d7 h4h5 a8b8 c1c2 c6e7 d1b1\n"
+         "ln 2 16 -44 0 0 0 E c4d5 c3b2 c1b2 c6b4 e2b5 g4f3 g2f3 e8h8 d5d6 c7d6 d4d5 a7a6 d1d4 f7f6 g5d2 a6b5 d4b4 h8e8 b4b5 e7f5 h2h3\n"
+         "ln 3 16 -458 0 0 0 E a2a3 f7f6 g5f4 c3a5 c4c5 e7f5 e2d3 g4f3 g2f3 f5d4 b2b4 a5b4 a3b4 a7a5\n"
+         "an a2 1 0 0 14 c3b2 2\n"
+         "ln 1 14 44 0 0 0 E c3b2 c1b2 c6b4 e2b5 g4f3 g2f3 e8h8 d5d6 c7d6 d4d5 a7a6 d1d4 f7f6 g5d2 a6b5\n"
+         "ln 2 14 33 0 0 0 E c6d4 f3d4 g4e2 d4e2 c3e5 d1d3 d8d7 e2g3 f7f6 g5e3 b7b6 e3d2 e5g3 h2g3 h7h6 g3g4\n"
+         "an a3 1 1 0 6 b2c3 1\n"
+         "ln 1 6 4 0 0 0 E b2c3 f7f6 g5d2\n"
+         "end\n");
+        const Recorded bh2 = recorded(
+         "rec w f4h2 startpos ; d2d4 g8f6 g1f3 d7d5 b1c3 c7c6 c1f4 c8g4 e2e3 b8d7 h1g1 f6e4 f1d3 d8a5 d1c1 f7f6 h2h3 e4c3 f3d2 e7e5\n"
+         "an a0 1 1 0 16 h3g4 3\n"
+         "ln 1 16 -240 0 0 0 E h3g4 e5f4 b2c3 f8a3 c1d1 e8c8 a1b1 h8e8 e1e2 c6c5 b1b5 a5c3\n"
+         "ln 2 16 -292 0 0 0 E f4h2 g4h5 g2g4 h5g6 b2c3 a5c3 a1b1 g6d3 c2d3 c3c1 b1c1 e5d4 e3d4 e8c8 e1d1 f8a3 c1c2 d7f8 g1e1 f8g6\n"
+         "ln 3 16 -292 0 0 0 E b2c3 f8a3 d2b3 a5c3 c1d2 c3d2 b3d2 g4e6 f4h2 b7b5 a1b1 a7a5 f2f3 e8g8 e1e2\n"
+         "an a2 1 0 0 14 g4h5 2\n"
+         "ln 1 14 309 0 0 0 E g4h5 b2c3 a5c3 g2g4 h5g6 a1b1 g6d3 c2d3 c3c1 b1c1 e5d4 e3d4 f8a3 c1b1 e8c8 e1e2 d7f8 b1b3\n"
+         "ln 2 14 283 0 0 0 E g4e6 d2b3 a5a4 b2c3 c6c5 d4c5 f8c5 b3c5 d7c5 c1b2 e8g8 d3b5 a4e4 b2b4\n"
+         "an a3 1 1 0 6 h3g4 1\n"
+         "ln 1 6 -240 0 0 0 E h3g4 e5f4 b2c3 f8a3 d2b3 a3c1 b3a5 c1b2 e1e2 b2c3 a5b7\n"
+         "end\n");
+        const std::pair<const Recorded*, const char*> cases[] = {{&nxe2, "Nxe2+"}, {&cxd5, "cxd5"}, {&bh2, "Bh2"}};
+        for (const auto& [rc, name] : cases) {
+            for (int level = 1; level <= 6; ++level) {
+                Reviewer rv;
+                const Review r = reviewRecorded(rv, *rc, level);
+                char where[32];
+                std::snprintf(where, sizeof where, "%s b%d", name, level);
+                checkScript(r.script, where);
+                CHECK(r.verdict.exType != ExType::MissedCapture);
+                CHECK(!hasKeyPrefix(r.script, "ex.missed_capture"));
+                CHECK(!hasKeyPrefix(r.script, "ex.verdict.missed"));
+            }
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

@@ -376,6 +376,17 @@ void checkFree(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
             break;
         }
     }
+    // Free means kept: the better line still holds the piece's worth after the reply (an exchange
+    // there read where it ends), and the move played does not win as much along its own line.
+    const int worth = kPiecePoints[target->piece] - 1;
+    if (-lossAt(c.bestLine, c.p0, c.human, c.base, 2) < worth)
+        out.push_back({"MISSED_NOT_FREE", k + ": the reply to the capture takes material back at once"});
+    for (size_t n = 1; n <= 3; n += 2) {
+        if (-lossAt(c.playedLine, c.p0, c.human, c.base, n) >= worth) {
+            out.push_back({"MISSED_GAINED", k + ": the move played wins as much along its line"});
+            break;
+        }
+    }
 }
 
 // A sacrifice praised: the move gives up material by exchange, or the player is still 2 points down

@@ -1162,6 +1162,14 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     };
     if (takenLater(c.playedLine, 1) || takenLater(c.r, 0)) return false;
     if (c.f.captured != NoPiece && c.f.seePts >= points(yt) - 1) return false;   // took as much elsewhere
+    // Free means kept: a reply that takes as much back at once (hxg4 exf4, the player's own bishop
+    // left en prise) makes it a trade; a capture the player takes straight back counts whole.
+    const size_t kept = c.best.size() >= 3 && c.best[1].captured != NoPiece && c.best[2].captured != NoPiece &&
+                        c.best[2].move.to == c.best[1].move.to ? 3 : 2;
+    if (heldGain(c.best, kept, c.base, c.human, c.bestEnd) < points(yt) - 1) return false;
+    // The move played wins as much along its line (cxd5 Bxb2+ Kxb2: the bishop taken on b2 instead).
+    for (size_t i = 1; i <= 3; i += 2)
+        if (heldGain(c.playedLine, i, c.base, c.human, c.playedEnd) >= points(yt) - 1) return false;
     // A move that loses as much as the piece missed: the loss is the story (materialLine).
     if (c.concreteLoss(8) && c.lossWithin(8) >= points(yt)) return false;
     const bool bigPiece = points(yt) >= 3;
