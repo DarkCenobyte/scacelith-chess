@@ -1278,6 +1278,86 @@ TEST(coach_review_failed_take_back_is_explained) {
     }
 }
 
+TEST(coach_review_take_back_answer_is_the_strongest_capture) {
+    // Recorded moves (tools/coach_audit corpora) where the take-back the line never plays fails:
+    // the capture that answers it is a mate when one does it, else one with check when it takes as
+    // much ("Rxd7+", not "Nxd7"), and never one the human answers with a capture and check.
+    struct Case {
+        const char* what;
+        const char* rec;
+        const char* reply;   // the answer said ("": no take-back line at all)
+    };
+    const Case cases[] = {
+        // 19...Qb7? f4 Nd7 Bxc5+ Ne7 Bxd6: 24...Qxb5 fails to Qxe7#, not merely to Bxe7.
+        {"m_309_50",
+         "rec b e7b7 startpos ; c2c3 d7d6 d1c2 e7e5 c3c4 e5e4 c2e4 d8e7 e4f4 g7g5 f4f3 b8c6 f3g3 c6d8 b1c3 f8g7 f2f3 g7e5 g3f2 c7c5 a1b1 c8f5 b1a1 a8b8 e1d1 d8c6 e2e4 e5c3 e4f5 c3g7 d2d3 g5g4 f2e2 b7b5 c4b5 c6e5 c1e3\n"
+         "an a0 1 0 0 18 g8h6 3\n"
+         "ln 1 18 34 0 0 0 E g8h6 e3h6 g7h6 f3g4 e8g8 h2h4 h6g7 g4g5 f8e8 h1h3 e7d7 f5f6 e5g4 e2d2 g7f8 h3g3 d6d5\n"
+         "ln 2 18 2 0 0 0 E g8f6 e3g5 e8g8 f3f4 b8b5 f4e5 d6e5 a1c1 e5e4 b2b3 f8d8 e2g4 b5a5 a2a4 e4d3 g1f3 d3d2 c1b1 f6g4 g5e7 d8d7 f1b5 g4e3 d1e2 d7e7 e2d2 c5c4 b1e1 g7h6 d2c3 c4b3 c3b3\n"
+         "ln 3 18 -67 0 0 0 E h7h5 d3d4 c5d4 e3d4 g8h6 e2e4 e8g8 f1d3 d6d5 f5f6 d5e4 f6e7 f8e8 d3e4 e8e7 g1e2 b8d8 d1c2 f7f5 d4e5 g7e5\n"
+         "an a1 1 0 0 18 e7b7 1\n"
+         "ln 1 18 -223 0 0 0 E e7b7 f3f4 e5d7 e3c5 g8e7 c5d6 e8g8 d6b8 d7b8 f5f6 g7f6 e2g4 f6g7 d3d4 f8d8 g4f3 d8d4 d1e1 d4e4 g1e2 e7f5 a1d1\n"
+         "an a2 1 1 0 14 f3f4 2\n"
+         "ln 1 14 223 0 0 0 E f3f4 e5d7 e3c5 g8e7 c5d6 e8g8 d6b8 d7b8 f5f6 g7f6 e2g4 f6g7 d3d4 f8d8 g4f3 e7d5\n"
+         "ln 2 14 42 0 0 0 E h2h3 g4f3 g1f3 g8e7 f3e5 g7e5 e3c5 b7b5 d3d4 b5e2 f1e2 d6c5 d4e5 e7f5 b2b3\n"
+         "an a3 1 0 0 6 g8h6 1\n"
+         "ln 1 6 37 0 0 0 E g8h6 f5f6 e7f6 f3f4 h6f5 e3c1 e8g8 f4e5 d6e5\n"
+         "end\n",
+         "e2e7"},
+        // 18...Bc8? cxd7 Bxd7 Nxa8 Nf6 Nxb6: 21...Nxe4 fails to Rxd7+ (the knight takes the bishop too).
+        {"g_345_17",
+         "rec b b7c8 startpos ; e2e4 c7c5 g1f3 a7a6 f1e2 e7e6 d2d4 c5d4 e1g1 d8c7 d1d4 b7b6 c2c4 d7d6 b1c3 c8b7 f1d1 c7c5 c1f4 c5d4 d1d4 e6e5 f3e5 d6e5 d4d8 e8d8 a1d1 d8e8 c3d5 e5f4 d5c7 e8e7 c4c5 b8d7 c5c6\n"
+         "an a0 1 0 0 18 b7c6 3\n"
+         "ln 1 18 827 0 0 0 E b7c6 c7a8 c6a8 e2a6 g8f6 a6b5 d7e5 b2b3 f6e4 h2h4 e4c5 b3b4 c5e4\n"
+         "ln 2 18 709 0 0 0 E g8f6 c6b7 a8b8 c7a6 b8b7 g2g4 d7e5 a6b4 b7d7 g4g5 d7d1 e2d1 f6d7\n"
+         "ln 3 18 581 0 0 0 E d7c5 c6b7 a8b8 c7d5 e7d8 b2b4 c5d7 e2a6 f8d6 e4e5 d7e5 d5b6 g8e7 g2g3 d8c7\n"
+         "an a1 1 0 0 18 b7c8 1\n"
+         "ln 1 18 364 0 0 0 E b7c8 c6d7 c8d7 c7a8 g8f6 a8b6 d7b5 e2b5 a6b5 e4e5 f6g4 b6d5 e7e6 d5c7 e6e5 d1d5 e5f6 c7b5 g7g5 d5d8\n"
+         "an a2 1 1 0 14 c6d7 2\n"
+         "ln 1 14 -364 0 0 0 E c6d7 c8d7 c7a8 d7e6 e2a6 g8f6 a8b6 g7g6 a2a4 f8g7 a4a5 h8d8 d1e1 f6d7 b6d5 e6d5 e4d5 e7d6 b2b4 g7c3\n"
+         "ln 2 14 -441 0 0 0 E c7a8 g8f6 e4e5 d7e5 a8b6 e5c6 b6c8 e7e6 e2c4 e6e5 d1e1 f6e4 c8b6 f8c5 b6d7 e5d6 e1e4 d6d7 e4f4 d7d6 c4a6 h8b8 f4f7 b8b2\n"
+         "an a3 1 0 0 6 b7c6 1\n"
+         "ln 1 6 827 0 0 0 E b7c6 c7a8 c6a8 e2a6 d7e5\n"
+         "end\n",
+         "d1d7"},
+        // 7...Qd7? Rxh4 Qd6 exd5: after 9...Qxd5, Bxh6 would allow Qxg2+ and Qxg1+ (Bf3 is what wins).
+        {"m_316_5",
+         "rec b d8d7 startpos ; e2e4 b7b5 c2c3 g8h6 f1b5 h8g8 b5e2 d7d5 d2d3 g7g5 h2h4 g5h4 e1f1\n"
+         "an a0 1 0 0 18 d5e4 3\n"
+         "ln 1 18 -162 0 0 0 E d5e4 d3e4 d8d1 e2d1 c8a6 d1e2 a6e2 g1e2 h6g4 f2f3 g4e5 h1h4 b8c6 b1d2 e8c8 h4h7 a7a5 h7h5 e7e6 e2d4 c6d4 c3d4 e5c6 d2b3\n"
+         "ln 2 18 -192 0 0 0 E d8d6 e4d5 h6g4 d1a4 c8d7 a4d4 h7h5 g1f3 f8g7 d4e4 c7c6 d5c6 d7c6 e4f5 e7e6 f5f4 e6e5 f4b4 d6b4 c3b4 g7f6\n"
+         "ln 3 18 -193 0 0 0 E e7e5 e4d5 h6g4 d1a4 c7c6 d5c6 d8b6 d3d4 b8c6 b1d2 c8d7 d2c4 b6d8 a4c2 e5d4 g1f3 d8f6 h1h4 e8c8 c3d4 c6d4\n"
+         "an a1 1 0 0 18 d8d7 1\n"
+         "ln 1 18 -440 0 0 0 E d8d7 h1h4 d7d6 e4d5 b8d7 b1a3 d6g6 g2g3 d7f6 e2f3 h6f5 h4h1 c8b7 d1a4 e8d8 c1f4 f6d5 a3c4 d5f4\n"
+         "an a2 1 1 0 14 h1h4 2\n"
+         "ln 1 14 440 0 0 0 E h1h4 d7d6 e4d5 b8d7 b1a3 d6g6 g2g3 d7f6 e2f3 h6f5 h4h1 c8b7 d1a4 e8d8 c1f4 f6d5\n"
+         "ln 2 14 364 0 0 0 E b1d2 d7c6 e4d5 c6d5 d2e4 b8d7 h1h4 h6f5 h4h5\n"
+         "an a3 1 0 0 6 d5e4 1\n"
+         "ln 1 6 -169 0 0 0 E d5e4 d3e4 d8d1 e2d1 c8a6 d1e2 a6e2 g1e2\n"
+         "end\n",
+         ""},
+    };
+    for (const Case& k : cases) {
+        const Recorded rc = recorded(k.rec);
+        int said = 0;
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[48];
+            std::snprintf(where, sizeof where, "%s b%d", k.what, level);
+            checkScript(r.script, where);
+            for (const Beat& b : r.script) {
+                if (b.line.key.rfind("ex.retake.", 0) != 0) continue;
+                ++said;
+                const Arg* reply = b.line.arg("reply");
+                CHECK(reply && reply->uci == k.reply);
+                if (!reply || reply->uci != k.reply) dump(r.script);
+            }
+        }
+        CHECK(*k.reply == 0 || said > 0);
+    }
+}
+
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
     // better move, never the move itself while the takeback is offered.

@@ -20,12 +20,17 @@ namespace audit {
 
 using namespace chess;
 
+namespace {
+// The least cost (win percentage points) any finding counts: such a move is searched for again.
+constexpr double kRecheck = 5.0;
+}  // namespace
+
 struct MoveJudge::Impl {
     ai::Engine engine;
     int depth = 14;
     bool ok = false;
     std::string cachePath;
-    std::map<std::string, std::pair<double, std::string>> costs;   // "fen|uci" -> cost, best move
+    std::map<std::string, std::pair<double, std::string>> costs;   // "fen|uci" -> cost (rechecked), best move
     std::map<std::string, std::pair<ai::Score, std::string>> best;  // fen -> best score, best move
     int unsaved = 0;
 
@@ -34,7 +39,7 @@ struct MoveJudge::Impl {
         if (cachePath.empty() || unsaved == 0) return;
         if (FILE* f = files::create(cachePath.c_str())) {
             for (const auto& kv : costs)
-                std::fprintf(f, "%s|%.2f|%s\n", kv.first.c_str(), kv.second.first, kv.second.second.c_str());
+                std::fprintf(f, "%s|%.2f|%s|c\n", kv.first.c_str(), kv.second.first, kv.second.second.c_str());
             std::fclose(f);
         }
         unsaved = 0;
@@ -64,12 +69,15 @@ MoveJudge::MoveJudge(int depth, int threads, const std::string& cachePath) : d(n
         std::ifstream in(cachePath);
         std::string line;
         while (std::getline(in, line)) {
-            // fen|uci|cost|best
+            // fen|uci|cost|best|c ("c": a cost of kRecheck or more was checked again, cost())
             std::istringstream ls(line);
-            std::string fen, uci, cost, bestUci;
+            std::string fen, uci, cost, bestUci, checked;
             if (std::getline(ls, fen, '|') && std::getline(ls, uci, '|') && std::getline(ls, cost, '|') &&
-                std::getline(ls, bestUci))
-                d->costs[fen + "|" + uci] = {std::atof(cost.c_str()), bestUci};
+                std::getline(ls, bestUci, '|')) {
+                std::getline(ls, checked);
+                const double c = std::atof(cost.c_str());
+                if (c < kRecheck || checked == "c") d->costs[fen + "|" + uci] = {c, bestUci};
+            }
         }
     }
     d->ok = d->engine.start() && d->engine.waitReady(60000);
@@ -103,14 +111,27 @@ double MoveJudge::cost(const Position& p, const Move& m, std::string* bestUci) {
         b = d->best.emplace(fen, std::make_pair(a.lines[0].score, a.lines[0].pv[0])).first;
     }
     double c = 0.0;
-    if (b->second.second != uci) {
+    std::string bestHere = b->second.second;
+    if (bestHere != uci) {
         ai::Analysis a;
         if (!d->analyse(p, uci, a)) return -1.0;
         c = std::max(0.0, coach::winPercent(b->second.first) - coach::winPercent(a.lines[0].score));
     }
-    d->costs[key] = {c, b->second.second};
+    // A move that costs something is searched for once more from a cleared hash table: at a fixed
+    // depth the search depends on what the table holds, and a move the engine picks itself from a
+    // clean start is its own choice at that depth (the lines the coach says are the engine's, from
+    // searches about as deep), no mistake.
+    if (c >= kRecheck) {
+        d->engine.clearHash();
+        ai::Analysis a;
+        if (d->analyse(p, "", a) && !a.lines[0].pv.empty() && a.lines[0].pv[0] == uci) {
+            c = 0.0;
+            bestHere = uci;
+        }
+    }
+    d->costs[key] = {c, bestHere};
     if (++d->unsaved >= 200) d->save();
-    if (bestUci) *bestUci = b->second.second;
+    if (bestUci) *bestUci = bestHere;
     return c;
 }
 

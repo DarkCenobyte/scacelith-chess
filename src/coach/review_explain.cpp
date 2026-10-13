@@ -125,10 +125,23 @@ int standingGain(const Position& before, const Position& now, const Move& m) {
     return 0;
 }
 
+// Whether the side to move in p has a capture that wins material with check: the check may win
+// more than the capture ("Qxg2+", the knight on g1 next), so what it takes back is not plain.
+bool winsWithCheck(const Position& p) {
+    for (const Move& m : p.legalMoves()) {
+        if (!(m.flags & MoveCapture) || seePoints(p, m) < 1) continue;
+        Position x = p;
+        x.makeMove(m);
+        if (x.inCheck()) return true;
+    }
+    return false;
+}
+
 // Whether the coach answers the human's capture 'm' in q (taking 'took' by exchange) with a capture
 // elsewhere that wins back as much, more than that capture already won on the table after the move
 // (p1: a piece that stood en prise all along is no answer), and leaves the human down 'need' or
-// more whatever the human takes next. 'punish': that capture (the one that takes most).
+// more whatever the human takes next, with no capture that wins material with check then.
+// 'punish': that capture (a mate first, else the one that takes most, one with check first).
 bool answered(const Ctx& c, const Position& q, const Move& m, int took, int need, Move* punish) {
     Position after = q;
     after.makeMove(m);
@@ -137,13 +150,15 @@ bool answered(const Ctx& c, const Position& q, const Move& m, int took, int need
         // The exchange on the capture's own square is counted in what it takes (SEE).
         if (!(r.flags & MoveCapture) || r.to == m.to || (r.promotion != NoPiece && r.promotion != Queen)) continue;
         const int see = seePoints(after, r);
-        if (see - standingGain(c.p1, after, r) < took || see <= best) continue;
+        if (see - standingGain(c.p1, after, r) < took) continue;
         Position end = after;
         end.makeMove(r);
+        const int rank = end.isCheckmate() ? 1000 : 2 * see + (end.inCheck() ? 1 : 0);
+        if (rank <= best) continue;
         int lost = c.base - materialBalance(end, c.human);
         if (end.hasLegalMove()) lost -= bestCapturePoints(end, c.human);
-        if (lost < need) continue;
-        best = see;
+        if (lost < need || winsWithCheck(end)) continue;
+        best = rank;
         if (punish) *punish = r;
     }
     return best >= 0;
