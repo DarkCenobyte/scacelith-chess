@@ -79,6 +79,8 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
   ходы́, ходо́в, фигу́р, ничья́, доско́й, выи́грывает...: see `common.lang`). A new form of these nouns
   needs its own entry. Homographs stay unmarked (ладьи, хода, ходу, доски, стоит).
 - Always write ё: the voice reads "е" as written (the catalog uses ё throughout: чёрные, ещё, конём).
+- "даром" is a close call between "да́ром" and "даро́м" (probe, alone and in "можно было взять даром"):
+  marked `да́ром`.
 - Inherent to the notation, left as is: "а пять" sounds like "опять", "е два" like "едва".
 - Round trip over 1,000 lines; the stress of the 140 most frequent words and of the chess nouns compared
   with a dictionary.
@@ -92,6 +94,7 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
   over 1,000 lines.
 - "ферзем" unmarked is read like the Russian "ферзём": `ферзе́м`. Words shared with Russian are the
   ones to check first.
+- Adverbs too: "задарма" is read "зада́рма" (probe, 4 seeds), the dictionary stress is `задарма́`.
 
 ## Arabic
 
@@ -102,6 +105,9 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
   catalog sets a diacritic only where a reading is ambiguous (رخّ, ملِكي). Round trip over 100 lines
   (Whisper): nothing else misread. The file letter "e" can melt into a word ending in "ī" before it
   ("في إي ثلاثة" heard "في ثلاثة" twice in six), as in Spanish.
+- "أخذ" as a verbal noun ("فرصة أخذ", a chance to take) can be read as the verb "أَخَذَ": the probe
+  could not tell the two apart. A line that means "a capture" uses another noun ("مكسب مجاني"), or the
+  article ("الأخذ"), which no verb takes.
 - The recogniser writes no short vowels, so a vowel misreading only shows in a direct comparison of
   vowelled spellings (`--probe "ar:الملك=المَلِك|المَلَك|المُلك"`); a candidate that adds only one
   diacritic is the fairest comparison, full vocalisation changes the delivery.
