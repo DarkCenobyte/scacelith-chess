@@ -95,8 +95,13 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 
 ## Arabic
 
+- The file letter "a" is `أيه` ("ay"): "إيه" is read "īh", hardly apart from "إي" ("e"); the
+  recogniser took "بـ إيه ستة" for e6 four times in six, never with "أيه" (file.a.spoken,
+  FILE_WORDS).
 - Unvowelled words are read with their usual vowels (الملك as al-malik, نقلة, الوزير, شوكة); the
-  catalog sets a diacritic only where a reading is ambiguous (رخّ, ملِكي).
+  catalog sets a diacritic only where a reading is ambiguous (رخّ, ملِكي). Round trip over 100 lines
+  (Whisper): nothing else misread. The file letter "e" can melt into a word ending in "ī" before it
+  ("في إي ثلاثة" heard "في ثلاثة" twice in six), as in Spanish.
 - The recogniser writes no short vowels, so a vowel misreading only shows in a direct comparison of
   vowelled spellings (`--probe "ar:الملك=المَلِك|المَلَك|المُلك"`); a candidate that adds only one
   diacritic is the fairest comparison, full vocalisation changes the delivery.
