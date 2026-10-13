@@ -1401,6 +1401,23 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 89 0 0 0 E h2h4 g8f6 b1d2 d8b6 a1b1 c6c5\n"
          "end\n",
          ExType::Hanging, ExType::None, 3},
+        // 11.Qg2? Bxe5 dxe5 Qxe5 costs a pawn, but so does the better 11.Qh5+ (it wins one back on
+        // c7 later): no "miscount on e5".
+        {"m_308_23",
+         "rec w f3g2 startpos ; c2c3 g8f6 e2e3 a7a6 g1f3 b7b6 e3e4 e7e6 f3e5 f6e4 d1e2 f7f5 g2g3 d8f6 d2d4 d7d5 e2f3 f8d6 f1h3 a6a5\n"
+         "an a0 1 1 0 18 f3h5 3\n"
+         "ln 1 18 -265 0 0 0 E f3h5 g7g6 h5h6 d6e5 d4e5 f6e5 c1f4 e5f6 f4c7 c8a6 b1d2 b8d7 d2e4 f5e4 c7f4 d7c5 e1c1 c5d3 c1b1 d3f4 g3f4 a6d3 b1a1 e8c8\n"
+         "ln 2 18 -293 0 0 0 E f3d1 b8d7 f2f4 c7c5 e1g1 f6e7 b1d2 e8g8 d2e4 d5e4 c1e3 d7f6 d4c5 b6c5\n"
+         "ln 3 18 -297 0 0 0 E h3f1 e8g8 f3e3 d6e5 d4e5 f6e5 f2f3 e4g5 e1f2 e5e3 c1e3 g5f7 c3c4 c7c5 c4d5 e6d5 e3f4\n"
+         "an a1 1 1 0 18 f3g2 1\n"
+         "ln 1 18 -489 0 0 0 E f3g2 d6e5 d4e5 f6e5 e1g1 e5f6 f2f3 e4c5 g2c2 c8a6 f1d1 b8d7 b1a3 e8g8 c1e3 c7c6 c3c4 h7h6 h3f1 f6f7 f3f4 c5e4 c4d5 c6d5\n"
+         "an a2 1 0 0 14 d6e5 2\n"
+         "ln 1 14 458 0 0 0 E d6e5 d4e5 f6e5 c1e3 e8g8 b1d2 e5f6 g3g4\n"
+         "ln 2 14 303 0 0 0 E c8a6 f2f3 e4g5 c1g5 f6g5 f3f4 g5h6 e5f3 e8g8 b1d2 b8d7 e1c1 d7f6 h1e1\n"
+         "an a3 1 1 0 6 f3h5 1\n"
+         "ln 1 6 -265 0 0 0 E f3h5 g7g6 h5h6 d6e5 d4e5 f6e5\n"
+         "end\n",
+         ExType::None, ExType::Exchange, 0},
         // 39.Rf5? loses material along the engine's line: never "a better position" for it.
         {"mis_b_160",
          "rec w f2f5 startpos ; e2e4 c7c5 g1e2 d7d6 d2d4 g8f6 e4e5 f6d7 e5e6 f7e6 e2f4 d7f6 a2a4 b8c6 f4e2 g7g6 f2f4 f8h6 d4c5 e8g8 c5d6 e6e5 b1c3 f6g4 d6d7 c8d7 c3a2 d8c7 h2h3 g4f6 d1d7 c7a5 d7d2 a5b6 a4a5 b6c7 e2c3 e5f4 f1c4 g8h8 e1g1 c6a5 c4d3 c7c5 f1f2 a5c4 b2b4 c5c7 h3h4 c4d2 c1b2 f4f3 f2d2 h6e3 g1h1 f3g2 d2g2 e3d4 c3b5 c7d7 a2c3 d4c3 b5c3 d7h3 g2h2 h3f3 h1g1 f3e3 h2f2 a8d8 c3e4 h8g7 a1f1 d8d5 g1g2 d5d4\n"

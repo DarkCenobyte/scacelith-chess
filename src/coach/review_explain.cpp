@@ -239,10 +239,18 @@ int givenUpAlong(const Ctx& c, int k, bool& atK) {
     // The most the better move's line is down for good within its first ten plies (a loss that
     // still holds four plies later): a piece it gives up while it wins as much back elsewhere ("fxe5"
     // takes a knight for the bishop) is traded, not given up.
+    // A capture of the human's that the coach takes back on the next ply is read with that
+    // recapture (the exchange whole: "dxe5 Qxe5" gives up the pawn, it wins no bishop back).
+    const auto lossAt = [&](size_t j) {
+        if (j < c.best.size() && c.best[j - 1].mover == c.human && c.best[j - 1].captured != NoPiece &&
+            c.best[j].mover != c.human && c.best[j].captured != NoPiece && c.best[j].move.to == c.best[j - 1].move.to)
+            ++j;
+        return c.base - c.best[j - 1].balance;
+    };
     int endLoss = 0;
     for (size_t i = 1; i <= std::min<size_t>(c.best.size(), 10); ++i) {
-        int l = c.base - c.best[i - 1].balance;
-        for (size_t j = i + 1; j <= std::min(c.best.size(), i + 4); ++j) l = std::min(l, c.base - c.best[j - 1].balance);
+        int l = lossAt(i);
+        for (size_t j = i + 1; j <= std::min(c.best.size(), i + 4); ++j) l = std::min(l, lossAt(j));
         endLoss = std::max(endLoss, l);
     }
     if (endLoss <= 0) return 0;
