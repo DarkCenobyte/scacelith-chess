@@ -47,6 +47,9 @@ TEST(online_ui_sign_in_refusals_and_two_factor_code) {
     CHECK(app->hasLabel("Continue with Google"));   // the fake server offers it
     CHECK(app->hasLabel("Create an account"));
     CHECK(app->hasLabel("Forgot password?"));
+    // The page keeps what was typed in it: emptied first.
+    REQUIRE(fill(*app, "User name or e-mail", ""));
+    REQUIRE(fill(*app, "Password", ""));
     CHECK(!enabled(*app, "Sign in"));
     REQUIRE(fill(*app, "User name or e-mail", "Refused"));
     CHECK(!enabled(*app, "Sign in"));               // no password yet
