@@ -81,8 +81,12 @@ window of the test's size, a clock the test advances, scripted input, the data f
 temporary folder). `tests/headless.h` runs `main.cpp`'s loop around a scene with the game's
 command-line options, plays the mouse and the keyboard, and finds the widgets of the last frame by
 their label (`ui::im::setTrace`). The null driver's defaults are generated from `glcorearb.h`
-(`python3 tools/gen_null_gl.py`, after `tools/gen_gl_loader.py`). The robot is built once per
-test run (`character::keepBuiltRobot`).
+(`python3 tools/gen_null_gl.py`, after `tools/gen_gl_loader.py`). The robot, the hall, the chess
+set and the font's glyphs are built once per test run (`character::keepBuiltRobot`,
+`hall::keepBuiltHall`, `keepBuiltPieces`, `ui::font::keepBuiltGlyphs`; the game leaves them off).
+The tests of one file can share one game (`headless::shared`); the test runner stops it before the
+next file's tests (its scene holds the engine). MinGW runs the files in the reverse order, so a
+test must not count on what a test of another file left behind.
 
 ## Test coverage
 

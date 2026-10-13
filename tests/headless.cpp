@@ -9,7 +9,10 @@
 #include "game/settings.h"
 #include "gl/gl_context.h"
 #include "net/net_sys.h"
+#include "scene/hall.h"
+#include "scene/pieces.h"
 #include "ui/ui_draw.h"
+#include "ui/ui_font.h"
 #include <atomic>
 #include <cstdio>
 #include <filesystem>
@@ -48,8 +51,12 @@ App::~App() { stop(); }
 
 bool App::start(const std::vector<std::string>& args) {
     stop();
-    // One robot for every scene of the run (seconds of CPU each, a minute under gcov).
+    // One robot, one hall, one chess set and one set of glyphs for every scene of the run: each
+    // takes seconds of CPU to build (a minute for the robot under gcov), the same each time.
     character::keepBuiltRobot(true);
+    hall::keepBuiltHall(true);
+    keepBuiltPieces(true);
+    ui::font::keepBuiltGlyphs(true);
     fakeplat::reset();
     fakeplat::setSize(width_, height_);
     fakeplat::setDataFolder(dir_->path);

@@ -5,6 +5,7 @@
 #include "../render/renderer.h"
 #include <cctype>
 #include <chrono>
+#include <mutex>
 
 using namespace m;
 
@@ -42,7 +43,12 @@ void wallBar(MeshData& d, const WallDef& w, vec2 a, vec2 b, float n, float width
 
 }  // namespace detail
 
-Model buildHall(BuildStats* stats) {
+namespace {
+std::mutex g_keptMu;
+bool g_keep = false;
+Model g_kept;   // the hall built while g_keep is on (no parts until then)
+
+Model buildModel(BuildStats* stats) {
     using namespace detail;
     auto t0 = std::chrono::steady_clock::now();
     Accum acc;
@@ -102,6 +108,24 @@ Model buildHall(BuildStats* stats) {
          secs);
     if (stats) *stats = st;
     return model;
+}
+}  // namespace
+
+Model buildHall(BuildStats* stats) {
+    if (!stats) {
+        std::lock_guard<std::mutex> lk(g_keptMu);
+        if (g_keep && !g_kept.parts.empty()) return g_kept;
+    }
+    Model model = buildModel(stats);
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    if (g_keep && g_kept.parts.empty()) g_kept = model;
+    return model;
+}
+
+void keepBuiltHall(bool on) {
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    g_keep = on;
+    if (!on) g_kept = Model();
 }
 
 }  // namespace hall

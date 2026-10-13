@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <mutex>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
@@ -191,6 +192,12 @@ struct SdfGlyph {
     int w = 0, h = 0;
     std::vector<uint8_t> px;
 };
+
+// The glyphs built while keepBuiltGlyphs is on, by face and code point (keepBuiltGlyphs).
+std::mutex g_keptMu;
+bool g_keep = false;
+std::unordered_map<uint64_t, SdfGlyph> g_kept;
+uint64_t glyphKey(int face, uint32_t cp) { return (uint64_t(uint32_t(face)) << 32) | cp; }
 
 // Builds the glyph metrics and (for visible glyphs) its distance field bitmap.
 void buildGlyph(const FaceData& fd, const FaceDesc& desc, uint32_t cp, int gi, SdfGlyph& out, Scratch& sc) {
@@ -534,23 +541,45 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
     }
     if (jobs.empty()) return;
     std::vector<SdfGlyph> results(jobs.size());
+    std::vector<size_t> todo;   // the jobs to build (the others were kept)
+    {
+        std::lock_guard<std::mutex> lk(g_keptMu);
+        for (size_t i = 0; i < jobs.size(); ++i) {
+            auto k = g_keep ? g_kept.find(glyphKey(jobs[i].face, jobs[i].cp)) : g_kept.end();
+            if (k != g_kept.end()) results[i] = k->second;
+            else todo.push_back(i);
+        }
+    }
     unsigned hw = std::thread::hardware_concurrency();
     int threads = int(std::clamp(hw == 0 ? 2u : hw, 1u, 8u));
-    threads = std::min(threads, int(jobs.size()));
+    threads = std::min(threads, int(todo.size()));
     auto work = [&](int t) {
         Scratch sc;
-        for (size_t i = size_t(t); i < jobs.size(); i += size_t(threads))
+        for (size_t j = size_t(t); j < todo.size(); j += size_t(threads)) {
+            const size_t i = todo[j];
             buildGlyph(g_faces[jobs[i].face], kFaces[jobs[i].face], jobs[i].cp, jobs[i].gi, results[i], sc);
+        }
     };
     std::vector<std::thread> pool;
     for (int t = 1; t < threads; ++t) pool.emplace_back(work, t);
-    work(0);
+    if (threads > 0) work(0);
     for (auto& th : pool) th.join();
+    {
+        std::lock_guard<std::mutex> lk(g_keptMu);
+        if (g_keep)
+            for (size_t i : todo) g_kept[glyphKey(jobs[i].face, jobs[i].cp)] = results[i];
+    }
     // Pack tallest first for a tighter shelf layout.
     std::vector<size_t> order(results.size());
     for (size_t i = 0; i < order.size(); ++i) order[i] = i;
     std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return results[a].h > results[b].h; });
     for (size_t i : order) insert(jobs[i].face, results[i]);
+}
+
+void keepBuiltGlyphs(bool on) {
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    g_keep = on;
+    if (!on) g_kept = std::unordered_map<uint64_t, SdfGlyph>();
 }
 
 void flushUploads() {
