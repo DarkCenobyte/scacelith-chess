@@ -115,6 +115,26 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = بدلًا منها {best}، {eval}.
 ex.better.b6.3 = مع {best} التقييم {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = كانت هناك نقلة أفضل ب{your}.
+ex.hint.b1.2 = كانت لدى {your} نقلة أفضل.
+ex.hint.b2 = كانت لدى {your} نقلة أفضل.
+ex.hint.b2.2 = كانت هناك نقلة أفضل ب{your}.
+ex.hint.b3 = كانت لدى {your} نقلة أفضل.
+ex.hint.b3.2 = كان هناك ما هو أفضل ب{your}.
+ex.hint.b4 = كانت لدى {your} نقلة أفضل.
+ex.hint.b4.2 = انظر إلى {your} مرة أخرى: كان هناك ما هو أفضل.
+ex.hint.b5 = كانت لدى {your} نقلة أقوى.
+ex.hint.b5.2 = كانت هناك نقلة أقوى ب{your}.
+ex.hint.b6 = كان لدى {your} ما هو أفضل.
+ex.hint.b6.2 = انظر إلى {your} مرة أخرى.
+ex.hint.move = كانت هناك نقلة أفضل.
+ex.hint.move.2 = كانت لديك نقلة أفضل هنا.
+ex.reveal.b1 = النقلة الأفضل كانت {your} إلى {sq}.
+ex.reveal.b1.2 = كان بإمكان {your} الذهاب إلى {sq}. كان ذلك أفضل.
+ex.reveal.b2 = نقل {your} إلى {sq} كان الأفضل.
+ex.reveal.b2.2 = النقلة الأفضل كانت {your} إلى {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = لنُعِد القطع إلى أماكنها.
 ex.rewind.b1.2 = والآن أُعيد كل شيء كما كان.
@@ -223,6 +243,18 @@ ex.result_back.b2 = تستطيع أن تستردّ بعض الشيء، لكنن�
 ex.result_back.b2.2 = حتى بعد الاسترداد، تخسر {pts:point}.
 ex.result_back.b3 = حتى بعد استردادك، أتقدّم عليك ب{pts:point}.
 ex.result_back.b3.2 = تستردّ شيئًا، لكن هذا يكلّفك {pts:point} مع ذلك.
+ex.retake.b1 = إذا استرددت ب{your2}، يأخذ {my} {your}.
+ex.retake.b1.2 = لا يمكنك الاسترداد ب{your2}: عندها يأخذ {my} {your}.
+ex.retake.b2 = إذا استرددت ب{your2}، يأخذ {my} {your}.
+ex.retake.b2.2 = الاسترداد ب{your2} لا ينفع: يأخذ {my} {your}.
+ex.retake.b3 = إذا استرددت ب{move}، يأخذ {reply} {your}.
+ex.retake.b3.2 = الاسترداد ب{move} يفشل: {reply} ويضيع {your}.
+ex.retake.b4 = {move} يفشل بسبب {reply}، ويضيع {your}.
+ex.retake.b4.2 = وإذا لعبت {move}، يأتي {reply} ويضيع {your}.
+ex.retake.b5 = الاسترداد ب{move} يصطدم ب{reply}، ويسقط {your}.
+ex.retake.b5.2 = {move} يفشل أمام {reply}: يسقط {your}.
+ex.retake.b6 = {move}؟ {reply} ويسقط {your}.
+ex.retake.b6.2 = {move} يفشل: {reply} ويسقط {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = وهنا، في {sq}، تحصل على وزير جديد.
 demo.promote.2 = ثم يبلغ {your} المربع {sq} ويصبح وزيرًا.
@@ -899,6 +931,10 @@ tb.fixed.2 = أفضل.
 tb.fixed.3 = تصحيح جيد.
 tb.same = النقلة نفسها مرة أخرى؟ حسنًا، لنرَ.
 tb.same.2 = يبدو أن هذه النقلة تعجبك. لنكمل بها.
+tb.found.b1 = نعم! هذه هي النقلة التي في ذهني.
+tb.found.b1.2 = أحسنت! هذه هي النقلة الأفضل.
+tb.found = هذه هي النقلة التي في ذهني.
+tb.found.2 = بالضبط، هذه هي.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = للأسف، لا مزيد من استرجاع النقلات في هذه المباراة.

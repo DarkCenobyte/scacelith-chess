@@ -117,6 +117,26 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = Mejor {best}, {eval}.
 ex.better.b6.3 = Con {best}, {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = Había una jugada mejor con {your}.
+ex.hint.b1.2 = {your} tenía una jugada mejor.
+ex.hint.b2 = {your} tenía una jugada mejor.
+ex.hint.b2.2 = Había una jugada mejor con {your}.
+ex.hint.b3 = {your} tenía una jugada mejor.
+ex.hint.b3.2 = Había algo mejor con {your}.
+ex.hint.b4 = {your} tenía una jugada mejor.
+ex.hint.b4.2 = Vuelve a mirar {your}: tenía algo mejor.
+ex.hint.b5 = {your} tenía una jugada más fuerte.
+ex.hint.b5.2 = Había una jugada más fuerte con {your}.
+ex.hint.b6 = {your} tenía algo mejor.
+ex.hint.b6.2 = Vuelve a mirar {your}.
+ex.hint.move = Había una jugada mejor.
+ex.hint.move.2 = Aquí tenías una jugada mejor.
+ex.reveal.b1 = La mejor jugada era {your} a {sq}.
+ex.reveal.b1.2 = {your} podía ir a {sq}. Era mejor.
+ex.reveal.b2 = {your} a {sq} era la mejor jugada.
+ex.reveal.b2.2 = La mejor jugada era {your} a {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Volvamos a colocar las piezas.
 ex.rewind.b1.2 = Ahora lo pongo todo como estaba.
@@ -225,6 +245,18 @@ ex.result_back.b2 = Puedes recapturar algo, pero aún tienes {pts:point} menos.
 ex.result_back.b2.2 = Incluso después de recapturar, has perdido {pts:point}.
 ex.result_back.b3 = Incluso tras tu recaptura, tienes {pts:point} menos.
 ex.result_back.b3.2 = Recuperas algo, pero aun así te cuesta {pts:point}.
+ex.retake.b1 = Si recapturas con {your2}, {my} captura {your}.
+ex.retake.b1.2 = No puedes recapturar con {your2}: {my} capturaría {your}.
+ex.retake.b2 = Si recapturas con {your2}, {my} captura {your}.
+ex.retake.b2.2 = Recapturar con {your2} no sirve: {my} captura {your}.
+ex.retake.b3 = Si recapturas con {move}, {reply} captura {your}.
+ex.retake.b3.2 = La recaptura {move} falla: {reply} captura {your}.
+ex.retake.b4 = {move} falla por {reply}, que captura {your}.
+ex.retake.b4.2 = Y si {move}, entonces {reply} captura {your}.
+ex.retake.b5 = La recaptura {move} choca con {reply}, y cae {your}.
+ex.retake.b5.2 = {move} falla por {reply}: cae {your}.
+ex.retake.b6 = ¿{move}? {reply} captura {your}.
+ex.retake.b6.2 = {move} falla: {reply} captura {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = Y aquí, en {sq}, tendrías una dama nueva.
 demo.promote.2 = Luego {your} llega a {sq} y se convierte en dama.
@@ -895,6 +927,10 @@ tb.fixed.2 = Mejor.
 tb.fixed.3 = Buena corrección.
 tb.same = ¿Otra vez la misma jugada? De acuerdo, veamos.
 tb.same.2 = Te gusta esa jugada. Veamos cómo sale.
+tb.found.b1 = ¡Sí! Esa es la jugada en la que pensaba.
+tb.found.b1.2 = ¡La encontraste! Es la mejor jugada.
+tb.found = Esa es la jugada que tenía en mente.
+tb.found.2 = Exacto, es esa.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = Me temo que en esta partida ya no puedes deshacer más jugadas.

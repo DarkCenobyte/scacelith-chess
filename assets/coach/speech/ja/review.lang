@@ -136,6 +136,26 @@ ex.better.b6 = {best}：{eval}。
 ex.better.b6.2 = 代わりに{best}、{eval}。
 ex.better.b6.3 = {best}なら{eval}。
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = {your}に、もっと良い手がありました。
+ex.hint.b1.2 = {your}で、もっと良い手が指せました。
+ex.hint.b2 = {your}に、もっと良い手がありました。
+ex.hint.b2.2 = {your}で、もっと良い手が指せました。
+ex.hint.b3 = {your}に、より良い手がありました。
+ex.hint.b3.2 = {your}で、より良い手が指せました。
+ex.hint.b4 = {your}に、より良い手がありました。
+ex.hint.b4.2 = {your}をもう一度見てください。より良い手がありました。
+ex.hint.b5 = {your}に、より強い手がありました。
+ex.hint.b5.2 = {your}で、より強い手が指せました。
+ex.hint.b6 = {your}に、より良い手あり。
+ex.hint.b6.2 = {your}をもう一度。
+ex.hint.move = もっと良い手がありました。
+ex.hint.move.2 = ここには、より良い手がありました。
+ex.reveal.b1 = より良い手は、{your}を{sq}へ動かすことでした。
+ex.reveal.b1.2 = {your}を{sq}へ動かせば、もっと良かったです。
+ex.reveal.b2 = {your}を{sq}へ動かすのが、より良い手でした。
+ex.reveal.b2.2 = より良い手は、{your}を{sq}へ動かすことでした。
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = 駒を元に戻しましょう。
 ex.rewind.b1.2 = では、全部元の場所に戻しますね。
@@ -246,6 +266,18 @@ ex.result_back.b2.2 = 取り返しても、{pts:point}を失っています。
 ex.result_back.b3 = 取り返したあとも、{pts:point}の駒損です。
 ex.result_back.b3.spoken = 取り返したあとも、{pts:point}のこまぞんです。
 ex.result_back.b3.2 = 少し取り返せますが、結局{pts:point}の損です。
+ex.retake.b1 = {your2}で取り返すと、{my}に{your}を取られます。
+ex.retake.b1.2 = {your2}では取り返せません。{my}に{your}を取られます。
+ex.retake.b2 = {your2}で取り返すと、{my}に{your}を取られます。
+ex.retake.b2.2 = {your2}で取り返してもだめです。{my}に{your}を取られます。
+ex.retake.b3 = {move}と取り返すと、{reply}で{your}を取られます。
+ex.retake.b3.2 = {move}の取り返しは失敗です：{reply}で{your}を取られます。
+ex.retake.b4 = {move}には{reply}があり、{your}を取られます。
+ex.retake.b4.2 = {move}なら、{reply}で{your}を取られます。
+ex.retake.b5 = 取り返しの{move}は{reply}にぶつかり、{your}が落ちます。
+ex.retake.b5.2 = {move}は{reply}で失敗：{your}が落ちます。
+ex.retake.b6 = {move}？{reply}で{your}が落ちます。
+ex.retake.b6.2 = {move}は失敗：{reply}で{your}を失います。
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = そしてここ、{sq}で新しいクイーンができます。
 demo.promote.2 = そして{your}が{sq}まで進み、クイーンになります。
@@ -984,6 +1016,10 @@ tb.fixed.2 = 良くなりました。
 tb.fixed.3 = いい修正です。
 tb.same = また同じ手ですか？わかりました、見てみましょう。
 tb.same.2 = その手が好きなんですね。では、指し進めましょう。
+tb.found.b1 = そうです！私が考えていたのは、その手です。
+tb.found.b1.2 = 見つけましたね！それがより良い手です。
+tb.found = 私が考えていたのは、その手です。
+tb.found.2 = その通り、その手です。
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = 残念ですが、この対局ではもう手を戻せません。

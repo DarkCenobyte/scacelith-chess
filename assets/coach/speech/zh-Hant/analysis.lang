@@ -66,7 +66,7 @@ an.missed_fork.2 = {best}是一步捉雙，同時攻擊{t1}和{t2:bare}。
 # The better move, when nothing above named it.
 an.better = {best}更強。
 an.better.2 = 更好的是{best}。
-an.better.3 = 引擎更推薦{best}。
+an.better.3 = {best}更精確。
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

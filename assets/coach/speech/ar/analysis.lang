@@ -69,7 +69,7 @@ an.missed_fork.2 = نقلة {best} كانت شوكة تهاجم {t1} و{t2}.
 # The better move, when nothing above named it.
 an.better = نقلة {best} كانت أقوى.
 an.better.2 = الأفضل كان {best}.
-an.better.3 = المحرّك يفضّل {best}.
+an.better.3 = نقلة {best} كانت أدق.
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

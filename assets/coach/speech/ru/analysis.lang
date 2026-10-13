@@ -66,7 +66,7 @@ an.missed_fork.2 = Ход {best} давал вилку: удар сразу по
 # The better move, when nothing above named it.
 an.better = Сильнее было {best}.
 an.better.2 = Лучше было {best}.
-an.better.3 = Компьютер предпочитает {best}.
+an.better.3 = Точнее было {best}.
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

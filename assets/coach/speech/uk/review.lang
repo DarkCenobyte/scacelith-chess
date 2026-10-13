@@ -123,6 +123,26 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = Натомість {best}, {eval}.
 ex.better.b6.3 = Сильніше було {best}: {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = У {your:gen} був кращий хід.
+ex.hint.b1.2 = Був кращий хід {your:bare_ins}.
+ex.hint.b2 = У {your:gen} був кращий хід.
+ex.hint.b2.2 = Був кращий хід {your:bare_ins}.
+ex.hint.b3 = У {your:gen} був кращий хід.
+ex.hint.b3.2 = Був сильніший хід {your:bare_ins}.
+ex.hint.b4 = У {your:gen} був кращий хід.
+ex.hint.b4.2 = Подивись ще раз на {your:acc}: був кращий хід.
+ex.hint.b5 = У {your:gen} був сильніший хід.
+ex.hint.b5.2 = Був сильніший хід {your:bare_ins}.
+ex.hint.b6 = У {your:gen} був кращий хід.
+ex.hint.b6.2 = Подивись ще раз на {your:acc}.
+ex.hint.move = Був кращий хід.
+ex.hint.move.2 = Тут був кращий хід.
+ex.reveal.b1 = Краще було піти {your:bare_ins} на {sq}.
+ex.reveal.b1.2 = Краще було зіграти {your:bare_ins} на {sq}.
+ex.reveal.b2 = Краще було піти {your:bare_ins} на {sq}.
+ex.reveal.b2.2 = Кращий хід — {your:bare_ins} на {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Поставмо фігури на місце.
 ex.rewind.b1.2 = Тепер я поверну все, як було.
@@ -231,6 +251,18 @@ ex.result_back.b2 = Частину можна відіграти, але в те
 ex.result_back.b2.2 = Навіть після взяття у відповідь ти втрачаєш {pts:point}.
 ex.result_back.b3 = Навіть після твого взяття у відповідь у тебе мінус {pts:point}.
 ex.result_back.b3.2 = Ти дещо відіграєш, але це все одно коштує тобі {pts:point}.
+ex.retake.b1 = Якщо взяти у відповідь {your2:bare_ins}, {my} забере {your:acc}.
+ex.retake.b1.2 = Бити у відповідь {your2:bare_ins} не можна: тоді {my} забере {your:acc}.
+ex.retake.b2 = Якщо взяти у відповідь {your2:bare_ins}, {my} забере {your:acc}.
+ex.retake.b2.2 = Взяття {your2:bare_ins} не допомагає: {my} забирає {your:acc}.
+ex.retake.b3 = Якщо взяти у відповідь ходом {move}, то {reply} забирає {your:acc}.
+ex.retake.b3.2 = Взяття {move} не рятує: {reply} забирає {your:acc}.
+ex.retake.b4 = {move} не проходить через {reply}, і {your} гине.
+ex.retake.b4.2 = А на {move} буде {reply}, і {your} гине.
+ex.retake.b5 = Взяття {move} наштовхується на {reply}, і {your} гине.
+ex.retake.b5.2 = {move} не проходить: {reply}, і {your} гине.
+ex.retake.b6 = {move}? {reply}, і {your} гине.
+ex.retake.b6.2 = {move} не проходить: {reply} забирає {your:acc}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = А тут, на {sq}, у тебе з’явився б новий ферзь.
 demo.promote.2 = Потім {your} доходить до {sq} і стає ферзем.
@@ -901,6 +933,10 @@ tb.fixed.2 = Краще.
 tb.fixed.3 = Добре виправлено.
 tb.same = Знову той самий хід? Гаразд, подивимося.
 tb.same.2 = Тобі подобається цей хід. Зіграймо його.
+tb.found.b1 = Так! Саме цей хід я й мав на увазі.
+tb.found.b1.2 = Ось він! Це і є кращий хід.
+tb.found = Саме цей хід я мав на увазі.
+tb.found.2 = Точно, саме він.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = На жаль, більше повернути хід у цій партії не можна.

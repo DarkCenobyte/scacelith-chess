@@ -109,6 +109,11 @@ struct TakebackRecord {
     ExType firstType = ExType::None;
     bool fixed = false;              // the replacement lost less than 5 W% points
     bool same = false;               // the same move was played again
+    // A blunder offered back without its reason or the better move ("your knight had a better
+    // move"): that move, said once the offer is declined; 'found': the replacement is that move.
+    bool hintOnly = false;
+    std::string bestUci;
+    bool found = false;
 };
 
 // ---- Level parameters ---------------------------------------------------------------------------
@@ -184,13 +189,14 @@ public:
     Script coachMoved(const chess::Game& g, const ai::Analysis* before = nullptr);
 
     // The player's answer to an offer. Accepted: call after Game::undo(1); returns the hint
-    // (levels 1-2) and remembers the move so the replay is judged against it. Declined: nothing
-    // is said by the review (the director says the events line) and nothing is remembered.
+    // (levels 1-2) and remembers the move so the replay is judged against it. Declined: returns the
+    // better move when the offer did not name it (a blunder without a reason: TakebackRecord::
+    // hintOnly), said before the director's events line; nothing is remembered.
     // fromOffer: the player took the card. The pause menu's takeback of an offered move passes
     // false: the replay is judged the same way, but the level's takebacks (Band::offerCap) count
     // only those the coach offered and the player accepted.
     Script takebackAccepted(const chess::Game& g, bool fromOffer = true);
-    void takebackDeclined();
+    Script takebackDeclined();
 
     int offersMade() const { return offers_; }
     int humanMoves() const { return humanMoves_; }
@@ -222,6 +228,7 @@ private:
     // The last offer, and a takeback in progress.
     TakebackRecord offered_;          // the move the last offer was about
     chess::Square offeredHint_ = chess::NoSquare;
+    Beat offeredReveal_;              // the better move, said when a hint-only offer is declined
     int offersAtPly_ = 0;             // offers made for offered_.ply
     bool retryPending_ = false;
     TakebackRecord retry_;

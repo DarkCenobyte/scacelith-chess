@@ -122,6 +122,30 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = {best} instead, {eval}.
 ex.better.b6.3 = {best} was {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = There was a better move with {your}.
+ex.hint.b1.2 = {your} had a better move.
+ex.hint.b2 = {your} had a better move.
+ex.hint.b2.2 = There was a better move with {your}.
+ex.hint.b3 = {your} had a better move.
+ex.hint.b3.2 = There was something better with {your}.
+ex.hint.b4 = {your} had a better move.
+ex.hint.b4.2 = Look again at {your}: it had something better.
+ex.hint.b5 = {your} had a stronger move.
+ex.hint.b5.2 = There was a stronger move with {your}.
+ex.hint.b6 = {your} had better.
+ex.hint.b6.2 = Look at {your} again.
+ex.hint.move = There was a better move.
+ex.hint.move.2 = You had a better move there.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = The better move was {your} to {sq}.
+ex.reveal.b1.2 = {your} could go to {sq}. That was better.
+ex.reveal.b2 = {your} to {sq} was the better move.
+ex.reveal.b2.2 = The better move was {your} to {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Let's put the pieces back.
 ex.rewind.b1.2 = Now I'll put everything back where it was.
@@ -232,6 +256,21 @@ ex.result_back.b2 = You can take back some, but you're still {pts:point} down.
 ex.result_back.b2.2 = Even after you take back, you've lost {pts:point}.
 ex.result_back.b3 = Even after your recapture, you're {pts:point} down.
 ex.result_back.b3.2 = You win something back, but it still costs you {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = If {your2} takes back, {my} takes {your}.
+ex.retake.b1.2 = You can't take back with {your2}: then {my} takes {your}.
+ex.retake.b2 = If {your2} takes back, {my} takes {your}.
+ex.retake.b2.2 = Taking back with {your2} doesn't work: {my} takes {your}.
+ex.retake.b3 = If you take back with {move}, {reply} takes {your}.
+ex.retake.b3.2 = Taking back with {move} fails: {reply} takes {your}.
+ex.retake.b4 = {move} fails to {reply}, which takes {your}.
+ex.retake.b4.2 = And if {move}, then {reply} takes {your}.
+ex.retake.b5 = The recapture {move} runs into {reply}, and {your} falls.
+ex.retake.b5.2 = {move} fails to {reply}: {your} falls.
+ex.retake.b6 = {move}? {reply} takes {your}.
+ex.retake.b6.2 = {move} fails: {reply} takes {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = And here, on {sq}, you would get a new queen.
 demo.promote.2 = Then {your} reaches {sq} and becomes a queen.
@@ -901,6 +940,11 @@ tb.fixed.2 = Better.
 tb.fixed.3 = Good correction.
 tb.same = The same move again? All right, let's see.
 tb.same.2 = You like that move. Let's play it out.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Yes! That's the move I was thinking of.
+tb.found.b1.2 = You found it! That's the better move.
+tb.found = That's the move I had in mind.
+tb.found.2 = Exactly, that's the one.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = No more takebacks this game, I'm afraid.

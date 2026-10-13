@@ -67,7 +67,7 @@ an.missed_fork.2 = {best} era una horquilla, con ataque doble sobre {t1} y {t2}.
 # The better move, when nothing above named it.
 an.better = {best} era más fuerte.
 an.better.2 = Era mejor {best}.
-an.better.3 = El motor prefiere {best}.
+an.better.3 = Lo más preciso era {best}.
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

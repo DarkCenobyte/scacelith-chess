@@ -33,8 +33,9 @@ struct Ctx {
     int base = 0;                            // the human's material lead at p0 (points)
     int gain = -1;                           // plies of r after which the human is 2+ points down for good (-1: never)
     int loss = 0;                            // points the human is down for good within the lookahead
-    // What the best move costs: what the human is still down near the end of the best line's first
-    // 8 plies (from p0). A loss the best move suffers too is no reason the move played was bad.
+    // What the best move costs: what the human is still down at the end of the best line's first 8
+    // plies (from p0), where the line settles (an exchange completed; what the human wins back within
+    // four more plies taken off). A loss the best move suffers too is no reason the move played was bad.
     int bestLoss = 0;
     // How much the move costs in the engine's eyes: the human's centipawns after the best move minus
     // after the move played (mates as +-1000).
@@ -48,6 +49,10 @@ struct Ctx {
     // 'plies' plies: a reason that is about something else (king safety, the endgame, a better plan)
     // would not be the real one.
     bool concreteLoss(int plies) const;
+    // The refutation leaves the human down for good, beyond what the best move costs, after one of
+    // its first 'plies' plies and still four plies later: a "better position" or a better plan is
+    // then never the reason (the material is), even when no detector can name how it goes.
+    bool losesMaterial(int plies) const;
     // Points the human is down for good after the first 'plies' plies of r (relative to p0): a
     // recapture on the next ply undoes a loss, and where r stops, so does the exchange the human can
     // still win on the board (a line cut short right after a capture proves nothing).
@@ -117,6 +122,10 @@ struct Explanation {
     bool includesBest = false; // the cause already names the better move
     bool missed = false;       // the human missed something (no demonstration: the table shows p1)
     chess::Square hintSquare = chess::NoSquare;   // takeback hint (levels 1-2): the piece at risk, on p0
+    // Where the sequence stops, the human could take back, but that fails: the take-back the table
+    // shows there (after fullPlies plies of r) and the coach's capture that answers it. Invalid
+    // moves when the loss needs no such sentence.
+    chess::Move retake, punish;
 };
 
 // ---- Engine requests and figures (shared with the appraisal) ----
@@ -150,6 +159,9 @@ void limitPointing(Beat& b);
 bool findExplanation(const Ctx& c, Explanation& out);
 // Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
+// The tip findTip gives is about a won game drawn by repetition or the fifty-move rule: then it is
+// the reason the move costs so much.
+bool drawTip(const Ctx& c, uint32_t tipsSaid);
 
 // How much of the sequence the table shows (Explanation::demoPlies, full): levels 1-3 the whole of it
 // (fullPlies, within the band's demoPlies; a mate within mateLinePlies), else, and from level 4, up
@@ -164,6 +176,11 @@ int demoLength(const Ctx& c, const Explanation& ex);
 // and the closing lines once every planned ply was shown (the detector's, else a generic one: what
 // was lost, or what falls next), and the rewind of exactly the moves shown.
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s);
+// Whether the demonstration plays the whole sequence, to where Explanation::retake is said.
+bool demoReachesEnd(const Ctx& c, const Explanation& ex);
+// The line that says why the take-back fails (Explanation::retake), its pieces pointed at where
+// they stand on 'table'; false when there is none.
+bool retakeBeat(const Ctx& c, const Explanation& ex, const chess::Position& table, Beat& out);
 
 }  // namespace detail
 }  // namespace coach

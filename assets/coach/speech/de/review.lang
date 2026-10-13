@@ -114,6 +114,26 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = Stattdessen {best}, {eval}.
 ex.better.b6.3 = Besser {best}, Bewertung {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = Mit {your:dat} gab es einen besseren Zug.
+ex.hint.b1.2 = {your} hatte einen besseren Zug.
+ex.hint.b2 = {your} hatte einen besseren Zug.
+ex.hint.b2.2 = Mit {your:dat} gab es einen besseren Zug.
+ex.hint.b3 = {your} hatte einen besseren Zug.
+ex.hint.b3.2 = Mit {your:dat} gab es etwas Besseres.
+ex.hint.b4 = {your} hatte einen besseren Zug.
+ex.hint.b4.2 = Schau dir {your:acc} noch einmal an. Da gab es etwas Besseres.
+ex.hint.b5 = {your} hatte einen stärkeren Zug.
+ex.hint.b5.2 = Mit {your:dat} gab es einen stärkeren Zug.
+ex.hint.b6 = {your} hatte Besseres.
+ex.hint.b6.2 = Schau dir {your:acc} noch einmal an.
+ex.hint.move = Es gab einen besseren Zug.
+ex.hint.move.2 = Hier hattest du einen besseren Zug.
+ex.reveal.b1 = Der bessere Zug war {your} nach {sq}.
+ex.reveal.b1.2 = {your} konnte nach {sq} ziehen. Das war besser.
+ex.reveal.b2 = {your} nach {sq} war der bessere Zug.
+ex.reveal.b2.2 = Der bessere Zug war {your} nach {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Stellen wir die Figuren wieder zurück.
 ex.rewind.b1.2 = Jetzt stelle ich alles wieder dorthin, wo es war.
@@ -222,6 +242,18 @@ ex.result_back.b2 = Du kannst etwas zurückschlagen, aber du liegst immer noch {
 ex.result_back.b2.2 = Auch nach dem Zurückschlagen hast du {pts:point_acc} verloren.
 ex.result_back.b3 = Auch nach deinem Zurückschlagen liegst du {pts:point_acc} zurück.
 ex.result_back.b3.2 = Du holst dir etwas zurück, aber es kostet dich trotzdem {pts:point_acc}.
+ex.retake.b1 = Wenn {your2} zurückschlägt, schlägt {my} {your:acc}.
+ex.retake.b1.2 = Mit {your2:dat} kannst du nicht zurückschlagen: Dann schlägt {my} {your:acc}.
+ex.retake.b2 = Wenn {your2} zurückschlägt, schlägt {my} {your:acc}.
+ex.retake.b2.2 = Zurückschlagen mit {your2:dat} geht nicht: {my} schlägt {your:acc}.
+ex.retake.b3 = Schlägst du mit {move} zurück, folgt {reply}, und {your} geht verloren.
+ex.retake.b3.2 = Der Rückschlag {move} scheitert an {reply}: {your} geht verloren.
+ex.retake.b4 = {move} scheitert an {reply}, und {your} geht verloren.
+ex.retake.b4.2 = Auf {move} folgt {reply}, und {your} geht verloren.
+ex.retake.b5 = Der Rückschlag {move} scheitert an {reply}, und {your} fällt.
+ex.retake.b5.2 = {move} scheitert an {reply}: {your} fällt.
+ex.retake.b6 = {move}? {reply}, und {your} fällt.
+ex.retake.b6.2 = {move} scheitert: {reply}, und {your} fällt.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = Und hier, auf {sq}, würdest du eine neue Dame bekommen.
 demo.promote.2 = Dann zieht {your} nach {sq} und wird Dame.
@@ -893,6 +925,10 @@ tb.fixed.2 = Besser.
 tb.fixed.3 = Gute Korrektur.
 tb.same = Wieder derselbe Zug? Na gut, schauen wir mal.
 tb.same.2 = Du magst diesen Zug. Gut, spielen wir weiter.
+tb.found.b1 = Ja! Genau an diesen Zug habe ich gedacht.
+tb.found.b1.2 = Du hast ihn gefunden! Das ist der bessere Zug.
+tb.found = Genau diesen Zug meinte ich.
+tb.found.2 = Genau, das ist er.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = In dieser Partie gibt es leider keine Rücknahme mehr.

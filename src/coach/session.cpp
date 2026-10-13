@@ -453,8 +453,9 @@ struct Session::Impl {
             play(s);
             g.turnPly = -1;   // the human's turn again: A0 comes from the cache
         } else {
-            reviewer.takebackDeclined();
-            Script s = playedOn ? playOnScript(ply) : takebackScript(false, ply);
+            // The better move first, when the offer kept it back.
+            Script s = reviewer.takebackDeclined();
+            append(s, playedOn ? playOnScript(ply) : takebackScript(false, ply));
             const int moves = reviewer.humanMoves();
             if ((g.lastClass == MoveClass::Mistake || g.lastClass == MoveClass::Blunder) &&
                 moves - g.lastMistakeEncourage >= kMistakeEncourageGap) {

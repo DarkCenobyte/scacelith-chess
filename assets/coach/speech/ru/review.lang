@@ -114,6 +114,26 @@ ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = Вместо этого {best}, {eval}.
 ex.better.b6.3 = После {best} — {eval}.
 
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = У {your:gen} был ход получше.
+ex.hint.b1.2 = Был ход получше {your:bare_ins}.
+ex.hint.b2 = У {your:gen} был ход лучше.
+ex.hint.b2.2 = Был ход лучше {your:bare_ins}.
+ex.hint.b3 = У {your:gen} был ход лучше.
+ex.hint.b3.2 = Был ход сильнее {your:bare_ins}.
+ex.hint.b4 = У {your:gen} был ход лучше.
+ex.hint.b4.2 = Посмотри ещё раз на {your:acc}: был ход лучше.
+ex.hint.b5 = У {your:gen} был ход сильнее.
+ex.hint.b5.2 = Был ход сильнее {your:bare_ins}.
+ex.hint.b6 = У {your:gen} был ход лучше.
+ex.hint.b6.2 = Посмотри ещё раз на {your:acc}.
+ex.hint.move = Был ход лучше.
+ex.hint.move.2 = Здесь был ход лучше.
+ex.reveal.b1 = Лучше было пойти {your:bare_ins} на {sq}.
+ex.reveal.b1.2 = Лучше было сыграть {your:bare_ins} на {sq}.
+ex.reveal.b2 = Лучше было пойти {your:bare_ins} на {sq}.
+ex.reveal.b2.2 = Лучший ход — {your:bare_ins} на {sq}.
+
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Давай вернём фигуры на место.
 ex.rewind.b1.2 = Теперь я верну всё как было.
@@ -222,6 +242,18 @@ ex.result_back.b2 = Кое-что можно отыграть, но у тебя 
 ex.result_back.b2.2 = Даже после взятия в ответ ты теряешь {pts:point}.
 ex.result_back.b3 = Даже после ответного взятия у тебя минус {pts:point}.
 ex.result_back.b3.2 = Ты кое-что отыгрываешь, но это всё равно стоит тебе {pts:point}.
+ex.retake.b1 = Если взять в ответ {your2:bare_ins}, {my} заберёт {your:acc}.
+ex.retake.b1.2 = Брать в ответ {your2:bare_ins} нельзя: тогда {my} заберёт {your:acc}.
+ex.retake.b2 = Если взять в ответ {your2:bare_ins}, {my} заберёт {your:acc}.
+ex.retake.b2.2 = Взятие {your2:bare_ins} не помогает: {my} забирает {your:acc}.
+ex.retake.b3 = Если взять в ответ ходом {move}, то {reply} забирает {your:acc}.
+ex.retake.b3.2 = Взятие {move} не спасает: {reply} забирает {your:acc}.
+ex.retake.b4 = {move} не проходит из-за {reply}, и {your} гибнет.
+ex.retake.b4.2 = А на {move} последует {reply}, и {your} гибнет.
+ex.retake.b5 = Взятие {move} наталкивается на {reply}, и {your} гибнет.
+ex.retake.b5.2 = {move} не проходит: {reply}, и {your} гибнет.
+ex.retake.b6 = {move}? {reply}, и {your} гибнет.
+ex.retake.b6.2 = {move} не проходит: {reply} забирает {your:acc}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = А здесь, на {sq}, у тебя появился бы новый ферзь.
 demo.promote.2 = Потом {your} доходит до {sq} и становится ферзём.
@@ -892,6 +924,10 @@ tb.fixed.2 = Лучше.
 tb.fixed.3 = Хорошее исправление.
 tb.same = Опять тот же ход? Ладно, посмотрим.
 tb.same.2 = Тебе нравится этот ход. Что ж, сыграем.
+tb.found.b1 = Да! Именно этот ход я и имел в виду.
+tb.found.b1.2 = Вот он! Это и есть лучший ход.
+tb.found = Именно этот ход я имел в виду.
+tb.found.2 = Точно, это он.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = Увы, больше вернуть ход в этой партии нельзя.

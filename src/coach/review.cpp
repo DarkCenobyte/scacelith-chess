@@ -255,6 +255,13 @@ bool Ctx::lossExplains(int lost, bool pawn) const {
     return lost >= 3 || (lost >= 2 ? 400 : 250) * lost >= dropCp;
 }
 
+bool Ctx::losesMaterial(int plies) const {
+    const int n = std::min<int>(plies, int(r.size()));
+    for (int i = 1; i <= n; ++i)
+        if (lossAfter(i) > bestLoss && lossAfter(std::min(int(r.size()), i + 4)) > bestLoss) return true;
+    return false;
+}
+
 bool Ctx::concreteLoss(int plies) const {
     if (lossWithin(plies) - bestLoss >= 2) return true;
     for (int i = 0; i < int(r.size()) && i < plies; ++i)
@@ -479,6 +486,50 @@ void planDemo(const Ctx& c, Explanation& ex) {
     if (ex.threatTail.empty() && !designation(c, ex, afterPlies(c, ex.threatPlies), b)) ex.demoPlies = 0;
 }
 
+// "If you take back with Qxd2, Qxh1 takes your rook": said where the sequence stops when the
+// demonstration plays it to the end, else with the cause (the table then shows p1).
+bool retakeBeat(const Ctx& c, const Explanation& ex, const Position& table, Beat& out) {
+    if (!ex.retake.valid() || !ex.punish.valid() || ex.fullPlies <= 0) return false;
+    const Position q = afterPlies(c, ex.fullPlies);
+    Position after = q;
+    after.makeMove(ex.retake);
+    const Move& hit = ex.punish;
+    const Square lostOn = (hit.flags & MoveEnPassant) ? Square(hit.to + (c.coach == White ? -8 : 8)) : hit.to;
+    const Piece taker = q.at(ex.retake.from), hitter = after.at(hit.from), victim = after.at(lostOn);
+    if (taker.empty() || taker.color != c.human || hitter.empty() || hitter.color != c.coach || victim.empty() ||
+        victim.color != c.human)
+        return false;
+    // Where each piece stands on the table: the piece that takes back, before it does.
+    const Square victimAt = lostOn == ex.retake.to ? ex.retake.from : lostOn;
+    const auto there = [&](Square s, const Piece& pc) { return table.at(s) == pc ? s : NoSquare; };
+    const Square takerOn = there(ex.retake.from, taker), hitterOn = there(hit.from, hitter),
+                 victimOn = there(victimAt, victim);
+    out = sayBeat(bandKey("ex.retake", c.level), Look::Target, c.ply);
+    out.line.with("move", moveArg(q, ex.retake))
+        .with("reply", moveArg(after, hit))
+        .with("your2", Arg::ofPiece(taker.type, c.human, true, takerOn))
+        .with("my", Arg::ofPiece(hitter.type, c.coach, false, hitterOn))
+        .with("your", Arg::ofPiece(victim.type, c.human, true, victimOn));
+    // Levels 1-2 name the pieces, from level 3 the moves.
+    if (c.level <= 2) {
+        pointPiece(out, takerOn, "your2");
+        pointPiece(out, hitterOn, "my");
+    } else {
+        if (takerOn != NoSquare) traceMove(out, taker.type, ex.retake.from, ex.retake.to, "move");
+        if (hitterOn != NoSquare) traceMove(out, hitter.type, hit.from, hit.to, "reply");
+    }
+    if (victimOn != takerOn) pointPiece(out, victimOn, "your", true);
+    return true;
+}
+
+// A full demonstration, cut short neither by the band nor by the human's promotion.
+bool demoReachesEnd(const Ctx& c, const Explanation& ex) {
+    if (!ex.full || ex.demoPlies != ex.fullPlies || demoLength(c, ex) != ex.demoPlies) return false;
+    for (int i = 0; i < ex.demoPlies && i < int(c.r.size()); ++i)
+        if (c.r[size_t(i)].mover == c.human && c.r[size_t(i)].promotion != NoPiece) return false;
+    return true;
+}
+
 int demoLength(const Ctx& c, const Explanation& ex) {
     const int cap = ex.mate ? std::max(c.b.demoPlies, c.b.mateLinePlies) : c.b.demoPlies;
     return std::max(0, std::min({ex.demoPlies, int(c.r.size()), cap}));
@@ -523,6 +574,8 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
     }
     if (shown > 0 && !stopped && shown == ex.demoPlies) {
         if (ex.full) {
+            Beat rb;
+            if (retakeBeat(c, ex, pos, rb)) s.push_back(rb);
             // The end of the sequence: the detector's closing lines, else what the human has lost
             // (a single capture says it by itself: "I take your knight").
             if (!ex.tail.empty()) {
@@ -810,11 +863,21 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     c.loss = c.lossWithin(bd.lookahead);
     {
-        // What is still lost near the end of the best line's first 8 plies (an exchange with an
-        // in-between move loses nothing).
+        // What is still lost at the end of the best line's first 8 plies, read where the line
+        // settles: the human's capture the coach takes back on the next ply is a whole exchange, and
+        // a loss the human wins back within four more plies (an in-between check first) is none.
         const size_t w = std::min<size_t>(8, c.best.size());
-        int lost = w > 0 ? heldLoss(c.best, w, c.base, human_, c.bestEnd) : 0;
-        for (size_t i = w > 2 ? w - 2 : 1; i < w; ++i) lost = std::min(lost, heldLoss(c.best, i, c.base, human_, c.bestEnd));
+        auto settled = [&](size_t j) {
+            if (j < c.best.size() && c.best[j - 1].mover == human_ && c.best[j - 1].captured != NoPiece &&
+                c.best[j].mover != human_ && c.best[j].captured != NoPiece && c.best[j].move.to == c.best[j - 1].move.to)
+                ++j;
+            int l = c.base - c.best[j - 1].balance;
+            if (j == c.best.size() && c.bestEnd.sideToMove() == human_ && c.bestEnd.hasLegalMove())
+                l -= bestCapturePoints(c.bestEnd, human_);
+            return l;
+        };
+        int lost = w > 0 ? settled(w) : 0;
+        for (size_t j = w + 1; w > 0 && j <= std::min(c.best.size(), w + 4); ++j) lost = std::min(lost, settled(j));
         c.bestLoss = std::max(0, lost);
     }
     // whiteCp(s, true): the side to move's (the human's) centipawns.
@@ -841,6 +904,13 @@ Review Reviewer::review(const ReviewInput& in) {
     // Still better after the move: a costly move without a reason the board shows only gets a word
     // about the better move, never a blunder or mistake verdict that a player still ahead cannot see.
     const bool stillBetter = c.j.wPlayed >= 60.0;
+    // A blunder whose reason the coach cannot give reliably (none found, only the positional
+    // fallback, or one beyond a beginner's reach): "that's a blunder, your knight had a better move"
+    // and a takeback offered without naming the move. The move is said once the offer is declined,
+    // or at once when none can be made; the coach says so when the player finds it. Not for a won
+    // game drawn by repetition: the tip says why.
+    const bool hintOnly = cls == MoveClass::Blunder && !stillBetter && !c.isBest && !c.best.empty() &&
+                          !(reason && (level_ >= 3 || ex.concrete)) && !drawTip(c, tipsSaid_);
 
     bool voice = false;
     bool isRemark = false;   // counts against the unsolicited-remarks cap
@@ -869,9 +939,9 @@ Review Reviewer::review(const ReviewInput& in) {
         isRemark = true;
     } else if (fault) {
         switch (level_) {
-        case 1: voice = cls == MoveClass::Blunder && found && ex.concrete; break;
+        case 1: voice = cls == MoveClass::Blunder && ((found && ex.concrete) || hintOnly); break;
         case 2:
-            voice = (cls == MoveClass::Blunder && found && ex.concrete) ||
+            voice = (cls == MoveClass::Blunder && ((found && ex.concrete) || hintOnly)) ||
                     (cls == MoveClass::Mistake && found && ex.concrete && c.lossWithin(2) >= 1);
             isRemark = cls != MoveClass::Blunder;
             break;
@@ -904,7 +974,13 @@ Review Reviewer::review(const ReviewInput& in) {
             s.push_back(sayBeat("tb.same", Look::Player, ply));
         } else {
             out.takeback.fixed = c.j.delta < 5.0;
-            if (out.takeback.fixed) {
+            out.takeback.found = retry_.hintOnly && c.playedUci == retry_.bestUci;
+            if (out.takeback.found) {
+                // The move the hint was about.
+                Beat b = sayBeat(level_ <= 2 ? "tb.found.b1" : "tb.found", Look::Player, ply);
+                b.gestures.push_back(Gesture{GestureKind::Nod, NoSquare, {}, "", 0.0f, false});
+                s.push_back(b);
+            } else if (out.takeback.fixed) {
                 Beat b = sayBeat(level_ <= 2 ? "tb.fixed.b1" : "tb.fixed", Look::Player, ply);
                 b.gestures.push_back(Gesture{GestureKind::Nod, NoSquare, {}, "", 0.0f, false});
                 s.push_back(b);
@@ -929,7 +1005,8 @@ Review Reviewer::review(const ReviewInput& in) {
         // limit, stalemate when winning, a free piece of 3+ points missed at levels 1-2).
         // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
         const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
-        bool offer = (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) || (ex.offer && !hiddenLoss && !wonAnyway);
+        bool offer = hintOnly || (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) ||
+                     (ex.offer && !hiddenLoss && !wonAnyway);
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
@@ -941,9 +1018,33 @@ Review Reviewer::review(const ReviewInput& in) {
 
         // Sentence budget: verdict, cause, tip, better move (the demonstration's own lines, the rewind
         // and the offer excluded).
-        const bool wantBetter = level_ >= 3 && !ex.includesBest && !c.isBest && !c.best.empty() &&
+        const bool wantBetter = level_ >= 3 && !hintOnly && !ex.includesBest && !c.isBest && !c.best.empty() &&
                                 ex.type != ExType::MateMissed && ex.type != ExType::MissedCapture &&
                                 ex.type != ExType::MissedFork;
+        // The better move said: levels 3-6 with the idea that follows it ("Nf3, with the idea d4 c5"),
+        // levels 1-2 as the piece and its square (a hint-only blunder's move, once revealed).
+        auto betterBeat = [&]() {
+            if (level_ <= 2) {
+                const LineStep& b0 = c.best[0];
+                Beat bb = sayBeat(bandKey("ex.reveal", level_), Look::Target, ply);
+                bb.line.with("your", Arg::ofPiece(b0.piece, human_, true, b0.move.from)).with("sq", Arg::ofSquare(b0.move.to));
+                traceMove(bb, b0.piece, b0.move.from, b0.move.to, "your");
+                return bb;
+            }
+            // {line} is what follows {best}, never {best} again; level 5 names that idea, so without
+            // a continuation it says the level-4 line instead. Never past a move the player could not
+            // follow, a win-back with its capture (followablePlies).
+            const size_t ideaPlies = size_t(std::max(1, std::min(4, bd.linePlies) - 1));
+            const size_t sayable = followablePlies(c.best, 1 + ideaPlies, true);
+            std::string idea = sanLine(c.best, 1, sayable > 0 ? sayable - 1 : 0);
+            Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
+            bb.line.with("best", moveArg(c.best[0]))
+                .with("move", Arg::ofMove(c.playedSan, c.playedUci))
+                .with("line", Arg::ofMoves(idea))
+                .with("eval", evalArg(c.l1->score));
+            traceMove(bb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
+            return bb;
+        };
         std::string verdictKey;
         bool shake = false;
         // No verdict for a move that is not a fault (a slower mate at levels 5-6, a free piece
@@ -960,6 +1061,27 @@ Review Reviewer::review(const ReviewInput& in) {
         std::vector<Beat> cause = ex.cause, tip = ex.tip;
         Explanation shown = ex;
         if (spoken) shown.demoPlies = 0;
+        if (hintOnly) {
+            // Neither a reason (none is reliable) nor a demonstration: the piece that had the better
+            // move, when a takeback lets the player look for it; else the move itself.
+            cause.clear();
+            tip.clear();
+            shown.demoPlies = 0;
+            const LineStep& b0 = c.best[0];
+            // Where that piece stands on the table: the moved piece stands on the move's square.
+            const Square on = b0.move.from == c.played.from ? c.played.to : b0.move.from;
+            const Piece pc = c.p1.at(on);
+            if (offer && pc.color == human_ && (pc.type == b0.piece || on == c.played.to)) {
+                Beat hb = sayBeat(bandKey("ex.hint", level_), Look::Target, ply);
+                hb.line.with("your", pieceArg(c.p1, on, human_));
+                pointPiece(hb, on, "your", true);
+                cause.push_back(hb);
+            } else if (offer) {
+                cause.push_back(sayBeat("ex.hint.move", Look::Player, ply));
+            } else {
+                cause.push_back(betterBeat());
+            }
+        }
         if (level_ == 2 && cls == MoveClass::Mistake) {   // "one sentence"
             if (cause.size() > 1) cause.resize(1);
             tip.clear();
@@ -978,6 +1100,12 @@ Review Reviewer::review(const ReviewInput& in) {
             s.push_back(vb);
         }
         const bool demo = shown.demoPlies > 0 && !c.r.empty();
+        // Why the take-back the table would show fails, with the cause when no demonstration plays
+        // the sequence to its end (a cause line said: not the hint).
+        if (!useCause.empty() && !hintOnly && !(demo && demoReachesEnd(c, shown))) {
+            Beat rb;
+            if (retakeBeat(c, shown, c.p1, rb)) useCause.push_back(rb);
+        }
         for (Beat b : useCause) {
             if (demo)
                 for (Mark& m : b.marks) m.untilRewind = true;
@@ -993,22 +1121,7 @@ Review Reviewer::review(const ReviewInput& in) {
             limitPointing(b);
             s.push_back(b);
         }
-        if (better) {
-            // {line} is what follows {best} ("Nf3, with the idea d4 c5"), never {best} again; level 5
-            // names that idea, so without a continuation it says the level-4 line instead.
-            // Never past a move the player could not follow, a win-back with its capture
-            // (followablePlies).
-            const size_t ideaPlies = size_t(std::max(1, std::min(4, bd.linePlies) - 1));
-            const size_t sayable = followablePlies(c.best, 1 + ideaPlies, true);
-            std::string idea = sanLine(c.best, 1, sayable > 0 ? sayable - 1 : 0);
-            Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
-            bb.line.with("best", moveArg(c.best[0]))
-                .with("move", Arg::ofMove(c.playedSan, c.playedUci))
-                .with("line", Arg::ofMoves(idea))
-                .with("eval", evalArg(c.l1->score));
-            traceMove(bb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
-            s.push_back(bb);
-        }
+        if (better) s.push_back(betterBeat());
         if (offer) {
             Beat ob;
             ob.kind = BeatKind::OfferTakeback;
@@ -1025,6 +1138,13 @@ Review Reviewer::review(const ReviewInput& in) {
             offered_.firstUci = c.playedUci;
             offered_.firstType = ex.type;
             offeredHint_ = ex.hintSquare;
+            offeredReveal_ = Beat{};
+            if (hintOnly) {
+                offered_.hintOnly = true;
+                offered_.bestUci = c.l1->pv[0];
+                offeredHint_ = c.best[0].move.from;   // the piece, back on its square after the takeback
+                offeredReveal_ = betterBeat();
+            }
             out.offersTakeback = true;
             v.offered = true;
         } else {
@@ -1198,7 +1318,8 @@ Script Reviewer::takebackAccepted(const Game& g, bool fromOffer) {
     if (level_ > 2) return s;
     const int ply = int(g.moves().size());
     const Position& p = g.position();
-    const ExType t = offered_.firstType;
+    // A hint-only offer named the piece with the better move: the hint stays on it.
+    const ExType t = offered_.hintOnly ? ExType::None : offered_.firstType;
     if (t == ExType::MateMissed) {
         s.push_back(sayBeat("tb.hint.mate_missed.b1", Look::Player, ply));
     } else if (t == ExType::MissedCapture || t == ExType::MissedFork) {
@@ -1220,8 +1341,13 @@ Script Reviewer::takebackAccepted(const Game& g, bool fromOffer) {
     return s;
 }
 
-void Reviewer::takebackDeclined() {
+Script Reviewer::takebackDeclined() {
     retryPending_ = false;
+    Script s;
+    // The better move a hint-only offer kept back: said now, once.
+    if (offered_.hintOnly && !offeredReveal_.line.key.empty()) s.push_back(offeredReveal_);
+    offeredReveal_ = Beat{};
+    return s;
 }
 
 int Reviewer::takebacksLeft() const {

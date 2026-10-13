@@ -69,7 +69,7 @@ an.missed_fork.2 = Хід {best} давав вилку: удар по {t1:loc} �
 # The better move, when nothing above named it.
 an.better = Сильніше було {best}.
 an.better.2 = Краще було {best}.
-an.better.3 = Шахова програма радить хід {best}.
+an.better.3 = Точніше було {best}.
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

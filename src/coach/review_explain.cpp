@@ -113,39 +113,149 @@ Square squareBefore(const Ctx& c, Square sq, int k, int at) {
     return sq;
 }
 
-// Every capture the human (to move in q) could take back with (worth 'least' points or more: a pawn
-// grabbed elsewhere is no take-back of a piece) loses as much at once: the coach's best capture after
-// it (by exchange) wins back at least what it took ("Qxd2 Qxh1").
-bool takeBackFails(const Position& q, Color human, int least) {
-    for (const Move& m : q.legalMoves()) {
-        if (!(m.flags & MoveCapture) || (m.promotion != NoPiece && m.promotion != Queen)) continue;
-        const int took = seePoints(q, m);
-        if (took < std::max(1, least)) continue;
-        Position after = q;
-        after.makeMove(m);
-        if (bestCapturePoints(after, opposite(human)) < took) return false;
-    }
-    return true;
+// What the capture 'm' (legal in 'now') already won in 'before', where its side was to move too:
+// the same piece taking the same piece on the same squares (0 when it was no such move then). A
+// capture that stood there all along is no take-back and no punishment of one.
+int standingGain(const Position& before, const Position& now, const Move& m) {
+    if (before.at(m.from) != now.at(m.from) || before.at(m.to) != now.at(m.to) ||
+        before.sideToMove() != now.sideToMove())
+        return 0;
+    for (const Move& x : before.legalMoves())
+        if (x.from == m.from && x.to == m.to && x.promotion == m.promotion) return std::max(0, seePoints(before, x));
+    return 0;
 }
 
-// The piece the coach takes at ply k of r stood there before the move, and the better move gives it
-// up too: the coach takes it there within the first ten plies of the best line (nothing having moved
-// to or from that square before) and it is not taken back at once. Its loss is then no reason the move is bad (the
-// best line pays for it otherwise).
-bool bestGivesUp(const Ctx& c, int k) {
-    const Square on = c.r[size_t(k)].move.to;
-    const Piece was = c.p0.at(on);
-    if (was.color != c.human || was.type != c.r[size_t(k)].captured || c.played.from == on || c.played.to == on)
-        return false;
-    for (int j = 0; j < k; ++j)
-        if (c.r[size_t(j)].move.to == on || c.r[size_t(j)].move.from == on) return false;
+// Whether the coach answers the human's capture 'm' in q (taking 'took' by exchange) with a capture
+// elsewhere that wins back as much, more than that capture already won on the table after the move
+// (p1: a piece that stood en prise all along is no answer), and leaves the human down 'need' or
+// more whatever the human takes next. 'punish': that capture (the one that takes most).
+bool answered(const Ctx& c, const Position& q, const Move& m, int took, int need, Move* punish) {
+    Position after = q;
+    after.makeMove(m);
+    int best = -1;
+    for (const Move& r : after.legalMoves()) {
+        // The exchange on the capture's own square is counted in what it takes (SEE).
+        if (!(r.flags & MoveCapture) || r.to == m.to || (r.promotion != NoPiece && r.promotion != Queen)) continue;
+        const int see = seePoints(after, r);
+        if (see - standingGain(c.p1, after, r) < took || see <= best) continue;
+        Position end = after;
+        end.makeMove(r);
+        int lost = c.base - materialBalance(end, c.human);
+        if (end.hasLegalMove()) lost -= bestCapturePoints(end, c.human);
+        if (lost < need) continue;
+        best = see;
+        if (punish) *punish = r;
+    }
+    return best >= 0;
+}
+
+// The human's loss for good in q (the human to move, where the line shows the take-back never
+// comes): every capture worth 'least' points or more must fail ("Qxd2 Qxh1": answered()), a
+// smaller one that nothing answers is taken off (a pawn grabbed elsewhere), and the line must show
+// as much lost later on ('cap'). A capture counts for what it takes beyond what it took before the
+// move (p0): one the human could make all along takes nothing back. 0 when a take-back holds.
+// 'take', 'punish': the take-back a player looks at first (the one that takes most, on 'last'
+// first) and its answer; invalid when there is no take-back worth 'least'.
+int lossIfNoTakeBack(const Ctx& c, const Position& q, int least, int cap, Square last, Move* take, Move* punish) {
+    const int board = c.base - materialBalance(q, c.human);
+    const auto capture = [](const Move& m) {
+        return (m.flags & MoveCapture) && (m.promotion == NoPiece || m.promotion == Queen);
+    };
+    const auto takes = [&](const Move& m) { return seePoints(q, m) - standingGain(c.p0, q, m); };
+    int grab = 0;
+    for (const Move& m : q.legalMoves()) {
+        if (!capture(m)) continue;
+        const int took = takes(m);
+        if (took >= 1 && took < least && !answered(c, q, m, took, board, nullptr)) grab = std::max(grab, took);
+    }
+    const int need = std::min(board - grab, cap);
+    if (need <= 0) return 0;
+    int shown = -1;
+    for (const Move& m : q.legalMoves()) {
+        if (!capture(m)) continue;
+        const int took = takes(m);
+        if (took < std::max(1, least)) continue;
+        Move hit;
+        if (!answered(c, q, m, took, need, &hit)) return 0;
+        const int rank = 2 * took + (m.to == last ? 1 : 0);
+        if (rank > shown) {
+            shown = rank;
+            *take = m;
+            *punish = hit;
+        }
+    }
+    return need;
+}
+
+// The square a capture of the coach's along 'line' takes on (the pawn's own square en passant).
+Square takenOn(const LineStep& st, Color coach) {
+    return (st.move.flags & MoveEnPassant) ? Square(st.move.to + (coach == White ? -8 : 8)) : st.move.to;
+}
+
+// The points the better move gives up too with the human's piece that stands on 'onP0' before the
+// move: the coach takes it within the first ten plies of the best line (the piece followed as it
+// moves), and the captures on that square right after it do not win as much back; what the piece
+// took on its way is taken off ("Bxg2 Kxg2": a bishop for a pawn gives up 2). 0 when it survives,
+// or is only traded.
+int bestGivesUp(const Ctx& c, Square onP0) {
+    const Piece was = c.p0.at(onP0);
+    if (was.empty() || was.color != c.human) return 0;
+    Square at = onP0;
+    int took = 0;
     for (size_t i = 0; i < c.best.size() && i < 10; ++i) {
         const LineStep& st = c.best[i];
-        if (st.mover == c.coach && st.move.to == on && st.captured == was.type)
-            return !(i + 1 < c.best.size() && c.best[i + 1].captured != NoPiece && c.best[i + 1].move.to == on);
-        if (st.move.to == on || st.move.from == on) return false;
+        if (st.mover == c.human) {
+            if (st.move.from == at) {
+                at = st.move.to;
+                took += points(st.captured);
+            } else if (st.piece == King && (st.move.flags & (MoveCastleKing | MoveCastleQueen))) {
+                // The rook castles with the king.
+                const int rank = rankOf(st.move.to);
+                const bool king = fileOf(st.move.to) == 6;
+                if (at == makeSquare(king ? 7 : 0, rank)) at = makeSquare(king ? 5 : 3, rank);
+            }
+            continue;
+        }
+        if (st.captured == NoPiece || takenOn(st, c.coach) != at) continue;
+        // The captures on that square after it (an in-between move or two allowed): what the human
+        // wins back there (a trade gives up nothing; "Nxe4 Nxe4 Rxe4" still costs the pawn).
+        int net = points(st.captured);
+        for (size_t j = i + 1, last = i; j < c.best.size() && j <= last + 3; ++j) {
+            if (c.best[j].captured == NoPiece || c.best[j].move.to != st.move.to) continue;   // an in-between move
+            net += c.best[j].mover == c.human ? -points(c.best[j].captured) : points(c.best[j].captured);
+            last = j;
+        }
+        return std::max(0, std::min(net, points(st.captured)) - took);
     }
-    return false;
+    return 0;
+}
+
+// What the better move gives up too of the pieces the first k+1 plies of r take (bestGivesUp, each
+// piece followed back to where it stood before the move), at most what its line loses for good;
+// 'atK': the piece taken at ply k is one, and that line loses as much.
+int givenUpAlong(const Ctx& c, int k, bool& atK) {
+    int total = 0;
+    atK = false;
+    // The most the better move's line is down for good within its first ten plies (a loss that
+    // still holds four plies later): a piece it gives up while it wins as much back elsewhere ("fxe5"
+    // takes a knight for the bishop) is traded, not given up.
+    int endLoss = 0;
+    for (size_t i = 1; i <= std::min<size_t>(c.best.size(), 10); ++i) {
+        int l = c.base - c.best[i - 1].balance;
+        for (size_t j = i + 1; j <= std::min(c.best.size(), i + 4); ++j) l = std::min(l, c.base - c.best[j - 1].balance);
+        endLoss = std::max(endLoss, l);
+    }
+    if (endLoss <= 0) return 0;
+    for (int j = 0; j <= k && j < int(c.r.size()); ++j) {
+        const LineStep& st = c.r[size_t(j)];
+        if (st.mover != c.coach || st.captured == NoPiece) continue;
+        const Square onP1 = squareBefore(c, takenOn(st, c.coach), j, 0);
+        if (onP1 == NoSquare) continue;
+        const int g = bestGivesUp(c, onP1 == c.played.to ? c.played.from : onP1);
+        total += g;
+        if (j == k && g > 0 && endLoss >= g) atK = true;
+    }
+    return std::min(total, endLoss);
 }
 
 // The sequence of a loss: the coach's capture at ply k of r, with the human's recapture when one
@@ -156,12 +266,18 @@ bool bestGivesUp(const Ctx& c, int k) {
 // (Ctx::lossExplains). At most a few plies
 // past the band's reach (the lines say the sequence, the table shows it). threatPlies: the plies of
 // r until the problem stands on the board. The captured piece is the target, on its square once the
-// problem stands; it must still be the same piece there.
-bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
+// problem stands; it must still be the same piece there. targetOnly: the reason names that target
+// only (a motif), not the whole line.
+bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targetOnly = false) {
     const int n = int(c.r.size());
     if (k < 0 || k >= n || c.r[size_t(k)].mover != c.coach || c.r[size_t(k)].captured == NoPiece) return false;
     const bool pawn = c.r[size_t(k)].captured == Pawn;
-    if (bestGivesUp(c, k)) return false;
+    // A piece the better move gives up too is no reason the move is bad; one taken on the way would
+    // be counted in what the line says is lost: the move must then cost a piece or more on its own,
+    // twice what the better move gives up as well.
+    bool atK = false;
+    const int givenUp = givenUpAlong(c, k, atK);
+    if (atK) return false;
     const int cap = std::max(c.b.demoPlies, c.b.linePlies) + 2;
     int plies = 0, lost = 0;
     // The human's recapture on the next ply is part of the sequence (shown and said with it).
@@ -177,6 +293,11 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
     const Square at = c.r[size_t(k)].move.to;
     const bool tradeBack = capturesOn(k - 1, c.human, at) && !capturesOn(k - 2, c.coach, at);
     const int already = k > 0 ? c.lossAfter(tradeBack ? k - 1 : k) : 0;
+    // Whether material changed hands before ply k on another square than this capture's.
+    bool earlier = false;
+    for (int i = 0; i < k; ++i)
+        if (c.r[size_t(i)].captured != NoPiece && c.r[size_t(i)].move.to != at) earlier = true;
+    Move take, punish;
     for (int p = retake ? k + 2 : k + 1; p <= std::min({n, k + 2, cap}) && plies == 0; ++p) {
         const LineStep& st = c.r[size_t(p - 1)];
         if (st.captured == NoPiece || st.mate) continue;
@@ -194,25 +315,44 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex) {
         const int held = p < n ? c.lossAfter(std::min(n, p + 4)) : l;
         // Only when the human's next move takes nothing (a capture elsewhere, taken back at once, would
         // leave the take-back the board shows unexplained: "after Nxf3, 3 points lost", gxf3 there),
-        // and when every such take-back loses as much at once to a capture (not a gambit the line
-        // prefers, nor a refutation the table cannot show).
+        // and when every such take-back loses as much at once to a capture (lossIfNoTakeBack: not a
+        // gambit the line prefers, nor a refutation the table cannot show); the take-back is then
+        // said with the loss.
+        Move tk, pn;
+        bool fails = false;
         if (held > l && p < n && c.r[size_t(p)].mover == c.human && c.r[size_t(p)].captured == NoPiece &&
-            !(l > already && c.lossExplains(l, pawn)) &&
-            takeBackFails(q, c.human, std::min(2, points(c.r[size_t(k)].captured)))) {
+            !(l > already && c.lossExplains(l, pawn))) {
             // Four plies later, the board still shows as much lost, whatever the human could take then.
             const int at = std::min(n, p + 4);
             const Position later = afterR(c, at);
             int still = c.base - c.r[size_t(at - 1)].balance;
             if (later.sideToMove() == c.human) still -= bestCapturePoints(later, c.human);
-            l = std::max(l, std::min({board, held, still}));
+            const int raised = lossIfNoTakeBack(c, q, std::min(2, points(c.r[size_t(k)].captured)),
+                                                std::min(held, still), st.move.to, &tk, &pn);
+            if (raised > l) {
+                l = raised;
+                fails = tk.valid() && pn.valid();
+            }
         }
         if (l <= already || !c.lossExplains(l, pawn) || !c.lossExplains(held, pawn)) continue;
+        // A reason that names only this capture's target: what was lost before it on other squares
+        // is the reason when it explains the move by itself and this capture adds no more ("Nxb3"
+        // took the queen: the pawn a discovered attack wins next is not it).
+        if (targetOnly && earlier && already > c.bestLoss && already >= l - already && c.lossExplains(already)) continue;
+        if (givenUp > 0 && (l - givenUp < std::max(3, 2 * givenUp) || !c.lossExplains(l - givenUp, pawn))) continue;
         plies = p;
         lost = l;
+        if (fails) {
+            take = tk;
+            punish = pn;
+        }
     }
     if (plies == 0) return false;
     ex.fullPlies = plies;
     ex.lost = lost;
+    // The take-back the table shows there fails: said with the loss (the line stops before it).
+    ex.retake = take;
+    ex.punish = punish;
     ex.threatPlies = std::min(threatPlies, k);
     ex.targets.clear();
     const Square to = (c.r[size_t(k)].move.flags & MoveEnPassant)
@@ -429,7 +569,7 @@ bool fork(const Ctx& c, Explanation& out) {
     Square taken = NoSquare;
     const int takenAt = firstTaken(c, targets, &taken);
     Explanation ex;
-    if (!settleLoss(c, takenAt, 1, ex)) return false;
+    if (!settleLoss(c, takenAt, 1, ex, true)) return false;
     ex.type = ExType::Fork;
     ex.concrete = true;
     ex.includesBest = c.level == 6;
@@ -492,7 +632,7 @@ bool discovered(const Ctx& c, Explanation& out) {
         const int at = coachTakesAt(c, d.target, motifReach(c));
         if (at < 0 || !stays(c, d.target, 1, at)) continue;
         Explanation ex;
-        if (!settleLoss(c, at, 1, ex)) continue;
+        if (!settleLoss(c, at, 1, ex, true)) continue;
         ex.type = ExType::Discovered;
         ex.concrete = true;
         ex.hintSquare = squareOnP0(c, d.target);
@@ -521,7 +661,7 @@ bool discovered(const Ctx& c, Explanation& out) {
         if (!d.check) continue;
         for (int k = 1; k < int(c.r.size()) && k <= motifReach(c); ++k) {
             Explanation ex;
-            if (!settleLoss(c, k, 1, ex)) continue;
+            if (!settleLoss(c, k, 1, ex, true)) continue;
             ex.type = ExType::Discovered;
             ex.concrete = true;
             ex.hintSquare = c.p1.kingSquare(c.human);
@@ -557,7 +697,7 @@ bool skewer(const Ctx& c, Explanation& out) {
         const int at = coachTakesAt(c, sk.behind, motifReach(c));
         if (at < 0 || !stays(c, sk.behind, 1, at)) continue;
         Explanation ex;
-        if (!settleLoss(c, at, 1, ex)) continue;
+        if (!settleLoss(c, at, 1, ex, true)) continue;
         ex.type = ExType::Skewer;
         ex.concrete = true;
         ex.hintSquare = squareOnP0(c, sk.behind);
@@ -598,7 +738,7 @@ bool pin(const Ctx& c, Explanation& out) {
         const int at = coachTakesAt(c, pn.pinned, reach);
         if (at < 0 || !stays(c, pn.pinned, 1, at)) continue;
         Explanation ex;
-        if (!settleLoss(c, at, 1, ex)) continue;
+        if (!settleLoss(c, at, 1, ex, true)) continue;
         ex.type = ExType::Pin;
         ex.concrete = true;
         ex.hintSquare = squareOnP0(c, pn.pinned);
@@ -678,7 +818,7 @@ bool trapped(const Ctx& c, Explanation& out) {
     Square x = NoSquare;
     Explanation ex;
     for (Square s : squaresOf(p2.pieces(c.human) & ~(p2.pieces(Pawn) | p2.pieces(King))))
-        if (isTrapped(p2, s) && settleLoss(c, takenLater(c, s, reach), 1, ex)) {
+        if (isTrapped(p2, s) && settleLoss(c, takenLater(c, s, reach), 1, ex, true)) {
             x = s;
             break;
         }
@@ -691,7 +831,7 @@ bool trapped(const Ctx& c, Explanation& out) {
         if (boxed)
             for (const Move& m : p2.legalMovesFrom(c.played.to))
                 if (seePoints(p2, m) >= 0) boxed = false;
-        if (boxed && settleLoss(c, takenLater(c, c.played.to, reach), 1, ex)) x = c.played.to;
+        if (boxed && settleLoss(c, takenLater(c, c.played.to, reach), 1, ex, true)) x = c.played.to;
     }
     if (x == NoSquare) return false;
     ex.type = ExType::Trapped;
@@ -726,8 +866,12 @@ bool backRank(const Ctx& c, Explanation& out) {
         // The lines say the check wins material: the line wins it, for good, after the check.
         Explanation ex;
         bool won = false;
-        for (int k = i; k < int(c.r.size()) && k <= i + 4 && !won; ++k) won = settleLoss(c, k, i + 1, ex);
+        int at = i;
+        for (; at < int(c.r.size()) && at <= i + 4 && !won; ++at) won = settleLoss(c, at, i + 1, ex, true);
         if (!won) return false;
+        // The check that takes a loose piece and wins no more: that piece was hanging (section 10),
+        // whatever the back rank.
+        if (at - 1 == i && st.captured != NoPiece && isUndefended(afterR(c, i), st.move.to)) return false;
         const Square k = c.p1.kingSquare(c.human);
         ex.type = ExType::BackRank;
         ex.concrete = true;
@@ -876,7 +1020,7 @@ bool materialLine(const Ctx& c, Explanation& out) {
     const int reach = std::min(int(c.r.size()), std::max(8, c.b.lookahead + 4));
     for (int k = 0; k < reach; ++k) {
         Explanation ex;
-        if (!settleLoss(c, k, k, ex)) continue;
+        if (!settleLoss(c, k, k, ex, c.level <= 2)) continue;
         // The piece named: the one whose capture settles the loss (not one traded on the way), on
         // its square of the table (p1).
         Square named = NoSquare;
@@ -887,7 +1031,10 @@ bool materialLine(const Ctx& c, Explanation& out) {
         }
         // Levels 1-2 name the piece and show the whole sequence (a claim the table does not show
         // would be lost on a beginner).
-        if (c.level <= 2 && (named == NoSquare || ex.fullPlies > c.b.demoPlies)) continue;
+        // The piece named is the reason by itself ("I can win your pawn" for two pawns lost says too little).
+        if (c.level <= 2 && (named == NoSquare || ex.fullPlies > c.b.demoPlies ||
+                             !c.lossExplains(points(c.p1.at(named).type), c.p1.at(named).type == Pawn)))
+            continue;
         ex.type = ExType::Material;
         ex.concrete = true;
         ex.hintSquare = named != NoSquare ? squareOnP0(c, named) : NoSquare;
@@ -1066,7 +1213,9 @@ bool promotionRace(const Ctx& c, Explanation& out) {
 bool kingSafety(const Ctx& c, Explanation& out) {
     // The checks counted and the line said: the part of the refutation a player can follow.
     const int reach = c.followable(c.b.lookahead + 2, true);
-    if (c.j.delta < 5.0 || c.concreteLoss(8) || reach == 0) return false;
+    // Never for a move that loses material: the king's safety may be why it is lost (a take-back
+    // that opens the king), but the coach cannot show it.
+    if (c.j.delta < 5.0 || c.concreteLoss(8) || c.losesMaterial(8) || reach == 0) return false;
     int checks = 0;
     for (int i = 0; i < reach; ++i)
         if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].check) ++checks;
@@ -1100,7 +1249,7 @@ bool kingSafety(const Ctx& c, Explanation& out) {
 
 // ---- 15. Bad trade: into a lost pawn ending; the bishop pair ----
 bool badTrade(const Ctx& c, Explanation& out) {
-    if (c.level < 3 || c.j.delta < 5.0 || c.concreteLoss(8)) return false;
+    if (c.level < 3 || c.j.delta < 5.0 || c.concreteLoss(8) || c.losesMaterial(8)) return false;
     // A trade needs pieces on both sides (a piece simply lost is another explanation).
     const uint64_t kingsPawns = c.p0.pieces(Pawn) | c.p0.pieces(King);
     const bool bothHavePieces = (c.p0.pieces(c.human) & ~kingsPawns) && (c.p0.pieces(c.coach) & ~kingsPawns);
@@ -1143,7 +1292,8 @@ bool badTrade(const Ctx& c, Explanation& out) {
 
 // ---- 17. Endgame technique ----
 bool endgame(const Ctx& c, Explanation& out) {
-    if (!endgamePhase(c) || c.best.empty() || c.isBest || c.j.delta < 5.0 || c.concreteLoss(8)) return false;
+    if (!endgamePhase(c) || c.best.empty() || c.isBest || c.j.delta < 5.0 || c.concreteLoss(8) || c.losesMaterial(8))
+        return false;
     const LineStep& b0 = c.best[0];
     Explanation ex;
     ex.type = ExType::Endgame;
@@ -1188,8 +1338,9 @@ bool endgame(const Ctx& c, Explanation& out) {
 }
 
 // ---- 18. Positional fallback (levels 4-6) ----
+// "X keeps a better position": never for a move that loses material (Ctx::losesMaterial).
 bool positional(const Ctx& c, Explanation& out) {
-    if (c.level < 4 || c.best.empty() || c.isBest || c.concreteLoss(8)) return false;
+    if (c.level < 4 || c.best.empty() || c.isBest || c.concreteLoss(8) || c.losesMaterial(8)) return false;
     Explanation ex;
     ex.type = ExType::Positional;
     ex.includesBest = true;
@@ -1356,6 +1507,11 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
         }
     }
     return false;
+}
+
+bool drawTip(const Ctx& c, uint32_t tipsSaid) {
+    Explanation t;
+    return findTip(c, tipsSaid, t) && (t.tipBit == Fifty || t.tipBit == Repetition);
 }
 
 }  // namespace detail
