@@ -437,8 +437,8 @@ TEST(coach_catalog_respellings) {
     Line l = line("c");
     l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false)).with("sq", Arg::ofSquare(chess::parseSquare("e8")));
     Catalog::Rendered rc = c.renderVariant(l, "fr", true, 1);
-    CHECK_EQ(rc.text, std::string("Ma tour va en eu huite, et c’est matte."));
-    CHECK_EQ(rc.text.substr(size_t(rc.anchor("sq")), 8), std::string("eu huite"));
+    CHECK_EQ(rc.text, std::string("Ma tour va en euh huite, et c’est matte."));
+    CHECK_EQ(rc.text.substr(size_t(rc.anchor("sq")), 9), std::string("euh huite"));
     // Other languages keep their words.
     c.addFile("de", "test", "a = Matt in {n:move}, {@}mat.\nb = x\nc = x\n");
     CHECK(spoken(c, a, "de").find(" mat.") != std::string::npos);

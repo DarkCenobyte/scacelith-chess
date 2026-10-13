@@ -91,12 +91,12 @@ EPONYM_LATIN = {
 }
 
 # Spoken squares and files. Files are said by their letter's name, ranks as number words (as file.*.spoken and
-# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "eu", "sisse" and "huite": the voice says a lone
-# "e" too briefly, reads "six" as "sixe" and "huit" as "hui"; Russian "йе" and Ukrainian "е́" with a stress mark:
+# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "euh", "sisse" and "huite": the voice says a lone
+# "e" too briefly and "eu" like "u", reads "six" as "sixe" and "huit" as "hui"; Russian "йе" and Ukrainian "е́" with a stress mark:
 # the voice reads a lone Russian "е" as "и" and swallows the Ukrainian one).
 FILE_WORDS = {
     'en': ['ay', 'bee', 'see', 'dee', 'ee', 'eff', 'gee', 'aitch'],
-    'fr': ['a', 'bé', 'cé', 'dé', 'eu', 'effe', 'gé', 'ache'],
+    'fr': ['a', 'bé', 'cé', 'dé', 'euh', 'effe', 'gé', 'ache'],
     'de': ['a', 'be', 'ce', 'de', 'e', 'ef', 'ge', 'ha'],
     'es': ['a', 'be', 'ce', 'de', 'e', 'efe', 'ge', 'hache'],
     'ru': ['а', 'бэ', 'цэ', 'дэ', 'йе', 'эф', 'жэ', 'аш'],
