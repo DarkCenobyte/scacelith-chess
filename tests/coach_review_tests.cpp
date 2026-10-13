@@ -1420,6 +1420,69 @@ TEST(coach_review_take_back_answer_is_the_strongest_capture) {
     }
 }
 
+TEST(coach_review_bad_move_series_cases) {
+    // Bad moves played in recorded positions (coach_audit record --positions): reasons the audit
+    // found wrong, each fixed.
+    {
+        // 31...Bg4? The rook on a8 already hung to Qxa8+, and dxe5 cannot save it either (it takes
+        // the knight instead): never "your rook has no protector", at any level.
+        const Recorded rc = recorded(
+         "rec b d7g4 startpos ; e2e4 c7c5 d2d3 g7g6 d3d4 c5d4 c2c3 d4c3 b1c3 f8g7 c1g5 d8a5 g1f3 b8c6 g5d2 a5d8 f1c4 g8f6 e1g1 c6a5 c4e2 a5c6 f1e1 d7d6 h2h3 b7b5 e2b5 c8d7 d2g5 e8g8 a1b1 d8b8 b1c1 a7a5 d1d2 c6e5 f3e5 d7b5 a2a4 b5e8 e5f3 b8b7 f3d4 b7b6 b2b3 e8d7 e1d1 f8d8 d2e2 d8c8 g5e3 g7f8 e2f3 f8g7 d4f5 c8c3 f5e7 g8f8 e4e5 c3e3 f2e3\n"
+         "an a0 1 0 0 16 d6e5 3\n"
+         "ln 1 16 -51 0 0 0 E d6e5 e7g6 h7g6 f3a8 d7e8 g1h1 b6b3 a8a5 b3a4 a5c5 f8g8 d1d8 g8h7 c5e5 e8d7\n"
+         "ln 2 16 -51 0 0 0 E f6e8 f3a8 f8e7 e5d6 e8d6 g1h1 g7b2 c1c2 b2e5 a8d5 f7f6 d5c5 b6c5 c2c5 d6b7 c5c4\n"
+         "ln 3 16 -359 0 0 0 E f8e7 e5f6 g7f6 f3a8 b6e3 g1h1 e3b3 d1f1 b3a4 c1c7 a4a2 a8e4 f6e5 e4h4 e7e8 h4h7 e8e7\n"
+         "an a1 1 0 0 16 d7g4 1\n"
+         "ln 1 16 -781 0 0 0 E d7g4 f3a8 f6e8 e7d5 b6b3 h3g4 g7e5 a8c8 e5g3 c8c4 b3b2 c4f1 b2b8 f1f3 g3h2 g1h1\n"
+         "an a2 1 1 0 14 f3a8 2\n"
+         "ln 1 14 868 0 0 0 E f3a8 f6e8 e7d5 b6b3 h3g4 g7h6 d1e1 b3a4 a8d8 f8g7 d8e7 a4g4\n"
+         "ln 2 14 668 0 0 0 E h3g4 d6e5 e7c8 e5e4 f3f4 b6b3 d1d8 f6e8 f4e4\n"
+         "an a3 1 0 0 6 f6e8 1\n"
+         "ln 1 6 -51 0 0 0 E f6e8 f3a8 f8e7 e5d6 e8d6 g1h1 g7b2 c1c2 b2e5 a8d5 f7f6\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bg4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.hanging"));
+            for (const Beat& b : r.script) {
+                if (startsWith(b.line.key, "ex.hint.") || startsWith(b.line.key, "ex.reveal.") ||
+                    startsWith(b.line.key, "ex.better."))
+                    continue;
+                for (const auto& a : b.line.args) CHECK(!(a.second.kind == Arg::Kind::Piece && a.second.square == sq("a8")));
+            }
+        }
+    }
+    {
+        // 2.f5? d5 e4 dxe4 Nc3 Bxf5: two pawns for a drop of three. Levels 4-6 stop the table at d5:
+        // "a discovered attack on your pawn" alone would say one; the line and its two points instead.
+        const Recorded rc = recorded(
+         "rec w f4f5 startpos ; f2f4 c7c6\n"
+         "an a0 1 1 0 16 d2d3 3\n"
+         "ln 1 16 6 0 0 0 E d2d3 d7d5 e2e4 d5e4 d3e4 d8d1 e1d1 g8f6 e4e5 f6d5 g1f3 g7g6 c1d2 c8f5 b1c3 d5c3 d2c3 e7e6 f1d3 f5d3 c2d3 c6c5\n"
+         "ln 2 16 6 0 0 0 E e2e4 d7d5 d2d3 d5e4 d3e4 d8d1 e1d1 g8f6 e4e5 f6d5 g1f3 g7g6 c1d2 c8f5 b1c3 d5c3 d2c3\n"
+         "ln 3 16 -3 0 0 0 E g1f3 d7d5 d2d3 g8f6 b1c3 c8f5 h2h3 h7h6 g2g4 f5h7 f4f5 e7e6\n"
+         "an a1 1 1 0 16 f4f5 1\n"
+         "ln 1 16 -288 0 0 0 E f4f5 d7d5 e2e4 d5e4 b1c3 c8f5 g2g4 f5e6 d1e2 b8d7 g4g5 h7h6 c3e4 h6g5 e4g5 e6d5 g1f3 e7e6 d2d4\n"
+         "an a2 1 0 0 14 d7d5 2\n"
+         "ln 1 14 278 0 0 0 E d7d5 e2e4 d5e4 b1c3 c8f5 g2g4 f5g6 d1e2 b8a6 c3e4\n"
+         "ln 2 14 178 0 0 0 E g8f6 d2d3 d7d5 g2g4 g7g6 g4g5 f6h5 f1h3 c8f5 h3f5 g6f5 e2e4 h5g7 d1e2 f5e4 d3e4\n"
+         "an a3 1 1 0 6 e2e4 1\n"
+         "ln 1 6 14 0 0 0 E e2e4 d7d5 d2d3\n"
+         "end\n");
+        for (int level = 4; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "f5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.discovered"));
+        }
+    }
+}
+
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
     // better move, never the move itself while the takeback is offered.

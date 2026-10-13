@@ -89,11 +89,16 @@ int worstLoss(const std::vector<LineStep>& line, const Position& start, Color hu
 
 // The human's loss after the first 'plies' plies of a line played from 'start' (relative to
 // 'base'): the human's capture there that the other side takes back on the next ply is a whole
-// exchange, and where the line stops with the human to move, what the human takes back at once is
-// taken off.
+// exchange, and so are the captures on that square that follow it at once (Bxa6 ... Rxa6 Rxa6 Nxa6:
+// the exchange read where it ends); where the line stops with the human to move, what the human
+// takes back at once is taken off.
 int lossAt(const std::vector<LineStep>& line, const Position& start, Color human, int base, size_t plies) {
     if (plies > 0 && plies < line.size() && line[plies - 1].mover == human && line[plies - 1].captured != NoPiece &&
         line[plies].mover != human && line[plies].captured != NoPiece && line[plies].move.to == line[plies - 1].move.to)
+        ++plies;
+    while (plies > 1 && plies < line.size() && line[plies - 1].captured != NoPiece &&
+           line[plies - 2].captured != NoPiece && line[plies - 2].move.to == line[plies - 1].move.to &&
+           line[plies].captured != NoPiece && line[plies].move.to == line[plies - 1].move.to)
         ++plies;
     Position q = start;
     for (size_t i = 0; i < plies && i < line.size(); ++i) q.makeMove(line[i].move);
@@ -311,25 +316,31 @@ void checkAnchors(const Beat& b, std::vector<Finding>& out) {
 }
 
 // "I can win your queen" / "your rook can't be saved": the piece named is taken by the coach along
-// the refutation, and not traded (the human taking back as much on that square at once).
-void checkWon(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
+// the refutation, and not traded (the human taking back as much on that square at once; a pawn that
+// promotes as it captures is a pawn taken back). 'from': the plies of the refutation shown before the
+// line is said (ex.point.piece names the piece where it stands then).
+void checkWon(const Ctx& c, const Beat& b, size_t from, std::vector<Finding>& out) {
     const bool claim = b.line.key.rfind("ex.material.b1", 0) == 0 || b.line.key.rfind("ex.material.b2", 0) == 0 ||
                        b.line.key == "ex.point.piece";
     const Arg* t1 = b.line.arg("t1");
     if (!claim || !t1 || t1->square == NoSquare) return;
     // Follow the piece along the line from where it stands on the table, or where the demonstration
     // stopped (ex.point.piece: its square then; found by matching the piece along the line).
+    if (b.line.key != "ex.point.piece") from = 0;
     Position q = c.p1;
     Square at = NoSquare;
     for (size_t i = 0; i <= c.refut.size(); ++i) {
-        if (q.at(t1->square).type == t1->piece && q.at(t1->square).color == c.human && at == NoSquare) at = t1->square;
+        if (i >= from && q.at(t1->square).type == t1->piece && q.at(t1->square).color == c.human && at == NoSquare)
+            at = t1->square;
         if (i == c.refut.size()) break;
         const LineStep& st = c.refut[i];
         if (at != NoSquare) {
             if (st.mover == c.human && st.move.from == at) at = st.move.to;
             else if (st.mover == c.coach && st.move.to == at && st.captured != NoPiece) {
+                const int back = st.promotion != NoPiece ? kPiecePoints[Pawn]
+                                 : i + 1 < c.refut.size() ? kPiecePoints[c.refut[i + 1].captured] : 0;
                 const bool traded = i + 1 < c.refut.size() && c.refut[i + 1].mover == c.human &&
-                                    c.refut[i + 1].move.to == at && kPiecePoints[c.refut[i + 1].captured] >= kPiecePoints[st.captured];
+                                    c.refut[i + 1].move.to == at && back >= kPiecePoints[st.captured];
                 if (traded) out.push_back({"TRADED_NAMED", b.line.key + " names a " + pieceName(st.captured) + " that is traded"});
                 return;
             }
@@ -758,7 +769,7 @@ int reviewMain(const Options& o) {
                 case BeatKind::OfferTakeback:
                     checkPieceArgs(c, b, table, false, f);
                     checkPts(c, b, f);
-                    checkWon(c, b, f);
+                    checkWon(c, b, size_t(demoPlies), f);
                     checkFree(c, b, f);
                     checkFork(c, b, f);
                     checkMateCount(c, b, f);
@@ -1043,7 +1054,7 @@ int reviewMain(const Options& o) {
             // took the queen; "Qxc6" took a loose bishop, the fork on two pawns came after).
             if (explained && fault && (isMaterialType(t) && t != ExType::Hanging && t != ExType::Exchange) &&
                 !c.refut.empty() && c.refut[0].mover == c.coach && c.refut[0].captured != NoPiece) {
-                bool saysPts = false, named = false;
+                bool saysPts = false, named = false, kingNamed = false;
                 int target = 0;
                 const Square took = (c.refut[0].move.flags & MoveEnPassant)
                                         ? Square(c.refut[0].move.to + (c.human == White ? 8 : -8))
@@ -1055,7 +1066,11 @@ int reviewMain(const Options& o) {
                         continue;
                     for (const std::string& vt : variantsOf(k)) saysPts = saysPts || usesPlaceholder(vt, "pts");
                     for (const char* n : {"t1", "t2", "your"})
-                        if (const Arg* a = b.line.arg(n); a && a->kind == Arg::Kind::Piece && a->color == c.human && a->piece != King) {
+                        if (const Arg* a = b.line.arg(n); a && a->kind == Arg::Kind::Piece && a->color == c.human) {
+                            if (a->piece == King) {
+                                kingNamed = true;
+                                continue;
+                            }
                             target = std::max(target, int(kPiecePoints[a->piece]));
                             named = named || a->square == took;
                         }
@@ -1067,6 +1082,10 @@ int reviewMain(const Options& o) {
                 if (c.refut.size() >= 2 && c.refut[1].mover == c.human && c.refut[1].captured != NoPiece)
                     q.makeMove(c.refut[1].move);
                 const int lostAtOnce = c.base - materialBalance(q, c.human);
+                // A check the motif names (a discovered check, a fork with check): its prize is what
+                // the line wins after the reply's own capture.
+                if (kingNamed && (t == ExType::Discovered || t == ExType::Fork || t == ExType::Skewer))
+                    target = std::max(target, lastingLoss(c.playedLine, c.p0, c.human, c.base, 9) - lostAtOnce);
                 if (lostAtOnce >= 1 && lostAtOnce >= target && !named && !(t == ExType::Material && saysPts))
                     f.push_back({"MOTIF_BEHIND_CAPTURE", std::string(exTypeName(t)) + " names " + std::to_string(target) +
                                                               " points, " + c.refut[0].san + " takes " +

@@ -247,7 +247,10 @@ int bestGivesUp(const Ctx& c, Square onP0) {
 
 // What the better move gives up too of the pieces the first k+1 plies of r take (bestGivesUp, each
 // piece followed back to where it stood before the move), at most what its line loses for good;
-// 'atK': the piece taken at ply k is one, and that line loses as much.
+// 'atK': the piece taken at ply k is one, and that line loses as much, or the better move gives it up
+// whole (it takes nothing on its way) and it could already be won so before the move (the move did
+// not leave it: "your rook has no protector" would blame the move for a rook the better move cannot
+// save either, whatever it wins elsewhere).
 int givenUpAlong(const Ctx& c, int k, bool& atK) {
     int total = 0;
     atK = false;
@@ -274,9 +277,12 @@ int givenUpAlong(const Ctx& c, int k, bool& atK) {
         if (st.mover != c.coach || st.captured == NoPiece) continue;
         const Square onP1 = squareBefore(c, takenOn(st, c.coach), j, 0);
         if (onP1 == NoSquare) continue;
-        const int g = bestGivesUp(c, onP1 == c.played.to ? c.played.from : onP1);
+        const Square onP0 = onP1 == c.played.to ? c.played.from : onP1;
+        const int g = bestGivesUp(c, onP0);
         total += g;
-        if (j == k && g > 0 && endLoss >= g) atK = true;
+        if (j == k && g > 0 &&
+            (endLoss >= g || (g >= points(c.p0.at(onP0).type) && seeSquarePoints(c.p0, onP0, c.coach) >= g)))
+            atK = true;
     }
     return std::min(total, endLoss);
 }
@@ -380,6 +386,9 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
         // is the reason when it explains the move by itself and this capture adds no more ("Nxb3"
         // took the queen: the pawn a discovered attack wins next is not it).
         if (targetOnly && earlier && already > c.bestLoss && already >= l - already && c.lossExplains(already)) continue;
+        // ... and when the demonstration stops where the problem stands (levels 4-6), the target
+        // alone must explain the move: "your pawn can't be saved" for two pawns lost understates it.
+        if (targetOnly && earlier && !c.b.fullDemo && !c.lossExplains(l - already, pawn)) continue;
         if (givenUp > 0 && (l - givenUp < std::max(3, 2 * givenUp) || !c.lossExplains(l - givenUp, pawn))) continue;
         plies = p;
         lost = l;
