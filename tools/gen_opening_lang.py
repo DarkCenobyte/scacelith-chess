@@ -116,9 +116,11 @@ RANK_WORDS = {
 }
 SQUARE_SEP = {'ja': ''}
 # Words the voice misreads, said otherwise in speech (as respell.* in assets/coach/speech/<code>/common.lang, which
-# the catalog applies to whole words only): French "dix-neuvième" is read with a k ("dixe-neuvième").
+# the catalog applies to whole words only): French "dix-neuvième" is read with a k ("dixe-neuvième"); Japanese
+# "代わり" is read "たわり", and "一マス"/"二マス" are said "ひとマス"/"ふたマス" (as count.square.spoken).
 SPOKEN_WORDS = {
     'fr': {'dix-neuvième': 'dize-neuvième'},
+    'ja': {'代わり': 'かわり', '一マス': 'ひとマス', '二マス': 'ふたマス'},
 }
 # A file named by its letter next to its noun ("the c-file", "la colonne c", "c-Linie", "cファイル").
 FILE_PATTERNS = {
