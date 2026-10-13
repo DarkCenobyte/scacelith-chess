@@ -577,7 +577,7 @@ ex.hanging.tip.b1.2 = A good habit: after every move, check which of your pieces
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured.
-ex.exchange_capture.b1 = {your} took a piece, but {my} takes back. That trade loses points.
+ex.exchange_capture.b1 = {your} made a capture, but {my} takes back. That trade loses points.
 ex.exchange_capture.b1.2 = {my} takes back. {your} is worth {n}, but you only got {n2}.
 ex.exchange_capture.b1.3 = Careful: {my} can take {your} back. That's a bad trade.
 ex.exchange_capture.b2 = Careful with trades: {your} is worth {n}. {my} takes back, and you got only {n2}.

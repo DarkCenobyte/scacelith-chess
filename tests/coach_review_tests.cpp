@@ -2320,6 +2320,298 @@ TEST(coach_review_human_context_cases) {
     }
 }
 
+// Whole games of the 2016 sample, each move reviewed in turn (as a game is): what they showed.
+TEST(coach_review_whole_game_cases) {
+    const auto namesOn = [](const Script& s, const char* prefix, PieceType t) {
+        for (const Beat& b : s)
+            if (startsWith(b.line.key, prefix))
+                if (const Arg* a = b.line.arg("t1"))
+                    if (a->piece == t) return true;
+        return false;
+    };
+    {
+        // Game 87P2Fwvq: 5.d5 Nb8 6.Bg5 Nf6 7.Nxe5 Qxe5 gives up the knight safe on f3, and wins the
+        // knight pinned on f6 back after the line's 16 plies (+1.7 for White, two points down). No
+        // material lost: never "d5 loses material" nor "I can win your knight".
+        const Recorded rc = recorded(
+         "rec w d4d5 startpos ; e2e4 h7h5 g1f3 e7e5 b1c3 d8e7 d2d4 b8c6\n"
+         "tag game https://lichess.org/87P2Fwvq 1251/1061 300+0 ply 9 drop 0.0\n"
+         "an a0 1 1 0 16 d4e5 3\n"
+         "ln 1 16 398 0 0 0 E d4e5 c6e5 c3d5 e7d6 f3e5 d6e5 f1d3 f8d6 c1f4 e5e6 d5c7 d6c7 f4c7 b7b6 h1g1\n"
+         "ln 2 16 385 0 0 0 E c3d5 e7d8 d4e5 d7d6 c1g5 f8e7 e5d6 c7d6 d5e7 g8e7 f1c4 c8g4 d1d2 f7f6 g5f4\n"
+         "ln 3 16 220 0 0 0 E c1g5 f7f6 g5e3 d7d6 f1c4 c8g4 d4d5 c6d8 h2h3 g4f3 d1f3 a7a6 e1c1 g7g6\n"
+         "an a1 1 1 0 16 d4d5 1\n"
+         "ln 1 16 174 0 0 0 E d4d5 c6b8 c1g5 g8f6 f3e5 e7e5 f2f4 e5e7 e4e5 d7d6 f1b5 c7c6 e1g1 d6e5 f4e5 e7c5 g1h1 f6d5 d1d5 c5d5 c3d5\n"
+         "an a2 1 0 0 14 c6b8 2\n"
+         "ln 1 14 -158 0 0 0 E c6b8 c1g5 g8f6 d1d2 d7d6 f3h4 b8d7 g2g3 a7a6 e1c1 e7d8 f1h3 b7b5 f2f3 g7g6 f3f4\n"
+         "ln 2 14 -179 0 0 0 E c6d8 c1g5 f7f6 g5e3 a7a6 f3h4 e7f7 d1d2 d7d6 f1d3 g8e7 e1c1 g7g5 h4f5 e7f5 e4f5 f7h7 c3e4\n"
+         "an a3 1 1 0 6 d4e5 1\n"
+         "ln 1 6 398 0 0 0 E d4e5 c6e5 c3d5 e7d6 f3e5 d6e5 f1d3 f8d6 c1f4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "d5 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.material"));
+            CHECK(!hasKeyPrefix(r.script, "ex.result"));
+        }
+    }
+    {
+        // Same game: 22...Kf7 Ba3 c5 Rd1 Rhd8 Rdxd7+ Rxd7 Rxd7+ takes a rook for a rook: one pawn
+        // lost, never "I can win your rook".
+        const Recorded rc = recorded(
+         "rec b e8f7 startpos ; e2e4 h7h5 g1f3 e7e5 b1c3 d8e7 d2d4 b8c6 d4d5 c6b4 c1g5 f7f6 g5d2 c7c6 d5c6 b7c6 f1d3 c8a6 e1g1 a6d3 c2d3 b4d3 f3h4 d3b2 d1b3 b2d3 h4f5 e7b4 b3b4 d3b4 c3a4 b4d3 a1b1 g7g6 f5e3 f8c5 a4c5 d3c5 d2b4 c5a6 b4d6 g8h6 b1b7\n"
+         "tag game https://lichess.org/87P2Fwvq 1251/1061 300+0 ply 44 drop 0.0\n"
+         "an a0 1 0 0 16 h6f7 3\n"
+         "ln 1 16 152 0 0 0 E h6f7 d6a3 f7d8 b7b1 d8e6 e3c4 c6c5 g2g3 a8b8 b1b8 a6b8 f2f4 e5f4 g3f4 h8g8 g1h1 b8a6 f4f5 g6f5 c4d6 e8d8 e4f5\n"
+         "ln 2 16 32 0 0 0 E e8d8 f2f4 h6f7 f4e5 f7d6 e5d6 a6c5 b7b4 h8f8 e4e5 f6f5 g2g4 c5d3 b4b1 d3e5 g4f5 g6f5 f1f5 f8f5 e3f5\n"
+         "ln 3 16 -2 0 0 0 E h8h7 d6a3 h6f7 f2f4 e5f4 f1f4 f7e5 f4f6 h7f7 f6d6 e8d8 b7b3 a6c7 a3b2 f7e7 b2e5 e7e5 d6g6 e5e4 e3f5\n"
+         "an a1 1 0 0 16 e8f7 1\n"
+         "ln 1 16 -24 0 0 0 E e8f7 d6a3 c6c5 f1d1 h8d8 d1d7 d8d7 b7d7 f7e6 d7g7 a8b8 h2h3 h6f7 e3d5 a6b4 a3b4 c5b4 d5c7 e6e7 g7g6 f7d6 g6g7 d6f7\n"
+         "an a2 1 1 0 14 f1d1 2\n"
+         "ln 1 14 28 0 0 0 E f1d1 h8d8 d6a3 c6c5 d1d7 d8d7 b7d7 f7e6 d7g7 a8b8 h2h4 a6b4 g7g6 h6g4 e3g4 h5g4 g6g4 b4d3 f2f3 b8b1 g1h2\n"
+         "ln 2 14 28 0 0 0 E d6a3 c6c5 f1d1 h8d8 d1d7 d8d7 b7d7 f7e6 d7g7 a8b8 h2h4 a6b4 f2f3 a7a5 g7g6 h6g8 g6g7 g8e7 g2g4 h5g4 f3g4\n"
+         "an a3 1 0 0 6 h6f7 1\n"
+         "ln 1 6 152 0 0 0 E h6f7 d6a3 f7d8 b7b1 d8e6 e3c4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Kf7 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!namesOn(r.script, "ex.material", Rook));
+            CHECK(!namesOn(r.script, "ex.point.piece", Rook));
+        }
+    }
+    {
+        // Game oWPJHXNA: 16.Qh6?? Rxg2+ Bxg2 Bxh6, the rook uncovering the bishop on the queen: the
+        // queen is the story, never "your king gets exposed".
+        const Recorded rc = recorded(
+         "rec w h7h6 startpos ; e2e4 d7d5 d2d3 d5d4 g1f3 e7e5 c2c3 b8c6 c1g5 f7f6 g5d2 g8h6 f3h4 g7g5 h4f3 h6g4 h2h3 g4f2 e1f2 g5g4 f3h4 g4g3 f2g3 h8g8 g3f2 c8e6 d1h5 e6f7 h5h7 g8g7\n"
+         "tag game https://lichess.org/oWPJHXNA 1284/1238 600+2 ply 31 drop 0.0\n"
+         "an a0 1 1 0 16 h7f5 3\n"
+         "ln 1 16 456 0 0 0 E h7f5 d4c3 b2c3 c6d4 c3d4 d8d4 d2e3 d4a1 f1e2 a1a2 b1c3 a2e6 c3d5 e8c8 h1g1\n"
+         "ln 2 16 328 0 0 0 E h7h8 d4c3 b2c3 c6d4 c3d4 d8d4 d2e3 d4a1 f1e2 e8c8 h4f5 g7g6 h8h7 d8d7 h1c1 g6g8 b1c3 a1b2 f2f1\n"
+         "ln 3 16 10 0 0 0 E h7h6 g7g2 f1g2 f8h6 d2h6 d8d7 g2f3 e8c8 f3g4 f7e6 b1d2 d8h8 h4f5 c8b8 h1g1 d4c3 b2c3 d7d3\n"
+         "an a2 1 0 0 14 g7g2 2\n"
+         "ln 1 14 12 0 0 0 E g7g2 f1g2 f8h6 d2h6 d8d7 g2f3 e8c8 f3g4\n"
+         "ln 2 14 -164 0 0 0 E d4c3 b1c3 g7g2 f1g2 f8h6 d2h6 d8d4 h6e3 d4b4 a1b1 e8c8 h1d1 f7e6 d1d2 d8h8 h4f5 e6f5 e4f5 c6e7\n"
+         "an a3 1 1 0 6 h7f5 1\n"
+         "ln 1 6 456 0 0 0 E h7f5 d4c3 b2c3 c6d4 c3d4 d8d4 d2e3 d4a1\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Qh6 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::KingSafety);
+            CHECK(!hasKeyPrefix(r.script, "ex.king_"));
+        }
+    }
+    {
+        // Same game: 17...Bxh6?? where 17...fxg5 wins 6 points: the bishop pair (half a pawn) is
+        // never the reason for a blunder.
+        const Recorded rc = recorded(
+         "rec b f8h6 startpos ; e2e4 d7d5 d2d3 d5d4 g1f3 e7e5 c2c3 b8c6 c1g5 f7f6 g5d2 g8h6 f3h4 g7g5 h4f3 h6g4 h2h3 g4f2 e1f2 g5g4 f3h4 g4g3 f2g3 h8g8 g3f2 c8e6 d1h5 e6f7 h5h7 g8g7 h7h6 g7g5 d2g5\n"
+         "tag game https://lichess.org/oWPJHXNA 1284/1238 600+2 ply 34 drop 0.0\n"
+         "an a0 1 0 0 16 f6g5 3\n"
+         "ln 1 16 0 0 0 0 E f6g5 h6h7 g5h4 f1e2 d8g5 h1f1 f7g6 h7g8 g5e3 f2e1 e8c8 g8g6 e3c1 e2d1 c1e3\n"
+         "ln 2 16 -335 0 0 0 E f8h6 g5h6 d8d7 h6d2 e8c8 g2g4 d4c3 b1c3 c6b4 d2e3 b4c2 f1e2 b7b5 h4f5\n"
+         "ln 3 16 -372 0 0 0 E d4c3 h6f8 e8f8 g5h6 f8g8 b1c3 b7b5 h6e3 c6d4 h4f5 f7e6 g2g4 b5b4 c3d1 d4c2\n"
+         "an a2 1 1 0 14 g5h6 2\n"
+         "ln 1 14 330 0 0 0 E g5h6 d8d7 h6d2 e8c8 g2g4 d4c3 b1c3 c6b4 a1c1 b4a2 c3a2 d7d4 d2e3 d4b2 f2g3 b2a2\n"
+         "ln 2 14 -449 0 0 0 E g5d2 h6d2 b1d2 d4c3 b2c3 d8d6 d2b3 f7b3 a2b3 d6c5 f2g3 e8c8 h4f5 c5c3 f1e2 d8g8 e2g4\n"
+         "an a3 1 0 0 6 f6g5 1\n"
+         "ln 1 6 -1 0 0 0 E f6g5 h6h7\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bxh6 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.bishop_pair"));
+        }
+    }
+    {
+        // Game padVsOE6: 9...Bxd4 when 9...Nxb4 wins a pawn more: the pawn is the reason, never the
+        // bishop pair.
+        const Recorded rc = recorded(
+         "rec b c5d4 startpos ; e2e4 c7c6 d1f3 d7d5 e4e5 e7e6 d2d4 b8a6 c2c3 g8h6 g2g4 c6c5 g1e2 c5d4 e2d4 f8c5 b2b4\n"
+         "tag game https://lichess.org/padVsOE6 1233/1348 180+5 ply 18 drop 0.0\n"
+         "an a0 1 0 0 16 a6b4 3\n"
+         "ln 1 16 187 0 0 0 E a6b4 b1a3 b4c6 a3b5 c6e5 f3g3 f7f6 g4g5 h6f7 g5f6 g7f6 f2f4 e5c6 f4f5 c5d4 c3d4 e6e5 f1e2 a7a6 d4e5 f6e5 b5c3 c8f5 e2h5 f5g6 h5g6 h7g6 e1g1 d8d6\n"
+         "ln 2 16 69 0 0 0 E c5d4 c3d4 a6b4 b1a3 e8g8 f1e2 b4c6 a3c2 f7f6 e5f6 f8f6 f3g3 f6g6 h2h4 h6f5 g3d3 f5d6 f2f3 c8d7\n"
+         "ln 3 16 -24 0 0 0 E c5b6 c1h6 g7h6 f3e3 c8d7 a2a4 a8c8 h2h4 f7f6 f1a6 b7a6 e3h6 b6d4 c3d4 f6e5 h6h5 e8e7\n"
+         "an a2 1 1 0 14 c3d4 2\n"
+         "ln 1 14 -69 0 0 0 E c3d4 a6b4 b1a3 c8d7 f1e2 b4c6 a3c2 a8c8 f3g3\n"
+         "ln 2 14 -149 0 0 0 E f1b5 c8d7 b5d7 d8d7 c3d4 a6b4 b1a3 d7a4 a1b1 b4c2 a3c2 a4c2 b1a1 a8c8 c1h6 g7h6 e1g1 c2g6 h2h3 h6h5 a1c1 e8g8 g1h1 h5g4 f3g4 g6g4\n"
+         "an a3 1 0 0 6 a6b4 1\n"
+         "ln 1 6 175 0 0 0 E a6b4 b1a3 b4c6 f3g3 c6d4 c3d4 c5d4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bxd4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.bishop_pair"));
+        }
+    }
+    {
+        // Game 0gaTD8FX: 8.Bxf7+ Kxf7 hxg3, the bishop attacked on d5 taking what it can before the
+        // pawn takes back on g3: a desperado, no sacrifice, never "brilliant".
+        const Recorded rc = recorded(
+         "rec w d5f7 startpos ; c2c4 e7e6 b1c3 d7d5 c4d5 e6d5 g2g3 f8d6 f1g2 g8f6 c3d5 f6d5 g2d5 d6g3\n"
+         "tag game https://lichess.org/0gaTD8FX 1647/2112 60+0 ply 15 drop 0.0\n"
+         "an a0 1 1 0 16 d5f7 3\n"
+         "ln 1 16 250 0 0 0 E d5f7 e8f7 h2g3 d8d5 h1h4 h7h6 d1c2 b8c6 c2c3\n"
+         "ln 2 16 170 0 0 0 E d1b3 g3d6 d5f7 e8f8 f7d5 c7c6 d5e6 c8e6 b3e6 b8a6 g1f3 d8f6 e6f6 g7f6 d2d3 f8f7 c1d2 a6b4\n"
+         "ln 3 16 126 0 0 0 E d1a4 e8f8 a4b3 g3d6 d5b7 c8b7 b3b7 b8d7 g1f3 h7h6 e1f1 d7e5 f3e5 d6e5 b7e4 e5f6 a1b1\n"
+         "an a2 1 0 0 14 e8f7 2\n"
+         "ln 1 14 -209 0 0 0 E e8f7 h2g3 b8c6 d1b3 c8e6 b3c3 d8d5 h1h4 h8e8 g1f3 f7g8 d2d3 a8d8\n"
+         "ln 2 14 -360 0 0 0 E e8e7 h2g3 e7f7 h1h4 c8e6 b2b3 h7h5\n"
+         "an a3 1 1 0 6 d5f7 1\n"
+         "ln 1 6 246 0 0 0 E d5f7 e8f7 h2g3 d8d5 h1h4 g7g5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Bxf7+ b%d", level);
+            checkScript(r.script, where);
+            CHECK(!r.verdict.brilliant);
+            CHECK(!hasKeyPrefix(r.script, "praise.sacrifice"));
+            CHECK(!hasKeyPrefix(r.script, "praise.brilliant"));
+        }
+    }
+    {
+        // Game Mheca3V4: 21...Kh8 Nh5 Bc6 Re3 Rad8 Rxa7 e4 dxe4: the pawn pushed to e4 is given for
+        // the rook's play on the d-file. The line may be said (two pawns, -5 for Black), but the
+        // pawn on e5 is never named as what the move loses.
+        const Recorded rc = recorded(
+         "rec b g8h8 startpos ; e2e4 e7e5 f1c4 g8f6 d2d3 d7d6 c1g5 f8e7 b1c3 c8e6 c4b3 e8g8 g1e2 b8d7 h2h3 c7c6 e1g1 d6d5 e2g3 d7c5 f2f4 f6d7 g5e7 d8e7 f4f5 e7g5 d1g4 g5e3 g1h2 d7f6 g4f3 e3f3 f1f3 e6d7 e4d5 c6d5 c3d5 c5b3 d5f6 g7f6 a2b3\n"
+         "tag game https://lichess.org/Mheca3V4 1812/1786 1500+0 ply 42 drop 0.0\n"
+         "an a0 1 0 0 16 d7c6 3\n"
+         "ln 1 16 -226 0 0 0 E d7c6 f3e3 f8d8 g3h5 d8d6 c2c4 g8h8 b3b4 a8g8 e3g3 g8g3 h5g3 a7a6 g3h5 d6d3 b4b5 c6e4 g2g4 d3d2 h2g3 d2b2 b5a6 b2b3 g3f2 b3f3 f2e2 b7a6 a1a6 f3h3 a6d6 e4f3 e2f2 h7h6 c4c5\n"
+         "ln 2 16 -372 0 0 0 E f8c8 g3e4 c8c6 d3d4 d7e8 d4e5 f6e5 c2c4 g8f8 c4c5 b7b6 b3b4 b6c5 b4c5 a7a5 f5f6\n"
+         "ln 3 16 -448 0 0 0 E f8d8 g3h5 a8c8 f3f2 c8c6 a1a7 c6b6 a7a3 g8f8 g2g4 b6d6 h2g3 f8e7 f2d2 d7c6 g3f2 d6d4\n"
+         "an a1 1 0 0 16 g8h8 1\n"
+         "ln 1 16 -505 0 0 0 E g8h8 g3h5 d7c6 f3e3 a8d8 h5f6 h8g7 f6h5 g7h6 h5g3 f8g8 g3e4 c6e4 e3e4\n"
+         "an a2 1 1 0 14 g3h5 2\n"
+         "ln 1 14 504 0 0 0 E g3h5 d7c6 f3e3 a8d8 a1a7 e5e4 d3e4 d8d2 c2c4 f8d8 h2g3 d8g8 g3h4 d2g2 h5f6\n"
+         "ln 2 14 343 0 0 0 E f3f2 a7a5 a1d1 f8d8 g3h5 a8a6 d3d4 a6d6 d4d5 d8c8 g2g4 b7b5 h2g3 c8c5 f2d2 h7h6\n"
+         "an a3 1 0 0 6 d7c6 1\n"
+         "ln 1 6 -226 0 0 0 E d7c6 f3e3 f8d8 g3h5 d8d6 c2c4\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Kh8 b%d", level);
+            checkScript(r.script, where);
+            for (const Beat& b : r.script)
+                if (const Arg* t = b.line.arg("t1"))
+                    if (startsWith(b.line.key, "ex.material") || startsWith(b.line.key, "ex.point.piece"))
+                        CHECK(t->square != sq("e5"));
+        }
+    }
+    {
+        // Game JtaBgB4j: 9...Kxf8 where 9...Ng4 would hit f2 and h2: two pawns are no fork (one falls
+        // at most), never "you missed a fork".
+        const Recorded rc = recorded(
+         "rec b e8f8 startpos ; e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 f3g5 g8h6 d2d3 f7f5 e1g1 h8f8 b1c3 f5f4 g5h7 d8h4 h7f8\n"
+         "tag game https://lichess.org/JtaBgB4j 1962/2085 300+0 ply 18 drop 0.0\n"
+         "an a0 1 0 0 16 h6g4 3\n"
+         "ln 1 16 85 0 0 0 E h6g4 h2h3 g4f2 f1f2 c5f2 g1f1 e8f8 d1g4 h4g4 h3g4 f2b6 c3d5 d7d6 g4g5 c6a5 c4b3 c8g4 c1d2 c7c6 d5b6 a7b6 b3a4 f8e7 f1f2\n"
+         "ln 2 16 -134 0 0 0 E e8f8 c1e3 f4e3 d1f3 f8e8 f2e3 c6b4 f1f2 c7c6 a2a3 b4a6 d3d4 c5e7 a1f1 h4g4 f3g4 h6g4 f2f3 d7d6 f3g3\n"
+         "ln 3 16 -323 0 0 0 E c5f8 c3d5 f8c5 d3d4 c6d4 b2b4 f4f3 b4c5 h6g4 d5c7 e8d8 c7e6 d4e6 h2h3 e6d4 c2c3 f3g2 d1g4 h4g4 h3g4 g2f1q g1f1\n"
+         "an a2 1 1 0 14 c1e3 2\n"
+         "ln 1 14 132 0 0 0 E c1e3 f4e3 f2e3 f8e8 d1f3 c6b4 f1f2 c7c6 a2a3 b4a6 d3d4 c5e7 a1f1 h4g4 f3g4 h6g4 f2f3 d7d6\n"
+         "ln 2 14 24 0 0 0 E d3d4 c6d4 c3a4 d7d5 a4c5 f4f3 g2f3 h4h5 c4e2 c8h3 c5e6 h3e6 g1h1 d5e4 c1h6 e4f3 e2d3 e6h3 f1g1 h5h6 d1e1 h3g2 g1g2 f3g2 h1g2 h6c6 d3e4 d4c2 e1e2\n"
+         "an a3 1 0 0 6 h6g4 1\n"
+         "ln 1 6 85 0 0 0 E h6g4 h2h3 g4f2 f1f2 c5f2 g1f1\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Kxf8 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::MissedFork);
+            CHECK(!hasKeyPrefix(r.script, "ex.missed_fork"));
+        }
+    }
+    {
+        // Game 3OsT6yUe: 28.f4?? Qd6 Rxe6 Qxe6 Qxe6 fxe6 loses the exchange; the queens are traded:
+        // never "I can win your queen".
+        const Recorded rc = recorded(
+         "rec w f3f4 startpos ; e2e4 e7e5 g1f3 d7d6 f1c4 c7c6 e1g1 g8f6 d2d4 e5d4 f3d4 c6c5 d4f3 b8c6 f1e1 f8e7 a2a3 e8g8 b1c3 a7a6 c3d5 f6d5 e4d5 c6a5 c4a2 b7b5 c2c3 c8b7 c1e3 c5c4 a1c1 d8c7 a2b1 e7f6 d1c2 g7g6 e1e2 b7d5 c1e1 a5b3 f3d4 b3d4 e3d4 f6d4 c3d4 c7c6 f2f3 a8e8 e2e7 e8e7 e1e7 d5e6 c2e2 d6d5\n"
+         "tag game https://lichess.org/3OsT6yUe 1519/1184 60+0 ply 55 drop 0.0\n"
+         "an a0 1 1 0 16 e2e5 3\n"
+         "ln 1 16 -202 0 0 0 E e2e5 f8e8 e7e8 c6e8 h2h4 h7h5 g1f2 e8e7 g2g3 e7d7 f2e2 e6f5 b1f5 d7f5 e5f5 g6f5 e2e3 g8g7 e3f4 g7f6 f4e3 f6e6 e3e2 e6d7\n"
+         "ln 2 16 -400 0 0 0 E e2e1 c6d6 e1h4 b5b4 a3a4 e6d7 a4a5 d7a4 f3f4 c4c3 f4f5 c3c2 b1c2 a4c2 f5f6 f8c8 h4g5 c2e4\n"
+         "ln 3 16 -477 0 0 0 E e2e3 c6d6 e7a7 d6b6 a7e7 b5b4 a3b4 b6b4 e7e6 f7e6 e3e6 g8g7 h2h3 b4b7 h3h4 f8f6 e6e5 g7f7\n"
+         "an a1 1 1 0 16 f3f4 1\n"
+         "ln 1 16 -709 0 0 0 E f3f4 c6d6 e7e6 d6e6 e2e6 f7e6 g2g3 b5b4 a3a4 f8c8 g1f2 c4c3 b2c3 c8c3 f2e2 c3c1 h2h4\n"
+         "an a2 1 0 0 14 c6d6 2\n"
+         "ln 1 14 709 0 0 0 E c6d6 e7e6 d6e6 e2e6 f7e6 g2g3 b5b4 a3a4 f8c8 b1c2 b4b3 c2d1 c4c3 b2c3 b3b2\n"
+         "ln 2 14 418 0 0 0 E c4c3 b2c3 c6c3 e7e6 f7e6 e2e6 f8f7 e6e8 g8g7 e8e5 f7f6 e5e7 g7h6 g2g3 c3d4 g1g2 d4b2 g2h3 b2b1 e7f6 b1f5 f6f5 g6f5\n"
+         "an a3 1 1 0 6 e2e5 1\n"
+         "ln 1 6 -202 0 0 0 E e2e5 f8e8 e7e8 c6e8 h2h4 h7h5\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "f4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!namesOn(r.script, "ex.material", Queen));
+            CHECK(!namesOn(r.script, "ex.point.piece", Queen));
+        }
+    }
+    {
+        // Game aHYJcDhE: 23...Re7?? Qc8 Rxd7 Qxd7: the rook leaves e7, where it stood safe, only to
+        // stop the pawn queening (-6 for Black): a loss the move causes, said at every level.
+        const Recorded rc = recorded(
+         "rec b e8e7 startpos ; d2d4 g8f6 h2h3 e7e6 g1f3 b8c6 a2a3 d7d5 c2c3 f8d6 e2e3 c8d7 b2b4 e8g8 f1e2 f8e8 e1g1 h7h6 b4b5 c6e7 a3a4 c7c6 c3c4 a7a6 c1a3 d6a3 a1a3 a6b5 a4b5 a8a3 b1a3 f6e4 d1c1 e7g6 c4c5 b7b6 f3e5 g6e5 d4e5 c6b5 c5c6 b5b4 e2b5 b4a3 c6d7\n"
+         "tag game https://lichess.org/aHYJcDhE 1837/1500 - ply 46 lc 46??,72n,73?,77s eco A45 open Indian_Game grp common\n"
+         "an a0 1 0 0 16 e8f8 3\n"
+         "ln 1 16 -21 0 0 0 E e8f8 c1a3 e4c5 a3a7 d8b8 a7b8 f8b8 f1a1 b8d8 a1a7 g8f8 g2g4 f8e7 f2f4 f7f6 e5f6 g7f6\n"
+         "ln 2 16 -598 0 0 0 E e8e7 c1c8 e7d7 c8d7 d8f8 b5d3 e4d2 f1d1 d2c4 d7b5 c4e5 b5a6 e5d3 a6d3 f8b4 d1a1 b6b5 d3a3\n"
+         "ln 3 16 -811 0 0 0 E e4d6 d7e8b d6e8 b5e8 d8e8 c1a3 e8b8 g1h1 b6b5 a3b2 b5b4\n"
+         "an a2 1 1 0 14 c1c8 2\n"
+         "ln 1 14 571 0 0 0 E c1c8 e7d7 c8d7 d8g5 d7c8 g8h7 c8c2 g5e5\n"
+         "ln 2 14 170 0 0 0 E c1a3 e7d7 b5d7 d8d7 a3a8 g8h7 f1c1 e4c5 c1a1 d7b5 a8a2\n"
+         "an a3 1 0 0 6 e8f8 1\n"
+         "ln 1 6 -21 0 0 0 E e8f8 c1a3 e4c5 a3a7 d8b8 a7b8\n"
+         "end\n"
+        );
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Re7 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType == ExType::Material);
+            CHECK(namesOn(r.script, "ex.material", Rook));
+        }
+    }
+}
+
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
     // better move, never the move itself while the takeback is offered.

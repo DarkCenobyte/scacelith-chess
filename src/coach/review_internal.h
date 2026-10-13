@@ -170,6 +170,12 @@ void limitPointing(Beat& b);
 
 // ---- Explanation choice (in ExType order, first match wins) ----
 bool findExplanation(const Ctx& c, Explanation& out);
+// What the human gets on its square for the piece the coach takes at ply k of r: what that piece took
+// there just before (unless it only took back as much as the coach had taken there: Rxg8+ Bxg8 Qxg8+
+// trades the rooks and wins the bishop), and what the human takes back there at once (less what the
+// coach takes back there then: Qxb4+ Qxb4 Bxb4+ trades the queens and wins the bishop). As much as
+// the piece, and it is traded, not lost (Rdxd7+ Rxd7 Rxd7+; Qxf8+ Qxf8 Bxf8).
+int tradedFor(const Ctx& c, int k);
 // Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 // The tip findTip gives is about a won game drawn by repetition or the fifty-move rule: then it is

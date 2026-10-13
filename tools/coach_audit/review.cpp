@@ -321,9 +321,10 @@ void checkAnchors(const Beat& b, std::vector<Finding>& out) {
 }
 
 // "I can win your queen" / "your rook can't be saved": the piece named is taken by the coach along
-// the refutation, and not traded (the human taking back as much on that square at once; a pawn that
-// promotes as it captures is a pawn taken back). 'from': the plies of the refutation shown before the
-// line is said (ex.point.piece names the piece where it stands then).
+// the refutation, and not traded (the human taking back as much on that square at once, or having
+// taken as much there with it just before; a pawn that promotes as it captures is a pawn taken
+// back). 'from': the plies of the refutation shown before the line is said (ex.point.piece names
+// the piece where it stands then).
 void checkWon(const Ctx& c, const Beat& b, size_t from, std::vector<Finding>& out) {
     const bool claim = b.line.key.rfind("ex.material.b1", 0) == 0 || b.line.key.rfind("ex.material.b2", 0) == 0 ||
                        b.line.key == "ex.point.piece";
@@ -358,8 +359,19 @@ void checkWon(const Ctx& c, const Beat& b, size_t from, std::vector<Finding>& ou
                      ((st.move.flags & MoveEnPassant) ? Square(st.move.to + (c.human == White ? 8 : -8)) : st.move.to) == at) {
                 const int back = st.promotion != NoPiece ? kPiecePoints[Pawn]
                                  : i + 1 < c.refut.size() ? kPiecePoints[c.refut[i + 1].captured] : 0;
-                const bool traded = i + 1 < c.refut.size() && c.refut[i + 1].mover == c.human &&
-                                    c.refut[i + 1].move.to == at && back >= kPiecePoints[st.captured];
+                // Or what the piece itself took there just before (Rdxd7+ Rxd7 Rxd7+: a rook for a rook),
+                // unless it only took back as much as the coach had taken there (Rxe1+ Nxe1 Qxe1+: the
+                // rooks traded, the knight lost).
+                const auto tookAt = [&](size_t j, Color who) {
+                    return j < c.refut.size() && c.refut[j].mover == who && c.refut[j].captured != NoPiece && c.refut[j].move.to == at
+                               ? kPiecePoints[c.refut[j].captured] : 0;
+                };
+                const bool backThere = i + 1 < c.refut.size() && c.refut[i + 1].mover == c.human && c.refut[i + 1].move.to == at;
+                int took = i >= 1 ? tookAt(i - 1, c.human) : 0;
+                if (took > 0 && i >= 2 && tookAt(i - 2, c.coach) >= took) took = 0;
+                // What the human takes back, less what the coach takes back then (Qxb4+ Qxb4 Bxb4+).
+                const int kept = backThere ? std::max(0, back - tookAt(i + 2, c.coach)) : 0;
+                const bool traded = kept + took >= kPiecePoints[st.captured];
                 if (traded) out.push_back({"TRADED_NAMED", b.line.key + " names a " + pieceName(st.captured) + " that is traded"});
                 return;
             }
@@ -427,8 +439,15 @@ void checkTrapped(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
 void checkSacrifice(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const std::string& k = b.line.key;
     if (k.rfind("praise.sacrifice", 0) != 0 && k.rfind("praise.brilliant", 0) != 0) return;
-    // Given up by exchange: a legal capture there wins the coach two points more than the move took.
     const Move m = c.p0.parseUCI(c.rec->played);
+    // Taken, and won back at once elsewhere by the player's next move: a piece lost anyway, no
+    // sacrifice (Bxf7+ Kxf7 hxg3, the bishop on d5 hung to the queen).
+    if (m.valid() && c.playedLine.size() >= 3 && c.playedLine[1].captured != NoPiece && c.playedLine[1].move.to == m.to &&
+        c.playedLine[2].captured != NoPiece && c.playedLine[2].move.to != m.to && c.playedLine[2].balance >= c.base - 1) {
+        out.push_back({"SACRIFICE_WON_BACK", k + ": " + c.playedLine[2].san + " wins it back at once"});
+        return;
+    }
+    // Given up by exchange: a legal capture there wins the coach two points more than the move took.
     if (m.valid()) {
         int back = 0;
         for (const Move& r : c.p1.legalMoves())
@@ -501,11 +520,105 @@ void checkKingLine(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     bool lineUsed = false;
     for (const std::string& v : variantsOf(k)) lineUsed = lineUsed || usesPlaceholder(v, "line");
     if (!lineUsed) return;
+    // The line said wins none of the human's pieces (not taken back as much at once): a queen it
+    // takes is the story, not the king (Qh6 Rxg2+ Bxg2 Bxh6, the rook uncovering the bishop).
+    {
+        std::istringstream said(ln->san);
+        std::vector<std::string> sans;
+        for (std::string w; said >> w;) sans.push_back(w);
+        Position q = c.p1;
+        for (size_t i = 0; i < sans.size(); ++i) {
+            const Move m = q.parseSAN(sans[i]);
+            if (!m.valid()) break;
+            const Piece taken = q.at(m.to);
+            const bool coachMove = q.sideToMove() == c.coach;
+            q.makeMove(m);
+            if (!coachMove || taken.empty() || taken.type == Pawn) continue;
+            // The take-back may come just after the line said ends, as the refutation goes on.
+            int back = 0;
+            Move r;
+            if (i + 1 < sans.size()) r = q.parseSAN(sans[i + 1]);
+            else if (i + 1 < c.refut.size() && c.refut[i].move == m) r = c.refut[i + 1].move;
+            if (r.valid() && r.to == m.to) back = kPiecePoints[q.at(r.to).type];
+            if (kPiecePoints[taken.type] - back >= 2)
+                out.push_back({"KING_LINE_WINS_PIECE", k + ": " + ln->san + " takes a " + pieceName(taken.type)});
+        }
+    }
     std::istringstream in(ln->san);
     std::string san;
     for (int i = 0; in >> san; ++i)
         if (i % 2 == 0 && (san.back() == '+' || san.back() == '#')) return;
     out.push_back({"KING_LINE_NO_CHECK", k + ": " + ln->san});
+}
+
+// The human's piece on 'sq' stands safe in 'p', the human to move: passing the turn, the coach has no
+// legal capture of it that wins anything (false when the human is in check).
+bool safeWhereItStands(const Position& p, Square sq) {
+    Position t = p;
+    if (t.inCheck() || !t.passTurn()) return false;
+    for (const Move& m : t.legalMoves())
+        if (m.to == sq && !t.at(m.to).empty() && seePoints(t, m) > 0) return false;
+    return true;
+}
+
+// A loss said that the line gives away by its own choice: the human moves a piece from where it
+// stood safe to a square the coach takes it on at once, not as a recapture there nor a trade, where
+// the engine's score after the move is a pawn better than the material then, or with check while
+// mated anyway (d5 Nb8 Bg5 Nf6 Nxe5 Qxe5: the knight stood safe on f3, +1.7 two points down, and
+// the pinned knight on f6 falls later). When that pair is what brings the loss to the amount said,
+// the amount must be lost before it. The material line said ({line} from the table), or its
+// demonstration (ex.result).
+void checkGivenAway(const Ctx& c, const PlyVerdict& v, const Beat& b, int demoPlies, std::vector<Finding>& out) {
+    const Arg* pts = b.line.arg("pts");
+    if (!pts || pts->number <= 0) return;
+    const std::string& k = b.line.key;
+    const bool result = k.rfind("ex.result", 0) == 0;
+    if (k.rfind("ex.material", 0) != 0 && !(result && v.exType == ExType::Material)) return;
+    int plies = 0;
+    if (const Arg* ln = b.line.arg("line")) {
+        Position end;
+        if (!replaySan(c.p1, ln->san, end, plies)) return;
+    } else if (result) {
+        plies = demoPlies;
+    } else {
+        return;
+    }
+    Position q = c.p1;
+    for (int i = 0; i + 1 < plies && i + 1 < int(c.refut.size()); ++i) {
+        const LineStep& st = c.refut[size_t(i)];
+        const LineStep& next = c.refut[size_t(i + 1)];
+        const bool recapture = i >= 1 && c.refut[size_t(i - 1)].captured != NoPiece && c.refut[size_t(i - 1)].move.to == st.move.to;
+        // What the move gives: the piece, less what it takes there and what the human takes back
+        // there at once (Bg5 Bxg5 hxg5 is a trade).
+        const bool backThere = i + 2 < int(c.refut.size()) && c.refut[size_t(i + 2)].mover == c.human &&
+                               c.refut[size_t(i + 2)].captured != NoPiece && c.refut[size_t(i + 2)].move.to == st.move.to;
+        const int given = kPiecePoints[q.at(st.move.from).type] - (st.captured != NoPiece ? kPiecePoints[st.captured] : 0) -
+                          (backThere ? kPiecePoints[c.refut[size_t(i + 2)].captured] : 0);
+        const int after = c.lp ? coach::detail::whiteCp(c.lp->score, true) : 0;
+        const bool unborne = c.lp && after >= 100 * next.balance + 100;
+        const bool spite = c.lp && st.check && after <= -1000;
+        if (st.mover == c.human && next.captured != NoPiece && next.move.to == st.move.to && !recapture && given > 0 &&
+            (spite || unborne) && safeWhereItStands(q, st.move.from)) {
+            const int before = shownLoss(c, i);
+            if (pts->number > std::max(0, before) && shownLoss(c, i + 2) >= pts->number)
+                out.push_back({"GIVEN_AWAY", b.line.key + " says " + std::to_string(pts->number) + ": " + st.san +
+                                                 " gives the piece away, " + std::to_string(before) + " lost before it"});
+            return;
+        }
+        q.makeMove(st.move);
+    }
+}
+
+// "That trade costs you the bishop pair": half a pawn, never the reason for a blunder, nor where the
+// better move wins more material within 8 plies (Bxd4 when Nxb4 wins a pawn more).
+void checkBishopPair(const Ctx& c, const PlyVerdict& v, const Beat& b, std::vector<Finding>& out) {
+    if (b.line.key.rfind("ex.bishop_pair.", 0) != 0) return;
+    if (v.cls == MoveClass::Blunder) out.push_back({"BISHOP_PAIR_BLUNDER", b.line.key});
+    const int best = -lossAt(c.bestLine, c.p0, c.human, c.base, std::min<size_t>(8, c.bestLine.size()));
+    const int played = -lossAt(c.playedLine, c.p0, c.human, c.base, std::min<size_t>(8, c.playedLine.size()));
+    if (best > played)
+        out.push_back({"BISHOP_PAIR_MORE_WON", b.line.key + ": the better line wins " + std::to_string(best) + ", the move " +
+                                                   std::to_string(played)});
 }
 
 void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
@@ -516,6 +629,8 @@ void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
     const Arg* t1 = b.line.arg("t1");
     const Arg* t2 = b.line.arg("t2");
     if (!mv || !t1 || !t2) return;
+    // Two pawns are no fork worth the name ("Ng4 forked my pawn and my pawn"): one falls at most.
+    if (t1->piece == Pawn && t2->piece == Pawn) out.push_back({"FORK_PAWNS", k + ": " + mv->san});
     Position q = allowed ? c.p1 : c.p0;
     const Move m = q.parseUCI(mv->uci);
     if (!m.valid()) {
@@ -1006,6 +1121,8 @@ int reviewMain(const Options& o) {
                     checkPraiseLost(c, v, b, f);
                     checkLineRepeats(c, b, f);
                     checkKingLine(c, b, f);
+                    checkGivenAway(c, v, b, demoPlies, f);
+                    checkBishopPair(c, v, b, f);
                     checkFork(c, b, f);
                     checkMateCount(c, b, f);
                     checkLinePrizes(c, b, f);

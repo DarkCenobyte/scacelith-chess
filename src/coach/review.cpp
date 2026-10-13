@@ -437,13 +437,27 @@ Position afterPlies(const Ctx& c, int plies) {
     return q;
 }
 
+// Whether the human's piece on 'sq' after the first 'from' plies of c.r is traded where the coach
+// takes it later along the line (tradedFor: Qxf8+ Qxf8 Bxf8, the queens traded).
+bool tradedLater(const Ctx& c, int from, Square sq) {
+    for (int i = from; i < int(c.r.size()); ++i) {
+        const LineStep& st = c.r[size_t(i)];
+        if (st.mover == c.human && st.move.from == sq) sq = st.move.to;
+        else if (st.mover == c.coach && st.captured != NoPiece && st.move.to == sq)
+            return tradedFor(c, i) >= points(st.captured);
+    }
+    return false;
+}
+
 // The human's pieces among ex.targets that stand at the position after 'plies' plies of c.r, the
-// king aside (a check is said by the detector's own lines).
-std::vector<Square> standingTargets(const Ctx& c, const Explanation& ex, const Position& q) {
+// king aside (a check is said by the detector's own lines), nor one traded later along the line
+// ("now your queen can't be saved" when the queens are traded).
+std::vector<Square> standingTargets(const Ctx& c, const Explanation& ex, const Position& q, int plies) {
     std::vector<Square> out;
     for (Square t : ex.targets) {
         const Piece pc = q.at(t);
-        if (!pc.empty() && pc.color == c.human && pc.type != King && out.size() < 2) out.push_back(t);
+        if (!pc.empty() && pc.color == c.human && pc.type != King && out.size() < 2 && !tradedLater(c, plies, t))
+            out.push_back(t);
     }
     return out;
 }
@@ -460,7 +474,7 @@ bool designation(const Ctx& c, const Explanation& ex, const Position& q, Beat& o
         traceMove(out, m.piece, m.move.from, m.move.to, "reply");
         return true;
     }
-    const std::vector<Square> ts = standingTargets(c, ex, q);
+    const std::vector<Square> ts = standingTargets(c, ex, q, k);
     if (ts.empty()) return false;
     // "Can't be saved" with the human to move: only for what the line still costs from here. A piece
     // the coach takes while the human wins as much meanwhile (Nxe5 dxe5 Bxb5, a pawn lost in all)
@@ -1279,7 +1293,12 @@ Review Reviewer::review(const ReviewInput& in) {
         for (const Move& m : c.p1.legalMoves())
             if (m.to == c.played.to && (m.flags & MoveCapture)) takenBack = std::max(takenBack, seePoints(c.p1, m));
         const int byExchange = takenBack - (c.f.captured != NoPiece ? points(c.f.captured) : 0);
-        const bool sacrifice = !promoSoon && ((c.f.seePts <= -2 && byExchange >= 2) || downAfter);
+        // Nor won back at once elsewhere by the player's next move: Bxf7+ Kxf7 hxg3, the bishop on
+        // d5 was lost anyway (a check on the way that wins a pawn).
+        const bool wonBack = c.playedLine.size() >= 3 && c.playedLine[1].captured != NoPiece &&
+                             c.playedLine[1].move.to == c.played.to && c.playedLine[2].captured != NoPiece &&
+                             c.playedLine[2].move.to != c.played.to && c.playedLine[2].balance >= c.base - 1;
+        const bool sacrifice = !promoSoon && !wonBack && ((c.f.seePts <= -2 && byExchange >= 2) || downAfter);
         // A capture that wins the whole piece ("for free"); at levels 1-2 the lines also say it had
         // no protector.
         const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
