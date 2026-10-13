@@ -33,21 +33,33 @@ struct Ctx {
     int base = 0;                            // the human's material lead at p0 (points)
     int gain = -1;                           // plies of r after which the human is 2+ points down for good (-1: never)
     int loss = 0;                            // points the human is down for good within the lookahead
-    // What the best move costs: what the human is still down near the end of the best line's first
-    // 8 plies (from p0). A loss the best move suffers too is no reason the move played was bad.
+    // What the best move costs: what the human is still down at the end of the best line's first 8
+    // plies (from p0), where the line settles (an exchange completed; what the human wins back within
+    // four more plies taken off). A loss the best move suffers too is no reason the move played was bad.
     int bestLoss = 0;
+    // What the move played loses for good along its own line (the deeper search's, from p0): the
+    // most the human is down after any of its first 9 plies and still four plies later. -1 when that
+    // line is too short to tell.
+    int playedLoss = -1;
     // How much the move costs in the engine's eyes: the human's centipawns after the best move minus
     // after the move played (mates as +-1000).
     int dropCp = 0;
     // Whether losing 'lost' points (for good, from p0) is the reason the move is bad: a real loss
-    // (1 point when the best move loses nothing or the reason is about a pawn, else 2), one the best
-    // move avoids (by as much), and one the size of the problem (3 points or more; else at least 40 %
-    // of the engine's drop): a pawn named for a collapse would hide what really goes wrong.
+    // (1 point when the best move loses nothing, or a pawn at most and the reason is about a pawn,
+    // else 2), one the best move avoids (by as much), and one the size of the problem (3 points or
+    // more; else at least 40 % of the engine's drop): a pawn named for a collapse would hide what
+    // really goes wrong.
     bool lossExplains(int lost, bool pawn = false) const;
-    // The refutation loses material for good, beyond what the best move loses, within its first
-    // 'plies' plies: a reason that is about something else (king safety, the endgame, a better plan)
-    // would not be the real one.
+    // The refutation loses material for good, beyond what the best move loses, or mates within its
+    // first 'plies' plies, or the move allows a forced mate however long: a reason that is about
+    // something else (king safety, the endgame, a better plan) would not be the real one.
     bool concreteLoss(int plies) const;
+    // The refutation leaves the human down for good, beyond what the best move costs, after one of
+    // its first 'plies' plies and still four plies later, or the move played's own line does
+    // (playedLoss: the two searches can go different ways, Nb1 hxg4 ... Rxc7+ Qxc7 Qxc7+ Kxc7 losing
+    // the exchange where the refutation loses it two plies later): a "better position" or a better
+    // plan is then never the reason (the material is), even when no detector can name how it goes.
+    bool losesMaterial(int plies) const;
     // Points the human is down for good after the first 'plies' plies of r (relative to p0): a
     // recapture on the next ply undoes a loss, and where r stops, so does the exchange the human can
     // still win on the board (a line cut short right after a capture proves nothing).
@@ -63,6 +75,12 @@ struct Ctx {
     int followable(int want, bool extend) const;
     // The plies of the best line, at most 'want', the coach can say (at least its first move).
     int followableBest(int want) const;
+    // How far a demonstration (levels 1-3) or a line said (levels 4-6) may go to reach a loss further
+    // than the band's own plies, when every coach move among the first 'plies' plies of r forces the
+    // reply (a check, a capture, a promotion) and the human can take nothing back where they end:
+    // one forced move after another, a distant loss the player can follow (9 plies at level 1, 11
+    // above). 0 when one of them is a quiet move, or a take-back is left.
+    int forcingPlies(int plies) const;
 };
 
 // pov's material change, for good, after the first 'plies' plies of 'line' (relative to 'base'; 'end'
@@ -117,6 +135,10 @@ struct Explanation {
     bool includesBest = false; // the cause already names the better move
     bool missed = false;       // the human missed something (no demonstration: the table shows p1)
     chess::Square hintSquare = chess::NoSquare;   // takeback hint (levels 1-2): the piece at risk, on p0
+    // Where the sequence stops, the human could take back, but that fails: the take-back the table
+    // shows there (after fullPlies plies of r) and the coach's capture that answers it. Invalid
+    // moves when the loss needs no such sentence.
+    chess::Move retake, punish;
 };
 
 // ---- Engine requests and figures (shared with the appraisal) ----
@@ -148,8 +170,22 @@ void limitPointing(Beat& b);
 
 // ---- Explanation choice (in ExType order, first match wins) ----
 bool findExplanation(const Ctx& c, Explanation& out);
+// What the human gets on its square for the piece the coach takes at ply k of r: what that piece took
+// there just before (unless it only took back as much as the coach had taken there: Rxg8+ Bxg8 Qxg8+
+// trades the rooks and wins the bishop), and what the human takes back there at once (less what the
+// coach takes back there then: Qxb4+ Qxb4 Bxb4+ trades the queens and wins the bishop). As much as
+// the piece, and it is traded, not lost (Rdxd7+ Rxd7 Rxd7+; Qxf8+ Qxf8 Bxf8).
+int tradedFor(const Ctx& c, int k);
 // Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
+// The tip findTip gives is about a won game drawn by repetition or the fifty-move rule: then it is
+// the reason the move costs so much.
+bool drawTip(const Ctx& c, uint32_t tipsSaid);
+// What a blunder without a reason missed: the points the better move wins for good (where its line
+// settles) when the move played neither wins nor loses any along its own, and those points explain
+// the drop by themselves (0: none, or not that plain). A hint can then say the better move wins
+// material without naming it.
+int missedGain(const Ctx& c);
 
 // How much of the sequence the table shows (Explanation::demoPlies, full): levels 1-3 the whole of it
 // (fullPlies, within the band's demoPlies; a mate within mateLinePlies), else, and from level 4, up
@@ -164,6 +200,11 @@ int demoLength(const Ctx& c, const Explanation& ex);
 // and the closing lines once every planned ply was shown (the detector's, else a generic one: what
 // was lost, or what falls next), and the rewind of exactly the moves shown.
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s);
+// Whether the demonstration plays the whole sequence, to where Explanation::retake is said.
+bool demoReachesEnd(const Ctx& c, const Explanation& ex);
+// The line that says why the take-back fails (Explanation::retake), its pieces pointed at where
+// they stand on 'table'; false when there is none.
+bool retakeBeat(const Ctx& c, const Explanation& ex, const chess::Position& table, Beat& out);
 
 }  // namespace detail
 }  // namespace coach

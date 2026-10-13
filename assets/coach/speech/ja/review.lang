@@ -114,6 +114,11 @@ ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
 ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
 ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = その手は疑問手のようです。
+ex.verdict.dubious.spoken = その手はぎもんしゅのようです。
+ex.verdict.dubious.2 = 疑問手かもしれませんね。
+ex.verdict.dubious.2.spoken = ぎもんしゅかもしれませんね。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = あれ？いい手を見逃しましたよ。
 ex.verdict.missed.b1.2 = もう一度見てみましょう！もっと良い手がありました。
@@ -137,6 +142,47 @@ ex.better.b6 = {best}：{eval}。
 ex.better.b6.2 = 代わりに{best}、{eval}。
 ex.better.b6.2.spoken = かわりに{best}、{eval}。
 ex.better.b6.3 = {best}なら{eval}。
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = {your}に、もっと良い手がありました。
+ex.hint.b1.2 = {your}で、もっと良い手が指せました。
+ex.hint.b2 = {your}に、もっと良い手がありました。
+ex.hint.b2.2 = {your}で、もっと良い手が指せました。
+ex.hint.b3 = {your}に、より良い手がありました。
+ex.hint.b3.2 = {your}で、より良い手が指せました。
+ex.hint.b4 = {your}に、より良い手がありました。
+ex.hint.b4.2 = {your}をもう一度見てください。より良い手がありました。
+ex.hint.b5 = {your}に、より強い手がありました。
+ex.hint.b5.2 = {your}で、より強い手が指せました。
+ex.hint.b6 = {your}に、より良い手あり。
+ex.hint.b6.2 = {your}をもう一度。
+ex.hint.move = もっと良い手がありました。
+ex.hint.move.2 = ここには、より良い手がありました。
+# The same when the better move plainly wins material (see the English file); the move is not named.
+ex.hint.gain.b1 = {your}に、もっと良い手がありました。駒で得をする手です。
+ex.hint.gain.b1.2 = {your}で、もっと良い手が指せました。駒で得をする手です。
+ex.hint.gain.b2 = {your}に、もっと良い手がありました。駒で得をする手です。
+ex.hint.gain.b2.2 = {your}で、駒で得をする手が指せました。
+ex.hint.gain.b3 = {your}に、駒得になる、より良い手がありました。
+ex.hint.gain.b3.spoken = {your}に、こまどくになる、より良い手がありました。
+ex.hint.gain.b3.2 = {your}で、駒得になる手が指せました。
+ex.hint.gain.b3.2.spoken = {your}で、こまどくになる手が指せました。
+ex.hint.gain.b4 = {your}に、駒得になる手がありました。
+ex.hint.gain.b4.spoken = {your}に、こまどくになる手がありました。
+ex.hint.gain.b4.2 = {your}をもう一度見てください。駒得になる手がありました。
+ex.hint.gain.b4.2.spoken = {your}をもう一度見てください。こまどくになる手がありました。
+ex.hint.gain.b5 = {your}に、駒得になる、より強い手がありました。
+ex.hint.gain.b5.spoken = {your}に、こまどくになる、より強い手がありました。
+ex.hint.gain.b5.2 = {your}で、駒得になる手が指せました。
+ex.hint.gain.b5.2.spoken = {your}で、こまどくになる手が指せました。
+ex.hint.gain.b6 = {your}に、駒得の手あり。
+ex.hint.gain.b6.spoken = {your}に、こまどくの手あり。
+ex.hint.gain.b6.2 = {your}をもう一度。駒得あり。
+ex.hint.gain.b6.2.spoken = {your}をもう一度。こまどくあり。
+ex.reveal.b1 = より良い手は、{your}を{sq}へ動かすことでした。
+ex.reveal.b1.2 = {your}を{sq}へ動かせば、もっと良かったです。
+ex.reveal.b2 = {your}を{sq}へ動かすのが、より良い手でした。
+ex.reveal.b2.2 = より良い手は、{your}を{sq}へ動かすことでした。
 
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = 駒を元に戻しましょう。
@@ -171,6 +217,15 @@ ex.offer.b5.3 = 取り消しますか？
 ex.offer.b6 = 戻しますか？
 ex.offer.b6.2 = 取り消しますか？
 ex.offer.b6.3 = やり直しますか？
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = その手は疑問手です。もっと良い手が見つかるかもしれませんよ？
+ex.dubious.b1.spoken = その手はぎもんしゅです。もっと良い手が見つかるかもしれませんよ？
+ex.dubious.b1.2 = 疑問手ですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b1.2.spoken = ぎもんしゅですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2 = 疑問手ですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2.spoken = ぎもんしゅですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2.2 = その手は疑問手です。もっと良くできるかもしれませんよ？
+ex.dubious.b2.2.spoken = その手はぎもんしゅです。もっと良くできるかもしれませんよ？
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.
@@ -248,6 +303,18 @@ ex.result_back.b2.2 = 取り返しても、{pts:point}を失っています。
 ex.result_back.b3 = 取り返したあとも、{pts:point}の駒損です。
 ex.result_back.b3.spoken = 取り返したあとも、{pts:point}のこまぞんです。
 ex.result_back.b3.2 = 少し取り返せますが、結局{pts:point}の損です。
+ex.retake.b1 = {your2}で取り返すと、{my}に{your}を取られます。
+ex.retake.b1.2 = {your2}では取り返せません。{my}に{your}を取られます。
+ex.retake.b2 = {your2}で取り返すと、{my}に{your}を取られます。
+ex.retake.b2.2 = {your2}で取り返してもだめです。{my}に{your}を取られます。
+ex.retake.b3 = {move}と取り返すと、{reply}で{your}を取られます。
+ex.retake.b3.2 = {move}の取り返しは失敗です：{reply}で{your}を取られます。
+ex.retake.b4 = {move}には{reply}があり、{your}を取られます。
+ex.retake.b4.2 = {move}なら、{reply}で{your}を取られます。
+ex.retake.b5 = 取り返しの{move}は{reply}にぶつかり、{your}が落ちます。
+ex.retake.b5.2 = {move}は{reply}で失敗：{your}が落ちます。
+ex.retake.b6 = {move}？{reply}で{your}が落ちます。
+ex.retake.b6.2 = {move}は失敗：{reply}で{your}を失います。
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = そしてここ、{sq}で新しいクイーンができます。
 demo.promote.2 = そして{your}が{sq}まで進み、クイーンになります。
@@ -986,6 +1053,10 @@ tb.fixed.2 = 良くなりました。
 tb.fixed.3 = いい修正です。
 tb.same = また同じ手ですか？わかりました、見てみましょう。
 tb.same.2 = その手が好きなんですね。では、指し進めましょう。
+tb.found.b1 = そうです！私が考えていたのは、その手です。
+tb.found.b1.2 = 見つけましたね！それがより良い手です。
+tb.found = 私が考えていたのは、その手です。
+tb.found.2 = その通り、その手です。
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = 残念ですが、この対局ではもう手を戻せません。

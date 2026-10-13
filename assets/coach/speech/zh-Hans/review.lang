@@ -94,6 +94,9 @@ ex.verdict.inaccuracy.b5.3 = {best}比{move}更精确。
 ex.verdict.inaccuracy.b6 = {move}不精确，该走{best}。
 ex.verdict.inaccuracy.b6.2 = 欠精确。应走{best}。
 ex.verdict.inaccuracy.b6.3 = {best}更好。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = 这步棋看起来有点可疑。
+ex.verdict.dubious.2 = 这步棋似乎有点可疑。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = 哦，等等！你错过了一步好棋。
 ex.verdict.missed.b1.2 = 再看看！刚才有更好的走法。
@@ -115,6 +118,39 @@ ex.better.b5.3 = 更好的是{best}，接着{line}。
 ex.better.b6 = {best}：{eval}。
 ex.better.b6.2 = 应走{best}，{eval}。
 ex.better.b6.3 = {best}的评估是{eval}。
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = {your}本来有更好的走法。
+ex.hint.b1.2 = 用{your}本来可以走得更好。
+ex.hint.b2 = {your}本来有更好的走法。
+ex.hint.b2.2 = 用{your}本来可以走得更好。
+ex.hint.b3 = {your}本来有更好的着法。
+ex.hint.b3.2 = 用{your}本来有更好的着法。
+ex.hint.b4 = {your}本来有更好的着法。
+ex.hint.b4.2 = 再看看{your}，它本来有更好的着法。
+ex.hint.b5 = {your}本来有更强的着法。
+ex.hint.b5.2 = 用{your}本来有更强的着法。
+ex.hint.b6 = {your}有更好的着法。
+ex.hint.b6.2 = 再看看{your}。
+ex.hint.move = 这里本来有更好的着法。
+ex.hint.move.2 = 刚才有更好的走法。
+# The same when the better move plainly wins material (see the English file); the move is not named.
+ex.hint.gain.b1 = {your}本来有更好的走法，可以得子。
+ex.hint.gain.b1.2 = 用{your}本来可以走得更好，还能得子。
+ex.hint.gain.b2 = {your}本来有更好的走法，可以得子。
+ex.hint.gain.b2.2 = 用{your}本来有一步能得子的走法。
+ex.hint.gain.b3 = {your}本来有更好的着法，可以得子。
+ex.hint.gain.b3.2 = 用{your}本来有一步得子的着法。
+ex.hint.gain.b4 = {your}本来有一步得子的着法。
+ex.hint.gain.b4.2 = 再看看{your}，它本来有一步得子的着法。
+ex.hint.gain.b5 = {your}本来有更强的着法，可以得子。
+ex.hint.gain.b5.2 = 用{your}本来有一步得子的着法。
+ex.hint.gain.b6 = {your}有得子的着法。
+ex.hint.gain.b6.2 = 再看看{your}，有子可得。
+ex.reveal.b1 = 更好的走法是把{your}走到{sq}。
+ex.reveal.b1.2 = {your}本来可以走到{sq}，那样更好。
+ex.reveal.b2 = 把{your}走到{sq}才是更好的走法。
+ex.reveal.b2.2 = 更好的走法是把{your}走到{sq}。
 
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = 我们把棋子摆回去吧。
@@ -149,6 +185,11 @@ ex.offer.b5.3 = 收回这步吗？
 ex.offer.b6 = 悔棋？
 ex.offer.b6.2 = 收回这步？
 ex.offer.b6.3 = 重下？
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = 这步棋有点可疑，也许你能下得更好？
+ex.dubious.b1.2 = 这步棋有些可疑，也许你能找到更好的？
+ex.dubious.b2 = 这步棋有些可疑，也许你能找到更好的？
+ex.dubious.b2.2 = 这步棋有点可疑，也许还有更好的下法？
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.
@@ -224,6 +265,18 @@ ex.result_back.b2 = 你可以吃回一些，但仍然少{pts:point}。
 ex.result_back.b2.2 = 就算吃回来，你也亏了{pts:point}。
 ex.result_back.b3 = 即使你吃回来，也还落后{pts:point}。
 ex.result_back.b3.2 = 你能赢回一些，但仍要付出{pts:point}的代价。
+ex.retake.b1 = 如果用{your2}吃回，{my}就吃掉{your}。
+ex.retake.b1.2 = 不能用{your2}吃回：{my}会吃掉{your}。
+ex.retake.b2 = 如果用{your2}吃回，{my}就吃掉{your}。
+ex.retake.b2.2 = 用{your2}吃回不行：{my}会吃掉{your}。
+ex.retake.b3 = 如果用{move}吃回，{reply}就吃掉{your}。
+ex.retake.b3.2 = {move}吃回不行：{reply}吃掉{your}。
+ex.retake.b4 = {move}会遭到{reply}，{your}被吃掉。
+ex.retake.b4.2 = 如果{move}，那么{reply}吃掉{your}。
+ex.retake.b5 = 吃回{move}会碰上{reply}，{your}丢了。
+ex.retake.b5.2 = {move}不成立：{reply}，{your}丢了。
+ex.retake.b6 = {move}？{reply}，{your}丢了。
+ex.retake.b6.2 = {move}不行：{reply}吃掉{your}。
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = 然后在{sq}这里，你会得到一个新的后。
 demo.promote.2 = 接着{your}到达{sq}，变成后。
@@ -894,6 +947,10 @@ tb.fixed.2 = 更好了。
 tb.fixed.3 = 改得好。
 tb.same = 还是这步？好吧，我们看看。
 tb.same.2 = 你很喜欢这步棋。那就走下去看看。
+tb.found.b1 = 对！这就是我想的那步棋。
+tb.found.b1.2 = 你找到了！这就是更好的走法。
+tb.found = 这正是我想的那步。
+tb.found.2 = 没错，就是这步。
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = 很遗憾，这盘棋不能再悔棋了。

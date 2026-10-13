@@ -1,7 +1,10 @@
 # Test coverage of the game's own code (src/): the unit tests and the X11 desktop tests of a Linux
 # build instrumented for gcov (CMakeLists.txt, SCACELITH_COVERAGE; Stockfish, built apart, is not
 # counted), measured by gcovr. The game is built too, so that the code no test runs (the renderer,
-# the scenes, the menus) counts as not covered. The run's summary shows the line, function and
+# the scenes, the menus) counts as not covered. The coach voice's audio synthesis is left out: its
+# tests skip in this build (tests/tts_tests.cpp; instrumented, they took 13 to 50 minutes of the
+# run, the other CI jobs run them) and its code (src/tts but the text front end and the model
+# store) is not measured. The run's summary shows the line, function and
 # branch coverage; on master, the line coverage also goes to coverage.json on the badges branch,
 # which the README's coverage badge reads (a shields.io endpoint badge). Not one of the checks
 # master requires.
@@ -20,12 +23,10 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # The instrumented voice tests take most of the run: about 13 minutes of unit tests on a runner
-  # with AVX-512, about 50 on one without (the runner's CPU is GitHub's choice).
   coverage:
     name: Test coverage
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -39,8 +40,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build libssl-dev libx11-dev libgl-dev \
             xvfb openbox gcovr
 
-      # The coach's voice model, as in the CI's Linux job (the same cache), so that the coach's
-      # voice is measured too.
+      # The coach's voice model, as in the CI's Linux job (the same cache), for the tests that read
+      # its files without synthesizing (the text front end against the reference, the model store).
       - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -65,7 +66,8 @@ jobs:
       - name: Measure
         run: |
           mkdir -p coverage
-          gcovr --root . --filter 'src/' --json-summary coverage/summary.json --txt coverage/coverage.txt build
+          gcovr --root . --filter 'src/' --exclude 'src/tts/(?!text\.|nfkd_table\.|model_store\.)' \
+            --json-summary coverage/summary.json --txt coverage/coverage.txt build
           python3 -I tools/coverage_badge.py coverage/summary.json coverage/coverage.json "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the coverage report

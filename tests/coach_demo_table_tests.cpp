@@ -856,33 +856,8 @@ struct NoCard {
     int fromLevel, toLevel;
 };
 
-std::string fenAfterSan(const std::vector<const char*>& sans) {
-    Game g;
-    for (const char* s : sans) {
-        const Move m = g.position().parseSAN(s);
-        CHECK(m.valid());
-        if (m.valid()) g.play(m);
-    }
-    return g.position().fen();
-}
-
 std::vector<NoCard> noCards() {
     std::vector<NoCard> v;
-    {
-        // coach_review_rook_lost_in_a_lost_position: 16.Kg2? Nxg3+ 17.Kxg3 Qxh1, an inaccuracy by
-        // the numbers (W% 16 -> 10) that loses the exchange and more. Shown at every level, without a
-        // verdict (review.cpp, hiddenLoss) and without an offer.
-        NoCard c{"rook lost in a lost position", "", {"f1g2"}, {}, "e4g3", 1, 6};
-        c.fen = fenAfterSan({"d4", "d5", "e3", "Nf6", "Bb5+", "Bd7", "Bxd7+", "Nbxd7", "f4", "Rc8", "c4", "dxc4", "Na3",
-                             "Nb6", "Bd2", "Qd5", "b3", "cxb3", "axb3", "Ne4", "g3", "e6", "Bc1", "Qa5+", "Kf1", "Qd5",
-                             "Nc4", "Rd8", "Ne5", "a6"});
-        c.results[c.fen + "|A0"] = analysisOf({pvl(-447, "d1f3 f8d6 e5g4 c7c5 a1a5 f7f5 g4f2 e8g8 f1g2 b6d7"),
-                                               pvl(-468, "d1c2 f7f6 e5f3 c7c5 a1a5 g7g5 f4g5 f6g5"),
-                                               pvl(-486, "e5f3 f8b4 f1g2 e8g8 d1c2 c7c5 d4c5 d8c8")});
-        c.results[c.fen + "|A1"] =
-            analysisOf({pvl(-582, "f1g2 e4g3 g2g3 d5h1 e5f3 g7g5 f4g5 h7h6 e3e4 h8g8 a1a2 h6g5")});
-        v.push_back(c);
-    }
     {
         // A blunder that leaves the human still clearly ahead (W% 92 -> 76): no offer from 75 on.
         NoCard c{"a blunder still ahead", "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1", {"c3d5"}, {}, "e6d5", 1, 3};
@@ -943,7 +918,7 @@ TEST(coach_demo_table_no_card_after_some_demonstrations) {
             ++runs;
         }
     }
-    CHECK_EQ(runs, 6 + 3 + 3);
+    CHECK_EQ(runs, 3 + 3);
 }
 
 // A mistake, not a blunder (the en passant fork already a piece down, W% 19 -> 7): said in words
@@ -1036,6 +1011,33 @@ TEST(coach_demo_table_takeback_cap_leaves_the_demonstration) {
 // shown without a card. The count the HUD shows (Session::takebacksLeft) stays while a card is up
 // and drops when it is accepted; the third review says that no takeback is left, then "Now I play
 // my move", and the coach plays once the line is back.
+TEST(coach_demo_table_dubious_move_card) {
+    // Level 1: 1.a4 gives the b4 pawn (W% 59 -> 50, an inaccuracy): "that move is dubious, maybe you
+    // can do better?" with the card, nothing shown on the table. Taken back, the best move found is
+    // praised.
+    const char* fen = "1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1";
+    Scene s;
+    s.analyst.results[std::string(fen) + "|A0"] = analysisOf({pvl(100, "g1f1 g8f8"), pvl(0, "a3a4 b8b4 g1f1")});
+    s.start(fen, 1, chess::White);
+    CHECK(s.quiet());
+    CHECK(s.humanMove("a3a4"));
+    CHECK(s.until([&] { return s.session.offerOpen() || !s.coachHolds(); }, 180.0f));
+    CHECK(s.session.offerOpen());
+    if (!s.session.offerOpen()) return;
+    CHECK_EQ(s.stage.demoMoves, 0);
+    CHECK(s.queued("ex.dubious.b1"));
+    s.session.onOfferAnswer(s.game, true);
+    CHECK(s.until([&] { return s.humanMayMove(); }, 60.0f));
+    CHECK(s.tableShowsGame());
+    CHECK(s.humanMove("g1f1"));
+    CHECK(s.coachReply("g8f8"));
+    CHECK(s.quiet());
+    CHECK(s.queued("tb.found.b1"));
+    CHECK_EQ(s.offersShown, 1);
+    CHECK(s.tableShowsGame());
+    s.checkTable();
+}
+
 TEST(coach_demo_table_takebacks_run_out) {
     const std::vector<Blunder> all = blunders();
     const Blunder* fork = blunderNamed(all, "en passant fork");

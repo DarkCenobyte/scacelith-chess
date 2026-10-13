@@ -422,8 +422,19 @@ MatePattern classifyMate(const Position& mated) {
     if (ct == Knight && (around & ~mated.pieces(c)) == 0) return MatePattern::Smothered;
     const int home = c == White ? 0 : 7, fwd = c == White ? 1 : -1;
     const bool heavy = ct == Rook || ct == Queen;
-    if (rankOf(k) == home && heavy && rankOf(cs) == home && (around & rankMask(home + fwd) & mated.pieces(c)))
-        return MatePattern::BackRank;
+    // Back rank: the king shut in by its own pieces. Every square in front of it holds one of them,
+    // or is empty and covered by the checker alone (Qe8# against Kg8 with pawns on g7 and h7: the
+    // queen covers f7 too). A square another attacker covers or holds makes it a mating net (Qxf1#
+    // against Kh1 with a bishop of the mating side on h2), not a back-rank mate.
+    if (rankOf(k) == home && heavy && rankOf(cs) == home && (around & rankMask(home + fwd) & mated.pieces(c))) {
+        const U64 occ = mated.occupancy() & ~bit(k);
+        bool shut = true;
+        for (U64 f = around & rankMask(home + fwd) & ~mated.pieces(c); f; f &= f - 1) {
+            const Square s = lowest(f);
+            if (!mated.at(s).empty() || (mated.attackersTo(s, occ) & mated.pieces(them) & ~bit(cs))) shut = false;
+        }
+        if (shut) return MatePattern::BackRank;
+    }
     if (ct == Queen && (around & bit(cs)) && mated.attackersTo(cs, them)) return MatePattern::Support;
     if (heavy) {
         // Ladder: the king on an edge line, checked along it, the next line inward held by another heavy piece.
@@ -509,6 +520,19 @@ int kingZoneAttacks(const Position& p, Color c) {
     const Square k = p.kingSquare(c);
     if (k == NoSquare) return 0;
     return squareCount(attacksOf(King, c, k, 0) & attacksBy(p, opposite(c)));
+}
+
+int kingShelter(const Position& p, Color c) {
+    const Square k = p.kingSquare(c);
+    if (k == NoSquare) return 0;
+    const int up = c == White ? 1 : -1;
+    int n = 0;
+    for (int df = -1; df <= 1; ++df)
+        for (int dr = 1; dr <= 2; ++dr) {
+            const int f = fileOf(k) + df, r = rankOf(k) + dr * up;
+            if (f >= 0 && f <= 7 && r >= 0 && r <= 7 && p.at(makeSquare(f, r)) == Piece{Pawn, c}) ++n;
+        }
+    return n;
 }
 
 Square promotionSquare(const Position& p, Square pawn) {
@@ -635,7 +659,8 @@ std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t coun
 Square prizeLeft(const Position& before, const Move& m) {
     const PieceType took = (m.flags & MoveEnPassant) ? Pawn : before.at(m.to).type;   // NoPiece: a quiet move
     int gain = took != NoPiece ? seePoints(before, m) : 0;
-    if (m.flags & MovePromotion) gain = std::max(gain, kPiecePoints[m.promotion] - 1);
+    // A promotion wins the new piece, unless it is taken at once ("d8=Q Rxd8" wins nothing).
+    if (m.flags & MovePromotion) gain = std::max(gain, seePoints(before, m));
     Square prize = NoSquare;
     int most = gain + 2;
     for (const Move& x : before.legalMoves()) {

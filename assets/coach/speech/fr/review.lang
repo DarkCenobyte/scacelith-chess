@@ -94,6 +94,9 @@ ex.verdict.inaccuracy.b5.3 = {best} était plus précis que {move}.
 ex.verdict.inaccuracy.b6 = {move} est imprécis ; {best}.
 ex.verdict.inaccuracy.b6.2 = Imprécis. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} était meilleur.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = Ce coup me semble douteux.
+ex.verdict.dubious.2 = Ce coup semble douteux.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Oh, attends ! Tu as raté quelque chose de bien.
 ex.verdict.missed.b1.2 = Regarde encore ! Il y avait mieux.
@@ -115,6 +118,39 @@ ex.better.b5.3 = Mieux valait {best}, suivi de {line}.
 ex.better.b6 = {best} : {eval}.
 ex.better.b6.2 = Plutôt {best}, {eval}.
 ex.better.b6.3 = {best} donnait {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = Il y avait un meilleur coup avec {your}.
+ex.hint.b1.2 = {your} avait un meilleur coup.
+ex.hint.b2 = {your} avait un meilleur coup.
+ex.hint.b2.2 = Il y avait un meilleur coup avec {your}.
+ex.hint.b3 = {your} avait un meilleur coup.
+ex.hint.b3.2 = Il y avait mieux avec {your}.
+ex.hint.b4 = {your} avait un meilleur coup.
+ex.hint.b4.2 = Regarde encore {your} : il y avait mieux.
+ex.hint.b5 = {your} avait un coup plus fort.
+ex.hint.b5.2 = Il y avait plus fort avec {your}.
+ex.hint.b6 = {your} avait mieux.
+ex.hint.b6.2 = Regarde de nouveau {your}.
+ex.hint.move = Il y avait un meilleur coup.
+ex.hint.move.2 = Tu avais un meilleur coup ici.
+# The same when the better move plainly wins material (see the English file); the move is not named.
+ex.hint.gain.b1 = {your} avait un meilleur coup. Il gagne du matériel.
+ex.hint.gain.b1.2 = Il y avait un meilleur coup avec {your}. Il gagne du matériel.
+ex.hint.gain.b2 = {your} avait un meilleur coup. Il gagne du matériel.
+ex.hint.gain.b2.2 = Il y avait un coup avec {your} qui gagne du matériel.
+ex.hint.gain.b3 = {your} avait un meilleur coup, qui gagne du matériel.
+ex.hint.gain.b3.2 = Il y avait un coup avec {your} qui gagne du matériel.
+ex.hint.gain.b4 = {your} avait un coup qui gagne du matériel.
+ex.hint.gain.b4.2 = Regarde encore {your} : il y avait un coup qui gagne du matériel.
+ex.hint.gain.b5 = {your} avait un coup plus fort, qui gagne du matériel.
+ex.hint.gain.b5.2 = Il y avait un coup avec {your} qui gagne du matériel.
+ex.hint.gain.b6 = {your} avait un coup qui gagne du matériel.
+ex.hint.gain.b6.2 = Regarde de nouveau {your} : il y avait du matériel à gagner.
+ex.reveal.b1 = Le meilleur coup était {your} en {sq}.
+ex.reveal.b1.2 = {your} pouvait aller en {sq}. C’était mieux.
+ex.reveal.b2 = {your} en {sq} était le meilleur coup.
+ex.reveal.b2.2 = Le meilleur coup était {your} en {sq}.
 
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Remettons les pièces en place.
@@ -149,6 +185,11 @@ ex.offer.b5.3 = On le reprend ?
 ex.offer.b6 = Reprendre ?
 ex.offer.b6.2 = Tu reprends ?
 ex.offer.b6.3 = Réessayer ?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ce coup est douteux, tu peux peut-être faire mieux ?
+ex.dubious.b1.2 = Ce coup est douteux. Tu peux peut-être trouver mieux ?
+ex.dubious.b2 = Ce coup est douteux, tu peux peut-être faire mieux ?
+ex.dubious.b2.2 = Un coup douteux. Il y a peut-être mieux, non ?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.
@@ -224,6 +265,18 @@ ex.result_back.b2 = Tu peux reprendre un peu, mais tu as toujours {pts:point} de
 ex.result_back.b2.2 = Même si tu reprends, tu as perdu {pts:point}.
 ex.result_back.b3 = Même après ta reprise, tu as {pts:point} de moins.
 ex.result_back.b3.2 = Tu regagnes quelque chose, mais ça te coûte quand même {pts:point}.
+ex.retake.b1 = Si {your2} reprend, {my} prend {your}.
+ex.retake.b1.2 = Tu ne peux pas reprendre avec {your2} : {my} prendrait {your}.
+ex.retake.b2 = Si {your2} reprend, {my} prend {your}.
+ex.retake.b2.2 = Reprendre avec {your2} ne marche pas : {my} prend {your}.
+ex.retake.b3 = Si tu reprends par {move}, {reply} prend {your}.
+ex.retake.b3.2 = La reprise {move} échoue : {reply} prend {your}.
+ex.retake.b4 = {move} échoue sur {reply}, qui prend {your}.
+ex.retake.b4.2 = Et si {move}, alors {reply} prend {your}.
+ex.retake.b5 = La reprise {move} se heurte à {reply}, et {your} tombe.
+ex.retake.b5.2 = {move} échoue sur {reply} : {your} tombe.
+ex.retake.b6 = {move} ? {reply} prend {your}.
+ex.retake.b6.2 = {move} échoue : {reply} prend {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = Et ici, en {sq}, tu aurais une nouvelle dame.
 demo.promote.2 = Puis {your} arrive en {sq} et devient une dame.
@@ -570,7 +623,7 @@ ex.material.b6.2 = {move} perd {pts:point} : {line}.
 ex.missed_capture.b1 = Tu as vu ? Rien ne défendait {my} en {sq}. {your} pouvait {my:le} prendre.
 ex.missed_capture.b1.2 = Regarde : {my} n’avait pas de défenseur. {your} pouvait {my:le} capturer.
 ex.missed_capture.b1.3 = {my} en {sq} n’était pas protégé{my:e}. {your} pouvait s’en emparer !
-ex.missed_capture.b2 = Tu as raté une pièce gratuite : {best} gagne {my}.
+ex.missed_capture.b2 = Tu as raté une prise gratuite : {best} gagne {my}.
 ex.missed_capture.b2.2 = {my} était sans défense en {sq}. Il fallait jouer {best}. Ne rate plus ça !
 ex.missed_capture.b2.3 = {best} aurait gagné {my} gratuitement.
 ex.missed_capture.b3 = {best} gagnait {my} pour rien.
@@ -894,6 +947,10 @@ tb.fixed.2 = Mieux.
 tb.fixed.3 = Bonne correction.
 tb.same = Encore le même coup ? D’accord, voyons.
 tb.same.2 = Tu tiens à ce coup. Jouons-le.
+tb.found.b1 = Oui ! C’est le coup auquel je pensais.
+tb.found.b1.2 = Tu l’as trouvé ! C’est le meilleur coup.
+tb.found = C’est le coup que j’avais en tête.
+tb.found.2 = Exactement, c’est celui-là.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = Plus de reprise possible dans cette partie, hélas.

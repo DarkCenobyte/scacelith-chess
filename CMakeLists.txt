@@ -32,7 +32,8 @@ set(SCACELITH_SANITIZE "" CACHE STRING "Sanitizers for a test build (e.g. addres
 # Test coverage on Linux (GCC): -DSCACELITH_COVERAGE=ON instruments the game's own code (the core
 # modules, the game and the sources the unit tests compile) for gcov, not Stockfish, built apart;
 # gcovr reads the counters after a test run, the code of the game that no test runs counted as not
-# covered (.github/workflows/coverage.yml). The tests that measure time skip.
+# covered (.github/workflows/coverage.yml). The tests that measure time skip, and so do those that
+# synthesize the coach's voice (tests/tts_tests.cpp).
 option(SCACELITH_COVERAGE "Linux test build: instrument the game's code for gcov (test coverage)" OFF)
 set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 

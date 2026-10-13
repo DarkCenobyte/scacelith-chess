@@ -75,7 +75,7 @@ an.missed_fork.2 = {best} was a fork, attacking {t1} and {t2}.
 # The better move, when nothing above named it.
 an.better = {best} was stronger.
 an.better.2 = Better was {best}.
-an.better.3 = The engine prefers {best}.
+an.better.3 = {best} was more precise.
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

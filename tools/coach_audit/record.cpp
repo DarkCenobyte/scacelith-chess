@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <fstream>
 #include <random>
+#include <set>
 #include <sstream>
 #include <thread>
 
@@ -85,25 +86,56 @@ bool leavesMaterial(const Game& before, const Move& m, int points = 2) {
     return coach::bestCapturePoints(p, p.sideToMove()) >= points;
 }
 
-// A move that costs 10.5 to 14.5 win-% points at depth 12 (every legal move searched; the review,
-// deeper, mostly agrees it is a mistake), picked at random;
-// an invalid move when there is none.
-Move mistakeMove(ai::Engine& e, const Game& g, std::mt19937& rng) {
+// A move that costs what one of the bands says (win-% points at 'depth', every legal move searched;
+// the review, deeper, mostly agrees on its class; a band picked at random, 10.5 to 14.5 when there is
+// none: a mistake), picked at random among those that fit and differ from 'other'; an invalid move
+// when there is none.
+Move badMove(ai::Engine& e, const Game& g, std::mt19937& rng, const std::vector<std::pair<double, double>>& bands,
+             int depth = 12, const std::string& other = std::string()) {
+    const std::pair<double, double> band = bands.empty() ? std::make_pair(10.5, 14.5) : bands[rng() % bands.size()];
     ai::AnalysisRequest r;
     const Position& s = g.startPosition();
     r.startFen = s.isStandardStart() ? std::string() : s.fen();
     r.moves = g.uciMoves();
     r.multiPV = std::min(64, int(g.position().legalMoves().size()));
-    r.depth = 12;
+    r.depth = depth;
     const ai::Analysis a = analyse(e, r);
     if (!a.ok || a.lines.size() < 2) return Move{};
     const double best = coach::winPercent(a.lines[0].score);
     std::vector<Move> picks;
     for (const ai::PvLine& l : a.lines) {
         const double cost = best - coach::winPercent(l.score);
-        if (!l.pv.empty() && cost >= 10.5 && cost <= 14.5) picks.push_back(g.position().parseUCI(l.pv[0]));
+        if (!l.pv.empty() && l.pv[0] != other && cost >= band.first && cost <= band.second)
+            picks.push_back(g.position().parseUCI(l.pv[0]));
     }
     return picks.empty() ? Move{} : picks[rng() % picks.size()];
+}
+
+// The side to move's win percentage in the position after the game's moves, at depth 10 (-1 when
+// the search fails; 0 or 100 when the game is over).
+double winAt(ai::Engine& e, const Game& g) {
+    if (g.position().isCheckmate()) return 0.0;
+    if (g.isOver()) return 50.0;
+    ai::AnalysisRequest r;
+    const Position& s = g.startPosition();
+    r.startFen = s.isStandardStart() ? std::string() : s.fen();
+    r.moves = g.uciMoves();
+    r.multiPV = 1;
+    r.depth = 10;
+    const ai::Analysis a = analyse(e, r);
+    return a.ok && !a.lines.empty() ? coach::winPercent(a.lines[0].score) : -1.0;
+}
+
+// One field of a comma-separated line (no quoting in the puzzle CSV).
+std::string csvField(const std::string& line, int n) {
+    size_t at = 0;
+    for (int i = 0; i < n; ++i) {
+        at = line.find(',', at);
+        if (at == std::string::npos) return std::string();
+        ++at;
+    }
+    const size_t end = line.find(',', at);
+    return line.substr(at, end == std::string::npos ? std::string::npos : end - at);
 }
 
 ai::EngineSettings humanSettings(std::mt19937& rng) {
@@ -134,11 +166,81 @@ int recordMain(const Options& o) {
         return 1;
     }
     int written = 0;
+    const auto stopped = [&]() { return !o.stop.empty() && std::ifstream(o.stop).good(); };
     auto emit = [&](const Record& r) {
         out << writeRecord(r);
         out.flush();
         ++written;
     };
+
+    // Bad moves in recorded positions: each position before a human move whose best line leaves
+    // the game undecided (12 to 88 win-%), with another move that costs what a band says (searched
+    // at depth 10: the self-play's depth 12 for every move costs twice the time, for the class the
+    // review measures again).
+    std::mt19937 prng(o.seed);
+    for (const std::string& path : o.positions) {
+        std::ifstream in(path, std::ios::binary);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        std::vector<Record> recs;
+        std::string err;
+        if (!readRecords(ss.str(), recs, err)) {
+            std::fprintf(stderr, "%s: %s\n", path.c_str(), err.c_str());
+            continue;
+        }
+        const int before = written;
+        for (const Record& src : recs) {
+            if (stopped()) break;
+            if (!src.a0.ok || src.a0.lines.empty()) continue;
+            const double w = coach::winPercent(src.a0.lines[0].score);
+            if (w < 12.0 || w > 88.0) continue;
+            Game g;
+            if (!src.startFen.empty() && !g.resetFromFEN(src.startFen)) continue;
+            bool ok = true;
+            for (const std::string& u : src.moves) {
+                const Move m = g.position().parseUCI(u);
+                if (!m.valid() || !g.play(m)) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok || g.isOver()) continue;
+            ai::EngineSettings host;
+            host.hashMB = 64;
+            host.threads = o.threads;
+            e.configure(host);
+            e.newGame();
+            const Move m = badMove(e, g, prng, o.bands, 10, src.played);
+            if (m.valid()) emit(recordMove(e, g, m, o.depth));
+        }
+        std::fprintf(stderr, "positions %s: %d records\n", path.c_str(), written - before);
+    }
+
+    // Lichess puzzles (PuzzleId,FEN,Moves,Rating,RatingDeviation,Popularity,NbPlays,Themes,...): the
+    // FEN is the position before the move that loses, the first of Moves, which the side to move
+    // played in a real game; the rest is the refutation.
+    for (const std::string& path : o.puzzles) {
+        std::ifstream in(path, std::ios::binary);
+        std::string line;
+        const int before = written;
+        while (std::getline(in, line) && !stopped()) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+            const std::string fen = csvField(line, 1), moves = csvField(line, 2);
+            Game g;
+            if (fen.empty() || moves.empty() || !g.resetFromFEN(fen) || g.isOver()) continue;
+            const Move m = g.position().parseUCI(moves.substr(0, moves.find(' ')));
+            if (!m.valid()) continue;
+            ai::EngineSettings host;
+            host.hashMB = 64;
+            host.threads = o.threads;
+            e.configure(host);
+            e.newGame();
+            Record r = recordMove(e, g, m, o.depth);
+            r.tag = "puzzle " + csvField(line, 0) + " " + csvField(line, 3) + " " + csvField(line, 7);
+            emit(r);
+        }
+        std::fprintf(stderr, "puzzles %s: %d records\n", path.c_str(), written - before);
+    }
 
     // PGN games.
     for (const std::string& path : o.pgns) {
@@ -157,12 +259,51 @@ int recordMain(const Options& o) {
             host.threads = o.threads;
             e.configure(host);
             e.newGame();
-            for (size_t i = 0; i < pg.record.plies.size(); ++i) {
+            const std::string tag = "game " + pg.record.tag("Site") + " " + pg.record.tag("WhiteElo") + "/" +
+                                    pg.record.tag("BlackElo") + " " + pg.record.tag("TimeControl");
+            // A sample's picks: the plies its AuditPlies tag lists (from 1), recorded without the
+            // --min-drop scan, its AuditTag added to their tag.
+            std::set<size_t> picks;
+            {
+                std::istringstream ps(pg.record.tag("AuditPlies"));
+                for (size_t n; ps >> n;) picks.insert(n);
+            }
+            // --min-drop: every position searched once (depth 10), a move's cost read from the
+            // positions before and after it.
+            std::vector<double> win;
+            if (o.minDrop > 0 && picks.empty()) {
+                Game scan = g;
+                win.push_back(winAt(e, scan));
+                for (const pgn::Ply& ply : pg.record.plies) {
+                    const Move m = scan.position().parseSAN(ply.san);
+                    if (!m.valid() || !scan.play(m) || stopped()) break;
+                    win.push_back(winAt(e, scan));
+                }
+            }
+            for (size_t i = 0; i < pg.record.plies.size() && !stopped(); ++i) {
                 const Move m = g.position().parseSAN(pg.record.plies[i].san);
                 if (!m.valid()) break;
                 const Color mover = g.position().sideToMove();
                 const bool human = mover == White ? !coachWhite : !coachBlack;
-                if (human && (!o.materialOnly || leavesMaterial(g, m))) emit(recordMove(e, g, m, o.depth));
+                double drop = 0.0;
+                if (o.minDrop > 0 && picks.empty()) {
+                    if (i + 1 >= win.size() || win[i] < 0 || win[i + 1] < 0) break;
+                    drop = win[i] - (100.0 - win[i + 1]);
+                }
+                if (!picks.empty()) {
+                    if (human && picks.count(i + 1)) {
+                        Record r = recordMove(e, g, m, o.depth);
+                        r.tag = tag + " ply " + std::to_string(i + 1) + " " + pg.record.tag("AuditTag");
+                        emit(r);
+                    }
+                } else if (human && (!o.materialOnly || leavesMaterial(g, m)) && (o.minDrop <= 0 || drop >= o.minDrop)) {
+                    Record r = recordMove(e, g, m, o.depth);
+                    char d[48];
+                    std::snprintf(d, sizeof d, " ply %zu drop %.1f", i + 1, drop);
+                    r.tag = tag + d;
+                    emit(r);
+                }
+                if (!picks.empty() && i + 1 >= *picks.rbegin()) break;
                 if (!g.play(m)) break;
             }
             std::fprintf(stderr, "pgn %s: %d records\n", path.c_str(), written);
@@ -197,7 +338,7 @@ int recordMain(const Options& o) {
             bool picked = false;
             if (!m.valid() && humanTurn && o.mistakeRate > 0 &&
                 std::uniform_real_distribution<double>(0, 1)(rng) < o.mistakeRate) {
-                m = mistakeMove(e, g, rng);
+                m = badMove(e, g, rng, o.bands);
                 picked = m.valid();
             }
             if (!m.valid() && humanTurn && randomMove > 0 &&

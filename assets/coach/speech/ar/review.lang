@@ -93,6 +93,9 @@ ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
 ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
 ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
 ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = تبدو هذه النقلة مشكوكًا فيها.
+ex.verdict.dubious.2 = يبدو أن هذه النقلة مشكوك فيها.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = مهلًا! فاتك شيء جيد.
 ex.verdict.missed.b1.2 = انظر مرة أخرى! كان هناك ما هو أفضل.
@@ -114,6 +117,39 @@ ex.better.b5.3 = الأفضل {best}، ثم {line}.
 ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = بدلًا منها {best}، {eval}.
 ex.better.b6.3 = مع {best} التقييم {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+ex.hint.b1 = كانت هناك نقلة أفضل ب{your}.
+ex.hint.b1.2 = كانت لدى {your} نقلة أفضل.
+ex.hint.b2 = كانت لدى {your} نقلة أفضل.
+ex.hint.b2.2 = كانت هناك نقلة أفضل ب{your}.
+ex.hint.b3 = كانت لدى {your} نقلة أفضل.
+ex.hint.b3.2 = كان هناك ما هو أفضل ب{your}.
+ex.hint.b4 = كانت لدى {your} نقلة أفضل.
+ex.hint.b4.2 = انظر إلى {your} مرة أخرى: كان هناك ما هو أفضل.
+ex.hint.b5 = كانت لدى {your} نقلة أقوى.
+ex.hint.b5.2 = كانت هناك نقلة أقوى ب{your}.
+ex.hint.b6 = كان لدى {your} ما هو أفضل.
+ex.hint.b6.2 = انظر إلى {your} مرة أخرى.
+ex.hint.move = كانت هناك نقلة أفضل.
+ex.hint.move.2 = كانت لديك نقلة أفضل هنا.
+# The same when the better move plainly wins material (see the English file); the move is not named.
+ex.hint.gain.b1 = كانت لدى {your} نقلة أفضل. إنها تكسب مادة.
+ex.hint.gain.b1.2 = كانت هناك نقلة أفضل ب{your}. إنها تكسب مادة.
+ex.hint.gain.b2 = كانت لدى {your} نقلة أفضل. إنها تكسب مادة.
+ex.hint.gain.b2.2 = كانت هناك نقلة ب{your} تكسب مادة.
+ex.hint.gain.b3 = كانت لدى {your} نقلة أفضل تكسب مادة.
+ex.hint.gain.b3.2 = كانت هناك نقلة ب{your} تكسب مادة.
+ex.hint.gain.b4 = كانت لدى {your} نقلة تكسب مادة.
+ex.hint.gain.b4.2 = انظر إلى {your} مرة أخرى: كانت لديه نقلة تكسب مادة.
+ex.hint.gain.b5 = كانت لدى {your} نقلة أقوى تكسب مادة.
+ex.hint.gain.b5.2 = كانت هناك نقلة ب{your} تكسب مادة.
+ex.hint.gain.b6 = كانت لدى {your} نقلة تكسب مادة.
+ex.hint.gain.b6.2 = انظر إلى {your} مرة أخرى: كان بالإمكان كسب مادة.
+ex.reveal.b1 = النقلة الأفضل كانت {your} إلى {sq}.
+ex.reveal.b1.2 = كان بإمكان {your} الذهاب إلى {sq}. كان ذلك أفضل.
+ex.reveal.b2 = نقل {your} إلى {sq} كان الأفضل.
+ex.reveal.b2.2 = النقلة الأفضل كانت {your} إلى {sq}.
 
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = لنُعِد القطع إلى أماكنها.
@@ -148,6 +184,11 @@ ex.offer.b5.3 = استرجاع النقلة؟
 ex.offer.b6 = استرجاع؟
 ex.offer.b6.2 = استرجاع النقلة؟
 ex.offer.b6.3 = إعادة المحاولة؟
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = هذه النقلة مشكوك فيها، ربما تستطيع أن تلعب أفضل؟
+ex.dubious.b1.2 = نقلة مشكوك فيها. ربما تجد أفضل منها؟
+ex.dubious.b2 = نقلة مشكوك فيها. ربما تجد أفضل منها؟
+ex.dubious.b2.2 = هذه النقلة مشكوك فيها، ربما هناك أفضل منها؟
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.
@@ -223,6 +264,18 @@ ex.result_back.b2 = تستطيع أن تستردّ بعض الشيء، لكنن�
 ex.result_back.b2.2 = حتى بعد الاسترداد، تخسر {pts:point}.
 ex.result_back.b3 = حتى بعد استردادك، أتقدّم عليك ب{pts:point}.
 ex.result_back.b3.2 = تستردّ شيئًا، لكن هذا يكلّفك {pts:point} مع ذلك.
+ex.retake.b1 = إذا استرددت ب{your2}، يأخذ {my} {your}.
+ex.retake.b1.2 = لا يمكنك الاسترداد ب{your2}: عندها يأخذ {my} {your}.
+ex.retake.b2 = إذا استرددت ب{your2}، يأخذ {my} {your}.
+ex.retake.b2.2 = الاسترداد ب{your2} لا ينفع: يأخذ {my} {your}.
+ex.retake.b3 = إذا استرددت ب{move}، يأخذ {reply} {your}.
+ex.retake.b3.2 = الاسترداد ب{move} يفشل: {reply} ويضيع {your}.
+ex.retake.b4 = {move} يفشل بسبب {reply}، ويضيع {your}.
+ex.retake.b4.2 = وإذا لعبت {move}، يأتي {reply} ويضيع {your}.
+ex.retake.b5 = الاسترداد ب{move} يصطدم ب{reply}، ويسقط {your}.
+ex.retake.b5.2 = {move} يفشل أمام {reply}: يسقط {your}.
+ex.retake.b6 = {move}؟ {reply} ويسقط {your}.
+ex.retake.b6.2 = {move} يفشل: {reply} ويسقط {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = وهنا، في {sq}، تحصل على وزير جديد.
 demo.promote.2 = ثم يبلغ {your} المربع {sq} ويصبح وزيرًا.
@@ -511,7 +564,7 @@ ex.hanging.tip.b1.2 = عادة جيدة: بعد كل نقلة، تفقّد أي�
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured (said with نقاط: "{n:point}").
-ex.exchange_capture.b1 = أخذ {your} قطعة، لكن {my} يستردّ. هذا التبادل يكلّفك نقاطًا.
+ex.exchange_capture.b1 = أخذ {your}، لكن {my} يستردّ. هذا التبادل يكلّفك نقاطًا.
 ex.exchange_capture.b1.2 = {my} يستردّ. {your} يساوي {n:point}، ولم تحصل إلا على {n2:point}.
 ex.exchange_capture.b1.3 = انتبه: يستطيع {my} أن يستردّ بأخذ {your}. هذا تبادل سيئ.
 ex.exchange_capture.b2 = انتبه عند التبادل: {your} يساوي {n:point}. {my} يستردّ، ولم تكسب إلا {n2:point}.
@@ -573,7 +626,7 @@ ex.material.b6.2 = مع {move} تخسر {pts:point}: {line}.
 ex.missed_capture.b1 = انظر! {my} في {sq} كان بلا حماية. كان بإمكان {your} أخذه.
 ex.missed_capture.b1.2 = لاحظ: {my} لم يكن محميًّا، وكان {your} قادرًا على أخذه.
 ex.missed_capture.b1.3 = {my} في {sq} لم يكن محميًّا. كان {your} يستطيع اقتناصه!
-ex.missed_capture.b2 = فاتتك قطعة مجانية: مع {best} تربح {my}.
+ex.missed_capture.b2 = فاتك مكسب مجاني: مع {best} تربح {my}.
 ex.missed_capture.b2.2 = {my} كان بلا حماية في {sq}: {best}. في المرة القادمة، اقتنصه!
 ex.missed_capture.b2.3 = مع {best} كان بإمكانك ربح {my} مجانًا.
 ex.missed_capture.b3 = نقلة {best} كانت ستربح {my} بلا مقابل.
@@ -899,6 +952,10 @@ tb.fixed.2 = أفضل.
 tb.fixed.3 = تصحيح جيد.
 tb.same = النقلة نفسها مرة أخرى؟ حسنًا، لنرَ.
 tb.same.2 = يبدو أن هذه النقلة تعجبك. لنكمل بها.
+tb.found.b1 = نعم! هذه هي النقلة التي في ذهني.
+tb.found.b1.2 = أحسنت! هذه هي النقلة الأفضل.
+tb.found = هذه هي النقلة التي في ذهني.
+tb.found.2 = بالضبط، هذه هي.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = للأسف، لا مزيد من استرجاع النقلات في هذه المباراة.

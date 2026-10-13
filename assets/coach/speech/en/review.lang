@@ -99,6 +99,9 @@ ex.verdict.inaccuracy.b5.3 = {best} was more precise than {move}.
 ex.verdict.inaccuracy.b6 = {move} is inaccurate; {best}.
 ex.verdict.inaccuracy.b6.2 = Inaccurate. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} was better.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = That move looks dubious.
+ex.verdict.dubious.2 = That move seems dubious.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Oh, wait! You missed something good.
 ex.verdict.missed.b1.2 = Look again! There was something better.
@@ -121,6 +124,44 @@ ex.better.b5.3 = Better was {best}, followed by {line}.
 ex.better.b6 = {best}: {eval}.
 ex.better.b6.2 = {best} instead, {eval}.
 ex.better.b6.3 = {best} was {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = There was a better move with {your}.
+ex.hint.b1.2 = {your} had a better move.
+ex.hint.b2 = {your} had a better move.
+ex.hint.b2.2 = There was a better move with {your}.
+ex.hint.b3 = {your} had a better move.
+ex.hint.b3.2 = There was something better with {your}.
+ex.hint.b4 = {your} had a better move.
+ex.hint.b4.2 = Look again at {your}: it had something better.
+ex.hint.b5 = {your} had a stronger move.
+ex.hint.b5.2 = There was a stronger move with {your}.
+ex.hint.b6 = {your} had better.
+ex.hint.b6.2 = Look at {your} again.
+ex.hint.move = There was a better move.
+ex.hint.move.2 = You had a better move there.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} had a better move. It wins material.
+ex.hint.gain.b1.2 = There was a better move with {your}. It wins material.
+ex.hint.gain.b2 = {your} had a better move. It wins material.
+ex.hint.gain.b2.2 = There was a move with {your} that wins material.
+ex.hint.gain.b3 = {your} had a better move, one that wins material.
+ex.hint.gain.b3.2 = There was a move with {your} that wins material.
+ex.hint.gain.b4 = {your} had a move that wins material.
+ex.hint.gain.b4.2 = Look again at {your}: it had a move that wins material.
+ex.hint.gain.b5 = {your} had a stronger move, one that wins material.
+ex.hint.gain.b5.2 = There was a move with {your} that wins material.
+ex.hint.gain.b6 = {your} had a move that wins material.
+ex.hint.gain.b6.2 = Look at {your} again: there was material to win.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = The better move was {your} to {sq}.
+ex.reveal.b1.2 = {your} could go to {sq}. That was better.
+ex.reveal.b2 = {your} to {sq} was the better move.
+ex.reveal.b2.2 = The better move was {your} to {sq}.
 
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Let's put the pieces back.
@@ -155,6 +196,11 @@ ex.offer.b5.3 = Take it back?
 ex.offer.b6 = Take back?
 ex.offer.b6.2 = Take it back?
 ex.offer.b6.3 = Retry?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = That move is dubious. Maybe you can do better?
+ex.dubious.b1.2 = That move is dubious. Maybe you can find a better one?
+ex.dubious.b2 = A dubious move. Maybe you can do better?
+ex.dubious.b2.2 = That move is dubious. Maybe there's something better?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.
@@ -232,6 +278,21 @@ ex.result_back.b2 = You can take back some, but you're still {pts:point} down.
 ex.result_back.b2.2 = Even after you take back, you've lost {pts:point}.
 ex.result_back.b3 = Even after your recapture, you're {pts:point} down.
 ex.result_back.b3.2 = You win something back, but it still costs you {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = If {your2} takes back, {my} takes {your}.
+ex.retake.b1.2 = You can't take back with {your2}: then {my} takes {your}.
+ex.retake.b2 = If {your2} takes back, {my} takes {your}.
+ex.retake.b2.2 = Taking back with {your2} doesn't work: {my} takes {your}.
+ex.retake.b3 = If you take back with {move}, {reply} takes {your}.
+ex.retake.b3.2 = Taking back with {move} fails: {reply} takes {your}.
+ex.retake.b4 = {move} fails to {reply}, which takes {your}.
+ex.retake.b4.2 = And if {move}, then {reply} takes {your}.
+ex.retake.b5 = The recapture {move} runs into {reply}, and {your} falls.
+ex.retake.b5.2 = {move} fails to {reply}: {your} falls.
+ex.retake.b6 = {move}? {reply} takes {your}.
+ex.retake.b6.2 = {move} fails: {reply} takes {your}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = And here, on {sq}, you would get a new queen.
 demo.promote.2 = Then {your} reaches {sq} and becomes a queen.
@@ -516,7 +577,7 @@ ex.hanging.tip.b1.2 = A good habit: after every move, check which of your pieces
 # ---- 11. Exchange going wrong -------------------------------------------------------------------
 # A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
 # {n2} = what it captured.
-ex.exchange_capture.b1 = {your} took a piece, but {my} takes back. That trade loses points.
+ex.exchange_capture.b1 = {your} made a capture, but {my} takes back. That trade loses points.
 ex.exchange_capture.b1.2 = {my} takes back. {your} is worth {n}, but you only got {n2}.
 ex.exchange_capture.b1.3 = Careful: {my} can take {your} back. That's a bad trade.
 ex.exchange_capture.b2 = Careful with trades: {your} is worth {n}. {my} takes back, and you got only {n2}.
@@ -577,7 +638,7 @@ ex.material.b6.2 = {move} loses {pts:point}: {line}.
 ex.missed_capture.b1 = Did you see? {my} on {sq} was free. {your} could have taken it.
 ex.missed_capture.b1.2 = Look: {my} had no defender. {your} could have captured it.
 ex.missed_capture.b1.3 = {my} on {sq} was not protected. {your} could have grabbed it!
-ex.missed_capture.b2 = You missed a free piece: {best} wins {my}.
+ex.missed_capture.b2 = You missed a free capture: {best} wins {my}.
 ex.missed_capture.b2.2 = {my} was hanging on {sq}. {best} takes it. Next time, grab it!
 ex.missed_capture.b2.3 = {best} would have won {my} for free.
 ex.missed_capture.b3 = {best} would have won {my} for nothing.
@@ -901,6 +962,11 @@ tb.fixed.2 = Better.
 tb.fixed.3 = Good correction.
 tb.same = The same move again? All right, let's see.
 tb.same.2 = You like that move. Let's play it out.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Yes! That's the move I was thinking of.
+tb.found.b1.2 = You found it! That's the better move.
+tb.found = That's the move I had in mind.
+tb.found.2 = Exactly, that's the one.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = No more takebacks this game, I'm afraid.

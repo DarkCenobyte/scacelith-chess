@@ -70,7 +70,7 @@ an.missed_fork.2 = {best}がフォークでした：{t1}と{t2:bare}を同時に
 # The better move, when nothing above named it.
 an.better = {best}の方が強い手でした。
 an.better.2 = より良いのは{best}でした。
-an.better.3 = エンジンは{best}を推しています。
+an.better.3 = {best}の方が正確な手でした。
 
 # ---- Good moves -------------------------------------------------------------------------------------
 # A brilliant move gives material away ({piece} is the piece offered) and stands.

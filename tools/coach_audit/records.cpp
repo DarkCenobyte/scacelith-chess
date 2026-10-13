@@ -1,5 +1,6 @@
 // The records file of coach_audit: one block per human move.
 //   rec <human w|b> <played> <startfen|startpos> ; <moves...>
+//   tag <text>   (optional: where the move comes from)
 //   an <slot> <ok> <wtm> <nolegal> <depth> <best|-> <lines>
 //   ln <multipv> <depth> <cp> <mate> <matedNow> <matesNow> <bound E|L|U> <pv...>
 //   end
@@ -34,6 +35,7 @@ std::string writeRecord(const Record& r) {
       << (r.startFen.empty() ? std::string("startpos") : r.startFen) << " ;";
     for (const std::string& m : r.moves) o << ' ' << m;
     o << '\n';
+    if (!r.tag.empty()) o << "tag " << r.tag << '\n';
     writeAnalysis(o, "a0", r.a0);
     if (r.hasA1) writeAnalysis(o, "a1", r.a1);
     if (r.hasA2) writeAnalysis(o, "a2", r.a2);
@@ -73,6 +75,9 @@ bool readRecords(const std::string& text, std::vector<Record>& out, std::string&
             std::string m;
             while (ms >> m) cur.moves.push_back(m);
             open = true;
+        } else if (tag == "tag") {
+            std::getline(ls, cur.tag);
+            while (!cur.tag.empty() && cur.tag.front() == ' ') cur.tag.erase(cur.tag.begin());
         } else if (tag == "an") {
             std::string slot, best;
             int ok = 0, wtm = 0, nl = 0, depth = 0;

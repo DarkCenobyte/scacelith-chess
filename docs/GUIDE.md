@@ -145,10 +145,14 @@ your colour (White, Black, or alternating from one game to the next); the choice
   capture, a threat), it wins at least as much back, and says so when the bigger piece only has to
   wait. At levels 1 to 3 it plays the whole sequence, down to the piece lost or the mate, and says
   what it cost; from level 4 it plays up to where the problem stands and points at what falls
-  next. A reason is given only when the board proves it (the material really lost for good, beyond
-  what the best move loses, and enough to explain the mistake), else the coach only names the
-  better move. A move that costs a little is called a small slip, never a mistake with a made-up
-  line. A mistake (less than a blunder) is explained in words only, without playing the line: the
+  next. Where you could take back but that fails, it says why ("if you take back with Qxd2, Qxh1
+  takes your rook"). A reason is given only when the board proves it (the material really lost for
+  good, beyond what the best move loses, and enough to explain the mistake), else the coach only
+  names the better move. For a blunder whose reason it cannot prove, it says that it is a blunder
+  and which piece had a better move (and that the move wins material, when it plainly does), and
+  offers the takeback without giving the move away: it names the move if you play on, and says so
+  if you find it. A move that costs a little is called
+  a small slip, never a mistake with a made-up line. A mistake (less than a blunder) is explained in words only, without playing the line: the
   coach then plays its own move, and you answer it. After a blunder it has shown, it offers to take
   your move back: **Take back** or
   **Backspace** accepts, **Play on** or touching one of your pieces declines. At levels 4 to 6 these

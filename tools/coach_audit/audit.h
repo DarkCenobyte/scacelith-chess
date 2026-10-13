@@ -1,17 +1,33 @@
 // coach_audit: an audit of the coach's review (src/coach/review.h) and of the Analysis mode's
 // commentary (src/analysis/commentary.h) against the board.
 //   coach_audit record --out FILE [--pgn FILE]... [--selfplay N --seed S] [--depth D] [--threads T]
-//                      [--material-only] [--hang-rate R]
+//                      [--material-only] [--hang-rate R] [--positions FILE]... [--band LO HI]...
+//                      [--stop FILE] [--puzzles FILE]... [--min-drop D]
 //       runs the analyses a Coach game asks for on every move of the human side (embedded Stockfish);
 //       --material-only: only the moves after which the coach can win 2 points or more by exchange
 //       (the moves whose review shows a loss, a few times quicker to gather); --hang-rate R: in
 //       self-play, the "human" plays with probability R a random move that leaves 3 points or more
-//       to win by exchange (when one exists), for audits of the coach's demonstrations
-//   coach_audit review --in FILE [--level L] [--out FILE] [--all]
+//       to win by exchange (when one exists), for audits of the coach's demonstrations;
+//       --positions FILE: in each undecided position before a recorded human move (a record file),
+//       a move that costs what a --band says instead (every move of those that fit, one at random;
+//       a band picked at random per position), for audits of bad moves only; --stop FILE: ends
+//       before the next record once FILE exists (every record written stays whole);
+//       --puzzles FILE: the first move of each puzzle of a Lichess puzzle CSV (the move the player
+//       blundered into it, the side to move in its FEN being the human), tagged with the puzzle's
+//       id, rating and themes; --min-drop D: of the PGN games' moves, only those that cost D win-%
+//       points or more at depth 10 (each position searched once), tagged with the game's site,
+//       ratings and time control; a game with an AuditPlies tag (ply numbers from 1, a sample's
+//       picks) gives those plies only, without the scan, its AuditTag added to their tag
+//   coach_audit review --in FILE [--level L] [--out FILE] [--all] [--sequence]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
 //       before the problem it announces, a piece named on the wrong square, a loss the best move
 //       suffers too, a takeback offered for a small slip...
+//       --sequence: the records of each game (a PGN game recorded without --min-drop, a self-play
+//       game: each record continuing the last one's moves) through one Reviewer per level and side,
+//       kept from move to move as in a Coach game:
+//       the other side's moves played as the coach's (announced, remarked on: PRE lines), every
+//       offer declined (DECL lines)
 //       --verify D [--threads T] [--cache FILE]: also every move the coach shows or says, judged by
 //       the engine at depth D (verify.cpp: what it costs its mover against the best move there;
 //       the cache keeps the verdicts between runs)
@@ -39,17 +55,27 @@ struct Options {
     int maxPlies = 160;
     int level = 0;          // review: 0 = every level
     bool all = false;       // review: print every reviewed move, not only those with a script
+    bool sequence = false;  // review: one Reviewer per level and side through each game's records
     bool materialOnly = false;   // record: only the moves that leave material to win (2 points or more)
     double hangRate = 0.0;       // record, self-play: share of the human's moves that leave 3+ points to win
     double mistakeRate = 0.0;    // record, self-play: share of the human's moves picked among those that
                                  // cost 8 to 20 win-% points at depth 10 (around the mistake band)
     bool mistakesOnly = false;   // record, self-play: only the moves picked so (with --mistake-rate)
+    std::vector<std::string> positions;   // record: record files whose positions get a bad move (--band)
+    // record: the costs in win-% points at depth 12 of the moves picked (--mistake-rate, --positions),
+    // one band picked at random per move; none = 10.5 to 14.5 (a mistake)
+    std::vector<std::pair<double, double>> bands;
+    std::string stop;            // record: ends before the next record once this file exists
+    std::vector<std::string> puzzles;   // record: Lichess puzzle CSV files (the move that starts each)
+    double minDrop = 0.0;        // record, PGN games: only the moves that cost this many win-% points
+                                 // or more at depth 10 (0 = every move)
     int verify = 0;              // review: depth of the engine's check of every move shown or said (0 = none)
     std::string cache;           // review --verify: the verdicts kept between runs
 };
 
 // One human move and its analyses.
 struct Record {
+    std::string tag;                   // where the move comes from (a puzzle, a game), shown by review
     std::string startFen;              // "" = standard start
     std::vector<std::string> moves;    // before the human's move
     std::string played;                // the human's move (UCI)
