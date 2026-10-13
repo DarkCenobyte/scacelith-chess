@@ -70,19 +70,35 @@ cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_STOCKF
 ninja -C build-san scacelith_tests && ./build-san/scacelith_tests
 ```
 
+## The scenes in the unit tests
+
+The unit tests link the game's code too, all but the platform layer and `main.cpp` (the object
+library `scacelith_game_objs`, which the game links as well), and run it without a GPU or a window:
+on a null OpenGL driver (`tests/null_gl.cpp`: every entry point does nothing but what the game
+reads back, such as object names, compile and link status, limits, mapped buffers and fences; it
+counts the draws and the objects alive) and a fake platform layer (`tests/fake_platform.cpp`: a
+window of the test's size, a clock the test advances, scripted input, the data folders in a
+temporary folder). `tests/headless.h` runs `main.cpp`'s loop around a scene with the game's
+command-line options, plays the mouse and the keyboard, and finds the widgets of the last frame by
+their label (`ui::im::setTrace`). The null driver's defaults are generated from `glcorearb.h`
+(`python3 tools/gen_null_gl.py`, after `tools/gen_gl_loader.py`). The robot is built once per
+test run (`character::keepBuiltRobot`).
+
 ## Test coverage
 
-`-DSCACELITH_COVERAGE=ON` (Linux, GCC) instruments the game's own code for gcov: the core modules,
-the game and the sources the unit tests compile, not Stockfish, which is built apart (the test
-that measures the mixer's CPU time skips). After a run of the unit tests and of the X11 desktop
-tests, [gcovr](https://gcovr.com) reads the counters; the code of the game that no test runs,
-much of the renderer, the scenes and the menus, counts as not covered:
+`-DSCACELITH_COVERAGE=ON` (Linux, GCC) instruments the game's own code for gcov: the core modules
+and the game, not Stockfish, which is built apart (the test that measures the mixer's CPU time
+skips, and so do those that synthesize the coach's voice). After a run of the unit tests and of
+the X11 desktop tests, [gcovr](https://gcovr.com) reads the counters; the code that no test runs
+counts as not covered, and the voice's audio synthesis (`src/tts` but its text front end and the
+model store) is not measured:
 
 ```sh
 cmake -B build-cov -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_COVERAGE=ON \
       -DSCACELITH_SF_VARIANTS=x86-64-avx2
 ninja -C build-cov scacelith scacelith_tests && ./build-cov/scacelith_tests && tools/test_x11.sh build-cov
-gcovr --root . --filter 'src/' --txt build-cov            # apt install gcovr
+gcovr --root . --filter 'src/' --exclude 'src/tts/(?!text\.|nfkd_table\.|model_store\.)' \
+      --txt build-cov                                     # apt install gcovr
 ```
 
 The Coverage workflow (`.github/workflows/coverage.yml`) does the same on every pull request and
