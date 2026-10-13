@@ -28,7 +28,7 @@ struct English {
     ~English() { i18n::setLanguage("en"); }
 };
 
-bool near(float a, float b, float eps = 1e-4f) { return std::fabs(a - b) <= eps; }
+bool nearly(float a, float b, float eps = 1e-4f) { return std::fabs(a - b) <= eps; }
 
 // "سلام" (peace): seen, lam, alef, meem.
 const char* const kSalam = "\xD8\xB3\xD9\x84\xD8\xA7\xD9\x85";
@@ -80,7 +80,7 @@ TEST(ui_font_wrapping) {
     CHECK_EQ(gfx::wrapLineCount("one\ntwo\n\nthree", 10000.0f, st), 4);
     CHECK_EQ(gfx::wrapLineCount("", 100.0f, st), 1);
     CHECK(gfx::wrapWidth("one two three four", oneTwo + 2.0f, st) <= oneTwo + 2.0f);
-    CHECK(near(gfx::wrapWidth("one two", 10000.0f, st), oneTwo, 0.01f));
+    CHECK(nearly(gfx::wrapWidth("one two", 10000.0f, st), oneTwo, 0.01f));
     // A word longer than the width stays whole on its line.
     CHECK_EQ(gfx::wrapLineCount("unbreakable", 20.0f, st), 1);
     // Japanese has no spaces: it breaks between characters, never before "。".
@@ -115,8 +115,8 @@ TEST(ui_font_measures_and_carets) {
     CHECK(w > 100.0f);
     CHECK_EQ(gfx::textWidth("", st), 0.0f);
     CHECK_EQ(gfx::fitSize("Scacelith", st, w + 10.0f), 40.0f);
-    CHECK(near(gfx::fitSize("Scacelith", st, w * 0.8f), 32.0f, 0.01f));
-    CHECK(near(gfx::fitSize("Scacelith", st, w * 0.1f, 0.5f), 20.0f));
+    CHECK(nearly(gfx::fitSize("Scacelith", st, w * 0.8f), 32.0f, 0.01f));
+    CHECK(nearly(gfx::fitSize("Scacelith", st, w * 0.1f, 0.5f), 20.0f));
     CHECK_EQ(gfx::textDirection(kSalam, st), 1);
     CHECK_EQ(gfx::textDirection(std::string("abc ") + kSalam, st), 0);
     TextStyle forced = st;
@@ -129,11 +129,11 @@ TEST(ui_font_measures_and_carets) {
     i18n::setLanguage("en");
     TextStyle hand = st;
     hand.hand = font::HAND_MARCK;
-    CHECK(near(gfx::capHeight(hand), font::metrics(font::FACE_HAND_MARCK).capHeight * 40.0f));
-    CHECK(near(gfx::capHeight(st), font::metrics(font::FACE_TEXT).capHeight * 40.0f));
+    CHECK(nearly(gfx::capHeight(hand), font::metrics(font::FACE_HAND_MARCK).capHeight * 40.0f));
+    CHECK(nearly(gfx::capHeight(st), font::metrics(font::FACE_TEXT).capHeight * 40.0f));
     CHECK(gfx::textWidth("Ann", hand) > 0.0f);
     CHECK_EQ(gfx::caretOffset("abc", st, 0), 0.0f);
-    CHECK(near(gfx::caretOffset("abc", st, 3), gfx::textWidth("abc", st), 0.01f));
+    CHECK(nearly(gfx::caretOffset("abc", st, 3), gfx::textWidth("abc", st), 0.01f));
     CHECK_EQ(gfx::caretAt("abc", st, gfx::textWidth("abc", st)), 3);
     CHECK_EQ(gfx::caretAt("abc", st, gfx::caretOffset("abc", st, 1) + 0.5f), 1);
     TextStyle none = st;

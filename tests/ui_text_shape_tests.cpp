@@ -29,7 +29,7 @@ struct English {
     ~English() { i18n::setLanguage("en"); }
 };
 
-bool near(float a, float b, float eps = 1e-4f) { return std::fabs(a - b) <= eps; }
+bool nearly(float a, float b, float eps = 1e-4f) { return std::fabs(a - b) <= eps; }
 
 // "\u0633\u0644\u0627\u0645" (salam, peace): seen, lam, alef, meem.
 const char* const kSalam = "\xD8\xB3\xD9\x84\xD8\xA7\xD9\x85";
@@ -62,7 +62,7 @@ TEST(ui_text_shape_latin_line) {
         sum += g.advance;
         if (i > 0) kern += font::kerning(font::FACE_TEXT, r.glyphs[i - 1].glyph->index, g.glyph->index);
     }
-    CHECK(near(r.advance, sum + kern));
+    CHECK(nearly(r.advance, sum + kern));
     CHECK(kern < 0.0f);   // "AV" and "VA" are kerned closer in EB Garamond
     // A cached kerning pair answers the same; glyph index 0 kerns nothing.
     CHECK_EQ(font::kerning(font::FACE_TEXT, r.glyphs[0].glyph->index, r.glyphs[1].glyph->index),
@@ -70,10 +70,10 @@ TEST(ui_text_shape_latin_line) {
     CHECK_EQ(font::kerning(font::FACE_TEXT, 0, r.glyphs[1].glyph->index), 0.0f);
     // Tracking: 0.1 em between each pair of letters (three pairs).
     const text::Run tracked = text::shapeLine("AVAx", font::FACE_TEXT, 0.1f);
-    CHECK(near(tracked.advance, r.advance + 0.3f));
+    CHECK(nearly(tracked.advance, r.advance + 0.3f));
     // Carets: 0 before the first letter, the whole width after the last, and back.
     CHECK_EQ(text::caretX(r, 0), 0.0f);
-    CHECK(near(text::caretX(r, 4), r.advance));
+    CHECK(nearly(text::caretX(r, 4), r.advance));
     for (int i = 0; i <= 4; ++i) CHECK_EQ(text::caretIndex(r, text::caretX(r, i)), i);
     CHECK_EQ(text::caretIndex(r, -5.0f), 0);
     CHECK_EQ(text::caretIndex(r, 100.0f), 4);
@@ -123,14 +123,14 @@ TEST(ui_text_shape_arabic_joining_and_direction) {
     for (const text::PlacedGlyph& g : r.glyphs) {
         CHECK(g.rtl);
         CHECK_EQ(g.face, int(font::FACE_ARABIC));
-        CHECK(near(g.scale, font::fallbackScale(font::FACE_TEXT, font::FACE_ARABIC)));
+        CHECK(nearly(g.scale, font::fallbackScale(font::FACE_TEXT, font::FACE_ARABIC)));
     }
     CHECK(font::fallbackScale(font::FACE_TEXT, font::FACE_ARABIC) > 1.0f);
     // No tracking inside an Arabic word: its letters are joined.
-    CHECK(near(text::shapeLine(kSalam, font::FACE_TEXT, 0.2f).advance, r.advance));
+    CHECK(nearly(text::shapeLine(kSalam, font::FACE_TEXT, 0.2f).advance, r.advance));
     // Carets: before the first letter (on the right), after the last (on the left).
-    CHECK(near(text::caretX(r, 0), r.advance));
-    CHECK(near(text::caretX(r, 4), 0.0f));
+    CHECK(nearly(text::caretX(r, 0), r.advance));
+    CHECK(nearly(text::caretX(r, 4), 0.0f));
     CHECK_EQ(text::caretIndex(r, r.advance), 0);
     // The forced left-to-right base keeps the word reversed inside its own run.
     const text::Run ltr = text::shapeLine(kSalam, font::FACE_TEXT, 0.0f, 0);
@@ -183,12 +183,12 @@ TEST(ui_text_shape_combining_marks) {
     CHECK(mark.mark);
     CHECK_EQ(mark.advance, 0.0f);
     CHECK_EQ(mark.source, 1);
-    CHECK(near(acute.advance, e.advance));
+    CHECK(nearly(acute.advance, e.advance));
     const float baseCentre = base.x + 0.5f * (base.glyph->x0 + base.glyph->x1) * base.scale;
     const float markCentre = mark.x + 0.5f * (mark.glyph->x0 + mark.glyph->x1) * mark.scale;
-    CHECK(near(baseCentre, markCentre, 1e-3f));
+    CHECK(nearly(baseCentre, markCentre, 1e-3f));
     // Carets skip the mark: after "e" and after "e + mark" are the same place.
-    CHECK(near(text::caretX(acute, 2), acute.advance));
+    CHECK(nearly(text::caretX(acute, 2), acute.advance));
     const text::Run fatha = text::shapeLine("\xD8\xA8\xD9\x8E", font::FACE_TEXT);   // beh + fatha
     REQUIRE(fatha.glyphs.size() == 2u);
     int marks = 0;
@@ -211,7 +211,7 @@ TEST(ui_text_shape_title_face_small_capitals) {
     CHECK_EQ(r.glyphs[2].cp, 0x418u);
     CHECK(r.glyphs[0].face != int(font::FACE_TITLE));
     CHECK(r.glyphs[1].scale < r.glyphs[0].scale);
-    CHECK(near(r.glyphs[0].scale, font::metrics(font::FACE_TITLE).capHeight / font::metrics(r.glyphs[0].face).capHeight));
+    CHECK(nearly(r.glyphs[0].scale, font::metrics(font::FACE_TITLE).capHeight / font::metrics(r.glyphs[0].face).capHeight));
     // Latin stays in Cinzel at its own size.
     const text::Run latin = text::shapeLine("Ab", font::FACE_TITLE);
     for (const text::PlacedGlyph& g : latin.glyphs) {
