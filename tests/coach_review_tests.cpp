@@ -3152,6 +3152,27 @@ TEST(coach_review_threat_warnings) {
     checkScript(ms, "threat mate");
 }
 
+TEST(coach_review_punish_hint_needs_a_real_loss) {
+    // "My last move was a mistake. Can you punish it?" (level 1): the coach's knight left to be taken
+    // for nothing...
+    {
+        Game g = gameOf("4k3/8/5n2/8/8/8/5N2/4K3 b - - 0 1", {"Ng4"});
+        Reviewer rv;
+        rv.reset(1, White);
+        const ai::Analysis a0 = analysisOf({pvl(300, "f2g4 e8e7")});
+        CHECK(hasKey(rv.coachMoved(g, &a0), "threat.punish.b1"));
+    }
+    // ...never after a trade: the knight took a bishop, and taking it back only evens the material
+    // (16.Nxg4 Nxg4 in a 2016 Lichess game).
+    {
+        Game g = gameOf("4k3/8/5n2/8/6B1/8/5N2/4K3 b - - 0 1", {"Nxg4"});
+        Reviewer rv;
+        rv.reset(1, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "f2g4 e8e7")});
+        CHECK(!hasKey(rv.coachMoved(g, &a0), "threat.punish.b1"));
+    }
+}
+
 // ---- Regressions ---------------------------------------------------------------------------------
 
 TEST(coach_review_great_praise_forgets_taken_back_moves) {

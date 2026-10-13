@@ -1338,7 +1338,12 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before) {
     if (level_ == 1 && !punishHintDone_ && before && before->ok && !before->lines.empty() && !before->lines[0].pv.empty()) {
         const uint64_t hung = hangingPieces(now, coach, true) & ~hangingPieces(prev, coach, true);
         const Move bm = now.parseUCI(before->lines[0].pv[0]);
-        if (bm.valid() && hasBit(hung, bm.to) && points(now.at(bm.to).type) >= 3 && remarkAllowed()) {
+        // What the coach's move took counts against it: a piece taken back after it took as much
+        // (16.Nxg4 Nxg4) is a trade, not a mistake.
+        const Move last = g.moves().back();
+        const int took = points(prev.at(last.to).type);
+        if (bm.valid() && hasBit(hung, bm.to) && points(now.at(bm.to).type) >= 3 && seePoints(now, bm) - took >= 2 &&
+            remarkAllowed()) {
             Beat b = sayBeat("threat.punish.b1", Look::Player, ply, Priority::Low);
             b.gestures.push_back(Gesture{GestureKind::Open, NoSquare, {}, "", 0.0f, false});
             s.push_back(b);

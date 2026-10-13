@@ -772,6 +772,7 @@ int reviewMain(const Options& o) {
             Reviewer single;
             Reviewer* rvp = &single;
             Script pre;   // --sequence: the other side's move, as the coach's
+            std::vector<Finding> preF;
             if (o.sequence) {
                 const auto key = std::make_pair(level, int(c.human));
                 auto it = seq.find(key);
@@ -784,7 +785,18 @@ int reviewMain(const Options& o) {
                 before.undo(1);
                 if (!before.moves().empty()) {
                     for (const Beat& b : rvp->announce(before)) pre.push_back(b);
-                    for (const Beat& b : rvp->coachMoved(before, &r.a0)) pre.push_back(b);
+                    for (const Beat& b : rvp->coachMoved(before, &r.a0)) {
+                        pre.push_back(b);
+                        // "My last move was a mistake": the human's best line keeps 2 points more
+                        // than before the coach's move, once the coach has answered the capture.
+                        if (b.line.key != "threat.punish.b1" || !r.a0.ok || r.a0.lines.empty()) continue;
+                        const int start = materialBalance(before.positionAt(before.moves().size() - 1), c.human);
+                        const std::vector<LineStep> l = replayLine(c.p0, r.a0.lines[0].pv, c.human, 16);
+                        const int kept = l.size() >= 2 ? l[1].balance : l.empty() ? start : l[0].balance;
+                        if (kept - start < 2)
+                            preF.push_back({"PUNISH_NONE", "threat.punish.b1: the best line keeps " +
+                                                               std::to_string(kept - start) + " points from before my move"});
+                    }
                 }
                 for (const Beat& b : rvp->announce(c.g)) pre.push_back(b);
             } else {
@@ -808,7 +820,7 @@ int reviewMain(const Options& o) {
                         break;
                     }
             const PlyVerdict& v = rev.verdict;
-            std::vector<Finding> f;
+            std::vector<Finding> f = preF;
 
             // The demonstration's moves, none of them leaving a bigger prize standing unexplained.
             {
