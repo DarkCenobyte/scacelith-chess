@@ -114,7 +114,10 @@ TEST(ui_screens_title_page_entries) {
         CHECK(d.has(T(key)));
     CHECK(!d.has(T("menu.library")));
     const Rect quitR = d.find(T("menu.quit"))->r;
-    // The keyboard starts on New Game: Enter opens its page, Esc comes back.
+    // The keyboard starts on New Game: Enter opens its page, Esc comes back. (No focus left over
+    // by the tests before, as in a game that just started: one may have left it on Quit.)
+    ui::im::setFocus(0);
+    d.frame();
     ui::im::setKeyboardMode(true);
     d.press(plat::KEY_ENTER);
     settle(d);
