@@ -1715,6 +1715,34 @@ TEST(coach_review_human_context_cases) {
             CHECK(!hasKeyPrefix(r.script, "ex.back_rank"));
         }
     }
+    {
+        // Game tolm2f3k (Lichess, 2013): 18...h4? Na5. Two pawns still shelter the king on b8, it
+        // stands on its first rank and no checks come early: never "your king is exposed".
+        const Recorded rc = recorded(
+         "rec b h5h4 startpos ; d2d4 d7d5 g1f3 g8f6 e2e3 c8g4 f1e2 b8c6 e1g1 d8d7 b2b3 e8c8 c1b2 e7e6 a2a3 f8d6 b1d2 h7h5 f3e5 d7e8 f2f4 g4e2 d1e2 e8e7 b3b4 f6d7 e5c6 b7c6 e2a6 c8b8 a6c6 d7b6 c2c4 d5c4 d2c4\n"
+         "tag game https://lichess.org/tolm2f3k 1732/1863 300+0 ply 36 drop 22.7\n"
+         "an a0 1 0 0 16 b6c4 3\n"
+         "ln 1 16 -307 0 0 0 E b6c4 c6c4 e7d7 a1c1 h5h4 h2h3 h8h5 e3e4 h5b5 g1h1 f7f5 d4d5 e6d5 e4d5 d8e8 f1e1 e8e1 c1e1 a7a5 b2c3\n"
+         "ln 2 16 -524 0 0 0 E e7e8 c4a5 e8c6 a5c6 b8b7 c6d8 h8d8 a1e1 f7f5 f1f2 b6d5 f2c2\n"
+         "ln 3 16 -535 0 0 0 E f7f5 c4a5 b8c8 c6b7 c8d7 a5c6 e7f6 c6d8 h8d8 e3e4 f5e4 b7e4 f6f5 a1e1 d8f8 b2c1 h5h4\n"
+         "an a1 1 0 0 16 h5h4 1\n"
+         "ln 1 16 -674 0 0 0 E h5h4 c4a5 b8c8 e3e4 h4h3 g2g3 e7e8 c6b7 c8d7 e4e5 d6f8 a1c1 d8c8 f4f5 e6f5 d4d5 h8h5 b7a6 b6d5\n"
+         "an a2 1 1 0 14 c4a5 2\n"
+         "ln 1 14 674 0 0 0 E c4a5 b8c8 e3e4 h4h3 g2g3 e7e8 c6b7 c8d7 e4e5 d6f8 a1c1 d8c8 f4f5 e6f5 d4d5 h8h5\n"
+         "ln 2 14 307 0 0 0 E h2h3 b6c4 c6c4 e7d7 a1c1 f7f6 e3e4 f6f5 e4e5 d6e7 f1d1\n"
+         "an a3 1 0 0 6 b6c4 1\n"
+         "ln 1 6 -307 0 0 0 E b6c4 c6c4 e7d7 a1c1 h5h4 h2h3\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "h4 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::KingSafety);
+            CHECK(!hasKeyPrefix(r.script, "ex.king_exposed"));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

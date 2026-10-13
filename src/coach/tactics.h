@@ -109,6 +109,8 @@ bool isForced(const chess::Position& p);                  // exactly one legal m
 bool isRecapture(const chess::Game& g, size_t ply);
 // King zone: the (up to 8) squares next to c's king that the opponent attacks.
 int kingZoneAttacks(const chess::Position& p, chess::Color c);
+// c's pawns in front of its king: on the king's file and the two next to it, one and two ranks up.
+int kingShelter(const chess::Position& p, chess::Color c);
 // Rule of the square: the pawn on 'pawn' promotes before the enemy king can catch it (no help from
 // other pieces). defenderToMove: the king's side moves next.
 bool outsideSquare(const chess::Position& p, chess::Square pawn, bool defenderToMove);

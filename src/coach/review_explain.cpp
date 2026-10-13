@@ -1308,6 +1308,14 @@ bool kingSafety(const Ctx& c, Explanation& out) {
                         (c.p0.castling() & castlingOf(c.human));
     if (!shield && !walk && !centre && !zone) return false;
     if (!shield && (c.level == 2 || c.level == 3) && checks < 2) return false;   // "I can give many checks"
+    // A king said open (exposed, no shelter) is: one that just walked out with the queens on, or
+    // has at most one pawn of its own in front of it, or stands off its first two ranks, or is
+    // checked twice within the first eight plies of the line. One attacked behind its pawns is not.
+    int early = 0;
+    for (int i = 0; i < reach && i < 8; ++i)
+        if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].check) ++early;
+    const Square kp = c.p1.kingSquare(c.human);
+    if (!shield && !walk && kingShelter(c.p1, c.human) >= 2 && std::abs(rankOf(kp) - home) < 2 && early < 2) return false;
     Explanation ex;
     ex.type = ExType::KingSafety;
     ex.concrete = true;

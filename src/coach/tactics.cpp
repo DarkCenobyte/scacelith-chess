@@ -511,6 +511,19 @@ int kingZoneAttacks(const Position& p, Color c) {
     return squareCount(attacksOf(King, c, k, 0) & attacksBy(p, opposite(c)));
 }
 
+int kingShelter(const Position& p, Color c) {
+    const Square k = p.kingSquare(c);
+    if (k == NoSquare) return 0;
+    const int up = c == White ? 1 : -1;
+    int n = 0;
+    for (int df = -1; df <= 1; ++df)
+        for (int dr = 1; dr <= 2; ++dr) {
+            const int f = fileOf(k) + df, r = rankOf(k) + dr * up;
+            if (f >= 0 && f <= 7 && r >= 0 && r <= 7 && p.at(makeSquare(f, r)) == Piece{Pawn, c}) ++n;
+        }
+    return n;
+}
+
 Square promotionSquare(const Position& p, Square pawn) {
     const Piece x = p.at(pawn);
     if (x.type != Pawn) return NoSquare;

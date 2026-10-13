@@ -1026,6 +1026,43 @@ int reviewMain(const Options& o) {
                                                        std::to_string(refLoss) + (mated ? " (mate)" : "")});
             }
 
+            // What a king-safety line says, read on the board: a shield pawn moved ("that pawn
+            // protected your king": the pawn stood next to the king, one or two ranks up); a king said
+            // open (exposed, no shelter, too open) just walked out with the queens on, or has at most
+            // one pawn of its own in front of it (the three files, two ranks), or stands off its first
+            // two ranks, or faces two checks within eight plies of the line; checks said ("many
+            // checks", "with checks") are two at least.
+            for (const Beat& b : rev.script) {
+                const std::string& k = b.line.key;
+                const bool shieldKey = k.rfind("ex.king_shield.", 0) == 0, exposedKey = k.rfind("ex.king_exposed.", 0) == 0;
+                if (b.kind != BeatKind::Say || (!shieldKey && !exposedKey)) continue;
+                const Square ks = c.p1.kingSquare(c.human);
+                const int up = c.human == White ? 1 : -1, home = c.human == White ? 0 : 7;
+                int shelter = 0;
+                for (int df = -1; df <= 1; ++df)
+                    for (int dr = 1; dr <= 2; ++dr) {
+                        const int f = fileOf(ks) + df, r = rankOf(ks) + dr * up;
+                        if (f < 0 || f > 7 || r < 0 || r > 7) continue;
+                        if (c.p1.at(makeSquare(f, r)) == Piece{Pawn, c.human}) ++shelter;
+                    }
+                const bool offHome = std::abs(rankOf(ks) - home) >= 2;
+                int checks = 0;
+                for (int i = 0; i < int(c.refut.size()) && i < 8; ++i) checks += c.refut[size_t(i)].mover == c.coach && c.refut[size_t(i)].check;
+                const Move pm = c.p0.parseUCI(c.rec->played);
+                const Square k0 = c.p0.kingSquare(c.human);
+                if (shieldKey && !(c.p0.at(pm.from).type == Pawn && std::abs(fileOf(pm.from) - fileOf(k0)) <= 1 &&
+                                   (rankOf(pm.from) - rankOf(k0)) * up >= 1 && (rankOf(pm.from) - rankOf(k0)) * up <= 2))
+                    f.push_back({"KING_CLAIM", k + ": the move is no shield pawn's"});
+                const bool walk = c.p0.at(pm.from).type == King && std::abs(fileOf(pm.to) - fileOf(pm.from)) <= 1 &&
+                                  c.p0.pieces(c.human, Queen) && c.p0.pieces(c.coach, Queen);
+                if (exposedKey && shelter >= 2 && !offHome && checks < 2 && !walk)
+                    f.push_back({"KING_CLAIM", k + ": the king has " + std::to_string(shelter) + " pawns in front, " +
+                                                   std::to_string(checks) + " checks follow"});
+                if ((k.rfind("ex.king_exposed.b2", 0) == 0 || k.rfind("ex.king_exposed.b3", 0) == 0) && checks < 2 &&
+                    render(b.line).find("check") != std::string::npos)
+                    f.push_back({"KING_CLAIM", k + ": checks said, " + std::to_string(checks) + " in the line"});
+            }
+
             // An explanation where one is due: a blunder the player can still repair (not lost before
             // it, not still winning after it) after which the engine's line wins material for good or
             // mates (or that misses such a win), and no line of the coach's says why. Levels 1-2 stay
