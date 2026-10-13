@@ -23,7 +23,7 @@
 #include <vector>
 
 using viewer_test::LogCapture;
-using viewer_test::near;
+using viewer_test::nearly;
 
 namespace {
 
@@ -128,7 +128,7 @@ TEST(render_quality_presets_of_the_test_scenes) {
     CHECK_EQ(s.shadowCascades, 2);
     CHECK_EQ(s.probeBounces, 1);
     CHECK_EQ(s.aoQuality, -1);   // the post effects follow the level again
-    CHECK(near(s.renderScale, 0.5f));
+    CHECK(nearly(s.renderScale, 0.5f));
     s.applyPreset(render::Quality::Medium);
     CHECK(s.planarReflections && s.volumetrics && s.motionBlur && !s.ssr && !s.dof);
     CHECK_EQ(s.probeResolution, 64);
@@ -136,11 +136,11 @@ TEST(render_quality_presets_of_the_test_scenes) {
     CHECK(s.ssr && s.dof && s.tessellation);
     CHECK_EQ(s.shadowMapSize, 4096);
     CHECK_EQ(s.shadowFilter, 2);
-    CHECK(near(s.renderScale, 0.5f));
+    CHECK(nearly(s.renderScale, 0.5f));
     s.applyPreset(render::Quality::Ultra);
     CHECK_EQ(s.probeBounces, 3);
     CHECK_EQ(s.shadowFilter, 3);
-    CHECK(near(s.renderScale, 1.0f));
+    CHECK(nearly(s.renderScale, 1.0f));
 }
 
 // The depth of field looks: off, then the apertures and blur radii of Subtle, Cinematic, Shallow.
@@ -149,11 +149,11 @@ TEST(render_depth_of_field_presets) {
     applyDofPreset(s, DofPreset::Off);
     CHECK(!s.dof);
     applyDofPreset(s, DofPreset::Subtle);
-    CHECK(s.dof && near(s.dofFStop, 5.6f) && near(s.dofMaxRadius, 10.0f));
+    CHECK(s.dof && nearly(s.dofFStop, 5.6f) && nearly(s.dofMaxRadius, 10.0f));
     applyDofPreset(s, DofPreset::Cinematic);
-    CHECK(near(s.dofFStop, 2.8f) && near(s.dofMaxRadius, 14.0f));
+    CHECK(nearly(s.dofFStop, 2.8f) && nearly(s.dofMaxRadius, 14.0f));
     applyDofPreset(s, DofPreset::Shallow);
-    CHECK(near(s.dofFStop, 1.8f) && near(s.dofMaxRadius, 16.0f));
+    CHECK(nearly(s.dofFStop, 1.8f) && nearly(s.dofMaxRadius, 16.0f));
 }
 
 // The ray through a pixel: through the centre of the view along the camera's axis, through the
@@ -164,14 +164,14 @@ TEST(render_camera_screen_ray) {
     c.fovY = 90.0f * m::DEG;
     c.lookAt(m::vec3(0, 1, 0));
     const m::Ray centre = c.screenRay(50.0f, 50.0f, 101, 101);
-    CHECK(near(centre.o, c.position));
-    CHECK(near(centre.d, m::vec3(0, 0, -1), 1e-5f));
-    CHECK(near(c.right(), m::vec3(1, 0, 0), 1e-5f));
+    CHECK(nearly(centre.o, c.position));
+    CHECK(nearly(centre.d, m::vec3(0, 0, -1), 1e-5f));
+    CHECK(nearly(c.right(), m::vec3(1, 0, 0), 1e-5f));
     // A 200 x 100 view: the left edge of the first column at -2 (aspect 2, tan 45 = 1), the top at +1.
     const m::Ray left = c.screenRay(-0.5f, 49.5f, 200, 100);
-    CHECK(near(left.d, m::normalize(m::vec3(-2, 0, -1)), 1e-5f));
+    CHECK(nearly(left.d, m::normalize(m::vec3(-2, 0, -1)), 1e-5f));
     const m::Ray top = c.screenRay(99.5f, -0.5f, 200, 100);
-    CHECK(near(top.d, m::normalize(m::vec3(0, 1, -1)), 1e-5f));
+    CHECK(nearly(top.d, m::normalize(m::vec3(0, 1, -1)), 1e-5f));
 }
 
 // ---- the renderer of a running scene --------------------------------------------------------
@@ -229,7 +229,7 @@ TEST(render_window_resizes_and_minimised_window) {
     CHECK_EQ(r.width(), 800);
     CHECK_EQ(r.targets().w, 800);
     CHECK_EQ(r.targets().h, 600);
-    CHECK(near(r.frameData().resolution.x, 800.0f) && near(r.frameData().resolution.y, 600.0f));
+    CHECK(nearly(r.frameData().resolution.x, 800.0f) && nearly(r.frameData().resolution.y, 600.0f));
     render::RenderSettings half = r.settings();
     half.renderScale = 0.5f;
     r.setSettings(half);
@@ -293,16 +293,16 @@ TEST(render_frame_constants_without_the_physical_sky) {
     render::PointLight lamp;
     lamp.position = m::vec3(0, 2, 0);
     lamp.setSpot(m::vec3(0, -2, 0), 0.2f, 0.4f);
-    CHECK(near(lamp.direction, m::vec3(0, -1, 0)));
-    CHECK(near(lamp.spotCosOuter, std::cos(0.4f)));
+    CHECK(nearly(lamp.direction, m::vec3(0, -1, 0)));
+    CHECK(nearly(lamp.spotCosOuter, std::cos(0.4f)));
     r.addLight(lamp);
     r.endFrame();
     const render::FrameUBOData& f = r.frameData();
     const float exposure = 1.0f / (1.2f * std::pow(2.0f, 10.0f));
-    CHECK(near(f.exposure.x, exposure, 1e-8f));
-    CHECK(near(f.sunRadiance.w, 50000.0f, 1.0f));
-    CHECK(near(f.skyParams.y, 8000.0f * exposure, 1e-4f));
-    CHECK(near(f.cameraPos.w, 2.5f));
+    CHECK(nearly(f.exposure.x, exposure, 1e-8f));
+    CHECK(nearly(f.sunRadiance.w, 50000.0f, 1.0f));
+    CHECK(nearly(f.skyParams.y, 8000.0f * exposure, 1e-4f));
+    CHECK(nearly(f.cameraPos.w, 2.5f));
     CHECK(f.jitter.x == 0.0f && f.jitter.y == 0.0f);
 
     LogCapture log;

@@ -17,7 +17,7 @@
 #include <vector>
 
 using viewer_test::LogCapture;
-using viewer_test::near;
+using viewer_test::nearly;
 using viewer_test::orbits;
 using viewer_test::sees;
 
@@ -74,8 +74,8 @@ TEST(viewer_materials_close_ups_keys_and_albedo_debug) {
     CHECK_EQ(materials::get(MaterialId::FloorMarbleInlay).planarReflector, materials::get(MaterialId::FloorMarble).planarReflector);
     app->frames(2);
     CHECK(orbits(cam(*app), m::vec3(-2.9f, 1.2f, -1.9f), 45 * kDeg, 5 * kDeg, 2.3f, 45));   // glass, 30 degrees round
-    CHECK(near(env(*app).sunDirection, m::vec3(std::sqrt(0.5f), std::sqrt(0.5f), 0)));
-    CHECK(near(env(*app).time, 2 * kFrame, 1e-5f));
+    CHECK(nearly(env(*app).sunDirection, m::vec3(std::sqrt(0.5f), std::sqrt(0.5f), 0)));
+    CHECK(nearly(env(*app).time, 2 * kFrame, 1e-5f));
     for (int k = 1; k <= 10; ++k) {
         app->key(plat::KEY_0 + k % 10);
         const Preset& p = presets[k - 1];
@@ -94,7 +94,7 @@ TEST(viewer_materials_close_ups_keys_and_albedo_debug) {
     CHECK(everyMaterialHas("MAT_DEBUG_ALBEDO", false));   // the first scene's end took them away
     app->frame();
     CHECK(orbits(cam(*app), m::vec3(0, 0.8f, 0), 0.0f, 0.35f, 1.2f, 40.0f));
-    CHECK(near(env(*app).sunDirection, render::Environment().sunDirection));   // unreadable: the default
+    CHECK(nearly(env(*app).sunDirection, render::Environment().sunDirection));   // unreadable: the default
     headless::stopShared();
     CHECK_EQ(materials::get(MaterialId::FloorMarble).planarReflector, -1);
     CHECK_EQ(materials::get(MaterialId::FloorMarbleInlay).planarReflector, -1);
@@ -123,13 +123,13 @@ TEST(viewer_lightbox_views_sun_and_exposure) {
         app->frames(2);
         CHECK(sees(cam(*app), views[v].eye, views[v].target, views[v].fov));
         if (v < 4) {
-            CHECK(near(env(*app).sunDirection, render::Environment().sunDirection));
-            CHECK(near(env(*app).exposureEV100, render::Environment().exposureEV100));
+            CHECK(nearly(env(*app).sunDirection, render::Environment().sunDirection));
+            CHECK(nearly(env(*app).exposureEV100, render::Environment().exposureEV100));
         } else {
-            CHECK(near(env(*app).sunDirection, m::vec3(0, 0.5f, std::sqrt(0.75f))));
-            CHECK(near(env(*app).exposureEV100, 9.0f));
+            CHECK(nearly(env(*app).sunDirection, m::vec3(0, 0.5f, std::sqrt(0.75f))));
+            CHECK(nearly(env(*app).exposureEV100, 9.0f));
         }
-        CHECK(near(env(*app).time, 2 * kFrame, 1e-5f));
+        CHECK(nearly(env(*app).time, 2 * kFrame, 1e-5f));
     }
     headless::App* app = headless::shared({"--scene", "lightbox", "--view", "4", "--sun", "90,30", "--ev", "9"});
     CHECK(!viewer_test::frameWithKey(*app, plat::KEY_ESCAPE));
@@ -144,8 +144,8 @@ TEST(viewer_testbed_views_dusk_and_sun) {
     REQUIRE(app);
     app->frame();
     CHECK(orbits(cam(*app), m::vec3(0, 0.1f, 0), 0.6f, 0.3f, 1.9f, 40));
-    CHECK(near(env(*app).sunDirection, sunFromAzEl(25, 35)));
-    CHECK(near(env(*app).exposureEV100, 14.7f));
+    CHECK(nearly(env(*app).sunDirection, sunFromAzEl(25, 35)));
+    CHECK(nearly(env(*app).exposureEV100, 14.7f));
     app->wheel(2.0f);
     CHECK(orbits(cam(*app), m::vec3(0, 0.1f, 0), 0.6f, 0.3f, 1.9f * 0.81f, 40));
 
@@ -153,17 +153,17 @@ TEST(viewer_testbed_views_dusk_and_sun) {
     REQUIRE(app);
     app->frame();
     CHECK(orbits(cam(*app), m::vec3(-0.2f, 0.12f, 0), 1.2f, 0.08f, 2.2f, 40));
-    CHECK(near(env(*app).sunDirection, sunFromAzEl(25, -4)));
+    CHECK(nearly(env(*app).sunDirection, sunFromAzEl(25, -4)));
     CHECK(env(*app).sunDirection.y < 0.0f);
-    CHECK(near(env(*app).exposureEV100, 8.5f));
+    CHECK(nearly(env(*app).exposureEV100, 8.5f));
 
     app = headless::shared({"--scene", "testbed", "--view", "2", "--dusk", "--sun", "10,20", "--ev", "9.5", "--shot", "--time", "4"});
     REQUIRE(app);
     app->frames(2);
     CHECK(orbits(cam(*app), m::vec3(0, 0.04f, 0.35f), 0.3f, 0.35f, 0.55f, 40));
-    CHECK(near(env(*app).sunDirection, sunFromAzEl(10, 20)));
-    CHECK(near(env(*app).exposureEV100, 9.5f));
-    CHECK(near(env(*app).time, 4.0f));
+    CHECK(nearly(env(*app).sunDirection, sunFromAzEl(10, 20)));
+    CHECK(nearly(env(*app).exposureEV100, 9.5f));
+    CHECK(nearly(env(*app).time, 4.0f));
     CHECK(!viewer_test::frameWithKey(*app, plat::KEY_ESCAPE));
 }
 
@@ -183,15 +183,15 @@ TEST(viewer_posttest_low_quality_without_effects) {
     CHECK(!s.ssao && !s.ssr && !s.volumetrics && !s.taa && !s.motionBlur && !s.dof && !s.bloom);
     CHECK_EQ(s.shadowMapSize, 2048);
     CHECK(!s.tessellation);
-    CHECK(near(s.renderScale, 0.5f));
+    CHECK(nearly(s.renderScale, 0.5f));
     CHECK_EQ(app->renderer().targets().w, 640);
     CHECK_EQ(app->renderer().targets().h, 360);
-    CHECK(near(app->renderer().fade, 0.25f));
-    CHECK(near(env(*app).time, 0.0f));   // --static
-    CHECK(near(env(*app).exposureEV100, 9.0f));
-    CHECK(near(env(*app).skyIlluminance, 1000.0f));
-    CHECK(near(post(*app).dofFocusDistance, 3.0f));
-    CHECK(near(post(*app).dofFStop, 4.0f));
+    CHECK(nearly(app->renderer().fade, 0.25f));
+    CHECK(nearly(env(*app).time, 0.0f));   // --static
+    CHECK(nearly(env(*app).exposureEV100, 9.0f));
+    CHECK(nearly(env(*app).skyIlluminance, 1000.0f));
+    CHECK(nearly(post(*app).dofFocusDistance, 3.0f));
+    CHECK(nearly(post(*app).dofFStop, 4.0f));
     CHECK(!post(*app).autoExposure);
 }
 
@@ -209,7 +209,7 @@ TEST(viewer_posttest_presets_and_debug_view_keys) {
     CHECK_EQ(s.shadowFilter, 3);
     CHECK(post(*app).autoExposure);
     CHECK_EQ(post(*app).debugView, 7);
-    CHECK(near(env(*app).time, 1.0f + 3 * 2 * kFrame, 1e-4f));
+    CHECK(nearly(env(*app).time, 1.0f + 3 * 2 * kFrame, 1e-4f));
     struct Preset {
         m::vec3 eye, target, subject;
     };
@@ -219,10 +219,10 @@ TEST(viewer_posttest_presets_and_debug_view_keys) {
     auto checkPreset = [&](int k) {
         const Preset& p = presets[k];
         CHECK(sees(cam(*app), p.eye, p.target, 50));
-        CHECK(near(post(*app).dofFocusDistance, m::dot(p.subject - p.eye, m::normalize(p.target - p.eye))));
+        CHECK(nearly(post(*app).dofFocusDistance, m::dot(p.subject - p.eye, m::normalize(p.target - p.eye))));
     };
     checkPreset(2);
-    CHECK(near(post(*app).dofFocusDistance, m::length(presets[2].target - presets[2].eye)));
+    CHECK(nearly(post(*app).dofFocusDistance, m::length(presets[2].target - presets[2].eye)));
     for (int k : {0, 1, 2}) {
         app->key(plat::KEY_0 + k + 1);
         checkPreset(k);

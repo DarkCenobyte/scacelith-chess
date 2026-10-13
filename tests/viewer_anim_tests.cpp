@@ -18,7 +18,7 @@
 #include <vector>
 
 using viewer_test::LogCapture;
-using viewer_test::near;
+using viewer_test::nearly;
 
 namespace {
 
@@ -101,9 +101,9 @@ const ViewCheck kViewChecks[] = {
 void checkView(headless::App& app, int view) {
     for (const ViewCheck& c : kViewChecks) {
         if (c.view != view) continue;
-        const bool ok = c.fixedEye ? near(eye(app), c.v) : near(focus(app), m::length(c.v), 1e-4f);
+        const bool ok = c.fixedEye ? nearly(eye(app), c.v) : nearly(focus(app), m::length(c.v), 1e-4f);
         CHECK(ok);
-        CHECK(near(fovDeg(app), c.fov, 0.01f));
+        CHECK(nearly(fovDeg(app), c.fov, 0.01f));
         if (!ok) std::fprintf(stderr, "  (the camera of view %d)\n", view);
     }
 }
@@ -123,10 +123,10 @@ TEST(viewer_anim_default_timeline_plays_the_opening) {
                        "anim viewer: White e4xd5 (piece 4 takes 19)", "White pressed the clock"}));
     CHECK_EQ(log.count("handshake clasp"), 2);
     CHECK_EQ(log.count("pressed the clock"), 3);
-    CHECK(near(sceneTime(*app), 642 * kFrame));
+    CHECK(nearly(sceneTime(*app), 642 * kFrame));
     // The default view looks at the table from its +X end.
-    CHECK(near(eye(*app), m::vec3(1.50f, 1.18f, 0.0f)));
-    CHECK(near(fovDeg(*app), 44.0f, 0.01f));
+    CHECK(nearly(eye(*app), m::vec3(1.50f, 1.18f, 0.0f)));
+    CHECK(nearly(fovDeg(*app), 44.0f, 0.01f));
 }
 
 // Space pauses and resumes, S slows the timeline down to a fifth and back, R restarts it, and
@@ -136,22 +136,22 @@ TEST(viewer_anim_keys_pause_slow_down_restart_and_quit) {
     REQUIRE(app);
     app->frames(30);
     app->key('R');   // the timeline from 0, then the two frames of the key
-    CHECK(near(sceneTime(*app), 2 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), 2 * kFrame, 1e-4f));
     // Space acts in the first frame of the key, before the timeline moves.
     const float paused = sceneTime(*app);
     app->key(plat::KEY_SPACE);
     app->frames(30);
-    CHECK(near(sceneTime(*app), paused, 1e-6f));
+    CHECK(nearly(sceneTime(*app), paused, 1e-6f));
     app->key(plat::KEY_SPACE);
-    CHECK(near(sceneTime(*app), paused + 2 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), paused + 2 * kFrame, 1e-4f));
     app->key('S');
     float t = sceneTime(*app);
     app->frames(10);
-    CHECK(near(sceneTime(*app), t + 10 * 0.2f * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), t + 10 * 0.2f * kFrame, 1e-4f));
     app->key('S');
     t = sceneTime(*app);
     app->frames(10);
-    CHECK(near(sceneTime(*app), t + 10 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), t + 10 * kFrame, 1e-4f));
     plat::Input& in = fakeplat::next();
     in.keyDown[plat::KEY_ESCAPE] = in.keyPressed[plat::KEY_ESCAPE] = true;
     CHECK(!app->frame());
@@ -167,44 +167,44 @@ TEST(viewer_anim_view_key_steps_through_every_camera) {
     app->key('R');
     app->frames(240);   // 4 s: White's hand is on its way to the e-pawn
     const m::vec3 first = eye(*app);
-    CHECK(near(first, m::vec3(1.50f, 1.18f, 0.0f)));
+    CHECK(nearly(first, m::vec3(1.50f, 1.18f, 0.0f)));
     for (int v = 0; v < kViewCount; ++v) {
         checkView(*app, v);
         if (v == 5 || v == 6) {
             // Through White's (+Z) / Black's (-Z) eyes, 55 degrees wide.
             CHECK(v == 5 ? eye(*app).z > 0.3f : eye(*app).z < -0.3f);
             CHECK(eye(*app).y > 1.0f);
-            CHECK(near(fovDeg(*app), 55.0f, 0.01f));
+            CHECK(nearly(fovDeg(*app), 55.0f, 0.01f));
         }
         if (v == 32) CHECK(focus(*app) <= 0.2001f);   // shaked: from below, at most 20 cm
         if (v == 11) {
             // The orbit camera: yaw 1.2, pitch 0.35, 1.9 m from the table's centre above the board.
             const m::vec3 target(0.0f, 0.95f, 0.0f);
-            CHECK(near(eye(*app), viewer_test::orbitEye(target, 1.2f, 0.35f, 1.9f)));
-            CHECK(near(focus(*app), 1.9f));
+            CHECK(nearly(eye(*app), viewer_test::orbitEye(target, 1.2f, 0.35f, 1.9f)));
+            CHECK(nearly(focus(*app), 1.9f));
             app->wheel(2.0f);   // 0.9 of the distance per notch
             const float d = 1.9f * 0.81f;
-            CHECK(near(eye(*app), viewer_test::orbitEye(target, 1.2f, 0.35f, d)));
-            CHECK(near(focus(*app), d));
+            CHECK(nearly(eye(*app), viewer_test::orbitEye(target, 1.2f, 0.35f, d)));
+            CHECK(nearly(focus(*app), d));
             plat::Input& in = fakeplat::next();
             app->moveMouse(600.0f, 300.0f);
             in.mouseDown[plat::MOUSE_RIGHT] = true;
             app->moveMouse(700.0f, 300.0f);   // 100 px: 0.5 rad the other way round
             in.mouseDown[plat::MOUSE_RIGHT] = false;
             app->frame();
-            CHECK(near(eye(*app), viewer_test::orbitEye(target, 0.7f, 0.35f, d)));
+            CHECK(nearly(eye(*app), viewer_test::orbitEye(target, 0.7f, 0.35f, d)));
             // A middle-drag moves the target (and the eye with it) along the camera's up axis.
             const render::Camera before = app->renderer().camera();
             in.mouseDown[plat::MOUSE_MIDDLE] = true;
             app->moveMouse(700.0f, 340.0f);
             in.mouseDown[plat::MOUSE_MIDDLE] = false;
             app->frame();
-            CHECK(near(eye(*app), before.position + before.up() * (40.0f * 0.0015f * d)));
-            CHECK(near(app->renderer().camera().forward(), before.forward(), 1e-4f));
+            CHECK(nearly(eye(*app), before.position + before.up() * (40.0f * 0.0015f * d)));
+            CHECK(nearly(app->renderer().camera().forward(), before.forward(), 1e-4f));
         }
         app->key('V');
     }
-    CHECK(near(eye(*app), first));
+    CHECK(nearly(eye(*app), first));
 }
 
 // --solo draws only the pieces held or near a playing fingertip (none during the handshake, White's
@@ -217,14 +217,14 @@ TEST(viewer_anim_solo_and_only_draw_less) {
     app = headless::shared({"--scene", "anim", "--shot", "--time", "1.5", "--play", "--solo", "--only", "1"});
     REQUIRE(app);
     app->frames(3);
-    CHECK(near(sceneTime(*app), 1.5f + 3 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), 1.5f + 3 * kFrame, 1e-4f));
     const uint64_t few = frameDraws(*app);
     CHECK(few > 0);
     CHECK(few < all / 2);
     app = headless::shared({"--scene", "anim", "--shot", "--time", "4.2", "--play", "--solo", "--only", "1"});
     REQUIRE(app);
     app->frames(3);
-    CHECK(near(sceneTime(*app), 4.2f + 3 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), 4.2f + 3 * kFrame, 1e-4f));
     CHECK(frameDraws(*app) > few);
 }
 
@@ -261,7 +261,7 @@ TEST(viewer_anim_coach_demo_demonstrates_and_takes_back) {
     headless::App* app = headless::shared({"--scene", "anim", "--demo", "coach", "--time", "30", "--view", "coachhand"});
     REQUIRE(app);
     app->frame();
-    CHECK(near(sceneTime(*app), 30.0f + kFrame, 1e-3f));
+    CHECK(nearly(sceneTime(*app), 30.0f + kFrame, 1e-3f));
     CHECK(log.inOrder({"coach demonstrates d5-e4 (piece 19, a capture)", "coach demonstrates c3-e4 (piece 9, a capture)",
                        "coach demonstrates g8-f6 (piece 30)", "coach takes back its demonstration move (piece 30)",
                        "coach takes back its demonstration move (piece 9)", "coach takes back its demonstration move (piece 19)"}));
@@ -289,9 +289,9 @@ TEST(viewer_anim_left_hand_castles_and_promotes) {
         REQUIRE(app);
         app->frames(2);
         CHECK(log.inOrder({"anim viewer: Black b2-b1=Q (left hand)", "Black pressed the clock"}));
-        CHECK(near(eye(*app), m::vec3(0.5f, 1.6f, 1.4f)));
-        CHECK(near(fovDeg(*app), 30.0f, 0.01f));
-        CHECK(near(focus(*app), std::sqrt(0.25f + 0.64f + 1.96f)));
+        CHECK(nearly(eye(*app), m::vec3(0.5f, 1.6f, 1.4f)));
+        CHECK(nearly(fovDeg(*app), 30.0f, 0.01f));
+        CHECK(nearly(focus(*app), std::sqrt(0.25f + 0.64f + 1.96f)));
     }
 }
 
@@ -318,7 +318,7 @@ TEST(viewer_anim_stance_script_stands_walks_and_sits_down) {
         checkView(*app, v % kViewCount);
         app->key('V');
     }
-    CHECK(near(app->renderer().camera().forward().y, std::sin(-20.0f * m::DEG), 2e-3f));
+    CHECK(nearly(app->renderer().camera().forward().y, std::sin(-20.0f * m::DEG), 2e-3f));
 }
 
 // --robot draws the porcelain robot (and the game's table and chairs) instead of the debug
@@ -328,7 +328,7 @@ TEST(viewer_anim_porcelain_robot_frozen_for_the_shot) {
     REQUIRE(app);
     CHECK(uploaded("eye_cornea"));
     app->frames(5);
-    CHECK(near(sceneTime(*app), 2.0f, 1e-5f));
+    CHECK(nearly(sceneTime(*app), 2.0f, 1e-5f));
     checkView(*app, 7);
     CHECK(frameDraws(*app) > 0);
 }
@@ -358,5 +358,5 @@ TEST(viewer_anim_self_test_passes_its_checks) {
     CHECK(log.has("selftest timeline: lowest fingertip"));
     CHECK(log.has("after the rewind the farthest piece is 0.00 mm"));
     app->frames(2);
-    CHECK(near(sceneTime(*app), 2 * kFrame, 1e-4f));
+    CHECK(nearly(sceneTime(*app), 2 * kFrame, 1e-4f));
 }

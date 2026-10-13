@@ -76,8 +76,8 @@ private:
     std::string text_;
 };
 
-inline bool near(float a, float b, float eps = 1e-3f) { return std::fabs(a - b) <= eps; }
-inline bool near(m::vec3 a, m::vec3 b, float eps = 1e-3f) { return m::length(a - b) <= eps; }
+inline bool nearly(float a, float b, float eps = 1e-3f) { return std::fabs(a - b) <= eps; }
+inline bool nearly(m::vec3 a, m::vec3 b, float eps = 1e-3f) { return m::length(a - b) <= eps; }
 
 // Where OrbitCamera (src/app/orbit_camera.h) puts the eye for these angles (radians) and distance.
 inline m::vec3 orbitEye(m::vec3 target, float yaw, float pitch, float distance) {
@@ -86,7 +86,7 @@ inline m::vec3 orbitEye(m::vec3 target, float yaw, float pitch, float distance) 
 
 // Whether the renderer's last camera stood at 'eye', looked at 'target' and was 'fovDeg' wide.
 inline bool sees(const render::Camera& c, m::vec3 eye, m::vec3 target, float fovDeg) {
-    return near(c.position, eye) && near(c.forward(), m::normalize(target - eye), 1e-4f) && near(c.fovY / m::DEG, fovDeg, 0.01f);
+    return nearly(c.position, eye) && nearly(c.forward(), m::normalize(target - eye), 1e-4f) && nearly(c.fovY / m::DEG, fovDeg, 0.01f);
 }
 // The same for an orbit camera's angles (radians) and distance.
 inline bool orbits(const render::Camera& c, m::vec3 target, float yaw, float pitch, float distance, float fovDeg) {

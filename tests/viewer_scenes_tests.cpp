@@ -17,7 +17,7 @@
 #include <vector>
 
 using viewer_test::LogCapture;
-using viewer_test::near;
+using viewer_test::nearly;
 using viewer_test::orbits;
 using viewer_test::sees;
 
@@ -62,9 +62,9 @@ TEST(viewer_robot_face_view_follows_the_pose) {
     CHECK(uploaded("floor") && uploaded("seat") && uploaded("table"));
     CHECK(uploaded("eye_cornea") && uploaded("lid_upper"));
     app->frames(2);
-    CHECK(near(focus(*app), 0.42f));
-    CHECK(near(cam(*app).fovY / m::DEG, 28.0f, 0.01f));
-    CHECK(near(cam(*app).forward(), orbitForward(0.30f, 0.02f), 1e-4f));
+    CHECK(nearly(focus(*app), 0.42f));
+    CHECK(nearly(cam(*app).fovY / m::DEG, 28.0f, 0.01f));
+    CHECK(nearly(cam(*app).forward(), orbitForward(0.30f, 0.02f), 1e-4f));
     const m::vec3 restEyes = orbitTarget(*app) + m::vec3(0, 0.03f, 0);
     CHECK(restEyes.y > 1.0f && restEyes.y < layout::EYE_HEIGHT + 0.1f);
 
@@ -78,24 +78,24 @@ TEST(viewer_robot_face_view_follows_the_pose) {
     const m::vec3 reachEyes = orbitTarget(*app) + m::vec3(0, 0.03f, 0);
     CHECK(reachEyes.z > restEyes.z + 0.02f);   // leaning towards the table (+Z)
     CHECK(reachEyes.y < restEyes.y);
-    CHECK(near(env(*app).sunDirection, m::vec3(0, 1, 0)));
-    CHECK(near(env(*app).time, kFrame, 1e-5f));   // not a shot: the clock runs
+    CHECK(nearly(env(*app).sunDirection, m::vec3(0, 1, 0)));
+    CHECK(nearly(env(*app).time, kFrame, 1e-5f));   // not a shot: the clock runs
     const uint64_t withHead = frameDraws(*app);
 
     // The wheel: 0.9 of the distance, towards the same point.
     const m::vec3 target = orbitTarget(*app);
     app->wheel(1.0f);
-    CHECK(near(focus(*app), 0.42f * 0.9f));
-    CHECK(near(cam(*app).position, target - cam(*app).forward() * (0.42f * 0.9f)));
+    CHECK(nearly(focus(*app), 0.42f * 0.9f));
+    CHECK(nearly(cam(*app).position, target - cam(*app).forward() * (0.42f * 0.9f)));
     // A right-drag of 40 px to the left turns the camera 0.2 rad the other way.
     viewer_test::drag(*app, plat::MOUSE_RIGHT, 640.0f, 360.0f, 600.0f, 360.0f);
-    CHECK(near(cam(*app).forward(), orbitForward(0.50f, 0.02f), 1e-4f));
-    CHECK(near(orbitTarget(*app), target));
+    CHECK(nearly(cam(*app).forward(), orbitForward(0.50f, 0.02f), 1e-4f));
+    CHECK(nearly(orbitTarget(*app), target));
     // B closes and opens the lids: the camera stays.
     const m::vec3 before = cam(*app).position;
     app->key('B');
     app->key('B');
-    CHECK(near(cam(*app).position, before));
+    CHECK(nearly(cam(*app).position, before));
     CHECK(!viewer_test::frameWithKey(*app, plat::KEY_ESCAPE));
 
     std::vector<std::string> fp = reach;
@@ -121,10 +121,10 @@ TEST(viewer_robot_hand_view_looks_from_the_eyes_at_the_hand) {
     CHECK(log.has("robot viewer: 6 draws"));
     CHECK(log.has("robot: chest marking \"MENTOR\""));
     app->frame();
-    CHECK(near(focus(*app), 0.30f));
-    CHECK(near(cam(*app).fovY / m::DEG, 50.0f, 0.01f));
+    CHECK(nearly(focus(*app), 0.30f));
+    CHECK(nearly(cam(*app).fovY / m::DEG, 50.0f, 0.01f));
     const m::vec3 hand = orbitTarget(*app);
-    CHECK(near(m::normalize(eyes - hand), -cam(*app).forward(), 1e-3f));
+    CHECK(nearly(m::normalize(eyes - hand), -cam(*app).forward(), 1e-3f));
     CHECK(hand.y > layout::TABLE_TOP_Y && hand.y < layout::TABLE_TOP_Y + 0.2f);   // pinching a piece on the table
     CHECK(hand.z > 0.2f);
     CHECK(frameDraws(*app) > 0);
@@ -149,7 +149,7 @@ TEST(viewer_robot_camera_presets_and_overrides) {
         REQUIRE(app);
         app->frame();
         CHECK(orbits(cam(*app), p.target, p.yaw, p.pitch, p.distance, 35.0f));
-        CHECK(near(focus(*app), p.distance));
+        CHECK(nearly(focus(*app), p.distance));
         if (std::string(p.view) == "full") bare = frameDraws(*app);
     }
     LogCapture log;
@@ -164,8 +164,8 @@ TEST(viewer_robot_camera_presets_and_overrides) {
     REQUIRE(app);
     app->frames(3);
     CHECK(orbits(cam(*app), m::vec3(0, 1, 0), 0.1f, 0.2f, 0.5f, 60.0f));
-    CHECK(near(focus(*app), 0.5f));
-    CHECK(near(env(*app).time, 3.0f));
+    CHECK(nearly(focus(*app), 0.5f));
+    CHECK(nearly(env(*app).time, 3.0f));
 }
 
 // ---- hall -----------------------------------------------------------------------------------
@@ -183,9 +183,9 @@ TEST(viewer_hall_player_view_and_debug_options) {
     app->frames(2);
     const m::vec3 eye(0, layout::EYE_HEIGHT, layout::PLAYER_PELVIS_Z);
     CHECK(sees(cam(*app), eye, m::vec3(-0.1f, 0.84f, -0.45f), 70.0f));
-    CHECK(near(env(*app).sunDirection, m::normalize(m::vec3(1, 1, 0))));
-    CHECK(near(env(*app).exposureEV100, 10.0f));
-    CHECK(near(env(*app).time, 2 * kFrame, 1e-5f));
+    CHECK(nearly(env(*app).sunDirection, m::normalize(m::vec3(1, 1, 0))));
+    CHECK(nearly(env(*app).exposureEV100, 10.0f));
+    CHECK(nearly(env(*app).time, 2 * kFrame, 1e-5f));
     const uint64_t all = frameDraws(*app);
 
     app = headless::shared({"--scene", "hall", "--view", "player", "--sun", "1,1,0", "--ev", "10", "--noglass"});
@@ -198,8 +198,8 @@ TEST(viewer_hall_player_view_and_debug_options) {
     REQUIRE(app);
     app->frame();
     CHECK(frameDraws(*app) < noGlass);
-    CHECK(near(env(*app).sunDirection, hall::recommendedSunDirection()));
-    CHECK(near(env(*app).exposureEV100, 11.5f));
+    CHECK(nearly(env(*app).sunDirection, hall::recommendedSunDirection()));
+    CHECK(nearly(env(*app).exposureEV100, 11.5f));
     CHECK(!viewer_test::frameWithKey(*app, plat::KEY_ESCAPE));
 }
 
@@ -259,8 +259,8 @@ TEST(viewer_tabletop_overview_orbits_the_board) {
     // A middle-drag 40 px down pans the camera up (the target with it).
     const render::Camera before = cam(*app);
     viewer_test::drag(*app, plat::MOUSE_MIDDLE, 600.0f, 300.0f, 600.0f, 340.0f);
-    CHECK(near(cam(*app).position, before.position + before.up() * (40.0f * 0.0015f * 0.95f / 0.9f)));
-    CHECK(near(cam(*app).forward(), before.forward(), 1e-4f));
+    CHECK(nearly(cam(*app).position, before.position + before.up() * (40.0f * 0.0015f * 0.95f / 0.9f)));
+    CHECK(nearly(cam(*app).forward(), before.forward(), 1e-4f));
     CHECK(viewer_test::frameWithKey(*app, plat::KEY_SPACE));
     CHECK(app->frame());
     CHECK(!viewer_test::frameWithKey(*app, plat::KEY_ESCAPE));
@@ -299,5 +299,5 @@ TEST(viewer_tabletop_presets_and_overrides) {
     REQUIRE(app);
     app->frames(2);
     CHECK(orbits(cam(*app), m::vec3(0.1f, 0.9f, 0.2f), 1.0f, 0.5f, 0.3f, 25.0f));
-    CHECK(near(env(*app).time, 2.0f));
+    CHECK(nearly(env(*app).time, 2.0f));
 }

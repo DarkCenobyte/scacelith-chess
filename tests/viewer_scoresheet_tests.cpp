@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-using viewer_test::near;
+using viewer_test::nearly;
 
 namespace {
 
@@ -34,7 +34,7 @@ uint64_t frameDraws(headless::App& app) {
 // An orbit camera at these angles (radians), this far from what it looks at, this wide (degrees).
 bool orbitAt(headless::App& app, float yaw, float pitch, float distance, float fovDeg) {
     const m::vec3 forward = -m::vec3(std::sin(yaw) * std::cos(pitch), std::sin(pitch), std::cos(yaw) * std::cos(pitch));
-    return near(cam(app).forward(), forward, 1e-4f) && near(focus(app), distance) && near(cam(app).fovY / m::DEG, fovDeg, 0.01f);
+    return nearly(cam(app).forward(), forward, 1e-4f) && nearly(focus(app), distance) && nearly(cam(app).fovY / m::DEG, fovDeg, 0.01f);
 }
 
 // The language of the UI back to English when a test ends.
@@ -53,8 +53,8 @@ TEST(viewer_scoresheet_write_demo_turns_the_page_and_restarts) {
     REQUIRE(app);
     app->frames(2);
     CHECK(orbitAt(*app, 0.15f, 1.05f, 0.42f, 40.0f));
-    CHECK(near(env(*app).sunDirection, hall::recommendedSunDirection()));
-    CHECK(near(env(*app).time, 2 * kFrame, 1e-5f));
+    CHECK(nearly(env(*app).sunDirection, hall::recommendedSunDirection()));
+    CHECK(nearly(env(*app).time, 2 * kFrame, 1e-5f));
     app->frames(2);
     const uint64_t onePage = frameDraws(*app);
     app->frames(12, 0.5f);   // 6 s: the move written, the page turned, the next move begun
@@ -85,7 +85,7 @@ TEST(viewer_scoresheet_turn_demo_loops_and_holds) {
     REQUIRE(app);
     app->frame();
     CHECK(orbitAt(*app, m::PI + 0.2f, 1.0f, 0.24f, 40.0f));
-    CHECK(near(env(*app).sunDirection, m::vec3(0, 1, 0)));
+    CHECK(nearly(env(*app).sunDirection, m::vec3(0, 1, 0)));
     const uint64_t held = frameDraws(*app);
     app->frames(4, 0.5f);
     CHECK_EQ(frameDraws(*app), held);   // half turned, all the time
@@ -102,21 +102,21 @@ TEST(viewer_scoresheet_header_static_and_overrides) {
     app->frame();
     CHECK(orbitAt(*app, 0.0f, 1.05f, 0.2f, 40.0f));
     app->frames(30, 0.5f);   // 15 s: written, shown, and begun again
-    CHECK(near(env(*app).time, kFrame + 15.0f, 1e-3f));
+    CHECK(nearly(env(*app).time, kFrame + 15.0f, 1e-3f));
     i18n::setLanguage("en");
 
     app = headless::shared({"--scene", "scoresheet", "--demo", "static", "--view", "player", "--names", "arabic", "--shot", "--time", "7"});
     REQUIRE(app);
     app->frames(3);
-    CHECK(near(cam(*app).position, m::vec3(0, layout::EYE_HEIGHT, layout::PLAYER_PELVIS_Z)));
-    CHECK(near(cam(*app).fovY / m::DEG, 50.0f, 0.01f));
+    CHECK(nearly(cam(*app).position, m::vec3(0, layout::EYE_HEIGHT, layout::PLAYER_PELVIS_Z)));
+    CHECK(nearly(cam(*app).fovY / m::DEG, 50.0f, 0.01f));
     CHECK(cam(*app).forward().y < -0.5f);   // down at the pad
-    CHECK(near(env(*app).time, 7.0f));
+    CHECK(nearly(env(*app).time, 7.0f));
 
     app = headless::shared({"--scene", "scoresheet", "--demo", "static", "--view", "overview", "--yaw", "1", "--pitch", "0.3", "--dist", "2",
                             "--fov", "30", "--target", "0,1,0"});
     REQUIRE(app);
     app->frame();
     CHECK(orbitAt(*app, 1.0f, 0.3f, 2.0f, 30.0f));
-    CHECK(near(cam(*app).position, viewer_test::orbitEye(m::vec3(0, 1, 0), 1.0f, 0.3f, 2.0f)));
+    CHECK(nearly(cam(*app).position, viewer_test::orbitEye(m::vec3(0, 1, 0), 1.0f, 0.3f, 2.0f)));
 }

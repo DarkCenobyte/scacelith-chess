@@ -17,7 +17,7 @@
 #include <vector>
 
 using viewer_test::LogCapture;
-using viewer_test::near;
+using viewer_test::nearly;
 
 // Every viewer scene of the command line (--scene) is listed with a description, and made by name;
 // an unknown name makes nothing.
@@ -49,13 +49,13 @@ TEST(scene_chandelier_candle_flames) {
     for (size_t i = 0; i < flames.size(); ++i) {
         const bool lower = i < 12;
         const float r = std::hypot(flames[i].x, flames[i].z);
-        CHECK(near(r, (lower ? 0.86f : 0.5f) * s));
+        CHECK(nearly(r, (lower ? 0.86f : 0.5f) * s));
         const float cupY = lower ? hall::CHANDELIER_Y : 6.36f;
-        CHECK(near(flames[i].y, hall::CHANDELIER_Y + (cupY + above - hall::CHANDELIER_Y) * s));
+        CHECK(nearly(flames[i].y, hall::CHANDELIER_Y + (cupY + above - hall::CHANDELIER_Y) * s));
     }
-    CHECK(near(flames[0], m::vec3(0.86f * s, flames[0].y, 0.0f)));
+    CHECK(nearly(flames[0], m::vec3(0.86f * s, flames[0].y, 0.0f)));
     // The upper ring is turned half a step: its first flame at 30 degrees.
-    CHECK(near(std::atan2(flames[12].z, flames[12].x), m::PI / 6.0f));
+    CHECK(nearly(std::atan2(flames[12].z, flames[12].x), m::PI / 6.0f));
 }
 
 // A pawn stands on its felt and is as tall as the layout says; a type that is no piece makes
@@ -69,7 +69,7 @@ TEST(scene_pieces_built_by_type) {
         hi = std::max(hi, v.pos.y);
     }
     CHECK(lo > -0.002f && lo < 0.002f);
-    CHECK(near(hi, layout::PIECE_HEIGHT[1], 0.002f));
+    CHECK(nearly(hi, layout::PIECE_HEIGHT[1], 0.002f));
     LogCapture log;
     CHECK(buildPiece(0).body.vertices.empty());
     CHECK(buildPiece(7).felt.vertices.empty());
@@ -102,19 +102,19 @@ TEST(scene_robot_eyelids_close_and_follow_the_gaze) {
         const m::vec3 y = m::rotate(q, m::vec3(0, 1, 0));
         return std::atan2(y.z, y.y);
     };
-    CHECK(near(angle(lidRotation(LidUpperL, 0.0f)), 0.0f, 1e-5f));
-    CHECK(near(angle(lidRotation(LidLowerR, 0.0f)), 0.0f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperL, 0.0f)), 0.0f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidLowerR, 0.0f)), 0.0f, 1e-5f));
     const float upperClosed = eye::LID_UPPER_OPEN - eye::LID_CLOSED, lowerClosed = -eye::LID_LOWER_OPEN - eye::LID_CLOSED;
-    CHECK(near(angle(lidRotation(LidUpperR, 1.0f)), upperClosed, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperR, 1.0f)), upperClosed, 1e-5f));
     CHECK(upperClosed > 0.0f);   // closing: positive for the upper lid
-    CHECK(near(angle(lidRotation(LidLowerL, 1.0f)), lowerClosed, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidLowerL, 1.0f)), lowerClosed, 1e-5f));
     CHECK(lowerClosed < 0.0f);   // negative for the lower one
-    CHECK(near(angle(lidRotation(LidUpperL, 3.0f)), upperClosed, 1e-5f));
-    CHECK(near(angle(lidRotation(LidUpperL, 0.0f, 0.3f)), -0.8f * 0.3f, 1e-5f));
-    CHECK(near(angle(lidRotation(LidUpperL, 0.0f, 2.0f)), -0.8f * 0.5f, 1e-5f));
-    CHECK(near(angle(lidRotation(LidLowerL, 0.0f, -0.3f)), 0.35f * 0.3f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperL, 3.0f)), upperClosed, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperL, 0.0f, 0.3f)), -0.8f * 0.3f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperL, 0.0f, 2.0f)), -0.8f * 0.5f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidLowerL, 0.0f, -0.3f)), 0.35f * 0.3f, 1e-5f));
     // Half closed: half way between open and closed.
-    CHECK(near(angle(lidRotation(LidUpperL, 0.5f)), upperClosed * 0.5f, 1e-5f));
+    CHECK(nearly(angle(lidRotation(LidUpperL, 0.5f)), upperClosed * 0.5f, 1e-5f));
 }
 
 // Mesh helpers: smooth normals weighted by area, tangents along the texture's u, the faceted
@@ -130,10 +130,10 @@ TEST(scene_mesh_normals_tangents_and_open_cylinder) {
     }
     quad.indices = {0, 1, 2, 0, 2, 3};
     quad.computeNormals();
-    for (const Vertex& v : quad.vertices) CHECK(near(v.normal, m::vec3(0, 1, 0), 1e-5f));
+    for (const Vertex& v : quad.vertices) CHECK(nearly(v.normal, m::vec3(0, 1, 0), 1e-5f));
     quad.computeTangents();
     for (const Vertex& v : quad.vertices) {
-        CHECK(near(v.tangent.xyz(), m::vec3(1, 0, 0), 1e-5f));
+        CHECK(nearly(v.tangent.xyz(), m::vec3(1, 0, 0), 1e-5f));
         CHECK(v.tangent.w == 1.0f || v.tangent.w == -1.0f);
     }
     MeshData faceted = quad;
@@ -146,7 +146,7 @@ TEST(scene_mesh_normals_tangents_and_open_cylinder) {
     REQUIRE(!open.vertices.empty());
     CHECK(open.indices.size() < closed.indices.size());
     for (const Vertex& v : open.vertices) {
-        CHECK(near(std::hypot(v.pos.x, v.pos.z), 0.1f, 1e-4f));
-        CHECK(near(v.normal.y, 0.0f, 1e-4f));   // the side faces outwards
+        CHECK(nearly(std::hypot(v.pos.x, v.pos.z), 0.1f, 1e-4f));
+        CHECK(nearly(v.normal.y, 0.0f, 1e-4f));   // the side faces outwards
     }
 }
