@@ -245,32 +245,44 @@ inline std::string serverFrame(int opcode, const std::string& payload, bool fin 
     return f + payload;
 }
 
-// One client frame from c.in (client frames are masked): its opcode and unmasked payload. False
-// when none came within ms, or when it is not masked.
-inline bool readClientFrame(Conn& c, int& opcode, std::string& payload, int ms = 5000, bool* finOut = nullptr) {
-    if (!c.need(2, ms)) return false;
-    const uint8_t b1 = uint8_t(c.in[1]);
-    if (!(b1 & 0x80)) return false;
+// Takes one whole client frame (masked, as clients send them) from the front of 'in': its opcode,
+// FIN bit and unmasked payload. 0 when it is not whole yet, -1 when it is not masked, 1 when taken.
+inline int takeClientFrame(std::string& in, int& opcode, std::string& payload, bool* finOut = nullptr) {
+    if (in.size() < 2) return 0;
+    const uint8_t b1 = uint8_t(in[1]);
+    if (!(b1 & 0x80)) return -1;
     uint64_t len = b1 & 0x7F;
     size_t hdr = 2;
     if (len == 126) {
-        if (!c.need(4, ms)) return false;
-        len = uint64_t(uint8_t(c.in[2])) << 8 | uint8_t(c.in[3]);
+        if (in.size() < 4) return 0;
+        len = uint64_t(uint8_t(in[2])) << 8 | uint8_t(in[3]);
         hdr = 4;
     } else if (len == 127) {
-        if (!c.need(10, ms)) return false;
+        if (in.size() < 10) return 0;
         len = 0;
-        for (int i = 0; i < 8; ++i) len = len << 8 | uint8_t(c.in[2 + size_t(i)]);
+        for (int i = 0; i < 8; ++i) len = len << 8 | uint8_t(in[2 + size_t(i)]);
         hdr = 10;
     }
-    if (!c.need(hdr + 4 + size_t(len), ms)) return false;
-    opcode = uint8_t(c.in[0]) & 0x0F;
-    if (finOut) *finOut = (uint8_t(c.in[0]) & 0x80) != 0;
-    const char* mask = c.in.data() + hdr;
-    payload.assign(c.in, hdr + 4, size_t(len));
+    if (in.size() < hdr + 4 + len) return 0;
+    opcode = uint8_t(in[0]) & 0x0F;
+    if (finOut) *finOut = (uint8_t(in[0]) & 0x80) != 0;
+    const char* mask = in.data() + hdr;
+    payload.assign(in, hdr + 4, size_t(len));
     for (size_t i = 0; i < payload.size(); ++i) payload[i] = char(uint8_t(payload[i]) ^ uint8_t(mask[i & 3]));
-    c.in.erase(0, hdr + 4 + size_t(len));
-    return true;
+    in.erase(0, hdr + 4 + size_t(len));
+    return 1;
+}
+
+// One client frame from c.in, waiting up to ms for it. False when none came, or when it is not
+// masked.
+inline bool readClientFrame(Conn& c, int& opcode, std::string& payload, int ms = 5000, bool* finOut = nullptr) {
+    const auto end = Clock::now() + std::chrono::milliseconds(ms);
+    for (;;) {
+        const int r = takeClientFrame(c.in, opcode, payload, finOut);
+        if (r != 0) return r > 0;
+        const int left = int(std::chrono::duration_cast<std::chrono::milliseconds>(end - Clock::now()).count());
+        if (left <= 0 || !c.readMore(left)) return false;
+    }
 }
 
 // The two bytes of a close frame's code.
