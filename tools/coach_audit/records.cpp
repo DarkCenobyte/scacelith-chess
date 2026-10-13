@@ -2,8 +2,10 @@
 //   rec <human w|b> <played> <startfen|startpos> ; <moves...>
 //   tag <text>   (optional: where the move comes from)
 //   an <slot> <ok> <wtm> <nolegal> <depth> <best|-> <lines>
-//   ln <multipv> <depth> <cp> <mate> <matedNow> <matesNow> <bound E|L|U> <pv...>
+//   ln <multipv> <depth> <cp> <mate> <matedNow> <matesNow> <bound E|L|U> [wdl <W> <D> <L>] <pv...>
 //   end
+// "wdl": the engine's win/draw/loss per mille for the side to move (UCI_ShowWDL); the files recorded
+// before it was kept have none (the reader leaves Score::hasWdl false there).
 #include "audit.h"
 
 #include <sstream>
@@ -22,6 +24,7 @@ void writeAnalysis(std::ostringstream& o, const char* slot, const ai::Analysis& 
     for (const ai::PvLine& l : a.lines) {
         o << "ln " << l.multipv << ' ' << l.depth << ' ' << l.score.cp << ' ' << l.score.mate << ' '
           << int(l.score.matedNow) << ' ' << int(l.score.matesNow) << ' ' << boundChar(l.score.bound);
+        if (l.score.hasWdl) o << " wdl " << l.score.win << ' ' << l.score.draw << ' ' << l.score.loss;
         for (const std::string& m : l.pv) o << ' ' << m;
         o << '\n';
     }
@@ -105,7 +108,14 @@ bool readRecords(const std::string& text, std::vector<Record>& out, std::string&
             l.score.matesNow = ms != 0;
             l.score.bound = b == 'L' ? ai::Score::Bound::Lower : b == 'U' ? ai::Score::Bound::Upper : ai::Score::Bound::Exact;
             std::string m;
-            while (ls >> m) l.pv.push_back(m);
+            while (ls >> m) {
+                if (m == "wdl" && l.pv.empty() && !l.score.hasWdl) {
+                    ls >> l.score.win >> l.score.draw >> l.score.loss;
+                    l.score.hasWdl = true;
+                    continue;
+                }
+                l.pv.push_back(m);
+            }
             an->lines.push_back(l);
         } else if (tag == "end") {
             if (open) out.push_back(cur);

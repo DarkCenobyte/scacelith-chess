@@ -18,6 +18,15 @@
 //       points or more at depth 10 (each position searched once), tagged with the game's site,
 //       ratings and time control; a game with an AuditPlies tag (ply numbers from 1, a sample's
 //       picks) gives those plies only, without the scan, its AuditTag added to their tag
+//   coach_audit reanalyse --in FILE --out FILE [--threads T] [--stop FILE]
+//       the analyses of every record of FILE run again, the same requests at the same depth, and
+//       written with the engine's win/draw/loss chances (records.cpp: "wdl"), the tag kept; a rerun
+//       goes on after the records the output already holds
+//   coach_audit truth --in FILE --out FILE [--depth D] [--threads T] [--stop FILE]
+//       the reference the reviews are measured against: for every record of FILE, the position
+//       before the human's move searched deeper (MultiPV 4, WDL, depth D, 22 by default for this
+//       mode's callers; a fresh hash table each time) as a0, and the move played alone as a1 when
+//       a0 holds no exact line for it; a rerun goes on after the records the output holds
 //   coach_audit review --in FILE [--level L] [--out FILE] [--all] [--sequence]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
@@ -105,6 +114,8 @@ private:
 };
 
 int recordMain(const Options& o);
+int reanalyseMain(const Options& o);
+int truthMain(const Options& o);
 int reviewMain(const Options& o);
 int commentaryMain(const Options& o);
 

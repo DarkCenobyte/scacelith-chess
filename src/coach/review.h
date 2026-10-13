@@ -12,6 +12,7 @@
 // through the coach::Analyst interface (stage.h) and hands the results back as ai::Analysis values;
 // tests build those by hand.
 #pragma once
+#include "assessment.h"
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
 #include "script.h"
@@ -150,12 +151,33 @@ struct ReviewInput {
     bool inBook = false;                     // the position after the move is in the openings book
 };
 
+// What a voiced reason asserts about the move, for audits (tools/coach_audit): its type, the points
+// the human loses for good by its sequence (0: a reason that is not about material), the plies of the
+// refutation (from the position after the move) that sequence takes, and whether some of them are
+// replies the engine did not show (guessed from the board: extendRefutation).
+struct Claim {
+    ExType type = ExType::None;
+    int lost = 0;
+    int plies = 0;
+    std::vector<std::string> line;   // UCI, the first 'plies' moves of the refutation
+    bool guessed = false;
+    bool mate = false;
+    // The common checks' figures (claims.cpp): the human's free moves inside the sequence, the
+    // centipawns by which the engine's drop falls short of the material lost, whether the move's own
+    // deeper line loses as much; what the best move loses and the move's own line, and the drop.
+    int quiet = 0, compensation = 0;
+    bool ownLine = true;
+    int bestLoss = 0, playedLoss = -1, dropCp = 0;
+};
+
 struct Review {
     Script script;                // empty when the coach says nothing
     PlyVerdict verdict;           // store it for the appraisal (Appraisal::addReview)
     bool offersTakeback = false;  // the script ends with an OfferTakeback beat
     bool isRetry = false;         // this move replaced a taken-back one: 'takeback' describes it
     TakebackRecord takeback;
+    Claim claim;                  // the reason said (type None when none is)
+    Assessment assessment;        // what the move does to the expected result (assessment.h)
 };
 
 class Reviewer {

@@ -467,6 +467,23 @@ bool wonWhereItStood(const Position& p, Square sq) {
     return false;
 }
 
+// Whether the human's piece that stands on 'sq' after the move survives the first plies of the move's
+// own line (followed as it moves): a piece saved from one attack and lost to the next was not saved.
+// Taken there and taken back as much at once, it is traded, and counts as kept.
+bool pieceKept(const Ctx& c, Square sq) {
+    for (size_t i = 1; i < c.playedLine.size() && i <= 6; ++i) {
+        const LineStep& st = c.playedLine[i];
+        if (st.mover == c.human) {
+            if (st.move.from == sq) sq = st.move.to;
+            continue;
+        }
+        if (st.captured == NoPiece || st.move.to != sq) continue;
+        return i + 1 < c.playedLine.size() && c.playedLine[i + 1].mover == c.human &&
+               c.playedLine[i + 1].move.to == st.move.to && points(c.playedLine[i + 1].captured) >= points(st.captured);
+    }
+    return true;
+}
+
 // The human's pieces among ex.targets that stand at the position after 'plies' plies of c.r, the
 // king aside (a check is said by the detector's own lines), nor one traded later along the line
 // ("now your queen can't be saved" when the queens are traded).
@@ -874,6 +891,8 @@ Review Reviewer::review(const ReviewInput& in) {
     }
     c.isBest = c.l1->pv[0] == c.playedUci;
     c.j = judge(c.l1->score, c.lp->score, c.isBest);
+    c.a = assess(a0->lines, c.lp->score, c.isBest);
+    out.assessment = c.a;
     const bool forced = c.p0.legalMoves().size() == 1;
     MoveClass cls = c.j.cls;
     if (forced) cls = MoveClass::Forced;
@@ -1240,6 +1259,24 @@ Review Reviewer::review(const ReviewInput& in) {
             limitPointing(b);
             s.push_back(b);
         }
+        if (!useCause.empty() && !hintOnly) {
+            Claim& cl = out.claim;
+            cl.type = shown.type;
+            cl.lost = shown.lost;
+            cl.mate = shown.mate;
+            cl.plies = std::min(shown.fullPlies, int(c.r.size()));
+            for (int i = 0; i < cl.plies; ++i) {
+                cl.line.push_back(c.r[size_t(i)].uci);
+                cl.guessed = cl.guessed || c.r[size_t(i)].guessed;
+            }
+            const ClaimCheck cc = checkClaim(c, shown);
+            cl.quiet = cc.quiet;
+            cl.compensation = cc.compensation;
+            cl.ownLine = cc.ownLine;
+            cl.bestLoss = c.bestLoss;
+            cl.playedLoss = c.playedLoss;
+            cl.dropCp = c.dropCp;
+        }
         if (demo) {
             for (Beat& t : shown.tail) limitPointing(t);
             for (Beat& t : shown.threatTail) limitPointing(t);
@@ -1286,16 +1323,49 @@ Review Reviewer::review(const ReviewInput& in) {
         // ---- Praise: top moves only ----
         const int legal = int(c.p0.legalMoves().size());
         const double w1 = c.j.wBest, w2 = c.l2 ? winPercent(c.l2->score) : w1;
-        const bool decided = w1 >= 90.0 && !(c.p1.isCheckmate() || (c.l1->score.mate > 0 && c.isBest));
+        // Praise says a move mattered: it is weighed by what it does to the result (assessment.h).
+        const Assessment& A = c.a;
+        // The move alone keeps the result the engine expects: the second best changes it (a win
+        // against a draw, a draw against a loss). Worth a word in a decided game too.
+        const bool resultLead = A.wdl && c.isBest && A.eLead() >= kDecidedLead;
+        const bool decided = w1 >= 90.0 && !resultLead && !(c.p1.isCheckmate() || (c.l1->score.mate > 0 && c.isBest));
         // Lost already: the win chances no longer tell the moves apart (Rb1 four pawns worse than Rf3,
-        // both near 2 %), so only the move the lines prefer earns praise.
-        const bool lostAnyway = w1 <= 10.0 && !c.isBest;
+        // both near 2 %), so only the move the lines prefer earns praise; with the engine's WDL, only
+        // the move that alone saves the result.
+        const bool lostAnyway = w1 <= 10.0 && !(A.wdl ? resultLead : c.isBest);
+        // Won or lost whatever is played in the engine's eyes (every move compared at E >= 0.98, or
+        // the best at E <= 0.02): a small variation is no feat. Praise then needs the result itself, a
+        // forced mate found (c8=R mates where Kb3 only wins), or a large practical lead over the second
+        // move (10 W% points: a free rook in a game the engine already calls won).
+        const bool settled = A.wdl && (A.eLow >= 0.98 || std::max(A.best.e, A.played.e) <= 0.02);
+        const bool flatSettled = settled && !resultLead && !(c.isBest && (A.wLead() >= 10.0 || c.l1->score.mate > 0));
+        // The moves compared lie together on both scales: whichever is played, nothing changes.
+        const bool flat = A.wdl && A.eSpread() < kFlatE && A.wSpread() < kFlatW;
         const bool recapture = isRecapture(g, size_t(c.ply));
         const bool tricky = in.shallow && in.shallow->ok && !in.shallow->bestMove.empty() && in.shallow->bestMove != c.playedUci;
+        // The shallow search's move is one of A0's lines and worth as much as the move played: the
+        // move was not harder to find than an equal one.
+        bool shallowEqual = false;
+        if (tricky && A.wdl)
+            if (const ai::PvLine* sl = a0->line(in.shallow->bestMove)) {
+                const Outcome so = outcomeOf(sl->score);
+                shallowEqual = so.wdl && std::abs(so.e - A.played.e) < kFlatE && std::abs(so.w - A.played.w) < kFlatW;
+            }
+        // What the move wins for good along its own line: the gain after the first 'plies' plies
+        // (heldGain), still there four plies later (the least over that window: Rxd7 Bxc4 bxc4 gives
+        // the rook back with the queen).
+        auto keptGain = [&](size_t plies) {
+            const size_t n = std::min(plies, c.playedLine.size());
+            if (n == 0) return 0;
+            int kept = heldGain(c.playedLine, n, c.base, human_, c.playedEnd);
+            for (size_t j = n + 1; j <= std::min(c.playedLine.size(), n + 4); ++j)
+                kept = std::min(kept, heldGain(c.playedLine, j, c.base, human_, c.playedEnd));
+            return kept;
+        };
+        // The most the move wins for good within its line's first 'plies' plies.
         auto lineGain = [&](size_t plies) {
             int bestGain = 0;
-            for (size_t i = 1; i <= c.playedLine.size() && i <= plies; ++i)
-                bestGain = std::max(bestGain, heldGain(c.playedLine, i, c.base, human_, c.playedEnd));
+            for (size_t i = 1; i <= c.playedLine.size() && i <= plies; ++i) bestGain = std::max(bestGain, keptGain(i));
             return bestGain;
         };
         bool promoSoon = false;
@@ -1331,8 +1401,16 @@ Review Reviewer::review(const ReviewInput& in) {
         // no protector.
         const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
                                  c.f.seePts >= points(c.f.captured);
+        // ... and keeps it: the game goes on (a capture that stalemates wins nothing) and the engine's
+        // line does not win it back (within a pawn) over the next four plies.
+        const bool captureKept = freeCapture && c.p1.hasLegalMove() && keptGain(1) >= points(c.f.captured) - 1;
         const bool unprotected = c.f.captured != NoPiece && !c.p0.attackersTo(c.f.capturedOn, c.coach);
-        const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
+        // The best move by far in practice: the second best is 15 W% points worse...
+        const bool farBest = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
+        // ... and the only move when, with the engine's WDL, the second best changes the result
+        // (kOnlyLead): a second move that wins as well, or holds as well, makes it the better of two
+        // good moves ("good move", not "the only move").
+        const bool only = farBest && (!A.wdl || A.eLead() >= kOnlyLead);
         // A fork praised wins one of the pieces it hits: the player's next move along the played line
         // takes a forked piece, not a pawn. Nd3+ Qxd3 Qxd3 wins the queen that took the knight (a
         // decoy), not the pawn on b2 the knight hit; Rxc7+ Rd7 exd7 wins the rook put in the way.
@@ -1342,35 +1420,40 @@ Review Reviewer::review(const ReviewInput& in) {
         double lastW = -1.0;   // the human's W% after their previous judged move
         for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
         std::string key;
+        // A sacrifice in a game already won is praised only when it wins far more than the second move.
+        const bool sacrificeLead = c.isBest && (A.wLead() >= 15.0 || (A.wdl && A.eLead() >= kOnlyLead));
         if (!c.p1.isCheckmate() && !recapture && !decided && !lostAnyway && !v.hastensMate && cls != MoveClass::Forced) {
-            if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && w1 <= 85.0 && c.j.wPlayed >= 50.0) {
+            if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && (w1 <= 85.0 || sacrificeLead) && c.j.wPlayed >= 50.0 &&
+                !flatSettled) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;
                 v.brilliant = true;
             } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastW >= 0.0 &&
-                       lastW <= 45.0) {
+                       lastW <= 45.0 && (!A.wdl || A.eLead() >= kOnlyLead)) {
                 key = bandKey("praise.great", level_);
                 v.great = true;
             } else if (level_ >= 2 && only) {
                 key = bandKey("praise.only", level_);
-            } else if (level_ >= 2 && squareCount(c.f.forks) >= 2 && forkWins && lineGain(4) >= 2) {
+            } else if (level_ >= 2 && squareCount(c.f.forks) >= 2 && forkWins && lineGain(4) >= 2 && !flatSettled) {
                 key = level_ == 2 ? "praise.fork.b2" : "praise.fork.b3";
-            } else if (level_ <= 2 && freeCapture && unprotected) {
+            } else if (level_ <= 2 && captureKept && unprotected && !flatSettled) {
                 key = bandKey("praise.capture", level_);
                 v.goodCapture = true;
-            } else if (level_ <= 3 && c.isBest && (lineGain(3) >= 2 || c.l1->score.mate > 0 || only) && (level_ < 3 || tricky)) {
+            } else if (level_ <= 3 && c.isBest && (lineGain(3) >= 2 || c.l1->score.mate > 0 || farBest) && (level_ < 3 || tricky) &&
+                       !flatSettled) {
                 key = bandKey("praise.best", level_);
             } else if (level_ <= 3 && c.base >= 3 && c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
                        c.f.seePts == 0 && legalCaptureOn(c.p1, c.played.to)) {
                 key = bandKey("praise.trade", level_);
-            } else if ((level_ == 3 || level_ == 4) && c.j.delta < 2.0 && c.f.captured == NoPiece && !c.f.check && tricky) {
+            } else if ((level_ == 3 || level_ == 4) && c.j.delta < 2.0 && c.f.captured == NoPiece && !c.f.check && tricky &&
+                       !flat && !shallowEqual && !flatSettled) {
                 key = bandKey("praise.excellent", level_);
             } else if (level_ == 1 && (c.f.castleKing || c.f.castleQueen) && !castlePraised_) {
                 key = "praise.castle.b1";
                 castlePraised_ = true;
             } else if (level_ == 1 && c.p0.at(c.played.from).type != Pawn &&
                        hasBit(hangingPieces(c.p0, human_, true), c.played.from) && wonWhereItStood(c.p0, c.played.from) &&
-                       !hangingPieces(c.p1, human_, false)) {
+                       !hangingPieces(c.p1, human_, false) && !flatSettled && pieceKept(c, c.played.to)) {
                 // Saved only when nothing else is left en prise (Rb1 while the queen on b3 hangs to a rook),
                 // and only a piece: the line says "piece", and a pawn is none.
                 key = "praise.saved.b1";
@@ -1380,7 +1463,7 @@ Review Reviewer::review(const ReviewInput& in) {
             }
         }
         v.only = only;
-        v.goodCapture = v.goodCapture || freeCapture;
+        v.goodCapture = v.goodCapture || captureKept;
         if (!key.empty() && humanMoves_ - lastPraise_ >= bd.praiseEvery && remarkAllowed() && !retry) {
             Beat b = sayBeat(key, Look::Player, ply);
             if (c.f.captured != NoPiece) b.line.with("my", Arg::ofPiece(c.f.captured, c.coach, false, NoSquare));

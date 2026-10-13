@@ -2611,6 +2611,21 @@ int reviewMain(const Options& o) {
             std::fprintf(out, "  move %s  class %s  W%% %.1f -> %.1f (d %.1f)  best %s  ex %s%s%s\n", v.san.c_str(),
                          className(v.cls), v.wBest, v.wPlayed, v.delta, v.bestSan.c_str(), exTypeName(t),
                          v.voiced ? " voiced" : "", v.offered ? " offer" : "");
+            if (rev.assessment.wdl) {
+                const Assessment& A = rev.assessment;
+                std::fprintf(out, "  wdl best %d/%d/%d played %d/%d/%d  E %.2f -> %.2f  lead %.2f%s\n", A.best.win, A.best.draw,
+                             A.best.loss, A.played.win, A.played.draw, A.played.loss, A.best.e, A.played.e, A.eLead(),
+                             A.changesResult() ? "  result" : "");
+            }
+            if (rev.claim.type != ExType::None) {
+                std::string ln;
+                for (const std::string& m : rev.claim.line) ln += " " + m;
+                const Claim& cl = rev.claim;
+                std::fprintf(out, "  claim %s lost %d plies %d%s%s line%s\n", exTypeName(cl.type), cl.lost, cl.plies,
+                             cl.mate ? " mate" : "", cl.guessed ? " guessed" : "", ln.c_str());
+                std::fprintf(out, "  checks quiet %d comp %d own %d bestLoss %d playedLoss %d drop %d\n", cl.quiet,
+                             cl.compensation, int(cl.ownLine), cl.bestLoss, cl.playedLoss, cl.dropCp);
+            }
             std::fprintf(out, "  best line: %s\n", sanLine(c.bestLine, 0, std::min<size_t>(10, c.bestLine.size())).c_str());
             std::fprintf(out, "  played line: %s\n",
                          sanLine(c.playedLine, 0, std::min<size_t>(10, c.playedLine.size())).c_str());

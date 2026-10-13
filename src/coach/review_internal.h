@@ -1,6 +1,7 @@
 // Internal to the coach's review (review.cpp, review_explain.cpp, appraisal.cpp): the facts of one
 // reviewed move and the helpers that turn them into beats. Not a public API.
 #pragma once
+#include "assessment.h"
 #include "review.h"
 #include "tactics.h"
 
@@ -25,6 +26,9 @@ struct Ctx {
     const ai::PvLine* l2 = nullptr;          // second best (only-move tests), may be null
     const ai::PvLine* lp = nullptr;          // the played move's line
     Judgement j;
+    // What the move does to the expected result (assessment.h): the engine's WDL and the practical
+    // win percentage of the best, second and played lines.
+    Assessment a;
     bool isBest = false;
     std::vector<LineStep> r;                 // refutation from p1 (the coach moves first)
     std::vector<LineStep> best;              // L1 from p0
@@ -140,6 +144,22 @@ struct Explanation {
     // moves when the loss needs no such sentence.
     chess::Move retake, punish;
 };
+
+// ---- Claim checks (claims.cpp): what a reason's sequence establishes ----
+// How firmly the consequence a reason states stands.
+enum class Support : uint8_t { Established, Plausible, Unsupported };
+struct ClaimCheck {
+    Support support = Support::Established;
+    int quiet = 0;          // the human's free moves inside the sequence (quietReplies)
+    int compensation = 0;   // centipawns by which the engine's drop falls short of the material the move loses
+    bool ownLine = true;    // the move's own deeper line loses as much (or is mated), when it is long enough to tell
+};
+// The human's moves among the first 'plies' plies of r that the human chose: not a capture, not an
+// answer to a check, not the only legal move. A sequence that needs several of them is one way the
+// game may go, not what the move forces.
+int quietReplies(const Ctx& c, int plies);
+// The checks every reason's sequence goes through (claims.cpp).
+ClaimCheck checkClaim(const Ctx& c, const Explanation& ex);
 
 // ---- Engine requests and figures (shared with the appraisal) ----
 // The start position as sent to the engine: "" for the standard start, else its FEN.
