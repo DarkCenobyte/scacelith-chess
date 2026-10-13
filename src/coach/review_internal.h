@@ -50,9 +50,9 @@ struct Ctx {
     // more; else at least 40 % of the engine's drop): a pawn named for a collapse would hide what
     // really goes wrong.
     bool lossExplains(int lost, bool pawn = false) const;
-    // The refutation loses material for good, beyond what the best move loses, within its first
-    // 'plies' plies: a reason that is about something else (king safety, the endgame, a better plan)
-    // would not be the real one.
+    // The refutation loses material for good, beyond what the best move loses, or mates within its
+    // first 'plies' plies, or the move allows a forced mate however long: a reason that is about
+    // something else (king safety, the endgame, a better plan) would not be the real one.
     bool concreteLoss(int plies) const;
     // The refutation leaves the human down for good, beyond what the best move costs, after one of
     // its first 'plies' plies and still four plies later, or the move played's own line does

@@ -1567,6 +1567,35 @@ TEST(coach_review_bad_move_series_cases) {
             }
         }
     }
+    {
+        // Two knights against a pawn: 65...Kh8? allows a mate in 8, too long for levels 1-2 to show.
+        // "Your pawn could run to h1" would hide the mate: no endgame reason there, the mate from
+        // level 3.
+        const Recorded rc = recorded(
+         "rec b g7h8 startpos ; d2d4 g8f6 e2e3 e7e6 c2c4 f8b4 c1d2 a7a5 g1f3 f6e4 h2h3 c7c5 d4c5 e4d2 f3d2 a5a4 h3h4 b4c5 g2g3 d8b6 d1c1 b8c6 c1c2 c6b4 c2c3 d7d5 f1h3 d5d4 c3c1 b4a2 h3f5 a8a7 f5e6 h8g8 a1a2 b6c6 e6d5 c6h6 b2b4 a4b3 a2a3 d4e3 a3a7 c5a7 d5f3 e3f2 e1e2 h6e3 e2f1 c8f5 c1c3 g7g5 f3e2 g5h4 c4c5 e3c3 e2b5 e8f8 h1h2 f5g6 b1c3 b3b2 h2h4 f8g7 d2e4 b2b1n c3b1 g8c8 b1d2 f7f5 e4f2 a7c5 h4f4 c5e3 f1e1 c8c2 d2f1 e3f4 b5d7 f4e5 g3g4 f5g4 f2g4 e5a1 d7a4 c2c3 g4e5 g6h5 e1d2 g7h8 f1h2 c3c7 a4d1 a1c3 d2d3 h5d1 e5c4 c3g7 c4d6 g7d4 d6f5 d4a1 d3e3 c7e7 f5e7 d1c2 h2f3 c2e4 e3e4 a1b2 f3d4 b2c3 e4d5 c3d2 d4b5 d2c3 b5c3 h8g7 c3e2 b7b5 e2g3 g7f7 e7c8 f7g7 c8a7 g7f7 a7b5 f7g7 d5d6\n"
+         "an a0 1 0 0 16 h7h5 3\n"
+         "ln 1 16 -86 0 0 0 E h7h5 d6e7 g7g6 e7e6 g6g5 e6e5 g5g4 g3f1 g4f3 b5d4 f3f2 f1h2 f2e3 d4f5 e3d3 f5h4 d3c4 h2f1 c4c5 f1e3 c5b6 e5d5 b6b7 e3c4 b7c7 d5c5 c7d7 c4e5 d7e6\n"
+         "ln 2 16 -97 0 0 0 E g7g6 d6e5 h7h5 b5d6 g6g5 g3f1 g5g4 d6f5 g4f3 f5d4 f3f2 f1h2 f2e3 d4f5 e3d3 f5h4 d3c4 h2f3 c4c3\n"
+         "ln 3 16 -119 0 0 0 E g7f6 b5d4 f6g5 d6e5 h7h5 g3f1 g5g6 d4f3 g6f7 f3h4 f7e7 f1g3 e7d7 e5d5 d7c7 g3e4 c7d7 e4f6 d7c7 d5c5 c7b7 f6d5\n"
+         "an a1 1 0 0 16 g7h8 1\n"
+         "ln 1 16 0 -8 0 0 E g7h8 g3h5 h8g8 d6e7 h7h6 b5d4 g8h7 e7f7 h7h8 d4f5 h8h7 f5h4 h7h8 h5f6 h6h5 h4g6\n"
+         "an a2 1 1 0 14 g3h5 2\n"
+         "ln 1 14 0 8 0 0 E g3h5 h8g8 d6e7 h7h6 b5d4 g8h7 e7f7 h7h8 d4f5 h8h7 f5h4 h7h8 h5f6 h6h5 h4g6\n"
+         "ln 2 14 399 0 0 0 E g3f5 h7h5 f5h4 h8g8 d6e7 g8h7 b5d4 h7h6 e7f6 h6h7 d4f5 h7g8\n"
+         "an a3 1 0 0 6 h7h5 1\n"
+         "ln 1 6 -78 0 0 0 E h7h5 d6e7 h5h4 g3f1 g7g6 e7e6\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Kh8 b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.exType != ExType::Endgame);
+            CHECK(!hasKeyPrefix(r.script, "ex.push_passed"));
+            if (level >= 3) CHECK_EQ(r.verdict.exType, ExType::MateAllowed);
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {

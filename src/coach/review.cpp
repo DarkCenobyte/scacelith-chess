@@ -265,7 +265,7 @@ bool Ctx::losesMaterial(int plies) const {
 }
 
 bool Ctx::concreteLoss(int plies) const {
-    if (lossWithin(plies) - bestLoss >= 2) return true;
+    if (lossWithin(plies) - bestLoss >= 2 || j.mate == MateChange::Created) return true;
     for (int i = 0; i < int(r.size()) && i < plies; ++i)
         if (r[size_t(i)].mate && r[size_t(i)].mover == coach) return true;
     return false;
