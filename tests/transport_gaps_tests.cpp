@@ -358,8 +358,8 @@ TEST(transport_gaps_tls_websocket_and_stream) {
     std::unique_ptr<net::WebSocket> ws = net::wsConnect(wp, err, answer);
     REQUIRE(ws != nullptr);
     CHECK_EQ(answer.status, 101);
-    const std::vector<uint8_t> small(10, 1), mid(300, 2), big(70000, 3);   // 7-, 16- and 64-bit lengths
-    CHECK(ws->send(small));
+    const std::vector<uint8_t> tiny(10, 1), mid(300, 2), big(70000, 3);   // 7-, 16- and 64-bit lengths
+    CHECK(ws->send(tiny));
     CHECK(ws->send(mid));
     CHECK(ws->send(big));
     std::vector<std::vector<uint8_t>> got;
@@ -371,12 +371,12 @@ TEST(transport_gaps_tls_websocket_and_stream) {
         return ws->closed(code, reason);
     }));
     REQUIRE(got.size() == 3);
-    CHECK(got[0] == small);
+    CHECK(got[0] == tiny);
     CHECK(got[1] == mid);
     CHECK(got[2] == big);
     CHECK_EQ(code, uint16_t(4000));
     CHECK_EQ(reason, std::string("done"));
-    CHECK(!ws->send(small));   // closed: refused
+    CHECK(!ws->send(tiny));   // closed: refused
     ws->close(1000);
     ws.reset();
 
