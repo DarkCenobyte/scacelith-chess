@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstring>
+#include <mutex>
 #include <thread>
 
 using namespace m;
@@ -93,7 +94,12 @@ void Sink::run(int threads) {
 
 }  // namespace build
 
-std::vector<RobotPart> buildRobot() {
+namespace {
+std::mutex g_keptMu;
+bool g_keep = false;
+std::vector<RobotPart> g_kept;   // the robot built while g_keep is on ("" until then)
+
+std::vector<RobotPart> buildParts() {
     double t0 = plat::time();
     build::Sink s;
     build::buildHand(s);
@@ -127,6 +133,24 @@ std::vector<RobotPart> buildRobot() {
     LOGI("robot: %d parts (%d draws), %d triangles, %d vertices, built in %.0f ms", int(s.parts.size()), int(out.size()), int(tris), int(verts),
          (plat::time() - t0) * 1000.0);
     return out;
+}
+}  // namespace
+
+std::vector<RobotPart> buildRobot() {
+    {
+        std::lock_guard<std::mutex> lk(g_keptMu);
+        if (g_keep && !g_kept.empty()) return g_kept;
+    }
+    std::vector<RobotPart> parts = buildParts();
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    if (g_keep && g_kept.empty()) g_kept = parts;
+    return parts;
+}
+
+void keepBuiltRobot(bool on) {
+    std::lock_guard<std::mutex> lk(g_keptMu);
+    g_keep = on;
+    if (!on) g_kept = std::vector<RobotPart>();
 }
 
 }  // namespace character

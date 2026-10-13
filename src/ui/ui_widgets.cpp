@@ -87,8 +87,15 @@ struct Ctx {
     Id tabTo = 0;                  // the field Tab or Enter went to: its edit starts as it is drawn
     uint64_t tabFrame = 0;         // the frame tabTo was set (it lasts until the end of the next one)
     uint64_t submitFrame = 0;      // Enter in the page's last field asked it to submit (ITEM_SUBMIT)
+    bool tracing = false;          // setTrace(): the items of this frame and of the last one
+    std::vector<TracedItem> traced, prevTraced;
 };
 Ctx c;
+
+// The label of the item just made, in the trace (the widgets that show one).
+void traceLabel(const std::string& label) {
+    if (c.tracing && !c.traced.empty()) c.traced.back().label = displayText(label);
+}
 
 const plat::Input& input() { return c.inputOverride ? *c.inputOverride : plat::input(); }
 
@@ -234,6 +241,10 @@ void beginFrame(float dt) {
 void endFrame() {
     c.prevList.swap(c.curList);
     c.curList.clear();
+    if (c.tracing) {
+        c.prevTraced.swap(c.traced);
+        c.traced.clear();
+    }
     c.prevMarks.swap(c.marks);
     c.marks.clear();
     if (c.defaultFocus && !findEntry(c.prevList, c.focus) && findEntry(c.prevList, c.defaultFocus)) c.focus = c.defaultFocus;
@@ -344,10 +355,18 @@ void sound(Sound s) {
     c.soundCb(s);
 }
 
+void setTrace(bool on) {
+    c.tracing = on;
+    c.traced.clear();
+    if (!on) c.prevTraced.clear();
+}
+const std::vector<TracedItem>& tracedItems() { return c.prevTraced; }
+
 // ---- Items ----------------------------------------------------------------------------------------
 Item item(Id id, const Rect& r, uint32_t flags) {
     Item it;
     it.id = id;
+    if (c.tracing) c.traced.push_back({id, r, flags, std::string()});
     Anim& a = anim(id);
     bool interactive = c.blockDepth == 0 && !(flags & ITEM_DISABLED);
     bool focusable = (flags & ITEM_FOCUSABLE) != 0 && !(flags & ITEM_MOUSE_ONLY);
@@ -545,6 +564,7 @@ float rowLabel(const std::string& label, const Rect& r, float reserved, bool ena
 
 bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign align) {
     Item it = item(makeId(label), r, enabled ? ITEM_FOCUSABLE : ITEM_DISABLED);
+    traceLabel(label);
     const std::string shown = displayText(label);
     if (align == HAlign::Left && rtl()) align = HAlign::Right;
     float t = it.hoverT;
@@ -590,6 +610,7 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign ali
 bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabled, uint32_t extraFlags) {
     uint32_t flags = (extraFlags & ITEM_MOUSE_ONLY) ? 0u : ITEM_FOCUSABLE;
     Item it = item(makeId(label), r, (enabled ? flags : ITEM_DISABLED) | extraFlags);
+    traceLabel(label);
     std::string shown = displayText(label);
     float t = it.hoverT, p = it.pressT;
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
@@ -644,12 +665,14 @@ void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, co
     // An item of its own over the disabled one, for the tip only: hovered or focused, it shows a
     // faint frame (the focus stops there) and the reason; activating it does nothing.
     Item it = item(makeId(label + "##why"), r, ITEM_FOCUSABLE | ITEM_SILENT);
+    traceLabel(label);
     if (it.hoverT > 0.01f) gfx::stroke(r, withAlpha(gold, 0.3f * it.hoverT), 0.0f, 1.5f);
     tooltip(why, within);
 }
 
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled) {
     Item it = item(makeId(label), r, enabled ? ITEM_FOCUSABLE : ITEM_DISABLED);
+    traceLabel(label);
     Anim& a = anim(it.id);
     bool changed = false;
     if (it.activated) {
@@ -685,6 +708,7 @@ bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enable
 bool sliderRow(const std::string& label, float& value, float lo, float hi, float step,
                const std::function<std::string(float)>& format, const Rect& r, bool enabled) {
     Item it = item(makeId(label), r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
+    traceLabel(label);
     Anim& a = anim(it.id);
     float old = value;
     float valueW = 120.0f;
@@ -750,6 +774,7 @@ void drawStepGlyph(vec2 c, bool plus, float t, bool enabled) {
 bool stepperRow(const std::string& label, int& index, int count, const std::function<std::string(int)>& format,
                 const Rect& r, bool enabled) {
     Item it = item(makeId(label), r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
+    traceLabel(label);
     Anim& a = anim(it.id);
     int old = index;
     float valueW = 170.0f;
@@ -798,6 +823,7 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
                  bool enabled, float valueW) {
     Item it = item(makeId(label), r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
+    traceLabel(label);
     int n = int(options.size());
     int old = index;
     Rect box = flip(r, Rect(r.r() - 22.0f - valueW, r.y, valueW, r.h));
@@ -871,6 +897,7 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
     const bool secret = (fieldFlags & FIELD_SECRET) != 0, ltr = (fieldFlags & (FIELD_LTR | FIELD_SECRET)) != 0;
     Id id = makeId(label);
     Item it = item(id, r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
+    traceLabel(label);
     const plat::Input& in = input();
     const std::string before = text;
     float boxW = std::min(480.0f, r.w * 0.5f);

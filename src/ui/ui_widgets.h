@@ -108,6 +108,17 @@ struct Item {
 };
 Item item(Id id, const Rect& r, uint32_t flags = ITEM_FOCUSABLE);
 void sound(Sound s);
+// The items of a frame as they were drawn, for the tests (tests/headless.h finds a button by its
+// label there): their id, rectangle, flags, and the text the widget that made them showed ("" for a
+// bare item). Off by default; while on, endFrame() keeps the frame's list.
+struct TracedItem {
+    Id id = 0;
+    Rect r;
+    uint32_t flags = 0;
+    std::string label;
+};
+void setTrace(bool on);
+const std::vector<TracedItem>& tracedItems();   // of the last frame ended while the trace was on
 void setSoundCallback(std::function<void(Sound)> cb);
 
 // ---- Styled widgets -----------------------------------------------------------------------------

@@ -40,6 +40,10 @@ struct RobotPart {
 
 // Builds every part of one robot (right side modelled, left side mirrored). Deterministic.
 std::vector<RobotPart> buildRobot();
+// On: the next robot buildRobot() builds is kept, and the calls after it get a copy of that one
+// instead of building another (seconds of CPU each). For the unit tests, which start many scenes
+// in one process; the game builds one robot per scene and leaves it off. Off frees the copy.
+void keepBuiltRobot(bool on);
 
 // Configures the Robot* entries of the material library (surface shaders + parameters).
 void setupRobotMaterials();

@@ -1,4 +1,5 @@
 #include "test.h"
+#include "headless.h"
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -146,6 +147,8 @@ int main(int argc, char** argv) {
         ++run;
         if (!ok) ++failedCases;
     }
+    // The App the headless tests shared (headless.h), while the game's statics are still there.
+    headless::stopShared();
     if (skipped) std::fprintf(stderr, "%d test(s), %d failed, %d skipped\n", run, failedCases, skipped);
     else std::fprintf(stderr, "%d test(s), %d failed\n", run, failedCases);
     if (note && failedCases) std::fprintf(stderr, "note: %s\n", note);

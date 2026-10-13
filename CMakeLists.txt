@@ -264,20 +264,38 @@ endif()
 
 # ---------------------------------------------------------------------------------------------
 # Game executable. Every .cpp under src/ (except the core modules above) is compiled directly
-# into the exe so static registration (scenes) is never dropped by the linker.
+# into the exe so static registration (scenes) is never dropped by the linker. The portable part
+# (everything but the platform layer and main.cpp) is an object library that the unit tests link
+# too, on a null OpenGL and a fake platform layer (tests/null_gl.cpp, tests/fake_platform.cpp):
+# compiled once for both. The animator and the skeleton are an object library of their own, which
+# the tests do not link (tests/anim_tests.cpp compiles them itself).
 # ---------------------------------------------------------------------------------------------
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/platform/*.cpp ${ROOT}/src/gl/*.cpp ${ROOT}/src/render/*.cpp ${ROOT}/src/scene/*.cpp
     ${ROOT}/src/character/*.cpp ${ROOT}/src/anim/*.cpp ${ROOT}/src/ui/*.cpp ${ROOT}/src/game/*.cpp
     ${ROOT}/src/app/*.cpp)
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
+file(GLOB GAME_PLATFORM_SOURCES CONFIGURE_DEPENDS ${ROOT}/src/platform/*.cpp)
+set(GAME_ANIM_SOURCES ${ROOT}/src/anim/animator.cpp ${ROOT}/src/anim/animator_gesture.cpp
+    ${ROOT}/src/anim/animator_stance.cpp ${ROOT}/src/anim/animator_writing.cpp ${ROOT}/src/character/skeleton.cpp)
+list(REMOVE_ITEM GAME_SOURCES ${GAME_PLATFORM_SOURCES} ${GAME_ANIM_SOURCES})
 # The vendored libraries compiled into the game, each in a unit of its own (not #included by the
 # game's code) so that code scanning leaves them out with the rest of third_party/
 # (.github/workflows/codeql.yml): Nayuki's QR Code generator for src/ui/ui_qr.cpp
 # (third_party/qrcodegen/README.scacelith.md), whose file-scope using-declarations then stay out of
 # the game's code too, and stb_truetype's implementation, the font rasteriser of src/ui/ui_font.cpp
 # (third_party/stb/README.scacelith.md).
-set(GAME_EXTRA ${ROOT}/third_party/qrcodegen/qrcodegen.cpp ${ROOT}/third_party/stb/stb_truetype.cpp)
+list(APPEND GAME_SOURCES ${ROOT}/third_party/qrcodegen/qrcodegen.cpp ${ROOT}/third_party/stb/stb_truetype.cpp)
+foreach(objs scacelith_game_objs scacelith_anim_objs)
+    if(objs STREQUAL scacelith_game_objs)
+        add_library(${objs} OBJECT ${GAME_SOURCES})
+    else()
+        add_library(${objs} OBJECT ${GAME_ANIM_SOURCES})
+    endif()
+    target_compile_options(${objs} PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
+    target_link_libraries(${objs} PUBLIC scacelith_core)
+endforeach()
+set(GAME_EXTRA "")
 if(WIN32)
     # The icon, the version resource and the manifest, with the version of cmake/version.cmake.
     set(SCACELITH_ICON_ICO ${ROOT}/res/icons/scacelith.ico)
@@ -290,11 +308,12 @@ if(WIN32)
 endif()
 if(APPLE)
     # The Cocoa layer instead of the X11 one, with automatic reference counting.
-    list(REMOVE_ITEM GAME_SOURCES ${ROOT}/src/platform/platform_x11.cpp ${ROOT}/src/platform/platform_win32.cpp)
+    list(REMOVE_ITEM GAME_PLATFORM_SOURCES ${ROOT}/src/platform/platform_x11.cpp ${ROOT}/src/platform/platform_win32.cpp)
     set_source_files_properties(${ROOT}/src/platform/platform_cocoa.mm PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
     list(APPEND GAME_EXTRA ${ROOT}/src/platform/platform_cocoa.mm)
 endif()
-add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
+add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_PLATFORM_SOURCES} ${GAME_EXTRA}
+               $<TARGET_OBJECTS:scacelith_game_objs> $<TARGET_OBJECTS:scacelith_anim_objs>)
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
 target_link_libraries(scacelith PRIVATE scacelith_core)
 if(WIN32)
@@ -327,22 +346,17 @@ endif()
 # ---------------------------------------------------------------------------------------------
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${ROOT}/tests/*.cpp)
 if(TEST_SOURCES)
-    add_executable(scacelith_tests ${TEST_SOURCES})
-    # The shader preprocessor's tests: shader.cpp needs the GL entry points only to link (they
-    # stay null, no GL library: the tests never compile a program).
-    target_sources(scacelith_tests PRIVATE ${ROOT}/src/render/shader.cpp ${ROOT}/src/gl/gl46.cpp)
-    # The hall ceiling's geometry tests: CPU meshes only (mesh.cpp's upload is never called).
-    target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/hall_ceiling.cpp ${ROOT}/src/scene/hall_geom.cpp
-                   ${ROOT}/src/scene/hall_ornament.cpp ${ROOT}/src/render/mesh.cpp)
-    # The pieces' picking outlines, from the chess set's meshes (CPU only).
-    target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/piece_silhouette.cpp ${ROOT}/src/scene/pieces.cpp
-                   ${ROOT}/src/scene/piece_profile.cpp ${ROOT}/src/scene/sdf_mesher.cpp)
+    # With the game's portable code (above), on the null OpenGL and the fake platform layer of
+    # tests/null_gl.cpp and tests/fake_platform.cpp: the menus, the renderer and the scenes run
+    # without a GPU or a window.
+    add_executable(scacelith_tests ${TEST_SOURCES} $<TARGET_OBJECTS:scacelith_game_objs>)
     target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS} ${COVERAGE_FLAGS})
     if(SCACELITH_COVERAGE)
         target_compile_definitions(scacelith_tests PRIVATE SCACELITH_COVERAGE_BUILD)
     endif()
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)
+        target_link_libraries(scacelith_tests PRIVATE gdi32 user32 shell32 dwmapi)
         target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
     elseif(NOT APPLE)
         # The X11 layer's desktop side (clipboard, input method, focus, fullscreen), which
