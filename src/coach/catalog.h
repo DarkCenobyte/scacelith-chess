@@ -18,7 +18,8 @@
 //                           every spoken line of the language: whole words, any case ("mat" ->
 //                           "matte"); respell.<word>.pause only before a pause (punctuation or the
 //                           end of the line: "huit" -> "huite", but "huit coups" unchanged; a
-//                           hyphen joining the next word is no pause: "dix-huit")
+//                           hyphen joining the next word is no pause: "dix-huit"); the words found
+//                           so far, per language, are in docs/PRONUNCIATION.md
 //   {name}, {name:form}     placeholder filled from the Line's argument 'name' (a form selects a
 //                           grammatical form, see common.lang)
 //   {@}, {@2} ...           zero-width anchors of static lines (removed from the text): the

@@ -270,4 +270,4 @@ the download prompt shows; see
 - Documentation: [how to play](docs/GUIDE.md), [development](docs/DEVELOPMENT.md),
   [architecture](docs/ARCHITECTURE.md), [online client](docs/ONLINE_CLIENT.md),
   [direct matches](docs/DIRECT_MATCH.md), [ports](docs/PORTS.md),
-  [online protocol](protocol/README.md)
+  [coach voice pronunciation](docs/PRONUNCIATION.md), [online protocol](protocol/README.md)
