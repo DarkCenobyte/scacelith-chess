@@ -1146,12 +1146,17 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     // the capture wins all of it, x-rays included.
     if (!isUndefended(c.p0, y) || seePoints(c.p0, b0.move) < points(yt)) return false;
     if (c.p1.at(y).empty() || c.p1.at(y).color != c.coach) return false;   // taken after all, or moved
-    // Taken a few moves later, a check or a trade first ("Qxd5 Nxd5 Rxd8"): not missed.
-    for (size_t i = 1; i < c.playedLine.size() && i <= 6; ++i) {
-        const LineStep& st = c.playedLine[i];
-        if (st.mover == c.coach && st.move.from == y) break;
-        if (st.mover == c.human && st.move.to == y && st.captured == yt) return false;
-    }
+    // Taken a few moves later, a check or a trade first ("Qxd5 Nxd5 Rxd8"), along the played line or
+    // the refutation the level reads: not missed.
+    const auto takenLater = [&](const std::vector<LineStep>& line, size_t from) {
+        for (size_t i = from; i < line.size() && i <= from + 5; ++i) {
+            const LineStep& st = line[i];
+            if (st.mover == c.coach && st.move.from == y) return false;
+            if (st.mover == c.human && st.move.to == y && st.captured == yt) return true;
+        }
+        return false;
+    };
+    if (takenLater(c.playedLine, 1) || takenLater(c.r, 0)) return false;
     if (c.f.captured != NoPiece && c.f.seePts >= points(yt) - 1) return false;   // took as much elsewhere
     // A move that loses as much as the piece missed: the loss is the story (materialLine).
     if (c.concreteLoss(8) && c.lossWithin(8) >= points(yt)) return false;
