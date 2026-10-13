@@ -1716,6 +1716,38 @@ TEST(coach_review_human_context_cases) {
         }
     }
     {
+        // Puzzle oFxHl: 57.g4? Rh1+ Kg3 Qc3+ Kf2 Qd2+ Qe2 Qf4+ Qf3 Rf1+ Kxf1 Qxf3+. Every move of mine
+        // is a check or a capture down to the queen falling: the line is said whole from level 2,
+        // and levels 2-3 play it to the end, longer than their usual demonstration.
+        const Recorded rc = recorded(
+         "rec w g3g4 7k/p3Q1p1/7p/8/8/1P4PP/P5RK/q4r2 w - - 8 57 ;\n"
+         "tag puzzle oFxHl 1233 crushing endgame short\n"
+         "an a0 1 1 0 16 e7e8 3\n"
+         "ln 1 16 19 0 0 0 E e7e8 h8h7 e8e4 h7h8 g2c2 f1c1 e4a8 h8h7 a8c6 c1c2 c6c2 h7h8 b3b4 a1e5 a2a4 a7a6 c2f2 e5e8 f2a2 e8e5 a2c2 e5e8\n"
+         "ln 2 16 0 0 0 0 E e7d8 h8h7 d8d3 h7h8\n"
+         "ln 3 16 -16 0 0 0 E g2g1 a1a2 h2h1 f1g1 h1g1 a2b3 e7e8 b3g8 e8e4 g8b8 g1f2 b8b6 f2g2 a7a5 h3h4\n"
+         "an a1 1 1 0 16 g3g4 1\n"
+         "ln 1 16 -686 0 0 0 E g3g4 f1h1 h2g3 a1c3 g3f2 c3d2 e7e2 d2f4 e2f3 h1f1 f2f1 f4f3 f1g1 f3e3 g1h2 e3e5 h2g1 e5e1 g1h2 e1e4\n"
+         "an a2 1 0 0 14 f1h1 2\n"
+         "ln 1 14 686 0 0 0 E f1h1 h2g3 a1c3 g3f2 c3d2 e7e2 d2f4 e2f3 h1f1 f2f1 f4f3 f1g1 f3e3 g1h2 e3e5 h2g1\n"
+         "ln 2 14 25 0 0 0 E a1d4 e7c7 f1f2 c7g3 f2d2 g3e1\n"
+         "an a3 1 1 0 6 e7e8 1\n"
+         "ln 1 6 20 0 0 0 E e7e8 h8h7 e8e4 h7h8 g2c2 f1c1\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "g4 b%d", level);
+            checkScript(r.script, where);
+            if (level >= 2) CHECK_EQ(r.verdict.exType, ExType::Material);
+            if (level == 2 || level == 3) {
+                CHECK_EQ(demoMoves(r.script), 11);
+                CHECK(hasKeyPrefix(r.script, "ex.result"));
+            }
+        }
+    }
+    {
         // Game tolm2f3k (Lichess, 2013): 18...h4? Na5. Two pawns still shelter the king on b8, it
         // stands on its first rank and no checks come early: never "your king is exposed".
         const Recorded rc = recorded(
@@ -1741,6 +1773,69 @@ TEST(coach_review_human_context_cases) {
             checkScript(r.script, where);
             CHECK(r.verdict.exType != ExType::KingSafety);
             CHECK(!hasKeyPrefix(r.script, "ex.king_exposed"));
+        }
+    }
+    {
+        // Puzzle GjJD7: 48...Rhxg3? Rxh7+ Kxh7 Qh2+ Kg7 Rxg3+ Kf7 Qh7+ Ke8 Rxg8+ Bxg8 Qxg8+. The rook on
+        // g8 is traded (Bxg8 takes back): never named as the loss, at any level; the forcing line is
+        // read to its end, where nothing comes back, from level 2.
+        const Recorded rc = recorded(
+         "rec b h3g3 6rk/2p4p/p1q1b3/Pp1pPp2/1P1P1P2/2P3Pr/1BQ4R/2K3R1 b - - 9 48 ;\n"
+         "tag puzzle GjJD7 1797 attraction crushing interference kingsideAttack long middlegame sacrifice\n"
+         "an a0 1 0 0 16 g8g3 3\n"
+         "ln 1 16 5 0 0 0 E g8g3 g1g3 h3g3 c2f2 g3g6 c1c2 g6g4 b2c1 c6c4 h2h6\n"
+         "ln 2 16 -16 0 0 0 E h3h2 c2h2 g8g4 h2h6 h8g8 c1d1 c6e8 b2c1 e8g6 h6h2 h7h5 c1e3\n"
+         "ln 3 16 -621 0 0 0 E h3g3 h2h7 h8h7 c2h2 h7g7 g1g3 g7f7 h2h7 f7e8 g3g8 e6g8 h7g8 e8e7 g8h7 e7f8 h7f5 f8g7 e5e6\n"
+         "an a2 1 1 0 14 h2h7 2\n"
+         "ln 1 14 556 0 0 0 E h2h7 h8h7 c2h2 h7g7 g1g3 g7f7 h2h7 f7e8 g3g8 e6g8 h7g8 e8e7 g8h7 e7f8 h7f5 f8g7 e5e6 g7g8\n"
+         "ln 2 14 0 0 0 0 E g1g3 g8g3 h2h7 h8h7 c2h2 h7g8 h2g3 g8f8 c1d2 f8e8 g3g7 c6c4 g7h8 e8d7 h8h7 d7e8\n"
+         "an a3 1 0 0 6 g8g3 1\n"
+         "ln 1 6 5 0 0 0 E g8g3 g1g3 h3g3 c2f2 g3g6\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rhxg3 b%d", level);
+            checkScript(r.script, where);
+            if (level >= 2) CHECK_EQ(r.verdict.exType, ExType::Material);
+            for (const Beat& b : r.script) {
+                if (b.kind != BeatKind::Say || startsWith(b.line.key, "ex.hint.") ||
+                    startsWith(b.line.key, "ex.reveal.") || startsWith(b.line.key, "ex.better."))
+                    continue;
+                for (const auto& a : b.line.args) CHECK(!(a.second.kind == Arg::Kind::Piece && a.second.square == sq("g8")));
+            }
+        }
+    }
+    {
+        // Puzzle 95YwF: 19...Rf6? Bg6+ Kg8 Qh7+ Kf8 Qh8+ Ke7 Qe8#. Every move a check: the mate is
+        // said from level 1, and levels 1-3 play it to the mate.
+        const Recorded rc = recorded(
+         "rec b f7f6 r1b4k/pp3rpB/2nqp3/3pb2Q/8/8/P4PPP/R3R1K1 b - - 1 19 ;\n"
+         "tag puzzle 95YwF 1862 discoveredAttack discoveredCheck kingsideAttack mate mateIn4 middlegame veryLong\n"
+         "an a0 1 0 0 16 e5a1 3\n"
+         "ln 1 16 619 0 0 0 E e5a1 h7g6 h8g8 g6f7 g8f8 f7e8 d6f4 e1a1 f8e7 e8c6 b7c6 h5h7 f4f6 a1b1 c8d7 h7d3 e6e5 d3e3 a7a5 h2h3\n"
+         "ln 2 16 581 0 0 0 E e5h2 g1h1 h2f4 h7g6 f4h6 g6f7 c8d7 g2g4 a8f8 g4g5 d6f4 g5h6 f8f7 h6g7 h8g7 e1e3\n"
+         "ln 3 16 496 0 0 0 E e5f4 h7g6 f4h6 g6f7 c8d7 f2f4 a8f8 e1f1 d6e7 f7g6 d7e8 f4f5 e6f5 g6e8 e7e3 g1h1 e3e8 f1f5 e8h5 f5h5\n"
+         "an a1 1 0 0 16 f7f6 1\n"
+         "ln 1 16 0 -4 0 0 E f7f6 h7g6 h8g8 h5h7 g8f8 h7h8 f8e7 h8e8\n"
+         "an a2 1 1 0 14 h7g6 2\n"
+         "ln 1 14 0 4 0 0 E h7g6 h8g8 h5h7 g8f8 h7h8 f8e7 h8e8\n"
+         "ln 2 14 -751 0 0 0 E e1e5 f6h6 e5g5 c8d7 h7b1 h6h5 g5h5 h8g8 b1h7 g8f8 h7g6\n"
+         "an a3 1 0 0 6 e5a1 1\n"
+         "ln 1 6 619 0 0 0 E e5a1 h7g6 h8g8 g6f7 g8f8 f7e8\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Rf6 b%d", level);
+            checkScript(r.script, where);
+            CHECK_EQ(r.verdict.exType, ExType::MateAllowed);
+            if (level <= 3) {
+                CHECK_EQ(demoMoves(r.script), 7);
+                CHECK(hasKey(r.script, "demo.my.mate"));
+            }
         }
     }
 }

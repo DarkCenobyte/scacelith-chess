@@ -309,11 +309,14 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
     bool atK = false;
     const int givenUp = givenUpAlong(c, k, atK);
     if (atK) return false;
-    const int cap = std::max(c.b.demoPlies, c.b.linePlies) + 2;
+    // The band's reach, and further when the coach's moves up to the sequence's end all force the
+    // reply (Ctx::forcingPlies).
+    const int bandCap = std::max(c.b.demoPlies, c.b.linePlies) + 2;
+    const auto within = [&](int p) { return p <= bandCap || p <= c.forcingPlies(p); };
     int plies = 0, lost = 0;
     // The human's recapture on the next ply is part of the sequence (shown and said with it).
     const bool retake = k + 1 < n && c.r[size_t(k + 1)].mover == c.human && c.r[size_t(k + 1)].captured != NoPiece &&
-                        c.r[size_t(k + 1)].move.to == c.r[size_t(k)].move.to && k + 2 <= cap;
+                        c.r[size_t(k + 1)].move.to == c.r[size_t(k)].move.to && within(k + 2);
     // What the human had lost already: the capture at k (with the recapture) must add to it, else it
     // is a trade on the way and not where the loss comes from. A trade the human starts on that very
     // square just before is the same ("you take my rook, I take yours"): what was lost counts from
@@ -338,7 +341,7 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
     for (int i = 0; i < k; ++i)
         if (c.r[size_t(i)].captured != NoPiece && c.r[size_t(i)].move.to != at) earlier = true;
     Move take, punish;
-    for (int p = retake ? k + 2 : k + 1; p <= std::min({n, k + 2, cap}) && plies == 0; ++p) {
+    for (int p = retake ? k + 2 : k + 1; p <= std::min(n, k + 2) && within(p) && plies == 0; ++p) {
         const LineStep& st = c.r[size_t(p - 1)];
         if (st.captured == NoPiece || st.mate) continue;
         // Never a sequence that stops after a move that leaves a bigger prize and before the capture
@@ -445,8 +448,10 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     Explanation ex;
     ex.type = ExType::MateAllowed;
     ex.mate = true;
-    // Levels 1-2: a mate the level can follow (a mate in two at level 1, in three at level 2), shown.
-    ex.concrete = plies <= std::max(c.b.lookahead, c.b.mateLinePlies);
+    // Levels 1-2: a mate the level can follow (a mate in two at level 1, in three at level 2), shown;
+    // a longer one where every coach move up to it forces the reply (Ctx::forcingPlies: checks, captures).
+    const int mateCap = std::max(c.b.mateLinePlies, lineKnown ? c.forcingPlies(plies) : 0);
+    ex.concrete = plies <= std::max(c.b.lookahead, mateCap);
     if (c.level <= 2 && (!ex.concrete || !lineKnown)) return false;   // too deep for the band: not this cause
     static const int kMateLimit[6] = {1, 2, 2, 3, 3, 4};
     ex.offer = n <= kMateLimit[c.level - 1];
@@ -479,7 +484,7 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     }
     ex.cause.push_back(b);
     // Shown in full (levels 1-3, planDemo): said on the mate itself.
-    const bool full = lineKnown && c.b.fullDemo && plies <= c.b.mateLinePlies;
+    const bool full = lineKnown && c.b.fullDemo && plies <= mateCap;
     if (full && c.level <= 2) {
         // The king has no escape square (where it stands at the end of the line).
         const Position q = afterR(c, plies);
@@ -1079,8 +1084,12 @@ bool exchange(const Ctx& c, Explanation& out) {
 // the piece that falls.
 bool materialLine(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
-    const int reach = std::min(int(c.r.size()), std::max(8, c.b.lookahead + 4));
+    // As far as a forcing sequence may go (Ctx::forcingPlies; settleLoss reads a loss beyond the
+    // band's reach only there too).
+    const int bandReach = std::max(8, c.b.lookahead + 4);
+    const int reach = std::min(int(c.r.size()), std::max(bandReach, 11));
     for (int k = 0; k < reach; ++k) {
+        if (k >= bandReach && c.forcingPlies(k + 1) == 0) continue;
         Explanation ex;
         if (!settleLoss(c, k, k, ex, c.level <= 2)) continue;
         // The piece named: the one whose capture settles the loss (not one traded on the way), on
@@ -1103,7 +1112,7 @@ bool materialLine(const Ctx& c, Explanation& out) {
         // Levels 1-2 name the piece and show the whole sequence (a claim the table does not show
         // would be lost on a beginner).
         // The piece named is the reason by itself ("I can win your pawn" for two pawns lost says too little).
-        if (c.level <= 2 && (named == NoSquare || ex.fullPlies > c.b.demoPlies ||
+        if (c.level <= 2 && (named == NoSquare || ex.fullPlies > std::max(c.b.demoPlies, c.forcingPlies(ex.fullPlies)) ||
                              !c.lossExplains(points(c.p1.at(named).type), c.p1.at(named).type == Pawn)))
             continue;
         ex.type = ExType::Material;

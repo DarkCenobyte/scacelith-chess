@@ -238,6 +238,20 @@ int Ctx::followableBest(int want) const {
     return std::max(std::min(want, 1), int(followablePlies(best, size_t(std::max(0, want)), true)));
 }
 
+int Ctx::forcingPlies(int plies) const {
+    plies = std::min(plies, int(r.size()));
+    for (int i = 0; i < plies; ++i) {
+        const LineStep& st = r[size_t(i)];
+        if (st.mover == coach && !st.check && st.captured == NoPiece && st.promotion == NoPiece) return 0;
+    }
+    // Where it ends, the human takes nothing back (a take-back at the end of a long line, and what
+    // it costs in turn, would be one more thing to show).
+    Position q = p1;
+    for (int i = 0; i < plies; ++i) q.makeMove(r[size_t(i)].move);
+    if (q.sideToMove() == human && bestCapturePoints(q, human) > 0) return 0;
+    return level == 1 ? 9 : 11;
+}
+
 int Ctx::lossWithin(int plies) const {
     int worst = 0;
     const int n = std::min<int>(plies, int(r.size()));
@@ -467,7 +481,7 @@ void planDemo(const Ctx& c, Explanation& ex) {
     // Never past a move the player could not follow (Ctx::followable).
     const int reach = std::min({int(c.r.size()), beforeHumanPromotion(c), c.followable(int(c.r.size()), true)});
     // Levels 1-3: the whole sequence, when the level can follow it.
-    const int fullCap = ex.mate ? c.b.mateLinePlies : c.b.demoPlies;
+    const int fullCap = std::max(ex.mate ? c.b.mateLinePlies : c.b.demoPlies, c.forcingPlies(ex.fullPlies));
     if (c.b.fullDemo && ex.fullPlies <= std::min(reach, fullCap) && c.followable(ex.fullPlies, false) == ex.fullPlies) {
         ex.full = true;
         ex.demoPlies = ex.fullPlies;
@@ -533,7 +547,7 @@ bool demoReachesEnd(const Ctx& c, const Explanation& ex) {
 }
 
 int demoLength(const Ctx& c, const Explanation& ex) {
-    const int cap = ex.mate ? std::max(c.b.demoPlies, c.b.mateLinePlies) : c.b.demoPlies;
+    const int cap = std::max({c.b.demoPlies, ex.mate ? c.b.mateLinePlies : 0, c.forcingPlies(ex.demoPlies)});
     return std::max(0, std::min({ex.demoPlies, int(c.r.size()), cap}));
 }
 

@@ -75,6 +75,12 @@ struct Ctx {
     int followable(int want, bool extend) const;
     // The plies of the best line, at most 'want', the coach can say (at least its first move).
     int followableBest(int want) const;
+    // How far a demonstration (levels 1-3) or a line said (levels 4-6) may go to reach a loss further
+    // than the band's own plies, when every coach move among the first 'plies' plies of r forces the
+    // reply (a check, a capture, a promotion) and the human can take nothing back where they end:
+    // one forced move after another, a distant loss the player can follow (9 plies at level 1, 11
+    // above). 0 when one of them is a quiet move, or a take-back is left.
+    int forcingPlies(int plies) const;
 };
 
 // pov's material change, for good, after the first 'plies' plies of 'line' (relative to 'base'; 'end'
