@@ -1087,11 +1087,13 @@ bool materialLine(const Ctx& c, Explanation& out) {
             if (on != NoSquare && c.p1.at(on).color == c.human && c.p1.at(on).type == st.captured) named = on;
         }
         // A piece the better move gives up too, its line down for good, is not named (nor pointed
-        // at) as what the move loses: "now I can win your queen" when Qxd1+ gives it up for a rook.
-        // Levels 1-2 need the name.
+        // at, nor said where a demonstration stops) as what the move loses: "now I can win your
+        // queen" when Qxd1+ gives it up for a rook, "now your rook can't be saved" when hxg4 Qxh1
+        // gives it up for the knight. Levels 1-2 need the name.
         if (named != NoSquare && c.bestLoss >= 1 && bestGivesUp(c, named == c.played.to ? c.played.from : named) > 0) {
             if (c.level <= 2) continue;
             named = NoSquare;
+            ex.targets.clear();
         }
         // Levels 1-2 name the piece and show the whole sequence (a claim the table does not show
         // would be lost on a beginner).

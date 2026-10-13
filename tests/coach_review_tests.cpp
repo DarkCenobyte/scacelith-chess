@@ -1627,6 +1627,39 @@ TEST(coach_review_human_context_cases) {
             if (level >= 4) CHECK_EQ(r.verdict.exType, ExType::Material);
         }
     }
+    {
+        // Puzzle kJcKa: 10.g3? Bxg3 Qe2 Nxf2 Bd4 Nxh1+. The rook falls after 10.hxg4 Qxh1 too (for the
+        // knight): never "now your rook can't be saved" or the rook named as the loss, at any level
+        // (a demonstration of the line still takes it).
+        const Recorded rc = recorded(
+         "rec w g2g3 r1b1k2B/ppp2p1p/3b4/3p4/4p1nq/1P2P2P/P1PP1PP1/RN1QKB1R w KQq - 1 10 ;\n"
+         "tag puzzle kJcKa 2032 advantage attackingF2F7 middlegame short\n"
+         "an a0 1 1 0 16 h3g4 3\n"
+         "ln 1 16 555 0 0 0 E h3g4 h4h1 b1c3 c7c6 d2d3 h1h4 g2g3 h4h6 h8d4 h6g5 d3e4 c8g4 d1d3 c6c5 d4h8\n"
+         "ln 2 16 270 0 0 0 E f1b5 c7c6 h1f1 g4h2 b5e2 h2f1 e2f1 f7f6 c2c4 e8e7 c4d5 c6d5 d1e2 a7a6\n"
+         "ln 3 16 233 0 0 0 E d1e2 g4f2 e2f2 d6g3 f2g3 h4g3 e1d1 c7c5 b1c3 g3d6 c3b5 d6g3 a2a4 a7a6 b5c3 g3d6 f1e2 c8d7 h1f1\n"
+         "an a1 1 1 0 16 g2g3 1\n"
+         "ln 1 16 -350 0 0 0 E g2g3 d6g3 d1e2 g4f2 h8d4 f2h1 e1d1 g3d6 d1c1 c8d7 a2a4 c7c5 d4b2 d7c6 b1c3 h1g3 e2f2 a7a6 a4a5\n"
+         "an a2 1 0 0 14 d6g3 2\n"
+         "ln 1 14 341 0 0 0 E d6g3 d1e2 g4f2 h8d4 f2h1 e1d1 g3d6 d1c1 c8d7 a2a4 e8c8\n"
+         "ln 2 14 -658 0 0 0 E h4h6 d1e2 f7f6 b1c3 g4e5 c3d5 e5f3 e2f3\n"
+         "an a3 1 1 0 6 h3g4 1\n"
+         "ln 1 6 555 0 0 0 E h3g4 h4h1 b1c3 c7c6 d2d3 h1h4\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "g3 b%d", level);
+            checkScript(r.script, where);
+            for (const Beat& b : r.script) {
+                if (b.kind != BeatKind::Say || startsWith(b.line.key, "ex.hint.") ||
+                    startsWith(b.line.key, "ex.reveal.") || startsWith(b.line.key, "ex.better."))
+                    continue;
+                for (const auto& a : b.line.args) CHECK(!(a.second.kind == Arg::Kind::Piece && a.second.square == sq("h1")));
+            }
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
