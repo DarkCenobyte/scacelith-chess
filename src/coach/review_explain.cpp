@@ -334,7 +334,12 @@ bool settleLoss(const Ctx& c, int k, int threatPlies, Explanation& ex, bool targ
                 fails = tk.valid() && pn.valid();
             }
         }
-        if (l <= already || !c.lossExplains(l, pawn) || !c.lossExplains(held, pawn)) continue;
+        // What the human wins back only for a while (a pawn taken in the middle of an exchange the
+        // line completes within four more plies) wins nothing back: the loss found again then
+        // counts, up to what this capture leaves.
+        int heldBack = held;
+        for (int j = p + 5; j <= std::min(n, p + 8); ++j) heldBack = std::max(heldBack, std::min(l, c.lossAfter(j)));
+        if (l <= already || !c.lossExplains(l, pawn) || !c.lossExplains(heldBack, pawn)) continue;
         // A reason that names only this capture's target: what was lost before it on other squares
         // is the reason when it explains the move by itself and this capture adds no more ("Nxb3"
         // took the queen: the pawn a discovered attack wins next is not it).

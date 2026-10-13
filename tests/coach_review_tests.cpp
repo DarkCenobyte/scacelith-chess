@@ -437,7 +437,8 @@ TEST(coach_review_bishop_for_a_pawn_is_explained) {
 
 TEST(coach_review_a_trade_is_not_the_piece_lost) {
     // From a recorded game (depth 18): 24...Re6?? 25.Bxf8 hxg4 26.hxg4 Bxg4 27.f3 Rxe2+ 28.Kxe2 loses
-    // the bishop on f8; the rooks are only traded. No line says the rook is what falls.
+    // the bishop on f8 for two pawns; the rooks are only traded. No line says the rook is what falls:
+    // a material reason names the bishop and two points.
     const ai::Analysis a0 = analysisOf({pvl(413, "e7e2 c3e2 f5e4 f2f3 e4f3 e1g1"),
                                         pvl(-249, "e7e6 a3f8 h5g4 h3g4 f5g4 f2f3 e6e2 e1e2 g4e6 f8d6")});
     for (int level = 1; level <= 6; ++level) {
@@ -448,9 +449,12 @@ TEST(coach_review_a_trade_is_not_the_piece_lost) {
         char where[32];
         std::snprintf(where, sizeof where, "trade b%d", level);
         checkScript(r.script, where);
-        for (const Beat& b : r.script)
+        for (const Beat& b : r.script) {
             if (const Arg* t = b.line.arg("t1")) CHECK(t->piece != Rook);
-        CHECK(r.verdict.exType != ExType::Material);
+            if (b.line.key.rfind("ex.material.", 0) != 0) continue;
+            CHECK(b.line.arg("t1") && b.line.arg("t1")->piece == Bishop && b.line.arg("t1")->square == sq("f8"));
+            if (const Arg* pts = b.line.arg("pts")) CHECK_EQ(pts->number, 2);
+        }
     }
 }
 
@@ -1380,6 +1384,23 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 -262 0 0 0 E e6e5 d4e5 e7d6 e5d4 d8c7 d4f6\n"
          "end\n",
          ExType::None, ExType::Exchange, 0},
+        // 7.Bh6?? Nxh6: the bishop hangs, even where the engine's line takes a pawn back for a while
+        // (8.Nbd2 e5 9.dxe5, the pawn won back by ...Nxe5 Nxe5 Qxe5).
+        {"mat_all_156",
+         "rec w f4h6 startpos ; d2d4 e7e6 c2c3 c7c6 g1f3 d7d5 c1f4 b8d7 e2e3 f8e7 f1d3 a7a5\n"
+         "an a0 1 1 0 18 b1d2 3\n"
+         "ln 1 18 93 0 0 0 E b1d2 g8f6 h2h4 d8b6 a1b1 c6c5 d1e2 f6h5 f4h2 h5f6 f3e5 e8g8\n"
+         "ln 2 18 93 0 0 0 E h2h4 d8b6 b1d2 g8f6 a1b1 c6c5 h4h5 e8g8 f3e5 c5d4 e3d4 d7e5 d4e5 f6d7 h5h6 g7g6 e1g1 f7f6 e5f6 d7f6 d1e2\n"
+         "ln 3 18 87 0 0 0 E a2a4 g8f6 h2h4 b7b6 d1e2 c8b7 b1d2 d8c8 h4h5 h7h6 f3e5 e8g8 d2f3 c6c5\n"
+         "an a1 1 1 0 18 f4h6 1\n"
+         "ln 1 18 -779 0 0 0 E f4h6 g8h6 b1d2 d8c7 g2g4 c6c5 g4g5 h6f5 h2h4 f5d6 h4h5 c5c4 d3c2 b7b5 a2a4\n"
+         "an a2 1 0 0 14 g8h6 2\n"
+         "ln 1 14 782 0 0 0 E g8h6 b1d2 e6e5 d4e5 d8c7 d3c2 d7e5 f3e5 c7e5 e3e4 e5e6 d1e2 e8g8 e4d5 c6d5 e2e6 f7e6 e1c1\n"
+         "ln 2 14 674 0 0 0 E g7h6 b1d2 g8f6 e1g1 d8c7 d1e2 h8g8 c3c4 d5c4 d2c4 g8g7 e3e4 b7b5 c4e5 c8b7\n"
+         "an a3 1 1 0 6 h2h4 1\n"
+         "ln 1 6 89 0 0 0 E h2h4 g8f6 b1d2 d8b6 a1b1 c6c5\n"
+         "end\n",
+         ExType::Hanging, ExType::None, 3},
         // 39.Rf5? loses material along the engine's line: never "a better position" for it.
         {"mis_b_160",
          "rec w f2f5 startpos ; e2e4 c7c5 g1e2 d7d6 d2d4 g8f6 e4e5 f6d7 e5e6 f7e6 e2f4 d7f6 a2a4 b8c6 f4e2 g7g6 f2f4 f8h6 d4c5 e8g8 c5d6 e6e5 b1c3 f6g4 d6d7 c8d7 c3a2 d8c7 h2h3 g4f6 d1d7 c7a5 d7d2 a5b6 a4a5 b6c7 e2c3 e5f4 f1c4 g8h8 e1g1 c6a5 c4d3 c7c5 f1f2 a5c4 b2b4 c5c7 h3h4 c4d2 c1b2 f4f3 f2d2 h6e3 g1h1 f3g2 d2g2 e3d4 c3b5 c7d7 a2c3 d4c3 b5c3 d7h3 g2h2 h3f3 h1g1 f3e3 h2f2 a8d8 c3e4 h8g7 a1f1 d8d5 g1g2 d5d4\n"
