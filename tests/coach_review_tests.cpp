@@ -1651,6 +1651,72 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 -572 0 0 0 E e5c5 g1h1 f8g7 f4f5 b7b6 c3b5\n"
          "end\n",
          ExType::Exchange, ExType::Pin, 0},
+        // 11...Be6? Bxd5 Be7 Bxe6 fxe6 Qxe6: four points down, but 11...Qb6 gives up the bishop on d6
+        // too. "You've lost 4 points" for a pawn more would say too much.
+        {"h_355_26",
+         "rec b c8e6 startpos ; c2c4 e7e6 g1f3 d7d5 d2d4 d5c4 e2e3 c7c5 f1c4 g8f6 b1c3 a7a6 d4d5 e6d5 c3d5 f8e7 d1b3 e7d6 e3e4 f6d5 e4e5\n"
+         "an a0 1 0 0 18 d8b6 3\n"
+         "ln 1 18 -43 0 0 0 E d8b6 e5d6 b6b3 c4b3 c8e6 c1g5 b8d7 e1g1 e8g8 a1d1 d5f6 b3e6 f7e6 f1e1 h7h6 g5f4 g8f7 e1e2 a8c8 h2h4 c5c4 f3e5 d7e5 f4e5\n"
+         "ln 2 18 -54 0 0 0 E e8g8 c4d5 d6e7 e1g1 b8c6 f1d1 d8c7 c1f4 c6d8 b3e3 d8e6 h2h4 c8d7 f4g5 e6g5 f3g5 e7g5 h4g5\n"
+         "ln 3 18 -55 0 0 0 E d6e7 c4d5 e8g8 e1g1 b8c6 c1d2 d8c7 a1e1 c8f5 e5e6 f7e6 d5e6 g8h8 e6f5 f8f5 e1e4 a8d8 f1e1 c7d7 d2c3 e7f6 c3f6 f5f6 f3g5 h7h6\n"
+         "an a1 1 0 0 18 c8e6 1\n"
+         "ln 1 18 -218 0 0 0 E c8e6 c4d5 d6e7 d5e6 f7e6 b3e6 b8c6 f3g5 d8d3 e6f7 e8d7 c1e3 a8f8 f7e6 d7c7 a1d1 d3f5 g2g4 f5c2 e1g1 c2e4\n"
+         "an a2 1 1 0 14 c4d5 2\n"
+         "ln 1 14 211 0 0 0 E c4d5 d6e7 d5e6 f7e6 b3e6 b8c6 f3g5 d8d3 e6f7 e8d7 c1e3 a8f8 f7e6 d7c7 a1d1 d3f5 g2g4 f5c2 e1g1 c7b8\n"
+         "ln 2 14 45 0 0 0 E e5d6 d8d6 b3b7 d6c6 b7b3 e8g8 f3g5 b8d7 e1g1 d7b6 c4d3 h7h6 g5e6 c6e6\n"
+         "an a3 1 0 0 6 d8b6 1\n"
+         "ln 1 6 -43 0 0 0 E d8b6 e5d6 b6b3 c4b3 c8e6 e1g1\n"
+         "end\n",
+         ExType::None, ExType::Material, 0},
+        // 25...Kg5? Nxe6+ (a discovered check) Kg6 Nxc7: the mistake is said in words, so the reason
+        // names the queen that falls, not only the check.
+        {"m_1036_18",
+         "rec b g6g5 startpos ; e2e3 b7b5 f1b5 g8f6 a2a3 c7c5 b1c3 a7a6 b5a4 d8b6 d1e2 e7e6 e3e4 h8g8 g1h3 h7h6 e4e5 b6d8 e5f6 c8b7 e1g1 b8c6 e2h5 f8e7 f6g7 c6e5 f2f3 d8c7 d2d3 e7f6 a1b1 g8g7 c3e4 g7g2 g1g2 e8e7 h5h6 b7e4 h6f6 e7f6 f3e4 f6g7 c1d2 a8a7 d2f4 g7f6 f4e3 f6g6 h3f4\n"
+         "an a0 1 0 0 16 g6h7 3\n"
+         "ln 1 16 -493 0 0 0 E g6h7 f4h5 f7f5 e3f4 d7d6 f4e5 d6e5 e4f5 c5c4 f1f3 c7a5 a4e8 a5d2 f3f2\n"
+         "ln 2 16 -576 0 0 0 E g6g7 g2h1 g7f8 b2b4 c5c4 b1d1 e5g4 e3c5 d7d6\n"
+         "ln 3 16 -911 0 0 0 E g6f6 f4d5 f6g7 d5c7 a7c7 g2h1 f7f6 f1g1 g7h8 c2c4 e5d3\n"
+         "an a1 1 0 0 16 g6g5 1\n"
+         "ln 1 16 -989 0 0 0 E g6g5 f4e6 g5g6 e6c7 a7c7 g2h1 g6h7 f1f4 d7d5 f4h4 h7g8\n"
+         "an a2 1 1 0 14 f4e6 2\n"
+         "ln 1 14 965 0 0 0 E f4e6 g5g6 e6c7 a7c7 g2h1 c7c6 f1g1 g6h7 g1g5 e5f3 g5g3 c6g6\n"
+         "ln 2 14 931 0 0 0 E f4d5 g5g6 d5c7 e5g4 e3f4 a7c7 f4c7 g4e3 g2f3 e3f1 b1f1 g6g7 c7e5 g7h7\n"
+         "an a3 1 0 0 6 g6h7 1\n"
+         "ln 1 6 -488 0 0 0 E g6h7 g2h1 a7a8 f4h3 a8h8 f1g1\n"
+         "end\n",
+         ExType::Material, ExType::Discovered, 0},
+        // 8.Bg3? Qb6 Nbd2 Qxb2: a mistake said in words ("I win your pawn"); "if you take back with
+        // exd6, Qxc3 takes your pawn" would stand after moves never said.
+        {"g_1041_7",
+         "rec w f4g3 startpos ; c2c3 c7c6 e2e4 g7g6 d2d4 a7a5 g1f3 a5a4 e4e5 d7d6 c1f4 c8f5 h2h3 f8h6\n"
+         "an a0 1 1 0 16 f4h6 3\n"
+         "ln 1 16 99 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1c4 b8d7 e1g1 d6d5 c4e2 e7e6 c1e3 h7h6 g2g4 f5e4 b1d2 g8e7\n"
+         "ln 2 16 8 0 0 0 E f4h2 d6e5 f3e5 b8d7 e5g4 h6g7 b1a3 f5g4 h3g4 h7h5 g4h5 h8h5 f1e2 h5h8\n"
+         "ln 3 16 8 0 0 0 E f4d2 d6e5 d4e5 f5e4 f1c4 e4f3 d1f3 e7e6 f3e2\n"
+         "an a1 1 1 0 16 f4g3 1\n"
+         "ln 1 16 -44 0 0 0 E f4g3 d8b6 b1d2 b6b2 a1c1 d6d5 g3h4 h6d2 d1d2 a4a3 f1e2 b8d7 e1g1 b2d2 f3d2 h7h5 c3c4 d5c4 d2c4 f5e6 f1e1\n"
+         "an a2 1 0 0 14 d8b6 2\n"
+         "ln 1 14 28 0 0 0 E d8b6 b1d2 b6b2 f1e2 d6d5 a1c1 b2a2 e1g1 a2b2 e5e6 g8f6 e6f7 e8f7 g3h2\n"
+         "ln 2 14 -5 0 0 0 E d6e5 f3e5 g8f6 f1d3 f5e6 e1g1 b8d7\n"
+         "an a3 1 1 0 6 f4h6 1\n"
+         "ln 1 6 53 0 0 0 E f4h6 g8h6 d1c1 h6g8 f1e2 d6e5 f3e5\n"
+         "end\n",
+         ExType::Pin, ExType::None, 0},
+        // 26...Kg8? Rxf4 Nxf4 Rxd8+ Rxd8: the rook takes the queen however it is defended; the check
+        // on the back rank is not why.
+        {"g_1041_189",
+         "rec b f7g8 startpos ; c2c3 g8f6 d2d4 d7d5 h2h3 b7b6 g1f3 c8b7 c1f4 f6e4 f3e5 f7f6 e5d3 b8c6 f2f3 e7e5 e2e3 e4c5 f4h2 c5d7 b1d2 f8d6 e3e4 e5d4 h2d6 d4c3 d2b3 c3b2 d3b2 c6e7 d6a3 c7c5 f1e2 d7e5 f3f4 e5g6 e2b5 e8f7 e1g1 d5e4 b2c4 e7d5 d1d2 a7a6 b5a4 e4e3 d2e1 d5f4 a1d1 e3e2 d1d7\n"
+         "an a0 1 0 0 16 d8d7 3\n"
+         "ln 1 16 -2 0 0 0 E d8d7 a4d7 e2f1r e1f1 b7g2 f1d1 h8d8 d1d6 g2h3 c4b6 d8d7 b6d7 a8e8 d7b6\n"
+         "ln 2 16 -504 0 0 0 E f7g8 f1f4 g6f4 d7d8 a8d8 b3c1 b6b5 c1e2 d8e8 a4d1 b5c4 e1d2 f4d3 e2f4 b7e4 f4d3 c4d3\n"
+         "ln 3 16 -630 0 0 0 E f7f8 f1f2 d8e8 c4b6 f8g8 b3c5 h7h6 c5b7 e8e3 g1h2 e3b6 a3c5 b6b2\n"
+         "an a2 1 1 0 14 f1f4 2\n"
+         "ln 1 14 504 0 0 0 E f1f4 g6f4 d7d8 a8d8 b3c1 b6b5 c1e2 d8e8 a4d1 b5c4 e1d2 f4d3 e2f4 b7e4 f4d3\n"
+         "ln 2 14 421 0 0 0 E f1f2 d8e8 a3c1 a8d8 c1f4 g6f4 f2f4 d8d7 a4d7 e8d7 e1e2 h7h6 f4f2 d7c7 e2e6 g8h7\n"
+         "an a3 1 0 0 6 d8d7 1\n"
+         "ln 1 6 -99 0 0 0 E d8d7 a4d7 e2f1q e1f1\n"
+         "end\n",
+         ExType::Material, ExType::BackRank, 0},
     };
     for (const Case& k : cases) {
         const Recorded rc = recorded(k.rec);

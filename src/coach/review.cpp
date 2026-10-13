@@ -247,8 +247,9 @@ int Ctx::lossWithin(int plies) const {
 
 bool Ctx::lossExplains(int lost, bool pawn) const {
     // A piece for two pawns is a loss when the best move loses nothing; when it loses something too,
-    // the move must lose two points more (one for a pawn).
-    const int need = pawn || bestLoss == 0 ? 1 : 2;
+    // the move must lose two points more (one for a pawn, when the best move loses no more than a
+    // pawn: with a piece gone either way, "you've lost 4 points" for a pawn more says too much).
+    const int need = bestLoss == 0 || (pawn && bestLoss <= 1) ? 1 : 2;
     if (lost < need || lost - bestLoss < need) return false;
     // A pawn explains a drop of up to 2.5 pawns; a piece for a pawn (or the exchange) up to 8: the
     // engine counts a minor piece well above three pawns, more so with the position it leaves.
@@ -1116,8 +1117,12 @@ Review Reviewer::review(const ReviewInput& in) {
         }
         const bool demo = shown.demoPlies > 0 && !c.r.empty();
         // Why the take-back the table would show fails, with the cause when no demonstration plays
-        // the sequence to its end (a cause line said: not the hint).
-        if (!useCause.empty() && !hintOnly && !(demo && demoReachesEnd(c, shown))) {
+        // the sequence to its end (a cause line said: not the hint), where the listener knows the
+        // position it stands in: right after the reply, or at the end of the sequence a material
+        // reason says ({line}, levels 3-6). After "I win it", "if you take back with exd6" would
+        // leave the moves on the way unsaid.
+        if (!useCause.empty() && !hintOnly && !(demo && demoReachesEnd(c, shown)) &&
+            (shown.fullPlies <= 1 || (shown.type == ExType::Material && level_ >= 3))) {
             Beat rb;
             if (retakeBeat(c, shown, c.p1, rb)) useCause.push_back(rb);
         }

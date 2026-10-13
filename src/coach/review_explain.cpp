@@ -681,8 +681,10 @@ bool discovered(const Ctx& c, Explanation& out) {
         return true;
     }
     // A discovered check, when the line then wins material (levels 1-3 and 5: the lines of levels 4
-    // and 6 say the target itself falls).
-    if (c.level == 4 || c.level == 6) return false;
+    // and 6 say the target itself falls). Not for a mistake: said in words, without the
+    // demonstration that shows what the line wins, "my bishop attacks your king" would leave out
+    // the queen that falls.
+    if (c.level == 4 || c.level == 6 || c.j.cls == MoveClass::Mistake) return false;
     for (const Discovery& d : all) {
         if (!d.check) continue;
         for (int k = 1; k < int(c.r.size()) && k <= motifReach(c); ++k) {
@@ -900,6 +902,9 @@ bool backRank(const Ctx& c, Explanation& out) {
         // The check that takes a loose piece and wins no more: that piece was hanging (section 10),
         // whatever the back rank.
         if (at - 1 == i && st.captured != NoPiece && isUndefended(afterR(c, i), st.move.to)) return false;
+        // Nor one that takes a piece worth more than the checking one: it wins it however it is
+        // defended, an exchange (section 11), whatever the back rank ("Rxd8+ Rxd8": the queen).
+        if (at - 1 == i && st.captured != NoPiece && points(st.captured) > points(st.piece)) return false;
         const Square k = c.p1.kingSquare(c.human);
         ex.type = ExType::BackRank;
         ex.concrete = true;

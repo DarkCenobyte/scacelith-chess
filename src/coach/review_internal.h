@@ -45,9 +45,10 @@ struct Ctx {
     // after the move played (mates as +-1000).
     int dropCp = 0;
     // Whether losing 'lost' points (for good, from p0) is the reason the move is bad: a real loss
-    // (1 point when the best move loses nothing or the reason is about a pawn, else 2), one the best
-    // move avoids (by as much), and one the size of the problem (3 points or more; else at least 40 %
-    // of the engine's drop): a pawn named for a collapse would hide what really goes wrong.
+    // (1 point when the best move loses nothing, or a pawn at most and the reason is about a pawn,
+    // else 2), one the best move avoids (by as much), and one the size of the problem (3 points or
+    // more; else at least 40 % of the engine's drop): a pawn named for a collapse would hide what
+    // really goes wrong.
     bool lossExplains(int lost, bool pawn = false) const;
     // The refutation loses material for good, beyond what the best move loses, within its first
     // 'plies' plies: a reason that is about something else (king safety, the endgame, a better plan)
