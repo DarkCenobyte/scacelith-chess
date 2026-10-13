@@ -85,23 +85,27 @@ bool leavesMaterial(const Game& before, const Move& m, int points = 2) {
     return coach::bestCapturePoints(p, p.sideToMove()) >= points;
 }
 
-// A move that costs 10.5 to 14.5 win-% points at depth 12 (every legal move searched; the review,
-// deeper, mostly agrees it is a mistake), picked at random;
-// an invalid move when there is none.
-Move mistakeMove(ai::Engine& e, const Game& g, std::mt19937& rng) {
+// A move that costs what one of the bands says (win-% points at 'depth', every legal move searched;
+// the review, deeper, mostly agrees on its class; a band picked at random, 10.5 to 14.5 when there is
+// none: a mistake), picked at random among those that fit and differ from 'other'; an invalid move
+// when there is none.
+Move badMove(ai::Engine& e, const Game& g, std::mt19937& rng, const std::vector<std::pair<double, double>>& bands,
+             int depth = 12, const std::string& other = std::string()) {
+    const std::pair<double, double> band = bands.empty() ? std::make_pair(10.5, 14.5) : bands[rng() % bands.size()];
     ai::AnalysisRequest r;
     const Position& s = g.startPosition();
     r.startFen = s.isStandardStart() ? std::string() : s.fen();
     r.moves = g.uciMoves();
     r.multiPV = std::min(64, int(g.position().legalMoves().size()));
-    r.depth = 12;
+    r.depth = depth;
     const ai::Analysis a = analyse(e, r);
     if (!a.ok || a.lines.size() < 2) return Move{};
     const double best = coach::winPercent(a.lines[0].score);
     std::vector<Move> picks;
     for (const ai::PvLine& l : a.lines) {
         const double cost = best - coach::winPercent(l.score);
-        if (!l.pv.empty() && cost >= 10.5 && cost <= 14.5) picks.push_back(g.position().parseUCI(l.pv[0]));
+        if (!l.pv.empty() && l.pv[0] != other && cost >= band.first && cost <= band.second)
+            picks.push_back(g.position().parseUCI(l.pv[0]));
     }
     return picks.empty() ? Move{} : picks[rng() % picks.size()];
 }
@@ -134,11 +138,55 @@ int recordMain(const Options& o) {
         return 1;
     }
     int written = 0;
+    const auto stopped = [&]() { return !o.stop.empty() && std::ifstream(o.stop).good(); };
     auto emit = [&](const Record& r) {
         out << writeRecord(r);
         out.flush();
         ++written;
     };
+
+    // Bad moves in recorded positions: each position before a human move whose best line leaves
+    // the game undecided (12 to 88 win-%), with another move that costs what a band says (searched
+    // at depth 10: the self-play's depth 12 for every move costs twice the time, for the class the
+    // review measures again).
+    std::mt19937 prng(o.seed);
+    for (const std::string& path : o.positions) {
+        std::ifstream in(path, std::ios::binary);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        std::vector<Record> recs;
+        std::string err;
+        if (!readRecords(ss.str(), recs, err)) {
+            std::fprintf(stderr, "%s: %s\n", path.c_str(), err.c_str());
+            continue;
+        }
+        const int before = written;
+        for (const Record& src : recs) {
+            if (stopped()) break;
+            if (!src.a0.ok || src.a0.lines.empty()) continue;
+            const double w = coach::winPercent(src.a0.lines[0].score);
+            if (w < 12.0 || w > 88.0) continue;
+            Game g;
+            if (!src.startFen.empty() && !g.resetFromFEN(src.startFen)) continue;
+            bool ok = true;
+            for (const std::string& u : src.moves) {
+                const Move m = g.position().parseUCI(u);
+                if (!m.valid() || !g.play(m)) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok || g.isOver()) continue;
+            ai::EngineSettings host;
+            host.hashMB = 64;
+            host.threads = o.threads;
+            e.configure(host);
+            e.newGame();
+            const Move m = badMove(e, g, prng, o.bands, 10, src.played);
+            if (m.valid()) emit(recordMove(e, g, m, o.depth));
+        }
+        std::fprintf(stderr, "positions %s: %d records\n", path.c_str(), written - before);
+    }
 
     // PGN games.
     for (const std::string& path : o.pgns) {
@@ -197,7 +245,7 @@ int recordMain(const Options& o) {
             bool picked = false;
             if (!m.valid() && humanTurn && o.mistakeRate > 0 &&
                 std::uniform_real_distribution<double>(0, 1)(rng) < o.mistakeRate) {
-                m = mistakeMove(e, g, rng);
+                m = badMove(e, g, rng, o.bands);
                 picked = m.valid();
             }
             if (!m.valid() && humanTurn && randomMove > 0 &&

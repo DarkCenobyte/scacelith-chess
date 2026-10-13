@@ -94,6 +94,9 @@ ex.verdict.inaccuracy.b5.3 = {best} était plus précis que {move}.
 ex.verdict.inaccuracy.b6 = {move} est imprécis ; {best}.
 ex.verdict.inaccuracy.b6.2 = Imprécis. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} était meilleur.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = Ce coup me semble douteux.
+ex.verdict.dubious.2 = Ce coup semble douteux.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Oh, attends ! Tu as raté quelque chose de bien.
 ex.verdict.missed.b1.2 = Regarde encore ! Il y avait mieux.
@@ -182,6 +185,11 @@ ex.offer.b5.3 = On le reprend ?
 ex.offer.b6 = Reprendre ?
 ex.offer.b6.2 = Tu reprends ?
 ex.offer.b6.3 = Réessayer ?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ce coup est douteux, tu peux peut-être faire mieux ?
+ex.dubious.b1.2 = Ce coup est douteux. Tu peux peut-être trouver mieux ?
+ex.dubious.b2 = Ce coup est douteux, tu peux peut-être faire mieux ?
+ex.dubious.b2.2 = Un coup douteux. Il y a peut-être mieux, non ?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.

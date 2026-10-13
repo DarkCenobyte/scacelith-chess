@@ -93,6 +93,9 @@ ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
 ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
 ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
 ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = تبدو هذه النقلة مشكوكًا فيها.
+ex.verdict.dubious.2 = يبدو أن هذه النقلة مشكوك فيها.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = مهلًا! فاتك شيء جيد.
 ex.verdict.missed.b1.2 = انظر مرة أخرى! كان هناك ما هو أفضل.
@@ -181,6 +184,11 @@ ex.offer.b5.3 = استرجاع النقلة؟
 ex.offer.b6 = استرجاع؟
 ex.offer.b6.2 = استرجاع النقلة؟
 ex.offer.b6.3 = إعادة المحاولة؟
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = هذه النقلة مشكوك فيها، ربما تستطيع أن تلعب أفضل؟
+ex.dubious.b1.2 = نقلة مشكوك فيها. ربما تجد أفضل منها؟
+ex.dubious.b2 = نقلة مشكوك فيها. ربما تجد أفضل منها؟
+ex.dubious.b2.2 = هذه النقلة مشكوك فيها، ربما هناك أفضل منها؟
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.

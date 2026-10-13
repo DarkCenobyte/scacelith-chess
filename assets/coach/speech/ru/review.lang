@@ -92,6 +92,9 @@ ex.verdict.inaccuracy.b5.3 = {best} точнее, чем {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточно; лучше {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Лучше было {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = Этот ход выглядит сомнительным.
+ex.verdict.dubious.2 = Этот ход кажется сомнительным.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Ой, подожди! Здесь было кое-что получше.
 ex.verdict.missed.b1.2 = Посмотри ещё раз! Был ход лучше.
@@ -180,6 +183,11 @@ ex.offer.b5.3 = Переиграешь?
 ex.offer.b6 = Вернуть?
 ex.offer.b6.2 = Берёшь назад?
 ex.offer.b6.3 = Ещё попытка?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Сомнительный ход. Может, найдёшь лучше?
+ex.dubious.b1.2 = Этот ход сомнительный. Может, сыграешь лучше?
+ex.dubious.b2 = Сомнительный ход. Может, сыграешь лучше?
+ex.dubious.b2.2 = Этот ход сомнительный. Может, найдёшь лучше?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move (the first two variants are the bare move, as in English).

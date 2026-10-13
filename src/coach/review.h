@@ -112,6 +112,9 @@ struct TakebackRecord {
     // A blunder offered back without its reason or the better move ("your knight had a better
     // move"): that move, said once the offer is declined; 'found': the replacement is that move.
     bool hintOnly = false;
+    // A dubious move offered back at levels 1-2 ("maybe you can do better?"): nothing said when the
+    // offer is answered; 'found' as for hintOnly.
+    bool dubious = false;
     std::string bestUci;
     bool found = false;
 };

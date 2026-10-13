@@ -867,14 +867,35 @@ int reviewMain(const Options& o) {
             if (explained && v.cls == MoveClass::Inaccuracy && demo &&
                 worstLoss(c.playedLine, c.p0, c.human, c.base, 9) < 3)
                 f.push_back({"INACCURACY_DEMO", exTypeName(t)});
+            // A dubious move (an inaccuracy) gets a remark and nothing more (review.cpp): the slip that
+            // names the better move, "that move looks dubious", a tip, or at levels 1-2 "maybe you can
+            // do better?" said with the takeback card. Levels 1-2 keep their word and offer for a free
+            // piece or a mate missed.
+            const bool missedKept = level <= 2 && (t == ExType::MissedCapture || t == ExType::MateMissed);
+            bool dubiousOffer = false;
+            for (const Beat& b : rev.script)
+                if (b.kind == BeatKind::OfferTakeback && b.line.key.rfind("ex.dubious.", 0) == 0) dubiousOffer = true;
+            if (dubiousOffer && (v.cls != MoveClass::Inaccuracy || level > 2))
+                f.push_back({"DUBIOUS_OFFER", std::string(className(v.cls)) + " at level " + std::to_string(level)});
+            if (v.cls == MoveClass::Inaccuracy && !missedKept)
+                for (const Beat& b : rev.script) {
+                    const std::string& k = b.line.key;
+                    const bool remark = k.rfind("ex.verdict.inaccuracy.", 0) == 0 || k == "ex.verdict.dubious" ||
+                                        k.rfind("tip.", 0) == 0 ||
+                                        (level <= 2 && b.kind == BeatKind::OfferTakeback && k.rfind("ex.dubious.", 0) == 0);
+                    if (!remark) {
+                        f.push_back({"DUBIOUS_MORE", k.empty() ? "beat kind " + std::to_string(int(b.kind)) : k});
+                        break;
+                    }
+                }
             // Levels 1-2 offer a free piece or a mate missed back whatever it costs (review.cpp).
-            if (offer && v.cls == MoveClass::Inaccuracy &&
-                !(level <= 2 && (t == ExType::MissedCapture || t == ExType::MateMissed)))
+            if (offer && !dubiousOffer && v.cls == MoveClass::Inaccuracy && !missedKept)
                 f.push_back({"OFFER_INACCURACY", exTypeName(t)});
-            if (offer && v.cls != MoveClass::Blunder && t != ExType::MateAllowed && t != ExType::MateMissed &&
-                t != ExType::Stalemate && t != ExType::MissedCapture)
+            if (offer && !dubiousOffer && v.cls != MoveClass::Blunder && t != ExType::MateAllowed &&
+                t != ExType::MateMissed && t != ExType::Stalemate && t != ExType::MissedCapture)
                 f.push_back({"OFFER_NOT_BLUNDER", className(v.cls)});
-            if (offer && v.wPlayed >= 75.0) f.push_back({"OFFER_STILL_WINNING", std::to_string(int(v.wPlayed)), false});
+            if (offer && !dubiousOffer && v.wPlayed >= 75.0)
+                f.push_back({"OFFER_STILL_WINNING", std::to_string(int(v.wPlayed)), false});
             if (verdictKey.rfind("ex.verdict.blunder", 0) == 0 && v.cls != MoveClass::Blunder)
                 f.push_back({"VERDICT_CLASS", verdictKey + " for " + className(v.cls)});
             if (!verdictKey.empty() && !demo)

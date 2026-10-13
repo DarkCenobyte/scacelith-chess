@@ -101,6 +101,9 @@ ex.verdict.inaccuracy.b5.3 = Точніше було {best}, ніж {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточність; {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Краще {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = Цей хід виглядає сумнівним.
+ex.verdict.dubious.2 = Цей хід здається сумнівним.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Ой, зачекай! Тут був гарний хід.
 ex.verdict.missed.b1.2 = Подивись ще раз! Був кращий хід.
@@ -189,6 +192,11 @@ ex.offer.b5.3 = Повернути хід?
 ex.offer.b6 = Повернути?
 ex.offer.b6.2 = Повернути хід?
 ex.offer.b6.3 = Ще раз?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Сумнівний хід. Може, знайдеш кращий?
+ex.dubious.b1.2 = Цей хід сумнівний. Може, зіграєш краще?
+ex.dubious.b2 = Сумнівний хід. Може, зіграєш краще?
+ex.dubious.b2.2 = Цей хід сумнівний. Може, знайдеш кращий?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.

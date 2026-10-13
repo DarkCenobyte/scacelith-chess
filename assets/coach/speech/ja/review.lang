@@ -114,6 +114,11 @@ ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
 ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
 ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = その手は疑問手のようです。
+ex.verdict.dubious.spoken = その手はぎもんしゅのようです。
+ex.verdict.dubious.2 = 疑問手かもしれませんね。
+ex.verdict.dubious.2.spoken = ぎもんしゅかもしれませんね。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = あれ？いい手を見逃しましたよ。
 ex.verdict.missed.b1.2 = もう一度見てみましょう！もっと良い手がありました。
@@ -212,6 +217,15 @@ ex.offer.b5.3 = 取り消しますか？
 ex.offer.b6 = 戻しますか？
 ex.offer.b6.2 = 取り消しますか？
 ex.offer.b6.3 = やり直しますか？
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = その手は疑問手です。もっと良い手が見つかるかもしれませんよ？
+ex.dubious.b1.spoken = その手はぎもんしゅです。もっと良い手が見つかるかもしれませんよ？
+ex.dubious.b1.2 = 疑問手ですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b1.2.spoken = ぎもんしゅですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2 = 疑問手ですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2.spoken = ぎもんしゅですね。もっと良い手があるかもしれませんよ？
+ex.dubious.b2.2 = その手は疑問手です。もっと良くできるかもしれませんよ？
+ex.dubious.b2.2.spoken = その手はぎもんしゅです。もっと良くできるかもしれませんよ？
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.

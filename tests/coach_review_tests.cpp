@@ -1171,8 +1171,10 @@ TEST(coach_review_small_loss_never_explains_a_collapse) {
 
 TEST(coach_review_rook_lost_in_a_lost_position) {
     // From a recorded game (depth 18): 16.Kg2? Nxg3+ 17.Kxg3 Qxh1 loses the exchange and more, in a
-    // position already lost (W% 16 -> 10: an inaccuracy by the numbers). The rook falls for good:
-    // shown as what it is, never as "a small slip", without a verdict and without an offer.
+    // position already lost (W% 16 -> 10: an inaccuracy by the numbers). A dubious move gets a remark
+    // and nothing more: "that move looks dubious" (levels 3-6; "a bit better" would play the rook
+    // down), "... maybe you can do better?" with the takeback card (levels 1-2). Never a verdict, a
+    // reason or a demonstration.
     const std::vector<const char*> moves = {"d4", "d5", "e3", "Nf6", "Bb5+", "Bd7", "Bxd7+", "Nbxd7", "f4", "Rc8",
                                             "c4", "dxc4", "Na3", "Nb6", "Bd2", "Qd5", "b3", "cxb3", "axb3", "Ne4",
                                             "g3", "e6", "Bc1", "Qa5+", "Kf1", "Qd5", "Nc4", "Rd8", "Ne5", "a6", "Kg2"};
@@ -1194,21 +1196,81 @@ TEST(coach_review_rook_lost_in_a_lost_position) {
         checkScript(r.script, where);
         CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
         CHECK(r.verdict.voiced);
-        CHECK(!r.offersTakeback);
-        for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.verdict."));
-        if (level <= 3) {
-            // The whole sequence: the knight's capture, the king's, the rook taken; three points net.
-            CHECK_EQ(demoMoves(r.script), 3);
-            const Beat* res = beatWithKey(r.script, "ex.result.b" + std::to_string(level));
-            CHECK(res != nullptr);
-            if (res && res->line.arg("pts")) CHECK_EQ(res->line.arg("pts")->number, 3);
+        CHECK_EQ(demoMoves(r.script), 0);
+        CHECK_EQ(r.script.size(), size_t(1));
+        if (r.script.empty()) continue;
+        if (level <= 2) {
+            CHECK(r.offersTakeback);
+            CHECK(r.script[0].kind == BeatKind::OfferTakeback);
+            CHECK_EQ(r.script[0].line.key, "ex.dubious.b" + std::to_string(level));
         } else {
-            // Up to the problem, then the rook on h1 is pointed at.
-            CHECK(demoMoves(r.script) >= 1 && demoMoves(r.script) <= 2);
-            const Beat* point = beatWithKey(r.script, "ex.point.piece");
-            CHECK(point != nullptr);
-            if (point && point->line.arg("t1")) CHECK_EQ(point->line.arg("t1")->square, sq("h1"));
+            CHECK(!r.offersTakeback);
+            CHECK_EQ(r.script[0].line.key, std::string("ex.verdict.dubious"));
         }
+    }
+}
+
+TEST(coach_review_dubious_move_invites_a_retry_at_levels_1_2) {
+    // 1.a4 gives the b4 pawn to the rook: W% 59 -> 50, an inaccuracy. Levels 3-6: the better move
+    // named in one line. Levels 1-2: "that move is dubious, maybe you can do better?" with the
+    // takeback card, the move kept back: nothing said when the offer is answered, the coach's praise
+    // when the replay finds the best move, and not again on a replay.
+    const char* fen = "1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1";
+    const ai::Analysis a0 = analysisOf({pvl(100, "g1f1 g8f8"), pvl(0, "a3a4 b8b4 g1f1")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"a4"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, a0);
+        char where[32];
+        std::snprintf(where, sizeof where, "dubious b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
+        CHECK_EQ(demoMoves(r.script), 0);
+        CHECK_EQ(r.script.size(), size_t(1));
+        if (r.script.empty()) continue;
+        if (level >= 3) {
+            CHECK(!r.offersTakeback);
+            CHECK(startsWith(r.script[0].line.key, "ex.verdict.inaccuracy.b"));
+            continue;
+        }
+        CHECK(r.offersTakeback);
+        CHECK_EQ(r.script[0].line.key, "ex.dubious.b" + std::to_string(level));
+        CHECK(r.script[0].line.arg("best") == nullptr);
+        // Accepted: no hint. The replay finds the best move: praised.
+        CHECK(g.undo(1));
+        CHECK(rv.takebackAccepted(g).empty());
+        g.play(g.position().parseSAN("Kf1"));
+        Review found = reviewOf(rv, g, a0);
+        CHECK(found.isRetry && found.takeback.found);
+        CHECK(!found.offersTakeback);
+        CHECK(!found.script.empty());
+        if (!found.script.empty()) CHECK_EQ(found.script.front().line.key, std::string("tb.found.b1"));
+        checkScript(found.script, "dubious found");
+        // Replayed as a dubious move again: no second offer.
+        Game g2 = gameOf(fen, {"a4"});
+        Reviewer rv2;
+        rv2.reset(level, White);
+        CHECK(reviewOf(rv2, g2, a0).offersTakeback);
+        CHECK(g2.undo(1));
+        rv2.takebackAccepted(g2);
+        g2.play(g2.position().parseSAN("a4"));
+        Review same = reviewOf(rv2, g2, a0);
+        CHECK(same.isRetry && same.takeback.same);
+        CHECK(!same.offersTakeback);
+        // Declined: nothing said, the move not named.
+        Game g3 = gameOf(fen, {"a4"});
+        Reviewer rv3;
+        rv3.reset(level, White);
+        CHECK(reviewOf(rv3, g3, a0).offersTakeback);
+        CHECK(rv3.takebackDeclined().empty());
+        // No offers in this mode: nothing said (the line invites a retry).
+        Game g4 = gameOf(fen, {"a4"});
+        Reviewer rv4;
+        rv4.reset(level, White, false);
+        Review off = reviewOf(rv4, g4, a0);
+        CHECK(!off.offersTakeback);
+        CHECK(!hasKeyPrefix(off.script, "ex.dubious"));
     }
 }
 
@@ -2122,7 +2184,7 @@ TEST(coach_review_stalemate_trick_needs_the_sacrifice) {
 TEST(coach_review_inaccuracy_is_not_called_a_mistake) {
     // 1.a4 leaves the b4 pawn to the rook: an inaccuracy (the appraisal counts it so). It is never
     // called a mistake, never played out on the table nor offered back; level 6 says the better move
-    // in one short line, levels 3-5 only for a larger slip (this one is small), levels 1-2 never.
+    // in one short line, levels 1-5 only for a larger slip (this one is small).
     const char* fen = "1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1";
     for (int level = 1; level <= 6; ++level) {
         Game g = gameOf(fen, {"a4"});
@@ -2915,6 +2977,7 @@ TEST(coach_review_every_key_exists) {
     const Family families[] = {
         {"ex.verdict.blunder", 1, 6}, {"ex.verdict.mistake", 3, 6}, {"ex.verdict.inaccuracy", 3, 6},
         {"ex.verdict.missed", 1, 2}, {"ex.better", 3, 6}, {"ex.rewind", 1, 4}, {"ex.offer", 1, 6},
+        {"ex.dubious", 1, 2},
         {"ex.result", 1, 3}, {"ex.result_back", 1, 3}, {"ex.material", 1, 6},
         {"ex.mate_allowed", 1, 6}, {"ex.mate_missed", 1, 6}, {"ex.mate_delayed", 5, 6}, {"ex.stalemate", 1, 6},
         {"ex.stalemate_trick", 1, 6}, {"ex.fork", 1, 6}, {"ex.discovered", 1, 6}, {"ex.skewer", 1, 6},
@@ -2944,7 +3007,7 @@ TEST(coach_review_every_key_exists) {
         "tip.mate_technique.b1", "tip.fifty.b1", "tip.repetition.b1", "praise.sacrifice", "praise.fork.b2",
         "praise.fork.b3", "praise.castle.b1", "praise.saved.b1", "praise.book.b1", "threat.punish.b1",
         "tb.hint.b1", "tb.hint.king.b1", "tb.hint.missed.b1", "tb.hint.mate_missed.b1", "tb.hint.general.b1",
-        "tb.fixed.b1", "tb.fixed", "tb.same",
+        "tb.fixed.b1", "tb.fixed", "tb.same", "ex.verdict.dubious",
     };
     for (const Family& f : families)
         for (int l = f.from; l <= f.to; ++l) {

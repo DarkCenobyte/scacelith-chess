@@ -94,6 +94,9 @@ ex.verdict.inaccuracy.b5.3 = {best}比{move}更精确。
 ex.verdict.inaccuracy.b6 = {move}不精确，该走{best}。
 ex.verdict.inaccuracy.b6.2 = 欠精确。应走{best}。
 ex.verdict.inaccuracy.b6.3 = {best}更好。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+ex.verdict.dubious = 这步棋看起来有点可疑。
+ex.verdict.dubious.2 = 这步棋似乎有点可疑。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = 哦，等等！你错过了一步好棋。
 ex.verdict.missed.b1.2 = 再看看！刚才有更好的走法。
@@ -182,6 +185,11 @@ ex.offer.b5.3 = 收回这步吗？
 ex.offer.b6 = 悔棋？
 ex.offer.b6.2 = 收回这步？
 ex.offer.b6.3 = 重下？
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = 这步棋有点可疑，也许你能下得更好？
+ex.dubious.b1.2 = 这步棋有些可疑，也许你能找到更好的？
+ex.dubious.b2 = 这步棋有些可疑，也许你能找到更好的？
+ex.dubious.b2.2 = 这步棋有点可疑，也许还有更好的下法？
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
 # Levels 4-6: just the move.

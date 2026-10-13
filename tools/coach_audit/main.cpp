@@ -29,6 +29,12 @@ int main(int argc, char** argv) {
         else if (a == "--hang-rate") o.hangRate = std::atof(next().c_str());
         else if (a == "--mistake-rate") o.mistakeRate = std::atof(next().c_str());
         else if (a == "--mistakes-only") o.mistakesOnly = true;
+        else if (a == "--positions") o.positions.push_back(next());
+        else if (a == "--band") {
+            const double lo = std::atof(next().c_str());
+            o.bands.push_back({lo, std::atof(next().c_str())});
+        }
+        else if (a == "--stop") o.stop = next();
         else if (a == "--verify") o.verify = std::atoi(next().c_str());
         else if (a == "--cache") o.cache = next();
         else {

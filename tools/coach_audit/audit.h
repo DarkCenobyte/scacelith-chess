@@ -1,12 +1,17 @@
 // coach_audit: an audit of the coach's review (src/coach/review.h) and of the Analysis mode's
 // commentary (src/analysis/commentary.h) against the board.
 //   coach_audit record --out FILE [--pgn FILE]... [--selfplay N --seed S] [--depth D] [--threads T]
-//                      [--material-only] [--hang-rate R]
+//                      [--material-only] [--hang-rate R] [--positions FILE]... [--band LO HI]...
+//                      [--stop FILE]
 //       runs the analyses a Coach game asks for on every move of the human side (embedded Stockfish);
 //       --material-only: only the moves after which the coach can win 2 points or more by exchange
 //       (the moves whose review shows a loss, a few times quicker to gather); --hang-rate R: in
 //       self-play, the "human" plays with probability R a random move that leaves 3 points or more
-//       to win by exchange (when one exists), for audits of the coach's demonstrations
+//       to win by exchange (when one exists), for audits of the coach's demonstrations;
+//       --positions FILE: in each undecided position before a recorded human move (a record file),
+//       a move that costs what a --band says instead (every move of those that fit, one at random;
+//       a band picked at random per position), for audits of bad moves only; --stop FILE: ends
+//       before the next record once FILE exists (every record written stays whole)
 //   coach_audit review --in FILE [--level L] [--out FILE] [--all]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
@@ -44,6 +49,11 @@ struct Options {
     double mistakeRate = 0.0;    // record, self-play: share of the human's moves picked among those that
                                  // cost 8 to 20 win-% points at depth 10 (around the mistake band)
     bool mistakesOnly = false;   // record, self-play: only the moves picked so (with --mistake-rate)
+    std::vector<std::string> positions;   // record: record files whose positions get a bad move (--band)
+    // record: the costs in win-% points at depth 12 of the moves picked (--mistake-rate, --positions),
+    // one band picked at random per move; none = 10.5 to 14.5 (a mistake)
+    std::vector<std::pair<double, double>> bands;
+    std::string stop;            // record: ends before the next record once this file exists
     int verify = 0;              // review: depth of the engine's check of every move shown or said (0 = none)
     std::string cache;           // review --verify: the verdicts kept between runs
 };

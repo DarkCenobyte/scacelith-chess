@@ -926,23 +926,37 @@ Review Reviewer::review(const ReviewInput& in) {
     // at most a short word about the better move, levels 3-6, never a scenario, a demonstration or
     // an offer.
     bool slip = false;
-    // A piece or more lost on the board in a position already one-sided (the win percentage barely
-    // moves): shown as the mistake it is, without a verdict or an offer.
+    // An inaccuracy gets a remark and nothing more: no reason, scenario, demonstration or better
+    // line. Levels 3-6: the slip above, or "that move looks dubious" alone when the move loses
+    // material ("a bit better" would play it down). Levels 1-2: "that move is dubious, maybe you can
+    // do better?" with the takeback offered, the move kept back. A free piece or a mate missed keeps
+    // its word and offer at levels 1-2 (the detectors set ex.offer there).
+    bool dubious = false;
     const bool materialType = ex.type == ExType::Fork || ex.type == ExType::Discovered || ex.type == ExType::Skewer ||
                               ex.type == ExType::Pin || ex.type == ExType::Trapped || ex.type == ExType::BackRank ||
                               ex.type == ExType::Hanging || ex.type == ExType::Exchange || ex.type == ExType::Material;
-    const bool hiddenLoss = cls == MoveClass::Inaccuracy && found && materialType && ex.lost >= 3;
-    if (found && ex.type == ExType::Stalemate) voice = true;
+    // A piece or more lost on the board while the win percentage barely moves (a one-sided game):
+    // said whatever the slip's size.
+    const bool lostPiece = found && materialType && ex.lost >= 3;
+    const bool missedKept = level_ <= 2 && found && (ex.type == ExType::MateMissed || missedPiece);
+    if (cls == MoveClass::Inaccuracy && !missedKept) {
+        isRemark = true;
+        const bool due = !c.isBest && !c.best.empty() && humanMoves_ - lastSlip_ >= 3;
+        if (level_ <= 2) {
+            // One offer per move: not on its replay.
+            dubious = due && (c.j.delta >= 7.0 || lostPiece) && offersEnabled_ && !retry && !g.isOver();
+        } else if (c.concreteLoss(8)) {
+            dubious = due && (level_ == 6 || c.j.delta >= 7.0 || lostPiece);
+        } else {
+            slip = due && (level_ == 6 || c.j.delta >= 7.0);
+        }
+        voice = slip || dubious;
+    } else if (found && ex.type == ExType::Stalemate) voice = true;
     else if (found && ex.type == ExType::MateMissed) voice = true;   // the detector checks the band's limit
     else if (missedPiece) voice = true;
-    else if (hiddenLoss) {
-        voice = true;
-        isRemark = true;
-    } else if (cls == MoveClass::Inaccuracy || (fault && !reason && stillBetter)) {
+    else if (fault && !reason && stillBetter) {
         // Never for a move that loses material: "a bit better" would play it down.
-        slip = level_ >= 3 && !c.isBest && !c.best.empty() && !c.concreteLoss(8) &&
-               (cls != MoveClass::Inaccuracy ||
-                ((level_ == 6 || c.j.delta >= 7.0) && humanMoves_ - lastSlip_ >= 3));
+        slip = level_ >= 3 && !c.isBest && !c.best.empty() && !c.concreteLoss(8);
         voice = slip;
         isRemark = true;
     } else if (fault) {
@@ -964,16 +978,17 @@ Review Reviewer::review(const ReviewInput& in) {
         default: voice = true; isRemark = cls != MoveClass::Blunder; break;
         }
     }
-    if (voice && decidedWin && !(ex.type == ExType::Stalemate || ex.type == ExType::MateMissed)) voice = false;
-    if (voice && decidedLoss && !(level_ <= 2 && ex.type == ExType::MateAllowed && ex.concrete)) voice = false;
+    const bool remarkOnly = slip || dubious;
+    if (voice && decidedWin && (remarkOnly || !(ex.type == ExType::Stalemate || ex.type == ExType::MateMissed))) voice = false;
+    if (voice && decidedLoss && (remarkOnly || !(level_ <= 2 && ex.type == ExType::MateAllowed && ex.concrete))) voice = false;
     if (voice && (cls == MoveClass::Forced || cls == MoveClass::Book) && !mateType && ex.type != ExType::Stalemate) voice = false;
     if (voice && isRemark && !remarkAllowed()) voice = false;
     if (voice && retry && out.takeback.same) voice = false;
     // A mistake, not a blunder, with a reason the board shows: said in words, without a
     // demonstration (nor a takeback); the coach then plays its move and the player answers it.
-    // Mates and a piece lost while the game stays one-sided (hiddenLoss) are still shown.
-    const bool spoken = cls == MoveClass::Mistake && reason && !hiddenLoss && !mateType && ex.type != ExType::Stalemate;
-    if (!voice) slip = false;
+    // Mates are still shown.
+    const bool spoken = cls == MoveClass::Mistake && reason && !mateType && ex.type != ExType::Stalemate;
+    if (!voice) slip = dubious = false;
     // A principle instead (opening, technique): never a fault claim, Low priority, once per game each.
     Explanation tipEx;
     bool tip = false;
@@ -982,6 +997,26 @@ Review Reviewer::review(const ReviewInput& in) {
 
     Script s;
     const int ply = c.ply;
+    // The takeback offered: its line said and the card shown; the move remembered for the replay.
+    auto pushOffer = [&](const std::string& key) {
+        Beat ob;
+        ob.kind = BeatKind::OfferTakeback;
+        ob.line.key = key;
+        ob.look = Look::Player;
+        ob.ply = ply;
+        ob.gestures.push_back(Gesture{GestureKind::Open, NoSquare, {}, "", 0.0f, false});
+        s.push_back(ob);
+        ++offers_;
+        if (offered_.ply == ply) ++offersAtPly_;
+        else offersAtPly_ = 1;
+        offered_ = TakebackRecord{};
+        offered_.ply = ply;
+        offered_.firstUci = c.playedUci;
+        offeredHint_ = NoSquare;
+        offeredReveal_ = Beat{};
+        out.offersTakeback = true;
+        v.offered = true;
+    };
 
     // A replayed move after a takeback.
     if (retry) {
@@ -989,14 +1024,15 @@ Review Reviewer::review(const ReviewInput& in) {
             s.push_back(sayBeat("tb.same", Look::Player, ply));
         } else {
             out.takeback.fixed = c.j.delta < 5.0;
-            out.takeback.found = retry_.hintOnly && c.playedUci == retry_.bestUci;
+            out.takeback.found = (retry_.hintOnly || retry_.dubious) && c.playedUci == retry_.bestUci;
             if (out.takeback.found) {
                 // The move the hint was about.
                 Beat b = sayBeat(level_ <= 2 ? "tb.found.b1" : "tb.found", Look::Player, ply);
                 b.gestures.push_back(Gesture{GestureKind::Nod, NoSquare, {}, "", 0.0f, false});
                 s.push_back(b);
             } else if (out.takeback.fixed) {
-                Beat b = sayBeat(level_ <= 2 ? "tb.fixed.b1" : "tb.fixed", Look::Player, ply);
+                // After a dubious move, "much better" would say too much.
+                Beat b = sayBeat(level_ <= 2 && !retry_.dubious ? "tb.fixed.b1" : "tb.fixed", Look::Player, ply);
                 b.gestures.push_back(Gesture{GestureKind::Nod, NoSquare, {}, "", 0.0f, false});
                 s.push_back(b);
             }
@@ -1012,6 +1048,20 @@ Review Reviewer::review(const ReviewInput& in) {
         vb.line.with("move", Arg::ofMove(c.playedSan, c.playedUci)).with("best", moveArg(c.best[0]));
         traceMove(vb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
         s.push_back(vb);
+    } else if (dubious) {
+        // "That move looks dubious" (levels 3-6); "... maybe you can do better?" with the takeback
+        // offered (levels 1-2), nothing said on an answer, the coach's praise if the replay finds
+        // the best move.
+        v.voiced = true;
+        noteRemark();
+        lastSlip_ = humanMoves_;
+        if (level_ <= 2) {
+            pushOffer(bandKey("ex.dubious", level_));
+            offered_.dubious = true;
+            offered_.bestUci = c.l1->pv[0];
+        } else {
+            s.push_back(sayBeat("ex.verdict.dubious", Look::Player, ply));
+        }
     } else if (voice) {
         v.voiced = true;
         if (isRemark) noteRemark();
@@ -1021,7 +1071,7 @@ Review Reviewer::review(const ReviewInput& in) {
         // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
         const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
         bool offer = hintOnly || (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) ||
-                     (ex.offer && !hiddenLoss && !wonAnyway);
+                     (ex.offer && !wonAnyway);
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
@@ -1065,7 +1115,7 @@ Review Reviewer::review(const ReviewInput& in) {
         // No verdict for a move that is not a fault (a slower mate at levels 5-6, a free piece
         // missed with a small loss at levels 1-2 gets the "missed" one): the cause says it all.
         if (ex.missed && level_ <= 2) verdictKey = bandKey("ex.verdict.missed", level_);
-        else if (wonAnyway || hiddenLoss) verdictKey.clear();
+        else if (wonAnyway) verdictKey.clear();
         else if (cls == MoveClass::Blunder) {
             verdictKey = bandKey("ex.verdict.blunder", level_);
             shake = true;
@@ -1143,30 +1193,15 @@ Review Reviewer::review(const ReviewInput& in) {
         }
         if (better) s.push_back(betterBeat());
         if (offer) {
-            Beat ob;
-            ob.kind = BeatKind::OfferTakeback;
-            ob.line.key = bandKey("ex.offer", level_);
-            ob.look = Look::Player;
-            ob.ply = ply;
-            ob.gestures.push_back(Gesture{GestureKind::Open, NoSquare, {}, "", 0.0f, false});
-            s.push_back(ob);
-            ++offers_;
-            if (offered_.ply == ply) ++offersAtPly_;
-            else offersAtPly_ = 1;
-            offered_ = TakebackRecord{};
-            offered_.ply = ply;
-            offered_.firstUci = c.playedUci;
+            pushOffer(bandKey("ex.offer", level_));
             offered_.firstType = ex.type;
             offeredHint_ = ex.hintSquare;
-            offeredReveal_ = Beat{};
             if (hintOnly) {
                 offered_.hintOnly = true;
                 offered_.bestUci = c.l1->pv[0];
                 offeredHint_ = c.best[0].move.from;   // the piece, back on its square after the takeback
                 offeredReveal_ = betterBeat();
             }
-            out.offersTakeback = true;
-            v.offered = true;
         } else {
             if (noneLeft && !noneLeftSaid_) {
                 s.push_back(sayBeat("tb.none_left", Look::Player, ply));
@@ -1335,7 +1370,8 @@ Script Reviewer::takebackAccepted(const Game& g, bool fromOffer) {
     retry_ = offered_;
     // The card answered yes: one of the level's takebacks gone (levels 4-6, not for a mate).
     if (fromOffer && offerUsesTakeback()) ++takebacks_;
-    if (level_ > 2) return s;
+    // A dubious move: no hint, the player looks again on their own.
+    if (level_ > 2 || offered_.dubious) return s;
     const int ply = int(g.moves().size());
     const Position& p = g.position();
     // A hint-only offer named the piece with the better move: the hint stays on it.
