@@ -381,7 +381,8 @@ void checkFork(const Ctx& c, const Beat& b, std::vector<Finding>& out) {
 Move biggerPrize(const Position& before, const Move& m) {
     const Piece victim = before.at((m.flags & MoveEnPassant) ? Square(m.to + (before.sideToMove() == White ? -8 : 8)) : m.to);
     const int took = victim.empty() ? 0 : kPiecePoints[victim.type];
-    const int gain = victim.empty() ? 0 : seePoints(before, m);
+    // A promotion wins the new piece (a8=Q gains more than the knight left standing).
+    const int gain = victim.empty() && m.promotion == NoPiece ? 0 : seePoints(before, m);
     Move prize;
     int most = gain + 2;
     for (const Move& x : before.legalMoves()) {

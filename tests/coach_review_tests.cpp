@@ -1634,6 +1634,23 @@ TEST(coach_review_recorded_reasons_hold) {
          "ln 1 6 470 0 0 0 E d8a5 f1d3 d4c3 g1e2 c8e6 e1g1\n"
          "end\n",
          ExType::None, ExType::None, 0},
+        // 11...Ne7? fxe5: a pawn takes the queen. The knight on g6 that could not take back (pinned
+        // to the king) would not have saved it either: no pinned-defender reason.
+        {"m_349_40",
+         "rec b c6e7 startpos ; e2e4 f7f6 g1f3 b8c6 f1c4 a7a5 b1c3 e7e6 a2a4 g8e7 e1g1 g7g5 f3g5 f6g5 d1h5 e7g6 d2d3 d8f6 c1g5 f6e5 f2f4\n"
+         "an a0 1 0 0 18 e5c5 3\n"
+         "ln 1 18 -572 0 0 0 E e5c5 g1h1 f8e7 f4f5 c5e5 f5g6 h7g6 h5g6 e8d8 g5f4 e5h5 g6h5 h8h5 c3e2 d7d6 f4d2 h5g5\n"
+         "ln 2 18 -606 0 0 0 E e5g7 c3b5 d7d5 e4d5 c6d4 d5e6 c8e6 f4f5 e6c4 a1e1 e8d7 d3c4 f8c5 g1h1 d4b5 f5g6 h7g6\n"
+         "ln 3 18 -639 0 0 0 E f8c5 g1h1 e5g7 c3b5 c5b6 f4f5 h8g8 g5h6 g7h8 h6f4 d7d6 f5e6 c6e5 f4g5\n"
+         "an a1 1 0 0 18 c6e7 1\n"
+         "ln 1 18 -1097 0 0 0 E c6e7 f4e5 c7c6 f1f6 e8d8 f6g6 d8c7 g6f6 e7g6 f6f8 g6f8 a1f1 f8g6\n"
+         "an a2 1 1 0 14 f4e5 2\n"
+         "ln 1 14 1095 0 0 0 E f4e5 c7c6 f1f6 e8d8 f6g6 d8c7 g6f6 e7g6 f6f8 g6f8 a1f1 f8g6 f1f6 c7b6 g5e3 c6c5\n"
+         "ln 2 14 587 0 0 0 E g1h1 e5c5 f4f5 f8g7 f5f6 g7f8 c3b5 e8d8 b2b3 e7c6 d3d4 c6d4 f6f7 f8e7 g5e7 c5e7 b5d4\n"
+         "an a3 1 0 0 6 e5c5 1\n"
+         "ln 1 6 -572 0 0 0 E e5c5 g1h1 f8g7 f4f5 b7b6 c3b5\n"
+         "end\n",
+         ExType::Exchange, ExType::Pin, 0},
     };
     for (const Case& k : cases) {
         const Recorded rc = recorded(k.rec);

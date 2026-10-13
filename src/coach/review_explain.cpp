@@ -788,8 +788,10 @@ bool pin(const Ctx& c, Explanation& out) {
         return true;
     }
     // (b) A pinned piece is a bad defender: the only defender of the captured piece is pinned, and
-    // still cannot take back after the reply (a pinner that captured off the line freed it).
-    if (r0.captured != NoPiece) {
+    // still cannot take back after the reply (a pinner that captured off the line freed it). Not
+    // when a cheaper piece takes it: a defender free to take back would not have saved it either
+    // (fxe5 takes the queen, the pinned knight on g6 is not why).
+    if (r0.captured != NoPiece && points(r0.piece) >= points(r0.captured)) {
         const Square s = r0.move.to;
         const uint64_t defenders = c.p1.attackersTo(s, c.human);
         const uint64_t pinnedSet = c.p1.pinned(c.human);
