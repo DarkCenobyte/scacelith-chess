@@ -170,7 +170,9 @@ bool answered(const Ctx& c, const Position& q, const Move& m, int took, int need
 // as much lost later on ('cap'). A capture counts for what it takes beyond what it took before the
 // move (p0): one the human could make all along takes nothing back. 0 when a take-back holds.
 // 'take', 'punish': the take-back a player looks at first (the one that takes most, on 'last'
-// first) and its answer; invalid when there is no take-back worth 'least'.
+// first) and its answer; invalid when there is no take-back worth 'least', or when a smaller one
+// holds (after gxh7, "if your knight takes back, my pawn takes your rook" would be about Nxf5
+// while Qxh7 takes the pawn back).
 int lossIfNoTakeBack(const Ctx& c, const Position& q, int least, int cap, Square last, Move* take, Move* punish) {
     const int board = c.base - materialBalance(q, c.human);
     const auto capture = [](const Move& m) {
@@ -193,7 +195,7 @@ int lossIfNoTakeBack(const Ctx& c, const Position& q, int least, int cap, Square
         Move hit;
         if (!answered(c, q, m, took, need, &hit)) return 0;
         const int rank = 2 * took + (m.to == last ? 1 : 0);
-        if (rank > shown) {
+        if (rank > shown && grab == 0) {
             shown = rank;
             *take = m;
             *punish = hit;

@@ -1660,6 +1660,33 @@ TEST(coach_review_human_context_cases) {
             }
         }
     }
+    {
+        // Puzzle Ircl5: 42...Ng3? gxh7. Qxh7 (or Kxh7) takes the pawn back: never "if your knight
+        // takes back, my pawn takes your rook", about Nxf5 hxg8=Q#.
+        const Recorded rc = recorded(
+         "rec b h5g3 6rk/1p2q2r/1p1p2P1/1Pp1pQ1n/2P2p1P/P2P1P1K/8/R5R1 b - - 0 42 ;\n"
+         "tag puzzle Ircl5 1967 advancedPawn equality middlegame short\n"
+         "an a0 1 0 0 16 h7h6 3\n"
+         "ln 1 16 611 0 0 0 E h7h6 f5f7 e7f6 g1g5 g8g6 f7f6 h5f6 a1g1 g6g5 g1g5 f6h7 g5g1 h7f8\n"
+         "ln 2 16 472 0 0 0 E g8f8 f5g5 e7g5 h4g5 h7g7 g1h1 h5g3 h3g4 g3h1 a1h1 h8g8 h1h6 d6d5 c4d5 f8d8 g4f5 d8d5\n"
+         "ln 3 16 437 0 0 0 E e7d7 f5d7 h7d7 g1g5 h5g3 h4h5 h8g7 h3h4 g7h6 a3a4 g8f8\n"
+         "an a1 1 0 0 16 h5g3 1\n"
+         "ln 1 16 22 0 0 0 E h5g3 g6h7 g8g7 f5c8 h8h7 h3h2 e7f6 a1a2 f6g6 a2d2 g6h5 d2f2 h5h4 c8h3 h4h3 h2h3 h7g8 f2a2\n"
+         "an a2 1 1 0 14 g6h7 2\n"
+         "ln 1 14 -20 0 0 0 E g6h7 g8g7 f5c8 h8h7 h3h2 e7f6 c8h3 f6g6 a1d1 g6h5 h2g2 h7h8 h3c8 g7g8 c8h3 g3e2 g2h1 e2g1 d1g1 g8g1 h1g1 h5g6 h3g2\n"
+         "ln 2 14 -942 0 0 0 E f5g4 g8g6 g1g3 e7h4 h3g2 h4g3 g4g3 g6g3 g2f2 h7h2 f2f1 g3f3 f1e1 f3g3 e1f1 h2h3\n"
+         "an a3 1 0 0 6 h7h6 1\n"
+         "ln 1 6 611 0 0 0 E h7h6 f5f7 e7f6 a3a4 h6g6 g1g6 g8g6 f7f6 h5f6\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Ng3 b%d", level);
+            checkScript(r.script, where);
+            CHECK(!hasKeyPrefix(r.script, "ex.retake"));
+        }
+    }
 }
 
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
