@@ -1598,6 +1598,37 @@ TEST(coach_review_bad_move_series_cases) {
     }
 }
 
+TEST(coach_review_human_context_cases) {
+    // Blunders from real games (Lichess puzzles, CC0: the move a player blundered into each, coach_audit
+    // record --puzzles): reasons the audit found wrong, each fixed.
+    {
+        // Puzzle imBYj: 17...Nxd5? fxg7+ (a discovered check) Kxc7 gxh8=Q. Without the demonstration
+        // (levels 4-6), "Nxd5 allows the discovered attack fxg7+" would leave out the rook: the
+        // material reason says the line and the seven points.
+        const Recorded rc = recorded(
+         "rec b e7d5 1rbk1b1r/1pNpn1pp/p4P2/q1pN2B1/4P3/8/P1P1KPPP/2R2B1R b - - 0 17 ;\n"
+         "tag puzzle imBYj 1443 advancedPawn advantage discoveredAttack discoveredCheck middlegame promotion short\n"
+         "an a0 1 0 0 16 g7f6 3\n"
+         "ln 1 16 648 0 0 0 E g7f6 g5f6 h8g8 f2f4 g8g6 f6e5 g6c6\n"
+         "ln 2 16 -110 0 0 0 E d7d6 f6e7 f8e7 g5e7 d8d7 g2g3 b7b5 f1h3 d7c6 h3c8 h8c8 c7e6 a5a2 e2f3\n"
+         "ln 3 16 -380 0 0 0 E e7d5 f6g7 d8c7 g7h8q d5c3 e2f3 c5c4 h2h4 d7d5 g5d8 c7d8 h8f8 d8d7 g2g3 d7c6 f8h6 c6c5 f3g2 c3e4\n"
+         "an a2 1 1 0 14 f6g7 2\n"
+         "ln 1 14 378 0 0 0 E f6g7 d8c7 g7h8q d5c3 e2f3 c5c4 h2h4 d7d5 g5d8 c7d8 h8f8 d8d7 g2g3 d7c6 f8h6 c6c5\n"
+         "ln 2 14 -557 0 0 0 E c7d5 d8e8 g5d2 a5a4 e2d1 b7b5 f6g7 f8g7\n"
+         "an a3 1 0 0 6 g7f6 1\n"
+         "ln 1 6 648 0 0 0 E g7f6 g5f6 h8g8 e2e3 g8g6 d5e7 f8e7\n"
+         "end\n");
+        for (int level = 1; level <= 6; ++level) {
+            Reviewer rv;
+            const Review r = reviewRecorded(rv, rc, level);
+            char where[32];
+            std::snprintf(where, sizeof where, "Nxd5 b%d", level);
+            checkScript(r.script, where);
+            if (level >= 4) CHECK_EQ(r.verdict.exType, ExType::Material);
+        }
+    }
+}
+
 TEST(coach_review_blunder_without_a_reliable_reason_is_hinted) {
     // A blunder whose reason the coach cannot give reliably: the verdict and the piece that had the
     // better move, never the move itself while the takeback is offered.

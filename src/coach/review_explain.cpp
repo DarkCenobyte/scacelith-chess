@@ -704,11 +704,11 @@ bool discovered(const Ctx& c, Explanation& out) {
         out = ex;
         return true;
     }
-    // A discovered check, when the line then wins material (levels 1-3 and 5: the lines of levels 4
-    // and 6 say the target itself falls). Not for a mistake: said in words, without the
-    // demonstration that shows what the line wins, "my bishop attacks your king" would leave out
-    // the queen that falls.
-    if (c.level == 4 || c.level == 6 || c.j.cls == MoveClass::Mistake) return false;
+    // A discovered check, when the line then wins material: only where the demonstration shows what
+    // it wins (levels 1-3, not for a mistake). Said in words alone, "my bishop attacks your king" or
+    // "Nxd5 allows the discovered attack fxg7+" would leave out the queen or the rook that falls;
+    // the material reason says the line instead.
+    if (!c.b.fullDemo || c.j.cls == MoveClass::Mistake) return false;
     for (const Discovery& d : all) {
         if (!d.check) continue;
         for (int k = 1; k < int(c.r.size()) && k <= motifReach(c); ++k) {
