@@ -3,7 +3,8 @@
 // set this CPU runs against scalar references, the text front end, and, when the model files are
 // in <exe dir>/coach/, every stage against onnxruntime reference dumps (tests/data/tts, written by
 // tools/tts_reference.py), the whole synthesis and the background worker. Tests that need the
-// model are skipped without it.
+// model are skipped without it, and those that synthesize audio in the coverage build
+// (SKIP_SYNTHESIS_IN_COVERAGE).
 //
 // Optional, through environment variables:
 //   SCACELITH_TTS_PERF=1                 real-time factor of a 4-second sentence at 1 and 2 threads
@@ -2033,7 +2034,18 @@ TEST(tts_model_layout_choice) {
 #endif
 }
 
+// The coverage run (.github/workflows/coverage.yml) leaves the audio synthesis out: instrumented for
+// gcov, the tests that synthesize took 13 to 50 minutes of it, and its code is not measured. The
+// other CI jobs run them; the voice's corrections are checked on the text there too
+// (coach_catalog_every_respelling_in_sentences).
+#ifdef SCACELITH_COVERAGE_BUILD
+#define SKIP_SYNTHESIS_IN_COVERAGE() SKIP("audio synthesis: not part of the coverage run")
+#else
+#define SKIP_SYNTHESIS_IN_COVERAGE() ((void)0)
+#endif
+
 TEST(tts_stage_duration_and_text_encoder) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     StageFixture f;
     if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
@@ -2084,6 +2096,7 @@ Tensor veStep(const StageFixture& f, const tts::ExecContext& ctx, int step) {
 }  // namespace
 
 TEST(tts_stage_vector_estimator) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     StageFixture f;
     if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
@@ -2107,6 +2120,7 @@ TEST(tts_stage_vector_estimator) {
 }
 
 TEST(tts_stage_vocoder_and_end_to_end) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     StageFixture f;
     if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
@@ -2146,6 +2160,7 @@ TEST(tts_stage_vocoder_and_end_to_end) {
 
 TEST(tts_stage_every_level) {
     // One vector estimator step and the vocoder with every kernel set (same results to rounding).
+    SKIP_SYNTHESIS_IN_COVERAGE();
     StageFixture f;
     if (std::string missing = f.init(); !missing.empty()) SKIP_WITHOUT(kModel, missing);
     const tts::Engine& e = *f.s->engine();
@@ -2168,6 +2183,7 @@ TEST(tts_stage_every_level) {
 // Synthesizer and worker
 // ------------------------------------------------------------------------------------------------
 TEST(tts_synthesizer_output) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     tts::Synthesizer* s = model();
     if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     CHECK_EQ(s->sampleRate(), 44100);
@@ -2269,16 +2285,16 @@ TEST(tts_finish_pcm_non_finite) {
     CHECK(peak > 0.1f && peak <= 0.8913f);
 }
 
-// The waits of the worker test. An instrumented build (sanitizers, coverage) synthesizes several
-// times slower, and slower again on a CPU without AVX-512: on such a coverage runner, three short
-// requests took more than the 120 s a normal build is given.
-#if defined(SCACELITH_SANITIZED) || defined(SCACELITH_COVERAGE_BUILD)
+// The waits of the worker test. A sanitized build synthesizes several times slower (the coverage
+// build, slower still, skips the test).
+#if defined(SCACELITH_SANITIZED)
 constexpr double kWorkerWaitScale = 5.0;
 #else
 constexpr double kWorkerWaitScale = 1.0;
 #endif
 
 TEST(tts_worker) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     // The worker loads from the model store's folder: the build's development copy here.
     tts::setModelFolder(modelDir());
     struct Restore {
@@ -2374,6 +2390,7 @@ TEST(tts_worker) {
 // table, as damaged contents of a downloaded file would): the warm-up gives no samples and the
 // worker fails (failed() and warmUpFailed()), taking no request. Missing files fail the load.
 TEST(tts_worker_warm_up_failure) {
+    SKIP_SYNTHESIS_IN_COVERAGE();
     if (!model()) SKIP_WITHOUT(kModel, "no model files in " + modelDir());
     const std::string dir = net::sys::exeDirectory() + "ttstest-warmup/";
     CHECK(net::sys::makeDirectories(dir));

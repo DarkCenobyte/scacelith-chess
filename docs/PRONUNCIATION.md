@@ -18,6 +18,9 @@ keeps what was found per language, so that new lines and translations avoid the 
   whether the files are up to date). The respell.* keys apply to the opening lines too.
 - A Russian or Ukrainian stress mark is the combining acute U+0301 after the vowel ("коня́"): the voice
   follows it. Write it in spoken text only.
+- The unit test `coach_catalog_every_respelling_in_sentences` checks every `respell.*` word on the
+  lines of its language that hold it (said respelled, the subtitles unchanged), and on a sentence of its
+  own while no line holds it.
 
 The quality setting (flow-matching steps) does not change a reading: the text encoder and the duration
 predictor decide what is said, the steps only refine the sound. Same misreadings at 5 and 9 steps.

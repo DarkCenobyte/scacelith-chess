@@ -1,12 +1,14 @@
 // Coach speech catalog (src/coach/catalog.*): loading, variants, placeholders spoken and written,
-// grammatical forms, anchors, Arabic left-to-right marks, the Chinese speech fallback, and the
-// parity of every language's files with English.
+// grammatical forms, anchors, every respelled word on the lines that hold it, Arabic left-to-right
+// marks, the Chinese speech fallback, and the parity of every language's files with English.
 #include "test.h"
 #include "coach/catalog.h"
 #include "core/embedded.h"
 #include "i18n/i18n.h"
+#include "i18n/unicode.h"
 #include "tts/tts.h"
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cstring>
 #include <map>
@@ -442,6 +444,143 @@ TEST(coach_catalog_respellings) {
     // Other languages keep their words.
     c.addFile("de", "test", "a = Matt in {n:move}, {@}mat.\nb = x\nc = x\n");
     CHECK(spoken(c, a, "de").find(" mat.") != std::string::npos);
+}
+
+// Every respell.* word of every language, on the real lines that hold it (a template, a spoken
+// override, a form of common.lang, an opening text; placeholders left out): wherever the rule
+// applies, the spoken rendering says the respelled form, and the subtitles keep the word. A word
+// in no line yet (a form kept for later lines) is checked on a sentence of its own. The coverage
+// run leaves the audio synthesis out (tests/tts_tests.cpp): the voice's corrections are checked
+// here, on the text.
+TEST(coach_catalog_every_respelling_in_sentences) {
+    Catalog full;
+    CHECK(full.load());
+    // The words of a text as the catalog cuts them (isWordChar, src/coach/catalog.cpp), in upper
+    // case, each with whether a pause follows it (punctuation or the end; not a hyphen joining a word).
+    struct Word {
+        std::string upper;
+        bool pause;
+    };
+    auto isWordChar = [](char32_t c) {
+        if (c < 0x80) return std::isalnum(int(c)) != 0;
+        return c >= 0xC0 && c != 0xD7 && c != 0xF7 && !(c >= 0x2000 && c <= 0x206F) && !(c >= 0x3000 && c <= 0x303F);
+    };
+    auto words = [&](const std::string& s) {
+        const std::u32string t = uni::decode(s);
+        std::vector<Word> out;
+        for (size_t i = 0; i < t.size();) {
+            if (!isWordChar(t[i])) {
+                ++i;
+                continue;
+            }
+            size_t end = i;
+            while (end < t.size() && isWordChar(t[end])) ++end;
+            size_t n = end;
+            while (n < t.size() && uni::isSpace(t[n])) ++n;
+            const bool pause = !(n < t.size() && isWordChar(t[n])) &&
+                               !(n == end && n + 1 < t.size() && t[n] == U'-' && isWordChar(t[n + 1]));
+            out.push_back({uni::toUpper(uni::encode(t.substr(i, end - i))), pause});
+            i = end;
+        }
+        return out;
+    };
+    struct Rule {
+        std::string key, word, spoken;   // word and spoken form in upper case
+        bool pauseOnly = false;
+        int lines = 0;
+    };
+    // The texts as the lines of a test catalog with the language's real common.lang (its rules),
+    // each rendered written and spoken: the rule's word is said as its spoken form where the rule
+    // applies, left where it does not (".pause" before a word), and nothing else changes.
+    auto check = [&](const std::string& lang, std::vector<Rule>& rules, const std::vector<std::string>& texts) {
+        std::string file, enFile;
+        for (size_t i = 0; i < texts.size(); ++i) {
+            std::string escaped;
+            for (char ch : texts[i])
+                escaped += ch == '\\' ? std::string("\\\\") : ch == '\n' ? std::string("\\n") : std::string(1, ch);
+            file += "s" + std::to_string(i) + " = " + escaped + "\n";
+            enFile += "s" + std::to_string(i) + " = x\n";
+        }
+        Catalog c;
+        if (lang != "en") c.addFile("en", "test", enFile);
+        c.addFile(lang, "common", realFile(lang, "common"));
+        c.addFile(lang, "test", file);
+        for (size_t i = 0; i < texts.size(); ++i) {
+            const Line l = line("s" + std::to_string(i));
+            const std::string wr = written(c, l, lang), sp = spoken(c, l, lang);
+            const std::vector<Word> w = words(wr), s = words(sp);
+            CHECK_EQ(w.size(), s.size());
+            for (Rule& r : rules) {
+                // Where the rule applies, where it does not, the spoken form already in the line,
+                // the word left in speech, the spoken form said.
+                int applies = 0, stays = 0, already = 0, left = 0, said = 0;
+                for (const Word& x : w) {
+                    if (x.upper == r.word) ++(!r.pauseOnly || x.pause ? applies : stays);
+                    already += x.upper == r.spoken;
+                }
+                for (const Word& x : s) {
+                    left += x.upper == r.word;
+                    said += x.upper == r.spoken;
+                }
+                if (applies + stays == 0) continue;
+                ++r.lines;
+                if (left != stays || said != already + applies)
+                    std::fprintf(stderr, "  %s %s: \"%s\" spoken \"%s\"\n", lang.c_str(), r.key.c_str(), wr.c_str(),
+                                 sp.c_str());
+                CHECK_EQ(left, stays);
+                CHECK_EQ(said, already + applies);
+            }
+        }
+    };
+    static const std::regex placeholder("\\{[^}]*\\}");
+    int ruleCount = 0, lineCount = 0;
+    std::string unused;
+    for (const std::string& lang : full.languages()) {
+        std::vector<Rule> rules;
+        for (const std::string& k : full.keys(lang, "common")) {
+            if (!startsWith(k, "respell.")) continue;
+            Rule r;
+            r.key = k;
+            std::string w = k.substr(8);
+            r.pauseOnly = endsWith(w, ".pause");
+            if (r.pauseOnly) w.resize(w.size() - 6);
+            r.word = uni::toUpper(w);
+            r.spoken = uni::toUpper(*full.find(lang, k));
+            CHECK_EQ(words(r.spoken).size(), size_t(1));   // one word: counted as one
+            rules.push_back(r);
+        }
+        if (rules.empty()) continue;
+        // The language's spoken lines that hold one of the words (a line with a spoken override is
+        // never said: the override is).
+        std::vector<std::string> texts;
+        for (const std::string& topic : full.topics(lang))
+            for (const std::string& k : full.keys(lang, topic)) {
+                if (startsWith(k, "respell.") || full.find(lang, k + ".spoken")) continue;
+                const std::string text = std::regex_replace(*full.find(lang, k), placeholder, "");
+                bool holds = false;
+                for (const Word& w : words(text))
+                    for (const Rule& r : rules) holds = holds || w.upper == r.word;
+                if (holds) texts.push_back(text);
+            }
+        check(lang, rules, texts);
+        // The words in no line: "Word word." (before a word, then before a pause).
+        std::vector<std::string> own;
+        for (const Rule& r : rules) {
+            if (r.lines > 0) continue;
+            const std::string w = r.key.substr(8, r.key.size() - 8 - (r.pauseOnly ? 6 : 0));
+            std::u32string first = uni::decode(w);
+            first[0] = uni::toUpper(first[0]);
+            own.push_back(uni::encode(first) + " " + w + ".");
+            unused += " " + lang + " " + w;
+        }
+        check(lang, rules, own);
+        for (const Rule& r : rules) CHECK(r.lines > 0);
+        ruleCount += int(rules.size());
+        lineCount += int(texts.size());
+    }
+    std::fprintf(stderr, "  %d respelled words, checked on %d lines of the catalog%s%s\n", ruleCount, lineCount,
+                 unused.empty() ? "" : "; in no line yet, checked on a sentence of their own:", unused.c_str());
+    CHECK(ruleCount > 0);
 }
 
 TEST(coach_catalog_arabic_and_chinese) {
