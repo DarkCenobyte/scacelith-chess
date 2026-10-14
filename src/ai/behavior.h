@@ -38,11 +38,10 @@ int timePressureEloDrop(int64_t remainingMs, int64_t incMs, int64_t baseMs);
 // closer to the target than `s` does, or when the strength of `s` cannot be placed on that scale
 // (a node or move time limit, a depth cap at full strength).
 EngineSettings weakenedSettings(const EngineSettings& s, int drop);
-// The strength of `s` on the presets' scale, from which weakenedSettings drops (for a Skill Level
-// setting) and which the engine logs: Engine::estimateElo(), except a setting without a depth cap
-// below UCI_Elo 1500 (Skill Level 0-1, UCI_Elo 1320-1499), rated by what that UCI_Elo plays on
-// this scale (Skill Level 0 ~1200, UCI_Elo 1400 ~1300) where estimateElo() keeps Stockfish's own
-// calibration.
+// The strength of `s` on the presets' scale, from which weakenedSettings drops and which the engine
+// logs: Engine::estimateElo(), except a setting without a depth cap below UCI_Elo 1500 (Skill Level
+// 0-1, UCI_Elo 1320-1499), rated by what that UCI_Elo plays on this scale (Skill Level 0 ~1200,
+// UCI_Elo 1400 ~1300) where estimateElo() keeps Stockfish's own calibration.
 int presetScaleElo(const EngineSettings& s);
 
 // True if `reply` (UCI) captures on the destination square of the last move of `moves` (played

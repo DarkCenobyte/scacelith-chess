@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <thread>
+#include <vector>
 
 namespace {
 
@@ -142,7 +143,8 @@ TEST(ai_weakened_custom_skill19_depth_cap) {
     CHECK(w.depth >= 1 && w.depth <= 2);
     CHECK(Engine::estimateElo(w) < nominal);
     // Every Custom level (0-19) capped at or below its pick iteration, any MultiPV, every drop: a
-    // drop that leaves less than 1200 keeps a depth-capped handicap, never a stronger one.
+    // drop that leaves less than 1200 keeps a depth-capped handicap, or UCI_Elo 1320 (~1200) while it
+    // is the nearest step (down to 1187), never a stronger one.
     for (int level = 0; level < 20; ++level)
         for (int depth = 1; depth <= 1 + level; ++depth)
             for (int multiPV : {1, 5, 9, 20}) {
@@ -154,8 +156,13 @@ TEST(ai_weakened_custom_skill19_depth_cap) {
                 for (int d : {10, ai::detail::kLowTimeEloDrop, ai::detail::kTimeTroubleEloDrop}) {
                     if (e - d >= 1200) continue;
                     const ai::EngineSettings cw = weakenedSettings(c, d);
-                    CHECK(!cw.limitStrength && cw.depth > 0);
-                    CHECK(Engine::estimateElo(cw) <= e);
+                    if (cw.limitStrength) {
+                        CHECK_EQ(cw.elo, 1320);
+                        CHECK(e - d >= 1187);
+                    } else {
+                        CHECK(cw.depth > 0);
+                    }
+                    CHECK(ai::detail::presetScaleElo(cw) <= e);
                 }
             }
 }
@@ -211,6 +218,121 @@ TEST(ai_weakened_custom_low_skill_uncapped) {
         c.skillLevel = level;
         CHECK_EQ(presetScaleElo(c), Engine::estimateElo(c));
     }
+}
+
+TEST(ai_weakened_custom_uci_elo_low) {
+    // Audit N17: a Custom opponent at UCI_Elo 1320 with a depth limit of 4 (past the pick iteration,
+    // so no cap) on a 5+0 clock with 50 s left (-33). It plays as Skill Level 0 at depth 4 (~1200)
+    // and now drops the same way, to the Casual's settings, not to UCI_Elo 1389 without the limit.
+    using ai::Engine;
+    using ai::detail::presetScaleElo;
+    using ai::detail::weakenedSettings;
+    ai::EngineSettings uci;
+    uci.limitStrength = true;
+    uci.elo = 1320;
+    uci.depth = 4;
+    ai::EngineSettings skill;
+    skill.skillLevel = 0;
+    skill.depth = 4;
+    CHECK_EQ(presetScaleElo(uci), 1200);
+    CHECK_EQ(presetScaleElo(uci), presetScaleElo(skill));
+    const int drop = ai::detail::timePressureEloDrop(50 * kSec, 0, 5 * kMin);
+    CHECK_EQ(drop, 33);
+    ai::EngineSettings w = weakenedSettings(uci, drop);
+    CHECK(ai::detail::sameStrength(w, weakenedSettings(skill, drop)));
+    CHECK(ai::detail::sameStrength(w, preset("Casual")));
+    // UCI_Elo 1400 (~1300) weakens from the first drops, as Club Player does from 1500.
+    ai::EngineSettings u1400;
+    u1400.limitStrength = true;
+    u1400.elo = 1400;
+    w = weakenedSettings(u1400, drop);
+    CHECK(w.limitStrength && w.elo < 1400);
+    CHECK(std::abs(presetScaleElo(w) - (1300 - drop)) <= 2);
+    // Every Custom setting (UCI_Elo or Skill Level, any depth limit and MultiPV), every drop: never
+    // stronger on the presets' scale, and never a higher UCI_Elo than its own. (Every drop one by one
+    // in ai_weakened_larger_drop_never_stronger.)
+    std::vector<ai::EngineSettings> all;
+    for (int elo = 1320; elo <= 3190; elo += 10) {
+        ai::EngineSettings c;
+        c.limitStrength = true;
+        c.elo = elo;
+        all.push_back(c);
+    }
+    for (int level = 0; level < 20; ++level) {
+        ai::EngineSettings c;
+        c.skillLevel = level;
+        all.push_back(c);
+    }
+    for (ai::EngineSettings c : all)
+        for (int depth : {0, 1, 2, 3, 4, 8, 20})
+            for (int multiPV : {1, 5, 9, 20}) {
+                c.depth = depth;
+                c.multiPV = multiPV;
+                const int nominal = presetScaleElo(c);
+                for (int d = 0; d <= ai::detail::kTimeTroubleEloDrop; d += 10) {
+                    const ai::EngineSettings cw = weakenedSettings(c, d);
+                    CHECK(presetScaleElo(cw) <= nominal);
+                    if (c.limitStrength && cw.limitStrength) CHECK(cw.elo <= c.elo);
+                }
+            }
+}
+
+TEST(ai_weakened_larger_drop_never_stronger) {
+    // Audit N18: a Custom opponent at UCI_Elo 1400 with a depth limit of 1 (~1215) dropped 15 to
+    // UCI_Elo 1320 (~1200), the last step above 1200, but 16 back to its own settings: the steps
+    // below 1200 left UCI_Elo 1320 out and the ladder's top, the Casual (~1175), was further from
+    // the target than its own settings. Same at UCI_Elo 1330 (~1212) for drops 12 and 13.
+    using ai::detail::presetScaleElo;
+    using ai::detail::weakenedSettings;
+    ai::EngineSettings u1400;
+    u1400.limitStrength = true;
+    u1400.elo = 1400;
+    u1400.depth = 1;
+    CHECK_EQ(presetScaleElo(u1400), 1215);
+    ai::EngineSettings u1320;
+    u1320.limitStrength = true;
+    u1320.elo = 1320;
+    CHECK(ai::detail::sameStrength(weakenedSettings(u1400, 15), u1320));
+    CHECK(ai::detail::sameStrength(weakenedSettings(u1400, 16), u1320));
+    ai::EngineSettings u1330;
+    u1330.limitStrength = true;
+    u1330.elo = 1330;
+    CHECK_EQ(presetScaleElo(u1330), 1212);
+    CHECK(ai::detail::sameStrength(weakenedSettings(u1330, 12), u1320));
+    CHECK(ai::detail::sameStrength(weakenedSettings(u1330, 13), u1320));
+    // Club Player's drop goes the same way: UCI_Elo 1320 while it is the nearest step (a target of
+    // 1187-1200), then the Casual.
+    const ai::EngineSettings club = preset("Club Player");
+    CHECK(ai::detail::sameStrength(weakenedSettings(club, 313), u1320));
+    CHECK(ai::detail::sameStrength(weakenedSettings(club, 314), preset("Casual")));
+    // Every Custom setting of the grid above (UCI_Elo in steps of 100 from 1600, where it is played
+    // as is), each drop one by one: never stronger than a smaller drop, on the presets' scale.
+    std::vector<ai::EngineSettings> all;
+    for (int elo = 1320; elo <= 3190; elo += elo < 1600 ? 10 : 100) {
+        ai::EngineSettings c;
+        c.limitStrength = true;
+        c.elo = std::min(elo, 3190);
+        all.push_back(c);
+    }
+    for (int level = 0; level < 20; ++level) {
+        ai::EngineSettings c;
+        c.skillLevel = level;
+        all.push_back(c);
+    }
+    int rises = 0;
+    for (ai::EngineSettings c : all)
+        for (int depth : {0, 1, 2, 3, 4, 8, 20})
+            for (int multiPV : {1, 5, 9, 20}) {
+                c.depth = depth;
+                c.multiPV = multiPV;
+                int previous = presetScaleElo(c);
+                for (int d = 1; d <= ai::detail::kTimeTroubleEloDrop; ++d) {
+                    const int now = presetScaleElo(weakenedSettings(c, d));
+                    if (now > previous) ++rises;
+                    previous = now;
+                }
+            }
+    CHECK_EQ(rises, 0);
 }
 
 #if defined(SCACELITH_HAS_STOCKFISH)

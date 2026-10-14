@@ -258,30 +258,35 @@ EngineSettings weakenedSettings(const EngineSettings& s, int drop) {
     if (drop <= 0 || s.nodes > 0 || s.moveTimeMs > 0) return s;
     const double level = skillLevel(s);
     if (level < 0.0 && s.depth > 0) return s;
-    // The drop starts from what `s` plays: an uncapped Skill Level 0 or 1 plays ~60-120 below its
-    // estimate, which a small drop would otherwise turn into a stronger UCI_Elo. A UCI_Elo setting
-    // starts from its UCI_Elo (below 1500 the guard below keeps it from playing stronger).
-    const int nominal = s.limitStrength ? Engine::estimateElo(s) : presetScaleElo(s);
+    // The drop starts from what `s` plays: below UCI_Elo 1500 a setting without a depth cap (Skill
+    // Level 0-1, UCI_Elo 1320-1499, a depth limit past the pick iteration counting as none) plays
+    // ~60-120 below its estimate, which a small drop would otherwise turn into a stronger UCI_Elo.
+    const int nominal = presetScaleElo(s);
     const int target = nominal - drop;
     EngineSettings w;
     if (target >= 1200) {
         if (level < 0.0 && target > 3190) return s;  // nothing between full strength and UCI_Elo 3190
         w = limited(uciEloFor(target));
-        if (s.limitStrength && s.depth <= 0 && s.multiPV <= 4 && w.elo >= s.elo) return s;
+        if (presetScaleElo(w) >= nominal) return s;  // never stronger (a drop of an Elo or two rounds away)
     } else {
-        // The ladder's step nearest to the target, if it is nearer than `s` itself.
+        // The step nearest to the target, if it is nearer than `s` itself: the shallow ladder and the
+        // UCI_Elo step the branch above ends on (~1200), so that a target just under 1200 never picks a
+        // stronger setting than a target of 1200 did (`s` itself, or nothing below the ladder's top).
+        // A choice among fixed steps, all rated on the same scale: a larger drop never plays stronger.
         int bestGap = drop;
         bool found = false;
-        for (const EngineSettings& c : shallowLadder()) {
-            const int e = Engine::estimateElo(c);
-            if (e >= nominal) continue;
+        const auto consider = [&](const EngineSettings& c) {
+            const int e = presetScaleElo(c);
+            if (e >= nominal) return;
             const int gap = std::abs(e - target);
             if (gap < bestGap) {
                 bestGap = gap;
                 w = c;
                 found = true;
             }
-        }
+        };
+        consider(limited(uciEloFor(1200)));
+        for (const EngineSettings& c : shallowLadder()) consider(c);
         if (!found) return s;
     }
     w.threads = s.threads;
