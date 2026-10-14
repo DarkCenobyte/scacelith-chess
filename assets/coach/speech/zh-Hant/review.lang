@@ -71,6 +71,14 @@ ex.verdict.blunder.b5.3 = {move}是代價很大的錯誤。
 ex.verdict.blunder.b6 = {move}是嚴重失誤。
 ex.verdict.blunder.b6.2 = {move}是漏著。
 ex.verdict.blunder.b6.3 = {move}？漏著。
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = 哎呀！你沒有應對我的威脅。
+ex.verdict.ignored.b1.2 = 小心！我的威脅還在。
+ex.verdict.ignored.b1.3 = 喔，等一下。你忘了我的威脅。
+ex.verdict.ignored.b2 = 嗯，我的威脅還在。
+ex.verdict.ignored.b2.2 = 你沒有回應我的威脅。
+ex.verdict.ignored.b2.3 = 小心，你沒有應對我的威脅。
 ex.verdict.mistake.b3 = 這步不是好棋。
 ex.verdict.mistake.b3.2 = 嗯，{move}有問題。
 ex.verdict.mistake.b3.3 = 這步走錯了。
@@ -97,7 +105,11 @@ ex.verdict.inaccuracy.b5.3 = {best}比{move}更精確。
 ex.verdict.inaccuracy.b6 = {move}不精確，應走{best}。
 ex.verdict.inaccuracy.b6.2 = 不精確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}更好。
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = 也許走{best}會更精確一點。
+ex.verdict.inaccuracy.maybe.2 = 我也許會走{best}。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = 這步棋看起來有點可疑。
 ex.verdict.dubious.2 = 這步棋似乎有點可疑。
 # Something good was missed (levels 1-2).

@@ -66,6 +66,14 @@ ex.verdict.blunder.b5.3 = {move} ist ein teurer Fehler.
 ex.verdict.blunder.b6 = {move} ist ein schwerer Fehler.
 ex.verdict.blunder.b6.2 = {move} ist ein grober Fehler.
 ex.verdict.blunder.b6.3 = {move}? Ein Patzer.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hoppla! Du hast nicht auf meine Drohung reagiert.
+ex.verdict.ignored.b1.2 = Vorsicht! Meine Drohung war noch da.
+ex.verdict.ignored.b1.3 = Oh, warte. Du hast meine Drohung vergessen.
+ex.verdict.ignored.b2 = Hm, meine Drohung war noch da.
+ex.verdict.ignored.b2.2 = Du hast meine Drohung nicht abgewehrt.
+ex.verdict.ignored.b2.3 = Vorsicht, du hast nicht auf meine Drohung reagiert.
 ex.verdict.mistake.b3 = Das ist kein guter Zug.
 ex.verdict.mistake.b3.2 = Hm, {move} hat ein Problem.
 ex.verdict.mistake.b3.3 = Das ist ein Fehler.
@@ -92,7 +100,11 @@ ex.verdict.inaccuracy.b5.3 = {best} war präziser als {move}.
 ex.verdict.inaccuracy.b6 = {move} ist ungenau; {best}.
 ex.verdict.inaccuracy.b6.2 = Ungenau. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} war besser.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} war vielleicht etwas genauer.
+ex.verdict.inaccuracy.maybe.2 = Vielleicht hätte ich {best} gespielt.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = Dieser Zug sieht zweifelhaft aus.
 ex.verdict.dubious.2 = Dieser Zug scheint zweifelhaft.
 # Something good was missed (levels 1-2).

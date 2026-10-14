@@ -11,6 +11,7 @@
 #include "chess/pgn.h"
 #include "coach/tactics.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <fstream>
@@ -359,6 +360,153 @@ int recordMain(const Options& o) {
         }
         std::fprintf(stderr, "selfplay game %d (coach level %d, human %s): %d plies, %d records\n", game, level,
                      human == White ? "White" : "Black", plies, written);
+    }
+    e.shutdown();
+    return 0;
+}
+
+int truthMain(const Options& o) {
+    std::vector<Record> recs;
+    {
+        std::ifstream in(o.in, std::ios::binary);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        std::string err;
+        if (!in || !readRecords(ss.str(), recs, err)) {
+            std::fprintf(stderr, "%s: %s\n", o.in.c_str(), err.empty() ? "cannot read" : err.c_str());
+            return 1;
+        }
+    }
+    size_t done = 0;
+    {
+        std::ifstream prev(o.out, std::ios::binary);
+        std::string line;
+        while (std::getline(prev, line))
+            if (line == "end") ++done;
+    }
+    ai::Engine e;
+    if (!e.start() || !e.waitReady(60000)) {
+        std::fprintf(stderr, "engine unavailable\n");
+        return 1;
+    }
+    ai::EngineSettings host;
+    host.hashMB = 128;
+    host.threads = o.threads;
+    e.configure(host);
+    std::ofstream out(o.out, std::ios::app);
+    if (!out) {
+        std::fprintf(stderr, "cannot write %s\n", o.out.c_str());
+        return 1;
+    }
+    for (size_t i = done; i < recs.size(); ++i) {
+        if (!o.stop.empty() && std::ifstream(o.stop).good()) break;
+        const Record& src = recs[i];
+        Record t;
+        t.tag = src.tag;
+        t.startFen = src.startFen;
+        t.moves = src.moves;
+        t.played = src.played;
+        t.human = src.human;
+        Game g;
+        bool ok = src.startFen.empty() || g.resetFromFEN(src.startFen);
+        for (size_t k = 0; ok && k < src.moves.size(); ++k) {
+            const Move m = g.position().parseUCI(src.moves[k]);
+            ok = m.valid() && g.play(m);
+        }
+        if (ok && g.position().hasLegalMove() && g.position().parseUCI(src.played).valid()) {
+            e.newGame();
+            ai::AnalysisRequest r;
+            r.startFen = src.startFen;
+            r.moves = src.moves;
+            r.multiPV = std::min(4, int(g.position().legalMoves().size()));
+            r.depth = o.depth;
+            t.a0 = analyse(e, r);
+            const ai::PvLine* l = t.a0.ok ? t.a0.line(src.played) : nullptr;
+            if (t.a0.ok && (!l || l->score.bound != ai::Score::Bound::Exact)) {
+                ai::AnalysisRequest p = r;
+                p.multiPV = 1;
+                p.searchMoves = {src.played};
+                t.a1 = analyse(e, p);
+                t.hasA1 = true;
+            }
+        }
+        out << writeRecord(t);
+        out.flush();
+    }
+    e.shutdown();
+    return 0;
+}
+
+int reanalyseMain(const Options& o) {
+    std::vector<Record> recs;
+    {
+        std::ifstream in(o.in, std::ios::binary);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        std::string err;
+        if (!in || !readRecords(ss.str(), recs, err)) {
+            std::fprintf(stderr, "%s: %s\n", o.in.c_str(), err.empty() ? "cannot read" : err.c_str());
+            return 1;
+        }
+    }
+    // A rerun goes on after the records the output already holds (each one written whole).
+    size_t done = 0;
+    {
+        std::ifstream prev(o.out, std::ios::binary);
+        std::string line;
+        while (std::getline(prev, line))
+            if (line == "end") ++done;
+    }
+    ai::Engine e;
+    if (!e.start() || !e.waitReady(60000)) {
+        std::fprintf(stderr, "engine unavailable\n");
+        return 1;
+    }
+    ai::EngineSettings host;
+    host.hashMB = 64;
+    host.threads = o.threads;
+    e.configure(host);
+    std::ofstream out(o.out, std::ios::app);
+    if (!out) {
+        std::fprintf(stderr, "cannot write %s\n", o.out.c_str());
+        return 1;
+    }
+    std::string lastStart;
+    std::vector<std::string> lastMoves;
+    bool first = true;
+    for (size_t i = done; i < recs.size(); ++i) {
+        if (!o.stop.empty() && std::ifstream(o.stop).good()) break;
+        const Record& src = recs[i];
+        Game g;
+        if (!src.startFen.empty() && !g.resetFromFEN(src.startFen)) continue;
+        bool ok = true;
+        for (const std::string& u : src.moves) {
+            const Move m = g.position().parseUCI(u);
+            if (!m.valid() || !g.play(m)) {
+                ok = false;
+                break;
+            }
+        }
+        const Move m = ok ? g.position().parseUCI(src.played) : Move{};
+        if (!m.valid()) {
+            std::fprintf(stderr, "record %zu: cannot replay, kept as it was\n", i);
+            out << writeRecord(src);
+            out.flush();
+            continue;
+        }
+        // A new game for the engine unless this record goes on from the last one's moves (the hash
+        // table as a recording of the same game leaves it).
+        const bool goesOn = !first && src.startFen == lastStart && lastMoves.size() <= src.moves.size() &&
+                            std::equal(lastMoves.begin(), lastMoves.end(), src.moves.begin());
+        if (!goesOn) e.newGame();
+        first = false;
+        lastStart = src.startFen;
+        lastMoves = src.moves;
+        lastMoves.push_back(src.played);
+        Record r = recordMove(e, g, m, src.a0.ok && src.a0.depth >= 10 ? src.a0.depth : o.depth);
+        r.tag = src.tag;
+        out << writeRecord(r);
+        out.flush();
     }
     e.shutdown();
     return 0;

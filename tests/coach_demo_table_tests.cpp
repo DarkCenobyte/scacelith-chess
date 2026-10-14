@@ -845,8 +845,9 @@ TEST(coach_demo_table_two_demonstrations_in_one_game) {
 
 namespace {
 
-// A demonstration the offer policy (Reviewer::review, review.cpp) leaves without a card: the line
-// is shown and taken back, then the coach plays its reply at once and says "Your move."
+// A demonstration left without a card (by the offer policy, Reviewer::review in review.cpp, or with
+// the offers turned off): the line is shown and taken back, then the coach plays its reply at once
+// and says "Your move."
 struct NoCard {
     const char* name;
     std::string fen;                     // the position before the human's move(s)
@@ -854,13 +855,16 @@ struct NoCard {
     std::map<std::string, ai::Analysis> results;   // the fake Analyst's, by "fen|shape"
     const char* reply;                   // the coach's reply to the last one
     int fromLevel, toLevel;
+    bool offers = true;                  // the game's takeback offers
 };
 
 std::vector<NoCard> noCards() {
     std::vector<NoCard> v;
     {
-        // A blunder that leaves the human still clearly ahead (W% 92 -> 76): no offer from 75 on.
-        NoCard c{"a blunder still ahead", "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1", {"c3d5"}, {}, "e6d5", 1, 3};
+        // A blunder with the takeback offers turned off. (Left at +3.2, W% 76, a player of levels 1-3
+        // is no longer clearly ahead as they convert it: the card would come.)
+        NoCard c{"a blunder, offers off", "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1", {"c3d5"}, {}, "e6d5", 1, 3};
+        c.offers = false;
         c.results[c.fen + "|A0"] = analysisOf({pvl(650, "g1f1 g8f8"), pvl(320, "c3d5 e6d5 g1f1")});
         v.push_back(c);
     }
@@ -886,7 +890,7 @@ TEST(coach_demo_table_no_card_after_some_demonstrations) {
         for (int level = c.fromLevel; level <= c.toLevel; ++level) {
             Scene s;
             s.analyst.results = c.results;
-            s.start(c.fen.c_str(), level, chess::White);
+            s.start(c.fen.c_str(), level, chess::White, c.offers);
             const int taken = int(c.played.size()) - 1;   // offered and taken back first
             bool ok = true;
             for (int i = 0; i < taken && ok; ++i) {

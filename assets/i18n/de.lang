@@ -1062,6 +1062,7 @@ coach.note.clock = Keine Uhr: Nehmen Sie sich alle Zeit, die Sie brauchen.
 coach.note.takeback = Nach einem groben Fehler zeigt der Trainer, was schiefging, und bietet an, den Zug zurückzunehmen.
 coach.note.lesson = Sie spielen Weiß; der Trainer baut jede Übung auf dem Brett auf.
 coach.note.unrated = Partien mit dem Trainer werden nicht gewertet.
+coach.note.fallible = Der Trainer ist nicht unfehlbar: Er kann einen Zug manchmal falsch einschätzen.
 coach.colour = Ihre Farbe
 coach.colour.help = Die Farbe, mit der Sie gegen den Trainer spielen. Abwechselnd: erst Weiß, dann Schwarz, von Partie zu Partie. Die Lektion über die Regeln wird immer mit Weiß gespielt.
 coach.colour.alternate = Abwechselnd

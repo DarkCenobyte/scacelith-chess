@@ -75,6 +75,14 @@ ex.verdict.blunder.b5.3 = {move} — дорога помилка.
 ex.verdict.blunder.b6 = {move} — серйозна помилка.
 ex.verdict.blunder.b6.2 = {move} — груба помилка.
 ex.verdict.blunder.b6.3 = {move}? Груба помилка.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ой! Треба було відповісти на мою загрозу.
+ex.verdict.ignored.b1.2 = Обережно! Моя загроза нікуди не зникла.
+ex.verdict.ignored.b1.3 = Ой, зачекай. А як же моя загроза?
+ex.verdict.ignored.b2 = Хм, моя загроза нікуди не зникла.
+ex.verdict.ignored.b2.2 = Моя загроза лишилася без відповіді.
+ex.verdict.ignored.b2.3 = Обережно, на мою загрозу треба було відповісти.
 ex.verdict.mistake.b3 = Це не дуже вдалий хід.
 ex.verdict.mistake.b3.2 = Хм, у ходу {move} є слабке місце.
 ex.verdict.mistake.b3.3 = Це помилка.
@@ -101,7 +109,11 @@ ex.verdict.inaccuracy.b5.3 = Точніше було {best}, ніж {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточність; {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Краще {best}.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Можливо, трохи точніше було {best}.
+ex.verdict.inaccuracy.maybe.2 = Мабуть, я б зіграв так: {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = Цей хід виглядає сумнівним.
 ex.verdict.dubious.2 = Цей хід здається сумнівним.
 # Something good was missed (levels 1-2).

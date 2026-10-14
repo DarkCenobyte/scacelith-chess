@@ -66,6 +66,14 @@ ex.verdict.blunder.b5.3 = {move} — дорогая ошибка.
 ex.verdict.blunder.b6 = {move} — грубая ошибка.
 ex.verdict.blunder.b6.2 = {move} — зевок.
 ex.verdict.blunder.b6.3 = {move}? Зевок.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ой! Нужно было ответить на мою угрозу.
+ex.verdict.ignored.b1.2 = Осторожно! Моя угроза никуда не делась.
+ex.verdict.ignored.b1.3 = Ой, подожди. А как же моя угроза?
+ex.verdict.ignored.b2 = Хм, моя угроза никуда не делась.
+ex.verdict.ignored.b2.2 = Моя угроза осталась без ответа.
+ex.verdict.ignored.b2.3 = Осторожно, на мою угрозу надо было ответить.
 ex.verdict.mistake.b3 = Это неудачный ход.
 ex.verdict.mistake.b3.2 = Хм, у хода {move} есть недостаток.
 ex.verdict.mistake.b3.3 = Это ошибка.
@@ -92,7 +100,11 @@ ex.verdict.inaccuracy.b5.3 = {best} точнее, чем {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточно; лучше {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Лучше было {best}.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Возможно, чуть точнее было {best}.
+ex.verdict.inaccuracy.maybe.2 = Пожалуй, я бы сыграл {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = Этот ход выглядит сомнительным.
 ex.verdict.dubious.2 = Этот ход кажется сомнительным.
 # Something good was missed (levels 1-2).

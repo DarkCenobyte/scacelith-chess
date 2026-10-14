@@ -67,6 +67,14 @@ ex.verdict.blunder.b5.3 = {move} خطأ مكلف.
 ex.verdict.blunder.b6 = {move} خطأ جسيم.
 ex.verdict.blunder.b6.2 = {move} خطأ فادح.
 ex.verdict.blunder.b6.3 = {move}؟ خطأ فادح.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = أوه! كان عليك الردّ على تهديدي.
+ex.verdict.ignored.b1.2 = حذارِ! تهديدي ما زال قائمًا.
+ex.verdict.ignored.b1.3 = مهلًا. غاب تهديدي عن بالك.
+ex.verdict.ignored.b2 = لحظة، تهديدي ما زال قائمًا.
+ex.verdict.ignored.b2.2 = بقي تهديدي بلا ردّ.
+ex.verdict.ignored.b2.3 = انتبه، كان عليك الردّ على تهديدي.
 ex.verdict.mistake.b3 = هذه ليست نقلة جيدة.
 ex.verdict.mistake.b3.2 = آه، في نقلة {move} مشكلة.
 ex.verdict.mistake.b3.3 = هذا خطأ.
@@ -93,7 +101,11 @@ ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
 ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
 ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
 ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = ربما كانت نقلة {best} أدقّ قليلًا.
+ex.verdict.inaccuracy.maybe.2 = ربما كنتُ سألعب {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = تبدو هذه النقلة مشكوكًا فيها.
 ex.verdict.dubious.2 = يبدو أن هذه النقلة مشكوك فيها.
 # Something good was missed (levels 1-2).

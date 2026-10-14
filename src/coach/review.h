@@ -12,11 +12,13 @@
 // through the coach::Analyst interface (stage.h) and hands the results back as ai::Analysis values;
 // tests build those by hand.
 #pragma once
+#include "assessment.h"
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
 #include "script.h"
 #include <cstdint>
 #include <deque>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -137,8 +139,18 @@ struct Band {
     int praiseEvery = 3;        // at most one praise per this many human moves
     int offerCap = -1;          // takebacks the player may accept per game (-1: no cap)
     float demoPause = 0.8f;     // pause after a demonstration move lands
+    // How surely a player of the level turns an advantage into points: the slope, per 100 cp, of the
+    // logistic their results follow (Lichess's W% is 0.368, that of engines and strong players).
+    // Fitted on 20,452 positions of Lichess games: 0.14 at 1000-1300, 0.17 at 1300-1600, 0.20 at
+    // 1600-1900, 0.29 at 1900-2200, 0.36 from 2200 (levels 1-6: 750 to 2300 Elo).
+    double conversion = 0.36;
 };
 Band band(int level);           // clamped to 1..6
+// Lichess's W% (the mover's view) as a player of the band's level converts it: the same logit,
+// scaled by band.conversion / 0.368. It decides whether the game counts as decided, the player as
+// still better or clearly ahead; the classes keep Lichess's scale. 50 stays 50, a mate counts as
+// winPercent's +-1000 cp: +5 (W% 86) counts as 67 at level 1, 86 at level 6.
+double levelWinPercent(double w, const Band& b);
 
 // ---- The review --------------------------------------------------------------------------------
 struct ReviewInput {
@@ -148,6 +160,40 @@ struct ReviewInput {
     const ai::Analysis* after = nullptr;     // A2 (optional): the position after the move, for a longer refutation
     const ai::Analysis* shallow = nullptr;   // A3 (optional): a shallow search of the same root ("tricky" praise)
     bool inBook = false;                     // the position after the move is in the openings book
+    // The searches of the sequence a reason would show, by key (Reviewer::verifyRequest). Set, the
+    // review stands only by what they confirm move by move: the player's defences in the sequence
+    // are the best ones (another as good that loses less makes the claim smaller, or no claim), the
+    // coach's moves are not weaker than the engine's there. A search the review still wants is
+    // Review::verifyNext. Null: the sequences are the engine's lines as they come (tests, tools that
+    // do not verify).
+    const std::map<std::string, ai::Analysis>* verified = nullptr;
+};
+
+// What a voiced reason asserts about the move, for audits (tools/coach_audit): its type, the points
+// the human loses for good by its sequence (0: a reason that is not about material), the plies of the
+// refutation (from the position after the move) that sequence takes, and whether some of them are
+// replies the engine did not show (guessed from the board: extendRefutation).
+struct Claim {
+    ExType type = ExType::None;
+    int lost = 0;
+    int plies = 0;
+    std::vector<std::string> line;   // UCI, the first 'plies' moves of the refutation
+    bool guessed = false;
+    bool mate = false;
+    // The common checks' figures (claims.cpp): the human's free moves inside the sequence, the
+    // centipawns by which the engine's drop falls short of the material lost, whether the move's own
+    // deeper line loses as much; what the best move loses and the move's own line, and the drop.
+    int quiet = 0, compensation = 0;
+    bool ownLine = true;
+    int held = -1;   // the loss that stands along the line (lineLoss from its first ply)
+    int bestLoss = 0, playedLoss = -1, dropCp = 0;
+    // The verification (ReviewInput::verified): the plies of the sequence confirmed move by move,
+    // whether it changed the engine's line (a better defence or a stronger move found on the way),
+    // and what it did to the reason first found: 0 kept, 1 made smaller (a defence that loses less),
+    // 2 dropped (not confirmed, or nothing left to claim).
+    int verifiedPlies = -1;
+    bool lineChanged = false;
+    int reduced = 0;
 };
 
 struct Review {
@@ -156,6 +202,20 @@ struct Review {
     bool offersTakeback = false;  // the script ends with an OfferTakeback beat
     bool isRetry = false;         // this move replaced a taken-back one: 'takeback' describes it
     TakebackRecord takeback;
+    Claim claim;                  // the reason said (type None when none is)
+    Assessment assessment;        // what the move does to the expected result (assessment.h)
+    // With ReviewInput::verified: the key of the next search the review wants (verifyRequest) before
+    // it can stand by its reason, "" when it wants none. A review given without it says no reason it
+    // could not confirm.
+    std::string verifyNext;
+    Claim dropped;                // the reason first found, when the verification took it back or made it smaller (audits)
+    bool unsettled = false;       // a fault the search's last iterations disagree on (said at most as a mistake, no reason)
+    double costBefore[2] = {-1.0, -1.0};   // what the fault cost at the two iterations before the last (-1: not known)
+    bool ignoredThreat = false;   // the verdict says the move left the coach's threat standing (levels 1-2)
+    // The refutation (UCI, from the position after the move) the reason was looked for on, when the
+    // verification changed the engine's line (audits); empty otherwise.
+    std::vector<std::string> refutation;
+    std::vector<std::string> verifyLog;   // what the verification did, round by round (audits)
 };
 
 class Reviewer {
@@ -178,6 +238,27 @@ public:
     // move differs from the move played (a top move), that move was "not easy to see" (praise at
     // levels 3-4).
     ai::AnalysisRequest shallowRequest(const chess::Game& g) const;
+    // A search the review asks for before it stands by the sequence it would show (Review::verifyNext,
+    // review_internal.h: compareKey): a position's FEN, searched at depth kVerifyDepth (MultiPV 3), or
+    // "FEN | m1 m2", the two moves compared at depth kCompareDepth; each capped in time. The session
+    // runs them one after another, each time asking probe() for the next, at most kVerifyMax per
+    // review.
+    static ai::AnalysisRequest verifyRequest(const std::string& key);
+    static constexpr int kVerifyDepth = 12;
+    static constexpr int kCompareDepth = 16;
+    static constexpr int kVerifyMax = 10;
+    // A fault is unsettled when one of the two iterations before the search's last found the move
+    // costing less than this (win-% points): a good move then (review.cpp).
+    static constexpr double kUnsettledCost = 5.0;
+    // Level 6 hedges an inaccuracy costing less than this (win-% points; the class starts at 5):
+    // "Nf3 may have been a little more precise". Deeper searches clear about half of such moves.
+    static constexpr double kHedgedSlipCost = 6.0;
+    // The review this input would give, the reviewer left as it is (rate limits, offers, takeback):
+    // for Review::verifyNext before the review itself.
+    Review probe(const ReviewInput& in) const {
+        Reviewer copy = *this;
+        return copy.review(in);
+    }
 
     // Right after any move is completed (either side): "Check!", "Checkmate!" (Urgent beats).
     Script announce(const chess::Game& g);
@@ -188,8 +269,15 @@ public:
 
     // After the coach's own move, before the human plays: warnings about the coach's new threats
     // (levels 1-2) and, at level 1, "my last move was a mistake" once A0 of the human's turn
-    // ('before', optional) confirms the capture. Low-priority beats.
-    Script coachMoved(const chess::Game& g, const ai::Analysis* before = nullptr);
+    // ('before', optional) confirms the capture. Low-priority beats. 'threat' (optional): the search
+    // of threatKey(g), what the coach would play with the turn passed to it: a warning the board's
+    // rules find is said only when that search wins the material (or mates) too, and the threat is
+    // kept for the review of the player's move ("you did not answer my threat").
+    Script coachMoved(const chess::Game& g, const ai::Analysis* before = nullptr, const ai::Analysis* threat = nullptr);
+    // The search of the coach's threats after its move (levels 1-2): the position with the turn passed
+    // to the coach, searched as a verification's short search (verifyRequest(key)); "" when there is
+    // none to search (levels 3-6, the player in check, the game over, the last move the player's).
+    std::string threatKey(const chess::Game& g) const;
 
     // The player's answer to an offer. Accepted: call after Game::undo(1); returns the hint
     // (levels 1-2) and remembers the move so the replay is judged against it. Declined: returns the
@@ -226,6 +314,15 @@ private:
     bool castlePraised_ = false;
     bool coachCheckExplained_ = false;
     bool punishHintDone_ = false;
+    // The coach's threat after its last move, as the threat search found it (coachMoved): the move it
+    // would play, what it wins for good within four plies, a mate; ply: of the coach's move (-1: none).
+    struct Threat {
+        int ply = -1;
+        std::string uci;
+        int gain = 0;
+        bool mate = false;
+    };
+    Threat threat_;
     uint32_t tipsSaid_ = 0;           // opening principles and endgame tips already voiced (bits)
     std::vector<double> humanW_;      // the human's W% after each judged move on the board (index = ply, -1: none)
     // The last offer, and a takeback in progress.

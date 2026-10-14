@@ -351,6 +351,8 @@ void trainingTab(CoachSetup& setup, float lx, float rx, float colW, float top) {
     y += note(T("coach.note.clock"), rcol, rx, y, colW, ivoryDim);
     y += note(T(lessonNow ? "coach.note.lesson" : "coach.note.takeback"), rcol, rx, y, colW, ivoryDim);
     y += note(T("coach.note.unrated"), rcol, rx, y, colW, ivoryDim);
+    // The coach judges the player's moves in games (the lesson has none): it can misjudge one.
+    if (!lessonNow) y += note(T("coach.note.fallible"), rcol, rx, y, colW, ivoryDim);
     y += 12.0f;
     // Colour: White in the lesson; else White, Black or alternating (the next colour is shown).
     {

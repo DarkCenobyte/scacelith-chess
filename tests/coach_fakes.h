@@ -12,6 +12,7 @@
 #include "ai/analysis.h"
 #include "chess/chess.h"
 #include "coach/pacing.h"
+#include "coach/review.h"
 #include "coach/stage.h"
 
 #include <algorithm>
@@ -289,8 +290,11 @@ public:
 };
 
 // Scripted analyses: results[fen + "|" + shape] with shape A0 (MultiPV 3), A1 (searchmoves), A2
-// (MultiPV 2), A3 (depth 6), E (background evaluation). Anything else gets a level line (cp 0) on
-// the first legal move (or the searched move). Ready after 'delay' polls.
+// (MultiPV 2), A3 (depth 6), E (background evaluation), V (the short search confirming a reason's
+// sequence) and C (its comparison of two moves). Anything else gets a level line (cp 0) on the
+// first legal move (or the searched move); an unscripted V or C follows the scripted lines that go
+// through its position instead, as an engine agreeing with itself would (the sequences the reviews
+// show come from those lines). Ready after 'delay' polls.
 class Analyst : public coach::Analyst {
 public:
     bool engine = true;
@@ -306,6 +310,8 @@ public:
     std::vector<Job> asked;   // every request, in order
 
     static std::string shapeOf(const ai::AnalysisRequest& r) {
+        if (r.searchMoves.size() == 2 && r.depth == coach::Reviewer::kCompareDepth) return "C";
+        if (r.searchMoves.empty() && r.depth == coach::Reviewer::kVerifyDepth) return "V";
         if (!r.searchMoves.empty()) return "A1";
         if (r.priority < 0) return "E";
         if (r.depth == 6) return "A3";
@@ -328,6 +334,24 @@ public:
         return n;
     }
 
+    // The rest of a scripted line from 'fen' on (empty: none goes through it).
+    std::vector<std::string> scriptedFrom(const std::string& fen) const {
+        for (const auto& kv : results) {
+            const std::string root = kv.first.substr(0, kv.first.rfind('|'));
+            for (const ai::PvLine& l : kv.second.lines) {
+                chess::Game g;
+                if (!g.resetFromFEN(root)) break;
+                for (size_t i = 0; i < l.pv.size(); ++i) {
+                    if (g.position().fen() == fen) return std::vector<std::string>(l.pv.begin() + long(i), l.pv.end());
+                    const chess::Move m = g.position().parseUCI(l.pv[i]);
+                    if (!m.valid()) break;
+                    g.play(m);
+                }
+            }
+        }
+        return {};
+    }
+
     uint32_t analyse(const ai::AnalysisRequest& r) override {
         if (!engine) return 0;
         Job j;
@@ -347,8 +371,32 @@ public:
             chess::Position p;
             p.setFEN(it->fen);
             auto found = results.find(it->fen + "|" + it->shape);
+            std::vector<std::string> along =
+                found == results.end() && (it->shape == "V" || it->shape == "C") ? scriptedFrom(it->fen)
+                                                                                 : std::vector<std::string>();
+            const auto& sm = it->req.searchMoves;
+            if (!along.empty() && !sm.empty() && std::find(sm.begin(), sm.end(), along.front()) == sm.end())
+                along.clear();
             if (found != results.end()) {
                 out = found->second;
+            } else if (!along.empty()) {
+                out = ai::Analysis();
+                out.ok = true;
+                out.depth = it->req.depth;
+                ai::PvLine l;
+                l.depth = it->req.depth;
+                l.pv = along;
+                out.lines.push_back(l);
+                // A comparison: the other move too, as good (nothing to choose between them).
+                for (const std::string& m : it->req.searchMoves) {
+                    if (m == along.front()) continue;
+                    ai::PvLine o;
+                    o.multipv = 2;
+                    o.depth = it->req.depth;
+                    o.pv.push_back(m);
+                    out.lines.push_back(o);
+                }
+                out.bestMove = along.front();
             } else {
                 out = ai::Analysis();
                 out.ok = true;
@@ -367,6 +415,12 @@ public:
                     l.pv.push_back(first);
                 }
                 out.lines.push_back(l);
+                for (size_t k = 1; k < it->req.searchMoves.size(); ++k) {   // a comparison: level too
+                    ai::PvLine o = l;
+                    o.multipv = int(k) + 1;
+                    o.pv = {it->req.searchMoves[k]};
+                    out.lines.push_back(o);
+                }
                 out.bestMove = first;
             }
             out.id = id;

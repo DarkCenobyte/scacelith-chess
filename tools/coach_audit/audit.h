@@ -18,6 +18,15 @@
 //       points or more at depth 10 (each position searched once), tagged with the game's site,
 //       ratings and time control; a game with an AuditPlies tag (ply numbers from 1, a sample's
 //       picks) gives those plies only, without the scan, its AuditTag added to their tag
+//   coach_audit reanalyse --in FILE --out FILE [--threads T] [--stop FILE]
+//       the analyses of every record of FILE run again, the same requests at the same depth, and
+//       written with the engine's win/draw/loss chances (records.cpp: "wdl"), the tag kept; a rerun
+//       goes on after the records the output already holds
+//   coach_audit truth --in FILE --out FILE [--depth D] [--threads T] [--stop FILE]
+//       the reference the reviews are measured against: for every record of FILE, the position
+//       before the human's move searched deeper (MultiPV 4, WDL, depth D, 22 by default for this
+//       mode's callers; a fresh hash table each time) as a0, and the move played alone as a1 when
+//       a0 holds no exact line for it; a rerun goes on after the records the output holds
 //   coach_audit review --in FILE [--level L] [--out FILE] [--all] [--sequence]
 //       replays each move through the Reviewer at every level (no engine), prints what the coach says
 //       and shows, and checks every claim with board facts (oracles.cpp): a demonstration that stops
@@ -31,6 +40,10 @@
 //       --verify D [--threads T] [--cache FILE]: also every move the coach shows or says, judged by
 //       the engine at depth D (verify.cpp: what it costs its mover against the best move there;
 //       the cache keeps the verdicts between runs)
+//       --vcache FILE: each review whose reason a Coach game would say confirms its sequence move by
+//       move as the game does (ReviewInput::verified: the searches Reviewer::verifyRequest asks for,
+//       at most Reviewer::kVerifyMax), the searches run here once and kept in FILE ("vcheck" and
+//       "dropped" lines: what the check did)
 //   coach_audit commentary --in FILE [--out FILE] [--all]
 //       the Analysis mode's comment on each recorded move (A0 before it, A2 or A1's line after it),
 //       its material claims checked against the board (commentary.cpp)
@@ -39,6 +52,7 @@
 #include "chess/chess.h"
 #include "coach/review.h"
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -71,6 +85,9 @@ struct Options {
                                  // or more at depth 10 (0 = every move)
     int verify = 0;              // review: depth of the engine's check of every move shown or said (0 = none)
     std::string cache;           // review --verify: the verdicts kept between runs
+    // review: the cache of the searches that confirm the reasons' sequences as a Coach game does
+    // (SequenceSearches); "" = the reviews take the engine's lines as they come
+    std::string vcache;
 };
 
 // One human move and its analyses.
@@ -87,6 +104,27 @@ struct Record {
 std::string writeRecord(const Record& r);
 // Reads every record of a file's text; false on a syntax error (message in err).
 bool readRecords(const std::string& text, std::vector<Record>& out, std::string& err);
+// The verification searches' cache (review --vcache): one search per key (Reviewer::verifyRequest).
+std::string writeSearch(const std::string& fen, const ai::Analysis& a);
+bool readSearches(const std::string& text, std::map<std::string, ai::Analysis>& out, std::string& err);
+
+// The searches a Coach game runs to confirm the sequences its reasons show, move by move
+// (coach/review.h: ReviewInput::verified, Reviewer::verifyRequest), run with the embedded Stockfish
+// once per position and kept in a cache file between runs (review --vcache).
+class SequenceSearches {
+public:
+    SequenceSearches(int threads, const std::string& cachePath);
+    ~SequenceSearches();
+    bool ok() const;
+    // The search 'key' asks for (Reviewer::verifyRequest, at its depth only and from a cleared hash
+    // table: reproducible); a failed analysis when the engine is unavailable and the cache has none.
+    const ai::Analysis& get(const std::string& key);
+    int searched() const;   // searches this run made (not from the cache)
+
+private:
+    struct Impl;
+    std::unique_ptr<Impl> d;
+};
 
 // The engine's verdict on the moves of a line (review --verify): what a move costs its mover, in
 // win percentage points, against the engine's best move in that position at a fixed depth.
@@ -105,6 +143,8 @@ private:
 };
 
 int recordMain(const Options& o);
+int reanalyseMain(const Options& o);
+int truthMain(const Options& o);
 int reviewMain(const Options& o);
 int commentaryMain(const Options& o);
 

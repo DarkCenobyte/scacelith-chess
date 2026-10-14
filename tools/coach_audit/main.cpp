@@ -8,7 +8,7 @@
 int main(int argc, char** argv) {
     audit::Options o;
     if (argc < 2) {
-        std::fprintf(stderr, "usage: coach_audit record|review|commentary [options] (see tools/coach_audit/audit.h)\n");
+        std::fprintf(stderr, "usage: coach_audit record|reanalyse|truth|review|commentary [options] (see tools/coach_audit/audit.h)\n");
         return 2;
     }
     o.mode = argv[1];
@@ -40,12 +40,15 @@ int main(int argc, char** argv) {
         else if (a == "--min-drop") o.minDrop = std::atof(next().c_str());
         else if (a == "--verify") o.verify = std::atoi(next().c_str());
         else if (a == "--cache") o.cache = next();
+        else if (a == "--vcache") o.vcache = next();
         else {
             std::fprintf(stderr, "unknown option %s\n", a.c_str());
             return 2;
         }
     }
     if (o.mode == "record") return audit::recordMain(o);
+    if (o.mode == "reanalyse") return audit::reanalyseMain(o);
+    if (o.mode == "truth") return audit::truthMain(o);
     if (o.mode == "review") return audit::reviewMain(o);
     if (o.mode == "commentary") return audit::commentaryMain(o);
     std::fprintf(stderr, "unknown mode %s\n", o.mode.c_str());

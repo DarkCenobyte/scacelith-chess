@@ -2,8 +2,10 @@
 // with mate distances and win/draw/loss chances, principal variations, and the parser of
 // Stockfish's "info" lines. Engine-free value types, unit-testable without the engine.
 #pragma once
+#include <cstddef>
 #include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace ai {
@@ -41,6 +43,15 @@ struct PvLine {
     std::vector<std::string> pv;              // UCI moves from the analysed position
 };
 
+// One completed iteration of a search: the first move and score of each line it reported, best first.
+// A verdict the last iterations disagree on (a move judged a blunder at the last depth, best one depth
+// earlier) is one the search has not settled (coach/review.cpp).
+struct DepthReport {
+    int depth = 0;
+    std::vector<std::pair<std::string, Score>> lines;   // (first move, UCI; score), multipv order
+};
+constexpr size_t kHistoryDepths = 6;                     // iterations kept in Analysis::history
+
 struct AnalysisRequest {
     std::string startFen;                     // "" = standard start position
     std::vector<std::string> moves;           // UCI, played from startFen
@@ -70,6 +81,9 @@ struct Analysis {
     bool noLegalMove = false;
     std::string bestMove;                     // UCI; with searchMoves the best of those
     std::vector<PvLine> lines;                // the last complete report, sorted by multipv (best first)
+    // The last kHistoryDepths iterations reported (one per depth, the last report of each), oldest
+    // first; the last one is 'lines' itself. Empty for a position without legal moves.
+    std::vector<DepthReport> history;
     int depth = 0;                            // of lines[0]
     int64_t nodes = 0;
     int timeMs = 0;

@@ -68,6 +68,14 @@ ex.verdict.blunder.b5.3 = {move} est une faute coûteuse.
 ex.verdict.blunder.b6 = {move} est une grave erreur.
 ex.verdict.blunder.b6.2 = {move} est une gaffe.
 ex.verdict.blunder.b6.3 = {move} ? Une gaffe.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Oups ! Tu n’as pas répondu à ma menace.
+ex.verdict.ignored.b1.2 = Attention ! Ma menace était toujours là.
+ex.verdict.ignored.b1.3 = Oh, attends. Tu as oublié ma menace.
+ex.verdict.ignored.b2 = Hum, ma menace était toujours là.
+ex.verdict.ignored.b2.2 = Tu as laissé ma menace sans réponse.
+ex.verdict.ignored.b2.3 = Attention, tu n’as pas répondu à ma menace.
 ex.verdict.mistake.b3 = Ce n’est pas un bon coup.
 ex.verdict.mistake.b3.2 = Hum, {move} pose un problème.
 ex.verdict.mistake.b3.3 = C’est une erreur.
@@ -94,7 +102,11 @@ ex.verdict.inaccuracy.b5.3 = {best} était plus précis que {move}.
 ex.verdict.inaccuracy.b6 = {move} est imprécis ; {best}.
 ex.verdict.inaccuracy.b6.2 = Imprécis. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} était meilleur.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} était peut-être un peu plus précis.
+ex.verdict.inaccuracy.maybe.2 = Peut-être fallait-il jouer {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = Ce coup me semble douteux.
 ex.verdict.dubious.2 = Ce coup semble douteux.
 # Something good was missed (levels 1-2).

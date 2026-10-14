@@ -249,6 +249,9 @@ TEST(coach_tactics_mates_and_back_rank) {
     CHECK(classifyMate(fen("6rk/5Npp/8/8/8/8/8/6K1 b - - 0 1")) == MatePattern::Smothered);
     CHECK(classifyMate(fen("6k1/6Q1/5P2/8/8/8/8/6K1 b - - 0 1")) == MatePattern::Support);
     CHECK(classifyMate(fen("1R4k1/R7/8/8/8/8/8/6K1 b - - 0 1")) == MatePattern::Ladder);
+    // Qh6# against Kh4 with a rook on g8: the rook stands on the next file but guards nothing next to
+    // the king (the pawn on g6 shuts the file): pawns make the net, no ladder.
+    CHECK(classifyMate(fen("6R1/3r1p1p/4p1pQ/4P3/4pPPk/7P/3q1P1K/8 b - - 2 36")) == MatePattern::Other);
     CHECK(classifyMate(m) == MatePattern::None);   // not mate
 }
 

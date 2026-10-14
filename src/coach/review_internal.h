@@ -1,9 +1,11 @@
 // Internal to the coach's review (review.cpp, review_explain.cpp, appraisal.cpp): the facts of one
 // reviewed move and the helpers that turn them into beats. Not a public API.
 #pragma once
+#include "assessment.h"
 #include "review.h"
 #include "tactics.h"
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -25,6 +27,9 @@ struct Ctx {
     const ai::PvLine* l2 = nullptr;          // second best (only-move tests), may be null
     const ai::PvLine* lp = nullptr;          // the played move's line
     Judgement j;
+    // What the move does to the expected result (assessment.h): the engine's WDL and the practical
+    // win percentage of the best, second and played lines.
+    Assessment a;
     bool isBest = false;
     std::vector<LineStep> r;                 // refutation from p1 (the coach moves first)
     std::vector<LineStep> best;              // L1 from p0
@@ -140,6 +145,78 @@ struct Explanation {
     // moves when the loss needs no such sentence.
     chess::Move retake, punish;
 };
+
+// ---- Claim checks (claims.cpp): what a reason's sequence establishes ----
+// How firmly the consequence a reason states stands.
+enum class Support : uint8_t { Established, Plausible, Unsupported };
+struct ClaimCheck {
+    Support support = Support::Established;
+    int quiet = 0;          // the human's free moves inside the sequence (quietReplies)
+    int compensation = 0;   // centipawns by which the engine's drop falls short of the material the move loses
+    int held = -1;          // the loss that stands along the line, its plies and two more (lineLoss)
+    bool ownLine = true;    // the move's own deeper line loses as much (or is mated), when it is long enough to tell
+};
+// The human's moves among the first 'plies' plies of r that the human chose: not a capture, not an
+// answer to a check, not the only legal move. A sequence that needs several of them is one way the
+// game may go, not what the move forces.
+int quietReplies(const Ctx& c, int plies);
+// The checks every reason's sequence goes through (claims.cpp).
+ClaimCheck checkClaim(const Ctx& c, const Explanation& ex);
+
+// ---- Sequences verified move by move (claims.cpp, ReviewInput::verified) ----
+// Two moves of the same side are as good as each other when a search puts them within this many
+// win-% points (the side to move's view), and within kVerifySlackCp centipawns where the win
+// percentage no longer tells them apart (a decided game; a forced mate above any material).
+constexpr double kVerifySlack = 3.0;
+constexpr int kVerifySlackCp = 150;
+bool asGood(const ai::Score& a, const ai::Score& b);   // 'a' as good as 'b', or better (side to move's view)
+// A coach move of a line is replaced only when the comparison puts it this many win-% points below
+// the best: a slightly weaker move still shows what the reason says (the reason is checked on the
+// line as it is), while a new line from there may no longer show it.
+constexpr double kReplaceSlack = 10.0;
+// The searches the verification asks for, by key (Review::verifyNext, Reviewer::verifyRequest): a
+// position's FEN for the short search of all its moves (MultiPV 3, Reviewer::kVerifyDepth), or
+// "FEN | m1 m2" for the deeper comparison of two moves there (Reviewer::kCompareDepth): what a short
+// search finds against the engine's own line is only a doubt (one search in eight of the moves it
+// prefers holds at depth 20), the comparison settles it.
+std::string compareKey(const std::string& fen, const std::string& a, const std::string& b);
+// The two moves' lines of a comparison, null while it is not in 'v' (or failed); 'a' is a's line.
+bool compared(const std::map<std::string, ai::Analysis>& v, const std::string& fen, const std::string& a,
+              const std::string& b, const ai::PvLine*& la, const ai::PvLine*& lb);
+// Another defence the player had, about as good in the short search as the one in the line: the
+// line with it (the plies before it, then the search's line from there).
+struct Defence {
+    int at = 0;                         // the ply of the line where the player chooses
+    std::vector<LineStep> line;
+    ai::Score score;                    // the short search's score of that defence (the player's view)
+};
+struct Verification {
+    int plies = 0;                      // plies of the line walked from its start (forced replies too)
+    bool changed = false;               // a coach move replaced (the rest of the line with it)
+    int changedAt = -1;                 // where
+    std::vector<Defence> others;        // the player's other defences, about as good as the line's
+    std::string next;                   // the key of the first search the walk still needs
+    std::vector<std::string> notes;     // the moves replaced, and why (Review::verifyLog)
+};
+// 'line' (from 'start', where the coach moves first) walked against the searches in 'v', for at most
+// 'want' plies. A coach move the short search finds weaker than its best is compared with it more
+// deeply; when the comparison finds it clearly weaker (kReplaceSlack), the line goes on with the
+// comparison's line from there.
+// Within its first 'deepPlies' plies the line's own search saw deeper: its coach moves stay. The
+// player's other moves about as good as the line's in the short search are kept as other defences
+// (verifyReason weighs them). Stops at the first search missing (Verification::next); a reply the
+// player is forced to make needs none. 'first' (optional) stands for the short search of 'start'
+// (A2, on p1).
+Verification verifyLine(const Ctx& c, std::vector<LineStep>& line, const chess::Position& start,
+                        const std::map<std::string, ai::Analysis>& v, const ai::Analysis* first, int want,
+                        int deepPlies);
+// The most the human is down for good after any of the plies from..plies of 'line' (from p1),
+// relative to p0's balance: a loss counts when no ply of the next kHeldPlies wins it back (each
+// read where the captures that follow at once end: an exchange, or a capture answered by another,
+// counted whole), nor a capture still due at the line's end. A defence's line often ends in the
+// middle of the play that wins the material back.
+constexpr int kHeldPlies = 4;
+int lineLoss(const Ctx& c, const std::vector<LineStep>& line, int from, int plies);
 
 // ---- Engine requests and figures (shared with the appraisal) ----
 // The start position as sent to the engine: "" for the standard start, else its FEN.

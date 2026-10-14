@@ -84,6 +84,14 @@ ex.verdict.blunder.b6.2 = {move}は大悪手。
 ex.verdict.blunder.b6.2.spoken = {move}はだいあくしゅ。
 ex.verdict.blunder.b6.3 = {move}？大悪手。
 ex.verdict.blunder.b6.3.spoken = {move}？だいあくしゅ。
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = おっと！私の狙いを防いでいませんね。
+ex.verdict.ignored.b1.2 = 気をつけて！私の狙いがまだ残っていましたよ。
+ex.verdict.ignored.b1.3 = あっ、ちょっと待ってください。私の狙いを忘れていましたね。
+ex.verdict.ignored.b2 = うーん、私の狙いがまだ残っていました。
+ex.verdict.ignored.b2.2 = 私の狙いをそのままにしてしまいましたね。
+ex.verdict.ignored.b2.3 = 気をつけて、私の狙いを防いでいませんよ。
 ex.verdict.mistake.b3 = それは良い手ではありません。
 ex.verdict.mistake.b3.2 = うーん、{move}には問題があります。
 ex.verdict.mistake.b3.3 = それはミスです。
@@ -114,7 +122,11 @@ ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
 ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
 ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best}の方が少し正確だったかもしれません。
+ex.verdict.inaccuracy.maybe.2 = 私なら{best}を指したかもしれません。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = その手は疑問手のようです。
 ex.verdict.dubious.spoken = その手はぎもんしゅのようです。
 ex.verdict.dubious.2 = 疑問手かもしれませんね。

@@ -39,6 +39,10 @@ predictor decide what is said, the steps only refine the sound. Same misreadings
   sherpa-onnx's Whisper drops the tokens that hold part of a UTF-8 character: most kanji and some
   Arabic letters vanish from its transcripts ("الضغط" comes out "الغط"). Give it a tokens file whose
   tokens are the hex of their bytes and decode the text from hex afterwards.
+- Both recognisers come from the `asr-models` release of sherpa-onnx on GitHub
+  (`sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8`, `sherpa-onnx-whisper-medium`); `pip install sherpa-onnx`
+  runs them. A line with `{best}` or `{move}` is checked with a piece move and a pawn move in its place
+  ("rook a3", "e4"): a pawn move puts a lone file letter after the word before it.
 - Stress (Russian, Ukrainian): synthesise the plain word and one variant per vowel with U+0301 after
   it; the variant closest to the plain rendering is where the voice puts the stress. Compare with a
   dictionary (espeak-ng's is wrong for many Ukrainian words; check the doubtful ones by hand).
@@ -62,6 +66,11 @@ predictor decide what is said, the steps only refine the sound. Same misreadings
 (silent t). Checked and fine: "sept" (no p). A round trip over 300 lines found nothing else, homophones
 aside (cent/sans, roque/roc, ma dame/madame).
 
+"J’aurais peut-être joué {best}" lost "être" in 2 renderings of 6 ("peut-joué", the spoken "p'têt");
+"Peut-être fallait-il jouer {best}" came through 8 times in 8 (ex.verdict.inaccuracy.maybe.2). Seen on
+the way, left as is: "J’aurais joué tour a trois" (ex.verdict.inaccuracy.b5.2) was heard without "joué"
+twice in 4.
+
 ## German
 
 | Written | Voice said | Spoken spelling |
@@ -72,6 +81,13 @@ aside (cent/sans, roque/roc, ma dame/madame).
 | Pirc | "Pirk" | `pirz` |
 
 Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, rochieren, Giuoco Piano.
+
+Word order around a move: "Ich hätte vielleicht {best} gespielt" lost a word in 4 renderings of 6 ("Ich
+hätte vielleicht gespielt", "Ich hätte Turm a drei gespielt"); "Vielleicht hätte ich {best} gespielt"
+came through 7 times in 8, once heard "je vier" (ex.verdict.inaccuracy.maybe.2). After "war", a pawn
+move's "e" melts: "Vielleicht war e vier" was heard "Vielleicht war ich hier" 3 times in 4, so that line
+keeps the move first ("{best} war vielleicht etwas genauer"). Seen on the way, left as is: "Ich hätte
+Turm a drei gespielt" (ex.verdict.inaccuracy.b5.2) lost "Turm" 3 times in 4.
 
 ## Russian
 
@@ -87,6 +103,10 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - Inherent to the notation, left as is: "а пять" sounds like "опять", "е два" like "едва".
 - Round trip over 1,000 lines; the stress of the 140 most frequent words and of the chess nouns compared
   with a dictionary.
+- "угрозу" / "угроза" (ex.verdict.ignored) are stressed on the о, as written (probe, 3 seeds).
+- "пожалуй" is a close call: alone the voice leans to пожа́луй, in "Пожалуй, я бы сыграл" to по́жалуй
+  (probe, 8 seeds): marked `пожа́луй`, the dictionary stress. "возможно" (возмо́жно) and "точнее"
+  (точне́е) are read as the dictionary has them (probe, 4 seeds).
 
 ## Ukrainian
 
@@ -98,6 +118,10 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - "ферзем" unmarked is read like the Russian "ферзём": `ферзе́м`. Words shared with Russian are the
   ones to check first.
 - Adverbs too: "задарма" is read "зада́рма" (probe, 4 seeds), the dictionary stress is `задарма́`.
+- "загрозу" alone is a close call between загро́зу and загрозу́ (probe, 6 seeds); in "на мою загрозу"
+  the voice says загро́зу, as the dictionary does: left unmarked (ex.hanging_threat.b3 already said it).
+- "мабуть" is read мабу́ть, alone and in "Мабуть, я б зіграв так" (probe, 8 seeds); the dictionary
+  stress is `ма́буть`. "можливо" (можли́во) and "трохи" (тро́хи) are read as the dictionary has them.
 
 ## Arabic
 
@@ -114,6 +138,9 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - The recogniser writes no short vowels, so a vowel misreading only shows in a direct comparison of
   vowelled spellings (`--probe "ar:الملك=المَلِك|المَلَك|المُلك"`); a candidate that adds only one
   diacritic is the fairest comparison, full vocalisation changes the delivery.
+- "تهديدي" (my threat, ex.verdict.ignored) is read tahdīdī (probe against تُهْدِيدِي and تَهَدُّدِي).
+- "ربما" (perhaps, ex.verdict.inaccuracy.maybe) is read rubbamā (probe against رُبما, رَبما and رِبما,
+  4 seeds).
 
 ## Japanese
 
@@ -123,6 +150,8 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - 一局指し: the voice voices 指し right after 一局 ("いっきょくざし"): `一局さし`. With を ("一局を指し")
   it is fine.
 - 一マス / 二マス: say `ひとマス` / `ふたマス` (count.square.spoken does).
+- 狙い (the coach's threat, ex.verdict.ignored) is read ねらい, alone and in 私の狙い (probe, 3 seeds).
+- を指した is read さした (probe against ざした and ゆびさした, 4 seeds).
 - respell.* cannot match inside a Japanese sentence (no spaces between words): a misread word needs a
   `.spoken` line in each catalog line that uses it, and an entry in SPOKEN_WORDS for the opening texts.
 
@@ -132,8 +161,12 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
   vowel, which melts into it ("la casilla e cinco", "sobre e cinco" heard without the e). "é", "ee",
   "eh" and "e-e" did no clearly better, so it stays "e". After a consonant it is heard ("en e siete"):
   prefer that in new lines.
+- ex.verdict.inaccuracy.maybe puts the move after a consonant ("Quizás {best}", "por {best}"): the
+  pawn move's "e" came through every time (round trip, 3 seeds).
 
 ## English
 
 - "en passant" as written is said "in passant": `ahn pahssahn` (respell.en, respell.passant), the
   pronunciation dictionaries give. Otherwise clean over 250 lines.
+- "Perhaps {best} was ..." lost the piece name in 2 renderings of 3 ("Perhaps A three"): the line starts
+  with the move instead ("{best} may have been a little more precise", 8 times in 8).

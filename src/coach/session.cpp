@@ -8,6 +8,12 @@
 //       review waits for it: a search stopped early judges and explains from too shallow a line).
 //   A1  after the human's move, when A0 does not hold the played move or holds only a bound for it
 //       (Reviewer::needsPlayedRequest); A2 at levels 4-6.
+//   T   after the coach's move at levels 1-2: its threats, the turn passed to it (Reviewer::threatKey),
+//       before the human's A0; the threat warnings wait for it (kCoachRemarkWait at most).
+//   V   then, when the review would show a reason's sequence: the searches that confirm it move by
+//       move (Review::verifyNext, Reviewer::verifyRequest), one after another, at most
+//       Reviewer::kVerifyMax of them and kVerifyWait seconds in all; what they could not confirm in
+//       time is not said (the verdict stays).
 //   evaluations of the positions the appraisal still lacks, in the background when the Analyst is
 //       idle and no review waits.
 // The review holds the coach's move (coachMayMove) from the human's move until its script is over
@@ -30,6 +36,7 @@ namespace {
 
 constexpr float kA0Wait = 4.0f;           // the review waits this long for A0 (2.5 s of search at most)
 constexpr float kA12Wait = 4.0f;          // ... and for A1 / A2
+constexpr float kVerifyWait = 6.0f;       // ... and for the searches confirming a reason's sequence
 constexpr float kCoachRemarkWait = 1.5f;  // the coach's remarks wait this long for A0
 constexpr float kTakeYourTime = 60.0f;    // "Take your time." after this long without a move (levels 1-3)
 constexpr float kFiller = 6.0f;           // a filler once the engine holds the coach's move this long
@@ -91,14 +98,14 @@ void append(Script& s, const Script& more) { s.insert(s.end(), more.begin(), mor
 }  // namespace
 
 struct Session::Impl {
-    enum class JobKind { A0, A1, A2, A3, Eval };
+    enum class JobKind { A0, A1, A2, A3, Verify, Threat, Eval };
     struct Job {
         uint32_t id = 0;
         JobKind kind = JobKind::A0;
-        std::string fen;      // analysed position
+        std::string fen;      // analysed position (Verify: the search's key; Threat: the turn passed)
         size_t plies = 0;     // its ply in the game
     };
-    enum class ReviewState { None, WaitA0, WaitA12, Playing };
+    enum class ReviewState { None, WaitA0, WaitA12, WaitV, Playing };
     enum class React { None, Before, Undo };
 
     // Everything that lives for one game (start() resets it).
@@ -116,6 +123,9 @@ struct Session::Impl {
         // The coach's last move: its remarks wait for A0.
         int coachMovedPly = -1;
         float coachMovedWait = 0.0f;
+        std::string threatKey;        // the search of the coach's threats after that move ("": none asked)
+        ai::Analysis threat;
+        bool threatDone = false;
         bool yourMoveAfterCoach = false;
         // The review of the human's move.
         ReviewState review = ReviewState::None;
@@ -125,6 +135,10 @@ struct Session::Impl {
         bool a1Asked = false, a2Asked = false;
         ai::Analysis a1, a2;
         bool a1Done = false, a2Done = false;
+        bool verifying = false;                        // the reason's sequence is being confirmed
+        std::map<std::string, ai::Analysis> verified;  // its searches so far (ReviewInput::verified)
+        std::string verifyKey;                         // the one under way ("": none)
+        int verifyAsked = 0;
         uint64_t reviewScript = 0;
         MoveClass lastClass = MoveClass::Unjudged;
         int offerPly = -1;            // the human ply the last offer was about
@@ -230,7 +244,8 @@ struct Session::Impl {
     // The game is back at 'plies' moves: analyses of positions that are gone are cancelled.
     void cancelBeyond(const chess::Game& game, size_t plies) {
         for (auto it = g.jobs.begin(); it != g.jobs.end();) {
-            const bool gone = it->kind == JobKind::A1 || it->kind == JobKind::A2 || it->plies > plies ||
+            const bool gone = it->kind == JobKind::A1 || it->kind == JobKind::A2 || it->kind == JobKind::Verify ||
+                              it->kind == JobKind::Threat || it->plies > plies ||
                               it->plies > game.moves().size() || game.positionAt(it->plies).fen() != it->fen;
             if (gone) {
                 analyst->cancelAnalysis(it->id);
@@ -268,6 +283,18 @@ struct Session::Impl {
                 if (int(j.plies) == g.reviewPly + 1 && g.review == ReviewState::WaitA12) {
                     g.a2 = a;
                     g.a2Done = true;
+                }
+                break;
+            case JobKind::Verify:
+                if (int(j.plies) == g.reviewPly + 1 && g.review == ReviewState::WaitV && j.fen == g.verifyKey) {
+                    g.verified[j.fen] = a;
+                    g.verifyKey.clear();
+                }
+                break;
+            case JobKind::Threat:
+                if (int(j.plies) == g.coachMovedPly + 1 && j.fen == g.threatKey) {
+                    g.threat = a;
+                    g.threatDone = true;
                 }
                 break;
             case JobKind::Eval:
@@ -317,14 +344,32 @@ struct Session::Impl {
             g.reviewWait = 0.0f;
             g.a1Asked = g.a2Asked = g.a1Done = g.a2Done = false;
             g.a1 = g.a2 = ai::Analysis();
+            g.verifying = false;
+            g.verified.clear();
+            g.verifyKey.clear();
+            g.verifyAsked = 0;
             stopJobs(JobKind::A3, g.reviewRoot);
             g.turnPly = -1;
             g.engineHold = 0.0f;
             g.fillerSaid = false;
             g.coachMovedPly = -1;
+            // The coach's remarks on its last move are past: their threat search goes.
+            for (auto it = g.jobs.begin(); it != g.jobs.end();) {
+                if (it->kind == JobKind::Threat) {
+                    analyst->cancelAnalysis(it->id);
+                    it = g.jobs.erase(it);
+                } else {
+                    ++it;
+                }
+            }
         } else {
             g.coachMovedPly = int(n) - 1;
             g.coachMovedWait = 0.0f;
+            g.threatKey = reviewer.threatKey(game);
+            g.threat = ai::Analysis();
+            g.threatDone = false;
+            if (!g.threatKey.empty() && !ask(JobKind::Threat, Reviewer::verifyRequest(g.threatKey), g.threatKey, n))
+                g.threatKey.clear();
             g.engineHold = 0.0f;
             g.fillerSaid = false;
             if (g.yourMoveAfterCoach && !game.isOver()) play(yourMoveScript(int(n) - 1));
@@ -333,7 +378,7 @@ struct Session::Impl {
         announceOpenings(game, director.idle() && g.review == ReviewState::None);
     }
 
-    void buildReview(const chess::Game& game) {
+    ReviewInput reviewInput(const chess::Game& game) const {
         const ai::Analysis* a0 = cachedA0(g.reviewRoot);
         auto a3 = g.a3.find(g.reviewRoot);
         ReviewInput in;
@@ -343,7 +388,24 @@ struct Session::Impl {
         in.after = g.a2Done ? &g.a2 : nullptr;
         in.shallow = a3 != g.a3.end() ? &a3->second : nullptr;
         in.inBook = OpeningBook::instance().lookup(game.position().hash());
-        Review r = reviewer.review(in);
+        in.verified = g.verifying ? &g.verified : nullptr;
+        return in;
+    }
+
+    // The next search the reason's sequence needs, asked for; false when there is none to ask (all
+    // in, the budget spent, or no engine): the review is built with what is in.
+    bool askVerify(const chess::Game& game) {
+        if (g.verifyAsked >= Reviewer::kVerifyMax || g.reviewWait >= kVerifyWait) return false;
+        const std::string next = reviewer.probe(reviewInput(game)).verifyNext;
+        if (next.empty() || g.verified.count(next)) return false;
+        if (!ask(JobKind::Verify, Reviewer::verifyRequest(next), next, game.moves().size())) return false;
+        g.verifyKey = next;
+        ++g.verifyAsked;
+        return true;
+    }
+
+    void buildReview(const chess::Game& game) {
+        Review r = reviewer.review(reviewInput(game));
         appraisal.add(r);
         g.lastClass = r.verdict.cls;
         if (r.offersTakeback) g.offerPly = r.verdict.ply;
@@ -416,6 +478,31 @@ struct Session::Impl {
                 } else {
                     ++it;
                 }
+            }
+            // A reason with a sequence to show: confirmed first (the searches one after another).
+            if (reviewer.probe(reviewInput(game)).claim.type != ExType::None) {
+                g.verifying = true;
+                g.review = ReviewState::WaitV;
+                g.reviewWait = 0.0f;
+                if (askVerify(game)) return;
+            }
+            buildReview(game);
+            return;
+        }
+        if (g.review == ReviewState::WaitV) {
+            if (!g.verifyKey.empty() && g.reviewWait < kVerifyWait) return;
+            if (!g.verifyKey.empty()) {   // too late: what is in decides
+                for (auto it = g.jobs.begin(); it != g.jobs.end();) {
+                    if (it->kind == JobKind::Verify) {
+                        analyst->cancelAnalysis(it->id);
+                        it = g.jobs.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+                g.verifyKey.clear();
+            } else if (askVerify(game)) {
+                return;
             }
             buildReview(game);
             return;
@@ -513,8 +600,8 @@ struct Session::Impl {
             const ai::Analysis* a0 = int(n) == g.coachMovedPly + 1 ? cachedA0(game.position().fen()) : nullptr;
             if (int(n) != g.coachMovedPly + 1 || g.over) {
                 g.coachMovedPly = -1;
-            } else if (a0 || g.coachMovedWait >= kCoachRemarkWait) {
-                play(reviewer.coachMoved(game, a0 && a0->ok ? a0 : nullptr));
+            } else if ((a0 && (g.threatKey.empty() || g.threatDone)) || g.coachMovedWait >= kCoachRemarkWait) {
+                play(reviewer.coachMoved(game, a0 && a0->ok ? a0 : nullptr, g.threatDone && g.threat.ok ? &g.threat : nullptr));
                 g.coachMovedPly = -1;
             }
         }
@@ -578,10 +665,11 @@ struct Session::Impl {
         g.announcerWaiting = false;
         // No human turn follows: its analyses go, except the review's own input (the A0 / A3 of the
         // last move's root, still searching when it was played). A resignation abandons the review: A1 / A2 too.
-        const bool reviewing = g.review == ReviewState::WaitA0 || g.review == ReviewState::WaitA12;
+        const bool reviewing =
+            g.review == ReviewState::WaitA0 || g.review == ReviewState::WaitA12 || g.review == ReviewState::WaitV;
         for (auto it = g.jobs.begin(); it != g.jobs.end();) {
-            const bool turn = it->kind == JobKind::A0 || it->kind == JobKind::A3;
-            const bool review = it->kind == JobKind::A1 || it->kind == JobKind::A2;
+            const bool turn = it->kind == JobKind::A0 || it->kind == JobKind::A3 || it->kind == JobKind::Threat;
+            const bool review = it->kind == JobKind::A1 || it->kind == JobKind::A2 || it->kind == JobKind::Verify;
             if ((turn && !(reviewing && it->fen == g.reviewRoot)) || (review && humanResigned)) {
                 analyst->cancelAnalysis(it->id);
                 it = g.jobs.erase(it);
