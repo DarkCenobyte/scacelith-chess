@@ -437,7 +437,9 @@ MatePattern classifyMate(const Position& mated) {
     }
     if (ct == Queen && (around & bit(cs)) && mated.attackersTo(cs, them)) return MatePattern::Support;
     if (heavy) {
-        // Ladder: the king on an edge line, checked along it, the next line inward held by another heavy piece.
+        // Ladder: the king on an edge line, checked along it, and another heavy piece on the next line
+        // inward guarding that line next to the king (a rook on g8 behind a pawn on g6 guards nothing
+        // next to a king on h4: Qh6# there is a net of pawns, no ladder).
         const U64 others = (mated.pieces(them, Rook) | mated.pieces(them, Queen)) & ~bit(cs);
         const int kr = rankOf(k), kf = fileOf(k);
         if ((kr == 0 || kr == 7) && rankOf(cs) == kr) {
@@ -446,7 +448,7 @@ MatePattern classifyMate(const Position& mated) {
             while (o) {
                 const Square s = lowest(o);
                 o &= o - 1;
-                if (rankOf(s) == inner) return MatePattern::Ladder;
+                if (rankOf(s) == inner && (mated.attacksFrom(s) & around & rankMask(inner))) return MatePattern::Ladder;
             }
         }
         if ((kf == 0 || kf == 7) && fileOf(cs) == kf) {
@@ -455,7 +457,8 @@ MatePattern classifyMate(const Position& mated) {
             while (o) {
                 const Square s = lowest(o);
                 o &= o - 1;
-                if (fileOf(s) == inner) return MatePattern::Ladder;
+                if (fileOf(s) == inner && (mated.attacksFrom(s) & around & (0x0101010101010101ULL << inner)))
+                    return MatePattern::Ladder;
             }
         }
     }

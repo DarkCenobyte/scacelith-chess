@@ -5,6 +5,7 @@
 #include "coach/review_internal.h"
 
 #include <algorithm>
+#include <climits>
 #include <cstdlib>
 
 namespace coach {
@@ -1297,13 +1298,26 @@ bool missedCapture(const Ctx& c, Explanation& out) {
                         c.best[2].move.to == c.best[1].move.to ? 3 : 2;
     if (heldGain(c.best, kept, c.base, c.human, c.bestEnd) < worth) return false;
     // The move played wins as much along its line (cxd5 Bxb2+ Kxb2: the bishop taken on b2 instead),
-    // an exchange there read where it ends (Bxe6 Bxe6 Kxe6 wins the pawn on e6).
-    for (size_t i = 1; i <= 3; i += 2) {
-        size_t j = std::min(i, c.playedLine.size());
+    // an exchange there read where it ends (Bxe6 Bxe6 Kxe6 wins the pawn on e6), or keeps as much
+    // through the next replies, each exchange read where it ends (Ba6 Nf6 Bxc8 Nxg4 fxg4: a rook for
+    // a rook, and the knight).
+    const auto exchangeEnd = [&](size_t j) {
+        j = std::min(j, c.playedLine.size());
         while (j > 0 && j < c.playedLine.size() && c.playedLine[j - 1].captured != NoPiece &&
                c.playedLine[j].captured != NoPiece && c.playedLine[j].move.to == c.playedLine[j - 1].move.to)
             ++j;
-        if (heldGain(c.playedLine, j, c.base, c.human, c.playedEnd) >= worth) return false;
+        return j;
+    };
+    for (size_t i = 1; i <= 3; i += 2) {
+        if (heldGain(c.playedLine, exchangeEnd(i), c.base, c.human, c.playedEnd) >= worth) return false;
+        if (i > c.playedLine.size()) continue;
+        int kept = INT_MAX;
+        for (size_t j = i; j <= std::min(c.playedLine.size(), i + 3); ++j) {
+            const size_t e = exchangeEnd(j);
+            kept = std::min(kept, e >= c.playedLine.size() ? heldGain(c.playedLine, e, c.base, c.human, c.playedEnd)
+                                                           : c.playedLine[e - 1].balance - c.base);
+        }
+        if (kept >= worth) return false;
     }
     // A line that stops before the player's next move with as much still there to take (Nd5+ Kc6,
     // the bishop on c8 still loose; what went wrong is elsewhere, a repetition).

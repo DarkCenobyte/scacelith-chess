@@ -875,6 +875,22 @@ TEST(coach_review_mate_missed) {
     CHECK(r.verdict.exType != ExType::MateMissed);
 }
 
+TEST(coach_review_missed_capture_won_another_way) {
+    // From a generated game: 39.Ba6 instead of Qxh7, the knight on h7 free. Ba6 Nf6 Bxc8 Nxg4 fxg4
+    // trades a rook for a rook and wins the knight all the same: nothing was missed. (Scores of a game
+    // not yet decided at any level.)
+    const char* fen = "2rq1k2/5p1n/1p2p3/p7/P2P2R1/3B1P1Q/6PP/5R1K w - - 2 39";
+    for (int level = 1; level <= 2; ++level) {
+        Game g = gameOf(fen, {"Ba6"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, analysisOf({pvl(300, "h3h7 f8e7 g4g7 c8c3 g7f7 e7d6 d3b5 c3c7 h7g7 c7f7"),
+                                                     pvl(290, "d3a6 h7f6 a6c8 f6g4 f3g4 f8g7 c8a6 d8e7 h3d3 e7a7")}));
+        CHECK(r.verdict.exType != ExType::MissedCapture);
+        for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.missed_capture"));
+    }
+}
+
 TEST(coach_review_missed_free_piece) {
     // The coach's knight on d5 is free; the player plays h3 instead, and the knight escapes.
     const char* fen = "6k1/5ppp/8/3n4/8/2N5/1P3PPP/6K1 w - - 0 1";
