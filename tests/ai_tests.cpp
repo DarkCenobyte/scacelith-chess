@@ -198,6 +198,20 @@ TEST(ai_handicap_estimates) {
     const int single = ai::Engine::estimateElo(s);
     s.multiPV = 4;
     CHECK_EQ(ai::Engine::estimateElo(s), single);
+    // At every handicapped level, Skill 19 included (beyond Stockfish's Elo fit, audit N16): a cap
+    // at or below the pick iteration, or a wider MultiPV, is weaker than the same level without.
+    for (int level = 0; level < 20; ++level) {
+        ai::EngineSettings c;
+        c.skillLevel = level;
+        const int free = ai::Engine::estimateElo(c);
+        for (int depth = 1; depth <= 1 + level; ++depth) {
+            c.depth = depth;
+            CHECK(ai::Engine::estimateElo(c) < free);
+        }
+        c.depth = 0;
+        c.multiPV = 5;
+        CHECK(ai::Engine::estimateElo(c) < free);
+    }
 }
 
 TEST(ai_think_time) {

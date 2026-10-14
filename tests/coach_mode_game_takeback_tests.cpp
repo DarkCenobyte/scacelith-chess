@@ -7,7 +7,8 @@
 // piece (the player plays on); the pause menu's "Take back my move" (--play-then takeback) takes
 // back the player's move and the coach's reply. The review waits seconds of game time for the
 // analyses, which Stockfish makes in real time: the frames are paced so that the game's time never
-// runs ahead of the wall clock while the review is made (fast frames otherwise).
+// runs ahead of the wall clock while the review is made (fast frames otherwise), and the scripted
+// moves wait for Stockfish to have started (seconds on a slow machine).
 #include "test.h"
 #include "coach_mode_game_kit.h"
 #include "game/game_archive.h"

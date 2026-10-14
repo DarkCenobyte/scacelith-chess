@@ -174,7 +174,8 @@ calibration before the title page, as on a first start) and `--ini <file>`.
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
 N`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play
 e2e4,e7e5,...` plays the human moves by hand, the way a player would (touch, carry, press the
-clock): both sides on one PC, the human's side against Stockfish; with `--warp` it takes
+clock): both sides on one PC, the human's side against Stockfish (in a coach game, once Stockfish
+has started: the coach reviews each move with its analyses; not in the rules lesson); with `--warp` it takes
 screenshots of a game in progress, for instance the hand-over halfway (`--start --hotseat
 --no-intro --play e2e4 --warp 2.35`). The UI viewer has the hot-seat screens (`--scene ui
 --ui-screen newgame-hotseat|hotseat-hud|hotseat-confirm|hotseat-gameover`).
