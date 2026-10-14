@@ -84,6 +84,14 @@ ex.verdict.blunder.b6.2 = {move}は大悪手。
 ex.verdict.blunder.b6.2.spoken = {move}はだいあくしゅ。
 ex.verdict.blunder.b6.3 = {move}？大悪手。
 ex.verdict.blunder.b6.3.spoken = {move}？だいあくしゅ。
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = おっと！私の狙いを防いでいませんね。
+ex.verdict.ignored.b1.2 = 気をつけて！私の狙いがまだ残っていましたよ。
+ex.verdict.ignored.b1.3 = あっ、ちょっと待ってください。私の狙いを忘れていましたね。
+ex.verdict.ignored.b2 = うーん、私の狙いがまだ残っていました。
+ex.verdict.ignored.b2.2 = 私の狙いをそのままにしてしまいましたね。
+ex.verdict.ignored.b2.3 = 気をつけて、私の狙いを防いでいませんよ。
 ex.verdict.mistake.b3 = それは良い手ではありません。
 ex.verdict.mistake.b3.2 = うーん、{move}には問題があります。
 ex.verdict.mistake.b3.3 = それはミスです。

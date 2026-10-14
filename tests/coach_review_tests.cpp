@@ -632,6 +632,187 @@ TEST(coach_review_fork_worked_example) {
     }
 }
 
+// ---- Sequences confirmed move by move (ReviewInput::verified) -----------------------------------
+
+namespace {
+
+bool saysPrefix(const Script& s, const char* prefix) {
+    for (const Beat& b : s)
+        if (b.line.key.rfind(prefix, 0) == 0) return true;
+    return false;
+}
+
+// The position after the fork game and the first 'plies' moves of 'line' (UCI).
+std::string fenAlong(const Game& g, const std::vector<std::string>& line, size_t plies) {
+    Position q = g.position();
+    for (size_t i = 0; i < plies && i < line.size(); ++i) q.makeMove(q.parseUCI(line[i]));
+    return q.fen();
+}
+
+// What a search agreeing with the fork's line answers for 'key': that line from there, alone (no
+// other move as good). A comparison of two moves: both, the line's first.
+ai::Analysis alongForkLine(const Game& g, const std::string& key) {
+    const std::vector<std::string> line = {"d8g5", "c4f7", "e8d8", "e1g1", "g5e5", "c2c3", "d4e6", "d2d3", "g7g5"};
+    const size_t bar = key.find(" | ");
+    const std::string fen = key.substr(0, bar);
+    for (size_t i = 0; i <= line.size(); ++i) {
+        if (fenAlong(g, line, i) != fen) continue;
+        ai::PvLine l;
+        l.depth = 12;
+        l.score.cp = 0;
+        l.pv.assign(line.begin() + long(i), line.end());
+        std::vector<ai::PvLine> lines = {l};
+        if (bar != std::string::npos) {
+            std::istringstream ms(key.substr(bar + 3));
+            std::string m;
+            while (ms >> m) {
+                if (m == l.pv.front()) continue;
+                ai::PvLine o;
+                o.depth = 16;
+                o.score.cp = -400;
+                o.pv = {m};
+                lines.push_back(o);
+            }
+        }
+        return analysisOf(lines);
+    }
+    ai::Analysis none;
+    return none;
+}
+
+}  // namespace
+
+TEST(coach_review_verify_requests) {
+    const std::string fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1";
+    const ai::AnalysisRequest v = Reviewer::verifyRequest(fen);
+    CHECK_EQ(v.startFen, fen);
+    CHECK(v.moves.empty() && v.searchMoves.empty());
+    CHECK_EQ(v.multiPV, 3);
+    CHECK_EQ(v.depth, Reviewer::kVerifyDepth);
+    CHECK(v.moveTimeMs > 0);
+    const std::string key = detail::compareKey(fen, "g8f6", "e7e5");
+    CHECK_EQ(key, fen + " | e7e5 g8f6");   // the moves in order: one key per pair
+    CHECK_EQ(detail::compareKey(fen, "e7e5", "g8f6"), key);
+    const ai::AnalysisRequest c = Reviewer::verifyRequest(key);
+    CHECK_EQ(c.startFen, fen);
+    CHECK(c.searchMoves.size() == 2 && c.searchMoves[0] == "e7e5" && c.searchMoves[1] == "g8f6");
+    CHECK_EQ(c.multiPV, 2);
+    CHECK_EQ(c.depth, Reviewer::kCompareDepth);
+    CHECK(c.moveTimeMs > 0);
+    // "As good": within a few win-% points, and within 1.5 pawns where the win % no longer tells.
+    ai::Score a, b;
+    a.cp = 30;
+    b.cp = 50;
+    CHECK(detail::asGood(a, b) && detail::asGood(b, a));
+    a.cp = -80;
+    CHECK(!detail::asGood(a, b) && detail::asGood(b, a));
+    a.cp = 900;
+    b.cp = 1200;   // both near 100 %: the pawns decide
+    CHECK(!detail::asGood(a, b));
+    a.cp = 1100;
+    CHECK(detail::asGood(a, b));
+    b.mate = 4;   // a forced mate above any material
+    CHECK(!detail::asGood(a, b) && detail::asGood(b, a));
+}
+
+TEST(coach_review_fork_confirmed_move_by_move) {
+    const ai::Analysis a0 = forkA0();
+    const Game g = forkGame();
+    Reviewer rv;
+    rv.reset(1, White);
+    ReviewInput in;
+    in.game = &g;
+    in.before = &a0;
+    // Nothing searched yet: the reason waits for its first search (the reply to 4...Qg5: the plies
+    // the review's own search saw deeper need none), and a review without it says the verdict only.
+    std::map<std::string, ai::Analysis> v;
+    in.verified = &v;
+    Review r = rv.probe(in);
+    CHECK_EQ(r.verifyNext, fenAlong(g, {"d8g5"}, 1));
+    CHECK_EQ(r.claim.type, ExType::None);
+    CHECK_EQ(r.dropped.type, ExType::Fork);
+    CHECK(!saysPrefix(r.script, "ex.fork"));
+    CHECK(hasKey(r.script, "ex.verdict.blunder.b1"));
+    // Each search in, the next asked for, until the sequence is confirmed to its end.
+    int asked = 0;
+    while (!r.verifyNext.empty() && asked < Reviewer::kVerifyMax) {
+        v[r.verifyNext] = alongForkLine(g, r.verifyNext);
+        CHECK(v[r.verifyNext].ok);
+        ++asked;
+        r = rv.probe(in);
+    }
+    CHECK(r.verifyNext.empty());
+    CHECK(asked >= 3 && asked <= Reviewer::kVerifyMax);
+    r = rv.review(in);
+    CHECK_EQ(r.claim.type, ExType::Fork);
+    CHECK_EQ(r.dropped.type, ExType::None);
+    CHECK(!r.claim.lineChanged);
+    CHECK(r.claim.verifiedPlies >= r.claim.plies);
+    CHECK(hasKey(r.script, "ex.fork.b1"));
+    CHECK_EQ(demoMoves(r.script), 5);
+}
+
+TEST(coach_review_fork_with_a_better_defence_is_not_claimed) {
+    const ai::Analysis a0 = forkA0();
+    const Game g = forkGame();
+    // After 4...Qg5, the short search finds 5.Nf3 as good as 5.Bxf7+, and the deeper comparison
+    // agrees: 5.Nf3 Nxf3+ 6.Qxf3 keeps the material level. The fork wins nothing for sure.
+    const std::string at = fenAlong(g, {"d8g5"}, 1);
+    std::map<std::string, ai::Analysis> v;
+    v[at] = analysisOf({pvl(-80, "e5f3 d4f3 d1f3 g5f6"), pvl(-90, "c4f7 e8d8 e1g1 g5e5 c2c3")});
+    v[detail::compareKey(at, "c4f7", "e5f3")] =
+        analysisOf({pvl(-70, "e5f3 d4f3 d1f3 g5f6 c2c3 f8c5"), pvl(-90, "c4f7 e8d8 e1g1 g5e5 c2c3")});
+    for (int level = 1; level <= 6; ++level) {
+        Reviewer rv;
+        rv.reset(level, White);
+        ReviewInput in;
+        in.game = &g;
+        in.before = &a0;
+        in.verified = &v;
+        // Whatever else the new line still wants, searched as an engine agreeing with it would.
+        Review r = rv.probe(in);
+        for (int n = 0; !r.verifyNext.empty() && n < Reviewer::kVerifyMax; ++n) {
+            const std::string key = r.verifyNext;
+            const size_t bar = key.find(" | ");
+            ai::Analysis a = alongForkLine(g, key);
+            if (!a.ok) {   // on the new line: its own moves, alone
+                Position q;
+                q.setFEN(key.substr(0, bar));
+                const std::vector<std::string> nf3 = {"e5f3", "d4f3", "d1f3", "g5f6", "c2c3", "f8c5"};
+                Position p = g.position();
+                p.makeMove(p.parseUCI("d8g5"));
+                std::vector<std::string> tail;
+                for (size_t i = 0; i < nf3.size(); ++i) {
+                    if (p.fen() == q.fen()) {
+                        tail.assign(nf3.begin() + long(i), nf3.end());
+                        break;
+                    }
+                    p.makeMove(p.parseUCI(nf3[i]));
+                }
+                if (tail.empty()) tail = {q.toUCI(q.legalMoves().front())};
+                a = analysisOf({pvl(0, "")});
+                a.lines[0].pv = tail;
+                a.bestMove = tail.front();
+            }
+            v[key] = a;
+            r = rv.probe(in);
+        }
+        r = rv.review(in);
+        char where[48];
+        std::snprintf(where, sizeof where, "fork escaped b%d", level);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);   // the verdict stays
+        CHECK(r.claim.type != ExType::Fork);
+        CHECK_EQ(r.dropped.type, ExType::Fork);
+        CHECK(!saysPrefix(r.script, "ex.fork"));
+        bool logged = false;
+        for (const std::string& l : r.verifyLog) logged = logged || l.find("e5f3 instead of c4f7") != std::string::npos;
+        CHECK(logged);
+        if (!logged)
+            for (const std::string& l : r.verifyLog) std::fprintf(stderr, "  %s: %s\n", where, l.c_str());
+        checkScript(r.script, where);
+    }
+}
+
 TEST(coach_review_mate_allowed_first) {
     // 3...Nf6?? allows Qxf7#: a capture of a pawn too, but the mate explains it (ExType order).
     Game g = gameOf(nullptr, {"e4", "e5", "Bc4", "Nc6", "Qh5", "Nf6"});
@@ -4605,6 +4786,60 @@ TEST(coach_review_threat_warnings) {
     checkScript(ms, "threat mate");
 }
 
+TEST(coach_review_threat_search_gates_warnings) {
+    // The engine's view of the threats (Reviewer::threatKey: the coach to move again): a piece the
+    // rules find en prise is a threat when that search wins it, or as much.
+    Game g = gameOf("4k3/4p3/8/8/3N4/8/8/6K1 b - - 0 1", {"e5"});
+    Reviewer rv;
+    rv.reset(1, White);
+    CHECK_EQ(rv.threatKey(g), std::string("4k3/8/8/4p3/3N4/8/8/6K1 b - - 1 2"));
+    const ai::Analysis takes = analysisOf({pvl(330, "e5d4 g1f2")});
+    CHECK(hasKey(rv.coachMoved(g, nullptr, &takes), "threat.piece.b1"));
+    // Taking the knight walks into a back-rank mate (...exd4 Re8#): the search makes luft first and
+    // wins nothing, so the knight is no threat, whatever the rules alone see.
+    Game mate = gameOf("6k1/5ppp/4p3/8/3N4/8/5PPP/4R1K1 b - - 0 1", {"e5"});
+    rv.reset(1, White);
+    CHECK(hasKey(rv.coachMoved(mate), "threat.piece.b1"));
+    const ai::Analysis luft = analysisOf({pvl(-20, "h7h6 d4f3 g8h7")});
+    rv.reset(1, White);
+    CHECK(!hasKey(rv.coachMoved(mate, nullptr, &luft), "threat.piece.b1"));
+    // A failed search is no view: the rules decide.
+    ai::Analysis failed;
+    rv.reset(1, White);
+    CHECK(hasKey(rv.coachMoved(mate, nullptr, &failed), "threat.piece.b1"));
+    // No threat search at level 3 and beyond, nor after the player's own move.
+    rv.reset(3, White);
+    CHECK(rv.threatKey(g).empty());
+    rv.reset(1, Black);
+    CHECK(rv.threatKey(g).empty());
+}
+
+TEST(coach_review_ignored_threat_verdict) {
+    // Levels 1-2: the coach's ...e5 attacks the knight, its threat search takes it; the player's h3
+    // leaves it there and ...exd4 wins it: the verdict says the threat was not answered.
+    const char* fen = "6k1/5ppp/4p3/8/3N4/8/5PPP/6K1 b - - 0 1";
+    const ai::Analysis threat = analysisOf({pvl(330, "e5d4 g1f1")});
+    const ai::Analysis a0 = analysisOf({pvl(0, "d4f3 g8f8"), pvl(-330, "h2h3 e5d4 g1f1")});
+    auto verdict = [&](int level, const ai::Analysis* t, const char* move) {
+        Reviewer rv;
+        rv.reset(level, White);
+        rv.coachMoved(gameOf(fen, {"e5"}), nullptr, t);
+        const Review r = reviewOf(rv, gameOf(fen, {"e5", move}), a0);
+        checkScript(r.script, "ignored threat");
+        for (const Beat& b : r.script)
+            if (b.line.key.rfind("ex.verdict.", 0) == 0) return std::make_pair(b.line.key, r.ignoredThreat);
+        return std::make_pair(std::string(), r.ignoredThreat);
+    };
+    CHECK(verdict(1, &threat, "h3") == std::make_pair(std::string("ex.verdict.ignored.b1"), true));
+    CHECK(verdict(2, &threat, "h3") == std::make_pair(std::string("ex.verdict.ignored.b2"), true));
+    // Without the engine's view of the threat (no search, or level 3): the blunder's own verdict.
+    CHECK(verdict(1, nullptr, "h3") == std::make_pair(std::string("ex.verdict.blunder.b1"), false));
+    CHECK(verdict(3, &threat, "h3") == std::make_pair(std::string("ex.verdict.blunder.b3"), false));
+    // The threat search wins nothing: the blunder is not that threat carried out.
+    const ai::Analysis quiet = analysisOf({pvl(-20, "h7h6 d4f3")});
+    CHECK(verdict(1, &quiet, "h3") == std::make_pair(std::string("ex.verdict.blunder.b1"), false));
+}
+
 TEST(coach_review_punish_hint_needs_a_real_loss) {
     // "My last move was a mistake. Can you punish it?" (level 1): the player's move judged first (its
     // W% kept), then the coach's move with the analysis of the player's next turn.
@@ -4675,6 +4910,32 @@ TEST(coach_review_no_praise_for_a_quicker_mate) {
         CHECK(r.verdict.goodCapture);
         CHECK_EQ(hasKey(r.script, "praise.capture.b1"), bestMate == 0);
         checkScript(r.script, "quicker mate");
+    }
+}
+
+TEST(coach_review_praise_for_a_mate_found_in_a_won_game) {
+    // The Saavedra study: 6.c8=R mates, where Kb3 and Kc3 keep a won ending, all at E 1.00 in the
+    // engine's eyes: the moves lie together on both scales, but the mate found is praised. When the
+    // next move mates as well, finding one of two mates in a won game is no feat.
+    const char* fen = "8/2P5/8/8/3r4/8/2K5/k7 w - - 0 1";
+    const auto won = [](ai::PvLine l) {
+        l.score.hasWdl = true;
+        l.score.win = 1000;
+        l.score.draw = l.score.loss = 0;
+        return l;
+    };
+    for (bool secondMates : {false, true}) {
+        Game g = gameOf(fen, {"c8=R"});
+        Reviewer rv;
+        rv.reset(1, White);
+        const ai::Analysis a0 = analysisOf({won(pvl(0, "c7c8r d4a4 c2b3 a4b4 b3b4 a1b2", 8)),
+                                            won(secondMates ? pvl(0, "c2b3 a1b1 c7c8q", 9) : pvl(5028, "c2b3 a1b1 c7c8q")),
+                                            won(pvl(789, "c2c3 d4d1 c3c2 d1f1 c7c8q"))});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK_EQ(hasKey(r.script, "praise.best.b1"), !secondMates);
+        CHECK_EQ(r.verdict.praised, !secondMates);
+        checkScript(r.script, "mate found");
     }
 }
 

@@ -68,6 +68,14 @@ ex.verdict.blunder.b5.3 = {move}是代价很大的错误。
 ex.verdict.blunder.b6 = {move}是严重失误。
 ex.verdict.blunder.b6.2 = {move}是漏着。
 ex.verdict.blunder.b6.3 = {move}？漏着。
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = 哎呀！你没有应对我的威胁。
+ex.verdict.ignored.b1.2 = 小心！我的威胁还在。
+ex.verdict.ignored.b1.3 = 哦，等一下。你忘了我的威胁。
+ex.verdict.ignored.b2 = 嗯，我的威胁还在。
+ex.verdict.ignored.b2.2 = 你没有回应我的威胁。
+ex.verdict.ignored.b2.3 = 小心，你没有应对我的威胁。
 ex.verdict.mistake.b3 = 这不是一步好棋。
 ex.verdict.mistake.b3.2 = 嗯，{move}有问题。
 ex.verdict.mistake.b3.3 = 这是一步错着。

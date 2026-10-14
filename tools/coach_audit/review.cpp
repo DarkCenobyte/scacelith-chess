@@ -1937,6 +1937,9 @@ struct Stats {
     std::map<std::string, int> codes;
     std::map<std::string, int> types;   // voiced explanation types
     int reviews = 0, scripts = 0;
+    // --vcache: the reviews whose reason was checked, kept as found, made smaller, dropped (and of
+    // those, for want of searches: the budget spent), the searches they asked for.
+    int checked = 0, kept = 0, reduced = 0, dropped = 0, budgetOut = 0, searches = 0;
 };
 
 bool buildCtx(const Record& r, int level, Ctx& c) {
@@ -1995,6 +1998,11 @@ int reviewMain(const Options& o) {
         judge.reset(new MoveJudge(o.verify, o.threads, o.cache));
         if (!judge->ok()) std::fprintf(stderr, "engine unavailable: moves judged from the cache only\n");
     }
+    std::unique_ptr<SequenceSearches> searches;
+    if (!o.vcache.empty()) {
+        searches.reset(new SequenceSearches(1, o.vcache));
+        if (!searches->ok()) std::fprintf(stderr, "engine unavailable: sequences confirmed from the cache only\n");
+    }
     Stats st;
     // --sequence: the Reviewers of the game under way, per level and side.
     std::map<std::pair<int, int>, Reviewer> seq;
@@ -2035,7 +2043,10 @@ int reviewMain(const Options& o) {
                 before.undo(1);
                 if (!before.moves().empty()) {
                     for (const Beat& b : rvp->announce(before)) pre.push_back(b);
-                    for (const Beat& b : rvp->coachMoved(before, &r.a0)) {
+                    // --vcache: the threat search a Coach game runs after the coach's move (levels 1-2).
+                    const std::string threatKey = searches ? rvp->threatKey(before) : std::string();
+                    const ai::Analysis* threat = threatKey.empty() ? nullptr : &searches->get(threatKey);
+                    for (const Beat& b : rvp->coachMoved(before, &r.a0, threat && threat->ok ? threat : nullptr)) {
                         pre.push_back(b);
                         // "My knight is attacking your queen": it does, on the board the player sees.
                         if (b.line.key.rfind("threat.piece", 0) == 0) {
@@ -2095,7 +2106,41 @@ int reviewMain(const Options& o) {
             ri2.after = level >= 4 && r.hasA2 ? &r.a2 : nullptr;
             ri2.shallow = level == 3 || level == 4 ? &r.a3 : nullptr;
             ri2.inBook = OpeningBook::instance().lookup(c.p1.hash());
+            // --vcache: as a Coach game does (coach/session.cpp), a reason the review would say has its
+            // sequence confirmed first, the positions it asks for searched one after another.
+            std::map<std::string, ai::Analysis> confirmed;
+            int asked = 0;
+            bool budgetOut = false;
+            if (searches && rv.probe(ri2).claim.type != ExType::None) {
+                ri2.verified = &confirmed;
+                for (;;) {
+                    const std::string next = rv.probe(ri2).verifyNext;
+                    if (next.empty()) break;
+                    if (asked >= Reviewer::kVerifyMax) {
+                        budgetOut = true;
+                        break;
+                    }
+                    confirmed[next] = searches->get(next);
+                    ++asked;
+                }
+            }
             const Review rev = rv.review(ri2);
+            if (ri2.verified) {
+                ++st.checked;
+                st.searches += asked;
+                if (rev.dropped.type == ExType::None) ++st.kept;
+                else if (rev.claim.type != ExType::None) ++st.reduced;
+                else ++st.dropped;
+                if (budgetOut) ++st.budgetOut;
+            }
+            // The oracles read the line the reason was found on, and the better move the review named
+            // (the most natural of the moves as good as the best).
+            if (!rev.refutation.empty()) c.refut = replayLine(c.p1, rev.refutation, c.human, 16);
+            if (!rev.verdict.bestUci.empty() && !c.bestLine.empty() && c.bestLine[0].uci != rev.verdict.bestUci)
+                if (const ai::PvLine* l = c.rec->a0.line(rev.verdict.bestUci)) {
+                    c.bestLine = replayLine(c.p0, l->pv, c.human, 16);
+                    c.bestEnd = detail::lineEnd(c.p0, c.bestLine);
+                }
             ++st.reviews;
             Script declined;   // --sequence: the game goes on as played
             if (o.sequence)
@@ -2611,6 +2656,9 @@ int reviewMain(const Options& o) {
             std::fprintf(out, "  move %s  class %s  W%% %.1f -> %.1f (d %.1f)  best %s  ex %s%s%s\n", v.san.c_str(),
                          className(v.cls), v.wBest, v.wPlayed, v.delta, v.bestSan.c_str(), exTypeName(t),
                          v.voiced ? " voiced" : "", v.offered ? " offer" : "");
+            if (rev.unsettled) std::fprintf(out, "  unsettled (the search's last iterations disagree)\n");
+            if (rev.costBefore[0] >= 0.0 || rev.costBefore[1] >= 0.0)
+                std::fprintf(out, "  settle d-1 %.1f d-2 %.1f\n", rev.costBefore[0], rev.costBefore[1]);
             if (rev.assessment.wdl) {
                 const Assessment& A = rev.assessment;
                 std::fprintf(out, "  wdl best %d/%d/%d played %d/%d/%d  E %.2f -> %.2f  lead %.2f%s\n", A.best.win, A.best.draw,
@@ -2623,8 +2671,21 @@ int reviewMain(const Options& o) {
                 const Claim& cl = rev.claim;
                 std::fprintf(out, "  claim %s lost %d plies %d%s%s line%s\n", exTypeName(cl.type), cl.lost, cl.plies,
                              cl.mate ? " mate" : "", cl.guessed ? " guessed" : "", ln.c_str());
-                std::fprintf(out, "  checks quiet %d comp %d own %d bestLoss %d playedLoss %d drop %d\n", cl.quiet,
-                             cl.compensation, int(cl.ownLine), cl.bestLoss, cl.playedLoss, cl.dropCp);
+                std::fprintf(out, "  checks quiet %d comp %d own %d bestLoss %d playedLoss %d drop %d held %d\n", cl.quiet,
+                             cl.compensation, int(cl.ownLine), cl.bestLoss, cl.playedLoss, cl.dropCp, cl.held);
+            }
+            if (ri2.verified) {
+                const Claim& cl = rev.claim.type != ExType::None ? rev.claim : rev.dropped;
+                std::fprintf(out, "  vcheck plies %d changed %d reduced %d searches %d%s\n", cl.verifiedPlies,
+                             int(cl.lineChanged), rev.dropped.type == ExType::None ? 0 : rev.dropped.reduced, asked,
+                             budgetOut ? " budget" : "");
+            }
+            for (const std::string& l : rev.verifyLog) std::fprintf(out, "  vlog %s\n", l.c_str());
+            if (rev.dropped.type != ExType::None) {
+                std::string ln;
+                for (const std::string& m : rev.dropped.line) ln += " " + m;
+                std::fprintf(out, "  dropped %s lost %d plies %d line%s\n", exTypeName(rev.dropped.type), rev.dropped.lost,
+                             rev.dropped.plies, ln.c_str());
             }
             std::fprintf(out, "  best line: %s\n", sanLine(c.bestLine, 0, std::min<size_t>(10, c.bestLine.size())).c_str());
             std::fprintf(out, "  played line: %s\n",
@@ -2654,6 +2715,9 @@ int reviewMain(const Options& o) {
         }
     }
     std::fprintf(out, "\n==== %d reviews, %d with a script\n", st.reviews, st.scripts);
+    if (searches)
+        std::fprintf(out, "  sequences checked %d: kept %d, smaller %d, dropped %d (budget spent %d); %d searches asked, %d run\n",
+                     st.checked, st.kept, st.reduced, st.dropped, st.budgetOut, st.searches, searches->searched());
     for (const auto& k : st.codes) std::fprintf(out, "  %-24s %d\n", k.first.c_str(), k.second);
     std::fprintf(out, "  voiced explanations:\n");
     for (const auto& k : st.types) std::fprintf(out, "    %-16s %d\n", k.first.c_str(), k.second);

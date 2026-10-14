@@ -246,6 +246,71 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     checkRenders(t.lines);
 }
 
+// A reason's sequence is confirmed by the engine before it is said: the player's reply to 1...exd5
+// searched (V) once A0 is in; a search that confirms nothing leaves the verdict alone.
+TEST(coach_session_reason_confirmed_before_it_is_said) {
+    chess::Game after;
+    after.resetFromFEN(kHangFen);
+    after.play(after.position().parseUCI("c3d5"));
+    after.play(after.position().parseUCI("e6d5"));
+    const std::string reply = after.position().fen();
+    {
+        Table t;
+        hangTable(t);
+        t.start(levelConfig(1));
+        t.move("c3d5");
+        CHECK(t.until([&] { return t.session.offerOpen(); }, 60.0f));
+        CHECK_EQ(t.analyst.count("V", reply), 1);
+        CHECK_EQ(t.analyst.count("C"), 0);   // nothing to compare: the line's reply is the search's
+        CHECK(t.said("ex.hanging.b1"));
+    }
+    {
+        Table t;
+        hangTable(t);
+        ai::Analysis failed;
+        failed.ok = false;
+        t.analyst.results[reply + "|V"] = failed;
+        t.start(levelConfig(1));
+        t.move("c3d5");
+        CHECK(t.until([&] { return t.queued("ex.verdict.blunder.b1"); }, 60.0f));
+        CHECK(t.until([&] { return t.session.director().idle() || t.session.offerOpen(); }, 60.0f));
+        CHECK_EQ(t.analyst.count("V", reply), 1);
+        CHECK(!t.queuedPrefix("ex.hanging"));
+    }
+}
+
+TEST(coach_session_threats_searched_after_the_coach_move) {
+    // Levels 1-2: after the coach's move, its threats searched with the turn passed to it; the
+    // remark on that move waits for the search, which confirms a piece the rules find en prise.
+    const char* fen = "4k3/4p3/8/8/8/5N2/8/6K1 w - - 0 1";
+    chess::Game after;
+    after.resetFromFEN(fen);
+    after.play(after.position().parseUCI("f3d4"));
+    after.play(after.position().parseUCI("e7e5"));
+    chess::Position turn = after.position();
+    CHECK(turn.passTurn());
+    const std::string threat = turn.fen();
+    for (int level : {1, 2, 3}) {
+        for (bool wins : {true, false}) {
+            Table t;
+            t.game.resetFromFEN(fen);
+            t.analyst.results[fenOf(fen) + "|A0"] = analysisOf({pvl(0, "f3d4 e7e5")});
+            t.analyst.results[threat + "|V"] =
+                wins ? analysisOf({pvl(330, "e5d4 g1f2")}) : analysisOf({pvl(0, "e8d7 d4f3")});
+            t.start(levelConfig(level));
+            CHECK(t.quiet());
+            t.move("f3d4");
+            CHECK(t.reply("e7e5"));
+            t.run(2.0f);
+            CHECK(t.quiet());
+            CHECK_EQ(t.analyst.count("V", threat), level <= 2 ? 1 : 0);
+            // Level 1 warns about the knight when the search wins it; level 2 only about the queen.
+            CHECK_EQ(t.queued("threat.piece.b1"), level == 1 && wins);
+            checkRenders(t.lines);
+        }
+    }
+}
+
 TEST(coach_session_offer_declined) {
     Table t;
     hangTable(t);

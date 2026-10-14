@@ -67,6 +67,14 @@ ex.verdict.blunder.b5.3 = {move} خطأ مكلف.
 ex.verdict.blunder.b6 = {move} خطأ جسيم.
 ex.verdict.blunder.b6.2 = {move} خطأ فادح.
 ex.verdict.blunder.b6.3 = {move}؟ خطأ فادح.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = أوه! كان عليك الردّ على تهديدي.
+ex.verdict.ignored.b1.2 = حذارِ! تهديدي ما زال قائمًا.
+ex.verdict.ignored.b1.3 = مهلًا. غاب تهديدي عن بالك.
+ex.verdict.ignored.b2 = لحظة، تهديدي ما زال قائمًا.
+ex.verdict.ignored.b2.2 = بقي تهديدي بلا ردّ.
+ex.verdict.ignored.b2.3 = انتبه، كان عليك الردّ على تهديدي.
 ex.verdict.mistake.b3 = هذه ليست نقلة جيدة.
 ex.verdict.mistake.b3.2 = آه، في نقلة {move} مشكلة.
 ex.verdict.mistake.b3.3 = هذا خطأ.

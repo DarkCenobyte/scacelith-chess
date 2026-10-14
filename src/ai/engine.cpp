@@ -278,12 +278,28 @@ struct Engine::Impl {
     // Stockfish prints its MultiPV lines best first, all of them after each iteration (and after a
     // stop), so a line with multipv 1 starts a new report and the result is the last report. Only
     // an iteration stopped at depth 1 leaves lines out (unsearched ones): the report is shorter.
+    // The report held in a.lines kept as an iteration of a.history: one per depth (a later report of
+    // the same depth replaces it), the last kHistoryDepths.
+    static void keepReport(Analysis& a) {
+        if (a.lines.empty() || a.lines.front().pv.empty()) return;
+        DepthReport d;
+        d.depth = a.lines.front().depth;
+        for (size_t i = 0; i < a.lines.size(); ++i)
+            if (a.lines[i].multipv == int(i + 1) && !a.lines[i].pv.empty()) d.lines.emplace_back(a.lines[i].pv.front(), a.lines[i].score);
+        if (!a.history.empty() && a.history.back().depth == d.depth) a.history.back() = std::move(d);
+        else a.history.push_back(std::move(d));
+        if (a.history.size() > kHistoryDepths) a.history.erase(a.history.begin());
+    }
+
     void parseAnalysisInfo(const std::string& line, Job& job) {
         PvLine l;
         if (!parseInfoLine(line, l, &job.result.nodes, &job.result.timeMs)) return;
         job.depthSeen = std::max(job.depthSeen, l.depth);
         std::vector<PvLine>& lines = job.result.lines;
-        if (l.multipv == 1) lines.clear();
+        if (l.multipv == 1) {
+            keepReport(job.result);
+            lines.clear();
+        }
         if (l.multipv > kMaxMultiPV) return;
         if (lines.size() < size_t(l.multipv)) lines.resize(size_t(l.multipv), PvLine{0, 0, 0, Score{}, {}});
         lines[size_t(l.multipv - 1)] = std::move(l);
@@ -312,6 +328,7 @@ struct Engine::Impl {
             for (size_t i = 0; i < a.lines.size(); ++i)
                 if (a.lines[i].multipv == int(i + 1)) lines.push_back(std::move(a.lines[i]));
             a.lines = std::move(lines);
+            keepReport(a);
             a.depth = a.lines.empty() ? 0 : a.lines.front().depth;
             if (a.timeMs <= 0) a.timeMs = msSince(job->sentAt);
             const uint32_t id = a.id;

@@ -66,6 +66,14 @@ ex.verdict.blunder.b5.3 = {move} ist ein teurer Fehler.
 ex.verdict.blunder.b6 = {move} ist ein schwerer Fehler.
 ex.verdict.blunder.b6.2 = {move} ist ein grober Fehler.
 ex.verdict.blunder.b6.3 = {move}? Ein Patzer.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hoppla! Du hast nicht auf meine Drohung reagiert.
+ex.verdict.ignored.b1.2 = Vorsicht! Meine Drohung war noch da.
+ex.verdict.ignored.b1.3 = Oh, warte. Du hast meine Drohung vergessen.
+ex.verdict.ignored.b2 = Hm, meine Drohung war noch da.
+ex.verdict.ignored.b2.2 = Du hast meine Drohung nicht abgewehrt.
+ex.verdict.ignored.b2.3 = Vorsicht, du hast nicht auf meine Drohung reagiert.
 ex.verdict.mistake.b3 = Das ist kein guter Zug.
 ex.verdict.mistake.b3.2 = Hm, {move} hat ein Problem.
 ex.verdict.mistake.b3.3 = Das ist ein Fehler.

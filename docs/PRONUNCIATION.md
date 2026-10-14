@@ -87,6 +87,7 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - Inherent to the notation, left as is: "а пять" sounds like "опять", "е два" like "едва".
 - Round trip over 1,000 lines; the stress of the 140 most frequent words and of the chess nouns compared
   with a dictionary.
+- "угрозу" / "угроза" (ex.verdict.ignored) are stressed on the о, as written (probe, 3 seeds).
 
 ## Ukrainian
 
@@ -98,6 +99,8 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - "ферзем" unmarked is read like the Russian "ферзём": `ферзе́м`. Words shared with Russian are the
   ones to check first.
 - Adverbs too: "задарма" is read "зада́рма" (probe, 4 seeds), the dictionary stress is `задарма́`.
+- "загрозу" alone is a close call between загро́зу and загрозу́ (probe, 6 seeds); in "на мою загрозу"
+  the voice says загро́зу, as the dictionary does: left unmarked (ex.hanging_threat.b3 already said it).
 
 ## Arabic
 
@@ -114,6 +117,7 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - The recogniser writes no short vowels, so a vowel misreading only shows in a direct comparison of
   vowelled spellings (`--probe "ar:الملك=المَلِك|المَلَك|المُلك"`); a candidate that adds only one
   diacritic is the fairest comparison, full vocalisation changes the delivery.
+- "تهديدي" (my threat, ex.verdict.ignored) is read tahdīdī (probe against تُهْدِيدِي and تَهَدُّدِي).
 
 ## Japanese
 
@@ -123,6 +127,7 @@ Round trip over 800 lines. Unclear in the checks and left as they are: Rochade, 
 - 一局指し: the voice voices 指し right after 一局 ("いっきょくざし"): `一局さし`. With を ("一局を指し")
   it is fine.
 - 一マス / 二マス: say `ひとマス` / `ふたマス` (count.square.spoken does).
+- 狙い (the coach's threat, ex.verdict.ignored) is read ねらい, alone and in 私の狙い (probe, 3 seeds).
 - respell.* cannot match inside a Japanese sentence (no spaces between words): a misread word needs a
   `.spoken` line in each catalog line that uses it, and an entry in SPOKEN_WORDS for the opening texts.
 

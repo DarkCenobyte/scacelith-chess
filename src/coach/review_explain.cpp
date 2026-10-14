@@ -1296,9 +1296,15 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     const size_t kept = c.best.size() >= 3 && c.best[1].captured != NoPiece && c.best[2].captured != NoPiece &&
                         c.best[2].move.to == c.best[1].move.to ? 3 : 2;
     if (heldGain(c.best, kept, c.base, c.human, c.bestEnd) < worth) return false;
-    // The move played wins as much along its line (cxd5 Bxb2+ Kxb2: the bishop taken on b2 instead).
-    for (size_t i = 1; i <= 3; i += 2)
-        if (heldGain(c.playedLine, i, c.base, c.human, c.playedEnd) >= worth) return false;
+    // The move played wins as much along its line (cxd5 Bxb2+ Kxb2: the bishop taken on b2 instead),
+    // an exchange there read where it ends (Bxe6 Bxe6 Kxe6 wins the pawn on e6).
+    for (size_t i = 1; i <= 3; i += 2) {
+        size_t j = std::min(i, c.playedLine.size());
+        while (j > 0 && j < c.playedLine.size() && c.playedLine[j - 1].captured != NoPiece &&
+               c.playedLine[j].captured != NoPiece && c.playedLine[j].move.to == c.playedLine[j - 1].move.to)
+            ++j;
+        if (heldGain(c.playedLine, j, c.base, c.human, c.playedEnd) >= worth) return false;
+    }
     // A line that stops before the player's next move with as much still there to take (Nd5+ Kc6,
     // the bishop on c8 still loose; what went wrong is elsewhere, a repetition).
     if (c.playedLine.size() < 3 && c.playedEnd.sideToMove() == c.human && c.playedEnd.hasLegalMove() &&

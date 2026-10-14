@@ -75,6 +75,14 @@ ex.verdict.blunder.b5.3 = {move} — дорога помилка.
 ex.verdict.blunder.b6 = {move} — серйозна помилка.
 ex.verdict.blunder.b6.2 = {move} — груба помилка.
 ex.verdict.blunder.b6.3 = {move}? Груба помилка.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ой! Треба було відповісти на мою загрозу.
+ex.verdict.ignored.b1.2 = Обережно! Моя загроза нікуди не зникла.
+ex.verdict.ignored.b1.3 = Ой, зачекай. А як же моя загроза?
+ex.verdict.ignored.b2 = Хм, моя загроза нікуди не зникла.
+ex.verdict.ignored.b2.2 = Моя загроза лишилася без відповіді.
+ex.verdict.ignored.b2.3 = Обережно, на мою загрозу треба було відповісти.
 ex.verdict.mistake.b3 = Це не дуже вдалий хід.
 ex.verdict.mistake.b3.2 = Хм, у ходу {move} є слабке місце.
 ex.verdict.mistake.b3.3 = Це помилка.

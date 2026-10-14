@@ -40,6 +40,7 @@ int main(int argc, char** argv) {
         else if (a == "--min-drop") o.minDrop = std::atof(next().c_str());
         else if (a == "--verify") o.verify = std::atoi(next().c_str());
         else if (a == "--cache") o.cache = next();
+        else if (a == "--vcache") o.vcache = next();
         else {
             std::fprintf(stderr, "unknown option %s\n", a.c_str());
             return 2;

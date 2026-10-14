@@ -147,12 +147,18 @@ your colour (White, Black, or alternating from one game to the next); the choice
   what it cost; from level 4 it plays up to where the problem stands and points at what falls
   next. Where you could take back but that fails, it says why ("if you take back with Qxd2, Qxh1
   takes your rook"). A reason is given only when the board proves it (the material really lost for
-  good, beyond what the best move loses, and enough to explain the mistake), else the coach only
-  names the better move. For a blunder whose reason it cannot prove, it says that it is a blunder
+  good, beyond what the best move loses, and enough to explain the mistake) and a second, deeper
+  search confirms the line move by move, else the coach only names the better move; among moves
+  as good as each other, it names the most natural one (a capture, the move a player would look at
+  first). For a blunder whose reason it cannot prove, it says that it is a blunder
   and which piece had a better move (and that the move wins material, when it plainly does), and
   offers the takeback without giving the move away: it names the move if you play on, and says so
   if you find it. A move that costs a little is called
-  a small slip, never a mistake with a made-up line. A mistake (less than a blunder) is explained in words only, without playing the line: the
+  a small slip, never a mistake with a made-up line. Praise goes to a move that mattered: not to
+  one of several moves as good as each other, nor to a small gain in a game already won or lost.
+  At levels 1 and 2 the coach also looks for its own threats with a search after each of its moves:
+  it holds back a warning when the search finds that the threat wins nothing, and when your move
+  then loses to a threat it found, it says that you did not answer it. A mistake (less than a blunder) is explained in words only, without playing the line: the
   coach then plays its own move, and you answer it. After a blunder it has shown, it offers to take
   your move back: **Take back** or
   **Backspace** accepts, **Play on** or touching one of your pieces declines. At levels 4 to 6 these
