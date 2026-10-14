@@ -1203,6 +1203,10 @@ bool GameScene::update(AppContext& ctx, float dt) {
         if (coach()) updateCoachGameOver();
         if (coach() ? coachEndCardReady() : stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
             gameOverShown_ = true;
+            // The coach's results are kept before the card can be answered: the Space that skips
+            // the appraisal's last words makes the card ready in this frame, and the same key
+            // answers it ("Play again" keeps the keyboard's focus from the previous card).
+            if (coach()) persistCoachResults();
             ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,
                                             gameOverExtras());
             if (a == ui::MenuAction::StartAnalysis) {
