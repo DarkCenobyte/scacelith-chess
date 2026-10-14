@@ -1924,9 +1924,10 @@ Script Reviewer::coachMoved(const Game& g, const ai::Analysis* before, const ai:
     }
     if (target == NoSquare) return s;
     // The threat search, when there is one, wins that piece or as much: a piece the rules find en
-    // prise that a tactic defends is no threat.
+    // prise that a tactic defends is no threat. Its first move is the coach's, read with the turn
+    // passed (`turn`; `now` has the player to move and knows no such move).
     if (et.known) {
-        const Move first = now.parseUCI(et.uci);
+        const Move first = turn.parseUCI(et.uci);
         const bool takesIt = first.valid() && first.to == target;
         if (et.gain < 2 || (!takesIt && et.gain < points(now.at(target).type) - 1)) return s;
     }

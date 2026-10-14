@@ -4937,6 +4937,31 @@ TEST(coach_review_threat_search_gates_warnings) {
     CHECK(rv.threatKey(g).empty());
 }
 
+TEST(coach_review_threat_search_takes_a_defended_piece) {
+    // Audit N15: ...Rd3 attacks the queen, which the rook on d1 takes back (...Rxd4 Rxd4): a queen
+    // for a rook, 4 points, not the queen's whole value. The threat search (Stockfish 19's line,
+    // depth 12) takes the queen first: that move is the coach's, read with the turn passed, and it
+    // confirms the warning instead of hiding it.
+    const char* fen = "8/7k/8/8/3Qp3/r7/8/3R3K b - - 0 1";
+    const Game g = gameOf(fen, {"Rd3"});
+    const ai::Analysis takes = analysisOf({pvl(410, "d3d4 d1d4 h7g6 d4d8 g6f5 d8f8 f5g5 f8c8")});
+    Reviewer rv;
+    for (int level : {1, 2}) {
+        const std::string key = level == 1 ? "threat.piece.b1" : "threat.piece.b2";
+        rv.reset(level, White);
+        CHECK_EQ(rv.threatKey(g), std::string("8/7k/8/8/3Qp3/3r4/8/3R3K b - - 2 2"));
+        CHECK(hasKey(rv.coachMoved(g), key));
+        rv.reset(level, White);
+        const Script s = rv.coachMoved(g, nullptr, &takes);
+        CHECK(hasKey(s, key));
+        checkScript(s, "threat on a defended queen");
+        // A search that plays elsewhere and wins nothing is no threat, whatever the rules alone see.
+        const ai::Analysis quiet = analysisOf({pvl(-30, "h7g6 d4e4")});
+        rv.reset(level, White);
+        CHECK(!hasKey(rv.coachMoved(g, nullptr, &quiet), key));
+    }
+}
+
 TEST(coach_review_ignored_threat_verdict) {
     // Levels 1-2: the coach's ...e5 attacks the knight, its threat search takes it; the player's h3
     // leaves it there and ...exd4 wins it: the verdict says the threat was not answered.
