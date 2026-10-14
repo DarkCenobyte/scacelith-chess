@@ -139,8 +139,18 @@ struct Band {
     int praiseEvery = 3;        // at most one praise per this many human moves
     int offerCap = -1;          // takebacks the player may accept per game (-1: no cap)
     float demoPause = 0.8f;     // pause after a demonstration move lands
+    // How surely a player of the level turns an advantage into points: the slope, per 100 cp, of the
+    // logistic their results follow (Lichess's W% is 0.368, that of engines and strong players).
+    // Fitted on 20,452 positions of Lichess games: 0.14 at 1000-1300, 0.17 at 1300-1600, 0.20 at
+    // 1600-1900, 0.29 at 1900-2200, 0.36 from 2200 (levels 1-6: 750 to 2300 Elo).
+    double conversion = 0.36;
 };
 Band band(int level);           // clamped to 1..6
+// Lichess's W% (the mover's view) as a player of the band's level converts it: the same logit,
+// scaled by band.conversion / 0.368. It decides whether the game counts as decided, the player as
+// still better or clearly ahead; the classes keep Lichess's scale. 50 stays 50, a mate counts as
+// winPercent's +-1000 cp: +5 (W% 86) counts as 67 at level 1, 86 at level 6.
+double levelWinPercent(double w, const Band& b);
 
 // ---- The review --------------------------------------------------------------------------------
 struct ReviewInput {

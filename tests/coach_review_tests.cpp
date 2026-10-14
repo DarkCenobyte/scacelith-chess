@@ -300,6 +300,22 @@ TEST(coach_review_win_percent) {
     CHECK(std::fabs(a10 - (103.1668100711649 * std::exp(-0.4354415386753951) - 3.166924740191411 + 1.0)) < 1e-9);
 }
 
+TEST(coach_review_level_win_percent) {
+    // A player's W% as their level converts an advantage: the same logit, scaled by the level's
+    // slope. Even stays even, the sides stay symmetric, a lower level converts less surely.
+    for (int l = 1; l <= 6; ++l) {
+        CHECK(std::fabs(levelWinPercent(50.0, band(l)) - 50.0) < 1e-9);
+        CHECK(std::fabs(levelWinPercent(winPercent(-300), band(l)) + levelWinPercent(winPercent(300), band(l)) - 100.0) < 1e-6);
+        CHECK(levelWinPercent(winPercent(300), band(l)) <= winPercent(300));
+        if (l > 1) CHECK(levelWinPercent(winPercent(300), band(l)) >= levelWinPercent(winPercent(300), band(l - 1)));
+    }
+    CHECK(std::fabs(levelWinPercent(winPercent(500), band(1)) - 66.8) < 0.1);   // +5: 86 % for Lichess
+    CHECK(std::fabs(levelWinPercent(winPercent(500), band(6)) - 85.8) < 0.1);
+    // A won game at levels 1-4 (+10: W% 97.5) is not decided (90 and more) for the level.
+    for (int l = 1; l <= 4; ++l) CHECK(levelWinPercent(winPercent(1000), band(l)) < 90.0);
+    CHECK(levelWinPercent(winPercent(1000), band(5)) >= 90.0);
+}
+
 TEST(coach_review_classification_thresholds) {
     CHECK_EQ(classifyDelta(0.0, false), MoveClass::Best);
     CHECK_EQ(classifyDelta(0.49, false), MoveClass::Best);
@@ -363,18 +379,29 @@ TEST(coach_review_bands) {
 // ---- Explanations --------------------------------------------------------------------------------
 
 TEST(coach_review_play_on_after_a_demonstration_without_offer) {
-    // 1.Nd5?? exd5 while still clearly ahead (W% 92 -> 76): a blunder, shown at level 3 with no
-    // takeback card (none from 75 on). The coach says that its real move comes next.
+    // 1.Nd5?? exd5 (W% 92 -> 76): a blunder, shown at level 3 with no takeback card (offers turned
+    // off). The coach says that its real move comes next.
     const char* fen = "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1";
     Game g = gameOf(fen, {"Nd5"});
     Reviewer rv;
-    rv.reset(3, White);
+    rv.reset(3, White, false);
     const Review r = reviewOf(rv, g, analysisOf({pvl(650, "g1f1 g8f8"), pvl(320, "c3d5 e6d5 g1f1")}));
     checkScript(r.script, "play on");
     CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
     CHECK(!r.offersTakeback);
     CHECK(demoMoves(r.script) > 0);
     CHECK(!r.script.empty() && r.script.back().line.key == "demo.play_on");
+    // Offers on: a player of level 3 left at +3.2 (W% 76, 63 as they convert it) gets the card; at
+    // level 6 that player is still clearly ahead (from 75 on): no card.
+    for (int level : {3, 6}) {
+        Game o = gameOf(fen, {"Nd5"});
+        Reviewer ro;
+        ro.reset(level, White);
+        const Review w = reviewOf(ro, o, analysisOf({pvl(650, "g1f1 g8f8"), pvl(320, "c3d5 e6d5 g1f1")}));
+        CHECK_EQ(w.verdict.cls, MoveClass::Blunder);
+        CHECK(w.verdict.voiced);
+        CHECK_EQ(w.offersTakeback, level == 3);
+    }
     // With the card (a blunder that loses the game's balance), the card ends the script.
     Game h = gameOf(kHangFen, {"Nd5"});
     Reviewer rh;
@@ -414,6 +441,49 @@ TEST(coach_review_mistake_explained_without_demonstration) {
             CHECK(pointed);
             for (const Mark& m : cause->marks) CHECK(!m.untilRewind);   // no rewind to wait for
         }
+    }
+}
+
+TEST(coach_review_a_game_is_decided_at_the_level_of_its_player) {
+    // 1.Nd5? exd5 a rook and a knight up (+10 -> +4.5, W% 97.5 -> 84): a mistake in a game decided
+    // for a strong player, who keeps a won game (83 as level 6 converts it): nothing said. Players of
+    // levels 2-5 convert it less surely (79 at level 5, 63 at level 2): the coach says what the move
+    // gives away. Level 1 voices blunders only.
+    const char* fen = "6k1/5ppp/4p3/8/8/2N5/5PPP/R5K1 w - - 0 1";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"Nd5"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, g, analysisOf({pvl(1000, "g1f1 g8f8"), pvl(450, "c3d5 e6d5 g1f1")}));
+        CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+        CHECK_EQ(r.verdict.voiced, level >= 2 && level <= 5);
+        if (level >= 2 && level <= 5) CHECK_EQ(r.verdict.exType, ExType::Hanging);
+    }
+}
+
+TEST(coach_review_mate_in_a_game_decided_already) {
+    // 3...Nf6?? allows Qxf7#, but with the scores of a game lost already (-7.5 at best): judge's
+    // softened class, a mistake, and no fault to stress at levels 3-6 whatever their players convert.
+    Game g = gameOf(nullptr, {"e4", "e5", "Bc4", "Nc6", "Qh5", "Nf6"});
+    const ai::Analysis a0 = analysisOf({pvl(-750, "g7g6 h5f3 g8f6"), pvl(-760, "d8e7 g1f3"), pvl(0, "g8f6 h5f7", -1)});
+    for (int level = 3; level <= 6; ++level) {
+        Reviewer rv;
+        rv.reset(level, Black);
+        const Review r = reviewOf(rv, g, a0);
+        CHECK_EQ(r.verdict.cls, MoveClass::Mistake);
+        CHECK(!r.verdict.voiced);
+    }
+    // A mate in five missed, the move still +9: nothing said at levels 3-5 (beyond their missed-mate
+    // reach, and the game won either way; level 6 names the mate).
+    const char* fen = "6k1/5pp1/7p/8/8/8/5PPP/3QR1K1 w - - 0 1";
+    const ai::Analysis b0 = analysisOf({pvl(0, "d1d8 g8h7 e1e8", 5), pvl(950, "d1d5 g8h7"), pvl(920, "h2h3 g8h7")});
+    for (int level = 3; level <= 5; ++level) {
+        Game h = gameOf(fen, {"h3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const Review r = reviewOf(rv, h, b0);
+        CHECK(r.verdict.mateMissed);
+        CHECK(!r.verdict.voiced);
     }
 }
 
@@ -839,7 +909,7 @@ TEST(coach_review_mate_allowed_first) {
 TEST(coach_review_mate_missed) {
     // Rd8 mates; the player shuffles the king instead.
     const char* fen = "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1";
-    const ai::Analysis a0 = analysisOf({pvl(0, "d1d8", 1), pvl(600, "d1d7 g8f8"), pvl(550, "g1f1 g8f8")});
+    const ai::Analysis a0 = analysisOf({pvl(0, "d1d8", 1), pvl(650, "d1d7 g8f8"), pvl(600, "g1f1 g8f8")});
     for (int level = 1; level <= 6; ++level) {
         Game g = gameOf(fen, {"Kf1"});
         Reviewer rv;
@@ -855,10 +925,12 @@ TEST(coach_review_mate_missed) {
         CHECK_EQ(demoMoves(r.script), 0);   // the table shows the position after the move: trace only
         checkScript(r.script, where);
         if (level <= 2) CHECK(hasKey(r.script, "ex.verdict.missed.b" + std::to_string(level)));
-        // Still winning by far after Kf1: from level 3, the mate is said without a verdict or an offer.
-        if (level >= 3)
+        // Still winning by far after Kf1 (+6, W% 90): from level 4 (77 as its player converts it), the
+        // mate is said without a verdict or an offer. Level 3 (74) gets the verdict and the card.
+        if (level >= 4)
             for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.verdict."));
-        CHECK_EQ(r.offersTakeback, level <= 2);
+        if (level == 3) CHECK(hasKey(r.script, "ex.verdict.blunder.b3"));
+        CHECK_EQ(r.offersTakeback, level <= 3);
         if (level == 1) {
             g.undo(1);
             Script hint = rv.takebackAccepted(g);

@@ -2352,7 +2352,8 @@ int reviewMain(const Options& o) {
             if (offer && !dubiousOffer && v.cls != MoveClass::Blunder && t != ExType::MateAllowed &&
                 t != ExType::MateMissed && t != ExType::Stalemate && t != ExType::MissedCapture)
                 f.push_back({"OFFER_NOT_BLUNDER", className(v.cls)});
-            if (offer && !dubiousOffer && v.wPlayed >= 75.0)
+            // Still clearly ahead as a player of the level converts it (levelWinPercent, review.h).
+            if (offer && !dubiousOffer && levelWinPercent(v.wPlayed, band(level)) >= 75.0)
                 f.push_back({"OFFER_STILL_WINNING", std::to_string(int(v.wPlayed)), false});
             if (verdictKey.rfind("ex.verdict.blunder", 0) == 0 && v.cls != MoveClass::Blunder)
                 f.push_back({"VERDICT_CLASS", verdictKey + " for " + className(v.cls)});

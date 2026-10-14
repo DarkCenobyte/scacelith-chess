@@ -120,15 +120,22 @@ Band band(int level) {
     // three plies, five with a check and a recapture; a mate in two at level 1, in three at levels 2-3);
     // from level 4 the demonstration stops where the problem stands (a mate in three: the four plies
     // before the mate).
+    // The conversion slope last: levels 1 and 2 (750 and 1000 Elo) take the lowest band measured.
     static const Band kBands[6] = {
-        {1, true, 5, 1, 3, 1, 2, 3, 5, 3, -1, 0.80f},
-        {2, true, 7, 3, 5, 2, 3, 3, 4, 4, -1, 0.60f},
-        {3, true, 7, 3, 5, 2, 4, 4, 3, 5, -1, 0.50f},
-        {4, false, 4, 4, 7, 3, 5, 4, 3, 6, 5, 0.45f},
-        {5, false, 4, 6, 7, 4, 7, 3, 2, 8, 3, 0.35f},
-        {6, false, 4, 8, 7, 5, 9, 2, 2, 8, 2, 0.35f},
+        {1, true, 5, 1, 3, 1, 2, 3, 5, 3, -1, 0.80f, 0.14},
+        {2, true, 7, 3, 5, 2, 3, 3, 4, 4, -1, 0.60f, 0.14},
+        {3, true, 7, 3, 5, 2, 4, 4, 3, 5, -1, 0.50f, 0.17},
+        {4, false, 4, 4, 7, 3, 5, 4, 3, 6, 5, 0.45f, 0.20},
+        {5, false, 4, 6, 7, 4, 7, 3, 2, 8, 3, 0.35f, 0.29},
+        {6, false, 4, 8, 7, 5, 9, 2, 2, 8, 2, 0.35f, 0.36},
     };
     return kBands[level - 1];
+}
+
+double levelWinPercent(double w, const Band& b) {
+    if (w <= 0.0 || w >= 100.0) return w;
+    const double x = std::log(w / (100.0 - w)) * (b.conversion / 0.368208);
+    return 100.0 / (1.0 + std::exp(-x));
 }
 
 // ---- Beat helpers (review_internal.h) ----------------------------------------------------------------
@@ -1256,8 +1263,18 @@ Review Reviewer::review(const ReviewInput& in) {
     const bool topMove = cls == MoveClass::Best || cls == MoveClass::Excellent ||
                          ((cls == MoveClass::Book || cls == MoveClass::Forced) && c.j.delta < 2.0);
     const bool fault = cls == MoveClass::Inaccuracy || cls == MoveClass::Mistake || cls == MoveClass::Blunder;
-    const bool decidedWin = c.j.wBest >= 90.0 && c.j.wPlayed >= 80.0;
-    const bool decidedLoss = c.j.wBest <= 10.0;
+    // Decided, still better, clearly ahead: as a player of the level converts an advantage
+    // (levelWinPercent). A beginner's +5 is no decided game: the coach still says what a move gives
+    // away there, offers it back, and names a blunder that leaves the player only a little ahead.
+    // A mate found or allowed where the game was decided the other way already (judge's softened mate
+    // classes: +7 or more without the mate, -7 or less before it) keeps the engine's scale: a mate
+    // missed at +9, or a mate in 19 allowed at -7, is no fault to stress at any level.
+    const bool settledMate = (c.j.mate == MateChange::Lost && !mated(c.lp->score) && c.lp->score.cp > 700) ||
+                             (c.j.mate == MateChange::Created && top->score.cp < -700);
+    const double hBest = settledMate ? c.j.wBest : levelWinPercent(c.j.wBest, bd);
+    const double hPlayed = settledMate ? c.j.wPlayed : levelWinPercent(c.j.wPlayed, bd);
+    const bool decidedWin = hBest >= 90.0 && hPlayed >= 80.0;
+    const bool decidedLoss = hBest <= 10.0;
     const bool mateType = ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed;
     const bool missedPiece = ex.type == ExType::MissedCapture && ex.offer;   // levels 1-2, a piece of 3+
     // A reason the coach can give: what the move allows or misses on the board, a king left open, a
@@ -1265,7 +1282,7 @@ Review Reviewer::review(const ReviewInput& in) {
     const bool reason = found && ex.type != ExType::Positional;
     // Still better after the move: a costly move without a reason the board shows only gets a word
     // about the better move, never a blunder or mistake verdict that a player still ahead cannot see.
-    const bool stillBetter = c.j.wPlayed >= 60.0;
+    const bool stillBetter = hPlayed >= 60.0;
     // A blunder whose reason the coach cannot give reliably (none found, only the positional
     // fallback, or one beyond a beginner's reach): "that's a blunder, your knight had a better move"
     // and a takeback offered without naming the move. The move is said once the offer is declined,
@@ -1425,8 +1442,8 @@ Review Reviewer::review(const ReviewInput& in) {
         // still clearly ahead), and the cases the detector flags per level (a mate within the band's
         // limit, stalemate when winning, a free piece of 3+ points missed at levels 1-2).
         // A mate missed while the game stays won: said (levels 3-6) without a verdict or an offer.
-        const bool wonAnyway = ex.type == ExType::MateMissed && c.j.wPlayed >= 75.0 && level_ >= 3;
-        bool offer = hintOnly || (cls == MoveClass::Blunder && reason && c.j.wPlayed < 75.0) ||
+        const bool wonAnyway = ex.type == ExType::MateMissed && hPlayed >= 75.0 && level_ >= 3;
+        bool offer = hintOnly || (cls == MoveClass::Blunder && reason && hPlayed < 75.0) ||
                      (ex.offer && !wonAnyway);
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;

@@ -158,8 +158,9 @@ your colour (White, Black, or alternating from one game to the next); the choice
   one of several moves as good as each other, nor to a small gain in a game already won or lost.
   At levels 1 and 2 the coach also looks for its own threats with a search after each of its moves:
   it holds back a warning when the search finds that the threat wins nothing, and when your move
-  then loses to a threat it found, it says that you did not answer it. A mistake (less than a blunder) is explained in words only, without playing the line: the
-  coach then plays its own move, and you answer it. After a blunder it has shown, it offers to take
+  then loses to a threat it found, it says that you did not answer it. A mistake (less than a
+  blunder) is explained in words only, without playing the line: the coach then plays its own
+  move, and you answer it. After a blunder it has shown, it offers to take
   your move back: **Take back** or
   **Backspace** accepts, **Play on** or touching one of your pieces declines. At levels 4 to 6 these
   takebacks are counted, 5, 3 and 2 a game: only the offers you accept use one (never the offer
@@ -167,7 +168,11 @@ your colour (White, Black, or alternating from one game to the next); the choice
   corner, under the key hints, and on the offer card shows how many remain. Once they are used up,
   the coach says so, once, and offers no more takebacks in that game. When it shows a line without
   that offer (a game you still clearly win, the level's takebacks used up), it says that its own
-  move comes next once the pieces are back.
+  move comes next once the pieces are back. What counts as a game already decided, or as you
+  still clearly ahead, depends on the level: the lower the level, the bigger the advantage it
+  takes, as players of that level turn an advantage into a win less surely. The coach then keeps
+  pointing out what a move gives away in a game a strong player would win anyway, and offers the
+  takeback more often.
 - **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
   move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
   draw, resign, options, main menu (abandons the game).
