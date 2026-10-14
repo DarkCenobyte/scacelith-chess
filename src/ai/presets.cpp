@@ -64,7 +64,8 @@ namespace {
 // on which the weak presets were first calibrated. Stockfish 19's levels 0 and 1 play ~65-120 Elo
 // below Stockfish 16's (the drift fades by UCI_Elo 1500), so kDepthCapPenalty adds ~80 of that to the
 // ~105 a depth cap at or below the pick iteration costs: every depth-capped preset is at level 0 or 1.
-// An uncapped Custom setting at level 0 or 1 is therefore rated ~65-120 too high.
+// An uncapped Custom setting at level 0 or 1 is therefore rated ~65-120 too high (its rating; the
+// time-pressure drop starts from what it plays, detail::presetScaleElo).
 constexpr int kDepthCapPenalty = 185;
 constexpr int kShortOfPickPenalty = 97;  // per ply a depth cap stops short of the pick iteration
 // Index = MultiPV (<= 4 is Stockfish's own minimum); 20 and more count as 20.
@@ -223,6 +224,13 @@ int uciEloFor(int elo) {
     return 1320 + (std::max(elo, 1200) - 1200) * 4 / 5;
 }
 
+// The inverse: what UCI_Elo `uci` plays on the presets' scale.
+int eloForUci(int uci) {
+    if (uci >= 1500) return uci;
+    if (uci >= 1400) return 1300 + (uci - 1400) * 2;
+    return 1200 + (std::max(uci, 1320) - 1320) * 5 / 4;
+}
+
 // The depth-capped handicaps measured below 1200 (README.scacelith.md), strongest first: Casual,
 // Skill 1 depth 1 MultiPV 5, Beginner, Skill 0 depth 1 MultiPV 7, Novice, coach levels 1 and 0.
 const std::vector<EngineSettings>& shallowLadder() {
@@ -235,11 +243,25 @@ const std::vector<EngineSettings>& shallowLadder() {
 
 }  // namespace
 
+int presetScaleElo(const EngineSettings& s) {
+    const int elo = Engine::estimateElo(s);
+    const double level = skillLevel(s);
+    if (level < 0.0 || (s.depth > 0 && s.depth <= 1 + int(level))) return elo;  // full strength or depth-capped
+    EngineSettings bare = s;  // the same level without the MultiPV penalty
+    bare.depth = 0;
+    bare.multiPV = 1;
+    const int uci = Engine::estimateElo(bare);
+    return std::max(elo - (uci - eloForUci(uci)), 100);
+}
+
 EngineSettings weakenedSettings(const EngineSettings& s, int drop) {
     if (drop <= 0 || s.nodes > 0 || s.moveTimeMs > 0) return s;
     const double level = skillLevel(s);
     if (level < 0.0 && s.depth > 0) return s;
-    const int nominal = Engine::estimateElo(s);
+    // The drop starts from what `s` plays: an uncapped Skill Level 0 or 1 plays ~60-120 below its
+    // estimate, which a small drop would otherwise turn into a stronger UCI_Elo. A UCI_Elo setting
+    // starts from its UCI_Elo (below 1500 the guard below keeps it from playing stronger).
+    const int nominal = s.limitStrength ? Engine::estimateElo(s) : presetScaleElo(s);
     const int target = nominal - drop;
     EngineSettings w;
     if (target >= 1200) {

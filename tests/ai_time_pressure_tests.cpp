@@ -160,6 +160,59 @@ TEST(ai_weakened_custom_skill19_depth_cap) {
             }
 }
 
+TEST(ai_weakened_custom_low_skill_uncapped) {
+    // A Custom opponent at Skill Level 0 or 1 without a depth cap: rated 1320 / 1444 by Stockfish's
+    // calibration, it plays ~1200 / ~1388 on the presets' scale (the UCI_Elo levels below 1500 play
+    // weaker than their number). A drop starts from there: a small one gave it a stronger UCI_Elo.
+    using ai::Engine;
+    using ai::detail::presetScaleElo;
+    using ai::detail::weakenedSettings;
+    ai::EngineSettings s0;
+    s0.skillLevel = 0;
+    CHECK_EQ(Engine::estimateElo(s0), 1320);
+    CHECK_EQ(presetScaleElo(s0), 1200);
+    // 5+0 with 50 s left (-33): the Casual's settings (~1175), not UCI_Elo 1387 (~1290).
+    const int drop = ai::detail::timePressureEloDrop(50 * kSec, 0, 5 * kMin);
+    CHECK_EQ(drop, 33);
+    CHECK(ai::detail::sameStrength(weakenedSettings(s0, drop), preset("Casual")));
+    ai::EngineSettings s1;
+    s1.skillLevel = 1;
+    CHECK_EQ(presetScaleElo(s1), 1388);
+    ai::EngineSettings w = weakenedSettings(s1, drop);
+    CHECK(w.limitStrength && w.elo > 1400 && w.elo < Engine::estimateElo(s1));
+    CHECK(std::abs(presetScaleElo(w) - (1388 - drop)) <= 2);
+    // Skill 0-1 without a depth cap (none, or one past the pick iteration), any MultiPV, every drop:
+    // never stronger, weaker as the drop grows, and within half the widest step between the
+    // measured settings (Beginner ~1010 to Skill 0 depth 1 MultiPV 7 ~907) of the target while one
+    // of them reaches it.
+    const int floor = Engine::estimateElo(ai::coachLevelSettings(0));
+    for (int level = 0; level <= 1; ++level)
+        for (int depth : {0, 4})
+            for (int multiPV : {1, 5, 9, 20}) {
+                ai::EngineSettings c;
+                c.skillLevel = level;
+                c.depth = depth;
+                c.multiPV = multiPV;
+                const int nominal = presetScaleElo(c);
+                CHECK(nominal < Engine::estimateElo(c));
+                int last = nominal;
+                for (int d = 0; d <= ai::detail::kTimeTroubleEloDrop; d += 5) {
+                    const int e = presetScaleElo(weakenedSettings(c, d));
+                    CHECK(e <= last);
+                    if (nominal - d >= floor) CHECK(std::abs(e - (nominal - d)) <= 55);
+                    last = e;
+                }
+            }
+    // Every other setting starts from its estimate as before: the presets (and so the coach's
+    // depth-capped levels), Skill 2 and up.
+    for (const auto& p : ai::presets()) CHECK_EQ(presetScaleElo(p.settings), Engine::estimateElo(p.settings));
+    for (int level = 2; level < 20; ++level) {
+        ai::EngineSettings c;
+        c.skillLevel = level;
+        CHECK_EQ(presetScaleElo(c), Engine::estimateElo(c));
+    }
+}
+
 #if defined(SCACELITH_HAS_STOCKFISH)
 
 TEST(ai_timed_handicap_search_capped) {

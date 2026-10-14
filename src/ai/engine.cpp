@@ -466,7 +466,7 @@ struct Engine::Impl {
         EngineSettings s = detail::weakenedSettings(settings, drop);
         if (drop > 0)
             LOGI("ai: %.1f s left, time pressure -%d Elo: plays at ~%d instead of ~%d", double(left) / 1000.0, drop,
-                 Engine::estimateElo(s), Engine::estimateElo(settings));
+                 detail::presetScaleElo(s), detail::presetScaleElo(settings));
         return s;
     }
 
