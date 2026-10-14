@@ -249,10 +249,11 @@ void GameScene::updateScript(float dt) {
     if (anim_[inputSeat()].busy()) return;
     if (!seatMayPlay(inputSeat())) return;   // the scripted player is standing: no move, no menu
     if (coach() && !coachMayTouch()) return;  // the coach has the floor (or its hands the table)
-    // The coach reviews a move with Stockfish's analyses and waits only seconds for them
-    // (coach/session.cpp): a scripted move waits for the engine to have started, which can take
-    // longer on a slow machine.
-    if (coach() && engineOk_ && !engine_.ready()) return;
+    // In a coach game or a challenge the move is judged with Stockfish's analyses, which the coach
+    // waits only seconds for (coach/session.cpp, challenge_run.cpp): a scripted move waits for the
+    // engine to have started, which can take longer on a slow machine. The rules lesson needs no
+    // engine (its exercises' timers run from the start).
+    if (coach() && !lesson() && engineOk_ && !engine_.ready()) return;
     if (scriptPos_ >= script_.size()) {
         // --play-then: the player opens the Esc menu and picks the next choice (menuChoice).
         const std::string& a = scriptThen_[scriptThenPos_++];
