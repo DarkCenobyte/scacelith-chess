@@ -59,6 +59,9 @@ bool playByHand(headless::App& app, const coachtest::LogCapture& log, size_t mar
 // menu: declined at once, and the coach plays on. "Take back my move" then takes both moves back by
 // hand; 1.d4 instead, the Options applied, and the game left from the pause menu (saved unfinished).
 TEST(coach_mode_game_menu_started_from_coach_page_and_played_by_hand) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the coach answers a draw offer from the engine's evaluation");
+#endif
     coachtest::VoiceFolder voice;
     coachtest::LogCapture log;
     gstest::SettingsGuard guard;

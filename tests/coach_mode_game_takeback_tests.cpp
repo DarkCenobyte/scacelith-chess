@@ -27,6 +27,9 @@ bool offerShown(const headless::App& app) { return app.hasLabel("Take back") && 
 // player's hand, 2.Nf3 instead (the coach replies), then the pause menu's takeback of both moves,
 // and the game left from the pause menu (--play-then takeback,leave).
 TEST(coach_mode_game_takeback_auto_answer_then_pause_menu_takeback) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the takeback offer follows the engine's review of the move");
+#endif
     coachtest::VoiceFolder voice;
     coachtest::LogCapture log;
     headless::App* app = headless::shared(coachgame::gameArgs({"--coach-level", "1", "--coach-colour", "white", "--moves",
@@ -60,6 +63,9 @@ TEST(coach_mode_game_takeback_auto_answer_then_pause_menu_takeback) {
 // Answered by hand: Backspace takes 2.Qg4 back; after 2.Ba6 the coach offers again, and touching
 // one of the player's pieces plays on: the coach then plays. The player resigns from the pause menu.
 TEST(coach_mode_game_takeback_answered_by_backspace_then_by_a_touch) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the takeback offer follows the engine's review of the move");
+#endif
     coachtest::VoiceFolder voice;
     coachtest::LogCapture log;
     headless::App* app = headless::shared(coachgame::gameArgs({"--coach-level", "1", "--coach-colour", "white", "--moves",

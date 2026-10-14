@@ -18,6 +18,9 @@
 // The player offers a draw with the a-pawn in hand (the pause menu opens over the touched piece),
 // then plays 4.a3: the coach, a queen down, accepts.
 TEST(coach_mode_game_draw_offer_accepted_by_a_coach_a_queen_down) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the coach answers a draw offer from the engine's evaluation");
+#endif
     coachtest::VoiceFolder voice;
     coachtest::LogCapture log;
     headless::App* app = headless::shared(coachgame::gameArgs(

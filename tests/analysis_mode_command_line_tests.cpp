@@ -143,6 +143,9 @@ TEST(analysis_mode_command_line_game_just_played) {
 // searches waited for (the welcome, then the end's comment with the accuracies, the review being
 // complete), and neither the evaluation cache nor the settings file touched.
 TEST(analysis_mode_command_line_screenshot_run) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the review's searches and comments need the engine");
+#endif
     LogCapture log;
     coachtest::VoiceFolder modelFolder;
     headless::stopShared();

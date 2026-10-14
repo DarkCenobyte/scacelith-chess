@@ -176,6 +176,9 @@ TEST(analysis_mode_menu_paste_a_pgn) {
 // hidden and shown, the Esc menu with its Options (another language applied), and back to the
 // Analysis page. Nothing is saved but the settings.
 TEST(analysis_mode_menu_saved_game_with_its_review_cached) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the Analysis mode then makes no comments");
+#endif
     LogCapture log;
     coachtest::VoiceFolder modelFolder;
     headless::App* app = titleApp();
@@ -343,6 +346,9 @@ TEST(analysis_mode_menu_saved_game_with_its_review_cached) {
 // completes; the step to the end then says how the game ended with each side's accuracy. Opened
 // again, the game finds its review in the cache.
 TEST(analysis_mode_menu_reviewed_by_the_engine_then_found_in_the_cache) {
+#if !defined(SCACELITH_HAS_STOCKFISH)
+    SKIP("built without the embedded Stockfish: the review's searches need the engine");
+#endif
     LogCapture log;
     coachtest::VoiceFolder modelFolder;
     headless::App* app = titleApp();
