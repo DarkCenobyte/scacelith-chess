@@ -183,7 +183,8 @@ engine.thousand = {0}千
 engine.million = {0}百万
 engine.dynamic_elo = 持ち時間による動的 Elo
 engine.dynamic_elo.help = 人間の棋士のように、Stockfish は持ち時間が少なくなると弱くなります。残り 1 分を切ると少し（ラピッドとブリッツではもっと早く）、時間切迫ではずっと弱くなります。持ち時間のある対局のみ。
-engine.speed_note = Stockfish はこのコンピューターで計算します。応答時間はマシンの性能によって変わります。
+engine.pace.realistic = Stockfish は人間のように考えてから指します。すぐ指させるには「設定 > ゲーム > リアルな考慮時間」をオフにします。
+engine.pace.instant = Stockfish は計算が終わるとすぐ指します。人間のように考えさせるには「設定 > ゲーム > リアルな考慮時間」をオンにします。
 
 # Time controls
 tc.unlimited = 無制限

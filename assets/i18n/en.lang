@@ -191,7 +191,10 @@ engine.thousand = {0} thousand
 engine.million = {0} million
 engine.dynamic_elo = Dynamic Elo by time
 engine.dynamic_elo.help = Like a human player, Stockfish plays weaker when its clock runs low: a little in the last minute (earlier in rapid and blitz games), much weaker in time trouble. Timed games only.
-engine.speed_note = Stockfish thinks on this computer: its response time depends on the machine's performance.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish takes its time like a human of its level. To skip this pause: Options > Gameplay > Realistic thinking time.
+engine.pace.instant = Stockfish moves as soon as it has calculated. For human-like pauses: Options > Gameplay > Realistic thinking time.
 
 # Time controls ("3+2": minutes + increment in seconds)
 tc.unlimited = Unlimited

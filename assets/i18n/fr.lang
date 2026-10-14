@@ -184,7 +184,8 @@ engine.thousand = {0} mille
 engine.million = {0} millions
 engine.dynamic_elo = Elo dynamique au temps
 engine.dynamic_elo.help = Comme un joueur humain, Stockfish joue moins bien quand sa pendule s’épuise : un peu dans la dernière minute (plus tôt en rapide et en blitz), beaucoup moins bien en zeitnot. Parties à la pendule uniquement.
-engine.speed_note = Stockfish calcule sur cet ordinateur : son temps de réponse dépend des performances de la machine.
+engine.pace.realistic = Stockfish prend son temps comme un humain de son niveau. Pour qu’il joue sans attendre : Options > Jeu > Temps de réflexion réaliste.
+engine.pace.instant = Stockfish joue dès son calcul fini. Pour qu’il prenne son temps comme un humain : Options > Jeu > Temps de réflexion réaliste.
 
 # Time controls
 tc.unlimited = Illimitée

@@ -1146,13 +1146,15 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
         y += 6.0f;
     }
     const Rect col(rx, 0, colW, 0);
-    // Against Stockfish: "Dynamic Elo by time" (timed games only) and a word on its response time.
+    // Against Stockfish: "Dynamic Elo by time" (timed games only) and how long it takes over a move,
+    // which only Options > Gameplay > Realistic thinking time decides.
     if (!hotSeat) {
         const bool timed = customTc || tcs[size_t(setup.timeControl)] != "Unlimited";
         im::toggleRow(L("engine.dynamic_elo"), setup.dynamicElo, Rect(rx, y, colW, 42.0f), timed);
         im::tooltip(T("engine.dynamic_elo.help"));
         TextStyle es = style(font::FACE_ITALIC, 20.0f, muted, im::startAlign());
-        const int lines = gfx::textWrapped(T("engine.speed_note"), im::flipX(col, rx + 22.0f), y + 74.0f, colW - 26.0f, es, 26.0f);
+        const char* pace = game::settings().humanizeThinking ? "engine.pace.realistic" : "engine.pace.instant";
+        const int lines = gfx::textWrapped(T(pace), im::flipX(col, rx + 22.0f), y + 74.0f, colW - 26.0f, es, 26.0f);
         y += 52.0f + 26.0f * float(lines);
     }
 

@@ -45,15 +45,16 @@ pressing the clock) takes exactly the same time for both players, and each clock
 the lever is actually pressed.
 
 Stockfish runs on your computer. With **Realistic thinking time** (Options > Gameplay, on by
-default) it takes about as long over a move as a human of its strength would with its clock:
-longer for the stronger presets and the longer time controls, a few seconds per move for the weak
-presets in rapid. Its search itself stops within a second, except at full strength (Stockfish
-Max), which manages its clock as Stockfish does. **Dynamic Elo by time** (off by default) makes
-it play weaker when its own clock runs low, as people do: a little from the last minute (in rapid
-and blitz games earlier, from a fifth of the base time but at most 3 minutes; in bullet from half
-of it; each second of increment counts ten times), up to 150 Elo below its level at 15 seconds,
-then much weaker in time trouble, up to 400 Elo below with an empty clock (Stockfish Max only in
-the last seconds). It applies to timed games only and does not change the opponent's rating.
+default) it takes about as long over a move as a human of its strength would with its clock: longer
+for the stronger presets and the longer time controls, a few seconds per move for the weak presets
+in rapid. Its search itself stops within a second, except at full strength (Stockfish Max), which
+manages its clock as Stockfish does. The New Game and Watch a Game pages say which way it plays and
+where to change it. **Dynamic Elo by time** (off by default) makes it play weaker when its own
+clock runs low, as people do: a little from the last minute (in rapid and blitz games earlier, from
+a fifth of the base time but at most 3 minutes; in bullet from half of it; each second of increment
+counts ten times), up to 150 Elo below its level at 15 seconds, then much weaker in time trouble,
+up to 400 Elo below with an empty clock (Stockfish Max only in the last seconds). It applies to
+timed games only and does not change the opponent's rating.
 
 Illegal moves are only possible when legal-move hints are turned off (Options > Gameplay). As in
 tournaments, the arbiter then restores the position, gives the opponent extra time, and a second
