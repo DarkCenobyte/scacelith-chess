@@ -88,6 +88,13 @@ The tests of one file can share one game (`headless::shared`); the test runner s
 next file's tests (its scene holds the engine). MinGW runs the files in the reverse order, so a
 test must not count on what a test of another file left behind.
 
+The coach's voice is a third-party system for the unit tests: they never synthesize it in the
+Coach and Analysis modes, nor download its model from its known URLs. The Coach and Analysis tests
+give the game an empty voice folder (`tests/coach_mode_support.h`), so the coach speaks in
+subtitles, and the test runner gives the game's download job the model's manifest without any
+source (`game::setCoachModelManifest`): a download started by mistake fails at once. The download
+tests serve made-up files from a loopback server.
+
 ## Test coverage
 
 `-DSCACELITH_COVERAGE=ON` (Linux, GCC) instruments the game's own code for gcov: the core modules
