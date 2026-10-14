@@ -258,9 +258,11 @@ const tts::ModelManifest* setCoachModelManifest(const tts::ModelManifest* m) {
 void drawModelDownload(bool startupOffer) {
     ModelUi& u = state();
     if (!u.inited) coachModelInit();
-    // Options > Audio > Coach voice switched on (and applied): offer the model when it is missing.
+    // Options > Audio > Coach voice switched on (and applied): offer the model when it is missing,
+    // in the form the folder calls for (the update form when old files are there), as the Coach
+    // entry does.
     bool voice = settings().coachVoice;
-    if (voice && !u.lastVoice && coachModelNeedsPrompt()) u.promptOpen = true;
+    if (voice && !u.lastVoice && coachModelNeedsPrompt()) openModelPrompt();
     u.lastVoice = voice;
     if (!voice && !u.promptUpdate) u.promptOpen = false;   // the update is offered with the voice off too
 
