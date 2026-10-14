@@ -95,8 +95,12 @@ int Engine::estimateElo(const EngineSettings& s) {
     int elo;
     if (s.limitStrength) {
         elo = std::clamp(s.elo, 1320, 3190);
+    } else if (level >= 19.0) {
+        // Beyond the fit's range (UCI_Elo 3190 is level 18.4), and like any level still handicapped
+        // by the depth cap and MultiPV below: a time-pressure drop (weakenedSettings) starts from
+        // this estimate and must not trade Skill 19 at depth 1 for a deep UCI_Elo 3100 search.
+        elo = 3250;
     } else {
-        if (level >= 19.0) return 3250;
         // Invert Stockfish's (monotonic) Elo -> level fit by bisection.
         double lo = 1320, hi = 3190;
         for (int i = 0; i < 40; ++i) {

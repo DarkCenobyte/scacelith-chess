@@ -122,6 +122,44 @@ TEST(ai_weakened_settings) {
     }
 }
 
+TEST(ai_weakened_custom_skill19_depth_cap) {
+    // Audit N16: a Custom opponent at Skill Level 19 capped at depth 1 (no Elo limit) on a 5+0 clock
+    // with 15 s left (-150 Elo). Its estimate counts the cap, like Skill 18 at depth 1, so the drop
+    // gives a depth-capped handicap a little weaker, not UCI_Elo 3100 without a depth cap.
+    using ai::Engine;
+    using ai::detail::weakenedSettings;
+    ai::EngineSettings s;
+    s.skillLevel = 19;
+    s.depth = 1;
+    ai::EngineSettings s18 = s;
+    s18.skillLevel = 18;
+    const int nominal = Engine::estimateElo(s);
+    CHECK(std::abs(nominal - Engine::estimateElo(s18)) <= 100);
+    const int drop = ai::detail::timePressureEloDrop(15 * kSec, 0, 5 * kMin);
+    CHECK_EQ(drop, ai::detail::kLowTimeEloDrop);
+    const ai::EngineSettings w = weakenedSettings(s, drop);
+    CHECK(!w.limitStrength);
+    CHECK(w.depth >= 1 && w.depth <= 2);
+    CHECK(Engine::estimateElo(w) < nominal);
+    // Every Custom level (0-19) capped at or below its pick iteration, any MultiPV, every drop: a
+    // drop that leaves less than 1200 keeps a depth-capped handicap, never a stronger one.
+    for (int level = 0; level < 20; ++level)
+        for (int depth = 1; depth <= 1 + level; ++depth)
+            for (int multiPV : {1, 5, 9, 20}) {
+                ai::EngineSettings c;
+                c.skillLevel = level;
+                c.depth = depth;
+                c.multiPV = multiPV;
+                const int e = Engine::estimateElo(c);
+                for (int d : {10, ai::detail::kLowTimeEloDrop, ai::detail::kTimeTroubleEloDrop}) {
+                    if (e - d >= 1200) continue;
+                    const ai::EngineSettings cw = weakenedSettings(c, d);
+                    CHECK(!cw.limitStrength && cw.depth > 0);
+                    CHECK(Engine::estimateElo(cw) <= e);
+                }
+            }
+}
+
 #if defined(SCACELITH_HAS_STOCKFISH)
 
 TEST(ai_timed_handicap_search_capped) {
