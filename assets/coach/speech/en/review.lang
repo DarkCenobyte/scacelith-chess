@@ -107,7 +107,11 @@ ex.verdict.inaccuracy.b5.3 = {best} was more precise than {move}.
 ex.verdict.inaccuracy.b6 = {move} is inaccurate; {best}.
 ex.verdict.inaccuracy.b6.2 = Inaccurate. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} was better.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} may have been a little more precise.
+ex.verdict.inaccuracy.maybe.2 = I might have played {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = That move looks dubious.
 ex.verdict.dubious.2 = That move seems dubious.
 # Something good was missed (levels 1-2).

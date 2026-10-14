@@ -250,6 +250,9 @@ public:
     // A fault is unsettled when one of the two iterations before the search's last found the move
     // costing less than this (win-% points): a good move then (review.cpp).
     static constexpr double kUnsettledCost = 5.0;
+    // Level 6 hedges an inaccuracy costing less than this (win-% points; the class starts at 5):
+    // "Nf3 may have been a little more precise". Deeper searches clear about half of such moves.
+    static constexpr double kHedgedSlipCost = 6.0;
     // The review this input would give, the reviewer left as it is (rate limits, offers, takeback):
     // for Review::verifyNext before the review itself.
     Review probe(const ReviewInput& in) const {

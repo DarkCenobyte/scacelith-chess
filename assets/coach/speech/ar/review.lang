@@ -101,7 +101,11 @@ ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
 ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
 ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
 ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = ربما كانت نقلة {best} أدقّ قليلًا.
+ex.verdict.inaccuracy.maybe.2 = ربما كنتُ سألعب {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = تبدو هذه النقلة مشكوكًا فيها.
 ex.verdict.dubious.2 = يبدو أن هذه النقلة مشكوك فيها.
 # Something good was missed (levels 1-2).

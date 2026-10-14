@@ -105,7 +105,11 @@ ex.verdict.inaccuracy.b5.3 = {best}比{move}更精確。
 ex.verdict.inaccuracy.b6 = {move}不精確，應走{best}。
 ex.verdict.inaccuracy.b6.2 = 不精確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}更好。
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = 也許走{best}會更精確一點。
+ex.verdict.inaccuracy.maybe.2 = 我也許會走{best}。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = 這步棋看起來有點可疑。
 ex.verdict.dubious.2 = 這步棋似乎有點可疑。
 # Something good was missed (levels 1-2).

@@ -4445,6 +4445,41 @@ TEST(coach_review_inaccuracy_is_not_called_a_mistake) {
     }
 }
 
+TEST(coach_review_small_inaccuracy_is_hedged_at_level_6) {
+    // 1.a4 again, W% 59.1 -> 53.7: an inaccuracy under kHedgedSlipCost, where deeper searches often
+    // find no slip at all. Level 6 says it in a hedged word ("Kf1 may have been a little more
+    // precise"), also when the move gives two pawns away (no longer "that move looks dubious");
+    // levels 1-5 say nothing.
+    struct Case {
+        const char* fen;
+        const char* played;
+        bool pawnsLost;
+    };
+    const Case cases[] = {{"1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1", "a3a4 b8b4 g1f1", false},
+                          {"1r4k1/5ppp/8/8/1P6/P7/1P3PPP/6K1 w - - 0 1", "a3a4 b8b4 g1f1 b4b2", true}};
+    for (const Case& k : cases) {
+        for (int level = 1; level <= 6; ++level) {
+            Game g = gameOf(k.fen, {"a4"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, analysisOf({pvl(100, "g1f1 g8f8"), pvl(40, k.played)}));
+            char where[48];
+            std::snprintf(where, sizeof where, "hedged b%d%s", level, k.pawnsLost ? " pawns" : "");
+            checkScript(r.script, where);
+            CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
+            CHECK(!r.offersTakeback);
+            CHECK_EQ(demoMoves(r.script), 0);
+            CHECK(!hasKeyPrefix(r.script, "ex.verdict.dubious"));
+            CHECK_EQ(r.script.size(), size_t(level == 6 ? 1 : 0));
+            if (level == 6 && !r.script.empty()) {
+                CHECK_EQ(r.script[0].line.key, std::string("ex.verdict.inaccuracy.maybe"));
+                const Arg* best = r.script[0].line.arg("best");
+                CHECK(best && best->uci == "g1f1");
+            }
+        }
+    }
+}
+
 TEST(coach_review_score_bound_is_rescored) {
     // A0 was stopped when the player moved: its line for the move holds only a bound. The move is
     // re-scored (A1) and judged on that exact score.
@@ -5353,7 +5388,7 @@ TEST(coach_review_every_key_exists) {
         "tip.mate_technique.b1", "tip.fifty.b1", "tip.repetition.b1", "praise.sacrifice", "praise.fork.b2",
         "praise.fork.b3", "praise.castle.b1", "praise.saved.b1", "praise.book.b1", "threat.punish.b1",
         "tb.hint.b1", "tb.hint.king.b1", "tb.hint.missed.b1", "tb.hint.mate_missed.b1", "tb.hint.general.b1",
-        "tb.fixed.b1", "tb.fixed", "tb.same", "ex.verdict.dubious",
+        "tb.fixed.b1", "tb.fixed", "tb.same", "ex.verdict.dubious", "ex.verdict.inaccuracy.maybe",
     };
     for (const Family& f : families)
         for (int l = f.from; l <= f.to; ++l) {

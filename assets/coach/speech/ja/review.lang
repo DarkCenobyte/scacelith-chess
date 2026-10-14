@@ -122,7 +122,11 @@ ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
 ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
 ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best}の方が少し正確だったかもしれません。
+ex.verdict.inaccuracy.maybe.2 = 私なら{best}を指したかもしれません。
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = その手は疑問手のようです。
 ex.verdict.dubious.spoken = その手はぎもんしゅのようです。
 ex.verdict.dubious.2 = 疑問手かもしれませんね。

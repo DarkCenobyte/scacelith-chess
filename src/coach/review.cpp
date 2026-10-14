@@ -1310,13 +1310,17 @@ Review Reviewer::review(const ReviewInput& in) {
     // said whatever the slip's size.
     const bool lostPiece = found && materialType && ex.lost >= 3;
     const bool missedKept = level_ <= 2 && found && (ex.type == ExType::MateMissed || missedPiece);
+    // Level 6, an inaccuracy at the bottom of its class that loses no piece: the slip in a hedged
+    // word ("Nf3 may have been a little more precise"), also in place of "that move looks dubious".
+    bool hedged = false;
     if (cls == MoveClass::Inaccuracy && !missedKept) {
         isRemark = true;
         const bool due = !c.isBest && !c.best.empty() && humanMoves_ - lastSlip_ >= 3;
+        hedged = level_ == 6 && c.j.delta < kHedgedSlipCost && !lostPiece;
         if (level_ <= 2) {
             // One offer per move: not on its replay.
             dubious = due && (c.j.delta >= 7.0 || lostPiece) && offersEnabled_ && !retry && !g.isOver();
-        } else if (c.concreteLoss(8)) {
+        } else if (c.concreteLoss(8) && !hedged) {
             dubious = due && (level_ == 6 || c.j.delta >= 7.0 || lostPiece);
         } else {
             slip = due && (level_ == 6 || c.j.delta >= 7.0);
@@ -1413,11 +1417,13 @@ Review Reviewer::review(const ReviewInput& in) {
     }
 
     if (slip) {
-        // "Inaccurate: Nf3 was more precise", the better move traced.
+        // "Inaccurate: Nf3 was more precise" ("Nf3 may have been a little more precise" when hedged),
+        // the better move traced.
         v.voiced = true;
         noteRemark();
         lastSlip_ = humanMoves_;
-        Beat vb = sayBeat(bandKey("ex.verdict.inaccuracy", level_), Look::Target, ply);
+        const std::string key = hedged ? "ex.verdict.inaccuracy.maybe" : bandKey("ex.verdict.inaccuracy", level_);
+        Beat vb = sayBeat(key, Look::Target, ply);
         vb.line.with("move", Arg::ofMove(c.playedSan, c.playedUci)).with("best", moveArg(c.best[0]));
         traceMove(vb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
         s.push_back(vb);

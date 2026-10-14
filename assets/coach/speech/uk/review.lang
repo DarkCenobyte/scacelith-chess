@@ -109,7 +109,11 @@ ex.verdict.inaccuracy.b5.3 = Точніше було {best}, ніж {move}.
 ex.verdict.inaccuracy.b6 = {move} — неточність; {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = Краще {best}.
-# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better".
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Можливо, трохи точніше було {best}.
+ex.verdict.inaccuracy.maybe.2 = Мабуть, я б зіграв так: {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
 ex.verdict.dubious = Цей хід виглядає сумнівним.
 ex.verdict.dubious.2 = Цей хід здається сумнівним.
 # Something good was missed (levels 1-2).
