@@ -52,6 +52,8 @@ ModelUi& state() {
     return u;
 }
 
+const tts::ModelManifest* g_manifest = nullptr;   // setCoachModelManifest; nullptr: the real one
+
 // What the folder holds, again (start-up, the end of a job).
 void refreshInstalled() {
     ModelUi& u = state();
@@ -74,6 +76,17 @@ void startLegacyCheck() {
     });
 }
 
+// The voice needs its model: the player declined its download, cancelled it or closed its
+// failure, and no model is there to speak. [coach] voice off, saved: the coach speaks through
+// subtitles (Options > Audio shows the box unticked) until the voice is switched on again.
+void voiceOffWithoutModel(const char* why) {
+    ModelUi& u = state();
+    settings().coachVoice = false;
+    u.lastVoice = false;
+    settings().save();
+    LOGI("coach: %s; voice off (subtitles only)", why);
+}
+
 void openPrompt(bool update) {
     ModelUi& u = state();
     u.promptOpen = true;
@@ -88,7 +101,8 @@ void startDownload() {
         u.legacyCheck.reset();   // it reads them too
         if (u.releaseHook) u.releaseHook();
     }
-    u.job.reset(new tts::ModelDownloader());   // the folder as it is now (--coach-dir)
+    // The folder as it is now (--coach-dir).
+    u.job.reset(new tts::ModelDownloader(g_manifest ? *g_manifest : tts::supertonicManifest()));
     u.failed = false;
     u.failure.clear();
     // Testing aid: SCACELITH_COACH_SOURCE=archive starts with Supertone's archive copy (the
@@ -129,6 +143,7 @@ void finishJob(const tts::DownloadProgress& p) {
             break;
         case Phase::Cancelled:
             ui::notify(i18n::tr("coach.download.cancelled"), 4.0f);
+            if (!u.anyInstalled) voiceOffWithoutModel("voice download cancelled");
             break;
         default:
             u.failed = true;
@@ -242,17 +257,27 @@ void coachModelShutdown() {
         u.job->wait();
     }
     u.job.reset();
-    u.watching = false;
     u.legacyCheck.reset();
-    u.releaseHook = nullptr;   // its owner is going
+    u = ModelUi();   // the release hook's owner is going; the next scene starts afresh
+    // Nothing opens the prompt any more (the menus drawn without a scene, as the unit tests do).
+    ui::setCoachEntryHook(nullptr);
+    ui::setVoiceUpdateHooks(nullptr, nullptr);
+}
+
+const tts::ModelManifest* setCoachModelManifest(const tts::ModelManifest* m) {
+    const tts::ModelManifest* previous = g_manifest;
+    g_manifest = m;
+    return previous;
 }
 
 void drawModelDownload(bool startupOffer) {
     ModelUi& u = state();
     if (!u.inited) coachModelInit();
-    // Options > Audio > Coach voice switched on (and applied): offer the model when it is missing.
+    // Options > Audio > Coach voice switched on (and applied): offer the model when it is missing,
+    // in the form the folder calls for (the update form when old files are there), as the Coach
+    // entry does.
     bool voice = settings().coachVoice;
-    if (voice && !u.lastVoice && coachModelNeedsPrompt()) u.promptOpen = true;
+    if (voice && !u.lastVoice && coachModelNeedsPrompt()) openModelPrompt();
     u.lastVoice = voice;
     if (!voice && !u.promptUpdate) u.promptOpen = false;   // the update is offered with the voice off too
 
@@ -268,6 +293,7 @@ void drawModelDownload(bool startupOffer) {
         case ui::ModelPanelAction::Close:
             u.failed = false;
             u.failure.clear();
+            if (!u.anyInstalled) voiceOffWithoutModel("voice download failed and closed");
             break;
         case ui::ModelPanelAction::None: break;
     }
@@ -308,11 +334,7 @@ void drawModelDownload(bool startupOffer) {
                     LOGI("coach: voice model update declined; the old INT8 model stays");
                     break;
                 }
-                // Remembered: the coach speaks through subtitles until the voice is switched on again.
-                settings().coachVoice = false;
-                u.lastVoice = false;
-                settings().save();
-                LOGI("coach: voice download declined; voice off (subtitles only)");
+                voiceOffWithoutModel("voice download declined");
                 break;
             case ui::ModelPromptAction::None: break;
         }

@@ -1,5 +1,7 @@
 #include "test.h"
 #include "headless.h"
+#include "game/coach_model.h"
+#include "tts/model_store.h"
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -106,6 +108,12 @@ int main(int argc, char** argv) {
     setenv("SCACELITH_KEYRING", "off", 1);
 #endif
 #endif
+    // No test downloads the coach's voice model from its known URLs (a third-party service): the
+    // game's download job gets the model's manifest without any source, and fails at once. A test
+    // that plays a download against a loopback server gives its own and puts this one back.
+    static tts::ModelManifest noSource = tts::supertonicManifest();
+    noSource.sources.clear();
+    game::setCoachModelManifest(&noSource);
     int run = 0, failedCases = 0, skipped = 0;
     const char* lastFile = nullptr;
     for (auto& c : testing::registry()) {

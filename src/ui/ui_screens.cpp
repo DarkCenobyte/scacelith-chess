@@ -45,6 +45,7 @@ enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, 
 
 struct OptionsState {
     game::Settings work;
+    bool coachVoice = false;   // [coach] voice as the page last saw it in the settings
     int tab = 0;
     bool confirmDiscard = false;
     float pageT = 0.0f;
@@ -402,6 +403,7 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
 // ---- Options page -----------------------------------------------------------------------------------
 void openOptions() {
     S.opt.work = game::settings();
+    S.opt.coachVoice = game::settings().coachVoice;
     S.opt.confirmDiscard = false;
     S.opt.pageT = 0.0f;
     if (S.forcedTab >= 0) {
@@ -425,6 +427,13 @@ bool optionsPage(MenuAction& act) {
     im::captureMouseAll();
     im::captureKeyboard();
     bool closing = false, apply = false;
+    // The coach's voice switched off while the page is open: "Not now" on the voice model's
+    // prompt (which switching it on opened), or its download cancelled. The voice needs its
+    // model, so the page's box follows instead of switching it on again at Apply.
+    if (game::settings().coachVoice != o.coachVoice) {
+        o.coachVoice = game::settings().coachVoice;
+        o.work.coachVoice = o.coachVoice;
+    }
     bool dirty = !sameOptions(o.work, game::settings());
     if (o.confirmDiscard) im::pushBlock();
     gfx::pushAlpha(t);
@@ -725,6 +734,7 @@ bool optionsPage(MenuAction& act) {
         net::setFileSessionsAllowed(game::settings().onlineRememberWithoutKeyring);
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
+        o.coachVoice = game::settings().coachVoice;
         im::sound(Sound::Confirm);
     }
     if (closing) im::sound(Sound::Close);
@@ -1989,7 +1999,9 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         gfx::radial(p.center(), vec2(w * 0.95f, h * 1.3f), vec4(0, 0, 0, 0.55f * ct), 0.0f, 1.0f);
         gfx::setLayer(prev);
         gfx::pushAlpha(ct);
-        bool blockCard = fold > 0.5f;
+        // The key that brought the card up (the Space that skipped the coach's last words) does
+        // not answer it: the keyboard's focus may still be on its default button.
+        bool blockCard = fold > 0.5f || appear;
         if (blockCard) im::pushBlock();
         im::panel(p);
         TextStyle rs = style(font::FACE_TITLE, 76.0f, goldBright, HAlign::Center, 0.08f);
@@ -2053,7 +2065,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         Rect bar(v.x * 0.5f - w * 0.5f, v.y - h - 36.0f + (1.0f - fold) * 20.0f, w, h);
         im::captureMouseRect(bar);
         gfx::pushAlpha(bt);
-        bool blockBar = fold <= 0.5f;
+        bool blockBar = fold <= 0.5f || appear;
         if (blockBar) im::pushBlock();
         im::panel(bar);
         gfx::text(summary, im::flipX(bar, bar.x + 40.0f), baselineCentered(bar, bs), bs);
