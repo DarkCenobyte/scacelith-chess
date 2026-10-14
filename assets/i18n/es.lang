@@ -181,6 +181,9 @@ engine.nodes = Límite de nodos
 engine.no_limit = Sin límite
 engine.thousand = {0} mil
 engine.million = {0} millones
+engine.dynamic_elo = Elo dinámico según el reloj
+engine.dynamic_elo.help = Como un jugador humano, Stockfish juega peor cuando se le acaba el tiempo: un poco en el último minuto (antes en partidas rápidas y blitz), mucho peor en apuros de tiempo. Solo en partidas con reloj.
+engine.speed_note = Stockfish calcula en este ordenador: su tiempo de respuesta depende del rendimiento de la máquina.
 
 # Time controls
 tc.unlimited = Sin límite

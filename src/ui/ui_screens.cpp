@@ -301,6 +301,7 @@ void loadSetupFromSettings(NewGameSetup& s) {
     s.customBaseSeconds = nearestValue(baseTimeValues(), g.customBaseSeconds);
     s.customIncrementSeconds = std::clamp(g.customIncrementSeconds, 0, 60);
     s.customDelaySeconds = std::clamp(g.customDelaySeconds, 0, 60);
+    s.dynamicElo = g.dynamicElo;
     s.skillLevel = std::clamp(g.customSkillLevel, 0, 20);
     s.limitElo = g.customLimitElo;
     s.elo = std::clamp(g.customElo, 1320, 3190);
@@ -323,6 +324,7 @@ void storeSetupToSettings(const NewGameSetup& s) {
     g.customBaseSeconds = s.customBaseSeconds;
     g.customIncrementSeconds = s.customIncrementSeconds;
     g.customDelaySeconds = s.customDelaySeconds;
+    g.dynamicElo = s.dynamicElo;
     g.customSkillLevel = s.skillLevel;
     g.customLimitElo = s.limitElo;
     g.customElo = s.elo;
@@ -1143,6 +1145,16 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
         im::popId();
         y += 6.0f;
     }
+    const Rect col(rx, 0, colW, 0);
+    // Against Stockfish: "Dynamic Elo by time" (timed games only) and a word on its response time.
+    if (!hotSeat) {
+        const bool timed = customTc || tcs[size_t(setup.timeControl)] != "Unlimited";
+        im::toggleRow(L("engine.dynamic_elo"), setup.dynamicElo, Rect(rx, y, colW, 42.0f), timed);
+        im::tooltip(T("engine.dynamic_elo.help"));
+        TextStyle es = style(font::FACE_ITALIC, 20.0f, muted, im::startAlign());
+        const int lines = gfx::textWrapped(T("engine.speed_note"), im::flipX(col, rx + 22.0f), y + 74.0f, colW - 26.0f, es, 26.0f);
+        y += 52.0f + 26.0f * float(lines);
+    }
 
     // Colour note.
     int next = game::settings().nextColor;
@@ -1152,7 +1164,6 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
         colourLine = i18n::trf("hotseat.colours", {hotSeatName(setup, 0), hotSeatName(setup, 1)});
         colourNext = T("hotseat.colours_swap");
     }
-    const Rect col(rx, 0, colW, 0);
     TextStyle cs = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::startAlign());
     float noteY = std::max(y + 26.0f, footer - 70.0f);
     gfx::diamond(vec2(im::flipX(col, rx + 6.0f), noteY - 7.0f), 3.5f, withAlpha(gold, 0.8f));

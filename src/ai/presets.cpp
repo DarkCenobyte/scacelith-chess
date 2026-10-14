@@ -13,9 +13,9 @@
 //    ~0.6-0.7 pawn is added (~0.4 in Stockfish 16, so the same settings now play weaker).
 //
 // Presets from 1500 up use UCI_Elo as is, with normal (deep) searches like Stockfish's calibration:
-// the clock in timed games, 1 s per move in untimed ones (engine.cpp). Measured against Stockfish 16
-// at the same UCI_Elo (1500, 1800, 2100), they play as they did within the measurement's ~40 Elo, so
-// their labels stay.
+// 1 s per move, untimed and on the clock (engine.cpp; Stockfish's time management may stop it
+// sooner in bullet and time trouble). Measured against Stockfish 16 at the same UCI_Elo (1500,
+// 1800, 2100), they play as they did within the measurement's ~40 Elo, so their labels stay.
 //
 // Below 1320 we need Stockfish's other knobs. What the engine-vs-engine calibration showed (Stockfish
 // 19 self-play and matches against the Stockfish 16 presets, adjudicated by a referee engine;
@@ -35,6 +35,9 @@
 #include "ai/behavior.h"
 
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <vector>
 
 namespace ai {
 namespace detail {
@@ -175,3 +178,91 @@ int coachLevelElo(int level) {
 }
 
 }  // namespace ai
+
+// "Dynamic Elo by time": a player short of time plays worse, so the engine is weakened when its own
+// clock runs low (ClockInfo::dynamicElo, an option of the New Game and Watch a Game pages; engine.cpp
+// applies it to each move search). It never needs this to avoid losing on time: the humanised
+// thinking time already shrinks to almost nothing in time trouble (humanize.cpp) and the
+// handicapped searches stop within a second.
+//  * The time that counts is the time left plus ten increments (its next ten moves).
+//  * Low time from one minute down, or earlier in rapid and blitz games (base + 60 x increment under
+//    one hour, as chess::TimeControl counts them): at a fifth of the base time, at most three
+//    minutes; in bullet (base under two minutes) at half the base time. A gradual drop, up to
+//    kLowTimeEloDrop at the threshold of time trouble.
+//  * Time trouble below 15 s (in bullet: below half the low-time threshold): up to
+//    kTimeTroubleEloDrop with an empty clock.
+// The sizes are a judgement, not a measurement: players lose much more than a pawn's worth of
+// accuracy in the last seconds, and the drop has to be felt across a whole preset step (the
+// presets are 200-300 Elo apart).
+namespace ai::detail {
+
+int timePressureEloDrop(int64_t remainingMs, int64_t incMs, int64_t baseMs) {
+    const double left = double(std::max<int64_t>(0, remainingMs)) + 10.0 * double(std::max<int64_t>(0, incMs));
+    const double base = double(std::max<int64_t>(0, baseMs));
+    double lowTime = 60000.0;
+    if (baseMs + 60 * std::max<int64_t>(0, incMs) < 3600000)
+        lowTime = std::clamp(base / 5.0, std::min(60000.0, base / 2.0), 180000.0);
+    if (lowTime <= 0.0 || left >= lowTime) return 0;
+    const double trouble = std::min(15000.0, lowTime / 2.0);
+    if (left >= trouble) return int(std::lround(kLowTimeEloDrop * (lowTime - left) / (lowTime - trouble)));
+    return int(std::lround(kLowTimeEloDrop + (kTimeTroubleEloDrop - kLowTimeEloDrop) * (trouble - left) / trouble));
+}
+
+namespace {
+
+// UCI_Elo for a strength on the presets' scale from 1200 to 1500. Stockfish's own calibration holds
+// from 1500 (presets.cpp); below, levels 0-1 play weaker than their number: UCI_Elo 1400 ~1300 (coach
+// level 3), 1320 (Skill Level 0) ~1200.
+int uciEloFor(int elo) {
+    if (elo >= 1500) return std::min(elo, 3190);
+    if (elo >= 1300) return 1400 + (elo - 1300) / 2;
+    return 1320 + (std::max(elo, 1200) - 1200) * 4 / 5;
+}
+
+// The depth-capped handicaps measured below 1200 (README.scacelith.md), strongest first: Casual,
+// Skill 1 depth 1 MultiPV 5, Beginner, Skill 0 depth 1 MultiPV 7, Novice, coach levels 1 and 0.
+const std::vector<EngineSettings>& shallowLadder() {
+    static const std::vector<EngineSettings> ladder = {shallowSkill(1, 2, 5),  shallowSkill(1, 1, 5),
+                                                       shallowSkill(1, 1, 6),  shallowSkill(0, 1, 7),
+                                                       shallowSkill(0, 1, 9),  shallowSkill(0, 1, 12),
+                                                       shallowSkill(0, 1, 20)};
+    return ladder;
+}
+
+}  // namespace
+
+EngineSettings weakenedSettings(const EngineSettings& s, int drop) {
+    if (drop <= 0 || s.nodes > 0 || s.moveTimeMs > 0) return s;
+    const double level = skillLevel(s);
+    if (level < 0.0 && s.depth > 0) return s;
+    const int nominal = Engine::estimateElo(s);
+    const int target = nominal - drop;
+    EngineSettings w;
+    if (target >= 1200) {
+        if (level < 0.0 && target > 3190) return s;  // nothing between full strength and UCI_Elo 3190
+        w = limited(uciEloFor(target));
+        if (s.limitStrength && s.depth <= 0 && s.multiPV <= 4 && w.elo >= s.elo) return s;
+    } else {
+        // The ladder's step nearest to the target, if it is nearer than `s` itself.
+        int bestGap = drop;
+        bool found = false;
+        for (const EngineSettings& c : shallowLadder()) {
+            const int e = Engine::estimateElo(c);
+            if (e >= nominal) continue;
+            const int gap = std::abs(e - target);
+            if (gap < bestGap) {
+                bestGap = gap;
+                w = c;
+                found = true;
+            }
+        }
+        if (!found) return s;
+    }
+    w.threads = s.threads;
+    w.hashMB = s.hashMB;
+    w.useClock = s.useClock;
+    w.humanize = s.humanize;
+    return w;
+}
+
+}  // namespace ai::detail

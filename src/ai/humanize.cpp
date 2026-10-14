@@ -61,9 +61,11 @@ int humanThinkTimeMs(const EngineSettings& s, const ClockInfo& clock, int plyCou
     const double overhead = double(std::max(0, clock.moveOverheadMs));
 
     // Per-move budget as a human would split the clock: remaining/35 + increment. Weaker players
-    // use less of it.
+    // use less of it: over a 40-move game about 45-50 % of their clock at ~1000 Elo, 55-65 % at
+    // ~1500, 70-85 % from ~2100 up, which puts a ~1000 Elo middlegame move at a median of ~6 s in
+    // 10+0, ~15 s in 15+10 and ~19 s in 30+0.
     const double budget = remaining / 35.0 + inc;
-    double t = spread(budget * (0.6 + 0.4 * strength) * phaseFactor(moveNo) * forced);
+    double t = spread(budget * (0.35 + 0.65 * strength) * phaseFactor(moveNo) * forced);
     if (legalMoveCount == 1) t = std::min(t, 1500.0);
 
     // Never flag: this move's own overhead and a 0.5 s safety margin are untouchable; of the rest,

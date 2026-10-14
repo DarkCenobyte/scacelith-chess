@@ -181,6 +181,9 @@ engine.nodes = Knotenlimit
 engine.no_limit = Aus
 engine.thousand = {0} Tausend
 engine.million = {0} Millionen
+engine.dynamic_elo = Dynamische Elo nach Bedenkzeit
+engine.dynamic_elo.help = Wie ein menschlicher Spieler spielt Stockfish schwächer, wenn seine Uhr abläuft: etwas in der letzten Minute (im Schnellschach und Blitz früher), deutlich schwächer in Zeitnot. Nur in Partien mit Uhr.
+engine.speed_note = Stockfish rechnet auf diesem Computer: Seine Antwortzeit hängt von der Leistung des Rechners ab.
 
 # Time controls
 tc.unlimited = Unbegrenzt

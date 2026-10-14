@@ -1,0 +1,205 @@
+// The opponent's pace and its "Dynamic Elo by time": how much weaker it plays when its clock runs
+// low (presets.cpp), the settings it then searches with, and the embedded engine applying them
+// (hash clears) and capping handicapped searches in timed games (engine.cpp).
+#include "test.h"
+
+#include "ai/behavior.h"
+#include "ai/engine.h"
+
+#include <chrono>
+#include <thread>
+
+namespace {
+
+using SteadyClock = std::chrono::steady_clock;
+
+int msSince(SteadyClock::time_point t) {
+    return int(std::chrono::duration_cast<std::chrono::milliseconds>(SteadyClock::now() - t).count());
+}
+
+std::string waitMove(ai::Engine& e, int timeoutMs) {
+    auto t0 = SteadyClock::now();
+    while (!e.moveReady()) {
+        if (msSince(t0) > timeoutMs) return "timeout";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+    return e.takeMove();
+}
+
+const ai::EngineSettings& preset(const char* name) {
+    for (const auto& p : ai::presets())
+        if (std::string(p.name) == name) return p.settings;
+    static ai::EngineSettings none;
+    return none;
+}
+
+constexpr int64_t kSec = 1000, kMin = 60 * kSec;
+
+}  // namespace
+
+TEST(ai_time_pressure_drop) {
+    using ai::detail::timePressureEloDrop;
+    using ai::detail::kLowTimeEloDrop;
+    using ai::detail::kTimeTroubleEloDrop;
+    // Classical 90+0 (a standard game): nothing above one minute, then a gradual drop to
+    // kLowTimeEloDrop at 15 s, and kTimeTroubleEloDrop with an empty clock.
+    CHECK_EQ(timePressureEloDrop(10 * kMin, 0, 90 * kMin), 0);
+    CHECK_EQ(timePressureEloDrop(60 * kSec, 0, 90 * kMin), 0);
+    CHECK_EQ(timePressureEloDrop(15 * kSec, 0, 90 * kMin), kLowTimeEloDrop);
+    CHECK_EQ(timePressureEloDrop(0, 0, 90 * kMin), kTimeTroubleEloDrop);
+    const int mid = timePressureEloDrop(37500, 0, 90 * kMin);
+    CHECK(mid > 60 && mid < 90);
+    // The increment counts ten times: 30 s left with 30 s per move is no time trouble.
+    CHECK_EQ(timePressureEloDrop(30 * kSec, 30 * kSec, 90 * kMin), 0);
+    // Rapid starts earlier: 10+0 at a fifth of the base time (2 min), 30+0 capped at 3 min.
+    CHECK_EQ(timePressureEloDrop(121 * kSec, 0, 10 * kMin), 0);
+    CHECK(timePressureEloDrop(100 * kSec, 0, 10 * kMin) > 0);
+    CHECK(timePressureEloDrop(170 * kSec, 0, 30 * kMin) > 0);
+    CHECK_EQ(timePressureEloDrop(181 * kSec, 0, 30 * kMin), 0);
+    // Blitz 3+0 and 5+0: from one minute, like a standard game.
+    CHECK_EQ(timePressureEloDrop(61 * kSec, 0, 3 * kMin), 0);
+    CHECK(timePressureEloDrop(59 * kSec, 0, 5 * kMin) > 0);
+    // Bullet 1+0: from half the base time; time trouble below 15 s.
+    CHECK_EQ(timePressureEloDrop(31 * kSec, 0, 1 * kMin), 0);
+    CHECK_EQ(timePressureEloDrop(15 * kSec, 0, 1 * kMin), kLowTimeEloDrop);
+    // Never negative, never more than kTimeTroubleEloDrop, never smaller with less time.
+    for (int64_t base : {1 * kMin, 3 * kMin, 10 * kMin, 15 * kMin, 30 * kMin, 90 * kMin})
+        for (int64_t inc : {int64_t(0), 2 * kSec, 10 * kSec}) {
+            int last = 0;
+            for (int64_t left = 5 * kMin; left >= -kSec; left -= 250) {
+                const int d = timePressureEloDrop(left, inc, base);
+                CHECK(d >= last && d <= kTimeTroubleEloDrop);
+                last = d;
+            }
+        }
+}
+
+TEST(ai_weakened_settings) {
+    using ai::Engine;
+    using ai::detail::weakenedSettings;
+    const ai::EngineSettings& club = preset("Club Player");
+    // No drop, or settings whose strength is unknown: unchanged.
+    CHECK(ai::detail::sameStrength(weakenedSettings(club, 0), club));
+    ai::EngineSettings nodes;
+    nodes.nodes = 100000;
+    CHECK(ai::detail::sameStrength(weakenedSettings(nodes, 300), nodes));
+    ai::EngineSettings depthOnly;
+    depthOnly.depth = 8;
+    CHECK(ai::detail::sameStrength(weakenedSettings(depthOnly, 300), depthOnly));
+    // UCI_Elo from 1200 up on the presets' scale (UCI_Elo 1400 ~1300).
+    ai::EngineSettings w = weakenedSettings(club, 150);
+    CHECK(w.limitStrength && w.depth == 0 && w.elo > 1400 && w.elo < 1450);
+    w = weakenedSettings(preset("Grandmaster"), 400);
+    CHECK(w.limitStrength && w.elo == 2300);
+    // Below 1200, the nearest measured depth-capped handicap: Club - 400 = 1100 -> Skill 1,
+    // depth 1, MultiPV 5 (~1077).
+    w = weakenedSettings(club, 400);
+    CHECK(!w.limitStrength && w.skillLevel == 1 && w.depth == 1 && w.multiPV == 5);
+    // The Novice goes down to the rules lesson's level; a small drop leaves it as it is.
+    w = weakenedSettings(preset("Novice"), 150);
+    CHECK(w.skillLevel == 0 && w.depth == 1 && w.multiPV == 20);
+    CHECK(ai::detail::sameStrength(weakenedSettings(preset("Novice"), 20), preset("Novice")));
+    // Full strength only weakens below UCI_Elo's top (3190).
+    const ai::EngineSettings& max = preset("Stockfish Max");
+    CHECK(ai::detail::sameStrength(weakenedSettings(max, 150), max));
+    w = weakenedSettings(max, 400);
+    CHECK(w.limitStrength && w.elo == 3100);
+    // Every preset, every drop: never stronger, weaker as the drop grows, the user's threads,
+    // hash and humanised time kept.
+    for (const auto& p : ai::presets()) {
+        ai::EngineSettings s = p.settings;
+        s.threads = 3;
+        s.hashMB = 32;
+        s.humanize = false;
+        int last = Engine::estimateElo(s);
+        for (int drop = 0; drop <= ai::detail::kTimeTroubleEloDrop; drop += 10) {
+            const ai::EngineSettings ws = weakenedSettings(s, drop);
+            const int e = Engine::estimateElo(ws);
+            CHECK(e <= last);
+            CHECK(ws.threads == 3 && ws.hashMB == 32 && !ws.humanize);
+            last = e;
+        }
+    }
+}
+
+#if defined(SCACELITH_HAS_STOCKFISH)
+
+TEST(ai_timed_handicap_search_capped) {
+    // A UCI_Elo preset on a 15+10 clock: Stockfish's time management alone would think 20-60 s
+    // over this middlegame move; the handicapped search stops after 1 s.
+    ai::Engine e;
+    CHECK(e.start());
+    CHECK(e.waitReady(30000));
+    ai::EngineSettings s = preset("Club Player");
+    s.hashMB = 16;
+    e.configure(s);
+    e.newGame();
+    ai::ClockInfo clock;
+    clock.timed = true;
+    clock.whiteMs = clock.blackMs = 15 * kMin;
+    clock.whiteIncMs = clock.blackIncMs = 10 * kSec;
+    clock.moveOverheadMs = 1500;
+    clock.baseMs = 15 * kMin;
+    const std::vector<std::string> moves = {"e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6", "b5a4", "g8f6",
+                                            "e1g1", "f8e7", "f1e1", "b7b5", "a4b3", "d7d6", "c2c3", "e8g8"};
+    auto t0 = SteadyClock::now();
+    e.requestMove(moves, clock);
+    const std::string m = waitMove(e, 30000);
+    const int ms = msSince(t0);
+    std::fprintf(stderr, "  Club Player, 15+10, move 9: %s in %d ms\n", m.c_str(), ms);
+    CHECK(m.size() >= 4 && m != "timeout");
+    CHECK(ms < 4000);
+    e.shutdown();
+}
+
+TEST(ai_engine_time_pressure) {
+    // With "Dynamic Elo by time" the move searches of a short clock use weakened settings. Going
+    // from UCI_Elo (deep searches) to a depth-capped handicap clears the hash once; changes within
+    // one kind, or back to the configured settings, clear nothing (the same player).
+    ai::Engine e;
+    CHECK(e.start());
+    CHECK(e.waitReady(30000));
+    ai::EngineSettings s = preset("Club Player");
+    s.hashMB = 16;
+    s.moveTimeMs = 0;
+    e.configure(s);
+    e.newGame();
+    ai::ClockInfo clock;
+    clock.timed = true;
+    clock.whiteMs = clock.blackMs = 5 * kMin;
+    clock.moveOverheadMs = 100;
+    clock.baseMs = 5 * kMin;
+    clock.dynamicElo = true;
+    const std::vector<std::string> moves = {"e2e4", "e7e5", "g1f3", "b8c6"};
+    auto play = [&] {
+        e.requestMove(moves, clock);
+        return waitMove(e, 20000);
+    };
+    CHECK(play().size() >= 4);  // plenty of time: the Club Player itself
+    CHECK(e.sync(10000));
+    const int base = e.hashClears();
+    clock.whiteMs = 40 * kSec;  // low time: UCI_Elo lowered, still a deep search
+    CHECK(play().size() >= 4);
+    CHECK(e.sync(10000));
+    CHECK_EQ(e.hashClears(), base);
+    clock.whiteMs = 2 * kSec;  // time trouble: a depth-capped handicap, a cleared hash
+    CHECK(play().size() >= 4);
+    CHECK(e.sync(10000));
+    CHECK_EQ(e.hashClears(), base + 1);
+    CHECK(play().size() >= 4);
+    CHECK(e.sync(10000));
+    CHECK_EQ(e.hashClears(), base + 1);
+    clock.whiteMs = 5 * kMin;  // the clock is back (increment): the configured settings again
+    CHECK(play().size() >= 4);
+    CHECK(e.sync(10000));
+    CHECK_EQ(e.hashClears(), base + 1);
+    // Without the option the clock changes nothing.
+    clock.dynamicElo = false;
+    clock.whiteMs = 2 * kSec;
+    CHECK(play().size() >= 4);
+    CHECK(e.sync(10000));
+    CHECK_EQ(e.hashClears(), base + 1);
+    e.shutdown();
+}
+
+#endif

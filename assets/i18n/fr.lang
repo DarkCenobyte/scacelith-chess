@@ -182,6 +182,9 @@ engine.nodes = Limite de nœuds
 engine.no_limit = Sans limite
 engine.thousand = {0} mille
 engine.million = {0} millions
+engine.dynamic_elo = Elo dynamique au temps
+engine.dynamic_elo.help = Comme un joueur humain, Stockfish joue moins bien quand sa pendule s’épuise : un peu dans la dernière minute (plus tôt en rapide et en blitz), beaucoup moins bien en zeitnot. Parties à la pendule uniquement.
+engine.speed_note = Stockfish calcule sur cet ordinateur : son temps de réponse dépend des performances de la machine.
 
 # Time controls
 tc.unlimited = Illimitée

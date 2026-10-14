@@ -184,6 +184,9 @@ engine.nodes = حدّ العُقد
 engine.no_limit = بلا حدّ
 engine.thousand = {0} ألف
 engine.million = {0} مليون
+engine.dynamic_elo = إيلو ديناميكي حسب الوقت
+engine.dynamic_elo.help = كاللاعب البشري، يلعب Stockfish بمستوى أضعف عندما يوشك وقته على النفاد: أضعف قليلًا في الدقيقة الأخيرة (وأبكر في الشطرنج السريع والخاطف)، وأضعف بكثير في ضيق الوقت. في المباريات المؤقتة فقط.
+engine.speed_note = يفكّر Stockfish على هذا الحاسوب: يتوقف زمن استجابته على أداء الجهاز.
 
 # Time controls
 tc.unlimited = غير محدود

@@ -85,6 +85,7 @@ bool Settings::load(const std::string& p) {
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
     engineArch = ini.getString("engine.arch", engineArch);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
+    dynamicElo = ini.getBool("engine.dynamic_elo", dynamicElo);
     setPlayerRecord(elo::readRecord(ini, "player"));
     for (int i = 0; i < 2; ++i) {
         const char* side = i == 0 ? "white" : "black";
@@ -114,6 +115,7 @@ bool Settings::load(const std::string& p) {
     viewerCustomBaseSeconds = ini.getInt("viewer.custom_base_seconds", viewerCustomBaseSeconds);
     viewerCustomIncrementSeconds = ini.getInt("viewer.custom_increment_seconds", viewerCustomIncrementSeconds);
     viewerCustomDelaySeconds = ini.getInt("viewer.custom_delay_seconds", viewerCustomDelaySeconds);
+    viewerDynamicElo = ini.getBool("viewer.dynamic_elo", viewerDynamicElo);
     viewerShowControls = ini.getBool("viewer.show_controls", viewerShowControls);
     onlineCustomServer = ini.getBool("online.custom_server", onlineCustomServer);
     onlineHost = ini.getString("online.host", onlineHost);
@@ -251,6 +253,7 @@ bool Settings::save() const {
     ini.setInt("engine.hash_mb", engineHashMB);
     ini.set("engine.arch", engineArch);
     ini.setBool("engine.humanize", humanizeThinking);
+    ini.setBool("engine.dynamic_elo", dynamicElo);
     elo::writeRecord(ini, "player", playerRecord());
     ini.set("hotseat.white_name", hotseatNames[0]);
     ini.set("hotseat.black_name", hotseatNames[1]);
@@ -269,6 +272,7 @@ bool Settings::save() const {
     ini.setInt("viewer.custom_base_seconds", viewerCustomBaseSeconds);
     ini.setInt("viewer.custom_increment_seconds", viewerCustomIncrementSeconds);
     ini.setInt("viewer.custom_delay_seconds", viewerCustomDelaySeconds);
+    ini.setBool("viewer.dynamic_elo", viewerDynamicElo);
     ini.setBool("viewer.show_controls", viewerShowControls);
     ini.setBool("online.custom_server", onlineCustomServer);
     ini.set("online.host", onlineHost);

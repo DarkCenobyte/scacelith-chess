@@ -44,6 +44,17 @@ first game, then alternates. Every physical action (touching, moving, capturing,
 pressing the clock) takes exactly the same time for both players, and each clock only stops when
 the lever is actually pressed.
 
+Stockfish runs on your computer. With **Realistic thinking time** (Options > Gameplay, on by
+default) it takes about as long over a move as a human of its strength would with its clock:
+longer for the stronger presets and the longer time controls, a few seconds per move for the weak
+presets in rapid. Its search itself stops within a second, except at full strength (Stockfish
+Max), which manages its clock as Stockfish does. **Dynamic Elo by time** (off by default) makes
+it play weaker when its own clock runs low, as people do: a little from the last minute (in rapid
+and blitz games earlier, from a fifth of the base time but at most 3 minutes; in bullet from half
+of it; each second of increment counts ten times), up to 150 Elo below its level at 15 seconds,
+then much weaker in time trouble, up to 400 Elo below with an empty clock (Stockfish Max only in
+the last seconds). It applies to timed games only and does not change the opponent's rating.
+
 Illegal moves are only possible when legal-move hints are turned off (Options > Gameplay). As in
 tournaments, the arbiter then restores the position, gives the opponent extra time, and a second
 illegal move loses the game.
@@ -222,7 +233,9 @@ remembered (`[viewer]` in the settings file).
 - **Tab**: move list. **H**: hide the controls. **Esc**: menu (resume, options, main menu).
 
 The players claim and offer draws like the opponent of a normal game (repetition, fifty moves, an
-equal position late in the game), and the game over card offers to watch another game.
+equal position late in the game), and the game over card offers to watch another game. **Dynamic
+Elo by time** under the time controls weakens both players when their clocks run low, as in a
+game against Stockfish.
 
 ## Analysis
 
