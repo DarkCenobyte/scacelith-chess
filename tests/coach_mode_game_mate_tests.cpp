@@ -44,10 +44,10 @@ TEST(coach_mode_game_mate_by_the_player) {
 
 // A second win the same way, "Play again" answered with Enter (the card's default button: the
 // keyboard's focus stays on it from one card to the next). The Space that skips the coach's
-// appraisal also answers the card that comes up in the same frame: the next game begins at once,
-// and the game just over is kept all the same. Two accurate wins at level 2: the coach suggests
-// level 3, the Coach page's choice from now on.
-TEST(coach_mode_game_mate_again_card_answered_at_once_level_suggested) {
+// appraisal brings the card up in that frame; the same key does not answer it, and the game just
+// over is kept as soon as the card shows. Two accurate wins at level 2: the coach suggests level
+// 3, the Coach page's choice from now on.
+TEST(coach_mode_game_mate_again_card_waits_level_suggested) {
     coachtest::VoiceFolder voice;
     coachtest::LogCapture log;
     gstest::SettingsGuard guard;
@@ -71,8 +71,13 @@ TEST(coach_mode_game_mate_again_card_answered_at_once_level_suggested) {
     app->frames(15);
     CHECK(!app->hasLabel("Play again"));
     app->key(plat::KEY_SPACE);
-    REQUIRE(app->runUntil([&] { return after(appraisal, "New game (coach): level 2"); }, 600, 1.0f / 20.0f));
+    REQUIRE(app->runUntil([&] { return app->hasLabel("Play again"); }, 600, 1.0f / 20.0f));
     REQUIRE(s.coachHistory.size() == games + 1);
+    app->frames(10);
+    CHECK(app->hasLabel("Play again"));
+    CHECK(!after(appraisal, "New game (coach)"));
+    app->key(plat::KEY_ENTER);
+    REQUIRE(app->runUntil([&] { return after(appraisal, "New game (coach): level 2"); }, 600, 1.0f / 20.0f));
     CHECK_EQ(s.coachHistory.back().result, 1);
     CHECK(after(start, "coach: suggests level 3 (was 2)"));
     CHECK_EQ(s.coachLevel, 3);

@@ -1989,7 +1989,9 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         gfx::radial(p.center(), vec2(w * 0.95f, h * 1.3f), vec4(0, 0, 0, 0.55f * ct), 0.0f, 1.0f);
         gfx::setLayer(prev);
         gfx::pushAlpha(ct);
-        bool blockCard = fold > 0.5f;
+        // The key that brought the card up (the Space that skipped the coach's last words) does
+        // not answer it: the keyboard's focus may still be on its default button.
+        bool blockCard = fold > 0.5f || appear;
         if (blockCard) im::pushBlock();
         im::panel(p);
         TextStyle rs = style(font::FACE_TITLE, 76.0f, goldBright, HAlign::Center, 0.08f);
@@ -2053,7 +2055,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         Rect bar(v.x * 0.5f - w * 0.5f, v.y - h - 36.0f + (1.0f - fold) * 20.0f, w, h);
         im::captureMouseRect(bar);
         gfx::pushAlpha(bt);
-        bool blockBar = fold <= 0.5f;
+        bool blockBar = fold <= 0.5f || appear;
         if (blockBar) im::pushBlock();
         im::panel(bar);
         gfx::text(summary, im::flipX(bar, bar.x + 40.0f), baselineCentered(bar, bs), bs);
