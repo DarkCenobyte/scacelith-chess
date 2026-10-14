@@ -485,18 +485,29 @@ not the same scale, so the labels are approximate by nature.
 ### Search time on the clock
 
 A handicapped search (Skill Level or UCI_Elo) picks its move once iteration `1 + int(level)` is
-complete: iteration 2 for UCI_Elo 1500, 9 for 2700, a few milliseconds on any x86-64 CPU. In a
-timed game the client used to leave the rest to Stockfish's time management, which plans the
-search from the clock whatever the handicap: measured with the game's commands (`Move Overhead`
-1500, Threads 1, Hash 64, the `x86-64-avx2` variant, a Ruy Lopez middlegame after a warm-up
-search), UCI_Elo 1500 thought 4.7-9.6 s per move at 5+3 and 21-49 s at 15+10, all of it after the
-move was chosen. The client therefore adds `movetime 1000` to every handicapped search without a
-depth, node or move-time cap of its own (`kTimedLimitedMs`, engine.cpp), as untimed games always
-did; Stockfish stops at whichever limit comes first, so its time management still shortens the
-search in bullet and in time trouble. Only full strength (Stockfish Max) keeps the clock's
-budget. What the player waits for is then the humanised thinking time (`src/ai/humanize.cpp`,
-Options > Gameplay > Realistic thinking time), which follows the clock like a human of that
-strength.
+complete: iteration 2 for UCI_Elo 1500, 9 for 2700, a few milliseconds on any x86-64 CPU.
+Stockfish's time management plans the rest of a timed search from the clock whatever the
+handicap: measured with the game's commands (`Move Overhead` 1500, Threads 1, Hash 64, the
+`x86-64-avx2` variant, a Ruy Lopez middlegame after a warm-up search), UCI_Elo 1500 thinks
+4.7-9.6 s per move at 5+3, 21-49 s at 15+10 and 33-151 s at 30+0, and UCI_Elo 2700 22-27 s at
+15+10, all of it after the move is chosen. The client therefore adds `movetime 1000` to every
+handicapped search without a depth, node or move-time cap of its own (`kTimedLimitedMs`,
+engine.cpp), as untimed games do; Stockfish stops at whichever limit comes first, so its time
+management still shortens the search in bullet and in time trouble. Only full strength
+(Stockfish Max) keeps the clock's budget, where the time is spent on a better move (5.5-8.4 s at
+5+3, 25-76 s at 15+10 in the same middlegame). What the player waits for is then the humanised
+thinking time (`src/ai/humanize.cpp`, Options > Gameplay > Realistic thinking time), which
+follows the clock like a human of that strength.
+
+The operating system changes the search's speed, not the search: `bench 16 1 13` visits the same
+2,497,913 nodes with every build of every variant. Nodes per second, median of four interleaved
+runs on a 4-core Cascade Lake container (Linux GCC 13 / Linux GCC 11 / Windows MinGW GCC 13 under
+Wine): `x86-64-avx2` 397k / 383k / 350k, `x86-64-sse41-popcnt` 331k / 334k / 322k, `x86-64`
+227k / 246k / 215k. The Windows build is 3-12 % slower there; the Linux build gets transparent
+huge pages for the hash and the networks while Windows needs the "Lock pages in memory"
+privilege for large pages, and Wine and the Windows calling convention may add to it (not
+separated, and not measured on Windows itself). Either way it is milliseconds per handicapped
+move.
 
 ### Time pressure ("Dynamic Elo by time")
 
