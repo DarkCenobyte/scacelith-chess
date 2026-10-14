@@ -52,6 +52,8 @@ ModelUi& state() {
     return u;
 }
 
+const tts::ModelManifest* g_manifest = nullptr;   // setCoachModelManifest; nullptr: the real one
+
 // What the folder holds, again (start-up, the end of a job).
 void refreshInstalled() {
     ModelUi& u = state();
@@ -88,7 +90,8 @@ void startDownload() {
         u.legacyCheck.reset();   // it reads them too
         if (u.releaseHook) u.releaseHook();
     }
-    u.job.reset(new tts::ModelDownloader());   // the folder as it is now (--coach-dir)
+    // The folder as it is now (--coach-dir).
+    u.job.reset(new tts::ModelDownloader(g_manifest ? *g_manifest : tts::supertonicManifest()));
     u.failed = false;
     u.failure.clear();
     // Testing aid: SCACELITH_COACH_SOURCE=archive starts with Supertone's archive copy (the
@@ -242,9 +245,14 @@ void coachModelShutdown() {
         u.job->wait();
     }
     u.job.reset();
-    u.watching = false;
     u.legacyCheck.reset();
-    u.releaseHook = nullptr;   // its owner is going
+    u = ModelUi();   // the release hook's owner is going; the next scene starts afresh
+}
+
+const tts::ModelManifest* setCoachModelManifest(const tts::ModelManifest* m) {
+    const tts::ModelManifest* previous = g_manifest;
+    g_manifest = m;
+    return previous;
 }
 
 void drawModelDownload(bool startupOffer) {

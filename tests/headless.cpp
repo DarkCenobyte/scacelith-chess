@@ -11,6 +11,7 @@
 #include "net/net_sys.h"
 #include "scene/hall.h"
 #include "scene/pieces.h"
+#include "tts/model_store.h"
 #include "ui/ui_draw.h"
 #include "ui/ui_font.h"
 #include <atomic>
@@ -159,6 +160,7 @@ void App::stop() {
         plat::shutdown();
     }
     ui::im::setTrace(false);
+    tts::setModelFolder(std::string());   // --coach-dir: the next App reads its own folder
     running_ = false;
 }
 

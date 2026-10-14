@@ -53,13 +53,18 @@
 //      The next coach line starts a new worker, with the new files.
 //   6. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
 //          game::coachModelShutdown();
-//      The download stops; its .part files stay and the next download continues them.
+//      The download stops; its .part files stay and the next download continues them. The rest is
+//      forgotten: a scene started again in the same process calls coachModelInit() afresh.
 // Testing aid: the environment variable SCACELITH_COACH_SOURCE=archive skips Supertone's
 // repository (Supertone's archive copy only, the fallback path), =official never falls back to the
 // archive copy. The ui viewer's "coach-flow" screen runs all this over the title page
 // (scacelith --scene ui --ui-screen coach-flow [--coach-dir <folder>]).
 #pragma once
 #include <functional>
+
+namespace tts {
+struct ModelManifest;
+}
 
 namespace game {
 
@@ -95,7 +100,8 @@ bool coachVoiceWanted();
 // entry offers the download, whose first step checks every file (SHA-256) and fetches only the
 // bad ones.
 void coachModelLoadFailed();
-// Cancels and joins a running download.
+// Cancels and joins a running download, and forgets everything else (the prompt, the failure
+// shown, what the folder held): a later coachModelInit starts afresh.
 void coachModelShutdown();
 // Stops whatever maps the voice model's files (the scene's TTS worker), synchronously; called before
 // a download deletes the old model's files. nullptr = nothing to stop.
@@ -105,5 +111,9 @@ void setVoiceReleaseHook(std::function<void()> hook);
 bool coachModelUpdateAvailable();
 // Opens the prompt in its update form (the Options row's button).
 void openModelUpdatePrompt();
+// What the download job fetches: nullptr (the default) is tts::supertonicManifest(). The unit
+// tests give a manifest without any source, so that no test downloads the model from its known
+// URLs, or one served by a loopback server. Returns the previous one.
+const tts::ModelManifest* setCoachModelManifest(const tts::ModelManifest* m);
 
 }  // namespace game
