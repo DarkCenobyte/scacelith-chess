@@ -180,6 +180,7 @@ struct Session::Impl {
         int reactUndo = 0;
         Script reactAfter;
         int reactFrames = 0;
+        uint64_t reactDemo = 0;       // that help shows the solution on the table: no move meanwhile
         uint64_t illegalScript = 0;
         int takebackTo = -1;          // a takeback asked of the stage: the game goes back to this many plies
         // A challenge (run).
@@ -775,6 +776,16 @@ struct Session::Impl {
         g.reactAfter = r.after;
     }
 
+    // The help after a wrong move. When it shows the solution on the table (the third wrong move),
+    // the player's move waits until it is over: the demonstration and its rewind are played from
+    // the exercise's position, which a move made during "Watch." would have changed.
+    void playReactAfter() {
+        director.playNext(g.reactAfter);
+        const bool demo = std::any_of(g.reactAfter.begin(), g.reactAfter.end(),
+                                      [](const Beat& b) { return b.kind == BeatKind::DemoMove; });
+        g.reactDemo = demo ? director.lastScript() : 0;
+    }
+
     void updateLesson(const chess::Game&, float dt) {
         // A wrong move: its answer, the move back by hand, then the help, and the same wait.
         if (g.react == React::Before && !director.pending(g.reactScript)) {
@@ -784,11 +795,11 @@ struct Session::Impl {
                 g.reactFrames = 0;
             } else {
                 g.react = React::None;
-                director.playNext(g.reactAfter);
+                playReactAfter();
             }
         } else if (g.react == React::Undo && ++g.reactFrames > 1 && !stage->tableBusy()) {
             g.react = React::None;
-            director.playNext(g.reactAfter);
+            playReactAfter();
         }
 
         // Chapters one after the other; after the last one the handshake.
@@ -986,7 +997,8 @@ bool Session::playerMayMove(const chess::Game& game) const {
     if (!d.g.started) return false;
     if (d.g.challenge) return d.run->playerMayMove(game);
     if (d.g.level == 0)
-        return d.g.react == Impl::React::None && game.position().sideToMove() == chess::White && d.director.waitingMove();
+        return d.g.react == Impl::React::None && game.position().sideToMove() == chess::White && d.director.waitingMove() &&
+               !d.director.pending(d.g.reactDemo);
     return !d.g.over && !game.isOver() && game.position().sideToMove() == d.g.human && !d.director.offerOpen();
 }
 
