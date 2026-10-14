@@ -522,9 +522,10 @@ off by default) weakens a side when its own clock runs low (`detail::timePressur
 * **Time trouble** begins at 15 s (in bullet at half the low-time threshold if that is less): the
   drop grows from 150 to 400 Elo with an empty clock.
 * **Settings.** The drop is taken from the side's rating on the presets' scale
-  (`Engine::estimateElo`); a Custom Skill Level 0 or 1 without a depth cap starts from what it
-  plays on this scale (`detail::presetScaleElo`: ~1200 for Skill Level 0 rated 1320, ~1388 for
-  Skill Level 1 rated 1444), so a small drop never gives it a stronger UCI_Elo. From 1500 the target is played with `UCI_Elo` as is; from 1200 to 1500
+  (`Engine::estimateElo`); a Custom setting below UCI_Elo 1500 without a depth cap (Skill Level
+  0-1, UCI_Elo 1320-1499, a depth limit past the pick iteration counting as none) starts from what
+  it plays on this scale (`detail::presetScaleElo`: ~1200 for Skill Level 0 or UCI_Elo 1320 rated
+  1320, ~1300 for UCI_Elo 1400), and no drop picks settings stronger than the side's own. From 1500 the target is played with `UCI_Elo` as is; from 1200 to 1500
   with the UCI_Elo that plays it on this scale (1400 for ~1300, 1320 for ~1200, from the coach
   levels' calibration); below 1200 with the nearest of the measured depth-capped settings (Casual,
   Skill 1 depth 1 MultiPV 5, Beginner, Skill 0 depth 1 MultiPV 7, Novice, coach levels 1 and 0,
