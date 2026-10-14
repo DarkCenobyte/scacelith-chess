@@ -54,6 +54,11 @@ struct ClockInfo {
     // Clock time the AI loses per move outside thinking (arm movement, clock press). Passed to
     // Stockfish as "Move Overhead" and reserved by thinkTimeMs so the AI never flags.
     int moveOverheadMs = 1000;
+    // "Dynamic Elo by time": in a timed game, a move search plays weaker as the side to move runs
+    // short of time, like a human player (presets.cpp has the thresholds and sizes). baseMs is the
+    // time control's base time, which sets when "short" begins in rapid and blitz games.
+    bool dynamicElo = false;
+    int64_t baseMs = 0;
 };
 
 class Engine {
@@ -86,6 +91,8 @@ public:
     // side never plays with what the other one computed: the weak presets are calibrated with a
     // hash table that only ever saw their own shallow searches (presets.cpp), and each side of an
     // engine match has its own hash. Costs ~25 ms per switch at 64 MB (ai_engine_side_switch).
+    // Time pressure (ClockInfo::dynamicElo) does not count as a switch, as the configured settings
+    // are the same, except when it takes a side from deep searches to a depth-capped handicap.
     void configure(const EngineSettings& s);
     // Queues a hash / history clear before the next search.
     void clearHash();
@@ -98,7 +105,10 @@ public:
     // request replaces a pending one; on an engine that is not running, or with a move that is
     // not legal (never sent: Stockfish would end the process), it fails (moveReady() true,
     // takeMove() empty). Untimed games without depth/nodes/movetime search 1 s (handicapped) or
-    // 3 s (full strength); the humanised thinking time runs concurrently.
+    // 3 s (full strength); in timed games Stockfish manages its clock, and a handicapped search
+    // still stops after 1 s at most. The humanised thinking time runs concurrently. With
+    // clock.dynamicElo the search uses weakened settings when the side to move is short of time
+    // (detail::weakenedSettings); settings() stays what configure() set.
     void requestMove(const std::vector<std::string>& uciMoves, const ClockInfo& clock);
     // The same from a custom start position (tutorial exercises, games set up from a FEN):
     // startFen "" is the standard start (= requestMove), uciMoves are played from it. An invalid

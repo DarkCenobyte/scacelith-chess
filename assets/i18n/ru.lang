@@ -182,6 +182,9 @@ engine.nodes = Лимит узлов
 engine.no_limit = Нет
 engine.thousand = {0} тыс.
 engine.million = {0} млн
+engine.dynamic_elo = Динамическое Эло по времени
+engine.dynamic_elo.help = Как живой игрок, Stockfish играет слабее, когда у него кончается время: немного — в последнюю минуту (в рапиде и блице раньше), гораздо слабее — в цейтноте. Только в партиях с часами.
+engine.speed_note = Stockfish считает на этом компьютере: время его ответа зависит от производительности машины.
 
 # Time controls
 tc.unlimited = Без лимита

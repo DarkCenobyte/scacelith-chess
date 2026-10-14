@@ -432,7 +432,8 @@ Findings:
   depth-capped settings at level 0-1, `estimateElo` subtracts 185 instead of the ~105 the cap
   itself costs, so that its estimates stay on the labels' scale; an uncapped custom setting at
   level 0 or 1 is rated ~65-120 too high.
-* The game plays the UCI_Elo presets at 1 s per move untimed, or on the clock; 250 ms stands for
+* The game plays the UCI_Elo presets at 1 s per move, untimed and on the clock (where
+  Stockfish's own time management may stop it sooner: bullet, time trouble); 250 ms stands for
   that because the pick iteration does not depend on the budget and the hash-table effect is
   already saturated (above). Stockfish 19 searched ~37 % fewer nodes per move than Stockfish 16 in
   these games, so a longer budget can only favour it relatively. Those matches depend on the
@@ -480,3 +481,58 @@ presets their estimates: Novice (S0 d1, MPV 7, classical eval) 750-840, Beginner
 
 These are engine ratings on Stockfish's CCRL-anchored scale; human (FIDE or online) ratings are
 not the same scale, so the labels are approximate by nature.
+
+### Search time on the clock
+
+A handicapped search (Skill Level or UCI_Elo) picks its move once iteration `1 + int(level)` is
+complete: iteration 2 for UCI_Elo 1500, 9 for 2700, a few milliseconds on any x86-64 CPU.
+Stockfish's time management plans the rest of a timed search from the clock whatever the
+handicap: measured with the game's commands (`Move Overhead` 1500, Threads 1, Hash 64, the
+`x86-64-avx2` variant, a Ruy Lopez middlegame after a warm-up search), UCI_Elo 1500 thinks
+4.7-9.6 s per move at 5+3, 21-49 s at 15+10 and 33-151 s at 30+0, and UCI_Elo 2700 22-27 s at
+15+10, all of it after the move is chosen. The client therefore adds `movetime 1000` to every
+handicapped search without a depth, node or move-time cap of its own (`kTimedLimitedMs`,
+engine.cpp), as untimed games do; Stockfish stops at whichever limit comes first, so its time
+management still shortens the search in bullet and in time trouble. Only full strength
+(Stockfish Max) keeps the clock's budget, where the time is spent on a better move (5.5-8.4 s at
+5+3, 25-76 s at 15+10 in the same middlegame). What the player waits for is then the humanised
+thinking time (`src/ai/humanize.cpp`, Options > Gameplay > Realistic thinking time), which
+follows the clock like a human of that strength.
+
+The operating system changes the search's speed, not the search: `bench 16 1 13` visits the same
+2,497,913 nodes with every build of every variant. Nodes per second, median of four interleaved
+runs on a 4-core Cascade Lake container (Linux GCC 13 / Linux GCC 11 / Windows MinGW GCC 13 under
+Wine): `x86-64-avx2` 397k / 383k / 350k, `x86-64-sse41-popcnt` 331k / 334k / 322k, `x86-64`
+227k / 246k / 215k. The Windows build is 3-12 % slower there; the Linux build gets transparent
+huge pages for the hash and the networks while Windows needs the "Lock pages in memory"
+privilege for large pages, and Wine and the Windows calling convention may add to it (not
+separated, and not measured on Windows itself). Either way it is milliseconds per handicapped
+move.
+
+### Time pressure ("Dynamic Elo by time")
+
+An option of the New Game and Watch a Game pages (`[engine] dynamic_elo`, `[viewer] dynamic_elo`,
+off by default) weakens a side when its own clock runs low (`detail::timePressureEloDrop`,
+`detail::weakenedSettings`, presets.cpp; applied per move search by engine.cpp):
+
+* **Time left** counts the clock plus ten increments.
+* **Low time** begins at one minute; in rapid and blitz games (base + 60 × increment under one
+  hour) at a fifth of the base time, between one and three minutes; in bullet (base under two
+  minutes) at half the base time. The drop grows linearly to 150 Elo at the start of time trouble.
+* **Time trouble** begins at 15 s (in bullet at half the low-time threshold if that is less): the
+  drop grows from 150 to 400 Elo with an empty clock.
+* **Settings.** The drop is taken from the side's rating on the presets' scale
+  (`Engine::estimateElo`). From 1500 the target is played with `UCI_Elo` as is; from 1200 to 1500
+  with the UCI_Elo that plays it on this scale (1400 for ~1300, 1320 for ~1200, from the coach
+  levels' calibration); below 1200 with the nearest of the measured depth-capped settings (Casual,
+  Skill 1 depth 1 MultiPV 5, Beginner, Skill 0 depth 1 MultiPV 7, Novice, coach levels 1 and 0,
+  ~1175 down to ~670), when it is nearer to the target than the side's own settings. Stockfish
+  Max only weakens once the target is below UCI_Elo's top (3190), i.e. in the last seconds.
+  Settings with a node or move-time limit, or a depth cap at full strength, are left alone.
+* **Hash.** The weakened settings belong to the same side: they do not clear the hash as a switch
+  between the two sides of an AI game does, except when they take the side from deep searches to
+  a depth-capped handicap, whose calibration assumes a hash that only saw shallow searches.
+* The sizes are a judgement, not a measurement: the presets are 200-300 Elo apart, so a smaller
+  drop would hardly show. The opponent's rating (and the player's rating change) stays the
+  preset's. The option is not needed to avoid losing on time: the humanised thinking time already
+  falls to almost nothing in time trouble and the handicapped searches stop within a second.

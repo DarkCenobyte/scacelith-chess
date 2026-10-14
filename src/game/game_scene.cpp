@@ -144,6 +144,7 @@ bool GameScene::init(AppContext& ctx) {
     setup_.customBaseSeconds = s.customBaseSeconds;
     setup_.customIncrementSeconds = s.customIncrementSeconds;
     setup_.customDelaySeconds = s.customDelaySeconds;
+    setup_.dynamicElo = s.dynamicElo;
     setup_.skillLevel = s.customSkillLevel;
     setup_.limitElo = s.customLimitElo;
     setup_.elo = s.customElo;
@@ -157,6 +158,7 @@ bool GameScene::init(AppContext& ctx) {
     watch_.customBaseSeconds = s.viewerCustomBaseSeconds;
     watch_.customIncrementSeconds = s.viewerCustomIncrementSeconds;
     watch_.customDelaySeconds = s.viewerCustomDelaySeconds;
+    watch_.dynamicElo = s.viewerDynamicElo;
     hudVisible_ = s.viewerShowControls;
     // Saved games: the title page's "Saved games" lists this folder, games are saved there.
     library_.folder = plat::appDataDirectory() + "pgn/";
@@ -488,8 +490,9 @@ void GameScene::setupNewGame() {
              replayRecord_.tag("Date", "?").c_str(), int(replayRecord_.plies.size()), replayRecord_.result.c_str());
     } else if (watching()) {
         humanColor_ = White;  // nobody: keeps the human-game helpers well defined
-        LOGI("New game (watching): %s vs %s, %s", ai::presets()[size_t(watch_.whitePreset)].name,
-             ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str());
+        LOGI("New game (watching): %s vs %s, %s%s", ai::presets()[size_t(watch_.whitePreset)].name,
+             ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str(),
+             watch_.dynamicElo ? ", dynamic Elo by time" : "");
     } else if (coach()) {
         setupCoachGame();  // colours, level; the session starts with the game
     } else if (hotSeat()) {
@@ -512,8 +515,8 @@ void GameScene::setupNewGame() {
         std::string forced = ctx_->argValue("--human");
         if (forced == "white") humanColor_ = White;
         if (forced == "black") humanColor_ = Black;
-        LOGI("New game: human plays %s, %s, difficulty %d", humanColor_ == White ? "White" : "Black",
-             chosenTimeControl().label().c_str(), setup_.difficulty);
+        LOGI("New game: human plays %s, %s, difficulty %d%s", humanColor_ == White ? "White" : "Black",
+             chosenTimeControl().label().c_str(), setup_.difficulty, setup_.dynamicElo ? ", dynamic Elo by time" : "");
     }
 
     game_.reset();
@@ -1913,6 +1916,9 @@ ai::ClockInfo GameScene::clockInfo() const {
     // humanised thinking time, not the search time.
     int64_t budget = clock_.remainingMs(game_.position().sideToMove()) + int64_t(tc.incrementMs) * 49;
     ci.moveOverheadMs = int(std::clamp<int64_t>(budget / 104, 10, 1500));
+    // "Dynamic Elo by time", as chosen on the New Game or the Watch a Game page (not the coach).
+    ci.dynamicElo = mode_ == GameMode::Play ? setup_.dynamicElo : mode_ == GameMode::Watch && watch_.dynamicElo;
+    ci.baseMs = tc.baseMs;
     return ci;
 }
 

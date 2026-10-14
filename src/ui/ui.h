@@ -75,6 +75,7 @@ struct NewGameSetup {
     int difficulty = 3;           // index into ai::presets()
     int timeControl = 5;          // index into chess::timeControlPresets(), or -1 = custom
     int customBaseSeconds = 600, customIncrementSeconds = 5, customDelaySeconds = 0;
+    bool dynamicElo = false;      // Stockfish plays weaker when its clock runs low (timed games)
     // Custom engine parameters (only when the "Custom" preset is selected)
     int skillLevel = 10;
     bool limitElo = false;
@@ -110,6 +111,7 @@ struct WatchSetup {
     int whitePreset = 5, blackPreset = 4;  // indices into the difficulty list ("Custom" excluded)
     int timeControl = 5;                   // as NewGameSetup::timeControl (-1 = custom)
     int customBaseSeconds = 300, customIncrementSeconds = 3, customDelaySeconds = 0;
+    bool dynamicElo = false;               // as NewGameSetup::dynamicElo, for both players
 };
 
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out

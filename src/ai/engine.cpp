@@ -47,6 +47,14 @@ constexpr int kMateScore = 100000;
 constexpr int kUntimedFullMs = 3000;    // full strength
 constexpr int kUntimedLimitedMs = 1000; // Skill / UCI_Elo handicap (Stockfish calibrated UCI_Elo at 60s+0.6s)
 constexpr int kUntimedSafetyMs = 30000; // untimed game with only a depth/nodes cap
+// Timed game, Skill / UCI_Elo handicap without a depth, node or move-time cap: the most a search
+// may take, on top of Stockfish's clock-based time management (whichever stops it first). The
+// handicapped move is picked after iteration 1 + int(level) (iteration 9 for UCI_Elo 2700), which
+// takes milliseconds; the rest of a clock-based search (UCI_Elo 1500: 5-10 s per middlegame move at
+// 5+3, 21-49 s at 15+10) never changes that move and only fills the hash table, an effect that is
+// saturated within 30-250 ms (README.scacelith.md). The same budget as untimed games, which is how
+// the presets were measured.
+constexpr int kTimedLimitedMs = kUntimedLimitedMs;
 // Analysis limits (AnalysisRequest), clamped: Stockfish's MultiPV option stops at MAX_MOVES (256),
 // its iterative deepening at MAX_PLY (246).
 constexpr int kMaxMultiPV = 256;
@@ -150,6 +158,9 @@ struct Job {
     std::string startFen;        // "" = standard start position
     std::vector<std::string> moves;
     ClockInfo clock;
+    // The settings this search runs with, chosen when it starts: the configured ones, or for a move
+    // search under time pressure (ClockInfo::dynamicElo) weakened ones.
+    EngineSettings settings;
     int priority = 0;            // queue order (Engine::Impl::enqueue)
     bool stopRequested = false;  // stop as soon as one iteration has completed
     bool stopSent = false;
@@ -191,7 +202,8 @@ struct Engine::Impl {
 
     bool hashWarmedByAnalysis = false;   // an analysis search ran since the last move search
     bool haveLastMoveSettings = false;   // settings of the last move search (side switches)
-    EngineSettings lastMoveSettings;
+    EngineSettings lastMoveSettings;     // as configured
+    EngineSettings lastMoveSearch;       // as searched (time pressure)
     int hashClears = 0;
     int readySent = 0, readyOks = 0;     // isready / readyok count (sync)
 
@@ -336,7 +348,7 @@ struct Engine::Impl {
     }
 
     void syncOptions(const Job& job) {
-        const EngineSettings& s = settings;
+        const EngineSettings& s = job.settings;
         const int threads = std::clamp(s.threads, 1, 256);
         // Several search threads (engine.threads): one NUMA node with every CPU, set before the
         // thread pool grows. On a machine with several nodes Stockfish would otherwise bind the
@@ -378,7 +390,7 @@ struct Engine::Impl {
             }
             return go.str();
         }
-        const EngineSettings& s = settings;
+        const EngineSettings& s = job.settings;
         const ClockInfo& c = job.clock;
         const bool timed = s.useClock && c.timed;
         if (timed) {
@@ -398,6 +410,8 @@ struct Engine::Impl {
         if (!timed && movetime <= 0) {
             if (depth > 0 || s.nodes > 0) movetime = kUntimedSafetyMs;
             else movetime = detail::skillLevel(s) >= 0.0 ? kUntimedLimitedMs : kUntimedFullMs;
+        } else if (timed && movetime <= 0 && depth <= 0 && s.nodes <= 0 && detail::skillLevel(s) >= 0.0) {
+            movetime = kTimedLimitedMs;
         }
         if (movetime > 0) go << " movetime " << movetime;
         return go.str();
@@ -422,6 +436,23 @@ struct Engine::Impl {
         }
     }
 
+    static bool shallowHandicap(const EngineSettings& s) { return s.depth > 0 && detail::skillLevel(s) >= 0.0; }
+
+    // The settings of a move search from `root`: the configured ones, weakened when the side to move
+    // is short of time in a timed game with ClockInfo::dynamicElo.
+    EngineSettings underTimePressure(const Job& job, const chess::Position& root) const {
+        const ClockInfo& c = job.clock;
+        if (!c.dynamicElo || !c.timed || !settings.useClock) return settings;
+        const bool white = root.sideToMove() == chess::White;
+        const int64_t left = white ? c.whiteMs : c.blackMs;
+        const int drop = detail::timePressureEloDrop(left, white ? c.whiteIncMs : c.blackIncMs, c.baseMs);
+        EngineSettings s = detail::weakenedSettings(settings, drop);
+        if (drop > 0)
+            LOGI("ai: %.1f s left, time pressure -%d Elo: plays at ~%d instead of ~%d", double(left) / 1000.0, drop,
+                 Engine::estimateElo(s), Engine::estimateElo(settings));
+        return s;
+    }
+
     void startJob(std::unique_ptr<Job> job) {
         std::string position, why;
         chess::Position root;
@@ -429,15 +460,22 @@ struct Engine::Impl {
             fail(*job, why);
             return;
         }
+        job->settings = settings;
+        if (job->kind == Job::Move) job->settings = underTimePressure(*job, root);
         syncOptions(*job);
         if (job->kind != Job::Move) {
             hashWarmedByAnalysis = true;
         } else {
+            const EngineSettings& search = job->settings;
             // Depth-capped handicaps were calibrated with a hash table that only ever saw their own
             // shallow searches; a deep analysis in between would make the next move stronger.
-            bool clear = hashWarmedByAnalysis && settings.depth > 0 && detail::skillLevel(settings) >= 0.0;
-            // The other side of an AI vs AI game searched last: start from a clean table.
-            if (haveLastMoveSettings && !detail::sameStrength(lastMoveSettings, settings)) clear = true;
+            bool clear = hashWarmedByAnalysis && shallowHandicap(search);
+            if (haveLastMoveSettings) {
+                // The other side of an AI vs AI game searched last: start from a clean table.
+                if (!detail::sameStrength(lastMoveSettings, settings)) clear = true;
+                // Time pressure took this side from deep searches to a depth-capped handicap.
+                else if (shallowHandicap(search) && !shallowHandicap(lastMoveSearch)) clear = true;
+            }
             if (clear) {
                 send("setoption name Clear Hash");
                 ++hashClears;
@@ -445,6 +483,7 @@ struct Engine::Impl {
             hashWarmedByAnalysis = false;
             haveLastMoveSettings = true;
             lastMoveSettings = settings;
+            lastMoveSearch = search;
         }
         send(position);
         send(goCommand(*job));
@@ -674,7 +713,11 @@ int Engine::thinkTimeMs(const ClockInfo& clock, int plyCount, int legalMoveCount
     if (samePosition && !d.lastStartFen.empty() && start.setFEN(d.lastStartFen) && start.sideToMove() == chess::Black)
         ++ply;
     std::normal_distribution<double> gauss(0.0, 1.0);
-    return detail::humanThinkTimeMs(d.settings, clock, ply, legalMoveCount, inCheck, recapture, gauss(d.rng));
+    // The strength it played that move at (time pressure), when that move is the one just computed.
+    const EngineSettings& s = samePosition && d.haveLastMoveSettings && detail::sameStrength(d.lastMoveSettings, d.settings)
+                                  ? d.lastMoveSearch
+                                  : d.settings;
+    return detail::humanThinkTimeMs(s, clock, ply, legalMoveCount, inCheck, recapture, gauss(d.rng));
 }
 
 uint32_t Engine::requestAnalysis(const AnalysisRequest& r) {

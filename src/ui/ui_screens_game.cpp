@@ -95,6 +95,7 @@ void loadWatch(WatchSetup& w) {
     w.customBaseSeconds = nearestValue(baseTimeValues(), g.viewerCustomBaseSeconds);
     w.customIncrementSeconds = std::clamp(g.viewerCustomIncrementSeconds, 0, 60);
     w.customDelaySeconds = std::clamp(g.viewerCustomDelaySeconds, 0, 60);
+    w.dynamicElo = g.viewerDynamicElo;
 }
 void storeWatch(const WatchSetup& w) {
     game::Settings& g = game::settings();
@@ -104,6 +105,7 @@ void storeWatch(const WatchSetup& w) {
     g.viewerCustomBaseSeconds = w.customBaseSeconds;
     g.viewerCustomIncrementSeconds = w.customIncrementSeconds;
     g.viewerCustomDelaySeconds = w.customDelaySeconds;
+    g.viewerDynamicElo = w.dynamicElo;
     g.save();
 }
 
@@ -266,6 +268,15 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
                            [](int i) { return i == 0 ? std::string(tr("viewer.off")) : trf("viewer.seconds", {num(i)}); }, trow()))
             setup.customDelaySeconds = del;
         im::popId();
+    }
+    // "Dynamic Elo by time" for both players (timed games only) and a word on their response time.
+    {
+        const Rect col(x2, 0.0f, colW, 0.0f);
+        const bool timed = customTc || tcs[size_t(setup.timeControl)] != "Unlimited";
+        im::toggleRow(std::string(tr("engine.dynamic_elo")) + "##engine.dynamic_elo", setup.dynamicElo, Rect(x2, y + 6.0f, colW, 42.0f), timed);
+        im::tooltip(tr("engine.dynamic_elo.help"));
+        TextStyle es = style(font::FACE_ITALIC, 20.0f, muted, im::startAlign());
+        gfx::textWrapped(tr("engine.speed_note"), im::flipX(col, x2 + 4.0f), y + 80.0f, colW - 8.0f, es, 26.0f);
     }
 
     // Footer.

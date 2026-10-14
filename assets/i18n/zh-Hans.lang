@@ -181,6 +181,9 @@ engine.nodes = 节点上限
 engine.no_limit = 不限
 engine.thousand = {0} 千
 engine.million = {0} 百万
+engine.dynamic_elo = 按剩余时间动态调整等级分
+engine.dynamic_elo.help = 像人类棋手一样，Stockfish 在时间不多时会下得更弱：最后一分钟略弱（快棋和超快棋更早开始），严重缺时时明显更弱。仅限计时对局。
+engine.speed_note = Stockfish 在这台电脑上计算：它的响应时间取决于机器的性能。
 
 # Time controls
 tc.unlimited = 不限时

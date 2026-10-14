@@ -3,6 +3,7 @@
 #pragma once
 #include "ai/engine.h"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,20 @@ bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer);
 
 // Same strength settings (everything that changes the moves Stockfish plays).
 bool sameStrength(const EngineSettings& a, const EngineSettings& b);
+
+// "Dynamic Elo by time" (ClockInfo::dynamicElo, presets.cpp): how many Elo the side to move loses
+// to time pressure with `remainingMs` on its clock and `incMs` of increment, in a game of `baseMs`
+// base time. 0 with enough time; up to kLowTimeEloDrop once its clock runs low, up to
+// kTimeTroubleEloDrop in time trouble.
+constexpr int kLowTimeEloDrop = 150;
+constexpr int kTimeTroubleEloDrop = 400;
+int timePressureEloDrop(int64_t remainingMs, int64_t incMs, int64_t baseMs);
+// Settings that play `drop` Elo below `s` (the strength fields; threads, hash, humanize and clock
+// use are kept), on the presets' scale: UCI_Elo from 1200 up, the depth-capped handicaps of the
+// weak presets and coach levels below. `s` itself when drop <= 0, when nothing measured lies
+// closer to the target than `s` does, or when the strength of `s` cannot be placed on that scale
+// (a node or move time limit, a depth cap at full strength).
+EngineSettings weakenedSettings(const EngineSettings& s, int drop);
 
 // True if `reply` (UCI) captures on the destination square of the last move of `moves` (played
 // from the standard start position) and that last move was itself a capture.

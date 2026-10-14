@@ -77,6 +77,9 @@ struct Settings {
     // ai::Engine::setArchLimit)
     std::string engineArch = "auto";
     bool humanizeThinking = true; // spend realistic time before moving
+    // "Dynamic Elo by time" on the New Game page: Stockfish plays weaker when its clock runs low
+    // (ai::ClockInfo::dynamicElo)
+    bool dynamicElo = false;
     // [player] the human's rating (elo.h), updated after every rated game against Stockfish
     int playerElo = 1500;
     int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
@@ -104,6 +107,7 @@ struct Settings {
     int viewerCustomBaseSeconds = 300;
     int viewerCustomIncrementSeconds = 3;
     int viewerCustomDelaySeconds = 0;
+    bool viewerDynamicElo = false;  // "Dynamic Elo by time", for both players
     bool viewerShowControls = true; // the controls hint overlay (H)
     // [online] the server of online play (Options > Online). Never any token: the network layer
     // keeps the sessions itself, per server.
