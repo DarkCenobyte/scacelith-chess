@@ -62,7 +62,9 @@ tts::ModelManifest sourceless() {
 
 // A loopback server with the made-up model at http://127.0.0.1:<port>/dl/resolve/r1/<path>, a
 // thread per connection. One file can be held back (its request waits until release(), or 10 s),
-// one sent with other bytes.
+// one sent slowly (16 KiB every 300 ms: the job is cancelled while its body comes, which Wine's
+// WinHTTP aborts at once, unlike a request still waiting for its answer), one sent with other
+// bytes.
 struct FakeRepo {
     const std::vector<std::string> files = {content(0), content(1), content(2)};
     std::mutex mu;
@@ -70,6 +72,7 @@ struct FakeRepo {
     int held = -1;                  // the file whose request waits
     bool open = false;
     std::atomic<bool> holding{false};   // a request is waiting
+    std::atomic<int> slow{-1};      // the file sent slowly
     std::atomic<int> wrong{-1};     // the file sent with other bytes (its size kept)
     std::atomic<int> served{0};     // the files' requests answered or held
     fakehttp::Server srv;           // last: its thread starts once the rest is there
@@ -86,7 +89,9 @@ struct FakeRepo {
                   }
                   std::string data = files[size_t(i)];
                   if (i == wrong) data[data.size() / 2] = char(data[data.size() / 2] ^ 0x5a);
-                  return fakehttp::fileReply(data, r);
+                  fakehttp::Reply rep = fakehttp::fileReply(data, r);
+                  if (i == slow) rep.pieceDelayMs = 300;
+                  return rep;
               }
               fakehttp::Reply rep;
               rep.status = 404;
@@ -201,6 +206,13 @@ float closeRow(const uitest::Driver& d) {
     return close ? close->r.y : -2.0f;
 }
 
+// The bytes of a file's download so far (its .part file).
+uintmax_t partBytes(const std::string& file) {
+    std::error_code ec;
+    const uintmax_t n = std::filesystem::file_size(std::filesystem::u8path(file + ".part"), ec);
+    return ec ? 0 : n;
+}
+
 bool panelFailed(const uitest::Driver& d) {
     return d.has(T("coach.download.close")) && d.has(T("coach.download.retry")) && !d.has(T("coach.download.cancel"));
 }
@@ -249,11 +261,15 @@ TEST(coach_voice_ui_download_fails_without_a_source) {
     CHECK_EQ(log.count("download failed: unavailable"), 2);
     REQUIRE(panelFailed(d));
     CHECK(closeRow(d) == network);
-    // Close: the panel goes, nothing else happens.
+    // Close: the panel goes, and with no model to speak the voice goes off (saved).
     REQUIRE(d.click(T("coach.download.close")));
     d.wait(1.0f);
     CHECK(panelGone(d));
     CHECK_EQ(log.count("coach: voice model download started"), 2);
+    CHECK(!game::settings().coachVoice);
+    CHECK(log.has("coach: voice download failed and closed; voice off (subtitles only)"));
+    game::settings().coachVoice = true;   // switched on again, as Options > Audio does
+    d.frames(2);
 
     // A model folder under a file: it cannot be made (the disk reason, with the folder in it).
     REQUIRE(coachtest::writeFile(folder.file("plain"), "a file"));
@@ -270,6 +286,7 @@ TEST(coach_voice_ui_download_fails_without_a_source) {
     d.wait(1.0f);
     CHECK(panelGone(d));
     CHECK(!game::coachModelInstalled());
+    CHECK(!game::settings().coachVoice);
 }
 
 // The made-up model from the loopback server. While a file is held back the job is fetching: the
@@ -343,10 +360,11 @@ TEST(coach_voice_ui_download_from_a_loopback_server) {
     CHECK_EQ(log.count("coach: voice model download started"), 2);
 }
 
-// Cancel on the panel while a file is held back: the job stops, nothing installed. The next job
-// keeps the file already there, and fails on a file sent with other bytes (the server's reason,
-// with "hash" in it); Retry once the server sends it right fetches only the files still missing.
-// The scene going (coachModelShutdown) while a job runs cancels and joins it.
+// Cancel on the panel while a file comes: the job stops, nothing installed, and with no model to
+// speak the voice goes off. The next job keeps the file already there, and fails on a file sent
+// with other bytes (the server's reason, with "hash" in it); Retry once the server sends it right
+// fetches only the files still missing. The scene going (coachModelShutdown) while a job runs
+// cancels and joins it, and leaves the voice on (the next start offers the download again).
 TEST(coach_voice_ui_download_cancelled_and_refused) {
     REQUIRE(uitest::app());
     FakeRepo repo;
@@ -361,19 +379,22 @@ TEST(coach_voice_ui_download_cancelled_and_refused) {
     attach(d);
     d.frames(2);
 
-    repo.hold(1);
+    repo.slow = 1;
     REQUIRE(pressOnPrompt(d, downloadButton()));
-    REQUIRE(until(d, [&repo] { return repo.holding.load(); }));
-    d.frames(3);
+    REQUIRE(until(d, [&folder] { return partBytes(folder.file(kNames[1])) > 0; }));
     REQUIRE(panelWorking(d));
     REQUIRE(d.click(T("coach.download.cancel")));
     REQUIRE(jobEnded(d));
     CHECK(log.has("tts: voice model download cancelled"));
     CHECK(!game::coachModelInstalled());
     CHECK(!log.has("coach: the voice model is ready"));
+    CHECK(!game::settings().coachVoice);
+    CHECK(log.has("coach: voice download cancelled; voice off (subtitles only)"));
     d.wait(1.0f);
     CHECK(panelGone(d));
-    repo.release();
+    repo.slow = -1;
+    game::settings().coachVoice = true;   // switched on again, as Options > Audio does
+    d.frames(2);
 
     // The last file sent with other bytes: the job fails on it.
     repo.wrong = 2;
@@ -404,16 +425,17 @@ TEST(coach_voice_ui_download_cancelled_and_refused) {
         std::error_code ec;
         std::filesystem::remove(std::filesystem::u8path(folder.file(kNames[i])), ec);
     }
-    repo.hold(1);
+    repo.slow = 1;
     REQUIRE(pressOnPrompt(d, downloadButton()));
-    REQUIRE(until(d, [&repo] { return repo.holding.load(); }));
+    REQUIRE(until(d, [&folder] { return partBytes(folder.file(kNames[1])) > 0; }));
     CHECK(game::coachModelDownloading());
     const int cancelled = log.count("tts: voice model download cancelled");
     game::coachModelShutdown();
     CHECK(!game::coachModelDownloading());
     CHECK_EQ(log.count("tts: voice model download cancelled"), cancelled + 1);
     CHECK(!game::coachModelInstalled());
-    repo.release();
+    CHECK(game::settings().coachVoice);
+    repo.slow = -1;
 }
 
 // In the headless game: the Coach entry's prompt, its Download, the panel over the Coach page and

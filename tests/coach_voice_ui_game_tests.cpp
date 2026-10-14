@@ -68,8 +68,7 @@ bool openAudioOptions(headless::App& app) {
     return app.clickLabel(T("menu.options")) && app.waitForLabel(T("options.coach_voice"), 60);
 }
 
-// Leaves the Options page. The page may still show the voice switched on that "Not now" switched
-// off: Esc then asks about that change, and Discard keeps the voice off.
+// Leaves the Options page (Discard, should it ask about a change).
 void leaveOptions(headless::App& app) {
     app.key(plat::KEY_ESCAPE);
     app.frames(3);
@@ -162,7 +161,8 @@ TEST(coach_voice_ui_game_coach_entry_offers_the_voice) {
 }
 
 // Switched back on in Options > Audio (and applied), the voice is offered again over the Options
-// page; "Not now" switches it off again. The Analysis mode offers it only to a player who has never
+// page; "Not now" switches it off again, and the page's box follows (nothing left to apply, Esc
+// closes the page at once). The Analysis mode offers it only to a player who has never
 // seen the offer, with its own voice on. The download form closes by itself when the voice is
 // switched off while it is open.
 TEST(coach_voice_ui_game_voice_switched_on_is_offered_again) {
@@ -187,7 +187,10 @@ TEST(coach_voice_ui_game_voice_switched_on_is_offered_again) {
     CHECK(!promptShown(*app));
     CHECK(!g.coachVoice);
     CHECK_EQ(log.count("coach: voice download declined"), 1);
-    leaveOptions(*app);
+    app->key(plat::KEY_ESCAPE);
+    app->frames(3);
+    CHECK(!app->hasLabel(T("common.discard")));
+    if (app->hasLabel(T("common.discard"))) app->clickLabel(T("common.discard"));
     REQUIRE(titlePage(*app));
     CHECK(!g.coachVoice);
 

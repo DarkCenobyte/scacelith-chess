@@ -13,7 +13,9 @@
 //     analysis's own, M), the model missing, and the prompt was never shown before
 //     (Settings::coachVoiceOffered; offerVoiceForAnalysis).
 // "Not now" (or Esc) switches [coach] voice off and saves: the coach speaks through subtitles,
-// and is not offered the download again until the player switches the voice back on.
+// and is not offered the download again until the player switches the voice back on. So do the
+// download cancelled and its failure closed, when no model is there to speak: the voice stays on
+// only with a model (Options > Audio shows the box unticked at once).
 //
 // The old INT8 model (tts::legacyManifest(), downloaded by earlier versions) still speaks, and its
 // update to the official Supertonic 3 is offered:

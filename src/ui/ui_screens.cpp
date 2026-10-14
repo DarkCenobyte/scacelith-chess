@@ -45,6 +45,7 @@ enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, 
 
 struct OptionsState {
     game::Settings work;
+    bool coachVoice = false;   // [coach] voice as the page last saw it in the settings
     int tab = 0;
     bool confirmDiscard = false;
     float pageT = 0.0f;
@@ -402,6 +403,7 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
 // ---- Options page -----------------------------------------------------------------------------------
 void openOptions() {
     S.opt.work = game::settings();
+    S.opt.coachVoice = game::settings().coachVoice;
     S.opt.confirmDiscard = false;
     S.opt.pageT = 0.0f;
     if (S.forcedTab >= 0) {
@@ -425,6 +427,13 @@ bool optionsPage(MenuAction& act) {
     im::captureMouseAll();
     im::captureKeyboard();
     bool closing = false, apply = false;
+    // The coach's voice switched off while the page is open: "Not now" on the voice model's
+    // prompt (which switching it on opened), or its download cancelled. The voice needs its
+    // model, so the page's box follows instead of switching it on again at Apply.
+    if (game::settings().coachVoice != o.coachVoice) {
+        o.coachVoice = game::settings().coachVoice;
+        o.work.coachVoice = o.coachVoice;
+    }
     bool dirty = !sameOptions(o.work, game::settings());
     if (o.confirmDiscard) im::pushBlock();
     gfx::pushAlpha(t);
@@ -725,6 +734,7 @@ bool optionsPage(MenuAction& act) {
         net::setFileSessionsAllowed(game::settings().onlineRememberWithoutKeyring);
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
+        o.coachVoice = game::settings().coachVoice;
         im::sound(Sound::Confirm);
     }
     if (closing) im::sound(Sound::Close);

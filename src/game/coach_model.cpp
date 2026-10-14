@@ -76,6 +76,17 @@ void startLegacyCheck() {
     });
 }
 
+// The voice needs its model: the player declined its download, cancelled it or closed its
+// failure, and no model is there to speak. [coach] voice off, saved: the coach speaks through
+// subtitles (Options > Audio shows the box unticked) until the voice is switched on again.
+void voiceOffWithoutModel(const char* why) {
+    ModelUi& u = state();
+    settings().coachVoice = false;
+    u.lastVoice = false;
+    settings().save();
+    LOGI("coach: %s; voice off (subtitles only)", why);
+}
+
 void openPrompt(bool update) {
     ModelUi& u = state();
     u.promptOpen = true;
@@ -132,6 +143,7 @@ void finishJob(const tts::DownloadProgress& p) {
             break;
         case Phase::Cancelled:
             ui::notify(i18n::tr("coach.download.cancelled"), 4.0f);
+            if (!u.anyInstalled) voiceOffWithoutModel("voice download cancelled");
             break;
         default:
             u.failed = true;
@@ -281,6 +293,7 @@ void drawModelDownload(bool startupOffer) {
         case ui::ModelPanelAction::Close:
             u.failed = false;
             u.failure.clear();
+            if (!u.anyInstalled) voiceOffWithoutModel("voice download failed and closed");
             break;
         case ui::ModelPanelAction::None: break;
     }
@@ -321,11 +334,7 @@ void drawModelDownload(bool startupOffer) {
                     LOGI("coach: voice model update declined; the old INT8 model stays");
                     break;
                 }
-                // Remembered: the coach speaks through subtitles until the voice is switched on again.
-                settings().coachVoice = false;
-                u.lastVoice = false;
-                settings().save();
-                LOGI("coach: voice download declined; voice off (subtitles only)");
+                voiceOffWithoutModel("voice download declined");
                 break;
             case ui::ModelPromptAction::None: break;
         }
