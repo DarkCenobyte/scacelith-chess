@@ -247,6 +247,9 @@ void coachModelShutdown() {
     u.job.reset();
     u.legacyCheck.reset();
     u = ModelUi();   // the release hook's owner is going; the next scene starts afresh
+    // Nothing opens the prompt any more (the menus drawn without a scene, as the unit tests do).
+    ui::setCoachEntryHook(nullptr);
+    ui::setVoiceUpdateHooks(nullptr, nullptr);
 }
 
 const tts::ModelManifest* setCoachModelManifest(const tts::ModelManifest* m) {
