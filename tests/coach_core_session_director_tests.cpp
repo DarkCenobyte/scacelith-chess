@@ -13,6 +13,7 @@
 #include "coach/catalog.h"
 #include "coach/director.h"
 
+#include <algorithm>
 #include <functional>
 #include <string>
 #include <vector>
@@ -58,7 +59,7 @@ struct Rig {
     static bool isKey(const std::string& text, const std::string& key, const Line* line = nullptr) {
         const Catalog& cat = Catalog::shared();
         const Line l = line ? *line : Line{key, {}};
-        for (int v = 1; v <= std::max(1, cat.variants(key)); ++v)
+        for (int v = 1; v <= (std::max)(1, cat.variants(key)); ++v)
             for (bool spoken : {true, false})
                 if (cat.renderVariant(l, "en", spoken, v).text == text) return true;
         return false;

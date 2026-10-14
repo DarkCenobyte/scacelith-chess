@@ -402,8 +402,8 @@ TEST(coach_core_session_analysis_cache_bounded) {
     CHECK(t.quiet());
     // The turn's searches asked and back.
     auto searched = [&] {
-        const std::string fen = t.game.position().fen();
-        return t.session.playerMayMove(t.game) && t.analyst.count("A0", fen) >= 1 && t.analyst.count("A3", fen) >= 1 &&
+        const std::string now = t.game.position().fen();
+        return t.session.playerMayMove(t.game) && t.analyst.count("A0", now) >= 1 && t.analyst.count("A3", now) >= 1 &&
                t.analyst.idle();
     };
     std::vector<std::string> roots;

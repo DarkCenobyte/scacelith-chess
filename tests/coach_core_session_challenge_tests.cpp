@@ -220,7 +220,12 @@ TEST(coach_core_session_challenge_task_lines_and_a_move_outside_a_wait) {
         // Nothing was synthesised for the introduction: the first speech is the task.
         const auto requests = t.stage.all("request");
         CHECK(!requests.empty());
-        if (!requests.empty()) CHECK_EQ(requests.front().text, std::string("Find the best move."));
+        const Catalog& cat = Catalog::shared();
+        const Line task{"ch.task.default", {}};
+        bool first = false;
+        for (int v = 1; v <= cat.variants(task.key); ++v)
+            first = first || (!requests.empty() && requests.front().text == cat.renderVariant(task, "en", true, v).text);
+        CHECK(first);
         // The line's only move: solved, and the set is complete (no mate: the plain praise).
         t.move("b2b7");
         CHECK(t.run.completed());
