@@ -269,14 +269,16 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
             setup.customDelaySeconds = del;
         im::popId();
     }
-    // "Dynamic Elo by time" for both players (timed games only) and a word on their response time.
+    // "Dynamic Elo by time" for both players (timed games only) and how long they take over a move
+    // (Options > Gameplay > Realistic thinking time).
     {
         const Rect col(x2, 0.0f, colW, 0.0f);
         const bool timed = customTc || tcs[size_t(setup.timeControl)] != "Unlimited";
         im::toggleRow(std::string(tr("engine.dynamic_elo")) + "##engine.dynamic_elo", setup.dynamicElo, Rect(x2, y + 6.0f, colW, 42.0f), timed);
         im::tooltip(tr("engine.dynamic_elo.help"));
         TextStyle es = style(font::FACE_ITALIC, 20.0f, muted, im::startAlign());
-        gfx::textWrapped(tr("engine.speed_note"), im::flipX(col, x2 + 4.0f), y + 80.0f, colW - 8.0f, es, 26.0f);
+        const char* pace = game::settings().humanizeThinking ? "engine.pace.realistic" : "engine.pace.instant";
+        gfx::textWrapped(tr(pace), im::flipX(col, x2 + 4.0f), y + 80.0f, colW - 8.0f, es, 26.0f);
     }
 
     // Footer.
