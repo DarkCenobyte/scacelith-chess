@@ -269,19 +269,24 @@ EngineSettings weakenedSettings(const EngineSettings& s, int drop) {
         w = limited(uciEloFor(target));
         if (presetScaleElo(w) >= nominal) return s;  // never stronger (a drop of an Elo or two rounds away)
     } else {
-        // The ladder's step nearest to the target, if it is nearer than `s` itself.
+        // The step nearest to the target, if it is nearer than `s` itself: the shallow ladder and the
+        // UCI_Elo step the branch above ends on (~1200), so that a target just under 1200 never picks a
+        // stronger setting than a target of 1200 did (`s` itself, or nothing below the ladder's top).
+        // A choice among fixed steps, all rated on the same scale: a larger drop never plays stronger.
         int bestGap = drop;
         bool found = false;
-        for (const EngineSettings& c : shallowLadder()) {
-            const int e = Engine::estimateElo(c);
-            if (e >= nominal) continue;
+        const auto consider = [&](const EngineSettings& c) {
+            const int e = presetScaleElo(c);
+            if (e >= nominal) return;
             const int gap = std::abs(e - target);
             if (gap < bestGap) {
                 bestGap = gap;
                 w = c;
                 found = true;
             }
-        }
+        };
+        consider(limited(uciEloFor(1200)));
+        for (const EngineSettings& c : shallowLadder()) consider(c);
         if (!found) return s;
     }
     w.threads = s.threads;
