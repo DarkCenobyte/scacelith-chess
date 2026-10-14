@@ -1060,6 +1060,7 @@ coach.note.clock = Pas de pendule : prenez tout le temps qu’il vous faut.
 coach.note.takeback = Après une gaffe, le coach montre ce qui n’allait pas et propose de reprendre le coup.
 coach.note.lesson = Vous jouez les Blancs ; le coach installe chaque exercice sur l’échiquier.
 coach.note.unrated = Les parties avec le coach ne sont pas classées.
+coach.note.fallible = Le coach n’est pas infaillible : il peut parfois mal juger un coup.
 coach.colour = Votre couleur
 coach.colour.help = La couleur que vous jouez contre le coach. Alternée : les Blancs, puis les Noirs, d’une partie à l’autre. La leçon sur les règles se joue toujours avec les Blancs.
 coach.colour.alternate = Alternée

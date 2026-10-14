@@ -1071,6 +1071,7 @@ coach.note.clock = No clock: take all the time you need.
 coach.note.takeback = After a blunder, the coach shows what went wrong and offers to take the move back.
 coach.note.lesson = You play White; the coach sets up each exercise on the board.
 coach.note.unrated = Games with the coach are not rated.
+coach.note.fallible = The coach is not infallible: it may sometimes misjudge a move.
 coach.colour = Your colour
 coach.colour.help = The colour you play against the coach. Alternate: White, then Black, from one game to the next. The lesson on the rules is always played with White.
 coach.colour.alternate = Alternate

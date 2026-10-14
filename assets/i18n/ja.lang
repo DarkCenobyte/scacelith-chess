@@ -1060,6 +1060,7 @@ coach.note.clock = 時計なし：好きなだけ時間をかけてください�
 coach.note.takeback = 大悪手のあとは、コーチが何がまずかったかを示し、手を戻すことを提案します。
 coach.note.lesson = あなたは白番で、コーチが各練習問題を盤上に並べます。
 coach.note.unrated = コーチとの対局はレーティング対象外です。
+coach.note.fallible = コーチも完璧ではありません：手の評価を誤ることもあります。
 coach.colour = あなたの色
 coach.colour.help = コーチと対局するときの色。交互：対局ごとに白と黒が入れ替わります。ルールのレッスンは常に白番です。
 coach.colour.alternate = 交互

@@ -1059,6 +1059,7 @@ coach.note.clock = Sin reloj: tómese todo el tiempo que necesite.
 coach.note.takeback = Tras un error grave, el entrenador muestra qué falló y le ofrece deshacer la jugada.
 coach.note.lesson = Usted juega con blancas; el entrenador prepara cada ejercicio en el tablero.
 coach.note.unrated = Las partidas con el entrenador no puntúan.
+coach.note.fallible = El entrenador no es infalible: a veces puede valorar mal una jugada.
 coach.colour = Su color
 coach.colour.help = El color con el que juega contra el entrenador. Alterno: blancas y luego negras, de una partida a otra. La lección sobre las reglas se juega siempre con blancas.
 coach.colour.alternate = Alterno

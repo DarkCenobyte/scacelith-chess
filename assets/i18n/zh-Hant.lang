@@ -1059,6 +1059,7 @@ coach.note.clock = 不用棋鐘：想多久都可以。
 coach.note.takeback = 出現大錯後，教練會指出問題所在，並提議悔棋。
 coach.note.lesson = 你執白，教練會在棋盤上擺好每道練習。
 coach.note.unrated = 與教練的對局不計等級分。
+coach.note.fallible = 教練並非萬無一失：有時也會誤判一步棋。
 coach.colour = 你的顏色
 coach.colour.help = 你與教練對局時所執的顏色。輪流：每局交替執白、執黑。規則課程一律執白。
 coach.colour.alternate = 輪流
