@@ -251,7 +251,8 @@ lesson.talk.clock = Toto sú {@}šachové hodiny. Každý hráč má vlastný č
 lesson.talk.press = Po svojom ťahu stlačíš hodiny tou istou rukou. Tým sa spustí môj čas.
 lesson.talk.flag = Ak ti vyprší čas, prehrávaš. Výnimkou je, keď ti už nijako nemôžem dať mat.
 lesson.talk.increment = Päť plus tri znamená päť minút pre každého a k tomu tri sekundy po každom ťahu.
-lesson.talk.speeds = Krátkym partiám sa hovorí blitz, dlhším rapid a najdlhším klasický šach.
+# Time-control names as assets/i18n/sk.lang (tc.blitz "Bleskový", tc.rapid "Rapid", tc.classical "Klasický").
+lesson.talk.speeds = Krátkym partiám sa hovorí bleskový šach, dlhším rapid a najdlhším klasický šach.
 lesson.talk.no_clock = So mnou sú hodiny vypnuté. Na premýšľanie máš toľko času, koľko potrebuješ.
 lesson.talk.touch = V skutočnej partii platí: ak sa dotkneš svojej figúry, musíš ňou ťahať.
 lesson.talk.touch_mine = Ak sa dotkneš mojej figúry, musíš ju vziať, ak sa to dá.

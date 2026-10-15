@@ -108,7 +108,7 @@ appraisal.open.stalemate.b3.2 = Pat. Výhra sa vyšmykla až na samom konci.
 appraisal.open.stalemate.b4 = Remíza patom.
 appraisal.open.stalemate.b4.2 = Pat: remíza.
 appraisal.open.stalemate.b5 = Pat.
-appraisal.open.stalemate.b5.2 = Remíza, pat.
+appraisal.open.stalemate.b5.2 = Remíza patom.
 appraisal.open.stalemate.b6 = Pat.
 appraisal.open.stalemate.b6.2 = Remíza, pat.
 appraisal.open.loss.b1 = Tentoraz som vyhral ja, ale niektoré tvoje ťahy boli naozaj dobré.
@@ -168,7 +168,7 @@ appraisal.opening.b6.2 = Otvorenie: {opening}.
 # "{move} v {n:ord_loc} ťahu" = "Sxe5 v 21. ťahu"; a verb after a bare {move} is in the present tense
 # ("{move} získava materiál"), a past tense only with the noun "ťah" as its subject.
 appraisal.best.brilliant.b1 = Aká obeť v {n:ord_loc} ťahu: {move}!
-appraisal.best.brilliant.b1.2 = Môj obľúbený moment: {move}. Obeť figúry, a vyšla!
+appraisal.best.brilliant.b1.2 = Môj obľúbený moment: {move}. Obeť figúry, ktorá vyšla!
 appraisal.best.brilliant.b2 = Tvoj najlepší moment: obeť {move} v {n:ord_loc} ťahu.
 appraisal.best.brilliant.b2.2 = {move} v {n:ord_loc} ťahu: odvážna obeť. Výborne!
 appraisal.best.brilliant.b3 = Brilantná obeť: {move}.

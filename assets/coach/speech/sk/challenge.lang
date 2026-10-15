@@ -16,7 +16,9 @@
 #   {sq}     a square ("pole {sq}"); the coach points at it on that word
 # The player always has the white pieces. The coach says "ty" to the player and is male ("odpovedal
 # by som"); the player's gender is unknown: no past tense, conditional or adjective about the player.
-# The challenge names are those chosen for assets/i18n/sk.lang (challenge.<id>.name).
+# The challenge names are those of assets/i18n/sk.lang (challenge.<id>.name), except that the coach
+# says the two imperative names informally ("Nájdi únik", "Zastav pešiaka"; the menus say "Nájdite",
+# "Zastavte").
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
 ch.intro.mate1 = Mat 1. ťahom. {n:position} a v každej dá mat jediný ťah. Preskúmaj všetky šachy.
@@ -27,7 +29,7 @@ ch.intro.mate3 = Mat 3. ťahom. {n:position}. Šachy, brania a hrozby: zakaždý
 ch.intro.mate3.spoken = Mat tretím ťahom. {n:position}. Šachy, brania a hrozby: zakaždým si vypočítaj moju najlepšiu odpoveď.
 ch.intro.backrank = Maty na poslednom rade. {n:position}: kráľ je zakaždým uväznený za vlastnými pešiakmi.
 ch.intro.patterns = Typické maty. {n:position} s klasickými matovými sieťami. Rozpoznaj vzor a potom udri.
-ch.intro.hanging = Nekryté figúry. {n:position}: vždy mám niečo bez ochrany. Nájdi to a vezmi si to.
+ch.intro.hanging = Figúry zadarmo. {n:position}: vždy mám niečo bez ochrany. Nájdi to a vezmi si to.
 ch.intro.fork = Vidličky. {n:position}: nájdi ťah, ktorý napadne dve veci naraz.
 ch.intro.pin = Väzby. {n:position}: zviaž figúru alebo využi väzbu.
 ch.intro.skewer = Napichnutia. {n:position}: napadni cennú figúru a získaj to, čo stojí za ňou.
@@ -35,7 +37,7 @@ ch.intro.discovered = Odkryté útoky. {n:position}: odtiahni jednu figúru a uv
 ch.intro.deflection = Odlákanie a prilákanie. {n:position}: odlákaj obrancu preč alebo ho prilákaj na osudné pole.
 ch.intro.intermezzo = Medziťahy. {n:position}: pred samozrejmým ťahom nájdi silnejší.
 ch.intro.trapped = Chytené figúry. {n:position}: jedna z mojich figúr nemá kam bezpečne ustúpiť. Získaj ju.
-ch.intro.promotion = Premena pešiaka. {n:position}: partiu rozhodne postúpený pešiak.
+ch.intro.promotion = Premena. {n:position}: partiu rozhodne postúpený pešiak.
 ch.intro.quiet = Tiché ťahy. {n:position}: víťazný ťah nie je ani šach, ani branie.
 ch.intro.opening = Pasce v otvorení. {n:position} z prvých ťahov skutočných partií. Potrestaj moju chybu.
 ch.intro.escape = Nájdi únik. {n:position}: tvoj kráľ je v nebezpečenstve a zachráni ho jediný ťah.
