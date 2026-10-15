@@ -16,10 +16,10 @@
 # Commas as the glossary says: no comma before a subordinate clause that follows its main clause.
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
-ch.intro.mate1 = Mat i ét træk. {n:position}, og hver gang er der kun ét træk der sætter mat. Se på alle skakkerne.
+ch.intro.mate1 = Mat i ét træk. {n:position}, og hver gang er ét træk nok til at sætte mat. Se på alle skakkerne.
 ch.intro.mate2 = Mat i to træk. {n:position}: dit første træk skal efterlade mig uden forsvar, og så sætter du mat.
 ch.intro.mate3 = Mat i tre træk. {n:position}. Skakker, slag og trusler: regn mit bedste svar ud hver gang.
-ch.intro.backrank = Mat på grundrækken. {n:position} hvor en konge sidder fanget bag sine egne bønder.
+ch.intro.backrank = Grundrækkemat. {n:position} hvor en konge sidder fanget bag sine egne bønder.
 ch.intro.patterns = Matmønstre. {n:position} med klassiske matnet. Genkend mønstret, og slå så til.
 ch.intro.hanging = Gratis brikker. {n:position}: en af mine brikker står udækket. Find den, og slå den.
 ch.intro.fork = Gafler. {n:position}: find trækket der angriber to ting på én gang.
@@ -38,7 +38,7 @@ ch.intro.kq = Dronning og konge mod konge. {n:position}: sæt min konge mat. Pas
 ch.intro.kr = Tårn og konge mod konge. {n:position}: sæt min konge mat, ét skridt ad gangen.
 ch.intro.kp = Konge og bonde mod konge. {n:position}: få en ny dronning. Lad din konge gå forrest.
 ch.intro.kp_hold = Stop bonden. {n:position}: du har kun din konge. Hold remis.
-ch.intro.rook = Tårnslutspil. {n:position}: byg broen for at forvandle bonden, og hold remis med Philidor-forsvaret.
+ch.intro.rook = Tårnslutspil. {n:position}: byg broen for at forvandle bonden, og hold remis med Philidors forsvar.
 ch.intro.endgame = Slutspilstaktik. {n:position} med få brikker og skarpe idéer.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -95,7 +95,7 @@ ch.solved.hold = Remisen holder. Godt forsvaret!
 ch.solved.draw = Remis på brættet. Godt forsvaret!
 # A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
 ch.wrong.reply = Ikke det træk: så ville jeg svare {move}.
-ch.wrong.reply.2 = Ikke helt: jeg ville svare igen med {move}.
+ch.wrong.reply.2 = Ikke helt: jeg ville svare med {move}.
 ch.wrong.reply.3 = Så ville jeg spille {move}.
 ch.wrong.mate = Pas på: {move:nomate} ville være skakmat.
 ch.wrong.mate.2 = Se dig for: jeg ville svare {move:nomate}, og så er det mat.

@@ -9,7 +9,7 @@ event.greet.l1 = Tere! Mängime ühe sõbraliku partii. Ma aitan sind alati, kui
 event.greet.l1.2 = Hei! Ma mängin leebelt ja näitan sulle, millele tähelepanu pöörata.
 event.greet.l1.3 = Tere tulemast! Võta aega: ma ütlen sulle, kui mõni malend on ohus.
 event.greet.l2 = Tere! Mängime. Kui laual tekib kahvel või sidumine, näitan seda sulle.
-event.greet.l2.2 = Hei! Too oma nupud mängu ja hoia kuningas julgeolekus. Ma aitan sind mängu ajal.
+event.greet.l2.2 = Hei! Too oma nupud mängu ja hoia oma kuningas ohust eemal. Ma aitan sind mängu ajal.
 event.greet.l2.3 = Tere tulemast tagasi malelaua taha! Jälgi kahvleid ja sidumisi: nendega võidetakse partiisid.
 event.greet.l3 = Tere! Mängime päris partii. Ma kommenteerin sinu plaane ja suuremaid vigu.
 event.greet.l3.2 = Hei! Mõtle välja plaan oma nuppudele. Ma ütlen, kui mõni käik jätab midagi tähelepanuta.
@@ -74,7 +74,7 @@ event.encourage.mistake.2 = Ära muretse. Vaata, mida mu viimane käik ründab, 
 event.encourage.mistake.3 = Seda juhtub iga mängijaga. Lähme edasi.
 # The player is behind (material or evaluation).
 event.encourage.behind = Ära anna alla: otsi võimalusi ja pane mind pingutama.
-event.encourage.behind.2 = Võitle edasi. Sellised seisud võivad veel pöörduda.
+event.encourage.behind.2 = Võitle edasi. Sellised seisud võivad veel pöörde võtta.
 event.encourage.behind.3 = Jää rahulikuks ja otsi minu nõrkusi.
 # The player has played several good moves in a row.
 event.encourage.well = Sa kontrollid enne käiku minu ähvardusi. Tubli.

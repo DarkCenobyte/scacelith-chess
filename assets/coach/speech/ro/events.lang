@@ -75,7 +75,7 @@ event.encourage.mistake.2 = Nu-ți face griji. Uită-te ce atacă ultima mea mut
 event.encourage.mistake.3 = I se întâmplă oricărui jucător. Mergem mai departe.
 # The player is behind (material or evaluation).
 event.encourage.behind = Nu renunța: caută-ți șansele și nu-mi face viața ușoară.
-event.encourage.behind.2 = Luptă mai departe. Astfel de poziții încă se pot întoarce.
+event.encourage.behind.2 = Luptă mai departe. Pozițiile de felul ăsta se mai pot întoarce.
 event.encourage.behind.3 = Păstrează-ți calmul și caută-mi slăbiciunile.
 # The player has played several good moves in a row.
 event.encourage.well = Îmi verifici amenințările înainte să muți. Bravo.

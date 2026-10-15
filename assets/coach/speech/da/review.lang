@@ -131,7 +131,7 @@ ex.better.b3.3 = I stedet var {best} godt.
 ex.better.b4 = {best} var stærkere.
 ex.better.b4.2 = {best} var det rigtige træk.
 ex.better.b4.3 = Bedre var {best}.
-ex.better.b5 = {best}, med ideen {line}.
+ex.better.b5 = {best}, med idéen {line}.
 ex.better.b5.2 = {best} var trækket: {line}.
 ex.better.b5.3 = Bedre var {best}, efterfulgt af {line}.
 ex.better.b6 = {best}: {eval}.
@@ -235,21 +235,21 @@ demo.my.mate.2 = Og {my} til {sq} er skakmat.
 demo.my.mate.3 = {my} til {sq}. Det er skakmat.
 # Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
 # bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
-# "{t1} løber ingen vegne" (it won't go anywhere) = "{t1} will still be there".
+# "{t1} står der stadig bagefter" = "{t1} will still be there".
 demo.my.first.take = Først slår {my} {your}. {t1} kan vente.
-demo.my.first.take.2 = {my} slår {your} først. {t1} løber ingen vegne.
+demo.my.first.take.2 = {my} slår {your} først. {t1} står der stadig bagefter.
 demo.my.first.check = {my} slår {your}, og det er skak! {t1} kan vente.
-demo.my.first.check.2 = Først slår {my} {your} med skak. {t1} løber ingen vegne.
+demo.my.first.check.2 = Først slår {my} {your} med skak. {t1} står der stadig bagefter.
 demo.my.first.check_move = Først skak med {my} på {sq}. {t1} kan vente.
-demo.my.first.check_move.2 = {my} går til {sq}: først skak! {t1} løber ingen vegne.
+demo.my.first.check_move.2 = {my} går til {sq}: først skak! {t1} står der stadig bagefter.
 demo.my.first.move = Først går {my} til {sq}. {t1} kan vente.
-demo.my.first.move.2 = Først {my} til {sq}. {t1} løber ingen vegne.
+demo.my.first.move.2 = Først {my} til {sq}. {t1} står der stadig bagefter.
 # The piece that moves was attacked itself: it takes something before it can be taken.
 demo.my.first.attacked = {my} er angrebet, så {my:den} slår {your} først.
 demo.my.first.attacked.2 = {my} er under angreb: {my:den} snupper {your} først.
 # Levels 4-6, the same in-between move.
 demo.first = Først {move}: {t1} kan vente.
-demo.first.2 = Først {move}. {t1} løber ingen vegne.
+demo.first.2 = Først {move}. {t1} står der stadig bagefter.
 # After the rewind when no takeback is offered: the coach's real move comes next.
 demo.play_on = Nu spiller jeg mit træk.
 demo.play_on.2 = Her er mit rigtige træk.
@@ -361,7 +361,7 @@ ex.mate_missed.b3 = Du overså mat i {m:move}: {best:nomate}.
 ex.mate_missed.b3.2 = {best:nomate} sætter mat i {m:move}: {line:nomate}.
 ex.mate_missed.b3.3 = Der var mat i {m:move} med {best:nomate} som første træk.
 ex.mate_missed.b4 = Overset mat: {line:nomate}, med {best:nomate} som første træk.
-ex.mate_missed.b4.2 = {best:nomate} tvang mat i {m:move}.
+ex.mate_missed.b4.2 = {best:nomate} gennemtvang mat i {m:move}.
 ex.mate_missed.b4.3 = Du havde mat i {m:move} med {best:nomate}.
 ex.mate_missed.b5 = {best:nomate} sætter mat i {m:move}: {line:nomate}.
 ex.mate_missed.b5.2 = Overset mat i {m:move}, med {best:nomate} som første træk.
@@ -548,7 +548,7 @@ ex.back_rank.b5 = Svag grundrække omkring {your}: {line}.
 ex.back_rank.b5.2 = {line}; {your} har ingen luft.
 ex.back_rank.b6 = {line}, grundrækken; {your} er lukket inde.
 ex.back_rank.b6.2 = Grundrækken: {line} ({your}).
-ex.back_rank.tip.b1 = Giv din konge lidt luft: ryk en af bønderne foran den et felt frem.
+ex.back_rank.tip.b1 = Giv din konge lidt luft: ryk en af bønderne foran den frem.
 ex.back_rank.tip.b1.2 = En konge bag tre bønder kan sættes mat på bagerste række. Giv den lidt plads.
 
 # ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
@@ -744,7 +744,7 @@ ex.king_exposed.b6.2 = {your} er for åben: {line}.
 
 # ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
 ex.bad_trade.b3 = Den afbytning fører til et bondeslutspil som jeg vinder.
-ex.bad_trade.b3.2 = Efter {line} er der kun bønder tilbage, og min konge står bedst.
+ex.bad_trade.b3.2 = Efter {line} er der kun bønder tilbage, og min konge står bedre.
 ex.bad_trade.b4 = Afbytningerne fører til et tabt bondeslutspil: {line}.
 ex.bad_trade.b4.2 = At bytte af til dette bondeslutspil taber.
 ex.bad_trade.b5 = Forkert afbytning: bondeslutspillet efter {line} er tabt.
@@ -802,7 +802,7 @@ ex.positional.b4 = {best} bevarer en bedre stilling.
 ex.positional.b4.2 = {best} var stærkere her.
 ex.positional.b4.3 = Jeg ville have foretrukket {best}.
 ex.positional.b5 = {best} var stærkere: {line}.
-ex.positional.b5.2 = {best}, med ideen {line}.
+ex.positional.b5.2 = {best}, med idéen {line}.
 ex.positional.b5.3 = Overvej {best}: {line}.
 ex.positional.b6 = {best}: {eval}.
 ex.positional.b6.2 = {best}, {eval}.
@@ -922,8 +922,8 @@ praise.best.b3.3 = {move} er det bedste træk her. Godt.
 praise.trade.b1 = Godt! Når du fører, hjælper det dig at bytte brikker.
 praise.trade.b1.2 = Fin afbytning. Du fører, så færre brikker er godt for dig.
 praise.trade.b2 = God afbytning: du fører, så byt brikker af.
-praise.trade.b2.2 = Det er klogt at bytte {my} af, når du fører.
-praise.trade.b3 = Godt: byt af, når du fører.
+praise.trade.b2.2 = Det er klogt at bytte {my} af når du fører.
+praise.trade.b3 = Godt: byt af når du fører.
 praise.trade.b3.2 = Fornuftig afbytning.
 praise.excellent.b3 = Glimrende træk.
 praise.excellent.b3.2 = Det er et stærkt træk.

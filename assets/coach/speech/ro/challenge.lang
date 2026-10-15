@@ -1,0 +1,135 @@
+# Coach speech (Romanian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 poziții", "20 de poziții", count.position
+#            in common.lang), "{n:move}" likewise; "{n:in_move}" is the mate distance with its "în"
+#            ("mat într-o mutare", "mat în 3 mutări"). A count is never capitalised: it never starts a
+#            sentence (the intros put it after a colon).
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "șah mat" (the line says it)
+#   {your}   one of the player's pieces ("calul tău", "dama ta"); the coach points at it on that word
+#   {sq}     a square ("câmpul {sq}", never inflected); the coach points at it on that word
+# The player always has the white pieces. The coach says "tu" and is male; the player's gender is
+# unknown: no adjective or participle about the player ("Te-ai apărat bine!", not "Bine apărat!").
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat într-o mutare: {n:position}, iar de fiecare dată o singură mutare dă mat. Verifică fiecare șah.
+ch.intro.mate2 = Mat în două mutări: {n:position}. Prima ta mutare trebuie să mă lase fără apărare, apoi dai mat.
+ch.intro.mate3 = Mat în trei mutări: {n:position}. Șahuri, capturi și amenințări: calculează de fiecare dată cel mai bun răspuns al meu.
+ch.intro.backrank = Matul pe ultima linie: {n:position} în care un rege e prins în spatele propriilor pioni.
+ch.intro.patterns = Modele de mat: {n:position} cu plase de mat clasice. Recunoaște modelul, apoi lovește.
+ch.intro.hanging = Piese neapărate: {n:position} în care am lăsat ceva fără apărare. Găsește-l și ia-l.
+ch.intro.fork = Furculița: {n:position}. Găsește mutarea care atacă două ținte deodată.
+ch.intro.pin = Legarea: {n:position}. Leagă o piesă sau profită de o legare.
+ch.intro.skewer = Frigarea: {n:position}. Atacă o piesă valoroasă și câștigă ce se află în spatele ei.
+ch.intro.discovered = Atacul descoperit: {n:position}. Mută o piesă ca să-i deschizi drumul alteia.
+ch.intro.deflection = Devierea și atragerea: {n:position}. Abate un apărător sau atrage-l pe un câmp fatal.
+ch.intro.intermezzo = Mutări intermediare: {n:position}. Înaintea mutării evidente, găsește una mai puternică.
+ch.intro.trapped = Piese prinse: {n:position}. Una dintre piesele mele nu are niciun câmp sigur. Câștig-o.
+ch.intro.promotion = Promovarea: {n:position} în care un pion avansat decide partida.
+ch.intro.quiet = Mutări liniștite: {n:position}. Mutarea câștigătoare nu e nici șah, nici captură.
+ch.intro.opening = Capcane în deschidere: {n:position} din primele mutări ale unor partide reale. Pedepsește-mi greșeala.
+ch.intro.escape = Găsește scăparea: {n:position}. Regele tău e în pericol și doar o mutare îl salvează.
+ch.intro.defend = Mutări de apărare: {n:position}. Găsește singura mutare care îți ține poziția în picioare.
+ch.intro.kq = Damă și rege contra rege: {n:position}. Dă mat regelui meu. Atenție la pat.
+ch.intro.kr = Turn și rege contra rege: {n:position}. Dă mat regelui meu, pas cu pas.
+ch.intro.kp = Rege și pion contra rege: {n:position}. Fă o damă. Regele tău merge în față.
+ch.intro.kp_hold = Oprește pionul: {n:position}. Ai doar regele. Ține remiza.
+ch.intro.rook = Finaluri de turnuri: {n:position}. Construiește podul ca să promovezi și ține remiza cu apărarea Philidor.
+ch.intro.endgame = Tactică în final: {n:position} cu puține piese și idei ascuțite.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:in_move}: "în 2 mutări").
+ch.task.mate = Mat {n:in_move}.
+ch.task.mate.2 = Găsește matul {n:in_move}.
+ch.task.hanging = Ceva a rămas fără apărare.
+ch.task.hanging.2 = Ce poți lua gratis?
+ch.task.fork = Găsește furculița.
+ch.task.fork.2 = Caută o furculiță.
+ch.task.pin = Aici, cheia e o legare.
+ch.task.skewer = Aici câștigă o frigare.
+ch.task.discovered = Aici câștigă un atac descoperit.
+ch.task.deflection = Suprasolicită sau atrage un apărător.
+ch.task.intermezzo = Caută o mutare intermediară.
+ch.task.trapped = Una dintre piesele mele nu are scăpare. Câștig-o.
+ch.task.promotion = Folosește-ți pionul avansat.
+ch.task.quiet = Mutarea câștigătoare e una liniștită.
+ch.task.opening = Pedepsește-mi ultima mutare.
+ch.task.escape = Salvează-ți regele: o singură mutare merge.
+ch.task.defend = Găsește singura mutare bună.
+ch.task.endgame = Găsește cea mai bună mutare.
+ch.task.default = Găsește cea mai bună mutare.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Dă mat regelui meu. Mă apăr cât pot de bine.
+ch.task.play.promote = Promovează-ți pionul și păstrează câștigul. Voi încerca să te opresc.
+ch.task.play.hold = Ține remiza timp de {n:move}. Eu voi încerca să câștig.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Aceste poziții provin din partide reale. Eu joc ultima mutare, apoi e rândul tău.
+ch.lead.first.2 = Fiecare poziție provine dintr-o partidă reală: joc mutarea care a dus la ea, apoi muți tu.
+ch.next = Poziția următoare.
+ch.next.2 = Iată următoarea.
+ch.next.3 = Trecem la următoarea.
+ch.last = Ultima poziție.
+ch.last.2 = Și acum, ultima.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Bine.
+ch.good.2 = Da.
+ch.good.3 = Corect.
+ch.good.4 = Exact.
+# The position is solved.
+ch.solved = Asta e! Bravo.
+ch.solved.2 = Exact așa.
+ch.solved.3 = Foarte bine.
+ch.solved.mate = Șah mat! Bravo.
+ch.solved.mate.2 = Și e mat. Foarte bine.
+ch.solved.mate.3 = Șah mat. Frumos jucat.
+ch.solved.promote = O damă nouă, iar câștigul e asigurat. Bravo.
+ch.solved.hold = Remiza se menține. Te-ai apărat bine!
+ch.solved.draw = Remiză pe tablă. Ce apărare bună!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Nu mutarea asta: aș răspunde {move}.
+ch.wrong.reply.2 = Nu chiar: aș răspunde cu {move}.
+ch.wrong.reply.3 = Atunci aș juca {move}.
+ch.wrong.mate = Atenție: {move:nomate} ar fi șah mat.
+ch.wrong.mate.2 = Atenție: aș răspunde {move:nomate}, și e mat.
+ch.wrong.mated = Atenție: după {move}, pot forța matul {m:in_move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Și așa se ajunge la mat, dar durează mai mult. Există o cale mai rapidă.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Și asta dă mat, dar eu mă gândesc la altă mutare. Mai uită-te.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Nu e rău, dar există ceva mai puternic. Mai uită-te.
+ch.wrong.weaker.2 = Mutarea se poate juca, dar poți găsi ceva mai bun.
+ch.wrong.stalemate = Pat! Regele meu nu se poate muta, iar asta e doar remiză.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Nu mutarea asta: după {move}, pot ține remiza.
+ch.wrong.loses = Atenție: după {move}, aș avea eu poziție câștigată.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Nu e asta.
+ch.try_again = Mai încearcă.
+ch.try_again.2 = Mai uită-te o dată.
+ch.try_again.3 = Mai caută.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Vrei un indiciu?
+ch.offer.2 = Să-ți dau un indiciu?
+ch.no_hint = Bine. Caută mai departe.
+ch.no_hint.2 = În regulă, nu te grăbi.
+ch.hint.piece = Uită-te la {your}.
+ch.hint.piece.2 = Gândește-te la {your}.
+ch.hint.square = Uită-te la câmpul {sq}.
+ch.hint.square.2 = Câmpul-cheie este {sq}.
+ch.hint.square.3 = Nu pierde din ochi câmpul {sq}.
+ch.hint.show = Iată mutarea. Uită-te.
+ch.hint.show.2 = Hai să-ți arăt. Uită-te.
+ch.hint.now = Acum e rândul tău s-o joci.
+ch.hint.now.2 = E rândul tău: joacă mutarea.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Ai terminat provocarea. Bravo!
+ch.complete.2 = Ai rezolvat toate pozițiile. Bravo!

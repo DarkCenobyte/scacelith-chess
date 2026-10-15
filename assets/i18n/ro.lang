@@ -1,0 +1,1117 @@
+# Scacelith - Română (Romanian)
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1)|few (0, 2-19, 101-119...)|other (20-100, 120...: Romanian puts "de" before the noun, "20 de mutări").
+# Register: the formal 2nd person plural of Windows / macOS in Romanian ("Introduceți parola"), without the
+# subject pronoun, "dvs." for "your"; buttons are short nouns where one exists ("Anulare", "Aplicare").
+# The player's gender is unknown: no adjective or passive participle agreeing with the player.
+# Orthography: ș ț with the comma below (never the cedilla); quotation marks „…”; titles in capitals keep
+# their diacritics.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Activat
+common.off = Dezactivat
+common.back = Înapoi
+common.apply = Aplicare
+common.discard = Renunțare
+common.cancel = Anulare
+common.white = Albele
+common.black = Negrele
+common.main_menu = Meniu principal
+# Decimal separator of numbers ("2,5 s"); the percent sign follows a no-break space.
+number.decimal = ,
+number.percent = {0}<NBSP>%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Jocul regilor
+menu.new_game = Partidă nouă
+menu.options = Opțiuni
+menu.credits = Credite
+menu.quit = Ieșire
+menu.version = Versiunea {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPȚIUNI
+options.tab.display = Afișare
+options.tab.graphics = Grafică
+options.tab.audio = Audio
+options.tab.gameplay = Joc
+options.tab.player = Jucător
+options.tab.controls = Comenzi
+options.pending = Modificările intră în vigoare după aplicare.
+options.unsaved.title = MODIFICĂRI NESALVATE
+options.unsaved.text = Unele opțiuni au fost modificate. Le aplicați înainte de a ieși?
+
+options.language = Limbă
+options.language.help = Limba meniurilor și a mesajelor. Se schimbă imediat.
+options.display_mode = Mod de afișare
+options.display_mode.help = Ecran complet: o fereastră fără margini peste tot ecranul, la rezoluția desktopului. Fereastră: o fereastră de dimensiunea de mai jos.
+options.fullscreen = Ecran complet
+options.windowed = Fereastră
+options.window_size = Dimensiunea ferestrei
+options.window_size.help = Dimensiunea ferestrei în modul Fereastră. Ecranul complet folosește întotdeauna rezoluția desktopului.
+options.vsync = Sincronizare verticală
+options.vsync.help = Sincronizează cadrele cu monitorul, pentru a evita ruperea imaginii.
+options.render_scale = Scară de randare
+options.render_scale.help = Rezoluția internă a imaginii 3D. O valoare mai mică e mai rapidă, una mai mare dă o imagine mai clară.
+
+# The quality levels are also the values of the rows below (shadows, reflections...): the neuter
+# "Scăzut / Mediu / Ridicat" of a level ("nivel"), hence the label "Nivel de calitate".
+options.quality = Nivel de calitate
+options.quality.very_low = Foarte scăzut
+options.quality.low = Scăzut
+options.quality.medium = Mediu
+options.quality.high = Ridicat
+options.quality.ultra = Ultra
+options.quality.custom = Personalizat
+options.quality.help = Setează deodată toate opțiunile de mai jos: Foarte scăzut dezactivează toate efectele, Ultra le duce pe toate la maximum. Dacă modificați o singură opțiune, nivelul devine Personalizat. Pe o placă grafică modestă, reducerea scării de randare (Afișare) ajută și ea mult.
+options.shadows = Umbre
+options.shadows.help = Detaliul umbrelor aruncate de soare și cât de estompate le sunt marginile. Scăzut: margini simple, rapide de desenat.
+options.reflections = Reflexii
+options.reflections.help = Podeaua, masa și tabla reflectă sala (care este desenată încă o dată pentru fiecare: una dintre opțiunile cele mai solicitante); de la Mediu în sus, piesele și obiectele lucioase reflectă și ele ce se află în jurul lor.
+options.ambient_occlusion = Ocluziune ambientală
+options.ambient_occlusion.help = O umbrire discretă acolo unde obiectele se ating și în adâncituri, unde pătrunde mai puțină lumină.
+options.indirect_light = Lumină indirectă
+options.indirect_light.help = Lumina zilei reflectată de pereți, podea și tavan. Scăzut: în locul ei, o lumină ambientală uniformă. Influențează mai ales timpul de încărcare.
+options.volumetric_light = Raze de lumină
+options.volumetric_light.help = Fascicule de lumină solară prin aerul plin de praf al sălii și firele de praf care sclipesc în ele.
+options.tessellation = Teselare
+options.tessellation.help = Contururi netede pe curbele pieselor văzute de aproape.
+options.tessellation.unavailable = Indisponibil: acest driver grafic nu acceptă teselarea.
+options.antialiasing = Antialiasing
+options.antialiasing.help = Netezește marginile zimțate și reflexele care sclipesc. Dezactivat: imagine mai clară, dar zimțată, iar unele efecte par granulate.
+options.depth_of_field = Profunzime de câmp
+options.depth_of_field.help = Estompează ce se află mult în fața sau în spatele a ceea ce priviți, cum face obiectivul unui aparat foto.
+options.motion_blur = Estompare de mișcare
+options.motion_blur.help = Estompează mișcările rapide ale camerei și ale brațelor, cum face o cameră de filmat.
+options.bloom = Strălucire
+options.bloom.help = O strălucire discretă în jurul celor mai luminoase reflexe, ca într-un obiectiv foto.
+options.brightness = Luminozitate
+options.brightness.neutral = Neutră
+options.brightness.value = {0} EV
+options.brightness.help = Compensarea expunerii camerei. Calibrarea de la prima pornire o setează astfel încât umbrele cele mai întunecate să fie abia vizibile.
+
+options.master_volume = Volum general
+options.effects = Efecte
+options.ambience = Ambianță
+options.ambience.help = Murmurul sălii: focul, pași îndepărtați, bătrânul ceas.
+options.ambience_volume = Volumul ambianței
+options.voice_volume = Volumul vocii
+options.voice_volume.help = Volumul vocii antrenorului în modul Antrenor.
+options.subtitles = Subtitrări
+options.subtitles.auto = Automat
+options.subtitles.help = Cuvintele antrenorului, scrise în partea de jos a ecranului. Automat: apar când antrenorul nu vorbește limba meniurilor (cu meniurile în chineză, vorbește engleză). Apar întotdeauna când vocea lui nu este instalată.
+
+options.legal_moves = Afișare mutări legale
+options.legal_moves.help = Evidențiază câmpurile în care poate ajunge piesa atinsă. Dezactivat: nimic nu vă arată dacă o mutare este legală, iar o mutare ilegală este penalizată de arbitru după ce apăsați ceasul.
+options.coordinates = Coordonatele tablei
+options.auto_press = Apăsare automată a ceasului
+options.auto_press.help = Robotul dvs. apasă singur ceasul imediat ce mutarea este pe tablă. În partidele online decide serverul, iar într-un meci direct, jucătorul care îl găzduiește.
+options.thinking_time = Timp de gândire realist
+options.thinking_time.help = Adversarul își ia timp de gândire ca un jucător uman, în loc să mute instantaneu.
+options.ignore_head = Ignorarea mișcărilor capului adversarului
+options.ignore_head.help = În partidele online și în meciurile directe, robotul adversarului privește unde privește jucătorul său. Activat: își mișcă singur capul, ca împotriva lui Stockfish.
+options.mouse_sensitivity = Sensibilitatea mouse-ului
+options.invert_look = Inversarea privirii pe verticală
+options.handover = Schimbarea jucătorului
+options.handover.cut = Comutare instantanee
+options.handover.flight = Zbor, {0} s
+options.handover.help = Doi jucători la un singur PC: cum trece imaginea din ochii unui jucător în ochii celuilalt după fiecare mutare. Comutarea instantanee evită mișcarea camerei.
+options.game_cursor = Cursorul jocului
+options.game_cursor.help = La masă, jocul își desenează propriul cursor, care arată ce va face un clic. Dezactivat: săgeata obișnuită a sistemului.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nume
+player.name.help = Numele dvs., așa cum este scris în partea de sus a foilor de notație, în orice alfabet.
+player.default_name = Jucător
+player.handwriting = Scris de mână
+player.handwriting.help = Scrisul de mână cu care vă sunt notate mutările. Araba, japoneza și chineza au un scris propriu.
+player.preview = PE FOAIA DVS. DE NOTAȚIE
+hand.caveat = Lejer
+hand.marck = Cursiv
+hand.badscript = Înclinat
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Clic stânga
+controls.touch = Atingeți o piesă, apoi mutați-o
+controls.clock.keys = Spațiu  sau  clic pe ceas
+controls.clock = Apăsați ceasul
+controls.look.keys = Butonul drept, ținut apăsat
+controls.look = Priviți în jur
+controls.sheet.keys = S
+controls.sheet = Priviți foaia de notație și reveniți
+controls.stand.keys = ↑
+controls.stand = Ridicați-vă în fața scaunului
+controls.side.keys = ←  /  →
+controls.side = Treceți la capătul din stânga / dreapta al mesei
+controls.sit.keys = ↓
+controls.sit = Așezați-vă la loc (se joacă doar de pe scaun)
+controls.moves.keys = Tab
+controls.moves = Afișați sau ascundeți lista mutărilor
+controls.menu.keys = Esc
+controls.menu = Meniu
+controls.coach_skip.keys = Spațiu
+controls.coach_skip = Antrenor: săriți peste ce spune antrenorul
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Antrenor: anulați mutarea când vi se propune
+controls.coach_hint.keys = H
+controls.coach_hint = Provocările antrenorului: cereți un indiciu
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = LUMINOZITATE
+calibration.text = Mișcați cursorul până când calul de pe câmpul negru abia se mai vede sau nu se mai vede deloc.
+calibration.later = O puteți modifica mai târziu în Opțiuni > Grafică.
+calibration.continue = Continuare
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = PARTIDĂ NOUĂ
+newgame.opponent = ADVERSAR
+newgame.time_control = RITM DE JOC
+newgame.start = Start
+newgame.elo = ~{0} Elo
+newgame.you_white = Veți juca cu albele.
+newgame.you_black = Veți juca cu negrele.
+newgame.colour_lot = Culorile se trag la sorți pentru prima partidă.
+newgame.colour_alternate = Apoi culorile alternează de la o partidă la alta.
+newgame.opponent_kind = Adversar
+newgame.opponent_kind.help = Jucați împotriva lui Stockfish sau a unui prieten care stă la acest calculator: mutați pe rând, fiecare din partea sa a tablei.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Jucător, același PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = Nivel de joc
+engine.skill.help = Opțiunea „Skill Level” a lui Stockfish (0–20). Ignorată cât timp forța de joc e limitată prin Elo.
+engine.limit_elo = Limitarea forței (Elo)
+engine.limit_elo.help = UCI_LimitStrength: motorul țintește ratingul Elo de mai jos.
+engine.elo = Elo
+engine.depth = Adâncime de calcul
+engine.plies = {0} semimutare|{0} semimutări|{0} de semimutări
+engine.move_time = Timp pe mutare
+engine.nodes = Limită de noduri
+engine.no_limit = Fără limită
+# Written in figures: "1 mie / 2 mii / 20 de mii" would need a plural this key does not have.
+engine.thousand = {0}.000
+engine.million = {0} mil.
+engine.dynamic_elo = Elo dinamic în funcție de timp
+engine.dynamic_elo.help = Ca un jucător uman, Stockfish joacă mai slab când îi rămâne puțin timp pe ceas: puțin mai slab în ultimul minut (mai devreme în partidele rapid și blitz), mult mai slab în criză de timp. Doar în partidele cu ceas.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish își ia timp de gândire ca un om de nivelul lui. Pentru a sări peste această pauză: Opțiuni > Joc > Timp de gândire realist.
+engine.pace.instant = Stockfish mută imediat ce a terminat calculul. Pentru pauze ca la un om: Opțiuni > Joc > Timp de gândire realist.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Nelimitat
+tc.no_clock = Fără ceas
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapid
+tc.classical = Clasic
+tc.custom = Personalizat
+tc.your_own = La alegere
+tc.base_time = Timp de bază
+tc.base_time.help = Timpul inițial pe fiecare ceas (minute : secunde).
+tc.increment = Increment
+tc.increment.help = Increment Fischer adăugat după fiecare mutare.
+tc.delay = Întârziere
+tc.delay.help = Întârziere Bronstein: după fiecare mutare se restituie timpul consumat, până la valoarea acestei întârzieri.
+tc.no_delay = Fără
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, întârziere {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Debutant
+preset.novice.desc = Abia a învățat mutările: lasă piese în priză și nu vede amenințările simple.
+preset.beginner.name = Începător
+preset.beginner.desc = Cunoaște noțiunile de bază, dar încă pierde des material prin gafe.
+preset.casual.name = Amator
+preset.casual.desc = Un adversar pentru o seară relaxată: mutări rezonabile, greșeli frecvente.
+preset.club_player.name = Jucător de club
+preset.club_player.desc = Jucător de club solid, care pedepsește gafele evidente.
+preset.advanced.name = Avansat
+preset.advanced.desc = Jucător de club puternic, cu o bună viziune tactică.
+preset.expert.name = Expert
+preset.expert.desc = Expert de turneu: greșește rar, valorifică avantajele.
+preset.master.name = Maestru
+preset.master.desc = Forță de maestru: calcul profund și joc pozițional fin.
+preset.grandmaster.name = Mare maestru
+preset.grandmaster.desc = Nivel de mare maestru: extrem de greu de învins.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 la forță maximă. Mult noroc.
+preset.custom.name = Personalizat
+preset.custom.desc = Setările dvs. pentru motor.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CREDITE
+credits.game.head = SCACELITH
+credits.game = Un joc de șah într-o sală regală, pe un motor OpenGL 4.6 dezvoltat intern.
+credits.engine.head = MOTOR DE ȘAH
+credits.engine = Stockfish 19, creat de dezvoltatorii Stockfish.
+credits.engine.licence = Licență: GNU General Public License v3.
+credits.engine.data = Rețeaua sa neuronală a fost antrenată pe date furnizate de proiectul Leela Chess Zero, puse la dispoziție sub licența Open Database License (ODbL).
+credits.voice.head = VOCEA ANTRENORULUI
+credits.voice = Voce sintetică generată de Supertonic 3 pentru modul Antrenor.
+credits.voice.licence = Supertonic 3 este un model creat de Supertone, folosit sub licența OpenRAIL-M, ale cărei restricții de utilizare se aplică tuturor celor care îl folosesc (vezi Licențe).
+credits.openings.head = DESCHIDERI
+credits.openings = Numele deschiderilor provin din baza de date chess-openings a lichess.org, dedicată domeniului public (CC0).
+credits.fonts.head = FONTURI
+credits.fonts = EB Garamond de Georg Duffner și Cinzel de Natanael Gama; Amiri de Khaled Hosny.
+credits.fonts.hand = Scris de mână: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figurile de șah provin din GNU FreeFont (GPL v3 cu excepție pentru fonturi).
+credits.quote = „Șahul este arta analizei.”  — Mihail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licențe
+licences.title = LICENȚE
+licences.note = Licențele sunt afișate în textul lor original, în limba engleză.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUZĂ
+pause.resume = Reluare
+pause.offer_draw = Propuneți remiză
+pause.claim_draw = Cereți remiză
+pause.claim_draw.help = Repetarea poziției de trei ori sau regula celor 50 de mutări.
+pause.resign = Abandon
+confirm.resign.title = ABANDON
+confirm.resign.text = Abandonați partida? Adversarul va fi declarat câștigător.
+confirm.resign.draw = Abandonați partida? Adversarul nu mai poate da mat: partida se va încheia remiză.
+confirm.resign.ok = Abandon
+confirm.leave.title = PĂRĂSIREA PARTIDEI
+confirm.leave.text = Reveniți la meniul principal? Partida în curs va fi abandonată.
+confirm.leave.ok = Părăsire
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOVARE ÎN
+piece.queen = Damă
+piece.rook = Turn
+piece.bishop = Nebun
+piece.knight = Cal
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partida s-a încheiat remiză.
+gameover.draw_moves = Partida s-a încheiat remiză după {0} mutare.|Partida s-a încheiat remiză după {0} mutări.|Partida s-a încheiat remiză după {0} de mutări.
+gameover.win = Bine jucat — ați câștigat.
+gameover.win_moves = Bine jucat — ați câștigat în {0} mutare.|Bine jucat — ați câștigat în {0} mutări.|Bine jucat — ați câștigat în {0} de mutări.
+gameover.loss = Adversarul dvs. a câștigat.
+gameover.loss_moves = Adversarul dvs. a câștigat în {0} mutare.|Adversarul dvs. a câștigat în {0} mutări.|Adversarul dvs. a câștigat în {0} de mutări.
+gameover.rematch = Revanșă
+gameover.view_board = Vedeți tabla
+gameover.show = Afișare
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Șah mat
+reason.resignation = Abandon
+reason.timeout = Pierdere la timp
+reason.illegal_moves = A doua mutare ilegală (partidă pierdută)
+reason.stalemate = Pat
+reason.insufficient = Poziție moartă (material insuficient)
+reason.timeout_vs_insufficient = Stegulețul a căzut, dar adversarul nu poate da mat
+reason.fivefold = Repetarea poziției de cinci ori
+reason.75_moves = Regula celor 75 de mutări
+reason.threefold_claim = Repetarea poziției de trei ori (cerută)
+reason.50_moves_claim = Regula celor 50 de mutări (cerută)
+reason.agreement = Remiză de comun acord
+reason.illegal_vs_insufficient = A doua mutare ilegală, dar adversarul nu poate da mat
+reason.resignation_vs_insufficient = Abandon, dar adversarul nu poate da mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = MUTĂRI
+movelist.empty = Nicio mutare încă.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Se pregătesc materialele
+loading.hall = Se înalță sala
+loading.furniture = Se sculptează masa și scaunele
+loading.board = Se lustruiește tabla
+loading.pieces = Se strunjesc piesele
+loading.clock = Se asamblează ceasul
+loading.porcelain = Se arde porțelanul
+loading.ready = Gata
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move is "piesă atinsă, piesă mutată" in Romanian.
+notify.no_draw_claim = În această poziție nu se poate cere remiză.
+notify.flag_you = V-a căzut stegulețul.
+notify.flag_opponent = Adversarului i-a căzut stegulețul.
+notify.touched.pawn = Piesă atinsă, piesă mutată: trebuie să mutați pionul pe care l-ați atins.
+notify.touched.knight = Piesă atinsă, piesă mutată: trebuie să mutați calul pe care l-ați atins.
+notify.touched.bishop = Piesă atinsă, piesă mutată: trebuie să mutați nebunul pe care l-ați atins.
+notify.touched.rook = Piesă atinsă, piesă mutată: trebuie să mutați turnul pe care l-ați atins.
+notify.touched.queen = Piesă atinsă, piesă mutată: trebuie să mutați dama pe care ați atins-o.
+notify.touched.king = Piesă atinsă, piesă mutată: trebuie să mutați regele pe care l-ați atins.
+notify.touched.piece = Piesă atinsă, piesă mutată: trebuie să mutați piesa pe care ați atins-o.
+notify.touched_square = Piesă atinsă, piesă mutată: trebuie să mutați piesa de pe {0}.
+notify.press_clock = Apăsați ceasul pentru a încheia mutarea (Spațiu).
+notify.manual_clock = În această partidă, apăsați dvs. ceasul după fiecare mutare.
+notify.illegal = Mutare ilegală.
+notify.cannot_move = Această mutare nu se poate face.
+notify.move_first = Faceți mutarea înainte de a apăsa ceasul.
+notify.stance.sit_to_play = Așezați-vă la loc pentru a juca (săgeata în jos).
+notify.stance.first = Ceasul merge în continuare cât timp stați în picioare. Săgeata în jos: vă așezați la loc.
+notify.stance.first_untimed = Se joacă doar de pe scaun. Săgeata în jos: vă așezați la loc.
+notify.stance.finish_move = Terminați mai întâi mutarea.
+notify.draw_already_offered = Ați propus deja remiză la această mutare.
+notify.draw_accepted = Adversarul acceptă remiza.
+notify.draw_declined = Adversarul refuză propunerea de remiză.
+notify.draw_claimed = Adversarul cere remiză.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Arbitru: ceasul a fost apăsat fără a se face o mutare, ceea ce contează ca mutare ilegală.
+arbiter.unpromoted = Arbitru: mutare ilegală, pionul nu a fost înlocuit cu o piesă nouă înainte de apăsarea ceasului.
+arbiter.illegal = Arbitru: mutare ilegală.
+arbiter.second_loses.white = Este a doua mutare ilegală a Albului: Albul pierde partida.
+arbiter.second_loses.black = Este a doua mutare ilegală a Negrului: Negrul pierde partida.
+arbiter.second_draw.white = Este a doua mutare ilegală a Albului, dar Negrul nu poate da mat: partida se încheie remiză.
+arbiter.second_draw.black = Este a doua mutare ilegală a Negrului, dar Albul nu poate da mat: partida se încheie remiză.
+arbiter.queen = Pionul devine damă.
+arbiter.queen_one_minute.white = Pionul devine damă, iar Albul primește un minut în plus.
+arbiter.queen_one_minute.black = Pionul devine damă, iar Negrul primește un minut în plus.
+arbiter.queen_two_minutes.white = Pionul devine damă, iar Albul primește două minute în plus.
+arbiter.queen_two_minutes.black = Pionul devine damă, iar Negrul primește două minute în plus.
+arbiter.restored = Poziția este restabilită.
+arbiter.restored_one_minute.white = Poziția este restabilită, iar Albul primește un minut în plus.
+arbiter.restored_one_minute.black = Poziția este restabilită, iar Negrul primește un minut în plus.
+arbiter.restored_two_minutes.white = Poziția este restabilită, iar Albul primește două minute în plus.
+arbiter.restored_two_minutes.black = Poziția este restabilită, iar Negrul primește două minute în plus.
+arbiter.one_minute.white = Albul primește un minut în plus.
+arbiter.one_minute.black = Negrul primește un minut în plus.
+arbiter.two_minutes.white = Albul primește două minute în plus.
+arbiter.two_minutes.black = Negrul primește două minute în plus.
+arbiter.second_loses = A doua mutare ilegală duce la pierderea partidei.
+arbiter.touched.white = Albul trebuie să mute piesa atinsă.
+arbiter.touched.black = Negrul trebuie să mute piesa atinsă.
+arbiter.game_over = Partida s-a încheiat.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Urmăriți o partidă
+
+viewer.title = URMĂRIȚI O PARTIDĂ
+viewer.white = ALBUL
+viewer.black = NEGRUL
+viewer.time_control = RITM DE JOC
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Inversare culori
+viewer.note = Ambii jucători sunt Stockfish. Zburați liber prin sală cât timp joacă: nimeni nu vă va vedea.
+viewer.summary = {0} contra {1}
+viewer.custom = Personalizat
+viewer.tc.custom = La alegere
+viewer.base_time = Timp de bază
+viewer.increment = Increment
+viewer.delay = Întârziere
+viewer.off = Fără
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = întârziere {0} s
+viewer.back = Înapoi
+viewer.start = Start
+
+viewer.paused = PAUZĂ
+viewer.resume = Reluare
+viewer.options = Opțiuni
+viewer.main_menu = Meniu principal
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = COMENZI
+viewer.keys.move = W A S D  ·  Z Q S D  ·  săgeți
+viewer.controls.move = Deplasare
+viewer.keys.updown = E, Spațiu  /  C, Ctrl
+viewer.controls.updown = Sus / jos
+viewer.keys.fast = Shift
+viewer.controls.fast = Mai repede
+viewer.keys.look = Butonul drept al mouse-ului
+viewer.controls.look = Privire în jur
+viewer.keys.speed = Rotița mouse-ului
+viewer.controls.speed = Viteză
+viewer.keys.views = 1 – 9
+viewer.controls.views = Puncte de observație
+viewer.keys.eyes = 0
+viewer.controls.eyes = Prin ochii jucătorului aflat la mutare
+viewer.keys.moves = Tab
+viewer.controls.moves = Lista mutărilor
+viewer.keys.menu = Esc
+viewer.controls.menu = Meniu
+viewer.keys.hide = H
+viewer.controls.hide = Ascunderea acestui panou
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauză / reluare
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = O mutare înapoi / înainte
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Mai încet / mai repede
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Începutul / sfârșitul partidei
+viewer.speed = Viteză {0} m/s
+viewer.view.0 = Prin ochii jucătorilor
+viewer.view.1 = Lângă masă
+viewer.view.2 = Deasupra tablei
+viewer.view.3 = Sala
+viewer.view.4 = Ceasul
+viewer.view.5 = Chipul Albului
+viewer.view.6 = Chipul Negrului
+viewer.view.7 = Duelul
+viewer.view.8 = Ferestrele
+viewer.view.9 = Tapiseriile
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Albul
+viewer.side.black = Negrul
+viewer.flag.white = Albului i-a căzut stegulețul.
+viewer.flag.black = Negrului i-a căzut stegulețul.
+viewer.claims_draw = {0} cere remiză.
+viewer.offer_accepted = {0} propune remiză, {1} acceptă.
+viewer.offer_declined = {0} propune remiză, {1} refuză.
+viewer.gameover.white_wins = Albul câștigă după mutarea {0}.
+viewer.gameover.black_wins = Negrul câștigă după mutarea {0}.
+viewer.gameover.draw = Partida se încheie remiză după mutarea {0}.
+viewer.gameover.players = {0} contra {1}
+viewer.watch_again = Urmăriți din nou
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Nicio partidă cu rating încă
+elo.provisional = Rating provizoriu
+elo.peak = Maxim {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo-ul dvs.: {0}
+elo.expected = scor așteptat {0}<NBSP>%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · această partidă nu contează pentru rating
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Foaie de notație
+scoresheet.event = Competiția
+scoresheet.date = Data
+scoresheet.round = Runda
+scoresheet.board = Masa
+scoresheet.page = Pagina
+scoresheet.white = Alb
+scoresheet.black = Negru
+scoresheet.elo = Elo
+scoresheet.result = Rezultat
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Semnătura Albului
+scoresheet.sign_black = Semnătura Negrului
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = R D T N C
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+# "Partidă amicală" is a casual game; the user's own account is "contul dvs."; "two-factor" is
+# "autentificare în doi pași", the term Romanian users know from their other accounts.
+menu.online = Joc online
+online.title = JOC ONLINE
+online.continue = Continuare
+online.retry = Reîncercare
+online.copy = Copiere
+online.copied = Copiat
+online.copy.unavailable = Copierea nu este disponibilă aici: vă rugăm să notați manual.
+online.rated = Cu rating
+online.casual = Amicală
+online.casual_only = Doar amicală
+online.color.random = La sorți
+online.ping = {0} ms
+online.conn.online = Conectat
+online.conn.connecting = Conectare…
+online.conn.reconnecting = Reconectare…
+online.conn.offline = Neconectat
+online.conn.incompatible = Altă versiune
+online.no_server.text = Jocul online necesită un server Scacelith. Introduceți adresa unui server în opțiuni sau jucați cu un prieten printr-un meci direct.
+online.no_server.settings = Setări server
+
+# Options > Online server
+options.tab.online = Server online
+options.online.server = Server
+options.online.server.help = Serverul oficial sau un server personalizat (al comunității), administrat de altcineva, accesat prin API-ul său web securizat și prin WebSocket-ul său securizat. Vă autentificați separat pe fiecare server: un cont și autentificarea lui nu sunt niciodată partajate între servere.
+options.online.official = Server oficial — {0}
+options.online.community = Server personalizat
+options.online.host = Gazdă
+options.online.host.hint = nume de domeniu sau adresă IP
+options.online.host.help = Numele de domeniu sau adresa IP a serverului personalizat, așa cum le-a dat proprietarul lui.
+options.online.api_port = Port HTTPS / API
+options.online.api_port.help = Portul API-ului web securizat al serverului (443 pe serverele Scacelith).
+options.online.ws_port = Port WSS
+options.online.ws_port.hint = la fel ca portul API
+options.online.ws_port.help = Portul WebSocket-ului securizat al serverului. Lăsați câmpul gol dacă este același cu portul API.
+options.online.pin = Amprenta certificatului (SHA-256)
+options.online.pin.hint = opțional
+options.online.pin.help = Pentru un server cu certificat autosemnat: amprenta SHA-256 pe care o dă proprietarul lui (64 de caractere hexazecimale; caracterul „:” este permis). Lăsați câmpul gol pentru a avea încredere în certificatele sistemului.
+options.online.pin.invalid = O amprentă are 64 de caractere hexazecimale (caracterul „:” este permis).
+options.online.test = Testare conexiune
+options.online.test_ok = {0}: conectat, compatibil cu această versiune.
+options.online.test_incompatible = {0}: conectat, dar necesită o altă versiune de Scacelith.
+options.online.in_game = Serverul nu poate fi schimbat în timpul unei partide online.
+options.online.remember_session = Memorarea autentificării când depozitul de chei al sistemului lipsește
+options.online.remember_session.help = Când niciun depozit de chei al sistemului (GNOME Keyring, KWallet…) nu vă poate păstra sesiunea, aceasta este salvată într-un fișier pe care doar contul dvs. de utilizator îl poate citi. Oricine vă poate citi fișierele sau o copie a lor, de exemplu o copie de rezervă, ar putea folosi acea sesiune. Dezactivat: autentificarea rămâne valabilă până la închiderea jocului. Puteți deconecta orice dispozitiv din Dispozitive conectate, în contul dvs.
+
+# Sign in, create an account
+online.signin.lead = Autentificați-vă pe {0} pentru a juca online cu alți jucători.
+online.field.user = Nume de utilizator sau e-mail
+online.field.user.hint = nume sau adresă
+online.field.password = Parolă
+online.field.password.hint = cel puțin 10 caractere
+online.field.password2 = Confirmare parolă
+online.field.current_password = Parola actuală
+online.field.new_password = Parola nouă
+online.field.username = Nume de utilizator
+online.field.username.hint = 3–24 de caractere: litere, cifre, _ sau -
+online.field.email = E-mail
+online.field.new_email = E-mail nou
+online.field.code = Cod
+online.field.code.hint = 6 cifre sau un cod de recuperare
+online.field.code6 = Codul din aplicație
+online.field.code6.hint = 6 cifre
+online.signin.button = Autentificare
+online.signin.google = Continuați cu Google
+online.signin.register = Creați un cont
+online.signin.forgot = Ați uitat parola?
+online.mfa.title = COD DE VERIFICARE
+online.mfa.lead = Introduceți codul de 6 cifre afișat de aplicația de autentificare sau unul dintre codurile dvs. de recuperare.
+online.mfa.verify = Verificare
+online.register.title = CREARE CONT
+online.register.lead = Un cont gratuit pe {0}: numele, ratingurile și partidele dvs. sunt păstrate doar pe acest server.
+online.register.button = Creare cont
+online.register.working = Se creează contul… poate dura câteva secunde.
+online.register.ready = Contul dvs. este gata. Autentificați-vă pentru a juca.
+online.password.mismatch = Cele două parole diferă.
+online.check_email.title = VERIFICAȚI E-MAILUL
+online.check_email.text = Am trimis un link la {0}. Deschideți-l pentru a vă activa contul, apoi autentificați-vă aici.
+online.check_email.ask = Introduceți adresa contului dvs. pentru a primi din nou linkul de activare.
+online.check_email.resend = Retrimitere e-mail
+online.check_email.resent = E-mailul a fost trimis din nou. Poate dura câteva minute; verificați și dosarul de spam.
+online.forgot.title = PAROLĂ UITATĂ
+online.forgot.lead = Introduceți adresa de e-mail a contului dvs.: vă vom trimite un link pentru a alege o parolă nouă.
+online.forgot.button = Trimitere link
+online.forgot.sent = Dacă există un cont cu această adresă, linkul este pe drum.
+online.sso.title = AUTENTIFICARE CU GOOGLE
+online.sso.wait = Continuați în browserul web: alegeți contul Google în fereastra care s-a deschis. Scacelith preia controlul imediat ce Google vă trimite înapoi.
+online.sso.name_title = ALEGEREA NUMELUI
+online.sso.name_lead = Este prima dată când veniți aici cu Google. Alegeți numele pe care îl vor vedea ceilalți jucători.
+online.sso.continue = Continuare
+online.sso.finishing = Google v-a trimis înapoi. Se finalizează autentificarea…
+online.sso.link_title = ADĂUGAREA AUTENTIFICĂRII GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Contul {0} de pe {1} folosește deja adresa de e-mail a acestui cont Google. Introduceți parola acestui cont pentru a-i adăuga autentificarea cu Google. Trebuie să faceți asta o singură dată.
+online.sso.link_button = Adăugare autentificare Google
+online.sso.link_mfa = Autentificarea cu Google se adaugă acestui cont imediat ce codul este acceptat.
+online.sso.not_mine = Nu este contul meu
+online.sso.not_mine_note = Autentificarea cu Google nu a fost adăugată. Dacă această adresă de e-mail vă aparține, folosiți „Ați uitat parola?” cu ea: linkul ajunge în acea căsuță poștală. Dacă, în plus, contul cere un cod de autentificare în doi pași pe care nu îl aveți, contactați administratorul serverului.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: autentificare Google
+online.sso.page.done_heading = Înapoi la Scacelith
+online.sso.page.done = Google v-a trimis înapoi la Scacelith. Reveniți în joc pentru a finaliza autentificarea; puteți închide această filă.
+online.sso.page.cancelled_heading = Autentificare anulată
+online.sso.page.cancelled = Autentificarea cu Google a fost anulată. Puteți închide această filă și reveni la Scacelith.
+online.sso.page.foreign_heading = Această pagină nu vă este destinată
+online.sso.page.foreign = Această pagină nu corespunde autentificării pe care o așteaptă Scacelith pe acest calculator. Dacă nu ați început chiar acum o autentificare Google în Scacelith, este posibil ca cineva să vă fi trimis acest link: închideți această filă.
+
+# Account
+online.account.button = Cont
+online.account.title = CONT
+online.account.section = CONT
+online.account.username = NUME DE UTILIZATOR
+online.account.email = E-MAIL
+online.account.unverified = (neverificat)
+online.account.mfa = AUTENTIFICARE ÎN DOI PAȘI
+online.account.mfa_on = Activată
+online.account.mfa_off = Dezactivată
+online.account.google = GOOGLE
+online.account.google_linked = Asociat cu un cont Google
+online.account.change_password = Schimbare parolă
+online.account.mfa_setup = Activați autentificarea în doi pași
+online.account.mfa_disable = Dezactivați autentificarea în doi pași
+online.account.recovery = Coduri de recuperare noi
+online.account.sign_out = Deconectare
+online.account.sign_out_all = Deconectare peste tot
+online.account.sign_out_all.help = Deconectează acest cont de pe toate calculatoarele, inclusiv de pe acesta.
+online.account.signed_out = V-ați deconectat.
+online.account.signed_out_all = V-ați deconectat de pe toate calculatoarele.
+online.account.signing_out_all = Se deconectează toate calculatoarele…
+online.account.sign_out_all_failed = Celelalte calculatoare ale dvs. ar putea fi încă conectate: autentificați-vă din nou, apoi deconectați-le din Dispozitive conectate. {0}
+online.account.sign_out_all_retry = Celelalte calculatoare ale dvs. ar putea fi încă conectate. Încercați din nou „Deconectare peste tot”. {0}
+online.account.ratings = RATINGURI
+online.account.col.tc = RITM DE JOC
+online.account.col.rating = RATING
+online.account.col.games = PARTIDE
+# Wins / draws / losses: victorii / remize / înfrângeri
+online.account.col.record = V / R / Î
+online.account.provisional = Un semn de întrebare indică un rating provizoriu (încă puține partide jucate).
+online.password.title = SCHIMBAREA PAROLEI
+online.password.button = Schimbare parolă
+online.password.changed = Parola dvs. a fost schimbată.
+online.password.other_sessions = Pe celelalte calculatoare va trebui să vă autentificați din nou.
+online.mfa_setup.title = AUTENTIFICARE ÎN DOI PAȘI
+online.mfa_setup.lead = Autentificarea în doi pași vă cere, la fiecare autentificare, un cod dintr-o aplicație de pe telefon. Introduceți parola pentru a începe.
+online.mfa_setup.scan = 1. Scanați acest cod cu o aplicație de autentificare sau introduceți în ea această cheie:
+online.mfa_setup.enter = 2. Introduceți codul de 6 cifre afișat de aplicație:
+online.mfa_setup.enable = Activare
+online.mfa_setup.done = Autentificarea în doi pași este activată.
+online.mfa_off.title = DEZACTIVAREA AUTENTIFICĂRII ÎN DOI PAȘI
+online.mfa_off.lead = Introduceți parola și un cod din aplicație (sau un cod de recuperare).
+online.mfa_off.button = Dezactivare
+online.mfa.off_done = Autentificarea în doi pași este dezactivată.
+online.recovery.title = CODURI DE RECUPERARE
+online.recovery.lead = Fiecare cod vă permite să vă autentificați o singură dată dacă vă pierdeți telefonul. Păstrați-le într-un loc sigur: sunt afișate doar acum.
+online.recovery.saved = Le-am salvat
+online.recovery.new_title = CODURI DE RECUPERARE NOI
+online.recovery.new_lead = Codurile noi le înlocuiesc pe cele vechi. Introduceți parola și un cod din aplicație.
+online.recovery.button = Coduri noi
+online.account.manage = SECURITATE ȘI DATE
+online.account.pending_email = Se așteaptă confirmarea: {0}
+online.account.accept_challenges = Acceptare provocări
+online.account.accept_challenges.help = Alți jucători vă pot provoca după numele de utilizator. Dezactivat: provocările lor sunt refuzate.
+online.account.history = Istoricul partidelor
+online.account.devices = Dispozitive conectate
+online.account.change_email = Schimbare e-mail
+online.account.export = Descărcați datele mele
+online.account.delete = Ștergere cont
+
+# Play
+online.play.signed_in = Cont conectat: {0}
+online.session.file = Niciun depozit de chei al sistemului nu v-a putut păstra autentificarea: aceasta este memorată într-un fișier pe care doar contul dvs. de utilizator îl poate citi (Opțiuni > Server online).
+online.session.memory = Niciun depozit de chei al sistemului nu v-a putut păstra autentificarea, iar aceasta nu este salvată într-un fișier: rămâne valabilă până la închiderea jocului (Opțiuni > Server online).
+online.play.find_section = CĂUTARE ADVERSAR
+online.play.friend_section = JOC CU UN PRIETEN
+online.play.mode = Partidă
+online.play.mode.help = Partidele cu rating vă modifică ratingul în acest ritm de joc; partidele amicale, nu.
+online.play.find = Căutare adversar
+online.play.connecting = Conectare la server…
+online.play.cooldown = Puteți căuta din nou un adversar la ora {0}.
+online.play.banned = Acest cont este suspendat până la {0}.
+online.play.challenge = Provocați un jucător
+online.play.challenge.desc = Invitați pe cineva care este online, după numele de utilizator.
+online.play.private = Partidă privată
+online.play.private.desc = Creați un cod pentru un prieten sau intrați cu codul primit.
+online.play.direct = Meci direct
+online.play.direct.desc = Fără server: jucați direct cu calculatorul unui prieten.
+online.search.title = CĂUTARE
+online.search.window = Interval de rating {0}
+online.search.queued = {0} jucător caută|{0} jucători caută|{0} de jucători caută
+online.search.wait = Se caută un adversar de nivelul dvs.…
+online.outgoing.challenge = PROVOCARE TRIMISĂ
+online.outgoing.waiting = se așteaptă un răspuns
+online.outgoing.private = PARTIDĂ PRIVATĂ
+online.outgoing.private_hint = Dați acest cod prietenului dvs.: partida începe când intră și el.
+online.challenge.title = PROVOCAȚI UN JUCĂTOR
+online.challenge.opponent = ADVERSAR
+online.field.opponent = Nume de utilizator
+online.field.opponent.hint = pe cine provocați
+online.challenge.note = Adversarul vede provocarea oriunde s-ar afla în meniuri și are un minut pentru a răspunde.
+online.challenge.send = Trimitere provocare
+online.terms.rated = Cu rating
+online.terms.rated.help = Numai ritmurile de joc oficiale pot conta pentru rating.
+online.terms.color = Culoarea dvs.
+online.private.title = PARTIDĂ PRIVATĂ
+online.private.create_section = CREARE
+online.private.create_note = Primiți un cod scurt: cine îl introduce joacă împotriva dvs.
+online.private.create = Creare partidă
+online.private.join_section = ALĂTURARE
+online.field.private_code = Cod
+online.private.join = Alăturare
+online.private.joining = Conectare la partidă…
+online.challenge.received = PROVOCARE
+online.challenge.accept = Acceptare
+online.challenge.decline = Refuz
+online.challenge.you_white = jucați cu albele
+online.challenge.you_black = jucați cu negrele
+online.challenge.you_random = culori trase la sorți
+online.challenge.declined = {0} v-a refuzat provocarea.
+online.challenge.expired = Provocarea dvs. a expirat fără răspuns.
+online.challenge.unavailable = Acum nu se poate juca cu {0}.
+online.challenge.lost = Conexiune pierdută: provocarea dvs. a fost anulată.
+
+# At the table
+online.pause.clock_runs = Partida continuă: ceasul dvs. merge în continuare.
+online.pause.abort = Anulare partidă
+online.pause.abort.help = Înainte de prima dvs. mutare, partida poate fi anulată; nu se ia în calcul.
+online.pause.leave = Părăsire partidă
+online.confirm.resign.text = Abandonați partida? Adversarul o câștigă.
+online.confirm.leave.text = Dacă plecați, abandonați partida: adversarul o câștigă.
+online.confirm.leave.ok = Abandon și ieșire
+online.confirm.leave_abort.text = Plecați înainte de prima mutare? Partida este anulată și nu se ia în calcul.
+online.confirm.leave_abort.ok = Anulare și ieșire
+online.draw.card_title = PROPUNERE DE REMIZĂ
+online.draw.card_text = Adversarul propune remiză.
+online.draw.accept = Acceptare
+online.draw.decline = Refuz
+online.draw.offered = Adversarul propune remiză.
+online.opponent_back = Adversarul a revenit.
+online.opponent_away = Adversar deconectat — {0} pentru a reveni
+online.first_move = Prima dvs. mutare · {0}
+online.reconnecting = RECONECTARE…
+online.reconnecting.text = Partida continuă pe server, iar ceasul dvs. merge în continuare.
+online.gameover.aborted = Partida a fost anulată: nu se ia în calcul.
+online.rating.casual = Partidă amicală: ratingurile rămân neschimbate.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Acceptare revanșă
+online.rematch.offered = Adversarul propune o revanșă.
+online.rematch.waiting = Revanșă propusă…
+online.rematch.gone = Fără revanșă
+online.rematch.declined = Nicio revanșă de data aceasta.
+online.report.button = Raportare adversar
+online.report.title = RAPORTARE
+online.report.lead = Rapoartele ajung la moderatorii serverului, împreună cu această partidă. Vă mulțumim că ne ajutați să păstrăm jocul corect.
+online.report.category = Motiv
+online.report.cheating = Trișare
+online.report.abuse = Comportament abuziv
+online.report.other = Altceva
+online.report.comment = Comentariu
+online.report.comment.hint = opțional
+online.report.send = Trimitere raport
+online.report.sent = Raport trimis. Vă mulțumim.
+online.report.queued = Raportul dvs. va fi trimis la sfârșitul partidei.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0}, {1}
+online.sheet.rated = cu rating
+online.sheet.casual = amicală
+online.sheet.game = Partida {0}
+# End reasons of online games
+reason.online.abandonment = Adversarul a părăsit partida
+reason.online.abandonment_vs_insufficient = Partidă părăsită, dar adversarul nu poate da mat
+reason.online.aborted = Partidă anulată
+reason.online.no_show = Prima mutare nu a fost făcută la timp (anulată)
+reason.online.forfeit = Pierdere prin forfait
+reason.online.server_aborted = Anulată de server
+reason.online.both_disconnected = Ambii jucători s-au deconectat
+# Server notices
+online.notice.shutdown = Serverul repornește în {0}. Partidele în desfășurare sunt salvate.
+online.notice.revoked = Sesiunea dvs. pe acest server a fost închisă.
+online.notice.replaced = Contul dvs. s-a conectat dintr-o altă fereastră; aceasta este acum deconectată.
+online.notice.rating_restored = Ratingul dvs. a fost restabilit cu {0} punct: un adversar a fost exclus pentru trișare.|Ratingul dvs. a fost restabilit cu {0} puncte: un adversar a fost exclus pentru trișare.|Ratingul dvs. a fost restabilit cu {0} de puncte: un adversar a fost exclus pentru trișare.
+# Errors
+online.err.rate_limited_for = Prea multe încercări. Încercați din nou peste {0}.
+online.err.rate_limited = Prea multe încercări. Încercați din nou peste puțin timp.
+online.err.server_busy_for = Serverul este ocupat. Încercați din nou peste {0}.
+online.err.server_busy = Serverul este ocupat. Încercați din nou peste puțin timp.
+online.err.banned_until = Acest cont este suspendat până la {0}.
+online.err.banned = Acest cont este suspendat.
+online.err.invalid_credentials = Nume de utilizator sau parolă greșită.
+online.err.invalid_credentials_pending = Nume de utilizator sau parolă greșită. Dacă tocmai v-ați înregistrat, deschideți mai întâi linkul pe care vi l-am trimis.
+online.err.email_unverified = Adresa dvs. de e-mail nu este încă verificată: deschideți linkul pe care vi l-am trimis.
+online.err.network = Serverul nu poate fi accesat. Verificați conexiunea și adresa serverului.
+online.err.tls = Nu s-a putut stabili o conexiune securizată cu serverul.
+online.err.certificate = Certificatul serverului nu este de încredere (sau nu corespunde amprentei din opțiuni).
+online.err.incompatible = Acest server necesită o altă versiune de Scacelith.
+online.err.unauthorized = Sesiunea dvs. a expirat: vă rugăm să vă autentificați din nou.
+online.err.username_taken = Acest nume de utilizator este deja folosit.
+online.err.email_taken = Un cont folosește deja această adresă de e-mail.
+online.err.invalid_username = Numele de utilizator au între 3 și 24 de caractere: litere, cifre, _ sau -.
+online.err.invalid_email = Această adresă de e-mail nu este validă.
+online.err.weak_password = Această parolă este prea slabă: folosiți cel puțin 10 caractere.
+online.err.invalid_code = Acest cod nu este corect.
+online.err.expired = Această cerere a expirat: vă rugăm să o luați de la capăt.
+online.err.registration_closed = Acest server nu acceptă conturi noi.
+online.err.sso_cancelled = Autentificarea cu Google a fost anulată.
+online.err.sso_expired = Autentificarea cu Google a durat prea mult sau a fost deja folosită. Vă rugăm să o luați de la capăt.
+online.err.sso_failed = Autentificarea cu Google nu a funcționat. Vă rugăm să încercați din nou.
+online.err.sso_listen = Scacelith nu a putut primi răspunsul Google pe acest calculator. Vă rugăm să încercați din nou.
+online.err.sso_origin = Autentificarea cu Google nu funcționează prin această adresă de server. Adăugați serverul cu numele public dat de administratorul lui, apoi încercați din nou.
+online.err.browser = Browserul web nu a putut fi deschis.
+online.err.sso_email_unverified = Google nu a confirmat adresa de e-mail a acestui cont Google.
+online.err.sso_account_exists = Un cont folosește deja această adresă de e-mail și nu poate fi asociat cu autentificarea Google: autentificați-vă cu parola lui sau folosiți „Ați uitat parola?”.
+online.err.sso_already_linked = Acest cont Google este deja asociat cu un alt cont.
+online.err.account_disabled = Acest cont nu mai poate fi folosit.
+online.err.server_error = Serverul a avut o problemă. Vă rugăm să încercați din nou.
+online.err.timeout = Serverul nu a răspuns la timp.
+online.err.offline = Nu există conexiune cu serverul: încercați din nou după conectare.
+online.err.other = Serverul a refuzat ({0}).
+online.err.code = Serverul a refuzat (eroarea {0}).
+online.err.slow_down = Mai încet, vă rugăm.
+online.err.server_full = Serverul este plin. Încercați din nou mai târziu.
+online.err.restarting = Serverul repornește. Încercați din nou peste puțin timp.
+online.err.move_refused = Serverul a refuzat această mutare: tabla revine la poziția anterioară.
+online.err.game_over = Această partidă s-a încheiat deja.
+online.err.already_in_game = Jucați deja o partidă.
+online.err.invalid_category = Acest ritm de joc nu este oferit aici.
+online.err.draw_offer_limit = Deocamdată nu mai puteți propune remiză.
+online.err.abort_not_allowed = Partida nu mai poate fi anulată.
+online.err.no_pending_offer = Nu există nicio propunere la care să răspundeți.
+online.err.flag_fell = Timpul dvs. a expirat.
+online.err.queue_not_allowed = Nu puteți căuta un adversar acum.
+online.err.challenge_not_found = Această provocare nu mai există.
+online.err.user_unavailable = Acest jucător nu este disponibil.
+online.err.challenge_limit = Prea multe provocări deocamdată. Încercați din nou mai târziu.
+online.err.challenge_self = Nu puteți trimite o provocare propriului cont.
+online.err.code_invalid = Nicio partidă nu are acest cod.
+online.err.rated_official_tc = Numai ritmurile de joc oficiale pot conta pentru rating.
+online.err.cooldown = Căutarea unui adversar vă este suspendată pentru scurt timp.
+online.err.invalid_tc = Acest ritm de joc nu este permis.
+online.err.rematch_unavailable = Revanșa nu mai este posibilă.
+online.err.rated_repeat_limit = Deocamdată ați jucat destule partide cu rating împotriva acestui jucător. Jucați o partidă amicală sau încercați din nou mai târziu.
+online.err.cheat_detected = Partida a fost oprită de verificările de fair-play ale serverului.
+online.err.invalid_password = Parolă greșită.
+online.err.mfa_code_required = Introduceți un cod din aplicația de autentificare (sau un cod de recuperare).
+online.err.password_not_set = Acest cont se autentifică prin Google și nu are încă o parolă. Setați mai întâi una cu „Ați uitat parola?” pe pagina de autentificare.
+online.err.too_many_attempts = Prea multe încercări greșite. Încercați din nou mai târziu.
+online.err.too_many_attempts_for = Prea multe încercări greșite. Încercați din nou peste {0}.
+online.err.same_email = Aceasta este deja adresa dvs. de e-mail.
+online.err.not_found = Nu există pe server.
+online.err.invalid_response = Răspunsul serverului nu a putut fi citit.
+online.err.storage = Sesiunea nu a putut fi salvată pe acest calculator.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = ISTORICUL PARTIDELOR
+online.history.filter.games = Partide
+online.history.filter.result = Rezultat
+online.history.filter.all = Toate
+online.history.filter.won = Câștigate
+online.history.filter.lost = Pierdute
+online.history.filter.drawn = Remize
+online.history.col.date = DATA
+online.history.col.opponent = ADVERSAR
+online.history.col.result = REZULTAT
+online.history.col.tc = RITM DE JOC
+online.history.col.kind = TIP
+online.history.col.rating = RATING
+online.history.won = Câștigată
+online.history.lost = Pierdută
+online.history.drawn = Remiză
+online.history.aborted = Anulată
+online.history.page = Pagina {0} din {1}
+online.history.total = {0} partidă|{0} partide|{0} de partide
+online.history.previous = Anterioară
+online.history.next = Următoare
+online.history.empty.title = NICIO PARTIDĂ ÎNCĂ
+online.history.empty = Partidele dvs. de pe acest server apar aici după ce se încheie.
+online.history.empty_filter.title = NICIO PARTIDĂ
+online.history.empty_filter = Nicio partidă nu corespunde acestor filtre.
+online.history.error = ISTORICUL NU A PUTUT FI ÎNCĂRCAT
+online.history.unavailable = ACEST SERVER NU OFERĂ ISTORICUL PARTIDELOR
+online.game.title = PARTIDĂ
+online.game.players = JUCĂTORI
+online.game.you = DVS.
+online.game.unrated = Fără rating
+online.game.you_won = Ați câștigat
+online.game.you_lost = Ați pierdut
+online.game.draw = Remiză
+online.game.you_left = Ați părăsit partida
+online.game.date = DATA
+online.game.time_control = RITM DE JOC
+online.game.moves = MUTĂRI
+online.game.move_count = {0} mutare|{0} mutări|{0} de mutări
+online.game.no_moves = Nu s-a jucat nicio mutare.
+online.game.moves_incomplete = Unele mutări nu au putut fi citite: lista se oprește înainte de final.
+online.game.save = Salvare partidă
+online.game.saved_button = Salvată
+online.game.saved = Partida se află printre partidele dvs. salvate.
+online.game.already_saved = Această partidă se află deja printre partidele dvs. salvate.
+online.game.save_failed = Partida nu a putut fi salvată.
+online.game.invalid = Serverul a trimis o înregistrare a partidei care nu poate fi citită.
+online.game.replay = Redare
+online.game.not_found = PARTIDA NU A FOST GĂSITĂ
+online.game.error = PARTIDA NU A PUTUT FI ÎNCĂRCATĂ
+online.devices.title = DISPOZITIVE CONECTATE
+online.devices.lead = Dispozitivele pe care este conectat acest cont. Dacă nu recunoașteți unul dintre ele, deconectați-l și schimbați parola.
+online.devices.unknown = Dispozitiv necunoscut
+online.devices.this = ACEST DISPOZITIV
+online.devices.signed_in = Conectat pe {0}
+online.devices.last_active = ultima activitate {0}
+online.devices.active_now = folosit acum
+online.devices.sign_out = Deconectare
+online.devices.signed_out = Dispozitivul a fost deconectat.
+online.devices.error = DISPOZITIVELE NU AU PUTUT FI ÎNCĂRCATE
+online.devices.all.title = DECONECTARE PESTE TOT
+online.email.title = SCHIMBAREA ADRESEI DE E-MAIL
+online.email.current = Adresa actuală: {0}
+online.email.button = Schimbare e-mail
+online.email.sent = Un link de confirmare a fost trimis la {0}.
+online.email.sent.hint = Adresa se schimbă după ce linkul este deschis. Până atunci, se folosește în continuare adresa dvs. actuală.
+online.email.done = Gata
+online.email.changed = Adresa dvs. de e-mail a fost schimbată.
+online.export.title = DESCĂRCAREA DATELOR MELE
+online.export.lead = Tot ce păstrează acest server despre contul dvs. (profil, ratinguri, partide, dispozitive, evenimente de securitate) este salvat ca fișier JSON pe acest calculator. Introduceți parola pentru a confirma.
+online.export.button = Descărcare
+online.export.saved = Datele dvs. au fost salvate pe acest calculator.
+online.export.failed = Fișierul nu a putut fi scris.
+online.delete.title = ȘTERGEREA CONTULUI
+online.delete.warning = Contul dvs. va fi șters de pe acest server: adresa de e-mail, parola, autentificarea în doi pași și dispozitivele sunt eliminate și nu vă veți mai putea autentifica. Această acțiune nu poate fi anulată.
+online.delete.games = Partidele și ratingurile dvs. rămân pe server sub numele anonim {0}.
+online.delete.confirm_name = Pentru confirmare, introduceți numele de utilizator și parola.
+online.delete.button = Ștergeți-mi contul
+online.delete.done = Contul dvs. a fost șters.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Meci direct
+online.direct.title = MECI DIRECT
+online.direct.lead = O partidă amicală direct între două calculatoare: fără server, fără cont, niciodată cu rating.
+online.direct.host = Găzduiți o partidă
+online.direct.host.desc = Prietenul dvs. se conectează la dvs.: îi dați adresa dvs. și un cod.
+online.direct.join = Alăturați-vă unei partide
+online.direct.join.desc = Conectați-vă la un prieten care găzduiește o partidă.
+online.direct.host_title = GĂZDUIREA UNEI PARTIDE
+online.direct.your_color = Culoarea dvs.
+online.direct.auto_press.help = Ambii roboți apasă singuri ceasul imediat ce o mutare este pe tablă. Dezactivat: fiecare jucător apasă ceasul după fiecare mutare.
+online.direct.unrated = Meciurile directe sunt partide amicale: niciodată cu rating.
+online.direct.connection = CONEXIUNE
+online.direct.port = Port
+online.direct.port.help = Portul TCP la care se conectează prietenul dvs. (47100, dacă nu este ocupat).
+online.direct.port_range = Alegeți un port între 1024 și 65535.
+online.direct.upnp = Deschiderea portului pe router (UPnP)
+online.direct.upnp.help = Cere routerului de acasă să redirecționeze portul către acest calculator și îl închide după partidă.
+online.direct.host_note_upnp = Jocul cere routerului să deschidă portul. Dacă nu reușește, vi se va spune ce port să redirecționați manual.
+online.direct.host_note_manual = Redirecționați portul TCP către acest calculator din setările routerului sau jucați în aceeași rețea.
+online.direct.host_button = Găzduire
+online.direct.wait_title = SE AȘTEAPTĂ PRIETENUL DVS.
+online.direct.opening = Se deschide portul {0} pe router…
+online.direct.give = Dați-i prietenului dvs.:
+online.direct.cap_address = ADRESĂ
+online.direct.cap_port = PORT
+online.direct.cap_code = COD
+online.direct.lan = În aceeași rețea: {0}
+online.direct.router = routerul dvs.
+online.direct.upnp_searching = Se caută routerul…
+online.direct.upnp_mapped = Port deschis pe {0}.
+online.direct.upnp_none = Niciun router UPnP nu a răspuns: redirecționați manual portul TCP {0} către acest calculator.
+online.direct.upnp_failed = Routerul a refuzat să deschidă portul: redirecționați manual portul TCP {0} către acest calculator.
+online.direct.upnp_off = Redirecționați portul TCP {0} către acest calculator din setările routerului.
+online.direct.upnp_cgnat = Probabil furnizorul dvs. vă partajează adresa de internet (CGNAT): încercați IPv6 sau un VPN.
+online.direct.firewall = Dacă Windows întreabă dacă Scacelith poate accepta conexiuni, permiteți-i.
+online.direct.waiting = Se așteaptă prietenul dvs.…
+online.direct.connecting_friend = Prietenul dvs. se conectează…
+online.direct.starting = Se pregătește tabla…
+online.direct.join_title = ALĂTURAȚI-VĂ UNEI PARTIDE
+online.direct.join_lead = Introduceți ce vă citește prietenul dvs.: adresa lui, portul și codul.
+online.direct.address = Adresă
+online.direct.address.hint = IPv4, IPv6 sau nume
+online.direct.code = Cod
+online.direct.join_button = Alăturare
+online.direct.connecting_to = Conectare la {0}…
+online.direct.securing = Se securizează conexiunea cu {0}…
+direct.event = Meci amical
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Direct, {0}
+direct.err.refused = Nimeni nu găzduiește o partidă la această adresă și la acest port.
+direct.err.timeout = Niciun răspuns: verificați adresa și portul și dacă routerul prietenului dvs. lasă jocul să treacă.
+direct.err.wrong_code = Codul nu este corect.
+direct.err.invalid_code = Un cod are 12 caractere (XXXX-XXXX-XXXX).
+direct.err.incompatible = Prietenul dvs. are o altă versiune de Scacelith.
+direct.err.port_in_use = Acest port este deja folosit pe acest calculator: alegeți altul.
+direct.err.network = Rețeaua nu a putut fi folosită.
+direct.err.too_many_attempts = Prea multe coduri greșite: găzduirea s-a oprit. Găzduiți din nou pentru a obține un cod nou.
+direct.err.bad_address = Această adresă nu este validă.
+direct.err.not_found = Acest nume nu a fost găsit.
+direct.err.unreachable = Această adresă nu poate fi accesată de aici.
+direct.err.reset = Conexiunea a fost întreruptă.
+direct.err.closed = Conexiunea a fost închisă.
+direct.err.host_left = Prietenul dvs. a oprit găzduirea.
+direct.err.other = Conexiunea a eșuat ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# The players' names ({0}, {1}) take no case ending and no "lui" (a name may be a woman's): the
+# sentences keep them in the nominative or after a preposition.
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Jucătorul 2
+hotseat.white_player = Albul
+hotseat.black_player = Negrul
+hotseat.name.help = Numele scris pe ambele foi de notație, în orice alfabet.
+hotseat.swap = Inversare culori
+hotseat.left_hand = {0} joacă cu mâna stângă: ceasul stă în stânga sa.
+hotseat.rated = Partidă cu rating
+hotseat.rated.help = Fiecare nume are pe acest calculator propriul rating pentru partidele în doi. Ratingul dvs. împotriva lui Stockfish nu se schimbă niciodată.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Ratinguri pentru partidele în doi: {0} {1} · {2} {3}
+hotseat.new_rating = (nou)
+hotseat.friendly_note = O partidă amicală: ratingurile nu se schimbă.
+hotseat.colours = {0} joacă cu albele, {1} cu negrele.
+hotseat.colours_swap = Culorile se inversează la fiecare revanșă.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, este rândul dvs.
+hotseat.flag = {0}: stegulețul a căzut.
+hotseat.confirm.resign = Confirmați abandonul pentru {0}? {1} câștigă partida.
+hotseat.confirm.resign_draw = Confirmați abandonul pentru {0}? {1} nu mai poate da mat: partida se va încheia remiză.
+hotseat.draw.offer_noted = Propunerea de remiză pleacă odată cu mutarea dvs.: {0} o va vedea după ce apăsați ceasul.
+hotseat.draw.card_title = PROPUNERE DE REMIZĂ
+hotseat.draw.offered = {0} propune remiză.
+hotseat.draw.card_hint = Atingerea unei piese o refuză.
+hotseat.draw.accept = Acceptare
+hotseat.draw.decline = Refuz
+hotseat.draw.accepted = {0} acceptă remiza propusă de {1}.
+hotseat.draw.declined = {0} refuză remiza propusă de {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Partidă cu rating
+hotseat.sheet.friendly = Partidă amicală
+# Game over card
+hotseat.gameover.wins = {0} câștigă în {1} mutare.|{0} câștigă în {1} mutări.|{0} câștigă în {1} de mutări.
+hotseat.gameover.wins_now = {0} câștigă.
+hotseat.gameover.friendly = {0} contra {1} · partidă amicală
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Această partidă nu contează pentru rating.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Antrenor
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Voce sintetică generată de {0} pentru modul Antrenor
+# Coach page
+coach.title = ANTRENOR
+coach.section.level = NIVEL
+coach.section.lesson = CU ANTRENORUL
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Pentru jucători cu rating {0}
+coach.completed = Finalizat
+coach.recommended = Recomandat
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+# The names 1-6 are the ones the coach quotes (events.lang, appraisal.lang, lesson.lang).
+coach.level.0.name = Regulile șahului
+coach.level.0.desc = O lecție interactivă, câte o regulă pe rând.
+coach.level.0.detail = Antrenorul așază poziții mici și arată cum se mută și cum ia fiecare piesă, apoi rocada, promovarea, șahul și șahul mat. Încercați chiar dvs. fiecare idee pe tablă.
+coach.level.1.name = Primii pași
+coach.level.1.desc = Ce este atacat, ce rămâne neapărat.
+coach.level.1.detail = Antrenorul joacă blând și vorbește simplu: care dintre piesele dvs. sunt atacate, care au rămas fără apărare și cum le puteți păstra.
+coach.level.2.name = Începător
+coach.level.2.desc = Tactică simplă, dezvoltare, siguranța regelui.
+coach.level.2.detail = Furculițele și legările sunt numite pe nume. Antrenorul vorbește despre scoaterea pieselor în joc și despre siguranța regelui.
+coach.level.3.name = Intermediar
+coach.level.3.desc = Planuri, structura de pioni, singurele mutări.
+coach.level.3.detail = Antrenorul explică planurile și structurile de pioni și vă avertizează când o singură mutare ține poziția.
+coach.level.4.name = Jucător de club
+coach.level.4.desc = Mutări candidate, evaluarea în pioni.
+coach.level.4.detail = Antrenorul cântărește mutările candidate și dă evaluarea în pioni, cum ar face un antrenor de club.
+coach.level.5.name = Jucător de club puternic
+coach.level.5.desc = Variante concise, termeni poziționali.
+coach.level.5.detail = Remarci scurte, variante concrete și vocabularul jocului pozițional.
+coach.level.6.name = Expert
+coach.level.6.desc = Remarci laconice, variante adânci, evaluări în cifre.
+coach.level.6.detail = Puține cuvinte, ca între jucători puternici: variante de mai multe mutări și evaluări în cifre.
+coach.note.clock = Fără ceas: luați-vă tot timpul de care aveți nevoie.
+coach.note.takeback = După o gafă, antrenorul arată ce nu a mers și vă propune să anulați mutarea.
+coach.note.lesson = Jucați cu albele; antrenorul așază fiecare exercițiu pe tablă.
+coach.note.unrated = Partidele cu antrenorul nu contează pentru rating.
+coach.note.fallible = Antrenorul nu este infailibil: uneori poate judeca greșit o mutare.
+coach.colour = Culoarea dvs.
+coach.colour.help = Culoarea cu care jucați împotriva antrenorului. Pe rând: cu albele, apoi cu negrele, de la o partidă la alta. Lecția despre reguli se joacă întotdeauna cu albele.
+coach.colour.alternate = Pe rând
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Vocea antrenorului nu este instalată sau este dezactivată (Opțiuni > Audio): cuvintele lui vor fi scrise pe ecran.
+# At the table
+coach.speaker = ANTRENOR
+coach.skip = Omitere
+coach.offer.title = ANULAȚI MUTAREA?
+coach.offer.text = Antrenorul vă propune să anulați ultima mutare, ca să căutați una mai bună.
+coach.offer.hint = Backspace o anulează. Atingerea unei piese continuă partida.
+coach.offer.accept = Anulați mutarea
+coach.offer.decline = Continuați
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Anulări de mutare rămase: {0}
+coach.pause.take_back = Anulați-mi mutarea
+coach.pause.take_back.help = Anulează ultima dvs. mutare și răspunsul antrenorului, dacă acesta a jucat deja.
+coach.confirm.resign = Abandonați partida? Antrenorul va fi declarat câștigător.
+coach.confirm.resign_draw = Abandonați partida? Antrenorul nu mai poate da mat: partida se va încheia remiză.
+coach.confirm.leave = Reveniți la meniul principal? Această partidă cu antrenorul va fi abandonată.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Încă o partidă
+coach.gameover.unrated = Această partidă cu antrenorul nu contează pentru rating.
+coach.lesson.done = BRAVO
+coach.lesson.done.line = Acum cunoașteți regulile șahului.
+coach.lesson.next = Prima partidă

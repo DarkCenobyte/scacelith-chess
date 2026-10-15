@@ -112,10 +112,12 @@ lesson.king.wrong = Din konge står lige ved siden af {my}. Gå hen på {my:dens
 lesson.king.ok = Godt! Kongen er langsom, men stærk på tæt hold.
 # Knight
 lesson.knight.intro = Det her er {your}. {your:den} går i et L: to felter lige ud og så ét til siden.
+lesson.knight.intro.spoken = Det her er {your}. {your:den} går i et æl: to felter lige ud og så ét til siden.
 lesson.knight.l = Sådan {@}her. Springeren lander altid på et felt med den anden farve.
 lesson.knight.jump = Springeren er den eneste brik der kan springe over andre.
 lesson.knight.ask = Slå {my} med din springer!
 lesson.knight.wrong = Det er et rigtigt springertræk, men det når ikke {my}. Prøv et andet L.
+lesson.knight.wrong.spoken = Det er et rigtigt springertræk, men det når ikke {my}. Prøv et andet æl.
 lesson.knight.ok = Flot spring!
 # Pawn: moving
 lesson.pawn.intro = Og nu {your}. {your:den} går lige frem, ét felt ad gangen, og aldrig baglæns.
@@ -258,7 +260,7 @@ lesson.talk.sheet = I turneringer skriver begge spillere hvert træk ned på en 
 lesson.talk.notation = Vi skriver brikkens bogstav og feltet, som {move:letters}. Ved bønder skriver man kun feltet.
 lesson.talk.robot = Din robot noterer dine træk for dig. I hurtige partier behøver man ikke at notere.
 lesson.talk.handshake = Partier begynder og slutter med et håndtryk. Det betyder: godt parti, og tak.
-lesson.talk.polite = Vind eller tab, så vær høflig, og forstyr aldrig en modstander der sidder og tænker.
+lesson.talk.polite = Uanset om du vinder eller taber, så vær høflig, og forstyr aldrig en modstander der sidder og tænker.
 lesson.talk.tips = Tre råd til dine partier: {@}kontrollér centrum, {@2}få springere og løbere ud, og {@3}rokér tidligt.
 lesson.talk.next = Når du er klar, så vælg »Første skridt«. Jeg spiller ikke for hårdt og hjælper dig efter hver fejl.
 lesson.talk.welcome = Velkommen til skakkens verden! Lad os give hånd.

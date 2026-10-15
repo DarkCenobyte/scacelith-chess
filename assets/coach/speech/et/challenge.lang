@@ -29,7 +29,7 @@ ch.intro.deflection = Eemaletõrjumine ja meelitus. {n:position}: meelita kaitsj
 ch.intro.intermezzo = Vahekäigud. {n:position}: enne ilmset käiku leia tugevam.
 ch.intro.trapped = Lõksus malendid. {n:position}: ühel minu malendil pole kuhugi ohutult minna. Võida see.
 ch.intro.promotion = Muundumine. {n:position}, kus kaugele edenenud ettur otsustab partii.
-ch.intro.quiet = Vaiksed käigud. {n:position}: võidukäik ei ole tuleandmine ega löömine.
+ch.intro.quiet = Vaiksed käigud. {n:position}: võitev käik ei ole tuleandmine ega löömine.
 ch.intro.opening = Avangulõksud. {n:position} päris partiide esimestest käikudest. Karista mind mu vea eest.
 ch.intro.escape = Leia pääsetee. {n:position}: sinu kuningas on ohus ja ainult üks käik päästab ta.
 ch.intro.defend = Kaitsekäigud. {n:position}: leia see ainus käik, mis hoiab sinu seisu koos.
@@ -38,7 +38,7 @@ ch.intro.kr = Vanker ja kuningas kuninga vastu. {n:position}: pane mu kuningale 
 ch.intro.kp = Kuningas ja ettur kuninga vastu. {n:position}: muunda ettur lipuks. Lase kuningal ees käia.
 ch.intro.kp_hold = Peata ettur. {n:position}: sul on ainult kuningas. Hoia viiki.
 ch.intro.rook = Vankrilõppmängud. {n:position}: ehita sild, et ettur muundada, ja hoia viiki Philidori kaitsega.
-ch.intro.endgame = Lõppmängu taktika. {n:position} väheste malendite ja teravate ideedega.
+ch.intro.endgame = Lõppmängutaktika. {n:position} väheste malendite ja teravate ideedega.
 
 # ---- At each position: the task --------------------------------------------------------------------
 # A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_com}: "2 käiguga").
@@ -55,7 +55,7 @@ ch.task.deflection = Koorma kaitsja üle või meelita ta ära.
 ch.task.intermezzo = Otsi vahekäiku.
 ch.task.trapped = Üks minu malend ei pääse minema. Võida see.
 ch.task.promotion = Kasuta oma kaugele edenenud etturit.
-ch.task.quiet = Võidukäik on vaikne käik.
+ch.task.quiet = Võitev käik on vaikne käik.
 ch.task.opening = Karista mind mu viimase käigu eest.
 ch.task.escape = Päästa oma kuningas: ainult üks käik aitab.
 ch.task.defend = Leia ainus hea käik.
@@ -105,7 +105,7 @@ ch.wrong.slower = Ka see paneb matti, aga see võtab kauem aega. On kiirem tee.
 ch.wrong.other = Ka see paneb matti, aga mul on mõttes teine käik. Vaata uuesti.
 # A move that keeps an advantage, but less than the solution.
 ch.wrong.weaker = Pole paha, aga on midagi tugevamat. Vaata uuesti.
-ch.wrong.weaker.2 = Seda võib mängida, aga sa saad paremini.
+ch.wrong.weaker.2 = Seda võib mängida, aga sa suudad paremini.
 ch.wrong.stalemate = Patt! Minu kuningas ei saa käia ja see on ainult viik.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
 ch.wrong.draw = Mitte see: pärast käiku {move} suudan ma viigi hoida.

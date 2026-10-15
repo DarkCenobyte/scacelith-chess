@@ -105,11 +105,11 @@ ex.verdict.inaccuracy.b6 = {move} on ebatäpne; {best}.
 ex.verdict.inaccuracy.b6.2 = Ebatäpne. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} oli parem.
 # Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
-ex.verdict.inaccuracy.maybe = {best} oleks võinud olla veidi täpsem.
+ex.verdict.inaccuracy.maybe = {best} oli ehk veidi täpsem.
 ex.verdict.inaccuracy.maybe.2 = Mina oleksin ehk käinud {best}.
 # A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
 # under 6 points, the hedged word above unless a piece is lost).
-ex.verdict.dubious = See käik paistab kahtlane.
+ex.verdict.dubious = See käik näib kahtlane.
 ex.verdict.dubious.2 = See käik tundub kahtlane.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Oi, oota! Sul jäi midagi head märkamata.
@@ -168,7 +168,7 @@ ex.hint.gain.b6.2 = Vaata uuesti {your:own_part}: sellega sai materjali võita.
 # Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
 # when none can be made); levels 3-6 say ex.better.
 ex.reveal.b1 = Parem oli käia {your:own_com} väljale {sq}.
-ex.reveal.b1.2 = {your} võis minna väljale {sq}. See oli parem.
+ex.reveal.b1.2 = {your} oleks võinud minna väljale {sq}. See oli parem.
 ex.reveal.b2 = Käik {your:com} väljale {sq} oli parem.
 ex.reveal.b2.2 = Parem oli viia {your:own_nom} väljale {sq}.
 
@@ -206,9 +206,9 @@ ex.offer.b6 = Võtad tagasi?
 ex.offer.b6.2 = Käik tagasi?
 ex.offer.b6.3 = Uuesti?
 # A dubious move at levels 1-2, said with the takeback card; the better move is not named.
-ex.dubious.b1 = See käik on kahtlane. Äkki saad paremini?
+ex.dubious.b1 = See käik on kahtlane. Äkki suudad paremini?
 ex.dubious.b1.2 = See käik on kahtlane. Äkki leiad parema käigu?
-ex.dubious.b2 = Kahtlane käik. Äkki saad paremini?
+ex.dubious.b2 = Kahtlane käik. Äkki suudad paremini?
 ex.dubious.b2.2 = See käik on kahtlane. Äkki leidub midagi paremat?
 
 # ---- Demonstration narration: one short line per move shown on the board ------------------------
@@ -377,14 +377,14 @@ ex.stalemate.b1.2 = Vaata: {my:ade} pole ühtegi ohutut välja, aga ta pole tule
 ex.stalemate.b1.3 = See on patt. {my} ei saa käia, seega lõpeb partii viigiga.
 ex.stalemate.b2 = Patt! {my:ade} pole ühtegi lubatud käiku ja tuld ei ole. Viik.
 ex.stalemate.b2.2 = Oh ei, patt: {my} on kinni, aga mitte tule all.
-ex.stalemate.b2.3 = Patt tähendab viiki. {my} ei saa käia.
+ex.stalemate.b2.3 = See on viik pati tõttu. {my} ei saa käia.
 ex.stalemate.b3 = See on patt: {my:ade} pole ühtegi lubatud käiku. Sul oli võiduseis!
 ex.stalemate.b3.2 = Patt! {my} on kinni ja võidetud partii muutub viigiks.
 ex.stalemate.b3.3 = {my:ade} pole käike ja tuld pole: patt.
 ex.stalemate.b4 = Patt: {my:ade} pole ühtegi lubatud käiku. Sellega läheb võit käest.
 ex.stalemate.b4.2 = {move} paneb {my:all} patti. Viik võiduseisust.
 ex.stalemate.b4.3 = See on patt; {my} on täiesti kinni.
-ex.stalemate.b5 = {move} paneb {my:all} patti. Võit on läinud.
+ex.stalemate.b5 = {move} paneb {my:all} patti. Võit on käest läinud.
 ex.stalemate.b5.2 = Patt: {my:ade} pole välju.
 ex.stalemate.b5.3 = See on patt, {my} on kinni.
 ex.stalemate.b6 = Patt. {my:ade} pole käike.
@@ -693,9 +693,9 @@ ex.missed_fork.b6.2 = {best}: kahvel {t1:all} ja {t2:all}.
 # The rule of the square: "etturi ruut" ("väljaspool etturi ruutu").
 ex.promotion.b1 = {my} võib joosta väljale {sq} ja muunduda lipuks. {your} on liiga kaugel.
 ex.promotion.b1.2 = Vaata: miski ei takista {my:part} jõudmast väljale {sq}. {your} ei jõua sellele järele.
-ex.promotion.b1.3 = {my} on väljast {sq} {n:square_gen} kaugusel ja {your} on liiga aeglane.
+ex.promotion.b1.3 = {my} on {n:square_gen} kaugusel väljast {sq} ja {your} on liiga aeglane.
 ex.promotion.b2 = {my} jookseb väljale {sq} ja {your} ei jõua sellele järele.
-ex.promotion.b2.2 = {my} jõuab väljale {sq} {n:move_gen} pärast, {your} alles {n2:move_gen} pärast. Liiga aeglane.
+ex.promotion.b2.2 = {my} jõuab {n:move_gen} pärast väljale {sq}, {your} alles {n2:move_gen} pärast. Liiga aeglane.
 ex.promotion.b2.3 = Ettevaatust: {my} muundub väljal {sq} lipuks ja {your} on liiga kaugel.
 ex.promotion.b3 = {your} on väljaspool {my:gen} ruutu ega jõua sellele enne välja {sq} järele.
 ex.promotion.b3.2 = Võidujooks on kaotatud: {my} jõuab väljale {sq} enne {your:part}.
@@ -759,7 +759,7 @@ ex.bad_trade.b6 = Etturilõppmäng pärast jätku {line} on kaotatud.
 ex.bad_trade.b6.2 = Kaotatud etturilõppmäng: {line}.
 ex.bishop_pair.b5 = Selle vahetusega kaotad odapaari.
 ex.bishop_pair.b5.2 = Selle vahetusega loobud oma odapaarist; minu oma jääb alles.
-ex.bishop_pair.b6 = Odapaar on läinud.
+ex.bishop_pair.b6 = Odapaar läheb kaotsi.
 ex.bishop_pair.b6.2 = Odapaar ära antud.
 
 # ---- 17. Endgame technique -------------------------------------------------------------------------
@@ -861,7 +861,7 @@ tip.centre.b1 = Proovi kontrollida laua keskosa, näiteks välja {sq}.
 tip.centre.b1.2 = Tsenter on tähtis. Pane ettur või nupp välja {sq} lähedale.
 tip.centre.b1.3 = Keskel olevad malendid on tugevad. Sihi näiteks välja {sq} poole.
 tip.centre.b2 = Võitle tsentri eest: sellised väljad nagu {sq} on tähtsad.
-tip.centre.b2.2 = Sa annad mulle tsentri. Vaata välja {sq}.
+tip.centre.b2.2 = Sa loovutad mulle tsentri. Vaata välja {sq}.
 tip.centre.b3 = Sa ei võitle tsentri eest; väli {sq} on minu.
 tip.centre.b3.2 = Võitle tsentri eest välja {sq} ümbruses.
 # Endgame technique tips.
@@ -960,7 +960,7 @@ threat.piece.b1.3 = Ettevaatust, {my} tahab {your:gen} lüüa.
 threat.piece.b2 = Ettevaatust {your:own_com}.
 threat.piece.b2.2 = {your} on rünnaku all.
 threat.piece.b2.3 = Jälgi {your:own_part}.
-threat.punish.b1 = Minu viimane käik oli viga. Kas oskad seda karistada?
+threat.punish.b1 = Minu viimane käik oli viga. Kas oskad mind selle eest karistada?
 threat.punish.b1.2 = Hmm, ma vist tegin vea. Kas leiad selle?
 
 # ---- Takebacks ------------------------------------------------------------------------------------
