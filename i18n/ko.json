@@ -1,0 +1,805 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — 1인칭으로 두는 포토리얼 체스",
+      "description": "Windows, Linux, macOS용 무료 1인칭 포토리얼 체스: 왕실의 홀에서 Stockfish 19, 코치, 게임 분석, 온라인 플레이를 즐기세요."
+    },
+    "players": {
+      "title": "순위표와 플레이어 — Scacelith",
+      "description": "Scacelith 공식 서버의 레이팅 게임 시간 제한별 최상위 플레이어와 각 플레이어의 레이팅, 최근 게임."
+    },
+    "account": {
+      "title": "내 계정 — Scacelith",
+      "description": "Scacelith 계정에 로그인하여 레이팅, 게임 기록, PGN 및 GIF 다운로드, 로그인된 기기, 설정을 관리하세요."
+    },
+    "gif": {
+      "title": "애니메이션 GIF — Scacelith",
+      "description": "Scacelith 게임의 애니메이션 GIF."
+    },
+    "legal": {
+      "title": "법적 고지, 개인정보 보호 및 이용약관 — Scacelith",
+      "description": "Scacelith의 운영자와 호스팅 업체, 웹사이트·게임·공식 서버의 개인 데이터 처리, 이용자의 권리, 공식 서버의 규칙."
+    }
+  },
+  "brand": {
+    "tagline": "왕의 게임"
+  },
+  "nav": {
+    "skip": "본문으로 건너뛰기",
+    "home": "홈",
+    "label": "메인 메뉴",
+    "game": "게임",
+    "modes": "게임 모드",
+    "gallery": "갤러리",
+    "trailer": "트레일러",
+    "online": "온라인",
+    "players": "순위표",
+    "account": "계정",
+    "language": "언어",
+    "menu": "메뉴",
+    "download": "다운로드"
+  },
+  "hero": {
+    "image_alt": "햇살이 비치는 대리석 홀에서 도자기 로봇 두 대가 호두나무 테이블에 앉아 체스를 두고 있습니다.",
+    "lead": "햇살 가득한 왕실의 홀, 왁스로 윤을 낸 호두나무 테이블에 앉으세요. 체스판 건너편에서는 Stockfish로 움직이는 도자기 로봇이 첫 수를 기다리고 있습니다.",
+    "watch": "트레일러 보기",
+    "meta": "자유 소프트웨어 · Windows, Linux, macOS(실험 버전) · OpenGL 4.6 지원 그래픽 카드",
+    "caption": "게임 내 캡처: 왕실의 홀"
+  },
+  "highlights": {
+    "engine": "자체 개발 OpenGL 4.6 엔진",
+    "stockfish": "Stockfish 19 내장",
+    "rules": "FIDE 규칙",
+    "online": "온라인 플레이",
+    "languages": "34개 언어"
+  },
+  "experience": {
+    "eyebrow": "체험",
+    "title": "화면 속 체스판이 아닌,<br><em>테이블의 한 자리.</em>",
+    "lead": "Scacelith는 실제 대국을 이루는 것들을 되살립니다. 홀, 고요함, 시계, 눈을 마주치는 상대, 그리고 대회의 격식까지.",
+    "presence": {
+      "title": "1인칭 시점",
+      "text": "내 로봇의 눈으로 봅니다. 홀을 둘러보고, 체스판 위로 몸을 숙이고, 고개를 들어 상대를 보고, 기보지를 흘끗 보거나, 일어나서 테이블 끝으로 걸어갈 수 있습니다."
+    },
+    "ritual": {
+      "title": "대회 규칙",
+      "text": "손댄 기물은 반드시 움직여야 하며, 손으로 시계를 눌러야 수가 완료됩니다. “둘 수 있는 수 표시”를 끄면 불법 수에는 심판이 벌칙을 주고, 두 번째 불법 수를 두면 게임에서 집니다."
+    },
+    "scoresheet": {
+      "title": "손으로 쓰는 기보",
+      "text": "두 플레이어 모두 자기 기보지에 저마다의 필체로 모든 수를 기록하고, 40수마다 페이지를 넘깁니다. 종이 위를 지나는 펜 소리가 들립니다."
+    },
+    "opponent": {
+      "title": "만만치 않은 상대",
+      "text": "입문자(800)부터 Stockfish 최강(3500)까지, 내 수준에 맞춘 Stockfish 19와 둡니다. 게임이 끝날 때마다 FIDE 규칙에 따라 레이팅이 계산됩니다."
+    },
+    "engine": {
+      "title": "이 게임만을 위한 엔진",
+      "text": "처음부터 직접 만든 엔진: 물리 기반 조명, 대리석, 왁스 칠한 목재, 도자기와 황동, 창으로 들어오는 햇살, 부드러운 그림자와 반사. 매우 낮음부터 울트라까지의 품질 프리셋으로 그래픽 카드에 맞출 수 있습니다."
+    },
+    "languages": {
+      "title": "34개 언어",
+      "text": "영어, 프랑스어, 독일어, 스페인어, 포르투갈어(포르투갈·브라질), 이탈리아어, 네덜란드어, 스웨덴어, 덴마크어, 핀란드어, 에스토니아어, 라트비아어, 리투아니아어, 폴란드어, 체코어, 슬로바키아어, 슬로베니아어, 크로아티아어, 헝가리어, 루마니아어, 불가리아어, 그리스어, 튀르키예어, 우크라이나어, 러시아어, 아랍어, 힌디어, 인도네시아어, 베트남어, 한국어, 일본어, 중국어(간체·번체). 아랍어는 오른쪽에서 왼쪽으로 표시되며, 코치는 중국어를 제외한 모든 언어로 소리 내어 말합니다. 중국어에서는 코치의 말이 자막으로 표시됩니다."
+    }
+  },
+  "modes": {
+    "eyebrow": "게임 모드",
+    "title": "모든 게임에<br><em>저마다의 테이블.</em>",
+    "lead": "모든 게임은 타이틀 화면에서 시작해 같은 홀에서 진행됩니다. 오프라인에서도 Stockfish는 언제든 둘 준비가 되어 있습니다.",
+    "new_game": {
+      "name": "새 게임",
+      "text": "원하는 실력의 Stockfish와 불릿부터 클래식까지 다양한 시간 제한으로 두거나, 같은 컴퓨터에서 친구와 둘 수 있습니다. 두 사람은 각자 자기 로봇의 눈으로 봅니다."
+    },
+    "coach": {
+      "name": "코치",
+      "text": "맞은편에 앉은 선생님이 내 수준에 맞춰 두면서 게임을 함께 짚어 줍니다. 위협, 좋은 수, 실수를 알려 주고, 실수가 어떤 대가를 치르는지 직접 손으로 두어 보여 줍니다. 레벨은 체스 규칙부터 전문가까지이며, 목소리는 내 컴퓨터에서 합성됩니다."
+    },
+    "challenges": {
+      "name": "코치 챌린지",
+      "text": "포지션 몇 개로 이루어진 짧은 세트로, 세트마다 한 가지 기술을 훈련합니다. 1~3수 메이트, 포크와 핀을 비롯한 전술, 방어, 그리고 코치를 상대로 하는 기본 엔드게임. 힌트는 요청할 때만 나오며, 완료한 세트마다 초록색 체크 표시가 붙습니다."
+    },
+    "analysis": {
+      "name": "분석",
+      "text": "Stockfish가 저장된 게임, 내 온라인 게임, 어떤 PGN이든 검토합니다. 평가 막대, 묘수부터 블런더까지 표시된 주요 수, 화살표로 그려지는 더 좋은 수, 음성과 자막으로 나오는 해설까지. 수를 하나씩 넘기면 로봇의 손이 직접 수를 둡니다."
+    },
+    "online": {
+      "name": "온라인 플레이",
+      "text": "Scacelith 서버를 통해 실제 상대와 둡니다. 레이팅 게임, 매칭, 도전, 비공개 게임, 또는 두 컴퓨터를 바로 연결하는 다이렉트 매치. 상대의 로봇은 상대가 움직이는 대로 실시간으로 움직입니다."
+    },
+    "watch": {
+      "name": "게임 관전",
+      "text": "두 Stockfish가 맞붙는 동안 아무에게도 보이지 않는 채로 홀 안을 자유롭게 다니며 이 시점에서 저 시점으로 옮겨 볼 수 있습니다."
+    },
+    "saved": {
+      "name": "저장된 게임",
+      "text": "게임은 PGN 파일로 보관됩니다. 실제 생각 시간과 시계 그대로 홀에서 다시 보거나, 다른 프로그램의 게임을 가져올 수 있습니다."
+    }
+  },
+  "gallery": {
+    "eyebrow": "갤러리",
+    "title": "<em>홀 안</em>에서 본 모습",
+    "lead": "모든 이미지는 게임 안에서 자체 엔진으로 실시간 렌더링한 화면입니다.",
+    "title_screen": {
+      "alt": "타이틀 화면: 홀에서 체스를 두는 두 로봇 옆에 Scacelith 메뉴가 있습니다.",
+      "caption": "타이틀 화면"
+    },
+    "coach": {
+      "alt": "가슴에 “COACH”라고 적힌 도자기 로봇 코치가 체스판 너머에서 인사합니다. 코치의 말은 자막으로도 표시됩니다.",
+      "caption": "코치"
+    },
+    "challenges": {
+      "alt": "코치 챌린지 메뉴: 난이도와 완료 여부가 표시된 체크메이트·전술 세트 목록 옆에 선택한 세트의 설명이 있습니다.",
+      "caption": "코치 챌린지"
+    },
+    "analysis": {
+      "alt": "분석 모드: 평가 막대, 체스판에 그려진 화살표, 양쪽의 정확도와 함께 주석이 달린 수, 조작 방법 목록.",
+      "caption": "분석"
+    },
+    "game": {
+      "alt": "옆에서 본 모습. 한 로봇이 테이블 너머로 손을 뻗어 기물을 움직이고, 다른 로봇은 기다립니다. 잡힌 기물은 체스판 옆에 세워져 있습니다.",
+      "caption": "게임 관전"
+    },
+    "hall": {
+      "alt": "높은 창 아래, 붉은 벨벳 의자에 앉은 두 로봇이 체스판을 사이에 두고 마주 보고 있습니다.",
+      "caption": "왕실의 홀"
+    },
+    "opponent": {
+      "alt": "상대 도자기 로봇의 클로즈업. 체스판 쪽으로 고개를 숙이고 있습니다.",
+      "caption": "상대"
+    },
+    "scoresheet": {
+      "alt": "로봇의 손이 만년필로 기보지에 수를 적고 있습니다.",
+      "caption": "기보지"
+    },
+    "note": "버전 1.0.0. 이 이미지들의 인터페이스는 영어로 표시되어 있습니다.",
+    "viewer": "이미지 뷰어",
+    "close": "닫기",
+    "previous": "이전 이미지",
+    "next": "다음 이미지"
+  },
+  "trailer": {
+    "eyebrow": "트레일러",
+    "title": "<em>움직이는</em> Scacelith",
+    "soon_title": "트레일러 공개 예정",
+    "soon_text": "그동안 자리에 앉아 보세요. 게임은 지금 바로 다운로드할 수 있습니다.",
+    "privacy": "YouTube 플레이어에 동의하기 전에는 YouTube에서 아무것도 불러오지 않습니다.",
+    "open_youtube": "YouTube에서 보기"
+  },
+  "online": {
+    "eyebrow": "온라인",
+    "title": "실제 상대,<br><em>같은 홀.</em>",
+    "lead": "게임에서 공식 서버에 로그인하여 전 세계 사람들과 두세요. 물론 1인칭 그대로입니다.",
+    "point_rated": "모든 공식 시간 제한에서 레이팅 게임을 둘 수 있으며, 시간 제한마다 FIDE 규칙으로 계산되는 레이팅이 따로 있습니다.",
+    "point_match": "매칭, 사용자 이름으로 신청하는 도전, 코드로 만드는 비공개 게임. 서버도 계정도 없이 두 컴퓨터를 바로 연결하는 다이렉트 매치도 있습니다.",
+    "point_fair": "페어플레이: 자동 검사, 끝난 게임의 엔진 분석, 플레이어 신고.",
+    "point_history": "이 사이트에서 게임 기록을 보고, 각 게임을 PGN이나 애니메이션 GIF로 다운로드할 수 있습니다.",
+    "point_open": "누구나 커뮤니티 서버를 운영할 수 있습니다. 서버는 자유 소프트웨어이며 API 문서도 공개되어 있습니다.",
+    "create": "계정 만들기",
+    "signin": "로그인",
+    "server_title": "공식 서버",
+    "status_checking": "확인 중…",
+    "address": "주소",
+    "registration": "회원가입",
+    "categories": "레이팅 게임 시간 제한",
+    "top_players": "상위 플레이어",
+    "category": "시간 제한",
+    "board_loading": "순위표를 불러오는 중…",
+    "full_board": "전체 순위표"
+  },
+  "download": {
+    "button": "다운로드",
+    "choose": "시스템 선택",
+    "see_release": "GitHub에서 릴리스 보기",
+    "latest": "Scacelith",
+    "all_releases": "모든 릴리스",
+    "experimental": "실험 버전",
+    "source": "소스 코드",
+    "source_zip": "ZIP 압축 파일",
+    "eyebrow": "다운로드",
+    "title": "자리에 앉으세요.<br><em>무료, 그리고 오픈 소스.</em>",
+    "lead": "압축을 풀고 바로 플레이하세요. Windows와 Linux에서는 설치 프로그램이 필요 없고, Mac에서는 응용 프로그램 폴더로 끌어다 놓기만 하면 됩니다. 모든 파일은 GitHub Actions가 태그된 소스로 빌드하며, 빌드 출처가 증명되어 있습니다.",
+    "notes": "릴리스 노트",
+    "macos_note": "macOS 26 이상을 실행하는 Apple Silicon Mac(M1 이상)용이며, 가상 머신에서는 실행되지 않습니다. 다른 빌드보다 새롭고 테스트가 덜 되었습니다. 이 앱에는 등록된 Apple 개발자의 서명이 없으므로, 처음에는 시스템 설정 › 개인정보 보호 및 보안 › 확인 없이 열기에서 여세요.",
+    "req_system": "시스템",
+    "req_system_value": "Windows 64비트(x64); Linux 64비트(x86-64 또는 aarch64), glibc 2.34, OpenSSL 3, X11 또는 XWayland 필요(예: Ubuntu 22.04, Debian 12); Apple Silicon의 macOS 26 이상(실험 버전)",
+    "req_gpu": "그래픽",
+    "req_gpu_value": "OpenGL 4.6 지원 그래픽 카드와 최신 드라이버(Mac에서는 게임에 자체 OpenGL이 포함되어 있습니다)",
+    "req_included": "포함",
+    "req_included_value": "Stockfish 19와 신경망: 바로 오프라인으로 플레이할 수 있습니다",
+    "req_network": "인터넷",
+    "req_network_value": "온라인 플레이, GIF, 코치와 분석의 음성에 필요(음성은 선택 다운로드, 약 399 MB)",
+    "req_licence": "라이선스",
+    "req_licence_value": "GNU 일반 공중 사용 허가서 v3",
+    "verify_title": "다운로드 확인",
+    "verify_text": "각 파일의 빌드 출처는 GitHub가 증명합니다. GitHub CLI로 확인하려면:",
+    "checksums": "SHA-256 체크섬(SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "크레딧",
+    "title": "크레딧과 <em>감사의 말</em>",
+    "engine_head": "체스 엔진",
+    "engine": "Stockfish 19, Stockfish 개발자들 제작(GNU GPL v3). 신경망은 Leela Chess Zero 프로젝트가 제공한 데이터(Open Database License)로 학습되었습니다.",
+    "voice_head": "음성",
+    "voice": "Supertone의 Supertonic 3, BigScience Open RAIL-M 라이선스: 요청할 때 다운로드되며, 내 컴퓨터에서 코치와 분석의 목소리를 냅니다.",
+    "fonts_head": "서체",
+    "fonts": "Georg Duffner의 EB Garamond, Natanael Gama의 Cinzel, Khaled Hosny의 Amiri. 손글씨는 Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai(모두 SIL Open Font License). 체스 기물 기호는 GNU FreeFont.",
+    "openings_head": "오프닝과 퍼즐",
+    "openings": "오프닝 이름은 lichess.org의 chess-openings 데이터베이스에서, 코치 챌린지의 퍼즐은 Lichess 퍼즐 데이터베이스에서 가져왔으며, 둘 다 퍼블릭 도메인(CC0)으로 공개되어 있습니다.",
+    "quote": "“체스는 분석의 예술이다.”",
+    "quote_author": "미하일 보트비닉"
+  },
+  "footer": {
+    "about": "자체 개발한 OpenGL 4.6 엔진으로 만든, 1인칭으로 두는 포토리얼 체스 게임. GNU GPL v3에 따른 자유 소프트웨어입니다.",
+    "game": "게임",
+    "online": "온라인",
+    "api_docs": "서버 API 문서",
+    "source": "소스 코드",
+    "game_source": "GitHub의 게임",
+    "server_source": "GitHub의 서버",
+    "releases": "릴리스",
+    "licence": "라이선스(GPL v3)",
+    "credits": "Stockfish는 Stockfish 개발자들의 상표입니다. YouTube는 Google LLC의 상표입니다. Windows는 Microsoft Corporation의 상표입니다. macOS는 Apple Inc.의 상표입니다. Linux는 Linus Torvalds의 등록 상표입니다. OpenGL은 Hewlett Packard Enterprise의 등록 상표입니다.",
+    "legal": "Scacelith",
+    "made": "이 사이트는 쿠키를 설정하지 않으며 추적기도 사용하지 않습니다. YouTube 플레이어는 동의한 경우에만 불러옵니다.",
+    "legal_link": "법적 고지, 개인정보 보호 및 이용약관"
+  },
+  "common": {
+    "copy": "복사",
+    "loading": "불러오는 중…",
+    "noscript": "이 페이지에서 Scacelith 서버와 통신하려면 JavaScript가 필요합니다."
+  },
+  "players": {
+    "title": "순위표와 플레이어",
+    "lead": "공식 서버의 레이팅 게임 시간 제한별 최상위 플레이어입니다. 플레이어를 검색하면 레이팅과 최근 게임을 볼 수 있습니다.",
+    "search_label": "플레이어 찾기",
+    "search_placeholder": "사용자 이름",
+    "search_button": "검색",
+    "back": "순위표로 돌아가기",
+    "recent_games": "최근 게임",
+    "board_title": "순위표",
+    "category": "시간 제한",
+    "col_rank": "순위",
+    "col_player": "플레이어",
+    "col_rating": "레이팅",
+    "col_peak": "최고",
+    "col_games": "게임 수",
+    "col_wdl": "승 / 무 / 패",
+    "loading": "불러오는 중…"
+  },
+  "account": {
+    "title": "내 계정",
+    "auth_foot": "공식 서버의 계정 하나로 게임과 이 사이트를 모두 이용합니다. 게임에서 Google로 계정을 만드셨나요? “비밀번호를 잊으셨나요?”에서 비밀번호를 설정하세요.",
+    "common": {
+      "back": "로그인으로 돌아가기"
+    },
+    "fields": {
+      "login": "사용자 이름 또는 이메일",
+      "password": "비밀번호",
+      "show_password": "비밀번호 표시",
+      "username": "사용자 이름",
+      "email": "이메일",
+      "confirm_password": "비밀번호 확인",
+      "current_password": "현재 비밀번호",
+      "new_password": "새 비밀번호",
+      "new_email": "새 이메일 주소",
+      "mfa_code": "2단계 인증 코드(또는 복구 코드)"
+    },
+    "signin": {
+      "tab": "로그인",
+      "title": "다시 오신 것을 환영합니다",
+      "remember": "이 기기에서 로그인 상태 유지",
+      "submit": "로그인",
+      "forgot": "비밀번호를 잊으셨나요?",
+      "resend": "확인 이메일 다시 보내기"
+    },
+    "mfa": {
+      "title": "2단계 인증",
+      "text": "인증 앱에 표시된 6자리 코드를 입력하세요.",
+      "code": "인증 앱의 코드",
+      "use_recovery": "대신 복구 코드 사용",
+      "submit": "확인"
+    },
+    "google": {
+      "or": "또는",
+      "button": "Google로 로그인",
+      "username_title": "사용자 이름 정하기",
+      "username_text": "이 서버에서 처음 사용하는 Google 계정입니다. 다른 플레이어에게 보일 이름을 정하세요. 나중에 바꿀 수 없습니다.",
+      "username_submit": "내 계정 만들기",
+      "link_title": "Google 계정 연결",
+      "link_submit": "연결하고 로그인",
+      "returning": "Google로 로그인하는 중…"
+    },
+    "register": {
+      "tab": "계정 만들기",
+      "title": "무료 계정",
+      "closed": "현재 서버가 새 계정을 받지 않습니다.",
+      "username_hint": "문자, 숫자, _ 및 -만 쓸 수 있으며, 첫 글자는 문자나 숫자여야 합니다.",
+      "password_hint": "10자 이상이며, 사용자 이름이나 이메일을 포함할 수 없습니다.",
+      "pow_note": "로봇을 막기 위해 가입할 때 브라우저가 작은 퍼즐을 풉니다. 몇 초 걸립니다.",
+      "submit": "계정 만들기",
+      "done_title": "이메일을 확인하세요",
+      "done_text": "입력한 주소로 확인 링크를 보냈습니다. 링크를 열어 계정을 만든 다음 로그인하세요.",
+      "done_hint": "링크는 24시간 동안 유효합니다. 받은편지함에 없나요? 스팸 폴더를 확인하거나 이메일을 다시 요청하세요.",
+      "go_signin": "로그인하러 가기",
+      "legal_note": "사용자 이름, 레이팅, 게임은 공개됩니다. 계정을 만들면 이용약관에 동의하는 것으로 간주됩니다.",
+      "legal_link": "개인정보 보호 및 이용약관"
+    },
+    "forgot": {
+      "title": "비밀번호 찾기",
+      "text": "계정의 이메일 주소를 입력하세요. 해당 주소의 계정이 있으면 새 비밀번호를 정할 수 있는 링크를 보내 드립니다. 링크는 1시간 동안 유효합니다.",
+      "submit": "링크 보내기"
+    },
+    "resend": {
+      "title": "이메일 주소 확인",
+      "text": "확인 이메일을 받지 못했거나 링크가 만료되었나요? 주소를 입력하면 새 링크를 보내 드립니다.",
+      "submit": "다시 보내기"
+    },
+    "dash": {
+      "public_profile": "공개 프로필",
+      "signout": "로그아웃",
+      "tab_overview": "개요",
+      "tab_games": "게임",
+      "tab_devices": "기기",
+      "tab_settings": "설정"
+    },
+    "overview": {
+      "info": "내 정보",
+      "ratings": "내 레이팅",
+      "sanctions": "제재",
+      "recent": "최근 게임",
+      "all_games": "내 게임 모두 보기"
+    },
+    "games": {
+      "filter_category": "시간 제한",
+      "all": "전체",
+      "custom": "사용자 지정",
+      "filter_rated": "유형",
+      "rated": "레이팅",
+      "casual": "캐주얼",
+      "filter_result": "결과",
+      "wins": "승리",
+      "losses": "패배",
+      "draws": "무승부"
+    },
+    "devices": {
+      "title": "로그인된 기기",
+      "signout_all": "모든 기기에서 로그아웃",
+      "text": "게임이나 이 사이트에서 로그인할 때마다 기기 하나로 기록됩니다. 모르는 기기는 로그아웃하세요."
+    },
+    "settings": {
+      "challenges_title": "도전",
+      "challenges_text": "다른 플레이어가 게임에서 내 사용자 이름으로 도전을 신청할 수 있습니다.",
+      "challenges_label": "도전 받기",
+      "mfa_title": "2단계 인증",
+      "mfa_text": "켜기와 끄기, 새 복구 코드 발급은 게임의 계정 페이지에서 할 수 있습니다.",
+      "password_title": "비밀번호 변경",
+      "password_text": "다른 기기에서는 로그아웃되고, 이 기기는 로그인 상태가 유지됩니다.",
+      "password_submit": "비밀번호 변경",
+      "email_title": "이메일 주소 변경",
+      "email_submit": "확인 링크 보내기",
+      "export_title": "내 데이터 다운로드",
+      "export_text": "서버가 내 계정에 대해 보관하는 모든 정보를 JSON 파일 하나로 받습니다.",
+      "export_submit": "내 데이터 다운로드",
+      "delete_title": "계정 삭제",
+      "delete_text": "되돌릴 수 없습니다. 게임과 레이팅은 익명 이름으로 남고, 이메일 주소, 비밀번호, 기기는 삭제됩니다.",
+      "delete_confirm": "확인하려면 사용자 이름을 입력하세요",
+      "delete_submit": "내 계정 삭제"
+    }
+  },
+  "gif": {
+    "title": "애니메이션 GIF",
+    "preparing": "GIF 준비 중…",
+    "download": "GIF 다운로드",
+    "make": "GIF 만들기",
+    "pause": "애니메이션 일시 정지",
+    "back": "내 게임으로 돌아가기",
+    "options": "설정",
+    "size": "크기",
+    "size_small": "작음(284 × 350)",
+    "size_medium": "중간(424 × 515)",
+    "size_large": "큼(628 × 762)",
+    "orientation": "체스판 시점",
+    "orientation_white": "백",
+    "orientation_black": "흑",
+    "speed": "속도",
+    "speed_fast": "빠름(한 수에 0.25초)",
+    "speed_normal": "보통(한 수에 0.5초)",
+    "speed_slow": "느림(한 수에 1초)",
+    "speed_very_slow": "매우 느림(한 수에 2초)",
+    "coords": "좌표 표시",
+    "regenerate": "다시 만들기",
+    "note": "GIF는 서버가 그립니다. 이미 만든 GIF는 바로 다시 받을 수 있지만, 새 GIF는 1분에 몇 개까지만 만들 수 있습니다."
+  },
+  "notfound": {
+    "title": "페이지를 찾을 수 없습니다",
+    "text": "이 칸은 비어 있습니다. 페이지가 옮겨졌을 수 있습니다.",
+    "home": "Scacelith로 돌아가기"
+  },
+  "js": {
+    "common": {
+      "loading": "불러오는 중…",
+      "retry": "다시 시도",
+      "close": "닫기",
+      "copy": "복사",
+      "copied": "클립보드에 복사했습니다.",
+      "copy_failed": "복사할 수 없습니다. 텍스트를 선택해 직접 복사하세요.",
+      "load_more": "더 보기",
+      "show_password": "비밀번호 표시",
+      "hide_password": "비밀번호 숨기기",
+      "signin_needed": "계속하려면 로그인하세요.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "서버에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.",
+      "timeout": "서버 응답이 너무 오래 걸렸습니다. 다시 시도하세요.",
+      "server_busy": "서버가 혼잡합니다. 잠시 후 다시 시도하세요.",
+      "rate_limited": "요청이 너무 많습니다. {time} 후에 다시 시도하세요.",
+      "rate_limited_short": "요청이 너무 많습니다. 잠시 후 다시 시도하세요.",
+      "internal_error": "서버에 예기치 않은 오류가 발생했습니다. 나중에 다시 시도하세요.",
+      "invalid_token": "세션이 종료되었습니다. 다시 로그인하세요.",
+      "unauthorized": "로그인하세요.",
+      "not_found": "찾을 수 없습니다.",
+      "unknown": "문제가 발생했습니다({code}).",
+      "invalid_credentials": "사용자 이름, 이메일 또는 비밀번호가 잘못되었습니다.",
+      "too_many_attempts": "시도 횟수가 너무 많습니다. {time} 후에 다시 시도하세요.",
+      "banned": "이 계정은 {date}까지 정지되었습니다.",
+      "banned_permanent": "이 계정은 정지되었습니다.",
+      "email_unverified": "이메일 주소가 아직 확인되지 않았습니다. 보내 드린 링크를 열거나 새 링크를 요청하세요.",
+      "invalid_mfa_token": "이 로그인 단계가 만료되었습니다. 다시 로그인하세요.",
+      "invalid_code": "코드가 잘못되었거나 이미 사용되었습니다.",
+      "mfa_code_required": "2단계 인증 코드를 입력하세요.",
+      "invalid_password": "비밀번호가 틀렸습니다.",
+      "password_not_set": "이 계정에는 아직 비밀번호가 없습니다. 로그인 페이지의 “비밀번호를 잊으셨나요?”에서 비밀번호를 설정하세요.",
+      "registration_closed": "현재 서버가 새 계정을 받지 않습니다.",
+      "invalid_username": "사용할 수 없는 사용자 이름입니다.",
+      "username_taken": "이미 사용 중인 사용자 이름입니다.",
+      "invalid_email": "올바른 이메일 주소가 아닙니다.",
+      "email_taken": "이 이메일 주소는 이미 다른 계정에서 사용 중입니다.",
+      "same_email": "현재 사용 중인 이메일 주소와 같습니다.",
+      "weak_password": "비밀번호가 너무 약합니다.",
+      "weak_too_short": "비밀번호가 너무 짧습니다(최소 {min}자).",
+      "weak_too_long": "비밀번호가 너무 깁니다.",
+      "weak_contains_username": "비밀번호에 사용자 이름을 포함할 수 없습니다.",
+      "weak_contains_email": "비밀번호에 이메일 주소를 포함할 수 없습니다.",
+      "weak_too_common": "너무 흔한 비밀번호입니다. 다른 비밀번호를 정하세요.",
+      "pow_failed": "로봇 방지 확인에 실패했습니다. 다시 시도하세요.",
+      "passwords_differ": "두 비밀번호가 다릅니다.",
+      "required": "이 항목을 입력하세요.",
+      "email_format": "올바른 이메일 주소를 입력하세요.",
+      "username_format": "{min}~{max}자의 문자, 숫자, _ 및 -만 쓸 수 있으며, 첫 글자는 문자나 숫자여야 합니다.",
+      "password_length": "{min}자 이상이어야 합니다.",
+      "confirm_name": "표시된 그대로 사용자 이름을 입력하세요.",
+      "game_too_long": "이 게임은 너무 길어서 GIF로 만들 수 없습니다.",
+      "gif_disabled": "이 서버는 GIF를 만들지 않습니다.",
+      "render_failed": "서버가 이 GIF를 그리지 못했습니다.",
+      "invalid_game": "존재하지 않는 게임입니다.",
+      "invalid_player": "사용자 이름을 입력하세요: 문자, 숫자, _, ., - 2~24자.",
+      "player_not_found": "이 이름의 플레이어가 없습니다.",
+      "sso_cancelled": "Google 로그인이 취소되었습니다.",
+      "sso_mismatch": "이 Google 로그인은 이 탭에서 시작되지 않았거나 이미 사용되었습니다. 다시 시도하세요.",
+      "sso_expired": "이 Google 로그인이 만료되었습니다. 다시 시도하세요.",
+      "invalid_verifier": "이 Google 로그인은 다른 탭이나 브라우저에서 시작되었습니다. 이 페이지에서 다시 시작하세요.",
+      "sso_email_unverified": "Google에서 이 Google 계정의 이메일 주소를 확인하지 않았습니다.",
+      "sso_account_exists": "이 이메일 주소를 이미 사용하는 계정이 있지만, Google과 연결하는 데 필요한 비밀번호가 없습니다. “비밀번호를 잊으셨나요?”에서 비밀번호를 설정한 다음 다시 Google로 로그인하세요.",
+      "sso_failed": "Google 로그인을 완료할 수 없습니다. 다시 시도하세요.",
+      "sso_disabled": "이 서버에서는 Google 로그인을 사용할 수 없습니다.",
+      "sso_already_linked": "이 Google 계정은 이미 다른 계정에 연결되어 있습니다.",
+      "account_disabled": "이 계정은 더 이상 사용할 수 없습니다.",
+      "sso_storage": "브라우저가 Google 로그인에 필요한 이 사이트의 저장소를 차단하고 있습니다. 저장소를 허용하거나 비밀번호로 로그인하세요.",
+      "sso_url": "서버가 예상치 못한 Google 주소로 응답하여 Google 로그인을 중단했습니다."
+    },
+    "time": {
+      "seconds": {
+        "other": "{count}초"
+      },
+      "minutes": {
+        "other": "{count}분"
+      }
+    },
+    "download": {
+      "exe": "실행 파일",
+      "zip": "ZIP 압축 파일",
+      "dmg": "디스크 이미지",
+      "archive": "압축 파일",
+      "file": "파일",
+      "unavailable": "제공 안 됨",
+      "your_system": "내 시스템",
+      "eyebrow_release": "버전 {version}",
+      "published": "게시일: {date}",
+      "unreachable": "지금은 GitHub에 연결할 수 없습니다. 릴리스 페이지를 확인하세요.",
+      "available": "사용 가능",
+      "verify_file": "파일",
+      "no_build": "현재 {os}용 게임 빌드가 없습니다.",
+      "x64": "64비트(x64)",
+      "arch_x64": "Intel / AMD(x86-64)",
+      "arch_arm64": "Arm(aarch64)",
+      "several_arches": "64비트, Intel / AMD 또는 Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 이상",
+      "experimental": "실험 버전"
+    },
+    "server": {
+      "online": "온라인",
+      "offline": "연결 불가",
+      "busy": "혼잡",
+      "open": "가능",
+      "closed": "불가",
+      "updated": "{time} 업데이트",
+      "min_games": "이 시간 제한에서 레이팅 게임을 {count}판 이상 둔 플레이어입니다.",
+      "empty": "이 시간 제한에는 아직 순위에 오른 플레이어가 없습니다.",
+      "error": "지금은 순위표를 불러올 수 없습니다."
+    },
+    "game": {
+      "number": "게임 #{id}",
+      "white": "백",
+      "black": "흑",
+      "you": "나",
+      "vs": "대",
+      "outcome_win": "승리",
+      "outcome_loss": "패배",
+      "outcome_draw": "무승부",
+      "outcome_aborted": "중단됨",
+      "result_white": "백 승",
+      "result_black": "흑 승",
+      "result_draw": "무승부",
+      "result_aborted": "중단됨",
+      "rated": "레이팅",
+      "casual": "캐주얼",
+      "custom": "사용자 지정",
+      "moves": {
+        "other": "{count}수"
+      },
+      "duration": "소요 시간 {time}",
+      "rating_diff": "레이팅 변동 {diff}",
+      "pgn": "PGN",
+      "pgn_title": "게임을 PGN으로 다운로드",
+      "copy_pgn": "복사",
+      "copy_pgn_title": "PGN 복사",
+      "gif": "GIF",
+      "gif_title": "애니메이션 GIF 만들기(새 탭에서 열림)",
+      "gif_signin": "GIF를 만들려면 로그인하세요",
+      "pgn_copied": "PGN을 클립보드에 복사했습니다.",
+      "pgn_saved": "PGN을 다운로드했습니다.",
+      "none": "아직 게임이 없습니다. 온라인 게임이 여기에 표시됩니다.",
+      "none_filtered": "이 필터에 맞는 게임이 없습니다.",
+      "none_public": "아직 게임이 없습니다.",
+      "total": {
+        "other": "{count}판"
+      },
+      "termination_unknown": "게임 종료",
+      "reason": {
+        "1": "체크메이트",
+        "2": "기권",
+        "3": "시간 초과 패배",
+        "4": "두 번째 불법 수(몰수패)",
+        "5": "스테일메이트",
+        "6": "데드 포지션(기물 부족)",
+        "7": "시간 초과지만 상대가 체크메이트할 수 없음",
+        "8": "5회 동형 반복",
+        "9": "75수 규칙",
+        "10": "3회 동형 반복(요구)",
+        "11": "50수 규칙(요구)",
+        "12": "합의 무승부",
+        "13": "두 번째 불법 수지만 상대가 체크메이트할 수 없음",
+        "14": "기권했지만 상대가 체크메이트할 수 없음",
+        "20": "게임을 떠남(너무 오래 연결 끊김)",
+        "21": "게임을 떠났지만 상대가 체크메이트할 수 없음",
+        "22": "게임 중단",
+        "23": "제한 시간 안에 첫 수를 두지 않음(중단)",
+        "24": "몰수패(페어플레이 위반)",
+        "25": "서버가 중단함",
+        "26": "두 플레이어 모두 연결 끊김"
+      }
+    },
+    "ratings": {
+      "category": "시간 제한",
+      "rating": "레이팅",
+      "peak": "최고",
+      "games": "게임 수",
+      "wdl": "승 / 무 / 패",
+      "provisional": "임시 레이팅",
+      "none": "아직 레이팅 게임이 없습니다.",
+      "unrated_hint": "물음표는 임시 레이팅을 뜻합니다(아직 둔 게임이 적음)."
+    },
+    "account": {
+      "member_since": "가입일: {date}",
+      "last_login": "마지막 로그인",
+      "created": "생성일",
+      "email": "이메일",
+      "pending_email": "확인 대기 중: {email}",
+      "verified": "확인됨",
+      "unverified": "확인되지 않음",
+      "mfa": "2단계 인증",
+      "mfa_on": "켬",
+      "mfa_off": "끔",
+      "google": "Google 로그인",
+      "google_on": "연결됨",
+      "google_off": "연결 안 됨",
+      "password": "비밀번호",
+      "password_set": "설정됨",
+      "password_unset": "아직 설정 안 됨",
+      "challenges": "도전",
+      "challenges_all": "받음",
+      "challenges_none": "받지 않음",
+      "badge_verified": "이메일 확인됨",
+      "badge_mfa": "2단계 인증 켬",
+      "badge_google": "Google",
+      "ban_until": "계정이 {date}까지 정지되었습니다.",
+      "ban_permanent": "계정이 정지되었습니다.",
+      "sanction_ban": "정지",
+      "sanction_mm_block": "매칭 차단",
+      "sanction_warning": "경고",
+      "sanction_until": "{date}까지",
+      "sanction_permanent": "영구",
+      "devices_current": "이 기기",
+      "devices_unknown": "이름 없는 기기",
+      "devices_signed_in": "로그인: {date}",
+      "devices_seen": "마지막 사용: {time}",
+      "devices_expires": "만료: {date}",
+      "devices_revoke": "로그아웃",
+      "devices_revoked": "기기가 로그아웃되었습니다.",
+      "devices_none": "다른 기기가 없습니다.",
+      "signout_all_confirm": "이 기기를 포함한 모든 기기에서 로그아웃하시겠습니까?",
+      "signed_out": "로그아웃되었습니다.",
+      "signed_in": "{name} 님, 환영합니다.",
+      "prefs_saved": "저장되었습니다.",
+      "password_changed": "비밀번호가 변경되었습니다. 다른 기기에서는 로그아웃되었습니다.",
+      "email_sent": "새 주소로 확인 링크를 보냈습니다. 링크를 열면 주소가 바뀝니다.",
+      "email_changed": "이제 이메일 주소는 {email}입니다.",
+      "email_current": "현재 주소: {email}",
+      "email_pending": "{email} 주소로의 변경이 확인 링크를 기다리고 있습니다.",
+      "export_done": "데이터를 다운로드했습니다.",
+      "deleted": "계정이 삭제되었습니다.",
+      "delete_confirm_label": "확인하려면 다음을 입력하세요: {name}",
+      "register_done": "{email} 주소로 확인 링크를 보냈습니다. 링크를 열어 계정을 만든 다음 로그인하세요.",
+      "register_ready": "계정이 준비되었습니다. 로그인할 수 있습니다.",
+      "forgot_done": "이 주소를 사용하는 계정이 있다면 새 비밀번호를 정할 수 있는 링크가 발송되었습니다.",
+      "resend_done": "이 주소가 확인을 기다리고 있다면 새 링크가 발송되었습니다.",
+      "pow_solving": "로봇 방지 퍼즐을 푸는 중…",
+      "mfa_recovery": "복구 코드",
+      "mfa_recovery_text": "복구 코드 중 하나를 입력하세요. 각 코드는 한 번만 사용할 수 있습니다.",
+      "mfa_app": "인증 앱의 코드",
+      "mfa_app_text": "인증 앱에 표시된 6자리 코드를 입력하세요.",
+      "mfa_state_on": "이 계정은 2단계 인증이 켜져 있습니다.",
+      "mfa_state_off": "이 계정은 2단계 인증이 꺼져 있습니다.",
+      "client_label": "Scacelith 웹사이트({browser})",
+      "username": "사용자 이름",
+      "password_rules": "{min}자 이상이며, 사용자 이름이나 이메일을 포함할 수 없습니다.",
+      "password_note": "다른 기기에서는 로그아웃되고, 이 기기는 로그인 상태가 유지됩니다.",
+      "signin_label": "로그인",
+      "google_link_text": "{name} 계정이 이미 이 이메일 주소를 사용하고 있습니다. 이 계정의 비밀번호를 한 번 입력하여 Google과 연결하세요. 그 뒤로는 “Google로 로그인”만으로 충분합니다.",
+      "auth_foot_google": "공식 서버의 계정 하나로 게임과 이 사이트를 모두 이용합니다. 게임에서 Google로 계정을 만드셨나요? 여기서도 Google로 로그인하세요."
+    },
+    "players": {
+      "since": "가입일: {date}",
+      "games": "게임 수",
+      "rated": "레이팅 게임",
+      "wins": "승리",
+      "draws": "무승부",
+      "losses": "패배",
+      "view": "{name} 님의 프로필 보기",
+      "you": "나",
+      "board": "순위표"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "게임 #{id} · {date}",
+      "preparing": "GIF 준비 중…",
+      "rendering": "서버가 GIF를 그리는 중입니다. 긴 게임은 몇 초 걸릴 수 있습니다…",
+      "ready": "GIF가 준비되었습니다. 다운로드가 시작되었습니다.",
+      "ready_again": "GIF가 준비되었습니다.",
+      "signin": "게임의 GIF를 만들려면 로그인하세요.",
+      "signin_button": "로그인",
+      "missing": "선택한 게임이 없습니다.",
+      "retry_in": "{time} 후에 다시 시도할 수 있습니다.",
+      "confirm": "“GIF 만들기”를 누르면 서버가 내 계정으로 이 게임을 그립니다.",
+      "retry_now": "이제 다시 시도할 수 있습니다."
+    },
+    "home": {
+      "create_account": "계정 만들기",
+      "my_account": "내 계정",
+      "my_games": "내 게임",
+      "signin": "로그인"
+    },
+    "trailer": {
+      "title": "Scacelith 트레일러",
+      "notice": "이 동영상은 YouTube에서 호스팅됩니다. 여기서 재생하면 Google의 플레이어를 불러오며, 이 플레이어는 IP 주소를 받고 기기에 쿠키나 기타 추적기를 저장할 수 있습니다.",
+      "accept": "동의하고 재생",
+      "google_privacy": "Google 개인정보처리방침"
+    }
+  },
+  "legal": {
+    "eyebrow": "법적 정보",
+    "title": "법적 고지, 개인정보 보호 및 이용약관",
+    "lead": "Scacelith의 운영자와 호스팅 업체, 이 웹사이트와 게임, 공식 서버에서 이용자의 데이터가 어떻게 처리되는지, 그리고 공식 서버에서 게임을 할 때의 규칙을 설명합니다.",
+    "updated": "최종 수정일: 2026년 10월 11일",
+    "toc": "이 페이지의 내용",
+    "notice": {
+      "title": "법적 고지",
+      "publisher_label": "운영자",
+      "publisher": "Scacelith는 한 개인이 직업 활동이 아닌 개인 자격으로 운영합니다. 프랑스 법률이 허용하는 바에 따라(2004년 6월 21일 법률 제2004-575호 제1-1조 II) 운영자의 신원은 여기에 공개하지 않으며, 호스팅 업체는 운영자의 신원을 알고 있습니다.",
+      "contact_label": "연락처",
+      "contact": "이 웹사이트, 공식 서버 또는 개인 데이터에 관한 모든 문의.",
+      "host_server": "공식 게임 서버 및 계정 데이터",
+      "host_server_note": "서버는 프랑스에 있습니다.",
+      "host_site": "이 웹사이트와 API 문서(GitHub Pages)",
+      "host_domain": "도메인 이름 등록 대행자",
+      "licence_label": "라이선스",
+      "licence": "게임과 서버는 GNU 일반 공중 사용 허가서 v3에 따른 자유 소프트웨어이며, 소스 코드가 공개되어 있습니다:",
+      "game_source": "게임",
+      "server_source": "서버",
+      "phone": "전화"
+    },
+    "privacy": {
+      "title": "개인정보 보호",
+      "intro": "Scacelith는 광고를 표시하지 않고, 데이터를 판매하지 않으며, 방문자 수를 측정하지 않습니다. 개인 데이터는 아래에 설명한 대로 이 웹사이트와 공식 서버를 운영하는 데에만 사용됩니다. 개인정보 처리 책임자는 운영자이며, 위의 연락처 주소로 연락할 수 있습니다.",
+      "site_title": "이 웹사이트에서",
+      "site_hosting": "이 사이트는 GitHub가 호스팅하며, GitHub는 다른 웹 호스팅 업체와 마찬가지로 보안을 위해 방문자의 IP 주소를 기록합니다.",
+      "github_privacy": "GitHub 개인정보처리방침",
+      "site_requests": "최신 릴리스를 표시하기 위해 브라우저는 GitHub API(api.github.com)에 요청하고, 서버 상태, 순위표, 플레이어, 내 계정을 표시하기 위해 공식 서버(caissa.scacelith.com)에 요청합니다. 다른 모든 요청과 마찬가지로 두 곳 모두 IP 주소를 받습니다.",
+      "site_storage": "이 사이트는 쿠키를 설정하지 않으며 분석 도구도 사용하지 않습니다. 브라우저에는 선택한 언어와, 로그인한 경우의 세션만 보관합니다. 세션은 현재 탭에만 보관되며, “로그인 상태 유지”에 체크하면 이 기기에 보관됩니다. Google 로그인의 일회용 코드도 사용될 때까지 현재 탭에 보관됩니다. 이 모든 것은 사이트 작동에 필요하며, 세션과 코드를 받는 곳은 공식 서버뿐입니다.",
+      "site_trailer": "트레일러는 YouTube 동영상입니다. “동의하고 재생”을 누르기 전에는 YouTube에서 아무것도 불러오지 않습니다. 누르면 YouTube(Google)가 IP 주소를 받고 기기에 쿠키나 기타 추적기를 저장할 수 있습니다. 이 선택은 기억되지 않으므로 다음에 방문할 때 다시 묻습니다.",
+      "site_google": "계정 페이지의 “Google로 로그인”은 누르기 전까지 Google에서 아무것도 불러오지 않습니다. 누르면 브라우저가 Google 로그인 페이지(accounts.google.com)로 이동하고, Google은 일회용 코드와 함께 브라우저를 이 사이트로 돌려보내며, 사이트는 이 코드를 공식 서버에 전달합니다. Google은 IP 주소와 Google 페이지에 입력한 내용을 자체 정책에 따라 받습니다.",
+      "google_privacy": "Google 개인정보처리방침",
+      "game_title": "게임에서",
+      "game_local": "게임은 설정, 로컬 게임 결과, 로그인 정보를 이용자의 컴퓨터에 저장합니다. 로그인 정보는 시스템의 보안 저장소에 보관됩니다. Windows에서는 DPAPI, macOS에서는 키체인, Linux에서는 Secret Service 키링이며, 이를 쓸 수 없으면 해당 사용자 계정만 읽을 수 있는 파일에 보관합니다.",
+      "game_network": "게임은 스스로 아무것도 보내지 않습니다. 원격 측정도, 업데이트 확인도 없습니다. 공식 서버에는 온라인 페이지를 열 때만, Hugging Face에는 코치 음성을 다운로드할 때만 연결하며, 다이렉트 매치에서는 상대의 컴퓨터에 연결하므로 상대가 IP 주소를 알게 됩니다(게임이 UPnP로 공유기의 포트를 열 수도 있습니다).",
+      "account_title": "공식 서버의 계정",
+      "account_intro": "게임이나 이 웹사이트에서 계정을 만들고 온라인으로 게임을 하면, 다음 데이터가 OVH가 프랑스에서 호스팅하는 공식 서버로 전송됩니다:",
+      "data_account": "<strong>계정:</strong> 사용자 이름, 이메일 주소, 비밀번호(Argon2id 해시로만 저장), 2단계 인증 비밀 키(암호화)와 복구 코드(해시), 가입일, 마지막 로그인 날짜.",
+      "data_google": "<strong>Google로 로그인:</strong> Google이 Google 계정 식별자, 이메일 주소, 이름을 보냅니다. 서버는 식별자와 주소를 보관하며, 이름은 사용자 이름을 제안하는 데에만 사용합니다.",
+      "data_sessions": "<strong>로그인된 기기:</strong> 로그인마다 기기 이름(게임은 “Scacelith/1.0.0 win64”처럼 게임 버전과 시스템, 이 웹사이트는 브라우저와 시스템), IP 주소, 사용 날짜.",
+      "data_games": "<strong>게임과 레이팅:</strong> 모든 온라인 게임(플레이어, 수, 각 수에 쓴 시간, 결과, 날짜)과 이용자의 레이팅. 게임 중 머리와 손의 움직임은 상대에게 실시간으로 전달될 뿐 저장되지 않습니다.",
+      "data_security": "<strong>보안 로그:</strong> 로그인, 실패한 시도, 계정 변경 내역과 그 IP 주소.",
+      "data_fairplay": "<strong>페어플레이:</strong> 이용자가 제출했거나 이용자에 대해 제출된 신고와 그 설명, 포기하거나 불참한 게임, 제재, 그리고 위조되거나 불가능한 수의 검출부터 Stockfish 엔진의 통계까지 게임에 대해 실시하는 검사.",
+      "basis_title": "처리 목적과 법적 근거",
+      "basis_contract": "계정과 온라인 플레이 운영(로그인, 대국, 레이팅, 게임 기록, 서비스가 보내는 이메일): 이용자가 가입한 서비스의 제공(GDPR 제6조 제1항 (b)).",
+      "basis_security": "계정과 서버 보호 및 공정한 게임 유지(보안 로그, IP 주소, 페어플레이 검사, 제재): 운영자와 플레이어의 정당한 이익(GDPR 제6조 제1항 (f)).",
+      "basis_trailer": "YouTube 트레일러 재생: 버튼으로 표시한 이용자의 동의(GDPR 제6조 제1항 (a)).",
+      "public_title": "누구나 볼 수 있는 정보",
+      "public": "사용자 이름, 가입일, 레이팅, 모든 수를 포함한 전체 게임 목록은 이 웹사이트, 서버의 API, 각 게임의 PGN을 통해 공개됩니다. 이메일 주소, 기기, 로그인 기록, 제재, 페어플레이 기록은 절대 표시되지 않습니다. 직접 도전은 거절할 수 있지만, 게임을 숨길 수는 없습니다.",
+      "auto_title": "자동화된 결정",
+      "auto": "위조된 메시지나 해당 포지션에서 불가능한 수처럼 게임 프로토콜을 위반하는 일부 행위는 부정행위의 확실한 증거입니다. 이 경우 서버는 그 게임을 몰수패로 처리하고, 계정을 24시간 정지하고, 순위표에서 제외하며, 최근 60일 동안 상대들이 그 계정에 잃은 점수를 돌려줍니다. 24시간 안에 게임을 3번 포기, 중단 또는 불참하면 레이팅 매칭이 15분 동안 일시 중지되며, 그 뒤로는 중지 시간이 더 길어집니다. 엔진 통계만으로는 절대 제재하지 않으며, 사람이 결정합니다. 모든 결정에 대해 연락처 주소로 재검토를 요청할 수 있습니다.",
+      "recipients_title": "데이터를 받는 곳",
+      "recipient_ovh": "OVH SAS는 프랑스에서 서버와 그 데이터를 호스팅합니다.",
+      "recipient_scaleway": "Scaleway SAS(8 rue de la Ville-l'Évêque, 75008 Paris, France)는 서버의 이메일을 발송하며, 이용자의 이메일 주소, 사용자 이름, 메시지 내용을 받습니다.",
+      "recipient_google": "Google은 이용자가 Google로 로그인하기로 선택했을 때 브라우저가 보내는 정보를 자체 개인정보처리방침에 따라 받습니다.",
+      "recipient_staff": "서버 관리자와 모더레이터는 서비스 운영을 위해 계정 및 페어플레이 데이터를 봅니다.",
+      "recipient_players": "다른 플레이어는 공개된 정보를 보고, 상대는 게임 중 이용자의 수와 움직임을 봅니다.",
+      "recipient_none": "그 밖에는 아무도 받지 않습니다. 데이터는 판매되거나 대여되지 않으며 광고에 사용되지 않습니다.",
+      "transfers": "계정 데이터는 프랑스에 머뭅니다. GitHub, Google, Porkbun(연락처 주소로 보낸 메시지를 전달함)은 미국에 본사가 있으며, 이들이 받는 정보에는 각 회사의 정책과 유럽 연합 밖으로의 이전에 대한 각 회사의 보호 조치가 적용됩니다.",
+      "retention_title": "보관 기간",
+      "ret_account": "<strong>계정:</strong> 이용자가 삭제할 때까지. 주소가 끝내 확인되지 않은 가입은 24시간 후 삭제됩니다.",
+      "ret_sessions": "<strong>로그인된 기기:</strong> 로그아웃할 때까지. 30일 동안 사용하지 않으면 그 시점에 삭제되며, 길어도 90일을 넘기지 않습니다.",
+      "ret_ip": "<strong>IP 주소:</strong> 30일 후 삭제됩니다. 서버 로그에는 일부를 줄인 주소만 남습니다.",
+      "ret_security": "<strong>보안 로그:</strong> 90일.",
+      "ret_conduct": "<strong>포기하거나 불참한 게임:</strong> 30일.",
+      "ret_games": "<strong>게임과 레이팅:</strong> 서버가 게임 기록을 보관하는 동안. 이 기록은 상대의 기록이기도 합니다. 계정을 삭제하면 기록 속 이름은 “deleted#” 뒤에 번호가 붙은 이름으로 바뀝니다.",
+      "ret_fairplay": "<strong>제재, 신고, 페어플레이 검사 결과:</strong> 정지된 플레이어가 쉽게 돌아오지 못하게 하고 다른 플레이어를 계속 보호하기 위해 보관합니다. 계정을 삭제하면 계정 번호에만 연결된 채 남습니다.",
+      "ret_backups": "<strong>백업:</strong> 삭제된 데이터는 서버의 백업 사본이 교체될 때까지 잠시 그 안에 남아 있을 수 있습니다.",
+      "ret_contact": "<strong>연락처 주소로 보낸 메시지:</strong> 답변하는 데 필요한 기간.",
+      "rights_title": "이용자의 권리",
+      "rights": "이용자는 자신의 데이터에 접근하고 데이터를 정정, 삭제하거나 내보낼 수 있으며, 처리를 제한하거나 처리에 반대할 수 있습니다(GDPR 제15조~제21조).",
+      "rights_self": "대부분은 게임이나 이 웹사이트의 계정 페이지에서 직접 할 수 있습니다. 계정 데이터를 JSON 파일로 다운로드하고, 이메일 주소나 비밀번호를 변경하고, 다른 기기를 로그아웃하거나, 계정을 즉시 삭제할 수 있습니다.",
+      "rights_google": "Google로 만든 계정에는 비밀번호가 없습니다. 계정을 내보내거나 삭제하려면 먼저 “비밀번호를 잊으셨나요?”에서 비밀번호를 설정하세요.",
+      "rights_mail": "그 밖의 모든 요청은, 내보내기에 포함되지 않는 데이터(페어플레이 검사, 이용자에 대한 신고)에 관한 요청을 포함해 연락처 주소로 보내세요. 한 달 안에 답변해 드립니다.",
+      "rights_cnil": "권리가 존중되지 않는다고 생각되면 CNIL(3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) 또는 거주 국가의 데이터 보호 기관에 민원을 제기할 수 있습니다.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "이용약관",
+      "intro": "이 약관은 공식 서버(caissa.scacelith.com)와 이 웹사이트의 계정 페이지에 적용됩니다. 계정을 만들거나 공식 서버에서 게임을 하면 이 약관에 동의하는 것으로 간주됩니다.",
+      "service": "<strong>무료 서비스.</strong> 게임은 무료 자유 소프트웨어입니다. 공식 서버는 무료로, 있는 그대로 제공되며 가용성을 보장하지 않습니다. 서버는 변경되거나, 일시 중지되거나, 종료될 수 있습니다.",
+      "account": "<strong>계정.</strong> 계정으로 이루어지는 모든 일과 비밀번호를 비밀로 유지하는 것은 이용자의 책임입니다. 다른 사람이 계정을 사용한다고 생각되면 즉시 연락처 주소로 연락하세요.",
+      "username": "<strong>사용자 이름</strong>은 공개됩니다. 모욕적이거나 혐오를 조장하는 이름, 다른 사람을 사칭하는 이름, 누군가의 개인 데이터를 드러내는 이름은 사용할 수 없습니다.",
+      "fair": "<strong>페어플레이.</strong> 레이팅 게임 중에는 체스 엔진, 다른 사람, 그 밖의 어떤 도구의 도움도 받을 수 없습니다. 수정된 게임 클라이언트, 위조된 메시지, 서버에 고의로 과부하를 거는 행위도 금지됩니다.",
+      "conduct": "<strong>게임은 끝까지 두세요.</strong> 24시간 안에 게임을 포기하거나 중단하거나 매칭된 게임에 불참한 횟수가 3번이 되면, 레이팅 매칭이 한동안 일시 중지됩니다.",
+      "reports": "<strong>신고</strong>는 선의로 해야 합니다. 플레이어나 모욕적인 사용자 이름 같은 불법 콘텐츠를 신고하려면 게임의 신고 버튼을 사용하거나 연락처 주소로 연락하세요.",
+      "sanctions": "<strong>제재.</strong> 이 규칙을 어기면 몰수패, 경고, 정지, 순위표 제외로 이어질 수 있으며, 부정행위자에게 잃은 점수는 그 상대들에게 돌려줍니다. 부정행위의 확실한 증거가 있을 때만 자동으로 제재하며, 그 밖의 경우는 사람이 결정합니다. 제재에 대한 이의는 연락처 주소로 제기할 수 있습니다.",
+      "liability": "<strong>책임.</strong> 법률이 허용하는 범위 내에서 운영자는 서비스 중단이나 게임, 레이팅, 데이터의 손실에 대해 책임지지 않습니다.",
+      "end": "<strong>이용 종료.</strong> 계정은 언제든지 삭제할 수 있습니다. 이 약관을 위반한 계정은 정지될 수 있습니다.",
+      "changes": "<strong>변경.</strong> 이 약관은 변경될 수 있습니다. 이 페이지 상단의 날짜가 현재 버전을 나타내며, 변경 후에도 계속 게임을 하면 변경에 동의하는 것으로 간주됩니다.",
+      "law": "<strong>준거법.</strong> 이 약관에는 프랑스 법이 적용됩니다. 분쟁이 생기면 함께 해결책을 찾을 수 있도록 먼저 연락처 주소로 연락하세요."
+    },
+    "version_note": "이 페이지는 여러 언어로 제공됩니다. 언어별 내용이 다를 경우 프랑스어판이 우선합니다."
+  }
+}
