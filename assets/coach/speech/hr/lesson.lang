@@ -144,7 +144,7 @@ lesson.setup.corners = Svaka partija počinje ovako: topovi u {@}kutovima, pa {@
 lesson.setup.queen = Dama stoji na polju svoje boje: tvoja dama je na svijetlom polju.
 lesson.setup.king = Kralj stoji pokraj nje. Bijeli uvijek povlači prvi potez.
 lesson.first.ask = Počni partiju: pomakni pješaka ispred svog kralja dva polja naprijed, na {sq}.
-lesson.first.wrong = I to je ispravan potez! Ali zasad, molim te, odigraj kraljevim pješakom na {sq}.
+lesson.first.wrong = I to je pravilan potez! Ali zasad, molim te, odigraj kraljevim pješakom na {sq}.
 lesson.first.ok = Sjajan prvi potez: otvara put tvojoj dami i lovcu.
 lesson.first.reply = Odgovaram na isti način. Sad razvij skakača: skoči s polja {sq} na {sq2}.
 lesson.first.knight_wrong = Skakači preskaču pješake. Pokušaj s polja {sq} na {sq2}.
@@ -233,7 +233,7 @@ lesson.promo.ok = Nova dama! Možeš čak imati i dvije dame odjednom.
 
 # ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
 lesson.stale.what = Ja sam na potezu. Moj kralj nije u šahu, ali {@}svako polje oko njega je napadnuto.
-lesson.stale.draw = Nemam nijedan dopušten potez. To je pat i partija je remi.
+lesson.stale.draw = Nemam nijedan pravilan potez. To je pat i partija je remi.
 lesson.stale2.ask = Kad dobivaš, čuvaj se pata. Daj mi mat u jednom potezu, bez pata!
 lesson.stale2.wrong = Daj šah na mom zadnjem redu, odakle moj kralj ne može pobjeći.
 lesson.stale2.ok = Mat! Uvijek ostavi protivničkom kralju neki potez, osim ako mu daješ mat.
@@ -251,9 +251,9 @@ lesson.talk.clock = Ovo je {@}šahovski sat. Svaki igrač ima svoje vrijeme, koj
 lesson.talk.press = Nakon svog poteza pritisneš sat istom rukom. Time pokrećeš moje vrijeme.
 lesson.talk.flag = Ako ti istekne vrijeme, gubiš, osim ako ti ja nikako ne mogu dati mat.
 lesson.talk.increment = Pet plus tri znači pet minuta za svakog igrača, plus tri sekunde nakon svakog poteza.
-# The time controls are named as on the new-game page (assets/i18n/hr.lang tc.*): blitz, brzi šah
-# (rapid, the Croatian federation's term), klasični šah.
-lesson.talk.speeds = Kratke partije igraju se u blitzu, dulje u brzom šahu, a najdulje u klasičnom šahu.
+# The time controls are named as on the new-game page (assets/i18n/hr.lang tc.*): Brzopotezni (blitz),
+# Ubrzani (rapid), Klasični (classical): "brzopotezni / ubrzani / klasični šah".
+lesson.talk.speeds = Kratke partije igraju se u brzopoteznom šahu, dulje u ubrzanom šahu, a najdulje u klasičnom šahu.
 lesson.talk.no_clock = Sa mnom je sat isključen. Razmišljaj koliko god ti treba.
 lesson.talk.touch = U pravoj partiji, ako dodirneš neku svoju figuru, moraš ju pomaknuti.
 lesson.talk.touch_mine = Ako dodirneš neku moju figuru, moraš ju uzeti, ako možeš.

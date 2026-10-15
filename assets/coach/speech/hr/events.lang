@@ -33,12 +33,12 @@ event.colour.black.2 = Ovaj put igraš crnima: ja povlačim prvi potez.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names (coach.level.<n>.name) chosen for assets/i18n/hr.lang: Prvi koraci, Početnik,
-# Napredni početnik, Klupski igrač, Jaki klupski igrač, Stručnjak.
+# Napredni početnik, Klupski igrač, Jak klupski igrač, Stručnjak.
 event.level.l1 = Prvi koraci: igram lagano i svaku pogrešku objašnjavam jednostavnim riječima.
 event.level.l2 = Početnik: igram malo jače i imenujem jednostavne taktičke motive poput vilica i vezanja.
 event.level.l3 = Napredni početnik: govorim o planovima i pješačkoj strukturi i pokazujem kratke varijante.
 event.level.l4 = Klupski igrač: dajem procjene u pješacima i predlažem poteze kandidate.
-event.level.l5 = Jaki klupski igrač: kratki komentari, a dulje varijante kad je važno.
+event.level.l5 = Jak klupski igrač: kratki komentari, a dulje varijante kad je važno.
 event.level.l6 = Stručnjak: igram najbolje što mogu i komentiram samo kritične trenutke.
 
 # ---- Turn-taking -------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ event.takeback.declined.3 = Kako želiš. Nastavimo.
 # After an explanation without an offer.
 event.play_on = Igrajmo dalje.
 event.play_on.2 = Nastavimo.
-event.play_on.3 = A sada natrag našoj partiji.
+event.play_on.3 = A sad se vratimo našoj partiji.
 
 # ---- Encouragement -------------------------------------------------------------------------------------
 # After the player's mistake has been explained (never mocking; praise the process, not the person).

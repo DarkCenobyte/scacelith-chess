@@ -86,7 +86,7 @@ an.only.win.2 = Samo {move} ovdje zadržava prednost. Dobro pronađeno.
 an.only.hold = {move} je jedini potez koji održava ravnotežu.
 an.only.hold.2 = Samo {move} ovdje drži poziciju.
 an.only.defend = {move} je jedini potez kojim se borba nastavlja.
-an.only.defend.2 = Samo {move} ovdje drži partiju živom. Dobra obrana.
+an.only.defend.2 = Samo {move} ovdje održava partiju na životu. Dobra obrana.
 an.only.best = {move} je ovdje daleko najjači potez.
 an.only.best.2 = Precizno: {move} je mnogo jači od svega ostalog.
 

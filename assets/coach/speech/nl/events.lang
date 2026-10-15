@@ -104,6 +104,6 @@ event.end.handshake = Laten we elkaar de hand schudden.
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang): a lower-case noun phrase that fits
 # after "met", "bij" and a colon.
 event.lesson.resume = Welkom terug! We gaan verder met {chapter}.
-event.lesson.resume.2 = Hallo weer! We waren gebleven bij {chapter}.
+event.lesson.resume.2 = Daar ben je weer! We waren gebleven bij {chapter}.
 event.lesson.next = Hierna: {chapter}.
 event.lesson.next.2 = En nu: {chapter}.
