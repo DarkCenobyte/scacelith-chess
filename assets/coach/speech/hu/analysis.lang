@@ -13,7 +13,7 @@
 # - Counted numbers (common.lang): {m:move_ine} "3 lépésben" (mate in 3), {m:move_adj} "3 lépéses",
 #   {pts:point_acc} "3 pontot", {pts:point_nyi} anyagot "3 pontnyi anyagot", {n:mistake} "2 hiba",
 #   {n:mistake_acc} "2 hibát", {m:blunder_acc} "1 baklövést", {acc_white:percent} "85%".
-# - "Forced mate" = kényszerített matt.
+# - "Forced mate" = forszírozott matt (as in review.lang); "to force mate" = kikényszeríti a mattot.
 
 # ---- The start ------------------------------------------------------------------------------------
 an.start = Nézzük át együtt ezt a játszmát.
@@ -44,8 +44,8 @@ an.missed_chance.2 = {move} lépéssel elúszik a lehetőség.
 # What it allows ({reply} is the other side's answer).
 an.mate_allowed.one = Most {reply:nomate} mattot ad.
 an.mate_allowed.one.2 = Erre jöhet {reply:nomate}, és az matt.
-an.mate_allowed = Ez kényszerített mattot tesz lehetővé {m:move_ine}, kezdve ezzel: {reply:nomate}.
-an.mate_allowed.2 = Most kényszerített matt van {m:move_ine}, kezdve ezzel: {reply:nomate}.
+an.mate_allowed = Ez {m:move_adj} forszírozott mattot enged, kezdve ezzel: {reply:nomate}.
+an.mate_allowed.2 = Most forszírozott matt van {m:move_ine}, kezdve ezzel: {reply:nomate}.
 an.fork = Most {reply} villával támadja {t1:acc} és {t2:acc}.
 an.fork.2 = Erre jöhet {reply}, amely egyszerre támadja {t1:acc} és {t2:acc}.
 an.fork.3 = {reply} egyszerre támadja {t1:acc} és {t2:acc}.
@@ -59,7 +59,7 @@ an.material.2 = Ezután {line}, és ez {pts:point_acc} nyer.
 an.mate_missed.one = {best:nomate} mattot adott volna.
 an.mate_missed.one.2 = {best:nomate} matt lett volna.
 an.mate_missed = {best:nomate} lépéssel kikényszeríthető lett volna a matt {m:move_ine}.
-an.mate_missed.2 = Volt kényszerített matt {m:move_ine}, kezdve ezzel: {best:nomate}.
+an.mate_missed.2 = Volt forszírozott matt {m:move_ine}, kezdve ezzel: {best:nomate}.
 an.missed_capture = {best} ingyen megnyerte volna {piece:acc}.
 an.missed_capture.2 = {piece:dat} nem volt védője: {best} leütötte volna.
 an.missed_fork = {best} villával támadta volna {t1:acc} és {t2:acc}.
@@ -75,7 +75,7 @@ an.better.3 = {best} pontosabb volt.
 an.brilliant = {move} briliáns lépés: feláldozza {piece:acc}!
 an.brilliant.2 = Briliáns áldozat! {move} felajánlja {piece:acc}.
 an.brilliant.3 = {move}! Briliáns lépés, amely felajánlja {piece:acc}.
-an.brilliant.mate = Ez kényszerített matthoz vezet {m:move_ine}.
+an.brilliant.mate = Ez {m:move_adj} forszírozott matthoz vezet.
 an.brilliant.mate.2 = És kikényszeríti a mattot {m:move_ine}.
 # The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
 # or simply far better than anything else.
@@ -95,9 +95,9 @@ an.interesting = {move} érdekes ötlet: felajánlja {piece:acc}.
 an.interesting.2 = Érdekes próbálkozás: {move} odaadja {piece:acc}.
 
 # ---- A forced mate appears -----------------------------------------------------------------------------
-an.mate_on.white = Világosnak most {m:move_adj} kényszerített mattja van.
+an.mate_on.white = Világosnak most {m:move_adj} forszírozott mattja van.
 an.mate_on.white.2 = Innen világos kikényszerítheti a mattot {m:move_ine}.
-an.mate_on.black = Sötétnek most {m:move_adj} kényszerített mattja van.
+an.mate_on.black = Sötétnek most {m:move_adj} forszírozott mattja van.
 an.mate_on.black.2 = Innen sötét kikényszerítheti a mattot {m:move_ine}.
 
 # ---- The end: how the game ended, then the accuracy and the errors of each side --------------------

@@ -1,0 +1,139 @@
+# Coach speech (Latvian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 pozīcijas", count.position in
+#            common.lang); "Mate in N" is "Mats {n:move_loc}" ("Mats 2 gājienos", "mats vienā
+#            gājienā"), "for N moves" is "{n:move_gen} garumā" ("5 gājienu garumā"). A count at the
+#            start of an intro is followed by a colon, never by a word agreeing with it (its number
+#            changes with the count: "21 pozīcija", "6 pozīcijas")
+#   {move}   one of the coach's moves, played on the board while the line is said, after "ar",
+#            "pēc" or as it is; "{move:nomate}" says a mating move without "mats" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use "savs": {your:refl_acc} = "savu zirgu", "savu dāmu"
+#   {sq}     a square, after the noun "lauciņš" in its case ("uz lauciņu {sq}"); the coach points
+#            at it on that word
+# The player always has the white pieces. The coach says "tu" to the player and is male; the
+# player's gender is unknown (finite verbs only). "Mati" (plural of "mats") also means "hair", so
+# the titles say "mats" in the singular.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mats vienā gājienā. {n:position}: katrā matu piesaka viens vienīgs gājiens. Pārbaudi visus šahus.
+ch.intro.mate2 = Mats divos gājienos. {n:position}: tavam pirmajam gājienam jāatstāj mani bez aizsardzības, pēc tam tu piesaki matu.
+ch.intro.mate3 = Mats trijos gājienos. {n:position}. Šahi, ņemšanas un draudi: katru reizi aprēķini manu labāko atbildi.
+ch.intro.backrank = Mats pa pēdējo horizontāli. {n:position}: karalis ir iesprostots aiz saviem bandiniekiem.
+ch.intro.patterns = Mata motīvi. {n:position} ar klasiskiem mata tīkliem. Atpazīsti motīvu un dod triecienu.
+ch.intro.hanging = Neaizsargātas figūras. {n:position}: kāda no manām figūrām ir palikusi bez aizsardzības. Atrodi to un paņem.
+ch.intro.fork = Dakšas. {n:position}: atrodi gājienu, kas uzbrūk diviem mērķiem vienlaikus.
+ch.intro.pin = Piesaistes. {n:position}: piesaisti figūru vai izmanto piesaisti.
+ch.intro.skewer = Iesmi. {n:position}: uzbrūc vērtīgai figūrai un iegūsti to, kas stāv aiz tās.
+ch.intro.discovered = Atklātie uzbrukumi. {n:position}: pārvieto vienu figūru, lai atbrīvotu ceļu citai.
+ch.intro.deflection = Novirzīšana un pievilināšana. {n:position}: novirzi aizsargu prom vai ievilini to liktenīgā lauciņā.
+ch.intro.intermezzo = Starpgājieni. {n:position}: pirms acīmredzamā gājiena atrodi spēcīgāku.
+ch.intro.trapped = Ieslēgtas figūras. {n:position}: vienai no manām figūrām nav droša lauciņa, kur iet. Iegūsti to.
+ch.intro.promotion = Bandinieka pārvēršana. {n:position}: partiju izšķir tālu pavirzīts bandinieks.
+ch.intro.quiet = Klusie gājieni. {n:position}: uzvarošais gājiens nav ne šahs, ne ņemšana.
+ch.intro.opening = Atklātnes slazdi. {n:position} no īstu partiju pirmajiem gājieniem. Sodi mani par kļūdu.
+ch.intro.escape = Atrodi glābiņu. {n:position}: tavs karalis ir briesmās, un to izglābj tikai viens gājiens.
+ch.intro.defend = Aizsardzības gājieni. {n:position}: atrodi vienīgo gājienu, kas notur tavu pozīciju.
+ch.intro.kq = Dāma un karalis pret karali. {n:position}: piesaki matu manam karalim. Uzmanies no pata.
+ch.intro.kr = Tornis un karalis pret karali. {n:position}: piesaki matu manam karalim, soli pa solim.
+ch.intro.kp = Karalis un bandinieks pret karali. {n:position}: pārvērt bandinieku dāmā. Lai ceļu rāda tavs karalis.
+ch.intro.kp_hold = Aptur bandinieku. {n:position}: tev ir tikai karalis. Noturi neizšķirtu.
+ch.intro.rook = Torņu galotnes. {n:position}: uzbūvē tiltu, lai pārvērstu bandinieku, un noturi neizšķirtu ar Filidora aizsardzību.
+ch.intro.endgame = Galotņu taktika. {n:position}: maz figūru, asas idejas.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Mats {n:move_loc}.
+ch.task.mate.2 = Atrodi matu {n:move_loc}.
+ch.task.hanging = Kaut kas ir palicis bez aizsardzības.
+ch.task.hanging.2 = Ko tu vari paņemt par velti?
+ch.task.fork = Atrodi dakšu.
+ch.task.fork.2 = Meklē dakšu.
+ch.task.pin = Šeit galvenais ir piesaiste.
+ch.task.skewer = Šeit uzvar iesms.
+ch.task.discovered = Šeit uzvar atklātais uzbrukums.
+ch.task.deflection = Pārslogo vai pievilini aizsargu.
+ch.task.intermezzo = Meklē starpgājienu.
+ch.task.trapped = Viena no manām figūrām nevar aizbēgt. Iegūsti to.
+ch.task.promotion = Izmanto savu tālu pavirzīto bandinieku.
+ch.task.quiet = Uzvarošais gājiens ir kluss gājiens.
+ch.task.opening = Sodi mani par pēdējo gājienu.
+ch.task.escape = Glāb savu karali: der tikai viens gājiens.
+ch.task.defend = Atrodi vienīgo labo gājienu.
+ch.task.endgame = Atrodi labāko gājienu.
+ch.task.default = Atrodi labāko gājienu.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Piesaki matu manam karalim. Es aizsargāšos, cik labi vien varu.
+ch.task.play.promote = Pārvērt savu bandinieku un nosargā uzvaru. Es mēģināšu tev traucēt.
+ch.task.play.hold = Noturi neizšķirtu {n:move_gen} garumā. Es mēģināšu uzvarēt.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Šīs pozīcijas ir no īstām partijām. Es izdaru pēdējo gājienu, un tad ir tava kārta.
+ch.lead.first.2 = Katra pozīcija ir no īstas partijas: es izdaru gājienu, kas pie tās noveda, un tad spēlē tu.
+ch.next = Nākamā pozīcija.
+ch.next.2 = Lūk, nākamā.
+ch.next.3 = Pārejam pie nākamās.
+ch.last = Pēdējā pozīcija.
+ch.last.2 = Un tagad pēdējā.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Labi.
+ch.good.2 = Jā.
+ch.good.3 = Pareizi.
+ch.good.4 = Tieši tā.
+# The position is solved.
+ch.solved = Tieši tā! Labi padarīts.
+ch.solved.2 = Pilnīgi pareizi.
+ch.solved.3 = Ļoti labi.
+ch.solved.mate = Mats! Labi padarīts.
+ch.solved.mate.2 = Un tas ir mats. Ļoti labi.
+ch.solved.mate.3 = Mats. Skaisti izdarīts.
+ch.solved.promote = Jauna dāma, un uzvara ir drošībā. Labi padarīts.
+ch.solved.hold = Neizšķirts nosargāts. Laba aizsardzība!
+ch.solved.draw = Uz galdiņa ir neizšķirts. Laba aizsardzība!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Ne šis gājiens: es atbildētu ar {move}.
+ch.wrong.reply.2 = Ne gluži: mana atbilde būtu {move}.
+ch.wrong.reply.3 = Tad es spēlētu {move}.
+ch.wrong.mate = Uzmanīgi: {move:nomate} būtu mats.
+ch.wrong.mate.2 = Uzmanies: es atbildētu ar {move:nomate}, un tas būtu mats.
+ch.wrong.mated = Uzmanīgi: pēc {move} man ir forsēts mats {m:move_loc}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Arī šis gājiens ved pie mata, bet ilgāk. Ir ātrāks ceļš.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Arī šis gājiens ved pie mata, bet man prātā ir cits gājiens. Paskaties vēlreiz.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Nav slikti, bet ir kaut kas spēcīgāks. Paskaties vēlreiz.
+ch.wrong.weaker.2 = Tā var spēlēt, bet tu vari labāk.
+ch.wrong.stalemate = Pats! Mans karalis nevar paiet, un tas ir tikai neizšķirts.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Ne šis gājiens: pēc {move} es varu nosargāt neizšķirtu.
+ch.wrong.loses = Uzmanīgi: pēc {move} uzvaroša pozīcija būtu man.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Tas nav tas.
+ch.try_again = Mēģini vēlreiz.
+ch.try_again.2 = Paskaties vēl.
+ch.try_again.3 = Paskaties vēlreiz.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Vai gribi mājienu?
+ch.offer.2 = Iedot tev mājienu?
+ch.no_hint = Labi. Meklē tālāk.
+ch.no_hint.2 = Labi, nesteidzies.
+ch.hint.piece = Paskaties uz {your:refl_acc}.
+ch.hint.piece.2 = Padomā par {your:refl_acc}.
+ch.hint.square = Paskaties uz lauciņu {sq}.
+ch.hint.square.2 = Galvenais lauciņš ir {sq}.
+ch.hint.square.3 = Pievērs uzmanību lauciņam {sq}.
+ch.hint.show = Lūk, gājiens. Skaties.
+ch.hint.show.2 = Ļauj man parādīt. Skaties.
+ch.hint.now = Tagad izdari to tu.
+ch.hint.now.2 = Tava kārta: atkārto to.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Viss izaicinājums ir pabeigts. Labi padarīts!
+ch.complete.2 = Visas pozīcijas ir atrisinātas. Lieliski!

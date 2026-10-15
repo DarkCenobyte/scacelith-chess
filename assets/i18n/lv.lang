@@ -1,0 +1,249 @@
+# Scacelith - Latviešu
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms, in this order:
+# zero (0, 10-20, 30...: n%10 = 0 or n%100 = 11-19)|one (1, 21, 31...: n%10 = 1 but not 11)|other.
+# A "zero" number does not decline: alone (nominative) its noun is in the genitive plural
+# ("10 partiju", as the coach files count); after a preposition the noun takes that preposition's
+# case ("pēc 10 gājieniem", "pēc 1 gājiena", "pēc 3 gājieniem").
+# Register: formal "jūs" (lowercase mid-sentence), as Latvian Microsoft/Apple software; buttons and
+# menu entries in the infinitive ("Saglabāt", "Padoties"); sentence case, titles in capitals.
+# The player's gender is unknown: finite verbs ("Jūs uzvarējāt", "Jūs izrakstījāties"), never a
+# participle or adjective agreeing with the player. A name placeholder never takes a case ending:
+# it stands in the nominative ("{0}: karodziņš nokrita", "Vai {0} padodas?").
+# Chess terms: glossary of the translation (Latvijas Šaha federācija): karalis, dāma, tornis, laidnis,
+# zirgs, bandinieks (K D T L Z); šahs, mats, pats, neizšķirts, rokāde, partija, pieraksta lapa.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Ieslēgts
+common.off = Izslēgts
+common.back = Atpakaļ
+common.apply = Lietot
+common.discard = Atmest
+common.cancel = Atcelt
+common.white = Baltie
+common.black = Melnie
+common.main_menu = Galvenā izvēlne
+# Decimal separator of numbers ("2,5 s"); percent without a space ("85%").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Karaliskā spēle
+menu.new_game = Jauna partija
+menu.options = Opcijas
+menu.credits = Veidotāji
+menu.quit = Iziet
+menu.version = Versija {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPCIJAS
+options.tab.display = Ekrāns
+options.tab.graphics = Grafika
+options.tab.audio = Skaņa
+options.tab.gameplay = Spēle
+options.tab.player = Spēlētājs
+options.tab.controls = Vadība
+options.pending = Izmaiņas stāsies spēkā pēc to lietošanas.
+options.unsaved.title = NESAGLABĀTAS IZMAIŅAS
+options.unsaved.text = Dažas opcijas ir mainītas. Vai lietot tās pirms iziešanas?
+
+options.language = Valoda
+options.language.help = Izvēlņu un ziņojumu valoda. Tā mainās uzreiz.
+options.display_mode = Attēlošanas režīms
+options.display_mode.help = Pilnekrāns: logs bez rāmja pāri visam ekrānam, ar darbvirsmas izšķirtspēju. Logā: logs ar zemāk norādīto izmēru.
+options.fullscreen = Pilnekrāns
+options.windowed = Logā
+options.window_size = Loga izmērs
+options.window_size.help = Loga izmērs režīmā „Logā”. Pilnekrānā vienmēr tiek izmantota darbvirsmas izšķirtspēja.
+options.vsync = Vertikālā sinhronizācija
+options.vsync.help = Sinhronizē kadrus ar displeju, lai novērstu attēla plīsumus.
+options.render_scale = Renderēšanas mērogs
+options.render_scale.help = 3D attēla iekšējā izšķirtspēja. Zemāka ir ātrāka, augstāka — asāka.
+
+options.quality = Kvalitāte
+options.quality.very_low = Ļoti zema
+options.quality.low = Zema
+options.quality.medium = Vidēja
+options.quality.high = Augsta
+options.quality.ultra = Ultra
+options.quality.custom = Pielāgota
+options.quality.help = Iestata visas zemāk esošās opcijas uzreiz: „Ļoti zema” izslēdz visus efektus, „Ultra” iestata visus uz maksimumu. Ja kādu opciju maina atsevišķi, kvalitāte kļūst „Pielāgota”. Ar pieticīgu grafikas karti ļoti palīdz arī renderēšanas mēroga samazināšana (cilnē „Ekrāns”).
+options.shadows = Ēnas
+options.shadows.help = Saules ēnu detalizācija un to malu maigums. Zema: vienkāršas malas, ātri zīmējamas.
+options.reflections = Atspulgi
+options.reflections.help = Grīdā, galdā un galdiņā atspoguļojas zāle (katram tā tiek zīmēta vēlreiz: viena no prasīgākajām opcijām); sākot ar līmeni „Vidēja”, arī spīdīgās figūras un priekšmeti atspoguļo apkārtni.
+options.ambient_occlusion = Apkārtējā aizsegšana
+options.ambient_occlusion.help = Maigs ēnojums vietās, kur priekšmeti saskaras, un padziļinājumos, kur iekļūst mazāk gaismas.
+options.indirect_light = Netiešā gaisma
+options.indirect_light.help = Dienas gaisma, kas atstarojas no sienām, grīdas un griestiem. Zema: tās vietā vienmērīga apkārtējā gaisma. Ietekmē galvenokārt ielādes laiku.
+options.volumetric_light = Gaismas stari
+options.volumetric_light.help = Saules stari zāles putekļainajā gaisā un tajos mirdzošās putekļu kripatiņas.
+options.tessellation = Teselācija
+options.tessellation.help = Gludas figūru izliekumu kontūras, skatoties no tuvuma.
+options.tessellation.unavailable = Nav pieejama: šis grafikas draiveris neatbalsta teselāciju.
+options.antialiasing = Malu nogludināšana
+options.antialiasing.help = Nogludina robainas malas un mirgojošus atspīdumus. Izslēgts: asāks, bet robains attēls, un daži efekti izskatās graudaini.
+options.depth_of_field = Asuma dziļums
+options.depth_of_field.help = Izpludina to, kas atrodas krietni priekšā vai aiz tā, uz ko skatāties, kā to dara kameras objektīvs.
+options.motion_blur = Kustības izplūdums
+options.motion_blur.help = Izpludina straujas kameras un roku kustības, kā to dara kinokamera.
+options.bloom = Mirdzums
+options.bloom.help = Maigs mirdzums ap spožākajiem atspīdumiem, kā kameras objektīvā.
+options.brightness = Spilgtums
+options.brightness.neutral = Neitrāls
+options.brightness.value = {0} EV
+options.brightness.help = Kameras ekspozīcijas korekcija. Pirmās palaišanas kalibrācija to iestata tā, lai tumšākās ēnas būtu tik tikko saskatāmas.
+
+options.master_volume = Galvenais skaļums
+options.effects = Efekti
+options.ambience = Fona skaņas
+options.ambience.help = Zāles klusās skaņas: uguns, tāli soļi, vecais pulkstenis.
+options.ambience_volume = Fona skaņu skaļums
+options.voice_volume = Balss skaļums
+options.voice_volume.help = Trenera balss skaļums trenera režīmā.
+options.subtitles = Subtitri
+options.subtitles.auto = Automātiski
+options.subtitles.help = Trenera vārdi, rakstīti ekrāna apakšā. Automātiski: tiek rādīti, ja treneris nerunā izvēlņu valodā (ar ķīniešu izvēlnēm viņš runā angliski). Vienmēr tiek rādīti, ja trenera balss nav instalēta.
+
+options.legal_moves = Rādīt atļautos gājienus
+options.legal_moves.help = Izgaismo lauciņus, uz kuriem var iet aizskartā figūra. Ja izslēgts, nekas nenorāda, vai gājiens ir atļauts: par neatļautu gājienu tiesnesis soda, tiklīdz nospiežat pulksteni.
+options.coordinates = Galdiņa koordinātas
+options.auto_press = Automātiski nospiest pulksteni
+options.auto_press.help = Jūsu robots pats nospiež pulksteni, tiklīdz jūsu gājiens ir uz galdiņa. Tiešsaistes partijās to nosaka serveris, bet tiešajā mačā — spēlētājs, kurš to rīko.
+options.thinking_time = Reālistisks domāšanas laiks
+options.thinking_time.help = Pretinieks domā kā cilvēks, nevis izdara gājienu acumirklī.
+options.ignore_head = Ignorēt pretinieka galvas kustības
+options.ignore_head.help = Tiešsaistes partijās un tiešajos mačos pretinieka robots skatās turp, kur skatās tā spēlētājs. Ja ieslēgts, robots kustina galvu pats, kā spēlējot pret Stockfish.
+options.mouse_sensitivity = Peles jutība
+options.invert_look = Apvērst vertikālo skatu
+options.handover = Skata maiņa starp spēlētājiem
+options.handover.cut = Tūlītēja pārslēgšana
+options.handover.flight = Pārlidojums, {0} s
+options.handover.help = Divi spēlētāji pie viena datora: kā pēc katra gājiena skats pāriet no viena spēlētāja acīm uz otra acīm. Tūlītēja pārslēgšana novērš kameras kustību.
+options.game_cursor = Spēles rādītājs
+options.game_cursor.help = Pie galda spēle zīmē savu rādītāju, kas parāda, ko darīs klikšķis. Izslēgts: parastā sistēmas bultiņa.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Vārds
+player.name.help = Jūsu vārds, kā tas rakstīts pieraksta lapu augšā, jebkurā alfabētā.
+player.default_name = Cilvēks
+player.handwriting = Rokraksts
+player.handwriting.help = Roka, kas raksta jūsu gājienus. Arābu, japāņu un ķīniešu valodai ir savs rokraksts.
+player.preview = JŪSU PIERAKSTA LAPĀ
+hand.caveat = Ikdienas
+hand.marck = Saistītais
+hand.badscript = Slīpais
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+# Actions in the infinitive, as menu commands; key names as printed on Latvian keyboards.
+controls.touch.keys = Kreisais klikšķis
+controls.touch = Pieskarties figūrai, tad to pārvietot
+controls.clock.keys = Atstarpe  vai  klikšķis uz pulksteņa
+controls.clock = Nospiest pulksteni
+controls.look.keys = Turēt labo peles pogu
+controls.look = Skatīties apkārt
+controls.sheet.keys = S
+controls.sheet = Paskatīties pieraksta lapā un atpakaļ
+controls.stand.keys = ↑
+controls.stand = Piecelties kājās pie sava krēsla
+controls.side.keys = ←  /  →
+controls.side = Nostāties pie galda kreisā / labā gala
+controls.sit.keys = ↓
+controls.sit = Apsēsties atpakaļ (spēlēt var tikai sēžot)
+controls.moves.keys = Tab
+controls.moves = Rādīt vai paslēpt gājienu sarakstu
+controls.menu.keys = Esc
+controls.menu = Izvēlne
+controls.coach_skip.keys = Atstarpe
+controls.coach_skip = Treneris: izlaist trenera teikto
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Treneris: atsaukt gājienu, kad tas tiek piedāvāts
+controls.coach_hint.keys = H
+controls.coach_hint = Trenera izaicinājumi: lūgt mājienu
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = SPILGTUMS
+calibration.text = Pārvietojiet slīdni, līdz zirgs uz melnā lauciņa ir tik tikko saskatāms vai vairs nav saskatāms.
+calibration.later = Vēlāk to varat mainīt sadaļā Opcijas > Grafika.
+calibration.continue = Turpināt
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = JAUNA PARTIJA
+newgame.opponent = PRETINIEKS
+newgame.time_control = LAIKA KONTROLE
+newgame.start = Sākt
+newgame.elo = ~{0} Elo
+newgame.you_white = Jūs spēlēsiet ar baltajiem.
+newgame.you_black = Jūs spēlēsiet ar melnajiem.
+newgame.colour_lot = Pirmajā partijā krāsas tiek izlozētas.
+newgame.colour_alternate = Pēc tam krāsas mainās katrā nākamajā partijā.
+newgame.opponent_kind = Pretinieks
+newgame.opponent_kind.help = Spēlējiet pret Stockfish vai pret draugu pie šī datora: gājienus izdarāt pēc kārtas, katrs no savas galdiņa puses.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Cilvēks pie šī datora
+
+# Custom opponent: Stockfish parameters
+engine.skill = Prasmes līmenis
+engine.skill.help = Stockfish parametrs „Skill Level” (0–20). Netiek ņemts vērā, kamēr spēku ierobežo Elo.
+engine.limit_elo = Ierobežot spēku (Elo)
+engine.limit_elo.help = UCI_LimitStrength: dzinējs tiecas spēlēt zemāk norādītā Elo reitinga līmenī.
+engine.elo = Elo
+engine.depth = Meklēšanas dziļums
+engine.plies = {0} pusgājienu|{0} pusgājiens|{0} pusgājieni
+engine.move_time = Laiks gājienam
+engine.nodes = Mezglu limits
+engine.no_limit = Neierobežots
+engine.thousand = {0} tūkst.
+engine.million = {0} milj.
+engine.dynamic_elo = Dinamisks Elo atkarībā no laika
+engine.dynamic_elo.help = Kā cilvēks, Stockfish spēlē vājāk, kad pulkstenī atliek maz laika: nedaudz vājāk pēdējā minūtē (ātrspēlē un zibspēlē agrāk), daudz vājāk laika trūkumā. Tikai partijās ar pulksteni.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish domā tik ilgi kā sava līmeņa cilvēks. Lai izlaistu šo pauzi: Opcijas > Spēle > Reālistisks domāšanas laiks.
+engine.pace.instant = Stockfish izdara gājienu, tiklīdz aprēķins ir pabeigts. Cilvēcīgām pauzēm: Opcijas > Spēle > Reālistisks domāšanas laiks.
+
+# Time controls ("3+2": minutes + increment in seconds)
+# Latvian Chess Federation names: zibspēle (blitz), ātrspēle (rapid), klasiskais šahs (classical).
+# tc.custom / viewer.custom agree with "laika kontrole" (feminine).
+tc.unlimited = Bez ierobežojuma
+tc.no_clock = Bez pulksteņa
+tc.bullet = Bullets
+tc.blitz = Zibspēle
+tc.rapid = Ātrspēle
+tc.classical = Klasiskais šahs
+tc.custom = Pielāgota
+tc.your_own = Pēc izvēles
+tc.base_time = Pamatlaiks
+tc.base_time.help = Sākuma laiks katrā pulkstenī (minūtes : sekundes).
+tc.increment = Pieskaitījums
+tc.increment.help = Fišera pieskaitījums, ko pievieno pēc katra gājiena.
+tc.delay = Aizture
+tc.delay.help = Bronšteina aizture: pēc katra gājiena tiek atdots izlietotais laiks, bet ne vairāk par šo aizturi.
+tc.no_delay = Nav
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, aizture {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Jaunpienācējs
+preset.novice.desc = Tikko apguvis gājienus: atstāj figūras neaizsargātas un neredz vienkāršus draudus.
+preset.beginner.name = Iesācējs
+preset.beginner.desc = Zina pamatus, bet joprojām regulāri zaudē materiālu rupjās kļūdās.
+preset.casual.name = Amatieris
+preset.casual.desc = Mierīgs pretinieks vakaram: saprātīgi gājieni, biežas kļūdas.
+preset.club_player.name = Kluba spēlētājs
+preset.club_player.desc = Stabils kluba spēlētājs, kas soda par acīmredzamām rupjām kļūdām.
+preset.advanced.name = Pieredzējis
+preset.advanced.desc = Spēcīgs kluba spēlētājs ar labu taktisko redzējumu.
+preset.expert.name = Eksperts
+preset.expert.desc = Turnīru eksperts: kļūdās reti, pārsvaru realizē.
+preset.master.name = Meistars
+preset.master.desc = Meistara spēks: dziļš aprēķins un smalka pozicionālā spēle.
+preset.grandmaster.name = Lielmeistars
+preset.grandmaster.desc = Lielmeistara līmenis: ārkārtīgi grūti uzvarams.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 ar pilnu spēku. Lai veicas!
+preset.custom.name = Pielāgots
+preset.custom.desc = Jūsu pašu dzinēja iestatījumi.

@@ -10,7 +10,7 @@
 event.greet.l1 = Sveiki! Uzspēlēsim draudzīgu partiju. Es palīdzēšu ikreiz, kad kaut kas noies greizi.
 event.greet.l1.2 = Čau! Es spēlēšu saudzīgi un parādīšu, kam jāpievērš uzmanība.
 event.greet.l1.3 = Laipni lūdzam! Nesteidzies: es pateikšu, kad kāda figūra būs briesmās.
-event.greet.l2 = Sveiki! Spēlēsim. Kad parādīsies dakša vai piesaiste, es tev to parādīšu.
+event.greet.l2 = Sveiki! Spēlēsim. Kad radīsies dakša vai piesaiste, es tev to parādīšu.
 event.greet.l2.2 = Čau! Attīsti savas figūras un sargā savu karali. Es palīdzēšu pa ceļam.
 event.greet.l2.3 = Atkal pie galdiņa! Seko līdzi dakšām un piesaistēm: ar tām uzvar partijas.
 event.greet.l3 = Sveiki! Uzspēlēsim īstu partiju. Es komentēšu tavus plānus un lielākās kļūdas.
@@ -20,7 +20,7 @@ event.greet.l4 = Sveiki! Šoreiz es došu novērtējumus un parādīšu labākos
 event.greet.l4.2 = Spēlēsim. Pēc kļūdas es pateikšu, kas būtu bijis precīzāk.
 event.greet.l4.3 = Uzspēlēsim kā klubā? Es komentēšu, kad mainīsies novērtējums.
 event.greet.l5 = Spēlēsim. Mani komentāri būs īsi.
-event.greet.l5.2 = Esmu gatavs, sāc, kad vēlies. Tikai īsi komentāri.
+event.greet.l5.2 = Esmu gatavs — sāc, kad vēlies. Tikai īsi komentāri.
 event.greet.l5.3 = Veiksmi! Runāšu tikai tad, kad tas būs svarīgi.
 event.greet.l6 = Veiksmi.
 event.greet.l6.2 = Sākam.

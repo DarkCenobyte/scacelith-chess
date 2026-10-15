@@ -1,0 +1,271 @@
+# Coach speech (Latvian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("tavs tornis", "mans zirgs"),
+# with the forms of common.lang ({my:acc}, {my:dat}, {my:gen}, {your:pron}, {your:pron_acc},
+# {your:this}, piesiet{your:adj} ...). When the player acts with their own piece the imperative takes
+# "savs": {your:refl_acc} = "savu torni" ("Izmanto savu torni", never "tavu").
+# {sq}, {sq2}, {to}, {esc} = squares, after a preposition ("uz {sq}") or the noun "lauciņš"
+# ("lauciņam {sq}"), never with an ending; {move} = a move. {@}, {@2}, {@3} are invisible marks:
+# the coach points at something while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: letters said with their Latvian names).
+# The player's gender is unknown: no participle or adjective agrees with the player ("tev bija
+# uzvaroša pozīcija", not "tu biji uzvarējis"). Files = vertikāles, ranks = horizontāles, back rank =
+# pēdējā horizontāle; to block a check = aizsegties.
+
+# ---- Chapter titles (said inside "Turpināsim ar tēmu „{chapter}”.") ----------------------------------
+# Capitalised nominatives: event.lesson.* (events.lang) quotes them after "tēma".
+lesson.title.welcome = Šaha galdiņš
+lesson.title.pieces = Kā iet figūras
+lesson.title.safety = Droša un nedroša ņemšana
+lesson.title.check = Šahs
+lesson.title.mate = Mats
+lesson.title.castling = Rokāde
+lesson.title.en_passant = Ņemšana garāmejot
+lesson.title.promotion = Bandinieka pārvēršana
+lesson.title.draws = Pats un neizšķirts
+lesson.title.etiquette = Īstas partijas: reitings, pulkstenis un pieklājība
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Tagad pamēģini tu.
+lesson.now_you.2 = Tagad tava kārta.
+lesson.now_you.3 = Tagad tu.
+# Another wrong move after the demonstration.
+lesson.almost = Gandrīz! Izdari gājienu, ko es tev parādīju.
+lesson.almost.2 = Ne gluži. Atkārto gājienu, ko es nodemonstrēju.
+lesson.almost.3 = Tuvu. Atceries, ko es tikko parādīju.
+# A wrong move without a line of its own.
+lesson.try_again = Ne tas. Mēģini vēlreiz.
+lesson.try_again.2 = Ne šis gājiens. Pamēģini vēl.
+lesson.try_again.3 = Pamēģināsim vēlreiz.
+lesson.use_your = Izmanto {your:refl_acc}.
+lesson.use_your.2 = Pamēģini ar {your:refl_acc}.
+lesson.watch = Skaties.
+lesson.like_this = Lūk, tā.
+lesson.and_back = Un atpakaļ.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Šahs, bet mans karalis aizbēg uz {esc}.
+lesson.check_takes = Šahs, bet mans karalis vienkārši paņem {your:acc}.
+lesson.check_block = Šahs, bet es varu aizsegties ar kādu figūru.
+lesson.stalemate = Pats! Mans karalis nevar paiet, un tam nav šaha. Neizšķirts, lai gan tev bija uzvaroša pozīcija!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Ne uz {sq}: šim lauciņam uzbrūk {my}. Karalis nekad neiet uz apdraudētu lauciņu.
+why.PathBlocked = Kaut kas stāv {@}ceļā: figūras nevar pārlēkt pāri citām, izņemot zirgu.
+why.WrongGeometry = {your} tā neiet.
+why.MustAnswerCheck = Tev ir {@}šahs: vispirms jātiek no tā vaļā.
+why.CastlingThroughCheck = Tavs karalis šķērsotu lauciņu {sq}, un tam uzbrūk {my}.
+why.CastlingNoRights = Šis karalis vai tornis jau ir gājis: rokāde nav iespējama.
+why.CastlingBlocked = Rokādei lauciņiem starp karali un torni jābūt brīviem.
+why.CastlingOutOfCheck = Kamēr tev ir šahs, rokādi veikt nevar.
+why.PawnForwardBlocked = Bandinieki nevar ņemt taisni uz priekšu: šis lauciņš ir {@}aizņemts.
+why.LeavesKingInCheck = {your} ir piesiet{your:adj}: ja tu {your:pron_acc} pārvietotu, {my} uzbruktu tavam karalim.
+why.OwnPieceOnTarget = Tu nevari iet uz lauciņu, kuru aizņem tava figūra.
+why.PawnCaptureNeedsVictim = Pa diagonāli bandinieks iet tikai tad, kad ņem.
+why.EnPassantExpired = Ņemt garāmejot drīkst tikai uzreiz pēc tam, kad bandinieks ir pavirzījies par diviem lauciņiem.
+why.NotYourTurn = Pagaidi: tagad ir mans gājiens.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Sveiki! Es esmu tavs treneris. Mācīsimies šaha noteikumus kopā, mazu solīti pa solītim.
+lesson.welcome.board = Šis ir šaha galdiņš: sešdesmit četri gaiši un tumši lauciņi, astoņas rindas pa astoņiem.
+lesson.welcome.light = Stūra lauciņš pa {@}labi no tevis vienmēr ir gaišs. Atceries: gaišais ir pa labi.
+lesson.welcome.files = Kolonnas sauc par vertikālēm. Tās apzīmē ar burtiem no {@}a līdz {@2}h.
+lesson.welcome.files.spoken = Kolonnas sauc par vertikālēm. Tās apzīmē ar burtiem no {@}a līdz {@2}hā.
+lesson.welcome.ranks = Rindas sauc par horizontālēm. Tās apzīmē ar cipariem no {@}viena līdz {@2}astoņiem, sākot no tavas puses.
+lesson.welcome.square = Katru lauciņu nosauc ar tā burtu un pēc tam ar ciparu. Šis lauciņš ir {sq}.
+lesson.welcome.square2 = Un šis ir {sq}.
+lesson.welcome.kings = Šie ir abi karaļi. Tavējais stāv uz {sq}, manējais uz {sq2}.
+lesson.welcome.ask = Tava kārta: pavirzi savu karali vienu lauciņu uz priekšu, uz {sq}.
+lesson.welcome.wrong = Tas ir {to}. Mums vajag {sq}: burts e, cipars divi.
+lesson.welcome.ok = Lieliski. Tavs karalis ir uz {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = {your:this} ir {your}. {your:pron} iet pa taisnām līnijām, pa vertikālēm un horizontālēm, cik tālu vien grib.
+lesson.rook.lines = Augšup pa vertikāli {@}vai pa horizontāli.
+lesson.rook.capture = Lai ņemtu, figūra nostājas uz {@}pretinieka figūras lauciņa, un paņemtā figūra pamet galdiņu.
+lesson.rook.ask = Paņem {my:acc} ar savu torni!
+lesson.rook.short = Pareizais virziens! Turpini augšup pa vertikāli līdz pat {my:dat}.
+lesson.rook.rank = Tas ir pa horizontāli. {my} ir augstāk, uz vertikāles.
+lesson.rook.king = Tas ir tavs karalis. Izmanto {your:refl_acc}, kas stāv stūrī.
+lesson.rook.ok = Ņemšana izdevās! {my} pamet galdiņu.
+# Pieces don't jump
+lesson.jump.blocked = Figūras nevar pārlēkt pāri citām. Tavs bandinieks uz {sq} aizšķērso tornim ceļu.
+lesson.jump.knight = Lēkt var tikai zirgs. Ar to mēs drīz iepazīsimies.
+# Bishop
+lesson.bishop.intro = {your:this} ir {your}. {your:pron} iet pa diagonāli, cik tālu vien grib.
+lesson.bishop.colour = Laidnis vienmēr paliek uz vienas krāsas lauciņiem.
+lesson.bishop.ask = {my} stāv uz tava laidņa diagonāles. Paņem {my:pron_acc}!
+lesson.bishop.short = Pareizā diagonāle! Ej tālāk, līdz sasniegsi {my:acc}.
+lesson.bishop.other = Tā ir otra diagonāle. Skaties {my:gen} virzienā.
+lesson.bishop.ok = Teicami. Laidņi mīl garas diagonāles.
+# Queen
+lesson.queen.intro = {your:this} ir {your}, visspēcīgākā figūra. {your:pron} iet kā tornis un laidnis kopā.
+lesson.queen.ask = Atrodi {my:acc} un paņem {my:pron_acc} ar savu dāmu.
+lesson.queen.wrong = Tava dāma var sasniegt {my:acc} ar vienu gājienu, pa diagonāli.
+lesson.queen.ok = Labi padarīts! Sargā savu dāmu: tā ir ļoti vērtīga.
+# King
+lesson.king.intro = Karalis iet tikai vienu lauciņu, jebkurā virzienā.
+lesson.king.important = Karalis ir pati svarīgākā figūra. Ja tam nav kur glābties, partija ir zaudēta.
+lesson.king.ask = Arī karalis var ņemt. Paņem {my:acc}!
+lesson.king.wrong = Tavs karalis stāv tieši blakus {my:dat}. Uzkāp uz {my:pron_gen} lauciņa, lai {my:pron_acc} paņemtu.
+lesson.king.ok = Labi! Karalis ir lēns, bet tuvumā spēcīgs.
+# Knight
+lesson.knight.intro = {your:this} ir {your}. {your:pron} iet burta „L” veidā: divus lauciņus taisni, tad vienu sāņus.
+lesson.knight.intro.spoken = {your:this} ir {your}. {your:pron} iet burta el veidā: divus lauciņus taisni, tad vienu sāņus.
+lesson.knight.l = Lūk, {@}šādi. Zirgs vienmēr nonāk uz citas krāsas lauciņa.
+lesson.knight.jump = Zirgs ir vienīgā figūra, kas var pārlēkt pāri citām.
+lesson.knight.ask = Paņem {my:acc} ar savu zirgu!
+lesson.knight.wrong = Tas ir īsts zirga gājiens, bet {my:acc} tas nesasniedz. Pamēģini citu „L”.
+lesson.knight.wrong.spoken = Tas ir īsts zirga gājiens, bet {my:acc} tas nesasniedz. Pamēģini citu el.
+lesson.knight.ok = Lielisks lēciens!
+# Pawn: moving
+lesson.pawn.intro = Tagad {your}. {your:pron} iet taisni uz priekšu, pa vienam lauciņam, un nekad atpakaļ.
+lesson.pawn.first = Ar savu pirmo gājienu bandinieks drīkst paiet vienu vai divus lauciņus.
+lesson.pawn.ask = Pavirzi savu bandinieku divus lauciņus uz priekšu.
+lesson.pawn.one = Tas ir viens lauciņš: tā drīkst, bet šoreiz ej divus.
+lesson.pawn.use = Izmanto bandinieku.
+lesson.pawn.ok = Labi.
+# Pawn: capturing
+lesson.pawncap.blocked = Mans bandinieks aizšķērso ceļu tavējam. Bandinieki nevar ņemt taisni uz priekšu.
+lesson.pawncap.diagonal = Taču bandinieks ņem pa diagonāli, vienu lauciņu uz priekšu.
+lesson.pawncap.ask = Paņem {my:acc} ar savu bandinieku.
+lesson.pawncap.use = Izmanto {your:refl_acc}: {your:pron} ņem pa diagonāli uz priekšu.
+lesson.pawncap.ok = Jā! Iet taisni, ņem pa diagonāli.
+# Values, set-up and the first moves
+lesson.values.pawn = Katrai figūrai ir vērtība punktos. Bandinieks ir vērts vienu punktu.
+lesson.values.pieces = Zirgs vai {@}laidnis: trīs. {@2}Tornis: pieci. {@3}Dāma: deviņi.
+lesson.values.king = Karalis ir nenovērtējams: to nekad nedrīkst atdot.
+lesson.values.trade = Centies nekad neatdot figūru lētāk, nekā tā ir vērta.
+lesson.setup.corners = Katra partija sākas šādi: torņi {@}stūros, blakus tiem {@2}zirgi, tad {@3}laidņi.
+lesson.setup.queen = Dāma stāv uz savas krāsas lauciņa: tava dāma ir uz gaiša lauciņa.
+lesson.setup.king = Karalis stāv blakus tai. Pirmo gājienu vienmēr izdara baltie.
+lesson.first.ask = Sāc partiju: pavirzi bandinieku, kas stāv tava karaļa priekšā, par diviem lauciņiem, uz {sq}.
+lesson.first.wrong = Arī tas ir atļauts gājiens! Bet pagaidām, lūdzu, pavirzi karaļa bandinieku uz {sq}.
+lesson.first.ok = Lielisks pirmais gājiens: tas atver ceļu tavai dāmai un laidnim.
+lesson.first.reply = Es atbildu tāpat. Tagad attīsti zirgu: lec no {sq} uz {sq2}.
+lesson.first.knight_wrong = Zirgi lec pāri bandiniekiem. Pamēģini no {sq} uz {sq2}.
+lesson.first.knight_ok = Lieliski. Zirgus un laidņus attīsta agri.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Figūra ir aizsargāta, ja kāda savējā figūra var ņemt atpakaļ.
+lesson.safety.pawn = Mans {@}bandinieks aizsargā {my:acc}.
+lesson.safety.free = Bet {my:dat} nav neviena aizsarga. Tava dāma uzbrūk abām figūrām.
+lesson.safety.ask = Paņem neaizsargāto figūru!
+lesson.safety.watch = Skaties, kas notiks.
+lesson.safety.gave = Tu atdevi savu dāmu, kas ir vērta deviņus punktus, par manu zirgu, kas ir vērts trīs.
+lesson.safety.other = Pamēģini otru figūru.
+lesson.safety.look = Meklē figūru, ko nekas neaizsargā.
+lesson.safety.ok = Teicami! Vienmēr jautā sev: vai šī figūra ir aizsargāta?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Mans tornis kontrolē visu otro horizontāli.
+lesson.danger.rule = Karalis nekad nedrīkst iet uz lauciņu, kur to varētu paņemt.
+lesson.danger.ask = Pārvieto savu karali uz drošu lauciņu.
+lesson.danger.ok = Pareizi. Tur tavs karalis ir drošībā.
+lesson.check.what = Mans tornis uzbrūk tavam karalim. To sauc par šahu.
+lesson.check.must = Ja tev ir šahs, no tā jātiek vaļā nekavējoties.
+lesson.check.ways = Ir trīs veidi: {@}pārvietot karali, {@2}aizsegties vai {@3}paņemt uzbrucēju.
+lesson.check.ask = Šeit pārvieto savu karali tā, lai tam vairs nebūtu šaha.
+lesson.check.file = Lauciņš {to} joprojām ir uz {@}mana torņa vertikāles. Pamet šo līniju.
+lesson.check.ok = Labi: šaha vairs nav.
+lesson.block.again = Atkal šahs! Šoreiz tavam karalim nav neviena brīva lauciņa.
+lesson.block.ask = Tātad aizsedzies: novieto kādu figūru uzbrukuma ceļā.
+lesson.block.queen = Šahs aizsegts! Bet mans tornis varētu paņemt tavu dāmu. Aizsedzies ar lētāku figūru.
+lesson.block.queen_ok = Tas der. Bet atceries: aizsedzies ar savu lētāko figūru.
+lesson.block.ok = Lieliski. Aizsedzies ar vismazāk vērtīgo figūru.
+lesson.capture.check = Mana dāma piesaka šahu, tieši blakus tavam karalim.
+lesson.capture.ask = Paņem uzbrucēju!
+lesson.capture.king_ok = Jā! Manu dāmu neviens neaizsargāja, tāpēc tavs karalis varēja to paņemt.
+lesson.capture.knight_ok = Jā! Tavs zirgs novāca uzbrucēju.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Mats: karalim ir šahs, un no tā nav glābiņa. Tas nozīmē uzvaru partijā.
+lesson.mate1.stuck = Mans karalis ir iesprostots aiz {@}saviem bandiniekiem.
+lesson.mate1.ask = Piesaki man matu vienā gājienā!
+lesson.mate1.wrong = Tuvu! Piesaki šahu pa manu pēdējo horizontāli, kur mans karalis nevar aizbēgt.
+lesson.mate1.ok = Mats! Tas ir mats pa pēdējo horizontāli. Atceries to!
+lesson.mate2.ask = Tavs karalis un dāma strādā kā komanda. Piesaki man matu vienā gājienā.
+lesson.mate2.wrong = Atrodi šahu, pēc kura manam karalim nepaliek neviena lauciņa.
+lesson.mate2.ok = Mats! Tavs karalis aizsargā dāmu, tāpēc manējais nevar to paņemt.
+lesson.mate2.ok_rank = Mats pa pēdējo horizontāli! Tavs karalis kontrolē visus lauciņus mana karaļa priekšā.
+lesson.mate3.edge = Tavs tornis septītajā horizontālē tur manu karali pie malas.
+lesson.mate3.ask = Tagad izmanto {your:refl_acc}, lai pieteiktu matu.
+lesson.mate3.free = Šahs, bet tagad septītā horizontāle ir brīva, un mans karalis aizbēg.
+lesson.mate3.takes = Mans karalis vienkārši paņem tavu torni.
+lesson.mate3.hint = Piesaki šahu pa pēdējo horizontāli ar to torni, kas nesargā septīto.
+lesson.mate3.ok = Mats! Abi torņi strādāja kā kāpnes.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rokāde ir īpašs gājiens, kas palīdz parūpēties par karaļa drošību. Karalis un tornis pārvietojas kopā.
+lesson.castle.how = {@}Karalis paiet divus lauciņus torņa virzienā, un {@2}tornis pārlec pāri karalim uz tā otru pusi.
+lesson.castle.ask = Vienmēr vispirms pieskaries karalim. Tagad tu: veic īso rokādi, karaļa flangā.
+lesson.castle.rook = Tā tu pārvieto tikai torni. Lai veiktu rokādi, pārvieto karali divus lauciņus torņa virzienā.
+lesson.castle.long = Tā ir garā rokāde, arī atļauta! Šoreiz veic rokādi uz tuvākā torņa pusi.
+lesson.castle.one = Viens lauciņš ir parasts karaļa gājiens. Rokādē karalis paiet divus.
+lesson.castle.other = Lai veiktu rokādi, pārvieto karali par diviem lauciņiem pretī tornim, kas stāv uz {sq}.
+lesson.castle.ok = Rokāde izdarīta! Tavs karalis ir paslēpts, un tavs tornis ir gatavs spēlei.
+lesson.castle2.moved = Rokādi veikt nevar, ja tavs karalis vai šis tornis jau ir gājis.
+lesson.castle2.attacked = Arī ne tad, kad tev ir šahs, vai ja tavs karalis šķērsotu apdraudētu lauciņu vai nonāktu uz tāda.
+lesson.castle2.bishop = Mans laidnis uzbrūk lauciņam {sq}. Tāpēc rokāde uz šo pusi tagad ir aizliegta.
+lesson.castle2.ask = Veic rokādi uz otru pusi.
+lesson.castle2.other = Veic rokādi uz sava otra torņa pusi, dāmas flangā.
+lesson.castle2.ok = Pareizi! Garā rokāde novieto tavu karali uz {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+# The Latvian term "ņemšana garāmejot" already means "taking in passing": the second sentence says
+# what it means instead of glossing the French words.
+lesson.ep.what = Vienu īpašu bandinieka ņemšanu sauc par ņemšanu garāmejot. Pretinieka bandinieku paņem brīdī, kad tas iet garām.
+lesson.ep.watch = Skaties uz manu bandinieku: tas paiet divus lauciņus un nostājas tieši blakus tavējam.
+lesson.ep.how = Tavs bandinieks var to paņemt tā, it kā tas būtu pagājis tikai vienu lauciņu: uz {sq}.
+lesson.ep.now = Bet tikai tagad, ar šo gājienu. Ņem garāmejot!
+lesson.ep.gone = Iespēja ir garām: ņemt garāmejot var tikai uzreiz. Pamēģināsim vēlreiz.
+lesson.ep.ok = Ņemšana garāmejot! Mans bandinieks uz {sq} tiek noņemts.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Kad bandinieks sasniedz pēdējo horizontāli, tas pārvēršas: kļūst par dāmu, torni, laidni vai zirgu.
+lesson.promo.ask = Gandrīz vienmēr izvēlies dāmu. Pārvērt savu bandinieku tagad!
+lesson.promo.under = Tā drīkst! Bet dāma ir spēcīgāka. Izvēlēsimies dāmu.
+lesson.promo.under_ok = Labi. Tomēr lielākā daļa spēlētāju izvēlas dāmu.
+lesson.promo.push = Pavirzi savu bandinieku līdz pēdējai horizontālei, uz {sq}.
+lesson.promo.ok = Jauna dāma! Tev var būt pat divas dāmas vienlaikus.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Tagad ir mans gājiens. Manam karalim nav šaha, bet {@}visi lauciņi ap to ir apdraudēti.
+lesson.stale.draw = Man nav neviena atļauta gājiena. Tas ir pats, un partija beidzas neizšķirti.
+lesson.stale2.ask = Kad tev ir uzvaroša pozīcija, uzmanies no pata. Piesaki man matu vienā gājienā, bez pata!
+lesson.stale2.wrong = Piesaki šahu pa manu pēdējo horizontāli, kur mans karalis nevar aizbēgt.
+lesson.stale2.ok = Mats! Vienmēr atstāj pretinieka karalim kādu gājienu, ja vien tu nepiesaki matu.
+lesson.draws.kings = Citi neizšķirti: kad neviens nevar pieteikt matu, piemēram, ja uz galdiņa palikuši tikai abi karaļi, partija beidzas neizšķirti.
+lesson.draws.agree = Spēlētāji var arī vienoties par neizšķirtu.
+lesson.draws.repeat = Neizšķirtu var panākt arī tad, ja pozīcija atkārtojas trīs reizes vai ja piecdesmit gājienos nav bijis nevienas ņemšanas un neviena bandinieka gājiena.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+# Time controls: zibšahs (blitz), ātrais šahs (rapid), klasiskais šahs (classical).
+lesson.talk.rules = Tagad tu zini visus šaha noteikumus. Labi padarīts!
+lesson.talk.real = Ļauj man pastāstīt, kā notiek īstas partijas.
+lesson.talk.elo = Spēlētājiem ir reitings, ko sauc par Elo. Tas pieaug, kad tu uzvari, un samazinās, kad zaudē.
+lesson.talk.elo_gap = Uzvara pār spēcīgāku spēlētāju dod vairāk punktu, bet zaudējums vājākam maksā vairāk.
+lesson.talk.elo_start = Tavs reitings parādīsies pēc piecām reitinga partijām. Partijas ar treneri ir treniņš, tāpēc tās nav reitinga partijas.
+lesson.talk.clock = Šis ir {@}šaha pulkstenis. Katram spēlētājam ir savs laiks, un tas tek tikai viņa gājiena laikā.
+lesson.talk.press = Pēc sava gājiena tu nospied pulksteni ar to pašu roku. Tad sāk tecēt mans laiks.
+lesson.talk.flag = Ja tavs laiks beidzas, tu zaudē, ja vien es nekādi nevaru tev pieteikt matu.
+lesson.talk.increment = Pieci plus trīs nozīmē piecas minūtes katram un vēl trīs sekundes pēc katra gājiena.
+lesson.talk.speeds = Īsās partijas sauc par zibšahu, garākās par ātro šahu, bet visgarākās par klasisko šahu.
+lesson.talk.no_clock = Ar mani pulkstenis ir izslēgts. Domā tik ilgi, cik tev vajag.
+lesson.talk.touch = Īstā partijā, ja tu pieskaries kādai no savām figūrām, tev ar to jāizdara gājiens.
+lesson.talk.touch_mine = Ja tu pieskaries kādai no manām figūrām, tev tā jāpaņem, ja vien tas ir iespējams.
+lesson.talk.adjust = Lai pielabotu figūru, to nepārvietojot, vispirms pasaki: „Es pielaboju”.
+lesson.talk.release = Tiklīdz tu atlaid figūru uz jauna lauciņa, gājiens ir izdarīts.
+lesson.talk.sheet = Turnīros abi spēlētāji katru gājienu ieraksta {@}pieraksta lapā.
+# {move:letters} shows the Latvian scoresheet letters ("Zf3"), which is what this line teaches.
+lesson.talk.notation = Mēs pierakstām figūras burtu un lauciņu, piemēram, {move:letters}. Bandiniekiem pietiek ar lauciņu.
+lesson.talk.robot = Tavs robots pieraksta gājienus tavā vietā. Ātrajās partijās pierakstīt nav obligāti.
+lesson.talk.handshake = Partijas sākas un beidzas ar rokasspiedienu. Tas nozīmē: laba partija, un paldies.
+lesson.talk.polite = Neatkarīgi no rezultāta saglabā pieklājību un nekad netraucē pretiniekam domāt.
+lesson.talk.tips = Trīs padomi tavām partijām: {@}kontrolē centru, {@2}attīsti zirgus un laidņus un {@3}agri veic rokādi.
+lesson.talk.next = Kad gribēsi, izvēlies līmeni „Pirmie soļi”. Es spēlēšu saudzīgi un palīdzēšu pēc katras kļūdas.
+lesson.talk.welcome = Laipni lūdzam šaha pasaulē! Paspiedīsim rokas.

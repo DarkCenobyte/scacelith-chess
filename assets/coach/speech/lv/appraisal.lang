@@ -1,0 +1,161 @@
+# Coach speech (Latvian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "tu"; the player's gender is unknown: finite verbs
+# ("tu uzvarēji", "tu atradi", "tu paņēmi"), conditionals ("saglabātu") and impersonal phrases
+# ("Labi nospēlēts", "Labi atrasts") only, never "tu esi uzvarējis", "esi gatavs".
+# Forms from common.lang: move numbers are ordinals, "{n:ord_loc} gājienā" = "21. gājienā" (at move 21),
+# "līdz {crit_no:ord_dat} gājienam" (until move 21), "{n:ord} gājiens" (move 21); "{acc:percent}" =
+# "85%" (spoken "astoņdesmit pieci procenti"), "{acc:percent_gen} precizitāte" = "85% precizitāte"
+# (spoken "astoņdesmit piecu procentu"); "{n:time_acc}" = "trīs reizes"; "{text:loc}" = a phase in
+# the locative ("atklātnē", appraisal.phase.*.loc in common.lang); "{my:adj}" = the ending -s / -a.
+# {level} is a level name in its nominative, inside „...” after a noun in the case ("līmenī „{level}”").
+# {opening:def} is the opening's nominative, used only where Latvian needs a nominative (after a colon
+# or as the subject / predicate).
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases (glossary: they MUST stay "atklātne", "vidusspēle", "galotne", feminine; common.lang adds
+# their gen / dat / acc / loc forms).
+appraisal.phase.opening = atklātne
+appraisal.phase.middlegame = vidusspēle
+appraisal.phase.endgame = galotne
+# Draw reasons, said after "Neizšķirts," (a comma before them, as "jo" needs one).
+appraisal.reason.stalemate = pata dēļ
+appraisal.reason.material = jo neviens nevarēja pieteikt matu
+appraisal.reason.repetition = pozīcijas atkārtošanās dēļ
+appraisal.reason.fifty = saskaņā ar piecdesmit gājienu noteikumu
+appraisal.reason.agreement = pēc vienošanās
+appraisal.reason.other = saskaņā ar noteikumiem
+# The level names of the coach page (coach.level.<n>.name in assets/i18n/lv.lang).
+appraisal.level.l1 = Pirmie soļi
+appraisal.level.l2 = Iesācējs
+appraisal.level.l3 = Turpinātājs
+appraisal.level.l4 = Kluba spēlētājs
+appraisal.level.l5 = Spēcīgs kluba spēlētājs
+appraisal.level.l6 = Eksperts
+# What to practise: an infinitive phrase in lower case, no full stop, said after a colon or after
+# "ir vērts" / "ir svarīgi". "Savs" for the player's own pieces (the player is the infinitive's subject).
+theme.general = pirms gājiena paskatīties uz visu galdiņu
+theme.mate_allowed = pirms katra gājiena pārbaudīt sava karaļa drošību
+theme.mate_missed = meklēt matu, sākot ar šahiem
+theme.stalemate = atstāt manam karalim brīvu lauciņu, kad tev ir uzvaroša pozīcija
+theme.fork = uzmanīties no divkāršiem uzbrukumiem
+theme.discovered = pamanīt slēptus uzbrukumus aiz manām figūrām
+theme.skewer = neturēt vērtīgas figūras uz vienas līnijas
+theme.pin = pamanīt piesaistes, pirms tās rodas
+theme.trapped = atstāt savām figūrām atkāpšanās ceļu
+theme.back_rank = izveidot savam karalim izeju no pēdējās horizontāles
+theme.hanging = turēt savas figūras aizsargātas
+theme.exchange = pirms maiņas saskaitīt uzbrucējus un aizsargus
+theme.missed_capture = vispirms meklēt figūras, ko var paņemt par velti
+theme.missed_fork = meklēt savus divkāršos uzbrukumus
+theme.promotion = rēķināt bandinieku sacīkstes un izmantot kvadrāta noteikumu
+theme.king_safety = turēt savu karali drošībā aiz bandiniekiem
+theme.bad_trade = izvēlēties, ar kurām figūrām mainīties
+theme.opening = attīstīt figūras un laikus veikt rokādi
+theme.endgame = izmantot savu karali un virzīt uz priekšu caurejošos bandiniekus
+theme.positional = uzlabot savu sliktāko figūru
+theme.material = pirms gājiena pārbaudīt, ko var iegūt mani nākamie gājieni
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Mats! Tu uzvarēji. Labi nospēlēts!
+appraisal.open.win.b1.2 = Tu uzvarēji! Lieliski, ka tu partiju novedi līdz galam.
+appraisal.open.win.b1.3 = Tu mani uzvarēji! Tā bija patiešām laba partija.
+appraisal.open.win.b2 = Labi nospēlēts! Tu uzvarēji {moves:move_loc}.
+appraisal.open.win.b2.2 = Apsveicu, tu uzvarēji!
+appraisal.open.win.b2.3 = Uzvara {moves:move_loc}. Ļoti labi!
+appraisal.open.win.b3 = Apsveicu, pelnīta uzvara.
+appraisal.open.win.b3.2 = Labi nospēlēts. Šo uzvaru tu nopelnīji godīgi.
+appraisal.open.win.b3.3 = Laba uzvara. Apsveicu.
+appraisal.open.win.b4 = Skaista uzvara.
+appraisal.open.win.b4.2 = Labi nospēlēts, pelnīta uzvara.
+appraisal.open.win.b4.3 = Laba uzvara.
+appraisal.open.win.b5 = Labi nospēlēts.
+appraisal.open.win.b5.2 = Skaisti uzvarēts.
+appraisal.open.win.b5.3 = Laba partija, pelnīta uzvara.
+appraisal.open.win.b6 = Labi nospēlēts.
+appraisal.open.win.b6.2 = Pārliecinoša uzvara.
+appraisal.open.win.b6.3 = Laba partija.
+appraisal.open.draw.b1 = Neizšķirts! Šajā partijā neviens nevarēja uzvarēt.
+appraisal.open.draw.b1.2 = Neizšķirts. Cīņa bija līdzvērtīga!
+appraisal.open.draw.b1.3 = Neizšķirts: punktu dalām uz pusēm. Labi nospēlēts!
+appraisal.open.draw.b2 = Neizšķirts – taisnīgs rezultāts.
+appraisal.open.draw.b2.2 = Mēs nospēlējām neizšķirti. Laba cīņa!
+appraisal.open.draw.b2.3 = Neizšķirts, un partija bija laba.
+appraisal.open.draw.b3 = Neizšķirts. Abām pusēm bija iespējas.
+appraisal.open.draw.b3.2 = Taisnīgs neizšķirts.
+appraisal.open.draw.b3.3 = Neizšķirts, {text}. Laba cīņa.
+appraisal.open.draw.b4 = Neizšķirts, {text}.
+appraisal.open.draw.b4.2 = Partija beidzās neizšķirti, {text}.
+appraisal.open.draw.b4.3 = Rezultāts – neizšķirts, {text}.
+appraisal.open.draw.b5 = Neizšķirts.
+appraisal.open.draw.b5.2 = Neizšķirts, {text}.
+appraisal.open.draw.b5.3 = Neizšķirts rezultāts.
+appraisal.open.draw.b6 = Neizšķirts.
+appraisal.open.draw.b6.2 = Neizšķirts, {text}.
+appraisal.open.draw.b6.3 = Neizšķirts rezultāts.
+appraisal.open.stalemate.b1 = Neizšķirts pata dēļ – uzvara bija tik tuvu! Nākamreiz atstāj manam karalim brīvu lauciņu.
+appraisal.open.stalemate.b1.2 = Pats, tātad neizšķirts. Tu jau biji gandrīz pie mērķa!
+appraisal.open.stalemate.b2 = Neizšķirts pata dēļ. Līdz uzvarai bija palicis pavisam nedaudz!
+appraisal.open.stalemate.b2.2 = Pats: neizšķirts, lai gan tev bija uzvaroša pozīcija.
+appraisal.open.stalemate.b3 = Neizšķirts pata dēļ, lai gan pozīcija bija uzvaroša.
+appraisal.open.stalemate.b3.2 = Pats. Uzvara izslīdēja pašās beigās.
+appraisal.open.stalemate.b4 = Neizšķirts pata dēļ.
+appraisal.open.stalemate.b4.2 = Pats: neizšķirts.
+appraisal.open.stalemate.b5 = Pats.
+appraisal.open.stalemate.b5.2 = Neizšķirts, pats.
+appraisal.open.stalemate.b6 = Pats.
+appraisal.open.stalemate.b6.2 = Neizšķirts, pats.
+appraisal.open.loss.b1 = Šoreiz uzvarēju es, bet tu izdarīji dažus patiešām labus gājienus.
+appraisal.open.loss.b1.2 = Laba partija! Tu man liki krietni papūlēties.
+appraisal.open.loss.b1.3 = Bija jautri! Šo partiju uzvarēju es, bet tu mācies ļoti ātri.
+appraisal.open.loss.b2 = Laba partija! Paskatīsimies, kas izdevās labi, un ko vērts pamēģināt.
+appraisal.open.loss.b2.2 = Paldies par partiju! Tev bija dažas labas idejas.
+appraisal.open.loss.b2.3 = Laba partija. Paskatīsimies, ko no tās varam mācīties.
+appraisal.open.loss.b3 = Laba partija.
+appraisal.open.loss.b3.2 = Paldies par partiju.
+appraisal.open.loss.b3.3 = Laba partija. Apskatīsim to tuvāk.
+appraisal.open.loss_close.b3 = Laba cīņa. Ilgu laiku partija bija līdzsvarota.
+appraisal.open.loss_close.b3.2 = Laba cīņa: līdzsvars saglabājās ilgi.
+appraisal.open.loss.b4 = Laba partija. Lūk, kas to izšķīra.
+appraisal.open.loss.b4.2 = Laba partija. To izšķīra viens brīdis.
+appraisal.open.loss.b4.3 = Paldies par partiju. Paskatīsimies, kur notika lūzums.
+appraisal.open.loss_close.b4 = Ilgu laiku cīņa bija līdzvērtīga. Lūk, kas izšķīra partiju.
+appraisal.open.loss_close.b4.2 = Laba partija, ilgi līdzsvarota.
+appraisal.open.loss.b5 = Laba partija.
+appraisal.open.loss.b5.2 = Paldies par partiju.
+appraisal.open.loss.b5.3 = Laba cīņa.
+appraisal.open.loss.b6 = Laba partija.
+appraisal.open.loss.b6.2 = Paldies par partiju.
+appraisal.open.loss.b6.3 = Laba cīņa.
+appraisal.open.resigned.b1 = Padoties – tā arī ir daļa no šaha spēles, un tam vajag drosmi. Laba partija!
+appraisal.open.resigned.b1.2 = Nekas. Zināt, kad jāpadodas, arī ir daļa no šaha spēles.
+appraisal.open.resigned.b2 = Padošanās ir daļa no šaha spēles, un tai vajag drosmi.
+appraisal.open.resigned.b2.2 = Saprotu. Arī padoties vajag drosmi.
+appraisal.open.resigned.b3 = Padošanās ir daļa no šaha spēles. Laba partija.
+appraisal.open.resigned.b3.2 = Saprotu. Paldies par partiju.
+appraisal.open.resigned.b4 = Laba partija.
+appraisal.open.resigned.b4.2 = Paldies par partiju.
+appraisal.open.resigned.b5 = Laba partija.
+appraisal.open.resigned.b5.2 = Paldies par partiju.
+appraisal.open.resigned.b6 = Laba partija.
+appraisal.open.resigned.b6.2 = Paldies.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Zini, partija vēl nebija beigusies: novērtējums bija apmēram {eval}.
+appraisal.resign_early.b3.2 = Patiesībā tev vēl bija iespējas: apmēram {eval}.
+appraisal.resign_early.b4 = Vēl nekas nebija izšķirts: apmēram {eval}.
+appraisal.resign_early.b4.2 = Vēl varēja cīnīties: apmēram {eval}.
+appraisal.resign_early.b5 = Tās vēl nebija beigas: {eval}.
+appraisal.resign_early.b5.2 = Pozīcija vēl bija spēlējama, apmēram {eval}.
+appraisal.resign_early.b6 = Vēl ne beigas: {eval}.
+appraisal.resign_early.b6.2 = Novērtējums bija {eval}.
+# The opening played (levels 3-6): the name stays in the nominative.
+appraisal.opening.b3 = Šīs partijas atklātne: {opening:def}.
+appraisal.opening.b3.2 = Atklātne bija {opening:def}.
+appraisal.opening.b4 = Mums bija {opening:def}.
+appraisal.opening.b4.2 = Atklātne: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Atklātne: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Atklātne: {opening:def}.
+

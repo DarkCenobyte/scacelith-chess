@@ -31,11 +31,11 @@ event.colour.black = Én vagyok világos, úgyhogy én kezdek.
 event.colour.black.2 = Most sötéttel játszol: én lépek először.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-# The level names must match coach.level.<n>.name of assets/i18n/hu.lang (chosen here, as hu.lang did
-# not exist yet): Első lépések, Kezdő, Középhaladó, Klubjátékos, Erős klubjátékos, Szakértő.
+# The level names match coach.level.<n>.name of assets/i18n/hu.lang: Első lépések, Kezdő,
+# Fejlődő játékos, Klubjátékos, Erős klubjátékos, Szakértő.
 event.level.l1 = Első lépések: kíméletesen játszom, és minden hibát egyszerű szavakkal magyarázok el.
 event.level.l2 = Kezdő: kicsit erősebben játszom, és megnevezem az egyszerű taktikai fogásokat, például a villát és a kötést.
-event.level.l3 = Középhaladó: beszélek a tervekről és a gyalogszerkezetről, és rövid változatokat mutatok.
+event.level.l3 = Fejlődő játékos: beszélek a tervekről és a gyalogszerkezetről, és rövid változatokat mutatok.
 event.level.l4 = Klubjátékos: gyalogegységben értékelem az állást, és jelölt lépéseket javaslok.
 event.level.l5 = Erős klubjátékos: rövid megjegyzések, és hosszabb változatok, ha fontos.
 event.level.l6 = Szakértő: a legjobb tudásom szerint játszom, és csak a kritikus pillanatokat kommentálom.

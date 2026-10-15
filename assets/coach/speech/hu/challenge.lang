@@ -32,13 +32,14 @@ ch.intro.trapped = Csapdába esett bábuk. {n:position}: az egyik bábumnak ninc
 ch.intro.promotion = Átváltozás. {n:position}, ahol egy előretört gyalog dönti el a játszmát.
 ch.intro.quiet = Csendes lépések. {n:position}: a nyerő lépés se nem sakk, se nem ütés.
 ch.intro.opening = Megnyitási csapdák. {n:position} valódi játszmák első lépéseiből. Büntesd meg a hibámat!
-ch.intro.escape = Keresd a menekülést. {n:position}: a királyod veszélyben van, és csak egyetlen lépés menti meg.
+ch.intro.escape = Kiút keresése. {n:position}: a királyod veszélyben van, és csak egyetlen lépés menti meg.
 ch.intro.defend = Védekező lépések. {n:position}: keresd meg azt az egy lépést, amely egyben tartja az állásodat.
 ch.intro.kq = Vezér és király a magányos király ellen. {n:position}: adj mattot a királyomnak. Vigyázz a pattra!
 ch.intro.kr = Bástya és király a magányos király ellen. {n:position}: adj mattot a királyomnak, lépésről lépésre.
 ch.intro.kp = Király és gyalog a magányos király ellen. {n:position}: szerezz új vezért. A királyod menjen elöl.
-ch.intro.kp_hold = Állítsd meg a gyalogot. {n:position}: csak a királyod van. Tartsd a döntetlent.
+ch.intro.kp_hold = A gyalog megállítása. {n:position}: csak a királyod van. Tartsd a döntetlent.
 ch.intro.rook = Bástyavégjátékok. {n:position}: építs hidat az átváltozáshoz, és tartsd a döntetlent a Philidor-védelemmel.
+ch.intro.rook.spoken = Bástyavégjátékok. {n:position}: építs hidat az átváltozáshoz, és tartsd a döntetlent a Filidor-védelemmel.
 ch.intro.endgame = Végjátéktaktika. {n:position} kevés bábuval és éles ötletekkel.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -52,7 +53,7 @@ ch.task.fork.2 = Keress egy villát.
 ch.task.pin = Itt egy kötés a kulcs.
 ch.task.skewer = Itt egy nyárs nyer.
 ch.task.discovered = Itt egy felfedett támadás nyer.
-ch.task.deflection = Terheld túl a védőt, vagy csald el.
+ch.task.deflection = Terheld túl a védőt, vagy csald rossz mezőre.
 ch.task.intermezzo = Keress egy közbeiktatott lépést.
 ch.task.trapped = Az egyik bábum nem tud elmenekülni. Nyerd meg!
 ch.task.promotion = Használd ki az előretört gyalogodat.
