@@ -20,7 +20,8 @@
   }
   if (!lang) {
     var nav = String(navigator.language || "en").toLowerCase();
-    lang = /^zh-(tw|hk|mo)/.test(nav) ? "zh-Hant" : /^zh/.test(nav) ? "zh-Hans" : (has(nav.split("-")[0]) ? nav.split("-")[0] : "en");
+    var base = nav.split("-")[0] === "in" ? "id" : nav.split("-")[0];
+    lang = /^zh-(tw|hk|mo)|^zh-hant/.test(nav) ? "zh-Hant" : /^zh/.test(nav) ? "zh-Hans" : /^pt-br/.test(nav) ? "pt-BR" : (has(base) ? base : "en");
   }
   var m = data[lang];
   var html = document.documentElement;

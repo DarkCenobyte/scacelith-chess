@@ -29,7 +29,9 @@
       var w = String(wanted[i]).toLowerCase();
       if (/^zh-(tw|hk|mo)|^zh-hant/.test(w)) return "zh-Hant";
       if (/^zh/.test(w)) return "zh-Hans";
+      if (/^pt-br/.test(w)) return "pt-BR";
       var base = w.split("-")[0];
+      if (base === "in") base = "id";   // the former code of Indonesian
       if (langs.indexOf(base) >= 0) return base;
     }
     return null;
