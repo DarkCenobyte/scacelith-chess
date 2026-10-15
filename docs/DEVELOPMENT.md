@@ -255,7 +255,9 @@ provenance of the files with actions/attest and publishes a GitHub release (a pr
 version has a suffix) with `Scacelith-<version>-windows-x64.zip` (the executable, its licence and
 the licence texts of what it embeds), the Windows executable alone,
 `Scacelith-<version>-linux-x86_64.tar.gz` (the executable, its launcher and icons, `install.sh`
-and the same licences), `Scacelith-<version>-linux-aarch64.tar.gz` (the same for aarch64),
+and the same licences), `Scacelith-<version>-linux-x86_64.AppImage` (the same executable, launcher,
+icons and licences in an AppImage, made and checked by `tools/linux/make-appimage.sh`, which the
+CI's Linux job runs too), `Scacelith-<version>-linux-aarch64.tar.gz` (the same archive for aarch64),
 `Scacelith-<version>-macos-arm64-experimental.dmg` (the app, signed ad hoc, with the licences of
 what it carries) and `SHA256SUMS`. Started by hand, the
 workflow builds the same files and keeps them as workflow artifacts without publishing anything,
@@ -266,5 +268,6 @@ gh attestation verify Scacelith-1.0.2-windows-x64.zip --repo DarkCenobyte/scacel
 ```
 
 Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by
-commit SHA); the code vendored in `third_party/` and the sources of the macOS build
-(`tools/macos/README.md`) are updated by hand.
+commit SHA); the code vendored in `third_party/`, the sources of the macOS build
+(`tools/macos/README.md`) and appimagetool and the AppImage runtime (pinned by their SHA-256 in
+`tools/linux/make-appimage.sh`) are updated by hand.

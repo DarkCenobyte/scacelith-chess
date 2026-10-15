@@ -32,8 +32,15 @@ std::string appDataDirectory();
 // Where Scacelith.ini, the saved logins and the log go: userDataDirectory(), unless a Scacelith.ini
 // stands next to the executable (a portable install; also where versions up to 1.0.0-beta.1 put
 // it) or the user data directory cannot be written: then the executable's folder. Never the
-// executable's folder of a macOS application bundle (insideAppBundle).
+// executable's folder of a macOS application bundle (insideAppBundle) or of an AppImage
+// (insideAppImage).
 std::string settingsDirectory();
+#if !defined(_WIN32) && !defined(__APPLE__)
+// 'dir' (with its trailing separator) is a folder of the AppImage that runs the game: below
+// $APPDIR, the folder the AppImage runtime mounted it on or extracted it to. Only below it: an
+// APPDIR inherited from another AppImage (a terminal started from one) names another folder.
+bool insideAppImage(const std::string& dir);
+#endif
 #ifdef __APPLE__
 // 'dir' (with its trailing separator) is the executable's folder of an application bundle,
 // "<...>.app/Contents/MacOS/".

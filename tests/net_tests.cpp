@@ -1163,6 +1163,77 @@ TEST(net_sys_settings_directory) {
     rmdir((home + "/.config").c_str());
     rmdir(home.c_str());
 }
+
+// An AppImage is no portable install: run from one (below $APPDIR), the game keeps its settings,
+// logins and log in the user data folder even with a Scacelith.ini next to the executable or a user
+// data folder that cannot be written; the AppImage's own portable folder ("<file>.AppImage.config",
+// which its runtime hands over as XDG_CONFIG_HOME) is followed.
+TEST(net_sys_settings_directory_appimage) {
+    const std::string exe = net::sys::exeDirectory(), ini = exe + "Scacelith.ini";
+    if (net::sys::fileExists(ini)) SKIP("a Scacelith.ini already stands next to the test executable");
+    const std::string home = exe + "net-test-appimage-home-" + std::to_string(getpid());
+    REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
+    ScopedEnv homeEnv("HOME", home.c_str());
+    ScopedEnv xdg("XDG_CONFIG_HOME", nullptr);
+    // The test executable's folder as usr/bin/ of an AppImage mounted on its parent folder.
+    const std::string appdir = exe.substr(0, exe.find_last_of('/', exe.size() - 2));
+    ScopedEnv appdirEnv("APPDIR", appdir.c_str());
+    REQUIRE(net::sys::insideAppImage(exe));
+    const std::string data = home + "/.config/scacelith/";
+    CHECK(net::sys::writeFileAtomic(ini, "[display]\n", false));
+    CHECK_EQ(net::sys::settingsDirectory(), data);
+    CHECK_EQ(net::CredentialStore::defaultPath(), data + "Scacelith.credentials");
+    std::remove(ini.c_str());
+    if (getuid() != 0) {   // root writes anywhere
+        CHECK(chmod(data.c_str(), 0500) == 0);
+        CHECK_EQ(net::sys::settingsDirectory(), data);   // not the AppImage's folder
+        chmod(data.c_str(), 0700);
+    }
+    {
+        const std::string portable = home + "/Scacelith-linux-x86_64.AppImage.config";
+        ScopedEnv config("XDG_CONFIG_HOME", portable.c_str());
+        CHECK_EQ(net::sys::settingsDirectory(), portable + "/scacelith/");
+        rmdir((portable + "/scacelith").c_str());
+        rmdir(portable.c_str());
+    }
+    rmdir(data.c_str());
+    rmdir((home + "/.config").c_str());
+    rmdir(home.c_str());
+}
+
+// The folders of the AppImage that runs the game: $APPDIR (absolute, resolved like
+// exeDirectory()) and below, nothing else.
+TEST(net_sys_inside_app_image) {
+    {
+        ScopedEnv appdir("APPDIR", nullptr);   // not run from an AppImage
+        CHECK(!net::sys::insideAppImage(net::sys::exeDirectory()));
+        CHECK(!net::sys::insideAppImage("/tmp/.mount_ScacelAbC123/usr/bin/"));
+    }
+    for (const char* root : {"/tmp/.mount_ScacelAbC123", "/tmp/.mount_ScacelAbC123/"}) {
+        ScopedEnv appdir("APPDIR", root);   // no such folder: compared as it is written
+        CHECK(net::sys::insideAppImage("/tmp/.mount_ScacelAbC123/usr/bin/"));
+        CHECK(net::sys::insideAppImage("/tmp/.mount_ScacelAbC123/"));
+        CHECK(!net::sys::insideAppImage("/tmp/.mount_ScacelAbC1234/usr/bin/"));
+        CHECK(!net::sys::insideAppImage("/tmp/usr/bin/"));
+        // The APPDIR of another AppImage (inherited from a terminal started from one).
+        CHECK(!net::sys::insideAppImage(net::sys::exeDirectory()));
+    }
+    for (const char* root : {"", "relative/AppDir"}) {
+        ScopedEnv appdir("APPDIR", root);
+        CHECK(!net::sys::insideAppImage("relative/AppDir/usr/bin/"));
+        CHECK(!net::sys::insideAppImage(net::sys::exeDirectory()));
+    }
+    // A symbolic link to the folder (a TMPDIR behind a link, say) is resolved.
+    const std::string exe = net::sys::exeDirectory();
+    const std::string link = exe + "net-test-appdir-link-" + std::to_string(getpid());
+    unlink(link.c_str());
+    REQUIRE(symlink(exe.c_str(), link.c_str()) == 0);
+    {
+        ScopedEnv appdir("APPDIR", link.c_str());
+        CHECK(net::sys::insideAppImage(exe));
+    }
+    unlink(link.c_str());
+}
 #endif  // __APPLE__
 #endif
 

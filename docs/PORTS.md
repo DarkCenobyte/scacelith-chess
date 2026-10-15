@@ -1,26 +1,38 @@
 # Ports: AppImage, Linux aarch64, macOS
 
 **Status.** Linux aarch64 and macOS on Apple Silicon are built by the CI and the release workflow
-(see the README); the macOS build is experimental, and no AppImage is made yet. This document keeps
-what was found while preparing these targets, so that the remaining work can start from it.
+(see the README); the macOS build is experimental. The Linux x86-64 release also has an AppImage
+(`tools/linux/make-appimage.sh`); an aarch64 one is not made yet. This document keeps what was
+found while preparing these targets, so that the remaining work can start from it.
 
-## AppImage (x86-64, later aarch64)
+## AppImage (x86-64; aarch64 later)
 
-**Layout of the AppDir**
-- `AppRun`: a symlink to `usr/bin/scacelith`.
-- `scacelith.desktop` (the same file as `res/linux/scacelith.desktop`) and `scacelith.png` (the
-  256 px icon) at the root; appimagetool makes `.DirIcon` a symlink to the root icon.
+**Layout of the AppDir** (`tools/linux/make-appimage.sh`)
+- `AppRun`: a symlink to `usr/bin/scacelith`, the executable of the release build. Nothing else is
+  bundled, so there is no environment to set up (and no library path handed on to the programs
+  the game starts: xdg-open, the browser, the file manager).
+- `scacelith.desktop` (the same file as `res/linux/scacelith.desktop`; appimagetool adds
+  `X-AppImage-Version` from `$VERSION`) and `scacelith.png` (the 256 px icon) at the root;
+  appimagetool makes `.DirIcon` a symlink to the root icon.
 - `usr/share/applications/scacelith.desktop`, `usr/share/icons/hicolor/<N>x<N>/apps/scacelith.png`
   (the sizes of `res/icons/png/`), `usr/share/doc/scacelith/` (LICENSE and the licences folder of
-  the archive).
-- An AppStream metainfo file is optional (appimagetool only warns).
+  the archive, plus `AppImage-runtime/`, the licence texts of the runtime and of what it links,
+  from `res/linux/appimage-runtime/`).
+- No AppStream metainfo file (optional: appimagetool only warns, and `--no-appstream` skips it) and
+  no update information (no `.zsync` file next to the release's).
 
 **Building it**
-- `ARCH=x86_64 appimagetool --appimage-extract-and-run --no-appstream --runtime-file runtime AppDir
-  Scacelith-<version>-linux-x86_64.AppImage`. With `--runtime-file` it works offline and the output
-  is byte-identical from one run to the next (tested: 94.6 MB for the 1.0.0-beta.1 binary).
+- `tools/linux/make-appimage.sh build/scacelith [<output.AppImage>]` on an x86-64 host: it runs
+  `ARCH=x86_64 appimagetool --appimage-extract-and-run --no-appstream --runtime-file runtime AppDir
+  Scacelith-<version>-linux-x86_64.AppImage`, then checks the result (the pinned runtime at its
+  start, the extracted files equal to the AppDir, a run with `--list-scenes` in extract-and-run
+  mode whose log lands in the user's folder). The release workflow runs it on the Ubuntu 22.04
+  build; the CI's Linux job runs it on its own build.
+- With `--runtime-file` appimagetool works offline; with the files' times set to the commit's
+  (`SOURCE_DATE_EPOCH` too) the same commit gives the same AppImage.
 - Without `--runtime-file`, appimagetool downloads the "continuous" runtime at build time: pin it.
-- Pins checked on 2026-10-04 (to be updated by hand, Dependabot does not see them):
+- Pins checked on 2026-10-04 and again on 2026-10-15 (the newest numbered releases; to be updated by
+  hand, Dependabot does not see them). The script uses the x86_64 ones:
 
 | File | URL | SHA-256 |
 |---|---|---|
@@ -28,6 +40,9 @@ what was found while preparing these targets, so that the remaining work can sta
 | appimagetool 1.9.1 aarch64 | `…/1.9.1/appimagetool-aarch64.AppImage` | `f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158` |
 | type2-runtime 20251108 x86_64 | `https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-x86_64` | `2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d` |
 | type2-runtime 20251108 aarch64 | `…/20251108/runtime-aarch64` | `00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444` |
+
+- A new runtime release may link other versions of its libraries: compare the licence list that
+  `<file>.AppImage --appimage-help` prints with `res/linux/appimage-runtime/` (its README).
 
 **Behaviour to keep in mind**
 - The static type2 runtime needs no libfuse2, only `fusermount`/`fusermount3`. Without them it
@@ -39,8 +54,14 @@ what was found while preparing these targets, so that the remaining work can sta
   keyring over D-Bus), libGL or libX11.
 - The game keeps its settings, log and saved logins in `$XDG_CONFIG_HOME/scacelith/` (by default
   `~/.config/scacelith/`) on Linux unless a `Scacelith.ini` stands next to the executable (portable
-  mode): in extract-and-run mode the executable lives in `$TMPDIR/appimage_extracted_<hash>/usr/bin`, so the portable mode must never
-  apply to an AppImage.
+  mode) or that folder cannot be written. Neither applies to an AppImage
+  (`net::sys::insideAppImage`, below `$APPDIR`): its executable's folder is the read-only mount, or,
+  in extract-and-run mode, `$TMPDIR/appimage_extracted_<hash>/usr/bin`, extracted again at each
+  start. The runtime's own portable mode (a `<file>.AppImage.config` folder next to it) sets
+  `XDG_CONFIG_HOME`, which the game follows.
+- In extract-and-run mode the runtime of 20251108 is meant to delete its copy when the game closes,
+  but did not when tried on 2026-10-15 (ext4 and tmpfs): about 130 MB stay in `$TMPDIR` (usually
+  `/tmp`) until the next start extracts over them or the system clears the folder.
 
 ## Linux aarch64
 
