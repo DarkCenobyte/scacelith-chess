@@ -26,7 +26,8 @@
    "hr",
    "hu",
    "ro",
-   "lv"
+   "lv",
+   "sk"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -198,6 +199,11 @@
      "forms": {
       "acc": "karaļa bandinieka atklātni"
      }
+    },
+    "sk": {
+     "name": "Hra kráľovským pešiakom",
+     "def": "hra kráľovským pešiakom",
+     "gender": "f"
     }
    },
    "comment": {
@@ -343,6 +349,11 @@
      "forms": {
       "acc": "dāmas bandinieka atklātni"
      }
+    },
+    "sk": {
+     "name": "Hra dámskym pešiakom",
+     "def": "hra dámskym pešiakom",
+     "gender": "f"
     }
    },
    "comment": {
@@ -485,6 +496,11 @@
      "forms": {
       "acc": "karaļa zirga atklātni"
      }
+    },
+    "sk": {
+     "name": "Hra kráľovským jazdcom",
+     "def": "hra kráľovským jazdcom",
+     "gender": "f"
     }
    },
    "comment": {
@@ -630,6 +646,11 @@
      "forms": {
       "acc": "sicīliešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Sicílska obrana",
+     "def": "sicílska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -772,6 +793,11 @@
      "forms": {
       "acc": "franču aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Francúzska obrana",
+     "def": "francúzska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -914,6 +940,11 @@
      "forms": {
       "acc": "Karo-Kanna aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Caro-Kannova obrana",
+     "def": "Caro-Kannova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1056,6 +1087,11 @@
      "forms": {
       "acc": "skandināvu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Škandinávska obrana",
+     "def": "škandinávska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1198,6 +1234,11 @@
      "forms": {
       "acc": "itāļu partiju"
      }
+    },
+    "sk": {
+     "name": "Talianska hra",
+     "def": "talianska hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1340,6 +1381,11 @@
      "forms": {
       "acc": "spāņu partiju"
      }
+    },
+    "sk": {
+     "name": "Španielska hra",
+     "def": "španielska hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1482,6 +1528,11 @@
      "forms": {
       "acc": "skotu partiju"
      }
+    },
+    "sk": {
+     "name": "Škótska hra",
+     "def": "škótska hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1624,6 +1675,11 @@
      "forms": {
       "acc": "Filidora aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Philidorova obrana",
+     "def": "Philidorova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1766,6 +1822,11 @@
      "forms": {
       "acc": "krievu partiju"
      }
+    },
+    "sk": {
+     "name": "Ruská hra",
+     "def": "ruská hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1909,6 +1970,11 @@
      "forms": {
       "acc": "četru zirgu partiju"
      }
+    },
+    "sk": {
+     "name": "Hra štyroch jazdcov",
+     "def": "hra štyroch jazdcov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2052,6 +2118,11 @@
      "forms": {
       "acc": "angļu atklātni"
      }
+    },
+    "sk": {
+     "name": "Anglické otvorenie",
+     "def": "anglické otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -2194,6 +2265,11 @@
      "forms": {
       "acc": "Cukertorta atklātni"
      }
+    },
+    "sk": {
+     "name": "Zukertortovo otvorenie",
+     "def": "Zukertortovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -2341,6 +2417,11 @@
      "forms": {
       "acc": "dāmas gambītu"
      }
+    },
+    "sk": {
+     "name": "Dámsky gambit",
+     "def": "dámsky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2483,6 +2564,11 @@
      "forms": {
       "acc": "nepieņemto dāmas gambītu"
      }
+    },
+    "sk": {
+     "name": "Odmietnutý dámsky gambit",
+     "def": "odmietnutý dámsky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2625,6 +2711,11 @@
      "forms": {
       "acc": "pieņemto dāmas gambītu"
      }
+    },
+    "sk": {
+     "name": "Prijatý dámsky gambit",
+     "def": "prijatý dámsky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2768,6 +2859,11 @@
      "forms": {
       "acc": "slāvu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Slovanská obrana",
+     "def": "slovanská obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2911,6 +3007,11 @@
      "forms": {
       "acc": "pusslāvu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Poloslovanská obrana",
+     "def": "poloslovanská obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3054,6 +3155,11 @@
      "forms": {
       "acc": "indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Indická obrana",
+     "def": "indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3196,6 +3302,11 @@
      "forms": {
       "acc": "karaļa indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Kráľovská indická obrana",
+     "def": "kráľovská indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3343,6 +3454,11 @@
      "forms": {
       "acc": "Londonas sistēmu"
      }
+    },
+    "sk": {
+     "name": "Londýnsky systém",
+     "def": "londýnsky systém",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3487,6 +3603,11 @@
      "forms": {
       "acc": "moderno aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Moderná obrana",
+     "def": "moderná obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3631,6 +3752,11 @@
      "forms": {
       "acc": "Pirca aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Pircova obrana",
+     "def": "Pircova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3774,6 +3900,11 @@
      "forms": {
       "acc": "Vīnes partiju"
      }
+    },
+    "sk": {
+     "name": "Viedenská hra",
+     "def": "viedenská hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3916,6 +4047,11 @@
      "forms": {
       "acc": "laidņa atklātni"
      }
+    },
+    "sk": {
+     "name": "Strelcova hra",
+     "def": "strelcova hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4058,6 +4194,11 @@
      "forms": {
       "acc": "Aļehīna aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Aljechinova obrana",
+     "def": "Aljechinova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4200,6 +4341,11 @@
      "forms": {
       "acc": "karaļa gambītu"
      }
+    },
+    "sk": {
+     "name": "Kráľovský gambit",
+     "def": "kráľovský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4342,6 +4488,11 @@
      "forms": {
       "acc": "pieņemto karaļa gambītu"
      }
+    },
+    "sk": {
+     "name": "Prijatý kráľovský gambit",
+     "def": "prijatý kráľovský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4484,6 +4635,11 @@
      "forms": {
       "acc": "nepieņemto karaļa gambītu"
      }
+    },
+    "sk": {
+     "name": "Odmietnutý kráľovský gambit",
+     "def": "odmietnutý kráľovský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4626,6 +4782,11 @@
      "forms": {
       "acc": "Nimcoviča aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Nimcovičova obrana",
+     "def": "Nimcovičova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4773,6 +4934,11 @@
      "forms": {
       "acc": "Ouena aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Owenova obrana",
+     "def": "Owenova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4916,6 +5082,11 @@
      "forms": {
       "acc": "Horvica aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Horwitzova obrana",
+     "def": "Horwitzova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5058,6 +5229,11 @@
      "forms": {
       "acc": "van 't Kreisa atklātni"
      }
+    },
+    "sk": {
+     "name": "Van't Kruijsovo otvorenie",
+     "def": "Van't Kruijsovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -5201,6 +5377,11 @@
      "forms": {
       "acc": "centrālo atklātni"
      }
+    },
+    "sk": {
+     "name": "Stredová hra",
+     "def": "stredová hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5344,6 +5525,11 @@
      "forms": {
       "acc": "Englunda gambītu"
      }
+    },
+    "sk": {
+     "name": "Englundov gambit",
+     "def": "Englundov gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -5486,6 +5672,11 @@
      "forms": {
       "acc": "holandiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Holandská obrana",
+     "def": "holandská obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5628,6 +5819,11 @@
      "forms": {
       "acc": "Nimco-indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Nimcovičova indická obrana",
+     "def": "Nimcovičova indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5772,6 +5968,11 @@
      "forms": {
       "acc": "dāmas indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Dámska indická obrana",
+     "def": "dámska indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5915,6 +6116,11 @@
      "forms": {
       "acc": "Grīnfelda aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Grünfeldova indická obrana",
+     "def": "Grünfeldova indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6057,6 +6263,11 @@
      "forms": {
       "acc": "katalāņu atklātni"
      }
+    },
+    "sk": {
+     "name": "Katalánske otvorenie",
+     "def": "katalánske otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6199,6 +6410,11 @@
      "forms": {
       "acc": "Benoni aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Obrana Benoni",
+     "def": "obrana Benoni",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6343,6 +6559,11 @@
      "forms": {
       "acc": "Benko gambītu"
      }
+    },
+    "sk": {
+     "name": "Volžský gambit",
+     "def": "volžský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -6485,6 +6706,11 @@
      "forms": {
       "acc": "Rēti atklātni"
      }
+    },
+    "sk": {
+     "name": "Rétiho otvorenie",
+     "def": "Rétiho otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6627,6 +6853,11 @@
      "forms": {
       "acc": "karaļa indiešu uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Kráľovský indický útok",
+     "def": "kráľovský indický útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -6773,6 +7004,11 @@
      "forms": {
       "acc": "Bērda atklātni"
      }
+    },
+    "sk": {
+     "name": "Birdovo otvorenie",
+     "def": "Birdovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6915,6 +7151,11 @@
      "forms": {
       "acc": "Ponciāni atklātni"
      }
+    },
+    "sk": {
+     "name": "Ponzianiho otvorenie",
+     "def": "Ponzianiho otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -7057,6 +7298,11 @@
      "forms": {
       "acc": "trīs zirgu partiju"
      }
+    },
+    "sk": {
+     "name": "Hra troch jazdcov",
+     "def": "hra troch jazdcov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -7201,6 +7447,11 @@
      "forms": {
       "acc": "dāņu gambītu"
      }
+    },
+    "sk": {
+     "name": "Dánsky gambit",
+     "def": "dánsky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -7345,6 +7596,11 @@
      "forms": {
       "acc": "Blekmāra-Dīmera gambītu"
      }
+    },
+    "sk": {
+     "name": "Blackmarov-Diemerov gambit",
+     "def": "Blackmarov-Diemerov gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -7487,6 +7743,11 @@
      "forms": {
       "acc": "Trompovska uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Trompowského útok",
+     "def": "Trompowského útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -7630,6 +7891,11 @@
      "forms": {
       "acc": "Torres uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Torreho útok",
+     "def": "Torreho útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -7774,6 +8040,11 @@
      "forms": {
       "acc": "Kolles sistēmu"
      }
+    },
+    "sk": {
+     "name": "Colleho systém",
+     "def": "Colleho systém",
+     "gender": "m"
     }
    },
    "comment": {
@@ -7916,6 +8187,11 @@
      "forms": {
       "acc": "Taraša aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Tarraschova obrana",
+     "def": "Tarraschova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8059,6 +8335,11 @@
      "forms": {
       "acc": "Budapeštas gambītu"
      }
+    },
+    "sk": {
+     "name": "Budapeštiansky gambit",
+     "def": "budapeštiansky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -8201,6 +8482,11 @@
      "forms": {
       "acc": "Bogo-indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Bogoljubovova indická obrana",
+     "def": "Bogoljubovova indická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8343,6 +8629,11 @@
      "forms": {
       "acc": "veco indiešu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Staroindická obrana",
+     "def": "staroindická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8490,6 +8781,11 @@
      "forms": {
       "acc": "Čigorina aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Čigorinova obrana",
+     "def": "Čigorinova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8632,6 +8928,11 @@
      "forms": {
       "acc": "Albina pretgambītu"
      }
+    },
+    "sk": {
+     "name": "Albinov protigambit",
+     "def": "Albinov protigambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -8775,6 +9076,11 @@
      "forms": {
       "acc": "latviešu gambītu"
      }
+    },
+    "sk": {
+     "name": "Lotyšský gambit",
+     "def": "lotyšský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -8917,6 +9223,11 @@
      "forms": {
       "acc": "ziloņa gambītu"
      }
+    },
+    "sk": {
+     "name": "Sloní gambit",
+     "def": "sloní gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -9064,6 +9375,11 @@
      "forms": {
       "acc": "Nimcoviča-Larsena uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Nimcovičov-Larsenov útok",
+     "def": "Nimcovičov-Larsenov útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -9206,6 +9522,11 @@
      "forms": {
       "acc": "poļu atklātni"
      }
+    },
+    "sk": {
+     "name": "Poľské otvorenie",
+     "def": "poľské otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9348,6 +9669,11 @@
      "forms": {
       "acc": "Groba atklātni"
      }
+    },
+    "sk": {
+     "name": "Grobovo otvorenie",
+     "def": "Grobovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9490,6 +9816,11 @@
      "forms": {
       "acc": "ungāru atklātni"
      }
+    },
+    "sk": {
+     "name": "Maďarské otvorenie",
+     "def": "maďarské otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9633,6 +9964,11 @@
      "forms": {
       "acc": "Mīzesa atklātni"
      }
+    },
+    "sk": {
+     "name": "Miesesovo otvorenie",
+     "def": "Miesesovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9775,6 +10111,11 @@
      "forms": {
       "acc": "Saragosas atklātni"
      }
+    },
+    "sk": {
+     "name": "Zaragozské otvorenie",
+     "def": "zaragozské otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9917,6 +10258,11 @@
      "forms": {
       "acc": "van Gēta atklātni"
      }
+    },
+    "sk": {
+     "name": "Van Geetovo otvorenie",
+     "def": "Van Geetovo otvorenie",
+     "gender": "n"
     }
    },
    "comment": {
@@ -10059,6 +10405,11 @@
      "forms": {
       "acc": "Džobavas Londonas sistēmu"
      }
+    },
+    "sk": {
+     "name": "Jobavov londýnsky systém",
+     "def": "Jobavov londýnsky systém",
+     "gender": "m"
     }
    },
    "comment": {
@@ -10201,6 +10552,11 @@
      "forms": {
       "acc": "akmens sienas uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok Stonewall",
+     "def": "útok Stonewall",
+     "gender": "m"
     }
    },
    "comment": {
@@ -10343,6 +10699,11 @@
      "forms": {
       "acc": "Rihtera-Veresova uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Richterov-Veresovov útok",
+     "def": "Richterov-Veresovov útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -10485,6 +10846,11 @@
      "forms": {
       "acc": "Svētā Jura aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Obrana svätého Juraja",
+     "def": "obrana svätého Juraja",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10627,6 +10993,11 @@
      "forms": {
       "acc": "Borga aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Borgova obrana",
+     "def": "Borgova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10769,6 +11140,11 @@
      "forms": {
       "acc": "nīlzirga aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Obrana Hroch",
+     "def": "obrana Hroch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10912,6 +11288,11 @@
      "forms": {
       "acc": "angļu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Anglická obrana",
+     "def": "anglická obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11054,6 +11435,11 @@
      "forms": {
       "acc": "pterodaktiļa aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Obrana Pterodaktyl",
+     "def": "obrana Pterodaktyl",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11196,6 +11582,11 @@
      "forms": {
       "acc": "Bongklauda uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok Bongcloud",
+     "def": "útok Bongcloud",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11310,6 +11701,11 @@
      "forms": {
       "acc": "atklāto variantu"
      }
+    },
+    "sk": {
+     "name": "Otvorená sicílska obrana",
+     "def": "otvorená sicílska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11416,6 +11812,11 @@
      "forms": {
       "acc": "slēgto variantu"
      }
+    },
+    "sk": {
+     "name": "Zatvorená sicílska obrana",
+     "def": "zatvorená sicílska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11522,6 +11923,11 @@
      "forms": {
       "acc": "Alapina variantu"
      }
+    },
+    "sk": {
+     "name": "Alapinov variant",
+     "def": "Alapinov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11630,6 +12036,11 @@
      "forms": {
       "acc": "Smita-Morras gambītu"
      }
+    },
+    "sk": {
+     "name": "Smithov-Morrov gambit",
+     "def": "Smithov-Morrov gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11737,6 +12148,11 @@
      "forms": {
       "acc": "Grand Prix uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok Grand Prix",
+     "def": "útok Grand Prix",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11843,6 +12259,11 @@
      "forms": {
       "acc": "Rosolimo variantu"
      }
+    },
+    "sk": {
+     "name": "Rossolimov variant",
+     "def": "Rossolimov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11949,6 +12370,11 @@
      "forms": {
       "acc": "Najdorfa variantu"
      }
+    },
+    "sk": {
+     "name": "Najdorfov variant",
+     "def": "Najdorfov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12055,6 +12481,11 @@
      "forms": {
       "acc": "pūķa variantu"
      }
+    },
+    "sk": {
+     "name": "Dračí variant",
+     "def": "dračí variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12163,6 +12594,11 @@
      "forms": {
       "acc": "paātrināto pūķa variantu"
      }
+    },
+    "sk": {
+     "name": "Zrýchlený drak",
+     "def": "zrýchlený drak",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12269,6 +12705,11 @@
      "forms": {
       "acc": "Šēveningenas variantu"
      }
+    },
+    "sk": {
+     "name": "Scheveningenský variant",
+     "def": "scheveningenský variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12375,6 +12816,11 @@
      "forms": {
       "acc": "Svešņikova variantu"
      }
+    },
+    "sk": {
+     "name": "Svešnikovov variant",
+     "def": "Svešnikovov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12482,6 +12928,11 @@
      "forms": {
       "acc": "Taimanova variantu"
      }
+    },
+    "sk": {
+     "name": "Tajmanovov variant",
+     "def": "Tajmanovov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12588,6 +13039,11 @@
      "forms": {
       "acc": "Kana variantu"
      }
+    },
+    "sk": {
+     "name": "Kanov variant",
+     "def": "Kanov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12694,6 +13150,11 @@
      "forms": {
       "acc": "klasisko variantu"
      }
+    },
+    "sk": {
+     "name": "Klasický variant",
+     "def": "klasický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12800,6 +13261,11 @@
      "forms": {
       "acc": "virzīšanas variantu"
      }
+    },
+    "sk": {
+     "name": "Postupový variant",
+     "def": "postupový variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -12906,6 +13372,11 @@
      "forms": {
       "acc": "maiņas variantu"
      }
+    },
+    "sk": {
+     "name": "Výmenný variant",
+     "def": "výmenný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13012,6 +13483,11 @@
      "forms": {
       "acc": "Taraša variantu"
      }
+    },
+    "sk": {
+     "name": "Tarraschov variant",
+     "def": "Tarraschov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13118,6 +13594,11 @@
      "forms": {
       "acc": "Vinavera variantu"
      }
+    },
+    "sk": {
+     "name": "Winawerov variant",
+     "def": "Winawerov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13224,6 +13705,11 @@
      "forms": {
       "acc": "klasisko variantu"
      }
+    },
+    "sk": {
+     "name": "Klasický variant",
+     "def": "klasický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13330,6 +13816,11 @@
      "forms": {
       "acc": "Rubinšteina variantu"
      }
+    },
+    "sk": {
+     "name": "Rubinsteinov variant",
+     "def": "Rubinsteinov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13436,6 +13927,11 @@
      "forms": {
       "acc": "virzīšanas variantu"
      }
+    },
+    "sk": {
+     "name": "Postupový variant",
+     "def": "postupový variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13542,6 +14038,11 @@
      "forms": {
       "acc": "maiņas variantu"
      }
+    },
+    "sk": {
+     "name": "Výmenný variant",
+     "def": "výmenný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13650,6 +14151,11 @@
      "forms": {
       "acc": "Panova uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Panovov útok",
+     "def": "Panovov útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13756,6 +14262,11 @@
      "forms": {
       "acc": "klasisko variantu"
      }
+    },
+    "sk": {
+     "name": "Klasický variant",
+     "def": "klasický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13862,6 +14373,11 @@
      "forms": {
       "acc": "divu zirgu uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok dvoch jazdcov",
+     "def": "útok dvoch jazdcov",
+     "gender": "m"
     }
    },
    "comment": {
@@ -13968,6 +14484,11 @@
      "forms": {
       "acc": "divu zirgu aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Obrana dvoch jazdcov",
+     "def": "obrana dvoch jazdcov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14076,6 +14597,11 @@
      "forms": {
       "acc": "Džuoko piano"
      }
+    },
+    "sk": {
+     "name": "Giuoco piano",
+     "def": "giuoco piano",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14188,6 +14714,11 @@
      "forms": {
       "acc": "Džuoko pianissimo"
      }
+    },
+    "sk": {
+     "name": "Giuoco pianissimo",
+     "def": "giuoco pianissimo",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14298,6 +14829,11 @@
      "forms": {
       "acc": "Evansa gambītu"
      }
+    },
+    "sk": {
+     "name": "Evansov gambit",
+     "def": "Evansov gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -14404,6 +14940,11 @@
      "forms": {
       "acc": "Fegatello uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok Fegatello",
+     "def": "útok Fegatello",
+     "gender": "m"
     }
    },
    "comment": {
@@ -14516,6 +15057,11 @@
      "forms": {
       "acc": "Trakslera pretuzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Traxlerov protiútok",
+     "def": "Traxlerov protiútok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -14622,6 +15168,11 @@
      "forms": {
       "acc": "Berlīnes aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Berlínska obrana",
+     "def": "berlínska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14728,6 +15279,11 @@
      "forms": {
       "acc": "Morfija aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Morphyho obrana",
+     "def": "Morphyho obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14834,6 +15390,11 @@
      "forms": {
       "acc": "slēgto variantu"
      }
+    },
+    "sk": {
+     "name": "Zatvorená španielska hra",
+     "def": "zatvorená španielska hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14940,6 +15501,11 @@
      "forms": {
       "acc": "Māršala uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Marshallov útok",
+     "def": "Marshallov útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15046,6 +15612,11 @@
      "forms": {
       "acc": "maiņas variantu"
      }
+    },
+    "sk": {
+     "name": "Výmenný variant",
+     "def": "výmenný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15152,6 +15723,11 @@
      "forms": {
       "acc": "atklāto variantu"
      }
+    },
+    "sk": {
+     "name": "Otvorená španielska hra",
+     "def": "otvorená španielska hra",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15258,6 +15834,11 @@
      "forms": {
       "acc": "Šlīmaņa aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Schliemannova obrana",
+     "def": "Schliemannova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15364,6 +15945,11 @@
      "forms": {
       "acc": "skotu gambītu"
      }
+    },
+    "sk": {
+     "name": "Škótsky gambit",
+     "def": "škótsky gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15471,6 +16057,11 @@
      "forms": {
       "acc": "Vīnes gambītu"
      }
+    },
+    "sk": {
+     "name": "Viedenský gambit",
+     "def": "viedenský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15578,6 +16169,11 @@
      "forms": {
       "acc": "Staforda gambītu"
      }
+    },
+    "sk": {
+     "name": "Staffordov gambit",
+     "def": "Staffordov gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15686,6 +16282,11 @@
      "forms": {
       "acc": "Pārhema uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok zablúdenej dámy",
+     "def": "útok zablúdenej dámy",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15801,6 +16402,11 @@
      "forms": {
       "acc": "Helovīna gambītu"
      }
+    },
+    "sk": {
+     "name": "Halloweenský gambit",
+     "def": "halloweenský gambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -15907,6 +16513,11 @@
      "forms": {
       "acc": "ortodoksālo aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Ortodoxná obrana",
+     "def": "ortodoxná obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16013,6 +16624,11 @@
      "forms": {
       "acc": "maiņas variantu"
      }
+    },
+    "sk": {
+     "name": "Výmenný variant",
+     "def": "výmenný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16119,6 +16735,11 @@
      "forms": {
       "acc": "Pustaraša aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Polotarraschova obrana",
+     "def": "polotarraschova obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16229,6 +16850,11 @@
      "forms": {
       "acc": "Merānas variantu"
      }
+    },
+    "sk": {
+     "name": "Meránsky variant",
+     "def": "meránsky variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16335,6 +16961,11 @@
      "forms": {
       "acc": "klasisko variantu"
      }
+    },
+    "sk": {
+     "name": "Klasický variant",
+     "def": "klasický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16442,6 +17073,11 @@
      "forms": {
       "acc": "Zēmiša variantu"
      }
+    },
+    "sk": {
+     "name": "Sämischov variant",
+     "def": "Sämischov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16548,6 +17184,11 @@
      "forms": {
       "acc": "četru bandinieku uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok štyroch pešiakov",
+     "def": "útok štyroch pešiakov",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16654,6 +17295,11 @@
      "forms": {
       "acc": "fianketo variantu"
      }
+    },
+    "sk": {
+     "name": "Variant s fianchettom",
+     "def": "variant s fianchettom",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16761,6 +17407,11 @@
      "forms": {
       "acc": "Rubinšteina variantu"
      }
+    },
+    "sk": {
+     "name": "Rubinsteinov variant",
+     "def": "Rubinsteinov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16867,6 +17518,11 @@
      "forms": {
       "acc": "klasisko variantu"
      }
+    },
+    "sk": {
+     "name": "Klasický variant",
+     "def": "klasický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -16973,6 +17629,11 @@
      "forms": {
       "acc": "Zēmiša variantu"
      }
+    },
+    "sk": {
+     "name": "Sämischov variant",
+     "def": "Sämischov variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17079,6 +17740,11 @@
      "forms": {
       "acc": "maiņas variantu"
      }
+    },
+    "sk": {
+     "name": "Výmenný variant",
+     "def": "výmenný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17186,6 +17852,11 @@
      "forms": {
       "acc": "Ļeņingradas variantu"
      }
+    },
+    "sk": {
+     "name": "Leningradský variant",
+     "def": "leningradský variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17292,6 +17963,11 @@
      "forms": {
       "acc": "akmens sienas variantu"
      }
+    },
+    "sk": {
+     "name": "Variant Stonewall",
+     "def": "variant Stonewall",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17398,6 +18074,11 @@
      "forms": {
       "acc": "moderno Benoni aizsardzību"
      }
+    },
+    "sk": {
+     "name": "Moderný Benoni",
+     "def": "moderný Benoni",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17504,6 +18185,11 @@
      "forms": {
       "acc": "atklāto variantu"
      }
+    },
+    "sk": {
+     "name": "Otvorený variant katalánskeho otvorenia",
+     "def": "otvorený variant katalánskeho otvorenia",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17611,6 +18297,11 @@
      "forms": {
       "acc": "slēgto variantu"
      }
+    },
+    "sk": {
+     "name": "Zatvorený variant katalánskeho otvorenia",
+     "def": "zatvorený variant katalánskeho otvorenia",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17717,6 +18408,11 @@
      "forms": {
       "acc": "simetrisko variantu"
      }
+    },
+    "sk": {
+     "name": "Symetrický variant",
+     "def": "symetrický variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -17823,6 +18519,11 @@
      "forms": {
       "acc": "sicīliešu aizsardzību ar mainītām krāsām"
      }
+    },
+    "sk": {
+     "name": "Obrátená sicílska obrana",
+     "def": "obrátená sicílska obrana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -17933,6 +18634,11 @@
      "forms": {
       "acc": "četru bandinieku uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Útok štyroch pešiakov",
+     "def": "útok štyroch pešiakov",
+     "gender": "m"
     }
    },
    "comment": {
@@ -18039,6 +18745,11 @@
      "forms": {
       "acc": "moderno variantu"
      }
+    },
+    "sk": {
+     "name": "Moderný variant",
+     "def": "moderný variant",
+     "gender": "m"
     }
    },
    "comment": {
@@ -18145,6 +18856,11 @@
      "forms": {
       "acc": "austriešu uzbrukumu"
      }
+    },
+    "sk": {
+     "name": "Rakúsky útok",
+     "def": "rakúsky útok",
+     "gender": "m"
     }
    },
    "comment": {
@@ -18251,6 +18967,11 @@
      "forms": {
       "acc": "Falkbēra pretgambītu"
      }
+    },
+    "sk": {
+     "name": "Falkbeerov protigambit",
+     "def": "Falkbeerov protigambit",
+     "gender": "m"
     }
    },
    "comment": {
@@ -18295,7 +19016,8 @@
     "hr": "{X:gen}a varijanta",
     "hu": "{X}-változat",
     "ro": "varianta {X}",
-    "lv": "{X:gen} variants"
+    "lv": "{X:gen} variants",
+    "sk": "{X:gen} variant"
    },
    "id": "varian",
    "nl": "variant",
@@ -18311,7 +19033,8 @@
    "hr": "varijanta",
    "hu": "változat",
    "ro": "variantă",
-   "lv": "variants"
+   "lv": "variants",
+   "sk": "variant"
   },
   "Attack": {
    "en": "Attack",
@@ -18348,7 +19071,8 @@
     "hr": "{X:gen} napad",
     "hu": "{X}-támadás",
     "ro": "atacul {X}",
-    "lv": "{X:gen} uzbrukums"
+    "lv": "{X:gen} uzbrukums",
+    "sk": "{X:gen} útok"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -18364,7 +19088,8 @@
    "hr": "napad",
    "hu": "támadás",
    "ro": "atac",
-   "lv": "uzbrukums"
+   "lv": "uzbrukums",
+   "sk": "útok"
   },
   "Gambit": {
    "en": "Gambit",
@@ -18401,7 +19126,8 @@
     "hr": "{X:gen} gambit",
     "hu": "{X}-csel",
     "ro": "gambitul {X}",
-    "lv": "{X:gen} gambīts"
+    "lv": "{X:gen} gambīts",
+    "sk": "{X:gen} gambit"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -18417,7 +19143,8 @@
    "hr": "gambit",
    "hu": "csel",
    "ro": "gambit",
-   "lv": "gambīts"
+   "lv": "gambīts",
+   "sk": "gambit"
   },
   "Defense": {
    "en": "Defense",
@@ -18454,7 +19181,8 @@
     "hr": "{X:gen}a obrana",
     "hu": "{X}-védelem",
     "ro": "apărarea {X}",
-    "lv": "{X:gen} aizsardzība"
+    "lv": "{X:gen} aizsardzība",
+    "sk": "{X} obrana"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -18470,7 +19198,8 @@
    "hr": "obrana",
    "hu": "védelem",
    "ro": "apărare",
-   "lv": "aizsardzība"
+   "lv": "aizsardzība",
+   "sk": "obrana"
   },
   "System": {
    "en": "System",
@@ -18507,7 +19236,8 @@
     "hr": "{X:gen} sustav",
     "hu": "{X}-rendszer",
     "ro": "sistemul {X}",
-    "lv": "{X:gen} sistēma"
+    "lv": "{X:gen} sistēma",
+    "sk": "{X:gen} systém"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -18523,7 +19253,8 @@
    "hr": "sustav",
    "hu": "rendszer",
    "ro": "sistem",
-   "lv": "sistēma"
+   "lv": "sistēma",
+   "sk": "systém"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -18560,7 +19291,8 @@
     "hr": "{X:gen} protugambit",
     "hu": "{X}-ellencsel",
     "ro": "contragambitul {X}",
-    "lv": "{X:gen} pretgambīts"
+    "lv": "{X:gen} pretgambīts",
+    "sk": "{X:gen} protigambit"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -18576,7 +19308,8 @@
    "hr": "protugambit",
    "hu": "ellencsel",
    "ro": "contragambit",
-   "lv": "pretgambīts"
+   "lv": "pretgambīts",
+   "sk": "protigambit"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -18613,7 +19346,8 @@
     "hr": "{X:gen} protunapad",
     "hu": "{X}-ellentámadás",
     "ro": "contraatacul {X}",
-    "lv": "{X:gen} pretuzbrukums"
+    "lv": "{X:gen} pretuzbrukums",
+    "sk": "{X:gen} protiútok"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -18629,7 +19363,8 @@
    "hr": "protunapad",
    "hu": "ellentámadás",
    "ro": "contraatac",
-   "lv": "pretuzbrukums"
+   "lv": "pretuzbrukums",
+   "sk": "protiútok"
   },
   "Opening": {
    "en": "Opening",
@@ -18666,7 +19401,8 @@
     "hr": "{X:gen}o otvaranje",
     "hu": "{X}-megnyitás",
     "ro": "deschiderea {X}",
-    "lv": "{X:gen} atklātne"
+    "lv": "{X:gen} atklātne",
+    "sk": "{X:gen}o otvorenie"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -18682,7 +19418,8 @@
    "hr": "otvaranje",
    "hu": "megnyitás",
    "ro": "deschidere",
-   "lv": "atklātne"
+   "lv": "atklātne",
+   "sk": "otvorenie"
   },
   "Game": {
    "en": "Game",
@@ -18709,7 +19446,8 @@
    "hr": "partija",
    "hu": "játszma",
    "ro": "partidă",
-   "lv": "partija"
+   "lv": "partija",
+   "sk": "hra"
   },
   "Line": {
    "en": "Line",
@@ -18746,7 +19484,8 @@
     "hr": "{X:gen} nastavak",
     "hu": "{X}-folytatás",
     "ro": "varianta {X}",
-    "lv": "{X:gen} turpinājums"
+    "lv": "{X:gen} turpinājums",
+    "sk": "{X:gen} variant"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -18762,7 +19501,8 @@
    "hr": "nastavak",
    "hu": "folytatás",
    "ro": "variantă",
-   "lv": "turpinājums"
+   "lv": "turpinājums",
+   "sk": "pokračovanie"
   },
   "Formation": {
    "en": "Formation",
@@ -18789,7 +19529,8 @@
    "hr": "postava",
    "hu": "felállás",
    "ro": "formație",
-   "lv": "izvietojums"
+   "lv": "izvietojums",
+   "sk": "postavenie"
   },
   "Trap": {
    "en": "Trap",
@@ -18826,7 +19567,8 @@
     "hr": "{X:gen}a zamka",
     "hu": "{X}-csapda",
     "ro": "capcana {X}",
-    "lv": "{X:gen} slazds"
+    "lv": "{X:gen} slazds",
+    "sk": "{X} pasca"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -18842,7 +19584,8 @@
    "hr": "zamka",
    "hu": "csapda",
    "ro": "capcană",
-   "lv": "slazds"
+   "lv": "slazds",
+   "sk": "pasca"
   },
   "Accepted": {
    "en": "Accepted",
@@ -18869,7 +19612,8 @@
    "hr": "prihvaćeni",
    "hu": "elfogadott",
    "ro": "acceptat",
-   "lv": "pieņemtais"
+   "lv": "pieņemtais",
+   "sk": "prijatý"
   },
   "Declined": {
    "en": "Declined",
@@ -18896,7 +19640,8 @@
    "hr": "odbijeni",
    "hu": "elhárított",
    "ro": "refuzat",
-   "lv": "nepieņemtais"
+   "lv": "nepieņemtais",
+   "sk": "odmietnutý"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -18923,7 +19668,8 @@
    "hr": "varijanta zamjene",
    "hu": "csereváltozat",
    "ro": "varianta de schimb",
-   "lv": "maiņas variants"
+   "lv": "maiņas variants",
+   "sk": "výmenný variant"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -18950,7 +19696,8 @@
    "hr": "varijanta napredovanja",
    "hu": "tolóváltozat",
    "ro": "varianta de avans",
-   "lv": "virzīšanas variants"
+   "lv": "virzīšanas variants",
+   "sk": "postupový variant"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -18977,7 +19724,8 @@
    "hr": "klasična varijanta",
    "hu": "klasszikus változat",
    "ro": "varianta clasică",
-   "lv": "klasiskais variants"
+   "lv": "klasiskais variants",
+   "sk": "klasický variant"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -19004,7 +19752,8 @@
    "hr": "moderna varijanta",
    "hu": "modern változat",
    "ro": "varianta modernă",
-   "lv": "modernais variants"
+   "lv": "modernais variants",
+   "sk": "moderný variant"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -19031,7 +19780,8 @@
    "hr": "otvorena varijanta",
    "hu": "nyílt változat",
    "ro": "varianta deschisă",
-   "lv": "atklātais variants"
+   "lv": "atklātais variants",
+   "sk": "otvorený variant"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -19058,7 +19808,8 @@
    "hr": "zatvorena varijanta",
    "hu": "zárt változat",
    "ro": "varianta închisă",
-   "lv": "slēgtais variants"
+   "lv": "slēgtais variants",
+   "sk": "zatvorený variant"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -19085,7 +19836,8 @@
    "hr": "varijanta s fijanketom",
    "hu": "fianchetto-változat",
    "ro": "varianta cu fianchetto",
-   "lv": "fianketo variants"
+   "lv": "fianketo variants",
+   "sk": "variant s fianchettom"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -19112,7 +19864,8 @@
    "hr": "simetrična varijanta",
    "hu": "szimmetrikus változat",
    "ro": "varianta simetrică",
-   "lv": "simetriskais variants"
+   "lv": "simetriskais variants",
+   "sk": "symetrický variant"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -19139,7 +19892,8 @@
    "hr": "škotski gambit",
    "hu": "skót csel",
    "ro": "gambitul scoțian",
-   "lv": "skotu gambīts"
+   "lv": "skotu gambīts",
+   "sk": "škótsky gambit"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -19166,7 +19920,8 @@
    "hr": "škotska varijanta",
    "hu": "skót változat",
    "ro": "varianta scoțiană",
-   "lv": "skotu variants"
+   "lv": "skotu variants",
+   "sk": "škótsky variant"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -19193,7 +19948,8 @@
    "hr": "danska varijanta",
    "hu": "dán változat",
    "ro": "varianta daneză",
-   "lv": "dāņu variants"
+   "lv": "dāņu variants",
+   "sk": "dánsky variant"
   },
   "Main Line": {
    "en": "Main Line",
@@ -19220,7 +19976,8 @@
    "hr": "glavna varijanta",
    "hu": "főváltozat",
    "ro": "varianta principală",
-   "lv": "galvenais variants"
+   "lv": "galvenais variants",
+   "sk": "hlavný variant"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -19247,7 +20004,8 @@
    "hr": "ubrzani",
    "hu": "gyorsított",
    "ro": "accelerat",
-   "lv": "paātrinātais"
+   "lv": "paātrinātais",
+   "sk": "zrýchlený"
   },
   "Deferred": {
    "en": "Deferred",
@@ -19274,7 +20032,8 @@
    "hr": "odgođeni",
    "hu": "késleltetett",
    "ro": "amânat",
-   "lv": "atliktais"
+   "lv": "atliktais",
+   "sk": "odložený"
   },
   "Reversed": {
    "en": "Reversed",
@@ -19301,7 +20060,8 @@
    "hr": "s obrnutim bojama",
    "hu": "fordított színekkel",
    "ro": "cu culorile inversate",
-   "lv": "ar mainītām krāsām"
+   "lv": "ar mainītām krāsām",
+   "sk": "s obrátenými farbami"
   }
  },
  "eponyms": {
@@ -19377,6 +20137,10 @@
    "lv": {
     "nom": "Steinics",
     "gen": "Steinica"
+   },
+   "sk": {
+    "nom": "Steinitzova",
+    "gen": "Steinitzov"
    }
   },
   "Rubinstein": {
@@ -19451,6 +20215,10 @@
    "lv": {
     "nom": "Rubinšteins",
     "gen": "Rubinšteina"
+   },
+   "sk": {
+    "nom": "Rubinsteinova",
+    "gen": "Rubinsteinov"
    }
   },
   "Winawer": {
@@ -19525,6 +20293,10 @@
    "lv": {
     "nom": "Vinavers",
     "gen": "Vinavera"
+   },
+   "sk": {
+    "nom": "Winawerova",
+    "gen": "Winawerov"
    }
   },
   "Evans": {
@@ -19599,6 +20371,10 @@
    "lv": {
     "nom": "Evanss",
     "gen": "Evansa"
+   },
+   "sk": {
+    "nom": "Evansova",
+    "gen": "Evansov"
    }
   },
   "Chigorin": {
@@ -19673,6 +20449,10 @@
    "lv": {
     "nom": "Čigorins",
     "gen": "Čigorina"
+   },
+   "sk": {
+    "nom": "Čigorinova",
+    "gen": "Čigorinov"
    }
   },
   "Morphy": {
@@ -19747,6 +20527,10 @@
    "lv": {
     "nom": "Morfijs",
     "gen": "Morfija"
+   },
+   "sk": {
+    "nom": "Morphyho",
+    "gen": "Morphyho"
    }
   },
   "Tarrasch": {
@@ -19821,6 +20605,10 @@
    "lv": {
     "nom": "Tarašs",
     "gen": "Taraša"
+   },
+   "sk": {
+    "nom": "Tarraschova",
+    "gen": "Tarraschov"
    }
   },
   "Alekhine": {
@@ -19895,6 +20683,10 @@
    "lv": {
     "nom": "Aļehīns",
     "gen": "Aļehīna"
+   },
+   "sk": {
+    "nom": "Aljechinova",
+    "gen": "Aljechinov"
    }
   },
   "Sämisch": {
@@ -19969,6 +20761,10 @@
    "lv": {
     "nom": "Zēmišs",
     "gen": "Zēmiša"
+   },
+   "sk": {
+    "nom": "Sämischova",
+    "gen": "Sämischov"
    }
   },
   "Nimzowitsch": {
@@ -20043,6 +20839,10 @@
    "lv": {
     "nom": "Nimcovičs",
     "gen": "Nimcoviča"
+   },
+   "sk": {
+    "nom": "Nimcovičova",
+    "gen": "Nimcovičov"
    }
   },
   "Najdorf": {
@@ -20117,6 +20917,10 @@
    "lv": {
     "nom": "Najdorfs",
     "gen": "Najdorfa"
+   },
+   "sk": {
+    "nom": "Najdorfova",
+    "gen": "Najdorfov"
    }
   },
   "Bogoljubow": {
@@ -20191,6 +20995,10 @@
    "lv": {
     "nom": "Bogoļubovs",
     "gen": "Bogoļubova"
+   },
+   "sk": {
+    "nom": "Bogoljubovova",
+    "gen": "Bogoljubovov"
    }
   },
   "Alapin": {
@@ -20265,6 +21073,10 @@
    "lv": {
     "nom": "Alapins",
     "gen": "Alapina"
+   },
+   "sk": {
+    "nom": "Alapinova",
+    "gen": "Alapinov"
    }
   },
   "Botvinnik": {
@@ -20339,6 +21151,10 @@
    "lv": {
     "nom": "Botviņņiks",
     "gen": "Botviņņika"
+   },
+   "sk": {
+    "nom": "Botvinnikova",
+    "gen": "Botvinnikov"
    }
   },
   "Paulsen": {
@@ -20413,6 +21229,10 @@
    "lv": {
     "nom": "Paulsens",
     "gen": "Paulsena"
+   },
+   "sk": {
+    "nom": "Paulsenova",
+    "gen": "Paulsenov"
    }
   },
   "Marshall": {
@@ -20487,6 +21307,10 @@
    "lv": {
     "nom": "Māršals",
     "gen": "Māršala"
+   },
+   "sk": {
+    "nom": "Marshallova",
+    "gen": "Marshallov"
    }
   },
   "Kieseritzky": {
@@ -20561,6 +21385,10 @@
    "lv": {
     "nom": "Kīzerickis",
     "gen": "Kīzericka"
+   },
+   "sk": {
+    "nom": "Kieseritzkého",
+    "gen": "Kieseritzkého"
    }
   },
   "Panov": {
@@ -20635,6 +21463,10 @@
    "lv": {
     "nom": "Panovs",
     "gen": "Panova"
+   },
+   "sk": {
+    "nom": "Panovova",
+    "gen": "Panovov"
    }
   },
   "Keres": {
@@ -20709,6 +21541,10 @@
    "lv": {
     "nom": "Keress",
     "gen": "Keresa"
+   },
+   "sk": {
+    "nom": "Keresova",
+    "gen": "Keresov"
    }
   },
   "Tartakower": {
@@ -20783,6 +21619,10 @@
    "lv": {
     "nom": "Tartakovers",
     "gen": "Tartakovera"
+   },
+   "sk": {
+    "nom": "Tartakowerova",
+    "gen": "Tartakowerov"
    }
   },
   "Maróczy": {
@@ -20857,6 +21697,10 @@
    "lv": {
     "nom": "Maroci",
     "gen": "Maroci"
+   },
+   "sk": {
+    "nom": "Maróczyho",
+    "gen": "Maróczyho"
    }
   },
   "Falkbeer": {
@@ -20931,6 +21775,10 @@
    "lv": {
     "nom": "Falkbērs",
     "gen": "Falkbēra"
+   },
+   "sk": {
+    "nom": "Falkbeerova",
+    "gen": "Falkbeerov"
    }
   },
   "Scheveningen": {
@@ -21005,6 +21853,10 @@
    "lv": {
     "nom": "Šēveningena",
     "gen": "Šēveningenas"
+   },
+   "sk": {
+    "nom": "scheveningenská",
+    "gen": "scheveningenský"
    }
   },
   "Richter-Rauzer": {
@@ -21079,6 +21931,10 @@
    "lv": {
     "nom": "Rihters-Rauzers",
     "gen": "Rihtera-Rauzera"
+   },
+   "sk": {
+    "nom": "Richterova-Rauzerova",
+    "gen": "Richterov-Rauzerov"
    }
   },
   "Lasker": {
@@ -21153,6 +22009,10 @@
    "lv": {
     "nom": "Laskers",
     "gen": "Laskera"
+   },
+   "sk": {
+    "nom": "Laskerova",
+    "gen": "Laskerov"
    }
   },
   "Taimanov": {
@@ -21227,6 +22087,10 @@
    "lv": {
     "nom": "Taimanovs",
     "gen": "Taimanova"
+   },
+   "sk": {
+    "nom": "Tajmanovova",
+    "gen": "Tajmanovov"
    }
   },
   "Smyslov": {
@@ -21301,6 +22165,10 @@
    "lv": {
     "nom": "Smislovs",
     "gen": "Smislova"
+   },
+   "sk": {
+    "nom": "Smyslovova",
+    "gen": "Smyslovov"
    }
   },
   "Spassky": {
@@ -21375,6 +22243,10 @@
    "lv": {
     "nom": "Spaskis",
     "gen": "Spaska"
+   },
+   "sk": {
+    "nom": "Spasského",
+    "gen": "Spasského"
    }
   },
   "Spielmann": {
@@ -21449,6 +22321,10 @@
    "lv": {
     "nom": "Špīlmanis",
     "gen": "Špīlmaņa"
+   },
+   "sk": {
+    "nom": "Spielmannova",
+    "gen": "Spielmannov"
    }
   },
   "Averbakh": {
@@ -21523,6 +22399,10 @@
    "lv": {
     "nom": "Averbahs",
     "gen": "Averbaha"
+   },
+   "sk": {
+    "nom": "Averbachova",
+    "gen": "Averbachov"
    }
   },
   "Greco": {
@@ -21597,6 +22477,10 @@
    "lv": {
     "nom": "Greko",
     "gen": "Greko"
+   },
+   "sk": {
+    "nom": "Grecova",
+    "gen": "Grecov"
    }
   },
   "Capablanca": {
@@ -21671,6 +22555,10 @@
    "lv": {
     "nom": "Kapablanka",
     "gen": "Kapablankas"
+   },
+   "sk": {
+    "nom": "Capablancova",
+    "gen": "Capablancov"
    }
   },
   "Kan": {
@@ -21745,6 +22633,10 @@
    "lv": {
     "nom": "Kans",
     "gen": "Kana"
+   },
+   "sk": {
+    "nom": "Kanova",
+    "gen": "Kanov"
    }
   },
   "Albin": {
@@ -21819,6 +22711,10 @@
    "lv": {
     "nom": "Albins",
     "gen": "Albina"
+   },
+   "sk": {
+    "nom": "Albinova",
+    "gen": "Albinov"
    }
   },
   "Breyer": {
@@ -21893,6 +22789,10 @@
    "lv": {
     "nom": "Breiers",
     "gen": "Breiera"
+   },
+   "sk": {
+    "nom": "Breyerova",
+    "gen": "Breyerov"
    }
   },
   "Schlechter": {
@@ -21967,6 +22867,10 @@
    "lv": {
     "nom": "Šlehters",
     "gen": "Šlehtera"
+   },
+   "sk": {
+    "nom": "Schlechterova",
+    "gen": "Schlechterov"
    }
   },
   "Jaenisch": {
@@ -22041,6 +22945,10 @@
    "lv": {
     "nom": "Jēnišs",
     "gen": "Jēniša"
+   },
+   "sk": {
+    "nom": "Jaenischova",
+    "gen": "Jaenischov"
    }
   },
   "Karpov": {
@@ -22115,6 +23023,10 @@
    "lv": {
     "nom": "Karpovs",
     "gen": "Karpova"
+   },
+   "sk": {
+    "nom": "Karpovova",
+    "gen": "Karpovov"
    }
   },
   "Petrosian": {
@@ -22189,6 +23101,10 @@
    "lv": {
     "nom": "Petrosjans",
     "gen": "Petrosjana"
+   },
+   "sk": {
+    "nom": "Petrosjanova",
+    "gen": "Petrosjanov"
    }
   },
   "Euwe": {
@@ -22263,6 +23179,10 @@
    "lv": {
     "nom": "Eive",
     "gen": "Eives"
+   },
+   "sk": {
+    "nom": "Euweho",
+    "gen": "Euweho"
    }
   },
   "Sozin": {
@@ -22337,6 +23257,10 @@
    "lv": {
     "nom": "Sozins",
     "gen": "Sozina"
+   },
+   "sk": {
+    "nom": "Sozinova",
+    "gen": "Sozinov"
    }
   },
   "Schliemann": {
@@ -22411,6 +23335,10 @@
    "lv": {
     "nom": "Šlīmanis",
     "gen": "Šlīmaņa"
+   },
+   "sk": {
+    "nom": "Schliemannova",
+    "gen": "Schliemannov"
    }
   },
   "Anderssen": {
@@ -22485,6 +23413,10 @@
    "lv": {
     "nom": "Andersens",
     "gen": "Andersena"
+   },
+   "sk": {
+    "nom": "Anderssenova",
+    "gen": "Anderssenov"
    }
   },
   "Philidor": {
@@ -22559,6 +23491,10 @@
    "lv": {
     "nom": "Filidors",
     "gen": "Filidora"
+   },
+   "sk": {
+    "nom": "Philidorova",
+    "gen": "Philidorov"
    }
   },
   "Zaitsev": {
@@ -22633,6 +23569,10 @@
    "lv": {
     "nom": "Zaicevs",
     "gen": "Zaiceva"
+   },
+   "sk": {
+    "nom": "Zajcevova",
+    "gen": "Zajcevov"
    }
   },
   "Sveshnikov": {
@@ -22707,6 +23647,10 @@
    "lv": {
     "nom": "Svešņikovs",
     "gen": "Svešņikova"
+   },
+   "sk": {
+    "nom": "Svešnikovova",
+    "gen": "Svešnikovov"
    }
   },
   "Kasparov": {
@@ -22781,6 +23725,10 @@
    "lv": {
     "nom": "Kasparovs",
     "gen": "Kasparova"
+   },
+   "sk": {
+    "nom": "Kasparovova",
+    "gen": "Kasparovov"
    }
   },
   "Fischer": {
@@ -22855,6 +23803,10 @@
    "lv": {
     "nom": "Fišers",
     "gen": "Fišera"
+   },
+   "sk": {
+    "nom": "Fischerova",
+    "gen": "Fischerov"
    }
   },
   "Tal": {
@@ -22929,6 +23881,10 @@
    "lv": {
     "nom": "Tāls",
     "gen": "Tāla"
+   },
+   "sk": {
+    "nom": "Talova",
+    "gen": "Talov"
    }
   },
   "McCutcheon": {
@@ -23003,6 +23959,10 @@
    "lv": {
     "nom": "Makkačens",
     "gen": "Makkačena"
+   },
+   "sk": {
+    "nom": "McCutcheonova",
+    "gen": "McCutcheonov"
    }
   },
   "Bronstein": {
@@ -23077,6 +24037,10 @@
    "lv": {
     "nom": "Bronšteins",
     "gen": "Bronšteina"
+   },
+   "sk": {
+    "nom": "Bronštejnova",
+    "gen": "Bronštejnov"
    }
   },
   "Janowski": {
@@ -23151,6 +24115,10 @@
    "lv": {
     "nom": "Janovskis",
     "gen": "Janovska"
+   },
+   "sk": {
+    "nom": "Janowského",
+    "gen": "Janowského"
    }
   },
   "Staunton": {
@@ -23225,6 +24193,10 @@
    "lv": {
     "nom": "Stontons",
     "gen": "Stontona"
+   },
+   "sk": {
+    "nom": "Stauntonova",
+    "gen": "Stauntonov"
    }
   },
   "Max Lange": {
@@ -23299,6 +24271,10 @@
    "lv": {
     "nom": "Makss Lange",
     "gen": "Maksa Langes"
+   },
+   "sk": {
+    "nom": "Maxa Langeho",
+    "gen": "Maxa Langeho"
    }
   },
   "Petrov": {
@@ -23373,6 +24349,10 @@
    "lv": {
     "nom": "Petrovs",
     "gen": "Petrova"
+   },
+   "sk": {
+    "nom": "Petrovova",
+    "gen": "Petrovov"
    }
   },
   "Grünfeld": {
@@ -23447,6 +24427,10 @@
    "lv": {
     "nom": "Grīnfelds",
     "gen": "Grīnfelda"
+   },
+   "sk": {
+    "nom": "Grünfeldova",
+    "gen": "Grünfeldov"
    }
   },
   "Colle": {
@@ -23521,6 +24505,10 @@
    "lv": {
     "nom": "Kolle",
     "gen": "Kolles"
+   },
+   "sk": {
+    "nom": "Colleho",
+    "gen": "Colleho"
    }
   },
   "Torre": {
@@ -23595,6 +24583,10 @@
    "lv": {
     "nom": "Torre",
     "gen": "Torres"
+   },
+   "sk": {
+    "nom": "Torreho",
+    "gen": "Torreho"
    }
   },
   "Réti": {
@@ -23669,6 +24661,10 @@
    "lv": {
     "nom": "Rēti",
     "gen": "Rēti"
+   },
+   "sk": {
+    "nom": "Rétiho",
+    "gen": "Rétiho"
    }
   }
  },
@@ -23744,6 +24740,10 @@
   "lv": {
    "compose_proper_names": false,
    "file_pattern": "(?<![\\w-])(?P<f>[a-h])(?= (?:vertikāl|bandiniek))"
+  },
+  "sk": {
+   "compose_proper_names": false,
+   "file_pattern": "\\b(?:[Ss]tĺp(?:ec|ca|ci|com|ce|cov)|[Pp]eši(?:ak|aka|akom|akovi|aci|akov|akmi)) (?P<f>[b-h](?!\\w)|a(?= aj stĺpec\\b))"
   }
  }
 }

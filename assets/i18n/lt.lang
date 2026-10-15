@@ -997,3 +997,221 @@ direct.err.reset = Ryšys nutrauktas.
 direct.err.closed = Ryšys uždarytas.
 direct.err.host_left = Jūsų draugas nutraukė partijos rengimą.
 direct.err.other = Nepavyko užmegzti ryšio ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Žaidėjas 2
+hotseat.white_player = Baltieji
+hotseat.black_player = Juodieji
+hotseat.name.help = Vardas, rašomas abiejuose partijos blankuose, bet kuria abėcėle.
+hotseat.swap = Sukeisti spalvas
+hotseat.left_hand = {0} žaidžia kaire ranka: laikrodis stovi kairėje.
+hotseat.rated = Reitinginė partija
+hotseat.rated.help = Kiekvienas vardas šiame kompiuteryje turi savo dviejų žaidėjų reitingą. Jūsų reitingas prieš Stockfish niekada nesikeičia.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Dviejų žaidėjų reitingai: {0} {1} · {2} {3}
+hotseat.new_rating = (naujas)
+hotseat.friendly_note = Draugiška partija: reitingai nesikeičia.
+hotseat.colours = {0} žaidžia baltosiomis, {1} – juodosiomis.
+hotseat.colours_swap = Kiekviename revanše spalvos sukeičiamos.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+# Names cannot be declined: they stay in the nominative ("{0} pasiduoda?"), never after a genitive.
+hotseat.your_move = {0}, jūsų ėjimas
+hotseat.flag = {0}: laikas baigėsi.
+hotseat.confirm.resign = {0} pasiduoda? Partiją laimės {1}.
+hotseat.confirm.resign_draw = {0} pasiduoda? {1} nebegali paskelbti mato: partija baigsis lygiosiomis.
+hotseat.draw.offer_noted = Jūsų lygiųjų pasiūlymas perduodamas kartu su ėjimu: {0} jį pamatys, kai paspausite laikrodį.
+hotseat.draw.card_title = LYGIŲJŲ PASIŪLYMAS
+hotseat.draw.offered = {0} siūlo lygiąsias.
+hotseat.draw.card_hint = Palietus figūrą, pasiūlymas atmetamas.
+hotseat.draw.accept = Priimti
+hotseat.draw.decline = Atmesti
+hotseat.draw.accepted = {1} pasiūlė lygiąsias – {0} sutinka.
+hotseat.draw.declined = {1} pasiūlė lygiąsias – {0} atsisako.
+# Scoresheet header note
+hotseat.sheet.rated = Reitinginė partija
+hotseat.sheet.friendly = Draugiška partija
+# Game over card
+hotseat.gameover.wins = {0} laimėjo per {1} ėjimą.|{0} laimėjo per {1} ėjimus.|{0} laimėjo per {1} ėjimų.
+hotseat.gameover.wins_now = {0} laimėjo.
+hotseat.gameover.friendly = {0} prieš {1} · draugiška partija
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Ši partija neturi įtakos reitingui.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Treneris
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Sintetinę kalbą trenerio režimui sugeneravo {0}
+# Coach page
+coach.title = TRENERIS
+coach.section.level = LYGIS
+coach.section.lesson = SU TRENERIU
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Žaidėjams, kurių reitingas {0}
+coach.completed = Įveikta
+coach.recommended = Rekomenduojama
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+# Level names as the coach quotes them (appraisal.level.* in assets/coach/speech/lt/appraisal.lang).
+coach.level.0.name = Šachmatų taisyklės
+coach.level.0.desc = Interaktyvi pamoka, po vieną taisyklę.
+coach.level.0.detail = Treneris išdėsto nedideles pozicijas ir parodo, kaip kiekviena figūra eina ir kerta, o paskui – rokiruotę, pėstininko virsmą, šachą ir matą. Kiekvieną idėją lentoje išbandote savarankiškai.
+coach.level.1.name = Pirmieji žingsniai
+coach.level.1.desc = Kas puolama, kas paliekama neapginta.
+coach.level.1.detail = Treneris žaidžia švelniai ir kalba paprastai: kurios jūsų figūros puolamos, kurios paliktos be apsaugos ir kaip jas išsaugoti.
+coach.level.2.name = Pradedantysis
+coach.level.2.desc = Paprasta taktika, figūrų vystymas, karaliaus saugumas.
+coach.level.2.detail = Šakutės ir surišimai vadinami tikraisiais vardais. Treneris kalba apie figūrų išvedimą ir karaliaus saugumą.
+coach.level.3.name = Mėgėjas
+coach.level.3.desc = Planai, pėstininkų struktūra, vieninteliai ėjimai.
+coach.level.3.detail = Treneris aiškina planus ir pėstininkų struktūras bei įspėja, kai poziciją išlaiko tik vienas ėjimas.
+coach.level.4.name = Klubo žaidėjas
+coach.level.4.desc = Kandidatiniai ėjimai, įvertinimas pėstininkais.
+coach.level.4.detail = Treneris pasveria kandidatinius ėjimus ir pateikia įvertinimą pėstininkais, kaip tai darytų klubo treneris.
+coach.level.5.name = Stiprus klubo žaidėjas
+coach.level.5.desc = Glausti variantai, pozicinės sąvokos.
+coach.level.5.detail = Trumpos pastabos, konkretūs variantai ir pozicinio žaidimo žodynas.
+coach.level.6.name = Ekspertas
+coach.level.6.desc = Lakoniškos pastabos, gilūs variantai, įvertinimai skaičiais.
+coach.level.6.detail = Nedaug žodžių, kaip tarp stiprių žaidėjų: kelių ėjimų gylio variantai ir įvertinimai skaičiais.
+coach.note.clock = Be laikrodžio: galvokite tiek, kiek reikia.
+coach.note.takeback = Po šiurkščios klaidos treneris parodo, kas nutiko, ir pasiūlo ėjimą atšaukti.
+coach.note.lesson = Žaidžiate baltosiomis; treneris kiekvieną pratimą išdėsto lentoje.
+coach.note.unrated = Partijos su treneriu neturi įtakos reitingui.
+coach.note.fallible = Treneris nėra neklystantis: kartais jis gali klaidingai įvertinti ėjimą.
+coach.colour = Jūsų spalva
+coach.colour.help = Kokiomis figūromis žaidžiate prieš trenerį. Pakaitomis: vieną partiją baltosiomis, kitą – juodosiomis. Pamoka apie taisykles visada žaidžiama baltosiomis.
+coach.colour.alternate = Pakaitomis
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Trenerio balsas neįdiegtas arba išjungtas (Nustatymai > Garsas): jo žodžiai bus rodomi ekrane.
+# At the table
+coach.speaker = TRENERIS
+coach.skip = Praleisti
+coach.offer.title = ATŠAUKTI ĖJIMĄ?
+coach.offer.text = Treneris siūlo atšaukti paskutinį jūsų ėjimą, kad galėtumėte paieškoti geresnio.
+coach.offer.hint = Backspace – atšaukti. Palietus figūrą, žaidimas tęsiamas.
+coach.offer.accept = Atšaukti ėjimą
+coach.offer.decline = Žaisti toliau
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Liko ėjimo atšaukimų: {0}
+coach.pause.take_back = Atšaukti mano ėjimą
+coach.pause.take_back.help = Atšaukia paskutinį jūsų ėjimą ir trenerio atsakymą, jei jis jau buvo padarytas.
+coach.confirm.resign = Pasiduoti šioje partijoje? Laimėtoju bus paskelbtas treneris.
+coach.confirm.resign_draw = Pasiduoti šioje partijoje? Treneris nebegali paskelbti mato: partija baigsis lygiosiomis.
+coach.confirm.leave = Grįžti į pagrindinį meniu? Ši partija su treneriu bus nutraukta.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Žaisti dar kartą
+coach.gameover.unrated = Ši partija su treneriu neturi įtakos reitingui.
+coach.lesson.done = PUIKU
+coach.lesson.done.line = Dabar jau žinote šachmatų taisykles.
+coach.lesson.next = Pirmoji partija
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Treniruotės
+coach.tab.challenges = Iššūkiai
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATAI
+challenge.group.tactics = TAKTIKA
+challenge.group.defence = GYNYBA
+challenge.group.endgames = ENDŠPILIAI
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+# Names as the coach quotes them (challenge.lang); the two imperative names take the formal form here.
+challenge.mate1.name = Matas per vieną ėjimą
+challenge.mate1.desc = Vienas ėjimas – ir matas.
+challenge.mate1.detail = Pirmiausia peržiūrėkite visus šachus: vienas iš jų nepalieka karaliui nei laisvo langelio, nei galimybės užsidengti ar kirsti.
+challenge.mate2.name = Matas per du ėjimus
+challenge.mate2.desc = Ėjimas, po kurio nebėra gynybos, o tada – matas.
+challenge.mate2.detail = Pirmasis ėjimas dažnai būna šachas arba auka, atimanti iš karaliaus langelį. Treneris ginasi kiek tik gali.
+challenge.mate3.name = Matas per tris ėjimus
+challenge.mate3.desc = Ilgesni priverstiniai variantai.
+challenge.mate3.detail = Šachai, kirtimai ir grėsmės trijų ėjimų gyliu. Prieš liečiant figūrą, kiekviename žingsnyje apskaičiuokite geriausią trenerio atsakymą.
+challenge.backrank.name = Matai paskutinėje horizontalėje
+challenge.backrank.desc = Karalius įkalintas už savo pėstininkų.
+challenge.backrank.detail = Kai pėstininkai prieš rokiruotą karalių dar nepajudėję, bokštas ar valdovė paskutinėje horizontalėje gali paskelbti matą. Pirmiausia pašalinkite arba atitraukite gynėjus.
+challenge.patterns.name = Tipiniai matai
+challenge.patterns.desc = Uždusintas matas, Anastasijos, arabiškasis ir kita klasika.
+challenge.patterns.detail = Garsūs matiniai tinklai, kurie kartojasi vėl ir vėl. Išmokite atpažinti figūrų išsidėstymą ir lemiamą smūgį.
+challenge.hanging.name = Neapgintos figūros
+challenge.hanging.desc = Pastebėkite, kas paliekama neapginta.
+challenge.hanging.detail = Figūrą ar pėstininką, kurio niekas negina, galima tiesiog nukirsti. Patikrinkite, kas saugo kiekvieną trenerio figūrą.
+challenge.fork.name = Šakutės
+challenge.fork.desc = Viena figūra puola dvi iš karto.
+challenge.fork.detail = Šakutę gali padaryti žirgai, pėstininkai, valdovės ir net karaliai. Varžovas gali išgelbėti tik vieną iš dviejų taikinių.
+challenge.pin.name = Surišimai
+challenge.pin.desc = Figūra, kuri negali pajudėti neprarasdama to, kas stovi už jos.
+challenge.pin.detail = Suriškite figūrą su jos karaliumi arba su vertingesne figūra, tada pulkite ją dar kartą arba pasinaudokite tuo, kad ji negali pajudėti.
+challenge.skewer.name = Pradūrimai
+challenge.skewer.desc = Pulkite vertingą figūrą ir laimėkite už jos stovinčią.
+challenge.skewer.detail = Surišimo priešingybė: vertingesnė figūra stovi priekyje, turi pasitraukti ir atidengia už jos esančią figūrą.
+challenge.discovered.name = Atidengti puolimai
+challenge.discovered.desc = Pajudinkite vieną figūrą ir paleiskite į kovą kitą.
+challenge.discovered.detail = Kai figūra pasitraukia iš linijos, už jos stovinti figūra ima pulti. Su šachu ar dvigubu šachu varžovas nespėja atremti abiejų grėsmių.
+challenge.deflection.name = Nukreipimas ir suviliojimas
+challenge.deflection.desc = Atitraukite gynėją arba suviliokite figūrą į pražūtingą langelį.
+challenge.deflection.detail = Gynėjas, turintis dvi užduotis, negali atlikti abiejų. Pulkite jį, ką nors jam pasiūlykite arba priverskite figūrą užeiti į langelį, kuriame ji bus prarasta.
+challenge.intermezzo.name = Tarpiniai ėjimai
+challenge.intermezzo.desc = Nekirskite atgal iš karto: yra kai kas stipresnio.
+challenge.intermezzo.detail = Prieš laukiamą ėjimą įterptas šachas ar didesnė grėsmė viską pakeičia.
+challenge.trapped.name = Įkalintos figūros
+challenge.trapped.desc = Figūra, kuriai nebeliko saugių langelių.
+challenge.trapped.detail = Atimkite iš figūros paskutinius pasitraukimo langelius, tada laimėkite ją.
+challenge.promotion.name = Pėstininko virsmas
+challenge.promotion.desc = Prasiveržkite pėstininku iki paskutinės horizontalės.
+challenge.promotion.detail = Pažengę pėstininkai labai vertingi. Atlaisvinkite kelią, nukreipkite blokuojančias figūras ir pasidarykite naują valdovę.
+challenge.quiet.name = Tylūs ėjimai
+challenge.quiet.desc = Laimintis ėjimas nėra nei šachas, nei kirtimas.
+challenge.quiet.detail = Kartais stipriausias ėjimas tik paruošia grėsmę, kurios neįmanoma atremti. Tokius ėjimus pamatyti sunkiausia.
+challenge.opening.name = Debiuto spąstai
+challenge.opening.desc = Nubauskite už ankstyvas klaidas.
+challenge.opening.detail = Pozicijos iš pirmųjų tikrų partijų ėjimų, kuriose vieną neapdairų ėjimą galima iš karto išnaudoti.
+challenge.escape.name = Raskite išsigelbėjimą
+challenge.escape.desc = Jūsų karaliui gresia pavojus: jį išgelbės vienas ėjimas.
+challenge.escape.detail = Visi kiti ėjimai pralaimi. Peržiūrėkite visus šachus ir grėsmes jūsų karaliui, tada raskite vienintelę išeitį.
+challenge.defend.name = Gynybiniai ėjimai
+challenge.defend.desc = Atremkite grėsmę be medžiagos nuostolių.
+challenge.defend.detail = Treneris kuo nors grasina. Raskite tikslų ėjimą, kuris viską išlaiko.
+challenge.kq.name = Valdovė ir karalius prieš karalių
+challenge.kq.desc = Matas valdove.
+challenge.kq.detail = Valdove nustumkite vienišą karalių prie lentos krašto, atveskite arčiau savo karalių ir saugokitės pato. Treneris ginasi geriausiais ėjimais.
+challenge.kr.name = Bokštas ir karalius prieš karalių
+challenge.kr.desc = Matas bokštu.
+challenge.kr.detail = Bokštas atkerta karalių horizontalė po horizontalės, o jūsų karalius užima opoziciją. Treneris ginasi geriausiais ėjimais.
+challenge.kp.name = Karalius ir pėstininkas prieš karalių
+challenge.kp.desc = Užimkite opoziciją ir paverskite pėstininką valdove.
+challenge.kp.detail = Pirmiausia veskite karalių, o ne pėstininką. Užimkite opoziciją ir pasidarykite valdovę, kurios treneris nebepagaus.
+challenge.kp_hold.name = Sustabdykite pėstininką
+challenge.kp_hold.desc = Vienišas karalius prieš karalių ir pėstininką: išlaikykite lygiąsias.
+challenge.kp_hold.detail = Stovėkite priešais pėstininką ir išlaikykite opoziciją. Išsilaikykite dešimt ėjimų.
+challenge.rook.name = Bokštų endšpiliai
+challenge.rook.desc = Lucenos tiltas ir Filidoro gynyba.
+challenge.rook.detail = Dvi pozicijos, kurias turėtų žinoti kiekvienas žaidėjas: kaip laimėti, kai pėstininkas septintoje horizontalėje, ir kaip gintis, kai bokštas trečioje.
+challenge.endgame.name = Taktika endšpilyje
+challenge.endgame.desc = Mažai figūrų, aštrios idėjos.
+challenge.endgame.detail = Pėstininkų lenktynės, prasiveržimai ir bokštų endšpiliai iš tikrų partijų.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozicija|{0} pozicijos|{0} pozicijų
+coach.challenge.done = Įveikta
+coach.challenge.start = Pradėti
+coach.challenge.note.white = Žaidžiate baltosiomis; treneris kiekvieną poziciją išdėsto lentoje.
+coach.challenge.note.hint = Įstrigote? Paspauskite H ir gausite užuominą. Po kelių bandymų treneris ją pasiūlys pats.
+coach.challenge.note.unsaved = Iššūkiai neturi įtakos reitingui ir neįrašomi; varnelė žymi tuos, kuriuos jau įveikėte.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = IŠŠŪKIS ĮVEIKTAS
+coach.challenge.complete.line = Išsprendėte visas pozicijas.
+coach.challenge.next = Kitas iššūkis
+coach.challenge.again = Dar kartą
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = UŽUOMINA?
+coach.hint.text = Treneris siūlo jums užuominą.
+coach.hint.hint = H – gauti užuominą. Palietus figūrą, ieškoma toliau.
+coach.hint.accept = Užuomina
+coach.hint.decline = Ne, ačiū
+coach.hint.key = Užuomina

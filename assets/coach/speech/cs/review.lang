@@ -5,7 +5,7 @@
 # gender is unknown: no second-person past tense or conditional ("přehlédl jsi", "mohl bys"): the
 # present or future ("ztrácíš", "nezachráníš"), impersonal phrasing ("šlo zahrát", "byl tu mat",
 # "uniklo ti"), nouns, or a piece as subject ("{your} měl{your:past} lepší tah").
-# Pieces carry their possessive; forms from common.lang: acc gen dat loc ins, bare_ins ("táhni
+# Pieces carry their possessive; forms from common.lang: acc gen dat ins, bare_ins ("táhni
 # jezdcem"), refl_acc refl_gen refl_ins ("svého jezdce": after an imperative or a verb whose subject
 # is the player), pron_acc pron_dat pron_ins npron_* ("za ním / za ní"), alone ("sám / sama"),
 # poss_ins, and the endings past ("visel{my:past}") and adj / adj_acc ("kter{my:adj}").
@@ -154,7 +154,7 @@ ex.hint.move.2 = Tady se nabízel lepší tah.
 # The same when the better move plainly wins material for good (the move played wins and loses
 # none); the move is still not named.
 ex.hint.gain.b1 = {your} měl{your:past} lepší tah. Ten tah získává materiál.
-ex.hint.gain.b1.2 = {your:ins} se dal zahrát lepší tah. Získává materiál.
+ex.hint.gain.b1.2 = {your:ins} se dal zahrát lepší tah. Ten tah získává materiál.
 ex.hint.gain.b2 = {your} měl{your:past} lepší tah. Ten tah získává materiál.
 ex.hint.gain.b2.2 = {your:ins} se dal zahrát tah, který získává materiál.
 ex.hint.gain.b3 = {your} měl{your:past} lepší tah, a to takový, který získává materiál.

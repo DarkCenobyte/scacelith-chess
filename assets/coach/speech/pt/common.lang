@@ -288,9 +288,18 @@ move.mate.spoken = {move}, xeque-mate
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: the
-# pronunciation pass adds them after listening (for instance "en passant", which Portuguese says
-# the French way).
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). An initial "x"
+# is unstable: right in "xeque" alone, but "s" in "xeque-mate" ("seque-mate"), "xeques" and half the
+# time "xadrez" ("sadrez"): "ch" is the same sound, always read right ("xeque" in "xeque-mate" is a
+# word of its own, so one key covers both). "en passant" the French way (the voice says "em
+# passante", with the t). "troco" in "a troco de nada" is read with the open o of the verb ("eu
+# troco"): every line has the noun; a line with the verb would need its own .spoken line.
+respell.xeque = cheque
+respell.xeques = cheques
+respell.xadrez = chadrez
+respell.en = ã
+respell.passant = passã
+respell.troco = trôco
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, as Portugal says them (catorze, dezasseis, dezassete, dezanove). 21-99

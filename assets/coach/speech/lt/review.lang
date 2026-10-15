@@ -374,3 +374,139 @@ ex.mate_delayed.b5 = Greičiau – {best:nomate}: matas per {m:move_acc}.
 ex.mate_delayed.b5.2 = Po {best:nomate} matas būtų greičiau – per {m:move_acc}.
 ex.mate_delayed.b6 = {best:nomate}: matas per {m:mv_acc}.
 ex.mate_delayed.b6.2 = Greičiau: {best:nomate}, matas per {m:mv_acc}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = O ne! {my} negali pajudėti, ir {my:pron_dat} nėra šacho. Tai patas – lygiosios.
+ex.stalemate.b1.2 = Žiūrėk: {my:dat} nėra saugaus langelio, bet ir šacho nėra. Lygiosios!
+ex.stalemate.b1.3 = Tai patas. {my} negali pajudėti, todėl partija baigiasi lygiosiomis.
+ex.stalemate.b2 = Patas! {my} neturi nė vieno leistino ėjimo, o šacho nėra. Lygiosios.
+ex.stalemate.b2.2 = O ne, patas: {my} įstrigo, bet šacho {my:pron_dat} nėra.
+ex.stalemate.b2.3 = Lygiosios dėl pato. {my} negali pajudėti.
+ex.stalemate.b3 = Tai patas: {my} neturi leistinų ėjimų. O tavo pozicija buvo laiminti!
+ex.stalemate.b3.2 = Patas! {my} įstrigo, ir laimėta partija baigiasi lygiosiomis.
+ex.stalemate.b3.3 = {my:dat} nei ėjimų, nei šacho: patas.
+ex.stalemate.b4 = Patas: {my} neturi leistinų ėjimų. Taip pergalė išslysta iš rankų.
+ex.stalemate.b4.2 = Po {move} {my:dat} patas. Lygiosios iš laiminčios pozicijos.
+ex.stalemate.b4.3 = Tai patas: {my} įkalint{my:agr_as_a}.
+ex.stalemate.b5 = Po {move} {my:dat} patas. Pergalės nebėra.
+ex.stalemate.b5.2 = Patas: {my:dat} nėra kur eiti.
+ex.stalemate.b5.3 = Tai patas, {my} įstrigo.
+ex.stalemate.b6 = Patas. {my} neturi ėjimų.
+ex.stalemate.b6.2 = {move}, patas: {my} įkalint{my:agr_as_a}.
+ex.stalemate.b6.3 = Patas: {my} negali pajudėti.
+ex.stalemate.tip.b1 = Kai laimi, visada palik mano karaliui langelį, kur eiti.
+ex.stalemate.tip.b1.2 = Atmink: kai turi persvarą, palik mano karaliui šiek tiek vietos.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Atsargiai! Galiu atiduoti savo figūras, ir tada {my} neturės ėjimų: patas.
+ex.stalemate_trick.b1.2 = Atsargiai: {my} beveik įstrigo. Galiu išsikovoti lygiąsias.
+ex.stalemate_trick.b2 = Atsargiai: galiu aukoti, ir {my:dat} būtų patas.
+ex.stalemate_trick.b2.2 = {my:dat} beveik neliko langelių. Galiu priversti patą!
+ex.stalemate_trick.b3 = Taip leidi man išsigelbėti patu: {my:dat} baigiasi ėjimai.
+ex.stalemate_trick.b3.2 = Atsargiai: po {line} {my:dat} patas.
+ex.stalemate_trick.b4 = {move} leidžia pato gudrybę: {line}, ir {my} negali pajudėti.
+ex.stalemate_trick.b4.2 = Dabar {my} gali pasislėpti pate: {line}.
+ex.stalemate_trick.b5 = {move} leidžia patą: {line}; {my} įkalint{my:agr_as_a}.
+ex.stalemate_trick.b5.2 = Pato gudrybė: {line}, ir {my} neturi ėjimų.
+ex.stalemate_trick.b6 = {line}, patas: {my} įkalint{my:agr_as_a}.
+ex.stalemate_trick.b6.2 = Patas po {line}; {my} įstrigo.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} gali eiti į {sq} ir pulti {t1:acc} ir {t2:acc}.
+ex.fork.b1.2 = {my} eina į {sq} ir puola du taikinius: {t1:acc} ir {t2:acc}.
+ex.fork.b1.3 = Stebėk {my:acc}: iš {sq} {my:pron} puola kartu {t1:acc} ir {t2:acc}.
+ex.fork.b2 = Šakutė! {my} langelyje {sq} puola kartu {t1:acc} ir {t2:acc}.
+ex.fork.b2.2 = Po tavo ėjimo {my} iš {sq} gali šakute pulti {t1:acc} ir {t2:acc}.
+ex.fork.b2.3 = {my} eina į {sq}: dvigubas {t1:gen} ir {t2:gen} puolimas.
+ex.fork.b3 = {move} leidžia {reply}, kuris šakute puola {t1:acc} ir {t2:acc}.
+ex.fork.b3.2 = Po {reply} puolu {t1:acc} ir {t2:acc} vienu metu.
+ex.fork.b3.3 = {reply} – šakutė: puolami ir {t1}, ir {t2}.
+ex.fork.b4 = {reply} šakute puola {t1:acc} ir {t2:acc}; po {line} netenki {pts:point_gen}.
+ex.fork.b4.2 = {reply} puola iš karto {t1:acc} ir {t2:acc}.
+ex.fork.b4.3 = {move} leidžia šakutę {reply} prieš {t1:acc} ir {t2:acc}.
+ex.fork.b5 = Po {move} pakliūni į šakutę {reply}: puolami {t1} ir {t2}.
+ex.fork.b5.2 = {reply} šakute puola {t1:acc} ir {t2:acc}.
+ex.fork.b5.3 = Po {reply} puolami abu: {t1} ir {t2}.
+ex.fork.b6 = {reply} – šakutė.
+ex.fork.b6.2 = {move} leidžia {reply} – šakutę.
+ex.fork.b6.3 = {reply}, šakutė.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Išgelbėsi tik vieną: {t1:acc} arba {t2:acc}.
+ex.fork.tail.b1.2 = Dabar iš karto puolu du taikinius: {t1:acc} ir {t2:acc}. Tai šakutė!
+ex.fork.tail.b1.3 = Matai? Puolami ir {t1}, ir {t2}. Vienas iš jų kris.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} turi pasitraukti nuo šacho, todėl kertu {t1:acc}.
+ex.fork.tail_king.2 = Šachas! {your:dat} tenka trauktis, ir {t1} krinta.
+ex.fork.more.b3 = Prieš ėjimą patikrink langelį {sq}: iš jo {my} gali pulti šakute.
+ex.fork.more.b3.2 = Stebėk langelį {sq}: iš ten {my} puola šakute.
+ex.fork.tip.knight = Saugokis žirgo šuolių šalia savo karaliaus ir valdovės!
+ex.fork.tip.knight.2 = Žirgai mėgsta pulti dvi figūras iš karto. Žiūrėk, kur jie gali nušokti.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Kai {my} pasitrauks, {my2} puls {t1:acc}!
+ex.discovered.b1.2 = Žiūrėk: {my} stovi kelyje. Jei {my:pron} pasitrauks, {my2} puls {t1:acc}.
+ex.discovered.b1.3 = {my} gali pasitraukti į šalį, ir tada {my2} puola {t1:acc}.
+ex.discovered.b2 = Paslėptas puolimas: {my} pasitraukia, ir {my2} puola {t1:acc}.
+ex.discovered.b2.2 = Atsargiai: {my} gali pasitraukti, ir tada {my2} smogs {t1:dat}.
+ex.discovered.b2.3 = {my} pasitraukia ir atidengia {my2:acc} prieš {t1:acc}.
+ex.discovered.b3 = Po {reply} atidengtas puolimas smogia {t1:dat}.
+ex.discovered.b3.2 = {reply} atidengia {t1:gen} puolimą.
+ex.discovered.b3.3 = {move} leidžia {reply} – atidengtą {t1:gen} puolimą.
+ex.discovered.b4 = {reply} atveria liniją į {t1:acc}: atidengtas puolimas.
+ex.discovered.b4.2 = Po {move} galimas atidengtas puolimas {reply}, ir laimiu {t1:acc}.
+ex.discovered.b4.3 = Po {reply} {t1} krinta nuo atidengto puolimo.
+ex.discovered.b5 = {move} leidžia atidengtą puolimą {reply}.
+ex.discovered.b5.2 = {reply} – atidengtas puolimas.
+ex.discovered.b5.3 = {reply} atidengia paslėptą puolimą.
+ex.discovered.b6 = {reply}: atidengtas {t1:gen} puolimas.
+ex.discovered.b6.2 = {reply}, ir {t1} krinta.
+ex.discovered.b6.3 = Atidengtas puolimas: {reply}, smūgis {t1:dat}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} puola {t1:acc}. Kai {t1:pron} pasitrauks, kirsiu {t2:acc} už {t1:pron_gen}.
+ex.skewer.b1.2 = Žiūrėk: {my} puola {t1:acc}, o {t2} stovi tiesiai už {t1:pron_gen}.
+ex.skewer.b1.3 = {my} puola {t1:acc}. {t1:pron} turi trauktis, ir tada krinta {t2}.
+ex.skewer.b2 = Pradūrimas: {my} puola {t1:acc}, o už {t1:pron_gen} stovi {t2}.
+ex.skewer.b2.2 = {my} puola {t1:acc} ir {t2:acc} vienoje linijoje. Pasitrauks priekinė figūra – kirsiu galinę.
+ex.skewer.b2.3 = Atsargiai: {t1} ir {t2} vienoje linijoje. {my} gali juos pradurti.
+ex.skewer.b3 = {reply} praduria {t1:acc} ir {t2:acc}.
+ex.skewer.b3.2 = Po {reply} {t1} turi trauktis, ir {t2} krinta.
+ex.skewer.b3.3 = {move} leidžia {reply} – {t1:gen} ir {t2:gen} pradūrimą.
+ex.skewer.b4 = {reply} praduria {t1:acc}; {t2} už {t1:pron_gen} žūva.
+ex.skewer.b4.2 = Po {move} {t1} ir {t2} stovi vienoje linijoje: {reply}.
+ex.skewer.b4.3 = Po {reply} {t1} pasitraukia, ir {t2} krinta.
+ex.skewer.b5 = {reply} praduria {t1:acc} ir {t2:acc}.
+ex.skewer.b5.2 = {move} leidžia pradūrimą {reply}: per {t1:acc} į {t2:acc}.
+ex.skewer.b6 = {reply} – pradūrimas.
+ex.skewer.b6.2 = {reply}, pradūrimas.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} gali eiti į {sq}. Tada {your} įstrigs priešais {t1:acc}.
+ex.pin.b1.2 = Stebėk {my:acc} langelyje {sq}: {your} įstringa priešais {t1:acc}.
+ex.pin.b1.3 = {my} gali surišti {your:acc}: už {your:pron_gen} stovi {t1}. Tada {your:pron_acc} laimėsiu.
+ex.pin.b2 = Surišimas: {your} įstrigo priešais {t1:acc}.
+ex.pin.b2.2 = {your} surišt{your:agr_as_a}: už {your:pron_gen} stovi {t1}. Tada galiu {your:pron_acc} laimėti.
+ex.pin.b2.3 = Dabar {your} įstrigo priešais {t1:acc}. Tai surišimas.
+ex.pin.b3 = Surišu {your:acc}, už {your:pron_gen} stovi {t1}, ir {your:pron_acc} laimiu.
+ex.pin.b3.2 = Po šio ėjimo {your} surišt{your:agr_as_a}: už {your:pron_gen} stovi {t1}.
+ex.pin.b3.3 = Dėl {your:gen} surišimo prarandi medžiagos: už {your:pron_gen} stovi {t1}.
+ex.pin.b4 = {reply} suriša ir laimi medžiagos.
+ex.pin.b4.2 = Po {move} pakliūni į surišimą {reply}.
+ex.pin.b4.3 = Po {reply} surištoji figūra krinta.
+ex.pin.b5 = {move} leidžia surišimą {reply}.
+ex.pin.b5.2 = {reply} suriša, ir figūra prarasta.
+ex.pin.b6 = {reply} suriša.
+ex.pin.b6.2 = {reply}, surišimas.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} surišt{your:agr_as_a}, todėl negali ginti langelio {sq}. Už {your:pron_gen} stovi {t1}.
+ex.pin_defender.b1.2 = Žiūrėk: {your} iš tikrųjų negina langelio {sq}, nes už {your:pron_gen} stovi {t1}.
+ex.pin_defender.b2 = {your} surišt{your:agr_as_a}: už {your:pron_gen} stovi {t1}. Todėl langelis {sq} neturi tikro gynėjo.
+ex.pin_defender.b2.2 = Surišta figūra – prastas gynėjas. {your} negali saugoti langelio {sq}: už {your:pron_gen} stovi {t1}.
+ex.pin_defender.b3 = {your} surišt{your:agr_as_a}, už {your:pron_gen} – {t1}; langelio {sq} {your:pron} iš tikrųjų negina.
+ex.pin_defender.b3.2 = Langelis {sq} atrodo apgintas, bet {your} surišt{your:agr_as_a} priešais {t1:acc}.
+ex.pin_defender.b4 = {your} surišt{your:agr_as_a}, todėl langelis {sq} iš tikrųjų neapgintas.
+ex.pin_defender.b4.2 = {your}, surišt{your:agr_as_a}, negali saugoti langelio {sq}.
+ex.pin_defender.b5 = {your} surišt{your:agr_as_a}; langelis {sq} be gynybos.
+ex.pin_defender.b5.2 = Langelio {sq} neapginsi: {your} surišt{your:agr_as_a}.
+ex.pin_defender.b6 = {your} surišt{your:agr_as_a}; langelis {sq} krinta.
+ex.pin_defender.b6.2 = {your} surišt{your:agr_as_a}, {sq} – be gynybos.
