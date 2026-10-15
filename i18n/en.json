@@ -51,7 +51,7 @@
     "stockfish": "Stockfish 19 built in",
     "rules": "FIDE rules",
     "online": "Online play",
-    "languages": "Ten languages"
+    "languages": "34 languages"
   },
   "experience": {
     "eyebrow": "The experience",
@@ -78,8 +78,8 @@
       "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections. Quality presets, from Very low to Ultra, fit it to your graphics card."
     },
     "languages": {
-      "title": "Ten languages",
-      "text": "English, French, German, Spanish, Ukrainian, Russian, Arabic, Japanese and Chinese, simplified and traditional. Arabic is laid out right to left."
+      "title": "34 languages",
+      "text": "English, French, German, Spanish, Portuguese from Portugal and Brazil, Italian, Dutch, Swedish, Danish, Finnish, Estonian, Latvian, Lithuanian, Polish, Czech, Slovak, Slovenian, Croatian, Hungarian, Romanian, Bulgarian, Greek, Turkish, Ukrainian, Russian, Arabic, Hindi, Indonesian, Vietnamese, Korean, Japanese and Chinese, simplified and traditional. Arabic is laid out right to left, and the coach speaks aloud in every language except Chinese, where its words appear as subtitles."
     }
   },
   "modes": {

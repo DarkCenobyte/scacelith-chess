@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — xadrez fotorrealista, jogado na primeira pessoa",
+      "description": "Xadrez fotorrealista gratuito na primeira pessoa para Windows, Linux e macOS: Stockfish 19, um treinador, análise de partidas e jogo online num salão régio."
+    },
+    "players": {
+      "title": "Classificação e jogadores — Scacelith",
+      "description": "Os melhores jogadores do servidor oficial do Scacelith em cada ritmo de jogo com Elo, as suas pontuações Elo e as suas partidas mais recentes."
+    },
+    "account": {
+      "title": "A sua conta — Scacelith",
+      "description": "Inicie sessão na sua conta Scacelith: pontuações Elo, histórico de partidas, transferências em PGN e GIF, dispositivos com sessão iniciada e definições."
+    },
+    "gif": {
+      "title": "GIF animado — Scacelith",
+      "description": "Um GIF animado de uma partida do Scacelith."
+    },
+    "legal": {
+      "title": "Aviso legal, privacidade e termos de utilização — Scacelith",
+      "description": "Quem publica e aloja o Scacelith, o que o site, o jogo e o servidor oficial fazem com os dados pessoais, os seus direitos e as regras do servidor oficial."
+    }
+  },
+  "brand": {
+    "tagline": "O Jogo dos Reis"
+  },
+  "nav": {
+    "skip": "Saltar para o conteúdo",
+    "home": "Início",
+    "label": "Menu principal",
+    "game": "O jogo",
+    "modes": "Modos de jogo",
+    "gallery": "Galeria",
+    "trailer": "Vídeo",
+    "online": "Jogo online",
+    "players": "Classificação",
+    "account": "Conta",
+    "language": "Idioma",
+    "menu": "Menu",
+    "download": "Transferir"
+  },
+  "hero": {
+    "image_alt": "Dois robôs de porcelana jogam xadrez a uma mesa de nogueira, num salão de mármore banhado pelo sol.",
+    "lead": "Ocupe o seu lugar a uma mesa de nogueira encerada, num salão régio banhado pelo sol. Do outro lado do tabuleiro, um robô de porcelana comandado pelo Stockfish aguarda o seu primeiro lance.",
+    "watch": "Ver o vídeo de apresentação",
+    "meta": "Software livre · Windows, Linux, macOS (experimental) · Placa gráfica com OpenGL 4.6",
+    "caption": "Capturado no jogo: o salão régio"
+  },
+  "highlights": {
+    "engine": "Motor OpenGL 4.6 próprio",
+    "stockfish": "Stockfish 19 incluído",
+    "rules": "Regras da FIDE",
+    "online": "Jogo online",
+    "languages": "34 idiomas"
+  },
+  "experience": {
+    "eyebrow": "A experiência",
+    "title": "Não é um tabuleiro num ecrã.<br><em>É um lugar à mesa.</em>",
+    "lead": "O Scacelith traz de volta o que faz uma verdadeira partida: o salão, o silêncio, o relógio, um adversário que olha para si e os rituais do torneio.",
+    "presence": {
+      "title": "Na primeira pessoa",
+      "text": "Vê através dos olhos do seu robô: percorra o salão com o olhar, debruce-se sobre o tabuleiro, levante os olhos para o seu adversário, espreite a sua folha de registo ou levante-se e caminhe até uma das pontas da mesa."
+    },
+    "ritual": {
+      "title": "Regras de torneio",
+      "text": "Uma peça que toque tem de ser jogada, e é a sua mão que carrega no relógio para concluir o lance. Sem a indicação dos lances legais, o árbitro penaliza um lance ilegal, e um segundo faz perder a partida."
+    },
+    "scoresheet": {
+      "title": "Escrito à mão",
+      "text": "Os dois jogadores registam todos os lances na sua própria folha de registo, cada um com a sua caligrafia, e viram a página de quarenta em quarenta lances. Ouve a caneta a deslizar no papel."
+    },
+    "opponent": {
+      "title": "Um adversário à altura",
+      "text": "O Stockfish 19 ao seu nível, de Novato (800) a Stockfish Máximo (3500), com uma pontuação Elo calculada segundo as regras da FIDE após cada partida."
+    },
+    "engine": {
+      "title": "Feito para este jogo",
+      "text": "Um motor escrito de raiz: iluminação baseada na física, mármore, madeira encerada, porcelana e latão, o sol através das janelas, sombras suaves e reflexos. As predefinições de qualidade, de Muito baixa a Ultra, adaptam-no à sua placa gráfica."
+    },
+    "languages": {
+      "title": "34 idiomas",
+      "text": "Inglês, francês, alemão, espanhol, português de Portugal e do Brasil, italiano, neerlandês, sueco, dinamarquês, finlandês, estónio, letão, lituano, polaco, checo, eslovaco, esloveno, croata, húngaro, romeno, búlgaro, grego, turco, ucraniano, russo, árabe, hindi, indonésio, vietnamita, coreano, japonês e chinês, simplificado e tradicional. O árabe é apresentado da direita para a esquerda, e o treinador fala em voz alta em todos os idiomas exceto o chinês, em que as suas palavras aparecem como legendas."
+    }
+  },
+  "modes": {
+    "eyebrow": "Modos de jogo",
+    "title": "Cada partida<br><em>tem a sua mesa.</em>",
+    "lead": "Tudo se joga no mesmo salão, a partir do ecrã inicial. Sem Internet, o Stockfish está sempre pronto para uma partida.",
+    "new_game": {
+      "name": "Nova partida",
+      "text": "Enfrente o Stockfish com a força que escolher, em ritmos de jogo que vão do bullet às partidas clássicas, ou jogue contra um amigo no mesmo computador, cada um através dos olhos do seu robô."
+    },
+    "coach": {
+      "name": "Treinador",
+      "text": "Um professor senta-se à sua frente, joga ao seu nível e comenta a partida consigo: ameaças, bons lances e erros, cujo preço mostra com a própria mão. Das regras do xadrez ao nível Especialista, com uma voz sintetizada no seu computador."
+    },
+    "challenges": {
+      "name": "Desafios do treinador",
+      "text": "Séries curtas de posições, cada uma para treinar uma competência: mates de um a três lances, garfos, cravadas e outras táticas, defesa e os finais básicos contra o treinador. Sugestões só quando as pedir, e uma marca de verificação verde por cada série concluída."
+    },
+    "analysis": {
+      "name": "Análise",
+      "text": "O Stockfish analisa as suas partidas guardadas, as suas partidas online ou qualquer PGN: uma barra de avaliação, os lances-chave assinalados, de brilhante a erro grave, o melhor lance desenhado como uma seta, e comentários em voz alta e em legendas. As mãos dos robôs jogam os lances à medida que avança na partida."
+    },
+    "online": {
+      "name": "Jogar online",
+      "text": "Adversários reais através de um servidor Scacelith: partidas com Elo, procura de adversário, desafios e partidas privadas, ou uma partida direta entre dois computadores. O robô do seu adversário reproduz os movimentos dele, em direto."
+    },
+    "watch": {
+      "name": "Ver uma partida",
+      "text": "Dois Stockfish defrontam-se enquanto percorre livremente o salão, invisível, de um ponto de vista para outro."
+    },
+    "saved": {
+      "name": "Partidas guardadas",
+      "text": "As suas partidas são guardadas como ficheiros PGN. Reveja-as no salão, com os tempos de reflexão e os relógios reais, ou importe partidas de outros programas."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galeria",
+    "title": "Visto <em>de dentro do salão</em>",
+    "lead": "Todas as imagens são capturadas no jogo, em tempo real, pelo motor do próprio jogo.",
+    "title_screen": {
+      "alt": "O ecrã inicial: o menu do Scacelith ao lado de dois robôs a jogar xadrez no salão.",
+      "caption": "O ecrã inicial"
+    },
+    "coach": {
+      "alt": "O treinador, um robô de porcelana com «COACH» no peito, dá-lhe as boas-vindas do outro lado do tabuleiro; o que diz aparece também como legenda.",
+      "caption": "Treinador"
+    },
+    "challenges": {
+      "alt": "O menu Desafios do treinador: séries de mates e de táticas com a respetiva dificuldade e as já concluídas, ao lado da descrição da série selecionada.",
+      "caption": "Desafios do treinador"
+    },
+    "analysis": {
+      "alt": "O modo Análise: a barra de avaliação, uma seta desenhada no tabuleiro, os lances anotados com a precisão de cada lado e a lista de controlos.",
+      "caption": "Análise"
+    },
+    "game": {
+      "alt": "Visto de lado, um robô estende o braço por cima da mesa para mover uma peça enquanto o outro espera; as peças capturadas estão ao lado do tabuleiro.",
+      "caption": "Ver uma partida"
+    },
+    "hall": {
+      "alt": "Dois robôs frente a frente, um de cada lado do tabuleiro, em cadeirões de veludo vermelho, sob janelas altas.",
+      "caption": "O salão régio"
+    },
+    "opponent": {
+      "alt": "Grande plano do adversário, um robô de porcelana, com a cabeça inclinada para o tabuleiro.",
+      "caption": "O seu adversário"
+    },
+    "scoresheet": {
+      "alt": "A mão de um robô escreve os lances na folha de registo com uma caneta de tinta permanente.",
+      "caption": "A folha de registo"
+    },
+    "note": "Versão 1.0.0. A interface destas imagens está em inglês.",
+    "viewer": "Visualizador de imagens",
+    "close": "Fechar",
+    "previous": "Imagem anterior",
+    "next": "Imagem seguinte"
+  },
+  "trailer": {
+    "eyebrow": "Vídeo",
+    "title": "Scacelith <em>em movimento</em>",
+    "soon_title": "O vídeo de apresentação chega em breve",
+    "soon_text": "Entretanto, ocupe o seu lugar: o jogo está pronto a transferir.",
+    "privacy": "Nada é carregado do YouTube enquanto não aceitar o respetivo leitor.",
+    "open_youtube": "Ver no YouTube"
+  },
+  "online": {
+    "eyebrow": "Jogo online",
+    "title": "Adversários reais,<br><em>o mesmo salão.</em>",
+    "lead": "Inicie sessão no servidor oficial a partir do jogo e jogue contra pessoas de todo o mundo, sempre na primeira pessoa.",
+    "point_rated": "Partidas com Elo em todos os ritmos de jogo oficiais, cada um com a sua própria pontuação Elo, calculada segundo as regras da FIDE.",
+    "point_match": "Procura de adversário, desafios por nome e partidas privadas com código; ou uma partida direta entre dois computadores, sem servidor nem conta.",
+    "point_fair": "Jogo limpo: verificações automáticas, análise das partidas terminadas por um motor e denúncias dos jogadores.",
+    "point_history": "O seu histórico de partidas neste site: transfira cada partida em PGN ou como GIF animado.",
+    "point_open": "Qualquer pessoa pode alojar um servidor comunitário: o servidor é software livre e a respetiva API está documentada.",
+    "create": "Criar uma conta",
+    "signin": "Iniciar sessão",
+    "server_title": "O servidor oficial",
+    "status_checking": "A verificar…",
+    "address": "Endereço",
+    "registration": "Inscrições",
+    "categories": "Ritmos de jogo com Elo",
+    "top_players": "Melhores jogadores",
+    "category": "Ritmo de jogo",
+    "board_loading": "A carregar a classificação…",
+    "full_board": "Classificação completa"
+  },
+  "download": {
+    "button": "Transferir",
+    "choose": "Escolha o seu sistema",
+    "see_release": "Ver a versão no GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Todas as versões",
+    "experimental": "Experimental",
+    "source": "Código-fonte",
+    "source_zip": "Arquivo ZIP",
+    "eyebrow": "Transferência",
+    "title": "Ocupe o seu lugar.<br><em>Gratuito e de código aberto.</em>",
+    "lead": "Descompacte e jogue: sem instalador no Windows nem no Linux, e basta arrastar para Aplicações num Mac. Cada ficheiro é compilado pelo GitHub Actions a partir do respetivo código-fonte etiquetado, com uma proveniência de compilação atestada.",
+    "notes": "Notas da versão",
+    "macos_note": "Para Macs com Apple Silicon (M1 ou posterior) e macOS 26 ou posterior, fora de uma máquina virtual; uma compilação mais recente e menos testada do que as outras. A aplicação não está assinada por um programador Apple registado: da primeira vez, abra-a a partir de Definições do Sistema › Privacidade e segurança › Abrir mesmo assim.",
+    "req_system": "Sistema",
+    "req_system_value": "Windows de 64 bits (x64); Linux de 64 bits (x86-64 ou aarch64) com glibc 2.34, OpenSSL 3 e X11 ou XWayland, como o Ubuntu 22.04 ou o Debian 12; macOS 26 ou posterior em Apple Silicon (experimental)",
+    "req_gpu": "Gráficos",
+    "req_gpu_value": "Uma placa gráfica com OpenGL 4.6 e um controlador atualizado (num Mac, o jogo inclui o OpenGL de que precisa)",
+    "req_included": "Incluído",
+    "req_included_value": "O Stockfish 19 e a respetiva rede neuronal: jogue de imediato, mesmo sem Internet",
+    "req_network": "Internet",
+    "req_network_value": "Para o jogo online, os GIFs e a voz do treinador e da análise (uma transferência opcional de cerca de 399 MB)",
+    "req_licence": "Licença",
+    "req_licence_value": "Licença Pública Geral GNU v3",
+    "verify_title": "Verifique a sua transferência",
+    "verify_text": "A proveniência de compilação de cada ficheiro é atestada pelo GitHub. Com a GitHub CLI:",
+    "checksums": "Somas de verificação SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Créditos",
+    "title": "Créditos e <em>agradecimentos</em>",
+    "engine_head": "Motor de xadrez",
+    "engine": "Stockfish 19, pelos programadores do Stockfish (GNU GPL v3). A respetiva rede neuronal foi treinada com dados fornecidos pelo projeto Leela Chess Zero (Open Database License).",
+    "voice_head": "Voz",
+    "voice": "Supertonic 3 da Supertone, ao abrigo da licença BigScience Open RAIL-M: transferido a seu pedido, dá voz ao treinador e à análise, no seu computador.",
+    "fonts_head": "Tipos de letra",
+    "fonts": "EB Garamond de Georg Duffner, Cinzel de Natanael Gama e Amiri de Khaled Hosny; caligrafia em Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One e LXGW WenKai (todos SIL Open Font License); figuras de xadrez do GNU FreeFont.",
+    "openings_head": "Aberturas e problemas",
+    "openings": "Nomes das aberturas da base de dados chess-openings do lichess.org e problemas dos desafios do treinador da base de dados de problemas do Lichess, ambas dedicadas ao domínio público (CC0).",
+    "quote": "«O xadrez é a arte da análise.»",
+    "quote_author": "Mikhail Botvinnik"
+  },
+  "footer": {
+    "about": "Um jogo de xadrez fotorrealista jogado na primeira pessoa, com um motor OpenGL 4.6 próprio. Software livre ao abrigo da GNU GPL v3.",
+    "game": "O jogo",
+    "online": "Jogo online",
+    "api_docs": "Documentação da API do servidor",
+    "source": "Código-fonte",
+    "game_source": "O jogo no GitHub",
+    "server_source": "O servidor no GitHub",
+    "releases": "Versões",
+    "licence": "Licença (GPL v3)",
+    "credits": "Stockfish é uma marca dos respetivos programadores. YouTube é uma marca da Google LLC. Windows é uma marca da Microsoft Corporation. macOS é uma marca da Apple Inc. Linux é a marca registada de Linus Torvalds. OpenGL é uma marca registada da Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Este site não utiliza cookies nem rastreadores; o leitor do YouTube só é carregado se o aceitar.",
+    "legal_link": "Aviso legal, privacidade e termos"
+  },
+  "common": {
+    "copy": "Copiar",
+    "loading": "A carregar…",
+    "noscript": "Esta página precisa de JavaScript para comunicar com o servidor do Scacelith."
+  },
+  "players": {
+    "title": "Classificação e jogadores",
+    "lead": "Os melhores jogadores do servidor oficial em cada ritmo de jogo com Elo. Procure qualquer jogador para ver as suas pontuações Elo e as suas partidas mais recentes.",
+    "search_label": "Procurar um jogador",
+    "search_placeholder": "Nome de utilizador",
+    "search_button": "Procurar",
+    "back": "Voltar à classificação",
+    "recent_games": "Partidas recentes",
+    "board_title": "Classificação",
+    "category": "Ritmo de jogo",
+    "col_rank": "Posição",
+    "col_player": "Jogador",
+    "col_rating": "Elo",
+    "col_peak": "Máximo",
+    "col_games": "Partidas",
+    "col_wdl": "V / E / D",
+    "loading": "A carregar…"
+  },
+  "account": {
+    "title": "A sua conta",
+    "auth_foot": "Uma única conta no servidor oficial, para o jogo e para este site. Criou a sua conta com o Google no jogo? Use «Esqueceu-se da palavra-passe?» para lhe atribuir uma palavra-passe.",
+    "common": {
+      "back": "Voltar ao início de sessão"
+    },
+    "fields": {
+      "login": "Nome de utilizador ou e-mail",
+      "password": "Palavra-passe",
+      "show_password": "Mostrar a palavra-passe",
+      "username": "Nome de utilizador",
+      "email": "E-mail",
+      "confirm_password": "Confirmar a palavra-passe",
+      "current_password": "Palavra-passe atual",
+      "new_password": "Nova palavra-passe",
+      "new_email": "Novo endereço de e-mail",
+      "mfa_code": "Código de dois fatores (ou um código de recuperação)"
+    },
+    "signin": {
+      "tab": "Iniciar sessão",
+      "title": "Olá de novo",
+      "remember": "Manter a sessão iniciada neste dispositivo",
+      "submit": "Iniciar sessão",
+      "forgot": "Esqueceu-se da palavra-passe?",
+      "resend": "Reenviar o e-mail de confirmação"
+    },
+    "mfa": {
+      "title": "Autenticação de dois fatores",
+      "text": "Introduza o código de 6 algarismos da sua aplicação de autenticação.",
+      "code": "Código da aplicação",
+      "use_recovery": "Usar antes um código de recuperação",
+      "submit": "Confirmar"
+    },
+    "google": {
+      "or": "ou",
+      "button": "Iniciar sessão com o Google",
+      "username_title": "Escolha o seu nome de utilizador",
+      "username_text": "A sua conta Google é nova neste servidor. Escolha o nome que os outros jogadores vão ver: não poderá ser alterado mais tarde.",
+      "username_submit": "Criar a minha conta",
+      "link_title": "Associar a sua conta Google",
+      "link_submit": "Associar e iniciar sessão",
+      "returning": "A iniciar sessão com o Google…"
+    },
+    "register": {
+      "tab": "Criar uma conta",
+      "title": "Uma conta gratuita",
+      "closed": "De momento, o servidor não aceita novas contas.",
+      "username_hint": "Letras, algarismos, _ e -, a começar por uma letra ou um algarismo.",
+      "password_hint": "Pelo menos 10 carateres, sem o seu nome de utilizador nem o seu e-mail.",
+      "pow_note": "Para manter os robôs à distância, o seu navegador resolve um pequeno quebra-cabeças quando cria a conta. Demora alguns segundos.",
+      "submit": "Criar conta",
+      "done_title": "Verifique o seu e-mail",
+      "done_text": "Enviámos uma ligação de confirmação para o seu endereço. Abra-a para criar a sua conta e, depois, inicie sessão.",
+      "done_hint": "A ligação é válida durante 24 horas. Nada na caixa de entrada? Verifique a pasta de spam ou peça o e-mail novamente.",
+      "go_signin": "Ir para o início de sessão",
+      "legal_note": "O seu nome de utilizador, as suas pontuações Elo e as suas partidas serão públicos. Ao criar uma conta, aceita os termos de utilização.",
+      "legal_link": "Privacidade e termos de utilização"
+    },
+    "forgot": {
+      "title": "Palavra-passe esquecida",
+      "text": "Introduza o endereço de e-mail da sua conta. Se existir uma conta com esse endereço, enviamos-lhe uma ligação para escolher uma nova palavra-passe, válida durante uma hora.",
+      "submit": "Enviar a ligação"
+    },
+    "resend": {
+      "title": "Confirme o seu e-mail",
+      "text": "Não recebeu o e-mail de confirmação ou a ligação expirou? Introduza o seu endereço para receber uma nova.",
+      "submit": "Enviar novamente"
+    },
+    "dash": {
+      "public_profile": "Perfil público",
+      "signout": "Terminar sessão",
+      "tab_overview": "Resumo",
+      "tab_games": "Partidas",
+      "tab_devices": "Dispositivos",
+      "tab_settings": "Definições"
+    },
+    "overview": {
+      "info": "As suas informações",
+      "ratings": "As suas pontuações Elo",
+      "sanctions": "Sanções",
+      "recent": "Partidas recentes",
+      "all_games": "Todas as suas partidas"
+    },
+    "games": {
+      "filter_category": "Ritmo de jogo",
+      "all": "Todas",
+      "custom": "Personalizado",
+      "filter_rated": "Tipo",
+      "rated": "Com Elo",
+      "casual": "Amigáveis",
+      "filter_result": "Resultado",
+      "wins": "Ganhas",
+      "losses": "Perdidas",
+      "draws": "Empatadas"
+    },
+    "devices": {
+      "title": "Dispositivos com sessão iniciada",
+      "signout_all": "Terminar todas as sessões",
+      "text": "Cada início de sessão, no jogo ou neste site, é um dispositivo. Termine a sessão nos que não reconhecer."
+    },
+    "settings": {
+      "challenges_title": "Desafios",
+      "challenges_text": "Os outros jogadores podem enviar-lhe desafios a partir do jogo, através do seu nome de utilizador.",
+      "challenges_label": "Aceitar desafios",
+      "mfa_title": "Autenticação de dois fatores",
+      "mfa_text": "Ative-a ou desative-a, e crie novos códigos de recuperação, na página Conta do jogo.",
+      "password_title": "Alterar a palavra-passe",
+      "password_text": "A sessão é terminada nos seus outros dispositivos e mantém-se iniciada neste.",
+      "password_submit": "Alterar a palavra-passe",
+      "email_title": "Alterar o endereço de e-mail",
+      "email_submit": "Enviar a ligação de confirmação",
+      "export_title": "Transferir os meus dados",
+      "export_text": "Tudo o que o servidor guarda sobre a sua conta, num único ficheiro JSON.",
+      "export_submit": "Transferir os meus dados",
+      "delete_title": "Eliminar a conta",
+      "delete_text": "Esta ação não pode ser anulada. As suas partidas e pontuações Elo permanecem, com um nome anónimo; o seu endereço de e-mail, a palavra-passe e os dispositivos são apagados.",
+      "delete_confirm": "Escreva o seu nome de utilizador para confirmar",
+      "delete_submit": "Eliminar a minha conta"
+    }
+  },
+  "gif": {
+    "title": "GIF animado",
+    "preparing": "A preparar o GIF…",
+    "download": "Transferir o GIF",
+    "make": "Criar o GIF",
+    "pause": "Pausar a animação",
+    "back": "Voltar às minhas partidas",
+    "options": "Opções",
+    "size": "Tamanho",
+    "size_small": "Pequeno (284 × 350)",
+    "size_medium": "Médio (424 × 515)",
+    "size_large": "Grande (628 × 762)",
+    "orientation": "Tabuleiro visto pelas",
+    "orientation_white": "Brancas",
+    "orientation_black": "Pretas",
+    "speed": "Velocidade",
+    "speed_fast": "Rápida (0,25 s por lance)",
+    "speed_normal": "Normal (0,5 s por lance)",
+    "speed_slow": "Lenta (1 s por lance)",
+    "speed_very_slow": "Muito lenta (2 s por lance)",
+    "coords": "Mostrar as coordenadas",
+    "regenerate": "Criar de novo",
+    "note": "O servidor desenha cada GIF. Um GIF que já criou é devolvido de imediato; os novos estão limitados a alguns por minuto."
+  },
+  "notfound": {
+    "title": "Página não encontrada",
+    "text": "Esta casa está vazia. A página pode ter mudado de lugar.",
+    "home": "Voltar ao Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "A carregar…",
+      "retry": "Tentar novamente",
+      "close": "Fechar",
+      "copy": "Copiar",
+      "copied": "Copiado para a área de transferência.",
+      "copy_failed": "Não foi possível copiar. Selecione o texto e copie-o manualmente.",
+      "load_more": "Mostrar mais",
+      "show_password": "Mostrar a palavra-passe",
+      "hide_password": "Ocultar a palavra-passe",
+      "signin_needed": "Inicie sessão para continuar.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Não é possível contactar o servidor. Verifique a sua ligação e tente novamente.",
+      "timeout": "O servidor demorou demasiado a responder. Tente novamente.",
+      "server_busy": "O servidor está ocupado. Tente novamente daqui a pouco.",
+      "rate_limited": "Demasiados pedidos. Tente novamente dentro de {time}.",
+      "rate_limited_short": "Demasiados pedidos. Tente novamente daqui a pouco.",
+      "internal_error": "O servidor encontrou um erro inesperado. Tente novamente mais tarde.",
+      "invalid_token": "A sua sessão terminou. Inicie sessão novamente.",
+      "unauthorized": "Inicie sessão.",
+      "not_found": "Não encontrado.",
+      "unknown": "Ocorreu um erro ({code}).",
+      "invalid_credentials": "Nome de utilizador, e-mail ou palavra-passe incorretos.",
+      "too_many_attempts": "Demasiadas tentativas. Tente novamente dentro de {time}.",
+      "banned": "Esta conta está suspensa até {date}.",
+      "banned_permanent": "Esta conta está suspensa.",
+      "email_unverified": "O seu endereço de e-mail ainda não foi confirmado. Abra a ligação que lhe enviámos ou peça uma nova.",
+      "invalid_mfa_token": "Este passo do início de sessão expirou. Inicie sessão novamente.",
+      "invalid_code": "Código incorreto ou já utilizado.",
+      "mfa_code_required": "Introduza o seu código de dois fatores.",
+      "invalid_password": "Palavra-passe incorreta.",
+      "password_not_set": "Esta conta ainda não tem palavra-passe: use «Esqueceu-se da palavra-passe?» na página de início de sessão para definir uma.",
+      "registration_closed": "De momento, o servidor não aceita novas contas.",
+      "invalid_username": "Este nome de utilizador não é permitido.",
+      "username_taken": "Este nome de utilizador já está a ser utilizado.",
+      "invalid_email": "Este endereço de e-mail não é válido.",
+      "email_taken": "Este endereço de e-mail já é utilizado por outra conta.",
+      "same_email": "Este já é o seu endereço de e-mail.",
+      "weak_password": "Esta palavra-passe é demasiado fraca.",
+      "weak_too_short": "A palavra-passe é demasiado curta (pelo menos {min} carateres).",
+      "weak_too_long": "A palavra-passe é demasiado longa.",
+      "weak_contains_username": "A palavra-passe não pode conter o seu nome de utilizador.",
+      "weak_contains_email": "A palavra-passe não pode conter o seu endereço de e-mail.",
+      "weak_too_common": "Esta palavra-passe é demasiado comum. Escolha outra.",
+      "pow_failed": "A verificação anti-robô falhou. Tente novamente.",
+      "passwords_differ": "As duas palavras-passe são diferentes.",
+      "required": "Preencha este campo.",
+      "email_format": "Introduza um endereço de e-mail válido.",
+      "username_format": "{min} a {max} carateres: letras, algarismos, _ e -, a começar por uma letra ou um algarismo.",
+      "password_length": "Pelo menos {min} carateres.",
+      "confirm_name": "Escreva o seu nome de utilizador exatamente como é apresentado.",
+      "game_too_long": "Esta partida é demasiado longa para ser transformada num GIF.",
+      "gif_disabled": "Este servidor não cria GIFs.",
+      "render_failed": "O servidor não conseguiu desenhar este GIF.",
+      "invalid_game": "Esta partida não existe.",
+      "invalid_player": "Introduza um nome de utilizador: 2 a 24 letras, algarismos, _, . ou -.",
+      "player_not_found": "Não existe nenhum jogador com este nome.",
+      "sso_cancelled": "O início de sessão com o Google foi cancelado.",
+      "sso_mismatch": "Este início de sessão com o Google não foi iniciado neste separador ou já foi utilizado. Tente novamente.",
+      "sso_expired": "Este início de sessão com o Google expirou. Tente novamente.",
+      "invalid_verifier": "Este início de sessão com o Google foi iniciado noutro separador ou noutro navegador. Recomece a partir desta página.",
+      "sso_email_unverified": "O Google não confirmou o endereço de e-mail desta conta Google.",
+      "sso_account_exists": "Já existe uma conta com este endereço de e-mail, mas não tem nenhuma palavra-passe à qual associar o Google. Atribua-lhe uma com «Esqueceu-se da palavra-passe?» e, depois, inicie sessão novamente com o Google.",
+      "sso_failed": "Não foi possível concluir o início de sessão com o Google. Tente novamente.",
+      "sso_disabled": "O início de sessão com o Google não está disponível neste servidor.",
+      "sso_already_linked": "Esta conta Google já está associada a outra conta.",
+      "account_disabled": "Esta conta já não pode ser utilizada.",
+      "sso_storage": "O seu navegador bloqueia o armazenamento deste site, de que o início de sessão com o Google precisa. Permita-o ou inicie sessão com a sua palavra-passe.",
+      "sso_url": "O servidor respondeu com um endereço Google inesperado, pelo que o início de sessão com o Google foi interrompido."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} segundo",
+        "many": "{count} de segundos",
+        "other": "{count} segundos"
+      },
+      "minutes": {
+        "one": "{count} minuto",
+        "many": "{count} de minutos",
+        "other": "{count} minutos"
+      }
+    },
+    "download": {
+      "exe": "Executável",
+      "zip": "Arquivo ZIP",
+      "dmg": "Imagem de disco",
+      "archive": "Arquivo comprimido",
+      "file": "Ficheiro",
+      "unavailable": "Indisponível",
+      "your_system": "O seu sistema",
+      "eyebrow_release": "Versão {version}",
+      "published": "Publicada a {date}",
+      "unreachable": "De momento, não é possível contactar o GitHub: consulte a página das versões.",
+      "available": "Disponível",
+      "verify_file": "o ficheiro",
+      "no_build": "De momento, não existe nenhuma compilação do jogo para {os}.",
+      "x64": "64 bits (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bits, Intel / AMD ou Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 ou posterior",
+      "experimental": "Experimental"
+    },
+    "server": {
+      "online": "Disponível",
+      "offline": "Inacessível",
+      "busy": "Ocupado",
+      "open": "Abertas",
+      "closed": "Fechadas",
+      "updated": "Última atualização: {time}",
+      "min_games": "Jogadores com pelo menos {count} partidas com Elo neste ritmo de jogo.",
+      "empty": "Ainda não há jogadores classificados neste ritmo de jogo.",
+      "error": "De momento, não é possível carregar a classificação."
+    },
+    "game": {
+      "number": "Partida n.º {id}",
+      "white": "Brancas",
+      "black": "Pretas",
+      "you": "eu",
+      "vs": "contra",
+      "outcome_win": "Vitória",
+      "outcome_loss": "Derrota",
+      "outcome_draw": "Empate",
+      "outcome_aborted": "Anulada",
+      "result_white": "Vitória das brancas",
+      "result_black": "Vitória das pretas",
+      "result_draw": "Empate",
+      "result_aborted": "Anulada",
+      "rated": "Com Elo",
+      "casual": "Amigável",
+      "custom": "Personalizado",
+      "moves": {
+        "one": "{count} lance",
+        "many": "{count} de lances",
+        "other": "{count} lances"
+      },
+      "duration": "Duração: {time}",
+      "rating_diff": "Variação do Elo: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Transferir a partida em PGN",
+      "copy_pgn": "Copiar",
+      "copy_pgn_title": "Copiar o PGN",
+      "gif": "GIF",
+      "gif_title": "Criar um GIF animado (abre um novo separador)",
+      "gif_signin": "Inicie sessão para criar GIFs",
+      "pgn_copied": "PGN copiado para a área de transferência.",
+      "pgn_saved": "PGN transferido.",
+      "none": "Ainda não há partidas. As suas partidas online vão aparecer aqui.",
+      "none_filtered": "Nenhuma partida corresponde a estes filtros.",
+      "none_public": "Ainda não há partidas.",
+      "total": {
+        "one": "{count} partida",
+        "many": "{count} de partidas",
+        "other": "{count} partidas"
+      },
+      "termination_unknown": "Partida terminada",
+      "reason": {
+        "1": "Xeque-mate",
+        "2": "Abandono",
+        "3": "Derrota por tempo",
+        "4": "Segundo lance ilegal (derrota)",
+        "5": "Afogamento",
+        "6": "Posição morta (material insuficiente)",
+        "7": "Queda da bandeira, mas o adversário não pode dar mate",
+        "8": "Quíntupla repetição",
+        "9": "Regra dos 75 lances",
+        "10": "Tripla repetição (reclamada)",
+        "11": "Regra dos 50 lances (reclamada)",
+        "12": "Empate por acordo",
+        "13": "Segundo lance ilegal, mas o adversário não pode dar mate",
+        "14": "Abandono, mas o adversário não pode dar mate",
+        "20": "Saída da partida (sem ligação durante demasiado tempo)",
+        "21": "Saída da partida, mas o adversário não pode dar mate",
+        "22": "Partida anulada",
+        "23": "Sem primeiro lance a tempo (anulada)",
+        "24": "Derrota por falta (infração às regras de jogo limpo)",
+        "25": "Anulada pelo servidor",
+        "26": "Ambos os jogadores se desligaram"
+      }
+    },
+    "ratings": {
+      "category": "Ritmo de jogo",
+      "rating": "Elo",
+      "peak": "Máximo",
+      "games": "Partidas",
+      "wdl": "V / E / D",
+      "provisional": "Pontuação provisória",
+      "none": "Ainda não há partidas com Elo.",
+      "unrated_hint": "Um ponto de interrogação indica uma pontuação provisória (ainda poucas partidas jogadas)."
+    },
+    "account": {
+      "member_since": "Membro desde {date}",
+      "last_login": "Último início de sessão",
+      "created": "Data de criação",
+      "email": "E-mail",
+      "pending_email": "A aguardar confirmação: {email}",
+      "verified": "Confirmado",
+      "unverified": "Não confirmado",
+      "mfa": "Autenticação de dois fatores",
+      "mfa_on": "Ativada",
+      "mfa_off": "Desativada",
+      "google": "Início de sessão com o Google",
+      "google_on": "Associado",
+      "google_off": "Não associado",
+      "password": "Palavra-passe",
+      "password_set": "Definida",
+      "password_unset": "Ainda não definida",
+      "challenges": "Desafios",
+      "challenges_all": "Aceites",
+      "challenges_none": "Recusados",
+      "badge_verified": "E-mail confirmado",
+      "badge_mfa": "Dois fatores ativos",
+      "badge_google": "Google",
+      "ban_until": "A sua conta está suspensa até {date}.",
+      "ban_permanent": "A sua conta está suspensa.",
+      "sanction_ban": "Suspensão",
+      "sanction_mm_block": "Procura de adversário bloqueada",
+      "sanction_warning": "Aviso",
+      "sanction_until": "até {date}",
+      "sanction_permanent": "permanente",
+      "devices_current": "Este dispositivo",
+      "devices_unknown": "Dispositivo sem nome",
+      "devices_signed_in": "Sessão iniciada a {date}",
+      "devices_seen": "Utilizado pela última vez {time}",
+      "devices_expires": "Expira a {date}",
+      "devices_revoke": "Terminar sessão",
+      "devices_revoked": "A sessão no dispositivo foi terminada.",
+      "devices_none": "Nenhum outro dispositivo.",
+      "signout_all_confirm": "Terminar a sessão em todos os dispositivos, incluindo este?",
+      "signed_out": "A sessão foi terminada.",
+      "signed_in": "Boas-vindas, {name}.",
+      "prefs_saved": "Guardado.",
+      "password_changed": "A sua palavra-passe foi alterada. A sessão foi terminada nos seus outros dispositivos.",
+      "email_sent": "Foi enviada uma ligação de confirmação para o novo endereço. O seu endereço muda quando a abrir.",
+      "email_changed": "O seu endereço de e-mail passou a ser {email}.",
+      "email_current": "Endereço atual: {email}.",
+      "email_pending": "Uma alteração para {email} aguarda a respetiva ligação de confirmação.",
+      "export_done": "Os seus dados foram transferidos.",
+      "deleted": "A sua conta foi eliminada.",
+      "delete_confirm_label": "Escreva {name} para confirmar",
+      "register_done": "Enviámos uma ligação de confirmação para {email}. Abra-a para criar a sua conta e, depois, inicie sessão.",
+      "register_ready": "A sua conta está pronta. Já pode iniciar sessão.",
+      "forgot_done": "Se existir uma conta com este endereço, uma ligação para escolher uma nova palavra-passe já vai a caminho.",
+      "resend_done": "Se este endereço estiver a aguardar confirmação, uma nova ligação já vai a caminho.",
+      "pow_solving": "A resolver o quebra-cabeças anti-robô…",
+      "mfa_recovery": "Código de recuperação",
+      "mfa_recovery_text": "Introduza um dos seus códigos de recuperação. Cada código só funciona uma vez.",
+      "mfa_app": "Código da aplicação",
+      "mfa_app_text": "Introduza o código de 6 algarismos da sua aplicação de autenticação.",
+      "mfa_state_on": "A autenticação de dois fatores está ativada nesta conta.",
+      "mfa_state_off": "A autenticação de dois fatores está desativada nesta conta.",
+      "client_label": "Site do Scacelith ({browser})",
+      "username": "Nome de utilizador",
+      "password_rules": "Pelo menos {min} carateres, sem o seu nome de utilizador nem o seu e-mail.",
+      "password_note": "A sessão é terminada nos seus outros dispositivos e mantém-se iniciada neste.",
+      "signin_label": "Iniciar sessão",
+      "google_link_text": "A conta {name} já utiliza este endereço de e-mail. Introduza a respetiva palavra-passe uma vez para a associar ao Google; depois disso, basta «Iniciar sessão com o Google».",
+      "auth_foot_google": "Uma única conta no servidor oficial, para o jogo e para este site. Criou-a com o Google no jogo? Inicie sessão com o Google também aqui."
+    },
+    "players": {
+      "since": "Membro desde {date}",
+      "games": "Partidas",
+      "rated": "Com Elo",
+      "wins": "Vitórias",
+      "draws": "Empates",
+      "losses": "Derrotas",
+      "view": "Ver o perfil de {name}",
+      "you": "Eu",
+      "board": "Classificação"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partida n.º {id} · {date}",
+      "preparing": "A preparar o GIF…",
+      "rendering": "O servidor está a desenhar o GIF. Uma partida longa pode demorar alguns segundos…",
+      "ready": "O seu GIF está pronto. A transferência começou.",
+      "ready_again": "O seu GIF está pronto.",
+      "signin": "Inicie sessão para criar GIFs das suas partidas.",
+      "signin_button": "Iniciar sessão",
+      "missing": "Não foi escolhida nenhuma partida.",
+      "retry_in": "Pode tentar novamente dentro de {time}.",
+      "confirm": "Clique em «Criar o GIF» para que o servidor desenhe esta partida com a sua conta.",
+      "retry_now": "Já pode tentar novamente."
+    },
+    "home": {
+      "create_account": "Criar uma conta",
+      "my_account": "A minha conta",
+      "my_games": "As minhas partidas",
+      "signin": "Iniciar sessão"
+    },
+    "trailer": {
+      "title": "Vídeo de apresentação do Scacelith",
+      "notice": "Este vídeo está alojado no YouTube. Reproduzi-lo aqui carrega o leitor da Google, que recebe o seu endereço IP e pode guardar cookies ou outros rastreadores no seu dispositivo.",
+      "accept": "Aceitar e reproduzir",
+      "google_privacy": "Política de privacidade da Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Informação legal",
+    "title": "Aviso legal, privacidade e termos de utilização",
+    "lead": "Quem publica e aloja o Scacelith, o que acontece aos seus dados neste site, no jogo e no servidor oficial, e as regras para lá jogar.",
+    "updated": "Última atualização: 11 de outubro de 2026",
+    "toc": "Nesta página",
+    "notice": {
+      "title": "Aviso legal",
+      "publisher_label": "Editor",
+      "publisher": "O Scacelith é publicado por um particular, a título não profissional. Como a lei francesa o permite (artigo 1-1 II da lei n.º 2004-575, de 21 de junho de 2004), a identidade do editor não é indicada aqui; é do conhecimento do fornecedor de alojamento.",
+      "contact_label": "Contacto",
+      "contact": "Para qualquer questão sobre este site, o servidor oficial ou os seus dados.",
+      "host_server": "Servidor de jogo oficial e dados das contas",
+      "host_server_note": "Servidores em França.",
+      "host_site": "Este site e a documentação da API (GitHub Pages)",
+      "host_domain": "Entidade de registo do nome de domínio",
+      "licence_label": "Licença",
+      "licence": "O jogo e o respetivo servidor são software livre ao abrigo da Licença Pública Geral GNU v3, com código-fonte público:",
+      "game_source": "o jogo",
+      "server_source": "o servidor",
+      "phone": "Telefone"
+    },
+    "privacy": {
+      "title": "Privacidade",
+      "intro": "O Scacelith não mostra publicidade, não vende dados e não mede audiências. Os dados pessoais são utilizados apenas para fazer funcionar este site e o servidor oficial, conforme descrito abaixo. O responsável pelo tratamento é o editor, contactável através do endereço de contacto acima.",
+      "site_title": "Neste site",
+      "site_hosting": "O GitHub aloja o site e, como qualquer serviço de alojamento web, regista os endereços IP dos visitantes para fins de segurança.",
+      "github_privacy": "Declaração de privacidade do GitHub",
+      "site_requests": "Para mostrar a versão mais recente, o seu navegador consulta a API do GitHub (api.github.com); para mostrar o estado do servidor, a classificação, os jogadores e a sua conta, consulta o servidor oficial (caissa.scacelith.com). Ambos recebem o seu endereço IP, como em qualquer pedido.",
+      "site_storage": "O site não utiliza cookies nem ferramentas de análise de audiências. Guarda no seu navegador apenas o idioma escolhido e, depois de iniciar sessão, a sua sessão: apenas para o separador atual ou neste dispositivo, se marcar «Manter a sessão iniciada». Um início de sessão com o Google também guarda os seus códigos de utilização única no separador atual até serem utilizados. Tudo isto é necessário para o funcionamento do site, e só o servidor oficial recebe a sessão e os códigos.",
+      "site_trailer": "O vídeo de apresentação é um vídeo do YouTube. Nada é carregado do YouTube enquanto não clicar em «Aceitar e reproduzir»; o YouTube (Google) recebe então o seu endereço IP e pode guardar cookies ou outros rastreadores no seu dispositivo. A sua resposta não é memorizada: a pergunta volta a aparecer na sua próxima visita.",
+      "site_google": "O botão «Iniciar sessão com o Google» da página Conta não carrega nada da Google enquanto não clicar nele. O seu navegador vai então para a página de início de sessão da Google (accounts.google.com), e a Google reencaminha-o para este site com um código de utilização única que o site entrega ao servidor oficial. A Google recebe o seu endereço IP e o que introduzir na respetiva página, segundo a política da própria Google.",
+      "google_privacy": "Política de privacidade da Google",
+      "game_title": "No jogo",
+      "game_local": "O jogo guarda as definições, os seus resultados locais e o seu início de sessão no seu computador. O início de sessão é guardado no armazenamento seguro do sistema: DPAPI no Windows, o Porta-chaves no macOS, o porta-chaves do Secret Service no Linux ou, na falta destes, um ficheiro que só a sua conta de utilizador pode ler.",
+      "game_network": "Não envia nada por iniciativa própria: nem telemetria, nem verificação de atualizações. Liga-se ao servidor oficial apenas quando abre a página Jogar online, ao Hugging Face apenas quando transfere a voz do treinador e, numa partida direta, ao computador do seu adversário, que fica então a conhecer o seu endereço IP (o jogo também pode abrir uma porta no seu router com UPnP).",
+      "account_title": "A sua conta no servidor oficial",
+      "account_intro": "Criar uma conta, no jogo ou neste site, e jogar online enviam os seguintes dados para o servidor oficial, alojado pela OVH em França:",
+      "data_account": "<strong>Conta:</strong> nome de utilizador, endereço de e-mail, palavra-passe (guardada apenas como hash Argon2id), segredo da verificação em dois passos (encriptado) e códigos de recuperação (em hash), data de inscrição e data do último início de sessão.",
+      "data_google": "<strong>Início de sessão com o Google:</strong> a Google envia o identificador da sua conta Google, o seu endereço de e-mail e o seu nome. O servidor guarda o identificador e o endereço, e usa o nome apenas para sugerir um nome de utilizador.",
+      "data_sessions": "<strong>Dispositivos com sessão iniciada:</strong> para cada início de sessão, o nome do dispositivo (a versão e o sistema do jogo, como «Scacelith/1.0.0 win64», ou o navegador e o sistema, no caso deste site), o endereço IP e as datas de utilização.",
+      "data_games": "<strong>Partidas e pontuações Elo:</strong> todas as partidas online (jogadores, lances, tempo gasto em cada lance, resultado, datas) e as suas pontuações Elo. Durante uma partida, os movimentos da sua cabeça e da sua mão são transmitidos em direto ao seu adversário e nunca são guardados.",
+      "data_security": "<strong>Registo de segurança:</strong> inícios de sessão, tentativas falhadas e alterações à conta, com o endereço IP.",
+      "data_fairplay": "<strong>Jogo limpo:</strong> denúncias feitas por si ou sobre si, com o respetivo comentário; partidas abandonadas e faltas de comparência; sanções; e as verificações efetuadas às partidas, desde lances forjados ou impossíveis até às estatísticas do motor Stockfish.",
+      "basis_title": "Porquê e com que fundamento jurídico",
+      "basis_contract": "Gerir a sua conta e o jogo online (início de sessão, emparelhamentos, pontuações Elo, registos das partidas, e-mails enviados pelo serviço): o serviço em que se inscreve (artigo 6.º, n.º 1, alínea b), do RGPD).",
+      "basis_security": "Proteger as contas e o servidor, e garantir o jogo limpo (registo de segurança, endereços IP, verificações de jogo limpo, sanções): o interesse legítimo do editor e dos jogadores (artigo 6.º, n.º 1, alínea f), do RGPD).",
+      "basis_trailer": "Reproduzir o vídeo de apresentação a partir do YouTube: o seu consentimento, dado através do botão (artigo 6.º, n.º 1, alínea a), do RGPD).",
+      "public_title": "O que todos podem ver",
+      "public": "O seu nome de utilizador, a data de inscrição, as pontuações Elo e a lista completa das suas partidas, com todos os lances, são públicos: neste site, através da API do servidor e no PGN de cada partida. O seu endereço de e-mail, os dispositivos, os inícios de sessão, as sanções e os registos de jogo limpo nunca são mostrados. Pode recusar desafios diretos, mas as partidas não podem ser ocultadas.",
+      "auto_title": "Decisões automáticas",
+      "auto": "Algumas infrações ao protocolo do jogo, como uma mensagem forjada ou um lance impossível na posição, são prova certa de batota: o servidor atribui então a derrota a essa conta, bane-a durante 24 horas, retira-a da classificação e devolve aos adversários os pontos que perderam contra ela nos últimos 60 dias. Três abandonos, anulações ou faltas de comparência em 24 horas suspendem a procura de adversário para partidas com Elo durante 15 minutos e, depois, durante mais tempo. As estatísticas do motor nunca levam, por si só, a uma sanção: é uma pessoa que decide. Pode pedir a revisão de qualquer decisão através do endereço de contacto.",
+      "recipients_title": "Quem recebe os seus dados",
+      "recipient_ovh": "A OVH SAS aloja o servidor e os respetivos dados, em França.",
+      "recipient_scaleway": "A Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, França) envia os e-mails do servidor: recebe o seu endereço, o seu nome de utilizador e a mensagem.",
+      "recipient_google": "A Google recebe o que o seu navegador lhe envia quando escolhe iniciar sessão com o Google, ao abrigo da respetiva política de privacidade.",
+      "recipient_staff": "O administrador e os moderadores do servidor veem os dados das contas e de jogo limpo para gerir o serviço.",
+      "recipient_players": "Os outros jogadores veem o que é público, e o seu adversário vê os seus lances e movimentos durante uma partida.",
+      "recipient_none": "Mais ninguém: nenhum dado é vendido, alugado ou utilizado para publicidade.",
+      "transfers": "Os dados das contas permanecem em França. O GitHub, a Google e a Porkbun (que reencaminha as mensagens enviadas para o endereço de contacto) estão sediados nos Estados Unidos: o que recebem rege-se pelas políticas de cada uma destas empresas e pelas respetivas garantias relativas às transferências para fora da União Europeia.",
+      "retention_title": "Durante quanto tempo são conservados",
+      "ret_account": "<strong>Conta:</strong> até a eliminar. Uma inscrição cujo endereço nunca seja confirmado é eliminada ao fim de 24 horas.",
+      "ret_sessions": "<strong>Dispositivos com sessão iniciada:</strong> até terminar a sessão, após 30 dias sem utilização e, no máximo, após 90 dias.",
+      "ret_ip": "<strong>Endereços IP:</strong> apagados após 30 dias. Os registos do servidor só guardam endereços truncados.",
+      "ret_security": "<strong>Registo de segurança:</strong> 90 dias.",
+      "ret_conduct": "<strong>Partidas abandonadas e faltas de comparência:</strong> 30 dias.",
+      "ret_games": "<strong>Partidas e pontuações Elo:</strong> enquanto o servidor conservar os registos das partidas, que são também os registos dos seus adversários. Depois de a sua conta ser eliminada, o seu nome nesses registos é substituído por «deleted#» e um número.",
+      "ret_fairplay": "<strong>Sanções, denúncias e resultados de jogo limpo:</strong> conservados, para que os jogadores banidos não possam simplesmente voltar e os outros jogadores continuem protegidos. Depois de a sua conta ser eliminada, ficam ligados apenas ao respetivo número.",
+      "ret_backups": "<strong>Cópias de segurança:</strong> os dados eliminados podem permanecer durante pouco tempo na cópia de segurança do servidor, até esta ser substituída.",
+      "ret_contact": "<strong>Mensagens para o endereço de contacto:</strong> durante o tempo necessário para lhes responder.",
+      "rights_title": "Os seus direitos",
+      "rights": "Pode aceder aos seus dados, retificá-los, apagá-los e exportá-los, limitar a sua utilização e opor-se a ela (artigos 15.º a 21.º do RGPD).",
+      "rights_self": "A maior parte disto encontra-se na sua conta, no jogo ou na página Conta deste site: transferir os dados da sua conta num ficheiro JSON, alterar o seu endereço de e-mail ou a sua palavra-passe, terminar a sessão noutros dispositivos ou eliminar a conta de imediato.",
+      "rights_google": "Uma conta criada com o Google não tem palavra-passe: para a exportar ou eliminar, atribua-lhe primeiro uma com «Esqueceu-se da palavra-passe?».",
+      "rights_mail": "Para tudo o resto, incluindo dados que a exportação não contém (verificações de jogo limpo, denúncias sobre si), escreva para o endereço de contacto. Receberá uma resposta no prazo de um mês.",
+      "rights_cnil": "Se considerar que os seus direitos não são respeitados, pode apresentar uma reclamação junto da CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, França) ou da autoridade de proteção de dados do seu país.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Termos de utilização",
+      "intro": "Estes termos aplicam-se ao servidor oficial (caissa.scacelith.com) e às páginas de conta deste site. Criar uma conta ou jogar no servidor oficial implica aceitá-los.",
+      "service": "<strong>Um serviço gratuito.</strong> O jogo é software livre e gratuito. O servidor oficial é disponibilizado gratuitamente e tal como está, sem garantia de disponibilidade: pode mudar, parar durante algum tempo ou encerrar.",
+      "account": "<strong>A sua conta.</strong> É responsável pelo que é feito com ela e por manter a respetiva palavra-passe secreta. Escreva de imediato para o endereço de contacto se achar que outra pessoa a está a utilizar.",
+      "username": "<strong>O seu nome de utilizador</strong> é público: não pode ser ofensivo nem incitar ao ódio, fazer-se passar por outra pessoa nem revelar dados pessoais de quem quer que seja.",
+      "fair": "<strong>Jogo limpo.</strong> Durante uma partida com Elo, nenhuma ajuda de um motor de xadrez, de outra pessoa ou de qualquer outra ferramenta. Nada de clientes de jogo modificados, mensagens forjadas ou sobrecarga deliberada do servidor.",
+      "conduct": "<strong>Termine as suas partidas.</strong> Abandonar ou anular partidas, ou faltar a partidas que lhe foram atribuídas, três vezes em 24 horas suspende durante algum tempo a procura de adversário para partidas com Elo.",
+      "reports": "<strong>As denúncias</strong> devem ser feitas de boa-fé. Para denunciar um jogador ou um conteúdo ilegal, como um nome de utilizador ofensivo, use o botão de denúncia de uma partida ou escreva para o endereço de contacto.",
+      "sanctions": "<strong>Sanções.</strong> Infringir estas regras pode levar a uma derrota por falta, a um aviso, a um banimento e à remoção da classificação; os pontos perdidos para um batoteiro são devolvidos aos respetivos adversários. Só uma prova certa de batota é sancionada automaticamente; tudo o resto é decidido por uma pessoa. Pode contestar uma sanção através do endereço de contacto.",
+      "liability": "<strong>Responsabilidade.</strong> Dentro dos limites permitidos por lei, o editor não é responsável por interrupções do serviço nem pela perda de partidas, pontuações Elo ou dados.",
+      "end": "<strong>Cessação.</strong> Pode eliminar a sua conta a qualquer momento. Uma conta que infrinja estes termos pode ser banida.",
+      "changes": "<strong>Alterações.</strong> Estes termos podem mudar; a data no topo desta página indica a versão em vigor, e continuar a jogar após uma alteração implica aceitá-la.",
+      "law": "<strong>Lei aplicável.</strong> Estes termos regem-se pela lei francesa. Em caso de litígio, escreva primeiro para o endereço de contacto para, em conjunto, encontrarmos uma solução."
+    },
+    "version_note": "Esta página existe em vários idiomas; em caso de divergência, prevalece a versão francesa."
+  }
+}

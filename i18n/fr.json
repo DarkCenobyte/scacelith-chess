@@ -51,7 +51,7 @@
     "stockfish": "Stockfish 19 intégré",
     "rules": "Règles de la FIDE",
     "online": "Jeu en ligne",
-    "languages": "Dix langues"
+    "languages": "34 langues"
   },
   "experience": {
     "eyebrow": "L’expérience",
@@ -78,8 +78,8 @@
       "text": "Un moteur écrit de zéro : éclairage physique, marbre, bois ciré, porcelaine et laiton, le soleil à travers les fenêtres, ombres douces et reflets. Des préréglages de qualité, de Très basse à Ultra, l’adaptent à votre carte graphique."
     },
     "languages": {
-      "title": "Dix langues",
-      "text": "Anglais, français, allemand, espagnol, ukrainien, russe, arabe, japonais et chinois, simplifié et traditionnel. L’arabe se lit de droite à gauche."
+      "title": "34 langues",
+      "text": "Anglais, français, allemand, espagnol, portugais du Portugal et du Brésil, italien, néerlandais, suédois, danois, finnois, estonien, letton, lituanien, polonais, tchèque, slovaque, slovène, croate, hongrois, roumain, bulgare, grec, turc, ukrainien, russe, arabe, hindi, indonésien, vietnamien, coréen, japonais et chinois, simplifié et traditionnel. L’arabe se lit de droite à gauche, et le coach parle à voix haute dans toutes les langues sauf le chinois, où ses paroles s’affichent en sous-titres."
     }
   },
   "modes": {

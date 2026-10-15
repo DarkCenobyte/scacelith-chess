@@ -51,7 +51,7 @@
     "stockfish": "Stockfish 19 integrado",
     "rules": "Normas de la FIDE",
     "online": "Juego en línea",
-    "languages": "Diez idiomas"
+    "languages": "34 idiomas"
   },
   "experience": {
     "eyebrow": "La experiencia",
@@ -78,8 +78,8 @@
       "text": "Un motor escrito desde cero: iluminación basada en la física, mármol, madera encerada, porcelana y latón, el sol a través de las ventanas, sombras suaves y reflejos. Sus niveles de calidad, de «Muy baja» a «Ultra», lo adaptan a su tarjeta gráfica."
     },
     "languages": {
-      "title": "Diez idiomas",
-      "text": "Inglés, francés, alemán, español, ucraniano, ruso, árabe, japonés y chino, simplificado y tradicional. El árabe se muestra de derecha a izquierda."
+      "title": "34 idiomas",
+      "text": "Inglés, francés, alemán, español, portugués de Portugal y de Brasil, italiano, neerlandés, sueco, danés, finés, estonio, letón, lituano, polaco, checo, eslovaco, esloveno, croata, húngaro, rumano, búlgaro, griego, turco, ucraniano, ruso, árabe, hindi, indonesio, vietnamita, coreano, japonés y chino, simplificado y tradicional. El árabe se muestra de derecha a izquierda, y el entrenador habla en voz alta en todos los idiomas salvo en chino, donde sus palabras aparecen como subtítulos."
     }
   },
   "modes": {
