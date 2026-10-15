@@ -1,0 +1,324 @@
+# Coach speech (Romanian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# The appraisal is always positive and never blames. The coach says "tu"; the player's gender is
+# unknown: no adjective or participle agrees with the player. Use the active past ("ai câștigat",
+# "ai găsit"), the invariable "gata" ("Ești gata pentru…"), nouns and impersonal phrasing ("aveai o
+# poziție câștigată", "Bine jucat.", "Bine găsit.").
+#
+# Names inserted by {text}, {theme}, {level}, {opening} (written to fit every line that inserts them):
+#   appraisal.phase.*   with their article ("deschiderea", "jocul de mijloc", "finalul"): only as a
+#                       subject, a direct object or after a colon, never after a preposition
+#                       ("în deschidere" would need the bare noun).
+#   appraisal.reason.*  a complement after "Remiză, {text}." ("prin pat", "de comun acord").
+#   theme.*             a noun phrase in lower case, no full stop ("căutarea matului, începând cu
+#                       șahurile"), always said after a colon.
+#   appraisal.level.*   the coach page's level name in „ ”, always after "nivelul":
+#                       "la nivelul „Începător”".
+#   {opening:def}       the opening's name with its article after a verb ("Am jucat {opening:def}.");
+#                       {opening} alone (the citation name) after a colon or on its own.
+# Accuracy: "{acc:percent}" = "85 %" (spoken "optzeci și cinci la sută"), "o precizie de {acc:percent}".
+# Move numbers stay cardinal: "la mutarea {n}", "Mutarea {n}:". The game's length: "{moves:in_move}" =
+# "în 25 de mutări" (it carries its "în"). A count never starts a sentence (it renders in lower case):
+# the short levels give a bare number after a label ("Piese capturate: {n:f}", "șahuri: {m:neut}").
+# Hanging: "în priză" (no agreement); "neapăra{my:agr_t}" for a loose piece.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = deschiderea
+appraisal.phase.middlegame = jocul de mijloc
+appraisal.phase.endgame = finalul
+appraisal.reason.stalemate = prin pat
+appraisal.reason.material = pentru că nimeni nu mai putea da mat
+appraisal.reason.repetition = prin repetarea poziției
+appraisal.reason.fifty = prin regula celor cincizeci de mutări
+appraisal.reason.agreement = de comun acord
+appraisal.reason.other = conform regulilor
+# The coach level names of the menus (coach.level.<n>.name), in „ ”, after "nivelul".
+appraisal.level.l1 = „Primii pași”
+appraisal.level.l2 = „Începător”
+appraisal.level.l3 = „Intermediar”
+appraisal.level.l4 = „Jucător de club”
+appraisal.level.l5 = „Jucător de club puternic”
+appraisal.level.l6 = „Expert”
+# What to practise, after "Un lucru de exersat:" and similar (a noun phrase, no full stop).
+theme.general = o privire peste toată tabla înainte să muți
+theme.mate_allowed = verificarea siguranței regelui tău înainte de fiecare mutare
+theme.mate_missed = căutarea matului, începând cu șahurile
+theme.stalemate = un câmp liber pentru regele meu când ai o poziție câștigată
+theme.fork = atenție la atacurile duble
+theme.discovered = atenție la atacurile ascunse în spatele pieselor mele
+theme.skewer = evitarea alinierii pieselor valoroase pe aceeași linie
+theme.pin = depistarea legărilor înainte să apară
+theme.trapped = o cale de retragere pentru piesele tale
+theme.back_rank = un câmp de scăpare pentru regele tău
+theme.hanging = protejarea pieselor tale
+theme.exchange = numărarea atacatorilor și a apărătorilor înainte de schimb
+theme.missed_capture = căutarea, în primul rând, a pieselor neapărate
+theme.missed_fork = căutarea propriilor atacuri duble
+theme.promotion = cursele de pioni și regula pătratului
+theme.king_safety = un adăpost sigur pentru regele tău, în spatele pionilor lui
+theme.bad_trade = alegerea pieselor pe care le schimbi
+theme.opening = dezvoltarea pieselor și rocada din timp
+theme.endgame = activarea regelui și avansarea pionilor trecuți
+theme.positional = îmbunătățirea celei mai slabe dintre piesele tale
+theme.material = verificarea a ceea ce pot câștiga următoarele mele mutări, înainte să joci
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Șah mat! Ai câștigat. Bine jucat!
+appraisal.open.win.b1.2 = Ai câștigat! Foarte bine că ai dus partida până la capăt.
+appraisal.open.win.b1.3 = M-ai învins! A fost o partidă foarte bună.
+appraisal.open.win.b2 = Bine jucat! Ai câștigat {moves:in_move}.
+appraisal.open.win.b2.2 = Felicitări, ai câștigat!
+appraisal.open.win.b2.3 = O victorie {moves:in_move}. Bravo!
+appraisal.open.win.b3 = Felicitări, o victorie pe deplin meritată.
+appraisal.open.win.b3.2 = Bine jucat. Ai meritat victoria asta.
+appraisal.open.win.b3.3 = O victorie frumoasă. Felicitări.
+appraisal.open.win.b4 = Frumoasă victorie.
+appraisal.open.win.b4.2 = Bine jucat, o victorie meritată.
+appraisal.open.win.b4.3 = O victorie bună.
+appraisal.open.win.b5 = Bine jucat.
+appraisal.open.win.b5.2 = Frumos câștigat.
+appraisal.open.win.b5.3 = Partidă bună, câștigată frumos.
+appraisal.open.win.b6 = Bine jucat.
+appraisal.open.win.b6.2 = Victorie clară.
+appraisal.open.win.b6.3 = Partidă bună.
+appraisal.open.draw.b1 = Remiză! Nimeni n-a putut câștiga partida asta.
+appraisal.open.draw.b1.2 = E remiză. A fost o luptă strânsă!
+appraisal.open.draw.b1.3 = Remiză: împărțim punctul. Bine jucat!
+appraisal.open.draw.b2 = Remiză: un rezultat corect.
+appraisal.open.draw.b2.2 = Am făcut remiză. Frumoasă luptă!
+appraisal.open.draw.b2.3 = Remiză, și o partidă bună.
+appraisal.open.draw.b3 = Remiză. Ambele părți au avut șanse.
+appraisal.open.draw.b3.2 = O remiză echitabilă.
+appraisal.open.draw.b3.3 = Remiză, {text}. O luptă frumoasă.
+appraisal.open.draw.b4 = Remiză, {text}.
+appraisal.open.draw.b4.2 = E remiză, {text}.
+appraisal.open.draw.b4.3 = Partida s-a încheiat remiză, {text}.
+appraisal.open.draw.b5 = Remiză.
+appraisal.open.draw.b5.2 = Remiză, {text}.
+appraisal.open.draw.b5.3 = E remiză.
+appraisal.open.draw.b6 = Remiză.
+appraisal.open.draw.b6.2 = Remiză, {text}.
+appraisal.open.draw.b6.3 = E remiză.
+appraisal.open.stalemate.b1 = Remiză prin pat: victoria era atât de aproape! Data viitoare, lasă-i regelui meu un câmp liber.
+appraisal.open.stalemate.b1.2 = Pat, deci e remiză. Erai la un pas!
+appraisal.open.stalemate.b2 = Remiză prin pat. Erai atât de aproape de victorie!
+appraisal.open.stalemate.b2.2 = Pat: remiză, deși aveai o poziție câștigată.
+appraisal.open.stalemate.b3 = Remiză prin pat, dintr-o poziție câștigată.
+appraisal.open.stalemate.b3.2 = Pat. Victoria ți-a scăpat chiar la final.
+appraisal.open.stalemate.b4 = Remiză prin pat.
+appraisal.open.stalemate.b4.2 = Pat: remiză.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remiză, prin pat.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remiză, pat.
+appraisal.open.loss.b1 = De data asta am câștigat eu, dar ai jucat câteva mutări foarte bune.
+appraisal.open.loss.b1.2 = Partidă frumoasă! Nu mi-a fost deloc ușor.
+appraisal.open.loss.b1.3 = A fost distractiv! Partida asta am câștigat-o eu, dar înveți repede.
+appraisal.open.loss.b2 = Partidă frumoasă! Hai să vedem ce a mers bine și un lucru de încercat.
+appraisal.open.loss.b2.2 = Mulțumesc pentru partidă! Ai avut câteva idei bune.
+appraisal.open.loss.b2.3 = Partidă frumoasă. Hai să vedem ce putem învăța din ea.
+appraisal.open.loss.b3 = Partidă bună.
+appraisal.open.loss.b3.2 = Mulțumesc pentru partidă.
+appraisal.open.loss.b3.3 = Partidă bună. Hai să aruncăm o privire.
+appraisal.open.loss_close.b3 = Luptă frumoasă. Partida a fost echilibrată multă vreme.
+appraisal.open.loss_close.b3.2 = Luptă frumoasă: poziția a rămas echilibrată mult timp.
+appraisal.open.loss.b4 = Partidă bună. Iată ce a decis-o.
+appraisal.open.loss.b4.2 = Partidă bună. Un singur moment a decis-o.
+appraisal.open.loss.b4.3 = Mulțumesc pentru partidă. Hai să vedem unde a fost momentul de cotitură.
+appraisal.open.loss_close.b4 = Multă vreme, o luptă strânsă. Iată ce a decis partida.
+appraisal.open.loss_close.b4.2 = Partidă bună, echilibrată multă vreme.
+appraisal.open.loss.b5 = Partidă bună.
+appraisal.open.loss.b5.2 = Mulțumesc pentru partidă.
+appraisal.open.loss.b5.3 = Luptă frumoasă.
+appraisal.open.loss.b6 = Partidă bună.
+appraisal.open.loss.b6.2 = Mulțumesc pentru partidă.
+appraisal.open.loss.b6.3 = Luptă frumoasă.
+appraisal.open.resigned.b1 = Abandonul face parte din șah; cere curaj. Partidă frumoasă!
+appraisal.open.resigned.b1.2 = Nu-i nimic. Și să știi când să abandonezi face parte din șah.
+appraisal.open.resigned.b2 = Abandonul face parte din șah; e nevoie de curaj.
+appraisal.open.resigned.b2.2 = Înțeleg. Și abandonul cere curaj.
+appraisal.open.resigned.b3 = Abandonul face parte din șah. Partidă bună.
+appraisal.open.resigned.b3.2 = Înțeleg. Mulțumesc pentru partidă.
+appraisal.open.resigned.b4 = Partidă bună.
+appraisal.open.resigned.b4.2 = Mulțumesc pentru partidă.
+appraisal.open.resigned.b5 = Partidă bună.
+appraisal.open.resigned.b5.2 = Mulțumesc pentru partidă.
+appraisal.open.resigned.b6 = Partidă bună.
+appraisal.open.resigned.b6.2 = Mulțumesc.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Să știi că nu se terminase încă: cam {eval}.
+appraisal.resign_early.b3.2 = De fapt, mai aveai șanse: cam {eval}.
+appraisal.resign_early.b4 = Nu se terminase încă: aproximativ {eval}.
+appraisal.resign_early.b4.2 = Mai era de jucat: aproximativ {eval}.
+appraisal.resign_early.b5 = Partida nu se terminase: {eval}.
+appraisal.resign_early.b5.2 = Încă se putea juca, circa {eval}.
+appraisal.resign_early.b6 = Nu se terminase: {eval}.
+appraisal.resign_early.b6.2 = Era {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Am jucat {opening:def}.
+appraisal.opening.b3.2 = Deschiderea a fost {opening:def}.
+appraisal.opening.b4 = Am avut pe tablă {opening:def}.
+appraisal.opening.b4.2 = Deschiderea: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Deschiderea: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Deschiderea: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Ce sacrificiu la mutarea {n}: {move}!
+appraisal.best.brilliant.b1.2 = Momentul meu preferat: {move}. Ai dat o piesă și a funcționat!
+appraisal.best.brilliant.b2 = Cel mai bun moment al tău: sacrificiul {move}, la mutarea {n}.
+appraisal.best.brilliant.b2.2 = {move}, la mutarea {n}, a fost un sacrificiu curajos. Bravo!
+appraisal.best.brilliant.b3 = Sacrificiu genial cu {move}.
+appraisal.best.brilliant.b3.2 = Punctul culminant: {move}, un adevărat sacrificiu, la mutarea {n}.
+appraisal.best.brilliant.b4 = Cel mai bun moment: {move}, mutarea {n}. Un sacrificiu genial.
+appraisal.best.brilliant.b4.2 = La mutarea {n}, {move} a fost o mutare genială.
+appraisal.best.brilliant.b5 = {move}, la mutarea {n}: genial.
+appraisal.best.brilliant.b5.2 = Mutarea {n}, {move}: genial.
+appraisal.best.brilliant.b6 = {move}!! la mutarea {n}.
+appraisal.best.brilliant.b6.spoken = La mutarea {n}: {move}, genial!
+appraisal.best.brilliant.b6.2 = Mutarea {n}: {move}, genial.
+appraisal.best.great.b1 = Momentul meu preferat: {move}. A fost o mutare excelentă!
+appraisal.best.great.b1.2 = Îți amintești de {move}? A fost o găselniță excelentă.
+appraisal.best.great.b2 = Cel mai bun moment al tău: {move}, la mutarea {n}. A întors soarta partidei.
+appraisal.best.great.b2.2 = La mutarea {n}, {move} a fost o mutare excelentă.
+appraisal.best.great.b3 = Mutarea-cheie a fost {move}, la mutarea {n}: a întors situația.
+appraisal.best.great.b3.2 = Găselniță excelentă: {move}, la mutarea {n}.
+appraisal.best.great.b4 = Mi-ai pedepsit imediat greșeala cu {move}.
+appraisal.best.great.b4.2 = Cel mai bun moment: {move}, mutarea {n}.
+appraisal.best.great.b5 = {move}, la mutarea {n}. Bine găsit.
+appraisal.best.great.b5.2 = Mutarea {n}, {move}: o găselniță excelentă.
+appraisal.best.great.b6 = {move}, la mutarea {n}. Bine găsit.
+appraisal.best.great.b6.2 = Mutarea {n}: {move}!
+appraisal.best.only.b1 = Momentul meu preferat: {move}. Era singura mutare bună!
+appraisal.best.only.b1.2 = La mutarea {n}, ai găsit {move}, singura mutare bună. Excelent!
+appraisal.best.only.b2 = Cel mai bun moment al tău: {move}, singura mutare bună în poziția aceea.
+appraisal.best.only.b2.2 = La mutarea {n}, {move} era singura mutare și ai găsit-o.
+appraisal.best.only.b3 = Mutarea-cheie a fost {move}, la mutarea {n}: singura care ținea poziția.
+appraisal.best.only.b3.2 = La mutarea {n}, doar {move} ținea poziția și ai găsit-o.
+appraisal.best.only.b4 = Cel mai bun moment: {move}, mutarea {n}. Singura mutare.
+appraisal.best.only.b4.2 = Mutarea {n}: {move}, singura mutare.
+appraisal.best.only.b5 = La mutarea {n}, {move} era singura mutare. Bine găsit.
+appraisal.best.only.b5.2 = Singura mutare, la mutarea {n}: {move}.
+appraisal.best.only.b6 = La mutarea {n}, {move} era singura mutare. Bine găsit.
+appraisal.best.only.b6.2 = Mutarea {n}: {move}, singura mutare.
+appraisal.best.won.b1 = Momentul meu preferat: {move}. Ți-a adus {pts:point}!
+appraisal.best.won.b1.2 = Îți amintești de {move}? Așa ai câștigat {pts:point}. Bravo!
+appraisal.best.won.b2 = Cel mai bun moment al tău: {move}, la mutarea {n}, cu un câștig de {pts:point}.
+appraisal.best.won.b2.2 = La mutarea {n}, {move} a câștigat material. Frumos!
+appraisal.best.won.b3 = Mutarea-cheie a fost {move}, la mutarea {n}: a câștigat {pts:point}.
+appraisal.best.won.b3.2 = La mutarea {n}, {move} a câștigat material curat.
+appraisal.best.won.b4 = Cel mai bun moment: {move}, mutarea {n}, cu câștig de material.
+appraisal.best.won.b4.2 = La mutarea {n}, {move} a câștigat {pts:point}.
+appraisal.best.won.b5 = La mutarea {n}, {move} a câștigat material.
+appraisal.best.won.b5.2 = Mutarea {n}: {move}, cu câștig de material.
+appraisal.best.won.b6 = {move}, la mutarea {n}: câștig de material.
+appraisal.best.won.b6.2 = Mutarea {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Mutarea {n}: {move}, plus {pts}.
+appraisal.best.streak.b1 = Ai găsit cea mai bună mutare {n:time} la rând. Excelent!
+appraisal.best.streak.b1.2 = Ai jucat {n:best_move} la rând! Asta da, șah frumos.
+appraisal.best.streak.b2 = Ai găsit cea mai bună mutare {n:time} la rând.
+appraisal.best.streak.b2.2 = La rând, {n:best_move}. Foarte bine!
+appraisal.best.streak.b3 = O serie de {n:best_move} la rând. Foarte solid.
+appraisal.best.streak.b3.2 = Ai găsit {n:best_move} la rând. Bine jucat.
+appraisal.best.streak.b4 = Ai jucat {n:best_move} la rând.
+appraisal.best.streak.b4.2 = O serie de {n:best_move}.
+appraisal.best.streak.b5 = Ai jucat {n:best_move} la rând.
+appraisal.best.streak.b5.2 = O serie de {n:best_move}.
+appraisal.best.streak.b6 = Serie: {n:best_move} la rând.
+appraisal.best.streak.b6.2 = Serie: {n:best_move}.
+appraisal.best.capture.b1 = Momentul meu preferat: {move}. Ai luat gratis {my}!
+appraisal.best.capture.b1.2 = Îți amintești de {move}? Ai observat că {my} se putea lua gratis!
+appraisal.best.capture.b2 = Cel mai bun moment al tău: {move}, care câștigă {my}.
+appraisal.best.capture.b2.2 = Frumoasă captură la mutarea {n}: {move}.
+appraisal.best.capture.b3 = Ochi bun la mutarea {n}: {move} a câștigat {my}.
+appraisal.best.capture.b3.2 = La mutarea {n}, {move} a luat {my}.
+appraisal.best.capture.b4 = Cel mai bun moment: {move}, mutarea {n}, cu câștigul {my:gen}.
+appraisal.best.capture.b4.2 = La mutarea {n}, {move} a câștigat material.
+appraisal.best.capture.b5 = La mutarea {n}, {move} a câștigat {my}.
+appraisal.best.capture.b5.2 = Mutarea {n}: {move}.
+appraisal.best.capture.b6 = {move}, la mutarea {n}.
+appraisal.best.capture.b6.2 = Mutarea {n}: {move}, cu câștig de material.
+appraisal.best.phase.b1 = Ai jucat foarte bine {text}.
+appraisal.best.phase.b1.2 = {text} a fost partea cea mai reușită a partidei tale.
+appraisal.best.phase.b2 = Partea ta cea mai bună a fost {text}.
+appraisal.best.phase.b2.2 = {text} ți-a reușit foarte bine.
+appraisal.best.phase.b3 = Cea mai bună fază a ta a fost {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} ți-a ieșit cel mai bine: o precizie de {acc:percent}.
+appraisal.best.phase.b4 = Cea mai bună fază: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} a fost faza ta cea mai bună, cu {acc:percent}.
+appraisal.best.phase.b5 = Cea mai bună fază: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Faza cea mai bună: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 piesă" / "3 piese") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# The short levels give the numbers after a label: "Piese capturate: {n:f}" (feminine "două"),
+# "șahuri: {m:neut}"; "Bilanț: {n:capture}, {m:check}" = "4 capturi, 2 șahuri".
+appraisal.num.material.b1 = Mi-ai luat {n:piece} și mi-ai dat șah {m:time}.
+appraisal.num.material.b1.2 = Ai capturat {n:piece} și ai dat șah regelui meu {m:time}.
+appraisal.num.material.b2 = Ai capturat {n:piece} și ai dat șah {m:time}.
+appraisal.num.material.b2.2 = Ai luat {n:piece} și mi-ai dat șah {m:time}.
+appraisal.num.material.b3 = Ai capturat {n:piece} și ai dat șah {m:time}.
+appraisal.num.material.b3.2 = Piese capturate: {n:f}; șahuri date: {m:neut}.
+appraisal.num.material.b4 = Piese capturate: {n:f}, șahuri: {m:neut}.
+appraisal.num.material.b4.2 = Ai luat {n:piece} și ai dat șah {m:time}.
+appraisal.num.material.b5 = Capturi: {n:f}; șahuri: {m:neut}.
+appraisal.num.material.b5.2 = Ai luat {n:piece} și ai dat {m:check}.
+appraisal.num.material.b6 = Capturi: {n:f}, șahuri: {m:neut}.
+appraisal.num.material.b6.2 = Bilanț: {n:capture}, {m:check}.
+appraisal.num.material_nochecks.b1 = Mi-ai luat {n:piece}.
+appraisal.num.material_nochecks.b1.2 = Ai capturat {n:piece} în partida asta.
+appraisal.num.material_nochecks.b2 = Ai capturat {n:piece}.
+appraisal.num.material_nochecks.b2.2 = În partida asta ai luat {n:piece}.
+appraisal.num.material_nochecks.b3 = Ai capturat {n:piece}.
+appraisal.num.material_nochecks.b3.2 = Piese capturate: {n:f}.
+appraisal.num.material_nochecks.b4 = Piese capturate: {n:f}.
+appraisal.num.material_nochecks.b4.2 = Ai luat {n:piece}.
+appraisal.num.material_nochecks.b5 = Piese capturate: {n:f}.
+appraisal.num.material_nochecks.b5.2 = Capturi: {n:f}.
+appraisal.num.material_nochecks.b6 = Piese capturate: {n:f}.
+appraisal.num.material_nochecks.b6.2 = Capturi: {n:f}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well ("{m:f} dintre ele" =
+# "una dintre ele", "două dintre ele").
+appraisal.num.takebacks.b1 = Ai luat înapoi {n:move} și ai corectat {m:f} dintre ele. Așa se învață!
+appraisal.num.takebacks.b1.2 = Ai luat înapoi {n:move} și {m:time} ai găsit una mai bună. Super!
+appraisal.num.takebacks.b2 = Ai luat înapoi {n:move} și ai corectat {m:f} dintre ele. Așa se învață.
+appraisal.num.takebacks.b2.2 = Ai luat înapoi {n:move} și ai reușit să corectezi {m:f} dintre ele. Bravo!
+appraisal.num.takebacks.b3 = Ai luat înapoi {n:move} și ai corectat {m:f} dintre ele.
+appraisal.num.takebacks.b3.2 = Mutări luate înapoi: {n:f}; corectate: {m:f}. Bine.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Nicio greșeală mare: super!
+appraisal.num.clean.b2.2 = Nici măcar o greșeală mare în partida asta. Excelent!
+appraisal.num.clean.b2.3 = N-ai făcut nicio greșeală mare. Foarte bine!
+appraisal.num.few.b2 = Doar {n:mistake} în partida asta.
+appraisal.num.few.b2.2 = Numai {n:mistake} în toată partida. Bine!
+appraisal.num.few.b2.3 = Doar {n:mistake} care contează. Bravo.
+appraisal.num.best.b2 = Ai găsit cea mai bună mutare {n:time}.
+appraisal.num.best.b2.2 = Ai jucat chiar cea mai bună mutare {n:time}.
+appraisal.num.best.b2.3 = Ai nimerit cea mai bună mutare {n:time}.
+appraisal.num.acc.b3 = Precizia ta a fost de {acc:percent}, cu {n:mistake} și {m:blunder}.
+appraisal.num.acc.b3.2 = Precizie {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Ai jucat cu o precizie de {acc:percent}: {n:mistake} și {m:blunder}.
+appraisal.num.acc_explain.b3 = Precizia îți compară mutările cu cea mai bună mutare din fiecare poziție: o sută înseamnă perfecțiune.
+appraisal.num.acc_explain.b3.2 = Precizia măsoară cât de aproape au fost mutările tale de cele mai bune. O sută e perfect.
+appraisal.num.acc.b4 = Precizie: {acc:percent}.
+appraisal.num.acc.b4.2 = Ai jucat cu o precizie de {acc:percent}.
+appraisal.num.acc.b4.3 = Precizia ta: {acc:percent}.
+appraisal.num.acc_phase.b4 = Precizie {acc:percent}; {text}, faza ta cea mai bună: {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = În total {acc:percent}; {text}: {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Ai jucat cu {acc:percent}; cel mai bine ți-a ieșit {text}, cu {acc_phase:percent}.
+appraisal.num.coach.b4 = Eu am avut {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Precizia mea a fost de {acc_coach:percent}.
+appraisal.num.acc.b5 = Precizie {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Precizie {acc:percent}, cu {n:inaccuracy} și {m:mistake}.
+appraisal.num.acc.b5.3 = Ai jucat cu {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Ieșire din teorie la mutarea {k}.
+appraisal.num.book.b5.2 = Am ieșit din teorie la mutarea {k}.
+appraisal.num.acc.b6 = Tu {acc:percent}, eu {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = Precizie: {acc:percent} contra {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Precizie {acc:percent}, a mea {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Precizie {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Precizia: {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.

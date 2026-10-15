@@ -10,7 +10,8 @@
 #   "го" / "я"; {piece:rel} = "който" / "която" (forms of common.lang).
 # - A move as the subject of an adjective or a past tense is preceded by "ходът" ("Ходът {best}
 #   беше по-силен"), so that the agreement is clear.
-# - {opening:def} is the opening's name with its article, the subject form ("Сицилианската защита").
+# - {opening:def} is the opening's name in lower case without an article ("сицилианска защита",
+#   "вариант Найдорф", from the openings names fragment): it stands as a predicate after "е".
 # - Counted numbers (common.lang): {m:move} "мат в 3 хода", {pts:point} "3 точки", {n:mistake}
 #   "2 грешки", {m:blunder} "1 груба грешка", {acc_white:percent} "87%".
 
@@ -46,7 +47,7 @@ an.mate_allowed.one.2 = Ходът позволява {reply:nomate} и това
 an.mate_allowed = Това позволява форсиран мат в {m:move}, който започва с {reply:nomate}.
 an.mate_allowed.2 = Сега има форсиран мат в {m:move}, който започва с {reply:nomate}.
 an.fork = Сега {reply} прави вилица на {t1:obj} и {t2:obj}.
-an.fork.2 = Това позволява {reply} с удар едновременно по {t1:obj} и {t2:obj}.
+an.fork.2 = Това позволява {reply} с двоен удар по {t1:obj} и {t2:obj}.
 an.fork.3 = {reply} напада едновременно {t1:obj} и {t2:obj}.
 an.hanging = Ходът оставя {piece:obj} без защита и {reply} {piece:pron_obj} взема.
 an.hanging.2 = {piece} остава без защитник: {reply} {piece:pron_obj} печели.
@@ -62,7 +63,7 @@ an.mate_missed.2 = Имаше форсиран мат в {m:move}, който з
 an.missed_capture = Ходът {best} щеше да спечели {piece:obj} даром.
 an.missed_capture.2 = {piece} нямаше защитник: {best} щеше да {piece:pron_obj} вземе.
 an.missed_fork = Ходът {best} щеше да направи вилица на {t1:obj} и {t2:obj}.
-an.missed_fork.2 = Ходът {best} беше вилица, която напада {t1:obj} и {t2:obj}.
+an.missed_fork.2 = Ходът {best} беше вилица срещу {t1:obj} и {t2:obj}.
 
 # The better move, when nothing above named it.
 an.better = Ходът {best} беше по-силен.
@@ -79,7 +80,7 @@ an.brilliant.mate.2 = И форсира мат в {m:move}.
 # The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
 # or simply far better than anything else.
 an.only.win = {move} е единственият ход, който запазва предимството.
-an.only.win.2 = Само {move} запазва превъзходството тук. Чудесна находка.
+an.only.win.2 = Само {move} запазва превъзходството тук. Добре намерено.
 an.only.hold = {move} е единственият ход, който запазва равновесието.
 an.only.hold.2 = Само {move} удържа позицията тук.
 an.only.defend = {move} е единственият ход, който продължава борбата.

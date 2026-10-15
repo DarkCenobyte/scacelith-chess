@@ -15,7 +15,7 @@
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
 ch.intro.mate1 = Мат в един ход. {n:position}, и всеки път един-единствен ход дава мат. Провери всеки шах.
-ch.intro.mate2 = Мат в два хода. {n:position}: първият ти ход трябва да не ми оставя защита, а после даваш мат.
+ch.intro.mate2 = Мат в два хода. {n:position}: първият ти ход трябва да ме остави без защита, а после даваш мат.
 ch.intro.mate3 = Мат в три хода. {n:position}. Шахове, вземания и заплахи: всеки път изчисли най-добрия ми отговор.
 ch.intro.backrank = Матове на задната линия. {n:position} с цар, заклещен зад собствените си пешки.
 ch.intro.patterns = Матови схеми. {n:position} с класически матови мрежи. Разпознай схемата и удари.
@@ -36,7 +36,7 @@ ch.intro.kq = Дама и цар срещу цар. {n:position}: дай мат 
 ch.intro.kr = Топ и цар срещу цар. {n:position}: дай мат на царя ми, стъпка по стъпка.
 ch.intro.kp = Цар и пешка срещу цар. {n:position}: произведи дама. Нека царят ти води.
 ch.intro.kp_hold = Спри пешката. {n:position}: имаш само цар. Удържи реми.
-ch.intro.rook = Топовни ендшпили. {n:position}: построй мост, за да произведеш пешката, и удържи реми със защитата на Филидор.
+ch.intro.rook = Топови ендшпили. {n:position}: построй мост, за да произведеш пешката, и удържи реми със защитата на Филидор.
 ch.intro.endgame = Тактика в ендшпила. {n:position} с малко фигури и остри идеи.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -109,7 +109,7 @@ ch.wrong.weaker.2 = Това може да се играе, но можеш и �
 ch.wrong.stalemate = Пат! Царят ми няма ход, а това е само реми.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
 ch.wrong.draw = Не този: след {move} мога да удържа реми.
-ch.wrong.loses = Внимавай: след {move} печеля аз.
+ch.wrong.loses = Внимавай: след {move} бих имал печеливша позиция.
 # No answer from the engine: the move is simply not the one.
 ch.wrong.plain = Не е това.
 ch.try_again = Опитай пак.

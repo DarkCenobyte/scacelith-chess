@@ -31,7 +31,7 @@ appraisal.reason.other = a szabályok szerint
 # The coach level names (coach.level.<n>.name of assets/i18n/hu.lang) with their article.
 appraisal.level.l1 = az „Első lépések”
 appraisal.level.l2 = a „Kezdő”
-appraisal.level.l3 = a „Haladó”
+appraisal.level.l3 = a „Fejlődő játékos”
 appraisal.level.l4 = a „Klubjátékos”
 appraisal.level.l5 = az „Erős klubjátékos”
 appraisal.level.l6 = a „Szakértő”

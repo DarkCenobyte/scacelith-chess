@@ -8,7 +8,8 @@
 # ending of a participle ("свързан{your:a}"). {sq}, {sq2}, {to}, {esc} = squares ("на {sq}",
 # "полето {to}"); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at
 # something while saying the word right after the mark. A ".spoken" key is what the voice says
-# instead (here: the Latin file letters said as their Cyrillic names, and "Elo" in Cyrillic).
+# instead (here: the Latin file letters said as their Cyrillic names, "Elo" in Cyrillic, and the
+# letter "Г" of the knight's move said as its letter name "гъ").
 # Files = вертикали, ranks = хоризонтали, back rank = задната линия, castling kingside / queenside =
 # малка / голяма рокада. No l-participle or adjective about the player (gender unknown).
 
@@ -115,10 +116,12 @@ lesson.king.wrong = Царят ти е точно до {my:obj}. Стъпи на
 lesson.king.ok = Добре! Царят е бавен, но отблизо е силен.
 # Knight
 lesson.knight.intro = Това е {your}. {your:pron} се движи като буквата Г: две полета направо, после едно встрани.
+lesson.knight.intro.spoken = Това е {your}. {your:pron} се движи като буквата гъ: две полета направо, после едно встрани.
 lesson.knight.l = Ето {@}така. Конят винаги попада на поле от другия цвят.
 lesson.knight.jump = Конят е единствената фигура, която може да прескача други.
 lesson.knight.ask = Вземи {my:obj} с коня си!
 lesson.knight.wrong = Това е истински ход на кон, но не стига до {my:obj}. Опитай друго Г.
+lesson.knight.wrong.spoken = Това е истински ход на кон, но не стига до {my:obj}. Опитай друго гъ.
 lesson.knight.ok = Страхотен скок!
 # Pawn: moving
 lesson.pawn.intro = А сега – {your}. {your:pron} се движи право напред, по едно поле, и никога назад.
@@ -251,7 +254,7 @@ lesson.talk.clock = Това е {@}шахматен часовник. Всеки
 lesson.talk.press = След хода си натискаш часовника със същата ръка. Така пускаш моето време.
 lesson.talk.flag = Ако времето ти изтече, губиш, освен ако аз по никакъв начин не мога да ти дам мат.
 lesson.talk.increment = „Пет плюс три“ означава по пет минути за всеки играч плюс три секунди след всеки ход.
-lesson.talk.speeds = Кратките партии се наричат блиц, по-дългите – рапид, а най-дългите – класически шахмат.
+lesson.talk.speeds = Кратките партии се наричат блиц, по-дългите – рапид, а най-дългите – класически.
 lesson.talk.no_clock = С мен часовникът е изключен. Мисли колкото ти е нужно.
 lesson.talk.touch = В истинска партия, ако докоснеш някоя от своите фигури, трябва да я преместиш.
 lesson.talk.touch_mine = Ако докоснеш някоя от моите фигури, трябва да я вземеш, ако е възможно.
@@ -261,7 +264,7 @@ lesson.talk.sheet = На турнирите двамата играчи запи
 # {move:letters} shows the Bulgarian scoresheet letters ("Кf3"), which is what this line teaches.
 lesson.talk.notation = Записваме буквата на фигурата и полето, например {move:letters}. За пешките – само полето.
 lesson.talk.robot = Твоят робот записва ходовете вместо теб. В бързите партии записването не е задължително.
-lesson.talk.handshake = Партиите започват и завършват с ръкостискане. То означава: „добра игра и благодаря“.
+lesson.talk.handshake = Партиите започват и завършват с ръкостискане. То означава: „хубава партия и благодаря“.
 lesson.talk.polite = Независимо дали печелиш, или губиш, дръж се учтиво и никога не пречи на противника си, докато мисли.
 lesson.talk.tips = Три съвета за партиите ти: {@}контролирай центъра, {@2}развий конете и офицерите си и {@3}направи рокада рано.
 lesson.talk.next = Когато решиш, избери „Първи стъпки“. Ще играя по-меко и ще ти помагам след всяка грешка.

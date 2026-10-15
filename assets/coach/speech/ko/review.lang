@@ -11,7 +11,7 @@
 # sentence on them. Counted numbers carry their counter, so a particle may follow: {m:move} "3수"
 # (세 수), {pts:point} "3점", {n:time} "3번", {n:square} "3칸", {n:piece} "기물 3개".
 # {text} = name.pattern.*: every name ends in 메이트 (a vowel), so the two pattern lines attach 라고 / 예요.
-# Terms: 통과한 폰 (passed pawn), 오퍼지션 (opposition), 폰의 사각형 (the square of the pawn), 숨 쉴 칸
+# Terms: 통과한 폰 (passed pawn), 오퍼지션 (opposition, as assets/i18n/ko.lang), 폰의 사각형 (the square of the pawn), 숨 쉴 칸
 # (luft), 비숍 쌍 (bishop pair), 무방비 (loose), 더블 체크 (double check), 스테일메이트 함정 (stalemate trick).
 # Levels 1-2: short, simple sentences; levels 5-6: terse, noun-final fragments allowed.
 

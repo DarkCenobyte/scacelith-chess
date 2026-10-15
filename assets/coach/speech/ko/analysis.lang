@@ -9,6 +9,7 @@
 # the same side ("{t1:and} {t2:bare}" = "백 퀸과 룩": a fork's two targets belong to one side).
 # Moves ({move} {best} {reply} {line}) and {opening:def} end in a varying sound: never a particle
 # after them; apposition instead ("{best}, 이 수가 더 강했어요"), or the sentence ends on them.
+# "{opening:cop}" is the name with its own copula (시실리안 디펜스예요), from the openings fragment.
 # Counted numbers: {m:move} "3수" (spoken "세 수"), {pts:point} "3점", {n:mistake} "실수 2번",
 # {m:blunder} "블런더 1번", {n:time} "2번", {acc_white:percent} "87%" (spoken "팔십칠 퍼센트").
 # The draw rules are written "50수 규칙" / "75수 규칙" (spoken "오십 수", "칠십오 수").

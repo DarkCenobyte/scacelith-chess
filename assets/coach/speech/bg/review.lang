@@ -100,7 +100,7 @@ ex.verdict.inaccuracy.b4.3 = Не е най-точният ход: по-прец
 ex.verdict.inaccuracy.b5 = {move} е неточен ход; по-силно беше {best}.
 ex.verdict.inaccuracy.b5.2 = Леко неточно. Аз бих изиграл {best}.
 ex.verdict.inaccuracy.b5.3 = {best} беше по-точен ход от {move}.
-ex.verdict.inaccuracy.b6 = {move} е неточно; {best}.
+ex.verdict.inaccuracy.b6 = {move} е неточен ход; {best}.
 ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
 ex.verdict.inaccuracy.b6.3 = По-добре беше {best}.
 # Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
@@ -335,7 +335,7 @@ ex.mate_allowed.tail.b1.2 = Виждаш ли? {your} е под удар и не
 ex.mate_allowed.tail.b1.3 = {your} няма къде да отиде. Това е мат.
 # The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
 ex.mate_allowed.pattern = Тази матова картина се нарича {text}.
-ex.mate_allowed.pattern.2 = Запомни я: това е {text}.
+ex.mate_allowed.pattern.2 = Запомни тази картина: това е {text}.
 ex.mate_allowed.tip.b3 = Преди всеки ход проверявай дали царят ти е още в безопасност.
 ex.mate_allowed.tip.b3.2 = Винаги се питай: след моя ход може ли царят ми да получи мат?
 
@@ -350,7 +350,7 @@ name.pattern.epaulette = еполетен мат
 ex.mate_missed.b1 = С {best:nomate} можеше да дадеш мат на {my:obj}!
 ex.mate_missed.b1.2 = {best:nomate} беше мат! {my} нямаше да може да избяга.
 ex.mate_missed.b1.3 = Виж! {best:nomate} щеше да даде мат на {my:obj}.
-ex.mate_missed.b2 = Имаше мат в {m:move}, като първият ход е {best:nomate}.
+ex.mate_missed.b2 = Имаше мат в {m:move}, който започваше с {best:nomate}.
 ex.mate_missed.b2.2 = {best:nomate} даваше мат в {m:move}!
 ex.mate_missed.b2.3 = Можеше да ми дадеш мат с {best:nomate}.
 ex.mate_missed.b3 = Пропусна мат в {m:move}: {best:nomate}.
@@ -474,7 +474,7 @@ ex.skewer.b4.2 = След {move} {t1} и {t2} стоят на една лини�
 ex.skewer.b4.3 = След {reply} {t1} се отмества и {t2} пада.
 ex.skewer.b5 = {reply}: линеен удар по {t1:obj} и {t2:obj}.
 ex.skewer.b5.2 = {move} позволява линейния удар {reply} през {t1:obj} към {t2:obj}.
-ex.skewer.b6 = {reply} с линеен удар.
+ex.skewer.b6 = {reply} нанася линеен удар.
 ex.skewer.b6.2 = {reply}, линеен удар.
 
 # ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
@@ -538,7 +538,7 @@ ex.back_rank.b2 = Опасност на задната линия: {your} ням
 ex.back_rank.b2.2 = {your} е затворен{your:a}. {my} отива на {sq} и печели материал.
 ex.back_rank.b2.3 = Задната ти линия е слаба: {my} може да даде шах на {your:obj} от {sq}.
 ex.back_rank.b3 = Задната ти линия е слаба: {line}. {your} няма поле за бягство.
-ex.back_rank.b3.2 = {your} няма луфт, затова {line} печели материал.
+ex.back_rank.b3.2 = {your} няма въздух, затова {line} печели материал.
 ex.back_rank.b3.3 = След {line} задната линия решава: {your} е затворен{your:a}.
 ex.back_rank.b4 = Задната линия: {line}, а {your} няма луфт.
 ex.back_rank.b4.2 = {line} използва слабата задна линия около {your:obj}.
@@ -672,7 +672,7 @@ ex.missed_fork.b1 = Имаше двоен удар: {best} напада {t1:obj}
 ex.missed_fork.b1.2 = Виж! {best} щеше да нападне едновременно {t1:obj} и {t2:obj}.
 ex.missed_fork.b1.3 = {best} беше вилица: и {t1}, и {t2} под удар.
 ex.missed_fork.b2 = {best} беше вилица: {t1} и {t2}.
-ex.missed_fork.b2.2 = Пропусна двоен удар: {best}, по {t1:obj} и {t2:obj}.
+ex.missed_fork.b2.2 = Пропусна двоен удар: {best} щеше да нападне {t1:obj} и {t2:obj}.
 ex.missed_fork.b2.3 = {best} напада едновременно {t1:obj} и {t2:obj}. Вилица!
 ex.missed_fork.b3 = {best} правеше вилица на {t1:obj} и {t2:obj}.
 ex.missed_fork.b3.2 = Имаше {best} с вилица на {t1:obj} и {t2:obj}.
@@ -982,7 +982,7 @@ tb.same.2 = Харесва ти този ход. Да видим докъде щ
 tb.found.b1 = Да! Точно за този ход си мислех.
 tb.found.b1.2 = Откри го! Това е по-добрият ход.
 tb.found = Това е ходът, който имах предвид.
-tb.found.2 = Точно така, това е той.
+tb.found.2 = Точно така, това е ходът.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = Боя се, че в тази партия не остават повече връщания на ход.

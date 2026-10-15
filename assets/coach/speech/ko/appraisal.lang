@@ -16,8 +16,10 @@
 #                       무승부 / 비겼어요 ("{text} 무승부예요" = "합의로 무승부예요").
 #   theme.*             a nominal -기 phrase, no full stop, always said after a colon.
 #   appraisal.level.*   the level name, said in quotes before 레벨 ("“중급자” 레벨").
-# {opening} stands alone or after a colon, at the end of the sentence.
-# Terms shared with review.lang: 통과한 폰, 폰의 사각형, 숨 쉴 칸, 무방비, 강제수 (forcing move).
+# The opening name ends the sentence: "{opening:cop}" (시실리안 디펜스예요), "{opening:was}어요" (시실리안
+# 디펜스였어요), forms of every family and variation in the openings fragment; or {opening} alone after a colon.
+# Terms shared with review.lang: 통과한 폰, 폰의 사각형, 숨 쉴 칸, 무방비, 강제수 (forcing move,
+# glossed at level 3 as "체크, 잡기, 위협 같은 강제수").
 
 # ---- Names used inside the lines ------------------------------------------------------------------
 appraisal.phase.opening = 오프닝

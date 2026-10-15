@@ -55,7 +55,7 @@ event.filler.3 = 잠깐 볼게요.
 
 # ---- Takebacks -----------------------------------------------------------------------------------------
 # The player took the move back after the coach's offer.
-event.takeback.taken = 좋아요, 그 수는 물러요.
+event.takeback.taken = 좋아요, 그 수는 무르죠.
 event.takeback.taken.2 = 좋은 생각이에요. 다시 한번 보세요.
 event.takeback.taken.3 = 수를 되돌렸어요. 다시 해 보세요.
 # The player declined the offer and played on.

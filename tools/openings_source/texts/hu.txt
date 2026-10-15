@@ -1,0 +1,95 @@
+# Coach openings: Hungarian texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
+# families.json into assets/coach/openings/hu.lang.
+# Register: the coach says "te" to the player (tegezés: "számíts", "vigyázz") and "én" for himself; Hungarian has no
+# grammatical gender, so nothing agrees with the sex of the coach or of the player.
+# Opening names: "def" is the name with its article, lower case except proper names ("a szicíliai védelem",
+# "az angol megnyitás", "a Najdorf-változat"); the names fragment also gives every family and variation the case
+# forms acc (-t), dat (-nak/-nek), ins (-val/-vel), ine (-ban/-ben), ela (-ból/-ből) and sub (-ra/-re), with the
+# article ("az olasz játszmával"), so a template never attaches a suffix to a name. {line} stands alone after a
+# colon. {n} is a move number said as an ordinal through the coach's count.ord ("a játszma 12. lépésénél",
+# spoken "tizenkettedik").
+# Squares never take a suffix or a hyphenated ending (the voice spells them, and "c3-at", "f7-et" would come out
+# wrong): the case goes on a noun next to them ("az f3 mezőn", "a c4 mezőre", "az e6 lépéssel", "a d4
+# előretolás", "a c5 áttörés", "e5 után"); a pawn on a square is written "az e4-gyalog". The article before a
+# square follows the letter as said: "az" before a, e, f ("az e4", "az f3", "az a6"), "a" before the others.
+# Files as "c-vonal", pawns as "d-gyalog" (file_pattern spells the letter); pieces in words, never piece
+# letters. White and Black are "világos" and "sötét" (lower case inside a sentence); a light-squared bishop is
+# "világosmezős futó", never "világos futó" (White's bishop).
+
+# ---- Sentences. "pw" = the player (the listener) has White, "pb" = the player has Black; the coach is the
+# other side. Gambits are "elfogadott" (accepted) or "elhárított" (declined), as in their Hungarian names.
+opening.say.pw.both = {white:ins} kezdtél, én pedig {black:ins} válaszoltam.
+opening.say.pw.both.2 = Te {white:acc} választottad, én pedig {black:acc}.
+opening.say.pb.both = {white:ins} kezdtem, te pedig {black:ins} válaszoltál.
+opening.say.pb.both.2 = Én {white:acc} választottam, te pedig {black:acc}.
+opening.say.pw.declined = {white:acc} játszottad, én pedig elhárítottam.
+opening.say.pb.declined = {white:acc} játszottam, te pedig elhárítottad.
+opening.say.pw.accepted = {white:acc} játszottad, én pedig elfogadtam.
+opening.say.pb.accepted = {white:acc} játszottam, te pedig elfogadtad.
+opening.say.pw.white = {white:ins} kezdtél.
+opening.say.pw.white.2 = Te {white:acc} választottad.
+opening.say.pb.white = {white:ins} kezdtem.
+opening.say.pb.white.2 = Én {white:acc} választottam.
+opening.say.pw.var_white = Én {black:ins} válaszoltam, te pedig {white:acc} választottad.
+opening.say.pb.var_white = Te {black:ins} válaszoltál, én pedig {white:acc} választottam.
+opening.say.pw.black = {black:ins} válaszoltam.
+opening.say.pb.black = {black:ins} válaszoltál.
+opening.say.both = {both:acc} játsszuk.
+opening.say.both.2 = Ez {both:def}.
+opening.say.variation = Pontosabban szólva ez {variation:def}.
+opening.say.variations = Pontosabban: világos {white:acc} választotta, sötét pedig {black:acc}.
+opening.say.now_variation = Most már {variation:ine} járunk.
+opening.say.transposed = Lépésátfordulással most már {opening:ine} járunk.
+opening.say.deep = Egészen pontosan: {line}.
+opening.say.left_book = Épp most hagytuk el az ismert megnyitáselméletet.
+opening.say.left_book_move = A játszma {n:ord} lépésénél hagytuk el az ismert megnyitáselméletet.
+opening.say.rare = Ez egy ritka megnyitás.
+opening.say.rare_named = Ez egy ritka megnyitás: {line}.
+
+# ---- Families: beginner (levels 1-3) and advanced (levels 4-6) comments
+opening.family.kings_pawn.beginner = Ha a királygyalog két mezőt lép előre, megszállja a centrumot, és egyszerre utat nyit a vezérnek és az egyik futónak: ez a legnépszerűbb kezdőlépés.
+opening.family.kings_pawn.advanced = Az e4 lépés e5 után nyílt, taktikus játszmákhoz vezet, a szicíliai, a francia vagy a Caro–Kann-védelem ellen pedig éles, kiegyensúlyozatlan küzdelmekhez.
+opening.family.queens_pawn.beginner = A vezérgyalog a d4 mezőn foglal helyet a centrumban, ahol a vezér már védi: a játszmák többnyire lassabbak és inkább stratégiai jellegűek, mint az e4 lépés után.
+opening.family.queens_pawn.advanced = A vezérgyalog-megnyitások zárt állásokhoz vezetnek, ahol a tisztek elhelyezése, a gyalogszerkezet, valamint a c4 és az e4 áttörés többet számít a korai taktikánál.
+opening.family.kings_knight.beginner = A huszár kifejlődik, és megtámadja az e5-gyalogot: ez a legtermészetesebb fejlesztő lépés, sötét pedig többnyire a saját huszárjával védi a gyalogot.
+opening.family.kings_knight.advanced = Az f3 mezőn álló huszár minden klasszikus utat nyitva hagy, a spanyol megnyitást, az olasz és a skót játszmát vagy a négyhuszáros játékot, és döntésre kényszeríti sötétet az e5-gyalog védelméről.
+opening.family.sicilian.beginner = Sötét az e-gyalog helyett a c-gyaloggal válaszol, és felborítja az egyensúlyt: éles küzdelemre számíts, mindkét fél a saját szárnyán támad.
+opening.family.sicilian.advanced = A d4 lépés és a gyalogcsere után sötété a félig nyílt c-vonal és a centrumbeli gyalogtöbblet, világosé pedig a gyorsabb fejlődés és a királyszárnyi támadási esélyek.
+opening.family.french.beginner = Sötét az e6 lépéssel készíti elő a d5 előretolást: szilárd védelem, de a világosmezős futó gyakran bezárul a saját gyalogjai mögé.
+opening.family.french.advanced = Ha világos az e5 mezőre tolja a gyalogját, zárt gyaloglánc alakul ki: világos a királyszárnyon támad, sötét pedig a c5 és az f6 lépéssel a láncot bontja.
+opening.family.caro_kann.beginner = Sötét a c6 lépéssel készíti elő a d5 előretolást, és szabad utat hagy a világosmezős futónak: nagyon szilárd, kevés gyengeséggel járó védelem.
+opening.family.caro_kann.advanced = Sötét egészséges gyalogszerkezetet és aktív világosmezős futót kap; világos térelőnyt vagy kis fejlődési előnyt szerez, sötét a c5 lépésre vagy egy jó végjátékra törekszik.
+opening.family.scandinavian.beginner = Sötét a d5 lépéssel azonnal megtámadja az e4-gyalogot; ha a vezér üt vissza, világos tempót nyer az üldözésével, ezért biztonságos mezőt kell keresni neki.
+opening.family.scandinavian.advanced = A Caro–Kann-védelemhez hasonló szerkezet, a világosmezős futó a gyalogláncon kívül áll: világosnak valamivel több tere marad, sötét szilárd, könnyen felállítható állást kap.
+opening.family.italian.beginner = Világos a c4 mezőre állítja a futót, és a gyenge f7 mezőt veszi célba: klasszikus megnyitás, amelyben mindkét fél gyorsan fejlődik és sáncol.
+opening.family.italian.advanced = A modern olasz játszmák lassú manőverharcok a c3 és a d3 lépéssel, amelyek később előkészítik a d4 előretolást; az éles próbálkozások az Evans-csel és a huszárugrás a g5 mezőre.
+opening.family.ruy_lopez.beginner = Világos futója megtámadja a huszárt, amely az e5-gyalogot védi: az egyik legrégebbi és legmélyebb megnyitás, tele lassú stratégiai játékkal.
+opening.family.ruy_lopez.advanced = Világos a c3 és a d4 lépéssel tartós nyomást épít fel az e5 mezőre és a centrumra, sötét pedig az a6 és a b5 lépéssel teret nyer a vezérszárnyon; az éles kivétel a Marshall-támadás.
+opening.family.scotch.beginner = Világos a d4 lépéssel azonnal megnyitja a centrumot: a tisztek gyorsan kifejlődnek, és az állás korán kinyílik.
+opening.family.scotch.advanced = A centrumbeli feszültség azonnal megszűnik; a küzdelem sötét aktív fejlődéséről és a c6 mezőn történő csere utáni gyalogszerkezetekről szól.
+opening.family.philidor.beginner = Sötét a d-gyaloggal védi az e5-gyalogot: szilárd, de kissé passzív, mert a sötétmezős futó bezárul.
+opening.family.philidor.advanced = Sötét feladja a teret, cserébe szilárdan tartja az e5 mezőt; világos kényelmes nyomást gyakorol a centrumra, és klubszinten gyakoriak az f7 elleni trükkök.
+opening.family.petrov.beginner = Sötét nem védi az e5-gyalogot, hanem a huszárjával ellentámadást indít az e4-gyalog ellen: szilárd, szimmetrikus védelem; csak ne másold túl sokáig világos lépéseit.
+opening.family.petrov.advanced = A Petrov-védelem szimmetrikus, gyakran döntetlen jellegű szerkezetekhez vezet: világos kis kezdeményezést tart meg, sötét gyorsan fejlődik, és kiegyenlítő cserékre törekszik.
+opening.family.four_knights.beginner = Mindkét fél először a huszárjait hozza ki: egészséges, nyugodt megnyitás, amely betartja a fejlődés szabályait.
+opening.family.four_knights.advanced = Szimmetrikus, kiegyensúlyozott megnyitás: világos spanyol, skót vagy olasz stílusú folytatást választ, sötétnek pedig ismernie kell a Rubinstein-ellencselt.
+opening.family.english.beginner = Világos a c-gyaloggal kezd, és oldalról ellenőrzi a d5 mezőt: rugalmas megnyitás, amelyben a centrumért a tisztekkel folyik a harc.
+opening.family.english.advanced = Az angol megnyitás gyakran átfordul vezérgyalog-megnyitásokba; saját változataira a fianchettós manőverek, a d5 mezőre gyakorolt nyomás és a vezérszárnyi játék jellemző.
+opening.family.zukertort.beginner = Ha világos először a királyhuszárt fejleszti, szemmel tartja a centrumot, és még nem köti le magát egyetlen gyaloglépéssel sem.
+opening.family.zukertort.advanced = Lépéssorrendi fegyver: lehet belőle Réti-megnyitás, angol vagy katalán megnyitás, illetve vezércsel, miközben kikerüli sötét néhány védelmét.
+opening.family.queens_gambit.beginner = Világos felkínálja a c-gyalogot, hogy elcsalja sötét gyalogját a centrumból; ez nem valódi áldozat, mert világos általában vissza tudja nyerni.
+opening.family.queens_gambit.advanced = A c4 lépés a d5 támpontot támadja: sötét vagy megtartja, mint az elhárított vezércselben vagy a szláv védelemben, vagy feladja a szabad fejlődésért, mint az elfogadott vezércselben.
+opening.family.qgd.beginner = Sötét megtartja a gyalogot a d5 mezőn, és az e6 lépéssel támogatja: nagyon szilárd, de a világosmezős futóra oda kell figyelni.
+opening.family.qgd.advanced = Klasszikus szerkezetek: a karlsbadi szerkezet világos kisebbségi támadásával, sötét felszabadító c5 vagy e5 lépése, és a világosmezős futó örök problémája.
+opening.family.qga.beginner = Sötét leüti a gyalogot, de nem próbálja megtartani: a cél a szabad fejlődés, és világos centrumának megtámadása a c5 lépéssel.
+opening.family.qga.advanced = Világos visszanyeri a gyalogot, és gyakran elszigetelt d-gyalog marad neki: a tisztek aktivitása áll szemben egy tartós szerkezeti gyengeséggel.
+opening.family.slav.beginner = Sötét a c6 lépéssel támogatja a d5-gyalogot, és szabad utat hagy a világosmezős futónak: nagyon szilárd védelem.
+opening.family.slav.advanced = A szláv védelem úgy tartja a d5 mezőt, hogy nem zárja be a világosmezős futót; a főváltozatokban sötét üt a c4 mezőn, és ezt a futót az f5 vagy a g4 mezőre fejleszti.
+opening.family.semi_slav.beginner = Sötét a szláv védelem c6-gyalogját az e6-gyaloggal kombinálja: csendesnek tűnik, de nagyon éles változatokhoz vezet.
+opening.family.semi_slav.advanced = A félszláv védelem fő ágai a meráni változat, vezérszárnyi terjeszkedéssel a b5 lépés révén, valamint a rendkívül éles Botvinnik-csel és moszkvai csel.
+opening.family.indian.beginner = Sötét gyalog helyett huszárral válaszol, és nyitva hagyja a lehetőségeit: ez a kapu az összes indiai védelemhez.
+opening.family.indian.advanced = Az f6 mezőn álló huszár egyelőre megakadályozza az e4 lépést; sötét következő lépései döntenek a királyindiai, a nimzoindiai, a vezérindiai, a Grünfeld- és a Benoni-védelem között.
+opening.family.kings_indian.beginner = Sötét hagyja, hogy világos nagy centrumot építsen, a futóját a g7 mezőre állítja, és később vág vissza: dinamikus, harcias védelem.
+opening.family.kings_indian.advanced = Sötét az e5 vagy a c5 lépéssel támadja a centrumot; ha az bezárul, világos a vezérszárnyon támad, sötét pedig az f5, f4 és g5 lépésekkel rohamozza a királyszárnyat.
+opening.family.london.beginner = Világos szinte bármi ellen ugyanazt állítja fel: d4, futó az f4 mezőn, e3, huszár az f3 mezőn és c3. Könnyen megtanulható, szilárd, egyértelmű tervvel.
+opening.family.london.advanced = Stabil gyalogpiramis, a futó a láncon kívül áll: világos királyszárnyi kezdeményezésre vagy lassú szorításra játszik, sötét legkomolyabb próbája pedig a korai c5 lépés.
