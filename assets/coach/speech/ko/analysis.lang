@@ -22,7 +22,7 @@ an.start.setup = 이 게임은 따로 배치한 포지션에서 시작해요. �
 an.start.setup.2 = 따로 배치한 포지션에서 시작한 게임이에요. 어떻게 흘러갔는지 봐요.
 
 # ---- The opening (said where the game leaves the opening book) ------------------------------------
-an.opening = 이 게임의 오프닝은 {opening:def}.
+an.opening = 이 게임의 오프닝은 {opening:cop}.
 an.opening.2 = {opening:def}, 이 오프닝으로 시작한 게임이에요.
 an.book_exit = {move}, 이 수로 게임이 알려진 오프닝 이론을 벗어나요.
 an.book_exit.2 = {move}, 이 수가 오프닝 이론을 벗어난 첫 수예요.
@@ -50,8 +50,8 @@ an.fork.3 = {reply}, 이 수가 {t1:and} {t2:bare_obj} 한꺼번에 노려요.
 an.hanging = {piece:subj} 지켜지지 않은 채 남아서, {reply}, 이 수에 잡혀요.
 an.hanging.2 = {piece}에게는 수비 기물이 없어요. {reply}, 이 수로 그 기물을 따내요.
 an.hanging.3 = {reply}, 이 수로 지켜 주는 기물이 없던 {piece:obj} 그냥 잡아요.
-an.material = {line}, 이 응수로 기물 {pts:point}을 얻어요.
-an.material.2 = 그러면 {line}, 이 수순으로 {pts:point}을 얻어요.
+an.material = {line}, 이 응수로 {pts:point}만큼 기물 이득을 봐요.
+an.material.2 = 그러면 {line}, 이 수순으로 {pts:point}만큼 이득을 봐요.
 
 # What it misses ({best} is the better move).
 an.mate_missed.one = {best:nomate}, 이 수가 체크메이트였어요.
@@ -80,7 +80,7 @@ an.brilliant.mate.2 = 그리고 {m:move} 만에 메이트를 강제해요.
 an.only.win = {move}, 우위를 지키는 유일한 수예요.
 an.only.win.2 = 여기서 우위를 지키는 수는 {move}, 이 수뿐이에요. 잘 찾았어요.
 an.only.hold = {move}, 균형을 지키는 유일한 수예요.
-an.only.hold.2 = 여기서 포지션을 버티게 하는 수는 {move}, 이 수뿐이에요.
+an.only.hold.2 = 여기서 포지션을 지켜 내는 수는 {move}, 이 수뿐이에요.
 an.only.defend = {move}, 싸움을 이어 가게 하는 유일한 수예요.
 an.only.defend.2 = 여기서 게임을 살려 두는 수는 {move}, 이 수뿐이에요. 좋은 수비예요.
 an.only.best = 여기서는 {move}, 이 수가 단연 가장 강한 수예요.

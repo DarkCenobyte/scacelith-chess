@@ -119,8 +119,8 @@ lesson.knight.intro.spoken = 이건 {your:cop}. 엘자 모양으로 움직여요
 lesson.knight.l = {@}이렇게요. 나이트는 언제나 다른 색 칸에 내려앉아요.
 lesson.knight.jump = 나이트는 다른 기물을 뛰어넘을 수 있는 유일한 기물이에요.
 lesson.knight.ask = 나이트로 {my:obj} 잡으세요!
-lesson.knight.wrong = 나이트가 갈 수 있는 수는 맞지만, {my}까지 닿지 않아요. 다른 L자로 가 보세요.
-lesson.knight.wrong.spoken = 나이트가 갈 수 있는 수는 맞지만, {my}까지 닿지 않아요. 다른 엘자로 가 보세요.
+lesson.knight.wrong = 나이트의 움직임은 맞지만, {my}까지 닿지 않아요. 다른 L자로 가 보세요.
+lesson.knight.wrong.spoken = 나이트의 움직임은 맞지만, {my}까지 닿지 않아요. 다른 엘자로 가 보세요.
 lesson.knight.ok = 멋진 점프예요!
 # Pawn: moving
 lesson.pawn.intro = 이번엔 {your:cop}. 한 번에 한 칸씩 똑바로 앞으로만 가고, 절대 뒤로는 가지 않아요.
@@ -166,7 +166,7 @@ lesson.safety.ok = 훌륭해요! “저 기물을 지키는 기물이 있나?”
 
 # ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
 lesson.danger.rank = 제 룩이 2랭크 전체를 장악하고 있어요.
-lesson.danger.rank.spoken = 제 룩이 이 랭크 전체를 장악하고 있어요.
+lesson.danger.rank.spoken = 제 룩이 두 번째 랭크 전체를 장악하고 있어요.
 lesson.danger.rule = 킹은 잡힐 수 있는 칸으로는 절대 갈 수 없어요.
 lesson.danger.ask = 킹을 안전한 칸으로 옮기세요.
 lesson.danger.ok = 맞아요. 거기라면 킹이 안전해요.

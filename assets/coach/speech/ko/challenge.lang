@@ -14,8 +14,8 @@
 # The player always has the white pieces.
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
-ch.intro.mate1 = 1수 메이트예요. {n:position}, 모두 한 수 만에 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
-ch.intro.mate1.spoken = 한 수 메이트예요. {n:position}, 모두 한 수 만에 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
+ch.intro.mate1 = 1수 메이트예요. 모두 {n:position}예요. 매번 단 한 수로 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
+ch.intro.mate1.spoken = 한 수 메이트예요. 모두 {n:position}예요. 매번 단 한 수로 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
 ch.intro.mate2 = 2수 메이트예요. 모두 {n:position}예요. 첫 수로 제가 막을 방법을 없애고, 그다음에 메이트하세요.
 ch.intro.mate2.spoken = 두 수 메이트예요. 모두 {n:position}예요. 첫 수로 제가 막을 방법을 없애고, 그다음에 메이트하세요.
 ch.intro.mate3 = 3수 메이트예요. 모두 {n:position}예요. 체크, 잡기, 위협. 매번 제 최선의 응수를 읽어 보세요.
@@ -39,7 +39,7 @@ ch.intro.kq = 퀸과 킹 대 킹이에요. 모두 {n:position}예요. 제 킹을
 ch.intro.kr = 룩과 킹 대 킹이에요. 모두 {n:position}예요. 한 걸음씩 제 킹을 체크메이트하세요.
 ch.intro.kp = 킹과 폰 대 킹이에요. 모두 {n:position}예요. 퀸을 만드세요. 킹이 앞장서야 해요.
 ch.intro.kp_hold = 폰 막기예요. 모두 {n:position}예요. 남은 건 킹뿐이에요. 무승부를 지켜 내세요.
-ch.intro.rook = 룩 엔드게임이에요. 모두 {n:position}예요. 다리를 놓아 프로모션하고, 필리도르 디펜스로 무승부를 지켜 내세요.
+ch.intro.rook = 룩 엔드게임이에요. 모두 {n:position}예요. 다리를 놓아 프로모션하고, 필리도르 방어로 무승부를 지켜 내세요.
 ch.intro.endgame = 엔드게임 전술이에요. 기물은 적어도 날카로운 아이디어가 담긴 {n:position}예요.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -53,7 +53,7 @@ ch.task.fork.2 = 포크를 노려 보세요.
 ch.task.pin = 여기서는 핀이 열쇠예요.
 ch.task.skewer = 여기서는 스큐어로 이길 수 있어요.
 ch.task.discovered = 여기서는 디스커버드 어택으로 이길 수 있어요.
-ch.task.deflection = 수비 기물에 짐을 지우거나, 꾀어내세요.
+ch.task.deflection = 수비 기물에 과부하를 걸거나, 꾀어내세요.
 ch.task.intermezzo = 중간 수를 찾아보세요.
 ch.task.trapped = 제 기물 하나가 도망갈 수 없어요. 그 기물을 잡으세요.
 ch.task.promotion = 전진한 폰을 활용하세요.
@@ -71,7 +71,7 @@ ch.task.play.hold = {n:move} 동안 무승부를 지켜 내세요. 저는 이기
 # ---- Setting up ----------------------------------------------------------------------------------
 # Before the coach plays the first move into a position (once per challenge).
 ch.lead.first = 이 포지션들은 실전 게임에서 나왔어요. 제가 마지막 수를 두면, 그다음에 두실 차례예요.
-ch.lead.first.2 = 포지션마다 실전 게임에서 가져왔어요. 그 포지션으로 이어진 수를 제가 두면, 그다음에 두세요.
+ch.lead.first.2 = 포지션은 모두 실전 게임에서 가져왔어요. 그 포지션으로 이어진 수를 제가 두면, 그다음에 두세요.
 ch.next = 다음 포지션이에요.
 ch.next.2 = 자, 다음이에요.
 ch.next.3 = 다음으로 넘어가요.
@@ -104,7 +104,7 @@ ch.wrong.mated = 조심하세요. {move}, 이 수 다음에는 제가 {m:move} �
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = 그 수로도 메이트할 수 있지만, 더 오래 걸려요. 더 빠른 방법이 있어요.
 # A move that mates just as fast, but is not the solution the coach answers.
-ch.wrong.other = 그 수로도 메이트되지만, 제가 생각한 수는 따로 있어요. 다시 보세요.
+ch.wrong.other = 그 수로도 메이트가 되지만, 제가 생각한 수는 따로 있어요. 다시 보세요.
 # A move that keeps an advantage, but less than the solution.
 ch.wrong.weaker = 나쁘지 않지만, 더 강한 수가 있어요. 다시 보세요.
 ch.wrong.weaker.2 = 둘 만한 수지만, 더 잘 두실 수 있어요.

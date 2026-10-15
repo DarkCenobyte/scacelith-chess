@@ -587,3 +587,170 @@ ex.hanging_threat.b3 = Promakla ti je moja prijetnja: {my} je napada{my:pt} {you
 ex.hanging_threat.b3.2 = {my} je cijelo vrijeme ima{my:pt} {your:acc} na nišanu.
 ex.hanging.tip.b1 = Prije svakog poteza zapitaj se: jesu li sve moje figure sigurne?
 ex.hanging.tip.b1.2 = Dobra navika: nakon svakog poteza provjeri koje su tvoje figure zaštićene.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} je uze{your:pt} figuru, ali {my} uzima natrag. Ta zamjena gubi bodove.
+ex.exchange_capture.b1.2 = {my} uzima natrag. {your} vrijedi {n:point_acc}, a za to dobivaš samo {n2:point_acc}.
+ex.exchange_capture.b1.3 = Pazi: {my} može uzeti natrag {your:acc}. To je loša zamjena.
+ex.exchange_capture.b2 = Oprezno sa zamjenama: {your} vrijedi {n:point_acc}. {my} uzima natrag, a ti dobivaš samo {n2:point_acc}.
+ex.exchange_capture.b2.2 = {my} uzima natrag {your:acc}. Gubiš {n:point_acc}, a dobivaš samo {n2:point_acc}.
+ex.exchange_capture.b3 = Uzimanje na {sq} ne prolazi: {your} je izgubljen{your:ag} nakon {line}.
+ex.exchange_capture.b3.2 = {your} uzima na {sq}, ali nakon {line} gubiš {pts:point_acc}.
+ex.exchange_capture.b4 = Potez {move} je pogrešan račun na polju {sq}: {line}, i {your} je izgubljen{your:ag}.
+ex.exchange_capture.b4.2 = Uzimanjem na {sq} gubiš {your:refl_acc}: {line}.
+ex.exchange_capture.b5 = {move} gubi {your:acc} u nizu uzimanja na {sq}: {line}.
+ex.exchange_capture.b5.2 = Na polju {sq} gubi se {your}: {line}.
+ex.exchange_capture.b6 = {move} gubi {your:acc} na {sq} nakon {line}.
+ex.exchange_capture.b6.2 = {line} na {sq}, i {your} pada.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Prebroji: polje {sq} napadam {n:time}, a ti ga braniš {n2:time}.
+ex.exchange_count.b1.2 = Na polju {sq} imam {n:attacker_acc}, a ti {n2:defender_acc}. Tu sam ja jači.
+ex.exchange_count.b2 = Polje {sq} napadnuto je {n:time}, a branjeno {n2:time}. Tamo ćeš izgubiti materijal.
+ex.exchange_count.b2.2 = Prebroji na polju {sq}: {n:attacker} protiv {n2:defender_gen}.
+ex.exchange_count.b3 = Prebroji napadače i branitelje na polju {sq}: ja ih imam više.
+ex.exchange_count.b3.2 = Zamjena na {sq} ne prolazi: nakon {line} gubiš {pts:point_acc}.
+ex.exchange_count.b4 = Potez {move} je pogrešan račun na polju {sq}: {line}, i gubiš {pts:point_acc}.
+ex.exchange_count.b4.2 = Polje {sq} više je puta napadnuto nego branjeno: {line}.
+ex.exchange_count.b5 = Na polju {sq} napad je jači, {n:attacker} protiv {n2:defender_gen}: {line}.
+ex.exchange_count.b5.2 = {move}: na polju {sq} račun ne izlazi.
+ex.exchange_count.b6 = {line} na {sq}, i dobio sam {pts:point_acc}.
+ex.exchange_count.b6.2 = {sq}: {n} protiv {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} vrijedi manje od {your:gen}. Ako uzmem, gubiš bodove.
+ex.exchange_cheap.b1.2 = {my} napada {your:acc}. Ta zamjena je loša za tebe.
+ex.exchange_cheap.b2 = {your} vrijedi {n:point_acc}, a {my} samo {n2:point_acc}. Ta te zamjena skupo stoji.
+ex.exchange_cheap.b2.2 = {my} vrijedi manje od {your:gen}, pa napad dobiva materijal.
+ex.exchange_cheap.b3 = {your:acc} na {sq} napada figura manje vrijednosti.
+ex.exchange_cheap.b3.2 = Figura od {n2:point_gen} napada {your:acc} na {sq}: {line}.
+ex.exchange_cheap.b4 = {your:acc} na {sq} napada figura manje vrijednosti; {reply} dobiva materijal.
+ex.exchange_cheap.b4.2 = Potez {reply} napada {your:acc} na {sq} figurom manje vrijednosti.
+ex.exchange_cheap.b5 = {your} na {sq} izložen{your:ag} je napadu slabije figure: {line}.
+ex.exchange_cheap.b5.2 = {reply} dobiva materijal na {sq} protiv {your:gen}.
+ex.exchange_cheap.b6 = {reply} dobiva {your:acc} na {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} na {sq} je izgubljen{your:ag}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Pazi: sad mogu dobiti {t1:acc}.
+ex.material.b1.2 = Nakon tog poteza je {t1} u nevolji. Mogu {t1:pron_acc} dobiti.
+ex.material.b2 = Nakon ovog poteza mogu dobiti {t1:acc}.
+ex.material.b2.2 = Sad je {t1} u nevolji, i dobivam {t1:pron_acc}.
+ex.material.b3 = Potez {move} gubi materijal: nakon {line} imaš {pts:point_acc} manje.
+ex.material.b3.2 = Nakon {line} imaš {pts:point_acc} manje.
+ex.material.b4 = Potez {move} gubi materijal: {line}, i gubiš {pts:point_acc}.
+ex.material.b4.2 = Nakon {line} imaš {pts:point_acc} manje.
+ex.material.b5 = {move} gubi materijal: {line}.
+ex.material.b5.2 = {line} meni donosi {pts:point_acc}.
+ex.material.b6 = {line}, i dobio sam {pts:point_acc}.
+ex.material.b6.2 = {move} gubi {pts:point_acc}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Vidiš? {my} na {sq} bi{my:pt} je nebranjen{my:ag}. {your} {my:pron_acc} je mog{your:pt2} uzeti.
+ex.missed_capture.b1.2 = Gledaj: {my} nije ima{my:pt} branitelja. {your} {my:pron_acc} je mog{your:pt2} uzeti.
+ex.missed_capture.b1.3 = {my} na {sq} nije bi{my:pt} zaštićen{my:ag}. {your} {my:pron_acc} je mog{your:pt2} zgrabiti!
+ex.missed_capture.b2 = Promaklo ti je besplatno uzimanje: potez {best} dobiva {my:acc}.
+ex.missed_capture.b2.2 = {my} na {sq} bi{my:pt} je bez zaštite. Potez {best} {my:pron_acc} uzima. Sljedeći put {my:pron_acc} zgrabi!
+ex.missed_capture.b2.3 = Potez {best} besplatno bi dobio {my:acc}.
+ex.missed_capture.b3 = Potez {best} dobio bi {my:acc} bez ikakve naknade.
+ex.missed_capture.b3.2 = {my} na {sq} bi{my:pt} je nebranjen{my:ag}: {best}. U svakom potezu traži nebranjene figure.
+ex.missed_capture.b3.3 = {my} se mog{my:pt2} uzeti potezom {best}.
+ex.missed_capture.b4 = Propušteno: {best} uzima {my:acc} na {sq}.
+ex.missed_capture.b4.2 = {best} dobiva {my:acc}, {my:rel} je bi{my:pt} nebranjen{my:ag}.
+ex.missed_capture.b4.3 = {my} je bi{my:pt} nebranjen{my:ag}: {best}.
+ex.missed_capture.b5 = {best} dobiva {my:acc}; {move} {my:pron_dat} dopušta bijeg.
+ex.missed_capture.b5.2 = {my} na {sq} bi{my:pt} je nebranjen{my:ag}: {best}.
+ex.missed_capture.b6 = {best}! {my} na {sq} bi{my:pt} je nebranjen{my:ag}.
+ex.missed_capture.b6.2 = {best} je dobivao {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Tu je bio dvostruki napad: {best} napada {t1:acc} i {t2:acc}!
+ex.missed_fork.b1.2 = Gledaj! Potez {best} istodobno bi napao {t1:acc} i {t2:acc}.
+ex.missed_fork.b1.3 = Potez {best} bio je vilica na {t1:acc} i {t2:acc}.
+ex.missed_fork.b2 = Potez {best} bio je vilica: {t1} i {t2}.
+ex.missed_fork.b2.2 = Promakao ti je dvostruki napad: {best}, na {t1:acc} i {t2:acc}.
+ex.missed_fork.b2.3 = Potez {best} istodobno napada {t1:acc} i {t2:acc}. Vilica!
+ex.missed_fork.b3 = Potez {best} bio je vilica: {t1} i {t2}.
+ex.missed_fork.b3.2 = Postojao je potez {best}, vilica na {t1:acc} i {t2:acc}.
+ex.missed_fork.b3.3 = Potez {best} napao bi vilicom {t1:acc} i {t2:acc}.
+ex.missed_fork.b4 = Potez {best} davao je vilicu na {t1:acc} i {t2:acc}.
+ex.missed_fork.b4.2 = Propuštena vilica: {best} na {t1:acc} i {t2:acc}.
+ex.missed_fork.b5 = {best}: vilica na {t1:acc} i {t2:acc}.
+ex.missed_fork.b5.2 = {best} je napadao {t1:acc} i {t2:acc}.
+ex.missed_fork.b6 = {best} je davao vilicu na {t1:acc} i {t2:acc}.
+ex.missed_fork.b6.2 = {best}: vilica na {t1:acc} i {t2:acc}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} može otrčati na {sq} i postati dama. {your} je predaleko.
+ex.promotion.b1.2 = Gledaj: ništa ne zaustavlja {my:acc} na putu do {sq}. {your} {my:pron_acc} ne može stići.
+ex.promotion.b1.3 = {my} ima još {n:square_acc} do {sq}, a {your} je prespor{your:ag}.
+ex.promotion.b2 = {my} trči na {sq}, a {your} {my:pron_acc} ne može stići.
+ex.promotion.b2.2 = {my} stiže na {sq} za {n:move_acc}, a {your} tek za {n2:move_acc}. Prekasno.
+ex.promotion.b2.3 = Pazi: {my} postaje dama na {sq}, a {your} je predaleko.
+ex.promotion.b3 = {my} je izvan kvadrata: {your} {my:pron_acc} ne može stići prije polja {sq}.
+ex.promotion.b3.2 = Utrka je izgubljena: {my} stiže na {sq} prije {your:gen}.
+ex.promotion.b4 = {your} je izvan kvadrata pješaka; pješak postaje dama na {sq}.
+ex.promotion.b4.2 = {my} se promovira na {sq}; {your:dat} nedostaje jedan potez.
+ex.promotion.b5 = Utrka pješaka je izgubljena: {your} je izvan kvadrata, promocija na {sq}.
+ex.promotion.b5.2 = {line}: dobivam damu na {sq}, a {your} kasni.
+ex.promotion.b6 = {your} je izvan kvadrata; dobivam damu na {sq}.
+ex.promotion.b6.2 = {line}, promocija na {sq} ({your} kasni).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Tvoj pješak mogao je otrčati na {sq} i postati dama!
+ex.promotion_missed.b1.2 = Pogledaj polje {sq}! Tvoj pješak mogao je otrčati onamo.
+ex.promotion_missed.b2 = Tvoj pješak mogao je otrčati na {sq}. Guraj slobodne pješake!
+ex.promotion_missed.b2.2 = Ništa nije zaustavljalo tvog pješaka na putu do {sq}.
+ex.promotion_missed.b3 = Potez {best} dobiva utrku do polja {sq}.
+ex.promotion_missed.b3.2 = Tvoj pješak bio je brži: {best}, i postaje dama na {sq}.
+ex.promotion_missed.b4 = Potez {best} dobiva utrku pješaka do {sq}.
+ex.promotion_missed.b4.2 = {best}! Pješak postaje dama na {sq}.
+ex.promotion_missed.b5 = Nakon {best} pješak prvi postaje dama na {sq}.
+ex.promotion_missed.b5.2 = {best}, i polje {sq} je tvoje.
+ex.promotion_missed.b6 = {best} dobiva utrku do {sq}.
+ex.promotion_missed.b6.2 = {best}; pješak prvi na {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Taj je pješak štitio {your:acc}. Sad {your} ima manje zaklona.
+ex.king_shield.b1.2 = Pješak s polja {sq} bio je štit {your:dat}. Sad moje figure mogu prodrijeti.
+ex.king_shield.b2 = Pomicanje pješaka s polja {sq} slabi zaklon {your:gen}. Sad {your:pron_acc} moje figure mogu napasti.
+ex.king_shield.b2.2 = {your} je izgubi{your:pt} čuvara: pješak na {sq} bio je {your:poss} štit.
+ex.king_shield.b3 = Taj potez pješakom otvara {your:acc} mom napadu.
+ex.king_shield.b3.2 = {your} ostaje bez pješačkog zaklona, a moje figure prodiru.
+ex.king_shield.b4 = Potez {move} slabi pješake oko {your:gen}; moj napad prodire.
+ex.king_shield.b4.2 = Zaklon oko {your:gen} razbijen je nakon poteza {move}.
+ex.king_shield.b5 = {move} slabi zaklon {your:gen}: {line}.
+ex.king_shield.b5.2 = {your} je izložen{your:ag} nakon poteza {move}: {line}.
+ex.king_shield.b6 = {move} slabi položaj {your:gen}: {line}.
+ex.king_shield.b6.2 = {line}; {your} je previše otvoren{your:ag}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} je u opasnosti. Moje figure kreću na {your:pron_acc_full}.
+ex.king_exposed.b1.2 = Gledaj koliko je {your} izložen{your:ag}. Drži {your:pron_acc} na sigurnom iza pješaka.
+ex.king_exposed.b2 = {your} je previše izložen{your:ag}. Sad mogu davati mnogo šahova.
+ex.king_exposed.b2.2 = Pazi: {your} nema zaklona, a moje figure {your:pron_acc} napadaju.
+ex.king_exposed.b3 = {your} je izložen{your:ag}; moje figure {your:pron_acc} mogu napadati šahovima.
+ex.king_exposed.b3.2 = Nakon ovoga {your} nema zaklona.
+ex.king_exposed.b4 = {your} ostaje izložen{your:ag}: {line}.
+ex.king_exposed.b4.2 = Potez {move} izlaže {your:acc} napadu.
+ex.king_exposed.b5 = {your} je previše izložen{your:ag}: {line}.
+ex.king_exposed.b5.2 = {move} ostavlja {your:acc} bez zaklona.
+ex.king_exposed.b6 = {line}; {your} je izložen{your:ag}.
+ex.king_exposed.b6.2 = {your} je previše otvoren{your:ag}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Ta zamjena vodi u pješačku završnicu koju ja dobivam.
+ex.bad_trade.b3.2 = Nakon {line} ostaju samo pješaci, a moj kralj stoji bolje.
+ex.bad_trade.b4 = Zamjene vode u izgubljenu pješačku završnicu: {line}.
+ex.bad_trade.b4.2 = Prijelaz u ovu pješačku završnicu gubi.
+ex.bad_trade.b5 = Pogrešna zamjena: pješačka završnica nakon {line} je izgubljena.
+ex.bad_trade.b5.2 = Pješačka završnica je izgubljena; zadrži figure na ploči.
+ex.bad_trade.b6 = Pješačka završnica nakon {line} je izgubljena.
+ex.bad_trade.b6.2 = Izgubljena pješačka završnica: {line}.
+ex.bishop_pair.b5 = Tom zamjenom gubiš par lovaca.
+ex.bishop_pair.b5.2 = Tom zamjenom predaješ par lovaca; moj ostaje.
+ex.bishop_pair.b6 = Par lovaca odlazi.
+ex.bishop_pair.b6.2 = Par lovaca prepušten.
