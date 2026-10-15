@@ -1,0 +1,452 @@
+# Coach speech (Slovak): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ty"; the player's gender is unknown: no second-person
+# past tense or conditional ("vyhral si", "našiel si", "mohol si"), no adjective about the player
+# ("pripravený"). Instead: nouns ("Výhra je tvoja"), the neuter impersonal ("podarilo sa ti", "dalo sa
+# vziať", "neušlo ti to"), "we" ("remizovali sme", "vrátili sme"), the coach's own first person
+# ("prehral som", "prišiel som o"), or the present tense ("{move} získava materiál").
+# A move is never the subject of a past tense or an adjective (a queen move is spoken "dáma ..."): the
+# noun "ťah" comes first ("ťah {move} priniesol"), or the neuter "lepšie bolo {crit_best}".
+# Forms from common.lang: "v {n:ord_loc} ťahu" = "v 21. ťahu" (spoken "v dvadsať prvom ťahu"),
+# "{n:ord} ťah" = "21. ťah", "do {crit_no:ord_gen} ťahu"; "{acc:percent}" = "85 %" (spoken "osemdesiat
+# päť percent"); "{n:piece_acc}" = "jednu figúru"; "{m:check}" = "2 šachy"; "{n:best_move}" = "5
+# najlepších ťahov"; "za {moves:move}" = "za 25 ťahov"; "{text:loc}" / "{text:acc}" = a phase in the
+# locative / accusative (appraisal.phase.*.loc in common.lang). Counts after a colon are plain numbers
+# ("Vzaté figúry: {n:f}", {n:f} says "jedna" / "dve" for the feminine "figúra").
+# {level} is a level name, always in „...“ after a form of "úroveň" ("na úrovni „Začiatočník“").
+# {opening} is the opening's citation name, always after a colon or alone, so it never needs a case.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases: lower-case nominatives (otvorenie n, stredná hra f, koncovka f); no verb or adjective in the
+# lines agrees with them.
+appraisal.phase.opening = otvorenie
+appraisal.phase.middlegame = stredná hra
+appraisal.phase.endgame = koncovka
+# Draw reasons, said right after "Remíza" with no comma ("Remíza dohodou.") or after "a to".
+appraisal.reason.stalemate = patom
+appraisal.reason.material = pre nedostatočný materiál
+appraisal.reason.repetition = opakovaním pozície
+appraisal.reason.fifty = podľa pravidla 50 ťahov
+appraisal.reason.fifty.spoken = podľa pravidla päťdesiatich ťahov
+appraisal.reason.agreement = dohodou
+appraisal.reason.other = podľa pravidiel
+# The coach level names (coach.level.<n>.name of assets/i18n/sk.lang), said inside „...“ after "úroveň".
+appraisal.level.l1 = Prvé kroky
+appraisal.level.l2 = Začiatočník
+appraisal.level.l3 = Mierne pokročilý
+appraisal.level.l4 = Klubový hráč
+appraisal.level.l5 = Silný klubový hráč
+appraisal.level.l6 = Expert
+# What to practise: an infinitive phrase in lower case, no full stop, always said after a colon.
+# "Svoj" for the player's own pieces (the player is the subject of the infinitive).
+theme.general = pozerať sa na celú šachovnicu, skôr než potiahneš
+theme.mate_allowed = pred každým ťahom kontrolovať bezpečnosť svojho kráľa
+theme.mate_missed = hľadať maty a začínať pritom šachmi
+theme.stalemate = nechávať môjmu kráľovi voľné pole, keď vyhrávaš
+theme.fork = dávať pozor na dvojité útoky
+theme.discovered = všímať si skryté útoky za mojimi figúrami
+theme.skewer = nestavať cenné figúry na tú istú líniu
+theme.pin = všímať si väzby skôr, než vzniknú
+theme.trapped = nechávať svojim figúram únikovú cestu
+theme.back_rank = urobiť svojmu kráľovi okienko
+theme.hanging = udržiavať svoje figúry kryté
+theme.exchange = pred výmenou spočítať útočníkov a obrancov
+theme.missed_capture = najprv hľadať figúry, ktoré sa dajú vziať zadarmo
+theme.missed_fork = hľadať vlastné dvojité útoky
+theme.promotion = počítať preteky pešiakov a myslieť na štvorec pešiaka
+theme.king_safety = držať svojho kráľa v bezpečí za pešiakmi
+theme.bad_trade = dobre vyberať, ktoré figúry vymeniť
+theme.opening = vyvíjať svoje figúry a zavčasu urobiť rošádu
+theme.endgame = zapájať do hry svojho kráľa a posúvať voľných pešiakov
+theme.positional = zlepšovať svoju najhoršiu figúru
+theme.material = skôr než potiahneš, kontrolovať, čo môžu získať moje ďalšie ťahy
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Mat! Výhra je tvoja. Výborne zahrané!
+appraisal.open.win.b1.2 = Výhra je tvoja! Skvelé, že sa ti podarilo dotiahnuť partiu do konca.
+appraisal.open.win.b1.3 = Tentoraz som prehral ja! Bola to naozaj dobrá partia.
+appraisal.open.win.b2 = Dobre zahrané! Výhra za {moves:move}.
+appraisal.open.win.b2.2 = Gratulujem k výhre!
+appraisal.open.win.b2.3 = Výhra za {moves:move}. Pekná práca!
+appraisal.open.win.b3 = Gratulujem, zaslúžená výhra.
+appraisal.open.win.b3.2 = Dobre zahrané. Táto výhra je zaslúžená.
+appraisal.open.win.b3.3 = Pekná výhra. Gratulujem.
+appraisal.open.win.b4 = Pekná výhra.
+appraisal.open.win.b4.2 = Dobre zahrané, zaslúžená výhra.
+appraisal.open.win.b4.3 = Dobrá výhra.
+appraisal.open.win.b5 = Dobre zahrané.
+appraisal.open.win.b5.2 = Pekne vyhraté.
+appraisal.open.win.b5.3 = Dobrá partia, zaslúžene vyhraná.
+appraisal.open.win.b6 = Dobre zahrané.
+appraisal.open.win.b6.2 = Čisto vyhraté.
+appraisal.open.win.b6.3 = Dobrá partia.
+appraisal.open.draw.b1 = Remíza! Túto partiu sa nepodarilo vyhrať nikomu.
+appraisal.open.draw.b1.2 = Je to remíza. Bola to vyrovnaná partia!
+appraisal.open.draw.b1.3 = Remíza: delíme sa o bod. Dobre zahrané!
+appraisal.open.draw.b2 = Remíza: spravodlivý výsledok.
+appraisal.open.draw.b2.2 = Remizovali sme. Dobrý boj!
+appraisal.open.draw.b2.3 = Remíza, a k tomu dobrá partia.
+appraisal.open.draw.b3 = Remíza. Obe strany mali šance.
+appraisal.open.draw.b3.2 = Spravodlivá remíza.
+appraisal.open.draw.b3.3 = Remíza {text}. Dobrý boj.
+appraisal.open.draw.b4 = Remíza {text}.
+appraisal.open.draw.b4.2 = Výsledok: remíza {text}.
+appraisal.open.draw.b4.3 = Remíza, a to {text}.
+appraisal.open.draw.b5 = Remíza.
+appraisal.open.draw.b5.2 = Remíza {text}.
+appraisal.open.draw.b5.3 = Výsledok: remíza.
+appraisal.open.draw.b6 = Remíza.
+appraisal.open.draw.b6.2 = Remíza {text}.
+appraisal.open.draw.b6.3 = Výsledok: remíza.
+appraisal.open.stalemate.b1 = Remíza patom: výhra bola tak blízko! Nabudúce nechaj môjmu kráľovi voľné pole.
+appraisal.open.stalemate.b1.2 = Pat, takže remíza. Výhra bola na dosah!
+appraisal.open.stalemate.b2 = Remíza patom. K výhre chýbal už len kúsok!
+appraisal.open.stalemate.b2.2 = Pat: remíza, hoci tvoja pozícia bola vyhratá.
+appraisal.open.stalemate.b3 = Remíza patom, a to z vyhratej pozície.
+appraisal.open.stalemate.b3.2 = Pat. Výhra sa vyšmykla až na samom konci.
+appraisal.open.stalemate.b4 = Remíza patom.
+appraisal.open.stalemate.b4.2 = Pat: remíza.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remíza, pat.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remíza, pat.
+appraisal.open.loss.b1 = Tentoraz som vyhral ja, ale niektoré tvoje ťahy boli naozaj dobré.
+appraisal.open.loss.b1.2 = Dobrá partia! Dalo mi to poriadne zabrať.
+appraisal.open.loss.b1.3 = To bola zábava! Túto partiu som vyhral ja, ale učíš sa rýchlo.
+appraisal.open.loss.b2 = Dobrá partia! Pozrime sa, čo sa ti darilo, a na jednu vec, ktorú môžeš skúsiť.
+appraisal.open.loss.b2.2 = Ďakujem za partiu! V tvojej hre bolo zopár dobrých nápadov.
+appraisal.open.loss.b2.3 = Dobrá partia. Pozrime sa, čo sa z nej môžeme naučiť.
+appraisal.open.loss.b3 = Dobrá partia.
+appraisal.open.loss.b3.2 = Ďakujem za partiu.
+appraisal.open.loss.b3.3 = Dobrá partia. Poďme sa na ňu pozrieť.
+appraisal.open.loss_close.b3 = Dobrý boj. Partia bola dlho vyrovnaná.
+appraisal.open.loss_close.b3.2 = Dobrý boj: pozícia bola dlho v rovnováhe.
+appraisal.open.loss.b4 = Dobrá partia. Rozhodlo toto.
+appraisal.open.loss.b4.2 = Dobrá partia. Rozhodol jediný moment.
+appraisal.open.loss.b4.3 = Ďakujem za partiu. Pozrime sa, kde sa zlomila.
+appraisal.open.loss_close.b4 = Dlho to bol vyrovnaný boj. Rozhodlo toto.
+appraisal.open.loss_close.b4.2 = Dobrá partia, dlho vyrovnaná.
+appraisal.open.loss.b5 = Dobrá partia.
+appraisal.open.loss.b5.2 = Ďakujem za partiu.
+appraisal.open.loss.b5.3 = Dobrý boj.
+appraisal.open.loss.b6 = Dobrá partia.
+appraisal.open.loss.b6.2 = Ďakujem za partiu.
+appraisal.open.loss.b6.3 = Dobrý boj.
+appraisal.open.resigned.b1 = Vzdať sa patrí k šachu a chce to odvahu. Dobrá partia!
+appraisal.open.resigned.b1.2 = To je v poriadku. Vedieť, kedy sa vzdať, tiež patrí k šachu.
+appraisal.open.resigned.b2 = Vzdať sa patrí k šachu; chce to odvahu.
+appraisal.open.resigned.b2.2 = Rozumiem. Aj vzdať sa chce odvahu.
+appraisal.open.resigned.b3 = Aj vzdanie partie patrí k šachu. Dobrá partia.
+appraisal.open.resigned.b3.2 = Rozumiem. Ďakujem za partiu.
+appraisal.open.resigned.b4 = Dobrá partia.
+appraisal.open.resigned.b4.2 = Ďakujem za partiu.
+appraisal.open.resigned.b5 = Dobrá partia.
+appraisal.open.resigned.b5.2 = Ďakujem za partiu.
+appraisal.open.resigned.b6 = Dobrá partia.
+appraisal.open.resigned.b6.2 = Vďaka.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Vieš, ešte nebolo rozhodnuté: približne {eval}.
+appraisal.resign_early.b3.2 = V skutočnosti ešte boli šance: približne {eval}.
+appraisal.resign_early.b4 = Ešte nebolo rozhodnuté: približne {eval}.
+appraisal.resign_early.b4.2 = Ešte sa dalo hrať: približne {eval}.
+appraisal.resign_early.b5 = Ešte to nebol koniec: {eval}.
+appraisal.resign_early.b5.2 = Ešte hrateľné, približne {eval}.
+appraisal.resign_early.b6 = Nebol to koniec: {eval}.
+appraisal.resign_early.b6.2 = Bolo to {eval}.
+# The opening played (levels 3-6). The name stays in its citation form, after a colon.
+appraisal.opening.b3 = Otvorenie, ktoré sme hrali: {opening}.
+appraisal.opening.b3.2 = Otvorenie tejto partie: {opening}.
+appraisal.opening.b4 = Naše otvorenie: {opening}.
+appraisal.opening.b4.2 = Otvorenie: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Otvorenie: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Otvorenie: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+# "{move} v {n:ord_loc} ťahu" = "Sxe5 v 21. ťahu"; a verb after a bare {move} is in the present tense
+# ("{move} získava materiál"), a past tense only with the noun "ťah" as its subject.
+appraisal.best.brilliant.b1 = Aká obeť v {n:ord_loc} ťahu: {move}!
+appraisal.best.brilliant.b1.2 = Môj obľúbený moment: {move}. Obeť figúry, a vyšla!
+appraisal.best.brilliant.b2 = Tvoj najlepší moment: obeť {move} v {n:ord_loc} ťahu.
+appraisal.best.brilliant.b2.2 = {move} v {n:ord_loc} ťahu: odvážna obeť. Výborne!
+appraisal.best.brilliant.b3 = Brilantná obeť: {move}.
+appraisal.best.brilliant.b3.2 = Vrchol partie: {move}, skutočná obeť, v {n:ord_loc} ťahu.
+appraisal.best.brilliant.b4 = Najlepší moment: {move}, {n:ord} ťah. Brilantná obeť.
+appraisal.best.brilliant.b4.2 = {move} v {n:ord_loc} ťahu: brilantné.
+appraisal.best.brilliant.b5 = {move} v {n:ord_loc} ťahu: brilantný ťah.
+appraisal.best.brilliant.b5.2 = {n:ord} ťah, {move}: brilantné.
+appraisal.best.brilliant.b6 = {move}!! v {n:ord_loc} ťahu.
+appraisal.best.brilliant.b6.spoken = {move}, brilantný ťah, v {n:ord_loc} ťahu.
+appraisal.best.brilliant.b6.2 = {n:ord} ťah: {move}, brilantné.
+appraisal.best.great.b1 = Môj obľúbený moment: {move}. To bol výborný ťah!
+appraisal.best.great.b1.2 = Pamätáš sa na ťah {move}? To bol skvelý objav.
+appraisal.best.great.b2 = Tvoj najlepší moment: {move} v {n:ord_loc} ťahu. Ten ťah otočil partiu.
+appraisal.best.great.b2.2 = {move} v {n:ord_loc} ťahu: výborný ťah.
+appraisal.best.great.b3 = Kľúčový ťah: {move} v {n:ord_loc} ťahu. Ten zvrátil situáciu.
+appraisal.best.great.b3.2 = Skvelý objav: {move} v {n:ord_loc} ťahu.
+appraisal.best.great.b4 = Moja chyba bola hneď potrestaná: {move}.
+appraisal.best.great.b4.2 = Najlepší moment: {move}, {n:ord} ťah.
+appraisal.best.great.b5 = {move} v {n:ord_loc} ťahu. Dobre nájdené.
+appraisal.best.great.b5.2 = {n:ord} ťah, {move}: skvelý objav.
+appraisal.best.great.b6 = {move} v {n:ord_loc} ťahu. Dobre nájdené.
+appraisal.best.great.b6.2 = {n:ord} ťah: {move}!
+appraisal.best.only.b1 = Môj obľúbený moment: {move}. Bol to jediný dobrý ťah!
+appraisal.best.only.b1.2 = V {n:ord_loc} ťahu sa ti podarilo nájsť jediný dobrý ťah: {move}. Výborne!
+appraisal.best.only.b2 = Tvoj najlepší moment: {move}, jediný dobrý ťah v tej pozícii.
+appraisal.best.only.b2.2 = V {n:ord_loc} ťahu existoval jediný ťah, {move}, a ten ti neušiel.
+appraisal.best.only.b3 = Kľúčový ťah: {move} v {n:ord_loc} ťahu, jediný, ktorý udržal pozíciu.
+appraisal.best.only.b3.2 = V {n:ord_loc} ťahu držal pozíciu iba ťah {move} a ten ti neušiel.
+appraisal.best.only.b4 = Najlepší moment: {move}, {n:ord} ťah. Jediný ťah.
+appraisal.best.only.b4.2 = {n:ord} ťah: {move}, jediný ťah.
+appraisal.best.only.b5 = {move} v {n:ord_loc} ťahu: jediný ťah. Dobre nájdené.
+appraisal.best.only.b5.2 = {n:ord} ťah, jediná možnosť: {move}.
+appraisal.best.only.b6 = {move} v {n:ord_loc} ťahu: jediný ťah. Dobre nájdené.
+appraisal.best.only.b6.2 = {n:ord} ťah: {move}, jediný ťah.
+appraisal.best.won.b1 = Môj obľúbený moment: {move}. Ten ťah získal {pts:point}!
+appraisal.best.won.b1.2 = Pamätáš sa na ťah {move}? Priniesol ti {pts:point}. Výborne!
+appraisal.best.won.b2 = Tvoj najlepší moment: {move} v {n:ord_loc} ťahu, ktorý získal {pts:point}.
+appraisal.best.won.b2.2 = {move} v {n:ord_loc} ťahu získava materiál. Pekné!
+appraisal.best.won.b3 = Kľúčový ťah: {move} v {n:ord_loc} ťahu. Získal {pts:point}.
+appraisal.best.won.b3.2 = {move} v {n:ord_loc} ťahu čisto získava materiál.
+appraisal.best.won.b4 = Najlepší moment: {move}, {n:ord} ťah, so ziskom materiálu.
+appraisal.best.won.b4.2 = {move} v {n:ord_loc} ťahu získava {pts:point}.
+appraisal.best.won.b5 = {move} v {n:ord_loc} ťahu získava materiál.
+appraisal.best.won.b5.2 = {n:ord} ťah: {move}, zisk materiálu.
+appraisal.best.won.b6 = {move} v {n:ord_loc} ťahu: zisk materiálu.
+appraisal.best.won.b6.2 = {n:ord} ťah: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = {n:ord} ťah: {move}, plus {pts}.
+appraisal.best.streak.b1 = Podarilo sa ti {n:time} za sebou nájsť najlepší ťah. Výborne!
+appraisal.best.streak.b1.2 = {n:best_move} za sebou! To je skvelý šach.
+appraisal.best.streak.b2 = Najlepší ťah sa ti podarilo nájsť {n:time} za sebou.
+appraisal.best.streak.b2.2 = {n:best_move} za sebou. Veľmi dobre!
+appraisal.best.streak.b3 = Celá séria: {n:best_move} za sebou. Veľmi solídne.
+appraisal.best.streak.b3.2 = Za sebou {n:best_move}. Dobre zahrané.
+appraisal.best.streak.b4 = {n:best_move} za sebou.
+appraisal.best.streak.b4.2 = Séria najlepších ťahov: {n}.
+appraisal.best.streak.b5 = {n:best_move} za sebou.
+appraisal.best.streak.b5.2 = Séria najlepších ťahov: {n}.
+appraisal.best.streak.b6 = {n:best_move} za sebou.
+appraisal.best.streak.b6.2 = Séria: {n:best_move}.
+appraisal.best.capture.b1 = Môj obľúbený moment: {move}. {my:acc} sa ti podarilo vziať zadarmo!
+appraisal.best.capture.b1.2 = Pamätáš sa na ťah {move}? Neušlo ti, že {my} je zadarmo!
+appraisal.best.capture.b2 = Tvoj najlepší moment: {move} a zisk {my:gen}.
+appraisal.best.capture.b2.2 = Pekné branie v {n:ord_loc} ťahu: {move}.
+appraisal.best.capture.b3 = Dobrý postreh v {n:ord_loc} ťahu: {move} získava {my:acc}.
+appraisal.best.capture.b3.2 = {move} v {n:ord_loc} ťahu si odnáša {my:acc}.
+appraisal.best.capture.b4 = Najlepší moment: {move}, {n:ord} ťah, so ziskom {my:gen}.
+appraisal.best.capture.b4.2 = {move} v {n:ord_loc} ťahu získava materiál.
+appraisal.best.capture.b5 = {move} v {n:ord_loc} ťahu získava {my:acc}.
+appraisal.best.capture.b5.2 = {n:ord} ťah: {move}.
+appraisal.best.capture.b6 = {move} v {n:ord_loc} ťahu.
+appraisal.best.capture.b6.2 = {n:ord} ťah: {move}, zisk materiálu.
+# Phases: {text} in the nominative only after a colon; "v {text:loc}", "{text:acc} sa ti podarilo".
+appraisal.best.phase.b1 = V {text:loc} sa ti darilo veľmi dobre.
+appraisal.best.phase.b1.2 = Najlepšia časť tvojej partie: {text}.
+appraisal.best.phase.b2 = Najviac sa ti darilo v {text:loc}.
+appraisal.best.phase.b2.2 = {text:acc} sa ti podarilo zahrať veľmi dobre.
+appraisal.best.phase.b3 = Najlepšia fáza tvojej hry: {text}, presnosť {acc:percent}.
+appraisal.best.phase.b3.2 = Najlepšie sa ti darilo v {text:loc}: presnosť {acc:percent}.
+appraisal.best.phase.b4 = Najsilnejšia fáza: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = V {text:loc} bola tvoja hra najlepšia: {acc:percent}.
+appraisal.best.phase.b5 = Najlepšia fáza: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Najlepšia fáza: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 figúra" / "3 figúry") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# The short levels give the numbers after a colon ("Vzaté figúry: {n:f}"); the coach may also say what
+# he lost ("prišiel som o {n:piece_acc}", "môj kráľ dostal {m:time} šach").
+appraisal.num.material.b1 = Podarilo sa ti vziať mi {n:piece_acc} a {m:time} dať šach.
+appraisal.num.material.b1.2 = Prišiel som o {n:piece_acc} a môj kráľ dostal {m:time} šach.
+appraisal.num.material.b2 = Podarilo sa ti vziať {n:piece_acc} a dať {m:check}.
+appraisal.num.material.b2.2 = Prišiel som o {n:piece_acc} a {m:time} som dostal šach.
+appraisal.num.material.b3 = Podarilo sa ti vziať {n:piece_acc} a {m:time} dať šach.
+appraisal.num.material.b3.2 = Vzaté figúry: {n:f}, dané šachy: {m}.
+appraisal.num.material.b4 = Vzaté figúry: {n:f}, dané šachy: {m}.
+appraisal.num.material.b4.2 = Podarilo sa ti vziať {n:piece_acc} a dať {m:check}.
+appraisal.num.material.b5 = Vzaté figúry: {n:f}; šachy: {m}.
+appraisal.num.material.b5.2 = Vzaté: {n:piece}; šachy: {m}.
+appraisal.num.material.b6 = Vzaté figúry: {n:f}, šachy: {m}.
+appraisal.num.material.b6.2 = Vzaté: {n:piece}; šachy: {m}.
+appraisal.num.material_nochecks.b1 = Podarilo sa ti vziať mi {n:piece_acc}.
+appraisal.num.material_nochecks.b1.2 = V tejto partii sa ti podarilo vziať {n:piece_acc}.
+appraisal.num.material_nochecks.b2 = Podarilo sa ti vziať {n:piece_acc}.
+appraisal.num.material_nochecks.b2.2 = V tejto partii som prišiel o {n:piece_acc}.
+appraisal.num.material_nochecks.b3 = Podarilo sa ti vziať {n:piece_acc}.
+appraisal.num.material_nochecks.b3.2 = Vzaté figúry: {n:f}.
+appraisal.num.material_nochecks.b4 = Vzaté figúry: {n:f}.
+appraisal.num.material_nochecks.b4.2 = Tvoja korisť: {n:piece}.
+appraisal.num.material_nochecks.b5 = Vzaté figúry: {n:f}.
+appraisal.num.material_nochecks.b5.2 = Vzaté: {n:piece}.
+appraisal.num.material_nochecks.b6 = Vzaté figúry: {n:f}.
+appraisal.num.material_nochecks.b6.2 = Vzaté: {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well. "Vrátili sme" (we): the
+# coach allowed them, and the plural needs no form agreeing with the player. {m} alone is masculine,
+# as "ťah" ("dva z nich").
+appraisal.num.takebacks.b1 = Vrátili sme {n:move} a {m} z nich sa ti podarilo opraviť. Tak sa človek učí!
+appraisal.num.takebacks.b1.2 = Vrátili sme {n:move} a {m:time} sa ti podarilo nájsť lepší ťah. Super!
+appraisal.num.takebacks.b2 = Vrátili sme {n:move} a {m} z nich sa ti podarilo opraviť. Tak sa učíme.
+appraisal.num.takebacks.b2.2 = Vrátené ťahy: {n}, opravené: {m}. Takto sa napreduje!
+appraisal.num.takebacks.b3 = Vrátili sme {n:move} a {m} z nich sa ti podarilo opraviť.
+appraisal.num.takebacks.b3.2 = Vrátené ťahy: {n}, z toho opravené: {m}. Dobre.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Ani jedna vážna chyba: výborne!
+appraisal.num.clean.b2.2 = V tejto partii ani jedna vážna chyba. Vynikajúce!
+appraisal.num.clean.b2.3 = Žiadne vážne chyby. Veľmi dobre!
+appraisal.num.few.b2 = V tejto partii len {n:mistake}.
+appraisal.num.few.b2.2 = Za celú partiu iba {n:mistake}. Dobre!
+appraisal.num.few.b2.3 = Chyby, ktoré stoja za reč: len {n:f}. Výborne.
+appraisal.num.best.b2 = Najlepší ťah sa ti podarilo nájsť {n:time}.
+appraisal.num.best.b2.2 = Úplne najlepší ťah sa ti podaril {n:time}.
+appraisal.num.best.b2.3 = V tejto partii sa ti {n:time} podarilo nájsť najlepší ťah.
+appraisal.num.acc.b3 = Tvoja presnosť bola {acc:percent}. V partii máš {n:mistake_acc} a {m:blunder_acc}.
+appraisal.num.acc.b3.2 = Presnosť {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Tvoje ťahy mali presnosť {acc:percent}; v partii máš {n:mistake_acc} a {m:blunder_acc}.
+appraisal.num.acc_explain.b3 = Presnosť porovnáva tvoje ťahy s najlepším ťahom v každej pozícii: sto znamená dokonalú hru.
+appraisal.num.acc_explain.b3.2 = Presnosť meria, ako blízko sú tvoje ťahy k tým najlepším. Sto znamená dokonalosť.
+appraisal.num.acc.b4 = Presnosť {acc:percent}.
+appraisal.num.acc.b4.2 = Tvoja presnosť: {acc:percent}.
+appraisal.num.acc.b4.3 = {acc:percent} presnosti.
+appraisal.num.acc_phase.b4 = Presnosť {acc:percent}, v {text:loc}, tvojej najsilnejšej fáze, {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = Celkovo {acc:percent}, v {text:loc} {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Presnosť {acc:percent}; najlepšie v {text:loc}: {acc_phase:percent}.
+appraisal.num.coach.b4 = Ja som hral s presnosťou {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Moja presnosť bola {acc_coach:percent}.
+appraisal.num.acc.b5 = Presnosť {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Presnosť {acc:percent}, k tomu {n:inaccuracy} a {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Koniec teórie v {k:ord_loc} ťahu.
+appraisal.num.book.b5.2 = Z teórie sme vyšli v {k:ord_loc} ťahu.
+appraisal.num.acc.b6 = Ty {acc:percent}, ja {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = Presnosť: ty {acc:percent}, ja {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Presnosť {acc:percent}, moja {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Presnosť {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Presnosť: {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Jedna vec na precvičenie: {theme}.
+appraisal.improve.theme.b1.2 = Jedna rada na budúce: {theme}.
+appraisal.improve.theme.b1.3 = Na tomto sa oplatí popracovať: {theme}.
+appraisal.improve.theme.b2 = Niečo na precvičenie: {theme}.
+appraisal.improve.theme.b2.2 = Nápad na budúcu partiu: {theme}.
+appraisal.improve.theme.b2.3 = Dobrá vec na tréning: {theme}.
+appraisal.improve.theme.b3 = Téma tejto partie: {theme}.
+appraisal.improve.theme.b3.2 = Oplatí sa trénovať: {theme}.
+appraisal.improve.theme.b4 = Opakujúca sa téma: {theme}.
+appraisal.improve.theme.b4.2 = Objavilo sa to viackrát: {theme}.
+appraisal.improve.theme.b5 = Opakuje sa: {theme}.
+appraisal.improve.theme.b5.2 = Téma partie: {theme}.
+appraisal.improve.theme.b6 = Opakuje sa: {theme}.
+appraisal.improve.theme.b6.2 = Téma: {theme}.
+# The critical moment (levels 2-6). Moves are never declined: "namiesto ťahu {crit_move}", and the
+# neuter "lepšie bolo {crit_best}" (no adjective agreeing with a move).
+appraisal.improve.critical.b2 = Partia sa zlomila v {crit_no:ord_loc} ťahu. Nabudúce sa zameraj na toto: {theme}.
+appraisal.improve.critical.b2.2 = Kľúčovým momentom bol {crit_no:ord} ťah, {crit_move}. Niečo na precvičenie: {theme}.
+appraisal.improve.critical.b3 = Kritickým momentom bol {crit_no:ord} ťah. Namiesto ťahu {crit_move} bolo lepšie {crit_best}.
+appraisal.improve.critical.b3.2 = V {crit_no:ord_loc} ťahu bolo lepšie {crit_best} ako {crit_move}. Najprv kontroluj moje vynucujúce ťahy.
+appraisal.improve.critical.b4 = Kritický moment: {crit_no:ord} ťah, {crit_move}. Lepšie bolo {crit_best}.
+appraisal.improve.critical.b4.2 = Kľúčový bol {crit_no:ord} ťah: {crit_best} namiesto ťahu {crit_move}.
+appraisal.improve.critical.b5 = {crit_no:ord} ťah: {crit_best} namiesto ťahu {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Kritický bol {crit_no:ord} ťah: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = {crit_no:ord} ťah: {crit_best}, nie {crit_move}; {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, nie {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = {crit_no:ord} ťah: {crit_best}, nie {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words. "Vyhrávaš" has no past tense here (it would show
+# the player's gender): the position is the subject ("tvoja pozícia bola vyhratá").
+appraisal.improve.was_winning.b1 = Až do {crit_no:ord_gen} ťahu bola tvoja pozícia vyhratá. Jedna rada: {theme}.
+appraisal.improve.was_winning.b1.2 = Až do {crit_no:ord_gen} ťahu ti to išlo výborne. Zapamätaj si: {theme}.
+appraisal.improve.was_winning.b2 = Až do {crit_no:ord_gen} ťahu bola tvoja pozícia vyhratá. Nabudúce: {theme}.
+appraisal.improve.was_winning.b2.2 = Do {crit_no:ord_gen} ťahu stála tvoja pozícia na výhru. Niečo na precvičenie: {theme}.
+appraisal.improve.was_winning.b3 = Až do {crit_no:ord_gen} ťahu bola tvoja pozícia vyhratá. Ťah {crit_best} by tvoju výhodu udržal.
+appraisal.improve.was_winning.b3.2 = Do {crit_no:ord_gen} ťahu stála tvoja pozícia na výhru; s ťahom {crit_best} by to tak zostalo.
+appraisal.improve.was_winning.b4 = Až do {crit_no:ord_gen} ťahu bola tvoja pozícia vyhratá. Ťah {crit_best} by výhodu udržal.
+appraisal.improve.was_winning.b4.2 = Vyhratá pozícia až do {crit_no:ord_gen} ťahu; ťah {crit_best} by ju udržal.
+appraisal.improve.was_winning.b5 = Vyhratá pozícia až do {crit_no:ord_gen} ťahu: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = {crit_no:ord} ťah: výhru drží {crit_best}, {eval}.
+appraisal.improve.was_winning.b6 = {crit_no:ord} ťah: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} v {crit_no:ord_loc} ťahu drží výhru: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Jedna rada: keď vyhrávaš, vždy nechaj môjmu kráľovi pole, kam sa môže pohnúť.
+appraisal.improve.stalemate.b1.2 = Zapamätaj si: ku koncu partie pred každým ťahom skontroluj, či sa môj kráľ ešte môže pohnúť.
+appraisal.improve.stalemate.b2 = Keď vyhrávaš, vždy nechaj môjmu kráľovi voľné pole, inak je to pat.
+appraisal.improve.stalemate.b2.2 = Nabudúce pred ťahom skontroluj, či sa môj kráľ ešte môže pohnúť.
+appraisal.improve.stalemate.b3 = Vo vyhratej pozícii pri každom ťahu kontroluj, či má môj kráľ ešte voľné pole.
+appraisal.improve.stalemate.b3.2 = Vo vyhratých koncovkách si daj pozor na pat: nechaj môjmu kráľovi priestor.
+appraisal.improve.stalemate.b4 = Vo vyhratých koncovkách vždy mysli na pat.
+appraisal.improve.stalemate.b4.2 = Pozor na pat: tu stál výhru.
+appraisal.improve.stalemate.b5 = Vo vyhratej koncovke si daj pozor na pat.
+appraisal.improve.stalemate.b5.2 = Pat stál výhru.
+appraisal.improve.stalemate.b6 = Pozor na pat.
+appraisal.improve.stalemate.b6.2 = Výhru zmaril pat.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+# "{my} zostal{my:past}" = "môj jazdec zostal" / "moja dáma zostala"; "{my} bol{my:past} nekryt{my:adj}"
+# = "bol nekrytý" / "bola nekrytá"; the question is the neuter impersonal ("Padlo ti to do oka?").
+appraisal.improve.coach_hung.b1 = V {n:ord_loc} ťahu {my} zostal{my:past} bez ochrany. Padlo ti to do oka?
+appraisal.improve.coach_hung.b1.2 = V {n:ord_loc} ťahu {my} bol{my:past} pre teba zadarmo. Vždy hľadaj figúry, ktoré môžeš vziať zadarmo!
+appraisal.improve.coach_hung.b2 = V {n:ord_loc} ťahu {my} visel{my:past}. Padlo ti to do oka?
+appraisal.improve.coach_hung.b2.2 = V {n:ord_loc} ťahu sa dalo zadarmo vziať {my:acc}.
+appraisal.improve.coach_hung.b3 = V {n:ord_loc} ťahu {my} bol{my:past} nekryt{my:adj}. Neušlo ti to?
+appraisal.improve.coach_hung.b3.2 = {my} visel{my:past} v {n:ord_loc} ťahu. Pri každom ťahu hľadaj nekryté figúry.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Aj naďalej kontroluj, či sú tvoje figúry v bezpečí, ako dnes.
+appraisal.improve.clean.b1.2 = Aj naďalej sa pred každým ťahom pozri, na čo útočím. Funguje to!
+appraisal.improve.clean.b1.3 = Pokračuj v takej pozornej hre!
+appraisal.improve.clean.b2 = Čistá partia. Aj naďalej takto kontroluj moje hrozby.
+appraisal.improve.clean.b2.2 = Pokračuj ako dnes: figúry v bezpečí, dobré ťahy.
+appraisal.improve.clean.b3 = Čistá partia. Aj naďalej najprv kontroluj vynucujúce ťahy.
+appraisal.improve.clean.b3.2 = Žiadne vážne chyby: len tak ďalej.
+appraisal.improve.clean.b4 = Čistá partia. Nič podstatné netreba opravovať.
+appraisal.improve.clean.b4.2 = Žiadne kritické chyby.
+appraisal.improve.clean.b5 = Bez kritických chýb.
+appraisal.improve.clean.b5.2 = Čistá partia.
+appraisal.improve.clean.b6 = Čistá partia.
+appraisal.improve.clean.b6.2 = Žiadne kritické chyby.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} always in „...“ after "úroveň" in a fixed case ("na úrovni „Začiatočník“"): the name never
+# declines. "Na úroveň ... už máš" = you are up to it (no adjective "pripravený").
+appraisal.end.b1 = S každou partiou hráš lepšie. Ešte jednu?
+appraisal.end.b1.2 = To bola zábava! Zahráme si znova?
+appraisal.end.b1.3 = Skvelé nasadenie! Chceš si zahrať ďalšiu partiu?
+appraisal.end.b2 = S každou partiou hráš lepšie. Ešte jednu?
+appraisal.end.b2.2 = Dobrá partia. Zahráme si znova?
+appraisal.end.b2.3 = Dobre zahrané. Ešte jednu partiu?
+appraisal.end.b3 = Solídna partia. Ideme na ďalšiu?
+appraisal.end.b3.2 = Dobrá partia. Ešte jednu?
+appraisal.end.b3.3 = Dobre zahrané. Ideme znova?
+appraisal.end.b4 = Solídna partia. Ideme na ďalšiu?
+appraisal.end.b4.2 = Ešte jednu partiu?
+appraisal.end.b4.3 = Dobrá partia. Ďalšia?
+appraisal.end.b5 = Ešte jednu?
+appraisal.end.b5.2 = Ďalšia partia?
+appraisal.end.b5.3 = Znova?
+appraisal.end.b6 = Ešte jednu?
+appraisal.end.b6.2 = Ďalšia partia?
+appraisal.end.b6.3 = Znova?
+appraisal.end.up.b1 = Na úroveň „{level}“ už máš. Chceš ju skúsiť?
+appraisal.end.up.b1.2 = Myslím, že na úroveň „{level}“ už máš. Skúsime ju?
+appraisal.end.up.b2 = Na úroveň „{level}“ už máš. Chceš ju skúsiť?
+appraisal.end.up.b2.2 = Čo tak nabudúce úroveň „{level}“? Myslím, že na ňu máš.
+appraisal.end.up.b3 = Táto úroveň je už pre teba malá: skús úroveň „{level}“.
+appraisal.end.up.b3.2 = Čas na úroveň „{level}“? Myslím, že áno.
+appraisal.end.up.b4 = Táto úroveň je už pre teba malá: skús úroveň „{level}“.
+appraisal.end.up.b4.2 = Čas na úroveň „{level}“?
+appraisal.end.up.b5 = Nabudúce skús úroveň „{level}“.
+appraisal.end.up.b5.2 = Ďalej úroveň „{level}“?
+appraisal.end.up.b6 = Nabudúce skús úroveň „{level}“.
+appraisal.end.up.b6.2 = Ďalej úroveň „{level}“?
+appraisal.end.down.b2 = Zahrajme si jednu partiu na úrovni „{level}“ a precvičme si tieto idey.
+appraisal.end.down.b2.2 = Čo tak partia na úrovni „{level}“, na precvičenie?
+appraisal.end.down.b3 = Chceš si zahrať partiu na úrovni „{level}“ a precvičiť si tieto idey?
+appraisal.end.down.b3.2 = Partia na úrovni „{level}“ by ti mohla pomôcť precvičiť si tieto idey.
+appraisal.end.down.b4 = Partia na úrovni „{level}“ by mohla pomôcť tieto idey precvičiť.
+appraisal.end.down.b4.2 = Možno jednu na úrovni „{level}“, na precvičenie?
+appraisal.end.down.b5 = Možno jednu na úrovni „{level}“?
+appraisal.end.down.b5.2 = Úroveň „{level}“ na precvičenie?
+appraisal.end.down.b6 = Možno jednu na úrovni „{level}“?
+appraisal.end.down.b6.2 = Úroveň „{level}“ na precvičenie?

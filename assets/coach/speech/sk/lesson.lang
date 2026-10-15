@@ -147,3 +147,122 @@ lesson.first.ok = Výborný prvý ťah: otvára cestu tvojej dáme aj strelcovi.
 lesson.first.reply = Odpovedám rovnako. Teraz vyveď jazdca: skoč z poľa {sq} na {sq2}.
 lesson.first.knight_wrong = Jazdci preskakujú pešiakov. Skús to z poľa {sq} na {sq2}.
 lesson.first.knight_ok = Perfektné. Jazdcov a strelcov vyvíjame skoro.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Figúra je krytá, keď ju chráni iná figúra rovnakej farby, ktorá môže brať späť.
+lesson.safety.pawn = Môj {@}pešiak kryje {my:acc}.
+lesson.safety.free = Ale {my} nemá žiadneho obrancu. Tvoja dáma napáda obe figúry.
+lesson.safety.ask = Vezmi nekrytú figúru!
+lesson.safety.watch = Pozri, čo sa stane.
+lesson.safety.gave = Tvoja dáma s hodnotou deväť padla za môjho jazdca s hodnotou tri.
+lesson.safety.other = Skús tú druhú figúru.
+lesson.safety.look = Hľadaj figúru, ktorú nič nekryje.
+lesson.safety.ok = Výborne! Vždy sa pýtaj: je tá figúra krytá?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Moja veža ovláda celý druhý rad.
+lesson.danger.rule = Kráľ nikdy nesmie vstúpiť na pole, kde by ho bolo možné vziať.
+lesson.danger.ask = Presuň svojho kráľa na bezpečné pole.
+lesson.danger.ok = Správne. Tam je tvoj kráľ v bezpečí.
+lesson.check.what = Moja veža napáda tvojho kráľa. Tomu sa hovorí šach.
+lesson.check.must = Keď si v šachu, musíš sa z neho hneď dostať.
+lesson.check.ways = Sú tri spôsoby: {@}ustúpiť kráľom, {@2}zablokovať útok alebo {@3}vziať útočníka.
+lesson.check.ask = Tu ustúp kráľom zo šachu.
+lesson.check.file = Pole {to} je stále na stĺpci {@}mojej veže. Odstúp z tejto línie.
+lesson.check.ok = Dobre: už nie si v šachu.
+lesson.block.again = Znova šach! Tentoraz nemá tvoj kráľ žiadne voľné pole.
+lesson.block.ask = Tak zablokuj útok: postav mu do cesty figúru.
+lesson.block.queen = Šach je zablokovaný! Ale moja veža by mohla vziať tvoju dámu. Blokuj lacnejšou figúrou.
+lesson.block.queen_ok = Funguje to. Zapamätaj si však: blokuj najlacnejšou figúrou.
+lesson.block.ok = Perfektné. Blokuj figúrou s najnižšou hodnotou.
+lesson.capture.check = Moja dáma dáva šach priamo vedľa tvojho kráľa.
+lesson.capture.ask = Vezmi útočníka!
+lesson.capture.king_ok = Áno! Moja dáma nemala obrancu, takže ju tvoj kráľ mohol vziať.
+lesson.capture.knight_ok = Áno! Tvoj jazdec odstránil útočníka.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Mat: kráľ je v šachu a nemá žiadny únik. Tým sa partia vyhráva.
+lesson.mate1.stuck = Môj kráľ je uväznený za {@}vlastnými pešiakmi.
+lesson.mate1.ask = Daj mi mat jedným ťahom!
+lesson.mate1.wrong = Blízko! Daj šach na mojom poslednom rade, odkiaľ môj kráľ nemôže ujsť.
+lesson.mate1.ok = Mat! To je mat na poslednom rade. Zapamätaj si ho!
+lesson.mate2.ask = Tvoj kráľ a dáma spolupracujú ako tím. Daj mi mat jedným ťahom.
+lesson.mate2.wrong = Nájdi šach, po ktorom môjmu kráľovi nezostane ani jedno pole.
+lesson.mate2.ok = Mat! Tvoj kráľ chráni dámu, takže ju môj nemôže vziať.
+lesson.mate2.ok_rank = Mat na poslednom rade! Tvoj kráľ stráži všetky polia pred mojím.
+lesson.mate3.edge = Tvoja veža na siedmom rade drží môjho kráľa na okraji.
+lesson.mate3.ask = Teraz daj mat {your:refl_ins}.
+lesson.mate3.free = Šach, ale siedmy rad je teraz voľný a môj kráľ uniká.
+lesson.mate3.takes = Môj kráľ jednoducho vezme tvoju vežu.
+lesson.mate3.hint = Daj šach na poslednom rade tou vežou, ktorá nestráži siedmy rad.
+lesson.mate3.ok = Mat! Dve veže postupovali ako po rebríku.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rošáda je špeciálny ťah, ktorý dostane tvojho kráľa do bezpečia. Kráľ a veža sa pri nej pohnú naraz.
+lesson.castle.how = {@}Kráľ sa posunie o dve polia smerom k veži a {@2}veža preskočí na jeho druhú stranu.
+lesson.castle.ask = Vždy sa najprv dotkni kráľa. Teraz ty: urob malú rošádu, na kráľovskom krídle.
+lesson.castle.rook = Takto sa pohne len veža. Pri rošáde posuň kráľa o dve polia smerom k nej.
+lesson.castle.long = To je veľká rošáda, aj tá je povolená! Tentoraz urob rošádu smerom k bližšej veži.
+lesson.castle.one = Jedno pole je obyčajný ťah kráľom. Pri rošáde ide kráľ o dve polia.
+lesson.castle.other = Pri rošáde posuň kráľa o dve polia smerom k veži na {sq}.
+lesson.castle.ok = Rošáda je hotová! Tvoj kráľ je v úkryte a tvoja veža je pripravená do hry.
+lesson.castle2.moved = Rošádu nemôžeš urobiť, ak sa už ťahalo tvojím kráľom alebo touto vežou.
+lesson.castle2.attacked = Ani keď si v šachu, ani keď by kráľ prešiel cez napadnuté pole alebo na ňom skončil.
+lesson.castle2.bishop = Môj strelec napáda {sq}. Preto je rošáda na tejto strane teraz zakázaná.
+lesson.castle2.ask = Urob rošádu na druhú stranu.
+lesson.castle2.other = Urob rošádu smerom k svojej druhej veži, na dámskom krídle.
+lesson.castle2.ok = Správne! Po veľkej rošáde stojí tvoj kráľ na {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+# Slovak names the rule "branie mimochodom" ("taking in passing"), so the English gloss of the French
+# term becomes a short explanation of the name.
+lesson.ep.what = Jedno špeciálne branie pešiakom sa volá branie mimochodom: pešiaka vezmeš, keď prechádza popri tvojom.
+lesson.ep.watch = Sleduj môjho pešiaka: pohne sa o dve polia a zastane hneď vedľa tvojho.
+lesson.ep.how = Tvoj pešiak ho môže vziať tak, akoby sa môj posunul len o jedno pole: na {sq}.
+lesson.ep.now = Ale len teraz, v tomto ťahu. Vezmi mimochodom!
+lesson.ep.gone = Príležitosť je preč: mimochodom sa dá brať len hneď. Skúsme to znova.
+lesson.ep.ok = Branie mimochodom! Môj pešiak na {sq} mizne zo šachovnice.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Keď pešiak dôjde na posledný rad, premení sa: stane sa z neho dáma, veža, strelec alebo jazdec.
+lesson.promo.ask = Takmer vždy si vyber dámu. Premeň teraz svojho pešiaka!
+lesson.promo.under = Povolené! Ale dáma je silnejšia. Vyberme si dámu.
+lesson.promo.under_ok = Dobre. Väčšina hráčov si však vyberá dámu.
+lesson.promo.push = Posuň svojho pešiaka na posledný rad, na {sq}.
+lesson.promo.ok = Nová dáma! Môžeš mať dokonca aj dve dámy naraz.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Som na ťahu. Môj kráľ nie je v šachu, ale {@}všetky polia okolo neho sú napadnuté.
+lesson.stale.draw = Nemám žiadny povolený ťah. To je pat a partia končí remízou.
+lesson.stale2.ask = Keď vyhrávaš, daj si pozor na pat. Daj mi mat jedným ťahom, bez patu!
+lesson.stale2.wrong = Daj šach na mojom poslednom rade, odkiaľ môj kráľ nemôže ujsť.
+lesson.stale2.ok = Mat! Súperovmu kráľovi vždy nechaj nejaký ťah, ak mu práve nedávaš mat.
+lesson.draws.kings = Ďalšie remízy: keď nikto nemôže dať mat, napríklad keď zostanú len dvaja králi, partia končí remízou.
+lesson.draws.agree = Hráči sa môžu na remíze aj dohodnúť.
+lesson.draws.repeat = Remízu umožňuje aj trojnásobné opakovanie pozície alebo päťdesiat ťahov bez brania a bez ťahu pešiakom.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Teraz už poznáš všetky pravidlá šachu. Výborne!
+lesson.talk.real = Poviem ti, ako sa hrajú skutočné partie.
+lesson.talk.elo = Hráči majú rating, ktorý sa volá Elo. Keď vyhrávaš, stúpa, a keď prehrávaš, klesá.
+lesson.talk.elo_gap = Výhra nad silnejším hráčom prinesie viac bodov; prehra so slabším stojí viac.
+lesson.talk.elo_start = Tvoj rating sa zobrazí po piatich hodnotených partiách. Naše partie sú tréning, preto sa nehodnotia.
+lesson.talk.clock = Toto sú {@}šachové hodiny. Každý hráč má vlastný čas, ktorý beží, len keď je na ťahu.
+lesson.talk.press = Po svojom ťahu stlačíš hodiny tou istou rukou. Tým sa spustí môj čas.
+lesson.talk.flag = Ak ti vyprší čas, prehrávaš. Výnimkou je, keď ti už nijako nemôžem dať mat.
+lesson.talk.increment = Päť plus tri znamená päť minút pre každého a k tomu tri sekundy po každom ťahu.
+lesson.talk.speeds = Krátkym partiám sa hovorí blitz, dlhším rapid a najdlhším klasický šach.
+lesson.talk.no_clock = So mnou sú hodiny vypnuté. Na premýšľanie máš toľko času, koľko potrebuješ.
+lesson.talk.touch = V skutočnej partii platí: ak sa dotkneš svojej figúry, musíš ňou ťahať.
+lesson.talk.touch_mine = Ak sa dotkneš mojej figúry, musíš ju vziať, ak sa to dá.
+lesson.talk.adjust = Ak chceš figúru len narovnať a neťahať ňou, povedz najprv „upravujem“.
+lesson.talk.release = Keď figúru pustíš na novom poli, ťah je urobený.
+lesson.talk.sheet = Na turnajoch obaja hráči zapisujú každý ťah do {@}partiára.
+# {move:letters} shows the Slovak scoresheet letters ("Jf3"), which is what this line teaches.
+lesson.talk.notation = Zapisujeme písmeno figúry a pole, napríklad {move:letters}. Pri pešiakoch len pole.
+lesson.talk.robot = Tvoj robot zapisuje ťahy za teba. V rýchlych partiách zapisovanie nie je povinné.
+lesson.talk.handshake = Partie sa začínajú aj končia podaním ruky. Znamená to: dobrá partia a ďakujem.
+lesson.talk.polite = Či vyhráš, alebo prehráš, správaj sa slušne a nikdy neruš súpera, keď premýšľa.
+lesson.talk.tips = Tri rady do tvojich partií: {@}ovládni stred, {@2}vyveď jazdcov a strelcov a {@3}urob včas rošádu.
+lesson.talk.next = Keď budeš chcieť, vyber si úroveň „Prvé kroky“. Budem hrať jemne a po každej chybe ti pomôžem.
+lesson.talk.welcome = Vitaj vo svete šachu! Podajme si ruky.

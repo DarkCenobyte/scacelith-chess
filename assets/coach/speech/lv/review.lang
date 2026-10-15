@@ -369,3 +369,617 @@ ex.mate_delayed.b5 = Ātrāk bija {best:nomate}: mats {m:move_loc}.
 ex.mate_delayed.b5.2 = Ar {best:nomate} mats būtu ātrāk, {m:move_loc}.
 ex.mate_delayed.b6 = {best:nomate} forsē matu {m:move_loc}.
 ex.mate_delayed.b6.2 = Ātrāk: {best:nomate}, mats {m:move_loc}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ak nē! {my} nevar paiet, un šaha nav. Tas ir pats: neizšķirts.
+ex.stalemate.b1.2 = Skaties: {my:dat} nav neviena droša lauciņa, bet šaha nav. Neizšķirts!
+ex.stalemate.b1.3 = Tas ir pats. {my} nevar paiet, tāpēc partija beidzas neizšķirti.
+ex.stalemate.b2 = Pats! {my:dat} nav neviena atļauta gājiena, un šaha nav. Neizšķirts.
+ex.stalemate.b2.2 = Ak nē, pats: {my} ir iesprūd{my:is}, bet šaha nav.
+ex.stalemate.b2.3 = Tas ir pats, tātad neizšķirts. {my} nevar paiet.
+ex.stalemate.b3 = Tas ir pats: {my:dat} nav neviena atļauta gājiena. Bet tev bija uzvaroša pozīcija!
+ex.stalemate.b3.2 = Pats! {my} ir iesprūd{my:is}, un uzvara pārvēršas neizšķirtā.
+ex.stalemate.b3.3 = {my:dat} nav gājienu un nav šaha: pats.
+ex.stalemate.b4 = Pats: {my:dat} nav neviena atļauta gājiena. Tā tu palaid uzvaru garām.
+ex.stalemate.b4.2 = Pēc {move} {my:dat} ir pats. Neizšķirts uzvarošā pozīcijā.
+ex.stalemate.b4.3 = Tas ir pats; {my} ir ieslēgt{my:adj}.
+ex.stalemate.b5 = Pēc {move} {my:dat} ir pats. Uzvaras vairs nav.
+ex.stalemate.b5.2 = Pats: {my:dat} nav lauciņu.
+ex.stalemate.b5.3 = Tas ir pats, {my} ir iesprūd{my:is}.
+ex.stalemate.b6 = Pats. {my:dat} nav gājienu.
+ex.stalemate.b6.2 = {move}, pats: {my} ir ieslēgt{my:adj}.
+ex.stalemate.b6.3 = Pats; {my} nevar paiet.
+ex.stalemate.tip.b1 = Kad tev ir uzvaroša pozīcija, vienmēr atstāj manam karalim brīvu lauciņu.
+ex.stalemate.tip.b1.2 = Atceries: kad tev ir pārsvars, atstāj manam karalim nedaudz vietas.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Uzmanīgi! Es varu atdot savas figūras, un tad {my:dat} nebūs gājienu: pats.
+ex.stalemate_trick.b1.2 = Uzmanies: {my} ir gandrīz iesprūd{my:is}. Es varu panākt neizšķirtu.
+ex.stalemate_trick.b2 = Uzmanīgi: es varu upurēt, un {my:dat} būtu pats.
+ex.stalemate_trick.b2.2 = {my:dat} gandrīz nav lauciņu. Es varu panākt patu!
+ex.stalemate_trick.b3 = Tas ļauj man izglābties ar patu: {my:dat} beidzas gājieni.
+ex.stalemate_trick.b3.2 = Uzmanīgi: pēc {line} {my:dat} ir pats.
+ex.stalemate_trick.b4 = {move} pieļauj pata slazdu: {line}, un {my} nevar paiet.
+ex.stalemate_trick.b4.2 = Tagad {my} var paslēpties patā: {line}.
+ex.stalemate_trick.b5 = {move} pieļauj patu: {line}; {my} ir ieslēgt{my:adj}.
+ex.stalemate_trick.b5.2 = Pata slazds: {line}, un {my:dat} nav gājienu.
+ex.stalemate_trick.b6 = {line}, pats: {my} ir ieslēgt{my:adj}.
+ex.stalemate_trick.b6.2 = Pats pēc {line}; {my} ir iesprūd{my:is}.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} var iet uz {sq} un uzbrukt {t1:dat} un {t2:dat}.
+ex.fork.b1.2 = {my} iet uz {sq} un uzbrūk divām figūrām: {t1:dat} un {t2:dat}.
+ex.fork.b1.3 = Uzmani {my:acc}: no {sq} {my:pron} uzbrūk reizē {t1:dat} un {t2:dat}.
+ex.fork.b2 = Dakša! {my} uz {sq} uzbrūk reizē {t1:dat} un {t2:dat}.
+ex.fork.b2.2 = Pēc tava gājiena {my} no {sq} var uztaisīt dakšu {t1:dat} un {t2:dat}.
+ex.fork.b2.3 = {my} iet uz {sq}: divkāršs uzbrukums {t1:dat} un {t2:dat}.
+ex.fork.b3 = {move} pieļauj {reply} ar dakšu {t1:dat} un {t2:dat}.
+ex.fork.b3.2 = Pēc {reply} es uzbrūku reizē {t1:dat} un {t2:dat}.
+ex.fork.b3.3 = {reply} ir dakša: uzbrukums gan {t1:dat}, gan {t2:dat}.
+ex.fork.b4 = {reply} ir dakša {t1:dat} un {t2:dat}; pēc {line} tev ir par {pts:point_pacc} mazāk.
+ex.fork.b4.2 = {reply} uzbrūk uzreiz {t1:dat} un {t2:dat}.
+ex.fork.b4.3 = {move} pieļauj dakšu {reply} pret {t1:acc} un {t2:acc}.
+ex.fork.b5 = {move} noved pie dakšas {reply}: uzbrukums {t1:dat} un {t2:dat}.
+ex.fork.b5.2 = {reply}: dakša {t1:dat} un {t2:dat}.
+ex.fork.b5.3 = Pēc {reply} uzbrukums ir gan {t1:dat}, gan {t2:dat}.
+ex.fork.b6 = {reply} ar dakšu.
+ex.fork.b6.2 = {move} pieļauj {reply}, dakšu.
+ex.fork.b6.3 = {reply}, dakša.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Tu vari izglābt tikai vienu figūru: {t1:acc} vai {t2:acc}.
+ex.fork.tail.b1.2 = Tagad es uzbrūku divām figūrām uzreiz: {t1:dat} un {t2:dat}. Tā ir dakša!
+ex.fork.tail.b1.3 = Redzi? Es uzbrūku gan {t1:dat}, gan {t2:dat}. Viena figūra kritīs.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:dat} jāaizsargājas no šaha, tāpēc es paņemu {t1:acc}.
+ex.fork.tail_king.2 = Šahs! {your:dat} jāatkāpjas, un {t1} krīt.
+ex.fork.more.b3 = Pirms gājiena paskaties uz lauciņu {sq}: no tā {my} var uztaisīt dakšu.
+ex.fork.more.b3.2 = Uzmani lauciņu {sq}. No turienes {my} uztaisa dakšu.
+ex.fork.tip.knight = Uzmanies no zirga lēcieniem sava karaļa un dāmas tuvumā!
+ex.fork.tip.knight.2 = Zirgiem patīk uzbrukt divām figūrām uzreiz. Skaties, kur tie var palēkt.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Kad {my} aiziet, {my2} uzbrūk {t1:dat}!
+ex.discovered.b1.2 = Skaties: {my} stāv ceļā. Ja {my:pron} aiziet, {my2} uzbrūk {t1:dat}.
+ex.discovered.b1.3 = {my} var pakāpties malā, un tad {my2} uzbrūk {t1:dat}.
+ex.discovered.b2 = Slēpts uzbrukums: {my} aiziet, un {my2} uzbrūk {t1:dat}.
+ex.discovered.b2.2 = Uzmanīgi: {my} var aiziet, un {my2} uzbrūk {t1:dat}.
+ex.discovered.b2.3 = {my} aiziet un atver ceļu {my2:dat} uz {t1:acc}.
+ex.discovered.b3 = Pēc {reply} atklātais uzbrukums ir vērsts pret {t1:acc}.
+ex.discovered.b3.2 = {reply} atklāj uzbrukumu {t1:dat}.
+ex.discovered.b3.3 = {move} pieļauj {reply}: atklāto uzbrukumu {t1:dat}.
+ex.discovered.b4 = {reply} atver līniju uz {t1:acc}: atklātais uzbrukums.
+ex.discovered.b4.2 = {move} pieļauj atklāto uzbrukumu {reply}, kas iegūst {t1:acc}.
+ex.discovered.b4.3 = Pēc {reply} atklātais uzbrukums iegūst {t1:acc}.
+ex.discovered.b5 = {move} pieļauj atklāto uzbrukumu {reply}.
+ex.discovered.b5.2 = {reply} ir atklātais uzbrukums.
+ex.discovered.b5.3 = {reply} atklāj slēptu uzbrukumu.
+ex.discovered.b6 = {reply}, atklātais uzbrukums {t1:dat}.
+ex.discovered.b6.2 = {reply}, un {t1} krīt.
+ex.discovered.b6.3 = Atklātais uzbrukums: {reply}, uzbrūkot {t1:dat}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} uzbrūk {t1:dat}. Kad {t1:pron} aiziet, es paņemu {t2:acc} aiz {t1:pron_gen}.
+ex.skewer.b1.2 = Skaties: {my} uzbrūk {t1:dat}, un tieši aiz {t1:pron_gen} stāv {t2}.
+ex.skewer.b1.3 = {my} uzbrūk {t1:dat}. {t1:pron_dat} jāaiziet, un tad {t2} krīt.
+ex.skewer.b2 = Iesms: {my} uzbrūk {t1:dat}, un aiz {t1:pron_gen} stāv {t2}.
+ex.skewer.b2.2 = {my} uzbrūk {t1:dat} un {t2:dat} pa vienu līniju. Kad pirmā figūra aiziet, es paņemu otro.
+ex.skewer.b2.3 = Uzmanīgi: {t1} un {t2} stāv vienā līnijā. {my} var tām uzbrukt ar iesmu.
+ex.skewer.b3 = {reply}: iesms pret {t1:acc} un {t2:acc}.
+ex.skewer.b3.2 = Pēc {reply} {t1:dat} jāaiziet, un {t2} krīt.
+ex.skewer.b3.3 = {move} pieļauj {reply}: iesmu pret {t1:acc} un {t2:acc}.
+ex.skewer.b4 = {reply} uzbrūk {t1:dat} ar iesmu; {t2} aiz {t1:pron_gen} ir zaudēt{t2:adj}.
+ex.skewer.b4.2 = Pēc {move} {t1} un {t2} stāv vienā līnijā: {reply}.
+ex.skewer.b4.3 = Pēc {reply} {t1} aiziet, un {t2} krīt.
+ex.skewer.b5 = {reply}: iesms pret {t1:acc} un {t2:acc}.
+ex.skewer.b5.2 = {move} pieļauj iesmu {reply} caur {t1:acc} uz {t2:acc}.
+ex.skewer.b6 = {reply} ar iesmu.
+ex.skewer.b6.2 = {reply}, iesms.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+# "Pinned to the king" = "piesiets pie karaļa" ("piesiet{your:adj} pie {t1:gen}").
+ex.pin.b1 = {my} var iet uz {sq}. Tad {your} iesprūst {t1:dat} priekšā.
+ex.pin.b1.2 = Uzmani {my:acc} uz {sq}: {your} iesprūst {t1:dat} priekšā.
+ex.pin.b1.3 = {my} var piesiet {your:acc} pie {t1:gen}. Tad es {your:pron_acc} iegūšu.
+ex.pin.b2 = Piesaiste: {your} ir iesprūd{your:is} {t1:dat} priekšā.
+ex.pin.b2.2 = {your} ir piesiet{your:adj} pie {t1:gen}. Tad es varu {your:pron_acc} iegūt.
+ex.pin.b2.3 = Tagad {your} ir iesprūd{your:is} {t1:dat} priekšā. Tā ir piesaiste.
+ex.pin.b3 = {your} tiek piesiet{your:adj} pie {t1:gen}, un es {your:pron_acc} iegūstu.
+ex.pin.b3.2 = Pēc tā {your} ir piesiet{your:adj} pie {t1:gen}.
+ex.pin.b3.3 = {your:gen} piesaiste maksā materiālu: aiz {your:pron_gen} stāv {t1}.
+ex.pin.b4 = {reply} piesaista un iegūst materiālu.
+ex.pin.b4.2 = {move} noved pie piesaistes {reply}.
+ex.pin.b4.3 = Pēc {reply} piesietā figūra krīt.
+ex.pin.b5 = {move} pieļauj piesaisti {reply}.
+ex.pin.b5.2 = {reply} piesaista, un figūra ir zaudēta.
+ex.pin.b6 = {reply} piesaista.
+ex.pin.b6.2 = {reply}, piesaiste.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} ir piesiet{your:adj}, tāpēc {your:pron} nevar aizsargāt lauciņu {sq}. Aiz {your:pron_gen} stāv {t1}.
+ex.pin_defender.b1.2 = Skaties: {your} īsti nevar aizsargāt lauciņu {sq}, jo aiz {your:pron_gen} stāv {t1}.
+ex.pin_defender.b2 = {your} ir piesiet{your:adj} pie {t1:gen}, tāpēc lauciņam {sq} nav īsta aizsarga.
+ex.pin_defender.b2.2 = Piesieta figūra ir slikts aizsargs. {your} nevar aizsargāt lauciņu {sq}: aiz {your:pron_gen} stāv {t1}.
+ex.pin_defender.b3 = {your} ir piesiet{your:adj} pie {t1:gen}; {your:pron} īsti neaizsargā lauciņu {sq}.
+ex.pin_defender.b3.2 = Lauciņš {sq} izskatās aizsargāts, bet {your} ir piesiet{your:adj} pie {t1:gen}.
+ex.pin_defender.b4 = {your} ir piesiet{your:adj}, tāpēc lauciņš {sq} īsti nav aizsargāts.
+ex.pin_defender.b4.2 = Piesiet{your:def} {your:bare_nom} nevar aizsargāt lauciņu {sq}.
+ex.pin_defender.b5 = {your} ir piesiet{your:adj}; lauciņš {sq} ir bez aizsardzības.
+ex.pin_defender.b5.2 = Lauciņu {sq} nenoturēt: {your} ir piesiet{your:adj}.
+ex.pin_defender.b6 = {your} ir piesiet{your:adj}; lauciņu {sq} nenoturēt.
+ex.pin_defender.b6.2 = Piesiet{your:def} {your:bare_nom}, neaizsargāts lauciņš {sq}.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} ir ieslēgt{your:adj}. Visi lauciņi, uz kuriem {your:pron} var iet, ir apdraudēti.
+ex.trapped.b1.2 = Paskaties uz {your:refl_acc}: {your:pron_dat} nav droša lauciņa, kur bēgt.
+ex.trapped.b1.3 = {your} ir iesprūd{your:is}. Es varu {your:pron_dat} uzbrukt, un {your:pron} nevar aizbēgt.
+ex.trapped.b2 = {your:dat} nav drošu lauciņu. Es varu {your:pron_acc} iegūt.
+ex.trapped.b2.2 = {your} ir ieslēgt{your:adj}: lai kur {your:pron} ietu, es {your:pron_acc} paņemšu.
+ex.trapped.b2.3 = Uzmanīgi, {your:dat} beidzas lauciņi.
+ex.trapped.b3 = {your} tiek ieslēgt{your:adj}: drošu lauciņu vairs nav.
+ex.trapped.b3.2 = Pēc tā {your} ir ieslēgt{your:adj} un zaudēt{your:adj}.
+ex.trapped.b3.3 = {your} iekļuva slazdā: ārā {your:pron} netiek.
+ex.trapped.b4 = Pēc {move} {your} ir ieslēgt{your:adj}.
+ex.trapped.b4.2 = {your:dat} nav kur atkāpties; es {your:pron_acc} iegūstu.
+ex.trapped.b4.3 = Pēc {reply} {your} ir ieslēgt{your:adj}.
+ex.trapped.b5 = {your} beigās ir ieslēgt{your:adj}: {line}.
+ex.trapped.b5.2 = {move} atstāj {your:acc} bez izejas.
+ex.trapped.b6 = {your} ir ieslēgt{your:adj}.
+ex.trapped.b6.2 = {line} ieslēdz {your:acc}.
+ex.trapped.tip.b1 = Pirms pārvieto figūru, pārbaudi, vai tā var tikt atpakaļ.
+ex.trapped.tip.b1.2 = Figūras dziļi manā nometnē var iesprūst. Atstāj tām atkāpšanās ceļu.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# "Saviem bandiniekiem": the king's own pawns, the king being the subject.
+ex.back_rank.b1 = {your} ir iesprūd{your:is} aiz saviem bandiniekiem. {my} var pieteikt {your:pron_dat} šahu pēdējā horizontālē.
+ex.back_rank.b1.2 = Uzmanīgi: {your:dat} nav kur bēgt, un {my} var nokļūt uz {sq}.
+ex.back_rank.b1.3 = {my} var iet uz {sq}. {your} ir ieslēgt{your:adj} aiz saviem bandiniekiem.
+ex.back_rank.b2 = Briesmas pēdējā horizontālē: {your:dat} nav brīva lauciņa. {my} var pieteikt šahu uz {sq}.
+ex.back_rank.b2.2 = {your} ir ieslēgt{your:adj}. {my} iet uz {sq} un iegūst materiālu.
+ex.back_rank.b2.3 = Tava pēdējā horizontāle ir vāja: {my} var pieteikt šahu {your:dat} uz {sq}.
+ex.back_rank.b3 = Tava pēdējā horizontāle ir vāja: {line}. {your:dat} nav kur bēgt.
+ex.back_rank.b3.2 = {your:dat} nav brīva lauciņa, tāpēc {line} iegūst materiālu.
+ex.back_rank.b3.3 = Pēc {line} izšķir pēdējā horizontāle: {your} ir ieslēgt{your:adj}.
+ex.back_rank.b4 = Pēdējā horizontāle: {line}, un {your:dat} nav brīva lauciņa.
+ex.back_rank.b4.2 = {line} izmanto {your:gen} vājo pēdējo horizontāli.
+ex.back_rank.b4.3 = {your:dat} trūkst brīva lauciņa: {line}.
+ex.back_rank.b5 = Pēdējās horizontāles vājums pie {your:gen}: {line}.
+ex.back_rank.b5.2 = {line}; {your:dat} nav brīva lauciņa.
+ex.back_rank.b6 = {line}, pēdējā horizontāle; {your} ir ieslēgt{your:adj}.
+ex.back_rank.b6.2 = Pēdējā horizontāle: {line} ({your}).
+ex.back_rank.tip.b1 = Izveido savam karalim lodziņu: pavirzi vienu bandinieku, kas stāv tā priekšā.
+ex.back_rank.tip.b1.2 = Karalim aiz trim bandiniekiem var pieteikt matu pēdējā horizontālē. Atbrīvo tam vietu.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} uz {sq} nav aizsargāt{your:adj}. {my} var {your:pron_acc} paņemt par velti.
+ex.hanging.b1.2 = Paskaties uz {your:refl_acc}: neviens {your:pron_acc} neaizsargā, un {my} {your:pron_dat} uzbrūk.
+ex.hanging.b1.3 = {your} nav aizsargāt{your:adj}. {my} var {your:pron_acc} vienkārši paņemt.
+ex.hanging.b2 = {your} uz {sq} ir neaizsargāt{your:adj}. {my} {your:pron_acc} paņem, un tu nevari ņemt atpakaļ.
+ex.hanging.b2.2 = {my} var paņemt {your:acc} par velti. Neviens {your:pron_acc} neaizsargā.
+ex.hanging.b2.3 = {your} uz {sq} paliek bez aizsardzības, un {my} {your:pron_acc} paņem.
+ex.hanging.b3 = {move} atstāj {your:acc} bez aizsardzības: {reply}, un ņemt atpakaļ nav ar ko.
+ex.hanging.b3.2 = {your} uz {sq} ir neaizsargāt{your:adj}: {reply}.
+ex.hanging.b3.3 = Pēc {reply} {your} pazūd par velti.
+ex.hanging.b4 = {move} atstāj {your:acc} neaizsargātu: {reply} iegūst {pts:point_acc}.
+ex.hanging.b4.2 = {reply} paņem {your:acc} par velti.
+ex.hanging.b4.3 = {your} ir neaizsargāt{your:adj}; {reply} {your:pron_acc} paņem.
+ex.hanging.b5 = {move} atstāj {your:acc} neaizsargātu; {reply} {your:pron_acc} iegūst.
+ex.hanging.b5.2 = {your} uz {sq} krīt pēc {reply}.
+ex.hanging.b5.3 = {reply} iegūst {your:acc}.
+ex.hanging.b6 = {move}? {reply}, un {your} krīt.
+ex.hanging.b6.2 = {reply} iegūst {your:acc}.
+ex.hanging.b6.3 = {your} ir neaizsargāt{your:adj}: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} aizsargāja {your:acc}. Tagad {my} var {your:pron_acc} paņemt.
+ex.hanging_guard.b1.2 = {your2} aizgāja, un tagad {your} ir bez aizsardzības. {my} {your:pron_acc} paņem.
+ex.hanging_guard.b2 = {your2} aizsargāja {your:acc}. Tagad {your:pron} ir bez aizsardzības, un {my} {your:pron_acc} paņem.
+ex.hanging_guard.b2.2 = Pārvietojot {your2:refl_acc}, tu atstāji {your:refl_acc} neaizsargātu pret {my:acc}.
+ex.hanging_guard.b3 = {your2} aizsargāja {your:acc}. Kad {your2:pron} aiziet, {reply} {your:pron_acc} paņem.
+ex.hanging_guard.b3.2 = Bez {your2:gen} {your} ir neaizsargāt{your:adj}: {reply}.
+ex.hanging_guard.b4 = {move} noņem aizsardzību: {your2} pameta {your:acc}, un {reply} {your:pron_acc} paņem.
+ex.hanging_guard.b4.2 = {your2} bija vienīgais {your:gen} aizsargs; {reply} {your:pron_acc} iegūst.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} jau uzbruka {your:dat}. Vienmēr pārbaudi, kādus draudus rada mans gājiens.
+ex.hanging_threat.b1.2 = Tu neredzēji manus draudus: {my} uzbrūk {your:dat}.
+ex.hanging_threat.b2 = Pēdējā gājienā es ar {my:refl_acc} uzbruku {your:dat}. Vienmēr skaties uz maniem draudiem.
+ex.hanging_threat.b2.2 = {my} draudēja {your:dat}, un tagad es varu {your:pron_acc} paņemt.
+ex.hanging_threat.b3 = Tu palaidi garām manus draudus: {my} uzbruka {your:dat}.
+ex.hanging_threat.b3.2 = {my} visu laiku turēja {your:acc} uz grauda.
+ex.hanging.tip.b1 = Pirms katra gājiena pajautā sev: vai visas manas figūras ir drošībā?
+ex.hanging.tip.b1.2 = Labs ieradums: pēc katra gājiena pārbaudi, kuras no tavām figūrām ir aizsargātas.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. "Worth 3 points" = "vērt{your:adj} {n:point_acc}" (vērts 3 punktus).
+ex.exchange_capture.b1 = {your} ņēma, bet {my} ņem atpakaļ. Šī maiņa tev maksā punktus.
+ex.exchange_capture.b1.2 = {my} ņem atpakaļ. {your} ir vērt{your:adj} {n:point_acc}, bet tu ieguvi tikai {n2:point_acc}.
+ex.exchange_capture.b1.3 = Uzmanīgi: {my} atbildē var paņemt {your:acc}. Tā ir slikta maiņa.
+ex.exchange_capture.b2 = Uzmanīgi ar maiņām: {your} ir vērt{your:adj} {n:point_acc}. {my} ņem atpakaļ, un tu ieguvi tikai {n2:point_acc}.
+ex.exchange_capture.b2.2 = {my} atbildē paņem {your:acc}. Tu zaudē {n:point_acc} un iegūsti tikai {n2:point_acc}.
+ex.exchange_capture.b3 = Ņemšana uz {sq} neder: pēc {line} {your} ir zaudēt{your:adj}.
+ex.exchange_capture.b3.2 = {your} ņem uz {sq}, bet pēc {line} tev ir par {pts:point_pacc} mazāk.
+ex.exchange_capture.b4 = {move} ir kļūdains aprēķins uz {sq}: {line}, un {your} ir zaudēt{your:adj}.
+ex.exchange_capture.b4.2 = Ņemšana uz {sq} maksā {your:acc}: {line}.
+ex.exchange_capture.b5 = {move} zaudē {your:acc} maiņās uz {sq}: {line}.
+ex.exchange_capture.b5.2 = Uz {sq} {your} ir zaudēt{your:adj}: {line}.
+ex.exchange_capture.b6 = {move} zaudē {your:acc} uz {sq} pēc {line}.
+ex.exchange_capture.b6.2 = {line} uz {sq}, un {your} ir zaudēt{your:adj}.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Saskaiti: es uzbrūku lauciņam {sq} {n:time_acc}, tu to aizsargā {n2:time_acc}.
+ex.exchange_count.b1.2 = Lauciņam {sq} es uzbrūku ar {n:piece_pacc}, bet tu to aizsargā ar {n2:piece_pacc}. Šo cīņu es uzvaru.
+ex.exchange_count.b2 = Lauciņam {sq} es uzbrūku {n:time_acc}, bet tu to aizsargā {n2:time_acc}. Tur tu zaudēsi materiālu.
+ex.exchange_count.b2.2 = Saskaiti spēkus pie lauciņa {sq}: {n:attacker} pret {n2:defender_pacc}.
+ex.exchange_count.b3 = Saskaiti uzbrucējus un aizsargus pie lauciņa {sq}: man to ir vairāk.
+ex.exchange_count.b3.2 = Maiņa uz {sq} neder: pēc {line} tev ir par {pts:point_pacc} mazāk.
+ex.exchange_count.b4 = {move} ir kļūdains aprēķins uz {sq}: {line}, un tev ir par {pts:point_pacc} mazāk.
+ex.exchange_count.b4.2 = Lauciņam {sq} ir vairāk uzbrucēju nekā aizsargu: {line}.
+ex.exchange_count.b5 = Uz {sq} {n:attacker} pārspēj {n2:defender_acc}: {line}.
+ex.exchange_count.b5.2 = Pēc {move} spēku samērs uz {sq} nav tavā labā.
+ex.exchange_count.b6 = {line} uz {sq}, un es esmu ieguvis {pts:point_acc}.
+ex.exchange_count.b6.2 = {sq}: uzbrucēji {n}, aizsargi {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} ir mazāk vērt{my:adj} nekā {your}. Ja es ņemu, tu zaudē punktus.
+ex.exchange_cheap.b1.2 = {my} uzbrūk {your:dat}. Šī maiņa tev ir neizdevīga.
+ex.exchange_cheap.b2 = {your} ir vērt{your:adj} {n:point_acc}, bet {my} tikai {n2:point_acc}. Šī maiņa tev ir neizdevīga.
+ex.exchange_cheap.b2.2 = {my} ir lētāk{my:adj} nekā {your}, tāpēc uzbrukums iegūst materiālu.
+ex.exchange_cheap.b3 = {your:dat} uz {sq} uzbrūk lētāka figūra.
+ex.exchange_cheap.b3.2 = Figūra, kas ir vērta {n2:point_acc}, uzbrūk {your:dat} uz {sq}: {line}.
+ex.exchange_cheap.b4 = {your:dat} uz {sq} uzbrūk lētāka figūra; {reply} iegūst materiālu.
+ex.exchange_cheap.b4.2 = {reply} ar lētāku figūru uzbrūk {your:dat} uz {sq}.
+ex.exchange_cheap.b5 = {your} uz {sq} ir lētāka uzbrucēja mērķis: {line}.
+ex.exchange_cheap.b5.2 = {reply} iegūst materiālu uz {sq}, uzbrūkot {your:dat}.
+ex.exchange_cheap.b6 = {reply} iegūst {your:acc} uz {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} uz {sq} ir zaudēt{your:adj}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Uzmanīgi: tagad es varu iegūt {t1:acc}.
+ex.material.b1.2 = Pēc šī gājiena {t1} ir briesmās. Es varu {t1:pron_acc} iegūt.
+ex.material.b2 = Šis gājiens ļauj man iegūt {t1:acc}.
+ex.material.b2.2 = Tagad {t1} nonāk briesmās, un es {t1:pron_acc} iegūstu.
+ex.material.b3 = {move} zaudē materiālu: pēc {line} tev ir par {pts:point_pacc} mazāk.
+ex.material.b3.2 = Pēc {line} tev ir par {pts:point_pacc} mazāk.
+ex.material.b4 = {move} zaudē materiālu: {line}, un tu zaudē {pts:point_acc}.
+ex.material.b4.2 = Pēc {line} tu atpaliec par {pts:point_pacc}.
+ex.material.b5 = {move} atdod materiālu: {line}.
+ex.material.b5.2 = Pēc {line} es iegūstu {pts:point_acc}.
+ex.material.b6 = {line}, un es esmu ieguvis {pts:point_acc}.
+ex.material.b6.2 = {move} zaudē {pts:point_acc}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Vai redzēji? {my} uz {sq} bija neaizsargāt{my:adj}. {your} varēja {my:pron_acc} paņemt.
+ex.missed_capture.b1.2 = Skaties: {my:dat} nebija aizsarga. {your} varēja {my:pron_acc} paņemt.
+ex.missed_capture.b1.3 = {my} uz {sq} nebija aizsargāt{my:adj}. {your} varēja {my:pron_acc} paķert!
+ex.missed_capture.b2 = Tu varēji paņemt par velti: {best} iegūst {my:acc}.
+ex.missed_capture.b2.2 = {my} uz {sq} bija neaizsargāt{my:adj}. {best} {my:pron_acc} paņem. Nākamreiz paķer!
+ex.missed_capture.b2.3 = {best} par velti iegūtu {my:acc}.
+ex.missed_capture.b3 = Ar gājienu {best} tu par velti iegūtu {my:acc}.
+ex.missed_capture.b3.2 = {my} uz {sq} nebija aizsargāt{my:adj}: {best}. Katrā gājienā meklē neaizsargātas figūras.
+ex.missed_capture.b3.3 = Tu varēji paņemt {my:acc} ar gājienu {best}.
+ex.missed_capture.b4 = Palaists garām: {best} paņem {my:acc} uz {sq}.
+ex.missed_capture.b4.2 = {best} iegūst {my:acc}, kas nebija aizsargāt{my:adj}.
+ex.missed_capture.b4.3 = {my} bija neaizsargāt{my:adj}: {best}.
+ex.missed_capture.b5 = {best} iegūst {my:acc}; pēc {move} {my:pron} aizbēg.
+ex.missed_capture.b5.2 = {my} uz {sq} bija neaizsargāt{my:adj}: {best}.
+ex.missed_capture.b6 = {best}! {my} uz {sq} bija neaizsargāt{my:adj}.
+ex.missed_capture.b6.2 = {best} iegūtu {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Tev bija divkāršs uzbrukums: {best} uzbrūk {t1:dat} un {t2:dat}!
+ex.missed_fork.b1.2 = Skaties! {best} uzbruktu reizē {t1:dat} un {t2:dat}.
+ex.missed_fork.b1.3 = {best} bija dakša: uzbrukums gan {t1:dat}, gan {t2:dat}.
+ex.missed_fork.b2 = {best} bija dakša: {t1} un {t2}.
+ex.missed_fork.b2.2 = Tu palaidi garām divkāršu uzbrukumu: {best}, uzbrūkot {t1:dat} un {t2:dat}.
+ex.missed_fork.b2.3 = {best} uzbrūk reizē {t1:dat} un {t2:dat}. Dakša!
+ex.missed_fork.b3 = {best} bija dakša: {t1} un {t2}.
+ex.missed_fork.b3.2 = Tev bija {best} ar dakšu {t1:dat} un {t2:dat}.
+ex.missed_fork.b3.3 = {best} radītu dakšu {t1:dat} un {t2:dat}.
+ex.missed_fork.b4 = {best} bija dakša {t1:dat} un {t2:dat}.
+ex.missed_fork.b4.2 = Palaista garām dakša: {best} pret {t1:acc} un {t2:acc}.
+ex.missed_fork.b5 = {best}: dakša {t1:dat} un {t2:dat}.
+ex.missed_fork.b5.2 = {best} uzbruktu {t1:dat} un {t2:dat}.
+ex.missed_fork.b6 = {best}, dakša {t1:dat} un {t2:dat}.
+ex.missed_fork.b6.2 = {best}: dakša pret {t1:acc} un {t2:acc}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} var aizskriet līdz {sq} un pārvērsties dāmā. {your} ir pārāk tālu.
+ex.promotion.b1.2 = Skaties: nekas netraucē {my:dat} sasniegt lauciņu {sq}. {your} {my:pron_acc} nepanāks.
+ex.promotion.b1.3 = {my:dat} līdz {sq} ir {n:square}, un {your} nepaspēj.
+ex.promotion.b2 = {my} skrien uz {sq}, un {your} {my:pron_acc} nepanāk.
+ex.promotion.b2.2 = {my:dat} līdz {sq} ir {n:move}, {your:dat} ir {n2:move}. Par lēnu.
+ex.promotion.b2.3 = Uzmanīgi: {my} pārvēršas dāmā uz {sq}, un {your} ir pārāk tālu.
+ex.promotion.b3 = {my} ir ārpus kvadrāta: {your} {my:pron_acc} nepanāks līdz {sq}.
+ex.promotion.b3.2 = Sacīkste zaudēta: {my} sasniedz lauciņu {sq} ātrāk nekā {your}.
+ex.promotion.b4 = {your} ir ārpus bandinieka kvadrāta; tas pārvēršas dāmā uz {sq}.
+ex.promotion.b4.2 = {my} pārvēršas uz {sq}; {your:dat} pietrūkst viena gājiena.
+ex.promotion.b5 = Bandinieku sacīkste zaudēta: {your} ir ārpus kvadrāta, un mans bandinieks iet uz {sq}.
+ex.promotion.b5.2 = {line}: es iegūstu dāmu uz {sq}, un {your} nokavē.
+ex.promotion.b6 = {your} ir ārpus kvadrāta; es iegūstu dāmu uz {sq}.
+ex.promotion.b6.2 = {line}, pārvēršana uz {sq} ({your} nokavē).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Tavs bandinieks varēja aizskriet līdz {sq} un pārvērsties dāmā!
+ex.promotion_missed.b1.2 = Paskaties uz {sq}! Tavs bandinieks varēja tur aizskriet.
+ex.promotion_missed.b2 = Tavs bandinieks varēja aizskriet līdz {sq}. Virzi caurejošos bandiniekus!
+ex.promotion_missed.b2.2 = Nekas netraucēja tavam bandiniekam iet uz {sq}.
+ex.promotion_missed.b3 = {best} uzvar sacīkstē līdz {sq}.
+ex.promotion_missed.b3.2 = Tavs bandinieks bija ātrāks: {best}, un tas pārvēršas dāmā uz {sq}.
+ex.promotion_missed.b4 = {best} uzvar bandinieku sacīkstē līdz {sq}.
+ex.promotion_missed.b4.2 = {best}! Bandinieks pārvēršas dāmā uz {sq}.
+ex.promotion_missed.b5 = Pēc {best} bandinieks pirmais pārvēršas dāmā uz {sq}.
+ex.promotion_missed.b5.2 = {best}, un lauciņš {sq} ir tavs.
+ex.promotion_missed.b6 = {best} uzvar sacīkstē līdz {sq}.
+ex.promotion_missed.b6.2 = {best}; pirmais uz {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Šis bandinieks aizsargāja {your:acc}. Tagad {your:dat} ir mazāk aizsega.
+ex.king_shield.b1.2 = Bandinieks no {sq} bija {your:gen} vairogs. Tagad manas figūras var ielauzties.
+ex.king_shield.b2 = Bandinieka gājiens no {sq} vājina {your:gen} aizsardzību. Tagad manas figūras var {your:pron_dat} uzbrukt.
+ex.king_shield.b2.2 = {your} zaudēja sargu: bandinieks uz {sq} bija {your:pron_gen} vairogs.
+ex.king_shield.b3 = Šis bandinieka gājiens atklāj {your:acc} manam uzbrukumam.
+ex.king_shield.b3.2 = {your} zaudē savu bandinieku aizsegu, un manas figūras ielaužas.
+ex.king_shield.b4 = {move} vājina bandiniekus ap {your:acc}; mans uzbrukums izlaužas cauri.
+ex.king_shield.b4.2 = Pēc {move} {your:gen} vairogs ir sagrauts.
+ex.king_shield.b5 = {move} vājina {your:gen} aizsegu: {line}.
+ex.king_shield.b5.2 = Pēc {move} {your} ir atklāt{your:adj}: {line}.
+ex.king_shield.b6 = {move} vājina {your:acc}: {line}.
+ex.king_shield.b6.2 = {line}; {your} ir pārāk atklāt{your:adj}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} ir briesmās. Manas figūras nāk {your:pron_dat} virsū.
+ex.king_exposed.b1.2 = Paskaties, cik atklāt{your:adj} ir {your}. Turi {your:pron_acc} drošībā aiz saviem bandiniekiem.
+ex.king_exposed.b2 = {your} ir pārāk atklāt{your:adj}. Tagad es varu pieteikt daudz šahu.
+ex.king_exposed.b2.2 = Uzmanīgi: {your:dat} nav patvēruma, un manas figūras {your:pron_dat} uzbrūk.
+ex.king_exposed.b3 = {your} ir atklāt{your:adj}; manas figūras var {your:pron_dat} uzbrukt ar šahiem.
+ex.king_exposed.b3.2 = Pēc tā {your:dat} nav patvēruma.
+ex.king_exposed.b4 = {your} paliek atklāt{your:adj}: {line}.
+ex.king_exposed.b4.2 = {move} atstāj {your:acc} atklātu uzbrukumam.
+ex.king_exposed.b5 = {your} ir pārāk atklāt{your:adj}: {line}.
+ex.king_exposed.b5.2 = {move} atstāj {your:acc} bez aizsega.
+ex.king_exposed.b6 = {line}; {your} ir atklāt{your:adj}.
+ex.king_exposed.b6.2 = {your} ir pārāk atklāt{your:adj}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Šī maiņa noved pie bandinieku galotnes, kurā es uzvaru.
+ex.bad_trade.b3.2 = Pēc {line} paliek tikai bandinieki, un mans karalis stāv labāk.
+ex.bad_trade.b4 = Maiņas noved pie zaudētas bandinieku galotnes: {line}.
+ex.bad_trade.b4.2 = Pāreja uz šo bandinieku galotni zaudē.
+ex.bad_trade.b5 = Nepareiza maiņa: bandinieku galotne pēc {line} ir zaudēta.
+ex.bad_trade.b5.2 = Bandinieku galotne ir zaudēta; saglabā figūras uz galdiņa.
+ex.bad_trade.b6 = Bandinieku galotne pēc {line} ir zaudēta.
+ex.bad_trade.b6.2 = Zaudēta bandinieku galotne: {line}.
+ex.bishop_pair.b5 = Šī maiņa tev maksā laidņu pāri.
+ex.bishop_pair.b5.2 = Ar šo maiņu tu atdod savu laidņu pāri; manējais paliek.
+ex.bishop_pair.b6 = Laidņu pāris zaudēts.
+ex.bishop_pair.b6.2 = Laidņu pāris atdots.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} ieņem opozīciju: karaļi stāv viens pretī otram ar vienu lauciņu starp tiem.
+ex.opposition.b3.2 = Karaļi! Ar gājienu {best} tu ieņemtu opozīciju.
+ex.opposition.b4 = {best} ieņem opozīciju: tas ir galvenais.
+ex.opposition.b4.2 = Izšķir opozīcija: {best}.
+ex.opposition.b5 = {best}, ieņemot opozīciju.
+ex.opposition.b5.2 = Opozīcija: {best}.
+ex.opposition.b6 = {best}, opozīcija.
+ex.opposition.b6.2 = {best}: opozīcija.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Tavs bandinieks varēja skriet uz {sq}. Caurejošie bandinieki grib iet uz priekšu!
+ex.push_passed.b1.2 = Virzi savu brīvo bandinieku! Tas grib sasniegt lauciņu {sq}.
+ex.push_passed.b1.3 = Tavs caurejošais bandinieks grib soļot uz {sq}. Virzi to!
+ex.push_passed.b2 = {best}: virzi caurejošo bandinieku uz {sq} pusi.
+ex.push_passed.b2.2 = Tavs caurejošais bandinieks ir stiprs. {best} to pavirza.
+ex.push_passed.b2.3 = Virzi to! {best} pietuvina bandinieku lauciņam {sq}.
+ex.push_passed.b3 = {best} pavirza caurejošo bandinieku.
+ex.push_passed.b3.2 = Caurejošie bandinieki jāvirza: {best}.
+ex.push_passed.b3.3 = Pareizais ceļš bija {best}: bandinieks skrien uz {sq}.
+ex.push_passed.b4 = {best}: izšķir caurejošais bandinieks.
+ex.push_passed.b4.2 = Uz priekšu: {best}.
+ex.push_passed.b5 = {best}, pavirzot caurejošo: {eval}.
+ex.push_passed.b5.2 = Caurejošais bandinieks: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, caurejošais.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Ved {your:refl_acc} uz priekšu! Galotnē karalis ir spēcīga figūra.
+ex.king_active.b1.2 = Tagad {your} var iesaistīties cīņā. Ved {your:pron_acc} uz centru.
+ex.king_active.b1.3 = Figūru ir maz, tāpēc {your:dat} jāiznāk un jāpalīdz.
+ex.king_active.b2 = Galotnē izmanto {your:refl_acc}: ved {your:pron_acc} uz centru.
+ex.king_active.b2.2 = Tagad aktivizē {your:refl_acc}! Ved {your:pron_acc} uz priekšu.
+ex.king_active.b3 = {best} aktivizē karali. Galotnē karalis cīnās.
+ex.king_active.b3.2 = {best}: tagad karaļa vieta ir centrā.
+ex.king_active.b4 = {best} centralizē karali.
+ex.king_active.b4.2 = Karalim jānāk uz priekšu: {best}.
+ex.king_active.b5 = {best}, aktivizējot karali: {line}.
+ex.king_active.b5.2 = Karaļa aktivitāte: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, karalis uz priekšu.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} saglabā labāku pozīciju.
+ex.positional.b4.2 = Šeit {best} bija spēcīgāks.
+ex.positional.b4.3 = Es būtu izvēlējies {best}.
+ex.positional.b5 = {best} bija spēcīgāks: {line}.
+ex.positional.b5.2 = {best} ar ideju {line}.
+ex.positional.b5.3 = Apsver gājienu {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} iznāca ļoti agri. Vispirms attīsti zirgus un laidņus.
+tip.early_queen.b1.2 = Uzmanīgi ar {your:refl_acc} tik agri: manas figūras var {your:pron_acc} dzenāt.
+tip.early_queen.b1.3 = Iet ar {your:refl_acc} ir jautri, bet vispirms attīsti vieglās figūras.
+tip.early_queen.b2 = Tik agri ejot ar {your:refl_acc}, tu ļauj man {your:pron_dat} uzbrukt un iegūt laiku.
+tip.early_queen.b2.2 = {your} jau ārā? Vispirms zirgi un laidņi!
+tip.early_queen.b3 = {your:gen} agrā iziešana ļauj man iegūt tempus, uzbrūkot {your:pron_dat}.
+tip.early_queen.b3.2 = Tik agri {your:acc} ir viegli dzenāt. Vispirms attīsti figūras.
+tip.queen_grab.b1 = {your} paņēma tālu bandinieku, un tagad {your:pron} var nonākt nepatikšanās.
+tip.queen_grab.b1.2 = Bandinieku ķeršana ar {your:acc} maksā laiku. Vispirms attīsti figūras!
+tip.queen_grab.b2 = {your} devās ķert bandiniekus malā. Tas maksā daudz laika.
+tip.queen_grab.b2.2 = Uzmanīgi, sūtot {your:refl_acc} pēc tāliem bandiniekiem.
+tip.queen_grab.b3 = Tik agra bandinieku ķeršana ar {your:acc} zaudē laiku.
+tip.queen_grab.b3.2 = {your} tagad ir tālu no mājām, un mana attīstība dos savu.
+tip.queen_grab.b4 = {your} paņem bandinieku, bet zaudē pārāk daudz laika.
+tip.queen_grab.b4.2 = Bandinieka ķeršana malā ar {your:acc} maksā tempu.
+tip.same_piece.b1 = Tu divreiz pārvietoji {your:refl_acc}. Mēģini katrā gājienā iesaistīt jaunu figūru.
+tip.same_piece.b1.2 = Atkal {your}? Attīsti arī citas savas figūras.
+tip.same_piece.b1.3 = Katrā gājienā mēģini attīstīt jaunu figūru, nevis atkal {your:refl_acc}.
+tip.same_piece.b2 = Divreiz iet ar {your:refl_acc} atklātnē nozīmē zaudēt laiku.
+tip.same_piece.b2.2 = {your} atkal gāja; tavas pārējās figūras vēl ir mājās.
+tip.same_piece.b3 = Divi gājieni ar {your:acc} kavē attīstību.
+tip.same_piece.b3.2 = Vēl viens gājiens ar {your:acc}; tava pārējā armija gaida.
+tip.castle.b1 = {your} joprojām ir centrā. Rokāde {your:pron_acc} pasargātu.
+tip.castle.b1.2 = Laiks veikt rokādi! Stūrī {your:dat} ir drošāk.
+tip.castle.b1.3 = Padomā par rokādi drīzumā. {your} ir atklātā vietā.
+tip.castle.b2 = {your} joprojām ir centrā. Drīz veic rokādi!
+tip.castle.b2.2 = Rokāde droši paslēptu {your:acc}.
+tip.castle.b3 = Centrs atveras, tāpēc {your:dat} laiks paslēpties ar rokādi.
+tip.castle.b3.2 = {your} joprojām ir centrā; rokādei bija pienācis laiks.
+tip.knight_rim.b1 = {your} malā daudz nedara. Zirgiem patīk centrs.
+tip.knight_rim.b1.2 = Zirgs malā ir slikts zirgs! Tur {your} kontrolē mazāk lauciņu.
+tip.knight_rim.b2 = {your} malā kontrolē maz lauciņu. Tiecies uz centru.
+tip.knight_rim.b2.2 = Zirgs malā ir slikts zirgs: {your:dat} vieta ir centrā.
+tip.knight_rim.b3 = {your} malā ir ārpus spēles.
+tip.knight_rim.b3.2 = Mala ir slikta vieta {your:dat}.
+tip.flank.b1 = Mēģini vispirms iet ar centra bandiniekiem. Malējie bandinieki daudz nepalīdz.
+tip.flank.b1.2 = Bandinieki malā nepalīdz tavām figūrām iziet. Izmanto centra bandiniekus.
+tip.flank.b2 = Malējo bandinieku gājieni neko neattīsta. Izmanto centra bandiniekus.
+tip.flank.b2.2 = Pārāk daudz gājienu ar malējiem bandiniekiem. Attīsti figūras!
+tip.flank.b3 = Flanga bandinieku gājieni atklātnē kavē attīstību.
+tip.flank.b3.2 = Malējie bandinieki var pagaidīt; attīsti figūras un cīnies par centru.
+tip.centre.b1 = Mēģini kontrolēt galdiņa centru, piemēram, lauciņu {sq}.
+tip.centre.b1.2 = Centrs ir svarīgs. Novieto bandinieku vai figūru pie lauciņa {sq}.
+tip.centre.b1.3 = Figūras centrā ir stipras. Tiecies uz tādiem lauciņiem kā {sq}.
+tip.centre.b2 = Cīnies par centru: tādi lauciņi kā {sq} ir svarīgi.
+tip.centre.b2.2 = Tu atdod man centru. Paskaties uz {sq}.
+tip.centre.b3 = Tu necīnies par centru; lauciņš {sq} ir mans.
+tip.centre.b3.2 = Cīnies par centru ap lauciņu {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Kad man ir palicis tikai karalis, piespied to pie malas un piesaki matu.
+tip.mate_technique.b1.2 = Padoms: spied manu karali uz malu. Turi arī savu karali tuvumā.
+tip.fifty.b1 = Uzmanīgi: pēc piecdesmit gājieniem bez ņemšanas vai bandinieka gājiena ir neizšķirts.
+tip.fifty.b1.2 = Laiks iet uz beigām: piecdesmit gājieni bez ņemšanām un bandinieku gājieniem nozīmē neizšķirtu.
+tip.repetition.b1 = Uzmanīgi! Ja tā pati pozīcija atkārtojas trešo reizi, ir neizšķirts.
+tip.repetition.b1.2 = Neatkārto gājienus: trešā atkārtošanās nozīmē neizšķirtu, bet tev ir uzvaroša pozīcija.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Oho, tu atdevi figūru, un tas strādā!
+praise.sacrifice.2 = Gudrs upuris! Ļoti labi nospēlēts.
+praise.brilliant.b3 = Izcili! Īsts upuris.
+praise.brilliant.b3.2 = Oho, {move} ir lielisks upuris!
+praise.brilliant.b4 = {move}! Izcils upuris.
+praise.brilliant.b4.2 = Izcili. To es negaidīju.
+praise.brilliant.b5 = {move}!! Izcili.
+praise.brilliant.b5.spoken = {move}. Izcili!
+praise.brilliant.b5.2 = Izcils upuris.
+praise.brilliant.b6 = {move}!! Lieliski.
+praise.brilliant.b6.spoken = {move}. Lieliski!
+praise.brilliant.b6.2 = Izcili.
+praise.great.b2 = Lielisks gājiens! Tu atradi veidu, kā pretoties.
+praise.great.b2.2 = Tas ir lielisks gājiens. Labi atrasts!
+praise.great.b3 = Lielisks gājiens! Tu atradi vienīgo labo ideju.
+praise.great.b3.2 = Lieliski, {move} visu apgriež otrādi.
+praise.great.b4 = {move}! Lielisks atradums.
+praise.great.b4.2 = Lielisks gājiens.
+praise.great.b5 = {move}! Labi atrasts.
+praise.great.b5.2 = Spēcīgi: {move}.
+praise.great.b6 = {move}! Lieliski.
+praise.great.b6.2 = Lielisks atradums.
+praise.only.b2 = Labi! Tas bija vienīgais labais gājiens.
+praise.only.b2.2 = Labi darīts, tu atradi vienīgo gājienu, kas der.
+praise.only.b3 = Vienīgais gājiens, un tu to atradi.
+praise.only.b3.2 = Tieši tā! Nekas cits te nederēja.
+praise.only.b4 = Vienīgais gājiens. Labi darīts.
+praise.only.b4.2 = Vienīgais gājiens, atrasts.
+praise.only.b5 = Vienīgais gājiens. Labi.
+praise.only.b5.2 = {move}, vienīgais gājiens.
+praise.only.b6 = Vienīgais gājiens.
+praise.only.b6.2 = Precīzi: vienīgais gājiens.
+praise.fork.b2 = Divkāršs uzbrukums! Labi darīts.
+praise.fork.b2.2 = Tu uzbrūc divām figūrām uzreiz! Lieliski.
+praise.fork.b2.3 = Jauki! Tā ir dakša.
+praise.fork.b3 = Skaista dakša.
+praise.fork.b3.2 = Laba dakša!
+praise.fork.b3.3 = Dakša. Labi nospēlēts.
+praise.capture.b1 = Labi darīts! Tu paņēmi {my:acc} par velti.
+praise.capture.b1.2 = Asa acs! {my} nebija aizsargāt{my:adj}.
+praise.capture.b1.3 = Jā! Tu ieguvi {my:acc}.
+praise.capture.b2 = Laba ņemšana! {my} bija neaizsargāt{my:adj}.
+praise.capture.b2.2 = Jauki, tu paņēmi {my:acc}.
+praise.capture.b2.3 = Labi pamanīts: {my} bija bez aizsardzības.
+praise.best.b1 = Labs gājiens!
+praise.best.b1.2 = Ļoti labi!
+praise.best.b1.3 = Labi nospēlēts!
+praise.best.b2 = Labs gājiens.
+praise.best.b2.2 = Ļoti jauki.
+praise.best.b2.3 = Labi nospēlēts.
+praise.best.b3 = Labs gājiens, un to nav viegli atrast.
+praise.best.b3.2 = Skaisti atrasts.
+praise.best.b3.3 = {move} šeit ir labākais gājiens. Labi.
+praise.trade.b1 = Labi! Kad tev ir pārsvars, figūru maiņa tev palīdz.
+praise.trade.b1.2 = Laba maiņa. Tev ir pārsvars, tāpēc mazāk figūru tev nāk par labu.
+praise.trade.b2 = Laba maiņa: tev ir pārsvars, tāpēc mainies ar figūrām.
+praise.trade.b2.2 = Apmainīt {my:acc}, kad tev ir pārsvars, ir gudri.
+praise.trade.b3 = Labi: ar pārsvaru mainies.
+praise.trade.b3.2 = Saprātīga maiņa.
+praise.excellent.b3 = Lielisks gājiens.
+praise.excellent.b3.2 = Tas ir spēcīgs gājiens.
+praise.excellent.b3.3 = Ļoti precīzi.
+praise.excellent.b4 = Precīzi.
+praise.excellent.b4.2 = Lieliski.
+praise.excellent.b4.3 = Labi, {move} ir precīzs.
+praise.castle.b1 = Labi! Tu veici rokādi. Tavam karalim tagad ir drošāk.
+praise.castle.b1.2 = Jauka rokāde! Tavs karalis ir paslēpts.
+praise.saved.b1 = Labi! Tu izglābi savu figūru.
+praise.saved.b1.2 = Labi darīts, tu aizvedi to drošībā.
+praise.book.b1 = Labi, tas ir labi zināms atklātnes gājiens.
+praise.book.b1.2 = Jauki, tā sāk arī spēcīgi spēlētāji.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Uzmanīgi! Es draudu ar matu uz {sq}.
+threat.mate.b1.2 = Uzmanies: {my} grib iet uz {sq}. Tas būtu mats.
+threat.mate.b1.3 = Paskaties uz {sq}. Ja es tur nokļūšu, būs mats!
+threat.mate.b2 = Uzmanīgi, es draudu ar matu.
+threat.mate.b2.2 = Uzmanies: uz {sq} ir mata draudi.
+threat.mate.b2.3 = Paskaties vērīgi: es draudu ar matu.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Skaties: {my} uzbrūk {your:dat}.
+threat.piece.b1.2 = Uzmanīgi! {your:dat} uzbrūk {my}.
+threat.piece.b1.3 = Uzmanies, {my} grib paņemt {your:acc}.
+threat.piece.b2 = Uzmanīgi ar {your:refl_acc}.
+threat.piece.b2.2 = {your} ir apdraudēt{your:adj}.
+threat.piece.b2.3 = Uzmani {your:refl_acc}.
+threat.punish.b1 = Mans pēdējais gājiens bija kļūda. Vai vari mani sodīt?
+threat.punish.b1.2 = Hmm, šķiet, es kļūdījos. Vai vari atrast manu kļūdu?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Šoreiz padomā par {your:refl_acc}.
+tb.hint.b1.2 = Uzmani {your:refl_acc}.
+tb.hint.king.b1 = Padomā par {your:refl_gen} drošību.
+tb.hint.king.b1.2 = Vispirms paskaties uz {your:refl_acc}. Vai {your:pron} ir drošībā?
+tb.hint.missed.b1 = Meklē figūras, ko vari paņemt par velti.
+tb.hint.missed.b1.2 = Paskaties vērīgi: vai ir kaut kas, ko vari paņemt?
+tb.hint.mate_missed.b1 = Paskaties uz manu karali. Vai vari tam pieteikt matu?
+tb.hint.mate_missed.b1.2 = Vispirms izmēģini šahus. Varbūt ir mats!
+tb.hint.general.b1 = Nesteidzies un paskaties uz visu galdiņu.
+tb.hint.general.b1.2 = Mēģini atrast drošāku gājienu.
+# The retry.
+tb.fixed.b1 = Daudz labāk!
+tb.fixed.b1.2 = Jā, tā ir labāk!
+tb.fixed.b1.3 = Labi, tā ir daudz labāk.
+tb.fixed = Tā ir labāk.
+tb.fixed.2 = Labāk.
+tb.fixed.3 = Labs labojums.
+tb.same = Atkal tas pats gājiens? Labi, paskatīsimies.
+tb.same.2 = Tev patīk šis gājiens. Izspēlēsim to.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Jā! Tieši par šo gājienu es domāju.
+tb.found.b1.2 = Tu to atradi! Šis gājiens ir labāks.
+tb.found = Tieši šo gājienu es biju iecerējis.
+tb.found.2 = Tieši tā, tas ir tas.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Diemžēl šajā partijā gājienu atsaukt vairs nevar.
+tb.none_left.2 = Šajā partijā tu vairs nevari atsaukt gājienus.
