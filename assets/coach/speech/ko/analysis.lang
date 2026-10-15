@@ -42,7 +42,7 @@ an.missed_chance.2 = {move}, 이 수로 기회가 날아가요.
 # What it allows ({reply} is the other side's answer).
 an.mate_allowed.one = 이제 {reply:nomate}, 이 수로 체크메이트예요.
 an.mate_allowed.one.2 = 상대에게 {reply:nomate}, 이 수를 허용해요. 그러면 체크메이트예요.
-an.mate_allowed = {reply:nomate}, 이 수부터 {m:move} 만에 강제 메이트를 허용해요.
+an.mate_allowed = {m:move} 만에 강제 메이트를 허용해요. {reply:nomate}, 이 수부터 시작해요.
 an.mate_allowed.2 = 이제 {m:move} 만에 강제 메이트가 있어요. 시작은 {reply:nomate}.
 an.fork = 이제 {reply}, 이 수로 {t1:and} {t2:bare}에 포크가 걸려요.
 an.fork.2 = {reply}, 이 수가 가능해져서 {t1:and} {t2:bare_top} 동시에 공격받아요.

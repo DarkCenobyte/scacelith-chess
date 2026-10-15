@@ -14,7 +14,9 @@
    "zh-Hant",
    "id",
    "nl",
-   "pt-BR"
+   "pt-BR",
+   "pt",
+   "ko"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -117,6 +119,21 @@
      "name": "Abertura do Peão do Rei",
      "def": "a Abertura do Peão do Rei",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura do Peão do Rei",
+     "def": "a Abertura do Peão do Rei",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "킹스 폰 오프닝",
+     "def": "킹스 폰 오프닝",
+     "forms": {
+      "obj": "킹스 폰 오프닝을",
+      "ins": "킹스 폰 오프닝으로",
+      "cop": "킹스 폰 오프닝이에요",
+      "was": "킹스 폰 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -193,6 +210,21 @@
      "name": "Abertura do Peão da Dama",
      "def": "a Abertura do Peão da Dama",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura do Peão da Dama",
+     "def": "a Abertura do Peão da Dama",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "퀸스 폰 오프닝",
+     "def": "퀸스 폰 오프닝",
+     "forms": {
+      "obj": "퀸스 폰 오프닝을",
+      "ins": "퀸스 폰 오프닝으로",
+      "cop": "퀸스 폰 오프닝이에요",
+      "was": "퀸스 폰 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -266,6 +298,21 @@
      "name": "Abertura do Cavalo do Rei",
      "def": "a Abertura do Cavalo do Rei",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura do Cavalo do Rei",
+     "def": "a Abertura do Cavalo do Rei",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "킹스 나이트 오프닝",
+     "def": "킹스 나이트 오프닝",
+     "forms": {
+      "obj": "킹스 나이트 오프닝을",
+      "ins": "킹스 나이트 오프닝으로",
+      "cop": "킹스 나이트 오프닝이에요",
+      "was": "킹스 나이트 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -342,6 +389,21 @@
      "name": "Defesa Siciliana",
      "def": "a Defesa Siciliana",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Siciliana",
+     "def": "a Defesa Siciliana",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "시실리안 디펜스",
+     "def": "시실리안 디펜스",
+     "forms": {
+      "obj": "시실리안 디펜스를",
+      "ins": "시실리안 디펜스로",
+      "cop": "시실리안 디펜스예요",
+      "was": "시실리안 디펜스였"
+     }
     }
    },
    "comment": {
@@ -415,6 +477,21 @@
      "name": "Defesa Francesa",
      "def": "a Defesa Francesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Francesa",
+     "def": "a Defesa Francesa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "프렌치 디펜스",
+     "def": "프렌치 디펜스",
+     "forms": {
+      "obj": "프렌치 디펜스를",
+      "ins": "프렌치 디펜스로",
+      "cop": "프렌치 디펜스예요",
+      "was": "프렌치 디펜스였"
+     }
     }
    },
    "comment": {
@@ -488,6 +565,21 @@
      "name": "Defesa Caro-Kann",
      "def": "a Defesa Caro-Kann",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Caro-Kann",
+     "def": "a Defesa Caro-Kann",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "카로칸 디펜스",
+     "def": "카로칸 디펜스",
+     "forms": {
+      "obj": "카로칸 디펜스를",
+      "ins": "카로칸 디펜스로",
+      "cop": "카로칸 디펜스예요",
+      "was": "카로칸 디펜스였"
+     }
     }
    },
    "comment": {
@@ -561,6 +653,21 @@
      "name": "Defesa Escandinava",
      "def": "a Defesa Escandinava",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Escandinava",
+     "def": "a Defesa Escandinava",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "스칸디나비안 디펜스",
+     "def": "스칸디나비안 디펜스",
+     "forms": {
+      "obj": "스칸디나비안 디펜스를",
+      "ins": "스칸디나비안 디펜스로",
+      "cop": "스칸디나비안 디펜스예요",
+      "was": "스칸디나비안 디펜스였"
+     }
     }
    },
    "comment": {
@@ -634,6 +741,21 @@
      "name": "Abertura Italiana",
      "def": "a Abertura Italiana",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Italiana",
+     "def": "a Abertura Italiana",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "이탈리안 게임",
+     "def": "이탈리안 게임",
+     "forms": {
+      "obj": "이탈리안 게임을",
+      "ins": "이탈리안 게임으로",
+      "cop": "이탈리안 게임이에요",
+      "was": "이탈리안 게임이었"
+     }
     }
    },
    "comment": {
@@ -707,6 +829,21 @@
      "name": "Abertura Espanhola",
      "def": "a Abertura Espanhola",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Espanhola",
+     "def": "a Abertura Espanhola",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "루이 로페즈",
+     "def": "루이 로페즈",
+     "forms": {
+      "obj": "루이 로페즈를",
+      "ins": "루이 로페즈로",
+      "cop": "루이 로페즈예요",
+      "was": "루이 로페즈였"
+     }
     }
    },
    "comment": {
@@ -780,6 +917,21 @@
      "name": "Abertura Escocesa",
      "def": "a Abertura Escocesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Escocesa",
+     "def": "a Abertura Escocesa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "스카치 게임",
+     "def": "스카치 게임",
+     "forms": {
+      "obj": "스카치 게임을",
+      "ins": "스카치 게임으로",
+      "cop": "스카치 게임이에요",
+      "was": "스카치 게임이었"
+     }
     }
    },
    "comment": {
@@ -853,6 +1005,21 @@
      "name": "Defesa Philidor",
      "def": "a Defesa Philidor",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Philidor",
+     "def": "a Defesa Philidor",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "필리도르 디펜스",
+     "def": "필리도르 디펜스",
+     "forms": {
+      "obj": "필리도르 디펜스를",
+      "ins": "필리도르 디펜스로",
+      "cop": "필리도르 디펜스예요",
+      "was": "필리도르 디펜스였"
+     }
     }
    },
    "comment": {
@@ -926,6 +1093,21 @@
      "name": "Defesa Petrov",
      "def": "a Defesa Petrov",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Petrov",
+     "def": "a Defesa Petrov",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "페트로프 디펜스",
+     "def": "페트로프 디펜스",
+     "forms": {
+      "obj": "페트로프 디펜스를",
+      "ins": "페트로프 디펜스로",
+      "cop": "페트로프 디펜스예요",
+      "was": "페트로프 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1000,6 +1182,21 @@
      "name": "Abertura dos Quatro Cavalos",
      "def": "a Abertura dos Quatro Cavalos",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura dos Quatro Cavalos",
+     "def": "a Abertura dos Quatro Cavalos",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "포 나이츠 게임",
+     "def": "포 나이츠 게임",
+     "forms": {
+      "obj": "포 나이츠 게임을",
+      "ins": "포 나이츠 게임으로",
+      "cop": "포 나이츠 게임이에요",
+      "was": "포 나이츠 게임이었"
+     }
     }
    },
    "comment": {
@@ -1074,6 +1271,21 @@
      "name": "Abertura Inglesa",
      "def": "a Abertura Inglesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Inglesa",
+     "def": "a Abertura Inglesa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "잉글리시 오프닝",
+     "def": "잉글리시 오프닝",
+     "forms": {
+      "obj": "잉글리시 오프닝을",
+      "ins": "잉글리시 오프닝으로",
+      "cop": "잉글리시 오프닝이에요",
+      "was": "잉글리시 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -1147,6 +1359,21 @@
      "name": "Abertura Zukertort",
      "def": "a Abertura Zukertort",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Zukertort",
+     "def": "a Abertura Zukertort",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "주커토트 오프닝",
+     "def": "주커토트 오프닝",
+     "forms": {
+      "obj": "주커토트 오프닝을",
+      "ins": "주커토트 오프닝으로",
+      "cop": "주커토트 오프닝이에요",
+      "was": "주커토트 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -1225,6 +1452,21 @@
      "name": "Gambito da Dama",
      "def": "o Gambito da Dama",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito da Dama",
+     "def": "o Gambito da Dama",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "퀸스 갬빗",
+     "def": "퀸스 갬빗",
+     "forms": {
+      "obj": "퀸스 갬빗을",
+      "ins": "퀸스 갬빗으로",
+      "cop": "퀸스 갬빗이에요",
+      "was": "퀸스 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -1298,6 +1540,21 @@
      "name": "Gambito da Dama Recusado",
      "def": "o Gambito da Dama Recusado",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito da Dama Recusado",
+     "def": "o Gambito da Dama Recusado",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "퀸스 갬빗 디클라인드",
+     "def": "퀸스 갬빗 디클라인드",
+     "forms": {
+      "obj": "퀸스 갬빗 디클라인드를",
+      "ins": "퀸스 갬빗 디클라인드로",
+      "cop": "퀸스 갬빗 디클라인드예요",
+      "was": "퀸스 갬빗 디클라인드였"
+     }
     }
    },
    "comment": {
@@ -1371,6 +1628,21 @@
      "name": "Gambito da Dama Aceito",
      "def": "o Gambito da Dama Aceito",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito da Dama Aceite",
+     "def": "o Gambito da Dama Aceite",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "퀸스 갬빗 억셉티드",
+     "def": "퀸스 갬빗 억셉티드",
+     "forms": {
+      "obj": "퀸스 갬빗 억셉티드를",
+      "ins": "퀸스 갬빗 억셉티드로",
+      "cop": "퀸스 갬빗 억셉티드예요",
+      "was": "퀸스 갬빗 억셉티드였"
+     }
     }
    },
    "comment": {
@@ -1445,6 +1717,21 @@
      "name": "Defesa Eslava",
      "def": "a Defesa Eslava",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Eslava",
+     "def": "a Defesa Eslava",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "슬라브 디펜스",
+     "def": "슬라브 디펜스",
+     "forms": {
+      "obj": "슬라브 디펜스를",
+      "ins": "슬라브 디펜스로",
+      "cop": "슬라브 디펜스예요",
+      "was": "슬라브 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1519,6 +1806,21 @@
      "name": "Defesa Semieslava",
      "def": "a Defesa Semieslava",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Semieslava",
+     "def": "a Defesa Semieslava",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "세미슬라브 디펜스",
+     "def": "세미슬라브 디펜스",
+     "forms": {
+      "obj": "세미슬라브 디펜스를",
+      "ins": "세미슬라브 디펜스로",
+      "cop": "세미슬라브 디펜스예요",
+      "was": "세미슬라브 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1593,6 +1895,21 @@
      "name": "Defesa Índia",
      "def": "a Defesa Índia",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Índia",
+     "def": "a Defesa Índia",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "인디언 디펜스",
+     "def": "인디언 디펜스",
+     "forms": {
+      "obj": "인디언 디펜스를",
+      "ins": "인디언 디펜스로",
+      "cop": "인디언 디펜스예요",
+      "was": "인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1666,6 +1983,21 @@
      "name": "Defesa Índia do Rei",
      "def": "a Defesa Índia do Rei",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Índia do Rei",
+     "def": "a Defesa Índia do Rei",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "킹스 인디언 디펜스",
+     "def": "킹스 인디언 디펜스",
+     "forms": {
+      "obj": "킹스 인디언 디펜스를",
+      "ins": "킹스 인디언 디펜스로",
+      "cop": "킹스 인디언 디펜스예요",
+      "was": "킹스 인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1744,6 +2076,21 @@
      "name": "Sistema Londres",
      "def": "o Sistema Londres",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Sistema de Londres",
+     "def": "o Sistema de Londres",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "런던 시스템",
+     "def": "런던 시스템",
+     "forms": {
+      "obj": "런던 시스템을",
+      "ins": "런던 시스템으로",
+      "cop": "런던 시스템이에요",
+      "was": "런던 시스템이었"
+     }
     }
    },
    "comment": {
@@ -1819,6 +2166,21 @@
      "name": "Defesa Moderna",
      "def": "a Defesa Moderna",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Moderna",
+     "def": "a Defesa Moderna",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "모던 디펜스",
+     "def": "모던 디펜스",
+     "forms": {
+      "obj": "모던 디펜스를",
+      "ins": "모던 디펜스로",
+      "cop": "모던 디펜스예요",
+      "was": "모던 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1894,6 +2256,21 @@
      "name": "Defesa Pirc",
      "def": "a Defesa Pirc",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Pirc",
+     "def": "a Defesa Pirc",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "피르츠 디펜스",
+     "def": "피르츠 디펜스",
+     "forms": {
+      "obj": "피르츠 디펜스를",
+      "ins": "피르츠 디펜스로",
+      "cop": "피르츠 디펜스예요",
+      "was": "피르츠 디펜스였"
+     }
     }
    },
    "comment": {
@@ -1968,6 +2345,21 @@
      "name": "Abertura Vienense",
      "def": "a Abertura Vienense",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Vienense",
+     "def": "a Abertura Vienense",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "비엔나 게임",
+     "def": "비엔나 게임",
+     "forms": {
+      "obj": "비엔나 게임을",
+      "ins": "비엔나 게임으로",
+      "cop": "비엔나 게임이에요",
+      "was": "비엔나 게임이었"
+     }
     }
    },
    "comment": {
@@ -2041,6 +2433,21 @@
      "name": "Abertura do Bispo",
      "def": "a Abertura do Bispo",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura do Bispo",
+     "def": "a Abertura do Bispo",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "비숍스 오프닝",
+     "def": "비숍스 오프닝",
+     "forms": {
+      "obj": "비숍스 오프닝을",
+      "ins": "비숍스 오프닝으로",
+      "cop": "비숍스 오프닝이에요",
+      "was": "비숍스 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -2114,6 +2521,21 @@
      "name": "Defesa Alekhine",
      "def": "a Defesa Alekhine",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Alekhine",
+     "def": "a Defesa Alekhine",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "알료힌 디펜스",
+     "def": "알료힌 디펜스",
+     "forms": {
+      "obj": "알료힌 디펜스를",
+      "ins": "알료힌 디펜스로",
+      "cop": "알료힌 디펜스예요",
+      "was": "알료힌 디펜스였"
+     }
     }
    },
    "comment": {
@@ -2187,6 +2609,21 @@
      "name": "Gambito do Rei",
      "def": "o Gambito do Rei",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito do Rei",
+     "def": "o Gambito do Rei",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "킹스 갬빗",
+     "def": "킹스 갬빗",
+     "forms": {
+      "obj": "킹스 갬빗을",
+      "ins": "킹스 갬빗으로",
+      "cop": "킹스 갬빗이에요",
+      "was": "킹스 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -2260,6 +2697,21 @@
      "name": "Gambito do Rei Aceito",
      "def": "o Gambito do Rei Aceito",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito do Rei Aceite",
+     "def": "o Gambito do Rei Aceite",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "킹스 갬빗 억셉티드",
+     "def": "킹스 갬빗 억셉티드",
+     "forms": {
+      "obj": "킹스 갬빗 억셉티드를",
+      "ins": "킹스 갬빗 억셉티드로",
+      "cop": "킹스 갬빗 억셉티드예요",
+      "was": "킹스 갬빗 억셉티드였"
+     }
     }
    },
    "comment": {
@@ -2333,6 +2785,21 @@
      "name": "Gambito do Rei Recusado",
      "def": "o Gambito do Rei Recusado",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito do Rei Recusado",
+     "def": "o Gambito do Rei Recusado",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "킹스 갬빗 디클라인드",
+     "def": "킹스 갬빗 디클라인드",
+     "forms": {
+      "obj": "킹스 갬빗 디클라인드를",
+      "ins": "킹스 갬빗 디클라인드로",
+      "cop": "킹스 갬빗 디클라인드예요",
+      "was": "킹스 갬빗 디클라인드였"
+     }
     }
    },
    "comment": {
@@ -2406,6 +2873,21 @@
      "name": "Defesa Nimzowitsch",
      "def": "a Defesa Nimzowitsch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Nimzowitsch",
+     "def": "a Defesa Nimzowitsch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "님조비치 디펜스",
+     "def": "님조비치 디펜스",
+     "forms": {
+      "obj": "님조비치 디펜스를",
+      "ins": "님조비치 디펜스로",
+      "cop": "님조비치 디펜스예요",
+      "was": "님조비치 디펜스였"
+     }
     }
    },
    "comment": {
@@ -2484,6 +2966,21 @@
      "name": "Defesa Owen",
      "def": "a Defesa Owen",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Owen",
+     "def": "a Defesa Owen",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "오언 디펜스",
+     "def": "오언 디펜스",
+     "forms": {
+      "obj": "오언 디펜스를",
+      "ins": "오언 디펜스로",
+      "cop": "오언 디펜스예요",
+      "was": "오언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -2558,6 +3055,21 @@
      "name": "Defesa Horwitz",
      "def": "a Defesa Horwitz",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Horwitz",
+     "def": "a Defesa Horwitz",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "호르비츠 디펜스",
+     "def": "호르비츠 디펜스",
+     "forms": {
+      "obj": "호르비츠 디펜스를",
+      "ins": "호르비츠 디펜스로",
+      "cop": "호르비츠 디펜스예요",
+      "was": "호르비츠 디펜스였"
+     }
     }
    },
    "comment": {
@@ -2631,6 +3143,21 @@
      "name": "Abertura Van't Kruijs",
      "def": "a Abertura Van't Kruijs",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Van't Kruijs",
+     "def": "a Abertura Van't Kruijs",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "판트 크라위스 오프닝",
+     "def": "판트 크라위스 오프닝",
+     "forms": {
+      "obj": "판트 크라위스 오프닝을",
+      "ins": "판트 크라위스 오프닝으로",
+      "cop": "판트 크라위스 오프닝이에요",
+      "was": "판트 크라위스 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -2705,6 +3232,21 @@
      "name": "Abertura do Centro",
      "def": "a Abertura do Centro",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura do Centro",
+     "def": "a Abertura do Centro",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "센터 게임",
+     "def": "센터 게임",
+     "forms": {
+      "obj": "센터 게임을",
+      "ins": "센터 게임으로",
+      "cop": "센터 게임이에요",
+      "was": "센터 게임이었"
+     }
     }
    },
    "comment": {
@@ -2779,6 +3321,21 @@
      "name": "Gambito Englund",
      "def": "o Gambito Englund",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Englund",
+     "def": "o Gambito Englund",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "엥글룬드 갬빗",
+     "def": "엥글룬드 갬빗",
+     "forms": {
+      "obj": "엥글룬드 갬빗을",
+      "ins": "엥글룬드 갬빗으로",
+      "cop": "엥글룬드 갬빗이에요",
+      "was": "엥글룬드 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -2852,6 +3409,21 @@
      "name": "Defesa Holandesa",
      "def": "a Defesa Holandesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Holandesa",
+     "def": "a Defesa Holandesa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "더치 디펜스",
+     "def": "더치 디펜스",
+     "forms": {
+      "obj": "더치 디펜스를",
+      "ins": "더치 디펜스로",
+      "cop": "더치 디펜스예요",
+      "was": "더치 디펜스였"
+     }
     }
    },
    "comment": {
@@ -2925,6 +3497,21 @@
      "name": "Defesa Nimzo-Índia",
      "def": "a Defesa Nimzo-Índia",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Nimzo-Índia",
+     "def": "a Defesa Nimzo-Índia",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "님조 인디언 디펜스",
+     "def": "님조 인디언 디펜스",
+     "forms": {
+      "obj": "님조 인디언 디펜스를",
+      "ins": "님조 인디언 디펜스로",
+      "cop": "님조 인디언 디펜스예요",
+      "was": "님조 인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -3000,6 +3587,21 @@
      "name": "Defesa Índia da Dama",
      "def": "a Defesa Índia da Dama",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Índia da Dama",
+     "def": "a Defesa Índia da Dama",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "퀸스 인디언 디펜스",
+     "def": "퀸스 인디언 디펜스",
+     "forms": {
+      "obj": "퀸스 인디언 디펜스를",
+      "ins": "퀸스 인디언 디펜스로",
+      "cop": "퀸스 인디언 디펜스예요",
+      "was": "퀸스 인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -3074,6 +3676,21 @@
      "name": "Defesa Grünfeld",
      "def": "a Defesa Grünfeld",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Grünfeld",
+     "def": "a Defesa Grünfeld",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "그륀펠트 디펜스",
+     "def": "그륀펠트 디펜스",
+     "forms": {
+      "obj": "그륀펠트 디펜스를",
+      "ins": "그륀펠트 디펜스로",
+      "cop": "그륀펠트 디펜스예요",
+      "was": "그륀펠트 디펜스였"
+     }
     }
    },
    "comment": {
@@ -3147,6 +3764,21 @@
      "name": "Abertura Catalã",
      "def": "a Abertura Catalã",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Catalã",
+     "def": "a Abertura Catalã",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "카탈란 오프닝",
+     "def": "카탈란 오프닝",
+     "forms": {
+      "obj": "카탈란 오프닝을",
+      "ins": "카탈란 오프닝으로",
+      "cop": "카탈란 오프닝이에요",
+      "was": "카탈란 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -3220,6 +3852,21 @@
      "name": "Defesa Benoni",
      "def": "a Defesa Benoni",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Benoni",
+     "def": "a Defesa Benoni",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "베노니 디펜스",
+     "def": "베노니 디펜스",
+     "forms": {
+      "obj": "베노니 디펜스를",
+      "ins": "베노니 디펜스로",
+      "cop": "베노니 디펜스예요",
+      "was": "베노니 디펜스였"
+     }
     }
    },
    "comment": {
@@ -3295,6 +3942,21 @@
      "name": "Gambito Benko",
      "def": "o Gambito Benko",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Benko",
+     "def": "o Gambito Benko",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "벤코 갬빗",
+     "def": "벤코 갬빗",
+     "forms": {
+      "obj": "벤코 갬빗을",
+      "ins": "벤코 갬빗으로",
+      "cop": "벤코 갬빗이에요",
+      "was": "벤코 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -3368,6 +4030,21 @@
      "name": "Abertura Réti",
      "def": "a Abertura Réti",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Réti",
+     "def": "a Abertura Réti",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "레티 오프닝",
+     "def": "레티 오프닝",
+     "forms": {
+      "obj": "레티 오프닝을",
+      "ins": "레티 오프닝으로",
+      "cop": "레티 오프닝이에요",
+      "was": "레티 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -3441,6 +4118,21 @@
      "name": "Ataque Índio do Rei",
      "def": "o Ataque Índio do Rei",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Índio do Rei",
+     "def": "o Ataque Índio do Rei",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "킹스 인디언 어택",
+     "def": "킹스 인디언 어택",
+     "forms": {
+      "obj": "킹스 인디언 어택을",
+      "ins": "킹스 인디언 어택으로",
+      "cop": "킹스 인디언 어택이에요",
+      "was": "킹스 인디언 어택이었"
+     }
     }
    },
    "comment": {
@@ -3518,6 +4210,21 @@
      "name": "Abertura Bird",
      "def": "a Abertura Bird",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Bird",
+     "def": "a Abertura Bird",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "버드 오프닝",
+     "def": "버드 오프닝",
+     "forms": {
+      "obj": "버드 오프닝을",
+      "ins": "버드 오프닝으로",
+      "cop": "버드 오프닝이에요",
+      "was": "버드 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -3591,6 +4298,21 @@
      "name": "Abertura Ponziani",
      "def": "a Abertura Ponziani",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Ponziani",
+     "def": "a Abertura Ponziani",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "폰치아니 오프닝",
+     "def": "폰치아니 오프닝",
+     "forms": {
+      "obj": "폰치아니 오프닝을",
+      "ins": "폰치아니 오프닝으로",
+      "cop": "폰치아니 오프닝이에요",
+      "was": "폰치아니 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -3664,6 +4386,21 @@
      "name": "Abertura dos Três Cavalos",
      "def": "a Abertura dos Três Cavalos",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura dos Três Cavalos",
+     "def": "a Abertura dos Três Cavalos",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "스리 나이츠 오프닝",
+     "def": "스리 나이츠 오프닝",
+     "forms": {
+      "obj": "스리 나이츠 오프닝을",
+      "ins": "스리 나이츠 오프닝으로",
+      "cop": "스리 나이츠 오프닝이에요",
+      "was": "스리 나이츠 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -3739,6 +4476,21 @@
      "name": "Gambito Dinamarquês",
      "def": "o Gambito Dinamarquês",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Dinamarquês",
+     "def": "o Gambito Dinamarquês",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "데니시 갬빗",
+     "def": "데니시 갬빗",
+     "forms": {
+      "obj": "데니시 갬빗을",
+      "ins": "데니시 갬빗으로",
+      "cop": "데니시 갬빗이에요",
+      "was": "데니시 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -3814,6 +4566,21 @@
      "name": "Gambito Blackmar-Diemer",
      "def": "o Gambito Blackmar-Diemer",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Blackmar-Diemer",
+     "def": "o Gambito Blackmar-Diemer",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "블랙마-디머 갬빗",
+     "def": "블랙마-디머 갬빗",
+     "forms": {
+      "obj": "블랙마-디머 갬빗을",
+      "ins": "블랙마-디머 갬빗으로",
+      "cop": "블랙마-디머 갬빗이에요",
+      "was": "블랙마-디머 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -3887,6 +4654,21 @@
      "name": "Ataque Trompowsky",
      "def": "o Ataque Trompowsky",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Trompowsky",
+     "def": "o Ataque Trompowsky",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "트롬포프스키 어택",
+     "def": "트롬포프스키 어택",
+     "forms": {
+      "obj": "트롬포프스키 어택을",
+      "ins": "트롬포프스키 어택으로",
+      "cop": "트롬포프스키 어택이에요",
+      "was": "트롬포프스키 어택이었"
+     }
     }
    },
    "comment": {
@@ -3961,6 +4743,21 @@
      "name": "Ataque Torre",
      "def": "o Ataque Torre",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Torre",
+     "def": "o Ataque Torre",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "토레 어택",
+     "def": "토레 어택",
+     "forms": {
+      "obj": "토레 어택을",
+      "ins": "토레 어택으로",
+      "cop": "토레 어택이에요",
+      "was": "토레 어택이었"
+     }
     }
    },
    "comment": {
@@ -4036,6 +4833,21 @@
      "name": "Sistema Colle",
      "def": "o Sistema Colle",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Sistema Colle",
+     "def": "o Sistema Colle",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "콜레 시스템",
+     "def": "콜레 시스템",
+     "forms": {
+      "obj": "콜레 시스템을",
+      "ins": "콜레 시스템으로",
+      "cop": "콜레 시스템이에요",
+      "was": "콜레 시스템이었"
+     }
     }
    },
    "comment": {
@@ -4109,6 +4921,21 @@
      "name": "Defesa Tarrasch",
      "def": "a Defesa Tarrasch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Tarrasch",
+     "def": "a Defesa Tarrasch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "타라슈 디펜스",
+     "def": "타라슈 디펜스",
+     "forms": {
+      "obj": "타라슈 디펜스를",
+      "ins": "타라슈 디펜스로",
+      "cop": "타라슈 디펜스예요",
+      "was": "타라슈 디펜스였"
+     }
     }
    },
    "comment": {
@@ -4183,6 +5010,21 @@
      "name": "Gambito Budapeste",
      "def": "o Gambito Budapeste",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito de Budapeste",
+     "def": "o Gambito de Budapeste",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "부다페스트 갬빗",
+     "def": "부다페스트 갬빗",
+     "forms": {
+      "obj": "부다페스트 갬빗을",
+      "ins": "부다페스트 갬빗으로",
+      "cop": "부다페스트 갬빗이에요",
+      "was": "부다페스트 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -4256,6 +5098,21 @@
      "name": "Defesa Bogo-Índia",
      "def": "a Defesa Bogo-Índia",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Bogo-Índia",
+     "def": "a Defesa Bogo-Índia",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "보고 인디언 디펜스",
+     "def": "보고 인디언 디펜스",
+     "forms": {
+      "obj": "보고 인디언 디펜스를",
+      "ins": "보고 인디언 디펜스로",
+      "cop": "보고 인디언 디펜스예요",
+      "was": "보고 인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -4329,6 +5186,21 @@
      "name": "Defesa Índia Antiga",
      "def": "a Defesa Índia Antiga",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Índia Antiga",
+     "def": "a Defesa Índia Antiga",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "올드 인디언 디펜스",
+     "def": "올드 인디언 디펜스",
+     "forms": {
+      "obj": "올드 인디언 디펜스를",
+      "ins": "올드 인디언 디펜스로",
+      "cop": "올드 인디언 디펜스예요",
+      "was": "올드 인디언 디펜스였"
+     }
     }
    },
    "comment": {
@@ -4407,6 +5279,21 @@
      "name": "Defesa Tchigorin",
      "def": "a Defesa Tchigorin",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Chigorin",
+     "def": "a Defesa Chigorin",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "치고린 디펜스",
+     "def": "치고린 디펜스",
+     "forms": {
+      "obj": "치고린 디펜스를",
+      "ins": "치고린 디펜스로",
+      "cop": "치고린 디펜스예요",
+      "was": "치고린 디펜스였"
+     }
     }
    },
    "comment": {
@@ -4480,6 +5367,21 @@
      "name": "Contragambito Albin",
      "def": "o Contragambito Albin",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Contragambito Albin",
+     "def": "o Contragambito Albin",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "알빈 카운터갬빗",
+     "def": "알빈 카운터갬빗",
+     "forms": {
+      "obj": "알빈 카운터갬빗을",
+      "ins": "알빈 카운터갬빗으로",
+      "cop": "알빈 카운터갬빗이에요",
+      "was": "알빈 카운터갬빗이었"
+     }
     }
    },
    "comment": {
@@ -4554,6 +5456,21 @@
      "name": "Gambito Letão",
      "def": "o Gambito Letão",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Letão",
+     "def": "o Gambito Letão",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "라트비안 갬빗",
+     "def": "라트비안 갬빗",
+     "forms": {
+      "obj": "라트비안 갬빗을",
+      "ins": "라트비안 갬빗으로",
+      "cop": "라트비안 갬빗이에요",
+      "was": "라트비안 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -4627,6 +5544,21 @@
      "name": "Gambito do Elefante",
      "def": "o Gambito do Elefante",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito do Elefante",
+     "def": "o Gambito do Elefante",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "엘리펀트 갬빗",
+     "def": "엘리펀트 갬빗",
+     "forms": {
+      "obj": "엘리펀트 갬빗을",
+      "ins": "엘리펀트 갬빗으로",
+      "cop": "엘리펀트 갬빗이에요",
+      "was": "엘리펀트 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -4705,6 +5637,21 @@
      "name": "Ataque Nimzo-Larsen",
      "def": "o Ataque Nimzo-Larsen",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Nimzowitsch-Larsen",
+     "def": "o Ataque Nimzowitsch-Larsen",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "님조-라르센 어택",
+     "def": "님조-라르센 어택",
+     "forms": {
+      "obj": "님조-라르센 어택을",
+      "ins": "님조-라르센 어택으로",
+      "cop": "님조-라르센 어택이에요",
+      "was": "님조-라르센 어택이었"
+     }
     }
    },
    "comment": {
@@ -4778,6 +5725,21 @@
      "name": "Abertura Polonesa",
      "def": "a Abertura Polonesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Polaca",
+     "def": "a Abertura Polaca",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "폴리시 오프닝",
+     "def": "폴리시 오프닝",
+     "forms": {
+      "obj": "폴리시 오프닝을",
+      "ins": "폴리시 오프닝으로",
+      "cop": "폴리시 오프닝이에요",
+      "was": "폴리시 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -4851,6 +5813,21 @@
      "name": "Abertura Grob",
      "def": "a Abertura Grob",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Grob",
+     "def": "a Abertura Grob",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "그로브 오프닝",
+     "def": "그로브 오프닝",
+     "forms": {
+      "obj": "그로브 오프닝을",
+      "ins": "그로브 오프닝으로",
+      "cop": "그로브 오프닝이에요",
+      "was": "그로브 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -4924,6 +5901,21 @@
      "name": "Abertura Húngara",
      "def": "a Abertura Húngara",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Húngara",
+     "def": "a Abertura Húngara",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "헝가리안 오프닝",
+     "def": "헝가리안 오프닝",
+     "forms": {
+      "obj": "헝가리안 오프닝을",
+      "ins": "헝가리안 오프닝으로",
+      "cop": "헝가리안 오프닝이에요",
+      "was": "헝가리안 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -4998,6 +5990,21 @@
      "name": "Abertura Mieses",
      "def": "a Abertura Mieses",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Mieses",
+     "def": "a Abertura Mieses",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "미제스 오프닝",
+     "def": "미제스 오프닝",
+     "forms": {
+      "obj": "미제스 오프닝을",
+      "ins": "미제스 오프닝으로",
+      "cop": "미제스 오프닝이에요",
+      "was": "미제스 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -5071,6 +6078,21 @@
      "name": "Abertura Saragoça",
      "def": "a Abertura Saragoça",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura de Saragoça",
+     "def": "a Abertura de Saragoça",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "사라고사 오프닝",
+     "def": "사라고사 오프닝",
+     "forms": {
+      "obj": "사라고사 오프닝을",
+      "ins": "사라고사 오프닝으로",
+      "cop": "사라고사 오프닝이에요",
+      "was": "사라고사 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -5144,6 +6166,21 @@
      "name": "Abertura Van Geet",
      "def": "a Abertura Van Geet",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Abertura Van Geet",
+     "def": "a Abertura Van Geet",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "판 헤이트 오프닝",
+     "def": "판 헤이트 오프닝",
+     "forms": {
+      "obj": "판 헤이트 오프닝을",
+      "ins": "판 헤이트 오프닝으로",
+      "cop": "판 헤이트 오프닝이에요",
+      "was": "판 헤이트 오프닝이었"
+     }
     }
    },
    "comment": {
@@ -5217,6 +6254,21 @@
      "name": "Sistema Rapport-Jobava",
      "def": "o Sistema Rapport-Jobava",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Sistema Rapport-Jobava",
+     "def": "o Sistema Rapport-Jobava",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "조바바 런던 시스템",
+     "def": "조바바 런던 시스템",
+     "forms": {
+      "obj": "조바바 런던 시스템을",
+      "ins": "조바바 런던 시스템으로",
+      "cop": "조바바 런던 시스템이에요",
+      "was": "조바바 런던 시스템이었"
+     }
     }
    },
    "comment": {
@@ -5290,6 +6342,21 @@
      "name": "Ataque Stonewall",
      "def": "o Ataque Stonewall",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Stonewall",
+     "def": "o Ataque Stonewall",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "스톤월 어택",
+     "def": "스톤월 어택",
+     "forms": {
+      "obj": "스톤월 어택을",
+      "ins": "스톤월 어택으로",
+      "cop": "스톤월 어택이에요",
+      "was": "스톤월 어택이었"
+     }
     }
    },
    "comment": {
@@ -5363,6 +6430,21 @@
      "name": "Ataque Richter-Veresov",
      "def": "o Ataque Richter-Veresov",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Richter-Veresov",
+     "def": "o Ataque Richter-Veresov",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "리히터-베레소프 어택",
+     "def": "리히터-베레소프 어택",
+     "forms": {
+      "obj": "리히터-베레소프 어택을",
+      "ins": "리히터-베레소프 어택으로",
+      "cop": "리히터-베레소프 어택이에요",
+      "was": "리히터-베레소프 어택이었"
+     }
     }
    },
    "comment": {
@@ -5436,6 +6518,21 @@
      "name": "Defesa São Jorge",
      "def": "a Defesa São Jorge",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa São Jorge",
+     "def": "a Defesa São Jorge",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "세인트 조지 디펜스",
+     "def": "세인트 조지 디펜스",
+     "forms": {
+      "obj": "세인트 조지 디펜스를",
+      "ins": "세인트 조지 디펜스로",
+      "cop": "세인트 조지 디펜스예요",
+      "was": "세인트 조지 디펜스였"
+     }
     }
    },
    "comment": {
@@ -5509,6 +6606,21 @@
      "name": "Defesa Borg",
      "def": "a Defesa Borg",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Borg",
+     "def": "a Defesa Borg",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "보르그 디펜스",
+     "def": "보르그 디펜스",
+     "forms": {
+      "obj": "보르그 디펜스를",
+      "ins": "보르그 디펜스로",
+      "cop": "보르그 디펜스예요",
+      "was": "보르그 디펜스였"
+     }
     }
    },
    "comment": {
@@ -5582,6 +6694,21 @@
      "name": "Defesa Hipopótamo",
      "def": "a Defesa Hipopótamo",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Hipopótamo",
+     "def": "a Defesa Hipopótamo",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "히포포타무스 디펜스",
+     "def": "히포포타무스 디펜스",
+     "forms": {
+      "obj": "히포포타무스 디펜스를",
+      "ins": "히포포타무스 디펜스로",
+      "cop": "히포포타무스 디펜스예요",
+      "was": "히포포타무스 디펜스였"
+     }
     }
    },
    "comment": {
@@ -5656,6 +6783,21 @@
      "name": "Defesa Inglesa",
      "def": "a Defesa Inglesa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Inglesa",
+     "def": "a Defesa Inglesa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "잉글리시 디펜스",
+     "def": "잉글리시 디펜스",
+     "forms": {
+      "obj": "잉글리시 디펜스를",
+      "ins": "잉글리시 디펜스로",
+      "cop": "잉글리시 디펜스예요",
+      "was": "잉글리시 디펜스였"
+     }
     }
    },
    "comment": {
@@ -5729,6 +6871,21 @@
      "name": "Defesa Pterodáctilo",
      "def": "a Defesa Pterodáctilo",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Pterodáctilo",
+     "def": "a Defesa Pterodáctilo",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "프테로닥틸 디펜스",
+     "def": "프테로닥틸 디펜스",
+     "forms": {
+      "obj": "프테로닥틸 디펜스를",
+      "ins": "프테로닥틸 디펜스로",
+      "cop": "프테로닥틸 디펜스예요",
+      "was": "프테로닥틸 디펜스였"
+     }
     }
    },
    "comment": {
@@ -5802,6 +6959,21 @@
      "name": "Ataque Bongcloud",
      "def": "o Ataque Bongcloud",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Bongcloud",
+     "def": "o Ataque Bongcloud",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "봉클라우드 어택",
+     "def": "봉클라우드 어택",
+     "forms": {
+      "obj": "봉클라우드 어택을",
+      "ins": "봉클라우드 어택으로",
+      "cop": "봉클라우드 어택이에요",
+      "was": "봉클라우드 어택이었"
+     }
     }
    },
    "comment": {
@@ -5847,6 +7019,21 @@
      "name": "Siciliana Aberta",
      "def": "a Siciliana Aberta",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Siciliana Aberta",
+     "def": "a Siciliana Aberta",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "오픈 시실리안",
+     "def": "오픈 시실리안",
+     "forms": {
+      "obj": "오픈 시실리안을",
+      "ins": "오픈 시실리안으로",
+      "cop": "오픈 시실리안이에요",
+      "was": "오픈 시실리안이었"
+     }
     }
    },
    "comment": {
@@ -5884,6 +7071,21 @@
      "name": "Siciliana Fechada",
      "def": "a Siciliana Fechada",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Siciliana Fechada",
+     "def": "a Siciliana Fechada",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클로즈드 시실리안",
+     "def": "클로즈드 시실리안",
+     "forms": {
+      "obj": "클로즈드 시실리안을",
+      "ins": "클로즈드 시실리안으로",
+      "cop": "클로즈드 시실리안이에요",
+      "was": "클로즈드 시실리안이었"
+     }
     }
    },
    "comment": {
@@ -5921,6 +7123,21 @@
      "name": "Variante Alapin",
      "def": "a Variante Alapin",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Alapin",
+     "def": "a Variante Alapin",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "알라핀 바리에이션",
+     "def": "알라핀 바리에이션",
+     "forms": {
+      "obj": "알라핀 바리에이션을",
+      "ins": "알라핀 바리에이션으로",
+      "cop": "알라핀 바리에이션이에요",
+      "was": "알라핀 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -5960,6 +7177,21 @@
      "name": "Gambito Smith-Morra",
      "def": "o Gambito Smith-Morra",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Smith-Morra",
+     "def": "o Gambito Smith-Morra",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "스미스-모라 갬빗",
+     "def": "스미스-모라 갬빗",
+     "forms": {
+      "obj": "스미스-모라 갬빗을",
+      "ins": "스미스-모라 갬빗으로",
+      "cop": "스미스-모라 갬빗이에요",
+      "was": "스미스-모라 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -5998,6 +7230,21 @@
      "name": "Ataque Grand Prix",
      "def": "o Ataque Grand Prix",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Grand Prix",
+     "def": "o Ataque Grand Prix",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "그랑프리 어택",
+     "def": "그랑프리 어택",
+     "forms": {
+      "obj": "그랑프리 어택을",
+      "ins": "그랑프리 어택으로",
+      "cop": "그랑프리 어택이에요",
+      "was": "그랑프리 어택이었"
+     }
     }
    },
    "comment": {
@@ -6035,6 +7282,21 @@
      "name": "Variante Rossolimo",
      "def": "a Variante Rossolimo",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Rossolimo",
+     "def": "a Variante Rossolimo",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "로솔리모 바리에이션",
+     "def": "로솔리모 바리에이션",
+     "forms": {
+      "obj": "로솔리모 바리에이션을",
+      "ins": "로솔리모 바리에이션으로",
+      "cop": "로솔리모 바리에이션이에요",
+      "was": "로솔리모 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6072,6 +7334,21 @@
      "name": "Variante Najdorf",
      "def": "a Variante Najdorf",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Najdorf",
+     "def": "a Variante Najdorf",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "나이도르프 바리에이션",
+     "def": "나이도르프 바리에이션",
+     "forms": {
+      "obj": "나이도르프 바리에이션을",
+      "ins": "나이도르프 바리에이션으로",
+      "cop": "나이도르프 바리에이션이에요",
+      "was": "나이도르프 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6109,6 +7386,21 @@
      "name": "Variante do Dragão",
      "def": "a Variante do Dragão",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante do Dragão",
+     "def": "a Variante do Dragão",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "드래곤 바리에이션",
+     "def": "드래곤 바리에이션",
+     "forms": {
+      "obj": "드래곤 바리에이션을",
+      "ins": "드래곤 바리에이션으로",
+      "cop": "드래곤 바리에이션이에요",
+      "was": "드래곤 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6148,6 +7440,21 @@
      "name": "Dragão Acelerado",
      "def": "o Dragão Acelerado",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Dragão Acelerado",
+     "def": "o Dragão Acelerado",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "액셀러레이티드 드래곤",
+     "def": "액셀러레이티드 드래곤",
+     "forms": {
+      "obj": "액셀러레이티드 드래곤을",
+      "ins": "액셀러레이티드 드래곤으로",
+      "cop": "액셀러레이티드 드래곤이에요",
+      "was": "액셀러레이티드 드래곤이었"
+     }
     }
    },
    "comment": {
@@ -6185,6 +7492,21 @@
      "name": "Variante Scheveningen",
      "def": "a Variante Scheveningen",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Scheveningen",
+     "def": "a Variante Scheveningen",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "셰베닝겐 바리에이션",
+     "def": "셰베닝겐 바리에이션",
+     "forms": {
+      "obj": "셰베닝겐 바리에이션을",
+      "ins": "셰베닝겐 바리에이션으로",
+      "cop": "셰베닝겐 바리에이션이에요",
+      "was": "셰베닝겐 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6222,6 +7544,21 @@
      "name": "Variante Sveshnikov",
      "def": "a Variante Sveshnikov",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Sveshnikov",
+     "def": "a Variante Sveshnikov",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "스베시니코프 바리에이션",
+     "def": "스베시니코프 바리에이션",
+     "forms": {
+      "obj": "스베시니코프 바리에이션을",
+      "ins": "스베시니코프 바리에이션으로",
+      "cop": "스베시니코프 바리에이션이에요",
+      "was": "스베시니코프 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6260,6 +7597,21 @@
      "name": "Variante Taimanov",
      "def": "a Variante Taimanov",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Taimanov",
+     "def": "a Variante Taimanov",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "타이마노프 바리에이션",
+     "def": "타이마노프 바리에이션",
+     "forms": {
+      "obj": "타이마노프 바리에이션을",
+      "ins": "타이마노프 바리에이션으로",
+      "cop": "타이마노프 바리에이션이에요",
+      "was": "타이마노프 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6297,6 +7649,21 @@
      "name": "Variante Kan",
      "def": "a Variante Kan",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Kan",
+     "def": "a Variante Kan",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "칸 바리에이션",
+     "def": "칸 바리에이션",
+     "forms": {
+      "obj": "칸 바리에이션을",
+      "ins": "칸 바리에이션으로",
+      "cop": "칸 바리에이션이에요",
+      "was": "칸 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6334,6 +7701,21 @@
      "name": "Variante Clássica",
      "def": "a Variante Clássica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클래시컬 바리에이션",
+     "def": "클래시컬 바리에이션",
+     "forms": {
+      "obj": "클래시컬 바리에이션을",
+      "ins": "클래시컬 바리에이션으로",
+      "cop": "클래시컬 바리에이션이에요",
+      "was": "클래시컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6371,6 +7753,21 @@
      "name": "Variante do Avanço",
      "def": "a Variante do Avanço",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante do Avanço",
+     "def": "a Variante do Avanço",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "어드밴스 바리에이션",
+     "def": "어드밴스 바리에이션",
+     "forms": {
+      "obj": "어드밴스 바리에이션을",
+      "ins": "어드밴스 바리에이션으로",
+      "cop": "어드밴스 바리에이션이에요",
+      "was": "어드밴스 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6408,6 +7805,21 @@
      "name": "Variante das Trocas",
      "def": "a Variante das Trocas",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "익스체인지 바리에이션",
+     "def": "익스체인지 바리에이션",
+     "forms": {
+      "obj": "익스체인지 바리에이션을",
+      "ins": "익스체인지 바리에이션으로",
+      "cop": "익스체인지 바리에이션이에요",
+      "was": "익스체인지 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6445,6 +7857,21 @@
      "name": "Variante Tarrasch",
      "def": "a Variante Tarrasch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Tarrasch",
+     "def": "a Variante Tarrasch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "타라슈 바리에이션",
+     "def": "타라슈 바리에이션",
+     "forms": {
+      "obj": "타라슈 바리에이션을",
+      "ins": "타라슈 바리에이션으로",
+      "cop": "타라슈 바리에이션이에요",
+      "was": "타라슈 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6482,6 +7909,21 @@
      "name": "Variante Winawer",
      "def": "a Variante Winawer",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Winawer",
+     "def": "a Variante Winawer",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "위나워 바리에이션",
+     "def": "위나워 바리에이션",
+     "forms": {
+      "obj": "위나워 바리에이션을",
+      "ins": "위나워 바리에이션으로",
+      "cop": "위나워 바리에이션이에요",
+      "was": "위나워 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6519,6 +7961,21 @@
      "name": "Variante Clássica",
      "def": "a Variante Clássica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클래시컬 바리에이션",
+     "def": "클래시컬 바리에이션",
+     "forms": {
+      "obj": "클래시컬 바리에이션을",
+      "ins": "클래시컬 바리에이션으로",
+      "cop": "클래시컬 바리에이션이에요",
+      "was": "클래시컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6556,6 +8013,21 @@
      "name": "Variante Rubinstein",
      "def": "a Variante Rubinstein",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Rubinstein",
+     "def": "a Variante Rubinstein",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "루빈스타인 바리에이션",
+     "def": "루빈스타인 바리에이션",
+     "forms": {
+      "obj": "루빈스타인 바리에이션을",
+      "ins": "루빈스타인 바리에이션으로",
+      "cop": "루빈스타인 바리에이션이에요",
+      "was": "루빈스타인 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6593,6 +8065,21 @@
      "name": "Variante do Avanço",
      "def": "a Variante do Avanço",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante do Avanço",
+     "def": "a Variante do Avanço",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "어드밴스 바리에이션",
+     "def": "어드밴스 바리에이션",
+     "forms": {
+      "obj": "어드밴스 바리에이션을",
+      "ins": "어드밴스 바리에이션으로",
+      "cop": "어드밴스 바리에이션이에요",
+      "was": "어드밴스 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6630,6 +8117,21 @@
      "name": "Variante das Trocas",
      "def": "a Variante das Trocas",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "익스체인지 바리에이션",
+     "def": "익스체인지 바리에이션",
+     "forms": {
+      "obj": "익스체인지 바리에이션을",
+      "ins": "익스체인지 바리에이션으로",
+      "cop": "익스체인지 바리에이션이에요",
+      "was": "익스체인지 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6669,6 +8171,21 @@
      "name": "Ataque Panov",
      "def": "o Ataque Panov",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Panov",
+     "def": "o Ataque Panov",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "파노프 어택",
+     "def": "파노프 어택",
+     "forms": {
+      "obj": "파노프 어택을",
+      "ins": "파노프 어택으로",
+      "cop": "파노프 어택이에요",
+      "was": "파노프 어택이었"
+     }
     }
    },
    "comment": {
@@ -6706,6 +8223,21 @@
      "name": "Variante Clássica",
      "def": "a Variante Clássica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클래시컬 바리에이션",
+     "def": "클래시컬 바리에이션",
+     "forms": {
+      "obj": "클래시컬 바리에이션을",
+      "ins": "클래시컬 바리에이션으로",
+      "cop": "클래시컬 바리에이션이에요",
+      "was": "클래시컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -6743,6 +8275,21 @@
      "name": "Ataque dos Dois Cavalos",
      "def": "o Ataque dos Dois Cavalos",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque dos Dois Cavalos",
+     "def": "o Ataque dos Dois Cavalos",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "투 나이츠 어택",
+     "def": "투 나이츠 어택",
+     "forms": {
+      "obj": "투 나이츠 어택을",
+      "ins": "투 나이츠 어택으로",
+      "cop": "투 나이츠 어택이에요",
+      "was": "투 나이츠 어택이었"
+     }
     }
    },
    "comment": {
@@ -6780,6 +8327,21 @@
      "name": "Defesa dos Dois Cavalos",
      "def": "a Defesa dos Dois Cavalos",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa dos Dois Cavalos",
+     "def": "a Defesa dos Dois Cavalos",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "투 나이츠 디펜스",
+     "def": "투 나이츠 디펜스",
+     "forms": {
+      "obj": "투 나이츠 디펜스를",
+      "ins": "투 나이츠 디펜스로",
+      "cop": "투 나이츠 디펜스예요",
+      "was": "투 나이츠 디펜스였"
+     }
     }
    },
    "comment": {
@@ -6819,6 +8381,21 @@
      "name": "Giuoco Piano",
      "def": "o Giuoco Piano",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Giuoco Piano",
+     "def": "o Giuoco Piano",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "주오코 피아노",
+     "def": "주오코 피아노",
+     "forms": {
+      "obj": "주오코 피아노를",
+      "ins": "주오코 피아노로",
+      "cop": "주오코 피아노예요",
+      "was": "주오코 피아노였"
+     }
     }
    },
    "comment": {
@@ -6862,6 +8439,21 @@
      "name": "Giuoco Pianissimo",
      "def": "o Giuoco Pianissimo",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Giuoco Pianissimo",
+     "def": "o Giuoco Pianissimo",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "주오코 피아니시모",
+     "def": "주오코 피아니시모",
+     "forms": {
+      "obj": "주오코 피아니시모를",
+      "ins": "주오코 피아니시모로",
+      "cop": "주오코 피아니시모예요",
+      "was": "주오코 피아니시모였"
+     }
     }
    },
    "comment": {
@@ -6903,6 +8495,21 @@
      "name": "Gambito Evans",
      "def": "o Gambito Evans",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Evans",
+     "def": "o Gambito Evans",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "에반스 갬빗",
+     "def": "에반스 갬빗",
+     "forms": {
+      "obj": "에반스 갬빗을",
+      "ins": "에반스 갬빗으로",
+      "cop": "에반스 갬빗이에요",
+      "was": "에반스 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -6940,6 +8547,21 @@
      "name": "Ataque Fegatello",
      "def": "o Ataque Fegatello",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Fegatello",
+     "def": "o Ataque Fegatello",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "프라이드 리버 어택",
+     "def": "프라이드 리버 어택",
+     "forms": {
+      "obj": "프라이드 리버 어택을",
+      "ins": "프라이드 리버 어택으로",
+      "cop": "프라이드 리버 어택이에요",
+      "was": "프라이드 리버 어택이었"
+     }
     }
    },
    "comment": {
@@ -6983,6 +8605,21 @@
      "name": "Contra-ataque Traxler",
      "def": "o Contra-ataque Traxler",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Contra-ataque Traxler",
+     "def": "o Contra-ataque Traxler",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "트랙슬러 카운터어택",
+     "def": "트랙슬러 카운터어택",
+     "forms": {
+      "obj": "트랙슬러 카운터어택을",
+      "ins": "트랙슬러 카운터어택으로",
+      "cop": "트랙슬러 카운터어택이에요",
+      "was": "트랙슬러 카운터어택이었"
+     }
     }
    },
    "comment": {
@@ -7020,6 +8657,21 @@
      "name": "Defesa Berlim",
      "def": "a Defesa Berlim",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Berlinense",
+     "def": "a Defesa Berlinense",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "베를린 디펜스",
+     "def": "베를린 디펜스",
+     "forms": {
+      "obj": "베를린 디펜스를",
+      "ins": "베를린 디펜스로",
+      "cop": "베를린 디펜스예요",
+      "was": "베를린 디펜스였"
+     }
     }
    },
    "comment": {
@@ -7057,6 +8709,21 @@
      "name": "Defesa Morphy",
      "def": "a Defesa Morphy",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Morphy",
+     "def": "a Defesa Morphy",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "모피 디펜스",
+     "def": "모피 디펜스",
+     "forms": {
+      "obj": "모피 디펜스를",
+      "ins": "모피 디펜스로",
+      "cop": "모피 디펜스예요",
+      "was": "모피 디펜스였"
+     }
     }
    },
    "comment": {
@@ -7094,6 +8761,21 @@
      "name": "Espanhola Fechada",
      "def": "a Espanhola Fechada",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Espanhola Fechada",
+     "def": "a Espanhola Fechada",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클로즈드 루이 로페즈",
+     "def": "클로즈드 루이 로페즈",
+     "forms": {
+      "obj": "클로즈드 루이 로페즈를",
+      "ins": "클로즈드 루이 로페즈로",
+      "cop": "클로즈드 루이 로페즈예요",
+      "was": "클로즈드 루이 로페즈였"
+     }
     }
    },
    "comment": {
@@ -7131,6 +8813,21 @@
      "name": "Ataque Marshall",
      "def": "o Ataque Marshall",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Marshall",
+     "def": "o Ataque Marshall",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "마셜 어택",
+     "def": "마셜 어택",
+     "forms": {
+      "obj": "마셜 어택을",
+      "ins": "마셜 어택으로",
+      "cop": "마셜 어택이에요",
+      "was": "마셜 어택이었"
+     }
     }
    },
    "comment": {
@@ -7168,6 +8865,21 @@
      "name": "Variante das Trocas",
      "def": "a Variante das Trocas",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "익스체인지 바리에이션",
+     "def": "익스체인지 바리에이션",
+     "forms": {
+      "obj": "익스체인지 바리에이션을",
+      "ins": "익스체인지 바리에이션으로",
+      "cop": "익스체인지 바리에이션이에요",
+      "was": "익스체인지 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7205,6 +8917,21 @@
      "name": "Variante Aberta",
      "def": "a Variante Aberta",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Aberta",
+     "def": "a Variante Aberta",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "오픈 바리에이션",
+     "def": "오픈 바리에이션",
+     "forms": {
+      "obj": "오픈 바리에이션을",
+      "ins": "오픈 바리에이션으로",
+      "cop": "오픈 바리에이션이에요",
+      "was": "오픈 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7242,6 +8969,21 @@
      "name": "Defesa Schliemann",
      "def": "a Defesa Schliemann",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Schliemann",
+     "def": "a Defesa Schliemann",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "슐리만 디펜스",
+     "def": "슐리만 디펜스",
+     "forms": {
+      "obj": "슐리만 디펜스를",
+      "ins": "슐리만 디펜스로",
+      "cop": "슐리만 디펜스예요",
+      "was": "슐리만 디펜스였"
+     }
     }
    },
    "comment": {
@@ -7279,6 +9021,21 @@
      "name": "Gambito Escocês",
      "def": "o Gambito Escocês",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Escocês",
+     "def": "o Gambito Escocês",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "스카치 갬빗",
+     "def": "스카치 갬빗",
+     "forms": {
+      "obj": "스카치 갬빗을",
+      "ins": "스카치 갬빗으로",
+      "cop": "스카치 갬빗이에요",
+      "was": "스카치 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -7317,6 +9074,21 @@
      "name": "Gambito Vienense",
      "def": "o Gambito Vienense",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Vienense",
+     "def": "o Gambito Vienense",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "비엔나 갬빗",
+     "def": "비엔나 갬빗",
+     "forms": {
+      "obj": "비엔나 갬빗을",
+      "ins": "비엔나 갬빗으로",
+      "cop": "비엔나 갬빗이에요",
+      "was": "비엔나 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -7355,6 +9127,21 @@
      "name": "Gambito Stafford",
      "def": "o Gambito Stafford",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Stafford",
+     "def": "o Gambito Stafford",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "스태퍼드 갬빗",
+     "def": "스태퍼드 갬빗",
+     "forms": {
+      "obj": "스태퍼드 갬빗을",
+      "ins": "스태퍼드 갬빗으로",
+      "cop": "스태퍼드 갬빗이에요",
+      "was": "스태퍼드 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -7394,6 +9181,21 @@
      "name": "Ataque Parham",
      "def": "o Ataque Parham",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Parham",
+     "def": "o Ataque Parham",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "웨이워드 퀸 어택",
+     "def": "웨이워드 퀸 어택",
+     "forms": {
+      "obj": "웨이워드 퀸 어택을",
+      "ins": "웨이워드 퀸 어택으로",
+      "cop": "웨이워드 퀸 어택이에요",
+      "was": "웨이워드 퀸 어택이었"
+     }
     }
    },
    "comment": {
@@ -7440,6 +9242,21 @@
      "name": "Gambito Halloween",
      "def": "o Gambito Halloween",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Gambito Halloween",
+     "def": "o Gambito Halloween",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "핼러윈 갬빗",
+     "def": "핼러윈 갬빗",
+     "forms": {
+      "obj": "핼러윈 갬빗을",
+      "ins": "핼러윈 갬빗으로",
+      "cop": "핼러윈 갬빗이에요",
+      "was": "핼러윈 갬빗이었"
+     }
     }
    },
    "comment": {
@@ -7477,6 +9294,21 @@
      "name": "Defesa Ortodoxa",
      "def": "a Defesa Ortodoxa",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Ortodoxa",
+     "def": "a Defesa Ortodoxa",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "오소독스 디펜스",
+     "def": "오소독스 디펜스",
+     "forms": {
+      "obj": "오소독스 디펜스를",
+      "ins": "오소독스 디펜스로",
+      "cop": "오소독스 디펜스예요",
+      "was": "오소독스 디펜스였"
+     }
     }
    },
    "comment": {
@@ -7514,6 +9346,21 @@
      "name": "Variante das Trocas",
      "def": "a Variante das Trocas",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "익스체인지 바리에이션",
+     "def": "익스체인지 바리에이션",
+     "forms": {
+      "obj": "익스체인지 바리에이션을",
+      "ins": "익스체인지 바리에이션으로",
+      "cop": "익스체인지 바리에이션이에요",
+      "was": "익스체인지 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7551,6 +9398,21 @@
      "name": "Defesa Semi-Tarrasch",
      "def": "a Defesa Semi-Tarrasch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Defesa Semi-Tarrasch",
+     "def": "a Defesa Semi-Tarrasch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "세미타라슈 디펜스",
+     "def": "세미타라슈 디펜스",
+     "forms": {
+      "obj": "세미타라슈 디펜스를",
+      "ins": "세미타라슈 디펜스로",
+      "cop": "세미타라슈 디펜스예요",
+      "was": "세미타라슈 디펜스였"
+     }
     }
    },
    "comment": {
@@ -7592,6 +9454,21 @@
      "name": "Variante Meran",
      "def": "a Variante Meran",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Merano",
+     "def": "a Variante Merano",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "메란 바리에이션",
+     "def": "메란 바리에이션",
+     "forms": {
+      "obj": "메란 바리에이션을",
+      "ins": "메란 바리에이션으로",
+      "cop": "메란 바리에이션이에요",
+      "was": "메란 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7629,6 +9506,21 @@
      "name": "Variante Clássica",
      "def": "a Variante Clássica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클래시컬 바리에이션",
+     "def": "클래시컬 바리에이션",
+     "forms": {
+      "obj": "클래시컬 바리에이션을",
+      "ins": "클래시컬 바리에이션으로",
+      "cop": "클래시컬 바리에이션이에요",
+      "was": "클래시컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7667,6 +9559,21 @@
      "name": "Variante Sämisch",
      "def": "a Variante Sämisch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Sämisch",
+     "def": "a Variante Sämisch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "제미슈 바리에이션",
+     "def": "제미슈 바리에이션",
+     "forms": {
+      "obj": "제미슈 바리에이션을",
+      "ins": "제미슈 바리에이션으로",
+      "cop": "제미슈 바리에이션이에요",
+      "was": "제미슈 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7704,6 +9611,21 @@
      "name": "Ataque dos Quatro Peões",
      "def": "o Ataque dos Quatro Peões",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque dos Quatro Peões",
+     "def": "o Ataque dos Quatro Peões",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "포 폰스 어택",
+     "def": "포 폰스 어택",
+     "forms": {
+      "obj": "포 폰스 어택을",
+      "ins": "포 폰스 어택으로",
+      "cop": "포 폰스 어택이에요",
+      "was": "포 폰스 어택이었"
+     }
     }
    },
    "comment": {
@@ -7741,6 +9663,21 @@
      "name": "Variante do Fianqueto",
      "def": "a Variante do Fianqueto",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante do Fianqueto",
+     "def": "a Variante do Fianqueto",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "피앙케토 바리에이션",
+     "def": "피앙케토 바리에이션",
+     "forms": {
+      "obj": "피앙케토 바리에이션을",
+      "ins": "피앙케토 바리에이션으로",
+      "cop": "피앙케토 바리에이션이에요",
+      "was": "피앙케토 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7779,6 +9716,21 @@
      "name": "Variante Rubinstein",
      "def": "a Variante Rubinstein",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Rubinstein",
+     "def": "a Variante Rubinstein",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "루빈스타인 바리에이션",
+     "def": "루빈스타인 바리에이션",
+     "forms": {
+      "obj": "루빈스타인 바리에이션을",
+      "ins": "루빈스타인 바리에이션으로",
+      "cop": "루빈스타인 바리에이션이에요",
+      "was": "루빈스타인 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7816,6 +9768,21 @@
      "name": "Variante Clássica",
      "def": "a Variante Clássica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클래시컬 바리에이션",
+     "def": "클래시컬 바리에이션",
+     "forms": {
+      "obj": "클래시컬 바리에이션을",
+      "ins": "클래시컬 바리에이션으로",
+      "cop": "클래시컬 바리에이션이에요",
+      "was": "클래시컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7853,6 +9820,21 @@
      "name": "Variante Sämisch",
      "def": "a Variante Sämisch",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Sämisch",
+     "def": "a Variante Sämisch",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "제미슈 바리에이션",
+     "def": "제미슈 바리에이션",
+     "forms": {
+      "obj": "제미슈 바리에이션을",
+      "ins": "제미슈 바리에이션으로",
+      "cop": "제미슈 바리에이션이에요",
+      "was": "제미슈 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7890,6 +9872,21 @@
      "name": "Variante das Trocas",
      "def": "a Variante das Trocas",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "익스체인지 바리에이션",
+     "def": "익스체인지 바리에이션",
+     "forms": {
+      "obj": "익스체인지 바리에이션을",
+      "ins": "익스체인지 바리에이션으로",
+      "cop": "익스체인지 바리에이션이에요",
+      "was": "익스체인지 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7928,6 +9925,21 @@
      "name": "Variante Leningrado",
      "def": "a Variante Leningrado",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Leninegrado",
+     "def": "a Variante Leninegrado",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "레닌그라드 바리에이션",
+     "def": "레닌그라드 바리에이션",
+     "forms": {
+      "obj": "레닌그라드 바리에이션을",
+      "ins": "레닌그라드 바리에이션으로",
+      "cop": "레닌그라드 바리에이션이에요",
+      "was": "레닌그라드 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -7965,6 +9977,21 @@
      "name": "Variante Stonewall",
      "def": "a Variante Stonewall",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Stonewall",
+     "def": "a Variante Stonewall",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "스톤월 바리에이션",
+     "def": "스톤월 바리에이션",
+     "forms": {
+      "obj": "스톤월 바리에이션을",
+      "ins": "스톤월 바리에이션으로",
+      "cop": "스톤월 바리에이션이에요",
+      "was": "스톤월 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -8002,6 +10029,21 @@
      "name": "Benoni Moderna",
      "def": "a Benoni Moderna",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Benoni Moderna",
+     "def": "a Benoni Moderna",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "모던 베노니",
+     "def": "모던 베노니",
+     "forms": {
+      "obj": "모던 베노니를",
+      "ins": "모던 베노니로",
+      "cop": "모던 베노니예요",
+      "was": "모던 베노니였"
+     }
     }
    },
    "comment": {
@@ -8039,6 +10081,21 @@
      "name": "Catalã Aberta",
      "def": "a Catalã Aberta",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Catalã Aberta",
+     "def": "a Catalã Aberta",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "오픈 카탈란",
+     "def": "오픈 카탈란",
+     "forms": {
+      "obj": "오픈 카탈란을",
+      "ins": "오픈 카탈란으로",
+      "cop": "오픈 카탈란이에요",
+      "was": "오픈 카탈란이었"
+     }
     }
    },
    "comment": {
@@ -8077,6 +10134,21 @@
      "name": "Catalã Fechada",
      "def": "a Catalã Fechada",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Catalã Fechada",
+     "def": "a Catalã Fechada",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "클로즈드 카탈란",
+     "def": "클로즈드 카탈란",
+     "forms": {
+      "obj": "클로즈드 카탈란을",
+      "ins": "클로즈드 카탈란으로",
+      "cop": "클로즈드 카탈란이에요",
+      "was": "클로즈드 카탈란이었"
+     }
     }
    },
    "comment": {
@@ -8114,6 +10186,21 @@
      "name": "Variante Simétrica",
      "def": "a Variante Simétrica",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Simétrica",
+     "def": "a Variante Simétrica",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "시메트리컬 바리에이션",
+     "def": "시메트리컬 바리에이션",
+     "forms": {
+      "obj": "시메트리컬 바리에이션을",
+      "ins": "시메트리컬 바리에이션으로",
+      "cop": "시메트리컬 바리에이션이에요",
+      "was": "시메트리컬 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -8151,6 +10238,21 @@
      "name": "Siciliana Invertida",
      "def": "a Siciliana Invertida",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Siciliana Invertida",
+     "def": "a Siciliana Invertida",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "리버스드 시실리안",
+     "def": "리버스드 시실리안",
+     "forms": {
+      "obj": "리버스드 시실리안을",
+      "ins": "리버스드 시실리안으로",
+      "cop": "리버스드 시실리안이에요",
+      "was": "리버스드 시실리안이었"
+     }
     }
    },
    "comment": {
@@ -8192,6 +10294,21 @@
      "name": "Ataque dos Quatro Peões",
      "def": "o Ataque dos Quatro Peões",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque dos Quatro Peões",
+     "def": "o Ataque dos Quatro Peões",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "포 폰스 어택",
+     "def": "포 폰스 어택",
+     "forms": {
+      "obj": "포 폰스 어택을",
+      "ins": "포 폰스 어택으로",
+      "cop": "포 폰스 어택이에요",
+      "was": "포 폰스 어택이었"
+     }
     }
    },
    "comment": {
@@ -8229,6 +10346,21 @@
      "name": "Variante Moderna",
      "def": "a Variante Moderna",
      "gender": "f"
+    },
+    "pt": {
+     "name": "Variante Moderna",
+     "def": "a Variante Moderna",
+     "gender": "f"
+    },
+    "ko": {
+     "name": "모던 바리에이션",
+     "def": "모던 바리에이션",
+     "forms": {
+      "obj": "모던 바리에이션을",
+      "ins": "모던 바리에이션으로",
+      "cop": "모던 바리에이션이에요",
+      "was": "모던 바리에이션이었"
+     }
     }
    },
    "comment": {
@@ -8266,6 +10398,21 @@
      "name": "Ataque Austríaco",
      "def": "o Ataque Austríaco",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Ataque Austríaco",
+     "def": "o Ataque Austríaco",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "오스트리안 어택",
+     "def": "오스트리안 어택",
+     "forms": {
+      "obj": "오스트리안 어택을",
+      "ins": "오스트리안 어택으로",
+      "cop": "오스트리안 어택이에요",
+      "was": "오스트리안 어택이었"
+     }
     }
    },
    "comment": {
@@ -8303,6 +10450,21 @@
      "name": "Contragambito Falkbeer",
      "def": "o Contragambito Falkbeer",
      "gender": "m"
+    },
+    "pt": {
+     "name": "Contragambito Falkbeer",
+     "def": "o Contragambito Falkbeer",
+     "gender": "m"
+    },
+    "ko": {
+     "name": "팔크베어 카운터갬빗",
+     "def": "팔크베어 카운터갬빗",
+     "forms": {
+      "obj": "팔크베어 카운터갬빗을",
+      "ins": "팔크베어 카운터갬빗으로",
+      "cop": "팔크베어 카운터갬빗이에요",
+      "was": "팔크베어 카운터갬빗이었"
+     }
     }
    },
    "comment": {
@@ -8335,11 +10497,15 @@
     "zh-Hant": "{X}變例",
     "id": "Varian {X}",
     "nl": "{X}-variant",
-    "pt-BR": "Variante {X}"
+    "pt-BR": "Variante {X}",
+    "pt": "Variante {X}",
+    "ko": "{X} 바리에이션"
    },
    "id": "varian",
    "nl": "variant",
-   "pt-BR": "variante"
+   "pt-BR": "variante",
+   "pt": "variante",
+   "ko": "바리에이션"
   },
   "Attack": {
    "en": "Attack",
@@ -8364,11 +10530,15 @@
     "zh-Hant": "{X}攻擊",
     "id": "Serangan {X}",
     "nl": "{X}-aanval",
-    "pt-BR": "Ataque {X}"
+    "pt-BR": "Ataque {X}",
+    "pt": "Ataque {X}",
+    "ko": "{X} 어택"
    },
    "id": "serangan",
    "nl": "aanval",
-   "pt-BR": "ataque"
+   "pt-BR": "ataque",
+   "pt": "ataque",
+   "ko": "어택"
   },
   "Gambit": {
    "en": "Gambit",
@@ -8393,11 +10563,15 @@
     "zh-Hant": "{X}棄兵",
     "id": "Gambit {X}",
     "nl": "{X}-gambiet",
-    "pt-BR": "Gambito {X}"
+    "pt-BR": "Gambito {X}",
+    "pt": "Gambito {X}",
+    "ko": "{X} 갬빗"
    },
    "id": "gambit",
    "nl": "gambiet",
-   "pt-BR": "gambito"
+   "pt-BR": "gambito",
+   "pt": "gambito",
+   "ko": "갬빗"
   },
   "Defense": {
    "en": "Defense",
@@ -8422,11 +10596,15 @@
     "zh-Hant": "{X}防禦",
     "id": "Pertahanan {X}",
     "nl": "{X}-verdediging",
-    "pt-BR": "Defesa {X}"
+    "pt-BR": "Defesa {X}",
+    "pt": "Defesa {X}",
+    "ko": "{X} 디펜스"
    },
    "id": "pertahanan",
    "nl": "verdediging",
-   "pt-BR": "defesa"
+   "pt-BR": "defesa",
+   "pt": "defesa",
+   "ko": "디펜스"
   },
   "System": {
    "en": "System",
@@ -8451,11 +10629,15 @@
     "zh-Hant": "{X}體系",
     "id": "Sistem {X}",
     "nl": "{X}-systeem",
-    "pt-BR": "Sistema {X}"
+    "pt-BR": "Sistema {X}",
+    "pt": "Sistema {X}",
+    "ko": "{X} 시스템"
    },
    "id": "sistem",
    "nl": "systeem",
-   "pt-BR": "sistema"
+   "pt-BR": "sistema",
+   "pt": "sistema",
+   "ko": "시스템"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -8480,11 +10662,15 @@
     "zh-Hant": "{X}反棄兵",
     "id": "Gambit Balasan {X}",
     "nl": "{X}-tegengambiet",
-    "pt-BR": "Contragambito {X}"
+    "pt-BR": "Contragambito {X}",
+    "pt": "Contragambito {X}",
+    "ko": "{X} 카운터갬빗"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
-   "pt-BR": "contragambito"
+   "pt-BR": "contragambito",
+   "pt": "contragambito",
+   "ko": "카운터갬빗"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -8509,11 +10695,15 @@
     "zh-Hant": "{X}反擊",
     "id": "Serangan Balik {X}",
     "nl": "{X}-tegenaanval",
-    "pt-BR": "Contra-ataque {X}"
+    "pt-BR": "Contra-ataque {X}",
+    "pt": "Contra-ataque {X}",
+    "ko": "{X} 카운터어택"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
-   "pt-BR": "contra-ataque"
+   "pt-BR": "contra-ataque",
+   "pt": "contra-ataque",
+   "ko": "카운터어택"
   },
   "Opening": {
    "en": "Opening",
@@ -8538,11 +10728,15 @@
     "zh-Hant": "{X}開局",
     "id": "Pembukaan {X}",
     "nl": "{X}-opening",
-    "pt-BR": "Abertura {X}"
+    "pt-BR": "Abertura {X}",
+    "pt": "Abertura {X}",
+    "ko": "{X} 오프닝"
    },
    "id": "pembukaan",
    "nl": "opening",
-   "pt-BR": "abertura"
+   "pt-BR": "abertura",
+   "pt": "abertura",
+   "ko": "오프닝"
   },
   "Game": {
    "en": "Game",
@@ -8557,7 +10751,9 @@
    "zh-Hant": "開局",
    "id": "permainan",
    "nl": "partij",
-   "pt-BR": "abertura"
+   "pt-BR": "abertura",
+   "pt": "partida",
+   "ko": "게임"
   },
   "Line": {
    "en": "Line",
@@ -8582,11 +10778,15 @@
     "zh-Hant": "{X}變著",
     "id": "Jalur {X}",
     "nl": "{X}-voortzetting",
-    "pt-BR": "Linha {X}"
+    "pt-BR": "Linha {X}",
+    "pt": "Linha {X}",
+    "ko": "{X} 라인"
    },
    "id": "jalur",
    "nl": "voortzetting",
-   "pt-BR": "linha"
+   "pt-BR": "linha",
+   "pt": "linha",
+   "ko": "라인"
   },
   "Formation": {
    "en": "Formation",
@@ -8601,7 +10801,9 @@
    "zh-Hant": "陣型",
    "id": "formasi",
    "nl": "opstelling",
-   "pt-BR": "formação"
+   "pt-BR": "formação",
+   "pt": "formação",
+   "ko": "포메이션"
   },
   "Trap": {
    "en": "Trap",
@@ -8626,11 +10828,15 @@
     "zh-Hant": "{X}陷阱",
     "id": "Jebakan {X}",
     "nl": "{X}-valstrik",
-    "pt-BR": "Armadilha {X}"
+    "pt-BR": "Armadilha {X}",
+    "pt": "Armadilha de {X}",
+    "ko": "{X} 트랩"
    },
    "id": "jebakan",
    "nl": "valstrik",
-   "pt-BR": "armadilha"
+   "pt-BR": "armadilha",
+   "pt": "armadilha",
+   "ko": "트랩"
   },
   "Accepted": {
    "en": "Accepted",
@@ -8645,7 +10851,9 @@
    "zh-Hant": "接受",
    "id": "diterima",
    "nl": "aangenomen",
-   "pt-BR": "aceito"
+   "pt-BR": "aceito",
+   "pt": "aceite",
+   "ko": "억셉티드"
   },
   "Declined": {
    "en": "Declined",
@@ -8660,7 +10868,9 @@
    "zh-Hant": "拒",
    "id": "ditolak",
    "nl": "geweigerd",
-   "pt-BR": "recusado"
+   "pt-BR": "recusado",
+   "pt": "recusado",
+   "ko": "디클라인드"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -8675,7 +10885,9 @@
    "zh-Hant": "兌換變例",
    "id": "Varian Pertukaran",
    "nl": "ruilvariant",
-   "pt-BR": "Variante das Trocas"
+   "pt-BR": "Variante das Trocas",
+   "pt": "Variante das Trocas",
+   "ko": "익스체인지 바리에이션"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -8690,7 +10902,9 @@
    "zh-Hant": "推進變例",
    "id": "Varian Maju",
    "nl": "doorschuifvariant",
-   "pt-BR": "Variante do Avanço"
+   "pt-BR": "Variante do Avanço",
+   "pt": "Variante do Avanço",
+   "ko": "어드밴스 바리에이션"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -8705,7 +10919,9 @@
    "zh-Hant": "古典變例",
    "id": "Varian Klasik",
    "nl": "klassieke variant",
-   "pt-BR": "Variante Clássica"
+   "pt-BR": "Variante Clássica",
+   "pt": "Variante Clássica",
+   "ko": "클래시컬 바리에이션"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -8720,7 +10936,9 @@
    "zh-Hant": "現代變例",
    "id": "Varian Modern",
    "nl": "moderne variant",
-   "pt-BR": "Variante Moderna"
+   "pt-BR": "Variante Moderna",
+   "pt": "Variante Moderna",
+   "ko": "모던 바리에이션"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -8735,7 +10953,9 @@
    "zh-Hant": "開放變例",
    "id": "Varian Terbuka",
    "nl": "open variant",
-   "pt-BR": "Variante Aberta"
+   "pt-BR": "Variante Aberta",
+   "pt": "Variante Aberta",
+   "ko": "오픈 바리에이션"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -8750,7 +10970,9 @@
    "zh-Hant": "封閉變例",
    "id": "Varian Tertutup",
    "nl": "gesloten variant",
-   "pt-BR": "Variante Fechada"
+   "pt-BR": "Variante Fechada",
+   "pt": "Variante Fechada",
+   "ko": "클로즈드 바리에이션"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -8765,7 +10987,9 @@
    "zh-Hant": "側翼出象變例",
    "id": "Varian Fianchetto",
    "nl": "fianchettovariant",
-   "pt-BR": "Variante do Fianqueto"
+   "pt-BR": "Variante do Fianqueto",
+   "pt": "Variante do Fianqueto",
+   "ko": "피앙케토 바리에이션"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -8780,7 +11004,9 @@
    "zh-Hant": "對稱變例",
    "id": "Varian Simetris",
    "nl": "symmetrische variant",
-   "pt-BR": "Variante Simétrica"
+   "pt-BR": "Variante Simétrica",
+   "pt": "Variante Simétrica",
+   "ko": "시메트리컬 바리에이션"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -8795,7 +11021,9 @@
    "zh-Hant": "蘇格蘭棄兵",
    "id": "Gambit Skotlandia",
    "nl": "Schots gambiet",
-   "pt-BR": "Gambito Escocês"
+   "pt-BR": "Gambito Escocês",
+   "pt": "Gambito Escocês",
+   "ko": "스카치 갬빗"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -8810,7 +11038,9 @@
    "zh-Hant": "蘇格蘭變例",
    "id": "Varian Skotlandia",
    "nl": "Schotse variant",
-   "pt-BR": "Variante Escocesa"
+   "pt-BR": "Variante Escocesa",
+   "pt": "Variante Escocesa",
+   "ko": "스카치 바리에이션"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -8825,7 +11055,9 @@
    "zh-Hant": "丹麥變例",
    "id": "Varian Denmark",
    "nl": "Deense variant",
-   "pt-BR": "Variante Dinamarquesa"
+   "pt-BR": "Variante Dinamarquesa",
+   "pt": "Variante Dinamarquesa",
+   "ko": "데니시 바리에이션"
   },
   "Main Line": {
    "en": "Main Line",
@@ -8840,7 +11072,9 @@
    "zh-Hant": "主線",
    "id": "jalur utama",
    "nl": "hoofdvariant",
-   "pt-BR": "linha principal"
+   "pt-BR": "linha principal",
+   "pt": "linha principal",
+   "ko": "메인 라인"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -8855,7 +11089,9 @@
    "zh-Hant": "加速",
    "id": "dipercepat",
    "nl": "versneld",
-   "pt-BR": "acelerado"
+   "pt-BR": "acelerado",
+   "pt": "acelerado",
+   "ko": "액셀러레이티드"
   },
   "Deferred": {
    "en": "Deferred",
@@ -8870,7 +11106,9 @@
    "zh-Hant": "延遲",
    "id": "ditunda",
    "nl": "uitgesteld",
-   "pt-BR": "adiado"
+   "pt-BR": "adiado",
+   "pt": "diferido",
+   "ko": "디퍼드"
   },
   "Reversed": {
    "en": "Reversed",
@@ -8885,7 +11123,9 @@
    "zh-Hant": "反",
    "id": "dengan warna terbalik",
    "nl": "met verwisselde kleuren",
-   "pt-BR": "invertido"
+   "pt-BR": "invertido",
+   "pt": "invertido",
+   "ko": "리버스드"
   }
  },
  "eponyms": {
@@ -8913,6 +11153,14 @@
    "pt-BR": {
     "nom": "Steinitz",
     "gen": "Steinitz"
+   },
+   "pt": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   },
+   "ko": {
+    "nom": "슈타이니츠",
+    "gen": "슈타이니츠"
    }
   },
   "Rubinstein": {
@@ -8939,6 +11187,14 @@
    "pt-BR": {
     "nom": "Rubinstein",
     "gen": "Rubinstein"
+   },
+   "pt": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
+   },
+   "ko": {
+    "nom": "루빈스타인",
+    "gen": "루빈스타인"
    }
   },
   "Winawer": {
@@ -8965,6 +11221,14 @@
    "pt-BR": {
     "nom": "Winawer",
     "gen": "Winawer"
+   },
+   "pt": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   },
+   "ko": {
+    "nom": "위나워",
+    "gen": "위나워"
    }
   },
   "Evans": {
@@ -8991,6 +11255,14 @@
    "pt-BR": {
     "nom": "Evans",
     "gen": "Evans"
+   },
+   "pt": {
+    "nom": "Evans",
+    "gen": "Evans"
+   },
+   "ko": {
+    "nom": "에반스",
+    "gen": "에반스"
    }
   },
   "Chigorin": {
@@ -9017,6 +11289,14 @@
    "pt-BR": {
     "nom": "Tchigorin",
     "gen": "Tchigorin"
+   },
+   "pt": {
+    "nom": "Chigorin",
+    "gen": "Chigorin"
+   },
+   "ko": {
+    "nom": "치고린",
+    "gen": "치고린"
    }
   },
   "Morphy": {
@@ -9043,6 +11323,14 @@
    "pt-BR": {
     "nom": "Morphy",
     "gen": "Morphy"
+   },
+   "pt": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "ko": {
+    "nom": "모피",
+    "gen": "모피"
    }
   },
   "Tarrasch": {
@@ -9069,6 +11357,14 @@
    "pt-BR": {
     "nom": "Tarrasch",
     "gen": "Tarrasch"
+   },
+   "pt": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
+   },
+   "ko": {
+    "nom": "타라슈",
+    "gen": "타라슈"
    }
   },
   "Alekhine": {
@@ -9095,6 +11391,14 @@
    "pt-BR": {
     "nom": "Alekhine",
     "gen": "Alekhine"
+   },
+   "pt": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
+   },
+   "ko": {
+    "nom": "알료힌",
+    "gen": "알료힌"
    }
   },
   "Sämisch": {
@@ -9121,6 +11425,14 @@
    "pt-BR": {
     "nom": "Sämisch",
     "gen": "Sämisch"
+   },
+   "pt": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   },
+   "ko": {
+    "nom": "제미슈",
+    "gen": "제미슈"
    }
   },
   "Nimzowitsch": {
@@ -9147,6 +11459,14 @@
    "pt-BR": {
     "nom": "Nimzowitsch",
     "gen": "Nimzowitsch"
+   },
+   "pt": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
+   },
+   "ko": {
+    "nom": "님조비치",
+    "gen": "님조비치"
    }
   },
   "Najdorf": {
@@ -9173,6 +11493,14 @@
    "pt-BR": {
     "nom": "Najdorf",
     "gen": "Najdorf"
+   },
+   "pt": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   },
+   "ko": {
+    "nom": "나이도르프",
+    "gen": "나이도르프"
    }
   },
   "Bogoljubow": {
@@ -9199,6 +11527,14 @@
    "pt-BR": {
     "nom": "Bogoljubow",
     "gen": "Bogoljubow"
+   },
+   "pt": {
+    "nom": "Bogoljubow",
+    "gen": "Bogoljubow"
+   },
+   "ko": {
+    "nom": "보골류보프",
+    "gen": "보골류보프"
    }
   },
   "Alapin": {
@@ -9225,6 +11561,14 @@
    "pt-BR": {
     "nom": "Alapin",
     "gen": "Alapin"
+   },
+   "pt": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   },
+   "ko": {
+    "nom": "알라핀",
+    "gen": "알라핀"
    }
   },
   "Botvinnik": {
@@ -9251,6 +11595,14 @@
    "pt-BR": {
     "nom": "Botvinnik",
     "gen": "Botvinnik"
+   },
+   "pt": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
+   },
+   "ko": {
+    "nom": "보트비닉",
+    "gen": "보트비닉"
    }
   },
   "Paulsen": {
@@ -9277,6 +11629,14 @@
    "pt-BR": {
     "nom": "Paulsen",
     "gen": "Paulsen"
+   },
+   "pt": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   },
+   "ko": {
+    "nom": "파울센",
+    "gen": "파울센"
    }
   },
   "Marshall": {
@@ -9303,6 +11663,14 @@
    "pt-BR": {
     "nom": "Marshall",
     "gen": "Marshall"
+   },
+   "pt": {
+    "nom": "Marshall",
+    "gen": "Marshall"
+   },
+   "ko": {
+    "nom": "마셜",
+    "gen": "마셜"
    }
   },
   "Kieseritzky": {
@@ -9329,6 +11697,14 @@
    "pt-BR": {
     "nom": "Kieseritzky",
     "gen": "Kieseritzky"
+   },
+   "pt": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "ko": {
+    "nom": "키제리츠키",
+    "gen": "키제리츠키"
    }
   },
   "Panov": {
@@ -9355,6 +11731,14 @@
    "pt-BR": {
     "nom": "Panov",
     "gen": "Panov"
+   },
+   "pt": {
+    "nom": "Panov",
+    "gen": "Panov"
+   },
+   "ko": {
+    "nom": "파노프",
+    "gen": "파노프"
    }
   },
   "Keres": {
@@ -9381,6 +11765,14 @@
    "pt-BR": {
     "nom": "Keres",
     "gen": "Keres"
+   },
+   "pt": {
+    "nom": "Keres",
+    "gen": "Keres"
+   },
+   "ko": {
+    "nom": "케레스",
+    "gen": "케레스"
    }
   },
   "Tartakower": {
@@ -9407,6 +11799,14 @@
    "pt-BR": {
     "nom": "Tartakower",
     "gen": "Tartakower"
+   },
+   "pt": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
+   },
+   "ko": {
+    "nom": "타르타코버",
+    "gen": "타르타코버"
    }
   },
   "Maróczy": {
@@ -9433,6 +11833,14 @@
    "pt-BR": {
     "nom": "Maróczy",
     "gen": "Maróczy"
+   },
+   "pt": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "ko": {
+    "nom": "마로치",
+    "gen": "마로치"
    }
   },
   "Falkbeer": {
@@ -9459,6 +11867,14 @@
    "pt-BR": {
     "nom": "Falkbeer",
     "gen": "Falkbeer"
+   },
+   "pt": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
+   },
+   "ko": {
+    "nom": "팔크베어",
+    "gen": "팔크베어"
    }
   },
   "Scheveningen": {
@@ -9485,6 +11901,14 @@
    "pt-BR": {
     "nom": "Scheveningen",
     "gen": "Scheveningen"
+   },
+   "pt": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   },
+   "ko": {
+    "nom": "셰베닝겐",
+    "gen": "셰베닝겐"
    }
   },
   "Richter-Rauzer": {
@@ -9511,6 +11935,14 @@
    "pt-BR": {
     "nom": "Richter-Rauzer",
     "gen": "Richter-Rauzer"
+   },
+   "pt": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
+   },
+   "ko": {
+    "nom": "리히터-라우저",
+    "gen": "리히터-라우저"
    }
   },
   "Lasker": {
@@ -9537,6 +11969,14 @@
    "pt-BR": {
     "nom": "Lasker",
     "gen": "Lasker"
+   },
+   "pt": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   },
+   "ko": {
+    "nom": "라스커",
+    "gen": "라스커"
    }
   },
   "Taimanov": {
@@ -9563,6 +12003,14 @@
    "pt-BR": {
     "nom": "Taimanov",
     "gen": "Taimanov"
+   },
+   "pt": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
+   },
+   "ko": {
+    "nom": "타이마노프",
+    "gen": "타이마노프"
    }
   },
   "Smyslov": {
@@ -9589,6 +12037,14 @@
    "pt-BR": {
     "nom": "Smyslov",
     "gen": "Smyslov"
+   },
+   "pt": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
+   },
+   "ko": {
+    "nom": "스미슬로프",
+    "gen": "스미슬로프"
    }
   },
   "Spassky": {
@@ -9615,6 +12071,14 @@
    "pt-BR": {
     "nom": "Spassky",
     "gen": "Spassky"
+   },
+   "pt": {
+    "nom": "Spassky",
+    "gen": "Spassky"
+   },
+   "ko": {
+    "nom": "스파스키",
+    "gen": "스파스키"
    }
   },
   "Spielmann": {
@@ -9641,6 +12105,14 @@
    "pt-BR": {
     "nom": "Spielmann",
     "gen": "Spielmann"
+   },
+   "pt": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   },
+   "ko": {
+    "nom": "슈필만",
+    "gen": "슈필만"
    }
   },
   "Averbakh": {
@@ -9667,6 +12139,14 @@
    "pt-BR": {
     "nom": "Averbakh",
     "gen": "Averbakh"
+   },
+   "pt": {
+    "nom": "Averbakh",
+    "gen": "Averbakh"
+   },
+   "ko": {
+    "nom": "아베르바흐",
+    "gen": "아베르바흐"
    }
   },
   "Greco": {
@@ -9693,6 +12173,14 @@
    "pt-BR": {
     "nom": "Greco",
     "gen": "Greco"
+   },
+   "pt": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "ko": {
+    "nom": "그레코",
+    "gen": "그레코"
    }
   },
   "Capablanca": {
@@ -9719,6 +12207,14 @@
    "pt-BR": {
     "nom": "Capablanca",
     "gen": "Capablanca"
+   },
+   "pt": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   },
+   "ko": {
+    "nom": "카파블랑카",
+    "gen": "카파블랑카"
    }
   },
   "Kan": {
@@ -9745,6 +12241,14 @@
    "pt-BR": {
     "nom": "Kan",
     "gen": "Kan"
+   },
+   "pt": {
+    "nom": "Kan",
+    "gen": "Kan"
+   },
+   "ko": {
+    "nom": "칸",
+    "gen": "칸"
    }
   },
   "Albin": {
@@ -9771,6 +12275,14 @@
    "pt-BR": {
     "nom": "Albin",
     "gen": "Albin"
+   },
+   "pt": {
+    "nom": "Albin",
+    "gen": "Albin"
+   },
+   "ko": {
+    "nom": "알빈",
+    "gen": "알빈"
    }
   },
   "Breyer": {
@@ -9797,6 +12309,14 @@
    "pt-BR": {
     "nom": "Breyer",
     "gen": "Breyer"
+   },
+   "pt": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   },
+   "ko": {
+    "nom": "브레이어",
+    "gen": "브레이어"
    }
   },
   "Schlechter": {
@@ -9823,6 +12343,14 @@
    "pt-BR": {
     "nom": "Schlechter",
     "gen": "Schlechter"
+   },
+   "pt": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
+   },
+   "ko": {
+    "nom": "슐레히터",
+    "gen": "슐레히터"
    }
   },
   "Jaenisch": {
@@ -9849,6 +12377,14 @@
    "pt-BR": {
     "nom": "Jaenisch",
     "gen": "Jaenisch"
+   },
+   "pt": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   },
+   "ko": {
+    "nom": "예니슈",
+    "gen": "예니슈"
    }
   },
   "Karpov": {
@@ -9875,6 +12411,14 @@
    "pt-BR": {
     "nom": "Karpov",
     "gen": "Karpov"
+   },
+   "pt": {
+    "nom": "Karpov",
+    "gen": "Karpov"
+   },
+   "ko": {
+    "nom": "카르포프",
+    "gen": "카르포프"
    }
   },
   "Petrosian": {
@@ -9901,6 +12445,14 @@
    "pt-BR": {
     "nom": "Petrosian",
     "gen": "Petrosian"
+   },
+   "pt": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
+   },
+   "ko": {
+    "nom": "페트로시안",
+    "gen": "페트로시안"
    }
   },
   "Euwe": {
@@ -9927,6 +12479,14 @@
    "pt-BR": {
     "nom": "Euwe",
     "gen": "Euwe"
+   },
+   "pt": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "ko": {
+    "nom": "외버",
+    "gen": "외버"
    }
   },
   "Sozin": {
@@ -9953,6 +12513,14 @@
    "pt-BR": {
     "nom": "Sozin",
     "gen": "Sozin"
+   },
+   "pt": {
+    "nom": "Sozin",
+    "gen": "Sozin"
+   },
+   "ko": {
+    "nom": "소진",
+    "gen": "소진"
    }
   },
   "Schliemann": {
@@ -9979,6 +12547,14 @@
    "pt-BR": {
     "nom": "Schliemann",
     "gen": "Schliemann"
+   },
+   "pt": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   },
+   "ko": {
+    "nom": "슐리만",
+    "gen": "슐리만"
    }
   },
   "Anderssen": {
@@ -10005,6 +12581,14 @@
    "pt-BR": {
     "nom": "Anderssen",
     "gen": "Anderssen"
+   },
+   "pt": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
+   },
+   "ko": {
+    "nom": "안데르센",
+    "gen": "안데르센"
    }
   },
   "Philidor": {
@@ -10031,6 +12615,14 @@
    "pt-BR": {
     "nom": "Philidor",
     "gen": "Philidor"
+   },
+   "pt": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   },
+   "ko": {
+    "nom": "필리도르",
+    "gen": "필리도르"
    }
   },
   "Zaitsev": {
@@ -10057,6 +12649,14 @@
    "pt-BR": {
     "nom": "Zaitsev",
     "gen": "Zaitsev"
+   },
+   "pt": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsev"
+   },
+   "ko": {
+    "nom": "자이체프",
+    "gen": "자이체프"
    }
   },
   "Sveshnikov": {
@@ -10083,6 +12683,14 @@
    "pt-BR": {
     "nom": "Sveshnikov",
     "gen": "Sveshnikov"
+   },
+   "pt": {
+    "nom": "Sveshnikov",
+    "gen": "Sveshnikov"
+   },
+   "ko": {
+    "nom": "스베시니코프",
+    "gen": "스베시니코프"
    }
   },
   "Kasparov": {
@@ -10109,6 +12717,14 @@
    "pt-BR": {
     "nom": "Kasparov",
     "gen": "Kasparov"
+   },
+   "pt": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
+   },
+   "ko": {
+    "nom": "카스파로프",
+    "gen": "카스파로프"
    }
   },
   "Fischer": {
@@ -10135,6 +12751,14 @@
    "pt-BR": {
     "nom": "Fischer",
     "gen": "Fischer"
+   },
+   "pt": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   },
+   "ko": {
+    "nom": "피셔",
+    "gen": "피셔"
    }
   },
   "Tal": {
@@ -10161,6 +12785,14 @@
    "pt-BR": {
     "nom": "Tal",
     "gen": "Tal"
+   },
+   "pt": {
+    "nom": "Tal",
+    "gen": "Tal"
+   },
+   "ko": {
+    "nom": "탈",
+    "gen": "탈"
    }
   },
   "McCutcheon": {
@@ -10187,6 +12819,14 @@
    "pt-BR": {
     "nom": "McCutcheon",
     "gen": "McCutcheon"
+   },
+   "pt": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   },
+   "ko": {
+    "nom": "매커천",
+    "gen": "매커천"
    }
   },
   "Bronstein": {
@@ -10213,6 +12853,14 @@
    "pt-BR": {
     "nom": "Bronstein",
     "gen": "Bronstein"
+   },
+   "pt": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
+   },
+   "ko": {
+    "nom": "브론스타인",
+    "gen": "브론스타인"
    }
   },
   "Janowski": {
@@ -10239,6 +12887,14 @@
    "pt-BR": {
     "nom": "Janowski",
     "gen": "Janowski"
+   },
+   "pt": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "ko": {
+    "nom": "야노프스키",
+    "gen": "야노프스키"
    }
   },
   "Staunton": {
@@ -10265,6 +12921,14 @@
    "pt-BR": {
     "nom": "Staunton",
     "gen": "Staunton"
+   },
+   "pt": {
+    "nom": "Staunton",
+    "gen": "Staunton"
+   },
+   "ko": {
+    "nom": "스톤턴",
+    "gen": "스톤턴"
    }
   },
   "Max Lange": {
@@ -10291,6 +12955,14 @@
    "pt-BR": {
     "nom": "Max Lange",
     "gen": "Max Lange"
+   },
+   "pt": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "ko": {
+    "nom": "막스 랑게",
+    "gen": "막스 랑게"
    }
   },
   "Petrov": {
@@ -10317,6 +12989,14 @@
    "pt-BR": {
     "nom": "Petrov",
     "gen": "Petrov"
+   },
+   "pt": {
+    "nom": "Petrov",
+    "gen": "Petrov"
+   },
+   "ko": {
+    "nom": "페트로프",
+    "gen": "페트로프"
    }
   },
   "Grünfeld": {
@@ -10343,6 +13023,14 @@
    "pt-BR": {
     "nom": "Grünfeld",
     "gen": "Grünfeld"
+   },
+   "pt": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   },
+   "ko": {
+    "nom": "그륀펠트",
+    "gen": "그륀펠트"
    }
   },
   "Colle": {
@@ -10369,6 +13057,14 @@
    "pt-BR": {
     "nom": "Colle",
     "gen": "Colle"
+   },
+   "pt": {
+    "nom": "Colle",
+    "gen": "Colle"
+   },
+   "ko": {
+    "nom": "콜레",
+    "gen": "콜레"
    }
   },
   "Torre": {
@@ -10395,6 +13091,14 @@
    "pt-BR": {
     "nom": "Torre",
     "gen": "Torre"
+   },
+   "pt": {
+    "nom": "Torre",
+    "gen": "Torre"
+   },
+   "ko": {
+    "nom": "토레",
+    "gen": "토레"
    }
   },
   "Réti": {
@@ -10421,6 +13125,14 @@
    "pt-BR": {
     "nom": "Réti",
     "gen": "Réti"
+   },
+   "pt": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "ko": {
+    "nom": "레티",
+    "gen": "레티"
    }
   }
  },
@@ -10448,6 +13160,14 @@
   "pt-BR": {
    "compose_proper_names": true,
    "file_pattern": "\\b(?:[Cc]olunas?|[Pp]eão|[Pp]eões) (?P<f>[a-h])(?!\\w)"
+  },
+  "pt": {
+   "compose_proper_names": true,
+   "file_pattern": "(?:\\b[Cc]olunas? |\\b[Pp]eão (?=[b-dfgh]\\b|[ae][,.;:!?]))(?P<f>[a-h])\\b"
+  },
+  "ko": {
+   "compose_proper_names": false,
+   "file_pattern": "(?<![A-Za-z0-9])(?P<f>[a-h])(?= (?:파일|폰))"
   }
  }
 }

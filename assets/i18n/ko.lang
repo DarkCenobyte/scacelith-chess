@@ -69,7 +69,7 @@ options.quality.help = 아래의 모든 설정을 한 번에 정합니다. 매�
 options.shadows = 그림자
 options.shadows.help = 햇빛이 만드는 그림자의 디테일과 가장자리의 부드러움입니다. 낮음: 가장자리가 단순하며 빠르게 그려집니다.
 options.reflections = 반사
-options.reflections.help = 바닥, 테이블, 체스판에 홀이 비칩니다(반사마다 홀을 한 번 더 그리므로 가장 부담이 큰 설정 중 하나입니다). 중간부터는 광택 있는 기물과 물건에도 주변이 비칩니다.
+options.reflections.help = 바닥, 테이블, 체스판에 홀이 비칩니다(반사면마다 홀을 한 번 더 그리므로 가장 부담이 큰 설정 중 하나입니다). 중간부터는 광택 있는 기물과 물건에도 주변이 비칩니다.
 options.ambient_occlusion = 앰비언트 오클루전
 options.ambient_occlusion.help = 물체가 맞닿는 곳과 움푹한 곳처럼 빛이 덜 드는 곳에 부드러운 음영을 넣습니다.
 options.indirect_light = 간접광
@@ -101,10 +101,10 @@ options.voice_volume = 음성 음량
 options.voice_volume.help = 코치 모드에서 코치 목소리의 음량입니다.
 options.subtitles = 자막
 options.subtitles.auto = 자동
-options.subtitles.help = 코치의 말을 화면 아래에 글로 보여 줍니다. 자동: 코치가 메뉴 언어로 말하지 않을 때 표시합니다(메뉴가 중국어이면 코치는 영어로 말합니다). 코치 음성이 설치되어 있지 않으면 항상 표시합니다.
+options.subtitles.help = 코치의 말을 화면 아래에 글로 보여 줍니다. 자동: 코치가 메뉴 언어를 말하지 못할 때 표시합니다(메뉴가 중국어이면 코치는 영어로 말합니다). 코치 음성이 설치되어 있지 않으면 항상 표시합니다.
 
 options.legal_moves = 둘 수 있는 수 표시
-options.legal_moves.help = 손댄 기물이 갈 수 있는 칸을 강조합니다. 끄면 수가 규칙에 맞는지 아무것도 알려 주지 않습니다. 불법 수는 시계를 누르는 순간 심판이 벌칙을 줍니다.
+options.legal_moves.help = 손댄 기물이 갈 수 있는 칸을 강조합니다. 끄면 수가 규칙에 맞는지 알려 주는 표시가 없습니다. 불법 수를 두고 시계를 누르면 심판이 벌칙을 줍니다.
 options.coordinates = 체스판 좌표
 options.auto_press = 시계 자동 누르기
 options.auto_press.help = 수가 체스판에 놓이면 내 로봇이 알아서 시계를 누릅니다. 온라인 게임에서는 서버가, 다이렉트 매치에서는 게임을 연 플레이어가 정합니다.
@@ -183,7 +183,7 @@ newgame.vs_human = 사람, 같은 PC
 engine.skill = 실력 레벨
 engine.skill.help = Stockfish “Skill Level”(0–20). Elo로 실력을 제한하는 동안에는 무시됩니다.
 engine.limit_elo = 실력 제한(Elo)
-engine.limit_elo.help = UCI_LimitStrength: 엔진이 아래의 Elo 레이팅을 목표로 둡니다.
+engine.limit_elo.help = UCI_LimitStrength: 엔진이 아래의 Elo 레이팅을 목표로 합니다.
 engine.elo = Elo
 engine.depth = 탐색 깊이
 engine.plies = {0}플라이
@@ -194,7 +194,7 @@ engine.no_limit = 제한 없음
 engine.thousand = {0},000
 engine.million = {0},000,000
 engine.dynamic_elo = 시간에 따른 동적 Elo
-engine.dynamic_elo.help = 사람처럼 Stockfish도 시간이 얼마 남지 않으면 약하게 둡니다. 마지막 1분에는 조금(래피드와 블리츠에서는 더 일찍), 시간에 쫓길 때는 훨씬 약하게 둡니다. 시간 제한이 있는 게임에만 적용됩니다.
+engine.dynamic_elo.help = 사람처럼 Stockfish도 시간이 얼마 남지 않으면 약하게 둡니다. 마지막 1분에는 조금(래피드와 블리츠에서는 더 일찍부터), 시간에 쫓길 때는 훨씬 약하게 둡니다. 시간 제한이 있는 게임에만 적용됩니다.
 # New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
 # Realistic thinking time on (realistic) or off (instant).
 engine.pace.realistic = Stockfish가 같은 수준의 사람처럼 시간을 들여 둡니다. 이 대기 시간을 없애려면: 설정 > 게임플레이 > 사람 같은 생각 시간.
@@ -229,7 +229,7 @@ preset.beginner.desc = 기본은 알지만 여전히 블런더로 기물을 자�
 preset.casual.name = 캐주얼
 preset.casual.desc = 저녁에 편하게 두는 상대: 무난한 수를 두지만 실수가 잦습니다.
 preset.club_player.name = 클럽 플레이어
-preset.club_player.desc = 뻔한 블런더를 놓치지 않고 응징하는 탄탄한 클럽 플레이어.
+preset.club_player.desc = 뻔한 블런더를 응징하는 탄탄한 클럽 플레이어.
 preset.advanced.name = 상급자
 preset.advanced.desc = 전술 감각이 좋은 강한 클럽 플레이어.
 preset.expert.name = 전문가
@@ -248,7 +248,7 @@ credits.title = 크레딧
 credits.game.head = SCACELITH
 credits.game = 왕실의 홀에서 두는 체스 게임. 자체 개발한 OpenGL 4.6 엔진으로 만들었습니다.
 credits.engine.head = 체스 엔진
-credits.engine = Stockfish 19, Stockfish 개발자들이 만들었습니다.
+credits.engine = Stockfish 개발진의 Stockfish 19.
 credits.engine.licence = GNU General Public License v3.
 credits.engine.data = 신경망은 Leela Chess Zero 프로젝트가 제공한 데이터로 학습되었으며, 이 데이터는 Open Database License(ODbL)로 공개되어 있습니다.
 credits.voice.head = 코치 음성
@@ -394,7 +394,7 @@ viewer.black = 흑
 viewer.time_control = 시간 제한
 viewer.elo_approx = 약 {0} Elo
 viewer.swap = 색 바꾸기
-viewer.note = 두 플레이어 모두 Stockfish입니다. 둘이 두는 동안 홀 안을 자유롭게 날아다니세요. 아무도 보지 못합니다.
+viewer.note = 두 플레이어 모두 Stockfish입니다. 대국이 진행되는 동안 홀 안을 자유롭게 날아다니세요. 아무도 보지 못합니다.
 viewer.summary = {0} 대 {1}
 viewer.custom = 사용자 지정
 viewer.tc.custom = 직접 설정
@@ -588,7 +588,7 @@ online.check_email.resent = 이메일을 다시 보냈습니다. 도착까지 �
 online.forgot.title = 비밀번호 찾기
 online.forgot.lead = 계정의 이메일 주소를 입력하세요. 새 비밀번호를 정할 수 있는 링크를 보내 드립니다.
 online.forgot.button = 링크 보내기
-online.forgot.sent = 이 주소를 사용하는 계정이 있으면 링크가 발송됩니다.
+online.forgot.sent = 이 주소를 사용하는 계정이 있다면 링크가 발송되었습니다.
 online.sso.title = Google로 로그인
 online.sso.wait = 웹 브라우저에서 계속하세요. 열린 창에서 Google 계정을 선택하면 됩니다. Google에서 돌아오는 즉시 Scacelith가 이어서 진행합니다.
 online.sso.name_title = 이름 정하기
@@ -605,7 +605,7 @@ online.sso.not_mine_note = Google 로그인은 추가되지 않았습니다. 이
 # The page the browser shows when Google sends it back to the game (127.0.0.1)
 online.sso.page.title = Scacelith: Google 로그인
 online.sso.page.done_heading = Scacelith로 돌아가기
-online.sso.page.done = Google에서 Scacelith로 돌려보냈습니다. 게임으로 돌아가 로그인을 마치세요. 이 탭은 닫아도 됩니다.
+online.sso.page.done = Google에서 Scacelith로 돌아왔습니다. 게임으로 돌아가 로그인을 마치세요. 이 탭은 닫아도 됩니다.
 online.sso.page.cancelled_heading = 로그인 취소됨
 online.sso.page.cancelled = Google 로그인이 취소되었습니다. 이 탭을 닫고 Scacelith로 돌아가도 됩니다.
 online.sso.page.foreign_heading = 잘못 전달된 페이지입니다
@@ -729,12 +729,12 @@ online.challenge.lost = 연결이 끊겨 도전이 취소되었습니다.
 # At the table
 online.pause.clock_runs = 게임은 계속 진행됩니다. 내 시계도 계속 갑니다.
 online.pause.abort = 게임 중단
-online.pause.abort.help = 첫 수를 두기 전에는 게임을 취소할 수 있으며, 기록에 남지 않습니다.
+online.pause.abort.help = 첫 수를 두기 전에는 게임을 취소할 수 있으며, 이때 게임은 무효 처리됩니다.
 online.pause.leave = 게임 나가기
 online.confirm.resign.text = 이 게임을 기권하시겠습니까? 상대가 승리합니다.
 online.confirm.leave.text = 나가면 이 게임을 기권하게 되며, 상대가 승리합니다.
 online.confirm.leave.ok = 기권하고 나가기
-online.confirm.leave_abort.text = 첫 수를 두기 전에 나가시겠습니까? 게임이 중단되며 기록에 남지 않습니다.
+online.confirm.leave_abort.text = 첫 수를 두기 전에 나가시겠습니까? 게임이 중단되며 무효 처리됩니다.
 online.confirm.leave_abort.ok = 중단하고 나가기
 online.draw.card_title = 무승부 제안
 online.draw.card_text = 상대가 무승부를 제안했습니다.
@@ -746,7 +746,7 @@ online.opponent_away = 상대 연결 끊김 — {0} 안에 돌아와야 함
 online.first_move = 내 첫 수 · {0}
 online.reconnecting = 다시 연결하는 중…
 online.reconnecting.text = 게임은 서버에서 계속 진행되며 내 시계도 계속 갑니다.
-online.gameover.aborted = 게임이 중단되었습니다. 기록에 남지 않습니다.
+online.gameover.aborted = 게임이 중단되어 무효 처리되었습니다.
 online.rating.casual = 캐주얼 게임: 레이팅 변동 없음.
 online.rating.change = 레이팅 {0} → {1} ({2})
 online.rating.pending = 레이팅: …
@@ -915,7 +915,7 @@ online.devices.signed_in = 로그인: {0}
 online.devices.last_active = 마지막 활동 {0}
 online.devices.active_now = 지금 사용 중
 online.devices.sign_out = 로그아웃
-online.devices.signed_out = 그 기기를 로그아웃시켰습니다.
+online.devices.signed_out = 그 기기가 로그아웃되었습니다.
 online.devices.error = 기기 목록을 불러올 수 없습니다
 online.devices.all.title = 모든 기기에서 로그아웃
 online.email.title = 이메일 변경
@@ -1002,3 +1002,446 @@ direct.err.reset = 연결이 끊겼습니다.
 direct.err.closed = 연결이 종료되었습니다.
 direct.err.host_left = 친구가 게임 열기를 중지했습니다.
 direct.err.other = 연결에 실패했습니다({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+# Korean: the players' names take 님 ("{0} 님이"), which also carries the particle.
+hotseat.player2 = 플레이어 2
+hotseat.white_player = 백
+hotseat.black_player = 흑
+hotseat.name.help = 두 기보지에 모두 적히는 이름입니다. 어떤 문자로든 쓸 수 있습니다.
+hotseat.swap = 색 바꾸기
+hotseat.left_hand = {0} 님은 왼손으로 둡니다. 시계는 그 플레이어의 왼쪽에 놓입니다.
+hotseat.rated = 레이팅 게임
+hotseat.rated.help = 이름마다 이 컴퓨터에 2인 레이팅이 따로 기록됩니다. Stockfish를 상대로 한 레이팅은 바뀌지 않습니다.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = 2인 레이팅: {0} {1} · {2} {3}
+hotseat.new_rating = (신규)
+hotseat.friendly_note = 친선 게임: 레이팅이 바뀌지 않습니다.
+hotseat.colours = {0} 님이 백, {1} 님이 흑으로 둡니다.
+hotseat.colours_swap = 재대결할 때마다 색이 바뀝니다.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0} 님 차례
+hotseat.flag = {0} 님의 시간이 다 되었습니다.
+hotseat.confirm.resign = {0} 님이 기권하시겠습니까? {1} 님이 승자가 됩니다.
+hotseat.confirm.resign_draw = {0} 님이 기권하시겠습니까? {1} 님이 더 이상 체크메이트할 수 없으므로 무승부가 됩니다.
+hotseat.draw.offer_noted = 무승부 제안은 수와 함께 전달됩니다. 시계를 누르면 {0} 님이 제안을 보게 됩니다.
+hotseat.draw.card_title = 무승부 제안
+hotseat.draw.offered = {0} 님이 무승부를 제안했습니다.
+hotseat.draw.card_hint = 기물을 만지면 거절합니다.
+hotseat.draw.accept = 수락
+hotseat.draw.decline = 거절
+hotseat.draw.accepted = {0} 님이 {1} 님의 무승부 제안을 수락했습니다.
+hotseat.draw.declined = {0} 님이 {1} 님의 무승부 제안을 거절했습니다.
+# Scoresheet header note
+hotseat.sheet.rated = 레이팅 게임
+hotseat.sheet.friendly = 친선 게임
+# Game over card
+hotseat.gameover.wins = {0} 님이 {1}수 만에 승리했습니다.
+hotseat.gameover.wins_now = {0} 님이 승리했습니다.
+hotseat.gameover.friendly = {0} 대 {1} · 친선 게임
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = 레이팅에 반영되지 않는 게임입니다.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = 코치
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = 코치 모드 합성 음성: {0}
+# Coach page
+coach.title = 코치
+coach.section.level = 레벨
+coach.section.lesson = 코치와 함께
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = 레이팅 {0} 플레이어용
+coach.completed = 완료
+coach.recommended = 추천
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+# Korean: the level names are the ones the coach says in assets/coach/speech/ko/events.lang.
+coach.level.0.name = 체스 규칙
+coach.level.0.desc = 규칙을 하나씩 배우는 대화형 레슨.
+coach.level.0.detail = 코치가 작은 포지션을 놓고 각 기물이 어떻게 움직이고 잡는지 보여 준 다음, 캐슬링, 프로모션, 체크, 체크메이트를 설명합니다. 각 개념을 직접 체스판에서 해 봅니다.
+coach.level.1.name = 첫걸음
+coach.level.1.desc = 무엇이 공격받는지, 무엇이 무방비로 남았는지.
+coach.level.1.detail = 코치가 살살 두면서 쉬운 말로 알려 줍니다. 내 기물 중 어떤 것이 공격받고 있는지, 어떤 것이 보호받지 못하는지, 그리고 그 기물을 어떻게 지키는지.
+coach.level.2.name = 초보자
+coach.level.2.desc = 간단한 전술, 전개, 킹의 안전.
+coach.level.2.detail = 포크와 핀을 이름으로 부릅니다. 코치는 기물을 전개하고 킹을 안전하게 지키는 법을 이야기합니다.
+coach.level.3.name = 중급자
+coach.level.3.desc = 계획, 폰 구조, 유일한 수.
+coach.level.3.detail = 코치가 계획과 폰 구조를 설명하고, 포지션을 지킬 수 있는 수가 하나뿐일 때 알려 줍니다.
+coach.level.4.name = 클럽 플레이어
+coach.level.4.desc = 후보수, 폰 단위 평가.
+coach.level.4.detail = 클럽 코치처럼 후보수를 따져 보고 평가를 폰 단위로 알려 줍니다.
+coach.level.5.name = 강한 클럽 플레이어
+coach.level.5.desc = 간결한 수순, 포지션 플레이 용어.
+coach.level.5.detail = 짧은 코멘트, 구체적인 수순, 포지션 플레이의 용어.
+coach.level.6.name = 전문가
+coach.level.6.desc = 짧은 코멘트, 깊은 수순, 평가 수치.
+coach.level.6.detail = 강자끼리처럼 말을 아낍니다. 여러 수 앞까지 내다보는 수순과 평가 수치.
+coach.note.clock = 시계 없음: 원하는 만큼 시간을 쓰세요.
+coach.note.takeback = 블런더를 두면 코치가 무엇이 잘못됐는지 보여 주고 그 수를 무르자고 제안합니다.
+coach.note.lesson = 백으로 둡니다. 코치가 체스판에 연습 문제를 하나씩 놓습니다.
+coach.note.unrated = 코치와 둔 게임은 레이팅에 반영되지 않습니다.
+coach.note.fallible = 코치도 완벽하지 않습니다. 가끔 수를 잘못 판단할 수 있습니다.
+coach.colour = 내 색
+coach.colour.help = 코치를 상대로 둘 색입니다. 번갈아: 백으로 시작해 게임마다 백과 흑을 번갈아 둡니다. 규칙 레슨은 항상 백으로 둡니다.
+coach.colour.alternate = 번갈아
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = 코치 음성이 설치되지 않았거나 꺼져 있습니다(설정 > 오디오). 코치의 말은 화면에 글로 표시됩니다.
+# At the table
+coach.speaker = 코치
+coach.skip = 건너뛰기
+coach.offer.title = 수를 무르시겠습니까?
+coach.offer.text = 코치가 마지막 수를 무르고 더 좋은 수를 찾아보자고 제안합니다.
+coach.offer.hint = Backspace 키를 누르면 무릅니다. 기물을 만지면 그대로 계속 둡니다.
+coach.offer.accept = 무르기
+coach.offer.decline = 계속 두기
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = 남은 무르기: {0}
+coach.pause.take_back = 내 수 무르기
+coach.pause.take_back.help = 마지막 수를 무릅니다. 코치가 이미 응수했다면 그 수도 함께 무릅니다.
+coach.confirm.resign = 이 게임을 기권하시겠습니까? 코치가 승자가 됩니다.
+coach.confirm.resign_draw = 이 게임을 기권하시겠습니까? 코치가 더 이상 체크메이트할 수 없으므로 무승부가 됩니다.
+coach.confirm.leave = 메인 메뉴로 돌아가시겠습니까? 코치와의 이 게임은 포기하게 됩니다.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = 다시 두기
+coach.gameover.unrated = 코치와의 이 게임은 레이팅에 반영되지 않습니다.
+coach.lesson.done = 잘하셨습니다
+coach.lesson.done.line = 이제 체스 규칙을 알게 되었습니다.
+coach.lesson.next = 첫 게임
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = 트레이닝
+coach.tab.challenges = 챌린지
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = 체크메이트
+challenge.group.tactics = 전술
+challenge.group.defence = 수비
+challenge.group.endgames = 엔드게임
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = 1수 메이트
+challenge.mate1.desc = 한 수 만에 체크메이트.
+challenge.mate1.detail = 먼저 모든 체크를 살펴보세요. 그중 하나는 킹이 피할 칸도, 막을 방법도, 잡을 방법도 남기지 않습니다.
+challenge.mate2.name = 2수 메이트
+challenge.mate2.desc = 막을 방법이 없는 수, 그다음 메이트.
+challenge.mate2.detail = 첫 수는 대개 킹의 칸을 빼앗는 체크나 희생입니다. 코치는 최선을 다해 방어합니다.
+challenge.mate3.name = 3수 메이트
+challenge.mate3.desc = 더 긴 강제 수순.
+challenge.mate3.detail = 체크, 잡기, 위협을 세 수 깊이까지. 기물을 만지기 전에 단계마다 코치의 최선의 응수를 계산하세요.
+challenge.backrank.name = 뒷줄 메이트
+challenge.backrank.desc = 자기 폰에 갇힌 킹.
+challenge.backrank.detail = 캐슬링한 킹 앞의 폰들이 움직이지 않았다면, 마지막 랭크에 들어온 룩이나 퀸으로 체크메이트가 될 수 있습니다. 먼저 수비 기물을 없애거나 다른 곳으로 유인하세요.
+challenge.patterns.name = 메이트 패턴
+challenge.patterns.desc = 스머더드 메이트, 아나스타시아 메이트, 아라비안 메이트 등 고전 패턴.
+challenge.patterns.detail = 몇 번이고 다시 나오는 유명한 메이트 그물. 기물의 배치와 마지막 결정타를 알아보는 법을 익히세요.
+challenge.hanging.name = 공짜 기물
+challenge.hanging.desc = 보호받지 못하는 기물을 찾으세요.
+challenge.hanging.detail = 아무도 지키지 않는 기물이나 폰은 그냥 잡을 수 있습니다. 코치의 기물마다 무엇이 지키고 있는지 확인하세요.
+challenge.fork.name = 포크
+challenge.fork.desc = 한 기물이 두 기물을 동시에 공격합니다.
+challenge.fork.detail = 나이트, 폰, 퀸, 심지어 킹도 포크를 걸 수 있습니다. 상대는 두 목표 중 하나만 구할 수 있습니다.
+challenge.pin.name = 핀
+challenge.pin.desc = 움직이면 뒤에 있는 것을 잃게 되는 기물.
+challenge.pin.detail = 기물을 킹이나 더 가치 있는 기물에 핀으로 묶은 다음 한 번 더 공격하거나, 그 기물이 움직일 수 없다는 점을 이용하세요.
+challenge.skewer.name = 스큐어
+challenge.skewer.desc = 가치 있는 기물을 공격해 그 뒤의 기물을 얻으세요.
+challenge.skewer.detail = 핀의 반대입니다. 더 가치 있는 기물이 앞에 있어 비켜야 하고, 그러면 뒤에 있던 기물이 드러납니다.
+challenge.discovered.name = 디스커버드 어택
+challenge.discovered.desc = 한 기물을 움직여 다른 기물의 공격을 여세요.
+challenge.discovered.detail = 기물이 줄에서 비켜나면 그 뒤의 기물이 공격합니다. 체크나 더블 체크가 함께라면 상대는 두 위협에 모두 대응할 시간이 없습니다.
+challenge.deflection.name = 디플렉션과 디코이
+challenge.deflection.desc = 수비 기물을 떼어 내거나 치명적인 칸으로 끌어들이세요.
+challenge.deflection.detail = 임무가 두 가지인 수비 기물은 둘 다 해낼 수 없습니다. 그 기물을 공격하거나, 무언가를 내주거나, 잃게 될 칸으로 기물을 강제로 끌어들이세요.
+challenge.intermezzo.name = 중간 수
+challenge.intermezzo.desc = 바로 되잡지 마세요. 더 강한 수가 있습니다.
+challenge.intermezzo.detail = 예상되는 수보다 먼저 끼워 넣는 체크나 더 큰 위협이 모든 것을 바꿉니다.
+challenge.trapped.name = 갇힌 기물
+challenge.trapped.desc = 안전한 칸이 하나도 남지 않은 기물.
+challenge.trapped.detail = 기물의 마지막 도피 칸까지 빼앗은 다음 그 기물을 잡으세요.
+challenge.promotion.name = 프로모션
+challenge.promotion.desc = 폰을 마지막 랭크까지 밀어붙이세요.
+challenge.promotion.detail = 멀리 전진한 폰은 가치가 큽니다. 길을 열고, 막는 기물을 떼어 내고, 새 퀸을 만드세요.
+challenge.quiet.name = 조용한 수
+challenge.quiet.desc = 이기는 수가 체크도 잡기도 아닙니다.
+challenge.quiet.detail = 때로는 가장 강한 수가 막을 수 없는 위협을 준비하기만 합니다. 가장 찾기 어려운 종류의 수입니다.
+challenge.opening.name = 오프닝 함정
+challenge.opening.desc = 초반 실수를 응징하세요.
+challenge.opening.detail = 실제 게임의 첫 몇 수에서 나온 포지션으로, 부주의한 수 하나를 곧바로 응징할 수 있습니다.
+challenge.escape.name = 탈출구 찾기
+challenge.escape.desc = 킹이 위험합니다. 킹을 구하는 수는 하나뿐입니다.
+challenge.escape.detail = 다른 수는 모두 집니다. 킹을 노리는 모든 체크와 위협을 살펴본 다음 유일한 탈출구를 찾으세요.
+challenge.defend.name = 방어 수
+challenge.defend.desc = 기물을 잃지 않고 위협을 막으세요.
+challenge.defend.detail = 코치가 무언가를 위협합니다. 모든 것을 지켜 내는 정확한 수를 찾으세요.
+challenge.kq.name = 퀸과 킹 대 킹
+challenge.kq.desc = 퀸으로 체크메이트하기.
+challenge.kq.detail = 퀸으로 혼자 남은 킹을 가장자리로 몰고, 내 킹을 가까이 데려오되 스테일메이트를 조심하세요. 코치는 최선의 수로 방어합니다.
+challenge.kr.name = 룩과 킹 대 킹
+challenge.kr.desc = 룩으로 체크메이트하기.
+challenge.kr.detail = 룩이 한 랭크씩 킹을 차단하고, 내 킹은 오퍼지션을 잡습니다. 코치는 최선의 수로 방어합니다.
+challenge.kp.name = 킹과 폰 대 킹
+challenge.kp.desc = 오퍼지션을 잡고 프로모션하세요.
+challenge.kp.detail = 폰이 아니라 킹을 앞세우세요. 오퍼지션을 잡고, 코치가 따라잡을 수 없는 퀸을 만드세요.
+challenge.kp_hold.name = 폰 막기
+challenge.kp_hold.desc = 킹 하나로 킹과 폰을 상대해 무승부를 지키세요.
+challenge.kp_hold.detail = 폰 앞에 서서 오퍼지션을 유지하세요. 열 수 동안 버티세요.
+challenge.rook.name = 룩 엔드게임
+challenge.rook.desc = 루세나의 다리 놓기와 필리도르 방어.
+challenge.rook.detail = 모든 플레이어가 알아야 할 두 포지션: 7랭크의 폰으로 이기는 방법과, 3랭크의 룩으로 방어하는 방법.
+challenge.endgame.name = 엔드게임 전술
+challenge.endgame.desc = 적은 기물, 날카로운 아이디어.
+challenge.endgame.detail = 실제 게임에서 나온 폰 레이스, 돌파, 룩 엔드게임.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = 포지션 {0}개
+coach.challenge.done = 완료
+coach.challenge.start = 시작
+coach.challenge.note.white = 백으로 둡니다. 코치가 체스판에 포지션을 하나씩 놓습니다.
+coach.challenge.note.hint = 막히셨나요? H 키를 누르면 힌트를 볼 수 있습니다. 몇 번 시도하고 나면 코치가 힌트를 제안합니다.
+coach.challenge.note.unsaved = 챌린지는 레이팅에 반영되거나 저장되지 않습니다. 완료한 챌린지에는 체크 표시가 붙습니다.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = 챌린지 완료
+coach.challenge.complete.line = 모든 포지션을 풀었습니다.
+coach.challenge.next = 다음 챌린지
+coach.challenge.again = 다시 하기
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = 힌트를 보시겠습니까?
+coach.hint.text = 코치가 힌트를 제안합니다.
+coach.hint.hint = H 키를 누르면 힌트를 봅니다. 기물을 만지면 힌트 없이 계속합니다.
+coach.hint.accept = 힌트
+coach.hint.decline = 괜찮습니다
+coach.hint.key = 힌트
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = 코치 음성
+options.coach_voice.help = 코치 모드에서 코치가 소리 내어 말합니다. 음성 모델은 처음 필요할 때 다운로드됩니다(약 399 MB). 끔: 코치의 말은 화면에 글로만 표시됩니다.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = 음성 모델
+options.voice_update.help = 코치가 아직 이전 8비트 버전의 음성 모델로 말합니다. 업데이트하면 Supertone이 배포한 Supertonic 3 공식 버전을 다운로드하며, 그 전에 이전 파일을 삭제합니다.
+options.voice_update.button = 업데이트({0} MB)
+options.voice_update.running = 다운로드가 진행 중입니다.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = 음성 품질
+options.voice_quality.help = 코치의 음성 합성이 대사마다 거치는 다듬기 단계의 수로, 낮음(4)부터 최대(9)까지이며 기본값은 중간(5)입니다. 단계가 높을수록 목소리가 조금 더 깨끗해지지만 계산 시간이 길어져 코치가 조금 늦게 말하기 시작합니다. 음성 모델이 설치되어 있고 코치 음성이 켜져 있을 때 설정할 수 있습니다.
+options.voice_quality.low = 낮음
+options.voice_quality.medium = 중간
+options.voice_quality.high = 높음
+options.voice_quality.very_high = 매우 높음
+options.voice_quality.ultra = 울트라
+options.voice_quality.max = 최대
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = 코치의 목소리
+coach.download.text = 코치의 목소리는 Supertone이 만든 음성 합성 모델 Supertonic 3에서 나옵니다. 이 모델은 Scacelith에 포함되어 있지 않으며, 지금 Hugging Face에서 다운로드할 수 있습니다({0} MB, 한 번만). 모델이 없으면 코치의 말은 화면에 글로 표시됩니다.
+coach.download.licence = 이 모델은 OpenRAIL-M 라이선스로 배포되며, 이 라이선스는 모델이 만든 목소리를 사람의 목소리인 것처럼 내세우거나 실존 인물을 흉내 내는 등 특정 용도를 금지합니다.
+coach.download.read_licence = 라이선스 읽기
+coach.download.accept = 다운로드를 선택하면 이 라이선스의 조건에 동의하게 됩니다.
+# {0} = a folder
+coach.download.folder = 저장 위치: {0}
+coach.download.not_now = 나중에
+# {0} = the size in megabytes
+coach.download.download = 다운로드({0} MB)
+coach.download.licence_title = OpenRAIL-M 라이선스
+coach.download.back = 뒤로
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = 코치의 새 목소리
+coach.update.text = 이제 코치의 목소리는 지금까지 설치되어 있던 8비트 변환본 대신 Supertone이 배포한 Supertonic 3 공식 버전을 사용합니다. 지금 Hugging Face에서 다운로드할 수 있습니다({0} MB, 한 번만). 이전 파일({1} MB)은 먼저 삭제됩니다. 거절하면 코치는 지금 목소리를 유지하며, 업데이트는 나중에 설정 > 오디오에서 받을 수 있습니다.
+coach.update.download = 업데이트({0} MB)
+coach.update.accept = 업데이트를 선택하면 이 라이선스의 조건에 동의하게 됩니다.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = 코치의 목소리
+coach.download.removing = 이전 버전을 삭제하는 중…
+coach.download.checking = 파일을 확인하는 중…
+coach.download.downloading = 다운로드하는 중…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Hugging Face에서
+coach.download.from_archive = Hugging Face에서(보관 사본)
+coach.download.cancel = 취소
+coach.download.failed = 다운로드에 실패했습니다.
+coach.download.error.network = 서버에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.
+# {0} = a folder
+coach.download.error.disk = {0}에 파일을 쓸 수 없습니다. 여유 공간을 확인하고 다시 시도하세요.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = 서버가 예상하지 못한 응답을 보냈습니다({0}). 나중에 다시 시도하세요.
+coach.download.retry = 다시 시도
+coach.download.close = 닫기
+# Notices
+coach.download.done = 코치 음성이 설치되었습니다.
+coach.download.cancelled = 다운로드가 취소되었습니다. 다음에 멈춘 곳부터 이어서 받습니다.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = 저장된 게임
+options.save_games = 내 게임 저장
+options.save_games.help = Stockfish와 둔 게임, 코치와 둔 게임, 이 컴퓨터에서 두 사람이 둔 게임, 다이렉트 매치가 끝나면 PGN 파일로 저장되어, 저장된 게임에서 다시 찾아볼 수 있습니다. 온라인 게임은 서버가 보관합니다.
+library.title = 저장된 게임
+library.section.games = 게임
+library.section.details = 게임 정보
+library.section.tags = 태그
+library.section.moves = 기보
+library.count = {0}판
+library.filter = 표시
+library.filter.all = 모든 게임
+library.filter.play = Stockfish 상대
+library.filter.coach = 코치와 함께
+library.filter.hotseat = 2인 게임
+library.filter.direct = 다이렉트 매치
+library.filter.server = 온라인 게임
+library.filter.imported = 가져온 게임
+library.mode.play = Stockfish 상대
+library.mode.coach = 코치와 함께
+library.mode.hotseat = 2인 게임
+library.mode.direct = 다이렉트 매치
+library.mode.server = 온라인 게임
+library.mode.imported = 가져온 게임
+library.coach_level = 레벨 {0}
+library.unknown_player = 알 수 없음
+library.unfinished = 끝나지 않음
+library.unreadable = 이 게임을 읽을 수 없습니다.
+library.moves = {0}수
+library.opening_variation = {0}: {1}
+library.file = 파일: {0}
+library.file_game = 파일: {0}, 게임 {1}/{2}
+library.no_moves = 둔 수가 없습니다.
+library.none_selected = 목록에서 게임을 선택하세요.
+library.reading = 저장된 게임을 읽는 중
+library.empty.title = 아직 저장된 게임이 없습니다
+library.empty.text = Stockfish와 둔 게임, 코치와 둔 게임, 이 컴퓨터에서 두 사람이 둔 게임, 다이렉트 매치는 끝나면 여기에 표시됩니다. 이 폴더에 PGN 파일을 넣을 수도 있습니다. 다른 프로그램이나 웹사이트에서 내보낸 게임도 내 게임과 함께 표시됩니다.
+library.empty.filter = 이 종류의 게임이 없습니다.
+library.error.folder = 저장된 게임 폴더를 읽을 수 없습니다
+library.error.game = 이 게임을 읽을 수 없습니다: {0}
+library.folder = 폴더: {0}
+library.open_folder = 폴더 열기
+library.open_failed = 폴더를 열 수 없습니다.
+library.replay = 다시 보기
+library.delete = 삭제
+library.delete.title = 게임 삭제
+library.delete.text = {0} 게임이 파일과 함께 이 컴퓨터에서 삭제됩니다. 되돌릴 수 없습니다.
+library.delete.ok = 삭제
+library.delete.several = 이 파일에는 게임이 {0}판 들어 있어 폴더에서만 삭제할 수 있습니다.
+library.deleted = 게임이 삭제되었습니다.
+library.delete.failed = 게임을 삭제할 수 없습니다.
+library.delete.changed = 파일이 변경되어 목록을 업데이트했습니다.
+library.truncated = 이 폴더에 게임이 너무 많아 최근 {0}판만 표시됩니다.
+library.tag.Event = 대회
+library.tag.Site = 장소
+library.tag.Date = 날짜
+library.tag.Time = 시각
+library.tag.Round = 라운드
+library.tag.White = 백
+library.tag.Black = 흑
+library.tag.Result = 결과
+library.tag.WhiteElo = 백 Elo
+library.tag.BlackElo = 흑 Elo
+library.tag.TimeControl = 시간 제한
+library.tag.Termination = 종료 사유
+library.tag.Opening = 오프닝
+library.tag.Variation = 변형
+library.tag.PlyCount = 플라이 수
+library.tag.FEN = 시작 포지션
+library.tag.ScacelithMode = 모드
+library.tag.CoachLevel = 코치 레벨
+library.tag.ScacelithServer = 서버
+library.tag.ScacelithGameId = 게임 번호
+library.tag.UTCDate = 날짜(UTC)
+library.tag.UTCTime = 시각(UTC)
+library.tag.WhiteRatingDiff = 백 레이팅 변동
+library.tag.BlackRatingDiff = 흑 레이팅 변동
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = 분석
+analysis.menu.title = 분석
+analysis.menu.analyse = 분석하기
+analysis.menu.paste = PGN 붙여넣기
+analysis.menu.online = 내 온라인 게임
+analysis.menu.folder = 이 폴더에 PGN 파일을 넣으면 분석할 수 있습니다: {0}
+analysis.menu.empty.title = 아직 저장된 게임이 없습니다
+analysis.menu.empty.text = 게임은 끝나면 여기에 표시되며, 아래 폴더에 넣은 PGN 파일도 함께 표시됩니다. PGN 텍스트로 복사한 게임을 붙여넣을 수도 있습니다.
+analysis.menu.empty.no_folder = PGN 텍스트로 복사한 게임을 붙여넣어 분석하세요.
+analysis.menu.paste.empty = 클립보드가 비어 있습니다. 먼저 게임을 PGN 텍스트로 복사하세요.
+analysis.menu.paste.none = 클립보드에서 체스 게임을 찾을 수 없습니다.
+analysis.menu.paste.several = 클립보드에 게임이 여러 개 있어 첫 번째 게임을 분석합니다.
+analysis.menu.gameover = 게임 분석
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = {1}수 중 {0}수째
+replay.speed.factor = ×{0}
+replay.speed.instant = 즉시
+replay.again = 처음부터 다시 보기
+replay.gameover.unfinished = 게임이 {0}수째에서 결과 없이 끝납니다.
+replay.tip.start = 게임 처음으로(Home)
+replay.tip.back = 한 수 뒤로(J)
+replay.tip.pause = 일시 정지(K)
+replay.tip.resume = 계속(K)
+replay.tip.forward = 한 수 앞으로(L)
+replay.tip.end = 게임 끝으로(End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = 해설
+analysis.hud.accuracy = 정확도
+analysis.hud.reviewing = Stockfish가 게임을 검토하는 중… {0}
+analysis.hud.no_engine = 체스 엔진이 없어 분석 없이 수만 표시합니다.
+analysis.hud.no_moves = 이 게임에는 수가 없습니다.
+analysis.hud.tip.play = 수 재생(K)
+analysis.hud.tip.comments_off = 주요 장면의 해설 숨기기(N)
+analysis.hud.tip.comments_on = 주요 장면의 해설 표시(N)
+analysis.hud.tip.voice_off = 해설자 목소리 끄기(M)
+analysis.hud.tip.voice_on = 해설을 음성으로 듣기(M)
+analysis.hud.tip.voice_missing = 음성을 들을 수 없습니다. 음성 파일이 설치되지 않았거나 설정 > 오디오 > 코치 음성이 꺼져 있습니다. 해설은 화면에 글로만 표시됩니다.
+analysis.hud.tip.arrows_off = 더 좋은 수의 화살표 숨기기(B)
+analysis.hud.tip.arrows_on = 더 좋은 수의 화살표 표시(B)
+analysis.hud.controls.play = 재생 / 일시 정지
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = 해설 표시 / 숨기기
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = 해설자 목소리 켜기 / 끄기
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = 화살표 표시 / 숨기기
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = GIF로 저장
+gif.making = GIF를 만드는 중: 서버가 게임을 그리고 있습니다…
+gif.saved = GIF를 저장했습니다:
+gif.saved_as = GIF 저장됨: {0}
+gif.sign_in_first = GIF를 만들려면 온라인 서버에 로그인하세요. GIF는 서버가 그립니다.
+gif.busy_other = 다른 GIF를 만드는 중입니다. 완성될 때까지 기다려 주세요.
+gif.err.rate_limited_for = 짧은 시간에 GIF를 많이 만들었습니다. {0} 후에 다음 GIF를 만들 수 있습니다.
+gif.err.rate_limited = 짧은 시간에 GIF를 많이 만들었습니다. 나중에 다시 시도하세요.
+gif.err.server_busy_for = 서버가 다른 GIF를 그리느라 바쁩니다. {0} 후에 다시 시도하세요.
+gif.err.server_busy = 서버가 다른 GIF를 그리느라 바쁩니다. 잠시 후 다시 시도하세요.
+gif.err.signed_out = 세션이 종료되었습니다. GIF를 만들려면 다시 로그인하세요.
+gif.err.game_too_long = 이 게임은 너무 길어서 GIF로 만들 수 없습니다.
+gif.err.pgn_too_large = 이 게임은 너무 길어서 GIF로 만들 수 없습니다.
+gif.err.invalid_pgn = 서버가 이 게임을 읽을 수 없습니다.
+gif.err.render_failed = 서버가 이 GIF를 만들 수 없습니다. 다시 시도하세요.
+gif.err.gif_disabled = 이 서버는 GIF를 만들지 않습니다.
+gif.err.write_failed = 이 컴퓨터에 GIF를 저장할 수 없습니다.
+gif.err.not_found = 이 게임은 더 이상 서버에 없습니다.
+gif.wait.seconds = {0}초
+gif.wait.minutes = {0}분
+gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6을 시작할 수 없습니다. 그래픽 드라이버를 업데이트하세요.
+error.opengl_macos = 이 Mac에서 OpenGL 4.6을 시작할 수 없습니다. Scacelith를 실행하려면 Apple 실리콘(M1 이상)과 macOS 26 이상이 필요하며, 가상 머신에서는 실행되지 않습니다.
+error.renderer = 렌더러를 시작할 수 없습니다.
+error.scene = 장면을 불러올 수 없습니다.
+error.log_file = 자세한 내용은 로그 파일에 있습니다: {0}
