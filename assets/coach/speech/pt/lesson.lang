@@ -67,7 +67,7 @@ why.NotYourTurn = Espera: agora é a minha vez.
 # ---- Chapter 0: welcome and the board -------------------------------------------------------------------
 lesson.welcome.hello = Olá! Sou o teu treinador. Vamos aprender juntos as regras do xadrez, passo a passo.
 lesson.welcome.board = Este é o tabuleiro: sessenta e quatro casas, claras e escuras, oito filas de oito casas.
-lesson.welcome.light = A casa do canto, à tua {@}direita, é sempre clara. Lembra-te: clara à direita.
+lesson.welcome.light = A casa do canto à tua {@}direita é sempre clara. Lembra-te: clara à direita.
 lesson.welcome.files = As linhas verticais chamam-se colunas. Têm letras, do {@}a ao {@2}h.
 lesson.welcome.files.spoken = As linhas verticais chamam-se colunas. Têm letras, do {@}á ao {@2}agá.
 lesson.welcome.ranks = As linhas horizontais chamam-se filas. Têm números, do {@}um ao {@2}oito, a começar do teu lado.
@@ -180,7 +180,7 @@ lesson.capture.king_ok = Isso! A minha dama não tinha defensor, por isso o teu 
 lesson.capture.knight_ok = Isso! O teu cavalo eliminou a peça atacante.
 
 # ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
-lesson.mate1.what = Xeque-mate: o rei está em xeque e não tem como escapar. Isso ganha a partida.
+lesson.mate1.what = Xeque-mate: o rei está em xeque e não tem como escapar. É assim que se ganha a partida.
 lesson.mate1.stuck = O meu rei está preso atrás dos seus {@}próprios peões.
 lesson.mate1.ask = Dá-me xeque-mate num lance!
 lesson.mate1.wrong = Quase! Dá xeque na minha última fila, onde o meu rei não consegue fugir.
@@ -234,7 +234,7 @@ lesson.stale.draw = Não tenho nenhum lance legal. Isso é afogamento, e a parti
 lesson.stale2.ask = Quando estás a ganhar, cuidado com o afogamento. Dá-me xeque-mate num lance, sem afogar o meu rei!
 lesson.stale2.wrong = Dá xeque na minha última fila, onde o meu rei não consegue fugir.
 lesson.stale2.ok = Xeque-mate! Deixa sempre um lance ao rei adversário, a não ser que lhe estejas a dar mate.
-lesson.draws.kings = Outros empates: quando ninguém pode dar xeque-mate, como com dois reis sozinhos, a partida é empate.
+lesson.draws.kings = Outros empates: quando ninguém pode dar xeque-mate, como quando só restam os dois reis, a partida é empate.
 lesson.draws.agree = Os jogadores também podem combinar um empate.
 lesson.draws.repeat = Repetir a mesma posição três vezes, ou fazer cinquenta lances sem capturas nem lances de peão, também permite o empate.
 
@@ -248,7 +248,7 @@ lesson.talk.clock = Isto é um {@}relógio de xadrez. Cada jogador tem o seu pr�
 lesson.talk.press = Depois do teu lance, carregas no relógio com a mesma mão. Isso põe o meu tempo a correr.
 lesson.talk.flag = Se o teu tempo acabar, perdes, a não ser que eu não tenha qualquer forma de te dar xeque-mate.
 lesson.talk.increment = Cinco mais três quer dizer cinco minutos para cada um, mais três segundos depois de cada lance.
-lesson.talk.speeds = As partidas curtas são de blitz; as mais longas, rápidas; e as mais longas de todas, clássicas.
+lesson.talk.speeds = Uma partida curta é de blitz; uma mais longa é rápida; e uma ainda mais longa é clássica.
 lesson.talk.no_clock = Comigo, o relógio está desligado. Leva todo o tempo de que precisares para pensar.
 lesson.talk.touch = Numa partida a sério, se tocares numa das tuas peças, tens de a jogar.
 lesson.talk.touch_mine = Se tocares numa das minhas peças, tens de a capturar, se puderes.

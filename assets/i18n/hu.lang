@@ -1,0 +1,252 @@
+# Scacelith - Magyar
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other; a Hungarian noun
+# stays singular after a number, so both forms are usually the same words ("1 lépés", "5 lépés").
+# Register: formal address, as Microsoft and Apple Hungarian do ("Válassza ki...", "Ön" only where a
+# pronoun is needed); buttons and menu entries are nouns or verbal nouns ("Új játszma", "Kilépés").
+# Titles in capitals with their accents (ÚJ JÁTSZMA). Terms follow the Hungarian glossary: világos /
+# sötét (lowercase inside a sentence), értékszám and "Élő" for Elo, játékidő for time control,
+# "fogott bábu" for touch-move, "mp" for seconds.
+# No case suffix and no article a/az is attached to a placeholder: their form depends on how the value
+# sounds, so the sentences put a name, a number or a square in the nominative or after a colon.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Be
+common.off = Ki
+common.back = Vissza
+common.apply = Alkalmaz
+common.discard = Elvetés
+common.cancel = Mégse
+common.white = Világos
+common.black = Sötét
+common.main_menu = Főmenü
+# Decimal separator of numbers ("2,5 mp"); percent without a space ("85%").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = A királyi játék
+menu.new_game = Új játszma
+menu.options = Beállítások
+menu.credits = Készítők
+menu.quit = Kilépés
+menu.version = Verzió: {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = BEÁLLÍTÁSOK
+options.tab.display = Megjelenítés
+options.tab.graphics = Grafika
+options.tab.audio = Hang
+options.tab.gameplay = Játékmenet
+options.tab.player = Játékos
+options.tab.controls = Irányítás
+options.pending = A módosítások az alkalmazásuk után lépnek életbe.
+options.unsaved.title = NEM MENTETT MÓDOSÍTÁSOK
+options.unsaved.text = Egyes beállítások megváltoztak. Alkalmazza őket kilépés előtt?
+
+options.language = Nyelv
+options.language.help = A menük és az üzenetek nyelve. Azonnal átvált.
+options.display_mode = Megjelenítési mód
+options.display_mode.help = Teljes képernyő: keret nélküli ablak a teljes képernyőn, az asztal felbontásával. Ablakos: az alább megadott méretű ablak.
+options.fullscreen = Teljes képernyő
+options.windowed = Ablakos
+options.window_size = Ablakméret
+options.window_size.help = Az ablak mérete ablakos módban. Teljes képernyőn mindig az asztal felbontása érvényes.
+options.vsync = Függőleges szinkron
+options.vsync.help = A képkockák összehangolása a kijelzővel a képszakadás elkerülésére.
+options.render_scale = Renderelési arány
+options.render_scale.help = A 3D-s kép belső felbontása. Alacsonyabb értéken gyorsabb, magasabbon élesebb.
+
+options.quality = Minőség
+options.quality.very_low = Nagyon alacsony
+options.quality.low = Alacsony
+options.quality.medium = Közepes
+options.quality.high = Magas
+options.quality.ultra = Ultra
+options.quality.custom = Egyéni
+options.quality.help = Egyszerre állítja be az alábbi beállításokat: a Nagyon alacsony minden effektust kikapcsol, az Ultra mindet a maximumra állítja. Ha egy beállítást külön módosít, a minőség Egyéni lesz. Gyengébb videokártyán a renderelési arány csökkentése (Megjelenítés) is sokat segít.
+options.shadows = Árnyékok
+options.shadows.help = A napfény árnyékainak részletessége és szélük lágysága. Alacsony: egyszerű szélek, gyors kirajzolás.
+options.reflections = Tükröződések
+options.reflections.help = A padló, az asztal és a tábla tükrözi a termet (ehhez mindegyiknél még egyszer ki kell rajzolni: a legigényesebb beállítások egyike); Közepes szinttől a fényes bábuk és tárgyak is tükrözik a környezetüket.
+options.ambient_occlusion = Környezeti takarás
+options.ambient_occlusion.help = Lágy árnyékolás a tárgyak találkozásánál és a mélyedésekben, ahová kevesebb fény jut.
+options.indirect_light = Közvetett fény
+options.indirect_light.help = A falakról, a padlóról és a mennyezetről visszaverődő napfény. Alacsony: helyette egyenletes környezeti fény. Főleg a betöltési időt befolyásolja.
+options.volumetric_light = Fénynyalábok
+options.volumetric_light.help = A terem poros levegőjén átszűrődő napsugarak és a bennük csillogó porszemek.
+options.tessellation = Tesszelláció
+options.tessellation.help = Sima körvonalak a bábuk íves részein, közelről nézve.
+options.tessellation.unavailable = Nem érhető el: ez a grafikus illesztőprogram nem támogatja a tesszellációt.
+options.antialiasing = Élsimítás
+options.antialiasing.help = Kisimítja a recés éleket és a vibráló csillanásokat. Ki: élesebb, de recés kép, és egyes effektusok szemcsésnek tűnnek.
+options.depth_of_field = Mélységélesség
+options.depth_of_field.help = Elmossa azt, ami jóval a nézett pont előtt vagy mögött van, ahogy egy fényképezőgép objektívje.
+options.motion_blur = Mozgási elmosódás
+options.motion_blur.help = Elmossa a kamera és a karok gyors mozgását, ahogy egy filmkamera.
+options.bloom = Ragyogás
+options.bloom.help = Lágy fénylés a legerősebb csillanások körül, mint egy fényképezőgép objektívjében.
+options.brightness = Fényerő
+options.brightness.neutral = Semleges
+options.brightness.value = {0} EV
+options.brightness.help = A kamera expozíciókorrekciója. Az első indításkor végzett kalibrálás úgy állítja be, hogy a legsötétebb árnyékok épp csak láthatók legyenek.
+
+options.master_volume = Fő hangerő
+options.effects = Effektusok
+options.ambience = Háttérhangok
+options.ambience.help = A terem moraja: a tűz, távoli léptek, az öreg óra.
+options.ambience_volume = Háttérhangok hangereje
+options.voice_volume = Beszéd hangereje
+options.voice_volume.help = Az edző hangjának hangereje Edző módban.
+options.subtitles = Feliratok
+options.subtitles.auto = Automatikus
+options.subtitles.help = Az edző szavai a képernyő alján. Automatikus: akkor jelennek meg, ha az edző nem a menük nyelvén beszél (kínai menük mellett angolul beszél). Mindig megjelennek, ha a hangja nincs telepítve.
+
+options.legal_moves = Szabályos lépések mutatása
+options.legal_moves.help = Kiemeli a mezőket, ahová a megérintett bábu léphet. Kikapcsolva semmi sem jelzi, hogy egy lépés szabályos-e: a szabálytalan lépést a versenybíró az óra megnyomása után bünteti.
+options.coordinates = Táblakoordináták
+options.auto_press = Automatikus óranyomás
+options.auto_press.help = A robotja magától megnyomja az órát, amint a lépése a táblán van. Online játszmákban erről a szerver dönt, közvetlen mérkőzésen pedig a mérkőzést létrehozó játékos.
+options.thinking_time = Valósághű gondolkodási idő
+options.thinking_time.help = Az ellenfél egy emberi játékoshoz hasonlóan időt szán a lépéseire, ahelyett hogy azonnal lépne.
+options.ignore_head = Ellenfél fejmozgásának mellőzése
+options.ignore_head.help = Online játszmákban és közvetlen mérkőzéseken az ellenfél robotja oda néz, ahová a játékosa. Bekapcsolva magától mozgatja a fejét, mint a Stockfish elleni játékban.
+options.mouse_sensitivity = Egérérzékenység
+options.invert_look = Függőleges nézés megfordítása
+options.handover = Játékosváltás
+options.handover.cut = Azonnali vágás
+options.handover.flight = Átrepülés, {0} mp
+options.handover.help = Két játékos egy gépen: hogyan kerül át a nézőpont az egyik játékos szeméből a másikéba minden lépés után. Az azonnali vágás elkerüli a kameramozgást.
+options.game_cursor = Játékbeli mutató
+options.game_cursor.help = Az asztalnál a játék saját mutatót rajzol, amely jelzi, mi történik kattintásra. Ki: a szokásos rendszernyíl.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Név
+player.name.help = Az Ön neve, ahogy a jegyzőlapok tetején szerepel, bármilyen írásrendszerben.
+player.default_name = Ember
+player.handwriting = Kézírás
+player.handwriting.help = A kézírás, amellyel a lépései a jegyzőlapra kerülnek. Az arab, a japán és a kínai szöveg saját kézírással jelenik meg.
+player.preview = AZ ÖN JEGYZŐLAPJÁN
+hand.caveat = Laza
+hand.marck = Folyóírás
+hand.badscript = Dőlt
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Bal kattintás
+controls.touch = Bábu megérintése, majd áthelyezése
+controls.clock.keys = Szóköz  vagy  kattintás az órára
+controls.clock = Az óra megnyomása
+controls.look.keys = Jobb egérgomb, nyomva tartva
+controls.look = Körülnézés
+controls.sheet.keys = S
+controls.sheet = A jegyzőlap megnézése, majd vissza
+controls.stand.keys = ↑
+controls.stand = Felállás a szék előtt
+controls.side.keys = ←  /  →
+controls.side = Odaállás az asztal bal / jobb végéhez
+controls.sit.keys = ↓
+controls.sit = Visszaülés (csak ülve lehet játszani)
+controls.moves.keys = Tab
+controls.moves = A lépéslista megjelenítése vagy elrejtése
+controls.menu.keys = Esc
+controls.menu = Menü
+controls.coach_skip.keys = Szóköz
+controls.coach_skip = Edző: az edző mondandójának átugrása
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Edző: a lépés visszavonása, ha az edző felajánlja
+controls.coach_hint.keys = H
+controls.coach_hint = Edzői kihívások: tipp kérése
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = FÉNYERŐ
+calibration.text = Mozgassa a csúszkát, amíg a sötét mezőn álló huszár épp csak látható, vagy már nem látszik.
+calibration.later = Később módosíthatja a Beállítások > Grafika lapon.
+calibration.continue = Tovább
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = ÚJ JÁTSZMA
+newgame.opponent = ELLENFÉL
+newgame.time_control = JÁTÉKIDŐ
+newgame.start = Kezdés
+newgame.elo = ~{0} Élő
+newgame.you_white = Ön világossal játszik.
+newgame.you_black = Ön sötéttel játszik.
+newgame.colour_lot = Az első játszmában a színeket sorsolás dönti el.
+newgame.colour_alternate = Ezután a színek játszmáról játszmára váltakoznak.
+newgame.opponent_kind = Ellenfél
+newgame.opponent_kind.help = Játsszon a Stockfish ellen, vagy egy barátja ellen, aki ennél a számítógépnél ül: felváltva lépnek, mindketten a tábla saját oldaláról.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Ember, ugyanazon a gépen
+
+# Custom opponent: Stockfish parameters
+engine.skill = Tudásszint
+engine.skill.help = A Stockfish „Skill Level” beállítása (0–20). Figyelmen kívül marad, amíg az erősséget Élő-pontszám korlátozza.
+engine.limit_elo = Erősség korlátozása (Élő)
+engine.limit_elo.help = UCI_LimitStrength: a motor az alább megadott Élő-pontszámra törekszik.
+engine.elo = Élő
+engine.depth = Keresési mélység
+engine.plies = {0} féllépés|{0} féllépés
+engine.move_time = Idő lépésenként
+engine.nodes = Csomópontkorlát
+engine.no_limit = Ki
+engine.thousand = {0} ezer
+engine.million = {0} millió
+engine.dynamic_elo = Dinamikus Élő az idő függvényében
+engine.dynamic_elo.help = Egy emberi játékoshoz hasonlóan a Stockfish is gyengébben játszik, amikor fogy az ideje: az utolsó percben kissé (rapid- és villámjátszmákban korábban), időzavarban sokkal gyengébben. Csak órával játszott játszmákban.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = A Stockfish egy hozzá hasonló erősségű emberi játékos módjára szán időt a lépéseire. A szünet kikapcsolása: Beállítások > Játékmenet > Valósághű gondolkodási idő.
+engine.pace.instant = A Stockfish azonnal lép, amint végzett a számítással. Emberszerű szünetekhez: Beállítások > Játékmenet > Valósághű gondolkodási idő.
+
+# Time controls ("3+2": minutes + increment in seconds). Blitz is "Villám" (villámjátszma), as the
+# Hungarian chess press and the chess sites write it; Bullet and Rapid are used as they are.
+tc.unlimited = Korlátlan
+tc.no_clock = Óra nélkül
+tc.bullet = Bullet
+tc.blitz = Villám
+tc.rapid = Rapid
+tc.classical = Klasszikus
+tc.custom = Egyéni
+tc.your_own = Saját
+tc.base_time = Alapidő
+tc.base_time.help = Kezdő idő mindkét órán (perc : másodperc).
+tc.increment = Többletidő
+tc.increment.help = Fischer-féle többletidő, amely minden lépés után hozzáadódik.
+tc.delay = Késleltetés
+tc.delay.help = Bronstein-féle késleltetés: a késleltetésig felhasznált időt a játékos minden lépés után visszakapja.
+tc.no_delay = Ki
+tc.seconds = {0} mp
+tc.minutes = {0} perc
+tc.summary_increment = {0} + {1} mp
+tc.summary_delay = {0}, késleltetés: {1} mp
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Újonc
+preset.novice.desc = Épp most tanulta meg a lépéseket: ütésben hagyja a bábuit, és nem veszi észre az egyszerű fenyegetéseket.
+preset.beginner.name = Kezdő
+preset.beginner.desc = Ismeri az alapokat, de baklövésekkel még rendszeresen anyagot veszít.
+preset.casual.name = Hobbijátékos
+preset.casual.desc = Laza esti ellenfél: értelmes lépések, gyakori hibák.
+preset.club_player.name = Klubjátékos
+preset.club_player.desc = Megbízható klubjátékos, aki megbünteti a nyilvánvaló baklövéseket.
+preset.advanced.name = Haladó
+preset.advanced.desc = Erős klubjátékos, jó taktikai érzékkel.
+preset.expert.name = Szakértő
+preset.expert.desc = Tapasztalt versenyjátékos: ritkán hibázik, és értékesíti az előnyét.
+preset.master.name = Mester
+preset.master.desc = Mesteri erő: mély számolás és finom pozíciós játék.
+preset.grandmaster.name = Nagymester
+preset.grandmaster.desc = Nagymesteri szint: rendkívül nehéz legyőzni.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = A Stockfish 19 teljes erővel. Sok sikert!
+preset.custom.name = Egyéni
+preset.custom.desc = Saját motorbeállítások.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = KÉSZÍTŐK
+credits.game.head = SCACELITH
+credits.game = Sakkjátszma egy királyi teremben, saját fejlesztésű, OpenGL 4.6 alapú motoron.
+credits.engine.head = SAKKMOTOR
+credits.engine = Stockfish 19, a Stockfish fejlesztőitől.
+credits.engine.licence = GNU General Public License, 3. verzió.
+credits.engine.data = Neurális hálózatát a Leela Chess Zero projekt által biztosított adatokon tanították, amelyek az Open Database License (ODbL) alapján érhetők el.
+credits.voice.head = AZ EDZŐ HANGJA

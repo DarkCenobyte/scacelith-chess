@@ -210,3 +210,786 @@ ex.dubious.b1 = See käik on kahtlane. Äkki saad paremini?
 ex.dubious.b1.2 = See käik on kahtlane. Äkki leiad parema käigu?
 ex.dubious.b2 = Kahtlane käik. Äkki saad paremini?
 ex.dubious.b2.2 = See käik on kahtlane. Äkki leidub midagi paremat?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Seejärel {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} läheb väljale {sq}.
+demo.my.move.2 = Ma viin {my:own_gen} väljale {sq}.
+demo.my.move.3 = Siis läheb {my} väljale {sq}.
+demo.my.take = Ma löön {your:gen}.
+demo.my.take.2 = {my} lööb {your:gen}.
+demo.my.take.3 = Ja nüüd löön ma {your:gen}.
+demo.my.check = {my} läheb väljale {sq}. Tuli.
+demo.my.check.2 = Annan tuld: {my} läheb väljale {sq}.
+demo.my.check.3 = {my} väljale {sq}, tuli!
+demo.my.mate = {my} läheb väljale {sq}. Matt.
+demo.my.mate.2 = Ja käik {my:com} väljale {sq} on matt.
+demo.my.mate.3 = {my} väljale {sq}. See on matt.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Kõigepealt lööb {my} {your:gen}. {t1} võib oodata.
+demo.my.first.take.2 = {my} lööb esmalt {your:gen}. {t1} ei kao kuhugi.
+demo.my.first.check = {my} lööb {your:gen} ja see on tuli! {t1} võib oodata.
+demo.my.first.check.2 = Kõigepealt lööb {my} {your:gen} ja annab tuld. {t1} ei kao kuhugi.
+demo.my.first.check_move = Kõigepealt annan tuld: {my} läheb väljale {sq}. {t1} võib oodata.
+demo.my.first.check_move.2 = {my} läheb väljale {sq}: kõigepealt tuli! {t1} ei kao kuhugi.
+demo.my.first.move = Kõigepealt läheb {my} väljale {sq}. {t1} võib oodata.
+demo.my.first.move.2 = Esmalt {my} väljale {sq}. {t1} ei kao kuhugi.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} on rünnaku all, nii et ta lööb kõigepealt {your:gen}.
+demo.my.first.attacked.2 = {my} on ohus: ta haarab kõigepealt {your:gen}.
+# Levels 4-6, the same in-between move.
+demo.first = Kõigepealt {move}: {t1} võib oodata.
+demo.first.2 = Esmalt {move}. {t1} ei kao kuhugi.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Nüüd teen oma käigu.
+demo.play_on.2 = Ja siin on minu tegelik käik.
+demo.play_on.3 = Ja nüüd minu päris käik.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Sa viiksid {your:own_gen} väljale {sq}.
+demo.your.move.2 = Oletame, et viid {your:own_gen} väljale {sq}.
+demo.your.move.3 = Siis läheb {your} väljale {sq}.
+demo.your.take = Sa lööksid {my:gen}.
+demo.your.take.2 = Sa lööd {my:gen} {your:own_com}.
+demo.your.take.3 = Siis lööd sa {my:gen}.
+demo.your.back = Sa lööd tagasi.
+demo.your.back.2 = Sa lööd tagasi väljal {sq}.
+demo.your.back.3 = Ja sa lööd tagasi.
+demo.your.king = Sinu kuningas peab liikuma.
+demo.your.king.2 = Kuningas peab taanduma väljale {sq}.
+demo.your.king.3 = Sinu kuningas põgeneb väljale {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Nüüd ei saa {t1:part} enam päästa.
+ex.point.piece.2 = Ja {t1} läheb kaotsi.
+ex.point.piece.3 = Järgmisena langeb {t1}.
+ex.point.two = {t1} ja {t2} on mõlemad rünnaku all: üks neist langeb.
+ex.point.two.2 = Nüüd ründan ma {t1:part} ja {t2:part}. Mõlemat sa päästa ei saa.
+ex.point.mate = Ja nüüd on {reply:nomate} matt.
+ex.point.mate.2 = Järgmisena tuleb {reply:nomate} ja see on matt.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Näed? Nüüd oled kaotanud {pts:point_obj}.
+ex.result.b1.2 = Nii kaotadki {pts:point_obj}.
+ex.result.b2 = Lõpuks oled kaotanud {pts:point_obj}.
+ex.result.b2.2 = Nüüd oled {pts:point_gen} võrra taga.
+ex.result.b3 = Sellega kaotad {pts:point_obj}.
+ex.result.b3.2 = Lõpuks jääd {pts:point_gen} võrra maha.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Midagi saad tagasi lüüa, aga jääd ikkagi {pts:point_gen} võrra maha.
+ex.result_back.b1.2 = Natuke saad tagasi võita, aga ikkagi oled kaotanud {pts:point_obj}.
+ex.result_back.b2 = Osa saad tagasi, aga oled ikka {pts:point_gen} võrra taga.
+ex.result_back.b2.2 = Isegi pärast tagasilöömist oled kaotanud {pts:point_obj}.
+ex.result_back.b3 = Ka pärast tagasilöömist oled {pts:point_gen} võrra taga.
+ex.result_back.b3.2 = Midagi võidad tagasi, aga kaotad ikkagi {pts:point_obj}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Kui {your2} lööb tagasi, lööb {my} {your:gen}.
+ex.retake.b1.2 = Sa ei saa {your2:own_com} tagasi lüüa: siis lööb {my} {your:gen}.
+ex.retake.b2 = Kui {your2} lööb tagasi, lööb {my} {your:gen}.
+ex.retake.b2.2 = Tagasilöömine {your2:com} ei toimi: {my} lööb {your:gen}.
+ex.retake.b3 = Kui lööd tagasi käiguga {move}, järgneb {reply}, mis lööb {your:gen}.
+ex.retake.b3.2 = Tagasilöömine käiguga {move} ei toimi: {reply} lööb {your:gen}.
+ex.retake.b4 = {move} ei toimi: järgneb {reply}, mis lööb {your:gen}.
+ex.retake.b4.2 = Ja kui {move}, siis lööb {reply} {your:gen}.
+ex.retake.b5 = Tagasilöömisele {move} järgneb {reply} ja {your} langeb.
+ex.retake.b5.2 = {move} ei toimi vastuse {reply} tõttu: {your} langeb.
+ex.retake.b6 = {move}? {reply} lööb {your:gen}.
+ex.retake.b6.2 = {move} ei toimi: {reply} lööb {your:gen}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Ja siin, väljal {sq}, saaksid sa uue lipu.
+demo.promote.2 = Siis jõuab {your} väljale {sq} ja muundub lipuks.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Ettevaatust: {my} võib minna väljale {sq} ja see on matt.
+ex.mate_allowed.b1.2 = Nüüd saab {my} minna väljale {sq}. See oleks matt!
+ex.mate_allowed.b1.3 = Ettevaatust! Kui {my} läheb väljale {sq}, on matt.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = See käik lubab mul {your:all} {m:move_com} matti panna.
+ex.mate_allowed.b2.2 = Nüüd saan {your:all} {m:move_com} matti panna. Vaata.
+ex.mate_allowed.b2.3 = Ettevaatust! {your} on ohus: matt {m:move_com}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = See lubab matti {m:move_com}: {line:nomate}.
+ex.mate_allowed.b3.2 = Pärast seda on mul matt {m:move_com}: {line:nomate}.
+ex.mate_allowed.b3.3 = Sinu kuningas saab mati: {line:nomate}.
+ex.mate_allowed.b4 = {move} lubab forsseeritud matti: {line:nomate}.
+ex.mate_allowed.b4.2 = Sellele järgneb matt {m:move_com}: {line:nomate}.
+ex.mate_allowed.b4.3 = Pärast käiku {move} on {line:nomate} matt.
+ex.mate_allowed.b5 = {move} lubab forsseeritud matti {m:move_com}.
+ex.mate_allowed.b5.2 = Sellele järgneb matt {m:move_com}.
+ex.mate_allowed.b5.3 = Nüüd on forsseeritud matt {m:move_com}.
+ex.mate_allowed.b6 = Matt {m:move_com}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, matt.
+ex.mate_allowed.b6.3 = Pärast jätku {line:nomate} on matt.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Vaata: {your:ade} pole enam ühtegi välja, kuhu põgeneda.
+ex.mate_allowed.tail.b1.2 = Näed? {your} on rünnaku all ega pääse minema.
+ex.mate_allowed.tail.b1.3 = {your:ade} pole kuhugi minna. See on matt.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Selle matikujundi nimi on „{text}“.
+ex.mate_allowed.pattern.2 = Jäta see meelde: see on {text}.
+ex.mate_allowed.tip.b3 = Enne iga käiku kontrolli, kas sinu kuningas on ikka ohust väljas.
+ex.mate_allowed.tip.b3.2 = Küsi alati: kas pärast minu käiku saab mu kuningale matti panna?
+
+# Nominative names (no article in Estonian).
+name.pattern.back_rank = tagumise rea matt
+name.pattern.smothered = umbmatt
+name.pattern.support = kaitstud lipuga matt
+name.pattern.ladder = redelimatt
+name.pattern.epaulette = epoletimatt
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Käiguga {best:nomate} oleksid saanud {my:all} matti panna!
+ex.mate_missed.b1.2 = {best:nomate} oli matt! {my} poleks pääsenud.
+ex.mate_missed.b1.3 = Vaata! Käik {best:nomate} oleks pannud {my:all} matti.
+ex.mate_missed.b2 = Sul oli matt {m:move_com}, alates käigust {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} oli matt {m:move_com}!
+ex.mate_missed.b2.3 = Oleksid võinud mulle käiguga {best:nomate} matti panna.
+ex.mate_missed.b3 = Sa lasid käest mati {m:move_com}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} paneb matti {m:move_com}: {line:nomate}.
+ex.mate_missed.b3.3 = Oli olemas matt {m:move_com}, alates käigust {best:nomate}.
+ex.mate_missed.b4 = Kasutamata matt: {line:nomate}, alates käigust {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} oleks forsseerinud mati {m:move_com}.
+ex.mate_missed.b4.3 = Sul oli matt {m:move_com}, esimene käik oli {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} paneb matti {m:move_com}: {line:nomate}.
+ex.mate_missed.b5.2 = Kasutamata matt {m:move_com}, alates käigust {best:nomate}.
+ex.mate_missed.b5.3 = Oli forsseeritud matt: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} paneb matti: {line:nomate}.
+ex.mate_missed.b6.2 = Matt {m:move_com}, alates käigust {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, matt {m:move_com}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Kiirem oli {best:nomate}: matt {m:move_com}.
+ex.mate_delayed.b5.2 = {best:nomate} oleks pannud matti varem: {m:move_com}.
+ex.mate_delayed.b6 = {best:nomate} paneb matti {m:move_com}.
+ex.mate_delayed.b6.2 = Kiirem: {best:nomate}, matt {m:move_com}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+# Stalemate = "patt"; "panna patti" (to stalemate), "jääb patti" (gets stalemated).
+ex.stalemate.b1 = Oh ei! {my} ei saa käia ega ole tule all. See on patt: viik.
+ex.stalemate.b1.2 = Vaata: {my:ade} pole ühtegi ohutut välja, aga ta pole tule all. See on viik!
+ex.stalemate.b1.3 = See on patt. {my} ei saa käia, seega lõpeb partii viigiga.
+ex.stalemate.b2 = Patt! {my:ade} pole ühtegi lubatud käiku ja tuld ei ole. Viik.
+ex.stalemate.b2.2 = Oh ei, patt: {my} on kinni, aga mitte tule all.
+ex.stalemate.b2.3 = Patt tähendab viiki. {my} ei saa käia.
+ex.stalemate.b3 = See on patt: {my:ade} pole ühtegi lubatud käiku. Sul oli võiduseis!
+ex.stalemate.b3.2 = Patt! {my} on kinni ja võidetud partii muutub viigiks.
+ex.stalemate.b3.3 = {my:ade} pole käike ja tuld pole: patt.
+ex.stalemate.b4 = Patt: {my:ade} pole ühtegi lubatud käiku. Sellega läheb võit käest.
+ex.stalemate.b4.2 = {move} paneb {my:all} patti. Viik võiduseisust.
+ex.stalemate.b4.3 = See on patt; {my} on täiesti kinni.
+ex.stalemate.b5 = {move} paneb {my:all} patti. Võit on läinud.
+ex.stalemate.b5.2 = Patt: {my:ade} pole välju.
+ex.stalemate.b5.3 = See on patt, {my} on kinni.
+ex.stalemate.b6 = Patt. {my:ade} pole käike.
+ex.stalemate.b6.2 = {move}, patt: {my} on kinni.
+ex.stalemate.b6.3 = Patt; {my} ei saa käia.
+ex.stalemate.tip.b1 = Kui sul on võiduseis, jäta minu kuningale alati väli, kuhu käia.
+ex.stalemate.tip.b1.2 = Pea meeles: kui oled eespool, jäta minu kuningale ruumi.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Ettevaatust! Ma võin oma malendid ära anda ja siis pole {my:ade} käike: patt.
+ex.stalemate_trick.b1.2 = Ettevaatust: {my} on peaaegu kinni. Ma võin viigi välja mängida.
+ex.stalemate_trick.b2 = Ettevaatust: ma võin ohverdada ja {my} jääks patti.
+ex.stalemate_trick.b2.2 = {my:ade} pole peaaegu ühtegi välja. Ma saan pati forsseerida!
+ex.stalemate_trick.b3 = See laseb mul patiga pääseda: {my:ade} saavad käigud otsa.
+ex.stalemate_trick.b3.2 = Ettevaatust: pärast jätku {line} on {my} patis.
+ex.stalemate_trick.b4 = {move} lubab patilõksu: {line} ja {my} ei saa käia.
+ex.stalemate_trick.b4.2 = Nüüd saab {my} patti peitu pugeda: {line}.
+ex.stalemate_trick.b5 = {move} lubab patti: {line}; {my} on kinni.
+ex.stalemate_trick.b5.2 = Patilõks: {line} ja {my:ade} pole käike.
+ex.stalemate_trick.b6 = {line}, patt: {my} on kinni.
+ex.stalemate_trick.b6.2 = Pärast jätku {line} patt; {my} on kinni.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+# "kahvel" + allative of the targets ("kahvel kuningale ja vankrile"); "ründab" + partitive.
+ex.fork.b1 = {my} võib minna väljale {sq} ja rünnata {t1:part} ja {t2:part}.
+ex.fork.b1.2 = {my} läheb väljale {sq} ja ründab kahte malendit: {t1:part} ja {t2:part}.
+ex.fork.b1.3 = Jälgi {my:part}: väljalt {sq} ründab ta korraga {t1:part} ja {t2:part}.
+ex.fork.b2 = Kahvel! {my} väljal {sq} ründab korraga {t1:part} ja {t2:part}.
+ex.fork.b2.2 = Pärast sinu käiku saab {my} väljalt {sq} teha kahvli {t1:all} ja {t2:all}.
+ex.fork.b2.3 = {my} läheb väljale {sq}: kahekordne rünnak {t1:all} ja {t2:all}.
+ex.fork.b3 = {move} lubab käiku {reply}: kahvel {t1:all} ja {t2:all}.
+ex.fork.b3.2 = Pärast käiku {reply} ründan ma korraga {t1:part} ja {t2:part}.
+ex.fork.b3.3 = {reply} on kahvel: {t1} ja {t2} on mõlemad rünnaku all.
+ex.fork.b4 = {reply} on kahvel {t1:all} ja {t2:all}; pärast jätku {line} oled kaotanud {pts:point_obj}.
+ex.fork.b4.2 = {reply} ründab korraga {t1:part} ja {t2:part}.
+ex.fork.b4.3 = {move} lubab kahvlit {reply} {t1:all} ja {t2:all}.
+ex.fork.b5 = {move} jookseb kahvli {reply} otsa, mis ründab {t1:part} ja {t2:part}.
+ex.fork.b5.2 = {reply} teeb kahvli {t1:all} ja {t2:all}.
+ex.fork.b5.3 = Pärast käiku {reply} on {t1} ja {t2} mõlemad rünnaku all.
+ex.fork.b6 = {reply} on kahvel.
+ex.fork.b6.2 = {move} lubab kahvlit {reply}.
+ex.fork.b6.3 = {reply}, kahvel.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Sa saad päästa ainult ühe neist: {t1:gen} või {t2:gen}.
+ex.fork.tail.b1.2 = Nüüd ründan ma korraga kahte malendit: {t1:part} ja {t2:part}. See on kahvel!
+ex.fork.tail.b1.3 = Näed? {t1} ja {t2} on mõlemad rünnaku all. Üks neist langeb.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} peab tule alt ära minema, nii et ma löön {t1:gen}.
+ex.fork.tail_king.2 = Tuli! {your} peab käima ja {t1} langeb.
+ex.fork.more.b3 = Enne käiku kontrolli välja {sq}: sealt saab {my} kahvli teha.
+ex.fork.more.b3.2 = Hoia väljal {sq} silm peal. Sealt teeb {my} kahvli.
+ex.fork.tip.knight = Jälgi ratsu hüppeid oma kuninga ja lipu lähedal!
+ex.fork.tip.knight.2 = Ratsudele meeldib rünnata kahte malendit korraga. Vaata, kuhu nad saavad hüpata.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+# Discovered attack = "avatud rünnak" (+ allative of the target).
+ex.discovered.b1 = Kui {my} eest ära läheb, ründab {my2} {t1:part}!
+ex.discovered.b1.2 = Vaata: {my} on teel ees. Kui see liigub, ründab {my2} {t1:part}.
+ex.discovered.b1.3 = {my} võib kõrvale astuda ja siis ründab {my2} {t1:part}.
+ex.discovered.b2 = Varjatud rünnak: {my} liigub ja {my2} ründab {t1:part}.
+ex.discovered.b2.2 = Ettevaatust: {my} võib eest ära minna ja {my2} ründab {t1:part}.
+ex.discovered.b2.3 = {my} astub eest ja avab {my2:all} tee {t1:ter}.
+ex.discovered.b3 = Pärast käiku {reply} on {t1} avatud rünnaku all.
+ex.discovered.b3.2 = {reply} avab rünnaku {t1:all}.
+ex.discovered.b3.3 = {move} lubab käiku {reply}: avatud rünnak {t1:all}.
+ex.discovered.b4 = {reply} avab tee {t1:ter}: avatud rünnak.
+ex.discovered.b4.2 = {move} lubab avatud rünnakut {reply}, mis võidab {t1:gen}.
+ex.discovered.b4.3 = Pärast käiku {reply} langeb {t1} avatud rünnaku ohvriks.
+ex.discovered.b5 = {move} lubab avatud rünnakut {reply}.
+ex.discovered.b5.2 = {reply} on avatud rünnak.
+ex.discovered.b5.3 = {reply} avab varjatud rünnaku.
+ex.discovered.b6 = {reply}, avatud rünnak {t1:all}.
+ex.discovered.b6.2 = {reply} ja {t1} langeb.
+ex.discovered.b6.3 = Avatud rünnak: {reply}, sihikul {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+# Skewer = "läbilöök".
+ex.skewer.b1 = {my} ründab {t1:part}. Kui see eest ära läheb, löön ma {t2:gen}, mis on selle taga.
+ex.skewer.b1.2 = Vaata: {my} ründab {t1:part} ja kohe selle taga on {t2}.
+ex.skewer.b1.3 = {my} läheb {t1:all} kallale. See peab eest ära minema ja siis langeb {t2}.
+ex.skewer.b2 = Läbilöök: {my} ründab {t1:part} ja selle taga on {t2}.
+ex.skewer.b2.2 = {my} ründab ühel joonel {t1:part} ja {t2:part}. Kui esimene eest läheb, löön ma teise.
+ex.skewer.b2.3 = Ettevaatust: {t1} ja {t2} on ühel joonel. {my} saab neile läbilöögi teha.
+ex.skewer.b3 = Läbilöök {reply}: sihikul on {t1} ja {t2}.
+ex.skewer.b3.2 = Pärast käiku {reply} peab {t1} eest ära minema ja {t2} langeb.
+ex.skewer.b3.3 = {move} lubab läbilööki {reply}: {t1} ja {t2} on ühel joonel.
+ex.skewer.b4 = {reply} ründab läbilöögiga {t1:part}; {t2}, mis on selle taga, läheb kaotsi.
+ex.skewer.b4.2 = Pärast käiku {move} on {t1} ja {t2} ühel joonel: {reply}.
+ex.skewer.b4.3 = Pärast käiku {reply} läheb {t1} eest ja {t2} langeb.
+ex.skewer.b5 = {reply} on läbilöök: {t1}, selle taga {t2}.
+ex.skewer.b5.2 = {move} lubab läbilööki {reply}: läbi {t1:gen} {t2:ter}.
+ex.skewer.b6 = {reply} on läbilöök.
+ex.skewer.b6.2 = {reply}, läbilöök.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+# Pin = "sidumine", pinned = "seotud"; the piece behind is named: "{t1:gen} ees kinni" (stuck in front
+# of), "selle taga on {t1}".
+ex.pin.b1 = {my} võib minna väljale {sq}. Siis on {your} {t1:gen} ees kinni.
+ex.pin.b1.2 = Jälgi {my:part} väljal {sq}: {your} jääb {t1:gen} ees kinni.
+ex.pin.b1.3 = {my} saab {your:gen} siduda: selle taga on {t1}. Siis võidan ma selle.
+ex.pin.b2 = Sidumine: {your} on {t1:gen} ees kinni.
+ex.pin.b2.2 = {your} on seotud: selle taga on {t1}. Nii saan ma selle võita.
+ex.pin.b2.3 = Nüüd on {your} {t1:gen} ees kinni. See on sidumine.
+ex.pin.b3 = {your} jääb seotuks ({t1} on selle taga) ja ma võidan selle.
+ex.pin.b3.2 = Pärast seda on {your} seotud: selle taga on {t1}.
+ex.pin.b3.3 = {your:gen} sidumine maksab materjali: selle taga on {t1}.
+ex.pin.b4 = {reply} seob ja võidab materjali.
+ex.pin.b4.2 = {move} jookseb sidumise {reply} otsa.
+ex.pin.b4.3 = Pärast käiku {reply} langeb seotud malend.
+ex.pin.b5 = {move} lubab sidumist {reply}.
+ex.pin.b5.2 = {reply} seob ja malend läheb kaotsi.
+ex.pin.b6 = {reply} seob.
+ex.pin.b6.2 = {reply}, sidumine.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} on seotud, nii et see ei saa välja {sq} kaitsta. Selle taga on {t1}.
+ex.pin_defender.b1.2 = Vaata: {your} ei saa välja {sq} päriselt kaitsta, sest selle taga on {t1}.
+ex.pin_defender.b2 = {your} on seotud ({t1} on selle taga), nii et väljal {sq} pole päris kaitsjat.
+ex.pin_defender.b2.2 = Seotud malend on halb kaitsja. {your} ei saa välja {sq} kaitsta: selle taga on {t1}.
+ex.pin_defender.b3 = {your} on seotud, sest selle taga on {t1}; välja {sq} see tegelikult ei kaitse.
+ex.pin_defender.b3.2 = Väli {sq} näib kaitstud, aga {your} on seotud: selle taga on {t1}.
+ex.pin_defender.b4 = {your} on seotud, nii et väli {sq} pole tegelikult kaitstud.
+ex.pin_defender.b4.2 = {your} on seotud ega saa välja {sq} kaitsta.
+ex.pin_defender.b5 = {your} on seotud; väli {sq} on kaitseta.
+ex.pin_defender.b5.2 = Väli {sq} langeb: {your} on seotud.
+ex.pin_defender.b6 = {your} on seotud; väli {sq} langeb.
+ex.pin_defender.b6.2 = {your} seotud, väli {sq} kaitseta.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} on lõksus. Iga väli, kuhu see saab minna, on rünnaku all.
+ex.trapped.b1.2 = Vaata {your:own_part}: sellel pole ühtegi ohutut välja, kuhu põgeneda.
+ex.trapped.b1.3 = {your} on kinni. Ma saan seda rünnata ja see ei pääse minema.
+ex.trapped.b2 = {your:ade} pole ohutuid välju. Ma saan selle võita.
+ex.trapped.b2.2 = {your} on lõksus: kuhu iganes see läheb, ma löön selle.
+ex.trapped.b2.3 = Ettevaatust, {your:ade} saavad väljad otsa.
+ex.trapped.b3 = {your} jääb lõksu: ühtegi ohutut välja pole enam.
+ex.trapped.b3.2 = Pärast seda on {your} lõksus ja läheb kaotsi.
+ex.trapped.b3.3 = {your} on lõksu läinud: see ei pääse välja.
+ex.trapped.b4 = Pärast käiku {move} jääb {your} lõksu.
+ex.trapped.b4.2 = {your:ade} pole taganemisteed; ma võidan selle.
+ex.trapped.b4.3 = Pärast käiku {reply} on {your} lõksus.
+ex.trapped.b5 = {your} jääb lõpuks lõksu: {line}.
+ex.trapped.b5.2 = {move} jätab {your:gen} lõksu.
+ex.trapped.b6 = {your} on lõksus.
+ex.trapped.b6.2 = {line} püüab {your:gen} lõksu.
+ex.trapped.tip.b1 = Enne kui malendi kuhugi viid, kontrolli, et see sealt ka välja pääseb.
+ex.trapped.tip.b1.2 = Sügavale minu laagrisse läinud malendid võivad kinni jääda. Jäta neile pääsetee.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# Back rank = "tagumine rida"; luft / escape square = "põgenemisväli".
+ex.back_rank.b1 = {your} on oma etturite taga kinni. {my} saab talle tagumisel real tuld anda.
+ex.back_rank.b1.2 = Ettevaatust: {your:ade} pole põgenemisvälja ja {my} jõuab väljale {sq}.
+ex.back_rank.b1.3 = {my} võib minna väljale {sq}. {your} on oma etturite taha lukustatud.
+ex.back_rank.b2 = Tagumise rea oht: {your:ade} pole õhku. {my} saab väljal {sq} tuld anda.
+ex.back_rank.b2.2 = {your} on kinni. {my} läheb väljale {sq} ja võidab materjali.
+ex.back_rank.b2.3 = Sinu tagumine rida on nõrk: {my} saab väljal {sq} {your:all} tuld anda.
+ex.back_rank.b3 = Sinu tagumine rida on nõrk: {line}. {your:ade} pole põgenemisvälja.
+ex.back_rank.b3.2 = {your:ade} pole õhku, seega võidab {line} materjali.
+ex.back_rank.b3.3 = Pärast jätku {line} otsustab tagumine rida: {your} on kinni.
+ex.back_rank.b4 = Tagumine rida: {line} ja {your:ade} pole põgenemisvälja.
+ex.back_rank.b4.2 = {line} kasutab ära nõrga tagumise rea {your:gen} ümber.
+ex.back_rank.b4.3 = {your:ade} puudub põgenemisväli: {line}.
+ex.back_rank.b5 = Tagumise rea nõrkus {your:gen} juures: {line}.
+ex.back_rank.b5.2 = {line}; {your:ade} pole põgenemisvälja.
+ex.back_rank.b6 = {line}, tagumine rida; {your} on kinni.
+ex.back_rank.b6.2 = Tagumine rida: {line} ({your}).
+ex.back_rank.tip.b1 = Anna oma kuningale väike aken: liiguta üht etturit tema ees.
+ex.back_rank.tip.b1.2 = Kolme etturi taga seisvale kuningale saab tagumisel real matti panna. Tee talle ruumi.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+# Hanging / loose = "kaitseta"; for free = "tasuta".
+ex.hanging.b1 = {your:ade} väljal {sq} pole kaitsjat. {my} võib selle tasuta lüüa.
+ex.hanging.b1.2 = Vaata {your:own_part}: miski ei kaitse seda ja {my} ründab seda.
+ex.hanging.b1.3 = {your} pole kaitstud. {my} võib selle lihtsalt lüüa.
+ex.hanging.b2 = {your} väljal {sq} on kaitseta. {my} lööb selle ja sa ei saa tagasi lüüa.
+ex.hanging.b2.2 = {my} võib {your:gen} tasuta lüüa. Miski ei kaitse seda.
+ex.hanging.b2.3 = {your} on väljal {sq} üksi jäänud ja {my} lööb selle.
+ex.hanging.b3 = {move} jätab {your:gen} kaitseta: {reply} ja tagasi lüüa pole millegagi.
+ex.hanging.b3.2 = {your} väljal {sq} on kaitseta: {reply}.
+ex.hanging.b3.3 = Pärast käiku {reply} on {your} niisama kadunud.
+ex.hanging.b4 = {move} jätab {your:gen} kaitseta: {reply} võidab {pts:point_obj}.
+ex.hanging.b4.2 = {reply} korjab {your:gen} tasuta ära.
+ex.hanging.b4.3 = {your} on kaitseta; {reply} lööb selle.
+ex.hanging.b5 = {move} jätab {your:gen} kaitseta; {reply} võidab selle.
+ex.hanging.b5.2 = {your} väljal {sq} langeb pärast käiku {reply}.
+ex.hanging.b5.3 = {reply} võidab {your:gen}.
+ex.hanging.b6 = {move}? {reply} ja {your} langeb.
+ex.hanging.b6.2 = {reply} võidab {your:gen}.
+ex.hanging.b6.3 = {your} on kaitseta: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} kaitses {your:part}. Nüüd saab {my} selle lüüa.
+ex.hanging_guard.b1.2 = {your2} läks ära ja nüüd on {your} üksi. {my} lööb selle.
+ex.hanging_guard.b2 = {your2} kaitses enne {your:part}. Nüüd on see üksi ja {my} lööb selle.
+ex.hanging_guard.b2.2 = {your2:own_gen} ära viies jätsid sa {your:own_gen} kaitseta ja {my} saab selle lüüa.
+ex.hanging_guard.b3 = {your2} kaitses {your:part}. Kui kaitsja ära läheb, langeb {your} pärast käiku {reply}.
+ex.hanging_guard.b3.2 = {your2:abe} on {your} kaitseta: {reply}.
+ex.hanging_guard.b4 = {move} viib kaitsja ära: {your2} lahkus {your:gen} juurest ja {reply} korjab selle ära.
+ex.hanging_guard.b4.2 = {your2} oli {your:gen} ainus kaitsja; {reply} võidab selle.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} ründas juba {your:part}. Kontrolli alati, mida minu käik ähvardab.
+ex.hanging_threat.b1.2 = Sa ei näinud minu ähvardust: {my} ründab {your:part}.
+ex.hanging_threat.b2 = Minu viimase käiguga hakkas {my} ründama {your:part}. Vaata alati minu ähvardusi.
+ex.hanging_threat.b2.2 = {my} ähvardas {your:part} ja nüüd saan ma selle lüüa.
+ex.hanging_threat.b3 = Sa jätsid minu ähvarduse märkamata: {my} ründas {your:part}.
+ex.hanging_threat.b3.2 = {my} hoidis {your:part} kogu aeg sihikul.
+ex.hanging.tip.b1 = Küsi enne iga käiku endalt: kas kõik minu malendid on ohust väljas?
+ex.hanging.tip.b1.2 = Hea harjumus: kontrolli pärast iga käiku, millised sinu malendid on kaitstud.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. Worth = "{n:point_gen} väärt" ("viie punkti väärt").
+ex.exchange_capture.b1 = {your} lõi, aga {my} lööb tagasi. Selle vahetusega kaotad punkte.
+ex.exchange_capture.b1.2 = {my} lööb tagasi. {your} on {n:point_gen} väärt, aga sa said ainult {n2:point_obj}.
+ex.exchange_capture.b1.3 = Ettevaatust: {my} saab {your:gen} tagasi lüüa. See on halb vahetus.
+ex.exchange_capture.b2 = Ettevaatust vahetustega: {your} on {n:point_gen} väärt. {my} lööb tagasi ja sina said ainult {n2:point_obj}.
+ex.exchange_capture.b2.2 = {my} lööb {your:gen} tagasi. Sa kaotad {n:point_obj} ja võidad ainult {n2:point_obj}.
+ex.exchange_capture.b3 = Löömine väljal {sq} ei toimi: pärast jätku {line} läheb {your} kaotsi.
+ex.exchange_capture.b3.2 = {your} lööb väljal {sq}, aga pärast jätku {line} oled kaotanud {pts:point_obj}.
+ex.exchange_capture.b4 = Käiguga {move} arvestasid väljal {sq} valesti: {line} ja {your} läheb kaotsi.
+ex.exchange_capture.b4.2 = Löömisel väljal {sq} kaotad {your:own_gen}: {line}.
+ex.exchange_capture.b5 = Pärast käiku {move} kaotad väljal {sq} {your:own_gen}: {line}.
+ex.exchange_capture.b5.2 = Väljal {sq} läheb {your} kaotsi: {line}.
+ex.exchange_capture.b6 = {move}: pärast jätku {line} langeb {your} väljal {sq}.
+ex.exchange_capture.b6.2 = {line} väljal {sq} ja {your} on kadunud.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+# Counted with count.attacker / count.defender ("kolm ründajat kahe kaitsja vastu").
+ex.exchange_count.b1 = Loe kokku: mina ründan {n:time} välja {sq}, sina kaitsed seda {n2:time}.
+ex.exchange_count.b1.2 = Väljal {sq} on mul {n:attacker}, sinul {n2:defender}. Selle võitluse võidan mina.
+ex.exchange_count.b2 = Välja {sq} rünnatakse {n:time} ja kaitstakse {n2:time}. Seal kaotad sa materjali.
+ex.exchange_count.b2.2 = Loe väljal {sq} kokku: {n:attacker} {n2:defender_gen} vastu.
+ex.exchange_count.b3 = Loe väljal {sq} ründajad ja kaitsjad kokku: minul on ründajaid rohkem.
+ex.exchange_count.b3.2 = Vahetus väljal {sq} ei toimi: pärast jätku {line} oled kaotanud {pts:point_obj}.
+ex.exchange_count.b4 = Käiguga {move} arvestasid väljal {sq} valesti: {line} ja oled kaotanud {pts:point_obj}.
+ex.exchange_count.b4.2 = Välja {sq} rünnatakse rohkem kordi, kui seda kaitstakse: {line}.
+ex.exchange_count.b5 = Väljal {sq} on {n:attacker} {n2:defender_gen} vastu ja ründajad võidavad: {line}.
+ex.exchange_count.b5.2 = Pärast käiku {move} on jõud väljal {sq} sinu kahjuks.
+ex.exchange_count.b6 = {line} väljal {sq} ja ma olen võitnud {pts:point_obj}.
+ex.exchange_count.b6.2 = {sq}: {n:attacker}, {n2:defender}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} on vähem väärt kui {your}. Kui ma löön, kaotad sa punkte.
+ex.exchange_cheap.b1.2 = {my} ründab {your:part}. Nende vahetus on sulle halb.
+ex.exchange_cheap.b2 = {your} on {n:point_gen} väärt, {my} ainult {n2:point_gen}. See vahetus läheb sulle maksma.
+ex.exchange_cheap.b2.2 = {my} on odavam kui {your}, nii et rünnak võidab materjali.
+ex.exchange_cheap.b3 = {your:part} väljal {sq} ründab odavam malend.
+ex.exchange_cheap.b3.2 = {n2:point_gen} väärtusega malend ründab {your:part} väljal {sq}: {line}.
+ex.exchange_cheap.b4 = {your:part} väljal {sq} ründab odavam malend; {reply} võidab materjali.
+ex.exchange_cheap.b4.2 = {reply} ründab {your:part} väljal {sq} odavama malendiga.
+ex.exchange_cheap.b5 = {your} väljal {sq} on odavama ründaja sihikul: {line}.
+ex.exchange_cheap.b5.2 = {reply} ründab {your:part} väljal {sq} ja võidab materjali.
+ex.exchange_cheap.b6 = {reply} võidab {your:gen} väljal {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} väljal {sq} läheb kaotsi.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Ettevaatust: nüüd saan ma {t1:gen} võita.
+ex.material.b1.2 = See käik jätab {t1:gen} hätta. Ma saan selle võita.
+ex.material.b2 = See käik lubab mul {t1:gen} võita.
+ex.material.b2.2 = Nüüd satub {t1} hätta ja ma võidan selle.
+ex.material.b3 = {move} kaotab materjali: pärast jätku {line} oled kaotanud {pts:point_obj}.
+ex.material.b3.2 = Pärast jätku {line} oled {pts:point_gen} võrra taga.
+ex.material.b4 = {move} kaotab materjali: {line} ja oled kaotanud {pts:point_obj}.
+ex.material.b4.2 = Pärast jätku {line} jääd {pts:point_gen} võrra maha.
+ex.material.b5 = {move} annab materjali ära: {line}.
+ex.material.b5.2 = {line} võidab mulle {pts:point_obj}.
+ex.material.b6 = {line} ja ma olen võitnud {pts:point_obj}.
+ex.material.b6.2 = {move} kaotab {pts:point_obj}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Kas nägid? {my} väljal {sq} oli tasuta võtta. {your} oleks võinud selle lüüa.
+ex.missed_capture.b1.2 = Vaata: {my:ade} polnud kaitsjat. {your} oleks võinud selle lüüa.
+ex.missed_capture.b1.3 = {my} väljal {sq} polnud kaitstud. {your} oleks võinud selle haarata!
+ex.missed_capture.b2 = Sa jätsid tasuta löögi kasutamata: {best} võidab {my:gen}.
+ex.missed_capture.b2.2 = {my} oli väljal {sq} kaitseta. {best} lööb selle. Järgmine kord haara kinni!
+ex.missed_capture.b2.3 = {best} oleks võitnud {my:gen} tasuta.
+ex.missed_capture.b3 = {best} oleks võitnud {my:gen} niisama.
+ex.missed_capture.b3.2 = {my} väljal {sq} oli kaitseta: {best}. Otsi igal käigul kaitseta malendeid.
+ex.missed_capture.b3.3 = Sa oleksid saanud {my:gen} lüüa käiguga {best}.
+ex.missed_capture.b4 = Kasutamata: {best} korjab {my:gen} väljal {sq} ära.
+ex.missed_capture.b4.2 = {best} võidab {my:gen}, mis oli kaitseta.
+ex.missed_capture.b4.3 = {my} oli kaitseta: {best}.
+ex.missed_capture.b5 = {best} võidab {my:gen}; {move} laseb sel pääseda.
+ex.missed_capture.b5.2 = {my} väljal {sq} oli kaitseta: {best}.
+ex.missed_capture.b6 = {best}! {my} väljal {sq} oli kaitseta.
+ex.missed_capture.b6.2 = {best} võitnuks {my:gen}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Sul oli kahekordne rünnak: {best} ründab {t1:part} ja {t2:part}!
+ex.missed_fork.b1.2 = Vaata! {best} ründaks korraga {t1:part} ja {t2:part}.
+ex.missed_fork.b1.3 = {best} oli kahvel: {t1} ja {t2} mõlemad rünnaku all.
+ex.missed_fork.b2 = {best} oli kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b2.2 = Sa jätsid kahekordse rünnaku kasutamata: {best} ründab {t1:part} ja {t2:part}.
+ex.missed_fork.b2.3 = {best} ründab korraga {t1:part} ja {t2:part}. Kahvel!
+ex.missed_fork.b3 = {best} oli kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b3.2 = Sul oli {best}, kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b3.3 = {best} oleks teinud kahvli {t1:all} ja {t2:all}.
+ex.missed_fork.b4 = {best} – kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b4.2 = Kasutamata kahvel: {best}, sihikul {t1} ja {t2}.
+ex.missed_fork.b5 = {best} oli kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b5.2 = {best} ründanuks {t1:part} ja {t2:part}.
+ex.missed_fork.b6 = {best} oli kahvel {t1:all} ja {t2:all}.
+ex.missed_fork.b6.2 = {best}: kahvel {t1:all} ja {t2:all}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# The rule of the square: "etturi ruut" ("väljaspool etturi ruutu").
+ex.promotion.b1 = {my} võib joosta väljale {sq} ja muunduda lipuks. {your} on liiga kaugel.
+ex.promotion.b1.2 = Vaata: miski ei takista {my:part} jõudmast väljale {sq}. {your} ei jõua sellele järele.
+ex.promotion.b1.3 = {my} on väljast {sq} {n:square_gen} kaugusel ja {your} on liiga aeglane.
+ex.promotion.b2 = {my} jookseb väljale {sq} ja {your} ei jõua sellele järele.
+ex.promotion.b2.2 = {my} jõuab väljale {sq} {n:move_gen} pärast, {your} alles {n2:move_gen} pärast. Liiga aeglane.
+ex.promotion.b2.3 = Ettevaatust: {my} muundub väljal {sq} lipuks ja {your} on liiga kaugel.
+ex.promotion.b3 = {your} on väljaspool {my:gen} ruutu ega jõua sellele enne välja {sq} järele.
+ex.promotion.b3.2 = Võidujooks on kaotatud: {my} jõuab väljale {sq} enne {your:part}.
+ex.promotion.b4 = {your} on väljaspool etturi ruutu; ettur muundub väljal {sq} lipuks.
+ex.promotion.b4.2 = {my} muundub väljal {sq}; {your:ade} jääb ühest käigust puudu.
+ex.promotion.b5 = Etturi võidujooks on kaotatud: {your} on väljaspool ruutu, muundumisväli on {sq}.
+ex.promotion.b5.2 = {line}: ma saan väljal {sq} lipu ja {your} jääb hiljaks.
+ex.promotion.b6 = {your} on ruudust väljas; ma saan väljal {sq} lipu.
+ex.promotion.b6.2 = {line}, lipp väljal {sq} ({your} jääb hiljaks).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Sinu ettur oleks võinud joosta väljale {sq} ja muunduda lipuks!
+ex.promotion_missed.b1.2 = Vaata välja {sq}! Sinu ettur oleks võinud sinna joosta.
+ex.promotion_missed.b2 = Sinu ettur oleks võinud joosta väljale {sq}. Lükka vabaettureid edasi!
+ex.promotion_missed.b2.2 = Miski ei takistanud sinu etturi teed väljale {sq}.
+ex.promotion_missed.b3 = {best} võidab võidujooksu väljale {sq}.
+ex.promotion_missed.b3.2 = Sinu ettur oli kiirem: {best} ja see muundub väljal {sq} lipuks.
+ex.promotion_missed.b4 = {best} võidab etturite võidujooksu väljale {sq}.
+ex.promotion_missed.b4.2 = {best}! Ettur muundub väljal {sq} lipuks.
+ex.promotion_missed.b5 = Pärast käiku {best} jõuab sinu ettur esimesena väljale {sq}.
+ex.promotion_missed.b5.2 = {best} ja väli {sq} on sinu.
+ex.promotion_missed.b6 = {best} võidab võidujooksu väljale {sq}.
+ex.promotion_missed.b6.2 = {best}; esimesena väljale {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = See ettur kaitses {your:part}. Nüüd on {your:ade} vähem varju.
+ex.king_shield.b1.2 = Väljal {sq} olnud ettur oli {your:all} kilbiks. Nüüd pääsevad minu malendid ligi.
+ex.king_shield.b2 = Etturi käik väljalt {sq} nõrgestab {your:gen} kaitset. Nüüd saavad minu malendid seda rünnata.
+ex.king_shield.b2.2 = {your} kaotas kaitsja: väljal {sq} olnud ettur oli tema kilp.
+ex.king_shield.b3 = See etturikäik avab {your:gen} minu rünnakule.
+ex.king_shield.b3.2 = {your} kaotab oma etturikatte ja minu malendid tungivad sisse.
+ex.king_shield.b4 = {move} nõrgestab etture {your:gen} ümber; minu rünnak pääseb ligi.
+ex.king_shield.b4.2 = Pärast käiku {move} on {your:gen} kaitsekilp lõhutud.
+ex.king_shield.b5 = {move} nõrgestab {your:gen} katet: {line}.
+ex.king_shield.b5.2 = Pärast käiku {move} jääb {your} lagedale: {line}.
+ex.king_shield.b6 = {move} nõrgestab {your:gen} kaitset: {line}.
+ex.king_shield.b6.2 = {line}; {your} on liiga avatud.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} on ohus. Minu malendid tulevad talle kallale.
+ex.king_exposed.b1.2 = Vaata, kui lahtine {your} on. Hoia teda turvaliselt oma etturite taga.
+ex.king_exposed.b2 = {your} on liiga avatud. Nüüd saan ma talle järjest tuld anda.
+ex.king_exposed.b2.2 = Ettevaatust: {your:ade} pole varju ja minu malendid ründavad seda.
+ex.king_exposed.b3 = {your} on lagedal; minu malendid saavad talle tuld anda ja seda rünnata.
+ex.king_exposed.b3.2 = Pärast seda pole {your:ade} varju.
+ex.king_exposed.b4 = {your} jääb lagedale: {line}.
+ex.king_exposed.b4.2 = {move} jätab {your:gen} rünnakule avatuks.
+ex.king_exposed.b5 = {your} on liiga lagedal: {line}.
+ex.king_exposed.b5.2 = {move} jätab {your:gen} lagedale.
+ex.king_exposed.b6 = {line}; {your} on lagedal.
+ex.king_exposed.b6.2 = {your} on liiga avatud: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+# Pawn ending = "etturilõppmäng"; bishop pair = "odapaar".
+ex.bad_trade.b3 = See vahetus viib etturilõppmängu, mille ma võidan.
+ex.bad_trade.b3.2 = Pärast jätku {line} jäävad alles ainult etturid ja minu kuningas seisab paremini.
+ex.bad_trade.b4 = Vahetused viivad kaotatud etturilõppmängu: {line}.
+ex.bad_trade.b4.2 = Vahetustega sellesse etturilõppmängu kaotad.
+ex.bad_trade.b5 = Vale vahetus: etturilõppmäng pärast jätku {line} on kaotatud.
+ex.bad_trade.b5.2 = Etturilõppmäng on kaotatud; hoia nupud laual.
+ex.bad_trade.b6 = Etturilõppmäng pärast jätku {line} on kaotatud.
+ex.bad_trade.b6.2 = Kaotatud etturilõppmäng: {line}.
+ex.bishop_pair.b5 = Selle vahetusega kaotad odapaari.
+ex.bishop_pair.b5.2 = Selle vahetusega loobud oma odapaarist; minu oma jääb alles.
+ex.bishop_pair.b6 = Odapaar on läinud.
+ex.bishop_pair.b6.2 = Odapaar ära antud.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at). Opposition = "opositsioon"; passed pawn = "vabaettur".
+ex.opposition.b3 = {best} võtab opositsiooni: kuningad seisavad vastamisi, nende vahel üks väli.
+ex.opposition.b3.2 = Kuningad! {best} oleks võtnud opositsiooni.
+ex.opposition.b4 = {best} võtab opositsiooni: see on võti.
+ex.opposition.b4.2 = Opositsioon otsustab: {best}.
+ex.opposition.b5 = {best}, opositsiooni võttes.
+ex.opposition.b5.2 = Opositsioon: {best}.
+ex.opposition.b6 = {best}, opositsioon.
+ex.opposition.b6.2 = {best}: opositsioon.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Sinu ettur võiks joosta väljale {sq}. Vabaettur tahab edasi minna!
+ex.push_passed.b1.2 = Lükka oma vaba ettur edasi! See tahab jõuda väljale {sq}.
+ex.push_passed.b1.3 = Sinu vabaettur tahab marssida väljale {sq}. Lükka see edasi!
+ex.push_passed.b2 = {best}: lükka vabaettur välja {sq} poole.
+ex.push_passed.b2.2 = Sinu vabaettur on tugev. {best} lükkab selle edasi.
+ex.push_passed.b2.3 = Lükka edasi! {best} viib etturi välja {sq} lähemale.
+ex.push_passed.b3 = {best} lükkab vabaetturi edasi.
+ex.push_passed.b3.2 = Vabaettureid tuleb edasi lükata: {best}.
+ex.push_passed.b3.3 = {best} oli õige tee: ettur jookseb väljale {sq}.
+ex.push_passed.b4 = {best}: vabaettur otsustab.
+ex.push_passed.b4.2 = Edasi: {best}.
+ex.push_passed.b5 = {best}, vabaettur edasi: {eval}.
+ex.push_passed.b5.2 = Vabaettur: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, vabaettur.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Too {your:own_nom} ette! Lõppmängus on kuningas tugev malend.
+ex.king_active.b1.2 = Nüüd saab {your} võitlusega liituda. Vii see keskele.
+ex.king_active.b1.3 = Kui malendeid on vähe järel, peaks {your} välja tulema ja aitama.
+ex.king_active.b2 = Kasuta lõppmängus {your:own_part}: too see tsentrisse.
+ex.king_active.b2.2 = {your} peaks nüüd aktiivne olema. Vii see edasi.
+ex.king_active.b3 = {best} aktiveerib kuninga. Lõppmängus kuningas võitleb.
+ex.king_active.b3.2 = {best}: kuninga koht on nüüd tsentris.
+ex.king_active.b4 = {best} toob kuninga tsentrisse.
+ex.king_active.b4.2 = Kuningas peaks tulema ette: {best}.
+ex.king_active.b5 = {best}, kuningas mängu: {line}.
+ex.king_active.b5.2 = Kuninga aktiivsus: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, kuningas ette.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} säilitab parema seisu.
+ex.positional.b4.2 = {best} oli siin tugevam.
+ex.positional.b4.3 = Mina oleksin eelistanud käiku {best}.
+ex.positional.b5 = {best} oli tugevam: {line}.
+ex.positional.b5.2 = {best} ideega {line}.
+ex.positional.b5.3 = Kaalu käiku {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+# Develop = "arendama"; minor pieces = "kerged nupud"; the rim / edge = "laua serv".
+tip.early_queen.b1 = {your} tuli väga vara välja. Too kõigepealt mängu oma ratsud ja odad.
+tip.early_queen.b1.2 = Ettevaatust {your:own_com} nii vara: minu malendid võivad seda taga ajada.
+tip.early_queen.b1.3 = On lõbus käia {your:own_com}, aga arenda enne kerged nupud.
+tip.early_queen.b2 = Kui käid {your:own_com} nii vara, saan ma seda rünnata ja aega võita.
+tip.early_queen.b2.2 = {your} juba väljas? Kõigepealt ratsud ja odad!
+tip.early_queen.b3 = {your:gen} varajane väljatulek annab mulle tempokäike selle vastu.
+tip.early_queen.b3.2 = {your:part} on nii vara lihtne taga ajada. Arenda kõigepealt.
+tip.queen_grab.b1 = {your} lõi kauge etturi ja nüüd võib see hätta sattuda.
+tip.queen_grab.b1.2 = Etturite korjamine {your:own_com} võtab aega. Arenda kõigepealt!
+tip.queen_grab.b2 = {your} läks äärele etture korjama. See võtab palju aega.
+tip.queen_grab.b2.2 = Ole ettevaatlik, kui saadad {your:own_gen} kaugete etturite järele.
+tip.queen_grab.b3 = Nii varane etturite korjamine {your:own_com} kaotab aega.
+tip.queen_grab.b3.2 = {your} on nüüd kodust kaugel; minu arendus annab tunda.
+tip.queen_grab.b4 = {your} korjab etturi, aga kaotab liiga palju aega.
+tip.queen_grab.b4.2 = Etturi korjamine äärel {your:own_com} kaotab tempot.
+tip.same_piece.b1 = Sa käisid {your:own_com} kaks korda. Proovi igal käigul uus malend mängu tuua.
+tip.same_piece.b1.2 = Jälle {your}? Too ka oma teised malendid välja.
+tip.same_piece.b1.3 = Proovi igal käigul arendada uut malendit, mitte jälle {your:own_part}.
+tip.same_piece.b2 = Kui käid avangus {your:own_com} kaks korda, kaotad aega.
+tip.same_piece.b2.2 = {your} käis jälle; sinu teised malendid on alles kodus.
+tip.same_piece.b3 = Kui käid {your:own_com} kaks korda, jääb arendus maha.
+tip.same_piece.b3.2 = Jälle käik {your:com}; sinu ülejäänud vägi ootab.
+tip.castle.b1 = {your} on ikka veel keskel. Vangerdus viiks ta turvalisse kohta.
+tip.castle.b1.2 = Aeg vangerdada! Nurgas on {your} paremini kaitstud.
+tip.castle.b1.3 = Mõtle peagi vangerdusele. {your} on lagedal.
+tip.castle.b2 = {your} on ikka veel tsentris. Vangerda varsti!
+tip.castle.b2.2 = Vangerdus peidaks {your:gen} turvaliselt ära.
+tip.castle.b3 = Kuna tsenter avaneb, peaks {your} vangerdusega varju minema.
+tip.castle.b3.2 = {your} on ikka tsentris; vangerdamise aeg oli käes.
+tip.knight_rim.b1 = {your} laua serval ei tee suurt midagi. Ratsudele meeldib keskel olla.
+tip.knight_rim.b1.2 = Ratsu laua serval on vilets ratsu! {your} kontrollib seal vähem välju.
+tip.knight_rim.b2 = {your} laua serval kontrollib vähe välju. Sihi tsentrisse.
+tip.knight_rim.b2.2 = Ratsu laua serval on vilets ratsu: {your} tahab tsentrisse.
+tip.knight_rim.b3 = {your} on laua serval kõrvale jäänud.
+tip.knight_rim.b3.2 = Laua serv on {your:all} kehv kodu.
+tip.flank.b1 = Proovi kõigepealt käia keskmiste etturitega. Ääreetturid ei aita palju.
+tip.flank.b1.2 = Äärel olevad etturid ei aita sinu malenditel välja tulla. Kasuta keskmisi.
+tip.flank.b2 = Ääreetturite käigud ei arenda midagi. Kasuta tsentrietture.
+tip.flank.b2.2 = Liiga palju ääreetturite käike. Arenda oma nupud!
+tip.flank.b3 = Tiivaetturite käigud avangus pidurdavad arendust.
+tip.flank.b3.2 = Ääreetturid võivad oodata; arenda nupud ja võitle tsentri eest.
+tip.centre.b1 = Proovi kontrollida laua keskosa, näiteks välja {sq}.
+tip.centre.b1.2 = Tsenter on tähtis. Pane ettur või nupp välja {sq} lähedale.
+tip.centre.b1.3 = Keskel olevad malendid on tugevad. Sihi näiteks välja {sq} poole.
+tip.centre.b2 = Võitle tsentri eest: sellised väljad nagu {sq} on tähtsad.
+tip.centre.b2.2 = Sa annad mulle tsentri. Vaata välja {sq}.
+tip.centre.b3 = Sa ei võitle tsentri eest; väli {sq} on minu.
+tip.centre.b3.2 = Võitle tsentri eest välja {sq} ümbruses.
+# Endgame technique tips.
+tip.mate_technique.b1 = Kui alles on üksik kuningas, suru see serva ja pane siis matt.
+tip.mate_technique.b1.2 = Nõuanne: suru minu kuningas serva poole. Hoia ka oma kuningas lähedal.
+tip.fifty.b1 = Ettevaatust: viiekümne käigu järel ilma löömise ja etturikäiguta on viik.
+tip.fifty.b1.2 = Aeg hakkab otsa saama: viiskümmend käiku ilma löömiste ja etturikäikudeta on viik.
+tip.repetition.b1 = Ettevaatust! Kui sama seis kordub kolmandat korda, on viik.
+tip.repetition.b1.2 = Väldi käikude kordamist: kolmas kordus on viik, aga sul on võiduseis.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Vau, sa ohverdasid malendi ja see toimib!
+praise.sacrifice.2 = Nutikas ohverdus! Väga hästi mängitud.
+praise.brilliant.b3 = Hiilgav! Tõeline ohverdus.
+praise.brilliant.b3.2 = Vau, {move} on suurepärane ohverdus!
+praise.brilliant.b4 = {move}! Hiilgav ohverdus.
+praise.brilliant.b4.2 = Hiilgav. Seda ma ei oodanud.
+praise.brilliant.b5 = {move}!! Hiilgav.
+praise.brilliant.b5.spoken = {move}. Hiilgav!
+praise.brilliant.b5.2 = Hiilgav ohverdus.
+praise.brilliant.b6 = {move}!! Suurepärane.
+praise.brilliant.b6.spoken = {move}. Suurepärane!
+praise.brilliant.b6.2 = Hiilgav.
+praise.great.b2 = Suurepärane käik! Sa leidsid viisi, kuidas vastu hakata.
+praise.great.b2.2 = See on suurepärane käik. Hästi leitud!
+praise.great.b3 = Suurepärane käik! Sa leidsid ainsa hea idee.
+praise.great.b3.2 = Suurepärane, {move} pöörab olukorra ümber.
+praise.great.b4 = {move}! Suurepärane leid.
+praise.great.b4.2 = Suurepärane käik.
+praise.great.b5 = {move}! Hästi leitud.
+praise.great.b5.2 = Tugev: {move}.
+praise.great.b6 = {move}! Suurepärane.
+praise.great.b6.2 = Suurepärane leid.
+praise.only.b2 = Hea! See oli ainus hea käik.
+praise.only.b2.2 = Tubli, sa leidsid ainsa käigu, mis toimib.
+praise.only.b3 = Ainus käik, ja sa leidsid selle.
+praise.only.b3.2 = Täpselt! Miski muu siin ei toiminud.
+praise.only.b4 = Ainus käik. Tubli.
+praise.only.b4.2 = Ainus käik, leitud.
+praise.only.b5 = Ainus käik. Hea.
+praise.only.b5.2 = {move}, ainus käik.
+praise.only.b6 = Ainus käik.
+praise.only.b6.2 = Täpne: ainus käik.
+praise.fork.b2 = Kahekordne rünnak! Tubli.
+praise.fork.b2.2 = Sa ründad korraga kahte malendit! Suurepärane.
+praise.fork.b2.3 = Tore! See on kahvel.
+praise.fork.b3 = Ilus kahvel.
+praise.fork.b3.2 = Hea kahvel!
+praise.fork.b3.3 = Kahvel. Hästi mängitud.
+praise.capture.b1 = Tubli! Sa lõid {my:gen} tasuta.
+praise.capture.b1.2 = Terane silm! {my} polnud kaitstud.
+praise.capture.b1.3 = Jah! Sa võitsid {my:gen}.
+praise.capture.b2 = Hea löömine! {my} oli kaitseta.
+praise.capture.b2.2 = Tore, sa korjasid {my:gen} ära.
+praise.capture.b2.3 = Hästi märgatud: {my} oli kaitseta.
+praise.best.b1 = Hea käik!
+praise.best.b1.2 = Väga hea!
+praise.best.b1.3 = Hästi mängitud!
+praise.best.b2 = Hea käik.
+praise.best.b2.2 = Väga ilus.
+praise.best.b2.3 = Hästi mängitud.
+praise.best.b3 = Hea käik: seda polnud lihtne leida.
+praise.best.b3.2 = Ilusti leitud.
+praise.best.b3.3 = {move} on siin parim käik. Hea.
+praise.trade.b1 = Hea! Kui sul on eelis, aitab malendite vahetamine sind.
+praise.trade.b1.2 = Ilus vahetus. Sul on eelis, nii et vähem malendeid on sulle hea.
+praise.trade.b2 = Hea vahetus: sul on eelis, nii et vaheta malendeid.
+praise.trade.b2.2 = Kui sul on eelis, on {my:gen} vahetamine tark.
+praise.trade.b3 = Hea: eelise korral vaheta.
+praise.trade.b3.2 = Mõistlik vahetus.
+praise.excellent.b3 = Suurepärane käik.
+praise.excellent.b3.2 = See on tugev käik.
+praise.excellent.b3.3 = Väga täpne.
+praise.excellent.b4 = Täpne.
+praise.excellent.b4.2 = Suurepärane.
+praise.excellent.b4.3 = Hea, {move} on täpne.
+praise.castle.b1 = Hea! Sa vangerdasid. Sinu kuningas on nüüd paremini kaitstud.
+praise.castle.b1.2 = Ilus vangerdus! Sinu kuningas on varjus.
+praise.saved.b1 = Hea! Sa päästsid oma malendi.
+praise.saved.b1.2 = Tubli, sa viisid selle ohust välja.
+praise.book.b1 = Hea, see on tuntud avangukäik.
+praise.book.b1.2 = Tore, just nii alustavad ka tugevad mängijad.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Ettevaatust! Ma ähvardan matti väljal {sq}.
+threat.mate.b1.2 = Ettevaatust: {my} tahab minna väljale {sq}. See oleks matt.
+threat.mate.b1.3 = Vaata välja {sq}. Kui ma sinna jõuan, on matt!
+threat.mate.b2 = Ettevaatust, ma ähvardan matti.
+threat.mate.b2.2 = Ettevaatust: väljal {sq} on matiähvardus.
+threat.mate.b2.3 = Vaata hoolikalt: ma ähvardan matti.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Vaata: {my} ründab {your:part}.
+threat.piece.b1.2 = Ettevaatust! {your} on {my:gen} rünnaku all.
+threat.piece.b1.3 = Ettevaatust, {my} tahab {your:gen} lüüa.
+threat.piece.b2 = Ettevaatust {your:own_com}.
+threat.piece.b2.2 = {your} on rünnaku all.
+threat.piece.b2.3 = Jälgi {your:own_part}.
+threat.punish.b1 = Minu viimane käik oli viga. Kas oskad seda karistada?
+threat.punish.b1.2 = Hmm, ma vist tegin vea. Kas leiad selle?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Mõtle seekord {your:own_all}.
+tb.hint.b1.2 = Hoia {your:own_ade} silm peal.
+tb.hint.king.b1 = Mõtle {your:own_gen} turvalisusele.
+tb.hint.king.b1.2 = Vaata kõigepealt {your:own_part}. Kas see on ohust väljas?
+tb.hint.missed.b1 = Otsi malendeid, mida saad tasuta lüüa.
+tb.hint.missed.b1.2 = Vaata hoolikalt: kas on midagi, mida saad lüüa?
+tb.hint.mate_missed.b1 = Vaata minu kuningat. Kas saad talle matti panna?
+tb.hint.mate_missed.b1.2 = Vaata kõigepealt käike, mis annavad tuld. Äkki on seal matt!
+tb.hint.general.b1 = Võta aega ja vaata kogu lauda.
+tb.hint.general.b1.2 = Proovi leida ohutum käik.
+# The retry.
+tb.fixed.b1 = Palju parem!
+tb.fixed.b1.2 = Jah, see on parem!
+tb.fixed.b1.3 = Hea, see toimib palju paremini.
+tb.fixed = Nii on parem.
+tb.fixed.2 = Parem.
+tb.fixed.3 = Hea parandus.
+tb.same = Jälle sama käik? Olgu, vaatame.
+tb.same.2 = Sulle meeldib see käik. Mängime selle läbi.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Jah! Seda käiku ma mõtlesingi.
+tb.found.b1.2 = Leidsid! See on parem käik.
+tb.found = Just seda käiku ma silmas pidasin.
+tb.found.2 = Täpselt, just see.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Kahjuks ei saa sa selles partiis enam käike tagasi võtta.
+tb.none_left.2 = Sul pole selles partiis enam käigu tagasivõtmisi alles.

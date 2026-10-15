@@ -1,0 +1,1438 @@
+# Scacelith - Suomi (Finnish)
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (1 is "one").
+# Register: the player is "sinä" (2nd person singular), as Finnish software writes; buttons are
+# imperatives ("Tallenna", "Peruuta") or nouns ("Asetukset"); sentence case, titles in capitals.
+# Chess words follow the Finnish glossary: valkea / musta (lower case in running text), sotilas,
+# ratsu, lähetti, torni, kuningatar, kuningas; letters K D T L R; rated / casual = pisteytetty /
+# pisteyttämätön. No case ending is ever put on a {n} placeholder: the sentence inflects a noun
+# beside it ("pelaajan {0} lippu", "palvelimelle {0}") or leaves the placeholder in the nominative.
+# Counted nouns after a figure: "{0} siirron jälkeen", "{0} siirrolla" (one form fits every number).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Päällä
+common.off = Pois
+common.back = Takaisin
+common.apply = Käytä
+common.discard = Hylkää
+common.cancel = Peruuta
+common.white = Valkea
+common.black = Musta
+common.main_menu = Päävalikko
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kuninkaallinen peli
+menu.new_game = Uusi peli
+menu.options = Asetukset
+menu.credits = Tekijät
+menu.quit = Lopeta
+menu.version = Versio {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = ASETUKSET
+options.tab.display = Näyttö
+options.tab.graphics = Grafiikka
+options.tab.audio = Ääni
+options.tab.gameplay = Peli
+options.tab.player = Pelaaja
+options.tab.controls = Ohjaus
+options.pending = Muutokset tulevat voimaan vasta, kun ne otetaan käyttöön.
+options.unsaved.title = TALLENTAMATTOMAT MUUTOKSET
+options.unsaved.text = Joitakin asetuksia on muutettu. Otatko ne käyttöön ennen poistumista?
+
+options.language = Kieli
+options.language.help = Valikkojen ja viestien kieli. Muutos tulee voimaan heti.
+options.display_mode = Näyttötila
+options.display_mode.help = Koko näyttö: reunaton ikkuna koko näytön kokoisena työpöydän tarkkuudella. Ikkunoitu: alla valitun kokoinen ikkuna.
+options.fullscreen = Koko näyttö
+options.windowed = Ikkunoitu
+options.window_size = Ikkunan koko
+options.window_size.help = Ikkunan koko ikkunoidussa tilassa. Koko näytön tila käyttää aina työpöydän tarkkuutta.
+options.vsync = Pystytahdistus
+options.vsync.help = Tahdistaa kuvat näytön virkistystaajuuteen, jotta kuva ei repeile.
+options.render_scale = Renderöintiskaala
+options.render_scale.help = 3D-kuvan sisäinen tarkkuus. Pienempi on nopeampi, suurempi terävämpi.
+
+options.quality = Laatu
+options.quality.very_low = Erittäin matala
+options.quality.low = Matala
+options.quality.medium = Keskitaso
+options.quality.high = Korkea
+options.quality.ultra = Ultra
+options.quality.custom = Mukautettu
+options.quality.help = Asettaa kaikki alla olevat asetukset kerralla: Erittäin matala poistaa kaikki tehosteet käytöstä, Ultra nostaa ne kaikki enimmäistasolle. Jos muutat yksittäistä asetusta, laaduksi tulee Mukautettu. Vaatimattomalla näytönohjaimella myös renderöintiskaalan pienentäminen (Näyttö) auttaa paljon.
+options.shadows = Varjot
+options.shadows.help = Auringon luomien varjojen tarkkuus ja niiden reunojen pehmeys. Matala: yksinkertaiset reunat ja nopea piirto.
+options.reflections = Heijastukset
+options.reflections.help = Lattia, pöytä ja lauta heijastavat salia (sali piirretään kutakin varten uudelleen: yksi raskaimmista asetuksista); Keskitasosta alkaen myös kiiltävät nappulat ja esineet heijastavat ympäristöään.
+options.ambient_occlusion = Ympäristövarjostus
+options.ambient_occlusion.help = Pehmeä varjostus kohdissa, joissa esineet kohtaavat, ja syvennyksissä, joihin valoa pääsee vähemmän.
+options.indirect_light = Epäsuora valo
+options.indirect_light.help = Päivänvalo heijastuu seinistä, lattiasta ja katosta. Matala: tasainen ympäristövalo heijastusten sijaan. Vaikuttaa lähinnä latausaikaan.
+options.volumetric_light = Valokeilat
+options.volumetric_light.help = Auringonsäteet salin pölyisessä ilmassa ja niissä kimaltelevat hiukkaset.
+options.tessellation = Tessellaatio
+options.tessellation.help = Pehmeät ääriviivat nappuloiden kaarevissa muodoissa läheltä katsottuna.
+options.tessellation.unavailable = Ei käytettävissä: tämä näytönohjaimen ajuri ei tue tessellaatiota.
+options.antialiasing = Reunanpehmennys
+options.antialiasing.help = Pehmentää sahalaitaiset reunat ja välkkyvät kiiltokohdat. Pois: terävämpi mutta sahalaitainen kuva, ja jotkin tehosteet näyttävät rakeisilta.
+options.depth_of_field = Syväterävyys
+options.depth_of_field.help = Sumentaa sen, mikä on selvästi katsomasi kohteen edessä tai takana, kuten kameran objektiivi.
+options.motion_blur = Liike-epäterävyys
+options.motion_blur.help = Sumentaa kameran ja käsivarsien nopeat liikkeet, kuten elokuvakamera.
+options.bloom = Hehku
+options.bloom.help = Pehmeä hehku kirkkaimpien kohtien ympärillä, kuten kameran objektiivissa.
+options.brightness = Kirkkaus
+options.brightness.neutral = Neutraali
+options.brightness.value = {0} EV
+options.brightness.help = Kameran valotuksen korjaus. Ensimmäisen käynnistyksen kalibrointi asettaa sen niin, että tummimmat varjot juuri ja juuri erottuvat.
+
+options.master_volume = Pääänenvoimakkuus
+options.effects = Tehosteet
+options.ambience = Taustaäänet
+options.ambience.help = Salin äänimaailma: takkatuli, kaukaiset askeleet, vanha kello.
+options.ambience_volume = Taustaäänten voimakkuus
+options.voice_volume = Puheen voimakkuus
+options.voice_volume.help = Valmentajan äänen voimakkuus valmentajatilassa.
+options.subtitles = Tekstitys
+options.subtitles.auto = Automaattinen
+options.subtitles.help = Valmentajan sanat kirjoitettuina näytön alareunaan. Automaattinen: näytetään, kun valmentaja ei puhu valikkojen kieltä (kiinankielisten valikkojen kanssa valmentaja puhuu englantia). Näytetään aina, kun valmentajan ääntä ei ole asennettu.
+
+options.legal_moves = Näytä sallitut siirrot
+options.legal_moves.help = Korostaa ruudut, joihin kosketettu nappula voi siirtyä. Kun asetus on pois päältä, mikään ei kerro, onko siirto sallittu: tuomari rankaisee laittomasta siirrosta, kun painat kelloa.
+options.coordinates = Laudan koordinaatit
+options.auto_press = Kellon automaattinen painallus
+options.auto_press.help = Robottisi painaa kelloa itse, kun siirtosi on laudalla. Verkkopeleissä tämän ratkaisee palvelin ja suorassa ottelussa sen isännöivä pelaaja.
+options.thinking_time = Realistinen miettimisaika
+options.thinking_time.help = Vastustajasi käyttää aikaa kuin ihmispelaaja sen sijaan, että siirtäisi heti.
+options.ignore_head = Ohita vastustajan pään liikkeet
+options.ignore_head.help = Verkkopeleissä ja suorissa otteluissa vastustajan robotti katsoo sinne, minne sen pelaaja katsoo. Kun asetus on päällä, robotti liikuttaa päätään itsestään kuten Stockfishia vastaan pelattaessa.
+options.mouse_sensitivity = Hiiren herkkyys
+options.invert_look = Käänteinen pystykatselu
+options.handover = Pelaajan vaihto
+options.handover.cut = Välitön leikkaus
+options.handover.flight = Lento, {0} s
+options.handover.help = Kaksi pelaajaa samalla tietokoneella: miten näkymä siirtyy pelaajan silmistä toisen pelaajan silmiin jokaisen siirron jälkeen. Välitön leikkaus välttää kameran liikkeen.
+options.game_cursor = Pelin osoitin
+options.game_cursor.help = Pöydän ääressä peli piirtää oman osoittimensa, joka näyttää, mitä napsautus tekee. Pois: järjestelmän tavallinen nuoli.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nimi
+player.name.help = Nimesi sellaisena kuin se kirjoitetaan pöytäkirjojen yläosaan, millä tahansa kirjaimistolla.
+player.default_name = Ihminen
+player.handwriting = Käsiala
+player.handwriting.help = Käsi, joka kirjoittaa siirtosi. Arabia, japani ja kiina kirjoitetaan omalla käsialallaan.
+player.preview = PÖYTÄKIRJASSASI
+hand.caveat = Rento
+hand.marck = Kaunokirjoitus
+hand.badscript = Kalteva
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Vasen napsautus
+controls.touch = Kosketa nappulaa ja siirrä sitä
+controls.clock.keys = Välilyönti  tai  napsauta kelloa
+controls.clock = Paina kelloa
+controls.look.keys = Hiiren oikea painike pohjassa
+controls.look = Katsele ympärillesi
+controls.sheet.keys = S
+controls.sheet = Katso pöytäkirjaasi ja palaa takaisin
+controls.stand.keys = ↑
+controls.stand = Nouse seisomaan tuolisi eteen
+controls.side.keys = ←  /  →
+controls.side = Siirry pöydän vasempaan / oikeaan päähän
+controls.sit.keys = ↓
+controls.sit = Istu takaisin (pelata voi vain istuen)
+controls.moves.keys = Sarkain
+controls.moves = Näytä tai piilota siirtoluettelo
+controls.menu.keys = Esc
+controls.menu = Valikko
+controls.coach_skip.keys = Välilyönti
+controls.coach_skip = Valmentaja: ohita valmentajan puhe
+controls.coach_takeback.keys = Askelpalautin
+controls.coach_takeback = Valmentaja: peru siirto, kun sitä tarjotaan
+controls.coach_hint.keys = H
+controls.coach_hint = Valmentajan haasteet: pyydä vihjettä
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = KIRKKAUS
+calibration.text = Siirrä liukusäädintä, kunnes mustassa ruudussa oleva ratsu juuri ja juuri erottuu tai ei enää erotu.
+calibration.later = Voit muuttaa sitä myöhemmin kohdassa Asetukset > Grafiikka.
+calibration.continue = Jatka
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = UUSI PELI
+newgame.opponent = VASTUSTAJA
+newgame.time_control = PELIAIKA
+newgame.start = Aloita
+newgame.elo = ~{0} Elo
+newgame.you_white = Pelaat valkeilla.
+newgame.you_black = Pelaat mustilla.
+newgame.colour_lot = Ensimmäisen pelin värit arvotaan.
+newgame.colour_alternate = Sen jälkeen värit vaihtuvat pelistä toiseen.
+newgame.opponent_kind = Vastustaja
+newgame.opponent_kind.help = Pelaa Stockfishia tai tämän tietokoneen ääressä istuvaa ystävää vastaan: siirrätte vuorotellen, kumpikin omalta puoleltaan lautaa.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Ihminen, sama kone
+
+# Custom opponent: Stockfish parameters
+engine.skill = Taitotaso
+engine.skill.help = Stockfishin ”Skill Level” (0–20). Ei vaikutusta, kun vahvuutta rajoitetaan Elo-luvulla.
+engine.limit_elo = Rajoita vahvuutta (Elo)
+engine.limit_elo.help = UCI_LimitStrength: moottori pyrkii alla valittuun Elo-lukuun.
+engine.elo = Elo
+engine.depth = Hakusyvyys
+engine.plies = {0} puolisiirto|{0} puolisiirtoa
+engine.move_time = Aika siirtoa kohden
+engine.nodes = Solmuraja
+engine.no_limit = Ei rajaa
+engine.thousand = {0} tuh.
+engine.million = {0} milj.
+engine.dynamic_elo = Dynaaminen Elo ajan mukaan
+engine.dynamic_elo.help = Kuten ihmispelaaja, Stockfish pelaa heikommin, kun sen aika käy vähiin: hieman heikommin viimeisellä minuutilla (aiemmin pika- ja salamapeleissä), paljon heikommin aikapulassa. Vain peleissä, joissa on kello.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish käyttää aikaa kuin tasoisensa ihminen. Jos haluat ohittaa tämän tauon: Asetukset > Peli > Realistinen miettimisaika.
+engine.pace.instant = Stockfish siirtää heti laskettuaan. Jos haluat ihmismäisiä taukoja: Asetukset > Peli > Realistinen miettimisaika.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Rajoittamaton
+tc.no_clock = Ei kelloa
+tc.bullet = Bullet
+tc.blitz = Salamashakki
+tc.rapid = Pikashakki
+tc.classical = Klassinen
+tc.custom = Mukautettu
+tc.your_own = Oma
+tc.base_time = Perusaika
+tc.base_time.help = Kummankin kellon alkuaika (minuutit : sekunnit).
+tc.increment = Lisäaika
+tc.increment.help = Fischer-lisäaika, joka lisätään jokaisen siirron jälkeen.
+tc.delay = Viive
+tc.delay.help = Bronstein-viive: tähän viiveeseen asti käytetty aika palautetaan jokaisen siirron jälkeen.
+tc.no_delay = Ei viivettä
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, viive {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Vasta-alkaja
+preset.novice.desc = On juuri oppinut siirrot: jättää nappuloita lyötäviksi eikä huomaa yksinkertaisia uhkia.
+preset.beginner.name = Aloittelija
+preset.beginner.desc = Osaa perusasiat, mutta menettää yhä usein materiaalia vakavilla virheillä.
+preset.casual.name = Harrastaja
+preset.casual.desc = Rento iltapelin vastustaja: järkeviä siirtoja, usein virheitä.
+preset.club_player.name = Kerhopelaaja
+preset.club_player.desc = Vankka kerhopelaaja, joka rankaisee ilmeisistä vakavista virheistä.
+preset.advanced.name = Edistynyt
+preset.advanced.desc = Vahva kerhopelaaja, jolla on hyvä taktinen silmä.
+preset.expert.name = Asiantuntija
+preset.expert.desc = Kokenut turnauspelaaja: erehtyy harvoin ja muuttaa edun voitoksi.
+preset.master.name = Mestari
+preset.master.desc = Mestaritaso: syvä laskenta ja hienovarainen asemapeli.
+preset.grandmaster.name = Suurmestari
+preset.grandmaster.desc = Suurmestaritaso: erittäin vaikea voittaa.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 täydellä teholla. Onnea matkaan.
+preset.custom.name = Mukautettu
+preset.custom.desc = Omat moottoriasetuksesi.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = TEKIJÄT
+credits.game.head = SCACELITH
+credits.game = Shakkipeli kuninkaallisessa salissa, omalla OpenGL 4.6 -pelimoottorilla.
+credits.engine.head = SHAKKIMOOTTORI
+credits.engine = Stockfish 19, tekijöinä Stockfishin kehittäjät.
+credits.engine.licence = Lisenssi: GNU General Public License v3.
+credits.engine.data = Sen neuroverkko on koulutettu Leela Chess Zero -projektin tarjoamalla datalla, joka on saatavilla Open Database License (ODbL) -lisenssillä.
+credits.voice.head = VALMENTAJAN ÄÄNI
+credits.voice = Valmentajatilan synteettinen puhe on tuotettu Supertonic 3 -mallilla.
+credits.voice.licence = Supertonic 3 on Supertonen malli, jota käytetään OpenRAIL-M-lisenssillä; sen käyttörajoitukset koskevat jokaista sen käyttäjää (ks. Lisenssit).
+credits.openings.head = AVAUKSET
+credits.openings = Avausten nimet ovat lichess.org-sivuston chess-openings-tietokannasta, joka on luovutettu vapaaseen käyttöön (CC0).
+credits.fonts.head = KIRJASIMET
+credits.fonts = EB Garamond (Georg Duffner) ja Cinzel (Natanael Gama); Amiri (Khaled Hosny).
+credits.fonts.hand = Käsialat: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Shakkinappuloiden symbolit GNU FreeFont -kirjasimesta (GPL v3 ja kirjasinpoikkeus).
+credits.quote = ”Shakki on analyysin taidetta.”  – Mihail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Lisenssit
+licences.title = LISENSSIT
+licences.note = Lisenssit näytetään alkuperäisinä englanninkielisinä teksteinä.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = TAUKO
+pause.resume = Jatka
+pause.offer_draw = Tarjoa tasapeliä
+pause.claim_draw = Vaadi tasapeliä
+pause.claim_draw.help = Kolmesti toistunut asema tai 50 siirron sääntö.
+pause.resign = Luovuta
+confirm.resign.title = LUOVUTA
+confirm.resign.text = Luovutatko pelin? Vastustajasi julistetaan voittajaksi.
+confirm.resign.draw = Luovutatko pelin? Vastustajasi ei voi enää tehdä mattia: peli päättyy tasapeliin.
+confirm.resign.ok = Luovuta
+confirm.leave.title = POISTU PELISTÄ
+confirm.leave.text = Palaatko päävalikkoon? Meneillään oleva peli jää kesken.
+confirm.leave.ok = Poistu
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = KOROTUS
+piece.queen = Kuningatar
+piece.rook = Torni
+piece.bishop = Lähetti
+piece.knight = Ratsu
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Peli päättyi tasapeliin.
+gameover.draw_moves = Peli päättyi tasapeliin {0} siirron jälkeen.|Peli päättyi tasapeliin {0} siirron jälkeen.
+gameover.win = Hyvin pelattu – voitit.
+gameover.win_moves = Hyvin pelattu – voitit {0} siirrolla.|Hyvin pelattu – voitit {0} siirrolla.
+gameover.loss = Vastustajasi voitti.
+gameover.loss_moves = Vastustajasi voitti {0} siirrolla.|Vastustajasi voitti {0} siirrolla.
+gameover.rematch = Uusintapeli
+gameover.view_board = Katso lautaa
+gameover.show = Näytä
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Shakkimatti
+reason.resignation = Luovutus
+reason.timeout = Aika loppui
+reason.illegal_moves = Toinen laiton siirto (tuomittu häviö)
+reason.stalemate = Patti
+reason.insufficient = Kuollut asema (riittämätön materiaali)
+reason.timeout_vs_insufficient = Lippu putosi, mutta vastustaja ei voi tehdä mattia
+reason.fivefold = Viidesti toistunut asema
+reason.75_moves = 75 siirron sääntö
+reason.threefold_claim = Kolmesti toistunut asema (vaadittu)
+reason.50_moves_claim = 50 siirron sääntö (vaadittu)
+reason.agreement = Sovittu tasapeli
+reason.illegal_vs_insufficient = Toinen laiton siirto, mutta vastustaja ei voi tehdä mattia
+reason.resignation_vs_insufficient = Luovutus, mutta vastustaja ei voi tehdä mattia
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = SIIRROT
+movelist.empty = Ei vielä siirtoja.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Valmistellaan materiaaleja
+loading.hall = Pystytetään salia
+loading.furniture = Veistetään pöytää ja tuoleja
+loading.board = Kiillotetaan lautaa
+loading.pieces = Sorvataan nappuloita
+loading.clock = Kootaan kelloa
+loading.porcelain = Poltetaan posliinia
+loading.ready = Valmis
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Tässä asemassa ei voi vaatia tasapeliä.
+notify.flag_you = Lippusi on pudonnut.
+notify.flag_opponent = Vastustajasi lippu on pudonnut.
+notify.touched.pawn = Kosketussääntö: koskettamasi sotilas on siirrettävä.
+notify.touched.knight = Kosketussääntö: koskettamasi ratsu on siirrettävä.
+notify.touched.bishop = Kosketussääntö: koskettamasi lähetti on siirrettävä.
+notify.touched.rook = Kosketussääntö: koskettamasi torni on siirrettävä.
+notify.touched.queen = Kosketussääntö: koskettamasi kuningatar on siirrettävä.
+notify.touched.king = Kosketussääntö: koskettamasi kuningas on siirrettävä.
+notify.touched.piece = Kosketussääntö: koskettamasi nappula on siirrettävä.
+notify.touched_square = Kosketussääntö: sinun on siirrettävä ruudussa {0} oleva nappula.
+notify.press_clock = Viimeistele siirtosi painamalla kelloa (Välilyönti).
+notify.manual_clock = Paina tässä pelissä kelloa itse jokaisen siirron jälkeen.
+notify.illegal = Laiton siirto.
+notify.cannot_move = Tätä siirtoa ei voi tehdä.
+notify.move_first = Tee siirtosi ennen kuin painat kelloa.
+notify.stance.sit_to_play = Istu takaisin, jotta voit pelata (Alanuoli).
+notify.stance.first = Kello käy, kun seisot. Alanuoli: istu takaisin.
+notify.stance.first_untimed = Voit pelata vain tuolilla istuen. Alanuoli: istu takaisin.
+notify.stance.finish_move = Tee ensin siirtosi loppuun.
+notify.draw_already_offered = Olet jo tarjonnut tasapeliä tällä siirrolla.
+notify.draw_accepted = Vastustajasi hyväksyy tasapelin.
+notify.draw_declined = Vastustajasi hylkää tasapelitarjouksen.
+notify.draw_claimed = Vastustajasi vaatii tasapeliä.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Tuomari: kelloa painettiin tekemättä siirtoa, mikä katsotaan laittomaksi siirroksi.
+arbiter.unpromoted = Tuomari: laiton siirto, sotilasta ei vaihdettu uuteen nappulaan ennen kellon painamista.
+arbiter.illegal = Tuomari: laiton siirto.
+arbiter.second_loses.white = Tämä on valkean toinen laiton siirto: valkea häviää pelin.
+arbiter.second_loses.black = Tämä on mustan toinen laiton siirto: musta häviää pelin.
+arbiter.second_draw.white = Tämä on valkean toinen laiton siirto, mutta musta ei voi tehdä mattia: peli päättyy tasapeliin.
+arbiter.second_draw.black = Tämä on mustan toinen laiton siirto, mutta valkea ei voi tehdä mattia: peli päättyy tasapeliin.
+arbiter.queen = Sotilaasta tulee kuningatar.
+arbiter.queen_one_minute.white = Sotilaasta tulee kuningatar, ja valkea saa yhden lisäminuutin.
+arbiter.queen_one_minute.black = Sotilaasta tulee kuningatar, ja musta saa yhden lisäminuutin.
+arbiter.queen_two_minutes.white = Sotilaasta tulee kuningatar, ja valkea saa kaksi lisäminuuttia.
+arbiter.queen_two_minutes.black = Sotilaasta tulee kuningatar, ja musta saa kaksi lisäminuuttia.
+arbiter.restored = Asema palautetaan.
+arbiter.restored_one_minute.white = Asema palautetaan, ja valkea saa yhden lisäminuutin.
+arbiter.restored_one_minute.black = Asema palautetaan, ja musta saa yhden lisäminuutin.
+arbiter.restored_two_minutes.white = Asema palautetaan, ja valkea saa kaksi lisäminuuttia.
+arbiter.restored_two_minutes.black = Asema palautetaan, ja musta saa kaksi lisäminuuttia.
+arbiter.one_minute.white = Valkea saa yhden lisäminuutin.
+arbiter.one_minute.black = Musta saa yhden lisäminuutin.
+arbiter.two_minutes.white = Valkea saa kaksi lisäminuuttia.
+arbiter.two_minutes.black = Musta saa kaksi lisäminuuttia.
+arbiter.second_loses = Toinen laiton siirto johtaa pelin häviämiseen.
+arbiter.touched.white = Valkean on siirrettävä koskettamansa nappula.
+arbiter.touched.black = Mustan on siirrettävä koskettamansa nappula.
+arbiter.game_over = Peli on päättynyt.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Katso peliä
+
+viewer.title = KATSO PELIÄ
+viewer.white = VALKEA
+viewer.black = MUSTA
+viewer.time_control = PELIAIKA
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Vaihda värit
+viewer.note = Kumpikin pelaaja on Stockfish. Lennä pelin aikana vapaasti ympäri salia: kukaan ei näe sinua.
+viewer.summary = {0} – {1}
+viewer.custom = Mukautettu
+viewer.tc.custom = Oma
+viewer.base_time = Perusaika
+viewer.increment = Lisäaika
+viewer.delay = Viive
+viewer.off = Ei viivettä
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = viive {0} s
+viewer.back = Takaisin
+viewer.start = Aloita
+
+viewer.paused = TAUKO
+viewer.resume = Jatka
+viewer.options = Asetukset
+viewer.main_menu = Päävalikko
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = OHJAUS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  nuolinäppäimet
+viewer.controls.move = Liiku
+viewer.keys.updown = E, Välilyönti  /  C, Ctrl
+viewer.controls.updown = Ylös / alas
+viewer.keys.fast = Vaihto
+viewer.controls.fast = Nopeammin
+viewer.keys.look = Hiiren oikea painike
+viewer.controls.look = Katsele ympärillesi
+viewer.keys.speed = Hiiren rulla
+viewer.controls.speed = Nopeus
+viewer.keys.views = 1 – 9
+viewer.controls.views = Kuvakulmat
+viewer.keys.eyes = 0
+viewer.controls.eyes = Siirtovuorossa olevan pelaajan silmin
+viewer.keys.moves = Sarkain
+viewer.controls.moves = Siirtoluettelo
+viewer.keys.menu = Esc
+viewer.controls.menu = Valikko
+viewer.keys.hide = H
+viewer.controls.hide = Piilota nämä ohjeet
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Tauko / jatka
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Siirto taaksepäin / eteenpäin
+viewer.keys.replay_speed = Vaihto + J  /  L
+viewer.controls.replay_speed = Hitaammin / nopeammin
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Pelin alku / loppu
+viewer.speed = Nopeus {0} m/s
+viewer.view.0 = Pelaajien silmin
+viewer.view.1 = Pöydän vierestä
+viewer.view.2 = Laudan yläpuolelta
+viewer.view.3 = Sali
+viewer.view.4 = Kello
+viewer.view.5 = Valkean kasvot
+viewer.view.6 = Mustan kasvot
+viewer.view.7 = Kaksintaistelu
+viewer.view.8 = Ikkunat
+viewer.view.9 = Kuvakudokset
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Valkea
+viewer.side.black = Musta
+viewer.flag.white = Valkean lippu on pudonnut.
+viewer.flag.black = Mustan lippu on pudonnut.
+viewer.claims_draw = {0} vaatii tasapeliä.
+viewer.offer_accepted = {0} tarjoaa tasapeliä. {1} hyväksyy sen.
+viewer.offer_declined = {0} tarjoaa tasapeliä. {1} kieltäytyy.
+viewer.gameover.white_wins = Valkea voitti siirron {0} jälkeen.
+viewer.gameover.black_wins = Musta voitti siirron {0} jälkeen.
+viewer.gameover.draw = Peli päättyi tasapeliin siirron {0} jälkeen.
+viewer.gameover.players = {0} vastaan {1}
+viewer.watch_again = Katso uudelleen
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Ei vielä pisteytettyjä pelejä
+elo.provisional = Alustava vahvuusluku
+elo.peak = Huippu {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo-lukusi {0}
+elo.expected = odotettu tulos {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · tätä peliä ei pisteytetä
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Pöytäkirja
+scoresheet.event = Tapahtuma
+scoresheet.date = Päivämäärä
+scoresheet.round = Kierros
+scoresheet.board = Pöytä
+scoresheet.page = Sivu
+scoresheet.white = Valkea
+scoresheet.black = Musta
+scoresheet.elo = Elo
+scoresheet.result = Tulos
+scoresheet.move_no = Nro
+scoresheet.sign_white = Valkean allekirjoitus
+scoresheet.sign_black = Mustan allekirjoitus
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L R
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Pelaa verkossa
+online.title = PELAA VERKOSSA
+online.continue = Jatka
+online.retry = Yritä uudelleen
+online.copy = Kopioi
+online.copied = Kopioitu
+online.copy.unavailable = Kopiointi ei ole käytettävissä tässä: kirjoita se muistiin.
+online.rated = Pisteytetty
+online.casual = Pisteyttämätön
+online.casual_only = Vain pisteyttämätön
+online.color.random = Arvonta
+online.ping = {0} ms
+online.conn.online = Yhdistetty
+online.conn.connecting = Yhdistetään…
+online.conn.reconnecting = Yhdistetään uudelleen…
+online.conn.offline = Ei yhteyttä
+online.conn.incompatible = Eri versio
+online.no_server.text = Verkkopeli vaatii Scacelith-palvelimen. Anna palvelimen osoite asetuksissa tai pelaa ystävää vastaan ilman palvelinta valitsemalla Suora ottelu.
+online.no_server.settings = Palvelimen asetukset
+
+# Options > Online server
+options.tab.online = Verkkopalvelin
+options.online.server = Palvelin
+options.online.server.help = Virallinen palvelin tai jonkun muun ylläpitämä mukautettu (yhteisön) palvelin, johon yhdistetään sen suojatun web-rajapinnan ja suojatun WebSocketin kautta. Kirjaudut jokaiselle palvelimelle erikseen: tiliä ja sen kirjautumista ei koskaan jaeta palvelinten kesken.
+options.online.official = Virallinen palvelin – {0}
+options.online.community = Mukautettu palvelin
+options.online.host = Osoite
+options.online.host.hint = verkkotunnus tai IP-osoite
+options.online.host.help = Mukautetun palvelimen verkkotunnus tai IP-osoite sellaisena kuin sen omistaja sen antoi.
+options.online.api_port = HTTPS- / API-portti
+options.online.api_port.help = Palvelimen suojatun web-rajapinnan portti (Scacelith-palvelimilla 443).
+options.online.ws_port = WSS-portti
+options.online.ws_port.hint = sama kuin API-portti
+options.online.ws_port.help = Palvelimen suojatun WebSocketin portti. Jätä tyhjäksi, jos se on sama kuin API-portti.
+options.online.pin = Varmenteen sormenjälki (SHA-256)
+options.online.pin.hint = valinnainen
+options.online.pin.help = Palvelimelle, jolla on itse allekirjoitettu varmenne: omistajan antama SHA-256-sormenjälki (64 heksadesimaalimerkkiä, kaksoispisteet sallittuja). Jätä tyhjäksi, jos haluat luottaa järjestelmän varmenteisiin.
+options.online.pin.invalid = Sormenjäljessä on 64 heksadesimaalimerkkiä (kaksoispisteet sallittuja).
+options.online.test = Testaa yhteys
+options.online.test_ok = {0}: yhdistetty, yhteensopiva tämän version kanssa.
+options.online.test_incompatible = {0}: yhdistetty, mutta palvelin vaatii toisen Scacelith-version.
+options.online.in_game = Palvelinta ei voi vaihtaa verkkopelin aikana.
+options.online.remember_session = Muista kirjautumiseni, kun järjestelmän avainnippu ei ole käytettävissä
+options.online.remember_session.help = Kun mikään järjestelmän avainnippu (GNOME Keyring, KWallet…) ei voi säilyttää istuntoasi, se tallennetaan tiedostoon, jota vain käyttäjätilisi voi lukea. Kuka tahansa, joka voi lukea tiedostojasi tai niiden kopiota, kuten varmuuskopiota, voisi käyttää tätä istuntoa. Pois: pysyt kirjautuneena, kunnes peli suljetaan. Voit kirjata minkä tahansa laitteen ulos tilisi kohdasta Kirjautuneet laitteet.
+
+# Sign in, create an account
+online.signin.lead = Kirjaudu palvelimelle {0}, niin voit pelata muita vastaan verkossa.
+online.field.user = Käyttäjänimi tai sähköposti
+online.field.user.hint = nimi tai osoite
+online.field.password = Salasana
+online.field.password.hint = vähintään 10 merkkiä
+online.field.password2 = Vahvista salasana
+online.field.current_password = Nykyinen salasana
+online.field.new_password = Uusi salasana
+online.field.username = Käyttäjänimi
+online.field.username.hint = 3–24 merkkiä: kirjaimia, numeroita, _ tai -
+online.field.email = Sähköposti
+online.field.new_email = Uusi sähköposti
+online.field.code = Koodi
+online.field.code.hint = 6 numeroa tai palautuskoodi
+online.field.code6 = Sovelluksen koodi
+online.field.code6.hint = 6 numeroa
+online.signin.button = Kirjaudu sisään
+online.signin.google = Jatka Googlella
+online.signin.register = Luo tili
+online.signin.forgot = Unohditko salasanan?
+online.mfa.title = VAHVISTUSKOODI
+online.mfa.lead = Anna todennussovelluksesi näyttämä 6-numeroinen koodi tai jokin palautuskoodeistasi.
+online.mfa.verify = Vahvista
+online.register.title = LUO TILI
+online.register.lead = Ilmainen tili palvelimella {0}: nimesi, vahvuuslukusi ja pelisi säilyvät vain tällä palvelimella.
+online.register.button = Luo tili
+online.register.working = Luodaan tiliäsi… tämä voi kestää muutaman sekunnin.
+online.register.ready = Tilisi on valmis. Kirjaudu sisään ja pelaa.
+online.password.mismatch = Salasanat eivät täsmää.
+online.check_email.title = TARKISTA SÄHKÖPOSTISI
+online.check_email.text = Lähetimme linkin osoitteeseen {0}. Aktivoi tilisi avaamalla linkki ja kirjaudu sitten sisään tässä.
+online.check_email.ask = Anna tilisi osoite, niin lähetämme aktivointilinkin uudelleen.
+online.check_email.resend = Lähetä viesti uudelleen
+online.check_email.resent = Viesti lähetettiin uudelleen. Sen saapuminen voi kestää muutaman minuutin; tarkista myös roskapostikansio.
+online.forgot.title = UNOHTUNUT SALASANA
+online.forgot.lead = Anna tilisi sähköpostiosoite: lähetämme linkin, jolla voit valita uuden salasanan.
+online.forgot.button = Lähetä linkki
+online.forgot.sent = Jos jokin tili käyttää tätä osoitetta, linkki on matkalla.
+online.sso.title = KIRJAUDU GOOGLELLA
+online.sso.wait = Jatka selaimessa: valitse Google-tilisi avautuneessa ikkunassa. Scacelith jatkaa heti, kun Google ohjaa sinut takaisin.
+online.sso.name_title = VALITSE NIMESI
+online.sso.name_lead = Olet täällä ensimmäistä kertaa Googlen kautta. Valitse nimi, jonka muut pelaajat näkevät.
+online.sso.continue = Jatka
+online.sso.finishing = Google ohjasi sinut takaisin. Viimeistellään kirjautumista…
+online.sso.link_title = LISÄÄ GOOGLE-KIRJAUTUMINEN
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Tili {0} palvelimella {1} käyttää jo tämän Google-tilin sähköpostiosoitetta. Anna tämän tilin salasana, niin Google-kirjautuminen lisätään siihen. Tämä tarvitsee tehdä vain kerran.
+online.sso.link_button = Lisää Google-kirjautuminen
+online.sso.link_mfa = Google-kirjautuminen lisätään tähän tiliin, kun koodi on hyväksytty.
+online.sso.not_mine = Tämä ei ole minun tilini
+online.sso.not_mine_note = Google-kirjautumista ei lisätty. Jos tämä sähköpostiosoite on sinun, käytä sen kanssa toimintoa ”Unohditko salasanan?”: linkki lähetetään siihen postilaatikkoon. Jos tili pyytää myös kaksivaiheisen vahvistuksen koodia, jota sinulla ei ole, ota yhteyttä palvelimen ylläpitäjään.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google-kirjautuminen
+online.sso.page.done_heading = Takaisin Scacelithiin
+online.sso.page.done = Google on ohjannut sinut takaisin Scacelithiin. Viimeistele kirjautuminen palaamalla peliin; voit sulkea tämän välilehden.
+online.sso.page.cancelled_heading = Kirjautuminen peruttu
+online.sso.page.cancelled = Google-kirjautuminen peruttiin. Voit sulkea tämän välilehden ja palata Scacelithiin.
+online.sso.page.foreign_heading = Tämä sivu ei ole sinua varten
+online.sso.page.foreign = Tämä sivu ei vastaa kirjautumista, jota Scacelith odottaa tällä tietokoneella. Jos et juuri aloittanut Google-kirjautumista Scacelithissa, joku on ehkä lähettänyt sinulle tämän linkin: sulje tämä välilehti.
+
+# Account
+online.account.button = Tili
+online.account.title = TILI
+online.account.section = TILI
+online.account.username = KÄYTTÄJÄNIMI
+online.account.email = SÄHKÖPOSTI
+online.account.unverified = (ei vahvistettu)
+online.account.mfa = KAKSIVAIHEINEN VAHVISTUS
+online.account.mfa_on = Päällä
+online.account.mfa_off = Pois
+online.account.google = GOOGLE
+online.account.google_linked = Linkitetty Google-tiliin
+online.account.change_password = Vaihda salasana
+online.account.mfa_setup = Ota kaksivaiheinen vahvistus käyttöön
+online.account.mfa_disable = Poista kaksivaiheinen vahvistus
+online.account.recovery = Uudet palautuskoodit
+online.account.sign_out = Kirjaudu ulos
+online.account.sign_out_all = Kirjaudu ulos kaikkialta
+online.account.sign_out_all.help = Kirjaa tämän tilin ulos kaikilta tietokoneilta, myös tältä.
+online.account.signed_out = Olet kirjautunut ulos.
+online.account.signed_out_all = Olet kirjautunut ulos kaikilta tietokoneilta.
+online.account.signing_out_all = Kirjataan ulos kaikki tietokoneet…
+online.account.sign_out_all_failed = Muut tietokoneesi voivat yhä olla kirjautuneina: kirjaudu uudelleen sisään ja kirjaa ne sitten ulos kohdasta Kirjautuneet laitteet. {0}
+online.account.sign_out_all_retry = Muut tietokoneesi voivat yhä olla kirjautuneina. Kokeile uudelleen toimintoa Kirjaudu ulos kaikkialta. {0}
+online.account.ratings = VAHVUUSLUVUT
+online.account.col.tc = PELIAIKA
+online.account.col.rating = VAHVUUSLUKU
+online.account.col.games = PELIT
+online.account.col.record = V / T / H
+online.account.provisional = Kysymysmerkki tarkoittaa alustavaa vahvuuslukua (pelattuja pelejä on vielä vähän).
+online.password.title = VAIHDA SALASANA
+online.password.button = Vaihda salasana
+online.password.changed = Salasanasi on vaihdettu.
+online.password.other_sessions = Muilla tietokoneillasi on kirjauduttava uudelleen sisään.
+online.mfa_setup.title = KAKSIVAIHEINEN VAHVISTUS
+online.mfa_setup.lead = Kaksivaiheinen vahvistus pyytää puhelimesi sovelluksesta koodin aina, kun kirjaudut sisään. Aloita antamalla salasanasi.
+online.mfa_setup.scan = 1. Skannaa tämä koodi todennussovelluksella tai kirjoita tämä avain siihen:
+online.mfa_setup.enter = 2. Anna sovelluksen näyttämä 6-numeroinen koodi:
+online.mfa_setup.enable = Ota käyttöön
+online.mfa_setup.done = Kaksivaiheinen vahvistus on käytössä.
+online.mfa_off.title = POISTA KAKSIVAIHEINEN VAHVISTUS
+online.mfa_off.lead = Anna salasanasi ja sovelluksesi koodi (tai palautuskoodi).
+online.mfa_off.button = Poista käytöstä
+online.mfa.off_done = Kaksivaiheinen vahvistus on poistettu käytöstä.
+online.recovery.title = PALAUTUSKOODIT
+online.recovery.lead = Kullakin koodilla voit kirjautua sisään kerran, jos kadotat puhelimesi. Säilytä ne turvallisessa paikassa: ne näytetään vain nyt.
+online.recovery.saved = Tallensin ne
+online.recovery.new_title = UUDET PALAUTUSKOODIT
+online.recovery.new_lead = Uudet koodit korvaavat vanhat. Anna salasanasi ja sovelluksesi koodi.
+online.recovery.button = Uudet koodit
+online.account.manage = TIETOTURVA JA TIEDOT
+online.account.pending_email = Odottaa vahvistusta: {0}
+online.account.accept_challenges = Hyväksy haasteet
+online.account.accept_challenges.help = Muut pelaajat voivat haastaa sinut käyttäjänimelläsi. Pois: heidän haasteensa hylätään.
+online.account.history = Pelihistoria
+online.account.devices = Kirjautuneet laitteet
+online.account.change_email = Vaihda sähköposti
+online.account.export = Lataa tietoni
+online.account.delete = Poista tili
+
+# Play
+online.play.signed_in = Kirjautuneena: {0}
+online.session.file = Mikään järjestelmän avainnippu ei voinut säilyttää kirjautumistasi: se muistetaan tiedostossa, jota vain käyttäjätilisi voi lukea (Asetukset > Verkkopalvelin).
+online.session.memory = Mikään järjestelmän avainnippu ei voinut säilyttää kirjautumistasi, eikä sitä tallenneta tiedostoon: pysyt kirjautuneena, kunnes peli suljetaan (Asetukset > Verkkopalvelin).
+online.play.find_section = ETSI VASTUSTAJA
+online.play.friend_section = PELAA YSTÄVÄÄ VASTAAN
+online.play.mode = Pelityyppi
+online.play.mode.help = Pisteytetyt pelit muuttavat vahvuuslukuasi tässä peliajassa, pisteyttämättömät eivät.
+online.play.find = Etsi vastustaja
+online.play.connecting = Yhdistetään palvelimeen…
+online.play.cooldown = Voit etsiä vastustajaa uudelleen klo {0}.
+online.play.banned = Tämä tili on jäädytetty {0} asti.
+online.play.challenge = Haasta pelaaja
+online.play.challenge.desc = Kutsu verkossa oleva pelaaja hänen käyttäjänimellään.
+online.play.private = Yksityinen peli
+online.play.private.desc = Luo koodi ystävällesi tai liity hänen koodillaan.
+online.play.direct = Suora ottelu
+online.play.direct.desc = Ei palvelinta: yhteys suoraan ystäväsi tietokoneeseen.
+online.search.title = HAETAAN
+online.search.window = Vahvuuslukuväli {0}
+online.search.queued = {0} pelaaja etsii|{0} pelaajaa etsii
+online.search.wait = Etsitään tasoistasi vastustajaa…
+online.outgoing.challenge = HAASTE LÄHETETTY
+online.outgoing.waiting = odotetaan vastausta
+online.outgoing.private = YKSITYINEN PELI
+online.outgoing.private_hint = Anna tämä koodi ystävällesi: peli alkaa, kun hän liittyy.
+online.challenge.title = HAASTA PELAAJA
+online.challenge.opponent = VASTUSTAJA
+online.field.opponent = Käyttäjänimi
+online.field.opponent.hint = kenet haastat
+online.challenge.note = Vastustajasi näkee haasteen missä tahansa valikossa hän onkin, ja hänellä on minuutti aikaa vastata.
+online.challenge.send = Lähetä haaste
+online.terms.rated = Pisteytetty
+online.terms.rated.help = Vain viralliset peliajat voivat olla pisteytettyjä.
+online.terms.color = Värisi
+online.private.title = YKSITYINEN PELI
+online.private.create_section = LUO
+online.private.create_note = Saat lyhyen koodin: se, joka syöttää sen, pelaa sinua vastaan.
+online.private.create = Luo peli
+online.private.join_section = LIITY
+online.field.private_code = Koodi
+online.private.join = Liity
+online.private.joining = Liitytään peliin…
+online.challenge.received = HAASTE
+online.challenge.accept = Hyväksy
+online.challenge.decline = Hylkää
+online.challenge.you_white = pelaat valkeilla
+online.challenge.you_black = pelaat mustilla
+online.challenge.you_random = värit arvotaan
+online.challenge.declined = {0} hylkäsi haasteesi.
+online.challenge.expired = Haasteesi vanheni ilman vastausta.
+online.challenge.unavailable = {0} ei ole juuri nyt tavoitettavissa.
+online.challenge.lost = Yhteys katkesi: haasteesi peruttiin.
+
+# At the table
+online.pause.clock_runs = Peli jatkuu: kellosi käy edelleen.
+online.pause.abort = Peru peli
+online.pause.abort.help = Ennen ensimmäistä siirtoasi pelin voi perua; sitä ei lasketa.
+online.pause.leave = Poistu pelistä
+online.confirm.resign.text = Luovutatko pelin? Vastustajasi voittaa sen.
+online.confirm.leave.text = Jos poistut, luovutat tämän pelin: vastustajasi voittaa sen.
+online.confirm.leave.ok = Luovuta ja poistu
+online.confirm.leave_abort.text = Poistutko ennen ensimmäistä siirtoasi? Peli perutaan eikä sitä lasketa.
+online.confirm.leave_abort.ok = Peru ja poistu
+online.draw.card_title = TASAPELITARJOUS
+online.draw.card_text = Vastustajasi tarjoaa tasapeliä.
+online.draw.accept = Hyväksy
+online.draw.decline = Hylkää
+online.draw.offered = Vastustajasi tarjoaa tasapeliä.
+online.opponent_back = Vastustajasi on palannut.
+online.opponent_away = Vastustajan yhteys katkesi – aikaa palata {0}
+online.first_move = Ensimmäinen siirtosi · {0}
+online.reconnecting = YHDISTETÄÄN UUDELLEEN…
+online.reconnecting.text = Peli jatkuu palvelimella, ja kellosi käy edelleen.
+online.gameover.aborted = Peli peruttiin: sitä ei lasketa.
+online.rating.casual = Pisteyttämätön peli: vahvuusluvut eivät muutu.
+online.rating.change = Vahvuusluku {0} → {1} ({2})
+online.rating.pending = Vahvuusluku: …
+online.rematch.accept = Hyväksy uusintapeli
+online.rematch.offered = Vastustajasi tarjoaa uusintapeliä.
+online.rematch.waiting = Uusintapeliä tarjottu…
+online.rematch.gone = Ei uusintapeliä
+online.rematch.declined = Ei uusintapeliä tällä kertaa.
+online.report.button = Ilmoita vastustajasta
+online.report.title = ILMOITUS
+online.report.lead = Ilmoitukset lähetetään palvelimen moderaattoreille tämän pelin kanssa. Kiitos, että autat pitämään pelin reiluna.
+online.report.category = Syy
+online.report.cheating = Huijaaminen
+online.report.abuse = Loukkaava käytös
+online.report.other = Muu
+online.report.comment = Kommentti
+online.report.comment.hint = valinnainen
+online.report.send = Lähetä ilmoitus
+online.report.sent = Ilmoitus lähetetty. Kiitos.
+online.report.queued = Ilmoituksesi lähetetään, kun peli päättyy.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Verkkopeli, {0}, {1}
+online.sheet.rated = pisteytetty
+online.sheet.casual = pisteyttämätön
+online.sheet.game = Peli {0}
+# End reasons of online games
+reason.online.abandonment = Vastustaja poistui pelistä
+reason.online.abandonment_vs_insufficient = Poistui pelistä, mutta vastustaja ei voi tehdä mattia
+reason.online.aborted = Peli peruttu
+reason.online.no_show = Ensimmäistä siirtoa ei tehty ajoissa (peruttu)
+reason.online.forfeit = Tuomittu häviö
+reason.online.server_aborted = Palvelin perui pelin
+reason.online.both_disconnected = Kummankin pelaajan yhteys katkesi
+# Server notices
+online.notice.shutdown = Palvelin käynnistyy uudelleen {0} kuluttua. Käynnissä olevat pelit tallennetaan.
+online.notice.revoked = Sinut kirjattiin ulos tältä palvelimelta.
+online.notice.replaced = Tilillesi kirjauduttiin toisesta ikkunasta; tämän ikkunan yhteys on nyt katkaistu.
+online.notice.rating_restored = Vahvuuslukuusi palautettiin {0} piste: eräs vastustajasi sai porttikiellon huijaamisesta.|Vahvuuslukuusi palautettiin {0} pistettä: eräs vastustajasi sai porttikiellon huijaamisesta.
+# Errors
+online.err.rate_limited_for = Liian monta yritystä. Yritä uudelleen {0} kuluttua.
+online.err.rate_limited = Liian monta yritystä. Yritä hetken kuluttua uudelleen.
+online.err.server_busy_for = Palvelin on ruuhkautunut. Yritä uudelleen {0} kuluttua.
+online.err.server_busy = Palvelin on ruuhkautunut. Yritä hetken kuluttua uudelleen.
+online.err.banned_until = Tämä tili on jäädytetty {0} asti.
+online.err.banned = Tämä tili on jäädytetty.
+online.err.invalid_credentials = Väärä käyttäjänimi tai salasana.
+online.err.invalid_credentials_pending = Väärä käyttäjänimi tai salasana. Jos rekisteröidyit juuri, avaa ensin lähettämämme linkki.
+online.err.email_unverified = Sähköpostiosoitettasi ei ole vielä vahvistettu: avaa lähettämämme linkki.
+online.err.network = Palvelimeen ei saada yhteyttä. Tarkista verkkoyhteytesi ja palvelimen osoite.
+online.err.tls = Suojattua yhteyttä palvelimeen ei voitu muodostaa.
+online.err.certificate = Palvelimen varmenteeseen ei luoteta (tai se ei vastaa asetuksissa annettua sormenjälkeä).
+online.err.incompatible = Tämä palvelin vaatii toisen Scacelith-version.
+online.err.unauthorized = Istuntosi on päättynyt: kirjaudu uudelleen sisään.
+online.err.username_taken = Tämä käyttäjänimi on jo varattu.
+online.err.email_taken = Tätä sähköpostiosoitetta käyttää jo jokin tili.
+online.err.invalid_username = Käyttäjänimessä on oltava 3–24 merkkiä: kirjaimia, numeroita, _ tai -.
+online.err.invalid_email = Tämä sähköpostiosoite ei kelpaa.
+online.err.weak_password = Salasana on liian heikko: käytä vähintään 10 merkkiä.
+online.err.invalid_code = Koodi on väärä.
+online.err.expired = Tämä pyyntö on vanhentunut: aloita alusta.
+online.err.registration_closed = Tämä palvelin ei ota vastaan uusia tilejä.
+online.err.sso_cancelled = Google-kirjautuminen peruttiin.
+online.err.sso_expired = Google-kirjautuminen kesti liian kauan tai se oli jo käytetty. Aloita alusta.
+online.err.sso_failed = Google-kirjautuminen ei onnistunut. Yritä uudelleen.
+online.err.sso_listen = Scacelith ei voinut vastaanottaa Googlen vastausta tällä tietokoneella. Yritä uudelleen.
+online.err.sso_origin = Google-kirjautuminen ei toimi tämän palvelinosoitteen kautta. Lisää palvelin sillä julkisella nimellä, jonka sen ylläpitäjä ilmoittaa, ja yritä sitten uudelleen.
+online.err.browser = Selainta ei voitu avata.
+online.err.sso_email_unverified = Google ei ole vahvistanut tämän Google-tilin sähköpostiosoitetta.
+online.err.sso_account_exists = Tätä sähköpostiosoitetta käyttää jo tili, jota ei voi linkittää Google-kirjautumiseen: kirjaudu sen salasanalla tai käytä toimintoa ”Unohditko salasanan?”.
+online.err.sso_already_linked = Tämä Google-tili on jo linkitetty toiseen tiliin.
+online.err.account_disabled = Tätä tiliä ei voi enää käyttää.
+online.err.server_error = Palvelimella oli ongelma. Yritä uudelleen.
+online.err.timeout = Palvelin ei vastannut ajoissa.
+online.err.offline = Ei yhteyttä palvelimeen: yritä uudelleen, kun yhteys on muodostettu.
+online.err.other = Palvelin kieltäytyi ({0}).
+online.err.code = Palvelin kieltäytyi (virhe {0}).
+online.err.slow_down = Hidasta hieman.
+online.err.server_full = Palvelin on täynnä. Yritä myöhemmin uudelleen.
+online.err.restarting = Palvelin käynnistyy uudelleen. Yritä hetken kuluttua uudelleen.
+online.err.move_refused = Palvelin hylkäsi siirron: lauta on palautettu.
+online.err.game_over = Tämä peli on jo päättynyt.
+online.err.already_in_game = Pelaat jo peliä.
+online.err.invalid_category = Tätä peliaikaa ei tarjota täällä.
+online.err.draw_offer_limit = Et voi tarjota enempää tasapelejä tällä erää.
+online.err.abort_not_allowed = Peliä ei voi enää perua.
+online.err.no_pending_offer = Ei vastattavaa tarjousta.
+online.err.flag_fell = Aikasi loppui.
+online.err.queue_not_allowed = Et voi etsiä vastustajaa juuri nyt.
+online.err.challenge_not_found = Tätä haastetta ei enää ole.
+online.err.user_unavailable = Tämä pelaaja ei ole tavoitettavissa.
+online.err.challenge_limit = Liikaa haasteita tällä erää. Yritä myöhemmin uudelleen.
+online.err.challenge_self = Et voi haastaa itseäsi.
+online.err.code_invalid = Millään pelillä ei ole tätä koodia.
+online.err.rated_official_tc = Vain viralliset peliajat voivat olla pisteytettyjä.
+online.err.cooldown = Vastustajan haku on sinun osaltasi hetken tauolla.
+online.err.invalid_tc = Tämä peliaika ei ole sallittu.
+online.err.rematch_unavailable = Uusintapeli ei ole enää mahdollinen.
+online.err.rated_repeat_limit = Olet pelannut tätä pelaajaa vastaan toistaiseksi tarpeeksi pisteytettyjä pelejä. Pelaa pisteyttämätön peli tai yritä myöhemmin uudelleen.
+online.err.cheat_detected = Palvelimen reilun pelin tarkistukset keskeyttivät pelin.
+online.err.invalid_password = Väärä salasana.
+online.err.mfa_code_required = Anna todennussovelluksesi koodi (tai palautuskoodi).
+online.err.password_not_set = Tähän tiliin kirjaudutaan Googlella, eikä sillä ole vielä salasanaa. Aseta salasana ensin kirjautumissivun toiminnolla ”Unohditko salasanan?”.
+online.err.too_many_attempts = Liian monta virheellistä yritystä. Yritä myöhemmin uudelleen.
+online.err.too_many_attempts_for = Liian monta virheellistä yritystä. Yritä uudelleen {0} kuluttua.
+online.err.same_email = Tämä on jo sähköpostiosoitteesi.
+online.err.not_found = Ei löytynyt palvelimelta.
+online.err.invalid_response = Palvelimen vastausta ei voitu lukea.
+online.err.storage = Istuntoa ei voitu tallentaa tälle tietokoneelle.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PELIHISTORIA
+online.history.filter.games = Pelit
+online.history.filter.result = Tulos
+online.history.filter.all = Kaikki
+online.history.filter.won = Voitetut
+online.history.filter.lost = Hävityt
+online.history.filter.drawn = Tasapelit
+online.history.col.date = PÄIVÄMÄÄRÄ
+online.history.col.opponent = VASTUSTAJA
+online.history.col.result = TULOS
+online.history.col.tc = PELIAIKA
+online.history.col.kind = TYYPPI
+online.history.col.rating = VAHVUUSLUKU
+online.history.won = Voitto
+online.history.lost = Häviö
+online.history.drawn = Tasapeli
+online.history.aborted = Peruttu
+online.history.page = Sivu {0} / {1}
+online.history.total = {0} peli|{0} peliä
+online.history.previous = Edellinen
+online.history.next = Seuraava
+online.history.empty.title = EI VIELÄ PELEJÄ
+online.history.empty = Tällä palvelimella pelaamasi pelit näkyvät tässä, kun ne ovat päättyneet.
+online.history.empty_filter.title = EI PELEJÄ
+online.history.empty_filter = Mikään peli ei vastaa näitä suodattimia.
+online.history.error = HISTORIAA EI VOITU LADATA
+online.history.unavailable = TÄLLÄ PALVELIMELLA EI OLE PELIHISTORIAA
+online.game.title = PELI
+online.game.players = PELAAJAT
+online.game.you = SINÄ
+online.game.unrated = Ei vahvuuslukua
+online.game.you_won = Voitit
+online.game.you_lost = Hävisit
+online.game.draw = Tasapeli
+online.game.you_left = Poistuit pelistä
+online.game.date = PÄIVÄMÄÄRÄ
+online.game.time_control = PELIAIKA
+online.game.moves = SIIRROT
+online.game.move_count = {0} siirto|{0} siirtoa
+online.game.no_moves = Yhtään siirtoa ei pelattu.
+online.game.moves_incomplete = Joitakin siirtoja ei voitu lukea: luettelo päättyy ennen pelin loppua.
+online.game.save = Tallenna peli
+online.game.saved_button = Tallennettu
+online.game.saved = Peli on nyt tallennetuissa peleissäsi.
+online.game.already_saved = Tämä peli on jo tallennetuissa peleissäsi.
+online.game.save_failed = Peliä ei voitu tallentaa.
+online.game.invalid = Palvelin lähetti pelitiedot, joita ei voi lukea.
+online.game.replay = Toista
+online.game.not_found = PELIÄ EI LÖYTYNYT
+online.game.error = PELIÄ EI VOITU LADATA
+online.devices.title = KIRJAUTUNEET LAITTEET
+online.devices.lead = Laitteet, joilla tähän tiliin on kirjauduttu. Jos et tunnista jotakin niistä, kirjaa se ulos ja vaihda salasanasi.
+online.devices.unknown = Tuntematon laite
+online.devices.this = TÄMÄ LAITE
+online.devices.signed_in = Kirjautunut {0}
+online.devices.last_active = viimeksi aktiivinen {0}
+online.devices.active_now = käytössä nyt
+online.devices.sign_out = Kirjaa ulos
+online.devices.signed_out = Laite on kirjattu ulos.
+online.devices.error = LAITTEITA EI VOITU LADATA
+online.devices.all.title = KIRJAUDU ULOS KAIKKIALTA
+online.email.title = VAIHDA SÄHKÖPOSTI
+online.email.current = Nykyinen osoite: {0}
+online.email.button = Vaihda sähköposti
+online.email.sent = Vahvistuslinkki lähetettiin osoitteeseen {0}.
+online.email.sent.hint = Osoite vaihtuu, kun linkki avataan. Siihen asti nykyinen osoitteesi pysyy käytössä.
+online.email.done = Valmis
+online.email.changed = Sähköpostiosoitteesi on vaihdettu.
+online.export.title = LATAA TIETONI
+online.export.lead = Kaikki tiedot, joita tämä palvelin säilyttää tilistäsi (profiili, vahvuusluvut, pelit, laitteet, tietoturvatapahtumat), tallennetaan JSON-tiedostona tälle tietokoneelle. Vahvista antamalla salasanasi.
+online.export.button = Lataa
+online.export.saved = Tietosi on tallennettu tälle tietokoneelle.
+online.export.failed = Tiedostoa ei voitu kirjoittaa.
+online.delete.title = POISTA TILI
+online.delete.warning = Tilisi poistetaan tältä palvelimelta: sähköpostiosoitteesi, salasanasi, kaksivaiheinen vahvistus ja laitteesi poistetaan, etkä voi enää kirjautua sisään. Tätä ei voi perua.
+online.delete.games = Pelisi ja vahvuuslukusi jäävät palvelimelle anonyymillä nimellä {0}.
+online.delete.confirm_name = Vahvista antamalla käyttäjänimesi ja salasanasi.
+online.delete.button = Poista tilini
+online.delete.done = Tilisi on poistettu.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Suora ottelu
+online.direct.title = SUORA OTTELU
+online.direct.lead = Ystävyysottelu suoraan kahden tietokoneen välillä: ei palvelinta, ei tiliä, ei koskaan pisteytystä.
+online.direct.host = Isännöi peliä
+online.direct.host.desc = Ystäväsi yhdistää sinuun: annat hänelle osoitteesi ja koodin.
+online.direct.join = Liity peliin
+online.direct.join.desc = Yhdistä ystävään, joka isännöi peliä.
+online.direct.host_title = ISÄNNÖI PELIÄ
+online.direct.your_color = Värisi
+online.direct.auto_press.help = Kumpikin robotti painaa kelloa itse, kun siirto on laudalla. Pois: kumpikin pelaaja painaa kelloa jokaisen siirron jälkeen.
+online.direct.unrated = Suorat ottelut ovat ystävyyspelejä: niitä ei koskaan pisteytetä.
+online.direct.connection = YHTEYS
+online.direct.port = Portti
+online.direct.port.help = TCP-portti, johon ystäväsi yhdistää (47100, ellei se ole varattu).
+online.direct.port_range = Valitse portti väliltä 1024–65535.
+online.direct.upnp = Avaa portti reitittimestäni (UPnP)
+online.direct.upnp.help = Pyytää kotireititintä ohjaamaan portin tähän tietokoneeseen ja sulkee sen pelin jälkeen.
+online.direct.host_note_upnp = Peli pyytää reititintäsi avaamaan portin. Jos se ei onnistu, saat tietää, mikä portti sinun on ohjattava käsin.
+online.direct.host_note_manual = Ohjaa TCP-portti reitittimessäsi tähän tietokoneeseen tai pelatkaa samassa verkossa.
+online.direct.host_button = Isännöi
+online.direct.wait_title = ODOTETAAN YSTÄVÄÄSI
+online.direct.opening = Avataan porttia {0} reitittimessäsi…
+online.direct.give = Anna ystävällesi:
+online.direct.cap_address = OSOITE
+online.direct.cap_port = PORTTI
+online.direct.cap_code = KOODI
+online.direct.lan = Samassa verkossa: {0}
+online.direct.router = reititin
+online.direct.upnp_searching = Etsitään reititintäsi…
+online.direct.upnp_mapped = Portti avattu ({0}).
+online.direct.upnp_none = Mikään UPnP-reititin ei vastannut: ohjaa TCP-portti {0} käsin tähän tietokoneeseen.
+online.direct.upnp_failed = Reititin kieltäytyi avaamasta porttia: ohjaa TCP-portti {0} käsin tähän tietokoneeseen.
+online.direct.upnp_off = Ohjaa reitittimessäsi TCP-portti {0} tähän tietokoneeseen.
+online.direct.upnp_cgnat = Internetpalveluntarjoajasi jakaa todennäköisesti internetosoitteesi muiden kanssa (CGNAT): kokeile IPv6-yhteyttä tai VPN-yhteyttä.
+online.direct.firewall = Jos Windows kysyy, saako Scacelith ottaa vastaan yhteyksiä, salli se.
+online.direct.waiting = Odotetaan ystävääsi…
+online.direct.connecting_friend = Ystäväsi yhdistää…
+online.direct.starting = Valmistellaan lautaa…
+online.direct.join_title = LIITY PELIIN
+online.direct.join_lead = Anna tiedot, jotka ystäväsi lukee sinulle: hänen osoitteensa, portti ja koodi.
+online.direct.address = Osoite
+online.direct.address.hint = IPv4, IPv6 tai nimi
+online.direct.code = Koodi
+online.direct.join_button = Liity
+online.direct.connecting_to = Yhdistetään osoitteeseen {0}…
+online.direct.securing = Suojataan yhteyttä osoitteeseen {0}…
+direct.event = Ystävyysottelu
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Suora yhteys, {0}
+direct.err.refused = Kukaan ei isännöi peliä tässä osoitteessa ja portissa.
+direct.err.timeout = Ei vastausta: tarkista osoite ja portti sekä se, että ystäväsi reititin päästää pelin läpi.
+direct.err.wrong_code = Koodi on väärä.
+direct.err.invalid_code = Koodissa on 12 merkkiä (XXXX-XXXX-XXXX).
+direct.err.incompatible = Ystävälläsi on eri Scacelith-versio.
+direct.err.port_in_use = Tämä portti on jo käytössä tällä tietokoneella: valitse toinen.
+direct.err.network = Verkkoa ei voitu käyttää.
+direct.err.too_many_attempts = Liian monta väärää koodia: isännöinti lopetettiin. Isännöi uudelleen, niin saat uuden koodin.
+direct.err.bad_address = Tämä osoite ei kelpaa.
+direct.err.not_found = Tätä nimeä ei löytynyt.
+direct.err.unreachable = Tähän osoitteeseen ei saada yhteyttä täältä.
+direct.err.reset = Yhteys katkesi.
+direct.err.closed = Yhteys suljettiin.
+direct.err.host_left = Ystäväsi lopetti isännöinnin.
+direct.err.other = Yhteys epäonnistui ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Pelaaja 2
+hotseat.white_player = Valkea
+hotseat.black_player = Musta
+hotseat.name.help = Molempiin pöytäkirjoihin kirjoitettava nimi, millä tahansa kirjaimistolla.
+hotseat.swap = Vaihda värit
+hotseat.left_hand = {0} pelaa vasemmalla kädellä: kello on hänen vasemmalla puolellaan.
+hotseat.rated = Pisteytetty peli
+hotseat.rated.help = Jokaisella nimellä on oma kahden pelaajan vahvuuslukunsa tällä tietokoneella. Vahvuuslukusi Stockfishia vastaan ei koskaan muutu.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Kahden pelaajan vahvuusluvut: {0} {1} · {2} {3}
+hotseat.new_rating = (uusi)
+hotseat.friendly_note = Ystävyyspeli: vahvuusluvut eivät muutu.
+hotseat.colours = {0} pelaa valkeilla, {1} mustilla.
+hotseat.colours_swap = Värit vaihtuvat jokaisessa uusintapelissä.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, sinun siirtosi
+hotseat.flag = Pelaajan {0} lippu on pudonnut.
+hotseat.confirm.resign = Luovutetaanko pelaajan {0} puolesta? {1} julistetaan voittajaksi.
+hotseat.confirm.resign_draw = Luovutetaanko pelaajan {0} puolesta? {1} ei voi enää tehdä mattia: peli päättyy tasapeliin.
+hotseat.draw.offer_noted = Tasapelitarjouksesi lähtee siirtosi mukana: {0} näkee sen, kun olet painanut kelloa.
+hotseat.draw.card_title = TASAPELITARJOUS
+hotseat.draw.offered = {0} tarjoaa tasapeliä.
+hotseat.draw.card_hint = Nappulan koskettaminen hylkää tarjouksen.
+hotseat.draw.accept = Hyväksy
+hotseat.draw.decline = Hylkää
+hotseat.draw.accepted = {0} hyväksyy pelaajan {1} tarjoaman tasapelin.
+hotseat.draw.declined = {0} hylkää pelaajan {1} tarjoaman tasapelin.
+# Scoresheet header note
+hotseat.sheet.rated = Pisteytetty peli
+hotseat.sheet.friendly = Ystävyyspeli
+# Game over card
+hotseat.gameover.wins = {0} voitti {1} siirrolla.|{0} voitti {1} siirrolla.
+hotseat.gameover.wins_now = {0} voitti.
+hotseat.gameover.friendly = {0} vastaan {1} · ystävyyspeli
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Tätä peliä ei pisteytetä.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Valmentaja
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Valmentajatilan synteettinen puhe: {0}
+# Coach page
+coach.title = VALMENTAJA
+coach.section.level = TASO
+coach.section.lesson = VALMENTAJAN KANSSA
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Pelaajille, joiden vahvuusluku on {0}
+coach.completed = Suoritettu
+coach.recommended = Suositeltu
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Shakin säännöt
+coach.level.0.desc = Vuorovaikutteinen oppitunti, sääntö kerrallaan.
+coach.level.0.detail = Valmentaja asettaa laudalle pieniä asemia ja näyttää ensin, miten kukin nappula liikkuu ja lyö, sitten linnoittautumisen, korotuksen, shakin ja matin. Kokeilet jokaista ajatusta itse laudalla.
+coach.level.1.name = Ensiaskeleet
+coach.level.1.desc = Mitä uhataan, mikä jää suojatta.
+coach.level.1.detail = Valmentaja pelaa lempeästi ja puhuu selkeästi: mitkä nappuloistasi ovat uhattuina, mitkä jäävät ilman suojaa ja miten ne pidetään tallessa.
+coach.level.2.name = Aloittelija
+coach.level.2.desc = Yksinkertainen taktiikka, kehitys, kuninkaan turvallisuus.
+coach.level.2.detail = Haarukat ja kiinnitykset mainitaan nimeltä. Valmentaja puhuu nappuloidesi kehittämisestä ja kuninkaasi pitämisestä turvassa.
+coach.level.3.name = Edistyvä
+coach.level.3.desc = Suunnitelmat, sotilasrakenne, ainoat siirrot.
+coach.level.3.detail = Valmentaja selittää suunnitelmia ja sotilasrakenteita ja varoittaa, kun vain yksi siirto pitää aseman.
+coach.level.4.name = Kerhopelaaja
+coach.level.4.desc = Ehdokassiirrot, arvio sotilasyksikköinä.
+coach.level.4.detail = Valmentaja punnitsee ehdokassiirtoja ja antaa arvion sotilasyksikköinä, kuten kerhovalmentaja tekisi.
+coach.level.5.name = Vahva kerhopelaaja
+coach.level.5.desc = Tiiviit muunnelmat, asemapelin käsitteet.
+coach.level.5.detail = Lyhyitä huomioita, konkreettisia muunnelmia ja asemapelin sanastoa.
+coach.level.6.name = Asiantuntija
+coach.level.6.desc = Niukat huomiot, syvät muunnelmat, arviot lukuina.
+coach.level.6.detail = Vähän sanoja, kuten vahvojen pelaajien kesken: monen siirron syvyisiä muunnelmia ja arviot lukuina.
+coach.note.clock = Ei kelloa: käytä niin paljon aikaa kuin tarvitset.
+coach.note.takeback = Vakavan virheen jälkeen valmentaja näyttää, mikä meni pieleen, ja tarjoutuu perumaan siirron.
+coach.note.lesson = Pelaat valkeilla; valmentaja asettaa jokaisen harjoituksen laudalle.
+coach.note.unrated = Valmentajan kanssa pelattuja pelejä ei pisteytetä.
+coach.note.fallible = Valmentaja ei ole erehtymätön, vaan saattaa joskus arvioida siirron väärin.
+coach.colour = Värisi
+coach.colour.help = Väri, jolla pelaat valmentajaa vastaan. Vuorotellen: ensin valkeilla, sitten mustilla, pelistä toiseen. Sääntöjen oppitunti pelataan aina valkeilla.
+coach.colour.alternate = Vuorotellen
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Valmentajan ääntä ei ole asennettu tai se on pois päältä (Asetukset > Ääni): valmentajan sanat näytetään tekstinä näytöllä.
+# At the table
+coach.speaker = VALMENTAJA
+coach.skip = Ohita
+coach.offer.title = PERUTAANKO SIIRTO?
+coach.offer.text = Valmentaja tarjoutuu perumaan viimeisimmän siirtosi, jotta voit etsiä paremman.
+coach.offer.hint = Askelpalautin peruu siirron. Nappulan koskettaminen jatkaa peliä.
+coach.offer.accept = Peru siirto
+coach.offer.decline = Jatka peliä
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Perumisia jäljellä: {0}
+coach.pause.take_back = Peru siirtoni
+coach.pause.take_back.help = Peruu viimeisimmän siirtosi ja valmentajan vastauksen, jos valmentaja on jo siirtänyt.
+coach.confirm.resign = Luovutatko pelin? Valmentaja julistetaan voittajaksi.
+coach.confirm.resign_draw = Luovutatko pelin? Valmentaja ei voi enää tehdä mattia: peli päättyy tasapeliin.
+coach.confirm.leave = Palaatko päävalikkoon? Tämä peli valmentajan kanssa jää kesken.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Pelaa uudelleen
+coach.gameover.unrated = Tätä valmentajan kanssa pelattua peliä ei pisteytetä.
+coach.lesson.done = HIENOA
+coach.lesson.done.line = Osaat nyt shakin säännöt.
+coach.lesson.next = Ensimmäinen peli
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Harjoittelu
+coach.tab.challenges = Haasteet
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATIT
+challenge.group.tactics = TAKTIIKKA
+challenge.group.defence = PUOLUSTUS
+challenge.group.endgames = LOPPUPELIT
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Matti yhdellä siirrolla
+challenge.mate1.desc = Yksi siirto, ja se on matti.
+challenge.mate1.detail = Katso ensin jokainen shakki: yksi niistä ei jätä kuninkaalle pakoruutua eikä mahdollisuutta torjua shakkia väliin asettamalla tai lyömällä.
+challenge.mate2.name = Matti kahdella siirrolla
+challenge.mate2.desc = Siirto, johon ei ole puolustusta, sitten matti.
+challenge.mate2.detail = Ensimmäinen siirto on usein shakki tai uhraus, joka vie kuninkaalta ruudun. Valmentaja puolustautuu parhaansa mukaan.
+challenge.mate3.name = Matti kolmella siirrolla
+challenge.mate3.desc = Pidempiä pakottavia muunnelmia.
+challenge.mate3.detail = Shakkeja, lyöntejä ja uhkia kolmen siirron syvyydeltä. Laske valmentajan paras vastaus jokaisessa vaiheessa ennen kuin kosket nappulaan.
+challenge.backrank.name = Takarivimatit
+challenge.backrank.desc = Kuningas jumissa omien sotilaidensa takana.
+challenge.backrank.detail = Kun linnoittautuneen kuninkaan edessä olevat sotilaat eivät ole liikkuneet, torni tai kuningatar viimeisellä rivillä voi tehdä matin. Poista tai harhauta puolustajat ensin.
+challenge.patterns.name = Mattikuviot
+challenge.patterns.desc = Klassikot: tukehtumismatti, Anastasian ja arabialainen matti…
+challenge.patterns.detail = Kuuluisia mattiverkkoja, jotka toistuvat yhä uudelleen. Opi tunnistamaan nappuloiden asetelma ja ratkaiseva isku.
+challenge.hanging.name = Ilmaiset nappulat
+challenge.hanging.desc = Huomaa, mikä on jäänyt suojatta.
+challenge.hanging.detail = Nappulan tai sotilaan, jota kukaan ei puolusta, voi yksinkertaisesti lyödä. Tarkista, mikä suojaa kutakin valmentajan nappulaa.
+challenge.fork.name = Haarukat
+challenge.fork.desc = Yksi nappula uhkaa kahta samanaikaisesti.
+challenge.fork.detail = Ratsut, sotilaat, kuningattaret ja jopa kuninkaat voivat haarukoida. Vastustaja voi pelastaa vain toisen kohteista.
+challenge.pin.name = Kiinnitykset
+challenge.pin.desc = Nappula, joka ei voi liikkua menettämättä takanaan olevaa.
+challenge.pin.detail = Kiinnitä nappula kuninkaaseensa tai arvokkaampaan nappulaan ja hyökkää sen kimppuun uudelleen, tai hyödynnä sitä, ettei se voi liikkua.
+challenge.skewer.name = Vartaat
+challenge.skewer.desc = Uhkaa arvokasta nappulaa ja voita sen takana oleva.
+challenge.skewer.detail = Kuin kiinnitys toisin päin: arvokkaampi nappula on edessä, sen on väistettävä, ja se paljastaa takanaan olevan nappulan.
+challenge.discovered.name = Paljastetut hyökkäykset
+challenge.discovered.desc = Siirrä yhtä nappulaa ja vapauta toinen.
+challenge.discovered.detail = Kun nappula siirtyy pois linjalta, sen takana oleva nappula hyökkää. Jos siirto antaa shakin tai kaksoisshakin, vastustajalla ei ole aikaa torjua molempia uhkia.
+challenge.deflection.name = Harhautus ja houkutus
+challenge.deflection.desc = Houkuttele puolustaja pois tai kohtalokkaaseen ruutuun.
+challenge.deflection.detail = Puolustaja, jolla on kaksi tehtävää, ei pysty hoitamaan molempia. Hyökkää sen kimppuun, tarjoa sille jotakin tai pakota nappula ruutuun, jossa se menetetään.
+challenge.intermezzo.name = Välisiirrot
+challenge.intermezzo.desc = Älä lyö heti takaisin: tarjolla on jotain vahvempaa.
+challenge.intermezzo.detail = Ennen odotettua siirtoa väliin tehty shakki tai suurempi uhka muuttaa kaiken.
+challenge.trapped.name = Ansaan jääneet nappulat
+challenge.trapped.desc = Nappula, jolla ei ole enää turvallista ruutua.
+challenge.trapped.detail = Vie nappulalta sen viimeiset pakoruudut ja voita se.
+challenge.promotion.name = Korotus
+challenge.promotion.desc = Vie sotilas läpi viimeiselle riville.
+challenge.promotion.detail = Pitkälle edenneet sotilaat ovat arvokkaita. Raivaa tie, harhauta tukkijat ja tee uusi kuningatar.
+challenge.quiet.name = Hiljaiset siirrot
+challenge.quiet.desc = Voittava siirto ei ole shakki eikä lyönti.
+challenge.quiet.detail = Joskus vahvin siirto vain valmistelee uhan, jota ei voi torjua. Kaikkein vaikeimmin huomattava siirtotyyppi.
+challenge.opening.name = Avausansat
+challenge.opening.desc = Rankaise varhaisista virheistä.
+challenge.opening.detail = Asemia oikeiden pelien ensimmäisistä siirroista, joissa yhtä huolimatonta siirtoa voi hyödyntää heti.
+challenge.escape.name = Löydä pelastus
+challenge.escape.desc = Kuninkaasi on vaarassa: yksi siirto pelastaa sen.
+challenge.escape.detail = Kaikki muut siirrot häviävät. Katso kaikki kuninkaaseesi kohdistuvat shakit ja uhat ja löydä ainoa pelastava siirto.
+challenge.defend.name = Puolustussiirrot
+challenge.defend.desc = Torju uhka menettämättä materiaalia.
+challenge.defend.detail = Valmentaja uhkaa jotakin. Löydä täsmällinen siirto, joka pitää kaiken koossa.
+challenge.kq.name = Kuningatar ja kuningas kuningasta vastaan
+challenge.kq.desc = Matti kuningattarella.
+challenge.kq.detail = Aja yksinäinen kuningas laidalle kuningattarellasi, tuo oma kuninkaasi lähemmäs ja varo pattia. Valmentaja puolustautuu parhailla mahdollisilla siirroilla.
+challenge.kr.name = Torni ja kuningas kuningasta vastaan
+challenge.kr.desc = Matti tornilla.
+challenge.kr.detail = Torni katkaisee kuninkaan tien rivi riviltä; kuninkaasi ottaa opposition. Valmentaja puolustautuu parhailla mahdollisilla siirroilla.
+challenge.kp.name = Kuningas ja sotilas kuningasta vastaan
+challenge.kp.desc = Voita oppositio ja korota.
+challenge.kp.detail = Kuljeta kuningasta sotilaan edellä. Ota oppositio ja tee kuningatar, jota valmentaja ei ehdi pysäyttää.
+challenge.kp_hold.name = Pysäytä sotilas
+challenge.kp_hold.desc = Yksinäinen kuningas kuningasta ja sotilasta vastaan: pidä tasapeli.
+challenge.kp_hold.detail = Asetu sotilaan eteen ja pidä oppositio. Pidä puolustus kymmenen siirron ajan.
+challenge.rook.name = Torniloppupelit
+challenge.rook.desc = Lucenan sillanrakennus ja Philidorin puolustus.
+challenge.rook.detail = Kaksi asemaa, jotka jokaisen pelaajan pitäisi tuntea: miten voitetaan sotilaalla seitsemännellä rivillä ja miten puolustetaan tornilla kolmannella rivillä.
+challenge.endgame.name = Loppupelin taktiikka
+challenge.endgame.desc = Vähän nappuloita, teräviä ideoita.
+challenge.endgame.detail = Sotilaiden kilpajuoksuja, läpimurtoja ja torniloppupelejä oikeista peleistä.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} asema|{0} asemaa
+coach.challenge.done = Suoritettu
+coach.challenge.start = Aloita
+coach.challenge.note.white = Pelaat valkeilla; valmentaja asettaa jokaisen aseman laudalle.
+coach.challenge.note.hint = Jumissa? Paina H, niin saat vihjeen. Muutaman yrityksen jälkeen valmentaja tarjoaa vihjettä itse.
+coach.challenge.note.unsaved = Haasteita ei pisteytetä eikä tallenneta; valintamerkki näyttää ne, jotka olet suorittanut.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = HAASTE SUORITETTU
+coach.challenge.complete.line = Ratkaisit jokaisen aseman.
+coach.challenge.next = Seuraava haaste
+coach.challenge.again = Uudelleen
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = VIHJE?
+coach.hint.text = Valmentaja tarjoaa sinulle vihjettä.
+coach.hint.hint = H näyttää vihjeen. Nappulan koskettaminen jatkaa etsimistä.
+coach.hint.accept = Vihje
+coach.hint.decline = Ei kiitos
+coach.hint.key = Vihje
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Valmentajan ääni
+options.coach_voice.help = Valmentaja puhuu ääneen valmentajatilassa. Äänimalli ladataan, kun sitä tarvitaan ensimmäisen kerran (noin 399 MB). Pois: valmentajan sanat näytetään vain tekstinä näytöllä.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Äänimalli
+options.voice_update.help = Valmentaja puhuu yhä äänimallinsa vanhalla 8-bittisellä versiolla. Päivitys lataa Supertonen julkaiseman Supertonic 3 -mallin virallisen version ja poistaa ensin vanhat tiedostot.
+options.voice_update.button = Päivitä ({0} MB)
+options.voice_update.running = Lataus on käynnissä.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Äänenlaatu
+options.voice_quality.help = Kuinka monta tarkennusvaihetta valmentajan puhesynteesi käyttää kuhunkin repliikkiin: tasosta Matala (4) tasoon Maksimi (9), oletuksena Keskitaso (5). Korkeampi taso antaa hieman puhtaamman äänen, mutta sen laskeminen kestää kauemmin, joten valmentaja alkaa puhua hieman myöhemmin. Asetusta voi muuttaa, kun äänimalli on asennettu ja Valmentajan ääni on päällä.
+options.voice_quality.low = Matala
+options.voice_quality.medium = Keskitaso
+options.voice_quality.high = Korkea
+options.voice_quality.very_high = Erittäin korkea
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimi
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Valmentajan ääni
+coach.download.text = Valmentaja puhuu Supertonic 3 -mallilla, joka on Supertonen puhesynteesimalli. Se ei sisälly Scacelithiin: peli voi ladata sen nyt Hugging Face -palvelusta ({0} MB, kerran). Ilman sitä valmentaja kirjoittaa sanansa näytölle.
+coach.download.licence = Malli on julkaistu OpenRAIL-M-lisenssillä, joka kieltää tietyt sen tuottaman äänen käyttötavat, kuten äänen esittämisen ihmisen äänenä tai todellisen henkilön jäljittelemisen.
+coach.download.read_licence = Lue lisenssi
+coach.download.accept = Valitsemalla Lataa hyväksyt tämän lisenssin ehdot.
+# {0} = a folder
+coach.download.folder = Tallennuspaikka: {0}
+coach.download.not_now = Ei nyt
+# {0} = the size in megabytes
+coach.download.download = Lataa ({0} MB)
+coach.download.licence_title = OPENRAIL-M-LISENSSI
+coach.download.back = Takaisin
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Valmentajalle uusi ääni
+coach.update.text = Valmentajan ääni käyttää nyt Supertonen julkaisemaa Supertonic 3 -mallin virallista versiota tähän asti asennetun 8-bittisen muunnoksen sijaan. Peli voi ladata sen nyt Hugging Face -palvelusta ({0} MB, kerran); vanhat tiedostot ({1} MB) poistetaan ensin. Jos kieltäydyt, valmentaja säilyttää nykyisen äänensä, ja päivitys on edelleen saatavilla kohdassa Asetukset > Ääni.
+coach.update.download = Päivitä ({0} MB)
+coach.update.accept = Valitsemalla Päivitä hyväksyt tämän lisenssin ehdot.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = VALMENTAJAN ÄÄNI
+coach.download.removing = Poistetaan vanhaa versiota…
+coach.download.checking = Tarkistetaan tiedostoja…
+coach.download.downloading = Ladataan…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Lähde: Hugging Face
+coach.download.from_archive = Lähde: Hugging Face (arkistokopio)
+coach.download.cancel = Peruuta
+coach.download.failed = Lataus epäonnistui.
+coach.download.error.network = Palvelimiin ei saatu yhteyttä. Tarkista internetyhteytesi ja yritä uudelleen.
+# {0} = a folder
+coach.download.error.disk = Tiedostoja ei voitu kirjoittaa kansioon {0}. Tarkista vapaa levytila ja yritä uudelleen.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Palvelimet lähettivät odottamattoman vastauksen ({0}). Yritä myöhemmin uudelleen.
+coach.download.retry = Yritä uudelleen
+coach.download.close = Sulje
+# Notices
+coach.download.done = Valmentajan ääni on asennettu.
+coach.download.cancelled = Lataus peruttiin: se jatkuu ensi kerralla siitä, mihin se jäi.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Tallennetut pelit
+options.save_games = Tallenna pelini
+options.save_games.help = Kun pelisi Stockfishia vastaan ja valmentajan kanssa, kahden pelaajan pelit tällä tietokoneella ja suorat ottelusi päättyvät, ne tallennetaan PGN-tiedostoina, ja löydät ne kohdasta Tallennetut pelit. Verkkopelit säilyvät palvelimella.
+library.title = TALLENNETUT PELIT
+library.section.games = PELIT
+library.section.details = PELI
+library.section.tags = TUNNISTEET
+library.section.moves = SIIRROT
+library.count = {0} peli|{0} peliä
+library.filter = Näytä
+library.filter.all = Kaikki pelit
+library.filter.play = Stockfishia vastaan
+library.filter.coach = Valmentajan kanssa
+library.filter.hotseat = Kaksi pelaajaa
+library.filter.direct = Suorat ottelut
+library.filter.server = Verkkopelit
+library.filter.imported = Tuodut
+library.mode.play = Stockfishia vastaan
+library.mode.coach = Valmentajan kanssa
+library.mode.hotseat = Kaksi pelaajaa
+library.mode.direct = Suora ottelu
+library.mode.server = Verkkopeli
+library.mode.imported = Tuotu
+library.coach_level = Taso {0}
+library.unknown_player = Tuntematon
+library.unfinished = Keskeneräinen
+library.unreadable = Tätä peliä ei voi lukea.
+library.moves = {0} siirto|{0} siirtoa
+library.opening_variation = {0}: {1}
+library.file = Tiedosto: {0}
+library.file_game = Tiedosto: {0}, peli {1} / {2}
+library.no_moves = Yhtään siirtoa ei pelattu.
+library.none_selected = Valitse peli luettelosta.
+library.reading = Luetaan tallennettuja pelejä
+library.empty.title = Ei vielä tallennettuja pelejä
+library.empty.text = Pelisi Stockfishia vastaan ja valmentajan kanssa, kahden pelaajan pelit tällä tietokoneella ja suorat ottelusi näkyvät tässä, kun ne ovat päättyneet. Voit myös laittaa tähän kansioon PGN-tiedostoja: muista ohjelmista tai verkkosivustoilta viedyt pelit näytetään omiesi joukossa.
+library.empty.filter = Ei tämänlaisia pelejä.
+library.error.folder = Tallennettujen pelien kansiota ei voi lukea
+library.error.game = Tätä peliä ei voi lukea: {0}
+library.folder = Kansio: {0}
+library.open_folder = Avaa kansio
+library.open_failed = Kansiota ei voitu avata.
+library.replay = Toista
+library.delete = Poista
+library.delete.title = POISTA PELI
+library.delete.text = Peli {0} poistetaan tältä tietokoneelta tiedostoineen. Tätä ei voi perua.
+library.delete.ok = Poista
+library.delete.several = Tässä tiedostossa on {0} peli: pelin voi poistaa vain kansiosta.|Tässä tiedostossa on {0} peliä: pelin voi poistaa vain kansiosta.
+library.deleted = Peli on poistettu.
+library.delete.failed = Peliä ei voitu poistaa.
+library.delete.changed = Tiedosto on muuttunut: luettelo on päivitetty.
+library.truncated = Tässä kansiossa on liikaa pelejä: vain {0} uusinta näytetään.
+library.tag.Event = Tapahtuma
+library.tag.Site = Paikka
+library.tag.Date = Päivämäärä
+library.tag.Time = Aika
+library.tag.Round = Kierros
+library.tag.White = Valkea
+library.tag.Black = Musta
+library.tag.Result = Tulos
+library.tag.WhiteElo = Valkean Elo
+library.tag.BlackElo = Mustan Elo
+library.tag.TimeControl = Peliaika
+library.tag.Termination = Päättymistapa
+library.tag.Opening = Avaus
+library.tag.Variation = Muunnelma
+library.tag.PlyCount = Puolisiirrot
+library.tag.FEN = Alkuasema
+library.tag.ScacelithMode = Tila
+library.tag.CoachLevel = Valmentajan taso
+library.tag.ScacelithServer = Palvelin
+library.tag.ScacelithGameId = Pelin numero
+library.tag.UTCDate = Päivämäärä (UTC)
+library.tag.UTCTime = Aika (UTC)
+library.tag.WhiteRatingDiff = Valkean vahvuusluvun muutos
+library.tag.BlackRatingDiff = Mustan vahvuusluvun muutos
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyysi
+analysis.menu.title = ANALYYSI
+analysis.menu.analyse = Analysoi
+analysis.menu.paste = Liitä PGN
+analysis.menu.online = Verkkopelini
+analysis.menu.folder = Laita PGN-tiedostoja tähän kansioon, niin voit analysoida niitä: {0}
+analysis.menu.empty.title = Ei vielä tallennettuja pelejä
+analysis.menu.empty.text = Pelisi näkyvät tässä, kun ne ovat päättyneet, kuten myös alla olevaan kansioon laitetut PGN-tiedostot. Voit myös liittää PGN-tekstinä kopioidun pelin.
+analysis.menu.empty.no_folder = Liitä PGN-tekstinä kopioitu peli, niin voit analysoida sen.
+analysis.menu.paste.empty = Leikepöytä on tyhjä: kopioi ensin peli PGN-tekstinä.
+analysis.menu.paste.none = Leikepöydältä ei löytynyt shakkipeliä.
+analysis.menu.paste.several = Leikepöydällä on useita pelejä: ensimmäinen analysoidaan.
+analysis.menu.gameover = Analysoi peli
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Siirto {0} / {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Välitön
+replay.again = Toista uudelleen
+replay.gameover.unfinished = Peli päättyy siirron {0} jälkeen ilman tulosta.
+replay.tip.start = Pelin alku (Home)
+replay.tip.back = Siirto taaksepäin (J)
+replay.tip.pause = Tauko (K)
+replay.tip.resume = Jatka (K)
+replay.tip.forward = Siirto eteenpäin (L)
+replay.tip.end = Pelin loppu (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAATTORI
+analysis.hud.accuracy = TARKKUUS
+analysis.hud.reviewing = Stockfish käy peliä läpi… {0}
+analysis.hud.no_engine = Ei shakkimoottoria: siirrot näytetään ilman analyysia.
+analysis.hud.no_moves = Tässä pelissä ei ole siirtoja.
+analysis.hud.tip.play = Toista siirrot (K)
+analysis.hud.tip.comments_off = Piilota avainhetkien kommentit (N)
+analysis.hud.tip.comments_on = Näytä avainhetkien kommentit (N)
+analysis.hud.tip.voice_off = Mykistä kommentaattorin ääni (M)
+analysis.hud.tip.voice_on = Kuuntele kommentit ääneen luettuina (M)
+analysis.hud.tip.voice_missing = Ääntä ei voi kuulla: sen tiedostoja ei ole asennettu, tai Asetukset > Ääni > Valmentajan ääni on pois päältä. Kommentit näytetään vain tekstinä näytöllä.
+analysis.hud.tip.arrows_off = Piilota parempien siirtojen nuolet (B)
+analysis.hud.tip.arrows_on = Näytä parempien siirtojen nuolet (B)
+analysis.hud.controls.play = Toista / tauko
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Näytä / piilota kommentit
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Kommentaattorin ääni päälle / pois
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Näytä / piilota nuolet
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Tallenna GIF-kuvana
+gif.making = Tehdään GIF-kuvaa: palvelin piirtää peliä…
+gif.saved = GIF-kuva on tallennettu:
+gif.saved_as = GIF-kuva tallennettu: {0}
+gif.sign_in_first = Kirjaudu verkkopalvelimelle, niin voit tehdä GIF-kuvia: palvelin piirtää ne.
+gif.busy_other = Toista GIF-kuvaa tehdään parhaillaan. Odota, kunnes se on valmis.
+gif.err.rate_limited_for = Olet tehnyt monta GIF-kuvaa lyhyessä ajassa. Odota {0}, niin voit tehdä seuraavan.
+gif.err.rate_limited = Olet tehnyt monta GIF-kuvaa lyhyessä ajassa. Yritä myöhemmin uudelleen.
+gif.err.server_busy_for = Palvelin piirtää parhaillaan muita GIF-kuvia. Odota {0} ja yritä sitten uudelleen.
+gif.err.server_busy = Palvelin piirtää parhaillaan muita GIF-kuvia. Yritä hetken kuluttua uudelleen.
+gif.err.signed_out = Istuntosi on päättynyt. Kirjaudu uudelleen sisään, niin voit tehdä GIF-kuvan.
+gif.err.game_too_long = Tämä peli on liian pitkä GIF-kuvaksi.
+gif.err.pgn_too_large = Tämä peli on liian pitkä GIF-kuvaksi.
+gif.err.invalid_pgn = Palvelin ei voinut lukea tätä peliä.
+gif.err.render_failed = Palvelin ei voinut tehdä tätä GIF-kuvaa. Yritä uudelleen.
+gif.err.gif_disabled = Tämä palvelin ei tee GIF-kuvia.
+gif.err.write_failed = GIF-kuvaa ei voitu tallentaa tälle tietokoneelle.
+gif.err.not_found = Tämä peli ei ole enää palvelimella.
+gif.wait.seconds = {0} sekunti|{0} sekuntia
+gif.wait.minutes = {0} minuutti|{0} minuuttia
+gif.wait.both = {0} ja {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6:n käynnistys epäonnistui. Päivitä näytönohjaimesi ajuri.
+error.opengl_macos = OpenGL 4.6:n käynnistys tällä Macilla epäonnistui. Scacelith vaatii Apple silicon -suorittimen (M1 tai uudempi) ja macOS 26:n tai uudemman, eikä se toimi virtuaalikoneessa.
+error.renderer = Renderöijää ei voitu käynnistää.
+error.scene = Näkymää ei voitu ladata.
+error.log_file = Lisätiedot ovat lokitiedostossa: {0}

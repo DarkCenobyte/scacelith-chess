@@ -74,7 +74,7 @@ lesson.welcome.light = La casa d’angolo alla tua {@}destra è sempre una casa 
 lesson.welcome.files = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a alla {@2}h.
 lesson.welcome.files.spoken = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a all’{@2}acca.
 lesson.welcome.ranks = Le righe orizzontali si chiamano traverse. Hanno un numero, da {@}uno a {@2}otto, a partire dal tuo lato.
-lesson.welcome.square = Ogni casa si chiama con la sua lettera e poi il suo numero. Questa è la casa {sq}.
+lesson.welcome.square = Ogni casa si indica con la sua lettera e poi con il suo numero. Questa è la casa {sq}.
 lesson.welcome.square2 = E questa è {sq}.
 lesson.welcome.kings = Questi sono i due re. Il tuo è in {sq}, il mio in {sq2}.
 lesson.welcome.ask = Tocca a te: muovi il tuo re di una casa in avanti, in {sq}.
@@ -194,14 +194,14 @@ lesson.mate3.ask = Ora usa {your} per dare scacco matto.
 lesson.mate3.free = Scacco, ma ora la settima traversa è libera e il mio re scappa.
 lesson.mate3.takes = Il mio re prende semplicemente la tua torre.
 lesson.mate3.hint = Dai scacco sull’ultima traversa con la torre che non controlla la settima.
-lesson.mate3.ok = Scacco matto! Le due torri hanno lavorato come i pioli di una scala.
+lesson.mate3.ok = Scacco matto! Le due torri hanno lavorato come una scala.
 
 # ---- Chapter 5: castling ---------------------------------------------------------------------------------------
 lesson.castle.what = L’arrocco è una mossa speciale che mette al sicuro il tuo re. Re e torre si muovono insieme.
 lesson.castle.how = Il {@}re si sposta di due case verso una torre, e la {@2}torre salta dall’altra parte del re.
 lesson.castle.ask = Tocca sempre prima il re. Ora tu: arrocca sull’ala di re.
 lesson.castle.rook = Così muovi solo la torre. Per arroccare, sposta il re di due case verso la torre.
-lesson.castle.long = Questo è l’arrocco lungo, anche lui legale! Stavolta arrocca verso la torre più vicina.
+lesson.castle.long = Questo è l’arrocco lungo: è legale anche questo! Stavolta arrocca verso la torre più vicina.
 lesson.castle.one = Una casa sola è una normale mossa di re. Per arroccare, il re si sposta di due case.
 lesson.castle.other = Per arroccare, sposta il re di due case verso la torre in {sq}.
 lesson.castle.ok = Arrocco fatto! Il tuo re è al riparo e la tua torre è pronta a entrare in gioco.
@@ -215,7 +215,7 @@ lesson.castle2.ok = Esatto! Con l’arrocco lungo il tuo re va in {sq}.
 # ---- Chapter 6: en passant ------------------------------------------------------------------------------------
 lesson.ep.what = C’è una cattura speciale del pedone che si chiama en passant. Vuol dire «al passaggio».
 lesson.ep.watch = Guarda il mio pedone: avanza di due case e finisce proprio accanto al tuo.
-lesson.ep.how = Il tuo pedone può catturarlo come se avesse fatto un passo solo: in {sq}.
+lesson.ep.how = Il tuo pedone può catturarlo come se fosse avanzato di una sola casa: in {sq}.
 lesson.ep.now = Ma solo adesso, a questa mossa. Cattura en passant!
 lesson.ep.gone = L’occasione è sfumata: l’en passant si può fare solo subito. Riproviamo.
 lesson.ep.ok = En passant! Il mio pedone in {sq} esce dalla scacchiera.

@@ -1,0 +1,987 @@
+# Coach speech (Finnish): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "sinä" in standard Finnish (no colloquial forms), drops subject pronouns.
+# Finnish has no grammatical gender: nothing agrees with the player or the coach.
+# Pieces carry their possessive suffix ({your} = "ratsusi", {my:part} = "lähettiäni"); the forms
+# (nom gen acc part ine ela ill ade abl all) are in common.lang. "It" for a piece is se / sen / sitä.
+# Objects: "uhata" and negated verbs take the partitive ({t1:part}); "lyödä", "voittaa", "menettää"
+# take the accusative ({your:acc}); "X had a move" = "{your:ade} oli siirto".
+# Squares, moves and lines never take an ending: "ruutuun {sq}", "ruudussa {sq}", "ruudusta {sq}",
+# "siirrolla {best}", "siirron {reply} jälkeen", "jatkon {line} jälkeen" (after the line).
+# Counted numbers: {m:move_ine} "kolmessa siirrossa" (mate in 3: "matti {m:move_ine}"), {pts:point_acc}
+# "kolme pistettä" (object), {pts:point_ade} "kolmella pisteellä tappiolla" (down), {n:point_gen}
+# "viiden pisteen arvoinen" (worth), {n:time} "kolme kertaa", {n:piece} "kaksi nappulaa".
+# Terms (glossary): vakava virhe (blunder), virhe, epätarkkuus, haarukka, kiinnitys, varras,
+# paljastettu hyökkäys, patti, takarivi, pakoruutu, vapaasotilas, oppositio, lähettipari, neliö
+# (the square of the pawn). "Falls" = "kaatuu".
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Shakki! Kuninkaani on uhattuna.
+ann.check.human.b1.2 = Shakki! Uhkaat kuningastani.
+ann.check.human.b1.3 = Se on shakki! Kuninkaani on päästävä siitä pois.
+ann.check.human = Shakki.
+ann.check.human.2 = Shakki!
+ann.check.human.3 = Ja se on shakki.
+# The coach gives check.
+ann.check.coach = Shakki!
+ann.check.coach.2 = Shakki.
+ann.check.coach.3 = Ja shakki!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Se tarkoittaa, että {your} on uhattuna. Sinun täytyy saada se pois shakista.
+ann.check.coach.first.2 = Shakki tarkoittaa, että {your} on uhattuna. Siirrä sitä, laita nappula väliin tai lyö nappulani.
+ann.double_check.coach = Kaksoisshakki! Kaksi nappulaani uhkaa kuningastasi yhtä aikaa, joten sen täytyy liikkua.
+ann.double_check.coach.2 = Se on kaksoisshakki: nyt auttaa vain kuninkaan siirto.
+ann.double_check.human = Kaksoisshakki! Kaksi nappulaasi uhkaa kuningastani yhtä aikaa, joten sen täytyy liikkua.
+ann.double_check.human.2 = Kaksoisshakki! Vain kuninkaan siirto voi enää pelastaa minut.
+# The player checkmates the coach.
+ann.mate.human.b1 = Matti! Voitit! Kuninkaani ei pääse pakoon.
+ann.mate.human.b1.2 = Se on matti! Hienoa, voitit pelin!
+ann.mate.human.b1.3 = Matti! Kuninkaani on ansassa. Onneksi olkoon!
+ann.mate.human = Matti. Hyvin pelattu.
+ann.mate.human.2 = Se on matti. Onneksi olkoon.
+ann.mate.human.3 = Matti! Hienosti tehty.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Se on matti. Kuninkaallasi ei ole pakotietä.
+ann.mate.coach.b1.2 = Matti. Kuninkaasi on uhattuna, eikä se pääse pakoon.
+ann.mate.coach.b1.3 = Valitettavasti se on matti. Kuninkaasi ei pääse karkuun.
+ann.mate.coach = Matti.
+ann.mate.coach.2 = Ja se on matti.
+ann.mate.coach.3 = Matti, valitettavasti.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Hups! Tuolla siirrolla annat jotain ilmaiseksi.
+ex.verdict.blunder.b1.2 = Varovasti! Tuo siirto voi tulla kalliiksi.
+ex.verdict.blunder.b1.3 = Oho, hetkinen. Tuossa siirrossa on ongelma.
+ex.verdict.blunder.b2 = Hmm, tuossa siirrossa on ongelma.
+ex.verdict.blunder.b2.2 = Tämä on paha virhe.
+ex.verdict.blunder.b2.3 = Varovasti, tuo siirto maksaa sinulle jotain.
+ex.verdict.blunder.b3 = Se on vakava virhe.
+ex.verdict.blunder.b3.2 = {move} on todellinen virhe.
+ex.verdict.blunder.b3.3 = Auts, {move} on iso virhe.
+ex.verdict.blunder.b4 = {move} on vakava virhe.
+ex.verdict.blunder.b4.2 = {move} on raskas virhe.
+ex.verdict.blunder.b4.3 = Se on valitettavasti vakava virhe.
+ex.verdict.blunder.b5 = {move} on raskas virhe.
+ex.verdict.blunder.b5.2 = {move} on vakava virhe.
+ex.verdict.blunder.b5.3 = {move} on kallis virhe.
+ex.verdict.blunder.b6 = {move} on raskas virhe.
+ex.verdict.blunder.b6.2 = {move} on vakava virhe.
+ex.verdict.blunder.b6.3 = {move}? Vakava virhe.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hups! Et vastannut uhkaani.
+ex.verdict.ignored.b1.2 = Varovasti! Uhkani oli yhä voimassa.
+ex.verdict.ignored.b1.3 = Oho, hetkinen. Unohdit uhkani.
+ex.verdict.ignored.b2 = Hmm, uhkani oli yhä voimassa.
+ex.verdict.ignored.b2.2 = Jätit uhkani torjumatta.
+ex.verdict.ignored.b2.3 = Varovasti, et vastannut uhkaani.
+ex.verdict.mistake.b3 = Tuo ei ole hyvä siirto.
+ex.verdict.mistake.b3.2 = Hmm, siirrossa {move} on ongelma.
+ex.verdict.mistake.b3.3 = Se on virhe.
+ex.verdict.mistake.b4 = {move} on virhe.
+ex.verdict.mistake.b4.2 = {move} ei ole hyvä.
+ex.verdict.mistake.b4.3 = Tuo on virhe.
+ex.verdict.mistake.b5 = {move} on selvä virhe.
+ex.verdict.mistake.b5.2 = {move} on virhe.
+ex.verdict.mistake.b5.3 = {move} ei ole hyvä.
+ex.verdict.mistake.b6 = {move} on virhe.
+ex.verdict.mistake.b6.2 = {move}? Virhe.
+ex.verdict.mistake.b6.3 = Ei {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Ei huono, mutta {best} oli vähän parempi.
+ex.verdict.inaccuracy.b3.2 = {best} oli hieman tarkempi.
+ex.verdict.inaccuracy.b3.3 = Pieni lipsahdus: {best} oli tässä parempi.
+ex.verdict.inaccuracy.b4 = Epätarkka: {best} oli tarkempi.
+ex.verdict.inaccuracy.b4.2 = Pieni epätarkkuus. {best} oli vähän parempi.
+ex.verdict.inaccuracy.b4.3 = Ei aivan paras: {best} oli tarkempi.
+ex.verdict.inaccuracy.b5 = {move} on epätarkka; {best} oli vahvempi.
+ex.verdict.inaccuracy.b5.2 = Hieman epätarkka. Olisin pelannut siirron {best}.
+ex.verdict.inaccuracy.b5.3 = {best} oli tarkempi kuin {move}.
+ex.verdict.inaccuracy.b6 = {move} on epätarkka; {best}.
+ex.verdict.inaccuracy.b6.2 = Epätarkka. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} oli parempi.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} olisi ehkä ollut hieman tarkempi.
+ex.verdict.inaccuracy.maybe.2 = Olisin ehkä pelannut siirron {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Tuo siirto näyttää kyseenalaiselta.
+ex.verdict.dubious.2 = Tuo siirto vaikuttaa kyseenalaiselta.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Hetkinen! Sinulta jäi huomaamatta jotain hyvää.
+ex.verdict.missed.b1.2 = Katso uudestaan! Tarjolla oli jotain parempaa.
+ex.verdict.missed.b1.3 = Odota, sinulla oli tuossa tilaisuus!
+ex.verdict.missed.b2 = Tuossa sinulta meni tilaisuus ohi.
+ex.verdict.missed.b2.2 = Hmm, tarjolla oli jotain parempaa.
+ex.verdict.missed.b2.3 = Odota, sinulla oli tuossa hieno siirto.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Parempi oli {best}.
+ex.better.b3.2 = {best} oli parempi siirto.
+ex.better.b3.3 = Sen sijaan {best} oli hyvä.
+ex.better.b4 = {best} oli vahvempi.
+ex.better.b4.2 = {best} oli oikea siirto.
+ex.better.b4.3 = Parempi oli {best}.
+ex.better.b5 = {best}, ideana {line}.
+ex.better.b5.2 = Oikea siirto oli {best}: {line}.
+ex.better.b5.3 = Parempi oli {best}, ja sen jälkeen {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Sen sijaan {best}, {eval}.
+ex.better.b6.3 = {best} oli {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece. "{your:ade} oli" = "{your} had".
+ex.hint.b1 = {your:ade} olisi ollut parempi siirto.
+ex.hint.b1.2 = {your:ade} oli parempi siirto.
+ex.hint.b2 = {your:ade} oli parempi siirto.
+ex.hint.b2.2 = {your:ade} olisi löytynyt parempi siirto.
+ex.hint.b3 = {your:ade} oli parempi siirto.
+ex.hint.b3.2 = {your:ade} olisi ollut jotain parempaa.
+ex.hint.b4 = {your:ade} oli parempi siirto.
+ex.hint.b4.2 = Katso vielä {your:part}: sillä oli jotain parempaa.
+ex.hint.b5 = {your:ade} oli vahvempi siirto.
+ex.hint.b5.2 = {your:ade} olisi ollut vahvempi siirto.
+ex.hint.b6 = {your:ade} oli parempaa tarjolla.
+ex.hint.b6.2 = Katso {your:part} uudestaan.
+ex.hint.move = Tarjolla oli parempi siirto.
+ex.hint.move.2 = Sinulla oli tuossa parempi siirto.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your:ade} oli parempi siirto. Se voittaa materiaalia.
+ex.hint.gain.b1.2 = {your:ade} olisi ollut parempi siirto. Se voittaa materiaalia.
+ex.hint.gain.b2 = {your:ade} oli parempi siirto. Se voittaa materiaalia.
+ex.hint.gain.b2.2 = {your:ade} oli siirto, joka voittaa materiaalia.
+ex.hint.gain.b3 = {your:ade} oli parempi siirto, joka voittaa materiaalia.
+ex.hint.gain.b3.2 = {your:ade} olisi ollut siirto, joka voittaa materiaalia.
+ex.hint.gain.b4 = {your:ade} oli materiaalia voittava siirto.
+ex.hint.gain.b4.2 = Katso vielä {your:part}: sillä oli materiaalia voittava siirto.
+ex.hint.gain.b5 = {your:ade} oli vahvempi siirto, joka voittaa materiaalia.
+ex.hint.gain.b5.2 = {your:ade} olisi ollut siirto, joka voittaa materiaalia.
+ex.hint.gain.b6 = {your:ade} oli materiaalia voittava siirto.
+ex.hint.gain.b6.2 = Katso {your:part} uudestaan: materiaalia oli voitettavissa.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Parempi siirto oli viedä {your:acc} ruutuun {sq}.
+ex.reveal.b1.2 = {your} olisi voinut mennä ruutuun {sq}. Se oli parempi.
+ex.reveal.b2 = {your:gen} siirto ruutuun {sq} oli parempi.
+ex.reveal.b2.2 = Parempi olisi ollut siirtää {your:acc} ruutuun {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Laitetaan nappulat takaisin.
+ex.rewind.b1.2 = Nyt laitan kaiken takaisin paikoilleen.
+ex.rewind.b1.3 = Asetan nappulat takaisin.
+ex.rewind.b2 = Laitetaan kaikki takaisin.
+ex.rewind.b2.2 = Takaisin siihen, mistä lähdettiin.
+ex.rewind.b2.3 = Laitan nappulat takaisin.
+ex.rewind.b3 = Takaisin peliin.
+ex.rewind.b3.2 = Palataan takaisin.
+ex.rewind.b3.3 = Takaisin asemaan.
+ex.rewind.b4 = Takaisin peliin.
+ex.rewind.b4.2 = Takaisin.
+ex.rewind.b4.3 = Palataan takaisin.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Haluatko kokeilla toista siirtoa?
+ex.offer.b1.2 = Haluaisitko perua siirron ja yrittää uudestaan?
+ex.offer.b1.3 = Kokeillaanko jotain toista siirtoa?
+ex.offer.b2 = Haluaisitko kokeilla toista siirtoa?
+ex.offer.b2.2 = Haluatko perua siirron?
+ex.offer.b2.3 = Yritetäänkö uudestaan?
+ex.offer.b3 = Haluaisitko perua sen?
+ex.offer.b3.2 = Haluatko yrittää uudestaan?
+ex.offer.b3.3 = Perutaanko se?
+ex.offer.b4 = Perutaanko?
+ex.offer.b4.2 = Haluatko perua sen?
+ex.offer.b4.3 = Kokeiletko toista siirtoa?
+ex.offer.b5 = Perutaanko?
+ex.offer.b5.2 = Perutko sen?
+ex.offer.b5.3 = Perutaanko siirto?
+ex.offer.b6 = Perutaanko?
+ex.offer.b6.2 = Perutko?
+ex.offer.b6.3 = Uusi yritys?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Tuo siirto on kyseenalainen. Pystyisitkö parempaan?
+ex.dubious.b1.2 = Tuo siirto on kyseenalainen. Löytäisitkö paremman?
+ex.dubious.b2 = Kyseenalainen siirto. Pystyisitkö parempaan?
+ex.dubious.b2.2 = Tuo siirto on kyseenalainen. Olisiko jotain parempaa?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Sitten {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} menee ruutuun {sq}.
+demo.my.move.2 = Siirrän {my:acc} ruutuun {sq}.
+demo.my.move.3 = Sitten {my} menee ruutuun {sq}.
+demo.my.take = Lyön {your:acc}.
+demo.my.take.2 = {my} lyö {your:acc}.
+demo.my.take.3 = Ja lyön {your:acc}.
+demo.my.check = {my} menee ruutuun {sq}. Shakki.
+demo.my.check.2 = Shakki {my:ade} ruudusta {sq}.
+demo.my.check.3 = {my} ruutuun {sq}, shakki!
+demo.my.mate = {my} menee ruutuun {sq}. Matti.
+demo.my.mate.2 = Ja kun {my} menee ruutuun {sq}, se on matti.
+demo.my.mate.3 = {my} ruutuun {sq}. Se on matti.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Ensin {my} lyö {your:acc}. {t1} saa odottaa.
+demo.my.first.take.2 = {my} lyö ensin {your:acc}. {t1} ei katoa mihinkään.
+demo.my.first.check = {my} lyö {your:acc}, ja se on shakki! {t1} saa odottaa.
+demo.my.first.check.2 = Ensin {my} lyö {your:acc} ja antaa shakin. {t1} ei katoa mihinkään.
+demo.my.first.check_move = Ensin shakki {my:ade} ruudusta {sq}. {t1} saa odottaa.
+demo.my.first.check_move.2 = {my} menee ruutuun {sq}: ensin shakki! {t1} ei katoa mihinkään.
+demo.my.first.move = Ensin {my} menee ruutuun {sq}. {t1} saa odottaa.
+demo.my.first.move.2 = Ensin {my} ruutuun {sq}. {t1} ei katoa mihinkään.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} on uhattuna, joten se lyö ensin {your:acc}.
+demo.my.first.attacked.2 = {my} on uhattuna: se nappaa ensin {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Ensin {move}: {t1} saa odottaa.
+demo.first.2 = Ensin {move}. {t1} ei katoa mihinkään.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Nyt pelaan oman siirtoni.
+demo.play_on.2 = Tässä on oikea siirtoni.
+demo.play_on.3 = Ja nyt varsinainen siirtoni.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Siirtäisit {your:acc} ruutuun {sq}.
+demo.your.move.2 = Oletetaan, että siirrät {your:acc} ruutuun {sq}.
+demo.your.move.3 = Sitten {your} menee ruutuun {sq}.
+demo.your.take = Löisit {my:acc}.
+demo.your.take.2 = Lyöt {my:acc} {your:ade}.
+demo.your.take.3 = Sitten lyöt {my:acc}.
+demo.your.back = Lyöt takaisin.
+demo.your.back.2 = Lyöt takaisin ruutuun {sq}.
+demo.your.back.3 = Ja lyöt takaisin.
+demo.your.king = Kuninkaasi täytyy siirtyä.
+demo.your.king.2 = Kuninkaan täytyy väistää ruutuun {sq}.
+demo.your.king.3 = Kuninkaasi pakenee ruutuun {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Nyt {t1:part} ei voi enää pelastaa.
+ex.point.piece.2 = Ja {t1} on menetetty.
+ex.point.piece.3 = Seuraavaksi kaatuu {t1}.
+ex.point.two = {t1} ja {t2} ovat molemmat uhattuina: toinen niistä kaatuu.
+ex.point.two.2 = Nyt uhkaan {t1:part} ja {t2:part}. Et voi pelastaa molempia.
+ex.point.mate = Ja nyt {reply:nomate} on matti.
+ex.point.mate.2 = Seuraavaksi tulee {reply:nomate}, ja se on matti.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Näetkö? Nyt olet menettänyt {pts:point_acc}.
+ex.result.b1.2 = Näin menetät {pts:point_acc}.
+ex.result.b2 = Lopulta olet menettänyt {pts:point_acc}.
+ex.result.b2.2 = Nyt olet {pts:point_ade} tappiolla.
+ex.result.b3 = Se maksaa sinulle {pts:point_acc}.
+ex.result.b3.2 = Jäät {pts:point_ade} tappiolle.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Voit lyödä jotain takaisin, mutta olet silti {pts:point_ade} tappiolla.
+ex.result_back.b1.2 = Voit voittaa vähän takaisin, mutta olet silti menettänyt {pts:point_acc}.
+ex.result_back.b2 = Voit saada osan takaisin, mutta olet yhä {pts:point_ade} tappiolla.
+ex.result_back.b2.2 = Vaikka lyöt takaisin, olet menettänyt {pts:point_acc}.
+ex.result_back.b3 = Takaisinlyönninkin jälkeen olet {pts:point_ade} tappiolla.
+ex.result_back.b3.2 = Voitat jotain takaisin, mutta se maksaa sinulle silti {pts:point_acc}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Jos {your2} lyö takaisin, {my} lyö {your:acc}.
+ex.retake.b1.2 = Et voi lyödä takaisin {your2:ade}: silloin {my} lyö {your:acc}.
+ex.retake.b2 = Jos {your2} lyö takaisin, {my} lyö {your:acc}.
+ex.retake.b2.2 = Takaisinlyönti {your2:ade} ei toimi: {my} lyö {your:acc}.
+ex.retake.b3 = Jos lyöt takaisin siirrolla {move}, {reply} lyö {your:acc}.
+ex.retake.b3.2 = Takaisinlyönti {move} ei toimi: {reply} lyö {your:acc}.
+ex.retake.b4 = {move} kumoutuu siirrolla {reply}, joka lyö {your:acc}.
+ex.retake.b4.2 = Ja jos {move}, niin {reply} lyö {your:acc}.
+ex.retake.b5 = Takaisinlyönti {move} törmää siirtoon {reply}, ja {your} kaatuu.
+ex.retake.b5.2 = {move} kumoutuu siirrolla {reply}: {your} kaatuu.
+ex.retake.b6 = {move}? {reply} lyö {your:acc}.
+ex.retake.b6.2 = {move} ei toimi: {reply} lyö {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Ja tässä, ruudussa {sq}, saisit uuden kuningattaren.
+demo.promote.2 = Sitten {your} pääsee ruutuun {sq} ja korottuu kuningattareksi.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Varo: {my} voi mennä ruutuun {sq}, ja se on matti.
+ex.mate_allowed.b1.2 = Nyt {my} voi siirtyä ruutuun {sq}. Se olisi matti!
+ex.mate_allowed.b1.3 = Varovasti! Jos {my} menee ruutuun {sq}, se on matti.
+# b2 ({your} = the king, pointed at). "Mate in 2" = "matti kahdessa siirrossa" ({m:move_ine}).
+ex.mate_allowed.b2 = Tämän siirron jälkeen voin matittaa {your:acc} {m:move_ine}.
+ex.mate_allowed.b2.2 = Nyt voin matittaa {your:acc} {m:move_ine}. Katso.
+ex.mate_allowed.b2.3 = Varovasti! {your} on vaarassa: matti {m:move_ine}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Tämä sallii matin {m:move_ine}: {line:nomate}.
+ex.mate_allowed.b3.2 = Tämän jälkeen minulla on matti {m:move_ine}: {line:nomate}.
+ex.mate_allowed.b3.3 = Kuninkaasi joutuu mattiin: {line:nomate}.
+ex.mate_allowed.b4 = {move} sallii pakotetun matin: {line:nomate}.
+ex.mate_allowed.b4.2 = Tämä johtaa mattiin {m:move_ine}: {line:nomate}.
+ex.mate_allowed.b4.3 = Siirron {move} jälkeen {line:nomate} on matti.
+ex.mate_allowed.b5 = {move} sallii pakotetun matin {m:move_ine}.
+ex.mate_allowed.b5.2 = Se johtaa mattiin {m:move_ine}.
+ex.mate_allowed.b5.3 = Nyt on pakotettu matti {m:move_ine}.
+ex.mate_allowed.b6 = Matti {m:move_ine}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, matti.
+ex.mate_allowed.b6.3 = Jatkon {line:nomate} jälkeen on matti.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Katso: {your:ade} ei ole enää yhtään pakoruutua.
+ex.mate_allowed.tail.b1.2 = Näetkö? {your} on uhattuna, eikä se pääse pakoon.
+ex.mate_allowed.tail.b1.3 = {your:ade} ei ole minne mennä. Se on matti.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below
+# (nominative, no article: "Tämän kuvion nimi on takarivimatti.").
+ex.mate_allowed.pattern = Tämän kuvion nimi on {text}.
+ex.mate_allowed.pattern.2 = Muista tämä: se on {text}.
+ex.mate_allowed.tip.b3 = Tarkista ennen jokaista siirtoa, onko kuninkaasi yhä turvassa.
+ex.mate_allowed.tip.b3.2 = Kysy aina: voiko kuninkaani joutua mattiin siirtoni jälkeen?
+
+name.pattern.back_rank = takarivimatti
+name.pattern.smothered = tukehtumismatti
+name.pattern.support = tuettu kuningatarmatti
+name.pattern.ladder = tikapuumatti
+name.pattern.epaulette = epolettimatti
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Siirrolla {best:nomate} olisit voinut matittaa {my:acc}!
+ex.mate_missed.b1.2 = {best:nomate} oli matti! {my} ei olisi päässyt pakoon.
+ex.mate_missed.b1.3 = Katso! {best:nomate} olisi matittanut {my:acc}.
+ex.mate_missed.b2 = Sinulla oli matti {m:move_ine}, ja se alkoi siirrolla {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} oli matti {m:move_ine}!
+ex.mate_missed.b2.3 = Olisit voinut tehdä minulle matin siirrolla {best:nomate}.
+ex.mate_missed.b3 = Sinulta jäi huomaamatta matti {m:move_ine}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} johtaa mattiin {m:move_ine}: {line:nomate}.
+ex.mate_missed.b3.3 = Tarjolla oli matti {m:move_ine}, alkaen siirrosta {best:nomate}.
+ex.mate_missed.b4 = Ohitettu matti: {line:nomate}, alkaen siirrosta {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} olisi pakottanut matin {m:move_ine}.
+ex.mate_missed.b4.3 = Siirrolla {best:nomate} sinulla oli matti {m:move_ine}.
+ex.mate_missed.b5 = {best:nomate} tekee matin {m:move_ine}: {line:nomate}.
+ex.mate_missed.b5.2 = Ohitettu matti {m:move_ine}, alkaen siirrosta {best:nomate}.
+ex.mate_missed.b5.3 = Pakotettu matti oli tarjolla: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} tekee matin: {line:nomate}.
+ex.mate_missed.b6.2 = Matti {m:move_ine}, ensin {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, matti {m:move_ine}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Nopeampi oli {best:nomate}: matti {m:move_ine}.
+ex.mate_delayed.b5.2 = {best:nomate} olisi tehnyt matin nopeammin, {m:move_ine}.
+ex.mate_delayed.b6 = {best:nomate} tekee matin {m:move_ine}.
+ex.mate_delayed.b6.2 = Nopeammin: {best:nomate}, matti {m:move_ine}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Voi ei! {my} ei voi liikkua, eikä se ole shakissa. Se on patti eli tasapeli.
+ex.stalemate.b1.2 = Katso: {my:ade} ei ole turvallista ruutua, mutta se ei ole shakissa. Tasapeli!
+ex.stalemate.b1.3 = Se on patti. {my} ei voi liikkua, joten peli päättyy tasapeliin.
+ex.stalemate.b2 = Patti! {my:ade} ei ole yhtään laillista siirtoa, eikä se ole shakissa. Tasapeli.
+ex.stalemate.b2.2 = Voi ei, patti: {my} on jumissa mutta ei shakissa.
+ex.stalemate.b2.3 = Patti päättää pelin tasapeliin. {my} ei voi liikkua.
+ex.stalemate.b3 = Se on patti: {my:ade} ei ole laillista siirtoa. Olit voittamassa!
+ex.stalemate.b3.2 = Patti! {my} on jumissa, ja voitettu peli muuttuu tasapeliksi.
+ex.stalemate.b3.3 = {my:ade} ei ole siirtoja, eikä se ole shakissa: patti.
+ex.stalemate.b4 = Patti: {my:ade} ei ole laillista siirtoa. Näin voitto menee hukkaan.
+ex.stalemate.b4.2 = {move} jättää {my:acc} pattiin. Tasapeli voitetusta asemasta.
+ex.stalemate.b4.3 = Se on patti; {my} on saarrettu.
+ex.stalemate.b5 = {move} jättää {my:acc} pattiin. Voitto on mennyttä.
+ex.stalemate.b5.2 = Patti: {my:ade} ei ole ruutuja.
+ex.stalemate.b5.3 = Se on patti, {my} on jumissa.
+ex.stalemate.b6 = Patti. {my:ade} ei ole siirtoja.
+ex.stalemate.b6.2 = {move}, patti: {my} on saarrettu.
+ex.stalemate.b6.3 = Patti; {my} ei voi liikkua.
+ex.stalemate.tip.b1 = Kun olet voittamassa, jätä kuninkaalleni aina ruutu, johon liikkua.
+ex.stalemate.tip.b1.2 = Muista: kun olet edellä, anna kuninkaalleni vähän tilaa.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Varovasti! Voin antaa nappulani pois, ja sitten {my:ade} ei ole siirtoja: patti.
+ex.stalemate_trick.b1.2 = Varo: {my} on melkein jumissa. Voin saada tasapelin.
+ex.stalemate_trick.b2 = Varovasti: voin uhrata, ja {my} jäisi pattiin.
+ex.stalemate_trick.b2.2 = {my:ade} ei ole juuri yhtään ruutua. Voin pakottaa patin!
+ex.stalemate_trick.b3 = Tämän jälkeen pelastun patilla: {my:abl} loppuvat siirrot.
+ex.stalemate_trick.b3.2 = Varovasti: jatkon {line} jälkeen {my} on patissa.
+ex.stalemate_trick.b4 = {move} sallii pattikikan: {line}, eikä {my} voi liikkua.
+ex.stalemate_trick.b4.2 = Nyt {my} voi piiloutua pattiin: {line}.
+ex.stalemate_trick.b5 = {move} sallii patin: {line}; {my} on saarrettu.
+ex.stalemate_trick.b5.2 = Pattikikka: {line}, eikä {my:ade} ole siirtoja.
+ex.stalemate_trick.b6 = {line}, patti: {my} on saarrettu.
+ex.stalemate_trick.b6.2 = Patti jatkon {line} jälkeen; {my} on jumissa.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} voi mennä ruutuun {sq} ja uhata {t1:part} ja {t2:part}.
+ex.fork.b1.2 = {my} menee ruutuun {sq} ja uhkaa kahta nappulaa: {t1:part} ja {t2:part}.
+ex.fork.b1.3 = Katso {my:part}: ruudusta {sq} se uhkaa yhtä aikaa {t1:part} ja {t2:part}.
+ex.fork.b2 = Haarukka! {my} uhkaa ruudusta {sq} yhtä aikaa {t1:part} ja {t2:part}.
+ex.fork.b2.2 = Siirtosi jälkeen {my} voi haarukoida {t1:part} ja {t2:part} ruudusta {sq}.
+ex.fork.b2.3 = {my} menee ruutuun {sq}: kaksoisuhka {t1:all} ja {t2:all}.
+ex.fork.b3 = {move} sallii siirron {reply}, joka haarukoi {t1:part} ja {t2:part}.
+ex.fork.b3.2 = Siirron {reply} jälkeen uhkaan yhtä aikaa {t1:part} ja {t2:part}.
+ex.fork.b3.3 = {reply} on haarukka: {t1} ja {t2} ovat molemmat uhattuina.
+ex.fork.b4 = {reply} haarukoi {t1:part} ja {t2:part}; jatkon {line} jälkeen olet menettänyt {pts:point_acc}.
+ex.fork.b4.2 = {reply} iskee yhtä aikaa {t1:ill} ja {t2:ill}.
+ex.fork.b4.3 = {move} sallii haarukan {reply}, joka kohdistuu {t1:ill} ja {t2:ill}.
+ex.fork.b5 = {move} johtaa haarukkaan {reply}, joka iskee {t1:ill} ja {t2:ill}.
+ex.fork.b5.2 = {reply} haarukoi {t1:part} ja {t2:part}.
+ex.fork.b5.3 = Siirron {reply} jälkeen {t1} ja {t2} ovat molemmat uhattuina.
+ex.fork.b6 = {reply} haarukoi.
+ex.fork.b6.2 = {move} sallii siirron {reply}, haarukan.
+ex.fork.b6.3 = {reply}, haarukka.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Voit pelastaa vain toisen: {t1:acc} tai {t2:acc}.
+ex.fork.tail.b1.2 = Nyt uhkaan kahta nappulaa yhtä aikaa: {t1:part} ja {t2:part}. Se on haarukka!
+ex.fork.tail.b1.3 = Näetkö? {t1} ja {t2} ovat molemmat uhattuina. Toinen niistä kaatuu.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:gen} täytyy päästä pois shakista, joten lyön {t1:acc}.
+ex.fork.tail_king.2 = Shakki! {your:gen} täytyy siirtyä, ja {t1} kaatuu.
+ex.fork.more.b3 = Tarkista ennen siirtoa ruutu {sq}: sieltä {my} voi tehdä haarukan.
+ex.fork.more.b3.2 = Pidä silmällä ruutua {sq}. Sieltä {my} haarukoi.
+ex.fork.tip.knight = Varo ratsun hyppyjä kuninkaasi ja kuningattaresi lähellä!
+ex.fork.tip.knight.2 = Ratsut uhkaavat mielellään kahta nappulaa kerralla. Katso, minne ne voivat hypätä.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Kun {my} siirtyy pois, {my2} uhkaa {t1:part}!
+ex.discovered.b1.2 = Katso: {my} on tiellä. Jos se siirtyy, {my2} iskee {t1:ill}.
+ex.discovered.b1.3 = {my} voi astua sivuun, ja silloin {my2} uhkaa {t1:part}.
+ex.discovered.b2 = Piilevä hyökkäys: {my} siirtyy, ja {my2} uhkaa {t1:part}.
+ex.discovered.b2.2 = Varovasti: {my} voi siirtyä pois, ja {my2} iskee {t1:ill}.
+ex.discovered.b2.3 = {my} astuu sivuun ja paljastaa {my2:gen} uhan {t1:all}.
+ex.discovered.b3 = Siirron {reply} jälkeen paljastettu hyökkäys iskee {t1:ill}.
+ex.discovered.b3.2 = {reply} paljastaa uhan {t1:all}.
+ex.discovered.b3.3 = {move} sallii siirron {reply}, paljastetun hyökkäyksen {t1:part} vastaan.
+ex.discovered.b4 = {reply} avaa linjan {t1:part} kohti: paljastettu hyökkäys.
+ex.discovered.b4.2 = {move} sallii paljastetun hyökkäyksen {reply}, joka voittaa {t1:acc}.
+ex.discovered.b4.3 = Siirron {reply} jälkeen {t1} kaatuu paljastettuun hyökkäykseen.
+ex.discovered.b5 = {move} sallii paljastetun hyökkäyksen {reply}.
+ex.discovered.b5.2 = {reply} on paljastettu hyökkäys.
+ex.discovered.b5.3 = {reply} paljastaa piilossa olleen hyökkäyksen.
+ex.discovered.b6 = {reply}, paljastettu hyökkäys {t1:part} vastaan.
+ex.discovered.b6.2 = {reply}, ja {t1} kaatuu.
+ex.discovered.b6.3 = Paljastettu hyökkäys: {reply} iskee {t1:ill}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} uhkaa {t1:part}. Kun se väistää, lyön {t2:acc} sen takaa.
+ex.skewer.b1.2 = Katso: {my} iskee {t1:ill}, ja {t2} on aivan sen takana.
+ex.skewer.b1.3 = {my} käy {t1:gen} kimppuun. Sen täytyy väistää, ja sitten {t2} kaatuu.
+ex.skewer.b2 = Varras: {my} uhkaa {t1:part}, ja {t2} on sen takana.
+ex.skewer.b2.2 = {t1} ja {t2} ovat {my:gen} linjalla. Kun ensimmäinen väistää, lyön toisen.
+ex.skewer.b2.3 = Varovasti: {t1} ja {t2} ovat samalla linjalla. {my} voi saada ne vartaaseen.
+ex.skewer.b3 = {reply} on varras: se iskee {t1:ill} ja {t2:ill}.
+ex.skewer.b3.2 = Siirron {reply} jälkeen {t1:gen} täytyy väistää, ja {t2} kaatuu.
+ex.skewer.b3.3 = {move} sallii vartaan {reply} {t1:gen} ja {t2:gen} läpi.
+ex.skewer.b4 = {reply} on varras {t1:gen} läpi; sen takana oleva {t2} menetetään.
+ex.skewer.b4.2 = Siirron {move} jälkeen {t1} ja {t2} ovat samalla linjalla: {reply}.
+ex.skewer.b4.3 = Siirron {reply} jälkeen {t1} väistää ja {t2} kaatuu.
+ex.skewer.b5 = {reply} on varras {t1:gen} ja {t2:gen} läpi.
+ex.skewer.b5.2 = {move} sallii vartaan {reply} {t1:gen} läpi {t2:ill}.
+ex.skewer.b6 = {reply} on varras.
+ex.skewer.b6.2 = {reply}, varras.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+# "Pinned to the king" = "kiinnitetty kuninkaaseen" ({t1:ill}).
+ex.pin.b1 = {my} voi mennä ruutuun {sq}. Silloin {your} on jumissa {t1:gen} edessä.
+ex.pin.b1.2 = Varo {my:part} ruudussa {sq}: {your} jää jumiin {t1:gen} eteen.
+ex.pin.b1.3 = {my} voi kiinnittää {your:acc} {t1:ill}. Sitten voitan sen.
+ex.pin.b2 = Kiinnitys: {your} on jumissa {t1:gen} edessä.
+ex.pin.b2.2 = {your} on kiinnitetty {t1:ill}. Sitten voin voittaa sen.
+ex.pin.b2.3 = Nyt {your} on jumissa {t1:gen} edessä. Se on kiinnitys.
+ex.pin.b3 = {your} kiinnitetään {t1:ill}, ja voitan sen.
+ex.pin.b3.2 = Tämän jälkeen {your} on kiinnitetty {t1:ill}.
+ex.pin.b3.3 = {your:gen} kiinnitys maksaa materiaalia: {t1} on sen takana.
+ex.pin.b4 = {reply} kiinnittää ja voittaa materiaalia.
+ex.pin.b4.2 = {move} johtaa kiinnitykseen {reply}.
+ex.pin.b4.3 = Siirron {reply} jälkeen kiinnitetty nappula kaatuu.
+ex.pin.b5 = {move} sallii kiinnityksen {reply}.
+ex.pin.b5.2 = {reply} kiinnittää, ja nappula menetetään.
+ex.pin.b6 = {reply} kiinnittää.
+ex.pin.b6.2 = {reply}, kiinnitys.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} on kiinnitetty, joten se ei voi suojata ruutua {sq}. {t1} on sen takana.
+ex.pin_defender.b1.2 = Katso: {your} ei oikeasti pysty puolustamaan ruutua {sq}, koska {t1} on sen takana.
+ex.pin_defender.b2 = {your} on kiinnitetty {t1:ill}, joten ruudulla {sq} ei ole todellista puolustajaa.
+ex.pin_defender.b2.2 = Kiinnitetty nappula on huono puolustaja. {your} ei voi suojata ruutua {sq}: {t1} on sen takana.
+ex.pin_defender.b3 = {your} on kiinnitetty {t1:ill}; se ei oikeasti puolusta ruutua {sq}.
+ex.pin_defender.b3.2 = Ruutu {sq} näyttää puolustetulta, mutta {your} on kiinnitettynä {t1:gen} edessä.
+ex.pin_defender.b4 = {your} on kiinnitetty, joten ruutu {sq} ei ole oikeasti puolustettu.
+ex.pin_defender.b4.2 = Kiinnitetty {your} ei voi suojata ruutua {sq}.
+ex.pin_defender.b5 = {your} on kiinnitetty; ruutu {sq} on suojaton.
+ex.pin_defender.b5.2 = Ruutu {sq} ei pidä: {your} on kiinnitetty.
+ex.pin_defender.b6 = {your} on kiinnitetty; ruutu {sq} ei pidä.
+ex.pin_defender.b6.2 = Kiinnitetty {your}, suojaton ruutu {sq}.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} on ansassa. Jokainen ruutu, johon se voi mennä, on uhattuna.
+ex.trapped.b1.2 = Katso {your:part}: sillä ei ole turvallista ruutua, johon paeta.
+ex.trapped.b1.3 = {your} on jumissa. Voin hyökätä sen kimppuun, eikä se pääse pakoon.
+ex.trapped.b2 = {your:ade} ei ole turvallisia ruutuja. Voin voittaa sen.
+ex.trapped.b2.2 = {your} on ansassa: minne tahansa se menee, lyön sen.
+ex.trapped.b2.3 = Varovasti, {your:abl} loppuvat ruudut.
+ex.trapped.b3 = {your} jää ansaan: turvallisia ruutuja ei ole jäljellä.
+ex.trapped.b3.2 = Tämän jälkeen {your} on ansassa ja menetetty.
+ex.trapped.b3.3 = {your} on kävellyt ansaan: se ei pääse pois.
+ex.trapped.b4 = {move} jättää {your:acc} ansaan.
+ex.trapped.b4.2 = {your:ade} ei ole perääntymistietä; voitan sen.
+ex.trapped.b4.3 = Siirron {reply} jälkeen {your} on ansassa.
+ex.trapped.b5 = {your} jää ansaan: {line}.
+ex.trapped.b5.2 = {move} jättää {your:acc} umpikujaan.
+ex.trapped.b6 = {your} on ansassa.
+ex.trapped.b6.2 = {line} vangitsee {your:acc}.
+ex.trapped.tip.b1 = Ennen kuin siirrät nappulaa, tarkista, että se pääsee myös takaisin.
+ex.trapped.tip.b1.2 = Syvällä minun puolellani nappulat voivat jäädä jumiin. Pidä pakotie auki.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} on jumissa omien sotilaidensa takana. {my} voi antaa sille shakin takarivillä.
+ex.back_rank.b1.2 = Varovasti: {your:ade} ei ole pakoruutua, ja {my} pääsee ruutuun {sq}.
+ex.back_rank.b1.3 = {my} voi mennä ruutuun {sq}. {your} on omien sotilaidensa vankina.
+ex.back_rank.b2 = Takarivin vaara: {your:ade} ei ole pakoruutua. {my} voi shakata ruudusta {sq}.
+ex.back_rank.b2.2 = {your} on suljettu sisään. {my} menee ruutuun {sq} ja voittaa materiaalia.
+ex.back_rank.b2.3 = Takarivisi on heikko: {my} voi shakata {your:part} ruudusta {sq}.
+ex.back_rank.b3 = Takarivisi on heikko: {line}. {your:ade} ei ole pakoruutua.
+ex.back_rank.b3.2 = {your:ade} ei ole pakoruutua, joten {line} voittaa materiaalia.
+ex.back_rank.b3.3 = Jatkon {line} jälkeen takarivi ratkaisee: {your} on saarrettu.
+ex.back_rank.b4 = Takarivi: {line}, eikä {your:ade} ole pakoruutua.
+ex.back_rank.b4.2 = {line} hyödyntää heikkoa takariviä {your:gen} ympärillä.
+ex.back_rank.b4.3 = {your:abl} puuttuu pakoruutu: {line}.
+ex.back_rank.b5 = Takarivin heikkous {your:gen} ympärillä: {line}.
+ex.back_rank.b5.2 = {line}; {your:ade} ei ole pakoruutua.
+ex.back_rank.b6 = {line}, takarivi; {your} on saarrettu.
+ex.back_rank.b6.2 = Takarivi: {line} ({your}).
+ex.back_rank.tip.b1 = Anna kuninkaallesi pieni ikkuna: siirrä yhtä sen edessä olevaa sotilasta.
+ex.back_rank.tip.b1.2 = Kolmen sotilaan takana oleva kuningas voi joutua mattiin takarivillä. Tee sille vähän tilaa.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} on ruudussa {sq} ilman suojaa. {my} voi lyödä sen ilmaiseksi.
+ex.hanging.b1.2 = Katso {your:part}: mikään ei puolusta sitä, ja {my} uhkaa sitä.
+ex.hanging.b1.3 = {your} ei ole suojattu. {my} voi yksinkertaisesti lyödä sen.
+ex.hanging.b2 = {your} on ruudussa {sq} suojaton. {my} lyö sen, etkä voi lyödä takaisin.
+ex.hanging.b2.2 = {my} voi lyödä {your:acc} ilmaiseksi. Mikään ei suojaa sitä.
+ex.hanging.b2.3 = {your} jää yksin ruutuun {sq}, ja {my} lyö sen.
+ex.hanging.b3 = {move} jättää {your:acc} suojattomaksi: {reply}, eikä mikään lyö takaisin.
+ex.hanging.b3.2 = {reply} lyö suojattoman {your:acc} ruudussa {sq}.
+ex.hanging.b3.3 = Siirron {reply} jälkeen {your} on menetetty korvauksetta.
+ex.hanging.b4 = {move} jättää {your:acc} suojattomaksi: {reply} voittaa {pts:point_acc}.
+ex.hanging.b4.2 = {reply} nappaa {your:acc} ilmaiseksi.
+ex.hanging.b4.3 = {your} on suojaton; {reply} lyö sen.
+ex.hanging.b5 = {move} jättää {your:acc} irralliseksi; {reply} voittaa sen.
+ex.hanging.b5.2 = {reply} voittaa {your:acc} ruudussa {sq}.
+ex.hanging.b5.3 = {reply} voittaa {your:acc}.
+ex.hanging.b6 = {move}? {reply}, ja {your} kaatuu.
+ex.hanging.b6.2 = {reply} voittaa {your:acc}.
+ex.hanging.b6.3 = {your} on suojaton: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} suojasi {your:part}. Nyt {my} voi lyödä sen.
+ex.hanging_guard.b1.2 = {your2} siirtyi pois, ja nyt {your} on yksin. {my} lyö sen.
+ex.hanging_guard.b2 = {your2} suojasi aiemmin {your:part}. Nyt se on yksin, ja {my} lyö sen.
+ex.hanging_guard.b2.2 = Kun siirsit {your2:acc} pois, jätit {your:acc} suojatta {my:gen} lyötäväksi.
+ex.hanging_guard.b3 = {your2} vartioi {your:part}. Kun siirrät sen, {reply} lyö {your:acc}.
+ex.hanging_guard.b3.2 = Ilman {your2:part} {your} on suojaton: {reply}.
+ex.hanging_guard.b4 = {move} poistaa suojan: {your2} jätti {your:acc}, ja {reply} nappaa sen.
+ex.hanging_guard.b4.2 = {your2} oli {your:gen} ainoa puolustaja; {reply} voittaa sen.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} uhkasi jo {your:part}. Tarkista aina, mitä siirtoni uhkaa.
+ex.hanging_threat.b1.2 = Et huomannut uhkaani: {my} hyökkää {your:gen} kimppuun.
+ex.hanging_threat.b2 = Edellisellä siirrollani uhkasin {your:part} {my:ade}. Katso aina, mitä uhkaan.
+ex.hanging_threat.b2.2 = {my} uhkasi {your:part}, ja nyt voin lyödä sen.
+ex.hanging_threat.b3 = Uhkani jäi sinulta huomaamatta: {my} uhkasi {your:part}.
+ex.hanging_threat.b3.2 = {my} tähtäsi {your:ill} koko ajan.
+ex.hanging.tip.b1 = Kysy itseltäsi ennen jokaista siirtoa: ovatko kaikki nappulani turvassa?
+ex.hanging.tip.b1.2 = Hyvä tapa: tarkista jokaisen siirron jälkeen, mitkä nappulasi ovat suojattuja.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. "Worth 5" = "{n:point_gen} arvoinen" ("viiden pisteen arvoinen").
+ex.exchange_capture.b1 = {your} löi, mutta {my} lyö takaisin. Vaihdossa menetät pisteitä.
+ex.exchange_capture.b1.2 = {my} lyö takaisin. {your} on {n:point_gen} arvoinen, mutta sait vain {n2:point_acc}.
+ex.exchange_capture.b1.3 = Varovasti: {my} voi lyödä takaisin ja viedä {your:acc}. Se on huono vaihto.
+ex.exchange_capture.b2 = Varovasti vaihtojen kanssa: {your} on {n:point_gen} arvoinen. {my} lyö takaisin, ja sait vain {n2:point_acc}.
+ex.exchange_capture.b2.2 = {my} lyö takaisin ja vie {your:acc}. Menetät {n:point_acc} ja voitat vain {n2:point_acc}.
+ex.exchange_capture.b3 = Lyönti ruutuun {sq} ei toimi: jatkon {line} jälkeen {your} on menetetty.
+ex.exchange_capture.b3.2 = {your} lyö ruutuun {sq}, mutta jatkon {line} jälkeen olet menettänyt {pts:point_acc}.
+ex.exchange_capture.b4 = {move} on laskuvirhe ruudussa {sq}: {line}, ja {your} on menetetty.
+ex.exchange_capture.b4.2 = Lyönti ruutuun {sq} maksaa {your:acc}: {line}.
+ex.exchange_capture.b5 = {move} menettää {your:acc} vaihdoissa ruudussa {sq}: {line}.
+ex.exchange_capture.b5.2 = Ruudussa {sq} {your} menetetään: {line}.
+ex.exchange_capture.b6 = {move} menettää {your:acc} ruudussa {sq} jatkolla {line}.
+ex.exchange_capture.b6.2 = Ruudussa {sq}: {line}, ja {your} on mennyttä.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+# Counted with {n:piece} ("kolme nappulaa") or {n:time} ("kolme kertaa"), never a bare number before
+# a noun ("1 hyökkääjää" would be wrong).
+ex.exchange_count.b1 = Laske: hyökkään ruutuun {sq} {n:time}, sinä puolustat sitä {n2:time}.
+ex.exchange_count.b1.2 = Ruutuun {sq} minulla on {n:piece} hyökkäämässä ja sinulla {n2:piece} puolustamassa. Voitan sen.
+ex.exchange_count.b2 = Ruutuun {sq} hyökätään {n:time} ja sitä puolustetaan {n2:time}. Menetät siinä materiaalia.
+ex.exchange_count.b2.2 = Laske ruutu {sq}: {n:piece} hyökkää, {n2:piece} puolustaa.
+ex.exchange_count.b3 = Laske ruudun {sq} hyökkääjät ja puolustajat: minulla on enemmän.
+ex.exchange_count.b3.2 = Vaihto ruudussa {sq} ei toimi: jatkon {line} jälkeen olet menettänyt {pts:point_acc}.
+ex.exchange_count.b4 = {move} on laskuvirhe ruudussa {sq}: {line}, ja olet menettänyt {pts:point_acc}.
+ex.exchange_count.b4.2 = Ruutuun {sq} hyökätään useammin kuin sitä puolustetaan: {line}.
+ex.exchange_count.b5 = Ruudussa {sq} hyökkääjät voittavat, {n} vastaan {n2}: {line}.
+ex.exchange_count.b5.2 = {move} jää ruudussa {sq} alakynteen.
+ex.exchange_count.b6 = Ruudussa {sq}: {line}, ja olen voittanut {pts:point_acc}.
+ex.exchange_count.b6.2 = Ruutu {sq}: {n} vastaan {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} on vähemmän arvokas kuin {your}. Jos lyön, menetät pisteitä.
+ex.exchange_cheap.b1.2 = {my} uhkaa {your:part}. Niiden vaihto on sinulle huono.
+ex.exchange_cheap.b2 = {your} on {n:point_gen} arvoinen, {my} vain {n2:point_gen}. Se vaihto tulee sinulle kalliiksi.
+ex.exchange_cheap.b2.2 = {my} on halvempi kuin {your}, joten hyökkäys voittaa materiaalia.
+ex.exchange_cheap.b3 = Halvempi nappula uhkaa {your:part} ruudussa {sq}.
+ex.exchange_cheap.b3.2 = {n2:point_gen} arvoinen nappula uhkaa {your:part} ruudussa {sq}: {line}.
+ex.exchange_cheap.b4 = Halvempi nappula uhkaa {your:part} ruudussa {sq}; {reply} voittaa materiaalia.
+ex.exchange_cheap.b4.2 = {reply} iskee halvemmalla nappulalla {your:ill} ruudussa {sq}.
+ex.exchange_cheap.b5 = {your} on ruudussa {sq} halvemman hyökkääjän armoilla: {line}.
+ex.exchange_cheap.b5.2 = {reply} voittaa materiaalia ruudussa {sq} {your:part} vastaan.
+ex.exchange_cheap.b6 = {reply} voittaa {your:acc} ruudussa {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} menetetään ruudussa {sq}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Varovasti: nyt voin voittaa {t1:acc}.
+ex.material.b1.2 = Tuo siirto jättää {t1:acc} pulaan. Voin voittaa sen.
+ex.material.b2 = Tämän siirron jälkeen voin voittaa {t1:acc}.
+ex.material.b2.2 = Nyt {t1} joutuu pulaan, ja voitan sen.
+ex.material.b3 = {move} maksaa materiaalia: jatkon {line} jälkeen olet menettänyt {pts:point_acc}.
+ex.material.b3.2 = Jatkon {line} jälkeen olet {pts:point_ade} tappiolla.
+ex.material.b4 = {move} maksaa materiaalia: {line}, ja olet menettänyt {pts:point_acc}.
+ex.material.b4.2 = Jatkon {line} jälkeen olet {pts:point_ade} tappiolla.
+ex.material.b5 = {move} menettää materiaalia: {line}.
+ex.material.b5.2 = {line} voittaa minulle {pts:point_acc}.
+ex.material.b6 = {line}, ja olen voittanut {pts:point_acc}.
+ex.material.b6.2 = {move} menettää {pts:point_acc}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Huomasitko? {my} oli ruudussa {sq} vapaasti lyötävissä. {your} olisi voinut lyödä sen.
+ex.missed_capture.b1.2 = Katso: {my:ade} ei ollut puolustajaa. {your} olisi voinut lyödä sen.
+ex.missed_capture.b1.3 = {my} oli ruudussa {sq} ilman suojaa. {your} olisi voinut napata sen!
+ex.missed_capture.b2 = Ilmainen lyönti jäi käyttämättä: {best} voittaa {my:acc}.
+ex.missed_capture.b2.2 = {my} oli ruudussa {sq} suojaton. {best} lyö sen. Nappaa se ensi kerralla!
+ex.missed_capture.b2.3 = {best} olisi voittanut {my:acc} ilmaiseksi.
+ex.missed_capture.b3 = {best} olisi voittanut {my:acc} korvauksetta.
+ex.missed_capture.b3.2 = {my} oli ruudussa {sq} suojaton: {best}. Etsi suojattomia nappuloita joka siirrolla.
+ex.missed_capture.b3.3 = Olisit voinut lyödä {my:acc} siirrolla {best}.
+ex.missed_capture.b4 = Jäi huomaamatta: {best} nappaa {my:acc} ruudussa {sq}.
+ex.missed_capture.b4.2 = {best} voittaa {my:acc}, joka oli suojaton.
+ex.missed_capture.b4.3 = {my} oli suojaton: {best}.
+ex.missed_capture.b5 = {best} voittaa {my:acc}; {move} päästää sen pakoon.
+ex.missed_capture.b5.2 = {my} oli ruudussa {sq} irrallinen: {best}.
+ex.missed_capture.b6 = {best}! {my} oli ruudussa {sq} suojaton.
+ex.missed_capture.b6.2 = {best} olisi voittanut {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Sinulla oli kaksoisuhka: {best} uhkaa {t1:part} ja {t2:part}!
+ex.missed_fork.b1.2 = Katso! {best} iskisi yhtä aikaa {t1:ill} ja {t2:ill}.
+ex.missed_fork.b1.3 = {best} oli haarukka: {t1} ja {t2} olisivat molemmat uhattuina.
+ex.missed_fork.b2 = {best} oli haarukka: {t1} ja {t2}.
+ex.missed_fork.b2.2 = Kaksoisuhka jäi huomaamatta: {best} iskee {t1:ill} ja {t2:ill}.
+ex.missed_fork.b2.3 = {best} uhkaa yhtä aikaa {t1:part} ja {t2:part}. Haarukka!
+ex.missed_fork.b3 = {best} oli haarukka: {t1} ja {t2}.
+ex.missed_fork.b3.2 = Sinulla oli tarjolla {best}, joka haarukoi {t1:part} ja {t2:part}.
+ex.missed_fork.b3.3 = {best} olisi haarukoinut {t1:part} ja {t2:part}.
+ex.missed_fork.b4 = {best} olisi haarukoinut {t1:part} ja {t2:part}.
+ex.missed_fork.b4.2 = Ohitettu haarukka: {best} {t1:part} ja {t2:part} vastaan.
+ex.missed_fork.b5 = {best} olisi haarukoinut {t1:part} ja {t2:part}.
+ex.missed_fork.b5.2 = {best} olisi iskenyt {t1:ill} ja {t2:ill}.
+ex.missed_fork.b6 = {best} olisi haarukoinut {t1:part} ja {t2:part}.
+ex.missed_fork.b6.2 = {best}: haarukka {t1:part} ja {t2:part} vastaan.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# "Outside the square" = "neliön ulkopuolella" (the rule of the square, neliösääntö), said of the king.
+ex.promotion.b1 = {my} voi juosta ruutuun {sq} ja korottua kuningattareksi. {your} on liian kaukana.
+ex.promotion.b1.2 = Katso: mikään ei estä {my:part} pääsemästä ruutuun {sq}. {your} ei saa sitä kiinni.
+ex.promotion.b1.3 = {my} on {n:square_gen} päässä korotusruudusta {sq}, ja {your} on liian hidas.
+ex.promotion.b2 = {my} juoksee ruutuun {sq}, eikä {your} saa sitä kiinni.
+ex.promotion.b2.2 = {my} tarvitsee {n:move_acc} päästäkseen ruutuun {sq}; {your} tarvitsee {n2:move_acc}. Liian hidas.
+ex.promotion.b2.3 = Varovasti: {my} korottuu ruudussa {sq}, ja {your} on liian kaukana.
+ex.promotion.b3 = {your} on neliön ulkopuolella: se ei saa {my:part} kiinni ennen ruutua {sq}.
+ex.promotion.b3.2 = Kilpajuoksu on hävitty: {my} ehtii ruutuun {sq} ennen {your:part}.
+ex.promotion.b4 = {your} on sotilaan neliön ulkopuolella; sotilas korottuu ruudussa {sq}.
+ex.promotion.b4.2 = {my} korottuu ruudussa {sq}; {your} on tempon myöhässä.
+ex.promotion.b5 = Kilpajuoksu on hävitty: {your} on neliön ulkopuolella, korotusruutu on {sq}.
+ex.promotion.b5.2 = {line}: saan kuningattaren ruudussa {sq}, ja {your} on myöhässä.
+ex.promotion.b6 = {your} on neliön ulkopuolella; sotilaani korottuu ruudussa {sq}.
+ex.promotion.b6.2 = {line}, korotus ruudussa {sq} ({your} myöhässä).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Sotilaasi olisi voinut juosta ruutuun {sq} ja korottua kuningattareksi!
+ex.promotion_missed.b1.2 = Katso ruutua {sq}! Sotilaasi olisi voinut kiitää sinne.
+ex.promotion_missed.b2 = Sotilaasi olisi voinut juosta ruutuun {sq}. Työnnä vapaasotilaita eteenpäin!
+ex.promotion_missed.b2.2 = Mikään ei estänyt sotilastasi matkalla ruutuun {sq}.
+ex.promotion_missed.b3 = {best} voittaa kilpajuoksun ruutuun {sq}.
+ex.promotion_missed.b3.2 = Sotilaasi oli nopeampi: {best}, ja se korottuu ruudussa {sq}.
+ex.promotion_missed.b4 = {best} voittaa sotilaiden kilpajuoksun ruutuun {sq}.
+ex.promotion_missed.b4.2 = {best}! Sotilas korottuu ruudussa {sq}.
+ex.promotion_missed.b5 = {best}: sotilaasi korottuu ensimmäisenä ruudussa {sq}.
+ex.promotion_missed.b5.2 = {best}, ja ruutu {sq} on sinun.
+ex.promotion_missed.b6 = {best} voittaa kilpajuoksun ruutuun {sq}.
+ex.promotion_missed.b6.2 = {best}; ensin ruutuun {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Tuo sotilas suojasi {your:part}. Nyt {your:ade} on vähemmän suojaa.
+ex.king_shield.b1.2 = Ruudussa {sq} ollut sotilas oli {your:gen} kilpi. Nyt nappulani pääsevät sisään.
+ex.king_shield.b2 = Sotilaan siirto ruudusta {sq} heikentää {your:gen} suojaa. Nappulani voivat nyt hyökätä sen kimppuun.
+ex.king_shield.b2.2 = {your} menetti suojan: ruudussa {sq} ollut sotilas oli sen kilpi.
+ex.king_shield.b3 = Tuo sotilassiirto altistaa {your:acc} hyökkäykselleni.
+ex.king_shield.b3.2 = {your} menettää sotilassuojansa, ja nappulani tulevat sisään.
+ex.king_shield.b4 = {move} heikentää sotilasrakennetta {your:gen} ympärillä; hyökkäykseni pääsee läpi.
+ex.king_shield.b4.2 = Siirron {move} jälkeen {your:gen} suojamuuri on murtunut.
+ex.king_shield.b5 = {move} heikentää {your:gen} suojaa: {line}.
+ex.king_shield.b5.2 = Siirron {move} jälkeen {your} on alttiina: {line}.
+ex.king_shield.b6 = {move} heikentää {your:gen} asemaa: {line}.
+ex.king_shield.b6.2 = {line}; {your} on liian paljaana.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} on vaarassa. Nappulani tulevat sen kimppuun.
+ex.king_exposed.b1.2 = Katso, miten paljaana {your} on. Pidä se turvassa sotilaiden takana.
+ex.king_exposed.b2 = {your} on liian paljaana. Voin nyt antaa monta shakkia.
+ex.king_exposed.b2.2 = Varovasti: {your:ade} ei ole suojaa, ja nappulani hyökkäävät sen kimppuun.
+ex.king_exposed.b3 = {your} on alttiina; nappulani voivat hyökätä sen kimppuun shakeilla.
+ex.king_exposed.b3.2 = Tämän jälkeen {your:ade} ei ole suojaa.
+ex.king_exposed.b4 = {your} jää alttiiksi: {line}.
+ex.king_exposed.b4.2 = {move} jättää {your:acc} alttiiksi hyökkäykselle.
+ex.king_exposed.b5 = {your} on liian alttiina: {line}.
+ex.king_exposed.b5.2 = {move} jättää {your:acc} paljaaksi.
+ex.king_exposed.b6 = {line}; {your} on alttiina.
+ex.king_exposed.b6.2 = {your} on liian paljaana: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Tämä vaihto johtaa sotilasloppupeliin, jonka voitan.
+ex.bad_trade.b3.2 = Jatkon {line} jälkeen jäljellä on vain sotilaita, ja kuninkaani on paremmassa asemassa.
+ex.bad_trade.b4 = Vaihdot johtavat hävittyyn sotilasloppupeliin: {line}.
+ex.bad_trade.b4.2 = Vaihto tähän sotilasloppupeliin häviää.
+ex.bad_trade.b5 = Väärä vaihto: sotilasloppupeli jatkon {line} jälkeen on hävitty.
+ex.bad_trade.b5.2 = Sotilasloppupeli on hävitty; pidä upseerit laudalla.
+ex.bad_trade.b6 = Sotilasloppupeli jatkon {line} jälkeen on hävitty.
+ex.bad_trade.b6.2 = Hävitty sotilasloppupeli: {line}.
+ex.bishop_pair.b5 = Tuo vaihto maksaa sinulle lähettiparin.
+ex.bishop_pair.b5.2 = Tuossa vaihdossa luovut lähettiparistasi; minun lähettiparini säilyy.
+ex.bishop_pair.b6 = Lähettipari menee.
+ex.bishop_pair.b6.2 = Lähettipari annettu pois.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} ottaa opposition: kuninkaat ovat vastakkain, ja niiden välissä on yksi ruutu.
+ex.opposition.b3.2 = Kuninkaat! {best} olisi ottanut opposition.
+ex.opposition.b4 = {best} ottaa opposition: se on avain.
+ex.opposition.b4.2 = Oppositio ratkaisee: {best}.
+ex.opposition.b5 = {best}, joka ottaa opposition.
+ex.opposition.b5.2 = Oppositio: {best}.
+ex.opposition.b6 = {best}, oppositio.
+ex.opposition.b6.2 = {best}: oppositio.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Sotilaasi voisi juosta ruutuun {sq}. Vapaasotilaat haluavat edetä!
+ex.push_passed.b1.2 = Työnnä vapaata sotilastasi! Se haluaa päästä ruutuun {sq}.
+ex.push_passed.b1.3 = Vapaasotilaasi haluaa marssia ruutuun {sq}. Työnnä sitä!
+ex.push_passed.b2 = {best}: työnnä vapaasotilasta kohti ruutua {sq}.
+ex.push_passed.b2.2 = Vapaasotilaasi on vahva. {best} työntää sitä eteenpäin.
+ex.push_passed.b2.3 = Työnnä sitä! {best} vie sotilasta lähemmäs ruutua {sq}.
+ex.push_passed.b3 = {best} työntää vapaasotilasta.
+ex.push_passed.b3.2 = Vapaasotilaita pitää työntää: {best}.
+ex.push_passed.b3.3 = {best} oli oikea tie: sotilas juoksee ruutuun {sq}.
+ex.push_passed.b4 = {best}: vapaasotilas ratkaisee.
+ex.push_passed.b4.2 = Eteenpäin: {best}.
+ex.push_passed.b5 = {best} työntää vapaasotilasta: {eval}.
+ex.push_passed.b5.2 = Vapaasotilas: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, vapaasotilas.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Tuo {your:acc} eteenpäin! Loppupelissä kuningas on vahva nappula.
+ex.king_active.b1.2 = Nyt {your} voi liittyä taisteluun. Kävelytä se keskelle.
+ex.king_active.b1.3 = Kun nappuloita on vähän jäljellä, {your:gen} kannattaa tulla esiin auttamaan.
+ex.king_active.b2 = Käytä loppupelissä {your:part}: tuo se keskustaan.
+ex.king_active.b2.2 = {your:gen} pitäisi nyt olla aktiivinen. Marssita se eteenpäin.
+ex.king_active.b3 = {best} aktivoi kuninkaan. Loppupeleissä kuningas taistelee.
+ex.king_active.b3.2 = {best}: kuninkaan paikka on nyt keskustassa.
+ex.king_active.b4 = {best} keskittää kuninkaan.
+ex.king_active.b4.2 = Kuninkaan pitää tulla eteenpäin: {best}.
+ex.king_active.b5 = {best} aktivoi kuninkaan: {line}.
+ex.king_active.b5.2 = Kuninkaan aktiivisuus: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, kuningas eteenpäin.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} säilyttää paremman aseman.
+ex.positional.b4.2 = {best} oli tässä vahvempi.
+ex.positional.b4.3 = Olisin valinnut mieluummin siirron {best}.
+ex.positional.b5 = {best} oli vahvempi: {line}.
+ex.positional.b5.2 = {best}, ideana {line}.
+ex.positional.b5.3 = Harkitse siirtoa {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} tuli peliin hyvin aikaisin. Kehitä ensin ratsusi ja lähettisi.
+tip.early_queen.b1.2 = Varovasti {your:gen} kanssa näin aikaisin: nappulani voivat ajaa sitä takaa ympäri lautaa.
+tip.early_queen.b1.3 = {your:gen} siirtely on hauskaa, mutta kehitä ensin kevyet upseerit.
+tip.early_queen.b2 = Kun siirrät {your:part} näin aikaisin, voin hyökätä sen kimppuun ja voittaa aikaa.
+tip.early_queen.b2.2 = {your} jo liikkeellä? Ensin ratsut ja lähetit!
+tip.early_queen.b3 = Kun {your} tulee esiin näin aikaisin, saan sitä vastaan tempoja.
+tip.early_queen.b3.2 = {your:part} on helppo ajaa takaa näin aikaisin. Kehitä ensin.
+tip.queen_grab.b1 = {your} löi kaukana olevan sotilaan, ja nyt se voi joutua pulaan.
+tip.queen_grab.b1.2 = Sotilaiden nappaaminen {your:ade} vie aikaa. Kehitä ensin!
+tip.queen_grab.b2 = {your} lähti sivustalle nappaamaan sotilaita. Se vie paljon aikaa.
+tip.queen_grab.b2.2 = Varo lähettämästä {your:part} kaukaisten sotilaiden perään.
+tip.queen_grab.b3 = Sotilaiden nappailu {your:ade} näin aikaisin maksaa aikaa.
+tip.queen_grab.b3.2 = {your} on nyt kaukana kotoa; kehitysetuni pääsee oikeuksiinsa.
+tip.queen_grab.b4 = {your} nappaa sotilaan mutta menettää liikaa aikaa.
+tip.queen_grab.b4.2 = Sotilaan nappaaminen sivussa {your:ade} maksaa tempoja.
+tip.same_piece.b1 = Siirsit {your:part} kahdesti. Yritä tuoda joka siirrolla uusi nappula peliin.
+tip.same_piece.b1.2 = Taas {your}? Tuo muutkin nappulasi peliin.
+tip.same_piece.b1.3 = Yritä kehittää joka siirrolla uusi nappula, eikä taas {your:part}.
+tip.same_piece.b2 = {your:gen} siirtäminen kahdesti avauksessa maksaa aikaa.
+tip.same_piece.b2.2 = {your} liikkui taas; muut nappulasi ovat yhä kotona.
+tip.same_piece.b3 = {your:gen} siirtäminen kahdesti hidastaa kehitystä.
+tip.same_piece.b3.2 = Taas siirto {your:ade}; muu armeijasi odottaa.
+tip.castle.b1 = {your} on yhä keskellä. Linnoittautuminen pitäisi sen turvassa.
+tip.castle.b1.2 = Aika linnoittautua! Nurkassa {your} on paremmassa turvassa.
+tip.castle.b1.3 = Mieti pian linnoittautumista. {your} on avoimella paikalla.
+tip.castle.b2 = {your} on yhä keskustassa. Linnoittaudu pian!
+tip.castle.b2.2 = Linnoittautuminen veisi {your:acc} turvaan.
+tip.castle.b3 = Keskustan avautuessa {your} kannattaa viedä turvaan linnoittautumalla.
+tip.castle.b3.2 = {your} on yhä keskustassa; olisi jo ollut aika linnoittautua.
+# "A knight on the rim is dim": a Finnish rhyme of the same kind, "Laitaratsu on laiska ratsu".
+tip.knight_rim.b1 = Laidalla {your} ei tee paljon. Ratsut viihtyvät keskellä.
+tip.knight_rim.b1.2 = Laitaratsu on laiska ratsu! Siellä {your} hallitsee vähemmän ruutuja.
+tip.knight_rim.b2 = Laidalla {your} hallitsee vain vähän ruutuja. Tähtää keskustaan.
+tip.knight_rim.b2.2 = Laitaratsu on laiska ratsu: {your} kaipaa keskustaan.
+tip.knight_rim.b3 = {your} on syrjässä laidalla.
+tip.knight_rim.b3.2 = Laita on huono paikka {your:all}.
+tip.flank.b1 = Yritä siirtää ensin keskustan sotilaita. Laitasotilaat eivät auta paljon.
+tip.flank.b1.2 = Sivustan sotilaat eivät auta nappuloitasi pääsemään peliin. Käytä keskimmäisiä.
+tip.flank.b2 = Laitasotilaiden siirrot eivät kehitä mitään. Käytä keskustan sotilaita.
+tip.flank.b2.2 = Liikaa sotilassiirtoja sivustoilla. Kehitä upseerisi!
+tip.flank.b3 = Sivustan sotilassiirrot avauksessa hidastavat kehitystä.
+tip.flank.b3.2 = Laitasotilaat voivat odottaa; kehitä ja taistele keskustasta.
+tip.centre.b1 = Yritä hallita laudan keskustaa, esimerkiksi ruutua {sq}.
+tip.centre.b1.2 = Keskusta on tärkeä. Laita sotilas tai upseeri ruudun {sq} lähelle.
+tip.centre.b1.3 = Keskellä olevat nappulat ovat vahvoja. Tähtää sellaisiin ruutuihin kuin {sq}.
+tip.centre.b2 = Taistele keskustasta: sellaiset ruudut kuin {sq} ovat tärkeitä.
+tip.centre.b2.2 = Annat minulle keskustan. Katso ruutua {sq}.
+tip.centre.b3 = Et kilpaile keskustasta; ruutu {sq} on minun.
+tip.centre.b3.2 = Haasta keskusta ruudun {sq} ympärillä.
+# Endgame technique tips.
+tip.mate_technique.b1 = Kun jäljellä on yksinäinen kuningas, aja se laidalle ja tee sitten matti.
+tip.mate_technique.b1.2 = Vinkki: ahdista kuningastani kohti laitaa. Pidä myös oma kuninkaasi lähellä.
+tip.fifty.b1 = Varovasti: jos viiteenkymmeneen siirtoon ei tule lyöntiä eikä sotilassiirtoa, peli päättyy tasapeliin.
+tip.fifty.b1.2 = Aika käy vähiin: viisikymmentä siirtoa ilman lyöntejä tai sotilassiirtoja on tasapeli.
+tip.repetition.b1 = Varovasti! Jos sama asema toistuu kolmannen kerran, se on tasapeli.
+tip.repetition.b1.2 = Vältä siirtojen toistamista: kolmas toisto on tasapeli, ja olet voittamassa.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Vau, uhrasit nappulan, ja se toimii!
+praise.sacrifice.2 = Ovela uhraus! Todella hyvin pelattu.
+praise.brilliant.b3 = Loistavaa! Todellinen uhraus.
+praise.brilliant.b3.2 = Vau, {move} on hieno uhraus!
+praise.brilliant.b4 = {move}! Loistava uhraus.
+praise.brilliant.b4.2 = Loistavaa. En odottanut tuota.
+praise.brilliant.b5 = {move}!! Loistavaa.
+praise.brilliant.b5.spoken = {move}. Loistavaa!
+praise.brilliant.b5.2 = Loistava uhraus.
+praise.brilliant.b6 = {move}!! Erinomaista.
+praise.brilliant.b6.spoken = {move}. Erinomaista!
+praise.brilliant.b6.2 = Loistavaa.
+praise.great.b2 = Hieno siirto! Löysit keinon taistella vastaan.
+praise.great.b2.2 = Se on hieno siirto. Hyvin löydetty!
+praise.great.b3 = Hieno siirto! Löysit ainoan hyvän idean.
+praise.great.b3.2 = Erinomaista, {move} kääntää tilanteen.
+praise.great.b4 = {move}! Hieno löytö.
+praise.great.b4.2 = Hieno siirto.
+praise.great.b5 = {move}! Hyvin löydetty.
+praise.great.b5.2 = Vahva: {move}.
+praise.great.b6 = {move}! Hienoa.
+praise.great.b6.2 = Hieno löytö.
+praise.only.b2 = Hyvä! Se oli ainoa hyvä siirto.
+praise.only.b2.2 = Hienoa, löysit ainoan toimivan siirron.
+praise.only.b3 = Ainoa siirto, ja löysit sen.
+praise.only.b3.2 = Juuri niin! Mikään muu ei toiminut tässä.
+praise.only.b4 = Ainoa siirto. Hyvin tehty.
+praise.only.b4.2 = Ainoa siirto, ja se löytyi.
+praise.only.b5 = Ainoa siirto. Hyvä.
+praise.only.b5.2 = {move}, ainoa siirto.
+praise.only.b6 = Ainoa siirto.
+praise.only.b6.2 = Tarkka: ainoa siirto.
+praise.fork.b2 = Kaksoisuhka! Hienosti tehty.
+praise.fork.b2.2 = Uhkaat kahta nappulaa kerralla! Hienoa.
+praise.fork.b2.3 = Hieno! Se on haarukka.
+praise.fork.b3 = Hieno haarukka.
+praise.fork.b3.2 = Hyvä haarukka!
+praise.fork.b3.3 = Haarukka. Hyvin pelattu.
+praise.capture.b1 = Hienoa! Löit {my:acc} ilmaiseksi.
+praise.capture.b1.2 = Tarkka silmä! {my} ei ollut suojattu.
+praise.capture.b1.3 = Kyllä! Voitit {my:acc}.
+praise.capture.b2 = Hyvä lyönti! {my} oli suojaton.
+praise.capture.b2.2 = Hienoa, nappasit {my:acc}.
+praise.capture.b2.3 = Hyvin huomattu: {my} oli ilman suojaa.
+praise.best.b1 = Hyvä siirto!
+praise.best.b1.2 = Erittäin hyvä!
+praise.best.b1.3 = Hyvin pelattu!
+praise.best.b2 = Hyvä siirto.
+praise.best.b2.2 = Oikein hienoa.
+praise.best.b2.3 = Hyvin pelattu.
+praise.best.b3 = Hyvä siirto: sitä ei ollut helppo löytää.
+praise.best.b3.2 = Hienosti löydetty.
+praise.best.b3.3 = {move} on tässä paras siirto. Hyvä.
+praise.trade.b1 = Hyvä! Kun olet edellä, nappuloiden vaihtaminen auttaa sinua.
+praise.trade.b1.2 = Hieno vaihto. Olet edellä, joten vähemmät nappulat ovat sinulle eduksi.
+praise.trade.b2 = Hyvä vaihto: olet edellä, joten vaihda nappuloita.
+praise.trade.b2.2 = {my:gen} vaihtaminen on viisasta, kun olet edellä.
+praise.trade.b3 = Hyvä: vaihda, kun olet edellä.
+praise.trade.b3.2 = Järkevä vaihto.
+praise.excellent.b3 = Erinomainen siirto.
+praise.excellent.b3.2 = Se on vahva siirto.
+praise.excellent.b3.3 = Hyvin tarkka.
+praise.excellent.b4 = Tarkka.
+praise.excellent.b4.2 = Erinomaista.
+praise.excellent.b4.3 = Hyvä, {move} on tarkka.
+praise.castle.b1 = Hyvä! Linnoittauduit. Kuninkaasi on nyt turvallisemmassa paikassa.
+praise.castle.b1.2 = Hieno linnoittautuminen! Kuninkaasi on suojassa.
+praise.saved.b1 = Hyvä! Pelastit nappulasi.
+praise.saved.b1.2 = Hienoa, siirsit sen turvaan.
+praise.book.b1 = Hyvä, se on tunnettu avaussiirto.
+praise.book.b1.2 = Hienoa, noin aloittavat vahvatkin pelaajat.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Varovasti! Uhkaan mattia ruudussa {sq}.
+threat.mate.b1.2 = Varo: {my} haluaa mennä ruutuun {sq}. Se olisi matti.
+threat.mate.b1.3 = Katso ruutua {sq}. Jos pääsen sinne, se on matti!
+threat.mate.b2 = Varovasti, uhkaan mattia.
+threat.mate.b2.2 = Varo: ruudussa {sq} on mattiuhka.
+threat.mate.b2.3 = Katso tarkkaan: uhkaan mattia.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Katso: {my} uhkaa {your:part}.
+threat.piece.b1.2 = Varovasti! {your} on {my:gen} uhkaamana.
+threat.piece.b1.3 = Varo, {my} haluaa lyödä {your:acc}.
+threat.piece.b2 = Ole varovainen {your:gen} kanssa.
+threat.piece.b2.2 = {your} on uhattuna.
+threat.piece.b2.3 = Pidä silmällä {your:part}.
+threat.punish.b1 = Edellinen siirtoni oli virhe. Osaatko rangaista siitä?
+threat.punish.b1.2 = Hmm, taisin tehdä virheen. Löydätkö sen?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Ajattele tällä kertaa {your:part}.
+tb.hint.b1.2 = Pidä silmällä {your:part}.
+tb.hint.king.b1 = Mieti {your:gen} turvallisuutta.
+tb.hint.king.b1.2 = Katso ensin {your:part}. Onko se turvassa?
+tb.hint.missed.b1 = Etsi nappuloita, jotka voit lyödä ilmaiseksi.
+tb.hint.missed.b1.2 = Katso tarkkaan: voitko lyödä jotain?
+tb.hint.mate_missed.b1 = Katso kuningastani. Voitko tehdä sille matin?
+tb.hint.mate_missed.b1.2 = Kokeile ensin shakkeja. Ehkä löytyy matti!
+tb.hint.general.b1 = Ota aikaa ja katso koko lautaa.
+tb.hint.general.b1.2 = Yritä löytää turvallisempi siirto.
+# The retry.
+tb.fixed.b1 = Paljon parempi!
+tb.fixed.b1.2 = Kyllä, tuo on parempi!
+tb.fixed.b1.3 = Hyvä, tuo toimii paljon paremmin.
+tb.fixed = Tuo on parempi.
+tb.fixed.2 = Parempi.
+tb.fixed.3 = Hyvä korjaus.
+tb.same = Sama siirto uudestaan? Selvä, katsotaan.
+tb.same.2 = Pidät tuosta siirrosta. Pelataan ja katsotaan.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Kyllä! Juuri sitä siirtoa ajattelin.
+tb.found.b1.2 = Löysit sen! Se on parempi siirto.
+tb.found = Sitä siirtoa minä tarkoitin.
+tb.found.2 = Juuri niin, se on oikea.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Valitettavasti tässä pelissä ei voi enää perua siirtoja.
+tb.none_left.2 = Sinulla ei ole tässä pelissä enää perumisia jäljellä.

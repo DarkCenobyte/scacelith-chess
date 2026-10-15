@@ -1,0 +1,110 @@
+# Coach speech (Hungarian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "te" (tegezés) and speaks of himself in the 1st person. Hungarian has no
+# grammatical gender: nothing agrees with the coach or the player.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Szia! Játsszunk egy barátságos játszmát. Ha valami félresikerül, mindig segítek.
+event.greet.l1.2 = Helló! Kíméletesen játszom, és megmutatom, mire kell figyelned.
+event.greet.l1.3 = Üdvözöllek! Nyugodtan, ne siess: szólok, ha egy bábu veszélyben van.
+event.greet.l2 = Szia! Játsszunk. Ha villa vagy kötés adódik, megmutatom.
+event.greet.l2.2 = Helló! Hozd ki a tisztjeidet, és tartsd biztonságban a királyodat. Menet közben segítek.
+event.greet.l2.3 = Üdv újra a táblánál! Figyelj a villákra és a kötésekre: ezek nyerik meg a játszmákat.
+event.greet.l3 = Szia! Játsszunk egy igazi játszmát. Elmondom a véleményem a terveidről és a nagyobb hibákról.
+event.greet.l3.2 = Helló! Gondolj ki egy tervet a bábuidnak. Szólok, ha egy lépésnél elnézel valamit.
+event.greet.l3.3 = Játsszunk! Jelzem, ha csak egyetlen lépés jó, és azt is, ha egy lépés rosszul sül el.
+event.greet.l4 = Szia! Ezúttal értékelem az állást, és megmutatom a jobb jelölt lépéseket.
+event.greet.l4.2 = Játsszunk. Egy hiba után megmondom, mi lett volna pontosabb.
+event.greet.l4.3 = Készen állsz egy klubjátszmára? Megjegyzést teszek, ha változik az értékelés.
+event.greet.l5 = Játsszunk. Röviden kommentálok.
+event.greet.l5.2 = Kezdhetjük, amikor akarod. Csak rövid megjegyzések.
+event.greet.l5.3 = Sok sikert. Csak akkor szólok, ha fontos.
+event.greet.l6 = Sok sikert.
+event.greet.l6.2 = Játsszunk.
+event.greet.l6.3 = Készen állok. Csak a kritikus pillanatokat kommentálom.
+
+# Who starts (said after the greeting).
+event.colour.white = Világossal játszol, úgyhogy te kezdesz.
+event.colour.white.2 = Te vagy világos: tiéd az első lépés.
+event.colour.black = Én vagyok világos, úgyhogy én kezdek.
+event.colour.black.2 = Most sötéttel játszol: én lépek először.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names must match coach.level.<n>.name of assets/i18n/hu.lang (chosen here, as hu.lang did
+# not exist yet): Első lépések, Kezdő, Középhaladó, Klubjátékos, Erős klubjátékos, Szakértő.
+event.level.l1 = Első lépések: kíméletesen játszom, és minden hibát egyszerű szavakkal magyarázok el.
+event.level.l2 = Kezdő: kicsit erősebben játszom, és megnevezem az egyszerű taktikai fogásokat, például a villát és a kötést.
+event.level.l3 = Középhaladó: beszélek a tervekről és a gyalogszerkezetről, és rövid változatokat mutatok.
+event.level.l4 = Klubjátékos: gyalogegységben értékelem az állást, és jelölt lépéseket javaslok.
+event.level.l5 = Erős klubjátékos: rövid megjegyzések, és hosszabb változatok, ha fontos.
+event.level.l6 = Szakértő: a legjobb tudásom szerint játszom, és csak a kritikus pillanatokat kommentálom.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Te jössz.
+event.your_move.2 = Te lépsz.
+event.your_move.3 = Rajtad a sor.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Nyugodtan gondolkodj.
+event.take_time.2 = Semmi sietség: a mi játszmáinkban nincs sakkóra.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Lássuk csak.
+event.filler.3 = Hadd nézzem.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Rendben, vonjuk vissza.
+event.takeback.taken.2 = Jó ötlet. Nézd meg még egyszer.
+event.takeback.taken.3 = Vissza vele. Próbáld újra.
+# The player declined the offer and played on.
+event.takeback.declined = Rendben, folytatjuk.
+event.takeback.declined.2 = Jól van, a játszma folytatódik.
+event.takeback.declined.3 = Ahogy gondolod. Folytassuk.
+# After an explanation without an offer.
+event.play_on = Játsszunk tovább.
+event.play_on.2 = Folytassuk.
+event.play_on.3 = Most pedig vissza a játszmánkhoz.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Ilyen hibákat mindenki elkövet. Az a fontos, hogy észrevedd őket.
+event.encourage.mistake.2 = Ne aggódj. Nézd meg, mit támad az utolsó lépésem, és rájössz.
+event.encourage.mistake.3 = Ez minden játékossal megesik. Menjünk tovább.
+# The player is behind (material or evaluation).
+event.encourage.behind = Ne add fel: keresd az esélyeidet, és nehezítsd meg a dolgomat.
+event.encourage.behind.2 = Küzdj tovább. Az ilyen állások még megfordulhatnak.
+event.encourage.behind.3 = Maradj nyugodt, és keresd a gyenge pontjaimat.
+# The player has played several good moves in a row.
+event.encourage.well = Lépés előtt ellenőrzöd a fenyegetéseimet. Szép munka.
+event.encourage.well.2 = Gondos, szilárd lépések. Csak így tovább.
+event.encourage.well.3 = Ma jól gondolkodsz.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Elfogadom. Akkor döntetlen.
+event.draw.accepted.2 = Rendben: döntetlen.
+event.draw.declined = Köszönöm, nem. Játsszunk tovább.
+event.draw.declined.2 = Inkább folytatnám.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Szépen játszottál. Gratulálok!
+event.end.win.2 = Megérdemelted. Szép volt!
+event.end.win.3 = Gratulálok: tisztességesen legyőztél.
+event.end.loss = Jó játszma volt. Legközelebb majd legyőzöl.
+event.end.loss.2 = Köszönöm a játszmát. Minden vereségből tanulsz valamit.
+event.end.loss.3 = Szép küzdelem volt. Nézzük meg, mi történt.
+event.end.draw = Döntetlen. Jó játszma volt!
+event.end.draw.2 = Ezúttal nincs győztes. Jól küzdöttél.
+event.end.draw.3 = Igazságos eredmény. Jó játszma volt.
+event.end.resigned = Feladtad. Azért szép küzdelem volt.
+event.end.resigned.2 = Rendben. Köszönöm a játszmát.
+event.end.handshake = Fogjunk kezet.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative with its article, in
+# lower case: it always follows a colon, so it needs no case suffix.
+event.lesson.resume = Üdv újra! Folytassuk a leckét: {chapter}.
+event.lesson.resume.2 = Örülök, hogy újra látlak! Itt hagytuk abba: {chapter}.
+event.lesson.next = Következik: {chapter}.
+event.lesson.next.2 = Most pedig: {chapter}.

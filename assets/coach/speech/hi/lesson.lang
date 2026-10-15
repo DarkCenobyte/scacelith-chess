@@ -1,0 +1,271 @@
+# Coach speech (Hindi): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("तुम्हारा हाथी", "मेरा घोड़ा"), with the
+# forms of common.lang ({my:ko} "मेरे घोड़े को", {my:obl} + तक, {my:ke} + बगल में, {my:ki} + तरफ़ ...). When the
+# player acts with their own piece (an imperative), Hindi says "अपना": {your:refl_ka} इस्तेमाल करो,
+# {your:refl_se} मात दो. {sq}, {sq2}, {to}, {esc} = squares ("{sq} पर"); {move} = a move. {@}, {@2}, {@3} are
+# invisible marks: the coach points at something while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: Latin letters said as their Hindi letter names, and
+# "Elo" as "एलो"). Files = फ़ाइल, ranks = रैंक, back rank = पिछली रैंक; checkmate = "शह और मात".
+# The player's gender is unknown: no verb agrees with "तुम" except the imperative, the subjunctive and "हो".
+
+# ---- Chapter titles (said inside "चलो, पाठ आगे बढ़ाते हैं: {chapter}।") ---------------------------------
+lesson.title.welcome = शतरंज का बोर्ड
+lesson.title.pieces = मोहरे कैसे चलते हैं
+lesson.title.safety = कब काटना सुरक्षित है
+lesson.title.check = शह
+lesson.title.mate = शह और मात
+lesson.title.castling = कैसलिंग
+lesson.title.en_passant = आँ पासाँ
+lesson.title.promotion = प्रमोशन
+lesson.title.draws = स्टेलमेट और ड्रॉ
+lesson.title.etiquette = असली बाज़ियों में रेटिंग, घड़ी और शिष्टाचार
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = अब तुम कोशिश करो।
+lesson.now_you.2 = अब तुम्हारी बारी।
+lesson.now_you.3 = अब तुम।
+# Another wrong move after the demonstration.
+lesson.almost = लगभग! वही चाल चलो, जो मैंने दिखाई।
+lesson.almost.2 = पूरी तरह नहीं। वह चाल आज़माओ, जो मैंने करके दिखाई थी।
+lesson.almost.3 = बहुत क़रीब! याद करो, मैंने अभी क्या दिखाया।
+# A wrong move without a line of its own.
+lesson.try_again = यह नहीं। फिर से कोशिश करो।
+lesson.try_again.2 = यह चाल नहीं। एक बार और कोशिश करो।
+lesson.try_again.3 = चलो, एक बार और कोशिश करते हैं।
+lesson.use_your = {your:refl_ka} इस्तेमाल करो।
+lesson.use_your.2 = {your:refl_se} कोशिश करो।
+lesson.watch = देखो।
+lesson.like_this = ऐसे।
+lesson.and_back = और वापस।
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = शह, लेकिन मेरा राजा बचकर {esc} पर चला जाता है।
+lesson.check_takes = शह, लेकिन मेरा राजा बस {your:ko} काट लेता है।
+lesson.check_block = शह, लेकिन मैं बीच में कोई मोहरा रख सकता हूँ।
+lesson.stalemate = स्टेलमेट! मेरा राजा चल नहीं सकता, और उस पर शह भी नहीं है। ड्रॉ, जबकि बाज़ी तुम्हारे हाथ में थी!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = {sq} पर नहीं: {my} उस खाने पर हमला कर रहा है। राजा कभी ख़तरे में नहीं जाता।
+why.PathBlocked = {@}रास्ते में कुछ है: घोड़े के सिवा कोई मोहरा कूद नहीं सकता।
+why.WrongGeometry = {your} ऐसे नहीं चलता।
+why.MustAnswerCheck = तुम {@}शह में हो: पहले उससे बचना ज़रूरी है।
+why.CastlingThroughCheck = तुम्हारा राजा {sq} से होकर गुज़रता, और {my} उस खाने पर हमला कर रहा है।
+why.CastlingNoRights = यह राजा या हाथी पहले ही चल चुका है: कैसलिंग नहीं हो सकती।
+why.CastlingBlocked = कैसलिंग के लिए राजा और हाथी के बीच के खाने ख़ाली होने चाहिए।
+why.CastlingOutOfCheck = शह में रहते हुए कैसलिंग नहीं की जा सकती।
+why.PawnForwardBlocked = प्यादे सीधे आगे नहीं काट सकते: आगे का रास्ता {@}बंद है।
+why.LeavesKingInCheck = {your} पिन है: उसे हटाने पर तुम्हारा राजा {my:ke} निशाने पर आ जाएगा।
+why.OwnPieceOnTarget = अपने ही मोहरे वाले खाने पर चाल नहीं चली जा सकती।
+why.PawnCaptureNeedsVictim = प्यादा तिरछा सिर्फ़ काटने के लिए चलता है।
+why.EnPassantExpired = आँ पासाँ सिर्फ़ प्यादे के दो खाने चलने के ठीक बाद हो सकता है।
+why.NotYourTurn = रुको: अभी मेरी बारी है।
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = नमस्ते! मैं तुम्हारा कोच हूँ। चलो, शतरंज के नियम साथ मिलकर सीखते हैं, एक-एक छोटा क़दम करके।
+lesson.welcome.board = यह शतरंज का बोर्ड है: चौंसठ खाने, हल्के और गहरे, आठ-आठ खानों की आठ पंक्तियाँ।
+lesson.welcome.light = तुम्हारी {@}दाईं ओर के कोने का खाना हमेशा हल्के रंग का होता है। याद रखो: दाईं ओर हल्का।
+lesson.welcome.files = खड़ी पंक्तियों को फ़ाइल कहते हैं। इन्हें अक्षरों से पहचाना जाता है, {@}a से {@2}h तक।
+lesson.welcome.files.spoken = खड़ी पंक्तियों को फ़ाइल कहते हैं। इन्हें अक्षरों से पहचाना जाता है, {@}ए से {@2}एच तक।
+lesson.welcome.ranks = आड़ी पंक्तियों को रैंक कहते हैं। इन्हें अंकों से पहचाना जाता है, {@}एक से {@2}आठ तक, तुम्हारी तरफ़ से शुरू करके।
+lesson.welcome.square = हर खाने का नाम पहले उसके अक्षर और फिर उसके अंक से बनता है। यह खाना {sq} है।
+lesson.welcome.square2 = और यह {sq} है।
+lesson.welcome.kings = ये दोनों राजा हैं। तुम्हारा {sq} पर है, मेरा {sq2} पर।
+lesson.welcome.ask = तुम्हारी बारी: अपने राजा को एक खाना आगे, {sq} पर ले जाओ।
+lesson.welcome.wrong = यह {to} है। हमें {sq} चाहिए: अक्षर e, अंक दो।
+lesson.welcome.wrong.spoken = यह {to} है। हमें {sq} चाहिए: अक्षर ई, अंक दो।
+lesson.welcome.ok = बिल्कुल सही। तुम्हारा राजा {sq} पर है।
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = यह {your} है। यह फ़ाइलों और रैंकों पर सीधी रेखा में, जितनी दूर चाहे, चलता है।
+lesson.rook.lines = फ़ाइल पर ऊपर, {@}या रैंक के साथ-साथ।
+lesson.rook.capture = काटने के लिए मोहरा किसी {@}विरोधी मोहरे के खाने पर जाता है, और वह विरोधी मोहरा बोर्ड से बाहर हो जाता है।
+lesson.rook.ask = अपने हाथी से {my:ko} काटो!
+lesson.rook.short = दिशा सही है! फ़ाइल पर ऊपर बढ़ते जाओ, सीधे {my:obl} तक।
+lesson.rook.rank = यह तो रैंक पर चलना हुआ। {my} फ़ाइल पर ऊपर है।
+lesson.rook.king = यह तुम्हारा राजा है। कोने में खड़े {your:refl_ka} इस्तेमाल करो।
+lesson.rook.ok = कट गया! {my} बोर्ड से बाहर हो जाता है।
+# Pieces don't jump
+lesson.jump.blocked = मोहरे दूसरे मोहरों के ऊपर से नहीं कूद सकते। {sq} पर खड़ा तुम्हारा प्यादा हाथी का रास्ता रोक रहा है।
+lesson.jump.knight = सिर्फ़ घोड़ा कूद सकता है। उससे हम जल्द ही मिलेंगे।
+# Bishop
+lesson.bishop.intro = यह {your} है। यह तिरछा, जितनी दूर चाहे, चलता है।
+lesson.bishop.colour = ऊँट हमेशा एक ही रंग के खानों पर रहता है।
+lesson.bishop.ask = {my} तुम्हारे ऊँट के विकर्ण पर खड़ा है। {my:pron_ko} काटो!
+lesson.bishop.short = विकर्ण सही है! और आगे जाओ, {my:obl} तक।
+lesson.bishop.other = यह दूसरा विकर्ण है। {my:ki} तरफ़ देखो।
+lesson.bishop.ok = शानदार। ऊँटों को लंबे विकर्ण बहुत पसंद हैं।
+# Queen
+lesson.queen.intro = यह {your} है, सबसे ताक़तवर मोहरा। यह हाथी और ऊँट, दोनों की तरह चलता है।
+lesson.queen.ask = {my:ko} ढूँढो और अपने वज़ीर से उसे काटो।
+lesson.queen.wrong = तुम्हारा वज़ीर एक ही चाल में, विकर्ण पर चलकर, {my:obl} तक पहुँच सकता है।
+lesson.queen.ok = शाबाश! अपने वज़ीर को सुरक्षित रखो: वह बहुत क़ीमती है।
+# King
+lesson.king.intro = राजा किसी भी दिशा में सिर्फ़ एक खाना चलता है।
+lesson.king.important = राजा सबसे ज़रूरी मोहरा है। अगर वह फँस जाए, तो बाज़ी हाथ से चली जाती है।
+lesson.king.ask = राजा भी काट सकता है। {my:ko} काटो!
+lesson.king.wrong = तुम्हारा राजा {my:ke} ठीक बगल में है। उसके खाने पर जाकर उसे काटो।
+lesson.king.ok = बढ़िया! राजा धीमा है, पर पास से ताक़तवर है।
+# Knight
+lesson.knight.intro = यह {your} है। यह L के आकार में चलता है: दो खाने सीधे, फिर एक बगल में।
+lesson.knight.intro.spoken = यह {your} है। यह एल के आकार में चलता है: दो खाने सीधे, फिर एक बगल में।
+lesson.knight.l = {@}ऐसे। घोड़ा हमेशा दूसरे रंग के खाने पर पहुँचता है।
+lesson.knight.jump = घोड़ा अकेला ऐसा मोहरा है, जो दूसरे मोहरों के ऊपर से कूद सकता है।
+lesson.knight.ask = अपने घोड़े से {my:ko} काटो!
+lesson.knight.wrong = यह घोड़े की सही चाल है, पर यह {my:obl} तक नहीं पहुँचती। कोई दूसरा L आज़माओ।
+lesson.knight.wrong.spoken = यह घोड़े की सही चाल है, पर यह {my:obl} तक नहीं पहुँचती। कोई दूसरा एल आज़माओ।
+lesson.knight.ok = शानदार छलाँग!
+# Pawn: moving
+lesson.pawn.intro = अब {your}। यह सीधा आगे चलता है, एक बार में एक खाना, और कभी पीछे नहीं जाता।
+lesson.pawn.first = अपनी पहली चाल में प्यादा एक या दो खाने चल सकता है।
+lesson.pawn.ask = अपने प्यादे को दो खाने आगे बढ़ाओ।
+lesson.pawn.one = यह एक खाना हुआ: यह भी नियम से सही है, पर इस बार दो खाने आगे बढ़ाओ।
+lesson.pawn.use = प्यादे का इस्तेमाल करो।
+lesson.pawn.ok = बढ़िया।
+# Pawn: capturing
+lesson.pawncap.blocked = मेरा प्यादा तुम्हारे प्यादे का रास्ता रोक रहा है। प्यादे सीधे आगे नहीं काट सकते।
+lesson.pawncap.diagonal = लेकिन प्यादा तिरछा काटता है, एक खाना आगे।
+lesson.pawncap.ask = अपने प्यादे से {my:ko} काटो।
+lesson.pawncap.use = {your:refl_ka} इस्तेमाल करो: वह तिरछा आगे की ओर काटता है।
+lesson.pawncap.ok = हाँ! चलना सीधा, काटना तिरछा।
+# Values, set-up and the first moves
+lesson.values.pawn = हर मोहरे की अंकों में एक क़ीमत होती है। प्यादे की क़ीमत एक अंक है।
+lesson.values.pieces = घोड़ा या {@}ऊँट, तीन। {@2}हाथी, पाँच। {@3}वज़ीर, नौ।
+lesson.values.king = राजा अनमोल है: उसे कभी नहीं दिया जा सकता।
+lesson.values.trade = कोशिश करो कि कोई मोहरा कभी उसकी क़ीमत से कम में न दो।
+lesson.setup.corners = हर बाज़ी ऐसे शुरू होती है: {@}कोनों में हाथी, फिर {@2}घोड़े, फिर {@3}ऊँट।
+lesson.setup.queen = वज़ीर अपने ही रंग के खाने पर खड़ा होता है: तुम्हारा वज़ीर हल्के रंग के खाने पर है।
+lesson.setup.king = राजा उसके बगल में खड़ा होता है। पहली चाल हमेशा सफ़ेद चलता है।
+lesson.first.ask = बाज़ी शुरू करो: अपने राजा के आगे वाले प्यादे को दो खाने बढ़ाकर {sq} पर ले जाओ।
+lesson.first.wrong = यह भी नियम से सही चाल है! पर अभी, ज़रा अपने राजा के आगे वाला प्यादा {sq} पर ले जाओ।
+lesson.first.ok = पहली चाल बढ़िया है: इससे तुम्हारे वज़ीर और ऊँट के लिए रास्ते खुल जाते हैं।
+lesson.first.reply = मैं भी वैसा ही जवाब देता हूँ। अब एक घोड़ा बाहर निकालो: {sq} से {sq2} पर कूदो।
+lesson.first.knight_wrong = घोड़े प्यादों के ऊपर से कूदते हैं। {sq} से {sq2} पर कोशिश करो।
+lesson.first.knight_ok = बिल्कुल सही। घोड़े और ऊँट जल्दी बाहर आते हैं।
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = किसी मोहरे का बचाव तब होता है, जब उसका कोई साथी मोहरा वापस काट सके।
+lesson.safety.pawn = मेरा {@}प्यादा {my:ka} बचाव करता है।
+lesson.safety.free = लेकिन {my:ka} कोई रक्षक नहीं है। तुम्हारा वज़ीर दोनों मोहरों पर हमला कर रहा है।
+lesson.safety.ask = असुरक्षित मोहरे को काटो!
+lesson.safety.watch = देखो, क्या होता है।
+lesson.safety.gave = तुमने नौ अंकों का अपना वज़ीर, मेरे तीन अंकों के घोड़े के बदले दे दिया।
+lesson.safety.other = दूसरा मोहरा आज़माओ।
+lesson.safety.look = वह मोहरा ढूँढो, जिसका बचाव कोई नहीं कर रहा।
+lesson.safety.ok = शानदार! हमेशा ख़ुद से पूछो: क्या उस मोहरे का बचाव हो रहा है?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = पूरी दूसरी रैंक मेरे हाथी के नियंत्रण में है।
+lesson.danger.rule = राजा कभी ऐसे खाने पर नहीं जा सकता, जहाँ उसे काटा जा सके।
+lesson.danger.ask = अपने राजा को किसी सुरक्षित खाने पर ले जाओ।
+lesson.danger.ok = सही। वहाँ तुम्हारा राजा सुरक्षित है।
+lesson.check.what = मेरा हाथी तुम्हारे राजा पर हमला कर रहा है। इसे शह कहते हैं।
+lesson.check.must = जब तुम शह में हो, तो तुम्हें तुरंत शह से बचना होगा।
+lesson.check.ways = इसके तीन तरीक़े हैं: {@}राजा को हटाना, {@2}हमले को बीच में रोकना, या {@3}हमलावर को काटना।
+lesson.check.ask = यहाँ अपने राजा को शह से बाहर निकालो।
+lesson.check.file = {to} अब भी {@}मेरे हाथी की फ़ाइल पर है। उस रेखा से हट जाओ।
+lesson.check.ok = बढ़िया: अब तुम शह में नहीं हो।
+lesson.block.again = फिर से शह! इस बार तुम्हारे राजा के पास कोई ख़ाली खाना नहीं है।
+lesson.block.ask = तो हमले को रोको: रास्ते में कोई मोहरा रखो।
+lesson.block.queen = हमला रुक गया! लेकिन मेरा हाथी तुम्हारे वज़ीर को काट सकता है। किसी सस्ते मोहरे से रोको।
+lesson.block.queen_ok = यह भी चलता है। याद रखो: सबसे सस्ते मोहरे से रोको।
+lesson.block.ok = बिल्कुल सही। सबसे कम क़ीमत वाले मोहरे से रोको।
+lesson.capture.check = मेरा वज़ीर तुम्हारे राजा के ठीक बगल से शह देता है।
+lesson.capture.ask = हमलावर को काटो!
+lesson.capture.king_ok = हाँ! मेरे वज़ीर का कोई रक्षक नहीं था, इसलिए तुम्हारा राजा उसे काट सका।
+lesson.capture.knight_ok = हाँ! तुम्हारे घोड़े ने हमलावर को हटा दिया।
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = शह और मात: राजा शह में है, और उसके बचने का कोई रास्ता नहीं। इससे बाज़ी जीती जाती है।
+lesson.mate1.stuck = मेरा राजा {@}अपने ही प्यादों के पीछे फँसा है।
+lesson.mate1.ask = मुझे एक चाल में मात दो!
+lesson.mate1.wrong = बहुत क़रीब! मेरी पिछली रैंक पर शह दो, जहाँ से मेरा राजा भाग नहीं सकता।
+lesson.mate1.ok = शह और मात! इसे पिछली रैंक की मात कहते हैं। इसे याद रखो!
+lesson.mate2.ask = तुम्हारा राजा और वज़ीर मिलकर काम करते हैं। मुझे एक चाल में मात दो।
+lesson.mate2.wrong = ऐसी शह ढूँढो, जिसके बाद मेरे राजा के पास एक भी खाना न बचे।
+lesson.mate2.ok = शह और मात! तुम्हारा राजा वज़ीर की रक्षा करता है, इसलिए मेरा राजा उसे काट नहीं सकता।
+lesson.mate2.ok_rank = पिछली रैंक पर शह और मात! तुम्हारा राजा मेरे राजा के आगे के हर खाने पर पहरा देता है।
+lesson.mate3.edge = सातवीं रैंक पर खड़ा तुम्हारा हाथी मेरे राजा को किनारे पर रोके रखता है।
+lesson.mate3.ask = अब {your:refl_se} मात दो।
+lesson.mate3.free = शह, लेकिन अब सातवीं रैंक ख़ाली है, और मेरा राजा निकल भागता है।
+lesson.mate3.takes = मेरा राजा बस तुम्हारे हाथी को काट लेता है।
+lesson.mate3.hint = पिछली रैंक पर उस हाथी से शह दो, जो सातवीं रैंक पर पहरा नहीं दे रहा।
+lesson.mate3.ok = शह और मात! दोनों हाथियों ने सीढ़ी की तरह काम किया।
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+# Kingside / queenside castling = छोटी / लंबी कैसलिंग, "on the king's side" = राजा की ओर (the glossary's terms).
+lesson.castle.what = कैसलिंग एक ख़ास चाल है, जो तुम्हारे राजा को सुरक्षित रखती है। राजा और हाथी एक साथ चलते हैं।
+lesson.castle.how = {@}राजा किसी हाथी की ओर दो खाने चलता है, और {@2}हाथी कूदकर राजा की दूसरी तरफ़ आ जाता है।
+lesson.castle.ask = हमेशा पहले राजा को छुओ। अब तुम: राजा की ओर कैसलिंग करो।
+lesson.castle.rook = इससे सिर्फ़ हाथी चलता है। कैसलिंग के लिए अपने राजा को उसकी ओर दो खाने चलाओ।
+lesson.castle.long = यह लंबी कैसलिंग है, यह भी नियम से सही है! इस बार पास वाले हाथी की ओर कैसलिंग करो।
+lesson.castle.one = एक खाना तो राजा की सामान्य चाल है। कैसलिंग में राजा दो खाने चलता है।
+lesson.castle.other = कैसलिंग के लिए अपने राजा को {sq} पर खड़े हाथी की ओर दो खाने चलाओ।
+lesson.castle.ok = कैसलिंग हो गई! तुम्हारा राजा सुरक्षित कोने में पहुँच गया, और तुम्हारा हाथी खेलने के लिए तैयार है।
+lesson.castle2.moved = अगर तुम्हारा राजा या वह हाथी पहले चल चुका हो, तो कैसलिंग नहीं हो सकती।
+lesson.castle2.attacked = शह में रहते हुए भी नहीं, और तब भी नहीं, जब तुम्हारा राजा किसी ऐसे खाने से गुज़रे या उस पर पहुँचे, जिस पर हमला हो।
+lesson.castle2.bishop = मेरा ऊँट {sq} पर हमला कर रहा है। इसलिए अभी इस तरफ़ कैसलिंग मना है।
+lesson.castle2.ask = दूसरी तरफ़ कैसलिंग करो।
+lesson.castle2.other = अपने दूसरे हाथी की ओर, यानी वज़ीर की तरफ़, कैसलिंग करो।
+lesson.castle2.ok = सही! लंबी कैसलिंग से तुम्हारा राजा {sq} पर पहुँचता है।
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = प्यादे के काटने का एक ख़ास तरीक़ा है, जिसे आँ पासाँ कहते हैं। इसका मतलब है “गुज़रते हुए”।
+lesson.ep.watch = मेरे प्यादे को देखो: यह दो खाने चलकर ठीक तुम्हारे प्यादे के बगल में आ जाता है।
+lesson.ep.how = तुम्हारा प्यादा इसे ऐसे काट सकता है, मानो यह सिर्फ़ एक खाना चला हो: {sq} पर जाकर।
+lesson.ep.now = लेकिन सिर्फ़ अभी, इसी चाल में। आँ पासाँ से काटो!
+lesson.ep.gone = मौक़ा निकल गया: आँ पासाँ सिर्फ़ तुरंत ही हो सकता है। चलो, फिर से कोशिश करते हैं।
+lesson.ep.ok = आँ पासाँ! {sq} पर खड़ा मेरा प्यादा बोर्ड से बाहर हो गया।
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = जब प्यादा आख़िरी रैंक पर पहुँचता है, तो उसका प्रमोशन होता है: वह वज़ीर, हाथी, ऊँट या घोड़ा बन जाता है।
+lesson.promo.ask = लगभग हमेशा वज़ीर चुनो। अब अपने प्यादे का प्रमोशन करो!
+lesson.promo.under = यह भी नियम से सही है! पर वज़ीर ज़्यादा ताक़तवर है। चलो, वज़ीर चुनते हैं।
+lesson.promo.under_ok = ठीक है। वैसे ज़्यादातर खिलाड़ी वज़ीर ही चुनते हैं।
+lesson.promo.push = अपने प्यादे को आख़िरी रैंक तक, {sq} पर ले जाओ।
+lesson.promo.ok = नया वज़ीर! एक साथ दो वज़ीर भी हो सकते हैं।
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = मेरी बारी है। मेरे राजा पर शह नहीं है, लेकिन उसके आस-पास के {@}हर खाने पर हमला है।
+lesson.stale.draw = मेरे पास एक भी वैध चाल नहीं है। यह स्टेलमेट है, और बाज़ी ड्रॉ हो जाती है।
+lesson.stale2.ask = जब बाज़ी तुम्हारे हाथ में हो, तो स्टेलमेट से सावधान रहो। मुझे एक चाल में मात दो, स्टेलमेट के बिना!
+lesson.stale2.wrong = मेरी पिछली रैंक पर शह दो, जहाँ से मेरा राजा भाग नहीं सकता।
+lesson.stale2.ok = शह और मात! विरोधी राजा के लिए हमेशा कोई चाल छोड़ो, जब तक कि उसी चाल से मात न हो रही हो।
+lesson.draws.kings = दूसरी तरह के ड्रॉ: जब कोई भी मात न दे सके, जैसे बोर्ड पर सिर्फ़ दो राजा बचे हों, तो बाज़ी ड्रॉ होती है।
+lesson.draws.agree = खिलाड़ी आपसी सहमति से भी ड्रॉ कर सकते हैं।
+lesson.draws.repeat = एक ही स्थिति तीन बार दोहराई जाए, या पचास चालों तक न कोई मोहरा कटे, न कोई प्यादा चले, तब भी ड्रॉ हो सकता है।
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = अब तुम्हें शतरंज के सारे नियम पता हैं। शाबाश!
+lesson.talk.real = अब मैं तुम्हें बताता हूँ कि असली बाज़ियाँ कैसे खेली जाती हैं।
+lesson.talk.elo = खिलाड़ियों की एक रेटिंग होती है, जिसे Elo कहते हैं। जीतने पर यह बढ़ती है और हारने पर घटती है।
+lesson.talk.elo.spoken = खिलाड़ियों की एक रेटिंग होती है, जिसे एलो कहते हैं। जीतने पर यह बढ़ती है और हारने पर घटती है।
+lesson.talk.elo_gap = ज़्यादा मज़बूत खिलाड़ी को हराने पर ज़्यादा अंक मिलते हैं; कमज़ोर खिलाड़ी से हारने पर ज़्यादा अंक कटते हैं।
+lesson.talk.elo_start = पाँच रेटेड बाज़ियों के बाद तुम्हारी रेटिंग दिखने लगती है। कोच के साथ बाज़ियाँ अभ्यास के लिए होती हैं, इसलिए वे रेटेड नहीं होतीं।
+lesson.talk.clock = यह {@}शतरंज की घड़ी है। हर खिलाड़ी का अपना समय होता है, जो सिर्फ़ उसकी बारी में चलता है।
+lesson.talk.press = अपनी चाल के बाद, उसी हाथ से घड़ी दबाओ। इससे मेरा समय चलने लगता है।
+lesson.talk.flag = अगर तुम्हारा समय ख़त्म हो जाए, तो हार तुम्हारी होती है, जब तक कि मेरे लिए तुम्हें मात देना नामुमकिन न हो।
+lesson.talk.increment = “पाँच प्लस तीन” का मतलब है: हर खिलाड़ी को पाँच मिनट, और हर चाल के बाद तीन सेकंड और।
+# The time controls as assets/i18n/hi.lang names them (tc.blitz, tc.rapid, tc.classical).
+lesson.talk.speeds = छोटी बाज़ियों को ब्लिट्ज़ कहते हैं, उनसे लंबी को रैपिड, और सबसे लंबी को क्लासिकल।
+lesson.talk.no_clock = मेरे साथ घड़ी बंद रहती है। सोचने के लिए जितना चाहे, उतना समय लो।
+lesson.talk.touch = असली बाज़ी में, अगर तुम अपना कोई मोहरा छू लो, तो तुम्हें उसे ही चलना होगा।
+lesson.talk.touch_mine = अगर तुम मेरा कोई मोहरा छू लो, तो तुम्हें उसे काटना होगा, अगर काटा जा सके।
+# Indian players say the English "adjust" (the player's own words: a Hindi verb would agree with their gender).
+lesson.talk.adjust = किसी मोहरे को चाल चले बिना सीधा करना हो, तो पहले “एडजस्ट” कहो।
+lesson.talk.release = नए खाने पर मोहरा छोड़ते ही चाल पूरी हो जाती है।
+lesson.talk.sheet = टूर्नामेंट में दोनों खिलाड़ी हर चाल {@}स्कोरशीट पर लिखते हैं।
+# {move:letters} shows the scoresheet letters ("Nf3": Indian scoresheets use the English letters), which is
+# what this line teaches.
+lesson.talk.notation = हम मोहरे का अक्षर और खाना लिखते हैं, जैसे {move:letters}। प्यादे के लिए सिर्फ़ खाना लिखा जाता है।
+lesson.talk.robot = तुम्हारा रोबोट तुम्हारी जगह तुम्हारी चालें लिख देता है। तेज़ बाज़ियों में लिखना ज़रूरी नहीं होता।
+lesson.talk.handshake = बाज़ी की शुरुआत और अंत हाथ मिलाकर होता है। इसका मतलब है: अच्छी बाज़ी, और धन्यवाद।
+lesson.talk.polite = जीत हो या हार, विनम्र रहो, और जब प्रतिद्वंद्वी सोच रहा हो, तब उसे कभी परेशान मत करो।
+lesson.talk.tips = तुम्हारी बाज़ियों के लिए तीन सुझाव: {@}केंद्र पर नियंत्रण रखो, {@2}अपने घोड़े और ऊँट बाहर निकालो, और {@3}जल्दी कैसलिंग करो।
+# "पहले क़दम" = coach.level.1.name of assets/i18n/hi.lang.
+lesson.talk.next = जब तुम तैयार हो, तो “पहले क़दम” चुनो। मैं नरमी से खेलूँगा और हर ग़लती के बाद तुम्हारी मदद करूँगा।
+lesson.talk.welcome = शतरंज की दुनिया में स्वागत है! आओ, हाथ मिलाएँ।

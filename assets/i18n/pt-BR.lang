@@ -384,9 +384,9 @@ arbiter.touched.black = As Pretas devem mover a peça tocada.
 arbiter.game_over = A partida terminou.
 
 # ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
-menu.watch = Assistir a uma partida
+menu.watch = Ver uma partida
 
-viewer.title = ASSISTIR A UMA PARTIDA
+viewer.title = VER UMA PARTIDA
 viewer.white = BRANCAS
 viewer.black = PRETAS
 viewer.time_control = CONTROLE DE TEMPO
@@ -468,7 +468,7 @@ viewer.gameover.white_wins = As Brancas venceram após o lance {0}.
 viewer.gameover.black_wins = As Pretas venceram após o lance {0}.
 viewer.gameover.draw = A partida terminou empatada após o lance {0}.
 viewer.gameover.players = {0} contra {1}
-viewer.watch_again = Assistir de novo
+viewer.watch_again = Ver de novo
 
 # The player's rating
 elo.label = ELO
@@ -583,7 +583,7 @@ online.check_email.text = Enviamos um link para {0}. Abra o link para ativar sua
 online.check_email.ask = Digite o endereço da sua conta para receber o link de ativação de novo.
 online.check_email.resend = Reenviar o e-mail
 online.check_email.resent = O e-mail foi reenviado. Ele pode levar alguns minutos para chegar; verifique também sua pasta de spam.
-online.forgot.title = SENHA ESQUECIDA
+online.forgot.title = ESQUECEU A SENHA?
 online.forgot.lead = Digite o endereço de e-mail da sua conta: vamos enviar um link para você escolher uma nova senha.
 online.forgot.button = Enviar o link
 online.forgot.sent = Se alguma conta usar este endereço, um link está a caminho.
@@ -941,7 +941,7 @@ online.direct.lead = Uma partida amistosa diretamente entre dois computadores: s
 online.direct.host = Hospedar uma partida
 online.direct.host.desc = Seu amigo se conecta a você: você passa a ele seu endereço e um código.
 online.direct.join = Entrar em uma partida
-online.direct.join.desc = Conectar-se a um amigo que está hospedando.
+online.direct.join.desc = Conecte-se a um amigo que está hospedando.
 online.direct.host_title = HOSPEDAR UMA PARTIDA
 online.direct.your_color = Sua cor
 online.direct.auto_press.help = Os dois robôs apertam o relógio sozinhos assim que um lance está no tabuleiro. Desativado: cada jogador aperta o relógio após cada lance.
@@ -1239,7 +1239,7 @@ options.voice_quality.ultra = Ultra
 options.voice_quality.max = Máxima
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = A voz do treinador
-coach.download.text = O treinador fala com o Supertonic 3, um modelo de síntese de voz da Supertone. Ele não vem incluído no Scacelith: o jogo pode baixá-lo agora do Hugging Face ({0} MB, uma única vez). Sem ele, o treinador escreve suas falas na tela.
+coach.download.text = O treinador fala com o Supertonic 3, um modelo de síntese de voz da Supertone. Ele não vem incluído no Scacelith: o jogo pode baixá-lo agora do Hugging Face ({0} MB, uma única vez). Sem ele, as falas do treinador aparecem escritas na tela.
 coach.download.licence = O modelo é publicado sob a licença OpenRAIL-M, que proíbe certos usos da voz que ele produz, como apresentá-la como voz humana ou imitar uma pessoa real.
 coach.download.read_licence = Ler a licença
 coach.download.accept = Ao escolher “Baixar”, você aceita os termos desta licença.

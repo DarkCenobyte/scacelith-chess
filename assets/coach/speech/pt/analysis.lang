@@ -32,7 +32,7 @@ an.book_exit.3 = A teoria acaba aqui, com {move}.
 
 # ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
 an.blunder = {move} é um erro grave.
-an.blunder.2 = Aqui, {move} é um erro muito sério.
+an.blunder.2 = Aqui, {move} é um erro sério.
 an.blunder.3 = Um erro grave: {move}.
 an.mistake = {move} é um erro.
 an.mistake.2 = {move} não é o lance certo aqui.

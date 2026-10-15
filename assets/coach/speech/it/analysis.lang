@@ -14,7 +14,7 @@
 #   era una mossa più precisa"; no article before it.
 # - Counted numbers (common.lang): {m:move} "matto in 3 mosse", {pts:point} "3 punti",
 #   {n:mistake} "2 errori", {m:blunder} "un errore grave", {acc_white:percent} "85%" (no article
-#   before a number: "pari a {acc_white:percent}", never "dell’85%").
+#   before a number: "Precisione del Bianco: {acc_white:percent}", never "dell’85%").
 
 # ---- The start ------------------------------------------------------------------------------------
 an.start = Ripercorriamo insieme questa partita.
@@ -135,7 +135,7 @@ an.end.draw.2 = Patta.
 an.end.unfinished = La partita si ferma qui, incompiuta.
 an.end.unfinished.2 = La partita si ferma qui: non era conclusa.
 an.end.accuracy = Precisione: {acc_white:percent} per il Bianco, {acc_black:percent} per il Nero.
-an.end.accuracy.2 = Il Bianco ha giocato con una precisione pari a {acc_white:percent}, il Nero pari a {acc_black:percent}.
+an.end.accuracy.2 = Precisione del Bianco: {acc_white:percent}; del Nero: {acc_black:percent}.
 an.end.clean.white = Il Bianco non ha commesso nessun errore, grave o meno.
 an.end.clean.white.2 = Il gioco del Bianco è stato privo di errori seri.
 an.end.clean.black = Il Nero non ha commesso nessun errore, grave o meno.

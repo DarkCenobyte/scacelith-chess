@@ -1,0 +1,1460 @@
+# Scacelith - Hrvatski
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31...)|few (2-4, 22-24...)|other (0, 5-20, 25-30...).
+# Register: formal "vi" (lower case mid-sentence), as Croatian software; buttons and menu commands
+# use the short command form ("Spremi", "Odustani", "Ponudi remi"); sentence case, never Title Case.
+# Titles are in capitals (the title face is an inscriptional capital face).
+# The player's gender is unknown: no adjective or past participle that agrees with the player where
+# a neutral wording exists ("Pobjeda" for "You won", "Kodovi su spremljeni" for "I saved them").
+# Standard Croatian chess terms (Hrvatski šahovski savez): kralj, dama, top, lovac, skakač, pješak;
+# zapisnik (scoresheet), tempo igre (time control), rejting (rating), remi, predaja, nepravilan potez.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Uključeno
+common.off = Isključeno
+common.back = Natrag
+common.apply = Primijeni
+common.discard = Odbaci
+common.cancel = Odustani
+common.white = Bijeli
+common.black = Crni
+common.main_menu = Glavni izbornik
+# Decimal separator of numbers ("2,5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kraljevska igra
+menu.new_game = Nova partija
+menu.options = Postavke
+menu.credits = Zasluge
+menu.quit = Izlaz
+menu.version = Verzija {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = POSTAVKE
+options.tab.display = Zaslon
+options.tab.graphics = Grafika
+options.tab.audio = Zvuk
+options.tab.gameplay = Igra
+options.tab.player = Igrač
+options.tab.controls = Upravljanje
+options.pending = Promjene stupaju na snagu nakon primjene.
+options.unsaved.title = NEPRIMIJENJENE PROMJENE
+options.unsaved.text = Neke su postavke promijenjene. Želite li ih primijeniti prije izlaska?
+
+options.language = Jezik
+options.language.help = Jezik izbornika i poruka. Mijenja se odmah.
+options.display_mode = Način prikaza
+options.display_mode.help = Cijeli zaslon: prozor bez obruba preko cijelog zaslona, u razlučivosti radne površine. U prozoru: prozor veličine zadane ispod.
+options.fullscreen = Cijeli zaslon
+options.windowed = U prozoru
+options.window_size = Veličina prozora
+options.window_size.help = Veličina prozora pri prikazu u prozoru. Na cijelom zaslonu uvijek se koristi razlučivost radne površine.
+options.vsync = Vertikalna sinkronizacija
+options.vsync.help = Usklađuje sličice sa zaslonom kako bi se izbjeglo kidanje slike.
+options.render_scale = Mjerilo iscrtavanja
+options.render_scale.help = Unutarnja razlučivost 3D slike. Niže je brže, više je oštrije.
+
+options.quality = Kvaliteta
+options.quality.very_low = Vrlo niska
+options.quality.low = Niska
+options.quality.medium = Srednja
+options.quality.high = Visoka
+options.quality.ultra = Ultra
+options.quality.custom = Prilagođena
+options.quality.help = Odjednom podešava sve postavke ispod: Vrlo niska isključuje sve efekte, Ultra ih sve postavlja na najviše. Promjena pojedinačne postavke prebacuje kvalitetu na Prilagođena. Na skromnijoj grafičkoj kartici mnogo pomaže i smanjenje mjerila iscrtavanja (Zaslon).
+options.shadows = Sjene
+options.shadows.help = Detaljnost sunčevih sjena i mekoća njihovih rubova. Niska: jednostavni rubovi, brzo iscrtavanje.
+options.reflections = Odrazi
+options.reflections.help = Pod, stol i ploča odražavaju dvoranu (za svaki od njih ona se iscrtava još jednom: među najzahtjevnijim je postavkama); od razine Srednja i sjajne figure i predmeti odražavaju ono što ih okružuje.
+options.ambient_occlusion = Ambijentalna okluzija
+options.ambient_occlusion.help = Meko zasjenjenje ondje gdje se predmeti dodiruju i u udubinama, kamo dopire manje svjetla.
+options.indirect_light = Neizravno svjetlo
+options.indirect_light.help = Dnevno svjetlo koje se odbija od zidova, poda i stropa. Niska: umjesto toga jednolično ambijentalno svjetlo. Ponajviše utječe na trajanje učitavanja.
+options.volumetric_light = Snopovi svjetla
+options.volumetric_light.help = Zrake sunčeva svjetla kroz prašnjavi zrak dvorane i čestice prašine koje u njima svjetlucaju.
+options.tessellation = Teselacija
+options.tessellation.help = Glatki obrisi na zaobljenjima figura gledanih izbliza.
+options.tessellation.unavailable = Nije dostupno: ovaj grafički upravljački program ne podržava teselaciju.
+options.antialiasing = Zaglađivanje rubova
+options.antialiasing.help = Zaglađuje nazubljene rubove i treperave odsjaje. Isključeno: oštrije, ali nazubljeno, a neki efekti izgledaju zrnato.
+options.depth_of_field = Dubinska oštrina
+options.depth_of_field.help = Omekšava ono što se nalazi znatno ispred ili iza onoga u što gledate, kao objektiv kamere.
+options.motion_blur = Zamućenje pokreta
+options.motion_blur.help = Zamućuje brze pokrete kamere i ruku, kao filmska kamera.
+options.bloom = Sjaj
+options.bloom.help = Blagi sjaj oko najsvjetlijih odsjaja, kao u objektivu kamere.
+options.brightness = Svjetlina
+options.brightness.neutral = Neutralno
+options.brightness.value = {0} EV
+options.brightness.help = Korekcija ekspozicije kamere. Kalibracija pri prvom pokretanju postavlja je tako da su najtamnije sjene jedva vidljive.
+
+options.master_volume = Glavna glasnoća
+options.effects = Efekti
+options.ambience = Ambijent
+options.ambience.help = Žamor dvorane: vatra, daleki koraci, stari sat.
+options.ambience_volume = Glasnoća ambijenta
+options.voice_volume = Glasnoća glasa
+options.voice_volume.help = Glasnoća trenerova glasa u načinu Trener.
+options.subtitles = Titlovi
+options.subtitles.auto = Automatski
+options.subtitles.help = Trenerove riječi, ispisane na dnu zaslona. Automatski: prikazuju se kad trener ne govori jezikom izbornika (uz izbornike na kineskom govori engleski). Uvijek se prikazuju kad njegov glas nije instaliran.
+
+options.legal_moves = Prikaži moguće poteze
+options.legal_moves.help = Označava polja na koja dodirnuta figura može stići. Kad je isključeno, ništa vam ne govori je li potez pravilan: nepravilan potez sudac kažnjava čim pritisnete sat.
+options.coordinates = Koordinate ploče
+options.auto_press = Automatski pritisak sata
+options.auto_press.help = Vaš robot sam pritišće sat čim je vaš potez na ploči. U partijama na mreži o tome odlučuje poslužitelj, a u izravnom meču igrač koji je domaćin.
+options.thinking_time = Realistično vrijeme razmišljanja
+options.thinking_time.help = Protivnik si uzima vremena poput ljudskog igrača umjesto da odmah odigra potez.
+options.ignore_head = Zanemari pokrete protivnikove glave
+options.ignore_head.help = U partijama na mreži i izravnim mečevima protivnikov robot gleda kamo gleda njegov igrač. Kad je uključeno, sam pomiče glavu, kao protiv Stockfisha.
+options.mouse_sensitivity = Osjetljivost miša
+options.invert_look = Obrni okomito gledanje
+options.handover = Smjena igrača
+options.handover.cut = Trenutni rez
+options.handover.flight = Prelet, {0} s
+options.handover.help = Dva igrača za jednim računalom: kako pogled nakon svakog poteza prelazi iz očiju jednog igrača u oči drugog. Trenutni rez izbjegava pomicanje kamere.
+options.game_cursor = Pokazivač igre
+options.game_cursor.help = Za stolom igra crta vlastiti pokazivač koji pokazuje što će klik učiniti. Isključeno: uobičajena strelica sustava.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Ime
+player.name.help = Vaše ime kako je napisano na vrhu zapisnika, u bilo kojem pismu.
+player.default_name = Čovjek
+player.handwriting = Rukopis
+player.handwriting.help = Ruka koja zapisuje vaše poteze. Arapski, japanski i kineski pišu se vlastitim rukopisom.
+player.preview = NA VAŠEM ZAPISNIKU
+# Handwriting styles: adjectives agreeing with "rukopis" (m).
+hand.caveat = Opušteni
+hand.marck = Povezani
+hand.badscript = Kosi
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+# Actions are verbal nouns ("Pritisak sata"), as in Croatian control lists.
+controls.touch.keys = Lijevi klik
+controls.touch = Dodir figure, zatim potez
+controls.clock.keys = Razmaknica  ili  klik na sat
+controls.clock = Pritisak sata
+controls.look.keys = Držanje desne tipke miša
+controls.look = Razgledavanje
+controls.sheet.keys = S
+controls.sheet = Pogled na zapisnik i natrag
+controls.stand.keys = ↑
+controls.stand = Ustajanje ispred stolca
+controls.side.keys = ←  /  →
+controls.side = Odlazak na lijevi / desni kraj stola
+controls.sit.keys = ↓
+controls.sit = Ponovno sjedanje (igra se samo sjedeći)
+controls.moves.keys = Tab
+controls.moves = Prikaz ili skrivanje popisa poteza
+controls.menu.keys = Esc
+controls.menu = Izbornik
+controls.coach_skip.keys = Razmaknica
+controls.coach_skip = Trener: preskakanje onoga što trener govori
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Trener: vraćanje poteza kad ga ponudi
+controls.coach_hint.keys = H
+controls.coach_hint = Izazovi trenera: traženje savjeta
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = SVJETLINA
+calibration.text = Pomičite klizač dok skakač na crnom polju ne bude jedva vidljiv ili više ne bude vidljiv.
+calibration.later = Svjetlinu možete kasnije promijeniti pod Postavke > Grafika.
+calibration.continue = Nastavi
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOVA PARTIJA
+newgame.opponent = PROTIVNIK
+newgame.time_control = TEMPO IGRE
+newgame.start = Započni
+newgame.elo = ~{0} Elo
+newgame.you_white = Igrat ćete bijelim figurama.
+newgame.you_black = Igrat ćete crnim figurama.
+newgame.colour_lot = Boje se za prvu partiju određuju ždrijebom.
+newgame.colour_alternate = Zatim se boje izmjenjuju od partije do partije.
+newgame.opponent_kind = Protivnik
+newgame.opponent_kind.help = Igrajte protiv Stockfisha ili protiv prijatelja za ovim računalom: igrate naizmjence, svatko sa svoje strane ploče.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Čovjek, isto računalo
+
+# Custom opponent: Stockfish parameters
+engine.skill = Razina vještine
+engine.skill.help = Stockfishova postavka „Skill Level“ (0–20). Zanemaruje se dok je snaga ograničena Elo rejtingom.
+engine.limit_elo = Ograniči snagu (Elo)
+engine.limit_elo.help = UCI_LimitStrength: program nastoji igrati na razini Elo rejtinga navedenog ispod.
+engine.elo = Elo
+engine.depth = Dubina pretraživanja
+engine.plies = {0} polupotez|{0} polupoteza|{0} polupoteza
+engine.move_time = Vrijeme po potezu
+engine.nodes = Ograničenje čvorova
+engine.no_limit = Isključeno
+# Abbreviations (tis. = tisuća, mil. = milijun): one form fits every count.
+engine.thousand = {0} tis.
+engine.million = {0} mil.
+engine.dynamic_elo = Dinamični Elo prema vremenu
+engine.dynamic_elo.help = Poput ljudskog igrača, Stockfish igra slabije kad mu na satu ponestaje vremena: malo slabije u posljednjoj minuti (u ubrzanim i brzopoteznim partijama i ranije), mnogo slabije u vremenskoj stisci. Samo u partijama sa satom.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish si uzima vremena poput čovjeka svoje razine. Za preskakanje te stanke: Postavke > Igra > Realistično vrijeme razmišljanja.
+engine.pace.instant = Stockfish igra čim izračuna potez. Za stanke nalik ljudskima: Postavke > Igra > Realistično vrijeme razmišljanja.
+
+# Time controls ("3+2": minutes + increment in seconds)
+# Categories: the Croatian chess federation's words (brzopotezni = blitz, ubrzani = rapid,
+# klasični = classical; masculine, agreeing with "šah"); "bullet" has no federation word and stays.
+tc.unlimited = Neograničeno
+tc.no_clock = Bez sata
+tc.bullet = Bullet
+tc.blitz = Brzopotezni
+tc.rapid = Ubrzani
+tc.classical = Klasični
+tc.custom = Prilagođeno
+tc.your_own = Po želji
+tc.base_time = Osnovno vrijeme
+tc.base_time.help = Početno vrijeme na svakom satu (minute : sekunde).
+tc.increment = Dodatak
+tc.increment.help = Fischerov dodatak koji se dodaje nakon svakog poteza.
+tc.delay = Odgoda
+tc.delay.help = Bronsteinova odgoda: vrijeme potrošeno do te odgode vraća se nakon svakog poteza.
+tc.no_delay = Isključeno
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, odgoda {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novak
+preset.novice.desc = Tek svladava poteze: ostavlja figure nebranjene i ne vidi jednostavne prijetnje.
+preset.beginner.name = Početnik
+preset.beginner.desc = Zna osnove, ali još redovito gubi materijal grubim pogreškama.
+preset.casual.name = Rekreativac
+preset.casual.desc = Opušten protivnik za večernju partiju: razumni potezi, česte pogreške.
+preset.club_player.name = Klupski igrač
+preset.club_player.desc = Solidan klupski igrač koji kažnjava očite grube pogreške.
+preset.advanced.name = Napredni igrač
+preset.advanced.desc = Jak klupski igrač s dobrim taktičkim okom.
+preset.expert.name = Stručnjak
+preset.expert.desc = Turnirski stručnjak: rijetko griješi, prednost pretvara u pobjedu.
+preset.master.name = Majstor
+preset.master.desc = Majstorska snaga: duboko računanje i fina pozicijska igra.
+preset.grandmaster.name = Velemajstor
+preset.grandmaster.desc = Velemajstorska razina: iznimno ga je teško pobijediti.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 punom snagom. Sretno.
+preset.custom.name = Prilagođeno
+preset.custom.desc = Vaše vlastite postavke programa.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = ZASLUGE
+credits.game.head = SCACELITH
+credits.game = Partija šaha u kraljevskoj dvorani, na vlastitom pogonu temeljenom na OpenGL-u 4.6.
+credits.engine.head = ŠAHOVSKI PROGRAM
+credits.engine = Stockfish 19, djelo razvijatelja Stockfisha.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Njegova je neuronska mreža trenirana na podacima projekta Leela Chess Zero, koji su dostupni pod licencom Open Database License (ODbL).
+credits.voice.head = GLAS TRENERA
+credits.voice = Sintetizirani govor za način Trener generiran modelom Supertonic 3.
+credits.voice.licence = Supertonic 3 je model tvrtke Supertone koji se koristi pod licencom OpenRAIL-M, čija ograničenja uporabe vrijede za svakoga tko ga koristi (vidi Licence).
+credits.openings.head = OTVARANJA
+credits.openings = Nazivi otvaranja iz baze šahovskih otvaranja (chess-openings) stranice lichess.org, ustupljene javnoj domeni (CC0).
+credits.fonts.head = PISMA
+credits.fonts = EB Garamond, autor Georg Duffner, i Cinzel, autor Natanael Gama; Amiri, autor Khaled Hosny.
+credits.fonts.hand = Rukopisna pisma: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Simboli šahovskih figura iz pisma GNU FreeFont (GPL v3 s iznimkom za fontove).
+credits.quote = „Šah je umjetnost analize.“  — Mihail Botvinik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licence
+licences.title = LICENCE
+licences.note = Licence su prikazane u izvornom engleskom tekstu.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = STANKA
+pause.resume = Nastavi
+pause.offer_draw = Ponudi remi
+pause.claim_draw = Zatraži remi
+pause.claim_draw.help = Trostruko ponavljanje pozicije ili pravilo 50 poteza.
+pause.resign = Predaj
+confirm.resign.title = PREDAJA
+confirm.resign.text = Želite li predati ovu partiju? Protivnik će biti proglašen pobjednikom.
+confirm.resign.draw = Želite li predati ovu partiju? Protivnik više ne može dati mat: partija će završiti remijem.
+confirm.resign.ok = Predaj
+confirm.leave.title = NAPUŠTANJE PARTIJE
+confirm.leave.text = Želite li se vratiti u glavni izbornik? Trenutna partija bit će napuštena.
+confirm.leave.ok = Napusti
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOCIJA PJEŠAKA
+piece.queen = Dama
+piece.rook = Top
+piece.bishop = Lovac
+piece.knight = Skakač
+
+# ---- Game over ---------------------------------------------------------------------------------
+# "nakon {0} poteza" (genitive) is the same for every count; "u {0} potezu|poteza" (1, 21: locative).
+gameover.draw = Partija je završila remijem.
+gameover.draw_moves = Partija je završila remijem nakon {0} poteza.|Partija je završila remijem nakon {0} poteza.|Partija je završila remijem nakon {0} poteza.
+gameover.win = Dobro odigrano — pobjeda je vaša.
+gameover.win_moves = Dobro odigrano — pobjeda u {0} potezu.|Dobro odigrano — pobjeda u {0} poteza.|Dobro odigrano — pobjeda u {0} poteza.
+gameover.loss = Protivnik pobjeđuje.
+gameover.loss_moves = Protivnik pobjeđuje u {0} potezu.|Protivnik pobjeđuje u {0} poteza.|Protivnik pobjeđuje u {0} poteza.
+gameover.rematch = Revanš
+gameover.view_board = Pogledaj ploču
+gameover.show = Prikaži
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Mat
+reason.resignation = Predaja
+reason.timeout = Poraz zbog isteka vremena
+reason.illegal_moves = Drugi nepravilan potez (poraz)
+reason.stalemate = Pat
+reason.insufficient = Mrtva pozicija (nedovoljno materijala)
+reason.timeout_vs_insufficient = Isteklo vrijeme, ali protivnik ne može dati mat
+reason.fivefold = Peterostruko ponavljanje pozicije
+reason.75_moves = Pravilo 75 poteza
+reason.threefold_claim = Trostruko ponavljanje pozicije (na zahtjev)
+reason.50_moves_claim = Pravilo 50 poteza (na zahtjev)
+reason.agreement = Remi dogovorom
+reason.illegal_vs_insufficient = Drugi nepravilan potez, ali protivnik ne može dati mat
+reason.resignation_vs_insufficient = Predaja, ali protivnik ne može dati mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = POTEZI
+movelist.empty = Još nema poteza.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Priprema materijala
+loading.hall = Podizanje dvorane
+loading.furniture = Rezbarenje stola i stolaca
+loading.board = Poliranje ploče
+loading.pieces = Tokarenje šahovskih figura
+loading.clock = Sastavljanje sata
+loading.porcelain = Pečenje porculana
+loading.ready = Spremno
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = U ovoj se poziciji ne može zatražiti remi.
+notify.flag_you = Vaše je vrijeme isteklo.
+notify.flag_opponent = Protivniku je isteklo vrijeme.
+notify.touched.pawn = Pravilo dodirnute figure: morate pomaknuti dodirnutog pješaka.
+notify.touched.knight = Pravilo dodirnute figure: morate pomaknuti dodirnutog skakača.
+notify.touched.bishop = Pravilo dodirnute figure: morate pomaknuti dodirnutog lovca.
+notify.touched.rook = Pravilo dodirnute figure: morate pomaknuti dodirnuti top.
+notify.touched.queen = Pravilo dodirnute figure: morate pomaknuti dodirnutu damu.
+notify.touched.king = Pravilo dodirnute figure: morate pomaknuti dodirnutog kralja.
+notify.touched.piece = Pravilo dodirnute figure: morate pomaknuti dodirnutu figuru.
+notify.touched_square = Pravilo dodirnute figure: morate pomaknuti figuru na polju {0}.
+notify.press_clock = Pritisnite sat kako biste dovršili potez (razmaknica).
+notify.manual_clock = U ovoj partiji nakon svakog poteza sami pritišćete sat.
+notify.illegal = Nepravilan potez.
+notify.cannot_move = Taj se potez ne može odigrati.
+notify.move_first = Odigrajte potez prije nego što pritisnete sat.
+notify.stance.sit_to_play = Sjednite da biste igrali (strelica dolje).
+notify.stance.first = Sat i dalje teče dok stojite. Strelica dolje: ponovno sjedanje.
+notify.stance.first_untimed = Igra se samo sjedeći na stolcu. Strelica dolje: ponovno sjedanje.
+notify.stance.finish_move = Najprije dovršite potez.
+notify.draw_already_offered = U ovom je potezu remi već ponuđen.
+notify.draw_accepted = Protivnik prihvaća remi.
+notify.draw_declined = Protivnik odbija ponudu remija.
+notify.draw_claimed = Protivnik traži remi.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+# White / Black as players: "bijeli" / "crni", lower case mid-sentence as in Croatian chess books.
+arbiter.join = {0} {1}
+arbiter.no_move = Sudac: sat je pritisnut bez odigranog poteza, što se smatra nepravilnim potezom.
+arbiter.unpromoted = Sudac: nepravilan potez, pješak nije zamijenjen novom figurom prije pritiska na sat.
+arbiter.illegal = Sudac: nepravilan potez.
+arbiter.second_loses.white = Ovo je drugi nepravilan potez bijelog: bijeli gubi partiju.
+arbiter.second_loses.black = Ovo je drugi nepravilan potez crnog: crni gubi partiju.
+arbiter.second_draw.white = Ovo je drugi nepravilan potez bijelog, ali crni ne može dati mat: partija završava remijem.
+arbiter.second_draw.black = Ovo je drugi nepravilan potez crnog, ali bijeli ne može dati mat: partija završava remijem.
+arbiter.queen = Pješak postaje dama.
+arbiter.queen_one_minute.white = Pješak postaje dama, a bijeli dobiva jednu dodatnu minutu.
+arbiter.queen_one_minute.black = Pješak postaje dama, a crni dobiva jednu dodatnu minutu.
+arbiter.queen_two_minutes.white = Pješak postaje dama, a bijeli dobiva dvije dodatne minute.
+arbiter.queen_two_minutes.black = Pješak postaje dama, a crni dobiva dvije dodatne minute.
+arbiter.restored = Pozicija je vraćena.
+arbiter.restored_one_minute.white = Pozicija je vraćena, a bijeli dobiva jednu dodatnu minutu.
+arbiter.restored_one_minute.black = Pozicija je vraćena, a crni dobiva jednu dodatnu minutu.
+arbiter.restored_two_minutes.white = Pozicija je vraćena, a bijeli dobiva dvije dodatne minute.
+arbiter.restored_two_minutes.black = Pozicija je vraćena, a crni dobiva dvije dodatne minute.
+arbiter.one_minute.white = Bijeli dobiva jednu dodatnu minutu.
+arbiter.one_minute.black = Crni dobiva jednu dodatnu minutu.
+arbiter.two_minutes.white = Bijeli dobiva dvije dodatne minute.
+arbiter.two_minutes.black = Crni dobiva dvije dodatne minute.
+arbiter.second_loses = Drugi nepravilan potez znači gubitak partije.
+arbiter.touched.white = Bijeli mora pomaknuti dodirnutu figuru.
+arbiter.touched.black = Crni mora pomaknuti dodirnutu figuru.
+arbiter.game_over = Partija je završena.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Gledaj partiju
+
+viewer.title = GLEDANJE PARTIJE
+viewer.white = BIJELI
+viewer.black = CRNI
+viewer.time_control = TEMPO IGRE
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Zamijeni boje
+viewer.note = Oba igrača su Stockfish. Slobodno letite dvoranom dok igraju: nitko vas neće vidjeti.
+# An en dash instead of "protiv" (which would need the genitive of the names).
+viewer.summary = {0} – {1}
+viewer.custom = Prilagođeno
+viewer.tc.custom = Po želji
+viewer.base_time = Osnovno vrijeme
+viewer.increment = Dodatak
+viewer.delay = Odgoda
+viewer.off = Isključeno
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = odgoda {0} s
+viewer.back = Natrag
+viewer.start = Započni
+
+viewer.paused = STANKA
+viewer.resume = Nastavi
+viewer.options = Postavke
+viewer.main_menu = Glavni izbornik
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = UPRAVLJANJE
+viewer.keys.move = W A S D  ·  Z Q S D  ·  strelice
+viewer.controls.move = Kretanje
+viewer.keys.updown = E, razmaknica  /  C, Ctrl
+viewer.controls.updown = Gore / dolje
+viewer.keys.fast = Shift
+viewer.controls.fast = Brže
+viewer.keys.look = Desna tipka miša
+viewer.controls.look = Razgledavanje
+viewer.keys.speed = Kotačić miša
+viewer.controls.speed = Brzina
+viewer.keys.views = 1 – 9
+viewer.controls.views = Pogledi
+viewer.keys.eyes = 0
+viewer.controls.eyes = Očima igrača na potezu
+viewer.keys.moves = Tab
+viewer.controls.moves = Popis poteza
+viewer.keys.menu = Esc
+viewer.controls.menu = Izbornik
+viewer.keys.hide = H
+viewer.controls.hide = Sakrij ovaj prikaz
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Stanka / nastavak
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Potez natrag / naprijed
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Sporije / brže
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Početak / kraj partije
+viewer.speed = Brzina {0} m/s
+viewer.view.0 = Očima igrača
+viewer.view.1 = Pokraj stola
+viewer.view.2 = Iznad ploče
+viewer.view.3 = Dvorana
+viewer.view.4 = Sat
+viewer.view.5 = Lice bijelog
+viewer.view.6 = Lice crnog
+viewer.view.7 = Dvoboj
+viewer.view.8 = Prozori
+viewer.view.9 = Tapiserije
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Bijeli
+viewer.side.black = Crni
+viewer.flag.white = Bijelom je isteklo vrijeme.
+viewer.flag.black = Crnom je isteklo vrijeme.
+viewer.claims_draw = {0} traži remi.
+viewer.offer_accepted = {0} nudi remi, {1} prihvaća.
+viewer.offer_declined = {0} nudi remi, {1} odbija.
+# "after move {0}": an ordinal ("nakon 34. poteza").
+viewer.gameover.white_wins = Bijeli pobjeđuje nakon {0}. poteza.
+viewer.gameover.black_wins = Crni pobjeđuje nakon {0}. poteza.
+viewer.gameover.draw = Partija završava remijem nakon {0}. poteza.
+viewer.gameover.players = {0} – {1}
+viewer.watch_again = Gledaj ponovno
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Još nema partija za rejting
+elo.provisional = Privremeni rejting
+elo.peak = Najviši {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Vaš Elo {0}
+elo.expected = očekivani rezultat {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ova partija nije za rejting
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Zapisnik
+scoresheet.event = Natjecanje
+scoresheet.date = Datum
+scoresheet.round = Kolo
+scoresheet.board = Ploča
+scoresheet.page = List
+scoresheet.white = Bijeli
+scoresheet.black = Crni
+scoresheet.elo = Elo
+scoresheet.result = Rezultat
+scoresheet.move_no = Br.
+scoresheet.sign_white = Potpis bijelog
+scoresheet.sign_black = Potpis crnog
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Croatian notation: K (kralj) D (dama) T (top) L (lovac) S (skakač); dates "14. 10. 2026."
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {0}. {1}. {2}.
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Igraj na mreži
+online.title = IGRA NA MREŽI
+online.continue = Nastavi
+online.retry = Pokušaj ponovno
+online.copy = Kopiraj
+online.copied = Kopirano
+online.copy.unavailable = Kopiranje ovdje nije dostupno: zapišite ručno.
+# Rated / casual as short labels (selectors, filters, the history's TYPE column): "Za rejting" /
+# "Bez rejtinga", invariant; "prijateljska partija" in full sentences.
+online.rated = Za rejting
+online.casual = Bez rejtinga
+online.casual_only = Samo bez rejtinga
+online.color.random = Ždrijeb
+online.ping = {0} ms
+online.conn.online = Povezano
+online.conn.connecting = Povezivanje…
+online.conn.reconnecting = Ponovno povezivanje…
+online.conn.offline = Nije povezano
+online.conn.incompatible = Druga verzija
+online.no_server.text = Za igru na mreži potreban je poslužitelj Scacelith. Unesite adresu poslužitelja u postavkama ili zaigrajte s prijateljem u izravnom meču.
+online.no_server.settings = Postavke poslužitelja
+
+# Options > Online server
+options.tab.online = Mrežni poslužitelj
+options.online.server = Poslužitelj
+options.online.server.help = Službeni poslužitelj ili prilagođeni poslužitelj (zajednice) koji vodi netko drugi, a kojem se pristupa preko njegova sigurnog web-API-ja i sigurnog WebSocketa. Na svaki se poslužitelj prijavljujete zasebno: račun i prijava nikad se ne dijele među poslužiteljima.
+options.online.official = Službeni poslužitelj — {0}
+options.online.community = Prilagođeni poslužitelj
+options.online.host = Adresa
+options.online.host.hint = naziv domene ili IP adresa
+options.online.host.help = Naziv domene ili IP adresa prilagođenog poslužitelja, onako kako ju je dao njegov vlasnik.
+options.online.api_port = HTTPS / API port
+options.online.api_port.help = Port sigurnog web-API-ja poslužitelja (443 na poslužiteljima Scacelith).
+options.online.ws_port = WSS port
+options.online.ws_port.hint = isti kao API port
+options.online.ws_port.help = Port sigurnog WebSocketa poslužitelja. Ostavite prazno ako je to API port.
+options.online.pin = Otisak certifikata (SHA-256)
+options.online.pin.hint = neobavezno
+options.online.pin.help = Za poslužitelj sa samopotpisanim certifikatom: otisak SHA-256 koji daje njegov vlasnik (64 heksadecimalna znaka, dvotočke su dopuštene). Ostavite prazno kako biste vjerovali certifikatima sustava.
+options.online.pin.invalid = Otisak ima 64 heksadecimalna znaka (dvotočke su dopuštene).
+options.online.test = Provjeri vezu
+options.online.test_ok = {0}: povezano, kompatibilno s ovom verzijom.
+options.online.test_incompatible = {0}: povezano, ali potrebna je druga verzija Scacelitha.
+options.online.in_game = Poslužitelj se ne može promijeniti tijekom partije na mreži.
+options.online.remember_session = Zapamti moju prijavu kad spremište ključeva sustava nije dostupno
+options.online.remember_session.help = Kad nijedno spremište ključeva sustava (GNOME Keyring, KWallet…) ne može čuvati vašu sesiju, ona se sprema u datoteku koju može čitati samo vaš korisnički račun. Svatko tko može čitati vaše datoteke ili njihovu kopiju, primjerice sigurnosnu kopiju, mogao bi iskoristiti tu sesiju. Isključeno: prijava vrijedi dok se igra ne zatvori. Bilo koji uređaj možete odjaviti pod Prijavljeni uređaji, u svom računu.
+
+# Sign in, create an account
+online.signin.lead = Prijavite se na {0} kako biste igrali s ljudima na mreži.
+online.field.user = Korisničko ime ili e-pošta
+online.field.user.hint = ime ili adresa
+online.field.password = Lozinka
+online.field.password.hint = najmanje 10 znakova
+online.field.password2 = Potvrdite lozinku
+online.field.current_password = Trenutna lozinka
+online.field.new_password = Nova lozinka
+online.field.username = Korisničko ime
+online.field.username.hint = 3 do 24 slova, znamenke, _ ili -
+online.field.email = E-pošta
+online.field.new_email = Nova e-pošta
+online.field.code = Kod
+online.field.code.hint = 6 znamenki ili kod za oporavak
+online.field.code6 = Kod iz aplikacije
+online.field.code6.hint = 6 znamenki
+online.signin.button = Prijavi se
+online.signin.google = Nastavi s Googleom
+online.signin.register = Izradi račun
+online.signin.forgot = Zaboravljena lozinka?
+# Two-factor: "dvofaktorska provjera" everywhere (headings, buttons, messages).
+online.mfa.title = KOD ZA DVOFAKTORSKU PROVJERU
+online.mfa.lead = Unesite šesteroznamenkasti kod koji prikazuje vaša aplikacija za autentifikaciju ili jedan od svojih kodova za oporavak.
+online.mfa.verify = Potvrdi
+online.register.title = IZRADA RAČUNA
+online.register.lead = Besplatan račun na {0}: vaše ime, rejtinzi i partije nalaze se samo na ovom poslužitelju.
+online.register.button = Izradi račun
+online.register.working = Izrada računa… to može potrajati nekoliko sekundi.
+online.register.ready = Vaš je račun spreman. Prijavite se za igru.
+online.password.mismatch = Lozinke se ne podudaraju.
+online.check_email.title = PROVJERITE E-POŠTU
+online.check_email.text = Poslali smo poveznicu na {0}. Otvorite je kako biste aktivirali račun, a zatim se ovdje prijavite.
+online.check_email.ask = Unesite adresu svog računa kako biste ponovno primili poveznicu za aktivaciju.
+online.check_email.resend = Ponovno pošalji e-poruku
+online.check_email.resent = E-poruka je ponovno poslana. Može potrajati nekoliko minuta; provjerite i mapu neželjene pošte.
+online.forgot.title = ZABORAVLJENA LOZINKA
+online.forgot.lead = Unesite adresu e-pošte svog računa: poslat ćemo vam poveznicu za odabir nove lozinke.
+online.forgot.button = Pošalji poveznicu
+online.forgot.sent = Ako neki račun koristi ovu adresu, poveznica je na putu.
+online.sso.title = PRIJAVA PUTEM GOOGLEA
+online.sso.wait = Nastavite u web-pregledniku: odaberite svoj Google račun u prozoru koji se otvorio. Scacelith nastavlja čim vas Google vrati.
+online.sso.name_title = ODABERITE IME
+online.sso.name_lead = Ovdje ste prvi put s Googleom. Odaberite ime koje će vidjeti drugi igrači.
+online.sso.continue = Nastavi
+online.sso.finishing = Google vas je vratio. Dovršavanje prijave…
+online.sso.link_title = DODAVANJE PRIJAVE PUTEM GOOGLEA
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Račun {0} na {1} već koristi adresu e-pošte ovog Google računa. Unesite lozinku tog računa kako biste mu dodali prijavu putem Googlea. To je potrebno učiniti samo jednom.
+online.sso.link_button = Dodaj prijavu putem Googlea
+online.sso.link_mfa = Prijava putem Googlea dodaje se ovom računu čim kod bude prihvaćen.
+online.sso.not_mine = Ovo nije moj račun
+online.sso.not_mine_note = Prijava putem Googlea nije dodana. Ako je ova adresa e-pošte vaša, upotrijebite s njom „Zaboravljena lozinka?“: poveznica stiže u taj poštanski sandučić. Ako račun traži i kod za dvofaktorsku provjeru koji nemate, obratite se operateru poslužitelja.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: prijava putem Googlea
+online.sso.page.done_heading = Natrag u Scacelith
+online.sso.page.done = Google vas je vratio u Scacelith. Vratite se u igru kako biste dovršili prijavu; ovu karticu možete zatvoriti.
+online.sso.page.cancelled_heading = Prijava je otkazana
+online.sso.page.cancelled = Prijava putem Googlea je otkazana. Možete zatvoriti ovu karticu i vratiti se u Scacelith.
+online.sso.page.foreign_heading = Ova stranica nije za vas
+online.sso.page.foreign = Ova stranica ne odgovara prijavi koju Scacelith čeka na ovom računalu. Ako prijava putem Googlea nije upravo pokrenuta u Scacelithu, netko vam je možda poslao ovu poveznicu: zatvorite ovu karticu.
+
+# Account
+online.account.button = Račun
+online.account.title = RAČUN
+online.account.section = RAČUN
+online.account.username = KORISNIČKO IME
+online.account.email = E-POŠTA
+online.account.unverified = (nije potvrđena)
+online.account.mfa = DVOFAKTORSKA PROVJERA
+online.account.mfa_on = Uključena
+online.account.mfa_off = Isključena
+online.account.google = GOOGLE
+online.account.google_linked = Povezan s Google računom
+online.account.change_password = Promijeni lozinku
+online.account.mfa_setup = Uključi dvofaktorsku provjeru
+online.account.mfa_disable = Isključi dvofaktorsku provjeru
+online.account.recovery = Novi kodovi za oporavak
+online.account.sign_out = Odjavi se
+online.account.sign_out_all = Odjavi se svugdje
+online.account.sign_out_all.help = Odjavljuje ovaj račun na svim računalima, uključujući ovo.
+online.account.signed_out = Odjava je uspjela.
+online.account.signed_out_all = Odjava je provedena na svim računalima.
+online.account.signing_out_all = Odjavljivanje svih računala…
+online.account.sign_out_all_failed = Vaša druga računala možda su i dalje prijavljena: ponovno se prijavite, a zatim ih odjavite pod Prijavljeni uređaji. {0}
+online.account.sign_out_all_retry = Vaša druga računala možda su i dalje prijavljena. Ponovno pokušajte s „Odjavi se svugdje“. {0}
+online.account.ratings = REJTINZI
+online.account.col.tc = TEMPO IGRE
+online.account.col.rating = REJTING
+online.account.col.games = PARTIJE
+# W / D / L as chess players write a score: + (wins) = (draws) − (losses).
+online.account.col.record = + / = / −
+online.account.provisional = Upitnik označava privremeni rejting (zasad je odigrano malo partija).
+online.password.title = PROMJENA LOZINKE
+online.password.button = Promijeni lozinku
+online.password.changed = Vaša je lozinka promijenjena.
+online.password.other_sessions = Na drugim ćete se računalima morati ponovno prijaviti.
+online.mfa_setup.title = DVOFAKTORSKA PROVJERA
+online.mfa_setup.lead = Dvofaktorska provjera pri svakoj prijavi traži kod iz aplikacije na vašem telefonu. Za početak unesite lozinku.
+online.mfa_setup.scan = 1. Skenirajte ovaj kod aplikacijom za autentifikaciju ili u nju upišite ovaj ključ:
+online.mfa_setup.enter = 2. Unesite šesteroznamenkasti kod koji prikazuje aplikacija:
+online.mfa_setup.enable = Uključi
+online.mfa_setup.done = Dvofaktorska provjera je uključena.
+online.mfa_off.title = ISKLJUČIVANJE DVOFAKTORSKE PROVJERE
+online.mfa_off.lead = Unesite lozinku i kod iz aplikacije (ili kod za oporavak).
+online.mfa_off.button = Isključi
+online.mfa.off_done = Dvofaktorska provjera je isključena.
+online.recovery.title = KODOVI ZA OPORAVAK
+online.recovery.lead = Svaki kod omogućuje jednu prijavu ako izgubite telefon. Čuvajte ih na sigurnom mjestu: prikazuju se samo sada.
+online.recovery.saved = Kodovi su spremljeni
+online.recovery.new_title = NOVI KODOVI ZA OPORAVAK
+online.recovery.new_lead = Novi kodovi zamjenjuju stare. Unesite lozinku i kod iz aplikacije.
+online.recovery.button = Novi kodovi
+online.account.manage = SIGURNOST I PODACI
+online.account.pending_email = Čeka se potvrda: {0}
+online.account.accept_challenges = Prihvaćaj izazove
+online.account.accept_challenges.help = Drugi igrači mogu vas izazvati putem vašeg korisničkog imena. Isključeno: njihovi se izazovi odbijaju.
+online.account.history = Povijest partija
+online.account.devices = Prijavljeni uređaji
+online.account.change_email = Promijeni e-poštu
+online.account.export = Preuzmi moje podatke
+online.account.delete = Izbriši račun
+
+# Play
+online.play.signed_in = Prijavljeni ste kao {0}
+online.session.file = Nijedno spremište ključeva sustava ne može čuvati vašu prijavu: pamti se u datoteci koju može čitati samo vaš korisnički račun (Postavke > Mrežni poslužitelj).
+online.session.memory = Nijedno spremište ključeva sustava ne može čuvati vašu prijavu, a ona se ne sprema u datoteku: prijava vrijedi dok se igra ne zatvori (Postavke > Mrežni poslužitelj).
+online.play.find_section = PRONAĐITE PROTIVNIKA
+online.play.friend_section = IGRAJTE S PRIJATELJEM
+online.play.mode = Vrsta partije
+online.play.mode.help = Partije za rejting mijenjaju vaš rejting u ovom tempu igre; partije bez rejtinga ne mijenjaju ga.
+online.play.find = Pronađi protivnika
+online.play.connecting = Povezivanje s poslužiteljem…
+online.play.cooldown = Protivnika možete ponovno tražiti u {0}.
+online.play.banned = Ovaj je račun suspendiran do {0}.
+online.play.challenge = Izazovi igrača
+online.play.challenge.desc = Pozovite nekoga tko je na mreži putem njegova korisničkog imena.
+online.play.private = Privatna partija
+online.play.private.desc = Izradite kod koji ćete dati prijatelju ili se pridružite pomoću prijateljeva koda.
+online.play.direct = Izravni meč
+online.play.direct.desc = Bez poslužitelja: igrajte izravno s računalom prijatelja.
+online.search.title = TRAŽENJE
+online.search.window = Raspon rejtinga {0}
+online.search.queued = {0} igrač traži|{0} igrača traže|{0} igrača traži
+online.search.wait = Traženje protivnika vaše razine…
+online.outgoing.challenge = IZAZOV JE POSLAN
+online.outgoing.waiting = čeka se odgovor
+online.outgoing.private = PRIVATNA PARTIJA
+online.outgoing.private_hint = Dajte ovaj kod prijatelju: partija počinje kad se pridruži.
+online.challenge.title = IZAZOVITE IGRAČA
+online.challenge.opponent = PROTIVNIK
+online.field.opponent = Korisničko ime
+online.field.opponent.hint = koga izazivate
+online.challenge.note = Protivnik vidi izazov bilo gdje u izbornicima i ima minutu za odgovor.
+online.challenge.send = Pošalji izazov
+online.terms.rated = Za rejting
+online.terms.rated.help = Za rejting se mogu igrati samo službeni tempovi igre.
+online.terms.color = Vaša boja
+online.private.title = PRIVATNA PARTIJA
+online.private.create_section = IZRADA
+online.private.create_note = Dobivate kratki kod: tko ga unese, igra protiv vas.
+online.private.create = Izradi partiju
+online.private.join_section = PRIDRUŽIVANJE
+online.field.private_code = Kod
+online.private.join = Pridruži se
+online.private.joining = Pridruživanje partiji…
+online.challenge.received = IZAZOV
+online.challenge.accept = Prihvati
+online.challenge.decline = Odbij
+online.challenge.you_white = igrate bijelima
+online.challenge.you_black = igrate crnima
+online.challenge.you_random = boje ždrijebom
+online.challenge.declined = {0} odbija vaš izazov.
+online.challenge.expired = Vaš je izazov istekao bez odgovora.
+online.challenge.unavailable = Igrač {0} trenutačno nije dostupan.
+online.challenge.lost = Veza je prekinuta: vaš je izazov otkazan.
+
+# At the table
+# Abort (the game is cancelled and does not count): "poništiti", kept apart from "predati" (resign).
+online.pause.clock_runs = Partija se nastavlja: vaš sat i dalje teče.
+online.pause.abort = Poništi partiju
+online.pause.abort.help = Prije vašeg prvog poteza partija se može poništiti; ne računa se.
+online.pause.leave = Napusti partiju
+online.confirm.resign.text = Želite li predati ovu partiju? Pobjeda pripada protivniku.
+online.confirm.leave.text = Napuštanje znači predaju ove partije: pobjeđuje protivnik.
+online.confirm.leave.ok = Predaj i izađi
+online.confirm.leave_abort.text = Želite li izaći prije prvog poteza? Partija se poništava i ne računa se.
+online.confirm.leave_abort.ok = Poništi i izađi
+online.draw.card_title = PONUDA REMIJA
+online.draw.card_text = Protivnik nudi remi.
+online.draw.accept = Prihvati
+online.draw.decline = Odbij
+online.draw.offered = Protivnik nudi remi.
+online.opponent_back = Protivnik je ponovno povezan.
+online.opponent_away = Protivnik nije povezan — {0} za povratak
+online.first_move = Vaš prvi potez · {0}
+online.reconnecting = PONOVNO POVEZIVANJE…
+online.reconnecting.text = Partija se nastavlja na poslužitelju, a vaš sat i dalje teče.
+online.gameover.aborted = Partija je poništena: ne računa se.
+online.rating.casual = Partija bez rejtinga: rejtinzi su nepromijenjeni.
+online.rating.change = Rejting {0} → {1} ({2})
+online.rating.pending = Rejting: …
+online.rematch.accept = Prihvati revanš
+online.rematch.offered = Protivnik nudi revanš.
+online.rematch.waiting = Revanš je ponuđen…
+online.rematch.gone = Nema revanša
+online.rematch.declined = Ovaj put nema revanša.
+online.report.button = Prijavi protivnika
+online.report.title = PRIJAVA PROTIVNIKA
+online.report.lead = Prijave se zajedno s ovom partijom šalju moderatorima poslužitelja. Hvala što pomažete da igra ostane poštena.
+online.report.category = Razlog
+online.report.cheating = Varanje
+online.report.abuse = Uvredljivo ponašanje
+online.report.other = Drugo
+online.report.comment = Komentar
+online.report.comment.hint = neobavezno
+online.report.send = Pošalji prijavu
+online.report.sent = Prijava je poslana. Hvala.
+online.report.queued = Vaša će prijava biti poslana kad partija završi.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Na mreži, {0} {1}
+online.sheet.rated = za rejting
+online.sheet.casual = bez rejtinga
+online.sheet.game = Partija {0}
+# End reasons of online games
+reason.online.abandonment = Protivnik je napustio partiju
+reason.online.abandonment_vs_insufficient = Napuštanje partije, ali protivnik ne može dati mat
+reason.online.aborted = Partija poništena
+reason.online.no_show = Prvi potez nije odigran na vrijeme (poništeno)
+reason.online.forfeit = Kontumacija
+reason.online.server_aborted = Poslužitelj je poništio partiju
+reason.online.both_disconnected = Oba igrača izgubila su vezu
+# Server notices
+online.notice.shutdown = Poslužitelj se ponovno pokreće za {0}. Partije u tijeku su spremljene.
+online.notice.revoked = Vaša je prijava na ovom poslužitelju opozvana.
+online.notice.replaced = Vaš se račun povezao iz drugog prozora; ovaj je sada izvan mreže.
+online.notice.rating_restored = Vašem je rejtingu vraćen {0} bod: jedan je protivnik isključen zbog varanja.|Vašem su rejtingu vraćena {0} boda: jedan je protivnik isključen zbog varanja.|Vašem je rejtingu vraćeno {0} bodova: jedan je protivnik isključen zbog varanja.
+# Errors
+online.err.rate_limited_for = Previše pokušaja. Pokušajte ponovno za {0}.
+online.err.rate_limited = Previše pokušaja. Pokušajte ponovno za trenutak.
+online.err.server_busy_for = Poslužitelj je zauzet. Pokušajte ponovno za {0}.
+online.err.server_busy = Poslužitelj je zauzet. Pokušajte ponovno za trenutak.
+online.err.banned_until = Ovaj je račun suspendiran do {0}.
+online.err.banned = Ovaj je račun suspendiran.
+online.err.invalid_credentials = Pogrešno korisničko ime ili lozinka.
+online.err.invalid_credentials_pending = Pogrešno korisničko ime ili lozinka. Nakon nedavne registracije najprije otvorite poveznicu koju smo vam poslali.
+online.err.email_unverified = Vaša adresa e-pošte još nije potvrđena: otvorite poveznicu koju smo vam poslali.
+online.err.network = Poslužitelj nije dostupan. Provjerite vezu i adresu poslužitelja.
+online.err.tls = Nije moguće uspostaviti sigurnu vezu s poslužiteljem.
+online.err.certificate = Certifikat poslužitelja nije pouzdan (ili ne odgovara otisku u postavkama).
+online.err.incompatible = Ovaj poslužitelj traži drugu verziju Scacelitha.
+online.err.unauthorized = Vaša je sesija završila: ponovno se prijavite.
+online.err.username_taken = Ovo korisničko ime je zauzeto.
+online.err.email_taken = Ovu adresu e-pošte već koristi neki račun.
+online.err.invalid_username = Korisničko ime ima 3 do 24 slova, znamenke, _ ili -.
+online.err.invalid_email = Ova adresa e-pošte nije valjana.
+online.err.weak_password = Lozinka je preslaba: upotrijebite najmanje 10 znakova.
+online.err.invalid_code = Ovaj kod nije ispravan.
+online.err.expired = Zahtjev je istekao: počnite ispočetka.
+online.err.registration_closed = Ovaj poslužitelj ne prima nove račune.
+online.err.sso_cancelled = Prijava putem Googlea je otkazana.
+online.err.sso_expired = Prijava putem Googlea trajala je predugo ili je već iskorištena. Počnite ispočetka.
+online.err.sso_failed = Prijava putem Googlea nije uspjela. Pokušajte ponovno.
+online.err.sso_listen = Googleov odgovor nije moguće primiti na ovom računalu. Pokušajte ponovno.
+online.err.sso_origin = Prijava putem Googlea ne radi preko ove adrese poslužitelja. Dodajte poslužitelj pod javnim nazivom koji navodi njegov operater, a zatim pokušajte ponovno.
+online.err.browser = Web-preglednik nije moguće otvoriti.
+online.err.sso_email_unverified = Google nije potvrdio adresu e-pošte ovog Google računa.
+online.err.sso_account_exists = Ovu adresu e-pošte već koristi račun koji se ne može povezati s prijavom putem Googlea: prijavite se njegovom lozinkom ili upotrijebite „Zaboravljena lozinka?“.
+online.err.sso_already_linked = Ovaj je Google račun već povezan s drugim računom.
+online.err.account_disabled = Ovaj se račun više ne može koristiti.
+online.err.server_error = Na poslužitelju je došlo do problema. Pokušajte ponovno.
+online.err.timeout = Poslužitelj nije odgovorio na vrijeme.
+online.err.offline = Nema veze s poslužiteljem: pokušajte ponovno kad se veza uspostavi.
+online.err.other = Poslužitelj je odbio zahtjev ({0}).
+online.err.code = Poslužitelj je odbio zahtjev (pogreška {0}).
+online.err.slow_down = Malo usporite.
+online.err.server_full = Poslužitelj je pun. Pokušajte ponovno kasnije.
+online.err.restarting = Poslužitelj se ponovno pokreće. Pokušajte ponovno za trenutak.
+online.err.move_refused = Poslužitelj je odbio taj potez: ploča je vraćena.
+online.err.game_over = Ova je partija već završena.
+online.err.already_in_game = Već igrate partiju.
+online.err.invalid_category = Ovaj tempo igre ovdje nije ponuđen.
+online.err.draw_offer_limit = Zasad nema više ponuda remija.
+online.err.abort_not_allowed = Partija se više ne može poništiti.
+online.err.no_pending_offer = Nema ponude na koju treba odgovoriti.
+online.err.flag_fell = Isteklo vam je vrijeme.
+online.err.queue_not_allowed = Trenutačno ne možete tražiti protivnika.
+online.err.challenge_not_found = Ovaj izazov više ne postoji.
+online.err.user_unavailable = Ovaj igrač nije dostupan.
+online.err.challenge_limit = Zasad previše izazova. Pokušajte ponovno kasnije.
+online.err.challenge_self = Ne možete izazvati sebe.
+online.err.code_invalid = Nijedna partija nema ovaj kod.
+online.err.rated_official_tc = Za rejting se mogu igrati samo službeni tempovi igre.
+online.err.cooldown = Traženje protivnika za vas je na trenutak zaustavljeno.
+online.err.invalid_tc = Ovaj tempo igre nije dopušten.
+online.err.rematch_unavailable = Revanš više nije moguć.
+online.err.rated_repeat_limit = Zasad je odigrano dovoljno partija za rejting protiv ovog igrača. Odigrajte partiju bez rejtinga ili pokušajte ponovno kasnije.
+online.err.cheat_detected = Partiju je zaustavila poslužiteljeva provjera poštene igre.
+online.err.invalid_password = Pogrešna lozinka.
+online.err.mfa_code_required = Unesite kod iz aplikacije za autentifikaciju (ili kod za oporavak).
+online.err.password_not_set = Ovaj se račun prijavljuje putem Googlea i još nema lozinku. Najprije je postavite pomoću „Zaboravljena lozinka?“ na stranici za prijavu.
+online.err.too_many_attempts = Previše pogrešnih pokušaja. Pokušajte ponovno kasnije.
+online.err.too_many_attempts_for = Previše pogrešnih pokušaja. Pokušajte ponovno za {0}.
+online.err.same_email = To je već vaša adresa e-pošte.
+online.err.not_found = Nije pronađeno na poslužitelju.
+online.err.invalid_response = Odgovor poslužitelja nije moguće pročitati.
+online.err.storage = Sesiju nije moguće spremiti na ovo računalo.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = POVIJEST PARTIJA
+online.history.filter.games = Partije
+online.history.filter.result = Rezultat
+online.history.filter.all = Sve
+online.history.filter.won = Pobjede
+online.history.filter.lost = Porazi
+online.history.filter.drawn = Remiji
+online.history.col.date = DATUM
+online.history.col.opponent = PROTIVNIK
+online.history.col.result = REZULTAT
+online.history.col.tc = TEMPO IGRE
+online.history.col.kind = VRSTA
+online.history.col.rating = REJTING
+online.history.won = Pobjeda
+online.history.lost = Poraz
+online.history.drawn = Remi
+online.history.aborted = Poništena
+online.history.page = Stranica {0} od {1}
+online.history.total = {0} partija|{0} partije|{0} partija
+online.history.previous = Prethodna
+online.history.next = Sljedeća
+online.history.empty.title = JOŠ NEMA PARTIJA
+online.history.empty = Vaše partije na ovom poslužitelju prikazuju se ovdje kad završe.
+online.history.empty_filter.title = NEMA PARTIJA
+online.history.empty_filter = Nijedna partija ne odgovara ovim filtrima.
+online.history.error = POVIJEST NIJE MOGUĆE UČITATI
+online.history.unavailable = OVAJ POSLUŽITELJ NE NUDI POVIJEST PARTIJA
+online.game.title = PARTIJA
+online.game.players = IGRAČI
+online.game.you = VI
+online.game.unrated = Bez rejtinga
+online.game.you_won = Pobjeda
+online.game.you_lost = Poraz
+online.game.draw = Remi
+online.game.you_left = Napustili ste partiju
+online.game.date = DATUM
+online.game.time_control = TEMPO IGRE
+online.game.moves = POTEZI
+online.game.move_count = {0} potez|{0} poteza|{0} poteza
+online.game.no_moves = Nije odigran nijedan potez.
+online.game.moves_incomplete = Neke poteze nije moguće pročitati: popis prestaje prije kraja.
+online.game.save = Spremi partiju
+online.game.saved_button = Spremljeno
+online.game.saved = Partija je među vašim spremljenim partijama.
+online.game.already_saved = Ova je partija već među vašim spremljenim partijama.
+online.game.save_failed = Partiju nije moguće spremiti.
+online.game.invalid = Poslužitelj je poslao zapis partije koji se ne može pročitati.
+online.game.replay = Reproduciraj
+online.game.not_found = PARTIJA NIJE PRONAĐENA
+online.game.error = PARTIJU NIJE MOGUĆE UČITATI
+online.devices.title = PRIJAVLJENI UREĐAJI
+online.devices.lead = Uređaji na kojima je ovaj račun prijavljen. Ako neki ne prepoznajete, odjavite ga i promijenite lozinku.
+online.devices.unknown = Nepoznat uređaj
+online.devices.this = OVAJ UREĐAJ
+online.devices.signed_in = Prijavljen {0}
+online.devices.last_active = posljednja aktivnost {0}
+online.devices.active_now = trenutačno u upotrebi
+online.devices.sign_out = Odjavi
+online.devices.signed_out = Taj je uređaj odjavljen.
+online.devices.error = UREĐAJE NIJE MOGUĆE UČITATI
+online.devices.all.title = ODJAVA SVUGDJE
+online.email.title = PROMJENA E-POŠTE
+online.email.current = Trenutna adresa: {0}
+online.email.button = Promijeni e-poštu
+online.email.sent = Poveznica za potvrdu poslana je na {0}.
+online.email.sent.hint = Adresa se mijenja kad se poveznica otvori. Do tada ostaje u upotrebi vaša trenutna adresa.
+online.email.done = Gotovo
+online.email.changed = Vaša je adresa e-pošte promijenjena.
+online.export.title = PREUZIMANJE MOJIH PODATAKA
+online.export.lead = Sve što ovaj poslužitelj čuva o vašem računu (profil, rejtinzi, partije, uređaji, sigurnosni događaji) sprema se kao datoteka JSON na ovo računalo. Za potvrdu unesite lozinku.
+online.export.button = Preuzmi
+online.export.saved = Vaši su podaci spremljeni na ovo računalo.
+online.export.failed = Datoteku nije moguće zapisati.
+online.delete.title = BRISANJE RAČUNA
+online.delete.warning = Vaš će račun biti izbrisan s ovog poslužitelja: vaša adresa e-pošte, lozinka, dvofaktorska provjera i uređaji brišu se i više se nije moguće prijaviti. To se ne može poništiti.
+online.delete.games = Vaše partije i rejtinzi ostaju na poslužitelju pod anonimnim imenom {0}.
+online.delete.confirm_name = Za potvrdu unesite svoje korisničko ime i lozinku.
+online.delete.button = Izbriši moj račun
+online.delete.done = Vaš je račun izbrisan.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+# Router: "usmjerivač" (as Croatian Windows); online.direct.router is a locative ("Port je otvoren
+# na vašem usmjerivaču.").
+online.direct.button = Izravni meč
+online.direct.title = IZRAVNI MEČ
+online.direct.lead = Prijateljska partija izravno između dva računala: bez poslužitelja, bez računa, nikad za rejting.
+online.direct.host = Ugosti partiju
+online.direct.host.desc = Prijatelj se povezuje s vama: od vas dobiva adresu i kod.
+online.direct.join = Pridruži se partiji
+online.direct.join.desc = Povežite se s prijateljem koji je domaćin.
+online.direct.host_title = UGOŠĆIVANJE PARTIJE
+online.direct.your_color = Vaša boja
+online.direct.auto_press.help = Oba robota sama pritišću sat čim je potez na ploči. Isključeno: svaki igrač pritišće sat nakon svakog poteza.
+online.direct.unrated = Izravni mečevi su prijateljske partije: nikad za rejting.
+online.direct.connection = VEZA
+online.direct.port = Port
+online.direct.port.help = TCP port na koji se prijatelj povezuje (47100 ako nije zauzet).
+online.direct.port_range = Odaberite port između 1024 i 65535.
+online.direct.upnp = Otvori port na mom usmjerivaču (UPnP)
+online.direct.upnp.help = Traži od kućnog usmjerivača da proslijedi port ovom računalu, a nakon partije ga zatvara.
+online.direct.host_note_upnp = Igra traži od vašeg usmjerivača da otvori port. Ako to ne može, saznat ćete koji port morate ručno proslijediti.
+online.direct.host_note_manual = Na usmjerivaču proslijedite TCP port ovom računalu ili igrajte na istoj mreži.
+online.direct.host_button = Ugosti
+online.direct.wait_title = ČEKANJE PRIJATELJA
+online.direct.opening = Otvaranje porta {0} na vašem usmjerivaču…
+online.direct.give = Dajte prijatelju:
+online.direct.cap_address = ADRESA
+online.direct.cap_port = PORT
+online.direct.cap_code = KOD
+online.direct.lan = Na istoj mreži: {0}
+online.direct.router = vašem usmjerivaču
+online.direct.upnp_searching = Traženje vašeg usmjerivača…
+online.direct.upnp_mapped = Port je otvoren na {0}.
+online.direct.upnp_none = Nijedan UPnP usmjerivač nije odgovorio: ručno proslijedite TCP port {0} ovom računalu.
+online.direct.upnp_failed = Usmjerivač je odbio otvoriti port: ručno proslijedite TCP port {0} ovom računalu.
+online.direct.upnp_off = Na usmjerivaču proslijedite TCP port {0} ovom računalu.
+online.direct.upnp_cgnat = Vaš davatelj usluga vjerojatno dijeli vašu internetsku adresu (CGNAT): pokušajte s IPv6 ili VPN-om.
+online.direct.firewall = Ako Windows pita smije li Scacelith prihvaćati veze, dopustite to.
+online.direct.waiting = Čekanje prijatelja…
+online.direct.connecting_friend = Prijatelj se povezuje…
+online.direct.starting = Postavljanje ploče…
+online.direct.join_title = PRIDRUŽIVANJE PARTIJI
+online.direct.join_lead = Unesite ono što vam prijatelj pročita: adresu, port i kod.
+online.direct.address = Adresa
+online.direct.address.hint = IPv4, IPv6 ili naziv
+online.direct.code = Kod
+online.direct.join_button = Pridruži se
+online.direct.connecting_to = Povezivanje s {0}…
+online.direct.securing = Osiguravanje veze s {0}…
+direct.event = Prijateljski meč
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Izravno, {0}
+direct.err.refused = Na ovoj adresi i portu nitko nije domaćin.
+direct.err.timeout = Nema odgovora: provjerite adresu i port te propušta li prijateljev usmjerivač igru.
+direct.err.wrong_code = Kod nije ispravan.
+direct.err.invalid_code = Kod ima 12 znakova (XXXX-XXXX-XXXX).
+direct.err.incompatible = Vaš prijatelj ima drugu verziju Scacelitha.
+direct.err.port_in_use = Ovaj se port već koristi na ovom računalu: odaberite drugi.
+direct.err.network = Mrežu nije moguće koristiti.
+direct.err.too_many_attempts = Previše pogrešnih kodova: ugošćivanje je zaustavljeno. Ponovno ugostite partiju za novi kod.
+direct.err.bad_address = Ova adresa nije valjana.
+direct.err.not_found = Ovaj naziv nije pronađen.
+direct.err.unreachable = Ova adresa nije dostupna odavde.
+direct.err.reset = Veza je prekinuta.
+direct.err.closed = Veza je zatvorena.
+direct.err.host_left = Prijatelj više nije domaćin.
+direct.err.other = Povezivanje nije uspjelo ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# Player names cannot be declined: they stand in the nominative, or after "igrač" ("igraču {1}").
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Igrač 2
+hotseat.white_player = Bijeli
+hotseat.black_player = Crni
+hotseat.name.help = Ime koje se upisuje na oba zapisnika, u bilo kojem pismu.
+hotseat.swap = Zamijeni boje
+hotseat.left_hand = {0} igra lijevom rukom: sat stoji s lijeve strane.
+hotseat.rated = Partija za rejting
+hotseat.rated.help = Svako ime ima vlastiti rejting za dva igrača na ovom računalu. Vaš rejting protiv Stockfisha nikad se ne mijenja.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Rejtinzi za dva igrača: {0} {1} · {2} {3}
+hotseat.new_rating = (novi)
+hotseat.friendly_note = Prijateljska partija: rejtinzi se ne mijenjaju.
+hotseat.colours = {0} igra bijelima, {1} crnima.
+hotseat.colours_swap = Boje se zamjenjuju pri svakom revanšu.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, vaš potez
+hotseat.flag = {0}: isteklo je vrijeme.
+hotseat.confirm.resign = Želite li predati u ime igrača {0}? Pobjeda pripada igraču {1}.
+hotseat.confirm.resign_draw = Želite li predati u ime igrača {0}? Igrač {1} više ne može dati mat: partija će završiti remijem.
+hotseat.draw.offer_noted = Vaša ponuda remija ide uz vaš potez: igrač {0} vidjet će je nakon pritiska na sat.
+hotseat.draw.card_title = PONUDA REMIJA
+hotseat.draw.offered = {0} nudi remi.
+hotseat.draw.card_hint = Dodir figure znači odbijanje.
+hotseat.draw.accept = Prihvati
+hotseat.draw.decline = Odbij
+hotseat.draw.accepted = {0} prihvaća remi koji nudi {1}.
+hotseat.draw.declined = {0} odbija remi koji nudi {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Partija za rejting
+hotseat.sheet.friendly = Prijateljska partija
+# Game over card
+hotseat.gameover.wins = {0} pobjeđuje u {1} potezu.|{0} pobjeđuje u {1} poteza.|{0} pobjeđuje u {1} poteza.
+hotseat.gameover.wins_now = {0} pobjeđuje.
+hotseat.gameover.friendly = {0} – {1} · prijateljska partija
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Ova partija nije za rejting.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Trener
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Sintetizirani govor za način Trener generiran modelom {0}
+# Coach page
+coach.title = TRENER
+coach.section.level = RAZINA
+coach.section.lesson = S TRENEROM
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Za igrače s rejtingom {0}
+coach.completed = Završeno
+coach.recommended = Preporučeno
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Pravila šaha
+coach.level.0.desc = Interaktivna lekcija, pravilo po pravilo.
+coach.level.0.detail = Trener postavlja male pozicije i pokazuje kako se svaka figura kreće i uzima, zatim rokadu, promociju, šah i mat. Svaku zamisao isprobavate na ploči vlastitom rukom.
+coach.level.1.name = Prvi koraci
+coach.level.1.desc = Što je napadnuto, a što ostaje nebranjeno.
+coach.level.1.detail = Trener igra blago i govori jednostavno: koje su vaše figure napadnute, koje su ostale bez zaštite i kako ih sačuvati.
+coach.level.2.name = Početnik
+coach.level.2.desc = Jednostavna taktika, razvoj, sigurnost kralja.
+coach.level.2.detail = Vilice i vezanja zovu se svojim imenima. Trener govori o razvoju figura i o tome kako zaštititi kralja.
+coach.level.3.name = Napredni početnik
+coach.level.3.desc = Planovi, pješačka struktura, jedini potezi.
+coach.level.3.detail = Trener objašnjava planove i pješačke strukture te upozorava kad poziciju drži samo jedan potez.
+coach.level.4.name = Klupski igrač
+coach.level.4.desc = Potezi kandidati, procjena u pješacima.
+coach.level.4.detail = Trener odvaguje poteze kandidate i daje procjenu u pješacima, kao što bi to činio klupski trener.
+coach.level.5.name = Jak klupski igrač
+coach.level.5.desc = Sažete varijante, pozicijski pojmovi.
+coach.level.5.detail = Kratke primjedbe, konkretne varijante i rječnik pozicijske igre.
+coach.level.6.name = Stručnjak
+coach.level.6.desc = Škrte primjedbe, duboke varijante, brojčane procjene.
+coach.level.6.detail = Malo riječi, kao među jakim igračima: varijante duboke nekoliko poteza i brojčane procjene.
+coach.note.clock = Bez sata: uzmite onoliko vremena koliko vam treba.
+coach.note.takeback = Nakon grube pogreške trener pokazuje što je pošlo po zlu i nudi vraćanje poteza.
+coach.note.lesson = Igrate bijelima; trener postavlja svaku vježbu na ploču.
+coach.note.unrated = Partije s trenerom nisu za rejting.
+coach.note.fallible = Trener nije nepogrešiv: ponekad može pogrešno procijeniti potez.
+coach.colour = Vaša boja
+coach.colour.help = Boja kojom igrate protiv trenera. Naizmjence: bijelima, zatim crnima, od partije do partije. Lekcija o pravilima uvijek se igra bijelima.
+coach.colour.alternate = Naizmjence
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Trenerov glas nije instaliran ili je isključen (Postavke > Zvuk): njegove će riječi biti ispisane na zaslonu.
+# At the table
+coach.speaker = TRENER
+coach.skip = Preskoči
+coach.offer.title = VRATITI POTEZ?
+coach.offer.text = Trener nudi vraćanje vašeg posljednjeg poteza kako biste potražili bolji.
+coach.offer.hint = Backspace vraća potez. Dodir figure znači nastavak igre.
+coach.offer.accept = Vrati potez
+coach.offer.decline = Nastavi igru
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Preostala vraćanja poteza: {0}
+coach.pause.take_back = Vrati moj potez
+coach.pause.take_back.help = Vraća vaš posljednji potez i trenerov odgovor ako je već odigran.
+coach.confirm.resign = Želite li predati ovu partiju? Trener će biti proglašen pobjednikom.
+coach.confirm.resign_draw = Želite li predati ovu partiju? Trener više ne može dati mat: partija će završiti remijem.
+coach.confirm.leave = Želite li se vratiti u glavni izbornik? Ova partija s trenerom bit će napuštena.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Igraj ponovno
+coach.gameover.unrated = Ova partija s trenerom nije za rejting.
+coach.lesson.done = BRAVO
+coach.lesson.done.line = Sada znate pravila šaha.
+coach.lesson.next = Prva partija
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Trening
+coach.tab.challenges = Izazovi
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATOVI
+challenge.group.tactics = TAKTIKA
+challenge.group.defence = OBRANA
+challenge.group.endgames = ZAVRŠNICE
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat u jednom potezu
+challenge.mate1.desc = Jedan potez – i mat.
+challenge.mate1.detail = Najprije pogledajte svaki šah: jedan od njih kralju ne ostavlja ni slobodno polje, ni pokrivanje, ni uzimanje.
+challenge.mate2.name = Mat u dva poteza
+challenge.mate2.desc = Potez nakon kojeg nema obrane, zatim mat.
+challenge.mate2.detail = Prvi je potez često šah ili žrtva koja kralju oduzima polje. Trener se brani najbolje što može.
+challenge.mate3.name = Mat u tri poteza
+challenge.mate3.desc = Dulje prisilne varijante.
+challenge.mate3.detail = Šahovi, uzimanja i prijetnje, tri poteza u dubinu. Prije nego što dodirnete figuru, izračunajte trenerov najbolji odgovor u svakom koraku.
+challenge.backrank.name = Matovi na zadnjem redu
+challenge.backrank.desc = Kralj zarobljen iza vlastitih pješaka.
+challenge.backrank.detail = Kad se pješaci ispred rokiranog kralja nisu pomaknuli, top ili dama na zadnjem redu mogu dati mat. Najprije uklonite ili odvucite branitelje.
+challenge.patterns.name = Matne slike
+challenge.patterns.desc = Ugušeni mat, Anastazijin mat, arapski mat i drugi klasici.
+challenge.patterns.detail = Slavne matne mreže koje se uvijek iznova vraćaju. Naučite prepoznati raspored figura i završni udarac.
+challenge.hanging.name = Nebranjene figure
+challenge.hanging.desc = Uočite ono što je ostalo nebranjeno.
+challenge.hanging.detail = Figura ili pješak koje nitko ne brani mogu se jednostavno uzeti. Provjerite što brani svaku trenerovu figuru.
+challenge.fork.name = Vilice
+challenge.fork.desc = Jedna figura napada dvije odjednom.
+challenge.fork.detail = Vilicu mogu napraviti skakači, pješaci, dame, pa čak i kraljevi. Protivnik može spasiti samo jednu od dviju napadnutih figura.
+challenge.pin.name = Vezanja
+challenge.pin.desc = Figura koja se ne može pomaknuti, a da se ne izgubi ono iza nje.
+challenge.pin.detail = Vežite figuru za njezina kralja ili za vrjedniju figuru, zatim je ponovno napadnite ili iskoristite to što se ne može pomaknuti.
+challenge.skewer.name = Ražnjevi
+challenge.skewer.desc = Napadnite vrijednu figuru i osvojite onu iza nje.
+challenge.skewer.detail = Obrnuto od vezanja: vrjednija figura stoji ispred, mora se skloniti i otkriva figuru iza sebe.
+challenge.discovered.name = Otkriveni napadi
+challenge.discovered.desc = Pomaknite jednu figuru da biste oslobodili drugu.
+challenge.discovered.detail = Kad se figura makne s puta, napada figura iza nje. Uz šah ili dvostruki šah protivnik nema vremena odgovoriti na obje prijetnje.
+challenge.deflection.name = Odvlačenje i mamljenje
+challenge.deflection.desc = Odvucite branitelja ili ga namamite na kobno polje.
+challenge.deflection.detail = Branitelj koji ima dva zadatka ne može obaviti oba. Napadnite ga, ponudite mu nešto ili natjerajte figuru na polje na kojem će biti izgubljena.
+challenge.intermezzo.name = Međupotezi
+challenge.intermezzo.desc = Ne uzimajte odmah natrag: postoji nešto jače.
+challenge.intermezzo.detail = Šah ili veća prijetnja umetnuta prije očekivanog poteza mijenja sve.
+challenge.trapped.name = Zarobljene figure
+challenge.trapped.desc = Figura kojoj nije ostalo nijedno sigurno polje.
+challenge.trapped.detail = Oduzmite figuri posljednja polja za bijeg, a zatim je osvojite.
+challenge.promotion.name = Promocija
+challenge.promotion.desc = Progurajte pješaka do zadnjeg reda.
+challenge.promotion.detail = Odmakli pješaci vrijede mnogo. Raščistite put, odvucite figure koje ga blokiraju i stvorite novu damu.
+challenge.quiet.name = Tihi potezi
+challenge.quiet.desc = Pobjednički potez nije ni šah ni uzimanje.
+challenge.quiet.detail = Ponekad najjači potez samo priprema prijetnju koja se ne može odbiti. Takve je poteze najteže uočiti.
+challenge.opening.name = Zamke u otvaranju
+challenge.opening.desc = Kaznite rane pogreške.
+challenge.opening.detail = Pozicije iz prvih poteza stvarnih partija, u kojima se jedan nepažljiv potez može odmah iskoristiti.
+challenge.escape.name = Pronađite izlaz
+challenge.escape.desc = Vaš je kralj u opasnosti: spašava ga jedan potez.
+challenge.escape.detail = Svaki drugi potez gubi. Pogledajte sve šahove i prijetnje vašem kralju, zatim pronađite jedini izlaz.
+challenge.defend.name = Obrambeni potezi
+challenge.defend.desc = Odbijte prijetnju bez gubitka materijala.
+challenge.defend.detail = Trener nečim prijeti. Pronađite precizan potez koji sve drži na okupu.
+challenge.kq.name = Dama i kralj protiv kralja
+challenge.kq.desc = Mat damom.
+challenge.kq.detail = Damom potisnite usamljenog kralja na rub, približite vlastitog kralja i čuvajte se pata. Trener se brani najboljim potezima.
+challenge.kr.name = Top i kralj protiv kralja
+challenge.kr.desc = Mat topom.
+challenge.kr.detail = Top odsijeca kralja, red po red; vaš kralj zauzima opoziciju. Trener se brani najboljim potezima.
+challenge.kp.name = Kralj i pješak protiv kralja
+challenge.kp.desc = Osvojite opoziciju i promovirajte pješaka.
+challenge.kp.detail = Predvodite kraljem, ne pješakom. Zauzmite opoziciju i stvorite damu koju trener ne može uhvatiti.
+challenge.kp_hold.name = Zaustavite pješaka
+challenge.kp_hold.desc = Usamljeni kralj protiv kralja i pješaka: zadržite remi.
+challenge.kp_hold.detail = Stanite ispred pješaka i zadržite opoziciju. Izdržite deset poteza.
+challenge.rook.name = Topovske završnice
+challenge.rook.desc = Lucenin most i Philidorova obrana.
+challenge.rook.detail = Dvije pozicije koje bi svaki igrač trebao znati: kako dobiti s pješakom na sedmom redu i kako se braniti topom na trećem.
+challenge.endgame.name = Taktika u završnici
+challenge.endgame.desc = Malo figura, oštre ideje.
+challenge.endgame.detail = Utrke pješaka, proboji i topovske završnice iz stvarnih partija.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozicija|{0} pozicije|{0} pozicija
+coach.challenge.done = Završeno
+coach.challenge.start = Započni
+coach.challenge.note.white = Igrate bijelima; trener postavlja svaku poziciju na ploču.
+coach.challenge.note.hint = Ne ide? Pritisnite H za savjet. Nakon nekoliko pokušaja trener će vam ga ponuditi.
+coach.challenge.note.unsaved = Izazovi nisu za rejting i ne spremaju se; kvačica označava završene izazove.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = IZAZOV ZAVRŠEN
+coach.challenge.complete.line = Sve su pozicije riješene.
+coach.challenge.next = Sljedeći izazov
+coach.challenge.again = Ponovno
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = SAVJET?
+coach.hint.text = Trener vam nudi savjet.
+coach.hint.hint = Tipka H daje savjet. Dodir figure znači nastavak traženja.
+coach.hint.accept = Savjet
+coach.hint.decline = Ne, hvala
+coach.hint.key = Savjet
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Trenerov glas
+options.coach_voice.help = Trener govori naglas u načinu Trener. Model njegova glasa preuzima se kad prvi put zatreba (oko 399 MB). Isključeno: trenerove riječi samo se ispisuju na zaslonu.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398,7")
+options.voice_update = Model glasa
+options.voice_update.help = Trener još govori starom 8-bitnom verzijom svog modela glasa. Ažuriranje preuzima službenu verziju modela Supertonic 3, koju objavljuje Supertone, a stare datoteke najprije briše.
+options.voice_update.button = Ažuriraj ({0} MB)
+options.voice_update.running = Preuzimanje je u tijeku.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Kvaliteta glasa
+options.voice_quality.help = Koliko koraka dorade sinteza trenerova govora obavlja za svaku rečenicu, od Niska (4) do Najviša (9); zadano je Srednja (5). Viša razina daje nešto čišći glas, ali izračun dulje traje pa trener počinje govoriti malo kasnije. Može se postaviti kad je model glasa instaliran, uz uključenu postavku Trenerov glas.
+options.voice_quality.low = Niska
+options.voice_quality.medium = Srednja
+options.voice_quality.high = Visoka
+options.voice_quality.very_high = Vrlo visoka
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Najviša
+# The prompt. {0} = the size in megabytes ("398,7")
+coach.download.title = Trenerov glas
+coach.download.text = Trenerov glas stvara Supertonic 3, model za sintezu govora tvrtke Supertone. Nije uključen u Scacelith: igra ga sada može preuzeti s Hugging Facea ({0} MB, jednokratno). Bez njega trener svoje riječi ispisuje na zaslonu.
+coach.download.licence = Model je objavljen pod licencom OpenRAIL-M, koja zabranjuje određene uporabe glasa koji proizvodi, primjerice predstavljanje tog glasa kao ljudskog ili oponašanje stvarne osobe.
+coach.download.read_licence = Pročitaj licencu
+coach.download.accept = Odabirom opcije Preuzmi prihvaćate uvjete ove licence.
+# {0} = a folder
+coach.download.folder = Sprema se u: {0}
+coach.download.not_now = Ne sada
+# {0} = the size in megabytes
+coach.download.download = Preuzmi ({0} MB)
+coach.download.licence_title = LICENCA OPENRAIL-M
+coach.download.back = Natrag
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Novi glas za trenera
+coach.update.text = Trenerov glas sada koristi službenu verziju modela Supertonic 3, koju objavljuje Supertone, umjesto dosad instalirane 8-bitne pretvorbe. Igra je sada može preuzeti s Hugging Facea ({0} MB, jednokratno); stare datoteke ({1} MB) najprije se brišu. Ako odbijete, trener zadržava sadašnji glas, a ažuriranje ostaje dostupno pod Postavke > Zvuk.
+coach.update.download = Ažuriraj ({0} MB)
+coach.update.accept = Odabirom opcije Ažuriraj prihvaćate uvjete ove licence.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TRENEROV GLAS
+coach.download.removing = Uklanjanje stare verzije…
+coach.download.checking = Provjera datoteka…
+coach.download.downloading = Preuzimanje…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = S Hugging Facea
+coach.download.from_archive = S Hugging Facea (arhivska kopija)
+coach.download.cancel = Odustani
+coach.download.failed = Preuzimanje nije uspjelo.
+coach.download.error.network = Poslužitelji nisu dostupni. Provjerite internetsku vezu i pokušajte ponovno.
+# {0} = a folder
+coach.download.error.disk = Datoteke nije moguće zapisati u {0}. Provjerite slobodan prostor i pokušajte ponovno.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Poslužitelji su poslali neočekivan odgovor ({0}). Pokušajte ponovno kasnije.
+coach.download.retry = Pokušaj ponovno
+coach.download.close = Zatvori
+# Notices
+coach.download.done = Trenerov glas je instaliran.
+coach.download.cancelled = Preuzimanje je otkazano: sljedeći put nastavit će se ondje gdje je stalo.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Spremljene partije
+options.save_games = Spremaj moje partije
+options.save_games.help = Kad završe, vaše partije protiv Stockfisha, s trenerom, između dva igrača za ovim računalom i vaši izravni mečevi spremaju se kao datoteke PGN koje možete ponovno pronaći pod Spremljene partije. Partije na mreži čuva poslužitelj.
+library.title = SPREMLJENE PARTIJE
+library.section.games = PARTIJE
+library.section.details = PARTIJA
+library.section.tags = OZNAKE
+library.section.moves = POTEZI
+library.count = {0} partija|{0} partije|{0} partija
+library.filter = Prikaz
+library.filter.all = Sve partije
+library.filter.play = Protiv Stockfisha
+library.filter.coach = S trenerom
+library.filter.hotseat = Dva igrača
+library.filter.direct = Izravni mečevi
+library.filter.server = Partije na mreži
+library.filter.imported = Uvezene
+library.mode.play = Protiv Stockfisha
+library.mode.coach = S trenerom
+library.mode.hotseat = Dva igrača
+library.mode.direct = Izravni meč
+library.mode.server = Partija na mreži
+library.mode.imported = Uvezena
+library.coach_level = Razina {0}
+library.unknown_player = Nepoznato
+library.unfinished = Nedovršena
+library.unreadable = Ova se partija ne može pročitati.
+library.moves = {0} potez|{0} poteza|{0} poteza
+library.opening_variation = {0}: {1}
+library.file = Datoteka: {0}
+library.file_game = Datoteka: {0}, partija {1} od {2}
+library.no_moves = Nije odigran nijedan potez.
+library.none_selected = Odaberite partiju s popisa.
+library.reading = Čitanje spremljenih partija
+library.empty.title = Još nema spremljenih partija
+library.empty.text = Vaše partije protiv Stockfisha, s trenerom, između dva igrača za ovim računalom i vaši izravni mečevi pojavljuju se ovdje kad završe. U ovu mapu možete staviti i datoteke PGN: partije izvezene iz drugih programa ili s web-stranica prikazuju se zajedno s vašima.
+library.empty.filter = Nema partija ove vrste.
+library.error.folder = Mapu spremljenih partija nije moguće pročitati
+library.error.game = Ova se partija ne može pročitati: {0}
+library.folder = Mapa: {0}
+library.open_folder = Otvori mapu
+library.open_failed = Mapu nije moguće otvoriti.
+library.replay = Reproduciraj
+library.delete = Izbriši
+library.delete.title = BRISANJE PARTIJE
+library.delete.text = Partija {0} bit će izbrisana s ovog računala zajedno sa svojom datotekom. To se ne može poništiti.
+library.delete.ok = Izbriši
+library.delete.several = Ova datoteka sadrži {0} partiju: može se izbrisati samo iz mape.|Ova datoteka sadrži {0} partije: može se izbrisati samo iz mape.|Ova datoteka sadrži {0} partija: može se izbrisati samo iz mape.
+library.deleted = Partija je izbrisana.
+library.delete.failed = Partiju nije moguće izbrisati.
+library.delete.changed = Datoteka se promijenila: popis je ažuriran.
+library.truncated = Ova mapa sadrži previše partija: prikazuje se samo {0} najnovijih.
+library.tag.Event = Natjecanje
+library.tag.Site = Mjesto
+library.tag.Date = Datum
+library.tag.Time = Vrijeme
+library.tag.Round = Kolo
+library.tag.White = Bijeli
+library.tag.Black = Crni
+library.tag.Result = Rezultat
+library.tag.WhiteElo = Elo bijelog
+library.tag.BlackElo = Elo crnog
+library.tag.TimeControl = Tempo igre
+library.tag.Termination = Završetak
+library.tag.Opening = Otvaranje
+library.tag.Variation = Varijanta
+library.tag.PlyCount = Polupotezi
+library.tag.FEN = Početna pozicija
+library.tag.ScacelithMode = Način
+library.tag.CoachLevel = Razina trenera
+library.tag.ScacelithServer = Poslužitelj
+library.tag.ScacelithGameId = Broj partije
+library.tag.UTCDate = Datum (UTC)
+library.tag.UTCTime = Vrijeme (UTC)
+library.tag.WhiteRatingDiff = Promjena rejtinga bijelog
+library.tag.BlackRatingDiff = Promjena rejtinga crnog
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analiza
+analysis.menu.title = ANALIZA
+analysis.menu.analyse = Analiziraj
+analysis.menu.paste = Zalijepi PGN
+analysis.menu.online = Moje partije na mreži
+analysis.menu.folder = Stavite datoteke PGN u ovu mapu kako biste ih analizirali: {0}
+analysis.menu.empty.title = Još nema spremljenih partija
+analysis.menu.empty.text = Vaše se partije pojavljuju ovdje kad završe, kao i datoteke PGN stavljene u mapu ispod. Možete i zalijepiti partiju kopiranu kao tekst PGN.
+analysis.menu.empty.no_folder = Zalijepite partiju kopiranu kao tekst PGN kako biste je analizirali.
+analysis.menu.paste.empty = Međuspremnik je prazan: najprije kopirajte partiju kao tekst PGN.
+analysis.menu.paste.none = U međuspremniku nije pronađena nijedna šahovska partija.
+analysis.menu.paste.several = Međuspremnik sadrži nekoliko partija: analizira se prva.
+analysis.menu.gameover = Analiziraj partiju
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Potez {0} od {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Trenutačno
+replay.again = Reproduciraj ponovno
+replay.gameover.unfinished = Partija se prekida nakon {0}. poteza, bez rezultata.
+replay.tip.start = Početak partije (Home)
+replay.tip.back = Potez natrag (J)
+replay.tip.pause = Stanka (K)
+replay.tip.resume = Nastavi (K)
+replay.tip.forward = Potez naprijed (L)
+replay.tip.end = Kraj partije (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTAR
+analysis.hud.accuracy = TOČNOST
+analysis.hud.reviewing = Stockfish pregledava partiju… {0}
+analysis.hud.no_engine = Nema šahovskog programa: potezi se prikazuju bez analize.
+analysis.hud.no_moves = Ova partija nema poteza.
+analysis.hud.tip.play = Reproduciraj poteze (K)
+analysis.hud.tip.comments_off = Sakrij komentare ključnih trenutaka (N)
+analysis.hud.tip.comments_on = Prikaži komentare ključnih trenutaka (N)
+analysis.hud.tip.voice_off = Utišaj glas komentatora (M)
+analysis.hud.tip.voice_on = Slušaj izgovorene komentare (M)
+analysis.hud.tip.voice_missing = Glas se ne može čuti: njegove datoteke nisu instalirane ili je isključena postavka Postavke > Zvuk > Trenerov glas. Komentari se samo ispisuju na zaslonu.
+analysis.hud.tip.arrows_off = Sakrij strelice boljih poteza (B)
+analysis.hud.tip.arrows_on = Prikaži strelice boljih poteza (B)
+analysis.hud.controls.play = Reprodukcija / stanka
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Prikaz / skrivanje komentara
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Glas komentatora uklj. / isklj.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Prikaz / skrivanje strelica
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Spremi kao GIF
+gif.making = Izrada GIF-a: poslužitelj iscrtava partiju…
+gif.saved = GIF je spremljen:
+gif.saved_as = GIF je spremljen: {0}
+gif.sign_in_first = Prijavite se na mrežni poslužitelj kako biste izrađivali GIF-ove: poslužitelj ih iscrtava.
+gif.busy_other = Izrađuje se drugi GIF. Pričekajte dok ne bude gotov.
+gif.err.rate_limited_for = U kratkom je vremenu izrađeno mnogo GIF-ova. Sljedeći možete izraditi za {0}.
+gif.err.rate_limited = U kratkom je vremenu izrađeno mnogo GIF-ova. Pokušajte ponovno kasnije.
+gif.err.server_busy_for = Poslužitelj je zauzet iscrtavanjem drugih GIF-ova. Pokušajte ponovno za {0}.
+gif.err.server_busy = Poslužitelj je zauzet iscrtavanjem drugih GIF-ova. Pokušajte ponovno za trenutak.
+gif.err.signed_out = Vaša je sesija završila. Ponovno se prijavite kako biste izradili GIF.
+gif.err.game_too_long = Ova je partija preduga da bi se od nje izradio GIF.
+gif.err.pgn_too_large = Ova je partija preduga da bi se od nje izradio GIF.
+gif.err.invalid_pgn = Poslužitelj nije mogao pročitati ovu partiju.
+gif.err.render_failed = Poslužitelj nije mogao izraditi ovaj GIF. Pokušajte ponovno.
+gif.err.gif_disabled = Ovaj poslužitelj ne izrađuje GIF-ove.
+gif.err.write_failed = GIF nije moguće spremiti na ovo računalo.
+gif.err.not_found = Ova partija više nije na poslužitelju.
+# A wait only ever follows "za" ("Pokušajte ponovno za {0}."): accusative forms (sekundu, minutu).
+gif.wait.seconds = {0} sekundu|{0} sekunde|{0} sekundi
+gif.wait.minutes = {0} minutu|{0} minute|{0} minuta
+gif.wait.both = {0} i {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Nije moguće pokrenuti OpenGL 4.6. Ažurirajte upravljački program grafičke kartice.
+error.opengl_macos = Nije moguće pokrenuti OpenGL 4.6 na ovom Macu. Scacelith zahtijeva Apple silicon (M1 ili noviji) i macOS 26 ili noviji te ne radi u virtualnom računalu.
+error.renderer = Nije moguće pokrenuti iscrtavanje.
+error.scene = Scenu nije moguće učitati.
+error.log_file = Pojedinosti su u datoteci dnevnika: {0}

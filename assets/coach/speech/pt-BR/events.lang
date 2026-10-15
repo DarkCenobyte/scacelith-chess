@@ -36,9 +36,9 @@ event.colour.black.2 = Desta vez você joga com as Pretas: eu jogo primeiro.
 # passos, Iniciante, Intermediário, Jogador de clube, Jogador de clube forte, Especialista.
 event.level.l1 = Primeiros passos: jogo com calma e explico cada erro com palavras simples.
 event.level.l2 = Iniciante: jogo um pouco mais forte e chamo pelo nome as táticas simples, como garfos e cravadas.
-event.level.l3 = Intermediário: falo de planos e de estrutura de peões, e mostro variantes curtas.
+event.level.l3 = Intermediário: falo de planos e de estrutura de peões, e mostro linhas curtas.
 event.level.l4 = Jogador de clube: dou a avaliação em peões e sugiro lances candidatos.
-event.level.l5 = Jogador de clube forte: comentários curtos, e variantes mais longas quando for importante.
+event.level.l5 = Jogador de clube forte: comentários curtos, e linhas mais longas quando for importante.
 event.level.l6 = Especialista: jogo o meu melhor e só comento os momentos críticos.
 
 # ---- Turn-taking -------------------------------------------------------------------------------------

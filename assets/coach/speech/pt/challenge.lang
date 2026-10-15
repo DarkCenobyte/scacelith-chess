@@ -31,12 +31,12 @@ ch.intro.trapped = Peças presas. {n:position}: uma das minhas peças não tem p
 ch.intro.promotion = Promoção. {n:position} em que um peão avançado decide a partida.
 ch.intro.quiet = Lances tranquilos. {n:position}: o lance vencedor não é um xeque nem uma captura.
 ch.intro.opening = Armadilhas de abertura. {n:position} dos primeiros lances de partidas reais. Castiga o meu erro.
-ch.intro.escape = Encontra a fuga. {n:position}: o teu rei está em perigo, e só um lance o salva.
+ch.intro.escape = Encontra a saída. {n:position}: o teu rei está em perigo, e só um lance o salva.
 ch.intro.defend = Lances defensivos. {n:position}: encontra o único lance que segura a tua posição.
 ch.intro.kq = Dama e rei contra rei. {n:position}: dá xeque-mate ao meu rei. Cuidado com o afogamento.
 ch.intro.kr = Torre e rei contra rei. {n:position}: dá xeque-mate ao meu rei, passo a passo.
 ch.intro.kp = Rei e peão contra rei. {n:position}: faz uma dama. O teu rei vai à frente.
-ch.intro.kp_hold = Trava o peão. {n:position}: só tens o teu rei. Segura o empate.
+ch.intro.kp_hold = Travar o peão. {n:position}: só tens o teu rei. Segura o empate.
 ch.intro.rook = Finais de torres. {n:position}: constrói a ponte para promover, e segura o empate com a defesa de Philidor.
 ch.intro.endgame = Tática nos finais. {n:position} com poucas peças e ideias incisivas.
 
@@ -50,8 +50,8 @@ ch.task.hanging.2 = O que podes tomar de graça?
 ch.task.fork = Encontra o garfo.
 ch.task.fork.2 = Procura um garfo.
 ch.task.pin = Aqui, a chave é uma cravada.
-ch.task.skewer = Aqui, um espeto ganha.
-ch.task.discovered = Aqui, um ataque descoberto ganha.
+ch.task.skewer = Aqui, ganha-se com um espeto.
+ch.task.discovered = Aqui, ganha-se com um ataque descoberto.
 ch.task.deflection = Sobrecarrega um defensor, ou atrai-o.
 ch.task.intermezzo = Procura um lance intermédio.
 ch.task.trapped = Uma das minhas peças não consegue escapar. Ganha-a.
@@ -118,8 +118,8 @@ ch.try_again.2 = Volta a olhar.
 ch.try_again.3 = Procura outra vez.
 
 # ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
-ch.offer = Queres uma pista?
-ch.offer.2 = Dou-te uma pista?
+ch.offer = Queres uma sugestão?
+ch.offer.2 = Dou-te uma sugestão?
 ch.no_hint = Está bem. Continua a procurar.
 ch.no_hint.2 = Muito bem, não tenhas pressa.
 ch.hint.piece = Olha para {your}.

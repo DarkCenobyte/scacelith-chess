@@ -1,0 +1,153 @@
+# Coach speech (Hindi): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by the
+# voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Hindi:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "तुम" or "मैं" here: the players are "सफ़ेद" and "काला" (masculine; oblique "काले": "काले ने
+#   हार मान ली", "काले की जीत"). A piece comes with its side: {piece} {t1} {t2} = "सफ़ेद घोड़ा", "काला हाथी"
+#   (common.lang, owner.white / owner.black, with the forms obl ka ki bare_obl ...). The two forked pieces
+#   belong to one side: "{t1:obl} और {t2:bare_obl} पर" = "काले वज़ीर और हाथी पर".
+# - Moves ({move} {best} {reply} {line}) are spoken with their verb ("... पर काटता है"), so they come after a
+#   colon or before a comma, never before a postposition, a copula or a verb.
+# - Counted numbers (common.lang): {m:move_obl} "3 चालों में मात" / "1 चाल में मात", {pts:point_obl} "3 अंकों
+#   का", {n:mistake} "2 ग़लतियाँ", {m:blunder} "1 ब्लंडर", {acc_white:percent} "87%" (spoken "सत्तासी
+#   प्रतिशत"). A verb would agree with a counted noun, so the end lines count without a verb.
+# - "Forced mate" = "पक्की मात".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = चलो, इस बाज़ी पर साथ मिलकर एक नज़र डालते हैं।
+an.start.2 = चलो, इस बाज़ी को चाल-दर-चाल देखते हैं।
+an.start.3 = यह रही बाज़ी। देखते हैं, यह कैसे आगे बढ़ी।
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = यह बाज़ी पहले से जमाई गई एक स्थिति से शुरू होती है। चलो, इसे देखते हैं।
+an.start.setup.2 = पहले से जमाई गई स्थिति से खेली गई बाज़ी। देखते हैं, यह कैसे आगे बढ़ी।
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = ओपनिंग: {opening:def}।
+an.opening.2 = यह {opening:def} है।
+an.book_exit = {move}, और यहाँ से बाज़ी ओपनिंग की जानी-मानी थ्योरी से बाहर निकलती है।
+an.book_exit.2 = ओपनिंग बुक से बाहर की पहली चाल: {move}।
+an.book_exit.3 = ओपनिंग थ्योरी यहीं ख़त्म होती है: {move}।
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move}, यह एक ब्लंडर है।
+an.blunder.2 = यहाँ एक गंभीर ग़लती: {move}।
+an.blunder.3 = ब्लंडर: {move}।
+an.mistake = {move}, यह एक ग़लती है।
+an.mistake.2 = {move}, यह यहाँ सही चाल नहीं है।
+an.mistake.3 = ग़लती: {move}।
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move}, और उस ग़लती की सज़ा देने का मौक़ा हाथ से निकल जाता है।
+an.missed_chance.2 = {move}, और मौक़ा हाथ से फिसल जाता है।
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = अब {reply:nomate}, और यह मात है।
+an.mate_allowed.one.2 = इसका जवाब: {reply:nomate}, और यह शह और मात है।
+an.mate_allowed = इससे {m:move_obl} में पक्की मात का रास्ता खुलता है, पहली चाल: {reply:nomate}।
+an.mate_allowed.2 = अब {m:move_obl} में पक्की मात है, शुरुआत: {reply:nomate}।
+an.fork = अब {reply}: {t1:obl} और {t2:bare_obl} पर फ़ोर्क।
+an.fork.2 = इसका जवाब: {reply}, एक साथ {t1:obl} और {t2:bare_obl} पर हमला।
+an.fork.3 = {reply}, और एक ही वार में {t1} और {t2:bare}, दोनों निशाने पर।
+an.hanging = इससे {piece} असुरक्षित छूट जाता है: {reply}, और वह कट जाता है।
+an.hanging.2 = {piece} बिना रक्षक के रह गया है: {reply}, और उसे जीत लिया जाता है।
+an.hanging.3 = {reply}, और {piece} आसानी से कट जाता है: उसका कोई रक्षक नहीं था।
+an.material = जवाब में {line}, और इससे {pts:point_obl} का मटीरियल हाथ आता है।
+an.material.2 = फिर {line}, और {pts:point_obl} का फ़ायदा।
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate}, और यह मात थी।
+an.mate_missed.one.2 = यहाँ मात हो सकती थी: {best:nomate}।
+an.mate_missed = {best:nomate}, और {m:move_obl} में मात पक्की हो जाती।
+an.mate_missed.2 = {m:move_obl} में पक्की मात मौजूद थी, शुरुआत: {best:nomate}।
+an.missed_capture = {best}, और {piece} मुफ़्त में हाथ आ जाता।
+an.missed_capture.2 = {piece:ka} कोई रक्षक नहीं था: {best}, और वह कट जाता।
+an.missed_fork = {best}: इससे {t1:obl} और {t2:bare_obl} पर फ़ोर्क हो जाता।
+an.missed_fork.2 = फ़ोर्क मौजूद था: {best}, एक साथ {t1:obl} और {t2:bare_obl} पर हमला।
+
+# The better move, when nothing above named it.
+an.better = इससे मज़बूत चाल थी: {best}।
+an.better.2 = बेहतर चाल थी: {best}।
+an.better.3 = ज़्यादा सटीक चाल थी: {best}।
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move}, शानदार चाल: {piece:ka} बलिदान!
+an.brilliant.2 = शानदार बलिदान! {move}: {piece:ki} पेशकश।
+an.brilliant.3 = {move}! शानदार चाल, {piece:ki} पेशकश के साथ।
+an.brilliant.mate = इससे {m:move_obl} में पक्की मात बनती है।
+an.brilliant.mate.2 = और इससे {m:move_obl} में मात तय हो जाती है।
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = एकमात्र चाल, जो बढ़त बनाए रखती है: {move}।
+an.only.win.2 = यहाँ बढ़त सिर्फ़ एक चाल से बचती है: {move}। बढ़िया खोज।
+an.only.hold = एकमात्र चाल, जो संतुलन बनाए रखती है: {move}।
+an.only.hold.2 = यहाँ स्थिति सिर्फ़ एक चाल से सँभलती है: {move}।
+an.only.defend = एकमात्र चाल, जो मुक़ाबला जारी रखती है: {move}।
+an.only.defend.2 = यहाँ बाज़ी सिर्फ़ एक चाल से ज़िंदा रहती है: {move}। अच्छा बचाव।
+an.only.best = यहाँ बाक़ी सब चालों से कहीं ज़्यादा मज़बूत: {move}।
+an.only.best.2 = सटीक: {move}, बाक़ी किसी भी चाल से कहीं ज़्यादा मज़बूत।
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move}, थोड़ी-सी चूक। ज़्यादा सटीक चाल थी: {best}।
+an.inaccuracy.2 = सबसे अच्छी चाल यह नहीं थी: {move}। इससे ज़्यादा सटीक चाल थी: {best}।
+an.interesting = {move}, एक दिलचस्प विचार: {piece:ki} पेशकश।
+an.interesting.2 = दिलचस्प कोशिश: {move}, जिसमें {piece} छोड़ दिया जाता है।
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = अब सफ़ेद के पास {m:move_obl} में पक्की मात है।
+an.mate_on.white.2 = यहाँ से सफ़ेद {m:move_obl} में मात पक्की कर सकता है।
+an.mate_on.black = अब काले के पास {m:move_obl} में पक्की मात है।
+an.mate_on.black.2 = यहाँ से काला {m:move_obl} में मात पक्की कर सकता है।
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = शह और मात। सफ़ेद बाज़ी जीतता है।
+an.end.mate.white.2 = और यह शह और मात है: सफ़ेद की जीत।
+an.end.mate.black = शह और मात। काला बाज़ी जीतता है।
+an.end.mate.black.2 = और यह शह और मात है: काले की जीत।
+an.end.resigned.white = काले ने हार मान ली, इसलिए सफ़ेद बाज़ी जीतता है।
+an.end.resigned.white.2 = बाज़ी यहीं ख़त्म होती है: काले ने हार मान ली, और सफ़ेद जीत गया।
+an.end.resigned.black = सफ़ेद ने हार मान ली, इसलिए काला बाज़ी जीतता है।
+an.end.resigned.black.2 = बाज़ी यहीं ख़त्म होती है: सफ़ेद ने हार मान ली, और काला जीत गया।
+an.end.timeout.white = काले का समय ख़त्म हो गया, इसलिए सफ़ेद जीतता है।
+an.end.timeout.white.2 = सफ़ेद की जीत, समय के आधार पर।
+an.end.timeout.black = सफ़ेद का समय ख़त्म हो गया, इसलिए काला जीतता है।
+an.end.timeout.black.2 = काले की जीत, समय के आधार पर।
+an.end.win.white = बाज़ी सफ़ेद की जीत के साथ ख़त्म होती है।
+an.end.win.white.2 = सफ़ेद बाज़ी जीतता है।
+an.end.win.black = बाज़ी काले की जीत के साथ ख़त्म होती है।
+an.end.win.black.2 = काला बाज़ी जीतता है।
+an.end.stalemate = स्टेलमेट: बाज़ी ड्रॉ।
+an.end.stalemate.2 = यह स्टेलमेट है, इसलिए बाज़ी ड्रॉ पर ख़त्म होती है।
+an.end.draw.agreement = खिलाड़ियों ने ड्रॉ पर सहमति दी।
+an.end.draw.agreement.2 = बाज़ी आपसी सहमति से ड्रॉ पर ख़त्म होती है।
+an.end.draw.repetition = स्थिति के दोहराव से बाज़ी ड्रॉ होती है।
+an.end.draw.repetition.2 = वही स्थिति फिर से लौट आई: ड्रॉ।
+an.end.draw.fifty = पचास चालों के नियम से बाज़ी ड्रॉ होती है।
+an.end.draw.fifty.2 = पचास चालें, न कोई मोहरा कटा, न कोई प्यादा चला: ड्रॉ।
+an.end.draw.seventy_five = पचहत्तर चालों के नियम से बाज़ी ड्रॉ होती है।
+an.end.draw.seventy_five.2 = पचहत्तर चालें, न कोई मोहरा कटा, न कोई प्यादा चला: ड्रॉ।
+an.end.draw.material = अब मात मुमकिन नहीं: बाज़ी ड्रॉ।
+an.end.draw.material.2 = अब कोई भी पक्ष मात नहीं दे सकता, इसलिए ड्रॉ।
+an.end.draw = बाज़ी ड्रॉ पर ख़त्म होती है।
+an.end.draw.2 = ड्रॉ।
+an.end.unfinished = बाज़ी यहीं रुकती है, अधूरी।
+an.end.unfinished.2 = बाज़ी यहीं रुक जाती है: यह पूरी नहीं खेली गई।
+an.end.accuracy = सटीकता: सफ़ेद की {acc_white:percent}, काले की {acc_black:percent}।
+an.end.accuracy.2 = सफ़ेद ने {acc_white:percent} सटीकता से खेला, काले ने {acc_black:percent} से।
+an.end.clean.white = सफ़ेद ने न कोई ग़लती की, न कोई ब्लंडर।
+an.end.clean.white.2 = सफ़ेद के खेल में कोई गंभीर ग़लती नहीं थी।
+an.end.clean.black = काले ने न कोई ग़लती की, न कोई ब्लंडर।
+an.end.clean.black.2 = काले के खेल में कोई गंभीर ग़लती नहीं थी।
+an.end.mistakes.white = सफ़ेद के खाते में {n:mistake}, और कोई ब्लंडर नहीं।
+an.end.mistakes.white.2 = सफ़ेद: {n:mistake}, ब्लंडर एक भी नहीं।
+an.end.mistakes.black = काले के खाते में {n:mistake}, और कोई ब्लंडर नहीं।
+an.end.mistakes.black.2 = काला: {n:mistake}, ब्लंडर एक भी नहीं।
+an.end.blunders.white = सफ़ेद के खाते में {m:blunder}।
+an.end.blunders.white.2 = सफ़ेद: {m:blunder}।
+an.end.blunders.black = काले के खाते में {m:blunder}।
+an.end.blunders.black.2 = काला: {m:blunder}।
+an.end.errors.white = सफ़ेद के खाते में {n:mistake} और {m:blunder}।
+an.end.errors.white.2 = सफ़ेद: {n:mistake} और {m:blunder}।
+an.end.errors.black = काले के खाते में {n:mistake} और {m:blunder}।
+an.end.errors.black.2 = काला: {n:mistake} और {m:blunder}।

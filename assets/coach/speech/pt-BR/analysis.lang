@@ -10,7 +10,8 @@
 #   {piece} {t1} {t2} = "o cavalo branco", "a torre preta" (common.lang, owner.white / owner.black).
 #   Never de, em, a or por right before them: "{t1:no}" = "no cavalo branco / na torre preta"
 #   ("um garfo no rei e na dama"). A pronoun that stands for the piece uses its form
-#   ("tê-{piece:lo}" = "tê-lo / tê-la"), or the sentence needs none ("e {reply} não perdoa").
+#   ("{reply} {piece:o} captura" = "o / a"), or the line repeats the noun without its side
+#   ("{piece:the}" = "o cavalo / a torre"). "Peça" is not used for a piece that may be a pawn.
 # - {opening:def} is the opening's name with its article ("a Defesa Siciliana", "o Gambito da
 #   Dama"): the lines put it after a verb, never after de, em, a or por, and agree with nothing.
 # - Counted numbers (common.lang): {m:move} "mate em 3 lances", {pts:point} "3 pontos",
@@ -51,8 +52,8 @@ an.mate_allowed.2 = Agora há um mate forçado em {m:move}, que começa com {rep
 an.fork = Agora {reply} dá um garfo {t1:no} e {t2:no}.
 an.fork.2 = Esse lance permite {reply}, que ataca ao mesmo tempo {t1} e {t2}.
 an.fork.3 = {reply} ataca {t1} e {t2} ao mesmo tempo.
-an.hanging = Esse lance deixa {piece} sem proteção, e {reply} aproveita.
-an.hanging.2 = {piece} fica sem defensor, e {reply} não perdoa.
+an.hanging = Esse lance deixa {piece} sem proteção, e {reply} {piece:o} captura.
+an.hanging.2 = {piece} fica sem defensor: {reply} ganha {piece:the}.
 an.hanging.3 = {reply} simplesmente toma {piece}, que não tinha defensor.
 an.material = A resposta {line} ganha {pts:point} de material.
 an.material.2 = Então {line} ganha {pts:point}.
@@ -63,7 +64,7 @@ an.mate_missed.one.2 = {best:nomate} teria sido xeque-mate.
 an.mate_missed = {best:nomate} teria forçado o mate em {m:move}.
 an.mate_missed.2 = Havia um mate forçado em {m:move}, começando com {best:nomate}.
 an.missed_capture = {best} teria ganhado {piece} de graça.
-an.missed_capture.2 = {piece} não tinha defensor: {best} poderia tê-{piece:lo} tomado.
+an.missed_capture.2 = {piece} não tinha defensor: {best} teria tomado {piece:the}.
 an.missed_fork = {best} teria dado um garfo {t1:no} e {t2:no}.
 an.missed_fork.2 = {best} era um garfo, que atacava {t1} e {t2}.
 
@@ -108,9 +109,9 @@ an.end.mate.white.2 = E é xeque-mate: as Brancas vencem.
 an.end.mate.black = Xeque-mate. As Pretas vencem a partida.
 an.end.mate.black.2 = E é xeque-mate: as Pretas vencem.
 an.end.resigned.white = As Pretas abandonaram, então as Brancas vencem a partida.
-an.end.resigned.white.2 = A partida termina aqui: as Pretas abandonam, e as Brancas vencem.
+an.end.resigned.white.2 = A partida termina aqui: as Pretas abandonaram, e as Brancas vencem.
 an.end.resigned.black = As Brancas abandonaram, então as Pretas vencem a partida.
-an.end.resigned.black.2 = A partida termina aqui: as Brancas abandonam, e as Pretas vencem.
+an.end.resigned.black.2 = A partida termina aqui: as Brancas abandonaram, e as Pretas vencem.
 an.end.timeout.white = O tempo das Pretas acabou, então as Brancas vencem.
 an.end.timeout.white.2 = As Brancas vencem por tempo.
 an.end.timeout.black = O tempo das Brancas acabou, então as Pretas vencem.

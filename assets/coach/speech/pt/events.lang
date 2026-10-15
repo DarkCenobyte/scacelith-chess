@@ -42,7 +42,7 @@ event.level.l6 = Especialista: jogo o melhor que sei e só comento os momentos c
 
 # ---- Turn-taking -------------------------------------------------------------------------------------
 # After an explanation or a demonstration, when the player may move again.
-event.your_move = Joga tu.
+event.your_move = Jogas tu.
 event.your_move.2 = É a tua vez.
 event.your_move.3 = Agora é contigo.
 # The player has been thinking for a while (never during the first minute).
@@ -70,14 +70,14 @@ event.play_on.3 = Agora, voltemos à nossa partida.
 # ---- Encouragement -------------------------------------------------------------------------------------
 # After the player's mistake has been explained (never mocking; praise the process, not the person).
 event.encourage.mistake = Toda a gente comete erros destes. O importante é dar por eles.
-event.encourage.mistake.2 = Não te preocupes. Vê o que ataca o meu último lance, e vais descobrir.
+event.encourage.mistake.2 = Não te preocupes. Vê o que o meu último lance ataca e vais descobrir.
 event.encourage.mistake.3 = Isso acontece a todos os jogadores. Vamos em frente.
 # The player is behind (material or evaluation).
 event.encourage.behind = Não desistas: procura as tuas oportunidades e dá-me trabalho.
-event.encourage.behind.2 = Continua a lutar. Posições destas ainda podem dar a volta.
+event.encourage.behind.2 = Continua a lutar. Ainda é possível dar a volta a posições destas.
 event.encourage.behind.3 = Mantém a calma e procura as minhas fraquezas.
 # The player has played several good moves in a row.
-event.encourage.well = Estás a ver as minhas ameaças antes de jogar. Muito bem.
+event.encourage.well = Estás a verificar as minhas ameaças antes de jogar. Muito bem.
 event.encourage.well.2 = Lances cuidadosos e sólidos. Continua assim.
 event.encourage.well.3 = Hoje estás a pensar bem.
 

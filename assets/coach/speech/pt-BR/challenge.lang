@@ -16,9 +16,9 @@
 # not "... tiradas de"), so that "1 posição" and "6 posições" both read well.
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
-ch.intro.mate1 = Mate em um lance. {n:position}, e em cada uma, um único lance dá xeque-mate. Olhe todos os xeques.
-ch.intro.mate2 = Mate em dois lances. {n:position}: seu primeiro lance tem de me deixar sem defesa, e então você dá mate.
-ch.intro.mate3 = Mate em três lances. {n:position}. Xeques, capturas e ameaças: calcule a minha melhor resposta a cada vez.
+ch.intro.mate1 = Mate em um. {n:position}, e em cada uma, um único lance dá xeque-mate. Olhe todos os xeques.
+ch.intro.mate2 = Mate em dois. {n:position}: seu primeiro lance tem de me deixar sem defesa, e então você dá mate.
+ch.intro.mate3 = Mate em três. {n:position}. Xeques, capturas e ameaças: calcule a minha melhor resposta a cada vez.
 ch.intro.backrank = Mates do corredor. {n:position} em que um rei está preso atrás dos próprios peões.
 ch.intro.patterns = Padrões de mate. {n:position} com redes de mate clássicas. Reconheça o padrão e dê o golpe.
 ch.intro.hanging = Peças soltas. {n:position}: alguma coisa minha ficou desprotegida. Encontre e capture.
@@ -32,14 +32,14 @@ ch.intro.trapped = Peças presas. {n:position}: uma das minhas peças não tem n
 ch.intro.promotion = Promoção. {n:position} em que um peão avançado decide a partida.
 ch.intro.quiet = Lances tranquilos. {n:position}: o lance vencedor não é nem xeque nem captura.
 ch.intro.opening = Armadilhas de abertura. {n:position} do início de partidas reais. Puna o meu erro.
-ch.intro.escape = Encontre a fuga. {n:position}: seu rei está em perigo, e só um lance o salva.
-ch.intro.defend = Lances de defesa. {n:position}: encontre o único lance que mantém a sua posição de pé.
+ch.intro.escape = Encontre a saída.{n:position}: seu rei está em perigo, e só um lance o salva.
+ch.intro.defend = Lances defensivos.{n:position}: encontre o único lance que mantém a sua posição de pé.
 ch.intro.kq = Dama e rei contra rei. {n:position}: dê xeque-mate no meu rei. Cuidado com o afogamento.
 ch.intro.kr = Torre e rei contra rei. {n:position}: dê xeque-mate no meu rei, passo a passo.
-ch.intro.kp = Rei e peão contra rei. {n:position}: faça uma dama. Seu rei vai na frente.
+ch.intro.kp = Rei e peão contra rei. {n:position}: faça uma dama. Avance com o rei na frente.
 ch.intro.kp_hold = Pare o peão. {n:position}: você só tem o seu rei. Segure o empate.
-ch.intro.rook = Finais de torre. {n:position}: construa a ponte para promover e segure o empate com a defesa de Philidor.
-ch.intro.endgame = Tática nos finais. {n:position} com poucas peças e ideias afiadas.
+ch.intro.rook = Finais de torres.{n:position}: construa a ponte para promover e segure o empate com a defesa de Philidor.
+ch.intro.endgame = Tática no final.{n:position} com poucas peças e ideias afiadas.
 
 # ---- At each position: the task --------------------------------------------------------------------
 # A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 lances").
@@ -125,7 +125,7 @@ ch.no_hint.2 = Certo, não tenha pressa.
 ch.hint.piece = Repare {your:no}.
 ch.hint.piece.2 = Pense {your:no}.
 ch.hint.square = Repare na casa {sq}.
-ch.hint.square.2 = A casa-chave é {sq}.
+ch.hint.square.2 = A chave é a casa {sq}.
 ch.hint.square.3 = Fique de olho na casa {sq}.
 ch.hint.show = Aqui está o lance. Observe.
 ch.hint.show.2 = Vou mostrar. Observe.

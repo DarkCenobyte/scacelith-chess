@@ -1,0 +1,134 @@
+# Coach speech (Hungarian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach WITH its article and possessive
+# ("a bástyád", "a huszárom"), with the case forms of common.lang ({my:acc} "a huszáromat",
+# {your:ins} "a bástyáddal", {my:dat}, {my:ter}, {your:noart_ins}...); never write "a"/"az" or a
+# possessive next to them. {sq}, {sq2}, {to}, {esc} = squares: never a suffix or an article on them,
+# the case goes on "mező" ("{sq} mezőre", "{sq} mezőn"). {move} = a move. {@}, {@2}, {@3} are
+# invisible marks: the coach points at something while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: letters said by their Hungarian names).
+# Files = vonalak, ranks = sorok, back rank = alapsor (glossary).
+
+# ---- Chapter titles (said inside "Folytassuk a leckét: {chapter}.") ------------------------------------
+# Nominative with the article, lower case (they always follow a colon, see event.lesson.* in events.lang).
+lesson.title.welcome = a sakktábla
+lesson.title.pieces = hogyan lépnek a bábuk
+lesson.title.safety = a biztonságos és a veszélyes ütések
+lesson.title.check = a sakk
+lesson.title.mate = a matt
+lesson.title.castling = a sáncolás
+lesson.title.en_passant = az en passant ütés
+lesson.title.promotion = az átváltozás
+lesson.title.draws = a patt és a döntetlen
+lesson.title.etiquette = értékszám, sakkóra és illem a valódi játszmákban
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Most próbáld te.
+lesson.now_you.2 = Most te jössz.
+lesson.now_you.3 = Most te.
+# Another wrong move after the demonstration.
+lesson.almost = Majdnem! Azt a lépést lépd meg, amit megmutattam.
+lesson.almost.2 = Nem egészen. Próbáld meg a bemutatott lépést.
+lesson.almost.3 = Közel jársz. Emlékezz, mit mutattam az előbb.
+# A wrong move without a line of its own.
+lesson.try_again = Nem ez az. Próbáld újra.
+lesson.try_again.2 = Nem ez. Próbálkozz még egyszer.
+lesson.try_again.3 = Próbáljuk meg még egyszer.
+lesson.use_your = Lépj {your:ins}.
+lesson.use_your.2 = Próbáld {your:ins}.
+lesson.watch = Figyelj.
+lesson.like_this = Így.
+lesson.and_back = És vissza.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Sakk, de a királyom elmenekül {esc} mezőre.
+lesson.check_takes = Sakk, de a királyom egyszerűen leüti {your:acc}.
+lesson.check_block = Sakk, de egy bábummal el tudom zárni az utat.
+lesson.stalemate = Patt! A királyom nem tud lépni, és nincs sakkban. Döntetlen, pedig nyerésre álltál!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Nem léphetsz {sq} mezőre: {my} támadja. A király sosem léphet támadott mezőre.
+why.PathBlocked = Valami {@}útban van: a huszáron kívül egyik bábu sem ugorhat át másikat.
+why.WrongGeometry = {your} nem így lép.
+why.MustAnswerCheck = {@}Sakkban vagy: előbb azt kell elhárítanod.
+why.CastlingThroughCheck = A királyod áthaladna {sq} mezőn, azt pedig {my} támadja.
+why.CastlingNoRights = Az a király vagy bástya már lépett: nem lehet sáncolni.
+why.CastlingBlocked = A sáncoláshoz üresnek kell lennie a király és a bástya közötti mezőknek.
+why.CastlingOutOfCheck = Sakkban nem sáncolhatsz.
+why.PawnForwardBlocked = A gyalog nem üthet egyenesen előre: az a mező {@}foglalt.
+why.LeavesKingInCheck = {your} kötésben van: ha ellépne, {my} támadná a királyodat.
+why.OwnPieceOnTarget = Nem léphetsz a saját bábudra.
+why.PawnCaptureNeedsVictim = A gyalog csak ütéskor léphet átlósan.
+why.EnPassantExpired = En passant ütni csak közvetlenül a gyalog kettős lépése után szabad.
+why.NotYourTurn = Várj: én jövök.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Szia! Én vagyok az edződ. Tanuljuk meg együtt a sakk szabályait, kis lépésekben.
+lesson.welcome.board = Ez a sakktábla: hatvannégy mező, világosak és sötétek, nyolc sorban nyolc-nyolc.
+lesson.welcome.light = A tőled {@}jobbra eső sarokmező mindig világos. Jegyezd meg: jobbra a világos.
+lesson.welcome.files = A függőleges oszlopokat vonalaknak hívjuk. Betűjelük van, {@}a-tól {@2}h-ig.
+lesson.welcome.files.spoken = A függőleges oszlopokat vonalaknak hívjuk. Betűjelük van, {@}atól {@2}háig.
+lesson.welcome.ranks = A vízszintes sorokat számokkal jelöljük, {@}egytől {@2}nyolcig, a te oldaladtól kezdve.
+lesson.welcome.square = Minden mezőt a betűjével, majd a számával nevezünk meg. Ez itt {sq}.
+lesson.welcome.square2 = Ez pedig {sq}.
+lesson.welcome.kings = Ez a két király. A tiéd {sq} mezőn áll, az enyém {sq2} mezőn.
+lesson.welcome.ask = Te jössz: lépj a királyoddal egy mezőt előre, {sq} mezőre.
+lesson.welcome.wrong = Ez {to}. Nekünk {sq} kell: az e betű és a kettes.
+lesson.welcome.ok = Tökéletes. A királyod {sq} mezőn áll.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Ez {your}. Egyenesen halad, a vonalak és a sorok mentén, ameddig csak akar.
+lesson.rook.lines = Fel a vonalon, {@}vagy végig a soron.
+lesson.rook.capture = Ütéskor a bábu egy {@}ellenséges bábu helyére lép, amely ekkor lekerül a tábláról.
+lesson.rook.ask = Üsd le {my:acc} a bástyáddal!
+lesson.rook.short = Jó irány! Menj tovább felfelé a vonalon, egészen {my:ter}.
+lesson.rook.rank = Ez a sor mentén halad. {my} feljebb áll, a vonalon.
+lesson.rook.king = Ez a királyod. Lépj a sarokban álló {your:noart_ins}!
+lesson.rook.ok = Leütve! {my} lekerül a tábláról.
+# Pieces don't jump
+lesson.jump.blocked = A bábuk nem ugorhatják át egymást. A gyalogod {sq} mezőn elzárja a bástya útját.
+lesson.jump.knight = Csak a huszár tud ugrani. Hamarosan megismerkedünk vele.
+# Bishop
+lesson.bishop.intro = Ez {your}. Átlósan lép, ameddig csak akar.
+lesson.bishop.colour = A futó mindig azonos színű mezőkön marad.
+lesson.bishop.ask = {my} a futód átlóján áll. Üsd le!
+lesson.bishop.short = Jó átló! Menj tovább, egészen {my:ter}.
+lesson.bishop.other = Ez a másik átló. Nézz {my} felé.
+lesson.bishop.ok = Kitűnő. A futók szeretik a hosszú átlókat.
+# Queen
+lesson.queen.intro = Ez {your}, a legerősebb bábu. Úgy lép, mint a bástya és a futó együtt.
+lesson.queen.ask = Keresd meg {my:acc}, és üsd le a vezéreddel.
+lesson.queen.wrong = A vezéred egyetlen lépéssel, átlósan eléri {my:acc}.
+lesson.queen.ok = Ügyes! Vigyázz a vezéredre: sokat ér.
+# King
+lesson.king.intro = A király csak egy mezőt lép, bármelyik irányba.
+lesson.king.important = A király a legfontosabb bábu. Ha csapdába esik, elveszett a játszma.
+lesson.king.ask = A király is tud ütni. Üsd le {my:acc}!
+lesson.king.wrong = A királyod közvetlenül {my} mellett áll. Lépj a mezőjére, és üsd le.
+lesson.king.ok = Jó! A király lassú, de közelről erős.
+# Knight
+lesson.knight.intro = Ez {your}. L alakban lép: két mezőt egyenesen, aztán egyet oldalra.
+lesson.knight.intro.spoken = Ez {your}. El alakban lép: két mezőt egyenesen, aztán egyet oldalra.
+lesson.knight.l = {@}Így. Mindig másik színű mezőre érkezik.
+lesson.knight.jump = A huszár az egyetlen bábu, amely át tud ugrani másokat.
+lesson.knight.ask = Üsd le {my:acc} a huszároddal!
+lesson.knight.wrong = Ez szabályos huszárlépés, de nem éri el {my:acc}. Próbálj egy másik L alakú lépést.
+lesson.knight.wrong.spoken = Ez szabályos huszárlépés, de nem éri el {my:acc}. Próbálj egy másik el alakú lépést.
+lesson.knight.ok = Remek ugrás!
+# Pawn: moving
+lesson.pawn.intro = Most pedig {your}. Egyenesen előre lép, egyszerre egy mezőt, és sosem hátra.
+lesson.pawn.first = Az első lépésénél a gyalog egy vagy két mezőt is léphet.
+lesson.pawn.ask = Lépj a gyalogoddal két mezőt előre.
+lesson.pawn.one = Ez egy mező: szabályos, de most lépj kettőt.
+lesson.pawn.use = Lépj a gyaloggal.
+lesson.pawn.ok = Jó.
+# Pawn: capturing
+lesson.pawncap.blocked = Az én gyalogom elállja a tiédet. A gyalog nem üthet egyenesen előre.
+lesson.pawncap.diagonal = A gyalog viszont átlósan üt, egy mezőt előre.
+lesson.pawncap.ask = Üsd le {my:acc} a gyalogoddal.
+lesson.pawncap.use = Lépj {your:ins}: átlósan előre üt.
+lesson.pawncap.ok = Igen! Egyenesen lép, átlósan üt.

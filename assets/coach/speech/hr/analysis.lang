@@ -1,0 +1,155 @@
+# Coach speech (Croatian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Croatian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "ti" or "ja" here: the players are "bijeli" and "crni", masculine singular, lower case
+#   inside a sentence as in Croatian chess books ("Bijeli je napravio ...", "pobjedom crnog"). A piece
+#   comes with its side: {piece} {t1} {t2} = "bijeli skakač", "crna dama"; forms from common.lang:
+#   acc gen pron_acc pt ("bijelog skakača", "ga" / "ju", "imao" / "imala").
+# - A move is often introduced by "potez" ("Potez {move} je pogreška", "nakon poteza {move}"): the
+#   spoken move ("skakač uzima na e pet") contains a verb, and "potez" carries the case and the
+#   masculine agreement of a past tense ("Potez {best} bio je jači"). "Bolje je bilo {best}" is the
+#   usual neuter of Croatian annotations.
+# - Counted numbers (common.lang): {m:move_loc} "mat u 3 poteza", {pts:point_gen} "od 3 boda",
+#   {n:mistake_acc} "2 pogreške" after "napravio je", {m:blunder} "1 gruba pogreška",
+#   {acc_white:percent} "87 %" (spoken "posto").
+# - {opening:def} is a nominative after "je" (the openings fragment's "def" form).
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Pogledajmo zajedno ovu partiju.
+an.start.2 = Prođimo kroz ovu partiju, potez po potez.
+an.start.3 = Evo partije. Pogledajmo kako je tekla.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Ova partija počinje iz postavljene pozicije. Prođimo kroz nju.
+an.start.setup.2 = Partija iz postavljene pozicije. Pogledajmo kako je tekla.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Otvaranje je {opening:def}.
+an.opening.2 = Ovo je {opening:def}.
+an.book_exit = Potezom {move} partija napušta poznatu teoriju.
+an.book_exit.2 = {move} je prvi potez izvan teorije otvaranja.
+an.book_exit.3 = Ovdje teorija otvaranja završava, potezom {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = Potez {move} je gruba pogreška.
+an.blunder.2 = Ovdje je {move} ozbiljna pogreška.
+an.blunder.3 = Gruba pogreška: {move}.
+an.mistake = Potez {move} je pogreška.
+an.mistake.2 = Ovdje {move} nije pravi potez.
+an.mistake.3 = Pogreška: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = Potez {move} propušta priliku da kazni tu pogrešku.
+an.missed_chance.2 = Potezom {move} prilika nestaje.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Sada potez {reply:nomate} daje mat.
+an.mate_allowed.one.2 = Ovo dopušta potez {reply:nomate}, a to je mat.
+an.mate_allowed = Ovo dopušta forsirani mat u {m:move_loc}, koji počinje potezom {reply:nomate}.
+an.mate_allowed.2 = Sada postoji forsirani mat u {m:move_loc}, a počinje potezom {reply:nomate}.
+an.fork = Sada potez {reply} vilicom napada {t1:acc} i {t2:acc}.
+an.fork.2 = Ovo dopušta potez {reply}, koji istodobno napada {t1:acc} i {t2:acc}.
+an.fork.3 = Potez {reply} istodobno napada {t1:acc} i {t2:acc}.
+an.hanging = Time {piece} ostaje bez obrane i pada nakon poteza {reply}.
+an.hanging.2 = {piece} ostaje bez branitelja i potez {reply} {piece:pron_acc} dobiva.
+an.hanging.3 = Potez {reply} jednostavno uzima {piece:acc}: branitelja nije bilo.
+an.material = Odgovor {line} dobiva materijal u vrijednosti od {pts:point_gen}.
+an.material.2 = Zatim slijedi {line}, uz dobitak od {pts:point_gen}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Potez {best:nomate} davao je mat.
+an.mate_missed.one.2 = Potez {best:nomate} donio bi mat.
+an.mate_missed = Potez {best:nomate} forsirao bi mat u {m:move_loc}.
+an.mate_missed.2 = Postojao je forsirani mat u {m:move_loc}, koji je počinjao potezom {best:nomate}.
+an.missed_capture = Potez {best} besplatno bi dobio {piece:acc}.
+an.missed_capture.2 = {piece} nije ima{piece:pt} branitelja: potez {best} uzeo bi {piece:pron_acc}.
+an.missed_fork = Potez {best} napao bi vilicom {t1:acc} i {t2:acc}.
+an.missed_fork.2 = Potez {best} davao je vilicu, s napadom na {t1:acc} i {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = Potez {best} bio je jači.
+an.better.2 = Bolje je bilo {best}.
+an.better.3 = Potez {best} bio je točniji.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} je briljantan potez: žrtvuje {piece:acc}!
+an.brilliant.2 = Briljantna žrtva! Potez {move} nudi {piece:acc}.
+an.brilliant.3 = {move}! Briljantan potez koji nudi {piece:acc}.
+an.brilliant.mate = Vodi do forsiranog mata u {m:move_loc}.
+an.brilliant.mate.2 = I forsira mat u {m:move_loc}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} je jedini potez koji zadržava prednost.
+an.only.win.2 = Samo {move} ovdje zadržava prednost. Dobro pronađeno.
+an.only.hold = {move} je jedini potez koji održava ravnotežu.
+an.only.hold.2 = Samo {move} ovdje drži poziciju.
+an.only.defend = {move} je jedini potez kojim se borba nastavlja.
+an.only.defend.2 = Samo {move} ovdje drži partiju živom. Dobra obrana.
+an.only.best = {move} je ovdje daleko najjači potez.
+an.only.best.2 = Precizno: {move} je mnogo jači od svega ostalog.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} je mala netočnost: točnije je bilo {best}.
+an.inaccuracy.2 = Ne sasvim najbolje: potez {best} bio je precizniji od poteza {move}.
+an.interesting = {move} je zanimljiva ideja: nudi {piece:acc}.
+an.interesting.2 = Zanimljiv pokušaj: {move} žrtvuje {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Bijeli sada ima forsirani mat u {m:move_loc}.
+an.mate_on.white.2 = Odavde bijeli može forsirati mat u {m:move_loc}.
+an.mate_on.black = Crni sada ima forsirani mat u {m:move_loc}.
+an.mate_on.black.2 = Odavde crni može forsirati mat u {m:move_loc}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Mat. Bijeli je dobio partiju.
+an.end.mate.white.2 = I to je mat: bijeli pobjeđuje.
+an.end.mate.black = Mat. Crni je dobio partiju.
+an.end.mate.black.2 = I to je mat: crni pobjeđuje.
+an.end.resigned.white = Crni je predao, pa je bijeli dobio partiju.
+an.end.resigned.white.2 = Partija ovdje završava: crni predaje, a bijeli pobjeđuje.
+an.end.resigned.black = Bijeli je predao, pa je crni dobio partiju.
+an.end.resigned.black.2 = Partija ovdje završava: bijeli predaje, a crni pobjeđuje.
+an.end.timeout.white = Crnom je isteklo vrijeme, pa bijeli pobjeđuje.
+an.end.timeout.white.2 = Bijeli pobjeđuje na vrijeme.
+an.end.timeout.black = Bijelom je isteklo vrijeme, pa crni pobjeđuje.
+an.end.timeout.black.2 = Crni pobjeđuje na vrijeme.
+an.end.win.white = Partija završava pobjedom bijelog.
+an.end.win.white.2 = Bijeli dobiva partiju.
+an.end.win.black = Partija završava pobjedom crnog.
+an.end.win.black.2 = Crni dobiva partiju.
+an.end.stalemate = Pat: partija je remi.
+an.end.stalemate.2 = Pat je, pa partija završava remijem.
+an.end.draw.agreement = Igrači su dogovorili remi.
+an.end.draw.agreement.2 = Partija završava remijem po dogovoru.
+an.end.draw.repetition = Partija je remi zbog ponavljanja pozicije.
+an.end.draw.repetition.2 = Ista se pozicija ponovila: remi.
+an.end.draw.fifty = Partija je remi po pravilu pedeset poteza.
+an.end.draw.fifty.2 = Pedeset poteza bez uzimanja i bez poteza pješakom: remi.
+an.end.draw.seventy_five = Partija je remi po pravilu sedamdeset i pet poteza.
+an.end.draw.seventy_five.2 = Sedamdeset i pet poteza bez uzimanja i bez poteza pješakom: remi.
+an.end.draw.material = Mat više nije moguć: partija je remi.
+an.end.draw.material.2 = Nijedna strana više ne može dati mat, pa je remi.
+an.end.draw = Partija završava remijem.
+an.end.draw.2 = Remi.
+an.end.unfinished = Partija ovdje staje, nedovršena.
+an.end.unfinished.2 = Tu partija staje: nije bila dovršena.
+an.end.accuracy = Točnost: bijeli {acc_white:percent}, crni {acc_black:percent}.
+an.end.accuracy.2 = Bijeli je igrao s točnošću od {acc_white:percent}, a crni od {acc_black:percent}.
+an.end.clean.white = Bijeli nije napravio ni pogrešaka ni grubih pogrešaka.
+an.end.clean.white.2 = Igra bijelog bila je bez ozbiljnih pogrešaka.
+an.end.clean.black = Crni nije napravio ni pogrešaka ni grubih pogrešaka.
+an.end.clean.black.2 = Igra crnog bila je bez ozbiljnih pogrešaka.
+an.end.mistakes.white = Bijeli je napravio {n:mistake_acc}, ali nijednu grubu pogrešku.
+an.end.mistakes.white.2 = Kod bijelog: {n:mistake}, bez grubih pogrešaka.
+an.end.mistakes.black = Crni je napravio {n:mistake_acc}, ali nijednu grubu pogrešku.
+an.end.mistakes.black.2 = Kod crnog: {n:mistake}, bez grubih pogrešaka.
+an.end.blunders.white = Bijeli je napravio {m:blunder_acc}.
+an.end.blunders.white.2 = Kod bijelog: {m:blunder}.
+an.end.blunders.black = Crni je napravio {m:blunder_acc}.
+an.end.blunders.black.2 = Kod crnog: {m:blunder}.
+an.end.errors.white = Bijeli je napravio {n:mistake_acc} i {m:blunder_acc}.
+an.end.errors.white.2 = Kod bijelog: {n:mistake} i {m:blunder}.
+an.end.errors.black = Crni je napravio {n:mistake_acc} i {m:blunder_acc}.
+an.end.errors.black.2 = Kod crnog: {n:mistake} i {m:blunder}.

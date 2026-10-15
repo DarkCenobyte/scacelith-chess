@@ -549,7 +549,7 @@ ex.back_rank.b5 = Fraqueza da última fila à volta {your:de}: {line}.
 ex.back_rank.b5.2 = {line}; {your} não tem casa de fuga.
 ex.back_rank.b6 = {line}, última fila; {your} está encurralad{your:o}.
 ex.back_rank.b6.2 = Última fila: {line} ({your}).
-ex.back_rank.tip.b1 = Dá uma janela ao teu rei: avança um dos peões que tem à frente.
+ex.back_rank.tip.b1 = Dá uma casa de fuga ao teu rei: avança um dos peões que tem à frente.
 ex.back_rank.tip.b1.2 = Um rei atrás de três peões pode levar mate na última fila. Dá-lhe algum espaço.
 
 # ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
@@ -746,7 +746,7 @@ ex.king_exposed.b6.2 = {your} está demasiado a descoberto: {line}.
 
 # ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
 ex.bad_trade.b3 = Esta troca leva a um final de peões que eu ganho.
-ex.bad_trade.b3.2 = Depois de {line}, só ficam peões, e o meu rei está melhor.
+ex.bad_trade.b3.2 = Depois de {line}, só ficam peões, e o meu rei está melhor colocado.
 ex.bad_trade.b4 = As trocas levam a um final de peões perdido: {line}.
 ex.bad_trade.b4.2 = Trocar para este final de peões perde.
 ex.bad_trade.b5 = Troca errada: o final de peões depois de {line} está perdido.
@@ -956,7 +956,7 @@ threat.piece.b1.3 = Atenção, {my} quer tomar {your}.
 threat.piece.b2 = Cuidado com {your}.
 threat.piece.b2.2 = {your} está sob ataque.
 threat.piece.b2.3 = Vigia {your}.
-threat.punish.b1 = O meu último lance foi um erro. Consegues aproveitar?
+threat.punish.b1 = O meu último lance foi um erro. Consegues castigá-lo?
 threat.punish.b1.2 = Hum, acho que cometi um erro. Consegues encontrá-lo?
 
 # ---- Takebacks ------------------------------------------------------------------------------------

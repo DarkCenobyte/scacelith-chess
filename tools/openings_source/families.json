@@ -17,7 +17,11 @@
    "pt-BR",
    "pt",
    "ko",
-   "bg"
+   "bg",
+   "it",
+   "da",
+   "et",
+   "fi"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -139,6 +143,23 @@
     "bg": {
      "name": "Дебют на царската пешка",
      "def": "дебют на царската пешка"
+    },
+    "it": {
+     "name": "Apertura di pedone di re",
+     "def": "l’apertura di pedone di re",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Kongebondeåbning",
+     "def": "en kongebondeåbning"
+    },
+    "et": {
+     "name": "Kuningaetturi avang",
+     "def": "kuningaetturi avang"
+    },
+    "fi": {
+     "name": "Kuningassotilaan avaus",
+     "def": "kuningassotilaan avaus"
     }
    },
    "comment": {
@@ -234,6 +255,23 @@
     "bg": {
      "name": "Дебют на дамската пешка",
      "def": "дебют на дамската пешка"
+    },
+    "it": {
+     "name": "Apertura di pedone di donna",
+     "def": "l’apertura di pedone di donna",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Dronningebondeåbning",
+     "def": "en dronningebondeåbning"
+    },
+    "et": {
+     "name": "Lipuetturi avang",
+     "def": "lipuetturi avang"
+    },
+    "fi": {
+     "name": "Kuningatarsotilaan avaus",
+     "def": "kuningatarsotilaan avaus"
     }
    },
    "comment": {
@@ -326,6 +364,23 @@
     "bg": {
      "name": "Дебют на царския кон",
      "def": "дебют на царския кон"
+    },
+    "it": {
+     "name": "Apertura di cavallo di re",
+     "def": "l’apertura di cavallo di re",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Kongespringeråbning",
+     "def": "en kongespringeråbning"
+    },
+    "et": {
+     "name": "Kuningaratsu avang",
+     "def": "kuningaratsu avang"
+    },
+    "fi": {
+     "name": "Kuningasratsun avaus",
+     "def": "kuningasratsun avaus"
     }
    },
    "comment": {
@@ -421,6 +476,23 @@
     "bg": {
      "name": "Сицилианска защита",
      "def": "сицилианска защита"
+    },
+    "it": {
+     "name": "Difesa siciliana",
+     "def": "la difesa siciliana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Siciliansk forsvar",
+     "def": "siciliansk forsvar"
+    },
+    "et": {
+     "name": "Sitsiilia kaitse",
+     "def": "Sitsiilia kaitse"
+    },
+    "fi": {
+     "name": "Sisilialainen puolustus",
+     "def": "sisilialainen puolustus"
     }
    },
    "comment": {
@@ -513,6 +585,23 @@
     "bg": {
      "name": "Френска защита",
      "def": "френска защита"
+    },
+    "it": {
+     "name": "Difesa francese",
+     "def": "la difesa francese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Fransk forsvar",
+     "def": "fransk forsvar"
+    },
+    "et": {
+     "name": "Prantsuse kaitse",
+     "def": "Prantsuse kaitse"
+    },
+    "fi": {
+     "name": "Ranskalainen puolustus",
+     "def": "ranskalainen puolustus"
     }
    },
    "comment": {
@@ -605,6 +694,23 @@
     "bg": {
      "name": "Защита Каро-Кан",
      "def": "защита Каро-Кан"
+    },
+    "it": {
+     "name": "Difesa Caro-Kann",
+     "def": "la difesa Caro-Kann",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Caro-Kann",
+     "def": "Caro-Kann"
+    },
+    "et": {
+     "name": "Caro-Kanni kaitse",
+     "def": "Caro-Kanni kaitse"
+    },
+    "fi": {
+     "name": "Caro-Kann-puolustus",
+     "def": "Caro-Kann-puolustus"
     }
    },
    "comment": {
@@ -697,6 +803,23 @@
     "bg": {
      "name": "Скандинавска защита",
      "def": "скандинавска защита"
+    },
+    "it": {
+     "name": "Difesa scandinava",
+     "def": "la difesa scandinava",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Skandinavisk forsvar",
+     "def": "skandinavisk forsvar"
+    },
+    "et": {
+     "name": "Skandinaavia kaitse",
+     "def": "Skandinaavia kaitse"
+    },
+    "fi": {
+     "name": "Skandinaavinen puolustus",
+     "def": "skandinaavinen puolustus"
     }
    },
    "comment": {
@@ -789,6 +912,23 @@
     "bg": {
      "name": "Италианска партия",
      "def": "италианска партия"
+    },
+    "it": {
+     "name": "Partita italiana",
+     "def": "la partita italiana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Italiensk parti",
+     "def": "italiensk parti"
+    },
+    "et": {
+     "name": "Itaalia partii",
+     "def": "Itaalia partii"
+    },
+    "fi": {
+     "name": "Italialainen peli",
+     "def": "italialainen peli"
     }
    },
    "comment": {
@@ -881,6 +1021,23 @@
     "bg": {
      "name": "Испанска партия",
      "def": "испанска партия"
+    },
+    "it": {
+     "name": "Partita spagnola",
+     "def": "la partita spagnola",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Spansk parti",
+     "def": "spansk parti"
+    },
+    "et": {
+     "name": "Hispaania partii",
+     "def": "Hispaania partii"
+    },
+    "fi": {
+     "name": "Espanjalainen peli",
+     "def": "espanjalainen peli"
     }
    },
    "comment": {
@@ -973,6 +1130,23 @@
     "bg": {
      "name": "Шотландска партия",
      "def": "шотландска партия"
+    },
+    "it": {
+     "name": "Partita scozzese",
+     "def": "la partita scozzese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Skotsk parti",
+     "def": "skotsk parti"
+    },
+    "et": {
+     "name": "Šoti partii",
+     "def": "Šoti partii"
+    },
+    "fi": {
+     "name": "Skotlantilainen peli",
+     "def": "skotlantilainen peli"
     }
    },
    "comment": {
@@ -1065,6 +1239,23 @@
     "bg": {
      "name": "Защита Филидор",
      "def": "защита Филидор"
+    },
+    "it": {
+     "name": "Difesa Philidor",
+     "def": "la difesa Philidor",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Philidors forsvar",
+     "def": "Philidors forsvar"
+    },
+    "et": {
+     "name": "Philidori kaitse",
+     "def": "Philidori kaitse"
+    },
+    "fi": {
+     "name": "Philidorin puolustus",
+     "def": "Philidorin puolustus"
     }
    },
    "comment": {
@@ -1157,6 +1348,23 @@
     "bg": {
      "name": "Руска партия",
      "def": "руска партия"
+    },
+    "it": {
+     "name": "Difesa russa",
+     "def": "la difesa russa",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Petrovs forsvar",
+     "def": "Petrovs forsvar"
+    },
+    "et": {
+     "name": "Vene partii",
+     "def": "Vene partii"
+    },
+    "fi": {
+     "name": "Petrovin puolustus",
+     "def": "Petrovin puolustus"
     }
    },
    "comment": {
@@ -1250,6 +1458,23 @@
     "bg": {
      "name": "Партия на четирите коня",
      "def": "партия на четирите коня"
+    },
+    "it": {
+     "name": "Partita dei quattro cavalli",
+     "def": "la partita dei quattro cavalli",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Firspringerspil",
+     "def": "firspringerspil"
+    },
+    "et": {
+     "name": "Nelja ratsu partii",
+     "def": "nelja ratsu partii"
+    },
+    "fi": {
+     "name": "Neljän ratsun peli",
+     "def": "neljän ratsun peli"
     }
    },
    "comment": {
@@ -1343,6 +1568,23 @@
     "bg": {
      "name": "Английско начало",
      "def": "английско начало"
+    },
+    "it": {
+     "name": "Partita inglese",
+     "def": "la partita inglese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Engelsk åbning",
+     "def": "engelsk åbning"
+    },
+    "et": {
+     "name": "Inglise avang",
+     "def": "Inglise avang"
+    },
+    "fi": {
+     "name": "Englantilainen avaus",
+     "def": "englantilainen avaus"
     }
    },
    "comment": {
@@ -1435,6 +1677,23 @@
     "bg": {
      "name": "Дебют Цукерторт",
      "def": "дебют Цукерторт"
+    },
+    "it": {
+     "name": "Apertura Zukertort",
+     "def": "l’apertura Zukertort",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Zukertort-åbning",
+     "def": "Zukertort-åbningen"
+    },
+    "et": {
+     "name": "Zukertorti avang",
+     "def": "Zukertorti avang"
+    },
+    "fi": {
+     "name": "Zukertortin avaus",
+     "def": "Zukertortin avaus"
     }
    },
    "comment": {
@@ -1532,6 +1791,23 @@
     "bg": {
      "name": "Дамски гамбит",
      "def": "дамски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di donna",
+     "def": "il gambetto di donna",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Dronninggambit",
+     "def": "dronninggambit"
+    },
+    "et": {
+     "name": "Lipugambiit",
+     "def": "lipugambiit"
+    },
+    "fi": {
+     "name": "Kuningatargambiitti",
+     "def": "kuningatargambiitti"
     }
    },
    "comment": {
@@ -1624,6 +1900,23 @@
     "bg": {
      "name": "Отказан дамски гамбит",
      "def": "отказан дамски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di donna rifiutato",
+     "def": "il gambetto di donna rifiutato",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Afslået dronninggambit",
+     "def": "afslået dronninggambit"
+    },
+    "et": {
+     "name": "Tagasilükatud lipugambiit",
+     "def": "tagasilükatud lipugambiit"
+    },
+    "fi": {
+     "name": "Hylätty kuningatargambiitti",
+     "def": "hylätty kuningatargambiitti"
     }
    },
    "comment": {
@@ -1716,6 +2009,23 @@
     "bg": {
      "name": "Приет дамски гамбит",
      "def": "приет дамски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di donna accettato",
+     "def": "il gambetto di donna accettato",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Antaget dronninggambit",
+     "def": "antaget dronninggambit"
+    },
+    "et": {
+     "name": "Vastuvõetud lipugambiit",
+     "def": "vastuvõetud lipugambiit"
+    },
+    "fi": {
+     "name": "Vastaanotettu kuningatargambiitti",
+     "def": "vastaanotettu kuningatargambiitti"
     }
    },
    "comment": {
@@ -1809,6 +2119,23 @@
     "bg": {
      "name": "Славянска защита",
      "def": "славянска защита"
+    },
+    "it": {
+     "name": "Difesa slava",
+     "def": "la difesa slava",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Slavisk forsvar",
+     "def": "slavisk forsvar"
+    },
+    "et": {
+     "name": "Slaavi kaitse",
+     "def": "Slaavi kaitse"
+    },
+    "fi": {
+     "name": "Slaavilainen puolustus",
+     "def": "slaavilainen puolustus"
     }
    },
    "comment": {
@@ -1902,6 +2229,23 @@
     "bg": {
      "name": "Полуславянска защита",
      "def": "полуславянска защита"
+    },
+    "it": {
+     "name": "Difesa semi-slava",
+     "def": "la difesa semi-slava",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Semislavisk forsvar",
+     "def": "semislavisk forsvar"
+    },
+    "et": {
+     "name": "Poolslaavi kaitse",
+     "def": "poolslaavi kaitse"
+    },
+    "fi": {
+     "name": "Puolislaavilainen puolustus",
+     "def": "puolislaavilainen puolustus"
     }
    },
    "comment": {
@@ -1995,6 +2339,23 @@
     "bg": {
      "name": "Индийска защита",
      "def": "индийска защита"
+    },
+    "it": {
+     "name": "Difesa indiana",
+     "def": "la difesa indiana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Indisk forsvar",
+     "def": "et indisk forsvar"
+    },
+    "et": {
+     "name": "India kaitse",
+     "def": "India kaitse"
+    },
+    "fi": {
+     "name": "Intialainen puolustus",
+     "def": "intialainen puolustus"
     }
    },
    "comment": {
@@ -2087,6 +2448,23 @@
     "bg": {
      "name": "Староиндийска защита",
      "def": "староиндийска защита"
+    },
+    "it": {
+     "name": "Difesa indiana di re",
+     "def": "la difesa indiana di re",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Kongeindisk forsvar",
+     "def": "kongeindisk forsvar"
+    },
+    "et": {
+     "name": "Kuningaindia kaitse",
+     "def": "kuningaindia kaitse"
+    },
+    "fi": {
+     "name": "Kuningasintialainen puolustus",
+     "def": "kuningasintialainen puolustus"
     }
    },
    "comment": {
@@ -2184,6 +2562,23 @@
     "bg": {
      "name": "Лондонска система",
      "def": "лондонска система"
+    },
+    "it": {
+     "name": "Sistema Londra",
+     "def": "il sistema Londra",
+     "gender": "m"
+    },
+    "da": {
+     "name": "London-system",
+     "def": "London-systemet"
+    },
+    "et": {
+     "name": "Londoni süsteem",
+     "def": "Londoni süsteem"
+    },
+    "fi": {
+     "name": "Lontoon järjestelmä",
+     "def": "Lontoon järjestelmä"
     }
    },
    "comment": {
@@ -2278,6 +2673,23 @@
     "bg": {
      "name": "Модерна защита",
      "def": "модерна защита"
+    },
+    "it": {
+     "name": "Difesa moderna",
+     "def": "la difesa moderna",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Moderne forsvar",
+     "def": "moderne forsvar"
+    },
+    "et": {
+     "name": "Moodne kaitse",
+     "def": "moodne kaitse"
+    },
+    "fi": {
+     "name": "Moderni puolustus",
+     "def": "moderni puolustus"
     }
    },
    "comment": {
@@ -2372,6 +2784,23 @@
     "bg": {
      "name": "Защита Пирц",
      "def": "защита Пирц"
+    },
+    "it": {
+     "name": "Difesa Pirc",
+     "def": "la difesa Pirc",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Pirc-forsvar",
+     "def": "Pirc-forsvaret"
+    },
+    "et": {
+     "name": "Pirci kaitse",
+     "def": "Pirci kaitse"
+    },
+    "fi": {
+     "name": "Pircin puolustus",
+     "def": "Pircin puolustus"
     }
    },
    "comment": {
@@ -2465,6 +2894,23 @@
     "bg": {
      "name": "Виенска партия",
      "def": "виенска партия"
+    },
+    "it": {
+     "name": "Partita viennese",
+     "def": "la partita viennese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Wienerparti",
+     "def": "wienerparti"
+    },
+    "et": {
+     "name": "Viini partii",
+     "def": "Viini partii"
+    },
+    "fi": {
+     "name": "Wieniläinen peli",
+     "def": "wieniläinen peli"
     }
    },
    "comment": {
@@ -2557,6 +3003,23 @@
     "bg": {
      "name": "Дебют на офицера",
      "def": "дебют на офицера"
+    },
+    "it": {
+     "name": "Apertura d’alfiere",
+     "def": "l’apertura d’alfiere",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Løberspil",
+     "def": "løberspil"
+    },
+    "et": {
+     "name": "Odaavang",
+     "def": "odaavang"
+    },
+    "fi": {
+     "name": "Lähettiavaus",
+     "def": "lähettiavaus"
     }
    },
    "comment": {
@@ -2649,6 +3112,23 @@
     "bg": {
      "name": "Защита Алехин",
      "def": "защита Алехин"
+    },
+    "it": {
+     "name": "Difesa Alekhine",
+     "def": "la difesa Alekhine",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Aljechins forsvar",
+     "def": "Aljechins forsvar"
+    },
+    "et": {
+     "name": "Aljehhini kaitse",
+     "def": "Aljehhini kaitse"
+    },
+    "fi": {
+     "name": "Aljehinin puolustus",
+     "def": "Aljehinin puolustus"
     }
    },
    "comment": {
@@ -2741,6 +3221,23 @@
     "bg": {
      "name": "Царски гамбит",
      "def": "царски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di re",
+     "def": "il gambetto di re",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Kongegambit",
+     "def": "kongegambit"
+    },
+    "et": {
+     "name": "Kuningagambiit",
+     "def": "kuningagambiit"
+    },
+    "fi": {
+     "name": "Kuningasgambiitti",
+     "def": "kuningasgambiitti"
     }
    },
    "comment": {
@@ -2833,6 +3330,23 @@
     "bg": {
      "name": "Приет царски гамбит",
      "def": "приет царски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di re accettato",
+     "def": "il gambetto di re accettato",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Antaget kongegambit",
+     "def": "antaget kongegambit"
+    },
+    "et": {
+     "name": "Vastuvõetud kuningagambiit",
+     "def": "vastuvõetud kuningagambiit"
+    },
+    "fi": {
+     "name": "Vastaanotettu kuningasgambiitti",
+     "def": "vastaanotettu kuningasgambiitti"
     }
    },
    "comment": {
@@ -2925,6 +3439,23 @@
     "bg": {
      "name": "Отказан царски гамбит",
      "def": "отказан царски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di re rifiutato",
+     "def": "il gambetto di re rifiutato",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Afslået kongegambit",
+     "def": "afslået kongegambit"
+    },
+    "et": {
+     "name": "Tagasilükatud kuningagambiit",
+     "def": "tagasilükatud kuningagambiit"
+    },
+    "fi": {
+     "name": "Hylätty kuningasgambiitti",
+     "def": "hylätty kuningasgambiitti"
     }
    },
    "comment": {
@@ -3017,6 +3548,23 @@
     "bg": {
      "name": "Защита Нимцович",
      "def": "защита Нимцович"
+    },
+    "it": {
+     "name": "Difesa Nimzowitsch",
+     "def": "la difesa Nimzowitsch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Nimzowitsch-forsvar",
+     "def": "Nimzowitsch-forsvaret"
+    },
+    "et": {
+     "name": "Nimzowitschi kaitse",
+     "def": "Nimzowitschi kaitse"
+    },
+    "fi": {
+     "name": "Nimzowitschin puolustus",
+     "def": "Nimzowitschin puolustus"
     }
    },
    "comment": {
@@ -3114,6 +3662,23 @@
     "bg": {
      "name": "Защита Оуен",
      "def": "защита Оуен"
+    },
+    "it": {
+     "name": "Difesa Owen",
+     "def": "la difesa Owen",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Owens forsvar",
+     "def": "Owens forsvar"
+    },
+    "et": {
+     "name": "Oweni kaitse",
+     "def": "Oweni kaitse"
+    },
+    "fi": {
+     "name": "Owenin puolustus",
+     "def": "Owenin puolustus"
     }
    },
    "comment": {
@@ -3207,6 +3772,23 @@
     "bg": {
      "name": "Защита Хорвиц",
      "def": "защита Хорвиц"
+    },
+    "it": {
+     "name": "Difesa Horwitz",
+     "def": "la difesa Horwitz",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Horwitz-forsvar",
+     "def": "Horwitz-forsvaret"
+    },
+    "et": {
+     "name": "Horwitzi kaitse",
+     "def": "Horwitzi kaitse"
+    },
+    "fi": {
+     "name": "Horwitzin puolustus",
+     "def": "Horwitzin puolustus"
     }
    },
    "comment": {
@@ -3299,6 +3881,23 @@
     "bg": {
      "name": "Дебют Ван Кройс",
      "def": "дебют Ван Кройс"
+    },
+    "it": {
+     "name": "Apertura Van’t Kruijs",
+     "def": "l’apertura Van’t Kruijs",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Van 't Kruijs-åbning",
+     "def": "Van 't Kruijs-åbningen"
+    },
+    "et": {
+     "name": "Van't Kruijsi avang",
+     "def": "Van't Kruijsi avang"
+    },
+    "fi": {
+     "name": "Van 't Kruijsin avaus",
+     "def": "Van 't Kruijsin avaus"
     }
    },
    "comment": {
@@ -3392,6 +3991,23 @@
     "bg": {
      "name": "Централен дебют",
      "def": "централен дебют"
+    },
+    "it": {
+     "name": "Partita del centro",
+     "def": "la partita del centro",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Centrumspil",
+     "def": "centrumspil"
+    },
+    "et": {
+     "name": "Tsentriavang",
+     "def": "tsentriavang"
+    },
+    "fi": {
+     "name": "Keskustapeli",
+     "def": "keskustapeli"
     }
    },
    "comment": {
@@ -3485,6 +4101,23 @@
     "bg": {
      "name": "Гамбит Енглунд",
      "def": "гамбит Енглунд"
+    },
+    "it": {
+     "name": "Gambetto Englund",
+     "def": "il gambetto Englund",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Englund-gambit",
+     "def": "Englund-gambit"
+    },
+    "et": {
+     "name": "Englundi gambiit",
+     "def": "Englundi gambiit"
+    },
+    "fi": {
+     "name": "Englundin gambiitti",
+     "def": "Englundin gambiitti"
     }
    },
    "comment": {
@@ -3577,6 +4210,23 @@
     "bg": {
      "name": "Холандска защита",
      "def": "холандска защита"
+    },
+    "it": {
+     "name": "Difesa olandese",
+     "def": "la difesa olandese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Hollandsk forsvar",
+     "def": "hollandsk forsvar"
+    },
+    "et": {
+     "name": "Hollandi kaitse",
+     "def": "Hollandi kaitse"
+    },
+    "fi": {
+     "name": "Hollantilainen puolustus",
+     "def": "hollantilainen puolustus"
     }
    },
    "comment": {
@@ -3669,6 +4319,23 @@
     "bg": {
      "name": "Нимцоиндийска защита",
      "def": "нимцоиндийска защита"
+    },
+    "it": {
+     "name": "Difesa nimzo-indiana",
+     "def": "la difesa nimzo-indiana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Nimzoindisk forsvar",
+     "def": "nimzoindisk forsvar"
+    },
+    "et": {
+     "name": "Nimzo-India kaitse",
+     "def": "Nimzo-India kaitse"
+    },
+    "fi": {
+     "name": "Nimzo-intialainen puolustus",
+     "def": "Nimzo-intialainen puolustus"
     }
    },
    "comment": {
@@ -3763,6 +4430,23 @@
     "bg": {
      "name": "Новоиндийска защита",
      "def": "новоиндийска защита"
+    },
+    "it": {
+     "name": "Difesa indiana di donna",
+     "def": "la difesa indiana di donna",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Dronningindisk forsvar",
+     "def": "dronningindisk forsvar"
+    },
+    "et": {
+     "name": "Lipuindia kaitse",
+     "def": "lipuindia kaitse"
+    },
+    "fi": {
+     "name": "Kuningatarintialainen puolustus",
+     "def": "kuningatarintialainen puolustus"
     }
    },
    "comment": {
@@ -3856,6 +4540,23 @@
     "bg": {
      "name": "Защита Грюнфелд",
      "def": "защита Грюнфелд"
+    },
+    "it": {
+     "name": "Difesa Grünfeld",
+     "def": "la difesa Grünfeld",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Grünfeld-indisk forsvar",
+     "def": "Grünfeld-indisk forsvar"
+    },
+    "et": {
+     "name": "Grünfeldi kaitse",
+     "def": "Grünfeldi kaitse"
+    },
+    "fi": {
+     "name": "Grünfeldin puolustus",
+     "def": "Grünfeldin puolustus"
     }
    },
    "comment": {
@@ -3948,6 +4649,23 @@
     "bg": {
      "name": "Каталонско начало",
      "def": "каталонско начало"
+    },
+    "it": {
+     "name": "Apertura catalana",
+     "def": "l’apertura catalana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Katalansk åbning",
+     "def": "katalansk åbning"
+    },
+    "et": {
+     "name": "Kataloonia avang",
+     "def": "Kataloonia avang"
+    },
+    "fi": {
+     "name": "Katalonialainen avaus",
+     "def": "katalonialainen avaus"
     }
    },
    "comment": {
@@ -4040,6 +4758,23 @@
     "bg": {
      "name": "Защита Бенони",
      "def": "защита Бенони"
+    },
+    "it": {
+     "name": "Difesa Benoni",
+     "def": "la difesa Benoni",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Benoni-forsvar",
+     "def": "Benoni-forsvaret"
+    },
+    "et": {
+     "name": "Benoni kaitse",
+     "def": "Benoni kaitse"
+    },
+    "fi": {
+     "name": "Benoni-puolustus",
+     "def": "Benoni-puolustus"
     }
    },
    "comment": {
@@ -4134,6 +4869,23 @@
     "bg": {
      "name": "Гамбит Бенко",
      "def": "гамбит Бенко"
+    },
+    "it": {
+     "name": "Gambetto Benko",
+     "def": "il gambetto Benko",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Benkø-gambit",
+     "def": "Benkø-gambit"
+    },
+    "et": {
+     "name": "Benko gambiit",
+     "def": "Benko gambiit"
+    },
+    "fi": {
+     "name": "Benkon gambiitti",
+     "def": "Benkon gambiitti"
     }
    },
    "comment": {
@@ -4226,6 +4978,23 @@
     "bg": {
      "name": "Дебют Рети",
      "def": "дебют Рети"
+    },
+    "it": {
+     "name": "Apertura Réti",
+     "def": "l’apertura Réti",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Réti-åbning",
+     "def": "Réti-åbningen"
+    },
+    "et": {
+     "name": "Réti avang",
+     "def": "Réti avang"
+    },
+    "fi": {
+     "name": "Rétin avaus",
+     "def": "Rétin avaus"
     }
    },
    "comment": {
@@ -4318,6 +5087,23 @@
     "bg": {
      "name": "Староиндийска атака",
      "def": "староиндийска атака"
+    },
+    "it": {
+     "name": "Attacco indiano di re",
+     "def": "l’attacco indiano di re",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Kongeindisk angreb",
+     "def": "kongeindisk angreb"
+    },
+    "et": {
+     "name": "Kuningaindia rünnak",
+     "def": "kuningaindia rünnak"
+    },
+    "fi": {
+     "name": "Kuningasintialainen hyökkäys",
+     "def": "kuningasintialainen hyökkäys"
     }
    },
    "comment": {
@@ -4414,6 +5200,23 @@
     "bg": {
      "name": "Дебют Бърд",
      "def": "дебют Бърд"
+    },
+    "it": {
+     "name": "Apertura Bird",
+     "def": "l’apertura Bird",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Birds åbning",
+     "def": "Birds åbning"
+    },
+    "et": {
+     "name": "Birdi avang",
+     "def": "Birdi avang"
+    },
+    "fi": {
+     "name": "Birdin avaus",
+     "def": "Birdin avaus"
     }
    },
    "comment": {
@@ -4506,6 +5309,23 @@
     "bg": {
      "name": "Дебют Понциани",
      "def": "дебют Понциани"
+    },
+    "it": {
+     "name": "Apertura Ponziani",
+     "def": "l’apertura Ponziani",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Ponziani-åbning",
+     "def": "Ponziani-åbningen"
+    },
+    "et": {
+     "name": "Ponziani avang",
+     "def": "Ponziani avang"
+    },
+    "fi": {
+     "name": "Ponzianin avaus",
+     "def": "Ponzianin avaus"
     }
    },
    "comment": {
@@ -4598,6 +5418,23 @@
     "bg": {
      "name": "Партия на трите коня",
      "def": "партия на трите коня"
+    },
+    "it": {
+     "name": "Partita dei tre cavalli",
+     "def": "la partita dei tre cavalli",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Trespringerspil",
+     "def": "trespringerspil"
+    },
+    "et": {
+     "name": "Kolme ratsu partii",
+     "def": "kolme ratsu partii"
+    },
+    "fi": {
+     "name": "Kolmen ratsun peli",
+     "def": "kolmen ratsun peli"
     }
    },
    "comment": {
@@ -4692,6 +5529,23 @@
     "bg": {
      "name": "Датски гамбит",
      "def": "датски гамбит"
+    },
+    "it": {
+     "name": "Gambetto danese",
+     "def": "il gambetto danese",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Nordisk gambit",
+     "def": "nordisk gambit"
+    },
+    "et": {
+     "name": "Taani gambiit",
+     "def": "Taani gambiit"
+    },
+    "fi": {
+     "name": "Tanskalainen gambiitti",
+     "def": "tanskalainen gambiitti"
     }
    },
    "comment": {
@@ -4786,6 +5640,23 @@
     "bg": {
      "name": "Гамбит Блекмар-Димер",
      "def": "гамбит Блекмар-Димер"
+    },
+    "it": {
+     "name": "Gambetto Blackmar-Diemer",
+     "def": "il gambetto Blackmar-Diemer",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Blackmar-Diemer-gambit",
+     "def": "Blackmar-Diemer-gambit"
+    },
+    "et": {
+     "name": "Blackmar-Diemeri gambiit",
+     "def": "Blackmar-Diemeri gambiit"
+    },
+    "fi": {
+     "name": "Blackmar-Diemer-gambiitti",
+     "def": "Blackmar-Diemer-gambiitti"
     }
    },
    "comment": {
@@ -4878,6 +5749,23 @@
     "bg": {
      "name": "Атака Тромповски",
      "def": "атака Тромповски"
+    },
+    "it": {
+     "name": "Attacco Trompowsky",
+     "def": "l’attacco Trompowsky",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Trompowsky-angreb",
+     "def": "Trompowsky-angrebet"
+    },
+    "et": {
+     "name": "Trompowsky rünnak",
+     "def": "Trompowsky rünnak"
+    },
+    "fi": {
+     "name": "Trompowskyn hyökkäys",
+     "def": "Trompowskyn hyökkäys"
     }
    },
    "comment": {
@@ -4971,6 +5859,23 @@
     "bg": {
      "name": "Атака Торе",
      "def": "атака Торе"
+    },
+    "it": {
+     "name": "Attacco Torre",
+     "def": "l’attacco Torre",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Torre-angreb",
+     "def": "Torre-angrebet"
+    },
+    "et": {
+     "name": "Torre rünnak",
+     "def": "Torre rünnak"
+    },
+    "fi": {
+     "name": "Torren hyökkäys",
+     "def": "Torren hyökkäys"
     }
    },
    "comment": {
@@ -5065,6 +5970,23 @@
     "bg": {
      "name": "Система Коле",
      "def": "система Коле"
+    },
+    "it": {
+     "name": "Sistema Colle",
+     "def": "il sistema Colle",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Colle-system",
+     "def": "Colle-systemet"
+    },
+    "et": {
+     "name": "Colle süsteem",
+     "def": "Colle süsteem"
+    },
+    "fi": {
+     "name": "Collen järjestelmä",
+     "def": "Collen järjestelmä"
     }
    },
    "comment": {
@@ -5157,6 +6079,23 @@
     "bg": {
      "name": "Защита Тараш",
      "def": "защита Тараш"
+    },
+    "it": {
+     "name": "Difesa Tarrasch",
+     "def": "la difesa Tarrasch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Tarrasch-forsvar",
+     "def": "Tarrasch-forsvaret"
+    },
+    "et": {
+     "name": "Tarraschi kaitse",
+     "def": "Tarraschi kaitse"
+    },
+    "fi": {
+     "name": "Tarraschin puolustus",
+     "def": "Tarraschin puolustus"
     }
    },
    "comment": {
@@ -5250,6 +6189,23 @@
     "bg": {
      "name": "Будапещенски гамбит",
      "def": "будапещенски гамбит"
+    },
+    "it": {
+     "name": "Gambetto di Budapest",
+     "def": "il gambetto di Budapest",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Budapest-gambit",
+     "def": "Budapest-gambit"
+    },
+    "et": {
+     "name": "Budapesti gambiit",
+     "def": "Budapesti gambiit"
+    },
+    "fi": {
+     "name": "Budapestin gambiitti",
+     "def": "Budapestin gambiitti"
     }
    },
    "comment": {
@@ -5342,6 +6298,23 @@
     "bg": {
      "name": "Защита Боголюбов",
      "def": "защита Боголюбов"
+    },
+    "it": {
+     "name": "Difesa bogo-indiana",
+     "def": "la difesa bogo-indiana",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Bogoindisk forsvar",
+     "def": "bogoindisk forsvar"
+    },
+    "et": {
+     "name": "Bogo-India kaitse",
+     "def": "Bogo-India kaitse"
+    },
+    "fi": {
+     "name": "Bogo-intialainen puolustus",
+     "def": "Bogo-intialainen puolustus"
     }
    },
    "comment": {
@@ -5434,6 +6407,23 @@
     "bg": {
      "name": "Стара индийска защита",
      "def": "стара индийска защита"
+    },
+    "it": {
+     "name": "Difesa indiana antica",
+     "def": "la difesa indiana antica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Gammelindisk forsvar",
+     "def": "gammelindisk forsvar"
+    },
+    "et": {
+     "name": "Vanaindia kaitse",
+     "def": "vanaindia kaitse"
+    },
+    "fi": {
+     "name": "Vanha intialainen puolustus",
+     "def": "vanha intialainen puolustus"
     }
    },
    "comment": {
@@ -5514,8 +6504,8 @@
      "gender": "f"
     },
     "pt": {
-     "name": "Defesa Chigorin",
-     "def": "a Defesa Chigorin",
+     "name": "Defesa Tchigorin",
+     "def": "a Defesa Tchigorin",
      "gender": "f"
     },
     "ko": {
@@ -5531,6 +6521,23 @@
     "bg": {
      "name": "Защита Чигорин",
      "def": "защита Чигорин"
+    },
+    "it": {
+     "name": "Difesa Chigorin",
+     "def": "la difesa Chigorin",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Tjigorin-forsvar",
+     "def": "Tjigorin-forsvaret"
+    },
+    "et": {
+     "name": "Tšigorini kaitse",
+     "def": "Tšigorini kaitse"
+    },
+    "fi": {
+     "name": "Tšigorinin puolustus",
+     "def": "Tšigorinin puolustus"
     }
    },
    "comment": {
@@ -5623,6 +6630,23 @@
     "bg": {
      "name": "Контрагамбит Албин",
      "def": "контрагамбит Албин"
+    },
+    "it": {
+     "name": "Controgambetto Albin",
+     "def": "il controgambetto Albin",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Albin-modgambit",
+     "def": "Albin-modgambit"
+    },
+    "et": {
+     "name": "Albini vastugambiit",
+     "def": "Albini vastugambiit"
+    },
+    "fi": {
+     "name": "Albinin vastagambiitti",
+     "def": "Albinin vastagambiitti"
     }
    },
    "comment": {
@@ -5716,6 +6740,23 @@
     "bg": {
      "name": "Латвийски гамбит",
      "def": "латвийски гамбит"
+    },
+    "it": {
+     "name": "Gambetto lettone",
+     "def": "il gambetto lettone",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Lettisk gambit",
+     "def": "lettisk gambit"
+    },
+    "et": {
+     "name": "Läti gambiit",
+     "def": "Läti gambiit"
+    },
+    "fi": {
+     "name": "Latvialainen gambiitti",
+     "def": "latvialainen gambiitti"
     }
    },
    "comment": {
@@ -5808,6 +6849,23 @@
     "bg": {
      "name": "Гамбит „Слон“",
      "def": "гамбит „Слон“"
+    },
+    "it": {
+     "name": "Gambetto dell’elefante",
+     "def": "il gambetto dell’elefante",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Elefantgambit",
+     "def": "elefantgambit"
+    },
+    "et": {
+     "name": "Elevandigambiit",
+     "def": "elevandigambiit"
+    },
+    "fi": {
+     "name": "Elefanttigambiitti",
+     "def": "elefanttigambiitti"
     }
    },
    "comment": {
@@ -5905,6 +6963,23 @@
     "bg": {
      "name": "Дебют Нимцович-Ларсен",
      "def": "дебют Нимцович-Ларсен"
+    },
+    "it": {
+     "name": "Attacco Nimzowitsch-Larsen",
+     "def": "l’attacco Nimzowitsch-Larsen",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Nimzo-Larsen-angreb",
+     "def": "Nimzo-Larsen-angrebet"
+    },
+    "et": {
+     "name": "Nimzowitsch-Larseni rünnak",
+     "def": "Nimzowitsch-Larseni rünnak"
+    },
+    "fi": {
+     "name": "Nimzo-Larsenin hyökkäys",
+     "def": "Nimzo-Larsenin hyökkäys"
     }
    },
    "comment": {
@@ -5997,6 +7072,23 @@
     "bg": {
      "name": "Дебют Соколски",
      "def": "дебют Соколски"
+    },
+    "it": {
+     "name": "Apertura polacca",
+     "def": "l’apertura polacca",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Polsk åbning",
+     "def": "polsk åbning"
+    },
+    "et": {
+     "name": "Poola avang",
+     "def": "Poola avang"
+    },
+    "fi": {
+     "name": "Puolalainen avaus",
+     "def": "puolalainen avaus"
     }
    },
    "comment": {
@@ -6089,6 +7181,23 @@
     "bg": {
      "name": "Дебют Гроб",
      "def": "дебют Гроб"
+    },
+    "it": {
+     "name": "Apertura Grob",
+     "def": "l’apertura Grob",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Grob-åbning",
+     "def": "Grob-åbningen"
+    },
+    "et": {
+     "name": "Grobi avang",
+     "def": "Grobi avang"
+    },
+    "fi": {
+     "name": "Grobin avaus",
+     "def": "Grobin avaus"
     }
    },
    "comment": {
@@ -6181,6 +7290,23 @@
     "bg": {
      "name": "Унгарско начало",
      "def": "унгарско начало"
+    },
+    "it": {
+     "name": "Apertura ungherese",
+     "def": "l’apertura ungherese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Ungarsk åbning",
+     "def": "ungarsk åbning"
+    },
+    "et": {
+     "name": "Ungari avang",
+     "def": "Ungari avang"
+    },
+    "fi": {
+     "name": "Unkarilainen avaus",
+     "def": "unkarilainen avaus"
     }
    },
    "comment": {
@@ -6274,6 +7400,23 @@
     "bg": {
      "name": "Дебют Мизес",
      "def": "дебют Мизес"
+    },
+    "it": {
+     "name": "Apertura Mieses",
+     "def": "l’apertura Mieses",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Mieses-åbning",
+     "def": "Mieses-åbningen"
+    },
+    "et": {
+     "name": "Miesesi avang",
+     "def": "Miesesi avang"
+    },
+    "fi": {
+     "name": "Miesesin avaus",
+     "def": "Miesesin avaus"
     }
    },
    "comment": {
@@ -6366,6 +7509,23 @@
     "bg": {
      "name": "Дебют Сарагоса",
      "def": "дебют Сарагоса"
+    },
+    "it": {
+     "name": "Apertura Saragozza",
+     "def": "l’apertura Saragozza",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Saragossa-åbning",
+     "def": "Saragossa-åbningen"
+    },
+    "et": {
+     "name": "Zaragoza avang",
+     "def": "Zaragoza avang"
+    },
+    "fi": {
+     "name": "Zaragozan avaus",
+     "def": "Zaragozan avaus"
     }
    },
    "comment": {
@@ -6458,6 +7618,23 @@
     "bg": {
      "name": "Дебют Ван Гет",
      "def": "дебют Ван Гет"
+    },
+    "it": {
+     "name": "Apertura Van Geet",
+     "def": "l’apertura Van Geet",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Van Geet-åbning",
+     "def": "Van Geet-åbningen"
+    },
+    "et": {
+     "name": "Van Geeti avang",
+     "def": "Van Geeti avang"
+    },
+    "fi": {
+     "name": "Van Geetin avaus",
+     "def": "Van Geetin avaus"
     }
    },
    "comment": {
@@ -6550,6 +7727,23 @@
     "bg": {
      "name": "Лондонска система Джобава",
      "def": "лондонска система Джобава"
+    },
+    "it": {
+     "name": "Sistema Rapport-Jobava",
+     "def": "il sistema Rapport-Jobava",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Jobava-London-system",
+     "def": "Jobava-London-systemet"
+    },
+    "et": {
+     "name": "Jobava Londoni süsteem",
+     "def": "Jobava Londoni süsteem"
+    },
+    "fi": {
+     "name": "Jobava-Lontoon järjestelmä",
+     "def": "Jobava-Lontoon järjestelmä"
     }
    },
    "comment": {
@@ -6642,6 +7836,23 @@
     "bg": {
      "name": "Атака „Каменна стена“",
      "def": "атака „Каменна стена“"
+    },
+    "it": {
+     "name": "Attacco Stonewall",
+     "def": "l’attacco Stonewall",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Stonewall-angreb",
+     "def": "Stonewall-angrebet"
+    },
+    "et": {
+     "name": "Stonewalli rünnak",
+     "def": "Stonewalli rünnak"
+    },
+    "fi": {
+     "name": "Stonewall-hyökkäys",
+     "def": "Stonewall-hyökkäys"
     }
    },
    "comment": {
@@ -6734,6 +7945,23 @@
     "bg": {
      "name": "Атака Рихтер-Вересов",
      "def": "атака Рихтер-Вересов"
+    },
+    "it": {
+     "name": "Attacco Richter-Veresov",
+     "def": "l’attacco Richter-Veresov",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Richter-Veresov-angreb",
+     "def": "Richter-Veresov-angrebet"
+    },
+    "et": {
+     "name": "Richter-Veressovi rünnak",
+     "def": "Richter-Veressovi rünnak"
+    },
+    "fi": {
+     "name": "Richter-Veresov-hyökkäys",
+     "def": "Richter-Veresov-hyökkäys"
     }
    },
    "comment": {
@@ -6826,6 +8054,23 @@
     "bg": {
      "name": "Защита „Свети Георги“",
      "def": "защита „Свети Георги“"
+    },
+    "it": {
+     "name": "Difesa San Giorgio",
+     "def": "la difesa San Giorgio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Sankt Georg-forsvar",
+     "def": "Sankt Georg-forsvaret"
+    },
+    "et": {
+     "name": "Püha Jüri kaitse",
+     "def": "Püha Jüri kaitse"
+    },
+    "fi": {
+     "name": "Pyhän Yrjön puolustus",
+     "def": "Pyhän Yrjön puolustus"
     }
    },
    "comment": {
@@ -6918,6 +8163,23 @@
     "bg": {
      "name": "Защита Борг",
      "def": "защита Борг"
+    },
+    "it": {
+     "name": "Difesa Borg",
+     "def": "la difesa Borg",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Borg-forsvar",
+     "def": "Borg-forsvaret"
+    },
+    "et": {
+     "name": "Borgi kaitse",
+     "def": "Borgi kaitse"
+    },
+    "fi": {
+     "name": "Borgin puolustus",
+     "def": "Borgin puolustus"
     }
    },
    "comment": {
@@ -7010,6 +8272,23 @@
     "bg": {
      "name": "Защита „Хипопотам“",
      "def": "защита „Хипопотам“"
+    },
+    "it": {
+     "name": "Difesa dell’ippopotamo",
+     "def": "la difesa dell’ippopotamo",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Flodhesteforsvar",
+     "def": "flodhesteforsvaret"
+    },
+    "et": {
+     "name": "Jõehobu kaitse",
+     "def": "jõehobu kaitse"
+    },
+    "fi": {
+     "name": "Virtahepopuolustus",
+     "def": "virtahepopuolustus"
     }
    },
    "comment": {
@@ -7103,6 +8382,23 @@
     "bg": {
      "name": "Английска защита",
      "def": "английска защита"
+    },
+    "it": {
+     "name": "Difesa inglese",
+     "def": "la difesa inglese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Engelsk forsvar",
+     "def": "engelsk forsvar"
+    },
+    "et": {
+     "name": "Inglise kaitse",
+     "def": "Inglise kaitse"
+    },
+    "fi": {
+     "name": "Englantilainen puolustus",
+     "def": "englantilainen puolustus"
     }
    },
    "comment": {
@@ -7195,6 +8491,23 @@
     "bg": {
      "name": "Защита „Птеродактил“",
      "def": "защита „Птеродактил“"
+    },
+    "it": {
+     "name": "Difesa dello pterodattilo",
+     "def": "la difesa dello pterodattilo",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Pterodaktylforsvar",
+     "def": "pterodaktylforsvaret"
+    },
+    "et": {
+     "name": "Pterodaktüli kaitse",
+     "def": "pterodaktüli kaitse"
+    },
+    "fi": {
+     "name": "Pterodaktyylipuolustus",
+     "def": "pterodaktyylipuolustus"
     }
    },
    "comment": {
@@ -7287,6 +8600,23 @@
     "bg": {
      "name": "Атака Бонгклауд",
      "def": "атака Бонгклауд"
+    },
+    "it": {
+     "name": "Attacco Bongcloud",
+     "def": "l’attacco Bongcloud",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Bongcloud-angreb",
+     "def": "Bongcloud-angrebet"
+    },
+    "et": {
+     "name": "Bongcloudi rünnak",
+     "def": "Bongcloudi rünnak"
+    },
+    "fi": {
+     "name": "Bongcloud-hyökkäys",
+     "def": "Bongcloud-hyökkäys"
     }
    },
    "comment": {
@@ -7351,6 +8681,23 @@
     "bg": {
      "name": "Открит вариант",
      "def": "открит вариант"
+    },
+    "it": {
+     "name": "Siciliana aperta",
+     "def": "la Siciliana aperta",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Åben siciliansk",
+     "def": "åben siciliansk"
+    },
+    "et": {
+     "name": "Avatud variant",
+     "def": "avatud variant"
+    },
+    "fi": {
+     "name": "Avoin sisilialainen",
+     "def": "avoin sisilialainen"
     }
    },
    "comment": {
@@ -7407,6 +8754,23 @@
     "bg": {
      "name": "Затворен вариант",
      "def": "затворен вариант"
+    },
+    "it": {
+     "name": "Siciliana chiusa",
+     "def": "la Siciliana chiusa",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Lukket siciliansk",
+     "def": "lukket siciliansk"
+    },
+    "et": {
+     "name": "Suletud variant",
+     "def": "suletud variant"
+    },
+    "fi": {
+     "name": "Suljettu sisilialainen",
+     "def": "suljettu sisilialainen"
     }
    },
    "comment": {
@@ -7463,6 +8827,23 @@
     "bg": {
      "name": "Вариант Алапин",
      "def": "вариант Алапин"
+    },
+    "it": {
+     "name": "Variante Alapin",
+     "def": "la variante Alapin",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Alapin-variant",
+     "def": "Alapin-varianten"
+    },
+    "et": {
+     "name": "Alapini variant",
+     "def": "Alapini variant"
+    },
+    "fi": {
+     "name": "Alapinin muunnelma",
+     "def": "Alapinin muunnelma"
     }
    },
    "comment": {
@@ -7521,6 +8902,23 @@
     "bg": {
      "name": "Гамбит Смит-Мора",
      "def": "гамбит Смит-Мора"
+    },
+    "it": {
+     "name": "Gambetto Smith-Morra",
+     "def": "il gambetto Smith-Morra",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Smith-Morra-gambit",
+     "def": "Smith-Morra-gambit"
+    },
+    "et": {
+     "name": "Smith-Morra gambiit",
+     "def": "Smith-Morra gambiit"
+    },
+    "fi": {
+     "name": "Smith-Morra-gambiitti",
+     "def": "Smith-Morra-gambiitti"
     }
    },
    "comment": {
@@ -7578,6 +8976,23 @@
     "bg": {
      "name": "Атака „Гран при“",
      "def": "атака „Гран при“"
+    },
+    "it": {
+     "name": "Attacco Grand Prix",
+     "def": "l’attacco Grand Prix",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Grand Prix-angreb",
+     "def": "Grand Prix-angrebet"
+    },
+    "et": {
+     "name": "Grand Prix' rünnak",
+     "def": "Grand Prix' rünnak"
+    },
+    "fi": {
+     "name": "Grand Prix -hyökkäys",
+     "def": "Grand Prix -hyökkäys"
     }
    },
    "comment": {
@@ -7634,6 +9049,23 @@
     "bg": {
      "name": "Вариант Росолимо",
      "def": "вариант Росолимо"
+    },
+    "it": {
+     "name": "Variante Rossolimo",
+     "def": "la variante Rossolimo",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Rossolimo-variant",
+     "def": "Rossolimo-varianten"
+    },
+    "et": {
+     "name": "Rossolimo variant",
+     "def": "Rossolimo variant"
+    },
+    "fi": {
+     "name": "Rossolimon muunnelma",
+     "def": "Rossolimon muunnelma"
     }
    },
    "comment": {
@@ -7690,6 +9122,23 @@
     "bg": {
      "name": "Вариант Найдорф",
      "def": "вариант Найдорф"
+    },
+    "it": {
+     "name": "Variante Najdorf",
+     "def": "la variante Najdorf",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Najdorf-variant",
+     "def": "Najdorf-varianten"
+    },
+    "et": {
+     "name": "Najdorfi variant",
+     "def": "Najdorfi variant"
+    },
+    "fi": {
+     "name": "Najdorfin muunnelma",
+     "def": "Najdorfin muunnelma"
     }
    },
    "comment": {
@@ -7746,6 +9195,23 @@
     "bg": {
      "name": "Вариант „Дракон“",
      "def": "вариант „Дракон“"
+    },
+    "it": {
+     "name": "Variante del Dragone",
+     "def": "la variante del Dragone",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Dragevariant",
+     "def": "dragevarianten"
+    },
+    "et": {
+     "name": "Draakonivariant",
+     "def": "draakonivariant"
+    },
+    "fi": {
+     "name": "Lohikäärmemuunnelma",
+     "def": "lohikäärmemuunnelma"
     }
    },
    "comment": {
@@ -7804,6 +9270,23 @@
     "bg": {
      "name": "Ускорен „Дракон“",
      "def": "ускорен „Дракон“"
+    },
+    "it": {
+     "name": "Dragone accelerato",
+     "def": "il Dragone accelerato",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Accelereret drage",
+     "def": "den accelererede drage"
+    },
+    "et": {
+     "name": "Kiirendatud draakonivariant",
+     "def": "kiirendatud draakonivariant"
+    },
+    "fi": {
+     "name": "Nopeutettu lohikäärme",
+     "def": "nopeutettu lohikäärme"
     }
    },
    "comment": {
@@ -7860,6 +9343,23 @@
     "bg": {
      "name": "Вариант Шевенинген",
      "def": "вариант Шевенинген"
+    },
+    "it": {
+     "name": "Variante Scheveningen",
+     "def": "la variante Scheveningen",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Scheveningen-variant",
+     "def": "Scheveningen-varianten"
+    },
+    "et": {
+     "name": "Scheveningeni variant",
+     "def": "Scheveningeni variant"
+    },
+    "fi": {
+     "name": "Scheveningenin muunnelma",
+     "def": "Scheveningenin muunnelma"
     }
    },
    "comment": {
@@ -7916,6 +9416,23 @@
     "bg": {
      "name": "Вариант Свешников",
      "def": "вариант Свешников"
+    },
+    "it": {
+     "name": "Variante Sveshnikov",
+     "def": "la variante Sveshnikov",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Svesjnikov-variant",
+     "def": "Svesjnikov-varianten"
+    },
+    "et": {
+     "name": "Svešnikovi variant",
+     "def": "Svešnikovi variant"
+    },
+    "fi": {
+     "name": "Svešnikovin muunnelma",
+     "def": "Svešnikovin muunnelma"
     }
    },
    "comment": {
@@ -7973,6 +9490,23 @@
     "bg": {
      "name": "Вариант Тайманов",
      "def": "вариант Тайманов"
+    },
+    "it": {
+     "name": "Variante Taimanov",
+     "def": "la variante Taimanov",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Tajmanov-variant",
+     "def": "Tajmanov-varianten"
+    },
+    "et": {
+     "name": "Taimanovi variant",
+     "def": "Taimanovi variant"
+    },
+    "fi": {
+     "name": "Taimanovin muunnelma",
+     "def": "Taimanovin muunnelma"
     }
    },
    "comment": {
@@ -8029,6 +9563,23 @@
     "bg": {
      "name": "Вариант Кан",
      "def": "вариант Кан"
+    },
+    "it": {
+     "name": "Variante Kan",
+     "def": "la variante Kan",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Kan-variant",
+     "def": "Kan-varianten"
+    },
+    "et": {
+     "name": "Kani variant",
+     "def": "Kani variant"
+    },
+    "fi": {
+     "name": "Kanin muunnelma",
+     "def": "Kanin muunnelma"
     }
    },
    "comment": {
@@ -8085,6 +9636,23 @@
     "bg": {
      "name": "Класически вариант",
      "def": "класически вариант"
+    },
+    "it": {
+     "name": "Variante classica",
+     "def": "la variante classica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Klassisk variant",
+     "def": "den klassiske variant"
+    },
+    "et": {
+     "name": "Klassikaline variant",
+     "def": "klassikaline variant"
+    },
+    "fi": {
+     "name": "Klassinen muunnelma",
+     "def": "klassinen muunnelma"
     }
    },
    "comment": {
@@ -8141,6 +9709,23 @@
     "bg": {
      "name": "Вариант с придвижване",
      "def": "вариант с придвижване"
+    },
+    "it": {
+     "name": "Variante di spinta",
+     "def": "la variante di spinta",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Fremstødsvariant",
+     "def": "fremstødsvarianten"
+    },
+    "et": {
+     "name": "Edasitungivariant",
+     "def": "edasitungivariant"
+    },
+    "fi": {
+     "name": "Etenemismuunnelma",
+     "def": "etenemismuunnelma"
     }
    },
    "comment": {
@@ -8197,6 +9782,23 @@
     "bg": {
      "name": "Разменен вариант",
      "def": "разменен вариант"
+    },
+    "it": {
+     "name": "Variante di cambio",
+     "def": "la variante di cambio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Afbytningsvariant",
+     "def": "afbytningsvarianten"
+    },
+    "et": {
+     "name": "Vahetusvariant",
+     "def": "vahetusvariant"
+    },
+    "fi": {
+     "name": "Vaihtomuunnelma",
+     "def": "vaihtomuunnelma"
     }
    },
    "comment": {
@@ -8253,6 +9855,23 @@
     "bg": {
      "name": "Вариант Тараш",
      "def": "вариант Тараш"
+    },
+    "it": {
+     "name": "Variante Tarrasch",
+     "def": "la variante Tarrasch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Tarrasch-variant",
+     "def": "Tarrasch-varianten"
+    },
+    "et": {
+     "name": "Tarraschi variant",
+     "def": "Tarraschi variant"
+    },
+    "fi": {
+     "name": "Tarraschin muunnelma",
+     "def": "Tarraschin muunnelma"
     }
    },
    "comment": {
@@ -8309,6 +9928,23 @@
     "bg": {
      "name": "Вариант Винавер",
      "def": "вариант Винавер"
+    },
+    "it": {
+     "name": "Variante Winawer",
+     "def": "la variante Winawer",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Winawer-variant",
+     "def": "Winawer-varianten"
+    },
+    "et": {
+     "name": "Winaweri variant",
+     "def": "Winaweri variant"
+    },
+    "fi": {
+     "name": "Winawerin muunnelma",
+     "def": "Winawerin muunnelma"
     }
    },
    "comment": {
@@ -8365,6 +10001,23 @@
     "bg": {
      "name": "Класически вариант",
      "def": "класически вариант"
+    },
+    "it": {
+     "name": "Variante classica",
+     "def": "la variante classica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Klassisk variant",
+     "def": "den klassiske variant"
+    },
+    "et": {
+     "name": "Klassikaline variant",
+     "def": "klassikaline variant"
+    },
+    "fi": {
+     "name": "Klassinen muunnelma",
+     "def": "klassinen muunnelma"
     }
    },
    "comment": {
@@ -8421,6 +10074,23 @@
     "bg": {
      "name": "Вариант Рубинщайн",
      "def": "вариант Рубинщайн"
+    },
+    "it": {
+     "name": "Variante Rubinstein",
+     "def": "la variante Rubinstein",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Rubinstein-variant",
+     "def": "Rubinstein-varianten"
+    },
+    "et": {
+     "name": "Rubinsteini variant",
+     "def": "Rubinsteini variant"
+    },
+    "fi": {
+     "name": "Rubinsteinin muunnelma",
+     "def": "Rubinsteinin muunnelma"
     }
    },
    "comment": {
@@ -8477,6 +10147,23 @@
     "bg": {
      "name": "Вариант с придвижване",
      "def": "вариант с придвижване"
+    },
+    "it": {
+     "name": "Variante di spinta",
+     "def": "la variante di spinta",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Fremstødsvariant",
+     "def": "fremstødsvarianten"
+    },
+    "et": {
+     "name": "Edasitungivariant",
+     "def": "edasitungivariant"
+    },
+    "fi": {
+     "name": "Etenemismuunnelma",
+     "def": "etenemismuunnelma"
     }
    },
    "comment": {
@@ -8533,6 +10220,23 @@
     "bg": {
      "name": "Разменен вариант",
      "def": "разменен вариант"
+    },
+    "it": {
+     "name": "Variante di cambio",
+     "def": "la variante di cambio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Afbytningsvariant",
+     "def": "afbytningsvarianten"
+    },
+    "et": {
+     "name": "Vahetusvariant",
+     "def": "vahetusvariant"
+    },
+    "fi": {
+     "name": "Vaihtomuunnelma",
+     "def": "vaihtomuunnelma"
     }
    },
    "comment": {
@@ -8591,6 +10295,23 @@
     "bg": {
      "name": "Атака Панов",
      "def": "атака Панов"
+    },
+    "it": {
+     "name": "Attacco Panov",
+     "def": "l’attacco Panov",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Panov-angreb",
+     "def": "Panov-angrebet"
+    },
+    "et": {
+     "name": "Panovi rünnak",
+     "def": "Panovi rünnak"
+    },
+    "fi": {
+     "name": "Panovin hyökkäys",
+     "def": "Panovin hyökkäys"
     }
    },
    "comment": {
@@ -8647,6 +10368,23 @@
     "bg": {
      "name": "Класически вариант",
      "def": "класически вариант"
+    },
+    "it": {
+     "name": "Variante classica",
+     "def": "la variante classica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Klassisk variant",
+     "def": "den klassiske variant"
+    },
+    "et": {
+     "name": "Klassikaline variant",
+     "def": "klassikaline variant"
+    },
+    "fi": {
+     "name": "Klassinen muunnelma",
+     "def": "klassinen muunnelma"
     }
    },
    "comment": {
@@ -8703,6 +10441,23 @@
     "bg": {
      "name": "Атака на двата коня",
      "def": "атака на двата коня"
+    },
+    "it": {
+     "name": "Attacco dei due cavalli",
+     "def": "l’attacco dei due cavalli",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Tospringerangreb",
+     "def": "tospringerangrebet"
+    },
+    "et": {
+     "name": "Kahe ratsu rünnak",
+     "def": "kahe ratsu rünnak"
+    },
+    "fi": {
+     "name": "Kahden ratsun hyökkäys",
+     "def": "kahden ratsun hyökkäys"
     }
    },
    "comment": {
@@ -8759,6 +10514,23 @@
     "bg": {
      "name": "Защита на двата коня",
      "def": "защита на двата коня"
+    },
+    "it": {
+     "name": "Difesa dei due cavalli",
+     "def": "la difesa dei due cavalli",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Tospringerforsvar",
+     "def": "tospringerforsvaret"
+    },
+    "et": {
+     "name": "Kahe ratsu kaitse",
+     "def": "kahe ratsu kaitse"
+    },
+    "fi": {
+     "name": "Kahden ratsun puolustus",
+     "def": "kahden ratsun puolustus"
     }
    },
    "comment": {
@@ -8817,6 +10589,23 @@
     "bg": {
      "name": "Джуоко пиано",
      "def": "джуоко пиано"
+    },
+    "it": {
+     "name": "Giuoco piano",
+     "def": "il Giuoco piano",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Giuoco Piano",
+     "def": "Giuoco Piano"
+    },
+    "et": {
+     "name": "Giuoco piano",
+     "def": "giuoco piano"
+    },
+    "fi": {
+     "name": "Giuoco piano",
+     "def": "Giuoco piano"
     }
    },
    "comment": {
@@ -8879,6 +10668,23 @@
     "bg": {
      "name": "Джуоко пианисимо",
      "def": "джуоко пианисимо"
+    },
+    "it": {
+     "name": "Giuoco pianissimo",
+     "def": "il Giuoco pianissimo",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Giuoco Pianissimo",
+     "def": "Giuoco Pianissimo"
+    },
+    "et": {
+     "name": "Giuoco pianissimo",
+     "def": "giuoco pianissimo"
+    },
+    "fi": {
+     "name": "Giuoco pianissimo",
+     "def": "Giuoco pianissimo"
     }
    },
    "comment": {
@@ -8939,6 +10745,23 @@
     "bg": {
      "name": "Гамбит Евънс",
      "def": "гамбит Евънс"
+    },
+    "it": {
+     "name": "Gambetto Evans",
+     "def": "il gambetto Evans",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Evans-gambit",
+     "def": "Evans-gambit"
+    },
+    "et": {
+     "name": "Evansi gambiit",
+     "def": "Evansi gambiit"
+    },
+    "fi": {
+     "name": "Evansin gambiitti",
+     "def": "Evansin gambiitti"
     }
    },
    "comment": {
@@ -8995,6 +10818,23 @@
     "bg": {
      "name": "Атака Фегатело",
      "def": "атака Фегатело"
+    },
+    "it": {
+     "name": "Attacco Fegatello",
+     "def": "l’attacco Fegatello",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Fegatello-angreb",
+     "def": "Fegatello-angrebet"
+    },
+    "et": {
+     "name": "Praetud maksa rünnak",
+     "def": "praetud maksa rünnak"
+    },
+    "fi": {
+     "name": "Fegatello-hyökkäys",
+     "def": "Fegatello-hyökkäys"
     }
    },
    "comment": {
@@ -9057,6 +10897,23 @@
     "bg": {
      "name": "Контраатака Тракслер",
      "def": "контраатака Тракслер"
+    },
+    "it": {
+     "name": "Contrattacco Traxler",
+     "def": "il contrattacco Traxler",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Traxler-modangreb",
+     "def": "Traxler-modangrebet"
+    },
+    "et": {
+     "name": "Traxleri vasturünnak",
+     "def": "Traxleri vasturünnak"
+    },
+    "fi": {
+     "name": "Traxlerin vastahyökkäys",
+     "def": "Traxlerin vastahyökkäys"
     }
    },
    "comment": {
@@ -9091,8 +10948,8 @@
      "def": "de Berlijnse verdediging"
     },
     "pt-BR": {
-     "name": "Defesa Berlim",
-     "def": "a Defesa Berlim",
+     "name": "Defesa Berlinense",
+     "def": "a Defesa Berlinense",
      "gender": "f"
     },
     "pt": {
@@ -9113,6 +10970,23 @@
     "bg": {
      "name": "Берлинска защита",
      "def": "берлинска защита"
+    },
+    "it": {
+     "name": "Difesa berlinese",
+     "def": "la difesa berlinese",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Berlinerforsvar",
+     "def": "Berlinerforsvaret"
+    },
+    "et": {
+     "name": "Berliini kaitse",
+     "def": "Berliini kaitse"
+    },
+    "fi": {
+     "name": "Berliinin puolustus",
+     "def": "Berliinin puolustus"
     }
    },
    "comment": {
@@ -9169,6 +11043,23 @@
     "bg": {
      "name": "Защита Морфи",
      "def": "защита Морфи"
+    },
+    "it": {
+     "name": "Difesa Morphy",
+     "def": "la difesa Morphy",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Morphy-forsvar",
+     "def": "Morphy-forsvaret"
+    },
+    "et": {
+     "name": "Morphy kaitse",
+     "def": "Morphy kaitse"
+    },
+    "fi": {
+     "name": "Morphyn puolustus",
+     "def": "Morphyn puolustus"
     }
    },
    "comment": {
@@ -9225,6 +11116,23 @@
     "bg": {
      "name": "Затворен вариант",
      "def": "затворен вариант"
+    },
+    "it": {
+     "name": "Spagnola chiusa",
+     "def": "la Spagnola chiusa",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Lukket spansk",
+     "def": "lukket spansk"
+    },
+    "et": {
+     "name": "Suletud variant",
+     "def": "suletud variant"
+    },
+    "fi": {
+     "name": "Suljettu espanjalainen",
+     "def": "suljettu espanjalainen"
     }
    },
    "comment": {
@@ -9281,6 +11189,23 @@
     "bg": {
      "name": "Атака Маршал",
      "def": "атака Маршал"
+    },
+    "it": {
+     "name": "Attacco Marshall",
+     "def": "l’attacco Marshall",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Marshall-angreb",
+     "def": "Marshall-angrebet"
+    },
+    "et": {
+     "name": "Marshalli rünnak",
+     "def": "Marshalli rünnak"
+    },
+    "fi": {
+     "name": "Marshallin hyökkäys",
+     "def": "Marshallin hyökkäys"
     }
    },
    "comment": {
@@ -9337,6 +11262,23 @@
     "bg": {
      "name": "Разменен вариант",
      "def": "разменен вариант"
+    },
+    "it": {
+     "name": "Variante di cambio",
+     "def": "la variante di cambio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Afbytningsvariant",
+     "def": "afbytningsvarianten"
+    },
+    "et": {
+     "name": "Vahetusvariant",
+     "def": "vahetusvariant"
+    },
+    "fi": {
+     "name": "Vaihtomuunnelma",
+     "def": "vaihtomuunnelma"
     }
    },
    "comment": {
@@ -9393,6 +11335,23 @@
     "bg": {
      "name": "Открит вариант",
      "def": "открит вариант"
+    },
+    "it": {
+     "name": "Spagnola aperta",
+     "def": "la Spagnola aperta",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Åben spansk",
+     "def": "åben spansk"
+    },
+    "et": {
+     "name": "Avatud variant",
+     "def": "avatud variant"
+    },
+    "fi": {
+     "name": "Avoin espanjalainen",
+     "def": "avoin espanjalainen"
     }
    },
    "comment": {
@@ -9449,6 +11408,23 @@
     "bg": {
      "name": "Защита Шлиман",
      "def": "защита Шлиман"
+    },
+    "it": {
+     "name": "Difesa Schliemann",
+     "def": "la difesa Schliemann",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Schliemann-forsvar",
+     "def": "Schliemann-forsvaret"
+    },
+    "et": {
+     "name": "Schliemanni kaitse",
+     "def": "Schliemanni kaitse"
+    },
+    "fi": {
+     "name": "Schliemannin puolustus",
+     "def": "Schliemannin puolustus"
     }
    },
    "comment": {
@@ -9505,6 +11481,23 @@
     "bg": {
      "name": "Шотландски гамбит",
      "def": "шотландски гамбит"
+    },
+    "it": {
+     "name": "Gambetto scozzese",
+     "def": "il gambetto scozzese",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Skotsk gambit",
+     "def": "skotsk gambit"
+    },
+    "et": {
+     "name": "Šoti gambiit",
+     "def": "Šoti gambiit"
+    },
+    "fi": {
+     "name": "Skotlantilainen gambiitti",
+     "def": "skotlantilainen gambiitti"
     }
    },
    "comment": {
@@ -9562,6 +11555,23 @@
     "bg": {
      "name": "Виенски гамбит",
      "def": "виенски гамбит"
+    },
+    "it": {
+     "name": "Gambetto viennese",
+     "def": "il gambetto viennese",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Wienergambit",
+     "def": "wienergambit"
+    },
+    "et": {
+     "name": "Viini gambiit",
+     "def": "Viini gambiit"
+    },
+    "fi": {
+     "name": "Wieniläinen gambiitti",
+     "def": "wieniläinen gambiitti"
     }
    },
    "comment": {
@@ -9619,6 +11629,23 @@
     "bg": {
      "name": "Гамбит Стафорд",
      "def": "гамбит Стафорд"
+    },
+    "it": {
+     "name": "Gambetto Stafford",
+     "def": "il gambetto Stafford",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Stafford-gambit",
+     "def": "Stafford-gambit"
+    },
+    "et": {
+     "name": "Staffordi gambiit",
+     "def": "Staffordi gambiit"
+    },
+    "fi": {
+     "name": "Staffordin gambiitti",
+     "def": "Staffordin gambiitti"
     }
    },
    "comment": {
@@ -9677,6 +11704,23 @@
     "bg": {
      "name": "Атака Пархам",
      "def": "атака Пархам"
+    },
+    "it": {
+     "name": "Attacco Parham",
+     "def": "l’attacco Parham",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Parham-angreb",
+     "def": "Parham-angrebet"
+    },
+    "et": {
+     "name": "Parhami rünnak",
+     "def": "Parhami rünnak"
+    },
+    "fi": {
+     "name": "Parhamin hyökkäys",
+     "def": "Parhamin hyökkäys"
     }
    },
    "comment": {
@@ -9742,6 +11786,23 @@
     "bg": {
      "name": "Гамбит „Хелоуин“",
      "def": "гамбит „Хелоуин“"
+    },
+    "it": {
+     "name": "Gambetto Halloween",
+     "def": "il gambetto Halloween",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Halloween-gambit",
+     "def": "Halloween-gambit"
+    },
+    "et": {
+     "name": "Halloweeni gambiit",
+     "def": "Halloweeni gambiit"
+    },
+    "fi": {
+     "name": "Halloween-gambiitti",
+     "def": "Halloween-gambiitti"
     }
    },
    "comment": {
@@ -9798,6 +11859,23 @@
     "bg": {
      "name": "Ортодоксална защита",
      "def": "ортодоксална защита"
+    },
+    "it": {
+     "name": "Difesa ortodossa",
+     "def": "la difesa ortodossa",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Ortodoks forsvar",
+     "def": "ortodoks forsvar"
+    },
+    "et": {
+     "name": "Ortodoksne kaitse",
+     "def": "ortodoksne kaitse"
+    },
+    "fi": {
+     "name": "Ortodoksinen puolustus",
+     "def": "ortodoksinen puolustus"
     }
    },
    "comment": {
@@ -9854,6 +11932,23 @@
     "bg": {
      "name": "Разменен вариант",
      "def": "разменен вариант"
+    },
+    "it": {
+     "name": "Variante di cambio",
+     "def": "la variante di cambio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Afbytningsvariant",
+     "def": "afbytningsvarianten"
+    },
+    "et": {
+     "name": "Vahetusvariant",
+     "def": "vahetusvariant"
+    },
+    "fi": {
+     "name": "Vaihtomuunnelma",
+     "def": "vaihtomuunnelma"
     }
    },
    "comment": {
@@ -9910,6 +12005,23 @@
     "bg": {
      "name": "Защита полу-Тараш",
      "def": "защита полу-Тараш"
+    },
+    "it": {
+     "name": "Difesa semi-Tarrasch",
+     "def": "la difesa semi-Tarrasch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Semi-Tarrasch-forsvar",
+     "def": "Semi-Tarrasch-forsvaret"
+    },
+    "et": {
+     "name": "Pool-Tarraschi kaitse",
+     "def": "pool-Tarraschi kaitse"
+    },
+    "fi": {
+     "name": "Semi-Tarrasch-puolustus",
+     "def": "semi-Tarrasch-puolustus"
     }
    },
    "comment": {
@@ -9970,6 +12082,23 @@
     "bg": {
      "name": "Мерански вариант",
      "def": "мерански вариант"
+    },
+    "it": {
+     "name": "Variante Merano",
+     "def": "la variante Merano",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Meran-variant",
+     "def": "Meran-varianten"
+    },
+    "et": {
+     "name": "Merani variant",
+     "def": "Merani variant"
+    },
+    "fi": {
+     "name": "Meranin muunnelma",
+     "def": "Meranin muunnelma"
     }
    },
    "comment": {
@@ -10026,6 +12155,23 @@
     "bg": {
      "name": "Класически вариант",
      "def": "класически вариант"
+    },
+    "it": {
+     "name": "Variante classica",
+     "def": "la variante classica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Klassisk variant",
+     "def": "den klassiske variant"
+    },
+    "et": {
+     "name": "Klassikaline variant",
+     "def": "klassikaline variant"
+    },
+    "fi": {
+     "name": "Klassinen muunnelma",
+     "def": "klassinen muunnelma"
     }
    },
    "comment": {
@@ -10083,6 +12229,23 @@
     "bg": {
      "name": "Вариант Земиш",
      "def": "вариант Земиш"
+    },
+    "it": {
+     "name": "Variante Sämisch",
+     "def": "la variante Sämisch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Sämisch-variant",
+     "def": "Sämisch-varianten"
+    },
+    "et": {
+     "name": "Sämischi variant",
+     "def": "Sämischi variant"
+    },
+    "fi": {
+     "name": "Sämischin muunnelma",
+     "def": "Sämischin muunnelma"
     }
    },
    "comment": {
@@ -10139,6 +12302,23 @@
     "bg": {
      "name": "Атака на четирите пешки",
      "def": "атака на четирите пешки"
+    },
+    "it": {
+     "name": "Attacco dei quattro pedoni",
+     "def": "l’attacco dei quattro pedoni",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Firbondeangreb",
+     "def": "firbondeangrebet"
+    },
+    "et": {
+     "name": "Nelja etturi rünnak",
+     "def": "nelja etturi rünnak"
+    },
+    "fi": {
+     "name": "Neljän sotilaan hyökkäys",
+     "def": "neljän sotilaan hyökkäys"
     }
    },
    "comment": {
@@ -10195,6 +12375,23 @@
     "bg": {
      "name": "Вариант с фианкето",
      "def": "вариант с фианкето"
+    },
+    "it": {
+     "name": "Variante del fianchetto",
+     "def": "la variante del fianchetto",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Fianchettovariant",
+     "def": "fianchettovarianten"
+    },
+    "et": {
+     "name": "Fiankettovariant",
+     "def": "fiankettovariant"
+    },
+    "fi": {
+     "name": "Fiankettomuunnelma",
+     "def": "fiankettomuunnelma"
     }
    },
    "comment": {
@@ -10252,6 +12449,23 @@
     "bg": {
      "name": "Вариант Рубинщайн",
      "def": "вариант Рубинщайн"
+    },
+    "it": {
+     "name": "Variante Rubinstein",
+     "def": "la variante Rubinstein",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Rubinstein-variant",
+     "def": "Rubinstein-varianten"
+    },
+    "et": {
+     "name": "Rubinsteini variant",
+     "def": "Rubinsteini variant"
+    },
+    "fi": {
+     "name": "Rubinsteinin muunnelma",
+     "def": "Rubinsteinin muunnelma"
     }
    },
    "comment": {
@@ -10308,6 +12522,23 @@
     "bg": {
      "name": "Класически вариант",
      "def": "класически вариант"
+    },
+    "it": {
+     "name": "Variante classica",
+     "def": "la variante classica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Klassisk variant",
+     "def": "den klassiske variant"
+    },
+    "et": {
+     "name": "Klassikaline variant",
+     "def": "klassikaline variant"
+    },
+    "fi": {
+     "name": "Klassinen muunnelma",
+     "def": "klassinen muunnelma"
     }
    },
    "comment": {
@@ -10364,6 +12595,23 @@
     "bg": {
      "name": "Вариант Земиш",
      "def": "вариант Земиш"
+    },
+    "it": {
+     "name": "Variante Sämisch",
+     "def": "la variante Sämisch",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Sämisch-variant",
+     "def": "Sämisch-varianten"
+    },
+    "et": {
+     "name": "Sämischi variant",
+     "def": "Sämischi variant"
+    },
+    "fi": {
+     "name": "Sämischin muunnelma",
+     "def": "Sämischin muunnelma"
     }
    },
    "comment": {
@@ -10420,6 +12668,23 @@
     "bg": {
      "name": "Разменен вариант",
      "def": "разменен вариант"
+    },
+    "it": {
+     "name": "Variante di cambio",
+     "def": "la variante di cambio",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Afbytningsvariant",
+     "def": "afbytningsvarianten"
+    },
+    "et": {
+     "name": "Vahetusvariant",
+     "def": "vahetusvariant"
+    },
+    "fi": {
+     "name": "Vaihtomuunnelma",
+     "def": "vaihtomuunnelma"
     }
    },
    "comment": {
@@ -10477,6 +12742,23 @@
     "bg": {
      "name": "Ленинградски вариант",
      "def": "ленинградски вариант"
+    },
+    "it": {
+     "name": "Variante Leningrado",
+     "def": "la variante Leningrado",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Leningrad-variant",
+     "def": "Leningrad-varianten"
+    },
+    "et": {
+     "name": "Leningradi variant",
+     "def": "Leningradi variant"
+    },
+    "fi": {
+     "name": "Leningradin muunnelma",
+     "def": "Leningradin muunnelma"
     }
    },
    "comment": {
@@ -10533,6 +12815,23 @@
     "bg": {
      "name": "Вариант „Каменна стена“",
      "def": "вариант „Каменна стена“"
+    },
+    "it": {
+     "name": "Variante Stonewall",
+     "def": "la variante Stonewall",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Stonewall-variant",
+     "def": "Stonewall-varianten"
+    },
+    "et": {
+     "name": "Stonewalli variant",
+     "def": "Stonewalli variant"
+    },
+    "fi": {
+     "name": "Stonewall-muunnelma",
+     "def": "Stonewall-muunnelma"
     }
    },
    "comment": {
@@ -10589,6 +12888,23 @@
     "bg": {
      "name": "Модерна защита Бенони",
      "def": "модерна защита Бенони"
+    },
+    "it": {
+     "name": "Benoni moderna",
+     "def": "la Benoni moderna",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Moderne Benoni",
+     "def": "moderne Benoni"
+    },
+    "et": {
+     "name": "Moodne Benoni",
+     "def": "moodne Benoni"
+    },
+    "fi": {
+     "name": "Moderni Benoni",
+     "def": "moderni Benoni"
     }
    },
    "comment": {
@@ -10645,6 +12961,23 @@
     "bg": {
      "name": "Открито каталонско начало",
      "def": "открито каталонско начало"
+    },
+    "it": {
+     "name": "Catalana aperta",
+     "def": "la Catalana aperta",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Åben katalansk",
+     "def": "åben katalansk"
+    },
+    "et": {
+     "name": "Avatud variant",
+     "def": "avatud variant"
+    },
+    "fi": {
+     "name": "Avoin katalonialainen",
+     "def": "avoin katalonialainen"
     }
    },
    "comment": {
@@ -10702,6 +13035,23 @@
     "bg": {
      "name": "Затворено каталонско начало",
      "def": "затворено каталонско начало"
+    },
+    "it": {
+     "name": "Catalana chiusa",
+     "def": "la Catalana chiusa",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Lukket katalansk",
+     "def": "lukket katalansk"
+    },
+    "et": {
+     "name": "Suletud variant",
+     "def": "suletud variant"
+    },
+    "fi": {
+     "name": "Suljettu katalonialainen",
+     "def": "suljettu katalonialainen"
     }
    },
    "comment": {
@@ -10758,6 +13108,23 @@
     "bg": {
      "name": "Симетричен вариант",
      "def": "симетричен вариант"
+    },
+    "it": {
+     "name": "Variante simmetrica",
+     "def": "la variante simmetrica",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Symmetrisk variant",
+     "def": "den symmetriske variant"
+    },
+    "et": {
+     "name": "Sümmeetriline variant",
+     "def": "sümmeetriline variant"
+    },
+    "fi": {
+     "name": "Symmetrinen muunnelma",
+     "def": "symmetrinen muunnelma"
     }
    },
    "comment": {
@@ -10814,6 +13181,23 @@
     "bg": {
      "name": "Сицилианска с разменени цветове",
      "def": "сицилианска с разменени цветове"
+    },
+    "it": {
+     "name": "Siciliana a colori invertiti",
+     "def": "la Siciliana a colori invertiti",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Omvendt siciliansk",
+     "def": "omvendt siciliansk"
+    },
+    "et": {
+     "name": "Vahetatud värvidega Sitsiilia kaitse",
+     "def": "vahetatud värvidega Sitsiilia kaitse"
+    },
+    "fi": {
+     "name": "Käänteinen sisilialainen",
+     "def": "käänteinen sisilialainen"
     }
    },
    "comment": {
@@ -10874,6 +13258,23 @@
     "bg": {
      "name": "Атака на четирите пешки",
      "def": "атака на четирите пешки"
+    },
+    "it": {
+     "name": "Attacco dei quattro pedoni",
+     "def": "l’attacco dei quattro pedoni",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Firbondeangreb",
+     "def": "firbondeangrebet"
+    },
+    "et": {
+     "name": "Nelja etturi rünnak",
+     "def": "nelja etturi rünnak"
+    },
+    "fi": {
+     "name": "Neljän sotilaan hyökkäys",
+     "def": "neljän sotilaan hyökkäys"
     }
    },
    "comment": {
@@ -10930,6 +13331,23 @@
     "bg": {
      "name": "Модерен вариант",
      "def": "модерен вариант"
+    },
+    "it": {
+     "name": "Variante moderna",
+     "def": "la variante moderna",
+     "gender": "f"
+    },
+    "da": {
+     "name": "Moderne variant",
+     "def": "den moderne variant"
+    },
+    "et": {
+     "name": "Moodne variant",
+     "def": "moodne variant"
+    },
+    "fi": {
+     "name": "Moderni muunnelma",
+     "def": "moderni muunnelma"
     }
    },
    "comment": {
@@ -10986,6 +13404,23 @@
     "bg": {
      "name": "Австрийска атака",
      "def": "австрийска атака"
+    },
+    "it": {
+     "name": "Attacco austriaco",
+     "def": "l’attacco austriaco",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Østrigsk angreb",
+     "def": "østrigsk angreb"
+    },
+    "et": {
+     "name": "Austria rünnak",
+     "def": "Austria rünnak"
+    },
+    "fi": {
+     "name": "Itävaltalainen hyökkäys",
+     "def": "itävaltalainen hyökkäys"
     }
    },
    "comment": {
@@ -11042,6 +13477,23 @@
     "bg": {
      "name": "Контрагамбит Фалкбеер",
      "def": "контрагамбит Фалкбеер"
+    },
+    "it": {
+     "name": "Controgambetto Falkbeer",
+     "def": "il controgambetto Falkbeer",
+     "gender": "m"
+    },
+    "da": {
+     "name": "Falkbeer-modgambit",
+     "def": "Falkbeer-modgambit"
+    },
+    "et": {
+     "name": "Falkbeeri vastugambiit",
+     "def": "Falkbeeri vastugambiit"
+    },
+    "fi": {
+     "name": "Falkbeerin vastagambiitti",
+     "def": "Falkbeerin vastagambiitti"
     }
    },
    "comment": {
@@ -11077,14 +13529,22 @@
     "pt-BR": "Variante {X}",
     "pt": "Variante {X}",
     "ko": "{X} 바리에이션",
-    "bg": "вариант {X}"
+    "bg": "вариант {X}",
+    "it": "variante {X}",
+    "da": "{X}-variant",
+    "et": "{X:gen} variant",
+    "fi": "{X}-muunnelma"
    },
    "id": "varian",
    "nl": "variant",
    "pt-BR": "variante",
    "pt": "variante",
    "ko": "바리에이션",
-   "bg": "вариант"
+   "bg": "вариант",
+   "it": "variante",
+   "da": "variant",
+   "et": "variant",
+   "fi": "muunnelma"
   },
   "Attack": {
    "en": "Attack",
@@ -11112,14 +13572,22 @@
     "pt-BR": "Ataque {X}",
     "pt": "Ataque {X}",
     "ko": "{X} 어택",
-    "bg": "атака {X}"
+    "bg": "атака {X}",
+    "it": "attacco {X}",
+    "da": "{X}-angreb",
+    "et": "{X:gen} rünnak",
+    "fi": "{X}-hyökkäys"
    },
    "id": "serangan",
    "nl": "aanval",
    "pt-BR": "ataque",
    "pt": "ataque",
    "ko": "어택",
-   "bg": "атака"
+   "bg": "атака",
+   "it": "attacco",
+   "da": "angreb",
+   "et": "rünnak",
+   "fi": "hyökkäys"
   },
   "Gambit": {
    "en": "Gambit",
@@ -11147,14 +13615,22 @@
     "pt-BR": "Gambito {X}",
     "pt": "Gambito {X}",
     "ko": "{X} 갬빗",
-    "bg": "гамбит {X}"
+    "bg": "гамбит {X}",
+    "it": "gambetto {X}",
+    "da": "{X}-gambit",
+    "et": "{X:gen} gambiit",
+    "fi": "{X}-gambiitti"
    },
    "id": "gambit",
    "nl": "gambiet",
    "pt-BR": "gambito",
    "pt": "gambito",
    "ko": "갬빗",
-   "bg": "гамбит"
+   "bg": "гамбит",
+   "it": "gambetto",
+   "da": "gambit",
+   "et": "gambiit",
+   "fi": "gambiitti"
   },
   "Defense": {
    "en": "Defense",
@@ -11182,14 +13658,22 @@
     "pt-BR": "Defesa {X}",
     "pt": "Defesa {X}",
     "ko": "{X} 디펜스",
-    "bg": "защита {X}"
+    "bg": "защита {X}",
+    "it": "difesa {X}",
+    "da": "{X}-forsvar",
+    "et": "{X:gen} kaitse",
+    "fi": "{X}-puolustus"
    },
    "id": "pertahanan",
    "nl": "verdediging",
    "pt-BR": "defesa",
    "pt": "defesa",
    "ko": "디펜스",
-   "bg": "защита"
+   "bg": "защита",
+   "it": "difesa",
+   "da": "forsvar",
+   "et": "kaitse",
+   "fi": "puolustus"
   },
   "System": {
    "en": "System",
@@ -11217,14 +13701,22 @@
     "pt-BR": "Sistema {X}",
     "pt": "Sistema {X}",
     "ko": "{X} 시스템",
-    "bg": "система {X}"
+    "bg": "система {X}",
+    "it": "sistema {X}",
+    "da": "{X}-system",
+    "et": "{X:gen} süsteem",
+    "fi": "{X}-järjestelmä"
    },
    "id": "sistem",
    "nl": "systeem",
    "pt-BR": "sistema",
    "pt": "sistema",
    "ko": "시스템",
-   "bg": "система"
+   "bg": "система",
+   "it": "sistema",
+   "da": "system",
+   "et": "süsteem",
+   "fi": "järjestelmä"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -11252,14 +13744,22 @@
     "pt-BR": "Contragambito {X}",
     "pt": "Contragambito {X}",
     "ko": "{X} 카운터갬빗",
-    "bg": "контрагамбит {X}"
+    "bg": "контрагамбит {X}",
+    "it": "controgambetto {X}",
+    "da": "{X}-modgambit",
+    "et": "{X:gen} vastugambiit",
+    "fi": "{X}-vastagambiitti"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
    "pt-BR": "contragambito",
    "pt": "contragambito",
    "ko": "카운터갬빗",
-   "bg": "контрагамбит"
+   "bg": "контрагамбит",
+   "it": "controgambetto",
+   "da": "modgambit",
+   "et": "vastugambiit",
+   "fi": "vastagambiitti"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -11287,14 +13787,22 @@
     "pt-BR": "Contra-ataque {X}",
     "pt": "Contra-ataque {X}",
     "ko": "{X} 카운터어택",
-    "bg": "контраатака {X}"
+    "bg": "контраатака {X}",
+    "it": "contrattacco {X}",
+    "da": "{X}-modangreb",
+    "et": "{X:gen} vasturünnak",
+    "fi": "{X}-vastahyökkäys"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
    "pt-BR": "contra-ataque",
    "pt": "contra-ataque",
    "ko": "카운터어택",
-   "bg": "контраатака"
+   "bg": "контраатака",
+   "it": "contrattacco",
+   "da": "modangreb",
+   "et": "vasturünnak",
+   "fi": "vastahyökkäys"
   },
   "Opening": {
    "en": "Opening",
@@ -11322,14 +13830,22 @@
     "pt-BR": "Abertura {X}",
     "pt": "Abertura {X}",
     "ko": "{X} 오프닝",
-    "bg": "дебют {X}"
+    "bg": "дебют {X}",
+    "it": "apertura {X}",
+    "da": "{X}-åbning",
+    "et": "{X:gen} avang",
+    "fi": "{X}-avaus"
    },
    "id": "pembukaan",
    "nl": "opening",
    "pt-BR": "abertura",
    "pt": "abertura",
    "ko": "오프닝",
-   "bg": "дебют"
+   "bg": "дебют",
+   "it": "apertura",
+   "da": "åbning",
+   "et": "avang",
+   "fi": "avaus"
   },
   "Game": {
    "en": "Game",
@@ -11347,7 +13863,11 @@
    "pt-BR": "abertura",
    "pt": "partida",
    "ko": "게임",
-   "bg": "партия"
+   "bg": "партия",
+   "it": "partita",
+   "da": "parti",
+   "et": "partii",
+   "fi": "peli"
   },
   "Line": {
    "en": "Line",
@@ -11375,14 +13895,22 @@
     "pt-BR": "Linha {X}",
     "pt": "Linha {X}",
     "ko": "{X} 라인",
-    "bg": "продължение {X}"
+    "bg": "продължение {X}",
+    "it": "linea {X}",
+    "da": "{X}-fortsættelse",
+    "et": "{X:gen} jätk",
+    "fi": "{X}-jatko"
    },
    "id": "jalur",
    "nl": "voortzetting",
    "pt-BR": "linha",
    "pt": "linha",
    "ko": "라인",
-   "bg": "продължение"
+   "bg": "продължение",
+   "it": "linea",
+   "da": "fortsættelse",
+   "et": "jätk",
+   "fi": "jatko"
   },
   "Formation": {
    "en": "Formation",
@@ -11400,7 +13928,11 @@
    "pt-BR": "formação",
    "pt": "formação",
    "ko": "포메이션",
-   "bg": "построение"
+   "bg": "построение",
+   "it": "schieramento",
+   "da": "opstilling",
+   "et": "ülesehitus",
+   "fi": "asetelma"
   },
   "Trap": {
    "en": "Trap",
@@ -11428,14 +13960,22 @@
     "pt-BR": "Armadilha {X}",
     "pt": "Armadilha de {X}",
     "ko": "{X} 트랩",
-    "bg": "капан на {X}"
+    "bg": "капан на {X}",
+    "it": "trappola di {X}",
+    "da": "{X}-fælde",
+    "et": "{X:gen} lõks",
+    "fi": "{X}-ansa"
    },
    "id": "jebakan",
    "nl": "valstrik",
    "pt-BR": "armadilha",
    "pt": "armadilha",
    "ko": "트랩",
-   "bg": "капан"
+   "bg": "капан",
+   "it": "trappola",
+   "da": "fælde",
+   "et": "lõks",
+   "fi": "ansa"
   },
   "Accepted": {
    "en": "Accepted",
@@ -11453,7 +13993,11 @@
    "pt-BR": "aceito",
    "pt": "aceite",
    "ko": "억셉티드",
-   "bg": "приет"
+   "bg": "приет",
+   "it": "accettato",
+   "da": "antaget",
+   "et": "vastuvõetud",
+   "fi": "vastaanotettu"
   },
   "Declined": {
    "en": "Declined",
@@ -11471,7 +14015,11 @@
    "pt-BR": "recusado",
    "pt": "recusado",
    "ko": "디클라인드",
-   "bg": "отказан"
+   "bg": "отказан",
+   "it": "rifiutato",
+   "da": "afslået",
+   "et": "tagasilükatud",
+   "fi": "hylätty"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -11489,7 +14037,11 @@
    "pt-BR": "Variante das Trocas",
    "pt": "Variante das Trocas",
    "ko": "익스체인지 바리에이션",
-   "bg": "разменен вариант"
+   "bg": "разменен вариант",
+   "it": "variante di cambio",
+   "da": "afbytningsvariant",
+   "et": "vahetusvariant",
+   "fi": "vaihtomuunnelma"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -11507,7 +14059,11 @@
    "pt-BR": "Variante do Avanço",
    "pt": "Variante do Avanço",
    "ko": "어드밴스 바리에이션",
-   "bg": "вариант с придвижване"
+   "bg": "вариант с придвижване",
+   "it": "variante di spinta",
+   "da": "fremstødsvariant",
+   "et": "edasitungivariant",
+   "fi": "etenemismuunnelma"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -11525,7 +14081,11 @@
    "pt-BR": "Variante Clássica",
    "pt": "Variante Clássica",
    "ko": "클래시컬 바리에이션",
-   "bg": "класически вариант"
+   "bg": "класически вариант",
+   "it": "variante classica",
+   "da": "klassisk variant",
+   "et": "klassikaline variant",
+   "fi": "klassinen muunnelma"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -11543,7 +14103,11 @@
    "pt-BR": "Variante Moderna",
    "pt": "Variante Moderna",
    "ko": "모던 바리에이션",
-   "bg": "модерен вариант"
+   "bg": "модерен вариант",
+   "it": "variante moderna",
+   "da": "moderne variant",
+   "et": "moodne variant",
+   "fi": "moderni muunnelma"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -11561,7 +14125,11 @@
    "pt-BR": "Variante Aberta",
    "pt": "Variante Aberta",
    "ko": "오픈 바리에이션",
-   "bg": "открит вариант"
+   "bg": "открит вариант",
+   "it": "variante aperta",
+   "da": "åben variant",
+   "et": "avatud variant",
+   "fi": "avoin muunnelma"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -11579,7 +14147,11 @@
    "pt-BR": "Variante Fechada",
    "pt": "Variante Fechada",
    "ko": "클로즈드 바리에이션",
-   "bg": "затворен вариант"
+   "bg": "затворен вариант",
+   "it": "variante chiusa",
+   "da": "lukket variant",
+   "et": "suletud variant",
+   "fi": "suljettu muunnelma"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -11597,7 +14169,11 @@
    "pt-BR": "Variante do Fianqueto",
    "pt": "Variante do Fianqueto",
    "ko": "피앙케토 바리에이션",
-   "bg": "вариант с фианкето"
+   "bg": "вариант с фианкето",
+   "it": "variante del fianchetto",
+   "da": "fianchettovariant",
+   "et": "fiankettovariant",
+   "fi": "fiankettomuunnelma"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -11615,7 +14191,11 @@
    "pt-BR": "Variante Simétrica",
    "pt": "Variante Simétrica",
    "ko": "시메트리컬 바리에이션",
-   "bg": "симетричен вариант"
+   "bg": "симетричен вариант",
+   "it": "variante simmetrica",
+   "da": "symmetrisk variant",
+   "et": "sümmeetriline variant",
+   "fi": "symmetrinen muunnelma"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -11633,7 +14213,11 @@
    "pt-BR": "Gambito Escocês",
    "pt": "Gambito Escocês",
    "ko": "스카치 갬빗",
-   "bg": "шотландски гамбит"
+   "bg": "шотландски гамбит",
+   "it": "gambetto scozzese",
+   "da": "skotsk gambit",
+   "et": "Šoti gambiit",
+   "fi": "skotlantilainen gambiitti"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -11651,7 +14235,11 @@
    "pt-BR": "Variante Escocesa",
    "pt": "Variante Escocesa",
    "ko": "스카치 바리에이션",
-   "bg": "шотландски вариант"
+   "bg": "шотландски вариант",
+   "it": "variante scozzese",
+   "da": "skotsk variant",
+   "et": "Šoti variant",
+   "fi": "skotlantilainen muunnelma"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -11669,7 +14257,11 @@
    "pt-BR": "Variante Dinamarquesa",
    "pt": "Variante Dinamarquesa",
    "ko": "데니시 바리에이션",
-   "bg": "датски вариант"
+   "bg": "датски вариант",
+   "it": "variante danese",
+   "da": "nordisk variant",
+   "et": "Taani variant",
+   "fi": "tanskalainen muunnelma"
   },
   "Main Line": {
    "en": "Main Line",
@@ -11687,7 +14279,11 @@
    "pt-BR": "linha principal",
    "pt": "linha principal",
    "ko": "메인 라인",
-   "bg": "основен вариант"
+   "bg": "основен вариант",
+   "it": "linea principale",
+   "da": "hovedvariant",
+   "et": "peavariant",
+   "fi": "päämuunnelma"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -11705,7 +14301,11 @@
    "pt-BR": "acelerado",
    "pt": "acelerado",
    "ko": "액셀러레이티드",
-   "bg": "ускорен"
+   "bg": "ускорен",
+   "it": "accelerato",
+   "da": "accelereret",
+   "et": "kiirendatud",
+   "fi": "nopeutettu"
   },
   "Deferred": {
    "en": "Deferred",
@@ -11723,7 +14323,11 @@
    "pt-BR": "adiado",
    "pt": "diferido",
    "ko": "디퍼드",
-   "bg": "отложен"
+   "bg": "отложен",
+   "it": "differito",
+   "da": "udskudt",
+   "et": "edasilükatud",
+   "fi": "viivästetty"
   },
   "Reversed": {
    "en": "Reversed",
@@ -11741,7 +14345,11 @@
    "pt-BR": "invertido",
    "pt": "invertido",
    "ko": "리버스드",
-   "bg": "с разменени цветове"
+   "bg": "с разменени цветове",
+   "it": "a colori invertiti",
+   "da": "med ombyttede farver",
+   "et": "vahetatud värvidega",
+   "fi": "käänteinen"
   }
  },
  "eponyms": {
@@ -11781,6 +14389,22 @@
    "bg": {
     "nom": "Щайниц",
     "gen": "Щайниц"
+   },
+   "it": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   },
+   "da": {
+    "nom": "Steinitz",
+    "gen": "Steinitz'"
+   },
+   "et": {
+    "nom": "Steinitz",
+    "gen": "Steinitzi"
+   },
+   "fi": {
+    "nom": "Steinitz",
+    "gen": "Steinitzin"
    }
   },
   "Rubinstein": {
@@ -11819,6 +14443,22 @@
    "bg": {
     "nom": "Рубинщайн",
     "gen": "Рубинщайн"
+   },
+   "it": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
+   },
+   "da": {
+    "nom": "Rubinstein",
+    "gen": "Rubinsteins"
+   },
+   "et": {
+    "nom": "Rubinstein",
+    "gen": "Rubinsteini"
+   },
+   "fi": {
+    "nom": "Rubinstein",
+    "gen": "Rubinsteinin"
    }
   },
   "Winawer": {
@@ -11857,6 +14497,22 @@
    "bg": {
     "nom": "Винавер",
     "gen": "Винавер"
+   },
+   "it": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   },
+   "da": {
+    "nom": "Winawer",
+    "gen": "Winawers"
+   },
+   "et": {
+    "nom": "Winawer",
+    "gen": "Winaweri"
+   },
+   "fi": {
+    "nom": "Winawer",
+    "gen": "Winawerin"
    }
   },
   "Evans": {
@@ -11895,6 +14551,22 @@
    "bg": {
     "nom": "Евънс",
     "gen": "Евънс"
+   },
+   "it": {
+    "nom": "Evans",
+    "gen": "Evans"
+   },
+   "da": {
+    "nom": "Evans",
+    "gen": "Evans'"
+   },
+   "et": {
+    "nom": "Evans",
+    "gen": "Evansi"
+   },
+   "fi": {
+    "nom": "Evans",
+    "gen": "Evansin"
    }
   },
   "Chigorin": {
@@ -11923,8 +14595,8 @@
     "gen": "Tchigorin"
    },
    "pt": {
-    "nom": "Chigorin",
-    "gen": "Chigorin"
+    "nom": "Tchigorin",
+    "gen": "Tchigorin"
    },
    "ko": {
     "nom": "치고린",
@@ -11933,6 +14605,22 @@
    "bg": {
     "nom": "Чигорин",
     "gen": "Чигорин"
+   },
+   "it": {
+    "nom": "Chigorin",
+    "gen": "Chigorin"
+   },
+   "da": {
+    "nom": "Tjigorin",
+    "gen": "Tjigorins"
+   },
+   "et": {
+    "nom": "Tšigorin",
+    "gen": "Tšigorini"
+   },
+   "fi": {
+    "nom": "Tšigorin",
+    "gen": "Tšigorinin"
    }
   },
   "Morphy": {
@@ -11971,6 +14659,22 @@
    "bg": {
     "nom": "Морфи",
     "gen": "Морфи"
+   },
+   "it": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "da": {
+    "nom": "Morphy",
+    "gen": "Morphys"
+   },
+   "et": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "fi": {
+    "nom": "Morphy",
+    "gen": "Morphyn"
    }
   },
   "Tarrasch": {
@@ -12009,6 +14713,22 @@
    "bg": {
     "nom": "Тараш",
     "gen": "Тараш"
+   },
+   "it": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
+   },
+   "da": {
+    "nom": "Tarrasch",
+    "gen": "Tarraschs"
+   },
+   "et": {
+    "nom": "Tarrasch",
+    "gen": "Tarraschi"
+   },
+   "fi": {
+    "nom": "Tarrasch",
+    "gen": "Tarraschin"
    }
   },
   "Alekhine": {
@@ -12047,6 +14767,22 @@
    "bg": {
     "nom": "Алехин",
     "gen": "Алехин"
+   },
+   "it": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
+   },
+   "da": {
+    "nom": "Aljechin",
+    "gen": "Aljechins"
+   },
+   "et": {
+    "nom": "Aljehhin",
+    "gen": "Aljehhini"
+   },
+   "fi": {
+    "nom": "Aljehin",
+    "gen": "Aljehinin"
    }
   },
   "Sämisch": {
@@ -12085,6 +14821,22 @@
    "bg": {
     "nom": "Земиш",
     "gen": "Земиш"
+   },
+   "it": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   },
+   "da": {
+    "nom": "Sämisch",
+    "gen": "Sämischs"
+   },
+   "et": {
+    "nom": "Sämisch",
+    "gen": "Sämischi"
+   },
+   "fi": {
+    "nom": "Sämisch",
+    "gen": "Sämischin"
    }
   },
   "Nimzowitsch": {
@@ -12123,6 +14875,22 @@
    "bg": {
     "nom": "Нимцович",
     "gen": "Нимцович"
+   },
+   "it": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
+   },
+   "da": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitschs"
+   },
+   "et": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitschi"
+   },
+   "fi": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitschin"
    }
   },
   "Najdorf": {
@@ -12161,6 +14929,22 @@
    "bg": {
     "nom": "Найдорф",
     "gen": "Найдорф"
+   },
+   "it": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   },
+   "da": {
+    "nom": "Najdorf",
+    "gen": "Najdorfs"
+   },
+   "et": {
+    "nom": "Najdorf",
+    "gen": "Najdorfi"
+   },
+   "fi": {
+    "nom": "Najdorf",
+    "gen": "Najdorfin"
    }
   },
   "Bogoljubow": {
@@ -12199,6 +14983,22 @@
    "bg": {
     "nom": "Боголюбов",
     "gen": "Боголюбов"
+   },
+   "it": {
+    "nom": "Bogoljubow",
+    "gen": "Bogoljubow"
+   },
+   "da": {
+    "nom": "Bogoljubov",
+    "gen": "Bogoljubovs"
+   },
+   "et": {
+    "nom": "Bogoljubov",
+    "gen": "Bogoljubovi"
+   },
+   "fi": {
+    "nom": "Bogoljubov",
+    "gen": "Bogoljubovin"
    }
   },
   "Alapin": {
@@ -12237,6 +15037,22 @@
    "bg": {
     "nom": "Алапин",
     "gen": "Алапин"
+   },
+   "it": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   },
+   "da": {
+    "nom": "Alapin",
+    "gen": "Alapins"
+   },
+   "et": {
+    "nom": "Alapin",
+    "gen": "Alapini"
+   },
+   "fi": {
+    "nom": "Alapin",
+    "gen": "Alapinin"
    }
   },
   "Botvinnik": {
@@ -12275,6 +15091,22 @@
    "bg": {
     "nom": "Ботвиник",
     "gen": "Ботвиник"
+   },
+   "it": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
+   },
+   "da": {
+    "nom": "Botvinnik",
+    "gen": "Botvinniks"
+   },
+   "et": {
+    "nom": "Botvinnik",
+    "gen": "Botvinniku"
+   },
+   "fi": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnikin"
    }
   },
   "Paulsen": {
@@ -12313,6 +15145,22 @@
    "bg": {
     "nom": "Паулсен",
     "gen": "Паулсен"
+   },
+   "it": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   },
+   "da": {
+    "nom": "Paulsen",
+    "gen": "Paulsens"
+   },
+   "et": {
+    "nom": "Paulsen",
+    "gen": "Paulseni"
+   },
+   "fi": {
+    "nom": "Paulsen",
+    "gen": "Paulsenin"
    }
   },
   "Marshall": {
@@ -12351,6 +15199,22 @@
    "bg": {
     "nom": "Маршал",
     "gen": "Маршал"
+   },
+   "it": {
+    "nom": "Marshall",
+    "gen": "Marshall"
+   },
+   "da": {
+    "nom": "Marshall",
+    "gen": "Marshalls"
+   },
+   "et": {
+    "nom": "Marshall",
+    "gen": "Marshalli"
+   },
+   "fi": {
+    "nom": "Marshall",
+    "gen": "Marshallin"
    }
   },
   "Kieseritzky": {
@@ -12389,6 +15253,22 @@
    "bg": {
     "nom": "Кизерицки",
     "gen": "Кизерицки"
+   },
+   "it": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "da": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzkys"
+   },
+   "et": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "fi": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzkyn"
    }
   },
   "Panov": {
@@ -12427,6 +15307,22 @@
    "bg": {
     "nom": "Панов",
     "gen": "Панов"
+   },
+   "it": {
+    "nom": "Panov",
+    "gen": "Panov"
+   },
+   "da": {
+    "nom": "Panov",
+    "gen": "Panovs"
+   },
+   "et": {
+    "nom": "Panov",
+    "gen": "Panovi"
+   },
+   "fi": {
+    "nom": "Panov",
+    "gen": "Panovin"
    }
   },
   "Keres": {
@@ -12465,6 +15361,22 @@
    "bg": {
     "nom": "Керес",
     "gen": "Керес"
+   },
+   "it": {
+    "nom": "Keres",
+    "gen": "Keres"
+   },
+   "da": {
+    "nom": "Keres",
+    "gen": "Keres'"
+   },
+   "et": {
+    "nom": "Keres",
+    "gen": "Kerese"
+   },
+   "fi": {
+    "nom": "Keres",
+    "gen": "Keresin"
    }
   },
   "Tartakower": {
@@ -12503,6 +15415,22 @@
    "bg": {
     "nom": "Тартаковер",
     "gen": "Тартаковер"
+   },
+   "it": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
+   },
+   "da": {
+    "nom": "Tartakower",
+    "gen": "Tartakowers"
+   },
+   "et": {
+    "nom": "Tartakower",
+    "gen": "Tartakoweri"
+   },
+   "fi": {
+    "nom": "Tartakower",
+    "gen": "Tartakowerin"
    }
   },
   "Maróczy": {
@@ -12541,6 +15469,22 @@
    "bg": {
     "nom": "Мароци",
     "gen": "Мароци"
+   },
+   "it": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "da": {
+    "nom": "Maróczy",
+    "gen": "Maróczys"
+   },
+   "et": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "fi": {
+    "nom": "Maróczy",
+    "gen": "Maróczyn"
    }
   },
   "Falkbeer": {
@@ -12579,6 +15523,22 @@
    "bg": {
     "nom": "Фалкбеер",
     "gen": "Фалкбеер"
+   },
+   "it": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
+   },
+   "da": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeers"
+   },
+   "et": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeeri"
+   },
+   "fi": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeerin"
    }
   },
   "Scheveningen": {
@@ -12617,6 +15577,22 @@
    "bg": {
     "nom": "Шевенинген",
     "gen": "Шевенинген"
+   },
+   "it": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   },
+   "da": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningens"
+   },
+   "et": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningeni"
+   },
+   "fi": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningenin"
    }
   },
   "Richter-Rauzer": {
@@ -12655,6 +15631,22 @@
    "bg": {
     "nom": "Рихтер-Раузер",
     "gen": "Рихтер-Раузер"
+   },
+   "it": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
+   },
+   "da": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzers"
+   },
+   "et": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzeri"
+   },
+   "fi": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzerin"
    }
   },
   "Lasker": {
@@ -12693,6 +15685,22 @@
    "bg": {
     "nom": "Ласкер",
     "gen": "Ласкер"
+   },
+   "it": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   },
+   "da": {
+    "nom": "Lasker",
+    "gen": "Laskers"
+   },
+   "et": {
+    "nom": "Lasker",
+    "gen": "Laskeri"
+   },
+   "fi": {
+    "nom": "Lasker",
+    "gen": "Laskerin"
    }
   },
   "Taimanov": {
@@ -12731,6 +15739,22 @@
    "bg": {
     "nom": "Тайманов",
     "gen": "Тайманов"
+   },
+   "it": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
+   },
+   "da": {
+    "nom": "Tajmanov",
+    "gen": "Tajmanovs"
+   },
+   "et": {
+    "nom": "Taimanov",
+    "gen": "Taimanovi"
+   },
+   "fi": {
+    "nom": "Taimanov",
+    "gen": "Taimanovin"
    }
   },
   "Smyslov": {
@@ -12769,6 +15793,22 @@
    "bg": {
     "nom": "Смислов",
     "gen": "Смислов"
+   },
+   "it": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
+   },
+   "da": {
+    "nom": "Smyslov",
+    "gen": "Smyslovs"
+   },
+   "et": {
+    "nom": "Smõslov",
+    "gen": "Smõslovi"
+   },
+   "fi": {
+    "nom": "Smyslov",
+    "gen": "Smyslovin"
    }
   },
   "Spassky": {
@@ -12807,6 +15847,22 @@
    "bg": {
     "nom": "Спаски",
     "gen": "Спаски"
+   },
+   "it": {
+    "nom": "Spassky",
+    "gen": "Spassky"
+   },
+   "da": {
+    "nom": "Spasskij",
+    "gen": "Spasskijs"
+   },
+   "et": {
+    "nom": "Spasski",
+    "gen": "Spasski"
+   },
+   "fi": {
+    "nom": "Spasski",
+    "gen": "Spasskin"
    }
   },
   "Spielmann": {
@@ -12845,6 +15901,22 @@
    "bg": {
     "nom": "Шпилман",
     "gen": "Шпилман"
+   },
+   "it": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   },
+   "da": {
+    "nom": "Spielmann",
+    "gen": "Spielmanns"
+   },
+   "et": {
+    "nom": "Spielmann",
+    "gen": "Spielmanni"
+   },
+   "fi": {
+    "nom": "Spielmann",
+    "gen": "Spielmannin"
    }
   },
   "Averbakh": {
@@ -12883,6 +15955,22 @@
    "bg": {
     "nom": "Авербах",
     "gen": "Авербах"
+   },
+   "it": {
+    "nom": "Averbakh",
+    "gen": "Averbakh"
+   },
+   "da": {
+    "nom": "Averbakh",
+    "gen": "Averbakhs"
+   },
+   "et": {
+    "nom": "Averbahh",
+    "gen": "Averbahhi"
+   },
+   "fi": {
+    "nom": "Averbah",
+    "gen": "Averbahin"
    }
   },
   "Greco": {
@@ -12921,6 +16009,22 @@
    "bg": {
     "nom": "Греко",
     "gen": "Греко"
+   },
+   "it": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "da": {
+    "nom": "Greco",
+    "gen": "Grecos"
+   },
+   "et": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "fi": {
+    "nom": "Greco",
+    "gen": "Grecon"
    }
   },
   "Capablanca": {
@@ -12959,6 +16063,22 @@
    "bg": {
     "nom": "Капабланка",
     "gen": "Капабланка"
+   },
+   "it": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   },
+   "da": {
+    "nom": "Capablanca",
+    "gen": "Capablancas"
+   },
+   "et": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   },
+   "fi": {
+    "nom": "Capablanca",
+    "gen": "Capablancan"
    }
   },
   "Kan": {
@@ -12997,6 +16117,22 @@
    "bg": {
     "nom": "Кан",
     "gen": "Кан"
+   },
+   "it": {
+    "nom": "Kan",
+    "gen": "Kan"
+   },
+   "da": {
+    "nom": "Kan",
+    "gen": "Kans"
+   },
+   "et": {
+    "nom": "Kan",
+    "gen": "Kani"
+   },
+   "fi": {
+    "nom": "Kan",
+    "gen": "Kanin"
    }
   },
   "Albin": {
@@ -13035,6 +16171,22 @@
    "bg": {
     "nom": "Албин",
     "gen": "Албин"
+   },
+   "it": {
+    "nom": "Albin",
+    "gen": "Albin"
+   },
+   "da": {
+    "nom": "Albin",
+    "gen": "Albins"
+   },
+   "et": {
+    "nom": "Albin",
+    "gen": "Albini"
+   },
+   "fi": {
+    "nom": "Albin",
+    "gen": "Albinin"
    }
   },
   "Breyer": {
@@ -13073,6 +16225,22 @@
    "bg": {
     "nom": "Брейер",
     "gen": "Брейер"
+   },
+   "it": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   },
+   "da": {
+    "nom": "Breyer",
+    "gen": "Breyers"
+   },
+   "et": {
+    "nom": "Breyer",
+    "gen": "Breyeri"
+   },
+   "fi": {
+    "nom": "Breyer",
+    "gen": "Breyerin"
    }
   },
   "Schlechter": {
@@ -13111,6 +16279,22 @@
    "bg": {
     "nom": "Шлехтер",
     "gen": "Шлехтер"
+   },
+   "it": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
+   },
+   "da": {
+    "nom": "Schlechter",
+    "gen": "Schlechters"
+   },
+   "et": {
+    "nom": "Schlechter",
+    "gen": "Schlechteri"
+   },
+   "fi": {
+    "nom": "Schlechter",
+    "gen": "Schlechterin"
    }
   },
   "Jaenisch": {
@@ -13149,6 +16333,22 @@
    "bg": {
     "nom": "Яниш",
     "gen": "Яниш"
+   },
+   "it": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   },
+   "da": {
+    "nom": "Jaenisch",
+    "gen": "Jaenischs"
+   },
+   "et": {
+    "nom": "Jaenisch",
+    "gen": "Jaenischi"
+   },
+   "fi": {
+    "nom": "Jaenisch",
+    "gen": "Jaenischin"
    }
   },
   "Karpov": {
@@ -13187,6 +16387,22 @@
    "bg": {
     "nom": "Карпов",
     "gen": "Карпов"
+   },
+   "it": {
+    "nom": "Karpov",
+    "gen": "Karpov"
+   },
+   "da": {
+    "nom": "Karpov",
+    "gen": "Karpovs"
+   },
+   "et": {
+    "nom": "Karpov",
+    "gen": "Karpovi"
+   },
+   "fi": {
+    "nom": "Karpov",
+    "gen": "Karpovin"
    }
   },
   "Petrosian": {
@@ -13225,6 +16441,22 @@
    "bg": {
     "nom": "Петросян",
     "gen": "Петросян"
+   },
+   "it": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
+   },
+   "da": {
+    "nom": "Petrosjan",
+    "gen": "Petrosjans"
+   },
+   "et": {
+    "nom": "Petrosjan",
+    "gen": "Petrosjani"
+   },
+   "fi": {
+    "nom": "Petrosjan",
+    "gen": "Petrosjanin"
    }
   },
   "Euwe": {
@@ -13263,6 +16495,22 @@
    "bg": {
     "nom": "Ойве",
     "gen": "Ойве"
+   },
+   "it": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "da": {
+    "nom": "Euwe",
+    "gen": "Euwes"
+   },
+   "et": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "fi": {
+    "nom": "Euwe",
+    "gen": "Euwen"
    }
   },
   "Sozin": {
@@ -13301,6 +16549,22 @@
    "bg": {
     "nom": "Созин",
     "gen": "Созин"
+   },
+   "it": {
+    "nom": "Sozin",
+    "gen": "Sozin"
+   },
+   "da": {
+    "nom": "Sozin",
+    "gen": "Sozins"
+   },
+   "et": {
+    "nom": "Sozin",
+    "gen": "Sozini"
+   },
+   "fi": {
+    "nom": "Sozin",
+    "gen": "Sozinin"
    }
   },
   "Schliemann": {
@@ -13339,6 +16603,22 @@
    "bg": {
     "nom": "Шлиман",
     "gen": "Шлиман"
+   },
+   "it": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   },
+   "da": {
+    "nom": "Schliemann",
+    "gen": "Schliemanns"
+   },
+   "et": {
+    "nom": "Schliemann",
+    "gen": "Schliemanni"
+   },
+   "fi": {
+    "nom": "Schliemann",
+    "gen": "Schliemannin"
    }
   },
   "Anderssen": {
@@ -13377,6 +16657,22 @@
    "bg": {
     "nom": "Андерсен",
     "gen": "Андерсен"
+   },
+   "it": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
+   },
+   "da": {
+    "nom": "Anderssen",
+    "gen": "Anderssens"
+   },
+   "et": {
+    "nom": "Anderssen",
+    "gen": "Andersseni"
+   },
+   "fi": {
+    "nom": "Anderssen",
+    "gen": "Anderssenin"
    }
   },
   "Philidor": {
@@ -13415,6 +16711,22 @@
    "bg": {
     "nom": "Филидор",
     "gen": "Филидор"
+   },
+   "it": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   },
+   "da": {
+    "nom": "Philidor",
+    "gen": "Philidors"
+   },
+   "et": {
+    "nom": "Philidor",
+    "gen": "Philidori"
+   },
+   "fi": {
+    "nom": "Philidor",
+    "gen": "Philidorin"
    }
   },
   "Zaitsev": {
@@ -13453,6 +16765,22 @@
    "bg": {
     "nom": "Зайцев",
     "gen": "Зайцев"
+   },
+   "it": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsev"
+   },
+   "da": {
+    "nom": "Zajtsev",
+    "gen": "Zajtsevs"
+   },
+   "et": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsevi"
+   },
+   "fi": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsevin"
    }
   },
   "Sveshnikov": {
@@ -13491,6 +16819,22 @@
    "bg": {
     "nom": "Свешников",
     "gen": "Свешников"
+   },
+   "it": {
+    "nom": "Sveshnikov",
+    "gen": "Sveshnikov"
+   },
+   "da": {
+    "nom": "Svesjnikov",
+    "gen": "Svesjnikovs"
+   },
+   "et": {
+    "nom": "Svešnikov",
+    "gen": "Svešnikovi"
+   },
+   "fi": {
+    "nom": "Svešnikov",
+    "gen": "Svešnikovin"
    }
   },
   "Kasparov": {
@@ -13529,6 +16873,22 @@
    "bg": {
     "nom": "Каспаров",
     "gen": "Каспаров"
+   },
+   "it": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
+   },
+   "da": {
+    "nom": "Kasparov",
+    "gen": "Kasparovs"
+   },
+   "et": {
+    "nom": "Kasparov",
+    "gen": "Kasparovi"
+   },
+   "fi": {
+    "nom": "Kasparov",
+    "gen": "Kasparovin"
    }
   },
   "Fischer": {
@@ -13567,6 +16927,22 @@
    "bg": {
     "nom": "Фишер",
     "gen": "Фишер"
+   },
+   "it": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   },
+   "da": {
+    "nom": "Fischer",
+    "gen": "Fischers"
+   },
+   "et": {
+    "nom": "Fischer",
+    "gen": "Fischeri"
+   },
+   "fi": {
+    "nom": "Fischer",
+    "gen": "Fischerin"
    }
   },
   "Tal": {
@@ -13605,6 +16981,22 @@
    "bg": {
     "nom": "Тал",
     "gen": "Тал"
+   },
+   "it": {
+    "nom": "Tal",
+    "gen": "Tal"
+   },
+   "da": {
+    "nom": "Tal",
+    "gen": "Tals"
+   },
+   "et": {
+    "nom": "Tal",
+    "gen": "Tali"
+   },
+   "fi": {
+    "nom": "Tal",
+    "gen": "Talin"
    }
   },
   "McCutcheon": {
@@ -13643,6 +17035,22 @@
    "bg": {
     "nom": "Маккъчън",
     "gen": "Маккъчън"
+   },
+   "it": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   },
+   "da": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheons"
+   },
+   "et": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheoni"
+   },
+   "fi": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheonin"
    }
   },
   "Bronstein": {
@@ -13681,6 +17089,22 @@
    "bg": {
     "nom": "Бронщайн",
     "gen": "Бронщайн"
+   },
+   "it": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
+   },
+   "da": {
+    "nom": "Bronstein",
+    "gen": "Bronsteins"
+   },
+   "et": {
+    "nom": "Bronštein",
+    "gen": "Bronšteini"
+   },
+   "fi": {
+    "nom": "Bronstein",
+    "gen": "Bronsteinin"
    }
   },
   "Janowski": {
@@ -13719,6 +17143,22 @@
    "bg": {
     "nom": "Яновски",
     "gen": "Яновски"
+   },
+   "it": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "da": {
+    "nom": "Janowski",
+    "gen": "Janowskis"
+   },
+   "et": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "fi": {
+    "nom": "Janowski",
+    "gen": "Janowskin"
    }
   },
   "Staunton": {
@@ -13757,6 +17197,22 @@
    "bg": {
     "nom": "Стонтън",
     "gen": "Стонтън"
+   },
+   "it": {
+    "nom": "Staunton",
+    "gen": "Staunton"
+   },
+   "da": {
+    "nom": "Staunton",
+    "gen": "Stauntons"
+   },
+   "et": {
+    "nom": "Staunton",
+    "gen": "Stauntoni"
+   },
+   "fi": {
+    "nom": "Staunton",
+    "gen": "Stauntonin"
    }
   },
   "Max Lange": {
@@ -13795,6 +17251,22 @@
    "bg": {
     "nom": "Макс Ланге",
     "gen": "Макс Ланге"
+   },
+   "it": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "da": {
+    "nom": "Max Lange",
+    "gen": "Max Langes"
+   },
+   "et": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "fi": {
+    "nom": "Max Lange",
+    "gen": "Max Langen"
    }
   },
   "Petrov": {
@@ -13833,6 +17305,22 @@
    "bg": {
     "nom": "Петров",
     "gen": "Петров"
+   },
+   "it": {
+    "nom": "Petrov",
+    "gen": "Petrov"
+   },
+   "da": {
+    "nom": "Petrov",
+    "gen": "Petrovs"
+   },
+   "et": {
+    "nom": "Petrov",
+    "gen": "Petrovi"
+   },
+   "fi": {
+    "nom": "Petrov",
+    "gen": "Petrovin"
    }
   },
   "Grünfeld": {
@@ -13871,6 +17359,22 @@
    "bg": {
     "nom": "Грюнфелд",
     "gen": "Грюнфелд"
+   },
+   "it": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   },
+   "da": {
+    "nom": "Grünfeld",
+    "gen": "Grünfelds"
+   },
+   "et": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeldi"
+   },
+   "fi": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeldin"
    }
   },
   "Colle": {
@@ -13909,6 +17413,22 @@
    "bg": {
     "nom": "Коле",
     "gen": "Коле"
+   },
+   "it": {
+    "nom": "Colle",
+    "gen": "Colle"
+   },
+   "da": {
+    "nom": "Colle",
+    "gen": "Colles"
+   },
+   "et": {
+    "nom": "Colle",
+    "gen": "Colle"
+   },
+   "fi": {
+    "nom": "Colle",
+    "gen": "Collen"
    }
   },
   "Torre": {
@@ -13947,6 +17467,22 @@
    "bg": {
     "nom": "Торе",
     "gen": "Торе"
+   },
+   "it": {
+    "nom": "Torre",
+    "gen": "Torre"
+   },
+   "da": {
+    "nom": "Torre",
+    "gen": "Torres"
+   },
+   "et": {
+    "nom": "Torre",
+    "gen": "Torre"
+   },
+   "fi": {
+    "nom": "Torre",
+    "gen": "Torren"
    }
   },
   "Réti": {
@@ -13985,6 +17521,22 @@
    "bg": {
     "nom": "Рети",
     "gen": "Рети"
+   },
+   "it": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "da": {
+    "nom": "Réti",
+    "gen": "Rétis"
+   },
+   "et": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "fi": {
+    "nom": "Réti",
+    "gen": "Rétin"
    }
   }
  },
@@ -14024,6 +17576,22 @@
   "bg": {
    "compose_proper_names": false,
    "file_pattern": "(?<![\\w-])(?P<f>[a-h])(?![\\w-])"
+  },
+  "it": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?:[Cc]olonn[ae]|[Pp]edon[ei]) (?P<f>[b-dfgh])\\b"
+  },
+  "da": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?P<f>[a-h])-(?:linje|linjen|linjer|linjerne|bonde|bonden|bønder|bønderne)\\b"
+  },
+  "et": {
+   "compose_proper_names": false,
+   "file_pattern": "\\b(?P<f>[a-h])-(?=vertikaal|ettur)"
+  },
+  "fi": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?P<f>[a-h])-(?=linj|sotil)"
   }
  }
 }

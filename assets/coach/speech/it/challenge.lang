@@ -70,7 +70,7 @@ ch.task.play.hold = Tieni la patta per {n:move}. Io proverò a vincere.
 # ---- Setting up ----------------------------------------------------------------------------------
 # Before the coach plays the first move into a position (once per challenge).
 ch.lead.first = Queste posizioni vengono da partite vere. Gioco io l’ultima mossa, poi tocca a te.
-ch.lead.first.2 = Ogni posizione viene da una partita vera: gioco la mossa che ci ha portato lì, poi giochi tu.
+ch.lead.first.2 = Ogni posizione viene da una partita vera: gioco la mossa che ha portato a quella posizione, poi giochi tu.
 ch.next = Prossima posizione.
 ch.next.2 = Ecco la prossima.
 ch.next.3 = Passiamo alla prossima.

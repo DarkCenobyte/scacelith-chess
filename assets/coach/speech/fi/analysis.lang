@@ -1,0 +1,157 @@
+# Coach speech (Finnish): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Finnish:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+#   "Let's" is the passive ("Katsotaan", "Käydään läpi").
+# - Nobody is "sinä" or "minä" here: the players are "valkea" and "musta" (lower case inside a
+#   sentence, as the glossary says). A piece comes with its side: {piece} {t1} {t2} = "valkean
+#   ratsu", "mustan kuningatar"; forms from common.lang: acc ("valkean ratsun"), part ("valkean
+#   ratsua", after "uhkaa" and "haarukoi"), ade ("valkean ratsulla ei ole puolustajaa").
+# - Moves and lines are never inflected: a noun carries the case ("siirrolla {move}", "siirron
+#   {move} jälkeen"), or the move stands alone as subject.
+# - Counted numbers (common.lang): {m:move_ine} "matti 3 siirrossa", {pts:point_acc} "voittaa 3
+#   pistettä", {pts:point_gen} "3 pisteen verran", {n:mistake} "2 virhettä" ("Valkealla 2
+#   virhettä"), {n:mistake_acc} / {m:blunder_acc} after "teki" ("teki 1 virheen"), and
+#   {acc_white:gen} for the genitive of a bare number ("87 prosentin tarkkuudella").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Käydään tämä peli yhdessä läpi.
+an.start.2 = Käydään peli läpi siirto siirrolta.
+an.start.3 = Tässä on peli. Katsotaan, miten se eteni.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Tämä peli alkaa erikseen asetetusta asemasta. Käydään se läpi.
+an.start.setup.2 = Peli alkaa asetetusta asemasta. Katsotaan, miten se eteni.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+# {opening:def} is the name in the nominative (Finnish has no article); it never starts a sentence.
+an.opening = Avaus on {opening:def}.
+an.opening.2 = Tämä on {opening:def}.
+an.book_exit = Siirrolla {move} peli poistuu tunnetusta avausteoriasta.
+an.book_exit.2 = {move} on ensimmäinen siirto avausteorian ulkopuolella.
+an.book_exit.3 = Avausteoria päättyy tähän, siirtoon {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = Siirto {move} on vakava virhe.
+an.blunder.2 = Tässä {move} on paha virhe.
+an.blunder.3 = Vakava virhe: {move}.
+an.mistake = Siirto {move} on virhe.
+an.mistake.2 = {move} ei ole tässä oikea siirto.
+an.mistake.3 = Virhe: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = Siirto {move} jättää käyttämättä tilaisuuden rangaista tuosta virheestä.
+an.missed_chance.2 = Siirrolla {move} tilaisuus menee ohi.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Nyt {reply:nomate} on matti.
+an.mate_allowed.one.2 = Se sallii siirron {reply:nomate}, ja se on matti.
+an.mate_allowed = Se sallii pakotetun matin {m:move_ine}, alkaen siirrolla {reply:nomate}.
+an.mate_allowed.2 = Nyt on tarjolla pakotettu matti {m:move_ine}, ja se alkaa siirrolla {reply:nomate}.
+an.fork = Nyt {reply} haarukoi {t1:part} ja {t2:part}.
+an.fork.2 = Se sallii siirron {reply}, joka uhkaa yhtä aikaa {t1:part} ja {t2:part}.
+an.fork.3 = {reply} uhkaa samanaikaisesti {t1:part} ja {t2:part}.
+an.hanging = Se jättää {piece:acc} suojattomaksi, ja {reply} lyö sen.
+an.hanging.2 = {piece} jää ilman puolustajaa: {reply} voittaa sen.
+an.hanging.3 = {reply} yksinkertaisesti lyö {piece:acc}, jolla ei ollut puolustajaa.
+an.material = Vastaus {line} voittaa materiaalia {pts:point_gen} verran.
+an.material.2 = Sitten {line} voittaa {pts:point_acc}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Siirto {best:nomate} olisi tehnyt matin.
+an.mate_missed.one.2 = {best:nomate} olisi ollut matti.
+an.mate_missed = {best:nomate} olisi pakottanut matin {m:move_ine}.
+an.mate_missed.2 = Tarjolla oli pakotettu matti {m:move_ine}, alkaen siirrolla {best:nomate}.
+an.missed_capture = {best} olisi voittanut {piece:acc} ilmaiseksi.
+an.missed_capture.2 = {piece:ade} ei ollut puolustajaa: {best} olisi lyönyt sen.
+an.missed_fork = {best} olisi haarukoinut {t1:part} ja {t2:part}.
+an.missed_fork.2 = {best} oli haarukka, joka uhkasi {t1:part} ja {t2:part}.
+
+# The better move, when nothing above named it.
+an.better = {best} olisi ollut vahvempi.
+an.better.2 = Parempi oli {best}.
+an.better.3 = {best} olisi ollut tarkempi.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} on loistava: se uhraa {piece:acc}!
+an.brilliant.2 = Loistava uhraus! {move} tarjoaa {piece:acc}.
+an.brilliant.3 = {move}! Loistava siirto, joka tarjoaa {piece:acc}.
+an.brilliant.mate = Se johtaa pakotettuun mattiin {m:move_ine}.
+an.brilliant.mate.2 = Ja se pakottaa matin {m:move_ine}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} on ainoa siirto, joka säilyttää edun.
+an.only.win.2 = Vain {move} säilyttää edun tässä. Hyvin löydetty.
+an.only.hold = {move} on ainoa siirto, joka säilyttää tasapainon.
+an.only.hold.2 = Vain {move} pitää aseman tässä.
+an.only.defend = {move} on ainoa siirto, joka pitää taistelun käynnissä.
+an.only.defend.2 = Vain {move} pitää pelin hengissä tässä. Hyvä puolustus.
+an.only.best = {move} on tässä ylivoimaisesti vahvin siirto.
+an.only.best.2 = Tarkkaa peliä: {move} on paljon vahvempi kuin mikään muu.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} on hieman epätarkka: {best} olisi ollut tarkempi.
+an.inaccuracy.2 = Ei aivan paras: {best} olisi ollut tarkempi kuin {move}.
+an.interesting = {move} on mielenkiintoinen idea, joka tarjoaa {piece:acc}.
+an.interesting.2 = Mielenkiintoinen yritys: {move} uhraa {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Valkealla on nyt pakotettu matti {m:move_ine}.
+an.mate_on.white.2 = Tästä eteenpäin valkea voi pakottaa matin {m:move_ine}.
+an.mate_on.black = Mustalla on nyt pakotettu matti {m:move_ine}.
+an.mate_on.black.2 = Tästä eteenpäin musta voi pakottaa matin {m:move_ine}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Matti. Valkea voittaa pelin.
+an.end.mate.white.2 = Ja se on matti: valkea voittaa.
+an.end.mate.black = Matti. Musta voittaa pelin.
+an.end.mate.black.2 = Ja se on matti: musta voittaa.
+an.end.resigned.white = Musta luovutti, joten valkea voittaa pelin.
+an.end.resigned.white.2 = Peli päättyy tähän: musta luovuttaa, ja valkea voittaa.
+an.end.resigned.black = Valkea luovutti, joten musta voittaa pelin.
+an.end.resigned.black.2 = Peli päättyy tähän: valkea luovuttaa, ja musta voittaa.
+an.end.timeout.white = Mustalta loppui aika, joten valkea voittaa.
+an.end.timeout.white.2 = Valkea voittaa ajalla.
+an.end.timeout.black = Valkealta loppui aika, joten musta voittaa.
+an.end.timeout.black.2 = Musta voittaa ajalla.
+an.end.win.white = Peli päättyy valkean voittoon.
+an.end.win.white.2 = Valkea voittaa pelin.
+an.end.win.black = Peli päättyy mustan voittoon.
+an.end.win.black.2 = Musta voittaa pelin.
+an.end.stalemate = Patti: peli päättyy tasapeliin.
+an.end.stalemate.2 = Asema on patti, joten peli on tasapeli.
+an.end.draw.agreement = Pelaajat sopivat tasapelistä.
+an.end.draw.agreement.2 = Peli päättyy sovittuun tasapeliin.
+an.end.draw.repetition = Peli päättyy tasapeliin aseman toistumisen vuoksi.
+an.end.draw.repetition.2 = Sama asema toistui jälleen: tasapeli.
+an.end.draw.fifty = Peli päättyy tasapeliin viidenkymmenen siirron säännön perusteella.
+an.end.draw.fifty.2 = Viisikymmentä siirtoa ilman lyöntiä tai sotilaan siirtoa: tasapeli.
+an.end.draw.seventy_five = Peli päättyy tasapeliin seitsemänkymmenenviiden siirron säännön perusteella.
+an.end.draw.seventy_five.2 = Seitsemänkymmentäviisi siirtoa ilman lyöntiä tai sotilaan siirtoa: tasapeli.
+an.end.draw.material = Matti ei ole enää mahdollinen: peli on tasapeli.
+an.end.draw.material.2 = Kumpikaan ei pysty enää tekemään mattia, joten peli on tasapeli.
+an.end.draw = Peli päättyy tasapeliin.
+an.end.draw.2 = Tasapeli.
+an.end.unfinished = Peli päättyy tähän keskeneräisenä.
+an.end.unfinished.2 = Tähän peli pysähtyy: sitä ei pelattu loppuun.
+an.end.accuracy = Tarkkuus: valkealla {acc_white} prosenttia, mustalla {acc_black}.
+an.end.accuracy.2 = Valkea pelasi {acc_white:gen} prosentin tarkkuudella, musta {acc_black:gen} prosentin.
+# "Vakava virhe" is the blunder (glossary), so "serious errors" (mistakes and blunders together) is
+# "isot virheet" in the .2 lines.
+an.end.clean.white = Valkea ei tehnyt virheitä eikä vakavia virheitä.
+an.end.clean.white.2 = Valkea pelasi ilman isoja virheitä.
+an.end.clean.black = Musta ei tehnyt virheitä eikä vakavia virheitä.
+an.end.clean.black.2 = Musta pelasi ilman isoja virheitä.
+an.end.mistakes.white = Valkea teki {n:mistake_acc} eikä yhtään vakavaa virhettä.
+an.end.mistakes.white.2 = Valkealla {n:mistake}, ei yhtään vakavaa virhettä.
+an.end.mistakes.black = Musta teki {n:mistake_acc} eikä yhtään vakavaa virhettä.
+an.end.mistakes.black.2 = Mustalla {n:mistake}, ei yhtään vakavaa virhettä.
+an.end.blunders.white = Valkea teki {m:blunder_acc}.
+an.end.blunders.white.2 = Valkealla {m:blunder}.
+an.end.blunders.black = Musta teki {m:blunder_acc}.
+an.end.blunders.black.2 = Mustalla {m:blunder}.
+an.end.errors.white = Valkea teki {n:mistake_acc} ja {m:blunder_acc}.
+an.end.errors.white.2 = Valkealla {n:mistake} ja {m:blunder}.
+an.end.errors.black = Musta teki {n:mistake_acc} ja {m:blunder_acc}.
+an.end.errors.black.2 = Mustalla {n:mistake} ja {m:blunder}.
