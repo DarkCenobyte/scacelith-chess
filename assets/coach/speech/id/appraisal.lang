@@ -10,7 +10,8 @@
 #   appraisal.reason.*  a complement said right after "remis", no comma ("Remis karena pat.").
 #   theme.*             a verb phrase, no full stop, said after a colon or after "berlatihlah",
 #                       "biasakan", "coba".
-#   appraisal.level.*   the level name in title case, always after the word "level" ("level Pemula").
+#   appraisal.level.*   the level name exactly as assets/i18n/id.lang shows it (coach.level.<n>.name),
+#                       always after the word "tingkat" (the UI's word for a level): "tingkat Pemula".
 # {opening:def} inside a sentence, {opening} when the name stands alone or after a label.
 
 # ---- Names used inside the lines ------------------------------------------------------------------
@@ -23,11 +24,11 @@ appraisal.reason.repetition = karena pengulangan posisi
 appraisal.reason.fifty = karena aturan lima puluh langkah
 appraisal.reason.agreement = atas kesepakatan
 appraisal.reason.other = sesuai aturan
-appraisal.level.l1 = Langkah Pertama
+appraisal.level.l1 = Langkah awal
 appraisal.level.l2 = Pemula
-appraisal.level.l3 = Pemain Berkembang
-appraisal.level.l4 = Pemain Klub
-appraisal.level.l5 = Pemain Klub Kuat
+appraisal.level.l3 = Menengah
+appraisal.level.l4 = Pemain klub
+appraisal.level.l5 = Pemain klub kuat
 appraisal.level.l6 = Ahli
 # What to practise, after "Satu hal untuk dilatih:", "berlatihlah", "biasakan", "coba" (a verb phrase,
 # no full stop).
@@ -45,7 +46,7 @@ theme.hanging = menjaga buah caturmu tetap terlindungi
 theme.exchange = menghitung penyerang dan pelindung sebelum bertukar
 theme.missed_capture = mencari buah gratis lebih dulu
 theme.missed_fork = mencari serangan gandamu sendiri
-theme.promotion = menghitung adu cepat pion dan memakai aturan kotak pion
+theme.promotion = menghitung adu cepat pion dan memakai aturan bujur sangkar pion
 theme.king_safety = menjaga rajamu tetap aman di balik pion-pionnya
 theme.bad_trade = memilih buah mana yang sebaiknya ditukar
 theme.opening = mengembangkan buah caturmu dan melakukan rokade lebih awal
@@ -111,7 +112,7 @@ appraisal.open.loss.b2.3 = Permainan yang bagus. Ayo kita lihat apa yang bisa ki
 appraisal.open.loss.b3 = Permainan yang bagus.
 appraisal.open.loss.b3.2 = Terima kasih atas permainannya.
 appraisal.open.loss.b3.3 = Permainan yang bagus. Ayo kita lihat.
-appraisal.open.loss_close.b3 = Pertarungan yang bagus. Lama sekali permainannya berjalan ketat.
+appraisal.open.loss_close.b3 = Pertarungan yang bagus. Permainannya lama berjalan ketat.
 appraisal.open.loss_close.b3.2 = Pertarungan yang bagus: posisinya lama seimbang.
 appraisal.open.loss.b4 = Permainan yang bagus. Ini yang menentukan hasilnya.
 appraisal.open.loss.b4.2 = Permainan yang bagus. Satu momen yang menentukan.
@@ -345,7 +346,7 @@ appraisal.improve.was_winning.b1.2 = Kamu bermain hebat sampai langkah {crit_no:
 appraisal.improve.was_winning.b2 = Kamu dalam posisi menang sampai langkah {crit_no:ord}. Lain kali, coba {theme}.
 appraisal.improve.was_winning.b2.2 = Sampai langkah {crit_no:ord}, posisimu menang. Hal yang perlu dilatih: {theme}.
 appraisal.improve.was_winning.b3 = Kamu dalam posisi menang sampai langkah {crit_no:ord}. Dengan {crit_best}, keunggulanmu tetap terjaga.
-appraisal.improve.was_winning.b3.2 = Sampai langkah {crit_no:ord}, posisimu menang; dengan {crit_best}, kemenangan itu tetap terjaga.
+appraisal.improve.was_winning.b3.2 = Sampai langkah {crit_no:ord}, posisimu menang; {crit_best} bisa mempertahankannya.
 appraisal.improve.was_winning.b4 = Kamu dalam posisi menang sampai langkah {crit_no:ord}. {crit_best} menjaga keunggulanmu.
 appraisal.improve.was_winning.b4.2 = Posisi menang sampai langkah {crit_no:ord}; {crit_best} menjaganya.
 appraisal.improve.was_winning.b5 = Posisi menang sampai langkah {crit_no:ord}: {crit_best}, {eval}.
@@ -407,25 +408,25 @@ appraisal.end.b5.3 = Lagi?
 appraisal.end.b6 = Satu lagi?
 appraisal.end.b6.2 = Permainan berikutnya?
 appraisal.end.b6.3 = Lagi?
-appraisal.end.up.b1 = Kamu sudah siap untuk level {level}. Mau mencobanya?
-appraisal.end.up.b1.2 = Menurutku kamu sudah siap untuk level {level}. Kita coba?
-appraisal.end.up.b2 = Kamu sudah siap untuk level {level}. Mau mencobanya?
-appraisal.end.up.b2.2 = Bagaimana kalau berikutnya level {level}? Menurutku kamu sudah siap.
-appraisal.end.up.b3 = Level ini sudah terlalu mudah untukmu: coba level {level}.
-appraisal.end.up.b3.2 = Siap untuk level {level}? Menurutku sudah.
-appraisal.end.up.b4 = Level ini sudah terlalu mudah untukmu: coba level {level}.
-appraisal.end.up.b4.2 = Saatnya naik ke level {level}?
-appraisal.end.up.b5 = Berikutnya, coba level {level}.
-appraisal.end.up.b5.2 = Berikutnya level {level}?
-appraisal.end.up.b6 = Berikutnya, coba level {level}.
-appraisal.end.up.b6.2 = Berikutnya level {level}?
-appraisal.end.down.b2 = Ayo main satu permainan di level {level}, untuk melatih ide-ide ini.
-appraisal.end.down.b2.2 = Bagaimana kalau satu permainan di level {level}, untuk berlatih?
-appraisal.end.down.b3 = Mau main satu permainan di level {level}, untuk melatih ide-ide ini?
-appraisal.end.down.b3.2 = Satu permainan di level {level} bisa membantu melatih ide-ide ini.
-appraisal.end.down.b4 = Satu permainan di level {level} mungkin bisa membantu melatih ide-ide ini.
-appraisal.end.down.b4.2 = Mungkin satu permainan di level {level}, untuk berlatih?
-appraisal.end.down.b5 = Mungkin satu permainan di level {level}?
-appraisal.end.down.b5.2 = Level {level}, untuk berlatih?
-appraisal.end.down.b6 = Mungkin satu permainan di level {level}?
-appraisal.end.down.b6.2 = Level {level}, untuk berlatih?
+appraisal.end.up.b1 = Kamu sudah siap untuk tingkat {level}. Mau mencobanya?
+appraisal.end.up.b1.2 = Menurutku kamu sudah siap untuk tingkat {level}. Kita coba?
+appraisal.end.up.b2 = Kamu sudah siap untuk tingkat {level}. Mau mencobanya?
+appraisal.end.up.b2.2 = Bagaimana kalau berikutnya tingkat {level}? Menurutku kamu sudah siap.
+appraisal.end.up.b3 = Tingkat ini sudah terlalu mudah untukmu: coba tingkat {level}.
+appraisal.end.up.b3.2 = Siap untuk tingkat {level}? Menurutku sudah.
+appraisal.end.up.b4 = Tingkat ini sudah terlalu mudah untukmu: coba tingkat {level}.
+appraisal.end.up.b4.2 = Saatnya naik ke tingkat {level}?
+appraisal.end.up.b5 = Berikutnya, coba tingkat {level}.
+appraisal.end.up.b5.2 = Berikutnya tingkat {level}?
+appraisal.end.up.b6 = Berikutnya, coba tingkat {level}.
+appraisal.end.up.b6.2 = Berikutnya tingkat {level}?
+appraisal.end.down.b2 = Ayo main satu permainan di tingkat {level}, untuk melatih ide-ide ini.
+appraisal.end.down.b2.2 = Bagaimana kalau satu permainan di tingkat {level}, untuk berlatih?
+appraisal.end.down.b3 = Mau main satu permainan di tingkat {level}, untuk melatih ide-ide ini?
+appraisal.end.down.b3.2 = Satu permainan di tingkat {level} bisa membantu melatih ide-ide ini.
+appraisal.end.down.b4 = Satu permainan di tingkat {level} mungkin bisa membantu melatih ide-ide ini.
+appraisal.end.down.b4.2 = Mungkin satu permainan di tingkat {level}, untuk berlatih?
+appraisal.end.down.b5 = Mungkin satu permainan di tingkat {level}?
+appraisal.end.down.b5.2 = Tingkat {level}, untuk berlatih?
+appraisal.end.down.b6 = Mungkin satu permainan di tingkat {level}?
+appraisal.end.down.b6.2 = Tingkat {level}, untuk berlatih?

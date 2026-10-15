@@ -31,12 +31,12 @@ event.colour.black = Aku bermain sebagai Putih, jadi aku yang mulai.
 event.colour.black.2 = Kali ini kamu bermain sebagai Hitam: aku yang melangkah lebih dulu.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-# Level names (sentence case, as the coach page should show them): Langkah pertama, Pemula,
-# Berkembang, Pemain klub, Pemain klub kuat, Ahli. Keep them in step with assets/i18n/id.lang
+# Level names exactly as the coach page shows them: Langkah awal, Pemula,
+# Menengah, Pemain klub, Pemain klub kuat, Ahli. Keep them in step with assets/i18n/id.lang
 # coach.level.<n>.name. "Play gently" = "tidak bermain terlalu keras" (the coach plays below strength).
-event.level.l1 = Langkah pertama: aku tidak bermain terlalu keras, dan setiap kesalahan kujelaskan dengan kata-kata sederhana.
+event.level.l1 = Langkah awal: aku tidak bermain terlalu keras, dan setiap kesalahan kujelaskan dengan kata-kata sederhana.
 event.level.l2 = Pemula: aku bermain sedikit lebih kuat, dan aku menyebut nama taktik sederhana seperti garpu dan kunci.
-event.level.l3 = Berkembang: aku membahas rencana dan struktur pion, dan aku menunjukkan variasi pendek.
+event.level.l3 = Menengah: aku membahas rencana dan struktur pion, dan aku menunjukkan variasi pendek.
 event.level.l4 = Pemain klub: aku memberikan evaluasi dalam satuan pion dan menyarankan langkah-langkah kandidat.
 event.level.l5 = Pemain klub kuat: komentar singkat, dan variasi yang lebih panjang kalau memang perlu.
 event.level.l6 = Ahli: aku bermain dengan kekuatan penuh dan hanya mengomentari momen-momen kritis.

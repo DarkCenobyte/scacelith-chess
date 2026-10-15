@@ -171,7 +171,7 @@ ex.reveal.b2.2 = Langkah yang lebih baik adalah {your} ke {sq}.
 # ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
 ex.rewind.b1 = Ayo kita kembalikan buah-buahnya ke tempat semula.
 ex.rewind.b1.2 = Sekarang aku kembalikan semuanya seperti semula.
-ex.rewind.b1.3 = Biar aku kembalikan buah-buahnya.
+ex.rewind.b1.3 = Biar kukembalikan buah-buahnya.
 ex.rewind.b2 = Ayo kita kembalikan semuanya.
 ex.rewind.b2.2 = Kembali ke posisi tadi.
 ex.rewind.b2.3 = Aku kembalikan buah-buahnya.
@@ -543,7 +543,7 @@ ex.back_rank.b5.2 = {line}; {your} tak punya ruang napas.
 ex.back_rank.b6 = {line}, baris belakang; {your} terkurung.
 ex.back_rank.b6.2 = Baris belakang: {line} ({your}).
 ex.back_rank.tip.b1 = Beri rajamu sedikit celah: majukan satu pion di depannya.
-ex.back_rank.tip.b1.2 = Raja di belakang tiga pion bisa kena skakmat di baris belakang. Beri ia sedikit ruang.
+ex.back_rank.tip.b1.2 = Raja di belakang tiga pion bisa kena skakmat di baris belakang. Beri raja itu sedikit ruang.
 
 # ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
 ex.hanging.b1 = {your} di {sq} tidak punya pelindung. {my} bisa memakannya gratis.
@@ -698,7 +698,7 @@ ex.promotion.b6 = {your} di luar bujur sangkar; aku mendapat menteri di {sq}.
 ex.promotion.b6.2 = {line}, lalu promosi menjadi menteri di {sq} ({your} terlambat).
 # The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
 ex.promotion_missed.b1 = Tadi pionmu bisa berlari ke {sq} dan menjadi menteri!
-ex.promotion_missed.b1.2 = Lihat petak {sq}! Pionmu bisa melaju ke sana.
+ex.promotion_missed.b1.2 = Lihat petak {sq}! Tadi pionmu bisa melaju ke sana.
 ex.promotion_missed.b2 = Tadi pionmu bisa berlari ke {sq}. Majukan pion bebas!
 ex.promotion_missed.b2.2 = Tidak ada yang menghalangi pionmu menuju {sq}.
 ex.promotion_missed.b3 = {best} memenangkan adu cepat ke {sq}.
@@ -726,7 +726,7 @@ ex.king_shield.b6 = {move} melemahkan {your}: {line}.
 ex.king_shield.b6.2 = {line}; {your} terlalu terbuka.
 # The king is exposed (in the centre, walking out, many attackers).
 ex.king_exposed.b1 = {your} dalam bahaya. Buah-buahku sedang mendekatinya.
-ex.king_exposed.b1.2 = Lihat betapa terbukanya {your}. Jaga ia tetap aman di balik pion-pionnya.
+ex.king_exposed.b1.2 = Lihat betapa terbukanya {your}. Jaga agar ia tetap aman di balik pion-pionnya.
 ex.king_exposed.b2 = {your} terlalu terbuka. Sekarang aku bisa memberi banyak skak.
 ex.king_exposed.b2.2 = Hati-hati: {your} tidak punya tempat berlindung, dan buah-buahku menyerangnya.
 ex.king_exposed.b3 = {your} terbuka; buah-buahku bisa menyerangnya dengan skak.
@@ -739,7 +739,7 @@ ex.king_exposed.b6 = {line}; {your} terbuka.
 ex.king_exposed.b6.2 = {your} terlalu terbuka: {line}.
 
 # ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
-ex.bad_trade.b3 = Pertukaran ini menuju permainan akhir pion yang aku menangkan.
+ex.bad_trade.b3 = Pertukaran ini menuju permainan akhir pion yang kumenangkan.
 ex.bad_trade.b3.2 = Setelah {line}, hanya pion yang tersisa, dan rajaku lebih unggul.
 ex.bad_trade.b4 = Rangkaian pertukaran ini menuju permainan akhir pion yang kalah: {line}.
 ex.bad_trade.b4.2 = Menukar menuju permainan akhir pion ini berarti kalah.
@@ -780,10 +780,10 @@ ex.push_passed.b6 = {best}: {eval}.
 ex.push_passed.b6.2 = {best}, pion bebas.
 # Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
 ex.king_active.b1 = Majukan {your}! Di permainan akhir, raja adalah buah yang kuat.
-ex.king_active.b1.2 = Sekarang {your} bisa ikut bertarung. Bawa ia ke tengah.
+ex.king_active.b1.2 = Sekarang {your} bisa ikut bertarung. Bawa ke tengah.
 ex.king_active.b1.3 = Dengan sedikit buah tersisa, {your} sebaiknya keluar dan membantu.
-ex.king_active.b2 = Di permainan akhir, gunakan {your}: bawa ia ke pusat.
-ex.king_active.b2.2 = {your} sebaiknya aktif sekarang. Bawa ia maju.
+ex.king_active.b2 = Di permainan akhir, gunakan {your}: bawa ke pusat.
+ex.king_active.b2.2 = {your} sebaiknya aktif sekarang. Majukan.
 ex.king_active.b3 = {best} mengaktifkan raja. Di permainan akhir, raja ikut bertarung.
 ex.king_active.b3.2 = {best}: sekarang tempat raja di pusat.
 ex.king_active.b4 = {best} membawa raja ke pusat.
@@ -810,9 +810,9 @@ tip.early_queen.b1.2 = Hati-hati memainkan {your} sedini ini: buah-buahku bisa m
 tip.early_queen.b1.3 = Menjalankan {your} memang seru, tapi kembangkan dulu buah-buah kecil: kuda dan gajah.
 tip.early_queen.b2 = Menjalankan {your} sedini ini membuatku bisa menyerangnya dan menang waktu.
 tip.early_queen.b2.2 = {your} sudah keluar secepat ini? Kuda dan gajah dulu!
-tip.early_queen.b3 = {your} keluar terlalu dini, dan aku bisa menyerangnya sambil mendapat tempo.
+tip.early_queen.b3 = {your} keluar sedini ini, jadi aku bisa menyerangnya sambil mendapat tempo.
 tip.early_queen.b3.2 = {your} mudah dikejar sedini ini. Kembangkan buah dulu.
-tip.queen_grab.b1 = {your} memakan pion yang jauh, dan sekarang ia bisa dalam bahaya.
+tip.queen_grab.b1 = {your} memakan pion yang jauh, dan sekarang ia bisa jatuh dalam kesulitan.
 tip.queen_grab.b1.2 = Mengambil pion dengan {your} membuang waktu. Kembangkan buah dulu!
 tip.queen_grab.b2 = {your} pergi memburu pion di pinggir. Itu membuang banyak waktu.
 tip.queen_grab.b2.2 = Hati-hati mengirim {your} untuk mengejar pion yang jauh.
@@ -855,7 +855,7 @@ tip.centre.b2.2 = Kamu menyerahkan pusat kepadaku. Lihat petak {sq}.
 tip.centre.b3 = Kamu tidak memperebutkan pusat; petak {sq} milikku.
 tip.centre.b3.2 = Perebutkan pusat di sekitar petak {sq}.
 # Endgame technique tips.
-tip.mate_technique.b1 = Kalau tinggal raja sendirian, dorong ia ke tepi papan, lalu beri skakmat.
+tip.mate_technique.b1 = Kalau tinggal raja sendirian, dorong raja itu ke tepi papan, lalu beri skakmat.
 tip.mate_technique.b1.2 = Tips: desak rajaku ke tepi. Dekatkan juga rajamu.
 tip.fifty.b1 = Hati-hati: setelah lima puluh langkah tanpa ada yang dimakan atau pion bergerak, hasilnya remis.
 tip.fifty.b1.2 = Waktunya makin sempit: lima puluh langkah tanpa ada yang dimakan atau pion bergerak berarti remis.
@@ -981,5 +981,5 @@ tb.found = Itu langkah yang ada di pikiranku.
 tb.found.2 = Tepat, itu dia.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
-tb.none_left = Sayang sekali, jatah ambil kembali langkah di permainan ini sudah habis.
-tb.none_left.2 = Kamu tidak punya jatah ambil kembali langkah lagi di permainan ini.
+tb.none_left = Sayang sekali, kesempatan ambil kembali langkah di permainan ini sudah habis.
+tb.none_left.2 = Kamu tidak punya kesempatan ambil kembali langkah lagi di permainan ini.
