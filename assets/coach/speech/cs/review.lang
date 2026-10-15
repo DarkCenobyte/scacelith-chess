@@ -1,0 +1,508 @@
+# Coach speech (Czech): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "ty"; the coach is male ("nečekal jsem", "já bych zahrál"). The player's
+# gender is unknown: no second-person past tense or conditional ("přehlédl jsi", "mohl bys"): the
+# present or future ("ztrácíš", "nezachráníš"), impersonal phrasing ("šlo zahrát", "byl tu mat",
+# "uniklo ti"), nouns, or a piece as subject ("{your} měl{your:past} lepší tah").
+# Pieces carry their possessive; forms from common.lang: acc gen dat loc ins, bare_ins ("táhni
+# jezdcem"), refl_acc refl_gen refl_ins ("svého jezdce": after an imperative or a verb whose subject
+# is the player), pron_acc pron_dat pron_ins npron_* ("za ním / za ní"), alone ("sám / sama"),
+# poss_ins, and the endings past ("visel{my:past}") and adj / adj_acc ("kter{my:adj}").
+# A move as subject: "Tah {best} byl ..." or the impersonal neuter "Lepší bylo {best}", as Czech
+# annotations write it. Mate in N: "mat {m:ord_ins} tahem" (spoken "mat třetím tahem") or "mat za
+# {m:move}" (simpler, levels 1-3). Counted numbers: {pts:point}, {n:time} ("dvakrát"),
+# {n:attacker_acc}, {n2:defender_acc}, {n:square}; a piece's value "je za {n:point}".
+# Only prepositions that never change before {sq}, {move}, {best}, {reply}, {line} ("na", "po",
+# "do", "od", "o", "za"), or a fixed noun in between ("z pole {sq}", "k poli {sq}", "tahem {move}").
+# Levels 1-2: simple words, short sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Šach! Můj král je pod útokem.
+ann.check.human.b1.2 = Šach! Napadáš mého krále.
+ann.check.human.b1.3 = To je šach! Můj král se musí ze šachu dostat.
+ann.check.human = Šach.
+ann.check.human.2 = Šach!
+ann.check.human.3 = A to je šach.
+# The coach gives check.
+ann.check.coach = Šach!
+ann.check.coach.2 = Šach.
+ann.check.coach.3 = A šach!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = To znamená, že {your} je pod útokem. Musíš {your:pron_acc} dostat ze šachu.
+ann.check.coach.first.2 = Šach znamená, že {your} je pod útokem. Uhni {your:pron_ins}, zacloň, nebo vezmi moji figuru.
+ann.double_check.coach = Dvojitý šach! Dvě moje figury napadají tvého krále najednou, takže musí ustoupit.
+ann.double_check.coach.2 = To je dvojitý šach: teď pomůže jen tah králem.
+ann.double_check.human = Dvojitý šach! Dvě tvoje figury napadají mého krále najednou, takže musí ustoupit.
+ann.double_check.human.2 = Dvojitý šach! Teď mě zachrání jen tah králem.
+# The player checkmates the coach.
+ann.mate.human.b1 = Mat! Vítězství je tvoje! Můj král nemá kam utéct.
+ann.mate.human.b1.2 = To je mat! Výborně, partie je tvoje!
+ann.mate.human.b1.3 = Mat! Můj král je v pasti. Gratuluju!
+ann.mate.human = Mat. Dobře zahráno.
+ann.mate.human.2 = To je mat. Gratuluju.
+ann.mate.human.3 = Mat! Pěkná práce.
+# The coach checkmates the player.
+ann.mate.coach.b1 = To je mat. Tvůj král nemá kam uniknout.
+ann.mate.coach.b1.2 = Mat. Tvůj král je v šachu a nemůže utéct.
+ann.mate.coach.b1.3 = Obávám se, že je to mat. Tvůj král nemůže uniknout.
+ann.mate.coach = Mat.
+ann.mate.coach.2 = A to je mat.
+ann.mate.coach.3 = Obávám se, že je to mat.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Jejda! Tímhle tahem mi něco daruješ.
+ex.verdict.blunder.b1.2 = Pozor! Tenhle tah tě může něco stát.
+ex.verdict.blunder.b1.3 = Ale počkej. Tenhle tah má háček.
+ex.verdict.blunder.b2 = Hmm, tenhle tah má háček.
+ex.verdict.blunder.b2.2 = To je velká chyba.
+ex.verdict.blunder.b2.3 = Pozor, tenhle tah tě něco stojí.
+ex.verdict.blunder.b3 = To je hrubá chyba.
+ex.verdict.blunder.b3.2 = {move} je opravdová chyba.
+ex.verdict.blunder.b3.3 = Au, {move} je velká chyba.
+ex.verdict.blunder.b4 = {move} je hrubá chyba.
+ex.verdict.blunder.b4.2 = {move} je vážná chyba.
+ex.verdict.blunder.b4.3 = Obávám se, že je to hrubá chyba.
+ex.verdict.blunder.b5 = {move} je vážná chyba.
+ex.verdict.blunder.b5.2 = {move} je hrubá chyba.
+ex.verdict.blunder.b5.3 = {move} je chyba, která tě vyjde draho.
+ex.verdict.blunder.b6 = {move} je závažná chyba.
+ex.verdict.blunder.b6.2 = {move} je hrubá chyba.
+ex.verdict.blunder.b6.3 = {move}? Hrubá chyba.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Jejda! Moje hrozba zůstala bez odpovědi.
+ex.verdict.ignored.b1.2 = Pozor! Moje hrozba pořád platila.
+ex.verdict.ignored.b1.3 = Ale počkej. A co moje hrozba?
+ex.verdict.ignored.b2 = Hmm, moje hrozba pořád platila.
+ex.verdict.ignored.b2.2 = Moje hrozba zůstala bez odpovědi.
+ex.verdict.ignored.b2.3 = Pozor, na moji hrozbu bylo potřeba odpovědět.
+ex.verdict.mistake.b3 = To není dobrý tah.
+ex.verdict.mistake.b3.2 = Hmm, {move} má háček.
+ex.verdict.mistake.b3.3 = To je chyba.
+ex.verdict.mistake.b4 = {move} je chyba.
+ex.verdict.mistake.b4.2 = {move} není dobrý tah.
+ex.verdict.mistake.b4.3 = To je chyba.
+ex.verdict.mistake.b5 = {move} je jasná chyba.
+ex.verdict.mistake.b5.2 = {move} je chyba.
+ex.verdict.mistake.b5.3 = {move} není dobrý tah.
+ex.verdict.mistake.b6 = {move} je chyba.
+ex.verdict.mistake.b6.2 = {move}? Chyba.
+ex.verdict.mistake.b6.3 = {move} ne.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Ujde to, ale o něco lepší bylo {best}.
+ex.verdict.inaccuracy.b3.2 = O trochu přesnější bylo {best}.
+ex.verdict.inaccuracy.b3.3 = Malé zaváhání: tady bylo lepší {best}.
+ex.verdict.inaccuracy.b4 = Nepřesné: přesnější bylo {best}.
+ex.verdict.inaccuracy.b4.2 = Drobná nepřesnost. O něco lepší bylo {best}.
+ex.verdict.inaccuracy.b4.3 = Ne úplně nejlepší: přesnější bylo {best}.
+ex.verdict.inaccuracy.b5 = {move} je nepřesný tah; silnější bylo {best}.
+ex.verdict.inaccuracy.b5.2 = Trochu nepřesné. Já bych zahrál {best}.
+ex.verdict.inaccuracy.b5.3 = Přesnější než {move} bylo {best}.
+ex.verdict.inaccuracy.b6 = {move} je nepřesnost; {best}.
+ex.verdict.inaccuracy.b6.2 = Nepřesné. {best}.
+ex.verdict.inaccuracy.b6.3 = Lepší bylo {best}.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = O něco přesnější bylo možná {best}.
+ex.verdict.inaccuracy.maybe.2 = Já bych možná zahrál {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Ten tah vypadá pochybně.
+ex.verdict.dubious.2 = Ten tah se zdá pochybný.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ale počkej! Něco dobrého ti uniklo.
+ex.verdict.missed.b1.2 = Podívej se znovu! Bylo tu něco lepšího.
+ex.verdict.missed.b1.3 = Počkej, tady se nabízela šance!
+ex.verdict.missed.b2 = Tady ti unikla šance.
+ex.verdict.missed.b2.2 = Hmm, bylo tu něco lepšího.
+ex.verdict.missed.b2.3 = Počkej, tady se nabízel skvělý tah.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Lepší bylo {best}.
+ex.better.b3.2 = Lepší tah byl {best}.
+ex.better.b3.3 = Místo toho bylo dobré {best}.
+ex.better.b4 = Silnější bylo {best}.
+ex.better.b4.2 = Správný tah byl {best}.
+ex.better.b4.3 = Lepší bylo {best}.
+ex.better.b5 = {best} s ideou {line}.
+ex.better.b5.2 = Správně bylo {best}: {line}.
+ex.better.b5.3 = Lepší bylo {best} a potom {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Místo toho {best}, {eval}.
+ex.better.b6.3 = Po {best}: {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = {your:ins} se dal zahrát lepší tah.
+ex.hint.b1.2 = {your} měl{your:past} lepší tah.
+ex.hint.b2 = {your} měl{your:past} lepší tah.
+ex.hint.b2.2 = {your:ins} se dal zahrát lepší tah.
+ex.hint.b3 = {your} měl{your:past} lepší tah.
+ex.hint.b3.2 = {your:ins} šlo zahrát něco lepšího.
+ex.hint.b4 = {your} měl{your:past} lepší tah.
+ex.hint.b4.2 = Podívej se znovu na {your:refl_acc}: měl{your:past} něco lepšího.
+ex.hint.b5 = {your} měl{your:past} silnější tah.
+ex.hint.b5.2 = {your:ins} se dal zahrát silnější tah.
+ex.hint.b6 = {your} měl{your:past} lepší možnost.
+ex.hint.b6.2 = Podívej se znovu na {your:refl_acc}.
+ex.hint.move = Byl tu lepší tah.
+ex.hint.move.2 = Tady se nabízel lepší tah.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} měl{your:past} lepší tah. Ten tah získává materiál.
+ex.hint.gain.b1.2 = {your:ins} se dal zahrát lepší tah. Získává materiál.
+ex.hint.gain.b2 = {your} měl{your:past} lepší tah. Ten tah získává materiál.
+ex.hint.gain.b2.2 = {your:ins} se dal zahrát tah, který získává materiál.
+ex.hint.gain.b3 = {your} měl{your:past} lepší tah, a to takový, který získává materiál.
+ex.hint.gain.b3.2 = {your:ins} se dal zahrát tah, který získává materiál.
+ex.hint.gain.b4 = {your} měl{your:past} tah, který získává materiál.
+ex.hint.gain.b4.2 = Podívej se znovu na {your:refl_acc}: měl{your:past} tah, který získává materiál.
+ex.hint.gain.b5 = {your} měl{your:past} silnější tah, a to takový, který získává materiál.
+ex.hint.gain.b5.2 = {your:ins} se dal zahrát tah, který získává materiál.
+ex.hint.gain.b6 = {your} měl{your:past} tah, který získává materiál.
+ex.hint.gain.b6.2 = Podívej se znovu na {your:refl_acc}: šlo získat materiál.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Lepší bylo táhnout {your:bare_ins} na {sq}.
+ex.reveal.b1.2 = {your} mohl{your:past} jít na {sq}. To bylo lepší.
+ex.reveal.b2 = {your} na {sq}, to byl lepší tah.
+ex.reveal.b2.2 = Lepší bylo táhnout {your:bare_ins} na {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Vrátíme figury zpátky.
+ex.rewind.b1.2 = Teď všechno vrátím tam, kde to bylo.
+ex.rewind.b1.3 = Postavím figury zpátky.
+ex.rewind.b2 = Vrátíme všechno zpátky.
+ex.rewind.b2.2 = Zpátky do původní pozice.
+ex.rewind.b2.3 = Vrátím figury zpátky.
+ex.rewind.b3 = Zpátky k partii.
+ex.rewind.b3.2 = Vrátíme se.
+ex.rewind.b3.3 = Vraťme se k pozici.
+ex.rewind.b4 = Zpět k partii.
+ex.rewind.b4.2 = Zpět.
+ex.rewind.b4.3 = Vraťme se.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Chceš zkusit jiný tah?
+ex.offer.b1.2 = Chceš ten tah vrátit a zkusit to znovu?
+ex.offer.b1.3 = Zkusíme jiný tah?
+ex.offer.b2 = Nezkusíš jiný tah?
+ex.offer.b2.2 = Chceš tah vrátit?
+ex.offer.b2.3 = Zkusíš to znovu?
+ex.offer.b3 = Chceš tah vrátit?
+ex.offer.b3.2 = Chceš to zkusit znovu?
+ex.offer.b3.3 = Vrátit tah?
+ex.offer.b4 = Vrátit tah?
+ex.offer.b4.2 = Chceš ho vrátit?
+ex.offer.b4.3 = Zkusíš jiný tah?
+ex.offer.b5 = Vrátit?
+ex.offer.b5.2 = Chceš tah vrátit?
+ex.offer.b5.3 = Vrátit tah?
+ex.offer.b6 = Vrátit?
+ex.offer.b6.2 = Vrátit tah?
+ex.offer.b6.3 = Zkusit znovu?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ten tah je pochybný. Nenajdeš něco lepšího?
+ex.dubious.b1.2 = Ten tah je pochybný. Možná najdeš lepší?
+ex.dubious.b2 = Pochybný tah. Možná to jde lépe?
+ex.dubious.b2.2 = Ten tah je pochybný. Není tu něco lepšího?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Potom {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} jde na {sq}.
+demo.my.move.2 = Táhnu {my:bare_ins} na {sq}.
+demo.my.move.3 = Pak jde {my} na {sq}.
+demo.my.take = Beru {your:acc}.
+demo.my.take.2 = {my} bere {your:acc}.
+demo.my.take.3 = A sebírám {your:acc}.
+demo.my.check = {my} jde na {sq}. Šach.
+demo.my.check.2 = Šach: {my} na {sq}.
+demo.my.check.3 = {my} na {sq}, šach!
+demo.my.mate = {my} jde na {sq}. Mat.
+demo.my.mate.2 = A {my} na {sq} je mat.
+demo.my.mate.3 = {my} na {sq}. To je mat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Nejdřív {my} bere {your:acc}. {t1} počká.
+demo.my.first.take.2 = {my} nejdřív bere {your:acc}. {t1} nikam neuteče.
+demo.my.first.check = {my} bere {your:acc}, a to je šach! {t1} počká.
+demo.my.first.check.2 = Nejdřív {my} bere se šachem {your:acc}. {t1} nikam neuteče.
+demo.my.first.check_move = Nejdřív šach: {my} na {sq}. {t1} počká.
+demo.my.first.check_move.2 = {my} jde na {sq}: nejdřív šach! {t1} nikam neuteče.
+demo.my.first.move = Nejdřív jde {my} na {sq}. {t1} počká.
+demo.my.first.move.2 = Nejdřív {my} na {sq}. {t1} nikam neuteče.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} je pod útokem, a tak nejdřív bere {your:acc}.
+demo.my.first.attacked.2 = {my} je napaden{my:adj}: nejdřív sebere {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Nejdřív {move}: {t1} počká.
+demo.first.2 = Nejdřív {move}. {t1} nikam neuteče.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Teď zahraju svůj tah.
+demo.play_on.2 = Tady je můj skutečný tah.
+demo.play_on.3 = A teď můj tah doopravdy.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Ty pak táhneš {your:bare_ins} na {sq}.
+demo.your.move.2 = Řekněme, že {your} jde na {sq}.
+demo.your.move.3 = Pak jde {your} na {sq}.
+demo.your.take = Ty bereš {my:acc}.
+demo.your.take.2 = Bereš {my:acc} {your:refl_ins}.
+demo.your.take.3 = Pak sebereš {my:acc}.
+demo.your.back = Bereš zpět.
+demo.your.back.2 = Bereš zpět na {sq}.
+demo.your.back.3 = A ty bereš zpátky.
+demo.your.king = Tvůj král musí ustoupit.
+demo.your.king.2 = Král musí ustoupit na {sq}.
+demo.your.king.3 = Tvůj král utíká na {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Teď už {t1:acc} nejde zachránit.
+ex.point.piece.2 = A {t1} je ztracen{t1:adj}.
+ex.point.piece.3 = Další padne {t1}.
+ex.point.two = Pod útokem jsou {t1} i {t2}: jedna z figur padne.
+ex.point.two.2 = Teď napadám {t1:acc} i {t2:acc}. Obě figury nezachráníš.
+ex.point.mate = A teď {reply:nomate} dává mat.
+ex.point.mate.2 = Dál přijde {reply:nomate}, a to je mat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Vidíš? Teď máš o {pts:point} méně.
+ex.result.b1.2 = Takhle ztratíš {pts:point}.
+ex.result.b2 = Nakonec ztrácíš {pts:point}.
+ex.result.b2.2 = Teď jsi o {pts:point} pozadu.
+ex.result.b3 = To tě stojí {pts:point}.
+ex.result.b3.2 = Nakonec máš o {pts:point} méně.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Něco můžeš vzít zpátky, ale pořád máš o {pts:point} méně.
+ex.result_back.b1.2 = Kousek můžeš získat zpátky, ale pořád ztrácíš {pts:point}.
+ex.result_back.b2 = Něco můžeš vzít zpět, ale stejně jsi o {pts:point} pozadu.
+ex.result_back.b2.2 = I když vezmeš zpět, ztrácíš {pts:point}.
+ex.result_back.b3 = I po braní zpět jsi o {pts:point} pozadu.
+ex.result_back.b3.2 = Něco získáš zpátky, ale stejně tě to stojí {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Když {your2} bere zpět, {my} vezme {your:acc}.
+ex.retake.b1.2 = Brát zpět {your2:bare_ins} nejde: {my} pak vezme {your:acc}.
+ex.retake.b2 = Když {your2} bere zpět, {my} vezme {your:acc}.
+ex.retake.b2.2 = Braní zpět {your2:bare_ins} nefunguje: {my} vezme {your:acc}.
+ex.retake.b3 = Když bereš zpět tahem {move}, {reply} bere {your:acc}.
+ex.retake.b3.2 = Braní zpět tahem {move} nevychází: {reply} bere {your:acc}.
+ex.retake.b4 = {move} nejde kvůli tahu {reply}, který bere {your:acc}.
+ex.retake.b4.2 = A když {move}, tak {reply} bere {your:acc}.
+ex.retake.b5 = Braní zpět tahem {move} naráží na {reply} a {your} padne.
+ex.retake.b5.2 = {move} ztroskotá na {reply}: {your} padne.
+ex.retake.b6 = {move}? {reply} bere {your:acc}.
+ex.retake.b6.2 = {move} nejde: {reply} bere {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = A tady, na {sq}, by ti vznikla nová dáma.
+demo.promote.2 = Pak {your} dojde na {sq} a promění se v dámu.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Pozor: {my} může jít na {sq}, a to je mat.
+ex.mate_allowed.b1.2 = Teď může {my} táhnout na {sq}. To by byl mat!
+ex.mate_allowed.b1.3 = Pozor! Když {my} půjde na {sq}, je to mat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Tenhle tah mi dovolí dát {your:dat} mat za {m:move}.
+ex.mate_allowed.b2.2 = Teď můžu dát {your:dat} mat za {m:move}. Dívej se.
+ex.mate_allowed.b2.3 = Pozor! {your} je v nebezpečí: mat za {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Tohle umožňuje mat za {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Potom mám mat za {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Tvůj král dostane mat: {line:nomate}.
+ex.mate_allowed.b4 = {move} připouští vynucený mat: {line:nomate}.
+ex.mate_allowed.b4.2 = Po tomhle tahu přijde mat {m:ord_ins} tahem: {line:nomate}.
+ex.mate_allowed.b4.3 = Po {move} přijde mat: {line:nomate}.
+ex.mate_allowed.b5 = {move} připouští vynucený mat {m:ord_ins} tahem.
+ex.mate_allowed.b5.2 = To vede k matu {m:ord_ins} tahem.
+ex.mate_allowed.b5.3 = Teď je tu vynucený mat {m:ord_ins} tahem.
+ex.mate_allowed.b6 = Mat {m:ord_ins} tahem: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = Po {line:nomate} je mat.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Podívej: {your} nemá kam utéct.
+ex.mate_allowed.tail.b1.2 = Vidíš? {your} je v šachu a nemůže utéct.
+ex.mate_allowed.tail.b1.3 = {your} nemá kam jít. To je mat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Tomuhle matovému obrazci se říká {text}.
+ex.mate_allowed.pattern.2 = Zapamatuj si ho: je to {text}.
+ex.mate_allowed.tip.b3 = Před každým tahem si ověř, jestli je tvůj král pořád v bezpečí.
+ex.mate_allowed.tip.b3.2 = Vždycky se ptej: může můj král po mém tahu dostat mat?
+
+# Nominative noun phrases, said after "říká se" and "je to".
+name.pattern.back_rank = mat na základní řadě
+name.pattern.smothered = dušený mat
+name.pattern.support = mat krytou dámou
+name.pattern.ladder = schodový mat
+name.pattern.epaulette = epoletový mat
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Tahem {best:nomate} šlo dát {my:dat} mat!
+ex.mate_missed.b1.2 = Tah {best:nomate} byl mat! {my} by neutekl{my:past}.
+ex.mate_missed.b1.3 = Podívej! Tah {best:nomate} by dal {my:dat} mat.
+ex.mate_missed.b2 = Byl tu mat za {m:move}: začínal tahem {best:nomate}.
+ex.mate_missed.b2.2 = Tah {best:nomate} dával mat za {m:move}!
+ex.mate_missed.b2.3 = Mohl jsem dostat mat po tahu {best:nomate}.
+ex.mate_missed.b3 = Unikl ti mat {m:ord_ins} tahem: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} dává mat {m:ord_ins} tahem: {line:nomate}.
+ex.mate_missed.b3.3 = Byl tu mat {m:ord_ins} tahem; první tah: {best:nomate}.
+ex.mate_missed.b4 = Promarněný mat: {line:nomate}, první tah {best:nomate}.
+ex.mate_missed.b4.2 = Tah {best:nomate} vynucoval mat za {m:move}.
+ex.mate_missed.b4.3 = Byl tu mat {m:ord_ins} tahem: {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} dává mat {m:ord_ins} tahem: {line:nomate}.
+ex.mate_missed.b5.2 = Unikl ti mat za {m:move}, začínal tahem {best:nomate}.
+ex.mate_missed.b5.3 = Byl tu vynucený mat: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} matuje: {line:nomate}.
+ex.mate_missed.b6.2 = Mat {m:ord_ins} tahem: {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat {m:ord_ins} tahem.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Rychlejší bylo {best:nomate}: mat za {m:move}.
+ex.mate_delayed.b5.2 = Po {best:nomate} by byl mat dřív, za {m:move}.
+ex.mate_delayed.b6 = {best:nomate} matuje {m:ord_ins} tahem.
+ex.mate_delayed.b6.2 = Rychleji: {best:nomate}, mat {m:ord_ins} tahem.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ale ne! {my} nemůže táhnout a není v šachu. To je pat: remíza.
+ex.stalemate.b1.2 = Podívej: {my} nemá žádné bezpečné pole, ale není v šachu. Je to remíza!
+ex.stalemate.b1.3 = To je pat. {my} nemůže táhnout, takže partie končí remízou.
+ex.stalemate.b2 = Pat! {my} nemá žádný tah a není v šachu. Remíza.
+ex.stalemate.b2.2 = Ale ne, pat: {my} se nemůže hnout, ale není v šachu.
+ex.stalemate.b2.3 = To je remíza patem. {my} nemůže táhnout.
+ex.stalemate.b3 = To je pat: {my} nemá žádný tah. A přitom to byla vyhraná pozice!
+ex.stalemate.b3.2 = Pat! {my} se nemůže hnout a vyhraná partie končí remízou.
+ex.stalemate.b3.3 = {my} nemá tah ani šach: pat.
+ex.stalemate.b4 = Pat: {my} nemá žádný tah. Tím je výhra pryč.
+ex.stalemate.b4.2 = {move} dává {my:dat} pat. Remíza z vyhrané pozice.
+ex.stalemate.b4.3 = To je pat; {my} se nemá kam hnout.
+ex.stalemate.b5 = {move} dává {my:dat} pat. Výhra je pryč.
+ex.stalemate.b5.2 = Pat: {my} nemá žádné pole.
+ex.stalemate.b5.3 = To je pat, {my} se nemůže hnout.
+ex.stalemate.b6 = Pat. {my} nemá tah.
+ex.stalemate.b6.2 = {move}, pat: {my} nemá kam.
+ex.stalemate.b6.3 = Pat; {my} nemůže táhnout.
+ex.stalemate.tip.b1 = Když vyhráváš, vždycky nech mému králi nějaké volné pole.
+ex.stalemate.tip.b1.2 = Pamatuj: když vedeš, dej mému králi trochu místa.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Pozor! Můžu rozdat své figury a {my} pak nebude mít tah: pat.
+ex.stalemate_trick.b1.2 = Pozor: {my} skoro nemá kam jít. Můžu z toho udělat remízu.
+ex.stalemate_trick.b2 = Pozor: můžu obětovat figuru a {my} skončí v patu.
+ex.stalemate_trick.b2.2 = {my} nemá skoro žádné pole. Můžu si vynutit pat!
+ex.stalemate_trick.b3 = Tohle mi dovolí zachránit se patem: {my} už nebude mít kam táhnout.
+ex.stalemate_trick.b3.2 = Pozor: po {line} je {my} v patu.
+ex.stalemate_trick.b4 = {move} umožňuje patovou past: {line} a {my} nemůže táhnout.
+ex.stalemate_trick.b4.2 = Teď se {my} může schovat do patu: {line}.
+ex.stalemate_trick.b5 = {move} umožňuje pat: {line}; {my} se nemůže hnout.
+ex.stalemate_trick.b5.2 = Patová past: {line} a {my} nemá tah.
+ex.stalemate_trick.b6 = {line}, pat: {my} se nemůže hnout.
+ex.stalemate_trick.b6.2 = Pat po {line}; {my} nemá kam.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} může jít na {sq} a napadnout {t1:acc} i {t2:acc}.
+ex.fork.b1.2 = {my} jde na {sq} a napadá dvě figury: {t1:acc} a {t2:acc}.
+ex.fork.b1.3 = Sleduj {my:acc}: z pole {sq} napadá {t1:acc} i {t2:acc} najednou.
+ex.fork.b2 = Vidlička! {my} na {sq} napadá {t1:acc} i {t2:acc} zároveň.
+ex.fork.b2.2 = Po tvém tahu může {my} z pole {sq} dát vidličku na {t1:acc} a {t2:acc}.
+ex.fork.b2.3 = {my} jde na {sq}: dvojný útok na {t1:acc} a {t2:acc}.
+ex.fork.b3 = {move} umožní {reply}, vidličku na {t1:acc} a {t2:acc}.
+ex.fork.b3.2 = Po {reply} napadám {t1:acc} i {t2:acc} zároveň.
+ex.fork.b3.3 = {reply} je vidlička: {t1} i {t2} jsou pod útokem.
+ex.fork.b4 = {reply} je vidlička na {t1:acc} a {t2:acc}; po {line} ztrácíš {pts:point}.
+ex.fork.b4.2 = {reply} napadá {t1:acc} i {t2:acc} najednou.
+ex.fork.b4.3 = {move} umožní vidličku {reply} na {t1:acc} a {t2:acc}.
+ex.fork.b5 = {move} vede do vidličky {reply} na {t1:acc} a {t2:acc}.
+ex.fork.b5.2 = {reply} je vidlička na {t1:acc} a {t2:acc}.
+ex.fork.b5.3 = Po {reply} jsou {t1} i {t2} pod útokem.
+ex.fork.b6 = {reply} je vidlička.
+ex.fork.b6.2 = {move} umožní {reply}, vidličku.
+ex.fork.b6.3 = {reply}, vidlička.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Zachránit jde jen jedna figura: {t1}, nebo {t2}.
+ex.fork.tail.b1.2 = Teď napadám dvě figury najednou: {t1:acc} a {t2:acc}. To je vidlička!
+ex.fork.tail.b1.3 = Vidíš? {t1} i {t2} jsou pod útokem. Jedna z figur padne.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} musí uniknout ze šachu, a tak beru {t1:acc}.
+ex.fork.tail_king.2 = Šach! {your} musí ustoupit a {t1} padne.
+ex.fork.more.b3 = Než potáhneš, zkontroluj pole {sq}: odtud může {my} dát vidličku.
+ex.fork.more.b3.2 = Hlídej pole {sq}. Odtud {my} dává vidličku.
+ex.fork.tip.knight = Pozor na skoky jezdce poblíž tvého krále a dámy!
+ex.fork.tip.knight.2 = Jezdci rádi napadají dvě figury najednou. Dívej se, kam můžou skočit.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Když {my} odtáhne, {my2} napadne {t1:acc}!
+ex.discovered.b1.2 = Podívej: {my} stojí v cestě. Když uhne, {my2} napadne {t1:acc}.
+ex.discovered.b1.3 = {my} může uhnout stranou a pak {my2} napadne {t1:acc}.
+ex.discovered.b2 = Skrytý útok: {my} odtáhne a {my2} napadne {t1:acc}.
+ex.discovered.b2.2 = Pozor: {my} může odtáhnout a {my2} napadne {t1:acc}.
+ex.discovered.b2.3 = {my} uhne a otevře {my2:dat} cestu na {t1:acc}.
+ex.discovered.b3 = Po {reply} zasáhne {t1:acc} odtažný útok.
+ex.discovered.b3.2 = {reply} odkrývá útok na {t1:acc}.
+ex.discovered.b3.3 = {move} umožní {reply}, odtažný útok na {t1:acc}.
+ex.discovered.b4 = {reply} otevírá linii na {t1:acc}: odtažný útok.
+ex.discovered.b4.2 = {move} umožní odtažný útok {reply}, který získá {t1:acc}.
+ex.discovered.b4.3 = Po {reply} padne {t1} kvůli odtažnému útoku.
+ex.discovered.b5 = {move} umožní odtažný útok {reply}.
+ex.discovered.b5.2 = {reply} je odtažný útok.
+ex.discovered.b5.3 = {reply} odkrývá skrytý útok.
+ex.discovered.b6 = {reply}, odtažný útok na {t1:acc}.
+ex.discovered.b6.2 = {reply} a {t1} padá.
+ex.discovered.b6.3 = Odtažný útok: {reply} napadá {t1:acc}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} napadá {t1:acc}. Až uhne, vezmu {t2:acc} za {t1:npron_ins}.
+ex.skewer.b1.2 = Podívej: {my} napadá {t1:acc} a hned za {t1:npron_ins} stojí {t2}.
+ex.skewer.b1.3 = {my} útočí na {t1:acc}. {t1} musí uhnout a pak padne {t2}.
+ex.skewer.b2 = Napíchnutí: {my} napadá {t1:acc} a za {t1:npron_ins} stojí {t2}.
+ex.skewer.b2.2 = {my} má {t1:acc} a {t2:acc} na jedné linii. Až uhne první figura, vezmu druhou.
+ex.skewer.b2.3 = Pozor: {t1} a {t2} stojí na jedné linii. {my} je může napíchnout.
+ex.skewer.b3 = {reply} napíchne {t1:acc} a {t2:acc}.
+ex.skewer.b3.2 = Po {reply} musí {t1} uhnout a {t2} padne.
+ex.skewer.b3.3 = {move} umožní {reply}, napíchnutí {t1:gen} a {t2:gen}.
+ex.skewer.b4 = {reply} napichuje {t1:acc}; {t2} za {t1:npron_ins} padne.
+ex.skewer.b4.2 = Po {move} stojí {t1} a {t2} na jedné linii: {reply}.
+ex.skewer.b4.3 = Po {reply} uhne {t1} a padne {t2}.
+ex.skewer.b5 = {reply} napichuje {t1:acc} a {t2:acc}.
+ex.skewer.b5.2 = {move} umožní napíchnutí {reply} přes {t1:acc} na {t2:acc}.
+ex.skewer.b6 = {reply} je napíchnutí.
+ex.skewer.b6.2 = {reply}, napíchnutí.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} může jít na {sq}. Pak {your} uvízne před {t1:ins}.
+ex.pin.b1.2 = Pozor na {my:acc} na {sq}: {your} uvízne před {t1:ins}.
+ex.pin.b1.3 = {my} může dostat {your:acc} do vazby na {t1:acc}. Pak {your:pron_acc} získám.
+ex.pin.b2 = Vazba: {your} stojí před {t1:ins} a nemůže uhnout.
+ex.pin.b2.2 = {your} je ve vazbě na {t1:acc}. A pak {your:pron_acc} můžu získat.
+ex.pin.b2.3 = Teď {your} uvízne před {t1:ins}. To je vazba.
+ex.pin.b3 = {your} se dostane do vazby na {t1:acc} a já {your:pron_acc} získám.
+ex.pin.b3.2 = Potom je {your} ve vazbě na {t1:acc}.
+ex.pin.b3.3 = Vazba {your:gen} stojí materiál: za {your:npron_ins} je {t1}.
+ex.pin.b4 = {reply} váže a získává materiál.
+ex.pin.b4.2 = Po {move} přijde vazba {reply}.
+ex.pin.b4.3 = Po {reply} vázaná figura padne.
+ex.pin.b5 = {move} umožní vazbu {reply}.
+ex.pin.b5.2 = {reply} váže a figura je ztracená.
+ex.pin.b6 = {reply} váže.
+ex.pin.b6.2 = {reply}, vazba.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} je ve vazbě, takže nemůže krýt pole {sq}. Za {your:npron_ins} je {t1}.
+ex.pin_defender.b1.2 = Podívej: {your} pole {sq} doopravdy neubrání, protože za {your:npron_ins} stojí {t1}.
+ex.pin_defender.b2 = {your} je ve vazbě na {t1:acc}, takže pole {sq} nemá skutečného obránce.
+ex.pin_defender.b2.2 = Figura ve vazbě je špatný obránce. {your} nemůže krýt pole {sq}: za {your:npron_ins} je {t1}.
+ex.pin_defender.b3 = {your} je ve vazbě na {t1:acc}; pole {sq} doopravdy nekryje.
+ex.pin_defender.b3.2 = Pole {sq} se zdá kryté, ale {your} je ve vazbě před {t1:ins}.
+ex.pin_defender.b4 = {your} je ve vazbě, takže pole {sq} není doopravdy kryté.
+ex.pin_defender.b4.2 = {your} ve vazbě nemůže krýt pole {sq}.
+ex.pin_defender.b5 = {your} je ve vazbě; pole {sq} je bez krytí.
+ex.pin_defender.b5.2 = Pole {sq} neudržíš: {your} je ve vazbě.
+ex.pin_defender.b6 = {your} je ve vazbě; pole {sq} neudržíš.
+ex.pin_defender.b6.2 = {your} ve vazbě, pole {sq} bez krytí.
+

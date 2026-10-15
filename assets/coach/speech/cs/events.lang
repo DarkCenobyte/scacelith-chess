@@ -33,8 +33,8 @@ event.colour.black = Mám bílé figury, takže začínám já.
 event.colour.black.2 = Tentokrát hraješ černými: táhnu první.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-# The level names as chosen for assets/i18n/cs.lang coach.level.<n>.name: První kroky, Začátečník,
-# Mírně pokročilý, Klubový hráč, Silný klubový hráč, Expert.
+# The level names of assets/i18n/cs.lang (coach.level.<n>.name): První kroky, Začátečník, Mírně
+# pokročilý, Klubový hráč, Silný klubový hráč, Expert.
 event.level.l1 = První kroky: hraju mírně a každou chybu vysvětlím jednoduchými slovy.
 event.level.l2 = Začátečník: hraju o něco silněji a pojmenovávám jednoduché taktické motivy, jako jsou vidličky a vazby.
 event.level.l3 = Mírně pokročilý: mluvím o plánech a pěšcové struktuře a ukazuju krátké varianty.

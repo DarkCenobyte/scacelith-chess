@@ -1,0 +1,259 @@
+# Scacelith - Lietuvių
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31..., not 11)|few (2-9, 22-29..., not 12-19)|other (0, 10-20, 30...).
+# Register: formal "jūs" (lowercase), instructions in the plural imperative ("Įveskite"), buttons and
+# menu commands in the infinitive ("Įrašyti", "Pasiduoti"). The player's gender is unknown: no
+# adjective, participle or half-participle agrees with the player (no "prisijungęs", "norėdami",
+# "patys"); impersonal forms instead ("Prisijungta kaip {0}", "Atsijungta", "sėdint").
+# Titles in capitals. Quotes „…“, decimal comma, "85 %". Save = "įrašyti" (VLKK, Microsoft).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Įjungta
+common.off = Išjungta
+common.back = Atgal
+common.apply = Taikyti
+common.discard = Atmesti
+common.cancel = Atšaukti
+common.white = Baltieji
+common.black = Juodieji
+common.main_menu = Pagrindinis meniu
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Karališkasis žaidimas
+menu.new_game = Nauja partija
+menu.options = Nustatymai
+menu.credits = Kūrėjai
+menu.quit = Išeiti
+menu.version = Versija {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = NUSTATYMAI
+options.tab.display = Ekranas
+options.tab.graphics = Grafika
+options.tab.audio = Garsas
+options.tab.gameplay = Žaidimas
+options.tab.player = Žaidėjas
+options.tab.controls = Valdymas
+options.pending = Pakeitimai įsigalios, kai juos pritaikysite.
+options.unsaved.title = NEĮRAŠYTI PAKEITIMAI
+options.unsaved.text = Kai kurie nustatymai pakeisti. Pritaikyti juos prieš išeinant?
+
+options.language = Kalba
+options.language.help = Meniu ir pranešimų kalba. Pakeičiama iš karto.
+options.display_mode = Ekrano režimas
+options.display_mode.help = Visas ekranas: langas be rėmelio per visą ekraną, darbalaukio skyra. Lange: toliau nurodyto dydžio langas.
+options.fullscreen = Visas ekranas
+options.windowed = Lange
+options.window_size = Lango dydis
+options.window_size.help = Lango dydis, kai žaidžiama lange. Visas ekranas visada naudoja darbalaukio skyrą.
+options.vsync = Vertikalusis sinchronizavimas
+options.vsync.help = Sinchronizuoja kadrus su ekranu, kad vaizdas neplyštų.
+options.render_scale = Atvaizdavimo mastelis
+options.render_scale.help = Vidinė 3D vaizdo skyra. Mažesnė – greičiau, didesnė – ryškiau.
+
+options.quality = Kokybė
+options.quality.very_low = Labai žema
+options.quality.low = Žema
+options.quality.medium = Vidutinė
+options.quality.high = Aukšta
+options.quality.ultra = Ultra
+options.quality.custom = Pasirinktinė
+options.quality.help = Iš karto nustato visas toliau esančias parinktis: „Labai žema“ išjungia visus efektus, „Ultra“ juos visus nustato maksimaliai. Pakeitus vieną parinktį atskirai, kokybė tampa „Pasirinktinė“. Silpnesnei vaizdo plokštei taip pat labai padeda sumažintas atvaizdavimo mastelis (skirtukas „Ekranas“).
+options.shadows = Šešėliai
+options.shadows.help = Saulės šešėlių detalumas ir jų kraštų švelnumas. „Žema“: paprasti kraštai, greitai piešiama.
+options.reflections = Atspindžiai
+options.reflections.help = Grindys, stalas ir lenta atspindi salę (kiekvienam iš jų ji piešiama dar kartą – tai viena reikliausių parinkčių); nuo lygio „Vidutinė“ blizgios figūros ir daiktai taip pat atspindi tai, kas yra aplink.
+options.ambient_occlusion = Aplinkos okliuzija
+options.ambient_occlusion.help = Švelnus šešėliavimas ten, kur daiktai susiliečia, ir įdubose, į kurias patenka mažiau šviesos.
+options.indirect_light = Netiesioginė šviesa
+options.indirect_light.help = Dienos šviesa, atsispindinti nuo sienų, grindų ir lubų. „Žema“: vietoj jos tolygi aplinkos šviesa. Daugiausia turi įtakos įkėlimo trukmei.
+options.volumetric_light = Šviesos spinduliai
+options.volumetric_light.help = Saulės spinduliai, krentantys pro dulkėtą salės orą, ir juose žibančios dulkelės.
+options.tessellation = Teseliacija
+options.tessellation.help = Glotnūs figūrų išlinkimų kontūrai, žiūrint iš arti.
+options.tessellation.unavailable = Neprieinama: ši vaizdo plokštės tvarkyklė nepalaiko teseliacijos.
+options.antialiasing = Kraštų glodinimas
+options.antialiasing.help = Išlygina dantytus kraštus ir mirgančius atšvaitus. Išjungta: ryškiau, bet kraštai dantyti, o kai kurie efektai atrodo grūdėti.
+options.depth_of_field = Ryškumo gylis
+options.depth_of_field.help = Sulieja tai, kas yra gerokai priekyje arba už to, į ką žiūrite, kaip fotoaparato objektyvas.
+options.motion_blur = Judesio suliejimas
+options.motion_blur.help = Sulieja greitus kameros ir rankų judesius, kaip kino kamera.
+options.bloom = Švytėjimas
+options.bloom.help = Švelnus švytėjimas aplink ryškiausius atšvaitus, kaip fotoaparato objektyve.
+options.brightness = Ryškumas
+options.brightness.neutral = Neutralus
+options.brightness.value = {0} EV
+options.brightness.help = Kameros ekspozicijos korekcija. Pirmojo paleidimo kalibravimas ją nustato taip, kad tamsiausi šešėliai būtų vos matomi.
+
+options.master_volume = Bendras garsumas
+options.effects = Efektai
+options.ambience = Aplinkos garsai
+options.ambience.help = Salės šurmulys: ugnis, tolimi žingsniai, senas laikrodis.
+options.ambience_volume = Aplinkos garsų garsumas
+options.voice_volume = Balso garsumas
+options.voice_volume.help = Trenerio balso garsumas trenerio režimu.
+options.subtitles = Subtitrai
+options.subtitles.auto = Automatiškai
+options.subtitles.help = Trenerio žodžiai, rašomi ekrano apačioje. Automatiškai: rodomi, kai treneris nekalba meniu kalba (kai meniu kinų kalba, jis kalba angliškai). Visada rodomi, kai jo balsas neįdiegtas.
+
+options.legal_moves = Rodyti galimus ėjimus
+options.legal_moves.help = Paryškina langelius, į kuriuos gali eiti paliesta figūra. Kai išjungta, niekas nepasako, ar ėjimas leistinas: už neleistiną ėjimą teisėjas baudžia, kai tik paspaudžiate laikrodį.
+options.coordinates = Lentos koordinatės
+options.auto_press = Automatiškai spausti laikrodį
+options.auto_press.help = Jūsų robotas pats paspaudžia laikrodį, kai tik jūsų ėjimas padarytas lentoje. Interneto partijose tai lemia serveris, o tiesioginiame mače – jį surengęs žaidėjas.
+options.thinking_time = Realistiškas mąstymo laikas
+options.thinking_time.help = Varžovas neskuba, kaip žmogus, užuot ėjęs akimirksniu.
+options.ignore_head = Nepaisyti varžovo galvos judesių
+options.ignore_head.help = Interneto partijose ir tiesioginiuose mačuose varžovo robotas žiūri ten, kur žiūri jo žaidėjas. Kai įjungta, robotas galvą judina savarankiškai, kaip žaidžiant su Stockfish.
+options.mouse_sensitivity = Pelės jautrumas
+options.invert_look = Invertuoti vertikalią ašį
+options.handover = Perėjimas tarp žaidėjų
+options.handover.cut = Staigus perjungimas
+options.handover.flight = Skrydis, {0} s
+options.handover.help = Du žaidėjai prie vieno kompiuterio: kaip po kiekvieno ėjimo vaizdas pereina iš vieno žaidėjo akių į kito. Staigus perjungimas apsieina be kameros judesio.
+options.game_cursor = Žaidimo žymiklis
+options.game_cursor.help = Prie stalo žaidimas piešia savo žymiklį, kuris parodo, ką padarys spustelėjimas. Išjungta: įprasta sistemos rodyklė.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Vardas
+player.name.help = Jūsų vardas, rašomas partijos blankų viršuje, bet kuria abėcėle.
+player.default_name = Žmogus
+player.handwriting = Rašysena
+player.handwriting.help = Ranka, kuri užrašo jūsų ėjimus. Arabų, japonų ir kinų kalbomis rašoma atskira rašysena.
+player.preview = JŪSŲ PARTIJOS BLANKE
+hand.caveat = Kasdienė
+hand.marck = Rišlioji
+hand.badscript = Pasvirusi
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Kairysis pelės mygtukas
+controls.touch = Paliesti figūrą, tada ją perkelti
+controls.clock.keys = Tarpas  arba  laikrodžio spustelėjimas
+controls.clock = Paspausti laikrodį
+controls.look.keys = Dešinysis pelės mygtukas, laikyti
+controls.look = Apsidairyti
+controls.sheet.keys = S
+controls.sheet = Pažiūrėti į savo partijos blanką ir atgal
+controls.stand.keys = ↑
+controls.stand = Atsistoti priešais savo kėdę
+controls.side.keys = ←  /  →
+controls.side = Atsistoti kairiajame / dešiniajame stalo gale
+controls.sit.keys = ↓
+controls.sit = Vėl atsisėsti (žaidžiama tik sėdint)
+controls.moves.keys = Tab
+controls.moves = Rodyti arba slėpti ėjimų sąrašą
+controls.menu.keys = Esc
+controls.menu = Meniu
+controls.coach_skip.keys = Tarpas
+controls.coach_skip = Treneris: praleisti trenerio kalbą
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Treneris: atšaukti ėjimą, kai tai siūloma
+controls.coach_hint.keys = H
+controls.coach_hint = Trenerio iššūkiai: paprašyti užuominos
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = RYŠKUMAS
+calibration.text = Stumkite šliaužiklį, kol žirgas ant tamsaus langelio bus vos matomas arba visai nebematomas.
+calibration.later = Vėliau tai galėsite pakeisti: Nustatymai > Grafika.
+calibration.continue = Tęsti
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NAUJA PARTIJA
+newgame.opponent = VARŽOVAS
+newgame.time_control = LAIKO KONTROLĖ
+newgame.start = Pradėti
+newgame.elo = ~{0} Elo
+newgame.you_white = Žaisite baltosiomis.
+newgame.you_black = Žaisite juodosiomis.
+newgame.colour_lot = Pirmojoje partijoje spalvos nustatomos burtų keliu.
+newgame.colour_alternate = Vėliau spalvos keičiasi kas partiją.
+newgame.opponent_kind = Varžovas
+newgame.opponent_kind.help = Žaiskite su Stockfish arba su draugu prie šio kompiuterio: ėjimus darote paeiliui, kiekvienas iš savo lentos pusės.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Žmogus prie šio kompiuterio
+
+# Custom opponent: Stockfish parameters
+engine.skill = Žaidimo lygis
+engine.skill.help = Stockfish parametras „Skill Level“ (0–20). Nepaisomas, kai stiprumas ribojamas pagal Elo.
+engine.limit_elo = Riboti stiprumą (Elo)
+engine.limit_elo.help = UCI_LimitStrength: variklis siekia toliau nurodyto Elo reitingo.
+engine.elo = Elo
+engine.depth = Paieškos gylis
+engine.plies = {0} pusėjimis|{0} pusėjimiai|{0} pusėjimių
+engine.move_time = Laikas ėjimui
+engine.nodes = Mazgų riba
+engine.no_limit = Išjungta
+engine.thousand = {0} tūkst.
+engine.million = {0} mln.
+engine.dynamic_elo = Dinaminis Elo pagal laiką
+engine.dynamic_elo.help = Kaip ir žmogus, Stockfish žaidžia silpniau, kai jo laikas senka: šiek tiek silpniau paskutinę minutę (greituosiuose ir žaibo šachmatuose – anksčiau), daug silpniau, kai laiko beveik nelieka. Tik partijose su laikrodžiu.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish galvoja tiek, kiek savo lygio žmogus. Kad praleistumėte šią pauzę: Nustatymai > Žaidimas > Realistiškas mąstymo laikas.
+engine.pace.instant = Stockfish eina, vos tik apskaičiuoja. Kad pauzės būtų kaip žmogaus: Nustatymai > Žaidimas > Realistiškas mąstymo laikas.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Neribota
+tc.no_clock = Be laikrodžio
+tc.bullet = Kulka
+tc.blitz = Žaibas
+tc.rapid = Greitieji
+tc.classical = Klasikiniai
+tc.custom = Pasirinktinė
+tc.your_own = Savo nuožiūra
+tc.base_time = Pradinis laikas
+tc.base_time.help = Pradinis laikas kiekvieno žaidėjo laikrodyje (minutės : sekundės).
+tc.increment = Pridėtinis laikas
+tc.increment.help = Fischerio pridėtinis laikas, pridedamas po kiekvieno ėjimo.
+tc.delay = Delsa
+tc.delay.help = Bronšteino delsa: per šią delsą sunaudotas laikas po kiekvieno ėjimo grąžinamas.
+tc.no_delay = Nėra
+tc.seconds = {0} s
+tc.minutes = {0} min.
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, delsa {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Naujokas
+preset.novice.desc = Ką tik išmoko ėjimus: palieka figūras be apsaugos ir nepastebi paprastų grėsmių.
+preset.beginner.name = Pradedantysis
+preset.beginner.desc = Moka pagrindus, bet vis dar dažnai šiurkščiai klysta ir praranda medžiagą.
+preset.casual.name = Mėgėjas
+preset.casual.desc = Ramus vakaro varžovas: protingi ėjimai, dažnos klaidos.
+preset.club_player.name = Klubo žaidėjas
+preset.club_player.desc = Tvirtas klubo žaidėjas, baudžiantis už akivaizdžias šiurkščias klaidas.
+preset.advanced.name = Pažengęs
+preset.advanced.desc = Stiprus klubo žaidėjas, gerai matantis taktiką.
+preset.expert.name = Ekspertas
+preset.expert.desc = Turnyrų ekspertas: retai klysta, pranašumą paverčia pergale.
+preset.master.name = Meistras
+preset.master.desc = Meistro stiprumas: gilus skaičiavimas ir subtilus pozicinis žaidimas.
+preset.grandmaster.name = Didmeistris
+preset.grandmaster.desc = Didmeistrio lygis: įveikti ypač sunku.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 visu pajėgumu. Sėkmės.
+preset.custom.name = Pasirinktinis
+preset.custom.desc = Variklio nustatymai jūsų nuožiūra.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = KŪRĖJAI
+credits.game.head = SCACELITH
+credits.game = Šachmatų žaidimas karališkoje salėje, veikiantis savo kūrimo OpenGL 4.6 varikliu.
+credits.engine.head = ŠACHMATŲ VARIKLIS
+credits.engine = Stockfish 19, sukurtas Stockfish kūrėjų.
+credits.engine.licence = GNU bendroji viešoji licencija v3.
+credits.engine.data = Jo neuroninis tinklas apmokytas duomenimis, kuriuos pateikė projektas Leela Chess Zero; jie platinami pagal Open Database License (ODbL).
+credits.voice.head = TRENERIO BALSAS
+credits.voice = Sintetinę kalbą trenerio režimui sugeneravo Supertonic 3.
+credits.voice.licence = Supertonic 3 – Supertone sukurtas modelis, naudojamas pagal OpenRAIL-M licenciją, kurios naudojimo apribojimai taikomi visiems jo naudotojams (žr. „Licencijos“).
+credits.openings.head = DEBIUTAI
+credits.openings = Debiutų pavadinimai paimti iš lichess.org šachmatų debiutų duomenų bazės, perduotos į viešąją sritį (CC0).
+credits.fonts.head = ŠRIFTAI
+credits.fonts = EB Garamond – Georg Duffner, Cinzel – Natanael Gama; Amiri – Khaled Hosny.
+credits.fonts.hand = Rašysena: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Šachmatų figūros iš GNU FreeFont (GPL v3 su šrifto išimtimi).
+credits.quote = „Šachmatai – analizės menas.“  — Michailas Botvinikas

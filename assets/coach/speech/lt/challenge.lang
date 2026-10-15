@@ -1,0 +1,139 @@
+# Coach speech (Lithuanian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 pozicijos", count.position in
+#            common.lang); "{n:move_acc}" = "3 ėjimus" ("matas per 3 ėjimus", "išlaikyk lygiąsias
+#            10 ėjimų"); after a count in the nominative, a relative clause uses "kur", which does not
+#            change with the number ("1 pozicija, kur...", "6 pozicijos, kur...")
+#   {move}   one of the coach's moves, played on the board while the line is said; after a verb it
+#            stands behind "ėjimu" ("atsakyčiau ėjimu {move}"); "{move:nomate}" says a mating move
+#            without "matas" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use the reflexive "savo": {your:refl_acc} = "savo žirgą"
+#   {sq}     a square, after the noun "langelis" ("langelį {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "tu" to the player and is male ("ginsiuos kaip
+# galėdamas"); the player's gender is unknown: no adjective or participle about the player.
+# "Mate in N" = "matas per N ėjimų" (glossary). The challenge names quoted in ch.intro.* are the
+# names chosen for assets/i18n/lt.lang (challenge.<id>.name).
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matas per vieną ėjimą. {n:position}, ir kiekvienoje matui užtenka vieno ėjimo. Patikrink kiekvieną šachą.
+ch.intro.mate2 = Matas per du ėjimus. {n:position}: pirmasis tavo ėjimas turi atimti iš manęs bet kokią gynybą, o tada paskelbsi matą.
+ch.intro.mate3 = Matas per tris ėjimus. {n:position}. Šachai, kirtimai ir grėsmės: kaskart apskaičiuok geriausią mano atsakymą.
+ch.intro.backrank = Matai paskutinėje horizontalėje. {n:position}, kur karalius įkalintas už savo pėstininkų.
+ch.intro.patterns = Tipiniai matai. {n:position} su klasikinėmis mato schemomis. Atpažink schemą ir smok.
+ch.intro.hanging = Neapgintos figūros. {n:position}: kažkas mano pusėje liko be gynybos. Rask ir kirsk.
+ch.intro.fork = Šakutės. {n:position}: rask ėjimą, kuris iš karto puola du taikinius.
+ch.intro.pin = Surišimai. {n:position}: surišk figūrą arba pasinaudok surišimu.
+ch.intro.skewer = Pradūrimai. {n:position}: pulk vertingą figūrą ir laimėk tai, kas stovi už jos.
+ch.intro.discovered = Atidengti puolimai. {n:position}: paeik viena figūra, kad atvertum kelią kitai.
+ch.intro.deflection = Nukreipimas ir suviliojimas. {n:position}: atitrauk gynėją arba suviliok jį į pražūtingą langelį.
+ch.intro.intermezzo = Tarpiniai ėjimai. {n:position}: prieš akivaizdų ėjimą rask stipresnį.
+ch.intro.trapped = Įkalintos figūros. {n:position}: viena mano figūra neturi kur saugiai pasitraukti. Laimėk ją.
+ch.intro.promotion = Pėstininko virsmas. {n:position}, kur partijos likimą lemia toli pažengęs pėstininkas.
+ch.intro.quiet = Tylūs ėjimai. {n:position}: laimintis ėjimas nėra nei šachas, nei kirtimas.
+ch.intro.opening = Debiuto spąstai. {n:position} iš pirmųjų tikrų partijų ėjimų. Nubausk mane už klaidą.
+ch.intro.escape = Rask išsigelbėjimą. {n:position}: tavo karaliui gresia pavojus, ir jį išgelbsti tik vienas ėjimas.
+ch.intro.defend = Gynybiniai ėjimai. {n:position}: rask vienintelį ėjimą, kuris išlaiko tavo poziciją.
+ch.intro.kq = Valdovė ir karalius prieš karalių. {n:position}: paskelbk matą mano karaliui. Saugokis pato.
+ch.intro.kr = Bokštas ir karalius prieš karalių. {n:position}: paskelbk matą mano karaliui, žingsnis po žingsnio.
+ch.intro.kp = Karalius ir pėstininkas prieš karalių. {n:position}: paversk pėstininką valdove. Kelią tegul rodo karalius.
+ch.intro.kp_hold = Sustabdyk pėstininką. {n:position}: turi tik karalių. Išlaikyk lygiąsias.
+ch.intro.rook = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Philidoro gynyba.
+ch.intro.endgame = Taktika endšpilyje. {n:position}, kur figūrų mažai, o idėjos aštrios.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Matas per {n:move_acc}.
+ch.task.mate.2 = Rask matą per {n:move_acc}.
+ch.task.hanging = Kažkas liko be gynybos.
+ch.task.hanging.2 = Ką gali kirsti veltui?
+ch.task.fork = Rask šakutę.
+ch.task.fork.2 = Ieškok šakutės.
+ch.task.pin = Čia viską lemia surišimas.
+ch.task.skewer = Čia laimi pradūrimas.
+ch.task.discovered = Čia laimi atidengtas puolimas.
+ch.task.deflection = Perkrauk gynėją arba suviliok jį.
+ch.task.intermezzo = Ieškok tarpinio ėjimo.
+ch.task.trapped = Viena mano figūra negali pabėgti. Laimėk ją.
+ch.task.promotion = Pasinaudok savo toli pažengusiu pėstininku.
+ch.task.quiet = Laimintis ėjimas – tylus.
+ch.task.opening = Nubausk mane už paskutinį ėjimą.
+ch.task.escape = Gelbėk savo karalių: tinka tik vienas ėjimas.
+ch.task.defend = Rask vienintelį gerą ėjimą.
+ch.task.endgame = Rask geriausią ėjimą.
+ch.task.default = Rask geriausią ėjimą.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Paskelbk matą mano karaliui. Ginsiuos kaip galėdamas geriau.
+ch.task.play.promote = Pasiek pėstininko virsmą ir išlaikyk pergalę. Bandysiu tau sutrukdyti.
+ch.task.play.hold = Išlaikyk lygiąsias {n:move_acc}. Bandysiu laimėti.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Šios pozicijos paimtos iš tikrų partijų. Aš padarau paskutinį ėjimą, o tada tavo eilė.
+ch.lead.first.2 = Kiekviena pozicija – iš tikros partijos: aš padarau ėjimą, kuris į ją atvedė, o tada žaidi tu.
+ch.next = Kita pozicija.
+ch.next.2 = Štai kita.
+ch.next.3 = Pereikime prie kitos.
+ch.last = Paskutinė pozicija.
+ch.last.2 = O dabar paskutinė.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Gerai.
+ch.good.2 = Taip.
+ch.good.3 = Teisingai.
+ch.good.4 = Būtent.
+# The position is solved.
+ch.solved = Štai taip! Šaunu.
+ch.solved.2 = Visiškai teisingai.
+ch.solved.3 = Labai gerai.
+ch.solved.mate = Matas! Šaunu.
+ch.solved.mate.2 = Ir tai matas. Labai gerai.
+ch.solved.mate.3 = Matas. Puikiai atlikta.
+ch.solved.promote = Nauja valdovė, ir pergalė užtikrinta. Šaunu.
+ch.solved.hold = Lygiosios išlaikytos. Puiki gynyba!
+ch.solved.draw = Lentoje lygiosios. Puiki gynyba!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Ne šis ėjimas: atsakyčiau ėjimu {move}.
+ch.wrong.reply.2 = Ne visai: į tai atsakyčiau ėjimu {move}.
+ch.wrong.reply.3 = Tada sužaisčiau {move}.
+ch.wrong.mate = Atsargiai: {move:nomate} būtų matas.
+ch.wrong.mate.2 = Dėmesio: atsakyčiau ėjimu {move:nomate}, ir tai matas.
+ch.wrong.mated = Atsargiai: po {move} turiu priverstinį matą per {m:move_acc}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Taip irgi bus matas, bet ilgiau. Yra greitesnis kelias.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Taip irgi bus matas, bet aš turiu omenyje kitą ėjimą. Pažiūrėk dar kartą.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Neblogai, bet yra kai kas stipresnio. Pažiūrėk dar kartą.
+ch.wrong.weaker.2 = Taip žaisti galima, bet gali ir geriau.
+ch.wrong.stalemate = Patas! Mano karalius negali pajudėti, o tai tik lygiosios.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Ne šis ėjimas: po {move} galiu išlaikyti lygiąsias.
+ch.wrong.loses = Atsargiai: po {move} mano pozicija būtų laiminti.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Ne tai.
+ch.try_again = Bandyk dar kartą.
+ch.try_again.2 = Pažiūrėk dar.
+ch.try_again.3 = Pažvelk dar kartą.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Nori užuominos?
+ch.offer.2 = Ar duoti tau užuominą?
+ch.no_hint = Gerai. Ieškok toliau.
+ch.no_hint.2 = Sutarta, neskubėk.
+ch.hint.piece = Pažiūrėk į {your:refl_acc}.
+ch.hint.piece.2 = Pagalvok apie {your:refl_acc}.
+ch.hint.square = Pažiūrėk į langelį {sq}.
+ch.hint.square.2 = Svarbiausias langelis – {sq}.
+ch.hint.square.3 = Stebėk langelį {sq}.
+ch.hint.show = Štai ėjimas. Žiūrėk.
+ch.hint.show.2 = Leisk parodyti. Žiūrėk.
+ch.hint.now = Dabar padaryk jį tu.
+ch.hint.now.2 = Tavo eilė: padaryk šį ėjimą.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Visas iššūkis įveiktas. Puikus darbas!
+ch.complete.2 = Visos pozicijos išspręstos. Šaunu!

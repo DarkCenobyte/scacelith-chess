@@ -1,0 +1,155 @@
+# Coach speech (Czech): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by the
+# voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Czech:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "ty" or "já" here: the players are "bílý" and "černý", masculine singular, lower case
+#   inside a sentence as in Czech chess books ("Bílý vyhrává", "černému došel čas"); their verbs agree
+#   in the masculine, which is grammar, not anyone's gender. A piece comes with its side: {piece}
+#   {t1} {t2} = "bílý jezdec", "černá věž"; forms from common.lang: acc, pron_acc ("ho" / "ji"),
+#   past and adj endings ("{piece}, kter{piece:adj} neměl{piece:past} obránce").
+# - "Mate in N" is "mat N. tahem" ({m:ord_ins}: written "mat 3. tahem", spoken "mat třetím tahem").
+#   A move as the subject of a past tense comes after "tah" ("Tah {best} dával mat", "Silnější byl
+#   tah {best}"); "Lepší bylo {best}" is the usual wording of Czech annotations.
+# - Counted numbers (common.lang): {pts:point} "3 body", {n:mistake} "2 chyby", {m:blunder} "1 hrubá
+#   chyba", their accusatives after "udělal" ({n:mistake_acc} "jednu chybu"), {acc_white:percent}
+#   "87 %" (spoken "sedmaosmdesát procent").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Podívejme se spolu zpátky na tuhle partii.
+an.start.2 = Projdeme si tuhle partii tah po tahu.
+an.start.3 = Tady je partie. Podívejme se, jak probíhala.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Tahle partie začíná ze zadané pozice. Projdeme si ji.
+an.start.setup.2 = Partie ze zadané pozice. Podívejme se, jak probíhala.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+# {opening:def} is the opening's name in the nominative, lower case ("sicilská obrana").
+an.opening = Hraje se {opening:def}.
+an.opening.2 = Je to {opening:def}.
+an.book_exit = Tahem {move} partie opouští známou teorii zahájení.
+an.book_exit.2 = Tah {move} je prvním tahem mimo teorii zahájení.
+an.book_exit.3 = Tady teorie zahájení končí, tahem {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} je hrubá chyba.
+an.blunder.2 = Tady je {move} vážná chyba.
+an.blunder.3 = Hrubá chyba: {move}.
+an.mistake = {move} je chyba.
+an.mistake.2 = {move} tady není správný tah.
+an.mistake.3 = Chyba: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} promarňuje šanci tu chybu potrestat.
+an.missed_chance.2 = Po tahu {move} je šance pryč.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Teď {reply:nomate} dává mat.
+an.mate_allowed.one.2 = Připouští tah {reply:nomate}, a to je mat.
+an.mate_allowed = Připouští vynucený mat {m:ord_ins} tahem, počínaje tahem {reply:nomate}.
+an.mate_allowed.2 = Teď vede {reply:nomate} k vynucenému matu {m:ord_ins} tahem.
+an.fork = Teď {reply} dává vidličku na {t1:acc} a {t2:acc}.
+an.fork.2 = Připouští tah {reply}, který napadne {t1:acc} i {t2:acc} najednou.
+an.fork.3 = {reply} napadá současně {t1:acc} i {t2:acc}.
+an.hanging = Nechává {piece:acc} bez krytí a {reply} {piece:pron_acc} sebere.
+an.hanging.2 = {piece} zůstává bez obránce: získá {piece:pron_acc} tah {reply}.
+an.hanging.3 = {reply} prostě bere {piece:acc}, kter{piece:adj} neměl{piece:past} obránce.
+an.material = Odpověď {line} získá {pts:point} materiálu.
+an.material.2 = Pak {line} získá {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Tah {best:nomate} dával mat.
+an.mate_missed.one.2 = Tah {best:nomate} by dal mat.
+an.mate_missed = Tah {best:nomate} by vynutil mat {m:ord_ins} tahem.
+an.mate_missed.2 = Existoval vynucený mat {m:ord_ins} tahem a začínal tahem {best:nomate}.
+an.missed_capture = Tah {best} by zadarmo získal {piece:acc}.
+an.missed_capture.2 = {piece} neměl{piece:past} obránce: tah {best} by {piece:pron_acc} sebral.
+an.missed_fork = Tah {best} by dal vidličku na {t1:acc} a {t2:acc}.
+an.missed_fork.2 = Tah {best} byl vidličkou, která napadala {t1:acc} i {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = Silnější byl tah {best}.
+an.better.2 = Lepší bylo {best}.
+an.better.3 = Přesnější byl tah {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} je brilantní tah: obětuje {piece:acc}!
+an.brilliant.2 = Brilantní oběť! {move} nabízí {piece:acc}.
+an.brilliant.3 = {move}! Brilantní tah, který nabízí {piece:acc}.
+an.brilliant.mate = Vede k vynucenému matu {m:ord_ins} tahem.
+an.brilliant.mate.2 = A vynucuje mat {m:ord_ins} tahem.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} je jediný tah, který udrží výhodu.
+an.only.win.2 = Jen {move} tady udrží převahu. Dobře nalezeno.
+an.only.hold = {move} je jediný tah, který udrží rovnováhu.
+an.only.hold.2 = Jen {move} tady pozici udrží.
+an.only.defend = {move} je jediný tah, se kterým boj pokračuje.
+an.only.defend.2 = Jen {move} tady drží partii při životě. Dobrá obrana.
+an.only.best = {move} je tady zdaleka nejsilnější tah.
+an.only.best.2 = Přesná hra: {move} je mnohem silnější než všechno ostatní.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} je drobná nepřesnost: přesnější byl tah {best}.
+an.inaccuracy.2 = Ne zcela nejlepší: {best} byl přesnější tah než {move}.
+an.interesting = {move} je zajímavý nápad, který nabízí {piece:acc}.
+an.interesting.2 = Zajímavý pokus: {move} obětuje {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Bílý má teď vynucený mat {m:ord_ins} tahem.
+an.mate_on.white.2 = Odsud může bílý vynutit mat {m:ord_ins} tahem.
+an.mate_on.black = Černý má teď vynucený mat {m:ord_ins} tahem.
+an.mate_on.black.2 = Odsud může černý vynutit mat {m:ord_ins} tahem.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Mat. Bílý vyhrává partii.
+an.end.mate.white.2 = A je to mat: bílý vyhrává.
+an.end.mate.black = Mat. Černý vyhrává partii.
+an.end.mate.black.2 = A je to mat: černý vyhrává.
+an.end.resigned.white = Černý se vzdal, takže partii vyhrává bílý.
+an.end.resigned.white.2 = Tady partie končí: černý se vzdal a bílý vyhrává.
+an.end.resigned.black = Bílý se vzdal, takže partii vyhrává černý.
+an.end.resigned.black.2 = Tady partie končí: bílý se vzdal a černý vyhrává.
+an.end.timeout.white = Černému došel čas, takže vyhrává bílý.
+an.end.timeout.white.2 = Bílý vyhrává na čas.
+an.end.timeout.black = Bílému došel čas, takže vyhrává černý.
+an.end.timeout.black.2 = Černý vyhrává na čas.
+an.end.win.white = Partie končí výhrou bílého.
+an.end.win.white.2 = Bílý vyhrává partii.
+an.end.win.black = Partie končí výhrou černého.
+an.end.win.black.2 = Černý vyhrává partii.
+an.end.stalemate = Pat: partie končí remízou.
+an.end.stalemate.2 = Je to pat, a tak partie končí remízou.
+an.end.draw.agreement = Hráči se dohodli na remíze.
+an.end.draw.agreement.2 = Partie končí dohodnutou remízou.
+an.end.draw.repetition = Partie končí remízou opakováním pozice.
+an.end.draw.repetition.2 = Na šachovnici se znovu objevila stejná pozice: remíza.
+an.end.draw.fifty = Partie končí remízou podle pravidla padesáti tahů.
+an.end.draw.fifty.2 = Padesát tahů bez braní a bez tahu pěšcem: remíza.
+an.end.draw.seventy_five = Partie končí remízou podle pravidla pětasedmdesáti tahů.
+an.end.draw.seventy_five.2 = Pětasedmdesát tahů bez braní a bez tahu pěšcem: remíza.
+an.end.draw.material = Mat už není možný: partie končí remízou.
+an.end.draw.material.2 = Ani jedna strana už nemůže dát mat, takže je to remíza.
+an.end.draw = Partie končí remízou.
+an.end.draw.2 = Remíza.
+an.end.unfinished = Partie tady končí nedohraná.
+an.end.unfinished.2 = Tady se partie zastavuje: nebyla dohrána.
+an.end.accuracy = Přesnost: bílý {acc_white:percent}, černý {acc_black:percent}.
+an.end.accuracy.2 = Bílý hrál s přesností {acc_white:percent}, černý {acc_black:percent}.
+an.end.clean.white = Bílý neudělal žádnou chybu ani hrubou chybu.
+an.end.clean.white.2 = Hra bílého se obešla bez vážných chyb.
+an.end.clean.black = Černý neudělal žádnou chybu ani hrubou chybu.
+an.end.clean.black.2 = Hra černého se obešla bez vážných chyb.
+an.end.mistakes.white = Bílý udělal {n:mistake_acc} a žádnou hrubou chybu.
+an.end.mistakes.white.2 = Bílý: {n:mistake}, žádná hrubá chyba.
+an.end.mistakes.black = Černý udělal {n:mistake_acc} a žádnou hrubou chybu.
+an.end.mistakes.black.2 = Černý: {n:mistake}, žádná hrubá chyba.
+an.end.blunders.white = Bílý udělal {m:blunder_acc}.
+an.end.blunders.white.2 = Bílý: {m:blunder}.
+an.end.blunders.black = Černý udělal {m:blunder_acc}.
+an.end.blunders.black.2 = Černý: {m:blunder}.
+an.end.errors.white = Bílý udělal {n:mistake_acc} a {m:blunder_acc}.
+an.end.errors.white.2 = Bílý: {n:mistake} a {m:blunder}.
+an.end.errors.black = Černý udělal {n:mistake_acc} a {m:blunder_acc}.
+an.end.errors.black.2 = Černý: {n:mistake} a {m:blunder}.

@@ -1,0 +1,154 @@
+# Coach speech (Lithuanian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Lithuanian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tu" or "aš" here: the players are "baltieji" and "juodieji" (plural verbs: "baltieji
+#   laimi", "juodieji pasidavė"; genitive "baltųjų", dative "juodiesiems"). A piece comes with its
+#   side: {piece} {t1} {t2} = "baltųjų žirgas", {piece:acc} = "juodųjų valdovę"; forms from
+#   common.lang: acc gen dat pron_acc rel.
+# - A move ({move}, {best}, {reply}) never takes an ending: it stands after "ėjimas" / "ėjimu" /
+#   "po", or before a dash ("{move} – klaida."). Missed moves are said impersonally ("Ėjimu {best}
+#   buvo galima...") or with "ėjimas" as the subject ("Ėjimas {best} būtų buvęs matas").
+# - Counted numbers (common.lang): "mate in {m}" = "matas per {m:move_acc}" ("per 3 ėjimus"),
+#   {pts:point_acc} "3 taškus", {n:mistake} "2 klaidos" / {n:mistake_acc} "2 klaidas", {m:blunder}
+#   "1 šiurkšti klaida", {acc_white:percent} "85 %" ("aštuoniasdešimt penki procentai" spoken).
+# - {opening:def} stands after a colon or "Tai" (a nominative that never inflects).
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Peržvelkime šią partiją kartu.
+an.start.2 = Panagrinėkime šią partiją ėjimas po ėjimo.
+an.start.3 = Štai partija. Pažiūrėkime, kaip ji klostėsi.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Ši partija prasideda iš sustatytos pozicijos. Panagrinėkime ją.
+an.start.setup.2 = Partija iš sustatytos pozicijos. Pažiūrėkime, kaip ji klostėsi.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Debiutas: {opening:def}.
+an.opening.2 = Tai {opening:def}.
+an.book_exit = Ėjimu {move} partija išeina iš žinomos debiutų teorijos.
+an.book_exit.2 = Ėjimas {move} – pirmasis už debiutų teorijos ribų.
+an.book_exit.3 = Čia, ėjimu {move}, baigiasi debiutų teorija.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} – šiurkšti klaida.
+an.blunder.2 = Čia {move} – rimta klaida.
+an.blunder.3 = Šiurkšti klaida: {move}.
+an.mistake = {move} – klaida.
+an.mistake.2 = Čia {move} – ne tas ėjimas.
+an.mistake.3 = Klaida: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = Ėjimu {move} praleidžiama proga nubausti už tą klaidą.
+an.missed_chance.2 = Po {move} proga praleista.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Dabar {reply:nomate} – matas.
+an.mate_allowed.one.2 = Tai leidžia ėjimą {reply:nomate}, ir tai matas.
+an.mate_allowed = Tai leidžia priverstinį matą per {m:move_acc}, pradedant ėjimu {reply:nomate}.
+an.mate_allowed.2 = Dabar yra priverstinis matas per {m:move_acc}, pirmasis ėjimas – {reply:nomate}.
+an.fork = Dabar {reply} daro šakutę: puola {t1:acc} ir {t2:acc}.
+an.fork.2 = Tai leidžia ėjimą {reply}, kuris iš karto puola {t1:acc} ir {t2:acc}.
+an.fork.3 = {reply} tuo pačiu metu puola {t1:acc} ir {t2:acc}.
+an.hanging = Šis ėjimas palieka {piece:acc} neapgintą, ir {reply} {piece:pron_acc} nukerta.
+an.hanging.2 = {piece} lieka be gynėjo: {reply} {piece:pron_acc} laimi.
+an.hanging.3 = {reply} tiesiog kerta {piece:acc}, {piece:rel} neturėjo gynėjo.
+an.material = Atsakymas {line} laimi medžiagos už {pts:point_acc}.
+an.material.2 = Tada {line} laimi {pts:point_acc}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Ėjimu {best:nomate} buvo galima paskelbti matą.
+an.mate_missed.one.2 = Ėjimas {best:nomate} būtų buvęs matas.
+an.mate_missed = Po ėjimo {best:nomate} būtų buvęs priverstinis matas per {m:move_acc}.
+an.mate_missed.2 = Buvo priverstinis matas per {m:move_acc}, pradedant ėjimu {best:nomate}.
+an.missed_capture = Ėjimu {best} buvo galima veltui laimėti {piece:acc}.
+an.missed_capture.2 = {piece} neturėjo gynėjo: ėjimu {best} buvo galima {piece:pron_acc} kirsti.
+an.missed_fork = Ėjimu {best} buvo galima padaryti šakutę {t1:dat} ir {t2:dat}.
+an.missed_fork.2 = Ėjimas {best} buvo šakutė, puolanti iš karto {t1:acc} ir {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = Stipresnis buvo ėjimas {best}.
+an.better.2 = Geriau buvo žaisti {best}.
+an.better.3 = Tikslesnis buvo ėjimas {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} – genialus ėjimas: jis aukoja {piece:acc}!
+an.brilliant.2 = Geniali auka! {move} paaukoja {piece:acc}.
+an.brilliant.3 = {move}! Genialus ėjimas, aukojantis {piece:acc}.
+an.brilliant.mate = Jis veda į priverstinį matą per {m:move_acc}.
+an.brilliant.mate.2 = Ir matas per {m:move_acc} neišvengiamas.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} – vienintelis ėjimas, išlaikantis pranašumą.
+an.only.win.2 = Čia tik {move} išlaiko persvarą. Gerai rasta.
+an.only.hold = {move} – vienintelis ėjimas, išlaikantis pusiausvyrą.
+an.only.hold.2 = Čia poziciją išlaiko tik {move}.
+an.only.defend = {move} – vienintelis ėjimas, leidžiantis tęsti kovą.
+an.only.defend.2 = Čia tik {move} išsaugo šansus. Gera gynyba.
+an.only.best = Čia {move} – neabejotinai stipriausias ėjimas.
+an.only.best.2 = Tiksliai: {move} daug stipresnis už visus kitus ėjimus.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} – nedidelis netikslumas: tikslesnis buvo ėjimas {best}.
+an.inaccuracy.2 = Ne visai geriausia: ėjimas {best} buvo tikslesnis nei {move}.
+an.interesting = {move} – įdomi idėja su {piece:gen} auka.
+an.interesting.2 = Įdomus bandymas: {move} atiduoda {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Dabar baltieji turi priverstinį matą per {m:move_acc}.
+an.mate_on.white.2 = Nuo čia baltieji gali priverstinai paskelbti matą per {m:move_acc}.
+an.mate_on.black = Dabar juodieji turi priverstinį matą per {m:move_acc}.
+an.mate_on.black.2 = Nuo čia juodieji gali priverstinai paskelbti matą per {m:move_acc}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Matas. Baltieji laimi partiją.
+an.end.mate.white.2 = Ir tai matas: laimi baltieji.
+an.end.mate.black = Matas. Juodieji laimi partiją.
+an.end.mate.black.2 = Ir tai matas: laimi juodieji.
+an.end.resigned.white = Juodieji pasidavė, tad partiją laimi baltieji.
+an.end.resigned.white.2 = Partija čia baigiasi: juodieji pasidavė, ir laimi baltieji.
+an.end.resigned.black = Baltieji pasidavė, tad partiją laimi juodieji.
+an.end.resigned.black.2 = Partija čia baigiasi: baltieji pasidavė, ir laimi juodieji.
+an.end.timeout.white = Juodiesiems baigėsi laikas, tad laimi baltieji.
+an.end.timeout.white.2 = Baltieji laimi pagal laiką.
+an.end.timeout.black = Baltiesiems baigėsi laikas, tad laimi juodieji.
+an.end.timeout.black.2 = Juodieji laimi pagal laiką.
+an.end.win.white = Partija baigiasi baltųjų pergale.
+an.end.win.white.2 = Baltieji laimi partiją.
+an.end.win.black = Partija baigiasi juodųjų pergale.
+an.end.win.black.2 = Juodieji laimi partiją.
+an.end.stalemate = Patas: partija baigiasi lygiosiomis.
+an.end.stalemate.2 = Tai patas, todėl partija baigiasi lygiosiomis.
+an.end.draw.agreement = Žaidėjai susitarė dėl lygiųjų.
+an.end.draw.agreement.2 = Partija baigiasi lygiosiomis susitarus.
+an.end.draw.repetition = Lygiosios dėl pozicijos pasikartojimo.
+an.end.draw.repetition.2 = Ta pati pozicija vėl pasikartojo: lygiosios.
+an.end.draw.fifty = Lygiosios pagal penkiasdešimties ėjimų taisyklę.
+an.end.draw.fifty.2 = Penkiasdešimt ėjimų be kirtimų ir pėstininkų ėjimų: lygiosios.
+an.end.draw.seventy_five = Lygiosios pagal septyniasdešimt penkių ėjimų taisyklę.
+an.end.draw.seventy_five.2 = Septyniasdešimt penki ėjimai be kirtimų ir pėstininkų ėjimų: lygiosios.
+an.end.draw.material = Matas nebeįmanomas: lygiosios.
+an.end.draw.material.2 = Nė viena pusė nebegali paskelbti mato, todėl lygiosios.
+an.end.draw = Partija baigiasi lygiosiomis.
+an.end.draw.2 = Lygiosios.
+an.end.unfinished = Partija čia nutrūksta nebaigta.
+an.end.unfinished.2 = Čia partija sustoja: ji nebuvo baigta.
+an.end.accuracy = Tikslumas: baltųjų {acc_white:percent}, juodųjų {acc_black:percent}.
+an.end.accuracy.2 = Baltieji žaidė {acc_white:percent_gen} tikslumu, juodieji – {acc_black:percent_gen}.
+an.end.clean.white = Baltieji nepadarė nei klaidų, nei šiurkščių klaidų.
+an.end.clean.white.2 = Baltieji žaidė be rimtų klaidų.
+an.end.clean.black = Juodieji nepadarė nei klaidų, nei šiurkščių klaidų.
+an.end.clean.black.2 = Juodieji žaidė be rimtų klaidų.
+an.end.mistakes.white = Baltieji padarė {n:mistake_acc}, o šiurkščių klaidų – nė vienos.
+an.end.mistakes.white.2 = Baltieji: {n:mistake}, šiurkščių klaidų nėra.
+an.end.mistakes.black = Juodieji padarė {n:mistake_acc}, o šiurkščių klaidų – nė vienos.
+an.end.mistakes.black.2 = Juodieji: {n:mistake}, šiurkščių klaidų nėra.
+an.end.blunders.white = Baltieji padarė {m:blunder_acc}.
+an.end.blunders.white.2 = Baltieji: {m:blunder}.
+an.end.blunders.black = Juodieji padarė {m:blunder_acc}.
+an.end.blunders.black.2 = Juodieji: {m:blunder}.
+an.end.errors.white = Baltieji padarė {n:mistake_acc} ir {m:blunder_acc}.
+an.end.errors.white.2 = Baltieji: {n:mistake} ir {m:blunder}.
+an.end.errors.black = Juodieji padarė {n:mistake_acc} ir {m:blunder_acc}.
+an.end.errors.black.2 = Juodieji: {n:mistake} ir {m:blunder}.
