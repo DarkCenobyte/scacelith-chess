@@ -648,3 +648,162 @@ ex.material.b5 = {move} atiduoda medžiagą: {line}.
 ex.material.b5.2 = {line}, ir aš laimiu {pts:point_acc}.
 ex.material.b6 = {line}, ir laimėjau {pts:point_acc}.
 ex.material.b6.2 = {move} praranda {pts:point_acc}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Ar pastebėjai? {my} langelyje {sq} stovėjo be gynybos. {your} galėjo {my:pron_acc} kirsti.
+ex.missed_capture.b1.2 = Žiūrėk: {my} neturėjo gynėjo. {your} galėjo {my:pron_acc} nukirsti.
+ex.missed_capture.b1.3 = {my} langelyje {sq} buvo neapgint{my:agr_as_a}. {your} galėjo {my:pron_acc} pačiupti!
+ex.missed_capture.b2 = Praleidai nemokamą kirtimą: {best} laimi {my:acc}.
+ex.missed_capture.b2.2 = {my} kabojo langelyje {sq}. {best} {my:pron_acc} kerta. Kitą kartą čiupk!
+ex.missed_capture.b2.3 = Ėjimas {best} laimėtų {my:acc} už dyką.
+ex.missed_capture.b3 = Ėjimas {best} būtų laimėjęs {my:acc} už dyką.
+ex.missed_capture.b3.2 = {my} langelyje {sq} buvo be gynybos: {best}. Kiekvieną ėjimą ieškok neapgintų figūrų.
+ex.missed_capture.b3.3 = Galėjai kirsti {my:acc} ėjimu {best}.
+ex.missed_capture.b4 = Praleista: {best} pasiima {my:acc} langelyje {sq}.
+ex.missed_capture.b4.2 = {best} laimi {my:acc}, {my:rel_acc} niekas negynė.
+ex.missed_capture.b4.3 = {my} kabojo: {best}.
+ex.missed_capture.b5 = {best} laimi {my:acc}; po {move} {my:pron} pabėga.
+ex.missed_capture.b5.2 = {my} langelyje {sq} buvo be gynybos: {best}.
+ex.missed_capture.b6 = {best}! {my} langelyje {sq} buvo be gynybos.
+ex.missed_capture.b6.2 = {best} laimėtų {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Turėjai dvigubą puolimą: {best} puola {t1:acc} ir {t2:acc}!
+ex.missed_fork.b1.2 = Žiūrėk! {best} pultų {t1:acc} ir {t2:acc} vienu metu.
+ex.missed_fork.b1.3 = {best} buvo šakutė: puolami ir {t1}, ir {t2}.
+ex.missed_fork.b2 = {best} buvo šakutė: {t1} ir {t2}.
+ex.missed_fork.b2.2 = Praleidai dvigubą puolimą: {best} puola {t1:acc} ir {t2:acc}.
+ex.missed_fork.b2.3 = {best} puola kartu {t1:acc} ir {t2:acc}. Šakutė!
+ex.missed_fork.b3 = {best} buvo šakutė: {t1} ir {t2}.
+ex.missed_fork.b3.2 = Turėjai ėjimą {best}, kuris šakute puola {t1:acc} ir {t2:acc}.
+ex.missed_fork.b3.3 = {best} šakute pultų {t1:acc} ir {t2:acc}.
+ex.missed_fork.b4 = {best} buvo šakutė prieš {t1:acc} ir {t2:acc}.
+ex.missed_fork.b4.2 = Praleista šakutė: {best} prieš {t1:acc} ir {t2:acc}.
+ex.missed_fork.b5 = {best} šakute pultų {t1:acc} ir {t2:acc}.
+ex.missed_fork.b5.2 = {best} pultų {t1:acc} ir {t2:acc}.
+ex.missed_fork.b6 = {best} šakute pultų {t1:acc} ir {t2:acc}.
+ex.missed_fork.b6.2 = {best} – šakutė prieš {t1:acc} ir {t2:acc}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} gali nubėgti į {sq} ir virsti valdove. {your} per toli.
+ex.promotion.b1.2 = Žiūrėk: niekas nesutrukdys {my:dat} pasiekti {sq}. {your} {my:pron_gen} nepavys.
+ex.promotion.b1.3 = {my:dat} iki {sq} liko {n:square}, o {your} per lėt{your:agr_as_a}.
+ex.promotion.b2 = {my} bėga į {sq}, ir {your} {my:pron_gen} nepavys.
+ex.promotion.b2.2 = {my:dat} iki {sq} reikia {n:move_gen}, o {your:dat} – {n2:move_gen}. Per lėtai.
+ex.promotion.b2.3 = Atsargiai: {my} virs valdove langelyje {sq}, o {your} per toli.
+ex.promotion.b3 = {my} už kvadrato ribų: {your} nepavys {my:pron_gen} iki {sq}.
+ex.promotion.b3.2 = Lenktynės pralaimėtos: {my} pasieks {sq} anksčiau nei {your}.
+ex.promotion.b4 = {your} už pėstininko kvadrato ribų; pėstininkas virsta valdove langelyje {sq}.
+ex.promotion.b4.2 = {my} virsta valdove langelyje {sq}; {your:dat} pritrūksta vieno ėjimo.
+ex.promotion.b5 = Lenktynės iki {sq} pralaimėtos: {your} už kvadrato ribų.
+ex.promotion.b5.2 = {line}: gaunu valdovę langelyje {sq}, o {your} vėluoja.
+ex.promotion.b6 = {your} už kvadrato ribų; virsmas langelyje {sq}.
+ex.promotion.b6.2 = {line}, virsmas langelyje {sq} ({your} vėluoja).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Tavo pėstininkas galėjo nubėgti į {sq} ir virsti valdove!
+ex.promotion_missed.b1.2 = Pažiūrėk į {sq}! Tavo pėstininkas galėjo ten nulėkti.
+ex.promotion_missed.b2 = Tavo pėstininkas galėjo nubėgti į {sq}. Stumk praeivius!
+ex.promotion_missed.b2.2 = Niekas netrukdė tavo pėstininkui eiti į {sq}.
+ex.promotion_missed.b3 = {best} laimi lenktynes iki {sq}.
+ex.promotion_missed.b3.2 = Tavo pėstininkas buvo greitesnis: {best}, ir jis virsta valdove langelyje {sq}.
+ex.promotion_missed.b4 = {best} laimi pėstininkų lenktynes iki {sq}.
+ex.promotion_missed.b4.2 = {best}! Pėstininkas virsta valdove langelyje {sq}.
+ex.promotion_missed.b5 = {best}, ir valdovę langelyje {sq} gauni pirmiau.
+ex.promotion_missed.b5.2 = {best}, ir langelis {sq} tavo.
+ex.promotion_missed.b6 = {best} laimi lenktynes iki {sq}.
+ex.promotion_missed.b6.2 = {best}; {sq} – pirmiau.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Tas pėstininkas saugojo {your:acc}. Dabar {your:dat} mažiau priedangos.
+ex.king_shield.b1.2 = Pėstininkas iš {sq} buvo {your:gen} skydas. Dabar mano figūros gali prasiveržti.
+ex.king_shield.b2 = Pėstininko ėjimas iš {sq} susilpnina {your:gen} priedangą. Dabar mano figūros gali {your:pron_acc} pulti.
+ex.king_shield.b2.2 = {your} neteko sargybinio: pėstininkas langelyje {sq} buvo {your:pron_gen} skydas.
+ex.king_shield.b3 = Šis pėstininko ėjimas atveria {your:acc} mano puolimui.
+ex.king_shield.b3.2 = {your} netenka pėstininkų priedangos, ir mano figūros įsiveržia.
+ex.king_shield.b4 = {move} susilpnina pėstininkus aplink {your:acc}; mano puolimas prasiveržia.
+ex.king_shield.b4.2 = {your:gen} skydas suardytas po {move}.
+ex.king_shield.b5 = {move} susilpnina {your:gen} priedangą: {line}.
+ex.king_shield.b5.2 = Po {move} {your} lieka be priedangos: {line}.
+ex.king_shield.b6 = {move} susilpnina {your:gen} poziciją: {line}.
+ex.king_shield.b6.2 = {line}; {your} per daug atvir{your:agr_as_a}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your:dat} gresia pavojus. Mano figūros jau artėja prie {your:pron_gen}.
+ex.king_exposed.b1.2 = Pažiūrėk, kiek mažai priedangos turi {your}. Laikyk {your:pron_acc} saugiai už pėstininkų.
+ex.king_exposed.b2 = {your} per daug atvir{your:agr_as_a}. Dabar galiu skelbti daug šachų.
+ex.king_exposed.b2.2 = Atsargiai: {your} neturi priedangos, o mano figūros {your:pron_acc} puola.
+ex.king_exposed.b3 = {your} be priedangos; mano figūros gali {your:pron_acc} pulti šachais.
+ex.king_exposed.b3.2 = Po šio ėjimo {your} lieka be priedangos.
+ex.king_exposed.b4 = {your} lieka be priedangos: {line}.
+ex.king_exposed.b4.2 = {move} palieka {your:acc} atvirą puolimui.
+ex.king_exposed.b5 = {your} per daug atvir{your:agr_as_a}: {line}.
+ex.king_exposed.b5.2 = {move} palieka {your:acc} be priedangos.
+ex.king_exposed.b6 = {line}; {your} be priedangos.
+ex.king_exposed.b6.2 = {your} per daug atvir{your:agr_as_a}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Šie mainai veda į pėstininkų endšpilį, kurį aš laimiu.
+ex.bad_trade.b3.2 = Po {line} lieka tik pėstininkai, o mano karalius stovi geriau.
+ex.bad_trade.b4 = Mainai veda į pralaimėtą pėstininkų endšpilį: {line}.
+ex.bad_trade.b4.2 = Pereiti mainais į šį pėstininkų endšpilį – vadinasi, pralaimėti.
+ex.bad_trade.b5 = Klaidingi mainai: pėstininkų endšpilis po {line} pralaimėtas.
+ex.bad_trade.b5.2 = Pėstininkų endšpilis pralaimėtas; išlaikyk figūras lentoje.
+ex.bad_trade.b6 = Pėstininkų endšpilis po {line} pralaimėtas.
+ex.bad_trade.b6.2 = Pralaimėtas pėstininkų endšpilis: {line}.
+ex.bishop_pair.b5 = Šie mainai tau kainuoja rikių porą.
+ex.bishop_pair.b5.2 = Šiais mainais atiduodi savo rikių porą, o manoji lieka.
+ex.bishop_pair.b6 = Rikių pora prarasta.
+ex.bishop_pair.b6.2 = Rikių pora atiduota.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} užima opoziciją: karaliai stovi vienas prieš kitą, tarp jų – vienas langelis.
+ex.opposition.b3.2 = Karaliai! {best} užimtų opoziciją.
+ex.opposition.b4 = {best} užima opoziciją: tai ir yra raktas.
+ex.opposition.b4.2 = Lemia opozicija: {best}.
+ex.opposition.b5 = {best}, užimant opoziciją.
+ex.opposition.b5.2 = Opozicija: {best}.
+ex.opposition.b6 = {best}, opozicija.
+ex.opposition.b6.2 = {best}: opozicija.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Tavo pėstininkas galėjo bėgti į {sq}. Praeiviai nori eiti į priekį!
+ex.push_passed.b1.2 = Stumk savo laisvą pėstininką! Jis nori pasiekti {sq}.
+ex.push_passed.b1.3 = Tavo praeivis nori žygiuoti į {sq}. Stumk jį!
+ex.push_passed.b2 = {best}: stumk praeivį link {sq}.
+ex.push_passed.b2.2 = Tavo praeivis stiprus. {best} jį pastumia.
+ex.push_passed.b2.3 = Stumk! {best} priartina pėstininką prie {sq}.
+ex.push_passed.b3 = {best} pastumia praeivį.
+ex.push_passed.b3.2 = Praeivius reikia stumti: {best}.
+ex.push_passed.b3.3 = Reikėjo {best}: pėstininkas bėga į {sq}.
+ex.push_passed.b4 = {best}: lemia praeivis.
+ex.push_passed.b4.2 = Stumk: {best}.
+ex.push_passed.b5 = {best}, stumiant praeivį: {eval}.
+ex.push_passed.b5.2 = Praeivis: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, praeivis.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Vesk {your:refl_acc} į priekį! Endšpilyje karalius – stipri figūra.
+ex.king_active.b1.2 = Dabar {your} gali įsitraukti į kovą. Vesk {your:pron_acc} į centrą.
+ex.king_active.b1.3 = Kai figūrų liko mažai, {your} turėtų išeiti ir padėti.
+ex.king_active.b2 = Endšpilyje naudok {your:refl_acc}: vesk {your:pron_acc} į centrą.
+ex.king_active.b2.2 = Dabar {your} turi būti aktyv{your:agr_us_i}. Vesk {your:pron_acc} pirmyn.
+ex.king_active.b3 = {best} aktyvina karalių. Endšpilyje karalius kovoja.
+ex.king_active.b3.2 = {best}: dabar karaliaus vieta – centre.
+ex.king_active.b4 = {best} centralizuoja karalių.
+ex.king_active.b4.2 = Karalius turėtų eiti į priekį: {best}.
+ex.king_active.b5 = {best}, aktyvinant karalių: {line}.
+ex.king_active.b5.2 = Karaliaus aktyvumas: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, karalius pirmyn.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} išlaiko geresnę poziciją.
+ex.positional.b4.2 = Čia stipresnis buvo {best}.
+ex.positional.b4.3 = Aš rinkčiausi {best}.
+ex.positional.b5 = Stipresnis buvo {best}: {line}.
+ex.positional.b5.2 = {best} su idėja {line}.
+ex.positional.b5.3 = Apsvarstyk {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
