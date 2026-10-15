@@ -75,9 +75,10 @@ SPIRV_TOOLS_TAG=vulkan-sdk-1.4.363.0
 SPIRV_TOOLS_COMMIT=ef96ed763b43b59b33b31b362f09a02b729fa1c9
 
 # Homebrew formulae for the build: CMake, Ninja, pkg-config, a bison newer than macOS's 2.3,
-# LLVM, and MoltenVK, whose headers Zink's build requires on macOS (MoltenVK itself is neither
-# used nor shipped: KosmicKrisp is the Vulkan driver).
-BREW_FORMULAE=(cmake ninja pkgconf bison "$LLVM_FORMULA" molten-vk)
+# LLVM, MoltenVK, whose headers Zink's build requires on macOS (MoltenVK itself is neither used
+# nor shipped: KosmicKrisp is the Vulkan driver), and Python 3.14, the newest the pinned wheels of
+# Mesa's build exist for (lib.sh, find_python).
+BREW_FORMULAE=(cmake ninja pkgconf bison "$LLVM_FORMULA" molten-vk python@3.14)
 
 MACOS_MIN=26.0
 

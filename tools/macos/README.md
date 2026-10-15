@@ -16,9 +16,10 @@ tools/macos/make-dmg.sh build-macos/Scacelith.app   # -> build-macos/Scacelith-<
 
 They need an Apple Silicon Mac (a shell running under Rosetta is refused), Xcode or its command
 line tools with the macOS 26 SDK, [Homebrew](https://brew.sh) for the build tools (`build-deps.sh`
-installs the formulae it lacks: cmake, ninja, pkgconf, bison, llvm@19, molten-vk) and Python 3.10
-or later. Each script stops at the first problem with a message naming it, and prints the versions
-it used.
+installs the formulae it lacks: cmake, ninja, pkgconf, bison, llvm@19, molten-vk, python@3.14) and
+Python 3.10 to 3.14 (3.14 is the newest the pinned wheels of Mesa's build exist for; a newer
+python3 is only used by dmgbuild, when no python3.14 to 3.10 is installed). Each script stops at
+the first problem with a message naming it, and prints the versions it used.
 
 | File | What it does |
 |---|---|
