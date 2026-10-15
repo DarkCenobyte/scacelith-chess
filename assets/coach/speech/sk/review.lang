@@ -458,7 +458,7 @@ ex.discovered.b6.2 = {reply} a {t1} padne.
 ex.discovered.b6.3 = Odkrytý útok: {reply} napadne {t1:acc}.
 
 # ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
-ex.skewer.b1 = {my} napáda {t1:acc}. Keď {t1:pron} uhne, vezmem {t2:acc} za {t1:npron_ins}.
+ex.skewer.b1 = {my} napáda {t1:acc}. Keď uhne, vezmem {t2:acc} za {t1:npron_ins}.
 ex.skewer.b1.2 = Pozri: {my} napáda {t1:acc} a hneď za {t1:npron_ins} stojí {t2}.
 ex.skewer.b1.3 = {my} ide po {t1:loc}. {t1} musí uhnúť a potom padne {t2}.
 ex.skewer.b2 = Napichnutie: {my} napáda {t1:acc} a za {t1:npron_ins} stojí {t2}.
@@ -832,7 +832,7 @@ tip.castle.b1.2 = Čas na rošádu! V rohu je {your} bezpečnejš{your:adj_soft}
 tip.castle.b1.3 = Mysli čoskoro na rošádu. {your} stojí bez úkrytu.
 tip.castle.b2 = {your} je stále v strede. Urob čoskoro rošádu!
 tip.castle.b2.2 = Rošáda by {your:acc} bezpečne ukryla.
-tip.castle.b3 = Stred sa otvára: je čas ukryť {your:acc} rošádou.
+tip.castle.b3 = Stred sa otvára: je čas ukryť {your:refl_acc} rošádou.
 tip.castle.b3.2 = {your} je stále v strede; rošáda bola už na čase.
 tip.knight_rim.b1 = {your} na okraji veľa nerobí. Jazdci majú radi stred.
 tip.knight_rim.b1.2 = Jazdec na okraji je zlý jazdec! {your} tam kontroluje menej polí.

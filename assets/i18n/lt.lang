@@ -257,3 +257,244 @@ credits.fonts = EB Garamond – Georg Duffner, Cinzel – Natanael Gama; Amiri �
 credits.fonts.hand = Rašysena: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Šachmatų figūros iš GNU FreeFont (GPL v3 su šrifto išimtimi).
 credits.quote = „Šachmatai – analizės menas.“  — Michailas Botvinikas
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licencijos
+licences.title = LICENCIJOS
+licences.note = Licencijos pateikiamos originaliu tekstu anglų kalba.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUZĖ
+pause.resume = Tęsti
+pause.offer_draw = Siūlyti lygiąsias
+pause.claim_draw = Reikalauti lygiųjų
+pause.claim_draw.help = Trigubas pozicijos pasikartojimas arba penkiasdešimties ėjimų taisyklė.
+pause.resign = Pasiduoti
+confirm.resign.title = PASIDUOTI
+confirm.resign.text = Pasiduoti šioje partijoje? Laimėtoju bus paskelbtas varžovas.
+confirm.resign.draw = Pasiduoti šioje partijoje? Varžovas nebegali paskelbti mato: partija baigsis lygiosiomis.
+confirm.resign.ok = Pasiduoti
+confirm.leave.title = PALIKTI PARTIJĄ
+confirm.leave.text = Grįžti į pagrindinį meniu? Dabartinė partija bus nutraukta.
+confirm.leave.ok = Išeiti
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PĖSTININKO VIRSMAS
+piece.queen = Valdovė
+piece.rook = Bokštas
+piece.bishop = Rikis
+piece.knight = Žirgas
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partija baigėsi lygiosiomis.
+gameover.draw_moves = Partija baigėsi lygiosiomis po {0} ėjimo.|Partija baigėsi lygiosiomis po {0} ėjimų.|Partija baigėsi lygiosiomis po {0} ėjimų.
+gameover.win = Puikiai sužaista – jūs laimėjote.
+gameover.win_moves = Puikiai sužaista – laimėjote per {0} ėjimą.|Puikiai sužaista – laimėjote per {0} ėjimus.|Puikiai sužaista – laimėjote per {0} ėjimų.
+gameover.loss = Laimėjo varžovas.
+gameover.loss_moves = Varžovas laimėjo per {0} ėjimą.|Varžovas laimėjo per {0} ėjimus.|Varžovas laimėjo per {0} ėjimų.
+gameover.rematch = Revanšas
+gameover.view_board = Pažiūrėti lentą
+gameover.show = Rodyti
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Matas
+reason.resignation = Pasidavimas
+reason.timeout = Pralaimėjimas dėl laiko
+reason.illegal_moves = Antrasis neleistinas ėjimas (techninis pralaimėjimas)
+reason.stalemate = Patas
+reason.insufficient = Negyva pozicija (nepakanka medžiagos)
+reason.timeout_vs_insufficient = Baigėsi laikas, bet varžovas negali paskelbti mato
+reason.fivefold = Penkiagubas pozicijos pasikartojimas
+reason.75_moves = 75 ėjimų taisyklė
+reason.threefold_claim = Trigubas pozicijos pasikartojimas (pareikalauta)
+reason.50_moves_claim = 50 ėjimų taisyklė (pareikalauta)
+reason.agreement = Lygiosios susitarus
+reason.illegal_vs_insufficient = Antrasis neleistinas ėjimas, bet varžovas negali paskelbti mato
+reason.resignation_vs_insufficient = Pasidavimas, bet varžovas negali paskelbti mato
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ĖJIMAI
+movelist.empty = Ėjimų dar nėra.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Ruošiamos medžiagos
+loading.hall = Statoma salė
+loading.furniture = Drožiamas stalas ir kėdės
+loading.board = Poliruojama lenta
+loading.pieces = Tekinamos šachmatų figūros
+loading.clock = Surenkamas laikrodis
+loading.porcelain = Degamas porcelianas
+loading.ready = Paruošta
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Šioje pozicijoje reikalauti lygiųjų negalima.
+notify.flag_you = Jūsų laikas baigėsi.
+notify.flag_opponent = Varžovo laikas baigėsi.
+notify.touched.pawn = Paliestos figūros taisyklė: turite eiti paliestu pėstininku.
+notify.touched.knight = Paliestos figūros taisyklė: turite eiti paliestu žirgu.
+notify.touched.bishop = Paliestos figūros taisyklė: turite eiti paliestu rikiu.
+notify.touched.rook = Paliestos figūros taisyklė: turite eiti paliestu bokštu.
+notify.touched.queen = Paliestos figūros taisyklė: turite eiti paliesta valdove.
+notify.touched.king = Paliestos figūros taisyklė: turite eiti paliestu karaliumi.
+notify.touched.piece = Paliestos figūros taisyklė: turite eiti paliesta figūra.
+notify.touched_square = Paliestos figūros taisyklė: turite eiti figūra iš langelio {0}.
+notify.press_clock = Paspauskite laikrodį, kad užbaigtumėte ėjimą (tarpas).
+notify.manual_clock = Šioje partijoje laikrodis automatiškai nespaudžiamas: paspauskite jį po kiekvieno ėjimo.
+notify.illegal = Neleistinas ėjimas.
+notify.cannot_move = Tokio ėjimo padaryti negalima.
+notify.move_first = Pirma padarykite ėjimą, tada spauskite laikrodį.
+notify.stance.sit_to_play = Atsisėskite, kad galėtumėte žaisti (rodyklė žemyn).
+notify.stance.first = Kol stovite, laikrodis eina. Rodyklė žemyn – atsisėsti.
+notify.stance.first_untimed = Žaisti galima tik sėdint savo kėdėje. Rodyklė žemyn – atsisėsti.
+notify.stance.finish_move = Pirma užbaikite ėjimą.
+notify.draw_already_offered = Šiame ėjime lygiąsias jau pasiūlėte.
+notify.draw_accepted = Varžovas sutinka su lygiosiomis.
+notify.draw_declined = Varžovas atmeta lygiųjų pasiūlymą.
+notify.draw_claimed = Varžovas reikalauja lygiųjų.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Teisėjas: laikrodis paspaustas nepadarius ėjimo – tai laikoma neleistinu ėjimu.
+arbiter.unpromoted = Teisėjas: neleistinas ėjimas – prieš paspaudžiant laikrodį pėstininkas nebuvo pakeistas nauja figūra.
+arbiter.illegal = Teisėjas: neleistinas ėjimas.
+arbiter.second_loses.white = Tai antrasis baltųjų neleistinas ėjimas: baltieji pralaimi partiją.
+arbiter.second_loses.black = Tai antrasis juodųjų neleistinas ėjimas: juodieji pralaimi partiją.
+arbiter.second_draw.white = Tai antrasis baltųjų neleistinas ėjimas, bet juodieji negali paskelbti mato: partija baigiasi lygiosiomis.
+arbiter.second_draw.black = Tai antrasis juodųjų neleistinas ėjimas, bet baltieji negali paskelbti mato: partija baigiasi lygiosiomis.
+arbiter.queen = Pėstininkas virsta valdove.
+arbiter.queen_one_minute.white = Pėstininkas virsta valdove, o baltieji gauna vieną papildomą minutę.
+arbiter.queen_one_minute.black = Pėstininkas virsta valdove, o juodieji gauna vieną papildomą minutę.
+arbiter.queen_two_minutes.white = Pėstininkas virsta valdove, o baltieji gauna dvi papildomas minutes.
+arbiter.queen_two_minutes.black = Pėstininkas virsta valdove, o juodieji gauna dvi papildomas minutes.
+arbiter.restored = Pozicija atkurta.
+arbiter.restored_one_minute.white = Pozicija atkurta, o baltieji gauna vieną papildomą minutę.
+arbiter.restored_one_minute.black = Pozicija atkurta, o juodieji gauna vieną papildomą minutę.
+arbiter.restored_two_minutes.white = Pozicija atkurta, o baltieji gauna dvi papildomas minutes.
+arbiter.restored_two_minutes.black = Pozicija atkurta, o juodieji gauna dvi papildomas minutes.
+arbiter.one_minute.white = Baltieji gauna vieną papildomą minutę.
+arbiter.one_minute.black = Juodieji gauna vieną papildomą minutę.
+arbiter.two_minutes.white = Baltieji gauna dvi papildomas minutes.
+arbiter.two_minutes.black = Juodieji gauna dvi papildomas minutes.
+arbiter.second_loses = Antrasis neleistinas ėjimas reiškia pralaimėjimą.
+arbiter.touched.white = Baltieji privalo eiti paliesta figūra.
+arbiter.touched.black = Juodieji privalo eiti paliesta figūra.
+arbiter.game_over = Partija baigta.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Stebėti partiją
+
+viewer.title = STEBĖTI PARTIJĄ
+viewer.white = BALTIEJI
+viewer.black = JUODIEJI
+viewer.time_control = LAIKO KONTROLĖ
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Sukeisti spalvas
+viewer.note = Abu žaidėjai – Stockfish. Kol jie žaidžia, laisvai skraidykite po salę: niekas jūsų nematys.
+viewer.summary = {0} prieš {1}
+viewer.custom = Pasirinktinė
+viewer.tc.custom = Savo nuožiūra
+viewer.base_time = Pradinis laikas
+viewer.increment = Pridėtinis laikas
+viewer.delay = Delsa
+viewer.off = Išjungta
+viewer.minutes = {0} min.
+viewer.seconds = {0} s
+viewer.delay_summary = delsa {0} s
+viewer.back = Atgal
+viewer.start = Pradėti
+
+viewer.paused = PAUZĖ
+viewer.resume = Tęsti
+viewer.options = Nustatymai
+viewer.main_menu = Pagrindinis meniu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = VALDYMAS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  rodyklės
+viewer.controls.move = Judėti
+viewer.keys.updown = E, Tarpas  /  C, Ctrl
+viewer.controls.updown = Aukštyn / žemyn
+viewer.keys.fast = Shift
+viewer.controls.fast = Greičiau
+viewer.keys.look = Dešinysis pelės mygtukas
+viewer.controls.look = Apsidairyti
+viewer.keys.speed = Pelės ratukas
+viewer.controls.speed = Greitis
+viewer.keys.views = 1 – 9
+viewer.controls.views = Žiūrėjimo taškai
+viewer.keys.eyes = 0
+viewer.controls.eyes = Ėjimą darančio žaidėjo akimis
+viewer.keys.moves = Tab
+viewer.controls.moves = Ėjimų sąrašas
+viewer.keys.menu = Esc
+viewer.controls.menu = Meniu
+viewer.keys.hide = H
+viewer.controls.hide = Slėpti šį skydelį
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauzė / tęsti
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Vienu ėjimu atgal / pirmyn
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Lėčiau / greičiau
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partijos pradžia / pabaiga
+viewer.speed = Greitis {0} m/s
+viewer.view.0 = Žaidėjų akimis
+viewer.view.1 = Prie stalo
+viewer.view.2 = Virš lentos
+viewer.view.3 = Salė
+viewer.view.4 = Laikrodis
+viewer.view.5 = Baltųjų veidas
+viewer.view.6 = Juodųjų veidas
+viewer.view.7 = Dvikova
+viewer.view.8 = Langai
+viewer.view.9 = Gobelenai
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Baltieji
+viewer.side.black = Juodieji
+viewer.flag.white = Baltųjų laikas baigėsi.
+viewer.flag.black = Juodųjų laikas baigėsi.
+viewer.claims_draw = {0} reikalauja lygiųjų.
+viewer.offer_accepted = {0} siūlo lygiąsias. {1} sutinka.
+viewer.offer_declined = {0} siūlo lygiąsias. {1} atsisako.
+viewer.gameover.white_wins = Baltieji laimėjo po {0}-ojo ėjimo.
+viewer.gameover.black_wins = Juodieji laimėjo po {0}-ojo ėjimo.
+viewer.gameover.draw = Partija baigėsi lygiosiomis po {0}-ojo ėjimo.
+viewer.gameover.players = {0} prieš {1}
+viewer.watch_again = Žiūrėti dar kartą
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Reitinginių partijų dar nėra
+elo.provisional = Preliminarus reitingas
+elo.peak = Aukščiausias {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Jūsų Elo {0}
+elo.expected = tikėtinas rezultatas {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ši partija neturi įtakos reitingui
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partijos blankas
+scoresheet.event = Varžybos
+scoresheet.date = Data
+scoresheet.round = Turas
+scoresheet.board = Lenta
+scoresheet.page = Puslapis
+scoresheet.white = Baltieji
+scoresheet.black = Juodieji
+scoresheet.elo = Elo
+scoresheet.result = Rezultatas
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Baltųjų parašas
+scoresheet.sign_black = Juodųjų parašas
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Lithuanian letters: K karalius, V valdovė, B bokštas, R rikis, Ž žirgas; ISO date 2026-10-14.
+scoresheet.pieces = K V B R Ž
+scoresheet.date_format = {2}-{1}-{0}
