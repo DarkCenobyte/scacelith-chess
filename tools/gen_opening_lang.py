@@ -166,8 +166,9 @@ def slug(s):
     return t
 
 
-def parse_lang(path):
-    """Parses a key = value file; returns an ordered list of (key, value)."""
+def parse_lang(path, allow_empty=False):
+    """Parses a key = value file; returns an ordered list of (key, value). allow_empty: a key may have an empty
+    value (the coach's speech files: a form that is nothing in that language)."""
     out = []
     with open(path, encoding='utf-8') as f:
         for n, line in enumerate(f, 1):
@@ -178,7 +179,7 @@ def parse_lang(path):
                 fail('%s:%d: missing "="' % (path, n))
             k, v = s.split('=', 1)
             k, v = k.strip(), v.strip()
-            if not k or not v:
+            if not k or (not v and not allow_empty):
                 fail('%s:%d: empty key or value' % (path, n))
             out.append((k, v))
     keys = [k for k, _ in out]
@@ -256,7 +257,7 @@ def speech_words(lang):
         p = os.path.join(SPEECH, lang, 'common.lang')
         if not os.path.exists(p):
             fail('missing ' + p + ' (the spoken squares of the openings come from it)')
-        kv = dict(parse_lang(p))
+        kv = dict(parse_lang(p, allow_empty=True))
         try:
             files = [kv['file.%s.spoken' % f] for f in 'abcdefgh']
             ranks = [kv['rank.%d.spoken' % r] for r in range(1, 9)]

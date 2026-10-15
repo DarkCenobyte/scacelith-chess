@@ -1,0 +1,136 @@
+# Coach speech (Bulgarian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 позиции", count.position in
+#            common.lang), "{n:move}" likewise ("мат в 2 хода", "мат в 1 ход")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "мат" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use the reflexive: {your:refl} = "коня си"
+#   {sq}     a square; the coach points at it on that word ("полето {sq}")
+# The player always has the white pieces. The coach says "ти" to the player and is male ("бих
+# отговорил"); the player's gender is unknown. "{n:position}" is never followed by a relative
+# pronoun ("които" would not agree with "1 позиция").
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Мат в един ход. {n:position}, и всеки път един-единствен ход дава мат. Провери всеки шах.
+ch.intro.mate2 = Мат в два хода. {n:position}: първият ти ход трябва да не ми оставя защита, а после даваш мат.
+ch.intro.mate3 = Мат в три хода. {n:position}. Шахове, вземания и заплахи: всеки път изчисли най-добрия ми отговор.
+ch.intro.backrank = Матове на задната линия. {n:position} с цар, заклещен зад собствените си пешки.
+ch.intro.patterns = Матови схеми. {n:position} с класически матови мрежи. Разпознай схемата и удари.
+ch.intro.hanging = Незащитени фигури. {n:position}: нещо мое е останало без защита. Намери го и го вземи.
+ch.intro.fork = Вилици. {n:position}: намери хода, който напада две неща едновременно.
+ch.intro.pin = Свръзки. {n:position}: свържи фигура или се възползвай от свръзка.
+ch.intro.skewer = Линейни удари. {n:position}: нападни ценна фигура и спечели това, което стои зад нея.
+ch.intro.discovered = Открити атаки. {n:position}: премести една фигура, за да отвориш пътя на друга.
+ch.intro.deflection = Отклоняване и привличане. {n:position}: отклони защитник или го привлечи на гибелно поле.
+ch.intro.intermezzo = Междинни ходове. {n:position}: преди очевидния ход намери по-силен.
+ch.intro.trapped = Фигури в капан. {n:position}: една от моите фигури няма безопасно поле. Спечели я.
+ch.intro.promotion = Произвеждане. {n:position}: напреднала пешка решава партията.
+ch.intro.quiet = Тихи ходове. {n:position}: печелившият ход не е нито шах, нито вземане.
+ch.intro.opening = Дебютни капани. {n:position} от първите ходове на истински партии. Накажи грешката ми.
+ch.intro.escape = Намери спасението. {n:position}: царят ти е в опасност и само един ход го спасява.
+ch.intro.defend = Защитни ходове. {n:position}: намери единствения ход, който удържа позицията ти.
+ch.intro.kq = Дама и цар срещу цар. {n:position}: дай мат на царя ми. Внимавай за пат.
+ch.intro.kr = Топ и цар срещу цар. {n:position}: дай мат на царя ми, стъпка по стъпка.
+ch.intro.kp = Цар и пешка срещу цар. {n:position}: произведи дама. Нека царят ти води.
+ch.intro.kp_hold = Спри пешката. {n:position}: имаш само цар. Удържи реми.
+ch.intro.rook = Топовни ендшпили. {n:position}: построй мост, за да произведеш пешката, и удържи реми със защитата на Филидор.
+ch.intro.endgame = Тактика в ендшпила. {n:position} с малко фигури и остри идеи.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Мат в {n:move}.
+ch.task.mate.2 = Намери мата в {n:move}.
+ch.task.hanging = Нещо е останало без защита.
+ch.task.hanging.2 = Какво можеш да вземеш даром?
+ch.task.fork = Намери вилицата.
+ch.task.fork.2 = Потърси вилица.
+ch.task.pin = Тук ключът е свръзката.
+ch.task.skewer = Тук печели линеен удар.
+ch.task.discovered = Тук печели открита атака.
+ch.task.deflection = Претовари или привлечи защитник.
+ch.task.intermezzo = Потърси междинен ход.
+ch.task.trapped = Една от моите фигури не може да избяга. Спечели я.
+ch.task.promotion = Използвай напредналата си пешка.
+ch.task.quiet = Печелившият ход е тих ход.
+ch.task.opening = Накажи последния ми ход.
+ch.task.escape = Спаси царя си: само един ход върши работа.
+ch.task.defend = Намери единствения добър ход.
+ch.task.endgame = Намери най-добрия ход.
+ch.task.default = Намери най-добрия ход.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Дай мат на царя ми. Ще се защитавам, доколкото мога.
+ch.task.play.promote = Произведи пешката си и запази победата. Ще се опитам да те спра.
+ch.task.play.hold = Удържи реми в продължение на {n:move}. Ще се опитам да спечеля.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Тези позиции са от истински партии. Изигравам последния ход, а после ти си на ход.
+ch.lead.first.2 = Всяка позиция е от истинска партия: изигравам хода, който е довел до нея, а после играеш ти.
+ch.next = Следваща позиция.
+ch.next.2 = Ето следващата.
+ch.next.3 = Към следващата.
+ch.last = Последната позиция.
+ch.last.2 = А сега последната.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Добре.
+ch.good.2 = Да.
+ch.good.3 = Правилно.
+ch.good.4 = Точно така.
+# The position is solved.
+ch.solved = Това е! Браво.
+ch.solved.2 = Абсолютно правилно.
+ch.solved.3 = Много добре.
+ch.solved.mate = Мат! Браво.
+ch.solved.mate.2 = И това е мат. Много добре.
+ch.solved.mate.3 = Мат. Чудесна работа.
+ch.solved.promote = Нова дама и победата е сигурна. Браво.
+# "реми" is indeclinable (glossary): no "ремито".
+ch.solved.hold = Партията остава реми. Добра защита!
+ch.solved.draw = Реми на дъската. Добра защита!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Не този: бих отговорил с {move}.
+ch.wrong.reply.2 = Не съвсем: отговорът ми би бил {move}.
+ch.wrong.reply.3 = Тогава бих изиграл {move}.
+ch.wrong.mate = Внимавай: ходът {move:nomate} би бил мат.
+ch.wrong.mate.2 = Внимание: бих отговорил с {move:nomate} и това е мат.
+ch.wrong.mated = Внимавай: след {move} мога да форсирам мат в {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = И така се дава мат, но по-бавно. Има по-бърз път.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = И така се дава мат, но аз имам предвид друг ход. Погледни пак.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Не е лошо, но има нещо по-силно. Погледни пак.
+ch.wrong.weaker.2 = Това може да се играе, но можеш и по-добре.
+ch.wrong.stalemate = Пат! Царят ми няма ход, а това е само реми.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Не този: след {move} мога да удържа реми.
+ch.wrong.loses = Внимавай: след {move} печеля аз.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Не е това.
+ch.try_again = Опитай пак.
+ch.try_again.2 = Погледни още веднъж.
+ch.try_again.3 = Погледни пак.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Искаш ли подсказка?
+ch.offer.2 = Да ти подскажа ли?
+ch.no_hint = Добре. Търси още.
+ch.no_hint.2 = Добре, не бързай.
+ch.hint.piece = Погледни {your:refl}.
+ch.hint.piece.2 = Помисли за {your:refl}.
+ch.hint.square = Погледни полето {sq}.
+ch.hint.square.2 = Ключовото поле е {sq}.
+ch.hint.square.3 = Следи полето {sq}.
+ch.hint.show = Ето хода. Гледай.
+ch.hint.show.2 = Нека ти покажа. Гледай.
+ch.hint.now = Сега го изиграй ти.
+ch.hint.now.2 = Твой ход: изиграй го.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Това е цялото предизвикателство. Браво!
+ch.complete.2 = Всички позиции са решени. Браво!

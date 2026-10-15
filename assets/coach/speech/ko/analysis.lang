@@ -1,0 +1,155 @@
+# Coach speech (Korean): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by the
+# voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Register: a calm, warm commentator in polite 해요체; short sentences (subtitles too). Nobody is
+# "you" or "I" here: the players are 백 and 흑 (as assets/i18n/ko.lang).
+# {piece} {t1} {t2} = a piece with its side, "백 나이트" / "흑 퀸", with the forms of common.lang
+# ({piece:obj} "백 나이트를", {piece:subj} "흑 퀸이"); {t2:bare} = the piece name alone after {t1} of
+# the same side ("{t1:and} {t2:bare}" = "백 퀸과 룩": a fork's two targets belong to one side).
+# Moves ({move} {best} {reply} {line}) and {opening:def} end in a varying sound: never a particle
+# after them; apposition instead ("{best}, 이 수가 더 강했어요"), or the sentence ends on them.
+# Counted numbers: {m:move} "3수" (spoken "세 수"), {pts:point} "3점", {n:mistake} "실수 2번",
+# {m:blunder} "블런더 1번", {n:time} "2번", {acc_white:percent} "87%" (spoken "팔십칠 퍼센트").
+# The draw rules are written "50수 규칙" / "75수 규칙" (spoken "오십 수", "칠십오 수").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = 이 게임을 같이 되돌아봐요.
+an.start.2 = 이 게임을 한 수씩 짚어 봐요.
+an.start.3 = 이게 그 게임이에요. 어떻게 흘러갔는지 봐요.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = 이 게임은 따로 배치한 포지션에서 시작해요. 하나씩 살펴봐요.
+an.start.setup.2 = 따로 배치한 포지션에서 시작한 게임이에요. 어떻게 흘러갔는지 봐요.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = 이 게임의 오프닝은 {opening:def}.
+an.opening.2 = {opening:def}, 이 오프닝으로 시작한 게임이에요.
+an.book_exit = {move}, 이 수로 게임이 알려진 오프닝 이론을 벗어나요.
+an.book_exit.2 = {move}, 이 수가 오프닝 이론을 벗어난 첫 수예요.
+an.book_exit.3 = {move}, 여기서 오프닝 이론이 끝나요.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move}, 블런더예요.
+an.blunder.2 = 여기서 {move}, 이 수는 큰 실수예요.
+an.blunder.3 = 블런더가 나왔어요. {move}.
+an.mistake = {move}, 실수예요.
+an.mistake.2 = 여기서 {move}, 이 수는 올바른 수가 아니에요.
+an.mistake.3 = 실수가 나왔어요. {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move}, 이 수로는 그 실수를 응징할 기회를 놓쳐요.
+an.missed_chance.2 = {move}, 이 수로 기회가 날아가요.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = 이제 {reply:nomate}, 이 수로 체크메이트예요.
+an.mate_allowed.one.2 = 상대에게 {reply:nomate}, 이 수를 허용해요. 그러면 체크메이트예요.
+an.mate_allowed = {reply:nomate}, 이 수부터 {m:move} 만에 강제 메이트를 허용해요.
+an.mate_allowed.2 = 이제 {m:move} 만에 강제 메이트가 있어요. 시작은 {reply:nomate}.
+an.fork = 이제 {reply}, 이 수로 {t1:and} {t2:bare}에 포크가 걸려요.
+an.fork.2 = {reply}, 이 수가 가능해져서 {t1:and} {t2:bare_top} 동시에 공격받아요.
+an.fork.3 = {reply}, 이 수가 {t1:and} {t2:bare_obj} 한꺼번에 노려요.
+an.hanging = {piece:subj} 지켜지지 않은 채 남아서, {reply}, 이 수에 잡혀요.
+an.hanging.2 = {piece}에게는 수비 기물이 없어요. {reply}, 이 수로 그 기물을 따내요.
+an.hanging.3 = {reply}, 이 수로 지켜 주는 기물이 없던 {piece:obj} 그냥 잡아요.
+an.material = {line}, 이 응수로 기물 {pts:point}을 얻어요.
+an.material.2 = 그러면 {line}, 이 수순으로 {pts:point}을 얻어요.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate}, 이 수가 체크메이트였어요.
+an.mate_missed.one.2 = {best:nomate}, 이렇게 두었다면 체크메이트였어요.
+an.mate_missed = {best:nomate}, 이 수였다면 {m:move} 만에 강제 메이트였어요.
+an.mate_missed.2 = {m:move} 만에 강제 메이트가 있었어요. 시작은 {best:nomate}.
+an.missed_capture = {best}, 이 수로 {piece:obj} 공짜로 잡을 수 있었어요.
+an.missed_capture.2 = {piece}에게는 수비 기물이 없었어요. {best}, 이 수로 잡을 수 있었어요.
+an.missed_fork = {best}, 이 수로 {t1:and} {t2:bare}에 포크를 걸 수 있었어요.
+an.missed_fork.2 = {best}, 이 수는 {t1:and} {t2:bare_obj} 동시에 공격하는 포크였어요.
+
+# The better move, when nothing above named it.
+an.better = {best}, 이 수가 더 강했어요.
+an.better.2 = 더 좋은 수가 있었어요. {best}.
+an.better.3 = {best}, 이 수가 더 정확했어요.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move}, 묘수예요! {piece:obj} 내줘요!
+an.brilliant.2 = 기막힌 희생이에요! {move}, 이 수로 {piece:obj} 내줘요.
+an.brilliant.3 = {move}! {piece:obj} 내주는 묘수예요.
+an.brilliant.mate = {m:move} 만에 강제 메이트로 이어져요.
+an.brilliant.mate.2 = 그리고 {m:move} 만에 메이트를 강제해요.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move}, 우위를 지키는 유일한 수예요.
+an.only.win.2 = 여기서 우위를 지키는 수는 {move}, 이 수뿐이에요. 잘 찾았어요.
+an.only.hold = {move}, 균형을 지키는 유일한 수예요.
+an.only.hold.2 = 여기서 포지션을 버티게 하는 수는 {move}, 이 수뿐이에요.
+an.only.defend = {move}, 싸움을 이어 가게 하는 유일한 수예요.
+an.only.defend.2 = 여기서 게임을 살려 두는 수는 {move}, 이 수뿐이에요. 좋은 수비예요.
+an.only.best = 여기서는 {move}, 이 수가 단연 가장 강한 수예요.
+an.only.best.2 = 정확해요. {move}, 이 수가 다른 어떤 수보다 훨씬 강해요.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move}, 이 수는 조금 부정확해요. {best}, 이 수가 더 정확했어요.
+an.inaccuracy.2 = 최선은 아니었어요. {move} 대신 {best}, 이 수가 더 정확했어요.
+an.interesting = {move}, {piece:obj} 내주는 흥미로운 아이디어예요.
+an.interesting.2 = 흥미로운 시도예요. {move}, 이 수로 {piece:obj} 내줘요.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = 이제 백에게 {m:move} 만에 강제 메이트가 있어요.
+an.mate_on.white.2 = 여기서부터 백은 {m:move} 만에 메이트를 강제할 수 있어요.
+an.mate_on.black = 이제 흑에게 {m:move} 만에 강제 메이트가 있어요.
+an.mate_on.black.2 = 여기서부터 흑은 {m:move} 만에 메이트를 강제할 수 있어요.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = 체크메이트예요. 백이 게임을 이겼어요.
+an.end.mate.white.2 = 이걸로 체크메이트, 백 승리예요.
+an.end.mate.black = 체크메이트예요. 흑이 게임을 이겼어요.
+an.end.mate.black.2 = 이걸로 체크메이트, 흑 승리예요.
+an.end.resigned.white = 흑이 기권해서 백이 이겼어요.
+an.end.resigned.white.2 = 게임은 여기서 끝나요. 흑이 기권했고, 백이 이겼어요.
+an.end.resigned.black = 백이 기권해서 흑이 이겼어요.
+an.end.resigned.black.2 = 게임은 여기서 끝나요. 백이 기권했고, 흑이 이겼어요.
+an.end.timeout.white = 흑의 시간이 다 떨어져서 백이 이겼어요.
+an.end.timeout.white.2 = 백의 시간승이에요.
+an.end.timeout.black = 백의 시간이 다 떨어져서 흑이 이겼어요.
+an.end.timeout.black.2 = 흑의 시간승이에요.
+an.end.win.white = 게임은 백의 승리로 끝나요.
+an.end.win.white.2 = 백이 게임을 이겼어요.
+an.end.win.black = 게임은 흑의 승리로 끝나요.
+an.end.win.black.2 = 흑이 게임을 이겼어요.
+an.end.stalemate = 스테일메이트예요. 게임은 무승부예요.
+an.end.stalemate.2 = 스테일메이트라서 게임은 무승부로 끝나요.
+an.end.draw.agreement = 두 플레이어가 무승부에 합의했어요.
+an.end.draw.agreement.2 = 게임은 합의 무승부로 끝나요.
+an.end.draw.repetition = 동형 반복으로 무승부예요.
+an.end.draw.repetition.2 = 같은 포지션이 또 나왔어요. 무승부예요.
+an.end.draw.fifty = 50수 규칙으로 무승부예요.
+an.end.draw.fifty.spoken = 오십 수 규칙으로 무승부예요.
+an.end.draw.fifty.2 = 잡기도 폰 이동도 없이 50수가 지났어요. 무승부예요.
+an.end.draw.fifty.2.spoken = 잡기도 폰 이동도 없이 오십 수가 지났어요. 무승부예요.
+an.end.draw.seventy_five = 75수 규칙으로 무승부예요.
+an.end.draw.seventy_five.spoken = 칠십오 수 규칙으로 무승부예요.
+an.end.draw.seventy_five.2 = 잡기도 폰 이동도 없이 75수가 지났어요. 무승부예요.
+an.end.draw.seventy_five.2.spoken = 잡기도 폰 이동도 없이 칠십오 수가 지났어요. 무승부예요.
+an.end.draw.material = 더 이상 체크메이트가 불가능해요. 무승부예요.
+an.end.draw.material.2 = 어느 쪽도 더는 체크메이트할 수 없어서 무승부예요.
+an.end.draw = 게임은 무승부로 끝나요.
+an.end.draw.2 = 무승부예요.
+an.end.unfinished = 게임은 끝나지 않은 채 여기서 멈춰요.
+an.end.unfinished.2 = 게임은 여기까지예요. 끝까지 두지 않았어요.
+an.end.accuracy = 정확도는 백 {acc_white:percent}, 흑 {acc_black:percent}예요.
+an.end.accuracy.2 = 백은 정확도 {acc_white:percent}, 흑은 {acc_black:percent}로 뒀어요.
+an.end.clean.white = 백은 실수도 블런더도 없었어요.
+an.end.clean.white.2 = 백은 큰 실수 없이 뒀어요.
+an.end.clean.black = 흑은 실수도 블런더도 없었어요.
+an.end.clean.black.2 = 흑은 큰 실수 없이 뒀어요.
+an.end.mistakes.white = 백은 실수를 {n:time} 했고, 블런더는 없었어요.
+an.end.mistakes.white.2 = 백: {n:mistake}, 블런더 없음.
+an.end.mistakes.black = 흑은 실수를 {n:time} 했고, 블런더는 없었어요.
+an.end.mistakes.black.2 = 흑: {n:mistake}, 블런더 없음.
+an.end.blunders.white = 백은 블런더를 {m:time} 했어요.
+an.end.blunders.white.2 = 백: {m:blunder}.
+an.end.blunders.black = 흑은 블런더를 {m:time} 했어요.
+an.end.blunders.black.2 = 흑: {m:blunder}.
+an.end.errors.white = 백은 실수를 {n:time}, 블런더를 {m:time} 했어요.
+an.end.errors.white.2 = 백: {n:mistake}, {m:blunder}.
+an.end.errors.black = 흑은 실수를 {n:time}, 블런더를 {m:time} 했어요.
+an.end.errors.black.2 = 흑: {n:mistake}, {m:blunder}.

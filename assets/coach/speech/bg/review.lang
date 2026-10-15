@@ -1,0 +1,589 @@
+# Coach speech (Bulgarian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register and forms: see the header of bg/common.lang and the glossary. The coach says "ти" and is
+# male ("бих изиграл", "не очаквах", "сгреших"). The player's gender is unknown: no l-participle, no
+# adjective or passive participle about the player. The lines use the present ("губиш", "изоставаш с"),
+# the imperfect ("можеше да дадеш мат", "щеше да спечели") or an aorist that cannot be read as an
+# imperative ("пропусна", "взе", "откри", "прибра"); never "загуби", "спечели", "остави", "направи",
+# "намери" as a 2nd person aorist, which sound like orders.
+# Piece forms (bg/common.lang): {your} = subject ("конят ти"), {your:obj} = object and after a
+# preposition ("коня ти"), {your:refl} = when the player (or the coach, for {my}) is the subject
+# ("Погледни коня си", "Премествам офицера си"), pron / pron_obj / pron_dat / pron_full / rel, and
+# {x:a} = the feminine ending of a participle after the piece ("свързан{your:a}" = свързан / свързана).
+# Other participles about a piece are avoided: "под удар", "в капан", "без защита", "виси", "пада".
+# {m:mv} (level 6) = "3" written, "три хода" spoken; {n:point} = "3 точки"; {n:attacker} /
+# {n:defender} = "3 нападащи фигури" / "2 защитаващи фигури"; {n:time} = "веднъж" / "3 пъти".
+# Levels 1-2: simple words, short sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Шах! Царят ми е под удар.
+ann.check.human.b1.2 = Шах! Нападаш царя ми.
+ann.check.human.b1.3 = Това е шах! Царят ми трябва да излезе от шах.
+ann.check.human = Шах.
+ann.check.human.2 = Шах!
+ann.check.human.3 = А това е шах.
+# The coach gives check.
+ann.check.coach = Шах!
+ann.check.coach.2 = Шах.
+ann.check.coach.3 = И шах!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Това означава, че {your} е под удар. Трябва да {your:pron_obj} извадиш от шах.
+ann.check.coach.first.2 = Шах означава, че {your} е под удар. Премести {your:pron_obj}, закрий се или вземи фигурата ми.
+ann.double_check.coach = Двоен шах! Две мои фигури нападат царя ти едновременно, затова той трябва да се премести.
+ann.double_check.coach.2 = Това е двоен шах: сега ще ти помогне само ход с царя.
+ann.double_check.human = Двоен шах! Две твои фигури нападат царя ми едновременно, затова той трябва да се премести.
+ann.double_check.human.2 = Двоен шах! Сега може да ме спаси само ход с царя.
+# The player checkmates the coach.
+ann.mate.human.b1 = Мат! Ти спечели! Царят ми не може да избяга.
+ann.mate.human.b1.2 = Това е мат! Браво, партията е твоя!
+ann.mate.human.b1.3 = Мат! Царят ми е в капан. Поздравления!
+ann.mate.human = Мат. Добре изиграно.
+ann.mate.human.2 = Това е мат. Поздравления.
+ann.mate.human.3 = Мат! Отлично се справи.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Това е мат. Царят ти няма изход.
+ann.mate.coach.b1.2 = Мат. Царят ти е под удар и не може да избяга.
+ann.mate.coach.b1.3 = Боя се, че това е мат. Царят ти не може да се измъкне.
+ann.mate.coach = Мат.
+ann.mate.coach.2 = А това е мат.
+ann.mate.coach.3 = Мат, за съжаление.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Опа! С този ход подаряваш нещо.
+ex.verdict.blunder.b1.2 = Внимавай! Този ход може да ти навреди.
+ex.verdict.blunder.b1.3 = О, чакай. Този ход има проблем.
+ex.verdict.blunder.b2 = Хм, този ход има проблем.
+ex.verdict.blunder.b2.2 = Това е голяма грешка.
+ex.verdict.blunder.b2.3 = Внимавай, с този ход губиш нещо.
+ex.verdict.blunder.b3 = Това е груба грешка.
+ex.verdict.blunder.b3.2 = {move} е истинска грешка.
+ex.verdict.blunder.b3.3 = Ох, {move} е голяма грешка.
+ex.verdict.blunder.b4 = {move} е груба грешка.
+ex.verdict.blunder.b4.2 = {move} е сериозна грешка.
+ex.verdict.blunder.b4.3 = Боя се, че това е груба грешка.
+ex.verdict.blunder.b5 = {move} е сериозна грешка.
+ex.verdict.blunder.b5.2 = {move} е груба грешка.
+ex.verdict.blunder.b5.3 = {move} е скъпо струваща грешка.
+ex.verdict.blunder.b6 = {move} е тежка грешка.
+ex.verdict.blunder.b6.2 = {move} е груба грешка.
+ex.verdict.blunder.b6.3 = {move}? Груба грешка.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Опа! Ти не отговори на заплахата ми.
+ex.verdict.ignored.b1.2 = Внимавай! Заплахата ми още беше в сила.
+ex.verdict.ignored.b1.3 = О, чакай. Изпусна от поглед заплахата ми.
+ex.verdict.ignored.b2 = Хм, заплахата ми още беше в сила.
+ex.verdict.ignored.b2.2 = Заплахата ми остана без отговор.
+ex.verdict.ignored.b2.3 = Внимавай, ти не отговори на заплахата ми.
+ex.verdict.mistake.b3 = Това не е добър ход.
+ex.verdict.mistake.b3.2 = Хм, ходът {move} има проблем.
+ex.verdict.mistake.b3.3 = Това е грешка.
+ex.verdict.mistake.b4 = {move} е грешка.
+ex.verdict.mistake.b4.2 = {move} не е добър ход.
+ex.verdict.mistake.b4.3 = Това е грешка.
+ex.verdict.mistake.b5 = {move} е явна грешка.
+ex.verdict.mistake.b5.2 = {move} е грешка.
+ex.verdict.mistake.b5.3 = {move} не е хубав ход.
+ex.verdict.mistake.b6 = {move} е грешка.
+ex.verdict.mistake.b6.2 = {move}? Грешка.
+ex.verdict.mistake.b6.3 = Не {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Не е зле, но малко по-добре беше {best}.
+ex.verdict.inaccuracy.b3.2 = Малко по-точно беше {best}.
+ex.verdict.inaccuracy.b3.3 = Малка неточност: тук по-добре беше {best}.
+ex.verdict.inaccuracy.b4 = Неточно: по-точно беше {best}.
+ex.verdict.inaccuracy.b4.2 = Малка неточност. Леко по-добре беше {best}.
+ex.verdict.inaccuracy.b4.3 = Не е най-точният ход: по-прецизно беше {best}.
+ex.verdict.inaccuracy.b5 = {move} е неточен ход; по-силно беше {best}.
+ex.verdict.inaccuracy.b5.2 = Леко неточно. Аз бих изиграл {best}.
+ex.verdict.inaccuracy.b5.3 = {best} беше по-точен ход от {move}.
+ex.verdict.inaccuracy.b6 = {move} е неточно; {best}.
+ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
+ex.verdict.inaccuracy.b6.3 = По-добре беше {best}.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Може би малко по-точно беше {best}.
+ex.verdict.inaccuracy.maybe.2 = Аз може би бих изиграл {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Този ход изглежда съмнителен.
+ex.verdict.dubious.2 = Този ход ми се струва съмнителен.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = О, чакай! Пропусна нещо хубаво.
+ex.verdict.missed.b1.2 = Погледни пак! Имаше нещо по-добро.
+ex.verdict.missed.b1.3 = Чакай малко, тук имаше шанс!
+ex.verdict.missed.b2 = Тук пропусна шанс.
+ex.verdict.missed.b2.2 = Хм, имаше нещо по-добро.
+ex.verdict.missed.b2.3 = Чакай, тук имаше страхотен ход.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = По-добре беше {best}.
+ex.better.b3.2 = {best} беше по-добрият ход.
+ex.better.b3.3 = Вместо това добър ход беше {best}.
+ex.better.b4 = По-силно беше {best}.
+ex.better.b4.2 = Правилният ход беше {best}.
+ex.better.b4.3 = По-добре беше {best}.
+ex.better.b5 = {best}, с идеята {line}.
+ex.better.b5.2 = Правилният ход беше {best}: {line}.
+ex.better.b5.3 = По-добре беше {best}, а след това {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Вместо това {best}, {eval}.
+ex.better.b6.3 = {best} даваше {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Имаше по-добър ход с {your:obj}.
+ex.hint.b1.2 = {your} имаше по-добър ход.
+ex.hint.b2 = {your} имаше по-добър ход.
+ex.hint.b2.2 = Имаше по-добър ход с {your:obj}.
+ex.hint.b3 = {your} имаше по-добър ход.
+ex.hint.b3.2 = С {your:obj} имаше нещо по-добро.
+ex.hint.b4 = {your} имаше по-добър ход.
+ex.hint.b4.2 = Погледни пак {your:refl}: с {your:pron_full} имаше нещо по-добро.
+ex.hint.b5 = {your} имаше по-силен ход.
+ex.hint.b5.2 = Имаше по-силен ход с {your:obj}.
+ex.hint.b6 = {your} имаше по-добър ход.
+ex.hint.b6.2 = Погледни пак {your:refl}.
+ex.hint.move = Имаше по-добър ход.
+ex.hint.move.2 = Тук имаше по-добър ход.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named. "който" always follows "ход" directly, so that it cannot
+# refer to a masculine piece.
+ex.hint.gain.b1 = {your} имаше по-добър ход. Този ход печели материал.
+ex.hint.gain.b1.2 = Имаше по-добър ход с {your:obj}. Този ход печели материал.
+ex.hint.gain.b2 = {your} имаше по-добър ход. С него се печели материал.
+ex.hint.gain.b2.2 = С {your:obj} имаше ход, който печели материал.
+ex.hint.gain.b3 = {your} имаше по-добър ход, който печели материал.
+ex.hint.gain.b3.2 = С {your:obj} имаше ход, който печели материал.
+ex.hint.gain.b4 = {your} имаше ход, който печели материал.
+ex.hint.gain.b4.2 = Погледни пак {your:refl}: с {your:pron_full} имаше ход, който печели материал.
+ex.hint.gain.b5 = {your} имаше по-силен ход, който печели материал.
+ex.hint.gain.b5.2 = С {your:obj} имаше ход с печалба на материал.
+ex.hint.gain.b6 = {your} имаше ход с печалба на материал.
+ex.hint.gain.b6.2 = Погледни пак {your:refl}: можеше да се спечели материал.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = По-добрият ход беше да преместиш {your:refl} на {sq}.
+ex.reveal.b1.2 = {your} можеше да отиде на {sq}. Това беше по-добре.
+ex.reveal.b2 = Ходът с {your:obj} на {sq} беше по-добър.
+ex.reveal.b2.2 = По-добре беше да преместиш {your:refl} на {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Да върнем фигурите по местата им.
+ex.rewind.b1.2 = Сега ще върна всичко, както беше.
+ex.rewind.b1.3 = Нека наредя фигурите отново.
+ex.rewind.b2 = Да върнем всичко обратно.
+ex.rewind.b2.2 = Връщаме се там, където бяхме.
+ex.rewind.b2.3 = Ще върна фигурите по местата им.
+ex.rewind.b3 = Обратно към партията.
+ex.rewind.b3.2 = Да се върнем.
+ex.rewind.b3.3 = Обратно към позицията.
+ex.rewind.b4 = Връщаме се към партията.
+ex.rewind.b4.2 = Обратно.
+ex.rewind.b4.3 = Да се върнем.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Искаш ли да опиташ друг ход?
+ex.offer.b1.2 = Искаш ли да върнеш хода и да опиташ отново?
+ex.offer.b1.3 = Да опитаме ли друг ход?
+ex.offer.b2 = Ще опиташ ли друг ход?
+ex.offer.b2.2 = Искаш ли да върнеш хода?
+ex.offer.b2.3 = Да пробваме ли пак?
+ex.offer.b3 = Ще върнеш ли хода?
+ex.offer.b3.2 = Искаш ли да опиташ отново?
+ex.offer.b3.3 = Връщаш ли хода?
+ex.offer.b4 = Връщаш ли хода?
+ex.offer.b4.2 = Искаш ли да върнеш хода?
+ex.offer.b4.3 = Ще опиташ ли друг ход?
+ex.offer.b5 = Връщане на хода?
+ex.offer.b5.2 = Ще го върнеш ли?
+ex.offer.b5.3 = Връщаш ли хода?
+ex.offer.b6 = Връщане на хода?
+ex.offer.b6.2 = Връщаш ли го?
+ex.offer.b6.3 = Нов опит?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Този ход е съмнителен. Може би можеш и по-добре?
+ex.dubious.b1.2 = Този ход е съмнителен. Може би ще намериш по-добър?
+ex.dubious.b2 = Съмнителен ход. Може би можеш и по-добре?
+ex.dubious.b2.2 = Този ход е съмнителен. Може би има нещо по-добро?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = След това {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} отива на {sq}.
+demo.my.move.2 = Премествам {my:refl} на {sq}.
+demo.my.move.3 = След това {my} отива на {sq}.
+demo.my.take = Вземам {your:obj}.
+demo.my.take.2 = {my} взема {your:obj}.
+demo.my.take.3 = И аз вземам {your:obj}.
+demo.my.check = {my} отива на {sq}. Шах.
+demo.my.check.2 = Шах с {my:obj} на {sq}.
+demo.my.check.3 = {my} на {sq}, шах!
+demo.my.mate = {my} отива на {sq}. Мат.
+demo.my.mate.2 = И {my} на {sq} дава мат.
+demo.my.mate.3 = {my} на {sq}. Това е мат.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Първо {my} взема {your:obj}. {t1} може да почака.
+demo.my.first.take.2 = {my} първо взема {your:obj}. {t1} ще си остане там.
+demo.my.first.check = {my} взема {your:obj} и това е шах! {t1} може да почака.
+demo.my.first.check.2 = Първо {my} взема {your:obj} с шах. {t1} ще си остане там.
+demo.my.first.check_move = Първо шах с {my:obj} на {sq}. {t1} може да почака.
+demo.my.first.check_move.2 = {my} отива на {sq}: първо шах! {t1} ще си остане там.
+demo.my.first.move = Първо {my} отива на {sq}. {t1} може да почака.
+demo.my.first.move.2 = Първо {my} на {sq}. {t1} ще си остане там.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} е под удар, затова първо взема {your:obj}.
+demo.my.first.attacked.2 = {my} е под удар: първо грабва {your:obj}.
+# Levels 4-6, the same in-between move.
+demo.first = Първо {move}: {t1} може да почака.
+demo.first.2 = Първо {move}. {t1} ще си остане там.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Сега играя своя ход.
+demo.play_on.2 = Ето истинския ми ход.
+demo.play_on.3 = А сега играя хода си наистина.
+# Levels 1-3, the player's moves (what they would play; the present tense, as in a story).
+demo.your.move = Ти местиш {your:refl} на {sq}.
+demo.your.move.2 = Да кажем, че местиш {your:refl} на {sq}.
+demo.your.move.3 = След това {your} отива на {sq}.
+demo.your.take = Ти вземаш {my:obj}.
+demo.your.take.2 = Вземаш {my:obj} с {your:refl}.
+demo.your.take.3 = След това вземаш {my:obj}.
+demo.your.back = Ти вземаш обратно.
+demo.your.back.2 = Вземаш обратно на {sq}.
+demo.your.back.3 = И вземаш обратно.
+demo.your.king = Царят ти трябва да се премести.
+demo.your.king.2 = Царят трябва да отстъпи на {sq}.
+demo.your.king.3 = Царят ти бяга на {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Сега {t1} вече не може да бъде спасен{t1:a}.
+ex.point.piece.2 = И {t1} е изгубен{t1:a}.
+ex.point.piece.3 = След това пада {t1}.
+ex.point.two = И {t1}, и {t2} са под удар: едното от двете ще падне.
+ex.point.two.2 = Сега нападам {t1:obj} и {t2:obj}. Не можеш да ги спасиш едновременно.
+ex.point.mate = А сега {reply:nomate} дава мат.
+ex.point.mate.2 = Следва {reply:nomate} и това е мат.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Виждаш ли? Вече имаш {pts:point} по-малко.
+ex.result.b1.2 = Ето така губиш {pts:point}.
+ex.result.b2 = В крайна сметка губиш {pts:point}.
+ex.result.b2.2 = Сега изоставаш с {pts:point}.
+ex.result.b3 = Това ти струва {pts:point}.
+ex.result.b3.2 = Накрая оставаш с {pts:point} по-малко.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Можеш да вземеш нещо обратно, но пак имаш {pts:point} по-малко.
+ex.result_back.b1.2 = Можеш да си върнеш малко, но пак губиш {pts:point}.
+ex.result_back.b2 = Можеш да си върнеш част, но пак изоставаш с {pts:point}.
+ex.result_back.b2.2 = Дори след като вземеш обратно, губиш {pts:point}.
+ex.result_back.b3 = Дори след обратното вземане изоставаш с {pts:point}.
+ex.result_back.b3.2 = Връщаш си нещо, но това пак ти струва {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Ако {your2} вземе обратно, {my} взема {your:obj}.
+ex.retake.b1.2 = Не можеш да вземеш обратно с {your2:refl}: тогава {my} взема {your:obj}.
+ex.retake.b2 = Ако {your2} вземе обратно, {my} ще вземе {your:obj}.
+ex.retake.b2.2 = Обратното вземане с {your2:obj} не става: {my} взема {your:obj}.
+ex.retake.b3 = Ако вземеш обратно с {move}, {reply} взема {your:obj}.
+ex.retake.b3.2 = Обратното вземане {move} не става: {reply} взема {your:obj}.
+ex.retake.b4 = {move} се опровергава с {reply}, който взема {your:obj}.
+ex.retake.b4.2 = А ако {move}, тогава {reply} взема {your:obj}.
+ex.retake.b5 = Обратното вземане {move} се натъква на {reply} и {your} пада.
+ex.retake.b5.2 = {move} се опровергава с {reply}: {your} пада.
+ex.retake.b6 = {move}? {reply} взема {your:obj}.
+ex.retake.b6.2 = {move} не минава: {reply} взема {your:obj}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = А тук, на {sq}, ще получиш нова дама.
+demo.promote.2 = След това {your} стига до {sq} и става дама.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Внимавай: {my} може да отиде на {sq} и това е мат.
+ex.mate_allowed.b1.2 = Сега {my} може да отиде на {sq}. Това ще бъде мат!
+ex.mate_allowed.b1.3 = Внимавай! Ако {my} отиде на {sq}, това е мат.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Този ход ми позволява да дам мат на {your:obj} в {m:move}.
+ex.mate_allowed.b2.2 = Сега мога да дам мат на {your:obj} в {m:move}. Гледай.
+ex.mate_allowed.b2.3 = Внимавай! {your} е в опасност: мат в {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Това позволява мат в {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = След това имам мат в {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Царят ти получава мат: {line:nomate}.
+ex.mate_allowed.b4 = {move} позволява форсиран мат: {line:nomate}.
+ex.mate_allowed.b4.2 = Този ход води до мат в {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = След {move} следва мат: {line:nomate}.
+ex.mate_allowed.b5 = {move} позволява форсиран мат в {m:move}.
+ex.mate_allowed.b5.2 = Това води до мат в {m:move}.
+ex.mate_allowed.b5.3 = Сега има форсиран мат в {m:move}.
+# Level 6: "{m:mv}" is the bare number in writing ("Мат в 3"), "три хода" in the voice.
+ex.mate_allowed.b6 = Мат в {m:mv}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, мат.
+ex.mate_allowed.b6.3 = Мат след {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Виж: {your} няма поле, където да избяга.
+ex.mate_allowed.tail.b1.2 = Виждаш ли? {your} е под удар и не може да избяга.
+ex.mate_allowed.tail.b1.3 = {your} няма къде да отиде. Това е мат.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Тази матова картина се нарича {text}.
+ex.mate_allowed.pattern.2 = Запомни я: това е {text}.
+ex.mate_allowed.tip.b3 = Преди всеки ход проверявай дали царят ти е още в безопасност.
+ex.mate_allowed.tip.b3.2 = Винаги се питай: след моя ход може ли царят ми да получи мат?
+
+# Noun phrases without an article (Bulgarian has no indefinite article), said after "нарича" / "е".
+name.pattern.back_rank = мат на задната линия
+name.pattern.smothered = задушен мат
+name.pattern.support = мат с подкрепена дама
+name.pattern.ladder = линеен мат
+name.pattern.epaulette = еполетен мат
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = С {best:nomate} можеше да дадеш мат на {my:obj}!
+ex.mate_missed.b1.2 = {best:nomate} беше мат! {my} нямаше да може да избяга.
+ex.mate_missed.b1.3 = Виж! {best:nomate} щеше да даде мат на {my:obj}.
+ex.mate_missed.b2 = Имаше мат в {m:move}, който започва с {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} даваше мат в {m:move}!
+ex.mate_missed.b2.3 = Можеше да ми дадеш мат с {best:nomate}.
+ex.mate_missed.b3 = Пропусна мат в {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} дава мат в {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Имаше мат в {m:move}, който започва с {best:nomate}.
+ex.mate_missed.b4 = Пропуснат мат: {line:nomate}, като се започне с {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} форсираше мат в {m:move}.
+ex.mate_missed.b4.3 = Имаше мат в {m:move} с {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} дава мат в {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Пропуснат мат в {m:move}, който започва с {best:nomate}.
+ex.mate_missed.b5.3 = Имаше форсиран мат: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} дава мат: {line:nomate}.
+ex.mate_missed.b6.2 = Мат в {m:mv} с {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, мат в {m:mv}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = По-бързо беше {best:nomate}: мат в {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} даваше мат по-бързо, в {m:move}.
+ex.mate_delayed.b6 = {best:nomate} дава мат в {m:mv}.
+ex.mate_delayed.b6.2 = По-бързо: {best:nomate}, мат в {m:mv}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = О, не! {my} не може да се движи и не е под шах. Това е пат: реми.
+ex.stalemate.b1.2 = Виж: {my} няма безопасно поле, но не е под шах. Партията е реми!
+ex.stalemate.b1.3 = Това е пат. {my} не може да се движи, затова партията е реми.
+ex.stalemate.b2 = Пат! {my} няма нито един позволен ход, а шах няма. Реми.
+ex.stalemate.b2.2 = О, не, пат: {my} е заклещен{my:a}, но не е под шах.
+ex.stalemate.b2.3 = Това е реми поради пат. {my} не може да се движи.
+ex.stalemate.b3 = Това е пат: {my} няма позволен ход. А ти печелеше!
+ex.stalemate.b3.2 = Пат! {my} е заклещен{my:a} и спечелената партия става реми.
+ex.stalemate.b3.3 = {my} няма ходове и не е под шах: пат.
+ex.stalemate.b4 = Пат: {my} няма позволен ход. Така изпускаш победата.
+ex.stalemate.b4.2 = {move} вкарва {my:obj} в пат. Реми от печеливша позиция.
+ex.stalemate.b4.3 = Това е пат; {my} е затворен{my:a}.
+ex.stalemate.b5 = {move} вкарва {my:obj} в пат. Победата е изпусната.
+ex.stalemate.b5.2 = Пат: {my} няма полета.
+ex.stalemate.b5.3 = Това е пат, {my} е заклещен{my:a}.
+ex.stalemate.b6 = Пат. {my} няма ходове.
+ex.stalemate.b6.2 = {move}, пат: {my} е затворен{my:a}.
+ex.stalemate.b6.3 = Пат; {my} не може да се движи.
+ex.stalemate.tip.b1 = Когато печелиш, винаги оставяй на царя ми поле, където да отиде.
+ex.stalemate.tip.b1.2 = Запомни: когато водиш, давай на царя ми малко място.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Внимавай! Мога да подаря фигурите си и тогава {my} няма да има ходове: пат.
+ex.stalemate_trick.b1.2 = Внимавай: {my} е почти заклещен{my:a}. Мога да постигна реми.
+ex.stalemate_trick.b2 = Внимавай: мога да жертвам и {my} ще остане в пат.
+ex.stalemate_trick.b2.2 = {my} почти няма полета. Мога да форсирам пат!
+ex.stalemate_trick.b3 = Това ми позволява да се спася с пат: {my} остава без ходове.
+ex.stalemate_trick.b3.2 = Внимавай: {my} попада в пат след {line}.
+ex.stalemate_trick.b4 = {move} позволява патов капан: {line} и {my} не може да се движи.
+ex.stalemate_trick.b4.2 = Сега {my} може да се скрие в пат: {line}.
+ex.stalemate_trick.b5 = {move} позволява пат: {line}; {my} е затворен{my:a}.
+ex.stalemate_trick.b5.2 = Патов капан: {line} и {my} няма ходове.
+ex.stalemate_trick.b6 = {line}, пат: {my} е затворен{my:a}.
+ex.stalemate_trick.b6.2 = Пат след {line}; {my} е заклещен{my:a}.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+# "хващам на вилица" = to fork; "двоен удар" = double attack (the beginner's word).
+ex.fork.b1 = {my} може да отиде на {sq} и да нападне {t1:obj} и {t2:obj}.
+ex.fork.b1.2 = {my} отива на {sq} и напада две неща: {t1:obj} и {t2:obj}.
+ex.fork.b1.3 = Гледай {my:obj}: от {sq} напада едновременно {t1:obj} и {t2:obj}.
+ex.fork.b2 = Вилица! {my} на {sq} напада едновременно {t1:obj} и {t2:obj}.
+ex.fork.b2.2 = След твоя ход {my} може от {sq} да хване на вилица {t1:obj} и {t2:obj}.
+ex.fork.b2.3 = {my} отива на {sq}: двоен удар по {t1:obj} и {t2:obj}.
+ex.fork.b3 = {move} позволява {reply} с вилица на {t1:obj} и {t2:obj}.
+ex.fork.b3.2 = След {reply} нападам едновременно {t1:obj} и {t2:obj}.
+ex.fork.b3.3 = {reply} е вилица: и {t1}, и {t2} са под удар.
+ex.fork.b4 = {reply} хваща на вилица {t1:obj} и {t2:obj}; след {line} губиш {pts:point}.
+ex.fork.b4.2 = {reply} напада наведнъж {t1:obj} и {t2:obj}.
+ex.fork.b4.3 = {move} позволява вилицата {reply} срещу {t1:obj} и {t2:obj}.
+ex.fork.b5 = {move} се натъква на вилицата {reply} срещу {t1:obj} и {t2:obj}.
+ex.fork.b5.2 = {reply} хваща на вилица {t1:obj} и {t2:obj}.
+ex.fork.b5.3 = След {reply} и {t1}, и {t2} са под удар.
+ex.fork.b6 = {reply} прави вилица.
+ex.fork.b6.2 = {move} позволява {reply}, вилица.
+ex.fork.b6.3 = {reply}, вилица.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+# "едното от двете" (neuter) = one of the two, whatever the genders of the pieces.
+ex.fork.tail.b1 = Само едното от двете може да се спаси: {t1} или {t2}.
+ex.fork.tail.b1.2 = Сега нападам две неща наведнъж: {t1:obj} и {t2:obj}. Това е вилица!
+ex.fork.tail.b1.3 = Виждаш ли? И {t1}, и {t2} са под удар. Едното от двете ще падне.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} трябва да излезе от шах, затова вземам {t1:obj}.
+ex.fork.tail_king.2 = Шах! {your} трябва да се премести и {t1} пада.
+ex.fork.more.b3 = Преди да играеш, провери полето {sq}: оттам {my} може да направи вилица.
+ex.fork.more.b3.2 = Следи полето {sq}. Оттам {my} прави вилица.
+ex.fork.tip.knight = Пази се от скоковете на конете близо до царя и дамата си!
+ex.fork.tip.knight.2 = Конете обичат да нападат две фигури наведнъж. Гледай къде могат да скочат.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Когато {my} се отмести, {my2} ще нападне {t1:obj}!
+ex.discovered.b1.2 = Виж: {my} е на пътя. Ако се отмести, {my2} напада {t1:obj}.
+ex.discovered.b1.3 = {my} може да се отмести и тогава {my2} напада {t1:obj}.
+ex.discovered.b2 = Скрита атака: {my} се мести и {my2} напада {t1:obj}.
+ex.discovered.b2.2 = Внимавай: {my} може да се отмести и {my2} ще нападне {t1:obj}.
+ex.discovered.b2.3 = {my} се отмества и открива пътя на {my2:obj} към {t1:obj}.
+ex.discovered.b3 = След {reply} следва открита атака срещу {t1:obj}.
+ex.discovered.b3.2 = {reply} открива атака срещу {t1:obj}.
+ex.discovered.b3.3 = {move} позволява {reply}, открита атака срещу {t1:obj}.
+ex.discovered.b4 = {reply} отваря линия към {t1:obj}: открита атака.
+ex.discovered.b4.2 = {move} позволява откритата атака {reply}, която печели {t1:obj}.
+ex.discovered.b4.3 = {t1} пада след {reply}: открита атака.
+ex.discovered.b5 = {move} позволява откритата атака {reply}.
+ex.discovered.b5.2 = {reply} е открита атака.
+ex.discovered.b5.3 = {reply} разкрива скрита атака.
+ex.discovered.b6 = {reply}, открита атака срещу {t1:obj}.
+ex.discovered.b6.2 = {reply} и {t1} пада.
+ex.discovered.b6.3 = Открита атака: {reply} напада {t1:obj}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} напада {t1:obj}. Когато {t1:pron} се отмести, вземам {t2:obj} зад {t1:pron_full}.
+ex.skewer.b1.2 = Виж: {my} напада {t1:obj}, а точно зад {t1:pron_full} е {t2}.
+ex.skewer.b1.3 = {my} тръгва срещу {t1:obj}. {t1:pron} трябва да се отмести и тогава {t2} пада.
+ex.skewer.b2 = Линеен удар: {my} напада {t1:obj}, а {t2} е зад {t1:pron_full}.
+ex.skewer.b2.2 = {t1} и {t2} са на една линия с {my:obj}. Щом {t1:pron} се отмести, вземам {t2:obj}.
+ex.skewer.b2.3 = Внимавай: {t1} и {t2} са на една линия. {my} може да им нанесе линеен удар.
+ex.skewer.b3 = {reply} е линеен удар по {t1:obj} и {t2:obj}.
+ex.skewer.b3.2 = След {reply} {t1} трябва да се отмести и {t2} пада.
+ex.skewer.b3.3 = {move} позволява {reply}, линеен удар по {t1:obj} и {t2:obj}.
+ex.skewer.b4 = {reply} е линеен удар по {t1:obj}; {t2} зад {t1:pron_full} е загубен{t2:a}.
+ex.skewer.b4.2 = След {move} {t1} и {t2} стоят на една линия: {reply}.
+ex.skewer.b4.3 = След {reply} {t1} се отмества и {t2} пада.
+ex.skewer.b5 = {reply}: линеен удар по {t1:obj} и {t2:obj}.
+ex.skewer.b5.2 = {move} позволява линейния удар {reply} през {t1:obj} към {t2:obj}.
+ex.skewer.b6 = {reply} с линеен удар.
+ex.skewer.b6.2 = {reply}, линеен удар.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} може да отиде на {sq}. Тогава {your} остава заклещен{your:a} пред {t1:obj}.
+ex.pin.b1.2 = Гледай {my:obj} на {sq}: {your} се оказва заклещен{your:a} пред {t1:obj}.
+ex.pin.b1.3 = {my} може да свърже {your:obj} с {t1:obj}. Тогава ще {your:pron_obj} спечеля.
+ex.pin.b2 = Свръзка: {your} е заклещен{your:a} пред {t1:obj}.
+ex.pin.b2.2 = {your} е свързан{your:a} с {t1:obj}. Тогава мога да {your:pron_obj} спечеля.
+ex.pin.b2.3 = Сега {your} е заклещен{your:a} пред {t1:obj}. Това е свръзка.
+ex.pin.b3 = {your} попада в свръзка с {t1:obj} и аз {your:pron_obj} печеля.
+ex.pin.b3.2 = След това {your} е свързан{your:a} с {t1:obj}.
+ex.pin.b3.3 = Свръзката на {your:obj} струва материал: зад {your:pron_full} е {t1}.
+ex.pin.b4 = {reply} свързва и печели материал.
+ex.pin.b4.2 = {move} се натъква на свръзката {reply}.
+ex.pin.b4.3 = След {reply} свързаната фигура пада.
+ex.pin.b5 = {move} позволява свръзката {reply}.
+ex.pin.b5.2 = {reply} свързва и фигурата е загубена.
+ex.pin.b6 = {reply} свързва.
+ex.pin.b6.2 = {reply}, свръзка.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} е свързан{your:a}, затова не може да защити полето {sq}. Зад {your:pron_full} е {t1}.
+ex.pin_defender.b1.2 = Виж: {your} всъщност не може да защити {sq}, защото зад {your:pron_full} е {t1}.
+ex.pin_defender.b2 = {your} е свързан{your:a} с {t1:obj}, затова полето {sq} няма истински защитник.
+ex.pin_defender.b2.2 = Свързаната фигура е лош защитник. {your} не може да пази {sq}: зад {your:pron_full} е {t1}.
+ex.pin_defender.b3 = {your} е свързан{your:a} с {t1:obj}; всъщност не защитава {sq}.
+ex.pin_defender.b3.2 = Полето {sq} изглежда защитено, но {your} е свързан{your:a} пред {t1:obj}.
+ex.pin_defender.b4 = {your} е свързан{your:a}, така че полето {sq} всъщност не е защитено.
+ex.pin_defender.b4.2 = {your} не може да пази {sq}, защото е свързан{your:a}.
+ex.pin_defender.b5 = {your} е свързан{your:a}; {sq} е без защита.
+ex.pin_defender.b5.2 = Полето {sq} не се удържа: {your} е свързан{your:a}.
+ex.pin_defender.b6 = {your} е свързан{your:a}; {sq} не се удържа.
+ex.pin_defender.b6.2 = Свръзка на {your:obj}, {sq} без защита.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} е в капан. Всяко поле, на което може да отиде, е под удар.
+ex.trapped.b1.2 = Погледни {your:refl}: няма безопасно поле, където да избяга.
+ex.trapped.b1.3 = {your} е заклещен{your:a}. Мога да {your:pron_obj} нападна, а {your:pron} не може да избяга.
+ex.trapped.b2 = {your} няма безопасни полета. Мога да {your:pron_obj} спечеля.
+ex.trapped.b2.2 = {your} е в капан: където и да отиде, ще {your:pron_obj} взема.
+ex.trapped.b2.3 = Внимавай, {your} остава без полета.
+ex.trapped.b3 = {your} попада в капан: не остава безопасно поле.
+ex.trapped.b3.2 = След това {your} е в капан и е изгубен{your:a}.
+ex.trapped.b3.3 = {your} влезе в капан: не може да излезе.
+ex.trapped.b4 = {move} оставя {your:obj} в капан.
+ex.trapped.b4.2 = {your} няма къде да отстъпи; печеля {your:pron_obj}.
+ex.trapped.b4.3 = {your} е в капан след {reply}.
+ex.trapped.b5 = {your} се оказва в капан: {line}.
+ex.trapped.b5.2 = {move} оставя {your:obj} в безизходица.
+ex.trapped.b6 = {your} е в капан.
+ex.trapped.b6.2 = {line} хваща {your:obj} в капан.
+ex.trapped.tip.b1 = Преди да преместиш фигура, провери дали може да се върне обратно.
+ex.trapped.tip.b1.2 = Фигурите дълбоко в моя лагер могат да се заклещят. Оставяй им път за отстъпление.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# "луфт" (from the German Luft) = an escape square for the king, as Bulgarian players say it.
+ex.back_rank.b1 = {your} е заклещен{your:a} зад пешките си. {my} може да {your:pron_dat} даде шах на задната линия.
+ex.back_rank.b1.2 = Внимавай: {your} няма поле за бягство, а {my} може да стигне до {sq}.
+ex.back_rank.b1.3 = {my} може да отиде на {sq}. {your} е затворен{your:a} от собствените си пешки.
+ex.back_rank.b2 = Опасност на задната линия: {your} няма въздух. {my} може да даде шах на {sq}.
+ex.back_rank.b2.2 = {your} е затворен{your:a}. {my} отива на {sq} и печели материал.
+ex.back_rank.b2.3 = Задната ти линия е слаба: {my} може да даде шах на {your:obj} от {sq}.
+ex.back_rank.b3 = Задната ти линия е слаба: {line}. {your} няма поле за бягство.
+ex.back_rank.b3.2 = {your} няма луфт, затова {line} печели материал.
+ex.back_rank.b3.3 = След {line} задната линия решава: {your} е затворен{your:a}.
+ex.back_rank.b4 = Задната линия: {line}, а {your} няма луфт.
+ex.back_rank.b4.2 = {line} използва слабата задна линия около {your:obj}.
+ex.back_rank.b4.3 = {your} няма поле за отстъпление: {line}.
+ex.back_rank.b5 = Слаба задна линия около {your:obj}: {line}.
+ex.back_rank.b5.2 = {line}; {your} няма луфт.
+ex.back_rank.b6 = {line}, задна линия; {your} е затворен{your:a}.
+ex.back_rank.b6.2 = Задна линия: {line} ({your}).
+ex.back_rank.tip.b1 = Направи на царя си малко прозорче: премести една от пешките пред него.
+ex.back_rank.tip.b1.2 = Цар зад три пешки може да получи мат на задната линия. Направи му малко място.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} на {sq} няма защитник. {my} може да {your:pron_obj} вземе даром.
+ex.hanging.b1.2 = Погледни {your:refl}: нищо не {your:pron_obj} защитава, а {my} {your:pron_obj} напада.
+ex.hanging.b1.3 = {your} не е защитен{your:a}. {my} може просто да {your:pron_obj} вземе.
+ex.hanging.b2 = {your} на {sq} виси. {my} {your:pron_obj} взема и не можеш да вземеш обратно.
+ex.hanging.b2.2 = {my} може да вземе {your:obj} даром. Нищо не {your:pron_obj} защитава.
+ex.hanging.b2.3 = {your} остава сам{your:a} на {sq} и {my} {your:pron_obj} взема.
+ex.hanging.b3 = {move} оставя {your:obj} без защита: {reply} и няма с какво да вземеш обратно.
+ex.hanging.b3.2 = {your} на {sq} виси: {reply}.
+ex.hanging.b3.3 = След {reply} губиш {your:refl} даром.
+ex.hanging.b4 = {move} оставя {your:obj} да виси: {reply} печели {pts:point}.
+ex.hanging.b4.2 = {reply} взема {your:obj} даром.
+ex.hanging.b4.3 = {your} е без защита; {reply} {your:pron_obj} взема.
+ex.hanging.b5 = {move} оставя {your:obj} без защита; {reply} {your:pron_obj} печели.
+ex.hanging.b5.2 = {your} на {sq} пада след {reply}.
+ex.hanging.b5.3 = {reply} печели {your:obj}.
+ex.hanging.b6 = {move}? {reply} и {your} пада.
+ex.hanging.b6.2 = {reply} взема {your:obj}.
+ex.hanging.b6.3 = {your} виси: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} пазеше {your:obj}. Сега {my} може да {your:pron_obj} вземе.
+ex.hanging_guard.b1.2 = {your2} се отмести и сега {your} е сам{your:a}. {my} {your:pron_obj} взема.
+ex.hanging_guard.b2 = {your2} защитаваше {your:obj}. Сега {your:pron} е сам{your:a} и {my} {your:pron_obj} взема.
+ex.hanging_guard.b2.2 = Премествайки {your2:refl}, оставяш {your:refl} без защита срещу {my:obj}.
+ex.hanging_guard.b3 = {your2} пазеше {your:obj}. Щом {your2:pron} се отмести, {reply} {your:pron_obj} взема.
+ex.hanging_guard.b3.2 = Без {your2:obj} {your} остава без защита: {reply}.
+ex.hanging_guard.b4 = {move} премахва защитата: {your2} изостави {your:obj} и {reply} {your:pron_obj} прибира.
+ex.hanging_guard.b4.2 = {your2} беше единственият защитник на {your:obj}; {reply} {your:pron_obj} печели.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} вече нападаше {your:obj}. Винаги проверявай какво заплашва моят ход.
+ex.hanging_threat.b1.2 = Не видя заплахата ми: {my} напада {your:obj}.
+ex.hanging_threat.b2 = С последния си ход нападнах {your:obj} с {my:refl}. Винаги гледай заплахите ми.
+ex.hanging_threat.b2.2 = {my} заплашваше {your:obj} и сега мога да {your:pron_obj} взема.
+ex.hanging_threat.b3 = Пропусна заплахата ми: {my} нападаше {your:obj}.
+ex.hanging_threat.b3.2 = {my} през цялото време държеше {your:obj} на прицел.
+ex.hanging.tip.b1 = Преди всеки ход се питай: всичките ли ми фигури са в безопасност?
+ex.hanging.tip.b1.2 = Добър навик: след всеки ход проверявай кои от фигурите ти са защитени.

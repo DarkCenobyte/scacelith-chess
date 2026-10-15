@@ -1,0 +1,497 @@
+# Scacelith - Dansk
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
+# Register: informal "du", as in all Danish software; buttons are imperatives or nouns. Titles are
+# in capitals (title face). Chess terms follow the Danish glossary (parti, træk, skak, mat, remis,
+# pat, rokade, noteringsblanket, betænkningstid). Quotation marks »…«; decimal comma.
+# "Thinking time" (Stockfish's pause before a move) is "tænketid", so that "betænkningstid" always
+# means the time control. The coach is "træneren" and "han" (a male teacher, as in the coach files).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Til
+common.off = Fra
+common.back = Tilbage
+common.apply = Anvend
+common.discard = Kassér
+common.cancel = Annuller
+common.white = Hvid
+common.black = Sort
+common.main_menu = Hovedmenu
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Det kongelige spil
+menu.new_game = Nyt parti
+menu.options = Indstillinger
+menu.credits = Medvirkende
+menu.quit = Afslut
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = INDSTILLINGER
+options.tab.display = Skærm
+options.tab.graphics = Grafik
+options.tab.audio = Lyd
+options.tab.gameplay = Spil
+options.tab.player = Spiller
+options.tab.controls = Styring
+options.pending = Ændringerne træder i kraft, når de er anvendt.
+options.unsaved.title = IKKE ANVENDTE ÆNDRINGER
+options.unsaved.text = Nogle indstillinger er ændret. Vil du anvende dem, før du går?
+
+options.language = Sprog
+options.language.help = Sproget i menuer og meddelelser. Det skifter med det samme.
+options.display_mode = Visningstilstand
+options.display_mode.help = Fuld skærm: et vindue uden kant over hele skærmen i skrivebordets opløsning. Vindue: et vindue i størrelsen nedenfor.
+options.fullscreen = Fuld skærm
+options.windowed = Vindue
+options.window_size = Vinduesstørrelse
+options.window_size.help = Vinduets størrelse i vinduestilstand. Fuld skærm bruger altid skrivebordets opløsning.
+options.vsync = Lodret synkronisering
+options.vsync.help = Synkroniserer billederne med skærmen for at undgå, at billedet rives over (tearing).
+options.render_scale = Renderingsskala
+options.render_scale.help = Den interne opløsning af 3D-billedet. Lavere er hurtigere, højere er skarpere.
+
+options.quality = Kvalitet
+options.quality.very_low = Meget lav
+options.quality.low = Lav
+options.quality.medium = Middel
+options.quality.high = Høj
+options.quality.ultra = Ultra
+options.quality.custom = Tilpasset
+options.quality.help = Indstiller alle indstillingerne nedenfor på én gang: Meget lav slår alle effekter fra, Ultra sætter dem alle til maksimum. Ændrer du en enkelt indstilling, skifter kvaliteten til Tilpasset. På et beskedent grafikkort hjælper det også meget at sænke renderingsskalaen (Skærm).
+options.shadows = Skygger
+options.shadows.help = Detaljegraden af solens skygger og hvor bløde deres kanter er. Lav: enkle kanter, hurtige at tegne.
+options.reflections = Refleksioner
+options.reflections.help = Gulvet, bordet og brættet spejler rummet (det tegnes én gang mere for hver af dem: blandt de mest krævende indstillinger); fra Middel spejler de blanke brikker og genstande også deres omgivelser.
+options.ambient_occlusion = Omgivende okklusion
+options.ambient_occlusion.help = Blød skyggelægning, hvor genstande mødes, og i fordybninger, hvor der kommer mindre lys ind.
+options.indirect_light = Indirekte lys
+options.indirect_light.help = Dagslys, der kastes tilbage fra væggene, gulvet og loftet. Lav: et jævnt omgivende lys i stedet. Påvirker mest indlæsningstiden.
+options.volumetric_light = Lysstråler
+options.volumetric_light.help = Solstråler gennem salens støvede luft og de støvkorn, der glimter i dem.
+options.tessellation = Tessellering
+options.tessellation.help = Bløde konturer på brikkernes kurver, når de ses tæt på.
+options.tessellation.unavailable = Ikke tilgængelig: denne grafikdriver understøtter ikke tessellering.
+options.antialiasing = Kantudjævning
+options.antialiasing.help = Udjævner takkede kanter og flimrende højlys. Fra: skarpere, men takket, og nogle effekter ser kornede ud.
+options.depth_of_field = Dybdeskarphed
+options.depth_of_field.help = Slører det, der ligger et godt stykke foran eller bag det, du ser på, som et kameraobjektiv gør.
+options.motion_blur = Bevægelsessløring
+options.motion_blur.help = Slører kameraets og armenes hurtige bevægelser, som et filmkamera gør.
+options.bloom = Glød
+options.bloom.help = Et blødt skær omkring de klareste højlys, som i et kameraobjektiv.
+options.brightness = Lysstyrke
+options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
+options.brightness.help = Kameraets eksponeringskompensation. Kalibreringen ved første start indstiller den, så de mørkeste skygger lige netop er synlige.
+
+options.master_volume = Samlet lydstyrke
+options.effects = Effekter
+options.ambience = Baggrundslyde
+options.ambience.help = Salens mumlen: ilden, fjerne fodtrin, det gamle ur.
+options.ambience_volume = Baggrundslydstyrke
+options.voice_volume = Stemmens lydstyrke
+options.voice_volume.help = Lydstyrken af trænerens stemme i trænertilstand.
+options.subtitles = Undertekster
+options.subtitles.auto = Automatisk
+options.subtitles.help = Trænerens ord, skrevet nederst på skærmen. Automatisk: vises, når træneren ikke taler menuernes sprog (med kinesiske menuer taler han engelsk). Vises altid, når hans stemme ikke er installeret.
+
+options.legal_moves = Vis lovlige træk
+options.legal_moves.help = Fremhæver de felter, en rørt brik kan nå. Når indstillingen er slået fra, er der intet, der fortæller dig, om et træk er lovligt: et ulovligt træk straffes af dommeren, når du trykker på uret.
+options.coordinates = Koordinater på brættet
+options.auto_press = Tryk automatisk på uret
+options.auto_press.help = Din robot trykker selv på uret, så snart dit træk står på brættet. I onlinepartier bestemmer serveren, og i et direkte parti den spiller, der er vært.
+options.thinking_time = Realistisk tænketid
+options.thinking_time.help = Din modstander tager sig tid som en menneskelig spiller i stedet for at trække med det samme.
+options.ignore_head = Ignorér modstanderens hovedbevægelser
+options.ignore_head.help = I onlinepartier og direkte partier kigger modstanderens robot derhen, hvor dens spiller kigger. Når indstillingen er slået til, bevæger den selv hovedet, som mod Stockfish.
+options.mouse_sensitivity = Musefølsomhed
+options.invert_look = Invertér lodret kig
+options.handover = Spillerskift
+options.handover.cut = Øjeblikkeligt klip
+options.handover.flight = Flyvning, {0} s
+options.handover.help = To spillere ved én pc: hvordan synsvinklen går fra den ene spillers øjne til den andens efter hvert træk. Det øjeblikkelige klip undgår kamerabevægelsen.
+options.game_cursor = Spilmarkør
+options.game_cursor.help = Ved bordet tegner spillet sin egen markør, som viser, hvad et klik vil gøre. Fra: systemets almindelige pil.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Navn
+player.name.help = Dit navn, sådan som det står øverst på noteringsblanketterne, i et hvilket som helst alfabet.
+player.default_name = Menneske
+player.handwriting = Håndskrift
+player.handwriting.help = Den hånd, der skriver dine træk. Arabisk, japansk og kinesisk skrives med en hånd for sig.
+player.preview = PÅ DIN NOTERINGSBLANKET
+hand.caveat = Uformel
+hand.marck = Sammenhængende
+hand.badscript = Skrå
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Venstreklik
+controls.touch = Rør en brik, og flyt den så
+controls.clock.keys = Mellemrum  eller  klik på uret
+controls.clock = Tryk på uret
+controls.look.keys = Hold højre museknap nede
+controls.look = Se dig omkring
+controls.sheet.keys = S
+controls.sheet = Se på din noteringsblanket og tilbage igen
+controls.stand.keys = ↑
+controls.stand = Rejs dig op foran din stol
+controls.side.keys = ←  /  →
+controls.side = Stil dig ved bordets venstre / højre ende
+controls.sit.keys = ↓
+controls.sit = Sæt dig ned igen (du spiller kun siddende)
+controls.moves.keys = Tab
+controls.moves = Vis eller skjul træklisten
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Mellemrum
+controls.coach_skip = Træner: spring over det, træneren siger
+controls.coach_takeback.keys = Tilbage
+controls.coach_takeback = Træner: tag trækket tilbage, når det tilbydes
+controls.coach_hint.keys = H
+controls.coach_hint = Trænerens udfordringer: bed om et hint
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = LYSSTYRKE
+calibration.text = Flyt skyderen, indtil springeren på det sorte felt knap er synlig eller slet ikke kan ses længere.
+calibration.later = Du kan ændre det senere under Indstillinger > Grafik.
+calibration.continue = Fortsæt
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NYT PARTI
+newgame.opponent = MODSTANDER
+newgame.time_control = BETÆNKNINGSTID
+newgame.start = Start
+newgame.elo = ~{0} Elo
+newgame.you_white = Du spiller med hvid.
+newgame.you_black = Du spiller med sort.
+newgame.colour_lot = Der trækkes lod om farverne i det første parti.
+newgame.colour_alternate = Derefter skifter farverne fra parti til parti.
+newgame.opponent_kind = Modstander
+newgame.opponent_kind.help = Spil mod Stockfish eller mod en ven, der sidder ved denne computer: I trækker på skift, hver fra sin side af brættet.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Menneske, samme pc
+
+# Custom opponent: Stockfish parameters
+engine.skill = Færdighedsniveau
+engine.skill.help = »Skill Level« i Stockfish (0–20). Ignoreres, så længe styrken er begrænset af Elo.
+engine.limit_elo = Begræns styrken (Elo)
+engine.limit_elo.help = UCI_LimitStrength: motoren sigter efter Elo-ratingen nedenfor.
+engine.elo = Elo
+engine.depth = Søgedybde
+engine.plies = {0} halvtræk|{0} halvtræk
+engine.move_time = Tid pr. træk
+engine.nodes = Knudegrænse
+engine.no_limit = Fra
+engine.thousand = {0} tusind
+engine.million = {0} mio.
+engine.dynamic_elo = Dynamisk Elo efter tid
+engine.dynamic_elo.help = Ligesom en menneskelig spiller spiller Stockfish svagere, når tiden på uret bliver knap: lidt i det sidste minut (tidligere i hurtigskak og lynskak), meget svagere i tidsnød. Kun partier med ur.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish tager sig tid som et menneske på samme niveau. Vil du springe pausen over: Indstillinger > Spil > Realistisk tænketid.
+engine.pace.instant = Stockfish trækker, så snart den har regnet færdig. Vil du have menneskelige pauser: Indstillinger > Spil > Realistisk tænketid.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Ubegrænset
+tc.no_clock = Uden ur
+tc.bullet = Bullet
+tc.blitz = Lynskak
+tc.rapid = Hurtigskak
+tc.classical = Klassisk
+tc.custom = Tilpasset
+tc.your_own = Efter eget valg
+tc.base_time = Grundtid
+tc.base_time.help = Starttiden på hver side af uret (minutter : sekunder).
+tc.increment = Tillæg
+tc.increment.help = Fischer-tillæg, der lægges til efter hvert træk.
+tc.delay = Forsinkelse
+tc.delay.help = Bronstein-forsinkelse: tid, der bruges op til denne forsinkelse, gives tilbage efter hvert træk.
+tc.no_delay = Fra
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, forsinkelse {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Nybegynder
+preset.novice.desc = Har lige lært trækkene: lader brikker hænge og overser simple trusler.
+preset.beginner.name = Begynder
+preset.beginner.desc = Kender det grundlæggende, men laver stadig jævnligt brølere, der koster materiale.
+preset.casual.name = Hyggespiller
+preset.casual.desc = En afslappet modstander til en hyggeaften: fornuftige træk, hyppige fejl.
+preset.club_player.name = Klubspiller
+preset.club_player.desc = Solid klubspiller, der straffer åbenlyse brølere.
+preset.advanced.name = Avanceret
+preset.advanced.desc = Stærk klubspiller med godt taktisk blik.
+preset.expert.name = Ekspert
+preset.expert.desc = Turneringsekspert: fejler sjældent og omsætter fordele til gevinst.
+preset.master.name = Mester
+preset.master.desc = Mesterstyrke: dybe beregninger og fint positionsspil.
+preset.grandmaster.name = Stormester
+preset.grandmaster.desc = Stormesterniveau: ekstremt svær at slå.
+preset.stockfish_max.name = Stockfish Maks
+preset.stockfish_max.desc = Stockfish 19 i fuld styrke. Held og lykke.
+preset.custom.name = Tilpasset
+preset.custom.desc = Dine egne indstillinger af motoren.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = MEDVIRKENDE
+credits.game.head = SCACELITH
+credits.game = Et skakparti i en kongelig sal, på en egenudviklet OpenGL 4.6-motor.
+credits.engine.head = SKAKMOTOR
+credits.engine = Stockfish 19, af Stockfish-udviklerne.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Motorens neurale netværk er trænet på data fra projektet Leela Chess Zero, som stilles til rådighed under Open Database License (ODbL).
+credits.voice.head = TRÆNERENS STEMME
+credits.voice = Syntetisk tale genereret med Supertonic 3 til trænertilstanden.
+credits.voice.licence = Supertonic 3 er en model fra Supertone, som bruges under OpenRAIL-M-licensen, hvis brugsbegrænsninger gælder for alle, der bruger den (se Licenser).
+credits.openings.head = ÅBNINGER
+credits.openings = Åbningernes navne stammer fra databasen chess-openings på lichess.org, der er frigivet til det offentlige domæne (CC0).
+credits.fonts.head = SKRIFTTYPER
+credits.fonts = EB Garamond af Georg Duffner og Cinzel af Natanael Gama; Amiri af Khaled Hosny.
+credits.fonts.hand = Håndskrift: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Skakfigurer fra GNU FreeFont (GPL v3 med skrifttypeundtagelse).
+credits.quote = »Skak er analysens kunst.«  — Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenser
+licences.title = LICENSER
+licences.note = Licenserne vises i deres oprindelige engelske tekst.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSE
+pause.resume = Fortsæt
+pause.offer_draw = Tilbyd remis
+pause.claim_draw = Kræv remis
+pause.claim_draw.help = Trefoldig gentagelse eller 50-træksreglen.
+pause.resign = Opgiv
+confirm.resign.title = OPGIV
+confirm.resign.text = Vil du opgive partiet? Din modstander erklæres som vinder.
+confirm.resign.draw = Vil du opgive partiet? Din modstander kan ikke længere sætte mat: partiet bliver remis.
+confirm.resign.ok = Opgiv
+confirm.leave.title = FORLAD PARTIET
+confirm.leave.text = Vil du vende tilbage til hovedmenuen? Det igangværende parti bliver afbrudt.
+confirm.leave.ok = Forlad
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = FORVANDL TIL
+piece.queen = Dronning
+piece.rook = Tårn
+piece.bishop = Løber
+piece.knight = Springer
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partiet er remis.
+gameover.draw_moves = Partiet er remis efter {0} træk.|Partiet er remis efter {0} træk.
+gameover.win = Godt spillet — du vinder.
+gameover.win_moves = Godt spillet — du vinder i {0} træk.|Godt spillet — du vinder i {0} træk.
+gameover.loss = Din modstander vinder.
+gameover.loss_moves = Din modstander vinder i {0} træk.|Din modstander vinder i {0} træk.
+gameover.rematch = Revanche
+gameover.view_board = Se brættet
+gameover.show = Vis
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Skakmat
+reason.resignation = Opgivelse
+reason.timeout = Tab på tid
+reason.illegal_moves = Andet ulovlige træk (partiet tabt)
+reason.stalemate = Pat
+reason.insufficient = Død stilling (utilstrækkeligt materiale)
+reason.timeout_vs_insufficient = Flaget faldt, men modstanderen kan ikke sætte mat
+reason.fivefold = Femfoldig gentagelse
+reason.75_moves = 75-træksreglen
+reason.threefold_claim = Trefoldig gentagelse (krævet)
+reason.50_moves_claim = 50-træksreglen (krævet)
+reason.agreement = Remis efter aftale
+reason.illegal_vs_insufficient = Andet ulovlige træk, men modstanderen kan ikke sætte mat
+reason.resignation_vs_insufficient = Opgivelse, men modstanderen kan ikke sætte mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = TRÆK
+movelist.empty = Ingen træk endnu.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Forbereder materialerne
+loading.hall = Rejser salen
+loading.furniture = Udskærer bordet og stolene
+loading.board = Polerer brættet
+loading.pieces = Drejer skakbrikkerne
+loading.clock = Samler uret
+loading.porcelain = Brænder porcelænet
+loading.ready = Klar
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Der kan ikke kræves remis i denne stilling.
+notify.flag_you = Dit flag er faldet.
+notify.flag_opponent = Din modstanders flag er faldet.
+notify.touched.pawn = Rørt brik: du skal flytte den bonde, du rørte.
+notify.touched.knight = Rørt brik: du skal flytte den springer, du rørte.
+notify.touched.bishop = Rørt brik: du skal flytte den løber, du rørte.
+notify.touched.rook = Rørt brik: du skal flytte det tårn, du rørte.
+notify.touched.queen = Rørt brik: du skal flytte den dronning, du rørte.
+notify.touched.king = Rørt brik: du skal flytte den konge, du rørte.
+notify.touched.piece = Rørt brik: du skal flytte den brik, du rørte.
+notify.touched_square = Rørt brik: du skal flytte brikken på {0}.
+notify.press_clock = Tryk på uret for at fuldføre dit træk (Mellemrum).
+notify.manual_clock = Tryk selv på uret efter hvert træk i dette parti.
+notify.illegal = Ulovligt træk.
+notify.cannot_move = Det træk kan ikke udføres.
+notify.move_first = Udfør dit træk, før du trykker på uret.
+notify.stance.sit_to_play = Sæt dig ned igen for at spille (Pil ned).
+notify.stance.first = Uret kører videre, mens du står. Pil ned: sæt dig ned igen.
+notify.stance.first_untimed = Du spiller kun fra din stol. Pil ned: sæt dig ned igen.
+notify.stance.finish_move = Gør dit træk færdigt først.
+notify.draw_already_offered = Du har allerede tilbudt remis i dette træk.
+notify.draw_accepted = Din modstander tager imod remis.
+notify.draw_declined = Din modstander afslår remistilbuddet.
+notify.draw_claimed = Din modstander kræver remis.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Dommer: der blev trykket på uret uden at udføre et træk, hvilket tæller som et ulovligt træk.
+arbiter.unpromoted = Dommer: ulovligt træk, bonden blev ikke erstattet af en ny brik, før der blev trykket på uret.
+arbiter.illegal = Dommer: ulovligt træk.
+arbiter.second_loses.white = Det er hvids andet ulovlige træk: hvid taber partiet.
+arbiter.second_loses.black = Det er sorts andet ulovlige træk: sort taber partiet.
+arbiter.second_draw.white = Det er hvids andet ulovlige træk, men sort kan ikke sætte mat: partiet er remis.
+arbiter.second_draw.black = Det er sorts andet ulovlige træk, men hvid kan ikke sætte mat: partiet er remis.
+arbiter.queen = Bonden bliver en dronning.
+arbiter.queen_one_minute.white = Bonden bliver en dronning, og hvid får ét minut ekstra.
+arbiter.queen_one_minute.black = Bonden bliver en dronning, og sort får ét minut ekstra.
+arbiter.queen_two_minutes.white = Bonden bliver en dronning, og hvid får to minutter ekstra.
+arbiter.queen_two_minutes.black = Bonden bliver en dronning, og sort får to minutter ekstra.
+arbiter.restored = Stillingen genoprettes.
+arbiter.restored_one_minute.white = Stillingen genoprettes, og hvid får ét minut ekstra.
+arbiter.restored_one_minute.black = Stillingen genoprettes, og sort får ét minut ekstra.
+arbiter.restored_two_minutes.white = Stillingen genoprettes, og hvid får to minutter ekstra.
+arbiter.restored_two_minutes.black = Stillingen genoprettes, og sort får to minutter ekstra.
+arbiter.one_minute.white = Hvid får ét minut ekstra.
+arbiter.one_minute.black = Sort får ét minut ekstra.
+arbiter.two_minutes.white = Hvid får to minutter ekstra.
+arbiter.two_minutes.black = Sort får to minutter ekstra.
+arbiter.second_loses = Et andet ulovligt træk taber partiet.
+arbiter.touched.white = Hvid skal flytte den rørte brik.
+arbiter.touched.black = Sort skal flytte den rørte brik.
+arbiter.game_over = Partiet er slut.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Se et parti
+
+viewer.title = SE ET PARTI
+viewer.white = HVID
+viewer.black = SORT
+viewer.time_control = BETÆNKNINGSTID
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Byt farver
+viewer.note = Begge spillere er Stockfish. Flyv frit rundt i salen, mens de spiller: ingen kan se dig.
+viewer.summary = {0} mod {1}
+viewer.custom = Tilpasset
+viewer.tc.custom = Efter eget valg
+viewer.base_time = Grundtid
+viewer.increment = Tillæg
+viewer.delay = Forsinkelse
+viewer.off = Fra
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = forsinkelse {0} s
+viewer.back = Tilbage
+viewer.start = Start
+
+viewer.paused = PAUSE
+viewer.resume = Fortsæt
+viewer.options = Indstillinger
+viewer.main_menu = Hovedmenu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = STYRING
+viewer.keys.move = W A S D  ·  Z Q S D  ·  piletaster
+viewer.controls.move = Bevæg dig
+viewer.keys.updown = E, Mellemrum  /  C, Ctrl
+viewer.controls.updown = Op / ned
+viewer.keys.fast = Skift
+viewer.controls.fast = Hurtigere
+viewer.keys.look = Højre museknap
+viewer.controls.look = Se dig omkring
+viewer.keys.speed = Musehjul
+viewer.controls.speed = Hastighed
+viewer.keys.views = 1 – 9
+viewer.controls.views = Synsvinkler
+viewer.keys.eyes = 0
+viewer.controls.eyes = Gennem øjnene på den spiller, der er i trækket
+viewer.keys.moves = Tab
+viewer.controls.moves = Trækliste
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Skjul denne oversigt
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pause / fortsæt
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Ét træk tilbage / frem
+viewer.keys.replay_speed = Skift + J  /  L
+viewer.controls.replay_speed = Langsommere / hurtigere
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partiets start / slutning
+viewer.speed = Hastighed {0} m/s
+viewer.view.0 = Gennem spillernes øjne
+viewer.view.1 = Ved siden af bordet
+viewer.view.2 = Over brættet
+viewer.view.3 = Salen
+viewer.view.4 = Uret
+viewer.view.5 = Hvids ansigt
+viewer.view.6 = Sorts ansigt
+viewer.view.7 = Duellen
+viewer.view.8 = Vinduerne
+viewer.view.9 = Vægtæpperne
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Hvid
+viewer.side.black = Sort
+viewer.flag.white = Hvids flag er faldet.
+viewer.flag.black = Sorts flag er faldet.
+viewer.claims_draw = {0} kræver remis.
+viewer.offer_accepted = {0} tilbyder remis, og {1} tager imod.
+viewer.offer_declined = {0} tilbyder remis, men {1} afslår.
+viewer.gameover.white_wins = Hvid vinder efter træk {0}.
+viewer.gameover.black_wins = Sort vinder efter træk {0}.
+viewer.gameover.draw = Partiet er remis efter træk {0}.
+viewer.gameover.players = {0} mod {1}
+viewer.watch_again = Se igen
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Endnu intet ratet parti
+elo.provisional = Foreløbig rating
+elo.peak = Højeste {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Din Elo {0}
+elo.expected = forventet score {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · dette parti er ikke ratet
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Noteringsblanket
+scoresheet.event = Turnering
+scoresheet.date = Dato
+scoresheet.round = Runde
+scoresheet.board = Bræt
+scoresheet.page = Side
+scoresheet.white = Hvid
+scoresheet.black = Sort
+scoresheet.elo = Elo
+scoresheet.result = Resultat
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Hvids underskrift
+scoresheet.sign_black = Sorts underskrift
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {0}.{1}.{2}

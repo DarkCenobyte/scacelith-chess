@@ -208,3 +208,543 @@ ex.dubious.b1 = 그 수는 좀 의심스러워요. 더 잘 둘 수 있지 않을
 ex.dubious.b1.2 = 그 수는 좀 의심스러워요. 더 좋은 수를 찾아볼까요?
 ex.dubious.b2 = 의심스러운 수예요. 더 잘 둘 수 있지 않을까요?
 ex.dubious.b2.2 = 그 수는 좀 의심스러워요. 더 좋은 수가 있지 않을까요?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = 그다음 {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my:subj} {sq} 칸으로 가요.
+demo.my.move.2 = {my:obj} {sq} 칸으로 옮겨요.
+demo.my.move.3 = 그러면 {my:subj} {sq} 칸으로 가요.
+demo.my.take = 제가 {your:obj} 잡아요.
+demo.my.take.2 = {my:subj} {your:obj} 잡아요.
+demo.my.take.3 = 그리고 {your:obj} 잡아요.
+demo.my.check = {my:subj} {sq} 칸으로 가요. 체크.
+demo.my.check.2 = {my:subj} {sq} 칸에서 체크를 걸어요.
+demo.my.check.3 = {my:subj} {sq} 칸으로, 체크!
+demo.my.mate = {my:subj} {sq} 칸으로 가요. 체크메이트.
+demo.my.mate.2 = 그리고 {my:subj} {sq} 칸으로 가면 체크메이트예요.
+demo.my.mate.3 = {my:subj} {sq} 칸으로. 체크메이트예요.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = 먼저 {my:subj} {your:obj} 잡아요. {t1:top} 나중에 잡아도 돼요.
+demo.my.first.take.2 = {my:subj} {your:obj} 먼저 잡아요. {t1:top} 어디 안 가요.
+demo.my.first.check = {my:subj} {your:obj} 잡으면서 체크! {t1:top} 나중에 잡아도 돼요.
+demo.my.first.check.2 = 먼저 {my:subj} 체크를 걸면서 {your:obj} 잡아요. {t1:top} 어디 안 가요.
+demo.my.first.check_move = 먼저 {my:ins} {sq} 칸에서 체크! {t1:top} 나중에 잡아도 돼요.
+demo.my.first.check_move.2 = {my:subj} {sq} 칸으로 가요. 체크가 먼저예요! {t1:top} 어디 안 가요.
+demo.my.first.move = 먼저 {my:subj} {sq} 칸으로 가요. {t1:top} 나중에 잡아도 돼요.
+demo.my.first.move.2 = {my:subj} 먼저 {sq} 칸으로. {t1:top} 어디 안 가요.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my:subj} 공격받고 있으니까, 먼저 {your:obj} 잡아요.
+demo.my.first.attacked.2 = {my:subj} 공격받고 있어요. 그래서 {your:obj} 먼저 잡아 버려요.
+# Levels 4-6, the same in-between move.
+demo.first = 먼저 {move}. {t1:top} 나중에 잡아도 돼요.
+demo.first.2 = 일단 {move}. {t1:top} 어디 안 가요.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = 이제 제 수를 둘게요.
+demo.play_on.2 = 이게 제 진짜 수예요.
+demo.play_on.3 = 그럼 이제 진짜로 둘게요.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = 그러면 {your:obj} {sq} 칸으로 옮기시겠죠.
+demo.your.move.2 = {your:obj} {sq} 칸으로 옮긴다고 해 봐요.
+demo.your.move.3 = 그러면 {your:subj} {sq} 칸으로 가요.
+demo.your.take = {my:obj} 잡으시겠죠.
+demo.your.take.2 = {your:ins} {my:obj} 잡아요.
+demo.your.take.3 = 그러면 {my:obj} 잡으시겠죠.
+demo.your.back = 되잡으시겠죠.
+demo.your.back.2 = {sq} 칸에서 되잡아요.
+demo.your.back.3 = 그리고 되잡으시죠.
+demo.your.king = 킹이 움직여야 해요.
+demo.your.king.2 = 킹은 {sq} 칸으로 피해야 해요.
+demo.your.king.3 = 킹이 {sq} 칸으로 도망가요.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = 이제 {t1:top} 살릴 수 없어요.
+ex.point.piece.2 = 그리고 {t1:top} 잡혀요.
+ex.point.piece.3 = 다음에 {t1:subj} 잡혀요.
+ex.point.two = {t1:and} {t2:subj} 둘 다 공격받고 있어요. 하나는 잡혀요.
+ex.point.two.2 = 이제 제가 {t1:and} {t2:obj} 공격해요. 둘 다 지킬 수는 없어요.
+ex.point.mate = 이제 {reply:nomate}, 체크메이트예요.
+ex.point.mate.2 = 다음은 {reply:nomate}, 그러면 체크메이트예요.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = 보셨죠? 이제 {pts:point}을 잃었어요.
+ex.result.b1.2 = 이렇게 해서 {pts:point}을 잃게 돼요.
+ex.result.b2 = 결국 {pts:point}을 잃었어요.
+ex.result.b2.2 = 이제 {pts:point} 손해예요.
+ex.result.b3 = 이걸로 {pts:point}을 잃어요.
+ex.result.b3.2 = 결국 {pts:point} 손해로 끝나요.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = 조금 되찾을 수는 있지만, 그래도 {pts:point} 손해예요.
+ex.result_back.b1.2 = 조금 되찾을 수 있어도, 결국 {pts:point}을 잃은 거예요.
+ex.result_back.b2 = 일부는 되찾을 수 있지만, 여전히 {pts:point} 손해예요.
+ex.result_back.b2.2 = 되잡아도 {pts:point}을 잃은 셈이에요.
+ex.result_back.b3 = 되잡은 뒤에도 {pts:point} 손해예요.
+ex.result_back.b3.2 = 조금 되찾지만, 그래도 {pts:point}을 잃어요.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = {your2:subj} 되잡으면, {my:subj} {your:obj} 잡아요.
+ex.retake.b1.2 = {your2:ins} 되잡으면 안 돼요. 그러면 {my:subj} {your:obj} 잡아요.
+ex.retake.b2 = {your2:ins} 되잡으면, {my:subj} {your:obj} 잡아요.
+ex.retake.b2.2 = {your2:ins} 되잡는 건 안 통해요. {my:subj} {your:obj} 잡거든요.
+ex.retake.b3 = {move}, 이렇게 되잡으면 {reply}, 이 수로 {your:obj} 잡아요.
+ex.retake.b3.2 = {move}, 이 되잡기는 안 통해요. {reply}, 이 수로 {your:obj} 잡거든요.
+ex.retake.b4 = {move}, 이건 {reply} 때문에 안 돼요. {your:subj} 잡히거든요.
+ex.retake.b4.2 = 그리고 {move}, 이렇게 두면 {reply}, 이 수로 {your:obj} 잡아요.
+ex.retake.b5 = {move}, 이 되잡기에는 {reply}, 이 수가 있어서 {your:subj} 잡혀요.
+ex.retake.b5.2 = {move}, 이건 {reply} 때문에 안 돼요. {your:subj} 잡혀요.
+ex.retake.b6 = {move}? {reply}, {your:subj} 잡혀요.
+ex.retake.b6.2 = {move}, 안 돼요. {reply}, {your:subj} 잡혀요.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = 그리고 여기 {sq} 칸에서 새 퀸을 얻게 돼요.
+demo.promote.2 = 그러면 {your:subj} {sq} 칸에 도착해서 퀸이 돼요.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = 조심하세요! {my:subj} {sq} 칸으로 갈 수 있는데, 그러면 체크메이트예요.
+ex.mate_allowed.b1.2 = 이제 {my:subj} {sq} 칸으로 갈 수 있어요. 그러면 체크메이트예요!
+ex.mate_allowed.b1.3 = 조심하세요! {my:subj} {sq} 칸으로 가면 체크메이트예요.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = 이 수 때문에 제가 {m:move} 만에 {your:obj} 체크메이트할 수 있어요.
+ex.mate_allowed.b2.2 = 이제 {m:move} 만에 {your:obj} 체크메이트할 수 있어요. 보세요.
+ex.mate_allowed.b2.3 = 조심하세요! {your:subj} 위험해요. {m:move} 메이트예요.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = 이 수 때문에 {m:move} 메이트가 생겨요. {line:nomate}.
+ex.mate_allowed.b3.2 = 이제 저한테 {m:move} 메이트가 있어요. {line:nomate}.
+ex.mate_allowed.b3.3 = 킹이 메이트당해요. {line:nomate}.
+ex.mate_allowed.b4 = {move}, 이 수는 강제 메이트를 허용해요. {line:nomate}.
+ex.mate_allowed.b4.2 = 이 수로 {m:move} 메이트에 걸려요. {line:nomate}.
+ex.mate_allowed.b4.3 = {move} 다음엔 {line:nomate}, 메이트예요.
+ex.mate_allowed.b5 = {move}, 이 수는 {m:move} 강제 메이트를 허용해요.
+ex.mate_allowed.b5.2 = 그 수로 {m:move} 메이트에 걸려요.
+ex.mate_allowed.b5.3 = 이제 {m:move} 강제 메이트가 있어요.
+ex.mate_allowed.b6 = {m:move} 메이트: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, 메이트.
+ex.mate_allowed.b6.3 = {line:nomate} 수순 뒤 메이트예요.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = 보세요. {your:subj} 도망갈 칸이 하나도 없어요.
+ex.mate_allowed.tail.b1.2 = 보셨죠? {your:subj} 공격받고 있는데 도망갈 수 없어요.
+ex.mate_allowed.tail.b1.3 = {your:subj} 갈 곳이 없어요. 이게 체크메이트예요.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = 이런 모양을 {text}라고 해요.
+ex.mate_allowed.pattern.2 = 꼭 기억해 두세요. 이게 {text}예요.
+ex.mate_allowed.tip.b3 = 수를 둘 때마다 킹이 아직 안전한지 확인하세요.
+ex.mate_allowed.tip.b3.2 = 항상 생각해 보세요. 이 수를 두면 킹이 체크메이트당할 수 있을까요?
+
+# Inserted in "{text}라고 해요" and "{text}예요": every name must end in 메이트 (a vowel).
+name.pattern.back_rank = 뒷줄 메이트
+name.pattern.smothered = 스머더드 메이트
+name.pattern.support = 보호받는 퀸 메이트
+name.pattern.ladder = 사다리 메이트
+name.pattern.epaulette = 에폴렛 메이트
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = {best:nomate}, 이 수로 {my:obj} 체크메이트하실 수 있었어요!
+ex.mate_missed.b1.2 = {best:nomate}, 이게 체크메이트였어요! {my:top} 도망갈 수 없었어요.
+ex.mate_missed.b1.3 = 보세요! {best:nomate}, 이렇게 두셨으면 {my:subj} 체크메이트였어요.
+ex.mate_missed.b2 = {best:nomate}, 이 수로 시작하는 {m:move} 메이트가 있었어요.
+ex.mate_missed.b2.2 = {best:nomate}, 이 수로 {m:move} 만에 체크메이트였어요!
+ex.mate_missed.b2.3 = {best:nomate}, 이 수로 저를 체크메이트하실 수 있었어요.
+ex.mate_missed.b3 = {m:move} 메이트를 놓치셨어요. {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate}, 이 수로 {m:move} 만에 메이트예요. {line:nomate}.
+ex.mate_missed.b3.3 = {best:nomate}, 이 수로 시작하는 {m:move} 메이트가 있었어요.
+ex.mate_missed.b4 = 메이트를 놓치셨어요. {best:nomate}, 이 수로 시작하는 수순: {line:nomate}.
+ex.mate_missed.b4.2 = {best:nomate}, 이 수로 {m:move} 강제 메이트였어요.
+ex.mate_missed.b4.3 = {best:nomate}, 이 수로 {m:move} 메이트가 가능했어요.
+ex.mate_missed.b5 = {best:nomate}, 이 수면 {m:move} 메이트예요. {line:nomate}.
+ex.mate_missed.b5.2 = {m:move} 메이트를 놓치셨어요. 시작은 {best:nomate}.
+ex.mate_missed.b5.3 = 강제 메이트가 있었어요. {best:nomate}.
+ex.mate_missed.b6 = {best:nomate}, 메이트: {line:nomate}.
+ex.mate_missed.b6.2 = {best:nomate}, {m:move} 메이트.
+ex.mate_missed.b6.3 = {best:nomate}, {m:move} 메이트였어요.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = {best:nomate}, 이쪽이 더 빨랐어요. {m:move} 메이트예요.
+ex.mate_delayed.b5.2 = {best:nomate}, 이 수면 {m:move} 만에 더 빨리 메이트였어요.
+ex.mate_delayed.b6 = {best:nomate}, {m:move} 메이트.
+ex.mate_delayed.b6.2 = 더 빠른 수: {best:nomate}, {m:move} 메이트.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = 이런! {my:subj} 움직일 수 없는데 체크도 아니에요. 스테일메이트, 무승부예요.
+ex.stalemate.b1.2 = 보세요. {my:subj} 갈 수 있는 안전한 칸이 없는데, 체크는 아니에요. 무승부예요!
+ex.stalemate.b1.3 = 스테일메이트예요. {my:subj} 움직일 수 없어서 무승부가 돼요.
+ex.stalemate.b2 = 스테일메이트! {my:subj} 둘 수 있는 수가 없는데 체크는 아니에요. 무승부예요.
+ex.stalemate.b2.2 = 이런, 스테일메이트예요. {my:subj} 꼼짝 못 하지만 체크는 아니에요.
+ex.stalemate.b2.3 = 스테일메이트로 무승부예요. {my:subj} 움직일 수 없어요.
+ex.stalemate.b3 = 스테일메이트예요. {my:subj} 둘 수 있는 수가 없어요. 이기던 게임이었는데요!
+ex.stalemate.b3.2 = 스테일메이트! {my:subj} 꼼짝 못 해서, 다 이긴 게임이 무승부가 돼요.
+ex.stalemate.b3.3 = {my:subj} 둘 수 있는 수도 없고 체크도 아니에요. 스테일메이트예요.
+ex.stalemate.b4 = 스테일메이트예요. {my:subj} 합법적인 수가 없어요. 승리를 날려 버렸네요.
+ex.stalemate.b4.2 = {move}, 이 수로 {my:subj} 스테일메이트가 돼요. 이기는 포지션에서 무승부예요.
+ex.stalemate.b4.3 = 스테일메이트예요. {my:subj} 꽉 갇혔어요.
+ex.stalemate.b5 = {move}, {my:subj} 스테일메이트가 돼요. 승리가 날아갔어요.
+ex.stalemate.b5.2 = 스테일메이트. {my:subj} 갈 칸이 없어요.
+ex.stalemate.b5.3 = 스테일메이트예요. {my:subj} 꼼짝 못 해요.
+ex.stalemate.b6 = 스테일메이트. {my:subj} 움직일 수 없어요.
+ex.stalemate.b6.2 = {move}, 스테일메이트. {my:subj} 갇혔어요.
+ex.stalemate.b6.3 = 스테일메이트. {my:subj} 못 움직여요.
+ex.stalemate.tip.b1 = 이기고 있을 때는 제 킹이 움직일 칸을 꼭 남겨 두세요.
+ex.stalemate.tip.b1.2 = 기억하세요. 앞서 있을 때는 제 킹에게 움직일 공간을 주세요.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = 조심하세요! 제가 기물을 내주면 {my:subj} 움직일 수 없게 돼요. 스테일메이트예요.
+ex.stalemate_trick.b1.2 = 조심하세요. {my:subj} 거의 꼼짝 못 해요. 제가 무승부로 만들 수 있어요.
+ex.stalemate_trick.b2 = 조심하세요. 제가 기물을 희생하면 {my:subj} 스테일메이트가 될 거예요.
+ex.stalemate_trick.b2.2 = {my}에게 갈 칸이 거의 없어요. 스테일메이트로 끌고 갈 수 있어요!
+ex.stalemate_trick.b3 = 이 수 덕분에 저는 스테일메이트로 빠져나갈 수 있어요. {my:subj} 움직일 수 없게 되거든요.
+ex.stalemate_trick.b3.2 = 조심하세요. {line} 수순 뒤에 {my:subj} 스테일메이트가 돼요.
+ex.stalemate_trick.b4 = {move}, 이 수는 스테일메이트 함정을 허용해요. {line}, 그러면 {my:subj} 움직일 수 없어요.
+ex.stalemate_trick.b4.2 = 이제 {my:subj} 스테일메이트로 피할 수 있어요. {line}.
+ex.stalemate_trick.b5 = {move}, 스테일메이트를 허용해요. {line}, {my:subj} 갇혀요.
+ex.stalemate_trick.b5.2 = 스테일메이트 함정: {line}, 그러면 {my:subj} 움직일 수 없어요.
+ex.stalemate_trick.b6 = {line}, 스테일메이트. {my:subj} 갇혀요.
+ex.stalemate_trick.b6.2 = {line} 수순 뒤 스테일메이트. {my:subj} 꼼짝 못 해요.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my:subj} {sq} 칸으로 가서 {t1:and} {t2:obj} 공격할 수 있어요.
+ex.fork.b1.2 = {my:subj} {sq} 칸으로 가서 두 기물을 동시에 공격해요. {t1:and} {t2:cop}.
+ex.fork.b1.3 = {my:obj} 보세요. {sq} 칸에서 {t1:and} {t2:obj} 한꺼번에 공격해요.
+ex.fork.b2 = 포크! {sq} 칸의 {my:subj} {t1:and} {t2:obj} 동시에 공격해요.
+ex.fork.b2.2 = 이 수 다음엔 {my:subj} {sq} 칸에서 {t1:and} {t2}에 포크를 걸 수 있어요.
+ex.fork.b2.3 = {my:subj} {sq} 칸으로 가요. {t1:and} {t2}에 대한 이중 공격이에요.
+ex.fork.b3 = {move} 다음엔 {reply}, {t1:and} {t2}에 포크가 걸려요.
+ex.fork.b3.2 = {reply}, 이 수로 제가 {t1:and} {t2:obj} 동시에 공격해요.
+ex.fork.b3.3 = {reply}, 이건 포크예요. {t1:and} {t2:subj} 둘 다 공격받아요.
+ex.fork.b4 = {reply}, {t1:and} {t2}에 포크예요. {line} 수순 뒤에는 {pts:point} 손해예요.
+ex.fork.b4.2 = {reply}, 이 수가 {t1:and} {t2:obj} 한꺼번에 노려요.
+ex.fork.b4.3 = {move}, 이 수 때문에 {reply}, {t1:and} {t2}에 거는 포크가 가능해져요.
+ex.fork.b5 = {move}, 이 수로 {t1:and} {t2:subj} 포크에 걸려요. {reply}.
+ex.fork.b5.2 = {reply}, {t1:and} {t2}에 포크.
+ex.fork.b5.3 = {reply}, 그러면 {t1:and} {t2:subj} 둘 다 공격받아요.
+ex.fork.b6 = {reply}, 포크.
+ex.fork.b6.2 = {move} 다음엔 {reply}, 포크.
+ex.fork.b6.3 = {reply}, 포크예요.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = {t1:stem}나 {t2}, 둘 중 하나만 살릴 수 있어요.
+ex.fork.tail.b1.2 = 이제 제가 두 기물을 한꺼번에 공격해요. {t1:and} {t2:cop}. 이게 포크예요!
+ex.fork.tail.b1.3 = 보셨죠? {t1:and} {t2:subj} 둘 다 공격받고 있어요. 하나는 잡히게 돼요.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:subj} 체크를 피해야 하니까, 제가 {t1:obj} 잡아요.
+ex.fork.tail_king.2 = 체크! {your:subj} 움직여야 하니까 {t1:subj} 잡혀요.
+ex.fork.more.b3 = 두기 전에 {sq} 칸을 확인하세요. {my:subj} 포크를 걸 수 있는 칸이에요.
+ex.fork.more.b3.2 = {sq} 칸을 잘 보세요. {my:subj} 거기서 포크를 걸어요.
+ex.fork.tip.knight = 킹과 퀸 근처로 뛰어드는 나이트를 조심하세요!
+ex.fork.tip.knight.2 = 나이트는 두 기물을 한꺼번에 공격하는 걸 좋아해요. 나이트가 어디로 뛸 수 있는지 보세요.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = {my:subj} 비키면 {my2:subj} {t1:obj} 공격해요!
+ex.discovered.b1.2 = 보세요. {my:subj} 길을 막고 있어요. 비키면 {my2:subj} {t1:obj} 공격해요.
+ex.discovered.b1.3 = {my:subj} 옆으로 비킬 수 있어요. 그러면 {my2:subj} {t1:obj} 공격해요.
+ex.discovered.b2 = 숨은 공격이에요. {my:subj} 움직이면 {my2:subj} {t1:obj} 공격해요.
+ex.discovered.b2.2 = 조심하세요. {my:subj} 비키면 {my2:subj} {t1:obj} 공격해요.
+ex.discovered.b2.3 = {my:subj} 비키면, 가려져 있던 {my2:subj} {t1:obj} 겨냥해요.
+ex.discovered.b3 = {reply}, 이 수로 디스커버드 어택이 {t1:obj} 노려요.
+ex.discovered.b3.2 = {reply}, 이 수로 {t1:obj} 노리는 공격이 드러나요.
+ex.discovered.b3.3 = {move} 다음엔 {reply}, {t1:obj} 노리는 디스커버드 어택이 가능해요.
+ex.discovered.b4 = {reply}, 이 수로 {t1}까지 길이 열려요. 디스커버드 어택이에요.
+ex.discovered.b4.2 = {move} 다음엔 디스커버드 어택 {reply}, 이걸로 {t1:obj} 잡아요.
+ex.discovered.b4.3 = {reply}, 그러면 디스커버드 어택으로 {t1:subj} 잡혀요.
+ex.discovered.b5 = {move} 다음엔 디스커버드 어택이 있어요. {reply}.
+ex.discovered.b5.2 = {reply}, 디스커버드 어택이에요.
+ex.discovered.b5.3 = {reply}, 숨어 있던 공격이 드러나요.
+ex.discovered.b6 = {reply}, {t1:obj} 노리는 디스커버드 어택.
+ex.discovered.b6.2 = {reply}, 그리고 {t1:subj} 잡혀요.
+ex.discovered.b6.3 = 디스커버드 어택: {reply}, {t1:obj} 노려요.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my:subj} {t1:obj} 공격해요. 비키면 그 뒤의 {t2:obj} 잡아요.
+ex.skewer.b1.2 = 보세요. {my:subj} {t1:obj} 공격하는데, 바로 뒤에 {t2:subj} 있어요.
+ex.skewer.b1.3 = {my:subj} {t1:obj} 노려요. 피할 수밖에 없고, 그러면 {t2:subj} 잡혀요.
+ex.skewer.b2 = 스큐어예요. {my:subj} {t1:obj} 공격하고, 그 뒤에 {t2:subj} 있어요.
+ex.skewer.b2.2 = {my:subj} 한 줄에 선 {t1:and} {t2:obj} 노려요. 앞의 기물이 비키면 뒤의 기물을 잡아요.
+ex.skewer.b2.3 = 조심하세요. {t1:and} {t2:subj} 한 줄에 있어요. {my:subj} 스큐어를 걸 수 있어요.
+ex.skewer.b3 = {reply}, {t1:and} {t2}에 스큐어가 걸려요.
+ex.skewer.b3.2 = {reply}, 그러면 {t1:subj} 비켜야 하고 {t2:subj} 잡혀요.
+ex.skewer.b3.3 = {move} 다음엔 {reply}, {t1:and} {t2}에 스큐어가 걸려요.
+ex.skewer.b4 = {reply}, {t1}에 스큐어가 걸려요. 뒤에 있는 {t2:subj} 잡혀요.
+ex.skewer.b4.2 = {move} 뒤에는 {t1:and} {t2:subj} 한 줄에 서요. {reply}.
+ex.skewer.b4.3 = {reply}, 그러면 {t1:subj} 비키고 {t2:subj} 잡혀요.
+ex.skewer.b5 = {reply}, {t1:and} {t2}에 스큐어.
+ex.skewer.b5.2 = {move} 다음엔 {reply}, {t1}에서 {t2}까지 꿰뚫는 스큐어예요.
+ex.skewer.b6 = {reply}, 스큐어.
+ex.skewer.b6.2 = {reply}, 스큐어예요.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my:subj} {sq} 칸으로 갈 수 있어요. 그러면 {your:subj} {t1} 앞에서 꼼짝 못 해요.
+ex.pin.b1.2 = {sq} 칸의 {my:obj} 보세요. {your:subj} {t1} 앞에 묶여요.
+ex.pin.b1.3 = {my:subj} {your:obj} {t1} 앞에 묶어 둘 수 있어요. 그러면 제가 잡아요.
+ex.pin.b2 = 핀이에요. {your:subj} {t1} 앞에서 꼼짝 못 해요.
+ex.pin.b2.2 = {your:subj} 핀에 걸려요. 뒤에 {t1:subj} 있거든요. 그러면 제가 잡을 수 있어요.
+ex.pin.b2.3 = 이제 {your:subj} {t1} 앞에서 꼼짝 못 해요. 이게 핀이에요.
+ex.pin.b3 = {your:subj} {t1} 앞에서 핀에 걸리고, 제가 그걸 잡아요.
+ex.pin.b3.2 = 이 수 다음엔 {your:subj} {t1} 앞에서 핀에 걸려요.
+ex.pin.b3.3 = {your}에 걸린 핀 때문에 기물을 잃어요. 뒤에 {t1:subj} 있거든요.
+ex.pin.b4 = {reply}, 핀을 걸고 기물 이득을 봐요.
+ex.pin.b4.2 = {move}, 이 수는 핀에 걸려요. {reply}.
+ex.pin.b4.3 = {reply}, 그러면 핀에 걸린 기물이 잡혀요.
+ex.pin.b5 = {move} 다음엔 {reply}, 핀이 걸려요.
+ex.pin.b5.2 = {reply}, 핀에 걸린 기물을 잃어요.
+ex.pin.b6 = {reply}, 핀.
+ex.pin.b6.2 = {reply}, 핀이에요.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your:subj} 핀에 걸려서 {sq} 칸을 지킬 수 없어요. 뒤에 {t1:subj} 있거든요.
+ex.pin_defender.b1.2 = 보세요. 뒤에 {t1:subj} 있어서 {your:subj} {sq} 칸을 제대로 지킬 수 없어요.
+ex.pin_defender.b2 = {your:subj} {t1} 앞에서 핀에 걸려 있어서, {sq} 칸을 제대로 지키는 기물이 없어요.
+ex.pin_defender.b2.2 = 핀에 걸린 기물은 수비를 잘 못 해요. {your:top} {sq} 칸을 지킬 수 없어요. 뒤에 {t1:subj} 있거든요.
+ex.pin_defender.b3 = {your:subj} {t1} 앞에서 핀에 걸려 있어요. {sq} 칸을 실제로는 지키지 못해요.
+ex.pin_defender.b3.2 = {sq} 칸은 지켜지는 것처럼 보이지만, {your:subj} {t1} 앞에서 핀에 걸려 있어요.
+ex.pin_defender.b4 = {your:subj} 핀에 걸려 있어서 {sq} 칸은 사실상 무방비예요.
+ex.pin_defender.b4.2 = 핀에 걸린 {your:top} {sq} 칸을 지킬 수 없어요.
+ex.pin_defender.b5 = {your:subj} 핀에 걸려서 {sq} 칸이 무방비예요.
+ex.pin_defender.b5.2 = {sq} 칸이 뚫려요. {your:subj} 핀에 걸려 있거든요.
+ex.pin_defender.b6 = {your:subj} 핀에 걸려 {sq} 칸이 뚫려요.
+ex.pin_defender.b6.2 = 핀에 걸린 {your}, 무방비인 {sq} 칸.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your:subj} 갇혔어요. 갈 수 있는 칸이 모두 공격받고 있어요.
+ex.trapped.b1.2 = {your:obj} 보세요. 도망갈 안전한 칸이 없어요.
+ex.trapped.b1.3 = {your:subj} 꼼짝 못 해요. 제가 공격하면 도망갈 수 없어요.
+ex.trapped.b2 = {your}에게는 안전한 칸이 없어요. 제가 잡을 수 있어요.
+ex.trapped.b2.2 = {your:subj} 갇혔어요. 어디로 가든 제가 잡아요.
+ex.trapped.b2.3 = 조심하세요, {your:subj} 갈 칸이 점점 없어져요.
+ex.trapped.b3 = {your:subj} 갇혀요. 안전한 칸이 하나도 안 남아요.
+ex.trapped.b3.2 = 이 수 다음엔 {your:subj} 갇혀서 잡히게 돼요.
+ex.trapped.b3.3 = {your:subj} 함정에 들어갔어요. 빠져나올 수 없어요.
+ex.trapped.b4 = {move}, 이 수로 {your:subj} 갇혀요.
+ex.trapped.b4.2 = {your}에게 물러날 곳이 없어요. 제가 잡아요.
+ex.trapped.b4.3 = {reply}, 그러면 {your:subj} 갇혀요.
+ex.trapped.b5 = {your:subj} 결국 갇혀요. {line}.
+ex.trapped.b5.2 = {move}, {your:subj} 고립돼요.
+ex.trapped.b6 = {your:subj} 갇혔어요.
+ex.trapped.b6.2 = {line}, {your:subj} 갇혀요.
+ex.trapped.tip.b1 = 기물을 움직이기 전에, 다시 빠져나올 수 있는지 확인하세요.
+ex.trapped.tip.b1.2 = 제 진영 깊숙이 들어간 기물은 갇힐 수 있어요. 빠져나올 길을 남겨 두세요.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your:subj} 폰들 뒤에 갇혀 있어요. {my:subj} 뒷줄에서 체크를 걸 수 있어요.
+ex.back_rank.b1.2 = 조심하세요. {your}에게 피할 칸이 없는데, {my:subj} {sq} 칸까지 갈 수 있어요.
+ex.back_rank.b1.3 = {my:subj} {sq} 칸으로 갈 수 있어요. {your:subj} 폰들에 막혀 갇혀 있어요.
+ex.back_rank.b2 = 뒷줄이 위험해요. {your}에게 숨 쉴 칸이 없어요. {my:subj} {sq} 칸에서 체크를 걸 수 있어요.
+ex.back_rank.b2.2 = {your:subj} 갇혀 있어요. {my:subj} {sq} 칸으로 가서 기물 이득을 봐요.
+ex.back_rank.b2.3 = 뒷줄이 약해요. {my:subj} {sq} 칸에서 {your}에게 체크를 걸 수 있어요.
+ex.back_rank.b3 = 뒷줄이 약해요. {line}. {your}에게 피할 칸이 없어요.
+ex.back_rank.b3.2 = {your}에게 숨 쉴 칸이 없어서, {line} 수순으로 기물 이득을 봐요.
+ex.back_rank.b3.3 = {line} 수순 뒤에는 뒷줄이 승부를 갈라요. {your:subj} 갇혀 있거든요.
+ex.back_rank.b4 = 뒷줄이 문제예요. {line}, {your}에게 숨 쉴 칸이 없어요.
+ex.back_rank.b4.2 = {line}, {your} 주변의 약한 뒷줄을 파고들어요.
+ex.back_rank.b4.3 = {your}에게 피할 칸이 없어요. {line}.
+ex.back_rank.b5 = {your} 주변 뒷줄의 약점: {line}.
+ex.back_rank.b5.2 = {line}, {your}에게 숨 쉴 칸이 없어요.
+ex.back_rank.b6 = {line}, 뒷줄. {your:subj} 갇혔어요.
+ex.back_rank.b6.2 = 뒷줄: {line} ({your}).
+ex.back_rank.tip.b1 = 킹에게 작은 창문을 만들어 주세요. 킹 앞의 폰 하나를 움직이면 돼요.
+ex.back_rank.tip.b1.2 = 폰 세 개 뒤에 있는 킹은 뒷줄에서 메이트당할 수 있어요. 숨 쉴 칸을 만들어 주세요.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {sq} 칸의 {your:top} 지켜 주는 기물이 없어요. {my:subj} 공짜로 잡을 수 있어요.
+ex.hanging.b1.2 = {your:obj} 보세요. 지켜 주는 기물이 없는데, {my:subj} 공격하고 있어요.
+ex.hanging.b1.3 = {your:top} 보호받지 못하고 있어요. {my:subj} 그냥 잡을 수 있어요.
+ex.hanging.b2 = {sq} 칸의 {your:subj} 지켜지지 않고 있어요. {my:subj} 잡아도 되잡을 수 없어요.
+ex.hanging.b2.2 = {my:subj} {your:obj} 공짜로 잡을 수 있어요. 지켜 주는 기물이 없거든요.
+ex.hanging.b2.3 = {your:subj} {sq} 칸에 홀로 남아 있어서 {my:subj} 잡아요.
+ex.hanging.b3 = {move}, 이 수로 {your:subj} 무방비가 돼요. {reply}, 되잡을 기물이 없어요.
+ex.hanging.b3.2 = {sq} 칸의 {your:subj} {reply}, 이 수에 공짜로 잡혀요.
+ex.hanging.b3.3 = {reply}, 그러면 {your:subj} 아무 대가 없이 사라져요.
+ex.hanging.b4 = {move}, {your:subj} 무방비가 돼요. {reply}, 이 수로 제가 {pts:point}을 얻어요.
+ex.hanging.b4.2 = {reply}, {your:obj} 공짜로 잡아요.
+ex.hanging.b4.3 = {your:top} 무방비예요. {reply}, 잡아요.
+ex.hanging.b5 = {move}, {your:subj} 무방비가 돼요. {reply}, 잡아요.
+ex.hanging.b5.2 = {sq} 칸의 {your:subj} {reply}, 이 수에 잡혀요.
+ex.hanging.b5.3 = {reply}, {your:obj} 잡아요.
+ex.hanging.b6 = {move}? {reply}, {your:subj} 잡혀요.
+ex.hanging.b6.2 = {reply}, {your:obj} 따내요.
+ex.hanging.b6.3 = {your:subj} 무방비예요. {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2:subj} {your:obj} 지키고 있었어요. 이제는 {my:subj} 잡을 수 있어요.
+ex.hanging_guard.b1.2 = {your2:subj} 자리를 떠나서 {your:subj} 혼자 남았어요. {my:subj} 잡아요.
+ex.hanging_guard.b2 = 원래 {your2:subj} {your:obj} 지켜 줬어요. 이제 혼자라서 {my:subj} 잡아요.
+ex.hanging_guard.b2.2 = {your2:obj} 옮기셔서 {your:subj} 무방비로 남았어요. {my:subj} 잡을 수 있어요.
+ex.hanging_guard.b3 = {your2:subj} {your:obj} 지키고 있었어요. 그걸 옮기면 {reply}, 이 수에 잡혀요.
+ex.hanging_guard.b3.2 = {your2:subj} 없으면 {your:top} 무방비예요. {reply}.
+ex.hanging_guard.b4 = {move}, 수비 기물이 사라져요. {your2:subj} {your:obj} 두고 떠나서, {reply}, 이 수로 잡아요.
+ex.hanging_guard.b4.2 = {your}의 유일한 수비 기물은 {your2:was}어요. {reply}, 잡아요.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my:subj} 이미 {your:obj} 공격하고 있었어요. 제 수가 무엇을 노리는지 항상 확인하세요.
+ex.hanging_threat.b1.2 = 제 위협을 못 보셨네요. {my:subj} {your:obj} 공격하고 있어요.
+ex.hanging_threat.b2 = 제가 방금 {my:ins} {your:obj} 공격했어요. 제 위협을 항상 살펴보세요.
+ex.hanging_threat.b2.2 = {my:subj} {your:obj} 노리고 있었어요. 이제 잡을 수 있어요.
+ex.hanging_threat.b3 = 제 위협을 놓치셨어요. {my:subj} {your:obj} 공격하고 있었어요.
+ex.hanging_threat.b3.2 = {my:subj} 줄곧 {your:obj} 노리고 있었어요.
+ex.hanging.tip.b1 = 수를 두기 전에, 기물이 전부 안전한지 스스로 물어보세요.
+ex.hanging.tip.b1.2 = 좋은 습관이 있어요. 수를 둘 때마다 어떤 기물이 보호받고 있는지 확인하세요.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. Values are said with their counter: {n:point} "3점".
+ex.exchange_capture.b1 = {your:subj} 잡았지만, {my:subj} 되잡아요. 그 교환은 점수로 손해예요.
+ex.exchange_capture.b1.2 = {my:subj} 되잡아요. {your:top} {n:point}짜리인데, 얻은 건 {n2:point}뿐이에요.
+ex.exchange_capture.b1.3 = 조심하세요. {my:subj} {your:obj} 되잡을 수 있어요. 나쁜 교환이에요.
+ex.exchange_capture.b2 = 교환할 때는 조심하세요. {your:top} {n:point}짜리예요. {my:subj} 되잡으면 얻은 건 {n2:point}뿐이에요.
+ex.exchange_capture.b2.2 = {my:subj} {your:obj} 되잡아요. {n:point}을 잃고 {n2:point}만 얻어요.
+ex.exchange_capture.b3 = {sq} 칸의 잡기는 통하지 않아요. {line} 수순 뒤에 {your:obj} 잃어요.
+ex.exchange_capture.b3.2 = {your:subj} {sq} 칸에서 잡지만, {line} 수순 뒤에는 {pts:point} 손해예요.
+ex.exchange_capture.b4 = {move}, {sq} 칸의 계산이 틀렸어요. {line}, {your:obj} 잃어요.
+ex.exchange_capture.b4.2 = {sq} 칸에서 잡으면 {your:obj} 잃어요. {line}.
+ex.exchange_capture.b5 = {move}, {sq} 칸의 교환에서 {your:obj} 잃어요. {line}.
+ex.exchange_capture.b5.2 = {sq} 칸에서 {your:obj} 잃어요. {line}.
+ex.exchange_capture.b6 = {move}, {line} 수순 뒤 {sq} 칸에서 {your:obj} 잃어요.
+ex.exchange_capture.b6.2 = {sq} 칸에서 {line}, {your:subj} 사라져요.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = 세어 보세요. 저는 {sq} 칸을 {n:time} 공격하는데, 지키는 건 {n2:time}이에요.
+ex.exchange_count.b1.2 = {sq} 칸을 저는 {n:piece}로 공격하는데, 지키는 건 {n2:piece}예요. 이 싸움은 제가 이겨요.
+ex.exchange_count.b2 = {sq} 칸은 {n:time} 공격받고 {n2:time} 방어돼요. 거기서 기물을 잃게 돼요.
+ex.exchange_count.b2.2 = {sq} 칸을 세어 보세요. 공격은 {n:piece}, 수비는 {n2:piece}.
+ex.exchange_count.b3 = {sq} 칸의 공격 기물과 수비 기물을 세어 보세요. 제 쪽이 더 많아요.
+ex.exchange_count.b3.2 = {sq} 칸의 교환은 통하지 않아요. {line} 수순 뒤에는 {pts:point} 손해예요.
+ex.exchange_count.b4 = {move}, {sq} 칸의 계산이 틀렸어요. {line}, 결국 {pts:point} 손해예요.
+ex.exchange_count.b4.2 = {sq} 칸은 지키는 횟수보다 공격받는 횟수가 많아요. {line}.
+ex.exchange_count.b5 = {sq} 칸에서는 공격 {n:piece}가 수비 {n2:piece}를 이겨요. {line}.
+ex.exchange_count.b5.2 = {move}, {sq} 칸의 숫자 싸움에서 밀려요.
+ex.exchange_count.b6 = {sq} 칸에서 {line}, 제가 {pts:point} 이득.
+ex.exchange_count.b6.2 = {sq} 칸: {n} 대 {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my:top} {your}보다 가치가 낮아요. 제가 잡으면 점수로 손해예요.
+ex.exchange_cheap.b1.2 = {my:subj} {your:obj} 공격해요. 서로 바꾸면 손해예요.
+ex.exchange_cheap.b2 = {your:top} {n:point}짜리인데, {my:top} {n2:point}짜리예요. 그 교환은 손해예요.
+ex.exchange_cheap.b2.2 = {my:top} {your}보다 싸서, 이 공격으로 기물 이득을 봐요.
+ex.exchange_cheap.b3 = {sq} 칸의 {your:subj} 더 싼 기물에게 공격받고 있어요.
+ex.exchange_cheap.b3.2 = {n2:point}짜리 기물이 {sq} 칸의 {your:obj} 공격해요. {line}.
+ex.exchange_cheap.b4 = {sq} 칸의 {your:subj} 더 싼 기물에게 공격받아요. {reply}, 기물 이득이에요.
+ex.exchange_cheap.b4.2 = {reply}, 더 싼 기물로 {sq} 칸의 {your:obj} 공격해요.
+ex.exchange_cheap.b5 = {sq} 칸의 {your:subj} 더 싼 기물의 공격에 노출돼요. {line}.
+ex.exchange_cheap.b5.2 = {reply}, {sq} 칸의 {your:obj} 상대로 기물 이득을 봐요.
+ex.exchange_cheap.b6 = {reply}, {sq} 칸의 {your:obj} 잡아요.
+ex.exchange_cheap.b6.2 = {line}, {sq} 칸의 {your:subj} 잡혀요.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = 조심하세요. 이제 제가 {t1:obj} 잡을 수 있어요.
+ex.material.b1.2 = 그 수 때문에 {t1:subj} 위험해졌어요. 제가 잡을 수 있어요.
+ex.material.b2 = 이 수 덕분에 제가 {t1:obj} 잡을 수 있어요.
+ex.material.b2.2 = 이제 {t1:subj} 위험해지고, 제가 잡아요.
+ex.material.b3 = {move}, 기물을 잃는 수예요. {line} 수순 뒤에는 {pts:point} 손해예요.
+ex.material.b3.2 = {line} 수순 뒤에는 {pts:point} 손해예요.
+ex.material.b4 = {move}, 기물을 잃어요. {line}, 결국 {pts:point} 손해예요.
+ex.material.b4.2 = {line} 수순 뒤에는 {pts:point} 뒤져요.
+ex.material.b5 = {move}, 기물을 잃어요. {line}.
+ex.material.b5.2 = {line}, 제가 {pts:point}을 얻어요.
+ex.material.b6 = {line}, 제가 {pts:point} 이득.
+ex.material.b6.2 = {move}, {pts:point} 손해: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = 보셨어요? {sq} 칸의 {my:subj} 공짜였어요. {your:ins} 잡을 수 있었어요.
+ex.missed_capture.b1.2 = 보세요. {my:obj} 지키는 기물이 없었어요. {your:ins} 잡을 수 있었어요.
+ex.missed_capture.b1.3 = {sq} 칸의 {my:top} 보호받지 못하고 있었어요. {your:ins} 잡을 수 있었어요!
+ex.missed_capture.b2 = 공짜로 잡을 기회를 놓치셨어요. {best}, 이 수로 {my:obj} 잡아요.
+ex.missed_capture.b2.2 = {sq} 칸의 {my:subj} 무방비였어요. {best}, 이렇게 잡으면 돼요. 다음엔 꼭 잡으세요!
+ex.missed_capture.b2.3 = {best}, 이 수로 {my:obj} 공짜로 잡을 수 있었어요.
+ex.missed_capture.b3 = {best}, 이렇게 두셨으면 {my:obj} 공짜로 잡았을 거예요.
+ex.missed_capture.b3.2 = {sq} 칸의 {my:subj} 무방비였어요. {best}. 매 수마다 무방비인 기물이 있는지 보세요.
+ex.missed_capture.b3.3 = {best}, 이 수로 {my:obj} 잡으실 수 있었어요.
+ex.missed_capture.b4 = 놓치셨어요. {best}, {sq} 칸의 {my:obj} 잡는 수예요.
+ex.missed_capture.b4.2 = {best}, 무방비였던 {my:obj} 잡아요.
+ex.missed_capture.b4.3 = {my:subj} 무방비였어요. {best}.
+ex.missed_capture.b5 = {best}, 이 수면 {my:obj} 잡아요. {move}, 이 수로는 놓쳐요.
+ex.missed_capture.b5.2 = {sq} 칸의 {my:subj} 무방비였어요. {best}.
+ex.missed_capture.b6 = {best}! {sq} 칸의 {my:subj} 무방비였어요.
+ex.missed_capture.b6.2 = {best}, {my:obj} 잡는 수였어요.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = 이중 공격이 있었어요. {best}, 이 수로 {t1:and} {t2:obj} 공격할 수 있어요!
+ex.missed_fork.b1.2 = 보세요! {best}, 이 수면 {t1:and} {t2:obj} 동시에 공격해요.
+ex.missed_fork.b1.3 = {best}, 이게 포크였어요. {t1:and} {t2:subj} 둘 다 공격받아요.
+ex.missed_fork.b2 = {best}, {t1:and} {t2}에 거는 포크였어요.
+ex.missed_fork.b2.2 = 이중 공격을 놓치셨어요. {best}, {t1:and} {t2:obj} 동시에 노리는 수예요.
+ex.missed_fork.b2.3 = {best}, 이 수는 {t1:and} {t2:obj} 함께 공격해요. 포크예요!
+ex.missed_fork.b3 = {best}, {t1:and} {t2}에 거는 포크였어요.
+ex.missed_fork.b3.2 = {best}, 이 수로 {t1:and} {t2}에 포크를 거실 수 있었어요.
+ex.missed_fork.b3.3 = {best}, 이렇게 두셨으면 {t1:and} {t2}에 포크가 걸렸을 거예요.
+ex.missed_fork.b4 = {best}, {t1:and} {t2}에 포크가 걸리는 수였어요.
+ex.missed_fork.b4.2 = 놓친 포크: {best}, {t1:and} {t2:bare}.
+ex.missed_fork.b5 = {best}, {t1:and} {t2}에 포크.
+ex.missed_fork.b5.2 = {best}, {t1:and} {t2:obj} 함께 노리는 수였어요.
+ex.missed_fork.b6 = {best}, {t1:and} {t2}에 포크.
+ex.missed_fork.b6.2 = {best}: {t1:and} {t2}에 포크.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my:subj} {sq} 칸까지 달려가서 퀸이 될 수 있어요. {your:top} 너무 멀리 있어요.
+ex.promotion.b1.2 = 보세요. {my:subj} {sq} 칸에 가는 걸 막을 기물이 없어요. {your:top} 따라잡을 수 없어요.
+ex.promotion.b1.3 = {my:top} {sq} 칸까지 {n:square} 남았는데, {your:top} 너무 느려요.
+ex.promotion.b2 = {my:subj} {sq} 칸으로 달려가는데, {your:top} 따라잡을 수 없어요.
+ex.promotion.b2.2 = {my:top} {n:move}면 {sq} 칸에 닿는데, {your:top} {n2:move}가 필요해요. 너무 느려요.
+ex.promotion.b2.3 = 조심하세요. {my:subj} {sq} 칸에서 퀸이 되는데, {your:top} 너무 멀어요.
+ex.promotion.b3 = {your:top} {my}의 사각형 밖에 있어서, {sq} 칸 전에 따라잡을 수 없어요.
+ex.promotion.b3.2 = 경주에서 졌어요. {my:subj} {your}보다 먼저 {sq} 칸에 닿아요.
+ex.promotion.b4 = {your:top} 폰의 사각형 밖에 있어요. 폰은 {sq} 칸에서 퀸이 돼요.
+ex.promotion.b4.2 = {my:subj} {sq} 칸에서 프로모션해요. {your:top} 한 수가 모자라요.
+ex.promotion.b5 = 폰 경주는 졌어요. {your:top} {sq} 칸으로 가는 폰의 사각형 밖에 있어요.
+ex.promotion.b5.2 = {line}, 제가 {sq} 칸에서 퀸을 만들고 {your:top} 너무 늦어요.
+ex.promotion.b6 = {your:top} 사각형 밖. 제가 {sq} 칸에서 퀸을 만들어요.
+ex.promotion.b6.2 = {line}, {sq} 칸에서 퀸 ({your:top} 늦어요).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = 폰이 {sq} 칸까지 달려가서 퀸이 될 수 있었어요!
+ex.promotion_missed.b1.2 = {sq} 칸을 보세요! 폰이 거기까지 달려갈 수 있었어요.
+ex.promotion_missed.b2 = 폰이 {sq} 칸까지 달려갈 수 있었어요. 통과한 폰은 밀어야 해요!
+ex.promotion_missed.b2.2 = {sq} 칸으로 가는 폰을 막을 기물이 없었어요.
+ex.promotion_missed.b3 = {best}, 이 수면 {sq} 칸까지의 경주에서 이겨요.
+ex.promotion_missed.b3.2 = 폰이 더 빨랐어요. {best}, 그러면 {sq} 칸에서 퀸이 돼요.
+ex.promotion_missed.b4 = {best}, {sq} 칸까지의 폰 경주에서 이겨요.
+ex.promotion_missed.b4.2 = {best}! 폰이 {sq} 칸에서 퀸이 돼요.
+ex.promotion_missed.b5 = {best}, {sq} 칸에서 먼저 퀸이 돼요.
+ex.promotion_missed.b5.2 = {best}, 그러면 {sq} 칸을 차지해요.
+ex.promotion_missed.b6 = {best}, {sq} 칸까지의 경주에서 승리.
+ex.promotion_missed.b6.2 = {best}, {sq} 칸에 먼저.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = 그 폰이 {your:obj} 지켜 주고 있었어요. 이제 {your:top} 덜 보호받아요.
+ex.king_shield.b1.2 = {sq} 칸에 있던 폰은 {your}의 방패였어요. 이제 제 기물들이 파고들 수 있어요.
+ex.king_shield.b2 = {sq} 칸의 폰을 움직이면 {your:subj} 약해져요. 이제 제 기물들이 공격할 수 있어요.
+ex.king_shield.b2.2 = {your:subj} 지킴이를 잃었어요. {sq} 칸의 폰이 방패였거든요.
+ex.king_shield.b3 = 그 폰 수 때문에 {your:subj} 제 공격에 노출돼요.
+ex.king_shield.b3.2 = {your:subj} 폰 방패를 잃고, 제 기물들이 들어와요.
+ex.king_shield.b4 = {move}, 이 수로 {your} 주변의 폰이 약해져요. 제 공격이 들어가요.
+ex.king_shield.b4.2 = {move}, 이 수로 {your} 주변의 방패가 깨져요.
+ex.king_shield.b5 = {move}, {your}의 방어막이 느슨해져요. {line}.
+ex.king_shield.b5.2 = {move} 뒤에는 {your:subj} 드러나요. {line}.
+ex.king_shield.b6 = {move}, {your:subj} 약해져요. {line}.
+ex.king_shield.b6.2 = {line}, {your:subj} 너무 열려 있어요.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your:subj} 위험해요. 제 기물들이 노리고 다가와요.
+ex.king_exposed.b1.2 = {your:subj} 얼마나 열려 있는지 보세요. 폰들 뒤에 안전하게 두세요.
+ex.king_exposed.b2 = {your:subj} 너무 열려 있어요. 이제 제가 체크를 여러 번 걸 수 있어요.
+ex.king_exposed.b2.2 = 조심하세요. {your}에게 피난처가 없고, 제 기물들이 공격해요.
+ex.king_exposed.b3 = {your:subj} 노출돼 있어요. 제 기물들이 체크로 공격할 수 있어요.
+ex.king_exposed.b3.2 = 이 수 다음엔 {your}에게 피난처가 없어요.
+ex.king_exposed.b4 = {your:subj} 노출돼요. {line}.
+ex.king_exposed.b4.2 = {move}, 이 수로 {your:subj} 공격에 노출돼요.
+ex.king_exposed.b5 = {your:subj} 너무 노출돼 있어요. {line}.
+ex.king_exposed.b5.2 = {move}, {your:subj} 훤히 드러나요.
+ex.king_exposed.b6 = {line}, {your:subj} 노출돼요.
+ex.king_exposed.b6.2 = {your:subj} 너무 열려 있어요. {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = 이 교환은 제가 이기는 폰 엔드게임으로 이어져요.
+ex.bad_trade.b3.2 = {line} 수순 뒤에는 폰만 남는데, 제 킹이 더 좋은 자리에 있어요.
+ex.bad_trade.b4 = 이 교환들은 지는 폰 엔드게임으로 이어져요. {line}.
+ex.bad_trade.b4.2 = 교환해서 이 폰 엔드게임으로 가면 져요.
+ex.bad_trade.b5 = 잘못된 교환이에요. {line} 수순 뒤의 폰 엔드게임은 져요.
+ex.bad_trade.b5.2 = 폰 엔드게임은 져요. 기물을 남겨 두세요.
+ex.bad_trade.b6 = {line} 수순 뒤 폰 엔드게임은 패배.
+ex.bad_trade.b6.2 = 지는 폰 엔드게임: {line}.
+ex.bishop_pair.b5 = 그 교환으로 비숍 쌍을 잃어요.
+ex.bishop_pair.b5.2 = 그 교환으로 비숍 쌍을 내줬어요. 제 비숍 쌍은 그대로예요.
+ex.bishop_pair.b6 = 비숍 쌍이 사라져요.
+ex.bishop_pair.b6.2 = 비숍 쌍을 내줬어요.

@@ -1,0 +1,152 @@
+# Coach speech (Bulgarian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Bulgarian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "ти" or "аз" here: the players are "белите" and "черните" (plural verb, lower case
+#   inside a sentence). A piece comes with its side: {piece} {t1} {t2} = "белият кон", "бялата
+#   пешка" (subject); {piece:obj} = "белия кон" (object, after a preposition); {piece:pron_obj} =
+#   "го" / "я"; {piece:rel} = "който" / "която" (forms of common.lang).
+# - A move as the subject of an adjective or a past tense is preceded by "ходът" ("Ходът {best}
+#   беше по-силен"), so that the agreement is clear.
+# - {opening:def} is the opening's name with its article, the subject form ("Сицилианската защита").
+# - Counted numbers (common.lang): {m:move} "мат в 3 хода", {pts:point} "3 точки", {n:mistake}
+#   "2 грешки", {m:blunder} "1 груба грешка", {acc_white:percent} "87%".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Да разгледаме заедно тази партия.
+an.start.2 = Да минем през тази партия, ход по ход.
+an.start.3 = Ето партията. Да видим как протече.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Тази партия започва от зададена позиция. Да я разгледаме.
+an.start.setup.2 = Партия от зададена позиция. Да видим как протече.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Дебютът е {opening:def}.
+an.opening.2 = Това е {opening:def}.
+an.book_exit = С {move} партията излиза от известната дебютна теория.
+an.book_exit.2 = {move} е първият ход извън дебютната теория.
+an.book_exit.3 = Дебютната теория свършва тук, с {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} е груба грешка.
+an.blunder.2 = Тук {move} е сериозна грешка.
+an.blunder.3 = Груба грешка: {move}.
+an.mistake = {move} е грешка.
+an.mistake.2 = {move} не е правилният ход тук.
+an.mistake.3 = Грешка: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} пропуска шанса да накаже тази грешка.
+an.missed_chance.2 = С {move} шансът се изплъзва.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Сега {reply:nomate} е мат.
+an.mate_allowed.one.2 = Ходът позволява {reply:nomate} и това е мат.
+an.mate_allowed = Това позволява форсиран мат в {m:move}, който започва с {reply:nomate}.
+an.mate_allowed.2 = Сега има форсиран мат в {m:move}, който започва с {reply:nomate}.
+an.fork = Сега {reply} прави вилица на {t1:obj} и {t2:obj}.
+an.fork.2 = Това позволява {reply} с удар едновременно по {t1:obj} и {t2:obj}.
+an.fork.3 = {reply} напада едновременно {t1:obj} и {t2:obj}.
+an.hanging = Ходът оставя {piece:obj} без защита и {reply} {piece:pron_obj} взема.
+an.hanging.2 = {piece} остава без защитник: {reply} {piece:pron_obj} печели.
+an.hanging.3 = {reply} просто взема {piece:obj}, {piece:rel} нямаше защитник.
+an.material = Отговорът {line} печели материал на стойност {pts:point}.
+an.material.2 = После {line} печели {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Ходът {best:nomate} даваше мат.
+an.mate_missed.one.2 = Ходът {best:nomate} щеше да даде мат.
+an.mate_missed = Ходът {best:nomate} щеше да форсира мат в {m:move}.
+an.mate_missed.2 = Имаше форсиран мат в {m:move}, който започваше с {best:nomate}.
+an.missed_capture = Ходът {best} щеше да спечели {piece:obj} даром.
+an.missed_capture.2 = {piece} нямаше защитник: {best} щеше да {piece:pron_obj} вземе.
+an.missed_fork = Ходът {best} щеше да направи вилица на {t1:obj} и {t2:obj}.
+an.missed_fork.2 = Ходът {best} беше вилица, която напада {t1:obj} и {t2:obj}.
+
+# The better move, when nothing above named it.
+an.better = Ходът {best} беше по-силен.
+an.better.2 = По-добър ход беше {best}.
+an.better.3 = Ходът {best} беше по-точен.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} е блестящ ход: той отдава {piece:obj}!
+an.brilliant.2 = Блестяща жертва! {move} предлага {piece:obj}.
+an.brilliant.3 = {move}! Блестящ ход, който предлага {piece:obj}.
+an.brilliant.mate = Той води до форсиран мат в {m:move}.
+an.brilliant.mate.2 = И форсира мат в {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} е единственият ход, който запазва предимството.
+an.only.win.2 = Само {move} запазва превъзходството тук. Чудесна находка.
+an.only.hold = {move} е единственият ход, който запазва равновесието.
+an.only.hold.2 = Само {move} удържа позицията тук.
+an.only.defend = {move} е единственият ход, който продължава борбата.
+an.only.defend.2 = Само {move} държи партията жива тук. Добра защита.
+an.only.best = {move} е най-силният ход тук, и то с голяма разлика.
+an.only.best.2 = Точна игра: ходът {move} е много по-силен от всичко останало.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} е малка неточност: ходът {best} беше по-точен.
+an.inaccuracy.2 = Не най-добрият ход: {best} беше по-точен от {move}.
+an.interesting = {move} е интересна идея, която предлага {piece:obj}.
+an.interesting.2 = Интересен опит: {move} отдава {piece:obj}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Белите вече имат форсиран мат в {m:move}.
+an.mate_on.white.2 = Оттук белите могат да форсират мат в {m:move}.
+an.mate_on.black = Черните вече имат форсиран мат в {m:move}.
+an.mate_on.black.2 = Оттук черните могат да форсират мат в {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Мат. Белите печелят партията.
+an.end.mate.white.2 = И това е мат: белите печелят.
+an.end.mate.black = Мат. Черните печелят партията.
+an.end.mate.black.2 = И това е мат: черните печелят.
+an.end.resigned.white = Черните се предадоха, така че белите печелят партията.
+an.end.resigned.white.2 = Партията приключва тук: черните се предадоха и белите печелят.
+an.end.resigned.black = Белите се предадоха, така че черните печелят партията.
+an.end.resigned.black.2 = Партията приключва тук: белите се предадоха и черните печелят.
+an.end.timeout.white = Времето на черните изтече, така че белите печелят.
+an.end.timeout.white.2 = Белите печелят по време.
+an.end.timeout.black = Времето на белите изтече, така че черните печелят.
+an.end.timeout.black.2 = Черните печелят по време.
+an.end.win.white = Партията завършва с победа на белите.
+an.end.win.white.2 = Белите печелят партията.
+an.end.win.black = Партията завършва с победа на черните.
+an.end.win.black.2 = Черните печелят партията.
+an.end.stalemate = Пат: партията завършва реми.
+an.end.stalemate.2 = Пат е, така че партията завършва реми.
+an.end.draw.agreement = Играчите се споразумяха за реми.
+an.end.draw.agreement.2 = Партията завършва реми по взаимно съгласие.
+an.end.draw.repetition = Партията завършва реми чрез повторение.
+an.end.draw.repetition.2 = Същата позиция се повтори отново: реми.
+an.end.draw.fifty = Партията завършва реми по правилото на петдесетте хода.
+an.end.draw.fifty.2 = Петдесет хода без вземане и без ход с пешка: реми.
+an.end.draw.seventy_five = Партията завършва реми по правилото на седемдесет и петте хода.
+an.end.draw.seventy_five.2 = Седемдесет и пет хода без вземане и без ход с пешка: реми.
+an.end.draw.material = Матът вече е невъзможен: партията завършва реми.
+an.end.draw.material.2 = Никоя от страните вече не може да даде мат, така че е реми.
+an.end.draw = Партията завършва реми.
+an.end.draw.2 = Реми.
+an.end.unfinished = Партията спира дотук, незавършена.
+an.end.unfinished.2 = Дотук стига партията: тя не беше доиграна.
+an.end.accuracy = Точност: {acc_white:percent} за белите, {acc_black:percent} за черните.
+an.end.accuracy.2 = Белите играха с точност {acc_white:percent}, черните – с {acc_black:percent}.
+an.end.clean.white = Белите не допуснаха нито грешки, нито груби грешки.
+an.end.clean.white.2 = Играта на белите беше без сериозни грешки.
+an.end.clean.black = Черните не допуснаха нито грешки, нито груби грешки.
+an.end.clean.black.2 = Играта на черните беше без сериозни грешки.
+an.end.mistakes.white = Белите допуснаха {n:mistake} и нито една груба грешка.
+an.end.mistakes.white.2 = За белите: {n:mistake}, без груби грешки.
+an.end.mistakes.black = Черните допуснаха {n:mistake} и нито една груба грешка.
+an.end.mistakes.black.2 = За черните: {n:mistake}, без груби грешки.
+an.end.blunders.white = Белите допуснаха {m:blunder}.
+an.end.blunders.white.2 = За белите: {m:blunder}.
+an.end.blunders.black = Черните допуснаха {m:blunder}.
+an.end.blunders.black.2 = За черните: {m:blunder}.
+an.end.errors.white = Белите допуснаха {n:mistake} и {m:blunder}.
+an.end.errors.white.2 = За белите: {n:mistake} и {m:blunder}.
+an.end.errors.black = Черните допуснаха {n:mistake} и {m:blunder}.
+an.end.errors.black.2 = За черните: {n:mistake} и {m:blunder}.

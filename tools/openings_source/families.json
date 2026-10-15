@@ -11,7 +11,10 @@
    "ar",
    "ja",
    "zh-Hans",
-   "zh-Hant"
+   "zh-Hant",
+   "id",
+   "nl",
+   "pt-BR"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -101,6 +104,19 @@
     },
     "zh-Hant": {
      "name": "王兵開局"
+    },
+    "id": {
+     "name": "Pembukaan Pion Raja",
+     "def": "Pembukaan Pion Raja"
+    },
+    "nl": {
+     "name": "Koningspionopening",
+     "def": "de koningspionopening"
+    },
+    "pt-BR": {
+     "name": "Abertura do Peão do Rei",
+     "def": "a Abertura do Peão do Rei",
+     "gender": "f"
     }
    },
    "comment": {
@@ -164,6 +180,19 @@
     },
     "zh-Hant": {
      "name": "后兵開局"
+    },
+    "id": {
+     "name": "Pembukaan Pion Menteri",
+     "def": "Pembukaan Pion Menteri"
+    },
+    "nl": {
+     "name": "Damepionopening",
+     "def": "de damepionopening"
+    },
+    "pt-BR": {
+     "name": "Abertura do Peão da Dama",
+     "def": "a Abertura do Peão da Dama",
+     "gender": "f"
     }
    },
    "comment": {
@@ -224,6 +253,19 @@
     },
     "zh-Hant": {
      "name": "王馬開局"
+    },
+    "id": {
+     "name": "Pembukaan Kuda Raja",
+     "def": "Pembukaan Kuda Raja"
+    },
+    "nl": {
+     "name": "Koningspaardopening",
+     "def": "de koningspaardopening"
+    },
+    "pt-BR": {
+     "name": "Abertura do Cavalo do Rei",
+     "def": "a Abertura do Cavalo do Rei",
+     "gender": "f"
     }
    },
    "comment": {
@@ -287,6 +329,19 @@
     },
     "zh-Hant": {
      "name": "西西里防禦"
+    },
+    "id": {
+     "name": "Pertahanan Sisilia",
+     "def": "Pertahanan Sisilia"
+    },
+    "nl": {
+     "name": "Siciliaanse verdediging",
+     "def": "de Siciliaanse verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Siciliana",
+     "def": "a Defesa Siciliana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -347,6 +402,19 @@
     },
     "zh-Hant": {
      "name": "法蘭西防禦"
+    },
+    "id": {
+     "name": "Pertahanan Prancis",
+     "def": "Pertahanan Prancis"
+    },
+    "nl": {
+     "name": "Franse verdediging",
+     "def": "de Franse verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Francesa",
+     "def": "a Defesa Francesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -407,6 +475,19 @@
     },
     "zh-Hant": {
      "name": "卡羅-卡恩防禦"
+    },
+    "id": {
+     "name": "Pertahanan Caro-Kann",
+     "def": "Pertahanan Caro-Kann"
+    },
+    "nl": {
+     "name": "Caro-Kann-verdediging",
+     "def": "de Caro-Kann-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Caro-Kann",
+     "def": "a Defesa Caro-Kann",
+     "gender": "f"
     }
    },
    "comment": {
@@ -467,6 +548,19 @@
     },
     "zh-Hant": {
      "name": "斯堪地那維亞防禦"
+    },
+    "id": {
+     "name": "Pertahanan Skandinavia",
+     "def": "Pertahanan Skandinavia"
+    },
+    "nl": {
+     "name": "Scandinavische verdediging",
+     "def": "de Scandinavische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Escandinava",
+     "def": "a Defesa Escandinava",
+     "gender": "f"
     }
    },
    "comment": {
@@ -527,6 +621,19 @@
     },
     "zh-Hant": {
      "name": "義大利開局"
+    },
+    "id": {
+     "name": "Pembukaan Italia",
+     "def": "Pembukaan Italia"
+    },
+    "nl": {
+     "name": "Italiaanse partij",
+     "def": "de Italiaanse partij"
+    },
+    "pt-BR": {
+     "name": "Abertura Italiana",
+     "def": "a Abertura Italiana",
+     "gender": "f"
     }
    },
    "comment": {
@@ -587,6 +694,19 @@
     },
     "zh-Hant": {
      "name": "西班牙開局"
+    },
+    "id": {
+     "name": "Ruy Lopez",
+     "def": "Ruy Lopez"
+    },
+    "nl": {
+     "name": "Spaanse partij",
+     "def": "de Spaanse partij"
+    },
+    "pt-BR": {
+     "name": "Abertura Espanhola",
+     "def": "a Abertura Espanhola",
+     "gender": "f"
     }
    },
    "comment": {
@@ -647,6 +767,19 @@
     },
     "zh-Hant": {
      "name": "蘇格蘭開局"
+    },
+    "id": {
+     "name": "Pembukaan Skotlandia",
+     "def": "Pembukaan Skotlandia"
+    },
+    "nl": {
+     "name": "Schotse partij",
+     "def": "de Schotse partij"
+    },
+    "pt-BR": {
+     "name": "Abertura Escocesa",
+     "def": "a Abertura Escocesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -707,6 +840,19 @@
     },
     "zh-Hant": {
      "name": "菲利多爾防禦"
+    },
+    "id": {
+     "name": "Pertahanan Philidor",
+     "def": "Pertahanan Philidor"
+    },
+    "nl": {
+     "name": "Philidor-verdediging",
+     "def": "de Philidor-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Philidor",
+     "def": "a Defesa Philidor",
+     "gender": "f"
     }
    },
    "comment": {
@@ -767,6 +913,19 @@
     },
     "zh-Hant": {
      "name": "彼得羅夫防禦"
+    },
+    "id": {
+     "name": "Pertahanan Petrov",
+     "def": "Pertahanan Petrov"
+    },
+    "nl": {
+     "name": "Russische verdediging",
+     "def": "de Russische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Petrov",
+     "def": "a Defesa Petrov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -828,6 +987,19 @@
     },
     "zh-Hant": {
      "name": "四馬開局"
+    },
+    "id": {
+     "name": "Pembukaan Empat Kuda",
+     "def": "Pembukaan Empat Kuda"
+    },
+    "nl": {
+     "name": "Vierpaardenspel",
+     "def": "het vierpaardenspel"
+    },
+    "pt-BR": {
+     "name": "Abertura dos Quatro Cavalos",
+     "def": "a Abertura dos Quatro Cavalos",
+     "gender": "f"
     }
    },
    "comment": {
@@ -889,6 +1061,19 @@
     },
     "zh-Hant": {
      "name": "英國式開局"
+    },
+    "id": {
+     "name": "Pembukaan Inggris",
+     "def": "Pembukaan Inggris"
+    },
+    "nl": {
+     "name": "Engelse opening",
+     "def": "de Engelse opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Inglesa",
+     "def": "a Abertura Inglesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -949,6 +1134,19 @@
     },
     "zh-Hant": {
      "name": "祖克托特開局"
+    },
+    "id": {
+     "name": "Pembukaan Zukertort",
+     "def": "Pembukaan Zukertort"
+    },
+    "nl": {
+     "name": "Zukertort-opening",
+     "def": "de Zukertort-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Zukertort",
+     "def": "a Abertura Zukertort",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1014,6 +1212,19 @@
     },
     "zh-Hant": {
      "name": "后翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Menteri",
+     "def": "Gambit Menteri"
+    },
+    "nl": {
+     "name": "Damegambiet",
+     "def": "het damegambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito da Dama",
+     "def": "o Gambito da Dama",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1074,6 +1285,19 @@
     },
     "zh-Hant": {
      "name": "拒后翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Menteri Ditolak",
+     "def": "Gambit Menteri Ditolak"
+    },
+    "nl": {
+     "name": "Geweigerd damegambiet",
+     "def": "het geweigerde damegambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito da Dama Recusado",
+     "def": "o Gambito da Dama Recusado",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1134,6 +1358,19 @@
     },
     "zh-Hant": {
      "name": "接受后翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Menteri Diterima",
+     "def": "Gambit Menteri Diterima"
+    },
+    "nl": {
+     "name": "Aangenomen damegambiet",
+     "def": "het aangenomen damegambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito da Dama Aceito",
+     "def": "o Gambito da Dama Aceito",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1195,6 +1432,19 @@
     },
     "zh-Hant": {
      "name": "斯拉夫防禦"
+    },
+    "id": {
+     "name": "Pertahanan Slavia",
+     "def": "Pertahanan Slavia"
+    },
+    "nl": {
+     "name": "Slavische verdediging",
+     "def": "de Slavische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Eslava",
+     "def": "a Defesa Eslava",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1256,6 +1506,19 @@
     },
     "zh-Hant": {
      "name": "半斯拉夫防禦"
+    },
+    "id": {
+     "name": "Pertahanan Semi-Slavia",
+     "def": "Pertahanan Semi-Slavia"
+    },
+    "nl": {
+     "name": "Semi-Slavische verdediging",
+     "def": "de Semi-Slavische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Semieslava",
+     "def": "a Defesa Semieslava",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1317,6 +1580,19 @@
     },
     "zh-Hant": {
      "name": "印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan India",
+     "def": "Pertahanan India"
+    },
+    "nl": {
+     "name": "Indische verdediging",
+     "def": "de Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Índia",
+     "def": "a Defesa Índia",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1377,6 +1653,19 @@
     },
     "zh-Hant": {
      "name": "古印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan India Raja",
+     "def": "Pertahanan India Raja"
+    },
+    "nl": {
+     "name": "Konings-Indische verdediging",
+     "def": "de Konings-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Índia do Rei",
+     "def": "a Defesa Índia do Rei",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1442,6 +1731,19 @@
     },
     "zh-Hant": {
      "name": "倫敦體系"
+    },
+    "id": {
+     "name": "Sistem London",
+     "def": "Sistem London"
+    },
+    "nl": {
+     "name": "Londen-systeem",
+     "def": "het Londen-systeem"
+    },
+    "pt-BR": {
+     "name": "Sistema Londres",
+     "def": "o Sistema Londres",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1504,6 +1806,19 @@
     },
     "zh-Hant": {
      "name": "現代防禦"
+    },
+    "id": {
+     "name": "Pertahanan Modern",
+     "def": "Pertahanan Modern"
+    },
+    "nl": {
+     "name": "Moderne verdediging",
+     "def": "de moderne verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Moderna",
+     "def": "a Defesa Moderna",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1566,6 +1881,19 @@
     },
     "zh-Hant": {
      "name": "皮爾茨防禦"
+    },
+    "id": {
+     "name": "Pertahanan Pirc",
+     "def": "Pertahanan Pirc"
+    },
+    "nl": {
+     "name": "Pirc-verdediging",
+     "def": "de Pirc-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Pirc",
+     "def": "a Defesa Pirc",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1627,6 +1955,19 @@
     },
     "zh-Hant": {
      "name": "維也納開局"
+    },
+    "id": {
+     "name": "Pembukaan Wina",
+     "def": "Pembukaan Wina"
+    },
+    "nl": {
+     "name": "Weense partij",
+     "def": "de Weense partij"
+    },
+    "pt-BR": {
+     "name": "Abertura Vienense",
+     "def": "a Abertura Vienense",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1687,6 +2028,19 @@
     },
     "zh-Hant": {
      "name": "象開局"
+    },
+    "id": {
+     "name": "Pembukaan Gajah",
+     "def": "Pembukaan Gajah"
+    },
+    "nl": {
+     "name": "Loperspel",
+     "def": "het loperspel"
+    },
+    "pt-BR": {
+     "name": "Abertura do Bispo",
+     "def": "a Abertura do Bispo",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1747,6 +2101,19 @@
     },
     "zh-Hant": {
      "name": "阿廖欣防禦"
+    },
+    "id": {
+     "name": "Pertahanan Alekhine",
+     "def": "Pertahanan Alekhine"
+    },
+    "nl": {
+     "name": "Aljechin-verdediging",
+     "def": "de Aljechin-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Alekhine",
+     "def": "a Defesa Alekhine",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1807,6 +2174,19 @@
     },
     "zh-Hant": {
      "name": "王翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Raja",
+     "def": "Gambit Raja"
+    },
+    "nl": {
+     "name": "Koningsgambiet",
+     "def": "het koningsgambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito do Rei",
+     "def": "o Gambito do Rei",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1867,6 +2247,19 @@
     },
     "zh-Hant": {
      "name": "接受王翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Raja Diterima",
+     "def": "Gambit Raja Diterima"
+    },
+    "nl": {
+     "name": "Aangenomen koningsgambiet",
+     "def": "het aangenomen koningsgambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito do Rei Aceito",
+     "def": "o Gambito do Rei Aceito",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1927,6 +2320,19 @@
     },
     "zh-Hant": {
      "name": "拒王翼棄兵"
+    },
+    "id": {
+     "name": "Gambit Raja Ditolak",
+     "def": "Gambit Raja Ditolak"
+    },
+    "nl": {
+     "name": "Geweigerd koningsgambiet",
+     "def": "het geweigerde koningsgambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito do Rei Recusado",
+     "def": "o Gambito do Rei Recusado",
+     "gender": "m"
     }
    },
    "comment": {
@@ -1987,6 +2393,19 @@
     },
     "zh-Hant": {
      "name": "尼姆佐維奇防禦"
+    },
+    "id": {
+     "name": "Pertahanan Nimzowitsch",
+     "def": "Pertahanan Nimzowitsch"
+    },
+    "nl": {
+     "name": "Nimzowitsch-verdediging",
+     "def": "de Nimzowitsch-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Nimzowitsch",
+     "def": "a Defesa Nimzowitsch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2052,6 +2471,19 @@
     },
     "zh-Hant": {
      "name": "歐文防禦"
+    },
+    "id": {
+     "name": "Pertahanan Owen",
+     "def": "Pertahanan Owen"
+    },
+    "nl": {
+     "name": "Owen-verdediging",
+     "def": "de Owen-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Owen",
+     "def": "a Defesa Owen",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2113,6 +2545,19 @@
     },
     "zh-Hant": {
      "name": "霍維茨防禦"
+    },
+    "id": {
+     "name": "Pertahanan Horwitz",
+     "def": "Pertahanan Horwitz"
+    },
+    "nl": {
+     "name": "Horwitz-verdediging",
+     "def": "de Horwitz-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Horwitz",
+     "def": "a Defesa Horwitz",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2173,6 +2618,19 @@
     },
     "zh-Hant": {
      "name": "范克魯伊斯開局"
+    },
+    "id": {
+     "name": "Pembukaan Van't Kruijs",
+     "def": "Pembukaan Van't Kruijs"
+    },
+    "nl": {
+     "name": "Van 't Kruijs-opening",
+     "def": "de Van 't Kruijs-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Van't Kruijs",
+     "def": "a Abertura Van't Kruijs",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2234,6 +2692,19 @@
     },
     "zh-Hant": {
      "name": "中心開局"
+    },
+    "id": {
+     "name": "Pembukaan Pusat",
+     "def": "Pembukaan Pusat"
+    },
+    "nl": {
+     "name": "Middengambiet",
+     "def": "het middengambiet"
+    },
+    "pt-BR": {
+     "name": "Abertura do Centro",
+     "def": "a Abertura do Centro",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2295,6 +2766,19 @@
     },
     "zh-Hant": {
      "name": "英格倫棄兵"
+    },
+    "id": {
+     "name": "Gambit Englund",
+     "def": "Gambit Englund"
+    },
+    "nl": {
+     "name": "Englund-gambiet",
+     "def": "het Englund-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Englund",
+     "def": "o Gambito Englund",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2355,6 +2839,19 @@
     },
     "zh-Hant": {
      "name": "荷蘭防禦"
+    },
+    "id": {
+     "name": "Pertahanan Belanda",
+     "def": "Pertahanan Belanda"
+    },
+    "nl": {
+     "name": "Hollandse verdediging",
+     "def": "de Hollandse verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Holandesa",
+     "def": "a Defesa Holandesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2415,6 +2912,19 @@
     },
     "zh-Hant": {
      "name": "尼姆佐-印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan Nimzo-India",
+     "def": "Pertahanan Nimzo-India"
+    },
+    "nl": {
+     "name": "Nimzo-Indische verdediging",
+     "def": "de Nimzo-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Nimzo-Índia",
+     "def": "a Defesa Nimzo-Índia",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2477,6 +2987,19 @@
     },
     "zh-Hant": {
      "name": "新印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan India Menteri",
+     "def": "Pertahanan India Menteri"
+    },
+    "nl": {
+     "name": "Dame-Indische verdediging",
+     "def": "de Dame-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Índia da Dama",
+     "def": "a Defesa Índia da Dama",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2538,6 +3061,19 @@
     },
     "zh-Hant": {
      "name": "格林菲爾德防禦"
+    },
+    "id": {
+     "name": "Pertahanan Grünfeld",
+     "def": "Pertahanan Grünfeld"
+    },
+    "nl": {
+     "name": "Grünfeld-Indische verdediging",
+     "def": "de Grünfeld-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Grünfeld",
+     "def": "a Defesa Grünfeld",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2598,6 +3134,19 @@
     },
     "zh-Hant": {
      "name": "卡塔蘭開局"
+    },
+    "id": {
+     "name": "Pembukaan Katalan",
+     "def": "Pembukaan Katalan"
+    },
+    "nl": {
+     "name": "Catalaanse opening",
+     "def": "de Catalaanse opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Catalã",
+     "def": "a Abertura Catalã",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2658,6 +3207,19 @@
     },
     "zh-Hant": {
      "name": "別諾尼防禦"
+    },
+    "id": {
+     "name": "Pertahanan Benoni",
+     "def": "Pertahanan Benoni"
+    },
+    "nl": {
+     "name": "Benoni-verdediging",
+     "def": "de Benoni-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Benoni",
+     "def": "a Defesa Benoni",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2720,6 +3282,19 @@
     },
     "zh-Hant": {
      "name": "本科棄兵"
+    },
+    "id": {
+     "name": "Gambit Benko",
+     "def": "Gambit Benko"
+    },
+    "nl": {
+     "name": "Benko-gambiet",
+     "def": "het Benko-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Benko",
+     "def": "o Gambito Benko",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2780,6 +3355,19 @@
     },
     "zh-Hant": {
      "name": "列蒂開局"
+    },
+    "id": {
+     "name": "Pembukaan Réti",
+     "def": "Pembukaan Réti"
+    },
+    "nl": {
+     "name": "Réti-opening",
+     "def": "de Réti-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Réti",
+     "def": "a Abertura Réti",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2840,6 +3428,19 @@
     },
     "zh-Hant": {
      "name": "古印度攻擊"
+    },
+    "id": {
+     "name": "Serangan India Raja",
+     "def": "Serangan India Raja"
+    },
+    "nl": {
+     "name": "Konings-Indische aanval",
+     "def": "de Konings-Indische aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Índio do Rei",
+     "def": "o Ataque Índio do Rei",
+     "gender": "m"
     }
    },
    "comment": {
@@ -2904,6 +3505,19 @@
     },
     "zh-Hant": {
      "name": "伯德開局"
+    },
+    "id": {
+     "name": "Pembukaan Bird",
+     "def": "Pembukaan Bird"
+    },
+    "nl": {
+     "name": "Bird-opening",
+     "def": "de Bird-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Bird",
+     "def": "a Abertura Bird",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2964,6 +3578,19 @@
     },
     "zh-Hant": {
      "name": "龐齊亞尼開局"
+    },
+    "id": {
+     "name": "Pembukaan Ponziani",
+     "def": "Pembukaan Ponziani"
+    },
+    "nl": {
+     "name": "Ponziani-opening",
+     "def": "de Ponziani-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Ponziani",
+     "def": "a Abertura Ponziani",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3024,6 +3651,19 @@
     },
     "zh-Hant": {
      "name": "三馬開局"
+    },
+    "id": {
+     "name": "Pembukaan Tiga Kuda",
+     "def": "Pembukaan Tiga Kuda"
+    },
+    "nl": {
+     "name": "Driepaardenspel",
+     "def": "het driepaardenspel"
+    },
+    "pt-BR": {
+     "name": "Abertura dos Três Cavalos",
+     "def": "a Abertura dos Três Cavalos",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3086,6 +3726,19 @@
     },
     "zh-Hant": {
      "name": "丹麥棄兵"
+    },
+    "id": {
+     "name": "Gambit Denmark",
+     "def": "Gambit Denmark"
+    },
+    "nl": {
+     "name": "Deens gambiet",
+     "def": "het Deense gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Dinamarquês",
+     "def": "o Gambito Dinamarquês",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3148,6 +3801,19 @@
     },
     "zh-Hant": {
      "name": "布萊克默-迪默棄兵"
+    },
+    "id": {
+     "name": "Gambit Blackmar-Diemer",
+     "def": "Gambit Blackmar-Diemer"
+    },
+    "nl": {
+     "name": "Blackmar-Diemer-gambiet",
+     "def": "het Blackmar-Diemer-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Blackmar-Diemer",
+     "def": "o Gambito Blackmar-Diemer",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3208,6 +3874,19 @@
     },
     "zh-Hant": {
      "name": "特羅姆波夫斯基攻擊"
+    },
+    "id": {
+     "name": "Serangan Trompowsky",
+     "def": "Serangan Trompowsky"
+    },
+    "nl": {
+     "name": "Trompowsky-aanval",
+     "def": "de Trompowsky-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Trompowsky",
+     "def": "o Ataque Trompowsky",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3269,6 +3948,19 @@
     },
     "zh-Hant": {
      "name": "托雷攻擊"
+    },
+    "id": {
+     "name": "Serangan Torre",
+     "def": "Serangan Torre"
+    },
+    "nl": {
+     "name": "Torre-aanval",
+     "def": "de Torre-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Torre",
+     "def": "o Ataque Torre",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3331,6 +4023,19 @@
     },
     "zh-Hant": {
      "name": "科勒體系"
+    },
+    "id": {
+     "name": "Sistem Colle",
+     "def": "Sistem Colle"
+    },
+    "nl": {
+     "name": "Colle-systeem",
+     "def": "het Colle-systeem"
+    },
+    "pt-BR": {
+     "name": "Sistema Colle",
+     "def": "o Sistema Colle",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3391,6 +4096,19 @@
     },
     "zh-Hant": {
      "name": "塔拉什防禦"
+    },
+    "id": {
+     "name": "Pertahanan Tarrasch",
+     "def": "Pertahanan Tarrasch"
+    },
+    "nl": {
+     "name": "Tarrasch-verdediging",
+     "def": "de Tarrasch-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Tarrasch",
+     "def": "a Defesa Tarrasch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3452,6 +4170,19 @@
     },
     "zh-Hant": {
      "name": "布達佩斯棄兵"
+    },
+    "id": {
+     "name": "Gambit Budapest",
+     "def": "Gambit Budapest"
+    },
+    "nl": {
+     "name": "Boedapest-gambiet",
+     "def": "het Boedapest-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Budapeste",
+     "def": "o Gambito Budapeste",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3512,6 +4243,19 @@
     },
     "zh-Hant": {
      "name": "博戈-印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan Bogo-India",
+     "def": "Pertahanan Bogo-India"
+    },
+    "nl": {
+     "name": "Bogo-Indische verdediging",
+     "def": "de Bogo-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Bogo-Índia",
+     "def": "a Defesa Bogo-Índia",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3572,6 +4316,19 @@
     },
     "zh-Hant": {
      "name": "老印度防禦"
+    },
+    "id": {
+     "name": "Pertahanan India Lama",
+     "def": "Pertahanan India Lama"
+    },
+    "nl": {
+     "name": "Oud-Indische verdediging",
+     "def": "de Oud-Indische verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Índia Antiga",
+     "def": "a Defesa Índia Antiga",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3637,6 +4394,19 @@
     },
     "zh-Hant": {
      "name": "奇戈林防禦"
+    },
+    "id": {
+     "name": "Pertahanan Chigorin",
+     "def": "Pertahanan Chigorin"
+    },
+    "nl": {
+     "name": "Tsjigorin-verdediging",
+     "def": "de Tsjigorin-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Tchigorin",
+     "def": "a Defesa Tchigorin",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3697,6 +4467,19 @@
     },
     "zh-Hant": {
      "name": "阿爾賓反棄兵"
+    },
+    "id": {
+     "name": "Gambit Balasan Albin",
+     "def": "Gambit Balasan Albin"
+    },
+    "nl": {
+     "name": "Albin-tegengambiet",
+     "def": "het Albin-tegengambiet"
+    },
+    "pt-BR": {
+     "name": "Contragambito Albin",
+     "def": "o Contragambito Albin",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3758,6 +4541,19 @@
     },
     "zh-Hant": {
      "name": "拉脫維亞棄兵"
+    },
+    "id": {
+     "name": "Gambit Latvia",
+     "def": "Gambit Latvia"
+    },
+    "nl": {
+     "name": "Lets gambiet",
+     "def": "het Letse gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Letão",
+     "def": "o Gambito Letão",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3818,6 +4614,19 @@
     },
     "zh-Hant": {
      "name": "大象棄兵"
+    },
+    "id": {
+     "name": "Gambit Elephant",
+     "def": "Gambit Elephant"
+    },
+    "nl": {
+     "name": "Olifantengambiet",
+     "def": "het olifantengambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito do Elefante",
+     "def": "o Gambito do Elefante",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3883,6 +4692,19 @@
     },
     "zh-Hant": {
      "name": "尼姆佐-拉爾森攻擊"
+    },
+    "id": {
+     "name": "Serangan Nimzo-Larsen",
+     "def": "Serangan Nimzo-Larsen"
+    },
+    "nl": {
+     "name": "Nimzowitsch-Larsen-aanval",
+     "def": "de Nimzowitsch-Larsen-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Nimzo-Larsen",
+     "def": "o Ataque Nimzo-Larsen",
+     "gender": "m"
     }
    },
    "comment": {
@@ -3943,6 +4765,19 @@
     },
     "zh-Hant": {
      "name": "波蘭開局"
+    },
+    "id": {
+     "name": "Pembukaan Polandia",
+     "def": "Pembukaan Polandia"
+    },
+    "nl": {
+     "name": "Poolse opening",
+     "def": "de Poolse opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Polonesa",
+     "def": "a Abertura Polonesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4003,6 +4838,19 @@
     },
     "zh-Hant": {
      "name": "格羅布開局"
+    },
+    "id": {
+     "name": "Pembukaan Grob",
+     "def": "Pembukaan Grob"
+    },
+    "nl": {
+     "name": "Grob-opening",
+     "def": "de Grob-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Grob",
+     "def": "a Abertura Grob",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4063,6 +4911,19 @@
     },
     "zh-Hant": {
      "name": "匈牙利開局"
+    },
+    "id": {
+     "name": "Pembukaan Hungaria",
+     "def": "Pembukaan Hungaria"
+    },
+    "nl": {
+     "name": "Hongaarse opening",
+     "def": "de Hongaarse opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Húngara",
+     "def": "a Abertura Húngara",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4124,6 +4985,19 @@
     },
     "zh-Hant": {
      "name": "米澤斯開局"
+    },
+    "id": {
+     "name": "Pembukaan Mieses",
+     "def": "Pembukaan Mieses"
+    },
+    "nl": {
+     "name": "Mieses-opening",
+     "def": "de Mieses-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Mieses",
+     "def": "a Abertura Mieses",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4184,6 +5058,19 @@
     },
     "zh-Hant": {
      "name": "薩拉戈薩開局"
+    },
+    "id": {
+     "name": "Pembukaan Saragossa",
+     "def": "Pembukaan Saragossa"
+    },
+    "nl": {
+     "name": "Saragossa-opening",
+     "def": "de Saragossa-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Saragoça",
+     "def": "a Abertura Saragoça",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4244,6 +5131,19 @@
     },
     "zh-Hant": {
      "name": "范吉特開局"
+    },
+    "id": {
+     "name": "Pembukaan Van Geet",
+     "def": "Pembukaan Van Geet"
+    },
+    "nl": {
+     "name": "Van Geet-opening",
+     "def": "de Van Geet-opening"
+    },
+    "pt-BR": {
+     "name": "Abertura Van Geet",
+     "def": "a Abertura Van Geet",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4304,6 +5204,19 @@
     },
     "zh-Hant": {
      "name": "拉波特-喬巴瓦體系"
+    },
+    "id": {
+     "name": "Sistem London Jobava",
+     "def": "Sistem London Jobava"
+    },
+    "nl": {
+     "name": "Rapport-Jobava-systeem",
+     "def": "het Rapport-Jobava-systeem"
+    },
+    "pt-BR": {
+     "name": "Sistema Rapport-Jobava",
+     "def": "o Sistema Rapport-Jobava",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4364,6 +5277,19 @@
     },
     "zh-Hant": {
      "name": "石牆攻擊"
+    },
+    "id": {
+     "name": "Serangan Stonewall",
+     "def": "Serangan Stonewall"
+    },
+    "nl": {
+     "name": "Stonewall-aanval",
+     "def": "de Stonewall-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Stonewall",
+     "def": "o Ataque Stonewall",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4424,6 +5350,19 @@
     },
     "zh-Hant": {
      "name": "里希特-韋列索夫攻擊"
+    },
+    "id": {
+     "name": "Serangan Richter-Veresov",
+     "def": "Serangan Richter-Veresov"
+    },
+    "nl": {
+     "name": "Richter-Veresov-aanval",
+     "def": "de Richter-Veresov-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Richter-Veresov",
+     "def": "o Ataque Richter-Veresov",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4484,6 +5423,19 @@
     },
     "zh-Hant": {
      "name": "聖喬治防禦"
+    },
+    "id": {
+     "name": "Pertahanan Saint George",
+     "def": "Pertahanan Saint George"
+    },
+    "nl": {
+     "name": "Sint-Joris-verdediging",
+     "def": "de Sint-Joris-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa São Jorge",
+     "def": "a Defesa São Jorge",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4544,6 +5496,19 @@
     },
     "zh-Hant": {
      "name": "博格防禦"
+    },
+    "id": {
+     "name": "Pertahanan Borg",
+     "def": "Pertahanan Borg"
+    },
+    "nl": {
+     "name": "Borg-verdediging",
+     "def": "de Borg-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Borg",
+     "def": "a Defesa Borg",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4604,6 +5569,19 @@
     },
     "zh-Hant": {
      "name": "河馬防禦"
+    },
+    "id": {
+     "name": "Pertahanan Kuda Nil",
+     "def": "Pertahanan Kuda Nil"
+    },
+    "nl": {
+     "name": "Nijlpaardverdediging",
+     "def": "de nijlpaardverdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Hipopótamo",
+     "def": "a Defesa Hipopótamo",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4665,6 +5643,19 @@
     },
     "zh-Hant": {
      "name": "英國式防禦"
+    },
+    "id": {
+     "name": "Pertahanan Inggris",
+     "def": "Pertahanan Inggris"
+    },
+    "nl": {
+     "name": "Engelse verdediging",
+     "def": "de Engelse verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Inglesa",
+     "def": "a Defesa Inglesa",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4725,6 +5716,19 @@
     },
     "zh-Hant": {
      "name": "翼手龍防禦"
+    },
+    "id": {
+     "name": "Pertahanan Pterodaktil",
+     "def": "Pertahanan Pterodaktil"
+    },
+    "nl": {
+     "name": "Pterodactylus-verdediging",
+     "def": "de pterodactylus-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Pterodáctilo",
+     "def": "a Defesa Pterodáctilo",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4785,6 +5789,19 @@
     },
     "zh-Hant": {
      "name": "邦克勞德攻擊"
+    },
+    "id": {
+     "name": "Serangan Bongcloud",
+     "def": "Serangan Bongcloud"
+    },
+    "nl": {
+     "name": "Bongcloud-aanval",
+     "def": "de Bongcloud-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Bongcloud",
+     "def": "o Ataque Bongcloud",
+     "gender": "m"
     }
    },
    "comment": {
@@ -4817,7 +5834,20 @@
     "ar": "المتغير المفتوح",
     "ja": "オープン・シシリアン",
     "zh-Hans": "开放西西里",
-    "zh-Hant": "開放西西里"
+    "zh-Hant": "開放西西里",
+    "id": {
+     "name": "Sisilia Terbuka",
+     "def": "Sisilia Terbuka"
+    },
+    "nl": {
+     "name": "Open Siciliaans",
+     "def": "het open Siciliaans"
+    },
+    "pt-BR": {
+     "name": "Siciliana Aberta",
+     "def": "a Siciliana Aberta",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "White opens the centre with d4 and recaptures with the knight: the main battleground of the Sicilian, sharp and heavy with theory."
@@ -4841,7 +5871,20 @@
     "ar": "المتغير المغلق",
     "ja": "クローズド・シシリアン",
     "zh-Hans": "封闭西西里",
-    "zh-Hant": "封閉西西里"
+    "zh-Hant": "封閉西西里",
+    "id": {
+     "name": "Sisilia Tertutup",
+     "def": "Sisilia Tertutup"
+    },
+    "nl": {
+     "name": "Gesloten Siciliaans",
+     "def": "het gesloten Siciliaans"
+    },
+    "pt-BR": {
+     "name": "Siciliana Fechada",
+     "def": "a Siciliana Fechada",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "White avoids d4 and plays Nc3, g3, Bg2 and often f4, aiming for a slow kingside attack."
@@ -4865,7 +5908,20 @@
     "ar": "متغير ألابين",
     "ja": "アラピン・バリエーション",
     "zh-Hans": "阿拉平变例",
-    "zh-Hant": "阿拉平變例"
+    "zh-Hant": "阿拉平變例",
+    "id": {
+     "name": "Varian Alapin",
+     "def": "Varian Alapin"
+    },
+    "nl": {
+     "name": "Alapin-variant",
+     "def": "de Alapin-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Alapin",
+     "def": "a Variante Alapin",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "2.c3 prepares d4 to build a full pawn centre and sidestep the main Sicilian theory; Black answers with ...d5 or ...Nf6."
@@ -4891,7 +5947,20 @@
     "ar": "جامبيت سميث-مورا",
     "ja": "スミス・モラ・ギャンビット",
     "zh-Hans": "史密斯-莫拉弃兵",
-    "zh-Hant": "史密斯-莫拉棄兵"
+    "zh-Hant": "史密斯-莫拉棄兵",
+    "id": {
+     "name": "Gambit Smith-Morra",
+     "def": "Gambit Smith-Morra"
+    },
+    "nl": {
+     "name": "Smith-Morra-gambiet",
+     "def": "het Smith-Morra-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Smith-Morra",
+     "def": "o Gambito Smith-Morra",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "A pawn for rapid development and the open c- and d-files; Black develops soundly and often returns the pawn at the right moment.",
@@ -4916,7 +5985,20 @@
     "ar": "هجوم الجائزة الكبرى",
     "ja": "グランプリ・アタック",
     "zh-Hans": "大奖赛攻击",
-    "zh-Hant": "大獎賽攻擊"
+    "zh-Hant": "大獎賽攻擊",
+    "id": {
+     "name": "Serangan Grand Prix",
+     "def": "Serangan Grand Prix"
+    },
+    "nl": {
+     "name": "Grand Prix-aanval",
+     "def": "de Grand Prix-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Grand Prix",
+     "def": "o Ataque Grand Prix",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White plays Nc3 and f4 for a quick kingside attack with f5, avoiding the Open Sicilian."
@@ -4940,7 +6022,20 @@
     "ar": "متغير روسوليمو",
     "ja": "ロッソリモ・バリエーション",
     "zh-Hans": "罗索利莫变例",
-    "zh-Hant": "羅索利莫變例"
+    "zh-Hant": "羅索利莫變例",
+    "id": {
+     "name": "Varian Rossolimo",
+     "def": "Varian Rossolimo"
+    },
+    "nl": {
+     "name": "Rossolimo-variant",
+     "def": "de Rossolimo-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Rossolimo",
+     "def": "a Variante Rossolimo",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3.Bb5 pins or trades the c6 knight to give Black doubled pawns and keep the game positional."
@@ -4964,7 +6059,20 @@
     "ar": "متغير نايدورف",
     "ja": "ナイドルフ・バリエーション",
     "zh-Hans": "纳道尔夫变例",
-    "zh-Hant": "納道爾夫變例"
+    "zh-Hant": "納道爾夫變例",
+    "id": {
+     "name": "Varian Najdorf",
+     "def": "Varian Najdorf"
+    },
+    "nl": {
+     "name": "Najdorf-variant",
+     "def": "de Najdorf-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Najdorf",
+     "def": "a Variante Najdorf",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "5...a6 is the most famous Sicilian: flexible and deep, with ...e5 or ...e6 structures against sharp attacks such as the English Attack or 6.Bg5."
@@ -4988,7 +6096,20 @@
     "ar": "متغير التنين",
     "ja": "ドラゴン・バリエーション",
     "zh-Hans": "龙式变例",
-    "zh-Hant": "龍式變例"
+    "zh-Hant": "龍式變例",
+    "id": {
+     "name": "Varian Naga",
+     "def": "Varian Naga"
+    },
+    "nl": {
+     "name": "Drakenvariant",
+     "def": "de drakenvariant"
+    },
+    "pt-BR": {
+     "name": "Variante do Dragão",
+     "def": "a Variante do Dragão",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black fianchettoes to g7 (the pawn chain looks like a dragon); the Yugoslav Attack leads to famous races of attacks on opposite wings."
@@ -5014,7 +6135,20 @@
     "ar": "التنين المعجّل",
     "ja": "アクセラレーテッド・ドラゴン",
     "zh-Hans": "加速龙式",
-    "zh-Hant": "加速龍式"
+    "zh-Hant": "加速龍式",
+    "id": {
+     "name": "Varian Naga Dipercepat",
+     "def": "Varian Naga Dipercepat"
+    },
+    "nl": {
+     "name": "Versnelde draak",
+     "def": "de versnelde draak"
+    },
+    "pt-BR": {
+     "name": "Dragão Acelerado",
+     "def": "o Dragão Acelerado",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "Black fianchettoes before ...d6 to play ...d5 in one go; the Maróczy Bind with c4 is White's positional antidote."
@@ -5038,7 +6172,20 @@
     "ar": "متغير شيفينينغن",
     "ja": "シェベニンゲン・バリエーション",
     "zh-Hans": "舍维宁根变例",
-    "zh-Hant": "舍維寧根變例"
+    "zh-Hant": "舍維寧根變例",
+    "id": {
+     "name": "Varian Scheveningen",
+     "def": "Varian Scheveningen"
+    },
+    "nl": {
+     "name": "Scheveningse variant",
+     "def": "de Scheveningse variant"
+    },
+    "pt-BR": {
+     "name": "Variante Scheveningen",
+     "def": "a Variante Scheveningen",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black builds the small centre e6-d6, a flexible defensive shell; White often attacks with g4 (the Keres Attack)."
@@ -5062,7 +6209,20 @@
     "ar": "متغير سفيشنيكوف",
     "ja": "スヴェシニコフ・バリエーション",
     "zh-Hans": "斯维什尼科夫变例",
-    "zh-Hant": "斯維什尼科夫變例"
+    "zh-Hant": "斯維什尼科夫變例",
+    "id": {
+     "name": "Varian Sveshnikov",
+     "def": "Varian Sveshnikov"
+    },
+    "nl": {
+     "name": "Svesjnikov-variant",
+     "def": "de Svesjnikov-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Sveshnikov",
+     "def": "a Variante Sveshnikov",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black plays ...e5, accepting a hole on d5 and a backward d-pawn for activity and the bishop pair: very dynamic."
@@ -5087,7 +6247,20 @@
     "ar": "متغير تايمانوف",
     "ja": "タイマノフ・バリエーション",
     "zh-Hans": "泰曼诺夫变例",
-    "zh-Hant": "泰曼諾夫變例"
+    "zh-Hant": "泰曼諾夫變例",
+    "id": {
+     "name": "Varian Taimanov",
+     "def": "Varian Taimanov"
+    },
+    "nl": {
+     "name": "Tajmanov-variant",
+     "def": "de Tajmanov-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Taimanov",
+     "def": "a Variante Taimanov",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black combines ...e6 and ...Nc6 with a flexible ...a6 and ...Qc7, keeping ...d6 or ...Bb4 in reserve."
@@ -5111,7 +6284,20 @@
     "ar": "متغير كان",
     "ja": "カン・バリエーション",
     "zh-Hans": "坎恩变例",
-    "zh-Hant": "坎恩變例"
+    "zh-Hant": "坎恩變例",
+    "id": {
+     "name": "Varian Kan",
+     "def": "Varian Kan"
+    },
+    "nl": {
+     "name": "Kan-variant",
+     "def": "de Kan-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Kan",
+     "def": "a Variante Kan",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black plays ...e6 and ...a6, keeps the knights at home and often aims for a Hedgehog setup."
@@ -5135,7 +6321,20 @@
     "ar": "المتغير الكلاسيكي",
     "ja": "クラシカル・バリエーション",
     "zh-Hans": "古典变例",
-    "zh-Hant": "古典變例"
+    "zh-Hant": "古典變例",
+    "id": {
+     "name": "Varian Klasik",
+     "def": "Varian Klasik"
+    },
+    "nl": {
+     "name": "Klassieke variant",
+     "def": "de klassieke variant"
+    },
+    "pt-BR": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black develops both knights (...Nc6, ...Nf6, ...d6); White's main answers are the Richter-Rauzer (Bg5) and the Sozin (Bc4)."
@@ -5159,7 +6358,20 @@
     "ar": "متغير التقدم",
     "ja": "アドバンス・バリエーション",
     "zh-Hans": "推进变例",
-    "zh-Hant": "推進變例"
+    "zh-Hant": "推進變例",
+    "id": {
+     "name": "Varian Maju",
+     "def": "Varian Maju"
+    },
+    "nl": {
+     "name": "Doorschuifvariant",
+     "def": "de doorschuifvariant"
+    },
+    "pt-BR": {
+     "name": "Variante do Avanço",
+     "def": "a Variante do Avanço",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "White locks the centre with e5 and gains space; Black attacks d4, the base of the chain, with ...c5, ...Nc6 and ...Qb6."
@@ -5183,7 +6395,20 @@
     "ar": "متغير التبادل",
     "ja": "エクスチェンジ・バリエーション",
     "zh-Hans": "兑换变例",
-    "zh-Hant": "兌換變例"
+    "zh-Hant": "兌換變例",
+    "id": {
+     "name": "Varian Pertukaran",
+     "def": "Varian Pertukaran"
+    },
+    "nl": {
+     "name": "Ruilvariant",
+     "def": "de ruilvariant"
+    },
+    "pt-BR": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "exd5 releases the tension: a symmetrical, quiet structure in which Black's light bishop is freed."
@@ -5207,7 +6432,20 @@
     "ar": "متغير تاراش",
     "ja": "タラッシュ・バリエーション",
     "zh-Hans": "塔拉什变例",
-    "zh-Hant": "塔拉什變例"
+    "zh-Hant": "塔拉什變例",
+    "id": {
+     "name": "Varian Tarrasch",
+     "def": "Varian Tarrasch"
+    },
+    "nl": {
+     "name": "Tarrasch-variant",
+     "def": "de Tarrasch-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Tarrasch",
+     "def": "a Variante Tarrasch",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3.Nd2 avoids the Winawer pin; Black often accepts an isolated d-pawn after ...c5 or plays ...Nf6 for a locked centre."
@@ -5231,7 +6469,20 @@
     "ar": "متغير فيناور",
     "ja": "ウィナワー・バリエーション",
     "zh-Hans": "维纳维尔变例",
-    "zh-Hant": "維納維爾變例"
+    "zh-Hant": "維納維爾變例",
+    "id": {
+     "name": "Varian Winawer",
+     "def": "Varian Winawer"
+    },
+    "nl": {
+     "name": "Winawer-variant",
+     "def": "de Winawer-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Winawer",
+     "def": "a Variante Winawer",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...Bb4 pins the knight; after e5 and a3 Black usually gives bishop for knight, leaving White doubled c-pawns but the bishop pair and kingside chances."
@@ -5255,7 +6506,20 @@
     "ar": "المتغير الكلاسيكي",
     "ja": "クラシカル・バリエーション",
     "zh-Hans": "古典变例",
-    "zh-Hant": "古典變例"
+    "zh-Hant": "古典變例",
+    "id": {
+     "name": "Varian Klasik",
+     "def": "Varian Klasik"
+    },
+    "nl": {
+     "name": "Klassieke variant",
+     "def": "de klassieke variant"
+    },
+    "pt-BR": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...Nf6 invites 4.Bg5 or 4.e5; the play turns on the e5 chain and the f6 knight."
@@ -5279,7 +6543,20 @@
     "ar": "متغير روبنشتاين",
     "ja": "ルビンシュタイン・バリエーション",
     "zh-Hans": "鲁宾斯坦变例",
-    "zh-Hant": "魯賓斯坦變例"
+    "zh-Hant": "魯賓斯坦變例",
+    "id": {
+     "name": "Varian Rubinstein",
+     "def": "Varian Rubinstein"
+    },
+    "nl": {
+     "name": "Rubinstein-variant",
+     "def": "de Rubinstein-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Rubinstein",
+     "def": "a Variante Rubinstein",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...dxe4 gives up the centre for a solid, compact position; Black aims for ...Nd7, ...Ngf6 and ...c5."
@@ -5303,7 +6580,20 @@
     "ar": "متغير التقدم",
     "ja": "アドバンス・バリエーション",
     "zh-Hans": "推进变例",
-    "zh-Hant": "推進變例"
+    "zh-Hant": "推進變例",
+    "id": {
+     "name": "Varian Maju",
+     "def": "Varian Maju"
+    },
+    "nl": {
+     "name": "Doorschuifvariant",
+     "def": "de doorschuifvariant"
+    },
+    "pt-BR": {
+     "name": "Variante do Avanço",
+     "def": "a Variante do Avanço",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "White gains space with e5; Black develops the bishop to f5 before ...e6 and fights back with ...c5."
@@ -5327,7 +6617,20 @@
     "ar": "متغير التبادل",
     "ja": "エクスチェンジ・バリエーション",
     "zh-Hans": "兑换变例",
-    "zh-Hant": "兌換變例"
+    "zh-Hant": "兌換變例",
+    "id": {
+     "name": "Varian Pertukaran",
+     "def": "Varian Pertukaran"
+    },
+    "nl": {
+     "name": "Ruilvariant",
+     "def": "de ruilvariant"
+    },
+    "pt-BR": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "A Carlsbad structure with colours reversed: White usually plays Bd3, c3 and a kingside setup, Black a minority attack with ...b5-b4."
@@ -5353,7 +6656,20 @@
     "ar": "هجوم بانوف",
     "ja": "パノフ・アタック",
     "zh-Hans": "潘诺夫攻击",
-    "zh-Hant": "潘諾夫攻擊"
+    "zh-Hant": "潘諾夫攻擊",
+    "id": {
+     "name": "Serangan Panov",
+     "def": "Serangan Panov"
+    },
+    "nl": {
+     "name": "Panov-aanval",
+     "def": "de Panov-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Panov",
+     "def": "o Ataque Panov",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White plays c4 and accepts an isolated d-pawn in exchange for active pieces and attacking chances."
@@ -5377,7 +6693,20 @@
     "ar": "المتغير الكلاسيكي",
     "ja": "クラシカル・バリエーション",
     "zh-Hans": "古典变例",
-    "zh-Hant": "古典變例"
+    "zh-Hant": "古典變例",
+    "id": {
+     "name": "Varian Klasik",
+     "def": "Varian Klasik"
+    },
+    "nl": {
+     "name": "Klassieke variant",
+     "def": "de klassieke variant"
+    },
+    "pt-BR": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4...Bf5 develops the bishop with tempo on the e4 knight; White gains space with h4-h5 and castling on opposite sides is common."
@@ -5401,7 +6730,20 @@
     "ar": "هجوم الحصانين",
     "ja": "ツー・ナイツ・アタック",
     "zh-Hans": "双马攻击",
-    "zh-Hant": "雙馬攻擊"
+    "zh-Hant": "雙馬攻擊",
+    "id": {
+     "name": "Serangan Dua Kuda",
+     "def": "Serangan Dua Kuda"
+    },
+    "nl": {
+     "name": "Tweepaardenaanval",
+     "def": "de tweepaardenaanval"
+    },
+    "pt-BR": {
+     "name": "Ataque dos Dois Cavalos",
+     "def": "o Ataque dos Dois Cavalos",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White develops Nc3 and Nf3 before d4, staying flexible and avoiding main-line theory."
@@ -5425,7 +6767,20 @@
     "ar": "دفاع الحصانين",
     "ja": "ツー・ナイツ・ディフェンス",
     "zh-Hans": "双马防御",
-    "zh-Hant": "雙馬防禦"
+    "zh-Hant": "雙馬防禦",
+    "id": {
+     "name": "Pertahanan Dua Kuda",
+     "def": "Pertahanan Dua Kuda"
+    },
+    "nl": {
+     "name": "Tweepaardenspel",
+     "def": "het tweepaardenspel"
+    },
+    "pt-BR": {
+     "name": "Defesa dos Dois Cavalos",
+     "def": "a Defesa dos Dois Cavalos",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...Nf6 invites the sharp 4.Ng5 (answered by ...d5 and ...Na5) or the quiet 4.d3; it is Black's most active reply to the Italian.",
@@ -5451,7 +6806,20 @@
     "ar": "جوكو بيانو",
     "ja": "ジュオッコ・ピアノ",
     "zh-Hans": "意大利慢棋",
-    "zh-Hant": "義大利慢棋"
+    "zh-Hant": "義大利慢棋",
+    "id": {
+     "name": "Giuoco Piano",
+     "def": "Giuoco Piano"
+    },
+    "nl": {
+     "name": "Giuoco Piano",
+     "def": "het Giuoco Piano"
+    },
+    "pt-BR": {
+     "name": "Giuoco Piano",
+     "def": "o Giuoco Piano",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "3...Bc5 mirrors White's bishop; White chooses between c3 and d4 central play, the slow d3 (Pianissimo) or the Evans Gambit.",
@@ -5481,7 +6849,20 @@
     "ar": "جوكو بيانيسيمو",
     "ja": "ジュオッコ・ピアニッシモ",
     "zh-Hans": "意大利极慢棋",
-    "zh-Hant": "義大利極慢棋"
+    "zh-Hant": "義大利極慢棋",
+    "id": {
+     "name": "Giuoco Pianissimo",
+     "def": "Giuoco Pianissimo"
+    },
+    "nl": {
+     "name": "Giuoco Pianissimo",
+     "def": "het Giuoco Pianissimo"
+    },
+    "pt-BR": {
+     "name": "Giuoco Pianissimo",
+     "def": "o Giuoco Pianissimo",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "The modern slow Italian (d3, c3, castling, Re1, a4, h3): long manoeuvres like Nbd2-f1-g3 and a delayed d4 break."
@@ -5509,7 +6890,20 @@
     "ar": "جامبيت إيفانز",
     "ja": "エバンス・ギャンビット",
     "zh-Hans": "埃文斯弃兵",
-    "zh-Hant": "埃文斯棄兵"
+    "zh-Hant": "埃文斯棄兵",
+    "id": {
+     "name": "Gambit Evans",
+     "def": "Gambit Evans"
+    },
+    "nl": {
+     "name": "Evans-gambiet",
+     "def": "het Evans-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Evans",
+     "def": "o Gambito Evans",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "4.b4 gives a pawn to deflect the c5 bishop and build a fast centre with c3 and d4: very sharp, a favourite of the romantic era."
@@ -5533,7 +6927,20 @@
     "ar": "هجوم الكبد المقلي",
     "ja": "フライド・リバー・アタック",
     "zh-Hans": "炸肝攻击",
-    "zh-Hant": "炸肝攻擊"
+    "zh-Hant": "炸肝攻擊",
+    "id": {
+     "name": "Serangan Fried Liver",
+     "def": "Serangan Fried Liver"
+    },
+    "nl": {
+     "name": "Fegatello-aanval",
+     "def": "de Fegatello-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Fegatello",
+     "def": "o Ataque Fegatello",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "After 4.Ng5 d5 5.exd5 Nxd5?! 6.Nxf7 Kxf7 White gets a fierce attack; the main line 5...Na5 avoids it.",
@@ -5563,7 +6970,20 @@
     "ar": "هجوم تراكسلر المضاد",
     "ja": "トラクスラー・カウンターアタック",
     "zh-Hans": "特拉克斯勒反击",
-    "zh-Hant": "特拉克斯勒反擊"
+    "zh-Hant": "特拉克斯勒反擊",
+    "id": {
+     "name": "Serangan Balik Traxler",
+     "def": "Serangan Balik Traxler"
+    },
+    "nl": {
+     "name": "Traxler-tegenaanval",
+     "def": "de Traxler-tegenaanval"
+    },
+    "pt-BR": {
+     "name": "Contra-ataque Traxler",
+     "def": "o Contra-ataque Traxler",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "4...Bc5 ignores the threat to f7 and hits f2 instead: wild tactics where exact knowledge decides."
@@ -5587,7 +7007,20 @@
     "ar": "الدفاع البرليني",
     "ja": "ベルリン・ディフェンス",
     "zh-Hans": "柏林防御",
-    "zh-Hant": "柏林防禦"
+    "zh-Hant": "柏林防禦",
+    "id": {
+     "name": "Pertahanan Berlin",
+     "def": "Pertahanan Berlin"
+    },
+    "nl": {
+     "name": "Berlijnse verdediging",
+     "def": "de Berlijnse verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Berlim",
+     "def": "a Defesa Berlim",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...Nf6 counterattacks e4; the famous Berlin endgame (queens off early, Black's king in the centre) is extremely solid."
@@ -5611,7 +7044,20 @@
     "ar": "دفاع مورفي",
     "ja": "モーフィー・ディフェンス",
     "zh-Hans": "莫菲防御",
-    "zh-Hant": "莫菲防禦"
+    "zh-Hant": "莫菲防禦",
+    "id": {
+     "name": "Pertahanan Morphy",
+     "def": "Pertahanan Morphy"
+    },
+    "nl": {
+     "name": "Morphy-verdediging",
+     "def": "de Morphy-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Morphy",
+     "def": "a Defesa Morphy",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...a6 questions the bishop at once: the gateway to the main lines (Closed, Open, Marshall)."
@@ -5635,7 +7081,20 @@
     "ar": "روي لوبيز المغلق",
     "ja": "クローズド・ルイ・ロペス",
     "zh-Hans": "封闭西班牙",
-    "zh-Hant": "封閉西班牙"
+    "zh-Hant": "封閉西班牙",
+    "id": {
+     "name": "Ruy Lopez Tertutup",
+     "def": "Ruy Lopez Tertutup"
+    },
+    "nl": {
+     "name": "Gesloten Spaans",
+     "def": "het gesloten Spaans"
+    },
+    "pt-BR": {
+     "name": "Espanhola Fechada",
+     "def": "a Espanhola Fechada",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "5...Be7 with ...b5, ...d6 and castling: the classical main line, with slow manoeuvres (Nbd2-f1-g3) against Black's queenside plans (Breyer, Zaitsev, Chigorin)."
@@ -5659,7 +7118,20 @@
     "ar": "هجوم مارشال",
     "ja": "マーシャル・アタック",
     "zh-Hans": "马歇尔攻击",
-    "zh-Hant": "馬歇爾攻擊"
+    "zh-Hant": "馬歇爾攻擊",
+    "id": {
+     "name": "Serangan Marshall",
+     "def": "Serangan Marshall"
+    },
+    "nl": {
+     "name": "Marshall-aanval",
+     "def": "de Marshall-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Marshall",
+     "def": "o Ataque Marshall",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "8...d5 sacrifices a pawn for a lasting kingside attack; deeply analysed, it is a respected drawing weapon at the top level."
@@ -5683,7 +7155,20 @@
     "ar": "متغير التبادل",
     "ja": "エクスチェンジ・バリエーション",
     "zh-Hans": "兑换变例",
-    "zh-Hant": "兌換變例"
+    "zh-Hant": "兌換變例",
+    "id": {
+     "name": "Varian Pertukaran",
+     "def": "Varian Pertukaran"
+    },
+    "nl": {
+     "name": "Ruilvariant",
+     "def": "de ruilvariant"
+    },
+    "pt-BR": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4.Bxc6 gives Black the bishop pair but doubled c-pawns; White aims for an endgame with a healthy kingside majority."
@@ -5707,7 +7192,20 @@
     "ar": "المتغير المفتوح",
     "ja": "オープン・バリエーション",
     "zh-Hans": "开放变例",
-    "zh-Hant": "開放變例"
+    "zh-Hant": "開放變例",
+    "id": {
+     "name": "Varian Terbuka",
+     "def": "Varian Terbuka"
+    },
+    "nl": {
+     "name": "Open Spaans",
+     "def": "het open Spaans"
+    },
+    "pt-BR": {
+     "name": "Variante Aberta",
+     "def": "a Variante Aberta",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "5...Nxe4 takes the centre pawn for active piece play; Black's pieces are lively but the e-file and the d5 pawn need care."
@@ -5731,7 +7229,20 @@
     "ar": "دفاع شليمان",
     "ja": "シュリーマン・ディフェンス",
     "zh-Hans": "施利曼防御",
-    "zh-Hant": "施利曼防禦"
+    "zh-Hant": "施利曼防禦",
+    "id": {
+     "name": "Pertahanan Schliemann",
+     "def": "Pertahanan Schliemann"
+    },
+    "nl": {
+     "name": "Schliemann-verdediging",
+     "def": "de Schliemann-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Schliemann",
+     "def": "a Defesa Schliemann",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "3...f5 is a King's Gambit with the colours reversed: sharp and risky for both sides."
@@ -5755,7 +7266,20 @@
     "ar": "الجامبيت الاسكتلندي",
     "ja": "スコッチ・ギャンビット",
     "zh-Hans": "苏格兰弃兵",
-    "zh-Hant": "蘇格蘭棄兵"
+    "zh-Hant": "蘇格蘭棄兵",
+    "id": {
+     "name": "Gambit Skotlandia",
+     "def": "Gambit Skotlandia"
+    },
+    "nl": {
+     "name": "Schots gambiet",
+     "def": "het Schotse gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Escocês",
+     "def": "o Gambito Escocês",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White plays Bc4 instead of recapturing on d4 and offers a pawn for fast development; it often transposes to the Two Knights."
@@ -5780,7 +7304,20 @@
     "ar": "جامبيت فيينا",
     "ja": "ウィーン・ギャンビット",
     "zh-Hans": "维也纳弃兵",
-    "zh-Hant": "維也納棄兵"
+    "zh-Hant": "維也納棄兵",
+    "id": {
+     "name": "Gambit Wina",
+     "def": "Gambit Wina"
+    },
+    "nl": {
+     "name": "Weens gambiet",
+     "def": "het Weense gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Vienense",
+     "def": "o Gambito Vienense",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "f4 in the Vienna, a King's Gambit with Nc3 already played; Black's best answer is the central strike ...d5."
@@ -5805,7 +7342,20 @@
     "ar": "جامبيت ستافورد",
     "ja": "スタッフォード・ギャンビット",
     "zh-Hans": "斯塔福德弃兵",
-    "zh-Hant": "斯塔福德棄兵"
+    "zh-Hant": "斯塔福德棄兵",
+    "id": {
+     "name": "Gambit Stafford",
+     "def": "Gambit Stafford"
+    },
+    "nl": {
+     "name": "Stafford-gambiet",
+     "def": "het Stafford-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Stafford",
+     "def": "o Gambito Stafford",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "After 3.Nxe5 Nc6 4.Nxc6 dxc6 Black gets quick development and traps with ...Bc5 and ...Ng4; with calm moves (d3, Be2, castling) White stays a clean pawn up.",
@@ -5831,7 +7381,20 @@
     "ar": "هجوم الوزير المتجول",
     "ja": "ウェイワード・クイーン・アタック",
     "zh-Hans": "早出后攻击",
-    "zh-Hant": "早出后攻擊"
+    "zh-Hant": "早出后攻擊",
+    "id": {
+     "name": "Serangan Parham",
+     "def": "Serangan Parham"
+    },
+    "nl": {
+     "name": "Parham-aanval",
+     "def": "de Parham-aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Parham",
+     "def": "o Ataque Parham",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "2.Qh5 (or 2.Qf3) breaks the rule of early development; Black gains time by harassing the queen (...Nc6, ...g6, ...Nf6) and should come out better.",
@@ -5864,7 +7427,20 @@
     "ar": "جامبيت الهالوين",
     "ja": "ハロウィン・ギャンビット",
     "zh-Hans": "万圣节弃兵",
-    "zh-Hant": "萬聖節棄兵"
+    "zh-Hant": "萬聖節棄兵",
+    "id": {
+     "name": "Gambit Halloween",
+     "def": "Gambit Halloween"
+    },
+    "nl": {
+     "name": "Halloween-gambiet",
+     "def": "het Halloween-gambiet"
+    },
+    "pt-BR": {
+     "name": "Gambito Halloween",
+     "def": "o Gambito Halloween",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "4.Nxe5 gives a knight for two pawns and a big centre: objectively unsound but dangerous in fast games."
@@ -5888,7 +7464,20 @@
     "ar": "الدفاع الأرثوذكسي",
     "ja": "オーソドックス・ディフェンス",
     "zh-Hans": "正统防御",
-    "zh-Hant": "正統防禦"
+    "zh-Hant": "正統防禦",
+    "id": {
+     "name": "Pertahanan Ortodoks",
+     "def": "Pertahanan Ortodoks"
+    },
+    "nl": {
+     "name": "Orthodoxe verdediging",
+     "def": "de orthodoxe verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Ortodoxa",
+     "def": "a Defesa Ortodoxa",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "The classical setup (...Be7, castling, ...Nbd7): solid but passive, freed by ...dxc4 with ...e5 or ...c5 (Capablanca's freeing manoeuvre)."
@@ -5912,7 +7501,20 @@
     "ar": "متغير التبادل",
     "ja": "エクスチェンジ・バリエーション",
     "zh-Hans": "兑换变例",
-    "zh-Hant": "兌換變例"
+    "zh-Hant": "兌換變例",
+    "id": {
+     "name": "Varian Pertukaran",
+     "def": "Varian Pertukaran"
+    },
+    "nl": {
+     "name": "Ruilvariant",
+     "def": "de ruilvariant"
+    },
+    "pt-BR": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "cxd5 exd5 creates the Carlsbad structure; White's classic plan is the minority attack b4-b5 against Black's c6 pawn."
@@ -5936,7 +7538,20 @@
     "ar": "دفاع شبه تاراش",
     "ja": "セミタラッシュ・ディフェンス",
     "zh-Hans": "半塔拉什防御",
-    "zh-Hant": "半塔拉什防禦"
+    "zh-Hant": "半塔拉什防禦",
+    "id": {
+     "name": "Pertahanan Semi-Tarrasch",
+     "def": "Pertahanan Semi-Tarrasch"
+    },
+    "nl": {
+     "name": "Semi-Tarrasch-verdediging",
+     "def": "de Semi-Tarrasch-verdediging"
+    },
+    "pt-BR": {
+     "name": "Defesa Semi-Tarrasch",
+     "def": "a Defesa Semi-Tarrasch",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "...c5 with the knight on f6 recaptures on d5 with a piece and avoids the isolated pawn of the Tarrasch; White gets a mobile centre."
@@ -5964,7 +7579,20 @@
     "ar": "متغير ميران",
     "ja": "メラン・バリエーション",
     "zh-Hans": "梅兰变例",
-    "zh-Hant": "梅蘭變例"
+    "zh-Hant": "梅蘭變例",
+    "id": {
+     "name": "Varian Meran",
+     "def": "Varian Meran"
+    },
+    "nl": {
+     "name": "Meraanse variant",
+     "def": "de Meraanse variant"
+    },
+    "pt-BR": {
+     "name": "Variante Meran",
+     "def": "a Variante Meran",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "...dxc4 and ...b5 gain queenside space with tempo; the play turns on the ...c5 break and White's e4-e5 push."
@@ -5988,7 +7616,20 @@
     "ar": "المتغير الكلاسيكي",
     "ja": "クラシカル・バリエーション",
     "zh-Hans": "古典变例",
-    "zh-Hant": "古典變例"
+    "zh-Hant": "古典變例",
+    "id": {
+     "name": "Varian Klasik",
+     "def": "Varian Klasik"
+    },
+    "nl": {
+     "name": "Klassieke variant",
+     "def": "de klassieke variant"
+    },
+    "pt-BR": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Nf3, Be2 and castling: after ...e5 and d5 the famous race begins, White on the queenside (c5), Black on the kingside (...f5, ...f4, ...g5)."
@@ -6013,7 +7654,20 @@
     "ar": "متغير زيميش",
     "ja": "ゼーミッシュ・バリエーション",
     "zh-Hans": "塞米施变例",
-    "zh-Hant": "塞米施變例"
+    "zh-Hant": "塞米施變例",
+    "id": {
+     "name": "Varian Sämisch",
+     "def": "Varian Sämisch"
+    },
+    "nl": {
+     "name": "Sämisch-variant",
+     "def": "de Sämisch-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Sämisch",
+     "def": "a Variante Sämisch",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "f3 supports e4 and prepares Be3, Qd2 and a kingside pawn storm; Black answers with ...c5, ...e5 or the ...Nc6, ...a6, ...b5 plan."
@@ -6037,7 +7691,20 @@
     "ar": "هجوم البيادق الأربعة",
     "ja": "フォー・ポーンズ・アタック",
     "zh-Hans": "四兵攻击",
-    "zh-Hant": "四兵攻擊"
+    "zh-Hant": "四兵攻擊",
+    "id": {
+     "name": "Serangan Empat Pion",
+     "def": "Serangan Empat Pion"
+    },
+    "nl": {
+     "name": "Vierpionnenaanval",
+     "def": "de vierpionnenaanval"
+    },
+    "pt-BR": {
+     "name": "Ataque dos Quatro Peões",
+     "def": "o Ataque dos Quatro Peões",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White builds a c4-d4-e4-f4 wall; Black undermines it at once with ...c5 and ...e6, leading to Benoni-like tactics."
@@ -6061,7 +7728,20 @@
     "ar": "متغير الفيانكيتو",
     "ja": "フィアンケット・バリエーション",
     "zh-Hans": "侧翼出象变例",
-    "zh-Hant": "側翼出象變例"
+    "zh-Hant": "側翼出象變例",
+    "id": {
+     "name": "Varian Fianchetto",
+     "def": "Varian Fianchetto"
+    },
+    "nl": {
+     "name": "Fianchettovariant",
+     "def": "de fianchettovariant"
+    },
+    "pt-BR": {
+     "name": "Variante do Fianqueto",
+     "def": "a Variante do Fianqueto",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "g3 and Bg2 blunt the g7 bishop; the game is more positional, with ...Nc6 and ...a6 or ...c6 and ...Qb6 plans for Black."
@@ -6086,7 +7766,20 @@
     "ar": "متغير روبنشتاين",
     "ja": "ルビンシュタイン・バリエーション",
     "zh-Hans": "鲁宾斯坦变例",
-    "zh-Hant": "魯賓斯坦變例"
+    "zh-Hant": "魯賓斯坦變例",
+    "id": {
+     "name": "Varian Rubinstein",
+     "def": "Varian Rubinstein"
+    },
+    "nl": {
+     "name": "Rubinstein-variant",
+     "def": "de Rubinstein-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Rubinstein",
+     "def": "a Variante Rubinstein",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4.e3 develops calmly and keeps Bd3, Ne2 or a3 in reserve: the most popular way to meet the Nimzo."
@@ -6110,7 +7803,20 @@
     "ar": "المتغير الكلاسيكي",
     "ja": "クラシカル・バリエーション",
     "zh-Hans": "古典变例",
-    "zh-Hant": "古典變例"
+    "zh-Hant": "古典變例",
+    "id": {
+     "name": "Varian Klasik",
+     "def": "Varian Klasik"
+    },
+    "nl": {
+     "name": "Klassieke variant",
+     "def": "de klassieke variant"
+    },
+    "pt-BR": {
+     "name": "Variante Clássica",
+     "def": "a Variante Clássica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4.Qc2 avoids doubled pawns by recapturing on c3 with the queen; White gets the bishop pair, Black fast development."
@@ -6134,7 +7840,20 @@
     "ar": "متغير زيميش",
     "ja": "ゼーミッシュ・バリエーション",
     "zh-Hans": "塞米施变例",
-    "zh-Hant": "塞米施變例"
+    "zh-Hant": "塞米施變例",
+    "id": {
+     "name": "Varian Sämisch",
+     "def": "Varian Sämisch"
+    },
+    "nl": {
+     "name": "Sämisch-variant",
+     "def": "de Sämisch-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Sämisch",
+     "def": "a Variante Sämisch",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4.a3 forces ...Bxc3+ at once; White accepts doubled c-pawns for the bishop pair and a big centre."
@@ -6158,7 +7877,20 @@
     "ar": "متغير التبادل",
     "ja": "エクスチェンジ・バリエーション",
     "zh-Hans": "兑换变例",
-    "zh-Hant": "兌換變例"
+    "zh-Hant": "兌換變例",
+    "id": {
+     "name": "Varian Pertukaran",
+     "def": "Varian Pertukaran"
+    },
+    "nl": {
+     "name": "Ruilvariant",
+     "def": "de ruilvariant"
+    },
+    "pt-BR": {
+     "name": "Variante das Trocas",
+     "def": "a Variante das Trocas",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "cxd5 and e4 build the big centre; Black attacks d4 with ...c5, ...Nc6 and ...Bg4, and the endgames often favour Black's queenside majority."
@@ -6183,7 +7915,20 @@
     "ar": "متغير لينينغراد",
     "ja": "レニングラード・バリエーション",
     "zh-Hans": "列宁格勒变例",
-    "zh-Hant": "列寧格勒變例"
+    "zh-Hant": "列寧格勒變例",
+    "id": {
+     "name": "Varian Leningrad",
+     "def": "Varian Leningrad"
+    },
+    "nl": {
+     "name": "Leningrad-variant",
+     "def": "de Leningrad-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Leningrado",
+     "def": "a Variante Leningrado",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "...g6 and ...Bg7: a King's Indian-style Dutch in which Black plays for ...e5 and kingside play."
@@ -6207,7 +7952,20 @@
     "ar": "متغير الجدار الحجري",
     "ja": "ストーンウォール・バリエーション",
     "zh-Hans": "石墙变例",
-    "zh-Hant": "石牆變例"
+    "zh-Hant": "石牆變例",
+    "id": {
+     "name": "Varian Stonewall",
+     "def": "Varian Stonewall"
+    },
+    "nl": {
+     "name": "Stonewall-variant",
+     "def": "de Stonewall-variant"
+    },
+    "pt-BR": {
+     "name": "Variante Stonewall",
+     "def": "a Variante Stonewall",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Pawns on c6, d5, e6 and f5 give Black a rock-solid grip on e4, at the cost of a hole on e5 and a passive light bishop."
@@ -6231,7 +7989,20 @@
     "ar": "بينوني الحديث",
     "ja": "モダン・ベノニ",
     "zh-Hans": "现代别诺尼",
-    "zh-Hant": "現代別諾尼"
+    "zh-Hant": "現代別諾尼",
+    "id": {
+     "name": "Benoni Modern",
+     "def": "Benoni Modern"
+    },
+    "nl": {
+     "name": "Moderne Benoni",
+     "def": "de moderne Benoni"
+    },
+    "pt-BR": {
+     "name": "Benoni Moderna",
+     "def": "a Benoni Moderna",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "...e6 and ...exd5 give Black a queenside majority against White's central majority; tactics around e5 and the g7 bishop dominate."
@@ -6255,7 +8026,20 @@
     "ar": "الكتالوني المفتوح",
     "ja": "オープン・カタラン",
     "zh-Hans": "开放卡塔兰",
-    "zh-Hant": "開放卡塔蘭"
+    "zh-Hant": "開放卡塔蘭",
+    "id": {
+     "name": "Katalan Terbuka",
+     "def": "Katalan Terbuka"
+    },
+    "nl": {
+     "name": "Open Catalaans",
+     "def": "het open Catalaans"
+    },
+    "pt-BR": {
+     "name": "Catalã Aberta",
+     "def": "a Catalã Aberta",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "...dxc4 takes the pawn; White wins it back with Qc2 or Qa4 and keeps long-diagonal pressure, Black aims for ...c5 or ...b5 and ...Bb7."
@@ -6280,7 +8064,20 @@
     "ar": "الكتالوني المغلق",
     "ja": "クローズド・カタラン",
     "zh-Hans": "封闭卡塔兰",
-    "zh-Hant": "封閉卡塔蘭"
+    "zh-Hant": "封閉卡塔蘭",
+    "id": {
+     "name": "Katalan Tertutup",
+     "def": "Katalan Tertutup"
+    },
+    "nl": {
+     "name": "Gesloten Catalaans",
+     "def": "het gesloten Catalaans"
+    },
+    "pt-BR": {
+     "name": "Catalã Fechada",
+     "def": "a Catalã Fechada",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "Black keeps d5 with ...Be7, ...c6 and ...Nbd7: a slow positional fight around the ...e5 or ...b6 and ...Bb7 freeing plans."
@@ -6304,7 +8101,20 @@
     "ar": "المتغير المتماثل",
     "ja": "シンメトリカル・バリエーション",
     "zh-Hans": "对称变例",
-    "zh-Hant": "對稱變例"
+    "zh-Hant": "對稱變例",
+    "id": {
+     "name": "Varian Simetris",
+     "def": "Varian Simetris"
+    },
+    "nl": {
+     "name": "Symmetrische variant",
+     "def": "de symmetrische variant"
+    },
+    "pt-BR": {
+     "name": "Variante Simétrica",
+     "def": "a Variante Simétrica",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "1...c5 copies White: slow manoeuvring with fianchettoes, pressure on d4 and d5, and Hedgehog or Maróczy-type structures."
@@ -6328,7 +8138,20 @@
     "ar": "الصقلي المعكوس",
     "ja": "リバースド・シシリアン",
     "zh-Hans": "反西西里",
-    "zh-Hant": "反西西里"
+    "zh-Hant": "反西西里",
+    "id": {
+     "name": "Sisilia Terbalik",
+     "def": "Sisilia Terbalik"
+    },
+    "nl": {
+     "name": "Omgekeerd Siciliaans",
+     "def": "het omgekeerde Siciliaans"
+    },
+    "pt-BR": {
+     "name": "Siciliana Invertida",
+     "def": "a Siciliana Invertida",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "1...e5 turns the English into a Sicilian with an extra tempo for White; typical plans are g3 and Bg2 with d3 and a queenside push."
@@ -6356,7 +8179,20 @@
     "ar": "هجوم البيادق الأربعة",
     "ja": "フォー・ポーンズ・アタック",
     "zh-Hans": "四兵攻击",
-    "zh-Hant": "四兵攻擊"
+    "zh-Hant": "四兵攻擊",
+    "id": {
+     "name": "Serangan Empat Pion",
+     "def": "Serangan Empat Pion"
+    },
+    "nl": {
+     "name": "Vierpionnenaanval",
+     "def": "de vierpionnenaanval"
+    },
+    "pt-BR": {
+     "name": "Ataque dos Quatro Peões",
+     "def": "o Ataque dos Quatro Peões",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "White chases the knight with c4, e5 and f4 and builds a huge but overextended centre; Black counters with ...dxe5, ...c5 and ...Bf5."
@@ -6380,7 +8216,20 @@
     "ar": "المتغير الحديث",
     "ja": "モダン・バリエーション",
     "zh-Hans": "现代变例",
-    "zh-Hant": "現代變例"
+    "zh-Hant": "現代變例",
+    "id": {
+     "name": "Varian Modern",
+     "def": "Varian Modern"
+    },
+    "nl": {
+     "name": "Moderne variant",
+     "def": "de moderne variant"
+    },
+    "pt-BR": {
+     "name": "Variante Moderna",
+     "def": "a Variante Moderna",
+     "gender": "f"
+    }
    },
    "comment": {
     "advanced": "4.Nf3 keeps a solid space advantage without overextending; Black pins with ...Bg4 or fianchettoes with ...g6."
@@ -6404,7 +8253,20 @@
     "ar": "الهجوم النمساوي",
     "ja": "オーストリアン・アタック",
     "zh-Hans": "奥地利攻击",
-    "zh-Hant": "奧地利攻擊"
+    "zh-Hant": "奧地利攻擊",
+    "id": {
+     "name": "Serangan Austria",
+     "def": "Serangan Austria"
+    },
+    "nl": {
+     "name": "Oostenrijkse aanval",
+     "def": "de Oostenrijkse aanval"
+    },
+    "pt-BR": {
+     "name": "Ataque Austríaco",
+     "def": "o Ataque Austríaco",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "f4 builds a big centre for e5 or a kingside attack; Black strikes with ...c5, or castles and plays ...c5 or ...e5."
@@ -6428,7 +8290,20 @@
     "ar": "جامبيت فالكبير المضاد",
     "ja": "ファルクビア・カウンターギャンビット",
     "zh-Hans": "法尔克比尔反弃兵",
-    "zh-Hant": "法爾克比爾反棄兵"
+    "zh-Hant": "法爾克比爾反棄兵",
+    "id": {
+     "name": "Gambit Balasan Falkbeer",
+     "def": "Gambit Balasan Falkbeer"
+    },
+    "nl": {
+     "name": "Falkbeer-tegengambiet",
+     "def": "het Falkbeer-tegengambiet"
+    },
+    "pt-BR": {
+     "name": "Contragambito Falkbeer",
+     "def": "o Contragambito Falkbeer",
+     "gender": "m"
+    }
    },
    "comment": {
     "advanced": "2...d5 strikes back in the centre instead of taking on f4; modern practice favours 3.exd5 with ...exf4 or ...e4 lines."
@@ -6457,8 +8332,14 @@
     "ar": "متغير {X}",
     "ja": "{X}・バリエーション",
     "zh-Hans": "{X}变例",
-    "zh-Hant": "{X}變例"
-   }
+    "zh-Hant": "{X}變例",
+    "id": "Varian {X}",
+    "nl": "{X}-variant",
+    "pt-BR": "Variante {X}"
+   },
+   "id": "varian",
+   "nl": "variant",
+   "pt-BR": "variante"
   },
   "Attack": {
    "en": "Attack",
@@ -6480,8 +8361,14 @@
     "ar": "هجوم {X}",
     "ja": "{X}・アタック",
     "zh-Hans": "{X}攻击",
-    "zh-Hant": "{X}攻擊"
-   }
+    "zh-Hant": "{X}攻擊",
+    "id": "Serangan {X}",
+    "nl": "{X}-aanval",
+    "pt-BR": "Ataque {X}"
+   },
+   "id": "serangan",
+   "nl": "aanval",
+   "pt-BR": "ataque"
   },
   "Gambit": {
    "en": "Gambit",
@@ -6503,8 +8390,14 @@
     "ar": "جامبيت {X}",
     "ja": "{X}・ギャンビット",
     "zh-Hans": "{X}弃兵",
-    "zh-Hant": "{X}棄兵"
-   }
+    "zh-Hant": "{X}棄兵",
+    "id": "Gambit {X}",
+    "nl": "{X}-gambiet",
+    "pt-BR": "Gambito {X}"
+   },
+   "id": "gambit",
+   "nl": "gambiet",
+   "pt-BR": "gambito"
   },
   "Defense": {
    "en": "Defense",
@@ -6526,8 +8419,14 @@
     "ar": "دفاع {X}",
     "ja": "{X}・ディフェンス",
     "zh-Hans": "{X}防御",
-    "zh-Hant": "{X}防禦"
-   }
+    "zh-Hant": "{X}防禦",
+    "id": "Pertahanan {X}",
+    "nl": "{X}-verdediging",
+    "pt-BR": "Defesa {X}"
+   },
+   "id": "pertahanan",
+   "nl": "verdediging",
+   "pt-BR": "defesa"
   },
   "System": {
    "en": "System",
@@ -6549,8 +8448,14 @@
     "ar": "نظام {X}",
     "ja": "{X}・システム",
     "zh-Hans": "{X}体系",
-    "zh-Hant": "{X}體系"
-   }
+    "zh-Hant": "{X}體系",
+    "id": "Sistem {X}",
+    "nl": "{X}-systeem",
+    "pt-BR": "Sistema {X}"
+   },
+   "id": "sistem",
+   "nl": "systeem",
+   "pt-BR": "sistema"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -6572,8 +8477,14 @@
     "ar": "جامبيت {X} المضاد",
     "ja": "{X}・カウンターギャンビット",
     "zh-Hans": "{X}反弃兵",
-    "zh-Hant": "{X}反棄兵"
-   }
+    "zh-Hant": "{X}反棄兵",
+    "id": "Gambit Balasan {X}",
+    "nl": "{X}-tegengambiet",
+    "pt-BR": "Contragambito {X}"
+   },
+   "id": "gambit balasan",
+   "nl": "tegengambiet",
+   "pt-BR": "contragambito"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -6595,8 +8506,14 @@
     "ar": "هجوم {X} المضاد",
     "ja": "{X}・カウンターアタック",
     "zh-Hans": "{X}反击",
-    "zh-Hant": "{X}反擊"
-   }
+    "zh-Hant": "{X}反擊",
+    "id": "Serangan Balik {X}",
+    "nl": "{X}-tegenaanval",
+    "pt-BR": "Contra-ataque {X}"
+   },
+   "id": "serangan balik",
+   "nl": "tegenaanval",
+   "pt-BR": "contra-ataque"
   },
   "Opening": {
    "en": "Opening",
@@ -6618,8 +8535,14 @@
     "ar": "افتتاح {X}",
     "ja": "{X}・オープニング",
     "zh-Hans": "{X}开局",
-    "zh-Hant": "{X}開局"
-   }
+    "zh-Hant": "{X}開局",
+    "id": "Pembukaan {X}",
+    "nl": "{X}-opening",
+    "pt-BR": "Abertura {X}"
+   },
+   "id": "pembukaan",
+   "nl": "opening",
+   "pt-BR": "abertura"
   },
   "Game": {
    "en": "Game",
@@ -6631,7 +8554,10 @@
    "ar": "افتتاح",
    "ja": "ゲーム",
    "zh-Hans": "开局",
-   "zh-Hant": "開局"
+   "zh-Hant": "開局",
+   "id": "permainan",
+   "nl": "partij",
+   "pt-BR": "abertura"
   },
   "Line": {
    "en": "Line",
@@ -6653,8 +8579,14 @@
     "ar": "خط {X}",
     "ja": "{X}・ライン",
     "zh-Hans": "{X}变着",
-    "zh-Hant": "{X}變著"
-   }
+    "zh-Hant": "{X}變著",
+    "id": "Jalur {X}",
+    "nl": "{X}-voortzetting",
+    "pt-BR": "Linha {X}"
+   },
+   "id": "jalur",
+   "nl": "voortzetting",
+   "pt-BR": "linha"
   },
   "Formation": {
    "en": "Formation",
@@ -6666,7 +8598,10 @@
    "ar": "تشكيل",
    "ja": "フォーメーション",
    "zh-Hans": "阵型",
-   "zh-Hant": "陣型"
+   "zh-Hant": "陣型",
+   "id": "formasi",
+   "nl": "opstelling",
+   "pt-BR": "formação"
   },
   "Trap": {
    "en": "Trap",
@@ -6688,8 +8623,14 @@
     "ar": "فخ {X}",
     "ja": "{X}・トラップ",
     "zh-Hans": "{X}陷阱",
-    "zh-Hant": "{X}陷阱"
-   }
+    "zh-Hant": "{X}陷阱",
+    "id": "Jebakan {X}",
+    "nl": "{X}-valstrik",
+    "pt-BR": "Armadilha {X}"
+   },
+   "id": "jebakan",
+   "nl": "valstrik",
+   "pt-BR": "armadilha"
   },
   "Accepted": {
    "en": "Accepted",
@@ -6701,7 +8642,10 @@
    "ar": "المقبول",
    "ja": "アクセプテッド",
    "zh-Hans": "接受",
-   "zh-Hant": "接受"
+   "zh-Hant": "接受",
+   "id": "diterima",
+   "nl": "aangenomen",
+   "pt-BR": "aceito"
   },
   "Declined": {
    "en": "Declined",
@@ -6713,7 +8657,10 @@
    "ar": "المرفوض",
    "ja": "ディクラインド",
    "zh-Hans": "拒",
-   "zh-Hant": "拒"
+   "zh-Hant": "拒",
+   "id": "ditolak",
+   "nl": "geweigerd",
+   "pt-BR": "recusado"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -6725,7 +8672,10 @@
    "ar": "متغير التبادل",
    "ja": "エクスチェンジ・バリエーション",
    "zh-Hans": "兑换变例",
-   "zh-Hant": "兌換變例"
+   "zh-Hant": "兌換變例",
+   "id": "Varian Pertukaran",
+   "nl": "ruilvariant",
+   "pt-BR": "Variante das Trocas"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -6737,7 +8687,10 @@
    "ar": "متغير التقدم",
    "ja": "アドバンス・バリエーション",
    "zh-Hans": "推进变例",
-   "zh-Hant": "推進變例"
+   "zh-Hant": "推進變例",
+   "id": "Varian Maju",
+   "nl": "doorschuifvariant",
+   "pt-BR": "Variante do Avanço"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -6749,7 +8702,10 @@
    "ar": "المتغير الكلاسيكي",
    "ja": "クラシカル・バリエーション",
    "zh-Hans": "古典变例",
-   "zh-Hant": "古典變例"
+   "zh-Hant": "古典變例",
+   "id": "Varian Klasik",
+   "nl": "klassieke variant",
+   "pt-BR": "Variante Clássica"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -6761,7 +8717,10 @@
    "ar": "المتغير الحديث",
    "ja": "モダン・バリエーション",
    "zh-Hans": "现代变例",
-   "zh-Hant": "現代變例"
+   "zh-Hant": "現代變例",
+   "id": "Varian Modern",
+   "nl": "moderne variant",
+   "pt-BR": "Variante Moderna"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -6773,7 +8732,10 @@
    "ar": "المتغير المفتوح",
    "ja": "オープン・バリエーション",
    "zh-Hans": "开放变例",
-   "zh-Hant": "開放變例"
+   "zh-Hant": "開放變例",
+   "id": "Varian Terbuka",
+   "nl": "open variant",
+   "pt-BR": "Variante Aberta"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -6785,7 +8747,10 @@
    "ar": "المتغير المغلق",
    "ja": "クローズド・バリエーション",
    "zh-Hans": "封闭变例",
-   "zh-Hant": "封閉變例"
+   "zh-Hant": "封閉變例",
+   "id": "Varian Tertutup",
+   "nl": "gesloten variant",
+   "pt-BR": "Variante Fechada"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -6797,7 +8762,10 @@
    "ar": "متغير الفيانكيتو",
    "ja": "フィアンケット・バリエーション",
    "zh-Hans": "侧翼出象变例",
-   "zh-Hant": "側翼出象變例"
+   "zh-Hant": "側翼出象變例",
+   "id": "Varian Fianchetto",
+   "nl": "fianchettovariant",
+   "pt-BR": "Variante do Fianqueto"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -6809,7 +8777,10 @@
    "ar": "المتغير المتماثل",
    "ja": "シンメトリカル・バリエーション",
    "zh-Hans": "对称变例",
-   "zh-Hant": "對稱變例"
+   "zh-Hant": "對稱變例",
+   "id": "Varian Simetris",
+   "nl": "symmetrische variant",
+   "pt-BR": "Variante Simétrica"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -6821,7 +8792,10 @@
    "ar": "الجامبيت الاسكتلندي",
    "ja": "スコッチ・ギャンビット",
    "zh-Hans": "苏格兰弃兵",
-   "zh-Hant": "蘇格蘭棄兵"
+   "zh-Hant": "蘇格蘭棄兵",
+   "id": "Gambit Skotlandia",
+   "nl": "Schots gambiet",
+   "pt-BR": "Gambito Escocês"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -6833,7 +8807,10 @@
    "ar": "المتغير الاسكتلندي",
    "ja": "スコッチ・バリエーション",
    "zh-Hans": "苏格兰变例",
-   "zh-Hant": "蘇格蘭變例"
+   "zh-Hant": "蘇格蘭變例",
+   "id": "Varian Skotlandia",
+   "nl": "Schotse variant",
+   "pt-BR": "Variante Escocesa"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -6845,7 +8822,10 @@
    "ar": "المتغير الدنماركي",
    "ja": "デニッシュ・バリエーション",
    "zh-Hans": "丹麦变例",
-   "zh-Hant": "丹麥變例"
+   "zh-Hant": "丹麥變例",
+   "id": "Varian Denmark",
+   "nl": "Deense variant",
+   "pt-BR": "Variante Dinamarquesa"
   },
   "Main Line": {
    "en": "Main Line",
@@ -6857,7 +8837,10 @@
    "ar": "الخط الرئيسي",
    "ja": "メインライン",
    "zh-Hans": "主线",
-   "zh-Hant": "主線"
+   "zh-Hant": "主線",
+   "id": "jalur utama",
+   "nl": "hoofdvariant",
+   "pt-BR": "linha principal"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -6869,7 +8852,10 @@
    "ar": "المعجّل",
    "ja": "アクセラレーテッド",
    "zh-Hans": "加速",
-   "zh-Hant": "加速"
+   "zh-Hant": "加速",
+   "id": "dipercepat",
+   "nl": "versneld",
+   "pt-BR": "acelerado"
   },
   "Deferred": {
    "en": "Deferred",
@@ -6881,7 +8867,10 @@
    "ar": "المؤجل",
    "ja": "ディファード",
    "zh-Hans": "延迟",
-   "zh-Hant": "延遲"
+   "zh-Hant": "延遲",
+   "id": "ditunda",
+   "nl": "uitgesteld",
+   "pt-BR": "adiado"
   },
   "Reversed": {
    "en": "Reversed",
@@ -6893,7 +8882,10 @@
    "ar": "المعكوس",
    "ja": "リバースド",
    "zh-Hans": "反",
-   "zh-Hant": "反"
+   "zh-Hant": "反",
+   "id": "dengan warna terbalik",
+   "nl": "met verwisselde kleuren",
+   "pt-BR": "invertido"
   }
  },
  "eponyms": {
@@ -6909,7 +8901,19 @@
    "ar": "شتاينيتز",
    "ja": "シュタイニッツ",
    "zh-Hans": "斯坦尼茨",
-   "zh-Hant": "斯坦尼茨"
+   "zh-Hant": "斯坦尼茨",
+   "id": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   },
+   "nl": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   },
+   "pt-BR": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   }
   },
   "Rubinstein": {
    "ru": {
@@ -6923,7 +8927,19 @@
    "ar": "روبنشتاين",
    "ja": "ルビンシュタイン",
    "zh-Hans": "鲁宾斯坦",
-   "zh-Hant": "魯賓斯坦"
+   "zh-Hant": "魯賓斯坦",
+   "id": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
+   },
+   "nl": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
+   },
+   "pt-BR": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
+   }
   },
   "Winawer": {
    "ru": {
@@ -6937,7 +8953,19 @@
    "ar": "فيناور",
    "ja": "ウィナワー",
    "zh-Hans": "维纳维尔",
-   "zh-Hant": "維納維爾"
+   "zh-Hant": "維納維爾",
+   "id": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   },
+   "nl": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   },
+   "pt-BR": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   }
   },
   "Evans": {
    "ru": {
@@ -6951,7 +8979,19 @@
    "ar": "إيفانز",
    "ja": "エバンス",
    "zh-Hans": "埃文斯",
-   "zh-Hant": "埃文斯"
+   "zh-Hant": "埃文斯",
+   "id": {
+    "nom": "Evans",
+    "gen": "Evans"
+   },
+   "nl": {
+    "nom": "Evans",
+    "gen": "Evans"
+   },
+   "pt-BR": {
+    "nom": "Evans",
+    "gen": "Evans"
+   }
   },
   "Chigorin": {
    "ru": {
@@ -6965,7 +9005,19 @@
    "ar": "تشيغورين",
    "ja": "チゴリン",
    "zh-Hans": "奇戈林",
-   "zh-Hant": "奇戈林"
+   "zh-Hant": "奇戈林",
+   "id": {
+    "nom": "Chigorin",
+    "gen": "Chigorin"
+   },
+   "nl": {
+    "nom": "Tsjigorin",
+    "gen": "Tsjigorin"
+   },
+   "pt-BR": {
+    "nom": "Tchigorin",
+    "gen": "Tchigorin"
+   }
   },
   "Morphy": {
    "ru": {
@@ -6979,7 +9031,19 @@
    "ar": "مورفي",
    "ja": "モーフィー",
    "zh-Hans": "莫菲",
-   "zh-Hant": "莫菲"
+   "zh-Hant": "莫菲",
+   "id": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "nl": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "pt-BR": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   }
   },
   "Tarrasch": {
    "ru": {
@@ -6993,7 +9057,19 @@
    "ar": "تاراش",
    "ja": "タラッシュ",
    "zh-Hans": "塔拉什",
-   "zh-Hant": "塔拉什"
+   "zh-Hant": "塔拉什",
+   "id": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
+   },
+   "nl": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
+   },
+   "pt-BR": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
+   }
   },
   "Alekhine": {
    "ru": {
@@ -7007,7 +9083,19 @@
    "ar": "أليخين",
    "ja": "アレヒン",
    "zh-Hans": "阿廖欣",
-   "zh-Hant": "阿廖欣"
+   "zh-Hant": "阿廖欣",
+   "id": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
+   },
+   "nl": {
+    "nom": "Aljechin",
+    "gen": "Aljechin"
+   },
+   "pt-BR": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
+   }
   },
   "Sämisch": {
    "ru": {
@@ -7021,7 +9109,19 @@
    "ar": "زيميش",
    "ja": "ゼーミッシュ",
    "zh-Hans": "塞米施",
-   "zh-Hant": "塞米施"
+   "zh-Hant": "塞米施",
+   "id": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   },
+   "nl": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   },
+   "pt-BR": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   }
   },
   "Nimzowitsch": {
    "ru": {
@@ -7035,7 +9135,19 @@
    "ar": "نيمزوفيتش",
    "ja": "ニムゾヴィッチ",
    "zh-Hans": "尼姆佐维奇",
-   "zh-Hant": "尼姆佐維奇"
+   "zh-Hant": "尼姆佐維奇",
+   "id": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
+   },
+   "nl": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
+   },
+   "pt-BR": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
+   }
   },
   "Najdorf": {
    "ru": {
@@ -7049,7 +9161,19 @@
    "ar": "نايدورف",
    "ja": "ナイドルフ",
    "zh-Hans": "纳道尔夫",
-   "zh-Hant": "納道爾夫"
+   "zh-Hant": "納道爾夫",
+   "id": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   },
+   "nl": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   },
+   "pt-BR": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   }
   },
   "Bogoljubow": {
    "ru": {
@@ -7063,7 +9187,19 @@
    "ar": "بوغوليوبوف",
    "ja": "ボゴリュボフ",
    "zh-Hans": "博戈柳博夫",
-   "zh-Hant": "博戈柳博夫"
+   "zh-Hant": "博戈柳博夫",
+   "id": {
+    "nom": "Bogoljubow",
+    "gen": "Bogoljubow"
+   },
+   "nl": {
+    "nom": "Bogoljoebov",
+    "gen": "Bogoljoebov"
+   },
+   "pt-BR": {
+    "nom": "Bogoljubow",
+    "gen": "Bogoljubow"
+   }
   },
   "Alapin": {
    "ru": {
@@ -7077,7 +9213,19 @@
    "ar": "ألابين",
    "ja": "アラピン",
    "zh-Hans": "阿拉平",
-   "zh-Hant": "阿拉平"
+   "zh-Hant": "阿拉平",
+   "id": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   },
+   "nl": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   },
+   "pt-BR": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   }
   },
   "Botvinnik": {
    "ru": {
@@ -7091,7 +9239,19 @@
    "ar": "بوتفينيك",
    "ja": "ボトヴィニク",
    "zh-Hans": "鲍特温尼克",
-   "zh-Hant": "鮑特溫尼克"
+   "zh-Hant": "鮑特溫尼克",
+   "id": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
+   },
+   "nl": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
+   },
+   "pt-BR": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
+   }
   },
   "Paulsen": {
    "ru": {
@@ -7105,7 +9265,19 @@
    "ar": "باولسن",
    "ja": "パウルセン",
    "zh-Hans": "保尔森",
-   "zh-Hant": "保爾森"
+   "zh-Hant": "保爾森",
+   "id": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   },
+   "nl": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   },
+   "pt-BR": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   }
   },
   "Marshall": {
    "ru": {
@@ -7119,7 +9291,19 @@
    "ar": "مارشال",
    "ja": "マーシャル",
    "zh-Hans": "马歇尔",
-   "zh-Hant": "馬歇爾"
+   "zh-Hant": "馬歇爾",
+   "id": {
+    "nom": "Marshall",
+    "gen": "Marshall"
+   },
+   "nl": {
+    "nom": "Marshall",
+    "gen": "Marshall"
+   },
+   "pt-BR": {
+    "nom": "Marshall",
+    "gen": "Marshall"
+   }
   },
   "Kieseritzky": {
    "ru": {
@@ -7133,7 +9317,19 @@
    "ar": "كيزيريتسكي",
    "ja": "キーゼリツキー",
    "zh-Hans": "基塞利茨基",
-   "zh-Hant": "基塞利茨基"
+   "zh-Hant": "基塞利茨基",
+   "id": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "nl": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "pt-BR": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   }
   },
   "Panov": {
    "ru": {
@@ -7147,7 +9343,19 @@
    "ar": "بانوف",
    "ja": "パノフ",
    "zh-Hans": "潘诺夫",
-   "zh-Hant": "潘諾夫"
+   "zh-Hant": "潘諾夫",
+   "id": {
+    "nom": "Panov",
+    "gen": "Panov"
+   },
+   "nl": {
+    "nom": "Panov",
+    "gen": "Panov"
+   },
+   "pt-BR": {
+    "nom": "Panov",
+    "gen": "Panov"
+   }
   },
   "Keres": {
    "ru": {
@@ -7161,7 +9369,19 @@
    "ar": "كيريس",
    "ja": "ケレス",
    "zh-Hans": "凯列斯",
-   "zh-Hant": "凱列斯"
+   "zh-Hant": "凱列斯",
+   "id": {
+    "nom": "Keres",
+    "gen": "Keres"
+   },
+   "nl": {
+    "nom": "Keres",
+    "gen": "Keres"
+   },
+   "pt-BR": {
+    "nom": "Keres",
+    "gen": "Keres"
+   }
   },
   "Tartakower": {
    "ru": {
@@ -7175,7 +9395,19 @@
    "ar": "تارتاكوفر",
    "ja": "タルタコワ",
    "zh-Hans": "塔塔科维",
-   "zh-Hant": "塔塔科維"
+   "zh-Hant": "塔塔科維",
+   "id": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
+   },
+   "nl": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
+   },
+   "pt-BR": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
+   }
   },
   "Maróczy": {
    "ru": {
@@ -7189,7 +9421,19 @@
    "ar": "ماروتشي",
    "ja": "マロッツィ",
    "zh-Hans": "马罗齐",
-   "zh-Hant": "馬羅齊"
+   "zh-Hant": "馬羅齊",
+   "id": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "nl": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "pt-BR": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   }
   },
   "Falkbeer": {
    "ru": {
@@ -7203,7 +9447,19 @@
    "ar": "فالكبير",
    "ja": "ファルクビア",
    "zh-Hans": "法尔克比尔",
-   "zh-Hant": "法爾克比爾"
+   "zh-Hant": "法爾克比爾",
+   "id": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
+   },
+   "nl": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
+   },
+   "pt-BR": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
+   }
   },
   "Scheveningen": {
    "ru": {
@@ -7217,7 +9473,19 @@
    "ar": "شيفينينغن",
    "ja": "シェベニンゲン",
    "zh-Hans": "舍维宁根",
-   "zh-Hant": "舍維寧根"
+   "zh-Hant": "舍維寧根",
+   "id": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   },
+   "nl": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   },
+   "pt-BR": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   }
   },
   "Richter-Rauzer": {
    "ru": {
@@ -7231,7 +9499,19 @@
    "ar": "ريختر-راوزر",
    "ja": "リヒター・ラウザー",
    "zh-Hans": "里希特-劳泽",
-   "zh-Hant": "里希特-勞澤"
+   "zh-Hant": "里希特-勞澤",
+   "id": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
+   },
+   "nl": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
+   },
+   "pt-BR": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
+   }
   },
   "Lasker": {
    "ru": {
@@ -7245,7 +9525,19 @@
    "ar": "لاسكر",
    "ja": "ラスカー",
    "zh-Hans": "拉斯克",
-   "zh-Hant": "拉斯克"
+   "zh-Hant": "拉斯克",
+   "id": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   },
+   "nl": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   },
+   "pt-BR": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   }
   },
   "Taimanov": {
    "ru": {
@@ -7259,7 +9551,19 @@
    "ar": "تايمانوف",
    "ja": "タイマノフ",
    "zh-Hans": "泰曼诺夫",
-   "zh-Hant": "泰曼諾夫"
+   "zh-Hant": "泰曼諾夫",
+   "id": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
+   },
+   "nl": {
+    "nom": "Tajmanov",
+    "gen": "Tajmanov"
+   },
+   "pt-BR": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
+   }
   },
   "Smyslov": {
    "ru": {
@@ -7273,7 +9577,19 @@
    "ar": "سميسلوف",
    "ja": "スミスロフ",
    "zh-Hans": "斯梅斯洛夫",
-   "zh-Hant": "斯梅斯洛夫"
+   "zh-Hant": "斯梅斯洛夫",
+   "id": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
+   },
+   "nl": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
+   },
+   "pt-BR": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
+   }
   },
   "Spassky": {
    "ru": {
@@ -7287,7 +9603,19 @@
    "ar": "سباسكي",
    "ja": "スパスキー",
    "zh-Hans": "斯帕斯基",
-   "zh-Hant": "斯帕斯基"
+   "zh-Hant": "斯帕斯基",
+   "id": {
+    "nom": "Spassky",
+    "gen": "Spassky"
+   },
+   "nl": {
+    "nom": "Spasski",
+    "gen": "Spasski"
+   },
+   "pt-BR": {
+    "nom": "Spassky",
+    "gen": "Spassky"
+   }
   },
   "Spielmann": {
    "ru": {
@@ -7301,7 +9629,19 @@
    "ar": "شبيلمان",
    "ja": "シュピールマン",
    "zh-Hans": "施皮尔曼",
-   "zh-Hant": "施皮爾曼"
+   "zh-Hant": "施皮爾曼",
+   "id": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   },
+   "nl": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   },
+   "pt-BR": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   }
   },
   "Averbakh": {
    "ru": {
@@ -7315,7 +9655,19 @@
    "ar": "أفرباخ",
    "ja": "アヴェルバッハ",
    "zh-Hans": "阿韦尔巴赫",
-   "zh-Hant": "阿韋爾巴赫"
+   "zh-Hant": "阿韋爾巴赫",
+   "id": {
+    "nom": "Averbakh",
+    "gen": "Averbakh"
+   },
+   "nl": {
+    "nom": "Averbach",
+    "gen": "Averbach"
+   },
+   "pt-BR": {
+    "nom": "Averbakh",
+    "gen": "Averbakh"
+   }
   },
   "Greco": {
    "ru": {
@@ -7329,7 +9681,19 @@
    "ar": "غريكو",
    "ja": "グレコ",
    "zh-Hans": "格雷科",
-   "zh-Hant": "格雷科"
+   "zh-Hant": "格雷科",
+   "id": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "nl": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "pt-BR": {
+    "nom": "Greco",
+    "gen": "Greco"
+   }
   },
   "Capablanca": {
    "ru": {
@@ -7343,7 +9707,19 @@
    "ar": "كابابلانكا",
    "ja": "カパブランカ",
    "zh-Hans": "卡帕布兰卡",
-   "zh-Hant": "卡帕布蘭卡"
+   "zh-Hant": "卡帕布蘭卡",
+   "id": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   },
+   "nl": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   },
+   "pt-BR": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
+   }
   },
   "Kan": {
    "ru": {
@@ -7357,7 +9733,19 @@
    "ar": "كان",
    "ja": "カン",
    "zh-Hans": "坎恩",
-   "zh-Hant": "坎恩"
+   "zh-Hant": "坎恩",
+   "id": {
+    "nom": "Kan",
+    "gen": "Kan"
+   },
+   "nl": {
+    "nom": "Kan",
+    "gen": "Kan"
+   },
+   "pt-BR": {
+    "nom": "Kan",
+    "gen": "Kan"
+   }
   },
   "Albin": {
    "ru": {
@@ -7371,7 +9759,19 @@
    "ar": "ألبين",
    "ja": "アルビン",
    "zh-Hans": "阿尔宾",
-   "zh-Hant": "阿爾賓"
+   "zh-Hant": "阿爾賓",
+   "id": {
+    "nom": "Albin",
+    "gen": "Albin"
+   },
+   "nl": {
+    "nom": "Albin",
+    "gen": "Albin"
+   },
+   "pt-BR": {
+    "nom": "Albin",
+    "gen": "Albin"
+   }
   },
   "Breyer": {
    "ru": {
@@ -7385,7 +9785,19 @@
    "ar": "براير",
    "ja": "ブレイヤー",
    "zh-Hans": "布雷耶",
-   "zh-Hant": "布雷耶"
+   "zh-Hant": "布雷耶",
+   "id": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   },
+   "nl": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   },
+   "pt-BR": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   }
   },
   "Schlechter": {
    "ru": {
@@ -7399,7 +9811,19 @@
    "ar": "شليختر",
    "ja": "シュレヒター",
    "zh-Hans": "施莱希特",
-   "zh-Hant": "施萊希特"
+   "zh-Hant": "施萊希特",
+   "id": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
+   },
+   "nl": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
+   },
+   "pt-BR": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
+   }
   },
   "Jaenisch": {
    "ru": {
@@ -7413,7 +9837,19 @@
    "ar": "يانيش",
    "ja": "ヤーニッシュ",
    "zh-Hans": "雅尼施",
-   "zh-Hant": "雅尼施"
+   "zh-Hant": "雅尼施",
+   "id": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   },
+   "nl": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   },
+   "pt-BR": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   }
   },
   "Karpov": {
    "ru": {
@@ -7427,7 +9863,19 @@
    "ar": "كاربوف",
    "ja": "カルポフ",
    "zh-Hans": "卡尔波夫",
-   "zh-Hant": "卡爾波夫"
+   "zh-Hant": "卡爾波夫",
+   "id": {
+    "nom": "Karpov",
+    "gen": "Karpov"
+   },
+   "nl": {
+    "nom": "Karpov",
+    "gen": "Karpov"
+   },
+   "pt-BR": {
+    "nom": "Karpov",
+    "gen": "Karpov"
+   }
   },
   "Petrosian": {
    "ru": {
@@ -7441,7 +9889,19 @@
    "ar": "بتروسيان",
    "ja": "ペトロシアン",
    "zh-Hans": "彼得罗相",
-   "zh-Hant": "彼得羅相"
+   "zh-Hant": "彼得羅相",
+   "id": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
+   },
+   "nl": {
+    "nom": "Petrosjan",
+    "gen": "Petrosjan"
+   },
+   "pt-BR": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
+   }
   },
   "Euwe": {
    "ru": {
@@ -7455,7 +9915,19 @@
    "ar": "أويفه",
    "ja": "ユーウェ",
    "zh-Hans": "尤伟",
-   "zh-Hant": "尤偉"
+   "zh-Hant": "尤偉",
+   "id": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "nl": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "pt-BR": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   }
   },
   "Sozin": {
    "ru": {
@@ -7469,7 +9941,19 @@
    "ar": "سوزين",
    "ja": "ソージン",
    "zh-Hans": "索津",
-   "zh-Hant": "索津"
+   "zh-Hant": "索津",
+   "id": {
+    "nom": "Sozin",
+    "gen": "Sozin"
+   },
+   "nl": {
+    "nom": "Sozin",
+    "gen": "Sozin"
+   },
+   "pt-BR": {
+    "nom": "Sozin",
+    "gen": "Sozin"
+   }
   },
   "Schliemann": {
    "ru": {
@@ -7483,7 +9967,19 @@
    "ar": "شليمان",
    "ja": "シュリーマン",
    "zh-Hans": "施利曼",
-   "zh-Hant": "施利曼"
+   "zh-Hant": "施利曼",
+   "id": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   },
+   "nl": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   },
+   "pt-BR": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   }
   },
   "Anderssen": {
    "ru": {
@@ -7497,7 +9993,19 @@
    "ar": "أندرسن",
    "ja": "アンデルセン",
    "zh-Hans": "安德森",
-   "zh-Hant": "安德森"
+   "zh-Hant": "安德森",
+   "id": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
+   },
+   "nl": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
+   },
+   "pt-BR": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
+   }
   },
   "Philidor": {
    "ru": {
@@ -7511,7 +10019,19 @@
    "ar": "فيليدور",
    "ja": "フィリドール",
    "zh-Hans": "菲利多尔",
-   "zh-Hant": "菲利多爾"
+   "zh-Hant": "菲利多爾",
+   "id": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   },
+   "nl": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   },
+   "pt-BR": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   }
   },
   "Zaitsev": {
    "ru": {
@@ -7525,7 +10045,19 @@
    "ar": "زايتسيف",
    "ja": "ザイツェフ",
    "zh-Hans": "扎伊采夫",
-   "zh-Hant": "扎伊采夫"
+   "zh-Hant": "扎伊采夫",
+   "id": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsev"
+   },
+   "nl": {
+    "nom": "Zajtsev",
+    "gen": "Zajtsev"
+   },
+   "pt-BR": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsev"
+   }
   },
   "Sveshnikov": {
    "ru": {
@@ -7539,7 +10071,19 @@
    "ar": "سفيشنيكوف",
    "ja": "スヴェシニコフ",
    "zh-Hans": "斯维什尼科夫",
-   "zh-Hant": "斯維什尼科夫"
+   "zh-Hant": "斯維什尼科夫",
+   "id": {
+    "nom": "Sveshnikov",
+    "gen": "Sveshnikov"
+   },
+   "nl": {
+    "nom": "Svesjnikov",
+    "gen": "Svesjnikov"
+   },
+   "pt-BR": {
+    "nom": "Sveshnikov",
+    "gen": "Sveshnikov"
+   }
   },
   "Kasparov": {
    "ru": {
@@ -7553,7 +10097,19 @@
    "ar": "كاسباروف",
    "ja": "カスパロフ",
    "zh-Hans": "卡斯帕罗夫",
-   "zh-Hant": "卡斯帕羅夫"
+   "zh-Hant": "卡斯帕羅夫",
+   "id": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
+   },
+   "nl": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
+   },
+   "pt-BR": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
+   }
   },
   "Fischer": {
    "ru": {
@@ -7567,7 +10123,19 @@
    "ar": "فيشر",
    "ja": "フィッシャー",
    "zh-Hans": "菲舍尔",
-   "zh-Hant": "菲舍爾"
+   "zh-Hant": "菲舍爾",
+   "id": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   },
+   "nl": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   },
+   "pt-BR": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   }
   },
   "Tal": {
    "ru": {
@@ -7581,7 +10149,19 @@
    "ar": "تال",
    "ja": "タリ",
    "zh-Hans": "塔尔",
-   "zh-Hant": "塔爾"
+   "zh-Hant": "塔爾",
+   "id": {
+    "nom": "Tal",
+    "gen": "Tal"
+   },
+   "nl": {
+    "nom": "Tal",
+    "gen": "Tal"
+   },
+   "pt-BR": {
+    "nom": "Tal",
+    "gen": "Tal"
+   }
   },
   "McCutcheon": {
    "ru": {
@@ -7595,7 +10175,19 @@
    "ar": "ماكاتشين",
    "ja": "マカッチョン",
    "zh-Hans": "麦卡琴",
-   "zh-Hant": "麥卡琴"
+   "zh-Hant": "麥卡琴",
+   "id": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   },
+   "nl": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   },
+   "pt-BR": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   }
   },
   "Bronstein": {
    "ru": {
@@ -7609,7 +10201,19 @@
    "ar": "برونشتاين",
    "ja": "ブロンシュタイン",
    "zh-Hans": "布龙斯坦",
-   "zh-Hant": "布龍斯坦"
+   "zh-Hant": "布龍斯坦",
+   "id": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
+   },
+   "nl": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
+   },
+   "pt-BR": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
+   }
   },
   "Janowski": {
    "ru": {
@@ -7623,7 +10227,19 @@
    "ar": "يانوفسكي",
    "ja": "ヤノフスキー",
    "zh-Hans": "亚诺夫斯基",
-   "zh-Hant": "亞諾夫斯基"
+   "zh-Hant": "亞諾夫斯基",
+   "id": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "nl": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "pt-BR": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   }
   },
   "Staunton": {
    "ru": {
@@ -7637,7 +10253,19 @@
    "ar": "ستونتون",
    "ja": "スタントン",
    "zh-Hans": "斯汤顿",
-   "zh-Hant": "斯湯頓"
+   "zh-Hant": "斯湯頓",
+   "id": {
+    "nom": "Staunton",
+    "gen": "Staunton"
+   },
+   "nl": {
+    "nom": "Staunton",
+    "gen": "Staunton"
+   },
+   "pt-BR": {
+    "nom": "Staunton",
+    "gen": "Staunton"
+   }
   },
   "Max Lange": {
    "ru": {
@@ -7651,7 +10279,19 @@
    "ar": "ماكس لانغه",
    "ja": "マックス・ランゲ",
    "zh-Hans": "马克斯·朗格",
-   "zh-Hant": "馬克斯·朗格"
+   "zh-Hant": "馬克斯·朗格",
+   "id": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "nl": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "pt-BR": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   }
   },
   "Petrov": {
    "ru": {
@@ -7665,7 +10305,19 @@
    "ar": "بتروف",
    "ja": "ペトロフ",
    "zh-Hans": "彼得罗夫",
-   "zh-Hant": "彼得羅夫"
+   "zh-Hant": "彼得羅夫",
+   "id": {
+    "nom": "Petrov",
+    "gen": "Petrov"
+   },
+   "nl": {
+    "nom": "Petrov",
+    "gen": "Petrov"
+   },
+   "pt-BR": {
+    "nom": "Petrov",
+    "gen": "Petrov"
+   }
   },
   "Grünfeld": {
    "ru": {
@@ -7679,7 +10331,19 @@
    "ar": "غرونفيلد",
    "ja": "グリュンフェルト",
    "zh-Hans": "格林菲尔德",
-   "zh-Hant": "格林菲爾德"
+   "zh-Hant": "格林菲爾德",
+   "id": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   },
+   "nl": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   },
+   "pt-BR": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   }
   },
   "Colle": {
    "ru": {
@@ -7693,7 +10357,19 @@
    "ar": "كولي",
    "ja": "コール",
    "zh-Hans": "科勒",
-   "zh-Hant": "科勒"
+   "zh-Hant": "科勒",
+   "id": {
+    "nom": "Colle",
+    "gen": "Colle"
+   },
+   "nl": {
+    "nom": "Colle",
+    "gen": "Colle"
+   },
+   "pt-BR": {
+    "nom": "Colle",
+    "gen": "Colle"
+   }
   },
   "Torre": {
    "ru": {
@@ -7707,7 +10383,19 @@
    "ar": "توري",
    "ja": "トーレ",
    "zh-Hans": "托雷",
-   "zh-Hant": "托雷"
+   "zh-Hant": "托雷",
+   "id": {
+    "nom": "Torre",
+    "gen": "Torre"
+   },
+   "nl": {
+    "nom": "Torre",
+    "gen": "Torre"
+   },
+   "pt-BR": {
+    "nom": "Torre",
+    "gen": "Torre"
+   }
   },
   "Réti": {
    "ru": {
@@ -7721,7 +10409,19 @@
    "ar": "ريتي",
    "ja": "レティ",
    "zh-Hans": "列蒂",
-   "zh-Hant": "列蒂"
+   "zh-Hant": "列蒂",
+   "id": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "nl": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "pt-BR": {
+    "nom": "Réti",
+    "gen": "Réti"
+   }
   }
  },
  "ignore_components": [
@@ -7735,5 +10435,19 @@
   "Rare Defenses",
   "Traditional Line",
   "Old Variation"
- ]
+ ],
+ "lang_options": {
+  "id": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?:[Ll]ajur|[Pp]ion) (?P<f>[a-h])\\b"
+  },
+  "nl": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?P<f>[a-h])-(?:lijn|lijnen|pion|pionnen)\\b"
+  },
+  "pt-BR": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?:[Cc]olunas?|[Pp]eão|[Pp]eões) (?P<f>[a-h])(?!\\w)"
+  }
+ }
 }
