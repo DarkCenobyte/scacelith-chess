@@ -158,11 +158,11 @@ ex.hint.gain.b2 = {your} có một nước hay hơn. Nước đó ăn được q
 ex.hint.gain.b2.2 = {your} có một nước giúp bạn ăn được quân.
 ex.hint.gain.b3 = {your} có một nước hay hơn, một nước ăn được quân.
 ex.hint.gain.b3.2 = {your} có một nước giúp bạn ăn được quân.
-ex.hint.gain.b4 = {your} có một nước giúp giành lợi thế lực lượng.
-ex.hint.gain.b4.2 = Hãy nhìn lại {your}: nó có một nước giúp giành lợi thế lực lượng.
-ex.hint.gain.b5 = {your} có một nước mạnh hơn, một nước giành lợi thế lực lượng.
-ex.hint.gain.b5.2 = {your} có một nước giúp giành lợi thế lực lượng.
-ex.hint.gain.b6 = {your:short} có một nước giành lợi thế lực lượng.
+ex.hint.gain.b4 = {your} có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b4.2 = Hãy nhìn lại {your}: nó có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b5 = {your} có một nước mạnh hơn, giành được lợi thế lực lượng.
+ex.hint.gain.b5.2 = Với {your}, có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b6 = {your:short} có nước giành lợi thế lực lượng.
 ex.hint.gain.b6.2 = Xem lại {your}: đã có quân để ăn.
 # Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
 # when none can be made); levels 3-6 say ex.better.
