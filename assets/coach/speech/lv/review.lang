@@ -347,7 +347,7 @@ name.pattern.epaulette = epoletu mats
 
 # ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
 ex.mate_missed.b1 = Ar gājienu {best:nomate} tu varēji pieteikt matu {my:dat}!
-ex.mate_missed.b1.2 = {best:nomate} bija mats! {my} nevarētu aizbēgt.
+ex.mate_missed.b1.2 = {best:nomate} bija mats! {my} nebūtu varēj{my:is} aizbēgt.
 ex.mate_missed.b1.3 = Skaties! Pēc {best:nomate} {my:dat} būtu mats.
 ex.mate_missed.b2 = Tev bija mats {m:move_loc}, sākot ar {best:nomate}.
 ex.mate_missed.b2.2 = Ar {best:nomate} bija mats {m:move_loc}!
@@ -425,7 +425,7 @@ ex.fork.b6 = {reply} ar dakšu.
 ex.fork.b6.2 = {move} pieļauj {reply}, dakšu.
 ex.fork.b6.3 = {reply}, dakša.
 # Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
-ex.fork.tail.b1 = Tu vari izglābt tikai vienu figūru: {t1:acc} vai {t2:acc}.
+ex.fork.tail.b1 = Izglābt var tikai vienu figūru: {t1:acc} vai {t2:acc}.
 ex.fork.tail.b1.2 = Tagad es uzbrūku divām figūrām uzreiz: {t1:dat} un {t2:dat}. Tā ir dakša!
 ex.fork.tail.b1.3 = Redzi? Es uzbrūku gan {t1:dat}, gan {t2:dat}. Viena figūra kritīs.
 # The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
@@ -462,7 +462,7 @@ ex.skewer.b1.2 = Skaties: {my} uzbrūk {t1:dat}, un tieši aiz {t1:pron_gen} st�
 ex.skewer.b1.3 = {my} uzbrūk {t1:dat}. {t1:pron_dat} jāaiziet, un tad {t2} krīt.
 ex.skewer.b2 = Iesms: {my} uzbrūk {t1:dat}, un aiz {t1:pron_gen} stāv {t2}.
 ex.skewer.b2.2 = {my} uzbrūk {t1:dat} un {t2:dat} pa vienu līniju. Kad pirmā figūra aiziet, es paņemu otro.
-ex.skewer.b2.3 = Uzmanīgi: {t1} un {t2} stāv vienā līnijā. {my} var tām uzbrukt ar iesmu.
+ex.skewer.b2.3 = Uzmanīgi: {t1} un {t2} stāv vienā līnijā. {my} var uzbrukt abām figūrām ar iesmu.
 ex.skewer.b3 = {reply}: iesms pret {t1:acc} un {t2:acc}.
 ex.skewer.b3.2 = Pēc {reply} {t1:dat} jāaiziet, un {t2} krīt.
 ex.skewer.b3.3 = {move} pieļauj {reply}: iesmu pret {t1:acc} un {t2:acc}.
@@ -524,7 +524,7 @@ ex.trapped.b5 = {your} beigās ir ieslēgt{your:adj}: {line}.
 ex.trapped.b5.2 = {move} atstāj {your:acc} bez izejas.
 ex.trapped.b6 = {your} ir ieslēgt{your:adj}.
 ex.trapped.b6.2 = {line} ieslēdz {your:acc}.
-ex.trapped.tip.b1 = Pirms pārvieto figūru, pārbaudi, vai tā var tikt atpakaļ.
+ex.trapped.tip.b1 = Pirms tu pārvieto figūru, pārbaudi, vai tā varēs atgriezties.
 ex.trapped.tip.b1.2 = Figūras dziļi manā nometnē var iesprūst. Atstāj tām atkāpšanās ceļu.
 
 # ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
@@ -603,7 +603,7 @@ ex.exchange_capture.b5.2 = Uz {sq} {your} ir zaudēt{your:adj}: {line}.
 ex.exchange_capture.b6 = {move} zaudē {your:acc} uz {sq} pēc {line}.
 ex.exchange_capture.b6.2 = {line} uz {sq}, un {your} ir zaudēt{your:adj}.
 # Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
-ex.exchange_count.b1 = Saskaiti: es uzbrūku lauciņam {sq} {n:time_acc}, tu to aizsargā {n2:time_acc}.
+ex.exchange_count.b1 = Saskaiti: es {n:time_acc} uzbrūku lauciņam {sq}, tu to aizsargā {n2:time_acc}.
 ex.exchange_count.b1.2 = Lauciņam {sq} es uzbrūku ar {n:piece_pacc}, bet tu to aizsargā ar {n2:piece_pacc}. Šo cīņu es uzvaru.
 ex.exchange_count.b2 = Lauciņam {sq} es uzbrūku {n:time_acc}, bet tu to aizsargā {n2:time_acc}. Tur tu zaudēsi materiālu.
 ex.exchange_count.b2.2 = Saskaiti spēkus pie lauciņa {sq}: {n:attacker} pret {n2:defender_pacc}.
@@ -611,7 +611,7 @@ ex.exchange_count.b3 = Saskaiti uzbrucējus un aizsargus pie lauciņa {sq}: man 
 ex.exchange_count.b3.2 = Maiņa uz {sq} neder: pēc {line} tev ir par {pts:point_pacc} mazāk.
 ex.exchange_count.b4 = {move} ir kļūdains aprēķins uz {sq}: {line}, un tev ir par {pts:point_pacc} mazāk.
 ex.exchange_count.b4.2 = Lauciņam {sq} ir vairāk uzbrucēju nekā aizsargu: {line}.
-ex.exchange_count.b5 = Uz {sq} {n:attacker} pārspēj {n2:defender_acc}: {line}.
+ex.exchange_count.b5 = {n:attacker} pārspēj {n2:defender_acc} uz {sq}: {line}.
 ex.exchange_count.b5.2 = Pēc {move} spēku samērs uz {sq} nav tavā labā.
 ex.exchange_count.b6 = {line} uz {sq}, un es esmu ieguvis {pts:point_acc}.
 ex.exchange_count.b6.2 = {sq}: uzbrucēji {n}, aizsargi {n2}.
@@ -719,11 +719,11 @@ ex.king_shield.b2 = Bandinieka gājiens no {sq} vājina {your:gen} aizsardzību.
 ex.king_shield.b2.2 = {your} zaudēja sargu: bandinieks uz {sq} bija {your:pron_gen} vairogs.
 ex.king_shield.b3 = Šis bandinieka gājiens atklāj {your:acc} manam uzbrukumam.
 ex.king_shield.b3.2 = {your} zaudē savu bandinieku aizsegu, un manas figūras ielaužas.
-ex.king_shield.b4 = {move} vājina bandiniekus ap {your:acc}; mans uzbrukums izlaužas cauri.
+ex.king_shield.b4 = {move} vājina bandinieku aizsegu ap {your:acc}; mans uzbrukums izlaužas cauri.
 ex.king_shield.b4.2 = Pēc {move} {your:gen} vairogs ir sagrauts.
 ex.king_shield.b5 = {move} vājina {your:gen} aizsegu: {line}.
 ex.king_shield.b5.2 = Pēc {move} {your} ir atklāt{your:adj}: {line}.
-ex.king_shield.b6 = {move} vājina {your:acc}: {line}.
+ex.king_shield.b6 = {move} vājina {your:gen} aizsardzību: {line}.
 ex.king_shield.b6.2 = {line}; {your} ir pārāk atklāt{your:adj}.
 # The king is exposed (in the centre, walking out, many attackers).
 ex.king_exposed.b1 = {your} ir briesmās. Manas figūras nāk {your:pron_dat} virsū.

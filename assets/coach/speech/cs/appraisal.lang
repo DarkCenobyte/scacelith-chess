@@ -1,0 +1,165 @@
+# Coach speech (Czech): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ty"; the player's gender is unknown: no
+# second-person past tense or conditional ("vyhrál jsi", "našel jsi", "mohl bys", "abys procvičil"),
+# no adjective agreeing with the player ("připravený"). Instead: nouns ("výhra", "tvoje pozice"),
+# impersonal forms ("podařilo se ti", "neušlo ti", "bylo to vyhrané"), the present or future tense,
+# or "we" ("hráli jsme", "vrátili jsme": masculine plural, the coach being male).
+# Move numbers come after the noun, cardinal (glossary): "v tahu {n}", "do tahu {crit_no}", "tah {n}".
+# A move ({move}, {crit_best} ...) is spoken as its piece ("dáma dé osm"), so a verb or a case never
+# hangs on it: the noun "tah" carries them ("tah {move} získal", "místo tahu {crit_move}"), or the
+# line is verbless or in the present tense ("{move} v tahu {n} získává materiál").
+# Accuracy: "{acc:percent}" = "85 %" (spoken "pětaosmdesát procent"), count.percent in common.lang.
+# Names inserted by {text}, {theme}, {level}:
+#   appraisal.phase.*   nominatives: "zahájení" (n), "střední hra" (f), "koncovka" (f); the other
+#                       cases, "{text:in}" ("ve střední hře") and "{text:past}" are in common.lang.
+#   appraisal.reason.*  an adverbial right after "remíza" ("Remíza dohodou.", "Remíza, a to patem.").
+#   theme.*             an infinitive phrase, lower case, no full stop, "svůj" for the player's own
+#                       pieces; said after a colon or after "je důležité" (never after "snaž se":
+#                       "snaž se dívat se").
+#   appraisal.level.*   the level names of the coach page (coach.level.N.name), said inside „…“
+#                       after "úroveň": "na úroveň „Začátečník“".
+# {opening:def} is the opening's name as used inside a sentence (lower-case nominative, from the
+# opening texts), always after a colon; "{opening}" alone at the start of a line.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = zahájení
+appraisal.phase.middlegame = střední hra
+appraisal.phase.endgame = koncovka
+appraisal.reason.stalemate = patem
+appraisal.reason.material = pro nedostatek materiálu
+appraisal.reason.repetition = opakováním pozice
+appraisal.reason.fifty = podle pravidla padesáti tahů
+appraisal.reason.agreement = dohodou
+appraisal.reason.other = podle pravidel
+appraisal.level.l1 = První kroky
+appraisal.level.l2 = Začátečník
+appraisal.level.l3 = Mírně pokročilý
+appraisal.level.l4 = Klubový hráč
+appraisal.level.l5 = Silný klubový hráč
+appraisal.level.l6 = Expert
+# What to practise, after "Tip na příště:" and similar (an infinitive phrase, no full stop).
+theme.general = dívat se na celou šachovnici, než táhneš
+theme.mate_allowed = před každým tahem kontrolovat bezpečnost svého krále
+theme.mate_missed = hledat maty, nejdřív mezi šachy
+theme.stalemate = nechávat mému králi volné pole, když vyhráváš
+theme.fork = dávat pozor na dvojné útoky
+theme.discovered = dávat pozor na skryté útoky za mými figurami
+theme.skewer = nestavět cenné figury na stejnou linii
+theme.pin = všímat si vazeb dřív, než vzniknou
+theme.trapped = nechávat svým figurám únikovou cestu
+theme.back_rank = udělat svému králi okénko
+theme.hanging = mít své figury kryté
+theme.exchange = před výměnou počítat útočníky a obránce
+theme.missed_capture = nejdřív hledat, co se dá vzít zadarmo
+theme.missed_fork = hledat vlastní dvojné útoky
+theme.promotion = počítat závody pěšců a pamatovat na pravidlo čtverce
+theme.king_safety = držet svého krále v bezpečí za jeho pěšci
+theme.bad_trade = vybírat, které figury vyměnit
+theme.opening = vyvíjet své figury a brzy udělat rošádu
+theme.endgame = zapojovat do hry svého krále a posouvat volné pěšce
+theme.positional = zlepšovat svou nejhorší figuru
+theme.material = před tahem kontrolovat, co můžou získat moje další tahy
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Mat! Je to tvoje výhra. Výborně zahráno!
+appraisal.open.win.b1.2 = Vyhráno! Skvělé, že se ti podařilo partii dotáhnout až do konce.
+appraisal.open.win.b1.3 = Tentokrát jsem prohrál já! Byla to opravdu dobrá partie.
+appraisal.open.win.b2 = Dobře zahráno! Výhra za {moves:move}.
+appraisal.open.win.b2.2 = Gratuluju k výhře!
+appraisal.open.win.b2.3 = Výhra za {moves:move}. Pěkná práce!
+appraisal.open.win.b3 = Gratuluju, zasloužená výhra.
+appraisal.open.win.b3.2 = Dobře zahráno. Tahle výhra ti právem patří.
+appraisal.open.win.b3.3 = Pěkná výhra. Gratuluju.
+appraisal.open.win.b4 = Pěkná výhra.
+appraisal.open.win.b4.2 = Dobře zahráno, zasloužená výhra.
+appraisal.open.win.b4.3 = Dobrá výhra.
+appraisal.open.win.b5 = Dobře zahráno.
+appraisal.open.win.b5.2 = Pěkně vyhráno.
+appraisal.open.win.b5.3 = Dobrá partie, pěkně vyhraná.
+appraisal.open.win.b6 = Dobře zahráno.
+appraisal.open.win.b6.2 = Zasloužená výhra.
+appraisal.open.win.b6.3 = Dobrá partie.
+appraisal.open.draw.b1 = Remíza! Tuhle partii nikdo vyhrát nedokázal.
+appraisal.open.draw.b1.2 = Je to remíza. Byla to vyrovnaná partie!
+appraisal.open.draw.b1.3 = Remíza: bod si dělíme. Dobře zahráno!
+appraisal.open.draw.b2 = Remíza: spravedlivý výsledek.
+appraisal.open.draw.b2.2 = Remizovali jsme. Dobrý boj!
+appraisal.open.draw.b2.3 = Remíza, a k tomu dobrá partie.
+appraisal.open.draw.b3 = Remíza. Šance měly obě strany.
+appraisal.open.draw.b3.2 = Spravedlivá remíza.
+appraisal.open.draw.b3.3 = Remíza {text}. Dobrý boj.
+appraisal.open.draw.b4 = Remíza {text}.
+appraisal.open.draw.b4.2 = Výsledek: remíza {text}.
+appraisal.open.draw.b4.3 = Remíza, a to {text}.
+appraisal.open.draw.b5 = Remíza.
+appraisal.open.draw.b5.2 = Remíza {text}.
+appraisal.open.draw.b5.3 = Je to remíza.
+appraisal.open.draw.b6 = Remíza.
+appraisal.open.draw.b6.2 = Remíza {text}.
+appraisal.open.draw.b6.3 = Výsledek: remíza.
+appraisal.open.stalemate.b1 = Remíza patem: bylo to tak blízko! Příště nech mému králi volné pole.
+appraisal.open.stalemate.b1.2 = Pat, takže remíza. Výhra už byla skoro tvoje!
+appraisal.open.stalemate.b2 = Remíza patem. K výhře chybělo tak málo!
+appraisal.open.stalemate.b2.2 = Pat: remíza, i když tvoje pozice byla vyhraná.
+appraisal.open.stalemate.b3 = Remíza patem, a to z vyhrané pozice.
+appraisal.open.stalemate.b3.2 = Pat. Výhra unikla až úplně na konci.
+appraisal.open.stalemate.b4 = Remíza patem.
+appraisal.open.stalemate.b4.2 = Pat: remíza.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remíza, a to patem.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remíza, pat.
+appraisal.open.loss.b1 = Tentokrát jsem vyhrál já, ale některé tvoje tahy byly opravdu dobré.
+appraisal.open.loss.b1.2 = Dobrá partie! Dalo mi to pořádnou práci.
+appraisal.open.loss.b1.3 = To byla zábava! Tuhle jsem vyhrál já, ale učíš se rychle.
+appraisal.open.loss.b2 = Dobrá partie! Podívejme se na to, co se povedlo, a na jednu věc, kterou můžeš zkusit.
+appraisal.open.loss.b2.2 = Díky za partii! Některé tvoje nápady byly dobré.
+appraisal.open.loss.b2.3 = Dobrá partie. Podívejme se, co se z ní můžeme naučit.
+appraisal.open.loss.b3 = Dobrá partie.
+appraisal.open.loss.b3.2 = Díky za partii.
+appraisal.open.loss.b3.3 = Dobrá partie. Pojďme se na ni podívat.
+appraisal.open.loss_close.b3 = Dobrý boj. Partie byla dlouho vyrovnaná.
+appraisal.open.loss_close.b3.2 = Dobrý boj: dlouho to bylo v rovnováze.
+appraisal.open.loss.b4 = Dobrá partie. Ukážu ti, co rozhodlo.
+appraisal.open.loss.b4.2 = Dobrá partie. Rozhodl jeden okamžik.
+appraisal.open.loss.b4.3 = Díky za partii. Podívejme se, kde se zlomila.
+appraisal.open.loss_close.b4 = Dlouho vyrovnaný boj. Ukážu ti, co rozhodlo.
+appraisal.open.loss_close.b4.2 = Dobrá partie, dlouho vyrovnaná.
+appraisal.open.loss.b5 = Dobrá partie.
+appraisal.open.loss.b5.2 = Díky za partii.
+appraisal.open.loss.b5.3 = Dobrý boj.
+appraisal.open.loss.b6 = Dobrá partie.
+appraisal.open.loss.b6.2 = Díky za partii.
+appraisal.open.loss.b6.3 = Dobrý boj.
+appraisal.open.resigned.b1 = Vzdát se k šachům patří a chce to odvahu. Dobrá partie!
+appraisal.open.resigned.b1.2 = To nevadí. Vědět, kdy se vzdát, k šachům taky patří.
+appraisal.open.resigned.b2 = Vzdát se k šachům patří a chce to odvahu.
+appraisal.open.resigned.b2.2 = Rozumím. I vzdát se chce odvahu.
+appraisal.open.resigned.b3 = Vzdát se k šachům patří. Dobrá partie.
+appraisal.open.resigned.b3.2 = Rozumím. Díky za partii.
+appraisal.open.resigned.b4 = Dobrá partie.
+appraisal.open.resigned.b4.2 = Díky za partii.
+appraisal.open.resigned.b5 = Dobrá partie.
+appraisal.open.resigned.b5.2 = Díky za partii.
+appraisal.open.resigned.b6 = Dobrá partie.
+appraisal.open.resigned.b6.2 = Díky.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Víš, ještě nebyl konec: zhruba {eval}.
+appraisal.resign_early.b3.2 = Ve skutečnosti ti ještě zbývaly šance: zhruba {eval}.
+appraisal.resign_early.b4 = Ještě nebyl konec: zhruba {eval}.
+appraisal.resign_early.b4.2 = Ještě se dalo hrát: zhruba {eval}.
+appraisal.resign_early.b5 = Nebylo rozhodnuto: {eval}.
+appraisal.resign_early.b5.2 = Ještě hratelné, zhruba {eval}.
+appraisal.resign_early.b6 = Nebyl konec: {eval}.
+appraisal.resign_early.b6.2 = Hodnocení bylo {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Hráli jsme zahájení: {opening:def}.
+appraisal.opening.b3.2 = Zahájení partie: {opening:def}.
+appraisal.opening.b4 = Naše zahájení: {opening:def}.
+appraisal.opening.b4.2 = Zahájení: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Zahájení: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Zahájení: {opening:def}.
