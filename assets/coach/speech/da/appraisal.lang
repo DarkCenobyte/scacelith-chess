@@ -1,0 +1,439 @@
+# Coach speech (Danish): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "du" to the player and "jeg" of himself; Danish
+# adjectives and participles never agree with a person's gender.
+#
+# Names inserted by {text}, {theme}, {level} (written to fit every sentence that inserts them):
+#   appraisal.phase.*   definite nouns ("åbningen", "midtspillet", "slutspillet"): "i {text}",
+#                       "{text} gik bedst".
+#   appraisal.reason.*  a complement right after "remis", no comma: "Remis {text}." ("Remis efter
+#                       aftale.", "Partiet endte remis ved pat.").
+#   theme.*             an infinitive phrase WITH "at", lower case, no full stop: said after a colon
+#                       ("Tema: at holde dine brikker dækket.") or after "husk", "prøv", "øve dig i"
+#                       ("Husk at give din konge lidt luft.").
+#   appraisal.level.*   the coach level names of the menus (coach.level.N.name) in Danish guillemets,
+#                       said after "niveauet" or alone: "klar til niveauet »Begynder«".
+# {opening:def} inside a sentence, {opening} alone after a colon.
+# Move numbers: "i træk {n}" (cardinal after the noun, glossary). Accuracy: {acc:percent} = "85
+# procent" where English says "{acc} percent", the bare number where English has it bare.
+# "In a row" is "i streg" in these lines (they all contain "træk" already: "3 gange i streg").
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = åbningen
+appraisal.phase.middlegame = midtspillet
+appraisal.phase.endgame = slutspillet
+appraisal.reason.stalemate = ved pat
+appraisal.reason.material = fordi ingen af os kunne sætte mat
+appraisal.reason.repetition = ved trækgentagelse
+appraisal.reason.fifty = efter 50-træksreglen
+appraisal.reason.fifty.spoken = efter halvtredstræksreglen
+appraisal.reason.agreement = efter aftale
+appraisal.reason.other = efter reglerne
+appraisal.level.l1 = »Første skridt«
+appraisal.level.l2 = »Begynder«
+appraisal.level.l3 = »Let øvet«
+appraisal.level.l4 = »Klubspiller«
+appraisal.level.l5 = »Stærk klubspiller«
+appraisal.level.l6 = »Ekspert«
+# What to practise: an infinitive phrase with "at" (a phrase, no full stop).
+theme.general = at se på hele brættet før du trækker
+theme.mate_allowed = at tjekke din konges sikkerhed før hvert træk
+theme.mate_missed = at lede efter mat og se på skakkerne først
+theme.stalemate = at give min konge et frit felt når du står til gevinst
+theme.fork = at holde øje med dobbeltangreb
+theme.discovered = at holde øje med skjulte angreb bag mine brikker
+theme.skewer = at undgå at stille værdifulde brikker på linje med hinanden
+theme.pin = at opdage bindinger før de opstår
+theme.trapped = at sikre dine brikker en flugtvej
+theme.back_rank = at give din konge lidt luft
+theme.hanging = at holde dine brikker dækket
+theme.exchange = at tælle angribere og forsvarere før du bytter
+theme.missed_capture = at lede efter gratis brikker først
+theme.missed_fork = at lede efter dine egne dobbeltangreb
+theme.promotion = at regne bondeløb igennem og kende kvadratreglen
+theme.king_safety = at holde din konge i sikkerhed bag dens bønder
+theme.bad_trade = at vælge hvilke brikker du bytter af
+theme.opening = at udvikle dine brikker og rokere tidligt
+theme.endgame = at bruge din konge og føre fribønder frem
+theme.positional = at forbedre din dårligste brik
+theme.material = at tjekke hvad mine næste træk kan vinde før du trækker
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Skakmat! Du vandt. Godt spillet!
+appraisal.open.win.b1.2 = Du vandt! Flot klaret at føre partiet helt hjem.
+appraisal.open.win.b1.3 = Du slog mig! Det var et rigtig godt parti.
+appraisal.open.win.b2 = Godt spillet! Du vandt på {moves:move}.
+appraisal.open.win.b2.2 = Tillykke, du vandt!
+appraisal.open.win.b2.3 = En sejr på {moves:move}. Flot klaret!
+appraisal.open.win.b3 = Tillykke med en velfortjent sejr.
+appraisal.open.win.b3.2 = Godt spillet. Du fortjente den sejr.
+appraisal.open.win.b3.3 = En god sejr. Tillykke.
+appraisal.open.win.b4 = Flot sejr.
+appraisal.open.win.b4.2 = Godt spillet, en fortjent sejr.
+appraisal.open.win.b4.3 = God sejr.
+appraisal.open.win.b5 = Godt spillet.
+appraisal.open.win.b5.2 = Flot vundet.
+appraisal.open.win.b5.3 = Godt parti, fortjent vundet.
+appraisal.open.win.b6 = Godt spillet.
+appraisal.open.win.b6.2 = Fortjent sejr.
+appraisal.open.win.b6.3 = Godt parti.
+appraisal.open.draw.b1 = Remis! Ingen af os kunne vinde dette parti.
+appraisal.open.draw.b1.2 = Det blev remis. Det var et tæt parti!
+appraisal.open.draw.b1.3 = Remis: vi deler pointet. Godt spillet!
+appraisal.open.draw.b2 = Remis: et retfærdigt resultat.
+appraisal.open.draw.b2.2 = Vi spillede remis. God kamp!
+appraisal.open.draw.b2.3 = Remis, og et godt parti.
+appraisal.open.draw.b3 = Remis. Begge sider havde chancer.
+appraisal.open.draw.b3.2 = En retfærdig remis.
+appraisal.open.draw.b3.3 = Remis {text}. En god kamp.
+appraisal.open.draw.b4 = Remis {text}.
+appraisal.open.draw.b4.2 = Det blev remis {text}.
+appraisal.open.draw.b4.3 = Partiet endte remis {text}.
+appraisal.open.draw.b5 = Remis.
+appraisal.open.draw.b5.2 = Remis {text}.
+appraisal.open.draw.b5.3 = Det blev remis.
+appraisal.open.draw.b6 = Remis.
+appraisal.open.draw.b6.2 = Remis {text}.
+appraisal.open.draw.b6.3 = Det blev remis.
+appraisal.open.stalemate.b1 = Remis ved pat: så tæt på! Husk næste gang at give min konge et frit felt.
+appraisal.open.stalemate.b1.2 = Pat, så det er remis. Du var så tæt på!
+appraisal.open.stalemate.b2 = Remis ved pat. Du var så tæt på at vinde!
+appraisal.open.stalemate.b2.2 = Pat: remis, men du stod til gevinst.
+appraisal.open.stalemate.b3 = Remis ved pat, fra en gevinststilling.
+appraisal.open.stalemate.b3.2 = Pat. Sejren gled dig af hænde helt til sidst.
+appraisal.open.stalemate.b4 = Remis ved pat.
+appraisal.open.stalemate.b4.2 = Pat: remis.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remis ved pat.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remis: pat.
+appraisal.open.loss.b1 = Jeg vandt denne gang, men du spillede nogle rigtig gode træk.
+appraisal.open.loss.b1.2 = Godt parti! Du fik mig til at kæmpe for det.
+appraisal.open.loss.b1.3 = Det var sjovt! Jeg vandt denne gang, men du lærer hurtigt.
+appraisal.open.loss.b2 = Godt parti! Lad os se på hvad der gik godt, og én ting du kan prøve.
+appraisal.open.loss.b2.2 = Tak for partiet! Du havde nogle gode idéer.
+appraisal.open.loss.b2.3 = Godt parti. Lad os se hvad vi kan lære af det.
+appraisal.open.loss.b3 = Godt parti.
+appraisal.open.loss.b3.2 = Tak for partiet.
+appraisal.open.loss.b3.3 = Godt parti. Lad os kigge på det.
+appraisal.open.loss_close.b3 = God kamp. Partiet var jævnbyrdigt længe.
+appraisal.open.loss_close.b3.2 = God kamp: det var lige i lang tid.
+appraisal.open.loss.b4 = Godt parti. Her er hvad der afgjorde det.
+appraisal.open.loss.b4.2 = Godt parti. Ét øjeblik afgjorde det.
+appraisal.open.loss.b4.3 = Tak for partiet. Lad os se hvor det vendte.
+appraisal.open.loss_close.b4 = En tæt kamp i lang tid. Her er hvad der afgjorde den.
+appraisal.open.loss_close.b4.2 = Godt parti, længe i balance.
+appraisal.open.loss.b5 = Godt parti.
+appraisal.open.loss.b5.2 = Tak for partiet.
+appraisal.open.loss.b5.3 = God kamp.
+appraisal.open.loss.b6 = Godt parti.
+appraisal.open.loss.b6.2 = Tak for partiet.
+appraisal.open.loss.b6.3 = God kamp.
+appraisal.open.resigned.b1 = At opgive er en del af skak, og det kræver mod. Godt parti!
+appraisal.open.resigned.b1.2 = Det er helt i orden. At vide hvornår man skal opgive, er en del af skak.
+appraisal.open.resigned.b2 = At opgive er en del af skak, og det kræver mod.
+appraisal.open.resigned.b2.2 = Fair nok. Det kræver også mod at opgive.
+appraisal.open.resigned.b3 = At opgive er en del af skak. Godt parti.
+appraisal.open.resigned.b3.2 = Fair nok. Tak for partiet.
+appraisal.open.resigned.b4 = Godt parti.
+appraisal.open.resigned.b4.2 = Tak for partiet.
+appraisal.open.resigned.b5 = Godt parti.
+appraisal.open.resigned.b5.2 = Tak for partiet.
+appraisal.open.resigned.b6 = Godt parti.
+appraisal.open.resigned.b6.2 = Tak.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Det var ikke slut endnu, ved du: omkring {eval}.
+appraisal.resign_early.b3.2 = Faktisk havde du stadig chancer: omkring {eval}.
+appraisal.resign_early.b4 = Det var ikke slut endnu: omkring {eval}.
+appraisal.resign_early.b4.2 = Der var stadig spil i det: omkring {eval}.
+appraisal.resign_early.b5 = Det var ikke slut: {eval}.
+appraisal.resign_early.b5.2 = Stadig spilbart, omkring {eval}.
+appraisal.resign_early.b6 = Ikke slut: {eval}.
+appraisal.resign_early.b6.2 = Det var {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Vi spillede {opening:def}.
+appraisal.opening.b3.2 = Åbningen var {opening:def}.
+appraisal.opening.b4 = Vi fik {opening:def} på brættet.
+appraisal.opening.b4.2 = Åbningen: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Åbning: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Åbning: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Sikke et offer i træk {n}: {move}!
+appraisal.best.brilliant.b1.2 = Mit yndlingsøjeblik: {move}. Du ofrede en brik, og det virkede!
+appraisal.best.brilliant.b2 = Dit bedste øjeblik: offeret {move} i træk {n}.
+appraisal.best.brilliant.b2.2 = {move} i træk {n} var et modigt offer. Flot klaret!
+appraisal.best.brilliant.b3 = Genialt offer med {move}.
+appraisal.best.brilliant.b3.2 = Højdepunktet: {move}, et ægte offer, i træk {n}.
+appraisal.best.brilliant.b4 = Bedste øjeblik: {move}, træk {n}. Et genialt offer.
+appraisal.best.brilliant.b4.2 = {move} i træk {n} var genialt.
+appraisal.best.brilliant.b5 = {move} i træk {n} var genialt.
+appraisal.best.brilliant.b5.2 = Træk {n}, {move}: genialt.
+appraisal.best.brilliant.b6 = {move}!! i træk {n}.
+appraisal.best.brilliant.b6.spoken = {move} i træk {n}: genialt!
+appraisal.best.brilliant.b6.2 = Træk {n}: {move}, genialt.
+appraisal.best.great.b1 = Mit yndlingsøjeblik: {move}. Det var et fremragende træk!
+appraisal.best.great.b1.2 = Kan du huske {move}? Det var et flot fund.
+appraisal.best.great.b2 = Dit bedste øjeblik: {move} i træk {n}. Det vendte partiet.
+appraisal.best.great.b2.2 = {move} i træk {n} var et fremragende træk.
+appraisal.best.great.b3 = Nøgletrækket var {move} i træk {n}: det vendte billedet.
+appraisal.best.great.b3.2 = Flot fund: {move} i træk {n}.
+appraisal.best.great.b4 = Du straffede straks min fejl med {move}.
+appraisal.best.great.b4.2 = Bedste øjeblik: {move}, træk {n}.
+appraisal.best.great.b5 = {move} i træk {n}. Godt fundet.
+appraisal.best.great.b5.2 = Træk {n}, {move}: et flot fund.
+appraisal.best.great.b6 = {move} i træk {n}. Godt fundet.
+appraisal.best.great.b6.2 = Træk {n}: {move}!
+appraisal.best.only.b1 = Mit yndlingsøjeblik: {move}. Det var det eneste gode træk!
+appraisal.best.only.b1.2 = I træk {n} fandt du {move}, det eneste gode træk. Fremragende!
+appraisal.best.only.b2 = Dit bedste øjeblik: {move}, det eneste gode træk i stillingen.
+appraisal.best.only.b2.2 = {move} i træk {n} var det eneste træk, og du fandt det.
+appraisal.best.only.b3 = Nøgletrækket var {move} i træk {n}: det eneste træk der holdt.
+appraisal.best.only.b3.2 = I træk {n} holdt kun {move}, og du fandt det.
+appraisal.best.only.b4 = Bedste øjeblik: {move}, træk {n}. Eneste træk.
+appraisal.best.only.b4.2 = Træk {n}: {move}, det eneste træk.
+appraisal.best.only.b5 = {move} i træk {n} var eneste træk. Godt fundet.
+appraisal.best.only.b5.2 = Træk {n}, eneste træk: {move}.
+appraisal.best.only.b6 = {move} i træk {n} var eneste træk. Godt fundet.
+appraisal.best.only.b6.2 = Træk {n}: {move}, eneste træk.
+appraisal.best.won.b1 = Mit yndlingsøjeblik: {move}. Det vandt {pts:point}!
+appraisal.best.won.b1.2 = Kan du huske {move}? Det gav dig {pts:point}. Flot klaret!
+appraisal.best.won.b2 = Dit bedste øjeblik: {move} i træk {n}, der vandt {pts:point}.
+appraisal.best.won.b2.2 = {move} i træk {n} vandt materiale. Flot!
+appraisal.best.won.b3 = Nøgletrækket var {move} i træk {n}: det vandt {pts:point}.
+appraisal.best.won.b3.2 = {move} i træk {n} vandt rent materiale.
+appraisal.best.won.b4 = Bedste øjeblik: {move}, træk {n}, der vandt materiale.
+appraisal.best.won.b4.2 = {move} i træk {n} vandt {pts:point}.
+appraisal.best.won.b5 = {move} i træk {n} vandt materiale.
+appraisal.best.won.b5.2 = Træk {n}: {move}, materialegevinst.
+appraisal.best.won.b6 = {move} i træk {n} vandt materiale.
+appraisal.best.won.b6.2 = Træk {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Træk {n}: {move}, plus {pts}.
+appraisal.best.streak.b1 = Du fandt det bedste træk {n:time} i streg. Fremragende!
+appraisal.best.streak.b1.2 = {n:best_move} i streg! Det er flot skak.
+appraisal.best.streak.b2 = Du fandt det bedste træk {n:time} i streg.
+appraisal.best.streak.b2.2 = {n:best_move} i streg. Rigtig godt!
+appraisal.best.streak.b3 = En stime på {n:best_move} i streg. Meget solidt.
+appraisal.best.streak.b3.2 = {n:best_move} i streg. Godt spillet.
+appraisal.best.streak.b4 = {n:best_move} i streg.
+appraisal.best.streak.b4.2 = En stime på {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} i streg.
+appraisal.best.streak.b5.2 = En stime på {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} i streg.
+appraisal.best.streak.b6.2 = Stime: {n:best_move}.
+appraisal.best.capture.b1 = Mit yndlingsøjeblik: {move}. Du slog {my} gratis!
+appraisal.best.capture.b1.2 = Kan du huske {move}? Du så at {my} kunne slås gratis!
+appraisal.best.capture.b2 = Dit bedste øjeblik: {move}, der vandt {my}.
+appraisal.best.capture.b2.2 = Flot slag i træk {n}: {move}.
+appraisal.best.capture.b3 = Godt set i træk {n}: {move} vandt {my}.
+appraisal.best.capture.b3.2 = {move} i træk {n} snuppede {my}.
+appraisal.best.capture.b4 = Bedste øjeblik: {move}, træk {n}, der vandt {my}.
+appraisal.best.capture.b4.2 = {move} i træk {n} vandt materiale.
+appraisal.best.capture.b5 = {move} i træk {n} vandt {my}.
+appraisal.best.capture.b5.2 = Træk {n}: {move}.
+appraisal.best.capture.b6 = {move} i træk {n}.
+appraisal.best.capture.b6.2 = Træk {n}: {move}, materialegevinst.
+appraisal.best.phase.b1 = Du spillede rigtig godt i {text}.
+appraisal.best.phase.b1.2 = {text} var din bedste del af partiet.
+appraisal.best.phase.b2 = Du var stærkest i {text}.
+appraisal.best.phase.b2.2 = Du spillede {text} rigtig godt.
+appraisal.best.phase.b3 = Din bedste fase var {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} gik bedst: {acc:percent} præcision.
+appraisal.best.phase.b4 = Stærkeste fase: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} var din bedste fase, med {acc}.
+appraisal.best.phase.b5 = Bedste fase: {text}, {acc}.
+appraisal.best.phase.b5.2 = {text}: {acc}.
+appraisal.best.phase.b6 = {text}: {acc}.
+appraisal.best.phase.b6.2 = Bedste fase: {text}, {acc}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 brik" / "3 brikker") come from count.<noun> in common.lang;
+# "{m:check}" = "2 skakker", "{n:capture}" = "3 slag", "{n:best_move}" = "5 bedste træk".
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# A capture is "slå" (glossary); a bare {m} after "rettede" counts træk (neuter: "ét").
+appraisal.num.material.b1 = Du snuppede {n:piece} fra mig og gav mig skak {m:time}.
+appraisal.num.material.b1.2 = Du slog {n:piece} og satte min konge i skak {m:time}.
+appraisal.num.material.b2 = Du slog {n:piece} og gav skak {m:time}.
+appraisal.num.material.b2.2 = Du slog {n:piece} og gav mig skak {m:time}.
+appraisal.num.material.b3 = Du slog {n:piece} og gav skak {m:time}.
+appraisal.num.material.b3.2 = {n:piece} slået, {m:check} givet.
+appraisal.num.material.b4 = {n:piece} slået, {m:check} givet.
+appraisal.num.material.b4.2 = Du slog {n:piece} og gav skak {m:time}.
+appraisal.num.material.b5 = {n:piece} slået; {m:check} givet.
+appraisal.num.material.b5.2 = Slået: {n:piece}; givet: {m:check}.
+appraisal.num.material.b6 = {n:piece} slået, {m:check}.
+appraisal.num.material.b6.2 = {n:capture}, {m:check}.
+appraisal.num.material_nochecks.b1 = Du snuppede {n:piece} fra mig.
+appraisal.num.material_nochecks.b1.2 = Du slog {n:piece} i dette parti.
+appraisal.num.material_nochecks.b2 = Du slog {n:piece}.
+appraisal.num.material_nochecks.b2.2 = I dette parti slog du {n:piece}.
+appraisal.num.material_nochecks.b3 = Du slog {n:piece}.
+appraisal.num.material_nochecks.b3.2 = {n:piece} slået.
+appraisal.num.material_nochecks.b4 = {n:piece} slået.
+appraisal.num.material_nochecks.b4.2 = Du slog {n:piece}.
+appraisal.num.material_nochecks.b5 = {n:piece} slået.
+appraisal.num.material_nochecks.b5.2 = Slået: {n:piece}.
+appraisal.num.material_nochecks.b6 = {n:piece} slået.
+appraisal.num.material_nochecks.b6.2 = {n:capture}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = Du tog {n:move} tilbage og rettede {m} af dem. Sådan lærer vi!
+appraisal.num.takebacks.b1.2 = Du tog {n:move} tilbage, og {m:time} fandt du et bedre. Super!
+appraisal.num.takebacks.b2 = Du tog {n:move} tilbage og rettede {m} af dem. Sådan lærer man.
+appraisal.num.takebacks.b2.2 = Du tog {n:move} tilbage og fik rettet {m} af dem. Godt arbejde!
+appraisal.num.takebacks.b3 = Du tog {n:move} tilbage og rettede {m} af dem.
+appraisal.num.takebacks.b3.2 = {n:move} taget tilbage, {m} af dem rettet. Godt.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Ingen store fejl overhovedet: super!
+appraisal.num.clean.b2.2 = Ikke en eneste stor fejl i dette parti. Fremragende!
+appraisal.num.clean.b2.3 = Du lavede ingen store fejl. Rigtig godt!
+appraisal.num.few.b2 = Kun {n:mistake} i dette parti.
+appraisal.num.few.b2.2 = Bare {n:mistake} i hele partiet. Godt!
+appraisal.num.few.b2.3 = Kun {n:mistake} der er værd at nævne. Flot.
+appraisal.num.best.b2 = Du fandt det bedste træk {n:time}.
+appraisal.num.best.b2.2 = Du spillede det allerbedste træk {n:time}.
+appraisal.num.best.b2.3 = {n:time} fandt du det bedste træk.
+appraisal.num.acc.b3 = Din præcision var {acc:percent}, med {n:mistake} og {m:blunder}.
+appraisal.num.acc.b3.2 = {acc:percent} præcision: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Du spillede med {acc:percent} præcision; {n:mistake} og {m:blunder}.
+appraisal.num.acc_explain.b3 = Præcision sammenligner dine træk med det bedste træk i hver stilling: hundrede er perfekt.
+appraisal.num.acc_explain.b3.2 = Præcision måler hvor tæt dine træk var på de bedste. Hundrede er perfekt.
+appraisal.num.acc.b4 = Præcision: {acc:percent}.
+appraisal.num.acc.b4.2 = Du spillede med {acc:percent}.
+appraisal.num.acc.b4.3 = {acc:percent} præcision.
+appraisal.num.acc_phase.b4 = Præcision {acc}: {acc_phase} i {text}, din stærkeste fase.
+appraisal.num.acc_phase.b4.2 = {acc:percent} i alt, {acc_phase} i {text}.
+appraisal.num.acc_phase.b4.3 = Du spillede med {acc}; bedst i {text}, med {acc_phase}.
+appraisal.num.coach.b4 = Jeg spillede med {acc_coach}.
+appraisal.num.coach.b4.2 = Min præcision var {acc_coach}.
+appraisal.num.acc.b5 = Præcision {acc}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Præcision {acc}, med {n:inaccuracy} og {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Ude af teorien i træk {k}.
+appraisal.num.book.b5.2 = Vi forlod teorien i træk {k}.
+appraisal.num.acc.b6 = {acc} mod mine {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc} mod {acc_coach}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Præcision {acc}, min {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Præcision: {acc}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Præcision {acc}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Én ting du kan øve dig i: {theme}.
+appraisal.improve.theme.b1.2 = Et tip til næste gang: husk {theme}.
+appraisal.improve.theme.b1.3 = Noget at arbejde med: {theme}.
+appraisal.improve.theme.b2 = Noget at øve: {theme}.
+appraisal.improve.theme.b2.2 = En idé til næste gang: prøv {theme}.
+appraisal.improve.theme.b2.3 = Noget godt at arbejde med: {theme}.
+appraisal.improve.theme.b3 = Et tema i dette parti: {theme}.
+appraisal.improve.theme.b3.2 = Værd at øve: {theme}.
+appraisal.improve.theme.b4 = Et tilbagevendende tema: {theme}.
+appraisal.improve.theme.b4.2 = Det dukkede op mere end én gang: {theme}.
+appraisal.improve.theme.b5 = Tilbagevendende: {theme}.
+appraisal.improve.theme.b5.2 = Partiets tema: {theme}.
+appraisal.improve.theme.b6 = Tilbagevendende: {theme}.
+appraisal.improve.theme.b6.2 = Tema: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = Partiet vendte i træk {crit_no}. Næste gang kan du øve dig i {theme}.
+appraisal.improve.critical.b2.2 = Det afgørende øjeblik var træk {crit_no}, {crit_move}. Noget at øve: {theme}.
+appraisal.improve.critical.b3 = Det kritiske øjeblik var træk {crit_no}. I stedet for {crit_move} var {crit_best} bedre.
+appraisal.improve.critical.b3.2 = I træk {crit_no} var {crit_best} bedre end {crit_move}. Tjek mine forcerende træk først.
+appraisal.improve.critical.b4 = Kritisk øjeblik: træk {crit_no}, {crit_move}. {crit_best} var det bedre træk.
+appraisal.improve.critical.b4.2 = Træk {crit_no} var det afgørende øjeblik: {crit_best} i stedet for {crit_move}.
+appraisal.improve.critical.b5 = Træk {crit_no}: {crit_best} i stedet for {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Det kritiske træk var nummer {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Træk {crit_no}: {crit_best} i stedet for {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, ikke {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Træk {crit_no}: {crit_best}, ikke {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words. {crit_best} was not played: "ville have
+# bevaret" / "havde holdt" (counterfactual), never a plain past.
+appraisal.improve.was_winning.b1 = Du var ved at vinde indtil træk {crit_no}. Et lille tip: husk {theme}.
+appraisal.improve.was_winning.b1.2 = Det gik rigtig godt indtil træk {crit_no}. Husk {theme}.
+appraisal.improve.was_winning.b2 = Du var ved at vinde indtil træk {crit_no}. Prøv næste gang {theme}.
+appraisal.improve.was_winning.b2.2 = Frem til træk {crit_no} var du ved at vinde. Noget at øve: {theme}.
+appraisal.improve.was_winning.b3 = Du stod til gevinst indtil træk {crit_no}. {crit_best} ville have bevaret din fordel.
+appraisal.improve.was_winning.b3.2 = Frem til træk {crit_no} stod du til gevinst; {crit_best} ville have holdt gevinsten.
+appraisal.improve.was_winning.b4 = Du stod til gevinst indtil træk {crit_no}. {crit_best} ville have bevaret din fordel.
+appraisal.improve.was_winning.b4.2 = Vundet stilling indtil træk {crit_no}; {crit_best} havde holdt den.
+appraisal.improve.was_winning.b5 = Vundet stilling indtil træk {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Træk {crit_no}: {crit_best} havde holdt gevinsten, {eval}.
+appraisal.improve.was_winning.b6 = Træk {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} i træk {crit_no} havde holdt gevinsten: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Et lille tip: når du er ved at vinde, skal du altid give min konge et felt at gå til.
+appraisal.improve.stalemate.b1.2 = Husk: før hvert træk mod slutningen skal du tjekke at min konge stadig kan flytte.
+appraisal.improve.stalemate.b2 = Når du er ved at vinde, skal du altid give min konge et felt, ellers bliver det pat.
+appraisal.improve.stalemate.b2.2 = Næste gang skal du tjekke at min konge stadig kan flytte før du trækker.
+appraisal.improve.stalemate.b3 = Når du står til gevinst, skal du i hvert træk tjekke at min konge stadig har et felt.
+appraisal.improve.stalemate.b3.2 = Pas på pat i vundne slutspil: giv min konge luft.
+appraisal.improve.stalemate.b4 = I vundne slutspil skal du altid holde øje med pat.
+appraisal.improve.stalemate.b4.2 = Pas på pat: det kostede sejren her.
+appraisal.improve.stalemate.b5 = Hold øje med pat i vundne slutspil.
+appraisal.improve.stalemate.b5.2 = Patstillingen kostede sejren.
+appraisal.improve.stalemate.b6 = Pas på pat.
+appraisal.improve.stalemate.b6.2 = Pat kostede sejren.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = I træk {n} hang {my}. Så du det?
+appraisal.improve.coach_hung.b1.2 = I træk {n} kunne du få {my} gratis. Kig altid efter gratis brikker!
+appraisal.improve.coach_hung.b2 = I træk {n} hang {my}. Lagde du mærke til det?
+appraisal.improve.coach_hung.b2.2 = I træk {n} kunne du have slået {my} gratis.
+appraisal.improve.coach_hung.b3 = I træk {n} stod {my} udækket. Fik du øje på det?
+appraisal.improve.coach_hung.b3.2 = {my} hang i træk {n}. Kig efter udækkede brikker i hvert træk.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Bliv ved med at tjekke at dine brikker er i sikkerhed, ligesom i dag.
+appraisal.improve.clean.b1.2 = Bliv ved med at se på hvad jeg angriber før hvert træk. Det virker!
+appraisal.improve.clean.b1.3 = Bliv ved med at spille så omhyggeligt!
+appraisal.improve.clean.b2 = Et parti uden store fejl. Bliv ved med at tjekke mine trusler på den måde.
+appraisal.improve.clean.b2.2 = Bliv ved med det du gjorde i dag: sikre brikker, gode træk.
+appraisal.improve.clean.b3 = Et parti uden store fejl. Bliv ved med at tjekke forcerende træk først.
+appraisal.improve.clean.b3.2 = Ingen store fejl: fortsæt sådan.
+appraisal.improve.clean.b4 = Et parti uden store fejl. Intet væsentligt at rette.
+appraisal.improve.clean.b4.2 = Ingen kritiske fejl.
+appraisal.improve.clean.b5 = Ingen kritiske fejl.
+appraisal.improve.clean.b5.2 = Rent parti.
+appraisal.improve.clean.b6 = Rent parti.
+appraisal.improve.clean.b6.2 = Ingen afgørende fejl.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = »Begynder« ...: after "niveauet", or alone where the guillemets make it a name.
+appraisal.end.b1 = Du bliver bedre for hvert parti. Skal vi tage et til?
+appraisal.end.b1.2 = Det var sjovt! Skal vi spille igen?
+appraisal.end.b1.3 = Flot indsats. Vil du spille et parti mere?
+appraisal.end.b2 = Du bliver bedre for hvert parti. Skal vi tage et til?
+appraisal.end.b2.2 = Godt parti. Skal vi spille igen?
+appraisal.end.b2.3 = Godt spillet. Et parti til?
+appraisal.end.b3 = Solidt parti. Klar til det næste?
+appraisal.end.b3.2 = Godt parti. Et til?
+appraisal.end.b3.3 = Godt spillet. Skal vi spille igen?
+appraisal.end.b4 = Solidt parti. Klar til det næste?
+appraisal.end.b4.2 = Et parti til?
+appraisal.end.b4.3 = Godt parti. Næste?
+appraisal.end.b5 = Et til?
+appraisal.end.b5.2 = Næste parti?
+appraisal.end.b5.3 = Igen?
+appraisal.end.b6 = Et til?
+appraisal.end.b6.2 = Næste parti?
+appraisal.end.b6.3 = Igen?
+appraisal.end.up.b1 = Du er klar til niveauet {level}. Vil du prøve det?
+appraisal.end.up.b1.2 = Jeg tror du er klar til niveauet {level}. Skal vi prøve det?
+appraisal.end.up.b2 = Du er klar til niveauet {level}. Vil du prøve det?
+appraisal.end.up.b2.2 = Hvad med niveauet {level} næste gang? Jeg tror du er klar.
+appraisal.end.up.b3 = Du er vokset fra dette niveau: prøv {level}.
+appraisal.end.up.b3.2 = Klar til niveauet {level}? Det tror jeg.
+appraisal.end.up.b4 = Du er vokset fra dette niveau: prøv {level}.
+appraisal.end.up.b4.2 = Tid til {level}?
+appraisal.end.up.b5 = Prøv {level} næste gang.
+appraisal.end.up.b5.2 = {level} næste gang?
+appraisal.end.up.b6 = Prøv {level} næste gang.
+appraisal.end.up.b6.2 = {level} næste gang?
+appraisal.end.down.b2 = Lad os spille et parti på niveauet {level} for at øve idéerne.
+appraisal.end.down.b2.2 = Hvad med et parti på niveauet {level} for at øve dig?
+appraisal.end.down.b3 = Vil du spille et parti på niveauet {level} for at øve idéerne?
+appraisal.end.down.b3.2 = Et parti på niveauet {level} kunne hjælpe dig med at øve disse idéer.
+appraisal.end.down.b4 = Et parti på niveauet {level} kan måske hjælpe med at øve disse idéer.
+appraisal.end.down.b4.2 = Måske et parti på {level} for at øve?
+appraisal.end.down.b5 = Måske et parti på {level}?
+appraisal.end.down.b5.2 = {level} for at øve?
+appraisal.end.down.b6 = Måske et parti på {level}?
+appraisal.end.down.b6.2 = {level} for at øve?

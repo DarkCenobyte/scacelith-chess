@@ -1,0 +1,137 @@
+# Coach speech (Danish): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 stillinger", count.position in
+#            common.lang), "{n:move}" likewise ("10 træk")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "skakmat" (the line says it)
+#   {your}   one of the player's pieces ("din springer", "dit tårn"); the coach points at it on that word
+#   {sq}     a square ("feltet {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "du" to the player.
+# "Mat i {n} træk": a bare {n} says the neuter "ét", which agrees with "træk" ("mat i ét træk").
+# Challenge names as chosen for assets/i18n/da.lang (challenge.<id>.name). Tactical terms: gaffel,
+# binding, spid, afdækket angreb, afledning, tiltrækning, mellemtræk, fanget brik, stille træk.
+# Commas as the glossary says: no comma before a subordinate clause that follows its main clause.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat i ét træk. {n:position}, og hver gang er der kun ét træk der sætter mat. Se på alle skakkerne.
+ch.intro.mate2 = Mat i to træk. {n:position}: dit første træk skal efterlade mig uden forsvar, og så sætter du mat.
+ch.intro.mate3 = Mat i tre træk. {n:position}. Skakker, slag og trusler: regn mit bedste svar ud hver gang.
+ch.intro.backrank = Mat på grundrækken. {n:position} hvor en konge sidder fanget bag sine egne bønder.
+ch.intro.patterns = Matmønstre. {n:position} med klassiske matnet. Genkend mønstret, og slå så til.
+ch.intro.hanging = Gratis brikker. {n:position}: en af mine brikker står udækket. Find den, og slå den.
+ch.intro.fork = Gafler. {n:position}: find trækket der angriber to ting på én gang.
+ch.intro.pin = Bindinger. {n:position}: bind en brik, eller udnyt en binding.
+ch.intro.skewer = Spid. {n:position}: angrib en værdifuld brik, og vind det der står bag den.
+ch.intro.discovered = Afdækkede angreb. {n:position}: flyt én brik for at slippe en anden løs.
+ch.intro.deflection = Afledning og tiltrækning. {n:position}: lok en forsvarer væk, eller hen på et fatalt felt.
+ch.intro.intermezzo = Mellemtræk. {n:position}: find et stærkere træk før det oplagte.
+ch.intro.trapped = Fangede brikker. {n:position}: en af mine brikker har intet sikkert felt at flygte til. Vind den.
+ch.intro.promotion = Forvandling. {n:position} hvor en fremskudt bonde afgør partiet.
+ch.intro.quiet = Stille træk. {n:position}: det vindende træk er hverken en skak eller et slag.
+ch.intro.opening = Åbningsfælder. {n:position} fra de første træk i rigtige partier. Straf min fejl.
+ch.intro.escape = Find udvejen. {n:position}: din konge er i fare, og kun ét træk redder den.
+ch.intro.defend = Forsvarstræk. {n:position}: find det ene træk der holder sammen på din stilling.
+ch.intro.kq = Dronning og konge mod konge. {n:position}: sæt min konge mat. Pas på pat.
+ch.intro.kr = Tårn og konge mod konge. {n:position}: sæt min konge mat, ét skridt ad gangen.
+ch.intro.kp = Konge og bonde mod konge. {n:position}: få en ny dronning. Lad din konge gå forrest.
+ch.intro.kp_hold = Stop bonden. {n:position}: du har kun din konge. Hold remis.
+ch.intro.rook = Tårnslutspil. {n:position}: byg broen for at forvandle bonden, og hold remis med Philidor-forsvaret.
+ch.intro.endgame = Slutspilstaktik. {n:position} med få brikker og skarpe idéer.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Mat i {n} træk.
+ch.task.mate.2 = Find mat i {n} træk.
+ch.task.hanging = Der står noget udækket.
+ch.task.hanging.2 = Hvad kan du slå gratis?
+ch.task.fork = Find gaflen.
+ch.task.fork.2 = Se efter en gaffel.
+ch.task.pin = En binding er nøglen her.
+ch.task.skewer = Et spid vinder her.
+ch.task.discovered = Et afdækket angreb vinder her.
+ch.task.deflection = Overbelast en forsvarer, eller lok den i en fælde.
+ch.task.intermezzo = Se efter et mellemtræk.
+ch.task.trapped = En af mine brikker kan ikke slippe væk. Vind den.
+ch.task.promotion = Brug din fremskudte bonde.
+ch.task.quiet = Det vindende træk er et stille træk.
+ch.task.opening = Straf mit sidste træk.
+ch.task.escape = Red din konge: kun ét træk virker.
+ch.task.defend = Find det eneste gode træk.
+ch.task.endgame = Find det bedste træk.
+ch.task.default = Find det bedste træk.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Sæt min konge mat. Jeg forsvarer mig så godt jeg kan.
+ch.task.play.promote = Forvandl din bonde, og hold fast i gevinsten. Jeg prøver at stoppe dig.
+ch.task.play.hold = Hold remis i {n:move}. Jeg prøver at vinde.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Disse stillinger stammer fra rigtige partier. Jeg spiller det sidste træk, og så er det din tur.
+ch.lead.first.2 = Hver stilling stammer fra et rigtigt parti: jeg spiller trækket der førte til den, og så spiller du.
+ch.next = Næste stilling.
+ch.next.2 = Her er den næste.
+ch.next.3 = Videre til den næste.
+ch.last = Den sidste stilling.
+ch.last.2 = Og nu den sidste.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Godt.
+ch.good.2 = Ja.
+ch.good.3 = Rigtigt.
+ch.good.4 = Præcis.
+# The position is solved.
+ch.solved = Sådan! Godt gået.
+ch.solved.2 = Helt rigtigt.
+ch.solved.3 = Meget godt.
+ch.solved.mate = Skakmat! Godt gået.
+ch.solved.mate.2 = Og det er mat. Meget godt.
+ch.solved.mate.3 = Skakmat. Flot klaret.
+ch.solved.promote = En ny dronning, og gevinsten er sikret. Godt gået.
+ch.solved.hold = Remisen holder. Godt forsvaret!
+ch.solved.draw = Remis på brættet. Godt forsvaret!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Ikke det træk: så ville jeg svare {move}.
+ch.wrong.reply.2 = Ikke helt: jeg ville svare igen med {move}.
+ch.wrong.reply.3 = Så ville jeg spille {move}.
+ch.wrong.mate = Pas på: {move:nomate} ville være skakmat.
+ch.wrong.mate.2 = Se dig for: jeg ville svare {move:nomate}, og så er det mat.
+ch.wrong.mated = Pas på: efter {move} kan jeg gennemtvinge mat i {m} træk.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Det sætter også mat, men det tager længere tid. Der er en hurtigere vej.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Det sætter også mat, men jeg har et andet træk i tankerne. Kig igen.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Ikke dårligt, men der er noget stærkere. Kig igen.
+ch.wrong.weaker.2 = Det kan spilles, men du kan gøre det bedre.
+ch.wrong.stalemate = Pat! Min konge kan ikke flytte, og det er kun remis.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Ikke det træk: efter {move} kan jeg holde remis.
+ch.wrong.loses = Pas på: efter {move} ville jeg stå til gevinst.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Det er ikke det.
+ch.try_again = Prøv igen.
+ch.try_again.2 = Kig en gang til.
+ch.try_again.3 = Se efter igen.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Vil du have et hint?
+ch.offer.2 = Skal jeg give dig et hint?
+ch.no_hint = Okay. Bliv ved med at lede.
+ch.no_hint.2 = Fint, tag dig god tid.
+ch.hint.piece = Se på {your}.
+ch.hint.piece.2 = Tænk på {your}.
+ch.hint.square = Se på feltet {sq}.
+ch.hint.square.2 = Nøglefeltet er {sq}.
+ch.hint.square.3 = Hold øje med feltet {sq}.
+ch.hint.show = Her er trækket. Se her.
+ch.hint.show.2 = Lad mig vise dig det. Se her.
+ch.hint.now = Spil det nu selv.
+ch.hint.now.2 = Din tur: spil det.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Det var hele udfordringen. Godt gået!
+ch.complete.2 = Alle stillinger er løst. Godt gået!

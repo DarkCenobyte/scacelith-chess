@@ -1,0 +1,264 @@
+# Scacelith - Italiano
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (1 is singular,
+# 0 takes the plural: "0 mosse").
+# Register: informal "tu" everywhere (as Italian Microsoft, Apple and Google software); buttons are
+# tu-imperatives or nouns in sentence case; titles in capitals keep their accents (È, PIÙ).
+# The player's gender is unknown: no adjective or participle agrees with the player ("Accesso
+# effettuato come {0}", never "connesso come"). Chess terms follow the it glossary: donna, alfiere,
+# patta, stallo, arrocco, formulario, cadenza, allenatore; notation letters R D T A C.
+# Typography: apostrophe ’, quotes « », decimal comma, "85%", dates dd/mm/yyyy.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Attivato
+common.off = Disattivato
+common.back = Indietro
+common.apply = Applica
+common.discard = Scarta
+common.cancel = Annulla
+common.white = Bianco
+common.black = Nero
+common.main_menu = Menu principale
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Il gioco dei re
+menu.new_game = Nuova partita
+menu.options = Opzioni
+menu.credits = Riconoscimenti
+menu.quit = Esci
+menu.version = Versione {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPZIONI
+options.tab.display = Schermo
+options.tab.graphics = Grafica
+options.tab.audio = Audio
+options.tab.gameplay = Gioco
+options.tab.player = Giocatore
+options.tab.controls = Comandi
+options.pending = Le modifiche hanno effetto una volta applicate.
+options.unsaved.title = MODIFICHE NON APPLICATE
+options.unsaved.text = Alcune opzioni sono state modificate. Vuoi applicarle prima di uscire?
+
+options.language = Lingua
+options.language.help = Lingua dei menu e dei messaggi. Il cambio è immediato.
+options.display_mode = Modalità di visualizzazione
+options.display_mode.help = Schermo intero: una finestra senza bordi su tutto lo schermo, alla risoluzione del desktop. In finestra: una finestra delle dimensioni indicate qui sotto.
+options.fullscreen = Schermo intero
+options.windowed = In finestra
+options.window_size = Dimensioni della finestra
+options.window_size.help = Dimensioni della finestra nella modalità In finestra. Lo schermo intero usa sempre la risoluzione del desktop.
+options.vsync = Sincronizzazione verticale
+options.vsync.help = Sincronizza i fotogrammi con lo schermo per evitare lo strappo dell’immagine (tearing).
+options.render_scale = Scala di rendering
+options.render_scale.help = Risoluzione interna dell’immagine 3D. Più bassa è più veloce, più alta è più nitida.
+
+options.quality = Qualità
+options.quality.very_low = Molto bassa
+options.quality.low = Bassa
+options.quality.medium = Media
+options.quality.high = Alta
+options.quality.ultra = Ultra
+options.quality.custom = Personalizzata
+options.quality.help = Imposta in un colpo solo tutte le opzioni qui sotto: Molto bassa disattiva tutti gli effetti, Ultra li porta tutti al massimo. Se modifichi una singola opzione, la qualità diventa Personalizzata. Con una scheda grafica modesta, anche abbassare la scala di rendering (Schermo) aiuta molto.
+options.shadows = Ombre
+options.shadows.help = Dettaglio delle ombre del sole e morbidezza dei loro contorni. Bassa: contorni semplici, rapidi da disegnare.
+options.reflections = Riflessi
+options.reflections.help = Il pavimento, il tavolo e la scacchiera riflettono la sala (che viene disegnata una volta in più per ciascuno: tra le opzioni più pesanti); da Media in su, anche i pezzi e gli oggetti lucidi riflettono ciò che li circonda.
+options.ambient_occlusion = Occlusione ambientale
+options.ambient_occlusion.help = Un’ombreggiatura morbida dove gli oggetti si toccano e negli incavi, dove entra meno luce.
+options.indirect_light = Luce indiretta
+options.indirect_light.help = La luce del giorno che rimbalza su pareti, pavimento e soffitto. Bassa: al suo posto, una luce ambientale uniforme. Incide soprattutto sul tempo di caricamento.
+options.volumetric_light = Raggi di luce
+options.volumetric_light.help = Fasci di luce solare nell’aria polverosa della sala, con il pulviscolo che vi scintilla.
+options.tessellation = Tassellazione
+options.tessellation.help = Contorni lisci sulle curve dei pezzi visti da vicino.
+options.tessellation.unavailable = Non disponibile: questo driver grafico non supporta la tassellazione.
+options.antialiasing = Antialiasing
+options.antialiasing.help = Smussa i bordi seghettati e i riflessi tremolanti. Disattivato: immagine più nitida ma seghettata, e alcuni effetti appaiono sgranati.
+options.depth_of_field = Profondità di campo
+options.depth_of_field.help = Sfoca ciò che si trova molto più vicino o molto più lontano di ciò che guardi, come fa l’obiettivo di una fotocamera.
+options.motion_blur = Sfocatura di movimento
+options.motion_blur.help = Sfoca i movimenti rapidi della telecamera e delle braccia, come fa una cinepresa.
+options.bloom = Bagliore
+options.bloom.help = Un alone morbido attorno ai riflessi più luminosi, come in un obiettivo fotografico.
+options.brightness = Luminosità
+options.brightness.neutral = Neutra
+options.brightness.value = {0} EV
+options.brightness.help = Compensazione dell’esposizione della telecamera. La calibrazione al primo avvio la imposta in modo che le ombre più scure siano appena visibili.
+
+options.master_volume = Volume generale
+options.effects = Effetti
+options.ambience = Ambiente
+options.ambience.help = Il brusio della sala: il fuoco, passi lontani, la vecchia pendola.
+options.ambience_volume = Volume dell’ambiente
+options.voice_volume = Volume della voce
+options.voice_volume.help = Volume della voce dell’allenatore nella modalità allenatore.
+options.subtitles = Sottotitoli
+options.subtitles.auto = Automatici
+options.subtitles.help = Le parole dell’allenatore, scritte in basso sullo schermo. Automatici: mostrati quando l’allenatore non parla la lingua dei menu (con i menu in cinese parla inglese). Sempre mostrati quando la sua voce non è installata.
+
+options.legal_moves = Mostra le mosse legali
+options.legal_moves.help = Evidenzia le case che il pezzo toccato può raggiungere. Se disattivato, niente ti dice se una mossa è legale: una mossa illegale viene penalizzata dall’arbitro quando premi l’orologio.
+options.coordinates = Coordinate della scacchiera
+options.auto_press = Pressione automatica dell’orologio
+options.auto_press.help = Il tuo robot preme l’orologio da solo non appena la tua mossa è sulla scacchiera. Nelle partite online decide il server, e in una partita diretta il giocatore che la ospita.
+options.thinking_time = Tempo di riflessione realistico
+options.thinking_time.help = Il tuo avversario si prende il suo tempo come un giocatore umano, invece di muovere all’istante.
+options.ignore_head = Ignora i movimenti di testa dell’avversario
+options.ignore_head.help = Nelle partite online e nelle partite dirette, il robot dell’avversario guarda dove guarda il suo giocatore. Se attivato, muove la testa da solo, come contro Stockfish.
+options.mouse_sensitivity = Sensibilità del mouse
+options.invert_look = Inverti asse verticale
+options.handover = Passaggio tra giocatori (stesso PC)
+options.handover.cut = Stacco netto
+options.handover.flight = Volo, {0} s
+options.handover.help = Due giocatori su un solo PC: come la visuale passa dagli occhi di un giocatore a quelli dell’altro dopo ogni mossa. Lo stacco netto evita il movimento della telecamera.
+options.game_cursor = Puntatore di gioco
+options.game_cursor.help = Al tavolo, il gioco disegna un proprio puntatore, che mostra cosa farà un clic. Disattivato: la normale freccia di sistema.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nome
+player.name.help = Il tuo nome come appare in cima ai formulari, in qualsiasi alfabeto.
+player.default_name = Umano
+player.handwriting = Grafia
+player.handwriting.help = La mano che scrive le tue mosse. L’arabo, il giapponese e il cinese sono scritti con una grafia propria.
+player.preview = SUL TUO FORMULARIO
+hand.caveat = Disinvolta
+hand.marck = Corsiva
+hand.badscript = Inclinata
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Clic sinistro
+controls.touch = Tocca un pezzo, poi muovilo
+controls.clock.keys = Spazio  o  clic sull’orologio
+controls.clock = Premi l’orologio
+controls.look.keys = Tasto destro, tenuto premuto
+controls.look = Guardati intorno
+controls.sheet.keys = S
+controls.sheet = Guarda il tuo formulario, e torna indietro
+controls.stand.keys = ↑
+controls.stand = Alzati in piedi davanti alla sedia
+controls.side.keys = ←  /  →
+controls.side = Spostati all’estremità sinistra / destra del tavolo
+controls.sit.keys = ↓
+controls.sit = Torna a sederti (si gioca solo dalla sedia)
+controls.moves.keys = Tab
+controls.moves = Mostra o nascondi la lista delle mosse
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Spazio
+controls.coach_skip = Allenatore: salta ciò che sta dicendo
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Allenatore: ritira la mossa quando te lo propone
+controls.coach_hint.keys = H
+controls.coach_hint = Sfide dell’allenatore: chiedi un suggerimento
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = LUMINOSITÀ
+calibration.text = Sposta il cursore finché il cavallo sulla casa nera è appena visibile, o non è più visibile.
+calibration.later = Potrai cambiarla in seguito in Opzioni > Grafica.
+calibration.continue = Continua
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NUOVA PARTITA
+newgame.opponent = AVVERSARIO
+newgame.time_control = CADENZA
+newgame.start = Inizia
+newgame.elo = ~{0} Elo
+newgame.you_white = Giocherai con il Bianco.
+newgame.you_black = Giocherai con il Nero.
+newgame.colour_lot = Per la prima partita i colori vengono sorteggiati.
+newgame.colour_alternate = Poi i colori si alternano da una partita all’altra.
+newgame.opponent_kind = Avversario
+newgame.opponent_kind.help = Gioca contro Stockfish, o contro un amico seduto a questo computer: muovete a turno, ognuno dal proprio lato della scacchiera.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Umano, stesso PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = Livello di abilità
+engine.skill.help = «Skill Level» di Stockfish (0–20). Ignorato quando la forza è limitata dall’Elo.
+engine.limit_elo = Limita la forza (Elo)
+engine.limit_elo.help = UCI_LimitStrength: il motore punta al punteggio Elo indicato qui sotto.
+engine.elo = Elo
+engine.depth = Profondità di ricerca
+engine.plies = {0} semimossa|{0} semimosse
+engine.move_time = Tempo per mossa
+engine.nodes = Limite di nodi
+engine.no_limit = Nessun limite
+# Italian: digit groups instead of "mila" / "milioni" (1 would need "mille", "un milione").
+engine.thousand = {0}.000
+engine.million = {0}.000.000
+engine.dynamic_elo = Elo dinamico in base al tempo
+engine.dynamic_elo.help = Come un giocatore umano, Stockfish gioca peggio quando il suo tempo sta per finire: un po’ nell’ultimo minuto (prima nelle partite rapid e blitz), molto peggio in crisi di tempo. Solo partite con l’orologio.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish si prende il suo tempo come un umano del suo livello. Per saltare questa pausa: Opzioni > Gioco > Tempo di riflessione realistico.
+engine.pace.instant = Stockfish muove non appena ha finito di calcolare. Per pause simili a quelle umane: Opzioni > Gioco > Tempo di riflessione realistico.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Illimitato
+tc.no_clock = Senza orologio
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapid
+tc.classical = Classica
+tc.custom = Personalizzata
+tc.your_own = A tua scelta
+tc.base_time = Tempo base
+tc.base_time.help = Tempo iniziale di ciascun giocatore (minuti : secondi).
+tc.increment = Incremento
+tc.increment.help = Incremento Fischer aggiunto dopo ogni mossa.
+tc.delay = Ritardo
+tc.delay.help = Ritardo Bronstein: il tempo usato fino a questo ritardo viene restituito dopo ogni mossa.
+tc.no_delay = Nessuno
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, ritardo {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novizio
+preset.novice.desc = Ha appena imparato le mosse: lascia pezzi in presa e non vede le minacce semplici.
+preset.beginner.name = Principiante
+preset.beginner.desc = Conosce le basi, ma perde ancora spesso materiale con errori gravi.
+preset.casual.name = Amatore
+preset.casual.desc = Un avversario per una serata tranquilla: mosse sensate, errori frequenti.
+preset.club_player.name = Giocatore di circolo
+preset.club_player.desc = Solido giocatore di circolo che punisce gli errori gravi evidenti.
+preset.advanced.name = Avanzato
+preset.advanced.desc = Forte giocatore di circolo con una buona visione tattica.
+preset.expert.name = Esperto
+preset.expert.desc = Esperto di torneo: sbaglia di rado e concretizza i vantaggi.
+preset.master.name = Maestro
+preset.master.desc = Forza da maestro: calcolo profondo e fine gioco posizionale.
+preset.grandmaster.name = Grande maestro
+preset.grandmaster.desc = Livello da grande maestro: difficilissimo da battere.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 alla massima forza. Buona fortuna.
+preset.custom.name = Personalizzato
+preset.custom.desc = Le tue impostazioni del motore.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = RICONOSCIMENTI
+credits.game.head = SCACELITH
+credits.game = Un gioco di scacchi in un salone regale, su un motore grafico OpenGL 4.6 sviluppato in proprio.
+credits.engine.head = MOTORE SCACCHISTICO
+credits.engine = Stockfish 19, degli sviluppatori di Stockfish.
+credits.engine.licence = Licenza GNU General Public License v3.
+credits.engine.data = La sua rete neurale è stata addestrata con dati forniti dal progetto Leela Chess Zero, resi disponibili con la licenza Open Database License (ODbL).
+credits.voice.head = VOCE DELL’ALLENATORE
+credits.voice = Voce sintetica generata da Supertonic 3 per la modalità allenatore.
+credits.voice.licence = Supertonic 3 è un modello di Supertone, usato con la licenza OpenRAIL-M, le cui restrizioni d’uso valgono per chiunque lo utilizzi (vedi Licenze).
+credits.openings.head = APERTURE
+credits.openings = Nomi delle aperture tratti dal database chess-openings di lichess.org, dedicato al pubblico dominio (CC0).
+credits.fonts.head = CARATTERI
+credits.fonts = EB Garamond di Georg Duffner e Cinzel di Natanael Gama; Amiri di Khaled Hosny.
+credits.fonts.hand = Grafie: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figure degli scacchi da GNU FreeFont (GPL v3 con eccezione per i font).
+credits.quote = «Gli scacchi sono l’arte dell’analisi.»  — Michail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenze
+licences.title = LICENZE
+licences.note = Le licenze sono riportate nel loro testo originale in inglese.

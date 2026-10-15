@@ -1,0 +1,154 @@
+# Coach speech (Italian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Italian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tu" or "io" here: the players are "il Bianco" and "il Nero" (capitalised, as
+#   assets/i18n/it.lang). A piece comes with its side: {piece} {t1} {t2} = "il cavallo bianco",
+#   "la torre nera" (common.lang, owner.white / owner.black); never di, a, da, in, su right before
+#   them: ask for the form ({t1:su} = "sulla torre nera"). Pronouns and participles that agree with
+#   the piece use the forms {piece:lo} and {piece:o} ("l’avrebbe pres{piece:o}").
+# - A move placeholder ({move}, {best}, {reply}) never takes an adjective that would need a gender
+#   (it may be spoken as "arrocco corto"): "{best} era più forte" (forte does not change), "{best}
+#   era una mossa più precisa"; no article before it.
+# - Counted numbers (common.lang): {m:move} "matto in 3 mosse", {pts:point} "3 punti",
+#   {n:mistake} "2 errori", {m:blunder} "un errore grave", {acc_white:percent} "85%" (no article
+#   before a number: "pari a {acc_white:percent}", never "dell’85%").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Ripercorriamo insieme questa partita.
+an.start.2 = Rivediamo questa partita, mossa dopo mossa.
+an.start.3 = Ecco la partita. Vediamo com’è andata.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Questa partita parte da una posizione impostata sulla scacchiera. Ripercorriamola.
+an.start.setup.2 = Una partita da una posizione impostata. Vediamo com’è andata.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = L’apertura è {opening:def}.
+an.opening.2 = Questa è {opening:def}.
+an.book_exit = Con {move} la partita esce dalla teoria conosciuta.
+an.book_exit.2 = {move} è la prima mossa fuori teoria.
+an.book_exit.3 = La teoria d’apertura finisce qui, con {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} è un errore grave.
+an.blunder.2 = Qui {move} è un grave errore.
+an.blunder.3 = Un errore grave: {move}.
+an.mistake = {move} è un errore.
+an.mistake.2 = Qui {move} non è la mossa giusta.
+an.mistake.3 = Un errore: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} non sfrutta l’occasione di punire quell’errore.
+an.missed_chance.2 = Con {move} l’occasione sfuma.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Ora {reply:nomate} è scacco matto.
+an.mate_allowed.one.2 = Permette {reply:nomate}, ed è scacco matto.
+an.mate_allowed = Permette un matto forzato in {m:move}, che comincia con {reply:nomate}.
+an.mate_allowed.2 = Ora c’è un matto forzato in {m:move}, a partire da {reply:nomate}.
+an.fork = Ora {reply} fa forchetta {t1:su} e {t2:su}.
+an.fork.2 = Permette {reply}, che attacca contemporaneamente {t1} e {t2}.
+an.fork.3 = {reply} colpisce {t1} e {t2} allo stesso tempo.
+an.hanging = Lascia {piece} senza protezione, e {reply} se ne impadronisce.
+an.hanging.2 = {piece} resta senza difensori: {reply} {piece:lo} cattura.
+an.hanging.3 = {reply} prende semplicemente {piece}, che non aveva difensori.
+an.material = La risposta {line} guadagna {pts:point} di materiale.
+an.material.2 = Poi {line} guadagna {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} era scacco matto.
+an.mate_missed.one.2 = Con {best:nomate} sarebbe stato scacco matto.
+an.mate_missed = {best:nomate} avrebbe forzato il matto in {m:move}.
+an.mate_missed.2 = C’era un matto forzato in {m:move}, che cominciava con {best:nomate}.
+an.missed_capture = {best} avrebbe guadagnato {piece} gratis.
+an.missed_capture.2 = {piece} non aveva difensori: {best} l’avrebbe pres{piece:o}.
+an.missed_fork = {best} avrebbe fatto forchetta {t1:su} e {t2:su}.
+an.missed_fork.2 = {best} era una forchetta, che attaccava {t1} e {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} era più forte.
+an.better.2 = Era meglio {best}.
+an.better.3 = {best} era una mossa più precisa.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} è brillante: sacrifica {piece}!
+an.brilliant.2 = Un sacrificio brillante! {move} offre {piece}.
+an.brilliant.3 = {move}! Una mossa brillante, che offre {piece}.
+an.brilliant.mate = Porta a un matto forzato in {m:move}.
+an.brilliant.mate.2 = E forza il matto in {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} è l’unica mossa che mantiene il vantaggio.
+an.only.win.2 = Qui solo {move} conserva il vantaggio. Bella trovata.
+an.only.hold = {move} è l’unica mossa che mantiene l’equilibrio.
+an.only.hold.2 = Qui solo {move} tiene la posizione.
+an.only.defend = {move} è l’unica mossa che tiene viva la lotta.
+an.only.defend.2 = Qui solo {move} tiene in vita la partita. Bella difesa.
+an.only.best = Qui {move} è di gran lunga la mossa più forte.
+an.only.best.2 = Mossa precisa: {move} è molto più forte di qualsiasi alternativa.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} è una piccola imprecisione: {best} era una mossa più accurata.
+an.inaccuracy.2 = Non proprio la migliore: {best} era una mossa più precisa di {move}.
+an.interesting = {move} è un’idea interessante, che offre {piece}.
+an.interesting.2 = Un tentativo interessante: {move} sacrifica {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Ora il Bianco ha un matto forzato in {m:move}.
+an.mate_on.white.2 = Da qui il Bianco può forzare il matto in {m:move}.
+an.mate_on.black = Ora il Nero ha un matto forzato in {m:move}.
+an.mate_on.black.2 = Da qui il Nero può forzare il matto in {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Scacco matto. Il Bianco vince la partita.
+an.end.mate.white.2 = Ed è scacco matto: vince il Bianco.
+an.end.mate.black = Scacco matto. Il Nero vince la partita.
+an.end.mate.black.2 = Ed è scacco matto: vince il Nero.
+an.end.resigned.white = Il Nero ha abbandonato, quindi il Bianco vince la partita.
+an.end.resigned.white.2 = La partita finisce qui: il Nero abbandona e il Bianco vince.
+an.end.resigned.black = Il Bianco ha abbandonato, quindi il Nero vince la partita.
+an.end.resigned.black.2 = La partita finisce qui: il Bianco abbandona e il Nero vince.
+an.end.timeout.white = Al Nero è scaduto il tempo, quindi vince il Bianco.
+an.end.timeout.white.2 = Il Bianco vince per tempo.
+an.end.timeout.black = Al Bianco è scaduto il tempo, quindi vince il Nero.
+an.end.timeout.black.2 = Il Nero vince per tempo.
+an.end.win.white = La partita si conclude con la vittoria del Bianco.
+an.end.win.white.2 = Il Bianco vince la partita.
+an.end.win.black = La partita si conclude con la vittoria del Nero.
+an.end.win.black.2 = Il Nero vince la partita.
+an.end.stalemate = Stallo: la partita è patta.
+an.end.stalemate.2 = È stallo, quindi la partita finisce patta.
+an.end.draw.agreement = I giocatori hanno concordato la patta.
+an.end.draw.agreement.2 = La partita finisce patta di comune accordo.
+an.end.draw.repetition = La partita è patta per ripetizione.
+an.end.draw.repetition.2 = La stessa posizione è tornata di nuovo: patta.
+an.end.draw.fifty = La partita è patta per la regola delle cinquanta mosse.
+an.end.draw.fifty.2 = Cinquanta mosse senza catture né mosse di pedone: patta.
+an.end.draw.seventy_five = La partita è patta per la regola delle settantacinque mosse.
+an.end.draw.seventy_five.2 = Settantacinque mosse senza catture né mosse di pedone: patta.
+an.end.draw.material = Lo scacco matto non è più possibile: la partita è patta.
+an.end.draw.material.2 = Nessuno dei due può più dare scacco matto, quindi è patta.
+an.end.draw = La partita finisce patta.
+an.end.draw.2 = Patta.
+an.end.unfinished = La partita si ferma qui, incompiuta.
+an.end.unfinished.2 = La partita si ferma qui: non era conclusa.
+an.end.accuracy = Precisione: {acc_white:percent} per il Bianco, {acc_black:percent} per il Nero.
+an.end.accuracy.2 = Il Bianco ha giocato con una precisione pari a {acc_white:percent}, il Nero pari a {acc_black:percent}.
+an.end.clean.white = Il Bianco non ha commesso nessun errore, grave o meno.
+an.end.clean.white.2 = Il gioco del Bianco è stato privo di errori seri.
+an.end.clean.black = Il Nero non ha commesso nessun errore, grave o meno.
+an.end.clean.black.2 = Il gioco del Nero è stato privo di errori seri.
+an.end.mistakes.white = Il Bianco ha commesso {n:mistake} e nessun errore grave.
+an.end.mistakes.white.2 = Per il Bianco: {n:mistake}, nessun errore grave.
+an.end.mistakes.black = Il Nero ha commesso {n:mistake} e nessun errore grave.
+an.end.mistakes.black.2 = Per il Nero: {n:mistake}, nessun errore grave.
+an.end.blunders.white = Il Bianco ha commesso {m:blunder}.
+an.end.blunders.white.2 = Per il Bianco: {m:blunder}.
+an.end.blunders.black = Il Nero ha commesso {m:blunder}.
+an.end.blunders.black.2 = Per il Nero: {m:blunder}.
+an.end.errors.white = Il Bianco ha commesso {n:mistake} e {m:blunder}.
+an.end.errors.white.2 = Per il Bianco: {n:mistake} e {m:blunder}.
+an.end.errors.black = Il Nero ha commesso {n:mistake} e {m:blunder}.
+an.end.errors.black.2 = Per il Nero: {n:mistake} e {m:blunder}.

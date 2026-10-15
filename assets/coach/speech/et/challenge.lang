@@ -1,0 +1,136 @@
+# Coach speech (Estonian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 seisu", count.position in
+#            common.lang); the mate distance is "{n:move_com}" ("matt 2 käiguga" = "kahe käiguga"),
+#            the length of a hold "{n:move_gen} jooksul" ("10 käigu jooksul")
+#   {move}   one of the coach's moves, played on the board while the line is said; it never takes a
+#            case ending: "käiguga {move}", "pärast käiku {move}". "{move:nomate}" says a mating move
+#            without "matt" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use the reflexive "oma": {your:own_part} = "oma ratsut"
+#   {sq}     a square, always next to "väli" ("väljal {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "sina" to the player.
+# The challenge names are those of assets/i18n/et.lang (challenge.<id>.name).
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matt ühe käiguga. {n:position} ja iga kord paneb matti üksainus käik. Kontrolli kõiki tuleandmisi.
+ch.intro.mate2 = Matt kahe käiguga. {n:position}: sinu esimene käik peab jätma mind kaitseta, siis paned matti.
+ch.intro.mate3 = Matt kolme käiguga. {n:position}. Tuleandmised, löömised ja ähvardused: arvuta iga kord välja minu parim vastus.
+ch.intro.backrank = Tagumise rea matid. {n:position}, kus kuningas on lõksus oma etturite taga.
+ch.intro.patterns = Matipildid. {n:position} klassikaliste mativõrkudega. Tunne muster ära ja anna siis löök.
+ch.intro.hanging = Kaitseta malendid. {n:position}: mul on midagi kaitseta jäänud. Leia see ja löö ära.
+ch.intro.fork = Kahvlid. {n:position}: leia käik, mis ründab korraga kahte sihtmärki.
+ch.intro.pin = Sidumised. {n:position}: seo mõni malend või kasuta sidumist ära.
+ch.intro.skewer = Läbilöögid. {n:position}: ründa väärtuslikku malendit ja võida see, mis seisab tema taga.
+ch.intro.discovered = Avatud rünnakud. {n:position}: liiguta üht malendit, et vabastada teine.
+ch.intro.deflection = Eemaletõrjumine ja meelitus. {n:position}: meelita kaitsja eemale või saatuslikule väljale.
+ch.intro.intermezzo = Vahekäigud. {n:position}: enne ilmset käiku leia tugevam.
+ch.intro.trapped = Lõksus malendid. {n:position}: ühel minu malendil pole kuhugi ohutult minna. Võida see.
+ch.intro.promotion = Muundumine. {n:position}, kus kaugele edenenud ettur otsustab partii.
+ch.intro.quiet = Vaiksed käigud. {n:position}: võidukäik ei ole tuleandmine ega löömine.
+ch.intro.opening = Avangulõksud. {n:position} päris partiide esimestest käikudest. Karista mind mu vea eest.
+ch.intro.escape = Leia pääsetee. {n:position}: sinu kuningas on ohus ja ainult üks käik päästab ta.
+ch.intro.defend = Kaitsekäigud. {n:position}: leia see ainus käik, mis hoiab sinu seisu koos.
+ch.intro.kq = Lipp ja kuningas kuninga vastu. {n:position}: pane mu kuningale matt. Hoidu patist.
+ch.intro.kr = Vanker ja kuningas kuninga vastu. {n:position}: pane mu kuningale matt, samm-sammult.
+ch.intro.kp = Kuningas ja ettur kuninga vastu. {n:position}: muunda ettur lipuks. Lase kuningal ees käia.
+ch.intro.kp_hold = Peata ettur. {n:position}: sul on ainult kuningas. Hoia viiki.
+ch.intro.rook = Vankrilõppmängud. {n:position}: ehita sild, et ettur muundada, ja hoia viiki Philidori kaitsega.
+ch.intro.endgame = Lõppmängu taktika. {n:position} väheste malendite ja teravate ideedega.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_com}: "2 käiguga").
+ch.task.mate = Matt {n:move_com}.
+ch.task.mate.2 = Leia matt {n:move_com}.
+ch.task.hanging = Midagi on kaitseta jäänud.
+ch.task.hanging.2 = Mida saad tasuta lüüa?
+ch.task.fork = Leia kahvel.
+ch.task.fork.2 = Otsi kahvlit.
+ch.task.pin = Siin on võti sidumises.
+ch.task.skewer = Siin võidab läbilöök.
+ch.task.discovered = Siin võidab avatud rünnak.
+ch.task.deflection = Koorma kaitsja üle või meelita ta ära.
+ch.task.intermezzo = Otsi vahekäiku.
+ch.task.trapped = Üks minu malend ei pääse minema. Võida see.
+ch.task.promotion = Kasuta oma kaugele edenenud etturit.
+ch.task.quiet = Võidukäik on vaikne käik.
+ch.task.opening = Karista mind mu viimase käigu eest.
+ch.task.escape = Päästa oma kuningas: ainult üks käik aitab.
+ch.task.defend = Leia ainus hea käik.
+ch.task.endgame = Leia parim käik.
+ch.task.default = Leia parim käik.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Pane mu kuningale matt. Ma kaitsen end nii hästi, kui oskan.
+ch.task.play.promote = Muunda oma ettur ja hoia võit käes. Ma püüan sind takistada.
+ch.task.play.hold = Hoia viiki {n:move_gen} jooksul. Ma püüan võita.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Need seisud on pärit päris partiidest. Mina teen viimase käigu, siis on sinu kord.
+ch.lead.first.2 = Iga seis on pärit päris partiist: ma teen käigu, mis selleni viis, ja siis mängid sina.
+ch.next = Järgmine seis.
+ch.next.2 = Siin on järgmine.
+ch.next.3 = Edasi järgmise juurde.
+ch.last = Viimane seis.
+ch.last.2 = Ja nüüd viimane.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Hea.
+ch.good.2 = Jah.
+ch.good.3 = Õige.
+ch.good.4 = Täpselt.
+# The position is solved.
+ch.solved = Just nii! Tubli.
+ch.solved.2 = Täiesti õige.
+ch.solved.3 = Väga hea.
+ch.solved.mate = Matt! Tubli.
+ch.solved.mate.2 = Ja see on matt. Väga hea.
+ch.solved.mate.3 = Matt. Kenasti tehtud.
+ch.solved.promote = Uus lipp ja võit on kindel. Tubli.
+ch.solved.hold = Viik on kindel. Hästi kaitstud!
+ch.solved.draw = Laual on viik. Hästi kaitstud!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Mitte see: ma vastaksin käiguga {move}.
+ch.wrong.reply.2 = Mitte päris: siis käiksin {move}.
+ch.wrong.reply.3 = Siis mängiksin {move}.
+ch.wrong.mate = Ettevaatust: {move:nomate} oleks matt.
+ch.wrong.mate.2 = Vaata ette: ma vastaksin käiguga {move:nomate} ja see on matt.
+ch.wrong.mated = Ettevaatust: pärast käiku {move} on mul forsseeritud matt {m:move_com}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Ka see paneb matti, aga see võtab kauem aega. On kiirem tee.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Ka see paneb matti, aga mul on mõttes teine käik. Vaata uuesti.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Pole paha, aga on midagi tugevamat. Vaata uuesti.
+ch.wrong.weaker.2 = Seda võib mängida, aga sa saad paremini.
+ch.wrong.stalemate = Patt! Minu kuningas ei saa käia ja see on ainult viik.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Mitte see: pärast käiku {move} suudan ma viigi hoida.
+ch.wrong.loses = Ettevaatust: pärast käiku {move} oleksin mina võitmas.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = See pole õige käik.
+ch.try_again = Proovi uuesti.
+ch.try_again.2 = Vaata veel kord.
+ch.try_again.3 = Vaata uuesti.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Kas soovid vihjet?
+ch.offer.2 = Kas ma annan sulle vihje?
+ch.no_hint = Hästi. Otsi edasi.
+ch.no_hint.2 = Olgu, võta aega.
+ch.hint.piece = Vaata {your:own_part}.
+ch.hint.piece.2 = Mõtle {your:own_all}.
+ch.hint.square = Vaata välja {sq}.
+ch.hint.square.2 = Võtmeväli on {sq}.
+ch.hint.square.3 = Hoia silm peal väljal {sq}.
+ch.hint.show = Siin on käik. Vaata.
+ch.hint.show.2 = Las ma näitan. Vaata.
+ch.hint.now = Nüüd tee see käik ise.
+ch.hint.now.2 = Sinu kord: tee see käik.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = See oli kogu väljakutse. Tubli!
+ch.complete.2 = Kõik seisud on lahendatud. Tubli!

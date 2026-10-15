@@ -1,0 +1,164 @@
+# Coach speech (Estonian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "sina" (sa, sinu, singular imperatives); Estonian has
+# no grammatical gender, so nothing agrees with the player or the coach.
+#
+# Names inserted by {text}, {theme}, {level} (written to fit every line that inserts them):
+#   appraisal.phase.*   lower-case nominative nouns ("avang"); their cases are in common.lang:
+#                       "{text:ine}" = "avangus", "{text:gen}" = "avangu" ("Avangu mängisid sa hästi.").
+#   appraisal.reason.*  an adverbial phrase said right after "viik" ("Viik pati tõttu."), no comma.
+#   theme.*             a verbal-noun phrase in -mine (nominative, lower case, no full stop), always said
+#                       after a colon ("Üks nõuanne: kogu laua vaatamine enne käiku.").
+#   appraisal.level.*   the level names of the coach page (coach.level.N.name), always quoted „…“ after
+#                       the noun "tase", which carries the case ("proovi taset „Algaja“").
+# Forms from common.lang: move numbers are ordinals: "{n:ord_ade} käigul" = "21. käigul" (spoken
+# "kahekümne esimesel käigul"), "{n:ord} käik" = "21. käik", "kuni {crit_no:ord_gen} käiguni";
+# accuracy "{acc:percent}" = "85 %" (spoken "kaheksakümmend viis protsenti"), "{acc:percent_gen}
+# täpsusega"; total objects "{n:piece_obj}", "{n:move_obj}"; "{moves:move_com}" = "30 käiguga";
+# a list "{n:mistake_gen} ja {m:blunder_com}" = "kahe vea ja ühe jämeda veaga".
+# Material won is said as "{pts:point_gen} väärtuses materjali" ("kolme punkti väärtuses materjali").
+# {opening:def} is the opening's name inside a sentence, always where the nominative fits ("Meil oli
+# {opening:def}."); {opening} alone is a short sentence by itself.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = avang
+appraisal.phase.middlegame = keskmäng
+appraisal.phase.endgame = lõppmäng
+appraisal.reason.stalemate = pati tõttu
+appraisal.reason.material = ebapiisava materjali tõttu
+appraisal.reason.repetition = seisu kordumise tõttu
+appraisal.reason.fifty = viiekümne käigu reegli järgi
+appraisal.reason.agreement = kokkuleppel
+appraisal.reason.other = reeglite järgi
+# The level names of the coach page (coach.level.<n>.name of assets/i18n/et.lang).
+appraisal.level.l1 = Esimesed sammud
+appraisal.level.l2 = Algaja
+appraisal.level.l3 = Edasijõudnu
+appraisal.level.l4 = Klubimängija
+appraisal.level.l5 = Tugev klubimängija
+appraisal.level.l6 = Ekspert
+# What to practise, after "Üks nõuanne:" and similar (a verbal-noun phrase, no full stop). "Oma" for the
+# player's own pieces (the player is the implied subject of the verbal noun).
+theme.general = kogu laua vaatamine enne käiku
+theme.mate_allowed = oma kuninga turvalisuse kontrollimine enne iga käiku
+theme.mate_missed = mativõimaluste otsimine, alustades tuld andvatest käikudest
+theme.stalemate = minu kuningale vaba välja jätmine, kui sul on võiduseis
+theme.fork = kahekordsete rünnakute jälgimine
+theme.discovered = minu malendite taha peidetud rünnakute jälgimine
+theme.skewer = väärtuslike malendite hoidmine eri liinidel
+theme.pin = sidumiste märkamine enne, kui need tekivad
+theme.trapped = oma malenditele taganemistee jätmine
+theme.back_rank = oma kuningale väikese väljapääsu tegemine
+theme.hanging = oma malendite kaitstuna hoidmine
+theme.exchange = ründajate ja kaitsjate kokkulugemine enne vahetust
+theme.missed_capture = esmalt tasuta löödavate malendite otsimine
+theme.missed_fork = oma kahekordsete rünnakute otsimine
+theme.promotion = etturite võidujooks ja etturi ruudu reegel
+theme.king_safety = oma kuninga hoidmine etturite varjus
+theme.bad_trade = vahetatavate malendite valimine
+theme.opening = oma nuppude arendamine ja varajane vangerdus
+theme.endgame = oma kuninga kasutamine ja vabaetturite edasiviimine
+theme.positional = oma halvima nupu parendamine
+theme.material = enne oma käiku kontrollimine, mida minu järgmised käigud võita võivad
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Matt! Sa võitsid. Hästi mängitud!
+appraisal.open.win.b1.2 = Sa võitsid! Väga tubli, et viisid partii lõpuni.
+appraisal.open.win.b1.3 = Sa võitsid mind! See oli tõesti hea partii.
+appraisal.open.win.b2 = Hästi mängitud! Sa võitsid {moves:move_com}.
+appraisal.open.win.b2.2 = Palju õnne, sa võitsid!
+appraisal.open.win.b2.3 = Võit {moves:move_com}. Hästi tehtud!
+appraisal.open.win.b3 = Palju õnne, igati teenitud võit.
+appraisal.open.win.b3.2 = Hästi mängitud. Sa väärisid seda võitu.
+appraisal.open.win.b3.3 = Hea võit. Palju õnne.
+appraisal.open.win.b4 = Ilus võit.
+appraisal.open.win.b4.2 = Hästi mängitud, teenitud võit.
+appraisal.open.win.b4.3 = Hea võit.
+appraisal.open.win.b5 = Hästi mängitud.
+appraisal.open.win.b5.2 = Kenasti võidetud.
+appraisal.open.win.b5.3 = Hea partii, hästi võidetud.
+appraisal.open.win.b6 = Hästi mängitud.
+appraisal.open.win.b6.2 = Hästi võidetud.
+appraisal.open.win.b6.3 = Hea partii.
+appraisal.open.draw.b1 = Viik! Seda partiid ei suutnud keegi võita.
+appraisal.open.draw.b1.2 = Viik. See oli tasavägine partii!
+appraisal.open.draw.b1.3 = Viik: jagame punkti pooleks. Hästi mängitud!
+appraisal.open.draw.b2 = Viik – õiglane tulemus.
+appraisal.open.draw.b2.2 = Mängisime viigi. Hea võitlus!
+appraisal.open.draw.b2.3 = Viik ja hea partii.
+appraisal.open.draw.b3 = Viik. Mõlemal poolel oli võimalusi.
+appraisal.open.draw.b3.2 = Õiglane viik.
+appraisal.open.draw.b3.3 = Viik {text}. Hea võitlus.
+appraisal.open.draw.b4 = Viik {text}.
+appraisal.open.draw.b4.2 = Partii lõppes viigiga {text}.
+appraisal.open.draw.b4.3 = Tulemus: viik {text}.
+appraisal.open.draw.b5 = Viik.
+appraisal.open.draw.b5.2 = Viik {text}.
+appraisal.open.draw.b5.3 = Lõppes viigiga.
+appraisal.open.draw.b6 = Viik.
+appraisal.open.draw.b6.2 = Viik {text}.
+appraisal.open.draw.b6.3 = Lõppes viigiga.
+appraisal.open.stalemate.b1 = Viik pati tõttu – võit oli nii lähedal! Järgmisel korral jäta minu kuningale vaba väli.
+appraisal.open.stalemate.b1.2 = Patt, nii et viik. Võit oli peaaegu käes!
+appraisal.open.stalemate.b2 = Viik pati tõttu. Sa olid võidule nii lähedal!
+appraisal.open.stalemate.b2.2 = Patt: viik, kuigi sul oli võiduseis.
+appraisal.open.stalemate.b3 = Viik pati tõttu, kuigi seis oli võidetud.
+appraisal.open.stalemate.b3.2 = Patt. Võit libises käest päris lõpus.
+appraisal.open.stalemate.b4 = Viik pati tõttu.
+appraisal.open.stalemate.b4.2 = Patt: viik.
+appraisal.open.stalemate.b5 = Patt.
+appraisal.open.stalemate.b5.2 = Patiga viik.
+appraisal.open.stalemate.b6 = Patt.
+appraisal.open.stalemate.b6.2 = Viik, patt.
+appraisal.open.loss.b1 = Seekord võitsin mina, aga sa tegid tõeliselt häid käike.
+appraisal.open.loss.b1.2 = Hea partii! Sa panid mind tõsiselt pingutama.
+appraisal.open.loss.b1.3 = See oli lõbus! Selle partii võitsin mina, aga sa õpid kiiresti.
+appraisal.open.loss.b2 = Hea partii! Vaatame, mis läks hästi, ja leiame ühe asja, mida proovida.
+appraisal.open.loss.b2.2 = Aitäh partii eest! Sul oli häid ideid.
+appraisal.open.loss.b2.3 = Hea partii. Vaatame, mida me sellest õppida saame.
+appraisal.open.loss.b3 = Hea partii.
+appraisal.open.loss.b3.2 = Aitäh partii eest.
+appraisal.open.loss.b3.3 = Hea partii. Vaatame lähemalt.
+appraisal.open.loss_close.b3 = Hea võitlus. Partii oli kaua tasavägine.
+appraisal.open.loss_close.b3.2 = Hea võitlus: seis oli pikka aega tasakaalus.
+appraisal.open.loss.b4 = Hea partii. Vaatame, mis selle otsustas.
+appraisal.open.loss.b4.2 = Hea partii. Selle otsustas üks hetk.
+appraisal.open.loss.b4.3 = Aitäh partii eest. Vaatame, kus toimus pööre.
+appraisal.open.loss_close.b4 = Pikka aega tasavägine võitlus. Vaatame, mis selle otsustas.
+appraisal.open.loss_close.b4.2 = Hea partii, pikka aega tasakaalus.
+appraisal.open.loss.b5 = Hea partii.
+appraisal.open.loss.b5.2 = Aitäh partii eest.
+appraisal.open.loss.b5.3 = Hea võitlus.
+appraisal.open.loss.b6 = Hea partii.
+appraisal.open.loss.b6.2 = Aitäh partii eest.
+appraisal.open.loss.b6.3 = Hea võitlus.
+appraisal.open.resigned.b1 = Allaandmine kuulub male juurde ja selleks on vaja julgust. Hea partii!
+appraisal.open.resigned.b1.2 = Pole hullu. Teada, millal alla anda, on osa malest.
+appraisal.open.resigned.b2 = Allaandmine kuulub male juurde ja see nõuab julgust.
+appraisal.open.resigned.b2.2 = Mõistan. Ka allaandmine nõuab julgust.
+appraisal.open.resigned.b3 = Allaandmine kuulub male juurde. Hea partii.
+appraisal.open.resigned.b3.2 = Mõistan. Aitäh partii eest.
+appraisal.open.resigned.b4 = Hea partii.
+appraisal.open.resigned.b4.2 = Aitäh partii eest.
+appraisal.open.resigned.b5 = Hea partii.
+appraisal.open.resigned.b5.2 = Aitäh partii eest.
+appraisal.open.resigned.b6 = Hea partii.
+appraisal.open.resigned.b6.2 = Aitäh.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Tead, partii polnud veel läbi: hinnang oli umbes {eval}.
+appraisal.resign_early.b3.2 = Tegelikult oli sul veel võimalusi: umbes {eval}.
+appraisal.resign_early.b4 = Partii polnud veel läbi: umbes {eval}.
+appraisal.resign_early.b4.2 = Seisus oli veel mängu: umbes {eval}.
+appraisal.resign_early.b5 = Polnud veel läbi: {eval}.
+appraisal.resign_early.b5.2 = Veel mängitav, umbes {eval}.
+appraisal.resign_early.b6 = Polnud läbi: {eval}.
+appraisal.resign_early.b6.2 = Hinnang oli {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Meie avang oli {opening:def}.
+appraisal.opening.b3.2 = Avanguks oli {opening:def}.
+appraisal.opening.b4 = Meil oli {opening:def}.
+appraisal.opening.b4.2 = Avang: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Avang: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Avang: {opening:def}.

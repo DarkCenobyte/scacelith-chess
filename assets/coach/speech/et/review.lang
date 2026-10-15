@@ -1,0 +1,212 @@
+# Coach speech (Estonian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "sina" (sa, sinu, singular imperatives) and "mina" for himself. Estonian has
+# no grammatical gender: nothing agrees with the sex of the player or of the coach.
+# Pieces carry their possessive; forms from common.lang: {your:part} "sinu ratsut", {your:gen},
+# {your:all}, {your:ade} ("{your:ade} oli parem käik" = "your knight had a better move"), {your:com},
+# {your:ter}, {your:abe}; own_* ("oma ...") whenever the owner is the subject of the clause, also the
+# implied subject of an imperative: "Vaata {your:own_part}", "Ma viin {my:own_gen} väljale {sq}".
+# A pronoun for a piece is "see / seda / selle" (or "ta" where the piece acts).
+# Squares, moves and lines never take an ending: "väljale {sq}", "väljal {sq}", "pärast käiku
+# {reply}", "pärast jätku {line}", "käiguga {best}", "alates käigust {best:nomate}".
+# Counts: {pts:point_obj} after "kaotama / võitma" ("oled kaotanud ühe punkti"), {pts:point_gen}
+# before "võrra" ("oled kolme punkti võrra taga"), {n:point_gen} väärt ("viie punkti väärt"),
+# {m:move_com} for mates ("matt kahe käiguga"), {n:attacker} {n2:defender_gen} vastu, {n:time}.
+# Pin: "seotud", and the piece behind is named ("selle taga on {t1}") rather than a preposition.
+# Mate pattern names (name.pattern.*) are in the nominative; one line quotes them: „{text}“.
+# Levels 1-2: short sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Tuli! Minu kuningas on rünnaku all.
+ann.check.human.b1.2 = Tuli! Sa ründad minu kuningat.
+ann.check.human.b1.3 = See on tuli! Minu kuningas peab tule alt pääsema.
+ann.check.human = Tuli.
+ann.check.human.2 = Tuli!
+ann.check.human.3 = Ja see on tuli.
+# The coach gives check.
+ann.check.coach = Tuli!
+ann.check.coach.2 = Tuli.
+ann.check.coach.3 = Ja tuli!
+# Once per game at levels 1-2, right after the coach's first check.
+ann.check.coach.first = See tähendab, et {your} on rünnaku all. Sa pead ta tule alt päästma.
+ann.check.coach.first.2 = Tuli tähendab, et {your} on rünnaku all. Liiguta seda, pane midagi vahele või löö minu malend.
+ann.double_check.coach = Kahekordne tuli! Kaks minu malendit ründavad korraga sinu kuningat, nii et kuningas peab liikuma.
+ann.double_check.coach.2 = See on kahekordne tuli: nüüd aitab sind ainult kuningakäik.
+ann.double_check.human = Kahekordne tuli! Kaks sinu malendit ründavad korraga minu kuningat, nii et kuningas peab liikuma.
+ann.double_check.human.2 = Kahekordne tuli! Nüüd päästab mind ainult kuningakäik.
+# The player checkmates the coach.
+ann.mate.human.b1 = Matt! Sa võitsid! Minu kuningas ei pääse kuhugi.
+ann.mate.human.b1.2 = See on matt! Tubli, sa võitsid partii!
+ann.mate.human.b1.3 = Matt! Minu kuningas on lõksus. Palju õnne!
+ann.mate.human = Matt. Hästi mängitud.
+ann.mate.human.2 = See on matt. Palju õnne.
+ann.mate.human.3 = Matt! Ilusti tehtud.
+# The coach checkmates the player.
+ann.mate.coach.b1 = See on matt. Sinu kuningal pole pääsu.
+ann.mate.coach.b1.2 = Matt. Sinu kuningas on rünnaku all ega pääse minema.
+ann.mate.coach.b1.3 = Kahjuks on see matt. Sinu kuningas ei saa enam põgeneda.
+ann.mate.coach = Matt.
+ann.mate.coach.2 = Ja ongi matt.
+ann.mate.coach.3 = Kahjuks matt.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Oi! See käik annab midagi ära.
+ex.verdict.blunder.b1.2 = Ettevaatust! See käik võib sulle kalliks maksma minna.
+ex.verdict.blunder.b1.3 = Oi, oota. Selle käiguga on üks probleem.
+ex.verdict.blunder.b2 = Hmm, selle käiguga on probleem.
+ex.verdict.blunder.b2.2 = See on suur viga.
+ex.verdict.blunder.b2.3 = Ettevaatust, see käik maksab sulle midagi.
+ex.verdict.blunder.b3 = See on jäme viga.
+ex.verdict.blunder.b3.2 = {move} on tõeline viga.
+ex.verdict.blunder.b3.3 = Oi-oi, {move} on suur viga.
+ex.verdict.blunder.b4 = {move} on jäme viga.
+ex.verdict.blunder.b4.2 = {move} on tõsine viga.
+ex.verdict.blunder.b4.3 = Kahjuks on see jäme viga.
+ex.verdict.blunder.b5 = {move} on tõsine viga.
+ex.verdict.blunder.b5.2 = {move} on jäme viga.
+ex.verdict.blunder.b5.3 = {move} on kulukas viga.
+ex.verdict.blunder.b6 = {move} on raske viga.
+ex.verdict.blunder.b6.2 = {move} on jäme viga.
+ex.verdict.blunder.b6.3 = {move}? Jäme viga.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Oi! Sa ei vastanud minu ähvardusele.
+ex.verdict.ignored.b1.2 = Ettevaatust! Minu ähvardus oli alles.
+ex.verdict.ignored.b1.3 = Oi, oota. Sa unustasid minu ähvarduse.
+ex.verdict.ignored.b2 = Hmm, minu ähvardus oli ju alles.
+ex.verdict.ignored.b2.2 = Sa jätsid minu ähvardusele vastamata.
+ex.verdict.ignored.b2.3 = Ettevaatust, sa ei vastanud minu ähvardusele.
+ex.verdict.mistake.b3 = See pole hea käik.
+ex.verdict.mistake.b3.2 = Hmm, käiguga {move} on probleem.
+ex.verdict.mistake.b3.3 = See on viga.
+ex.verdict.mistake.b4 = {move} on viga.
+ex.verdict.mistake.b4.2 = {move} pole hea.
+ex.verdict.mistake.b4.3 = See on viga.
+ex.verdict.mistake.b5 = {move} on selge viga.
+ex.verdict.mistake.b5.2 = {move} on viga.
+ex.verdict.mistake.b5.3 = {move} ei ole hea.
+ex.verdict.mistake.b6 = {move} on viga.
+ex.verdict.mistake.b6.2 = {move}? Viga.
+ex.verdict.mistake.b6.3 = Mitte {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Pole paha, aga {best} oli veidi parem.
+ex.verdict.inaccuracy.b3.2 = {best} oli natuke täpsem.
+ex.verdict.inaccuracy.b3.3 = Väike libastus: {best} oli siin parem.
+ex.verdict.inaccuracy.b4 = Ebatäpne: {best} oli täpsem.
+ex.verdict.inaccuracy.b4.2 = Väike ebatäpsus. {best} oli veidi parem.
+ex.verdict.inaccuracy.b4.3 = Mitte päris parim: {best} oli täpsem.
+ex.verdict.inaccuracy.b5 = {move} on ebatäpne; {best} oli tugevam.
+ex.verdict.inaccuracy.b5.2 = Veidi ebatäpne. Mina oleksin käinud {best}.
+ex.verdict.inaccuracy.b5.3 = {best} oli täpsem kui {move}.
+ex.verdict.inaccuracy.b6 = {move} on ebatäpne; {best}.
+ex.verdict.inaccuracy.b6.2 = Ebatäpne. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} oli parem.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} oleks võinud olla veidi täpsem.
+ex.verdict.inaccuracy.maybe.2 = Mina oleksin ehk käinud {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = See käik paistab kahtlane.
+ex.verdict.dubious.2 = See käik tundub kahtlane.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oi, oota! Sul jäi midagi head märkamata.
+ex.verdict.missed.b1.2 = Vaata uuesti! Oli midagi paremat.
+ex.verdict.missed.b1.3 = Oota, sul oli seal võimalus!
+ex.verdict.missed.b2 = Sa lasid siin võimaluse käest.
+ex.verdict.missed.b2.2 = Hmm, oli midagi paremat.
+ex.verdict.missed.b2.3 = Oota, sul oli seal suurepärane käik.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Parem oli {best}.
+ex.better.b3.2 = {best} oli parem käik.
+ex.better.b3.3 = Selle asemel oli hea {best}.
+ex.better.b4 = {best} oli tugevam.
+ex.better.b4.2 = {best} oli õige käik.
+ex.better.b4.3 = Parem oli {best}.
+ex.better.b5 = {best} ideega {line}.
+ex.better.b5.2 = Õige oli {best}: {line}.
+ex.better.b5.3 = Parem oli {best}, millele järgneb {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Selle asemel {best}, {eval}.
+ex.better.b6.3 = Käigu {best} hinnang oli {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = {your:com} oli parem käik.
+ex.hint.b1.2 = {your:ade} oli parem käik.
+ex.hint.b2 = {your:ade} oli parem käik.
+ex.hint.b2.2 = {your:com} oli parem käik.
+ex.hint.b3 = {your:ade} oli parem käik.
+ex.hint.b3.2 = {your:com} oli midagi paremat.
+ex.hint.b4 = {your:ade} oli parem käik.
+ex.hint.b4.2 = Vaata veel kord {your:own_part}: sellel oli midagi paremat.
+ex.hint.b5 = {your:ade} oli tugevam käik.
+ex.hint.b5.2 = {your:com} oli tugevam käik.
+ex.hint.b6 = {your:ade} oli paremat pakkuda.
+ex.hint.b6.2 = Vaata uuesti {your:own_part}.
+ex.hint.move = Leidus parem käik.
+ex.hint.move.2 = Sul oli seal parem käik.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your:ade} oli parem käik. See võidab materjali.
+ex.hint.gain.b1.2 = {your:com} oli parem käik. See võidab materjali.
+ex.hint.gain.b2 = {your:ade} oli parem käik. See võidab materjali.
+ex.hint.gain.b2.2 = {your:com} oli käik, mis võidab materjali.
+ex.hint.gain.b3 = {your:ade} oli parem käik – selline, mis võidab materjali.
+ex.hint.gain.b3.2 = {your:com} oli käik, mis võidab materjali.
+ex.hint.gain.b4 = {your:ade} oli materjali võitev käik.
+ex.hint.gain.b4.2 = Vaata veel kord {your:own_part}: sellel oli materjali võitev käik.
+ex.hint.gain.b5 = {your:ade} oli tugevam käik, mis võidab materjali.
+ex.hint.gain.b5.2 = {your:com} oli materjali võitev käik.
+ex.hint.gain.b6 = {your:ade} oli materjali võitev käik.
+ex.hint.gain.b6.2 = Vaata uuesti {your:own_part}: sellega sai materjali võita.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Parem oli käia {your:own_com} väljale {sq}.
+ex.reveal.b1.2 = {your} võis minna väljale {sq}. See oli parem.
+ex.reveal.b2 = Käik {your:com} väljale {sq} oli parem.
+ex.reveal.b2.2 = Parem oli viia {your:own_nom} väljale {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Paneme malendid tagasi.
+ex.rewind.b1.2 = Nüüd panen kõik tagasi endisele kohale.
+ex.rewind.b1.3 = Las ma panen malendid tagasi.
+ex.rewind.b2 = Paneme kõik tagasi.
+ex.rewind.b2.2 = Tagasi sinna, kus olime.
+ex.rewind.b2.3 = Panen malendid tagasi.
+ex.rewind.b3 = Tagasi partii juurde.
+ex.rewind.b3.2 = Läheme tagasi.
+ex.rewind.b3.3 = Tagasi seisu juurde.
+ex.rewind.b4 = Tagasi partii juurde.
+ex.rewind.b4.2 = Tagasi.
+ex.rewind.b4.3 = Läheme tagasi.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Kas tahad proovida mõnda teist käiku?
+ex.offer.b1.2 = Kas soovid selle käigu tagasi võtta ja uuesti proovida?
+ex.offer.b1.3 = Kas proovime mõnda teist käiku?
+ex.offer.b2 = Kas soovid proovida teist käiku?
+ex.offer.b2.2 = Kas tahad käigu tagasi võtta?
+ex.offer.b2.3 = Proovid uuesti?
+ex.offer.b3 = Kas soovid käigu tagasi võtta?
+ex.offer.b3.2 = Kas tahad uuesti proovida?
+ex.offer.b3.3 = Võtad tagasi?
+ex.offer.b4 = Võtad tagasi?
+ex.offer.b4.2 = Kas tahad käigu tagasi võtta?
+ex.offer.b4.3 = Proovid teist käiku?
+ex.offer.b5 = Võtad tagasi?
+ex.offer.b5.2 = Tahad tagasi võtta?
+ex.offer.b5.3 = Võtad käigu tagasi?
+ex.offer.b6 = Võtad tagasi?
+ex.offer.b6.2 = Käik tagasi?
+ex.offer.b6.3 = Uuesti?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = See käik on kahtlane. Äkki saad paremini?
+ex.dubious.b1.2 = See käik on kahtlane. Äkki leiad parema käigu?
+ex.dubious.b2 = Kahtlane käik. Äkki saad paremini?
+ex.dubious.b2.2 = See käik on kahtlane. Äkki leidub midagi paremat?

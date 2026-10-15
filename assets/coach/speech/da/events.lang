@@ -1,0 +1,111 @@
+# Coach speech (Danish): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "du" to the player and "jeg" of himself (glossary/da.md). Danish adjectives and
+# participles do not agree with a person's gender, so no line shows the player's gender.
+# Commas as the glossary says: no comma before a subordinate clause that follows its main clause.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Hej! Lad os spille et venskabeligt parti. Jeg hjælper dig hver gang noget går galt.
+event.greet.l1.2 = Hej! Jeg spiller ikke for hårdt og viser dig hvad du skal holde øje med.
+event.greet.l1.3 = Velkommen! Tag dig god tid: jeg siger til når en brik er i fare.
+event.greet.l2 = Hej! Lad os spille. Når der opstår en gaffel eller en binding, viser jeg dig den.
+event.greet.l2.2 = Hej! Få dine brikker i spil, og hold din konge i sikkerhed. Jeg hjælper dig undervejs.
+event.greet.l2.3 = Velkommen tilbage til brættet! Hold øje med gafler og bindinger: de vinder partier.
+event.greet.l3 = Hej! Lad os spille et rigtigt parti. Jeg kommenterer dine planer og de større fejl.
+event.greet.l3.2 = Hej! Tænk over en plan for dine brikker. Jeg siger til når et træk overser noget.
+event.greet.l3.3 = Lad os spille! Jeg siger til når kun ét træk holder og når et træk går galt.
+event.greet.l4 = Hej! Denne gang giver jeg vurderinger og viser dig de bedre kandidattræk.
+event.greet.l4.2 = Lad os spille. Efter en fejl siger jeg hvad der var mere præcist.
+event.greet.l4.3 = Klar til et klubparti? Jeg kommenterer når vurderingen ændrer sig.
+event.greet.l5 = Lad os spille. Jeg holder mine kommentarer korte.
+event.greet.l5.2 = Jeg er klar når du er. Kun korte kommentarer.
+event.greet.l5.3 = Held og lykke. Jeg siger kun noget når det er vigtigt.
+event.greet.l6 = Held og lykke.
+event.greet.l6.2 = Lad os spille.
+event.greet.l6.3 = Klar. Jeg kommenterer kun de kritiske øjeblikke.
+
+# Who starts (said after the greeting).
+event.colour.white = Du har de hvide brikker, så du begynder.
+event.colour.white.2 = Du spiller hvid: du har det første træk.
+event.colour.black = Jeg har hvid, så jeg begynder.
+event.colour.black.2 = Du spiller sort denne gang: jeg trækker først.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those chosen for assets/i18n/da.lang (coach.level.<n>.name): Første skridt,
+# Begynder, Let øvet, Klubspiller, Stærk klubspiller, Ekspert.
+event.level.l1 = Første skridt: jeg spiller ikke for hårdt og forklarer hver fejl med enkle ord.
+event.level.l2 = Begynder: jeg spiller lidt stærkere og kalder enkle taktiske motiver som gafler og bindinger ved navn.
+event.level.l3 = Let øvet: jeg taler om planer og bondestruktur og viser korte varianter.
+event.level.l4 = Klubspiller: jeg giver vurderinger i bønder og foreslår kandidattræk.
+event.level.l5 = Stærk klubspiller: korte kommentarer og længere varianter når det betyder noget.
+event.level.l6 = Ekspert: jeg spiller for fuld styrke og kommenterer kun de kritiske øjeblikke.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Dit træk.
+event.your_move.2 = Din tur.
+event.your_move.3 = Over til dig.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Tag dig god tid.
+event.take_time.2 = Ingen hast: der er intet ur i vores partier.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Lad os se.
+event.filler.3 = Lad mig lige kigge.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Okay, så tager vi trækket tilbage.
+event.takeback.taken.2 = God idé. Kig på det en gang til.
+event.takeback.taken.3 = Trækket er taget tilbage. Prøv igen.
+# The player declined the offer and played on.
+event.takeback.declined = Okay, vi spiller videre.
+event.takeback.declined.2 = Fint, partiet fortsætter.
+event.takeback.declined.3 = Det er dit valg. Lad os fortsætte.
+# After an explanation without an offer.
+event.play_on = Lad os spille videre.
+event.play_on.2 = Lad os fortsætte.
+event.play_on.3 = Nå, tilbage til vores parti.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Alle laver den slags fejl. Det vigtige er at få øje på dem.
+event.encourage.mistake.2 = Bare rolig. Se hvad mit sidste træk angriber, så finder du det.
+event.encourage.mistake.3 = Det sker for alle spillere. Lad os fortsætte.
+# The player is behind (material or evaluation).
+event.encourage.behind = Giv ikke op: se efter chancer, og gør det svært for mig.
+event.encourage.behind.2 = Kæmp videre. Stillinger som denne kan stadig vende.
+event.encourage.behind.3 = Bevar roen, og se efter mine svagheder.
+# The player has played several good moves in a row.
+event.encourage.well = Du tjekker mine trusler før du trækker. Godt gået.
+event.encourage.well.2 = Omhyggelige, solide træk. Fortsæt sådan.
+event.encourage.well.3 = Du tænker klart i dag.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Jeg tager imod. Så er det remis.
+event.draw.accepted.2 = Aftalt: partiet er remis.
+event.draw.declined = Nej tak, lad os spille videre.
+event.draw.declined.2 = Jeg vil hellere fortsætte.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Godt spillet. Tillykke!
+event.end.win.2 = Det var fortjent. Godt gået!
+event.end.win.3 = Tillykke: du slog mig ærligt og redeligt.
+event.end.loss = Godt parti. Du får mig næste gang.
+event.end.loss.2 = Tak for partiet. Hvert nederlag lærer dig noget.
+event.end.loss.3 = God kamp. Lad os se på hvad der skete.
+event.end.draw = Remis. Godt parti!
+event.end.draw.2 = Ingen vinder denne gang. Godt kæmpet.
+event.end.draw.3 = Et retfærdigt resultat. Godt parti.
+event.end.resigned = Du opgav. God kamp alligevel.
+event.end.resigned.2 = Okay. Tak for partiet.
+event.end.handshake = Lad os give hånd.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title in lower case (lesson.title.* in lesson.lang): a noun phrase that
+# fits after "med", "ved", "til" and a colon.
+event.lesson.resume = Velkommen tilbage! Lad os fortsætte med {chapter}.
+event.lesson.resume.2 = Hej igen! Vi stoppede ved {chapter}.
+event.lesson.next = Næste kapitel: {chapter}.
+event.lesson.next.2 = Nu til {chapter}.
