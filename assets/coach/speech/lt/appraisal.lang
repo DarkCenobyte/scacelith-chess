@@ -14,7 +14,7 @@
 #   accuracy: "{acc:percent}" = "85 %" (spoken "aštuoniasdešimt penki procentai"),
 #   "{acc:percent_gen} tikslumu" = "85 % tikslumu" (spoken "...penkių procentų tikslumu");
 #   "{text:loc}" = the phase in the locative ("debiute", "mitelšpilyje", "endšpilyje").
-# {opening} is the citation name, always after a colon or a dash (it cannot inflect).
+# {opening} is the citation name, alone or after a colon or a dash (it cannot inflect).
 # {level} is the coach page's level name, always in „...“ after "lygis" ("lygiu „Pradedantysis“").
 
 # ---- Names used inside the lines ------------------------------------------------------------------
@@ -81,7 +81,7 @@ appraisal.open.win.b6 = Gerai sužaista.
 appraisal.open.win.b6.2 = Pelnytai laimėta.
 appraisal.open.win.b6.3 = Gera partija.
 appraisal.open.draw.b1 = Lygiosios! Šįkart niekam nepavyko laimėti.
-appraisal.open.draw.b1.2 = Lygiosios. Kova buvo labai lygi!
+appraisal.open.draw.b1.2 = Lygiosios. Kova buvo apylygė!
 appraisal.open.draw.b1.3 = Lygiosios: tašką pasidalijame per pusę. Gerai sužaidei!
 appraisal.open.draw.b2 = Lygiosios – teisingas rezultatas.
 appraisal.open.draw.b2.2 = Sužaidėme lygiosiomis. Gera kova!
@@ -135,7 +135,7 @@ appraisal.open.loss.b6.3 = Gera kova.
 appraisal.open.resigned.b1 = Pasiduoti – irgi šachmatų dalis, tam reikia drąsos. Gera partija!
 appraisal.open.resigned.b1.2 = Nieko tokio. Žinoti, kada pasiduoti, – irgi šachmatų dalis.
 appraisal.open.resigned.b2 = Pasidavimas – šachmatų dalis, ir tam reikia drąsos.
-appraisal.open.resigned.b2.2 = Suprantu. Pasiduoti irgi reikia drąsos.
+appraisal.open.resigned.b2.2 = Suprantu. Ir pasidavimui reikia drąsos.
 appraisal.open.resigned.b3 = Pasidavimas – šachmatų dalis. Gera partija.
 appraisal.open.resigned.b3.2 = Suprantu. Ačiū už partiją.
 appraisal.open.resigned.b4 = Gera partija.
@@ -198,15 +198,15 @@ appraisal.best.only.b3.2 = {n:nth_move_loc} poziciją išlaikė tik {move}, ir t
 appraisal.best.only.b4 = Geriausia akimirka: {move}, {n:nth_move}. Vienintelis ėjimas.
 appraisal.best.only.b4.2 = {n:nth_move}: {move}, vienintelis ėjimas.
 appraisal.best.only.b5 = {n:nth_move_loc} {move} buvo vienintelis ėjimas. Gerai rasta.
-appraisal.best.only.b5.2 = Vienintelis ėjimas {n:nth_move_loc}: {move}.
+appraisal.best.only.b5.2 = {n:nth_move_loc} tiko tik {move}.
 appraisal.best.only.b6 = {n:nth_move_loc} {move} – vienintelis ėjimas. Gerai rasta.
 appraisal.best.only.b6.2 = {n:nth_move}: {move}, vienintelis.
 appraisal.best.won.b1 = Mano mėgstamiausia akimirka: {move}. Šis ėjimas laimėjo {pts:point_acc} medžiagos!
 appraisal.best.won.b1.2 = Prisimeni ėjimą {move}? Jis tau atnešė {pts:point_acc} medžiagos. Šaunu!
 appraisal.best.won.b2 = Tavo geriausia akimirka – {move} {n:nth_move_loc}: laimėjai {pts:point_acc} medžiagos.
-appraisal.best.won.b2.2 = {n:nth_move_loc} ėjimu {move} laimėjai medžiagos. Puiku!
+appraisal.best.won.b2.2 = {move} {n:nth_move_loc} laimėjo medžiagos. Puiku!
 appraisal.best.won.b3 = Lemiamas ėjimas – {move} {n:nth_move_loc}: jis laimėjo {pts:point_acc} medžiagos.
-appraisal.best.won.b3.2 = {n:nth_move_loc} ėjimu {move} švariai laimėjai medžiagos.
+appraisal.best.won.b3.2 = {move} {n:nth_move_loc} švariai laimėjo medžiagos.
 appraisal.best.won.b4 = Geriausia akimirka: {move} {n:nth_move_loc}, laimėta medžiaga.
 appraisal.best.won.b4.2 = {move} {n:nth_move_loc} laimėjo {pts:point_acc} medžiagos.
 appraisal.best.won.b5 = {move} {n:nth_move_loc} laimėjo medžiagos.
@@ -231,7 +231,7 @@ appraisal.best.capture.b1.2 = Prisimeni ėjimą {move}? Pastebėjai, kad {my} st
 appraisal.best.capture.b2 = Tavo geriausia akimirka – {move}: laimėjai {my:acc}.
 appraisal.best.capture.b2.2 = Gražus kirtimas {n:nth_move_loc}: {move}.
 appraisal.best.capture.b3 = {n:nth_move_loc} gerai pastebėjai: {move} laimėjo {my:acc}.
-appraisal.best.capture.b3.2 = {n:nth_move_loc} ėjimu {move} pasiėmei {my:acc}.
+appraisal.best.capture.b3.2 = {move} {n:nth_move_loc} – ir {my} tavo.
 appraisal.best.capture.b4 = Geriausia akimirka: {move} {n:nth_move_loc} laimėjo {my:acc}.
 appraisal.best.capture.b4.2 = {move} {n:nth_move_loc} laimėjo medžiagos.
 appraisal.best.capture.b5 = {move} {n:nth_move_loc} laimėjo {my:acc}.
@@ -243,7 +243,7 @@ appraisal.best.phase.b1.2 = {text} buvo geriausia tavo partijos dalis.
 appraisal.best.phase.b2 = Stipriausiai žaidei {text:loc}.
 appraisal.best.phase.b2.2 = {text} tau labai pavyko.
 appraisal.best.phase.b3 = Geriausia tavo partijos stadija – {text}: {acc:percent}.
-appraisal.best.phase.b3.2 = {text} sekėsi geriausiai: {acc:percent_gen} tikslumas.
+appraisal.best.phase.b3.2 = {text} tau sekėsi geriausiai: {acc:percent_gen} tikslumas.
 appraisal.best.phase.b4 = Stipriausia stadija: {text}, {acc:percent}.
 appraisal.best.phase.b4.2 = {text} buvo tavo geriausia stadija: {acc:percent}.
 appraisal.best.phase.b5 = Geriausia stadija: {text}, {acc:percent}.

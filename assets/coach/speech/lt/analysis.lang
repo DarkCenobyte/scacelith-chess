@@ -91,7 +91,7 @@ an.only.best.2 = Tiksliai: {move} daug stipresnis už visus kitus ėjimus.
 
 # ---- Smaller remarks, in quiet moments -------------------------------------------------------------
 an.inaccuracy = {move} – nedidelis netikslumas: tikslesnis buvo ėjimas {best}.
-an.inaccuracy.2 = Ne visai geriausia: ėjimas {best} buvo tikslesnis nei {move}.
+an.inaccuracy.2 = Ne pats geriausias ėjimas: {best} buvo tikslesnis nei {move}.
 an.interesting = {move} – įdomi idėja su {piece:gen} auka.
 an.interesting.2 = Įdomus bandymas: {move} atiduoda {piece:acc}.
 

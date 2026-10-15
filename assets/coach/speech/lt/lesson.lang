@@ -33,7 +33,7 @@ lesson.now_you.3 = Dabar tu.
 # Another wrong move after the demonstration.
 lesson.almost = Beveik! Padaryk ėjimą, kurį parodžiau.
 lesson.almost.2 = Ne visai. Pabandyk ėjimą iš mano pavyzdžio.
-lesson.almost.3 = Arti. Prisimink, ką ką tik parodžiau.
+lesson.almost.3 = Arti. Prisimink mano ką tik parodytą ėjimą.
 # A wrong move without a line of its own.
 lesson.try_again = Ne tai. Bandyk dar kartą.
 lesson.try_again.2 = Ne šis ėjimas. Mėgink dar.
@@ -70,7 +70,7 @@ why.NotYourTurn = Palauk: dabar mano ėjimas.
 
 # ---- Chapter 0: welcome and the board -------------------------------------------------------------------
 lesson.welcome.hello = Labas! Aš tavo treneris. Kartu išmokime šachmatų taisykles, po mažą žingsnelį.
-lesson.welcome.board = Tai šachmatų lenta: šešiasdešimt keturi langeliai, šviesūs ir tamsūs, aštuonios eilės po aštuonis.
+lesson.welcome.board = Tai šachmatų lenta: šešiasdešimt keturi langeliai, šviesūs ir tamsūs, aštuonios eilės po aštuonis langelius.
 lesson.welcome.light = Kampinis langelis tavo {@}dešinėje visada šviesus. Įsimink: dešinėje – šviesus.
 lesson.welcome.files = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}h.
 lesson.welcome.files.spoken = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}ha.
@@ -143,10 +143,10 @@ lesson.values.trade = Stenkis niekada neatiduoti figūros pigiau, nei ji verta.
 lesson.setup.corners = Kiekviena partija prasideda taip: bokštai {@}kampuose, šalia jų {@2}žirgai, toliau {@3}rikiai.
 lesson.setup.queen = Valdovė stovi savo spalvos langelyje: tavo valdovė – šviesiame langelyje.
 lesson.setup.king = Karalius stovi šalia jos. Baltieji visada eina pirmieji.
-lesson.first.ask = Pradėk partiją: pastumk pėstininką, stovintį priešais tavo karalių, per du langelius, į {sq}.
+lesson.first.ask = Pradėk partiją: pėstininką, kuris stovi priešais tavo karalių, pastumk du langelius į priekį, į {sq}.
 lesson.first.wrong = Toks ėjimas irgi taisyklingas! Bet dabar, prašau, eik karaliaus pėstininku į {sq}.
 lesson.first.ok = Puikus pirmasis ėjimas: jis atveria kelią tavo valdovei ir rikiui.
-lesson.first.reply = Atsakau tuo pačiu. Dabar išvesk žirgą: šok iš {sq} į {sq2}.
+lesson.first.reply = Aš atsakau taip pat. Dabar išvesk žirgą: šok iš {sq} į {sq2}.
 lesson.first.knight_wrong = Žirgai peršoka per pėstininkus. Pabandyk iš {sq} į {sq2}.
 lesson.first.knight_ok = Puiku. Žirgai ir rikiai išvedami anksti.
 
@@ -173,7 +173,7 @@ lesson.check.ask = Čia pasitrauk karaliumi nuo šacho.
 lesson.check.file = Langelis {to} vis dar {@}mano bokšto vertikalėje. Pasitrauk iš šios linijos.
 lesson.check.ok = Gerai: šacho nebėra.
 lesson.block.again = Vėl šachas! Šį kartą tavo karaliui nėra laisvo langelio.
-lesson.block.ask = Tada užsidenk: pastatyk figūrą ant puolimo linijos.
+lesson.block.ask = Tada užsidenk: pastatyk figūrą puolimui ant kelio.
 lesson.block.queen = Užsidengta! Bet mano bokštas galėtų kirsti tavo valdovę. Užsidenk pigesne figūra.
 lesson.block.queen_ok = Pavyko. Įsimink: užsidenk pigiausia figūra.
 lesson.block.ok = Puiku. Užsidenk mažiausiai vertinga figūra.
@@ -201,7 +201,7 @@ lesson.mate3.ok = Matas! Du bokštai veikė kaip kopėčios.
 
 # ---- Chapter 5: castling ---------------------------------------------------------------------------------------
 lesson.castle.what = Rokiruotė – ypatingas ėjimas, kuris apsaugo tavo karalių. Karalius ir bokštas eina kartu.
-lesson.castle.how = {@}Karalius paeina du langelius bokšto link, o {@2}bokštas peršoka į kitą jo pusę.
+lesson.castle.how = {@}Karalius paeina du langelius bokšto link, o {@2}bokštas peršoka per jį ir atsistoja kitoje pusėje.
 lesson.castle.ask = Visada pirmiausia liesk karalių. Dabar tu: atlik rokiruotę karaliaus flange.
 lesson.castle.rook = Taip eina tik bokštas. Rokiruotei paeik karaliumi du langelius jo link.
 lesson.castle.long = Tai rokiruotė valdovės flange, irgi taisyklinga! Šį kartą rokiruokis artimesnio bokšto link.
@@ -226,7 +226,7 @@ lesson.ep.ok = Kirtimas prasilenkiant! Mano pėstininkas langelyje {sq} nuimamas
 
 # ---- Chapter 7: promotion -------------------------------------------------------------------------------------
 lesson.promo.what = Kai pėstininkas pasiekia paskutinę horizontalę, jis virsta valdove, bokštu, rikiu arba žirgu.
-lesson.promo.ask = Beveik visada rinkis valdovę. Paversk savo pėstininką dabar!
+lesson.promo.ask = Beveik visada rinkis valdovę. Dabar atlik pėstininko virsmą!
 lesson.promo.under = Taip galima! Bet valdovė stipresnė. Rinkimės valdovę.
 lesson.promo.under_ok = Gerai. Nors dauguma žaidėjų renkasi valdovę.
 lesson.promo.push = Stumk pėstininką į paskutinę horizontalę, į {sq}.
@@ -246,7 +246,7 @@ lesson.draws.repeat = Lygiosios galimos ir tada, kai ta pati pozicija pasikartoj
 lesson.talk.rules = Dabar žinai visas šachmatų taisykles. Šaunu!
 lesson.talk.real = Papasakosiu, kaip žaidžiamos tikros partijos.
 lesson.talk.elo = Žaidėjai turi reitingą, vadinamą Elo. Kai laimi, jis kyla, o kai pralaimi, krinta.
-lesson.talk.elo_gap = Nugalėjus stipresnį žaidėją gaunama daugiau taškų, o pralaimėjus silpnesniam prarandama daugiau.
+lesson.talk.elo_gap = Nugalėjus stipresnį žaidėją, gaunama daugiau taškų, o pralaimėjus silpnesniam, prarandama daugiau.
 lesson.talk.elo_start = Tavo reitingas atsiras po penkių reitinginių partijų. Partijos su treneriu – tai treniruotė, todėl jos neturi įtakos reitingui.
 lesson.talk.clock = Tai {@}šachmatų laikrodis. Kiekvienas žaidėjas turi savo laiką, kuris eina tik jo ėjimo metu.
 lesson.talk.press = Po ėjimo paspausk laikrodį ta pačia ranka. Tada pradeda eiti mano laikas.

@@ -1,0 +1,376 @@
+# Coach speech (Lithuanian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "tu" (singular imperative: "Pažiūrėk", "Kirsk"); the coach is male ("Aš būčiau
+# ėjęs {best}"). The player's gender is unknown: finite verbs only for the player ("praleidai", "galėjai",
+# "laimėjai"), never an adjective, participle or half-participle about the player ("būtum paskelbęs",
+# "pirmas", "eidamas" are avoided; "galėjai paskelbti", "pirmiau", "prieš statant" instead).
+# "You're 3 points down" = "atsilieki {pts:point_ins}" (trimis taškais); "you've lost 3 points" =
+# "netenki {pts:point_gen}" / "praradai {pts:point_acc}"; "worth 3" = "vert{your:agr_as_a} {n:point_gen}".
+# "Mate in N" = "matas per {m:move_acc}" (per du ėjimus); the bare "{m}" of level 6 = "{m:mv_acc}"
+# (written "matas per 3", spoken "per tris ėjimus").
+# Pieces carry their possessive; forms from common.lang: gen dat acc ins, refl_* ("savo" whenever the
+# player or the coach is the subject, imperatives included: "Pažiūrėk į {your:refl_acc}"), pron
+# pron_gen pron_dat pron_acc, rel_acc, and the endings agr_as_a ("surišt{your:agr_as_a}" = surištas /
+# surišta), agr_us_i, agr_is_e. Squares stand after a preposition or next to "langelis": "į {sq}",
+# "iš {sq}", "langelyje {sq}", "langelis {sq}". Moves are named with "ėjimas" when a case is needed
+# ("ėjimu {best}", "po {move}"), and a move as a sentence subject is linked with a dash ("{move} –
+# šiurkšti klaida").
+# Terms: šiurkšti klaida (blunder), netikslumas, abejotinas ėjimas, šakutė ("{reply} šakute puola
+# {t1:acc} ir {t2:acc}"), pradūrimas (pradurti), surišimas (surišti), atidengtas puolimas, patas,
+# kabo (hanging), už dyką (for free), įkalintas (trapped), paskutinė horizontalė (back rank; "paskutinė
+# eilė" at levels 1-2), praeivis, opozicija, kvadrato taisyklė, pėstininkų endšpilis, rikių pora,
+# lengvosios figūros (minor pieces), mainai (a trade, plural only).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Šachas! Mano karalius puolamas.
+ann.check.human.b1.2 = Šachas! Tu puoli mano karalių.
+ann.check.human.b1.3 = Tai šachas! Mano karaliui reikia nuo jo pasitraukti.
+ann.check.human = Šachas.
+ann.check.human.2 = Šachas!
+ann.check.human.3 = O tai šachas.
+# The coach gives check.
+ann.check.coach = Šachas!
+ann.check.coach.2 = Šachas.
+ann.check.coach.3 = Ir šachas!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Tai reiškia, kad {your} puolam{your:agr_as_a}. Turi {your:pron_acc} apsaugoti nuo šacho.
+ann.check.coach.first.2 = Šachas reiškia, kad {your} puolam{your:agr_as_a}. Patrauk {your:pron_acc}, užsidenk arba kirsk mano figūrą.
+ann.double_check.coach = Dvigubas šachas! Dvi mano figūros iš karto puola tavo karalių, todėl jis turi trauktis.
+ann.double_check.coach.2 = Tai dvigubas šachas: dabar padės tik karaliaus ėjimas.
+ann.double_check.human = Dvigubas šachas! Dvi tavo figūros iš karto puola mano karalių, todėl jis turi trauktis.
+ann.double_check.human.2 = Dvigubas šachas! Dabar mane išgelbės tik karaliaus ėjimas.
+# The player checkmates the coach.
+ann.mate.human.b1 = Matas! Tu laimėjai! Mano karalius negali pabėgti.
+ann.mate.human.b1.2 = Tai matas! Šaunu, laimėjai partiją!
+ann.mate.human.b1.3 = Šachas ir matas! Mano karalius įkalintas. Sveikinu!
+ann.mate.human = Matas. Gerai sužaista.
+ann.mate.human.2 = Tai matas. Sveikinu.
+ann.mate.human.3 = Matas! Puikiai sužaista.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Tai matas. Tavo karaliui nėra išeities.
+ann.mate.coach.b1.2 = Matas. Tavo karalius puolamas ir negali pabėgti.
+ann.mate.coach.b1.3 = Deja, tai matas. Tavo karaliui nebėra kur trauktis.
+ann.mate.coach = Matas.
+ann.mate.coach.2 = Štai ir matas.
+ann.mate.coach.3 = Matas, deja.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Oi! Šis ėjimas kai ką atiduoda.
+ex.verdict.blunder.b1.2 = Atsargiai! Šis ėjimas gali brangiai kainuoti.
+ex.verdict.blunder.b1.3 = Oi, palauk. Su šiuo ėjimu kažkas negerai.
+ex.verdict.blunder.b2 = Hm, šis ėjimas turi trūkumą.
+ex.verdict.blunder.b2.2 = Tai didelė klaida.
+ex.verdict.blunder.b2.3 = Atsargiai, šis ėjimas tau kai ką kainuoja.
+ex.verdict.blunder.b3 = Tai šiurkšti klaida.
+ex.verdict.blunder.b3.2 = {move} – tikra klaida.
+ex.verdict.blunder.b3.3 = Oi, {move} – didelė klaida.
+ex.verdict.blunder.b4 = {move} – šiurkšti klaida.
+ex.verdict.blunder.b4.2 = {move} – rimta klaida.
+ex.verdict.blunder.b4.3 = Deja, tai šiurkšti klaida.
+ex.verdict.blunder.b5 = {move} – rimta klaida.
+ex.verdict.blunder.b5.2 = {move} – šiurkšti klaida.
+ex.verdict.blunder.b5.3 = {move} – brangiai kainuojanti klaida.
+ex.verdict.blunder.b6 = {move} – rimta klaida.
+ex.verdict.blunder.b6.2 = {move} – šiurkšti klaida.
+ex.verdict.blunder.b6.3 = {move}? Šiurkšti klaida.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Oi! Neatsakei į mano grėsmę.
+ex.verdict.ignored.b1.2 = Atsargiai! Mano grėsmė niekur nedingo.
+ex.verdict.ignored.b1.3 = Oi, palauk. Pamiršai mano grėsmę.
+ex.verdict.ignored.b2 = Hm, mano grėsmė vis dar liko.
+ex.verdict.ignored.b2.2 = Palikai mano grėsmę be atsako.
+ex.verdict.ignored.b2.3 = Atsargiai, neatsakei į mano grėsmę.
+ex.verdict.mistake.b3 = Tai nėra geras ėjimas.
+ex.verdict.mistake.b3.2 = Hm, su ėjimu {move} kažkas negerai.
+ex.verdict.mistake.b3.3 = Tai klaida.
+ex.verdict.mistake.b4 = {move} – klaida.
+ex.verdict.mistake.b4.2 = {move} – negeras ėjimas.
+ex.verdict.mistake.b4.3 = Tai klaida.
+ex.verdict.mistake.b5 = {move} – akivaizdi klaida.
+ex.verdict.mistake.b5.2 = {move} – klaida.
+ex.verdict.mistake.b5.3 = {move} – nekoks ėjimas.
+ex.verdict.mistake.b6 = {move} – klaida.
+ex.verdict.mistake.b6.2 = {move}? Klaida.
+ex.verdict.mistake.b6.3 = Tik ne {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Neblogai, bet {best} buvo kiek geresnis.
+ex.verdict.inaccuracy.b3.2 = {best} buvo šiek tiek tikslesnis.
+ex.verdict.inaccuracy.b3.3 = Nedidelis netikslumas: čia geriau buvo {best}.
+ex.verdict.inaccuracy.b4 = Netiksliai: {best} buvo tikslesnis.
+ex.verdict.inaccuracy.b4.2 = Nedidelis netikslumas. {best} buvo kiek geresnis.
+ex.verdict.inaccuracy.b4.3 = Ne visai geriausia: {best} buvo tikslesnis.
+ex.verdict.inaccuracy.b5 = {move} – netikslu; {best} buvo stipresnis.
+ex.verdict.inaccuracy.b5.2 = Šiek tiek netiksliai. Aš būčiau ėjęs {best}.
+ex.verdict.inaccuracy.b5.3 = {best} buvo tikslesnis už {move}.
+ex.verdict.inaccuracy.b6 = {move} – netikslu; {best}.
+ex.verdict.inaccuracy.b6.2 = Netiksliai. {best}.
+ex.verdict.inaccuracy.b6.3 = Geriau buvo {best}.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Galbūt {best} buvo kiek tikslesnis.
+ex.verdict.inaccuracy.maybe.2 = Gal aš būčiau ėjęs {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Šis ėjimas atrodo abejotinas.
+ex.verdict.dubious.2 = Šis ėjimas, regis, abejotinas.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oi, palauk! Praleidai kai ką gero.
+ex.verdict.missed.b1.2 = Pažiūrėk dar kartą! Buvo kai kas geresnio.
+ex.verdict.missed.b1.3 = Palauk, čia turėjai progą!
+ex.verdict.missed.b2 = Čia praleidai progą.
+ex.verdict.missed.b2.2 = Hm, buvo kai kas geresnio.
+ex.verdict.missed.b2.3 = Palauk, čia turėjai puikų ėjimą.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Geriau buvo {best}.
+ex.better.b3.2 = {best} buvo geresnis ėjimas.
+ex.better.b3.3 = Vietoj to gerai buvo {best}.
+ex.better.b4 = Stipriau buvo {best}.
+ex.better.b4.2 = Teisingas ėjimas buvo {best}.
+ex.better.b4.3 = Geriau buvo {best}.
+ex.better.b5 = {best} su idėja {line}.
+ex.better.b5.2 = Reikėjo {best}: {line}.
+ex.better.b5.3 = Geriau buvo {best}, o toliau {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Vietoj to {best}, {eval}.
+ex.better.b6.3 = Po {best} – {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Buvo geresnis ėjimas {your:ins}.
+ex.hint.b1.2 = {your} turėjo geresnį ėjimą.
+ex.hint.b2 = {your} turėjo geresnį ėjimą.
+ex.hint.b2.2 = Buvo geresnis ėjimas {your:ins}.
+ex.hint.b3 = {your} turėjo geresnį ėjimą.
+ex.hint.b3.2 = {your:ins} buvo galima eiti geriau.
+ex.hint.b4 = {your} turėjo geresnį ėjimą.
+ex.hint.b4.2 = Dar kartą pažiūrėk į {your:refl_acc}: {your:pron} turėjo kai ką geresnio.
+ex.hint.b5 = {your} turėjo stipresnį ėjimą.
+ex.hint.b5.2 = Buvo stipresnis ėjimas {your:ins}.
+ex.hint.b6 = {your} galėjo geriau.
+ex.hint.b6.2 = Dar kartą pažiūrėk į {your:refl_acc}.
+ex.hint.move = Buvo geresnis ėjimas.
+ex.hint.move.2 = Čia turėjai geresnį ėjimą.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} turėjo geresnį ėjimą. Tas ėjimas laimi medžiagos.
+ex.hint.gain.b1.2 = Buvo geresnis ėjimas {your:ins}. Jis laimi medžiagos.
+ex.hint.gain.b2 = {your} turėjo geresnį ėjimą. Tas ėjimas laimi medžiagos.
+ex.hint.gain.b2.2 = Buvo ėjimas {your:ins}, kuris laimi medžiagos.
+ex.hint.gain.b3 = {your} turėjo geresnį ėjimą – tokį, kuris laimi medžiagos.
+ex.hint.gain.b3.2 = Buvo ėjimas {your:ins}, kuris laimi medžiagos.
+ex.hint.gain.b4 = {your} turėjo ėjimą, kuris laimi medžiagos.
+ex.hint.gain.b4.2 = Dar kartą pažiūrėk į {your:refl_acc}: {your:pron} turėjo ėjimą, laiminantį medžiagos.
+ex.hint.gain.b5 = {your} turėjo stipresnį ėjimą, laiminantį medžiagos.
+ex.hint.gain.b5.2 = Buvo ėjimas {your:ins}, laimintis medžiagos.
+ex.hint.gain.b6 = {your} turėjo ėjimą, laiminantį medžiagos.
+ex.hint.gain.b6.2 = Dar kartą pažiūrėk į {your:refl_acc}: buvo galima laimėti medžiagos.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Geresnis ėjimas buvo {your:ins} į {sq}.
+ex.reveal.b1.2 = {your} galėjo eiti į {sq}. Taip būtų buvę geriau.
+ex.reveal.b2 = {your} į {sq} – štai geresnis ėjimas.
+ex.reveal.b2.2 = Geresnis ėjimas buvo {your:ins} į {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Grąžinkime figūras atgal.
+ex.rewind.b1.2 = Dabar viską grąžinsiu į vietas.
+ex.rewind.b1.3 = Leisk man sustatyti figūras atgal.
+ex.rewind.b2 = Grąžinkime viską atgal.
+ex.rewind.b2.2 = Grįžtame ten, kur buvome.
+ex.rewind.b2.3 = Grąžinsiu figūras atgal.
+ex.rewind.b3 = Grįžtame prie partijos.
+ex.rewind.b3.2 = Grįžkime atgal.
+ex.rewind.b3.3 = Grįžtame prie pozicijos.
+ex.rewind.b4 = Grįžtame prie partijos.
+ex.rewind.b4.2 = Atgal.
+ex.rewind.b4.3 = Grįžkime.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Ar nori pabandyti kitą ėjimą?
+ex.offer.b1.2 = Gal nori atšaukti šį ėjimą ir pabandyti dar kartą?
+ex.offer.b1.3 = Pabandom kitą ėjimą?
+ex.offer.b2 = Gal nori pabandyti kitą ėjimą?
+ex.offer.b2.2 = Ar nori atšaukti ėjimą?
+ex.offer.b2.3 = Nori pabandyti dar kartą?
+ex.offer.b3 = Gal nori atšaukti ėjimą?
+ex.offer.b3.2 = Ar nori bandyti dar kartą?
+ex.offer.b3.3 = Atšauksi ėjimą?
+ex.offer.b4 = Atšauksi?
+ex.offer.b4.2 = Ar nori atšaukti ėjimą?
+ex.offer.b4.3 = Nori pabandyti kitą ėjimą?
+ex.offer.b5 = Atšaukti?
+ex.offer.b5.2 = Nori atšaukti?
+ex.offer.b5.3 = Atšauksi?
+ex.offer.b6 = Atšaukti?
+ex.offer.b6.2 = Atšauksi?
+ex.offer.b6.3 = Iš naujo?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Šis ėjimas abejotinas. Gal rasi geresnį?
+ex.dubious.b1.2 = Šis ėjimas abejotinas. Gal pavyks rasti geresnį?
+ex.dubious.b2 = Abejotinas ėjimas. Gal gali geriau?
+ex.dubious.b2.2 = Šis ėjimas abejotinas. Gal yra kas nors geresnio?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Tada {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} eina į {sq}.
+demo.my.move.2 = Statau {my:refl_acc} į {sq}.
+demo.my.move.3 = Tada {my} eina į {sq}.
+demo.my.take = Kertu {your:acc}.
+demo.my.take.2 = {my} kerta {your:acc}.
+demo.my.take.3 = Ir aš kertu {your:acc}.
+demo.my.check = {my} eina į {sq}. Šachas.
+demo.my.check.2 = Šachas: {my} stoja į {sq}.
+demo.my.check.3 = {my} į {sq} – šachas!
+demo.my.mate = {my} eina į {sq}. Matas.
+demo.my.mate.2 = O {my} į {sq} – jau matas.
+demo.my.mate.3 = {my} į {sq}. Tai matas.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Pirmiausia {my} kerta {your:acc}. {t1} palauks.
+demo.my.first.take.2 = Iš pradžių {my} kerta {your:acc}. {t1} niekur nedings.
+demo.my.first.check = {my} kerta {your:acc}, ir tai šachas! {t1} palauks.
+demo.my.first.check.2 = Pirmiausia {my} kerta {your:acc} su šachu. {t1} niekur nedings.
+demo.my.first.check_move = Pirmiausia šachas: {my} eina į {sq}. {t1} palauks.
+demo.my.first.check_move.2 = {my} eina į {sq}: pirma šachas! {t1} niekur nedings.
+demo.my.first.move = Pirmiausia {my} eina į {sq}. {t1} palauks.
+demo.my.first.move.2 = Iš pradžių {my} į {sq}. {t1} niekur nedings.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} puolam{my:agr_as_a}, todėl {my:pron} pirmiausia kerta {your:acc}.
+demo.my.first.attacked.2 = {my} puolam{my:agr_as_a}: {my:pron} pirmiausia pačiumpa {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Pirmiausia {move}: {t1} palauks.
+demo.first.2 = Iš pradžių {move}. {t1} niekur nedings.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Dabar darau savo ėjimą.
+demo.play_on.2 = O štai mano tikrasis ėjimas.
+demo.play_on.3 = O dabar einu iš tikrųjų.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Tu eitum {your:refl_ins} į {sq}.
+demo.your.move.2 = Tarkime, eini {your:refl_ins} į {sq}.
+demo.your.move.3 = Tada {your} eina į {sq}.
+demo.your.take = Tu kirstum {my:acc}.
+demo.your.take.2 = Kerti {my:acc} {your:refl_ins}.
+demo.your.take.3 = Tada kerti {my:acc}.
+demo.your.back = Tu kerti atgal.
+demo.your.back.2 = Kerti atgal langelyje {sq}.
+demo.your.back.3 = Ir tu kerti atgal.
+demo.your.king = Tavo karaliui tenka trauktis.
+demo.your.king.2 = Karalius turi pasitraukti – į {sq}.
+demo.your.king.3 = Tavo karalius bėga į {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Dabar {t1:gen} jau nebeišgelbėti.
+ex.point.piece.2 = Ir {t1} žūva.
+ex.point.piece.3 = Kitu ėjimu krinta {t1}.
+ex.point.two = {t1} ir {t2} abu puolami: vienas iš jų kris.
+ex.point.two.2 = Dabar puolu {t1:acc} ir {t2:acc}. Abiejų neišgelbėsi.
+ex.point.mate = O dabar {reply:nomate} – matas.
+ex.point.mate.2 = Toliau – {reply:nomate}, ir tai matas.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Matai? Štai ir netekai {pts:point_gen}.
+ex.result.b1.2 = Štai taip prarandi {pts:point_acc}.
+ex.result.b2 = Galiausiai praradai {pts:point_acc}.
+ex.result.b2.2 = Dabar atsilieki {pts:point_ins}.
+ex.result.b3 = Tai tau kainuoja {pts:point_acc}.
+ex.result.b3.2 = Galiausiai atsilieki {pts:point_ins}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Gali šį tą kirsti atgal, bet vis tiek atsilieki {pts:point_ins}.
+ex.result_back.b1.2 = Šiek tiek gali atsiimti, bet vis tiek netenki {pts:point_gen}.
+ex.result_back.b2 = Dalį gali atsiimti, bet vis tiek atsilieki {pts:point_ins}.
+ex.result_back.b2.2 = Net kai kerti atgal, vis tiek netenki {pts:point_gen}.
+ex.result_back.b3 = Net po kirtimo atgal atsilieki {pts:point_ins}.
+ex.result_back.b3.2 = Šį tą atsiimi, bet tai vis tiek tau kainuoja {pts:point_acc}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Jei {your2} kirs atgal, {my} kirs {your:acc}.
+ex.retake.b1.2 = Negali kirsti atgal {your2:refl_ins}: tada {my} kerta {your:acc}.
+ex.retake.b2 = Jei {your2} kirs atgal, {my} kirs {your:acc}.
+ex.retake.b2.2 = Kirsti atgal {your2:refl_ins} neišeina: {my} kerta {your:acc}.
+ex.retake.b3 = Jei kirsi atgal ėjimu {move}, {reply} kirs {your:acc}.
+ex.retake.b3.2 = Kirtimas atgal {move} nepasiteisina: {reply} kerta {your:acc}.
+ex.retake.b4 = Į {move} atsakau {reply} ir kertu {your:acc}.
+ex.retake.b4.2 = O jei {move}, tada {reply} kerta {your:acc}.
+ex.retake.b5 = Kirtimas atgal {move} atsimuša į {reply}, ir {your} krinta.
+ex.retake.b5.2 = {move} nepavyksta: {reply}, ir {your} krinta.
+ex.retake.b6 = {move}? {reply} kerta {your:acc}.
+ex.retake.b6.2 = {move} neišeina: {reply} kerta {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = O čia, langelyje {sq}, gautum naują valdovę.
+demo.promote.2 = Tada {your} pasiekia {sq} ir virsta valdove.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Atsargiai: {my} gali eiti į {sq}, ir tai matas.
+ex.mate_allowed.b1.2 = Dabar {my} gali eiti į {sq}. Tai būtų matas!
+ex.mate_allowed.b1.3 = Atsargiai! Jei {my} eis į {sq}, bus matas.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Po šio ėjimo galiu paskelbti matą {your:dat} per {m:move_acc}.
+ex.mate_allowed.b2.2 = Dabar galiu paskelbti matą {your:dat} per {m:move_acc}. Žiūrėk.
+ex.mate_allowed.b2.3 = Atsargiai! {your:dat} gresia pavojus: matas per {m:move_acc}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Taip leidi man paskelbti matą per {m:move_acc}: {line:nomate}.
+ex.mate_allowed.b3.2 = Po šio ėjimo turiu matą per {m:move_acc}: {line:nomate}.
+ex.mate_allowed.b3.3 = Tavo karaliui bus matas: {line:nomate}.
+ex.mate_allowed.b4 = Po {move} – priverstinis matas: {line:nomate}.
+ex.mate_allowed.b4.2 = Taip pakliūni į matą per {m:move_acc}: {line:nomate}.
+ex.mate_allowed.b4.3 = Po {move} seka {line:nomate}, ir matas.
+ex.mate_allowed.b5 = {move} leidžia priverstinį matą per {m:move_acc}.
+ex.mate_allowed.b5.2 = Taip pakliūni į matą per {m:move_acc}.
+ex.mate_allowed.b5.3 = Dabar yra priverstinis matas per {m:move_acc}.
+ex.mate_allowed.b6 = Matas per {m:mv_acc}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, matas.
+ex.mate_allowed.b6.3 = Po {line:nomate} – matas.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Žiūrėk: {your:dat} nebeliko kur pabėgti.
+ex.mate_allowed.tail.b1.2 = Matai? {your} puolam{your:agr_as_a} ir negali pabėgti.
+ex.mate_allowed.tail.b1.3 = {your:dat} nėra kur trauktis. Tai matas.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below, a
+# nominative, so it stands after a colon or "tai".
+ex.mate_allowed.pattern = Toks matas turi savo pavadinimą: {text}.
+ex.mate_allowed.pattern.2 = Įsimink šią schemą: tai {text}.
+ex.mate_allowed.tip.b3 = Prieš kiekvieną ėjimą patikrink, ar tavo karalius vis dar saugus.
+ex.mate_allowed.tip.b3.2 = Visada savęs paklausk: ar po šio ėjimo mano karaliui negresia matas?
+
+name.pattern.back_rank = paskutinės horizontalės matas
+name.pattern.smothered = uždusintas matas
+name.pattern.support = paremtos valdovės matas
+name.pattern.ladder = kopėčių matas
+name.pattern.epaulette = epoletų matas
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Ėjimu {best:nomate} galėjai paskelbti matą {my:dat}!
+ex.mate_missed.b1.2 = Ėjimas {best:nomate} būtų buvęs matas! {my:dat} nebūtų kur pabėgti.
+ex.mate_missed.b1.3 = Žiūrėk! Po {best:nomate} {my:dat} būtų matas.
+ex.mate_missed.b2 = Turėjai matą per {m:move_acc}, pradedant ėjimu {best:nomate}.
+ex.mate_missed.b2.2 = Ėjimas {best:nomate} vedė į matą per {m:move_acc}!
+ex.mate_missed.b2.3 = Ėjimu {best:nomate} galėjai man paskelbti matą.
+ex.mate_missed.b3 = Praleidai matą per {m:move_acc}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} – matas per {m:move_acc}: {line:nomate}.
+ex.mate_missed.b3.3 = Buvo matas per {m:move_acc}, pradedant ėjimu {best:nomate}.
+ex.mate_missed.b4 = Praleistas matas: {line:nomate}, pradedant ėjimu {best:nomate}.
+ex.mate_missed.b4.2 = Ėjimas {best:nomate} vedė į priverstinį matą per {m:move_acc}.
+ex.mate_missed.b4.3 = Ėjimu {best:nomate} turėjai matą per {m:move_acc}.
+ex.mate_missed.b5 = {best:nomate} – matas per {m:move_acc}: {line:nomate}.
+ex.mate_missed.b5.2 = Praleistas matas per {m:move_acc}, pradedant ėjimu {best:nomate}.
+ex.mate_missed.b5.3 = Buvo priverstinis matas: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} – matas: {line:nomate}.
+ex.mate_missed.b6.2 = Matas per {m:mv_acc}, pradedant ėjimu {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, matas per {m:mv_acc}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Greičiau – {best:nomate}: matas per {m:move_acc}.
+ex.mate_delayed.b5.2 = Po {best:nomate} matas būtų greičiau – per {m:move_acc}.
+ex.mate_delayed.b6 = {best:nomate}: matas per {m:mv_acc}.
+ex.mate_delayed.b6.2 = Greičiau: {best:nomate}, matas per {m:mv_acc}.

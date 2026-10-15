@@ -39,7 +39,7 @@ options.tab.gameplay = Hra
 options.tab.player = Hráč
 options.tab.controls = Ovládání
 options.pending = Změny se projeví po jejich použití.
-options.unsaved.title = NEPOUŽITÉ ZMĚNY
+options.unsaved.title = NEULOŽENÉ ZMĚNY
 options.unsaved.text = Některé možnosti byly změněny. Chcete je před odchodem použít?
 
 options.language = Jazyk
@@ -49,7 +49,7 @@ options.display_mode.help = Celá obrazovka: okno bez okraje přes celou obrazov
 options.fullscreen = Celá obrazovka
 options.windowed = V okně
 options.window_size = Velikost okna
-options.window_size.help = Velikost okna v režimu V okně. Celá obrazovka vždy používá rozlišení plochy.
+options.window_size.help = Velikost okna v okenním režimu. Celá obrazovka vždy používá rozlišení plochy.
 options.vsync = Vertikální synchronizace
 options.vsync.help = Synchronizuje snímky s obrazovkou, aby se obraz netrhal.
 options.render_scale = Měřítko vykreslování
@@ -79,7 +79,7 @@ options.tessellation.unavailable = Nedostupné: tento grafický ovladač teselac
 options.antialiasing = Vyhlazování hran
 options.antialiasing.help = Vyhlazuje zubaté hrany a mihotavé odlesky. Vypnuto: ostřejší, ale zubaté, a některé efekty vypadají zrnitě.
 options.depth_of_field = Hloubka ostrosti
-options.depth_of_field.help = Rozostří to, co leží hodně před tím nebo za tím, na co se díváte, jako to dělá objektiv fotoaparátu.
+options.depth_of_field.help = Rozostří vše, co je výrazně blíž nebo dál než místo, na které se díváte, jako to dělá objektiv fotoaparátu.
 options.motion_blur = Rozmazání pohybem
 options.motion_blur.help = Rozmaže rychlé pohyby kamery a paží, jako to dělá filmová kamera.
 options.bloom = Záře
@@ -174,7 +174,7 @@ newgame.colour_alternate = Potom se barvy od partie k partii střídají.
 newgame.opponent_kind = Soupeř
 newgame.opponent_kind.help = Hrajte proti Stockfishi, nebo s přítelem u tohoto počítače: střídáte se, každý ze své strany šachovnice.
 newgame.vs_stockfish = Stockfish
-newgame.vs_human = Člověk, týž počítač
+newgame.vs_human = Člověk, stejný počítač
 
 # Custom opponent: Stockfish parameters
 engine.skill = Úroveň dovednosti
@@ -516,7 +516,7 @@ online.conn.connecting = Připojování…
 online.conn.reconnecting = Obnovování připojení…
 online.conn.offline = Nepřipojeno
 online.conn.incompatible = Jiná verze
-online.no_server.text = Hra online vyžaduje server Scacelith. Zadejte v možnostech adresu serveru, nebo si s přítelem zahrajte napřímo v přímém zápase.
+online.no_server.text = Hra online vyžaduje server Scacelith. Zadejte v možnostech adresu serveru, nebo si s přítelem zahrajte přímý zápas.
 online.no_server.settings = Nastavení serveru
 
 # Options > Online server
@@ -786,7 +786,7 @@ online.err.server_busy = Server je přetížený. Zkuste to znovu za chvíli.
 online.err.banned_until = Tento účet je pozastaven do {0}.
 online.err.banned = Tento účet je pozastaven.
 online.err.invalid_credentials = Nesprávné uživatelské jméno nebo heslo.
-online.err.invalid_credentials_pending = Nesprávné uživatelské jméno nebo heslo. Pokud je vaše registrace čerstvá, nejprve otevřete odkaz, který jsme vám poslali.
+online.err.invalid_credentials_pending = Nesprávné uživatelské jméno nebo heslo. Jde-li o novou registraci, nejprve otevřete odkaz, který jsme vám poslali.
 online.err.email_unverified = Vaše e-mailová adresa ještě není ověřená: otevřete odkaz, který jsme vám poslali.
 online.err.network = Server je nedostupný. Zkontrolujte připojení a adresu serveru.
 online.err.tls = Zabezpečené spojení se serverem se nepodařilo navázat.
@@ -1057,10 +1057,10 @@ coach.level.0.desc = Interaktivní lekce, jedno pravidlo po druhém.
 coach.level.0.detail = Trenér rozestavuje malé pozice a ukazuje, jak každá figura táhne a bere, pak rošádu, proměnu, šach a mat. Každý nápad si vyzkoušíte přímo na šachovnici.
 coach.level.1.name = První kroky
 coach.level.1.desc = Co je napadeno, co zůstalo bez krytí.
-coach.level.1.detail = Trenér hraje mírně a mluví jednoduše: které vaše figury jsou napadené, které zůstaly bez krytí a jak je udržet.
+coach.level.1.detail = Trenér hraje mírně a mluví jednoduše: které vaše figury jsou napadené, které zůstaly bez krytí a jak o ně nepřijít.
 coach.level.2.name = Začátečník
 coach.level.2.desc = Jednoduchá taktika, vývin figur, bezpečí krále.
-coach.level.2.detail = Vidličky a vazby se nazývají pravými jmény. Trenér mluví o vývinu figur a o tom, jak udržet krále v bezpečí.
+coach.level.2.detail = Trenér nazývá vidličky a vazby jejich jmény. Mluví o vývinu vašich figur a o tom, jak udržet krále v bezpečí.
 coach.level.3.name = Mírně pokročilý
 coach.level.3.desc = Plány, pěšcová struktura, jediné tahy.
 coach.level.3.detail = Trenér vysvětluje plány a pěšcové struktury a upozorní vás, když pozici drží jen jediný tah.
@@ -1079,7 +1079,7 @@ coach.note.lesson = Hrajete bílými; trenér na šachovnici rozestaví každé 
 coach.note.unrated = Partie s trenérem nejsou na rating.
 coach.note.fallible = Trenér není neomylný: občas může tah posoudit špatně.
 coach.colour = Vaše barva
-coach.colour.help = Barva, kterou hrajete proti trenérovi. Střídavě: od partie k partii bílý, pak černý. Lekce pravidel se vždy hraje bílými.
+coach.colour.help = Barva, kterou hrajete proti trenérovi. Střídavě: jednu partii bílými, další černými. Lekce pravidel se vždy hraje bílými.
 coach.colour.alternate = Střídavě
 # Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
 coach.no_voice = Trenérův hlas není nainstalován nebo je vypnutý (Možnosti > Zvuk): jeho slova se budou vypisovat na obrazovku.
@@ -1093,7 +1093,7 @@ coach.offer.accept = Vrátit tah
 coach.offer.decline = Hrát dál
 # Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
 # of the screen, and on the takeback card)
-coach.takebacks_left = Zbývající vrácení tahu: {0}
+coach.takebacks_left = Zbývající vrácení tahů: {0}
 coach.pause.take_back = Vrátit můj tah
 coach.pause.take_back.help = Vrátí váš poslední tah a také odpověď trenéra, pokud už ji zahrál.
 coach.confirm.resign = Chcete tuto partii vzdát? Vítězem bude vyhlášen trenér.
@@ -1119,7 +1119,7 @@ challenge.group.endgames = KONCOVKY
 # characters) and a paragraph for the column of the selected challenge
 challenge.mate1.name = Mat 1. tahem
 challenge.mate1.desc = Jeden tah a je to mat.
-challenge.mate1.detail = Nejprve se podívejte na všechny šachy: po jednom z nich král nemá žádné pole, nedá se zakrýt a šachující figuru nelze vzít.
+challenge.mate1.detail = Nejprve se podívejte na všechny šachy: po jednom z nich král nemá kam ustoupit, šach nelze zaclonit a šachující figuru nelze vzít.
 challenge.mate2.name = Mat 2. tahem
 challenge.mate2.desc = Tah, proti kterému není obrana, a pak mat.
 challenge.mate2.detail = První tah je často šach nebo oběť, která králi vezme jedno pole. Trenér se brání, jak nejlépe umí.
@@ -1215,7 +1215,7 @@ coach.hint.key = Nápověda
 # Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = Hlas trenéra
-options.coach_voice.help = V režimu Trenér trenér mluví nahlas. Jeho hlasový model se stáhne, až bude poprvé potřeba (asi 399 MB). Vypnuto: trenérova slova se jen vypisují na obrazovku.
+options.coach_voice.help = V režimu Trenér mluví trenér nahlas. Jeho hlasový model se stáhne, až bude poprvé potřeba (asi 399 MB). Vypnuto: trenérova slova se jen vypisují na obrazovku.
 # The row under it while the old 8-bit voice model is installed: its update to the official one.
 # {0} = the size in megabytes ("398.7")
 options.voice_update = Hlasový model
