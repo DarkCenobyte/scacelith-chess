@@ -25,7 +25,7 @@ an.start.setup = Questa partita parte da una posizione impostata sulla scacchier
 an.start.setup.2 = Una partita da una posizione impostata. Vediamo com’è andata.
 
 # ---- The opening (said where the game leaves the opening book) ------------------------------------
-an.opening = L’apertura è {opening:def}.
+an.opening = Si gioca {opening:def}.
 an.opening.2 = Ecco {opening:def}.
 an.book_exit = Con {move} la partita esce dalla teoria conosciuta.
 an.book_exit.2 = {move} è la prima mossa fuori teoria.

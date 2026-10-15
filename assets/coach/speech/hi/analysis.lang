@@ -43,11 +43,11 @@ an.missed_chance.2 = {move}, और मौक़ा हाथ से फिस�
 
 # What it allows ({reply} is the other side's answer).
 an.mate_allowed.one = अब {reply:nomate}, और यह मात है।
-an.mate_allowed.one.2 = इसका जवाब: {reply:nomate}, और यह शह और मात है।
+an.mate_allowed.one.2 = इससे यह जवाब मुमकिन होता है: {reply:nomate}, और यह शह और मात है।
 an.mate_allowed = इससे {m:move_obl} में पक्की मात का रास्ता खुलता है, पहली चाल: {reply:nomate}।
 an.mate_allowed.2 = अब {m:move_obl} में पक्की मात है, शुरुआत: {reply:nomate}।
 an.fork = अब {reply}: {t1:obl} और {t2:bare_obl} पर फ़ोर्क।
-an.fork.2 = इसका जवाब: {reply}, एक साथ {t1:obl} और {t2:bare_obl} पर हमला।
+an.fork.2 = इससे यह जवाब मुमकिन होता है: {reply}, एक साथ {t1:obl} और {t2:bare_obl} पर हमला।
 an.fork.3 = {reply}, और एक ही वार में {t1} और {t2:bare}, दोनों निशाने पर।
 an.hanging = इससे {piece} असुरक्षित छूट जाता है: {reply}, और वह कट जाता है।
 an.hanging.2 = {piece} बिना रक्षक के रह गया है: {reply}, और उसे जीत लिया जाता है।

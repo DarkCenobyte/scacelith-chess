@@ -13,7 +13,7 @@
 # Counts: {pts:point} "3 अंक" ("तुम {pts:point} पीछे हो"), {pts:point_obl} before a postposition, {m:move_obl}
 # "3 चालों में मात", {n:time} "3 बार", {n:attacker} / {n2:defender}, {n:square}. A verb never agrees with a count.
 # Terms: blunder ब्लंडर, mistake ग़लती, inaccuracy चूक, dubious संदिग्ध, trade अदला-बदली, material मटीरियल
-# (levels 1-2: "मोहरों का फ़ायदा / नुक़सान"), passed pawn पास्ड प्यादा, opposition अपोज़िशन, rule of the square वर्ग,
+# (levels 1-2: "मोहरों का फ़ायदा / नुक़सान"), passed pawn पास्ड प्यादा, opposition ऑपोज़िशन, rule of the square वर्ग,
 # forced mate पक्की मात. Levels 1-2: simple words, short sentences; levels 5-6: terse.
 
 # ---- Announcements (either side's move) -------------------------------------------------------
@@ -281,7 +281,7 @@ ex.result_back.b3.2 = कुछ वापस मिलता है, पर फ�
 # Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
 # into a capture of the coach's ({reply}, by {my}) that takes {your}.
 ex.retake.b1 = अगर {your2} वापस काटे, तो {my} {your:ko} काट लेगा।
-ex.retake.b1.2 = {your2:se} वापस नहीं काटा जा सकता: तब {my} {your:ko} काट लेगा।
+ex.retake.b1.2 = {your2:refl_se} वापस काटना ठीक नहीं: तब {my} {your:ko} काट लेगा।
 ex.retake.b2 = अगर {your2} वापस काटे, तो {my} {your:ko} काट लेगा।
 ex.retake.b2.2 = {your2:refl_se} वापस काटना काम नहीं करता: {my} {your:ko} काट लेता है।
 ex.retake.b3 = अगर तुम वापस काटो, {move}, तो {reply}, और {your} कट जाता है।
@@ -330,8 +330,8 @@ ex.mate_allowed.tip.b3.2 = हमेशा ख़ुद से पूछो: म
 
 # Pattern names: Hindi words where they are clear (back rank = पिछली रैंक, ladder = सीढ़ी), the players' English
 # names in Devanagari otherwise. Each is said inside a sentence ("... को {text} कहते हैं", "यह {text} है").
-name.pattern.back_rank = पिछली रैंक की मात
-name.pattern.smothered = स्मोदर्ड मात
+name.pattern.back_rank = पिछली रैंक पर मात
+name.pattern.smothered = स्मदर्ड मात
 name.pattern.support = सुरक्षित वज़ीर से मात
 name.pattern.ladder = सीढ़ी वाली मात
 name.pattern.epaulette = एपॉलेट मात
@@ -387,7 +387,7 @@ ex.stalemate_trick.b1 = सावधान! मैं अपने मोहर�
 ex.stalemate_trick.b1.2 = ध्यान दो: {my} लगभग फँस चुका है। मैं बाज़ी ड्रॉ करा सकता हूँ।
 ex.stalemate_trick.b2 = सावधान: मैं बलिदान दे सकता हूँ, और {my} स्टेलमेट हो जाएगा।
 ex.stalemate_trick.b2.2 = {my:ke} पास लगभग कोई खाना नहीं। मैं ज़बरदस्ती स्टेलमेट करा सकता हूँ!
-ex.stalemate_trick.b3 = इससे मैं स्टेलमेट के सहारे बच निकलता हूँ: {my:ke} पास चालें ख़त्म हो जाती हैं।
+ex.stalemate_trick.b3 = इससे मुझे स्टेलमेट के सहारे बच निकलने का मौक़ा मिलता है: {my:ke} पास चालें ख़त्म हो जाती हैं।
 ex.stalemate_trick.b3.2 = सावधान: {line}, और {my} स्टेलमेट हो जाता है।
 ex.stalemate_trick.b4 = {move}, यह चाल स्टेलमेट के जाल का मौक़ा देती है: {line}, और {my} चल नहीं सकता।
 ex.stalemate_trick.b4.2 = अब {my} स्टेलमेट में छिप सकता है: {line}।
@@ -744,14 +744,14 @@ ex.bishop_pair.b6.2 = ऊँटों की जोड़ी छोड़ दी
 
 # ---- 17. Endgame technique -------------------------------------------------------------------------
 # Opposition (levels 3-6; {best} pointed at).
-ex.opposition.b3 = {best}: अपोज़िशन, यानी दोनों राजा आमने-सामने, बीच में एक खाना।
-ex.opposition.b3.2 = राजाओं को देखो! {best}: इससे अपोज़िशन मिल जाती।
-ex.opposition.b4 = {best}: अपोज़िशन लेना, यही कुंजी है।
-ex.opposition.b4.2 = अपोज़िशन फ़ैसला करती है: {best}।
-ex.opposition.b5 = {best}, अपोज़िशन लेते हुए।
-ex.opposition.b5.2 = अपोज़िशन: {best}।
-ex.opposition.b6 = {best}, अपोज़िशन।
-ex.opposition.b6.2 = {best}: अपोज़िशन।
+ex.opposition.b3 = {best}: ऑपोज़िशन, यानी दोनों राजा आमने-सामने, बीच में एक खाना।
+ex.opposition.b3.2 = राजाओं को देखो! {best}: इससे ऑपोज़िशन मिल जाती।
+ex.opposition.b4 = {best}: ऑपोज़िशन लेना, यही कुंजी है।
+ex.opposition.b4.2 = ऑपोज़िशन फ़ैसला करती है: {best}।
+ex.opposition.b5 = {best}, ऑपोज़िशन लेते हुए।
+ex.opposition.b5.2 = ऑपोज़िशन: {best}।
+ex.opposition.b6 = {best}, ऑपोज़िशन।
+ex.opposition.b6.2 = {best}: ऑपोज़िशन।
 # Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
 ex.push_passed.b1 = तुम्हारा प्यादा {sq} की ओर दौड़ सकता था। पास्ड प्यादे आगे बढ़ना चाहते हैं!
 ex.push_passed.b1.2 = अपने आज़ाद प्यादे को आगे बढ़ाओ! वह {sq} तक पहुँचना चाहता है।

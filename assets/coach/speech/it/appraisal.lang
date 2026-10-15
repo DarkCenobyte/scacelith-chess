@@ -154,8 +154,8 @@ appraisal.resign_early.b6 = Ancora aperta: {eval}.
 appraisal.resign_early.b6.2 = Valutazione: {eval}.
 # The opening played (levels 3-6).
 appraisal.opening.b3 = Abbiamo giocato {opening:def}.
-appraisal.opening.b3.2 = L’apertura era {opening:def}.
-appraisal.opening.b4 = L’apertura è stata {opening:def}.
+appraisal.opening.b3.2 = La partita è iniziata con {opening:def}.
+appraisal.opening.b4 = Abbiamo giocato {opening:def}.
 appraisal.opening.b4.2 = L’apertura: {opening}.
 appraisal.opening.b5 = {opening}.
 appraisal.opening.b5.2 = Apertura: {opening}.

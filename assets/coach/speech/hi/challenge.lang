@@ -26,7 +26,7 @@ ch.intro.fork = फ़ोर्क। {n:position}: वह चाल ढूँ�
 ch.intro.pin = पिन। {n:position}: किसी मोहरे को पिन करो, या किसी पिन का फ़ायदा उठाओ।
 ch.intro.skewer = स्क्यूअर। {n:position}: किसी क़ीमती मोहरे पर हमला करो, और उसके पीछे जो है, उसे जीत लो।
 ch.intro.discovered = डिस्कवर्ड अटैक। {n:position}: एक मोहरे को हटाकर दूसरे मोहरे का हमला खोलो।
-ch.intro.deflection = डिफ़्लेक्शन और डिकॉय। {n:position}: किसी रक्षक को उसकी जगह से हटाओ, या उसे किसी घातक खाने पर खींच लाओ।
+ch.intro.deflection = डिफ़्लेक्शन और डिकॉय। {n:position}: किसी रक्षक को दूर भटकाओ, या उसे किसी घातक खाने पर खींच लाओ।
 ch.intro.intermezzo = बीच की चालें। {n:position}: ज़ाहिर चाल से पहले, उससे ज़्यादा ताक़तवर चाल ढूँढो।
 ch.intro.trapped = फँसे हुए मोहरे। {n:position}: मेरे एक मोहरे के पास जाने को कोई सुरक्षित खाना नहीं है। उसे जीत लो।
 ch.intro.promotion = प्रमोशन। {n:position}, जहाँ आगे बढ़ा हुआ प्यादा बाज़ी का फ़ैसला करता है।
@@ -38,7 +38,7 @@ ch.intro.kq = वज़ीर और राजा बनाम राजा। {
 ch.intro.kr = हाथी और राजा बनाम राजा। {n:position}: मेरे राजा को क़दम-दर-क़दम मात दो।
 ch.intro.kp = राजा और प्यादा बनाम राजा। {n:position}: प्यादे को वज़ीर बनाओ। अपने राजा को आगे रखो।
 ch.intro.kp_hold = प्यादे को रोकें। {n:position}: तुम्हारे पास सिर्फ़ राजा है। ड्रॉ बचाओ।
-ch.intro.rook = हाथी के एंडगेम। {n:position}: प्रमोशन के लिए पुल बनाओ, और फ़िलिडोर डिफ़ेंस से ड्रॉ बचाओ।
+ch.intro.rook = हाथी के एंडगेम। {n:position}: प्रमोशन के लिए पुल बनाओ, और फ़िलिडोर के बचाव से ड्रॉ बचाओ।
 ch.intro.endgame = एंडगेम टैक्टिक्स। कम मोहरों और तीखे विचारों वाली {n:position}।
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -95,7 +95,7 @@ ch.solved.hold = ड्रॉ बच गया। बढ़िया बचा�
 ch.solved.draw = बोर्ड पर ड्रॉ। बढ़िया बचाव!
 # A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
 ch.wrong.reply = यह चाल नहीं। मैं जवाब देता: {move}।
-ch.wrong.reply.2 = पूरी तरह नहीं। मैं जवाब में खेलता: {move}।
+ch.wrong.reply.2 = पूरी तरह सही नहीं। मैं जवाब में खेलता: {move}।
 ch.wrong.reply.3 = तब मैं खेलता: {move}।
 ch.wrong.mate = सावधान: {move:nomate}, और यह मात होती।
 ch.wrong.mate.2 = संभलकर! मेरा जवाब होता: {move:nomate}, और यह मात है।

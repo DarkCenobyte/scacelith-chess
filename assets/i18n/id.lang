@@ -468,7 +468,7 @@ viewer.watch_again = Tonton lagi
 
 # The player's rating
 elo.label = ELO
-elo.no_games = Belum ada permainan dinilai
+elo.no_games = Belum ada permainan yang dinilai
 elo.provisional = Rating sementara
 elo.peak = Puncak {0}
 # Wins, draws, losses in chess notation: +12 =4 −9
@@ -837,7 +837,7 @@ online.err.rated_official_tc = Hanya kontrol waktu resmi yang dapat dinilai.
 online.err.cooldown = Pencarian lawan dijeda sejenak untuk Anda.
 online.err.invalid_tc = Kontrol waktu ini tidak diizinkan.
 online.err.rematch_unavailable = Tanding ulang sudah tidak memungkinkan.
-online.err.rated_repeat_limit = Untuk saat ini Anda sudah cukup banyak memainkan permainan dinilai melawan pemain ini. Mainkan permainan santai, atau coba lagi nanti.
+online.err.rated_repeat_limit = Untuk saat ini Anda sudah cukup banyak memainkan permainan yang dinilai melawan pemain ini. Mainkan permainan santai, atau coba lagi nanti.
 online.err.cheat_detected = Permainan dihentikan oleh pemeriksaan fair play server.
 online.err.invalid_password = Kata sandi salah.
 online.err.mfa_code_required = Masukkan kode dari aplikasi autentikator Anda (atau kode pemulihan).
