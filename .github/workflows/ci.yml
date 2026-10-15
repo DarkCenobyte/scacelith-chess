@@ -1,8 +1,9 @@
-# Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
-# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as docs/DEVELOPMENT.md's
-# "Building" section describes; on Linux aarch64; on macOS (Apple Silicon, experimental) with its
-# app and disk image; the contract with the dedicated server pinned in
-# tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
+# Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan,
+# and packed as an AppImage) and, cross-compiled with MinGW-w64, for Windows (its tests run under
+# Wine), as docs/DEVELOPMENT.md's "Building" section describes; on Linux aarch64; on macOS (Apple
+# Silicon, experimental) with its app and disk image; the contract with the dedicated server pinned
+# in tools/interop/server-revision and the live online tests against it; plus the workflows' own
+# lint.
 # The release workflow runs it again on the tagged commit (workflow_call). A weekly run checks the
 # contract against the server's master, to see changes on its side early.
 name: CI
@@ -52,7 +53,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev \
-            xvfb openbox
+            xvfb openbox desktop-file-utils
 
       # The coach's voice model (399 MB, seven files from Hugging Face) that the first configure
       # downloads for the TTS tests (third_party/supertonic3/supertonic3.cmake checks their SHA-256).
@@ -109,6 +110,11 @@ jobs:
       # x11-wm fail a test that skips for want of either.
       - name: X11 desktop tests
         run: tools/test_x11.sh build
+
+      # The AppImage of the Linux x86-64 release, made, extracted and run as the release workflow
+      # does (tools/linux/make-appimage.sh), so that a change that breaks it shows here first.
+      - name: AppImage
+        run: tools/linux/make-appimage.sh build/scacelith
 
       - name: Compiler cache statistics
         if: always()
