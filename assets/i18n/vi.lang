@@ -258,3 +258,262 @@ credits.fonts.hand = Chữ viết tay: Caveat, Marck Script, Bad Script, Aref Ru
 credits.fonts.figures = Hình quân cờ từ GNU FreeFont (GPL v3 kèm ngoại lệ phông chữ).
 credits.quote = “Cờ vua là nghệ thuật phân tích.”  — Mikhail Botvinnik
 # Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Giấy phép
+licences.title = GIẤY PHÉP
+licences.note = Các giấy phép được hiển thị bằng nguyên bản tiếng Anh.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = TẠM DỪNG
+pause.resume = Tiếp tục
+pause.offer_draw = Cầu hòa
+pause.claim_draw = Yêu cầu xử hòa
+pause.claim_draw.help = Lặp lại thế cờ ba lần hoặc luật 50 nước.
+pause.resign = Xin thua
+confirm.resign.title = XIN THUA
+confirm.resign.text = Xin thua ván này? Đối thủ của bạn sẽ được xử thắng.
+confirm.resign.draw = Xin thua ván này? Đối thủ của bạn không còn khả năng chiếu hết: ván cờ sẽ được xử hòa.
+confirm.resign.ok = Xin thua
+confirm.leave.title = RỜI VÁN CỜ
+confirm.leave.text = Quay về menu chính? Ván cờ hiện tại sẽ bị bỏ dở.
+confirm.leave.ok = Rời đi
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PHONG CẤP THÀNH
+piece.queen = Hậu
+piece.rook = Xe
+piece.bishop = Tượng
+piece.knight = Mã
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Ván cờ hòa.
+gameover.draw_moves = Ván cờ hòa sau {0} nước.
+gameover.win = Chơi hay lắm — bạn đã thắng.
+gameover.win_moves = Chơi hay lắm — bạn thắng sau {0} nước.
+gameover.loss = Đối thủ của bạn thắng.
+gameover.loss_moves = Đối thủ của bạn thắng sau {0} nước.
+gameover.rematch = Tái đấu
+gameover.view_board = Xem bàn cờ
+gameover.show = Hiện
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Chiếu hết
+reason.resignation = Xin thua
+reason.timeout = Thua do hết giờ
+reason.illegal_moves = Nước đi không hợp lệ thứ hai (xử thua)
+reason.stalemate = Hết nước đi
+reason.insufficient = Thế cờ chết (không đủ lực lượng)
+reason.timeout_vs_insufficient = Hết giờ, nhưng đối thủ không thể chiếu hết
+reason.fivefold = Lặp lại thế cờ năm lần
+reason.75_moves = Luật 75 nước
+reason.threefold_claim = Lặp lại thế cờ ba lần (theo yêu cầu)
+reason.50_moves_claim = Luật 50 nước (theo yêu cầu)
+reason.agreement = Hòa theo thỏa thuận
+reason.illegal_vs_insufficient = Nước đi không hợp lệ thứ hai, nhưng đối thủ không thể chiếu hết
+reason.resignation_vs_insufficient = Xin thua, nhưng đối thủ không thể chiếu hết
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = NƯỚC ĐI
+movelist.empty = Chưa có nước đi nào.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Chuẩn bị vật liệu
+loading.hall = Dựng đại sảnh
+loading.furniture = Chạm khắc bàn ghế
+loading.board = Đánh bóng bàn cờ
+loading.pieces = Tiện bộ quân cờ
+loading.clock = Lắp ráp đồng hồ
+loading.porcelain = Nung đồ sứ
+loading.ready = Sẵn sàng
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Không thể yêu cầu xử hòa ở thế cờ này.
+notify.flag_you = Bạn đã hết giờ.
+notify.flag_opponent = Đối thủ của bạn đã hết giờ.
+notify.touched.pawn = Luật chạm quân: bạn phải đi con Tốt đã chạm.
+notify.touched.knight = Luật chạm quân: bạn phải đi con Mã đã chạm.
+notify.touched.bishop = Luật chạm quân: bạn phải đi con Tượng đã chạm.
+notify.touched.rook = Luật chạm quân: bạn phải đi con Xe đã chạm.
+notify.touched.queen = Luật chạm quân: bạn phải đi con Hậu đã chạm.
+notify.touched.king = Luật chạm quân: bạn phải đi con Vua đã chạm.
+notify.touched.piece = Luật chạm quân: bạn phải đi quân đã chạm.
+notify.touched_square = Luật chạm quân: bạn phải đi quân ở ô {0}.
+notify.press_clock = Bấm đồng hồ để hoàn tất nước đi (phím cách).
+notify.manual_clock = Trong ván này, hãy tự bấm đồng hồ sau mỗi nước đi.
+notify.illegal = Nước đi không hợp lệ.
+notify.cannot_move = Không thể thực hiện nước đi đó.
+notify.move_first = Hãy đi quân trước khi bấm đồng hồ.
+notify.stance.sit_to_play = Ngồi xuống để chơi (phím mũi tên xuống).
+notify.stance.first = Đồng hồ vẫn chạy khi bạn đứng. Mũi tên xuống: ngồi xuống lại.
+notify.stance.first_untimed = Bạn chỉ chơi được khi ngồi trên ghế. Mũi tên xuống: ngồi xuống lại.
+notify.stance.finish_move = Hãy hoàn tất nước đi trước.
+notify.draw_already_offered = Bạn đã cầu hòa ở nước này rồi.
+notify.draw_accepted = Đối thủ của bạn chấp nhận hòa.
+notify.draw_declined = Đối thủ của bạn từ chối lời cầu hòa.
+notify.draw_claimed = Đối thủ của bạn yêu cầu xử hòa.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Trọng tài: đồng hồ đã được bấm mà chưa đi quân, việc này được tính là một nước đi không hợp lệ.
+arbiter.unpromoted = Trọng tài: nước đi không hợp lệ, con Tốt chưa được thay bằng quân mới trước khi bấm đồng hồ.
+arbiter.illegal = Trọng tài: nước đi không hợp lệ.
+arbiter.second_loses.white = Đây là nước đi không hợp lệ thứ hai của Trắng: Trắng thua ván cờ.
+arbiter.second_loses.black = Đây là nước đi không hợp lệ thứ hai của Đen: Đen thua ván cờ.
+arbiter.second_draw.white = Đây là nước đi không hợp lệ thứ hai của Trắng, nhưng Đen không thể chiếu hết: ván cờ hòa.
+arbiter.second_draw.black = Đây là nước đi không hợp lệ thứ hai của Đen, nhưng Trắng không thể chiếu hết: ván cờ hòa.
+arbiter.queen = Con Tốt được thay bằng Hậu.
+arbiter.queen_one_minute.white = Con Tốt được thay bằng Hậu và Trắng được cộng thêm một phút.
+arbiter.queen_one_minute.black = Con Tốt được thay bằng Hậu và Đen được cộng thêm một phút.
+arbiter.queen_two_minutes.white = Con Tốt được thay bằng Hậu và Trắng được cộng thêm hai phút.
+arbiter.queen_two_minutes.black = Con Tốt được thay bằng Hậu và Đen được cộng thêm hai phút.
+arbiter.restored = Thế cờ được khôi phục.
+arbiter.restored_one_minute.white = Thế cờ được khôi phục và Trắng được cộng thêm một phút.
+arbiter.restored_one_minute.black = Thế cờ được khôi phục và Đen được cộng thêm một phút.
+arbiter.restored_two_minutes.white = Thế cờ được khôi phục và Trắng được cộng thêm hai phút.
+arbiter.restored_two_minutes.black = Thế cờ được khôi phục và Đen được cộng thêm hai phút.
+arbiter.one_minute.white = Trắng được cộng thêm một phút.
+arbiter.one_minute.black = Đen được cộng thêm một phút.
+arbiter.two_minutes.white = Trắng được cộng thêm hai phút.
+arbiter.two_minutes.black = Đen được cộng thêm hai phút.
+arbiter.second_loses = Nước đi không hợp lệ thứ hai sẽ bị xử thua.
+arbiter.touched.white = Trắng phải đi quân đã chạm.
+arbiter.touched.black = Đen phải đi quân đã chạm.
+arbiter.game_over = Ván cờ đã kết thúc.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Xem ván cờ
+
+viewer.title = XEM VÁN CỜ
+viewer.white = TRẮNG
+viewer.black = ĐEN
+viewer.time_control = THỜI GIAN THI ĐẤU
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Đổi màu quân
+viewer.note = Cả hai người chơi đều là Stockfish. Hãy tự do bay quanh đại sảnh trong khi họ chơi: không ai nhìn thấy bạn.
+viewer.summary = {0} đấu {1}
+viewer.custom = Tùy chỉnh
+viewer.tc.custom = Tự chọn
+viewer.base_time = Thời gian cơ bản
+viewer.increment = Cộng thêm
+viewer.delay = Độ trễ
+viewer.off = Tắt
+viewer.minutes = {0} phút
+viewer.seconds = {0} giây
+viewer.delay_summary = trễ {0} giây
+viewer.back = Quay lại
+viewer.start = Bắt đầu
+
+viewer.paused = TẠM DỪNG
+viewer.resume = Tiếp tục
+viewer.options = Tùy chọn
+viewer.main_menu = Menu chính
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = ĐIỀU KHIỂN
+viewer.keys.move = W A S D  ·  Z Q S D  ·  phím mũi tên
+viewer.controls.move = Di chuyển
+viewer.keys.updown = E, phím cách  /  C, Ctrl
+viewer.controls.updown = Lên / xuống
+viewer.keys.fast = Shift
+viewer.controls.fast = Nhanh hơn
+viewer.keys.look = Nút chuột phải
+viewer.controls.look = Nhìn xung quanh
+viewer.keys.speed = Con lăn chuột
+viewer.controls.speed = Tốc độ
+viewer.keys.views = 1 – 9
+viewer.controls.views = Góc nhìn
+viewer.keys.eyes = 0
+viewer.controls.eyes = Qua mắt người chơi đến lượt đi
+viewer.keys.moves = Tab
+viewer.controls.moves = Danh sách nước đi
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Ẩn bảng hướng dẫn này
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Tạm dừng / tiếp tục
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Lùi / tiến một nước
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Chậm hơn / nhanh hơn
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Đầu / cuối ván cờ
+viewer.speed = Tốc độ {0} m/s
+viewer.view.0 = Qua mắt người chơi
+viewer.view.1 = Bên cạnh bàn
+viewer.view.2 = Phía trên bàn cờ
+viewer.view.3 = Đại sảnh
+viewer.view.4 = Đồng hồ
+viewer.view.5 = Gương mặt bên Trắng
+viewer.view.6 = Gương mặt bên Đen
+viewer.view.7 = Cuộc song đấu
+viewer.view.8 = Những ô cửa sổ
+viewer.view.9 = Những tấm thảm treo tường
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Trắng
+viewer.side.black = Đen
+viewer.flag.white = Trắng đã hết giờ.
+viewer.flag.black = Đen đã hết giờ.
+viewer.claims_draw = {0} yêu cầu xử hòa.
+viewer.offer_accepted = {0} cầu hòa, {1} chấp nhận.
+viewer.offer_declined = {0} cầu hòa, {1} từ chối.
+viewer.gameover.white_wins = Trắng thắng sau nước thứ {0}.
+viewer.gameover.black_wins = Đen thắng sau nước thứ {0}.
+viewer.gameover.draw = Ván cờ hòa sau nước thứ {0}.
+viewer.gameover.players = {0} đấu với {1}
+viewer.watch_again = Xem lại
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Chưa có ván tính điểm nào
+elo.provisional = Hệ số tạm thời
+elo.peak = Cao nhất {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo của bạn: {0}
+elo.expected = điểm kỳ vọng {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ván này không tính điểm
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Biên bản ván đấu
+scoresheet.event = Giải đấu
+scoresheet.date = Ngày
+scoresheet.round = Vòng
+scoresheet.board = Bàn
+scoresheet.page = Trang
+scoresheet.white = Trắng
+scoresheet.black = Đen
+scoresheet.elo = Elo
+scoresheet.result = Kết quả
+scoresheet.move_no = TT
+scoresheet.sign_white = Chữ ký bên Trắng
+scoresheet.sign_black = Chữ ký bên Đen
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = V H X T M
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Chơi trực tuyến
+online.title = CHƠI TRỰC TUYẾN
+online.continue = Tiếp tục
+online.retry = Thử lại
+online.copy = Sao chép
+online.copied = Đã sao chép
+online.copy.unavailable = Không thể sao chép ở đây: vui lòng ghi lại.
+online.rated = Tính điểm
+online.casual = Giao hữu
+online.casual_only = Chỉ giao hữu
+online.color.random = Bốc thăm
+online.ping = {0} ms
+online.conn.online = Đã kết nối
+online.conn.connecting = Đang kết nối…
+online.conn.reconnecting = Đang kết nối lại…
+online.conn.offline = Chưa kết nối
+online.conn.incompatible = Khác phiên bản
+online.no_server.text = Chơi trực tuyến cần một máy chủ Scacelith. Hãy nhập địa chỉ máy chủ trong phần tùy chọn, hoặc chơi thẳng với một người bạn bằng chế độ Đấu trực tiếp.

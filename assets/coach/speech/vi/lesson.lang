@@ -1,0 +1,147 @@
+# Coach speech (Vietnamese): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("con Xe của bạn", "con Mã của
+# tôi", common.lang); "nó" is "it" for any piece. {sq}, {sq2}, {to}, {esc} = squares, always after
+# the noun "ô" ("ô {sq}"); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points
+# while saying the word right after the mark.
+# Pieces written by hand are capitalised (Vua, Hậu, Xe, Tượng, Mã, Tốt). Numbers and ranks are
+# written in words ("hàng thứ bảy"), so only the lines with a file letter or the letter L need a
+# ".spoken" line (h = "hát", L = "e-lờ", as Vietnamese spells Latin letters).
+
+# ---- Chapter titles (said inside "Chúng ta tiếp tục với phần {chapter}.") ------------------------------
+# Lowercase noun phrases (see event.lesson.* in events.lang).
+lesson.title.welcome = bàn cờ
+lesson.title.pieces = cách đi của các quân cờ
+lesson.title.safety = bắt quân an toàn và không an toàn
+lesson.title.check = nước chiếu
+lesson.title.mate = chiếu hết
+lesson.title.castling = nhập thành
+lesson.title.en_passant = bắt tốt qua đường
+lesson.title.promotion = phong cấp
+lesson.title.draws = hết nước đi và hòa cờ
+lesson.title.etiquette = hệ số Elo, đồng hồ và phép lịch sự trong ván đấu thật
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Giờ bạn thử nhé.
+lesson.now_you.2 = Bây giờ đến lượt bạn.
+lesson.now_you.3 = Đến bạn.
+# Another wrong move after the demonstration.
+lesson.almost = Suýt nữa thôi! Hãy đi nước mà tôi đã chỉ cho bạn.
+lesson.almost.2 = Chưa hẳn. Hãy thử nước đi tôi đã làm mẫu.
+lesson.almost.3 = Gần được rồi. Hãy nhớ lại điều tôi vừa chỉ cho bạn.
+# A wrong move without a line of its own.
+lesson.try_again = Không phải vậy. Thử lại nhé.
+lesson.try_again.2 = Không phải nước này. Thử lần nữa nào.
+lesson.try_again.3 = Chúng ta thử thêm lần nữa nhé.
+lesson.use_your = Hãy dùng {your}.
+lesson.use_your.2 = Thử bằng {your} xem.
+lesson.watch = Xem này.
+lesson.like_this = Như thế này.
+lesson.and_back = Và quay lại.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Chiếu, nhưng Vua của tôi thoát sang ô {esc}.
+lesson.check_takes = Chiếu, nhưng Vua của tôi chỉ việc bắt {your}.
+lesson.check_block = Chiếu, nhưng tôi có thể đưa một quân vào chặn.
+lesson.stalemate = Hết nước đi! Vua của tôi không thể di chuyển, mà cũng không bị chiếu. Ván cờ hòa, dù bạn đang thắng thế!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Không được đi vào ô {sq}: {my} đang tấn công ô đó. Vua không bao giờ được tự đi vào chỗ nguy hiểm.
+why.PathBlocked = Có quân đang chắn {@}đường: các quân cờ không nhảy qua được, trừ con Mã.
+why.WrongGeometry = {your} không đi như vậy.
+why.MustAnswerCheck = Bạn đang bị {@}chiếu: phải thoát chiếu trước đã.
+why.CastlingThroughCheck = Vua của bạn sẽ phải đi qua ô {sq}, mà {my} đang tấn công ô đó.
+why.CastlingNoRights = Con Vua hoặc con Xe đó đã di chuyển rồi: không thể nhập thành.
+why.CastlingBlocked = Muốn nhập thành, các ô giữa Vua và Xe phải trống.
+why.CastlingOutOfCheck = Bạn không thể nhập thành khi đang bị chiếu.
+why.PawnForwardBlocked = Tốt không bắt thẳng về phía trước được: ô đó đã bị {@}chặn.
+why.LeavesKingInCheck = {your} đang bị ghim: nếu di chuyển nó, Vua của bạn sẽ bị {my} tấn công.
+why.OwnPieceOnTarget = Bạn không thể đi vào ô có quân của chính mình.
+why.PawnCaptureNeedsVictim = Tốt chỉ đi chéo khi bắt quân.
+why.EnPassantExpired = Chỉ được bắt tốt qua đường ngay sau khi con Tốt kia vừa tiến hai ô.
+why.NotYourTurn = Chờ đã: đang là lượt của tôi.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Xin chào! Tôi là huấn luyện viên của bạn. Chúng ta cùng học luật cờ vua nhé, từng bước nhỏ một.
+lesson.welcome.board = Đây là bàn cờ: sáu mươi tư ô sáng và tối, gồm tám hàng, mỗi hàng tám ô.
+lesson.welcome.light = Ô ở góc phía tay {@}phải của bạn luôn là ô sáng màu. Hãy nhớ: bên phải là ô sáng.
+lesson.welcome.files = Các đường dọc được gọi là cột. Mỗi cột mang một chữ cái, từ {@}a đến {@2}h.
+lesson.welcome.files.spoken = Các đường dọc được gọi là cột. Mỗi cột mang một chữ cái, từ {@}a đến {@2}hát.
+lesson.welcome.ranks = Các đường ngang được gọi là hàng. Mỗi hàng mang một con số, từ {@}một đến {@2}tám, bắt đầu từ phía bạn.
+lesson.welcome.square = Tên của mỗi ô gồm chữ cái trước, con số sau. Ô này là ô {sq}.
+lesson.welcome.square2 = Còn ô này là ô {sq}.
+lesson.welcome.kings = Đây là hai con Vua. Vua của bạn ở ô {sq}, Vua của tôi ở ô {sq2}.
+lesson.welcome.ask = Đến lượt bạn: hãy đi Vua lên phía trước một ô, đến ô {sq}.
+lesson.welcome.wrong = Đó là ô {to}. Chúng ta cần ô {sq}: chữ e, số hai.
+lesson.welcome.ok = Tuyệt. Vua của bạn đang ở ô {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Đây là {your}. Nó đi theo đường thẳng, dọc theo cột và hàng, xa bao nhiêu tùy ý.
+lesson.rook.lines = Đi lên theo cột, {@}hoặc đi ngang theo hàng.
+lesson.rook.capture = Để bắt quân, một quân đi vào ô có quân {@}đối phương, và quân đó bị loại khỏi bàn cờ.
+lesson.rook.ask = Hãy dùng Xe bắt {my}!
+lesson.rook.short = Đúng hướng rồi! Cứ đi tiếp lên theo cột, đến tận {my}.
+lesson.rook.rank = Đó là đi ngang theo hàng. {my} ở phía trên, theo cột.
+lesson.rook.king = Đó là Vua của bạn. Hãy dùng {your}, ở trong góc.
+lesson.rook.ok = Bắt được rồi! {my} bị loại khỏi bàn cờ.
+# Pieces don't jump
+lesson.jump.blocked = Các quân không thể nhảy qua quân khác. Con Tốt của bạn ở ô {sq} đang chắn đường của Xe.
+lesson.jump.knight = Chỉ có Mã mới nhảy được. Chúng ta sẽ sớm gặp nó.
+# Bishop
+lesson.bishop.intro = Đây là {your}. Nó đi theo đường chéo, xa bao nhiêu tùy ý.
+lesson.bishop.colour = Tượng luôn ở trên các ô cùng một màu.
+lesson.bishop.ask = {my} đang ở trên đường chéo đó. Hãy bắt nó!
+lesson.bishop.short = Đúng đường chéo rồi! Đi xa hơn nữa, đến tận {my}.
+lesson.bishop.other = Đó là đường chéo kia. Hãy nhìn về phía {my}.
+lesson.bishop.ok = Xuất sắc. Tượng rất thích những đường chéo dài.
+# Queen
+lesson.queen.intro = Đây là {your}, quân mạnh nhất. Nó đi như Xe và Tượng gộp lại.
+lesson.queen.ask = Hãy tìm {my} và dùng Hậu bắt nó.
+lesson.queen.wrong = Hậu của bạn có thể đến chỗ {my} chỉ trong một nước, theo đường chéo.
+lesson.queen.ok = Giỏi lắm! Hãy giữ Hậu an toàn: nó rất có giá trị.
+# King
+lesson.king.intro = Vua chỉ đi một ô, theo bất kỳ hướng nào.
+lesson.king.important = Vua là quân quan trọng nhất. Nếu Vua bị vây không còn lối thoát, ván cờ sẽ thua.
+lesson.king.ask = Vua cũng có thể bắt quân. Hãy bắt {my}!
+lesson.king.wrong = Vua của bạn đang ở ngay cạnh {my}. Hãy bước sang ô đó để bắt nó.
+lesson.king.ok = Tốt lắm! Vua đi chậm, nhưng rất mạnh ở cự ly gần.
+# Knight
+lesson.knight.intro = Đây là {your}. Nó đi theo hình chữ L: hai ô thẳng, rồi một ô sang bên.
+lesson.knight.intro.spoken = Đây là {your}. Nó đi theo hình chữ e-lờ: hai ô thẳng, rồi một ô sang bên.
+lesson.knight.l = Như {@}thế này. Nó luôn đáp xuống một ô khác màu.
+lesson.knight.jump = Mã là quân duy nhất có thể nhảy qua các quân khác.
+lesson.knight.ask = Hãy dùng Mã bắt {my}!
+lesson.knight.wrong = Đó đúng là một nước đi của Mã, nhưng không tới được {my}. Thử một hình chữ L khác xem.
+lesson.knight.wrong.spoken = Đó đúng là một nước đi của Mã, nhưng không tới được {my}. Thử một hình chữ e-lờ khác xem.
+lesson.knight.ok = Cú nhảy tuyệt vời!
+# Pawn: moving
+lesson.pawn.intro = Bây giờ là {your}. Nó đi thẳng về phía trước, mỗi lần một ô, và không bao giờ đi lùi.
+lesson.pawn.first = Ở nước đi đầu tiên của nó, Tốt có thể đi một hoặc hai ô.
+lesson.pawn.ask = Hãy đi Tốt lên phía trước hai ô.
+lesson.pawn.one = Đó là một ô: hợp lệ, nhưng lần này hãy đi hai ô.
+lesson.pawn.use = Hãy dùng con Tốt.
+lesson.pawn.ok = Đúng rồi.
+# Pawn: capturing
+lesson.pawncap.blocked = Tốt của tôi chặn Tốt của bạn. Tốt không thể bắt thẳng về phía trước.
+lesson.pawncap.diagonal = Nhưng Tốt bắt quân theo đường chéo, tiến lên một ô.
+lesson.pawncap.ask = Hãy dùng Tốt bắt {my}.
+lesson.pawncap.use = Hãy dùng {your}: nó bắt chéo về phía trước.
+lesson.pawncap.ok = Chính xác! Đi thì đi thẳng, bắt thì bắt chéo.
+# Values, set-up and the first moves
+lesson.values.pawn = Mỗi quân có một giá trị tính bằng điểm. Một con Tốt đáng một điểm.
+lesson.values.pieces = Mã hoặc {@}Tượng: ba điểm. {@2}Xe: năm điểm. {@3}Hậu: chín điểm.
+lesson.values.king = Vua là vô giá: bạn không bao giờ được đem nó ra đổi.
+lesson.values.trade = Hãy cố đừng bao giờ đổi một quân để lấy thứ ít giá trị hơn nó.
+lesson.setup.corners = Mọi ván cờ đều bắt đầu như thế này: Xe ở các {@}góc, rồi đến {@2}Mã, rồi đến {@3}Tượng.
+lesson.setup.queen = Hậu đứng trên ô cùng màu với mình: Hậu của bạn nằm trên một ô sáng.
+lesson.setup.king = Vua đứng cạnh Hậu. Bên Trắng luôn đi trước.
+lesson.first.ask = Bắt đầu ván cờ nào: hãy đi con Tốt trước mặt Vua lên hai ô, đến ô {sq}.
+lesson.first.wrong = Đó cũng là một nước đi hợp lệ! Nhưng bây giờ, hãy đi con Tốt trước Vua đến ô {sq} nhé.
+lesson.first.ok = Một nước đi đầu tiên tuyệt vời: nó mở đường cho Hậu và Tượng của bạn.
+lesson.first.reply = Tôi đáp lại y như vậy. Bây giờ hãy ra một con Mã: nhảy từ ô {sq} đến ô {sq2}.
+lesson.first.knight_wrong = Mã nhảy qua được các con Tốt. Thử từ ô {sq} đến ô {sq2} xem.
+lesson.first.knight_ok = Tuyệt. Mã và Tượng được đưa ra sớm.
