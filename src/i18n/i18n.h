@@ -8,9 +8,11 @@
 //     ui::notify(i18n::trf("notify.touched_square", {squareName(sq)}));
 //
 // Plurals: a value whose forms are separated by '|' is chosen by trn() with the CLDR plural rule
-// of the language, in this order: English/German/Spanish "one|other", French "one|other" (0 and 1
-// are singular), Russian/Ukrainian "one|few|many", Arabic "zero|one|two|few|many|other",
-// Japanese/Chinese a single form. pluralForms(code) gives the count a file must provide.
+// of the language (integer counts), in this order: "one|other" for most languages (French,
+// Brazilian Portuguese and Hindi count 0 as singular); Russian, Ukrainian, Polish "one|few|many";
+// Czech, Slovak, Croatian, Lithuanian, Romanian "one|few|other"; Latvian "zero|one|other";
+// Slovenian "one|two|few|other"; Arabic "zero|one|two|few|many|other"; Japanese, Chinese, Korean,
+// Indonesian and Vietnamese a single form. pluralForms(code) gives the count a file must provide.
 #pragma once
 #include <cstdint>
 #include <initializer_list>
@@ -25,8 +27,7 @@ struct Language {
     bool rtl;                // right-to-left script (Arabic)
 };
 
-// English, French, German, Spanish, Ukrainian, Arabic, Russian, Japanese, Traditional Chinese,
-// Simplified Chinese (in that order; index 0 = English).
+// The 34 languages of the game: English first, then by native name (see i18n.cpp).
 const std::vector<Language>& languages();
 int languageIndex(const std::string& code);  // -1 when unknown
 
@@ -36,7 +37,8 @@ const std::string& language();               // current code
 bool rtl();                                  // current language is right-to-left
 int generation();                            // incremented by every setLanguage() (cache keys)
 // Supported language for an OS locale tag ("fr-FR", "zh_TW.UTF-8", "zh-Hant-HK", "pt-BR"...):
-// zh-TW/HK/MO and zh-Hant -> "zh-Hant", other Chinese -> "zh-Hans", unsupported -> "en".
+// zh-TW/HK/MO and zh-Hant -> "zh-Hant", other Chinese -> "zh-Hans", pt-BR -> "pt-BR", other
+// Portuguese -> "pt", unsupported -> "en".
 std::string matchLocale(const std::string& tag);
 
 // Translation of 'key' in the current language (pointer stays valid until the next
@@ -62,8 +64,9 @@ std::string ltr(const std::string& s);
 int pluralForms(const std::string& code);
 int pluralIndex(const std::string& code, long long n);
 
-// Every codepoint used by the current language's strings (sorted, unique; Arabic letters are
-// given in their contextual presentation forms): the UI builds these glyphs up front.
+// Every codepoint used by the current language's strings (sorted, unique; as drawn: Arabic letters
+// in their contextual presentation forms, Devanagari syllables as the fonts' precomposed glyphs):
+// the UI builds these glyphs up front.
 std::vector<uint32_t> codepoints();
 
 // Parses one .lang file (for tests and tools). Returns false on a malformed line.

@@ -1,0 +1,1438 @@
+# Scacelith - Nederlands
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
+# Register: informal "je/jij/jouw" everywhere (as Dutch Microsoft and Apple software), never "u".
+# Buttons and menu items in sentence case (infinitive or noun); titles in capitals.
+# Chess terms as the Dutch federation (KNSB) uses them, see the glossary of the Dutch coach files:
+# zet, partij, remise, rokade, pat, notatieformulier, speeltempo; notation letters K D T L P.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Aan
+common.off = Uit
+common.back = Terug
+common.apply = Toepassen
+common.discard = Verwerpen
+common.cancel = Annuleren
+common.white = Wit
+common.black = Zwart
+common.main_menu = Hoofdmenu
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Het koninklijke spel
+menu.new_game = Nieuwe partij
+menu.options = Opties
+menu.credits = Credits
+menu.quit = Afsluiten
+menu.version = Versie {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPTIES
+options.tab.display = Weergave
+options.tab.graphics = Graphics
+options.tab.audio = Audio
+options.tab.gameplay = Spel
+options.tab.player = Speler
+options.tab.controls = Besturing
+options.pending = Wijzigingen gaan in zodra je ze toepast.
+options.unsaved.title = NIET-TOEGEPASTE WIJZIGINGEN
+options.unsaved.text = Er zijn opties gewijzigd. Wil je ze toepassen voordat je dit menu verlaat?
+
+options.language = Taal
+options.language.help = Taal van de menu's en berichten. De wijziging gaat meteen in.
+options.display_mode = Weergavemodus
+options.display_mode.help = Volledig scherm: een randloos venster over het hele scherm, op de resolutie van het bureaublad. Venster: een venster met de grootte hieronder.
+options.fullscreen = Volledig scherm
+options.windowed = Venster
+options.window_size = Venstergrootte
+options.window_size.help = Grootte van het venster in de venstermodus. Volledig scherm gebruikt altijd de resolutie van het bureaublad.
+options.vsync = Verticale synchronisatie
+options.vsync.help = Synchroniseert de beelden met het scherm om beeldscheuring te voorkomen.
+options.render_scale = Renderschaal
+options.render_scale.help = Interne resolutie van het 3D-beeld. Lager is sneller, hoger is scherper.
+
+options.quality = Kwaliteit
+options.quality.very_low = Zeer laag
+options.quality.low = Laag
+options.quality.medium = Gemiddeld
+options.quality.high = Hoog
+options.quality.ultra = Ultra
+options.quality.custom = Aangepast
+options.quality.help = Stelt alle opties hieronder in één keer in: Zeer laag schakelt alle effecten uit, Ultra zet ze allemaal op het maximum. Wijzig je één optie afzonderlijk, dan springt de kwaliteit op Aangepast. Op een bescheiden grafische kaart helpt een lagere renderschaal (Weergave) ook veel.
+options.shadows = Schaduwen
+options.shadows.help = Detail van de schaduwen van de zon en zachtheid van hun randen. Laag: eenvoudige randen, snel te tekenen.
+options.reflections = Reflecties
+options.reflections.help = De vloer, de tafel en het bord weerspiegelen de zaal (die daarvoor telkens opnieuw wordt getekend: een van de zwaarste opties); vanaf Gemiddeld weerspiegelen ook de glanzende stukken en voorwerpen hun omgeving.
+options.ambient_occlusion = Omgevingsocclusie
+options.ambient_occlusion.help = Zachte schaduw waar voorwerpen elkaar raken en in holtes, waar minder licht binnenkomt.
+options.indirect_light = Indirect licht
+options.indirect_light.help = Daglicht dat weerkaatst op de muren, de vloer en het plafond. Laag: in plaats daarvan een gelijkmatig omgevingslicht. Vooral een kwestie van laadtijd.
+options.volumetric_light = Lichtbundels
+options.volumetric_light.help = Zonnestralen door de stoffige lucht van de zaal, en de stofjes die erin glinsteren.
+options.tessellation = Tessellatie
+options.tessellation.help = Gladde contouren op de rondingen van de stukken als je ze van dichtbij bekijkt.
+options.tessellation.unavailable = Niet beschikbaar: dit grafische stuurprogramma ondersteunt geen tessellatie.
+options.antialiasing = Anti-aliasing
+options.antialiasing.help = Maakt gekartelde randen en flikkerende glanspunten glad. Uit: scherper maar gekarteld, en sommige effecten zien er korrelig uit.
+options.depth_of_field = Scherptediepte
+options.depth_of_field.help = Vervaagt wat ver voor of achter het punt ligt waar je naar kijkt, zoals een cameralens dat doet.
+options.motion_blur = Bewegingsonscherpte
+options.motion_blur.help = Vervaagt de snelle bewegingen van de camera en de armen, zoals een filmcamera dat doet.
+options.bloom = Gloed
+options.bloom.help = Een zachte gloed rond de felste lichtpunten, zoals in een cameralens.
+options.brightness = Helderheid
+options.brightness.neutral = Neutraal
+options.brightness.value = {0} EV
+options.brightness.help = Belichtingscorrectie van de camera. De kalibratie bij de eerste start stelt die zo in dat de donkerste schaduwen nauwelijks zichtbaar zijn.
+
+options.master_volume = Hoofdvolume
+options.effects = Effecten
+options.ambience = Sfeergeluid
+options.ambience.help = Het geroezemoes van de zaal: het vuur, verre voetstappen, de oude klok.
+options.ambience_volume = Volume sfeergeluid
+options.voice_volume = Stemvolume
+options.voice_volume.help = Volume van de stem van de coach in de coachmodus.
+options.subtitles = Ondertiteling
+options.subtitles.auto = Automatisch
+options.subtitles.help = Wat de coach zegt, onder in beeld uitgeschreven. Automatisch: getoond als de coach de taal van de menu's niet spreekt (bij Chinese menu's spreekt hij Engels). Altijd getoond als zijn stem niet geïnstalleerd is.
+
+options.legal_moves = Legale zetten tonen
+options.legal_moves.help = Markeert de velden die een aangeraakt stuk kan bereiken. Staat dit uit, dan vertelt niets je of een zet legaal is: een illegale zet wordt door de arbiter bestraft zodra je de klok indrukt.
+options.coordinates = Bordcoördinaten
+options.auto_press = Klok automatisch indrukken
+options.auto_press.help = Je robot drukt zelf de klok in zodra je zet op het bord staat. In onlinepartijen beslist de server, en in een directe partij de speler die de partij host.
+options.thinking_time = Realistische bedenktijd
+options.thinking_time.help = Je tegenstander neemt de tijd zoals een menselijke speler, in plaats van meteen te zetten.
+options.ignore_head = Hoofdbewegingen tegenstander negeren
+options.ignore_head.help = In onlinepartijen en directe partijen kijkt de robot van je tegenstander waar je tegenstander zelf kijkt. Staat dit aan, dan beweegt hij zijn hoofd zelf, zoals tegen Stockfish.
+options.mouse_sensitivity = Muisgevoeligheid
+options.invert_look = Verticaal kijken omkeren
+options.handover = Spelerswissel (hot-seat)
+options.handover.cut = Directe overgang
+options.handover.flight = Vlucht, {0} s
+options.handover.help = Twee spelers op één pc: hoe het beeld na elke zet van de ogen van de ene speler naar die van de andere gaat. De directe overgang voorkomt de camerabeweging.
+options.game_cursor = Spelaanwijzer
+options.game_cursor.help = Aan tafel tekent het spel een eigen aanwijzer, die laat zien wat een klik zal doen. Uit: de gewone pijl van het systeem.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Naam
+player.name.help = Je naam zoals die bovenaan de notatieformulieren staat, in elk alfabet.
+player.default_name = Mens
+player.handwriting = Handschrift
+player.handwriting.help = De hand die je zetten noteert. Arabisch, Japans en Chinees worden in een eigen handschrift geschreven.
+player.preview = OP JE NOTATIEFORMULIER
+hand.caveat = Losjes
+hand.marck = Lopend schrift
+hand.badscript = Schuin
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Linkermuisknop
+controls.touch = Een stuk aanraken en daarna verplaatsen
+controls.clock.keys = Spatiebalk  of  klik op de klok
+controls.clock = De klok indrukken
+controls.look.keys = Rechtermuisknop ingedrukt
+controls.look = Rondkijken
+controls.sheet.keys = S
+controls.sheet = Naar je notatieformulier kijken, en terug
+controls.stand.keys = ↑
+controls.stand = Opstaan voor je stoel
+controls.side.keys = ←  /  →
+controls.side = Aan het linker- / rechteruiteinde van de tafel gaan staan
+controls.sit.keys = ↓
+controls.sit = Weer gaan zitten (je speelt alleen zittend)
+controls.moves.keys = Tab
+controls.moves = Zettenlijst tonen of verbergen
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Spatiebalk
+controls.coach_skip = Coach: overslaan wat de coach zegt
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Coach: de zet terugnemen als dat wordt aangeboden
+controls.coach_hint.keys = H
+controls.coach_hint = Uitdagingen van de coach: om een hint vragen
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = HELDERHEID
+calibration.text = Verschuif de schuifregelaar tot het paard op het zwarte veld nauwelijks of niet meer zichtbaar is.
+calibration.later = Je kunt dit later wijzigen via Opties > Graphics.
+calibration.continue = Doorgaan
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NIEUWE PARTIJ
+newgame.opponent = TEGENSTANDER
+newgame.time_control = SPEELTEMPO
+newgame.start = Starten
+newgame.elo = ~{0} Elo
+newgame.you_white = Je speelt met wit.
+newgame.you_black = Je speelt met zwart.
+newgame.colour_lot = Voor de eerste partij worden de kleuren geloot.
+newgame.colour_alternate = Daarna wisselen de kleuren van partij tot partij.
+newgame.opponent_kind = Tegenstander
+newgame.opponent_kind.help = Speel tegen Stockfish, of tegen een vriend aan deze computer: jullie spelen om beurten, ieder vanaf de eigen kant van het bord.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Mens, zelfde pc
+
+# Custom opponent: Stockfish parameters
+engine.skill = Vaardigheidsniveau
+engine.skill.help = “Skill Level” van Stockfish (0–20). Wordt genegeerd zolang de sterkte via Elo beperkt is.
+engine.limit_elo = Sterkte beperken (Elo)
+engine.limit_elo.help = UCI_LimitStrength: de engine mikt op de Elo-rating hieronder.
+engine.elo = Elo
+engine.depth = Zoekdiepte
+engine.plies = {0} halve zet|{0} halve zetten
+engine.move_time = Tijd per zet
+engine.nodes = Knooppuntenlimiet
+engine.no_limit = Uit
+engine.thousand = {0} duizend
+engine.million = {0} miljoen
+engine.dynamic_elo = Tijdafhankelijke Elo
+engine.dynamic_elo.help = Net als een menselijke speler speelt Stockfish zwakker als zijn tijd opraakt: een beetje in de laatste minuut (eerder in rapid- en blitzpartijen), veel zwakker in tijdnood. Alleen partijen met klok.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish neemt de tijd zoals een mens van zijn niveau. Om deze pauze over te slaan: Opties > Spel > Realistische bedenktijd.
+engine.pace.instant = Stockfish zet zodra hij klaar is met rekenen. Voor menselijke pauzes: Opties > Spel > Realistische bedenktijd.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Onbeperkt
+tc.no_clock = Geen klok
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapid
+tc.classical = Klassiek
+tc.custom = Aangepast
+tc.your_own = Naar keuze
+tc.base_time = Basistijd
+tc.base_time.help = Begintijd op elke klok (minuten : seconden).
+tc.increment = Increment
+tc.increment.help = Fischer-increment dat na elke zet wordt toegevoegd.
+tc.delay = Vertraging
+tc.delay.help = Bronstein-vertraging: de tijd die tot aan deze vertraging is gebruikt, krijg je na elke zet terug.
+tc.no_delay = Uit
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, vertraging {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Nieuweling
+preset.novice.desc = Kent net de zetten: laat stukken hangen en ziet eenvoudige dreigingen over het hoofd.
+preset.beginner.name = Beginner
+preset.beginner.desc = Kent de basis, maar blundert nog regelmatig materiaal weg.
+preset.casual.name = Recreant
+preset.casual.desc = Een ontspannen tegenstander voor een avondje: verstandige zetten, geregeld fouten.
+preset.club_player.name = Clubspeler
+preset.club_player.desc = Solide clubspeler die duidelijke blunders afstraft.
+preset.advanced.name = Gevorderd
+preset.advanced.desc = Sterke clubspeler met een goed tactisch inzicht.
+preset.expert.name = Expert
+preset.expert.desc = Ervaren toernooispeler: maakt zelden fouten, zet voordeel om in winst.
+preset.master.name = Meester
+preset.master.desc = Meestersterkte: diep rekenwerk en verfijnd positiespel.
+preset.grandmaster.name = Grootmeester
+preset.grandmaster.desc = Grootmeesterniveau: uiterst moeilijk te verslaan.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 op volle sterkte. Veel succes.
+preset.custom.name = Aangepast
+preset.custom.desc = Je eigen engine-instellingen.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CREDITS
+credits.game.head = SCACELITH
+credits.game = Een schaakpartij in een koninklijke zaal, op een eigen OpenGL 4.6-engine.
+credits.engine.head = SCHAAKENGINE
+credits.engine = Stockfish 19, door de ontwikkelaars van Stockfish.
+credits.engine.licence = GNU General Public License, versie 3.
+credits.engine.data = Het neurale netwerk werd getraind met gegevens van het Leela Chess Zero-project, die beschikbaar zijn onder de Open Database License (ODbL).
+credits.voice.head = STEM VAN DE COACH
+credits.voice = Synthetische spraak gegenereerd met Supertonic 3 voor de coachmodus.
+credits.voice.licence = Supertonic 3 is een model van Supertone, gebruikt onder de OpenRAIL-M-licentie, waarvan de gebruiksbeperkingen gelden voor iedereen die het gebruikt (zie Licenties).
+credits.openings.head = OPENINGEN
+credits.openings = Namen van openingen uit de chess-openings-database van lichess.org, vrijgegeven in het publieke domein (CC0).
+credits.fonts.head = LETTERTYPEN
+credits.fonts = EB Garamond van Georg Duffner en Cinzel van Natanael Gama; Amiri van Khaled Hosny.
+credits.fonts.hand = Handschriften: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Schaakfiguren uit GNU FreeFont (GPL v3 met font-uitzondering).
+credits.quote = “Schaken is de kunst van de analyse.”  — Michail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenties
+licences.title = LICENTIES
+licences.note = De licenties worden getoond in hun oorspronkelijke Engelse tekst.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = GEPAUZEERD
+pause.resume = Hervatten
+pause.offer_draw = Remise aanbieden
+pause.claim_draw = Remise claimen
+pause.claim_draw.help = Drievoudige herhaling of vijftigzettenregel.
+pause.resign = Opgeven
+confirm.resign.title = OPGEVEN
+confirm.resign.text = Deze partij opgeven? Je tegenstander wordt tot winnaar verklaard.
+confirm.resign.draw = Deze partij opgeven? Je tegenstander kan niet meer mat zetten: de partij eindigt in remise.
+confirm.resign.ok = Opgeven
+confirm.leave.title = PARTIJ VERLATEN
+confirm.leave.text = Terug naar het hoofdmenu? De huidige partij wordt afgebroken.
+confirm.leave.ok = Verlaten
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOVEREN TOT
+piece.queen = Dame
+piece.rook = Toren
+piece.bishop = Loper
+piece.knight = Paard
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = De partij eindigt in remise.
+gameover.draw_moves = De partij eindigt na {0} zet in remise.|De partij eindigt na {0} zetten in remise.
+gameover.win = Goed gespeeld — je wint.
+gameover.win_moves = Goed gespeeld — je wint in {0} zet.|Goed gespeeld — je wint in {0} zetten.
+gameover.loss = Je tegenstander wint.
+gameover.loss_moves = Je tegenstander wint in {0} zet.|Je tegenstander wint in {0} zetten.
+gameover.rematch = Revanche
+gameover.view_board = Bord bekijken
+gameover.show = Tonen
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Schaakmat
+reason.resignation = Opgave
+reason.timeout = Verlies op tijd
+reason.illegal_moves = Tweede illegale zet (reglementair verlies)
+reason.stalemate = Pat
+reason.insufficient = Dode stelling (onvoldoende materiaal)
+reason.timeout_vs_insufficient = Vlag gevallen, maar de tegenstander kan niet mat zetten
+reason.fivefold = Vijfvoudige herhaling
+reason.75_moves = 75-zettenregel
+reason.threefold_claim = Drievoudige herhaling (geclaimd)
+reason.50_moves_claim = 50-zettenregel (geclaimd)
+reason.agreement = Remise in onderling overleg
+reason.illegal_vs_insufficient = Tweede illegale zet, maar de tegenstander kan niet mat zetten
+reason.resignation_vs_insufficient = Opgave, maar de tegenstander kan niet mat zetten
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ZETTEN
+movelist.empty = Nog geen zetten.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Materialen voorbereiden
+loading.hall = De zaal optrekken
+loading.furniture = Tafel en stoelen uitsnijden
+loading.board = Het bord polijsten
+loading.pieces = De schaakstukken draaien
+loading.clock = De klok in elkaar zetten
+loading.porcelain = Het porselein bakken
+loading.ready = Klaar
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move = "aanraakregel" (the rule's usual Dutch name).
+notify.no_draw_claim = In deze stelling kan geen remise worden geclaimd.
+notify.flag_you = Je vlag is gevallen.
+notify.flag_opponent = De vlag van je tegenstander is gevallen.
+notify.touched.pawn = Aanraakregel: je moet de pion spelen die je hebt aangeraakt.
+notify.touched.knight = Aanraakregel: je moet het paard spelen dat je hebt aangeraakt.
+notify.touched.bishop = Aanraakregel: je moet de loper spelen die je hebt aangeraakt.
+notify.touched.rook = Aanraakregel: je moet de toren spelen die je hebt aangeraakt.
+notify.touched.queen = Aanraakregel: je moet de dame spelen die je hebt aangeraakt.
+notify.touched.king = Aanraakregel: je moet de koning spelen die je hebt aangeraakt.
+notify.touched.piece = Aanraakregel: je moet het stuk spelen dat je hebt aangeraakt.
+notify.touched_square = Aanraakregel: je moet het stuk op {0} spelen.
+notify.press_clock = Druk de klok in om je zet te voltooien (spatiebalk).
+notify.manual_clock = Druk in deze partij na elke zet zelf de klok in.
+notify.illegal = Illegale zet.
+notify.cannot_move = Die zet kan niet worden gedaan.
+notify.move_first = Doe je zet voordat je de klok indrukt.
+notify.stance.sit_to_play = Ga weer zitten om te spelen (pijl omlaag).
+notify.stance.first = De klok loopt door terwijl je staat. Pijl omlaag: weer gaan zitten.
+notify.stance.first_untimed = Je speelt alleen vanaf je stoel. Pijl omlaag: weer gaan zitten.
+notify.stance.finish_move = Maak eerst je zet af.
+notify.draw_already_offered = Je hebt bij deze zet al remise aangeboden.
+notify.draw_accepted = Je tegenstander neemt het remiseaanbod aan.
+notify.draw_declined = Je tegenstander wijst het remiseaanbod af.
+notify.draw_claimed = Je tegenstander claimt remise.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Arbiter: de klok werd ingedrukt zonder dat er een zet was gedaan; dat telt als een illegale zet.
+arbiter.unpromoted = Arbiter: illegale zet, de pion werd niet door een nieuw stuk vervangen voordat de klok werd ingedrukt.
+arbiter.illegal = Arbiter: illegale zet.
+arbiter.second_loses.white = Dit is de tweede illegale zet van Wit: Wit verliest de partij.
+arbiter.second_loses.black = Dit is de tweede illegale zet van Zwart: Zwart verliest de partij.
+arbiter.second_draw.white = Dit is de tweede illegale zet van Wit, maar Zwart kan niet mat zetten: de partij eindigt in remise.
+arbiter.second_draw.black = Dit is de tweede illegale zet van Zwart, maar Wit kan niet mat zetten: de partij eindigt in remise.
+arbiter.queen = De pion wordt een dame.
+arbiter.queen_one_minute.white = De pion wordt een dame en Wit krijgt één minuut extra.
+arbiter.queen_one_minute.black = De pion wordt een dame en Zwart krijgt één minuut extra.
+arbiter.queen_two_minutes.white = De pion wordt een dame en Wit krijgt twee minuten extra.
+arbiter.queen_two_minutes.black = De pion wordt een dame en Zwart krijgt twee minuten extra.
+arbiter.restored = De stelling wordt hersteld.
+arbiter.restored_one_minute.white = De stelling wordt hersteld en Wit krijgt één minuut extra.
+arbiter.restored_one_minute.black = De stelling wordt hersteld en Zwart krijgt één minuut extra.
+arbiter.restored_two_minutes.white = De stelling wordt hersteld en Wit krijgt twee minuten extra.
+arbiter.restored_two_minutes.black = De stelling wordt hersteld en Zwart krijgt twee minuten extra.
+arbiter.one_minute.white = Wit krijgt één minuut extra.
+arbiter.one_minute.black = Zwart krijgt één minuut extra.
+arbiter.two_minutes.white = Wit krijgt twee minuten extra.
+arbiter.two_minutes.black = Zwart krijgt twee minuten extra.
+arbiter.second_loses = Een tweede illegale zet betekent verlies van de partij.
+arbiter.touched.white = Wit moet het aangeraakte stuk spelen.
+arbiter.touched.black = Zwart moet het aangeraakte stuk spelen.
+arbiter.game_over = De partij is afgelopen.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Partij bekijken
+
+viewer.title = PARTIJ BEKIJKEN
+viewer.white = WIT
+viewer.black = ZWART
+viewer.time_control = SPEELTEMPO
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Kleuren wisselen
+viewer.note = Beide spelers zijn Stockfish. Vlieg vrij door de zaal terwijl ze spelen: niemand ziet je.
+viewer.summary = {0} tegen {1}
+viewer.custom = Aangepast
+viewer.tc.custom = Naar keuze
+viewer.base_time = Basistijd
+viewer.increment = Increment
+viewer.delay = Vertraging
+viewer.off = Uit
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = vertraging {0} s
+viewer.back = Terug
+viewer.start = Starten
+
+viewer.paused = GEPAUZEERD
+viewer.resume = Hervatten
+viewer.options = Opties
+viewer.main_menu = Hoofdmenu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = BESTURING
+viewer.keys.move = W A S D  ·  Z Q S D  ·  pijltjestoetsen
+viewer.controls.move = Bewegen
+viewer.keys.updown = E, spatiebalk  /  C, Ctrl
+viewer.controls.updown = Omhoog / omlaag
+viewer.keys.fast = Shift
+viewer.controls.fast = Sneller
+viewer.keys.look = Rechtermuisknop
+viewer.controls.look = Rondkijken
+viewer.keys.speed = Muiswiel
+viewer.controls.speed = Snelheid
+viewer.keys.views = 1 – 9
+viewer.controls.views = Standpunten
+viewer.keys.eyes = 0
+viewer.controls.eyes = Door de ogen van de speler die aan zet is
+viewer.keys.moves = Tab
+viewer.controls.moves = Zettenlijst
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Dit overzicht verbergen
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauzeren / hervatten
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Eén zet terug / vooruit
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Langzamer / sneller
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Begin / einde van de partij
+viewer.speed = Snelheid {0} m/s
+viewer.view.0 = Door de ogen van de spelers
+viewer.view.1 = Naast de tafel
+viewer.view.2 = Boven het bord
+viewer.view.3 = De zaal
+viewer.view.4 = De klok
+viewer.view.5 = Het gezicht van Wit
+viewer.view.6 = Het gezicht van Zwart
+viewer.view.7 = Het duel
+viewer.view.8 = De ramen
+viewer.view.9 = De wandtapijten
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Wit
+viewer.side.black = Zwart
+viewer.flag.white = De vlag van Wit is gevallen.
+viewer.flag.black = De vlag van Zwart is gevallen.
+viewer.claims_draw = {0} claimt remise.
+viewer.offer_accepted = {0} biedt remise aan, {1} accepteert.
+viewer.offer_declined = {0} biedt remise aan, {1} weigert.
+viewer.gameover.white_wins = Wit wint na zet {0}.
+viewer.gameover.black_wins = Zwart wint na zet {0}.
+viewer.gameover.draw = De partij eindigt na zet {0} in remise.
+viewer.gameover.players = {0} tegen {1}
+viewer.watch_again = Opnieuw bekijken
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Nog geen partij met rating
+elo.provisional = Voorlopige rating
+elo.peak = Piek {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Jouw Elo {0}
+elo.expected = verwachte score {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · deze partij telt niet voor de rating
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Notatieformulier
+scoresheet.event = Toernooi
+scoresheet.date = Datum
+scoresheet.round = Ronde
+scoresheet.board = Bord
+scoresheet.page = Blad
+scoresheet.white = Wit
+scoresheet.black = Zwart
+scoresheet.elo = Elo
+scoresheet.result = Uitslag
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Handtekening Wit
+scoresheet.sign_black = Handtekening Zwart
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L P
+scoresheet.date_format = {0}-{1}-{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+# Sign in = inloggen, sign out = uitloggen; two-factor = tweestapsverificatie; keyring = sleutelbos.
+menu.online = Online spelen
+online.title = ONLINE SPELEN
+online.continue = Doorgaan
+online.retry = Opnieuw proberen
+online.copy = Kopiëren
+online.copied = Gekopieerd
+online.copy.unavailable = Kopiëren is hier niet mogelijk: schrijf het op.
+online.rated = Met rating
+online.casual = Vrijblijvend
+online.casual_only = Alleen vrijblijvend
+online.color.random = Door loting
+online.ping = {0} ms
+online.conn.online = Verbonden
+online.conn.connecting = Verbinden…
+online.conn.reconnecting = Opnieuw verbinden…
+online.conn.offline = Niet verbonden
+online.conn.incompatible = Andere versie
+online.no_server.text = Voor online spelen heb je een Scacelith-server nodig. Voer in de opties het adres van een server in, of speel rechtstreeks tegen een vriend in een directe partij.
+online.no_server.settings = Serverinstellingen
+
+# Options > Online server
+options.tab.online = Onlineserver
+options.online.server = Server
+options.online.server.help = De officiële server, of een aangepaste server (van de community) die door iemand anders wordt beheerd, bereikbaar via de beveiligde web-API en de beveiligde WebSocket ervan. Je logt op elke server apart in: een account en de inloggegevens ervan worden nooit tussen servers gedeeld.
+options.online.official = Officiële server — {0}
+options.online.community = Aangepaste server
+options.online.host = Host
+options.online.host.hint = domeinnaam of IP-adres
+options.online.host.help = Domeinnaam of IP-adres van de aangepaste server, zoals de eigenaar die heeft opgegeven.
+options.online.api_port = HTTPS-/API-poort
+options.online.api_port.help = Poort van de beveiligde web-API van de server (443 bij Scacelith-servers).
+options.online.ws_port = WSS-poort
+options.online.ws_port.hint = zelfde als de API-poort
+options.online.ws_port.help = Poort van de beveiligde WebSocket van de server. Laat dit leeg als het de API-poort is.
+options.online.pin = Vingerafdruk van het certificaat (SHA-256)
+options.online.pin.hint = optioneel
+options.online.pin.help = Voor een server met een zelfondertekend certificaat: de SHA-256-vingerafdruk die de eigenaar opgeeft (64 hexadecimale tekens, dubbele punten toegestaan). Laat dit leeg om de certificaten van het systeem te vertrouwen.
+options.online.pin.invalid = Een vingerafdruk bestaat uit 64 hexadecimale tekens (dubbele punten toegestaan).
+options.online.test = Verbinding testen
+options.online.test_ok = {0}: verbonden, compatibel met deze versie.
+options.online.test_incompatible = {0}: verbonden, maar er is een andere versie van Scacelith nodig.
+options.online.in_game = Tijdens een onlinepartij kan de server niet worden gewijzigd.
+options.online.remember_session = Ingelogd blijven als de sleutelbos van het systeem niet beschikbaar is
+options.online.remember_session.help = Als geen sleutelbos van het systeem (GNOME Keyring, KWallet…) je sessie kan bewaren, wordt die opgeslagen in een bestand dat alleen je gebruikersaccount kan lezen. Iedereen die je bestanden kan lezen, of een kopie ervan zoals een back-up, zou die sessie kunnen gebruiken. Uit: je blijft ingelogd tot het spel wordt afgesloten. Je kunt elk apparaat uitloggen via Ingelogde apparaten, in je account.
+
+# Sign in, create an account
+online.signin.lead = Log in op {0} om online tegen anderen te spelen.
+online.field.user = Gebruikersnaam of e-mailadres
+online.field.user.hint = naam of adres
+online.field.password = Wachtwoord
+online.field.password.hint = minstens 10 tekens
+online.field.password2 = Wachtwoord bevestigen
+online.field.current_password = Huidig wachtwoord
+online.field.new_password = Nieuw wachtwoord
+online.field.username = Gebruikersnaam
+online.field.username.hint = 3 tot 24 letters, cijfers, _ of -
+online.field.email = E-mailadres
+online.field.new_email = Nieuw e-mailadres
+online.field.code = Code
+online.field.code.hint = 6 cijfers of een herstelcode
+online.field.code6 = Code uit de app
+online.field.code6.hint = 6 cijfers
+online.signin.button = Inloggen
+online.signin.google = Doorgaan met Google
+online.signin.register = Account aanmaken
+online.signin.forgot = Wachtwoord vergeten?
+online.mfa.title = VERIFICATIECODE
+online.mfa.lead = Voer de 6-cijferige code in die je authenticator-app toont, of een van je herstelcodes.
+online.mfa.verify = Verifiëren
+online.register.title = ACCOUNT AANMAKEN
+online.register.lead = Een gratis account op {0}: je naam, ratings en partijen staan alleen op deze server.
+online.register.button = Account aanmaken
+online.register.working = Je account wordt aangemaakt… dit kan een paar seconden duren.
+online.register.ready = Je account is klaar. Log in om te spelen.
+online.password.mismatch = De twee wachtwoorden komen niet overeen.
+online.check_email.title = CONTROLEER JE E-MAIL
+online.check_email.text = We hebben een link gestuurd naar {0}. Open die om je account te activeren en log daarna hier in.
+online.check_email.ask = Voer het adres van je account in om de activeringslink opnieuw te ontvangen.
+online.check_email.resend = E-mail opnieuw sturen
+online.check_email.resent = De e-mail is opnieuw verstuurd. Dat kan een paar minuten duren; kijk ook in je spammap.
+online.forgot.title = WACHTWOORD VERGETEN
+online.forgot.lead = Voer het e-mailadres van je account in: we sturen je een link om een nieuw wachtwoord te kiezen.
+online.forgot.button = Link versturen
+online.forgot.sent = Als er een account met dit adres bestaat, is er een link onderweg.
+online.sso.title = INLOGGEN MET GOOGLE
+online.sso.wait = Ga verder in je webbrowser: kies je Google-account in het venster dat is geopend. Scacelith neemt het over zodra Google je terugstuurt.
+online.sso.name_title = KIES JE NAAM
+online.sso.name_lead = Je bent hier voor het eerst met Google. Kies de naam die andere spelers te zien krijgen.
+online.sso.continue = Doorgaan
+online.sso.finishing = Google heeft je teruggestuurd. Inloggen wordt afgerond…
+online.sso.link_title = INLOGGEN MET GOOGLE TOEVOEGEN
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Het account {0} op {1} gebruikt al het e-mailadres van dit Google-account. Voer het wachtwoord van dit account in om er inloggen met Google aan toe te voegen. Dit hoef je maar één keer te doen.
+online.sso.link_button = Inloggen met Google toevoegen
+online.sso.link_mfa = Inloggen met Google wordt aan dit account toegevoegd zodra de code is geaccepteerd.
+online.sso.not_mine = Dit is niet mijn account
+online.sso.not_mine_note = Inloggen met Google is niet toegevoegd. Is dit e-mailadres van jou, gebruik er dan "Wachtwoord vergeten?" mee: de link gaat naar die mailbox. Vraagt het account ook om een verificatiecode die je niet hebt, neem dan contact op met de beheerder van de server.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: inloggen met Google
+online.sso.page.done_heading = Terug naar Scacelith
+online.sso.page.done = Google heeft je teruggestuurd naar Scacelith. Ga terug naar het spel om het inloggen af te ronden; je kunt dit tabblad sluiten.
+online.sso.page.cancelled_heading = Inloggen geannuleerd
+online.sso.page.cancelled = Inloggen met Google is geannuleerd. Je kunt dit tabblad sluiten en teruggaan naar Scacelith.
+online.sso.page.foreign_heading = Deze pagina is niet voor jou
+online.sso.page.foreign = Deze pagina hoort niet bij de inlogpoging waarop Scacelith op deze computer wacht. Ben je niet net in Scacelith begonnen met inloggen met Google, dan heeft iemand je deze link misschien gestuurd: sluit dit tabblad.
+
+# Account
+online.account.button = Account
+online.account.title = ACCOUNT
+online.account.section = ACCOUNT
+online.account.username = GEBRUIKERSNAAM
+online.account.email = E-MAILADRES
+online.account.unverified = (niet geverifieerd)
+online.account.mfa = TWEESTAPSVERIFICATIE
+online.account.mfa_on = Aan
+online.account.mfa_off = Uit
+online.account.google = GOOGLE
+online.account.google_linked = Gekoppeld aan een Google-account
+online.account.change_password = Wachtwoord wijzigen
+online.account.mfa_setup = Tweestapsverificatie aanzetten
+online.account.mfa_disable = Tweestapsverificatie uitzetten
+online.account.recovery = Nieuwe herstelcodes
+online.account.sign_out = Uitloggen
+online.account.sign_out_all = Overal uitloggen
+online.account.sign_out_all.help = Logt dit account uit op alle computers, ook op deze.
+online.account.signed_out = Je bent uitgelogd.
+online.account.signed_out_all = Je bent op alle computers uitgelogd.
+online.account.signing_out_all = Alle computers worden uitgelogd…
+online.account.sign_out_all_failed = Je andere computers zijn misschien nog ingelogd: log opnieuw in en log ze daarna uit via Ingelogde apparaten. {0}
+online.account.sign_out_all_retry = Je andere computers zijn misschien nog ingelogd. Probeer Overal uitloggen nog eens. {0}
+online.account.ratings = RATINGS
+online.account.col.tc = SPEELTEMPO
+online.account.col.rating = RATING
+online.account.col.games = PARTIJEN
+online.account.col.record = W / R / V
+online.account.provisional = Een vraagteken geeft een voorlopige rating aan (nog weinig partijen gespeeld).
+online.password.title = WACHTWOORD WIJZIGEN
+online.password.button = Wachtwoord wijzigen
+online.password.changed = Je wachtwoord is gewijzigd.
+online.password.other_sessions = Op je andere computers moet je opnieuw inloggen.
+online.mfa_setup.title = TWEESTAPSVERIFICATIE
+online.mfa_setup.lead = Tweestapsverificatie vraagt bij elke keer dat je inlogt om een code uit een app op je telefoon. Voer je wachtwoord in om te beginnen.
+online.mfa_setup.scan = 1. Scan deze code met een authenticator-app, of typ deze sleutel erin:
+online.mfa_setup.enter = 2. Voer de 6-cijferige code in die de app toont:
+online.mfa_setup.enable = Aanzetten
+online.mfa_setup.done = Tweestapsverificatie staat aan.
+online.mfa_off.title = TWEESTAPSVERIFICATIE UITZETTEN
+online.mfa_off.lead = Voer je wachtwoord in en een code uit je app (of een herstelcode).
+online.mfa_off.button = Uitzetten
+online.mfa.off_done = Tweestapsverificatie staat uit.
+online.recovery.title = HERSTELCODES
+online.recovery.lead = Met elke code kun je één keer inloggen als je je telefoon kwijtraakt. Bewaar ze op een veilige plek: ze worden alleen nu getoond.
+online.recovery.saved = Ik heb ze bewaard
+online.recovery.new_title = NIEUWE HERSTELCODES
+online.recovery.new_lead = Nieuwe codes vervangen de oude. Voer je wachtwoord in en een code uit je app.
+online.recovery.button = Nieuwe codes
+online.account.manage = BEVEILIGING EN GEGEVENS
+online.account.pending_email = In afwachting van bevestiging: {0}
+online.account.accept_challenges = Uitdagingen accepteren
+online.account.accept_challenges.help = Andere spelers kunnen je uitdagen via je gebruikersnaam. Uit: hun uitdagingen worden geweigerd.
+online.account.history = Partijgeschiedenis
+online.account.devices = Ingelogde apparaten
+online.account.change_email = E-mailadres wijzigen
+online.account.export = Mijn gegevens downloaden
+online.account.delete = Account verwijderen
+
+# Play
+online.play.signed_in = Ingelogd als {0}
+online.session.file = Geen sleutelbos van het systeem kon je inlogsessie bewaren: die wordt onthouden in een bestand dat alleen je gebruikersaccount kan lezen (Opties > Onlineserver).
+online.session.memory = Geen sleutelbos van het systeem kon je inlogsessie bewaren, en die wordt niet in een bestand opgeslagen: je blijft ingelogd tot het spel wordt afgesloten (Opties > Onlineserver).
+online.play.find_section = TEGENSTANDER ZOEKEN
+online.play.friend_section = TEGEN EEN VRIEND SPELEN
+online.play.mode = Partij
+online.play.mode.help = Partijen met rating veranderen je rating in dit speeltempo; vrijblijvende partijen niet.
+online.play.find = Tegenstander zoeken
+online.play.connecting = Verbinden met de server…
+online.play.cooldown = Je kunt om {0} weer een tegenstander zoeken.
+online.play.banned = Dit account is geschorst tot {0}.
+online.play.challenge = Speler uitdagen
+online.play.challenge.desc = Nodig iemand die online is uit via diens gebruikersnaam.
+online.play.private = Privépartij
+online.play.private.desc = Maak een code aan voor een vriend, of neem deel met de code van je vriend.
+online.play.direct = Directe partij
+online.play.direct.desc = Geen server: verbind rechtstreeks met de computer van een vriend.
+online.search.title = ZOEKEN
+online.search.window = Ratingbereik {0}
+online.search.queued = {0} speler zoekt|{0} spelers zoeken
+online.search.wait = Op zoek naar een tegenstander van jouw niveau…
+online.outgoing.challenge = UITDAGING VERSTUURD
+online.outgoing.waiting = wacht op antwoord
+online.outgoing.private = PRIVÉPARTIJ
+online.outgoing.private_hint = Geef deze code aan je vriend: de partij begint zodra die deelneemt.
+online.challenge.title = SPELER UITDAGEN
+online.challenge.opponent = TEGENSTANDER
+online.field.opponent = Gebruikersnaam
+online.field.opponent.hint = wie wil je uitdagen?
+online.challenge.note = Je tegenstander ziet de uitdaging waar die zich ook in de menu's bevindt, en heeft een minuut om te antwoorden.
+online.challenge.send = Uitdaging versturen
+online.terms.rated = Met rating
+online.terms.rated.help = Alleen de officiële speeltempo's kunnen met rating worden gespeeld.
+online.terms.color = Jouw kleur
+online.private.title = PRIVÉPARTIJ
+online.private.create_section = AANMAKEN
+online.private.create_note = Je krijgt een korte code: wie die invoert, speelt tegen jou.
+online.private.create = Partij aanmaken
+online.private.join_section = DEELNEMEN
+online.field.private_code = Code
+online.private.join = Deelnemen
+online.private.joining = Deelnemen aan de partij…
+online.challenge.received = UITDAGING
+online.challenge.accept = Accepteren
+online.challenge.decline = Weigeren
+online.challenge.you_white = jij speelt met wit
+online.challenge.you_black = jij speelt met zwart
+online.challenge.you_random = kleuren door loting
+online.challenge.declined = {0} heeft je uitdaging geweigerd.
+online.challenge.expired = Je uitdaging is verlopen zonder antwoord.
+online.challenge.unavailable = {0} is nu niet beschikbaar.
+online.challenge.lost = Verbinding verbroken: je uitdaging is geannuleerd.
+
+# At the table
+online.pause.clock_runs = De partij gaat door: je klok blijft lopen.
+online.pause.abort = Partij afbreken
+online.pause.abort.help = Vóór je eerste zet kan een partij worden afgebroken; ze telt dan niet mee.
+online.pause.leave = Partij verlaten
+online.confirm.resign.text = Deze partij opgeven? Je tegenstander wint dan.
+online.confirm.leave.text = Als je weggaat, geef je deze partij op: je tegenstander wint.
+online.confirm.leave.ok = Opgeven en verlaten
+online.confirm.leave_abort.text = Weggaan vóór je eerste zet? De partij wordt afgebroken en telt niet mee.
+online.confirm.leave_abort.ok = Afbreken en verlaten
+online.draw.card_title = REMISEAANBOD
+online.draw.card_text = Je tegenstander biedt remise aan.
+online.draw.accept = Accepteren
+online.draw.decline = Weigeren
+online.draw.offered = Je tegenstander biedt remise aan.
+online.opponent_back = Je tegenstander is terug.
+online.opponent_away = Verbinding tegenstander verbroken — {0} om terug te komen
+online.first_move = Je eerste zet · {0}
+online.reconnecting = OPNIEUW VERBINDEN…
+online.reconnecting.text = De partij gaat door op de server en je klok blijft lopen.
+online.gameover.aborted = De partij is afgebroken en telt niet mee.
+online.rating.casual = Vrijblijvende partij: ratings ongewijzigd.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Revanche accepteren
+online.rematch.offered = Je tegenstander biedt een revanche aan.
+online.rematch.waiting = Revanche aangeboden…
+online.rematch.gone = Geen revanche
+online.rematch.declined = Deze keer geen revanche.
+online.report.button = Tegenstander melden
+online.report.title = MELDEN
+online.report.lead = Meldingen gaan samen met deze partij naar de moderators van de server. Bedankt dat je helpt het spel eerlijk te houden.
+online.report.category = Reden
+online.report.cheating = Valsspelen
+online.report.abuse = Beledigend gedrag
+online.report.other = Anders
+online.report.comment = Opmerking
+online.report.comment.hint = optioneel
+online.report.send = Melding versturen
+online.report.sent = Melding verstuurd. Bedankt.
+online.report.queued = Je melding wordt verstuurd zodra de partij is afgelopen.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = met rating
+online.sheet.casual = vrijblijvend
+online.sheet.game = Partij {0}
+# End reasons of online games
+reason.online.abandonment = Tegenstander heeft de partij verlaten
+reason.online.abandonment_vs_insufficient = Partij verlaten, maar de tegenstander kan niet mat zetten
+reason.online.aborted = Partij afgebroken
+reason.online.no_show = Geen eerste zet op tijd (afgebroken)
+reason.online.forfeit = Reglementair verlies
+reason.online.server_aborted = Afgebroken door de server
+reason.online.both_disconnected = Verbinding met beide spelers verbroken
+# Server notices
+online.notice.shutdown = De server start over {0} opnieuw op. Lopende partijen worden bewaard.
+online.notice.revoked = Je bent op deze server uitgelogd.
+online.notice.replaced = Je account heeft verbinding gemaakt vanuit een ander venster; dit venster is nu offline.
+online.notice.rating_restored = Je rating is met {0} punt hersteld: een tegenstander is uitgesloten wegens valsspelen.|Je rating is met {0} punten hersteld: een tegenstander is uitgesloten wegens valsspelen.
+# Errors
+online.err.rate_limited_for = Te veel pogingen. Probeer het over {0} opnieuw.
+online.err.rate_limited = Te veel pogingen. Probeer het zo meteen opnieuw.
+online.err.server_busy_for = De server is druk bezet. Probeer het over {0} opnieuw.
+online.err.server_busy = De server is druk bezet. Probeer het zo meteen opnieuw.
+online.err.banned_until = Dit account is geschorst tot {0}.
+online.err.banned = Dit account is geschorst.
+online.err.invalid_credentials = Gebruikersnaam of wachtwoord onjuist.
+online.err.invalid_credentials_pending = Gebruikersnaam of wachtwoord onjuist. Heb je net een account aangemaakt, open dan eerst de link die we je hebben gestuurd.
+online.err.email_unverified = Je e-mailadres is nog niet geverifieerd: open de link die we je hebben gestuurd.
+online.err.network = De server is niet bereikbaar. Controleer je verbinding en het serveradres.
+online.err.tls = Er kon geen beveiligde verbinding met de server worden opgezet.
+online.err.certificate = Het certificaat van de server wordt niet vertrouwd (of komt niet overeen met de vingerafdruk in de opties).
+online.err.incompatible = Deze server heeft een andere versie van Scacelith nodig.
+online.err.unauthorized = Je sessie is beëindigd: log opnieuw in.
+online.err.username_taken = Deze gebruikersnaam is al in gebruik.
+online.err.email_taken = Er bestaat al een account met dit e-mailadres.
+online.err.invalid_username = Gebruikersnamen bestaan uit 3 tot 24 letters, cijfers, _ of -.
+online.err.invalid_email = Dit e-mailadres is niet geldig.
+online.err.weak_password = Dit wachtwoord is te zwak: gebruik minstens 10 tekens.
+online.err.invalid_code = Deze code klopt niet.
+online.err.expired = Dit verzoek is verlopen: begin opnieuw.
+online.err.registration_closed = Deze server accepteert geen nieuwe accounts.
+online.err.sso_cancelled = Inloggen met Google is geannuleerd.
+online.err.sso_expired = Deze Google-inlogpoging duurde te lang of is al gebruikt. Begin opnieuw.
+online.err.sso_failed = Inloggen met Google is niet gelukt. Probeer het opnieuw.
+online.err.sso_listen = Scacelith kon het antwoord van Google op deze computer niet ontvangen. Probeer het opnieuw.
+online.err.sso_origin = Inloggen met Google werkt niet via dit serveradres. Voeg de server toe onder de openbare naam die de beheerder opgeeft en probeer het dan opnieuw.
+online.err.browser = De webbrowser kon niet worden geopend.
+online.err.sso_email_unverified = Google heeft het e-mailadres van dit Google-account niet bevestigd.
+online.err.sso_account_exists = Er bestaat al een account met dit e-mailadres en dat kan niet aan inloggen met Google worden gekoppeld: log in met het wachtwoord ervan, of gebruik "Wachtwoord vergeten?".
+online.err.sso_already_linked = Dit Google-account is al aan een ander account gekoppeld.
+online.err.account_disabled = Dit account kan niet meer worden gebruikt.
+online.err.server_error = Er is een probleem op de server opgetreden. Probeer het opnieuw.
+online.err.timeout = De server heeft niet op tijd geantwoord.
+online.err.offline = Niet verbonden met de server: probeer het opnieuw zodra er verbinding is.
+online.err.other = De server heeft geweigerd ({0}).
+online.err.code = De server heeft geweigerd (fout {0}).
+online.err.slow_down = Doe het iets rustiger aan.
+online.err.server_full = De server is vol. Probeer het later opnieuw.
+online.err.restarting = De server wordt opnieuw opgestart. Probeer het zo meteen opnieuw.
+online.err.move_refused = De server heeft die zet geweigerd: het bord is teruggezet.
+online.err.game_over = Deze partij is al afgelopen.
+online.err.already_in_game = Je speelt al een partij.
+online.err.invalid_category = Dit speeltempo wordt hier niet aangeboden.
+online.err.draw_offer_limit = Voorlopig geen remiseaanbiedingen meer.
+online.err.abort_not_allowed = De partij kan niet meer worden afgebroken.
+online.err.no_pending_offer = Er is geen aanbod om op te antwoorden.
+online.err.flag_fell = Je tijd is op.
+online.err.queue_not_allowed = Je kunt nu geen tegenstander zoeken.
+online.err.challenge_not_found = Deze uitdaging bestaat niet meer.
+online.err.user_unavailable = Deze speler is niet beschikbaar.
+online.err.challenge_limit = Voorlopig te veel uitdagingen. Probeer het later opnieuw.
+online.err.challenge_self = Je kunt jezelf niet uitdagen.
+online.err.code_invalid = Er is geen partij met deze code.
+online.err.rated_official_tc = Alleen de officiële speeltempo's kunnen met rating worden gespeeld.
+online.err.cooldown = Tegenstanders zoeken is voor jou even gepauzeerd.
+online.err.invalid_tc = Dit speeltempo is niet toegestaan.
+online.err.rematch_unavailable = Een revanche is niet meer mogelijk.
+online.err.rated_repeat_limit = Je hebt voorlopig genoeg partijen met rating tegen deze speler gespeeld. Speel een vrijblijvende partij, of probeer het later opnieuw.
+online.err.cheat_detected = De partij is gestopt door de fairplaycontroles van de server.
+online.err.invalid_password = Onjuist wachtwoord.
+online.err.mfa_code_required = Voer een code in uit je authenticator-app (of een herstelcode).
+online.err.password_not_set = Dit account logt in met Google en heeft nog geen wachtwoord. Stel er eerst een in via "Wachtwoord vergeten?" op de inlogpagina.
+online.err.too_many_attempts = Te veel onjuiste pogingen. Probeer het later opnieuw.
+online.err.too_many_attempts_for = Te veel onjuiste pogingen. Probeer het over {0} opnieuw.
+online.err.same_email = Dit is al je e-mailadres.
+online.err.not_found = Niet gevonden op de server.
+online.err.invalid_response = Het antwoord van de server kon niet worden gelezen.
+online.err.storage = De sessie kon niet op deze computer worden opgeslagen.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PARTIJGESCHIEDENIS
+online.history.filter.games = Partijen
+online.history.filter.result = Uitslag
+online.history.filter.all = Alle
+online.history.filter.won = Gewonnen
+online.history.filter.lost = Verloren
+online.history.filter.drawn = Remise
+online.history.col.date = DATUM
+online.history.col.opponent = TEGENSTANDER
+online.history.col.result = UITSLAG
+online.history.col.tc = SPEELTEMPO
+online.history.col.kind = SOORT
+online.history.col.rating = RATING
+online.history.won = Gewonnen
+online.history.lost = Verloren
+online.history.drawn = Remise
+online.history.aborted = Afgebroken
+online.history.page = Pagina {0} van {1}
+online.history.total = {0} partij|{0} partijen
+online.history.previous = Vorige
+online.history.next = Volgende
+online.history.empty.title = NOG GEEN PARTIJEN
+online.history.empty = Je partijen op deze server verschijnen hier zodra ze zijn afgelopen.
+online.history.empty_filter.title = GEEN PARTIJEN
+online.history.empty_filter = Geen enkele partij voldoet aan deze filters.
+online.history.error = DE GESCHIEDENIS KON NIET WORDEN GELADEN
+online.history.unavailable = DEZE SERVER BIEDT GEEN PARTIJGESCHIEDENIS
+online.game.title = PARTIJ
+online.game.players = SPELERS
+online.game.you = JIJ
+online.game.unrated = Zonder rating
+online.game.you_won = Je hebt gewonnen
+online.game.you_lost = Je hebt verloren
+online.game.draw = Remise
+online.game.you_left = Je hebt de partij verlaten
+online.game.date = DATUM
+online.game.time_control = SPEELTEMPO
+online.game.moves = ZETTEN
+online.game.move_count = {0} zet|{0} zetten
+online.game.no_moves = Er is geen zet gespeeld.
+online.game.moves_incomplete = Sommige zetten konden niet worden gelezen: de lijst stopt voor het einde.
+online.game.save = Partij opslaan
+online.game.saved_button = Opgeslagen
+online.game.saved = De partij staat bij je opgeslagen partijen.
+online.game.already_saved = Deze partij staat al bij je opgeslagen partijen.
+online.game.save_failed = De partij kon niet worden opgeslagen.
+online.game.invalid = De server heeft een partij gestuurd die niet kan worden gelezen.
+online.game.replay = Naspelen
+online.game.not_found = PARTIJ NIET GEVONDEN
+online.game.error = DE PARTIJ KON NIET WORDEN GELADEN
+online.devices.title = INGELOGDE APPARATEN
+online.devices.lead = De apparaten waarop dit account is ingelogd. Herken je er een niet, log het dan uit en wijzig je wachtwoord.
+online.devices.unknown = Onbekend apparaat
+online.devices.this = DIT APPARAAT
+online.devices.signed_in = Ingelogd op {0}
+online.devices.last_active = laatst actief {0}
+online.devices.active_now = nu in gebruik
+online.devices.sign_out = Uitloggen
+online.devices.signed_out = Dat apparaat is uitgelogd.
+online.devices.error = DE APPARATEN KONDEN NIET WORDEN GELADEN
+online.devices.all.title = OVERAL UITLOGGEN
+online.email.title = E-MAILADRES WIJZIGEN
+online.email.current = Huidig adres: {0}
+online.email.button = E-mailadres wijzigen
+online.email.sent = Er is een bevestigingslink gestuurd naar {0}.
+online.email.sent.hint = Het adres verandert zodra de link is geopend. Tot dan blijft je huidige adres in gebruik.
+online.email.done = Klaar
+online.email.changed = Je e-mailadres is gewijzigd.
+online.export.title = MIJN GEGEVENS DOWNLOADEN
+online.export.lead = Alles wat deze server over je account bewaart (profiel, ratings, partijen, apparaten, beveiligingsgebeurtenissen) wordt als JSON-bestand op deze computer opgeslagen. Voer je wachtwoord in om te bevestigen.
+online.export.button = Downloaden
+online.export.saved = Je gegevens zijn op deze computer opgeslagen.
+online.export.failed = Het bestand kon niet worden geschreven.
+online.delete.title = ACCOUNT VERWIJDEREN
+online.delete.warning = Je account wordt van deze server verwijderd: je e-mailadres, wachtwoord, tweestapsverificatie en apparaten worden gewist en je kunt niet meer inloggen. Dit kan niet ongedaan worden gemaakt.
+online.delete.games = Je partijen en ratings blijven op de server staan onder de anonieme naam {0}.
+online.delete.confirm_name = Voer ter bevestiging je gebruikersnaam en je wachtwoord in.
+online.delete.button = Mijn account verwijderen
+online.delete.done = Je account is verwijderd.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+# Direct match = "directe partij"; to host = "hosten" (the usual word in Dutch games).
+online.direct.button = Directe partij
+online.direct.title = DIRECTE PARTIJ
+online.direct.lead = Een vriendschappelijke partij rechtstreeks tussen twee computers: geen server, geen account, nooit met rating.
+online.direct.host = Partij hosten
+online.direct.host.desc = Je vriend maakt verbinding met jou: je geeft je adres en een code door.
+online.direct.join = Deelnemen aan een partij
+online.direct.join.desc = Maak verbinding met een vriend die een partij host.
+online.direct.host_title = PARTIJ HOSTEN
+online.direct.your_color = Jouw kleur
+online.direct.auto_press.help = Beide robots drukken zelf de klok in zodra een zet op het bord staat. Uit: elke speler drukt na elke zet zelf de klok in.
+online.direct.unrated = Directe partijen zijn vriendschappelijk: nooit met rating.
+online.direct.connection = VERBINDING
+online.direct.port = Poort
+online.direct.port.help = TCP-poort waarmee je vriend verbinding maakt (47100, tenzij die bezet is).
+online.direct.port_range = Kies een poort tussen 1024 en 65535.
+online.direct.upnp = De poort op mijn router openen (UPnP)
+online.direct.upnp.help = Vraagt de thuisrouter om de poort naar deze computer door te sturen, en sluit die na de partij weer.
+online.direct.host_note_upnp = Het spel vraagt je router om de poort te openen. Lukt dat niet, dan krijg je te horen welke poort je zelf moet doorsturen.
+online.direct.host_note_manual = Stuur de TCP-poort op je router door naar deze computer, of speel op hetzelfde netwerk.
+online.direct.host_button = Hosten
+online.direct.wait_title = WACHTEN OP JE VRIEND
+online.direct.opening = Poort {0} wordt geopend op je router…
+online.direct.give = Geef je vriend door:
+online.direct.cap_address = ADRES
+online.direct.cap_port = POORT
+online.direct.cap_code = CODE
+online.direct.lan = Op hetzelfde netwerk: {0}
+online.direct.router = je router
+online.direct.upnp_searching = Je router wordt gezocht…
+online.direct.upnp_mapped = Poort geopend op {0}.
+online.direct.upnp_none = Geen enkele UPnP-router reageerde: stuur TCP-poort {0} zelf door naar deze computer.
+online.direct.upnp_failed = De router weigerde de poort te openen: stuur TCP-poort {0} zelf door naar deze computer.
+online.direct.upnp_off = Stuur op je router TCP-poort {0} door naar deze computer.
+online.direct.upnp_cgnat = Je provider deelt waarschijnlijk je internetadres (CGNAT): probeer IPv6 of een VPN.
+online.direct.firewall = Vraagt Windows of Scacelith verbindingen mag accepteren, sta het dan toe.
+online.direct.waiting = Wachten op je vriend…
+online.direct.connecting_friend = Je vriend maakt verbinding…
+online.direct.starting = Het bord wordt klaargezet…
+online.direct.join_title = DEELNEMEN AAN EEN PARTIJ
+online.direct.join_lead = Voer in wat je vriend je doorgeeft: het adres, de poort en de code.
+online.direct.address = Adres
+online.direct.address.hint = IPv4, IPv6 of naam
+online.direct.code = Code
+online.direct.join_button = Deelnemen
+online.direct.connecting_to = Verbinden met {0}…
+online.direct.securing = Verbinding met {0} wordt beveiligd…
+direct.event = Vriendschappelijke partij
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Direct, {0}
+direct.err.refused = Niemand host op dit adres en deze poort.
+direct.err.timeout = Geen antwoord: controleer het adres en de poort, en of de router van je vriend het spel doorlaat.
+direct.err.wrong_code = De code klopt niet.
+direct.err.invalid_code = Een code heeft 12 tekens (XXXX-XXXX-XXXX).
+direct.err.incompatible = Je vriend heeft een andere versie van Scacelith.
+direct.err.port_in_use = Deze poort is op deze computer al in gebruik: kies een andere.
+direct.err.network = Het netwerk kon niet worden gebruikt.
+direct.err.too_many_attempts = Te veel onjuiste codes: het hosten is gestopt. Host opnieuw voor een nieuwe code.
+direct.err.bad_address = Dit adres is niet geldig.
+direct.err.not_found = Deze naam is niet gevonden.
+direct.err.unreachable = Dit adres is van hieruit niet bereikbaar.
+direct.err.reset = De verbinding is verbroken.
+direct.err.closed = De verbinding is gesloten.
+direct.err.host_left = Je vriend host niet meer.
+direct.err.other = De verbinding is mislukt ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Speler 2
+hotseat.white_player = Wit
+hotseat.black_player = Zwart
+hotseat.name.help = De naam die op beide notatieformulieren staat, in elk alfabet.
+hotseat.swap = Kleuren wisselen
+hotseat.left_hand = {0} speelt met de linkerhand: de klok staat aan de linkerkant.
+hotseat.rated = Partij met rating
+hotseat.rated.help = Elke naam heeft op deze computer een eigen rating voor partijen tussen twee spelers. Je rating tegen Stockfish verandert nooit.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Ratings voor twee spelers: {0} {1} · {2} {3}
+hotseat.new_rating = (nieuw)
+hotseat.friendly_note = Een vriendschappelijke partij: de ratings veranderen niet.
+hotseat.colours = {0} speelt met wit, {1} speelt met zwart.
+hotseat.colours_swap = Bij elke revanche wisselen de kleuren.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, jij bent aan zet
+hotseat.flag = De vlag van {0} is gevallen.
+hotseat.confirm.resign = Opgeven namens {0}? {1} wordt tot winnaar verklaard.
+hotseat.confirm.resign_draw = Opgeven namens {0}? {1} kan niet meer mat zetten: de partij eindigt in remise.
+hotseat.draw.offer_noted = Je remiseaanbod gaat mee met je zet: {0} ziet het nadat je de klok hebt ingedrukt.
+hotseat.draw.card_title = REMISEAANBOD
+hotseat.draw.offered = {0} biedt remise aan.
+hotseat.draw.card_hint = Raak je een stuk aan, dan weiger je het.
+hotseat.draw.accept = Accepteren
+hotseat.draw.decline = Weigeren
+hotseat.draw.accepted = {0} accepteert het remiseaanbod van {1}.
+hotseat.draw.declined = {0} weigert het remiseaanbod van {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Partij met rating
+hotseat.sheet.friendly = Vriendschappelijke partij
+# Game over card
+hotseat.gameover.wins = {0} wint in {1} zet.|{0} wint in {1} zetten.
+hotseat.gameover.wins_now = {0} wint.
+hotseat.gameover.friendly = {0} tegen {1} · vriendschappelijke partij
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Deze partij telt niet voor de rating.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+# The coach is a man: "hij" (English "it").
+menu.coach = Coach
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Synthetische spraak gegenereerd met {0} voor de coachmodus
+# Coach page
+coach.title = COACH
+coach.section.level = NIVEAU
+coach.section.lesson = MET DE COACH
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Voor spelers met een rating van {0}
+coach.completed = Voltooid
+coach.recommended = Aanbevolen
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = De schaakregels
+coach.level.0.desc = Een interactieve les, één regel tegelijk.
+coach.level.0.detail = De coach zet kleine stellingen op en laat zien hoe elk stuk zet en slaat, daarna de rokade, promotie, schaak en schaakmat. Je probeert elk idee zelf uit op het bord.
+coach.level.1.name = Eerste stappen
+coach.level.1.desc = Wat wordt aangevallen, wat staat ongedekt.
+coach.level.1.detail = De coach speelt rustig en zegt het eenvoudig: welke van je stukken worden aangevallen, welke ongedekt staan, en hoe je ze behoudt.
+coach.level.2.name = Beginner
+coach.level.2.desc = Eenvoudige tactiek, ontwikkeling, koningsveiligheid.
+coach.level.2.detail = Vorken en penningen worden bij hun naam genoemd. De coach praat over het ontwikkelen van je stukken en het veilig houden van je koning.
+coach.level.3.name = Halfgevorderd
+coach.level.3.desc = Plannen, pionnenstructuur, enige zetten.
+coach.level.3.detail = De coach legt plannen en pionnenstructuren uit, en waarschuwt je als maar één zet de stelling houdt.
+coach.level.4.name = Clubspeler
+coach.level.4.desc = Kandidaatzetten, evaluatie in pionnen.
+coach.level.4.detail = De coach weegt de kandidaatzetten af en geeft de evaluatie in pionnen, zoals een clubtrainer dat zou doen.
+coach.level.5.name = Sterke clubspeler
+coach.level.5.desc = Beknopte varianten, positionele begrippen.
+coach.level.5.detail = Korte opmerkingen, concrete varianten en de woordenschat van het positiespel.
+coach.level.6.name = Expert
+coach.level.6.desc = Kernachtige opmerkingen, diepe varianten, evaluatiecijfers.
+coach.level.6.detail = Weinig woorden, zoals tussen sterke spelers: varianten van meerdere zetten diep en evaluatiecijfers.
+coach.note.clock = Geen klok: neem alle tijd die je nodig hebt.
+coach.note.takeback = Na een blunder laat de coach zien wat er misging en biedt hij aan de zet terug te nemen.
+coach.note.lesson = Je speelt met wit; de coach zet elke oefening op het bord klaar.
+coach.note.unrated = Partijen met de coach tellen niet voor de rating.
+coach.note.fallible = De coach is niet onfeilbaar: hij kan een zet soms verkeerd beoordelen.
+coach.colour = Jouw kleur
+coach.colour.help = De kleur waarmee je tegen de coach speelt. Afwisselend: wit, daarna zwart, van partij tot partij. De les over de regels speel je altijd met wit.
+coach.colour.alternate = Afwisselend
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = De stem van de coach is niet geïnstalleerd of staat uit (Opties > Audio): wat hij zegt, verschijnt op het scherm.
+# At the table
+coach.speaker = COACH
+coach.skip = Overslaan
+coach.offer.title = ZET TERUGNEMEN?
+coach.offer.text = De coach biedt aan je laatste zet terug te nemen, zodat je een betere kunt zoeken.
+coach.offer.hint = Met Backspace neem je hem terug. Raak je een stuk aan, dan speel je verder.
+coach.offer.accept = Terugnemen
+coach.offer.decline = Doorspelen
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Zetten terugnemen: nog {0}
+coach.pause.take_back = Mijn zet terugnemen
+coach.pause.take_back.help = Neemt je laatste zet terug, en ook het antwoord van de coach als hij al heeft gezet.
+coach.confirm.resign = Deze partij opgeven? De coach wordt tot winnaar verklaard.
+coach.confirm.resign_draw = Deze partij opgeven? De coach kan niet meer mat zetten: de partij eindigt in remise.
+coach.confirm.leave = Terug naar het hoofdmenu? Deze partij met de coach wordt afgebroken.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Opnieuw spelen
+coach.gameover.unrated = Deze partij met de coach telt niet voor de rating.
+coach.lesson.done = GOED GEDAAN
+coach.lesson.done.line = Je kent nu de schaakregels.
+coach.lesson.next = Eerste partij
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Training
+coach.tab.challenges = Uitdagingen
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATZETTEN
+challenge.group.tactics = TACTIEK
+challenge.group.defence = VERDEDIGING
+challenge.group.endgames = EINDSPELEN
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat in één
+challenge.mate1.desc = Eén zet, en het is mat.
+challenge.mate1.detail = Bekijk eerst alle schaakzetten: bij één ervan heeft de koning geen vluchtveld, kan er niets tussen en valt er niets te slaan.
+challenge.mate2.name = Mat in twee
+challenge.mate2.desc = Een zet waartegen geen verdediging bestaat, dan mat.
+challenge.mate2.detail = De eerste zet is vaak een schaak of een offer dat de koning een veld afneemt. De coach verdedigt zo goed als hij kan.
+challenge.mate3.name = Mat in drie
+challenge.mate3.desc = Langere forcerende varianten.
+challenge.mate3.detail = Schaakzetten, slagzetten en dreigingen, drie zetten diep. Bereken bij elke stap het beste antwoord van de coach voordat je een stuk aanraakt.
+challenge.backrank.name = Mat op de achterste rij
+challenge.backrank.desc = Een koning opgesloten achter zijn eigen pionnen.
+challenge.backrank.detail = Als de pionnen voor een gerokeerde koning nog niet zijn opgerukt, kan een toren of dame op de laatste rij mat zetten. Schakel eerst de verdedigers uit of leid ze af.
+challenge.patterns.name = Matpatronen
+challenge.patterns.desc = Stikmat, Anastasia's mat, Arabisch mat en andere klassiekers.
+challenge.patterns.detail = Beroemde matnetten die steeds weer terugkomen. Leer de opstelling van de stukken en de genadeklap te herkennen.
+challenge.hanging.name = Gratis stukken
+challenge.hanging.desc = Ontdek wat er ongedekt staat.
+challenge.hanging.detail = Een stuk of pion dat door niemand wordt gedekt, kun je gewoon slaan. Kijk waardoor elk stuk van de coach wordt gedekt.
+challenge.fork.name = Vorken
+challenge.fork.desc = Eén stuk valt er twee tegelijk aan.
+challenge.fork.detail = Paarden, pionnen, dames en zelfs koningen kunnen een vork zetten. De tegenstander kan maar één van de twee doelwitten redden.
+challenge.pin.name = Penningen
+challenge.pin.desc = Een stuk dat niet weg kan zonder te verliezen wat erachter staat.
+challenge.pin.detail = Pen een stuk tegen zijn koning of tegen een waardevoller stuk, val het daarna nog eens aan, of maak gebruik van het feit dat het niet weg kan.
+challenge.skewer.name = Spiesen
+challenge.skewer.desc = Val een waardevol stuk aan en win het stuk erachter.
+challenge.skewer.detail = Het omgekeerde van een penning: het waardevollere stuk staat vooraan, moet wegzetten en geeft het stuk erachter bloot.
+challenge.discovered.name = Aftrekaanvallen
+challenge.discovered.desc = Zet een stuk weg om een ander te ontketenen.
+challenge.discovered.detail = Als een stuk opzijgaat, valt het stuk erachter aan. Met schaak, of met dubbelschaak, heeft de tegenstander geen tijd om beide dreigingen te pareren.
+challenge.deflection.name = Afleiden en lokken
+challenge.deflection.desc = Lok een verdediger weg, of naar een fataal veld.
+challenge.deflection.detail = Een verdediger met twee taken kan ze niet allebei uitvoeren. Val hem aan, bied hem iets aan, of dwing een stuk naar het veld waar het verloren gaat.
+challenge.intermezzo.name = Tussenzetten
+challenge.intermezzo.desc = Sla niet meteen terug: er is iets sterkers.
+challenge.intermezzo.detail = Vóór de verwachte zet verandert een schaak of een grotere dreiging tussendoor alles.
+challenge.trapped.name = Ingesloten stukken
+challenge.trapped.desc = Een stuk zonder veilig veld.
+challenge.trapped.detail = Neem een stuk zijn laatste vluchtvelden af en win het dan.
+challenge.promotion.name = Promotie
+challenge.promotion.desc = Duw een pion door tot de laatste rij.
+challenge.promotion.detail = Ver opgerukte pionnen zijn veel waard. Maak de weg vrij, leid de blokkeerders af en haal een nieuwe dame.
+challenge.quiet.name = Stille zetten
+challenge.quiet.desc = De winnende zet is geen schaak en geen slagzet.
+challenge.quiet.detail = Soms bereidt de sterkste zet alleen een dreiging voor die niet te pareren is. Het moeilijkste soort zet om te zien.
+challenge.opening.name = Openingsvallen
+challenge.opening.desc = Straf vroege fouten af.
+challenge.opening.detail = Stellingen uit de eerste zetten van echte partijen, waarin één onvoorzichtige zet meteen kan worden uitgebuit.
+challenge.escape.name = Vind de uitweg
+challenge.escape.desc = Je koning is in gevaar: één zet redt hem.
+challenge.escape.detail = Elke andere zet verliest. Bekijk alle schaakzetten en dreigingen tegen je koning en vind dan de enige uitweg.
+challenge.defend.name = Verdedigende zetten
+challenge.defend.desc = Pareer de dreiging zonder materiaal te verliezen.
+challenge.defend.detail = De coach dreigt iets. Vind de precieze zet die alles bij elkaar houdt.
+challenge.kq.name = Dame en koning tegen koning
+challenge.kq.desc = Mat zetten met de dame.
+challenge.kq.detail = Drijf de eenzame koning met je dame naar de rand, breng je eigen koning dichterbij en pas op voor pat. De coach verdedigt met zijn beste zetten.
+challenge.kr.name = Toren en koning tegen koning
+challenge.kr.desc = Mat zetten met de toren.
+challenge.kr.detail = De toren snijdt de koning rij voor rij af; je koning neemt de oppositie. De coach verdedigt met zijn beste zetten.
+challenge.kp.name = Koning en pion tegen koning
+challenge.kp.desc = Win de oppositie en promoveer.
+challenge.kp.detail = Ga voorop met je koning, niet met de pion. Neem de oppositie en haal een dame die de coach niet meer kan tegenhouden.
+challenge.kp_hold.name = Stop de pion
+challenge.kp_hold.desc = Een eenzame koning tegen koning en pion: houd de remise.
+challenge.kp_hold.detail = Ga voor de pion staan en houd de oppositie. Houd tien zetten stand.
+challenge.rook.name = Toreneindspelen
+challenge.rook.desc = De brug van Lucena en de verdediging van Philidor.
+challenge.rook.detail = De twee stellingen die elke speler moet kennen: hoe je wint met een pion op de zevende rij, en hoe je verdedigt met de toren op de derde.
+challenge.endgame.name = Eindspeltactiek
+challenge.endgame.desc = Weinig stukken, scherpe ideeën.
+challenge.endgame.detail = Pionnenwedlopen, doorbraken en toreneindspelen uit echte partijen.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} stelling|{0} stellingen
+coach.challenge.done = Voltooid
+coach.challenge.start = Starten
+coach.challenge.note.white = Je speelt met wit; de coach zet elke stelling op het bord klaar.
+coach.challenge.note.hint = Kom je er niet uit? Druk op H voor een hint. Na een paar pogingen biedt de coach er zelf een aan.
+coach.challenge.note.unsaved = Uitdagingen tellen niet voor de rating en worden niet opgeslagen; een vinkje toont welke je hebt voltooid.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = UITDAGING VOLTOOID
+coach.challenge.complete.line = Je hebt alle stellingen opgelost.
+coach.challenge.next = Volgende uitdaging
+coach.challenge.again = Opnieuw
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = EEN HINT?
+coach.hint.text = De coach biedt je een hint aan.
+coach.hint.hint = Met H krijg je de hint. Raak je een stuk aan, dan zoek je verder.
+coach.hint.accept = Hint
+coach.hint.decline = Nee, bedankt
+coach.hint.key = Hint
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Stem van de coach
+options.coach_voice.help = De coach spreekt hardop in de coachmodus. Zijn stemmodel wordt gedownload zodra het voor het eerst nodig is (ongeveer 399 MB). Uit: wat de coach zegt, verschijnt alleen op het scherm.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Stemmodel
+options.voice_update.help = De coach spreekt nog met de oude 8-bitversie van zijn stemmodel. De update downloadt de officiële versie van Supertonic 3, uitgebracht door Supertone, en verwijdert eerst de oude bestanden.
+options.voice_update.button = Bijwerken ({0} MB)
+options.voice_update.running = De download is bezig.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Stemkwaliteit
+options.voice_quality.help = Hoeveel verfijningsstappen de spraaksynthese van de coach voor elke zin doorloopt, van Laag (4) tot Maximaal (9); standaard Gemiddeld (5). Een hoger niveau geeft een iets zuiverdere stem, maar kost meer rekentijd, waardoor de coach iets later begint te spreken. Dit kan worden ingesteld zodra het stemmodel is geïnstalleerd, met Stem van de coach aan.
+options.voice_quality.low = Laag
+options.voice_quality.medium = Gemiddeld
+options.voice_quality.high = Hoog
+options.voice_quality.very_high = Zeer hoog
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maximaal
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = De stem van de coach
+coach.download.text = De coach spreekt met Supertonic 3, een spraaksynthesemodel van Supertone. Het zit niet bij Scacelith: het spel kan het nu downloaden van Hugging Face ({0} MB, eenmalig). Zonder dit model schrijft de coach zijn woorden op het scherm.
+coach.download.licence = Het model is uitgebracht onder de OpenRAIL-M-licentie, die bepaalde toepassingen van de stem die het maakt verbiedt, zoals die stem laten doorgaan voor een menselijke stem of er een echt persoon mee nabootsen.
+coach.download.read_licence = Licentie lezen
+coach.download.accept = Als je Downloaden kiest, ga je akkoord met de voorwaarden van deze licentie.
+# {0} = a folder
+coach.download.folder = Opgeslagen in: {0}
+coach.download.not_now = Niet nu
+# {0} = the size in megabytes
+coach.download.download = Downloaden ({0} MB)
+coach.download.licence_title = OPENRAIL-M-LICENTIE
+coach.download.back = Terug
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Een nieuwe stem voor de coach
+coach.update.text = De stem van de coach gebruikt nu de officiële versie van Supertonic 3, uitgebracht door Supertone, in plaats van de 8-bitconversie die tot nu toe geïnstalleerd was. Het spel kan die nu downloaden van Hugging Face ({0} MB, eenmalig); de oude bestanden ({1} MB) worden eerst verwijderd. Sla je dit af, dan houdt de coach zijn huidige stem en blijft de update beschikbaar via Opties > Audio.
+coach.update.download = Bijwerken ({0} MB)
+coach.update.accept = Als je Bijwerken kiest, ga je akkoord met de voorwaarden van deze licentie.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = DE STEM VAN DE COACH
+coach.download.removing = De oude versie wordt verwijderd…
+coach.download.checking = De bestanden worden gecontroleerd…
+coach.download.downloading = Downloaden…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Van Hugging Face
+coach.download.from_archive = Van Hugging Face (archiefkopie)
+coach.download.cancel = Annuleren
+coach.download.failed = Het downloaden is mislukt.
+coach.download.error.network = De servers zijn niet bereikbaar. Controleer je internetverbinding en probeer het opnieuw.
+# {0} = a folder
+coach.download.error.disk = De bestanden konden niet worden geschreven in {0}. Controleer de vrije ruimte en probeer het opnieuw.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = De servers gaven een onverwacht antwoord ({0}). Probeer het later opnieuw.
+coach.download.retry = Opnieuw proberen
+coach.download.close = Sluiten
+# Notices
+coach.download.done = De stem van de coach is geïnstalleerd.
+coach.download.cancelled = Downloaden geannuleerd: de volgende keer gaat het verder waar het gebleven was.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Opgeslagen partijen
+options.save_games = Mijn partijen opslaan
+options.save_games.help = Na afloop worden je partijen tegen Stockfish, met de coach, tussen twee spelers aan deze computer en je directe partijen opgeslagen als PGN-bestanden, terug te vinden onder Opgeslagen partijen. Onlinepartijen worden door de server bewaard.
+library.title = OPGESLAGEN PARTIJEN
+library.section.games = PARTIJEN
+library.section.details = DE PARTIJ
+library.section.tags = GEGEVENS
+library.section.moves = ZETTEN
+library.count = {0} partij|{0} partijen
+library.filter = Tonen
+library.filter.all = Alle partijen
+library.filter.play = Tegen Stockfish
+library.filter.coach = Met de coach
+library.filter.hotseat = Twee spelers
+library.filter.direct = Directe partijen
+library.filter.server = Onlinepartijen
+library.filter.imported = Geïmporteerd
+library.mode.play = Tegen Stockfish
+library.mode.coach = Met de coach
+library.mode.hotseat = Twee spelers
+library.mode.direct = Directe partij
+library.mode.server = Onlinepartij
+library.mode.imported = Geïmporteerd
+library.coach_level = Niveau {0}
+library.unknown_player = Onbekend
+library.unfinished = Niet uitgespeeld
+library.unreadable = Deze partij kan niet worden gelezen.
+library.moves = {0} zet|{0} zetten
+library.opening_variation = {0}: {1}
+library.file = Bestand: {0}
+library.file_game = Bestand: {0}, partij {1} van {2}
+library.no_moves = Er is geen zet gespeeld.
+library.none_selected = Kies een partij in de lijst.
+library.reading = De opgeslagen partijen worden gelezen
+library.empty.title = Nog geen opgeslagen partijen
+library.empty.text = Je partijen tegen Stockfish, met de coach, tussen twee spelers aan deze computer en je directe partijen verschijnen hier zodra ze zijn afgelopen. Je kunt ook PGN-bestanden in deze map zetten: partijen die uit andere programma's of websites zijn geëxporteerd, staan dan tussen de jouwe.
+library.empty.filter = Geen partijen van deze soort.
+library.error.folder = De map met opgeslagen partijen kan niet worden gelezen
+library.error.game = Deze partij kan niet worden gelezen: {0}
+library.folder = Map: {0}
+library.open_folder = Map openen
+library.open_failed = De map kon niet worden geopend.
+library.replay = Naspelen
+library.delete = Verwijderen
+library.delete.title = PARTIJ VERWIJDEREN
+library.delete.text = De partij {0} wordt samen met het bijbehorende bestand van deze computer verwijderd. Dit kan niet ongedaan worden gemaakt.
+library.delete.ok = Verwijderen
+library.delete.several = Dit bestand bevat {0} partij: het kan alleen vanuit de map worden verwijderd.|Dit bestand bevat {0} partijen: het kan alleen vanuit de map worden verwijderd.
+library.deleted = De partij is verwijderd.
+library.delete.failed = De partij kon niet worden verwijderd.
+library.delete.changed = Het bestand is gewijzigd: de lijst is bijgewerkt.
+library.truncated = Deze map bevat te veel partijen: alleen de {0} meest recente worden getoond.
+library.tag.Event = Toernooi
+library.tag.Site = Plaats
+library.tag.Date = Datum
+library.tag.Time = Tijd
+library.tag.Round = Ronde
+library.tag.White = Wit
+library.tag.Black = Zwart
+library.tag.Result = Uitslag
+library.tag.WhiteElo = Elo Wit
+library.tag.BlackElo = Elo Zwart
+library.tag.TimeControl = Speeltempo
+library.tag.Termination = Afloop
+library.tag.Opening = Opening
+library.tag.Variation = Variant
+library.tag.PlyCount = Halve zetten
+library.tag.FEN = Beginstelling
+library.tag.ScacelithMode = Modus
+library.tag.CoachLevel = Coachniveau
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Partijnummer
+library.tag.UTCDate = Datum (UTC)
+library.tag.UTCTime = Tijd (UTC)
+library.tag.WhiteRatingDiff = Ratingwijziging Wit
+library.tag.BlackRatingDiff = Ratingwijziging Zwart
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyse
+analysis.menu.title = ANALYSE
+analysis.menu.analyse = Analyseren
+analysis.menu.paste = PGN plakken
+analysis.menu.online = Mijn onlinepartijen
+analysis.menu.folder = Zet PGN-bestanden in deze map om ze te analyseren: {0}
+analysis.menu.empty.title = Nog geen opgeslagen partijen
+analysis.menu.empty.text = Je partijen verschijnen hier zodra ze zijn afgelopen, net als de PGN-bestanden in de map hieronder. Je kunt ook een partij plakken die als PGN-tekst is gekopieerd.
+analysis.menu.empty.no_folder = Plak een als PGN-tekst gekopieerde partij om die te analyseren.
+analysis.menu.paste.empty = Het klembord is leeg: kopieer eerst een partij als PGN-tekst.
+analysis.menu.paste.none = Er is geen schaakpartij gevonden op het klembord.
+analysis.menu.paste.several = Het klembord bevat meerdere partijen: de eerste wordt geanalyseerd.
+analysis.menu.gameover = Partij analyseren
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Zet {0} van {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Direct
+replay.again = Opnieuw naspelen
+replay.gameover.unfinished = De partij stopt na zet {0}, zonder uitslag.
+replay.tip.start = Begin van de partij (Home)
+replay.tip.back = Eén zet terug (J)
+replay.tip.pause = Pauzeren (K)
+replay.tip.resume = Hervatten (K)
+replay.tip.forward = Eén zet vooruit (L)
+replay.tip.end = Einde van de partij (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMMENTAAR
+analysis.hud.accuracy = NAUWKEURIGHEID
+analysis.hud.reviewing = Stockfish analyseert de partij… {0}
+analysis.hud.no_engine = Geen schaakengine: de zetten worden zonder analyse getoond.
+analysis.hud.no_moves = Deze partij heeft geen zetten.
+analysis.hud.tip.play = De zetten afspelen (K)
+analysis.hud.tip.comments_off = Commentaar bij de sleutelmomenten verbergen (N)
+analysis.hud.tip.comments_on = Commentaar bij de sleutelmomenten tonen (N)
+analysis.hud.tip.voice_off = Stem van de commentator uitzetten (M)
+analysis.hud.tip.voice_on = Het commentaar hardop horen (M)
+analysis.hud.tip.voice_missing = De stem is niet te horen: de bestanden ervan zijn niet geïnstalleerd, of Opties > Audio > Stem van de coach staat uit. Het commentaar verschijnt alleen op het scherm.
+analysis.hud.tip.arrows_off = Pijlen van de betere zetten verbergen (B)
+analysis.hud.tip.arrows_on = Pijlen van de betere zetten tonen (B)
+analysis.hud.controls.play = Afspelen / pauzeren
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Commentaar tonen / verbergen
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Stem van de commentator aan / uit
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Pijlen tonen / verbergen
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Opslaan als GIF
+gif.making = De GIF wordt gemaakt: de server tekent de partij…
+gif.saved = De GIF is opgeslagen:
+gif.saved_as = GIF opgeslagen: {0}
+gif.sign_in_first = Log in op een onlineserver om GIF's te maken: de server tekent ze.
+gif.busy_other = Er wordt al een andere GIF gemaakt. Wacht tot die klaar is.
+gif.err.rate_limited_for = Je hebt in korte tijd veel GIF's gemaakt. Je kunt de volgende over {0} maken.
+gif.err.rate_limited = Je hebt in korte tijd veel GIF's gemaakt. Probeer het later opnieuw.
+gif.err.server_busy_for = De server is bezig met het tekenen van andere GIF's. Probeer het over {0} opnieuw.
+gif.err.server_busy = De server is bezig met het tekenen van andere GIF's. Probeer het zo meteen opnieuw.
+gif.err.signed_out = Je sessie is beëindigd. Log opnieuw in om een GIF te maken.
+gif.err.game_too_long = Deze partij is te lang om er een GIF van te maken.
+gif.err.pgn_too_large = Deze partij is te lang om er een GIF van te maken.
+gif.err.invalid_pgn = De server kon deze partij niet lezen.
+gif.err.render_failed = De server kon deze GIF niet maken. Probeer het opnieuw.
+gif.err.gif_disabled = Deze server maakt geen GIF's.
+gif.err.write_failed = De GIF kon niet op deze computer worden opgeslagen.
+gif.err.not_found = Deze partij staat niet meer op de server.
+gif.wait.seconds = {0} seconde|{0} seconden
+gif.wait.minutes = {0} minuut|{0} minuten
+gif.wait.both = {0} en {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 kon niet worden gestart. Werk je grafische stuurprogramma bij.
+error.opengl_macos = OpenGL 4.6 kon niet worden gestart op deze Mac. Scacelith vereist Apple silicon (M1 of nieuwer) en macOS 26 of nieuwer, en werkt niet in een virtuele machine.
+error.renderer = De renderer kon niet worden gestart.
+error.scene = De scène kon niet worden geladen.
+error.log_file = Details staan in het logbestand: {0}

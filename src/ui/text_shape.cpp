@@ -1,4 +1,5 @@
 #include "text_shape.h"
+#include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
 #include <algorithm>
 #include <cmath>
@@ -21,6 +22,12 @@ bool invisible(char32_t c) {
 
 bool arabicLetter(char32_t c) { return uni::isArabic(c) && !uni::isMark(c); }
 
+// Latin letters (Vietnamese included), the script of the title face.
+bool latinLetter(char32_t c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0xC0 && c <= 0x24F && c != 0xD7 && c != 0xF7) ||
+           (c >= 0x1E00 && c <= 0x1EFF);
+}
+
 }  // namespace
 
 Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceFor, float tracking, int baseRtl) {
@@ -31,11 +38,23 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
         run.rtl = baseRtl == 1;
         return run;
     }
-    uni::Shaped sh = uni::shapeArabic(logical);
+    uni::Shaped sh = uni::shape(logical);
     int base = baseRtl >= 0 ? (baseRtl & 1) : uni::paragraphLevel(sh.text, 0);
     run.rtl = base == 1;
     std::vector<int> levels = uni::resolveLevels(sh.text, base);
     std::vector<int> order = uni::visualOrder(levels);
+    // A line in the title face with a Latin letter that Cinzel lacks (Vietnamese ơ, ư, ạ, ...) is
+    // drawn whole in the text face's inscriptional capitals: no word mixes the two faces.
+    bool titleInText = false;
+    for (char32_t c : sh.text) {
+        if (!latinLetter(c) || (faceFor ? faceFor(uint32_t(c)) : int(font::FACE_TEXT)) != font::FACE_TITLE) continue;
+        if (font::resolveFace(font::FACE_TITLE, uint32_t(c)) != font::FACE_TITLE) {
+            titleInText = true;
+            break;
+        }
+    }
+    // Turkish: the title face's lowercase i is a dotless small capital; the dotted İ is drawn.
+    const bool turkic = i18n::language() == "tr";
 
     const float titleCap = font::metrics(font::FACE_TITLE).capHeight;
     const float titleSmall = font::metrics(font::FACE_TITLE).xHeight;
@@ -52,16 +71,28 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
         bool mark = uni::isMark(cp);
         int want = faceFor ? faceFor(uint32_t(cp)) : int(font::FACE_TEXT);
         int used = want;
-        const font::Glyph* g = font::glyph(want, uint32_t(cp), &used);
+        const bool title = want == font::FACE_TITLE;
+        const font::Glyph* g = font::glyph(title && titleInText ? int(font::FACE_TEXT) : want, uint32_t(cp), &used);
         float scale = font::fallbackScale(want, used);
-        if (g && want == font::FACE_TITLE && used != font::FACE_TITLE && !uni::isArabic(cp) && !uni::isCjk(cp)) {
-            // Cinzel has no Cyrillic: inscriptional capitals from the text face instead, lowercase as
-            // small capitals, sized on Cinzel's capitals.
+        if (g && title && used == font::FACE_TITLE && turkic && cp == 'i') {
+            int u2 = used;
+            if (const font::Glyph* g2 = font::glyph(want, 0x130, &u2)) {   // small capital İ
+                const float cap = font::metrics(u2).capHeight;
+                g = g2;
+                cp = 0x130;
+                used = u2;
+                scale = cap > 0.0f ? titleSmall / cap : 0.8f;
+            }
+        }
+        if (g && title && used != font::FACE_TITLE && !uni::isArabic(cp) && !uni::isCjk(cp) && !uni::isHangul(cp) &&
+            !uni::isDevanagari(cp)) {
+            // Cinzel has no Cyrillic, Greek or Vietnamese: inscriptional capitals from the text face
+            // instead, lowercase as small capitals, sized on Cinzel's capitals.
             const float cap = font::metrics(used).capHeight;
             if (uni::isLower(cp) && cp != 0xDF) {
-                char32_t up = uni::toUpper(cp);
+                char32_t up = uni::toCapital(cp, turkic);
                 int u2 = used;
-                if (const font::Glyph* g2 = font::glyph(want, uint32_t(up), &u2)) {
+                if (const font::Glyph* g2 = font::glyph(titleInText ? int(font::FACE_TEXT) : want, uint32_t(up), &u2)) {
                     g = g2;
                     cp = up;
                     used = u2;

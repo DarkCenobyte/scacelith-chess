@@ -19,6 +19,8 @@ bool isPausePunct(char32_t c, bool* needsSpace) {
         return true;
     case 0x3001: case 0x3002: case 0xFF0C: case 0xFF1B: case 0xFF1A: case 0xFF01: case 0xFF1F:   // 、。，；：！？
     case 0x060C: case 0x061B: case 0x061F:              // Arabic comma, semicolon, question mark
+    case 0x0964: case 0x0965:                           // Devanagari danda, double danda (full stops)
+    case 0x037E: case 0x0387:                           // Greek question mark, ano teleia
         return true;
     default:
         return false;
@@ -32,6 +34,7 @@ bool isWeightless(char32_t c) {
     if (c == 0x00A0) return false;                                          // no-break space
     if (c >= 0x00A1 && c <= 0x00BF) return true;                            // ¡ « » ¿ ...
     if (c == 0x060C || c == 0x061B || c == 0x061F || c == 0x066A || c == 0x06D4) return true;
+    if (c == 0x0964 || c == 0x0965 || c == 0x037E || c == 0x0387) return true;
     return false;
 }
 
@@ -66,7 +69,7 @@ std::vector<Boundary> boundaries(const std::string& text) {
             // A run of punctuation ("?!", ".»", "—") is one boundary.
             while (j < t.size() && (isWeightless(t[j]) && t[j] != ' ')) {
                 if (t[j] == '.' || t[j] == '!' || t[j] == '?' || t[j] == 0x3002 || t[j] == 0xFF01 || t[j] == 0xFF1F ||
-                    t[j] == 0x061F)
+                    t[j] == 0x061F || t[j] == 0x0964 || t[j] == 0x0965 || t[j] == 0x037E)
                     sentence = true;
                 ++j;
             }

@@ -1,0 +1,266 @@
+# Coach speech (European Portuguese): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach, with its article ("a tua torre",
+# "o meu cavalo"), and the forms of common.lang: {my:a} "ao meu cavalo / à minha torre", {my:de},
+# {your:em}, {my:o} "o / a" (object pronoun: "Captura-{my:o}!"), {your:lo} ("movê-{your:lo}"),
+# {your:este} "este / esta" ("{your:este} é {your}." = "Esta é a tua torre."), {my:dele}.
+# {sq}, {sq2}, {to}, {esc} = squares ("em {sq}", "para {sq}", "a casa {sq}"); {move} = a move.
+# {@}, {@2}, {@3} are invisible marks: the coach points while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: file letters said by their Portuguese names,
+# and the knight's "L" said as the letter name "éle").
+
+# ---- Chapter titles (said inside "Vamos continuar com {chapter}.": with their article) -------------
+lesson.title.welcome = o tabuleiro
+lesson.title.pieces = o movimento das peças
+lesson.title.safety = as capturas seguras e as arriscadas
+lesson.title.check = o xeque
+lesson.title.mate = o xeque-mate
+lesson.title.castling = o roque
+lesson.title.en_passant = a captura en passant
+lesson.title.promotion = a promoção
+lesson.title.draws = o afogamento e os empates
+lesson.title.etiquette = o Elo, o relógio e as boas maneiras nas partidas a sério
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Agora tenta tu.
+lesson.now_you.2 = Agora é a tua vez.
+lesson.now_you.3 = Agora tu.
+# Another wrong move after the demonstration.
+lesson.almost = Quase! Joga o lance que te mostrei.
+lesson.almost.2 = Não é bem isso. Experimenta o lance da minha demonstração.
+lesson.almost.3 = Estás quase lá. Lembra-te do que te acabei de mostrar.
+# A wrong move without a line of its own.
+lesson.try_again = Não é isso. Tenta outra vez.
+lesson.try_again.2 = Esse não. Experimenta de novo.
+lesson.try_again.3 = Vamos tentar mais uma vez.
+lesson.use_your = Usa {your}.
+lesson.use_your.2 = Experimenta com {your}.
+lesson.watch = Repara.
+lesson.like_this = Assim.
+lesson.and_back = E voltamos atrás.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Xeque, mas o meu rei foge para {esc}.
+lesson.check_takes = Xeque, mas o meu rei limita-se a capturar {your}.
+lesson.check_block = Xeque, mas posso pôr uma peça no caminho.
+lesson.stalemate = Afogamento! O meu rei não se pode mexer e não está em xeque. É empate, embora estivesses a ganhar!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Para {sq}, não: {my} ataca essa casa. Um rei nunca se põe em perigo.
+why.PathBlocked = Há alguma coisa no {@}caminho: as peças não saltam, exceto o cavalo.
+why.WrongGeometry = {your} não se move assim.
+why.MustAnswerCheck = Estás em {@}xeque: primeiro tens de resolver isso.
+why.CastlingThroughCheck = O teu rei passaria por {sq}, e {my} ataca essa casa.
+why.CastlingNoRights = Esse rei ou essa torre já se moveu: o roque deixou de ser possível.
+why.CastlingBlocked = Para fazer o roque, as casas entre o rei e a torre têm de estar vazias.
+why.CastlingOutOfCheck = Não podes fazer o roque quando estás em xeque.
+why.PawnForwardBlocked = Os peões não capturam em frente: essa casa está {@}bloqueada.
+why.LeavesKingInCheck = {your} está cravad{your:o}: movê-{your:lo} deixaria o teu rei exposto {my:a}.
+why.OwnPieceOnTarget = Não podes ir para uma casa ocupada por uma peça tua.
+why.PawnCaptureNeedsVictim = Um peão só anda na diagonal para capturar.
+why.EnPassantExpired = A captura en passant só é permitida logo a seguir ao avanço de duas casas do peão.
+why.NotYourTurn = Espera: agora é a minha vez.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Olá! Sou o teu treinador. Vamos aprender juntos as regras do xadrez, passo a passo.
+lesson.welcome.board = Este é o tabuleiro: sessenta e quatro casas, claras e escuras, oito filas de oito casas.
+lesson.welcome.light = A casa do canto, à tua {@}direita, é sempre clara. Lembra-te: clara à direita.
+lesson.welcome.files = As linhas verticais chamam-se colunas. Têm letras, do {@}a ao {@2}h.
+lesson.welcome.files.spoken = As linhas verticais chamam-se colunas. Têm letras, do {@}á ao {@2}agá.
+lesson.welcome.ranks = As linhas horizontais chamam-se filas. Têm números, do {@}um ao {@2}oito, a começar do teu lado.
+lesson.welcome.square = Cada casa tem um nome: primeiro a letra, depois o número. Esta é a casa {sq}.
+lesson.welcome.square2 = E esta é a casa {sq}.
+lesson.welcome.kings = Estes são os dois reis. O teu está em {sq}, o meu está em {sq2}.
+lesson.welcome.ask = É a tua vez: avança o teu rei uma casa, para {sq}.
+lesson.welcome.wrong = Essa é a casa {to}. Queremos a casa {sq}: a letra e, o número dois.
+lesson.welcome.wrong.spoken = Essa é a casa {to}. Queremos a casa {sq}: a letra é, o número dois.
+lesson.welcome.ok = Perfeito. O teu rei está em {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = {your:este} é {your}. Move-se em linha reta, pelas colunas e pelas filas, até onde quiser.
+lesson.rook.lines = Pela coluna acima, {@}ou ao longo da fila.
+lesson.rook.capture = Para capturar, uma peça vai para a casa de uma peça {@}adversária, que sai do tabuleiro.
+lesson.rook.ask = Captura {my} com a tua torre!
+lesson.rook.short = Boa direção! Continua pela coluna acima, até {my:a}.
+lesson.rook.rank = Assim vais ao longo da fila. {my} está mais acima, na coluna.
+lesson.rook.king = Esse é o teu rei. Usa {your}, no canto.
+lesson.rook.ok = Boa captura! {my} sai do tabuleiro.
+# Pieces don't jump
+lesson.jump.blocked = As peças não podem saltar por cima das outras. O teu peão em {sq} tapa o caminho da torre.
+lesson.jump.knight = Só o cavalo pode saltar. Vamos conhecê-lo em breve.
+# Bishop
+lesson.bishop.intro = {your:este} é {your}. Move-se na diagonal, até onde quiser.
+lesson.bishop.colour = Um bispo fica sempre em casas da mesma cor.
+lesson.bishop.ask = {my} está na diagonal do teu bispo. Captura-{my:o}!
+lesson.bishop.short = Diagonal certa! Vai mais longe, até chegares {my:a}.
+lesson.bishop.other = Essa é a outra diagonal. Olha na direção {my:de}.
+lesson.bishop.ok = Excelente. Os bispos adoram as grandes diagonais.
+# Queen
+lesson.queen.intro = {your:este} é {your}, a peça mais forte. Move-se como uma torre e um bispo juntos.
+lesson.queen.ask = Encontra {my} e captura-{my:o} com a tua dama.
+lesson.queen.wrong = A tua dama pode chegar {my:a} num só lance, por uma diagonal.
+lesson.queen.ok = Muito bem! Mantém a tua dama em segurança: vale muito.
+# King
+lesson.king.intro = O rei move-se só uma casa, em qualquer direção.
+lesson.king.important = O rei é a peça mais importante. Se ficar encurralado, a partida está perdida.
+lesson.king.ask = O rei também pode capturar. Toma {my}!
+lesson.king.wrong = O teu rei está mesmo ao lado {my:de}. Entra na casa {my:dele} para {my:o} capturar.
+lesson.king.ok = Boa! O rei é lento, mas é forte a curta distância.
+# Knight
+lesson.knight.intro = {your:este} é {your}. Move-se em L: duas casas a direito, depois uma para o lado.
+lesson.knight.intro.spoken = {your:este} é {your}. Move-se em éle: duas casas a direito, depois uma para o lado.
+lesson.knight.l = {@}Assim. Vai sempre parar a uma casa da outra cor.
+lesson.knight.jump = O cavalo é a única peça que pode saltar por cima das outras.
+lesson.knight.ask = Captura {my} com o teu cavalo!
+lesson.knight.wrong = É um lance de cavalo válido, mas não chega {my:a}. Experimenta outro L.
+lesson.knight.wrong.spoken = É um lance de cavalo válido, mas não chega {my:a}. Experimenta outro éle.
+lesson.knight.ok = Belo salto!
+# Pawn: moving
+lesson.pawn.intro = Agora, {your}. Avança a direito, uma casa de cada vez, e nunca recua.
+lesson.pawn.first = No seu primeiro lance, um peão pode avançar uma ou duas casas.
+lesson.pawn.ask = Avança o teu peão duas casas.
+lesson.pawn.one = Isso é uma casa: é legal, mas desta vez avança duas.
+lesson.pawn.use = Usa o peão.
+lesson.pawn.ok = Boa.
+# Pawn: capturing
+lesson.pawncap.blocked = O meu peão bloqueia o teu. Os peões não capturam em frente.
+lesson.pawncap.diagonal = Mas um peão captura na diagonal, uma casa para a frente.
+lesson.pawncap.ask = Captura {my} com o teu peão.
+lesson.pawncap.use = Usa {your}: captura na diagonal, para a frente.
+lesson.pawncap.ok = Isso! Em frente para andar, na diagonal para capturar.
+# Values, set-up and the first moves
+lesson.values.pawn = Cada peça tem um valor em pontos. Um peão vale um.
+lesson.values.pieces = Um cavalo ou um {@}bispo, três. Uma {@2}torre, cinco. A {@3}dama, nove.
+lesson.values.king = O rei não tem preço: nunca o podes entregar.
+lesson.values.trade = Tenta nunca dar uma peça por menos do que ela vale.
+lesson.setup.corners = Todas as partidas começam assim: as torres nos {@}cantos, depois os {@2}cavalos, depois os {@3}bispos.
+lesson.setup.queen = A dama fica na casa da sua cor: a tua dama está numa casa clara.
+lesson.setup.king = O rei fica ao lado dela. As brancas jogam sempre primeiro.
+lesson.first.ask = Começa a partida: avança duas casas o peão que está à frente do teu rei, para {sq}.
+lesson.first.wrong = Esse lance também é legal! Mas, por agora, joga o peão do teu rei para {sq}, por favor.
+lesson.first.ok = Um ótimo primeiro lance: abre linhas para a tua dama e para o teu bispo.
+lesson.first.reply = Respondo da mesma maneira. Agora põe um cavalo em jogo: salta de {sq} para {sq2}.
+lesson.first.knight_wrong = Os cavalos saltam por cima dos peões. Experimenta de {sq} para {sq2}.
+lesson.first.knight_ok = Perfeito. Os cavalos e os bispos saem cedo.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Uma peça está defendida quando uma peça amiga pode retomar.
+lesson.safety.pawn = O meu {@}peão defende {my}.
+lesson.safety.free = Mas {my} não tem defensor. A tua dama ataca as duas peças.
+lesson.safety.ask = Captura a peça indefesa!
+lesson.safety.watch = Vê o que acontece.
+lesson.safety.gave = Deste a tua dama, que vale nove, pelo meu cavalo, que vale três.
+lesson.safety.other = Experimenta a outra peça.
+lesson.safety.look = Procura a peça que nada defende.
+lesson.safety.ok = Excelente! Pergunta sempre: essa peça está defendida?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = A minha torre controla toda a segunda fila.
+lesson.danger.rule = Um rei nunca pode ir para uma casa onde possa ser capturado.
+lesson.danger.ask = Leva o teu rei para uma casa segura.
+lesson.danger.ok = Certo. Aí, o teu rei está em segurança.
+lesson.check.what = A minha torre ataca o teu rei. A isso chama-se xeque.
+lesson.check.must = Quando estás em xeque, tens de sair dele imediatamente.
+lesson.check.ways = Há três maneiras: {@}mover o rei, {@2}bloquear o ataque ou {@3}capturar a peça atacante.
+lesson.check.ask = Aqui, tira o teu rei do xeque.
+lesson.check.file = A casa {to} ainda está na coluna da {@}minha torre. Sai dessa linha.
+lesson.check.ok = Boa: já não estás em xeque.
+lesson.block.again = Xeque outra vez! Desta vez, o teu rei não tem nenhuma casa livre.
+lesson.block.ask = Então bloqueia o ataque: põe uma peça no caminho.
+lesson.block.queen = Isso bloqueia! Mas a minha torre podia tomar a tua dama. Bloqueia com uma peça de menor valor.
+lesson.block.queen_ok = Funciona. Lembra-te: bloqueia com a tua peça de menor valor.
+lesson.block.ok = Perfeito. Bloqueia com a peça que vale menos.
+lesson.capture.check = A minha dama dá xeque, mesmo ao lado do teu rei.
+lesson.capture.ask = Captura a peça atacante!
+lesson.capture.king_ok = Isso! A minha dama não tinha defensor, por isso o teu rei podia tomá-la.
+lesson.capture.knight_ok = Isso! O teu cavalo eliminou a peça atacante.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Xeque-mate: o rei está em xeque e não tem como escapar. Isso ganha a partida.
+lesson.mate1.stuck = O meu rei está preso atrás dos seus {@}próprios peões.
+lesson.mate1.ask = Dá-me xeque-mate num lance!
+lesson.mate1.wrong = Quase! Dá xeque na minha última fila, onde o meu rei não consegue fugir.
+lesson.mate1.ok = Xeque-mate! É o mate da última fila. Não te esqueças dele!
+lesson.mate2.ask = O teu rei e a tua dama trabalham em equipa. Dá-me xeque-mate num lance.
+lesson.mate2.wrong = Encontra um xeque que não deixe nenhuma casa ao meu rei.
+lesson.mate2.ok = Xeque-mate! O teu rei protege a dama, por isso o meu não a pode tomar.
+lesson.mate2.ok_rank = Xeque-mate na última fila! O teu rei controla todas as casas à frente do meu.
+lesson.mate3.edge = A tua torre na sétima fila mantém o meu rei preso à borda do tabuleiro.
+lesson.mate3.ask = Agora usa {your} para dar xeque-mate.
+lesson.mate3.free = Xeque, mas agora a sétima fila ficou livre, e o meu rei escapa.
+lesson.mate3.takes = O meu rei limita-se a tomar a tua torre.
+lesson.mate3.hint = Dá xeque na última fila com a torre que não está a guardar a sétima.
+lesson.mate3.ok = Xeque-mate! As duas torres trabalharam como uma escada.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = O roque é um lance especial que põe o teu rei em segurança. O rei e a torre movem-se juntos.
+lesson.castle.how = O {@}rei anda duas casas em direção a uma torre, e a {@2}torre salta para o outro lado dele.
+lesson.castle.ask = Toca sempre primeiro no rei. Agora tu: faz o roque pequeno, do lado do rei.
+lesson.castle.rook = Assim só mexes a torre. Para fazer o roque, move o teu rei duas casas na direção dela.
+lesson.castle.long = Isso é o roque grande, também legal! Desta vez, faz o roque para o lado da torre mais próxima.
+lesson.castle.one = Uma casa é um lance normal do rei. No roque, o rei anda duas.
+lesson.castle.other = Para fazer o roque, move o teu rei duas casas em direção à torre em {sq}.
+lesson.castle.ok = Roque feito! O teu rei está abrigado, e a tua torre está pronta para entrar em jogo.
+lesson.castle2.moved = Não podes fazer o roque se o teu rei ou essa torre já se tiverem mexido.
+lesson.castle2.attacked = Nem quando estás em xeque, nem se o teu rei tiver de atravessar uma casa atacada ou de ir parar a uma.
+lesson.castle2.bishop = O meu bispo ataca a casa {sq}. Por isso, agora é proibido fazer o roque deste lado.
+lesson.castle2.ask = Faz o roque do outro lado.
+lesson.castle2.other = Faz o roque na direção da tua outra torre, do lado da dama.
+lesson.castle2.ok = Correto! O roque grande põe o teu rei em {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Há uma captura especial de peão chamada en passant. Quer dizer «de passagem».
+lesson.ep.watch = Olha para o meu peão: avança duas casas e fica mesmo ao lado do teu.
+lesson.ep.how = O teu peão pode capturá-lo como se ele só tivesse avançado uma casa: para {sq}.
+lesson.ep.now = Mas só agora, neste lance. Captura en passant!
+lesson.ep.gone = A oportunidade passou: o en passant só funciona logo a seguir. Vamos tentar outra vez.
+lesson.ep.ok = En passant! O meu peão em {sq} sai do tabuleiro.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Quando um peão chega à última fila, é promovido: transforma-se em dama, torre, bispo ou cavalo.
+lesson.promo.ask = Quase sempre, escolhe-se a dama. Promove agora o teu peão!
+lesson.promo.under = É permitido! Mas a dama é mais forte. Vamos escolher a dama.
+lesson.promo.under_ok = Está bem. Mas a maioria dos jogadores escolhe a dama.
+lesson.promo.push = Avança o teu peão até à última fila, para {sq}.
+lesson.promo.ok = Uma dama nova! Podes até ter duas damas ao mesmo tempo.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = É a minha vez. O meu rei não está em xeque, mas {@}todas as casas à volta dele estão atacadas.
+lesson.stale.draw = Não tenho nenhum lance legal. Isso é afogamento, e a partida termina empatada.
+lesson.stale2.ask = Quando estás a ganhar, cuidado com o afogamento. Dá-me xeque-mate num lance, sem afogar o meu rei!
+lesson.stale2.wrong = Dá xeque na minha última fila, onde o meu rei não consegue fugir.
+lesson.stale2.ok = Xeque-mate! Deixa sempre um lance ao rei adversário, a não ser que lhe estejas a dar mate.
+lesson.draws.kings = Outros empates: quando ninguém pode dar xeque-mate, como com dois reis sozinhos, a partida é empate.
+lesson.draws.agree = Os jogadores também podem combinar um empate.
+lesson.draws.repeat = Repetir a mesma posição três vezes, ou fazer cinquenta lances sem capturas nem lances de peão, também permite o empate.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Agora já conheces todas as regras do xadrez. Muito bem!
+lesson.talk.real = Deixa-me contar-te como se jogam as partidas a sério.
+lesson.talk.elo = Os jogadores têm uma pontuação, chamada Elo. Sobe quando ganhas e desce quando perdes.
+lesson.talk.elo_gap = Ganhar a um jogador mais forte dá mais pontos; perder com um mais fraco custa mais.
+lesson.talk.elo_start = A tua pontuação aparece depois de cinco partidas com Elo. As partidas com o treinador são treino, por isso não contam para o Elo.
+lesson.talk.clock = Isto é um {@}relógio de xadrez. Cada jogador tem o seu próprio tempo, que só corre durante a sua vez.
+lesson.talk.press = Depois do teu lance, carregas no relógio com a mesma mão. Isso põe o meu tempo a correr.
+lesson.talk.flag = Se o teu tempo acabar, perdes, a não ser que eu não tenha qualquer forma de te dar xeque-mate.
+lesson.talk.increment = Cinco mais três quer dizer cinco minutos para cada um, mais três segundos depois de cada lance.
+lesson.talk.speeds = As partidas curtas são de blitz; as mais longas, rápidas; e as mais longas de todas, clássicas.
+lesson.talk.no_clock = Comigo, o relógio está desligado. Leva todo o tempo de que precisares para pensar.
+lesson.talk.touch = Numa partida a sério, se tocares numa das tuas peças, tens de a jogar.
+lesson.talk.touch_mine = Se tocares numa das minhas peças, tens de a capturar, se puderes.
+# «Componho» is the word of the FIDE Laws in Portuguese (j'adoube).
+lesson.talk.adjust = Para endireitar uma peça sem a jogar, diz primeiro «componho».
+lesson.talk.release = Quando largas uma peça numa casa nova, o lance está feito.
+lesson.talk.sheet = Nos torneios, os dois jogadores escrevem todos os lances numa {@}folha de registo.
+# {move:letters} shows the Portuguese scoresheet letters ("Cf3"), which is what this line teaches.
+lesson.talk.notation = Escreve-se a letra da peça e a casa, como {move:letters}. Nos peões, basta a casa.
+lesson.talk.robot = O teu robô escreve os lances por ti. Nas partidas rápidas, não é obrigatório anotar.
+lesson.talk.handshake = As partidas começam e acabam com um aperto de mão. É uma forma de dizer «boa partida» e de agradecer.
+lesson.talk.polite = Ganhes ou percas, mantém a cortesia, e nunca incomodes o adversário enquanto pensa.
+lesson.talk.tips = Três conselhos para as tuas partidas: {@}controla o centro, {@2}põe em jogo os cavalos e os bispos, e {@3}faz o roque cedo.
+lesson.talk.next = Quando quiseres, escolhe «Primeiros passos». Vou jogar com calma e ajudar-te depois de cada erro.
+lesson.talk.welcome = Boas-vindas ao xadrez! Vamos dar um aperto de mão.

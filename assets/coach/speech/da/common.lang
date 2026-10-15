@@ -1,0 +1,345 @@
+# Coach speech (Danish): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Danish needs.
+# Register: the coach says "du" to the player and "jeg" of himself (the game menus say "du" too, as
+# Danish software does). Danish adjectives and participles never agree with a person's gender, so
+# neither the coach's nor the player's gender ever shows. Chess words as in the Danish glossary:
+# bonde, springer, løber, tårn, dronning, konge; skak, skakmat, pat, remis, rokade, forvandling,
+# træk, felt, linje, række, brøler, fejl, unøjagtighed.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders (c = common gender, "en"; n = neuter, "et"): en bonde, en springer, en løber,
+# et tårn, en dronning, en konge. Danish nouns have no cases: one form is the subject, the object
+# and the noun after a preposition. A possessive agrees with the piece (din / dit, min / mit) and
+# the noun after it stays indefinite ("din springer", never "din springeren").
+# Forms (every one defined for all six pieces and the four owners your, my, white, black):
+#   nom      din springer / dit tårn (the default form; Analysis mode: den hvide springer /
+#            det sorte tårn)              "{your} er bundet."  "Slå {my} med dit tårn!"
+#   gen      din springers / dit tårns (den hvide springers / det sorte tårns)
+#                                         "Tænk på {your:gen} sikkerhed." (= din konges sikkerhed)
+#   def      springeren / tårnet (definite, no owner)
+#                                         "{my} angriber {your}, og {your:def} kan ikke flygte."
+#   def_gen  springerens / tårnets        "Alle {your:def_gen} felter er angrebet."
+#   indef    en springer / et tårn (no owner)
+#                                         "Nu har du vundet {my:indef}."
+#   bare     springer / tårn (the noun alone), after poss, den or en and an adjective:
+#                                         "{your:poss} bundne {your:bare}" (= din bundne springer)
+#   poss     din / dit, min / mit, hvids / sorts: the possessive alone, before an adjective (which
+#            then takes its -e form)      "{your:poss} bundne {your:bare} kan ikke dække {sq}."
+#                                         (= "Din bundne springer ...", "Dit bundne tårn ...")
+#   den      den / det: the pronoun standing for the piece (subject, object, after a preposition):
+#            "{your} er bundet: flytter du {your:den}, står din konge i skak." Also the definite
+#            article before an adjective: "{my:den} løse {my:bare}" (= det løse tårn).
+#   dens     dens / dets: "its", when the piece owns something and is not the subject
+#                                         "Gå hen på {my:dens} felt for at slå {my:den}."
+#            When the piece is the subject, Danish says sin / sit / sine, which agree with the thing
+#            owned, not with the piece: no form is needed ("{your} sidder fast bag sine bønder").
+#   en       en / et: the indefinite article alone, before an adjective
+#                                         "{my:en} ubeskyttet {my:bare}" (= et ubeskyttet tårn)
+#   sin      sin springer / sit tårn (every owner): the reflexive possessive, only where the subject
+#            of the clause is a third person who owns the piece ("man", the unspoken subject of an
+#            infinitive, a side)          "Det koster tid at jage bønder med {your:sin}."
+#            With "du" or "jeg" as the subject Danish keeps din / min: use nom
+#                                         ("Du flyttede {your} to gange.")
+#   t        "" / "t": the neuter ending of an adjective agreeing with the piece, glued to the
+#            adjective, after the piece itself: "{my} var fri{my:t}." (= min springer var fri /
+#            mit tårn var frit), "{my:en} løs{my:t} {my:bare}" (= en løs bonde / et løst tårn).
+#            Only for adjectives that add -t (fri, løs, sikker, aktiv, åben, svag, stærk, god);
+#            words ending in -t, -sk or -e never change (ubeskyttet, fanget, bundet, angrebet,
+#            udsat, let, hængende): write those plain; rephrase around egen/eget, anden/andet.
+# Never put a possessive or an article before {your}, {my}, {t1}, {t2}, {piece}: the owner is in
+# them. Move notation spoken uses piece.<type>.nom, the bare noun ("springer æf tre").
+piece.pawn.gender = c
+piece.knight.gender = c
+piece.bishop.gender = c
+piece.rook.gender = n
+piece.queen.gender = c
+piece.king.gender = c
+piece.pawn.nom = bonde
+piece.knight.nom = springer
+piece.bishop.nom = løber
+piece.rook.nom = tårn
+piece.queen.nom = dronning
+piece.king.nom = konge
+piece.pawn.gen = bondes
+piece.knight.gen = springers
+piece.bishop.gen = løbers
+piece.rook.gen = tårns
+piece.queen.gen = dronnings
+piece.king.gen = konges
+piece.pawn.def = bonden
+piece.knight.def = springeren
+piece.bishop.def = løberen
+piece.rook.def = tårnet
+piece.queen.def = dronningen
+piece.king.def = kongen
+piece.pawn.def_gen = bondens
+piece.knight.def_gen = springerens
+piece.bishop.def_gen = løberens
+piece.rook.def_gen = tårnets
+piece.queen.def_gen = dronningens
+piece.king.def_gen = kongens
+piece.pawn.indef = en bonde
+piece.knight.indef = en springer
+piece.bishop.indef = en løber
+piece.rook.indef = et tårn
+piece.queen.indef = en dronning
+piece.king.indef = en konge
+piece.pawn.bare = bonde
+piece.knight.bare = springer
+piece.bishop.bare = løber
+piece.rook.bare = tårn
+piece.queen.bare = dronning
+piece.king.bare = konge
+# poss: empty nouns, the owner pattern below is the whole word.
+piece.pawn.poss =
+piece.knight.poss =
+piece.bishop.poss =
+piece.rook.poss =
+piece.queen.poss =
+piece.king.poss =
+piece.pawn.den = den
+piece.knight.den = den
+piece.bishop.den = den
+piece.rook.den = det
+piece.queen.den = den
+piece.king.den = den
+piece.pawn.dens = dens
+piece.knight.dens = dens
+piece.bishop.dens = dens
+piece.rook.dens = dets
+piece.queen.dens = dens
+piece.king.dens = dens
+piece.pawn.en = en
+piece.knight.en = en
+piece.bishop.en = en
+piece.rook.en = et
+piece.queen.en = en
+piece.king.en = en
+piece.pawn.sin = bonde
+piece.knight.sin = springer
+piece.bishop.sin = løber
+piece.rook.sin = tårn
+piece.queen.sin = dronning
+piece.king.sin = konge
+piece.pawn.t =
+piece.knight.t =
+piece.bishop.t =
+piece.rook.t = t
+piece.queen.t =
+piece.king.t =
+# The owner patterns: owner.<owner>.<form> serves the common-gender pieces, owner.<owner>.<form>.n
+# the neuter one (tårn). {your} = "din springer" / "dit tårn", {my} = "min springer" / "mit tårn".
+owner.your.nom = din {piece}
+owner.your.nom.n = dit {piece}
+owner.my.nom = min {piece}
+owner.my.nom.n = mit {piece}
+owner.your.gen = din {piece}
+owner.your.gen.n = dit {piece}
+owner.my.gen = min {piece}
+owner.my.gen.n = mit {piece}
+owner.your.poss = din
+owner.your.poss.n = dit
+owner.my.poss = min
+owner.my.poss.n = mit
+owner.your.sin = sin {piece}
+owner.your.sin.n = sit {piece}
+owner.my.sin = sin {piece}
+owner.my.sin.n = sit {piece}
+# Forms without an owner word: the noun or the pronoun alone, the same for every owner.
+owner.your.def = {piece}
+owner.my.def = {piece}
+owner.your.def_gen = {piece}
+owner.my.def_gen = {piece}
+owner.your.indef = {piece}
+owner.my.indef = {piece}
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.your.den = {piece}
+owner.my.den = {piece}
+owner.your.dens = {piece}
+owner.my.dens = {piece}
+owner.your.en = {piece}
+owner.my.en = {piece}
+owner.your.t = {piece}
+owner.my.t = {piece}
+# The Analysis mode names a piece by its side, nobody being "du" or "jeg" there: "den hvide
+# springer", "det sorte tårn" (article and adjective agree with the piece; the noun stays
+# indefinite). poss is the side's genitive, "hvids" / "sorts" ("hvids bundne springer").
+owner.white.nom = den hvide {piece}
+owner.white.nom.n = det hvide {piece}
+owner.black.nom = den sorte {piece}
+owner.black.nom.n = det sorte {piece}
+owner.white.gen = den hvide {piece}
+owner.white.gen.n = det hvide {piece}
+owner.black.gen = den sorte {piece}
+owner.black.gen.n = det sorte {piece}
+owner.white.poss = hvids
+owner.black.poss = sorts
+owner.white.sin = sin {piece}
+owner.white.sin.n = sit {piece}
+owner.black.sin = sin {piece}
+owner.black.sin.n = sit {piece}
+owner.white.def = {piece}
+owner.black.def = {piece}
+owner.white.def_gen = {piece}
+owner.black.def_gen = {piece}
+owner.white.indef = {piece}
+owner.black.indef = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+owner.white.den = {piece}
+owner.black.den = {piece}
+owner.white.dens = {piece}
+owner.black.dens = {piece}
+owner.white.en = {piece}
+owner.black.en = {piece}
+owner.white.t = {piece}
+owner.black.t = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# File letters are their Danish letter names, as when spelling: a, be, se, dé, é, æf, ge, hå
+# ("é fire", "æf tre", "dé fem", "hå syv"). d and e carry an acute accent so that the voice says
+# the long letter name, as in "idé" and "allé": a plain "de" is read as the pronoun ("di"), and a
+# lone "e" risks an unstressed schwa (for the pronunciation pass to confirm). Rank 1 is "ét", the
+# stressed numeral (Danes read a digit 1 as "et": "et-et-to"), not the article "et".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = se
+file.d.spoken = dé
+file.e.spoken = é
+file.f.spoken = æf
+file.g.spoken = ge
+file.h.spoken = hå
+rank.1.spoken = ét
+rank.2.spoken = to
+rank.3.spoken = tre
+rank.4.spoken = fire
+rank.5.spoken = fem
+rank.6.spoken = seks
+rank.7.spoken = syv
+rank.8.spoken = otte
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Danish scoresheet letters: K(onge) D(ronning) T(årn) L(øber) S(pringer): "Sf3", "Txd1", "Le2".
+move.letters = K D T L S
+# Spoken as Danish players read notation: "springer æf tre", "springer slår på é fem", "springer be
+# dé syv", "é slår på dé fem", "bonde slår tilbage", "kort rokade", "lang rokade", "é otte,
+# forvandling til dronning", "dronning ge fire, skak", "..., skakmat". {piece} is the bare noun.
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} slår på {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} slår på {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} slår på {to}
+move.recapture.spoken = {piece} slår tilbage
+move.castle_short.spoken = kort rokade
+move.castle_long.spoken = lang rokade
+move.promotion.spoken = {move}, forvandling til {piece}
+move.check.spoken = {move}, skak
+move.mate.spoken = {move}, skakmat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the words the Danish voice misreads (respell.<word>), likely
+# "en passant" (to be said the French way, not with the Danish article "en").
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Danish says the units first, joined to the tens with "og" in one word, and counts in twenties
+# from fifty (halvtreds, tres, halvfjerds, firs, halvfems): 21-99 compose as "{units}og{tens}"
+# ("treogtyve", "femoghalvfjerds", "nioghalvfems"); 21, 31 ... 91 are listed, since "en" inside the
+# compound never changes ("enogtyve" before any noun). 100-199 say "hundrede", 200-999 "to hundrede"
+# ... with "og" before the rest ("hundrede og ti", "tre hundrede og femogfyrre").
+# Forms of 1: the plain number is the neuter "ét", the form in which Danish names and reads a
+# number and counts a neuter noun ("træk ét", "mat i ét", "ét træk", "ét point", "ét felt"); the
+# form "en" ("{n:en}", count.en) says "én" before a common-gender noun ("én bonde", "én fejl").
+# The accent marks the stressed numeral for the voice (spoken text only). 101, 201 ... end in
+# "ét" / "én" the same way; every other number (21 included) is the same in both forms.
+number.0.spoken = nul
+number.1.spoken = ét
+number.1.en.spoken = én
+number.2.spoken = to
+number.3.spoken = tre
+number.4.spoken = fire
+number.5.spoken = fem
+number.6.spoken = seks
+number.7.spoken = syv
+number.8.spoken = otte
+number.9.spoken = ni
+number.10.spoken = ti
+number.11.spoken = elleve
+number.12.spoken = tolv
+number.13.spoken = tretten
+number.14.spoken = fjorten
+number.15.spoken = femten
+number.16.spoken = seksten
+number.17.spoken = sytten
+number.18.spoken = atten
+number.19.spoken = nitten
+number.20.spoken = tyve
+number.21.spoken = enogtyve
+number.30.spoken = tredive
+number.31.spoken = enogtredive
+number.40.spoken = fyrre
+number.41.spoken = enogfyrre
+number.50.spoken = halvtreds
+number.51.spoken = enoghalvtreds
+number.60.spoken = tres
+number.61.spoken = enogtres
+number.70.spoken = halvfjerds
+number.71.spoken = enoghalvfjerds
+number.80.spoken = firs
+number.81.spoken = enogfirs
+number.90.spoken = halvfems
+number.91.spoken = enoghalvfems
+number.100.spoken = hundrede
+number.tens.spoken = {units}og{tens}
+number.hundreds.spoken = {n} hundrede
+number.hundreds_rest.spoken = {hundreds} og {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Danish writes a decimal comma ("1,3") and says "ét komma tre".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} komma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Danish plural rule (assets/i18n): one (exactly 1) | other. Written with digits ("1 brøler",
+# "3 træk"). Neuter nouns (træk, point, felt, parti, slag) say their number plainly ("ét træk"),
+# common-gender nouns with the form "en" in both forms ("én brøler", "hundrede og én gange"; the
+# form changes nothing else: "enogtyve bønder", "to gange").
+count.move = {n} træk|{n} træk
+count.point = {n} point|{n} point
+count.pawn = {n:en} bonde|{n:en} bønder
+count.piece = {n:en} brik|{n:en} brikker
+count.mistake = {n:en} fejl|{n:en} fejl
+count.blunder = {n:en} brøler|{n:en} brølere
+count.inaccuracy = {n:en} unøjagtighed|{n:en} unøjagtigheder
+count.game = {n} parti|{n} partier
+count.time = {n:en} gang|{n:en} gange
+count.square = {n} felt|{n} felter
+count.position = {n:en} stilling|{n:en} stillinger
+# "{n:en}" in a line says a bare number in the common gender ("én"); it is a count key so that the
+# same form also works outside the counted nouns (and the form check knows it). A bare "{n}" is the
+# neuter "ét" ("Træk {n}", "mat i {m}", "{n} point værd").
+count.en = {n:en}|{n:en}
+# More counted nouns for the review and appraisal lines: "{m:check}" = "3 skakker", "{n:capture}"
+# = "2 slag", "{n:attacker}" / "{n:defender}" = "2 angribere", "1 forsvarer", "{acc:percent}" =
+# "85 procent", "{n:best_move}" = "5 bedste træk" (a streak: "5 bedste træk i streg").
+count.check = {n:en} skak|{n:en} skakker
+count.capture = {n} slag|{n} slag
+count.attacker = {n:en} angriber|{n:en} angribere
+count.defender = {n:en} forsvarer|{n:en} forsvarere
+count.percent = {n:en} procent|{n:en} procent
+count.best_move = {n} bedste træk|{n} bedste træk
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# A level position is "udlignet" ("{best}: udlignet", "Det var udlignet"). A bare {n} says "ét"
+# ("mat i ét"), right for the implied "træk".
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = udlignet
+eval.mate_win = mat i {n}
+eval.mate_loss = mat i {n} mod dig

@@ -1,0 +1,136 @@
+# Coach speech (Dutch): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 stellingen", count.position in
+#            common.lang), "{n:move}" likewise ("2 zetten")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "schaakmat" (the line says it)
+#   {your}   one of the player's pieces ("je paard", "je dame"); the coach points at it on that word
+#   {sq}     a square; the coach points at it on that word
+# The player always has the white pieces. The coach says "je" to the player.
+# "Mat in {n}" needs no noun in Dutch ("mat in drie"), as eval.mate_win in common.lang.
+# Challenge names as assets/i18n/nl.lang (challenge.<id>.name). Tactical terms: matpatroon, vork, penning, spies, aftrekaanval,
+# afleiden, lokken, tussenzet, ingesloten stuk, stille zet.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat in één. {n:position}, en telkens is er één zet die mat geeft. Bekijk alle schaakzetten.
+ch.intro.mate2 = Mat in twee. {n:position}: je eerste zet moet me zonder verdediging laten, daarna zet je mat.
+ch.intro.mate3 = Mat in drie. {n:position}. Schaakzetten, slagzetten en dreigingen: reken telkens mijn beste antwoord uit.
+ch.intro.backrank = Mat op de achterste rij. {n:position} waarin een koning vastzit achter zijn eigen pionnen.
+ch.intro.patterns = Matpatronen. {n:position} met klassieke matnetten. Herken het patroon en sla dan toe.
+ch.intro.hanging = Gratis stukken. {n:position}: iets van mij staat ongedekt. Vind het en sla het.
+ch.intro.fork = Vorken. {n:position}: vind de zet die twee dingen tegelijk aanvalt.
+ch.intro.pin = Penningen. {n:position}: pen een stuk, of maak gebruik van een penning.
+ch.intro.skewer = Spiesen. {n:position}: val een waardevol stuk aan en win wat erachter staat.
+ch.intro.discovered = Aftrekaanvallen. {n:position}: verzet één stuk om een ander vrij baan te geven.
+ch.intro.deflection = Afleiden en lokken. {n:position}: lok een verdediger weg, of juist naar een fataal veld.
+ch.intro.intermezzo = Tussenzetten. {n:position}: zoek vóór de voor de hand liggende zet een sterkere.
+ch.intro.trapped = Ingesloten stukken. {n:position}: een van mijn stukken kan nergens veilig heen. Win het.
+ch.intro.promotion = Promotie. {n:position} waarin een opgerukte pion de partij beslist.
+ch.intro.quiet = Stille zetten. {n:position}: de winnende zet is geen schaak en ook geen slagzet.
+ch.intro.opening = Openingsvallen. {n:position} uit de eerste zetten van echte partijen. Straf mijn fout af.
+ch.intro.escape = Vind de uitweg. {n:position}: je koning is in gevaar, en maar één zet redt hem.
+ch.intro.defend = Verdedigende zetten. {n:position}: vind de ene zet die je stelling overeind houdt.
+ch.intro.kq = Dame en koning tegen koning. {n:position}: zet mijn koning mat. Pas op voor pat.
+ch.intro.kr = Toren en koning tegen koning. {n:position}: zet mijn koning mat, stap voor stap.
+ch.intro.kp = Koning en pion tegen koning. {n:position}: haal een dame. Laat je koning voorop gaan.
+ch.intro.kp_hold = Stop de pion. {n:position}: je hebt alleen je koning. Houd remise.
+ch.intro.rook = Toreneindspelen. {n:position}: bouw de brug om te promoveren, en houd remise met de verdediging van Philidor.
+ch.intro.endgame = Eindspeltactiek. {n:position} met weinig stukken en scherpe ideeën.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Mat in {n}.
+ch.task.mate.2 = Geef mat in {n}.
+ch.task.hanging = Er staat iets ongedekt.
+ch.task.hanging.2 = Wat kun je gratis slaan?
+ch.task.fork = Vind de vork.
+ch.task.fork.2 = Zoek een vork.
+ch.task.pin = Een penning is hier de sleutel.
+ch.task.skewer = Hier wint een spies.
+ch.task.discovered = Hier wint een aftrekaanval.
+ch.task.deflection = Overbelast een verdediger of lok hem weg.
+ch.task.intermezzo = Zoek een tussenzet.
+ch.task.trapped = Een van mijn stukken kan niet ontsnappen. Win het.
+ch.task.promotion = Gebruik je opgerukte pion.
+ch.task.quiet = De winnende zet is een stille zet.
+ch.task.opening = Straf mijn laatste zet af.
+ch.task.escape = Red je koning: maar één zet werkt.
+ch.task.defend = Vind de enige goede zet.
+ch.task.endgame = Vind de beste zet.
+ch.task.default = Vind de beste zet.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Zet mijn koning mat. Ik verdedig me zo goed als ik kan.
+ch.task.play.promote = Promoveer je pion en houd de winst vast. Ik probeer je tegen te houden.
+ch.task.play.hold = Houd {n:move} lang de remise vast. Ik probeer te winnen.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Deze stellingen komen uit echte partijen. Ik speel de laatste zet, daarna ben jij aan de beurt.
+ch.lead.first.2 = Elke stelling komt uit een echte partij: ik speel de zet die ertoe leidde, daarna speel jij.
+ch.next = Volgende stelling.
+ch.next.2 = Hier is de volgende.
+ch.next.3 = Op naar de volgende.
+ch.last = De laatste stelling.
+ch.last.2 = En nu de laatste.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Goed.
+ch.good.2 = Ja.
+ch.good.3 = Juist.
+ch.good.4 = Precies.
+# The position is solved.
+ch.solved = Dat is het! Goed gedaan.
+ch.solved.2 = Precies goed.
+ch.solved.3 = Heel goed.
+ch.solved.mate = Schaakmat! Goed gedaan.
+ch.solved.mate.2 = En dat is mat. Heel goed.
+ch.solved.mate.3 = Schaakmat. Mooi gedaan.
+ch.solved.promote = Een nieuwe dame, en de winst is veiliggesteld. Goed gedaan.
+ch.solved.hold = De remise houdt stand. Goed verdedigd!
+ch.solved.draw = Remise op het bord. Goed verdedigd!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Deze niet: dan zou ik {move} spelen.
+ch.wrong.reply.2 = Niet helemaal: ik zou antwoorden met {move}.
+ch.wrong.reply.3 = Dan zou ik {move} spelen.
+ch.wrong.mate = Pas op: {move:nomate} zou schaakmat zijn.
+ch.wrong.mate.2 = Opgelet: ik zou met {move:nomate} antwoorden, en dat is mat.
+ch.wrong.mated = Pas op: na {move} kan ik mat in {m} forceren.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Dat geeft ook mat, maar het duurt langer. Het kan sneller.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Dat geeft ook mat, maar ik heb een andere zet in gedachten. Kijk nog eens.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Niet slecht, maar er is iets sterkers. Kijk nog eens.
+ch.wrong.weaker.2 = Dat is speelbaar, maar het kan beter.
+ch.wrong.stalemate = Pat! Mijn koning kan niet bewegen, en dat is maar remise.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Deze niet: na {move} kan ik remise houden.
+ch.wrong.loses = Pas op: na {move} zou ik gewonnen staan.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Dat is het niet.
+ch.try_again = Probeer het nog eens.
+ch.try_again.2 = Kijk nog eens goed.
+ch.try_again.3 = Kijk opnieuw.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Wil je een hint?
+ch.offer.2 = Zal ik je een hint geven?
+ch.no_hint = Goed. Zoek maar verder.
+ch.no_hint.2 = Prima, neem de tijd.
+ch.hint.piece = Kijk naar {your}.
+ch.hint.piece.2 = Denk aan {your}.
+ch.hint.square = Kijk naar het veld {sq}.
+ch.hint.square.2 = Het sleutelveld is {sq}.
+ch.hint.square.3 = Houd het veld {sq} in de gaten.
+ch.hint.show = Hier is de zet. Kijk.
+ch.hint.show.2 = Ik laat het je zien. Kijk.
+ch.hint.now = Speel hem nu zelf.
+ch.hint.now.2 = Jouw beurt: speel hem.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Dat was de hele uitdaging. Goed gedaan!
+ch.complete.2 = Alle stellingen opgelost. Goed gedaan!

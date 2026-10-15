@@ -1,0 +1,1440 @@
+# Scacelith - Português (Portugal)
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (1 is singular,
+# 0 takes the plural).
+# Register: European Portuguese software usage (Microsoft/Apple pt-PT): formal and impersonal,
+# imperative in the formal 3rd person ("Selecione", "Prima"), "o seu / a sua", never the pronoun
+# "você"; buttons and menu entries in the infinitive ("Jogar", "Guardar"). Spelling: 1990 agreement.
+# Chess terms follow the pt glossary (dama, lance, xeque, afogamento, folha de registo...).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Ativado
+common.off = Desativado
+common.back = Voltar
+common.apply = Aplicar
+common.discard = Descartar
+common.cancel = Cancelar
+common.white = Brancas
+common.black = Pretas
+common.main_menu = Menu principal
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = O Jogo dos Reis
+menu.new_game = Nova partida
+menu.options = Opções
+menu.credits = Créditos
+menu.quit = Sair
+menu.version = Versão {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPÇÕES
+options.tab.display = Ecrã
+options.tab.graphics = Gráficos
+options.tab.audio = Áudio
+options.tab.gameplay = Jogo
+options.tab.player = Jogador
+options.tab.controls = Controlos
+options.pending = As alterações entram em vigor depois de aplicadas.
+options.unsaved.title = ALTERAÇÕES NÃO GUARDADAS
+options.unsaved.text = Algumas opções foram alteradas. Aplicá-las antes de sair?
+
+options.language = Idioma
+options.language.help = Idioma dos menus e das mensagens. A alteração é imediata.
+options.display_mode = Modo de ecrã
+options.display_mode.help = Ecrã inteiro: uma janela sem margens que ocupa todo o ecrã, na resolução do ambiente de trabalho. Em janela: uma janela com o tamanho indicado abaixo.
+options.fullscreen = Ecrã inteiro
+options.windowed = Em janela
+options.window_size = Tamanho da janela
+options.window_size.help = Tamanho da janela no modo em janela. O ecrã inteiro usa sempre a resolução do ambiente de trabalho.
+options.vsync = Sincronização vertical
+options.vsync.help = Sincroniza as imagens com o ecrã para evitar o efeito de imagem rasgada (tearing).
+options.render_scale = Escala de renderização
+options.render_scale.help = Resolução interna da imagem 3D. Mais baixa é mais rápida, mais alta é mais nítida.
+
+options.quality = Qualidade
+options.quality.very_low = Muito baixa
+options.quality.low = Baixa
+options.quality.medium = Média
+options.quality.high = Alta
+options.quality.ultra = Ultra
+options.quality.custom = Personalizada
+options.quality.help = Define de uma só vez todas as opções abaixo: Muito baixa desativa todos os efeitos, Ultra coloca-os todos no máximo. Alterar uma única opção passa a qualidade para Personalizada. Com uma placa gráfica modesta, baixar a escala de renderização (Ecrã) também ajuda muito.
+options.shadows = Sombras
+options.shadows.help = Detalhe das sombras do sol e suavidade dos seus contornos. Baixa: contornos simples, rápidos de desenhar.
+options.reflections = Reflexos
+options.reflections.help = O chão, a mesa e o tabuleiro refletem o salão (que é desenhado mais uma vez para cada um: uma das opções mais exigentes); a partir de Média, as peças e os objetos brilhantes também refletem o que os rodeia.
+options.ambient_occlusion = Oclusão de ambiente
+options.ambient_occlusion.help = Sombreado suave onde os objetos se encontram e nas reentrâncias, onde entra menos luz.
+options.indirect_light = Luz indireta
+options.indirect_light.help = A luz do dia que se reflete nas paredes, no chão e no teto. Baixa: em vez disso, uma luz ambiente uniforme. Sobretudo uma questão de tempo de carregamento.
+options.volumetric_light = Raios de luz
+options.volumetric_light.help = Feixes de luz do sol no ar poeirento do salão e as partículas de pó que neles cintilam.
+options.tessellation = Tesselação
+options.tessellation.help = Contornos suaves nas curvas das peças vistas de perto.
+options.tessellation.unavailable = Indisponível: este controlador gráfico não suporta a tesselação.
+options.antialiasing = Anti-aliasing
+options.antialiasing.help = Suaviza as arestas serrilhadas e o cintilar dos reflexos. Desativado: mais nítido mas serrilhado, e alguns efeitos ficam granulados.
+options.depth_of_field = Profundidade de campo
+options.depth_of_field.help = Desfoca o que está muito à frente ou muito atrás daquilo para que olha, como faz a objetiva de uma câmara.
+options.motion_blur = Desfocagem de movimento
+options.motion_blur.help = Desfoca os movimentos rápidos da câmara e dos braços, como faz uma câmara de filmar.
+options.bloom = Halo luminoso
+options.bloom.help = Um brilho suave em torno dos reflexos mais intensos, como numa objetiva fotográfica.
+options.brightness = Brilho
+options.brightness.neutral = Neutro
+options.brightness.value = {0} EV
+options.brightness.help = Compensação de exposição da câmara. A calibração do primeiro arranque ajusta-a para que as sombras mais escuras mal se vejam.
+
+options.master_volume = Volume geral
+options.effects = Efeitos
+options.ambience = Ambiente
+options.ambience.help = O murmúrio do salão: a lareira, passos ao longe, o velho relógio.
+options.ambience_volume = Volume do ambiente
+options.voice_volume = Volume da voz
+options.voice_volume.help = Volume da voz do treinador no modo Treinador.
+options.subtitles = Legendas
+options.subtitles.auto = Automático
+options.subtitles.help = As palavras do treinador, escritas na parte inferior do ecrã. Automático: mostradas quando o treinador não fala o idioma dos menus (com os menus em chinês, fala inglês). Sempre mostradas quando a voz do treinador não está instalada.
+
+options.legal_moves = Mostrar lances legais
+options.legal_moves.help = Realça as casas que uma peça tocada pode alcançar. Quando desativado, nada lhe indica se um lance é legal: um lance ilegal é penalizado pelo árbitro assim que carregar no relógio.
+options.coordinates = Coordenadas do tabuleiro
+options.auto_press = Relógio automático
+options.auto_press.help = O seu robô carrega no relógio sozinho assim que o seu lance está no tabuleiro. Nas partidas online decide o servidor e, numa partida direta, o jogador que a organiza.
+options.thinking_time = Tempo de reflexão realista
+options.thinking_time.help = O seu adversário pensa com calma, como um jogador humano, em vez de jogar de imediato.
+options.ignore_head = Ignorar a cabeça do adversário
+options.ignore_head.help = Nas partidas online e nas partidas diretas, o robô do adversário olha para onde o respetivo jogador olha. Quando ativado, mexe a cabeça sozinho, como contra o Stockfish.
+options.mouse_sensitivity = Sensibilidade do rato
+options.invert_look = Inverter o eixo vertical
+options.handover = Troca de jogador
+options.handover.cut = Corte imediato
+options.handover.flight = Voo, {0} s
+options.handover.help = Dois jogadores num só PC: como a vista passa dos olhos de um jogador para os do outro após cada lance. O corte imediato evita o movimento da câmara.
+options.game_cursor = Ponteiro do jogo
+options.game_cursor.help = À mesa, o jogo desenha o seu próprio ponteiro, que mostra o que um clique fará. Desativado: a seta habitual do sistema.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nome
+player.name.help = O seu nome, tal como fica escrito no topo das folhas de registo, em qualquer alfabeto.
+player.default_name = Humano
+player.handwriting = Caligrafia
+player.handwriting.help = A mão que escreve os seus lances. O árabe, o japonês e o chinês são escritos numa caligrafia própria.
+player.preview = NA SUA FOLHA DE REGISTO
+hand.caveat = Descontraída
+hand.marck = Cursiva
+hand.badscript = Inclinada
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Clique esquerdo
+controls.touch = Tocar numa peça e depois movê-la
+controls.clock.keys = Espaço  ou  clique no relógio
+controls.clock = Carregar no relógio
+controls.look.keys = Botão direito premido
+controls.look = Olhar em redor
+controls.sheet.keys = S
+controls.sheet = Olhar para a folha de registo e voltar
+controls.stand.keys = ↑
+controls.stand = Levantar-se em frente à cadeira
+controls.side.keys = ←  /  →
+controls.side = Ir para a ponta esquerda / direita da mesa
+controls.sit.keys = ↓
+controls.sit = Voltar a sentar-se (só se joga a partir da cadeira)
+controls.moves.keys = Tab
+controls.moves = Mostrar ou ocultar a lista de lances
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Espaço
+controls.coach_skip = Treinador: saltar o que o treinador diz
+controls.coach_takeback.keys = Retrocesso
+controls.coach_takeback = Treinador: anular o lance quando for proposto
+controls.coach_hint.keys = H
+controls.coach_hint = Desafios do treinador: pedir uma sugestão
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = BRILHO
+calibration.text = Mova o cursor até que o cavalo na casa preta mal se veja ou deixe de se ver.
+calibration.later = Pode alterá-lo mais tarde em Opções > Gráficos.
+calibration.continue = Continuar
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOVA PARTIDA
+newgame.opponent = ADVERSÁRIO
+newgame.time_control = RITMO DE JOGO
+newgame.start = Começar
+newgame.elo = ~{0} Elo
+newgame.you_white = Vai jogar com as brancas.
+newgame.you_black = Vai jogar com as pretas.
+newgame.colour_lot = As cores são sorteadas na primeira partida.
+newgame.colour_alternate = Depois, as cores alternam de uma partida para a seguinte.
+newgame.opponent_kind = Adversário
+newgame.opponent_kind.help = Jogue contra o Stockfish ou contra um amigo sentado a este computador: jogam à vez, cada um do seu lado do tabuleiro.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Humano, mesmo PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = Nível de habilidade
+engine.skill.help = «Skill Level» do Stockfish (0–20). Ignorado enquanto a força estiver limitada pelo Elo.
+engine.limit_elo = Limitar a força (Elo)
+engine.limit_elo.help = UCI_LimitStrength: o motor procura jogar ao nível do Elo indicado abaixo.
+engine.elo = Elo
+engine.depth = Profundidade de cálculo
+engine.plies = {0} meio-lance|{0} meios-lances
+engine.move_time = Tempo por lance
+engine.nodes = Limite de nós
+engine.no_limit = Sem limite
+engine.thousand = {0} mil
+# {0} can be 1: the abbreviation avoids "1 milhões".
+engine.million = {0} M
+engine.dynamic_elo = Elo dinâmico pelo tempo
+engine.dynamic_elo.help = Como um jogador humano, o Stockfish joga pior quando tem pouco tempo no relógio: um pouco no último minuto (mais cedo nas partidas rápidas e de blitz), muito pior em apuros de tempo. Só em partidas com relógio.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = O Stockfish pensa com calma, como um humano do seu nível. Para saltar esta pausa: Opções > Jogo > Tempo de reflexão realista.
+engine.pace.instant = O Stockfish joga assim que acaba de calcular. Para pausas como as de um humano: Opções > Jogo > Tempo de reflexão realista.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Ilimitado
+tc.no_clock = Sem relógio
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rápida
+tc.classical = Clássica
+tc.custom = Personalizado
+tc.your_own = À sua medida
+tc.base_time = Tempo base
+tc.base_time.help = Tempo inicial de cada relógio (minutos : segundos).
+tc.increment = Incremento
+tc.increment.help = Incremento Fischer acrescentado após cada lance.
+tc.delay = Atraso
+tc.delay.help = Atraso Bronstein: o tempo gasto até ao valor deste atraso é devolvido após cada lance.
+tc.no_delay = Desativado
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, atraso {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novato
+preset.novice.desc = Acabou de aprender a mover as peças: deixa peças indefesas e não vê ameaças simples.
+preset.beginner.name = Principiante
+preset.beginner.desc = Conhece o básico, mas ainda perde material com erros graves frequentes.
+preset.casual.name = Ocasional
+preset.casual.desc = Um adversário descontraído para o serão: lances sensatos, erros frequentes.
+preset.club_player.name = Jogador de clube
+preset.club_player.desc = Jogador de clube sólido, que castiga os erros graves evidentes.
+preset.advanced.name = Avançado
+preset.advanced.desc = Jogador de clube forte, com boa visão tática.
+preset.expert.name = Especialista
+preset.expert.desc = Especialista de torneio: raramente erra e converte as vantagens.
+preset.master.name = Mestre
+preset.master.desc = Força de mestre: cálculo profundo e jogo posicional apurado.
+preset.grandmaster.name = Grande Mestre
+preset.grandmaster.desc = Nível de Grande Mestre: extremamente difícil de vencer.
+preset.stockfish_max.name = Stockfish Máximo
+preset.stockfish_max.desc = Stockfish 19 com toda a força. Boa sorte.
+preset.custom.name = Personalizado
+preset.custom.desc = As suas próprias definições do motor.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CRÉDITOS
+credits.game.head = SCACELITH
+credits.game = Um jogo de xadrez num salão régio, com um motor OpenGL 4.6 desenvolvido de raiz.
+credits.engine.head = MOTOR DE XADREZ
+credits.engine = Stockfish 19, pelos programadores do Stockfish.
+credits.engine.licence = Licença Pública Geral GNU v3.
+credits.engine.data = A sua rede neuronal foi treinada com dados fornecidos pelo projeto Leela Chess Zero, disponibilizados ao abrigo da Open Database License (ODbL).
+credits.voice.head = VOZ DO TREINADOR
+credits.voice = Voz sintética gerada pelo Supertonic 3 para o modo Treinador.
+credits.voice.licence = O Supertonic 3 é um modelo da Supertone, utilizado ao abrigo da licença OpenRAIL-M, cujas restrições de utilização se aplicam a todos os que o utilizam (ver Licenças).
+credits.openings.head = ABERTURAS
+credits.openings = Nomes das aberturas da base de dados chess-openings do lichess.org, dedicada ao domínio público (CC0).
+credits.fonts.head = TIPOS DE LETRA
+credits.fonts = EB Garamond de Georg Duffner e Cinzel de Natanael Gama; Amiri de Khaled Hosny.
+credits.fonts.hand = Caligrafia: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figuras de xadrez do GNU FreeFont (GPL v3 com exceção para tipos de letra).
+credits.quote = «O xadrez é a arte da análise.»  — Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenças
+licences.title = LICENÇAS
+licences.note = As licenças são apresentadas no texto original em inglês.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSA
+pause.resume = Continuar
+pause.offer_draw = Propor empate
+pause.claim_draw = Reclamar empate
+pause.claim_draw.help = Tripla repetição ou regra dos cinquenta lances.
+pause.resign = Abandonar
+confirm.resign.title = ABANDONAR
+confirm.resign.text = Abandonar esta partida? O seu adversário será declarado vencedor.
+confirm.resign.draw = Abandonar esta partida? O seu adversário já não pode dar mate: a partida terminará empatada.
+confirm.resign.ok = Abandonar
+confirm.leave.title = SAIR DA PARTIDA
+confirm.leave.text = Voltar ao menu principal? A partida em curso será abandonada.
+confirm.leave.ok = Sair
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOVER A
+piece.queen = Dama
+piece.rook = Torre
+piece.bishop = Bispo
+piece.knight = Cavalo
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = A partida termina empatada.
+gameover.draw_moves = A partida termina empatada ao fim de {0} lance.|A partida termina empatada ao fim de {0} lances.
+gameover.win = Bem jogado — ganhou.
+gameover.win_moves = Bem jogado — ganhou em {0} lance.|Bem jogado — ganhou em {0} lances.
+gameover.loss = O seu adversário ganhou.
+gameover.loss_moves = O seu adversário ganhou em {0} lance.|O seu adversário ganhou em {0} lances.
+gameover.rematch = Desforra
+gameover.view_board = Ver o tabuleiro
+gameover.show = Mostrar
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Xeque-mate
+reason.resignation = Abandono
+reason.timeout = Derrota por tempo
+reason.illegal_moves = Segundo lance ilegal (derrota)
+reason.stalemate = Afogamento
+reason.insufficient = Posição morta (material insuficiente)
+reason.timeout_vs_insufficient = Queda da bandeira, mas o adversário não pode dar mate
+reason.fivefold = Quíntupla repetição
+reason.75_moves = Regra dos 75 lances
+reason.threefold_claim = Tripla repetição (reclamada)
+reason.50_moves_claim = Regra dos 50 lances (reclamada)
+reason.agreement = Empate por acordo
+reason.illegal_vs_insufficient = Segundo lance ilegal, mas o adversário não pode dar mate
+reason.resignation_vs_insufficient = Abandono, mas o adversário não pode dar mate
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = LANCES
+movelist.empty = Ainda não há lances.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = A preparar os materiais
+loading.hall = A erguer o salão
+loading.furniture = A esculpir a mesa e as cadeiras
+loading.board = A polir o tabuleiro
+loading.pieces = A tornear as peças
+loading.clock = A montar o relógio
+loading.porcelain = A cozer a porcelana
+loading.ready = Pronto
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Não é possível reclamar o empate nesta posição.
+notify.flag_you = A sua bandeira caiu.
+notify.flag_opponent = A bandeira do seu adversário caiu.
+notify.touched.pawn = Peça tocada: tem de mover o peão em que tocou.
+notify.touched.knight = Peça tocada: tem de mover o cavalo em que tocou.
+notify.touched.bishop = Peça tocada: tem de mover o bispo em que tocou.
+notify.touched.rook = Peça tocada: tem de mover a torre em que tocou.
+notify.touched.queen = Peça tocada: tem de mover a dama em que tocou.
+notify.touched.king = Peça tocada: tem de mover o rei em que tocou.
+notify.touched.piece = Peça tocada: tem de mover a peça em que tocou.
+notify.touched_square = Peça tocada: tem de mover a peça que está em {0}.
+notify.press_clock = Carregue no relógio para concluir o seu lance (Espaço).
+notify.manual_clock = Nesta partida, carregue manualmente no relógio após cada lance.
+notify.illegal = Lance ilegal.
+notify.cannot_move = Não é possível jogar esse lance.
+notify.move_first = Jogue o seu lance antes de carregar no relógio.
+notify.stance.sit_to_play = Volte a sentar-se para jogar (seta para baixo).
+notify.stance.first = O relógio continua a contar enquanto está de pé. Seta para baixo: voltar a sentar-se.
+notify.stance.first_untimed = Só pode jogar a partir da sua cadeira. Seta para baixo: voltar a sentar-se.
+notify.stance.finish_move = Termine primeiro o seu lance.
+notify.draw_already_offered = Já propôs empate neste lance.
+notify.draw_accepted = O seu adversário aceita o empate.
+notify.draw_declined = O seu adversário recusa a proposta de empate.
+notify.draw_claimed = O seu adversário reclama o empate.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Árbitro: o relógio foi acionado sem que tivesse sido jogado um lance, o que conta como lance ilegal.
+arbiter.unpromoted = Árbitro: lance ilegal, o peão não foi substituído por uma nova peça antes de o relógio ser acionado.
+arbiter.illegal = Árbitro: lance ilegal.
+arbiter.second_loses.white = É o segundo lance ilegal das brancas: as brancas perdem a partida.
+arbiter.second_loses.black = É o segundo lance ilegal das pretas: as pretas perdem a partida.
+arbiter.second_draw.white = É o segundo lance ilegal das brancas, mas as pretas não podem dar mate: a partida termina empatada.
+arbiter.second_draw.black = É o segundo lance ilegal das pretas, mas as brancas não podem dar mate: a partida termina empatada.
+arbiter.queen = O peão é promovido a dama.
+arbiter.queen_one_minute.white = O peão é promovido a dama e as brancas recebem um minuto adicional.
+arbiter.queen_one_minute.black = O peão é promovido a dama e as pretas recebem um minuto adicional.
+arbiter.queen_two_minutes.white = O peão é promovido a dama e as brancas recebem dois minutos adicionais.
+arbiter.queen_two_minutes.black = O peão é promovido a dama e as pretas recebem dois minutos adicionais.
+arbiter.restored = A posição é reposta.
+arbiter.restored_one_minute.white = A posição é reposta e as brancas recebem um minuto adicional.
+arbiter.restored_one_minute.black = A posição é reposta e as pretas recebem um minuto adicional.
+arbiter.restored_two_minutes.white = A posição é reposta e as brancas recebem dois minutos adicionais.
+arbiter.restored_two_minutes.black = A posição é reposta e as pretas recebem dois minutos adicionais.
+arbiter.one_minute.white = As brancas recebem um minuto adicional.
+arbiter.one_minute.black = As pretas recebem um minuto adicional.
+arbiter.two_minutes.white = As brancas recebem dois minutos adicionais.
+arbiter.two_minutes.black = As pretas recebem dois minutos adicionais.
+arbiter.second_loses = Um segundo lance ilegal faz perder a partida.
+arbiter.touched.white = As brancas têm de mover a peça tocada.
+arbiter.touched.black = As pretas têm de mover a peça tocada.
+arbiter.game_over = A partida terminou.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Ver uma partida
+
+viewer.title = VER UMA PARTIDA
+viewer.white = BRANCAS
+viewer.black = PRETAS
+viewer.time_control = RITMO DE JOGO
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Trocar as cores
+viewer.note = Os dois jogadores são o Stockfish. Voe livremente pelo salão enquanto jogam: ninguém dará pela sua presença.
+viewer.summary = {0} contra {1}
+viewer.custom = Personalizado
+viewer.tc.custom = À sua medida
+viewer.base_time = Tempo base
+viewer.increment = Incremento
+viewer.delay = Atraso
+viewer.off = Desativado
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = atraso {0} s
+viewer.back = Voltar
+viewer.start = Começar
+
+viewer.paused = PAUSA
+viewer.resume = Continuar
+viewer.options = Opções
+viewer.main_menu = Menu principal
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = CONTROLOS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  setas
+viewer.controls.move = Deslocar-se
+viewer.keys.updown = E, Espaço  /  C, Ctrl
+viewer.controls.updown = Subir / descer
+viewer.keys.fast = Shift
+viewer.controls.fast = Mais depressa
+viewer.keys.look = Botão direito do rato
+viewer.controls.look = Olhar em redor
+viewer.keys.speed = Roda do rato
+viewer.controls.speed = Velocidade
+viewer.keys.views = 1 – 9
+viewer.controls.views = Pontos de vista
+viewer.keys.eyes = 0
+viewer.controls.eyes = Pelos olhos do jogador que tem a vez
+viewer.keys.moves = Tab
+viewer.controls.moves = Lista de lances
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Ocultar este painel
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pausa / continuar
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Um lance para trás / para a frente
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Mais devagar / mais depressa
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Início / fim da partida
+viewer.speed = Velocidade {0} m/s
+viewer.view.0 = Pelos olhos dos jogadores
+viewer.view.1 = Ao lado da mesa
+viewer.view.2 = Por cima do tabuleiro
+viewer.view.3 = O salão
+viewer.view.4 = O relógio
+viewer.view.5 = O rosto das brancas
+viewer.view.6 = O rosto das pretas
+viewer.view.7 = O duelo
+viewer.view.8 = As janelas
+viewer.view.9 = As tapeçarias
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+# Portuguese: the side words carry no article, the templates write it ("As {0}", "as {1}") and
+# put the verb in the plural ("as brancas reclamam").
+viewer.side.white = brancas
+viewer.side.black = pretas
+viewer.flag.white = A bandeira das brancas caiu.
+viewer.flag.black = A bandeira das pretas caiu.
+viewer.claims_draw = As {0} reclamam o empate.
+viewer.offer_accepted = As {0} propõem empate e as {1} aceitam.
+viewer.offer_declined = As {0} propõem empate e as {1} recusam.
+viewer.gameover.white_wins = As brancas ganham após o lance {0}.
+viewer.gameover.black_wins = As pretas ganham após o lance {0}.
+viewer.gameover.draw = A partida termina empatada após o lance {0}.
+viewer.gameover.players = {0} contra {1}
+viewer.watch_again = Ver de novo
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Ainda sem partidas com Elo
+elo.provisional = Elo provisório
+elo.peak = Máximo {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = O seu Elo {0}
+elo.expected = pontuação esperada {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · esta partida não conta para o Elo
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Folha de registo
+scoresheet.event = Prova
+scoresheet.date = Data
+scoresheet.round = Ronda
+scoresheet.board = Mesa
+scoresheet.page = Página
+scoresheet.white = Brancas
+scoresheet.black = Pretas
+scoresheet.elo = Elo
+scoresheet.result = Resultado
+scoresheet.move_no = N.º
+scoresheet.sign_white = Assinatura das brancas
+scoresheet.sign_black = Assinatura das pretas
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = R D T B C
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Jogar online
+online.title = JOGAR ONLINE
+online.continue = Continuar
+online.retry = Tentar novamente
+online.copy = Copiar
+online.copied = Copiado
+online.copy.unavailable = Não é possível copiar aqui: tome nota à mão.
+online.rated = Com Elo
+online.casual = Amigável
+online.casual_only = Só amigáveis
+online.color.random = Por sorteio
+online.ping = {0} ms
+online.conn.online = Ligado
+online.conn.connecting = A ligar…
+online.conn.reconnecting = A restabelecer a ligação…
+online.conn.offline = Sem ligação
+online.conn.incompatible = Outra versão
+online.no_server.text = O jogo online precisa de um servidor Scacelith. Introduza o endereço de um servidor nas opções ou jogue diretamente com um amigo numa partida direta.
+online.no_server.settings = Definições do servidor
+
+# Options > Online server
+options.tab.online = Servidor online
+options.online.server = Servidor
+options.online.server.help = O servidor oficial ou um servidor personalizado (da comunidade) gerido por outra pessoa, acessível através da sua API web segura e do seu WebSocket seguro. A sessão é iniciada separadamente em cada servidor: uma conta e o respetivo início de sessão nunca são partilhados entre servidores.
+options.online.official = Servidor oficial — {0}
+options.online.community = Servidor personalizado
+options.online.host = Endereço
+options.online.host.hint = nome de domínio ou endereço IP
+options.online.host.help = Nome de domínio ou endereço IP do servidor personalizado, tal como indicado pelo seu proprietário.
+options.online.api_port = Porta HTTPS / API
+options.online.api_port.help = Porta da API web segura do servidor (443 nos servidores Scacelith).
+options.online.ws_port = Porta WSS
+options.online.ws_port.hint = igual à porta da API
+options.online.ws_port.help = Porta do WebSocket seguro do servidor. Deixe em branco quando for a porta da API.
+options.online.pin = Impressão digital do certificado (SHA-256)
+options.online.pin.hint = opcional
+options.online.pin.help = Para um servidor com um certificado autoassinado: a impressão digital SHA-256 indicada pelo seu proprietário (64 carateres hexadecimais, dois-pontos permitidos). Deixe em branco para confiar nos certificados do sistema.
+options.online.pin.invalid = Uma impressão digital tem 64 carateres hexadecimais (dois-pontos permitidos).
+options.online.test = Testar a ligação
+options.online.test_ok = {0}: ligado, compatível com esta versão.
+options.online.test_incompatible = {0}: ligado, mas requer outra versão do Scacelith.
+options.online.in_game = Não é possível mudar de servidor durante uma partida online.
+options.online.remember_session = Memorizar o início de sessão quando o porta-chaves do sistema não estiver disponível
+options.online.remember_session.help = Quando nenhum porta-chaves do sistema (GNOME Keyring, KWallet…) consegue guardar a sua sessão, esta é guardada num ficheiro que só a sua conta de utilizador pode ler. Qualquer pessoa que consiga ler os seus ficheiros, ou uma cópia deles, como uma cópia de segurança, poderá usar essa sessão. Desativado: a sessão mantém-se iniciada até o jogo ser fechado. Pode terminar a sessão de qualquer dispositivo em Dispositivos com sessão iniciada, na sua conta.
+
+# Sign in, create an account
+online.signin.lead = Inicie sessão em {0} para jogar online com outras pessoas.
+online.field.user = Nome de utilizador ou e-mail
+online.field.user.hint = nome ou endereço
+online.field.password = Palavra-passe
+online.field.password.hint = pelo menos 10 carateres
+online.field.password2 = Confirmar a palavra-passe
+online.field.current_password = Palavra-passe atual
+online.field.new_password = Nova palavra-passe
+online.field.username = Nome de utilizador
+online.field.username.hint = 3 a 24 letras, algarismos, _ ou -
+online.field.email = E-mail
+online.field.new_email = Novo e-mail
+online.field.code = Código
+online.field.code.hint = 6 algarismos ou um código de recuperação
+online.field.code6 = Código da aplicação
+online.field.code6.hint = 6 algarismos
+online.signin.button = Iniciar sessão
+online.signin.google = Continuar com o Google
+online.signin.register = Criar uma conta
+online.signin.forgot = Esqueceu-se da palavra-passe?
+online.mfa.title = CÓDIGO DE DOIS FATORES
+online.mfa.lead = Introduza o código de 6 algarismos apresentado pela sua aplicação de autenticação ou um dos seus códigos de recuperação.
+online.mfa.verify = Verificar
+online.register.title = CRIAR UMA CONTA
+online.register.lead = Uma conta gratuita em {0}: o seu nome, as suas pontuações Elo e as suas partidas ficam apenas neste servidor.
+online.register.button = Criar conta
+online.register.working = A criar a sua conta… pode demorar alguns segundos.
+online.register.ready = A sua conta está pronta. Inicie sessão para jogar.
+online.password.mismatch = As duas palavras-passe são diferentes.
+online.check_email.title = VERIFIQUE O SEU E-MAIL
+online.check_email.text = Enviámos uma ligação para {0}. Abra-a para ativar a sua conta e, depois, inicie sessão aqui.
+online.check_email.ask = Introduza o endereço da sua conta para voltar a receber a ligação de ativação.
+online.check_email.resend = Reenviar o e-mail
+online.check_email.resent = O e-mail foi reenviado. Pode demorar alguns minutos; verifique também a pasta de spam.
+online.forgot.title = PALAVRA-PASSE ESQUECIDA
+online.forgot.lead = Introduza o endereço de e-mail da sua conta: enviar-lhe-emos uma ligação para escolher uma nova palavra-passe.
+online.forgot.button = Enviar a ligação
+online.forgot.sent = Se existir uma conta com este endereço, a ligação já vai a caminho.
+online.sso.title = INICIAR SESSÃO COM O GOOGLE
+online.sso.wait = Continue no seu navegador: escolha a sua conta Google na janela que se abriu. O Scacelith prossegue assim que o Google redirecionar o navegador de volta.
+online.sso.name_title = ESCOLHA O SEU NOME
+online.sso.name_lead = É a primeira vez que entra aqui com o Google. Escolha o nome que os outros jogadores vão ver.
+online.sso.continue = Continuar
+online.sso.finishing = O Google devolveu o controlo ao jogo. A concluir o início de sessão…
+online.sso.link_title = ADICIONAR INÍCIO DE SESSÃO COM GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = A conta {0} em {1} já usa o endereço de e-mail desta conta Google. Introduza a palavra-passe desta conta para lhe adicionar o início de sessão com o Google. Só precisa de o fazer uma vez.
+online.sso.link_button = Adicionar início de sessão Google
+online.sso.link_mfa = O início de sessão com o Google é adicionado a esta conta assim que o código for aceite.
+online.sso.not_mine = Esta conta não é minha
+online.sso.not_mine_note = O início de sessão com o Google não foi adicionado. Se este endereço de e-mail for seu, use «Esqueceu-se da palavra-passe?» com ele: a ligação será enviada para essa caixa de correio. Se a conta também pedir um código de dois fatores que não tem, contacte o administrador do servidor.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: início de sessão Google
+online.sso.page.done_heading = De volta ao Scacelith
+online.sso.page.done = O Google devolveu o controlo ao Scacelith. Volte ao jogo para concluir o início de sessão; pode fechar este separador.
+online.sso.page.cancelled_heading = Início de sessão cancelado
+online.sso.page.cancelled = O início de sessão com o Google foi cancelado. Pode fechar este separador e voltar ao Scacelith.
+online.sso.page.foreign_heading = Esta página não lhe é destinada
+online.sso.page.foreign = Esta página não corresponde ao início de sessão que o Scacelith está a aguardar neste computador. Se não acabou de iniciar sessão com o Google no Scacelith, alguém pode ter-lhe enviado esta ligação: feche este separador.
+
+# Account
+online.account.button = Conta
+online.account.title = CONTA
+online.account.section = CONTA
+online.account.username = NOME DE UTILIZADOR
+online.account.email = E-MAIL
+online.account.unverified = (não verificado)
+online.account.mfa = AUTENTICAÇÃO DE DOIS FATORES
+online.account.mfa_on = Ativada
+online.account.mfa_off = Desativada
+online.account.google = GOOGLE
+online.account.google_linked = Associada a uma conta Google
+online.account.change_password = Alterar a palavra-passe
+online.account.mfa_setup = Ativar dois fatores
+online.account.mfa_disable = Desativar dois fatores
+online.account.recovery = Novos códigos de recuperação
+online.account.sign_out = Terminar sessão
+online.account.sign_out_all = Terminar sessão em todo o lado
+online.account.sign_out_all.help = Termina a sessão desta conta em todos os computadores, incluindo este.
+online.account.signed_out = A sessão foi terminada.
+online.account.signed_out_all = A sessão foi terminada em todos os computadores.
+online.account.signing_out_all = A terminar a sessão em todos os computadores…
+online.account.sign_out_all_failed = Os seus outros computadores podem ainda ter a sessão iniciada: inicie sessão novamente e termine-a em Dispositivos com sessão iniciada. {0}
+online.account.sign_out_all_retry = Os seus outros computadores podem ainda ter a sessão iniciada. Tente novamente «Terminar sessão em todo o lado». {0}
+online.account.ratings = PONTUAÇÕES ELO
+online.account.col.tc = RITMO DE JOGO
+online.account.col.rating = ELO
+online.account.col.games = PARTIDAS
+online.account.col.record = V / E / D
+online.account.provisional = Um ponto de interrogação indica uma pontuação provisória (ainda poucas partidas jogadas).
+online.password.title = ALTERAR A PALAVRA-PASSE
+online.password.button = Alterar a palavra-passe
+online.password.changed = A sua palavra-passe foi alterada.
+online.password.other_sessions = Os seus outros computadores terão de iniciar sessão novamente.
+online.mfa_setup.title = AUTENTICAÇÃO DE DOIS FATORES
+online.mfa_setup.lead = A autenticação de dois fatores pede um código de uma aplicação no seu telemóvel sempre que inicia sessão. Introduza a sua palavra-passe para começar.
+online.mfa_setup.scan = 1. Leia este código com uma aplicação de autenticação ou introduza nela esta chave:
+online.mfa_setup.enter = 2. Introduza o código de 6 algarismos que a aplicação mostra:
+online.mfa_setup.enable = Ativar
+online.mfa_setup.done = A autenticação de dois fatores está ativada.
+online.mfa_off.title = DESATIVAR DOIS FATORES
+online.mfa_off.lead = Introduza a sua palavra-passe e um código da sua aplicação (ou um código de recuperação).
+online.mfa_off.button = Desativar
+online.mfa.off_done = A autenticação de dois fatores está desativada.
+online.recovery.title = CÓDIGOS DE RECUPERAÇÃO
+online.recovery.lead = Cada código permite iniciar sessão uma vez, se perder o telemóvel. Guarde-os num local seguro: só são mostrados agora.
+online.recovery.saved = Já os guardei
+online.recovery.new_title = NOVOS CÓDIGOS DE RECUPERAÇÃO
+online.recovery.new_lead = Os novos códigos substituem os antigos. Introduza a sua palavra-passe e um código da sua aplicação.
+online.recovery.button = Novos códigos
+online.account.manage = SEGURANÇA E DADOS
+online.account.pending_email = A aguardar confirmação: {0}
+online.account.accept_challenges = Aceitar desafios
+online.account.accept_challenges.help = Os outros jogadores podem enviar-lhe desafios através do seu nome de utilizador. Desativado: os desafios deles são recusados.
+online.account.history = Histórico de partidas
+online.account.devices = Dispositivos com sessão iniciada
+online.account.change_email = Alterar o e-mail
+online.account.export = Transferir os meus dados
+online.account.delete = Eliminar a conta
+
+# Play
+online.play.signed_in = Sessão iniciada como {0}
+online.session.file = Nenhum porta-chaves do sistema conseguiu guardar o seu início de sessão: fica memorizado num ficheiro que só a sua conta de utilizador pode ler (Opções > Servidor online).
+online.session.memory = Nenhum porta-chaves do sistema conseguiu guardar o seu início de sessão, e este não é guardado em ficheiro: a sessão mantém-se iniciada até o jogo ser fechado (Opções > Servidor online).
+online.play.find_section = ENCONTRAR UM ADVERSÁRIO
+online.play.friend_section = JOGAR COM UM AMIGO
+online.play.mode = Partida
+online.play.mode.help = As partidas com Elo alteram a sua pontuação neste ritmo de jogo; as partidas amigáveis não.
+online.play.find = Procurar adversário
+online.play.connecting = A ligar ao servidor…
+online.play.cooldown = Poderá voltar a procurar um adversário a partir de {0}.
+online.play.banned = Esta conta está suspensa até {0}.
+online.play.challenge = Desafiar um jogador
+online.play.challenge.desc = Convide alguém que esteja online através do nome de utilizador.
+online.play.private = Partida privada
+online.play.private.desc = Crie um código para dar a um amigo ou entre com o código dele.
+online.play.direct = Partida direta
+online.play.direct.desc = Sem servidor: ligação direta ao computador de um amigo.
+online.search.title = A PROCURAR
+online.search.window = Intervalo de Elo {0}
+online.search.queued = {0} jogador à procura|{0} jogadores à procura
+online.search.wait = À procura de um adversário do seu nível…
+online.outgoing.challenge = DESAFIO ENVIADO
+online.outgoing.waiting = a aguardar resposta
+online.outgoing.private = PARTIDA PRIVADA
+online.outgoing.private_hint = Dê este código ao seu amigo: a partida começa quando ele entrar.
+online.challenge.title = DESAFIAR UM JOGADOR
+online.challenge.opponent = ADVERSÁRIO
+online.field.opponent = Nome de utilizador
+online.field.opponent.hint = quem desafiar
+online.challenge.note = O seu adversário vê o desafio onde quer que esteja nos menus e tem um minuto para responder.
+online.challenge.send = Enviar desafio
+online.terms.rated = Com Elo
+online.terms.rated.help = Só os ritmos de jogo oficiais podem contar para o Elo.
+online.terms.color = A sua cor
+online.private.title = PARTIDA PRIVADA
+online.private.create_section = CRIAR
+online.private.create_note = Recebe um código curto: quem o introduzir joga consigo.
+online.private.create = Criar a partida
+online.private.join_section = ENTRAR
+online.field.private_code = Código
+online.private.join = Entrar
+online.private.joining = A entrar na partida…
+online.challenge.received = DESAFIO
+online.challenge.accept = Aceitar
+online.challenge.decline = Recusar
+online.challenge.you_white = joga com as brancas
+online.challenge.you_black = joga com as pretas
+online.challenge.you_random = cores por sorteio
+online.challenge.declined = {0} recusou o seu desafio.
+online.challenge.expired = O seu desafio expirou sem resposta.
+online.challenge.unavailable = {0} não está disponível neste momento.
+online.challenge.lost = Ligação perdida: o seu desafio foi cancelado.
+
+# At the table
+online.pause.clock_runs = A partida prossegue: o seu relógio continua a contar.
+online.pause.abort = Anular a partida
+online.pause.abort.help = Antes do seu primeiro lance, uma partida pode ser anulada; não conta.
+online.pause.leave = Sair da partida
+online.confirm.resign.text = Abandonar esta partida? O seu adversário ganha-a.
+online.confirm.leave.text = Sair equivale a abandonar esta partida: o seu adversário ganha-a.
+online.confirm.leave.ok = Abandonar e sair
+online.confirm.leave_abort.text = Sair antes do seu primeiro lance? A partida é anulada e não conta.
+online.confirm.leave_abort.ok = Anular e sair
+online.draw.card_title = PROPOSTA DE EMPATE
+online.draw.card_text = O seu adversário propõe empate.
+online.draw.accept = Aceitar
+online.draw.decline = Recusar
+online.draw.offered = O seu adversário propõe empate.
+online.opponent_back = O seu adversário voltou.
+online.opponent_away = Adversário sem ligação — {0} para voltar
+online.first_move = O seu primeiro lance · {0}
+online.reconnecting = A RESTABELECER A LIGAÇÃO…
+online.reconnecting.text = A partida prossegue no servidor e o seu relógio continua a contar.
+online.gameover.aborted = A partida foi anulada: não conta.
+online.rating.casual = Partida amigável: Elo inalterado.
+online.rating.change = Elo {0} → {1} ({2})
+online.rating.pending = Elo: …
+online.rematch.accept = Aceitar desforra
+online.rematch.offered = O seu adversário propõe uma desforra.
+online.rematch.waiting = Desforra proposta…
+online.rematch.gone = Sem desforra
+online.rematch.declined = Desta vez não há desforra.
+online.report.button = Denunciar adversário
+online.report.title = DENÚNCIA
+online.report.lead = As denúncias são enviadas aos moderadores do servidor juntamente com esta partida. Obrigado por ajudar a manter o jogo limpo.
+online.report.category = Motivo
+online.report.cheating = Batota
+online.report.abuse = Comportamento abusivo
+online.report.other = Outro
+online.report.comment = Comentário
+online.report.comment.hint = opcional
+online.report.send = Enviar denúncia
+online.report.sent = Denúncia enviada. Obrigado.
+online.report.queued = A sua denúncia será enviada quando a partida terminar.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = com Elo
+online.sheet.casual = amigável
+online.sheet.game = Partida {0}
+# End reasons of online games
+reason.online.abandonment = O adversário saiu da partida
+reason.online.abandonment_vs_insufficient = Saída da partida, mas o adversário não pode dar mate
+reason.online.aborted = Partida anulada
+reason.online.no_show = Sem primeiro lance a tempo (anulada)
+reason.online.forfeit = Derrota por falta
+reason.online.server_aborted = Anulada pelo servidor
+reason.online.both_disconnected = Ambos os jogadores se desligaram
+# Server notices
+online.notice.shutdown = O servidor vai reiniciar dentro de {0}. As partidas em curso são guardadas.
+online.notice.revoked = A sua sessão neste servidor foi terminada.
+online.notice.replaced = A sua conta ligou-se a partir de outra janela; esta ficou desligada.
+online.notice.rating_restored = O seu Elo recuperou {0} ponto: um adversário foi banido por batota.|O seu Elo recuperou {0} pontos: um adversário foi banido por batota.
+# Errors
+online.err.rate_limited_for = Demasiadas tentativas. Tente novamente dentro de {0}.
+online.err.rate_limited = Demasiadas tentativas. Tente novamente daqui a pouco.
+online.err.server_busy_for = O servidor está ocupado. Tente novamente dentro de {0}.
+online.err.server_busy = O servidor está ocupado. Tente novamente daqui a pouco.
+online.err.banned_until = Esta conta está suspensa até {0}.
+online.err.banned = Esta conta está suspensa.
+online.err.invalid_credentials = Nome de utilizador ou palavra-passe incorretos.
+online.err.invalid_credentials_pending = Nome de utilizador ou palavra-passe incorretos. Se acabou de criar a conta, abra primeiro a ligação que lhe enviámos.
+online.err.email_unverified = O seu endereço de e-mail ainda não foi verificado: abra a ligação que lhe enviámos.
+online.err.network = Não é possível contactar o servidor. Verifique a sua ligação e o endereço do servidor.
+online.err.tls = Não foi possível estabelecer uma ligação segura ao servidor.
+online.err.certificate = O certificado do servidor não é fidedigno (ou não corresponde à impressão digital indicada nas opções).
+online.err.incompatible = Este servidor requer outra versão do Scacelith.
+online.err.unauthorized = A sua sessão terminou: inicie sessão novamente.
+online.err.username_taken = Este nome de utilizador já está a ser usado.
+online.err.email_taken = Já existe uma conta com este endereço de e-mail.
+online.err.invalid_username = Os nomes de utilizador têm entre 3 e 24 letras, algarismos, _ ou -.
+online.err.invalid_email = Este endereço de e-mail não é válido.
+online.err.weak_password = Esta palavra-passe é demasiado fraca: use pelo menos 10 carateres.
+online.err.invalid_code = Este código não está correto.
+online.err.expired = Este pedido expirou: comece de novo.
+online.err.registration_closed = Este servidor não aceita novas contas.
+online.err.sso_cancelled = O início de sessão com o Google foi cancelado.
+online.err.sso_expired = O início de sessão com o Google demorou demasiado ou já foi utilizado. Comece de novo.
+online.err.sso_failed = O início de sessão com o Google não funcionou. Tente novamente.
+online.err.sso_listen = O Scacelith não conseguiu receber a resposta do Google neste computador. Tente novamente.
+online.err.sso_origin = O início de sessão com o Google não funciona através deste endereço de servidor. Adicione o servidor com o nome público indicado pelo seu administrador e tente novamente.
+online.err.browser = Não foi possível abrir o navegador.
+online.err.sso_email_unverified = O Google não confirmou o endereço de e-mail desta conta Google.
+online.err.sso_account_exists = Já existe uma conta com este endereço de e-mail e não é possível associá-la ao início de sessão com o Google: inicie sessão com a respetiva palavra-passe ou use «Esqueceu-se da palavra-passe?».
+online.err.sso_already_linked = Esta conta Google já está associada a outra conta.
+online.err.account_disabled = Esta conta já não pode ser utilizada.
+online.err.server_error = O servidor teve um problema. Tente novamente.
+online.err.timeout = O servidor não respondeu a tempo.
+online.err.offline = Sem ligação ao servidor: tente novamente quando houver ligação.
+online.err.other = O servidor recusou ({0}).
+online.err.code = O servidor recusou (erro {0}).
+online.err.slow_down = Mais devagar, por favor.
+online.err.server_full = O servidor está cheio. Tente novamente mais tarde.
+online.err.restarting = O servidor está a reiniciar. Tente novamente daqui a pouco.
+online.err.move_refused = O servidor recusou esse lance: o tabuleiro foi reposto.
+online.err.game_over = Esta partida já terminou.
+online.err.already_in_game = Já está a jogar uma partida.
+online.err.invalid_category = Este ritmo de jogo não está disponível aqui.
+online.err.draw_offer_limit = Não pode propor mais empates por agora.
+online.err.abort_not_allowed = A partida já não pode ser anulada.
+online.err.no_pending_offer = Não há nenhuma proposta a que responder.
+online.err.flag_fell = O seu tempo esgotou-se.
+online.err.queue_not_allowed = Não pode procurar um adversário neste momento.
+online.err.challenge_not_found = Este desafio já não existe.
+online.err.user_unavailable = Este jogador não está disponível.
+online.err.challenge_limit = Demasiados desafios por agora. Tente novamente mais tarde.
+online.err.challenge_self = Não pode desafiar a sua própria conta.
+online.err.code_invalid = Nenhuma partida tem este código.
+online.err.rated_official_tc = Só os ritmos de jogo oficiais podem contar para o Elo.
+online.err.cooldown = A procura de adversários está suspensa para si durante alguns instantes.
+online.err.invalid_tc = Este ritmo de jogo não é permitido.
+online.err.rematch_unavailable = Já não é possível uma desforra.
+online.err.rated_repeat_limit = Já jogou partidas com Elo suficientes contra este jogador por agora. Jogue uma partida amigável ou tente novamente mais tarde.
+online.err.cheat_detected = A partida foi interrompida pelos controlos de jogo limpo do servidor.
+online.err.invalid_password = Palavra-passe incorreta.
+online.err.mfa_code_required = Introduza um código da sua aplicação de autenticação (ou um código de recuperação).
+online.err.password_not_set = Esta conta inicia sessão com o Google e ainda não tem palavra-passe. Defina primeiro uma com «Esqueceu-se da palavra-passe?» na página de início de sessão.
+online.err.too_many_attempts = Demasiadas tentativas erradas. Tente novamente mais tarde.
+online.err.too_many_attempts_for = Demasiadas tentativas erradas. Tente novamente dentro de {0}.
+online.err.same_email = Este já é o seu endereço de e-mail.
+online.err.not_found = Não encontrado no servidor.
+online.err.invalid_response = Não foi possível ler a resposta do servidor.
+online.err.storage = Não foi possível guardar a sessão neste computador.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = HISTÓRICO DE PARTIDAS
+online.history.filter.games = Partidas
+online.history.filter.result = Resultado
+online.history.filter.all = Todas
+online.history.filter.won = Ganhas
+online.history.filter.lost = Perdidas
+online.history.filter.drawn = Empatadas
+online.history.col.date = DATA
+online.history.col.opponent = ADVERSÁRIO
+online.history.col.result = RESULTADO
+online.history.col.tc = RITMO DE JOGO
+online.history.col.kind = TIPO
+online.history.col.rating = ELO
+online.history.won = Vitória
+online.history.lost = Derrota
+online.history.drawn = Empate
+online.history.aborted = Anulada
+online.history.page = Página {0} de {1}
+online.history.total = {0} partida|{0} partidas
+online.history.previous = Anterior
+online.history.next = Seguinte
+online.history.empty.title = AINDA SEM PARTIDAS
+online.history.empty = As suas partidas neste servidor aparecem aqui depois de terminadas.
+online.history.empty_filter.title = SEM PARTIDAS
+online.history.empty_filter = Nenhuma partida corresponde a estes filtros.
+online.history.error = NÃO FOI POSSÍVEL CARREGAR O HISTÓRICO
+online.history.unavailable = ESTE SERVIDOR NÃO DISPONIBILIZA HISTÓRICO DE PARTIDAS
+online.game.title = PARTIDA
+online.game.players = JOGADORES
+online.game.you = EU
+online.game.unrated = Sem Elo
+online.game.you_won = Ganhou
+online.game.you_lost = Perdeu
+online.game.draw = Empate
+online.game.you_left = Saiu da partida
+online.game.date = DATA
+online.game.time_control = RITMO DE JOGO
+online.game.moves = LANCES
+online.game.move_count = {0} lance|{0} lances
+online.game.no_moves = Não foi jogado nenhum lance.
+online.game.moves_incomplete = Não foi possível ler alguns lances: a lista para antes do fim.
+online.game.save = Guardar a partida
+online.game.saved_button = Guardada
+online.game.saved = A partida está nas suas partidas guardadas.
+online.game.already_saved = Esta partida já está nas suas partidas guardadas.
+online.game.save_failed = Não foi possível guardar a partida.
+online.game.invalid = O servidor enviou um registo de partida que não pode ser lido.
+online.game.replay = Rever
+online.game.not_found = PARTIDA NÃO ENCONTRADA
+online.game.error = NÃO FOI POSSÍVEL CARREGAR A PARTIDA
+online.devices.title = DISPOSITIVOS COM SESSÃO INICIADA
+online.devices.lead = Os dispositivos onde esta conta tem sessão iniciada. Se não reconhecer algum, termine a sessão nesse dispositivo e altere a sua palavra-passe.
+online.devices.unknown = Dispositivo desconhecido
+online.devices.this = ESTE DISPOSITIVO
+online.devices.signed_in = Sessão iniciada a {0}
+online.devices.last_active = última atividade: {0}
+online.devices.active_now = em utilização agora
+online.devices.sign_out = Terminar sessão
+online.devices.signed_out = A sessão nesse dispositivo foi terminada.
+online.devices.error = NÃO FOI POSSÍVEL CARREGAR OS DISPOSITIVOS
+online.devices.all.title = TERMINAR SESSÃO EM TODO O LADO
+online.email.title = ALTERAR O E-MAIL
+online.email.current = Endereço atual: {0}
+online.email.button = Alterar o e-mail
+online.email.sent = Foi enviada uma ligação de confirmação para {0}.
+online.email.sent.hint = O endereço muda assim que a ligação for aberta. Até lá, continua a ser usado o seu endereço atual.
+online.email.done = Concluído
+online.email.changed = O seu endereço de e-mail foi alterado.
+online.export.title = TRANSFERIR OS MEUS DADOS
+online.export.lead = Tudo o que este servidor conserva sobre a sua conta (perfil, pontuações Elo, partidas, dispositivos, eventos de segurança) é guardado num ficheiro JSON neste computador. Introduza a sua palavra-passe para confirmar.
+online.export.button = Transferir
+online.export.saved = Os seus dados foram guardados neste computador.
+online.export.failed = Não foi possível escrever o ficheiro.
+online.delete.title = ELIMINAR A CONTA
+online.delete.warning = A sua conta será eliminada deste servidor: o seu endereço de e-mail, a palavra-passe, a autenticação de dois fatores e os dispositivos são apagados, e deixa de poder iniciar sessão. Esta ação não pode ser anulada.
+online.delete.games = As suas partidas e pontuações Elo ficam no servidor com o nome anónimo {0}.
+online.delete.confirm_name = Para confirmar, introduza o seu nome de utilizador e a sua palavra-passe.
+online.delete.button = Eliminar a minha conta
+online.delete.done = A sua conta foi eliminada.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Partida direta
+online.direct.title = PARTIDA DIRETA
+online.direct.lead = Uma partida amigável diretamente entre dois computadores: sem servidor, sem conta, nunca conta para o Elo.
+online.direct.host = Criar uma partida
+online.direct.host.desc = O seu amigo liga-se a si: dá-lhe o seu endereço e um código.
+online.direct.join = Entrar numa partida
+online.direct.join.desc = Ligar-se a um amigo que criou uma partida.
+online.direct.host_title = CRIAR UMA PARTIDA
+online.direct.your_color = A sua cor
+online.direct.auto_press.help = Os dois robôs carregam no relógio sozinhos assim que um lance está no tabuleiro. Desativado: cada jogador carrega no relógio após cada lance.
+online.direct.unrated = As partidas diretas são amigáveis: nunca contam para o Elo.
+online.direct.connection = LIGAÇÃO
+online.direct.port = Porta
+online.direct.port.help = Porta TCP à qual o seu amigo se liga (47100, exceto se estiver ocupada).
+online.direct.port_range = Escolha uma porta entre 1024 e 65535.
+online.direct.upnp = Abrir a porta no meu router (UPnP)
+online.direct.upnp.help = Pede ao router doméstico que reencaminhe a porta para este computador e fecha-a depois da partida.
+online.direct.host_note_upnp = O jogo pede ao seu router que abra a porta. Se não conseguir, ser-lhe-á indicada a porta a reencaminhar manualmente.
+online.direct.host_note_manual = Reencaminhe a porta TCP para este computador no seu router ou jogue na mesma rede.
+online.direct.host_button = Criar
+online.direct.wait_title = À ESPERA DO SEU AMIGO
+online.direct.opening = A abrir a porta {0} no seu router…
+online.direct.give = Dê ao seu amigo:
+online.direct.cap_address = ENDEREÇO
+online.direct.cap_port = PORTA
+online.direct.cap_code = CÓDIGO
+online.direct.lan = Na mesma rede: {0}
+online.direct.router = o seu router
+online.direct.upnp_searching = À procura do seu router…
+online.direct.upnp_mapped = Porta aberta em {0}.
+online.direct.upnp_none = Nenhum router UPnP respondeu: reencaminhe manualmente a porta TCP {0} para este computador.
+online.direct.upnp_failed = O router recusou abrir a porta: reencaminhe manualmente a porta TCP {0} para este computador.
+online.direct.upnp_off = Reencaminhe a porta TCP {0} para este computador no seu router.
+online.direct.upnp_cgnat = O seu fornecedor de internet provavelmente partilha o seu endereço de internet (CGNAT): experimente o IPv6 ou uma VPN.
+online.direct.firewall = Se o Windows perguntar se o Scacelith pode aceitar ligações, permita-o.
+online.direct.waiting = À espera do seu amigo…
+online.direct.connecting_friend = O seu amigo está a ligar-se…
+online.direct.starting = A preparar o tabuleiro…
+online.direct.join_title = ENTRAR NUMA PARTIDA
+online.direct.join_lead = Introduza o que o seu amigo lhe indicar: o endereço dele, a porta e o código.
+online.direct.address = Endereço
+online.direct.address.hint = IPv4, IPv6 ou nome
+online.direct.code = Código
+online.direct.join_button = Entrar
+online.direct.connecting_to = A ligar a {0}…
+online.direct.securing = A proteger a ligação com {0}…
+direct.event = Partida amigável
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Direta, {0}
+direct.err.refused = Ninguém está a aguardar uma partida neste endereço e nesta porta.
+direct.err.timeout = Sem resposta: verifique o endereço e a porta, e se o router do seu amigo deixa entrar o jogo.
+direct.err.wrong_code = O código não está correto.
+direct.err.invalid_code = Um código tem 12 carateres (XXXX-XXXX-XXXX).
+direct.err.incompatible = O seu amigo tem outra versão do Scacelith.
+direct.err.port_in_use = Esta porta já está a ser usada neste computador: escolha outra.
+direct.err.network = Não foi possível usar a rede.
+direct.err.too_many_attempts = Demasiados códigos errados: a partida foi fechada. Crie-a de novo para obter um novo código.
+direct.err.bad_address = Este endereço não é válido.
+direct.err.not_found = Este nome não foi encontrado.
+direct.err.unreachable = Não é possível chegar a este endereço a partir daqui.
+direct.err.reset = A ligação foi cortada.
+direct.err.closed = A ligação foi fechada.
+direct.err.host_left = O seu amigo fechou a partida.
+direct.err.other = A ligação falhou ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Jogador 2
+hotseat.white_player = Brancas
+hotseat.black_player = Pretas
+hotseat.name.help = O nome escrito nas duas folhas de registo, em qualquer alfabeto.
+hotseat.swap = Trocar as cores
+hotseat.left_hand = {0} joga com a mão esquerda: o relógio fica do lado esquerdo.
+hotseat.rated = Partida com Elo
+hotseat.rated.help = Cada nome tem a sua própria pontuação Elo a dois neste computador. A sua pontuação Elo contra o Stockfish nunca muda.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Elo a dois: {0} {1} · {2} {3}
+hotseat.new_rating = (novo)
+hotseat.friendly_note = Partida amigável: o Elo não muda.
+hotseat.colours = {0} joga com as brancas, {1} joga com as pretas.
+hotseat.colours_swap = As cores trocam a cada desforra.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+# Portuguese: no word may agree with a player's gender ("{1} ganhará", not "será declarado vencedor").
+hotseat.your_move = {0}, é a sua vez
+hotseat.flag = A bandeira de {0} caiu.
+hotseat.confirm.resign = Abandonar em nome de {0}? {1} ganhará a partida.
+hotseat.confirm.resign_draw = Abandonar em nome de {0}? {1} já não pode dar mate: a partida terminará empatada.
+hotseat.draw.offer_noted = A sua proposta de empate segue com o seu lance: {0} vai vê-la assim que o seu relógio for acionado.
+hotseat.draw.card_title = PROPOSTA DE EMPATE
+hotseat.draw.offered = {0} propõe empate.
+hotseat.draw.card_hint = Tocar numa peça recusa a proposta.
+hotseat.draw.accept = Aceitar
+hotseat.draw.decline = Recusar
+hotseat.draw.accepted = {0} aceita o empate proposto por {1}.
+hotseat.draw.declined = {0} recusa o empate proposto por {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Partida com Elo
+hotseat.sheet.friendly = Partida amigável
+# Game over card
+hotseat.gameover.wins = {0} ganha em {1} lance.|{0} ganha em {1} lances.
+hotseat.gameover.wins_now = {0} ganha.
+hotseat.gameover.friendly = {0} contra {1} · partida amigável
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Esta partida não conta para o Elo.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Treinador
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Voz sintética gerada pelo {0} para o modo Treinador
+# Coach page
+coach.title = TREINADOR
+coach.section.level = NÍVEL
+coach.section.lesson = COM O TREINADOR
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Para jogadores com {0}
+coach.completed = Concluído
+coach.recommended = Recomendado
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = As regras do xadrez
+coach.level.0.desc = Uma lição interativa, uma regra de cada vez.
+coach.level.0.detail = O treinador monta pequenas posições e mostra como cada peça se move e captura e, depois, o roque, a promoção, o xeque e o xeque-mate. Experimente cada ideia no tabuleiro.
+coach.level.1.name = Primeiros passos
+coach.level.1.desc = O que está atacado, o que ficou sem proteção.
+coach.level.1.detail = O treinador joga com brandura e fala de forma simples: quais das suas peças estão atacadas, quais ficaram sem proteção e como as conservar.
+coach.level.2.name = Principiante
+coach.level.2.desc = Tática simples, desenvolvimento, segurança do rei.
+coach.level.2.detail = Os garfos e as cravadas são chamados pelo nome. O treinador fala de desenvolver as suas peças e de manter o seu rei em segurança.
+coach.level.3.name = Intermédio
+coach.level.3.desc = Planos, estrutura de peões, lances únicos.
+coach.level.3.detail = O treinador explica planos e estruturas de peões e avisa quando só um lance segura a posição.
+coach.level.4.name = Jogador de clube
+coach.level.4.desc = Lances candidatos, avaliação em peões.
+coach.level.4.detail = O treinador pondera os lances candidatos e dá a avaliação em peões, como faria um treinador de clube.
+coach.level.5.name = Jogador de clube forte
+coach.level.5.desc = Variantes concisas, termos posicionais.
+coach.level.5.detail = Comentários curtos, variantes concretas e o vocabulário do jogo posicional.
+coach.level.6.name = Especialista
+coach.level.6.desc = Comentários secos, variantes longas, avaliações em números.
+coach.level.6.detail = Poucas palavras, como entre jogadores fortes: variantes com vários lances de profundidade e avaliações em números.
+coach.note.clock = Sem relógio: tome o tempo que precisar.
+coach.note.takeback = Depois de um erro grave, o treinador mostra o que correu mal e propõe anular o lance.
+coach.note.lesson = Joga com as brancas; o treinador monta cada exercício no tabuleiro.
+coach.note.unrated = As partidas com o treinador não contam para o Elo.
+coach.note.fallible = O treinador não é infalível: por vezes, pode avaliar mal um lance.
+coach.colour = A sua cor
+coach.colour.help = A cor com que joga contra o treinador. Alternar: brancas e depois pretas, de uma partida para a seguinte. A lição sobre as regras joga-se sempre com as brancas.
+coach.colour.alternate = Alternar
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = A voz do treinador não está instalada ou está desativada (Opções > Áudio): as palavras do treinador serão escritas no ecrã.
+# At the table
+coach.speaker = TREINADOR
+coach.skip = Saltar
+coach.offer.title = ANULAR O LANCE?
+coach.offer.text = O treinador propõe anular o seu último lance, para que possa procurar um melhor.
+coach.offer.hint = Retrocesso anula o lance. Tocar numa peça continua a partida.
+coach.offer.accept = Anular lance
+coach.offer.decline = Continuar
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Anulações restantes: {0}
+coach.pause.take_back = Anular o meu lance
+coach.pause.take_back.help = Anula o seu último lance e a resposta do treinador, se este já tiver jogado.
+coach.confirm.resign = Abandonar esta partida? O treinador será declarado vencedor.
+coach.confirm.resign_draw = Abandonar esta partida? O treinador já não pode dar mate: a partida terminará empatada.
+coach.confirm.leave = Voltar ao menu principal? Esta partida com o treinador será abandonada.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Jogar de novo
+coach.gameover.unrated = Esta partida com o treinador não conta para o Elo.
+coach.lesson.done = MUITO BEM
+coach.lesson.done.line = Já conhece as regras do xadrez.
+coach.lesson.next = Primeira partida
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Treino
+coach.tab.challenges = Desafios
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = XEQUE-MATES
+challenge.group.tactics = TÁTICA
+challenge.group.defence = DEFESA
+challenge.group.endgames = FINAIS
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mate num lance
+challenge.mate1.desc = Um lance, e é xeque-mate.
+challenge.mate1.detail = Veja primeiro todos os xeques: um deles não deixa ao rei nenhuma casa, nenhuma interposição e nenhuma captura.
+challenge.mate2.name = Mate em dois
+challenge.mate2.desc = Um lance que não deixa defesa e, depois, mate.
+challenge.mate2.detail = O primeiro lance é muitas vezes um xeque ou um sacrifício que tira uma casa ao rei. O treinador defende-se o melhor que pode.
+challenge.mate3.name = Mate em três
+challenge.mate3.desc = Variantes forçadas mais longas.
+challenge.mate3.detail = Xeques, capturas e ameaças, com três lances de profundidade. Calcule a melhor resposta do treinador em cada passo antes de tocar numa peça.
+challenge.backrank.name = Mates na última fila
+challenge.backrank.desc = Um rei preso atrás dos seus próprios peões.
+challenge.backrank.detail = Quando os peões à frente de um rei rocado não se moveram, uma torre ou uma dama na última fila pode dar xeque-mate. Elimine ou desvie primeiro os defensores.
+challenge.patterns.name = Padrões de mate
+challenge.patterns.desc = Mate sufocado, de Anastásia, árabe e outros clássicos.
+challenge.patterns.detail = Redes de mate famosas que aparecem vezes sem conta. Aprenda a reconhecer a disposição das peças e o golpe final.
+challenge.hanging.name = Peças indefesas
+challenge.hanging.desc = Descubra o que ficou sem proteção.
+challenge.hanging.detail = Uma peça ou um peão que ninguém defende pode simplesmente ser capturado. Verifique o que protege cada uma das peças do treinador.
+challenge.fork.name = Garfos
+challenge.fork.desc = Uma peça ataca duas ao mesmo tempo.
+challenge.fork.detail = Os cavalos, os peões, as damas e até os reis podem fazer garfos. O adversário só consegue salvar um dos dois alvos.
+challenge.pin.name = Cravadas
+challenge.pin.desc = Uma peça que não se pode mover sem perder o que está atrás dela.
+challenge.pin.detail = Crave uma peça ao seu rei ou a uma peça mais valiosa e, depois, ataque-a outra vez, ou aproveite o facto de ela não se poder mover.
+challenge.skewer.name = Espetos
+challenge.skewer.desc = Ataque uma peça valiosa e ganhe a que está atrás dela.
+challenge.skewer.detail = O inverso da cravada: a peça mais valiosa está à frente, tem de sair e descobre a peça que está atrás.
+challenge.discovered.name = Ataques descobertos
+challenge.discovered.desc = Mova uma peça para desencadear o ataque de outra.
+challenge.discovered.detail = Quando uma peça sai de uma linha, a peça que está atrás ataca. Com xeque, ou com xeque duplo, o adversário não tem tempo para responder às duas ameaças.
+challenge.deflection.name = Desvio e atração
+challenge.deflection.desc = Afaste um defensor ou atraia-o para uma casa fatal.
+challenge.deflection.detail = Um defensor com duas tarefas não consegue cumprir ambas. Ataque-o, ofereça-lhe algo ou obrigue uma peça a ir para a casa onde será perdida.
+challenge.intermezzo.name = Lances intermédios
+challenge.intermezzo.desc = Não retome de imediato: há algo mais forte.
+challenge.intermezzo.detail = Antes do lance esperado, um xeque ou uma ameaça maior pelo meio muda tudo.
+challenge.trapped.name = Peças presas
+challenge.trapped.desc = Uma peça sem nenhuma casa segura.
+challenge.trapped.detail = Tire a uma peça as últimas casas de fuga e, depois, ganhe-a.
+challenge.promotion.name = Promoção
+challenge.promotion.desc = Leve um peão até à última fila.
+challenge.promotion.detail = Os peões avançados valem muito. Abra caminho, desvie os bloqueadores e faça uma nova dama.
+challenge.quiet.name = Lances tranquilos
+challenge.quiet.desc = O lance vencedor não é nem um xeque nem uma captura.
+challenge.quiet.detail = Por vezes, o lance mais forte limita-se a preparar uma ameaça que não pode ser evitada. O tipo de lance mais difícil de ver.
+challenge.opening.name = Armadilhas de abertura
+challenge.opening.desc = Castigue os erros precoces.
+challenge.opening.detail = Posições dos primeiros lances de partidas reais, em que um lance descuidado pode ser aproveitado de imediato.
+challenge.escape.name = Encontre a saída
+challenge.escape.desc = O seu rei está em perigo: um lance salva-o.
+challenge.escape.detail = Todos os outros lances perdem. Veja todos os xeques e ameaças contra o seu rei e encontre a única saída.
+challenge.defend.name = Lances defensivos
+challenge.defend.desc = Neutralize a ameaça sem perder material.
+challenge.defend.detail = O treinador ameaça algo. Encontre o lance preciso que mantém tudo protegido.
+challenge.kq.name = Dama e rei contra rei
+challenge.kq.desc = Xeque-mate com a dama.
+challenge.kq.detail = Empurre o rei isolado para a borda do tabuleiro com a sua dama, aproxime o seu próprio rei e tenha cuidado com o afogamento. O treinador defende-se com os seus melhores lances.
+challenge.kr.name = Torre e rei contra rei
+challenge.kr.desc = Xeque-mate com a torre.
+challenge.kr.detail = A torre corta o caminho ao rei, fila a fila; o seu rei toma a oposição. O treinador defende-se com os seus melhores lances.
+challenge.kp.name = Rei e peão contra rei
+challenge.kp.desc = Ganhe a oposição e promova o peão.
+challenge.kp.detail = Avance com o rei à frente, não com o peão. Tome a oposição e faça uma dama que o treinador não consiga apanhar.
+challenge.kp_hold.name = Travar o peão
+challenge.kp_hold.desc = Um rei isolado contra rei e peão: segure o empate.
+challenge.kp_hold.detail = Coloque o rei à frente do peão e mantenha a oposição. Aguente durante dez lances.
+challenge.rook.name = Finais de torres
+challenge.rook.desc = A ponte de Lucena e a defesa de Philidor.
+challenge.rook.detail = As duas posições que todos os jogadores devem conhecer: como ganhar com um peão na sétima fila e como defender com a torre na terceira.
+challenge.endgame.name = Tática nos finais
+challenge.endgame.desc = Poucas peças, ideias incisivas.
+challenge.endgame.detail = Corridas de peões, ruturas e finais de torres de partidas reais.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} posição|{0} posições
+coach.challenge.done = Concluído
+coach.challenge.start = Começar
+coach.challenge.note.white = Joga com as brancas; o treinador monta cada posição no tabuleiro.
+coach.challenge.note.hint = Sem ideias? Prima H para obter uma sugestão. Após algumas tentativas, o treinador oferece uma.
+coach.challenge.note.unsaved = Os desafios não contam para o Elo nem são guardados; uma marca de verificação indica os que já concluiu.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = DESAFIO CONCLUÍDO
+coach.challenge.complete.line = Resolveu todas as posições.
+coach.challenge.next = Desafio seguinte
+coach.challenge.again = Repetir
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = UMA SUGESTÃO?
+coach.hint.text = O treinador oferece-lhe uma sugestão.
+coach.hint.hint = H mostra a sugestão. Tocar numa peça continua a procura.
+coach.hint.accept = Sugestão
+# "Não, obrigado" would agree with the player's gender.
+coach.hint.decline = Agora não
+coach.hint.key = Sugestão
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Voz do treinador
+options.coach_voice.help = O treinador fala em voz alta no modo Treinador. O modelo de voz é transferido da primeira vez que é necessário (cerca de 399 MB). Desativado: as palavras do treinador só são escritas no ecrã.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Modelo de voz
+options.voice_update.help = O treinador ainda fala com a antiga versão de 8 bits do seu modelo de voz. A atualização transfere a versão oficial do Supertonic 3, publicada pela Supertone, e apaga primeiro os ficheiros antigos.
+options.voice_update.button = Atualizar ({0} MB)
+options.voice_update.running = A transferência está em curso.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Qualidade da voz
+options.voice_quality.help = Quantos passos de refinamento a síntese de voz do treinador executa para cada frase, de Baixa (4) a Máxima (9); Média (5) por predefinição. Um nível mais alto dá uma voz ligeiramente mais limpa, mas demora mais a calcular, pelo que o treinador começa a falar um pouco mais tarde. Pode ser definida depois de o modelo de voz estar instalado, com a Voz do treinador ativada.
+options.voice_quality.low = Baixa
+options.voice_quality.medium = Média
+options.voice_quality.high = Alta
+options.voice_quality.very_high = Muito alta
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Máxima
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = A voz do treinador
+coach.download.text = O treinador fala com o Supertonic 3, um modelo de síntese de voz da Supertone. Não está incluído no Scacelith: o jogo pode transferi-lo agora do Hugging Face ({0} MB, uma única vez). Sem ele, o treinador escreve as suas palavras no ecrã.
+coach.download.licence = O modelo é publicado ao abrigo da licença OpenRAIL-M, que proíbe certas utilizações da voz que produz, como apresentá-la como uma voz humana ou imitar uma pessoa real.
+coach.download.read_licence = Ler a licença
+coach.download.accept = Ao escolher Transferir, aceita os termos desta licença.
+# {0} = a folder
+coach.download.folder = Guardado em: {0}
+coach.download.not_now = Agora não
+# {0} = the size in megabytes
+coach.download.download = Transferir ({0} MB)
+coach.download.licence_title = LICENÇA OPENRAIL-M
+coach.download.back = Voltar
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Uma nova voz para o treinador
+coach.update.text = A voz do treinador passa a usar a versão oficial do Supertonic 3, publicada pela Supertone, em vez da conversão de 8 bits instalada até agora. O jogo pode transferi-la agora do Hugging Face ({0} MB, uma única vez); os ficheiros antigos ({1} MB) são apagados primeiro. Se recusar, o treinador mantém a voz atual e a atualização continua disponível em Opções > Áudio.
+coach.update.download = Atualizar ({0} MB)
+coach.update.accept = Ao escolher Atualizar, aceita os termos desta licença.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = A VOZ DO TREINADOR
+coach.download.removing = A remover a versão antiga…
+coach.download.checking = A verificar os ficheiros…
+coach.download.downloading = A transferir…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Do Hugging Face
+coach.download.from_archive = Do Hugging Face (cópia arquivada)
+coach.download.cancel = Cancelar
+coach.download.failed = A transferência falhou.
+coach.download.error.network = Não foi possível contactar os servidores. Verifique a sua ligação à Internet e tente novamente.
+# {0} = a folder
+coach.download.error.disk = Não foi possível escrever os ficheiros em {0}. Verifique o espaço livre e tente novamente.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Os servidores enviaram uma resposta inesperada ({0}). Tente novamente mais tarde.
+coach.download.retry = Tentar novamente
+coach.download.close = Fechar
+# Notices
+coach.download.done = A voz do treinador está instalada.
+coach.download.cancelled = Transferência cancelada: da próxima vez, será retomada onde parou.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Partidas guardadas
+options.save_games = Guardar as minhas partidas
+options.save_games.help = Quando terminam, as suas partidas contra o Stockfish, com o treinador, entre dois jogadores neste computador e as suas partidas diretas são guardadas como ficheiros PGN, que pode voltar a encontrar em Partidas guardadas. As partidas online são conservadas pelo servidor.
+library.title = PARTIDAS GUARDADAS
+library.section.games = PARTIDAS
+library.section.details = A PARTIDA
+library.section.tags = ETIQUETAS
+library.section.moves = LANCES
+library.count = {0} partida|{0} partidas
+library.filter = Mostrar
+library.filter.all = Todas as partidas
+library.filter.play = Contra o Stockfish
+library.filter.coach = Com o treinador
+library.filter.hotseat = Dois jogadores
+library.filter.direct = Partidas diretas
+library.filter.server = Partidas online
+library.filter.imported = Importadas
+library.mode.play = Contra o Stockfish
+library.mode.coach = Com o treinador
+library.mode.hotseat = Dois jogadores
+library.mode.direct = Partida direta
+library.mode.server = Partida online
+library.mode.imported = Importada
+library.coach_level = Nível {0}
+library.unknown_player = Sem nome
+library.unfinished = Inacabada
+library.unreadable = Não é possível ler esta partida.
+library.moves = {0} lance|{0} lances
+library.opening_variation = {0}: {1}
+library.file = Ficheiro: {0}
+library.file_game = Ficheiro: {0}, partida {1} de {2}
+library.no_moves = Não foi jogado nenhum lance.
+library.none_selected = Selecione uma partida na lista.
+library.reading = A ler as partidas guardadas
+library.empty.title = Ainda não há partidas guardadas
+library.empty.text = As suas partidas contra o Stockfish, com o treinador, entre dois jogadores neste computador e as suas partidas diretas aparecem aqui depois de terminadas. Também pode colocar ficheiros PGN nesta pasta: as partidas exportadas de outros programas ou sites são listadas juntamente com as suas.
+library.empty.filter = Nenhuma partida deste tipo.
+library.error.folder = Não é possível ler a pasta das partidas guardadas
+library.error.game = Não é possível ler esta partida: {0}
+library.folder = Pasta: {0}
+library.open_folder = Abrir pasta
+library.open_failed = Não foi possível abrir a pasta.
+library.replay = Rever
+library.delete = Eliminar
+library.delete.title = ELIMINAR A PARTIDA
+library.delete.text = A partida {0} será eliminada deste computador, juntamente com o seu ficheiro. Esta ação não pode ser anulada.
+library.delete.ok = Eliminar
+library.delete.several = Este ficheiro contém {0} partida: só pode ser eliminado a partir da pasta.|Este ficheiro contém {0} partidas: só pode ser eliminado a partir da pasta.
+library.deleted = A partida foi eliminada.
+library.delete.failed = Não foi possível eliminar a partida.
+library.delete.changed = O ficheiro foi alterado: a lista foi atualizada.
+library.truncated = Esta pasta contém demasiadas partidas: só são listadas as {0} mais recentes.
+library.tag.Event = Prova
+library.tag.Site = Local
+library.tag.Date = Data
+library.tag.Time = Hora
+library.tag.Round = Ronda
+library.tag.White = Brancas
+library.tag.Black = Pretas
+library.tag.Result = Resultado
+library.tag.WhiteElo = Elo das brancas
+library.tag.BlackElo = Elo das pretas
+library.tag.TimeControl = Ritmo de jogo
+library.tag.Termination = Fim da partida
+library.tag.Opening = Abertura
+library.tag.Variation = Variante
+library.tag.PlyCount = Meios-lances
+library.tag.FEN = Posição inicial
+library.tag.ScacelithMode = Modo
+library.tag.CoachLevel = Nível do treinador
+library.tag.ScacelithServer = Servidor
+library.tag.ScacelithGameId = Número da partida
+library.tag.UTCDate = Data (UTC)
+library.tag.UTCTime = Hora (UTC)
+library.tag.WhiteRatingDiff = Variação do Elo das brancas
+library.tag.BlackRatingDiff = Variação do Elo das pretas
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Análise
+analysis.menu.title = ANÁLISE
+analysis.menu.analyse = Analisar
+analysis.menu.paste = Colar um PGN
+analysis.menu.online = As minhas partidas online
+analysis.menu.folder = Coloque ficheiros PGN nesta pasta para os analisar: {0}
+analysis.menu.empty.title = Ainda não há partidas guardadas
+analysis.menu.empty.text = As suas partidas aparecem aqui depois de terminadas, tal como os ficheiros PGN colocados na pasta abaixo. Também pode colar uma partida copiada como texto PGN.
+analysis.menu.empty.no_folder = Cole uma partida copiada como texto PGN para a analisar.
+analysis.menu.paste.empty = A área de transferência está vazia: copie primeiro uma partida como texto PGN.
+analysis.menu.paste.none = Não foi encontrada nenhuma partida de xadrez na área de transferência.
+analysis.menu.paste.several = A área de transferência contém várias partidas: é analisada a primeira.
+analysis.menu.gameover = Analisar a partida
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Lance {0} de {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Instantâneo
+replay.again = Rever de novo
+replay.gameover.unfinished = A partida interrompe-se após o lance {0}, sem resultado.
+replay.tip.start = Início da partida (Home)
+replay.tip.back = Um lance para trás (J)
+replay.tip.pause = Pausa (K)
+replay.tip.resume = Continuar (K)
+replay.tip.forward = Um lance para a frente (L)
+replay.tip.end = Fim da partida (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMENTÁRIO
+analysis.hud.accuracy = PRECISÃO
+analysis.hud.reviewing = O Stockfish está a analisar a partida… {0}
+analysis.hud.no_engine = Sem motor de xadrez: os lances são mostrados sem análise.
+analysis.hud.no_moves = Esta partida não tem lances.
+analysis.hud.tip.play = Reproduzir os lances (K)
+analysis.hud.tip.comments_off = Ocultar os comentários dos momentos-chave (N)
+analysis.hud.tip.comments_on = Mostrar os comentários dos momentos-chave (N)
+analysis.hud.tip.voice_off = Silenciar a voz do comentador (M)
+analysis.hud.tip.voice_on = Ouvir os comentários em voz alta (M)
+analysis.hud.tip.voice_missing = A voz não pode ser ouvida: os ficheiros não estão instalados ou a opção Opções > Áudio > Voz do treinador está desativada. Os comentários só são escritos no ecrã.
+analysis.hud.tip.arrows_off = Ocultar as setas dos melhores lances (B)
+analysis.hud.tip.arrows_on = Mostrar as setas dos melhores lances (B)
+analysis.hud.controls.play = Reproduzir / pausa
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Mostrar / ocultar os comentários
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Voz do comentador ativada / desativada
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Mostrar / ocultar as setas
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Guardar como GIF
+gif.making = A criar o GIF: o servidor está a desenhar a partida…
+gif.saved = O GIF foi guardado:
+gif.saved_as = GIF guardado: {0}
+gif.sign_in_first = Inicie sessão num servidor online para criar GIFs: é o servidor que os desenha.
+gif.busy_other = Já está a ser criado outro GIF. Aguarde até que esteja pronto.
+gif.err.rate_limited_for = Criou muitos GIFs em pouco tempo. Poderá criar o próximo dentro de {0}.
+gif.err.rate_limited = Criou muitos GIFs em pouco tempo. Tente novamente mais tarde.
+gif.err.server_busy_for = O servidor está ocupado a desenhar outros GIFs. Tente novamente dentro de {0}.
+gif.err.server_busy = O servidor está ocupado a desenhar outros GIFs. Tente novamente daqui a pouco.
+gif.err.signed_out = A sua sessão terminou. Inicie sessão novamente para criar um GIF.
+gif.err.game_too_long = Esta partida é demasiado longa para ser transformada num GIF.
+gif.err.pgn_too_large = Esta partida é demasiado longa para ser transformada num GIF.
+gif.err.invalid_pgn = O servidor não conseguiu ler esta partida.
+gif.err.render_failed = O servidor não conseguiu criar este GIF. Tente novamente.
+gif.err.gif_disabled = Este servidor não cria GIFs.
+gif.err.write_failed = Não foi possível guardar o GIF neste computador.
+gif.err.not_found = Esta partida já não está no servidor.
+gif.wait.seconds = {0} segundo|{0} segundos
+gif.wait.minutes = {0} minuto|{0} minutos
+gif.wait.both = {0} e {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Não foi possível iniciar o OpenGL 4.6. Atualize o controlador da placa gráfica.
+error.opengl_macos = Não foi possível iniciar o OpenGL 4.6 neste Mac. O Scacelith requer Apple Silicon (M1 ou posterior) e macOS 26 ou posterior, e não funciona numa máquina virtual.
+error.renderer = Não foi possível iniciar o motor de renderização.
+error.scene = Não foi possível carregar a cena.
+error.log_file = Os detalhes estão no ficheiro de registo: {0}

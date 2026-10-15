@@ -1,0 +1,137 @@
+# Coach speech (European Portuguese): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 posições", count.position in
+#            common.lang), "{n:move}" likewise ("2 lances"). Nothing after "{n:position}" agrees
+#            with it (the noun is singular or plural with the number).
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "xeque-mate" (the line says it)
+#   {your}   one of the player's pieces ("o teu cavalo", "a tua torre"); the coach points at it on that word
+#   {sq}     a square ("a casa {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "tu" to the player; the coach is male.
+# The player's gender is unknown: no adjective or participle agrees with the player ("Bem defendido!"
+# is an invariable exclamation, like "Bem jogado!").
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mate num lance. {n:position}, e de cada vez há um único lance que dá mate. Vê todos os xeques.
+ch.intro.mate2 = Mate em dois. {n:position}: o teu primeiro lance tem de me deixar sem defesa, e depois dás mate.
+ch.intro.mate3 = Mate em três. {n:position}. Xeques, capturas e ameaças: calcula a minha melhor resposta de cada vez.
+ch.intro.backrank = Mates na última fila. {n:position} em que um rei está preso atrás dos seus próprios peões.
+ch.intro.patterns = Padrões de mate. {n:position} com redes de mate clássicas. Reconhece o padrão e depois ataca.
+ch.intro.hanging = Peças indefesas. {n:position}: há algo meu que ficou sem proteção. Encontra-o e toma-o.
+ch.intro.fork = Garfos. {n:position}: encontra o lance que ataca duas coisas ao mesmo tempo.
+ch.intro.pin = Cravadas. {n:position}: crava uma peça, ou tira partido de uma cravada.
+ch.intro.skewer = Espetos. {n:position}: ataca uma peça valiosa e ganha o que está atrás dela.
+ch.intro.discovered = Ataques descobertos. {n:position}: move uma peça para libertar outra.
+ch.intro.deflection = Desvio e atração. {n:position}: afasta um defensor, ou atrai-o para uma casa fatal.
+ch.intro.intermezzo = Lances intermédios. {n:position}: antes do lance óbvio, encontra um mais forte.
+ch.intro.trapped = Peças presas. {n:position}: uma das minhas peças não tem para onde fugir em segurança. Ganha-a.
+ch.intro.promotion = Promoção. {n:position} em que um peão avançado decide a partida.
+ch.intro.quiet = Lances tranquilos. {n:position}: o lance vencedor não é um xeque nem uma captura.
+ch.intro.opening = Armadilhas de abertura. {n:position} dos primeiros lances de partidas reais. Castiga o meu erro.
+ch.intro.escape = Encontra a fuga. {n:position}: o teu rei está em perigo, e só um lance o salva.
+ch.intro.defend = Lances defensivos. {n:position}: encontra o único lance que segura a tua posição.
+ch.intro.kq = Dama e rei contra rei. {n:position}: dá xeque-mate ao meu rei. Cuidado com o afogamento.
+ch.intro.kr = Torre e rei contra rei. {n:position}: dá xeque-mate ao meu rei, passo a passo.
+ch.intro.kp = Rei e peão contra rei. {n:position}: faz uma dama. O teu rei vai à frente.
+ch.intro.kp_hold = Trava o peão. {n:position}: só tens o teu rei. Segura o empate.
+ch.intro.rook = Finais de torres. {n:position}: constrói a ponte para promover, e segura o empate com a defesa de Philidor.
+ch.intro.endgame = Tática nos finais. {n:position} com poucas peças e ideias incisivas.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ("mate em 3", as Portuguese
+# players say it).
+ch.task.mate = Mate em {n}.
+ch.task.mate.2 = Encontra o mate em {n}.
+ch.task.hanging = Há algo sem proteção.
+ch.task.hanging.2 = O que podes tomar de graça?
+ch.task.fork = Encontra o garfo.
+ch.task.fork.2 = Procura um garfo.
+ch.task.pin = Aqui, a chave é uma cravada.
+ch.task.skewer = Aqui, um espeto ganha.
+ch.task.discovered = Aqui, um ataque descoberto ganha.
+ch.task.deflection = Sobrecarrega um defensor, ou atrai-o.
+ch.task.intermezzo = Procura um lance intermédio.
+ch.task.trapped = Uma das minhas peças não consegue escapar. Ganha-a.
+ch.task.promotion = Aproveita o teu peão avançado.
+ch.task.quiet = O lance vencedor é um lance tranquilo.
+ch.task.opening = Castiga o meu último lance.
+ch.task.escape = Salva o teu rei: só um lance funciona.
+ch.task.defend = Encontra o único bom lance.
+ch.task.endgame = Encontra o melhor lance.
+ch.task.default = Encontra o melhor lance.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Dá xeque-mate ao meu rei. Vou defender-me o melhor que puder.
+ch.task.play.promote = Promove o teu peão e mantém a vitória. Vou tentar impedir-te.
+ch.task.play.hold = Segura o empate durante {n:move}. Vou tentar ganhar.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Estas posições vêm de partidas reais. Eu jogo o último lance, e depois é a tua vez.
+ch.lead.first.2 = Cada posição vem de uma partida real: jogo o lance que levou até ela, e depois jogas tu.
+ch.next = Próxima posição.
+ch.next.2 = Aqui está a próxima.
+ch.next.3 = Vamos à seguinte.
+ch.last = A última posição.
+ch.last.2 = E agora, a última.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Boa.
+ch.good.2 = Sim.
+ch.good.3 = Certo.
+ch.good.4 = Exatamente.
+# The position is solved.
+ch.solved = É isso! Muito bem.
+ch.solved.2 = Certíssimo.
+ch.solved.3 = Muito bom.
+ch.solved.mate = Xeque-mate! Muito bem.
+ch.solved.mate.2 = E é mate. Muito bom.
+ch.solved.mate.3 = Xeque-mate. Bem jogado.
+ch.solved.promote = Uma dama nova, e a vitória está garantida. Muito bem.
+ch.solved.hold = O empate aguenta-se. Bem defendido!
+ch.solved.draw = Empate no tabuleiro. Bem defendido!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Esse não: eu responderia {move}.
+ch.wrong.reply.2 = Não é bem isso: eu jogaria {move}.
+ch.wrong.reply.3 = Aí, eu jogaria {move}.
+ch.wrong.mate = Cuidado: {move:nomate} seria xeque-mate.
+ch.wrong.mate.2 = Atenção: eu responderia {move:nomate}, e é mate.
+ch.wrong.mated = Cuidado: depois de {move}, consigo forçar mate em {m}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Isso também dá mate, mas demora mais. Há um caminho mais rápido.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Isso também dá mate, mas eu tenho outro lance em mente. Olha outra vez.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Não está mal, mas há algo mais forte. Olha outra vez.
+ch.wrong.weaker.2 = É jogável, mas consegues fazer melhor.
+ch.wrong.stalemate = Afogamento! O meu rei não se pode mexer, e isso é só um empate.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Esse não: depois de {move}, consigo segurar o empate.
+ch.wrong.loses = Cuidado: depois de {move}, eu ficaria a ganhar.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Não é isso.
+ch.try_again = Tenta outra vez.
+ch.try_again.2 = Volta a olhar.
+ch.try_again.3 = Procura outra vez.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Queres uma pista?
+ch.offer.2 = Dou-te uma pista?
+ch.no_hint = Está bem. Continua a procurar.
+ch.no_hint.2 = Muito bem, não tenhas pressa.
+ch.hint.piece = Olha para {your}.
+ch.hint.piece.2 = Pensa {your:em}.
+ch.hint.square = Olha para a casa {sq}.
+ch.hint.square.2 = A casa-chave é {sq}.
+ch.hint.square.3 = Não percas de vista a casa {sq}.
+ch.hint.show = Aqui está o lance. Repara.
+ch.hint.show.2 = Deixa-me mostrar-te. Repara.
+ch.hint.now = Agora joga-o tu.
+ch.hint.now.2 = É a tua vez: joga-o.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = E assim termina o desafio. Muito bem!
+ch.complete.2 = Todas as posições resolvidas. Muito bem!

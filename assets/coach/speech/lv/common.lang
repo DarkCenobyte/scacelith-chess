@@ -1,0 +1,959 @@
+# Coach speech (Latvian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Latvian needs.
+# Register: the coach says "tu" to the player ("tavs", "tev", imperatives "paņem", "skaties"); the
+# game menus say "jūs". The coach is male ("esmu priecīgs", "esmu redzējis"). The player's gender is
+# unknown: Latvian finite verbs have no gender ("tu paņēmi", "tu uzvarēsi"), but participles and
+# adjectives do, so never "tu esi uzvarējis", "esi gatavs", "esi uzmanīgs" about the player: a finite
+# verb, an adverb ("Uzmanīgi!") or a noun instead. Words: glossary/lv.md of the translation brief.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns (Latvian Chess Federation): bandinieks, zirgs, laidnis, tornis, karalis (masculine), dāma
+# (feminine). Owners: your = "tavs", my = "mans" (they agree with the noun); in the Analysis mode
+# white = "balto", black = "melno", the genitive plural of "baltie" / "melnie" (White, Black):
+# "balto zirgs" = White's knight, "melno dāmu" = Black's queen (acc); only the noun changes.
+# EVERY form below is defined for all six pieces and all four owners (your, my, white, black), so
+# {your:X}, {my:X}, {your2:X}, {my2:X}, {t1:X}, {t2:X} and {piece:X} all work. Instrumental: Latvian
+# says "ar" + accusative ("ar {my:acc}"), there is no "ins" form. Cases:
+#   nom        tavs zirgs / tava dāma       subject, and the object of a debitive whose agent is not
+#                                           the owner: "{my} uzbrūk {your:dat}.", "Tev jāpaņem {my}."
+#   gen        tava zirga / tavas dāmas     "of", and after aiz, bez, no, pēc, pie, pirms, (...) dēļ:
+#                                           "{your:gen} drošība", "Aiz {my:gen} stāv {t1}."
+#   dat        tavam zirgam / tavai dāmai   after uzbrukt (attack), draudēt (threaten), līdz, blakus
+#                                           (next to), priekšā (in front of), and the owner with "būt":
+#                                           "{your:dat} bija labāks gājiens.", "{t1:dat} priekšā"
+#   acc        tavu zirgu / tavu dāmu       direct object; after ar, uz, par, pret, caur, pa, ap, gar:
+#                                           "Es paņemu {your:acc}.", "Šahs ar {my:acc}!"
+#   loc        tavā zirgā / tavā dāmā       (rare) "Visa problēma ir {your:loc}."
+# The reflexive possessive "savs" REPLACES tavs / mans / balto / melno when the owner is the subject
+# of the clause: the "tu" of an imperative or of a 2nd person verb, the coach's "es", the dative
+# agent of a debitive ("tev jā..."), "baltie" / "melnie". "Paskaties uz {your:refl_acc}" (never
+# "uz tavu ..."), "Es pārvietoju {my:refl_acc} uz {sq}" (never "manu ...").
+#   refl_nom   savs zirgs / sava dāma       object of a debitive: "Tev jāpaglābj {your:refl_nom}."
+#   refl_gen   sava zirga / savas dāmas     "Padomā par {your:refl_gen} drošību."
+#   refl_dat   savam zirgam / savai dāmai   "Atrodi {your:refl_dat} drošāku lauciņu."
+#   refl_acc   savu zirgu / savu dāmu       "Tu divreiz pārvietoji {your:refl_acc}."
+#   refl_loc   savā zirgā / savā dāmā       (rare, defined for completeness)
+# The noun alone, when the owner is clear or an adjective stands before the noun:
+#   bare_nom   zirgs / dāma                 "Piesiet{your:def} {your:bare_nom} nevar aizsargāt {sq}."
+#   bare_gen   zirga / dāmas                "{my:bare_gen} gājiens"
+#   bare_dat   zirgam / dāmai               "Uzbrūc {my:bare_dat}!"
+#   bare_acc   zirgu / dāmu                 "Ņem ar {your:bare_acc}!"
+#   bare_loc   zirgā / dāmā                 (rare) "Bandinieks pārvēršas {my:bare_loc}."
+# Pronouns for the piece just named ("tas / tā", as Latvian says of things; never "viņš / viņa"):
+#   pron       tas / tā                     "Lūk, {your}. {your:pron} iet pa diagonāli."
+#   pron_gen   tā / tās                     "aiz {your:pron_gen}" (behind it); also "its": "{my:pron_gen}
+#                                           lauciņš" (when the piece is not the subject; else "savs")
+#   pron_dat   tam / tai                    "Es uzbrūku {your:pron_dat}."
+#   pron_acc   to / to                      "Paņem {my:pron_acc}!", "ar {my:pron_acc}"
+#   pron_loc   tajā / tajā                  (rare)
+#   this       šis / šī                     "{your:this} ir {your}." = "Šis ir tavs tornis." / "Šī ir
+#                                           tava dāma." (or say "Lūk, {your}." with no agreement)
+# Endings that agree with the piece, glued to a stem right after it (nominative singular only; in
+# another case, or for two pieces at once, rephrase: "uzbrukums gan {t1:dat}, gan {t2:dat}"):
+#   adj        s / a      an indefinite adjective or passive participle whose masculine ends in -s:
+#                         "{your} ir piesiet{your:adj}." = piesiets / piesieta; likewise neaizsargāt-,
+#                         ieslēgt-, apdraudēt-, zaudēt-, droš-, brīv-, vērt- ("{your} ir vērt{your:adj}
+#                         {n:point_acc}"). Not for the adjectives in -š (vājš / vāja).
+#   def        ais / ā    the definite form before a bare noun: "piesiet{your:def} {your:bare_nom}" =
+#                         piesietais zirgs / piesietā dāma.
+#   is         is / usi   a past active participle whose two forms share their stem: "{your} ir
+#                         iesprūd{your:is}" = iesprūdis / iesprūdusi (also nokļuv-, pazud-, aizgāj-; NOT
+#                         palicis / palikusi). A finite past is simpler: "{your} iesprūda".
+piece.pawn.gender = m
+piece.pawn.nom = bandinieks
+piece.pawn.gen = bandinieka
+piece.pawn.dat = bandiniekam
+piece.pawn.acc = bandinieku
+piece.pawn.loc = bandiniekā
+piece.pawn.refl_nom = bandinieks
+piece.pawn.refl_gen = bandinieka
+piece.pawn.refl_dat = bandiniekam
+piece.pawn.refl_acc = bandinieku
+piece.pawn.refl_loc = bandiniekā
+piece.pawn.bare_nom = bandinieks
+piece.pawn.bare_gen = bandinieka
+piece.pawn.bare_dat = bandiniekam
+piece.pawn.bare_acc = bandinieku
+piece.pawn.bare_loc = bandiniekā
+piece.pawn.pron = tas
+piece.pawn.pron_gen = tā
+piece.pawn.pron_dat = tam
+piece.pawn.pron_acc = to
+piece.pawn.pron_loc = tajā
+piece.pawn.this = šis
+piece.pawn.adj = s
+piece.pawn.def = ais
+piece.pawn.is = is
+piece.knight.gender = m
+piece.knight.nom = zirgs
+piece.knight.gen = zirga
+piece.knight.dat = zirgam
+piece.knight.acc = zirgu
+piece.knight.loc = zirgā
+piece.knight.refl_nom = zirgs
+piece.knight.refl_gen = zirga
+piece.knight.refl_dat = zirgam
+piece.knight.refl_acc = zirgu
+piece.knight.refl_loc = zirgā
+piece.knight.bare_nom = zirgs
+piece.knight.bare_gen = zirga
+piece.knight.bare_dat = zirgam
+piece.knight.bare_acc = zirgu
+piece.knight.bare_loc = zirgā
+piece.knight.pron = tas
+piece.knight.pron_gen = tā
+piece.knight.pron_dat = tam
+piece.knight.pron_acc = to
+piece.knight.pron_loc = tajā
+piece.knight.this = šis
+piece.knight.adj = s
+piece.knight.def = ais
+piece.knight.is = is
+piece.bishop.gender = m
+piece.bishop.nom = laidnis
+piece.bishop.gen = laidņa
+piece.bishop.dat = laidnim
+piece.bishop.acc = laidni
+piece.bishop.loc = laidnī
+piece.bishop.refl_nom = laidnis
+piece.bishop.refl_gen = laidņa
+piece.bishop.refl_dat = laidnim
+piece.bishop.refl_acc = laidni
+piece.bishop.refl_loc = laidnī
+piece.bishop.bare_nom = laidnis
+piece.bishop.bare_gen = laidņa
+piece.bishop.bare_dat = laidnim
+piece.bishop.bare_acc = laidni
+piece.bishop.bare_loc = laidnī
+piece.bishop.pron = tas
+piece.bishop.pron_gen = tā
+piece.bishop.pron_dat = tam
+piece.bishop.pron_acc = to
+piece.bishop.pron_loc = tajā
+piece.bishop.this = šis
+piece.bishop.adj = s
+piece.bishop.def = ais
+piece.bishop.is = is
+piece.rook.gender = m
+piece.rook.nom = tornis
+piece.rook.gen = torņa
+piece.rook.dat = tornim
+piece.rook.acc = torni
+piece.rook.loc = tornī
+piece.rook.refl_nom = tornis
+piece.rook.refl_gen = torņa
+piece.rook.refl_dat = tornim
+piece.rook.refl_acc = torni
+piece.rook.refl_loc = tornī
+piece.rook.bare_nom = tornis
+piece.rook.bare_gen = torņa
+piece.rook.bare_dat = tornim
+piece.rook.bare_acc = torni
+piece.rook.bare_loc = tornī
+piece.rook.pron = tas
+piece.rook.pron_gen = tā
+piece.rook.pron_dat = tam
+piece.rook.pron_acc = to
+piece.rook.pron_loc = tajā
+piece.rook.this = šis
+piece.rook.adj = s
+piece.rook.def = ais
+piece.rook.is = is
+piece.queen.gender = f
+piece.queen.nom = dāma
+piece.queen.gen = dāmas
+piece.queen.dat = dāmai
+piece.queen.acc = dāmu
+piece.queen.loc = dāmā
+piece.queen.refl_nom = dāma
+piece.queen.refl_gen = dāmas
+piece.queen.refl_dat = dāmai
+piece.queen.refl_acc = dāmu
+piece.queen.refl_loc = dāmā
+piece.queen.bare_nom = dāma
+piece.queen.bare_gen = dāmas
+piece.queen.bare_dat = dāmai
+piece.queen.bare_acc = dāmu
+piece.queen.bare_loc = dāmā
+piece.queen.pron = tā
+piece.queen.pron_gen = tās
+piece.queen.pron_dat = tai
+piece.queen.pron_acc = to
+piece.queen.pron_loc = tajā
+piece.queen.this = šī
+piece.queen.adj = a
+piece.queen.def = ā
+piece.queen.is = usi
+piece.king.gender = m
+piece.king.nom = karalis
+piece.king.gen = karaļa
+piece.king.dat = karalim
+piece.king.acc = karali
+piece.king.loc = karalī
+piece.king.refl_nom = karalis
+piece.king.refl_gen = karaļa
+piece.king.refl_dat = karalim
+piece.king.refl_acc = karali
+piece.king.refl_loc = karalī
+piece.king.bare_nom = karalis
+piece.king.bare_gen = karaļa
+piece.king.bare_dat = karalim
+piece.king.bare_acc = karali
+piece.king.bare_loc = karalī
+piece.king.pron = tas
+piece.king.pron_gen = tā
+piece.king.pron_dat = tam
+piece.king.pron_acc = to
+piece.king.pron_loc = tajā
+piece.king.this = šis
+piece.king.adj = s
+piece.king.def = ais
+piece.king.is = is
+# Possessives, by case and gender: tavs / tava, mans / mana.
+owner.your.nom.m = tavs {piece}
+owner.your.nom.f = tava {piece}
+owner.your.gen.m = tava {piece}
+owner.your.gen.f = tavas {piece}
+owner.your.dat.m = tavam {piece}
+owner.your.dat.f = tavai {piece}
+owner.your.acc.m = tavu {piece}
+owner.your.acc.f = tavu {piece}
+owner.your.loc.m = tavā {piece}
+owner.your.loc.f = tavā {piece}
+owner.my.nom.m = mans {piece}
+owner.my.nom.f = mana {piece}
+owner.my.gen.m = mana {piece}
+owner.my.gen.f = manas {piece}
+owner.my.dat.m = manam {piece}
+owner.my.dat.f = manai {piece}
+owner.my.acc.m = manu {piece}
+owner.my.acc.f = manu {piece}
+owner.my.loc.m = manā {piece}
+owner.my.loc.f = manā {piece}
+# The English keys (every language defines them); Latvian uses the gendered patterns above.
+owner.your.nom = tavs {piece}
+owner.my.nom = mans {piece}
+# The Analysis mode names a piece by its side, nobody being "tu" or "es" there: "balto zirgs",
+# "melno dāma" (the side's genitive plural never changes, the noun takes the case).
+owner.white.nom = balto {piece}
+owner.white.gen = balto {piece}
+owner.white.dat = balto {piece}
+owner.white.acc = balto {piece}
+owner.white.loc = balto {piece}
+owner.black.nom = melno {piece}
+owner.black.gen = melno {piece}
+owner.black.dat = melno {piece}
+owner.black.acc = melno {piece}
+owner.black.loc = melno {piece}
+# "savs", by case and gender, the same words for every owner.
+owner.your.refl_nom.m = savs {piece}
+owner.your.refl_nom.f = sava {piece}
+owner.your.refl_gen.m = sava {piece}
+owner.your.refl_gen.f = savas {piece}
+owner.your.refl_dat.m = savam {piece}
+owner.your.refl_dat.f = savai {piece}
+owner.your.refl_acc.m = savu {piece}
+owner.your.refl_acc.f = savu {piece}
+owner.your.refl_loc.m = savā {piece}
+owner.your.refl_loc.f = savā {piece}
+owner.my.refl_nom.m = savs {piece}
+owner.my.refl_nom.f = sava {piece}
+owner.my.refl_gen.m = sava {piece}
+owner.my.refl_gen.f = savas {piece}
+owner.my.refl_dat.m = savam {piece}
+owner.my.refl_dat.f = savai {piece}
+owner.my.refl_acc.m = savu {piece}
+owner.my.refl_acc.f = savu {piece}
+owner.my.refl_loc.m = savā {piece}
+owner.my.refl_loc.f = savā {piece}
+owner.white.refl_nom.m = savs {piece}
+owner.white.refl_nom.f = sava {piece}
+owner.white.refl_gen.m = sava {piece}
+owner.white.refl_gen.f = savas {piece}
+owner.white.refl_dat.m = savam {piece}
+owner.white.refl_dat.f = savai {piece}
+owner.white.refl_acc.m = savu {piece}
+owner.white.refl_acc.f = savu {piece}
+owner.white.refl_loc.m = savā {piece}
+owner.white.refl_loc.f = savā {piece}
+owner.black.refl_nom.m = savs {piece}
+owner.black.refl_nom.f = sava {piece}
+owner.black.refl_gen.m = sava {piece}
+owner.black.refl_gen.f = savas {piece}
+owner.black.refl_dat.m = savam {piece}
+owner.black.refl_dat.f = savai {piece}
+owner.black.refl_acc.m = savu {piece}
+owner.black.refl_acc.f = savu {piece}
+owner.black.refl_loc.m = savā {piece}
+owner.black.refl_loc.f = savā {piece}
+# Forms without a possessive: the noun, the pronoun or the ending alone.
+owner.your.bare_nom = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_loc = {piece}
+owner.your.pron = {piece}
+owner.your.pron_gen = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_acc = {piece}
+owner.your.pron_loc = {piece}
+owner.your.this = {piece}
+owner.your.adj = {piece}
+owner.your.def = {piece}
+owner.your.is = {piece}
+owner.my.bare_nom = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_loc = {piece}
+owner.my.pron = {piece}
+owner.my.pron_gen = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_acc = {piece}
+owner.my.pron_loc = {piece}
+owner.my.this = {piece}
+owner.my.adj = {piece}
+owner.my.def = {piece}
+owner.my.is = {piece}
+owner.white.bare_nom = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_loc = {piece}
+owner.white.pron = {piece}
+owner.white.pron_gen = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_acc = {piece}
+owner.white.pron_loc = {piece}
+owner.white.this = {piece}
+owner.white.adj = {piece}
+owner.white.def = {piece}
+owner.white.is = {piece}
+owner.black.bare_nom = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_loc = {piece}
+owner.black.pron = {piece}
+owner.black.pron_gen = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_acc = {piece}
+owner.black.pron_loc = {piece}
+owner.black.this = {piece}
+owner.black.adj = {piece}
+owner.black.def = {piece}
+owner.black.is = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The file letters are said with their Latvian letter names, as when spelling: e4 = "e četri",
+# b5 = "bē pieci", f3 = "ef trīs", g7 = "gā septiņi", h8 = "hā astoņi".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = bē
+file.c.spoken = cē
+file.d.spoken = dē
+file.e.spoken = e
+file.f.spoken = ef
+file.g.spoken = gā
+file.h.spoken = hā
+rank.1.spoken = viens
+rank.2.spoken = divi
+rank.3.spoken = trīs
+rank.4.spoken = četri
+rank.5.spoken = pieci
+rank.6.spoken = seši
+rank.7.spoken = septiņi
+rank.8.spoken = astoņi
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Latvian scoresheet letters: K(aralis) D(āma) T(ornis) L(aidnis) Z(irgs): "Zf3", "Tad1", "Dxe2".
+move.letters = K D T L Z
+# Spoken as Latvian players read notation: "zirgs ef trīs", "zirgs ņem e pieci", "zirgs bē dē
+# septiņi", "e ņem dē pieci", "bandinieks ņem atpakaļ" (a recapture), "īsā rokāde", "garā rokāde",
+# "dāma gā četri, šahs". {piece} is always the nominative here, so the promotion names the new piece
+# after a colon ("pārvēršas par" would need the accusative): "e astoņi, pārvēršana: dāma".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} ņem {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} ņem {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} ņem {to}
+move.recapture.spoken = {piece} ņem atpakaļ
+move.castle_short.spoken = īsā rokāde
+move.castle_long.spoken = garā rokāde
+move.promotion.spoken = {move}, pārvēršana: {piece}
+move.check.spoken = {move}, šahs
+move.mate.spoken = {move}, mats
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: "ņemšana
+# garāmejot" (en passant) is Latvian; the pronunciation pass adds respell.* keys when the voice needs them.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words, masculine nominative by default ("viens", "divi"). 21-99 compose as
+# "{tens} {units}" ("divdesmit viens"), 101-999 as "{hundreds} {rest}" ("simt divdesmit pieci");
+# every hundred is listed in the form that combines ("simt", "divsimt" ... "deviņsimt"). 0 and 10-20,
+# the tens and the hundreds never change; 1-9 decline and agree with their noun, by these forms
+# (a compound changes its last word only: 21 = "divdesmit" + the form of "viens"):
+#   (none)  masc. nom   viens divi trīs četri     f       fem. nom   viena divas trīs četras
+#   m_gen   masc. gen   viena divu triju četru    f_gen   fem. gen   vienas divu triju četru
+#   m_dat   masc. dat   vienam diviem trim ...    f_dat   fem. dat   vienai divām trim četrām
+#   m_acc   masc. acc   vienu divus trīs četrus   f_acc   fem. acc   vienu divas trīs četras
+#   m_loc   masc. loc   vienā divos trijos ...    f_loc   fem. loc   vienā divās trijās četrās
+# The counted nouns below choose the right one; "{n:f}", "{n:m_acc}" ... say a bare number in that form.
+number.0.spoken = nulle
+number.1.spoken = viens
+number.1.f.spoken = viena
+number.1.m_gen.spoken = viena
+number.1.f_gen.spoken = vienas
+number.1.m_dat.spoken = vienam
+number.1.f_dat.spoken = vienai
+number.1.m_acc.spoken = vienu
+number.1.f_acc.spoken = vienu
+number.1.m_loc.spoken = vienā
+number.1.f_loc.spoken = vienā
+number.2.spoken = divi
+number.2.f.spoken = divas
+number.2.m_gen.spoken = divu
+number.2.f_gen.spoken = divu
+number.2.m_dat.spoken = diviem
+number.2.f_dat.spoken = divām
+number.2.m_acc.spoken = divus
+number.2.f_acc.spoken = divas
+number.2.m_loc.spoken = divos
+number.2.f_loc.spoken = divās
+number.3.spoken = trīs
+number.3.f.spoken = trīs
+number.3.m_gen.spoken = triju
+number.3.f_gen.spoken = triju
+number.3.m_dat.spoken = trim
+number.3.f_dat.spoken = trim
+number.3.m_acc.spoken = trīs
+number.3.f_acc.spoken = trīs
+number.3.m_loc.spoken = trijos
+number.3.f_loc.spoken = trijās
+number.4.spoken = četri
+number.4.f.spoken = četras
+number.4.m_gen.spoken = četru
+number.4.f_gen.spoken = četru
+number.4.m_dat.spoken = četriem
+number.4.f_dat.spoken = četrām
+number.4.m_acc.spoken = četrus
+number.4.f_acc.spoken = četras
+number.4.m_loc.spoken = četros
+number.4.f_loc.spoken = četrās
+number.5.spoken = pieci
+number.5.f.spoken = piecas
+number.5.m_gen.spoken = piecu
+number.5.f_gen.spoken = piecu
+number.5.m_dat.spoken = pieciem
+number.5.f_dat.spoken = piecām
+number.5.m_acc.spoken = piecus
+number.5.f_acc.spoken = piecas
+number.5.m_loc.spoken = piecos
+number.5.f_loc.spoken = piecās
+number.6.spoken = seši
+number.6.f.spoken = sešas
+number.6.m_gen.spoken = sešu
+number.6.f_gen.spoken = sešu
+number.6.m_dat.spoken = sešiem
+number.6.f_dat.spoken = sešām
+number.6.m_acc.spoken = sešus
+number.6.f_acc.spoken = sešas
+number.6.m_loc.spoken = sešos
+number.6.f_loc.spoken = sešās
+number.7.spoken = septiņi
+number.7.f.spoken = septiņas
+number.7.m_gen.spoken = septiņu
+number.7.f_gen.spoken = septiņu
+number.7.m_dat.spoken = septiņiem
+number.7.f_dat.spoken = septiņām
+number.7.m_acc.spoken = septiņus
+number.7.f_acc.spoken = septiņas
+number.7.m_loc.spoken = septiņos
+number.7.f_loc.spoken = septiņās
+number.8.spoken = astoņi
+number.8.f.spoken = astoņas
+number.8.m_gen.spoken = astoņu
+number.8.f_gen.spoken = astoņu
+number.8.m_dat.spoken = astoņiem
+number.8.f_dat.spoken = astoņām
+number.8.m_acc.spoken = astoņus
+number.8.f_acc.spoken = astoņas
+number.8.m_loc.spoken = astoņos
+number.8.f_loc.spoken = astoņās
+number.9.spoken = deviņi
+number.9.f.spoken = deviņas
+number.9.m_gen.spoken = deviņu
+number.9.f_gen.spoken = deviņu
+number.9.m_dat.spoken = deviņiem
+number.9.f_dat.spoken = deviņām
+number.9.m_acc.spoken = deviņus
+number.9.f_acc.spoken = deviņas
+number.9.m_loc.spoken = deviņos
+number.9.f_loc.spoken = deviņās
+number.10.spoken = desmit
+number.11.spoken = vienpadsmit
+number.12.spoken = divpadsmit
+number.13.spoken = trīspadsmit
+number.14.spoken = četrpadsmit
+number.15.spoken = piecpadsmit
+number.16.spoken = sešpadsmit
+number.17.spoken = septiņpadsmit
+number.18.spoken = astoņpadsmit
+number.19.spoken = deviņpadsmit
+number.20.spoken = divdesmit
+number.30.spoken = trīsdesmit
+number.40.spoken = četrdesmit
+number.50.spoken = piecdesmit
+number.60.spoken = sešdesmit
+number.70.spoken = septiņdesmit
+number.80.spoken = astoņdesmit
+number.90.spoken = deviņdesmit
+number.tens.spoken = {tens} {units}
+# 100 is "simt" (the form that also combines: "simt pieci", "simt procentu"); every hundred is listed.
+number.100.spoken = simt
+number.200.spoken = divsimt
+number.300.spoken = trīssimt
+number.400.spoken = četrsimt
+number.500.spoken = piecsimt
+number.600.spoken = sešsimt
+number.700.spoken = septiņsimt
+number.800.spoken = astoņsimt
+number.900.spoken = deviņsimt
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} simti
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = mīnus {n}
+# A decimal number: Latvian writes a decimal comma ("1,3") and says "viens komats trīs".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} komats {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Latvian plural rule (assets/i18n), three forms in this order: zero (0, 10-20, 30, 40 ... 100,
+# 110-119 ...: n%10 = 0 or n%100 = 11-19) | one (1, 21, 31 ... 101: n%10 = 1 but not 11) | other.
+# The "zero" numbers never decline: in the nominative and accusative their noun is in the genitive
+# plural ("desmit gājienu", "nulle kļūdu"), in the other cases in its own case ("pēc desmit gājieniem").
+# "one" takes the singular: "divdesmit viens gājiens". Written: digits ("3 gājieni").
+# Each noun has seven case forms; pick the one the sentence needs (examples with move / mistake):
+#   {n:move}       nominative            "Šajā partijā bija tikai {n:mistake}."
+#   {n:move_acc}   accusative            "Tu pieļāvi {n:mistake_acc}.", "Tu atsauci {n:move_acc}."
+#   {n:move_gen}   genitive              "{n:move_gen} sērija" (piecu gājienu sērija)
+#   {n:move_dat}   dative                "līdz {n:move_dat}"
+#   {n:move_loc}   locative              "Mats {n:move_loc}." (divos gājienos), "uzvara {moves:move_loc}"
+#   {n:move_pgen}  after pēc, no, bez, aiz, pie, pirms (genitive in the singular, dative in the
+#                  plural, like every Latvian preposition): "pēc {n:move_pgen}" = pēc viena gājiena /
+#                  pēc trim gājieniem
+#   {n:move_pacc}  after ar, uz, par, pa, pret, caur (accusative in the singular, dative in the
+#                  plural): "ar {n:mistake_pacc}" = ar vienu kļūdu / ar divām kļūdām
+# "N times" is an accusative of the adverb: "{m:time_acc}" = vienu reizi / trīs reizes / desmit reižu.
+# Never let a participle or an adjective agree with a counted noun (it changes with the number:
+# "paņemta viena figūra", "paņemtas trīs figūras"): use an active verb ("Tu paņēmi
+# {n:piece_acc}.") or a noun and a colon ("Paņemto figūru skaits: {n}.").
+count.move = {n} gājienu|{n} gājiens|{n} gājieni
+count.move_acc = {n} gājienu|{n:m_acc} gājienu|{n:m_acc} gājienus
+count.move_gen = {n} gājienu|{n:m_gen} gājiena|{n:m_gen} gājienu
+count.move_dat = {n} gājieniem|{n:m_dat} gājienam|{n:m_dat} gājieniem
+count.move_loc = {n} gājienos|{n:m_loc} gājienā|{n:m_loc} gājienos
+count.move_pgen = {n} gājieniem|{n:m_gen} gājiena|{n:m_dat} gājieniem
+count.move_pacc = {n} gājieniem|{n:m_acc} gājienu|{n:m_dat} gājieniem
+count.point = {n} punktu|{n} punkts|{n} punkti
+count.point_acc = {n} punktu|{n:m_acc} punktu|{n:m_acc} punktus
+count.point_gen = {n} punktu|{n:m_gen} punkta|{n:m_gen} punktu
+count.point_dat = {n} punktiem|{n:m_dat} punktam|{n:m_dat} punktiem
+count.point_loc = {n} punktos|{n:m_loc} punktā|{n:m_loc} punktos
+count.point_pgen = {n} punktiem|{n:m_gen} punkta|{n:m_dat} punktiem
+count.point_pacc = {n} punktiem|{n:m_acc} punktu|{n:m_dat} punktiem
+count.pawn = {n} bandinieku|{n} bandinieks|{n} bandinieki
+count.pawn_acc = {n} bandinieku|{n:m_acc} bandinieku|{n:m_acc} bandiniekus
+count.pawn_gen = {n} bandinieku|{n:m_gen} bandinieka|{n:m_gen} bandinieku
+count.pawn_dat = {n} bandiniekiem|{n:m_dat} bandiniekam|{n:m_dat} bandiniekiem
+count.pawn_loc = {n} bandiniekos|{n:m_loc} bandiniekā|{n:m_loc} bandiniekos
+count.pawn_pgen = {n} bandiniekiem|{n:m_gen} bandinieka|{n:m_dat} bandiniekiem
+count.pawn_pacc = {n} bandiniekiem|{n:m_acc} bandinieku|{n:m_dat} bandiniekiem
+count.piece = {n} figūru|{n:f} figūra|{n:f} figūras
+count.piece_acc = {n} figūru|{n:f_acc} figūru|{n:f_acc} figūras
+count.piece_gen = {n} figūru|{n:f_gen} figūras|{n:f_gen} figūru
+count.piece_dat = {n} figūrām|{n:f_dat} figūrai|{n:f_dat} figūrām
+count.piece_loc = {n} figūrās|{n:f_loc} figūrā|{n:f_loc} figūrās
+count.piece_pgen = {n} figūrām|{n:f_gen} figūras|{n:f_dat} figūrām
+count.piece_pacc = {n} figūrām|{n:f_acc} figūru|{n:f_dat} figūrām
+count.mistake = {n} kļūdu|{n:f} kļūda|{n:f} kļūdas
+count.mistake_acc = {n} kļūdu|{n:f_acc} kļūdu|{n:f_acc} kļūdas
+count.mistake_gen = {n} kļūdu|{n:f_gen} kļūdas|{n:f_gen} kļūdu
+count.mistake_dat = {n} kļūdām|{n:f_dat} kļūdai|{n:f_dat} kļūdām
+count.mistake_loc = {n} kļūdās|{n:f_loc} kļūdā|{n:f_loc} kļūdās
+count.mistake_pgen = {n} kļūdām|{n:f_gen} kļūdas|{n:f_dat} kļūdām
+count.mistake_pacc = {n} kļūdām|{n:f_acc} kļūdu|{n:f_dat} kļūdām
+count.blunder = {n} rupju kļūdu|{n:f} rupja kļūda|{n:f} rupjas kļūdas
+count.blunder_acc = {n} rupju kļūdu|{n:f_acc} rupju kļūdu|{n:f_acc} rupjas kļūdas
+count.blunder_gen = {n} rupju kļūdu|{n:f_gen} rupjas kļūdas|{n:f_gen} rupju kļūdu
+count.blunder_dat = {n} rupjām kļūdām|{n:f_dat} rupjai kļūdai|{n:f_dat} rupjām kļūdām
+count.blunder_loc = {n} rupjās kļūdās|{n:f_loc} rupjā kļūdā|{n:f_loc} rupjās kļūdās
+count.blunder_pgen = {n} rupjām kļūdām|{n:f_gen} rupjas kļūdas|{n:f_dat} rupjām kļūdām
+count.blunder_pacc = {n} rupjām kļūdām|{n:f_acc} rupju kļūdu|{n:f_dat} rupjām kļūdām
+count.inaccuracy = {n} neprecizitāšu|{n:f} neprecizitāte|{n:f} neprecizitātes
+count.inaccuracy_acc = {n} neprecizitāšu|{n:f_acc} neprecizitāti|{n:f_acc} neprecizitātes
+count.inaccuracy_gen = {n} neprecizitāšu|{n:f_gen} neprecizitātes|{n:f_gen} neprecizitāšu
+count.inaccuracy_dat = {n} neprecizitātēm|{n:f_dat} neprecizitātei|{n:f_dat} neprecizitātēm
+count.inaccuracy_loc = {n} neprecizitātēs|{n:f_loc} neprecizitātē|{n:f_loc} neprecizitātēs
+count.inaccuracy_pgen = {n} neprecizitātēm|{n:f_gen} neprecizitātes|{n:f_dat} neprecizitātēm
+count.inaccuracy_pacc = {n} neprecizitātēm|{n:f_acc} neprecizitāti|{n:f_dat} neprecizitātēm
+count.game = {n} partiju|{n:f} partija|{n:f} partijas
+count.game_acc = {n} partiju|{n:f_acc} partiju|{n:f_acc} partijas
+count.game_gen = {n} partiju|{n:f_gen} partijas|{n:f_gen} partiju
+count.game_dat = {n} partijām|{n:f_dat} partijai|{n:f_dat} partijām
+count.game_loc = {n} partijās|{n:f_loc} partijā|{n:f_loc} partijās
+count.game_pgen = {n} partijām|{n:f_gen} partijas|{n:f_dat} partijām
+count.game_pacc = {n} partijām|{n:f_acc} partiju|{n:f_dat} partijām
+count.time = {n} reižu|{n:f} reize|{n:f} reizes
+count.time_acc = {n} reižu|{n:f_acc} reizi|{n:f_acc} reizes
+count.time_gen = {n} reižu|{n:f_gen} reizes|{n:f_gen} reižu
+count.time_dat = {n} reizēm|{n:f_dat} reizei|{n:f_dat} reizēm
+count.time_loc = {n} reizēs|{n:f_loc} reizē|{n:f_loc} reizēs
+count.time_pgen = {n} reizēm|{n:f_gen} reizes|{n:f_dat} reizēm
+count.time_pacc = {n} reizēm|{n:f_acc} reizi|{n:f_dat} reizēm
+count.square = {n} lauciņu|{n} lauciņš|{n} lauciņi
+count.square_acc = {n} lauciņu|{n:m_acc} lauciņu|{n:m_acc} lauciņus
+count.square_gen = {n} lauciņu|{n:m_gen} lauciņa|{n:m_gen} lauciņu
+count.square_dat = {n} lauciņiem|{n:m_dat} lauciņam|{n:m_dat} lauciņiem
+count.square_loc = {n} lauciņos|{n:m_loc} lauciņā|{n:m_loc} lauciņos
+count.square_pgen = {n} lauciņiem|{n:m_gen} lauciņa|{n:m_dat} lauciņiem
+count.square_pacc = {n} lauciņiem|{n:m_acc} lauciņu|{n:m_dat} lauciņiem
+count.position = {n} pozīciju|{n:f} pozīcija|{n:f} pozīcijas
+count.position_acc = {n} pozīciju|{n:f_acc} pozīciju|{n:f_acc} pozīcijas
+count.position_gen = {n} pozīciju|{n:f_gen} pozīcijas|{n:f_gen} pozīciju
+count.position_dat = {n} pozīcijām|{n:f_dat} pozīcijai|{n:f_dat} pozīcijām
+count.position_loc = {n} pozīcijās|{n:f_loc} pozīcijā|{n:f_loc} pozīcijās
+count.position_pgen = {n} pozīcijām|{n:f_gen} pozīcijas|{n:f_dat} pozīcijām
+count.position_pacc = {n} pozīcijām|{n:f_acc} pozīciju|{n:f_dat} pozīcijām
+# More counted nouns (the review and the appraisal): "{m:check}" = 3 šahi, "{n:capture}" = 3 ņemšanas
+# (pawns included), "{n:best_move}" = 5 labākie gājieni (a streak), "{n:attacker}" = 3 uzbrucēji,
+# "{n2:defender}" = 2 aizsargi (of a square).
+count.check = {n} šahu|{n} šahs|{n} šahi
+count.check_acc = {n} šahu|{n:m_acc} šahu|{n:m_acc} šahus
+count.check_gen = {n} šahu|{n:m_gen} šaha|{n:m_gen} šahu
+count.check_dat = {n} šahiem|{n:m_dat} šaham|{n:m_dat} šahiem
+count.check_loc = {n} šahos|{n:m_loc} šahā|{n:m_loc} šahos
+count.check_pgen = {n} šahiem|{n:m_gen} šaha|{n:m_dat} šahiem
+count.check_pacc = {n} šahiem|{n:m_acc} šahu|{n:m_dat} šahiem
+count.capture = {n} ņemšanu|{n:f} ņemšana|{n:f} ņemšanas
+count.capture_acc = {n} ņemšanu|{n:f_acc} ņemšanu|{n:f_acc} ņemšanas
+count.capture_gen = {n} ņemšanu|{n:f_gen} ņemšanas|{n:f_gen} ņemšanu
+count.capture_dat = {n} ņemšanām|{n:f_dat} ņemšanai|{n:f_dat} ņemšanām
+count.capture_loc = {n} ņemšanās|{n:f_loc} ņemšanā|{n:f_loc} ņemšanās
+count.capture_pgen = {n} ņemšanām|{n:f_gen} ņemšanas|{n:f_dat} ņemšanām
+count.capture_pacc = {n} ņemšanām|{n:f_acc} ņemšanu|{n:f_dat} ņemšanām
+count.best_move = {n} labāko gājienu|{n} labākais gājiens|{n} labākie gājieni
+count.best_move_acc = {n} labāko gājienu|{n:m_acc} labāko gājienu|{n:m_acc} labākos gājienus
+count.best_move_gen = {n} labāko gājienu|{n:m_gen} labākā gājiena|{n:m_gen} labāko gājienu
+count.best_move_dat = {n} labākajiem gājieniem|{n:m_dat} labākajam gājienam|{n:m_dat} labākajiem gājieniem
+count.best_move_loc = {n} labākajos gājienos|{n:m_loc} labākajā gājienā|{n:m_loc} labākajos gājienos
+count.best_move_pgen = {n} labākajiem gājieniem|{n:m_gen} labākā gājiena|{n:m_dat} labākajiem gājieniem
+count.best_move_pacc = {n} labākajiem gājieniem|{n:m_acc} labāko gājienu|{n:m_dat} labākajiem gājieniem
+count.attacker = {n} uzbrucēju|{n} uzbrucējs|{n} uzbrucēji
+count.attacker_acc = {n} uzbrucēju|{n:m_acc} uzbrucēju|{n:m_acc} uzbrucējus
+count.attacker_gen = {n} uzbrucēju|{n:m_gen} uzbrucēja|{n:m_gen} uzbrucēju
+count.attacker_dat = {n} uzbrucējiem|{n:m_dat} uzbrucējam|{n:m_dat} uzbrucējiem
+count.attacker_loc = {n} uzbrucējos|{n:m_loc} uzbrucējā|{n:m_loc} uzbrucējos
+count.attacker_pgen = {n} uzbrucējiem|{n:m_gen} uzbrucēja|{n:m_dat} uzbrucējiem
+count.attacker_pacc = {n} uzbrucējiem|{n:m_acc} uzbrucēju|{n:m_dat} uzbrucējiem
+count.defender = {n} aizsargu|{n} aizsargs|{n} aizsargi
+count.defender_acc = {n} aizsargu|{n:m_acc} aizsargu|{n:m_acc} aizsargus
+count.defender_gen = {n} aizsargu|{n:m_gen} aizsarga|{n:m_gen} aizsargu
+count.defender_dat = {n} aizsargiem|{n:m_dat} aizsargam|{n:m_dat} aizsargiem
+count.defender_loc = {n} aizsargos|{n:m_loc} aizsargā|{n:m_loc} aizsargos
+count.defender_pgen = {n} aizsargiem|{n:m_gen} aizsarga|{n:m_dat} aizsargiem
+count.defender_pacc = {n} aizsargiem|{n:m_acc} aizsargu|{n:m_dat} aizsargiem
+# Percentages (accuracy): "{acc:percent}" = "85%" written (no space, as Latvian writes it), spoken
+# "astoņdesmit pieci procenti"; the case forms as for the other nouns ("ar {acc:percent_pacc}").
+count.percent = {n}%|{n}%|{n}%
+count.percent.spoken = {n} procentu|{n} procents|{n} procenti
+count.percent_acc = {n}%|{n}%|{n}%
+count.percent_acc.spoken = {n} procentu|{n:m_acc} procentu|{n:m_acc} procentus
+count.percent_gen = {n}%|{n}%|{n}%
+count.percent_gen.spoken = {n} procentu|{n:m_gen} procenta|{n:m_gen} procentu
+count.percent_dat = {n}%|{n}%|{n}%
+count.percent_dat.spoken = {n} procentiem|{n:m_dat} procentam|{n:m_dat} procentiem
+count.percent_loc = {n}%|{n}%|{n}%
+count.percent_loc.spoken = {n} procentos|{n:m_loc} procentā|{n:m_loc} procentos
+count.percent_pgen = {n}%|{n}%|{n}%
+count.percent_pgen.spoken = {n} procentiem|{n:m_gen} procenta|{n:m_dat} procentiem
+count.percent_pacc = {n}%|{n}%|{n}%
+count.percent_pacc.spoken = {n} procentiem|{n:m_acc} procentu|{n:m_dat} procentiem
+# The number forms as count keys, so that a line can say a bare number in a form ("{n:f}" = viena,
+# divas) and so that the form check knows them.
+count.f = {n:f}|{n:f}|{n:f}
+count.m_gen = {n:m_gen}|{n:m_gen}|{n:m_gen}
+count.f_gen = {n:f_gen}|{n:f_gen}|{n:f_gen}
+count.m_dat = {n:m_dat}|{n:m_dat}|{n:m_dat}
+count.f_dat = {n:f_dat}|{n:f_dat}|{n:f_dat}
+count.m_acc = {n:m_acc}|{n:m_acc}|{n:m_acc}
+count.f_acc = {n:f_acc}|{n:f_acc}|{n:f_acc}
+count.m_loc = {n:m_loc}|{n:m_loc}|{n:m_loc}
+count.f_loc = {n:f_loc}|{n:f_loc}|{n:f_loc}
+
+# Move numbers as ordinals (Latvian writes an ordinal as the digits and a period: "21. gājiens"):
+#   {n:ord}      21. / divdesmit pirmais   "{n:ord} gājiens bija izšķirošs."
+#   {n:ord_gen}  21. / divdesmit pirmā     "pēc {n:ord_gen} gājiena", "no {n:ord_gen} gājiena"
+#   {n:ord_dat}  21. / divdesmit pirmajam  "līdz {n:ord_dat} gājienam"
+#   {n:ord_acc}  21. / divdesmit pirmo     "Atceries {n:ord_acc} gājienu?"
+#   {n:ord_loc}  21. / divdesmit pirmajā   "{n:ord_loc} gājienā" (at move 21)
+# Masculine only (they go with "gājiens"); always follow them with their noun (never at the end of a
+# sentence: the period would double). A compound changes its last word only ("simt divdesmit
+# pirmajā"); the tens and the hundreds have their own ordinal words below.
+count.ord = {n}.|{n}.|{n}.
+count.ord.spoken = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n}.|{n}.|{n}.
+count.ord_gen.spoken = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_dat = {n}.|{n}.|{n}.
+count.ord_dat.spoken = {n:ord_dat}|{n:ord_dat}|{n:ord_dat}
+count.ord_acc = {n}.|{n}.|{n}.
+count.ord_acc.spoken = {n:ord_acc}|{n:ord_acc}|{n:ord_acc}
+count.ord_loc = {n}.|{n}.|{n}.
+count.ord_loc.spoken = {n:ord_loc}|{n:ord_loc}|{n:ord_loc}
+number.1.ord.spoken = pirmais
+number.2.ord.spoken = otrais
+number.3.ord.spoken = trešais
+number.4.ord.spoken = ceturtais
+number.5.ord.spoken = piektais
+number.6.ord.spoken = sestais
+number.7.ord.spoken = septītais
+number.8.ord.spoken = astotais
+number.9.ord.spoken = devītais
+number.10.ord.spoken = desmitais
+number.11.ord.spoken = vienpadsmitais
+number.12.ord.spoken = divpadsmitais
+number.13.ord.spoken = trīspadsmitais
+number.14.ord.spoken = četrpadsmitais
+number.15.ord.spoken = piecpadsmitais
+number.16.ord.spoken = sešpadsmitais
+number.17.ord.spoken = septiņpadsmitais
+number.18.ord.spoken = astoņpadsmitais
+number.19.ord.spoken = deviņpadsmitais
+number.20.ord.spoken = divdesmitais
+number.30.ord.spoken = trīsdesmitais
+number.40.ord.spoken = četrdesmitais
+number.50.ord.spoken = piecdesmitais
+number.60.ord.spoken = sešdesmitais
+number.70.ord.spoken = septiņdesmitais
+number.80.ord.spoken = astoņdesmitais
+number.90.ord.spoken = deviņdesmitais
+number.100.ord.spoken = simtais
+number.200.ord.spoken = divsimtais
+number.300.ord.spoken = trīssimtais
+number.400.ord.spoken = četrsimtais
+number.500.ord.spoken = piecsimtais
+number.600.ord.spoken = sešsimtais
+number.700.ord.spoken = septiņsimtais
+number.800.ord.spoken = astoņsimtais
+number.900.ord.spoken = deviņsimtais
+number.1.ord_gen.spoken = pirmā
+number.2.ord_gen.spoken = otrā
+number.3.ord_gen.spoken = trešā
+number.4.ord_gen.spoken = ceturtā
+number.5.ord_gen.spoken = piektā
+number.6.ord_gen.spoken = sestā
+number.7.ord_gen.spoken = septītā
+number.8.ord_gen.spoken = astotā
+number.9.ord_gen.spoken = devītā
+number.10.ord_gen.spoken = desmitā
+number.11.ord_gen.spoken = vienpadsmitā
+number.12.ord_gen.spoken = divpadsmitā
+number.13.ord_gen.spoken = trīspadsmitā
+number.14.ord_gen.spoken = četrpadsmitā
+number.15.ord_gen.spoken = piecpadsmitā
+number.16.ord_gen.spoken = sešpadsmitā
+number.17.ord_gen.spoken = septiņpadsmitā
+number.18.ord_gen.spoken = astoņpadsmitā
+number.19.ord_gen.spoken = deviņpadsmitā
+number.20.ord_gen.spoken = divdesmitā
+number.30.ord_gen.spoken = trīsdesmitā
+number.40.ord_gen.spoken = četrdesmitā
+number.50.ord_gen.spoken = piecdesmitā
+number.60.ord_gen.spoken = sešdesmitā
+number.70.ord_gen.spoken = septiņdesmitā
+number.80.ord_gen.spoken = astoņdesmitā
+number.90.ord_gen.spoken = deviņdesmitā
+number.100.ord_gen.spoken = simtā
+number.200.ord_gen.spoken = divsimtā
+number.300.ord_gen.spoken = trīssimtā
+number.400.ord_gen.spoken = četrsimtā
+number.500.ord_gen.spoken = piecsimtā
+number.600.ord_gen.spoken = sešsimtā
+number.700.ord_gen.spoken = septiņsimtā
+number.800.ord_gen.spoken = astoņsimtā
+number.900.ord_gen.spoken = deviņsimtā
+number.1.ord_dat.spoken = pirmajam
+number.2.ord_dat.spoken = otrajam
+number.3.ord_dat.spoken = trešajam
+number.4.ord_dat.spoken = ceturtajam
+number.5.ord_dat.spoken = piektajam
+number.6.ord_dat.spoken = sestajam
+number.7.ord_dat.spoken = septītajam
+number.8.ord_dat.spoken = astotajam
+number.9.ord_dat.spoken = devītajam
+number.10.ord_dat.spoken = desmitajam
+number.11.ord_dat.spoken = vienpadsmitajam
+number.12.ord_dat.spoken = divpadsmitajam
+number.13.ord_dat.spoken = trīspadsmitajam
+number.14.ord_dat.spoken = četrpadsmitajam
+number.15.ord_dat.spoken = piecpadsmitajam
+number.16.ord_dat.spoken = sešpadsmitajam
+number.17.ord_dat.spoken = septiņpadsmitajam
+number.18.ord_dat.spoken = astoņpadsmitajam
+number.19.ord_dat.spoken = deviņpadsmitajam
+number.20.ord_dat.spoken = divdesmitajam
+number.30.ord_dat.spoken = trīsdesmitajam
+number.40.ord_dat.spoken = četrdesmitajam
+number.50.ord_dat.spoken = piecdesmitajam
+number.60.ord_dat.spoken = sešdesmitajam
+number.70.ord_dat.spoken = septiņdesmitajam
+number.80.ord_dat.spoken = astoņdesmitajam
+number.90.ord_dat.spoken = deviņdesmitajam
+number.100.ord_dat.spoken = simtajam
+number.200.ord_dat.spoken = divsimtajam
+number.300.ord_dat.spoken = trīssimtajam
+number.400.ord_dat.spoken = četrsimtajam
+number.500.ord_dat.spoken = piecsimtajam
+number.600.ord_dat.spoken = sešsimtajam
+number.700.ord_dat.spoken = septiņsimtajam
+number.800.ord_dat.spoken = astoņsimtajam
+number.900.ord_dat.spoken = deviņsimtajam
+number.1.ord_acc.spoken = pirmo
+number.2.ord_acc.spoken = otro
+number.3.ord_acc.spoken = trešo
+number.4.ord_acc.spoken = ceturto
+number.5.ord_acc.spoken = piekto
+number.6.ord_acc.spoken = sesto
+number.7.ord_acc.spoken = septīto
+number.8.ord_acc.spoken = astoto
+number.9.ord_acc.spoken = devīto
+number.10.ord_acc.spoken = desmito
+number.11.ord_acc.spoken = vienpadsmito
+number.12.ord_acc.spoken = divpadsmito
+number.13.ord_acc.spoken = trīspadsmito
+number.14.ord_acc.spoken = četrpadsmito
+number.15.ord_acc.spoken = piecpadsmito
+number.16.ord_acc.spoken = sešpadsmito
+number.17.ord_acc.spoken = septiņpadsmito
+number.18.ord_acc.spoken = astoņpadsmito
+number.19.ord_acc.spoken = deviņpadsmito
+number.20.ord_acc.spoken = divdesmito
+number.30.ord_acc.spoken = trīsdesmito
+number.40.ord_acc.spoken = četrdesmito
+number.50.ord_acc.spoken = piecdesmito
+number.60.ord_acc.spoken = sešdesmito
+number.70.ord_acc.spoken = septiņdesmito
+number.80.ord_acc.spoken = astoņdesmito
+number.90.ord_acc.spoken = deviņdesmito
+number.100.ord_acc.spoken = simto
+number.200.ord_acc.spoken = divsimto
+number.300.ord_acc.spoken = trīssimto
+number.400.ord_acc.spoken = četrsimto
+number.500.ord_acc.spoken = piecsimto
+number.600.ord_acc.spoken = sešsimto
+number.700.ord_acc.spoken = septiņsimto
+number.800.ord_acc.spoken = astoņsimto
+number.900.ord_acc.spoken = deviņsimto
+number.1.ord_loc.spoken = pirmajā
+number.2.ord_loc.spoken = otrajā
+number.3.ord_loc.spoken = trešajā
+number.4.ord_loc.spoken = ceturtajā
+number.5.ord_loc.spoken = piektajā
+number.6.ord_loc.spoken = sestajā
+number.7.ord_loc.spoken = septītajā
+number.8.ord_loc.spoken = astotajā
+number.9.ord_loc.spoken = devītajā
+number.10.ord_loc.spoken = desmitajā
+number.11.ord_loc.spoken = vienpadsmitajā
+number.12.ord_loc.spoken = divpadsmitajā
+number.13.ord_loc.spoken = trīspadsmitajā
+number.14.ord_loc.spoken = četrpadsmitajā
+number.15.ord_loc.spoken = piecpadsmitajā
+number.16.ord_loc.spoken = sešpadsmitajā
+number.17.ord_loc.spoken = septiņpadsmitajā
+number.18.ord_loc.spoken = astoņpadsmitajā
+number.19.ord_loc.spoken = deviņpadsmitajā
+number.20.ord_loc.spoken = divdesmitajā
+number.30.ord_loc.spoken = trīsdesmitajā
+number.40.ord_loc.spoken = četrdesmitajā
+number.50.ord_loc.spoken = piecdesmitajā
+number.60.ord_loc.spoken = sešdesmitajā
+number.70.ord_loc.spoken = septiņdesmitajā
+number.80.ord_loc.spoken = astoņdesmitajā
+number.90.ord_loc.spoken = deviņdesmitajā
+number.100.ord_loc.spoken = simtajā
+number.200.ord_loc.spoken = divsimtajā
+number.300.ord_loc.spoken = trīssimtajā
+number.400.ord_loc.spoken = četrsimtajā
+number.500.ord_loc.spoken = piecsimtajā
+number.600.ord_loc.spoken = sešsimtajā
+number.700.ord_loc.spoken = septiņsimtajā
+number.800.ord_loc.spoken = astoņsimtajā
+number.900.ord_loc.spoken = deviņsimtajā
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = mīnus {x}
+eval.even = 0,0
+eval.even.spoken = līdzsvars
+# {n} here is a bare number (count keys do not apply to it), so the subtitles say "mats pēc 3" ("mate
+# after 3", right for every number, where "mats 3 gājienos" would be wrong for 1, 21, 31 ...), and the
+# voice adds the noun with the form "mv": the number as after "pēc" with "gājiens" in the right number,
+# "mats pēc viena gājiena", "mats pēc trim gājieniem", "mats pēc desmit gājieniem", "mats pēc
+# divdesmit viena gājiena". (The challenges say the proper term with a count: "Mats {n:move_loc}.")
+eval.mate_win = mats pēc {n}
+eval.mate_win.spoken = mats pēc {n:mv}
+eval.mate_loss = tev mats pēc {n}
+eval.mate_loss.spoken = tev mats pēc {n:mv}
+count.mv = {n:mv}|{n:mv}|{n:mv}
+number.1.mv.spoken = viena gājiena
+number.2.mv.spoken = diviem gājieniem
+number.3.mv.spoken = trim gājieniem
+number.4.mv.spoken = četriem gājieniem
+number.5.mv.spoken = pieciem gājieniem
+number.6.mv.spoken = sešiem gājieniem
+number.7.mv.spoken = septiņiem gājieniem
+number.8.mv.spoken = astoņiem gājieniem
+number.9.mv.spoken = deviņiem gājieniem
+number.10.mv.spoken = desmit gājieniem
+number.11.mv.spoken = vienpadsmit gājieniem
+number.12.mv.spoken = divpadsmit gājieniem
+number.13.mv.spoken = trīspadsmit gājieniem
+number.14.mv.spoken = četrpadsmit gājieniem
+number.15.mv.spoken = piecpadsmit gājieniem
+number.16.mv.spoken = sešpadsmit gājieniem
+number.17.mv.spoken = septiņpadsmit gājieniem
+number.18.mv.spoken = astoņpadsmit gājieniem
+number.19.mv.spoken = deviņpadsmit gājieniem
+number.20.mv.spoken = divdesmit gājieniem
+number.30.mv.spoken = trīsdesmit gājieniem
+number.40.mv.spoken = četrdesmit gājieniem
+number.50.mv.spoken = piecdesmit gājieniem
+number.60.mv.spoken = sešdesmit gājieniem
+number.70.mv.spoken = septiņdesmit gājieniem
+number.80.mv.spoken = astoņdesmit gājieniem
+number.90.mv.spoken = deviņdesmit gājieniem
+number.100.mv.spoken = simt gājieniem
+
+# ---- Forms of names used in other files ------------------------------------------------------------
+# The phases of the game (appraisal.lang, appraisal.phase.* = "atklātne", "vidusspēle", "galotne",
+# all feminine) in the other cases: "{text:loc}" = "atklātnē" ("Tu ļoti labi spēlēji {text:loc}."),
+# "{text:gen}", "{text:dat}", "{text:acc}".
+appraisal.phase.opening.gen = atklātnes
+appraisal.phase.opening.dat = atklātnei
+appraisal.phase.opening.acc = atklātni
+appraisal.phase.opening.loc = atklātnē
+appraisal.phase.middlegame.gen = vidusspēles
+appraisal.phase.middlegame.dat = vidusspēlei
+appraisal.phase.middlegame.acc = vidusspēli
+appraisal.phase.middlegame.loc = vidusspēlē
+appraisal.phase.endgame.gen = galotnes
+appraisal.phase.endgame.dat = galotnei
+appraisal.phase.endgame.acc = galotni
+appraisal.phase.endgame.loc = galotnē

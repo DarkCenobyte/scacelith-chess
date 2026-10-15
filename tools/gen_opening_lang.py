@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Generates the Coach's opening texts (10 languages) and the opening metadata.
+"""Generates the Coach's opening texts (34 languages) and the opening metadata.
 
 Inputs (tools/openings_source/):
-  families.json        curated opening families and notable variations: names in the 10 UI languages (citation
+  families.json        curated opening families and notable variations: names in the 34 UI languages (citation
                        form, form with article, gender), side, tier, umbrella, lichess name prefixes, glossary of
-                       variation-name words, eponyms (from the openings research of 2026-09-30)
+                       variation-name words, eponyms (from the openings research of 2026-09-30); lang_options:
+                       per-language settings of the languages added on 2026-10-14 (see LANG_OPTIONS below)
   texts/<code>.txt     hand-written texts per language, same "key = value" format as the .lang files:
                        sentence templates (opening.say.*), comments on what each opening leads to
                        (opening.family.<id>.beginner/.advanced, opening.variation.<id>...), optional overrides
@@ -40,7 +41,19 @@ ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 SRC = os.path.join(ROOT, 'tools', 'openings_source')
 OUT_LANG = os.path.join(ROOT, 'assets', 'coach', 'openings')
 OUT_META = os.path.join(ROOT, 'assets', 'coach', 'openings_data', 'openings.json')
-LANGS = ['en', 'fr', 'de', 'es', 'ru', 'uk', 'ar', 'ja', 'zh-Hans', 'zh-Hant']
+FIRST_LANGS = ['en', 'fr', 'de', 'es', 'ru', 'uk', 'ar', 'ja', 'zh-Hans', 'zh-Hant']
+# The languages added on 2026-10-14 are data-driven: their names come with their "def" form in families.json
+# (families[].names.<code>, notable_variations[].names.<code> = {"name", "def", "forms"}; eponyms.<name>.<code> =
+# {"nom", "gen"}), their spoken squares from assets/coach/speech/<code>/common.lang (square, file.*, rank.*), and
+# families.json lang_options.<code> = {"compose_proper_names": bool, "file_pattern": regex with a group named f}.
+NEW_LANGS = ['pt', 'pt-BR', 'ko', 'bg', 'cs', 'da', 'el', 'et', 'fi', 'hi', 'hr', 'hu', 'id', 'it', 'lt', 'lv', 'nl',
+             'pl', 'ro', 'sk', 'sl', 'sv', 'tr', 'vi']
+LANGS = FIRST_LANGS + NEW_LANGS
+SPEECH = os.path.join(ROOT, 'assets', 'coach', 'speech')
+# Languages that compose "<Proper> <Type>" with a proper name as it is (first languages; the new ones say it in
+# lang_options), and those whose names join two names with " — " (said with a hyphen).
+PROPER_NAME_LANGS = ['fr', 'de', 'es']
+NAME_DASH_LANGS = ['ru', 'uk']
 
 # Types of lichess variation names that compose ("<Proper> <Type>"), with their catalog slug.
 COMPOSE_TYPES = ['Variation', 'Attack', 'Gambit', 'Defense', 'System', 'Countergambit', 'Counterattack', 'Line',
@@ -207,6 +220,8 @@ def romance_def(name, table, lang, what):
 
 
 def variation_def(lang, name, what):
+    if lang in NEW_LANGS:
+        return None  # given with the name in families.json
     if lang == 'en':
         return 'the ' + name
     if lang == 'fr':
@@ -222,7 +237,7 @@ def variation_def(lang, name, what):
 
 def family_def(lang, fam):
     n = fam['names'][lang]
-    if lang in ('en', 'fr', 'de', 'es'):
+    if lang in ('en', 'fr', 'de', 'es') or lang in NEW_LANGS:
         if not n.get('def'):
             fail('family %s has no %s "def" form' % (fam['id'], lang))
         return n['def']
@@ -232,9 +247,43 @@ def family_def(lang, fam):
 
 
 # ---- Speech ------------------------------------------------------------------------------------------------------
-def spoken(lang, text, respell):
+_speech_words = {}
+
+
+def speech_words(lang):
+    """(file words, rank words, square pattern, file pattern) of a new language, from its coach common.lang."""
+    if lang not in _speech_words:
+        p = os.path.join(SPEECH, lang, 'common.lang')
+        if not os.path.exists(p):
+            fail('missing ' + p + ' (the spoken squares of the openings come from it)')
+        kv = dict(parse_lang(p))
+        try:
+            files = [kv['file.%s.spoken' % f] for f in 'abcdefgh']
+            ranks = [kv['rank.%d.spoken' % r] for r in range(1, 9)]
+            square = kv['square.spoken']
+        except KeyError as e:
+            fail('%s: missing %s' % (p, e))
+        _speech_words[lang] = (files, ranks, square)
+    return _speech_words[lang]
+
+
+def spoken(lang, text, respell, options=None):
     if lang.startswith('zh'):
         return text  # Chinese speech is the English line
+    if lang in NEW_LANGS:
+        files, ranks, square = speech_words(lang)
+        fw = dict(zip('abcdefgh', files))
+        t = text
+        if lang in NAME_DASH_LANGS:
+            t = NAME_DASH_RE.sub(r'\1-\2', t)
+        pat = (options or {}).get('file_pattern')
+        if pat:
+            def file_word(m):
+                a, b = m.span('f')
+                return m.group(0)[:a - m.start()] + fw[m.group('f')] + m.group(0)[b - m.start():]
+            t = re.sub(pat, file_word, t)
+        return SQUARE_RE.sub(lambda m: square.replace('{file}', fw[m.group(1)])
+                             .replace('{rank}', ranks[int(m.group(2)) - 1]), t)
     t = text
     if lang == 'en':
         for k in sorted(respell, key=len, reverse=True):
@@ -271,6 +320,12 @@ def build():
         J = json.load(f)
     fams, vars_ = J['families'], J['notable_variations']
     respell = J['meta']['tts_en_respell']
+    options = J.get('lang_options', {})
+    for lang in NEW_LANGS:
+        o = options.get(lang)
+        if not isinstance(o, dict) or not isinstance(o.get('compose_proper_names'), bool):
+            fail('families.json: lang_options.%s needs "compose_proper_names" (true or false)' % lang)
+    proper_langs = PROPER_NAME_LANGS + [l for l in NEW_LANGS if options[l]['compose_proper_names']]
     fam_ids = [x['id'] for x in fams]
     var_ids = [x['id'] for x in vars_]
     texts = {}
@@ -319,6 +374,8 @@ def build():
     glossary, eponyms = J['glossary'], J['eponyms']
     entries = {lang: [] for lang in LANGS}   # (section, key, value) in order
     spoken_candidates = []                    # keys whose .spoken form is considered
+    extra = {}                                # language -> [(section, key, value)]: keys of one language only
+    extra_spoken = set()
 
     def add(section, key, values, speak=False):
         for lang in LANGS:
@@ -328,6 +385,21 @@ def build():
             entries[lang].append((section, key, v))
         if speak:
             spoken_candidates.append(key)
+
+    def add_one(section, key, lang, v, speak=False):
+        extra.setdefault(lang, []).append((section, key, v))
+        if speak:
+            extra_spoken.add(key)
+
+    def add_forms(section, base, per_lang):
+        # Extra forms of a name a new language asked for ("forms": {"gen": ...}): keys base.<form>, in that
+        # language only (the catalog falls back to the base name in the others).
+        for l, n in per_lang.items():
+            if isinstance(n, dict):
+                for form, v in n.get('forms', {}).items():
+                    if not re.match(r'^[a-z0-9_]+$', form) or form in ('def', 'beginner', 'advanced', 'spoken'):
+                        fail('%s: bad form name %r for %s' % (l, form, base))
+                    add_one(section, base + '.' + form, l, v, True)
 
     # Sentences
     for k in en_text_keys:
@@ -340,10 +412,13 @@ def build():
         names = {}
         defs = {}
         for l in LANGS:
+            if l not in x['names']:
+                fail('family %s has no %s name' % (x['id'], l))
             names[l] = override(l, base) or x['names'][l]['name']
             defs[l] = override(l, base + '.def') or family_def(l, x)
         add('Families', base, names, True)
         add('Families', base + '.def', defs, True)
+        add_forms('Families', base, {l: x['names'][l] for l in LANGS})
         for lvl in ('beginner', 'advanced'):
             k = base + '.' + lvl
             add('Families', k, {l: texts[l][k] for l in LANGS}, True)
@@ -353,13 +428,21 @@ def build():
         base = 'opening.variation.' + x['id']
         names, defs = {}, {}
         for l in LANGS:
-            names[l] = override(l, base) or x['names'][l]
-            d = override(l, base + '.def') or variation_def(l, names[l], x['id'])
+            if l not in x['names']:
+                fail('variation %s has no %s name' % (x['id'], l))
+            n = x['names'][l]
+            if isinstance(n, dict):   # new languages: {"name", "def", "forms"}
+                names[l] = override(l, base) or n['name']
+                d = override(l, base + '.def') or n.get('def')
+            else:
+                names[l] = override(l, base) or n
+                d = override(l, base + '.def') or variation_def(l, names[l], x['id'])
             if d is None:
                 fail('texts/%s.txt: missing %s.def' % (l, base))
             defs[l] = d
         add('Notable variations', base, names, True)
         add('Notable variations', base + '.def', defs, True)
+        add_forms('Notable variations', base, {l: x['names'][l] for l in LANGS})
         for lvl in ('beginner', 'advanced'):
             k = base + '.' + lvl
             if k in texts['en']:
@@ -373,6 +456,8 @@ def build():
         compose_types[t] = s
         vals = {'en': '{X} ' + t}
         for l in LANGS[1:]:
+            if l not in g['compose']:
+                fail('glossary %s: no %s compose pattern' % (t, l))
             vals[l] = g['compose'][l].replace('{Xgen}', '{X:gen}')
         add('Composition of other variation names', 'opening.compose.' + s, vals)
     components = {}
@@ -390,7 +475,9 @@ def build():
         eponym_slugs[e] = s
         nom, gen = {}, {}
         for l in LANGS:
-            if l in ('ru', 'uk'):
+            if l in ('ru', 'uk') or l in NEW_LANGS:
+                if l not in tr:
+                    fail('eponym %s has no %s form' % (e, l))
                 nom[l], gen[l] = tr[l]['nom'], tr[l]['gen']
             elif l in ('ar', 'ja', 'zh-Hans', 'zh-Hant'):
                 nom[l] = gen[l] = tr[l]
@@ -403,9 +490,16 @@ def build():
     values = {l: {k: v for _, k, v in entries[l]} for l in LANGS}
     spoken_keys = {}
     for k in spoken_candidates:
-        sp = {l: spoken(l, values[l][k], respell) for l in LANGS}
+        sp = {l: spoken(l, values[l][k], respell, options.get(l)) for l in LANGS}
         if any(sp[l] != values[l][k] for l in LANGS):
             spoken_keys[k] = sp
+    extra_spoken_values = {}
+    for l, items in extra.items():
+        for _, k, v in items:
+            if k in extra_spoken:
+                sv = spoken(l, v, respell, options.get(l))
+                if sv != v:
+                    extra_spoken_values[(l, k)] = sv
 
     # Checks: names everywhere, templates only use names that exist, no stray braces.
     for l in LANGS:
@@ -418,6 +512,10 @@ def build():
                  '# GENERATED by tools/gen_opening_lang.py from tools/openings_source/: edit those files, then run',
                  '# "python3 tools/gen_opening_lang.py". Key scheme: see the generator.']
         section = None
+        mine = {}
+        for sec, k, v in extra.get(l, []):
+            base = k.rsplit('.', 1)[0]
+            mine.setdefault(base, []).append((k, v))
         for sec, k, v in entries[l]:
             if sec != section:
                 lines += ['', '# ---- ' + sec]
@@ -425,6 +523,11 @@ def build():
             lines.append('%s = %s' % (k, typography(l, v)))
             if k in spoken_keys:
                 lines.append('%s.spoken = %s' % (k, typography(l, spoken_keys[k][l])))
+            if k.endswith('.def'):
+                for fk, fv in mine.get(k[:-4], []):
+                    lines.append('%s = %s' % (fk, typography(l, fv)))
+                    if (l, fk) in extra_spoken_values:
+                        lines.append('%s.spoken = %s' % (fk, typography(l, extra_spoken_values[(l, fk)])))
         outputs[os.path.join(OUT_LANG, l + '.lang')] = '\n'.join(lines) + '\n'
 
     # Metadata for the C++ side (no text).
@@ -444,6 +547,8 @@ def build():
         'components': components,
         'eponyms': eponym_slugs,
         'common_words': COMMON_WORDS,
+        'proper_name_languages': proper_langs,
+        'name_dash_languages': NAME_DASH_LANGS,
         'tts_en_respell': respell,
     }
     outputs[OUT_META] = json.dumps(meta, ensure_ascii=False, indent=1) + '\n'

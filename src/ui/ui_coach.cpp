@@ -103,7 +103,7 @@ bool levelRow(int i, bool sel, bool recommended, const Rect& r) {
     float tagW = 0.0f;
     if (recommended) {
         TextStyle rs = style(font::FACE_TITLE, 14.0f, goldBright, im::endAlign(), 0.18f);
-        std::string tag = uni::toUpper(T("coach.recommended"));
+        std::string tag = uni::toUpper(T("coach.recommended"), i18n::language());
         tagW = gfx::textWidth(tag, rs) + 24.0f;
         gfx::text(tag, im::flipX(r, r.r() - 18.0f), r.y + 49.0f, rs);
     }
@@ -128,7 +128,7 @@ float note(const std::string& text, const Rect& col, float x, float y, float w, 
 std::string challengeText(const std::string& id, const char* part) {
     return i18n::trOr("challenge." + id + "." + part, std::string());
 }
-std::string groupTitle(const std::string& group) { return i18n::trOr("challenge.group." + group, uni::toUpper(group)); }
+std::string groupTitle(const std::string& group) { return i18n::trOr("challenge.group." + group, uni::toUpper(group, i18n::language())); }
 
 // The challenge the page selects: the one chosen last while the book still has it, else the first
 // one not completed yet, else the first.
@@ -223,7 +223,7 @@ void challengeDetail(const coach::Challenge& c, float rx, float colW, float top)
     im::sectionLabel(groupTitle(c.group), rx, top + 8.0f, colW);
     float y = top + 70.0f;
     TextStyle ts = style(font::FACE_TITLE, 26.0f, goldBright, im::startAlign(), 0.12f);
-    std::string name = uni::toUpper(challengeName(c.id));
+    std::string name = uni::toUpper(challengeName(c.id), i18n::language());
     ts.size = gfx::fitSize(name, ts, colW - 8.0f);
     gfx::text(name, im::flipX(rcol, rx + 2.0f), y, ts);
     y += 36.0f;
@@ -330,7 +330,7 @@ void trainingTab(CoachSetup& setup, float lx, float rx, float colW, float top) {
     float y = top + 70.0f;
     {
         TextStyle ts = style(font::FACE_TITLE, 26.0f, goldBright, im::startAlign(), 0.12f);
-        std::string name = uni::toUpper(levelName(setup.level));
+        std::string name = uni::toUpper(levelName(setup.level), i18n::language());
         ts.size = gfx::fitSize(name, ts, colW - 8.0f);
         gfx::text(name, im::flipX(rcol, rx + 2.0f), y, ts);
         std::string band = bandText(levelInfo(setup.level));
@@ -677,7 +677,7 @@ CoachHudAction coachHud(const CoachHud& hud) {
     if (!hud.progress.empty()) lastProgress = hud.progress;
     if (pa.v[0] > 0.01f && !lastProgress.empty()) {
         float a = ease(pa.v[0]);
-        std::string text = uni::toUpper(lastProgress);
+        std::string text = uni::toUpper(lastProgress, i18n::language());
         // Capitals carry Latin and Cyrillic at 17; Arabic and CJK, without them, need more.
         bool caps = true;
         for (char32_t c : uni::decode(text))

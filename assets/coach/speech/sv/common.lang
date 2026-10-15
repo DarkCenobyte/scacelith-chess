@@ -1,0 +1,392 @@
+# Coach speech (Swedish): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Swedish needs.
+# Register: the coach says "du" (dig, din / ditt / dina) to the player and "jag" (mig, min / mitt /
+# mina) of himself; the game menus say "du" too, as Swedish software does. Nothing in Swedish agrees
+# with a person's gender (the old masculine ending "-e", "den unge", is never used), so neither the
+# coach's nor the player's gender ever shows. Chess words as in assets/i18n/sv.lang: bonde, springare,
+# löpare, torn, dam, kung; schack, schackmatt, patt, remi, rockad, förvandling, drag, ruta, linje, rad,
+# blunder, misstag, onoggrannhet.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders (c = common gender, an "en" word; n = neuter, an "ett" word): en bonde, en
+# springare, en löpare, ett torn, en dam, en kung. Swedish nouns have no cases: one form is the
+# subject, the object and the noun after a preposition. A possessive agrees with the piece (din /
+# ditt, min / mitt) and the noun after it stays indefinite ("din springare", never "din springaren").
+# What else agrees with the piece: the pronoun that stands for it (den / det), an article (en / ett)
+# and an adjective or participle (säker / säkert, skyddad / skyddat, bunden / bundet).
+# Forms (every one defined for all six pieces and the four owners your, my, white, black; {your2},
+# {my2}, {t1}, {t2} and the analysis {piece} take the same forms):
+#   nom      din springare / ditt torn, min dam / mitt torn; Analysis mode: vits springare / svarts
+#            torn (the default form, subject and object alike)
+#                                         "{my} angriper {your}." (= Min löpare angriper ditt torn.)
+#   gen      din springares / ditt torns, vits kungs (the genitive, before the noun it owns)
+#                                         "{your:gen} flyktrutor är spärrade." (= Din kungs flyktrutor ...)
+#   def      springaren / tornet (definite, no owner: when the owner is already clear)
+#                                         "{my} angriper {your}, och {your:def} kan inte fly."
+#   def_gen  springarens / tornets        "{your:def_gen} väg tillbaka är stängd."
+#   indef    en springare / ett torn (indefinite, no owner)
+#                                         "Nu har du vunnit {my:indef}." (= ... vunnit ett torn.)
+#   bare     springare / torn (the noun alone), after poss, sin_poss, art or den and an adjective
+#                                         "{your:poss} bundna {your:bare}" (= din bundna springare)
+#   poss     din / ditt, min / mitt, vits / svarts: the possessive alone, before an adjective (which
+#            then takes its -a form) and bare; alone it also means "yours" / "mine"
+#                                         "{your:poss} bundna {your:bare} kan inte skydda {sq}."
+#                                         (= Din bundna löpare ... / Ditt bundna torn ...)
+#                                         "Din dam är hotad, inte {my:poss}." (my queen: "min")
+#   sin      sin springare / sitt torn (every owner): the reflexive possessive, only when the subject
+#            of the same clause is a third person who owns the piece (a side, "man", the unspoken
+#            subject of an infinitive that refers to them)
+#                                         "Vit offrar {piece:sin}." (= Vit offrar sitt torn.)
+#            With "du" or "jag" as the subject Swedish keeps din / min: use nom
+#                                         ("Du flyttade {your} två gånger.")
+#   sin_poss sin / sitt alone, before an adjective and bare
+#                                         "Svart flyttar {piece:sin_poss} bundna {piece:bare}."
+#   den      den / det: the pronoun standing for the piece (subject, object, after a preposition)
+#                                         "Det här är {your}. {your:den} går längs linjer och rader."
+#                                         "{my} hänger. Slå {my:den}!", "{t2} står bakom {t1:den}."
+#            Also the article before an adjective and def, and with "här" the demonstrative:
+#                                         "{my:den} oskyddade {my:def}" (= det oskyddade tornet)
+#                                         "{your:den} här {your:def}" (= den här springaren)
+#            "Its" needs no form: "dess" for every piece ("{my:den} och dess försvarare"), and when
+#            the piece is the subject, sin / sitt / sina agreeing with the thing owned
+#            ("{your} står bakom sina bönder"). The relative pronoun is always "som".
+#   art      en / ett: the indefinite article alone, before an adjective and bare
+#                                         "{my:art} oskydda{my:d_t} {my:bare}" (= ett oskyddat torn)
+# Endings glued to an adjective or participle that agrees with the piece (written right after the
+# word, with no space; the placeholder is the piece the word agrees with):
+#   t        "" / "t": adjectives that simply add -t for an ett-word (säker, ensam, stark, svag, aktiv,
+#            passiv, lös, dålig, farlig, försvarslös)
+#                                         "{your} är inte säker{your:t} där." (= Ditt torn är inte
+#                                         säkert där. / Din kung är inte säker där.)
+#   d_t      "d" / "t": participles in -ad and -d, and "värd" (hotad / hotat, skyddad / skyddat,
+#            oskyddad, obevakad, försvarad, förlorad, fångad, instängd / instängt, värd / värt)
+#                                         "{my} var oskydda{my:d_t}." (= Min löpare var oskyddad. /
+#                                         Mitt torn var oskyddat.)  "{your} är vär{your:d_t} {n:point}."
+#   en_et    "en" / "et": participles and adjectives in -en (angripen / angripet, bunden / bundet,
+#            slagen, fången, öppen)
+#                                         "{your} är bund{your:en_et}." (= Din springare är bunden. /
+#                                         Ditt torn är bundet.)  "{my} är angrip{my:en_et}."
+#            Words already ending in -t never change (utsatt, låst, täckt, fast, inlåst), nor -e / -a
+#            (hängande, ensamma), "bra", "kvar", "gratis": write them plain. Irregular ones (fri /
+#            fritt, ny / nytt, död / dött, klädd / klätt): rephrase. Two pieces take the plural:
+#            "{t1} och {t2} är angripna / hotade / bundna" (no form needed).
+# Never put a possessive or an article (din, min, en, ett, den, det) before {your}, {my}, {t1}, {t2},
+# {piece}: the owner is in them (only bare and def follow words you write). Never glue an "s" to a
+# placeholder: use gen or def_gen. Spoken moves use piece.<type>.nom, the bare noun ("springare eff tre").
+piece.pawn.gender = c
+piece.knight.gender = c
+piece.bishop.gender = c
+piece.rook.gender = n
+piece.queen.gender = c
+piece.king.gender = c
+piece.pawn.nom = bonde
+piece.knight.nom = springare
+piece.bishop.nom = löpare
+piece.rook.nom = torn
+piece.queen.nom = dam
+piece.king.nom = kung
+piece.pawn.gen = bondes
+piece.knight.gen = springares
+piece.bishop.gen = löpares
+piece.rook.gen = torns
+piece.queen.gen = dams
+piece.king.gen = kungs
+piece.pawn.def = bonden
+piece.knight.def = springaren
+piece.bishop.def = löparen
+piece.rook.def = tornet
+piece.queen.def = damen
+piece.king.def = kungen
+piece.pawn.def_gen = bondens
+piece.knight.def_gen = springarens
+piece.bishop.def_gen = löparens
+piece.rook.def_gen = tornets
+piece.queen.def_gen = damens
+piece.king.def_gen = kungens
+piece.pawn.indef = en bonde
+piece.knight.indef = en springare
+piece.bishop.indef = en löpare
+piece.rook.indef = ett torn
+piece.queen.indef = en dam
+piece.king.indef = en kung
+piece.pawn.bare = bonde
+piece.knight.bare = springare
+piece.bishop.bare = löpare
+piece.rook.bare = torn
+piece.queen.bare = dam
+piece.king.bare = kung
+# poss and sin_poss: empty nouns, the owner pattern below is the whole word.
+piece.pawn.poss =
+piece.knight.poss =
+piece.bishop.poss =
+piece.rook.poss =
+piece.queen.poss =
+piece.king.poss =
+piece.pawn.sin_poss =
+piece.knight.sin_poss =
+piece.bishop.sin_poss =
+piece.rook.sin_poss =
+piece.queen.sin_poss =
+piece.king.sin_poss =
+piece.pawn.sin = bonde
+piece.knight.sin = springare
+piece.bishop.sin = löpare
+piece.rook.sin = torn
+piece.queen.sin = dam
+piece.king.sin = kung
+piece.pawn.den = den
+piece.knight.den = den
+piece.bishop.den = den
+piece.rook.den = det
+piece.queen.den = den
+piece.king.den = den
+piece.pawn.art = en
+piece.knight.art = en
+piece.bishop.art = en
+piece.rook.art = ett
+piece.queen.art = en
+piece.king.art = en
+piece.pawn.t =
+piece.knight.t =
+piece.bishop.t =
+piece.rook.t = t
+piece.queen.t =
+piece.king.t =
+piece.pawn.d_t = d
+piece.knight.d_t = d
+piece.bishop.d_t = d
+piece.rook.d_t = t
+piece.queen.d_t = d
+piece.king.d_t = d
+piece.pawn.en_et = en
+piece.knight.en_et = en
+piece.bishop.en_et = en
+piece.rook.en_et = et
+piece.queen.en_et = en
+piece.king.en_et = en
+# The owner patterns: owner.<owner>.<form> serves the common-gender pieces, owner.<owner>.<form>.n
+# the neuter one (torn). {your} = "din springare" / "ditt torn", {my} = "min springare" / "mitt torn".
+owner.your.nom = din {piece}
+owner.your.nom.n = ditt {piece}
+owner.my.nom = min {piece}
+owner.my.nom.n = mitt {piece}
+owner.your.gen = din {piece}
+owner.your.gen.n = ditt {piece}
+owner.my.gen = min {piece}
+owner.my.gen.n = mitt {piece}
+owner.your.poss = din
+owner.your.poss.n = ditt
+owner.my.poss = min
+owner.my.poss.n = mitt
+owner.your.sin = sin {piece}
+owner.your.sin.n = sitt {piece}
+owner.my.sin = sin {piece}
+owner.my.sin.n = sitt {piece}
+owner.your.sin_poss = sin
+owner.your.sin_poss.n = sitt
+owner.my.sin_poss = sin
+owner.my.sin_poss.n = sitt
+# Forms without an owner word: the noun, the pronoun, the article or the ending alone, the same for
+# every owner.
+owner.your.def = {piece}
+owner.my.def = {piece}
+owner.your.def_gen = {piece}
+owner.my.def_gen = {piece}
+owner.your.indef = {piece}
+owner.my.indef = {piece}
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.your.den = {piece}
+owner.my.den = {piece}
+owner.your.art = {piece}
+owner.my.art = {piece}
+owner.your.t = {piece}
+owner.my.t = {piece}
+owner.your.d_t = {piece}
+owner.my.d_t = {piece}
+owner.your.en_et = {piece}
+owner.my.en_et = {piece}
+# The Analysis mode names a piece by its side, nobody being "du" or "jag" there: the side's genitive,
+# lowercase as in Swedish chess books ("vits springare", "svarts torn"; capitalised by the program at
+# the start of a sentence). The players themselves are "vit" and "svart".
+owner.white.nom = vits {piece}
+owner.black.nom = svarts {piece}
+owner.white.gen = vits {piece}
+owner.black.gen = svarts {piece}
+owner.white.poss = vits
+owner.black.poss = svarts
+owner.white.sin = sin {piece}
+owner.white.sin.n = sitt {piece}
+owner.black.sin = sin {piece}
+owner.black.sin.n = sitt {piece}
+owner.white.sin_poss = sin
+owner.white.sin_poss.n = sitt
+owner.black.sin_poss = sin
+owner.black.sin_poss.n = sitt
+owner.white.def = {piece}
+owner.black.def = {piece}
+owner.white.def_gen = {piece}
+owner.black.def_gen = {piece}
+owner.white.indef = {piece}
+owner.black.indef = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+owner.white.den = {piece}
+owner.black.den = {piece}
+owner.white.art = {piece}
+owner.black.art = {piece}
+owner.white.t = {piece}
+owner.black.t = {piece}
+owner.white.d_t = {piece}
+owner.black.d_t = {piece}
+owner.white.en_et = {piece}
+owner.black.en_et = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# File letters are their Swedish letter names, as when spelling: a, be, se, dé, é, eff, ghé, hå
+# ("é fyra", "eff tre", "dé fem", "hå sju", "ghé ett"). Respelled where the plain spelling would be
+# misread: c is "se" (the letter's sound); d "dé", since a plain "de" is read as the pronoun ("dom");
+# e "é", the long stressed letter name, as in "idé" (a lone "e" risks a short or reduced vowel); g
+# "ghé" with a hard g, as in "spaghetti": "ge" is the verb ("je") and g before e is soft in Swedish
+# spelling. These spellings are not Swedish words, so the pronunciation pass can respell them without
+# touching any other word. Ranks are number words; rank 1 is "ett" ("a ett").
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = se
+file.d.spoken = dé
+file.e.spoken = é
+file.f.spoken = eff
+file.g.spoken = ghé
+file.h.spoken = hå
+rank.1.spoken = ett
+rank.2.spoken = två
+rank.3.spoken = tre
+rank.4.spoken = fyra
+rank.5.spoken = fem
+rank.6.spoken = sex
+rank.7.spoken = sju
+rank.8.spoken = åtta
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Swedish scoresheet letters: K(ung) D(am) T(orn) L(öpare) S(pringare): "Sf3", "Txd1", "Lxc4".
+move.letters = K D T L S
+# Spoken as Swedish players read notation: "springare eff tre", "springare slår på é fem", "springare
+# be dé sju", "é slår på dé fem", "bonde slår tillbaka", "kort rockad", "lång rockad", "é åtta och
+# blir dam", "dam ghé fyra, schack", "dam hå sju, schackmatt". {piece} is the bare noun
+# (piece.<type>.nom); "blir dam" needs no article.
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} slår på {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} slår på {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} slår på {to}
+move.recapture.spoken = {piece} slår tillbaka
+move.castle_short.spoken = kort rockad
+move.castle_long.spoken = lång rockad
+move.promotion.spoken = {move} och blir {piece}
+move.check.spoken = {move}, schack
+move.mate.spoken = {move}, schackmatt
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the words the Swedish voice misreads (respell.<word>), likely
+# "en passant" (said the French way). Never respell "en" (the English file does, for "en passant"):
+# in Swedish it is the article and the number one.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Swedish writes the numbers under a thousand as one word: 21-99 compose as "{tens}{units}"
+# ("tjugotre", "fyrtiofem", "nittionio"), the hundreds as "{n}hundra" ("tvåhundra"; one hundred is
+# "hundra", not "etthundra"). The voice gets a space between the hundreds and the rest ("tvåhundra
+# femtiotre"): the subtitles show digits, and shorter words are safer for the voice.
+# Forms of 1: the plain number is "ett", the form in which Swedish counts, reads digits and counts a
+# neuter noun ("drag ett", "matt i ett", "ett drag", "ett misstag", "ett parti"); the form "en"
+# ("{n:en}", count.en) says "en" before a common-gender noun ("en bonde", "en pjäs", "en gång"); it
+# carries into 21, 31 ... ("tjugoen bönder", "tjugoett drag"), both forms being correct Swedish.
+number.0.spoken = noll
+number.1.spoken = ett
+number.1.en.spoken = en
+number.2.spoken = två
+number.3.spoken = tre
+number.4.spoken = fyra
+number.5.spoken = fem
+number.6.spoken = sex
+number.7.spoken = sju
+number.8.spoken = åtta
+number.9.spoken = nio
+number.10.spoken = tio
+number.11.spoken = elva
+number.12.spoken = tolv
+number.13.spoken = tretton
+number.14.spoken = fjorton
+number.15.spoken = femton
+number.16.spoken = sexton
+number.17.spoken = sjutton
+number.18.spoken = arton
+number.19.spoken = nitton
+number.20.spoken = tjugo
+number.30.spoken = trettio
+number.40.spoken = fyrtio
+number.50.spoken = femtio
+number.60.spoken = sextio
+number.70.spoken = sjuttio
+number.80.spoken = åttio
+number.90.spoken = nittio
+number.100.spoken = hundra
+number.tens.spoken = {tens}{units}
+number.hundreds.spoken = {n}hundra
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Swedish writes a decimal comma ("1,3") and says "ett komma tre".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} komma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Swedish plural rule (assets/i18n): one (exactly 1) | other (0, 2, 3 ... 21 ...). Written with digits
+# ("1 bonde", "3 drag"), except "en gång" (written out, as Swedish writes it). Neuter nouns (drag,
+# misstag, parti, slag) say their number plainly ("ett drag", "tjugoett drag"), common-gender nouns
+# with the form "en" in both forms ("en bonde", "tjugoen bönder"). drag, misstag, poäng, slag,
+# angripare and försvarare are the same in the plural. The program never capitalises a number: do not
+# start a sentence with a counted noun ("{n:time} hittade du ..." would show "en gång hittade du ...").
+count.move = {n} drag|{n} drag
+count.point = {n:en} poäng|{n:en} poäng
+count.pawn = {n:en} bonde|{n:en} bönder
+count.piece = {n:en} pjäs|{n:en} pjäser
+count.mistake = {n} misstag|{n} misstag
+count.blunder = {n:en} blunder|{n:en} blundrar
+count.inaccuracy = {n:en} onoggrannhet|{n:en} onoggrannheter
+count.game = {n} parti|{n} partier
+count.time = en gång|{n:en} gånger
+count.square = {n:en} ruta|{n:en} rutor
+count.position = {n:en} ställning|{n:en} ställningar
+# "{n:en}" in a line says a bare number in the common gender ("en"); it is a count key so that the
+# same form also works outside the counted nouns (and the form check knows it). A bare "{n}" is the
+# neuter "ett" ("i drag {n}", "matt i {m}").
+count.en = {n:en}|{n:en}
+# More counted nouns for the review and appraisal lines: "{n:capture}" = "2 slag" (captures, pawns
+# included), "{n:attacker}" / "{n:defender}" = "3 angripare", "1 försvarare" ("{n:attacker} mot
+# {n2:defender}"), "{acc:percent}" = "85 %" written (no-break space), "åttiofem procent" spoken.
+# Checks are counted as times ("du gav schack {m:time}"), a streak of best moves too ("bästa draget
+# {n:time} i rad").
+count.capture = {n} slag|{n} slag
+count.attacker = {n:en} angripare|{n:en} angripare
+count.defender = {n:en} försvarare|{n:en} försvarare
+count.percent = {n} %|{n} %
+count.percent.spoken = {n:en} procent|{n:en} procent
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# A level position is "jämnt" ("Det var jämnt", "ungefär jämnt"). The subtitles keep the short "matt
+# i 3"; the voice adds "drag", the same word in the singular and plural ("matt i tre drag", "matt i ett
+# drag"), as Swedish players say it. ({n:move} would not work here: inside these patterns a form is a
+# number form, number.<n>.<form>, not a counted noun.)
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = jämnt
+eval.mate_win = matt i {n}
+eval.mate_win.spoken = matt i {n} drag
+eval.mate_loss = matt i {n} mot dig
+eval.mate_loss.spoken = matt i {n} drag mot dig

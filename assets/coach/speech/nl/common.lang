@@ -1,0 +1,347 @@
+# Coach speech (Dutch): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Dutch needs.
+# Register: the coach says "je" to the player ("jij" / "jouw" only when stressed, for a contrast), and
+# "ik" / "mijn" for himself; the game menus say "je" too. Dutch adjectives, participles and past tenses
+# never agree with a person, so the player's gender never shows. Vocabulary (KNSB usage, as in
+# assets/i18n/nl.lang): zet, veld, lijn, rij, schaak, mat, pat, remise, rokade, slaan, penning, vork, spies.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: de pion, het paard, de loper, de toren, de dame, de koning. Genders (piece.<type>.gender):
+# m, n, m, m, f, m. Dutch has no cases: one form is both subject and object ("{your} valt {my} aan",
+# "Sla {my}!"). What depends on the piece is the article (de / het), the pronouns that point back at it
+# (the knight is "het", the queen "ze" / "haar", the others "hij" / "hem") and an adjective after "een".
+# Forms (every one defined for all six pieces and the four owners your, my, white, black; {your2},
+# {my2}, {t1}, {t2} and the analysis {piece} take the same forms). Never write je / mijn / de / het
+# before a piece placeholder, except before the form "bare", which has no determiner of its own:
+#   nom    je paard / mijn toren / het witte paard / de zwarte dame (the default, "{your}")
+#            "{your} staat gepend: als {your:subj} weggaat, staat je koning schaak."
+#   emph   jouw paard / mijn toren / white and black as nom (stressed possessive, for a contrast)
+#            "Niet mijn loper maar {your:emph} staat aangevallen."
+#   def    het paard / de toren (definite article, owner dropped)
+#            "Breng {your} naar voren! In het eindspel is {your:def} een sterk stuk."
+#   art    het / de (the article alone, to put an adjective before the noun)
+#            "{piece:art} ongedekte {piece:bare} gaat verloren." (analysis: the side is dropped)
+#   bare   paard / toren (the noun alone, after a determiner or adjective you write yourself)
+#            "Je gepende {your:bare} kan {sq} niet dekken.", "Pak mijn ongedekte {my:bare}!"
+#   subj   het / hij / ze (subject pronoun; capitalised at the start of a sentence)
+#            "Dit is {your}. {your:subj} beweegt schuin, zo ver als je wilt."
+#   obj    het / hem / haar (object pronoun)
+#            "{my} staat ongedekt. Sla {my:obj}!", "{your2} dekte {your}; nu slaat {my} {your:obj}."
+#   poss   zijn / haar ("its")
+#            "Je koning staat naast {my}. Ga op {my:poss} veld staan om {my:obj} te slaan."
+#   rel    dat / die (relative pronoun; also the demonstrative "that one", which spoken Dutch often
+#          prefers to hij / het as a subject)
+#            "{reply} slaat {piece}, {piece:rel} geen verdediger had."
+#            "Kijk naar {your}: {your:rel} kan nergens heen."
+#            With bare, the demonstrative determiner: "{your:rel} {your:bare}" = "dat paard" / "die loper".
+#   this   dit / deze (demonstrative "this", alone or with bare)
+#            "{your:this} {your:bare} moet nu weg."
+#   e      (nothing) / e: the ending of an adjective after een, geen, elk, welk, zo'n (a het-word has none;
+#          after de, het, je, mijn, dit, dat the adjective always ends in -e)
+#            "Een gepend{your:e} {your:bare} is een slechte verdediger." ("Een gepend paard",
+#            "Een gepende loper")
+#   alone  het jouwe / de jouwe, het mijne / de mijne, het witte / de witte ("yours", "mine"), only when the
+#          noun was just said for a piece of the SAME type
+#            "Jouw dame staat aangevallen, {my:alone} niet." (my queen: "de mijne")
+# After a preposition Dutch uses "er" + preposition for a thing, whatever its gender: "erachter",
+# "ernaast", "ermee", "erop" ("{t2} staat erachter"), and "waar" + preposition in a relative clause
+# ("waarop", "waarmee"); never "achter hem" / "naast het". Nothing else in Dutch agrees with a piece:
+# adjectives after a verb, participles and verbs stay the same ("{your} is gepend", "{my} is gevallen").
+piece.pawn.gender = m
+piece.pawn.nom = pion
+piece.pawn.emph = pion
+piece.pawn.def = pion
+piece.pawn.art = de
+piece.pawn.bare = pion
+piece.pawn.subj = hij
+piece.pawn.obj = hem
+piece.pawn.poss = zijn
+piece.pawn.rel = die
+piece.pawn.this = deze
+piece.pawn.e = e
+piece.pawn.alone = pion
+piece.knight.gender = n
+piece.knight.nom = paard
+piece.knight.emph = paard
+piece.knight.def = paard
+piece.knight.art = het
+piece.knight.bare = paard
+piece.knight.subj = het
+piece.knight.obj = het
+piece.knight.poss = zijn
+piece.knight.rel = dat
+piece.knight.this = dit
+piece.knight.e =
+piece.knight.alone = paard
+piece.bishop.gender = m
+piece.bishop.nom = loper
+piece.bishop.emph = loper
+piece.bishop.def = loper
+piece.bishop.art = de
+piece.bishop.bare = loper
+piece.bishop.subj = hij
+piece.bishop.obj = hem
+piece.bishop.poss = zijn
+piece.bishop.rel = die
+piece.bishop.this = deze
+piece.bishop.e = e
+piece.bishop.alone = loper
+piece.rook.gender = m
+piece.rook.nom = toren
+piece.rook.emph = toren
+piece.rook.def = toren
+piece.rook.art = de
+piece.rook.bare = toren
+piece.rook.subj = hij
+piece.rook.obj = hem
+piece.rook.poss = zijn
+piece.rook.rel = die
+piece.rook.this = deze
+piece.rook.e = e
+piece.rook.alone = toren
+piece.queen.gender = f
+piece.queen.nom = dame
+piece.queen.emph = dame
+piece.queen.def = dame
+piece.queen.art = de
+piece.queen.bare = dame
+piece.queen.subj = ze
+piece.queen.obj = haar
+piece.queen.poss = haar
+piece.queen.rel = die
+piece.queen.this = deze
+piece.queen.e = e
+piece.queen.alone = dame
+piece.king.gender = m
+piece.king.nom = koning
+piece.king.emph = koning
+piece.king.def = koning
+piece.king.art = de
+piece.king.bare = koning
+piece.king.subj = hij
+piece.king.obj = hem
+piece.king.poss = zijn
+piece.king.rel = die
+piece.king.this = deze
+piece.king.e = e
+piece.king.alone = koning
+# The possessives: "je" (unstressed, the default) and "jouw" (stressed); "mijn" for the coach. The
+# gender variant ".n" is the het-word (the knight); m and f take the plain pattern (de-words).
+owner.your.nom = je {piece}
+owner.my.nom = mijn {piece}
+owner.your.emph = jouw {piece}
+owner.my.emph = mijn {piece}
+owner.your.def = de {piece}
+owner.your.def.n = het {piece}
+owner.my.def = de {piece}
+owner.my.def.n = het {piece}
+owner.your.alone = de jouwe
+owner.your.alone.n = het jouwe
+owner.my.alone = de mijne
+owner.my.alone.n = het mijne
+# The forms that are the word of the piece itself (article, noun, pronouns, adjective ending).
+owner.your.art = {piece}
+owner.your.bare = {piece}
+owner.your.subj = {piece}
+owner.your.obj = {piece}
+owner.your.poss = {piece}
+owner.your.rel = {piece}
+owner.your.this = {piece}
+owner.your.e = {piece}
+owner.my.art = {piece}
+owner.my.bare = {piece}
+owner.my.subj = {piece}
+owner.my.obj = {piece}
+owner.my.poss = {piece}
+owner.my.rel = {piece}
+owner.my.this = {piece}
+owner.my.e = {piece}
+# The Analysis mode names a piece by its side, nobody being "je" or "ik" there: "het witte paard",
+# "de zwarte dame" (article + colour adjective, lowercase). The players themselves are "Wit" and "Zwart".
+owner.white.nom = de witte {piece}
+owner.white.nom.n = het witte {piece}
+owner.black.nom = de zwarte {piece}
+owner.black.nom.n = het zwarte {piece}
+owner.white.emph = de witte {piece}
+owner.white.emph.n = het witte {piece}
+owner.black.emph = de zwarte {piece}
+owner.black.emph.n = het zwarte {piece}
+owner.white.def = de {piece}
+owner.white.def.n = het {piece}
+owner.black.def = de {piece}
+owner.black.def.n = het {piece}
+owner.white.alone = de witte
+owner.white.alone.n = het witte
+owner.black.alone = de zwarte
+owner.black.alone.n = het zwarte
+owner.white.art = {piece}
+owner.white.bare = {piece}
+owner.white.subj = {piece}
+owner.white.obj = {piece}
+owner.white.poss = {piece}
+owner.white.rel = {piece}
+owner.white.this = {piece}
+owner.white.e = {piece}
+owner.black.art = {piece}
+owner.black.bare = {piece}
+owner.black.subj = {piece}
+owner.black.obj = {piece}
+owner.black.poss = {piece}
+owner.black.rel = {piece}
+owner.black.this = {piece}
+owner.black.e = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# File letters are said by their Dutch names: aa, bee, cee, dee, ee, ef, gee, ha ("ee vier", "ef drie",
+# "gee zeven"). "a" and "e" are written "aa" and "ee" so that the voice says the long vowel of the
+# letter name, not a short vowel or a schwa. Ranks are number words; one is "één" (with its accents:
+# "een" is the article).
+square.spoken = {file} {rank}
+file.a.spoken = aa
+file.b.spoken = bee
+file.c.spoken = cee
+file.d.spoken = dee
+file.e.spoken = ee
+file.f.spoken = ef
+file.g.spoken = gee
+file.h.spoken = ha
+rank.1.spoken = één
+rank.2.spoken = twee
+rank.3.spoken = drie
+rank.4.spoken = vier
+rank.5.spoken = vijf
+rank.6.spoken = zes
+rank.7.spoken = zeven
+rank.8.spoken = acht
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Dutch scoresheet letters: K(oning) D(ame) T(oren) L(oper) P(aard): "Pf3", "Lxc4", "Kxe2".
+move.letters = K D T L P
+# Spoken as Dutch players read notation: "paard ef drie", "paard slaat op ee vijf", "paard bee dee
+# zeven", "ee slaat op dee vijf", "pion slaat terug", "korte rokade", "ee acht, promotie tot dame",
+# "dame gee vier, schaak", "dame ha zeven, schaakmat". {piece} is the bare noun (piece.<type>.nom).
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} slaat op {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} slaat op {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} slaat op {to}
+move.recapture.spoken = {piece} slaat terug
+move.castle_short.spoken = korte rokade
+move.castle_long.spoken = lange rokade
+move.promotion.spoken = {move}, promotie tot {piece}
+move.check.spoken = {move}, schaak
+move.mate.spoken = {move}, schaakmat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds them after listening to the voice. Never respell "en" (the
+# English file does, for "en passant"): in Dutch it is the word "and".
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Dutch says the units before the tens, joined by "en": 21-99 compose as "{units}en{tens}"
+# ("vierentwintig", "achtenveertig"). Listed instead: the numbers ending in 1 ("eenentwintig": one
+# alone is "één", with the accents that tell the voice it is the number, not the article "een"), in
+# 2 and 3 (a diaeresis after the vowel: "tweeëntwintig", "drieëndertig").
+# 100-999: "{n}honderd" ("tweehonderd"; one hundred is "honderd", never "eenhonderd"), then the rest
+# after a space ("driehonderd vijfenveertig", "honderd één"). Written Dutch joins them in one word;
+# the space only helps the voice (subtitles show digits) and keeps "één" in 101, 201... stressed.
+number.0.spoken = nul
+number.1.spoken = één
+number.2.spoken = twee
+number.3.spoken = drie
+number.4.spoken = vier
+number.5.spoken = vijf
+number.6.spoken = zes
+number.7.spoken = zeven
+number.8.spoken = acht
+number.9.spoken = negen
+number.10.spoken = tien
+number.11.spoken = elf
+number.12.spoken = twaalf
+number.13.spoken = dertien
+number.14.spoken = veertien
+number.15.spoken = vijftien
+number.16.spoken = zestien
+number.17.spoken = zeventien
+number.18.spoken = achttien
+number.19.spoken = negentien
+number.20.spoken = twintig
+number.21.spoken = eenentwintig
+number.22.spoken = tweeëntwintig
+number.23.spoken = drieëntwintig
+number.30.spoken = dertig
+number.31.spoken = eenendertig
+number.32.spoken = tweeëndertig
+number.33.spoken = drieëndertig
+number.40.spoken = veertig
+number.41.spoken = eenenveertig
+number.42.spoken = tweeënveertig
+number.43.spoken = drieënveertig
+number.50.spoken = vijftig
+number.51.spoken = eenenvijftig
+number.52.spoken = tweeënvijftig
+number.53.spoken = drieënvijftig
+number.60.spoken = zestig
+number.61.spoken = eenenzestig
+number.62.spoken = tweeënzestig
+number.63.spoken = drieënzestig
+number.70.spoken = zeventig
+number.71.spoken = eenenzeventig
+number.72.spoken = tweeënzeventig
+number.73.spoken = drieënzeventig
+number.80.spoken = tachtig
+number.81.spoken = eenentachtig
+number.82.spoken = tweeëntachtig
+number.83.spoken = drieëntachtig
+number.90.spoken = negentig
+number.91.spoken = eenennegentig
+number.92.spoken = tweeënnegentig
+number.93.spoken = drieënnegentig
+number.100.spoken = honderd
+number.tens.spoken = {units}en{tens}
+number.hundreds.spoken = {n}honderd
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = min {n}
+# A decimal number: Dutch writes a decimal comma ("1,3") and says "één komma drie".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} komma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Dutch plural rule (assets/i18n): one (1) | other (0, 2, 3 ...): "1 zet", "0 zetten", "3 zetten";
+# spoken "één zet" (the stressed number, right for a count). "keer" has no plural after a number.
+# "stuk" excludes the pawns, as in Dutch chess books ("een stuk voor twee pionnen"): for a number of
+# captures that includes pawns, say how many times the player captured: "Je hebt {n:time} geslagen".
+# Move numbers are cardinals in Dutch ("bij zet {n}", "zet 21"): no ordinals are needed.
+count.move = {n} zet|{n} zetten
+count.point = {n} punt|{n} punten
+count.pawn = {n} pion|{n} pionnen
+count.piece = {n} stuk|{n} stukken
+count.mistake = {n} fout|{n} fouten
+count.blunder = {n} blunder|{n} blunders
+count.inaccuracy = {n} onnauwkeurigheid|{n} onnauwkeurigheden
+count.game = {n} partij|{n} partijen
+count.time = {n} keer|{n} keer
+count.square = {n} veld|{n} velden
+count.position = {n} stelling|{n} stellingen
+# More counted nouns for the review and the appraisal: attackers and defenders of a square
+# ("{n:attacker} tegen {n2:defender}" = "drie aanvallers tegen twee verdedigers"), a streak of best
+# moves ("{n:best_move} op rij"), and a percentage ("{acc:percent}" = "85%" written, "vijfentachtig
+# procent" spoken; "{acc} procent" written out in full is fine too).
+count.attacker = {n} aanvaller|{n} aanvallers
+count.defender = {n} verdediger|{n} verdedigers
+count.best_move = {n} beste zet|{n} beste zetten
+count.percent = {n}%|{n}%
+count.percent.spoken = {n} procent|{n} procent
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# "mat in 3" needs no noun ("mat in drie"); a mate against the listener says "tegen jou".
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = min {x}
+eval.even = 0,0
+eval.even.spoken = gelijk
+eval.mate_win = mat in {n}
+eval.mate_loss = mat in {n} tegen jou

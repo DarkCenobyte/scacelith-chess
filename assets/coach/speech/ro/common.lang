@@ -1,0 +1,630 @@
+# Coach speech (Romanian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Romanian needs.
+# Register (see the glossary): the coach says "tu" to the player (the game menus use the formal plural);
+# the coach is male ("sunt mulțumit"). The player's gender is unknown: no adjective, passive or
+# predicative participle agreeing with the player ("ești atent", "ai fost prins", "ai rămas singur");
+# the active past is invariable and fine ("ai pierdut", "ai găsit", "te-ai grăbit").
+# Orthography: ș ț Ș Ț with the comma below (U+0219 U+021B U+0218 U+021A), never the cedilla; â and î as
+# the current norm writes them ("sunt", "câmp", "în"); quotation marks „…”.
+# No value of this file may be empty: tools/gen_opening_lang.py reads it and rejects an empty value.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns (the Romanian Chess Federation's words): pionul (m), calul (m), nebunul (m), turnul (n), dama (f),
+# regele (m). A neuter noun agrees like a masculine one in the singular, so only the queen is feminine:
+# "dama ta", "ea", "o", "legată". piece.<type>.nom is the bare noun ("cal"), said in the spoken moves
+# ("cal ef trei", "se transformă în damă"); the placeholders {your} {my} {t1}... never give it.
+# A piece placeholder carries its article and its owner: never write "tău", "meu", "alb", an article or
+# "al" next to it. The forms, each defined for the six pieces and the four owners (your, my, white, black;
+# the forms without an owner word are the same for all four):
+#   (nom)     {your} = "calul tău" / "dama ta", {my} = "calul meu" / "dama mea", Analysis {piece} = "calul alb"
+#             / "dama albă", "calul negru" / "dama neagră". Subject, direct object, and after every
+#             preposition taking the accusative (cu, pe, la, în, din, de, spre, lângă, pentru, fără, sub,
+#             până la): the article stays there because the owner word follows. "Ia {my} cu {your}!"
+#   gen       "calului tău" / "damei tale", "calului meu" / "damei mele", "calului alb" / "damei albe",
+#             "calului negru" / "damei negre": genitive and dative, after a definite noun, after the
+#             prepositions taking the genitive (în fața, în spatele, împotriva, deasupra, în jurul) and the
+#             dative ones (datorită, mulțumită). "{t2} stă în spatele {t1:gen}.", "Dau șah {your:gen}."
+#   def       "calul" / "dama": article, no owner word, for a piece whose owner the sentence already gives
+#             (the subject, or a clitic îți / îmi / își). "Mută-ți {your:def} de acolo.", "Îmi retrag {my:def}."
+#   def_gen   "calului" / "damei", likewise. "Dă-i șah {my:def_gen}!"
+#   bare      "cal" / "damă", no article: a trade or a material count. "Un schimb: {my:bare} pentru {your:bare}."
+#   indef     "un cal" / "o damă". "Ai câștigat {my:indef}." After în, din, prin write "într-{my:indef}",
+#             "dintr-{my:indef}" ("într-un cal" / "într-o damă"), never "în {my:indef}".
+#   indef_gen "unui cal" / "unei dame". "Asta e valoarea {my:indef_gen}."
+#   pron      "el" / "ea": after a preposition, or as an emphatic subject (Romanian usually drops it).
+#             "{my} atacă {t1}, iar {t2} stă chiar lângă {t1:pron}.", "Totul se sprijină pe {your:pron}."
+#   pron_gen  "lui" / "ei", also for "its". "{t2} e în spatele {t1:pron_gen}.", "câmpurile {your:pron_gen}"
+#   cl        "îl" / "o", the object clitic before a verb. "Nu {your:cl} mai poți salva.", "{my:cl} poți lua."
+#             Not before a perfect or conditional auxiliary: "l-am luat" but "am luat-o" put the clitic in
+#             different places. Use the present or the future there, or name the piece again.
+#   cl_imp    "-l" / "-o" after an imperative that does not end in -ă. "Ia{my:cl_imp}!" = "Ia-l!" / "Ia-o!"
+#   cl_imp_a  "ă-l" / "-o" after the stem of an imperative in -ă (the ă drops before -o): write the verb
+#             without its ă. "Mut{your:cl_imp_a} de acolo!" = "Mută-l" / "Mut-o", "Apăr{your:cl_imp_a}!"
+#             The short "dă", "fă" keep their ă ("dă-l" / "dă-o"): they take cl_imp.
+#   cl_ger    "u-l" / "-o" after a gerund. "Câștigi timp atacând{my:cl_ger}." = "atacându-l" / "atacând-o"
+#   dem       "acesta" / "aceasta". "{your:dem} este {your}." = "Acesta este calul tău." / "Aceasta este dama ta."
+#   cel       "cel" / "cea". "{your} e {your:cel} mai activ{your:agr_v}.", "{t1:cel} de pe {sq}"
+#   ul        "ul" / "a", the article of an adjective standing for the piece, written joined to it.
+#             "{your} e singur{your:ul} care apără {sq}." = "singurul" / "singura"; "prim{t1:ul}", "ultim{t1:ul}"
+#   rel_gen   "căruia" / "căreia". "{your}, {your:rel_gen} nu-i mai rămâne niciun câmp, e pierdu{your:agr_t}."
+#   agr_t agr_s agr_v agr_r agr_l agr_c agr_n agr_b
+#             the last letter of an adjective or participle agreeing with the piece, masculine "t" /
+#             feminine "tă" (s/să, v/vă, r/ră, l/lă, c/că, n/nă, b/bă): write the word without its last
+#             letter. "{your} este lega{your:agr_t}." = "legat" / "legată"; "prin{t1:agr_s}" (prins),
+#             "pasi{t1:agr_v}" (pasiv), "libe{t1:agr_r}" (liber), "vulnerabi{t1:agr_l}", "puterni{t1:agr_c}",
+#             "bu{t1:agr_n}", "sla{t1:agr_b}". Only for words whose feminine just adds -ă: "mort / moartă",
+#             "periculos / periculoasă" do not, rephrase them.
+# Two pieces ({t1} și {t2}) cannot share one agreeing word: agree with "piesele" ("ambele piese sunt
+# atacate") or use a verb ("atac și {t1}, și {t2}").
+# The Analysis mode names a piece by its colour, "calul alb", "dama neagră" (the board shows which piece is
+# meant, so "nebunul alb" is White's bishop, not the light-squared one).
+piece.pawn.nom = pion
+piece.knight.nom = cal
+piece.bishop.nom = nebun
+piece.rook.nom = turn
+piece.queen.nom = damă
+piece.king.nom = rege
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = n
+piece.queen.gender = f
+piece.king.gender = m
+# The forms with an owner word, as whole phrases (the article sits on the noun, the owner word after it).
+phrase.your.pawn.nom = pionul tău
+phrase.your.knight.nom = calul tău
+phrase.your.bishop.nom = nebunul tău
+phrase.your.rook.nom = turnul tău
+phrase.your.queen.nom = dama ta
+phrase.your.king.nom = regele tău
+phrase.my.pawn.nom = pionul meu
+phrase.my.knight.nom = calul meu
+phrase.my.bishop.nom = nebunul meu
+phrase.my.rook.nom = turnul meu
+phrase.my.queen.nom = dama mea
+phrase.my.king.nom = regele meu
+phrase.white.pawn.nom = pionul alb
+phrase.white.knight.nom = calul alb
+phrase.white.bishop.nom = nebunul alb
+phrase.white.rook.nom = turnul alb
+phrase.white.queen.nom = dama albă
+phrase.white.king.nom = regele alb
+phrase.black.pawn.nom = pionul negru
+phrase.black.knight.nom = calul negru
+phrase.black.bishop.nom = nebunul negru
+phrase.black.rook.nom = turnul negru
+phrase.black.queen.nom = dama neagră
+phrase.black.king.nom = regele negru
+phrase.your.pawn.gen = pionului tău
+phrase.your.knight.gen = calului tău
+phrase.your.bishop.gen = nebunului tău
+phrase.your.rook.gen = turnului tău
+phrase.your.queen.gen = damei tale
+phrase.your.king.gen = regelui tău
+phrase.my.pawn.gen = pionului meu
+phrase.my.knight.gen = calului meu
+phrase.my.bishop.gen = nebunului meu
+phrase.my.rook.gen = turnului meu
+phrase.my.queen.gen = damei mele
+phrase.my.king.gen = regelui meu
+phrase.white.pawn.gen = pionului alb
+phrase.white.knight.gen = calului alb
+phrase.white.bishop.gen = nebunului alb
+phrase.white.rook.gen = turnului alb
+phrase.white.queen.gen = damei albe
+phrase.white.king.gen = regelui alb
+phrase.black.pawn.gen = pionului negru
+phrase.black.knight.gen = calului negru
+phrase.black.bishop.gen = nebunului negru
+phrase.black.rook.gen = turnului negru
+phrase.black.queen.gen = damei negre
+phrase.black.king.gen = regelui negru
+# The English keys (every language defines them); never used, the phrases above come first.
+owner.your.nom = {piece} tău
+owner.my.nom = {piece} meu
+owner.white.nom = {piece} alb
+owner.black.nom = {piece} negru
+# The forms without an owner word: the same words for every owner.
+piece.pawn.def = pionul
+piece.knight.def = calul
+piece.bishop.def = nebunul
+piece.rook.def = turnul
+piece.queen.def = dama
+piece.king.def = regele
+owner.your.def = {piece}
+owner.my.def = {piece}
+owner.white.def = {piece}
+owner.black.def = {piece}
+piece.pawn.def_gen = pionului
+piece.knight.def_gen = calului
+piece.bishop.def_gen = nebunului
+piece.rook.def_gen = turnului
+piece.queen.def_gen = damei
+piece.king.def_gen = regelui
+owner.your.def_gen = {piece}
+owner.my.def_gen = {piece}
+owner.white.def_gen = {piece}
+owner.black.def_gen = {piece}
+piece.pawn.bare = pion
+piece.knight.bare = cal
+piece.bishop.bare = nebun
+piece.rook.bare = turn
+piece.queen.bare = damă
+piece.king.bare = rege
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+piece.pawn.indef = un pion
+piece.knight.indef = un cal
+piece.bishop.indef = un nebun
+piece.rook.indef = un turn
+piece.queen.indef = o damă
+piece.king.indef = un rege
+owner.your.indef = {piece}
+owner.my.indef = {piece}
+owner.white.indef = {piece}
+owner.black.indef = {piece}
+piece.pawn.indef_gen = unui pion
+piece.knight.indef_gen = unui cal
+piece.bishop.indef_gen = unui nebun
+piece.rook.indef_gen = unui turn
+piece.queen.indef_gen = unei dame
+piece.king.indef_gen = unui rege
+owner.your.indef_gen = {piece}
+owner.my.indef_gen = {piece}
+owner.white.indef_gen = {piece}
+owner.black.indef_gen = {piece}
+piece.pawn.pron = el
+piece.knight.pron = el
+piece.bishop.pron = el
+piece.rook.pron = el
+piece.queen.pron = ea
+piece.king.pron = el
+owner.your.pron = {piece}
+owner.my.pron = {piece}
+owner.white.pron = {piece}
+owner.black.pron = {piece}
+piece.pawn.pron_gen = lui
+piece.knight.pron_gen = lui
+piece.bishop.pron_gen = lui
+piece.rook.pron_gen = lui
+piece.queen.pron_gen = ei
+piece.king.pron_gen = lui
+owner.your.pron_gen = {piece}
+owner.my.pron_gen = {piece}
+owner.white.pron_gen = {piece}
+owner.black.pron_gen = {piece}
+piece.pawn.cl = îl
+piece.knight.cl = îl
+piece.bishop.cl = îl
+piece.rook.cl = îl
+piece.queen.cl = o
+piece.king.cl = îl
+owner.your.cl = {piece}
+owner.my.cl = {piece}
+owner.white.cl = {piece}
+owner.black.cl = {piece}
+piece.pawn.cl_imp = -l
+piece.knight.cl_imp = -l
+piece.bishop.cl_imp = -l
+piece.rook.cl_imp = -l
+piece.queen.cl_imp = -o
+piece.king.cl_imp = -l
+owner.your.cl_imp = {piece}
+owner.my.cl_imp = {piece}
+owner.white.cl_imp = {piece}
+owner.black.cl_imp = {piece}
+piece.pawn.cl_imp_a = ă-l
+piece.knight.cl_imp_a = ă-l
+piece.bishop.cl_imp_a = ă-l
+piece.rook.cl_imp_a = ă-l
+piece.queen.cl_imp_a = -o
+piece.king.cl_imp_a = ă-l
+owner.your.cl_imp_a = {piece}
+owner.my.cl_imp_a = {piece}
+owner.white.cl_imp_a = {piece}
+owner.black.cl_imp_a = {piece}
+piece.pawn.cl_ger = u-l
+piece.knight.cl_ger = u-l
+piece.bishop.cl_ger = u-l
+piece.rook.cl_ger = u-l
+piece.queen.cl_ger = -o
+piece.king.cl_ger = u-l
+owner.your.cl_ger = {piece}
+owner.my.cl_ger = {piece}
+owner.white.cl_ger = {piece}
+owner.black.cl_ger = {piece}
+piece.pawn.dem = acesta
+piece.knight.dem = acesta
+piece.bishop.dem = acesta
+piece.rook.dem = acesta
+piece.queen.dem = aceasta
+piece.king.dem = acesta
+owner.your.dem = {piece}
+owner.my.dem = {piece}
+owner.white.dem = {piece}
+owner.black.dem = {piece}
+piece.pawn.cel = cel
+piece.knight.cel = cel
+piece.bishop.cel = cel
+piece.rook.cel = cel
+piece.queen.cel = cea
+piece.king.cel = cel
+owner.your.cel = {piece}
+owner.my.cel = {piece}
+owner.white.cel = {piece}
+owner.black.cel = {piece}
+piece.pawn.ul = ul
+piece.knight.ul = ul
+piece.bishop.ul = ul
+piece.rook.ul = ul
+piece.queen.ul = a
+piece.king.ul = ul
+owner.your.ul = {piece}
+owner.my.ul = {piece}
+owner.white.ul = {piece}
+owner.black.ul = {piece}
+piece.pawn.rel_gen = căruia
+piece.knight.rel_gen = căruia
+piece.bishop.rel_gen = căruia
+piece.rook.rel_gen = căruia
+piece.queen.rel_gen = căreia
+piece.king.rel_gen = căruia
+owner.your.rel_gen = {piece}
+owner.my.rel_gen = {piece}
+owner.white.rel_gen = {piece}
+owner.black.rel_gen = {piece}
+piece.pawn.agr_t = t
+piece.knight.agr_t = t
+piece.bishop.agr_t = t
+piece.rook.agr_t = t
+piece.queen.agr_t = tă
+piece.king.agr_t = t
+owner.your.agr_t = {piece}
+owner.my.agr_t = {piece}
+owner.white.agr_t = {piece}
+owner.black.agr_t = {piece}
+piece.pawn.agr_s = s
+piece.knight.agr_s = s
+piece.bishop.agr_s = s
+piece.rook.agr_s = s
+piece.queen.agr_s = să
+piece.king.agr_s = s
+owner.your.agr_s = {piece}
+owner.my.agr_s = {piece}
+owner.white.agr_s = {piece}
+owner.black.agr_s = {piece}
+piece.pawn.agr_v = v
+piece.knight.agr_v = v
+piece.bishop.agr_v = v
+piece.rook.agr_v = v
+piece.queen.agr_v = vă
+piece.king.agr_v = v
+owner.your.agr_v = {piece}
+owner.my.agr_v = {piece}
+owner.white.agr_v = {piece}
+owner.black.agr_v = {piece}
+piece.pawn.agr_r = r
+piece.knight.agr_r = r
+piece.bishop.agr_r = r
+piece.rook.agr_r = r
+piece.queen.agr_r = ră
+piece.king.agr_r = r
+owner.your.agr_r = {piece}
+owner.my.agr_r = {piece}
+owner.white.agr_r = {piece}
+owner.black.agr_r = {piece}
+piece.pawn.agr_l = l
+piece.knight.agr_l = l
+piece.bishop.agr_l = l
+piece.rook.agr_l = l
+piece.queen.agr_l = lă
+piece.king.agr_l = l
+owner.your.agr_l = {piece}
+owner.my.agr_l = {piece}
+owner.white.agr_l = {piece}
+owner.black.agr_l = {piece}
+piece.pawn.agr_c = c
+piece.knight.agr_c = c
+piece.bishop.agr_c = c
+piece.rook.agr_c = c
+piece.queen.agr_c = că
+piece.king.agr_c = c
+owner.your.agr_c = {piece}
+owner.my.agr_c = {piece}
+owner.white.agr_c = {piece}
+owner.black.agr_c = {piece}
+piece.pawn.agr_n = n
+piece.knight.agr_n = n
+piece.bishop.agr_n = n
+piece.rook.agr_n = n
+piece.queen.agr_n = nă
+piece.king.agr_n = n
+owner.your.agr_n = {piece}
+owner.my.agr_n = {piece}
+owner.white.agr_n = {piece}
+owner.black.agr_n = {piece}
+piece.pawn.agr_b = b
+piece.knight.agr_b = b
+piece.bishop.agr_b = b
+piece.rook.agr_b = b
+piece.queen.agr_b = bă
+piece.king.agr_b = b
+owner.your.agr_b = {piece}
+owner.my.agr_b = {piece}
+owner.white.agr_b = {piece}
+owner.black.agr_b = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Letter names as Romanian spells them, ranks as number words: e4 = "e patru", f3 = "ef trei",
+# d5 = "de cinci", c6 = "ce șase", g7 = "ge șapte", h8 = "haș opt", a1 = "a unu".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = ef
+file.g.spoken = ge
+file.h.spoken = haș
+rank.1.spoken = unu
+rank.2.spoken = doi
+rank.3.spoken = trei
+rank.4.spoken = patru
+rank.5.spoken = cinci
+rank.6.spoken = șase
+rank.7.spoken = șapte
+rank.8.spoken = opt
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Romanian scoresheet letters: R(ege) D(amă) T(urn) N(ebun) C(al): "Cf3", "Txe1", "Nb5".
+move.letters = R D T N C
+# Spoken as Romanian players read notation, with the bare noun: "cal ef trei", "cal ia e cinci",
+# "cal be de doi", "e ia de cinci", "pion recapturează" (a recapture in a line), "rocadă mică",
+# "e opt, se transformă în damă", "damă ge patru, șah", "damă haș șapte, șah mat".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} ia {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} ia {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} ia {to}
+move.recapture.spoken = {piece} recapturează
+move.castle_short.spoken = rocadă mică
+move.castle_long.spoken = rocadă mare
+move.promotion.spoken = {move}, se transformă în {piece}
+move.check.spoken = {move}, șah
+move.mate.spoken = {move}, șah mat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the words the voice misreads.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. The plain word is the counting and masculine form ("unu", "doi", "doisprezece",
+# "douăzeci și unu de pioni"). Forms: "f" = feminine ("una", "două", "douăsprezece": "două mutări",
+# "douăzeci și una de mutări", "una dintre ele"); "neut" = neuter, masculine 1 and feminine 2
+# ("douăzeci și unu de puncte", "două puncte", "douăsprezece câmpuri"). A number without its own form
+# falls back to the plain word. 21-99 compose as "{tens} și {units}" (the units keep the form);
+# every hundred is listed ("o sută", "două sute"), and 101-999 compose as "{hundreds} {rest}"
+# ("o sută douăzeci și trei"). The noun after a number takes "de" from 20 on (n % 100 = 0 or 20-99):
+# the counted nouns below do it.
+number.0.spoken = zero
+number.1.spoken = unu
+number.1.f.spoken = una
+number.2.spoken = doi
+number.2.f.spoken = două
+number.2.neut.spoken = două
+number.3.spoken = trei
+number.4.spoken = patru
+number.5.spoken = cinci
+number.6.spoken = șase
+number.7.spoken = șapte
+number.8.spoken = opt
+number.9.spoken = nouă
+number.10.spoken = zece
+number.11.spoken = unsprezece
+number.12.spoken = doisprezece
+number.12.f.spoken = douăsprezece
+number.12.neut.spoken = douăsprezece
+number.13.spoken = treisprezece
+number.14.spoken = paisprezece
+number.15.spoken = cincisprezece
+number.16.spoken = șaisprezece
+number.17.spoken = șaptesprezece
+number.18.spoken = optsprezece
+number.19.spoken = nouăsprezece
+number.20.spoken = douăzeci
+number.30.spoken = treizeci
+number.40.spoken = patruzeci
+number.50.spoken = cincizeci
+number.60.spoken = șaizeci
+number.70.spoken = șaptezeci
+number.80.spoken = optzeci
+number.90.spoken = nouăzeci
+number.100.spoken = o sută
+number.200.spoken = două sute
+number.300.spoken = trei sute
+number.400.spoken = patru sute
+number.500.spoken = cinci sute
+number.600.spoken = șase sute
+number.700.spoken = șapte sute
+number.800.spoken = opt sute
+number.900.spoken = nouă sute
+number.tens.spoken = {tens} și {units}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} sute
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Romanian writes a decimal comma ("1,3") and says "unu virgulă trei".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} virgulă {frac}
+# The mate distance of an evaluation with its noun and preposition ("{n:in_move}" in eval.mate_*.spoken,
+# where the count keys do not apply): "într-o mutare", "în două mutări", "în douăzeci de mutări".
+number.1.in_move.spoken = într-o mutare
+number.2.in_move.spoken = în două mutări
+number.3.in_move.spoken = în trei mutări
+number.4.in_move.spoken = în patru mutări
+number.5.in_move.spoken = în cinci mutări
+number.6.in_move.spoken = în șase mutări
+number.7.in_move.spoken = în șapte mutări
+number.8.in_move.spoken = în opt mutări
+number.9.in_move.spoken = în nouă mutări
+number.10.in_move.spoken = în zece mutări
+number.11.in_move.spoken = în unsprezece mutări
+number.12.in_move.spoken = în douăsprezece mutări
+number.13.in_move.spoken = în treisprezece mutări
+number.14.in_move.spoken = în paisprezece mutări
+number.15.in_move.spoken = în cincisprezece mutări
+number.16.in_move.spoken = în șaisprezece mutări
+number.17.in_move.spoken = în șaptesprezece mutări
+number.18.in_move.spoken = în optsprezece mutări
+number.19.in_move.spoken = în nouăsprezece mutări
+number.20.in_move.spoken = în douăzeci de mutări
+number.21.in_move.spoken = în douăzeci și una de mutări
+number.22.in_move.spoken = în douăzeci și două de mutări
+number.23.in_move.spoken = în douăzeci și trei de mutări
+number.24.in_move.spoken = în douăzeci și patru de mutări
+number.25.in_move.spoken = în douăzeci și cinci de mutări
+number.26.in_move.spoken = în douăzeci și șase de mutări
+number.27.in_move.spoken = în douăzeci și șapte de mutări
+number.28.in_move.spoken = în douăzeci și opt de mutări
+number.29.in_move.spoken = în douăzeci și nouă de mutări
+number.30.in_move.spoken = în treizeci de mutări
+number.31.in_move.spoken = în treizeci și una de mutări
+number.32.in_move.spoken = în treizeci și două de mutări
+number.33.in_move.spoken = în treizeci și trei de mutări
+number.34.in_move.spoken = în treizeci și patru de mutări
+number.35.in_move.spoken = în treizeci și cinci de mutări
+number.36.in_move.spoken = în treizeci și șase de mutări
+number.37.in_move.spoken = în treizeci și șapte de mutări
+number.38.in_move.spoken = în treizeci și opt de mutări
+number.39.in_move.spoken = în treizeci și nouă de mutări
+number.40.in_move.spoken = în patruzeci de mutări
+number.41.in_move.spoken = în patruzeci și una de mutări
+number.42.in_move.spoken = în patruzeci și două de mutări
+number.43.in_move.spoken = în patruzeci și trei de mutări
+number.44.in_move.spoken = în patruzeci și patru de mutări
+number.45.in_move.spoken = în patruzeci și cinci de mutări
+number.46.in_move.spoken = în patruzeci și șase de mutări
+number.47.in_move.spoken = în patruzeci și șapte de mutări
+number.48.in_move.spoken = în patruzeci și opt de mutări
+number.49.in_move.spoken = în patruzeci și nouă de mutări
+number.50.in_move.spoken = în cincizeci de mutări
+number.51.in_move.spoken = în cincizeci și una de mutări
+number.52.in_move.spoken = în cincizeci și două de mutări
+number.53.in_move.spoken = în cincizeci și trei de mutări
+number.54.in_move.spoken = în cincizeci și patru de mutări
+number.55.in_move.spoken = în cincizeci și cinci de mutări
+number.56.in_move.spoken = în cincizeci și șase de mutări
+number.57.in_move.spoken = în cincizeci și șapte de mutări
+number.58.in_move.spoken = în cincizeci și opt de mutări
+number.59.in_move.spoken = în cincizeci și nouă de mutări
+number.60.in_move.spoken = în șaizeci de mutări
+number.61.in_move.spoken = în șaizeci și una de mutări
+number.62.in_move.spoken = în șaizeci și două de mutări
+number.63.in_move.spoken = în șaizeci și trei de mutări
+number.64.in_move.spoken = în șaizeci și patru de mutări
+number.65.in_move.spoken = în șaizeci și cinci de mutări
+number.66.in_move.spoken = în șaizeci și șase de mutări
+number.67.in_move.spoken = în șaizeci și șapte de mutări
+number.68.in_move.spoken = în șaizeci și opt de mutări
+number.69.in_move.spoken = în șaizeci și nouă de mutări
+number.70.in_move.spoken = în șaptezeci de mutări
+number.71.in_move.spoken = în șaptezeci și una de mutări
+number.72.in_move.spoken = în șaptezeci și două de mutări
+number.73.in_move.spoken = în șaptezeci și trei de mutări
+number.74.in_move.spoken = în șaptezeci și patru de mutări
+number.75.in_move.spoken = în șaptezeci și cinci de mutări
+number.76.in_move.spoken = în șaptezeci și șase de mutări
+number.77.in_move.spoken = în șaptezeci și șapte de mutări
+number.78.in_move.spoken = în șaptezeci și opt de mutări
+number.79.in_move.spoken = în șaptezeci și nouă de mutări
+number.80.in_move.spoken = în optzeci de mutări
+number.81.in_move.spoken = în optzeci și una de mutări
+number.82.in_move.spoken = în optzeci și două de mutări
+number.83.in_move.spoken = în optzeci și trei de mutări
+number.84.in_move.spoken = în optzeci și patru de mutări
+number.85.in_move.spoken = în optzeci și cinci de mutări
+number.86.in_move.spoken = în optzeci și șase de mutări
+number.87.in_move.spoken = în optzeci și șapte de mutări
+number.88.in_move.spoken = în optzeci și opt de mutări
+number.89.in_move.spoken = în optzeci și nouă de mutări
+number.90.in_move.spoken = în nouăzeci de mutări
+number.91.in_move.spoken = în nouăzeci și una de mutări
+number.92.in_move.spoken = în nouăzeci și două de mutări
+number.93.in_move.spoken = în nouăzeci și trei de mutări
+number.94.in_move.spoken = în nouăzeci și patru de mutări
+number.95.in_move.spoken = în nouăzeci și cinci de mutări
+number.96.in_move.spoken = în nouăzeci și șase de mutări
+number.97.in_move.spoken = în nouăzeci și șapte de mutări
+number.98.in_move.spoken = în nouăzeci și opt de mutări
+number.99.in_move.spoken = în nouăzeci și nouă de mutări
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Romanian plural rule (assets/i18n): one (1) | few (0, 2-19, and 101-119, 201-219...) | other (20-99,
+# 100, 120...: the noun takes "de"). Written: digits ("1 mutare", "3 mutări", "20 de mutări"). Spoken: the
+# ".spoken" forms say "o mutare" / "un punct" for one, and the number in the noun's gender.
+# A count renders in lower case: never start a sentence with one.
+count.move = {n} mutare|{n} mutări|{n} de mutări
+count.move.spoken = o mutare|{n:f} mutări|{n:f} de mutări
+count.point = {n} punct|{n} puncte|{n} de puncte
+count.point.spoken = un punct|{n:neut} puncte|{n:neut} de puncte
+count.pawn = {n} pion|{n} pioni|{n} de pioni
+count.pawn.spoken = un pion|{n} pioni|{n} de pioni
+count.piece = {n} piesă|{n} piese|{n} de piese
+count.piece.spoken = o piesă|{n:f} piese|{n:f} de piese
+count.mistake = {n} greșeală|{n} greșeli|{n} de greșeli
+count.mistake.spoken = o greșeală|{n:f} greșeli|{n:f} de greșeli
+count.blunder = {n} gafă|{n} gafe|{n} de gafe
+count.blunder.spoken = o gafă|{n:f} gafe|{n:f} de gafe
+count.inaccuracy = {n} inexactitate|{n} inexactități|{n} de inexactități
+count.inaccuracy.spoken = o inexactitate|{n:f} inexactități|{n:f} de inexactități
+count.game = {n} partidă|{n} partide|{n} de partide
+count.game.spoken = o partidă|{n:f} partide|{n:f} de partide
+# "{n:time}" = "o dată", "de 3 ori", "de 20 de ori" (with its "de"): "Ai dat șah {m:time}."
+count.time = o dată|de {n} ori|de {n} de ori
+count.time.spoken = o dată|de {n:f} ori|de {n:f} de ori
+count.square = {n} câmp|{n} câmpuri|{n} de câmpuri
+count.square.spoken = un câmp|{n:neut} câmpuri|{n:neut} de câmpuri
+count.position = {n} poziție|{n} poziții|{n} de poziții
+count.position.spoken = o poziție|{n:f} poziții|{n:f} de poziții
+# Romanian only, for the sentences of the other coach files:
+# "mat {m:in_move}" = "mat într-o mutare" / "mat în 3 mutări" / "mat în 20 de mutări" (it carries its "în",
+# which contracts with "o" to "într-o": never write "în {m:move}"); "{n:best_move}" = "5 mutări optime"
+# (a streak of the engine's best moves); "{n:attacker}" / "{n:defender}" = "3 atacatori", "un apărător";
+# "{m:check}" = "2 șahuri"; "{n:capture}" = "4 capturi"; "{acc:percent}" = "85 %", spoken "optzeci și cinci
+# la sută" (the percent sign after a no-break space).
+count.in_move = într-o mutare|în {n} mutări|în {n} de mutări
+count.in_move.spoken = într-o mutare|în {n:f} mutări|în {n:f} de mutări
+count.best_move = {n} mutare optimă|{n} mutări optime|{n} de mutări optime
+count.best_move.spoken = o mutare optimă|{n:f} mutări optime|{n:f} de mutări optime
+count.attacker = {n} atacator|{n} atacatori|{n} de atacatori
+count.attacker.spoken = un atacator|{n} atacatori|{n} de atacatori
+count.defender = {n} apărător|{n} apărători|{n} de apărători
+count.defender.spoken = un apărător|{n} apărători|{n} de apărători
+count.check = {n} șah|{n} șahuri|{n} de șahuri
+count.check.spoken = un șah|{n:neut} șahuri|{n:neut} de șahuri
+count.capture = {n} captură|{n} capturi|{n} de capturi
+count.capture.spoken = o captură|{n:f} capturi|{n:f} de capturi
+count.percent = {n} %|{n} %|{n} %
+count.percent.spoken = {n} la sută|{n} la sută|{n} la sută
+# "{n:f}" / "{n:neut}" in a line say a bare number in the feminine / neuter, for a noun the line writes
+# itself or leaves out ("{m:f} dintre ele" = "una dintre ele", "două dintre ele"); digits in writing.
+# They are count keys so that the same forms work outside the counted nouns (and the form check knows them).
+count.f = {n:f}|{n:f}|{n:f}
+count.neut = {n:neut}|{n:neut}|{n:neut}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# The spoken mate says its noun ("mat în trei mutări", "mat într-o mutare"); the subtitles keep "mat în 3".
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = egalitate
+eval.mate_win = mat în {n}
+eval.mate_win.spoken = mat {n:in_move}
+eval.mate_loss = mat în {n} împotriva ta
+eval.mate_loss.spoken = mat {n:in_move} împotriva ta

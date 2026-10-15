@@ -1,0 +1,111 @@
+# Coach speech (Indonesian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "kamu" and "aku" (possessives "-mu" / "-ku"), conversational standard Indonesian
+# (glossary/id.md). Indonesian has no grammatical gender: nothing agrees with the player.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Halo! Ayo kita bermain santai. Aku akan membantumu setiap kali ada yang tidak beres.
+event.greet.l1.2 = Hai! Aku tidak akan bermain terlalu keras, dan aku akan menunjukkan apa saja yang perlu kamu waspadai.
+event.greet.l1.3 = Selamat datang! Tidak perlu terburu-buru: aku akan memberi tahu kalau ada buah yang sedang dalam bahaya.
+event.greet.l2 = Halo! Ayo kita main. Kalau muncul taktik garpu atau kunci, aku akan menunjukkannya kepadamu.
+event.greet.l2.2 = Hai! Kembangkan buah caturmu dan jaga rajamu tetap aman. Aku akan membantu sepanjang permainan.
+event.greet.l2.3 = Selamat datang kembali di papan! Waspadai taktik garpu dan kunci: taktik seperti itulah yang memenangkan permainan.
+event.greet.l3 = Halo! Ayo kita bermain sungguhan. Aku akan mengomentari rencanamu dan kesalahan-kesalahan yang lebih besar.
+event.greet.l3.2 = Hai! Pikirkan rencana untuk buah caturmu. Aku akan memberi tahu kalau ada langkah yang melewatkan sesuatu.
+event.greet.l3.3 = Ayo kita main! Aku akan memberi tahu kapan hanya ada satu langkah yang benar, dan langkah mana yang keliru.
+event.greet.l4 = Halo! Kali ini aku akan memberikan evaluasi dan menunjukkan langkah-langkah kandidat yang lebih baik.
+event.greet.l4.2 = Ayo kita main. Setelah ada kesalahan, aku akan memberi tahu apa yang lebih tepat.
+event.greet.l4.3 = Siap untuk permainan ala klub? Aku akan berkomentar saat evaluasinya berubah.
+event.greet.l5 = Ayo kita main. Komentarku akan singkat saja.
+event.greet.l5.2 = Aku siap kalau kamu sudah siap. Komentarnya singkat saja.
+event.greet.l5.3 = Semoga sukses. Aku hanya akan berbicara kalau memang penting.
+event.greet.l6 = Semoga sukses.
+event.greet.l6.2 = Ayo main.
+event.greet.l6.3 = Siap. Aku hanya akan mengomentari momen-momen kritis.
+
+# Who starts (said after the greeting).
+event.colour.white = Kamu memegang buah putih, jadi kamu yang mulai.
+event.colour.white.2 = Kamu bermain sebagai Putih: kamu yang melangkah lebih dulu.
+event.colour.black = Aku bermain sebagai Putih, jadi aku yang mulai.
+event.colour.black.2 = Kali ini kamu bermain sebagai Hitam: aku yang melangkah lebih dulu.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# Level names (sentence case, as the coach page should show them): Langkah pertama, Pemula,
+# Berkembang, Pemain klub, Pemain klub kuat, Ahli. Keep them in step with assets/i18n/id.lang
+# coach.level.<n>.name. "Play gently" = "tidak bermain terlalu keras" (the coach plays below strength).
+event.level.l1 = Langkah pertama: aku tidak bermain terlalu keras, dan setiap kesalahan kujelaskan dengan kata-kata sederhana.
+event.level.l2 = Pemula: aku bermain sedikit lebih kuat, dan aku menyebut nama taktik sederhana seperti garpu dan kunci.
+event.level.l3 = Berkembang: aku membahas rencana dan struktur pion, dan aku menunjukkan variasi pendek.
+event.level.l4 = Pemain klub: aku memberikan evaluasi dalam satuan pion dan menyarankan langkah-langkah kandidat.
+event.level.l5 = Pemain klub kuat: komentar singkat, dan variasi yang lebih panjang kalau memang perlu.
+event.level.l6 = Ahli: aku bermain dengan kekuatan penuh dan hanya mengomentari momen-momen kritis.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Giliranmu melangkah.
+event.your_move.2 = Giliranmu.
+event.your_move.3 = Silakan, sekarang kamu.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Pelan-pelan saja.
+event.take_time.2 = Tidak perlu terburu-buru: permainan kita tidak memakai jam.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Coba kita lihat.
+event.filler.3 = Biar kulihat dulu.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Baiklah, kita ambil kembali langkahnya.
+event.takeback.taken.2 = Ide bagus. Coba lihat sekali lagi.
+event.takeback.taken.3 = Kita kembalikan. Coba lagi.
+# The player declined the offer and played on.
+event.takeback.declined = Baiklah, kita lanjutkan.
+event.takeback.declined.2 = Baik, permainan berlanjut.
+event.takeback.declined.3 = Itu pilihanmu. Ayo kita lanjutkan.
+# After an explanation without an offer.
+event.play_on = Ayo kita lanjutkan permainannya.
+event.play_on.2 = Mari kita lanjutkan.
+event.play_on.3 = Nah, kembali ke permainan kita.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Semua orang pernah membuat kesalahan seperti ini. Yang penting adalah menyadarinya.
+event.encourage.mistake.2 = Jangan khawatir. Periksa apa yang diserang oleh langkah terakhirku, dan kamu akan menemukannya.
+event.encourage.mistake.3 = Hal seperti itu dialami setiap pemain. Ayo kita lanjutkan.
+# The player is behind (material or evaluation).
+event.encourage.behind = Jangan menyerah: cari peluang, dan jangan biarkan aku menang dengan mudah.
+event.encourage.behind.2 = Terus berjuang. Posisi seperti ini masih bisa berbalik.
+event.encourage.behind.3 = Tetap tenang, dan cari kelemahan-kelemahanku.
+# The player has played several good moves in a row.
+event.encourage.well = Kamu memeriksa ancamanku sebelum melangkah. Bagus sekali.
+event.encourage.well.2 = Langkah-langkah yang hati-hati dan kokoh. Teruskan.
+event.encourage.well.3 = Hari ini kamu berpikir dengan baik.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Aku terima. Jadi, remis.
+event.draw.accepted.2 = Setuju: permainan berakhir remis.
+event.draw.declined = Tidak, terima kasih. Ayo kita lanjutkan.
+event.draw.declined.2 = Aku lebih suka melanjutkan.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Permainanmu bagus sekali. Selamat!
+event.end.win.2 = Kamu pantas menang. Bagus sekali!
+event.end.win.3 = Selamat: kamu mengalahkanku secara adil.
+event.end.loss = Permainan yang bagus. Lain kali kamu akan mengalahkanku.
+event.end.loss.2 = Terima kasih atas permainannya. Setiap kekalahan mengajarimu sesuatu.
+event.end.loss.3 = Perlawanan yang bagus. Ayo kita lihat apa yang terjadi.
+event.end.draw = Remis. Permainan yang bagus!
+event.end.draw.2 = Kali ini tidak ada yang menang. Pertarungan yang bagus.
+event.end.draw.3 = Hasil yang adil. Permainan yang bagus.
+event.end.resigned = Kamu menyerah. Meski begitu, perlawananmu bagus.
+event.end.resigned.2 = Baiklah. Terima kasih atas permainannya.
+event.end.handshake = Ayo kita berjabat tangan.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lower-case noun phrase that
+# follows "bab tentang" ("the chapter about") or "kita bahas" ("we discuss").
+event.lesson.resume = Selamat datang kembali! Kita lanjutkan dengan bab tentang {chapter}.
+event.lesson.resume.2 = Halo lagi! Terakhir kali kita sampai di bab tentang {chapter}.
+event.lesson.next = Berikutnya: {chapter}.
+event.lesson.next.2 = Sekarang kita bahas {chapter}.

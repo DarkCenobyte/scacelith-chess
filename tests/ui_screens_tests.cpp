@@ -403,7 +403,7 @@ TEST(ui_screens_options_display_and_language) {
     REQUIRE(language(plat::KEY_RIGHT));
     CHECK_EQ(i18n::language(), std::string(langs[size_t(en + 1)].code));
     CHECK_EQ(g.language, i18n::language());
-    for (int i = 0; i < 12 && i18n::language() != "ar"; ++i) REQUIRE(language(plat::KEY_RIGHT));
+    for (int i = 0; i < 40 && i18n::language() != "ar"; ++i) REQUIRE(language(plat::KEY_RIGHT));
     REQUIRE(i18n::language() == "ar");
     CHECK(ui::im::rtl());
     // Mirrored, the Right arrow goes back in the list.
@@ -411,7 +411,7 @@ TEST(ui_screens_options_display_and_language) {
     REQUIRE(language(plat::KEY_RIGHT));
     CHECK_EQ(i18n::language(), std::string(langs[size_t(ar - 1)].code));
     CHECK(!ui::im::rtl());
-    for (int i = 0; i < 12 && i18n::language() != "en"; ++i) REQUIRE(language(plat::KEY_LEFT));
+    for (int i = 0; i < 40 && i18n::language() != "en"; ++i) REQUIRE(language(plat::KEY_LEFT));
     REQUIRE(i18n::language() == "en");
     CHECK_EQ(g.language, std::string("en"));
     d.frames(2);
@@ -439,6 +439,65 @@ TEST(ui_screens_options_display_and_language) {
     CHECK(ui::optionsOpen());   // still true the frame after (the game reads it one frame late)
     d.frame();
     CHECK(!ui::optionsOpen());
+}
+
+// Options > Display: a click on the language's name shows the whole list; a name picked there is
+// applied and saved at once. Enter on the row opens it too; Esc, or a click beside the list,
+// closes it without a change, and the options page stays.
+TEST(ui_screens_options_language_list) {
+    REQUIRE(uitest::app());
+    Restore restore;
+    game::Settings& g = game::settings();
+    g.language = "en";
+    uitest::Driver d;
+    Menus m;
+    m.attach(d);
+    d.frames(2);
+    REQUIRE(d.click(T("menu.options")));
+    settle(d);
+    const ui::im::TracedItem* row = d.find(T("options.language"));
+    REQUIRE(row != nullptr);
+    const Rect r = row->r;
+    const float boxX = r.r() - 22.0f - 125.0f;   // the middle of the selector's box (250 wide)
+    d.clickRect(Rect(boxX - 40.0f, r.y, 80.0f, r.h));
+    d.frames(20);
+    CHECK_EQ(i18n::language(), std::string("en"));   // no step: the list is open
+    for (const i18n::Language& l : i18n::languages()) CHECK(d.has(l.nativeName));
+    REQUIRE(d.click("Deutsch"));
+    d.frame();
+    CHECK_EQ(i18n::language(), std::string("de"));
+    CHECK_EQ(g.language, std::string("de"));
+    CHECK(!d.has("Italiano"));   // closed
+    CHECK(ui::optionsOpen());
+    CHECK(d.disabled(T("common.apply")));   // the language is no pending change
+    // Enter on the row, then Esc: the list closes, the page stays.
+    REQUIRE(d.focusRow(T("options.language")));
+    d.press(plat::KEY_ENTER);
+    d.frames(20);
+    CHECK(d.has("Italiano"));
+    d.press(plat::KEY_ESCAPE);
+    d.frame();
+    CHECK(!d.has("Italiano"));
+    CHECK(d.has(T("options.language")));
+    CHECK_EQ(i18n::language(), std::string("de"));
+    // A click beside the list closes it too.
+    d.clickRect(Rect(boxX - 40.0f, r.y, 80.0f, r.h));
+    d.frames(20);
+    REQUIRE(d.has("Italiano"));
+    d.clickAt(20.0f, 20.0f);
+    d.frame();
+    CHECK(!d.has("Italiano"));
+    CHECK_EQ(i18n::language(), std::string("de"));
+    // The keyboard: the list opens on the current language; Down then Enter picks the next one.
+    REQUIRE(d.focusRow(T("options.language")));
+    d.press(plat::KEY_ENTER);
+    d.frames(20);
+    d.press(plat::KEY_DOWN);
+    d.press(plat::KEY_ENTER);
+    d.frame();
+    const int de = i18n::languageIndex("de");
+    CHECK_EQ(i18n::language(), std::string(i18n::languages()[size_t(de + 1)].code));
+    CHECK(ui::optionsOpen());
 }
 
 // Leaving Options with changes asks first: Discard (or Esc) drops them, Apply stores them.

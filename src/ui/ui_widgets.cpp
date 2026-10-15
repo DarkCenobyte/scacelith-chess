@@ -821,7 +821,7 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
 }
 
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
-                 bool enabled, float valueW) {
+                 bool enabled, float valueW, bool* openList) {
     Item it = item(makeId(label), r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
     traceLabel(label);
     int n = int(options.size());
@@ -833,8 +833,10 @@ bool selectorRow(const std::string& label, int& index, const std::vector<std::st
     if (it.clicked) {
         if (rl.contains(mouse())) index -= step;
         else if (rr.contains(mouse())) index += step;
+        else if (box.contains(mouse()) && openList) *openList = true;
         else if (box.contains(mouse())) index = n > 0 ? (index + 1) % n : 0;
     }
+    if (openList && it.activated && !it.clicked) *openList = true;
     if (it.left) index -= step;
     if (it.right) index += step;
     index = std::clamp(index, 0, std::max(0, n - 1));
@@ -1281,6 +1283,68 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     gfx::popAlpha();
     // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
     if (result < 0) occlude(Rect(0, 0, view.x, view.y));
+    gfx::setLayer(prev);
+    return result;
+}
+
+int choiceDialog(const char* idStr, const std::string& title, const std::vector<std::string>& options, int current,
+                 int columns) {
+    Id id = makeId(idStr);
+    Anim& a = anim(id);
+    bool first = a.firstFrame == frame();
+    a.v[0] = first ? 0.0f : approach(a.v[0], 1.0f, 12.0f);
+    float t = a.v[0];
+    captureMouseAll();
+    captureKeyboard();
+    // Modal scope: items registered earlier this frame (the page below) leave the navigation.
+    c.curList.clear();
+    gfx::Layer prev = gfx::layer();
+    gfx::setLayer(gfx::LAYER_MODAL);
+    vec2 view = gfx::viewSize();
+    gfx::fill(Rect(0, 0, view.x, view.y), vec4(0, 0, 0, 0.55f * t));
+    gfx::pushAlpha(t);
+    const int n = int(options.size());
+    const int cols = std::clamp(columns, 1, std::max(1, n));
+    const int rows = std::max(1, (n + cols - 1) / cols);
+    const float pad = 60.0f, gapX = 18.0f, top = 128.0f, bottom = 48.0f;
+    float w = std::min(view.x - 40.0f, 2.0f * pad + float(cols) * 300.0f + float(cols - 1) * gapX);
+    float cellW = (w - 2.0f * pad - float(cols - 1) * gapX) / float(cols);
+    float cellH = std::clamp((view.y - 40.0f - top - bottom) / float(rows), 28.0f, 48.0f);
+    float h = top + float(rows) * cellH + bottom;
+    Rect r(view.x * 0.5f - w * 0.5f, view.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
+    gfx::fill(r, vec4(0.035f, 0.03f, 0.027f, 1.0f), 3.0f);  // opaque: hide the page below
+    panel(r);
+    pageTitle(title, r.cx(), r.y + 72.0f, w - 2.0f * pad);
+    pushId(idStr);
+    int result = -1;
+    for (int i = 0; i < n; ++i) {
+        const int col = i / rows, line = i % rows;
+        Rect cell = flip(r, Rect(r.x + pad + float(col) * (cellW + gapX), r.y + top + float(line) * cellH, cellW, cellH - 4.0f));
+        const std::string& label = options[size_t(i)];
+        Item it = item(makeId(label), cell, ITEM_FOCUSABLE);
+        traceLabel(label);
+        if (first && i == current) setFocus(it.id);
+        if (i == current) setDefaultFocus(it.id);
+        const bool chosen = i == current;
+        rowHighlight(cell, std::max(it.hoverT, chosen ? 0.6f : 0.0f));
+        TextStyle st = valueStyle(true, std::max(it.hoverT, chosen ? 1.0f : 0.0f));
+        st.align = HAlign::Center;
+        st.size = gfx::fitSize(label, st, cellW - 24.0f, 0.6f);
+        gfx::text(label, cell.cx(), centerBaseline(cell, st), st);
+        if (it.activated && result < 0) result = i;
+    }
+    popId();
+    if (!first && result < 0 && c.mPressed && c.mouseInWindow && !r.contains(mouse())) {
+        result = -2;
+        sound(Sound::Back);
+    } else if (!first && result < 0 && consumeBack()) {
+        result = -2;
+        sound(Sound::Back);
+    }
+    if (result >= 0) sound(Sound::Confirm);
+    gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it.
+    if (result == -1) occlude(Rect(0, 0, view.x, view.y));
     gfx::setLayer(prev);
     return result;
 }

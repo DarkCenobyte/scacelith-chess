@@ -1,0 +1,264 @@
+# Coach speech (Indonesian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("bentengmu", "kudaku");
+# {your:bare} = the noun alone ("benteng"), used to name the piece again instead of "it" (common.lang).
+# {sq}, {sq2}, {to}, {esc} = squares ("ke petak {sq}", "di {sq}": nothing glued to them);
+# {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points while saying the word right
+# after the mark. A ".spoken" key is what the voice says instead (here: letters spelled for the
+# voice: "ha" for h, "el" for the letter L of the knight's move).
+
+# ---- Chapter titles (said inside "Kita lanjutkan dengan bab tentang {chapter}.": lower case) ---------
+lesson.title.welcome = papan catur
+lesson.title.pieces = cara buah catur bergerak
+lesson.title.safety = langkah makan yang aman dan tidak aman
+lesson.title.check = skak
+lesson.title.mate = skakmat
+lesson.title.castling = rokade
+lesson.title.en_passant = en passant
+lesson.title.promotion = promosi
+lesson.title.draws = pat dan remis
+lesson.title.etiquette = rating, jam, dan sopan santun dalam permainan sungguhan
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Sekarang kamu coba.
+lesson.now_you.2 = Sekarang giliranmu.
+lesson.now_you.3 = Sekarang kamu.
+# Another wrong move after the demonstration.
+lesson.almost = Hampir! Mainkan langkah yang tadi kutunjukkan.
+lesson.almost.2 = Belum tepat. Coba langkah yang tadi kuperagakan.
+lesson.almost.3 = Sedikit lagi. Ingat apa yang baru saja kutunjukkan.
+# A wrong move without a line of its own.
+lesson.try_again = Bukan itu. Coba lagi.
+lesson.try_again.2 = Bukan langkah ini. Coba sekali lagi.
+lesson.try_again.3 = Ayo kita coba sekali lagi.
+lesson.use_your = Gunakan {your}.
+lesson.use_your.2 = Coba dengan {your}.
+lesson.watch = Perhatikan.
+lesson.like_this = Seperti ini.
+lesson.and_back = Lalu kita kembalikan.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Skak, tapi rajaku lolos ke petak {esc}.
+lesson.check_takes = Skak, tapi rajaku tinggal memakan {your}.
+lesson.check_block = Skak, tapi aku bisa menaruh sebuah buah untuk menghalanginya.
+lesson.stalemate = Pat! Rajaku tidak bisa bergerak, dan tidak sedang terkena skak. Hasilnya remis, padahal posisimu menang!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Jangan ke petak {sq}: {my} menyerang petak itu. Raja tidak pernah melangkah ke dalam bahaya.
+why.PathBlocked = Ada yang menghalangi {@}jalannya: buah catur tidak bisa melompat, kecuali kuda.
+why.WrongGeometry = {your} tidak bergerak seperti itu.
+why.MustAnswerCheck = Kamu sedang terkena {@}skak: kamu harus mengatasinya dulu.
+why.CastlingThroughCheck = Rajamu akan melewati petak {sq}, dan {my} menyerang petak itu.
+why.CastlingNoRights = Raja atau benteng itu sudah pernah bergerak: tidak boleh rokade.
+why.CastlingBlocked = Untuk rokade, petak-petak di antara raja dan benteng harus kosong.
+why.CastlingOutOfCheck = Kamu tidak boleh rokade saat sedang terkena skak.
+why.PawnForwardBlocked = Pion tidak bisa memakan lurus ke depan: petak itu {@}terhalang.
+why.LeavesKingInCheck = {your} terkunci: kalau dipindahkan, rajamu akan terbuka terhadap serangan {my}.
+why.OwnPieceOnTarget = Kamu tidak bisa melangkah ke petak yang ditempati buahmu sendiri.
+why.PawnCaptureNeedsVictim = Pion bergerak diagonal hanya untuk memakan.
+why.EnPassantExpired = En passant hanya boleh dilakukan tepat setelah pion itu maju dua petak.
+why.NotYourTurn = Tunggu: sekarang giliranku.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+# Files and ranks are introduced as "garis tegak" / "garis mendatar" (vertical / horizontal lines),
+# since "baris" (row) is itself the Indonesian word for a rank.
+lesson.welcome.hello = Halo! Aku pelatihmu. Ayo kita pelajari aturan catur bersama, sedikit demi sedikit.
+lesson.welcome.board = Ini papan catur: enam puluh empat petak, terang dan gelap, delapan kali delapan.
+lesson.welcome.light = Petak sudut di sebelah {@}kananmu selalu petak terang. Ingat: terang di kanan.
+lesson.welcome.files = Garis tegak disebut lajur. Lajur ditandai dengan huruf, dari {@}a sampai {@2}h.
+lesson.welcome.files.spoken = Garis tegak disebut lajur. Lajur ditandai dengan huruf, dari {@}a sampai {@2}ha.
+lesson.welcome.ranks = Garis mendatar disebut baris. Baris ditandai dengan angka, dari {@}satu sampai {@2}delapan, mulai dari sisimu.
+lesson.welcome.square = Setiap petak dinamai dengan hurufnya, lalu angkanya. Petak ini adalah {sq}.
+lesson.welcome.square2 = Dan yang ini petak {sq}.
+lesson.welcome.kings = Ini kedua raja. Rajamu ada di {sq}, rajaku di {sq2}.
+lesson.welcome.ask = Giliranmu: majukan rajamu satu petak, ke petak {sq}.
+lesson.welcome.wrong = Itu petak {to}. Yang kita mau petak {sq}: huruf e, angka dua.
+lesson.welcome.ok = Sempurna. Rajamu sekarang di {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Ini {your}. {your:bare} bergerak lurus, sepanjang lajur dan baris, sejauh apa pun.
+lesson.rook.lines = Naik sepanjang lajur, {@}atau menyusuri baris.
+lesson.rook.capture = Untuk memakan, sebuah buah melangkah ke petak buah {@}lawan, dan buah lawan itu pun keluar dari papan.
+lesson.rook.ask = Makan {my} dengan bentengmu!
+lesson.rook.short = Arahnya benar! Terus naik sepanjang lajur, sampai ke {my}.
+lesson.rook.rank = Itu menyusuri baris. {my} ada di atas, di lajur ini.
+lesson.rook.king = Itu rajamu. Gunakan {your}, yang ada di sudut.
+lesson.rook.ok = Berhasil dimakan! {my} keluar dari papan.
+# Pieces don't jump
+lesson.jump.blocked = Buah catur tidak bisa melompati buah lain. Pionmu di {sq} menghalangi jalan benteng.
+lesson.jump.knight = Hanya kuda yang bisa melompat. Sebentar lagi kita akan berkenalan dengannya.
+# Bishop
+lesson.bishop.intro = Ini {your}. {your:bare} bergerak diagonal, sejauh apa pun.
+lesson.bishop.colour = Gajah selalu tetap berada di petak yang warnanya sama.
+lesson.bishop.ask = {my} ada di diagonal gajahmu. Makan buah itu!
+lesson.bishop.short = Diagonalnya benar! Terus lagi, sampai kamu mencapai {my}.
+lesson.bishop.other = Itu diagonal yang lain. Lihat ke arah {my}.
+lesson.bishop.ok = Bagus sekali. Gajah suka diagonal yang panjang.
+# Queen
+lesson.queen.intro = Ini {your}, buah terkuat. {your:bare} bergerak seperti benteng dan gajah sekaligus.
+lesson.queen.ask = Temukan {my}, lalu makan buah itu dengan menterimu.
+lesson.queen.wrong = Menterimu bisa mencapai {my} dalam satu langkah, lewat sebuah diagonal.
+lesson.queen.ok = Bagus! Jaga menterimu tetap aman: nilainya tinggi.
+# King
+lesson.king.intro = Raja hanya bergerak satu petak, ke arah mana saja.
+lesson.king.important = Raja adalah buah yang paling penting. Kalau raja sampai terjebak, permainan berakhir dengan kekalahan.
+lesson.king.ask = Raja juga bisa memakan. Makan {my}!
+lesson.king.wrong = Rajamu tepat di sebelah {my}. Melangkahlah ke petaknya untuk memakannya.
+lesson.king.ok = Bagus! Raja memang lambat, tapi kuat dari jarak dekat.
+# Knight
+lesson.knight.intro = Ini {your}. {your:bare} bergerak membentuk huruf L: dua petak lurus, lalu satu ke samping.
+lesson.knight.intro.spoken = Ini {your}. {your:bare} bergerak membentuk huruf el: dua petak lurus, lalu satu ke samping.
+lesson.knight.l = Seperti {@}ini. Kuda selalu mendarat di petak yang warnanya berbeda.
+lesson.knight.jump = Kuda adalah satu-satunya buah yang bisa melompati buah lain.
+lesson.knight.ask = Makan {my} dengan kudamu!
+lesson.knight.wrong = Itu memang langkah kuda yang benar, tapi tidak mencapai {my}. Coba huruf L yang lain.
+lesson.knight.wrong.spoken = Itu memang langkah kuda yang benar, tapi tidak mencapai {my}. Coba huruf el yang lain.
+lesson.knight.ok = Lompatan hebat!
+# Pawn: moving
+lesson.pawn.intro = Sekarang {your}. {your:bare} bergerak lurus ke depan, satu petak sekali jalan, dan tidak pernah mundur.
+lesson.pawn.first = Pada langkah pertamanya, pion boleh maju satu atau dua petak.
+lesson.pawn.ask = Majukan pionmu dua petak.
+lesson.pawn.one = Itu satu petak: sah, tapi kali ini majulah dua petak.
+lesson.pawn.use = Gunakan pion.
+lesson.pawn.ok = Bagus.
+# Pawn: capturing
+lesson.pawncap.blocked = Pionku menghalangi pionmu. Pion tidak bisa memakan lurus ke depan.
+lesson.pawncap.diagonal = Tapi pion memakan secara diagonal, satu petak ke depan.
+lesson.pawncap.ask = Makan {my} dengan pionmu.
+lesson.pawncap.use = Gunakan {your}: {your:bare} memakan secara diagonal ke depan.
+lesson.pawncap.ok = Ya! Maju lurus, makan diagonal.
+# Values, set-up and the first moves
+lesson.values.pawn = Setiap buah punya nilai dalam poin. Pion bernilai satu.
+lesson.values.pieces = Kuda atau {@}gajah, tiga. {@2}Benteng, lima. {@3}Menteri, sembilan.
+lesson.values.king = Raja tak ternilai: kamu tidak akan pernah bisa menyerahkannya.
+lesson.values.trade = Usahakan jangan pernah menukar buah dengan sesuatu yang nilainya lebih rendah.
+lesson.setup.corners = Setiap permainan dimulai seperti ini: benteng di {@}sudut, lalu {@2}kuda, lalu {@3}gajah.
+lesson.setup.queen = Menteri berdiri di petak yang sewarna dengannya: menterimu ada di petak terang.
+lesson.setup.king = Raja berdiri di sebelahnya. Putih selalu melangkah lebih dulu.
+lesson.first.ask = Mulai permainannya: majukan pion di depan rajamu dua petak, ke petak {sq}.
+lesson.first.wrong = Itu juga langkah yang sah! Tapi untuk sekarang, tolong majukan pion rajamu ke petak {sq}.
+lesson.first.ok = Langkah pertama yang hebat: langkah ini membuka jalan bagi menteri dan gajahmu.
+lesson.first.reply = Aku menjawab dengan cara yang sama. Sekarang keluarkan kuda: lompat dari {sq} ke {sq2}.
+lesson.first.knight_wrong = Kuda melompati pion-pion. Coba dari {sq} ke {sq2}.
+lesson.first.knight_ok = Sempurna. Kuda dan gajah dikembangkan lebih awal.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Sebuah buah disebut terlindungi kalau ada buah kawan yang bisa memakan kembali.
+lesson.safety.pawn = {@}Pionku melindungi {my}.
+lesson.safety.free = Tapi {my} tidak punya pelindung. Menterimu menyerang kedua buah itu.
+lesson.safety.ask = Makan buah yang gratis itu!
+lesson.safety.watch = Perhatikan apa yang terjadi.
+lesson.safety.gave = Kamu menyerahkan menterimu, yang bernilai sembilan, demi kudaku, yang bernilai tiga.
+lesson.safety.other = Coba buah yang satunya.
+lesson.safety.look = Cari buah yang tidak dilindungi apa pun.
+lesson.safety.ok = Bagus sekali! Selalu tanyakan: apakah buah itu terlindungi?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Bentengku menguasai seluruh baris kedua.
+lesson.danger.rule = Raja tidak pernah boleh melangkah ke petak tempat ia bisa dimakan.
+lesson.danger.ask = Pindahkan rajamu ke petak yang aman.
+lesson.danger.ok = Benar. Rajamu aman di sana.
+lesson.check.what = Bentengku menyerang rajamu. Itu disebut skak.
+lesson.check.must = Kalau kamu terkena skak, kamu harus segera keluar dari skak itu.
+lesson.check.ways = Ada tiga cara: {@}memindahkan raja, {@2}menghalangi serangan, atau {@3}memakan penyerangnya.
+lesson.check.ask = Di sini, pindahkan rajamu keluar dari skak.
+lesson.check.file = Petak {to} masih berada di lajur {@}bentengku. Menyingkirlah dari garis itu.
+lesson.check.ok = Bagus: kamu sudah lolos dari skak.
+lesson.block.again = Skak lagi! Kali ini rajamu tidak punya petak bebas.
+lesson.block.ask = Jadi halangi serangannya: taruh sebuah buah di jalur serangan itu.
+lesson.block.queen = Itu menghalangi! Tapi bentengku bisa memakan menterimu. Halangi dengan buah yang nilainya lebih kecil.
+lesson.block.queen_ok = Itu berhasil. Ingat: halangi dengan buahmu yang paling murah.
+lesson.block.ok = Sempurna. Halangi dengan buahmu yang nilainya paling rendah.
+lesson.capture.check = Menteriku memberi skak, tepat di sebelah rajamu.
+lesson.capture.ask = Makan penyerangnya!
+lesson.capture.king_ok = Ya! Menteriku tidak punya pelindung, jadi rajamu bisa memakannya.
+lesson.capture.knight_ok = Ya! Kudamu menyingkirkan penyerangnya.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Skakmat: raja terkena skak, dan tidak punya jalan keluar. Itulah yang memenangkan permainan.
+lesson.mate1.stuck = Rajaku terkurung di belakang {@}pion-pionnya sendiri.
+lesson.mate1.ask = Skakmat rajaku dalam satu langkah!
+lesson.mate1.wrong = Hampir! Beri skak di baris belakangku, tempat rajaku tidak bisa lolos.
+lesson.mate1.ok = Skakmat! Itu namanya skakmat baris belakang. Ingat baik-baik!
+lesson.mate2.ask = Raja dan menterimu bekerja sama sebagai tim. Skakmat rajaku dalam satu langkah.
+lesson.mate2.wrong = Cari skak yang tidak menyisakan satu petak pun bagi rajaku.
+lesson.mate2.ok = Skakmat! Rajamu melindungi menteri, jadi rajaku tidak bisa memakannya.
+lesson.mate2.ok_rank = Skakmat di baris belakang! Rajamu menjaga setiap petak di depan rajaku.
+lesson.mate3.edge = Bentengmu di baris ketujuh menahan rajaku di tepi papan.
+lesson.mate3.ask = Sekarang gunakan {your} untuk memberi skakmat.
+lesson.mate3.free = Skak, tapi baris ketujuh sekarang terbuka, dan rajaku lolos.
+lesson.mate3.takes = Rajaku tinggal memakan bentengmu.
+lesson.mate3.hint = Beri skak di baris belakang dengan benteng yang tidak sedang menjaga baris ketujuh.
+lesson.mate3.ok = Skakmat! Kedua benteng bekerja seperti tangga.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rokade adalah langkah khusus yang menjaga rajamu tetap aman. Raja dan benteng bergerak bersamaan.
+lesson.castle.how = {@}Raja bergerak dua petak ke arah benteng, dan {@2}benteng melompati raja ke sisi seberangnya.
+lesson.castle.ask = Selalu sentuh rajanya dulu. Sekarang kamu: lakukan rokade di sayap raja.
+lesson.castle.rook = Itu hanya memindahkan benteng. Untuk rokade, pindahkan rajamu dua petak ke arah benteng itu.
+lesson.castle.long = Itu rokade di sayap menteri, juga sah! Kali ini, lakukan rokade ke arah benteng yang lebih dekat.
+lesson.castle.one = Satu petak itu langkah raja biasa. Untuk rokade, raja bergerak dua petak.
+lesson.castle.other = Untuk rokade, pindahkan rajamu dua petak ke arah benteng di petak {sq}.
+lesson.castle.ok = Rokade berhasil! Rajamu terlindung, dan bentengmu siap beraksi.
+lesson.castle2.moved = Kamu tidak boleh rokade kalau raja atau benteng itu sudah pernah bergerak.
+lesson.castle2.attacked = Juga tidak boleh saat terkena skak, atau kalau rajamu akan melewati atau mendarat di petak yang diserang.
+lesson.castle2.bishop = Gajahku menyerang petak {sq}. Jadi, rokade di sisi ini sekarang terlarang.
+lesson.castle2.ask = Lakukan rokade di sisi yang lain.
+lesson.castle2.other = Lakukan rokade ke arah bentengmu yang satunya, di sayap menteri.
+lesson.castle2.ok = Benar! Rokade di sayap menteri menempatkan rajamu di petak {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Pion punya satu cara memakan yang khusus, yang disebut en passant. Artinya “sambil lewat”.
+lesson.ep.watch = Perhatikan pionku: pion ini maju dua petak dan berhenti tepat di samping pionmu.
+lesson.ep.how = Pionmu boleh memakannya seolah-olah pionku hanya maju satu petak: ke petak {sq}.
+lesson.ep.now = Tapi hanya sekarang, pada langkah ini. Makan secara en passant!
+lesson.ep.gone = Kesempatannya sudah hilang: en passant hanya bisa dilakukan saat itu juga. Ayo kita coba lagi.
+lesson.ep.ok = En passant! Pionku di {sq} disingkirkan.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Kalau pion mencapai baris terakhir, pion itu dipromosikan: ia berubah menjadi menteri, benteng, gajah, atau kuda.
+lesson.promo.ask = Hampir selalu, pilih menteri. Promosikan pionmu sekarang!
+lesson.promo.under = Boleh! Tapi menteri lebih kuat. Ayo kita pilih menteri.
+lesson.promo.under_ok = Baiklah. Tapi kebanyakan pemain memilih menteri.
+lesson.promo.push = Majukan pionmu ke baris terakhir, ke petak {sq}.
+lesson.promo.ok = Menteri baru! Kamu bahkan boleh punya dua menteri sekaligus.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Sekarang giliranku. Rajaku tidak terkena skak, tapi {@}setiap petak di sekitarnya diserang.
+lesson.stale.draw = Aku tidak punya langkah yang sah. Itu namanya pat, dan permainan berakhir remis.
+lesson.stale2.ask = Kalau posisimu menang, waspadai pat. Skakmat rajaku dalam satu langkah, tanpa membuat pat!
+lesson.stale2.wrong = Beri skak di baris belakangku, tempat rajaku tidak bisa lolos.
+lesson.stale2.ok = Skakmat! Selalu sisakan satu langkah untuk raja lawan, kecuali kalau kamu sedang memberi skakmat.
+lesson.draws.kings = Remis lainnya: kalau tidak ada yang bisa memberi skakmat, misalnya tinggal dua raja saja, permainan berakhir remis.
+lesson.draws.agree = Para pemain juga bisa sepakat untuk remis.
+lesson.draws.repeat = Posisi yang terulang tiga kali, atau lima puluh langkah tanpa ada buah yang dimakan dan tanpa langkah pion, juga memungkinkan remis.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Sekarang kamu sudah tahu semua aturan catur. Bagus sekali!
+lesson.talk.real = Biar kuceritakan bagaimana permainan sungguhan dimainkan.
+lesson.talk.elo = Setiap pemain punya rating, yang disebut Elo. Rating naik kalau kamu menang dan turun kalau kamu kalah.
+lesson.talk.elo_gap = Mengalahkan pemain yang lebih kuat memberi lebih banyak poin; kalah dari pemain yang lebih lemah membuatmu kehilangan lebih banyak.
+lesson.talk.elo_start = Ratingmu muncul setelah lima permainan dinilai. Permainan melawan pelatih adalah latihan, jadi tidak dinilai.
+lesson.talk.clock = Ini {@}jam catur. Setiap pemain punya waktunya sendiri, yang hanya berjalan saat gilirannya.
+lesson.talk.press = Setelah melangkah, kamu menekan jam dengan tangan yang sama. Dengan begitu, waktuku mulai berjalan.
+lesson.talk.flag = Kalau waktumu habis, kamu kalah, kecuali aku sama sekali tidak mungkin memberimu skakmat.
+lesson.talk.increment = Lima plus tiga artinya lima menit untuk masing-masing pemain, ditambah tiga detik setiap selesai melangkah.
+lesson.talk.speeds = Permainan singkat disebut blitz, yang lebih lama rapid, dan yang paling lama klasik.
+lesson.talk.no_clock = Kalau bermain denganku, jamnya dimatikan. Gunakan waktu sebanyak yang kamu perlukan untuk berpikir.
+lesson.talk.touch = Dalam permainan sungguhan, kalau kamu menyentuh salah satu buahmu, kamu harus menjalankannya.
+lesson.talk.touch_mine = Kalau kamu menyentuh salah satu buahku, kamu harus memakannya, kalau bisa.
+lesson.talk.adjust = Untuk merapikan posisi buah tanpa menjalankannya, ucapkan dulu “aku rapikan”.
+lesson.talk.release = Begitu kamu melepaskan buah di petak baru, langkah itu sudah dianggap dimainkan.
+lesson.talk.sheet = Di turnamen, kedua pemain mencatat setiap langkah di {@}formulir notasi.
+# {move:letters} shows the Indonesian scoresheet letters ("Kf3"), which is what this line teaches.
+lesson.talk.notation = Kita menulis huruf buahnya dan petaknya, seperti {move:letters}. Untuk pion, cukup petaknya saja.
+lesson.talk.robot = Robotmu mencatat langkah-langkahmu untukmu. Dalam permainan cepat, mencatat tidak wajib.
+lesson.talk.handshake = Permainan dimulai dan diakhiri dengan berjabat tangan. Artinya: permainan yang bagus, dan terima kasih.
+lesson.talk.polite = Menang atau kalah, tetaplah sopan, dan jangan pernah mengganggu lawanmu saat ia sedang berpikir.
+lesson.talk.tips = Tiga tips untuk permainanmu: {@}kuasai pusat, {@2}keluarkan kuda dan gajahmu, dan {@3}lakukan rokade lebih awal.
+lesson.talk.next = Kalau kamu sudah siap, pilih tingkat “Langkah pertama”. Aku tidak akan bermain terlalu keras dan akan membantumu setelah setiap kesalahan.
+lesson.talk.welcome = Selamat datang di dunia catur! Ayo kita berjabat tangan.

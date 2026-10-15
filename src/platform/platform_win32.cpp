@@ -537,6 +537,33 @@ std::string systemLanguage() {
     case LANG_ARABIC: return "ar";
     case LANG_RUSSIAN: return "ru";
     case LANG_JAPANESE: return "ja";
+    case LANG_PORTUGUESE: return SUBLANGID(id) == SUBLANG_PORTUGUESE_BRAZILIAN ? "pt-BR" : "pt-PT";
+    case LANG_KOREAN: return "ko";
+    case LANG_BULGARIAN: return "bg";
+    case LANG_CZECH: return "cs";
+    case LANG_DANISH: return "da";
+    case LANG_GREEK: return "el";
+    case LANG_ESTONIAN: return "et";
+    case LANG_FINNISH: return "fi";
+    case LANG_HINDI: return "hi";
+    case LANG_CROATIAN: {
+        // Croatian shares its primary id with Serbian and Bosnian.
+        int sub = SUBLANGID(id);
+        return sub == SUBLANG_CROATIAN_CROATIA || sub == SUBLANG_CROATIAN_BOSNIA_HERZEGOVINA_LATIN ? "hr" : "";
+    }
+    case LANG_HUNGARIAN: return "hu";
+    case LANG_INDONESIAN: return "id";
+    case LANG_ITALIAN: return "it";
+    case LANG_LITHUANIAN: return "lt";
+    case LANG_LATVIAN: return "lv";
+    case LANG_DUTCH: return "nl";
+    case LANG_POLISH: return "pl";
+    case LANG_ROMANIAN: return "ro";
+    case LANG_SLOVAK: return "sk";
+    case LANG_SLOVENIAN: return "sl";
+    case LANG_SWEDISH: return "sv";
+    case LANG_TURKISH: return "tr";
+    case LANG_VIETNAMESE: return "vi";
     case LANG_CHINESE: {
         int sub = SUBLANGID(id);
         bool traditional = sub == SUBLANG_CHINESE_TRADITIONAL || sub == SUBLANG_CHINESE_HONGKONG || sub == SUBLANG_CHINESE_MACAU;

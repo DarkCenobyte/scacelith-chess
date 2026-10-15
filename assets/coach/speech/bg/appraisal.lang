@@ -1,0 +1,159 @@
+# Coach speech (Bulgarian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ти"; the player's gender is unknown: no
+# l-participle and no adjective about the player ("ти спечели", "печелеше", "играеш все по-добре",
+# "вече можеш да играеш на ниво ..." instead of "готов"). A 2nd person aorist that looks like an
+# imperative ("спечели", "намери", "направи") gets "ти" or another verb ("откри").
+# Forms from common.lang: "{acc:percent}" = "85%" (spoken "осемдесет и пет процента"), "{n:capture}" =
+# "3 вземания" (pawns included), "{m:check}" = "2 шаха", "{n:best_move}" = "5 най-добри хода",
+# "{m:m}" = a bare masculine number ("два" хода). Move numbers: "на ход {n}", "до ход {crit_no}".
+# Never "с" before a number or a percentage (it becomes "със" before "седем", "сто"...): a colon instead.
+# {opening} is the citation name, always after a colon ("Дебют: {opening}."), so that no article or
+# preposition has to agree with it.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases: the masculine nouns with the FULL article (дебютът, мителшпилът, ендшпилът). The lines use
+# {text} only as a subject, after "беше" or after a colon, never after a preposition or as an object.
+appraisal.phase.opening = дебютът
+appraisal.phase.middlegame = мителшпилът
+appraisal.phase.endgame = ендшпилът
+# Draw reasons, said right after "Реми" or "завърши реми" ("Реми по взаимно съгласие.").
+appraisal.reason.stalemate = поради пат
+appraisal.reason.material = поради недостатъчен материал за мат
+appraisal.reason.repetition = чрез повторение на позицията
+appraisal.reason.fifty = по правилото на петдесетте хода
+appraisal.reason.agreement = по взаимно съгласие
+appraisal.reason.other = по правилата
+# The coach level names (coach.level.<n>.name of assets/i18n/bg.lang), quoted in the lines: ниво „{level}“.
+appraisal.level.l1 = Първи стъпки
+appraisal.level.l2 = Начинаещ
+appraisal.level.l3 = Напредващ
+appraisal.level.l4 = Клубен играч
+appraisal.level.l5 = Силен клубен играч
+appraisal.level.l6 = Експерт
+# What to practise: a phrase in lower case, no full stop, always said after a colon ("Един съвет: ...",
+# "Тема: ..."): a verbal noun ("оглеждане", "търсене") or a short noun phrase.
+theme.general = оглеждане на цялата дъска, преди да играеш
+theme.mate_allowed = проверка дали царят ти е в безопасност преди всеки ход
+theme.mate_missed = търсене на мат, като започваш с шаховете
+theme.stalemate = оставяне на свободно поле за царя ми, когато печелиш
+theme.fork = внимание към двойните удари
+theme.discovered = внимание към скритите атаки зад фигурите ми
+theme.skewer = ценните фигури да не стоят на една линия
+theme.pin = предвиждане на свръзките, преди да възникнат
+theme.trapped = оставяне на път за отстъпление на фигурите ти
+theme.back_rank = малко въздух за царя ти
+theme.hanging = защитата на фигурите ти
+theme.exchange = броене на нападащите и защитаващите фигури преди размяна
+theme.missed_capture = търсене преди всичко на фигури, които може да вземеш даром
+theme.missed_fork = търсене на собствени двойни удари
+theme.promotion = надпреварата на пешките и правилото на квадрата
+theme.king_safety = сигурността на царя ти зад пешките му
+theme.bad_trade = избор кои фигури да разменяш
+theme.opening = развитие на фигурите и ранна рокада
+theme.endgame = използване на царя и придвижване на проходните пешки
+theme.positional = подобряване на най-лошата ти фигура
+theme.material = проверка какво могат да спечелят следващите ми ходове, преди да играеш
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Мат! Ти спечели. Браво!
+appraisal.open.win.b1.2 = Ти спечели! Браво, че доведе партията докрай.
+appraisal.open.win.b1.3 = Ти ме победи! Това беше наистина хубава партия.
+appraisal.open.win.b2 = Добре изиграно! Ти спечели за {moves:move}.
+appraisal.open.win.b2.2 = Поздравления, ти спечели!
+appraisal.open.win.b2.3 = Победа за {moves:move}. Чудесно!
+appraisal.open.win.b3 = Поздравления, напълно заслужена победа.
+appraisal.open.win.b3.2 = Добре изиграно. Заслужи си тази победа.
+appraisal.open.win.b3.3 = Хубава победа. Поздравления.
+appraisal.open.win.b4 = Хубава победа.
+appraisal.open.win.b4.2 = Добре изиграно, заслужена победа.
+appraisal.open.win.b4.3 = Добра победа.
+appraisal.open.win.b5 = Добре изиграно.
+appraisal.open.win.b5.2 = Красиво спечелено.
+appraisal.open.win.b5.3 = Добра партия, убедителна победа.
+appraisal.open.win.b6 = Добре изиграно.
+appraisal.open.win.b6.2 = Заслужена победа.
+appraisal.open.win.b6.3 = Добра партия.
+appraisal.open.draw.b1 = Реми! В тази партия никой не успя да победи.
+appraisal.open.draw.b1.2 = Реми. Партията беше много оспорвана!
+appraisal.open.draw.b1.3 = Реми: делим си точката. Браво!
+appraisal.open.draw.b2 = Реми – справедлив резултат.
+appraisal.open.draw.b2.2 = Завършихме реми. Хубава битка!
+appraisal.open.draw.b2.3 = Реми в една хубава партия.
+appraisal.open.draw.b3 = Реми. И двете страни имаха шансове.
+appraisal.open.draw.b3.2 = Справедливо реми.
+appraisal.open.draw.b3.3 = Реми {text}. Добра битка.
+appraisal.open.draw.b4 = Реми {text}.
+appraisal.open.draw.b4.2 = Партията завърши реми {text}.
+appraisal.open.draw.b4.3 = Завършихме реми {text}.
+appraisal.open.draw.b5 = Реми.
+appraisal.open.draw.b5.2 = Реми {text}.
+appraisal.open.draw.b5.3 = Равен резултат.
+appraisal.open.draw.b6 = Реми.
+appraisal.open.draw.b6.2 = Реми {text}.
+appraisal.open.draw.b6.3 = Наравно.
+appraisal.open.stalemate.b1 = Реми поради пат – беше толкова близо! Следващия път остави на царя ми свободно поле.
+appraisal.open.stalemate.b1.2 = Пат, значи реми. Победата беше съвсем близо!
+appraisal.open.stalemate.b2 = Реми поради пат. Беше толкова близо до победата!
+appraisal.open.stalemate.b2.2 = Пат: реми, въпреки че печелеше.
+appraisal.open.stalemate.b3 = Реми поради пат в печеливша позиция.
+appraisal.open.stalemate.b3.2 = Пат. Победата се изплъзна в самия край.
+appraisal.open.stalemate.b4 = Реми поради пат.
+appraisal.open.stalemate.b4.2 = Пат: реми.
+appraisal.open.stalemate.b5 = Пат.
+appraisal.open.stalemate.b5.2 = Реми поради пат.
+appraisal.open.stalemate.b6 = Пат.
+appraisal.open.stalemate.b6.2 = Реми, пат.
+appraisal.open.loss.b1 = Този път спечелих аз, но ти изигра няколко наистина добри хода.
+appraisal.open.loss.b1.2 = Хубава партия! Накара ме да се потрудя.
+appraisal.open.loss.b1.3 = Беше забавно! Тази спечелих аз, но ти се учиш бързо.
+appraisal.open.loss.b2 = Хубава партия! Да видим какво се получи добре и едно нещо, което да опиташ.
+appraisal.open.loss.b2.2 = Благодаря за партията! Имаше няколко добри идеи.
+appraisal.open.loss.b2.3 = Хубава партия. Да видим какво можем да научим от нея.
+appraisal.open.loss.b3 = Добра партия.
+appraisal.open.loss.b3.2 = Благодаря за партията.
+appraisal.open.loss.b3.3 = Добра партия. Да я разгледаме.
+appraisal.open.loss_close.b3 = Добра битка. Дълго време партията беше равна.
+appraisal.open.loss_close.b3.2 = Добра битка: дълго време имаше равновесие.
+appraisal.open.loss.b4 = Добра партия. Ето какво я реши.
+appraisal.open.loss.b4.2 = Добра партия. Реши я един момент.
+appraisal.open.loss.b4.3 = Благодаря за партията. Да видим къде настъпи обратът.
+appraisal.open.loss_close.b4 = Дълго време борбата беше равна. Ето какво я реши.
+appraisal.open.loss_close.b4.2 = Добра партия, дълго време равна.
+appraisal.open.loss.b5 = Добра партия.
+appraisal.open.loss.b5.2 = Благодаря за партията.
+appraisal.open.loss.b5.3 = Добра битка.
+appraisal.open.loss.b6 = Добра партия.
+appraisal.open.loss.b6.2 = Благодаря за партията.
+appraisal.open.loss.b6.3 = Добра битка.
+appraisal.open.resigned.b1 = Предаването е част от шаха и за него се иска смелост. Хубава партия!
+appraisal.open.resigned.b1.2 = Няма нищо. Да знаеш кога да се предадеш, също е част от шаха.
+appraisal.open.resigned.b2 = Предаването е част от шаха и изисква смелост.
+appraisal.open.resigned.b2.2 = Разбирам. И за предаването се иска смелост.
+appraisal.open.resigned.b3 = Предаването е част от шаха. Добра партия.
+appraisal.open.resigned.b3.2 = Разбирам. Благодаря за партията.
+appraisal.open.resigned.b4 = Добра партия.
+appraisal.open.resigned.b4.2 = Благодаря за партията.
+appraisal.open.resigned.b5 = Добра партия.
+appraisal.open.resigned.b5.2 = Благодаря за партията.
+appraisal.open.resigned.b6 = Добра партия.
+appraisal.open.resigned.b6.2 = Благодаря.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Знаеш ли, още нищо не беше решено: около {eval}.
+appraisal.resign_early.b3.2 = Всъщност още имаше шансове: около {eval}.
+appraisal.resign_early.b4 = Партията още не беше решена: около {eval}.
+appraisal.resign_early.b4.2 = Още имаше игра: около {eval}.
+appraisal.resign_early.b5 = Не беше решено: {eval}.
+appraisal.resign_early.b5.2 = Още можеше да се играе, около {eval}.
+appraisal.resign_early.b6 = Не беше краят: {eval}.
+appraisal.resign_early.b6.2 = Оценката беше {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Дебютът, който изиграхме: {opening}.
+appraisal.opening.b3.2 = Дебютът на партията: {opening}.
+appraisal.opening.b4 = Нашият дебют: {opening}.
+appraisal.opening.b4.2 = Дебютът: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Дебют: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Дебют: {opening}.

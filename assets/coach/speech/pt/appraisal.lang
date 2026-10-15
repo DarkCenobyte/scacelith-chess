@@ -1,0 +1,441 @@
+# Coach speech (European Portuguese): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "tu" and is male ("Obrigado pela partida"); the
+# player's gender is unknown: no adjective or participle about the player ("pronto", "atento"):
+# verbs ("ganhaste", "estavas a ganhar", "já podes passar ao nível ...") or nouns instead.
+# Portugal's past tense for what happened in the game ("ganhaste", "jogámos", "empatámos").
+#
+# Names inserted by {text}, {theme}, {level}, {opening} (written to fit every line that inserts them):
+#   appraisal.phase.*   with their article ("a abertura", "o meio-jogo", "o final"); never after
+#                       de / em: common.lang gives "{text:em}" = "na abertura", "{text:de}".
+#   appraisal.reason.*  a complement said after "Empate, {text}." ("por repetição", "por acordo").
+#   theme.*             an infinitive phrase in lower case, no full stop ("vigiar os ataques
+#                       duplos"), said after a colon or after "pensa em" (no article to merge).
+#   appraisal.level.*   the level name in « », said after "nível": "passar ao nível «Principiante»".
+#   {opening:def}       the opening's name with its article ("a Defesa Siciliana"), as an object;
+#                       {opening} alone (the citation name) after a colon.
+# Move numbers: "no lance {n}", "até ao lance {crit_no}" (a bare number is masculine).
+# Accuracy: "{acc:percent}" = "85%" (spoken "oitenta e cinco por cento"), at every level.
+# Counts: "{n:piece}", "{n:captured}" = "3 peças capturadas", "{n:capture}", "{m:check}" = "2 xeques",
+# "{n:time}" = "2 vezes", "{n:best_move}" = "5 melhores lances"; "de seguida" = in a row.
+# "Lances forçantes" = forcing moves (checks, captures, threats).
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = a abertura
+appraisal.phase.middlegame = o meio-jogo
+appraisal.phase.endgame = o final
+appraisal.reason.stalemate = por afogamento
+appraisal.reason.material = porque ninguém podia dar mate
+appraisal.reason.repetition = por repetição
+appraisal.reason.fifty = pela regra dos cinquenta lances
+appraisal.reason.agreement = por acordo
+appraisal.reason.other = segundo as regras
+# The coach level names of the menus (coach.level.<n>.name), in « », after "nível".
+appraisal.level.l1 = «Primeiros passos»
+appraisal.level.l2 = «Principiante»
+appraisal.level.l3 = «Intermédio»
+appraisal.level.l4 = «Jogador de clube»
+appraisal.level.l5 = «Jogador de clube forte»
+appraisal.level.l6 = «Especialista»
+# What to practise, after "Uma coisa para treinar:" and similar (an infinitive phrase, no full stop).
+theme.general = olhar para o tabuleiro todo antes de jogar
+theme.mate_allowed = verificar a segurança do teu rei antes de cada lance
+theme.mate_missed = procurar mates, a começar pelos xeques
+theme.stalemate = deixar uma casa livre ao meu rei quando estás a ganhar
+theme.fork = vigiar os ataques duplos
+theme.discovered = vigiar os ataques escondidos atrás das minhas peças
+theme.skewer = não pôr as peças valiosas na mesma linha
+theme.pin = detetar as cravadas antes de acontecerem
+theme.trapped = deixar sempre uma saída às tuas peças
+theme.back_rank = dar uma casa de fuga ao teu rei
+theme.hanging = manter as tuas peças protegidas
+theme.exchange = contar atacantes e defensores antes de trocar
+theme.missed_capture = procurar primeiro as peças que podes ganhar de graça
+theme.missed_fork = procurar os teus próprios ataques duplos
+theme.promotion = calcular as corridas de peões, com a regra do quadrado
+theme.king_safety = manter o teu rei em segurança atrás dos seus peões
+theme.bad_trade = escolher que peças trocar
+theme.opening = desenvolver as tuas peças e fazer o roque cedo
+theme.endgame = ativar o teu rei e avançar os peões passados
+theme.positional = melhorar a tua pior peça
+theme.material = ver o que os meus próximos lances podem ganhar, antes de jogares
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Xeque-mate! Ganhaste. Muito bem jogado!
+appraisal.open.win.b1.2 = Ganhaste! Muito bem, levaste a partida até ao fim.
+appraisal.open.win.b1.3 = Ganhaste-me! Foi mesmo uma boa partida.
+appraisal.open.win.b2 = Bem jogado! Ganhaste em {moves:move}.
+appraisal.open.win.b2.2 = Parabéns, ganhaste!
+appraisal.open.win.b2.3 = Uma vitória em {moves:move}. Muito bem!
+appraisal.open.win.b3 = Parabéns, uma vitória bem merecida.
+appraisal.open.win.b3.2 = Bem jogado. Mereceste esta vitória.
+appraisal.open.win.b3.3 = Uma boa vitória. Parabéns.
+appraisal.open.win.b4 = Bela vitória.
+appraisal.open.win.b4.2 = Bem jogado, uma vitória merecida.
+appraisal.open.win.b4.3 = Boa vitória.
+appraisal.open.win.b5 = Bem jogado.
+appraisal.open.win.b5.2 = Vitória bem conseguida.
+appraisal.open.win.b5.3 = Boa partida, e bem ganha.
+appraisal.open.win.b6 = Bem jogado.
+appraisal.open.win.b6.2 = Partida bem ganha.
+appraisal.open.win.b6.3 = Boa partida.
+appraisal.open.draw.b1 = Empate! Ninguém conseguiu ganhar esta.
+appraisal.open.draw.b1.2 = É empate. Foi uma partida renhida!
+appraisal.open.draw.b1.3 = Empate: dividimos o ponto. Bem jogado!
+appraisal.open.draw.b2 = Empate: um resultado justo.
+appraisal.open.draw.b2.2 = Empatámos. Boa luta!
+appraisal.open.draw.b2.3 = Um empate, e uma boa partida.
+appraisal.open.draw.b3 = Empate. Ambos os lados tiveram hipóteses.
+appraisal.open.draw.b3.2 = Um empate justo.
+appraisal.open.draw.b3.3 = Empate, {text}. Uma boa luta.
+appraisal.open.draw.b4 = Empate, {text}.
+appraisal.open.draw.b4.2 = Um empate, {text}.
+appraisal.open.draw.b4.3 = Partida empatada, {text}.
+appraisal.open.draw.b5 = Empate.
+appraisal.open.draw.b5.2 = Partida empatada, {text}.
+appraisal.open.draw.b5.3 = Um empate.
+appraisal.open.draw.b6 = Empate.
+appraisal.open.draw.b6.2 = Empate, {text}.
+appraisal.open.draw.b6.3 = Um empate.
+appraisal.open.stalemate.b1 = Empate por afogamento: estiveste tão perto! Da próxima vez, deixa uma casa livre ao meu rei.
+appraisal.open.stalemate.b1.2 = Afogamento, por isso é empate. Estiveste quase lá!
+appraisal.open.stalemate.b2 = Empate por afogamento. Estiveste tão perto de ganhar!
+appraisal.open.stalemate.b2.2 = Afogamento: empate, embora estivesses a ganhar.
+appraisal.open.stalemate.b3 = Empate por afogamento, numa posição ganha.
+appraisal.open.stalemate.b3.2 = Afogamento. A vitória escapou mesmo no fim.
+appraisal.open.stalemate.b4 = Empate por afogamento.
+appraisal.open.stalemate.b4.2 = Afogamento: empate.
+appraisal.open.stalemate.b5 = Afogamento.
+appraisal.open.stalemate.b5.2 = Empate, por afogamento.
+appraisal.open.stalemate.b6 = Afogamento.
+appraisal.open.stalemate.b6.2 = Empate, afogamento.
+appraisal.open.loss.b1 = Desta vez ganhei eu, mas fizeste uns lances mesmo bons.
+appraisal.open.loss.b1.2 = Boa partida! Não me facilitaste a vida.
+appraisal.open.loss.b1.3 = Foi divertido! Ganhei esta, mas estás a aprender depressa.
+appraisal.open.loss.b2 = Boa partida! Vamos ver o que correu bem, e uma coisa a experimentar.
+appraisal.open.loss.b2.2 = Obrigado pela partida! Tiveste boas ideias.
+appraisal.open.loss.b2.3 = Boa partida. Vamos ver o que podemos aprender com ela.
+appraisal.open.loss.b3 = Boa partida.
+appraisal.open.loss.b3.2 = Obrigado pela partida.
+appraisal.open.loss.b3.3 = Boa partida. Vamos dar uma vista de olhos.
+appraisal.open.loss_close.b3 = Boa luta. A partida esteve equilibrada durante muito tempo.
+appraisal.open.loss_close.b3.2 = Boa luta: houve equilíbrio durante muito tempo.
+appraisal.open.loss.b4 = Boa partida. Eis o que a decidiu.
+appraisal.open.loss.b4.2 = Boa partida. Decidiu-se num só momento.
+appraisal.open.loss.b4.3 = Obrigado pela partida. Vamos ver onde mudou de rumo.
+appraisal.open.loss_close.b4 = Uma luta renhida durante muito tempo. Eis o que a decidiu.
+appraisal.open.loss_close.b4.2 = Boa partida, equilibrada durante muito tempo.
+appraisal.open.loss.b5 = Boa partida.
+appraisal.open.loss.b5.2 = Obrigado pela partida.
+appraisal.open.loss.b5.3 = Boa luta.
+appraisal.open.loss.b6 = Boa partida.
+appraisal.open.loss.b6.2 = Obrigado pela partida.
+appraisal.open.loss.b6.3 = Boa luta.
+appraisal.open.resigned.b1 = Abandonar faz parte do xadrez; é preciso coragem. Boa partida!
+appraisal.open.resigned.b1.2 = Não faz mal. Saber quando abandonar faz parte do xadrez.
+appraisal.open.resigned.b2 = Abandonar faz parte do xadrez; é preciso coragem.
+appraisal.open.resigned.b2.2 = Compreendo. Abandonar também exige coragem.
+appraisal.open.resigned.b3 = Abandonar faz parte do xadrez. Boa partida.
+appraisal.open.resigned.b3.2 = Compreendo. Obrigado pela partida.
+appraisal.open.resigned.b4 = Boa partida.
+appraisal.open.resigned.b4.2 = Obrigado pela partida.
+appraisal.open.resigned.b5 = Boa partida.
+appraisal.open.resigned.b5.2 = Obrigado pela partida.
+appraisal.open.resigned.b6 = Boa partida.
+appraisal.open.resigned.b6.2 = Obrigado.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Sabes, a partida ainda não tinha acabado: cerca de {eval}.
+appraisal.resign_early.b3.2 = Na verdade, ainda tinhas hipóteses: cerca de {eval}.
+appraisal.resign_early.b4 = A partida ainda não tinha acabado: cerca de {eval}.
+appraisal.resign_early.b4.2 = Ainda havia jogo: cerca de {eval}.
+appraisal.resign_early.b5 = Ainda não tinha acabado: {eval}.
+appraisal.resign_early.b5.2 = Ainda jogável, cerca de {eval}.
+appraisal.resign_early.b6 = Não tinha acabado: {eval}.
+appraisal.resign_early.b6.2 = Avaliação: {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Jogámos {opening:def}.
+appraisal.opening.b3.2 = A abertura da partida foi {opening:def}.
+appraisal.opening.b4 = Jogou-se {opening:def}.
+appraisal.opening.b4.2 = A abertura: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Abertura: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Abertura: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Que sacrifício no lance {n}: {move}!
+appraisal.best.brilliant.b1.2 = O meu momento preferido: {move}. Entregaste uma peça, e resultou!
+appraisal.best.brilliant.b2 = O teu melhor momento: o sacrifício {move}, no lance {n}.
+appraisal.best.brilliant.b2.2 = {move}, no lance {n}, foi um sacrifício corajoso. Muito bem!
+appraisal.best.brilliant.b3 = Sacrifício brilhante com {move}.
+appraisal.best.brilliant.b3.2 = O ponto alto: {move}, um verdadeiro sacrifício, no lance {n}.
+appraisal.best.brilliant.b4 = Melhor momento: {move}, lance {n}. Um sacrifício brilhante.
+appraisal.best.brilliant.b4.2 = {move}, no lance {n}, foi brilhante.
+appraisal.best.brilliant.b5 = {move}, no lance {n}, foi brilhante.
+appraisal.best.brilliant.b5.2 = Lance {n}, {move}: brilhante.
+appraisal.best.brilliant.b6 = {move}!! no lance {n}.
+appraisal.best.brilliant.b6.spoken = {move}, no lance {n}: um lance brilhante.
+appraisal.best.brilliant.b6.2 = Lance {n}: {move}, brilhante.
+appraisal.best.great.b1 = O meu momento preferido: {move}. Foi um excelente lance!
+appraisal.best.great.b1.2 = Lembras-te de {move}? Foi um belo achado.
+appraisal.best.great.b2 = O teu melhor momento: {move}, no lance {n}. Deu a volta à partida.
+appraisal.best.great.b2.2 = No lance {n}, {move} foi um excelente lance.
+appraisal.best.great.b3 = No lance {n}, a chave foi {move}: deu a volta à situação.
+appraisal.best.great.b3.2 = Belo achado: {move}, no lance {n}.
+appraisal.best.great.b4 = Castigaste logo o meu erro com {move}.
+appraisal.best.great.b4.2 = Melhor momento: {move}, lance {n}.
+appraisal.best.great.b5 = {move} no lance {n}. Bem visto.
+appraisal.best.great.b5.2 = Lance {n}, {move}: um belo achado.
+appraisal.best.great.b6 = {move} no lance {n}. Bem visto.
+appraisal.best.great.b6.2 = Lance {n}: {move}!
+appraisal.best.only.b1 = O meu momento preferido: {move}. Era o único lance bom!
+appraisal.best.only.b1.2 = No lance {n}, encontraste {move}, o único lance bom. Excelente!
+appraisal.best.only.b2 = O teu melhor momento: {move}, o único lance bom naquela posição.
+appraisal.best.only.b2.2 = {move}, no lance {n}, era o único lance, e encontraste-o.
+appraisal.best.only.b3 = No lance {n}, a chave foi {move}: o único lance que aguentava.
+appraisal.best.only.b3.2 = No lance {n}, só {move} aguentava, e encontraste-o.
+appraisal.best.only.b4 = Melhor momento: {move}, lance {n}. Lance único.
+appraisal.best.only.b4.2 = Lance {n}: {move}, o lance único.
+appraisal.best.only.b5 = {move}, no lance {n}, era o lance único. Bem visto.
+appraisal.best.only.b5.2 = Lance único no lance {n}: {move}.
+appraisal.best.only.b6 = {move}, no lance {n}, era o lance único. Bem visto.
+appraisal.best.only.b6.2 = Lance {n}: {move}, lance único.
+appraisal.best.won.b1 = O meu momento preferido: {move}. Esse lance ganhou {pts:point}!
+appraisal.best.won.b1.2 = Lembras-te de {move}? Deu-te {pts:point}. Muito bem!
+appraisal.best.won.b2 = O teu melhor momento: {move}, no lance {n}, que ganhou {pts:point}.
+appraisal.best.won.b2.2 = {move}, no lance {n}, ganhou material. Boa!
+appraisal.best.won.b3 = No lance {n}, a chave foi {move}: ganhou {pts:point}.
+appraisal.best.won.b3.2 = {move}, no lance {n}, ganhou material de forma limpa.
+appraisal.best.won.b4 = Melhor momento: {move}, lance {n}, com ganho de material.
+appraisal.best.won.b4.2 = {move}, no lance {n}, ganhou {pts:point}.
+appraisal.best.won.b5 = {move}, no lance {n}, ganhou material.
+appraisal.best.won.b5.2 = Lance {n}: {move}, ganho de material.
+appraisal.best.won.b6 = {move}, no lance {n}, ganhou material.
+appraisal.best.won.b6.2 = Lance {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Lance {n}: {move}, mais {pts}.
+appraisal.best.streak.b1 = Encontraste o melhor lance {n:time} de seguida. Excelente!
+appraisal.best.streak.b1.2 = O melhor lance {n:time} de seguida! Isso é xadrez do bom.
+appraisal.best.streak.b2 = Encontraste o melhor lance {n:time} de seguida.
+appraisal.best.streak.b2.2 = O melhor lance {n:time} de seguida. Muito bem!
+appraisal.best.streak.b3 = Uma sequência de {n:best_move} seguidos. Muito sólido.
+appraisal.best.streak.b3.2 = {n:best_move} seguidos. Bem jogado.
+appraisal.best.streak.b4 = {n:best_move} seguidos.
+appraisal.best.streak.b4.2 = Uma sequência de {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} seguidos.
+appraisal.best.streak.b5.2 = Uma série de {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} seguidos.
+appraisal.best.streak.b6.2 = Sequência: {n:best_move}.
+appraisal.best.capture.b1 = O meu momento preferido: {move}. Tomaste {my} de graça!
+appraisal.best.capture.b1.2 = Lembras-te de {move}? Viste que {my} estava sem defesa!
+appraisal.best.capture.b2 = O teu melhor momento: {move}, que ganhou {my}.
+appraisal.best.capture.b2.2 = Boa captura no lance {n}: {move}.
+appraisal.best.capture.b3 = Bem visto no lance {n}: {move} ganhou {my}.
+appraisal.best.capture.b3.2 = {move}, no lance {n}, apanhou {my}.
+appraisal.best.capture.b4 = Melhor momento: {move}, lance {n}, que ganhou {my}.
+appraisal.best.capture.b4.2 = {move}, no lance {n}, ganhou material.
+appraisal.best.capture.b5 = {move}, no lance {n}, ganhou {my}.
+appraisal.best.capture.b5.2 = Lance {n}: {move}.
+appraisal.best.capture.b6 = {move} no lance {n}.
+appraisal.best.capture.b6.2 = Lance {n}: {move}, com ganho de material.
+appraisal.best.phase.b1 = Jogaste muito bem {text:em}.
+appraisal.best.phase.b1.2 = {text} foi a melhor parte da tua partida.
+appraisal.best.phase.b2 = A tua parte mais forte foi {text}.
+appraisal.best.phase.b2.2 = {text} correu-te muito bem.
+appraisal.best.phase.b3 = A tua melhor fase foi {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} foi o que correu melhor: {acc:percent} de precisão.
+appraisal.best.phase.b4 = Fase mais forte: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} foi a tua melhor fase, com {acc:percent}.
+appraisal.best.phase.b5 = Melhor fase: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Melhor fase: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 peça" / "3 peças") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# The short levels use "{n:captured}" = "3 peças capturadas" and "{m:check}" = "2 xeques" (a
+# participle written after "{n:piece}" could not agree with the number).
+appraisal.num.material.b1 = Tomaste-me {n:piece} e deste xeque {m:time}.
+appraisal.num.material.b1.2 = Capturaste {n:piece} e deste xeque ao meu rei {m:time}.
+appraisal.num.material.b2 = Capturaste {n:piece} e deste xeque {m:time}.
+appraisal.num.material.b2.2 = Tomaste-me {n:piece} e deste-me xeque {m:time}.
+appraisal.num.material.b3 = Capturaste {n:piece} e deste xeque {m:time}.
+appraisal.num.material.b3.2 = {n:captured} e {m:check}.
+appraisal.num.material.b4 = {n:captured}, {m:check}.
+appraisal.num.material.b4.2 = Tomaste {n:piece} e deste xeque {m:time}.
+appraisal.num.material.b5 = {n:captured}; {m:check}.
+appraisal.num.material.b5.2 = {n:capture}; {m:check}.
+appraisal.num.material.b6 = {n:captured}, {m:check}.
+appraisal.num.material.b6.2 = {n:capture}; {m:check}.
+appraisal.num.material_nochecks.b1 = Tomaste-me {n:piece}.
+appraisal.num.material_nochecks.b1.2 = Capturaste {n:piece} nesta partida.
+appraisal.num.material_nochecks.b2 = Capturaste {n:piece}.
+appraisal.num.material_nochecks.b2.2 = Tomaste {n:piece} nesta partida.
+appraisal.num.material_nochecks.b3 = Capturaste {n:piece}.
+appraisal.num.material_nochecks.b3.2 = {n:captured}.
+appraisal.num.material_nochecks.b4 = {n:captured}.
+appraisal.num.material_nochecks.b4.2 = Tomaste {n:piece}.
+appraisal.num.material_nochecks.b5 = {n:captured}.
+appraisal.num.material_nochecks.b5.2 = {n:capture}.
+appraisal.num.material_nochecks.b6 = {n:captured}.
+appraisal.num.material_nochecks.b6.2 = {n:capture}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = Anulaste {n:move} e corrigiste {m} deles. É assim que se aprende!
+appraisal.num.takebacks.b1.2 = Anulaste {n:move}, e {m:time} encontraste um lance melhor. Boa!
+appraisal.num.takebacks.b2 = Anulaste {n:move} e corrigiste {m} deles. É assim que se aprende.
+appraisal.num.takebacks.b2.2 = Anulaste {n:move} e conseguiste corrigir {m}. Assim é que se aprende!
+appraisal.num.takebacks.b3 = Anulaste {n:move} e corrigiste {m} deles.
+appraisal.num.takebacks.b3.2 = Lances anulados: {n}; corrigidos: {m}. Bom.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Nenhum erro grande: ótimo!
+appraisal.num.clean.b2.2 = Nem um único erro grande nesta partida. Excelente!
+appraisal.num.clean.b2.3 = Não cometeste erros grandes. Muito bem!
+appraisal.num.few.b2 = Só {n:mistake} nesta partida.
+appraisal.num.few.b2.2 = Apenas {n:mistake} em toda a partida. Boa!
+appraisal.num.few.b2.3 = Só {n:mistake} a assinalar. Muito bem.
+appraisal.num.best.b2 = Encontraste o melhor lance {n:time}.
+appraisal.num.best.b2.2 = Jogaste mesmo o melhor lance {n:time}.
+appraisal.num.best.b2.3 = O melhor lance? Encontraste-o {n:time}.
+appraisal.num.acc.b3 = A tua precisão foi de {acc:percent}, com {n:mistake} e {m:blunder}.
+appraisal.num.acc.b3.2 = {acc:percent} de precisão: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Jogaste com {acc:percent} de precisão: {n:mistake} e {m:blunder}.
+appraisal.num.acc_explain.b3 = A precisão compara os teus lances com o melhor lance de cada posição: cem é perfeito.
+appraisal.num.acc_explain.b3.2 = A precisão mede até que ponto os teus lances se aproximaram dos melhores. Cem é perfeito.
+appraisal.num.acc.b4 = Precisão: {acc:percent}.
+appraisal.num.acc.b4.2 = Jogaste com {acc:percent} de precisão.
+appraisal.num.acc.b4.3 = {acc:percent} de precisão.
+appraisal.num.acc_phase.b4 = Precisão: {acc:percent}; {acc_phase:percent} {text:em}, a tua fase mais forte.
+appraisal.num.acc_phase.b4.2 = {acc:percent} no total, {acc_phase:percent} {text:em}.
+appraisal.num.acc_phase.b4.3 = Jogaste com {acc:percent}; o melhor foi {text}, com {acc_phase:percent}.
+appraisal.num.coach.b4 = Eu joguei com {acc_coach:percent} de precisão.
+appraisal.num.coach.b4.2 = A minha precisão foi de {acc_coach:percent}.
+appraisal.num.acc.b5 = Precisão de {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Precisão de {acc:percent}, com {n:inaccuracy} e {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Fora da teoria no lance {k}.
+appraisal.num.book.b5.2 = Saímos da teoria no lance {k}.
+appraisal.num.acc.b6 = {acc:percent} contra os meus {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = Tu {acc:percent}, eu {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Precisão: {acc:percent}, a minha: {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Precisão: {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = {acc:percent} de precisão; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Uma coisa para treinar: {theme}.
+appraisal.improve.theme.b1.2 = Um conselho para a próxima vez: {theme}.
+appraisal.improve.theme.b1.3 = Algo a trabalhar: {theme}.
+appraisal.improve.theme.b2 = Algo para praticar: {theme}.
+appraisal.improve.theme.b2.2 = Uma ideia para a próxima vez: {theme}.
+appraisal.improve.theme.b2.3 = Vale a pena trabalhar isto: {theme}.
+appraisal.improve.theme.b3 = Um tema desta partida: {theme}.
+appraisal.improve.theme.b3.2 = Vale a pena treinar: {theme}.
+appraisal.improve.theme.b4 = Um tema recorrente: {theme}.
+appraisal.improve.theme.b4.2 = Apareceu mais do que uma vez: {theme}.
+appraisal.improve.theme.b5 = Recorrente: {theme}.
+appraisal.improve.theme.b5.2 = Tema da partida: {theme}.
+appraisal.improve.theme.b6 = Recorrente: {theme}.
+appraisal.improve.theme.b6.2 = Tema: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = A partida mudou no lance {crit_no}. Da próxima vez, trabalha isto: {theme}.
+appraisal.improve.critical.b2.2 = O momento-chave foi o lance {crit_no}, {crit_move}. Algo para praticar: {theme}.
+appraisal.improve.critical.b3 = O momento crítico foi o lance {crit_no}. Em vez de {crit_move}, era melhor {crit_best}.
+appraisal.improve.critical.b3.2 = No lance {crit_no}, {crit_best} era melhor do que {crit_move}. Vê primeiro os meus lances forçantes.
+appraisal.improve.critical.b4 = Momento crítico: lance {crit_no}, {crit_move}. {crit_best} era melhor.
+appraisal.improve.critical.b4.2 = O lance {crit_no} foi o momento-chave: {crit_best} em vez de {crit_move}.
+appraisal.improve.critical.b5 = Lance {crit_no}: {crit_best} em vez de {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = O lance crítico foi o {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Lance {crit_no}: {crit_best} em vez de {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, não {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Lance {crit_no}: {crit_best}, e não {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = Estavas a ganhar até ao lance {crit_no}. Um conselho: {theme}.
+appraisal.improve.was_winning.b1.2 = Estavas a jogar muito bem até ao lance {crit_no}. Lembra-te: {theme}.
+appraisal.improve.was_winning.b2 = Estavas a ganhar até ao lance {crit_no}. Da próxima vez: {theme}.
+appraisal.improve.was_winning.b2.2 = Até ao lance {crit_no}, estavas a ganhar. Algo para praticar: {theme}.
+appraisal.improve.was_winning.b3 = Estavas a ganhar até ao lance {crit_no}. {crit_best} mantinha a tua vantagem.
+appraisal.improve.was_winning.b3.2 = Até ao lance {crit_no}, estavas a ganhar; {crit_best} teria mantido a vantagem.
+appraisal.improve.was_winning.b4 = Estavas a ganhar até ao lance {crit_no}. {crit_best} mantinha a tua vantagem.
+appraisal.improve.was_winning.b4.2 = Posição ganha até ao lance {crit_no}; {crit_best} mantinha a vantagem.
+appraisal.improve.was_winning.b5 = Estava ganho até ao lance {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Lance {crit_no}: {crit_best} mantinha a vitória, {eval}.
+appraisal.improve.was_winning.b6 = Lance {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best}, no lance {crit_no}, mantinha a vitória: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Um conselho: quando estás a ganhar, deixa sempre ao meu rei uma casa para onde ir.
+appraisal.improve.stalemate.b1.2 = Lembra-te: perto do fim, antes de cada lance, verifica se o meu rei ainda se pode mexer.
+appraisal.improve.stalemate.b2 = Quando estás a ganhar, deixa sempre uma casa livre ao meu rei, senão é afogamento.
+appraisal.improve.stalemate.b2.2 = Da próxima vez, antes de jogares, verifica se o meu rei ainda se pode mexer.
+appraisal.improve.stalemate.b3 = Quando estás a ganhar, verifica a cada lance se o meu rei ainda tem uma casa livre.
+appraisal.improve.stalemate.b3.2 = Cuidado com o afogamento nos finais ganhos: dá ar ao meu rei.
+appraisal.improve.stalemate.b4 = Nos finais ganhos, pensa sempre no afogamento.
+appraisal.improve.stalemate.b4.2 = Atenção ao afogamento: aqui custou a vitória.
+appraisal.improve.stalemate.b5 = Nos finais ganhos, cuidado com o afogamento.
+appraisal.improve.stalemate.b5.2 = O afogamento custou a vitória.
+appraisal.improve.stalemate.b6 = Cuidado com o afogamento.
+appraisal.improve.stalemate.b6.2 = O afogamento custou a vitória.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = No lance {n}, {my} estava sem defesa. Viste?
+appraisal.improve.coach_hung.b1.2 = No lance {n}, {my} estava à tua mercê. Procura sempre peças que possas ganhar de graça!
+appraisal.improve.coach_hung.b2 = No lance {n}, {my} estava indefes{my:o}. Reparaste?
+appraisal.improve.coach_hung.b2.2 = No lance {n}, podias ter tomado {my} de graça.
+appraisal.improve.coach_hung.b3 = No lance {n}, {my} estava solt{my:o}. Deste por isso?
+appraisal.improve.coach_hung.b3.2 = {my} estava sem defesa no lance {n}. Procura peças soltas a cada lance.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Continua a verificar se as tuas peças estão seguras, como hoje.
+appraisal.improve.clean.b1.2 = Continua a ver o que eu ataco antes de cada lance. Resulta!
+appraisal.improve.clean.b1.3 = Continua a jogar com esse cuidado!
+appraisal.improve.clean.b2 = Uma partida limpa. Continua a verificar as minhas ameaças assim.
+appraisal.improve.clean.b2.2 = Continua a fazer o que fizeste hoje: peças seguras, bons lances.
+appraisal.improve.clean.b3 = Uma partida limpa. Continua a ver primeiro os lances forçantes.
+appraisal.improve.clean.b3.2 = Sem grandes erros: continua assim.
+appraisal.improve.clean.b4 = Uma partida limpa. Nada de importante a corrigir.
+appraisal.improve.clean.b4.2 = Nenhum erro crítico.
+appraisal.improve.clean.b5 = Nenhum erro crítico.
+appraisal.improve.clean.b5.2 = Partida limpa.
+appraisal.improve.clean.b6 = Partida limpa.
+appraisal.improve.clean.b6.2 = Sem erros críticos.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = «Principiante» ...: always after "nível" ("passar ao nível", "no nível"); never "estás
+# pronto" (it agrees with the player): "já podes passar", "já estás à altura".
+appraisal.end.b1 = Estás a melhorar a cada partida. Jogamos outra?
+appraisal.end.b1.2 = Foi divertido! Jogamos outra vez?
+appraisal.end.b1.3 = Belo esforço! Queres jogar outra partida?
+appraisal.end.b2 = Estás a melhorar a cada partida. Mais uma?
+appraisal.end.b2.2 = Boa partida. Jogamos outra vez?
+appraisal.end.b2.3 = Bem jogado. Outra partida?
+appraisal.end.b3 = Partida sólida. Vamos à próxima?
+appraisal.end.b3.2 = Boa partida. Mais uma?
+appraisal.end.b3.3 = Bem jogado. Vamos outra vez?
+appraisal.end.b4 = Partida sólida. Vamos à próxima?
+appraisal.end.b4.2 = Outra partida?
+appraisal.end.b4.3 = Boa partida. A próxima?
+appraisal.end.b5 = Mais uma?
+appraisal.end.b5.2 = Próxima partida?
+appraisal.end.b5.3 = Outra vez?
+appraisal.end.b6 = Mais uma?
+appraisal.end.b6.2 = Próxima partida?
+appraisal.end.b6.3 = Outra vez?
+appraisal.end.up.b1 = Já podes passar ao nível {level}. Queres experimentar?
+appraisal.end.up.b1.2 = Acho que já podes passar ao nível {level}. Experimentamos?
+appraisal.end.up.b2 = Já podes passar ao nível {level}. Queres experimentar?
+appraisal.end.up.b2.2 = E se passássemos ao nível {level}? Acho que já estás à altura.
+appraisal.end.up.b3 = Este nível já ficou pequeno para ti: experimenta o nível {level}.
+appraisal.end.up.b3.2 = O nível {level}? Acho que já estás à altura.
+appraisal.end.up.b4 = Este nível já ficou pequeno para ti: experimenta o nível {level}.
+appraisal.end.up.b4.2 = Está na altura do nível {level}?
+appraisal.end.up.b5 = Experimenta o nível {level} a seguir.
+appraisal.end.up.b5.2 = A seguir, o nível {level}?
+appraisal.end.up.b6 = Experimenta o nível {level} a seguir.
+appraisal.end.up.b6.2 = A seguir, o nível {level}?
+appraisal.end.down.b2 = Vamos jogar uma no nível {level}, para praticar as ideias.
+appraisal.end.down.b2.2 = Que tal uma partida no nível {level}, para praticar?
+appraisal.end.down.b3 = Queres jogar uma no nível {level}, para praticar as ideias?
+appraisal.end.down.b3.2 = Uma partida no nível {level} podia ajudar a praticar estas ideias.
+appraisal.end.down.b4 = Uma partida no nível {level} talvez ajude a praticar estas ideias.
+appraisal.end.down.b4.2 = Talvez uma no nível {level}, para praticar?
+appraisal.end.down.b5 = Talvez uma no nível {level}?
+appraisal.end.down.b5.2 = O nível {level}, para praticar?
+appraisal.end.down.b6 = Talvez uma no nível {level}?
+appraisal.end.down.b6.2 = O nível {level}, para praticar?

@@ -59,23 +59,54 @@ void ensureEnglish() {
     if (g_loaded) return;
     g_loaded = true;
     loadTable("en", g_english);
+    // The Devanagari syllables the fonts draw precomposed (uni::shapeDevanagari).
+    const char* clusters = "assets/fonts/devanagari-clusters.txt";
+    if (embedded::find(clusters)) uni::setDevanagariClusters(embedded::text(clusters));
+    else LOGW("i18n: %s is not embedded", clusters);
     if (g_current.code.empty()) g_current = g_english;
 }
 
 }  // namespace
 
 // The native names live here, not in the .lang files: the selector shows every language in its
-// own name whatever the current one.
+// own name whatever the current one. English first (the reference), then by native name: Latin
+// script (alphabetical), Greek, Cyrillic, Arabic, Devanagari, Hangul, Japanese, Chinese.
 const std::vector<Language>& languages() {
     static const std::vector<Language> list = {
-        {"en", "English", false},        {"fr", "Fran\xC3\xA7" "ais", false},
-        {"de", "Deutsch", false},        {"es", "Espa\xC3\xB1ol", false},
-        {"uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0", false},
-        {"ar", "\xD8\xA7\xD9\x84\xD8\xB9\xD8\xB1\xD8\xA8\xD9\x8A\xD8\xA9", true},
-        {"ru", "\xD0\xA0\xD1\x83\xD1\x81\xD1\x81\xD0\xBA\xD0\xB8\xD0\xB9", false},
-        {"ja", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", false},
-        {"zh-Hant", "\xE7\xB9\x81\xE9\xAB\x94\xE4\xB8\xAD\xE6\x96\x87", false},
-        {"zh-Hans", "\xE7\xAE\x80\xE4\xBD\x93\xE4\xB8\xAD\xE6\x96\x87", false},
+        {"en", "English", false},
+        {"id", "Bahasa Indonesia", false},
+        {"cs", "\xC4\x8C" "e\xC5\xA1tina", false},                                   // Čeština
+        {"da", "Dansk", false},
+        {"de", "Deutsch", false},
+        {"et", "Eesti", false},
+        {"es", "Espa\xC3\xB1ol", false},
+        {"fr", "Fran\xC3\xA7" "ais", false},
+        {"hr", "Hrvatski", false},
+        {"it", "Italiano", false},
+        {"lv", "Latvie\xC5\xA1u", false},                                             // Latviešu
+        {"lt", "Lietuvi\xC5\xB3", false},                                             // Lietuvių
+        {"hu", "Magyar", false},
+        {"nl", "Nederlands", false},
+        {"pl", "Polski", false},
+        {"pt-BR", "Portugu\xC3\xAAs (Brasil)", false},
+        {"pt", "Portugu\xC3\xAAs (Portugal)", false},
+        {"ro", "Rom\xC3\xA2n\xC4\x83", false},                                        // Română
+        {"sk", "Sloven\xC4\x8Dina", false},                                           // Slovenčina
+        {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false},                                   // Slovenščina
+        {"fi", "Suomi", false},
+        {"sv", "Svenska", false},
+        {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false},                            // Tiếng Việt
+        {"tr", "T\xC3\xBCrk\xC3\xA7" "e", false},                                     // Türkçe
+        {"el", "\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA\xCE\xAC", false},  // Ελληνικά
+        {"bg", "\xD0\x91\xD1\x8A\xD0\xBB\xD0\xB3\xD0\xB0\xD1\x80\xD1\x81\xD0\xBA\xD0\xB8", false},  // Български
+        {"ru", "\xD0\xA0\xD1\x83\xD1\x81\xD1\x81\xD0\xBA\xD0\xB8\xD0\xB9", false},  // Русский
+        {"uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0", false},  // Українська
+        {"ar", "\xD8\xA7\xD9\x84\xD8\xB9\xD8\xB1\xD8\xA8\xD9\x8A\xD8\xA9", true},  // العربية
+        {"hi", "\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80", false},  // हिन्दी
+        {"ko", "\xED\x95\x9C\xEA\xB5\xAD\xEC\x96\xB4", false},                      // 한국어
+        {"ja", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", false},                      // 日本語
+        {"zh-Hans", "\xE7\xAE\x80\xE4\xBD\x93\xE4\xB8\xAD\xE6\x96\x87", false},  // 简体中文
+        {"zh-Hant", "\xE7\xB9\x81\xE9\xAB\x94\xE4\xB8\xAD\xE6\x96\x87", false},  // 繁體中文
     };
     return list;
 }
@@ -91,10 +122,10 @@ bool setLanguage(const std::string& code) {
     ensureEnglish();
     ++g_generation;
     int idx = languageIndex(code);
-    if (idx <= 0) {
+    if (idx < 0 || code == "en") {
         g_current = g_english;
         g_current.code = "en";
-        return idx == 0;
+        return idx >= 0;
     }
     Table t;
     if (!loadTable(code, t)) {
@@ -135,6 +166,12 @@ std::string matchLocale(const std::string& tag) {
         p = q + 1;
     }
     const std::string& lang = sub.empty() ? t : sub[0];
+    if (lang == "pt") {
+        for (size_t i = 1; i < sub.size(); ++i)
+            if (sub[i] == "br") return "pt-BR";
+        return "pt";
+    }
+    if (lang == "in") return "id";   // the old ISO 639 code of Indonesian (Java, older Android)
     if (lang == "zh") {
         for (size_t i = 1; i < sub.size(); ++i) {
             if (sub[i] == "hant" || sub[i] == "tw" || sub[i] == "hk" || sub[i] == "mo") return "zh-Hant";
@@ -168,23 +205,43 @@ std::string trf(const char* key, std::initializer_list<std::string> args) {
     return format(tr(key), std::vector<std::string>(args));
 }
 
+// CLDR plural rules for integer counts (the forms a decimal count would need are never used).
 int pluralForms(const std::string& code) {
-    if (code == "ru" || code == "uk") return 3;
     if (code == "ar") return 6;
-    if (code == "ja" || code == "zh-Hans" || code == "zh-Hant") return 1;
+    if (code == "sl") return 4;
+    if (code == "ru" || code == "uk" || code == "pl" || code == "cs" || code == "sk" || code == "hr" ||
+        code == "lt" || code == "lv" || code == "ro")
+        return 3;
+    if (code == "ja" || code == "zh-Hans" || code == "zh-Hant" || code == "ko" || code == "id" || code == "vi")
+        return 1;
     return 2;
 }
 
 int pluralIndex(const std::string& code, long long n) {
     long long a = n < 0 ? -n : n;
-    if (code == "ru" || code == "uk") {
-        long long m10 = a % 10, m100 = a % 100;
+    long long m10 = a % 10, m100 = a % 100;
+    if (code == "ru" || code == "uk" || code == "hr") {   // one|few|many (Croatian: one|few|other)
         if (m10 == 1 && m100 != 11) return 0;
         if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 1;
         return 2;
     }
+    if (code == "pl") {   // one|few|many
+        if (a == 1) return 0;
+        if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 1;
+        return 2;
+    }
+    if (code == "cs" || code == "sk") return a == 1 ? 0 : a >= 2 && a <= 4 ? 1 : 2;   // one|few|other
+    if (code == "lt") {   // one|few|other
+        if (m100 >= 11 && m100 <= 19) return 2;
+        return m10 == 1 ? 0 : m10 >= 2 ? 1 : 2;
+    }
+    if (code == "lv") {   // zero|one|other
+        if (m10 == 0 || (m100 >= 11 && m100 <= 19)) return 0;
+        return m10 == 1 ? 1 : 2;
+    }
+    if (code == "ro") return a == 1 ? 0 : a == 0 || (m100 >= 1 && m100 <= 19) ? 1 : 2;   // one|few|other
+    if (code == "sl") return m100 == 1 ? 0 : m100 == 2 ? 1 : m100 == 3 || m100 == 4 ? 2 : 3;   // one|two|few|other
     if (code == "ar") {
-        long long m100 = a % 100;
         if (a == 0) return 0;
         if (a == 1) return 1;
         if (a == 2) return 2;
@@ -192,8 +249,8 @@ int pluralIndex(const std::string& code, long long n) {
         if (m100 >= 11) return 4;
         return 5;
     }
-    if (code == "ja" || code == "zh-Hans" || code == "zh-Hant") return 0;
-    if (code == "fr") return a <= 1 ? 0 : 1;
+    if (pluralForms(code) == 1) return 0;
+    if (code == "fr" || code == "pt-BR" || code == "hi") return a <= 1 ? 0 : 1;   // 0 and 1 are singular
     return a == 1 ? 0 : 1;
 }
 
@@ -234,7 +291,7 @@ std::vector<uint32_t> codepoints() {
     ensureEnglish();
     std::vector<uint32_t> out;
     for (auto& kv : g_current.map) {
-        uni::Shaped sh = uni::shapeArabic(uni::decode(kv.second));
+        uni::Shaped sh = uni::shape(uni::decode(kv.second));
         for (char32_t c : sh.text)
             if (c > ' ' && c != '|') out.push_back(uint32_t(c));
     }

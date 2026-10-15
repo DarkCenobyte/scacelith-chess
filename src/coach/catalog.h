@@ -1,4 +1,4 @@
-// The coach's speech catalog: hand-written sentence templates in the 10 UI languages, rendered
+// The coach's speech catalog: hand-written sentence templates in the 34 UI languages, rendered
 // twice from one Line (coach/script.h): the spoken text the TTS reads and the written text of the
 // subtitles. No language model: every sentence is a template with typed placeholders, and a
 // message has several phrasings (variants) so that the coach does not repeat itself word for word.
@@ -41,9 +41,9 @@
 
 namespace coach {
 
-// Language the coach speaks for a UI language: the UI language when the voice has it (en fr de es
-// ru uk ar ja), else English (Supertonic 3 has no Chinese: Chinese UIs get English speech and
-// Chinese subtitles).
+// Language the coach speaks for a UI language: the UI language when the voice has it (all but
+// Chinese; Brazilian Portuguese is read by the Portuguese voice), else English (Supertonic 3 has
+// no Chinese: Chinese UIs get English speech and Chinese subtitles).
 std::string speechLanguage(const std::string& uiLanguage);
 // True when the coach's voice speaks this language (the voice's own list, tts::languageSupported).
 bool speechSupported(const std::string& lang);
@@ -97,7 +97,8 @@ public:
     std::vector<std::string> keys(const std::string& lang, const std::string& topic) const;
     const std::vector<std::string>& problems() const { return problems_; }
 
-    // Every codepoint the written lines of a language can show (subtitle glyph prewarm).
+    // Every codepoint the written lines of a language can show, as drawn (Arabic presentation forms,
+    // Devanagari precomposed syllables): the subtitle glyph prewarm.
     std::vector<uint32_t> codepoints(const std::string& lang) const;
 
     // Opening names the catalog cannot resolve from the opening files alone ("line:<component>"

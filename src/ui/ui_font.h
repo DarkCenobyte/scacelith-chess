@@ -1,11 +1,13 @@
 // UI fonts: embedded TTF faces rasterised into a single-channel signed distance field atlas at
 // ui::init(). Glyphs outside the pre-built set are added lazily. Internal to src/ui.
 //
-// Scripts: EB Garamond / Cinzel cover Latin (Garamond also Cyrillic and Greek); Arabic comes from
-// Amiri (UI) or Aref Ruqaa (handwriting) through the presentation forms produced by the shaper;
-// kana, hanzi and kanji from Klee One (Japanese) and LXGW WenKai (Simplified / Traditional
+// Scripts: EB Garamond / Cinzel cover Latin (Garamond also Cyrillic, Greek and Vietnamese); Arabic
+// comes from Amiri (UI) or Aref Ruqaa (handwriting) through the presentation forms produced by the
+// shaper; kana, hanzi and kanji from Klee One (Japanese) and LXGW WenKai (Simplified / Traditional
 // Chinese), in the order preferred by the current language (Han unification: the same codepoint
-// is drawn with Japanese, Simplified or Traditional glyph shapes).
+// is drawn with Japanese, Simplified or Traditional glyph shapes); Hangul from Gowun Batang (UI) or
+// Nanum Pen Script (handwriting); Devanagari from Tiro Devanagari Hindi (UI) or Kalam
+// (handwriting), through the precomposed syllables of the shaper (uni::shapeDevanagari).
 //
 // Atlas: one 4096^2 R8 texture shared by every face. Each glyph's distance field is kept in memory
 // once built; when the atlas fills up (a session that switches between several CJK languages) it
@@ -36,17 +38,26 @@ enum Face : int {
     FACE_HAND_SC = 9,         // Simplified Chinese handwriting (Kai); also the Simplified UI face
     FACE_HAND_TC = 10,        // Traditional Chinese handwriting (Kai); also the Traditional UI face
     FACE_ARABIC = 11,         // Amiri: Arabic UI text (fallback of the UI faces for Arabic)
+    FACE_KOREAN = 12,         // Gowun Batang: Korean UI text (fallback of the UI faces for Hangul)
+    FACE_DEVANAGARI = 13,     // Tiro Devanagari Hindi: Hindi UI text (fallback of the UI faces for Devanagari)
+    FACE_HAND_KO = 14,        // Korean handwriting (Nanum Pen Script)
+    FACE_HAND_HI = 15,        // Devanagari handwriting (Kalam)
+    FACE_HAND_MYNERVE = 16,   // Mynerve: Latin (Vietnamese included) and Greek hand, for the languages
+                              // whose letters a style's own face lacks
     FACE_COUNT
 };
 
 // A player's handwriting: the Latin/Cyrillic style is chosen per player; every other script is
-// written with the handwriting face of that script (Arabic, kana/kanji, hanzi). Two players can
-// have different styles on the same scoresheet.
+// written with the handwriting face of that script (Arabic, kana/kanji, hanzi, Hangul,
+// Devanagari). Two players can have different styles on the same scoresheet. A style whose face
+// lacks letters of the current language (Greek, Vietnamese, Romanian ț for Marck Script) is
+// written with another hand face that has them all: Mynerve or Bad Script.
 enum HandStyle : int { HAND_CAVEAT = 0, HAND_MARCK = 1, HAND_BADSCRIPT = 2, HAND_STYLE_COUNT };
 const char* handStyleName(int style);   // "Caveat", "Marck Script", ...
 // Face that writes 'cp' in the given hand: the handwriting face of its script first (Arabic, kana,
-// Han, CJK punctuation), then the style's face, then Caveat, Klee One and LXGW WenKai, then the UI
-// text face; the style's face when none of them has the glyph.
+// Han, CJK punctuation, Hangul, Devanagari), then the style's face (or its stand-in for the
+// current language), then Caveat, Mynerve, Klee One and LXGW WenKai, then the UI text face; the
+// style's face when none of them has the glyph.
 int handwritingFace(int style, uint32_t cp);
 bool isHandwritingFace(int face);
 
@@ -74,8 +85,9 @@ bool ready();
 void beginFrame();
 
 // Resolves a codepoint with fallbacks: the face itself, then by script (Arabic -> Amiri / Ruqaa,
-// kana and Han -> Klee / WenKai in the language's order), then Text -> Symbol; a handwriting face
-// tries the other handwriting faces first. Returns nullptr when no face has it. usedFace receives
+// kana and Han -> Klee / WenKai in the language's order, Hangul -> Gowun Batang / Nanum Pen,
+// Devanagari -> Tiro / Kalam), then Text -> Symbol; a handwriting face tries the other handwriting
+// faces first. Returns nullptr when no face has it. usedFace receives
 // the face that provided the glyph.
 const Glyph* glyph(int face, uint32_t codepoint, int* usedFace = nullptr);
 // Face that glyph() would use, without building the glyph (-1 when none has it).

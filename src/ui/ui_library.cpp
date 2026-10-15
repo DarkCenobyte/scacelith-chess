@@ -659,7 +659,7 @@ float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const R
         for (const chess::pgn::Tag& t : d.record.tags) {
             if (t.name == "ScacelithEnd") continue;  // shown as the reason
             TagLine line;
-            line.label = uni::toUpper(tagLabel(t.name));
+            line.label = uni::toUpper(tagLabel(t.name), i18n::language());
             TextStyle n = ns;
             n.size = gfx::fitSize(line.label, n, nameW - 14.0f, 0.75f);
             line.label = elide(line.label, n, nameW - 14.0f);
@@ -703,7 +703,7 @@ void message(const Rect& area, const std::string& head, const std::string& text,
     int lines = text.empty() ? 0 : gfx::wrapLineCount(text, w, ts);
     float h = 34.0f + float(lines) * lineH;
     float y = area.y + std::max(40.0f, (area.h - h) * 0.42f);
-    std::string hd = uni::toUpper(head);
+    std::string hd = uni::toUpper(head, i18n::language());
     hs.size = gfx::fitSize(hd, hs, w);
     gfx::text(hd, area.cx(), y, hs);
     gfx::diamond(vec2(area.cx(), y + 26.0f), 3.5f, withAlpha(gold, 0.7f));

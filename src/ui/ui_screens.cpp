@@ -48,6 +48,7 @@ struct OptionsState {
     bool coachVoice = false;   // [coach] voice as the page last saw it in the settings
     int tab = 0;
     bool confirmDiscard = false;
+    bool pickLanguage = false;  // the list of the languages is open
     float pageT = 0.0f;
 };
 
@@ -162,7 +163,7 @@ std::string typographicResult(const std::string& s) {
     return out;
 }
 
-std::string upper(const std::string& s) { return uni::toUpper(s); }
+std::string upper(const std::string& s) { return uni::toUpper(s, i18n::language()); }
 
 // Glyph drawn centred on its ink box (used for chess figures).
 void glyphCentered(uint32_t cp, vec2 c, float size, const TextStyle& base) {
@@ -401,10 +402,28 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
 }
 
 // ---- Options page -----------------------------------------------------------------------------------
+// The languages of the game by their own names, in the order of i18n::languages().
+const std::vector<std::string>& languageNames() {
+    static std::vector<std::string> names;
+    if (names.empty())
+        for (const i18n::Language& l : i18n::languages()) names.push_back(l.nativeName);
+    return names;
+}
+
+// Language 'index' of i18n::languages(): applied and saved at once ('work' is the page's copy).
+void chooseLanguage(int index, game::Settings& work) {
+    const char* code = i18n::languages()[size_t(index)].code;
+    i18n::setLanguage(code);
+    game::settings().language = code;
+    work.language = code;
+    game::settings().save();
+}
+
 void openOptions() {
     S.opt.work = game::settings();
     S.opt.coachVoice = game::settings().coachVoice;
     S.opt.confirmDiscard = false;
+    S.opt.pickLanguage = false;
     S.opt.pageT = 0.0f;
     if (S.forcedTab >= 0) {
         S.opt.tab = S.forcedTab;
@@ -435,7 +454,8 @@ bool optionsPage(MenuAction& act) {
         o.work.coachVoice = o.coachVoice;
     }
     bool dirty = !sameOptions(o.work, game::settings());
-    if (o.confirmDiscard) im::pushBlock();
+    const bool modal = o.confirmDiscard || o.pickLanguage;
+    if (modal) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
     im::pageTitle(T("options.title"), p.cx(), p.y + 80.0f);
@@ -464,18 +484,11 @@ bool optionsPage(MenuAction& act) {
     im::beginInfoMarks();
     switch (o.tab) {
         case 0: {
-            // Language: applied and saved at once (the page itself changes language).
-            const std::vector<i18n::Language>& langs = i18n::languages();
-            std::vector<std::string> names;
-            for (const i18n::Language& l : langs) names.push_back(l.nativeName);
+            // Language: applied and saved at once (the page itself changes language). The arrows
+            // step through the list; a click on the name (or Enter) shows the whole list.
             int li = std::max(0, i18n::languageIndex(i18n::language()));
-            if (im::selectorRow(L("options.language"), li, names, row())) {
-                const char* code = langs[size_t(li)].code;
-                i18n::setLanguage(code);
-                game::settings().language = code;
-                s.language = code;
-                game::settings().save();
-            }
+            if (im::selectorRow(L("options.language"), li, languageNames(), row(), true, 250.0f, &o.pickLanguage))
+                chooseLanguage(li, s);
             im::tooltip(T("options.language.help"));
             int mode = s.fullscreen ? 0 : 1;
             if (im::selectorRow(L("options.display_mode"), mode, {T("options.fullscreen"), T("options.windowed")}, row()))
@@ -708,14 +721,20 @@ bool optionsPage(MenuAction& act) {
     if (!dirty) im::setDefaultFocus(im::makeId("##tabs"));
     im::popId();
     gfx::popAlpha();
-    if (o.confirmDiscard) im::popBlock();
-    if (!o.confirmDiscard && im::consumeBack()) {
+    if (modal) im::popBlock();
+    if (!modal && im::consumeBack()) {
         closing = true;
         im::sound(Sound::Back);
     }
     if (closing && dirty) {
         o.confirmDiscard = true;
         closing = false;
+    }
+    if (o.pickLanguage && !o.confirmDiscard) {
+        int r = im::choiceDialog("##languages", T("options.language"), languageNames(),
+                                 std::max(0, i18n::languageIndex(i18n::language())));
+        if (r >= 0) chooseLanguage(r, s);
+        if (r != -1) o.pickLanguage = false;
     }
     if (o.confirmDiscard) {
         int r = im::confirmDialog("##discard", T("options.unsaved.title"), T("options.unsaved.text"), T("common.apply"),

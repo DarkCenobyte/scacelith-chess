@@ -1,0 +1,210 @@
+# Coach speech (Korean): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: warm polite 해요체; -시- on the player's own actions where a teacher uses it (두셨어요,
+# 놓치셨어요, 잡으셨어요), never on pieces or on the coach. The player is never named by a pronoun.
+# Pieces: {your} {your2} = the bare noun ("나이트"), {my} {my2} = "제 나이트", {t1} {t2} = either side's.
+# Their particles come from the forms of common.lang (subj top obj and ins cop was stem, bare_*), or are
+# invariant (의 에 에게 까지 보다 앞에서...): "{your:subj}", "{t1:and} {t2:obj}", "{your}에게".
+# Moves ({move} {best} {reply} {line}), squares ({sq}), {eval} and bare numbers never take a particle:
+# "{sq} 칸으로", "{best}, 이 수가 더 좋았어요", "{line} 수순 뒤에", "{move} 다음엔"; terse levels may end a
+# sentence on them. Counted numbers carry their counter, so a particle may follow: {m:move} "3수"
+# (세 수), {pts:point} "3점", {n:time} "3번", {n:square} "3칸", {n:piece} "기물 3개".
+# {text} = name.pattern.*: every name ends in 메이트 (a vowel), so the two pattern lines attach 라고 / 예요.
+# Terms: 통과한 폰 (passed pawn), 오포지션 (opposition), 폰의 사각형 (the square of the pawn), 숨 쉴 칸
+# (luft), 비숍 쌍 (bishop pair), 무방비 (loose), 더블 체크 (double check), 스테일메이트 함정 (stalemate trick).
+# Levels 1-2: short, simple sentences; levels 5-6: terse, noun-final fragments allowed.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = 체크! 제 킹이 공격받고 있어요.
+ann.check.human.b1.2 = 체크! 제 킹을 공격하셨네요.
+ann.check.human.b1.3 = 체크예요! 제 킹이 체크에서 벗어나야 해요.
+ann.check.human = 체크.
+ann.check.human.2 = 체크!
+ann.check.human.3 = 체크네요.
+# The coach gives check.
+ann.check.coach = 체크!
+ann.check.coach.2 = 체크.
+ann.check.coach.3 = 그리고 체크!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = {your:subj} 공격받고 있다는 뜻이에요. 체크에서 벗어나야 해요.
+ann.check.coach.first.2 = 체크는 {your:subj} 공격받고 있다는 뜻이에요. 피하거나, 막거나, 체크를 건 제 기물을 잡으세요.
+ann.double_check.coach = 더블 체크! 제 기물 두 개가 동시에 킹을 공격해요. 그래서 킹이 움직여야 해요.
+ann.double_check.coach.2 = 더블 체크예요. 이제는 킹을 움직이는 수밖에 없어요.
+ann.double_check.human = 더블 체크! 기물 두 개가 동시에 제 킹을 공격하네요. 그래서 제 킹이 움직여야 해요.
+ann.double_check.human.2 = 더블 체크네요! 이제는 킹을 움직이는 수밖에 없어요.
+# The player checkmates the coach.
+ann.mate.human.b1 = 체크메이트! 이기셨어요! 제 킹이 도망갈 곳이 없어요.
+ann.mate.human.b1.2 = 체크메이트예요! 잘하셨어요, 게임에서 이기셨어요!
+ann.mate.human.b1.3 = 체크메이트! 제 킹이 갇혔어요. 축하해요!
+ann.mate.human = 체크메이트. 잘 두셨어요.
+ann.mate.human.2 = 메이트예요. 축하해요.
+ann.mate.human.3 = 체크메이트! 멋지게 끝내셨어요.
+# The coach checkmates the player.
+ann.mate.coach.b1 = 체크메이트예요. 킹이 빠져나갈 길이 없어요.
+ann.mate.coach.b1.2 = 체크메이트. 킹이 공격받고 있는데 피할 곳이 없어요.
+ann.mate.coach.b1.3 = 아쉽지만 체크메이트예요. 킹이 도망갈 수 없어요.
+ann.mate.coach = 체크메이트.
+ann.mate.coach.2 = 이걸로 메이트예요.
+ann.mate.coach.3 = 아쉽지만 체크메이트예요.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = 앗! 그 수는 뭔가를 내주게 돼요.
+ex.verdict.blunder.b1.2 = 조심하세요! 그 수는 손해를 볼 수 있어요.
+ex.verdict.blunder.b1.3 = 아, 잠깐만요. 그 수에는 문제가 있어요.
+ex.verdict.blunder.b2 = 음, 그 수에는 문제가 있어요.
+ex.verdict.blunder.b2.2 = 큰 실수예요.
+ex.verdict.blunder.b2.3 = 조심하세요, 그 수는 뭔가를 잃게 돼요.
+ex.verdict.blunder.b3 = 블런더예요.
+ex.verdict.blunder.b3.2 = {move}, 이 수는 정말 실수예요.
+ex.verdict.blunder.b3.3 = 아이고, {move}, 이건 큰 실수예요.
+ex.verdict.blunder.b4 = {move}, 블런더예요.
+ex.verdict.blunder.b4.2 = {move}, 이건 심각한 실수예요.
+ex.verdict.blunder.b4.3 = 아쉽지만 블런더예요.
+ex.verdict.blunder.b5 = {move}, 심각한 실수예요.
+ex.verdict.blunder.b5.2 = {move}: 블런더예요.
+ex.verdict.blunder.b5.3 = {move}, 대가가 큰 실수예요.
+ex.verdict.blunder.b6 = {move}: 심각한 실수.
+ex.verdict.blunder.b6.2 = {move}: 블런더.
+ex.verdict.blunder.b6.3 = {move}? 블런더예요.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = 앗! 제 위협을 막지 않으셨어요.
+ex.verdict.ignored.b1.2 = 조심하세요! 제 위협이 아직 남아 있었어요.
+ex.verdict.ignored.b1.3 = 아, 잠깐만요. 제 위협을 잊으셨네요.
+ex.verdict.ignored.b2 = 음, 제 위협이 아직 남아 있었어요.
+ex.verdict.ignored.b2.2 = 제 위협을 그대로 두셨네요.
+ex.verdict.ignored.b2.3 = 조심하세요, 제 위협에 대응하지 않으셨어요.
+ex.verdict.mistake.b3 = 좋은 수가 아니에요.
+ex.verdict.mistake.b3.2 = 음, {move}, 이 수에는 문제가 있어요.
+ex.verdict.mistake.b3.3 = 실수예요.
+ex.verdict.mistake.b4 = {move}, 실수예요.
+ex.verdict.mistake.b4.2 = {move}, 좋지 않은 수예요.
+ex.verdict.mistake.b4.3 = 그건 실수예요.
+ex.verdict.mistake.b5 = {move}, 명백한 실수예요.
+ex.verdict.mistake.b5.2 = {move}: 실수예요.
+ex.verdict.mistake.b5.3 = {move}, 좋지 않아요.
+ex.verdict.mistake.b6 = {move}: 실수.
+ex.verdict.mistake.b6.2 = {move}? 실수예요.
+ex.verdict.mistake.b6.3 = {move}, 이건 아니에요.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = 나쁘지 않지만, {best}, 이 수가 조금 더 좋았어요.
+ex.verdict.inaccuracy.b3.2 = {best}, 이 수가 조금 더 정확했어요.
+ex.verdict.inaccuracy.b3.3 = 작은 실수예요. 여기서는 {best}, 이 수가 더 좋았어요.
+ex.verdict.inaccuracy.b4 = 부정확한 수예요. {best}, 이쪽이 더 정확했어요.
+ex.verdict.inaccuracy.b4.2 = 조금 부정확했어요. {best}, 이 수가 조금 더 좋았어요.
+ex.verdict.inaccuracy.b4.3 = 최선은 아니에요. {best}, 이쪽이 더 정확했어요.
+ex.verdict.inaccuracy.b5 = {move}, 정확하지 않아요. {best}, 이쪽이 더 강했어요.
+ex.verdict.inaccuracy.b5.2 = 조금 부정확해요. 저라면 {best}, 이렇게 뒀을 거예요.
+ex.verdict.inaccuracy.b5.3 = {move} 대신 {best}, 이 수가 더 정확했어요.
+ex.verdict.inaccuracy.b6 = {move}, 부정확해요. {best}.
+ex.verdict.inaccuracy.b6.2 = 부정확해요. {best}.
+ex.verdict.inaccuracy.b6.3 = {best}, 이쪽이 더 나았어요.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best}, 이 수가 조금 더 정확했을지도 몰라요.
+ex.verdict.inaccuracy.maybe.2 = 저라면 {best}, 이렇게 뒀을지도 몰라요.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = 그 수는 좀 의심스러워 보여요.
+ex.verdict.dubious.2 = 그 수는 좀 미심쩍네요.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = 아, 잠깐만요! 좋은 기회를 놓치셨어요.
+ex.verdict.missed.b1.2 = 다시 보세요! 더 좋은 수가 있었어요.
+ex.verdict.missed.b1.3 = 잠깐만요, 방금 기회가 있었어요!
+ex.verdict.missed.b2 = 방금 기회를 놓치셨어요.
+ex.verdict.missed.b2.2 = 음, 더 좋은 수가 있었어요.
+ex.verdict.missed.b2.3 = 잠깐만요, 거기서 훌륭한 수가 있었어요.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = {best}, 이 수가 더 좋았어요.
+ex.better.b3.2 = {best}, 이게 더 나은 수였어요.
+ex.better.b3.3 = 대신 {best}, 이 수가 좋았어요.
+ex.better.b4 = {best}, 이쪽이 더 강했어요.
+ex.better.b4.2 = {best}, 이게 올바른 수였어요.
+ex.better.b4.3 = 더 좋은 수는 {best}.
+ex.better.b5 = {best}, 이어서 {line}, 이런 아이디어예요.
+ex.better.b5.2 = {best}, 이 수를 둬야 했어요. 이어서 {line}.
+ex.better.b5.3 = 더 좋은 수는 {best}, 그 뒤로 {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = 대신 {best}, {eval}.
+ex.better.b6.3 = {best}, 평가치 {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = {your:ins} 둘 수 있는 더 좋은 수가 있었어요.
+ex.hint.b1.2 = {your}에게 더 좋은 수가 있었어요.
+ex.hint.b2 = {your}에게 더 좋은 수가 있었어요.
+ex.hint.b2.2 = {your:ins} 더 좋은 수가 있었어요.
+ex.hint.b3 = {your:ins} 더 좋은 수를 두실 수 있었어요.
+ex.hint.b3.2 = {your:ins} 더 나은 수가 있었어요.
+ex.hint.b4 = {your}에게 더 좋은 수가 있었어요.
+ex.hint.b4.2 = {your:obj} 다시 보세요. 더 좋은 수가 있었어요.
+ex.hint.b5 = {your}에게 더 강한 수가 있었어요.
+ex.hint.b5.2 = {your:ins} 두는 더 강한 수가 있었어요.
+ex.hint.b6 = {your:ins} 더 나은 수가 있었어요.
+ex.hint.b6.2 = {your:obj} 다시 보세요.
+ex.hint.move = 더 좋은 수가 있었어요.
+ex.hint.move.2 = 거기서는 더 좋은 수가 있었어요.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your}에게 더 좋은 수가 있었어요. 기물을 얻는 수예요.
+ex.hint.gain.b1.2 = {your:ins} 더 좋은 수가 있었어요. 기물을 얻는 수예요.
+ex.hint.gain.b2 = {your}에게 더 좋은 수가 있었어요. 기물을 얻는 수예요.
+ex.hint.gain.b2.2 = {your:ins} 기물을 얻는 수가 있었어요.
+ex.hint.gain.b3 = {your}에게 더 좋은 수, 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b3.2 = {your:ins} 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b4 = {your}에게 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b4.2 = {your:obj} 다시 보세요. 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b5 = {your}에게 더 강한 수, 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b5.2 = {your:ins} 기물 이득을 볼 수 있는 수가 있었어요.
+ex.hint.gain.b6 = {your:ins} 기물 이득을 보는 수가 있었어요.
+ex.hint.gain.b6.2 = {your:obj} 다시 보세요. 얻을 기물이 있었어요.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = 더 좋은 수는 {your:obj} {sq} 칸으로 옮기는 거였어요.
+ex.reveal.b1.2 = {your:subj} {sq} 칸으로 갈 수 있었어요. 그게 더 좋았어요.
+ex.reveal.b2 = {your:obj} {sq} 칸으로 옮기는 게 더 좋은 수였어요.
+ex.reveal.b2.2 = 더 좋은 수는 {your:obj} {sq} 칸으로 보내는 거였어요.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = 자, 기물을 제자리로 돌려놓을게요.
+ex.rewind.b1.2 = 이제 전부 원래 자리로 돌려놓을게요.
+ex.rewind.b1.3 = 기물을 다시 놓을게요.
+ex.rewind.b2 = 다 원래대로 돌려놓을게요.
+ex.rewind.b2.2 = 아까 그 자리로 돌아가요.
+ex.rewind.b2.3 = 기물을 제자리로 돌려놓을게요.
+ex.rewind.b3 = 게임으로 돌아가요.
+ex.rewind.b3.2 = 다시 돌아가 볼까요.
+ex.rewind.b3.3 = 원래 포지션으로 돌아가요.
+ex.rewind.b4 = 게임으로 돌아가죠.
+ex.rewind.b4.2 = 돌아가요.
+ex.rewind.b4.3 = 다시 돌아가요.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = 다른 수를 둬 보실래요?
+ex.offer.b1.2 = 그 수를 무르고 다시 둬 보시겠어요?
+ex.offer.b1.3 = 다른 수를 둬 볼까요?
+ex.offer.b2 = 다른 수를 둬 보시겠어요?
+ex.offer.b2.2 = 그 수를 무르실래요?
+ex.offer.b2.3 = 다시 둬 볼래요?
+ex.offer.b3 = 무르시겠어요?
+ex.offer.b3.2 = 다시 둬 보실래요?
+ex.offer.b3.3 = 무를까요?
+ex.offer.b4 = 무를까요?
+ex.offer.b4.2 = 무르실래요?
+ex.offer.b4.3 = 다른 수를 둬 볼래요?
+ex.offer.b5 = 무를래요?
+ex.offer.b5.2 = 무르실래요?
+ex.offer.b5.3 = 무를까요?
+ex.offer.b6 = 무를래요?
+ex.offer.b6.2 = 무를까요?
+ex.offer.b6.3 = 다시 둘래요?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = 그 수는 좀 의심스러워요. 더 잘 둘 수 있지 않을까요?
+ex.dubious.b1.2 = 그 수는 좀 의심스러워요. 더 좋은 수를 찾아볼까요?
+ex.dubious.b2 = 의심스러운 수예요. 더 잘 둘 수 있지 않을까요?
+ex.dubious.b2.2 = 그 수는 좀 의심스러워요. 더 좋은 수가 있지 않을까요?

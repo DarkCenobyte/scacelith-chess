@@ -788,7 +788,7 @@ public:
         } else if (s == "hud") {
             m::vec2 v = ui::viewSize();
             ui::panel(m::vec2(v.x - 420.0f, 60.0f), m::vec2(360.0f, 150.0f));
-            ui::text(uni::toUpper(i18n::tr("common.white")), m::vec2(v.x - 390.0f, 84.0f), 20.0f, m::vec4(0.79f, 0.66f, 0.42f, 1.0f), ui::Align::Left, ui::FontStyle::Title, 0.2f);
+            ui::text(uni::toUpper(i18n::tr("common.white"), i18n::language()), m::vec2(v.x - 390.0f, 84.0f), 20.0f, m::vec4(0.79f, 0.66f, 0.42f, 1.0f), ui::Align::Left, ui::FontStyle::Title, 0.2f);
             ui::text("4:59", m::vec2(v.x - 90.0f, 74.0f), 64.0f, m::vec4(0.93f, 0.9f, 0.83f, 1.0f), ui::Align::Right);
             ui::text(i18n::tr("notify.press_clock"), m::vec2(v.x - 390.0f, 150.0f), 24.0f, m::vec4(0.76f, 0.72f, 0.65f, 1.0f), ui::Align::Left, ui::FontStyle::Italic);
             if (ui::button(i18n::tr("pause.offer_draw"), m::vec2(60.0f, v.y - 120.0f), m::vec2(240.0f, 56.0f))) LOGI("ui viewer: hud button");

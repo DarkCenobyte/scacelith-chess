@@ -9,6 +9,7 @@
 // uitest::fontsReady() in tests/ui_font_tests.cpp.
 #include "test.h"
 #include "i18n/i18n.h"
+#include "i18n/unicode.h"
 #include "ui/text_shape.h"
 #include "ui/ui_font.h"
 #include <cmath>
@@ -88,13 +89,13 @@ TEST(ui_text_shape_invisible_missing_and_empty) {
     CHECK_EQ(r.sourceCount, 5);
     REQUIRE(r.glyphs.size() == 2u);
     CHECK_EQ(r.glyphs[1].source, 2);
-    const text::Run missing = text::shapeLine("x\xEE\x80\x80", font::FACE_TEXT);   // U+E000, private use
+    const text::Run missing = text::shapeLine("x\xF3\xB0\x80\x80", font::FACE_TEXT);   // U+F0000, private use
     REQUIRE(missing.glyphs.size() == 2u);
-    CHECK_EQ(missing.glyphs[1].cp, 0xE000u);
+    CHECK_EQ(missing.glyphs[1].cp, 0xF0000u);
     CHECK(missing.glyphs[1].glyph == font::glyph(font::FACE_TEXT, '?'));
     CHECK_EQ(missing.glyphs[1].source, 1);
-    CHECK_EQ(font::resolveFace(font::FACE_TEXT, 0xE000), -1);
-    CHECK(font::glyph(font::FACE_TEXT, 0xE000) == nullptr);
+    CHECK_EQ(font::resolveFace(font::FACE_TEXT, 0xF0000), -1);
+    CHECK(font::glyph(font::FACE_TEXT, 0xF0000) == nullptr);
     const text::Run empty = text::shapeLine("", font::FACE_TEXT);
     CHECK(empty.glyphs.empty());
     CHECK_EQ(empty.sourceCount, 0);
@@ -220,6 +221,109 @@ TEST(ui_text_shape_title_face_small_capitals) {
     }
 }
 
+// Hangul from the Korean faces; Devanagari as the fonts' precomposed syllables from the Hindi
+// faces, one glyph per syllable, in the UI and in a hand.
+TEST(ui_text_shape_korean_and_hindi) {
+    REQUIRE(uitest::fontsReady());
+    English english;
+    const text::Run ko = text::shapeLine("\xED\x95\x9C\xEA\xB5\xAD\xEC\x96\xB4 A", font::FACE_TEXT);   // 한국어 A
+    REQUIRE(ko.glyphs.size() == 5u);
+    for (int i = 0; i < 3; ++i) {
+        CHECK_EQ(ko.glyphs[size_t(i)].face, int(font::FACE_KOREAN));
+        CHECK(nearly(ko.glyphs[size_t(i)].scale, font::fallbackScale(font::FACE_TEXT, font::FACE_KOREAN)));
+        CHECK(ko.glyphs[size_t(i)].advance > 0.5f);
+    }
+    CHECK_EQ(ko.glyphs[4].face, int(font::FACE_TEXT));
+    CHECK_EQ(text::shapeHandwriting("\xED\x95\x9C", font::HAND_MARCK).glyphs[0].face, int(font::FACE_HAND_KO));
+    CHECK_EQ(font::resolveFace(font::FACE_TITLE, 0xD55C), int(font::FACE_KOREAN));
+    // हिन्दी: two syllables, two precomposed glyphs.
+    const char* hindi = "\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80";
+    const text::Run hi = text::shapeLine(hindi, font::FACE_TEXT);
+    REQUIRE(hi.glyphs.size() == 2u);
+    CHECK_EQ(hi.sourceCount, 6);
+    for (const text::PlacedGlyph& g : hi.glyphs) {
+        CHECK(g.cp >= uni::kDevanagariClusterFirst && g.cp <= uni::kDevanagariClusterLast);
+        CHECK_EQ(g.face, int(font::FACE_DEVANAGARI));
+        CHECK(g.glyph->hasQuad || g.glyph->x1 > g.glyph->x0);
+        CHECK(!g.mark);
+    }
+    CHECK_EQ(hi.glyphs[0].source, 0);
+    CHECK_EQ(hi.glyphs[1].source, 2);
+    CHECK(nearly(hi.glyphs[1].x, hi.glyphs[0].advance));
+    CHECK(nearly(text::caretX(hi, 2), hi.glyphs[0].advance));
+    const text::Run hand = text::shapeHandwriting(hindi, font::HAND_CAVEAT);
+    REQUIRE(hand.glyphs.size() == 2u);
+    CHECK_EQ(hand.glyphs[0].face, int(font::FACE_HAND_HI));
+    // A syllable the fonts draw from its letters (का) stays two glyphs side by side.
+    const text::Run ka = text::shapeLine("\xE0\xA4\x95\xE0\xA4\xBE", font::FACE_TEXT);
+    REQUIRE(ka.glyphs.size() == 2u);
+    CHECK_EQ(ka.glyphs[0].cp, 0x915u);
+    CHECK(ka.glyphs[1].x > ka.glyphs[0].x);
+    CHECK(!font::isHandwritingFace(font::FACE_KOREAN) && !font::isHandwritingFace(font::FACE_DEVANAGARI));
+    CHECK(font::isHandwritingFace(font::FACE_HAND_KO) && font::isHandwritingFace(font::FACE_HAND_HI) &&
+          font::isHandwritingFace(font::FACE_HAND_MYNERVE));
+}
+
+// A title with a Latin letter Cinzel lacks (Vietnamese) is drawn whole in the text face's capitals,
+// lowercase as small capitals; Turkish draws the title face's i as a dotted capital; Greek small
+// capitals have no tonos.
+TEST(ui_text_shape_title_face_vietnamese_turkish_greek) {
+    REQUIRE(uitest::fontsReady());
+    English english;
+    const text::Run vi = text::shapeLine("C\xE1\xBB\x9C VUA", font::FACE_TITLE);   // CỜ VUA
+    REQUIRE(vi.glyphs.size() == 6u);
+    const float capScale = font::metrics(font::FACE_TITLE).capHeight / font::metrics(font::FACE_TEXT).capHeight;
+    for (const text::PlacedGlyph& g : vi.glyphs) {
+        CHECK_EQ(g.face, int(font::FACE_TEXT));
+        if (g.cp != ' ') CHECK(nearly(g.scale, capScale));
+    }
+    const text::Run small = text::shapeLine("c\xE1\xBB\x9D", font::FACE_TITLE);   // cờ
+    REQUIRE(small.glyphs.size() == 2u);
+    CHECK_EQ(small.glyphs[0].cp, uint32_t('C'));
+    CHECK_EQ(small.glyphs[1].cp, 0x1EDCu);
+    CHECK(small.glyphs[1].scale < capScale);
+    for (const text::PlacedGlyph& g : text::shapeLine("CHESS", font::FACE_TITLE).glyphs) CHECK_EQ(g.face, int(font::FACE_TITLE));
+    // Greek: έ as a small capital Ε.
+    const text::Run el = text::shapeLine("\xCE\xAD", font::FACE_TITLE);
+    REQUIRE(el.glyphs.size() == 1u);
+    CHECK_EQ(el.glyphs[0].cp, 0x395u);
+    // Turkish.
+    CHECK_EQ(text::shapeLine("i", font::FACE_TITLE).glyphs[0].cp, uint32_t('i'));
+    REQUIRE(i18n::setLanguage("tr"));
+    const text::Run tr = text::shapeLine("Bitir", font::FACE_TITLE);
+    REQUIRE(tr.glyphs.size() == 5u);
+    CHECK_EQ(tr.glyphs[1].cp, 0x130u);
+    CHECK_EQ(tr.glyphs[1].face, int(font::FACE_TITLE));
+    CHECK(tr.glyphs[1].scale < 1.0f);
+    CHECK_EQ(tr.glyphs[2].cp, uint32_t('t'));
+    CHECK_EQ(text::shapeLine("i", font::FACE_TEXT).glyphs[0].cp, uint32_t('i'));   // only the title face
+}
+
+// A hand style whose face lacks letters of the UI language is written with a face that has them
+// all (each style its own stand-in where possible); other scripts keep their own hands.
+TEST(ui_text_shape_hand_style_stand_ins) {
+    REQUIRE(uitest::fontsReady());
+    English english;
+    for (int style = 0; style < font::HAND_STYLE_COUNT; ++style)
+        CHECK_EQ(font::handwritingFace(style, 'a'), int(font::FACE_HAND_CAVEAT) + style);
+    REQUIRE(i18n::setLanguage("el"));
+    for (int style = 0; style < font::HAND_STYLE_COUNT; ++style) {
+        CHECK_EQ(font::handwritingFace(style, 'a'), int(font::FACE_HAND_MYNERVE));
+        CHECK_EQ(font::handwritingFace(style, 0x3B1), int(font::FACE_HAND_MYNERVE));   // α
+    }
+    REQUIRE(i18n::setLanguage("vi"));
+    CHECK_EQ(font::handwritingFace(font::HAND_CAVEAT, 0x1A1), int(font::FACE_HAND_MYNERVE));   // ơ
+    CHECK_EQ(font::handwritingFace(font::HAND_MARCK, 0x1A1), int(font::FACE_HAND_BADSCRIPT));
+    CHECK_EQ(font::handwritingFace(font::HAND_BADSCRIPT, 'a'), int(font::FACE_HAND_BADSCRIPT));
+    CHECK_EQ(font::handwritingFace(font::HAND_CAVEAT, 0x628), int(font::FACE_HAND_ARABIC));
+    REQUIRE(i18n::setLanguage("ro"));
+    CHECK_EQ(font::handwritingFace(font::HAND_CAVEAT, 0x21B), int(font::FACE_HAND_CAVEAT));    // ț
+    CHECK_EQ(font::handwritingFace(font::HAND_MARCK, 0x21B), int(font::FACE_HAND_BADSCRIPT));
+    REQUIRE(i18n::setLanguage("ru"));
+    for (int style = 0; style < font::HAND_STYLE_COUNT; ++style)
+        CHECK_EQ(font::handwritingFace(style, 0x416), int(font::FACE_HAND_CAVEAT) + style);
+}
+
 // Handwriting: Latin and Cyrillic in the player's style, every other script in the hand of its
 // own script; Han characters in the hand of the UI language (Japanese, Traditional, else
 // Simplified Chinese shapes), and the same order for the UI faces' fallbacks.
@@ -240,7 +344,7 @@ TEST(ui_text_shape_handwriting_faces_by_script_and_language) {
         CHECK_EQ(font::handwritingFace(style, 0x3055), int(font::FACE_HAND_JA));            // さ
     }
     CHECK_EQ(font::handwritingFace(-3, 'A'), int(font::FACE_HAND_CAVEAT));   // clamped
-    CHECK_EQ(font::handwritingFace(1, 0xE000), int(font::FACE_HAND_MARCK));  // no face has it: the style's
+    CHECK_EQ(font::handwritingFace(1, 0xF0000), int(font::FACE_HAND_MARCK));  // no face has it: the style's
     const uint32_t wang = 0x738B;   // 王
     CHECK_EQ(font::handwritingFace(0, wang), int(font::FACE_HAND_SC));
     CHECK_EQ(font::handwritingFace(0, 0x3002), int(font::FACE_HAND_SC));     // 。

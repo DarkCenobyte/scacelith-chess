@@ -1,0 +1,1172 @@
+# Coach speech (Lithuanian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Lithuanian needs.
+# Register: the coach says "tu" to the player (singular imperative: "Pažiūrėk", "Kirsk", "Eik žirgu");
+# the game menus say "jūs". The coach is male ("esu tikras", "aš pasiruošęs"). The player's gender is
+# unknown: Lithuanian verbs have no gender in any simple tense ("tu laimėjai", "suklydai" are fine), but
+# adjectives, participles, half-participles and "pats/pati" do: never use one that agrees with the
+# player ("tu pasiruošęs", "esi laimėjęs", "padaręs ėjimą, ..."): finite verbs, impersonal or noun
+# phrases instead ("Ar galime pradėti?", "Kai padarai ėjimą, ...").
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: pėstininkas, žirgas, rikis, bokštas, karalius (masculine) and valdovė (feminine, the only one).
+# The possessives tavo / mano and the side genitives baltųjų / juodųjų ("White's" / "Black's") never
+# change, so every owner pattern is one word + {piece}; only the noun takes the case. Every form below
+# is defined for all six pieces and all four owners (your, my, white, black): any of them can be used
+# in any coach file, the analysis included.
+#
+# Forms (middle column: the knight; the feminine valdovė differs only in its noun, pronouns and endings):
+#   nom        tavo žirgas  (the subject; "{your}" alone)  "{your} kabo: niekas jo negina."
+#   gen        tavo žirgo   (also after a negated verb: "Nekirsk {my:gen}!"; iš / už / prie / ant / be /
+#              dėl / nuo / iki / šalia + gen, po + gen "after")  "Už {your:gen} stovi {t1}."
+#   dat        tavo žirgui                          "{my:dat} reikia dar dviejų ėjimų."
+#   acc        tavo žirgą   (direct object; į / per / pro / prieš / priešais + acc)  "Galiu kirsti {your:acc}."
+#   ins        tavo žirgu   (the instrument: "move with"; su + ins)   "Buvo geresnis ėjimas {your:ins}."
+#   loc        tavo žirge                           "Visa grėsmė slypi {my:loc}."
+#   voc        tavo žirge / mano karaliau (address)  "Ak, {my:voc}, kur tu eini?"
+# Reflexive "savo": when the owner of the piece is the subject of the same clause, Lithuanian says
+# "savo", never "tavo" / "mano" ("Perkelk tavo žirgą" is wrong). Same words for every owner.
+#   refl_nom   savo žirgas  (only with a dative or genitive subject)  "Man labiausiai rūpi {my:refl_nom}."
+#   refl_gen   savo žirgo                           "Nepalik {your:refl_gen} be gynybos."
+#   refl_dat   savo žirgui                          "Duok {your:refl_dat} daugiau vietos."
+#   refl_acc   savo žirgą                           "Perkelk {your:refl_acc} į {sq}." / "Aš atiduodu {my:refl_acc}."
+#   refl_ins   savo žirgu                           "Kirsk {my:acc} {your:refl_ins}!"
+#   refl_loc   savo žirge                           "Matai {your:refl_loc} tik gynėją."
+# Without a possessive (often the most natural choice when the owner is obvious):
+#   bare_nom   žirgas                               "Tai {your:bare_nom}. Jis eina raide L."
+#   bare_gen   žirgo                                "Nejudink {your:bare_gen}."
+#   bare_dat   žirgui                               "{your:bare_dat} reikia vietos."
+#   bare_acc   žirgą                                "Pastatyk {your:bare_acc} į {sq}."
+#   bare_ins   žirgu                                "Eik {your:bare_ins}."
+#   bare_loc   žirge                                "Visa jėga slypi {your:bare_loc}."
+#   bare_voc   žirge / karaliau                     "Bėk, {my:bare_voc}!"
+# Pronouns referring back to a piece already named (jis / ji); there are no special forms after
+# prepositions ("už jo", "su ja"):
+#   pron       jis / ji                             "Tai {your}. {your:pron} eina įstrižainėmis."
+#   pron_gen   jo / jos (also "its")                "Už {your:pron_gen} stovi {t1}."
+#   pron_dat   jam / jai                            "{your:pron_dat} nebėra kur trauktis."
+#   pron_acc   jį / ją                              "{my} gali {your:pron_acc} kirsti."
+#   pron_ins   juo / ja                             "Eik {your:pron_ins}."
+#   pron_loc   jame / joje                          "Pažiūrėk į {my:acc}: {my:pron_loc} slypi grėsmė."
+# Relative pronoun "which" (kuris / kuri), its case set by its role in the relative clause:
+#   rel        kuris / kuri                         "{reply} kerta {piece:acc}, {piece:rel} neturėjo gynėjo."
+#   rel_gen    kurio / kurios                       "{your}, {your:rel_gen} niekas negina, kabo."
+#   rel_dat    kuriam / kuriai                      "{your}, {your:rel_dat} trūksta langelių, įstrigo."
+#   rel_acc    kurį / kurią                         "Tai {my}, {my:rel_acc} galėjai kirsti."
+#   rel_ins    kuriuo / kuria                       "{your2}, {your2:rel_ins} gynei {your:refl_acc}, pasitraukė."
+#   rel_loc    kuriame / kurioje                    "{my}, {my:rel_loc} slypi grėsmė, stovi {sq}."
+# Agreement endings (nominative singular, masculine / feminine): an adjective or participle about a
+# piece agrees with it. Prefer a verb ("{your} kabo", "{your} įstrigo", "{my} puola {your:acc}"); when
+# the adjective is needed, write its stem and the ending form, right after the piece placeholder when
+# you can (the coach points at the piece on the first placeholder):
+#   agr_as_a   as / a   "{your} surišt{your:agr_as_a}." = surištas / surišta (neapgintas, puolamas,
+#              įkalintas, vertas, vienas; also "t{your:agr_as_a}" = tas / ta)
+#   agr_us_i   us / i   "{your} saug{your:agr_us_i}." = saugus / saugi (aktyvus, pasyvus, stiprus)
+#   agr_es_usi ęs / usi "{your} įstrig{your:agr_es_usi} už pėstininkų." = įstrigęs / įstrigusi (likęs)
+#   agr_is_i   is / i   "{your}, ginant{your:agr_is_i} {sq}, ..." = ginantis / ginanti (also šis / ši)
+#   agr_is_e   is / ė   "{your} vienintel{your:agr_is_e} gina {sq}." = vienintelis / vienintelė (paskutinis)
+# In the accusative singular "-as" and "-a" adjectives agree alike ("palieka {piece:acc} neapgintą").
+# Two pieces together ("{t1} ir {t2}") take the masculine plural: "abu puolami", "jie".
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = m
+piece.queen.gender = f
+piece.king.gender = m
+# Case forms of the nouns, used with the possessive (tavo, mano, baltųjų, juodųjų).
+piece.pawn.nom = pėstininkas
+piece.pawn.gen = pėstininko
+piece.pawn.dat = pėstininkui
+piece.pawn.acc = pėstininką
+piece.pawn.ins = pėstininku
+piece.pawn.loc = pėstininke
+piece.pawn.voc = pėstininke
+piece.knight.nom = žirgas
+piece.knight.gen = žirgo
+piece.knight.dat = žirgui
+piece.knight.acc = žirgą
+piece.knight.ins = žirgu
+piece.knight.loc = žirge
+piece.knight.voc = žirge
+piece.bishop.nom = rikis
+piece.bishop.gen = rikio
+piece.bishop.dat = rikiui
+piece.bishop.acc = rikį
+piece.bishop.ins = rikiu
+piece.bishop.loc = rikyje
+piece.bishop.voc = riki
+piece.rook.nom = bokštas
+piece.rook.gen = bokšto
+piece.rook.dat = bokštui
+piece.rook.acc = bokštą
+piece.rook.ins = bokštu
+piece.rook.loc = bokšte
+piece.rook.voc = bokšte
+piece.queen.nom = valdovė
+piece.queen.gen = valdovės
+piece.queen.dat = valdovei
+piece.queen.acc = valdovę
+piece.queen.ins = valdove
+piece.queen.loc = valdovėje
+piece.queen.voc = valdove
+piece.king.nom = karalius
+piece.king.gen = karaliaus
+piece.king.dat = karaliui
+piece.king.acc = karalių
+piece.king.ins = karaliumi
+piece.king.loc = karaliuje
+piece.king.voc = karaliau
+# Possessive patterns: tavo / mano and, for the Analysis mode, baltųjų / juodųjų ("White's knight").
+owner.your.nom = tavo {piece}
+owner.your.gen = tavo {piece}
+owner.your.dat = tavo {piece}
+owner.your.acc = tavo {piece}
+owner.your.ins = tavo {piece}
+owner.your.loc = tavo {piece}
+owner.your.voc = tavo {piece}
+owner.my.nom = mano {piece}
+owner.my.gen = mano {piece}
+owner.my.dat = mano {piece}
+owner.my.acc = mano {piece}
+owner.my.ins = mano {piece}
+owner.my.loc = mano {piece}
+owner.my.voc = mano {piece}
+owner.white.nom = baltųjų {piece}
+owner.white.gen = baltųjų {piece}
+owner.white.dat = baltųjų {piece}
+owner.white.acc = baltųjų {piece}
+owner.white.ins = baltųjų {piece}
+owner.white.loc = baltųjų {piece}
+owner.white.voc = baltųjų {piece}
+owner.black.nom = juodųjų {piece}
+owner.black.gen = juodųjų {piece}
+owner.black.dat = juodųjų {piece}
+owner.black.acc = juodųjų {piece}
+owner.black.ins = juodųjų {piece}
+owner.black.loc = juodųjų {piece}
+owner.black.voc = juodųjų {piece}
+# The reflexive "savo" (the owner is the subject of the clause): the same words for every owner.
+piece.pawn.refl_nom = pėstininkas
+piece.pawn.refl_gen = pėstininko
+piece.pawn.refl_dat = pėstininkui
+piece.pawn.refl_acc = pėstininką
+piece.pawn.refl_ins = pėstininku
+piece.pawn.refl_loc = pėstininke
+piece.knight.refl_nom = žirgas
+piece.knight.refl_gen = žirgo
+piece.knight.refl_dat = žirgui
+piece.knight.refl_acc = žirgą
+piece.knight.refl_ins = žirgu
+piece.knight.refl_loc = žirge
+piece.bishop.refl_nom = rikis
+piece.bishop.refl_gen = rikio
+piece.bishop.refl_dat = rikiui
+piece.bishop.refl_acc = rikį
+piece.bishop.refl_ins = rikiu
+piece.bishop.refl_loc = rikyje
+piece.rook.refl_nom = bokštas
+piece.rook.refl_gen = bokšto
+piece.rook.refl_dat = bokštui
+piece.rook.refl_acc = bokštą
+piece.rook.refl_ins = bokštu
+piece.rook.refl_loc = bokšte
+piece.queen.refl_nom = valdovė
+piece.queen.refl_gen = valdovės
+piece.queen.refl_dat = valdovei
+piece.queen.refl_acc = valdovę
+piece.queen.refl_ins = valdove
+piece.queen.refl_loc = valdovėje
+piece.king.refl_nom = karalius
+piece.king.refl_gen = karaliaus
+piece.king.refl_dat = karaliui
+piece.king.refl_acc = karalių
+piece.king.refl_ins = karaliumi
+piece.king.refl_loc = karaliuje
+owner.your.refl_nom = savo {piece}
+owner.your.refl_gen = savo {piece}
+owner.your.refl_dat = savo {piece}
+owner.your.refl_acc = savo {piece}
+owner.your.refl_ins = savo {piece}
+owner.your.refl_loc = savo {piece}
+owner.my.refl_nom = savo {piece}
+owner.my.refl_gen = savo {piece}
+owner.my.refl_dat = savo {piece}
+owner.my.refl_acc = savo {piece}
+owner.my.refl_ins = savo {piece}
+owner.my.refl_loc = savo {piece}
+owner.white.refl_nom = savo {piece}
+owner.white.refl_gen = savo {piece}
+owner.white.refl_dat = savo {piece}
+owner.white.refl_acc = savo {piece}
+owner.white.refl_ins = savo {piece}
+owner.white.refl_loc = savo {piece}
+owner.black.refl_nom = savo {piece}
+owner.black.refl_gen = savo {piece}
+owner.black.refl_dat = savo {piece}
+owner.black.refl_acc = savo {piece}
+owner.black.refl_ins = savo {piece}
+owner.black.refl_loc = savo {piece}
+# The noun alone, without a possessive.
+piece.pawn.bare_nom = pėstininkas
+piece.pawn.bare_gen = pėstininko
+piece.pawn.bare_dat = pėstininkui
+piece.pawn.bare_acc = pėstininką
+piece.pawn.bare_ins = pėstininku
+piece.pawn.bare_loc = pėstininke
+piece.pawn.bare_voc = pėstininke
+piece.knight.bare_nom = žirgas
+piece.knight.bare_gen = žirgo
+piece.knight.bare_dat = žirgui
+piece.knight.bare_acc = žirgą
+piece.knight.bare_ins = žirgu
+piece.knight.bare_loc = žirge
+piece.knight.bare_voc = žirge
+piece.bishop.bare_nom = rikis
+piece.bishop.bare_gen = rikio
+piece.bishop.bare_dat = rikiui
+piece.bishop.bare_acc = rikį
+piece.bishop.bare_ins = rikiu
+piece.bishop.bare_loc = rikyje
+piece.bishop.bare_voc = riki
+piece.rook.bare_nom = bokštas
+piece.rook.bare_gen = bokšto
+piece.rook.bare_dat = bokštui
+piece.rook.bare_acc = bokštą
+piece.rook.bare_ins = bokštu
+piece.rook.bare_loc = bokšte
+piece.rook.bare_voc = bokšte
+piece.queen.bare_nom = valdovė
+piece.queen.bare_gen = valdovės
+piece.queen.bare_dat = valdovei
+piece.queen.bare_acc = valdovę
+piece.queen.bare_ins = valdove
+piece.queen.bare_loc = valdovėje
+piece.queen.bare_voc = valdove
+piece.king.bare_nom = karalius
+piece.king.bare_gen = karaliaus
+piece.king.bare_dat = karaliui
+piece.king.bare_acc = karalių
+piece.king.bare_ins = karaliumi
+piece.king.bare_loc = karaliuje
+piece.king.bare_voc = karaliau
+owner.your.bare_nom = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_ins = {piece}
+owner.your.bare_loc = {piece}
+owner.your.bare_voc = {piece}
+owner.my.bare_nom = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_ins = {piece}
+owner.my.bare_loc = {piece}
+owner.my.bare_voc = {piece}
+owner.white.bare_nom = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_ins = {piece}
+owner.white.bare_loc = {piece}
+owner.white.bare_voc = {piece}
+owner.black.bare_nom = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_ins = {piece}
+owner.black.bare_loc = {piece}
+owner.black.bare_voc = {piece}
+# Personal pronouns (jis / ji) referring back to the piece.
+piece.pawn.pron = jis
+piece.pawn.pron_gen = jo
+piece.pawn.pron_dat = jam
+piece.pawn.pron_acc = jį
+piece.pawn.pron_ins = juo
+piece.pawn.pron_loc = jame
+piece.knight.pron = jis
+piece.knight.pron_gen = jo
+piece.knight.pron_dat = jam
+piece.knight.pron_acc = jį
+piece.knight.pron_ins = juo
+piece.knight.pron_loc = jame
+piece.bishop.pron = jis
+piece.bishop.pron_gen = jo
+piece.bishop.pron_dat = jam
+piece.bishop.pron_acc = jį
+piece.bishop.pron_ins = juo
+piece.bishop.pron_loc = jame
+piece.rook.pron = jis
+piece.rook.pron_gen = jo
+piece.rook.pron_dat = jam
+piece.rook.pron_acc = jį
+piece.rook.pron_ins = juo
+piece.rook.pron_loc = jame
+piece.queen.pron = ji
+piece.queen.pron_gen = jos
+piece.queen.pron_dat = jai
+piece.queen.pron_acc = ją
+piece.queen.pron_ins = ja
+piece.queen.pron_loc = joje
+piece.king.pron = jis
+piece.king.pron_gen = jo
+piece.king.pron_dat = jam
+piece.king.pron_acc = jį
+piece.king.pron_ins = juo
+piece.king.pron_loc = jame
+owner.your.pron = {piece}
+owner.your.pron_gen = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_acc = {piece}
+owner.your.pron_ins = {piece}
+owner.your.pron_loc = {piece}
+owner.my.pron = {piece}
+owner.my.pron_gen = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_acc = {piece}
+owner.my.pron_ins = {piece}
+owner.my.pron_loc = {piece}
+owner.white.pron = {piece}
+owner.white.pron_gen = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_acc = {piece}
+owner.white.pron_ins = {piece}
+owner.white.pron_loc = {piece}
+owner.black.pron = {piece}
+owner.black.pron_gen = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_acc = {piece}
+owner.black.pron_ins = {piece}
+owner.black.pron_loc = {piece}
+# Relative pronouns (kuris / kuri) referring back to the piece.
+piece.pawn.rel = kuris
+piece.pawn.rel_gen = kurio
+piece.pawn.rel_dat = kuriam
+piece.pawn.rel_acc = kurį
+piece.pawn.rel_ins = kuriuo
+piece.pawn.rel_loc = kuriame
+piece.knight.rel = kuris
+piece.knight.rel_gen = kurio
+piece.knight.rel_dat = kuriam
+piece.knight.rel_acc = kurį
+piece.knight.rel_ins = kuriuo
+piece.knight.rel_loc = kuriame
+piece.bishop.rel = kuris
+piece.bishop.rel_gen = kurio
+piece.bishop.rel_dat = kuriam
+piece.bishop.rel_acc = kurį
+piece.bishop.rel_ins = kuriuo
+piece.bishop.rel_loc = kuriame
+piece.rook.rel = kuris
+piece.rook.rel_gen = kurio
+piece.rook.rel_dat = kuriam
+piece.rook.rel_acc = kurį
+piece.rook.rel_ins = kuriuo
+piece.rook.rel_loc = kuriame
+piece.queen.rel = kuri
+piece.queen.rel_gen = kurios
+piece.queen.rel_dat = kuriai
+piece.queen.rel_acc = kurią
+piece.queen.rel_ins = kuria
+piece.queen.rel_loc = kurioje
+piece.king.rel = kuris
+piece.king.rel_gen = kurio
+piece.king.rel_dat = kuriam
+piece.king.rel_acc = kurį
+piece.king.rel_ins = kuriuo
+piece.king.rel_loc = kuriame
+owner.your.rel = {piece}
+owner.your.rel_gen = {piece}
+owner.your.rel_dat = {piece}
+owner.your.rel_acc = {piece}
+owner.your.rel_ins = {piece}
+owner.your.rel_loc = {piece}
+owner.my.rel = {piece}
+owner.my.rel_gen = {piece}
+owner.my.rel_dat = {piece}
+owner.my.rel_acc = {piece}
+owner.my.rel_ins = {piece}
+owner.my.rel_loc = {piece}
+owner.white.rel = {piece}
+owner.white.rel_gen = {piece}
+owner.white.rel_dat = {piece}
+owner.white.rel_acc = {piece}
+owner.white.rel_ins = {piece}
+owner.white.rel_loc = {piece}
+owner.black.rel = {piece}
+owner.black.rel_gen = {piece}
+owner.black.rel_dat = {piece}
+owner.black.rel_acc = {piece}
+owner.black.rel_ins = {piece}
+owner.black.rel_loc = {piece}
+# Agreement endings (nominative singular): glued to an adjective or participle stem.
+piece.pawn.agr_as_a = as
+piece.pawn.agr_us_i = us
+piece.pawn.agr_es_usi = ęs
+piece.pawn.agr_is_i = is
+piece.pawn.agr_is_e = is
+piece.knight.agr_as_a = as
+piece.knight.agr_us_i = us
+piece.knight.agr_es_usi = ęs
+piece.knight.agr_is_i = is
+piece.knight.agr_is_e = is
+piece.bishop.agr_as_a = as
+piece.bishop.agr_us_i = us
+piece.bishop.agr_es_usi = ęs
+piece.bishop.agr_is_i = is
+piece.bishop.agr_is_e = is
+piece.rook.agr_as_a = as
+piece.rook.agr_us_i = us
+piece.rook.agr_es_usi = ęs
+piece.rook.agr_is_i = is
+piece.rook.agr_is_e = is
+piece.queen.agr_as_a = a
+piece.queen.agr_us_i = i
+piece.queen.agr_es_usi = usi
+piece.queen.agr_is_i = i
+piece.queen.agr_is_e = ė
+piece.king.agr_as_a = as
+piece.king.agr_us_i = us
+piece.king.agr_es_usi = ęs
+piece.king.agr_is_i = is
+piece.king.agr_is_e = is
+owner.your.agr_as_a = {piece}
+owner.your.agr_us_i = {piece}
+owner.your.agr_es_usi = {piece}
+owner.your.agr_is_i = {piece}
+owner.your.agr_is_e = {piece}
+owner.my.agr_as_a = {piece}
+owner.my.agr_us_i = {piece}
+owner.my.agr_es_usi = {piece}
+owner.my.agr_is_i = {piece}
+owner.my.agr_is_e = {piece}
+owner.white.agr_as_a = {piece}
+owner.white.agr_us_i = {piece}
+owner.white.agr_es_usi = {piece}
+owner.white.agr_is_i = {piece}
+owner.white.agr_is_e = {piece}
+owner.black.agr_as_a = {piece}
+owner.black.agr_us_i = {piece}
+owner.black.agr_es_usi = {piece}
+owner.black.agr_is_i = {piece}
+owner.black.agr_is_e = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice says a square as Lithuanian players read it: the file's letter name, then the rank as a
+# cardinal number: e4 = "e keturi", f3 = "ef trys", b5 = "bė penki", h7 = "ha septyni".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = bė
+file.c.spoken = cė
+file.d.spoken = dė
+file.e.spoken = e
+file.f.spoken = ef
+file.g.spoken = gė
+file.h.spoken = ha
+rank.1.spoken = vienas
+rank.2.spoken = du
+rank.3.spoken = trys
+rank.4.spoken = keturi
+rank.5.spoken = penki
+rank.6.spoken = šeši
+rank.7.spoken = septyni
+rank.8.spoken = aštuoni
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Lithuanian notation letters: K(aralius) V(aldovė) B(okštas) R(ikis) Ž(irgas): "Žf3", "Rb5", "Vxd8".
+# Careful, false friends: B is the rook and R the bishop.
+move.letters = K V B R Ž
+# Spoken as Lithuanian players read notation: "žirgas ef trys", "žirgas kerta e penki", "žirgas bė dė
+# septyni", "e kerta dė penki", "pėstininkas kerta" (a recapture on the same square), "trumpoji
+# rokiruotė", "valdovė gė keturi, šachas". {piece} is always the nominative here, so the promotion names
+# the new piece after a colon ("virsta valdove" would need the instrumental): "e aštuoni, virsmas: valdovė".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} kerta {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} kerta {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} kerta {to}
+move.recapture.spoken = {piece} kerta
+move.castle_short.spoken = trumpoji rokiruotė
+move.castle_long.spoken = ilgoji rokiruotė
+move.promotion.spoken = {move}, virsmas: {piece}
+move.check.spoken = {move}, šachas
+move.mate.spoken = {move}, matas
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the words the voice misreads. Lithuanian names en passant
+# "kirtimas prasilenkiant"; a line that keeps the French words gets its respelling in that pass.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words; the plain word is the masculine nominative. 21-99 compose as "{tens} {units}"
+# ("dvidešimt trys"), 101-999 as "{hundreds} {rest}" ("šimtas dvidešimt"); every hundred is listed.
+# In a compound number only the last word takes a form ("dvidešimt vienos", "dvidešimt pirmajame"),
+# as Lithuanian usage leaves the tens unchanged.
+number.0.spoken = nulis
+number.1.spoken = vienas
+number.2.spoken = du
+number.3.spoken = trys
+number.4.spoken = keturi
+number.5.spoken = penki
+number.6.spoken = šeši
+number.7.spoken = septyni
+number.8.spoken = aštuoni
+number.9.spoken = devyni
+number.10.spoken = dešimt
+number.11.spoken = vienuolika
+number.12.spoken = dvylika
+number.13.spoken = trylika
+number.14.spoken = keturiolika
+number.15.spoken = penkiolika
+number.16.spoken = šešiolika
+number.17.spoken = septyniolika
+number.18.spoken = aštuoniolika
+number.19.spoken = devyniolika
+number.20.spoken = dvidešimt
+number.30.spoken = trisdešimt
+number.40.spoken = keturiasdešimt
+number.50.spoken = penkiasdešimt
+number.60.spoken = šešiasdešimt
+number.70.spoken = septyniasdešimt
+number.80.spoken = aštuoniasdešimt
+number.90.spoken = devyniasdešimt
+number.100.spoken = šimtas
+number.200.spoken = du šimtai
+number.300.spoken = trys šimtai
+number.400.spoken = keturi šimtai
+number.500.spoken = penki šimtai
+number.600.spoken = šeši šimtai
+number.700.spoken = septyni šimtai
+number.800.spoken = aštuoni šimtai
+number.900.spoken = devyni šimtai
+number.tens.spoken = {tens} {units}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} šimtai
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Lithuanian writes a decimal comma ("1,3") and reads it "vienas kablelis trys".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} kablelis {frac}
+
+# Number forms. A number takes the case (and, for 1-9, the gender) of the noun it counts. "{n:<form>}"
+# looks for number.<n>.<form>.spoken first, then the plain word: a form equal to the plain word is not
+# listed. Forms:
+#   (none)  masculine nominative   du ėjimai, trys taškai
+#   gen dat acc ins loc            masculine: dviejų ėjimų, dviem ėjimams, du ėjimus, dviem ėjimais,
+#                                  dviejuose ėjimuose; also the form of every gender-free number (0,
+#                                  10-20, the tens and hundreds: dešimties klaidų)
+#   f f_gen f_dat f_acc f_ins f_loc  feminine, listed for 1-9 only (the other numbers have no gender):
+#                                  dvi klaidos, dviejų klaidų, dviem klaidoms, dvi klaidas, dviem
+#                                  klaidomis, dviejose klaidose
+#   ord ord_gen ord_dat ord_acc ord_ins ord_loc  ordinals, masculine definite (for "ėjimas"): pirmasis,
+#                                  pirmojo, pirmajam, pirmąjį, pirmuoju, pirmajame; listed up to 100,
+#                                  101-199 compose ("šimtas pirmasis"), no game reaches move 200
+#   mv_acc                         a number with "ėjimas" in the accusative, for "matas per {n:mv_acc}"
+#                                  in eval.* (a bare {n} there): vieną ėjimą, tris ėjimus, dešimt ėjimų
+# Lines say counted things through count.* (below), which pick these forms. Known limit: in 101-999 the
+# hundreds stay in the nominative ("šimtas dvidešimt trijų" instead of "šimto dvidešimt trijų"); the coach
+# never counts that high in an oblique case.
+number.0.gen.spoken = nulio
+number.0.dat.spoken = nuliui
+number.0.acc.spoken = nulį
+number.0.ins.spoken = nuliu
+number.0.loc.spoken = nulyje
+number.1.gen.spoken = vieno
+number.1.dat.spoken = vienam
+number.1.acc.spoken = vieną
+number.1.ins.spoken = vienu
+number.1.loc.spoken = viename
+number.2.gen.spoken = dviejų
+number.2.dat.spoken = dviem
+number.2.ins.spoken = dviem
+number.2.loc.spoken = dviejuose
+number.3.gen.spoken = trijų
+number.3.dat.spoken = trims
+number.3.acc.spoken = tris
+number.3.ins.spoken = trimis
+number.3.loc.spoken = trijuose
+number.4.gen.spoken = keturių
+number.4.dat.spoken = keturiems
+number.4.acc.spoken = keturis
+number.4.ins.spoken = keturiais
+number.4.loc.spoken = keturiuose
+number.5.gen.spoken = penkių
+number.5.dat.spoken = penkiems
+number.5.acc.spoken = penkis
+number.5.ins.spoken = penkiais
+number.5.loc.spoken = penkiuose
+number.6.gen.spoken = šešių
+number.6.dat.spoken = šešiems
+number.6.acc.spoken = šešis
+number.6.ins.spoken = šešiais
+number.6.loc.spoken = šešiuose
+number.7.gen.spoken = septynių
+number.7.dat.spoken = septyniems
+number.7.acc.spoken = septynis
+number.7.ins.spoken = septyniais
+number.7.loc.spoken = septyniuose
+number.8.gen.spoken = aštuonių
+number.8.dat.spoken = aštuoniems
+number.8.acc.spoken = aštuonis
+number.8.ins.spoken = aštuoniais
+number.8.loc.spoken = aštuoniuose
+number.9.gen.spoken = devynių
+number.9.dat.spoken = devyniems
+number.9.acc.spoken = devynis
+number.9.ins.spoken = devyniais
+number.9.loc.spoken = devyniuose
+number.10.gen.spoken = dešimties
+number.10.dat.spoken = dešimčiai
+number.10.ins.spoken = dešimčia
+number.10.loc.spoken = dešimtyje
+number.11.gen.spoken = vienuolikos
+number.11.dat.spoken = vienuolikai
+number.11.loc.spoken = vienuolikoje
+number.12.gen.spoken = dvylikos
+number.12.dat.spoken = dvylikai
+number.12.loc.spoken = dvylikoje
+number.13.gen.spoken = trylikos
+number.13.dat.spoken = trylikai
+number.13.loc.spoken = trylikoje
+number.14.gen.spoken = keturiolikos
+number.14.dat.spoken = keturiolikai
+number.14.loc.spoken = keturiolikoje
+number.15.gen.spoken = penkiolikos
+number.15.dat.spoken = penkiolikai
+number.15.loc.spoken = penkiolikoje
+number.16.gen.spoken = šešiolikos
+number.16.dat.spoken = šešiolikai
+number.16.loc.spoken = šešiolikoje
+number.17.gen.spoken = septyniolikos
+number.17.dat.spoken = septyniolikai
+number.17.loc.spoken = septyniolikoje
+number.18.gen.spoken = aštuoniolikos
+number.18.dat.spoken = aštuoniolikai
+number.18.loc.spoken = aštuoniolikoje
+number.19.gen.spoken = devyniolikos
+number.19.dat.spoken = devyniolikai
+number.19.loc.spoken = devyniolikoje
+number.20.gen.spoken = dvidešimties
+number.20.dat.spoken = dvidešimčiai
+number.20.ins.spoken = dvidešimčia
+number.20.loc.spoken = dvidešimtyje
+number.30.gen.spoken = trisdešimties
+number.30.dat.spoken = trisdešimčiai
+number.30.ins.spoken = trisdešimčia
+number.30.loc.spoken = trisdešimtyje
+number.40.gen.spoken = keturiasdešimties
+number.40.dat.spoken = keturiasdešimčiai
+number.40.ins.spoken = keturiasdešimčia
+number.40.loc.spoken = keturiasdešimtyje
+number.50.gen.spoken = penkiasdešimties
+number.50.dat.spoken = penkiasdešimčiai
+number.50.ins.spoken = penkiasdešimčia
+number.50.loc.spoken = penkiasdešimtyje
+number.60.gen.spoken = šešiasdešimties
+number.60.dat.spoken = šešiasdešimčiai
+number.60.ins.spoken = šešiasdešimčia
+number.60.loc.spoken = šešiasdešimtyje
+number.70.gen.spoken = septyniasdešimties
+number.70.dat.spoken = septyniasdešimčiai
+number.70.ins.spoken = septyniasdešimčia
+number.70.loc.spoken = septyniasdešimtyje
+number.80.gen.spoken = aštuoniasdešimties
+number.80.dat.spoken = aštuoniasdešimčiai
+number.80.ins.spoken = aštuoniasdešimčia
+number.80.loc.spoken = aštuoniasdešimtyje
+number.90.gen.spoken = devyniasdešimties
+number.90.dat.spoken = devyniasdešimčiai
+number.90.ins.spoken = devyniasdešimčia
+number.90.loc.spoken = devyniasdešimtyje
+number.100.gen.spoken = šimto
+number.100.dat.spoken = šimtui
+number.100.acc.spoken = šimtą
+number.100.ins.spoken = šimtu
+number.100.loc.spoken = šimte
+number.200.gen.spoken = dviejų šimtų
+number.200.dat.spoken = dviem šimtams
+number.200.acc.spoken = du šimtus
+number.200.ins.spoken = dviem šimtais
+number.200.loc.spoken = dviejuose šimtuose
+number.300.gen.spoken = trijų šimtų
+number.300.dat.spoken = trims šimtams
+number.300.acc.spoken = tris šimtus
+number.300.ins.spoken = trimis šimtais
+number.300.loc.spoken = trijuose šimtuose
+number.400.gen.spoken = keturių šimtų
+number.400.dat.spoken = keturiems šimtams
+number.400.acc.spoken = keturis šimtus
+number.400.ins.spoken = keturiais šimtais
+number.400.loc.spoken = keturiuose šimtuose
+number.500.gen.spoken = penkių šimtų
+number.500.dat.spoken = penkiems šimtams
+number.500.acc.spoken = penkis šimtus
+number.500.ins.spoken = penkiais šimtais
+number.500.loc.spoken = penkiuose šimtuose
+number.600.gen.spoken = šešių šimtų
+number.600.dat.spoken = šešiems šimtams
+number.600.acc.spoken = šešis šimtus
+number.600.ins.spoken = šešiais šimtais
+number.600.loc.spoken = šešiuose šimtuose
+number.700.gen.spoken = septynių šimtų
+number.700.dat.spoken = septyniems šimtams
+number.700.acc.spoken = septynis šimtus
+number.700.ins.spoken = septyniais šimtais
+number.700.loc.spoken = septyniuose šimtuose
+number.800.gen.spoken = aštuonių šimtų
+number.800.dat.spoken = aštuoniems šimtams
+number.800.acc.spoken = aštuonis šimtus
+number.800.ins.spoken = aštuoniais šimtais
+number.800.loc.spoken = aštuoniuose šimtuose
+number.900.gen.spoken = devynių šimtų
+number.900.dat.spoken = devyniems šimtams
+number.900.acc.spoken = devynis šimtus
+number.900.ins.spoken = devyniais šimtais
+number.900.loc.spoken = devyniuose šimtuose
+number.1.f.spoken = viena
+number.1.f_gen.spoken = vienos
+number.1.f_dat.spoken = vienai
+number.1.f_acc.spoken = vieną
+number.1.f_ins.spoken = viena
+number.1.f_loc.spoken = vienoje
+number.2.f.spoken = dvi
+number.2.f_gen.spoken = dviejų
+number.2.f_dat.spoken = dviem
+number.2.f_acc.spoken = dvi
+number.2.f_ins.spoken = dviem
+number.2.f_loc.spoken = dviejose
+number.3.f_gen.spoken = trijų
+number.3.f_dat.spoken = trims
+number.3.f_acc.spoken = tris
+number.3.f_ins.spoken = trimis
+number.3.f_loc.spoken = trijose
+number.4.f.spoken = keturios
+number.4.f_gen.spoken = keturių
+number.4.f_dat.spoken = keturioms
+number.4.f_acc.spoken = keturias
+number.4.f_ins.spoken = keturiomis
+number.4.f_loc.spoken = keturiose
+number.5.f.spoken = penkios
+number.5.f_gen.spoken = penkių
+number.5.f_dat.spoken = penkioms
+number.5.f_acc.spoken = penkias
+number.5.f_ins.spoken = penkiomis
+number.5.f_loc.spoken = penkiose
+number.6.f.spoken = šešios
+number.6.f_gen.spoken = šešių
+number.6.f_dat.spoken = šešioms
+number.6.f_acc.spoken = šešias
+number.6.f_ins.spoken = šešiomis
+number.6.f_loc.spoken = šešiose
+number.7.f.spoken = septynios
+number.7.f_gen.spoken = septynių
+number.7.f_dat.spoken = septynioms
+number.7.f_acc.spoken = septynias
+number.7.f_ins.spoken = septyniomis
+number.7.f_loc.spoken = septyniose
+number.8.f.spoken = aštuonios
+number.8.f_gen.spoken = aštuonių
+number.8.f_dat.spoken = aštuonioms
+number.8.f_acc.spoken = aštuonias
+number.8.f_ins.spoken = aštuoniomis
+number.8.f_loc.spoken = aštuoniose
+number.9.f.spoken = devynios
+number.9.f_gen.spoken = devynių
+number.9.f_dat.spoken = devynioms
+number.9.f_acc.spoken = devynias
+number.9.f_ins.spoken = devyniomis
+number.9.f_loc.spoken = devyniose
+number.1.ord.spoken = pirmasis
+number.1.ord_gen.spoken = pirmojo
+number.1.ord_dat.spoken = pirmajam
+number.1.ord_acc.spoken = pirmąjį
+number.1.ord_ins.spoken = pirmuoju
+number.1.ord_loc.spoken = pirmajame
+number.2.ord.spoken = antrasis
+number.2.ord_gen.spoken = antrojo
+number.2.ord_dat.spoken = antrajam
+number.2.ord_acc.spoken = antrąjį
+number.2.ord_ins.spoken = antruoju
+number.2.ord_loc.spoken = antrajame
+number.3.ord.spoken = trečiasis
+number.3.ord_gen.spoken = trečiojo
+number.3.ord_dat.spoken = trečiajam
+number.3.ord_acc.spoken = trečiąjį
+number.3.ord_ins.spoken = trečiuoju
+number.3.ord_loc.spoken = trečiajame
+number.4.ord.spoken = ketvirtasis
+number.4.ord_gen.spoken = ketvirtojo
+number.4.ord_dat.spoken = ketvirtajam
+number.4.ord_acc.spoken = ketvirtąjį
+number.4.ord_ins.spoken = ketvirtuoju
+number.4.ord_loc.spoken = ketvirtajame
+number.5.ord.spoken = penktasis
+number.5.ord_gen.spoken = penktojo
+number.5.ord_dat.spoken = penktajam
+number.5.ord_acc.spoken = penktąjį
+number.5.ord_ins.spoken = penktuoju
+number.5.ord_loc.spoken = penktajame
+number.6.ord.spoken = šeštasis
+number.6.ord_gen.spoken = šeštojo
+number.6.ord_dat.spoken = šeštajam
+number.6.ord_acc.spoken = šeštąjį
+number.6.ord_ins.spoken = šeštuoju
+number.6.ord_loc.spoken = šeštajame
+number.7.ord.spoken = septintasis
+number.7.ord_gen.spoken = septintojo
+number.7.ord_dat.spoken = septintajam
+number.7.ord_acc.spoken = septintąjį
+number.7.ord_ins.spoken = septintuoju
+number.7.ord_loc.spoken = septintajame
+number.8.ord.spoken = aštuntasis
+number.8.ord_gen.spoken = aštuntojo
+number.8.ord_dat.spoken = aštuntajam
+number.8.ord_acc.spoken = aštuntąjį
+number.8.ord_ins.spoken = aštuntuoju
+number.8.ord_loc.spoken = aštuntajame
+number.9.ord.spoken = devintasis
+number.9.ord_gen.spoken = devintojo
+number.9.ord_dat.spoken = devintajam
+number.9.ord_acc.spoken = devintąjį
+number.9.ord_ins.spoken = devintuoju
+number.9.ord_loc.spoken = devintajame
+number.10.ord.spoken = dešimtasis
+number.10.ord_gen.spoken = dešimtojo
+number.10.ord_dat.spoken = dešimtajam
+number.10.ord_acc.spoken = dešimtąjį
+number.10.ord_ins.spoken = dešimtuoju
+number.10.ord_loc.spoken = dešimtajame
+number.11.ord.spoken = vienuoliktasis
+number.11.ord_gen.spoken = vienuoliktojo
+number.11.ord_dat.spoken = vienuoliktajam
+number.11.ord_acc.spoken = vienuoliktąjį
+number.11.ord_ins.spoken = vienuoliktuoju
+number.11.ord_loc.spoken = vienuoliktajame
+number.12.ord.spoken = dvyliktasis
+number.12.ord_gen.spoken = dvyliktojo
+number.12.ord_dat.spoken = dvyliktajam
+number.12.ord_acc.spoken = dvyliktąjį
+number.12.ord_ins.spoken = dvyliktuoju
+number.12.ord_loc.spoken = dvyliktajame
+number.13.ord.spoken = tryliktasis
+number.13.ord_gen.spoken = tryliktojo
+number.13.ord_dat.spoken = tryliktajam
+number.13.ord_acc.spoken = tryliktąjį
+number.13.ord_ins.spoken = tryliktuoju
+number.13.ord_loc.spoken = tryliktajame
+number.14.ord.spoken = keturioliktasis
+number.14.ord_gen.spoken = keturioliktojo
+number.14.ord_dat.spoken = keturioliktajam
+number.14.ord_acc.spoken = keturioliktąjį
+number.14.ord_ins.spoken = keturioliktuoju
+number.14.ord_loc.spoken = keturioliktajame
+number.15.ord.spoken = penkioliktasis
+number.15.ord_gen.spoken = penkioliktojo
+number.15.ord_dat.spoken = penkioliktajam
+number.15.ord_acc.spoken = penkioliktąjį
+number.15.ord_ins.spoken = penkioliktuoju
+number.15.ord_loc.spoken = penkioliktajame
+number.16.ord.spoken = šešioliktasis
+number.16.ord_gen.spoken = šešioliktojo
+number.16.ord_dat.spoken = šešioliktajam
+number.16.ord_acc.spoken = šešioliktąjį
+number.16.ord_ins.spoken = šešioliktuoju
+number.16.ord_loc.spoken = šešioliktajame
+number.17.ord.spoken = septynioliktasis
+number.17.ord_gen.spoken = septynioliktojo
+number.17.ord_dat.spoken = septynioliktajam
+number.17.ord_acc.spoken = septynioliktąjį
+number.17.ord_ins.spoken = septynioliktuoju
+number.17.ord_loc.spoken = septynioliktajame
+number.18.ord.spoken = aštuonioliktasis
+number.18.ord_gen.spoken = aštuonioliktojo
+number.18.ord_dat.spoken = aštuonioliktajam
+number.18.ord_acc.spoken = aštuonioliktąjį
+number.18.ord_ins.spoken = aštuonioliktuoju
+number.18.ord_loc.spoken = aštuonioliktajame
+number.19.ord.spoken = devynioliktasis
+number.19.ord_gen.spoken = devynioliktojo
+number.19.ord_dat.spoken = devynioliktajam
+number.19.ord_acc.spoken = devynioliktąjį
+number.19.ord_ins.spoken = devynioliktuoju
+number.19.ord_loc.spoken = devynioliktajame
+number.20.ord.spoken = dvidešimtasis
+number.20.ord_gen.spoken = dvidešimtojo
+number.20.ord_dat.spoken = dvidešimtajam
+number.20.ord_acc.spoken = dvidešimtąjį
+number.20.ord_ins.spoken = dvidešimtuoju
+number.20.ord_loc.spoken = dvidešimtajame
+number.30.ord.spoken = trisdešimtasis
+number.30.ord_gen.spoken = trisdešimtojo
+number.30.ord_dat.spoken = trisdešimtajam
+number.30.ord_acc.spoken = trisdešimtąjį
+number.30.ord_ins.spoken = trisdešimtuoju
+number.30.ord_loc.spoken = trisdešimtajame
+number.40.ord.spoken = keturiasdešimtasis
+number.40.ord_gen.spoken = keturiasdešimtojo
+number.40.ord_dat.spoken = keturiasdešimtajam
+number.40.ord_acc.spoken = keturiasdešimtąjį
+number.40.ord_ins.spoken = keturiasdešimtuoju
+number.40.ord_loc.spoken = keturiasdešimtajame
+number.50.ord.spoken = penkiasdešimtasis
+number.50.ord_gen.spoken = penkiasdešimtojo
+number.50.ord_dat.spoken = penkiasdešimtajam
+number.50.ord_acc.spoken = penkiasdešimtąjį
+number.50.ord_ins.spoken = penkiasdešimtuoju
+number.50.ord_loc.spoken = penkiasdešimtajame
+number.60.ord.spoken = šešiasdešimtasis
+number.60.ord_gen.spoken = šešiasdešimtojo
+number.60.ord_dat.spoken = šešiasdešimtajam
+number.60.ord_acc.spoken = šešiasdešimtąjį
+number.60.ord_ins.spoken = šešiasdešimtuoju
+number.60.ord_loc.spoken = šešiasdešimtajame
+number.70.ord.spoken = septyniasdešimtasis
+number.70.ord_gen.spoken = septyniasdešimtojo
+number.70.ord_dat.spoken = septyniasdešimtajam
+number.70.ord_acc.spoken = septyniasdešimtąjį
+number.70.ord_ins.spoken = septyniasdešimtuoju
+number.70.ord_loc.spoken = septyniasdešimtajame
+number.80.ord.spoken = aštuoniasdešimtasis
+number.80.ord_gen.spoken = aštuoniasdešimtojo
+number.80.ord_dat.spoken = aštuoniasdešimtajam
+number.80.ord_acc.spoken = aštuoniasdešimtąjį
+number.80.ord_ins.spoken = aštuoniasdešimtuoju
+number.80.ord_loc.spoken = aštuoniasdešimtajame
+number.90.ord.spoken = devyniasdešimtasis
+number.90.ord_gen.spoken = devyniasdešimtojo
+number.90.ord_dat.spoken = devyniasdešimtajam
+number.90.ord_acc.spoken = devyniasdešimtąjį
+number.90.ord_ins.spoken = devyniasdešimtuoju
+number.90.ord_loc.spoken = devyniasdešimtajame
+number.100.ord.spoken = šimtasis
+number.100.ord_gen.spoken = šimtojo
+number.100.ord_dat.spoken = šimtajam
+number.100.ord_acc.spoken = šimtąjį
+number.100.ord_ins.spoken = šimtuoju
+number.100.ord_loc.spoken = šimtajame
+number.1.mv_acc.spoken = vieną ėjimą
+number.2.mv_acc.spoken = du ėjimus
+number.3.mv_acc.spoken = tris ėjimus
+number.4.mv_acc.spoken = keturis ėjimus
+number.5.mv_acc.spoken = penkis ėjimus
+number.6.mv_acc.spoken = šešis ėjimus
+number.7.mv_acc.spoken = septynis ėjimus
+number.8.mv_acc.spoken = aštuonis ėjimus
+number.9.mv_acc.spoken = devynis ėjimus
+number.10.mv_acc.spoken = dešimt ėjimų
+number.11.mv_acc.spoken = vienuolika ėjimų
+number.12.mv_acc.spoken = dvylika ėjimų
+number.13.mv_acc.spoken = trylika ėjimų
+number.14.mv_acc.spoken = keturiolika ėjimų
+number.15.mv_acc.spoken = penkiolika ėjimų
+number.16.mv_acc.spoken = šešiolika ėjimų
+number.17.mv_acc.spoken = septyniolika ėjimų
+number.18.mv_acc.spoken = aštuoniolika ėjimų
+number.19.mv_acc.spoken = devyniolika ėjimų
+number.20.mv_acc.spoken = dvidešimt ėjimų
+number.30.mv_acc.spoken = trisdešimt ėjimų
+number.40.mv_acc.spoken = keturiasdešimt ėjimų
+number.50.mv_acc.spoken = penkiasdešimt ėjimų
+number.60.mv_acc.spoken = šešiasdešimt ėjimų
+number.70.mv_acc.spoken = septyniasdešimt ėjimų
+number.80.mv_acc.spoken = aštuoniasdešimt ėjimų
+number.90.mv_acc.spoken = devyniasdešimt ėjimų
+number.100.mv_acc.spoken = šimtą ėjimų
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Lithuanian plural rule (assets/i18n): one (1, 21, 31, 101 ...: singular "vienas ėjimas") | few (2-9,
+# 22-29 ...: plural "trys ėjimai") | other (0, 10-20, 30, 40 ...: genitive plural "dešimt ėjimų").
+# count.<noun> is the nominative; count.<noun>_gen, _dat, _acc, _ins, _loc are the other cases, with
+# the number in the same case: "{n:mistake_acc}" = "padarei dvi klaidas", "{m:move_gen}" = "reikia
+# trijų ėjimų", "{pts:point_ins}" = "atsilieki dviem taškais", "{n:game_loc}" = "dviejose partijose".
+# In the "other" slot the noun stays in the genitive plural and the number word takes the case
+# ("dešimties ėjimų", "dešimčia taškų"). Feminine nouns use the "f" number forms in the "one" and
+# "few" slots. After a negated verb use _gen ("nepadarei nė {n:mistake_gen}").
+count.move = {n} ėjimas|{n} ėjimai|{n} ėjimų
+count.point = {n} taškas|{n} taškai|{n} taškų
+count.pawn = {n} pėstininkas|{n} pėstininkai|{n} pėstininkų
+count.piece = {n:f} figūra|{n:f} figūros|{n} figūrų
+count.mistake = {n:f} klaida|{n:f} klaidos|{n} klaidų
+count.blunder = {n:f} šiurkšti klaida|{n:f} šiurkščios klaidos|{n} šiurkščių klaidų
+count.inaccuracy = {n} netikslumas|{n} netikslumai|{n} netikslumų
+count.game = {n:f} partija|{n:f} partijos|{n} partijų
+count.time = {n} kartas|{n} kartai|{n} kartų
+count.square = {n} langelis|{n} langeliai|{n} langelių
+count.position = {n:f} pozicija|{n:f} pozicijos|{n} pozicijų
+# The other cases of the same nouns. "{n:time_acc}" is how Lithuanian says how often: "tris kartus",
+# "vieną kartą", "dešimt kartų" (count.time, the nominative "trys kartai", is rarely what a line needs).
+count.move_gen = {n:gen} ėjimo|{n:gen} ėjimų|{n:gen} ėjimų
+count.move_dat = {n:dat} ėjimui|{n:dat} ėjimams|{n:dat} ėjimų
+count.move_acc = {n:acc} ėjimą|{n:acc} ėjimus|{n:acc} ėjimų
+count.move_ins = {n:ins} ėjimu|{n:ins} ėjimais|{n:ins} ėjimų
+count.move_loc = {n:loc} ėjime|{n:loc} ėjimuose|{n:loc} ėjimų
+count.point_gen = {n:gen} taško|{n:gen} taškų|{n:gen} taškų
+count.point_dat = {n:dat} taškui|{n:dat} taškams|{n:dat} taškų
+count.point_acc = {n:acc} tašką|{n:acc} taškus|{n:acc} taškų
+count.point_ins = {n:ins} tašku|{n:ins} taškais|{n:ins} taškų
+count.point_loc = {n:loc} taške|{n:loc} taškuose|{n:loc} taškų
+count.pawn_gen = {n:gen} pėstininko|{n:gen} pėstininkų|{n:gen} pėstininkų
+count.pawn_dat = {n:dat} pėstininkui|{n:dat} pėstininkams|{n:dat} pėstininkų
+count.pawn_acc = {n:acc} pėstininką|{n:acc} pėstininkus|{n:acc} pėstininkų
+count.pawn_ins = {n:ins} pėstininku|{n:ins} pėstininkais|{n:ins} pėstininkų
+count.pawn_loc = {n:loc} pėstininke|{n:loc} pėstininkuose|{n:loc} pėstininkų
+count.piece_gen = {n:f_gen} figūros|{n:f_gen} figūrų|{n:gen} figūrų
+count.piece_dat = {n:f_dat} figūrai|{n:f_dat} figūroms|{n:dat} figūrų
+count.piece_acc = {n:f_acc} figūrą|{n:f_acc} figūras|{n:acc} figūrų
+count.piece_ins = {n:f_ins} figūra|{n:f_ins} figūromis|{n:ins} figūrų
+count.piece_loc = {n:f_loc} figūroje|{n:f_loc} figūrose|{n:loc} figūrų
+count.mistake_gen = {n:f_gen} klaidos|{n:f_gen} klaidų|{n:gen} klaidų
+count.mistake_dat = {n:f_dat} klaidai|{n:f_dat} klaidoms|{n:dat} klaidų
+count.mistake_acc = {n:f_acc} klaidą|{n:f_acc} klaidas|{n:acc} klaidų
+count.mistake_ins = {n:f_ins} klaida|{n:f_ins} klaidomis|{n:ins} klaidų
+count.mistake_loc = {n:f_loc} klaidoje|{n:f_loc} klaidose|{n:loc} klaidų
+count.blunder_gen = {n:f_gen} šiurkščios klaidos|{n:f_gen} šiurkščių klaidų|{n:gen} šiurkščių klaidų
+count.blunder_dat = {n:f_dat} šiurkščiai klaidai|{n:f_dat} šiurkščioms klaidoms|{n:dat} šiurkščių klaidų
+count.blunder_acc = {n:f_acc} šiurkščią klaidą|{n:f_acc} šiurkščias klaidas|{n:acc} šiurkščių klaidų
+count.blunder_ins = {n:f_ins} šiurkščia klaida|{n:f_ins} šiurkščiomis klaidomis|{n:ins} šiurkščių klaidų
+count.blunder_loc = {n:f_loc} šiurkščioje klaidoje|{n:f_loc} šiurkščiose klaidose|{n:loc} šiurkščių klaidų
+count.inaccuracy_gen = {n:gen} netikslumo|{n:gen} netikslumų|{n:gen} netikslumų
+count.inaccuracy_dat = {n:dat} netikslumui|{n:dat} netikslumams|{n:dat} netikslumų
+count.inaccuracy_acc = {n:acc} netikslumą|{n:acc} netikslumus|{n:acc} netikslumų
+count.inaccuracy_ins = {n:ins} netikslumu|{n:ins} netikslumais|{n:ins} netikslumų
+count.inaccuracy_loc = {n:loc} netikslume|{n:loc} netikslumuose|{n:loc} netikslumų
+count.game_gen = {n:f_gen} partijos|{n:f_gen} partijų|{n:gen} partijų
+count.game_dat = {n:f_dat} partijai|{n:f_dat} partijoms|{n:dat} partijų
+count.game_acc = {n:f_acc} partiją|{n:f_acc} partijas|{n:acc} partijų
+count.game_ins = {n:f_ins} partija|{n:f_ins} partijomis|{n:ins} partijų
+count.game_loc = {n:f_loc} partijoje|{n:f_loc} partijose|{n:loc} partijų
+count.time_gen = {n:gen} karto|{n:gen} kartų|{n:gen} kartų
+count.time_dat = {n:dat} kartui|{n:dat} kartams|{n:dat} kartų
+count.time_acc = {n:acc} kartą|{n:acc} kartus|{n:acc} kartų
+count.time_ins = {n:ins} kartu|{n:ins} kartais|{n:ins} kartų
+count.time_loc = {n:loc} karte|{n:loc} kartuose|{n:loc} kartų
+count.square_gen = {n:gen} langelio|{n:gen} langelių|{n:gen} langelių
+count.square_dat = {n:dat} langeliui|{n:dat} langeliams|{n:dat} langelių
+count.square_acc = {n:acc} langelį|{n:acc} langelius|{n:acc} langelių
+count.square_ins = {n:ins} langeliu|{n:ins} langeliais|{n:ins} langelių
+count.square_loc = {n:loc} langelyje|{n:loc} langeliuose|{n:loc} langelių
+count.position_gen = {n:f_gen} pozicijos|{n:f_gen} pozicijų|{n:gen} pozicijų
+count.position_dat = {n:f_dat} pozicijai|{n:f_dat} pozicijoms|{n:dat} pozicijų
+count.position_acc = {n:f_acc} poziciją|{n:f_acc} pozicijas|{n:acc} pozicijų
+count.position_ins = {n:f_ins} pozicija|{n:f_ins} pozicijomis|{n:ins} pozicijų
+count.position_loc = {n:f_loc} pozicijoje|{n:f_loc} pozicijose|{n:loc} pozicijų
+# More counted nouns: "{m:check_acc}" = "paskelbei 2 šachus", "{n:capture}" = "3 kirtimai" (pawns
+# included, unlike "figūra"), "{n:best_move}" = "5 geriausi ėjimai" (a streak), "{n:attacker}" and
+# "{n2:defender}" = "3 puolėjai", "2 gynėjai" (of a square).
+count.check = {n} šachas|{n} šachai|{n} šachų
+count.check_gen = {n:gen} šacho|{n:gen} šachų|{n:gen} šachų
+count.check_dat = {n:dat} šachui|{n:dat} šachams|{n:dat} šachų
+count.check_acc = {n:acc} šachą|{n:acc} šachus|{n:acc} šachų
+count.check_ins = {n:ins} šachu|{n:ins} šachais|{n:ins} šachų
+count.check_loc = {n:loc} šache|{n:loc} šachuose|{n:loc} šachų
+count.capture = {n} kirtimas|{n} kirtimai|{n} kirtimų
+count.capture_gen = {n:gen} kirtimo|{n:gen} kirtimų|{n:gen} kirtimų
+count.capture_dat = {n:dat} kirtimui|{n:dat} kirtimams|{n:dat} kirtimų
+count.capture_acc = {n:acc} kirtimą|{n:acc} kirtimus|{n:acc} kirtimų
+count.capture_ins = {n:ins} kirtimu|{n:ins} kirtimais|{n:ins} kirtimų
+count.capture_loc = {n:loc} kirtime|{n:loc} kirtimuose|{n:loc} kirtimų
+count.best_move = {n} geriausias ėjimas|{n} geriausi ėjimai|{n} geriausių ėjimų
+count.best_move_gen = {n:gen} geriausio ėjimo|{n:gen} geriausių ėjimų|{n:gen} geriausių ėjimų
+count.best_move_dat = {n:dat} geriausiam ėjimui|{n:dat} geriausiems ėjimams|{n:dat} geriausių ėjimų
+count.best_move_acc = {n:acc} geriausią ėjimą|{n:acc} geriausius ėjimus|{n:acc} geriausių ėjimų
+count.best_move_ins = {n:ins} geriausiu ėjimu|{n:ins} geriausiais ėjimais|{n:ins} geriausių ėjimų
+count.best_move_loc = {n:loc} geriausiame ėjime|{n:loc} geriausiuose ėjimuose|{n:loc} geriausių ėjimų
+count.attacker = {n} puolėjas|{n} puolėjai|{n} puolėjų
+count.attacker_gen = {n:gen} puolėjo|{n:gen} puolėjų|{n:gen} puolėjų
+count.attacker_dat = {n:dat} puolėjui|{n:dat} puolėjams|{n:dat} puolėjų
+count.attacker_acc = {n:acc} puolėją|{n:acc} puolėjus|{n:acc} puolėjų
+count.attacker_ins = {n:ins} puolėju|{n:ins} puolėjais|{n:ins} puolėjų
+count.attacker_loc = {n:loc} puolėjuje|{n:loc} puolėjuose|{n:loc} puolėjų
+count.defender = {n} gynėjas|{n} gynėjai|{n} gynėjų
+count.defender_gen = {n:gen} gynėjo|{n:gen} gynėjų|{n:gen} gynėjų
+count.defender_dat = {n:dat} gynėjui|{n:dat} gynėjams|{n:dat} gynėjų
+count.defender_acc = {n:acc} gynėją|{n:acc} gynėjus|{n:acc} gynėjų
+count.defender_ins = {n:ins} gynėju|{n:ins} gynėjais|{n:ins} gynėjų
+count.defender_loc = {n:loc} gynėjuje|{n:loc} gynėjuose|{n:loc} gynėjų
+# Accuracy in percent: "{acc:percent}" = "85 %" in the subtitles (as assets/i18n number.percent),
+# "aštuoniasdešimt penki procentai" spoken; the other cases as above ("{acc:percent_gen} tikslumas" =
+# "85 % tikslumas", spoken "aštuoniasdešimt penkių procentų tikslumas").
+count.percent = {n} %|{n} %|{n} %
+count.percent.spoken = {n} procentas|{n} procentai|{n} procentų
+count.percent_gen = {n} %|{n} %|{n} %
+count.percent_gen.spoken = {n:gen} procento|{n:gen} procentų|{n:gen} procentų
+count.percent_dat = {n} %|{n} %|{n} %
+count.percent_dat.spoken = {n:dat} procentui|{n:dat} procentams|{n:dat} procentų
+count.percent_acc = {n} %|{n} %|{n} %
+count.percent_acc.spoken = {n:acc} procentą|{n:acc} procentus|{n:acc} procentų
+count.percent_ins = {n} %|{n} %|{n} %
+count.percent_ins.spoken = {n:ins} procentu|{n:ins} procentais|{n:ins} procentų
+count.percent_loc = {n} %|{n} %|{n} %
+count.percent_loc.spoken = {n:loc} procente|{n:loc} procentuose|{n:loc} procentų
+# Move numbers as ordinals: "{n:nth_move_loc}" = "21-ajame ėjime" written, "dvidešimt pirmajame ėjime"
+# spoken ("at move 21"), "{n:nth_move_gen}" = "iki 21-ojo ėjimo", "{n:nth_move}" = "21-asis ėjimas";
+# "{n:ord...}" is the ordinal alone ("ėjimas, 21-asis"). Compound ordinals change only their last word
+# ("dvidešimt pirmasis", "šimtas dešimtasis"). Written endings are those of "-asis" ordinals: a number
+# ending in 3 (trečiasis) should be written "23-iasis", which a count key cannot tell apart; prefer
+# the nth_move keys at the levels that need them, or name the move itself ("ėjimu {move}").
+count.nth_move = {n}-asis ėjimas|{n}-asis ėjimas|{n}-asis ėjimas
+count.nth_move.spoken = {n:ord} ėjimas|{n:ord} ėjimas|{n:ord} ėjimas
+count.nth_move_gen = {n}-ojo ėjimo|{n}-ojo ėjimo|{n}-ojo ėjimo
+count.nth_move_gen.spoken = {n:ord_gen} ėjimo|{n:ord_gen} ėjimo|{n:ord_gen} ėjimo
+count.nth_move_dat = {n}-ajam ėjimui|{n}-ajam ėjimui|{n}-ajam ėjimui
+count.nth_move_dat.spoken = {n:ord_dat} ėjimui|{n:ord_dat} ėjimui|{n:ord_dat} ėjimui
+count.nth_move_acc = {n}-ąjį ėjimą|{n}-ąjį ėjimą|{n}-ąjį ėjimą
+count.nth_move_acc.spoken = {n:ord_acc} ėjimą|{n:ord_acc} ėjimą|{n:ord_acc} ėjimą
+count.nth_move_ins = {n}-uoju ėjimu|{n}-uoju ėjimu|{n}-uoju ėjimu
+count.nth_move_ins.spoken = {n:ord_ins} ėjimu|{n:ord_ins} ėjimu|{n:ord_ins} ėjimu
+count.nth_move_loc = {n}-ajame ėjime|{n}-ajame ėjime|{n}-ajame ėjime
+count.nth_move_loc.spoken = {n:ord_loc} ėjime|{n:ord_loc} ėjime|{n:ord_loc} ėjime
+count.ord = {n}-asis|{n}-asis|{n}-asis
+count.ord.spoken = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n}-ojo|{n}-ojo|{n}-ojo
+count.ord_gen.spoken = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_dat = {n}-ajam|{n}-ajam|{n}-ajam
+count.ord_dat.spoken = {n:ord_dat}|{n:ord_dat}|{n:ord_dat}
+count.ord_acc = {n}-ąjį|{n}-ąjį|{n}-ąjį
+count.ord_acc.spoken = {n:ord_acc}|{n:ord_acc}|{n:ord_acc}
+count.ord_ins = {n}-uoju|{n}-uoju|{n}-uoju
+count.ord_ins.spoken = {n:ord_ins}|{n:ord_ins}|{n:ord_ins}
+count.ord_loc = {n}-ajame|{n}-ajame|{n}-ajame
+count.ord_loc.spoken = {n:ord_loc}|{n:ord_loc}|{n:ord_loc}
+# Bare numbers in a form ("{n:f}" = "viena", "{n:f_acc}" = "vieną" ...): count keys so that the forms
+# also work in a line outside the counted nouns (and the form check knows them). The masculine case
+# forms ("{n:acc}" ...) need no key. "{n:mv_acc}" = digits written, "tris ėjimus" spoken (eval.*).
+count.f = {n:f}|{n:f}|{n}
+count.f_gen = {n:f_gen}|{n:f_gen}|{n:gen}
+count.f_dat = {n:f_dat}|{n:f_dat}|{n:dat}
+count.f_acc = {n:f_acc}|{n:f_acc}|{n:acc}
+count.f_ins = {n:f_ins}|{n:f_ins}|{n:ins}
+count.f_loc = {n:f_loc}|{n:f_loc}|{n:loc}
+count.mv_acc = {n:mv_acc}|{n:mv_acc}|{n:mv_acc}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plius {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = lygi pozicija
+# {n} here is a bare number (count keys do not apply to it): the form "mv_acc" says it with "ėjimas" in
+# the right case ("matas per tris ėjimus"); the subtitles keep the short "matas per 3".
+eval.mate_win = matas per {n:mv_acc}
+eval.mate_loss = tau matas per {n:mv_acc}
+
+# ---- The phases of the game in other cases (appraisal.lang) ---------------------------------------
+# appraisal.lang gives the nominatives (debiutas, mitelšpilis, endšpilis); "{text:loc}" = "debiute" /
+# "mitelšpilyje" / "endšpilyje" ("geriausiai žaidei {text:loc}"), also gen, dat, acc, ins.
+appraisal.phase.opening.gen = debiuto
+appraisal.phase.opening.dat = debiutui
+appraisal.phase.opening.acc = debiutą
+appraisal.phase.opening.ins = debiutu
+appraisal.phase.opening.loc = debiute
+appraisal.phase.middlegame.gen = mitelšpilio
+appraisal.phase.middlegame.dat = mitelšpiliui
+appraisal.phase.middlegame.acc = mitelšpilį
+appraisal.phase.middlegame.ins = mitelšpiliu
+appraisal.phase.middlegame.loc = mitelšpilyje
+appraisal.phase.endgame.gen = endšpilio
+appraisal.phase.endgame.dat = endšpiliui
+appraisal.phase.endgame.acc = endšpilį
+appraisal.phase.endgame.ins = endšpiliu
+appraisal.phase.endgame.loc = endšpilyje

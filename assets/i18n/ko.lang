@@ -1,0 +1,254 @@
+# Scacelith - 한국어
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
+# Register: the usual register of Korean software. Statements in formal polite 합니다체
+# (저장되었습니다), instructions in -하세요, confirmations in -하시겠습니까?; buttons, menu entries,
+# tabs and titles are noun phrases with no ending (새 게임, 기권, 무승부 제안). The player is never
+# named by a pronoun (no 당신 / 너): the subject is left out, and 내 is used for the player's own
+# things (내 색, 내 계정). Other players are named with 님 ("{0} 님"), which also gives a fixed noun
+# for the particle that follows. Korean has no capitals: titles are plain Hangul.
+# Particles: none is written right after a placeholder whose last sound is unknown; a fixed noun is
+# put after it ("{0} 칸의", "{0} 주소로", "{0} 계정으로") or the particle is invariant (에, 에서, 의, 까지).
+# Terms: see the Korean glossary (체크메이트, 스테일메이트, 기권, 무승부, 기보지, 시간 제한, 레이팅...).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = 켬
+common.off = 끔
+common.back = 뒤로
+common.apply = 적용
+# Options > the dialog on leaving with changes not applied: Apply / Discard.
+common.discard = 적용 안 함
+common.cancel = 취소
+common.white = 백
+common.black = 흑
+common.main_menu = 메인 메뉴
+# Decimal separator of numbers ("2.5 s").
+number.decimal = .
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = 왕의 게임
+menu.new_game = 새 게임
+menu.options = 설정
+menu.credits = 크레딧
+menu.quit = 종료
+menu.version = 버전 {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = 설정
+options.tab.display = 화면
+options.tab.graphics = 그래픽
+options.tab.audio = 오디오
+options.tab.gameplay = 게임플레이
+options.tab.player = 플레이어
+options.tab.controls = 조작
+options.pending = 변경 사항은 적용하면 반영됩니다.
+options.unsaved.title = 저장되지 않은 변경 사항
+options.unsaved.text = 일부 설정이 변경되었습니다. 나가기 전에 적용하시겠습니까?
+
+options.language = 언어
+options.language.help = 메뉴와 메시지의 언어입니다. 바로 바뀝니다.
+options.display_mode = 화면 모드
+options.display_mode.help = 전체 화면: 바탕 화면 해상도로 화면 전체를 덮는 테두리 없는 창입니다. 창 모드: 아래에서 정한 크기의 창입니다.
+options.fullscreen = 전체 화면
+options.windowed = 창 모드
+options.window_size = 창 크기
+options.window_size.help = 창 모드에서의 창 크기입니다. 전체 화면은 항상 바탕 화면 해상도를 사용합니다.
+options.vsync = 수직 동기화
+options.vsync.help = 화면 찢어짐을 막기 위해 프레임을 디스플레이와 동기화합니다.
+options.render_scale = 렌더링 배율
+options.render_scale.help = 3D 이미지의 내부 해상도입니다. 낮을수록 빠르고, 높을수록 선명합니다.
+
+options.quality = 품질
+options.quality.very_low = 매우 낮음
+options.quality.low = 낮음
+options.quality.medium = 중간
+options.quality.high = 높음
+options.quality.ultra = 울트라
+options.quality.custom = 사용자 지정
+options.quality.help = 아래의 모든 설정을 한 번에 정합니다. 매우 낮음은 모든 효과를 끄고, 울트라는 모든 효과를 최대로 설정합니다. 설정 하나를 따로 바꾸면 사용자 지정이 됩니다. 사양이 낮은 그래픽 카드에서는 렌더링 배율(화면)을 낮추는 것도 큰 도움이 됩니다.
+options.shadows = 그림자
+options.shadows.help = 햇빛이 만드는 그림자의 디테일과 가장자리의 부드러움입니다. 낮음: 가장자리가 단순하며 빠르게 그려집니다.
+options.reflections = 반사
+options.reflections.help = 바닥, 테이블, 체스판에 홀이 비칩니다(반사마다 홀을 한 번 더 그리므로 가장 부담이 큰 설정 중 하나입니다). 중간부터는 광택 있는 기물과 물건에도 주변이 비칩니다.
+options.ambient_occlusion = 앰비언트 오클루전
+options.ambient_occlusion.help = 물체가 맞닿는 곳과 움푹한 곳처럼 빛이 덜 드는 곳에 부드러운 음영을 넣습니다.
+options.indirect_light = 간접광
+options.indirect_light.help = 벽, 바닥, 천장에서 반사되는 햇빛입니다. 낮음: 대신 고른 주변광을 사용합니다. 주로 로딩 시간에 영향을 줍니다.
+options.volumetric_light = 빛줄기
+options.volumetric_light.help = 홀의 먼지 낀 공기를 뚫고 들어오는 햇살과, 그 속에서 반짝이는 먼지입니다.
+options.tessellation = 테셀레이션
+options.tessellation.help = 가까이서 본 기물의 곡선 윤곽을 매끄럽게 합니다.
+options.tessellation.unavailable = 사용할 수 없음: 이 그래픽 드라이버는 테셀레이션을 지원하지 않습니다.
+options.antialiasing = 안티에일리어싱
+options.antialiasing.help = 계단 현상과 반짝거리는 하이라이트를 매끄럽게 합니다. 끔: 더 선명하지만 계단 현상이 생기고, 일부 효과가 거칠게 보입니다.
+options.depth_of_field = 피사계 심도
+options.depth_of_field.help = 카메라 렌즈처럼, 보고 있는 곳보다 훨씬 앞이나 뒤에 있는 것을 흐리게 합니다.
+options.motion_blur = 모션 블러
+options.motion_blur.help = 영화 카메라처럼 카메라와 팔의 빠른 움직임을 흐리게 합니다.
+options.bloom = 블룸
+options.bloom.help = 카메라 렌즈처럼 가장 밝은 하이라이트 주위에 은은한 빛 번짐을 더합니다.
+options.brightness = 밝기
+options.brightness.neutral = 기본
+options.brightness.value = {0} EV
+options.brightness.help = 카메라의 노출 보정입니다. 처음 실행할 때의 보정 단계에서 가장 어두운 그림자가 겨우 보이도록 설정됩니다.
+
+options.master_volume = 전체 음량
+options.effects = 효과음
+options.ambience = 환경음
+options.ambience.help = 홀의 소리: 타오르는 불, 멀리서 들리는 발소리, 오래된 시계.
+options.ambience_volume = 환경음 음량
+options.voice_volume = 음성 음량
+options.voice_volume.help = 코치 모드에서 코치 목소리의 음량입니다.
+options.subtitles = 자막
+options.subtitles.auto = 자동
+options.subtitles.help = 코치의 말을 화면 아래에 글로 보여 줍니다. 자동: 코치가 메뉴 언어로 말하지 않을 때 표시합니다(메뉴가 중국어이면 코치는 영어로 말합니다). 코치 음성이 설치되어 있지 않으면 항상 표시합니다.
+
+options.legal_moves = 둘 수 있는 수 표시
+options.legal_moves.help = 손댄 기물이 갈 수 있는 칸을 강조합니다. 끄면 수가 규칙에 맞는지 아무것도 알려 주지 않습니다. 불법 수는 시계를 누르는 순간 심판이 벌칙을 줍니다.
+options.coordinates = 체스판 좌표
+options.auto_press = 시계 자동 누르기
+options.auto_press.help = 수가 체스판에 놓이면 내 로봇이 알아서 시계를 누릅니다. 온라인 게임에서는 서버가, 다이렉트 매치에서는 게임을 연 플레이어가 정합니다.
+options.thinking_time = 사람 같은 생각 시간
+options.thinking_time.help = 상대가 바로 두지 않고 사람처럼 시간을 들여 생각합니다.
+options.ignore_head = 상대 머리 움직임 무시
+options.ignore_head.help = 온라인 게임과 다이렉트 매치에서는 상대 로봇이 그 플레이어가 보는 곳을 바라봅니다. 켜면 Stockfish와 둘 때처럼 로봇이 알아서 머리를 움직입니다.
+options.mouse_sensitivity = 마우스 감도
+options.invert_look = 상하 시점 반전
+options.handover = 핫시트 시점 전환
+options.handover.cut = 즉시 전환
+options.handover.flight = 카메라 이동, {0}초
+options.handover.help = 한 PC에서 두 사람이 둘 때, 매 수 뒤에 한 플레이어의 시점에서 다른 플레이어의 시점으로 넘어가는 방식입니다. 즉시 전환을 고르면 카메라가 움직이지 않습니다.
+options.game_cursor = 게임 포인터
+options.game_cursor.help = 테이블에서는 게임이 전용 포인터를 그려, 클릭하면 무슨 일이 일어날지 보여 줍니다. 끔: 일반 시스템 화살표.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = 이름
+player.name.help = 기보지 맨 위에 적히는 이름입니다. 어떤 문자로든 쓸 수 있습니다.
+player.default_name = 인간
+player.handwriting = 필체
+player.handwriting.help = 내 수를 적는 손글씨입니다. 아랍어, 일본어, 중국어는 각 언어 전용 필체로 적힙니다.
+player.preview = 내 기보지에서
+hand.caveat = 편한 글씨
+hand.marck = 필기체
+hand.badscript = 기울임체
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = 왼쪽 클릭
+controls.touch = 기물을 만진 뒤 옮기기
+controls.clock.keys = 스페이스바  또는  시계 클릭
+controls.clock = 시계 누르기
+controls.look.keys = 마우스 오른쪽 버튼 누른 채로
+controls.look = 둘러보기
+controls.sheet.keys = S
+controls.sheet = 내 기보지 보기 / 돌아오기
+controls.stand.keys = ↑
+controls.stand = 의자 앞에서 일어서기
+controls.side.keys = ←  /  →
+controls.side = 테이블 왼쪽 / 오른쪽 끝에 서기
+controls.sit.keys = ↓
+controls.sit = 다시 앉기(앉아서만 둘 수 있음)
+controls.moves.keys = Tab
+controls.moves = 기보 표시 / 숨기기
+controls.menu.keys = Esc
+controls.menu = 메뉴
+controls.coach_skip.keys = 스페이스바
+controls.coach_skip = 코치: 코치의 말 건너뛰기
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = 코치: 제안받으면 수 무르기
+controls.coach_hint.keys = H
+controls.coach_hint = 코치 챌린지: 힌트 요청
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = 밝기
+calibration.text = 검은 칸 위의 나이트가 겨우 보이거나 더는 보이지 않을 때까지 슬라이더를 움직이세요.
+calibration.later = 나중에 설정 > 그래픽에서 바꿀 수 있습니다.
+calibration.continue = 계속
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = 새 게임
+newgame.opponent = 상대
+newgame.time_control = 시간 제한
+newgame.start = 시작
+newgame.elo = 약 {0} Elo
+newgame.you_white = 백으로 둡니다.
+newgame.you_black = 흑으로 둡니다.
+newgame.colour_lot = 첫 게임의 색은 추첨으로 정합니다.
+newgame.colour_alternate = 그 뒤로는 게임마다 색이 번갈아 바뀝니다.
+newgame.opponent_kind = 상대
+newgame.opponent_kind.help = Stockfish와 두거나, 이 컴퓨터 앞에 앉은 친구와 둡니다. 친구와 둘 때는 각자 자기 쪽에서 번갈아 둡니다.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = 사람, 같은 PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = 실력 레벨
+engine.skill.help = Stockfish “Skill Level”(0–20). Elo로 실력을 제한하는 동안에는 무시됩니다.
+engine.limit_elo = 실력 제한(Elo)
+engine.limit_elo.help = UCI_LimitStrength: 엔진이 아래의 Elo 레이팅을 목표로 둡니다.
+engine.elo = Elo
+engine.depth = 탐색 깊이
+engine.plies = {0}플라이
+engine.move_time = 한 수당 시간
+engine.nodes = 노드 제한
+engine.no_limit = 제한 없음
+# Korean counts in units of 10,000 (만), so "50 thousand" is written out as digits: 50,000.
+engine.thousand = {0},000
+engine.million = {0},000,000
+engine.dynamic_elo = 시간에 따른 동적 Elo
+engine.dynamic_elo.help = 사람처럼 Stockfish도 시간이 얼마 남지 않으면 약하게 둡니다. 마지막 1분에는 조금(래피드와 블리츠에서는 더 일찍), 시간에 쫓길 때는 훨씬 약하게 둡니다. 시간 제한이 있는 게임에만 적용됩니다.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish가 같은 수준의 사람처럼 시간을 들여 둡니다. 이 대기 시간을 없애려면: 설정 > 게임플레이 > 사람 같은 생각 시간.
+engine.pace.instant = Stockfish가 계산을 마치는 즉시 둡니다. 사람 같은 대기 시간을 원하면: 설정 > 게임플레이 > 사람 같은 생각 시간.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = 무제한
+tc.no_clock = 시계 없음
+tc.bullet = 불릿
+tc.blitz = 블리츠
+tc.rapid = 래피드
+tc.classical = 클래식
+tc.custom = 사용자 지정
+tc.your_own = 직접 설정
+tc.base_time = 기본 시간
+tc.base_time.help = 각 시계의 처음 시간입니다(분 : 초).
+tc.increment = 추가 시간
+tc.increment.help = 매 수 뒤에 더해지는 피셔 방식 추가 시간입니다.
+tc.delay = 지연
+tc.delay.help = 브론스타인 지연: 이 지연 시간까지 사용한 시간은 매 수 뒤에 돌려받습니다.
+tc.no_delay = 없음
+tc.seconds = {0}초
+tc.minutes = {0}분
+tc.summary_increment = {0} + {1}초
+tc.summary_delay = {0}, 지연 {1}초
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = 입문자
+preset.novice.desc = 이제 막 규칙을 배운 수준: 기물을 공짜로 내주고 간단한 위협을 놓칩니다.
+preset.beginner.name = 초보자
+preset.beginner.desc = 기본은 알지만 여전히 블런더로 기물을 자주 잃습니다.
+preset.casual.name = 캐주얼
+preset.casual.desc = 저녁에 편하게 두는 상대: 무난한 수를 두지만 실수가 잦습니다.
+preset.club_player.name = 클럽 플레이어
+preset.club_player.desc = 뻔한 블런더를 놓치지 않고 응징하는 탄탄한 클럽 플레이어.
+preset.advanced.name = 상급자
+preset.advanced.desc = 전술 감각이 좋은 강한 클럽 플레이어.
+preset.expert.name = 전문가
+preset.expert.desc = 대회 전문가: 실수가 드물고 우위를 승리로 연결합니다.
+preset.master.name = 마스터
+preset.master.desc = 마스터 수준: 깊은 수읽기와 섬세한 포지션 플레이.
+preset.grandmaster.name = 그랜드마스터
+preset.grandmaster.desc = 그랜드마스터 수준: 이기기가 매우 어렵습니다.
+preset.stockfish_max.name = Stockfish 최강
+preset.stockfish_max.desc = 최대 실력의 Stockfish 19입니다. 행운을 빕니다.
+preset.custom.name = 사용자 지정
+preset.custom.desc = 엔진을 직접 설정합니다.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = 크레딧
+credits.game.head = SCACELITH
+credits.game = 왕실의 홀에서 두는 체스 게임. 자체 개발한 OpenGL 4.6 엔진으로 만들었습니다.
+credits.engine.head = 체스 엔진
+credits.engine = Stockfish 19, Stockfish 개발자들이 만들었습니다.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = 신경망은 Leela Chess Zero 프로젝트가 제공한 데이터로 학습되었으며, 이 데이터는 Open Database License(ODbL)로 공개되어 있습니다.
+credits.voice.head = 코치 음성

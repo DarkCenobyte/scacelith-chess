@@ -1,0 +1,832 @@
+# Coach speech (Turkish): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the case forms Turkish needs.
+# Register: the coach says "sen" to the player (the game menus say "siz"); he calls himself "ben".
+# Turkish has no grammatical gender: nothing agrees with the coach, the player or a piece.
+# Chess words as in the glossary: piyon, at, fil, kale, vezir, şah; taş (a piece), hamle (a move),
+# kare (a square), şah (check), şah mat, pat, rok, geçerken alma, terfi, notasyon kâğıdı.
+# Spoken values are Turkish words only: no Latin letter alone, digit or symbol reaches the voice.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: piyon, at, fil, kale, vezir, şah. "Your" and "my" are suffixes, and the case comes after them,
+# both following vowel harmony: at -> atın (your knight), atım (my knight), atını, atıma ... Every form
+# of the listener's and the coach's pieces is a whole phrase (phrase.your.<type>.<form>,
+# phrase.my.<type>.<form>). The Analysis mode names a piece by its colour, an adjective before the noun:
+# "beyaz at", "siyah vezir"; the case goes on the noun ("beyaz atı", "siyah vezire"), through
+# piece.<type>.<form> (the bare noun in that form) and owner.white / owner.black.<form>.
+# NEVER write a case ending, "da/de" or "mı/mi/mu/mü" after a piece placeholder by hand (the vowel
+# changes with the piece): ask for the form that carries it. A placeholder that starts a sentence is
+# capitalised by the program ("Atın", "Beyaz at").
+# Forms (every one defined for the six pieces and the owners your, my, white and black):
+#   nom      atın / atım / beyaz at         subject, indefinite object; before için, gibi, kadar
+#                                           "{your} saldırı altında."  "{your} için endişelenme."
+#   acc      atını / atımı / beyaz atı      definite object          "{my:acc} bedavaya alabilirsin."
+#   dat      atına / atıma / beyaz ata      to; saldırmak, bakmak, karşı, doğru, göre
+#                                           "{my} {your:dat} saldırıyor."
+#   loc      atında / atımda / beyaz atta   on, at, in               "Gözüm {your:loc}."
+#   abl      atından / atımdan / beyaz attan  from, than; önce, sonra, başka
+#                                           "{my}, {your:abl} daha az değerli."
+#   gen      atının / atımın / beyaz atın   of (possessor); önünde, arkasında, yanında, yerine
+#                                           "{your}, {t1:gen} önünde sıkışıyor."
+#   ins      atınla / atımla / beyaz atla   with, by means of        "{your:ins} alabilirdin."
+#   <case>_da  the case form + "da/de" (too, also, even): nom_da atın da / kalen de, acc_da atını da,
+#            dat_da, loc_da, abl_da, gen_da, ins_da    "{t2:nom_da} tehlikede." "{t2:acc_da} alırım."
+#   <case>_mi  the case form + the question particle: nom_mi atın mı / piyonun mu / filin mi, acc_mi
+#            atını mı, dat_mi piyonuna mı, loc_mi, abl_mi, gen_mi, ins_mi
+#                                           "Yine {your:nom_mi}?"  "{your:ins_mi} alacaksın, {your2:ins_mi}?"
+#   was      atındı / atımdı / beyaz attı   "it was ..." (past copula)   "Düşen taş {your:was}."
+# Bare forms: the noun alone, without owner or colour, by case: bare (at), bare_acc (atı), bare_dat
+# (ata), bare_loc (atta), bare_abl (attan), bare_gen (atın), bare_ins (atla). After "bu" / "o", or when
+# the sentence already says whose piece it is: "Bu {my:bare_acc} alabilirsin." Never after "senin" /
+# "benim" (those need the possessive: write "senin {your}").
+# Pronouns ("it"): the same words for every piece: pron (o), pron_acc (onu), pron_dat (ona), pron_loc
+# (onda), pron_abl (ondan), pron_gen (onun), pron_ins (onunla). Turkish usually leaves out a subject
+# pronoun ("Çapraz gider."); use these where the coach points at the piece on that word:
+# "{your} saldırı altında; {your:pron_acc} kurtarabilir misin?" Being invariant, a pronoun form may be
+# followed by "da" or "mu" directly ("onu da", "onu mu"). Before için, gibi, kadar a pronoun takes
+# pron_gen ("onun için"), a noun the nom form ("şahın için").
+# Emphasis: "senin" may stand before {your...} and "benim" before {my...} ("Bu senin kalen."), "kendi"
+# before either ("kendi şahını"); never before {t1} {t2} {piece}, whose owner varies.
+piece.pawn.nom = piyon
+piece.knight.nom = at
+piece.bishop.nom = fil
+piece.rook.nom = kale
+piece.queen.nom = vezir
+piece.king.nom = şah
+# The English keys (every language defines them). Turkish uses the whole phrases below for "your" and
+# "my", so these two patterns are never reached.
+owner.your.nom = {piece}
+owner.my.nom = {piece}
+owner.white.nom = beyaz {piece}
+owner.black.nom = siyah {piece}
+# The listener's pieces ("your"): the suffix -(I)n, then the case.
+phrase.your.pawn.nom = piyonun
+phrase.your.pawn.acc = piyonunu
+phrase.your.pawn.dat = piyonuna
+phrase.your.pawn.loc = piyonunda
+phrase.your.pawn.abl = piyonundan
+phrase.your.pawn.gen = piyonunun
+phrase.your.pawn.ins = piyonunla
+phrase.your.pawn.nom_da = piyonun da
+phrase.your.pawn.acc_da = piyonunu da
+phrase.your.pawn.dat_da = piyonuna da
+phrase.your.pawn.loc_da = piyonunda da
+phrase.your.pawn.abl_da = piyonundan da
+phrase.your.pawn.gen_da = piyonunun da
+phrase.your.pawn.ins_da = piyonunla da
+phrase.your.pawn.nom_mi = piyonun mu
+phrase.your.pawn.acc_mi = piyonunu mu
+phrase.your.pawn.dat_mi = piyonuna mı
+phrase.your.pawn.loc_mi = piyonunda mı
+phrase.your.pawn.abl_mi = piyonundan mı
+phrase.your.pawn.gen_mi = piyonunun mu
+phrase.your.pawn.ins_mi = piyonunla mı
+phrase.your.pawn.was = piyonundu
+phrase.your.knight.nom = atın
+phrase.your.knight.acc = atını
+phrase.your.knight.dat = atına
+phrase.your.knight.loc = atında
+phrase.your.knight.abl = atından
+phrase.your.knight.gen = atının
+phrase.your.knight.ins = atınla
+phrase.your.knight.nom_da = atın da
+phrase.your.knight.acc_da = atını da
+phrase.your.knight.dat_da = atına da
+phrase.your.knight.loc_da = atında da
+phrase.your.knight.abl_da = atından da
+phrase.your.knight.gen_da = atının da
+phrase.your.knight.ins_da = atınla da
+phrase.your.knight.nom_mi = atın mı
+phrase.your.knight.acc_mi = atını mı
+phrase.your.knight.dat_mi = atına mı
+phrase.your.knight.loc_mi = atında mı
+phrase.your.knight.abl_mi = atından mı
+phrase.your.knight.gen_mi = atının mı
+phrase.your.knight.ins_mi = atınla mı
+phrase.your.knight.was = atındı
+phrase.your.bishop.nom = filin
+phrase.your.bishop.acc = filini
+phrase.your.bishop.dat = filine
+phrase.your.bishop.loc = filinde
+phrase.your.bishop.abl = filinden
+phrase.your.bishop.gen = filinin
+phrase.your.bishop.ins = filinle
+phrase.your.bishop.nom_da = filin de
+phrase.your.bishop.acc_da = filini de
+phrase.your.bishop.dat_da = filine de
+phrase.your.bishop.loc_da = filinde de
+phrase.your.bishop.abl_da = filinden de
+phrase.your.bishop.gen_da = filinin de
+phrase.your.bishop.ins_da = filinle de
+phrase.your.bishop.nom_mi = filin mi
+phrase.your.bishop.acc_mi = filini mi
+phrase.your.bishop.dat_mi = filine mi
+phrase.your.bishop.loc_mi = filinde mi
+phrase.your.bishop.abl_mi = filinden mi
+phrase.your.bishop.gen_mi = filinin mi
+phrase.your.bishop.ins_mi = filinle mi
+phrase.your.bishop.was = filindi
+phrase.your.rook.nom = kalen
+phrase.your.rook.acc = kaleni
+phrase.your.rook.dat = kalene
+phrase.your.rook.loc = kalende
+phrase.your.rook.abl = kalenden
+phrase.your.rook.gen = kalenin
+phrase.your.rook.ins = kalenle
+phrase.your.rook.nom_da = kalen de
+phrase.your.rook.acc_da = kaleni de
+phrase.your.rook.dat_da = kalene de
+phrase.your.rook.loc_da = kalende de
+phrase.your.rook.abl_da = kalenden de
+phrase.your.rook.gen_da = kalenin de
+phrase.your.rook.ins_da = kalenle de
+phrase.your.rook.nom_mi = kalen mi
+phrase.your.rook.acc_mi = kaleni mi
+phrase.your.rook.dat_mi = kalene mi
+phrase.your.rook.loc_mi = kalende mi
+phrase.your.rook.abl_mi = kalenden mi
+phrase.your.rook.gen_mi = kalenin mi
+phrase.your.rook.ins_mi = kalenle mi
+phrase.your.rook.was = kalendi
+phrase.your.queen.nom = vezirin
+phrase.your.queen.acc = vezirini
+phrase.your.queen.dat = vezirine
+phrase.your.queen.loc = vezirinde
+phrase.your.queen.abl = vezirinden
+phrase.your.queen.gen = vezirinin
+phrase.your.queen.ins = vezirinle
+phrase.your.queen.nom_da = vezirin de
+phrase.your.queen.acc_da = vezirini de
+phrase.your.queen.dat_da = vezirine de
+phrase.your.queen.loc_da = vezirinde de
+phrase.your.queen.abl_da = vezirinden de
+phrase.your.queen.gen_da = vezirinin de
+phrase.your.queen.ins_da = vezirinle de
+phrase.your.queen.nom_mi = vezirin mi
+phrase.your.queen.acc_mi = vezirini mi
+phrase.your.queen.dat_mi = vezirine mi
+phrase.your.queen.loc_mi = vezirinde mi
+phrase.your.queen.abl_mi = vezirinden mi
+phrase.your.queen.gen_mi = vezirinin mi
+phrase.your.queen.ins_mi = vezirinle mi
+phrase.your.queen.was = vezirindi
+phrase.your.king.nom = şahın
+phrase.your.king.acc = şahını
+phrase.your.king.dat = şahına
+phrase.your.king.loc = şahında
+phrase.your.king.abl = şahından
+phrase.your.king.gen = şahının
+phrase.your.king.ins = şahınla
+phrase.your.king.nom_da = şahın da
+phrase.your.king.acc_da = şahını da
+phrase.your.king.dat_da = şahına da
+phrase.your.king.loc_da = şahında da
+phrase.your.king.abl_da = şahından da
+phrase.your.king.gen_da = şahının da
+phrase.your.king.ins_da = şahınla da
+phrase.your.king.nom_mi = şahın mı
+phrase.your.king.acc_mi = şahını mı
+phrase.your.king.dat_mi = şahına mı
+phrase.your.king.loc_mi = şahında mı
+phrase.your.king.abl_mi = şahından mı
+phrase.your.king.gen_mi = şahının mı
+phrase.your.king.ins_mi = şahınla mı
+phrase.your.king.was = şahındı
+# The coach's pieces ("my"): the suffix -(I)m, then the case.
+phrase.my.pawn.nom = piyonum
+phrase.my.pawn.acc = piyonumu
+phrase.my.pawn.dat = piyonuma
+phrase.my.pawn.loc = piyonumda
+phrase.my.pawn.abl = piyonumdan
+phrase.my.pawn.gen = piyonumun
+phrase.my.pawn.ins = piyonumla
+phrase.my.pawn.nom_da = piyonum da
+phrase.my.pawn.acc_da = piyonumu da
+phrase.my.pawn.dat_da = piyonuma da
+phrase.my.pawn.loc_da = piyonumda da
+phrase.my.pawn.abl_da = piyonumdan da
+phrase.my.pawn.gen_da = piyonumun da
+phrase.my.pawn.ins_da = piyonumla da
+phrase.my.pawn.nom_mi = piyonum mu
+phrase.my.pawn.acc_mi = piyonumu mu
+phrase.my.pawn.dat_mi = piyonuma mı
+phrase.my.pawn.loc_mi = piyonumda mı
+phrase.my.pawn.abl_mi = piyonumdan mı
+phrase.my.pawn.gen_mi = piyonumun mu
+phrase.my.pawn.ins_mi = piyonumla mı
+phrase.my.pawn.was = piyonumdu
+phrase.my.knight.nom = atım
+phrase.my.knight.acc = atımı
+phrase.my.knight.dat = atıma
+phrase.my.knight.loc = atımda
+phrase.my.knight.abl = atımdan
+phrase.my.knight.gen = atımın
+phrase.my.knight.ins = atımla
+phrase.my.knight.nom_da = atım da
+phrase.my.knight.acc_da = atımı da
+phrase.my.knight.dat_da = atıma da
+phrase.my.knight.loc_da = atımda da
+phrase.my.knight.abl_da = atımdan da
+phrase.my.knight.gen_da = atımın da
+phrase.my.knight.ins_da = atımla da
+phrase.my.knight.nom_mi = atım mı
+phrase.my.knight.acc_mi = atımı mı
+phrase.my.knight.dat_mi = atıma mı
+phrase.my.knight.loc_mi = atımda mı
+phrase.my.knight.abl_mi = atımdan mı
+phrase.my.knight.gen_mi = atımın mı
+phrase.my.knight.ins_mi = atımla mı
+phrase.my.knight.was = atımdı
+phrase.my.bishop.nom = filim
+phrase.my.bishop.acc = filimi
+phrase.my.bishop.dat = filime
+phrase.my.bishop.loc = filimde
+phrase.my.bishop.abl = filimden
+phrase.my.bishop.gen = filimin
+phrase.my.bishop.ins = filimle
+phrase.my.bishop.nom_da = filim de
+phrase.my.bishop.acc_da = filimi de
+phrase.my.bishop.dat_da = filime de
+phrase.my.bishop.loc_da = filimde de
+phrase.my.bishop.abl_da = filimden de
+phrase.my.bishop.gen_da = filimin de
+phrase.my.bishop.ins_da = filimle de
+phrase.my.bishop.nom_mi = filim mi
+phrase.my.bishop.acc_mi = filimi mi
+phrase.my.bishop.dat_mi = filime mi
+phrase.my.bishop.loc_mi = filimde mi
+phrase.my.bishop.abl_mi = filimden mi
+phrase.my.bishop.gen_mi = filimin mi
+phrase.my.bishop.ins_mi = filimle mi
+phrase.my.bishop.was = filimdi
+phrase.my.rook.nom = kalem
+phrase.my.rook.acc = kalemi
+phrase.my.rook.dat = kaleme
+phrase.my.rook.loc = kalemde
+phrase.my.rook.abl = kalemden
+phrase.my.rook.gen = kalemin
+phrase.my.rook.ins = kalemle
+phrase.my.rook.nom_da = kalem de
+phrase.my.rook.acc_da = kalemi de
+phrase.my.rook.dat_da = kaleme de
+phrase.my.rook.loc_da = kalemde de
+phrase.my.rook.abl_da = kalemden de
+phrase.my.rook.gen_da = kalemin de
+phrase.my.rook.ins_da = kalemle de
+phrase.my.rook.nom_mi = kalem mi
+phrase.my.rook.acc_mi = kalemi mi
+phrase.my.rook.dat_mi = kaleme mi
+phrase.my.rook.loc_mi = kalemde mi
+phrase.my.rook.abl_mi = kalemden mi
+phrase.my.rook.gen_mi = kalemin mi
+phrase.my.rook.ins_mi = kalemle mi
+phrase.my.rook.was = kalemdi
+phrase.my.queen.nom = vezirim
+phrase.my.queen.acc = vezirimi
+phrase.my.queen.dat = vezirime
+phrase.my.queen.loc = vezirimde
+phrase.my.queen.abl = vezirimden
+phrase.my.queen.gen = vezirimin
+phrase.my.queen.ins = vezirimle
+phrase.my.queen.nom_da = vezirim de
+phrase.my.queen.acc_da = vezirimi de
+phrase.my.queen.dat_da = vezirime de
+phrase.my.queen.loc_da = vezirimde de
+phrase.my.queen.abl_da = vezirimden de
+phrase.my.queen.gen_da = vezirimin de
+phrase.my.queen.ins_da = vezirimle de
+phrase.my.queen.nom_mi = vezirim mi
+phrase.my.queen.acc_mi = vezirimi mi
+phrase.my.queen.dat_mi = vezirime mi
+phrase.my.queen.loc_mi = vezirimde mi
+phrase.my.queen.abl_mi = vezirimden mi
+phrase.my.queen.gen_mi = vezirimin mi
+phrase.my.queen.ins_mi = vezirimle mi
+phrase.my.queen.was = vezirimdi
+phrase.my.king.nom = şahım
+phrase.my.king.acc = şahımı
+phrase.my.king.dat = şahıma
+phrase.my.king.loc = şahımda
+phrase.my.king.abl = şahımdan
+phrase.my.king.gen = şahımın
+phrase.my.king.ins = şahımla
+phrase.my.king.nom_da = şahım da
+phrase.my.king.acc_da = şahımı da
+phrase.my.king.dat_da = şahıma da
+phrase.my.king.loc_da = şahımda da
+phrase.my.king.abl_da = şahımdan da
+phrase.my.king.gen_da = şahımın da
+phrase.my.king.ins_da = şahımla da
+phrase.my.king.nom_mi = şahım mı
+phrase.my.king.acc_mi = şahımı mı
+phrase.my.king.dat_mi = şahıma mı
+phrase.my.king.loc_mi = şahımda mı
+phrase.my.king.abl_mi = şahımdan mı
+phrase.my.king.gen_mi = şahımın mı
+phrase.my.king.ins_mi = şahımla mı
+phrase.my.king.was = şahımdı
+# The bare noun in each form, for the Analysis mode's colours (owner.white / owner.black put
+# "beyaz" / "siyah" before it). piece.<type>.nom is above.
+piece.pawn.acc = piyonu
+piece.pawn.dat = piyona
+piece.pawn.loc = piyonda
+piece.pawn.abl = piyondan
+piece.pawn.gen = piyonun
+piece.pawn.ins = piyonla
+piece.pawn.nom_da = piyon da
+piece.pawn.acc_da = piyonu da
+piece.pawn.dat_da = piyona da
+piece.pawn.loc_da = piyonda da
+piece.pawn.abl_da = piyondan da
+piece.pawn.gen_da = piyonun da
+piece.pawn.ins_da = piyonla da
+piece.pawn.nom_mi = piyon mu
+piece.pawn.acc_mi = piyonu mu
+piece.pawn.dat_mi = piyona mı
+piece.pawn.loc_mi = piyonda mı
+piece.pawn.abl_mi = piyondan mı
+piece.pawn.gen_mi = piyonun mu
+piece.pawn.ins_mi = piyonla mı
+piece.pawn.was = piyondu
+piece.knight.acc = atı
+piece.knight.dat = ata
+piece.knight.loc = atta
+piece.knight.abl = attan
+piece.knight.gen = atın
+piece.knight.ins = atla
+piece.knight.nom_da = at da
+piece.knight.acc_da = atı da
+piece.knight.dat_da = ata da
+piece.knight.loc_da = atta da
+piece.knight.abl_da = attan da
+piece.knight.gen_da = atın da
+piece.knight.ins_da = atla da
+piece.knight.nom_mi = at mı
+piece.knight.acc_mi = atı mı
+piece.knight.dat_mi = ata mı
+piece.knight.loc_mi = atta mı
+piece.knight.abl_mi = attan mı
+piece.knight.gen_mi = atın mı
+piece.knight.ins_mi = atla mı
+piece.knight.was = attı
+piece.bishop.acc = fili
+piece.bishop.dat = file
+piece.bishop.loc = filde
+piece.bishop.abl = filden
+piece.bishop.gen = filin
+piece.bishop.ins = fille
+piece.bishop.nom_da = fil de
+piece.bishop.acc_da = fili de
+piece.bishop.dat_da = file de
+piece.bishop.loc_da = filde de
+piece.bishop.abl_da = filden de
+piece.bishop.gen_da = filin de
+piece.bishop.ins_da = fille de
+piece.bishop.nom_mi = fil mi
+piece.bishop.acc_mi = fili mi
+piece.bishop.dat_mi = file mi
+piece.bishop.loc_mi = filde mi
+piece.bishop.abl_mi = filden mi
+piece.bishop.gen_mi = filin mi
+piece.bishop.ins_mi = fille mi
+piece.bishop.was = fildi
+piece.rook.acc = kaleyi
+piece.rook.dat = kaleye
+piece.rook.loc = kalede
+piece.rook.abl = kaleden
+piece.rook.gen = kalenin
+piece.rook.ins = kaleyle
+piece.rook.nom_da = kale de
+piece.rook.acc_da = kaleyi de
+piece.rook.dat_da = kaleye de
+piece.rook.loc_da = kalede de
+piece.rook.abl_da = kaleden de
+piece.rook.gen_da = kalenin de
+piece.rook.ins_da = kaleyle de
+piece.rook.nom_mi = kale mi
+piece.rook.acc_mi = kaleyi mi
+piece.rook.dat_mi = kaleye mi
+piece.rook.loc_mi = kalede mi
+piece.rook.abl_mi = kaleden mi
+piece.rook.gen_mi = kalenin mi
+piece.rook.ins_mi = kaleyle mi
+piece.rook.was = kaleydi
+piece.queen.acc = veziri
+piece.queen.dat = vezire
+piece.queen.loc = vezirde
+piece.queen.abl = vezirden
+piece.queen.gen = vezirin
+piece.queen.ins = vezirle
+piece.queen.nom_da = vezir de
+piece.queen.acc_da = veziri de
+piece.queen.dat_da = vezire de
+piece.queen.loc_da = vezirde de
+piece.queen.abl_da = vezirden de
+piece.queen.gen_da = vezirin de
+piece.queen.ins_da = vezirle de
+piece.queen.nom_mi = vezir mi
+piece.queen.acc_mi = veziri mi
+piece.queen.dat_mi = vezire mi
+piece.queen.loc_mi = vezirde mi
+piece.queen.abl_mi = vezirden mi
+piece.queen.gen_mi = vezirin mi
+piece.queen.ins_mi = vezirle mi
+piece.queen.was = vezirdi
+piece.king.acc = şahı
+piece.king.dat = şaha
+piece.king.loc = şahta
+piece.king.abl = şahtan
+piece.king.gen = şahın
+piece.king.ins = şahla
+piece.king.nom_da = şah da
+piece.king.acc_da = şahı da
+piece.king.dat_da = şaha da
+piece.king.loc_da = şahta da
+piece.king.abl_da = şahtan da
+piece.king.gen_da = şahın da
+piece.king.ins_da = şahla da
+piece.king.nom_mi = şah mı
+piece.king.acc_mi = şahı mı
+piece.king.dat_mi = şaha mı
+piece.king.loc_mi = şahta mı
+piece.king.abl_mi = şahtan mı
+piece.king.gen_mi = şahın mı
+piece.king.ins_mi = şahla mı
+piece.king.was = şahtı
+owner.white.acc = beyaz {piece}
+owner.white.dat = beyaz {piece}
+owner.white.loc = beyaz {piece}
+owner.white.abl = beyaz {piece}
+owner.white.gen = beyaz {piece}
+owner.white.ins = beyaz {piece}
+owner.white.nom_da = beyaz {piece}
+owner.white.acc_da = beyaz {piece}
+owner.white.dat_da = beyaz {piece}
+owner.white.loc_da = beyaz {piece}
+owner.white.abl_da = beyaz {piece}
+owner.white.gen_da = beyaz {piece}
+owner.white.ins_da = beyaz {piece}
+owner.white.nom_mi = beyaz {piece}
+owner.white.acc_mi = beyaz {piece}
+owner.white.dat_mi = beyaz {piece}
+owner.white.loc_mi = beyaz {piece}
+owner.white.abl_mi = beyaz {piece}
+owner.white.gen_mi = beyaz {piece}
+owner.white.ins_mi = beyaz {piece}
+owner.white.was = beyaz {piece}
+owner.black.acc = siyah {piece}
+owner.black.dat = siyah {piece}
+owner.black.loc = siyah {piece}
+owner.black.abl = siyah {piece}
+owner.black.gen = siyah {piece}
+owner.black.ins = siyah {piece}
+owner.black.nom_da = siyah {piece}
+owner.black.acc_da = siyah {piece}
+owner.black.dat_da = siyah {piece}
+owner.black.loc_da = siyah {piece}
+owner.black.abl_da = siyah {piece}
+owner.black.gen_da = siyah {piece}
+owner.black.ins_da = siyah {piece}
+owner.black.nom_mi = siyah {piece}
+owner.black.acc_mi = siyah {piece}
+owner.black.dat_mi = siyah {piece}
+owner.black.loc_mi = siyah {piece}
+owner.black.abl_mi = siyah {piece}
+owner.black.gen_mi = siyah {piece}
+owner.black.ins_mi = siyah {piece}
+owner.black.was = siyah {piece}
+# Bare forms (no owner, no colour) and pronouns, the same for the four owners.
+piece.pawn.bare = piyon
+piece.pawn.bare_acc = piyonu
+piece.pawn.bare_dat = piyona
+piece.pawn.bare_loc = piyonda
+piece.pawn.bare_abl = piyondan
+piece.pawn.bare_gen = piyonun
+piece.pawn.bare_ins = piyonla
+piece.pawn.pron = o
+piece.pawn.pron_acc = onu
+piece.pawn.pron_dat = ona
+piece.pawn.pron_loc = onda
+piece.pawn.pron_abl = ondan
+piece.pawn.pron_gen = onun
+piece.pawn.pron_ins = onunla
+piece.knight.bare = at
+piece.knight.bare_acc = atı
+piece.knight.bare_dat = ata
+piece.knight.bare_loc = atta
+piece.knight.bare_abl = attan
+piece.knight.bare_gen = atın
+piece.knight.bare_ins = atla
+piece.knight.pron = o
+piece.knight.pron_acc = onu
+piece.knight.pron_dat = ona
+piece.knight.pron_loc = onda
+piece.knight.pron_abl = ondan
+piece.knight.pron_gen = onun
+piece.knight.pron_ins = onunla
+piece.bishop.bare = fil
+piece.bishop.bare_acc = fili
+piece.bishop.bare_dat = file
+piece.bishop.bare_loc = filde
+piece.bishop.bare_abl = filden
+piece.bishop.bare_gen = filin
+piece.bishop.bare_ins = fille
+piece.bishop.pron = o
+piece.bishop.pron_acc = onu
+piece.bishop.pron_dat = ona
+piece.bishop.pron_loc = onda
+piece.bishop.pron_abl = ondan
+piece.bishop.pron_gen = onun
+piece.bishop.pron_ins = onunla
+piece.rook.bare = kale
+piece.rook.bare_acc = kaleyi
+piece.rook.bare_dat = kaleye
+piece.rook.bare_loc = kalede
+piece.rook.bare_abl = kaleden
+piece.rook.bare_gen = kalenin
+piece.rook.bare_ins = kaleyle
+piece.rook.pron = o
+piece.rook.pron_acc = onu
+piece.rook.pron_dat = ona
+piece.rook.pron_loc = onda
+piece.rook.pron_abl = ondan
+piece.rook.pron_gen = onun
+piece.rook.pron_ins = onunla
+piece.queen.bare = vezir
+piece.queen.bare_acc = veziri
+piece.queen.bare_dat = vezire
+piece.queen.bare_loc = vezirde
+piece.queen.bare_abl = vezirden
+piece.queen.bare_gen = vezirin
+piece.queen.bare_ins = vezirle
+piece.queen.pron = o
+piece.queen.pron_acc = onu
+piece.queen.pron_dat = ona
+piece.queen.pron_loc = onda
+piece.queen.pron_abl = ondan
+piece.queen.pron_gen = onun
+piece.queen.pron_ins = onunla
+piece.king.bare = şah
+piece.king.bare_acc = şahı
+piece.king.bare_dat = şaha
+piece.king.bare_loc = şahta
+piece.king.bare_abl = şahtan
+piece.king.bare_gen = şahın
+piece.king.bare_ins = şahla
+piece.king.pron = o
+piece.king.pron_acc = onu
+piece.king.pron_dat = ona
+piece.king.pron_loc = onda
+piece.king.pron_abl = ondan
+piece.king.pron_gen = onun
+piece.king.pron_ins = onunla
+owner.your.bare = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_loc = {piece}
+owner.your.bare_abl = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_ins = {piece}
+owner.your.pron = {piece}
+owner.your.pron_acc = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_loc = {piece}
+owner.your.pron_abl = {piece}
+owner.your.pron_gen = {piece}
+owner.your.pron_ins = {piece}
+owner.my.bare = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_loc = {piece}
+owner.my.bare_abl = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_ins = {piece}
+owner.my.pron = {piece}
+owner.my.pron_acc = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_loc = {piece}
+owner.my.pron_abl = {piece}
+owner.my.pron_gen = {piece}
+owner.my.pron_ins = {piece}
+owner.white.bare = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_loc = {piece}
+owner.white.bare_abl = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_ins = {piece}
+owner.white.pron = {piece}
+owner.white.pron_acc = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_loc = {piece}
+owner.white.pron_abl = {piece}
+owner.white.pron_gen = {piece}
+owner.white.pron_ins = {piece}
+owner.black.bare = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_loc = {piece}
+owner.black.bare_abl = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_ins = {piece}
+owner.black.pron = {piece}
+owner.black.pron_acc = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_loc = {piece}
+owner.black.pron_abl = {piece}
+owner.black.pron_gen = {piece}
+owner.black.pron_ins = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares stay "e4". Spoken: the Turkish names of the letters (as when spelling: a, be, ce, de,
+# e, fe, ge, he), then the rank as a number, as Turkish players read coordinates: e4 = "e dört",
+# f3 = "fe üç", c6 = "ce altı", h7 = "he yedi". A square ends in a varying sound: never put a suffix
+# after {sq}; put it on the noun "kare" instead ("{sq} karesine", "{sq} karesinde", "{sq} karesindeki").
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = fe
+file.g.spoken = ge
+file.h.spoken = he
+rank.1.spoken = bir
+rank.2.spoken = iki
+rank.3.spoken = üç
+rank.4.spoken = dört
+rank.5.spoken = beş
+rank.6.spoken = altı
+rank.7.spoken = yedi
+rank.8.spoken = sekiz
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Turkish scoresheet letters (TSF, MEB): Ş(ah) V(ezir) K(ale) F(il) A(t): "Af3", "Fxc4", "Şg1".
+move.letters = Ş V K F A
+# Spoken as Turkish players read notation: "at fe üç" (Nf3), "at e beş karesinde alır" (Nxe5: a suffix
+# cannot follow the square, so it goes on "kare"), "at be de yedi" (Nbd7), "e piyonu de beş karesinde
+# alır" (exd5), "piyon geri alır" (a recapture), "kısa rok", "uzun rok", "e sekiz, vezir olur" (e8=Q),
+# "vezir ge dört, şah", "..., şah mat". {piece} is the bare noun here. A move ends in a varying sound too:
+# never attach a suffix to {move} {best} {reply} {line}; write "{best} hamlesi", "{line} varyantında".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} {to} karesinde alır
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} {to} karesinde alır
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} piyonu {to} karesinde alır
+move.recapture.spoken = {piece} geri alır
+move.castle_short.spoken = kısa rok
+move.castle_long.spoken = uzun rok
+move.promotion.spoken = {move}, {piece} olur
+move.check.spoken = {move}, şah
+move.mate.spoken = {move}, şah mat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet for Turkish (the pronunciation pass adds the words the voice misreads). En passant is
+# "geçerken alma", so the English respellings are not needed.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. 11-19 and 21-99 are "{tens} {units}" ("on bir", "yirmi üç"), 100 is "yüz" (not
+# "bir yüz"), 200-900 "{n} yüz" ("iki yüz"), 101-999 "{hundreds} {rest}" ("yüz yirmi", "iki yüz beş"),
+# written apart as TDK spells them.
+number.0.spoken = sıfır
+number.1.spoken = bir
+number.2.spoken = iki
+number.3.spoken = üç
+number.4.spoken = dört
+number.5.spoken = beş
+number.6.spoken = altı
+number.7.spoken = yedi
+number.8.spoken = sekiz
+number.9.spoken = dokuz
+number.10.spoken = on
+number.11.spoken = on bir
+number.12.spoken = on iki
+number.13.spoken = on üç
+number.14.spoken = on dört
+number.15.spoken = on beş
+number.16.spoken = on altı
+number.17.spoken = on yedi
+number.18.spoken = on sekiz
+number.19.spoken = on dokuz
+number.20.spoken = yirmi
+number.30.spoken = otuz
+number.40.spoken = kırk
+number.50.spoken = elli
+number.60.spoken = altmış
+number.70.spoken = yetmiş
+number.80.spoken = seksen
+number.90.spoken = doksan
+number.100.spoken = yüz
+number.tens.spoken = {tens} {units}
+number.hundreds.spoken = {n} yüz
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = eksi {n}
+# A decimal number: Turkish writes a decimal comma ("1,3") and reads it "bir virgül üç".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} virgül {frac}
+# Ordinals, for move numbers ("{n:ord}", count.ord below): only the last word takes the ending, so 21-99
+# compose as "yirmi" + "birinci" and 101-199 as "yüz" + "onuncu"; every number whose cardinal is listed
+# above has its ordinal listed here (1-20, the tens, the hundreds).
+number.1.ord.spoken = birinci
+number.2.ord.spoken = ikinci
+number.3.ord.spoken = üçüncü
+number.4.ord.spoken = dördüncü
+number.5.ord.spoken = beşinci
+number.6.ord.spoken = altıncı
+number.7.ord.spoken = yedinci
+number.8.ord.spoken = sekizinci
+number.9.ord.spoken = dokuzuncu
+number.10.ord.spoken = onuncu
+number.11.ord.spoken = on birinci
+number.12.ord.spoken = on ikinci
+number.13.ord.spoken = on üçüncü
+number.14.ord.spoken = on dördüncü
+number.15.ord.spoken = on beşinci
+number.16.ord.spoken = on altıncı
+number.17.ord.spoken = on yedinci
+number.18.ord.spoken = on sekizinci
+number.19.ord.spoken = on dokuzuncu
+number.20.ord.spoken = yirminci
+number.30.ord.spoken = otuzuncu
+number.40.ord.spoken = kırkıncı
+number.50.ord.spoken = ellinci
+number.60.ord.spoken = altmışıncı
+number.70.ord.spoken = yetmişinci
+number.80.ord.spoken = sekseninci
+number.90.ord.spoken = doksanıncı
+number.100.ord.spoken = yüzüncü
+number.200.ord.spoken = iki yüzüncü
+number.300.ord.spoken = üç yüzüncü
+number.400.ord.spoken = dört yüzüncü
+number.500.ord.spoken = beş yüzüncü
+number.600.ord.spoken = altı yüzüncü
+number.700.ord.spoken = yedi yüzüncü
+number.800.ord.spoken = sekiz yüzüncü
+number.900.ord.spoken = dokuz yüzüncü
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Turkish plural rule (assets/i18n): one|other, but a noun after a number stays singular ("1 hamle",
+# "3 hamle"), so both forms are the same words. For the same reason a bare {n} may be followed by any
+# noun in a line ("{n} saldıran taş"). A counted value ends in its fixed noun, so a suffix may follow
+# the placeholder in that noun's harmony: hamle, kare: -de -yi -ye -den -lik; puan: -da -ı -a -dan
+# -lık; piyon, pozisyon: -da -u -a -dan; taş: -ta -ı -a -tan; hata, büyük hata: -da -yı -ya -dan;
+# kusurlu hamle as hamle; oyun: -da -u -a -dan; kez: none ("{m:move}de mat", "{n:move}lik bir
+# kombinasyon", "{n2:point}lık bir taş").
+count.move = {n} hamle|{n} hamle
+count.point = {n} puan|{n} puan
+count.pawn = {n} piyon|{n} piyon
+count.piece = {n} taş|{n} taş
+count.mistake = {n} hata|{n} hata
+count.blunder = {n} büyük hata|{n} büyük hata
+count.inaccuracy = {n} kusurlu hamle|{n} kusurlu hamle
+count.game = {n} oyun|{n} oyun
+count.time = {n} kez|{n} kez
+count.square = {n} kare|{n} kare
+count.position = {n} pozisyon|{n} pozisyon
+# Turkish additions, for the other coach files:
+#   ord      a move NUMBER as an ordinal: "{n:ord} hamlede" = written "21. hamlede", spoken "yirmi
+#            birinci hamlede"; "{crit_no:ord} hamleye kadar". Only a noun may follow it (never a suffix,
+#            and never a piece placeholder: the dot would capitalise it).
+#   percent  an accuracy: "{acc:percent}" = written "%85" (the sign comes first in Turkish), spoken
+#            "yüzde seksen beş". No suffix after it; "yüzde {acc}" is also correct.
+count.ord = {n}.|{n}.
+count.ord.spoken = {n:ord}|{n:ord}
+count.percent = %{n}|%{n}
+count.percent.spoken = yüzde {n}|yüzde {n}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# "artı bir virgül üç", "eşit" (level); a mate as Turkish puzzle books write it: "3 hamlede mat" (the
+# listener mates), "sana 3 hamlede mat" (the listener gets mated). Never attach a suffix to {eval}.
+eval.up = +{x}
+eval.up.spoken = artı {x}
+eval.down = −{x}
+eval.down.spoken = eksi {x}
+eval.even = 0,0
+eval.even.spoken = eşit
+eval.mate_win = {n} hamlede mat
+eval.mate_loss = sana {n} hamlede mat
+
+# ---- The phases of the game in their cases (appraisal.lang) ---------------------------------------
+# {text} = appraisal.phase.opening / middlegame / endgame = "açılış", "oyun ortası", "oyun sonu" (the
+# appraisal file must use exactly these words). Their case forms, read by "{text:<case>}":
+# "{text:loc} çok iyi oynadın" (açılışta / oyun ortasında / oyun sonunda), "{text:acc} iyi oynadın".
+appraisal.phase.opening.acc = açılışı
+appraisal.phase.opening.dat = açılışa
+appraisal.phase.opening.loc = açılışta
+appraisal.phase.opening.abl = açılıştan
+appraisal.phase.opening.gen = açılışın
+appraisal.phase.opening.ins = açılışla
+appraisal.phase.middlegame.acc = oyun ortasını
+appraisal.phase.middlegame.dat = oyun ortasına
+appraisal.phase.middlegame.loc = oyun ortasında
+appraisal.phase.middlegame.abl = oyun ortasından
+appraisal.phase.middlegame.gen = oyun ortasının
+appraisal.phase.middlegame.ins = oyun ortasıyla
+appraisal.phase.endgame.acc = oyun sonunu
+appraisal.phase.endgame.dat = oyun sonuna
+appraisal.phase.endgame.loc = oyun sonunda
+appraisal.phase.endgame.abl = oyun sonundan
+appraisal.phase.endgame.gen = oyun sonunun
+appraisal.phase.endgame.ins = oyun sonuyla

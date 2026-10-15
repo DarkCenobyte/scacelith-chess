@@ -1,5 +1,6 @@
 #include "unicode.h"
 #include <algorithm>
+#include <map>
 
 namespace uni {
 
@@ -93,7 +94,19 @@ bool isCjkPunct(char32_t c) {
     return (c >= 0x3000 && c <= 0x303F) || (c >= 0xFF00 && c <= 0xFF65) || (c >= 0xFFE0 && c <= 0xFFEF);
 }
 bool isCjk(char32_t c) { return isHan(c) || isKana(c) || (isCjkPunct(c) && c != 0x3000); }
+bool isHangul(char32_t c) {
+    return (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0x1100 && c <= 0x11FF) || (c >= 0x3130 && c <= 0x318F) ||
+           (c >= 0xA960 && c <= 0xA97F) || (c >= 0xD7B0 && c <= 0xD7FF);
+}
+bool isDevanagari(char32_t c) {
+    return (c >= 0x0900 && c <= 0x097F) || (c >= 0xA8E0 && c <= 0xA8FF) ||
+           (c >= kDevanagariClusterFirst && c <= kDevanagariClusterLast);
+}
 bool isMark(char32_t c) {
+    // Devanagari: the non-spacing signs only (the spacing vowel signs have their own advance).
+    if (c >= 0x0900 && c <= 0x0963)
+        return c <= 0x0902 || c == 0x093A || c == 0x093C || (c >= 0x0941 && c <= 0x0948) || c == 0x094D ||
+               (c >= 0x0951 && c <= 0x0957) || c >= 0x0962;
     return (c >= 0x0300 && c <= 0x036F) || (c >= 0x0483 && c <= 0x0489) || (c >= 0x0610 && c <= 0x061A) ||
            (c >= 0x064B && c <= 0x065F) || c == 0x0670 || (c >= 0x06D6 && c <= 0x06DC) || (c >= 0x06DF && c <= 0x06E4) ||
            (c >= 0x06E7 && c <= 0x06E8) || (c >= 0x06EA && c <= 0x06ED) || (c >= 0x08D3 && c <= 0x08FF && c != 0x08E2) ||
@@ -238,6 +251,112 @@ Shaped shapeArabic(const std::u32string& t) {
     }
     return out;
 }
+
+// ---- Devanagari syllables ----------------------------------------------------------------------------
+namespace {
+enum class Deva { Other, Consonant, Vowel, Nukta, Virama, Sign, Bindu, Joiner };
+
+Deva devaClass(char32_t c) {
+    if ((c >= 0x0915 && c <= 0x0939) || (c >= 0x0958 && c <= 0x095F) || (c >= 0x0978 && c <= 0x097F))
+        return Deva::Consonant;
+    if ((c >= 0x0904 && c <= 0x0914) || (c >= 0x0960 && c <= 0x0961) || (c >= 0x0972 && c <= 0x0977)) return Deva::Vowel;
+    if (c == 0x093C) return Deva::Nukta;
+    if (c == 0x094D) return Deva::Virama;
+    if ((c >= 0x093A && c <= 0x093B) || (c >= 0x093E && c <= 0x094C) || (c >= 0x094E && c <= 0x094F) ||
+        (c >= 0x0955 && c <= 0x0957) || (c >= 0x0962 && c <= 0x0963))
+        return Deva::Sign;
+    if (c >= 0x0900 && c <= 0x0903) return Deva::Bindu;
+    if (c == 0x200C || c == 0x200D) return Deva::Joiner;
+    return Deva::Other;
+}
+
+std::map<std::u32string, char32_t>& devaTable() {
+    static std::map<std::u32string, char32_t> table;
+    return table;
+}
+}  // namespace
+
+std::vector<std::pair<int, int>> devanagariSyllables(const std::u32string& t) {
+    std::vector<std::pair<int, int>> out;
+    const size_t n = t.size();
+    auto is = [&](size_t j, Deva d) { return j < n && devaClass(t[j]) == d; };
+    size_t i = 0;
+    while (i < n) {
+        const Deva k = devaClass(t[i]);
+        size_t j = i + 1;
+        if (k == Deva::Consonant || k == Deva::Vowel) {
+            if (is(j, Deva::Nukta)) ++j;
+            while (k == Deva::Consonant && is(j, Deva::Virama)) {   // conjunct: C (N) H (ZWJ) C (N) ...
+                ++j;
+                if (is(j, Deva::Joiner)) ++j;
+                if (!is(j, Deva::Consonant)) break;
+                ++j;
+                if (is(j, Deva::Nukta)) ++j;
+            }
+            while (is(j, Deva::Sign) || is(j, Deva::Nukta)) ++j;
+            while (is(j, Deva::Bindu)) ++j;
+            out.emplace_back(int(i), int(j));
+        }
+        i = j;
+    }
+    return out;
+}
+
+int setDevanagariClusters(const std::string& fileText) {
+    auto& table = devaTable();
+    table.clear();
+    size_t pos = 0;
+    while (pos < fileText.size()) {
+        size_t end = fileText.find('\n', pos);
+        if (end == std::string::npos) end = fileText.size();
+        std::string line = fileText.substr(pos, end - pos);
+        pos = end + 1;
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        size_t sp = line.find(' ');
+        if (line.empty() || line[0] == '#' || sp == std::string::npos) continue;
+        char32_t cp = char32_t(std::strtoul(line.substr(0, sp).c_str(), nullptr, 16));
+        std::u32string syl = decode(line.substr(sp + 1));
+        if (cp >= kDevanagariClusterFirst && cp <= kDevanagariClusterLast && syl.size() > 1) table[syl] = cp;
+    }
+    return int(table.size());
+}
+
+char32_t devanagariCluster(const std::u32string& syllable) {
+    const auto& table = devaTable();
+    auto it = table.find(syllable);
+    return it == table.end() ? 0 : it->second;
+}
+
+Shaped shapeDevanagari(const Shaped& in) {
+    bool any = false;
+    for (char32_t c : in.text)
+        if (c >= 0x0900 && c <= 0x097F) any = true;
+    if (!any || devaTable().empty()) return in;
+    Shaped out;
+    out.text.reserve(in.text.size());
+    out.source.reserve(in.text.size());
+    size_t pos = 0;
+    for (const auto& syl : devanagariSyllables(in.text)) {
+        const size_t b = size_t(syl.first), e = size_t(syl.second);
+        if (e - b < 2) continue;
+        const char32_t cp = devanagariCluster(in.text.substr(b, e - b));
+        if (!cp) continue;
+        for (; pos < b; ++pos) {
+            out.text += in.text[pos];
+            out.source.push_back(in.source[pos]);
+        }
+        out.text += cp;
+        out.source.push_back(in.source[b]);
+        pos = e;
+    }
+    for (; pos < in.text.size(); ++pos) {
+        out.text += in.text[pos];
+        out.source.push_back(in.source[pos]);
+    }
+    return out;
+}
+
+Shaped shape(const std::u32string& logical) { return shapeDevanagari(shapeArabic(logical)); }
 
 // ---- Bidi -----------------------------------------------------------------------------------------------
 BidiClass bidiClass(char32_t c) {
@@ -496,8 +615,11 @@ bool breakBetween(char32_t a, char32_t b) {
 float trackingScale(char32_t a, char32_t b) { return isCjk(a) && isCjk(b) ? 0.25f : 1.0f; }
 
 // ---- Case ---------------------------------------------------------------------------------------------
-char32_t toUpper(char32_t c) {
-    if (c < 0x80) return (c >= 'a' && c <= 'z') ? c - 32 : c;
+char32_t toUpper(char32_t c, bool turkic) {
+    if (c < 0x80) {
+        if (c == 'i' && turkic) return 0x130;
+        return (c >= 'a' && c <= 'z') ? c - 32 : c;
+    }
     if (c >= 0xE0 && c <= 0xFE && c != 0xF7) return c - 32;
     if (c == 0xFF) return 0x178;
     if (c >= 0x100 && c <= 0x17F) {
@@ -507,7 +629,14 @@ char32_t toUpper(char32_t c) {
         if (c == 0x138 || c == 0x149 || c == 0x130 || c == 0x178) return c;
         return (c & 1) ? c - 1 : c;
     }
+    // Latin Extended-B: Vietnamese horn letters, pinyin carons, Romanian comma-below letters.
+    if (c == 0x1A1 || c == 0x1B0) return c - 1;
+    if (c >= 0x1CD && c <= 0x1DC) return (c & 1) ? c : c - 1;
+    if ((c >= 0x1DE && c <= 0x1EF) || (c >= 0x1F8 && c <= 0x21F) || (c >= 0x222 && c <= 0x233)) return (c & 1) ? c - 1 : c;
+    // Latin Extended Additional (Vietnamese ạ ả ấ ... ỹ).
+    if ((c >= 0x1E00 && c <= 0x1E95) || (c >= 0x1EA0 && c <= 0x1EFF)) return (c & 1) ? c - 1 : c;
     if (c >= 0x3B1 && c <= 0x3C9) return c == 0x3C2 ? 0x3A3 : c - 32;
+    if (c == 0x3CA || c == 0x3CB) return c - 32;
     if (c == 0x3AC) return 0x386;
     if (c >= 0x3AD && c <= 0x3AF) return c - 37;
     if (c == 0x3CC) return 0x38C;
@@ -520,14 +649,30 @@ char32_t toUpper(char32_t c) {
     return c;
 }
 
-bool isLower(char32_t c) { return c == 0xDF || toUpper(c) != c; }
+char32_t toCapital(char32_t c, bool turkic) {
+    switch (c) {   // Greek all caps: no tonos (the diaeresis stays)
+        case 0x3AC: case 0x386: return 0x391;
+        case 0x3AD: case 0x388: return 0x395;
+        case 0x3AE: case 0x389: return 0x397;
+        case 0x3AF: case 0x38A: return 0x399;
+        case 0x3CC: case 0x38C: return 0x39F;
+        case 0x3CD: case 0x38E: return 0x3A5;
+        case 0x3CE: case 0x38F: return 0x3A9;
+        case 0x390: return 0x3AA;
+        case 0x3B0: return 0x3AB;
+        default: return toUpper(c, turkic);
+    }
+}
 
-std::string toUpper(const std::string& s) {
+bool isLower(char32_t c) { return c == 0xDF || c == 0x390 || c == 0x3B0 || toUpper(c) != c; }
+
+std::string toUpper(const std::string& s, const std::string& lang) {
+    const bool turkic = lang == "tr";
     std::string out;
     out.reserve(s.size());
     for (char32_t c : decode(s)) {
         if (c == 0xDF) out += "SS";
-        else append(out, toUpper(c));
+        else append(out, toCapital(c, turkic));
     }
     return out;
 }

@@ -1,0 +1,985 @@
+# Coach speech (Indonesian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "kamu" and "aku", possessive suffixes "-mu" / "-ku" on plain nouns
+# ("langkahmu", "rajaku", "buahku"); conversational standard Indonesian ("tidak", "saja", "sudah").
+# Indonesian has no gender, no cases and no tense agreement: nothing agrees with the player.
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) already carry their owner ("kudamu", "gajahku"): never
+# add "-mu", "-ku", "-nya" or "milik" to them. "It" for a piece: "ia", "-nya" on the verb
+# ("memakannya"), or {your:bare} (the noun alone). {your:milik} only for a stressed contrast.
+# Squares and moves stand alone: "ke {sq}", "di {sq}", "petak {sq}", "langkah {move}"; nothing glued.
+# Counted numbers: {m:move} "2 langkah", {pts:point} "3 poin", {n:time} "3 kali", {n2:piece}
+# "2 buah catur"; with a single plural form, "{n} penyerang" / "{n2} pelindung" are written directly.
+# "Mate in N" = "mat dalam {m:move}" (the eval wording of common.lang); otherwise "skakmat".
+# Past moments are marked with "tadi" where the sentence needs it ("Tadi kamu punya ...").
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Skak! Rajaku diserang.
+ann.check.human.b1.2 = Skak! Kamu menyerang rajaku.
+ann.check.human.b1.3 = Itu skak! Rajaku harus lolos dari skak.
+ann.check.human = Skak.
+ann.check.human.2 = Skak!
+ann.check.human.3 = Dan itu skak.
+# The coach gives check.
+ann.check.coach = Skak!
+ann.check.coach.2 = Skak.
+ann.check.coach.3 = Dan skak!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Artinya, {your} sedang diserang. Kamu harus membebaskannya dari skak.
+ann.check.coach.first.2 = Skak artinya {your} sedang diserang. Pindahkan {your:bare}, halangi skaknya, atau makan buahku.
+ann.double_check.coach = Skak ganda! Dua buahku menyerang rajamu sekaligus, jadi rajamu harus pindah.
+ann.double_check.coach.2 = Itu skak ganda: sekarang hanya langkah raja yang bisa menolongmu.
+ann.double_check.human = Skak ganda! Dua buahmu menyerang rajaku sekaligus, jadi rajaku harus pindah.
+ann.double_check.human.2 = Skak ganda! Sekarang hanya langkah raja yang bisa menyelamatkanku.
+# The player checkmates the coach.
+ann.mate.human.b1 = Skakmat! Kamu menang! Rajaku tidak bisa lolos.
+ann.mate.human.b1.2 = Itu skakmat! Hebat, kamu memenangkan permainan ini!
+ann.mate.human.b1.3 = Skakmat! Rajaku terjebak. Selamat!
+ann.mate.human = Skakmat. Permainanmu bagus.
+ann.mate.human.2 = Itu skakmat. Selamat.
+ann.mate.human.3 = Skakmat! Bagus sekali.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Itu skakmat. Rajamu tidak punya jalan keluar.
+ann.mate.coach.b1.2 = Skakmat. Rajamu diserang dan tidak bisa lolos.
+ann.mate.coach.b1.3 = Sayang sekali, itu skakmat. Rajamu tidak bisa menghindar.
+ann.mate.coach = Skakmat.
+ann.mate.coach.2 = Dan itu skakmat.
+ann.mate.coach.3 = Skakmat, sayang sekali.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ups! Langkah itu memberikan sesuatu begitu saja.
+ex.verdict.blunder.b1.2 = Hati-hati! Langkah itu bisa merugikanmu.
+ex.verdict.blunder.b1.3 = Oh, tunggu. Langkah itu ada masalahnya.
+ex.verdict.blunder.b2 = Hmm, langkah itu ada masalahnya.
+ex.verdict.blunder.b2.2 = Itu kesalahan besar.
+ex.verdict.blunder.b2.3 = Hati-hati, langkah itu membuatmu kehilangan sesuatu.
+ex.verdict.blunder.b3 = Itu blunder.
+ex.verdict.blunder.b3.2 = Langkah {move} benar-benar sebuah kesalahan.
+ex.verdict.blunder.b3.3 = Aduh, langkah {move} adalah kesalahan besar.
+ex.verdict.blunder.b4 = {move} adalah blunder.
+ex.verdict.blunder.b4.2 = {move} adalah kesalahan serius.
+ex.verdict.blunder.b4.3 = Sayangnya, itu blunder.
+ex.verdict.blunder.b5 = {move} adalah kesalahan serius.
+ex.verdict.blunder.b5.2 = {move} adalah blunder.
+ex.verdict.blunder.b5.3 = {move} adalah kesalahan yang mahal.
+ex.verdict.blunder.b6 = {move} adalah kesalahan berat.
+ex.verdict.blunder.b6.2 = {move} adalah blunder.
+ex.verdict.blunder.b6.3 = {move}? Blunder.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ups! Kamu tidak menanggapi ancamanku.
+ex.verdict.ignored.b1.2 = Hati-hati! Ancamanku masih ada.
+ex.verdict.ignored.b1.3 = Oh, tunggu. Kamu lupa pada ancamanku.
+ex.verdict.ignored.b2 = Hmm, ancamanku masih ada.
+ex.verdict.ignored.b2.2 = Kamu membiarkan ancamanku tanpa tanggapan.
+ex.verdict.ignored.b2.3 = Hati-hati, kamu tidak menanggapi ancamanku.
+ex.verdict.mistake.b3 = Itu bukan langkah yang bagus.
+ex.verdict.mistake.b3.2 = Hmm, langkah {move} ada masalahnya.
+ex.verdict.mistake.b3.3 = Itu kesalahan.
+ex.verdict.mistake.b4 = {move} adalah kesalahan.
+ex.verdict.mistake.b4.2 = {move} tidak bagus.
+ex.verdict.mistake.b4.3 = Itu kesalahan.
+ex.verdict.mistake.b5 = {move} jelas sebuah kesalahan.
+ex.verdict.mistake.b5.2 = {move} adalah kesalahan.
+ex.verdict.mistake.b5.3 = {move} tidak bagus.
+ex.verdict.mistake.b6 = {move} adalah kesalahan.
+ex.verdict.mistake.b6.2 = {move}? Kesalahan.
+ex.verdict.mistake.b6.3 = Bukan {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Lumayan, tapi {best} sedikit lebih baik.
+ex.verdict.inaccuracy.b3.2 = {best} sedikit lebih akurat.
+ex.verdict.inaccuracy.b3.3 = Sedikit meleset: di sini {best} lebih baik.
+ex.verdict.inaccuracy.b4 = Kurang akurat: {best} lebih tepat.
+ex.verdict.inaccuracy.b4.2 = Ketidakakuratan kecil. {best} sedikit lebih baik.
+ex.verdict.inaccuracy.b4.3 = Belum yang terbaik: {best} lebih akurat.
+ex.verdict.inaccuracy.b5 = {move} kurang tepat; {best} lebih kuat.
+ex.verdict.inaccuracy.b5.2 = Sedikit kurang akurat. Kalau aku, aku akan memilih {best}.
+ex.verdict.inaccuracy.b5.3 = {best} lebih akurat daripada {move}.
+ex.verdict.inaccuracy.b6 = {move} kurang akurat; {best}.
+ex.verdict.inaccuracy.b6.2 = Kurang akurat. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} lebih baik.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} mungkin sedikit lebih akurat.
+ex.verdict.inaccuracy.maybe.2 = Mungkin aku akan memilih {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Langkah itu terlihat meragukan.
+ex.verdict.dubious.2 = Langkah itu tampaknya meragukan.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oh, tunggu! Kamu melewatkan sesuatu yang bagus.
+ex.verdict.missed.b1.2 = Lihat lagi! Ada yang lebih baik.
+ex.verdict.missed.b1.3 = Sebentar, tadi kamu punya peluang!
+ex.verdict.missed.b2 = Kamu melewatkan peluang di situ.
+ex.verdict.missed.b2.2 = Hmm, ada yang lebih baik.
+ex.verdict.missed.b2.3 = Tunggu, tadi kamu punya langkah yang hebat.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Lebih baik {best}.
+ex.better.b3.2 = {best} adalah langkah yang lebih baik.
+ex.better.b3.3 = Sebagai gantinya, {best} adalah langkah yang bagus.
+ex.better.b4 = {best} lebih kuat.
+ex.better.b4.2 = {best} adalah langkah yang tepat.
+ex.better.b4.3 = Lebih baik {best}.
+ex.better.b5 = {best}, dengan ide {line}.
+ex.better.b5.2 = Langkah yang tepat adalah {best}: {line}.
+ex.better.b5.3 = Lebih baik {best}, diikuti {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Sebaiknya {best}, {eval}.
+ex.better.b6.3 = {best} memberi {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Ada langkah yang lebih baik dengan {your}.
+ex.hint.b1.2 = {your} punya langkah yang lebih baik.
+ex.hint.b2 = {your} punya langkah yang lebih baik.
+ex.hint.b2.2 = Ada langkah yang lebih baik dengan {your}.
+ex.hint.b3 = {your} punya langkah yang lebih baik.
+ex.hint.b3.2 = Ada pilihan yang lebih baik dengan {your}.
+ex.hint.b4 = {your} punya langkah yang lebih baik.
+ex.hint.b4.2 = Lihat lagi {your}: ia punya pilihan yang lebih baik.
+ex.hint.b5 = {your} punya langkah yang lebih kuat.
+ex.hint.b5.2 = Ada langkah yang lebih kuat dengan {your}.
+ex.hint.b6 = {your} punya pilihan yang lebih baik.
+ex.hint.b6.2 = Lihat lagi {your}.
+ex.hint.move = Ada langkah yang lebih baik.
+ex.hint.move.2 = Tadi kamu punya langkah yang lebih baik.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} punya langkah yang lebih baik. Langkah itu memenangkan materi.
+ex.hint.gain.b1.2 = Ada langkah yang lebih baik dengan {your}. Langkah itu memenangkan materi.
+ex.hint.gain.b2 = {your} punya langkah yang lebih baik. Langkah itu memenangkan materi.
+ex.hint.gain.b2.2 = Ada langkah dengan {your} yang memenangkan materi.
+ex.hint.gain.b3 = {your} punya langkah yang lebih baik, yang memenangkan materi.
+ex.hint.gain.b3.2 = Ada langkah dengan {your} yang memenangkan materi.
+ex.hint.gain.b4 = {your} punya langkah yang memenangkan materi.
+ex.hint.gain.b4.2 = Lihat lagi {your}: ia punya langkah yang memenangkan materi.
+ex.hint.gain.b5 = {your} punya langkah yang lebih kuat, yang memenangkan materi.
+ex.hint.gain.b5.2 = Ada langkah dengan {your} yang memenangkan materi.
+ex.hint.gain.b6 = {your} punya langkah yang memenangkan materi.
+ex.hint.gain.b6.2 = Lihat lagi {your}: ada materi yang bisa dimenangkan.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Langkah yang lebih baik adalah {your} ke {sq}.
+ex.reveal.b1.2 = {your} bisa melangkah ke {sq}. Itu lebih baik.
+ex.reveal.b2 = {your} ke {sq} adalah langkah yang lebih baik.
+ex.reveal.b2.2 = Langkah yang lebih baik adalah {your} ke {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Ayo kita kembalikan buah-buahnya ke tempat semula.
+ex.rewind.b1.2 = Sekarang aku kembalikan semuanya seperti semula.
+ex.rewind.b1.3 = Biar aku kembalikan buah-buahnya.
+ex.rewind.b2 = Ayo kita kembalikan semuanya.
+ex.rewind.b2.2 = Kembali ke posisi tadi.
+ex.rewind.b2.3 = Aku kembalikan buah-buahnya.
+ex.rewind.b3 = Kembali ke permainan.
+ex.rewind.b3.2 = Ayo kita kembali.
+ex.rewind.b3.3 = Kembali ke posisi.
+ex.rewind.b4 = Kembali ke permainan.
+ex.rewind.b4.2 = Kembali.
+ex.rewind.b4.3 = Ayo kembali.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Kamu mau mencoba langkah lain?
+ex.offer.b1.2 = Mau mengambil kembali langkah itu dan mencoba lagi?
+ex.offer.b1.3 = Bagaimana kalau kita coba langkah lain?
+ex.offer.b2 = Kamu ingin mencoba langkah lain?
+ex.offer.b2.2 = Kamu mau mengambil kembali langkahmu?
+ex.offer.b2.3 = Mau coba lagi?
+ex.offer.b3 = Mau mengambil kembali langkahmu?
+ex.offer.b3.2 = Kamu mau coba lagi?
+ex.offer.b3.3 = Ambil kembali?
+ex.offer.b4 = Ambil kembali langkahnya?
+ex.offer.b4.2 = Kamu mau mengambilnya kembali?
+ex.offer.b4.3 = Mau coba langkah lain?
+ex.offer.b5 = Ambil kembali?
+ex.offer.b5.2 = Mau diambil kembali?
+ex.offer.b5.3 = Ambil kembali langkahnya?
+ex.offer.b6 = Ambil kembali?
+ex.offer.b6.2 = Diambil kembali?
+ex.offer.b6.3 = Coba lagi?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Langkah itu meragukan. Mungkin kamu bisa lebih baik?
+ex.dubious.b1.2 = Langkah itu meragukan. Mungkin kamu bisa menemukan yang lebih baik?
+ex.dubious.b2 = Langkah yang meragukan. Mungkin kamu bisa lebih baik?
+ex.dubious.b2.2 = Langkah itu meragukan. Mungkin ada yang lebih baik?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Lalu {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} melangkah ke {sq}.
+demo.my.move.2 = Aku menjalankan {my} ke {sq}.
+demo.my.move.3 = Lalu {my} melangkah ke {sq}.
+demo.my.take = Aku memakan {your}.
+demo.my.take.2 = {my} memakan {your}.
+demo.my.take.3 = Dan aku memakan {your}.
+demo.my.check = {my} melangkah ke {sq}. Skak.
+demo.my.check.2 = Skak, dengan {my} di {sq}.
+demo.my.check.3 = {my} ke {sq}, skak!
+demo.my.mate = {my} melangkah ke {sq}. Skakmat.
+demo.my.mate.2 = Lalu {my} ke {sq}, dan itu skakmat.
+demo.my.mate.3 = {my} ke {sq}. Itu skakmat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Pertama, {my} memakan {your}. {t1} bisa menunggu.
+demo.my.first.take.2 = {my} memakan {your} dulu. {t1} tidak akan ke mana-mana.
+demo.my.first.check = {my} memakan {your}, dan itu skak! {t1} bisa menunggu.
+demo.my.first.check.2 = Pertama, {my} memakan {your} sambil memberi skak. {t1} tidak akan ke mana-mana.
+demo.my.first.check_move = Pertama, skak dengan {my} di {sq}. {t1} bisa menunggu.
+demo.my.first.check_move.2 = {my} melangkah ke {sq}: skak dulu! {t1} tidak akan ke mana-mana.
+demo.my.first.move = Pertama, {my} melangkah ke {sq}. {t1} bisa menunggu.
+demo.my.first.move.2 = {my} ke {sq} dulu. {t1} tidak akan ke mana-mana.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} sedang diserang, jadi ia memakan {your} lebih dulu.
+demo.my.first.attacked.2 = {my} sedang diserang: ia menyambar {your} lebih dulu.
+# Levels 4-6, the same in-between move.
+demo.first = {move} dulu: {t1} bisa menunggu.
+demo.first.2 = Pertama {move}. {t1} tidak akan ke mana-mana.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Sekarang aku memainkan langkahku.
+demo.play_on.2 = Ini langkahku yang sebenarnya.
+demo.play_on.3 = Dan sekarang, langkahku yang sungguhan.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Kamu akan memindahkan {your} ke {sq}.
+demo.your.move.2 = Misalkan kamu menjalankan {your} ke {sq}.
+demo.your.move.3 = Lalu {your} melangkah ke {sq}.
+demo.your.take = Kamu akan memakan {my}.
+demo.your.take.2 = Kamu memakan {my} dengan {your}.
+demo.your.take.3 = Lalu kamu memakan {my}.
+demo.your.back = Kamu memakan kembali.
+demo.your.back.2 = Kamu memakan kembali di {sq}.
+demo.your.back.3 = Dan kamu memakan kembali.
+demo.your.king = Rajamu harus pindah.
+demo.your.king.2 = Raja harus menyingkir, ke {sq}.
+demo.your.king.3 = Rajamu lari ke {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Sekarang {t1} tidak bisa diselamatkan.
+ex.point.piece.2 = Dan {t1} tidak tertolong lagi.
+ex.point.piece.3 = Berikutnya, {t1} jatuh.
+ex.point.two = {t1} dan {t2} sama-sama diserang: salah satunya akan jatuh.
+ex.point.two.2 = Sekarang aku menyerang {t1} dan {t2}. Kamu tidak bisa menyelamatkan keduanya.
+ex.point.mate = Dan sekarang, {reply:nomate} adalah skakmat.
+ex.point.mate.2 = Berikutnya {reply:nomate}, dan itu skakmat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Lihat, kan? Sekarang kamu kehilangan {pts:point}.
+ex.result.b1.2 = Begitulah kamu kehilangan {pts:point}.
+ex.result.b2 = Pada akhirnya, kamu kehilangan {pts:point}.
+ex.result.b2.2 = Sekarang kamu tertinggal {pts:point}.
+ex.result.b3 = Itu membuatmu kehilangan {pts:point}.
+ex.result.b3.2 = Akhirnya kamu tertinggal {pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Kamu bisa memakan kembali sesuatu, tapi kamu tetap tertinggal {pts:point}.
+ex.result_back.b1.2 = Kamu bisa merebut sedikit kembali, tapi kamu tetap kehilangan {pts:point}.
+ex.result_back.b2 = Kamu bisa memakan kembali sebagian, tapi tetap tertinggal {pts:point}.
+ex.result_back.b2.2 = Setelah memakan kembali pun, kamu tetap kehilangan {pts:point}.
+ex.result_back.b3 = Bahkan setelah kamu memakan kembali, kamu tertinggal {pts:point}.
+ex.result_back.b3.2 = Kamu merebut sesuatu kembali, tapi itu tetap membuatmu rugi {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Kalau {your2} memakan kembali, {my} memakan {your}.
+ex.retake.b1.2 = Kamu tidak bisa memakan kembali dengan {your2}: nanti {my} memakan {your}.
+ex.retake.b2 = Kalau {your2} memakan kembali, {my} memakan {your}.
+ex.retake.b2.2 = Memakan kembali dengan {your2} tidak berhasil: {my} memakan {your}.
+ex.retake.b3 = Kalau kamu memakan kembali dengan {move}, {reply} memakan {your}.
+ex.retake.b3.2 = Memakan kembali dengan {move} gagal: {reply} memakan {your}.
+ex.retake.b4 = {move} gagal karena {reply}, yang memakan {your}.
+ex.retake.b4.2 = Dan kalau {move}, maka {reply} memakan {your}.
+ex.retake.b5 = Memakan kembali dengan {move} dibalas {reply}, dan {your} jatuh.
+ex.retake.b5.2 = {move} gagal karena {reply}: {your} jatuh.
+ex.retake.b6 = {move}? {reply} memakan {your}.
+ex.retake.b6.2 = {move} gagal: {reply} memakan {your}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Dan di sini, di {sq}, kamu akan mendapat menteri baru.
+demo.promote.2 = Lalu {your} mencapai {sq} dan menjadi menteri.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Awas: {my} bisa ke {sq}, dan itu skakmat.
+ex.mate_allowed.b1.2 = Sekarang {my} bisa melangkah ke {sq}. Itu akan jadi skakmat!
+ex.mate_allowed.b1.3 = Hati-hati! Kalau {my} ke {sq}, itu skakmat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Dengan langkah ini, aku bisa memberi skakmat kepada {your} dalam {m:move}.
+ex.mate_allowed.b2.2 = Sekarang aku bisa memberi skakmat kepada {your} dalam {m:move}. Lihat.
+ex.mate_allowed.b2.3 = Hati-hati! {your} dalam bahaya: mat dalam {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Langkah ini memungkinkan mat dalam {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Setelah ini aku punya mat dalam {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Rajamu kena skakmat: {line:nomate}.
+ex.mate_allowed.b4 = {move} memungkinkan skakmat paksa: {line:nomate}.
+ex.mate_allowed.b4.2 = Langkah ini menjerumuskanmu ke mat dalam {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Setelah {move}, {line:nomate} berakhir dengan skakmat.
+ex.mate_allowed.b5 = {move} memungkinkan mat paksa dalam {m:move}.
+ex.mate_allowed.b5.2 = Itu menjerumuskanmu ke mat dalam {m:move}.
+ex.mate_allowed.b5.3 = Sekarang ada mat paksa dalam {m:move}.
+ex.mate_allowed.b6 = Mat dalam {m:move}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, skakmat.
+ex.mate_allowed.b6.3 = Skakmat setelah {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Lihat: {your} tidak punya petak lagi untuk lolos.
+ex.mate_allowed.tail.b1.2 = Lihat, kan? {your} diserang dan tidak bisa lari.
+ex.mate_allowed.tail.b1.3 = {your} tidak bisa ke mana-mana. Itu skakmat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Pola itu disebut {text}.
+ex.mate_allowed.pattern.2 = Ingat pola ini: namanya {text}.
+ex.mate_allowed.tip.b3 = Sebelum setiap langkah, periksa apakah rajamu masih aman.
+ex.mate_allowed.tip.b3.2 = Selalu tanyakan: setelah langkahku, bisakah rajaku kena skakmat?
+
+# Pattern names (no article in Indonesian; "mat" as in "pola mat").
+name.pattern.back_rank = mat baris belakang
+name.pattern.smothered = mat tercekik
+name.pattern.support = mat menteri yang didukung
+name.pattern.ladder = mat tangga
+name.pattern.epaulette = mat epolet
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Dengan {best:nomate}, tadi kamu bisa memberi skakmat kepada {my}!
+ex.mate_missed.b1.2 = {best:nomate} itu skakmat! {my} tidak akan bisa lolos.
+ex.mate_missed.b1.3 = Lihat! {best:nomate} akan membuat {my} kena skakmat.
+ex.mate_missed.b2 = Tadi kamu punya mat dalam {m:move}, dimulai dengan {best:nomate}.
+ex.mate_missed.b2.2 = Dengan {best:nomate}, ada mat dalam {m:move}!
+ex.mate_missed.b2.3 = Tadi kamu bisa memberiku skakmat dengan {best:nomate}.
+ex.mate_missed.b3 = Kamu melewatkan mat dalam {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} memberi mat dalam {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Ada mat dalam {m:move}, dimulai dengan {best:nomate}.
+ex.mate_missed.b4 = Skakmat terlewat: {line:nomate}, dimulai dengan {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} memaksakan mat dalam {m:move}.
+ex.mate_missed.b4.3 = Tadi kamu punya mat dalam {m:move} dengan {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} memberi mat dalam {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Mat dalam {m:move} terlewat, dimulai dengan {best:nomate}.
+ex.mate_missed.b5.3 = Ada skakmat paksa: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} memberi skakmat: {line:nomate}.
+ex.mate_missed.b6.2 = Mat dalam {m:move} dengan {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat dalam {m:move}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Lebih cepat {best:nomate}: mat dalam {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} memberi mat lebih cepat, dalam {m:move}.
+ex.mate_delayed.b6 = {best:nomate} memberi mat dalam {m:move}.
+ex.mate_delayed.b6.2 = Lebih cepat: {best:nomate}, mat dalam {m:move}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Oh tidak! {my} tidak bisa bergerak dan tidak terkena skak. Itu pat: remis.
+ex.stalemate.b1.2 = Lihat: {my} tidak punya petak aman, tapi tidak terkena skak. Hasilnya remis!
+ex.stalemate.b1.3 = Itu pat. {my} tidak bisa bergerak, jadi permainan berakhir remis.
+ex.stalemate.b2 = Pat! {my} tidak punya langkah sah, dan tidak terkena skak. Remis.
+ex.stalemate.b2.2 = Oh tidak, pat: {my} terjepit, tapi tidak terkena skak.
+ex.stalemate.b2.3 = Itu remis karena pat. {my} tidak bisa bergerak.
+ex.stalemate.b3 = Itu pat: {my} tidak punya langkah sah. Padahal posisimu menang!
+ex.stalemate.b3.2 = Pat! {my} terjepit, dan permainan yang sudah menang jadi remis.
+ex.stalemate.b3.3 = {my} tidak punya langkah dan tidak terkena skak: pat.
+ex.stalemate.b4 = Pat: {my} tidak punya langkah sah. Kemenangan pun terbuang.
+ex.stalemate.b4.2 = {move} menjebak {my} dalam pat. Remis dari posisi menang.
+ex.stalemate.b4.3 = Itu pat; {my} terkurung.
+ex.stalemate.b5 = {move} menjebak {my} dalam pat. Kemenangan hilang.
+ex.stalemate.b5.2 = Pat: {my} tidak punya petak.
+ex.stalemate.b5.3 = Itu pat, {my} terjepit.
+ex.stalemate.b6 = Pat. {my} tak punya langkah.
+ex.stalemate.b6.2 = {move}, pat: {my} terkurung.
+ex.stalemate.b6.3 = Pat; {my} tak bisa bergerak.
+ex.stalemate.tip.b1 = Kalau kamu sedang menang, selalu sisakan satu petak untuk rajaku.
+ex.stalemate.tip.b1.2 = Ingat: kalau kamu unggul, beri rajaku sedikit ruang.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Hati-hati! Aku bisa mengorbankan buah-buahku, lalu {my} tidak punya langkah: pat.
+ex.stalemate_trick.b1.2 = Awas: {my} hampir terjepit. Aku bisa membuatnya remis.
+ex.stalemate_trick.b2 = Hati-hati: aku bisa berkorban, dan {my} akan terjebak pat.
+ex.stalemate_trick.b2.2 = {my} hampir tidak punya petak. Aku bisa memaksakan pat!
+ex.stalemate_trick.b3 = Langkah ini membuatku bisa lolos dengan pat: {my} kehabisan langkah.
+ex.stalemate_trick.b3.2 = Hati-hati: setelah {line}, {my} terjebak pat.
+ex.stalemate_trick.b4 = {move} membuka peluang trik pat: {line}, dan {my} tidak bisa bergerak.
+ex.stalemate_trick.b4.2 = Sekarang {my} bisa berlindung dalam pat: {line}.
+ex.stalemate_trick.b5 = {move} memungkinkan pat: {line}; {my} terkurung.
+ex.stalemate_trick.b5.2 = Trik pat: {line}, dan {my} tidak punya langkah.
+ex.stalemate_trick.b6 = {line}, pat: {my} terkurung.
+ex.stalemate_trick.b6.2 = Pat setelah {line}; {my} terjepit.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} bisa melangkah ke {sq} lalu menyerang {t1} dan {t2}.
+ex.fork.b1.2 = {my} melangkah ke {sq} dan menyerang dua sasaran: {t1} dan {t2}.
+ex.fork.b1.3 = Perhatikan {my}: dari {sq}, ia menyerang {t1} dan {t2} sekaligus.
+ex.fork.b2 = Garpu! {my} di {sq} menyerang {t1} dan {t2} sekaligus.
+ex.fork.b2.2 = Setelah langkahmu, {my} bisa menggarpu {t1} dan {t2} dari {sq}.
+ex.fork.b2.3 = {my} melangkah ke {sq}: serangan ganda pada {t1} dan {t2}.
+ex.fork.b3 = {move} memungkinkan {reply}, yang menggarpu {t1} dan {t2}.
+ex.fork.b3.2 = Setelah {reply}, aku menyerang {t1} dan {t2} sekaligus.
+ex.fork.b3.3 = {reply} adalah garpu: {t1} dan {t2} sama-sama diserang.
+ex.fork.b4 = {reply} menggarpu {t1} dan {t2}; setelah {line}, kamu kehilangan {pts:point}.
+ex.fork.b4.2 = {reply} menyerang {t1} dan {t2} sekaligus.
+ex.fork.b4.3 = {move} memungkinkan garpu {reply} terhadap {t1} dan {t2}.
+ex.fork.b5 = Setelah {move}, kamu kena garpu {reply} pada {t1} dan {t2}.
+ex.fork.b5.2 = {reply} menggarpu {t1} dan {t2}.
+ex.fork.b5.3 = Setelah {reply}, {t1} dan {t2} sama-sama diserang.
+ex.fork.b6 = {reply} menggarpu.
+ex.fork.b6.2 = {move} memungkinkan {reply}, garpu.
+ex.fork.b6.3 = {reply}, garpu.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Kamu hanya bisa menyelamatkan salah satunya: {t1} atau {t2}.
+ex.fork.tail.b1.2 = Sekarang aku menyerang dua sasaran sekaligus: {t1} dan {t2}. Itu garpu!
+ex.fork.tail.b1.3 = Lihat, kan? {t1} dan {t2} sama-sama diserang. Salah satunya akan jatuh.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} harus lolos dari skak, jadi aku memakan {t1}.
+ex.fork.tail_king.2 = Skak! {your} harus pindah, dan {t1} jatuh.
+ex.fork.more.b3 = Sebelum melangkah, periksa petak {sq}: itu petak garpu bagi {my}.
+ex.fork.more.b3.2 = Awasi petak {sq}. {my} menggarpu dari sana.
+ex.fork.tip.knight = Awas lompatan kuda di dekat raja dan menterimu!
+ex.fork.tip.knight.2 = Kuda suka menyerang dua buah sekaligus. Lihat ke mana kuda bisa melompat.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Saat {my} menyingkir, {my2} menyerang {t1}!
+ex.discovered.b1.2 = Lihat: {my} menghalangi. Kalau ia pindah, {my2} menyerang {t1}.
+ex.discovered.b1.3 = {my} bisa menyingkir, lalu {my2} menyerang {t1}.
+ex.discovered.b2 = Serangan tersembunyi: {my} pindah, dan {my2} menyerang {t1}.
+ex.discovered.b2.2 = Hati-hati: {my} bisa menyingkir, dan {my2} menyerang {t1}.
+ex.discovered.b2.3 = {my} menyingkir dan membuka jalan bagi {my2} untuk menyerang {t1}.
+ex.discovered.b3 = Setelah {reply}, serangan tersingkap mengenai {t1}.
+ex.discovered.b3.2 = {reply} menyingkap serangan pada {t1}.
+ex.discovered.b3.3 = {move} memungkinkan {reply}, serangan tersingkap pada {t1}.
+ex.discovered.b4 = {reply} membuka jalur ke {t1}: serangan tersingkap.
+ex.discovered.b4.2 = {move} memungkinkan serangan tersingkap {reply}, yang memenangkan {t1}.
+ex.discovered.b4.3 = Setelah {reply}, {t1} jatuh karena serangan tersingkap.
+ex.discovered.b5 = {move} memungkinkan serangan tersingkap {reply}.
+ex.discovered.b5.2 = {reply} adalah serangan tersingkap.
+ex.discovered.b5.3 = {reply} menyingkap serangan tersembunyi.
+ex.discovered.b6 = {reply}, serangan tersingkap pada {t1}.
+ex.discovered.b6.2 = {reply}, dan {t1} jatuh.
+ex.discovered.b6.3 = Serangan tersingkap: {reply}, mengenai {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+# "Tusuk sate" (skewer) is a noun: "{reply}: tusuk sate pada {t1} dan {t2}".
+ex.skewer.b1 = {my} menyerang {t1}. Begitu {t1:bare} itu pindah, aku memakan {t2} di belakangnya.
+ex.skewer.b1.2 = Lihat: {my} menyerang {t1}, dan {t2} tepat di belakangnya.
+ex.skewer.b1.3 = {my} mengincar {t1}. {t1:bare} itu harus pindah, lalu {t2} jatuh.
+ex.skewer.b2 = Tusuk sate: {my} menyerang {t1}, dan {t2} ada di belakangnya.
+ex.skewer.b2.2 = {my} membidik {t1} dan {t2} dalam satu garis. Begitu yang depan pindah, aku memakan yang belakang.
+ex.skewer.b2.3 = Hati-hati: {t1} dan {t2} ada di satu garis. {my} bisa melakukan tusuk sate pada keduanya.
+ex.skewer.b3 = {reply}: tusuk sate pada {t1} dan {t2}.
+ex.skewer.b3.2 = Setelah {reply}, {t1} harus pindah dan {t2} jatuh.
+ex.skewer.b3.3 = {move} memungkinkan {reply}, tusuk sate pada {t1} dan {t2}.
+ex.skewer.b4 = {reply}: tusuk sate pada {t1}; {t2} di belakangnya hilang.
+ex.skewer.b4.2 = Setelah {move}, {t1} dan {t2} berada di satu garis: {reply}.
+ex.skewer.b4.3 = Setelah {reply}, {t1} pindah dan {t2} jatuh.
+ex.skewer.b5 = {reply}: tusuk sate pada {t1} dan {t2}.
+ex.skewer.b5.2 = {move} memungkinkan tusuk sate {reply}, menembus {t1} ke {t2}.
+ex.skewer.b6 = {reply} adalah tusuk sate.
+ex.skewer.b6.2 = {reply}, tusuk sate.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+# Levels 1-2 say "tertahan" (stuck) before naming the pin ("kunci", "terkunci di depan {t1}").
+ex.pin.b1 = {my} bisa melangkah ke {sq}. Lalu {your} tertahan di depan {t1}.
+ex.pin.b1.2 = Perhatikan {my} di {sq}: {your} jadi tertahan di depan {t1}.
+ex.pin.b1.3 = {my} bisa mengunci {your} di depan {t1}. Lalu aku memenangkannya.
+ex.pin.b2 = Ini namanya kunci: {your} tertahan di depan {t1}.
+ex.pin.b2.2 = {your} terkunci di depan {t1}. Jadi aku bisa memenangkannya.
+ex.pin.b2.3 = Sekarang {your} tertahan di depan {t1}. Itu namanya kunci.
+ex.pin.b3 = {your} terkunci di depan {t1}, dan aku memenangkannya.
+ex.pin.b3.2 = Setelah ini, {your} terkunci di depan {t1}.
+ex.pin.b3.3 = Kunci pada {your} membuatmu kehilangan materi: {t1} ada di belakangnya.
+ex.pin.b4 = {reply} mengunci dan memenangkan materi.
+ex.pin.b4.2 = {move} berujung pada kunci {reply}.
+ex.pin.b4.3 = Setelah {reply}, buah yang terkunci jatuh.
+ex.pin.b5 = {move} memungkinkan kunci {reply}.
+ex.pin.b5.2 = {reply} mengunci, dan buah itu hilang.
+ex.pin.b6 = {reply} mengunci.
+ex.pin.b6.2 = {reply}, kunci.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} terkunci, jadi ia tidak bisa melindungi petak {sq}. {t1} ada di belakangnya.
+ex.pin_defender.b1.2 = Lihat: {your} sebenarnya tidak bisa melindungi petak {sq}, karena {t1} ada di belakangnya.
+ex.pin_defender.b2 = {your} terkunci di depan {t1}, jadi petak {sq} tidak punya pelindung sungguhan.
+ex.pin_defender.b2.2 = Buah yang terkunci adalah pelindung yang buruk. {your} tidak bisa menjaga petak {sq}: {t1} ada di belakangnya.
+ex.pin_defender.b3 = {your} terkunci di depan {t1}; ia sebenarnya tidak melindungi petak {sq}.
+ex.pin_defender.b3.2 = Petak {sq} tampak terlindungi, tapi {your} terkunci di depan {t1}.
+ex.pin_defender.b4 = {your} terkunci, jadi petak {sq} sebenarnya tidak terlindungi.
+ex.pin_defender.b4.2 = {your} yang terkunci tidak bisa menjaga petak {sq}.
+ex.pin_defender.b5 = {your} terkunci; petak {sq} tak terjaga.
+ex.pin_defender.b5.2 = Petak {sq} direbut: {your} terkunci.
+ex.pin_defender.b6 = {your} terkunci; petak {sq} direbut.
+ex.pin_defender.b6.2 = {your} terkunci, petak {sq} tak terjaga.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} terjebak. Setiap petak yang bisa ia tuju sedang diserang.
+ex.trapped.b1.2 = Lihat {your}: ia tidak punya petak aman untuk lari.
+ex.trapped.b1.3 = {your} terjepit. Aku bisa menyerangnya, dan ia tidak bisa lolos.
+ex.trapped.b2 = {your} tidak punya petak aman. Aku bisa memenangkannya.
+ex.trapped.b2.2 = {your} terjebak: ke mana pun ia pergi, aku memakannya.
+ex.trapped.b2.3 = Hati-hati, {your} mulai kehabisan petak.
+ex.trapped.b3 = {your} terjebak: tidak ada petak aman lagi.
+ex.trapped.b3.2 = Setelah ini, {your} terjebak dan hilang.
+ex.trapped.b3.3 = {your} masuk perangkap: ia tidak bisa keluar.
+ex.trapped.b4 = {move} membuat {your} terjebak.
+ex.trapped.b4.2 = {your} tidak punya jalan mundur; aku memenangkannya.
+ex.trapped.b4.3 = {your} terjebak setelah {reply}.
+ex.trapped.b5 = {your} akhirnya terjebak: {line}.
+ex.trapped.b5.2 = {move} membuat {your} terdampar.
+ex.trapped.b6 = {your} terjebak.
+ex.trapped.b6.2 = {line} menjebak {your}.
+ex.trapped.tip.b1 = Sebelum menjalankan sebuah buah, pastikan ia masih bisa keluar lagi.
+ex.trapped.tip.b1.2 = Buah yang masuk jauh ke daerahku bisa terjebak. Sisakan jalan keluar.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# "Luft" / "air" = "ruang napas" (a flight square for the king).
+ex.back_rank.b1 = {your} terkurung di belakang pion-pionnya. {my} bisa memberinya skak di baris belakang.
+ex.back_rank.b1.2 = Hati-hati: {your} tidak punya petak untuk lolos, dan {my} bisa mencapai {sq}.
+ex.back_rank.b1.3 = {my} bisa melangkah ke {sq}. {your} terkurung oleh pion-pionnya sendiri.
+ex.back_rank.b2 = Bahaya baris belakang: {your} tidak punya ruang napas. {my} bisa memberi skak di {sq}.
+ex.back_rank.b2.2 = {your} terkurung. {my} melangkah ke {sq} dan memenangkan materi.
+ex.back_rank.b2.3 = Baris belakangmu lemah: {my} bisa memberi skak kepada {your} di {sq}.
+ex.back_rank.b3 = Baris belakangmu lemah: {line}. {your} tidak punya petak untuk lolos.
+ex.back_rank.b3.2 = {your} tidak punya ruang napas, jadi {line} memenangkan materi.
+ex.back_rank.b3.3 = Setelah {line}, baris belakang menentukan: {your} terkurung.
+ex.back_rank.b4 = Baris belakang: {line}, dan {your} tidak punya ruang napas.
+ex.back_rank.b4.2 = {line} memanfaatkan baris belakang yang lemah di sekitar {your}.
+ex.back_rank.b4.3 = {your} tidak punya petak pelarian: {line}.
+ex.back_rank.b5 = Kelemahan baris belakang di sekitar {your}: {line}.
+ex.back_rank.b5.2 = {line}; {your} tak punya ruang napas.
+ex.back_rank.b6 = {line}, baris belakang; {your} terkurung.
+ex.back_rank.b6.2 = Baris belakang: {line} ({your}).
+ex.back_rank.tip.b1 = Beri rajamu sedikit celah: majukan satu pion di depannya.
+ex.back_rank.tip.b1.2 = Raja di belakang tiga pion bisa kena skakmat di baris belakang. Beri ia sedikit ruang.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} di {sq} tidak punya pelindung. {my} bisa memakannya gratis.
+ex.hanging.b1.2 = Lihat {your}: tidak ada yang melindunginya, dan {my} menyerangnya.
+ex.hanging.b1.3 = {your} tidak terlindungi. {my} bisa langsung memakannya.
+ex.hanging.b2 = {your} di {sq} tidak terlindungi. {my} memakannya, dan kamu tidak bisa memakan kembali.
+ex.hanging.b2.2 = {my} bisa memakan {your} gratis. Tidak ada yang melindunginya.
+ex.hanging.b2.3 = {your} dibiarkan sendirian di {sq}, dan {my} memakannya.
+ex.hanging.b3 = {move} membuat {your} tak terlindungi: {reply}, dan tidak ada yang bisa memakan kembali.
+ex.hanging.b3.2 = {your} di {sq} dimakan gratis dengan {reply}.
+ex.hanging.b3.3 = Setelah {reply}, {your} hilang tanpa imbalan.
+ex.hanging.b4 = {move} meninggalkan {your} tanpa perlindungan: {reply} memenangkan {pts:point}.
+ex.hanging.b4.2 = {reply} memakan {your} gratis.
+ex.hanging.b4.3 = {your} tak terlindungi; {reply} memakannya.
+ex.hanging.b5 = {move} membiarkan {your} tak terlindungi; {reply} memenangkannya.
+ex.hanging.b5.2 = {your} di {sq} jatuh karena {reply}.
+ex.hanging.b5.3 = {reply} memenangkan {your}.
+ex.hanging.b6 = {move}? {reply}, dan {your} jatuh.
+ex.hanging.b6.2 = {reply} memenangkan {your}.
+ex.hanging.b6.3 = {your} tak terlindungi: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = Tadi {your2} melindungi {your}. Sekarang {my} bisa memakannya.
+ex.hanging_guard.b1.2 = {your2} pergi, dan sekarang {your} sendirian. {my} memakannya.
+ex.hanging_guard.b2 = Tadinya {your2} melindungi {your}. Sekarang {your:bare} itu sendirian, dan {my} memakannya.
+ex.hanging_guard.b2.2 = Dengan memindahkan {your2}, kamu membiarkan {your} tak terjaga di hadapan {my}.
+ex.hanging_guard.b3 = Tadi {your2} menjaga {your}. Memindahkannya membuat {your:bare} itu termakan oleh {reply}.
+ex.hanging_guard.b3.2 = Tanpa {your2}, {your} tak terlindungi: {reply}.
+ex.hanging_guard.b4 = {move} menyingkirkan penjaga: {your2} meninggalkan {your}, dan {reply} memakannya.
+ex.hanging_guard.b4.2 = {your2} adalah satu-satunya pelindung {your}; {reply} memenangkannya.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = Tadi {my} sudah menyerang {your}. Selalu periksa apa yang diancam langkahku.
+ex.hanging_threat.b1.2 = Kamu tidak melihat ancamanku: {my} menyerang {your}.
+ex.hanging_threat.b2 = Langkah terakhirku menyerang {your} dengan {my}. Selalu perhatikan ancamanku.
+ex.hanging_threat.b2.2 = {my} sudah mengancam {your}, dan sekarang aku bisa memakannya.
+ex.hanging_threat.b3 = Kamu melewatkan ancamanku: {my} sudah menyerang {your}.
+ex.hanging_threat.b3.2 = Sejak tadi {my} sudah mengincar {your}.
+ex.hanging.tip.b1 = Sebelum setiap langkah, tanyakan pada dirimu: apakah semua buahku aman?
+ex.hanging.tip.b1.2 = Kebiasaan yang baik: setelah setiap langkah, periksa mana saja buahmu yang terlindungi.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. Indonesian says the points with their noun: {n:point}, {n2:point}.
+ex.exchange_capture.b1 = {your} memakan sebuah buah, tapi {my} memakan kembali. Pertukaran itu membuatmu rugi poin.
+ex.exchange_capture.b1.2 = {my} memakan kembali. {your} bernilai {n:point}, tapi kamu hanya mendapat {n2:point}.
+ex.exchange_capture.b1.3 = Hati-hati: {my} bisa memakan kembali {your}. Itu pertukaran yang buruk.
+ex.exchange_capture.b2 = Hati-hati dengan pertukaran: {your} bernilai {n:point}. {my} memakan kembali, dan kamu hanya mendapat {n2:point}.
+ex.exchange_capture.b2.2 = {my} memakan kembali {your}. Kamu kehilangan {n:point} dan hanya mendapat {n2:point}.
+ex.exchange_capture.b3 = Memakan di {sq} tidak berhasil: {your} hilang setelah {line}.
+ex.exchange_capture.b3.2 = {your} memakan di {sq}, tapi setelah {line}, kamu kehilangan {pts:point}.
+ex.exchange_capture.b4 = Dengan {move}, kamu salah hitung di {sq}: setelah {line}, {your} hilang.
+ex.exchange_capture.b4.2 = Memakan di {sq} membuatmu kehilangan {your}: {line}.
+ex.exchange_capture.b5 = Dengan {move}, {your} hilang dalam rangkaian pertukaran di {sq}: {line}.
+ex.exchange_capture.b5.2 = Di {sq}, {your} hilang: {line}.
+ex.exchange_capture.b6 = {move} membuat {your} hilang di {sq} setelah {line}.
+ex.exchange_capture.b6.2 = {line} di {sq}, dan {your} hilang.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+# One plural form: "{n} penyerang", "{n2} pelindung" are written directly (no count key needed).
+ex.exchange_count.b1 = Hitung: petak {sq} kuserang {n:time}, dan kamu melindunginya {n2:time}.
+ex.exchange_count.b1.2 = Di petak {sq}, aku punya {n} penyerang dan kamu punya {n2} pelindung. Aku menang di situ.
+ex.exchange_count.b2 = Petak {sq} diserang {n:time} dan dilindungi {n2:time}. Kamu akan kehilangan materi di sana.
+ex.exchange_count.b2.2 = Hitung di petak {sq}: {n} penyerang melawan {n2} pelindung.
+ex.exchange_count.b3 = Hitung penyerang dan pelindung di petak {sq}: penyerangku lebih banyak.
+ex.exchange_count.b3.2 = Pertukaran di {sq} tidak berhasil: setelah {line}, kamu kehilangan {pts:point}.
+ex.exchange_count.b4 = Dengan {move}, kamu salah hitung di {sq}: {line}, dan kamu kehilangan {pts:point}.
+ex.exchange_count.b4.2 = Petak {sq} lebih banyak diserang daripada dilindungi: {line}.
+ex.exchange_count.b5 = Di {sq}, {n} penyerang mengalahkan {n2} pelindung: {line}.
+ex.exchange_count.b5.2 = Dengan {move}, kamu kalah hitungan di {sq}.
+ex.exchange_count.b6 = {line} di {sq}, dan aku memenangkan {pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n} lawan {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = Nilai {my} lebih rendah daripada {your}. Kalau aku memakan, kamu rugi poin.
+ex.exchange_cheap.b1.2 = {my} menyerang {your}. Menukar keduanya merugikanmu.
+ex.exchange_cheap.b2 = {your} bernilai {n:point}, sedangkan {my} hanya {n2:point}. Pertukaran itu merugikanmu.
+ex.exchange_cheap.b2.2 = Nilai {my} lebih rendah daripada {your}, jadi serangannya memenangkan materi.
+ex.exchange_cheap.b3 = {your} di {sq} diserang oleh buah yang nilainya lebih rendah.
+ex.exchange_cheap.b3.2 = Buah bernilai {n2:point} menyerang {your} di {sq}: {line}.
+ex.exchange_cheap.b4 = {your} di {sq} diserang buah yang nilainya lebih rendah; {reply} memenangkan materi.
+ex.exchange_cheap.b4.2 = {reply} menyerang {your} di {sq} dengan buah yang nilainya lebih rendah.
+ex.exchange_cheap.b5 = {your} di {sq} terbuka bagi penyerang yang nilainya lebih rendah: {line}.
+ex.exchange_cheap.b5.2 = {reply} memenangkan materi melawan {your} di {sq}.
+ex.exchange_cheap.b6 = {reply} memenangkan {your} di {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} di {sq} hilang.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Hati-hati: sekarang aku bisa memenangkan {t1}.
+ex.material.b1.2 = Langkah itu membuat {t1} dalam kesulitan. Aku bisa memenangkannya.
+ex.material.b2 = Langkah ini membuatku bisa memenangkan {t1}.
+ex.material.b2.2 = Sekarang {t1} dalam kesulitan, dan aku memenangkannya.
+ex.material.b3 = {move} membuatmu kehilangan materi: setelah {line}, kamu rugi {pts:point}.
+ex.material.b3.2 = Setelah {line}, kamu tertinggal {pts:point}.
+ex.material.b4 = {move} membuatmu kehilangan materi: {line}, dan kamu rugi {pts:point}.
+ex.material.b4.2 = Setelah {line}, kamu tertinggal {pts:point}.
+ex.material.b5 = {move} membuatmu kehilangan materi: {line}.
+ex.material.b5.2 = {line} memberiku {pts:point}.
+ex.material.b6 = {line}, dan aku memenangkan {pts:point}.
+ex.material.b6.2 = {move} berarti rugi {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Kamu lihat? Tadi {my} di {sq} gratis. {your} sebenarnya bisa memakannya.
+ex.missed_capture.b1.2 = Lihat: {my} tidak punya pelindung. {your} sebenarnya bisa memakannya.
+ex.missed_capture.b1.3 = {my} di {sq} tidak terlindungi. {your} sebenarnya bisa menyambarnya!
+ex.missed_capture.b2 = Kamu melewatkan buah gratis: {best} memenangkan {my}.
+ex.missed_capture.b2.2 = Tadi {my} di {sq} tidak terlindungi. {best} memakannya. Lain kali, sambar saja!
+ex.missed_capture.b2.3 = {best} akan memenangkan {my} secara gratis.
+ex.missed_capture.b3 = {best} akan memenangkan {my} tanpa kehilangan apa pun.
+ex.missed_capture.b3.2 = {my} di {sq} tidak terlindungi: {best}. Cari buah yang tak terlindungi di setiap langkah.
+ex.missed_capture.b3.3 = Tadi kamu bisa memakan {my} dengan {best}.
+ex.missed_capture.b4 = Terlewat: {best} memakan {my} di {sq}.
+ex.missed_capture.b4.2 = {best} memenangkan {my}, yang tak terlindungi.
+ex.missed_capture.b4.3 = {my} tak terlindungi: {best}.
+ex.missed_capture.b5 = {best} memenangkan {my}; {move} membiarkannya lolos.
+ex.missed_capture.b5.2 = {my} di {sq} tak terlindungi: {best}.
+ex.missed_capture.b6 = {best}! {my} di {sq} tak terlindungi.
+ex.missed_capture.b6.2 = {best} memenangkan {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Tadi kamu punya serangan ganda: {best} menyerang {t1} dan {t2}!
+ex.missed_fork.b1.2 = Lihat! {best} akan menyerang {t1} dan {t2} sekaligus.
+ex.missed_fork.b1.3 = {best} adalah garpu: {t1} dan {t2} sama-sama diserang.
+ex.missed_fork.b2 = {best} adalah garpu pada {t1} dan {t2}.
+ex.missed_fork.b2.2 = Kamu melewatkan serangan ganda: {best}, yang menyerang {t1} dan {t2}.
+ex.missed_fork.b2.3 = {best} menyerang {t1} dan {t2} sekaligus. Garpu!
+ex.missed_fork.b3 = {best} adalah garpu pada {t1} dan {t2}.
+ex.missed_fork.b3.2 = Tadi ada {best}, yang menggarpu {t1} dan {t2}.
+ex.missed_fork.b3.3 = {best} akan menggarpu {t1} dan {t2}.
+ex.missed_fork.b4 = {best} menggarpu {t1} dan {t2}.
+ex.missed_fork.b4.2 = Garpu terlewat: {best} pada {t1} dan {t2}.
+ex.missed_fork.b5 = {best} menggarpu {t1} dan {t2}.
+ex.missed_fork.b5.2 = {best} menyerang {t1} dan {t2}.
+ex.missed_fork.b6 = {best} menggarpu {t1} dan {t2}.
+ex.missed_fork.b6.2 = {best}: garpu pada {t1} dan {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# The rule of the square = "aturan bujur sangkar" ("di luar bujur sangkar pion").
+ex.promotion.b1 = {my} bisa berlari ke {sq} dan menjadi menteri. {your} terlalu jauh.
+ex.promotion.b1.2 = Lihat: tidak ada yang bisa menghentikan {my} mencapai {sq}. {your} tidak bisa mengejarnya.
+ex.promotion.b1.3 = {my} berjarak {n:square} dari {sq}, dan {your} terlalu lambat.
+ex.promotion.b2 = {my} berlari ke {sq}, dan {your} tidak bisa mengejarnya.
+ex.promotion.b2.2 = {my} butuh {n:move} untuk mencapai {sq}; {your} butuh {n2:move}. Terlalu lambat.
+ex.promotion.b2.3 = Hati-hati: {my} menjadi menteri di {sq}, dan {your} terlalu jauh.
+ex.promotion.b3 = {my} berada di luar bujur sangkar: {your} tidak bisa mengejarnya sebelum {sq}.
+ex.promotion.b3.2 = Kamu kalah adu cepat: {my} mencapai {sq} lebih dulu daripada {your}.
+ex.promotion.b4 = {your} berada di luar bujur sangkar pion; pion itu menjadi menteri di {sq}.
+ex.promotion.b4.2 = {my} promosi di {sq}; {your} kurang satu langkah.
+ex.promotion.b5 = Adu cepat pion sudah kalah: {your} di luar bujur sangkar menuju {sq}.
+ex.promotion.b5.2 = {line}: aku mendapat menteri di {sq} dan {your} terlambat.
+ex.promotion.b6 = {your} di luar bujur sangkar; aku mendapat menteri di {sq}.
+ex.promotion.b6.2 = {line}, lalu promosi menjadi menteri di {sq} ({your} terlambat).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Tadi pionmu bisa berlari ke {sq} dan menjadi menteri!
+ex.promotion_missed.b1.2 = Lihat petak {sq}! Pionmu bisa melaju ke sana.
+ex.promotion_missed.b2 = Tadi pionmu bisa berlari ke {sq}. Majukan pion bebas!
+ex.promotion_missed.b2.2 = Tidak ada yang menghalangi pionmu menuju {sq}.
+ex.promotion_missed.b3 = {best} memenangkan adu cepat ke {sq}.
+ex.promotion_missed.b3.2 = Pionmu lebih cepat: {best}, dan ia menjadi menteri di {sq}.
+ex.promotion_missed.b4 = {best} memenangkan adu cepat pion ke {sq}.
+ex.promotion_missed.b4.2 = {best}! Pion itu menjadi menteri di {sq}.
+ex.promotion_missed.b5 = Dengan {best}, pionmu lebih dulu menjadi menteri di {sq}.
+ex.promotion_missed.b5.2 = {best}, dan petak {sq} milikmu.
+ex.promotion_missed.b6 = {best} memenangkan adu cepat ke {sq}.
+ex.promotion_missed.b6.2 = {best}; {sq} lebih dulu.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Pion itu tadi melindungi {your}. Sekarang {your} kurang terlindungi.
+ex.king_shield.b1.2 = Pion dari {sq} adalah perisai bagi {your}. Sekarang buah-buahku bisa masuk.
+ex.king_shield.b2 = Memindahkan pion dari {sq} melemahkan posisi {your}. Sekarang buah-buahku bisa menyerangnya.
+ex.king_shield.b2.2 = {your} kehilangan penjaga: pion di {sq} adalah perisainya.
+ex.king_shield.b3 = Langkah pion itu membuka {your} untuk seranganku.
+ex.king_shield.b3.2 = {your} kehilangan perlindungan pion, dan buah-buahku masuk.
+ex.king_shield.b4 = {move} melemahkan pion-pion di sekitar {your}; seranganku bisa masuk.
+ex.king_shield.b4.2 = Perisai di sekitar {your} jebol setelah {move}.
+ex.king_shield.b5 = {move} melonggarkan perlindungan {your}: {line}.
+ex.king_shield.b5.2 = Setelah {move}, {your} terbuka: {line}.
+ex.king_shield.b6 = {move} melemahkan {your}: {line}.
+ex.king_shield.b6.2 = {line}; {your} terlalu terbuka.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} dalam bahaya. Buah-buahku sedang mendekatinya.
+ex.king_exposed.b1.2 = Lihat betapa terbukanya {your}. Jaga ia tetap aman di balik pion-pionnya.
+ex.king_exposed.b2 = {your} terlalu terbuka. Sekarang aku bisa memberi banyak skak.
+ex.king_exposed.b2.2 = Hati-hati: {your} tidak punya tempat berlindung, dan buah-buahku menyerangnya.
+ex.king_exposed.b3 = {your} terbuka; buah-buahku bisa menyerangnya dengan skak.
+ex.king_exposed.b3.2 = Setelah ini, {your} tidak punya tempat berlindung.
+ex.king_exposed.b4 = {your} jadi terbuka: {line}.
+ex.king_exposed.b4.2 = {move} membuat {your} terbuka terhadap serangan.
+ex.king_exposed.b5 = {your} terlalu terbuka: {line}.
+ex.king_exposed.b5.2 = {move} membiarkan {your} tanpa perlindungan.
+ex.king_exposed.b6 = {line}; {your} terbuka.
+ex.king_exposed.b6.2 = {your} terlalu terbuka: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Pertukaran ini menuju permainan akhir pion yang aku menangkan.
+ex.bad_trade.b3.2 = Setelah {line}, hanya pion yang tersisa, dan rajaku lebih unggul.
+ex.bad_trade.b4 = Rangkaian pertukaran ini menuju permainan akhir pion yang kalah: {line}.
+ex.bad_trade.b4.2 = Menukar menuju permainan akhir pion ini berarti kalah.
+ex.bad_trade.b5 = Pertukaran yang salah: permainan akhir pion setelah {line} kalah.
+ex.bad_trade.b5.2 = Permainan akhir pion itu kalah; pertahankan buah-buahmu di papan.
+ex.bad_trade.b6 = Permainan akhir pion setelah {line} kalah.
+ex.bad_trade.b6.2 = Permainan akhir pion yang kalah: {line}.
+ex.bishop_pair.b5 = Pertukaran itu membuatmu kehilangan pasangan gajah.
+ex.bishop_pair.b5.2 = Pertukaran itu melepas pasangan gajahmu; pasangan gajahku tetap ada.
+ex.bishop_pair.b6 = Pasangan gajah hilang.
+ex.bishop_pair.b6.2 = Pasangan gajah dilepas.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} mengambil oposisi: kedua raja berhadapan dengan satu petak di antaranya.
+ex.opposition.b3.2 = Lihat kedua raja! {best} akan mengambil oposisi.
+ex.opposition.b4 = {best} mengambil oposisi: itulah intinya.
+ex.opposition.b4.2 = Oposisi yang menentukan: {best}.
+ex.opposition.b5 = {best}, mengambil oposisi.
+ex.opposition.b5.2 = Oposisi: {best}.
+ex.opposition.b6 = {best}, oposisi.
+ex.opposition.b6.2 = {best}: oposisi.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Pionmu bisa berlari ke {sq}. Pion bebas ingin terus maju!
+ex.push_passed.b1.2 = Majukan pion bebasmu! Ia ingin mencapai {sq}.
+ex.push_passed.b1.3 = Pion bebasmu ingin melaju ke {sq}. Majukan!
+ex.push_passed.b2 = {best}: majukan pion bebas menuju {sq}.
+ex.push_passed.b2.2 = Pion bebasmu kuat. {best} memajukannya.
+ex.push_passed.b2.3 = Majukan! {best} membawa pion lebih dekat ke {sq}.
+ex.push_passed.b3 = {best} memajukan pion bebas.
+ex.push_passed.b3.2 = Pion bebas harus dimajukan: {best}.
+ex.push_passed.b3.3 = {best} adalah caranya: pion melaju ke {sq}.
+ex.push_passed.b4 = {best}: pion bebas yang menentukan.
+ex.push_passed.b4.2 = Majukan: {best}.
+ex.push_passed.b5 = {best}, memajukan pion bebas: {eval}.
+ex.push_passed.b5.2 = Pion bebas: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, pion bebas.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Majukan {your}! Di permainan akhir, raja adalah buah yang kuat.
+ex.king_active.b1.2 = Sekarang {your} bisa ikut bertarung. Bawa ia ke tengah.
+ex.king_active.b1.3 = Dengan sedikit buah tersisa, {your} sebaiknya keluar dan membantu.
+ex.king_active.b2 = Di permainan akhir, gunakan {your}: bawa ia ke pusat.
+ex.king_active.b2.2 = {your} sebaiknya aktif sekarang. Bawa ia maju.
+ex.king_active.b3 = {best} mengaktifkan raja. Di permainan akhir, raja ikut bertarung.
+ex.king_active.b3.2 = {best}: sekarang tempat raja di pusat.
+ex.king_active.b4 = {best} membawa raja ke pusat.
+ex.king_active.b4.2 = Raja sebaiknya maju: {best}.
+ex.king_active.b5 = {best}, mengaktifkan raja: {line}.
+ex.king_active.b5.2 = Aktivitas raja: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, raja maju.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} mempertahankan posisi yang lebih baik.
+ex.positional.b4.2 = {best} lebih kuat di sini.
+ex.positional.b4.3 = Aku lebih memilih {best}.
+ex.positional.b5 = {best} lebih kuat: {line}.
+ex.positional.b5.2 = {best}, dengan ide {line}.
+ex.positional.b5.3 = Pertimbangkan {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} keluar sangat awal. Keluarkan dulu kuda dan gajahmu.
+tip.early_queen.b1.2 = Hati-hati memainkan {your} sedini ini: buah-buahku bisa mengejar-ngejarnya.
+tip.early_queen.b1.3 = Menjalankan {your} memang seru, tapi kembangkan dulu buah-buah kecil: kuda dan gajah.
+tip.early_queen.b2 = Menjalankan {your} sedini ini membuatku bisa menyerangnya dan menang waktu.
+tip.early_queen.b2.2 = {your} sudah keluar secepat ini? Kuda dan gajah dulu!
+tip.early_queen.b3 = {your} keluar terlalu dini, dan aku bisa menyerangnya sambil mendapat tempo.
+tip.early_queen.b3.2 = {your} mudah dikejar sedini ini. Kembangkan buah dulu.
+tip.queen_grab.b1 = {your} memakan pion yang jauh, dan sekarang ia bisa dalam bahaya.
+tip.queen_grab.b1.2 = Mengambil pion dengan {your} membuang waktu. Kembangkan buah dulu!
+tip.queen_grab.b2 = {your} pergi memburu pion di pinggir. Itu membuang banyak waktu.
+tip.queen_grab.b2.2 = Hati-hati mengirim {your} untuk mengejar pion yang jauh.
+tip.queen_grab.b3 = Memburu pion dengan {your} sedini ini membuang waktu.
+tip.queen_grab.b3.2 = {your} sekarang jauh dari rumah; pengembangan buahku akan terasa hasilnya.
+tip.queen_grab.b4 = {your} mengambil pion tapi kehilangan terlalu banyak waktu.
+tip.queen_grab.b4.2 = Mengambil pion di pinggir dengan {your} membuang tempo.
+tip.same_piece.b1 = Kamu menjalankan {your} dua kali. Cobalah keluarkan buah baru di setiap langkah.
+tip.same_piece.b1.2 = {your} lagi? Keluarkan juga buah-buahmu yang lain.
+tip.same_piece.b1.3 = Di setiap langkah, cobalah kembangkan buah baru, bukan {your} lagi.
+tip.same_piece.b2 = Menjalankan {your} dua kali di pembukaan membuang waktu.
+tip.same_piece.b2.2 = {your} bergerak lagi; buah-buahmu yang lain masih di tempat awal.
+tip.same_piece.b3 = Menjalankan {your} dua kali menghambat pengembangan buah.
+tip.same_piece.b3.2 = Langkah lagi dengan {your}; sisa pasukanmu masih menunggu.
+tip.castle.b1 = {your} masih di tengah. Rokade akan membuatnya aman.
+tip.castle.b1.2 = Waktunya rokade! {your} lebih aman di sudut.
+tip.castle.b1.3 = Pikirkan untuk segera melakukan rokade. {your} sedang terbuka.
+tip.castle.b2 = {your} masih di pusat. Segera lakukan rokade!
+tip.castle.b2.2 = Rokade akan menyimpan {your} di tempat yang aman.
+tip.castle.b3 = Pusat mulai terbuka, jadi sebaiknya amankan {your} dengan rokade.
+tip.castle.b3.2 = {your} masih di pusat; sudah waktunya rokade.
+# "A knight on the rim is dim" keeps a rhyme: "Kuda di tepi tak berarti".
+tip.knight_rim.b1 = {your} di pinggir tidak banyak berguna. Kuda suka di tengah.
+tip.knight_rim.b1.2 = Kuda di tepi tak berarti! Di sana, {your} menguasai lebih sedikit petak.
+tip.knight_rim.b2 = {your} di tepi hanya menguasai sedikit petak. Arahkan ke pusat.
+tip.knight_rim.b2.2 = Kuda di tepi tak berarti: {your} ingin ke pusat.
+tip.knight_rim.b3 = {your} tersisih di tepi papan.
+tip.knight_rim.b3.2 = Tepi papan adalah tempat yang buruk bagi {your}.
+tip.flank.b1 = Cobalah majukan pion-pion tengah dulu. Pion di pinggir tidak banyak membantu.
+tip.flank.b1.2 = Pion di pinggir tidak membantu buah-buahmu keluar. Gunakan pion tengah.
+tip.flank.b2 = Langkah pion pinggir tidak mengembangkan apa pun. Gunakan pion pusat.
+tip.flank.b2.2 = Terlalu banyak langkah pion pinggir. Kembangkan buah-buahmu!
+tip.flank.b3 = Langkah pion sayap di pembukaan menghambat pengembangan buah.
+tip.flank.b3.2 = Pion pinggir bisa menunggu; kembangkan buah dan perebutkan pusat.
+tip.centre.b1 = Cobalah kuasai tengah papan, seperti petak {sq}.
+tip.centre.b1.2 = Pusat itu penting. Taruh pion atau buah lain di dekat {sq}.
+tip.centre.b1.3 = Buah di tengah itu kuat. Arahkan buahmu ke petak seperti {sq}.
+tip.centre.b2 = Perebutkan pusat: petak seperti {sq} itu penting.
+tip.centre.b2.2 = Kamu menyerahkan pusat kepadaku. Lihat petak {sq}.
+tip.centre.b3 = Kamu tidak memperebutkan pusat; petak {sq} milikku.
+tip.centre.b3.2 = Perebutkan pusat di sekitar petak {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Kalau tinggal raja sendirian, dorong ia ke tepi papan, lalu beri skakmat.
+tip.mate_technique.b1.2 = Tips: desak rajaku ke tepi. Dekatkan juga rajamu.
+tip.fifty.b1 = Hati-hati: setelah lima puluh langkah tanpa ada yang dimakan atau pion bergerak, hasilnya remis.
+tip.fifty.b1.2 = Waktunya makin sempit: lima puluh langkah tanpa ada yang dimakan atau pion bergerak berarti remis.
+tip.repetition.b1 = Hati-hati! Kalau posisi yang sama muncul untuk ketiga kalinya, hasilnya remis.
+tip.repetition.b1.2 = Hindari mengulang langkah: pengulangan ketiga berarti remis, padahal kamu sedang menang.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Wah, kamu mengorbankan sebuah buah, dan itu berhasil!
+praise.sacrifice.2 = Pengorbanan yang cerdik! Permainan yang sangat bagus.
+praise.brilliant.b3 = Brilian! Pengorbanan sungguhan.
+praise.brilliant.b3.2 = Wah, {move} adalah pengorbanan yang hebat!
+praise.brilliant.b4 = {move}! Pengorbanan yang brilian.
+praise.brilliant.b4.2 = Brilian. Aku tidak menyangka itu.
+praise.brilliant.b5 = {move}!! Brilian.
+praise.brilliant.b5.spoken = {move}. Brilian!
+praise.brilliant.b5.2 = Pengorbanan yang brilian.
+praise.brilliant.b6 = {move}!! Luar biasa.
+praise.brilliant.b6.spoken = {move}. Luar biasa!
+praise.brilliant.b6.2 = Brilian.
+praise.great.b2 = Langkah hebat! Kamu menemukan cara untuk melawan balik.
+praise.great.b2.2 = Itu langkah yang hebat. Jeli sekali!
+praise.great.b3 = Langkah hebat! Kamu menemukan satu-satunya ide yang bagus.
+praise.great.b3.2 = Luar biasa, {move} membalikkan keadaan.
+praise.great.b4 = {move}! Temuan yang hebat.
+praise.great.b4.2 = Langkah hebat.
+praise.great.b5 = {move}! Jeli sekali.
+praise.great.b5.2 = Kuat: {move}.
+praise.great.b6 = {move}! Hebat.
+praise.great.b6.2 = Temuan hebat.
+praise.only.b2 = Bagus! Itu satu-satunya langkah yang bagus.
+praise.only.b2.2 = Bagus sekali, kamu menemukan satu-satunya langkah yang berhasil.
+praise.only.b3 = Satu-satunya langkah, dan kamu menemukannya.
+praise.only.b3.2 = Tepat! Tidak ada langkah lain yang berhasil di sini.
+praise.only.b4 = Satu-satunya langkah. Bagus sekali.
+praise.only.b4.2 = Satu-satunya langkah, ditemukan.
+praise.only.b5 = Satu-satunya langkah. Bagus.
+praise.only.b5.2 = {move}, satu-satunya langkah.
+praise.only.b6 = Satu-satunya langkah.
+praise.only.b6.2 = Akurat: satu-satunya langkah.
+praise.fork.b2 = Serangan ganda! Bagus sekali.
+praise.fork.b2.2 = Kamu menyerang dua buah sekaligus! Hebat.
+praise.fork.b2.3 = Bagus! Itu garpu.
+praise.fork.b3 = Garpu yang bagus.
+praise.fork.b3.2 = Garpu yang jitu!
+praise.fork.b3.3 = Garpu. Permainan yang bagus.
+praise.capture.b1 = Bagus sekali! Kamu memakan {my} gratis.
+praise.capture.b1.2 = Jeli sekali! {my} tidak terlindungi.
+praise.capture.b1.3 = Ya! Kamu memenangkan {my}.
+praise.capture.b2 = Tangkapan bagus! {my} tak terlindungi.
+praise.capture.b2.2 = Bagus, kamu menyambar {my}.
+praise.capture.b2.3 = Jeli: {my} tak terlindungi.
+praise.best.b1 = Langkah bagus!
+praise.best.b1.2 = Bagus sekali!
+praise.best.b1.3 = Permainan yang bagus!
+praise.best.b2 = Langkah bagus.
+praise.best.b2.2 = Bagus sekali.
+praise.best.b2.3 = Permainan yang bagus.
+praise.best.b3 = Langkah bagus: tidak mudah ditemukan.
+praise.best.b3.2 = Jeli sekali.
+praise.best.b3.3 = {move} adalah langkah terbaik di sini. Bagus.
+praise.trade.b1 = Bagus! Kalau kamu unggul, menukar buah menguntungkanmu.
+praise.trade.b1.2 = Pertukaran yang bagus. Kamu unggul, jadi makin sedikit buah makin baik untukmu.
+praise.trade.b2 = Pertukaran bagus: kamu unggul, jadi tukarlah buah.
+praise.trade.b2.2 = Menukar {my} saat kamu unggul itu cerdas.
+praise.trade.b3 = Bagus: menukar saat unggul.
+praise.trade.b3.2 = Pertukaran yang masuk akal.
+praise.excellent.b3 = Langkah yang luar biasa.
+praise.excellent.b3.2 = Itu langkah yang kuat.
+praise.excellent.b3.3 = Sangat akurat.
+praise.excellent.b4 = Akurat.
+praise.excellent.b4.2 = Luar biasa.
+praise.excellent.b4.3 = Bagus, {move} akurat.
+praise.castle.b1 = Bagus! Kamu sudah melakukan rokade. Rajamu lebih aman sekarang.
+praise.castle.b1.2 = Rokade yang bagus! Rajamu tersimpan aman.
+praise.saved.b1 = Bagus! Kamu menyelamatkan buahmu.
+praise.saved.b1.2 = Bagus sekali, kamu memindahkannya ke tempat aman.
+praise.book.b1 = Bagus, itu langkah pembukaan yang terkenal.
+praise.book.b1.2 = Bagus, pemain kuat juga memulai seperti itu.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Hati-hati! Aku mengancam skakmat di {sq}.
+threat.mate.b1.2 = Awas: {my} ingin melangkah ke {sq}. Itu akan jadi skakmat.
+threat.mate.b1.3 = Lihat petak {sq}. Kalau aku sampai di sana, itu skakmat!
+threat.mate.b2 = Hati-hati, aku mengancam skakmat.
+threat.mate.b2.2 = Awas: ada ancaman skakmat di {sq}.
+threat.mate.b2.3 = Perhatikan baik-baik: aku mengancam skakmat.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Lihat: {my} sedang menyerang {your}.
+threat.piece.b1.2 = Hati-hati! {your} diserang oleh {my}.
+threat.piece.b1.3 = Awas, {my} ingin memakan {your}.
+threat.piece.b2 = Hati-hati dengan {your}.
+threat.piece.b2.2 = {your} sedang diserang.
+threat.piece.b2.3 = Perhatikan {your}.
+threat.punish.b1 = Langkah terakhirku adalah kesalahan. Bisakah kamu menghukum kesalahan itu?
+threat.punish.b1.2 = Hmm, sepertinya aku membuat kesalahan. Bisakah kamu menemukannya?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Kali ini, pikirkan {your}.
+tb.hint.b1.2 = Awasi {your}.
+tb.hint.king.b1 = Pikirkan keamanan {your}.
+tb.hint.king.b1.2 = Lihat {your} dulu. Apakah ia aman?
+tb.hint.missed.b1 = Cari buah yang bisa kamu makan gratis.
+tb.hint.missed.b1.2 = Lihat baik-baik: adakah yang bisa kamu makan?
+tb.hint.mate_missed.b1 = Lihat rajaku. Bisakah kamu memberinya skakmat?
+tb.hint.mate_missed.b1.2 = Coba langkah-langkah skak dulu. Mungkin ada skakmat!
+tb.hint.general.b1 = Tidak usah terburu-buru, lihat seluruh papan.
+tb.hint.general.b1.2 = Coba cari langkah yang lebih aman.
+# The retry.
+tb.fixed.b1 = Jauh lebih baik!
+tb.fixed.b1.2 = Ya, itu lebih baik!
+tb.fixed.b1.3 = Bagus, langkah itu jauh lebih baik.
+tb.fixed = Itu lebih baik.
+tb.fixed.2 = Lebih baik.
+tb.fixed.3 = Koreksi yang bagus.
+tb.same = Langkah yang sama lagi? Baiklah, kita lihat.
+tb.same.2 = Kamu suka langkah itu, ya. Ayo kita lihat kelanjutannya.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Ya! Itu langkah yang kupikirkan.
+tb.found.b1.2 = Kamu menemukannya! Itu langkah yang lebih baik.
+tb.found = Itu langkah yang ada di pikiranku.
+tb.found.2 = Tepat, itu dia.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Sayang sekali, jatah ambil kembali langkah di permainan ini sudah habis.
+tb.none_left.2 = Kamu tidak punya jatah ambil kembali langkah lagi di permainan ini.

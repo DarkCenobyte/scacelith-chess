@@ -51,6 +51,11 @@ const FaceDesc kFaces[FACE_COUNT] = {
     {"assets/fonts/hand/LXGWWenKai-Hand.ttf", 56.0f, 7, 2, 0.92f},
     {"assets/fonts/hand/LXGWWenKaiTC-Hand.ttf", 56.0f, 7, 2, 0.92f},
     {"assets/fonts/AmiriUI-Regular.ttf", 56.0f, 7, 4, 1.12f},
+    {"assets/fonts/GowunBatangUI-Regular.ttf", 56.0f, 7, 2, 0.94f},
+    {"assets/fonts/TiroDevanagariUI-Regular.ttf", 56.0f, 7, 4, 1.0f},
+    {"assets/fonts/hand/NanumPenScript-Hand.ttf", 56.0f, 7, 2, 1.0f},
+    {"assets/fonts/hand/Kalam-Hand.ttf", 56.0f, 7, 4, 1.0f},
+    {"assets/fonts/hand/Mynerve-Hand.ttf", 56.0f, 7, 4, 1.0f},
 };
 
 struct Slot {
@@ -91,6 +96,10 @@ bool g_ready = false;
 int g_langGen = -1;
 int g_hanOrder[3] = {FACE_HAND_SC, FACE_HAND_TC, FACE_HAND_JA};
 int g_punctOrder[3] = {FACE_HAND_SC, FACE_HAND_TC, FACE_HAND_JA};
+// Face of each hand style for the current language (a stand-in when the style's face lacks some of
+// the language's letters).
+int g_styleFace[HAND_STYLE_COUNT] = {FACE_HAND_CAVEAT, FACE_HAND_MARCK, FACE_HAND_BADSCRIPT};
+int g_orderGen = -1;   // i18n generation the two lists above were made for
 
 // ---- Distance transform -------------------------------------------------------------------------
 struct Scratch {
@@ -329,8 +338,41 @@ void addRange(std::vector<uint32_t>& v, uint32_t a, uint32_t b) {
     for (uint32_t c = a; c <= b; ++c) v.push_back(c);
 }
 
-// Han / CJK punctuation face order for the current language.
+// Letters of Latin, Greek and Cyrillic, the scripts of the hand styles.
+bool styleLetter(uint32_t c) {
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0xC0 && c <= 0x24F && c != 0xD7 && c != 0xF7) ||
+           (c >= 0x370 && c <= 0x52F) || (c >= 0x1E00 && c <= 0x1FFF);
+}
+
+// Hand style faces for the current language: each style's own face when it has every letter of
+// the language's strings, else the first stand-in that has them (each style its own order, so
+// that two players keep different hands where possible).
+void updateStyleFaces() {
+    static const int kCandidates[HAND_STYLE_COUNT][4] = {
+        {FACE_HAND_CAVEAT, FACE_HAND_MYNERVE, FACE_HAND_BADSCRIPT, FACE_HAND_MARCK},
+        {FACE_HAND_MARCK, FACE_HAND_BADSCRIPT, FACE_HAND_MYNERVE, FACE_HAND_CAVEAT},
+        {FACE_HAND_BADSCRIPT, FACE_HAND_MYNERVE, FACE_HAND_CAVEAT, FACE_HAND_MARCK},
+    };
+    std::vector<uint32_t> letters;
+    for (uint32_t cp : i18n::codepoints())
+        if (styleLetter(cp)) letters.push_back(cp);
+    for (int s = 0; s < HAND_STYLE_COUNT; ++s) {
+        g_styleFace[s] = kCandidates[s][0];
+        for (int f : kCandidates[s]) {
+            bool all = g_faces[f].ok;
+            for (size_t i = 0; all && i < letters.size(); ++i) all = stbtt_FindGlyphIndex(&g_faces[f].info, int(letters[i])) != 0;
+            if (all) {
+                g_styleFace[s] = f;
+                break;
+            }
+        }
+    }
+}
+
+// Han / CJK punctuation face order and hand style faces for the current language.
 void updateLanguageOrder() {
+    g_orderGen = i18n::generation();
+    updateStyleFaces();
     const std::string& lang = i18n::language();
     if (lang == "ja") {
         int h[3] = {FACE_HAND_JA, FACE_HAND_SC, FACE_HAND_TC};
@@ -368,16 +410,24 @@ int fallbackChain(int face, uint32_t cp, int* out) {
         for (int f : g_hanOrder) add(f);
     } else if (uni::isCjkPunct(cp)) {
         for (int f : g_punctOrder) add(f);
+    } else if (uni::isHangul(cp)) {
+        if (hand) add(FACE_HAND_KO);
+        add(FACE_KOREAN);
+        add(FACE_HAND_KO);
+    } else if (uni::isDevanagari(cp)) {
+        if (hand) add(FACE_HAND_HI);
+        add(FACE_DEVANAGARI);
+        add(FACE_HAND_HI);
     }
     if (hand) {
         add(FACE_HAND_CAVEAT);
         add(FACE_HAND_MARCK);
         add(FACE_HAND_BADSCRIPT);
+        add(FACE_HAND_MYNERVE);
     }
     add(FACE_TEXT);
     add(FACE_SYMBOL);
-    for (int f = FACE_HAND_CAVEAT; f <= FACE_HAND_TC; ++f) add(f);
-    add(FACE_ARABIC);
+    for (int f = 0; f < FACE_COUNT; ++f) add(f);
     return n;
 }
 
@@ -411,7 +461,7 @@ void prewarmLanguage() {
             if (seen.insert(key).second) want.push_back({used, cp});
             // Title-face fallbacks draw lowercase Cyrillic / Greek as small capitals.
             if (f == FACE_TITLE && used != FACE_TITLE && uni::isLower(cp)) {
-                uint32_t up = uint32_t(uni::toUpper(char32_t(cp)));
+                uint32_t up = uint32_t(uni::toCapital(char32_t(cp), i18n::language() == "tr"));
                 int u2 = resolveFace(FACE_TITLE, up);
                 uint64_t k2 = (uint64_t(uint32_t(u2)) << 32) | up;
                 if (u2 >= 0 && seen.insert(k2).second) want.push_back({u2, up});
@@ -507,6 +557,7 @@ void shutdown() {
     for (auto& f : g_faces) f = FaceData();
     g_ready = false;
     g_langGen = -1;
+    g_orderGen = -1;
 }
 
 bool ready() { return g_ready; }
@@ -646,7 +697,9 @@ float fallbackScale(int requested, int used) {
     return kFaces[used].fallbackScale;
 }
 
-bool isHandwritingFace(int face) { return face >= FACE_HAND_CAVEAT && face <= FACE_HAND_TC; }
+bool isHandwritingFace(int face) {
+    return (face >= FACE_HAND_CAVEAT && face <= FACE_HAND_TC) || (face >= FACE_HAND_KO && face <= FACE_HAND_MYNERVE);
+}
 
 const char* handStyleName(int style) {
     switch (style) {
@@ -657,8 +710,8 @@ const char* handStyleName(int style) {
 }
 
 int handwritingFace(int style, uint32_t cp) {
-    if (g_langGen != i18n::generation()) updateLanguageOrder();
-    int latin = FACE_HAND_CAVEAT + std::clamp(style, 0, HAND_STYLE_COUNT - 1);
+    if (g_orderGen != i18n::generation()) updateLanguageOrder();
+    int latin = g_styleFace[std::clamp(style, 0, HAND_STYLE_COUNT - 1)];
     int order[10];
     int n = 0;
     if (uni::isArabic(cp)) {
@@ -669,9 +722,14 @@ int handwritingFace(int style, uint32_t cp) {
         for (int f : g_hanOrder) order[n++] = f;
     } else if (uni::isCjkPunct(cp)) {
         for (int f : g_punctOrder) order[n++] = f;
+    } else if (uni::isHangul(cp)) {
+        order[n++] = FACE_HAND_KO;
+    } else if (uni::isDevanagari(cp)) {
+        order[n++] = FACE_HAND_HI;
     }
     order[n++] = latin;
     order[n++] = FACE_HAND_CAVEAT;
+    order[n++] = FACE_HAND_MYNERVE;
     order[n++] = FACE_HAND_JA;
     order[n++] = FACE_HAND_SC;
     for (int i = 0; i < n; ++i)

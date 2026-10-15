@@ -1,0 +1,109 @@
+# Coach speech (Dutch): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "je" ("jij" / "jouw" only when stressed) and "ik" for himself. Dutch past tenses and
+# participles never agree with the player ("je hebt opgegeven", "verslagen"), so nothing shows gender.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Hallo! Laten we een vriendschappelijke partij spelen. Ik help je telkens als er iets misgaat.
+event.greet.l1.2 = Hoi! Ik speel rustig en laat je zien waar je op moet letten.
+event.greet.l1.3 = Welkom! Neem rustig de tijd: ik zeg het je als een stuk in gevaar is.
+event.greet.l2 = Hallo! Laten we spelen. Zodra er een vork of een penning opduikt, laat ik je die zien.
+event.greet.l2.2 = Hoi! Breng je stukken in het spel en houd je koning veilig. Onderweg help ik je.
+event.greet.l2.3 = Welkom terug aan het bord! Let op vorken en penningen: daarmee win je partijen.
+event.greet.l3 = Hallo! Laten we een echte partij spelen. Ik geef commentaar op je plannen en op de grotere fouten.
+event.greet.l3.2 = Hoi! Bedenk een plan voor je stukken. Ik zeg het je als een zet iets mist.
+event.greet.l3.3 = Laten we spelen! Ik wijs je op de enige zetten en op de zetten die de mist ingaan.
+event.greet.l4 = Hallo! Deze keer geef ik evaluaties en laat ik je de betere kandidaatzetten zien.
+event.greet.l4.2 = Laten we spelen. Na een fout vertel ik je wat nauwkeuriger was.
+event.greet.l4.3 = Klaar voor een clubpartij? Ik geef commentaar als de evaluatie verandert.
+event.greet.l5 = Laten we spelen. Ik houd mijn commentaar kort.
+event.greet.l5.2 = Ik ben klaar als jij het bent. Alleen kort commentaar.
+event.greet.l5.3 = Succes. Ik zeg alleen iets als het ertoe doet.
+event.greet.l6 = Succes.
+event.greet.l6.2 = Spelen maar.
+event.greet.l6.3 = Klaar. Ik geef alleen commentaar op de kritieke momenten.
+
+# Who starts (said after the greeting).
+event.colour.white = Je hebt de witte stukken, dus jij begint.
+event.colour.white.2 = Je speelt met wit: jij bent als eerste aan zet.
+event.colour.black = Ik heb wit, dus ik begin.
+event.colour.black.2 = Deze keer speel je met zwart: ik doe de eerste zet.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/nl.lang coach.level.<n>.name).
+event.level.l1 = Eerste stappen: ik speel rustig en leg elke fout in eenvoudige woorden uit.
+event.level.l2 = Beginner: ik speel iets sterker en noem eenvoudige tactieken bij hun naam, zoals vorken en penningen.
+event.level.l3 = Halfgevorderd: ik praat over plannen en pionnenstructuur, en laat korte varianten zien.
+event.level.l4 = Clubspeler: ik geef evaluaties in pionnen en stel kandidaatzetten voor.
+event.level.l5 = Sterke clubspeler: kort commentaar, en langere varianten als het ertoe doet.
+event.level.l6 = Expert: ik speel zo sterk als ik kan en geef alleen commentaar op de kritieke momenten.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Jij bent aan zet.
+event.your_move.2 = Jouw beurt.
+event.your_move.3 = Aan jou.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Neem rustig de tijd.
+event.take_time.2 = Geen haast: in onze partijen loopt er geen klok.
+# Short filler while the coach is still looking at the position.
+event.filler = Hm.
+event.filler.2 = Eens kijken.
+event.filler.3 = Even kijken.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Goed, we nemen de zet terug.
+event.takeback.taken.2 = Goed idee. Kijk nog eens goed.
+event.takeback.taken.3 = De zet is teruggenomen. Probeer het opnieuw.
+# The player declined the offer and played on.
+event.takeback.declined = Goed, we spelen verder.
+event.takeback.declined.2 = Prima, de partij gaat door.
+event.takeback.declined.3 = Jij beslist. We gaan verder.
+# After an explanation without an offer.
+event.play_on = Laten we verderspelen.
+event.play_on.2 = We gaan verder.
+event.play_on.3 = Goed, terug naar onze partij.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Iedereen maakt zulke fouten. Het belangrijkste is dat je ze opmerkt.
+event.encourage.mistake.2 = Geen zorgen. Kijk wat mijn laatste zet aanvalt, dan vind je het.
+event.encourage.mistake.3 = Dat overkomt elke speler. We gaan door.
+# The player is behind (material or evaluation).
+event.encourage.behind = Geef niet op: zoek naar kansen en laat me er hard voor werken.
+event.encourage.behind.2 = Blijf vechten. Zulke stellingen kunnen nog kantelen.
+event.encourage.behind.3 = Blijf rustig en zoek naar mijn zwakke punten.
+# The player has played several good moves in a row.
+event.encourage.well = Je controleert mijn dreigingen voordat je een zet doet. Goed zo.
+event.encourage.well.2 = Zorgvuldige, solide zetten. Ga zo door.
+event.encourage.well.3 = Je denkt vandaag goed na.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Ik neem je aanbod aan. Remise dus.
+event.draw.accepted.2 = Akkoord: het is remise.
+event.draw.declined = Nee, dank je, we spelen verder.
+event.draw.declined.2 = Ik speel liever door.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Goed gespeeld. Gefeliciteerd!
+event.end.win.2 = Dat heb je verdiend. Goed gedaan!
+event.end.win.3 = Gefeliciteerd: je hebt me eerlijk verslagen.
+event.end.loss = Goede partij. De volgende keer krijg je me wel.
+event.end.loss.2 = Bedankt voor de partij. Van elke nederlaag leer je iets.
+event.end.loss.3 = Goed gevochten. Laten we kijken wat er gebeurd is.
+event.end.draw = Remise. Goede partij!
+event.end.draw.2 = Deze keer wint niemand. Goed gestreden.
+event.end.draw.3 = Een terechte uitslag. Goede partij.
+event.end.resigned = Je hebt opgegeven. Toch goed gevochten.
+event.end.resigned.2 = Goed. Bedankt voor de partij.
+event.end.handshake = Laten we elkaar de hand schudden.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang): a lower-case noun phrase that fits
+# after "met", "bij" and a colon.
+event.lesson.resume = Welkom terug! We gaan verder met {chapter}.
+event.lesson.resume.2 = Hallo weer! We waren gebleven bij {chapter}.
+event.lesson.next = Hierna: {chapter}.
+event.lesson.next.2 = En nu: {chapter}.

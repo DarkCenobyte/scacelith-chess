@@ -1,0 +1,771 @@
+# Coach speech (Hindi): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Hindi needs.
+# Register: the coach says "तुम" to the player (the game menus say "आप"). The coach is male ("मैं खुश हूँ",
+# "मैं जीत गया"). The player's gender is unknown, and a Hindi verb agrees with its subject: with तुम as the
+# subject the lines use only the imperative, the subjunctive, the present copula "हो" and transitive
+# perfectives with "ने" (they agree with the object); otherwise dative subjects ("तुम्हें ... चाहिए"), nouns
+# ("तुम्हारी जीत") or the passive. Never "तुम जीत गए", "तुम ले सकते हो", "तुम खेलोगे".
+# Chess words as in assets/i18n/hi.lang: राजा वज़ीर हाथी ऊँट घोड़ा प्यादा, मोहरा, चाल, शह, मात, स्टेलमेट, ड्रॉ,
+# कैसलिंग, खाना. Sentences end with "।". Spoken values are Devanagari only: no Latin letter or digit reaches the voice.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns, all masculine: प्यादा, घोड़ा, ऊँट, हाथी, वज़ीर, राजा. Before a postposition a noun takes the oblique case:
+# प्यादा -> प्यादे, घोड़ा -> घोड़े; ऊँट, हाथी, वज़ीर and राजा do not change ("राजा को"). The possessive agrees with the
+# piece: तुम्हारा / मेरा (direct), तुम्हारे / मेरे (oblique). तुम्हारी / मेरी never go with a piece (no piece noun is
+# feminine); the feminine shows only in the genitive "की", which agrees with the noun that FOLLOWS it
+# ("{your:ki} सुरक्षा"). For the same reason a verb or adjective agreeing with a piece is always masculine
+# ("{my} फँस गया है", "{your} पिन है"). Hindi postpositions are separate words: a line may also write its own
+# after the oblique form ("{my:obl} तक", "{t1:obl} के पीछे", "{your:obl} के लिए").
+# Forms (each one defined for all six pieces and the four owners your, my, white, black):
+#   nom       तुम्हारा घोड़ा / मेरा राजा     subject without ने, object without को: "{your} पिन है।"
+#   obl       तुम्हारे घोड़े / मेरे राजा     before a postposition the line writes: "सीधे {my:obl} तक जाओ।"
+#   ko        तुम्हारे घोड़े को             object or target: "{my:ko} काटो!"
+#   se        तुम्हारे घोड़े से             with, by, from: "तुम्हें {my:se} ख़तरा है।"
+#   par       तुम्हारे घोड़े पर             on, at (an attack on it): "{my} {your:par} हमला कर रहा है।"
+#   ne        तुम्हारे घोड़े ने             agent of a perfective transitive verb: "{your:ne} दूर का प्यादा लिया।"
+#   ka        तुम्हारे घोड़े का             before a masculine singular noun in the direct case: "{my:ka} कोई रक्षक नहीं था।"
+#   ke        तुम्हारे घोड़े के             before a masculine oblique or plural noun, or a compound postposition:
+#                                        "{t2} {t1:ke} पीछे है।"
+#   ki        तुम्हारे घोड़े की             before a feminine noun: "{your:ki} सुरक्षा के बारे में सोचो।"
+# Reflexive "अपना": Hindi says अपना, not तुम्हारा / मेरा, when the owner of the piece is the subject of the clause
+# (also the implied तुम of an imperative, a ने subject or a dative subject). The same words for every owner:
+#   refl      अपना घोड़ा                   "{your:refl} बचाओ!", "मैं {my:refl} {sq} पर ले जाता हूँ।"
+#   refl_obl  अपने घोड़े                   "{your:refl_obl} के साथ हमला करो।"
+#   refl_ko   अपने घोड़े को                "{your:refl_ko} आगे लाओ।"
+#   refl_se   अपने घोड़े से                "{your:refl_se} मेरा हाथी काटो!"
+#   refl_par  अपने घोड़े पर                "{your:refl_par} नज़र रखो।"
+#   refl_ka   अपने घोड़े का                "{your:refl_ka} इस्तेमाल करो।"
+#   refl_ke   अपने घोड़े के                "{your:refl_ke} बारे में सोचो।"
+#   refl_ki   अपने घोड़े की                "{your:refl_ki} सुरक्षा का ध्यान रखो।"
+# Without the owner (when the sentence already says whose piece it is):
+#   bare      घोड़ा                        "{t1} और {t2:bare} दोनों पर हमला है।" (तुम्हारा वज़ीर और हाथी)
+#   bare_obl  घोड़े                        "{t1:obl} और {t2:bare_obl} पर फ़ोर्क।" (तुम्हारे वज़ीर और हाथी पर)
+# Pronouns for the piece (they do not depend on the piece in Hindi: the plain words are as good; these forms let a
+# line keep the placeholder where Hindi says a pronoun):
+#   pron      वह                           "{your} फँस गया है: {your:pron} कहीं नहीं जा सकता।"
+#   pron_ko   उसे                          "{my} अकेला है। {my:pron_ko} काटो!"
+#   pron_se   उससे                         "{my} ख़तरनाक है: {my:pron_se} बचकर रहो।"
+#   pron_par  उस पर                        "{my} अकेला है: {my:pron_par} हमला करो।"
+#   pron_ne   उसने                         "{your} आगे आया, पर {your:pron_ne} समय गँवाया।"
+#   pron_ka   उसका                         "{my} {sq} पर है और {my:pron_ka} कोई रक्षक नहीं।"
+#   pron_ke   उसके                         "{my} {t1:par} हमला करता है, और {t2} {t1:pron_ke} ठीक पीछे है।"
+#   pron_ki   उसकी                         "{your} बीच में है; {your:pron_ki} सुरक्षा ज़रूरी है।"
+# The analysis owners name the side with an adjective: "सफ़ेद घोड़ा" (सफ़ेद does not change), "काला घोड़ा" /
+# "काले घोड़े को" (काला -> काले before a postposition).
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = m
+piece.queen.gender = m
+piece.king.gender = m
+# The noun inside each form: the direct case for nom, refl and bare, the oblique case for every form with a
+# postposition (and obl, refl_obl, bare_obl), the pronoun itself for the pron forms.
+piece.pawn.nom = प्यादा
+piece.pawn.obl = प्यादे
+piece.pawn.ko = प्यादे
+piece.pawn.se = प्यादे
+piece.pawn.par = प्यादे
+piece.pawn.ne = प्यादे
+piece.pawn.ka = प्यादे
+piece.pawn.ke = प्यादे
+piece.pawn.ki = प्यादे
+piece.pawn.refl = प्यादा
+piece.pawn.refl_obl = प्यादे
+piece.pawn.refl_ko = प्यादे
+piece.pawn.refl_se = प्यादे
+piece.pawn.refl_par = प्यादे
+piece.pawn.refl_ka = प्यादे
+piece.pawn.refl_ke = प्यादे
+piece.pawn.refl_ki = प्यादे
+piece.pawn.bare = प्यादा
+piece.pawn.bare_obl = प्यादे
+piece.pawn.pron = वह
+piece.pawn.pron_ko = उसे
+piece.pawn.pron_se = उससे
+piece.pawn.pron_par = उस पर
+piece.pawn.pron_ne = उसने
+piece.pawn.pron_ka = उसका
+piece.pawn.pron_ke = उसके
+piece.pawn.pron_ki = उसकी
+piece.knight.nom = घोड़ा
+piece.knight.obl = घोड़े
+piece.knight.ko = घोड़े
+piece.knight.se = घोड़े
+piece.knight.par = घोड़े
+piece.knight.ne = घोड़े
+piece.knight.ka = घोड़े
+piece.knight.ke = घोड़े
+piece.knight.ki = घोड़े
+piece.knight.refl = घोड़ा
+piece.knight.refl_obl = घोड़े
+piece.knight.refl_ko = घोड़े
+piece.knight.refl_se = घोड़े
+piece.knight.refl_par = घोड़े
+piece.knight.refl_ka = घोड़े
+piece.knight.refl_ke = घोड़े
+piece.knight.refl_ki = घोड़े
+piece.knight.bare = घोड़ा
+piece.knight.bare_obl = घोड़े
+piece.knight.pron = वह
+piece.knight.pron_ko = उसे
+piece.knight.pron_se = उससे
+piece.knight.pron_par = उस पर
+piece.knight.pron_ne = उसने
+piece.knight.pron_ka = उसका
+piece.knight.pron_ke = उसके
+piece.knight.pron_ki = उसकी
+piece.bishop.nom = ऊँट
+piece.bishop.obl = ऊँट
+piece.bishop.ko = ऊँट
+piece.bishop.se = ऊँट
+piece.bishop.par = ऊँट
+piece.bishop.ne = ऊँट
+piece.bishop.ka = ऊँट
+piece.bishop.ke = ऊँट
+piece.bishop.ki = ऊँट
+piece.bishop.refl = ऊँट
+piece.bishop.refl_obl = ऊँट
+piece.bishop.refl_ko = ऊँट
+piece.bishop.refl_se = ऊँट
+piece.bishop.refl_par = ऊँट
+piece.bishop.refl_ka = ऊँट
+piece.bishop.refl_ke = ऊँट
+piece.bishop.refl_ki = ऊँट
+piece.bishop.bare = ऊँट
+piece.bishop.bare_obl = ऊँट
+piece.bishop.pron = वह
+piece.bishop.pron_ko = उसे
+piece.bishop.pron_se = उससे
+piece.bishop.pron_par = उस पर
+piece.bishop.pron_ne = उसने
+piece.bishop.pron_ka = उसका
+piece.bishop.pron_ke = उसके
+piece.bishop.pron_ki = उसकी
+piece.rook.nom = हाथी
+piece.rook.obl = हाथी
+piece.rook.ko = हाथी
+piece.rook.se = हाथी
+piece.rook.par = हाथी
+piece.rook.ne = हाथी
+piece.rook.ka = हाथी
+piece.rook.ke = हाथी
+piece.rook.ki = हाथी
+piece.rook.refl = हाथी
+piece.rook.refl_obl = हाथी
+piece.rook.refl_ko = हाथी
+piece.rook.refl_se = हाथी
+piece.rook.refl_par = हाथी
+piece.rook.refl_ka = हाथी
+piece.rook.refl_ke = हाथी
+piece.rook.refl_ki = हाथी
+piece.rook.bare = हाथी
+piece.rook.bare_obl = हाथी
+piece.rook.pron = वह
+piece.rook.pron_ko = उसे
+piece.rook.pron_se = उससे
+piece.rook.pron_par = उस पर
+piece.rook.pron_ne = उसने
+piece.rook.pron_ka = उसका
+piece.rook.pron_ke = उसके
+piece.rook.pron_ki = उसकी
+piece.queen.nom = वज़ीर
+piece.queen.obl = वज़ीर
+piece.queen.ko = वज़ीर
+piece.queen.se = वज़ीर
+piece.queen.par = वज़ीर
+piece.queen.ne = वज़ीर
+piece.queen.ka = वज़ीर
+piece.queen.ke = वज़ीर
+piece.queen.ki = वज़ीर
+piece.queen.refl = वज़ीर
+piece.queen.refl_obl = वज़ीर
+piece.queen.refl_ko = वज़ीर
+piece.queen.refl_se = वज़ीर
+piece.queen.refl_par = वज़ीर
+piece.queen.refl_ka = वज़ीर
+piece.queen.refl_ke = वज़ीर
+piece.queen.refl_ki = वज़ीर
+piece.queen.bare = वज़ीर
+piece.queen.bare_obl = वज़ीर
+piece.queen.pron = वह
+piece.queen.pron_ko = उसे
+piece.queen.pron_se = उससे
+piece.queen.pron_par = उस पर
+piece.queen.pron_ne = उसने
+piece.queen.pron_ka = उसका
+piece.queen.pron_ke = उसके
+piece.queen.pron_ki = उसकी
+piece.king.nom = राजा
+piece.king.obl = राजा
+piece.king.ko = राजा
+piece.king.se = राजा
+piece.king.par = राजा
+piece.king.ne = राजा
+piece.king.ka = राजा
+piece.king.ke = राजा
+piece.king.ki = राजा
+piece.king.refl = राजा
+piece.king.refl_obl = राजा
+piece.king.refl_ko = राजा
+piece.king.refl_se = राजा
+piece.king.refl_par = राजा
+piece.king.refl_ka = राजा
+piece.king.refl_ke = राजा
+piece.king.refl_ki = राजा
+piece.king.bare = राजा
+piece.king.bare_obl = राजा
+piece.king.pron = वह
+piece.king.pron_ko = उसे
+piece.king.pron_se = उससे
+piece.king.pron_par = उस पर
+piece.king.pron_ne = उसने
+piece.king.pron_ka = उसका
+piece.king.pron_ke = उसके
+piece.king.pron_ki = उसकी
+# Possessive patterns: your = तुम्हारा, my = मेरा; the Analysis mode names a piece by its side, nobody being "तुम" or
+# "मैं" there: white = सफ़ेद (invariable), black = काला / काले. The noun {piece} is already in the form's case.
+owner.your.nom = तुम्हारा {piece}
+owner.your.obl = तुम्हारे {piece}
+owner.your.ko = तुम्हारे {piece} को
+owner.your.se = तुम्हारे {piece} से
+owner.your.par = तुम्हारे {piece} पर
+owner.your.ne = तुम्हारे {piece} ने
+owner.your.ka = तुम्हारे {piece} का
+owner.your.ke = तुम्हारे {piece} के
+owner.your.ki = तुम्हारे {piece} की
+owner.my.nom = मेरा {piece}
+owner.my.obl = मेरे {piece}
+owner.my.ko = मेरे {piece} को
+owner.my.se = मेरे {piece} से
+owner.my.par = मेरे {piece} पर
+owner.my.ne = मेरे {piece} ने
+owner.my.ka = मेरे {piece} का
+owner.my.ke = मेरे {piece} के
+owner.my.ki = मेरे {piece} की
+owner.white.nom = सफ़ेद {piece}
+owner.white.obl = सफ़ेद {piece}
+owner.white.ko = सफ़ेद {piece} को
+owner.white.se = सफ़ेद {piece} से
+owner.white.par = सफ़ेद {piece} पर
+owner.white.ne = सफ़ेद {piece} ने
+owner.white.ka = सफ़ेद {piece} का
+owner.white.ke = सफ़ेद {piece} के
+owner.white.ki = सफ़ेद {piece} की
+owner.black.nom = काला {piece}
+owner.black.obl = काले {piece}
+owner.black.ko = काले {piece} को
+owner.black.se = काले {piece} से
+owner.black.par = काले {piece} पर
+owner.black.ne = काले {piece} ने
+owner.black.ka = काले {piece} का
+owner.black.ke = काले {piece} के
+owner.black.ki = काले {piece} की
+# Reflexive, bare and pronoun patterns: the same for every owner ({piece} holds the pronoun in the pron forms).
+owner.your.refl = अपना {piece}
+owner.your.refl_obl = अपने {piece}
+owner.your.refl_ko = अपने {piece} को
+owner.your.refl_se = अपने {piece} से
+owner.your.refl_par = अपने {piece} पर
+owner.your.refl_ka = अपने {piece} का
+owner.your.refl_ke = अपने {piece} के
+owner.your.refl_ki = अपने {piece} की
+owner.your.bare = {piece}
+owner.your.bare_obl = {piece}
+owner.your.pron = {piece}
+owner.your.pron_ko = {piece}
+owner.your.pron_se = {piece}
+owner.your.pron_par = {piece}
+owner.your.pron_ne = {piece}
+owner.your.pron_ka = {piece}
+owner.your.pron_ke = {piece}
+owner.your.pron_ki = {piece}
+owner.my.refl = अपना {piece}
+owner.my.refl_obl = अपने {piece}
+owner.my.refl_ko = अपने {piece} को
+owner.my.refl_se = अपने {piece} से
+owner.my.refl_par = अपने {piece} पर
+owner.my.refl_ka = अपने {piece} का
+owner.my.refl_ke = अपने {piece} के
+owner.my.refl_ki = अपने {piece} की
+owner.my.bare = {piece}
+owner.my.bare_obl = {piece}
+owner.my.pron = {piece}
+owner.my.pron_ko = {piece}
+owner.my.pron_se = {piece}
+owner.my.pron_par = {piece}
+owner.my.pron_ne = {piece}
+owner.my.pron_ka = {piece}
+owner.my.pron_ke = {piece}
+owner.my.pron_ki = {piece}
+owner.white.refl = अपना {piece}
+owner.white.refl_obl = अपने {piece}
+owner.white.refl_ko = अपने {piece} को
+owner.white.refl_se = अपने {piece} से
+owner.white.refl_par = अपने {piece} पर
+owner.white.refl_ka = अपने {piece} का
+owner.white.refl_ke = अपने {piece} के
+owner.white.refl_ki = अपने {piece} की
+owner.white.bare = {piece}
+owner.white.bare_obl = {piece}
+owner.white.pron = {piece}
+owner.white.pron_ko = {piece}
+owner.white.pron_se = {piece}
+owner.white.pron_par = {piece}
+owner.white.pron_ne = {piece}
+owner.white.pron_ka = {piece}
+owner.white.pron_ke = {piece}
+owner.white.pron_ki = {piece}
+owner.black.refl = अपना {piece}
+owner.black.refl_obl = अपने {piece}
+owner.black.refl_ko = अपने {piece} को
+owner.black.refl_se = अपने {piece} से
+owner.black.refl_par = अपने {piece} पर
+owner.black.refl_ka = अपने {piece} का
+owner.black.refl_ke = अपने {piece} के
+owner.black.refl_ki = अपने {piece} की
+owner.black.bare = {piece}
+owner.black.bare_obl = {piece}
+owner.black.pron = {piece}
+owner.black.pron_ko = {piece}
+owner.black.pron_se = {piece}
+owner.black.pron_par = {piece}
+owner.black.pron_ne = {piece}
+owner.black.pron_ka = {piece}
+owner.black.pron_ke = {piece}
+owner.black.pron_ki = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice drops Latin letters: the file letters are spelled the way Indian players say the English letters,
+# the ranks are Hindi number words: e4 = "ई चार", f3 = "एफ़ तीन", a8 = "ए आठ", h7 = "एच सात".
+square.spoken = {file} {rank}
+file.a.spoken = ए
+file.b.spoken = बी
+file.c.spoken = सी
+file.d.spoken = डी
+file.e.spoken = ई
+file.f.spoken = एफ़
+file.g.spoken = जी
+file.h.spoken = एच
+rank.1.spoken = एक
+rank.2.spoken = दो
+rank.3.spoken = तीन
+rank.4.spoken = चार
+rank.5.spoken = पाँच
+rank.6.spoken = छह
+rank.7.spoken = सात
+rank.8.spoken = आठ
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Indian scoresheets use the English piece letters (assets/i18n/hi.lang scoresheet.pieces).
+move.letters = K Q R B N
+# Spoken as Hindi players read notation: "घोड़ा एफ़ तीन", "घोड़ा ई पाँच पर काटता है", "घोड़ा बी से डी सात",
+# "ई का प्यादा डी पाँच पर काटता है", "प्यादा वापस काटता है" (recapture), "छोटी कैसलिंग" / "लंबी कैसलिंग",
+# "ई आठ, और प्यादा वज़ीर बनता है", "वज़ीर जी चार, शह", "..., शह और मात". {piece} is the direct case. A capture
+# or a promotion is said with a verb: the lines treat a spoken move as a quoted name (after a colon, or before a
+# comma), never followed by a postposition or a verb ("{move} के बाद" would read "... काटता है के बाद").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} {to} पर काटता है
+move.piece_from.spoken = {piece} {from} से {to}
+move.piece_from_capture.spoken = {piece} {from} से {to} पर काटता है
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} का प्यादा {to} पर काटता है
+move.recapture.spoken = {piece} वापस काटता है
+move.castle_short.spoken = छोटी कैसलिंग
+move.castle_long.spoken = लंबी कैसलिंग
+move.promotion.spoken = {move}, और प्यादा {piece} बनता है
+move.check.spoken = {move}, शह
+move.mate.spoken = {move}, शह और मात
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet (the pronunciation pass adds them).
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. Hindi 0-99 do not compose (21 = इक्कीस, 99 = निन्यानबे): every one is listed, in the
+# standard spelling. 100-999 compose: "{n} सौ" and "{hundreds} {rest}" ("एक सौ", "दो सौ बीस"). Numbers do not
+# change before a postposition ("तीन पर", "बीस से").
+number.0.spoken = शून्य
+number.1.spoken = एक
+number.2.spoken = दो
+number.3.spoken = तीन
+number.4.spoken = चार
+number.5.spoken = पाँच
+number.6.spoken = छह
+number.7.spoken = सात
+number.8.spoken = आठ
+number.9.spoken = नौ
+number.10.spoken = दस
+number.11.spoken = ग्यारह
+number.12.spoken = बारह
+number.13.spoken = तेरह
+number.14.spoken = चौदह
+number.15.spoken = पंद्रह
+number.16.spoken = सोलह
+number.17.spoken = सत्रह
+number.18.spoken = अठारह
+number.19.spoken = उन्नीस
+number.20.spoken = बीस
+number.21.spoken = इक्कीस
+number.22.spoken = बाईस
+number.23.spoken = तेईस
+number.24.spoken = चौबीस
+number.25.spoken = पच्चीस
+number.26.spoken = छब्बीस
+number.27.spoken = सत्ताईस
+number.28.spoken = अट्ठाईस
+number.29.spoken = उनतीस
+number.30.spoken = तीस
+number.31.spoken = इकतीस
+number.32.spoken = बत्तीस
+number.33.spoken = तैंतीस
+number.34.spoken = चौंतीस
+number.35.spoken = पैंतीस
+number.36.spoken = छत्तीस
+number.37.spoken = सैंतीस
+number.38.spoken = अड़तीस
+number.39.spoken = उनतालीस
+number.40.spoken = चालीस
+number.41.spoken = इकतालीस
+number.42.spoken = बयालीस
+number.43.spoken = तैंतालीस
+number.44.spoken = चवालीस
+number.45.spoken = पैंतालीस
+number.46.spoken = छियालीस
+number.47.spoken = सैंतालीस
+number.48.spoken = अड़तालीस
+number.49.spoken = उनचास
+number.50.spoken = पचास
+number.51.spoken = इक्यावन
+number.52.spoken = बावन
+number.53.spoken = तिरपन
+number.54.spoken = चौवन
+number.55.spoken = पचपन
+number.56.spoken = छप्पन
+number.57.spoken = सत्तावन
+number.58.spoken = अट्ठावन
+number.59.spoken = उनसठ
+number.60.spoken = साठ
+number.61.spoken = इकसठ
+number.62.spoken = बासठ
+number.63.spoken = तिरसठ
+number.64.spoken = चौंसठ
+number.65.spoken = पैंसठ
+number.66.spoken = छियासठ
+number.67.spoken = सड़सठ
+number.68.spoken = अड़सठ
+number.69.spoken = उनहत्तर
+number.70.spoken = सत्तर
+number.71.spoken = इकहत्तर
+number.72.spoken = बहत्तर
+number.73.spoken = तिहत्तर
+number.74.spoken = चौहत्तर
+number.75.spoken = पचहत्तर
+number.76.spoken = छिहत्तर
+number.77.spoken = सतहत्तर
+number.78.spoken = अठहत्तर
+number.79.spoken = उनासी
+number.80.spoken = अस्सी
+number.81.spoken = इक्यासी
+number.82.spoken = बयासी
+number.83.spoken = तिरासी
+number.84.spoken = चौरासी
+number.85.spoken = पचासी
+number.86.spoken = छियासी
+number.87.spoken = सत्तासी
+number.88.spoken = अट्ठासी
+number.89.spoken = नवासी
+number.90.spoken = नब्बे
+number.91.spoken = इक्यानबे
+number.92.spoken = बानबे
+number.93.spoken = तिरानबे
+number.94.spoken = चौरानबे
+number.95.spoken = पंचानबे
+number.96.spoken = छियानबे
+number.97.spoken = सत्तानबे
+number.98.spoken = अट्ठानबे
+number.99.spoken = निन्यानबे
+# number.tens is unused (0-99 are all listed), kept because English defines it.
+number.tens.spoken = {tens} {units}
+number.hundreds.spoken = {n} सौ
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = माइनस {n}
+# A decimal number: written with a point ("1.5"), said "एक दशमलव पाँच".
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int} दशमलव {frac}
+# Form "ordf": the feminine ordinal, for the move numbers ("{n:moveno}" below: "इक्कीसवीं चाल"). 1-4 and 6 are
+# irregular (पहली दूसरी तीसरी चौथी छठी), the others add "वीं" to the number word. 101-999 compose ("एक सौ
+# इक्कीसवीं"), except where the last word would be irregular: above 100 "वीं" goes on the plain number
+# ("एक सौ एकवीं", not "एक सौ पहली"), so those are listed, with the round hundreds.
+number.1.ordf.spoken = पहली
+number.2.ordf.spoken = दूसरी
+number.3.ordf.spoken = तीसरी
+number.4.ordf.spoken = चौथी
+number.5.ordf.spoken = पाँचवीं
+number.6.ordf.spoken = छठी
+number.7.ordf.spoken = सातवीं
+number.8.ordf.spoken = आठवीं
+number.9.ordf.spoken = नौवीं
+number.10.ordf.spoken = दसवीं
+number.11.ordf.spoken = ग्यारहवीं
+number.12.ordf.spoken = बारहवीं
+number.13.ordf.spoken = तेरहवीं
+number.14.ordf.spoken = चौदहवीं
+number.15.ordf.spoken = पंद्रहवीं
+number.16.ordf.spoken = सोलहवीं
+number.17.ordf.spoken = सत्रहवीं
+number.18.ordf.spoken = अठारहवीं
+number.19.ordf.spoken = उन्नीसवीं
+number.20.ordf.spoken = बीसवीं
+number.21.ordf.spoken = इक्कीसवीं
+number.22.ordf.spoken = बाईसवीं
+number.23.ordf.spoken = तेईसवीं
+number.24.ordf.spoken = चौबीसवीं
+number.25.ordf.spoken = पच्चीसवीं
+number.26.ordf.spoken = छब्बीसवीं
+number.27.ordf.spoken = सत्ताईसवीं
+number.28.ordf.spoken = अट्ठाईसवीं
+number.29.ordf.spoken = उनतीसवीं
+number.30.ordf.spoken = तीसवीं
+number.31.ordf.spoken = इकतीसवीं
+number.32.ordf.spoken = बत्तीसवीं
+number.33.ordf.spoken = तैंतीसवीं
+number.34.ordf.spoken = चौंतीसवीं
+number.35.ordf.spoken = पैंतीसवीं
+number.36.ordf.spoken = छत्तीसवीं
+number.37.ordf.spoken = सैंतीसवीं
+number.38.ordf.spoken = अड़तीसवीं
+number.39.ordf.spoken = उनतालीसवीं
+number.40.ordf.spoken = चालीसवीं
+number.41.ordf.spoken = इकतालीसवीं
+number.42.ordf.spoken = बयालीसवीं
+number.43.ordf.spoken = तैंतालीसवीं
+number.44.ordf.spoken = चवालीसवीं
+number.45.ordf.spoken = पैंतालीसवीं
+number.46.ordf.spoken = छियालीसवीं
+number.47.ordf.spoken = सैंतालीसवीं
+number.48.ordf.spoken = अड़तालीसवीं
+number.49.ordf.spoken = उनचासवीं
+number.50.ordf.spoken = पचासवीं
+number.51.ordf.spoken = इक्यावनवीं
+number.52.ordf.spoken = बावनवीं
+number.53.ordf.spoken = तिरपनवीं
+number.54.ordf.spoken = चौवनवीं
+number.55.ordf.spoken = पचपनवीं
+number.56.ordf.spoken = छप्पनवीं
+number.57.ordf.spoken = सत्तावनवीं
+number.58.ordf.spoken = अट्ठावनवीं
+number.59.ordf.spoken = उनसठवीं
+number.60.ordf.spoken = साठवीं
+number.61.ordf.spoken = इकसठवीं
+number.62.ordf.spoken = बासठवीं
+number.63.ordf.spoken = तिरसठवीं
+number.64.ordf.spoken = चौंसठवीं
+number.65.ordf.spoken = पैंसठवीं
+number.66.ordf.spoken = छियासठवीं
+number.67.ordf.spoken = सड़सठवीं
+number.68.ordf.spoken = अड़सठवीं
+number.69.ordf.spoken = उनहत्तरवीं
+number.70.ordf.spoken = सत्तरवीं
+number.71.ordf.spoken = इकहत्तरवीं
+number.72.ordf.spoken = बहत्तरवीं
+number.73.ordf.spoken = तिहत्तरवीं
+number.74.ordf.spoken = चौहत्तरवीं
+number.75.ordf.spoken = पचहत्तरवीं
+number.76.ordf.spoken = छिहत्तरवीं
+number.77.ordf.spoken = सतहत्तरवीं
+number.78.ordf.spoken = अठहत्तरवीं
+number.79.ordf.spoken = उनासीवीं
+number.80.ordf.spoken = अस्सीवीं
+number.81.ordf.spoken = इक्यासीवीं
+number.82.ordf.spoken = बयासीवीं
+number.83.ordf.spoken = तिरासीवीं
+number.84.ordf.spoken = चौरासीवीं
+number.85.ordf.spoken = पचासीवीं
+number.86.ordf.spoken = छियासीवीं
+number.87.ordf.spoken = सत्तासीवीं
+number.88.ordf.spoken = अट्ठासीवीं
+number.89.ordf.spoken = नवासीवीं
+number.90.ordf.spoken = नब्बेवीं
+number.91.ordf.spoken = इक्यानबेवीं
+number.92.ordf.spoken = बानबेवीं
+number.93.ordf.spoken = तिरानबेवीं
+number.94.ordf.spoken = चौरानबेवीं
+number.95.ordf.spoken = पंचानबेवीं
+number.96.ordf.spoken = छियानबेवीं
+number.97.ordf.spoken = सत्तानबेवीं
+number.98.ordf.spoken = अट्ठानबेवीं
+number.99.ordf.spoken = निन्यानबेवीं
+number.100.ordf.spoken = सौवीं
+number.101.ordf.spoken = एक सौ एकवीं
+number.102.ordf.spoken = एक सौ दोवीं
+number.103.ordf.spoken = एक सौ तीनवीं
+number.104.ordf.spoken = एक सौ चारवीं
+number.106.ordf.spoken = एक सौ छहवीं
+number.200.ordf.spoken = दो सौवीं
+# Form "mv": the number said with "चाल" in the oblique case, for the mate distances of eval.mate_* below
+# ("तीन चालों में मात", "एक चाल में मात"); the subtitles keep the short "3 चाल में मात".
+number.1.mv.spoken = एक चाल
+number.2.mv.spoken = दो चालों
+number.3.mv.spoken = तीन चालों
+number.4.mv.spoken = चार चालों
+number.5.mv.spoken = पाँच चालों
+number.6.mv.spoken = छह चालों
+number.7.mv.spoken = सात चालों
+number.8.mv.spoken = आठ चालों
+number.9.mv.spoken = नौ चालों
+number.10.mv.spoken = दस चालों
+number.11.mv.spoken = ग्यारह चालों
+number.12.mv.spoken = बारह चालों
+number.13.mv.spoken = तेरह चालों
+number.14.mv.spoken = चौदह चालों
+number.15.mv.spoken = पंद्रह चालों
+number.16.mv.spoken = सोलह चालों
+number.17.mv.spoken = सत्रह चालों
+number.18.mv.spoken = अठारह चालों
+number.19.mv.spoken = उन्नीस चालों
+number.20.mv.spoken = बीस चालों
+number.21.mv.spoken = इक्कीस चालों
+number.22.mv.spoken = बाईस चालों
+number.23.mv.spoken = तेईस चालों
+number.24.mv.spoken = चौबीस चालों
+number.25.mv.spoken = पच्चीस चालों
+number.26.mv.spoken = छब्बीस चालों
+number.27.mv.spoken = सत्ताईस चालों
+number.28.mv.spoken = अट्ठाईस चालों
+number.29.mv.spoken = उनतीस चालों
+number.30.mv.spoken = तीस चालों
+number.31.mv.spoken = इकतीस चालों
+number.32.mv.spoken = बत्तीस चालों
+number.33.mv.spoken = तैंतीस चालों
+number.34.mv.spoken = चौंतीस चालों
+number.35.mv.spoken = पैंतीस चालों
+number.36.mv.spoken = छत्तीस चालों
+number.37.mv.spoken = सैंतीस चालों
+number.38.mv.spoken = अड़तीस चालों
+number.39.mv.spoken = उनतालीस चालों
+number.40.mv.spoken = चालीस चालों
+number.41.mv.spoken = इकतालीस चालों
+number.42.mv.spoken = बयालीस चालों
+number.43.mv.spoken = तैंतालीस चालों
+number.44.mv.spoken = चवालीस चालों
+number.45.mv.spoken = पैंतालीस चालों
+number.46.mv.spoken = छियालीस चालों
+number.47.mv.spoken = सैंतालीस चालों
+number.48.mv.spoken = अड़तालीस चालों
+number.49.mv.spoken = उनचास चालों
+number.50.mv.spoken = पचास चालों
+number.51.mv.spoken = इक्यावन चालों
+number.52.mv.spoken = बावन चालों
+number.53.mv.spoken = तिरपन चालों
+number.54.mv.spoken = चौवन चालों
+number.55.mv.spoken = पचपन चालों
+number.56.mv.spoken = छप्पन चालों
+number.57.mv.spoken = सत्तावन चालों
+number.58.mv.spoken = अट्ठावन चालों
+number.59.mv.spoken = उनसठ चालों
+number.60.mv.spoken = साठ चालों
+number.61.mv.spoken = इकसठ चालों
+number.62.mv.spoken = बासठ चालों
+number.63.mv.spoken = तिरसठ चालों
+number.64.mv.spoken = चौंसठ चालों
+number.65.mv.spoken = पैंसठ चालों
+number.66.mv.spoken = छियासठ चालों
+number.67.mv.spoken = सड़सठ चालों
+number.68.mv.spoken = अड़सठ चालों
+number.69.mv.spoken = उनहत्तर चालों
+number.70.mv.spoken = सत्तर चालों
+number.71.mv.spoken = इकहत्तर चालों
+number.72.mv.spoken = बहत्तर चालों
+number.73.mv.spoken = तिहत्तर चालों
+number.74.mv.spoken = चौहत्तर चालों
+number.75.mv.spoken = पचहत्तर चालों
+number.76.mv.spoken = छिहत्तर चालों
+number.77.mv.spoken = सतहत्तर चालों
+number.78.mv.spoken = अठहत्तर चालों
+number.79.mv.spoken = उनासी चालों
+number.80.mv.spoken = अस्सी चालों
+number.81.mv.spoken = इक्यासी चालों
+number.82.mv.spoken = बयासी चालों
+number.83.mv.spoken = तिरासी चालों
+number.84.mv.spoken = चौरासी चालों
+number.85.mv.spoken = पचासी चालों
+number.86.mv.spoken = छियासी चालों
+number.87.mv.spoken = सत्तासी चालों
+number.88.mv.spoken = अट्ठासी चालों
+number.89.mv.spoken = नवासी चालों
+number.90.mv.spoken = नब्बे चालों
+number.91.mv.spoken = इक्यानबे चालों
+number.92.mv.spoken = बानबे चालों
+number.93.mv.spoken = तिरानबे चालों
+number.94.mv.spoken = चौरानबे चालों
+number.95.mv.spoken = पंचानबे चालों
+number.96.mv.spoken = छियानबे चालों
+number.97.mv.spoken = सत्तानबे चालों
+number.98.mv.spoken = अट्ठानबे चालों
+number.99.mv.spoken = निन्यानबे चालों
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Hindi plural rule (assets/i18n): one (0 and 1) | other. Direct case: "3 चालें", "1 ग़लती", "5 बार".
+count.move = {n} चाल|{n} चालें
+count.point = {n} अंक|{n} अंक
+count.pawn = {n} प्यादा|{n} प्यादे
+count.piece = {n} मोहरा|{n} मोहरे
+count.mistake = {n} ग़लती|{n} ग़लतियाँ
+count.blunder = {n} ब्लंडर|{n} ब्लंडर
+count.inaccuracy = {n} चूक|{n} चूकें
+count.game = {n} बाज़ी|{n} बाज़ियाँ
+count.time = {n} बार|{n} बार
+count.square = {n} खाना|{n} खाने
+count.position = {n} स्थिति|{n} स्थितियाँ
+# The oblique count "<noun>_obl", for a count followed by a postposition: "{m:move_obl} में मात" = "3 चालों में
+# मात" / "1 चाल में मात", "{n:piece_obl} का फ़ायदा", "{n:time_obl} तक" ("बार" does not change).
+# A verb agreeing with a counted noun changes with the number ("1 ग़लती हुई", "3 ग़लतियाँ हुईं"): the lines avoid
+# it, e.g. with ने and को the verb stays masculine singular ("तुमने {n:move_obl} को वापस लिया").
+count.move_obl = {n} चाल|{n} चालों
+count.point_obl = {n} अंक|{n} अंकों
+count.pawn_obl = {n} प्यादे|{n} प्यादों
+count.piece_obl = {n} मोहरे|{n} मोहरों
+count.mistake_obl = {n} ग़लती|{n} ग़लतियों
+count.blunder_obl = {n} ब्लंडर|{n} ब्लंडरों
+count.inaccuracy_obl = {n} चूक|{n} चूकों
+count.game_obl = {n} बाज़ी|{n} बाज़ियों
+count.time_obl = {n} बार|{n} बार
+count.square_obl = {n} खाने|{n} खानों
+count.position_obl = {n} स्थिति|{n} स्थितियों
+# More counted nouns for the review and the appraisal: "{n:best_move}" = "5 सबसे अच्छी चालें" (a streak),
+# "{n:attacker}" / "{n2:defender}" = "3 हमलावर" / "2 रक्षक" (the pieces aimed at a square), each with its oblique.
+count.best_move = {n} सबसे अच्छी चाल|{n} सबसे अच्छी चालें
+count.best_move_obl = {n} सबसे अच्छी चाल|{n} सबसे अच्छी चालों
+count.attacker = {n} हमलावर|{n} हमलावर
+count.attacker_obl = {n} हमलावर|{n} हमलावरों
+count.defender = {n} रक्षक|{n} रक्षक
+count.defender_obl = {n} रक्षक|{n} रक्षकों
+# Accuracy in percent: "{acc:percent}" = "85%" in the subtitles, "पचासी प्रतिशत" spoken.
+count.percent = {n}%|{n}%
+count.percent.spoken = {n} प्रतिशत|{n} प्रतिशत
+# A move NUMBER ("at move 21"): "{n:moveno}" = "चाल 21" in the subtitles and the ordinal "इक्कीसवीं चाल" spoken
+# ("{n:moveno} पर" = "at move 21", "{crit_no:moveno} तक" = "until move 21"). A written ordinal ending depends on
+# the number ("21वीं" but "पहली", "दूसरी", "छठी"), which a count key cannot choose: hence "चाल 21" in writing.
+count.moveno = चाल {n}|चाल {n}
+count.moveno.spoken = {n:ordf} चाल|{n:ordf} चाल
+# "ordf" and "mv" are number forms (number.<n>.ordf.spoken, number.<n>.mv.spoken above); these count keys
+# declare them. In the lines use {n:moveno} and {n:move_obl}: "{n:ordf}" shows a bare number in the subtitles,
+# and count.mv only repeats count.move_obl.
+count.ordf = {n}|{n}
+count.ordf.spoken = {n:ordf}|{n:ordf}
+count.mv = {n} चाल|{n} चालों
+count.mv.spoken = {n:mv}|{n:mv}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves: a bare number,
+# said with "चाल" by the form "mv" ("तीन चालों में मात"); the subtitles keep "3 चाल में मात".
+eval.up = +{x}
+eval.up.spoken = प्लस {x}
+eval.down = −{x}
+eval.down.spoken = माइनस {x}
+eval.even = 0.0
+eval.even.spoken = बराबर
+eval.mate_win = {n} चाल में मात
+eval.mate_win.spoken = {n:mv} में मात
+eval.mate_loss = {n} चाल में तुम्हारी मात
+eval.mate_loss.spoken = {n:mv} में तुम्हारी मात

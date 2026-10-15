@@ -1,0 +1,660 @@
+# Coach speech (Italian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Italian needs.
+# Register: the coach says "tu" to the player (the game menus say "tu" too, as Italian software
+# does). The coach is male ("sono contento", "sono pronto"). The player's gender is unknown: nothing
+# may agree with the player (no "bravo", "sei pronto", "sei stato", "ti sei arreso"): use avere,
+# nouns or impersonal phrasing ("complimenti", "ben fatto", "hai giocato bene", "ce l’hai fatta",
+# "hai abbandonato").
+# Terms (FSI usage): mossa, casa, colonna, traversa, scacco, scacco matto, stallo, patta, arrocco
+# corto / lungo, en passant, promozione, forchetta, inchiodatura, infilata, attacco di scoperta,
+# errore grave / errore / imprecisione.
+# Typography: the typographic apostrophe ’ (l’alfiere), È with its accent, no space before ! ? : ;
+# quotes « ».
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders (FSI usage; the queen is "donna", never "regina"): il pedone, il cavallo,
+# l’alfiere, la torre, la donna, il re. piece.<type>.gender is m, f, or mv = a masculine noun that
+# starts with a vowel (alfiere), whose article elides: l’alfiere, dell’alfiere, all’alfiere. Only the
+# patterns that put an article right before the noun (white, black) need an ".mv" variant; every
+# other pattern falls back to the masculine one ("il tuo alfiere").
+#
+# A piece placeholder always carries its owner: {your} {your2} = the player's ("il tuo cavallo"),
+# {my} {my2} = the coach's ("il mio alfiere"), {t1} {t2} = either; in the Analysis mode {piece} {t1}
+# {t2} carry a side instead ("il cavallo bianco", "la torre nera"). Never write an article, a
+# possessive, or di / a / da / in / su (they fuse with the article: del, al, dal, nel, sul) right
+# before a placeholder: ask for its form. A preposition that does not fuse (con, per, tra, fra,
+# contro, verso, senza, dietro, dopo, oltre, sopra, sotto) goes before the plain form ("per {your}").
+# The coach points at the piece on its placeholder: every line names the piece with a full form
+# ({your}, {t1:a}, {my:art}, {your:poss}...); the pronoun and ending forms (lo, gli, lui, o) never
+# replace it and come after it (except an ending right before the noun: quest{your:o} {your:poss}).
+# Every form below is defined for all six pieces and the owners your, my, white and black.
+#
+# Forms with the owner (your / my: article + possessive + noun; white / black: article + noun +
+# colour adjective):
+#   nom     il tuo cavallo, la tua torre, il mio alfiere / l’alfiere bianco, la donna nera
+#           (subject, object, after a preposition that does not fuse)
+#           "{my} attacca {t1} e {t2}."  "Prendo {your}."
+#   di      del tuo cavallo, della tua torre / dell’alfiere bianco, della torre nera
+#           "{your2} era l’unico difensore {your:di}."
+#   a       al tuo cavallo, alla tua torre / all’alfiere bianco, alla torre nera
+#           "{your} è inchiodat{your:o} {t1:a}."
+#   da      dal tuo cavallo, dalla tua torre / dall’alfiere bianco, dalla torre nera
+#           "{your} è attaccat{your:o} {my:da}."
+#   in      nel tuo cavallo, nella tua torre / nell’alfiere bianco, nella torre nera
+#           "Ho fiducia {my:in}."
+#   su      sul tuo cavallo, sulla tua torre / sull’alfiere bianco, sulla torre nera
+#           "Forchetta {t1:su} e {t2:su}!"
+#   con     con il tuo cavallo, con la tua torre / con l’alfiere bianco (the same as "con {your}")
+#           "Prendi {my} {your:con}!"
+#   poss    tuo cavallo, tua torre / alfiere bianco, torre nera (no article: after a demonstrative)
+#           "Guarda quest{your:o} {your:poss}." = "Guarda questo tuo cavallo." / "questa tua torre."
+# Forms without the owner (the same words for every owner; use them when the owner is obvious):
+#   art     il cavallo, la torre, l’alfiere                "Muovi {your:art}!"
+#   art_di  del cavallo, della torre, dell’alfiere         "Pensa alla sicurezza {your:art_di}."
+#   art_a   al cavallo, alla torre, all’alfiere            "Pensa {your:art_a}."
+#   art_da  dal cavallo, dalla torre, dall’alfiere         "Allontana il re {my:art_da}."
+#   art_in  nel cavallo, nella torre, nell’alfiere         "Ora tutta la forza è {my:art_in}."
+#   art_su  sul cavallo, sulla torre, sull’alfiere         "La pressione cresce {your:art_su}."
+#   un      un cavallo, una torre, un alfiere              "Ho perso {my:un}, non la partita."
+#   bare    cavallo, torre, alfiere (the noun alone)       "{your:bare} inchiodat{your:o}." (terse
+#           lines: "Cavallo inchiodato." / "Torre inchiodata.")
+# Pronouns and endings that agree with the piece (the same for every owner):
+#   lo      lo / la, the direct object pronoun: "Prendi{my:lo}!" = "Prendilo!" / "Prendila!",
+#           "Ora {your:lo} attacco." Before a vowel or the h of avere write "l’" yourself (both
+#           genders) and let the participle agree: "l’ho pres{my:o}".
+#   gli     gli / le, the indirect object pronoun: "{your} è in trappola: non {your:gli} resta
+#           nessuna casa."
+#   lui     lui / lei, the stressed pronoun after a preposition: "{t2} è proprio dietro di {t1:lui}."
+#   o       o / a, the ending of a word in -o / -a that agrees with the piece, joined to its stem:
+#           "{your} è inchiodat{your:o}" = "inchiodato" / "inchiodata"; also quest{t1:o},
+#           l’altr{t1:o}, "te l{your:o} prendo" (te lo / te la), gliel{my:o}. Words in -e (forte,
+#           debole, vulnerabile) and "in presa" do not change.
+piece.pawn.nom = pedone
+piece.knight.nom = cavallo
+piece.bishop.nom = alfiere
+piece.rook.nom = torre
+piece.queen.nom = donna
+piece.king.nom = re
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = mv
+piece.rook.gender = f
+piece.queen.gender = f
+piece.king.gender = m
+# The noun of the forms with the owner (the patterns below add the article, the possessive or the
+# colour).
+piece.pawn.di = pedone
+piece.knight.di = cavallo
+piece.bishop.di = alfiere
+piece.rook.di = torre
+piece.queen.di = donna
+piece.king.di = re
+piece.pawn.a = pedone
+piece.knight.a = cavallo
+piece.bishop.a = alfiere
+piece.rook.a = torre
+piece.queen.a = donna
+piece.king.a = re
+piece.pawn.da = pedone
+piece.knight.da = cavallo
+piece.bishop.da = alfiere
+piece.rook.da = torre
+piece.queen.da = donna
+piece.king.da = re
+piece.pawn.in = pedone
+piece.knight.in = cavallo
+piece.bishop.in = alfiere
+piece.rook.in = torre
+piece.queen.in = donna
+piece.king.in = re
+piece.pawn.su = pedone
+piece.knight.su = cavallo
+piece.bishop.su = alfiere
+piece.rook.su = torre
+piece.queen.su = donna
+piece.king.su = re
+piece.pawn.con = pedone
+piece.knight.con = cavallo
+piece.bishop.con = alfiere
+piece.rook.con = torre
+piece.queen.con = donna
+piece.king.con = re
+piece.pawn.poss = pedone
+piece.knight.poss = cavallo
+piece.bishop.poss = alfiere
+piece.rook.poss = torre
+piece.queen.poss = donna
+piece.king.poss = re
+# The English keys owner.<owner>.nom are the masculine patterns; ".f" = feminine, ".mv" = alfiere.
+owner.your.nom = il tuo {piece}
+owner.your.nom.f = la tua {piece}
+owner.my.nom = il mio {piece}
+owner.my.nom.f = la mia {piece}
+owner.white.nom = il {piece} bianco
+owner.white.nom.f = la {piece} bianca
+owner.white.nom.mv = l’{piece} bianco
+owner.black.nom = il {piece} nero
+owner.black.nom.f = la {piece} nera
+owner.black.nom.mv = l’{piece} nero
+
+owner.your.di = del tuo {piece}
+owner.your.di.f = della tua {piece}
+owner.my.di = del mio {piece}
+owner.my.di.f = della mia {piece}
+owner.white.di = del {piece} bianco
+owner.white.di.f = della {piece} bianca
+owner.white.di.mv = dell’{piece} bianco
+owner.black.di = del {piece} nero
+owner.black.di.f = della {piece} nera
+owner.black.di.mv = dell’{piece} nero
+
+owner.your.a = al tuo {piece}
+owner.your.a.f = alla tua {piece}
+owner.my.a = al mio {piece}
+owner.my.a.f = alla mia {piece}
+owner.white.a = al {piece} bianco
+owner.white.a.f = alla {piece} bianca
+owner.white.a.mv = all’{piece} bianco
+owner.black.a = al {piece} nero
+owner.black.a.f = alla {piece} nera
+owner.black.a.mv = all’{piece} nero
+
+owner.your.da = dal tuo {piece}
+owner.your.da.f = dalla tua {piece}
+owner.my.da = dal mio {piece}
+owner.my.da.f = dalla mia {piece}
+owner.white.da = dal {piece} bianco
+owner.white.da.f = dalla {piece} bianca
+owner.white.da.mv = dall’{piece} bianco
+owner.black.da = dal {piece} nero
+owner.black.da.f = dalla {piece} nera
+owner.black.da.mv = dall’{piece} nero
+
+owner.your.in = nel tuo {piece}
+owner.your.in.f = nella tua {piece}
+owner.my.in = nel mio {piece}
+owner.my.in.f = nella mia {piece}
+owner.white.in = nel {piece} bianco
+owner.white.in.f = nella {piece} bianca
+owner.white.in.mv = nell’{piece} bianco
+owner.black.in = nel {piece} nero
+owner.black.in.f = nella {piece} nera
+owner.black.in.mv = nell’{piece} nero
+
+owner.your.su = sul tuo {piece}
+owner.your.su.f = sulla tua {piece}
+owner.my.su = sul mio {piece}
+owner.my.su.f = sulla mia {piece}
+owner.white.su = sul {piece} bianco
+owner.white.su.f = sulla {piece} bianca
+owner.white.su.mv = sull’{piece} bianco
+owner.black.su = sul {piece} nero
+owner.black.su.f = sulla {piece} nera
+owner.black.su.mv = sull’{piece} nero
+
+owner.your.con = con il tuo {piece}
+owner.your.con.f = con la tua {piece}
+owner.my.con = con il mio {piece}
+owner.my.con.f = con la mia {piece}
+owner.white.con = con il {piece} bianco
+owner.white.con.f = con la {piece} bianca
+owner.white.con.mv = con l’{piece} bianco
+owner.black.con = con il {piece} nero
+owner.black.con.f = con la {piece} nera
+owner.black.con.mv = con l’{piece} nero
+
+owner.your.poss = tuo {piece}
+owner.your.poss.f = tua {piece}
+owner.my.poss = mio {piece}
+owner.my.poss.f = mia {piece}
+owner.white.poss = {piece} bianco
+owner.white.poss.f = {piece} bianca
+owner.black.poss = {piece} nero
+owner.black.poss.f = {piece} nera
+
+# The forms without the owner: the whole phrase is the piece's own (owner.<owner>.<form> = {piece}).
+piece.pawn.art = il pedone
+piece.knight.art = il cavallo
+piece.bishop.art = l’alfiere
+piece.rook.art = la torre
+piece.queen.art = la donna
+piece.king.art = il re
+
+piece.pawn.art_di = del pedone
+piece.knight.art_di = del cavallo
+piece.bishop.art_di = dell’alfiere
+piece.rook.art_di = della torre
+piece.queen.art_di = della donna
+piece.king.art_di = del re
+
+piece.pawn.art_a = al pedone
+piece.knight.art_a = al cavallo
+piece.bishop.art_a = all’alfiere
+piece.rook.art_a = alla torre
+piece.queen.art_a = alla donna
+piece.king.art_a = al re
+
+piece.pawn.art_da = dal pedone
+piece.knight.art_da = dal cavallo
+piece.bishop.art_da = dall’alfiere
+piece.rook.art_da = dalla torre
+piece.queen.art_da = dalla donna
+piece.king.art_da = dal re
+
+piece.pawn.art_in = nel pedone
+piece.knight.art_in = nel cavallo
+piece.bishop.art_in = nell’alfiere
+piece.rook.art_in = nella torre
+piece.queen.art_in = nella donna
+piece.king.art_in = nel re
+
+piece.pawn.art_su = sul pedone
+piece.knight.art_su = sul cavallo
+piece.bishop.art_su = sull’alfiere
+piece.rook.art_su = sulla torre
+piece.queen.art_su = sulla donna
+piece.king.art_su = sul re
+
+piece.pawn.un = un pedone
+piece.knight.un = un cavallo
+piece.bishop.un = un alfiere
+piece.rook.un = una torre
+piece.queen.un = una donna
+piece.king.un = un re
+
+piece.pawn.bare = pedone
+piece.knight.bare = cavallo
+piece.bishop.bare = alfiere
+piece.rook.bare = torre
+piece.queen.bare = donna
+piece.king.bare = re
+
+piece.pawn.lo = lo
+piece.knight.lo = lo
+piece.bishop.lo = lo
+piece.rook.lo = la
+piece.queen.lo = la
+piece.king.lo = lo
+
+piece.pawn.gli = gli
+piece.knight.gli = gli
+piece.bishop.gli = gli
+piece.rook.gli = le
+piece.queen.gli = le
+piece.king.gli = gli
+
+piece.pawn.lui = lui
+piece.knight.lui = lui
+piece.bishop.lui = lui
+piece.rook.lui = lei
+piece.queen.lui = lei
+piece.king.lui = lui
+
+piece.pawn.o = o
+piece.knight.o = o
+piece.bishop.o = o
+piece.rook.o = a
+piece.queen.o = a
+piece.king.o = o
+
+owner.your.art = {piece}
+owner.my.art = {piece}
+owner.white.art = {piece}
+owner.black.art = {piece}
+owner.your.art_di = {piece}
+owner.my.art_di = {piece}
+owner.white.art_di = {piece}
+owner.black.art_di = {piece}
+owner.your.art_a = {piece}
+owner.my.art_a = {piece}
+owner.white.art_a = {piece}
+owner.black.art_a = {piece}
+owner.your.art_da = {piece}
+owner.my.art_da = {piece}
+owner.white.art_da = {piece}
+owner.black.art_da = {piece}
+owner.your.art_in = {piece}
+owner.my.art_in = {piece}
+owner.white.art_in = {piece}
+owner.black.art_in = {piece}
+owner.your.art_su = {piece}
+owner.my.art_su = {piece}
+owner.white.art_su = {piece}
+owner.black.art_su = {piece}
+owner.your.un = {piece}
+owner.my.un = {piece}
+owner.white.un = {piece}
+owner.black.un = {piece}
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+owner.your.lo = {piece}
+owner.my.lo = {piece}
+owner.white.lo = {piece}
+owner.black.lo = {piece}
+owner.your.gli = {piece}
+owner.my.gli = {piece}
+owner.white.gli = {piece}
+owner.black.gli = {piece}
+owner.your.lui = {piece}
+owner.my.lui = {piece}
+owner.white.lui = {piece}
+owner.black.lui = {piece}
+owner.your.o = {piece}
+owner.my.o = {piece}
+owner.white.o = {piece}
+owner.black.o = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Files are said by the Italian names of their letters, ranks by number words (the opening texts use
+# the same words): "e quattro", "effe tre", "di cinque", "acca sette", "ci sei".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = bi
+file.c.spoken = ci
+file.d.spoken = di
+file.e.spoken = e
+file.f.spoken = effe
+file.g.spoken = gi
+file.h.spoken = acca
+rank.1.spoken = uno
+rank.2.spoken = due
+rank.3.spoken = tre
+rank.4.spoken = quattro
+rank.5.spoken = cinque
+rank.6.spoken = sei
+rank.7.spoken = sette
+rank.8.spoken = otto
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Italian scoresheet letters (FSI): R(e) D(onna) T(orre) A(lfiere) C(avallo): "Cf3", "Txd1", "e8=D".
+move.letters = R D T A C
+# Spoken as Italian players read notation: "cavallo effe tre", "cavallo prende in e cinque",
+# "cavallo bi di due" (Nbd2), "pedone e prende in di cinque", "pedone riprende" (a recapture in a
+# line), "arrocco corto", "e otto, promozione a donna", "donna gi quattro, scacco",
+# "torre di otto, scacco matto". {piece} is the noun alone (piece.<type>.nom).
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} prende in {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} prende in {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = pedone {file} prende in {to}
+move.recapture.spoken = {piece} riprende
+move.castle_short.spoken = arrocco corto
+move.castle_long.spoken = arrocco lungo
+move.promotion.spoken = {move}, promozione a {piece}
+move.check.spoken = {move}, scacco
+move.mate.spoken = {move}, scacco matto
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the words the Italian voice misreads.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words, one word each as Italian writes them. 21-99 compose as "{tens}{units}"
+# ("ventidue", "quarantasei") except where Italian changes the joint, listed: a ten drops its final
+# vowel before uno and otto ("ventuno", "trentotto"), and a final tre takes an accent ("ventitré").
+# Hundreds: "cento", then "{n}cento" ("duecento" ... "novecento"); 101-999 compose as
+# "{hundreds}{rest}" ("centoventi", "trecentoquarantadue") except, listed: x01 keeps the o of cento
+# ("centouno", "duecentouno"), x03 takes the accent ("centotré"), and cento drops its o before otto
+# and ottanta ("centotto", "centottanta", "novecentottantotto").
+# Forms: "m" = before a masculine noun ("un punto", "un errore"), "f" = before a feminine noun or
+# alone for a feminine one ("una mossa", "matto in una"); the bare word is the counting form ("uno",
+# also right before s + consonant: "uno scacco"). Only 1 changes: 21, 31 ... stay "ventuno"
+# ("ventuno mosse"), and x01 is listed so that no form reaches its "uno" ("centouno punti").
+number.0.spoken = zero
+number.1.spoken = uno
+number.1.m.spoken = un
+number.1.f.spoken = una
+number.2.spoken = due
+number.3.spoken = tre
+number.4.spoken = quattro
+number.5.spoken = cinque
+number.6.spoken = sei
+number.7.spoken = sette
+number.8.spoken = otto
+number.9.spoken = nove
+number.10.spoken = dieci
+number.11.spoken = undici
+number.12.spoken = dodici
+number.13.spoken = tredici
+number.14.spoken = quattordici
+number.15.spoken = quindici
+number.16.spoken = sedici
+number.17.spoken = diciassette
+number.18.spoken = diciotto
+number.19.spoken = diciannove
+number.20.spoken = venti
+number.30.spoken = trenta
+number.40.spoken = quaranta
+number.50.spoken = cinquanta
+number.60.spoken = sessanta
+number.70.spoken = settanta
+number.80.spoken = ottanta
+number.90.spoken = novanta
+number.21.spoken = ventuno
+number.23.spoken = ventitré
+number.28.spoken = ventotto
+number.31.spoken = trentuno
+number.33.spoken = trentatré
+number.38.spoken = trentotto
+number.41.spoken = quarantuno
+number.43.spoken = quarantatré
+number.48.spoken = quarantotto
+number.51.spoken = cinquantuno
+number.53.spoken = cinquantatré
+number.58.spoken = cinquantotto
+number.61.spoken = sessantuno
+number.63.spoken = sessantatré
+number.68.spoken = sessantotto
+number.71.spoken = settantuno
+number.73.spoken = settantatré
+number.78.spoken = settantotto
+number.81.spoken = ottantuno
+number.83.spoken = ottantatré
+number.88.spoken = ottantotto
+number.91.spoken = novantuno
+number.93.spoken = novantatré
+number.98.spoken = novantotto
+number.100.spoken = cento
+number.101.spoken = centouno
+number.103.spoken = centotré
+number.108.spoken = centotto
+number.180.spoken = centottanta
+number.181.spoken = centottantuno
+number.182.spoken = centottantadue
+number.183.spoken = centottantatré
+number.184.spoken = centottantaquattro
+number.185.spoken = centottantacinque
+number.186.spoken = centottantasei
+number.187.spoken = centottantasette
+number.188.spoken = centottantotto
+number.189.spoken = centottantanove
+number.201.spoken = duecentouno
+number.203.spoken = duecentotré
+number.208.spoken = duecentotto
+number.280.spoken = duecentottanta
+number.281.spoken = duecentottantuno
+number.282.spoken = duecentottantadue
+number.283.spoken = duecentottantatré
+number.284.spoken = duecentottantaquattro
+number.285.spoken = duecentottantacinque
+number.286.spoken = duecentottantasei
+number.287.spoken = duecentottantasette
+number.288.spoken = duecentottantotto
+number.289.spoken = duecentottantanove
+number.301.spoken = trecentouno
+number.303.spoken = trecentotré
+number.308.spoken = trecentotto
+number.380.spoken = trecentottanta
+number.381.spoken = trecentottantuno
+number.382.spoken = trecentottantadue
+number.383.spoken = trecentottantatré
+number.384.spoken = trecentottantaquattro
+number.385.spoken = trecentottantacinque
+number.386.spoken = trecentottantasei
+number.387.spoken = trecentottantasette
+number.388.spoken = trecentottantotto
+number.389.spoken = trecentottantanove
+number.401.spoken = quattrocentouno
+number.403.spoken = quattrocentotré
+number.408.spoken = quattrocentotto
+number.480.spoken = quattrocentottanta
+number.481.spoken = quattrocentottantuno
+number.482.spoken = quattrocentottantadue
+number.483.spoken = quattrocentottantatré
+number.484.spoken = quattrocentottantaquattro
+number.485.spoken = quattrocentottantacinque
+number.486.spoken = quattrocentottantasei
+number.487.spoken = quattrocentottantasette
+number.488.spoken = quattrocentottantotto
+number.489.spoken = quattrocentottantanove
+number.501.spoken = cinquecentouno
+number.503.spoken = cinquecentotré
+number.508.spoken = cinquecentotto
+number.580.spoken = cinquecentottanta
+number.581.spoken = cinquecentottantuno
+number.582.spoken = cinquecentottantadue
+number.583.spoken = cinquecentottantatré
+number.584.spoken = cinquecentottantaquattro
+number.585.spoken = cinquecentottantacinque
+number.586.spoken = cinquecentottantasei
+number.587.spoken = cinquecentottantasette
+number.588.spoken = cinquecentottantotto
+number.589.spoken = cinquecentottantanove
+number.601.spoken = seicentouno
+number.603.spoken = seicentotré
+number.608.spoken = seicentotto
+number.680.spoken = seicentottanta
+number.681.spoken = seicentottantuno
+number.682.spoken = seicentottantadue
+number.683.spoken = seicentottantatré
+number.684.spoken = seicentottantaquattro
+number.685.spoken = seicentottantacinque
+number.686.spoken = seicentottantasei
+number.687.spoken = seicentottantasette
+number.688.spoken = seicentottantotto
+number.689.spoken = seicentottantanove
+number.701.spoken = settecentouno
+number.703.spoken = settecentotré
+number.708.spoken = settecentotto
+number.780.spoken = settecentottanta
+number.781.spoken = settecentottantuno
+number.782.spoken = settecentottantadue
+number.783.spoken = settecentottantatré
+number.784.spoken = settecentottantaquattro
+number.785.spoken = settecentottantacinque
+number.786.spoken = settecentottantasei
+number.787.spoken = settecentottantasette
+number.788.spoken = settecentottantotto
+number.789.spoken = settecentottantanove
+number.801.spoken = ottocentouno
+number.803.spoken = ottocentotré
+number.808.spoken = ottocentotto
+number.880.spoken = ottocentottanta
+number.881.spoken = ottocentottantuno
+number.882.spoken = ottocentottantadue
+number.883.spoken = ottocentottantatré
+number.884.spoken = ottocentottantaquattro
+number.885.spoken = ottocentottantacinque
+number.886.spoken = ottocentottantasei
+number.887.spoken = ottocentottantasette
+number.888.spoken = ottocentottantotto
+number.889.spoken = ottocentottantanove
+number.901.spoken = novecentouno
+number.903.spoken = novecentotré
+number.908.spoken = novecentotto
+number.980.spoken = novecentottanta
+number.981.spoken = novecentottantuno
+number.982.spoken = novecentottantadue
+number.983.spoken = novecentottantatré
+number.984.spoken = novecentottantaquattro
+number.985.spoken = novecentottantacinque
+number.986.spoken = novecentottantasei
+number.987.spoken = novecentottantasette
+number.988.spoken = novecentottantotto
+number.989.spoken = novecentottantanove
+number.tens.spoken = {tens}{units}
+number.hundreds.spoken = {n}cento
+number.hundreds_rest.spoken = {hundreds}{rest}
+number.minus.spoken = meno {n}
+# A decimal number: Italian writes a decimal comma ("1,3") and says "uno virgola tre".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} virgola {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Italian plural rule (assets/i18n): one (exactly 1) | other (0 included: "zero mosse"). The "one"
+# form says its number with the form of the noun's gender ("una mossa", "un punto"); the "other" form
+# says the bare number ("ventuno mosse"). Spoken, "una imprecisione" elides to "un’imprecisione"
+# (the subtitles write "1 imprecisione").
+count.move = {n:f} mossa|{n} mosse
+count.point = {n:m} punto|{n} punti
+count.pawn = {n:m} pedone|{n} pedoni
+count.piece = {n:m} pezzo|{n} pezzi
+count.mistake = {n:m} errore|{n} errori
+count.blunder = {n:m} errore grave|{n} errori gravi
+count.inaccuracy = {n:f} imprecisione|{n} imprecisioni
+count.inaccuracy.spoken = un’imprecisione|{n} imprecisioni
+count.game = {n:f} partita|{n} partite
+count.time = {n:f} volta|{n} volte
+count.square = {n:f} casa|{n} case
+count.position = {n:f} posizione|{n} posizioni
+# More counted nouns for the review, appraisal and analysis lines: "{m:check}" = "uno scacco" /
+# "3 scacchi", "{n:capture}" = "una cattura", "{n:captured}" = "un pezzo catturato" / "3 pezzi
+# catturati" (the participle agrees with the number: "{n:piece} captured"), "{n:attacker}" /
+# "{n:defender}" = "2 attaccanti", "un difensore", "{n:best_move}" = "5 mosse migliori".
+count.check = {n} scacco|{n} scacchi
+count.capture = {n:f} cattura|{n} catture
+count.captured = {n:m} pezzo catturato|{n} pezzi catturati
+count.attacker = {n:m} attaccante|{n} attaccanti
+count.defender = {n:m} difensore|{n} difensori
+count.best_move = {n:f} mossa migliore|{n} mosse migliori
+# Percentages (accuracy): "{acc:percent}" = "85%" in the subtitles, "ottantacinque per cento" spoken.
+count.percent = {n}%|{n}%
+count.percent.spoken = {n} per cento|{n} per cento
+# "{n:m}" / "{n:f}" say a bare number before a masculine / feminine noun, or alone in the feminine
+# ("matto in {m:f}" = "matto in una", "ne hai corrette {m:f}"); the subtitles write the digits.
+# They are count keys so that the forms also work outside the counted nouns (and the form check
+# knows them).
+count.m = {n:m}|{n:m}
+count.f = {n:f}|{n:f}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# {n} is a bare number here: the form "f" says "matto in una" (mossa) for a mate in one.
+eval.up = +{x}
+eval.up.spoken = più {x}
+eval.down = −{x}
+eval.down.spoken = meno {x}
+eval.even = 0,0
+eval.even.spoken = parità
+eval.mate_win = matto in {n:f}
+eval.mate_loss = matto in {n:f} contro di te
+
+# ---- Forms of the phase names (appraisal.lang {text}) -------------------------------------------
+# appraisal.phase.* carry their article ("l’apertura", "il mediogioco", "il finale"). With a form,
+# "{text:<form>}" says: di = "dell’apertura", a = "all’apertura", da = "dall’apertura", in =
+# "nell’apertura" ("Hai giocato benissimo {text:in}."), su = "sull’apertura", bare = "apertura" (no
+# article), o = the ending that agrees with the phase (l’apertura: a; il mediogioco, il finale: o).
+appraisal.phase.opening.di = dell’apertura
+appraisal.phase.opening.a = all’apertura
+appraisal.phase.opening.da = dall’apertura
+appraisal.phase.opening.in = nell’apertura
+appraisal.phase.opening.su = sull’apertura
+appraisal.phase.opening.bare = apertura
+appraisal.phase.opening.o = a
+appraisal.phase.middlegame.di = del mediogioco
+appraisal.phase.middlegame.a = al mediogioco
+appraisal.phase.middlegame.da = dal mediogioco
+appraisal.phase.middlegame.in = nel mediogioco
+appraisal.phase.middlegame.su = sul mediogioco
+appraisal.phase.middlegame.bare = mediogioco
+appraisal.phase.middlegame.o = o
+appraisal.phase.endgame.di = del finale
+appraisal.phase.endgame.a = al finale
+appraisal.phase.endgame.da = dal finale
+appraisal.phase.endgame.in = nel finale
+appraisal.phase.endgame.su = sul finale
+appraisal.phase.endgame.bare = finale
+appraisal.phase.endgame.o = o
