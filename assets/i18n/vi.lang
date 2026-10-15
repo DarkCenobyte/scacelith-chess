@@ -1,0 +1,260 @@
+# Scacelith - Tiếng Việt
+# Translation of assets/i18n/en.lang (same keys, same {n}). Vietnamese has a single plural form: a
+# noun after a number never changes ("1 nước", "3 nước").
+# Register: Vietnamese software (Microsoft, Apple): buttons, tabs and titles are short verbs or nouns
+# with no pronoun; the player is "bạn" when a pronoun is needed. Piece names are capitalised (Vua, Hậu,
+# Xe, Tượng, Mã, Tốt), and so are the sides as players (Trắng, Đen). Titles in capitals, every
+# diacritic kept. Time controls: Cờ siêu chớp (bullet), Cờ chớp (blitz), Cờ nhanh (rapid), Cờ tiêu
+# chuẩn (classical). "Friend" is "người bạn" / "bạn bè" (never "bạn của bạn"). Terms: glossary/vi.md.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Bật
+common.off = Tắt
+common.back = Quay lại
+common.apply = Áp dụng
+common.discard = Bỏ thay đổi
+common.cancel = Hủy
+common.white = Trắng
+common.black = Đen
+common.main_menu = Menu chính
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Trò chơi của bậc vương giả
+menu.new_game = Ván mới
+menu.options = Tùy chọn
+menu.credits = Ghi công
+menu.quit = Thoát
+menu.version = Phiên bản {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = TÙY CHỌN
+options.tab.display = Hiển thị
+options.tab.graphics = Đồ họa
+options.tab.audio = Âm thanh
+options.tab.gameplay = Lối chơi
+options.tab.player = Người chơi
+options.tab.controls = Điều khiển
+options.pending = Thay đổi có hiệu lực sau khi được áp dụng.
+options.unsaved.title = THAY ĐỔI CHƯA ÁP DỤNG
+options.unsaved.text = Một số tùy chọn đã được thay đổi. Áp dụng trước khi rời đi?
+
+options.language = Ngôn ngữ
+options.language.help = Ngôn ngữ của menu và thông báo. Thay đổi có hiệu lực ngay lập tức.
+options.display_mode = Chế độ hiển thị
+options.display_mode.help = Toàn màn hình: một cửa sổ không viền phủ kín màn hình, ở độ phân giải của màn hình nền. Cửa sổ: một cửa sổ có kích thước chọn bên dưới.
+options.fullscreen = Toàn màn hình
+options.windowed = Cửa sổ
+options.window_size = Kích thước cửa sổ
+options.window_size.help = Kích thước của cửa sổ ở chế độ Cửa sổ. Chế độ Toàn màn hình luôn dùng độ phân giải của màn hình nền.
+options.vsync = Đồng bộ dọc
+options.vsync.help = Đồng bộ khung hình với màn hình để tránh hiện tượng xé hình.
+options.render_scale = Tỷ lệ kết xuất
+options.render_scale.help = Độ phân giải nội bộ của hình ảnh 3D. Thấp hơn thì nhanh hơn, cao hơn thì sắc nét hơn.
+
+options.quality = Chất lượng
+options.quality.very_low = Rất thấp
+options.quality.low = Thấp
+options.quality.medium = Trung bình
+options.quality.high = Cao
+options.quality.ultra = Cực cao
+options.quality.custom = Tùy chỉnh
+options.quality.help = Đặt cùng lúc mọi tùy chọn bên dưới: Rất thấp tắt mọi hiệu ứng, Cực cao đặt tất cả ở mức tối đa. Thay đổi riêng một tùy chọn sẽ chuyển chất lượng sang Tùy chỉnh. Với card đồ họa cấu hình khiêm tốn, giảm tỷ lệ kết xuất (Hiển thị) cũng giúp ích rất nhiều.
+options.shadows = Bóng đổ
+options.shadows.help = Độ chi tiết của bóng nắng và độ mềm của viền bóng. Thấp: viền đơn giản, vẽ nhanh.
+options.reflections = Phản chiếu
+options.reflections.help = Sàn nhà, mặt bàn và bàn cờ phản chiếu căn phòng (căn phòng được vẽ thêm một lần cho mỗi bề mặt: thuộc nhóm tùy chọn nặng nhất); từ mức Trung bình, các quân cờ và đồ vật bóng loáng cũng phản chiếu những gì xung quanh.
+options.ambient_occlusion = Che khuất môi trường
+options.ambient_occlusion.help = Đổ bóng mềm ở nơi các vật tiếp giáp nhau và trong các hốc, nơi ít ánh sáng lọt vào.
+options.indirect_light = Ánh sáng gián tiếp
+options.indirect_light.help = Ánh sáng ban ngày dội lại từ tường, sàn và trần nhà. Thấp: thay bằng ánh sáng môi trường đồng đều. Chủ yếu ảnh hưởng đến thời gian tải.
+options.volumetric_light = Chùm tia sáng
+options.volumetric_light.help = Những chùm nắng xuyên qua không khí bụi bặm của đại sảnh, và những hạt bụi lấp lánh trong đó.
+options.tessellation = Chia nhỏ đa giác
+options.tessellation.help = Đường viền mượt trên các phần cong của quân cờ khi nhìn gần.
+options.tessellation.unavailable = Không khả dụng: trình điều khiển đồ họa này không hỗ trợ chia nhỏ đa giác (tessellation).
+options.antialiasing = Khử răng cưa
+options.antialiasing.help = Làm mượt các cạnh răng cưa và các điểm sáng nhấp nháy. Tắt: sắc nét hơn nhưng có răng cưa, và một số hiệu ứng trông bị nhiễu hạt.
+options.depth_of_field = Độ sâu trường ảnh
+options.depth_of_field.help = Làm mờ những gì nằm khá xa phía trước hoặc phía sau vật bạn đang nhìn, như ống kính máy ảnh.
+options.motion_blur = Nhòe chuyển động
+options.motion_blur.help = Làm nhòe các chuyển động nhanh của camera và cánh tay, như máy quay phim.
+options.bloom = Tỏa sáng
+options.bloom.help = Quầng sáng dịu quanh những điểm sáng nhất, như qua ống kính máy ảnh.
+options.brightness = Độ sáng
+options.brightness.neutral = Trung tính
+options.brightness.value = {0} EV
+options.brightness.help = Bù phơi sáng của camera. Bước hiệu chỉnh ở lần khởi động đầu tiên đặt giá trị này sao cho những vùng tối nhất chỉ vừa đủ nhìn thấy.
+
+options.master_volume = Âm lượng tổng
+options.effects = Hiệu ứng
+options.ambience = Âm thanh nền
+options.ambience.help = Tiếng rì rầm của đại sảnh: lửa lò sưởi, tiếng bước chân xa xa, chiếc đồng hồ cổ.
+options.ambience_volume = Âm lượng âm thanh nền
+options.voice_volume = Âm lượng giọng nói
+options.voice_volume.help = Âm lượng giọng nói của huấn luyện viên ở chế độ Huấn luyện viên.
+options.subtitles = Phụ đề
+options.subtitles.auto = Tự động
+options.subtitles.help = Lời của huấn luyện viên, hiển thị ở cuối màn hình. Tự động: hiện khi huấn luyện viên không nói ngôn ngữ của menu (với menu tiếng Trung, huấn luyện viên nói tiếng Anh). Luôn hiện khi giọng nói chưa được cài đặt.
+
+options.legal_moves = Hiện nước đi hợp lệ
+options.legal_moves.help = Đánh dấu các ô mà quân vừa chạm có thể đi tới. Khi tắt, không có gì cho bạn biết một nước đi có hợp lệ hay không: nước đi không hợp lệ sẽ bị trọng tài phạt ngay khi bạn bấm đồng hồ.
+options.coordinates = Tọa độ bàn cờ
+options.auto_press = Tự động bấm đồng hồ
+options.auto_press.help = Robot của bạn tự bấm đồng hồ ngay khi nước đi của bạn đã nằm trên bàn cờ. Trong ván trực tuyến, máy chủ quyết định việc này; trong trận đấu trực tiếp, người tạo ván quyết định.
+options.thinking_time = Thời gian suy nghĩ thực tế
+options.thinking_time.help = Đối thủ của bạn dành thời gian suy nghĩ như người thật thay vì đi ngay lập tức.
+options.ignore_head = Bỏ qua chuyển động đầu của đối thủ
+options.ignore_head.help = Trong ván trực tuyến và trận đấu trực tiếp, robot của đối thủ nhìn theo hướng người chơi điều khiển nó đang nhìn. Khi bật, robot tự chuyển động đầu, như khi đấu với Stockfish.
+options.mouse_sensitivity = Độ nhạy chuột
+options.invert_look = Đảo ngược trục nhìn dọc
+options.handover = Chuyển lượt (hai người)
+options.handover.cut = Chuyển tức thì
+options.handover.flight = Bay, {0} giây
+options.handover.help = Hai người chơi trên một máy tính: cách góc nhìn chuyển từ mắt người chơi này sang người chơi kia sau mỗi nước đi. Chuyển tức thì giúp tránh chuyển động của camera.
+options.game_cursor = Con trỏ trong trò chơi
+options.game_cursor.help = Tại bàn cờ, trò chơi vẽ con trỏ riêng, cho biết một cú nhấp chuột sẽ làm gì. Tắt: mũi tên thông thường của hệ thống.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Tên
+player.name.help = Tên của bạn được ghi ở đầu biên bản ván đấu, bằng bất kỳ hệ chữ nào.
+player.default_name = Người chơi
+player.handwriting = Nét chữ
+player.handwriting.help = Nét chữ ghi lại các nước đi của bạn. Tiếng Ả Rập, tiếng Nhật và tiếng Trung được viết bằng nét chữ riêng.
+player.preview = TRÊN BIÊN BẢN CỦA BẠN
+hand.caveat = Phóng khoáng
+hand.marck = Liền nét
+hand.badscript = Nghiêng
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Nhấp chuột trái
+controls.touch = Chạm vào một quân, rồi di chuyển nó
+controls.clock.keys = Phím cách  hoặc  nhấp vào đồng hồ
+controls.clock = Bấm đồng hồ
+controls.look.keys = Giữ chuột phải
+controls.look = Nhìn xung quanh
+controls.sheet.keys = S
+controls.sheet = Xem biên bản ván đấu, rồi quay lại
+controls.stand.keys = ↑
+controls.stand = Đứng dậy trước ghế
+controls.side.keys = ←  /  →
+controls.side = Đứng ở đầu bàn bên trái / bên phải
+controls.sit.keys = ↓
+controls.sit = Ngồi xuống lại (bạn chỉ chơi khi ngồi)
+controls.moves.keys = Tab
+controls.moves = Hiện hoặc ẩn danh sách nước đi
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Phím cách
+controls.coach_skip = Huấn luyện viên: bỏ qua lời đang nói
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Huấn luyện viên: đi lại nước vừa rồi khi được đề nghị
+controls.coach_hint.keys = H
+controls.coach_hint = Thử thách của huấn luyện viên: xin gợi ý
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = ĐỘ SÁNG
+calibration.text = Kéo thanh trượt cho đến khi con Mã trên ô đen chỉ vừa đủ nhìn thấy, hoặc không còn nhìn thấy nữa.
+calibration.later = Bạn có thể thay đổi sau trong Tùy chọn > Đồ họa.
+calibration.continue = Tiếp tục
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = VÁN MỚI
+newgame.opponent = ĐỐI THỦ
+newgame.time_control = THỜI GIAN THI ĐẤU
+newgame.start = Bắt đầu
+newgame.elo = ~{0} Elo
+newgame.you_white = Bạn sẽ chơi bên Trắng.
+newgame.you_black = Bạn sẽ chơi bên Đen.
+newgame.colour_lot = Màu quân của ván đầu tiên được bốc thăm.
+newgame.colour_alternate = Sau đó màu quân luân phiên từ ván này sang ván sau.
+newgame.opponent_kind = Đối thủ
+newgame.opponent_kind.help = Đấu với Stockfish, hoặc với một người bạn ngồi cùng máy tính này: hai người lần lượt đi, mỗi người từ phía bàn cờ của mình.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Người chơi, cùng máy
+
+# Custom opponent: Stockfish parameters
+engine.skill = Cấp độ kỹ năng
+engine.skill.help = “Skill Level” của Stockfish (0–20). Bị bỏ qua khi sức mạnh được giới hạn theo Elo.
+engine.limit_elo = Giới hạn sức mạnh (Elo)
+engine.limit_elo.help = UCI_LimitStrength: chương trình cờ nhắm tới hệ số Elo bên dưới.
+engine.elo = Elo
+engine.depth = Độ sâu tìm kiếm
+engine.plies = {0} nửa nước
+engine.move_time = Thời gian mỗi nước
+engine.nodes = Giới hạn số nút
+engine.no_limit = Tắt
+engine.thousand = {0} nghìn
+engine.million = {0} triệu
+engine.dynamic_elo = Elo thay đổi theo thời gian
+engine.dynamic_elo.help = Như người chơi thật, Stockfish chơi yếu hơn khi đồng hồ sắp hết giờ: yếu đi một chút ở phút cuối cùng (sớm hơn trong cờ nhanh và cờ chớp), yếu đi nhiều khi bị thiếu thời gian trầm trọng. Chỉ áp dụng cho ván có đồng hồ.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish dành thời gian suy nghĩ như người chơi cùng trình độ. Để bỏ khoảng dừng này: Tùy chọn > Lối chơi > Thời gian suy nghĩ thực tế.
+engine.pace.instant = Stockfish đi ngay khi tính xong. Để có khoảng dừng như người thật: Tùy chọn > Lối chơi > Thời gian suy nghĩ thực tế.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Không giới hạn
+tc.no_clock = Không đồng hồ
+tc.bullet = Cờ siêu chớp
+tc.blitz = Cờ chớp
+tc.rapid = Cờ nhanh
+tc.classical = Cờ tiêu chuẩn
+tc.custom = Tùy chỉnh
+tc.your_own = Tự chọn
+tc.base_time = Thời gian cơ bản
+tc.base_time.help = Thời gian ban đầu trên mỗi đồng hồ (phút : giây).
+tc.increment = Cộng thêm
+tc.increment.help = Thời gian cộng thêm kiểu Fischer sau mỗi nước đi.
+tc.delay = Độ trễ
+tc.delay.help = Độ trễ kiểu Bronstein: thời gian đã dùng, tối đa bằng độ trễ này, được trả lại sau mỗi nước đi.
+tc.no_delay = Tắt
+tc.seconds = {0} giây
+tc.minutes = {0} phút
+tc.summary_increment = {0} + {1} giây
+tc.summary_delay = {0}, trễ {1} giây
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Mới tập chơi
+preset.novice.desc = Vừa học cách đi quân: để quân bị bắt không và bỏ sót những đe dọa đơn giản.
+preset.beginner.name = Người mới chơi
+preset.beginner.desc = Nắm được những điều cơ bản, nhưng vẫn thường mất quân vì sai lầm nghiêm trọng.
+preset.casual.name = Giải trí
+preset.casual.desc = Đối thủ thư thả cho buổi tối: nước đi hợp lý, sai lầm thường xuyên.
+preset.club_player.name = Kỳ thủ câu lạc bộ
+preset.club_player.desc = Kỳ thủ câu lạc bộ vững vàng, biết trừng phạt những sai lầm hiển nhiên.
+preset.advanced.name = Nâng cao
+preset.advanced.desc = Kỳ thủ câu lạc bộ mạnh với nhãn quan chiến thuật sắc bén.
+preset.expert.name = Chuyên gia
+preset.expert.desc = Chuyên gia thi đấu: hiếm khi sai sót, biết biến ưu thế thành chiến thắng.
+preset.master.name = Kiện tướng
+preset.master.desc = Trình độ kiện tướng: tính toán sâu và lối chơi thế trận tinh tế.
+preset.grandmaster.name = Đại kiện tướng
+preset.grandmaster.desc = Trình độ đại kiện tướng: cực kỳ khó đánh bại.
+preset.stockfish_max.name = Stockfish tối đa
+preset.stockfish_max.desc = Stockfish 19 với toàn bộ sức mạnh. Chúc may mắn.
+preset.custom.name = Tùy chỉnh
+preset.custom.desc = Thiết lập chương trình cờ theo ý bạn.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = GHI CÔNG
+credits.game.head = SCACELITH
+credits.game = Một ván cờ trong đại sảnh hoàng gia, trên bộ máy đồ họa OpenGL 4.6 tự phát triển.
+credits.engine.head = CHƯƠNG TRÌNH CỜ
+credits.engine = Stockfish 19, của các nhà phát triển Stockfish.
+credits.engine.licence = Giấy phép GNU General Public License v3.
+credits.engine.data = Mạng nơ-ron của Stockfish được huấn luyện trên dữ liệu do dự án Leela Chess Zero cung cấp; dữ liệu này được phát hành theo giấy phép Open Database License (ODbL).
+credits.voice.head = GIỌNG HUẤN LUYỆN VIÊN
+credits.voice = Giọng nói tổng hợp do Supertonic 3 tạo ra cho chế độ Huấn luyện viên.
+credits.voice.licence = Supertonic 3 là mô hình của Supertone, được sử dụng theo giấy phép OpenRAIL-M; các hạn chế sử dụng của giấy phép này áp dụng cho mọi người dùng mô hình (xem Giấy phép).
+credits.openings.head = KHAI CUỘC
+credits.openings = Tên các khai cuộc lấy từ cơ sở dữ liệu chess-openings của lichess.org, được đưa vào phạm vi công cộng (CC0).
+credits.fonts.head = PHÔNG CHỮ
+credits.fonts = EB Garamond của Georg Duffner và Cinzel của Natanael Gama; Amiri của Khaled Hosny.
+credits.fonts.hand = Chữ viết tay: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Hình quân cờ từ GNU FreeFont (GPL v3 kèm ngoại lệ phông chữ).
+credits.quote = “Cờ vua là nghệ thuật phân tích.”  — Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)

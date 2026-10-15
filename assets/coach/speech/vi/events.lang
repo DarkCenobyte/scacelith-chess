@@ -1,0 +1,109 @@
+# Coach speech (Vietnamese): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach calls himself "tôi" and the player "bạn"; "we / let's" = "chúng ta" (glossary/vi.md).
+# Vietnamese has no gender agreement: nothing depends on the player's or the coach's gender.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Xin chào! Chúng ta chơi một ván giao hữu nhé. Mỗi khi có gì không ổn, tôi sẽ giúp bạn.
+event.greet.l1.2 = Chào bạn! Tôi sẽ chơi nhẹ nhàng và chỉ cho bạn những điều cần để ý.
+event.greet.l1.3 = Chào mừng bạn! Cứ thong thả nhé: khi có quân nào gặp nguy hiểm, tôi sẽ báo cho bạn.
+event.greet.l2 = Xin chào! Chúng ta chơi nào. Khi có đòn chĩa đôi hay đòn ghim, tôi sẽ chỉ cho bạn.
+event.greet.l2.2 = Chào bạn! Hãy ra quân và giữ an toàn cho Vua. Tôi sẽ giúp bạn trong suốt ván cờ.
+event.greet.l2.3 = Chào mừng bạn trở lại bàn cờ! Hãy để ý các đòn chĩa đôi và đòn ghim: chúng giúp thắng ván cờ.
+event.greet.l3 = Xin chào! Chúng ta chơi một ván thực sự nào. Tôi sẽ nhận xét về kế hoạch của bạn và những sai lầm lớn.
+event.greet.l3.2 = Chào bạn! Hãy nghĩ ra một kế hoạch cho các quân của mình. Khi một nước đi bỏ sót điều gì, tôi sẽ cho bạn biết.
+event.greet.l3.3 = Chơi thôi! Tôi sẽ chỉ ra những nước đi duy nhất và những nước đi sai.
+event.greet.l4 = Xin chào! Lần này tôi sẽ đưa ra đánh giá và chỉ cho bạn những nước ứng viên hay hơn.
+event.greet.l4.2 = Chúng ta chơi nào. Sau một sai lầm, tôi sẽ cho bạn biết nước nào chính xác hơn.
+event.greet.l4.3 = Sẵn sàng cho một ván như ở câu lạc bộ chưa? Tôi sẽ nhận xét khi đánh giá thay đổi.
+event.greet.l5 = Chơi nào. Tôi sẽ nhận xét ngắn gọn.
+event.greet.l5.2 = Bạn sẵn sàng lúc nào thì bắt đầu lúc đó. Chỉ nhận xét ngắn gọn thôi.
+event.greet.l5.3 = Chúc may mắn. Tôi chỉ lên tiếng khi có điều quan trọng.
+event.greet.l6 = Chúc may mắn.
+event.greet.l6.2 = Chơi thôi.
+event.greet.l6.3 = Sẵn sàng. Tôi chỉ nhận xét những thời điểm then chốt.
+
+# Who starts (said after the greeting).
+event.colour.white = Bạn cầm quân trắng, nên bạn đi trước.
+event.colour.white.2 = Bạn chơi bên Trắng: bạn đi trước.
+event.colour.black = Tôi cầm quân trắng, nên tôi sẽ đi trước.
+event.colour.black.2 = Lần này bạn chơi bên Đen: tôi đi trước.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/vi.lang coach.level.<n>.name).
+event.level.l1 = Những bước đầu: tôi chơi nhẹ nhàng và giải thích mọi sai lầm bằng lời lẽ đơn giản.
+event.level.l2 = Người mới chơi: tôi chơi mạnh hơn một chút, và gọi tên các đòn chiến thuật đơn giản như chĩa đôi và ghim.
+event.level.l3 = Đang tiến bộ: tôi nói về kế hoạch và cấu trúc Tốt, và chỉ ra những chuỗi nước đi ngắn.
+event.level.l4 = Kỳ thủ câu lạc bộ: tôi đưa ra đánh giá tính theo đơn vị Tốt và gợi ý các nước ứng viên.
+event.level.l5 = Kỳ thủ câu lạc bộ mạnh: nhận xét ngắn gọn, và những chuỗi nước dài hơn khi cần thiết.
+event.level.l6 = Chuyên gia: tôi chơi hết sức và chỉ nhận xét những thời điểm then chốt.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Đến lượt bạn.
+event.your_move.2 = Lượt của bạn.
+event.your_move.3 = Mời bạn đi.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Cứ từ từ nhé.
+event.take_time.2 = Không cần vội: các ván của chúng ta không có đồng hồ.
+# Short filler while the coach is still looking at the position.
+event.filler = Hừm.
+event.filler.2 = Để xem nào.
+event.filler.3 = Để tôi xem.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Được rồi, chúng ta đi lại nước đó nhé.
+event.takeback.taken.2 = Ý hay đấy. Bạn xem lại một lần nữa nhé.
+event.takeback.taken.3 = Đã rút lại nước đi. Thử lại nào.
+# The player declined the offer and played on.
+event.takeback.declined = Được rồi, chúng ta chơi tiếp.
+event.takeback.declined.2 = Được thôi, ván cờ tiếp tục.
+event.takeback.declined.3 = Tùy bạn. Chúng ta tiếp tục nào.
+# After an explanation without an offer.
+event.play_on = Chúng ta chơi tiếp nào.
+event.play_on.2 = Tiếp tục nào.
+event.play_on.3 = Nào, quay lại ván cờ của chúng ta.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Ai cũng mắc những sai lầm như thế này. Điều quan trọng là nhận ra chúng.
+event.encourage.mistake.2 = Đừng lo. Hãy xem nước đi vừa rồi của tôi tấn công gì, bạn sẽ tìm ra thôi.
+event.encourage.mistake.3 = Người chơi nào cũng từng gặp chuyện đó. Chúng ta chơi tiếp nào.
+# The player is behind (material or evaluation).
+event.encourage.behind = Đừng bỏ cuộc: hãy tìm cơ hội, và đừng để tôi thắng dễ dàng.
+event.encourage.behind.2 = Cứ tiếp tục chiến đấu. Những thế cờ như thế này vẫn có thể xoay chuyển.
+event.encourage.behind.3 = Hãy bình tĩnh và tìm điểm yếu của tôi.
+# The player has played several good moves in a row.
+event.encourage.well = Bạn kiểm tra các mối đe dọa của tôi trước khi đi. Giỏi lắm.
+event.encourage.well.2 = Những nước đi cẩn thận và chắc chắn. Cứ tiếp tục như vậy nhé.
+event.encourage.well.3 = Hôm nay bạn suy nghĩ rất tốt.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Tôi đồng ý. Vậy là hòa.
+event.draw.accepted.2 = Đồng ý: ván cờ hòa.
+event.draw.declined = Không, cảm ơn. Chúng ta chơi tiếp nhé.
+event.draw.declined.2 = Tôi muốn chơi tiếp hơn.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Chơi hay lắm. Chúc mừng bạn!
+event.end.win.2 = Bạn xứng đáng chiến thắng. Giỏi lắm!
+event.end.win.3 = Chúc mừng: bạn đã thắng tôi một cách sòng phẳng.
+event.end.loss = Ván cờ hay lắm. Lần sau bạn sẽ thắng được tôi thôi.
+event.end.loss.2 = Cảm ơn bạn vì ván cờ. Mỗi ván thua đều dạy cho bạn một điều gì đó.
+event.end.loss.3 = Một trận đấu hay. Chúng ta cùng xem chuyện gì đã xảy ra nhé.
+event.end.draw = Hòa. Ván cờ hay lắm!
+event.end.draw.2 = Lần này không ai thắng cả. Đấu hay lắm.
+event.end.draw.3 = Một kết quả công bằng. Ván cờ hay lắm.
+event.end.resigned = Bạn đã xin thua. Dù sao đó cũng là một trận đấu hay.
+event.end.resigned.2 = Được rồi. Cảm ơn bạn vì ván cờ.
+event.end.handshake = Chúng ta bắt tay nhé.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lowercase noun phrase that follows
+# "phần" ("phần nhập thành") or a colon.
+event.lesson.resume = Chào mừng bạn quay lại! Chúng ta tiếp tục với phần {chapter}.
+event.lesson.resume.2 = Chào bạn! Lần trước chúng ta dừng ở phần {chapter}.
+event.lesson.next = Tiếp theo: {chapter}.
+event.lesson.next.2 = Bây giờ đến phần {chapter}.
