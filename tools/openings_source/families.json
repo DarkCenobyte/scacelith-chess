@@ -24,7 +24,8 @@
    "fi",
    "hi",
    "hr",
-   "hu"
+   "hu",
+   "ro"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -184,6 +185,11 @@
       "ela": "a királygyalog-megnyitásból",
       "sub": "a királygyalog-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea pionului regelui",
+     "def": "deschiderea pionului regelui",
+     "gender": "f"
     }
    },
    "comment": {
@@ -317,6 +323,11 @@
       "ela": "a vezérgyalog-megnyitásból",
       "sub": "a vezérgyalog-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea pionului damei",
+     "def": "deschiderea pionului damei",
+     "gender": "f"
     }
    },
    "comment": {
@@ -447,6 +458,11 @@
       "ela": "a királyhuszár-megnyitásból",
       "sub": "a királyhuszár-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea calului regelui",
+     "def": "deschiderea calului regelui",
+     "gender": "f"
     }
    },
    "comment": {
@@ -580,6 +596,11 @@
       "ela": "a szicíliai védelemből",
       "sub": "a szicíliai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea siciliană",
+     "def": "apărarea siciliană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -710,6 +731,11 @@
       "ela": "a francia védelemből",
       "sub": "a francia védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea franceză",
+     "def": "apărarea franceză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -840,6 +866,11 @@
       "ela": "a Caro–Kann-védelemből",
       "sub": "a Caro–Kann-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Caro-Kann",
+     "def": "apărarea Caro-Kann",
+     "gender": "f"
     }
    },
    "comment": {
@@ -970,6 +1001,11 @@
       "ela": "a skandináv védelemből",
       "sub": "a skandináv védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea scandinavă",
+     "def": "apărarea scandinavă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1100,6 +1136,11 @@
       "ela": "az olasz játszmából",
       "sub": "az olasz játszmára"
      }
+    },
+    "ro": {
+     "name": "Partida italiană",
+     "def": "partida italiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1230,6 +1271,11 @@
       "ela": "a spanyol megnyitásból",
       "sub": "a spanyol megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Partida spaniolă",
+     "def": "partida spaniolă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1360,6 +1406,11 @@
       "ela": "a skót játszmából",
       "sub": "a skót játszmára"
      }
+    },
+    "ro": {
+     "name": "Partida scoțiană",
+     "def": "partida scoțiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1490,6 +1541,11 @@
       "ela": "a Philidor-védelemből",
       "sub": "a Philidor-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Philidor",
+     "def": "apărarea Philidor",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1620,6 +1676,11 @@
       "ela": "a Petrov-védelemből",
       "sub": "a Petrov-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Petrov",
+     "def": "apărarea Petrov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1751,6 +1812,11 @@
       "ela": "a négyhuszáros játékból",
       "sub": "a négyhuszáros játékra"
      }
+    },
+    "ro": {
+     "name": "Partida celor patru cai",
+     "def": "partida celor patru cai",
+     "gender": "f"
     }
    },
    "comment": {
@@ -1882,6 +1948,11 @@
       "ela": "az angol megnyitásból",
       "sub": "az angol megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea engleză",
+     "def": "deschiderea engleză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2012,6 +2083,11 @@
       "ela": "a Zukertort-megnyitásból",
       "sub": "a Zukertort-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Zukertort",
+     "def": "deschiderea Zukertort",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2147,6 +2223,11 @@
       "ela": "a vezércselből",
       "sub": "a vezércselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul damei",
+     "def": "gambitul damei",
+     "gender": "n"
     }
    },
    "comment": {
@@ -2277,6 +2358,11 @@
       "ela": "az elhárított vezércselből",
       "sub": "az elhárított vezércselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul damei refuzat",
+     "def": "gambitul damei refuzat",
+     "gender": "n"
     }
    },
    "comment": {
@@ -2407,6 +2493,11 @@
       "ela": "az elfogadott vezércselből",
       "sub": "az elfogadott vezércselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul damei acceptat",
+     "def": "gambitul damei acceptat",
+     "gender": "n"
     }
    },
    "comment": {
@@ -2538,6 +2629,11 @@
       "ela": "a szláv védelemből",
       "sub": "a szláv védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea slavă",
+     "def": "apărarea slavă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2669,6 +2765,11 @@
       "ela": "a félszláv védelemből",
       "sub": "a félszláv védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea semislavă",
+     "def": "apărarea semislavă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2800,6 +2901,11 @@
       "ela": "az indiai védelemből",
       "sub": "az indiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea indiană",
+     "def": "apărarea indiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -2930,6 +3036,11 @@
       "ela": "a királyindiai védelemből",
       "sub": "a királyindiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea est-indiană",
+     "def": "apărarea est-indiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3065,6 +3176,11 @@
       "ela": "a londoni rendszerből",
       "sub": "a londoni rendszerre"
      }
+    },
+    "ro": {
+     "name": "Sistemul Londra",
+     "def": "sistemul Londra",
+     "gender": "n"
     }
    },
    "comment": {
@@ -3197,6 +3313,11 @@
       "ela": "a modern védelemből",
       "sub": "a modern védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea modernă",
+     "def": "apărarea modernă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3329,6 +3450,11 @@
       "ela": "a Pirc-védelemből",
       "sub": "a Pirc-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Pirc",
+     "def": "apărarea Pirc",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3460,6 +3586,11 @@
       "ela": "a bécsi játszmából",
       "sub": "a bécsi játszmára"
      }
+    },
+    "ro": {
+     "name": "Partida vieneză",
+     "def": "partida vieneză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3590,6 +3721,11 @@
       "ela": "a futójátékból",
       "sub": "a futójátékra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea nebunului",
+     "def": "deschiderea nebunului",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3720,6 +3856,11 @@
       "ela": "az Aljechin-védelemből",
       "sub": "az Aljechin-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Alehin",
+     "def": "apărarea Alehin",
+     "gender": "f"
     }
    },
    "comment": {
@@ -3850,6 +3991,11 @@
       "ela": "a királycselből",
       "sub": "a királycselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul regelui",
+     "def": "gambitul regelui",
+     "gender": "n"
     }
    },
    "comment": {
@@ -3980,6 +4126,11 @@
       "ela": "az elfogadott királycselből",
       "sub": "az elfogadott királycselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul regelui acceptat",
+     "def": "gambitul regelui acceptat",
+     "gender": "n"
     }
    },
    "comment": {
@@ -4110,6 +4261,11 @@
       "ela": "az elhárított királycselből",
       "sub": "az elhárított királycselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul regelui refuzat",
+     "def": "gambitul regelui refuzat",
+     "gender": "n"
     }
    },
    "comment": {
@@ -4240,6 +4396,11 @@
       "ela": "a Nimzowitsch-védelemből",
       "sub": "a Nimzowitsch-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Nimzowitsch",
+     "def": "apărarea Nimzowitsch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4375,6 +4536,11 @@
       "ela": "az Owen-védelemből",
       "sub": "az Owen-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Owen",
+     "def": "apărarea Owen",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4506,6 +4672,11 @@
       "ela": "a Horwitz-védelemből",
       "sub": "a Horwitz-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Horwitz",
+     "def": "apărarea Horwitz",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4636,6 +4807,11 @@
       "ela": "a Van't Kruijs-megnyitásból",
       "sub": "a Van't Kruijs-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Van't Kruijs",
+     "def": "deschiderea Van't Kruijs",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4767,6 +4943,11 @@
       "ela": "a középcselből",
       "sub": "a középcselre"
      }
+    },
+    "ro": {
+     "name": "Partida de centru",
+     "def": "partida de centru",
+     "gender": "f"
     }
    },
    "comment": {
@@ -4898,6 +5079,11 @@
       "ela": "az Englund-cselből",
       "sub": "az Englund-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Englund",
+     "def": "gambitul Englund",
+     "gender": "n"
     }
    },
    "comment": {
@@ -5028,6 +5214,11 @@
       "ela": "a holland védelemből",
       "sub": "a holland védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea olandeză",
+     "def": "apărarea olandeză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5158,6 +5349,11 @@
       "ela": "a nimzoindiai védelemből",
       "sub": "a nimzoindiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea nimzo-indiană",
+     "def": "apărarea nimzo-indiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5290,6 +5486,11 @@
       "ela": "a vezérindiai védelemből",
       "sub": "a vezérindiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea vest-indiană",
+     "def": "apărarea vest-indiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5421,6 +5622,11 @@
       "ela": "a Grünfeld-védelemből",
       "sub": "a Grünfeld-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Grünfeld",
+     "def": "apărarea Grünfeld",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5551,6 +5757,11 @@
       "ela": "a katalán megnyitásból",
       "sub": "a katalán megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea catalană",
+     "def": "deschiderea catalană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5681,6 +5892,11 @@
       "ela": "a Benoni-védelemből",
       "sub": "a Benoni-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Benoni",
+     "def": "apărarea Benoni",
+     "gender": "f"
     }
    },
    "comment": {
@@ -5813,6 +6029,11 @@
       "ela": "a Benkő-cselből",
       "sub": "a Benkő-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Benko",
+     "def": "gambitul Benko",
+     "gender": "n"
     }
    },
    "comment": {
@@ -5943,6 +6164,11 @@
       "ela": "a Réti-megnyitásból",
       "sub": "a Réti-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Réti",
+     "def": "deschiderea Réti",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6073,6 +6299,11 @@
       "ela": "a királyindiai támadásból",
       "sub": "a királyindiai támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul est-indian",
+     "def": "atacul est-indian",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6207,6 +6438,11 @@
       "ela": "a Bird-megnyitásból",
       "sub": "a Bird-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Bird",
+     "def": "deschiderea Bird",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6337,6 +6573,11 @@
       "ela": "a Ponziani-megnyitásból",
       "sub": "a Ponziani-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Ponziani",
+     "def": "deschiderea Ponziani",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6467,6 +6708,11 @@
       "ela": "a háromhuszáros játékból",
       "sub": "a háromhuszáros játékra"
      }
+    },
+    "ro": {
+     "name": "Partida celor trei cai",
+     "def": "partida celor trei cai",
+     "gender": "f"
     }
    },
    "comment": {
@@ -6599,6 +6845,11 @@
       "ela": "a dán cselből",
       "sub": "a dán cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul danez",
+     "def": "gambitul danez",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6731,6 +6982,11 @@
       "ela": "a Blackmar–Diemer-cselből",
       "sub": "a Blackmar–Diemer-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Blackmar-Diemer",
+     "def": "gambitul Blackmar-Diemer",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6861,6 +7117,11 @@
       "ela": "a Trompowsky-támadásból",
       "sub": "a Trompowsky-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Trompowsky",
+     "def": "atacul Trompowsky",
+     "gender": "n"
     }
    },
    "comment": {
@@ -6992,6 +7253,11 @@
       "ela": "a Torre-támadásból",
       "sub": "a Torre-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Torre",
+     "def": "atacul Torre",
+     "gender": "n"
     }
    },
    "comment": {
@@ -7124,6 +7390,11 @@
       "ela": "a Colle-rendszerből",
       "sub": "a Colle-rendszerre"
      }
+    },
+    "ro": {
+     "name": "Sistemul Colle",
+     "def": "sistemul Colle",
+     "gender": "n"
     }
    },
    "comment": {
@@ -7254,6 +7525,11 @@
       "ela": "a Tarrasch-védelemből",
       "sub": "a Tarrasch-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Tarrasch",
+     "def": "apărarea Tarrasch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -7385,6 +7661,11 @@
       "ela": "a budapesti cselből",
       "sub": "a budapesti cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Budapesta",
+     "def": "gambitul Budapesta",
+     "gender": "n"
     }
    },
    "comment": {
@@ -7515,6 +7796,11 @@
       "ela": "a Bogoljubov-indiai védelemből",
       "sub": "a Bogoljubov-indiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea bogo-indiană",
+     "def": "apărarea bogo-indiană",
+     "gender": "f"
     }
    },
    "comment": {
@@ -7645,6 +7931,11 @@
       "ela": "az óindiai védelemből",
       "sub": "az óindiai védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea indiană veche",
+     "def": "apărarea indiană veche",
+     "gender": "f"
     }
    },
    "comment": {
@@ -7780,6 +8071,11 @@
       "ela": "a Csigorin-védelemből",
       "sub": "a Csigorin-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Cigorin",
+     "def": "apărarea Cigorin",
+     "gender": "f"
     }
    },
    "comment": {
@@ -7910,6 +8206,11 @@
       "ela": "az Albin-ellencselből",
       "sub": "az Albin-ellencselre"
      }
+    },
+    "ro": {
+     "name": "Contragambitul Albin",
+     "def": "contragambitul Albin",
+     "gender": "n"
     }
    },
    "comment": {
@@ -8041,6 +8342,11 @@
       "ela": "a lett cselből",
       "sub": "a lett cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul leton",
+     "def": "gambitul leton",
+     "gender": "n"
     }
    },
    "comment": {
@@ -8171,6 +8477,11 @@
       "ela": "az elefántcselből",
       "sub": "az elefántcselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul elefantului",
+     "def": "gambitul elefantului",
+     "gender": "n"
     }
    },
    "comment": {
@@ -8306,6 +8617,11 @@
       "ela": "a Nimzowitsch–Larsen-támadásból",
       "sub": "a Nimzowitsch–Larsen-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Nimzowitsch-Larsen",
+     "def": "atacul Nimzowitsch-Larsen",
+     "gender": "n"
     }
    },
    "comment": {
@@ -8436,6 +8752,11 @@
       "ela": "a lengyel megnyitásból",
       "sub": "a lengyel megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea poloneză",
+     "def": "deschiderea poloneză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8566,6 +8887,11 @@
       "ela": "a Grob-megnyitásból",
       "sub": "a Grob-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Grob",
+     "def": "deschiderea Grob",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8696,6 +9022,11 @@
       "ela": "a magyar megnyitásból",
       "sub": "a magyar megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea ungară",
+     "def": "deschiderea ungară",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8827,6 +9158,11 @@
       "ela": "a Mieses-megnyitásból",
       "sub": "a Mieses-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Mieses",
+     "def": "deschiderea Mieses",
+     "gender": "f"
     }
    },
    "comment": {
@@ -8957,6 +9293,11 @@
       "ela": "a Saragossa-megnyitásból",
       "sub": "a Saragossa-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Zaragoza",
+     "def": "deschiderea Zaragoza",
+     "gender": "f"
     }
    },
    "comment": {
@@ -9087,6 +9428,11 @@
       "ela": "a Van Geet-megnyitásból",
       "sub": "a Van Geet-megnyitásra"
      }
+    },
+    "ro": {
+     "name": "Deschiderea Van Geet",
+     "def": "deschiderea Van Geet",
+     "gender": "f"
     }
    },
    "comment": {
@@ -9217,6 +9563,11 @@
       "ela": "a Jobava-féle londoni rendszerből",
       "sub": "a Jobava-féle londoni rendszerre"
      }
+    },
+    "ro": {
+     "name": "Sistemul Jobava-Londra",
+     "def": "sistemul Jobava-Londra",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9347,6 +9698,11 @@
       "ela": "a Stonewall-támadásból",
       "sub": "a Stonewall-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Stonewall",
+     "def": "atacul Stonewall",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9477,6 +9833,11 @@
       "ela": "a Richter–Veresov-támadásból",
       "sub": "a Richter–Veresov-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Richter-Veresov",
+     "def": "atacul Richter-Veresov",
+     "gender": "n"
     }
    },
    "comment": {
@@ -9607,6 +9968,11 @@
       "ela": "a Szent György-védelemből",
       "sub": "a Szent György-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Sfântul Gheorghe",
+     "def": "apărarea Sfântul Gheorghe",
+     "gender": "f"
     }
    },
    "comment": {
@@ -9737,6 +10103,11 @@
       "ela": "a Borg-védelemből",
       "sub": "a Borg-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Borg",
+     "def": "apărarea Borg",
+     "gender": "f"
     }
    },
    "comment": {
@@ -9867,6 +10238,11 @@
       "ela": "a Hippopotamus-védelemből",
       "sub": "a Hippopotamus-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Hipopotam",
+     "def": "apărarea Hipopotam",
+     "gender": "f"
     }
    },
    "comment": {
@@ -9998,6 +10374,11 @@
       "ela": "az angol védelemből",
       "sub": "az angol védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea engleză",
+     "def": "apărarea engleză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10128,6 +10509,11 @@
       "ela": "a Pterodactyl-védelemből",
       "sub": "a Pterodactyl-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Pterodactil",
+     "def": "apărarea Pterodactil",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10258,6 +10644,11 @@
       "ela": "a Bongcloud-támadásból",
       "sub": "a Bongcloud-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Bongcloud",
+     "def": "atacul Bongcloud",
+     "gender": "n"
     }
    },
    "comment": {
@@ -10360,6 +10751,11 @@
       "ela": "a nyílt szicíliaiból",
       "sub": "a nyílt szicíliaira"
      }
+    },
+    "ro": {
+     "name": "Siciliana deschisă",
+     "def": "Siciliana deschisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10454,6 +10850,11 @@
       "ela": "a zárt szicíliaiból",
       "sub": "a zárt szicíliaira"
      }
+    },
+    "ro": {
+     "name": "Siciliana închisă",
+     "def": "Siciliana închisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10548,6 +10949,11 @@
       "ela": "az Alapin-változatból",
       "sub": "az Alapin-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Alapin",
+     "def": "varianta Alapin",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10644,6 +11050,11 @@
       "ela": "a Smith–Morra-cselből",
       "sub": "a Smith–Morra-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Smith-Morra",
+     "def": "gambitul Smith-Morra",
+     "gender": "n"
     }
    },
    "comment": {
@@ -10739,6 +11150,11 @@
       "ela": "a Grand Prix-támadásból",
       "sub": "a Grand Prix-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Grand Prix",
+     "def": "atacul Grand Prix",
+     "gender": "n"
     }
    },
    "comment": {
@@ -10833,6 +11249,11 @@
       "ela": "a Rossolimo-változatból",
       "sub": "a Rossolimo-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Rossolimo",
+     "def": "varianta Rossolimo",
+     "gender": "f"
     }
    },
    "comment": {
@@ -10927,6 +11348,11 @@
       "ela": "a Najdorf-változatból",
       "sub": "a Najdorf-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Najdorf",
+     "def": "varianta Najdorf",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11021,6 +11447,11 @@
       "ela": "a sárkányváltozatból",
       "sub": "a sárkányváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Dragon",
+     "def": "varianta Dragon",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11117,6 +11548,11 @@
       "ela": "a gyorsított sárkányból",
       "sub": "a gyorsított sárkányra"
      }
+    },
+    "ro": {
+     "name": "Dragonul accelerat",
+     "def": "Dragonul accelerat",
+     "gender": "m"
     }
    },
    "comment": {
@@ -11211,6 +11647,11 @@
       "ela": "a scheveningeni változatból",
       "sub": "a scheveningeni változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Scheveningen",
+     "def": "varianta Scheveningen",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11305,6 +11746,11 @@
       "ela": "a Szvesnyikov-változatból",
       "sub": "a Szvesnyikov-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Sveșnikov",
+     "def": "varianta Sveșnikov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11400,6 +11846,11 @@
       "ela": "a Tajmanov-változatból",
       "sub": "a Tajmanov-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Taimanov",
+     "def": "varianta Taimanov",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11494,6 +11945,11 @@
       "ela": "a Kan-változatból",
       "sub": "a Kan-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Kan",
+     "def": "varianta Kan",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11588,6 +12044,11 @@
       "ela": "a klasszikus változatból",
       "sub": "a klasszikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta clasică",
+     "def": "varianta clasică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11682,6 +12143,11 @@
       "ela": "a tolóváltozatból",
       "sub": "a tolóváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de avans",
+     "def": "varianta de avans",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11776,6 +12242,11 @@
       "ela": "a csereváltozatból",
       "sub": "a csereváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de schimb",
+     "def": "varianta de schimb",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11870,6 +12341,11 @@
       "ela": "a Tarrasch-változatból",
       "sub": "a Tarrasch-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Tarrasch",
+     "def": "varianta Tarrasch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -11964,6 +12440,11 @@
       "ela": "a Winawer-változatból",
       "sub": "a Winawer-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Winawer",
+     "def": "varianta Winawer",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12058,6 +12539,11 @@
       "ela": "a klasszikus változatból",
       "sub": "a klasszikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta clasică",
+     "def": "varianta clasică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12152,6 +12638,11 @@
       "ela": "a Rubinstein-változatból",
       "sub": "a Rubinstein-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Rubinstein",
+     "def": "varianta Rubinstein",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12246,6 +12737,11 @@
       "ela": "a tolóváltozatból",
       "sub": "a tolóváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de avans",
+     "def": "varianta de avans",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12340,6 +12836,11 @@
       "ela": "a csereváltozatból",
       "sub": "a csereváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de schimb",
+     "def": "varianta de schimb",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12436,6 +12937,11 @@
       "ela": "a Panov-támadásból",
       "sub": "a Panov-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Panov",
+     "def": "atacul Panov",
+     "gender": "n"
     }
    },
    "comment": {
@@ -12530,6 +13036,11 @@
       "ela": "a klasszikus változatból",
       "sub": "a klasszikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta clasică",
+     "def": "varianta clasică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12624,6 +13135,11 @@
       "ela": "a kéthuszáros támadásból",
       "sub": "a kéthuszáros támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul celor doi cai",
+     "def": "atacul celor doi cai",
+     "gender": "n"
     }
    },
    "comment": {
@@ -12718,6 +13234,11 @@
       "ela": "a kéthuszáros védelemből",
       "sub": "a kéthuszáros védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea celor doi cai",
+     "def": "apărarea celor doi cai",
+     "gender": "f"
     }
    },
    "comment": {
@@ -12814,6 +13335,11 @@
       "ela": "a giuoco pianóból",
       "sub": "a giuoco pianóra"
      }
+    },
+    "ro": {
+     "name": "Giuoco Piano",
+     "def": "Giuoco Piano",
+     "gender": "n"
     }
    },
    "comment": {
@@ -12914,6 +13440,11 @@
       "ela": "a giuoco pianissimóból",
       "sub": "a giuoco pianissimóra"
      }
+    },
+    "ro": {
+     "name": "Giuoco Pianissimo",
+     "def": "Giuoco Pianissimo",
+     "gender": "n"
     }
    },
    "comment": {
@@ -13012,6 +13543,11 @@
       "ela": "az Evans-cselből",
       "sub": "az Evans-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Evans",
+     "def": "gambitul Evans",
+     "gender": "n"
     }
    },
    "comment": {
@@ -13106,6 +13642,11 @@
       "ela": "a Fegatello-támadásból",
       "sub": "a Fegatello-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Fegatello",
+     "def": "atacul Fegatello",
+     "gender": "n"
     }
    },
    "comment": {
@@ -13206,6 +13747,11 @@
       "ela": "a Traxler-ellentámadásból",
       "sub": "a Traxler-ellentámadásra"
      }
+    },
+    "ro": {
+     "name": "Contraatacul Traxler",
+     "def": "contraatacul Traxler",
+     "gender": "n"
     }
    },
    "comment": {
@@ -13300,6 +13846,11 @@
       "ela": "a berlini védelemből",
       "sub": "a berlini védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea berlineză",
+     "def": "apărarea berlineză",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13394,6 +13945,11 @@
       "ela": "a Morphy-védelemből",
       "sub": "a Morphy-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Morphy",
+     "def": "apărarea Morphy",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13488,6 +14044,11 @@
       "ela": "a zárt spanyolból",
       "sub": "a zárt spanyolra"
      }
+    },
+    "ro": {
+     "name": "Spaniola închisă",
+     "def": "Spaniola închisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13582,6 +14143,11 @@
       "ela": "a Marshall-támadásból",
       "sub": "a Marshall-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Marshall",
+     "def": "atacul Marshall",
+     "gender": "n"
     }
    },
    "comment": {
@@ -13676,6 +14242,11 @@
       "ela": "a csereváltozatból",
       "sub": "a csereváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de schimb",
+     "def": "varianta de schimb",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13770,6 +14341,11 @@
       "ela": "a nyílt spanyolból",
       "sub": "a nyílt spanyolra"
      }
+    },
+    "ro": {
+     "name": "Spaniola deschisă",
+     "def": "Spaniola deschisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13864,6 +14440,11 @@
       "ela": "a Schliemann-védelemből",
       "sub": "a Schliemann-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea Schliemann",
+     "def": "apărarea Schliemann",
+     "gender": "f"
     }
    },
    "comment": {
@@ -13958,6 +14539,11 @@
       "ela": "a skót cselből",
       "sub": "a skót cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul scoțian",
+     "def": "gambitul scoțian",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14053,6 +14639,11 @@
       "ela": "a bécsi cselből",
       "sub": "a bécsi cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul vienez",
+     "def": "gambitul vienez",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14148,6 +14739,11 @@
       "ela": "a Stafford-cselből",
       "sub": "a Stafford-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Stafford",
+     "def": "gambitul Stafford",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14244,6 +14840,11 @@
       "ela": "a Parham-támadásból",
       "sub": "a Parham-támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul Parham",
+     "def": "atacul Parham",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14347,6 +14948,11 @@
       "ela": "a Halloween-cselből",
       "sub": "a Halloween-cselre"
      }
+    },
+    "ro": {
+     "name": "Gambitul Halloween",
+     "def": "gambitul Halloween",
+     "gender": "n"
     }
    },
    "comment": {
@@ -14441,6 +15047,11 @@
       "ela": "az ortodox védelemből",
       "sub": "az ortodox védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea ortodoxă",
+     "def": "apărarea ortodoxă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14535,6 +15146,11 @@
       "ela": "a csereváltozatból",
       "sub": "a csereváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de schimb",
+     "def": "varianta de schimb",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14629,6 +15245,11 @@
       "ela": "a fél-Tarrasch-védelemből",
       "sub": "a fél-Tarrasch-védelemre"
      }
+    },
+    "ro": {
+     "name": "Apărarea semi-Tarrasch",
+     "def": "apărarea semi-Tarrasch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14727,6 +15348,11 @@
       "ela": "a meráni változatból",
       "sub": "a meráni változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Meran",
+     "def": "varianta Meran",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14821,6 +15447,11 @@
       "ela": "a klasszikus változatból",
       "sub": "a klasszikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta clasică",
+     "def": "varianta clasică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -14916,6 +15547,11 @@
       "ela": "a Sämisch-változatból",
       "sub": "a Sämisch-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Sämisch",
+     "def": "varianta Sämisch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15010,6 +15646,11 @@
       "ela": "a négygyalogos támadásból",
       "sub": "a négygyalogos támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul celor patru pioni",
+     "def": "atacul celor patru pioni",
+     "gender": "n"
     }
    },
    "comment": {
@@ -15104,6 +15745,11 @@
       "ela": "a fianchetto-változatból",
       "sub": "a fianchetto-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta cu fianchetto",
+     "def": "varianta cu fianchetto",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15199,6 +15845,11 @@
       "ela": "a Rubinstein-változatból",
       "sub": "a Rubinstein-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Rubinstein",
+     "def": "varianta Rubinstein",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15293,6 +15944,11 @@
       "ela": "a klasszikus változatból",
       "sub": "a klasszikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta clasică",
+     "def": "varianta clasică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15387,6 +16043,11 @@
       "ela": "a Sämisch-változatból",
       "sub": "a Sämisch-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Sämisch",
+     "def": "varianta Sämisch",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15481,6 +16142,11 @@
       "ela": "a csereváltozatból",
       "sub": "a csereváltozatra"
      }
+    },
+    "ro": {
+     "name": "Varianta de schimb",
+     "def": "varianta de schimb",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15576,6 +16242,11 @@
       "ela": "a leningrádi változatból",
       "sub": "a leningrádi változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Leningrad",
+     "def": "varianta Leningrad",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15670,6 +16341,11 @@
       "ela": "a Stonewall-változatból",
       "sub": "a Stonewall-változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta Stonewall",
+     "def": "varianta Stonewall",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15764,6 +16440,11 @@
       "ela": "a modern Benoniból",
       "sub": "a modern Benonira"
      }
+    },
+    "ro": {
+     "name": "Apărarea Benoni modernă",
+     "def": "apărarea Benoni modernă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15858,6 +16539,11 @@
       "ela": "a nyílt katalánból",
       "sub": "a nyílt katalánra"
      }
+    },
+    "ro": {
+     "name": "Catalana deschisă",
+     "def": "Catalana deschisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -15953,6 +16639,11 @@
       "ela": "a zárt katalánból",
       "sub": "a zárt katalánra"
      }
+    },
+    "ro": {
+     "name": "Catalana închisă",
+     "def": "Catalana închisă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16047,6 +16738,11 @@
       "ela": "a szimmetrikus változatból",
       "sub": "a szimmetrikus változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta simetrică",
+     "def": "varianta simetrică",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16141,6 +16837,11 @@
       "ela": "a fordított szicíliaiból",
       "sub": "a fordított szicíliaira"
      }
+    },
+    "ro": {
+     "name": "Siciliana cu culorile inversate",
+     "def": "Siciliana cu culorile inversate",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16239,6 +16940,11 @@
       "ela": "a négygyalogos támadásból",
       "sub": "a négygyalogos támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul celor patru pioni",
+     "def": "atacul celor patru pioni",
+     "gender": "n"
     }
    },
    "comment": {
@@ -16333,6 +17039,11 @@
       "ela": "a modern változatból",
       "sub": "a modern változatra"
      }
+    },
+    "ro": {
+     "name": "Varianta modernă",
+     "def": "varianta modernă",
+     "gender": "f"
     }
    },
    "comment": {
@@ -16427,6 +17138,11 @@
       "ela": "az osztrák támadásból",
       "sub": "az osztrák támadásra"
      }
+    },
+    "ro": {
+     "name": "Atacul austriac",
+     "def": "atacul austriac",
+     "gender": "n"
     }
    },
    "comment": {
@@ -16521,6 +17237,11 @@
       "ela": "a Falkbeer-ellencselből",
       "sub": "a Falkbeer-ellencselre"
      }
+    },
+    "ro": {
+     "name": "Contragambitul Falkbeer",
+     "def": "contragambitul Falkbeer",
+     "gender": "n"
     }
    },
    "comment": {
@@ -16563,7 +17284,8 @@
     "fi": "{X}-muunnelma",
     "hi": "{X} वेरिएशन",
     "hr": "{X:gen}a varijanta",
-    "hu": "{X}-változat"
+    "hu": "{X}-változat",
+    "ro": "varianta {X}"
    },
    "id": "varian",
    "nl": "variant",
@@ -16577,7 +17299,8 @@
    "fi": "muunnelma",
    "hi": "वेरिएशन",
    "hr": "varijanta",
-   "hu": "változat"
+   "hu": "változat",
+   "ro": "variantă"
   },
   "Attack": {
    "en": "Attack",
@@ -16612,7 +17335,8 @@
     "fi": "{X}-hyökkäys",
     "hi": "{X} अटैक",
     "hr": "{X:gen} napad",
-    "hu": "{X}-támadás"
+    "hu": "{X}-támadás",
+    "ro": "atacul {X}"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -16626,7 +17350,8 @@
    "fi": "hyökkäys",
    "hi": "अटैक",
    "hr": "napad",
-   "hu": "támadás"
+   "hu": "támadás",
+   "ro": "atac"
   },
   "Gambit": {
    "en": "Gambit",
@@ -16661,7 +17386,8 @@
     "fi": "{X}-gambiitti",
     "hi": "{X} गैम्बिट",
     "hr": "{X:gen} gambit",
-    "hu": "{X}-csel"
+    "hu": "{X}-csel",
+    "ro": "gambitul {X}"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -16675,7 +17401,8 @@
    "fi": "gambiitti",
    "hi": "गैम्बिट",
    "hr": "gambit",
-   "hu": "csel"
+   "hu": "csel",
+   "ro": "gambit"
   },
   "Defense": {
    "en": "Defense",
@@ -16710,7 +17437,8 @@
     "fi": "{X}-puolustus",
     "hi": "{X} डिफ़ेंस",
     "hr": "{X:gen}a obrana",
-    "hu": "{X}-védelem"
+    "hu": "{X}-védelem",
+    "ro": "apărarea {X}"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -16724,7 +17452,8 @@
    "fi": "puolustus",
    "hi": "डिफ़ेंस",
    "hr": "obrana",
-   "hu": "védelem"
+   "hu": "védelem",
+   "ro": "apărare"
   },
   "System": {
    "en": "System",
@@ -16759,7 +17488,8 @@
     "fi": "{X}-järjestelmä",
     "hi": "{X} सिस्टम",
     "hr": "{X:gen} sustav",
-    "hu": "{X}-rendszer"
+    "hu": "{X}-rendszer",
+    "ro": "sistemul {X}"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -16773,7 +17503,8 @@
    "fi": "järjestelmä",
    "hi": "सिस्टम",
    "hr": "sustav",
-   "hu": "rendszer"
+   "hu": "rendszer",
+   "ro": "sistem"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -16808,7 +17539,8 @@
     "fi": "{X}-vastagambiitti",
     "hi": "{X} काउंटरगैम्बिट",
     "hr": "{X:gen} protugambit",
-    "hu": "{X}-ellencsel"
+    "hu": "{X}-ellencsel",
+    "ro": "contragambitul {X}"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -16822,7 +17554,8 @@
    "fi": "vastagambiitti",
    "hi": "काउंटरगैम्बिट",
    "hr": "protugambit",
-   "hu": "ellencsel"
+   "hu": "ellencsel",
+   "ro": "contragambit"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -16857,7 +17590,8 @@
     "fi": "{X}-vastahyökkäys",
     "hi": "{X} काउंटरअटैक",
     "hr": "{X:gen} protunapad",
-    "hu": "{X}-ellentámadás"
+    "hu": "{X}-ellentámadás",
+    "ro": "contraatacul {X}"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -16871,7 +17605,8 @@
    "fi": "vastahyökkäys",
    "hi": "काउंटरअटैक",
    "hr": "protunapad",
-   "hu": "ellentámadás"
+   "hu": "ellentámadás",
+   "ro": "contraatac"
   },
   "Opening": {
    "en": "Opening",
@@ -16906,7 +17641,8 @@
     "fi": "{X}-avaus",
     "hi": "{X} ओपनिंग",
     "hr": "{X:gen}o otvaranje",
-    "hu": "{X}-megnyitás"
+    "hu": "{X}-megnyitás",
+    "ro": "deschiderea {X}"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -16920,7 +17656,8 @@
    "fi": "avaus",
    "hi": "ओपनिंग",
    "hr": "otvaranje",
-   "hu": "megnyitás"
+   "hu": "megnyitás",
+   "ro": "deschidere"
   },
   "Game": {
    "en": "Game",
@@ -16945,7 +17682,8 @@
    "fi": "peli",
    "hi": "गेम",
    "hr": "partija",
-   "hu": "játszma"
+   "hu": "játszma",
+   "ro": "partidă"
   },
   "Line": {
    "en": "Line",
@@ -16980,7 +17718,8 @@
     "fi": "{X}-jatko",
     "hi": "{X} लाइन",
     "hr": "{X:gen} nastavak",
-    "hu": "{X}-folytatás"
+    "hu": "{X}-folytatás",
+    "ro": "varianta {X}"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -16994,7 +17733,8 @@
    "fi": "jatko",
    "hi": "लाइन",
    "hr": "nastavak",
-   "hu": "folytatás"
+   "hu": "folytatás",
+   "ro": "variantă"
   },
   "Formation": {
    "en": "Formation",
@@ -17019,7 +17759,8 @@
    "fi": "asetelma",
    "hi": "फ़ॉर्मेशन",
    "hr": "postava",
-   "hu": "felállás"
+   "hu": "felállás",
+   "ro": "formație"
   },
   "Trap": {
    "en": "Trap",
@@ -17054,7 +17795,8 @@
     "fi": "{X}-ansa",
     "hi": "{X} ट्रैप",
     "hr": "{X:gen}a zamka",
-    "hu": "{X}-csapda"
+    "hu": "{X}-csapda",
+    "ro": "capcana {X}"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -17068,7 +17810,8 @@
    "fi": "ansa",
    "hi": "ट्रैप",
    "hr": "zamka",
-   "hu": "csapda"
+   "hu": "csapda",
+   "ro": "capcană"
   },
   "Accepted": {
    "en": "Accepted",
@@ -17093,7 +17836,8 @@
    "fi": "vastaanotettu",
    "hi": "एक्सेप्टेड",
    "hr": "prihvaćeni",
-   "hu": "elfogadott"
+   "hu": "elfogadott",
+   "ro": "acceptat"
   },
   "Declined": {
    "en": "Declined",
@@ -17118,7 +17862,8 @@
    "fi": "hylätty",
    "hi": "डिक्लाइंड",
    "hr": "odbijeni",
-   "hu": "elhárított"
+   "hu": "elhárított",
+   "ro": "refuzat"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -17143,7 +17888,8 @@
    "fi": "vaihtomuunnelma",
    "hi": "एक्सचेंज वेरिएशन",
    "hr": "varijanta zamjene",
-   "hu": "csereváltozat"
+   "hu": "csereváltozat",
+   "ro": "varianta de schimb"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -17168,7 +17914,8 @@
    "fi": "etenemismuunnelma",
    "hi": "एडवांस वेरिएशन",
    "hr": "varijanta napredovanja",
-   "hu": "tolóváltozat"
+   "hu": "tolóváltozat",
+   "ro": "varianta de avans"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -17193,7 +17940,8 @@
    "fi": "klassinen muunnelma",
    "hi": "क्लासिकल वेरिएशन",
    "hr": "klasična varijanta",
-   "hu": "klasszikus változat"
+   "hu": "klasszikus változat",
+   "ro": "varianta clasică"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -17218,7 +17966,8 @@
    "fi": "moderni muunnelma",
    "hi": "मॉडर्न वेरिएशन",
    "hr": "moderna varijanta",
-   "hu": "modern változat"
+   "hu": "modern változat",
+   "ro": "varianta modernă"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -17243,7 +17992,8 @@
    "fi": "avoin muunnelma",
    "hi": "ओपन वेरिएशन",
    "hr": "otvorena varijanta",
-   "hu": "nyílt változat"
+   "hu": "nyílt változat",
+   "ro": "varianta deschisă"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -17268,7 +18018,8 @@
    "fi": "suljettu muunnelma",
    "hi": "क्लोज़्ड वेरिएशन",
    "hr": "zatvorena varijanta",
-   "hu": "zárt változat"
+   "hu": "zárt változat",
+   "ro": "varianta închisă"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -17293,7 +18044,8 @@
    "fi": "fiankettomuunnelma",
    "hi": "फ़ियांकेटो वेरिएशन",
    "hr": "varijanta s fijanketom",
-   "hu": "fianchetto-változat"
+   "hu": "fianchetto-változat",
+   "ro": "varianta cu fianchetto"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -17318,7 +18070,8 @@
    "fi": "symmetrinen muunnelma",
    "hi": "सिमेट्रिकल वेरिएशन",
    "hr": "simetrična varijanta",
-   "hu": "szimmetrikus változat"
+   "hu": "szimmetrikus változat",
+   "ro": "varianta simetrică"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -17343,7 +18096,8 @@
    "fi": "skotlantilainen gambiitti",
    "hi": "स्कॉच गैम्बिट",
    "hr": "škotski gambit",
-   "hu": "skót csel"
+   "hu": "skót csel",
+   "ro": "gambitul scoțian"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -17368,7 +18122,8 @@
    "fi": "skotlantilainen muunnelma",
    "hi": "स्कॉच वेरिएशन",
    "hr": "škotska varijanta",
-   "hu": "skót változat"
+   "hu": "skót változat",
+   "ro": "varianta scoțiană"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -17393,7 +18148,8 @@
    "fi": "tanskalainen muunnelma",
    "hi": "डेनिश वेरिएशन",
    "hr": "danska varijanta",
-   "hu": "dán változat"
+   "hu": "dán változat",
+   "ro": "varianta daneză"
   },
   "Main Line": {
    "en": "Main Line",
@@ -17418,7 +18174,8 @@
    "fi": "päämuunnelma",
    "hi": "मेन लाइन",
    "hr": "glavna varijanta",
-   "hu": "főváltozat"
+   "hu": "főváltozat",
+   "ro": "varianta principală"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -17443,7 +18200,8 @@
    "fi": "nopeutettu",
    "hi": "एक्सेलरेटेड",
    "hr": "ubrzani",
-   "hu": "gyorsított"
+   "hu": "gyorsított",
+   "ro": "accelerat"
   },
   "Deferred": {
    "en": "Deferred",
@@ -17468,7 +18226,8 @@
    "fi": "viivästetty",
    "hi": "डिफ़र्ड",
    "hr": "odgođeni",
-   "hu": "késleltetett"
+   "hu": "késleltetett",
+   "ro": "amânat"
   },
   "Reversed": {
    "en": "Reversed",
@@ -17493,7 +18252,8 @@
    "fi": "käänteinen",
    "hi": "रिवर्स्ड",
    "hr": "s obrnutim bojama",
-   "hu": "fordított színekkel"
+   "hu": "fordított színekkel",
+   "ro": "cu culorile inversate"
   }
  },
  "eponyms": {
@@ -17559,6 +18319,10 @@
     "gen": "Steinitzov"
    },
    "hu": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
+   },
+   "ro": {
     "nom": "Steinitz",
     "gen": "Steinitz"
    }
@@ -17627,6 +18391,10 @@
    "hu": {
     "nom": "Rubinstein",
     "gen": "Rubinstein"
+   },
+   "ro": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
    }
   },
   "Winawer": {
@@ -17691,6 +18459,10 @@
     "gen": "Winawerov"
    },
    "hu": {
+    "nom": "Winawer",
+    "gen": "Winawer"
+   },
+   "ro": {
     "nom": "Winawer",
     "gen": "Winawer"
    }
@@ -17759,6 +18531,10 @@
    "hu": {
     "nom": "Evans",
     "gen": "Evans"
+   },
+   "ro": {
+    "nom": "Evans",
+    "gen": "Evans"
    }
   },
   "Chigorin": {
@@ -17825,6 +18601,10 @@
    "hu": {
     "nom": "Csigorin",
     "gen": "Csigorin"
+   },
+   "ro": {
+    "nom": "Cigorin",
+    "gen": "Cigorin"
    }
   },
   "Morphy": {
@@ -17889,6 +18669,10 @@
     "gen": "Morphyjev"
    },
    "hu": {
+    "nom": "Morphy",
+    "gen": "Morphy"
+   },
+   "ro": {
     "nom": "Morphy",
     "gen": "Morphy"
    }
@@ -17957,6 +18741,10 @@
    "hu": {
     "nom": "Tarrasch",
     "gen": "Tarrasch"
+   },
+   "ro": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
    }
   },
   "Alekhine": {
@@ -18023,6 +18811,10 @@
    "hu": {
     "nom": "Aljechin",
     "gen": "Aljechin"
+   },
+   "ro": {
+    "nom": "Alehin",
+    "gen": "Alehin"
    }
   },
   "Sämisch": {
@@ -18087,6 +18879,10 @@
     "gen": "Sämischov"
    },
    "hu": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
+   },
+   "ro": {
     "nom": "Sämisch",
     "gen": "Sämisch"
    }
@@ -18155,6 +18951,10 @@
    "hu": {
     "nom": "Nimzowitsch",
     "gen": "Nimzowitsch"
+   },
+   "ro": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
    }
   },
   "Najdorf": {
@@ -18219,6 +19019,10 @@
     "gen": "Najdorfov"
    },
    "hu": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
+   },
+   "ro": {
     "nom": "Najdorf",
     "gen": "Najdorf"
    }
@@ -18287,6 +19091,10 @@
    "hu": {
     "nom": "Bogoljubov",
     "gen": "Bogoljubov"
+   },
+   "ro": {
+    "nom": "Bogoliubov",
+    "gen": "Bogoliubov"
    }
   },
   "Alapin": {
@@ -18351,6 +19159,10 @@
     "gen": "Alapinov"
    },
    "hu": {
+    "nom": "Alapin",
+    "gen": "Alapin"
+   },
+   "ro": {
     "nom": "Alapin",
     "gen": "Alapin"
    }
@@ -18419,6 +19231,10 @@
    "hu": {
     "nom": "Botvinnik",
     "gen": "Botvinnik"
+   },
+   "ro": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
    }
   },
   "Paulsen": {
@@ -18483,6 +19299,10 @@
     "gen": "Paulsenov"
    },
    "hu": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
+   },
+   "ro": {
     "nom": "Paulsen",
     "gen": "Paulsen"
    }
@@ -18551,6 +19371,10 @@
    "hu": {
     "nom": "Marshall",
     "gen": "Marshall"
+   },
+   "ro": {
+    "nom": "Marshall",
+    "gen": "Marshall"
    }
   },
   "Kieseritzky": {
@@ -18615,6 +19439,10 @@
     "gen": "Kieseritzkyjev"
    },
    "hu": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
+   },
+   "ro": {
     "nom": "Kieseritzky",
     "gen": "Kieseritzky"
    }
@@ -18683,6 +19511,10 @@
    "hu": {
     "nom": "Panov",
     "gen": "Panov"
+   },
+   "ro": {
+    "nom": "Panov",
+    "gen": "Panov"
    }
   },
   "Keres": {
@@ -18747,6 +19579,10 @@
     "gen": "Keresov"
    },
    "hu": {
+    "nom": "Keres",
+    "gen": "Keres"
+   },
+   "ro": {
     "nom": "Keres",
     "gen": "Keres"
    }
@@ -18815,6 +19651,10 @@
    "hu": {
     "nom": "Tartakower",
     "gen": "Tartakower"
+   },
+   "ro": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
    }
   },
   "Maróczy": {
@@ -18879,6 +19719,10 @@
     "gen": "Maróczyjev"
    },
    "hu": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
+   },
+   "ro": {
     "nom": "Maróczy",
     "gen": "Maróczy"
    }
@@ -18947,6 +19791,10 @@
    "hu": {
     "nom": "Falkbeer",
     "gen": "Falkbeer"
+   },
+   "ro": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
    }
   },
   "Scheveningen": {
@@ -19011,6 +19859,10 @@
     "gen": "scheveningensk"
    },
    "hu": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
+   },
+   "ro": {
     "nom": "Scheveningen",
     "gen": "Scheveningen"
    }
@@ -19079,6 +19931,10 @@
    "hu": {
     "nom": "Richter–Rauzer",
     "gen": "Richter–Rauzer"
+   },
+   "ro": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
    }
   },
   "Lasker": {
@@ -19143,6 +19999,10 @@
     "gen": "Laskerov"
    },
    "hu": {
+    "nom": "Lasker",
+    "gen": "Lasker"
+   },
+   "ro": {
     "nom": "Lasker",
     "gen": "Lasker"
    }
@@ -19211,6 +20071,10 @@
    "hu": {
     "nom": "Tajmanov",
     "gen": "Tajmanov"
+   },
+   "ro": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
    }
   },
   "Smyslov": {
@@ -19277,6 +20141,10 @@
    "hu": {
     "nom": "Szmiszlov",
     "gen": "Szmiszlov"
+   },
+   "ro": {
+    "nom": "Smîslov",
+    "gen": "Smîslov"
    }
   },
   "Spassky": {
@@ -19343,6 +20211,10 @@
    "hu": {
     "nom": "Szpasszkij",
     "gen": "Szpasszkij"
+   },
+   "ro": {
+    "nom": "Spasski",
+    "gen": "Spasski"
    }
   },
   "Spielmann": {
@@ -19407,6 +20279,10 @@
     "gen": "Spielmannov"
    },
    "hu": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
+   },
+   "ro": {
     "nom": "Spielmann",
     "gen": "Spielmann"
    }
@@ -19475,6 +20351,10 @@
    "hu": {
     "nom": "Averbah",
     "gen": "Averbah"
+   },
+   "ro": {
+    "nom": "Averbah",
+    "gen": "Averbah"
    }
   },
   "Greco": {
@@ -19539,6 +20419,10 @@
     "gen": "Grecov"
    },
    "hu": {
+    "nom": "Greco",
+    "gen": "Greco"
+   },
+   "ro": {
     "nom": "Greco",
     "gen": "Greco"
    }
@@ -19607,6 +20491,10 @@
    "hu": {
     "nom": "Capablanca",
     "gen": "Capablanca"
+   },
+   "ro": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
    }
   },
   "Kan": {
@@ -19671,6 +20559,10 @@
     "gen": "Kanov"
    },
    "hu": {
+    "nom": "Kan",
+    "gen": "Kan"
+   },
+   "ro": {
     "nom": "Kan",
     "gen": "Kan"
    }
@@ -19739,6 +20631,10 @@
    "hu": {
     "nom": "Albin",
     "gen": "Albin"
+   },
+   "ro": {
+    "nom": "Albin",
+    "gen": "Albin"
    }
   },
   "Breyer": {
@@ -19803,6 +20699,10 @@
     "gen": "Breyerov"
    },
    "hu": {
+    "nom": "Breyer",
+    "gen": "Breyer"
+   },
+   "ro": {
     "nom": "Breyer",
     "gen": "Breyer"
    }
@@ -19871,6 +20771,10 @@
    "hu": {
     "nom": "Schlechter",
     "gen": "Schlechter"
+   },
+   "ro": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
    }
   },
   "Jaenisch": {
@@ -19935,6 +20839,10 @@
     "gen": "Jaenischov"
    },
    "hu": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
+   },
+   "ro": {
     "nom": "Jaenisch",
     "gen": "Jaenisch"
    }
@@ -20003,6 +20911,10 @@
    "hu": {
     "nom": "Karpov",
     "gen": "Karpov"
+   },
+   "ro": {
+    "nom": "Karpov",
+    "gen": "Karpov"
    }
   },
   "Petrosian": {
@@ -20069,6 +20981,10 @@
    "hu": {
     "nom": "Petroszján",
     "gen": "Petroszján"
+   },
+   "ro": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
    }
   },
   "Euwe": {
@@ -20133,6 +21049,10 @@
     "gen": "Euweov"
    },
    "hu": {
+    "nom": "Euwe",
+    "gen": "Euwe"
+   },
+   "ro": {
     "nom": "Euwe",
     "gen": "Euwe"
    }
@@ -20201,6 +21121,10 @@
    "hu": {
     "nom": "Szozin",
     "gen": "Szozin"
+   },
+   "ro": {
+    "nom": "Sozin",
+    "gen": "Sozin"
    }
   },
   "Schliemann": {
@@ -20265,6 +21189,10 @@
     "gen": "Schliemannov"
    },
    "hu": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
+   },
+   "ro": {
     "nom": "Schliemann",
     "gen": "Schliemann"
    }
@@ -20333,6 +21261,10 @@
    "hu": {
     "nom": "Anderssen",
     "gen": "Anderssen"
+   },
+   "ro": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
    }
   },
   "Philidor": {
@@ -20397,6 +21329,10 @@
     "gen": "Philidorov"
    },
    "hu": {
+    "nom": "Philidor",
+    "gen": "Philidor"
+   },
+   "ro": {
     "nom": "Philidor",
     "gen": "Philidor"
    }
@@ -20465,6 +21401,10 @@
    "hu": {
     "nom": "Zajcev",
     "gen": "Zajcev"
+   },
+   "ro": {
+    "nom": "Zaițev",
+    "gen": "Zaițev"
    }
   },
   "Sveshnikov": {
@@ -20531,6 +21471,10 @@
    "hu": {
     "nom": "Szvesnyikov",
     "gen": "Szvesnyikov"
+   },
+   "ro": {
+    "nom": "Sveșnikov",
+    "gen": "Sveșnikov"
    }
   },
   "Kasparov": {
@@ -20597,6 +21541,10 @@
    "hu": {
     "nom": "Kaszparov",
     "gen": "Kaszparov"
+   },
+   "ro": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
    }
   },
   "Fischer": {
@@ -20661,6 +21609,10 @@
     "gen": "Fischerov"
    },
    "hu": {
+    "nom": "Fischer",
+    "gen": "Fischer"
+   },
+   "ro": {
     "nom": "Fischer",
     "gen": "Fischer"
    }
@@ -20729,6 +21681,10 @@
    "hu": {
     "nom": "Tal",
     "gen": "Tal"
+   },
+   "ro": {
+    "nom": "Tal",
+    "gen": "Tal"
    }
   },
   "McCutcheon": {
@@ -20793,6 +21749,10 @@
     "gen": "McCutcheonov"
    },
    "hu": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
+   },
+   "ro": {
     "nom": "McCutcheon",
     "gen": "McCutcheon"
    }
@@ -20861,6 +21821,10 @@
    "hu": {
     "nom": "Bronstejn",
     "gen": "Bronstejn"
+   },
+   "ro": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
    }
   },
   "Janowski": {
@@ -20925,6 +21889,10 @@
     "gen": "Janowskijev"
    },
    "hu": {
+    "nom": "Janowski",
+    "gen": "Janowski"
+   },
+   "ro": {
     "nom": "Janowski",
     "gen": "Janowski"
    }
@@ -20993,6 +21961,10 @@
    "hu": {
     "nom": "Staunton",
     "gen": "Staunton"
+   },
+   "ro": {
+    "nom": "Staunton",
+    "gen": "Staunton"
    }
   },
   "Max Lange": {
@@ -21057,6 +22029,10 @@
     "gen": "Max Langeov"
    },
    "hu": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
+   },
+   "ro": {
     "nom": "Max Lange",
     "gen": "Max Lange"
    }
@@ -21125,6 +22101,10 @@
    "hu": {
     "nom": "Petrov",
     "gen": "Petrov"
+   },
+   "ro": {
+    "nom": "Petrov",
+    "gen": "Petrov"
    }
   },
   "Grünfeld": {
@@ -21189,6 +22169,10 @@
     "gen": "Grünfeldov"
    },
    "hu": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
+   },
+   "ro": {
     "nom": "Grünfeld",
     "gen": "Grünfeld"
    }
@@ -21257,6 +22241,10 @@
    "hu": {
     "nom": "Colle",
     "gen": "Colle"
+   },
+   "ro": {
+    "nom": "Colle",
+    "gen": "Colle"
    }
   },
   "Torre": {
@@ -21323,6 +22311,10 @@
    "hu": {
     "nom": "Torre",
     "gen": "Torre"
+   },
+   "ro": {
+    "nom": "Torre",
+    "gen": "Torre"
    }
   },
   "Réti": {
@@ -21387,6 +22379,10 @@
     "gen": "Rétijev"
    },
    "hu": {
+    "nom": "Réti",
+    "gen": "Réti"
+   },
+   "ro": {
     "nom": "Réti",
     "gen": "Réti"
    }
@@ -21456,6 +22452,10 @@
   "hu": {
    "compose_proper_names": true,
    "file_pattern": "(?<![\\w–-])(?P<f>[a-h])-(?=vonal|gyalog)"
+  },
+  "ro": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?:[Cc]oloan(?:elor|ele|ei|a|ă|e)|[Pp]ion(?:ilor|ului|ul|ii|i)?) (?P<f>[a-h])\\b"
   }
  }
 }

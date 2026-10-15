@@ -89,7 +89,7 @@ options.brightness.neutral = Neutraali
 options.brightness.value = {0} EV
 options.brightness.help = Kameran valotuksen korjaus. Ensimmäisen käynnistyksen kalibrointi asettaa sen niin, että tummimmat varjot juuri ja juuri erottuvat.
 
-options.master_volume = Pääänenvoimakkuus
+options.master_volume = Pää-äänenvoimakkuus
 options.effects = Tehosteet
 options.ambience = Taustaäänet
 options.ambience.help = Salin äänimaailma: takkatuli, kaukaiset askeleet, vanha kello.
