@@ -209,3 +209,197 @@ ex.dubious.b1 = Nước đi này đáng ngờ. Có lẽ bạn đi được nư�
 ex.dubious.b1.2 = Nước đi này đáng ngờ. Bạn thử tìm nước hay hơn xem?
 ex.dubious.b2 = Một nước đi đáng ngờ. Có lẽ bạn đi được nước hay hơn?
 ex.dubious.b2.2 = Nước đi này đáng ngờ. Có lẽ còn nước hay hơn?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Tiếp theo, {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} đi đến ô {sq}.
+demo.my.move.2 = Tôi đi {my} đến ô {sq}.
+demo.my.move.3 = Rồi {my} đi đến ô {sq}.
+demo.my.take = Tôi bắt {your}.
+demo.my.take.2 = {my} bắt {your}.
+demo.my.take.3 = Rồi tôi bắt {your}.
+demo.my.check = {my} đi đến ô {sq}. Chiếu.
+demo.my.check.2 = Chiếu, bằng {my} ở ô {sq}.
+demo.my.check.3 = {my} đến ô {sq}, chiếu!
+demo.my.mate = {my} đi đến ô {sq}. Chiếu hết.
+demo.my.mate.2 = Và {my} đến ô {sq} là chiếu hết.
+demo.my.mate.3 = {my} đến ô {sq}. Thế là chiếu hết.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Trước tiên, {my} bắt {your}. {t1} để sau cũng được.
+demo.my.first.take.2 = {my} bắt {your} trước. {t1} vẫn còn ở đó.
+demo.my.first.check = {my} bắt {your}, và đó là nước chiếu! {t1} để sau cũng được.
+demo.my.first.check.2 = Trước tiên {my} bắt {your}, kèm nước chiếu. {t1} vẫn còn ở đó.
+demo.my.first.check_move = Trước tiên, chiếu bằng {my} ở ô {sq}. {t1} để sau cũng được.
+demo.my.first.check_move.2 = {my} đi đến ô {sq}: chiếu trước đã! {t1} vẫn còn ở đó.
+demo.my.first.move = Trước tiên, {my} đi đến ô {sq}. {t1} để sau cũng được.
+demo.my.first.move.2 = {my} đến ô {sq} trước. {t1} vẫn còn ở đó.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} đang bị tấn công, nên nó bắt {your} trước.
+demo.my.first.attacked.2 = {my} đang bị đe dọa: nó chộp lấy {your} trước.
+# Levels 4-6, the same in-between move.
+demo.first = Trước hết là {move}: {t1} để sau cũng được.
+demo.first.2 = Trước tiên là {move}. {t1} vẫn còn ở đó.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Bây giờ tôi đi nước của mình.
+demo.play_on.2 = Đây là nước đi thật của tôi.
+demo.play_on.3 = Còn bây giờ, tôi đi thật nhé.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Bạn sẽ đi {your} đến ô {sq}.
+demo.your.move.2 = Giả sử bạn đi {your} đến ô {sq}.
+demo.your.move.3 = Rồi {your} đi đến ô {sq}.
+demo.your.take = Bạn sẽ bắt {my}.
+demo.your.take.2 = Bạn dùng {your} bắt {my}.
+demo.your.take.3 = Rồi bạn bắt {my}.
+demo.your.back = Bạn bắt lại.
+demo.your.back.2 = Bạn bắt lại ở ô {sq}.
+demo.your.back.3 = Và bạn bắt lại quân.
+demo.your.king = Con Vua của bạn phải di chuyển.
+demo.your.king.2 = Con Vua phải tránh đi, sang ô {sq}.
+demo.your.king.3 = Con Vua của bạn chạy sang ô {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Giờ thì không cứu được {t1} nữa.
+ex.point.piece.2 = Và {t1} sẽ mất.
+ex.point.piece.3 = Tiếp theo, {t1} sẽ bị bắt.
+ex.point.two = {t1:bare} và {t2} đều bị tấn công: một trong hai sẽ mất.
+ex.point.two.2 = Giờ tôi tấn công {t1:bare} và {t2}. Bạn không thể cứu cả hai.
+ex.point.mate = Và giờ {reply:nomate} là chiếu hết.
+ex.point.mate.2 = Tiếp theo là {reply:nomate}, và thế là chiếu hết.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Thấy chưa? Giờ bạn đã mất {pts:point}.
+ex.result.b1.2 = Thế là bạn mất {pts:point}.
+ex.result.b2 = Cuối cùng, bạn đã mất {pts:point}.
+ex.result.b2.2 = Giờ bạn đang kém {pts:point}.
+ex.result.b3 = Điều đó khiến bạn mất {pts:point}.
+ex.result.b3.2 = Rốt cuộc bạn kém {pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Bạn có thể bắt lại một quân, nhưng vẫn kém {pts:point}.
+ex.result_back.b1.2 = Bạn có thể gỡ lại một ít, nhưng vẫn mất {pts:point}.
+ex.result_back.b2 = Bạn có thể bắt lại một phần, nhưng vẫn kém {pts:point}.
+ex.result_back.b2.2 = Ngay cả khi bắt lại, bạn vẫn mất {pts:point}.
+ex.result_back.b3 = Kể cả sau khi bắt lại, bạn vẫn kém {pts:point}.
+ex.result_back.b3.2 = Bạn gỡ lại được một ít, nhưng vẫn mất {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Nếu {your2} bắt lại, {my} sẽ bắt {your}.
+ex.retake.b1.2 = Bạn không thể bắt lại bằng {your2}: khi đó {my} sẽ bắt {your}.
+ex.retake.b2 = Nếu {your2} bắt lại, {my} sẽ bắt {your}.
+ex.retake.b2.2 = Bắt lại bằng {your2} không được: {my} sẽ bắt {your}.
+ex.retake.b3 = Nếu bạn bắt lại bằng nước {move}, tôi đi {reply}, bắt {your}.
+ex.retake.b3.2 = Bắt lại bằng nước {move} không được: tôi đi {reply}, bắt {your}.
+ex.retake.b4 = Nước {move} thất bại vì {reply}, bắt mất {your}.
+ex.retake.b4.2 = Còn nếu {move}, thì {reply} bắt {your}.
+ex.retake.b5 = Nước bắt lại {move} vấp phải {reply}, và {your} bị mất.
+ex.retake.b5.2 = Nước {move} thất bại vì {reply}: mất {your}.
+ex.retake.b6 = {move}? {reply} bắt {your:short}.
+ex.retake.b6.2 = {move} không được: {reply} bắt {your:short}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Và ở đây, tại ô {sq}, bạn sẽ có một con Hậu mới.
+demo.promote.2 = Rồi {your} đến ô {sq} và được phong Hậu.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Coi chừng: {my} có thể đến ô {sq}, và đó là chiếu hết.
+ex.mate_allowed.b1.2 = Giờ {my} có thể đến ô {sq}. Như thế là chiếu hết!
+ex.mate_allowed.b1.3 = Cẩn thận! Nếu {my} đến ô {sq}, đó là chiếu hết.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Nước này giúp tôi chiếu hết {your} sau {m:move}.
+ex.mate_allowed.b2.2 = Giờ tôi có thể chiếu hết {your} sau {m:move}. Xem này.
+ex.mate_allowed.b2.3 = Cẩn thận! {your} đang gặp nguy: chiếu hết sau {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Nước này để tôi chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Sau nước này, tôi có đòn chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Con Vua của bạn bị chiếu hết: {line:nomate}.
+ex.mate_allowed.b4 = Nước {move} để lọt một đòn chiếu hết bắt buộc: {line:nomate}.
+ex.mate_allowed.b4.2 = Nước này dẫn thẳng đến chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Sau {move}, {line:nomate} là chiếu hết.
+ex.mate_allowed.b5 = Nước {move} để lọt đòn chiếu hết bắt buộc sau {m:move}.
+ex.mate_allowed.b5.2 = Nước này dẫn đến chiếu hết sau {m:move}.
+ex.mate_allowed.b5.3 = Giờ đã có chiếu hết bắt buộc sau {m:move}.
+ex.mate_allowed.b6 = Chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, chiếu hết.
+ex.mate_allowed.b6.3 = Chiếu hết sau {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Nhìn này: {your} không còn ô nào để thoát.
+ex.mate_allowed.tail.b1.2 = Thấy chưa? {your} bị tấn công và không thể chạy thoát.
+ex.mate_allowed.tail.b1.3 = {your} không còn chỗ nào để đi. Đó là chiếu hết.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Người ta gọi kiểu này là {text}.
+ex.mate_allowed.pattern.2 = Hãy nhớ kiểu này nhé: đó là {text}.
+ex.mate_allowed.tip.b3 = Trước mỗi nước, hãy kiểm tra xem con Vua của bạn còn an toàn không.
+ex.mate_allowed.tip.b3.2 = Luôn tự hỏi: sau nước đi này, con Vua của mình có thể bị chiếu hết không?
+
+# The pattern names, said after "gọi kiểu này là" / "đó là" (no article in Vietnamese).
+name.pattern.back_rank = chiếu hết ở hàng cuối
+name.pattern.smothered = chiếu hết ngạt thở
+name.pattern.support = chiếu hết bằng Hậu có yểm trợ
+name.pattern.ladder = chiếu hết kiểu bậc thang
+name.pattern.epaulette = chiếu hết kiểu cầu vai
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Lẽ ra bạn đã chiếu hết được {my} bằng {best:nomate}!
+ex.mate_missed.b1.2 = {best:nomate} là chiếu hết đấy! {my} đã không thể thoát.
+ex.mate_missed.b1.3 = Nhìn này! Nước {best:nomate} đã có thể chiếu hết {my}.
+ex.mate_missed.b2 = Bạn đã có thể chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b2.2 = Nước {best:nomate} là chiếu hết sau {m:move}!
+ex.mate_missed.b2.3 = Lẽ ra bạn đã chiếu hết được tôi bằng {best:nomate}.
+ex.mate_missed.b3 = Bạn đã bỏ lỡ chiếu hết sau {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Đã có đòn chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b4 = Bỏ lỡ chiếu hết: {line:nomate}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} dẫn đến chiếu hết bắt buộc sau {m:move}.
+ex.mate_missed.b4.3 = Bạn đã có chiếu hết sau {m:move} với {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Bỏ lỡ chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b5.3 = Đã có chiếu hết bắt buộc: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} chiếu hết: {line:nomate}.
+ex.mate_missed.b6.2 = Chiếu hết sau {m:move} với {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, chiếu hết sau {m:move}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Nhanh hơn là {best:nomate}: chiếu hết sau {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} chiếu hết sớm hơn, sau {m:move}.
+ex.mate_delayed.b6 = {best:nomate} chiếu hết sau {m:move}.
+ex.mate_delayed.b6.2 = Nhanh hơn: {best:nomate}, chiếu hết sau {m:move}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ôi không! {my} không đi được và không bị chiếu. Thế là hết nước đi: ván cờ hòa.
+ex.stalemate.b1.2 = Nhìn này: {my} không còn ô an toàn, nhưng không bị chiếu. Hòa rồi!
+ex.stalemate.b1.3 = Đó là hết nước đi. {my} không đi được, nên ván cờ hòa.
+ex.stalemate.b2 = Hết nước đi! {my} không có nước đi hợp lệ, và không bị chiếu. Hòa.
+ex.stalemate.b2.2 = Ôi không, hết nước đi: {my} bị kẹt nhưng không bị chiếu.
+ex.stalemate.b2.3 = Đó là hòa do hết nước đi. {my} không đi được.
+ex.stalemate.b3 = Hết nước đi: {my} không có nước đi hợp lệ. Bạn đang ở thế thắng cơ mà!
+ex.stalemate.b3.2 = Hết nước đi! {my} bị kẹt, và một ván thắng thành ván hòa.
+ex.stalemate.b3.3 = {my} không còn nước đi mà không bị chiếu: thế hết nước đi.
+ex.stalemate.b4 = Hết nước đi: {my} không có nước đi hợp lệ. Thế là mất chiến thắng.
+ex.stalemate.b4.2 = Nước {move} làm {my} hết nước đi. Hòa từ một thế thắng.
+ex.stalemate.b4.3 = Hết nước đi; {my} bị vây kín.
+ex.stalemate.b5 = Nước {move} làm {my} hết nước đi. Chiến thắng đã tuột mất.
+ex.stalemate.b5.2 = Hết nước đi: {my} không còn ô nào.
+ex.stalemate.b5.3 = Hết nước đi, {my} bị kẹt.
+ex.stalemate.b6 = Hết nước đi. {my:short} không đi được.
+ex.stalemate.b6.2 = {move}, hết nước đi: {my:short} bị vây kín.
+ex.stalemate.b6.3 = Hết nước đi; {my:short} không thể di chuyển.
+ex.stalemate.tip.b1 = Khi đang thắng, hãy luôn chừa cho con Vua của tôi một ô để đi.
+ex.stalemate.tip.b1.2 = Hãy nhớ: khi đang dẫn trước, hãy chừa chỗ cho con Vua của tôi.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Cẩn thận! Tôi có thể cho đi các quân của mình, rồi {my} sẽ hết nước đi.
+ex.stalemate_trick.b1.2 = Coi chừng: {my} gần như bị kẹt. Tôi có thể cầm hòa.
+ex.stalemate_trick.b2 = Cẩn thận: tôi có thể thí quân, và {my} sẽ hết nước đi.
+ex.stalemate_trick.b2.2 = {my} gần như không còn ô nào. Tôi có thể ép thành thế hết nước đi!
+ex.stalemate_trick.b3 = Nước này giúp tôi thoát thua nhờ thế hết nước đi: {my} không còn nước nào.
+ex.stalemate_trick.b3.2 = Cẩn thận: sau {line}, {my} hết nước đi.
+ex.stalemate_trick.b4 = Nước {move} cho tôi gài bẫy hết nước đi: {line}, và {my} không đi được.
+ex.stalemate_trick.b4.2 = Giờ {my} có thể trốn vào thế hết nước đi: {line}.
+ex.stalemate_trick.b5 = Nước {move} để lọt thế hết nước đi: {line}; {my} bị vây kín.
+ex.stalemate_trick.b5.2 = Bẫy hết nước đi: {line}, và {my} không còn nước đi.
+ex.stalemate_trick.b6 = {line}, hết nước đi: {my:short} bị vây kín.
+ex.stalemate_trick.b6.2 = Hết nước đi sau {line}; {my:short} bị kẹt.

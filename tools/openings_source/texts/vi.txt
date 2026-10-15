@@ -1,0 +1,105 @@
+# Coach openings: Vietnamese texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
+# families.json into assets/coach/openings/vi.lang.
+# Register as in the coach files (glossary/vi.md): the coach says "tôi" for himself and "bạn" to the player,
+# "chúng ta" for both. Vietnamese has no articles, cases or gender: the "def" form of every name is its
+# citation form, and it fits every template unchanged. Names are written in sentence case: the first syllable,
+# proper names, nicknames (Rồng, Nhím, Hà mã) and piece names are capitalised ("Phòng thủ Sicilia", "Biến thể
+# cổ điển", "Khai cuộc bốn Mã"); a list of several openings shares one lower-case head noun ("các phòng thủ
+# Sicilia, Pháp hay Caro-Kann"). The templates avoid "khai cuộc bằng Khai cuộc ..." (the noun twice).
+# Pieces are capitalised (Vua, Hậu, Xe, Tượng, Mã, Tốt), and so are the players (Trắng, Đen). "tốt" (good)
+# sounds like "Tốt" (pawn): never "tốt" alone for "good" ("thuận lợi", "ổn"), only "tốt nhất".
+# Squares as "e4", files as "cột c", pawns as "Tốt d" (the generator spells the letter after "cột" / "Tốt");
+# pieces in words, never piece letters. A sentence never starts with a bare square: "Nước e4 ...".
+# Terms: light-squared / dark-squared bishop = "Tượng ô trắng" / "Tượng ô đen"; king's / queen's bishop or
+# knight = "Tượng cánh Vua", "Mã cánh Hậu"; break = "nước đột phá"; pawn majority = "đa số Tốt"; unbalanced =
+# "bất đối xứng" ("mất cân bằng" would suggest one side is better); hypermodern = "siêu hiện đại"; the
+# loanword "fianchetto" stays (Vietnamese chess books use it), beginner lines say "đưa Tượng ra đường chéo dài".
+# Numbers that are not squares are written in words ("nước thứ hai", "hàng thứ sáu", "thế kỷ mười chín").
+
+# ---- Sentences. "pw" = the player (the listener) has White, "pb" = the player has Black; the coach is the
+# other side.
+opening.say.pw.both = Bạn mở đầu bằng {white:def}, và tôi đáp lại bằng {black:def}.
+opening.say.pw.both.2 = Bạn chọn {white:def}, còn tôi chọn {black:def}.
+opening.say.pb.both = Tôi mở đầu bằng {white:def}, và bạn đáp lại bằng {black:def}.
+opening.say.pb.both.2 = Tôi chọn {white:def}, còn bạn chọn {black:def}.
+opening.say.pw.declined = Bạn chơi {white:def}, và tôi đã từ chối gambit đó.
+opening.say.pb.declined = Tôi chơi {white:def}, và bạn đã từ chối gambit đó.
+opening.say.pw.accepted = Bạn chơi {white:def}, và tôi đã chấp nhận gambit đó.
+opening.say.pb.accepted = Tôi chơi {white:def}, và bạn đã chấp nhận gambit đó.
+opening.say.pw.white = Bạn mở đầu bằng {white:def}.
+opening.say.pw.white.2 = Bạn đã chọn {white:def}.
+opening.say.pb.white = Tôi mở đầu bằng {white:def}.
+opening.say.pb.white.2 = Tôi đã chọn {white:def}.
+opening.say.pw.var_white = Tôi đáp lại bằng {black:def}, còn bạn chọn {white:def}.
+opening.say.pb.var_white = Bạn đáp lại bằng {black:def}, còn tôi chọn {white:def}.
+opening.say.pw.black = Tôi đáp lại bằng {black:def}.
+opening.say.pb.black = Bạn đáp lại bằng {black:def}.
+opening.say.both = Chúng ta đang chơi {both:def}.
+opening.say.both.2 = Đây là {both:def}.
+opening.say.variation = Cụ thể hơn, đây là {variation:def}.
+opening.say.variations = Cụ thể hơn: Trắng chơi {white:def}, còn Đen chơi {black:def}.
+opening.say.now_variation = Giờ thì chúng ta đã vào {variation:def}.
+opening.say.transposed = Do hoán đổi thứ tự nước đi, giờ chúng ta đã chuyển sang {opening:def}.
+opening.say.deep = Chính xác hơn nữa: {line}.
+opening.say.left_book = Chúng ta vừa rời khỏi lý thuyết khai cuộc quen thuộc.
+opening.say.left_book_move = Chúng ta đã rời khỏi lý thuyết khai cuộc quen thuộc ở nước {n}.
+opening.say.rare = Đây là một khai cuộc hiếm gặp.
+opening.say.rare_named = Đây là một khai cuộc hiếm gặp: {line}.
+
+# ---- Families: beginner (levels 1-3) and advanced (levels 4-6) comments
+opening.family.kings_pawn.beginner = Đẩy Tốt Vua lên hai ô giúp chiếm trung tâm và mở đường ngay cho Hậu và một con Tượng: đây là nước đi đầu tiên phổ biến nhất.
+opening.family.kings_pawn.advanced = Nước e4 dẫn đến những ván cờ mở, giàu chiến thuật sau e5, và đến những cuộc chiến sắc bén, bất đối xứng trước các phòng thủ Sicilia, Pháp hay Caro-Kann.
+opening.family.queens_pawn.beginner = Tốt Hậu chiếm trung tâm ở ô d4, nơi Hậu đã bảo vệ sẵn: các ván cờ thường chậm hơn và mang tính chiến lược nhiều hơn so với sau e4.
+opening.family.queens_pawn.advanced = Các khai cuộc Tốt Hậu dẫn đến những thế cờ đóng, nơi cách bố trí quân, cấu trúc Tốt và các nước đột phá c4, e4 quan trọng hơn chiến thuật ở giai đoạn đầu.
+opening.family.kings_knight.beginner = Con Mã ra quân và tấn công Tốt e5: đây là nước phát triển tự nhiên nhất, và Đen thường đáp lại bằng cách đưa Mã ra bảo vệ.
+opening.family.kings_knight.advanced = Con Mã ở f3 để ngỏ mọi hướng đi cổ điển, như các khai cuộc Tây Ban Nha, Ý, Scotland hay bốn Mã, và buộc Đen phải chọn cách bảo vệ e5.
+opening.family.sicilian.beginner = Đen đáp lại bằng Tốt c thay vì Tốt e, khiến thế cờ trở nên bất đối xứng: hãy chuẩn bị cho một cuộc chiến sắc bén, mỗi bên tấn công ở cánh của mình.
+opening.family.sicilian.advanced = Sau d4 và đổi Tốt, Đen có cột c nửa mở và nhiều Tốt trung tâm hơn, còn Trắng phát triển quân nhanh hơn và có cơ hội tấn công ở cánh Vua.
+opening.family.french.beginner = Đen chuẩn bị d5 bằng nước e6: một phòng thủ vững chắc, nhưng Tượng ô trắng thường bị chính các con Tốt của mình chắn đường.
+opening.family.french.advanced = Khi Trắng đẩy Tốt lên e5, một chuỗi Tốt khóa chặt xuất hiện: Trắng tấn công ở cánh Vua, còn Đen đánh vào chuỗi Tốt bằng c5 và f6.
+opening.family.caro_kann.beginner = Đen chuẩn bị d5 bằng nước c6 và giữ cho Tượng ô trắng được tự do: một phòng thủ rất vững chắc, ít điểm yếu.
+opening.family.caro_kann.advanced = Đen có cấu trúc Tốt lành mạnh và Tượng ô trắng hoạt động tích cực; Trắng giành không gian hoặc đi trước một chút về phát triển quân, còn Đen nhắm tới c5 hoặc một tàn cuộc thuận lợi.
+opening.family.scandinavian.beginner = Đen tấn công ngay Tốt e4 bằng nước d5; khi Hậu bắt lại, Trắng tranh thủ thời gian bằng cách đuổi Hậu, nên Hậu cần một ô an toàn.
+opening.family.scandinavian.advanced = Một cấu trúc giống Phòng thủ Caro-Kann, với Tượng ô trắng nằm ngoài chuỗi Tốt: Trắng có nhiều không gian hơn một chút, còn Đen có thế trận vững chắc, dễ triển khai.
+opening.family.italian.beginner = Trắng đặt Tượng ở c4, nhắm vào ô yếu f7: một khai cuộc cổ điển, trong đó cả hai bên phát triển quân nhanh và nhập thành.
+opening.family.italian.advanced = Khai cuộc Ý hiện đại là những trận điều quân chậm rãi với c3 và d3 để sau này chuẩn bị d4; Gambit Evans và nước nhảy Mã lên g5 là những cách chơi sắc bén.
+opening.family.ruy_lopez.beginner = Tượng của Trắng tấn công con Mã đang bảo vệ e5: một trong những khai cuộc lâu đời và sâu sắc nhất, giàu lối chơi chiến lược chậm rãi.
+opening.family.ruy_lopez.advanced = Trắng tạo sức ép lâu dài lên e5 và trung tâm bằng c3 và d4, trong khi Đen giành không gian ở cánh Hậu bằng a6 và b5; Tấn công Marshall là ngoại lệ sắc bén.
+opening.family.scotch.beginner = Trắng mở trung tâm ngay bằng nước d4: các quân ra nhanh và thế cờ sớm được mở.
+opening.family.scotch.advanced = Thế căng ở trung tâm biến mất ngay lập tức; cuộc chiến xoay quanh việc Đen phát triển quân tích cực và các cấu trúc Tốt sau khi đổi quân ở c6.
+opening.family.philidor.beginner = Đen bảo vệ e5 bằng Tốt d: vững chắc nhưng hơi thụ động, vì Tượng ô đen bị chắn đường.
+opening.family.philidor.advanced = Đen nhường không gian để giữ chắc e5; Trắng có sức ép thoải mái ở trung tâm, và các đòn mẹo nhắm vào f7 rất thường gặp ở trình độ câu lạc bộ.
+opening.family.petrov.beginner = Đen không bảo vệ e5 mà dùng Mã phản công e4: một phòng thủ vững chắc, đối xứng; chỉ có điều đừng bắt chước nước đi của Trắng quá lâu nhé.
+opening.family.petrov.advanced = Phòng thủ Petrov dẫn đến những cấu trúc đối xứng, thường dễ hòa: Trắng giữ được chút thế chủ động, còn Đen phát triển quân nhanh và tìm cách đổi quân để cân bằng thế cờ.
+opening.family.four_knights.beginner = Cả hai bên đều đưa Mã ra trước: một khai cuộc chắc chắn, êm đềm, tuân theo các nguyên tắc phát triển quân.
+opening.family.four_knights.advanced = Một khai cuộc đối xứng, cân bằng: Trắng chọn cách chơi kiểu Tây Ban Nha, Scotland hay Ý, còn Đen nên biết Phản gambit Rubinstein.
+opening.family.english.beginner = Trắng bắt đầu bằng Tốt c và kiểm soát d5 từ bên cánh: một khai cuộc linh hoạt, trong đó trung tâm được tranh giành bằng các quân.
+opening.family.english.advanced = Khai cuộc Anh thường chuyển sang các khai cuộc Tốt Hậu; những phương án riêng của nó mang lại các thế trận fianchetto, sức ép lên d5 và lối chơi ở cánh Hậu.
+opening.family.zukertort.beginner = Phát triển Mã cánh Vua trước giúp kiểm soát trung tâm mà chưa cần đẩy con Tốt nào.
+opening.family.zukertort.advanced = Một công cụ về thứ tự nước đi: nó có thể chuyển thành các khai cuộc Réti, Anh, Catalan hoặc Gambit Hậu, đồng thời tránh được một số phòng thủ của Đen.
+opening.family.queens_gambit.beginner = Trắng mời Tốt c để kéo Tốt của Đen ra khỏi trung tâm; đây không phải là một nước thí thật sự, vì Trắng thường có thể lấy lại con Tốt đó.
+opening.family.queens_gambit.advanced = Nước c4 đánh vào điểm tựa d5: Đen hoặc giữ nó, như trong Gambit Hậu từ chối hay Phòng thủ Slav, hoặc nhường nó để phát triển quân thoải mái, như trong Gambit Hậu chấp nhận.
+opening.family.qgd.beginner = Đen giữ Tốt ở d5 và hỗ trợ nó bằng e6: rất vững chắc, nhưng cần chú ý đến Tượng ô trắng.
+opening.family.qgd.advanced = Những cấu trúc cổ điển: cấu trúc Carlsbad với đòn tấn công thiểu số của Trắng, Đen giải phóng thế cờ bằng c5 hoặc e5, và vấn đề muôn thuở của Tượng ô trắng.
+opening.family.qga.beginner = Đen bắt Tốt nhưng không cố giữ nó: mục đích là phát triển quân thoải mái và đánh vào trung tâm của Trắng bằng c5.
+opening.family.qga.advanced = Trắng lấy lại Tốt và thường có một Tốt d cô lập: các quân hoạt động tích cực, đổi lại một điểm yếu cấu trúc lâu dài.
+opening.family.slav.beginner = Đen hỗ trợ d5 bằng c6 và để Tượng ô trắng tự do ra quân: một phòng thủ rất vững chắc.
+opening.family.slav.advanced = Phòng thủ Slav giữ d5 mà không chắn đường Tượng ô trắng; các phương án chính xoay quanh việc Đen bắt ở c4 và đưa con Tượng đó ra f5 hoặc g4.
+opening.family.semi_slav.beginner = Đen kết hợp Tốt c6 kiểu Slav với Tốt e6: trông có vẻ êm đềm, nhưng lại dẫn tới những phương án rất sắc bén.
+opening.family.semi_slav.advanced = Phòng thủ bán Slav rẽ nhánh thành Biến thể Meran, với việc mở rộng ở cánh Hậu bằng b5, và các gambit Botvinnik, Moscow cực kỳ sắc bén.
+opening.family.indian.beginner = Đen đáp lại bằng Mã thay vì Tốt và để ngỏ các lựa chọn: đây là cánh cửa dẫn vào tất cả các phòng thủ Ấn Độ.
+opening.family.indian.advanced = Con Mã ở f6 tạm thời ngăn e4; các nước tiếp theo của Đen sẽ chọn giữa các phòng thủ Ấn Độ của Vua, Nimzo-Ấn Độ, Ấn Độ của Hậu, Grünfeld hoặc Benoni.
+opening.family.kings_indian.beginner = Đen để Trắng xây dựng một trung tâm lớn, đặt Tượng ở g7 rồi phản đòn sau: một phòng thủ năng động, giàu tính chiến đấu.
+opening.family.kings_indian.advanced = Đen đánh vào trung tâm bằng e5 hoặc c5; khi trung tâm đóng lại, Trắng tấn công ở cánh Hậu, còn Đen dồn Tốt tấn công cánh Vua bằng f5, f4 và g5.
+opening.family.london.beginner = Trước hầu hết mọi cách đáp, Trắng dựng thế d4, Tượng ở f4, e3, Mã ở f3 và c3: dễ học, vững chắc, với một kế hoạch rõ ràng.
+opening.family.london.advanced = Một kim tự tháp Tốt ổn định với Tượng nằm ngoài chuỗi Tốt: Trắng chơi để giành thế chủ động ở cánh Vua hoặc siết dần đối phương, còn c5 sớm là cách đáp thử thách Trắng nhiều nhất.
+opening.family.modern.beginner = Đen đi g6 để đưa Tượng cánh Vua ra g7 và để Trắng chiếm trung tâm, với kế hoạch tấn công trung tâm đó về sau.
+opening.family.modern.advanced = Siêu hiện đại và linh hoạt: Đen hoãn việc đưa Mã ra f6 và để dành các nước c6, a6 và b5, hoặc e5, trong khi Trắng xây dựng một trung tâm lớn.
+opening.family.pirc.beginner = Đen đi d6, đưa Mã ra f6 rồi đi g6, để Trắng xây dựng trung tâm rồi phản công vào đó: một phòng thủ linh hoạt, giàu tính chiến đấu.
+opening.family.pirc.advanced = Trắng có một trung tâm rộng; các trận chiến chính là Tấn công Áo với f4 và những đợt tấn công bằng Hậu và Tượng, còn Đen phản đòn bằng c5 hoặc e5.
+opening.family.vienna.beginner = Trắng phát triển Mã cánh Hậu trước rồi thường tiếp tục bằng f4: một khai cuộc sôi nổi với cơ hội tấn công nhanh.
+opening.family.vienna.advanced = Khai cuộc Vienna chuẩn bị f4, tức Gambit Vienna, hoặc một thế trận êm đềm; cách đáp chính của Đen là đưa Mã ra f6 và phản đòn ở trung tâm bằng d5.
+opening.family.bishops_opening.beginner = Trắng đưa Tượng ra c4 trước Mã, nhắm vào f7 và giữ cho Tốt f được tự do.
+opening.family.bishops_opening.advanced = Một thứ tự nước đi linh hoạt, thường chuyển sang Khai cuộc Ý hoặc Khai cuộc Vienna; ý tưởng riêng chính của nó là các thế trận êm đềm với d3.
+opening.family.alekhine.beginner = Đen dùng Mã tấn công e4 để dụ các con Tốt của Trắng tiến lên: chúng giành được không gian, nhưng có thể trở thành mục tiêu.
+opening.family.alekhine.advanced = Đen mời các con Tốt tiến lên, rồi phá trung tâm đã dàn trải quá mức đó bằng d6 và c5; Biến thể hiện đại êm đềm là phương án chính của Trắng.
