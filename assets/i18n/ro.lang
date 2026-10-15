@@ -20,7 +20,7 @@ common.black = Negrele
 common.main_menu = Meniu principal
 # Decimal separator of numbers ("2,5 s"); the percent sign follows a no-break space.
 number.decimal = ,
-number.percent = {0}<NBSP>%
+number.percent = {0} %
 
 # ---- Title menu --------------------------------------------------------------------------------
 menu.subtitle = Jocul regilor
@@ -74,7 +74,7 @@ options.ambient_occlusion.help = O umbrire discretă acolo unde obiectele se ati
 options.indirect_light = Lumină indirectă
 options.indirect_light.help = Lumina zilei reflectată de pereți, podea și tavan. Scăzut: în locul ei, o lumină ambientală uniformă. Influențează mai ales timpul de încărcare.
 options.volumetric_light = Raze de lumină
-options.volumetric_light.help = Fascicule de lumină solară prin aerul plin de praf al sălii și firele de praf care sclipesc în ele.
+options.volumetric_light.help = Fascicule de lumină solară prin aerul prăfuit al sălii și particulele care sclipesc în ele.
 options.tessellation = Teselare
 options.tessellation.help = Contururi netede pe curbele pieselor văzute de aproape.
 options.tessellation.unavailable = Indisponibil: acest driver grafic nu acceptă teselarea.
@@ -159,7 +159,7 @@ controls.coach_hint = Provocările antrenorului: cereți un indiciu
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = LUMINOZITATE
-calibration.text = Mișcați cursorul până când calul de pe câmpul negru abia se mai vede sau nu se mai vede deloc.
+calibration.text = Mișcați glisorul până când calul de pe câmpul negru abia se mai vede sau nu se mai vede deloc.
 calibration.later = O puteți modifica mai târziu în Opțiuni > Grafică.
 calibration.continue = Continuare
 
@@ -478,7 +478,7 @@ elo.peak = Maxim {0}
 # Wins, draws, losses in chess notation: +12 =4 −9
 elo.record = +{0} ={1} −{2}
 elo.yours = Elo-ul dvs.: {0}
-elo.expected = scor așteptat {0}<NBSP>%
+elo.expected = scor așteptat {0} %
 elo.change = Elo {0} → {1} ({2})
 elo.unrated = Elo {0} · această partidă nu contează pentru rating
 
@@ -647,7 +647,7 @@ online.password.button = Schimbare parolă
 online.password.changed = Parola dvs. a fost schimbată.
 online.password.other_sessions = Pe celelalte calculatoare va trebui să vă autentificați din nou.
 online.mfa_setup.title = AUTENTIFICARE ÎN DOI PAȘI
-online.mfa_setup.lead = Autentificarea în doi pași vă cere, la fiecare autentificare, un cod dintr-o aplicație de pe telefon. Introduceți parola pentru a începe.
+online.mfa_setup.lead = Autentificarea în doi pași vă cere, la fiecare conectare, un cod dintr-o aplicație de pe telefon. Introduceți parola pentru a începe.
 online.mfa_setup.scan = 1. Scanați acest cod cu o aplicație de autentificare sau introduceți în ea această cheie:
 online.mfa_setup.enter = 2. Introduceți codul de 6 cifre afișat de aplicație:
 online.mfa_setup.enable = Activare
@@ -942,7 +942,7 @@ online.direct.button = Meci direct
 online.direct.title = MECI DIRECT
 online.direct.lead = O partidă amicală direct între două calculatoare: fără server, fără cont, niciodată cu rating.
 online.direct.host = Găzduiți o partidă
-online.direct.host.desc = Prietenul dvs. se conectează la dvs.: îi dați adresa dvs. și un cod.
+online.direct.host.desc = Prietenul se conectează la calculatorul dvs.: îi dați adresa și un cod.
 online.direct.join = Alăturați-vă unei partide
 online.direct.join.desc = Conectați-vă la un prieten care găzduiește o partidă.
 online.direct.host_title = GĂZDUIREA UNEI PARTIDE
@@ -1115,3 +1115,334 @@ coach.gameover.unrated = Această partidă cu antrenorul nu contează pentru rat
 coach.lesson.done = BRAVO
 coach.lesson.done.line = Acum cunoașteți regulile șahului.
 coach.lesson.next = Prima partidă
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Antrenament
+coach.tab.challenges = Provocări
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATURI
+challenge.group.tactics = TACTICĂ
+challenge.group.defence = APĂRARE
+challenge.group.endgames = FINALURI
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat într-o mutare
+challenge.mate1.desc = O singură mutare, și e mat.
+challenge.mate1.detail = Priviți mai întâi fiecare șah: unul dintre ele nu lasă regelui niciun câmp și nu poate fi parat nici prin interpunere, nici prin captură.
+challenge.mate2.name = Mat în două mutări
+challenge.mate2.desc = O mutare care nu lasă nicio apărare, apoi mat.
+challenge.mate2.detail = Prima mutare este adesea un șah sau un sacrificiu care îi ia regelui un câmp. Antrenorul se apără cât de bine poate.
+challenge.mate3.name = Mat în trei mutări
+challenge.mate3.desc = Variante forțate mai lungi.
+challenge.mate3.detail = Șahuri, capturi și amenințări, pe trei mutări în adâncime. Calculați cel mai bun răspuns al antrenorului la fiecare pas înainte de a atinge o piesă.
+challenge.backrank.name = Maturi pe ultima linie
+challenge.backrank.desc = Un rege prins în spatele propriilor pioni.
+challenge.backrank.detail = Când pionii din fața unui rege care a făcut rocada nu s-au mișcat, un turn sau o damă pe ultima linie poate da mat. Eliminați sau deviați mai întâi apărătorii.
+challenge.patterns.name = Modele de mat
+challenge.patterns.desc = Matul înăbușit, matul Anastasiei, matul arab și alte maturi clasice.
+challenge.patterns.detail = Rețele de mat celebre, care revin iar și iar. Învățați să recunoașteți așezarea pieselor și lovitura finală.
+challenge.hanging.name = Piese în priză
+challenge.hanging.desc = Observați ce a rămas neapărat.
+challenge.hanging.detail = O piesă sau un pion pe care nu îl apără nimeni poate fi pur și simplu luat. Verificați de ce este apărată fiecare piesă a antrenorului.
+challenge.fork.name = Furculițe
+challenge.fork.desc = O piesă atacă două deodată.
+challenge.fork.detail = Caii, pionii, damele și chiar regii pot face furculițe. Adversarul nu poate salva decât una dintre cele două ținte.
+challenge.pin.name = Legări
+challenge.pin.desc = O piesă care nu se poate mișca fără să piardă ce se află în spatele ei.
+challenge.pin.detail = Legați o piesă de regele ei sau de o piesă mai valoroasă, apoi atacați-o din nou sau folosiți faptul că nu se poate mișca.
+challenge.skewer.name = Frigări
+challenge.skewer.desc = Atacați o piesă valoroasă și câștigați-o pe cea din spatele ei.
+challenge.skewer.detail = Inversul legării: piesa mai valoroasă stă în față, trebuie să se mute și o descoperă pe cea din spatele ei.
+challenge.discovered.name = Atacuri descoperite
+challenge.discovered.desc = Mutați o piesă pentru a dezlănțui alta.
+challenge.discovered.detail = Când o piesă iese de pe o linie de atac, piesa din spatele ei atacă. Cu șah sau cu șah dublu, adversarul nu are timp să răspundă ambelor amenințări.
+challenge.deflection.name = Deviere și atragere
+challenge.deflection.desc = Îndepărtați un apărător sau atrageți o piesă pe un câmp fatal.
+challenge.deflection.detail = Un apărător care are două sarcini nu le poate îndeplini pe amândouă. Atacați-l, oferiți-i ceva sau forțați o piesă pe câmpul unde va fi pierdută.
+challenge.intermezzo.name = Mutări intermediare
+challenge.intermezzo.desc = Nu reluați imediat: există ceva mai puternic.
+challenge.intermezzo.detail = Înaintea mutării așteptate, un șah sau o amenințare mai mare intercalată schimbă totul.
+challenge.trapped.name = Piese prinse
+challenge.trapped.desc = O piesă care nu mai are niciun câmp sigur.
+challenge.trapped.detail = Luați-i unei piese ultimele câmpuri de retragere, apoi câștigați-o.
+challenge.promotion.name = Promovare
+challenge.promotion.desc = Duceți un pion până pe ultima linie.
+challenge.promotion.detail = Pionii avansați valorează mult. Eliberați drumul, deviați piesele care îl blochează și obțineți o damă nouă.
+challenge.quiet.name = Mutări liniștite
+challenge.quiet.desc = Mutarea câștigătoare nu este nici șah, nici captură.
+challenge.quiet.detail = Uneori, cea mai puternică mutare doar pregătește o amenințare care nu mai poate fi parată. Sunt cele mai greu de văzut.
+challenge.opening.name = Capcane în deschidere
+challenge.opening.desc = Pedepsiți greșelile timpurii.
+challenge.opening.detail = Poziții din primele mutări ale unor partide reale, în care o singură mutare neatentă poate fi exploatată imediat.
+challenge.escape.name = Găsiți scăparea
+challenge.escape.desc = Regele dvs. este în pericol: o singură mutare îl salvează.
+challenge.escape.detail = Orice altă mutare pierde. Priviți toate șahurile și amenințările împotriva regelui dvs., apoi găsiți singura ieșire.
+challenge.defend.name = Mutări defensive
+challenge.defend.desc = Parați amenințarea fără să pierdeți material.
+challenge.defend.detail = Antrenorul amenință ceva. Găsiți mutarea precisă care ține totul laolaltă.
+challenge.kq.name = Damă și rege contra rege
+challenge.kq.desc = Mat cu dama.
+challenge.kq.detail = Împingeți regele singur spre margine cu dama, apropiați-vă propriul rege și feriți-vă de pat. Antrenorul se apără cu cele mai bune mutări.
+challenge.kr.name = Turn și rege contra rege
+challenge.kr.desc = Mat cu turnul.
+challenge.kr.detail = Turnul taie regele, linie cu linie; regele dvs. ia opoziția. Antrenorul se apără cu cele mai bune mutări.
+challenge.kp.name = Rege și pion contra rege
+challenge.kp.desc = Câștigați opoziția și promovați pionul.
+challenge.kp.detail = Conduceți cu regele, nu cu pionul. Luați opoziția și faceți o damă pe care antrenorul nu o poate prinde.
+challenge.kp_hold.name = Opriți pionul
+challenge.kp_hold.desc = Un rege singur contra rege și pion: țineți remiza.
+challenge.kp_hold.detail = Așezați regele în fața pionului și păstrați opoziția. Rezistați zece mutări.
+challenge.rook.name = Finaluri de turnuri
+challenge.rook.desc = Podul lui Lucena și apărarea Philidor.
+challenge.rook.detail = Cele două poziții pe care orice jucător ar trebui să le cunoască: cum se câștigă cu un pion pe linia a șaptea și cum se apără cu turnul pe linia a treia.
+challenge.endgame.name = Tactică în final
+challenge.endgame.desc = Puține piese, idei ascuțite.
+challenge.endgame.detail = Curse de pioni, străpungeri și finaluri de turnuri din partide reale.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} poziție|{0} poziții|{0} de poziții
+coach.challenge.done = Finalizată
+coach.challenge.start = Start
+coach.challenge.note.white = Jucați cu albele; antrenorul așază fiecare poziție pe tablă.
+coach.challenge.note.hint = V-ați blocat? Apăsați H pentru un indiciu. După câteva încercări, antrenorul vă va oferi unul.
+coach.challenge.note.unsaved = Provocările nu contează pentru rating și nu se salvează; o bifă le marchează pe cele pe care le-ați finalizat.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = PROVOCARE ÎNCHEIATĂ
+coach.challenge.complete.line = Ați rezolvat toate pozițiile.
+coach.challenge.next = Provocarea următoare
+coach.challenge.again = Din nou
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = UN INDICIU?
+coach.hint.text = Antrenorul vă oferă un indiciu.
+coach.hint.hint = H afișează indiciul. Atingerea unei piese înseamnă că mai căutați.
+coach.hint.accept = Indiciu
+coach.hint.decline = Nu, mulțumesc
+coach.hint.key = Indiciu
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Vocea antrenorului
+options.coach_voice.help = Antrenorul vorbește cu voce tare în modul Antrenor. Modelul vocii sale este descărcat prima dată când este nevoie de el (aproximativ 399 MB). Dezactivat: cuvintele antrenorului sunt doar scrise pe ecran.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398,7")
+options.voice_update = Modelul vocii
+options.voice_update.help = Antrenorul vorbește încă cu vechea versiune pe 8 biți a modelului său de voce. Actualizarea descarcă versiunea oficială a Supertonic 3, publicată de Supertone, și șterge mai întâi fișierele vechi.
+options.voice_update.button = Actualizare ({0} MB)
+options.voice_update.running = Descărcarea este în curs.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed. Feminine forms: they agree with "calitatea vocii".
+options.voice_quality = Calitatea vocii
+options.voice_quality.help = Câți pași de rafinare face sinteza vocală a antrenorului pentru fiecare replică, de la Scăzută (4) la Maximă (9); implicit, Medie (5). Un nivel mai ridicat dă o voce puțin mai curată, dar calculul durează mai mult, așa că antrenorul începe să vorbească puțin mai târziu. Se poate seta după instalarea modelului de voce, cu Vocea antrenorului activată.
+options.voice_quality.low = Scăzută
+options.voice_quality.medium = Medie
+options.voice_quality.high = Ridicată
+options.voice_quality.very_high = Foarte ridicată
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maximă
+# The prompt. {0} = the size in megabytes ("398,7")
+coach.download.title = Vocea antrenorului
+coach.download.text = Antrenorul vorbește cu Supertonic 3, un model de sinteză vocală creat de Supertone. Nu este inclus în Scacelith: jocul îl poate descărca acum de pe Hugging Face ({0} MB, o singură dată). Fără el, antrenorul își scrie cuvintele pe ecran.
+coach.download.licence = Modelul este publicat sub licența OpenRAIL-M, care interzice anumite utilizări ale vocii pe care o produce, cum ar fi prezentarea ei drept voce umană sau imitarea unei persoane reale.
+coach.download.read_licence = Citiți licența
+coach.download.accept = Alegând Descărcare, acceptați termenii acestei licențe.
+# {0} = a folder
+coach.download.folder = Salvat în: {0}
+coach.download.not_now = Nu acum
+# {0} = the size in megabytes
+coach.download.download = Descărcare ({0} MB)
+coach.download.licence_title = LICENȚA OPENRAIL-M
+coach.download.back = Înapoi
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = O voce nouă pentru antrenor
+coach.update.text = Vocea antrenorului folosește acum versiunea oficială a Supertonic 3, publicată de Supertone, în locul conversiei pe 8 biți instalate până acum. Jocul o poate descărca acum de pe Hugging Face ({0} MB, o singură dată); fișierele vechi ({1} MB) sunt șterse mai întâi. Dacă refuzați, antrenorul își păstrează vocea actuală, iar actualizarea rămâne disponibilă în Opțiuni > Audio.
+coach.update.download = Actualizare ({0} MB)
+coach.update.accept = Alegând Actualizare, acceptați termenii acestei licențe.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = VOCEA ANTRENORULUI
+coach.download.removing = Se elimină versiunea veche…
+coach.download.checking = Se verifică fișierele…
+coach.download.downloading = Se descarcă…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = De pe Hugging Face
+coach.download.from_archive = De pe Hugging Face (copie de arhivă)
+coach.download.cancel = Anulare
+coach.download.failed = Descărcarea a eșuat.
+coach.download.error.network = Serverele nu au putut fi accesate. Verificați conexiunea la internet și încercați din nou.
+# {0} = a folder
+coach.download.error.disk = Fișierele nu au putut fi scrise în {0}. Verificați spațiul liber și încercați din nou.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serverele au trimis un răspuns neașteptat ({0}). Încercați din nou mai târziu.
+coach.download.retry = Reîncercare
+coach.download.close = Închidere
+# Notices
+coach.download.done = Vocea antrenorului este instalată.
+coach.download.cancelled = Descărcare anulată: data viitoare va continua de unde s-a oprit.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Partide salvate
+options.save_games = Salvarea partidelor mele
+options.save_games.help = La final, partidele dvs. împotriva lui Stockfish, cu antrenorul, între doi jucători la acest calculator și meciurile dvs. directe sunt salvate ca fișiere PGN, pe care le regăsiți în Partide salvate. Partidele online sunt păstrate de server.
+library.title = PARTIDE SALVATE
+library.section.games = PARTIDE
+library.section.details = PARTIDA
+library.section.tags = ETICHETE
+library.section.moves = MUTĂRI
+library.count = {0} partidă|{0} partide|{0} de partide
+library.filter = Afișare
+library.filter.all = Toate partidele
+library.filter.play = Împotriva lui Stockfish
+library.filter.coach = Cu antrenorul
+library.filter.hotseat = Doi jucători
+library.filter.direct = Meciuri directe
+library.filter.server = Partide online
+library.filter.imported = Importate
+library.mode.play = Împotriva lui Stockfish
+library.mode.coach = Cu antrenorul
+library.mode.hotseat = Doi jucători
+library.mode.direct = Meci direct
+library.mode.server = Partidă online
+library.mode.imported = Importată
+library.coach_level = Nivelul {0}
+library.unknown_player = Necunoscut
+library.unfinished = Neterminată
+library.unreadable = Această partidă nu poate fi citită.
+library.moves = {0} mutare|{0} mutări|{0} de mutări
+library.opening_variation = {0}: {1}
+library.file = Fișier: {0}
+library.file_game = Fișier: {0}, partida {1} din {2}
+library.no_moves = Nu s-a jucat nicio mutare.
+library.none_selected = Selectați o partidă din listă.
+library.reading = Se citesc partidele salvate
+library.empty.title = Nicio partidă salvată încă
+library.empty.text = Partidele dvs. împotriva lui Stockfish, cu antrenorul, între doi jucători la acest calculator și meciurile dvs. directe apar aici după ce se încheie. Puteți pune și fișiere PGN în acest dosar: partidele exportate din alte programe sau site-uri apar alături de ale dvs.
+library.empty.filter = Nicio partidă de acest tip.
+library.error.folder = Dosarul partidelor salvate nu poate fi citit
+library.error.game = Această partidă nu poate fi citită: {0}
+library.folder = Dosar: {0}
+library.open_folder = Deschidere dosar
+library.open_failed = Dosarul nu a putut fi deschis.
+library.replay = Redare
+library.delete = Ștergere
+library.delete.title = ȘTERGEREA PARTIDEI
+library.delete.text = Partida {0} va fi ștearsă de pe acest calculator, împreună cu fișierul ei. Această acțiune nu poate fi anulată.
+library.delete.ok = Ștergere
+library.delete.several = Acest fișier conține {0} partidă: poate fi șters doar din dosar.|Acest fișier conține {0} partide: poate fi șters doar din dosar.|Acest fișier conține {0} de partide: poate fi șters doar din dosar.
+library.deleted = Partida a fost ștearsă.
+library.delete.failed = Partida nu a putut fi ștearsă.
+library.delete.changed = Fișierul s-a schimbat: lista a fost actualizată.
+library.truncated = Acest dosar conține prea multe partide: sunt afișate doar cele mai recente {0}.
+library.tag.Event = Competiția
+library.tag.Site = Locul
+library.tag.Date = Data
+library.tag.Time = Ora
+library.tag.Round = Runda
+library.tag.White = Albul
+library.tag.Black = Negrul
+library.tag.Result = Rezultat
+library.tag.WhiteElo = Elo-ul Albului
+library.tag.BlackElo = Elo-ul Negrului
+library.tag.TimeControl = Ritm de joc
+library.tag.Termination = Mod de încheiere
+library.tag.Opening = Deschidere
+library.tag.Variation = Variantă
+library.tag.PlyCount = Semimutări
+library.tag.FEN = Poziție inițială
+library.tag.ScacelithMode = Mod
+library.tag.CoachLevel = Nivelul antrenorului
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Numărul partidei
+library.tag.UTCDate = Data (UTC)
+library.tag.UTCTime = Ora (UTC)
+library.tag.WhiteRatingDiff = Variația ratingului Albului
+library.tag.BlackRatingDiff = Variația ratingului Negrului
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analiză
+analysis.menu.title = ANALIZĂ
+analysis.menu.analyse = Analizați
+analysis.menu.paste = Lipiți un PGN
+analysis.menu.online = Partidele mele online
+analysis.menu.folder = Puneți fișiere PGN în acest dosar pentru a le analiza: {0}
+analysis.menu.empty.title = Nicio partidă salvată încă
+analysis.menu.empty.text = Partidele dvs. apar aici după ce se încheie, la fel ca fișierele PGN puse în dosarul de mai jos. Puteți și să lipiți o partidă copiată ca text PGN.
+analysis.menu.empty.no_folder = Lipiți o partidă copiată ca text PGN pentru a o analiza.
+analysis.menu.paste.empty = Clipboardul este gol: copiați mai întâi o partidă ca text PGN.
+analysis.menu.paste.none = Nu s-a găsit nicio partidă de șah în clipboard.
+analysis.menu.paste.several = Clipboardul conține mai multe partide: se analizează prima.
+analysis.menu.gameover = Analizați partida
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Mutarea {0} din {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Instantaneu
+replay.again = Redați din nou
+replay.gameover.unfinished = Partida se oprește după mutarea {0}, fără rezultat.
+replay.tip.start = Începutul partidei (Home)
+replay.tip.back = O mutare înapoi (J)
+replay.tip.pause = Pauză (K)
+replay.tip.resume = Reluare (K)
+replay.tip.forward = O mutare înainte (L)
+replay.tip.end = Sfârșitul partidei (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMENTARIU
+analysis.hud.accuracy = PRECIZIE
+analysis.hud.reviewing = Stockfish analizează partida… {0}
+analysis.hud.no_engine = Niciun motor de șah: mutările sunt afișate fără analiză.
+analysis.hud.no_moves = Această partidă nu are mutări.
+analysis.hud.tip.play = Redați mutările (K)
+analysis.hud.tip.comments_off = Ascundeți comentariile la momentele-cheie (N)
+analysis.hud.tip.comments_on = Afișați comentariile la momentele-cheie (N)
+analysis.hud.tip.voice_off = Opriți vocea comentatorului (M)
+analysis.hud.tip.voice_on = Ascultați comentariile rostite (M)
+analysis.hud.tip.voice_missing = Vocea nu se poate auzi: fișierele ei nu sunt instalate sau Opțiuni > Audio > Vocea antrenorului este dezactivată. Comentariile sunt doar scrise pe ecran.
+analysis.hud.tip.arrows_off = Ascundeți săgețile mutărilor mai bune (B)
+analysis.hud.tip.arrows_on = Afișați săgețile mutărilor mai bune (B)
+analysis.hud.controls.play = Redare / pauză
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Afișare / ascundere comentarii
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Vocea comentatorului pornită / oprită
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Afișare / ascundere săgeți
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Salvare ca GIF
+gif.making = Se creează GIF-ul: serverul desenează partida…
+gif.saved = GIF-ul a fost salvat:
+gif.saved_as = GIF salvat: {0}
+gif.sign_in_first = Autentificați-vă pe un server online pentru a crea GIF-uri: serverul le desenează.
+gif.busy_other = Se creează deja un alt GIF. Vă rugăm să așteptați până când este gata.
+gif.err.rate_limited_for = Ați creat multe GIF-uri într-un timp scurt. Îl puteți crea pe următorul peste {0}.
+gif.err.rate_limited = Ați creat multe GIF-uri într-un timp scurt. Vă rugăm să încercați din nou mai târziu.
+gif.err.server_busy_for = Serverul este ocupat cu desenarea altor GIF-uri. Vă rugăm să încercați din nou peste {0}.
+gif.err.server_busy = Serverul este ocupat cu desenarea altor GIF-uri. Vă rugăm să încercați din nou peste puțin timp.
+gif.err.signed_out = Sesiunea dvs. a expirat. Vă rugăm să vă autentificați din nou pentru a crea un GIF.
+gif.err.game_too_long = Această partidă este prea lungă pentru a fi transformată în GIF.
+gif.err.pgn_too_large = Această partidă este prea lungă pentru a fi transformată în GIF.
+gif.err.invalid_pgn = Serverul nu a putut citi această partidă.
+gif.err.render_failed = Serverul nu a putut crea acest GIF. Vă rugăm să încercați din nou.
+gif.err.gif_disabled = Acest server nu creează GIF-uri.
+gif.err.write_failed = GIF-ul nu a putut fi salvat pe acest calculator.
+gif.err.not_found = Această partidă nu mai există pe server.
+gif.wait.seconds = {0} secundă|{0} secunde|{0} de secunde
+gif.wait.minutes = {0} minut|{0} minute|{0} de minute
+gif.wait.both = {0} și {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Nu s-a putut porni OpenGL 4.6. Vă rugăm să actualizați driverul plăcii grafice.
+error.opengl_macos = Nu s-a putut porni OpenGL 4.6 pe acest Mac. Scacelith necesită un procesor Apple silicon (M1 sau mai nou) și macOS 26 sau mai nou și nu rulează într-o mașină virtuală.
+error.renderer = Motorul de randare nu a putut fi pornit.
+error.scene = Scena nu a putut fi încărcată.
+error.log_file = Detaliile se află în fișierul jurnal: {0}

@@ -16,9 +16,9 @@
 # not "Ben difeso!").
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
-ch.intro.mate1 = Matto in una mossa. {n:position}, e ogni volta una sola mossa dà scacco matto. Guarda tutti gli scacchi.
-ch.intro.mate2 = Matto in due mosse. {n:position}: la tua prima mossa non deve lasciarmi difese, poi dai matto.
-ch.intro.mate3 = Matto in tre mosse. {n:position}. Scacchi, catture e minacce: calcola ogni volta la mia risposta migliore.
+ch.intro.mate1 = Matto in una. {n:position}, e ogni volta una sola mossa dà scacco matto. Guarda tutti gli scacchi.
+ch.intro.mate2 = Matto in due. {n:position}: la tua prima mossa non deve lasciarmi difese, poi dai matto.
+ch.intro.mate3 = Matto in tre. {n:position}. Scacchi, catture e minacce: calcola ogni volta la mia risposta migliore.
 ch.intro.backrank = Matti del corridoio. {n:position} in cui un re è chiuso dietro i propri pedoni.
 ch.intro.patterns = Schemi di matto. {n:position} con classiche reti di matto. Riconosci lo schema, poi colpisci.
 ch.intro.hanging = Pezzi in presa. {n:position}: qualcosa di mio è rimasto senza protezione. Trovalo e prendilo.
@@ -36,9 +36,9 @@ ch.intro.escape = Trova la via di fuga. {n:position}: il tuo re è in pericolo, 
 ch.intro.defend = Mosse difensive. {n:position}: trova l’unica mossa che tiene in piedi la tua posizione.
 ch.intro.kq = Donna e re contro re. {n:position}: dai scacco matto al mio re. Attenzione allo stallo.
 ch.intro.kr = Torre e re contro re. {n:position}: dai scacco matto al mio re, un passo alla volta.
-ch.intro.kp = Re e pedone contro re. {n:position}: porta il pedone a donna. Apri la strada con il re.
+ch.intro.kp = Re e pedone contro re. {n:position}: porta il pedone a donna. Fagli strada con il re.
 ch.intro.kp_hold = Ferma il pedone. {n:position}: hai solo il tuo re. Tieni la patta.
-ch.intro.rook = Finali di torre. {n:position}: costruisci il ponte per promuovere, e tieni la patta con la difesa Philidor.
+ch.intro.rook = Finali di torre. {n:position}: costruisci il ponte per promuovere, e tieni la patta con la difesa di Philidor.
 ch.intro.endgame = Tattica nei finali. {n:position} con pochi pezzi e idee taglienti.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -110,7 +110,7 @@ ch.wrong.weaker.2 = È giocabile, ma puoi fare di meglio.
 ch.wrong.stalemate = Stallo! Il mio re non può muoversi, e così è solo patta.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
 ch.wrong.draw = Non questa: dopo {move}, riesco a tenere la patta.
-ch.wrong.loses = Attenzione: dopo {move}, sarei io a vincere.
+ch.wrong.loses = Attenzione: dopo {move}, avrei io una posizione vincente.
 # No answer from the engine: the move is simply not the one.
 ch.wrong.plain = Non è questa.
 ch.try_again = Riprova.

@@ -678,3 +678,307 @@ ex.missed_fork.b5 = {best} ataca dublu {t1} și {t2}.
 ex.missed_fork.b5.2 = {best} lovea {t1} și {t2}.
 ex.missed_fork.b6 = {best}, furculiță: {t1} și {t2}.
 ex.missed_fork.b6.2 = {best}: furculiță, {t1} și {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# "The square" of the rule of the square is "pătratul (pionului)", the Romanian chess term.
+ex.promotion.b1 = {my} poate ajunge până pe {sq}, unde devine damă. {your} e prea departe.
+ex.promotion.b1.2 = Uite: nimic nu oprește {my} până pe {sq}. {your} nu {my:cl} poate prinde.
+ex.promotion.b1.3 = {my} e la {n:square} de {sq}, iar {your} e prea len{your:agr_t}.
+ex.promotion.b2 = {my} fuge spre {sq}, iar {your} nu {my:cl} poate prinde.
+ex.promotion.b2.2 = {my} are nevoie de {n:move} până pe {sq}; {your}, de {n2:move}. Prea încet!
+ex.promotion.b2.3 = Atenție: {my} devine damă pe {sq}, iar {your} e prea departe.
+ex.promotion.b3 = {my} e în afara pătratului: {your} nu {my:cl} poate prinde înainte de {sq}.
+ex.promotion.b3.2 = Cursa e pierdută: {my} ajunge pe {sq} înaintea {your:gen}.
+ex.promotion.b4 = {your} e în afara pătratului pionului; pionul devine damă pe {sq}.
+ex.promotion.b4.2 = {my} se transformă în damă pe {sq}; {your:gen} îi lipsește o mutare.
+ex.promotion.b5 = Cursa de pioni e pierdută: {your} e în afara pătratului, iar eu fac damă pe {sq}.
+ex.promotion.b5.2 = {line}: fac damă pe {sq}, iar {your} ajunge prea târziu.
+ex.promotion.b6 = {your} e în afara pătratului; fac damă pe {sq}.
+ex.promotion.b6.2 = {line}, damă pe {sq} ({your} prea târziu).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Pionul tău putea ajunge pe {sq} și deveni damă!
+ex.promotion_missed.b1.2 = Uită-te la {sq}! Pionul tău putea fugi până acolo.
+ex.promotion_missed.b2 = Pionul tău putea fugi până pe {sq}. Împinge pionii trecuți!
+ex.promotion_missed.b2.2 = Nimic nu-ți oprea pionul în drum spre {sq}.
+ex.promotion_missed.b3 = {best} câștigă cursa spre {sq}.
+ex.promotion_missed.b3.2 = Pionul tău era mai rapid: {best}, și devine damă pe {sq}.
+ex.promotion_missed.b4 = {best} câștigă cursa de pioni spre {sq}.
+ex.promotion_missed.b4.2 = {best}! Pionul devine damă pe {sq}.
+ex.promotion_missed.b5 = Cu {best}, pionul tău devine damă pe {sq} înaintea mea.
+ex.promotion_missed.b5.2 = {best}, și câmpul {sq} e al tău.
+ex.promotion_missed.b6 = {best} câștigă cursa spre {sq}.
+ex.promotion_missed.b6.2 = {best}; pe {sq} înaintea mea.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Pionul acela apăra {your}. Acum {your} are mai puțină protecție.
+ex.king_shield.b1.2 = Pionul de pe {sq} era un scut pentru {your}. Acum piesele mele pot intra.
+ex.king_shield.b2 = Mutarea pionului de pe {sq} slăbește apărarea {your:gen}. Acum piesele mele {your:cl} pot ataca.
+ex.king_shield.b2.2 = {your} a pierdut un paznic: pionul de pe {sq} îi era scut.
+ex.king_shield.b3 = Mutarea asta de pion expune {your} atacului meu.
+ex.king_shield.b3.2 = {your} își pierde scutul de pioni, iar piesele mele intră.
+ex.king_shield.b4 = {move} slăbește pionii din jurul {your:gen}; atacul meu pătrunde.
+ex.king_shield.b4.2 = După {move}, scutul din jurul {your:gen} e spart.
+ex.king_shield.b5 = {move} slăbește adăpostul {your:gen}: {line}.
+ex.king_shield.b5.2 = După {move}, {your} e expu{your:agr_s}: {line}.
+ex.king_shield.b6 = {move} slăbește poziția {your:gen}: {line}.
+ex.king_shield.b6.2 = {line}; {your} e prea expu{your:agr_s}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} e în pericol. Piesele mele vin după {your:pron}.
+ex.king_exposed.b1.2 = Uite cât de expu{your:agr_s} e {your}. Ține{your:cl_imp} în siguranță, în spatele pionilor.
+ex.king_exposed.b2 = {your} e prea expu{your:agr_s}. Acum pot da multe șahuri.
+ex.king_exposed.b2.2 = Atenție: {your} n-are adăpost, iar piesele mele {your:cl} atacă.
+ex.king_exposed.b3 = {your} e expu{your:agr_s}; piesele mele {your:cl} pot ataca cu șahuri.
+ex.king_exposed.b3.2 = După asta, {your} rămâne fără adăpost.
+ex.king_exposed.b4 = {your} ajunge expu{your:agr_s}: {line}.
+ex.king_exposed.b4.2 = {move} lasă {your} pradă atacului.
+ex.king_exposed.b5 = {your} e prea expu{your:agr_s}: {line}.
+ex.king_exposed.b5.2 = {move} lasă {your} fără adăpost.
+ex.king_exposed.b6 = {line}; {your} e expu{your:agr_s}.
+ex.king_exposed.b6.2 = {your} e prea descoperi{your:agr_t}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Schimbul ăsta duce la un final de pioni pe care îl câștig eu.
+ex.bad_trade.b3.2 = După {line}, rămân doar pioni, iar regele meu stă mai bine.
+ex.bad_trade.b4 = Schimburile duc la un final de pioni pierdut: {line}.
+ex.bad_trade.b4.2 = Trecerea în acest final de pioni pierde.
+ex.bad_trade.b5 = Schimb greșit: finalul de pioni de după {line} e pierdut.
+ex.bad_trade.b5.2 = Finalul de pioni e pierdut; păstrează piesele pe tablă.
+ex.bad_trade.b6 = Finalul de pioni de după {line} e pierdut.
+ex.bad_trade.b6.2 = Final de pioni pierdut: {line}.
+ex.bishop_pair.b5 = Schimbul ăsta te costă perechea de nebuni.
+ex.bishop_pair.b5.2 = Cu schimbul ăsta cedezi perechea de nebuni; a mea rămâne.
+ex.bishop_pair.b6 = Perechea de nebuni se duce.
+ex.bishop_pair.b6.2 = Perechea de nebuni, cedată.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} ia opoziția: regii stau față în față, cu un câmp între ei.
+ex.opposition.b3.2 = Regii! {best} ar fi luat opoziția.
+ex.opposition.b4 = {best} ia opoziția: asta e cheia.
+ex.opposition.b4.2 = Opoziția decide: {best}.
+ex.opposition.b5 = {best}, cu luarea opoziției.
+ex.opposition.b5.2 = Opoziție: {best}.
+ex.opposition.b6 = {best}, opoziție.
+ex.opposition.b6.2 = {best}: opoziția.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Pionul tău putea fugi spre {sq}. Pionii trecuți vor să înainteze!
+ex.push_passed.b1.2 = Împinge-ți pionul liber! Vrea să ajungă pe {sq}.
+ex.push_passed.b1.3 = Pionul tău trecut vrea să meargă până pe {sq}. Împinge-l!
+ex.push_passed.b2 = {best}: împinge pionul trecut spre {sq}.
+ex.push_passed.b2.2 = Pionul tău trecut e puternic. {best} îl avansează.
+ex.push_passed.b2.3 = Împinge-l! {best} apropie pionul de {sq}.
+ex.push_passed.b3 = {best} avansează pionul trecut.
+ex.push_passed.b3.2 = Pionii trecuți trebuie împinși: {best}.
+ex.push_passed.b3.3 = {best} era calea: pionul fuge spre {sq}.
+ex.push_passed.b4 = {best}: pionul trecut decide.
+ex.push_passed.b4.2 = Împinge: {best}.
+ex.push_passed.b5 = {best}, cu avansul pionului trecut: {eval}.
+ex.push_passed.b5.2 = Pionul trecut: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, pionul trecut.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Adu {your} în față! În final, regele e o piesă puternică.
+ex.king_active.b1.2 = Acum {your} poate intra în luptă. Du{your:cl_imp} spre centru.
+ex.king_active.b1.3 = Cu puține piese rămase, {your} trebuie să iasă și să ajute.
+ex.king_active.b2 = În final, folosește {your}: adu{your:cl_imp} în centru.
+ex.king_active.b2.2 = Acum {your} trebuie să intre în joc. Du{your:cl_imp} înainte!
+ex.king_active.b3 = {best} activează regele. În final, regele luptă.
+ex.king_active.b3.2 = {best}: acum locul regelui e în centru.
+ex.king_active.b4 = {best} centralizează regele.
+ex.king_active.b4.2 = Regele trebuie să înainteze: {best}.
+ex.king_active.b5 = {best}, cu activarea regelui: {line}.
+ex.king_active.b5.2 = Activitatea regelui: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, regele înainte.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} păstrează o poziție mai bună.
+ex.positional.b4.2 = Aici, {best} era mai puternică.
+ex.positional.b4.3 = Aș fi preferat {best}.
+ex.positional.b5 = {best} era mai puternică: {line}.
+ex.positional.b5.2 = {best}, cu ideea {line}.
+ex.positional.b5.3 = Gândește-te la {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} a ieșit foarte devreme. Scoate mai întâi caii și nebunii.
+tip.early_queen.b1.2 = Atenție cu {your} atât de devreme: piesele mele {your:cl} pot hărțui.
+tip.early_queen.b1.3 = E distractiv să muți {your}, dar dezvoltă întâi piesele ușoare.
+tip.early_queen.b2 = Dacă muți {your} atât de devreme, {your:cl} pot ataca și câștig timp.
+tip.early_queen.b2.2 = {your} deja în joc? Întâi caii și nebunii!
+tip.early_queen.b3 = Când {your} iese devreme, câștig tempo atacând{your:cl_ger}.
+tip.early_queen.b3.2 = Atât de devreme, {your} e ușor de hărțuit. Dezvoltă-ți întâi piesele.
+tip.queen_grab.b1 = {your} a luat un pion îndepărtat, iar acum poate avea probleme.
+tip.queen_grab.b1.2 = Vânătoarea de pioni cu {your} costă timp. Dezvoltă-ți întâi piesele!
+tip.queen_grab.b2 = {your} a plecat după pioni pe flanc. Asta costă mult timp.
+tip.queen_grab.b2.2 = Atenție când trimiți {your} după pioni îndepărtați.
+tip.queen_grab.b3 = Vânătoarea de pioni cu {your} atât de devreme pierde timp.
+tip.queen_grab.b3.2 = {your} e departe de casă acum; avansul meu în dezvoltare va conta.
+tip.queen_grab.b4 = {your} ia un pion, dar pierde prea mult timp.
+tip.queen_grab.b4.2 = Pionul luat cu {your} departe, pe flanc, costă timp.
+tip.same_piece.b1 = Ai mutat {your} de două ori. Încearcă să scoți o piesă nouă la fiecare mutare.
+tip.same_piece.b1.2 = Iar {your}? Scoate-ți și celelalte piese.
+tip.same_piece.b1.3 = La fiecare mutare, încearcă să dezvolți o piesă nouă, nu iar {your}.
+tip.same_piece.b2 = Două mutări cu {your} în deschidere înseamnă timp pierdut.
+tip.same_piece.b2.2 = {your} s-a mișcat din nou; celelalte piese ale tale sunt încă acasă.
+tip.same_piece.b3 = Două mutări cu {your} întârzie dezvoltarea.
+tip.same_piece.b3.2 = Încă o mutare cu {your}; restul armatei tale așteaptă.
+tip.castle.b1 = {your} e încă la mijloc. Cu rocada, ar fi în siguranță.
+tip.castle.b1.2 = E timpul pentru rocadă! {your} e mai în siguranță în colț.
+tip.castle.b1.3 = Gândește-te să faci rocada curând. {your} e expu{your:agr_s}.
+tip.castle.b2 = {your} e încă în centru. Fă rocada curând!
+tip.castle.b2.2 = Rocada ar pune {your} la adăpost.
+tip.castle.b3 = Centrul se deschide: pune {your} la adăpost prin rocadă.
+tip.castle.b3.2 = {your} e încă în centru; rocada se impunea.
+tip.knight_rim.b1 = Pe margine, {your} nu face mare lucru. Caii preferă centrul.
+tip.knight_rim.b1.2 = Un cal pe margine e un cal slab! Acolo, {your} controlează mai puține câmpuri.
+tip.knight_rim.b2 = Pe margine, {your} controlează puține câmpuri. Țintește centrul.
+tip.knight_rim.b2.2 = Un cal pe margine e un cal slab: {your} vrea în centru.
+tip.knight_rim.b3 = {your} stă pe margine, departe de joc.
+tip.knight_rim.b3.2 = Marginea e un loc prost pentru {your}.
+tip.flank.b1 = Încearcă să muți întâi pionii din centru. Pionii de pe margine nu ajută prea mult.
+tip.flank.b1.2 = Pionii de pe margine nu-ți ajută piesele să iasă. Folosește-i pe cei din centru.
+tip.flank.b2 = Mutările pionilor de pe margine nu dezvoltă nimic. Folosește pionii din centru.
+tip.flank.b2.2 = Prea multe mutări de pioni pe flanc. Dezvoltă-ți piesele!
+tip.flank.b3 = Mutările de pioni pe flanc, în deschidere, întârzie dezvoltarea.
+tip.flank.b3.2 = Pionii de pe margine pot aștepta; dezvoltă-ți piesele și luptă pentru centru.
+tip.centre.b1 = Încearcă să controlezi centrul tablei, de exemplu câmpul {sq}.
+tip.centre.b1.2 = Centrul e important. Pune un pion sau o piesă lângă {sq}.
+tip.centre.b1.3 = Piesele din centru sunt puternice. Țintește câmpuri ca {sq}.
+tip.centre.b2 = Luptă pentru centru: câmpuri ca {sq} contează.
+tip.centre.b2.2 = Îmi lași centrul. Uită-te la câmpul {sq}.
+tip.centre.b3 = Nu-mi dispuți centrul; câmpul {sq} e al meu.
+tip.centre.b3.2 = Luptă pentru centru, în jurul câmpului {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Contra unui rege singur, împinge-l spre margine, apoi dă-i mat.
+tip.mate_technique.b1.2 = Sfat: împinge-mi regele spre margine. Ține-ți și regele aproape.
+tip.fifty.b1 = Atenție: după cincizeci de mutări fără captură sau mutare de pion, e remiză.
+tip.fifty.b1.2 = Timpul se scurge: cincizeci de mutări fără capturi sau mutări de pion înseamnă remiză.
+tip.repetition.b1 = Atenție! Dacă aceeași poziție apare a treia oară, e remiză.
+tip.repetition.b1.2 = Evită repetarea mutărilor: a treia repetare înseamnă remiză, iar tu ai poziție câștigată.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Uau, ai dat o piesă, și merge!
+praise.sacrifice.2 = Un sacrificiu inteligent! Foarte bine jucat.
+praise.brilliant.b3 = Genial! Un sacrificiu adevărat.
+praise.brilliant.b3.2 = Uau, {move} e un sacrificiu superb!
+praise.brilliant.b4 = {move}! Un sacrificiu genial.
+praise.brilliant.b4.2 = Genial. Nu mă așteptam la asta.
+praise.brilliant.b5 = {move}!! Genial.
+praise.brilliant.b5.spoken = {move}. Genial!
+praise.brilliant.b5.2 = Un sacrificiu genial.
+praise.brilliant.b6 = {move}!! Excelent.
+praise.brilliant.b6.spoken = {move}. Excelent!
+praise.brilliant.b6.2 = Genial.
+praise.great.b2 = Mutare excelentă! Ai găsit cum să ripostezi.
+praise.great.b2.2 = E o mutare excelentă. Bine găsit!
+praise.great.b3 = Mutare excelentă! Ai găsit singura idee bună.
+praise.great.b3.2 = Excelent, {move} întoarce situația.
+praise.great.b4 = {move}! O găselniță excelentă.
+praise.great.b4.2 = Mutare excelentă.
+praise.great.b5 = {move}! Bine găsit.
+praise.great.b5.2 = Puternic: {move}.
+praise.great.b6 = {move}! Excelent.
+praise.great.b6.2 = Găselniță excelentă.
+praise.only.b2 = Bine! Era singura mutare bună.
+praise.only.b2.2 = Bravo, ai găsit singura mutare care merge.
+praise.only.b3 = Singura mutare, și ai găsit-o.
+praise.only.b3.2 = Exact! Nimic altceva nu mergea aici.
+praise.only.b4 = Singura mutare. Bravo.
+praise.only.b4.2 = Singura mutare, găsită.
+praise.only.b5 = Singura mutare. Bine.
+praise.only.b5.2 = {move}, singura mutare.
+praise.only.b6 = Singura mutare.
+praise.only.b6.2 = Precis: singura mutare.
+praise.fork.b2 = Un atac dublu! Bravo.
+praise.fork.b2.2 = Ataci două piese deodată! Excelent.
+praise.fork.b2.3 = Frumos! Asta e o furculiță.
+praise.fork.b3 = Frumoasă furculiță.
+praise.fork.b3.2 = Furculiță bună!
+praise.fork.b3.3 = O furculiță. Bine jucat.
+praise.capture.b1 = Bravo! Ai luat gratis {my}.
+praise.capture.b1.2 = Bine văzut! {my} nu era proteja{my:agr_t}.
+praise.capture.b1.3 = Da! Ai câștigat {my}.
+praise.capture.b2 = Captură bună! {my} era neapăra{my:agr_t}.
+praise.capture.b2.2 = Frumos, ai luat {my}.
+praise.capture.b2.3 = Bine observat: {my} era în priză.
+praise.best.b1 = Mutare bună!
+praise.best.b1.2 = Foarte bine!
+praise.best.b1.3 = Bine jucat!
+praise.best.b2 = Mutare bună.
+praise.best.b2.2 = Foarte frumos.
+praise.best.b2.3 = Bine jucat.
+praise.best.b3 = Mutare bună: nu era ușor de găsit.
+praise.best.b3.2 = Frumoasă găselniță.
+praise.best.b3.3 = {move} e cea mai bună mutare aici. Bravo.
+praise.trade.b1 = Bine! Când ești în avantaj, schimburile de piese te ajută.
+praise.trade.b1.2 = Schimb frumos. Ai avantaj, deci simplificarea e bună pentru tine.
+praise.trade.b2 = Schimb bun: ai avantaj, deci schimbă piese.
+praise.trade.b2.2 = E inteligent să schimbi {my} când ai avantaj.
+praise.trade.b3 = Bine: când ai avantaj, schimbă.
+praise.trade.b3.2 = Schimb înțelept.
+praise.excellent.b3 = Excelentă mutare.
+praise.excellent.b3.2 = E o mutare puternică.
+praise.excellent.b3.3 = Foarte precis.
+praise.excellent.b4 = Precis.
+praise.excellent.b4.2 = Excelent.
+praise.excellent.b4.3 = Bine, {move} e precisă.
+praise.castle.b1 = Bine! Ai făcut rocada. Acum regele tău e mai în siguranță.
+praise.castle.b1.2 = Frumoasă rocadă! Regele tău e la adăpost.
+praise.saved.b1 = Bine! Ți-ai salvat piesa.
+praise.saved.b1.2 = Bravo, ai pus piesa la adăpost.
+praise.book.b1 = Bine, e o mutare de deschidere bine cunoscută.
+praise.book.b1.2 = Frumos, așa încep și jucătorii puternici.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Atenție! Amenint cu șah mat pe {sq}.
+threat.mate.b1.2 = Atenție: {my} vrea să meargă pe {sq}. Ar fi șah mat.
+threat.mate.b1.3 = Uită-te la {sq}. Dacă ajung acolo, e șah mat!
+threat.mate.b2 = Atenție, amenint mat.
+threat.mate.b2.2 = Atenție: e o amenințare de mat pe {sq}.
+threat.mate.b2.3 = Privește cu atenție: amenint șah mat.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Uite: {my} atacă {your}.
+threat.piece.b1.2 = Atenție! {your} e ataca{your:agr_t} de {my}.
+threat.piece.b1.3 = Atenție, {my} vrea să ia {your}.
+threat.piece.b2 = Atenție la {your}.
+threat.piece.b2.2 = {your} e sub atac.
+threat.piece.b2.3 = Ai grijă de {your}.
+threat.punish.b1 = Ultima mea mutare a fost o greșeală. Poți s-o pedepsești?
+threat.punish.b1.2 = Hm, cred că am făcut o greșeală. Poți s-o găsești?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = De data asta, gândește-te la {your}.
+tb.hint.b1.2 = Fii cu ochii pe {your}.
+tb.hint.king.b1 = Gândește-te la siguranța {your:gen}.
+tb.hint.king.b1.2 = Uită-te întâi la {your}. E în siguranță?
+tb.hint.missed.b1 = Caută piese pe care le poți lua gratis.
+tb.hint.missed.b1.2 = Privește cu atenție: poți captura ceva?
+tb.hint.mate_missed.b1 = Uită-te la regele meu. Îi poți da șah mat?
+tb.hint.mate_missed.b1.2 = Încearcă întâi șahurile. Poate există un mat!
+tb.hint.general.b1 = Nu te grăbi și uită-te la toată tabla.
+tb.hint.general.b1.2 = Încearcă să găsești o mutare mai sigură.
+# The retry.
+tb.fixed.b1 = Mult mai bine!
+tb.fixed.b1.2 = Da, așa e mai bine!
+tb.fixed.b1.3 = Bine, așa merge mult mai bine.
+tb.fixed = Așa e mai bine.
+tb.fixed.2 = Mai bine.
+tb.fixed.3 = Corectură bună.
+tb.same = Iar aceeași mutare? Bine, să vedem.
+tb.same.2 = Îți place mutarea asta. Hai s-o jucăm până la capăt.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Da! Asta e mutarea la care mă gândeam.
+tb.found.b1.2 = Ai găsit-o! Asta e mutarea mai bună.
+tb.found = Asta e mutarea pe care o aveam în minte.
+tb.found.2 = Exact, asta e.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Din păcate, în partida asta nu mai poți lua mutări înapoi.
+tb.none_left.2 = Nu mai ai nicio anulare de mutare în partida asta.

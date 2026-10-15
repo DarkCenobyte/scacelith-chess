@@ -114,10 +114,12 @@ lesson.king.wrong = Il tuo re è proprio accanto {my:a}. Spostati sulla sua casa
 lesson.king.ok = Bene! Il re è lento, ma da vicino è forte.
 # Knight
 lesson.knight.intro = Ecco {your}. Si muove a L: due case dritto, poi una di lato.
+lesson.knight.intro.spoken = Ecco {your}. Si muove a elle: due case dritto, poi una di lato.
 lesson.knight.l = {@}Così. Finisce sempre su una casa dell’altro colore.
 lesson.knight.jump = Il cavallo è l’unico pezzo che può saltare sopra gli altri.
 lesson.knight.ask = Cattura {my} con il tuo cavallo!
 lesson.knight.wrong = È una vera mossa di cavallo, ma non raggiunge {my}. Prova un’altra L.
+lesson.knight.wrong.spoken = È una vera mossa di cavallo, ma non raggiunge {my}. Prova un’altra elle.
 lesson.knight.ok = Gran bel salto!
 # Pawn: moving
 lesson.pawn.intro = Ora passiamo {your:a}. Va dritto in avanti, una casa alla volta, e non torna mai indietro.
@@ -213,7 +215,7 @@ lesson.castle2.other = Arrocca verso l’altra torre, sull’ala di donna.
 lesson.castle2.ok = Esatto! Con l’arrocco lungo il tuo re va in {sq}.
 
 # ---- Chapter 6: en passant ------------------------------------------------------------------------------------
-lesson.ep.what = C’è una cattura speciale del pedone che si chiama en passant. Vuol dire «al passaggio».
+lesson.ep.what = C’è una cattura speciale del pedone che si chiama en passant. Vuol dire «di passaggio».
 lesson.ep.watch = Guarda il mio pedone: avanza di due case e finisce proprio accanto al tuo.
 lesson.ep.how = Il tuo pedone può catturarlo come se fosse avanzato di una sola casa: in {sq}.
 lesson.ep.now = Ma solo adesso, a questa mossa. Cattura en passant!
@@ -243,12 +245,12 @@ lesson.talk.rules = Ora conosci tutte le regole degli scacchi. Ben fatto!
 lesson.talk.real = Lascia che ti racconti come si giocano le partite vere.
 lesson.talk.elo = I giocatori hanno un punteggio, chiamato Elo. Sale quando vinci e scende quando perdi.
 lesson.talk.elo_gap = Battere un giocatore più forte fa guadagnare più punti; perdere contro uno più debole ne fa perdere di più.
-lesson.talk.elo_start = Il tuo punteggio compare dopo cinque partite classificate. Le partite con l’allenatore sono allenamento, quindi non sono classificate.
+lesson.talk.elo_start = Il tuo punteggio compare dopo cinque partite classificate. Le partite con me sono un allenamento, quindi non sono classificate.
 lesson.talk.clock = Questo è un {@}orologio da scacchi. Ogni giocatore ha il suo tempo, che scorre solo durante il suo turno.
 lesson.talk.press = Dopo la tua mossa, premi l’orologio con la stessa mano. Così fai partire il mio tempo.
 lesson.talk.flag = Se il tuo tempo finisce, perdi, a meno che io non abbia alcun modo di darti scacco matto.
 lesson.talk.increment = Cinque più tre significa cinque minuti a testa, più tre secondi dopo ogni mossa.
-lesson.talk.speeds = Le partite brevi si chiamano blitz, quelle più lunghe rapid, e le più lunghe di tutte classiche.
+lesson.talk.speeds = Secondo la durata, si parla di cadenza blitz per le partite brevi, rapid per quelle più lunghe e classica per le più lunghe di tutte.
 lesson.talk.no_clock = Con me l’orologio è spento. Prenditi tutto il tempo che ti serve per pensare.
 lesson.talk.touch = In una partita vera, se tocchi uno dei tuoi pezzi, devi muoverlo.
 lesson.talk.touch_mine = Se tocchi uno dei miei pezzi, devi catturarlo, se puoi.

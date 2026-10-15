@@ -257,7 +257,8 @@ appraisal.best.phase.b6.2 = Fase migliore: {text}, {acc:percent}.
 # Counted nouns ("{n:piece}" = "un pezzo" / "3 pezzi") come from count.<noun> in common.lang.
 # Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
 # The short levels use "{n:captured}" = "3 pezzi catturati", "{m:check}" = "2 scacchi", or a bare
-# number after a colon ("Catture: 3"), so that nothing has to agree with the number.
+# number after a colon ("Catture: 3"; "{n:f}" says "Catture: una"), so that nothing has to agree
+# with the number.
 appraisal.num.material.b1 = Mi hai preso {n:piece} e hai dato scacco {m:time}.
 appraisal.num.material.b1.2 = Hai catturato {n:piece} e hai dato scacco al mio re {m:time}.
 appraisal.num.material.b2 = Hai catturato {n:piece} e hai dato scacco {m:time}.
@@ -267,9 +268,9 @@ appraisal.num.material.b3.2 = {n:captured} e {m:check}.
 appraisal.num.material.b4 = {n:captured}, scacco dato {m:time}.
 appraisal.num.material.b4.2 = Hai preso {n:piece} e hai dato scacco {m:time}.
 appraisal.num.material.b5 = {n:captured}; scacco dato {m:time}.
-appraisal.num.material.b5.2 = Catture: {n}; scacchi: {m}.
+appraisal.num.material.b5.2 = Catture: {n:f}; scacchi: {m}.
 appraisal.num.material.b6 = {n:captured}, {m:check}.
-appraisal.num.material.b6.2 = Catture: {n}; scacchi: {m}.
+appraisal.num.material.b6.2 = Catture: {n:f}; scacchi: {m}.
 appraisal.num.material_nochecks.b1 = Mi hai preso {n:piece}.
 appraisal.num.material_nochecks.b1.2 = In questa partita hai catturato {n:piece}.
 appraisal.num.material_nochecks.b2 = Hai catturato {n:piece}.
@@ -279,7 +280,7 @@ appraisal.num.material_nochecks.b3.2 = {n:captured}.
 appraisal.num.material_nochecks.b4 = {n:captured}.
 appraisal.num.material_nochecks.b4.2 = Hai preso {n:piece}.
 appraisal.num.material_nochecks.b5 = {n:captured}.
-appraisal.num.material_nochecks.b5.2 = Catture: {n}.
+appraisal.num.material_nochecks.b5.2 = Catture: {n:f}.
 appraisal.num.material_nochecks.b6 = {n:captured}.
 appraisal.num.material_nochecks.b6.2 = Pezzi catturati: {n}.
 # Takebacks, always positive: {n} moves taken back, {m} of them replayed well. "Ne hai corrette tre"
@@ -289,7 +290,7 @@ appraisal.num.takebacks.b1.2 = Hai ritirato {n:move}, e {m:time} hai trovato una
 appraisal.num.takebacks.b2 = Hai ritirato {n:move} e {m:time} hai corretto il tiro. È così che si impara.
 appraisal.num.takebacks.b2.2 = Hai ritirato {n:move}: {m:time} la nuova mossa era migliore. Ottimo esercizio!
 appraisal.num.takebacks.b3 = Hai ritirato {n:move} e {m:time} hai trovato di meglio.
-appraisal.num.takebacks.b3.2 = Mosse ritirate: {n}; corrette: {m}. Bene.
+appraisal.num.takebacks.b3.2 = Mosse ritirate: {n:f}; corrette: {m:f}. Bene.
 # Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}). "Errore grave"
 # is the blunder only: the big mistakes here are "errori importanti".
 appraisal.num.clean.b2 = Nessun errore importante: ottimo!

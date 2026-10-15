@@ -93,7 +93,7 @@ ch.solved.mate = Matti! Hienoa.
 ch.solved.mate.2 = Ja se on matti. Erittäin hyvä.
 ch.solved.mate.3 = Matti. Hienosti tehty.
 ch.solved.promote = Uusi kuningatar, ja voitto on varma. Hienoa.
-ch.solved.hold = Tasapeli pitää. Hyvin puolustettu!
+ch.solved.hold = Tasapeli säilyi. Hyvin puolustettu!
 ch.solved.draw = Laudalla on tasapeli. Hyvin puolustettu!
 # A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
 ch.wrong.reply = Ei tämä: vastaisin siirrolla {move}.

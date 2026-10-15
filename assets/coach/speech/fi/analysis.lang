@@ -135,7 +135,7 @@ an.end.draw = Peli päättyy tasapeliin.
 an.end.draw.2 = Tasapeli.
 an.end.unfinished = Peli päättyy tähän keskeneräisenä.
 an.end.unfinished.2 = Tähän peli pysähtyy: sitä ei pelattu loppuun.
-an.end.accuracy = Tarkkuus: valkealla {acc_white} prosenttia, mustalla {acc_black}.
+an.end.accuracy = Tarkkuusprosentit: valkealla {acc_white}, mustalla {acc_black}.
 an.end.accuracy.2 = Valkea pelasi {acc_white:gen} prosentin tarkkuudella, musta {acc_black:gen} prosentin.
 # "Vakava virhe" is the blunder (glossary), so "serious errors" (mistakes and blunders together) is
 # "isot virheet" in the .2 lines.

@@ -23,7 +23,8 @@
    "et",
    "fi",
    "hi",
-   "hr"
+   "hr",
+   "hu"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -171,6 +172,18 @@
      "name": "Otvaranje kraljevog pješaka",
      "def": "otvaranje kraljevog pješaka",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Királygyalog-megnyitás",
+     "def": "a királygyalog-megnyitás",
+     "forms": {
+      "acc": "a királygyalog-megnyitást",
+      "dat": "a királygyalog-megnyitásnak",
+      "ins": "a királygyalog-megnyitással",
+      "ine": "a királygyalog-megnyitásban",
+      "ela": "a királygyalog-megnyitásból",
+      "sub": "a királygyalog-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -292,6 +305,18 @@
      "name": "Otvaranje daminog pješaka",
      "def": "otvaranje daminog pješaka",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Vezérgyalog-megnyitás",
+     "def": "a vezérgyalog-megnyitás",
+     "forms": {
+      "acc": "a vezérgyalog-megnyitást",
+      "dat": "a vezérgyalog-megnyitásnak",
+      "ins": "a vezérgyalog-megnyitással",
+      "ine": "a vezérgyalog-megnyitásban",
+      "ela": "a vezérgyalog-megnyitásból",
+      "sub": "a vezérgyalog-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -410,6 +435,18 @@
      "name": "Otvaranje kraljevog skakača",
      "def": "otvaranje kraljevog skakača",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Királyhuszár-megnyitás",
+     "def": "a királyhuszár-megnyitás",
+     "forms": {
+      "acc": "a királyhuszár-megnyitást",
+      "dat": "a királyhuszár-megnyitásnak",
+      "ins": "a királyhuszár-megnyitással",
+      "ine": "a királyhuszár-megnyitásban",
+      "ela": "a királyhuszár-megnyitásból",
+      "sub": "a királyhuszár-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -531,6 +568,18 @@
      "name": "Sicilijanska obrana",
      "def": "sicilijanska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Szicíliai védelem",
+     "def": "a szicíliai védelem",
+     "forms": {
+      "acc": "a szicíliai védelmet",
+      "dat": "a szicíliai védelemnek",
+      "ins": "a szicíliai védelemmel",
+      "ine": "a szicíliai védelemben",
+      "ela": "a szicíliai védelemből",
+      "sub": "a szicíliai védelemre"
+     }
     }
    },
    "comment": {
@@ -649,6 +698,18 @@
      "name": "Francuska obrana",
      "def": "francuska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Francia védelem",
+     "def": "a francia védelem",
+     "forms": {
+      "acc": "a francia védelmet",
+      "dat": "a francia védelemnek",
+      "ins": "a francia védelemmel",
+      "ine": "a francia védelemben",
+      "ela": "a francia védelemből",
+      "sub": "a francia védelemre"
+     }
     }
    },
    "comment": {
@@ -767,6 +828,18 @@
      "name": "Caro-Kann obrana",
      "def": "Caro-Kann obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Caro–Kann-védelem",
+     "def": "a Caro–Kann-védelem",
+     "forms": {
+      "acc": "a Caro–Kann-védelmet",
+      "dat": "a Caro–Kann-védelemnek",
+      "ins": "a Caro–Kann-védelemmel",
+      "ine": "a Caro–Kann-védelemben",
+      "ela": "a Caro–Kann-védelemből",
+      "sub": "a Caro–Kann-védelemre"
+     }
     }
    },
    "comment": {
@@ -885,6 +958,18 @@
      "name": "Skandinavska obrana",
      "def": "skandinavska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Skandináv védelem",
+     "def": "a skandináv védelem",
+     "forms": {
+      "acc": "a skandináv védelmet",
+      "dat": "a skandináv védelemnek",
+      "ins": "a skandináv védelemmel",
+      "ine": "a skandináv védelemben",
+      "ela": "a skandináv védelemből",
+      "sub": "a skandináv védelemre"
+     }
     }
    },
    "comment": {
@@ -1003,6 +1088,18 @@
      "name": "Talijanska partija",
      "def": "talijanska partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Olasz játszma",
+     "def": "az olasz játszma",
+     "forms": {
+      "acc": "az olasz játszmát",
+      "dat": "az olasz játszmának",
+      "ins": "az olasz játszmával",
+      "ine": "az olasz játszmában",
+      "ela": "az olasz játszmából",
+      "sub": "az olasz játszmára"
+     }
     }
    },
    "comment": {
@@ -1121,6 +1218,18 @@
      "name": "Španjolska partija",
      "def": "španjolska partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Spanyol megnyitás",
+     "def": "a spanyol megnyitás",
+     "forms": {
+      "acc": "a spanyol megnyitást",
+      "dat": "a spanyol megnyitásnak",
+      "ins": "a spanyol megnyitással",
+      "ine": "a spanyol megnyitásban",
+      "ela": "a spanyol megnyitásból",
+      "sub": "a spanyol megnyitásra"
+     }
     }
    },
    "comment": {
@@ -1239,6 +1348,18 @@
      "name": "Škotska partija",
      "def": "škotska partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Skót játszma",
+     "def": "a skót játszma",
+     "forms": {
+      "acc": "a skót játszmát",
+      "dat": "a skót játszmának",
+      "ins": "a skót játszmával",
+      "ine": "a skót játszmában",
+      "ela": "a skót játszmából",
+      "sub": "a skót játszmára"
+     }
     }
    },
    "comment": {
@@ -1357,6 +1478,18 @@
      "name": "Philidorova obrana",
      "def": "Philidorova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Philidor-védelem",
+     "def": "a Philidor-védelem",
+     "forms": {
+      "acc": "a Philidor-védelmet",
+      "dat": "a Philidor-védelemnek",
+      "ins": "a Philidor-védelemmel",
+      "ine": "a Philidor-védelemben",
+      "ela": "a Philidor-védelemből",
+      "sub": "a Philidor-védelemre"
+     }
     }
    },
    "comment": {
@@ -1475,6 +1608,18 @@
      "name": "Petrovljeva obrana",
      "def": "Petrovljeva obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Petrov-védelem",
+     "def": "a Petrov-védelem",
+     "forms": {
+      "acc": "a Petrov-védelmet",
+      "dat": "a Petrov-védelemnek",
+      "ins": "a Petrov-védelemmel",
+      "ine": "a Petrov-védelemben",
+      "ela": "a Petrov-védelemből",
+      "sub": "a Petrov-védelemre"
+     }
     }
    },
    "comment": {
@@ -1594,6 +1739,18 @@
      "name": "Partija četiri skakača",
      "def": "partija četiri skakača",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Négyhuszáros játék",
+     "def": "a négyhuszáros játék",
+     "forms": {
+      "acc": "a négyhuszáros játékot",
+      "dat": "a négyhuszáros játéknak",
+      "ins": "a négyhuszáros játékkal",
+      "ine": "a négyhuszáros játékban",
+      "ela": "a négyhuszáros játékból",
+      "sub": "a négyhuszáros játékra"
+     }
     }
    },
    "comment": {
@@ -1713,6 +1870,18 @@
      "name": "Englesko otvaranje",
      "def": "englesko otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Angol megnyitás",
+     "def": "az angol megnyitás",
+     "forms": {
+      "acc": "az angol megnyitást",
+      "dat": "az angol megnyitásnak",
+      "ins": "az angol megnyitással",
+      "ine": "az angol megnyitásban",
+      "ela": "az angol megnyitásból",
+      "sub": "az angol megnyitásra"
+     }
     }
    },
    "comment": {
@@ -1831,6 +2000,18 @@
      "name": "Zukertortovo otvaranje",
      "def": "Zukertortovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Zukertort-megnyitás",
+     "def": "a Zukertort-megnyitás",
+     "forms": {
+      "acc": "a Zukertort-megnyitást",
+      "dat": "a Zukertort-megnyitásnak",
+      "ins": "a Zukertort-megnyitással",
+      "ine": "a Zukertort-megnyitásban",
+      "ela": "a Zukertort-megnyitásból",
+      "sub": "a Zukertort-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -1954,6 +2135,18 @@
      "name": "Damin gambit",
      "def": "damin gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Vezércsel",
+     "def": "a vezércsel",
+     "forms": {
+      "acc": "a vezércselt",
+      "dat": "a vezércselnek",
+      "ins": "a vezércsellel",
+      "ine": "a vezércselben",
+      "ela": "a vezércselből",
+      "sub": "a vezércselre"
+     }
     }
    },
    "comment": {
@@ -2072,6 +2265,18 @@
      "name": "Odbijeni damin gambit",
      "def": "odbijeni damin gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Elhárított vezércsel",
+     "def": "az elhárított vezércsel",
+     "forms": {
+      "acc": "az elhárított vezércselt",
+      "dat": "az elhárított vezércselnek",
+      "ins": "az elhárított vezércsellel",
+      "ine": "az elhárított vezércselben",
+      "ela": "az elhárított vezércselből",
+      "sub": "az elhárított vezércselre"
+     }
     }
    },
    "comment": {
@@ -2190,6 +2395,18 @@
      "name": "Prihvaćeni damin gambit",
      "def": "prihvaćeni damin gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Elfogadott vezércsel",
+     "def": "az elfogadott vezércsel",
+     "forms": {
+      "acc": "az elfogadott vezércselt",
+      "dat": "az elfogadott vezércselnek",
+      "ins": "az elfogadott vezércsellel",
+      "ine": "az elfogadott vezércselben",
+      "ela": "az elfogadott vezércselből",
+      "sub": "az elfogadott vezércselre"
+     }
     }
    },
    "comment": {
@@ -2309,6 +2526,18 @@
      "name": "Slavenska obrana",
      "def": "slavenska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Szláv védelem",
+     "def": "a szláv védelem",
+     "forms": {
+      "acc": "a szláv védelmet",
+      "dat": "a szláv védelemnek",
+      "ins": "a szláv védelemmel",
+      "ine": "a szláv védelemben",
+      "ela": "a szláv védelemből",
+      "sub": "a szláv védelemre"
+     }
     }
    },
    "comment": {
@@ -2428,6 +2657,18 @@
      "name": "Poluslavenska obrana",
      "def": "poluslavenska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Félszláv védelem",
+     "def": "a félszláv védelem",
+     "forms": {
+      "acc": "a félszláv védelmet",
+      "dat": "a félszláv védelemnek",
+      "ins": "a félszláv védelemmel",
+      "ine": "a félszláv védelemben",
+      "ela": "a félszláv védelemből",
+      "sub": "a félszláv védelemre"
+     }
     }
    },
    "comment": {
@@ -2547,6 +2788,18 @@
      "name": "Indijska obrana",
      "def": "indijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Indiai védelem",
+     "def": "az indiai védelem",
+     "forms": {
+      "acc": "az indiai védelmet",
+      "dat": "az indiai védelemnek",
+      "ins": "az indiai védelemmel",
+      "ine": "az indiai védelemben",
+      "ela": "az indiai védelemből",
+      "sub": "az indiai védelemre"
+     }
     }
    },
    "comment": {
@@ -2665,6 +2918,18 @@
      "name": "Kraljeva indijska obrana",
      "def": "kraljeva indijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Királyindiai védelem",
+     "def": "a királyindiai védelem",
+     "forms": {
+      "acc": "a királyindiai védelmet",
+      "dat": "a királyindiai védelemnek",
+      "ins": "a királyindiai védelemmel",
+      "ine": "a királyindiai védelemben",
+      "ela": "a királyindiai védelemből",
+      "sub": "a királyindiai védelemre"
+     }
     }
    },
    "comment": {
@@ -2788,6 +3053,18 @@
      "name": "Londonski sustav",
      "def": "londonski sustav",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Londoni rendszer",
+     "def": "a londoni rendszer",
+     "forms": {
+      "acc": "a londoni rendszert",
+      "dat": "a londoni rendszernek",
+      "ins": "a londoni rendszerrel",
+      "ine": "a londoni rendszerben",
+      "ela": "a londoni rendszerből",
+      "sub": "a londoni rendszerre"
+     }
     }
    },
    "comment": {
@@ -2908,6 +3185,18 @@
      "name": "Moderna obrana",
      "def": "moderna obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Modern védelem",
+     "def": "a modern védelem",
+     "forms": {
+      "acc": "a modern védelmet",
+      "dat": "a modern védelemnek",
+      "ins": "a modern védelemmel",
+      "ine": "a modern védelemben",
+      "ela": "a modern védelemből",
+      "sub": "a modern védelemre"
+     }
     }
    },
    "comment": {
@@ -3028,6 +3317,18 @@
      "name": "Pirčeva obrana",
      "def": "Pirčeva obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Pirc-védelem",
+     "def": "a Pirc-védelem",
+     "forms": {
+      "acc": "a Pirc-védelmet",
+      "dat": "a Pirc-védelemnek",
+      "ins": "a Pirc-védelemmel",
+      "ine": "a Pirc-védelemben",
+      "ela": "a Pirc-védelemből",
+      "sub": "a Pirc-védelemre"
+     }
     }
    },
    "comment": {
@@ -3147,6 +3448,18 @@
      "name": "Bečka partija",
      "def": "bečka partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Bécsi játszma",
+     "def": "a bécsi játszma",
+     "forms": {
+      "acc": "a bécsi játszmát",
+      "dat": "a bécsi játszmának",
+      "ins": "a bécsi játszmával",
+      "ine": "a bécsi játszmában",
+      "ela": "a bécsi játszmából",
+      "sub": "a bécsi játszmára"
+     }
     }
    },
    "comment": {
@@ -3265,6 +3578,18 @@
      "name": "Lovčevo otvaranje",
      "def": "lovčevo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Futójáték",
+     "def": "a futójáték",
+     "forms": {
+      "acc": "a futójátékot",
+      "dat": "a futójátéknak",
+      "ins": "a futójátékkal",
+      "ine": "a futójátékban",
+      "ela": "a futójátékból",
+      "sub": "a futójátékra"
+     }
     }
    },
    "comment": {
@@ -3383,6 +3708,18 @@
      "name": "Aljehinova obrana",
      "def": "Aljehinova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Aljechin-védelem",
+     "def": "az Aljechin-védelem",
+     "forms": {
+      "acc": "az Aljechin-védelmet",
+      "dat": "az Aljechin-védelemnek",
+      "ins": "az Aljechin-védelemmel",
+      "ine": "az Aljechin-védelemben",
+      "ela": "az Aljechin-védelemből",
+      "sub": "az Aljechin-védelemre"
+     }
     }
    },
    "comment": {
@@ -3501,6 +3838,18 @@
      "name": "Kraljev gambit",
      "def": "kraljev gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Királycsel",
+     "def": "a királycsel",
+     "forms": {
+      "acc": "a királycselt",
+      "dat": "a királycselnek",
+      "ins": "a királycsellel",
+      "ine": "a királycselben",
+      "ela": "a királycselből",
+      "sub": "a királycselre"
+     }
     }
    },
    "comment": {
@@ -3619,6 +3968,18 @@
      "name": "Prihvaćeni kraljev gambit",
      "def": "prihvaćeni kraljev gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Elfogadott királycsel",
+     "def": "az elfogadott királycsel",
+     "forms": {
+      "acc": "az elfogadott királycselt",
+      "dat": "az elfogadott királycselnek",
+      "ins": "az elfogadott királycsellel",
+      "ine": "az elfogadott királycselben",
+      "ela": "az elfogadott királycselből",
+      "sub": "az elfogadott királycselre"
+     }
     }
    },
    "comment": {
@@ -3737,6 +4098,18 @@
      "name": "Odbijeni kraljev gambit",
      "def": "odbijeni kraljev gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Elhárított királycsel",
+     "def": "az elhárított királycsel",
+     "forms": {
+      "acc": "az elhárított királycselt",
+      "dat": "az elhárított királycselnek",
+      "ins": "az elhárított királycsellel",
+      "ine": "az elhárított királycselben",
+      "ela": "az elhárított királycselből",
+      "sub": "az elhárított királycselre"
+     }
     }
    },
    "comment": {
@@ -3855,6 +4228,18 @@
      "name": "Nimzowitscheva obrana",
      "def": "Nimzowitscheva obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Nimzowitsch-védelem",
+     "def": "a Nimzowitsch-védelem",
+     "forms": {
+      "acc": "a Nimzowitsch-védelmet",
+      "dat": "a Nimzowitsch-védelemnek",
+      "ins": "a Nimzowitsch-védelemmel",
+      "ine": "a Nimzowitsch-védelemben",
+      "ela": "a Nimzowitsch-védelemből",
+      "sub": "a Nimzowitsch-védelemre"
+     }
     }
    },
    "comment": {
@@ -3978,6 +4363,18 @@
      "name": "Owenova obrana",
      "def": "Owenova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Owen-védelem",
+     "def": "az Owen-védelem",
+     "forms": {
+      "acc": "az Owen-védelmet",
+      "dat": "az Owen-védelemnek",
+      "ins": "az Owen-védelemmel",
+      "ine": "az Owen-védelemben",
+      "ela": "az Owen-védelemből",
+      "sub": "az Owen-védelemre"
+     }
     }
    },
    "comment": {
@@ -4097,6 +4494,18 @@
      "name": "Horwitzova obrana",
      "def": "Horwitzova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Horwitz-védelem",
+     "def": "a Horwitz-védelem",
+     "forms": {
+      "acc": "a Horwitz-védelmet",
+      "dat": "a Horwitz-védelemnek",
+      "ins": "a Horwitz-védelemmel",
+      "ine": "a Horwitz-védelemben",
+      "ela": "a Horwitz-védelemből",
+      "sub": "a Horwitz-védelemre"
+     }
     }
    },
    "comment": {
@@ -4215,6 +4624,18 @@
      "name": "Van't Kruijsovo otvaranje",
      "def": "Van't Kruijsovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Van't Kruijs-megnyitás",
+     "def": "a Van't Kruijs-megnyitás",
+     "forms": {
+      "acc": "a Van't Kruijs-megnyitást",
+      "dat": "a Van't Kruijs-megnyitásnak",
+      "ins": "a Van't Kruijs-megnyitással",
+      "ine": "a Van't Kruijs-megnyitásban",
+      "ela": "a Van't Kruijs-megnyitásból",
+      "sub": "a Van't Kruijs-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -4334,6 +4755,18 @@
      "name": "Centralna partija",
      "def": "centralna partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Középcsel",
+     "def": "a középcsel",
+     "forms": {
+      "acc": "a középcselt",
+      "dat": "a középcselnek",
+      "ins": "a középcsellel",
+      "ine": "a középcselben",
+      "ela": "a középcselből",
+      "sub": "a középcselre"
+     }
     }
    },
    "comment": {
@@ -4453,6 +4886,18 @@
      "name": "Englundov gambit",
      "def": "Englundov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Englund-csel",
+     "def": "az Englund-csel",
+     "forms": {
+      "acc": "az Englund-cselt",
+      "dat": "az Englund-cselnek",
+      "ins": "az Englund-csellel",
+      "ine": "az Englund-cselben",
+      "ela": "az Englund-cselből",
+      "sub": "az Englund-cselre"
+     }
     }
    },
    "comment": {
@@ -4571,6 +5016,18 @@
      "name": "Nizozemska obrana",
      "def": "nizozemska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Holland védelem",
+     "def": "a holland védelem",
+     "forms": {
+      "acc": "a holland védelmet",
+      "dat": "a holland védelemnek",
+      "ins": "a holland védelemmel",
+      "ine": "a holland védelemben",
+      "ela": "a holland védelemből",
+      "sub": "a holland védelemre"
+     }
     }
    },
    "comment": {
@@ -4689,6 +5146,18 @@
      "name": "Nimzoindijska obrana",
      "def": "nimzoindijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Nimzoindiai védelem",
+     "def": "a nimzoindiai védelem",
+     "forms": {
+      "acc": "a nimzoindiai védelmet",
+      "dat": "a nimzoindiai védelemnek",
+      "ins": "a nimzoindiai védelemmel",
+      "ine": "a nimzoindiai védelemben",
+      "ela": "a nimzoindiai védelemből",
+      "sub": "a nimzoindiai védelemre"
+     }
     }
    },
    "comment": {
@@ -4809,6 +5278,18 @@
      "name": "Damina indijska obrana",
      "def": "damina indijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Vezérindiai védelem",
+     "def": "a vezérindiai védelem",
+     "forms": {
+      "acc": "a vezérindiai védelmet",
+      "dat": "a vezérindiai védelemnek",
+      "ins": "a vezérindiai védelemmel",
+      "ine": "a vezérindiai védelemben",
+      "ela": "a vezérindiai védelemből",
+      "sub": "a vezérindiai védelemre"
+     }
     }
    },
    "comment": {
@@ -4928,6 +5409,18 @@
      "name": "Grünfeldova obrana",
      "def": "Grünfeldova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Grünfeld-védelem",
+     "def": "a Grünfeld-védelem",
+     "forms": {
+      "acc": "a Grünfeld-védelmet",
+      "dat": "a Grünfeld-védelemnek",
+      "ins": "a Grünfeld-védelemmel",
+      "ine": "a Grünfeld-védelemben",
+      "ela": "a Grünfeld-védelemből",
+      "sub": "a Grünfeld-védelemre"
+     }
     }
    },
    "comment": {
@@ -5046,6 +5539,18 @@
      "name": "Katalonsko otvaranje",
      "def": "katalonsko otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Katalán megnyitás",
+     "def": "a katalán megnyitás",
+     "forms": {
+      "acc": "a katalán megnyitást",
+      "dat": "a katalán megnyitásnak",
+      "ins": "a katalán megnyitással",
+      "ine": "a katalán megnyitásban",
+      "ela": "a katalán megnyitásból",
+      "sub": "a katalán megnyitásra"
+     }
     }
    },
    "comment": {
@@ -5164,6 +5669,18 @@
      "name": "Benoni obrana",
      "def": "Benoni obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Benoni-védelem",
+     "def": "a Benoni-védelem",
+     "forms": {
+      "acc": "a Benoni-védelmet",
+      "dat": "a Benoni-védelemnek",
+      "ins": "a Benoni-védelemmel",
+      "ine": "a Benoni-védelemben",
+      "ela": "a Benoni-védelemből",
+      "sub": "a Benoni-védelemre"
+     }
     }
    },
    "comment": {
@@ -5284,6 +5801,18 @@
      "name": "Benkov gambit",
      "def": "Benkov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Benkő-csel",
+     "def": "a Benkő-csel",
+     "forms": {
+      "acc": "a Benkő-cselt",
+      "dat": "a Benkő-cselnek",
+      "ins": "a Benkő-csellel",
+      "ine": "a Benkő-cselben",
+      "ela": "a Benkő-cselből",
+      "sub": "a Benkő-cselre"
+     }
     }
    },
    "comment": {
@@ -5402,6 +5931,18 @@
      "name": "Rétijevo otvaranje",
      "def": "Rétijevo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Réti-megnyitás",
+     "def": "a Réti-megnyitás",
+     "forms": {
+      "acc": "a Réti-megnyitást",
+      "dat": "a Réti-megnyitásnak",
+      "ins": "a Réti-megnyitással",
+      "ine": "a Réti-megnyitásban",
+      "ela": "a Réti-megnyitásból",
+      "sub": "a Réti-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -5520,6 +6061,18 @@
      "name": "Kraljev indijski napad",
      "def": "kraljev indijski napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Királyindiai támadás",
+     "def": "a királyindiai támadás",
+     "forms": {
+      "acc": "a királyindiai támadást",
+      "dat": "a királyindiai támadásnak",
+      "ins": "a királyindiai támadással",
+      "ine": "a királyindiai támadásban",
+      "ela": "a királyindiai támadásból",
+      "sub": "a királyindiai támadásra"
+     }
     }
    },
    "comment": {
@@ -5642,6 +6195,18 @@
      "name": "Birdovo otvaranje",
      "def": "Birdovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Bird-megnyitás",
+     "def": "a Bird-megnyitás",
+     "forms": {
+      "acc": "a Bird-megnyitást",
+      "dat": "a Bird-megnyitásnak",
+      "ins": "a Bird-megnyitással",
+      "ine": "a Bird-megnyitásban",
+      "ela": "a Bird-megnyitásból",
+      "sub": "a Bird-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -5760,6 +6325,18 @@
      "name": "Ponzianijevo otvaranje",
      "def": "Ponzianijevo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Ponziani-megnyitás",
+     "def": "a Ponziani-megnyitás",
+     "forms": {
+      "acc": "a Ponziani-megnyitást",
+      "dat": "a Ponziani-megnyitásnak",
+      "ins": "a Ponziani-megnyitással",
+      "ine": "a Ponziani-megnyitásban",
+      "ela": "a Ponziani-megnyitásból",
+      "sub": "a Ponziani-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -5878,6 +6455,18 @@
      "name": "Partija tri skakača",
      "def": "partija tri skakača",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Háromhuszáros játék",
+     "def": "a háromhuszáros játék",
+     "forms": {
+      "acc": "a háromhuszáros játékot",
+      "dat": "a háromhuszáros játéknak",
+      "ins": "a háromhuszáros játékkal",
+      "ine": "a háromhuszáros játékban",
+      "ela": "a háromhuszáros játékból",
+      "sub": "a háromhuszáros játékra"
+     }
     }
    },
    "comment": {
@@ -5998,6 +6587,18 @@
      "name": "Danski gambit",
      "def": "danski gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Dán csel",
+     "def": "a dán csel",
+     "forms": {
+      "acc": "a dán cselt",
+      "dat": "a dán cselnek",
+      "ins": "a dán csellel",
+      "ine": "a dán cselben",
+      "ela": "a dán cselből",
+      "sub": "a dán cselre"
+     }
     }
    },
    "comment": {
@@ -6118,6 +6719,18 @@
      "name": "Blackmar-Diemerov gambit",
      "def": "Blackmar-Diemerov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Blackmar–Diemer-csel",
+     "def": "a Blackmar–Diemer-csel",
+     "forms": {
+      "acc": "a Blackmar–Diemer-cselt",
+      "dat": "a Blackmar–Diemer-cselnek",
+      "ins": "a Blackmar–Diemer-csellel",
+      "ine": "a Blackmar–Diemer-cselben",
+      "ela": "a Blackmar–Diemer-cselből",
+      "sub": "a Blackmar–Diemer-cselre"
+     }
     }
    },
    "comment": {
@@ -6236,6 +6849,18 @@
      "name": "Trompowskyjev napad",
      "def": "Trompowskyjev napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Trompowsky-támadás",
+     "def": "a Trompowsky-támadás",
+     "forms": {
+      "acc": "a Trompowsky-támadást",
+      "dat": "a Trompowsky-támadásnak",
+      "ins": "a Trompowsky-támadással",
+      "ine": "a Trompowsky-támadásban",
+      "ela": "a Trompowsky-támadásból",
+      "sub": "a Trompowsky-támadásra"
+     }
     }
    },
    "comment": {
@@ -6355,6 +6980,18 @@
      "name": "Torreov napad",
      "def": "Torreov napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Torre-támadás",
+     "def": "a Torre-támadás",
+     "forms": {
+      "acc": "a Torre-támadást",
+      "dat": "a Torre-támadásnak",
+      "ins": "a Torre-támadással",
+      "ine": "a Torre-támadásban",
+      "ela": "a Torre-támadásból",
+      "sub": "a Torre-támadásra"
+     }
     }
    },
    "comment": {
@@ -6475,6 +7112,18 @@
      "name": "Colleov sustav",
      "def": "Colleov sustav",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Colle-rendszer",
+     "def": "a Colle-rendszer",
+     "forms": {
+      "acc": "a Colle-rendszert",
+      "dat": "a Colle-rendszernek",
+      "ins": "a Colle-rendszerrel",
+      "ine": "a Colle-rendszerben",
+      "ela": "a Colle-rendszerből",
+      "sub": "a Colle-rendszerre"
+     }
     }
    },
    "comment": {
@@ -6593,6 +7242,18 @@
      "name": "Tarraschova obrana",
      "def": "Tarraschova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Tarrasch-védelem",
+     "def": "a Tarrasch-védelem",
+     "forms": {
+      "acc": "a Tarrasch-védelmet",
+      "dat": "a Tarrasch-védelemnek",
+      "ins": "a Tarrasch-védelemmel",
+      "ine": "a Tarrasch-védelemben",
+      "ela": "a Tarrasch-védelemből",
+      "sub": "a Tarrasch-védelemre"
+     }
     }
    },
    "comment": {
@@ -6712,6 +7373,18 @@
      "name": "Budimpeštanski gambit",
      "def": "budimpeštanski gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Budapesti csel",
+     "def": "a budapesti csel",
+     "forms": {
+      "acc": "a budapesti cselt",
+      "dat": "a budapesti cselnek",
+      "ins": "a budapesti csellel",
+      "ine": "a budapesti cselben",
+      "ela": "a budapesti cselből",
+      "sub": "a budapesti cselre"
+     }
     }
    },
    "comment": {
@@ -6830,6 +7503,18 @@
      "name": "Bogoindijska obrana",
      "def": "bogoindijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Bogoljubov-indiai védelem",
+     "def": "a Bogoljubov-indiai védelem",
+     "forms": {
+      "acc": "a Bogoljubov-indiai védelmet",
+      "dat": "a Bogoljubov-indiai védelemnek",
+      "ins": "a Bogoljubov-indiai védelemmel",
+      "ine": "a Bogoljubov-indiai védelemben",
+      "ela": "a Bogoljubov-indiai védelemből",
+      "sub": "a Bogoljubov-indiai védelemre"
+     }
     }
    },
    "comment": {
@@ -6948,6 +7633,18 @@
      "name": "Staroindijska obrana",
      "def": "staroindijska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Óindiai védelem",
+     "def": "az óindiai védelem",
+     "forms": {
+      "acc": "az óindiai védelmet",
+      "dat": "az óindiai védelemnek",
+      "ins": "az óindiai védelemmel",
+      "ine": "az óindiai védelemben",
+      "ela": "az óindiai védelemből",
+      "sub": "az óindiai védelemre"
+     }
     }
    },
    "comment": {
@@ -7071,6 +7768,18 @@
      "name": "Čigorinova obrana",
      "def": "Čigorinova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csigorin-védelem",
+     "def": "a Csigorin-védelem",
+     "forms": {
+      "acc": "a Csigorin-védelmet",
+      "dat": "a Csigorin-védelemnek",
+      "ins": "a Csigorin-védelemmel",
+      "ine": "a Csigorin-védelemben",
+      "ela": "a Csigorin-védelemből",
+      "sub": "a Csigorin-védelemre"
+     }
     }
    },
    "comment": {
@@ -7189,6 +7898,18 @@
      "name": "Albinov protugambit",
      "def": "Albinov protugambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Albin-ellencsel",
+     "def": "az Albin-ellencsel",
+     "forms": {
+      "acc": "az Albin-ellencselt",
+      "dat": "az Albin-ellencselnek",
+      "ins": "az Albin-ellencsellel",
+      "ine": "az Albin-ellencselben",
+      "ela": "az Albin-ellencselből",
+      "sub": "az Albin-ellencselre"
+     }
     }
    },
    "comment": {
@@ -7308,6 +8029,18 @@
      "name": "Latvijski gambit",
      "def": "latvijski gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Lett csel",
+     "def": "a lett csel",
+     "forms": {
+      "acc": "a lett cselt",
+      "dat": "a lett cselnek",
+      "ins": "a lett csellel",
+      "ine": "a lett cselben",
+      "ela": "a lett cselből",
+      "sub": "a lett cselre"
+     }
     }
    },
    "comment": {
@@ -7426,6 +8159,18 @@
      "name": "Slonov gambit",
      "def": "slonov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Elefántcsel",
+     "def": "az elefántcsel",
+     "forms": {
+      "acc": "az elefántcselt",
+      "dat": "az elefántcselnek",
+      "ins": "az elefántcsellel",
+      "ine": "az elefántcselben",
+      "ela": "az elefántcselből",
+      "sub": "az elefántcselre"
+     }
     }
    },
    "comment": {
@@ -7549,6 +8294,18 @@
      "name": "Nimzo-Larsenov napad",
      "def": "Nimzo-Larsenov napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Nimzowitsch–Larsen-támadás",
+     "def": "a Nimzowitsch–Larsen-támadás",
+     "forms": {
+      "acc": "a Nimzowitsch–Larsen-támadást",
+      "dat": "a Nimzowitsch–Larsen-támadásnak",
+      "ins": "a Nimzowitsch–Larsen-támadással",
+      "ine": "a Nimzowitsch–Larsen-támadásban",
+      "ela": "a Nimzowitsch–Larsen-támadásból",
+      "sub": "a Nimzowitsch–Larsen-támadásra"
+     }
     }
    },
    "comment": {
@@ -7667,6 +8424,18 @@
      "name": "Poljsko otvaranje",
      "def": "poljsko otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Lengyel megnyitás",
+     "def": "a lengyel megnyitás",
+     "forms": {
+      "acc": "a lengyel megnyitást",
+      "dat": "a lengyel megnyitásnak",
+      "ins": "a lengyel megnyitással",
+      "ine": "a lengyel megnyitásban",
+      "ela": "a lengyel megnyitásból",
+      "sub": "a lengyel megnyitásra"
+     }
     }
    },
    "comment": {
@@ -7785,6 +8554,18 @@
      "name": "Grobovo otvaranje",
      "def": "Grobovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Grob-megnyitás",
+     "def": "a Grob-megnyitás",
+     "forms": {
+      "acc": "a Grob-megnyitást",
+      "dat": "a Grob-megnyitásnak",
+      "ins": "a Grob-megnyitással",
+      "ine": "a Grob-megnyitásban",
+      "ela": "a Grob-megnyitásból",
+      "sub": "a Grob-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -7903,6 +8684,18 @@
      "name": "Mađarsko otvaranje",
      "def": "mađarsko otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Magyar megnyitás",
+     "def": "a magyar megnyitás",
+     "forms": {
+      "acc": "a magyar megnyitást",
+      "dat": "a magyar megnyitásnak",
+      "ins": "a magyar megnyitással",
+      "ine": "a magyar megnyitásban",
+      "ela": "a magyar megnyitásból",
+      "sub": "a magyar megnyitásra"
+     }
     }
    },
    "comment": {
@@ -8022,6 +8815,18 @@
      "name": "Miesesovo otvaranje",
      "def": "Miesesovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Mieses-megnyitás",
+     "def": "a Mieses-megnyitás",
+     "forms": {
+      "acc": "a Mieses-megnyitást",
+      "dat": "a Mieses-megnyitásnak",
+      "ins": "a Mieses-megnyitással",
+      "ine": "a Mieses-megnyitásban",
+      "ela": "a Mieses-megnyitásból",
+      "sub": "a Mieses-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -8140,6 +8945,18 @@
      "name": "Zaragoško otvaranje",
      "def": "zaragoško otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Saragossa-megnyitás",
+     "def": "a Saragossa-megnyitás",
+     "forms": {
+      "acc": "a Saragossa-megnyitást",
+      "dat": "a Saragossa-megnyitásnak",
+      "ins": "a Saragossa-megnyitással",
+      "ine": "a Saragossa-megnyitásban",
+      "ela": "a Saragossa-megnyitásból",
+      "sub": "a Saragossa-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -8258,6 +9075,18 @@
      "name": "Van Geetovo otvaranje",
      "def": "Van Geetovo otvaranje",
      "gender": "n"
+    },
+    "hu": {
+     "name": "Van Geet-megnyitás",
+     "def": "a Van Geet-megnyitás",
+     "forms": {
+      "acc": "a Van Geet-megnyitást",
+      "dat": "a Van Geet-megnyitásnak",
+      "ins": "a Van Geet-megnyitással",
+      "ine": "a Van Geet-megnyitásban",
+      "ela": "a Van Geet-megnyitásból",
+      "sub": "a Van Geet-megnyitásra"
+     }
     }
    },
    "comment": {
@@ -8376,6 +9205,18 @@
      "name": "Jobavin londonski sustav",
      "def": "Jobavin londonski sustav",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Jobava-féle londoni rendszer",
+     "def": "a Jobava-féle londoni rendszer",
+     "forms": {
+      "acc": "a Jobava-féle londoni rendszert",
+      "dat": "a Jobava-féle londoni rendszernek",
+      "ins": "a Jobava-féle londoni rendszerrel",
+      "ine": "a Jobava-féle londoni rendszerben",
+      "ela": "a Jobava-féle londoni rendszerből",
+      "sub": "a Jobava-féle londoni rendszerre"
+     }
     }
    },
    "comment": {
@@ -8494,6 +9335,18 @@
      "name": "Stonewall napad",
      "def": "Stonewall napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Stonewall-támadás",
+     "def": "a Stonewall-támadás",
+     "forms": {
+      "acc": "a Stonewall-támadást",
+      "dat": "a Stonewall-támadásnak",
+      "ins": "a Stonewall-támadással",
+      "ine": "a Stonewall-támadásban",
+      "ela": "a Stonewall-támadásból",
+      "sub": "a Stonewall-támadásra"
+     }
     }
    },
    "comment": {
@@ -8612,6 +9465,18 @@
      "name": "Richter-Veresovljev napad",
      "def": "Richter-Veresovljev napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Richter–Veresov-támadás",
+     "def": "a Richter–Veresov-támadás",
+     "forms": {
+      "acc": "a Richter–Veresov-támadást",
+      "dat": "a Richter–Veresov-támadásnak",
+      "ins": "a Richter–Veresov-támadással",
+      "ine": "a Richter–Veresov-támadásban",
+      "ela": "a Richter–Veresov-támadásból",
+      "sub": "a Richter–Veresov-támadásra"
+     }
     }
    },
    "comment": {
@@ -8730,6 +9595,18 @@
      "name": "Obrana svetog Jurja",
      "def": "obrana svetog Jurja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Szent György-védelem",
+     "def": "a Szent György-védelem",
+     "forms": {
+      "acc": "a Szent György-védelmet",
+      "dat": "a Szent György-védelemnek",
+      "ins": "a Szent György-védelemmel",
+      "ine": "a Szent György-védelemben",
+      "ela": "a Szent György-védelemből",
+      "sub": "a Szent György-védelemre"
+     }
     }
    },
    "comment": {
@@ -8848,6 +9725,18 @@
      "name": "Borgova obrana",
      "def": "Borgova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Borg-védelem",
+     "def": "a Borg-védelem",
+     "forms": {
+      "acc": "a Borg-védelmet",
+      "dat": "a Borg-védelemnek",
+      "ins": "a Borg-védelemmel",
+      "ine": "a Borg-védelemben",
+      "ela": "a Borg-védelemből",
+      "sub": "a Borg-védelemre"
+     }
     }
    },
    "comment": {
@@ -8966,6 +9855,18 @@
      "name": "Obrana nilskog konja",
      "def": "obrana nilskog konja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Hippopotamus-védelem",
+     "def": "a Hippopotamus-védelem",
+     "forms": {
+      "acc": "a Hippopotamus-védelmet",
+      "dat": "a Hippopotamus-védelemnek",
+      "ins": "a Hippopotamus-védelemmel",
+      "ine": "a Hippopotamus-védelemben",
+      "ela": "a Hippopotamus-védelemből",
+      "sub": "a Hippopotamus-védelemre"
+     }
     }
    },
    "comment": {
@@ -9085,6 +9986,18 @@
      "name": "Engleska obrana",
      "def": "engleska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Angol védelem",
+     "def": "az angol védelem",
+     "forms": {
+      "acc": "az angol védelmet",
+      "dat": "az angol védelemnek",
+      "ins": "az angol védelemmel",
+      "ine": "az angol védelemben",
+      "ela": "az angol védelemből",
+      "sub": "az angol védelemre"
+     }
     }
    },
    "comment": {
@@ -9203,6 +10116,18 @@
      "name": "Obrana pterodaktila",
      "def": "obrana pterodaktila",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Pterodactyl-védelem",
+     "def": "a Pterodactyl-védelem",
+     "forms": {
+      "acc": "a Pterodactyl-védelmet",
+      "dat": "a Pterodactyl-védelemnek",
+      "ins": "a Pterodactyl-védelemmel",
+      "ine": "a Pterodactyl-védelemben",
+      "ela": "a Pterodactyl-védelemből",
+      "sub": "a Pterodactyl-védelemre"
+     }
     }
    },
    "comment": {
@@ -9321,6 +10246,18 @@
      "name": "Bongcloud napad",
      "def": "Bongcloud napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Bongcloud-támadás",
+     "def": "a Bongcloud-támadás",
+     "forms": {
+      "acc": "a Bongcloud-támadást",
+      "dat": "a Bongcloud-támadásnak",
+      "ins": "a Bongcloud-támadással",
+      "ine": "a Bongcloud-támadásban",
+      "ela": "a Bongcloud-támadásból",
+      "sub": "a Bongcloud-támadásra"
+     }
     }
    },
    "comment": {
@@ -9411,6 +10348,18 @@
      "name": "Otvorena sicilijanska obrana",
      "def": "otvorena sicilijanska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Nyílt szicíliai",
+     "def": "a nyílt szicíliai",
+     "forms": {
+      "acc": "a nyílt szicíliait",
+      "dat": "a nyílt szicíliainak",
+      "ins": "a nyílt szicíliaival",
+      "ine": "a nyílt szicíliaiban",
+      "ela": "a nyílt szicíliaiból",
+      "sub": "a nyílt szicíliaira"
+     }
     }
    },
    "comment": {
@@ -9493,6 +10442,18 @@
      "name": "Zatvorena sicilijanska obrana",
      "def": "zatvorena sicilijanska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Zárt szicíliai",
+     "def": "a zárt szicíliai",
+     "forms": {
+      "acc": "a zárt szicíliait",
+      "dat": "a zárt szicíliainak",
+      "ins": "a zárt szicíliaival",
+      "ine": "a zárt szicíliaiban",
+      "ela": "a zárt szicíliaiból",
+      "sub": "a zárt szicíliaira"
+     }
     }
    },
    "comment": {
@@ -9575,6 +10536,18 @@
      "name": "Alapinova varijanta",
      "def": "Alapinova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Alapin-változat",
+     "def": "az Alapin-változat",
+     "forms": {
+      "acc": "az Alapin-változatot",
+      "dat": "az Alapin-változatnak",
+      "ins": "az Alapin-változattal",
+      "ine": "az Alapin-változatban",
+      "ela": "az Alapin-változatból",
+      "sub": "az Alapin-változatra"
+     }
     }
    },
    "comment": {
@@ -9659,6 +10632,18 @@
      "name": "Smith-Morrin gambit",
      "def": "Smith-Morrin gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Smith–Morra-csel",
+     "def": "a Smith–Morra-csel",
+     "forms": {
+      "acc": "a Smith–Morra-cselt",
+      "dat": "a Smith–Morra-cselnek",
+      "ins": "a Smith–Morra-csellel",
+      "ine": "a Smith–Morra-cselben",
+      "ela": "a Smith–Morra-cselből",
+      "sub": "a Smith–Morra-cselre"
+     }
     }
    },
    "comment": {
@@ -9742,6 +10727,18 @@
      "name": "Grand Prix napad",
      "def": "Grand Prix napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Grand Prix-támadás",
+     "def": "a Grand Prix-támadás",
+     "forms": {
+      "acc": "a Grand Prix-támadást",
+      "dat": "a Grand Prix-támadásnak",
+      "ins": "a Grand Prix-támadással",
+      "ine": "a Grand Prix-támadásban",
+      "ela": "a Grand Prix-támadásból",
+      "sub": "a Grand Prix-támadásra"
+     }
     }
    },
    "comment": {
@@ -9824,6 +10821,18 @@
      "name": "Rossolimova varijanta",
      "def": "Rossolimova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Rossolimo-változat",
+     "def": "a Rossolimo-változat",
+     "forms": {
+      "acc": "a Rossolimo-változatot",
+      "dat": "a Rossolimo-változatnak",
+      "ins": "a Rossolimo-változattal",
+      "ine": "a Rossolimo-változatban",
+      "ela": "a Rossolimo-változatból",
+      "sub": "a Rossolimo-változatra"
+     }
     }
    },
    "comment": {
@@ -9906,6 +10915,18 @@
      "name": "Najdorfova varijanta",
      "def": "Najdorfova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Najdorf-változat",
+     "def": "a Najdorf-változat",
+     "forms": {
+      "acc": "a Najdorf-változatot",
+      "dat": "a Najdorf-változatnak",
+      "ins": "a Najdorf-változattal",
+      "ine": "a Najdorf-változatban",
+      "ela": "a Najdorf-változatból",
+      "sub": "a Najdorf-változatra"
+     }
     }
    },
    "comment": {
@@ -9988,6 +11009,18 @@
      "name": "Zmajeva varijanta",
      "def": "zmajeva varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Sárkányváltozat",
+     "def": "a sárkányváltozat",
+     "forms": {
+      "acc": "a sárkányváltozatot",
+      "dat": "a sárkányváltozatnak",
+      "ins": "a sárkányváltozattal",
+      "ine": "a sárkányváltozatban",
+      "ela": "a sárkányváltozatból",
+      "sub": "a sárkányváltozatra"
+     }
     }
    },
    "comment": {
@@ -10072,6 +11105,18 @@
      "name": "Ubrzani zmaj",
      "def": "ubrzani zmaj",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Gyorsított sárkány",
+     "def": "a gyorsított sárkány",
+     "forms": {
+      "acc": "a gyorsított sárkányt",
+      "dat": "a gyorsított sárkánynak",
+      "ins": "a gyorsított sárkánnyal",
+      "ine": "a gyorsított sárkányban",
+      "ela": "a gyorsított sárkányból",
+      "sub": "a gyorsított sárkányra"
+     }
     }
    },
    "comment": {
@@ -10154,6 +11199,18 @@
      "name": "Scheveningenska varijanta",
      "def": "scheveningenska varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Scheveningeni változat",
+     "def": "a scheveningeni változat",
+     "forms": {
+      "acc": "a scheveningeni változatot",
+      "dat": "a scheveningeni változatnak",
+      "ins": "a scheveningeni változattal",
+      "ine": "a scheveningeni változatban",
+      "ela": "a scheveningeni változatból",
+      "sub": "a scheveningeni változatra"
+     }
     }
    },
    "comment": {
@@ -10236,6 +11293,18 @@
      "name": "Svešnikovljeva varijanta",
      "def": "Svešnikovljeva varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Szvesnyikov-változat",
+     "def": "a Szvesnyikov-változat",
+     "forms": {
+      "acc": "a Szvesnyikov-változatot",
+      "dat": "a Szvesnyikov-változatnak",
+      "ins": "a Szvesnyikov-változattal",
+      "ine": "a Szvesnyikov-változatban",
+      "ela": "a Szvesnyikov-változatból",
+      "sub": "a Szvesnyikov-változatra"
+     }
     }
    },
    "comment": {
@@ -10319,6 +11388,18 @@
      "name": "Tajmanovljeva varijanta",
      "def": "Tajmanovljeva varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Tajmanov-változat",
+     "def": "a Tajmanov-változat",
+     "forms": {
+      "acc": "a Tajmanov-változatot",
+      "dat": "a Tajmanov-változatnak",
+      "ins": "a Tajmanov-változattal",
+      "ine": "a Tajmanov-változatban",
+      "ela": "a Tajmanov-változatból",
+      "sub": "a Tajmanov-változatra"
+     }
     }
    },
    "comment": {
@@ -10401,6 +11482,18 @@
      "name": "Kanova varijanta",
      "def": "Kanova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Kan-változat",
+     "def": "a Kan-változat",
+     "forms": {
+      "acc": "a Kan-változatot",
+      "dat": "a Kan-változatnak",
+      "ins": "a Kan-változattal",
+      "ine": "a Kan-változatban",
+      "ela": "a Kan-változatból",
+      "sub": "a Kan-változatra"
+     }
     }
    },
    "comment": {
@@ -10483,6 +11576,18 @@
      "name": "Klasična varijanta",
      "def": "klasična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Klasszikus változat",
+     "def": "a klasszikus változat",
+     "forms": {
+      "acc": "a klasszikus változatot",
+      "dat": "a klasszikus változatnak",
+      "ins": "a klasszikus változattal",
+      "ine": "a klasszikus változatban",
+      "ela": "a klasszikus változatból",
+      "sub": "a klasszikus változatra"
+     }
     }
    },
    "comment": {
@@ -10565,6 +11670,18 @@
      "name": "Varijanta napredovanja",
      "def": "varijanta napredovanja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Tolóváltozat",
+     "def": "a tolóváltozat",
+     "forms": {
+      "acc": "a tolóváltozatot",
+      "dat": "a tolóváltozatnak",
+      "ins": "a tolóváltozattal",
+      "ine": "a tolóváltozatban",
+      "ela": "a tolóváltozatból",
+      "sub": "a tolóváltozatra"
+     }
     }
    },
    "comment": {
@@ -10647,6 +11764,18 @@
      "name": "Varijanta zamjene",
      "def": "varijanta zamjene",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csereváltozat",
+     "def": "a csereváltozat",
+     "forms": {
+      "acc": "a csereváltozatot",
+      "dat": "a csereváltozatnak",
+      "ins": "a csereváltozattal",
+      "ine": "a csereváltozatban",
+      "ela": "a csereváltozatból",
+      "sub": "a csereváltozatra"
+     }
     }
    },
    "comment": {
@@ -10729,6 +11858,18 @@
      "name": "Tarraschova varijanta",
      "def": "Tarraschova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Tarrasch-változat",
+     "def": "a Tarrasch-változat",
+     "forms": {
+      "acc": "a Tarrasch-változatot",
+      "dat": "a Tarrasch-változatnak",
+      "ins": "a Tarrasch-változattal",
+      "ine": "a Tarrasch-változatban",
+      "ela": "a Tarrasch-változatból",
+      "sub": "a Tarrasch-változatra"
+     }
     }
    },
    "comment": {
@@ -10811,6 +11952,18 @@
      "name": "Winawerova varijanta",
      "def": "Winawerova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Winawer-változat",
+     "def": "a Winawer-változat",
+     "forms": {
+      "acc": "a Winawer-változatot",
+      "dat": "a Winawer-változatnak",
+      "ins": "a Winawer-változattal",
+      "ine": "a Winawer-változatban",
+      "ela": "a Winawer-változatból",
+      "sub": "a Winawer-változatra"
+     }
     }
    },
    "comment": {
@@ -10893,6 +12046,18 @@
      "name": "Klasična varijanta",
      "def": "klasična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Klasszikus változat",
+     "def": "a klasszikus változat",
+     "forms": {
+      "acc": "a klasszikus változatot",
+      "dat": "a klasszikus változatnak",
+      "ins": "a klasszikus változattal",
+      "ine": "a klasszikus változatban",
+      "ela": "a klasszikus változatból",
+      "sub": "a klasszikus változatra"
+     }
     }
    },
    "comment": {
@@ -10975,6 +12140,18 @@
      "name": "Rubinsteinova varijanta",
      "def": "Rubinsteinova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Rubinstein-változat",
+     "def": "a Rubinstein-változat",
+     "forms": {
+      "acc": "a Rubinstein-változatot",
+      "dat": "a Rubinstein-változatnak",
+      "ins": "a Rubinstein-változattal",
+      "ine": "a Rubinstein-változatban",
+      "ela": "a Rubinstein-változatból",
+      "sub": "a Rubinstein-változatra"
+     }
     }
    },
    "comment": {
@@ -11057,6 +12234,18 @@
      "name": "Varijanta napredovanja",
      "def": "varijanta napredovanja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Tolóváltozat",
+     "def": "a tolóváltozat",
+     "forms": {
+      "acc": "a tolóváltozatot",
+      "dat": "a tolóváltozatnak",
+      "ins": "a tolóváltozattal",
+      "ine": "a tolóváltozatban",
+      "ela": "a tolóváltozatból",
+      "sub": "a tolóváltozatra"
+     }
     }
    },
    "comment": {
@@ -11139,6 +12328,18 @@
      "name": "Varijanta zamjene",
      "def": "varijanta zamjene",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csereváltozat",
+     "def": "a csereváltozat",
+     "forms": {
+      "acc": "a csereváltozatot",
+      "dat": "a csereváltozatnak",
+      "ins": "a csereváltozattal",
+      "ine": "a csereváltozatban",
+      "ela": "a csereváltozatból",
+      "sub": "a csereváltozatra"
+     }
     }
    },
    "comment": {
@@ -11223,6 +12424,18 @@
      "name": "Panovljev napad",
      "def": "Panovljev napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Panov-támadás",
+     "def": "a Panov-támadás",
+     "forms": {
+      "acc": "a Panov-támadást",
+      "dat": "a Panov-támadásnak",
+      "ins": "a Panov-támadással",
+      "ine": "a Panov-támadásban",
+      "ela": "a Panov-támadásból",
+      "sub": "a Panov-támadásra"
+     }
     }
    },
    "comment": {
@@ -11305,6 +12518,18 @@
      "name": "Klasična varijanta",
      "def": "klasična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Klasszikus változat",
+     "def": "a klasszikus változat",
+     "forms": {
+      "acc": "a klasszikus változatot",
+      "dat": "a klasszikus változatnak",
+      "ins": "a klasszikus változattal",
+      "ine": "a klasszikus változatban",
+      "ela": "a klasszikus változatból",
+      "sub": "a klasszikus változatra"
+     }
     }
    },
    "comment": {
@@ -11387,6 +12612,18 @@
      "name": "Napad dva skakača",
      "def": "napad dva skakača",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Kéthuszáros támadás",
+     "def": "a kéthuszáros támadás",
+     "forms": {
+      "acc": "a kéthuszáros támadást",
+      "dat": "a kéthuszáros támadásnak",
+      "ins": "a kéthuszáros támadással",
+      "ine": "a kéthuszáros támadásban",
+      "ela": "a kéthuszáros támadásból",
+      "sub": "a kéthuszáros támadásra"
+     }
     }
    },
    "comment": {
@@ -11469,6 +12706,18 @@
      "name": "Obrana dva skakača",
      "def": "obrana dva skakača",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Kéthuszáros védelem",
+     "def": "a kéthuszáros védelem",
+     "forms": {
+      "acc": "a kéthuszáros védelmet",
+      "dat": "a kéthuszáros védelemnek",
+      "ins": "a kéthuszáros védelemmel",
+      "ine": "a kéthuszáros védelemben",
+      "ela": "a kéthuszáros védelemből",
+      "sub": "a kéthuszáros védelemre"
+     }
     }
    },
    "comment": {
@@ -11553,6 +12802,18 @@
      "name": "Giuoco piano",
      "def": "giuoco piano",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Giuoco piano",
+     "def": "a giuoco piano",
+     "forms": {
+      "acc": "a giuoco pianót",
+      "dat": "a giuoco pianónak",
+      "ins": "a giuoco pianóval",
+      "ine": "a giuoco pianóban",
+      "ela": "a giuoco pianóból",
+      "sub": "a giuoco pianóra"
+     }
     }
    },
    "comment": {
@@ -11641,6 +12902,18 @@
      "name": "Giuoco pianissimo",
      "def": "giuoco pianissimo",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Giuoco pianissimo",
+     "def": "a giuoco pianissimo",
+     "forms": {
+      "acc": "a giuoco pianissimót",
+      "dat": "a giuoco pianissimónak",
+      "ins": "a giuoco pianissimóval",
+      "ine": "a giuoco pianissimóban",
+      "ela": "a giuoco pianissimóból",
+      "sub": "a giuoco pianissimóra"
+     }
     }
    },
    "comment": {
@@ -11727,6 +13000,18 @@
      "name": "Evansov gambit",
      "def": "Evansov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Evans-csel",
+     "def": "az Evans-csel",
+     "forms": {
+      "acc": "az Evans-cselt",
+      "dat": "az Evans-cselnek",
+      "ins": "az Evans-csellel",
+      "ine": "az Evans-cselben",
+      "ela": "az Evans-cselből",
+      "sub": "az Evans-cselre"
+     }
     }
    },
    "comment": {
@@ -11809,6 +13094,18 @@
      "name": "Fegatello napad",
      "def": "Fegatello napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Fegatello-támadás",
+     "def": "a Fegatello-támadás",
+     "forms": {
+      "acc": "a Fegatello-támadást",
+      "dat": "a Fegatello-támadásnak",
+      "ins": "a Fegatello-támadással",
+      "ine": "a Fegatello-támadásban",
+      "ela": "a Fegatello-támadásból",
+      "sub": "a Fegatello-támadásra"
+     }
     }
    },
    "comment": {
@@ -11897,6 +13194,18 @@
      "name": "Traxlerov protunapad",
      "def": "Traxlerov protunapad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Traxler-ellentámadás",
+     "def": "a Traxler-ellentámadás",
+     "forms": {
+      "acc": "a Traxler-ellentámadást",
+      "dat": "a Traxler-ellentámadásnak",
+      "ins": "a Traxler-ellentámadással",
+      "ine": "a Traxler-ellentámadásban",
+      "ela": "a Traxler-ellentámadásból",
+      "sub": "a Traxler-ellentámadásra"
+     }
     }
    },
    "comment": {
@@ -11979,6 +13288,18 @@
      "name": "Berlinska obrana",
      "def": "berlinska obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Berlini védelem",
+     "def": "a berlini védelem",
+     "forms": {
+      "acc": "a berlini védelmet",
+      "dat": "a berlini védelemnek",
+      "ins": "a berlini védelemmel",
+      "ine": "a berlini védelemben",
+      "ela": "a berlini védelemből",
+      "sub": "a berlini védelemre"
+     }
     }
    },
    "comment": {
@@ -12061,6 +13382,18 @@
      "name": "Morphyjeva obrana",
      "def": "Morphyjeva obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Morphy-védelem",
+     "def": "a Morphy-védelem",
+     "forms": {
+      "acc": "a Morphy-védelmet",
+      "dat": "a Morphy-védelemnek",
+      "ins": "a Morphy-védelemmel",
+      "ine": "a Morphy-védelemben",
+      "ela": "a Morphy-védelemből",
+      "sub": "a Morphy-védelemre"
+     }
     }
    },
    "comment": {
@@ -12143,6 +13476,18 @@
      "name": "Zatvorena španjolska partija",
      "def": "zatvorena španjolska partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Zárt spanyol",
+     "def": "a zárt spanyol",
+     "forms": {
+      "acc": "a zárt spanyolt",
+      "dat": "a zárt spanyolnak",
+      "ins": "a zárt spanyollal",
+      "ine": "a zárt spanyolban",
+      "ela": "a zárt spanyolból",
+      "sub": "a zárt spanyolra"
+     }
     }
    },
    "comment": {
@@ -12225,6 +13570,18 @@
      "name": "Marshallov napad",
      "def": "Marshallov napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Marshall-támadás",
+     "def": "a Marshall-támadás",
+     "forms": {
+      "acc": "a Marshall-támadást",
+      "dat": "a Marshall-támadásnak",
+      "ins": "a Marshall-támadással",
+      "ine": "a Marshall-támadásban",
+      "ela": "a Marshall-támadásból",
+      "sub": "a Marshall-támadásra"
+     }
     }
    },
    "comment": {
@@ -12307,6 +13664,18 @@
      "name": "Varijanta zamjene",
      "def": "varijanta zamjene",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csereváltozat",
+     "def": "a csereváltozat",
+     "forms": {
+      "acc": "a csereváltozatot",
+      "dat": "a csereváltozatnak",
+      "ins": "a csereváltozattal",
+      "ine": "a csereváltozatban",
+      "ela": "a csereváltozatból",
+      "sub": "a csereváltozatra"
+     }
     }
    },
    "comment": {
@@ -12389,6 +13758,18 @@
      "name": "Otvorena španjolska partija",
      "def": "otvorena španjolska partija",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Nyílt spanyol",
+     "def": "a nyílt spanyol",
+     "forms": {
+      "acc": "a nyílt spanyolt",
+      "dat": "a nyílt spanyolnak",
+      "ins": "a nyílt spanyollal",
+      "ine": "a nyílt spanyolban",
+      "ela": "a nyílt spanyolból",
+      "sub": "a nyílt spanyolra"
+     }
     }
    },
    "comment": {
@@ -12471,6 +13852,18 @@
      "name": "Schliemannova obrana",
      "def": "Schliemannova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Schliemann-védelem",
+     "def": "a Schliemann-védelem",
+     "forms": {
+      "acc": "a Schliemann-védelmet",
+      "dat": "a Schliemann-védelemnek",
+      "ins": "a Schliemann-védelemmel",
+      "ine": "a Schliemann-védelemben",
+      "ela": "a Schliemann-védelemből",
+      "sub": "a Schliemann-védelemre"
+     }
     }
    },
    "comment": {
@@ -12553,6 +13946,18 @@
      "name": "Škotski gambit",
      "def": "škotski gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Skót csel",
+     "def": "a skót csel",
+     "forms": {
+      "acc": "a skót cselt",
+      "dat": "a skót cselnek",
+      "ins": "a skót csellel",
+      "ine": "a skót cselben",
+      "ela": "a skót cselből",
+      "sub": "a skót cselre"
+     }
     }
    },
    "comment": {
@@ -12636,6 +14041,18 @@
      "name": "Bečki gambit",
      "def": "bečki gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Bécsi csel",
+     "def": "a bécsi csel",
+     "forms": {
+      "acc": "a bécsi cselt",
+      "dat": "a bécsi cselnek",
+      "ins": "a bécsi csellel",
+      "ine": "a bécsi cselben",
+      "ela": "a bécsi cselből",
+      "sub": "a bécsi cselre"
+     }
     }
    },
    "comment": {
@@ -12719,6 +14136,18 @@
      "name": "Staffordov gambit",
      "def": "Staffordov gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Stafford-csel",
+     "def": "a Stafford-csel",
+     "forms": {
+      "acc": "a Stafford-cselt",
+      "dat": "a Stafford-cselnek",
+      "ins": "a Stafford-csellel",
+      "ine": "a Stafford-cselben",
+      "ela": "a Stafford-cselből",
+      "sub": "a Stafford-cselre"
+     }
     }
    },
    "comment": {
@@ -12803,6 +14232,18 @@
      "name": "Napad zalutale dame",
      "def": "napad zalutale dame",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Parham-támadás",
+     "def": "a Parham-támadás",
+     "forms": {
+      "acc": "a Parham-támadást",
+      "dat": "a Parham-támadásnak",
+      "ins": "a Parham-támadással",
+      "ine": "a Parham-támadásban",
+      "ela": "a Parham-támadásból",
+      "sub": "a Parham-támadásra"
+     }
     }
    },
    "comment": {
@@ -12894,6 +14335,18 @@
      "name": "Halloween gambit",
      "def": "Halloween gambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Halloween-csel",
+     "def": "a Halloween-csel",
+     "forms": {
+      "acc": "a Halloween-cselt",
+      "dat": "a Halloween-cselnek",
+      "ins": "a Halloween-csellel",
+      "ine": "a Halloween-cselben",
+      "ela": "a Halloween-cselből",
+      "sub": "a Halloween-cselre"
+     }
     }
    },
    "comment": {
@@ -12976,6 +14429,18 @@
      "name": "Ortodoksna obrana",
      "def": "ortodoksna obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Ortodox védelem",
+     "def": "az ortodox védelem",
+     "forms": {
+      "acc": "az ortodox védelmet",
+      "dat": "az ortodox védelemnek",
+      "ins": "az ortodox védelemmel",
+      "ine": "az ortodox védelemben",
+      "ela": "az ortodox védelemből",
+      "sub": "az ortodox védelemre"
+     }
     }
    },
    "comment": {
@@ -13058,6 +14523,18 @@
      "name": "Varijanta zamjene",
      "def": "varijanta zamjene",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csereváltozat",
+     "def": "a csereváltozat",
+     "forms": {
+      "acc": "a csereváltozatot",
+      "dat": "a csereváltozatnak",
+      "ins": "a csereváltozattal",
+      "ine": "a csereváltozatban",
+      "ela": "a csereváltozatból",
+      "sub": "a csereváltozatra"
+     }
     }
    },
    "comment": {
@@ -13140,6 +14617,18 @@
      "name": "Polu-Tarraschova obrana",
      "def": "polu-Tarraschova obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Fél-Tarrasch-védelem",
+     "def": "a fél-Tarrasch-védelem",
+     "forms": {
+      "acc": "a fél-Tarrasch-védelmet",
+      "dat": "a fél-Tarrasch-védelemnek",
+      "ins": "a fél-Tarrasch-védelemmel",
+      "ine": "a fél-Tarrasch-védelemben",
+      "ela": "a fél-Tarrasch-védelemből",
+      "sub": "a fél-Tarrasch-védelemre"
+     }
     }
    },
    "comment": {
@@ -13226,6 +14715,18 @@
      "name": "Meranska varijanta",
      "def": "meranska varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Meráni változat",
+     "def": "a meráni változat",
+     "forms": {
+      "acc": "a meráni változatot",
+      "dat": "a meráni változatnak",
+      "ins": "a meráni változattal",
+      "ine": "a meráni változatban",
+      "ela": "a meráni változatból",
+      "sub": "a meráni változatra"
+     }
     }
    },
    "comment": {
@@ -13308,6 +14809,18 @@
      "name": "Klasična varijanta",
      "def": "klasična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Klasszikus változat",
+     "def": "a klasszikus változat",
+     "forms": {
+      "acc": "a klasszikus változatot",
+      "dat": "a klasszikus változatnak",
+      "ins": "a klasszikus változattal",
+      "ine": "a klasszikus változatban",
+      "ela": "a klasszikus változatból",
+      "sub": "a klasszikus változatra"
+     }
     }
    },
    "comment": {
@@ -13391,6 +14904,18 @@
      "name": "Sämischova varijanta",
      "def": "Sämischova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Sämisch-változat",
+     "def": "a Sämisch-változat",
+     "forms": {
+      "acc": "a Sämisch-változatot",
+      "dat": "a Sämisch-változatnak",
+      "ins": "a Sämisch-változattal",
+      "ine": "a Sämisch-változatban",
+      "ela": "a Sämisch-változatból",
+      "sub": "a Sämisch-változatra"
+     }
     }
    },
    "comment": {
@@ -13473,6 +14998,18 @@
      "name": "Napad četiri pješaka",
      "def": "napad četiri pješaka",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Négygyalogos támadás",
+     "def": "a négygyalogos támadás",
+     "forms": {
+      "acc": "a négygyalogos támadást",
+      "dat": "a négygyalogos támadásnak",
+      "ins": "a négygyalogos támadással",
+      "ine": "a négygyalogos támadásban",
+      "ela": "a négygyalogos támadásból",
+      "sub": "a négygyalogos támadásra"
+     }
     }
    },
    "comment": {
@@ -13555,6 +15092,18 @@
      "name": "Varijanta s fijanketom",
      "def": "varijanta s fijanketom",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Fianchetto-változat",
+     "def": "a fianchetto-változat",
+     "forms": {
+      "acc": "a fianchetto-változatot",
+      "dat": "a fianchetto-változatnak",
+      "ins": "a fianchetto-változattal",
+      "ine": "a fianchetto-változatban",
+      "ela": "a fianchetto-változatból",
+      "sub": "a fianchetto-változatra"
+     }
     }
    },
    "comment": {
@@ -13638,6 +15187,18 @@
      "name": "Rubinsteinova varijanta",
      "def": "Rubinsteinova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Rubinstein-változat",
+     "def": "a Rubinstein-változat",
+     "forms": {
+      "acc": "a Rubinstein-változatot",
+      "dat": "a Rubinstein-változatnak",
+      "ins": "a Rubinstein-változattal",
+      "ine": "a Rubinstein-változatban",
+      "ela": "a Rubinstein-változatból",
+      "sub": "a Rubinstein-változatra"
+     }
     }
    },
    "comment": {
@@ -13720,6 +15281,18 @@
      "name": "Klasična varijanta",
      "def": "klasična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Klasszikus változat",
+     "def": "a klasszikus változat",
+     "forms": {
+      "acc": "a klasszikus változatot",
+      "dat": "a klasszikus változatnak",
+      "ins": "a klasszikus változattal",
+      "ine": "a klasszikus változatban",
+      "ela": "a klasszikus változatból",
+      "sub": "a klasszikus változatra"
+     }
     }
    },
    "comment": {
@@ -13802,6 +15375,18 @@
      "name": "Sämischova varijanta",
      "def": "Sämischova varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Sämisch-változat",
+     "def": "a Sämisch-változat",
+     "forms": {
+      "acc": "a Sämisch-változatot",
+      "dat": "a Sämisch-változatnak",
+      "ins": "a Sämisch-változattal",
+      "ine": "a Sämisch-változatban",
+      "ela": "a Sämisch-változatból",
+      "sub": "a Sämisch-változatra"
+     }
     }
    },
    "comment": {
@@ -13884,6 +15469,18 @@
      "name": "Varijanta zamjene",
      "def": "varijanta zamjene",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Csereváltozat",
+     "def": "a csereváltozat",
+     "forms": {
+      "acc": "a csereváltozatot",
+      "dat": "a csereváltozatnak",
+      "ins": "a csereváltozattal",
+      "ine": "a csereváltozatban",
+      "ela": "a csereváltozatból",
+      "sub": "a csereváltozatra"
+     }
     }
    },
    "comment": {
@@ -13967,6 +15564,18 @@
      "name": "Lenjingradska varijanta",
      "def": "lenjingradska varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Leningrádi változat",
+     "def": "a leningrádi változat",
+     "forms": {
+      "acc": "a leningrádi változatot",
+      "dat": "a leningrádi változatnak",
+      "ins": "a leningrádi változattal",
+      "ine": "a leningrádi változatban",
+      "ela": "a leningrádi változatból",
+      "sub": "a leningrádi változatra"
+     }
     }
    },
    "comment": {
@@ -14049,6 +15658,18 @@
      "name": "Stonewall varijanta",
      "def": "Stonewall varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Stonewall-változat",
+     "def": "a Stonewall-változat",
+     "forms": {
+      "acc": "a Stonewall-változatot",
+      "dat": "a Stonewall-változatnak",
+      "ins": "a Stonewall-változattal",
+      "ine": "a Stonewall-változatban",
+      "ela": "a Stonewall-változatból",
+      "sub": "a Stonewall-változatra"
+     }
     }
    },
    "comment": {
@@ -14131,6 +15752,18 @@
      "name": "Moderna Benoni obrana",
      "def": "moderna Benoni obrana",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Modern Benoni",
+     "def": "a modern Benoni",
+     "forms": {
+      "acc": "a modern Benonit",
+      "dat": "a modern Benoninak",
+      "ins": "a modern Benonival",
+      "ine": "a modern Benoniban",
+      "ela": "a modern Benoniból",
+      "sub": "a modern Benonira"
+     }
     }
    },
    "comment": {
@@ -14213,6 +15846,18 @@
      "name": "Otvorena varijanta katalonskog otvaranja",
      "def": "otvorena varijanta katalonskog otvaranja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Nyílt katalán",
+     "def": "a nyílt katalán",
+     "forms": {
+      "acc": "a nyílt katalánt",
+      "dat": "a nyílt katalánnak",
+      "ins": "a nyílt katalánnal",
+      "ine": "a nyílt katalánban",
+      "ela": "a nyílt katalánból",
+      "sub": "a nyílt katalánra"
+     }
     }
    },
    "comment": {
@@ -14296,6 +15941,18 @@
      "name": "Zatvorena varijanta katalonskog otvaranja",
      "def": "zatvorena varijanta katalonskog otvaranja",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Zárt katalán",
+     "def": "a zárt katalán",
+     "forms": {
+      "acc": "a zárt katalánt",
+      "dat": "a zárt katalánnak",
+      "ins": "a zárt katalánnal",
+      "ine": "a zárt katalánban",
+      "ela": "a zárt katalánból",
+      "sub": "a zárt katalánra"
+     }
     }
    },
    "comment": {
@@ -14378,6 +16035,18 @@
      "name": "Simetrična varijanta",
      "def": "simetrična varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Szimmetrikus változat",
+     "def": "a szimmetrikus változat",
+     "forms": {
+      "acc": "a szimmetrikus változatot",
+      "dat": "a szimmetrikus változatnak",
+      "ins": "a szimmetrikus változattal",
+      "ine": "a szimmetrikus változatban",
+      "ela": "a szimmetrikus változatból",
+      "sub": "a szimmetrikus változatra"
+     }
     }
    },
    "comment": {
@@ -14460,6 +16129,18 @@
      "name": "Sicilijanska obrana s obrnutim bojama",
      "def": "sicilijanska obrana s obrnutim bojama",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Fordított szicíliai",
+     "def": "a fordított szicíliai",
+     "forms": {
+      "acc": "a fordított szicíliait",
+      "dat": "a fordított szicíliainak",
+      "ins": "a fordított szicíliaival",
+      "ine": "a fordított szicíliaiban",
+      "ela": "a fordított szicíliaiból",
+      "sub": "a fordított szicíliaira"
+     }
     }
    },
    "comment": {
@@ -14546,6 +16227,18 @@
      "name": "Napad četiri pješaka",
      "def": "napad četiri pješaka",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Négygyalogos támadás",
+     "def": "a négygyalogos támadás",
+     "forms": {
+      "acc": "a négygyalogos támadást",
+      "dat": "a négygyalogos támadásnak",
+      "ins": "a négygyalogos támadással",
+      "ine": "a négygyalogos támadásban",
+      "ela": "a négygyalogos támadásból",
+      "sub": "a négygyalogos támadásra"
+     }
     }
    },
    "comment": {
@@ -14628,6 +16321,18 @@
      "name": "Moderna varijanta",
      "def": "moderna varijanta",
      "gender": "f"
+    },
+    "hu": {
+     "name": "Modern változat",
+     "def": "a modern változat",
+     "forms": {
+      "acc": "a modern változatot",
+      "dat": "a modern változatnak",
+      "ins": "a modern változattal",
+      "ine": "a modern változatban",
+      "ela": "a modern változatból",
+      "sub": "a modern változatra"
+     }
     }
    },
    "comment": {
@@ -14710,6 +16415,18 @@
      "name": "Austrijski napad",
      "def": "austrijski napad",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Osztrák támadás",
+     "def": "az osztrák támadás",
+     "forms": {
+      "acc": "az osztrák támadást",
+      "dat": "az osztrák támadásnak",
+      "ins": "az osztrák támadással",
+      "ine": "az osztrák támadásban",
+      "ela": "az osztrák támadásból",
+      "sub": "az osztrák támadásra"
+     }
     }
    },
    "comment": {
@@ -14792,6 +16509,18 @@
      "name": "Falkbeerov protugambit",
      "def": "Falkbeerov protugambit",
      "gender": "m"
+    },
+    "hu": {
+     "name": "Falkbeer-ellencsel",
+     "def": "a Falkbeer-ellencsel",
+     "forms": {
+      "acc": "a Falkbeer-ellencselt",
+      "dat": "a Falkbeer-ellencselnek",
+      "ins": "a Falkbeer-ellencsellel",
+      "ine": "a Falkbeer-ellencselben",
+      "ela": "a Falkbeer-ellencselből",
+      "sub": "a Falkbeer-ellencselre"
+     }
     }
    },
    "comment": {
@@ -14833,7 +16562,8 @@
     "et": "{X:gen} variant",
     "fi": "{X}-muunnelma",
     "hi": "{X} वेरिएशन",
-    "hr": "{X:gen}a varijanta"
+    "hr": "{X:gen}a varijanta",
+    "hu": "{X}-változat"
    },
    "id": "varian",
    "nl": "variant",
@@ -14846,7 +16576,8 @@
    "et": "variant",
    "fi": "muunnelma",
    "hi": "वेरिएशन",
-   "hr": "varijanta"
+   "hr": "varijanta",
+   "hu": "változat"
   },
   "Attack": {
    "en": "Attack",
@@ -14880,7 +16611,8 @@
     "et": "{X:gen} rünnak",
     "fi": "{X}-hyökkäys",
     "hi": "{X} अटैक",
-    "hr": "{X:gen} napad"
+    "hr": "{X:gen} napad",
+    "hu": "{X}-támadás"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -14893,7 +16625,8 @@
    "et": "rünnak",
    "fi": "hyökkäys",
    "hi": "अटैक",
-   "hr": "napad"
+   "hr": "napad",
+   "hu": "támadás"
   },
   "Gambit": {
    "en": "Gambit",
@@ -14927,7 +16660,8 @@
     "et": "{X:gen} gambiit",
     "fi": "{X}-gambiitti",
     "hi": "{X} गैम्बिट",
-    "hr": "{X:gen} gambit"
+    "hr": "{X:gen} gambit",
+    "hu": "{X}-csel"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -14940,7 +16674,8 @@
    "et": "gambiit",
    "fi": "gambiitti",
    "hi": "गैम्बिट",
-   "hr": "gambit"
+   "hr": "gambit",
+   "hu": "csel"
   },
   "Defense": {
    "en": "Defense",
@@ -14974,7 +16709,8 @@
     "et": "{X:gen} kaitse",
     "fi": "{X}-puolustus",
     "hi": "{X} डिफ़ेंस",
-    "hr": "{X:gen}a obrana"
+    "hr": "{X:gen}a obrana",
+    "hu": "{X}-védelem"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -14987,7 +16723,8 @@
    "et": "kaitse",
    "fi": "puolustus",
    "hi": "डिफ़ेंस",
-   "hr": "obrana"
+   "hr": "obrana",
+   "hu": "védelem"
   },
   "System": {
    "en": "System",
@@ -15021,7 +16758,8 @@
     "et": "{X:gen} süsteem",
     "fi": "{X}-järjestelmä",
     "hi": "{X} सिस्टम",
-    "hr": "{X:gen} sustav"
+    "hr": "{X:gen} sustav",
+    "hu": "{X}-rendszer"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -15034,7 +16772,8 @@
    "et": "süsteem",
    "fi": "järjestelmä",
    "hi": "सिस्टम",
-   "hr": "sustav"
+   "hr": "sustav",
+   "hu": "rendszer"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -15068,7 +16807,8 @@
     "et": "{X:gen} vastugambiit",
     "fi": "{X}-vastagambiitti",
     "hi": "{X} काउंटरगैम्बिट",
-    "hr": "{X:gen} protugambit"
+    "hr": "{X:gen} protugambit",
+    "hu": "{X}-ellencsel"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -15081,7 +16821,8 @@
    "et": "vastugambiit",
    "fi": "vastagambiitti",
    "hi": "काउंटरगैम्बिट",
-   "hr": "protugambit"
+   "hr": "protugambit",
+   "hu": "ellencsel"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -15115,7 +16856,8 @@
     "et": "{X:gen} vasturünnak",
     "fi": "{X}-vastahyökkäys",
     "hi": "{X} काउंटरअटैक",
-    "hr": "{X:gen} protunapad"
+    "hr": "{X:gen} protunapad",
+    "hu": "{X}-ellentámadás"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -15128,7 +16870,8 @@
    "et": "vasturünnak",
    "fi": "vastahyökkäys",
    "hi": "काउंटरअटैक",
-   "hr": "protunapad"
+   "hr": "protunapad",
+   "hu": "ellentámadás"
   },
   "Opening": {
    "en": "Opening",
@@ -15162,7 +16905,8 @@
     "et": "{X:gen} avang",
     "fi": "{X}-avaus",
     "hi": "{X} ओपनिंग",
-    "hr": "{X:gen}o otvaranje"
+    "hr": "{X:gen}o otvaranje",
+    "hu": "{X}-megnyitás"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -15175,7 +16919,8 @@
    "et": "avang",
    "fi": "avaus",
    "hi": "ओपनिंग",
-   "hr": "otvaranje"
+   "hr": "otvaranje",
+   "hu": "megnyitás"
   },
   "Game": {
    "en": "Game",
@@ -15199,7 +16944,8 @@
    "et": "partii",
    "fi": "peli",
    "hi": "गेम",
-   "hr": "partija"
+   "hr": "partija",
+   "hu": "játszma"
   },
   "Line": {
    "en": "Line",
@@ -15233,7 +16979,8 @@
     "et": "{X:gen} jätk",
     "fi": "{X}-jatko",
     "hi": "{X} लाइन",
-    "hr": "{X:gen} nastavak"
+    "hr": "{X:gen} nastavak",
+    "hu": "{X}-folytatás"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -15246,7 +16993,8 @@
    "et": "jätk",
    "fi": "jatko",
    "hi": "लाइन",
-   "hr": "nastavak"
+   "hr": "nastavak",
+   "hu": "folytatás"
   },
   "Formation": {
    "en": "Formation",
@@ -15270,7 +17018,8 @@
    "et": "ülesehitus",
    "fi": "asetelma",
    "hi": "फ़ॉर्मेशन",
-   "hr": "postava"
+   "hr": "postava",
+   "hu": "felállás"
   },
   "Trap": {
    "en": "Trap",
@@ -15304,7 +17053,8 @@
     "et": "{X:gen} lõks",
     "fi": "{X}-ansa",
     "hi": "{X} ट्रैप",
-    "hr": "{X:gen}a zamka"
+    "hr": "{X:gen}a zamka",
+    "hu": "{X}-csapda"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -15317,7 +17067,8 @@
    "et": "lõks",
    "fi": "ansa",
    "hi": "ट्रैप",
-   "hr": "zamka"
+   "hr": "zamka",
+   "hu": "csapda"
   },
   "Accepted": {
    "en": "Accepted",
@@ -15341,7 +17092,8 @@
    "et": "vastuvõetud",
    "fi": "vastaanotettu",
    "hi": "एक्सेप्टेड",
-   "hr": "prihvaćeni"
+   "hr": "prihvaćeni",
+   "hu": "elfogadott"
   },
   "Declined": {
    "en": "Declined",
@@ -15365,7 +17117,8 @@
    "et": "tagasilükatud",
    "fi": "hylätty",
    "hi": "डिक्लाइंड",
-   "hr": "odbijeni"
+   "hr": "odbijeni",
+   "hu": "elhárított"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -15389,7 +17142,8 @@
    "et": "vahetusvariant",
    "fi": "vaihtomuunnelma",
    "hi": "एक्सचेंज वेरिएशन",
-   "hr": "varijanta zamjene"
+   "hr": "varijanta zamjene",
+   "hu": "csereváltozat"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -15413,7 +17167,8 @@
    "et": "edasitungivariant",
    "fi": "etenemismuunnelma",
    "hi": "एडवांस वेरिएशन",
-   "hr": "varijanta napredovanja"
+   "hr": "varijanta napredovanja",
+   "hu": "tolóváltozat"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -15437,7 +17192,8 @@
    "et": "klassikaline variant",
    "fi": "klassinen muunnelma",
    "hi": "क्लासिकल वेरिएशन",
-   "hr": "klasična varijanta"
+   "hr": "klasična varijanta",
+   "hu": "klasszikus változat"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -15461,7 +17217,8 @@
    "et": "moodne variant",
    "fi": "moderni muunnelma",
    "hi": "मॉडर्न वेरिएशन",
-   "hr": "moderna varijanta"
+   "hr": "moderna varijanta",
+   "hu": "modern változat"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -15485,7 +17242,8 @@
    "et": "avatud variant",
    "fi": "avoin muunnelma",
    "hi": "ओपन वेरिएशन",
-   "hr": "otvorena varijanta"
+   "hr": "otvorena varijanta",
+   "hu": "nyílt változat"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -15509,7 +17267,8 @@
    "et": "suletud variant",
    "fi": "suljettu muunnelma",
    "hi": "क्लोज़्ड वेरिएशन",
-   "hr": "zatvorena varijanta"
+   "hr": "zatvorena varijanta",
+   "hu": "zárt változat"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -15533,7 +17292,8 @@
    "et": "fiankettovariant",
    "fi": "fiankettomuunnelma",
    "hi": "फ़ियांकेटो वेरिएशन",
-   "hr": "varijanta s fijanketom"
+   "hr": "varijanta s fijanketom",
+   "hu": "fianchetto-változat"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -15557,7 +17317,8 @@
    "et": "sümmeetriline variant",
    "fi": "symmetrinen muunnelma",
    "hi": "सिमेट्रिकल वेरिएशन",
-   "hr": "simetrična varijanta"
+   "hr": "simetrična varijanta",
+   "hu": "szimmetrikus változat"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -15581,7 +17342,8 @@
    "et": "Šoti gambiit",
    "fi": "skotlantilainen gambiitti",
    "hi": "स्कॉच गैम्बिट",
-   "hr": "škotski gambit"
+   "hr": "škotski gambit",
+   "hu": "skót csel"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -15605,7 +17367,8 @@
    "et": "Šoti variant",
    "fi": "skotlantilainen muunnelma",
    "hi": "स्कॉच वेरिएशन",
-   "hr": "škotska varijanta"
+   "hr": "škotska varijanta",
+   "hu": "skót változat"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -15629,7 +17392,8 @@
    "et": "Taani variant",
    "fi": "tanskalainen muunnelma",
    "hi": "डेनिश वेरिएशन",
-   "hr": "danska varijanta"
+   "hr": "danska varijanta",
+   "hu": "dán változat"
   },
   "Main Line": {
    "en": "Main Line",
@@ -15653,7 +17417,8 @@
    "et": "peavariant",
    "fi": "päämuunnelma",
    "hi": "मेन लाइन",
-   "hr": "glavna varijanta"
+   "hr": "glavna varijanta",
+   "hu": "főváltozat"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -15677,7 +17442,8 @@
    "et": "kiirendatud",
    "fi": "nopeutettu",
    "hi": "एक्सेलरेटेड",
-   "hr": "ubrzani"
+   "hr": "ubrzani",
+   "hu": "gyorsított"
   },
   "Deferred": {
    "en": "Deferred",
@@ -15701,7 +17467,8 @@
    "et": "edasilükatud",
    "fi": "viivästetty",
    "hi": "डिफ़र्ड",
-   "hr": "odgođeni"
+   "hr": "odgođeni",
+   "hu": "késleltetett"
   },
   "Reversed": {
    "en": "Reversed",
@@ -15725,7 +17492,8 @@
    "et": "vahetatud värvidega",
    "fi": "käänteinen",
    "hi": "रिवर्स्ड",
-   "hr": "s obrnutim bojama"
+   "hr": "s obrnutim bojama",
+   "hu": "fordított színekkel"
   }
  },
  "eponyms": {
@@ -15789,6 +17557,10 @@
    "hr": {
     "nom": "Steinitz",
     "gen": "Steinitzov"
+   },
+   "hu": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
    }
   },
   "Rubinstein": {
@@ -15851,6 +17623,10 @@
    "hr": {
     "nom": "Rubinstein",
     "gen": "Rubinsteinov"
+   },
+   "hu": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
    }
   },
   "Winawer": {
@@ -15913,6 +17689,10 @@
    "hr": {
     "nom": "Winawer",
     "gen": "Winawerov"
+   },
+   "hu": {
+    "nom": "Winawer",
+    "gen": "Winawer"
    }
   },
   "Evans": {
@@ -15975,6 +17755,10 @@
    "hr": {
     "nom": "Evans",
     "gen": "Evansov"
+   },
+   "hu": {
+    "nom": "Evans",
+    "gen": "Evans"
    }
   },
   "Chigorin": {
@@ -16037,6 +17821,10 @@
    "hr": {
     "nom": "Čigorin",
     "gen": "Čigorinov"
+   },
+   "hu": {
+    "nom": "Csigorin",
+    "gen": "Csigorin"
    }
   },
   "Morphy": {
@@ -16099,6 +17887,10 @@
    "hr": {
     "nom": "Morphy",
     "gen": "Morphyjev"
+   },
+   "hu": {
+    "nom": "Morphy",
+    "gen": "Morphy"
    }
   },
   "Tarrasch": {
@@ -16161,6 +17953,10 @@
    "hr": {
     "nom": "Tarrasch",
     "gen": "Tarraschov"
+   },
+   "hu": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
    }
   },
   "Alekhine": {
@@ -16223,6 +18019,10 @@
    "hr": {
     "nom": "Aljehin",
     "gen": "Aljehinov"
+   },
+   "hu": {
+    "nom": "Aljechin",
+    "gen": "Aljechin"
    }
   },
   "Sämisch": {
@@ -16285,6 +18085,10 @@
    "hr": {
     "nom": "Sämisch",
     "gen": "Sämischov"
+   },
+   "hu": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
    }
   },
   "Nimzowitsch": {
@@ -16347,6 +18151,10 @@
    "hr": {
     "nom": "Nimzowitsch",
     "gen": "Nimzowitschev"
+   },
+   "hu": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
    }
   },
   "Najdorf": {
@@ -16409,6 +18217,10 @@
    "hr": {
     "nom": "Najdorf",
     "gen": "Najdorfov"
+   },
+   "hu": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
    }
   },
   "Bogoljubow": {
@@ -16471,6 +18283,10 @@
    "hr": {
     "nom": "Bogoljubov",
     "gen": "Bogoljubovljev"
+   },
+   "hu": {
+    "nom": "Bogoljubov",
+    "gen": "Bogoljubov"
    }
   },
   "Alapin": {
@@ -16533,6 +18349,10 @@
    "hr": {
     "nom": "Alapin",
     "gen": "Alapinov"
+   },
+   "hu": {
+    "nom": "Alapin",
+    "gen": "Alapin"
    }
   },
   "Botvinnik": {
@@ -16589,12 +18409,16 @@
     "gen": "Botvinnikin"
    },
    "hi": {
-    "nom": "बोट्विनिक",
-    "gen": "बोट्विनिक"
+    "nom": "बोतविनिक",
+    "gen": "बोतविनिक"
    },
    "hr": {
     "nom": "Botvinik",
     "gen": "Botvinikov"
+   },
+   "hu": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
    }
   },
   "Paulsen": {
@@ -16657,6 +18481,10 @@
    "hr": {
     "nom": "Paulsen",
     "gen": "Paulsenov"
+   },
+   "hu": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
    }
   },
   "Marshall": {
@@ -16719,6 +18547,10 @@
    "hr": {
     "nom": "Marshall",
     "gen": "Marshallov"
+   },
+   "hu": {
+    "nom": "Marshall",
+    "gen": "Marshall"
    }
   },
   "Kieseritzky": {
@@ -16781,6 +18613,10 @@
    "hr": {
     "nom": "Kieseritzky",
     "gen": "Kieseritzkyjev"
+   },
+   "hu": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
    }
   },
   "Panov": {
@@ -16843,6 +18679,10 @@
    "hr": {
     "nom": "Panov",
     "gen": "Panovljev"
+   },
+   "hu": {
+    "nom": "Panov",
+    "gen": "Panov"
    }
   },
   "Keres": {
@@ -16905,6 +18745,10 @@
    "hr": {
     "nom": "Keres",
     "gen": "Keresov"
+   },
+   "hu": {
+    "nom": "Keres",
+    "gen": "Keres"
    }
   },
   "Tartakower": {
@@ -16967,6 +18811,10 @@
    "hr": {
     "nom": "Tartakower",
     "gen": "Tartakowerov"
+   },
+   "hu": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
    }
   },
   "Maróczy": {
@@ -17029,6 +18877,10 @@
    "hr": {
     "nom": "Maróczy",
     "gen": "Maróczyjev"
+   },
+   "hu": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
    }
   },
   "Falkbeer": {
@@ -17091,6 +18943,10 @@
    "hr": {
     "nom": "Falkbeer",
     "gen": "Falkbeerov"
+   },
+   "hu": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
    }
   },
   "Scheveningen": {
@@ -17153,6 +19009,10 @@
    "hr": {
     "nom": "Scheveningen",
     "gen": "scheveningensk"
+   },
+   "hu": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
    }
   },
   "Richter-Rauzer": {
@@ -17215,6 +19075,10 @@
    "hr": {
     "nom": "Richter-Rauzer",
     "gen": "Richter-Rauzerov"
+   },
+   "hu": {
+    "nom": "Richter–Rauzer",
+    "gen": "Richter–Rauzer"
    }
   },
   "Lasker": {
@@ -17277,6 +19141,10 @@
    "hr": {
     "nom": "Lasker",
     "gen": "Laskerov"
+   },
+   "hu": {
+    "nom": "Lasker",
+    "gen": "Lasker"
    }
   },
   "Taimanov": {
@@ -17339,6 +19207,10 @@
    "hr": {
     "nom": "Tajmanov",
     "gen": "Tajmanovljev"
+   },
+   "hu": {
+    "nom": "Tajmanov",
+    "gen": "Tajmanov"
    }
   },
   "Smyslov": {
@@ -17401,6 +19273,10 @@
    "hr": {
     "nom": "Smislov",
     "gen": "Smislovljev"
+   },
+   "hu": {
+    "nom": "Szmiszlov",
+    "gen": "Szmiszlov"
    }
   },
   "Spassky": {
@@ -17463,6 +19339,10 @@
    "hr": {
     "nom": "Spaski",
     "gen": "Spaskijev"
+   },
+   "hu": {
+    "nom": "Szpasszkij",
+    "gen": "Szpasszkij"
    }
   },
   "Spielmann": {
@@ -17525,6 +19405,10 @@
    "hr": {
     "nom": "Spielmann",
     "gen": "Spielmannov"
+   },
+   "hu": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
    }
   },
   "Averbakh": {
@@ -17587,6 +19471,10 @@
    "hr": {
     "nom": "Averbah",
     "gen": "Averbahov"
+   },
+   "hu": {
+    "nom": "Averbah",
+    "gen": "Averbah"
    }
   },
   "Greco": {
@@ -17649,6 +19537,10 @@
    "hr": {
     "nom": "Greco",
     "gen": "Grecov"
+   },
+   "hu": {
+    "nom": "Greco",
+    "gen": "Greco"
    }
   },
   "Capablanca": {
@@ -17711,6 +19603,10 @@
    "hr": {
     "nom": "Capablanca",
     "gen": "Capablancin"
+   },
+   "hu": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
    }
   },
   "Kan": {
@@ -17773,6 +19669,10 @@
    "hr": {
     "nom": "Kan",
     "gen": "Kanov"
+   },
+   "hu": {
+    "nom": "Kan",
+    "gen": "Kan"
    }
   },
   "Albin": {
@@ -17835,6 +19735,10 @@
    "hr": {
     "nom": "Albin",
     "gen": "Albinov"
+   },
+   "hu": {
+    "nom": "Albin",
+    "gen": "Albin"
    }
   },
   "Breyer": {
@@ -17897,6 +19801,10 @@
    "hr": {
     "nom": "Breyer",
     "gen": "Breyerov"
+   },
+   "hu": {
+    "nom": "Breyer",
+    "gen": "Breyer"
    }
   },
   "Schlechter": {
@@ -17959,6 +19867,10 @@
    "hr": {
     "nom": "Schlechter",
     "gen": "Schlechterov"
+   },
+   "hu": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
    }
   },
   "Jaenisch": {
@@ -18021,6 +19933,10 @@
    "hr": {
     "nom": "Jaenisch",
     "gen": "Jaenischov"
+   },
+   "hu": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
    }
   },
   "Karpov": {
@@ -18083,6 +19999,10 @@
    "hr": {
     "nom": "Karpov",
     "gen": "Karpovljev"
+   },
+   "hu": {
+    "nom": "Karpov",
+    "gen": "Karpov"
    }
   },
   "Petrosian": {
@@ -18145,6 +20065,10 @@
    "hr": {
     "nom": "Petrosjan",
     "gen": "Petrosjanov"
+   },
+   "hu": {
+    "nom": "Petroszján",
+    "gen": "Petroszján"
    }
   },
   "Euwe": {
@@ -18207,6 +20131,10 @@
    "hr": {
     "nom": "Euwe",
     "gen": "Euweov"
+   },
+   "hu": {
+    "nom": "Euwe",
+    "gen": "Euwe"
    }
   },
   "Sozin": {
@@ -18269,6 +20197,10 @@
    "hr": {
     "nom": "Sozin",
     "gen": "Sozinov"
+   },
+   "hu": {
+    "nom": "Szozin",
+    "gen": "Szozin"
    }
   },
   "Schliemann": {
@@ -18331,6 +20263,10 @@
    "hr": {
     "nom": "Schliemann",
     "gen": "Schliemannov"
+   },
+   "hu": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
    }
   },
   "Anderssen": {
@@ -18393,6 +20329,10 @@
    "hr": {
     "nom": "Anderssen",
     "gen": "Anderssenov"
+   },
+   "hu": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
    }
   },
   "Philidor": {
@@ -18455,6 +20395,10 @@
    "hr": {
     "nom": "Philidor",
     "gen": "Philidorov"
+   },
+   "hu": {
+    "nom": "Philidor",
+    "gen": "Philidor"
    }
   },
   "Zaitsev": {
@@ -18517,6 +20461,10 @@
    "hr": {
     "nom": "Zajcev",
     "gen": "Zajcevljev"
+   },
+   "hu": {
+    "nom": "Zajcev",
+    "gen": "Zajcev"
    }
   },
   "Sveshnikov": {
@@ -18579,6 +20527,10 @@
    "hr": {
     "nom": "Svešnikov",
     "gen": "Svešnikovljev"
+   },
+   "hu": {
+    "nom": "Szvesnyikov",
+    "gen": "Szvesnyikov"
    }
   },
   "Kasparov": {
@@ -18641,6 +20593,10 @@
    "hr": {
     "nom": "Kasparov",
     "gen": "Kasparovljev"
+   },
+   "hu": {
+    "nom": "Kaszparov",
+    "gen": "Kaszparov"
    }
   },
   "Fischer": {
@@ -18703,6 +20659,10 @@
    "hr": {
     "nom": "Fischer",
     "gen": "Fischerov"
+   },
+   "hu": {
+    "nom": "Fischer",
+    "gen": "Fischer"
    }
   },
   "Tal": {
@@ -18765,6 +20725,10 @@
    "hr": {
     "nom": "Tal",
     "gen": "Talov"
+   },
+   "hu": {
+    "nom": "Tal",
+    "gen": "Tal"
    }
   },
   "McCutcheon": {
@@ -18827,6 +20791,10 @@
    "hr": {
     "nom": "McCutcheon",
     "gen": "McCutcheonov"
+   },
+   "hu": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
    }
   },
   "Bronstein": {
@@ -18889,6 +20857,10 @@
    "hr": {
     "nom": "Bronstein",
     "gen": "Bronsteinov"
+   },
+   "hu": {
+    "nom": "Bronstejn",
+    "gen": "Bronstejn"
    }
   },
   "Janowski": {
@@ -18951,6 +20923,10 @@
    "hr": {
     "nom": "Janowski",
     "gen": "Janowskijev"
+   },
+   "hu": {
+    "nom": "Janowski",
+    "gen": "Janowski"
    }
   },
   "Staunton": {
@@ -19013,6 +20989,10 @@
    "hr": {
     "nom": "Staunton",
     "gen": "Stauntonov"
+   },
+   "hu": {
+    "nom": "Staunton",
+    "gen": "Staunton"
    }
   },
   "Max Lange": {
@@ -19075,6 +21055,10 @@
    "hr": {
     "nom": "Max Lange",
     "gen": "Max Langeov"
+   },
+   "hu": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
    }
   },
   "Petrov": {
@@ -19137,6 +21121,10 @@
    "hr": {
     "nom": "Petrov",
     "gen": "Petrovljev"
+   },
+   "hu": {
+    "nom": "Petrov",
+    "gen": "Petrov"
    }
   },
   "Grünfeld": {
@@ -19199,6 +21187,10 @@
    "hr": {
     "nom": "Grünfeld",
     "gen": "Grünfeldov"
+   },
+   "hu": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
    }
   },
   "Colle": {
@@ -19261,6 +21253,10 @@
    "hr": {
     "nom": "Colle",
     "gen": "Colleov"
+   },
+   "hu": {
+    "nom": "Colle",
+    "gen": "Colle"
    }
   },
   "Torre": {
@@ -19323,6 +21319,10 @@
    "hr": {
     "nom": "Torre",
     "gen": "Torreov"
+   },
+   "hu": {
+    "nom": "Torre",
+    "gen": "Torre"
    }
   },
   "Réti": {
@@ -19385,6 +21385,10 @@
    "hr": {
     "nom": "Réti",
     "gen": "Rétijev"
+   },
+   "hu": {
+    "nom": "Réti",
+    "gen": "Réti"
    }
   }
  },
@@ -19448,6 +21452,10 @@
   "hr": {
    "compose_proper_names": false,
    "file_pattern": "\\b(?:[Ll]inij\\w*|[Pp]ješa\\w*) (?P<f>[b-dfgh])\\b"
+  },
+  "hu": {
+   "compose_proper_names": true,
+   "file_pattern": "(?<![\\w–-])(?P<f>[a-h])-(?=vonal|gyalog)"
   }
  }
 }

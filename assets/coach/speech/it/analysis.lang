@@ -26,7 +26,7 @@ an.start.setup.2 = Una partita da una posizione impostata. Vediamo com’è anda
 
 # ---- The opening (said where the game leaves the opening book) ------------------------------------
 an.opening = L’apertura è {opening:def}.
-an.opening.2 = Questa è {opening:def}.
+an.opening.2 = Ecco {opening:def}.
 an.book_exit = Con {move} la partita esce dalla teoria conosciuta.
 an.book_exit.2 = {move} è la prima mossa fuori teoria.
 an.book_exit.3 = La teoria d’apertura finisce qui, con {move}.
@@ -51,7 +51,7 @@ an.fork = Ora {reply} fa forchetta {t1:su} e {t2:su}.
 an.fork.2 = Permette {reply}, che attacca contemporaneamente {t1} e {t2}.
 an.fork.3 = {reply} colpisce {t1} e {t2} allo stesso tempo.
 an.hanging = Lascia {piece} senza protezione, e {reply} se ne impadronisce.
-an.hanging.2 = {piece} resta senza difensori: {reply} {piece:lo} cattura.
+an.hanging.2 = {piece} resta senza difensori: {reply} {piece:lo} vince.
 an.hanging.3 = {reply} prende semplicemente {piece}, che non aveva difensori.
 an.material = La risposta {line} guadagna {pts:point} di materiale.
 an.material.2 = Poi {line} guadagna {pts:point}.

@@ -33,13 +33,13 @@ event.colour.black.2 = Pelaat tällä kertaa mustilla: minä siirrän ensin.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of the coach page (coach.level.<n>.name in assets/i18n/fi.lang):
-# Ensiaskeleet, Aloittelija, Kehittyvä pelaaja, Kerhopelaaja, Vahva kerhopelaaja, Ekspertti.
+# Ensiaskeleet, Aloittelija, Edistyvä, Kerhopelaaja, Vahva kerhopelaaja, Asiantuntija.
 event.level.l1 = Ensiaskeleet: pelaan lempeästi ja selitän jokaisen virheen yksinkertaisin sanoin.
 event.level.l2 = Aloittelija: pelaan hieman vahvemmin ja nimeän yksinkertaiset taktiset keinot, kuten haarukat ja kiinnitykset.
-event.level.l3 = Kehittyvä pelaaja: puhun suunnitelmista ja sotilasrakenteesta sekä näytän lyhyitä muunnelmia.
-event.level.l4 = Kerhopelaaja: annan arvion sotilaina mitattuna ja ehdotan ehdokassiirtoja.
+event.level.l3 = Edistyvä: puhun suunnitelmista ja sotilasrakenteesta sekä näytän lyhyitä muunnelmia.
+event.level.l4 = Kerhopelaaja: annan arviot sotilasyksikköinä ja ehdotan ehdokassiirtoja.
 event.level.l5 = Vahva kerhopelaaja: lyhyitä kommentteja ja pidempiä muunnelmia silloin, kun sillä on väliä.
-event.level.l6 = Ekspertti: pelaan parhaani mukaan ja kommentoin vain kriittisiä hetkiä.
+event.level.l6 = Asiantuntija: pelaan parhaani mukaan ja kommentoin vain kriittisiä hetkiä.
 
 # ---- Turn-taking -------------------------------------------------------------------------------------
 # After an explanation or a demonstration, when the player may move again.
