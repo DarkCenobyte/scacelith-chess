@@ -145,3 +145,122 @@ lesson.first.ok = Một nước đi đầu tiên tuyệt vời: nó mở đườ
 lesson.first.reply = Tôi đáp lại y như vậy. Bây giờ hãy ra một con Mã: nhảy từ ô {sq} đến ô {sq2}.
 lesson.first.knight_wrong = Mã nhảy qua được các con Tốt. Thử từ ô {sq} đến ô {sq2} xem.
 lesson.first.knight_ok = Tuyệt. Mã và Tượng được đưa ra sớm.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Một quân được bảo vệ khi có quân phe mình có thể bắt lại.
+lesson.safety.pawn = Con {@}Tốt của tôi đang bảo vệ {my}.
+lesson.safety.free = Nhưng {my} không có quân nào bảo vệ. Hậu của bạn đang tấn công cả hai quân.
+lesson.safety.ask = Hãy bắt quân không được bảo vệ!
+lesson.safety.watch = Xem chuyện gì xảy ra nhé.
+lesson.safety.gave = Bạn đã đổi Hậu, đáng chín điểm, lấy Mã của tôi, đáng ba điểm.
+lesson.safety.other = Thử quân còn lại xem.
+lesson.safety.look = Hãy tìm quân không có gì bảo vệ.
+lesson.safety.ok = Xuất sắc! Hãy luôn tự hỏi: quân đó có được bảo vệ không?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Xe của tôi kiểm soát toàn bộ hàng thứ hai.
+lesson.danger.rule = Vua không bao giờ được đi vào một ô mà ở đó nó có thể bị bắt.
+lesson.danger.ask = Hãy đưa Vua đến một ô an toàn.
+lesson.danger.ok = Đúng rồi. Ở đó Vua của bạn an toàn.
+lesson.check.what = Xe của tôi đang tấn công Vua của bạn. Đó gọi là chiếu.
+lesson.check.must = Khi bị chiếu, bạn phải thoát chiếu ngay lập tức.
+lesson.check.ways = Có ba cách: {@}di chuyển Vua, {@2}chặn đường tấn công, hoặc {@3}bắt quân đang chiếu.
+lesson.check.ask = Ở đây, hãy đưa Vua ra khỏi thế bị chiếu.
+lesson.check.file = Ô {to} vẫn ở cùng cột với {@}Xe của tôi. Hãy ra khỏi cột đó.
+lesson.check.ok = Đúng rồi: bạn đã thoát chiếu.
+lesson.block.again = Lại chiếu nữa! Lần này Vua của bạn không còn ô nào để đi.
+lesson.block.ask = Vậy hãy chặn đường tấn công: đặt một quân vào giữa.
+lesson.block.queen = Chặn được rồi! Nhưng Xe của tôi có thể bắt Hậu của bạn. Hãy chặn bằng một quân ít giá trị hơn.
+lesson.block.queen_ok = Cách này được. Hãy nhớ: chặn bằng quân ít giá trị nhất của bạn.
+lesson.block.ok = Tuyệt. Hãy chặn bằng quân ít giá trị nhất của bạn.
+lesson.capture.check = Hậu của tôi chiếu, ngay sát cạnh Vua của bạn.
+lesson.capture.ask = Hãy bắt quân đang chiếu!
+lesson.capture.king_ok = Đúng vậy! Hậu của tôi không có quân bảo vệ, nên Vua của bạn bắt được nó.
+lesson.capture.knight_ok = Đúng vậy! Mã của bạn đã loại bỏ quân đang chiếu.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Chiếu hết: Vua bị chiếu và không còn đường thoát. Như vậy là thắng ván cờ.
+lesson.mate1.stuck = Vua của tôi bị kẹt phía sau {@}các con Tốt của chính mình.
+lesson.mate1.ask = Hãy chiếu hết tôi trong một nước!
+lesson.mate1.wrong = Gần đúng rồi! Hãy chiếu ở hàng cuối của tôi, nơi Vua của tôi không thể thoát.
+lesson.mate1.ok = Chiếu hết! Đó là kiểu chiếu hết ở hàng cuối. Hãy nhớ lấy nhé!
+lesson.mate2.ask = Vua và Hậu của bạn phối hợp với nhau. Hãy chiếu hết tôi trong một nước.
+lesson.mate2.wrong = Hãy tìm một nước chiếu khiến Vua của tôi không còn ô nào để đi.
+lesson.mate2.ok = Chiếu hết! Vua của bạn bảo vệ Hậu, nên Vua của tôi không bắt được nó.
+lesson.mate2.ok_rank = Chiếu hết ở hàng cuối! Vua của bạn kiểm soát mọi ô phía trước Vua của tôi.
+lesson.mate3.edge = Xe của bạn ở hàng thứ bảy giữ Vua của tôi ở mép bàn cờ.
+lesson.mate3.ask = Bây giờ hãy dùng {your} để chiếu hết.
+lesson.mate3.free = Chiếu, nhưng giờ hàng thứ bảy đã bỏ trống, và Vua của tôi thoát ra.
+lesson.mate3.takes = Vua của tôi chỉ việc bắt Xe của bạn.
+lesson.mate3.hint = Hãy chiếu ở hàng cuối bằng con Xe không canh hàng thứ bảy.
+lesson.mate3.ok = Chiếu hết! Hai con Xe đã phối hợp như những bậc thang.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Nhập thành là một nước đi đặc biệt giúp Vua được an toàn. Vua và Xe cùng di chuyển.
+lesson.castle.how = {@}Vua đi hai ô về phía một con Xe, và {@2}Xe nhảy sang phía bên kia của Vua.
+lesson.castle.ask = Luôn chạm vào Vua trước. Giờ đến lượt bạn: hãy nhập thành ở cánh Vua.
+lesson.castle.rook = Như vậy chỉ di chuyển Xe thôi. Để nhập thành, hãy đi Vua hai ô về phía Xe.
+lesson.castle.long = Đó là nhập thành dài, cũng hợp lệ! Lần này, hãy nhập thành về phía con Xe gần hơn.
+lesson.castle.one = Đi một ô là nước đi bình thường của Vua. Khi nhập thành, Vua đi hai ô.
+lesson.castle.other = Để nhập thành, hãy đi Vua hai ô về phía con Xe ở ô {sq}.
+lesson.castle.ok = Đã nhập thành! Vua của bạn đã được che chắn, và Xe sẵn sàng vào cuộc.
+lesson.castle2.moved = Bạn không thể nhập thành nếu Vua hoặc con Xe đó đã từng di chuyển.
+lesson.castle2.attacked = Cũng không được nhập thành khi đang bị chiếu, hoặc nếu Vua phải đi qua hay dừng ở một ô bị tấn công.
+lesson.castle2.bishop = Tượng của tôi đang tấn công ô {sq}. Vì vậy lúc này không được nhập thành ở cánh này.
+lesson.castle2.ask = Hãy nhập thành ở cánh bên kia.
+lesson.castle2.other = Hãy nhập thành về phía con Xe còn lại, ở cánh Hậu.
+lesson.castle2.ok = Chính xác! Nhập thành dài đưa Vua của bạn đến ô {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+# The Vietnamese term "bắt tốt qua đường" already says "in passing": the line explains it in Vietnamese
+# instead of quoting the French words.
+lesson.ep.what = Tốt có một cách bắt quân đặc biệt gọi là bắt tốt qua đường: bắt con Tốt khi nó vừa đi ngang qua.
+lesson.ep.watch = Hãy xem Tốt của tôi: nó đi hai ô và dừng ngay cạnh Tốt của bạn.
+lesson.ep.how = Tốt của bạn có thể bắt nó như thể nó chỉ đi một ô: đến ô {sq}.
+lesson.ep.now = Nhưng chỉ ngay bây giờ, ở nước này thôi. Hãy bắt tốt qua đường!
+lesson.ep.gone = Cơ hội đã qua: chỉ được bắt tốt qua đường ngay lập tức. Chúng ta thử lại nhé.
+lesson.ep.ok = Bắt tốt qua đường! Tốt của tôi ở ô {sq} bị loại khỏi bàn cờ.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Khi Tốt đi đến hàng cuối cùng, nó được phong cấp: nó trở thành Hậu, Xe, Tượng hoặc Mã.
+lesson.promo.ask = Hầu như lúc nào cũng nên chọn Hậu. Hãy phong cấp cho Tốt của bạn ngay!
+lesson.promo.under = Được phép! Nhưng Hậu mạnh hơn. Chúng ta chọn Hậu nhé.
+lesson.promo.under_ok = Cũng được. Nhưng hầu hết người chơi đều chọn Hậu.
+lesson.promo.push = Hãy đẩy Tốt lên hàng cuối, đến ô {sq}.
+lesson.promo.ok = Một Hậu mới! Bạn thậm chí có thể có hai Hậu cùng lúc.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Đến lượt tôi. Vua của tôi không bị chiếu, nhưng {@}mọi ô xung quanh nó đều bị tấn công.
+lesson.stale.draw = Tôi không còn nước đi hợp lệ nào. Đó là thế hết nước đi, và ván cờ hòa.
+lesson.stale2.ask = Khi đang thắng thế, hãy cẩn thận với thế hết nước đi. Hãy chiếu hết tôi trong một nước, mà không để tôi hết nước đi!
+lesson.stale2.wrong = Hãy chiếu ở hàng cuối của tôi, nơi Vua của tôi không thể thoát.
+lesson.stale2.ok = Chiếu hết! Hãy luôn để Vua đối phương còn một nước để đi, trừ khi bạn đang chiếu hết.
+lesson.draws.kings = Các trường hợp hòa khác: khi không bên nào có thể chiếu hết, chẳng hạn chỉ còn hai con Vua, ván cờ hòa.
+lesson.draws.agree = Hai người chơi cũng có thể thỏa thuận hòa.
+lesson.draws.repeat = Lặp lại một thế cờ ba lần, hoặc năm mươi nước liền không có bắt quân hay đi Tốt, cũng cho phép hòa.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Bây giờ bạn đã biết mọi luật cờ vua. Giỏi lắm!
+lesson.talk.real = Để tôi kể cho bạn nghe các ván đấu thật diễn ra như thế nào.
+lesson.talk.elo = Mỗi người chơi có một hệ số xếp hạng, gọi là Elo. Nó tăng khi bạn thắng và giảm khi bạn thua.
+lesson.talk.elo_gap = Thắng người mạnh hơn được nhiều điểm hơn; thua người yếu hơn thì mất nhiều điểm hơn.
+lesson.talk.elo_start = Hệ số Elo của bạn sẽ hiện ra sau năm ván tính điểm. Các ván với huấn luyện viên là để luyện tập, nên không tính điểm.
+lesson.talk.clock = Đây là {@}đồng hồ cờ vua. Mỗi người chơi có thời gian riêng, chỉ chạy trong lượt của mình.
+lesson.talk.press = Sau khi đi quân, bạn bấm đồng hồ bằng chính bàn tay vừa đi quân. Thế là thời gian của tôi bắt đầu chạy.
+lesson.talk.flag = Nếu bạn hết giờ, bạn sẽ thua, trừ khi tôi hoàn toàn không có cách nào chiếu hết bạn.
+lesson.talk.increment = “Năm cộng ba” nghĩa là mỗi bên có năm phút, cộng thêm ba giây sau mỗi nước đi.
+lesson.talk.speeds = Ván ngắn gọi là cờ chớp, ván dài hơn là cờ nhanh, và ván dài nhất là cờ tiêu chuẩn.
+lesson.talk.no_clock = Khi chơi với tôi, đồng hồ được tắt. Bạn cứ suy nghĩ bao lâu tùy thích.
+lesson.talk.touch = Trong ván đấu thật, nếu bạn chạm vào một quân của mình, bạn phải đi quân đó.
+lesson.talk.touch_mine = Nếu bạn chạm vào một quân của tôi, bạn phải bắt nó, nếu có thể.
+lesson.talk.adjust = Muốn chỉnh lại một quân cho ngay ngắn mà không đi nó, trước hết hãy nói “tôi chỉnh quân”.
+lesson.talk.release = Một khi bạn đã buông tay khỏi quân cờ ở ô mới, nước đi coi như đã xong.
+lesson.talk.sheet = Trong các giải đấu, cả hai người chơi ghi lại mọi nước đi vào {@}biên bản ván đấu.
+# {move:letters} shows the Vietnamese scoresheet letters ("Mf3"), which is what this line teaches.
+lesson.talk.notation = Chúng ta ghi chữ cái của quân và ô đến, ví dụ {move:letters}. Với Tốt thì chỉ ghi ô.
+lesson.talk.robot = Robot của bạn sẽ ghi nước đi giúp bạn. Trong các ván đấu nhanh, không bắt buộc phải ghi biên bản.
+lesson.talk.handshake = Ván cờ bắt đầu và kết thúc bằng một cái bắt tay. Nó có nghĩa là: ván cờ hay, và cảm ơn bạn.
+lesson.talk.polite = Dù thắng hay thua, hãy luôn lịch sự, và đừng bao giờ làm phiền đối thủ khi họ đang suy nghĩ.
+lesson.talk.tips = Ba lời khuyên cho các ván cờ của bạn: {@}kiểm soát trung tâm, {@2}đưa Mã và Tượng ra, và {@3}nhập thành sớm.
+lesson.talk.next = Khi bạn sẵn sàng, hãy chọn “Những bước đầu”. Tôi sẽ chơi nhẹ nhàng và giúp bạn sau mỗi sai lầm.
+lesson.talk.welcome = Chào mừng bạn đến với cờ vua! Chúng ta bắt tay nhé.

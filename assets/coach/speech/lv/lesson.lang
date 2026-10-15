@@ -200,7 +200,7 @@ lesson.mate3.hint = Piesaki šahu pa pēdējo horizontāli ar to torni, kas nesa
 lesson.mate3.ok = Mats! Abi torņi strādāja kā kāpnes.
 
 # ---- Chapter 5: castling ---------------------------------------------------------------------------------------
-lesson.castle.what = Rokāde ir īpašs gājiens, kas palīdz parūpēties par karaļa drošību. Karalis un tornis pārvietojas kopā.
+lesson.castle.what = Rokāde ir īpašs gājiens, kas gādā par tava karaļa drošību. Karalis un tornis pārvietojas kopā.
 lesson.castle.how = {@}Karalis paiet divus lauciņus torņa virzienā, un {@2}tornis pārlec pāri karalim uz tā otru pusi.
 lesson.castle.ask = Vienmēr vispirms pieskaries karalim. Tagad tu: veic īso rokādi karaļa flangā.
 lesson.castle.rook = Tā tu pārvieto tikai torni. Lai veiktu rokādi, pārvieto karali divus lauciņus torņa virzienā.
