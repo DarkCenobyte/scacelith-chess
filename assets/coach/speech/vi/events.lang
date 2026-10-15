@@ -32,7 +32,7 @@ event.colour.black.2 = Lần này bạn chơi bên Đen: tôi đi trước.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of the coach page (assets/i18n/vi.lang coach.level.<n>.name).
-event.level.l1 = Những bước đầu: tôi chơi nhẹ nhàng và giải thích mọi sai lầm bằng lời lẽ đơn giản.
+event.level.l1 = Bước đầu: tôi chơi nhẹ nhàng và giải thích mọi sai lầm bằng lời lẽ đơn giản.
 event.level.l2 = Người mới chơi: tôi chơi mạnh hơn một chút, và gọi tên các đòn chiến thuật đơn giản như chĩa đôi và ghim.
 event.level.l3 = Đang tiến bộ: tôi nói về kế hoạch và cấu trúc Tốt, và chỉ ra những chuỗi nước đi ngắn.
 event.level.l4 = Kỳ thủ câu lạc bộ: tôi đưa ra đánh giá tính theo đơn vị Tốt và gợi ý các nước ứng viên.

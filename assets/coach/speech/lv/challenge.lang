@@ -15,10 +15,12 @@
 #            at it on that word
 # The player always has the white pieces. The coach says "tu" to the player and is male; the
 # player's gender is unknown (finite verbs only). "Mati" (plural of "mats") also means "hair", so
-# the titles say "mats" in the singular.
+# the titles say "mats" in the singular. The intro titles are the menu names (challenge.*.name in
+# assets/i18n/lv.lang), with the menus' "jūs" imperative said in the "tu" form ("Atrodi izeju",
+# "Aptur bandinieku" for "Atrodiet izeju", "Apturiet bandinieku").
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
-ch.intro.mate1 = Mats vienā gājienā. {n:position}: katrā matu piesaka viens vienīgs gājiens. Pārbaudi visus šahus.
+ch.intro.mate1 = Mats vienā gājienā. {n:position}: katrā matu var pieteikt ar vienu gājienu. Pārbaudi visus šahus.
 ch.intro.mate2 = Mats divos gājienos. {n:position}: tavam pirmajam gājienam jāatstāj mani bez aizsardzības, pēc tam tu piesaki matu.
 ch.intro.mate3 = Mats trijos gājienos. {n:position}. Šahi, ņemšanas un draudi: katru reizi aprēķini manu labāko atbildi.
 ch.intro.backrank = Mats pa pēdējo horizontāli. {n:position}: karalis ir iesprostots aiz saviem bandiniekiem.

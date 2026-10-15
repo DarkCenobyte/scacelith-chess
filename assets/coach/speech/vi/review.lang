@@ -1,0 +1,211 @@
+# Coach speech (Vietnamese): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach calls himself "tôi" and the player "bạn" ("we / let's" = "chúng ta"), as in the
+# glossary (glossary/vi.md). Vietnamese has no gender agreement: nothing depends on the player's gender.
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their owner ("con Mã của bạn"). Forms from
+# common.lang: short ("Mã của bạn", terse levels), bare ("con Mã": the same piece named again, or two
+# pieces of one owner with the owner said once: "{t1:bare} và {t2}" = "con Vua và con Hậu của bạn"),
+# noun ("Mã"), of ("của bạn"), refl ("con Mã của mình").
+# No word is glued to a square or a move: squares follow the noun "ô" ("ở ô {sq}"), moves often follow
+# "nước" ("Nước {move} là một sai lầm."). Counts: {pts:point} "3 điểm", {m:move} "2 nước", {n:time}
+# "2 lần", {n:attacker} / {n2:defender}; where English gives a piece's value as a bare number ("is
+# worth {n}"), the line says {n:point} ("đáng giá 3 điểm").
+# Terms: blunder = sai lầm nghiêm trọng, serious mistake = sai lầm nặng, dubious = đáng ngờ, hanging =
+# không được bảo vệ (terse: bị treo), take for free = ăn không, forced mate = chiếu hết bắt buộc,
+# opposition = thế đối Vua, the square (pawn race) = hình vuông. A better move = "nước (đi) hay hơn",
+# never "nước đi tốt": spoken "tốt" sounds like "Tốt" (pawn).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Chiếu! Con Vua của tôi bị tấn công.
+ann.check.human.b1.2 = Chiếu! Bạn đang tấn công con Vua của tôi.
+ann.check.human.b1.3 = Chiếu rồi! Con Vua của tôi phải thoát chiếu.
+ann.check.human = Chiếu.
+ann.check.human.2 = Chiếu!
+ann.check.human.3 = Và thế là chiếu.
+# The coach gives check.
+ann.check.coach = Chiếu!
+ann.check.coach.2 = Chiếu.
+ann.check.coach.3 = Và chiếu!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Như vậy nghĩa là {your} đang bị tấn công. Bạn phải giúp nó thoát chiếu.
+ann.check.coach.first.2 = Chiếu nghĩa là {your} đang bị tấn công. Hãy di chuyển nó, chặn lại, hoặc bắt quân của tôi.
+ann.double_check.coach = Chiếu đôi! Hai quân của tôi cùng lúc tấn công con Vua của bạn, nên nó phải chạy.
+ann.double_check.coach.2 = Đó là chiếu đôi: giờ chỉ có nước đi Vua mới cứu được bạn.
+ann.double_check.human = Chiếu đôi! Hai quân của bạn cùng lúc tấn công con Vua của tôi, nên nó phải chạy.
+ann.double_check.human.2 = Chiếu đôi! Giờ chỉ có nước đi Vua mới cứu được tôi.
+# The player checkmates the coach.
+ann.mate.human.b1 = Chiếu hết! Bạn thắng rồi! Con Vua của tôi không thể thoát.
+ann.mate.human.b1.2 = Chiếu hết rồi! Giỏi lắm, bạn đã thắng ván cờ!
+ann.mate.human.b1.3 = Chiếu hết! Con Vua của tôi bị vây chặt. Chúc mừng bạn!
+ann.mate.human = Chiếu hết. Chơi hay lắm.
+ann.mate.human.2 = Chiếu hết rồi. Chúc mừng bạn.
+ann.mate.human.3 = Chiếu hết! Làm tốt lắm.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Chiếu hết rồi. Con Vua của bạn không còn đường thoát.
+ann.mate.coach.b1.2 = Chiếu hết. Con Vua của bạn bị tấn công và không thể thoát.
+ann.mate.coach.b1.3 = Rất tiếc, chiếu hết rồi. Con Vua của bạn không chạy thoát được.
+ann.mate.coach = Chiếu hết.
+ann.mate.coach.2 = Và thế là chiếu hết.
+ann.mate.coach.3 = Chiếu hết rồi, rất tiếc.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ối! Nước này làm bạn thiệt rồi.
+ex.verdict.blunder.b1.2 = Cẩn thận! Nước này có thể khiến bạn thiệt.
+ex.verdict.blunder.b1.3 = Ồ, khoan đã. Nước này có vấn đề.
+ex.verdict.blunder.b2 = Hừm, nước này có vấn đề.
+ex.verdict.blunder.b2.2 = Đó là một sai lầm lớn.
+ex.verdict.blunder.b2.3 = Cẩn thận, nước này làm bạn thiệt đấy.
+ex.verdict.blunder.b3 = Đó là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b3.2 = Nước {move} là một sai lầm thật sự.
+ex.verdict.blunder.b3.3 = Ôi, nước {move} là một sai lầm lớn.
+ex.verdict.blunder.b4 = Nước {move} là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b4.2 = Nước {move} là một sai lầm nặng.
+ex.verdict.blunder.b4.3 = Rất tiếc, đó là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b5 = Nước {move} là một sai lầm nặng.
+ex.verdict.blunder.b5.2 = {move} là sai lầm nghiêm trọng.
+ex.verdict.blunder.b5.3 = {move} là một sai lầm đắt giá.
+ex.verdict.blunder.b6 = {move}: sai lầm nặng.
+ex.verdict.blunder.b6.2 = {move} là sai lầm nghiêm trọng.
+ex.verdict.blunder.b6.3 = {move}? Sai lầm nghiêm trọng.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ối! Bạn chưa đối phó với mối đe dọa của tôi.
+ex.verdict.ignored.b1.2 = Cẩn thận! Mối đe dọa của tôi vẫn còn đó.
+ex.verdict.ignored.b1.3 = Ồ, khoan đã. Bạn quên mối đe dọa của tôi rồi.
+ex.verdict.ignored.b2 = Hừm, mối đe dọa của tôi vẫn còn đó.
+ex.verdict.ignored.b2.2 = Bạn đã bỏ qua mối đe dọa của tôi.
+ex.verdict.ignored.b2.3 = Cẩn thận, bạn chưa đối phó với mối đe dọa của tôi.
+ex.verdict.mistake.b3 = Đó không phải là nước đi hay.
+ex.verdict.mistake.b3.2 = Hừm, nước {move} có vấn đề.
+ex.verdict.mistake.b3.3 = Đó là một sai lầm.
+ex.verdict.mistake.b4 = Nước {move} là một sai lầm.
+ex.verdict.mistake.b4.2 = Nước {move} không ổn.
+ex.verdict.mistake.b4.3 = Đó là một sai lầm.
+ex.verdict.mistake.b5 = Nước {move} rõ ràng là một sai lầm.
+ex.verdict.mistake.b5.2 = {move} là một sai lầm.
+ex.verdict.mistake.b5.3 = {move} không ổn.
+ex.verdict.mistake.b6 = {move}: sai lầm.
+ex.verdict.mistake.b6.2 = {move}? Sai lầm.
+ex.verdict.mistake.b6.3 = Không phải {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Không tệ, nhưng nước {best} hay hơn một chút.
+ex.verdict.inaccuracy.b3.2 = Nước {best} chính xác hơn một chút.
+ex.verdict.inaccuracy.b3.3 = Một sơ suất nhỏ: ở đây nước {best} hay hơn.
+ex.verdict.inaccuracy.b4 = Thiếu chính xác: nước {best} chính xác hơn.
+ex.verdict.inaccuracy.b4.2 = Hơi thiếu chính xác. Nước {best} hay hơn một chút.
+ex.verdict.inaccuracy.b4.3 = Chưa phải nước tốt nhất: nước {best} chính xác hơn.
+ex.verdict.inaccuracy.b5 = Nước {move} thiếu chính xác; {best} mạnh hơn.
+ex.verdict.inaccuracy.b5.2 = Hơi thiếu chính xác. Là tôi thì tôi đã đi {best}.
+ex.verdict.inaccuracy.b5.3 = Nước {best} chính xác hơn nước {move}.
+ex.verdict.inaccuracy.b6 = {move} thiếu chính xác; {best}.
+ex.verdict.inaccuracy.b6.2 = Thiếu chính xác. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} hay hơn.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Có lẽ nước {best} chính xác hơn một chút.
+ex.verdict.inaccuracy.maybe.2 = Có lẽ tôi sẽ đi {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Nước đi này trông đáng ngờ.
+ex.verdict.dubious.2 = Nước đi này có vẻ đáng ngờ.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ồ, khoan đã! Bạn đã bỏ lỡ một nước hay.
+ex.verdict.missed.b1.2 = Hãy nhìn lại! Có nước hay hơn đấy.
+ex.verdict.missed.b1.3 = Khoan, lúc nãy bạn có cơ hội đấy!
+ex.verdict.missed.b2 = Bạn đã bỏ lỡ một cơ hội.
+ex.verdict.missed.b2.2 = Hừm, có nước hay hơn đấy.
+ex.verdict.missed.b2.3 = Khoan, lúc nãy bạn có một nước rất hay.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Nước hay hơn là {best}.
+ex.better.b3.2 = {best} là nước đi hay hơn.
+ex.better.b3.3 = Thay vào đó, đi {best} thì hay.
+ex.better.b4 = {best} mạnh hơn.
+ex.better.b4.2 = Nước đúng là {best}.
+ex.better.b4.3 = Nên đi {best} thì hơn.
+ex.better.b5 = {best}, với ý đồ {line}.
+ex.better.b5.2 = Nước cần đi là {best}: {line}.
+ex.better.b5.3 = Hay hơn là {best}, tiếp theo là {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Nên đi {best}, {eval}.
+ex.better.b6.3 = {best} cho {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Có một nước hay hơn cho {your}.
+ex.hint.b1.2 = {your} có một nước đi hay hơn.
+ex.hint.b2 = {your} có một nước đi hay hơn.
+ex.hint.b2.2 = Có một nước hay hơn cho {your}.
+ex.hint.b3 = {your} có một nước đi hay hơn.
+ex.hint.b3.2 = Có nước hay hơn cho {your}.
+ex.hint.b4 = {your} có một nước đi hay hơn.
+ex.hint.b4.2 = Hãy nhìn lại {your}: nó có nước hay hơn.
+ex.hint.b5 = {your} có một nước mạnh hơn.
+ex.hint.b5.2 = Có một nước mạnh hơn cho {your}.
+ex.hint.b6 = {your:short} có nước hay hơn.
+ex.hint.b6.2 = Xem lại {your}.
+ex.hint.move = Đã có một nước đi hay hơn.
+ex.hint.move.2 = Lúc đó bạn có nước đi hay hơn.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} có một nước hay hơn. Nước đó ăn được quân.
+ex.hint.gain.b1.2 = Có một nước hay hơn cho {your}. Nước đó ăn được quân.
+ex.hint.gain.b2 = {your} có một nước hay hơn. Nước đó ăn được quân.
+ex.hint.gain.b2.2 = {your} có một nước giúp bạn ăn được quân.
+ex.hint.gain.b3 = {your} có một nước hay hơn, một nước ăn được quân.
+ex.hint.gain.b3.2 = {your} có một nước giúp bạn ăn được quân.
+ex.hint.gain.b4 = {your} có một nước giúp giành lợi thế lực lượng.
+ex.hint.gain.b4.2 = Hãy nhìn lại {your}: nó có một nước giúp giành lợi thế lực lượng.
+ex.hint.gain.b5 = {your} có một nước mạnh hơn, một nước giành lợi thế lực lượng.
+ex.hint.gain.b5.2 = {your} có một nước giúp giành lợi thế lực lượng.
+ex.hint.gain.b6 = {your:short} có một nước giành lợi thế lực lượng.
+ex.hint.gain.b6.2 = Xem lại {your}: đã có quân để ăn.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Nước hay hơn là đi {your} đến ô {sq}.
+ex.reveal.b1.2 = {your} có thể đi đến ô {sq}. Như thế hay hơn.
+ex.reveal.b2 = Đi {your} đến ô {sq} là nước hay hơn.
+ex.reveal.b2.2 = Nước hay hơn là đi {your} đến ô {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Chúng ta đặt các quân lại chỗ cũ nhé.
+ex.rewind.b1.2 = Giờ tôi sẽ đặt mọi thứ về như cũ.
+ex.rewind.b1.3 = Để tôi xếp các quân lại nhé.
+ex.rewind.b2 = Chúng ta đặt lại mọi thứ nhé.
+ex.rewind.b2.2 = Quay lại chỗ lúc nãy.
+ex.rewind.b2.3 = Tôi sẽ đặt các quân lại.
+ex.rewind.b3 = Quay lại ván cờ.
+ex.rewind.b3.2 = Chúng ta quay lại nhé.
+ex.rewind.b3.3 = Quay lại thế cờ.
+ex.rewind.b4 = Quay lại ván cờ.
+ex.rewind.b4.2 = Quay lại.
+ex.rewind.b4.3 = Quay lại nào.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Bạn có muốn thử nước khác không?
+ex.offer.b1.2 = Bạn có muốn đi lại nước đó và thử lần nữa không?
+ex.offer.b1.3 = Chúng ta thử một nước khác nhé?
+ex.offer.b2 = Bạn muốn thử một nước khác không?
+ex.offer.b2.2 = Bạn có muốn đi lại không?
+ex.offer.b2.3 = Thử lại nhé?
+ex.offer.b3 = Bạn có muốn đi lại nước này không?
+ex.offer.b3.2 = Bạn có muốn thử lại không?
+ex.offer.b3.3 = Đi lại nhé?
+ex.offer.b4 = Đi lại không?
+ex.offer.b4.2 = Bạn muốn đi lại không?
+ex.offer.b4.3 = Thử nước khác không?
+ex.offer.b5 = Đi lại?
+ex.offer.b5.2 = Muốn đi lại không?
+ex.offer.b5.3 = Đi lại không?
+ex.offer.b6 = Đi lại?
+ex.offer.b6.2 = Đi lại không?
+ex.offer.b6.3 = Thử lại?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Nước đi này đáng ngờ. Có lẽ bạn đi được nước hay hơn?
+ex.dubious.b1.2 = Nước đi này đáng ngờ. Bạn thử tìm nước hay hơn xem?
+ex.dubious.b2 = Một nước đi đáng ngờ. Có lẽ bạn đi được nước hay hơn?
+ex.dubious.b2.2 = Nước đi này đáng ngờ. Có lẽ còn nước hay hơn?
