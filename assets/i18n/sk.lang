@@ -1,0 +1,518 @@
+# Scacelith - Slovenčina
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1)|few (2-4)|other (0, 5 and more).
+# Register: formal "vy" (lower case mid-sentence), as Microsoft and Apple Slovak software; instructions
+# in the formal imperative ("Vyberte", "Zadajte"), buttons, menu entries and commands in the infinitive
+# ("Uložiť", "Vzdať partiu"); sentence case, never Title Case. Titles are in capitals (the title face
+# is an inscriptional capital face).
+# The player's gender is unknown: the formal past tense is plural and neutral ("vyhrali ste"), but no
+# adjective, passive participle or "sám/sami" about the player ("ste prihlásený"): nouns or impersonal
+# phrasing instead ("Odhlásenie prebehlo", "Kódy mám uložené").
+# Chess terms of the Slovak chess federation and the Slovak FIDE Laws: pešiak, jazdec, strelec, veža,
+# dáma, kráľ; partiár (scoresheet), tempo hry (time control), rating, remíza, nemožný ťah (illegal
+# move), rozhodca (arbiter), polťah (ply). White / Black as players: "biely" / "čierny".
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Zapnuté
+common.off = Vypnuté
+common.back = Späť
+common.apply = Použiť
+common.discard = Zahodiť
+common.cancel = Zrušiť
+common.white = Biely
+common.black = Čierny
+common.main_menu = Hlavná ponuka
+# Decimal separator of numbers ("2,5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kráľovská hra
+menu.new_game = Nová partia
+menu.options = Možnosti
+menu.credits = Autori
+menu.quit = Ukončiť
+menu.version = Verzia {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = MOŽNOSTI
+options.tab.display = Obrazovka
+options.tab.graphics = Grafika
+options.tab.audio = Zvuk
+options.tab.gameplay = Hra
+options.tab.player = Hráč
+options.tab.controls = Ovládanie
+options.pending = Zmeny sa prejavia po ich použití.
+options.unsaved.title = NEULOŽENÉ ZMENY
+options.unsaved.text = Niektoré možnosti sa zmenili. Chcete ich pred odchodom použiť?
+
+options.language = Jazyk
+options.language.help = Jazyk ponúk a správ. Zmení sa okamžite.
+options.display_mode = Režim zobrazenia
+options.display_mode.help = Celá obrazovka: okno bez okrajov cez celú obrazovku, v rozlíšení pracovnej plochy. V okne: okno s veľkosťou nastavenou nižšie.
+options.fullscreen = Celá obrazovka
+options.windowed = V okne
+options.window_size = Veľkosť okna
+options.window_size.help = Veľkosť okna v režime okna. Celá obrazovka vždy používa rozlíšenie pracovnej plochy.
+options.vsync = Vertikálna synchronizácia
+options.vsync.help = Synchronizuje snímky s obrazovkou, aby sa obraz netrhal.
+options.render_scale = Mierka vykresľovania
+options.render_scale.help = Vnútorné rozlíšenie 3D obrazu. Nižšie je rýchlejšie, vyššie je ostrejšie.
+
+# Quality levels: feminine, agreeing with "kvalita" (also shown for each option below).
+options.quality = Kvalita
+options.quality.very_low = Veľmi nízka
+options.quality.low = Nízka
+options.quality.medium = Stredná
+options.quality.high = Vysoká
+options.quality.ultra = Ultra
+options.quality.custom = Vlastná
+options.quality.help = Nastaví naraz všetky možnosti nižšie: Veľmi nízka vypne všetky efekty, Ultra ich všetky nastaví na maximum. Keď zmeníte jednu možnosť samostatne, kvalita sa prepne na Vlastná. Na slabšej grafickej karte veľmi pomôže aj zníženie mierky vykresľovania (Obrazovka).
+options.shadows = Tiene
+options.shadows.help = Podrobnosť slnečných tieňov a mäkkosť ich okrajov. Nízka: jednoduché okraje, rýchle vykresľovanie.
+options.reflections = Odrazy
+options.reflections.help = Podlaha, stôl a šachovnica odrážajú sálu (tá sa pre každý z nich vykresľuje ešte raz: patrí to k najnáročnejším možnostiam); od úrovne Stredná odrážajú svoje okolie aj lesklé figúry a predmety.
+options.ambient_occlusion = Ambientná oklúzia
+options.ambient_occlusion.help = Jemné tieňovanie tam, kde sa predmety stretávajú, a v priehlbinách, kam preniká menej svetla.
+options.indirect_light = Nepriame svetlo
+options.indirect_light.help = Denné svetlo odrazené od stien, podlahy a stropu. Nízka: namiesto neho rovnomerné okolité svetlo. Ovplyvňuje najmä čas načítania.
+options.volumetric_light = Svetelné lúče
+options.volumetric_light.help = Lúče slnečného svetla v prašnom vzduchu sály a čiastočky prachu, ktoré sa v nich trblietajú.
+options.tessellation = Teselácia
+options.tessellation.help = Hladké obrysy na zaobleniach figúr pri pohľade zblízka.
+options.tessellation.unavailable = Nie je k dispozícii: tento grafický ovládač nepodporuje teseláciu.
+options.antialiasing = Vyhladzovanie hrán
+options.antialiasing.help = Vyhladzuje zubaté hrany a mihotavé odlesky. Vypnuté: ostrejší, ale zubatý obraz a niektoré efekty pôsobia zrnito.
+options.depth_of_field = Hĺbka ostrosti
+options.depth_of_field.help = Rozostrí to, čo je výrazne pred alebo za tým, na čo sa pozeráte, ako to robí objektív fotoaparátu.
+options.motion_blur = Rozmazanie pohybu
+options.motion_blur.help = Rozmazáva rýchle pohyby kamery a rúk, ako to robí filmová kamera.
+options.bloom = Žiara
+options.bloom.help = Jemná žiara okolo najjasnejších odleskov, ako v objektíve fotoaparátu.
+options.brightness = Jas
+options.brightness.neutral = Neutrálny
+options.brightness.value = {0} EV
+options.brightness.help = Korekcia expozície kamery. Kalibrácia pri prvom spustení ho nastaví tak, aby boli najtmavšie tiene sotva viditeľné.
+
+options.master_volume = Celková hlasitosť
+options.effects = Efekty
+options.ambience = Zvuky prostredia
+options.ambience.help = Šum sály: oheň, vzdialené kroky, staré hodiny.
+options.ambience_volume = Hlasitosť prostredia
+options.voice_volume = Hlasitosť hlasu
+options.voice_volume.help = Hlasitosť hlasu trénera v režime trénera.
+options.subtitles = Titulky
+options.subtitles.auto = Automaticky
+options.subtitles.help = Slová trénera vypísané v dolnej časti obrazovky. Automaticky: zobrazia sa, keď tréner nehovorí jazykom ponúk (pri čínskych ponukách hovorí po anglicky). Zobrazia sa vždy, keď jeho hlas nie je nainštalovaný.
+
+options.legal_moves = Zobraziť možné ťahy
+options.legal_moves.help = Zvýrazní polia, na ktoré môže dotknutá figúra ťahať. Keď je vypnuté, nič vám neprezradí, či je ťah možný: nemožný ťah rozhodca potrestá, hneď ako stlačíte hodiny.
+options.coordinates = Súradnice šachovnice
+options.auto_press = Automaticky stláčať hodiny
+options.auto_press.help = Váš robot stlačí hodiny sám, hneď ako je váš ťah na šachovnici. V online partiách o tom rozhoduje server a v priamom zápase hostiteľ.
+options.thinking_time = Realistický čas na premýšľanie
+options.thinking_time.help = Súper si dáva na čas ako ľudský hráč, namiesto aby ťahal okamžite.
+options.ignore_head = Ignorovať pohyby súperovej hlavy
+options.ignore_head.help = V online partiách a priamych zápasoch sa súperov robot pozerá tam, kam sa pozerá jeho hráč. Keď je zapnuté, hýbe hlavou sám, ako proti Stockfishu.
+options.mouse_sensitivity = Citlivosť myši
+options.invert_look = Invertovať os Y pohľadu
+options.handover = Striedanie hráčov
+options.handover.cut = Okamžitý strih
+options.handover.flight = Prelet, {0} s
+options.handover.help = Dvaja hráči za jedným počítačom: ako sa po každom ťahu pohľad presunie z očí jedného hráča do očí druhého. Okamžitý strih sa vyhne pohybu kamery.
+options.game_cursor = Herný kurzor
+options.game_cursor.help = Pri stole hra kreslí vlastný kurzor, ktorý ukazuje, čo urobí kliknutie. Vypnuté: bežná systémová šípka.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Meno
+player.name.help = Vaše meno tak, ako sa píše do hlavičky partiárov, v ľubovoľnom písme.
+player.default_name = Človek
+player.handwriting = Rukopis
+player.handwriting.help = Ruka, ktorá zapisuje vaše ťahy. Arabčina, japončina a čínština sa píšu vlastným rukopisom.
+player.preview = NA VAŠOM PARTIÁRI
+# Handwriting styles: adjectives agreeing with "rukopis" (m).
+hand.caveat = Ležérny
+hand.marck = Krasopisný
+hand.badscript = Šikmý
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+# Actions in the infinitive, as Slovak control lists.
+controls.touch.keys = Ľavé tlačidlo myši
+controls.touch = Dotknúť sa figúry, potom ňou ťahať
+controls.clock.keys = Medzerník  alebo  kliknutie na hodiny
+controls.clock = Stlačiť hodiny
+controls.look.keys = Pravé tlačidlo myši, podržať
+controls.look = Rozhliadnuť sa
+controls.sheet.keys = S
+controls.sheet = Pozrieť sa na partiár a späť
+controls.stand.keys = ↑
+controls.stand = Postaviť sa pred stoličku
+controls.side.keys = ←  /  →
+controls.side = Postaviť sa k ľavému / pravému koncu stola
+controls.sit.keys = ↓
+controls.sit = Znova si sadnúť (hrá sa iba v sede)
+controls.moves.keys = Tab
+controls.moves = Zobraziť alebo skryť zoznam ťahov
+controls.menu.keys = Esc
+controls.menu = Ponuka
+controls.coach_skip.keys = Medzerník
+controls.coach_skip = Tréner: preskočiť, čo práve hovorí
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Tréner: vrátiť ťah, keď to ponúkne
+controls.coach_hint.keys = H
+controls.coach_hint = Výzvy trénera: požiadať o nápovedu
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = JAS
+calibration.text = Posúvajte ovládač, kým jazdec na čiernom poli nebude sotva viditeľný alebo kým celkom nezmizne.
+calibration.later = Neskôr ho môžete zmeniť v časti Možnosti > Grafika.
+calibration.continue = Pokračovať
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOVÁ PARTIA
+newgame.opponent = SÚPER
+newgame.time_control = TEMPO HRY
+newgame.start = Začať
+newgame.elo = ~{0} Elo
+newgame.you_white = Budete hrať bielymi.
+newgame.you_black = Budete hrať čiernymi.
+newgame.colour_lot = O farbách v prvej partii rozhodne žreb.
+newgame.colour_alternate = Potom sa farby z partie na partiu striedajú.
+newgame.opponent_kind = Súper
+newgame.opponent_kind.help = Hrajte so Stockfishom alebo s priateľom pri tomto počítači: ťaháte striedavo, každý zo svojej strany šachovnice.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Človek, ten istý počítač
+
+# Custom opponent: Stockfish parameters
+engine.skill = Úroveň hry
+engine.skill.help = „Skill Level“ Stockfishu (0–20). Ignoruje sa, kým je sila obmedzená podľa Elo.
+engine.limit_elo = Obmedziť silu (Elo)
+engine.limit_elo.help = UCI_LimitStrength: program sa snaží hrať na úrovni ratingu Elo nastaveného nižšie.
+engine.elo = Elo
+engine.depth = Hĺbka výpočtu
+engine.plies = {0} polťah|{0} polťahy|{0} polťahov
+engine.move_time = Čas na ťah
+engine.nodes = Limit uzlov
+engine.no_limit = Vypnuté
+# Abbreviations (tis. = tisíc, mil. = milión): one form fits every count.
+engine.thousand = {0} tis.
+engine.million = {0} mil.
+engine.dynamic_elo = Dynamické Elo podľa času
+engine.dynamic_elo.help = Ako ľudský hráč, aj Stockfish hrá slabšie, keď mu na hodinách dochádza čas: trochu v poslednej minúte (v rapide a bleskovom šachu skôr), oveľa slabšie v časovej tiesni. Iba v partiách s hodinami.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish si dáva na čas ako človek jeho úrovne. Ak chcete túto pauzu vynechať: Možnosti > Hra > Realistický čas na premýšľanie.
+engine.pace.instant = Stockfish ťahá hneď, ako ťah vypočíta. Ak chcete pauzy ako u človeka: Možnosti > Hra > Realistický čas na premýšľanie.
+
+# Time controls ("3+2": minutes + increment in seconds)
+# Categories as the Slovak chess federation names them: bleskový šach (blitz), rapid šach (rapid),
+# klasický šach (classical), adjectives agreeing with "šach"; "bullet" has no federation word and stays.
+tc.unlimited = Bez obmedzenia
+tc.no_clock = Bez hodín
+tc.bullet = Bullet
+tc.blitz = Bleskový
+tc.rapid = Rapid
+tc.classical = Klasický
+tc.custom = Vlastné
+tc.your_own = Na mieru
+tc.base_time = Základný čas
+tc.base_time.help = Počiatočný čas na každých hodinách (minúty : sekundy).
+tc.increment = Prírastok
+tc.increment.help = Fischerov prírastok pridaný po každom ťahu.
+tc.delay = Oneskorenie
+tc.delay.help = Bronsteinovo oneskorenie: čas spotrebovaný v rámci tohto oneskorenia sa po každom ťahu vráti.
+tc.no_delay = Vypnuté
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, oneskorenie {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Nováčik
+preset.novice.desc = Ťahy pozná len chvíľu: nechá visieť figúry a prehliada jednoduché hrozby.
+preset.beginner.name = Začiatočník
+preset.beginner.desc = Pozná základy, ale stále pravidelne stráca materiál hrubými chybami.
+preset.casual.name = Rekreačný hráč
+preset.casual.desc = Pohodový súper na večer: rozumné ťahy, časté chyby.
+preset.club_player.name = Klubový hráč
+preset.club_player.desc = Solídny klubový hráč, ktorý trestá zjavné hrubé chyby.
+preset.advanced.name = Pokročilý
+preset.advanced.desc = Silný klubový hráč s dobrým taktickým videním.
+preset.expert.name = Expert
+preset.expert.desc = Turnajový expert: chybuje zriedka, výhodu premení na víťazstvo.
+preset.master.name = Majster
+preset.master.desc = Majstrovská sila: hlboký výpočet a jemná pozičná hra.
+preset.grandmaster.name = Veľmajster
+preset.grandmaster.desc = Úroveň veľmajstra: poraziť ho je mimoriadne ťažké.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 v plnej sile. Veľa šťastia.
+preset.custom.name = Vlastný
+preset.custom.desc = Vaše vlastné nastavenia programu.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = AUTORI
+credits.game.head = SCACELITH
+credits.game = Šachová partia v kráľovskej sále, na vlastnom grafickom jadre s OpenGL 4.6.
+credits.engine.head = ŠACHOVÝ PROGRAM
+credits.engine = Stockfish 19 od vývojárov Stockfishu.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Jeho neurónová sieť bola natrénovaná na dátach projektu Leela Chess Zero, ktoré sú dostupné pod licenciou Open Database License (ODbL).
+credits.voice.head = HLAS TRÉNERA
+credits.voice = Syntetickú reč pre režim trénera generuje Supertonic 3.
+credits.voice.licence = Supertonic 3 je model spoločnosti Supertone, používaný na základe licencie OpenRAIL-M, ktorej obmedzenia použitia platia pre každého, kto ho používa (pozri Licencie).
+credits.openings.head = OTVORENIA
+credits.openings = Názvy otvorení z databázy chess-openings webu lichess.org, uvoľnenej do verejnej domény (CC0).
+credits.fonts.head = PÍSMA
+credits.fonts = EB Garamond od Georga Duffnera a Cinzel od Natanaela Gamu; Amiri od Khaleda Hosnyho.
+credits.fonts.hand = Rukopisné písma: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Symboly šachových figúr z písma GNU FreeFont (GPL v3 s výnimkou pre písma).
+credits.quote = „Šach je umenie analýzy.“  — Michail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licencie
+licences.title = LICENCIE
+licences.note = Licencie sú zobrazené v pôvodnom anglickom znení.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+# Claim a draw = "požiadať o remízu" (Slovak FIDE Laws), offer a draw = "ponúknuť remízu".
+pause.title = PAUZA
+pause.resume = Pokračovať
+pause.offer_draw = Ponúknuť remízu
+pause.claim_draw = Požiadať o remízu
+pause.claim_draw.help = Trojnásobné opakovanie pozície alebo pravidlo 50 ťahov.
+pause.resign = Vzdať partiu
+confirm.resign.title = VZDAŤ PARTIU
+confirm.resign.text = Vzdať túto partiu? Víťazom bude vyhlásený súper.
+confirm.resign.draw = Vzdať túto partiu? Súper už nemôže dať mat: partia skončí remízou.
+confirm.resign.ok = Vzdať sa
+confirm.leave.title = OPUSTIŤ PARTIU
+confirm.leave.text = Vrátiť sa do hlavnej ponuky? Rozohraná partia sa ukončí.
+confirm.leave.ok = Odísť
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PREMENIŤ NA
+piece.queen = Dáma
+piece.rook = Veža
+piece.bishop = Strelec
+piece.knight = Jazdec
+
+# ---- Game over ---------------------------------------------------------------------------------
+# "po {0} ťahu|ťahoch", "v {0} ťahu|ťahoch": locative, singular only for 1.
+gameover.draw = Partia skončila remízou.
+gameover.draw_moves = Partia skončila remízou po {0} ťahu.|Partia skončila remízou po {0} ťahoch.|Partia skončila remízou po {0} ťahoch.
+gameover.win = Dobre zahrané – vyhrali ste.
+gameover.win_moves = Dobre zahrané – vyhrali ste v {0} ťahu.|Dobre zahrané – vyhrali ste v {0} ťahoch.|Dobre zahrané – vyhrali ste v {0} ťahoch.
+gameover.loss = Vyhral súper.
+gameover.loss_moves = Súper vyhral v {0} ťahu.|Súper vyhral v {0} ťahoch.|Súper vyhral v {0} ťahoch.
+gameover.rematch = Odveta
+gameover.view_board = Pozrieť šachovnicu
+gameover.show = Zobraziť
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Mat
+reason.resignation = Vzdanie sa
+reason.timeout = Prehra na čas
+reason.illegal_moves = Druhý nemožný ťah (prehra)
+reason.stalemate = Pat
+reason.insufficient = Mŕtva pozícia (nedostatočný materiál)
+reason.timeout_vs_insufficient = Čas vypršal, ale súper nemôže dať mat
+reason.fivefold = Päťnásobné opakovanie pozície
+reason.75_moves = Pravidlo 75 ťahov
+reason.threefold_claim = Trojnásobné opakovanie pozície (na žiadosť)
+reason.50_moves_claim = Pravidlo 50 ťahov (na žiadosť)
+reason.agreement = Remíza dohodou
+reason.illegal_vs_insufficient = Druhý nemožný ťah, ale súper nemôže dať mat
+reason.resignation_vs_insufficient = Vzdanie sa, ale súper nemôže dať mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ŤAHY
+movelist.empty = Zatiaľ žiadne ťahy.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Príprava materiálov
+loading.hall = Stavanie sály
+loading.furniture = Vyrezávanie stola a stoličiek
+loading.board = Leštenie šachovnice
+loading.pieces = Sústruženie šachových figúr
+loading.clock = Skladanie hodín
+loading.porcelain = Vypaľovanie porcelánu
+loading.ready = Pripravené
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move: "Pravidlo dotyku" (FIDE: a touched piece must be moved).
+notify.no_draw_claim = V tejto pozícii nemožno požiadať o remízu.
+notify.flag_you = Váš čas vypršal.
+notify.flag_opponent = Súperovi vypršal čas.
+notify.touched.pawn = Pravidlo dotyku: musíte ťahať pešiakom, ktorého ste sa dotkli.
+notify.touched.knight = Pravidlo dotyku: musíte ťahať jazdcom, ktorého ste sa dotkli.
+notify.touched.bishop = Pravidlo dotyku: musíte ťahať strelcom, ktorého ste sa dotkli.
+notify.touched.rook = Pravidlo dotyku: musíte ťahať vežou, ktorej ste sa dotkli.
+notify.touched.queen = Pravidlo dotyku: musíte ťahať dámou, ktorej ste sa dotkli.
+notify.touched.king = Pravidlo dotyku: musíte ťahať kráľom, ktorého ste sa dotkli.
+notify.touched.piece = Pravidlo dotyku: musíte ťahať figúrou, ktorej ste sa dotkli.
+notify.touched_square = Pravidlo dotyku: musíte ťahať figúrou na poli {0}.
+notify.press_clock = Stlačením hodín dokončíte ťah (medzerník).
+notify.manual_clock = V tejto partii po každom ťahu stláčate hodiny ručne.
+notify.illegal = Nemožný ťah.
+notify.cannot_move = Tento ťah nemožno urobiť.
+notify.move_first = Pred stlačením hodín urobte ťah.
+notify.stance.sit_to_play = Ak chcete hrať, sadnite si (šípka nadol).
+notify.stance.first = Kým stojíte, hodiny bežia ďalej. Šípka nadol: znova si sadnúť.
+notify.stance.first_untimed = Hrať možno iba zo stoličky. Šípka nadol: znova si sadnúť.
+notify.stance.finish_move = Najprv dokončite ťah.
+notify.draw_already_offered = V tomto ťahu ste už remízu ponúkli.
+notify.draw_accepted = Súper prijíma remízu.
+notify.draw_declined = Súper odmieta ponuku remízy.
+notify.draw_claimed = Súper žiada o remízu.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+# White / Black as players: "biely" / "čierny", lower case mid-sentence as in Slovak chess books.
+arbiter.join = {0} {1}
+arbiter.no_move = Rozhodca: hodiny boli stlačené bez urobenia ťahu, čo sa počíta ako nemožný ťah.
+arbiter.unpromoted = Rozhodca: nemožný ťah, pešiak nebol pred stlačením hodín nahradený novou figúrou.
+arbiter.illegal = Rozhodca: nemožný ťah.
+arbiter.second_loses.white = Toto je druhý nemožný ťah bieleho: biely prehráva partiu.
+arbiter.second_loses.black = Toto je druhý nemožný ťah čierneho: čierny prehráva partiu.
+arbiter.second_draw.white = Toto je druhý nemožný ťah bieleho, ale čierny nemôže dať mat: partia končí remízou.
+arbiter.second_draw.black = Toto je druhý nemožný ťah čierneho, ale biely nemôže dať mat: partia končí remízou.
+arbiter.queen = Pešiak sa mení na dámu.
+arbiter.queen_one_minute.white = Pešiak sa mení na dámu a biely dostáva jednu minútu navyše.
+arbiter.queen_one_minute.black = Pešiak sa mení na dámu a čierny dostáva jednu minútu navyše.
+arbiter.queen_two_minutes.white = Pešiak sa mení na dámu a biely dostáva dve minúty navyše.
+arbiter.queen_two_minutes.black = Pešiak sa mení na dámu a čierny dostáva dve minúty navyše.
+arbiter.restored = Pozícia je obnovená.
+arbiter.restored_one_minute.white = Pozícia je obnovená a biely dostáva jednu minútu navyše.
+arbiter.restored_one_minute.black = Pozícia je obnovená a čierny dostáva jednu minútu navyše.
+arbiter.restored_two_minutes.white = Pozícia je obnovená a biely dostáva dve minúty navyše.
+arbiter.restored_two_minutes.black = Pozícia je obnovená a čierny dostáva dve minúty navyše.
+arbiter.one_minute.white = Biely dostáva jednu minútu navyše.
+arbiter.one_minute.black = Čierny dostáva jednu minútu navyše.
+arbiter.two_minutes.white = Biely dostáva dve minúty navyše.
+arbiter.two_minutes.black = Čierny dostáva dve minúty navyše.
+arbiter.second_loses = Druhý nemožný ťah znamená prehru partie.
+arbiter.touched.white = Biely musí ťahať dotknutou figúrou.
+arbiter.touched.black = Čierny musí ťahať dotknutou figúrou.
+arbiter.game_over = Partia sa skončila.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Sledovať partiu
+
+viewer.title = SLEDOVANIE PARTIE
+viewer.white = BIELY
+viewer.black = ČIERNY
+viewer.time_control = TEMPO HRY
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Vymeniť farby
+viewer.note = Obaja hráči sú Stockfish. Kým hrajú, voľne lietajte po sále: nikto vás neuvidí.
+# An en dash instead of "proti" (which would need the dative of the names).
+viewer.summary = {0} – {1}
+viewer.custom = Vlastné
+viewer.tc.custom = Na mieru
+viewer.base_time = Základný čas
+viewer.increment = Prírastok
+viewer.delay = Oneskorenie
+viewer.off = Vypnuté
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = oneskorenie {0} s
+viewer.back = Späť
+viewer.start = Začať
+
+viewer.paused = PAUZA
+viewer.resume = Pokračovať
+viewer.options = Možnosti
+viewer.main_menu = Hlavná ponuka
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = OVLÁDANIE
+viewer.keys.move = W A S D  ·  Z Q S D  ·  šípky
+viewer.controls.move = Pohyb
+viewer.keys.updown = E, medzerník  /  C, Ctrl
+viewer.controls.updown = Hore / dole
+viewer.keys.fast = Shift
+viewer.controls.fast = Rýchlejšie
+viewer.keys.look = Pravé tlačidlo myši
+viewer.controls.look = Rozhliadnuť sa
+viewer.keys.speed = Koliesko myši
+viewer.controls.speed = Rýchlosť
+viewer.keys.views = 1 – 9
+viewer.controls.views = Pohľady
+viewer.keys.eyes = 0
+viewer.controls.eyes = Očami hráča, ktorý je na ťahu
+viewer.keys.moves = Tab
+viewer.controls.moves = Zoznam ťahov
+viewer.keys.menu = Esc
+viewer.controls.menu = Ponuka
+viewer.keys.hide = H
+viewer.controls.hide = Skryť tento prehľad
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauza / pokračovať
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = O ťah späť / dopredu
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Pomalšie / rýchlejšie
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Začiatok / koniec partie
+viewer.speed = Rýchlosť {0} m/s
+viewer.view.0 = Očami hráčov
+viewer.view.1 = Vedľa stola
+viewer.view.2 = Nad šachovnicou
+viewer.view.3 = Sála
+viewer.view.4 = Hodiny
+viewer.view.5 = Tvár bieleho
+viewer.view.6 = Tvár čierneho
+viewer.view.7 = Súboj
+viewer.view.8 = Okná
+viewer.view.9 = Tapisérie
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+# Lower case: the sentences are built so that the side never starts them.
+viewer.side.white = biely
+viewer.side.black = čierny
+viewer.flag.white = Bielemu vypršal čas.
+viewer.flag.black = Čiernemu vypršal čas.
+viewer.claims_draw = O remízu žiada {0}.
+viewer.offer_accepted = Remízu ponúka {0}, {1} ju prijíma.
+viewer.offer_declined = Remízu ponúka {0}, {1} ju odmieta.
+# "after move {0}": an ordinal ("po 34. ťahu").
+viewer.gameover.white_wins = Biely vyhral po {0}. ťahu.
+viewer.gameover.black_wins = Čierny vyhral po {0}. ťahu.
+viewer.gameover.draw = Partia skončila remízou po {0}. ťahu.
+viewer.gameover.players = {0} – {1}
+viewer.watch_again = Sledovať znova
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Zatiaľ žiadna hodnotená partia
+elo.provisional = Predbežný rating
+elo.peak = Maximum {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Vaše Elo {0}
+elo.expected = očakávaný výsledok {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · táto partia nie je hodnotená
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partiár
+scoresheet.event = Turnaj
+scoresheet.date = Dátum
+scoresheet.round = Kolo
+scoresheet.board = Šachovnica
+scoresheet.page = Strana
+scoresheet.white = Biely
+scoresheet.black = Čierny
+scoresheet.elo = Elo
+scoresheet.result = Výsledok
+scoresheet.move_no = Č.
+scoresheet.sign_white = Podpis bieleho
+scoresheet.sign_black = Podpis čierneho
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Slovak notation: K (kráľ) D (dáma) V (veža) S (strelec) J (jazdec); dates "14. 10. 2026".
+scoresheet.pieces = K D V S J
+scoresheet.date_format = {0}. {1}. {2}

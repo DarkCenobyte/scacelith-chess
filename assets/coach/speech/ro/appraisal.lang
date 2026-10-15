@@ -20,7 +20,8 @@
 # Move numbers stay cardinal: "la mutarea {n}", "Mutarea {n}:". The game's length: "{moves:in_move}" =
 # "în 25 de mutări" (it carries its "în"). A count never starts a sentence (it renders in lower case):
 # the short levels give a bare number after a label ("Piese capturate: {n:f}", "șahuri: {m:neut}").
-# Hanging: "în priză" (no agreement); "neapăra{my:agr_t}" for a loose piece.
+# Hanging: "în priză" or "fără apărare" (no agreement). Never a predicative "neapărat" ("era neapărat"),
+# which is heard as the adverb "necessarily": "nu era apăra{my:agr_t}" for a loose piece.
 
 # ---- Names used inside the lines ------------------------------------------------------------------
 appraisal.phase.opening = deschiderea
@@ -40,22 +41,22 @@ appraisal.level.l4 = „Jucător de club”
 appraisal.level.l5 = „Jucător de club puternic”
 appraisal.level.l6 = „Expert”
 # What to practise, after "Un lucru de exersat:" and similar (a noun phrase, no full stop).
-theme.general = o privire peste toată tabla înainte să muți
+theme.general = privirea de ansamblu asupra tablei, înainte să muți
 theme.mate_allowed = verificarea siguranței regelui tău înainte de fiecare mutare
 theme.mate_missed = căutarea matului, începând cu șahurile
-theme.stalemate = un câmp liber pentru regele meu când ai o poziție câștigată
+theme.stalemate = lăsarea unui câmp liber pentru regele meu când ai o poziție câștigată
 theme.fork = atenție la atacurile duble
 theme.discovered = atenție la atacurile ascunse în spatele pieselor mele
 theme.skewer = evitarea alinierii pieselor valoroase pe aceeași linie
 theme.pin = depistarea legărilor înainte să apară
-theme.trapped = o cale de retragere pentru piesele tale
-theme.back_rank = un câmp de scăpare pentru regele tău
+theme.trapped = păstrarea unei căi de retragere pentru piesele tale
+theme.back_rank = crearea unei mici ferestre pentru regele tău
 theme.hanging = protejarea pieselor tale
 theme.exchange = numărarea atacatorilor și a apărătorilor înainte de schimb
 theme.missed_capture = căutarea, în primul rând, a pieselor neapărate
 theme.missed_fork = căutarea propriilor atacuri duble
 theme.promotion = cursele de pioni și regula pătratului
-theme.king_safety = un adăpost sigur pentru regele tău, în spatele pionilor lui
+theme.king_safety = adăpostirea regelui tău în spatele pionilor lui
 theme.bad_trade = alegerea pieselor pe care le schimbi
 theme.opening = dezvoltarea pieselor și rocada din timp
 theme.endgame = activarea regelui și avansarea pionilor trecuți
@@ -69,7 +70,7 @@ appraisal.open.win.b1.3 = M-ai învins! A fost o partidă foarte bună.
 appraisal.open.win.b2 = Bine jucat! Ai câștigat {moves:in_move}.
 appraisal.open.win.b2.2 = Felicitări, ai câștigat!
 appraisal.open.win.b2.3 = O victorie {moves:in_move}. Bravo!
-appraisal.open.win.b3 = Felicitări, o victorie pe deplin meritată.
+appraisal.open.win.b3 = Felicitări, o victorie binemeritată.
 appraisal.open.win.b3.2 = Bine jucat. Ai meritat victoria asta.
 appraisal.open.win.b3.3 = O victorie frumoasă. Felicitări.
 appraisal.open.win.b4 = Frumoasă victorie.
@@ -79,7 +80,7 @@ appraisal.open.win.b5 = Bine jucat.
 appraisal.open.win.b5.2 = Frumos câștigat.
 appraisal.open.win.b5.3 = Partidă bună, câștigată frumos.
 appraisal.open.win.b6 = Bine jucat.
-appraisal.open.win.b6.2 = Victorie clară.
+appraisal.open.win.b6.2 = Bine câștigat.
 appraisal.open.win.b6.3 = Partidă bună.
 appraisal.open.draw.b1 = Remiză! Nimeni n-a putut câștiga partida asta.
 appraisal.open.draw.b1.2 = E remiză. A fost o luptă strânsă!
@@ -112,7 +113,7 @@ appraisal.open.stalemate.b5.2 = Remiză, prin pat.
 appraisal.open.stalemate.b6 = Pat.
 appraisal.open.stalemate.b6.2 = Remiză, pat.
 appraisal.open.loss.b1 = De data asta am câștigat eu, dar ai jucat câteva mutări foarte bune.
-appraisal.open.loss.b1.2 = Partidă frumoasă! Nu mi-a fost deloc ușor.
+appraisal.open.loss.b1.2 = Partidă frumoasă! Mi-ai dat de furcă.
 appraisal.open.loss.b1.3 = A fost distractiv! Partida asta am câștigat-o eu, dar înveți repede.
 appraisal.open.loss.b2 = Partidă frumoasă! Hai să vedem ce a mers bine și un lucru de încercat.
 appraisal.open.loss.b2.2 = Mulțumesc pentru partidă! Ai avut câteva idei bune.
@@ -298,7 +299,7 @@ appraisal.num.few.b2.2 = Numai {n:mistake} în toată partida. Bine!
 appraisal.num.few.b2.3 = Doar {n:mistake} care contează. Bravo.
 appraisal.num.best.b2 = Ai găsit cea mai bună mutare {n:time}.
 appraisal.num.best.b2.2 = Ai jucat chiar cea mai bună mutare {n:time}.
-appraisal.num.best.b2.3 = Ai nimerit cea mai bună mutare {n:time}.
+appraisal.num.best.b2.3 = Cea mai bună mutare ai găsit-o {n:time}.
 appraisal.num.acc.b3 = Precizia ta a fost de {acc:percent}, cu {n:mistake} și {m:blunder}.
 appraisal.num.acc.b3.2 = Precizie {acc:percent}: {n:mistake}, {m:blunder}.
 appraisal.num.acc.b3.3 = Ai jucat cu o precizie de {acc:percent}: {n:mistake} și {m:blunder}.
@@ -372,7 +373,7 @@ appraisal.improve.stalemate.b2.2 = Data viitoare, înainte să joci, verifică d
 appraisal.improve.stalemate.b3 = Într-o poziție câștigată, verifică la fiecare mutare dacă regele meu mai are un câmp liber.
 appraisal.improve.stalemate.b3.2 = Atenție la pat în finalurile câștigate: lasă-i regelui meu loc de mișcare.
 appraisal.improve.stalemate.b4 = În finalurile câștigate, verifică mereu dacă nu e pat.
-appraisal.improve.stalemate.b4.2 = Atenție la pat: aici te-a costat victoria.
+appraisal.improve.stalemate.b4.2 = Atenție la pat: aici a costat victoria.
 appraisal.improve.stalemate.b5 = În finalurile câștigate, atenție la pat.
 appraisal.improve.stalemate.b5.2 = Patul a costat victoria.
 appraisal.improve.stalemate.b6 = Atenție la pat.
@@ -382,7 +383,7 @@ appraisal.improve.coach_hung.b1 = La mutarea {n}, {my} era fără apărare. Ai o
 appraisal.improve.coach_hung.b1.2 = La mutarea {n}, puteai lua gratis {my}. Caută mereu piesele care se pot lua gratis!
 appraisal.improve.coach_hung.b2 = La mutarea {n}, {my} era în priză. Ai observat?
 appraisal.improve.coach_hung.b2.2 = La mutarea {n}, ai fi putut lua gratis {my}.
-appraisal.improve.coach_hung.b3 = La mutarea {n}, {my} era neapăra{my:agr_t}. Ai remarcat asta?
+appraisal.improve.coach_hung.b3 = La mutarea {n}, {my} nu era apăra{my:agr_t}. Ai remarcat asta?
 appraisal.improve.coach_hung.b3.2 = {my} era în priză la mutarea {n}. Caută piesele neapărate la fiecare mutare.
 # A clean game: keep doing it.
 appraisal.improve.clean.b1 = Verifică în continuare dacă piesele tale sunt în siguranță, ca azi.

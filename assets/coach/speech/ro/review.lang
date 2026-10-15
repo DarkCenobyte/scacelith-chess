@@ -16,6 +16,8 @@
 # Counts: {pts:point} "3 puncte", {n:time} "de 3 ori", {n:attacker}, {n2:defender}, {n:square}; a mate
 # distance always uses {m:in_move} ("mat în 3 mutări", "mat într-o mutare"), never "în {m:move}".
 # Mate patterns (name.pattern.*) carry their article: "matul înăbușit".
+# A loose piece or square is "fără apărare" or "în priză", never a predicative "neapărat" (heard as the
+# adverb "necessarily"); a fork is "atacă dublu" / "furculiță" (glossary).
 
 # ---- Announcements (either side's move) -------------------------------------------------------
 # The player gives check (levels 1-2: say what it means).
@@ -410,8 +412,8 @@ ex.fork.b1 = {my} poate merge pe {sq}, de unde atacă {t1} și {t2}.
 ex.fork.b1.2 = {my} merge pe {sq} și atacă două piese: {t1} și {t2}.
 ex.fork.b1.3 = Atenție la {my}: de pe {sq} atacă deodată {t1} și {t2}.
 ex.fork.b2 = Furculiță! {my} de pe {sq} atacă deodată {t1} și {t2}.
-ex.fork.b2.2 = După mutarea ta, {my} poate da furculiță de pe {sq}: {t1} și {t2}.
-ex.fork.b2.3 = {my} merge pe {sq}: atac dublu, țintele sunt {t1} și {t2}.
+ex.fork.b2.2 = După mutarea ta, de pe {sq}, {my} poate ataca dublu {t1} și {t2}.
+ex.fork.b2.3 = {my} merge pe {sq}: atac dublu asupra {t1:gen} și a {t2:gen}.
 ex.fork.b3 = {move} permite {reply}, care atacă dublu {t1} și {t2}.
 ex.fork.b3.2 = După {reply}, atac în același timp {t1} și {t2}.
 ex.fork.b3.3 = {reply} e o furculiță: și {t1}, și {t2} sunt sub atac.
@@ -431,7 +433,7 @@ ex.fork.tail.b1.3 = Vezi? Atac și {t1}, și {t2}. Una dintre piese va cădea.
 # The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
 ex.fork.tail_king = {your} trebuie să iasă din șah, așa că iau {t1}.
 ex.fork.tail_king.2 = Șah! {your} trebuie să plece, iar {t1} cade.
-ex.fork.more.b3 = Înainte să muți, uită-te la câmpul {sq}: de acolo, {my} poate da o furculiță.
+ex.fork.more.b3 = Înainte să muți, uită-te la câmpul {sq}: de acolo, {my} poate ataca dublu.
 ex.fork.more.b3.2 = Urmărește câmpul {sq}. De acolo, {my} atacă dublu.
 ex.fork.tip.knight = Atenție la săriturile calului lângă regele tău și dama ta!
 ex.fork.tip.knight.2 = Caii adoră să atace două piese deodată. Uită-te unde pot sări.
@@ -501,10 +503,10 @@ ex.pin_defender.b3 = {your} e lega{your:agr_t} de {t1}; nu apără cu adevărat 
 ex.pin_defender.b3.2 = Câmpul {sq} pare apărat, dar {your} e lega{your:agr_t} de {t1}, care stă în spate.
 ex.pin_defender.b4 = {your} e lega{your:agr_t}, deci câmpul {sq} nu e apărat cu adevărat.
 ex.pin_defender.b4.2 = Fiind lega{your:agr_t}, {your} nu poate păzi {sq}.
-ex.pin_defender.b5 = {your} e lega{your:agr_t}; câmpul {sq} rămâne neapărat.
+ex.pin_defender.b5 = {your} e lega{your:agr_t}; câmpul {sq} rămâne fără apărare.
 ex.pin_defender.b5.2 = Câmpul {sq} cade: {your} e lega{your:agr_t}.
 ex.pin_defender.b6 = {your} e lega{your:agr_t}; {sq} cade.
-ex.pin_defender.b6.2 = {your} lega{your:agr_t}, {sq} neapărat.
+ex.pin_defender.b6.2 = {your} lega{your:agr_t}, {sq} fără apărare.
 
 # ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
 ex.trapped.b1 = {your} e prin{your:agr_s}. Toate câmpurile unde poate merge sunt atacate.
@@ -517,7 +519,7 @@ ex.trapped.b3 = {your} ajunge prin{your:agr_s}: nu mai are niciun câmp sigur.
 ex.trapped.b3.2 = După asta, {your} e prin{your:agr_s} și pierdu{your:agr_t}.
 ex.trapped.b3.3 = {your} a intrat într-o capcană: nu mai poate ieși.
 ex.trapped.b4 = După {move}, {your} rămâne prin{your:agr_s}.
-ex.trapped.b4.2 = {your} nu are retragere; {your:cl} câștig.
+ex.trapped.b4.2 = {your} nu are cale de retragere; {your:cl} câștig.
 ex.trapped.b4.3 = {your} e prin{your:agr_s} după {reply}.
 ex.trapped.b5 = {your} ajunge prin{your:agr_s}: {line}.
 ex.trapped.b5.2 = {move} lasă {your} fără ieșire.
@@ -558,8 +560,8 @@ ex.hanging.b3.2 = {your} de pe {sq} e în priză: {reply}.
 ex.hanging.b3.3 = După {reply}, îți pierzi {your:def} degeaba.
 ex.hanging.b4 = {move} lasă {your} în priză: {reply} câștigă {pts:point}.
 ex.hanging.b4.2 = {reply} ia gratis {your}.
-ex.hanging.b4.3 = {your} e neapăra{your:agr_t}; {reply} {your:cl} ia.
-ex.hanging.b5 = {move} lasă {your} neapăra{your:agr_t}; {reply} {your:cl} câștigă.
+ex.hanging.b4.3 = {your} e fără apărare; {reply} {your:cl} ia.
+ex.hanging.b5 = {move} lasă {your} fără apărare; {reply} {your:cl} câștigă.
 ex.hanging.b5.2 = {your} de pe {sq} cade după {reply}.
 ex.hanging.b5.3 = {reply} câștigă {your}.
 ex.hanging.b6 = {move}? {reply}, și {your} cade.
@@ -571,7 +573,7 @@ ex.hanging_guard.b1.2 = {your2} a plecat, iar acum {your} e singu{your:agr_r}. {
 ex.hanging_guard.b2 = {your2} apăra {your}. Acum {your:pron} e singu{your:agr_r}, iar {my} {your:cl} ia.
 ex.hanging_guard.b2.2 = Mutându-ți {your2:def}, ai lăsat {your} fără apărare în fața {my:gen}.
 ex.hanging_guard.b3 = {your2} păzea {your}. Mutând{your2:cl_ger}, îți pierzi {your:def}: {reply}.
-ex.hanging_guard.b3.2 = Fără {your2}, {your} rămâne neapăra{your:agr_t}: {reply}.
+ex.hanging_guard.b3.2 = Fără {your2}, {your} nu mai are apărare: {reply}.
 ex.hanging_guard.b4 = {move} elimină apărarea: {your2} a părăsit {your}, iar {reply} {your:cl} ia.
 ex.hanging_guard.b4.2 = {your2} era singura piesă care apăra {your}; {reply} {your:cl} câștigă.
 # The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
@@ -645,7 +647,7 @@ ex.material.b6 = {line}, și am câștigat {pts:point}.
 ex.material.b6.2 = {move} pierde {pts:point}: {line}.
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
-ex.missed_capture.b1 = Ai văzut? {my} de pe {sq} era neapăra{my:agr_t}. {your} {my:cl} putea lua.
+ex.missed_capture.b1 = Ai văzut? {my} de pe {sq} era fără apărare. {your} {my:cl} putea lua.
 ex.missed_capture.b1.2 = Uite: {my} nu avea niciun apărător. {your} {my:cl} putea captura.
 ex.missed_capture.b1.3 = {my} de pe {sq} nu era proteja{my:agr_t}. {your} {my:cl} putea înhăța!
 ex.missed_capture.b2 = Ai ratat o captură gratuită: {best} câștigă {my}.
@@ -655,10 +657,10 @@ ex.missed_capture.b3 = {best} ar fi câștigat {my} fără să dai nimic în sch
 ex.missed_capture.b3.2 = {my} de pe {sq} era neproteja{my:agr_t}: {best}. Caută piese neapărate la fiecare mutare.
 ex.missed_capture.b3.3 = Puteai lua {my} cu {best}.
 ex.missed_capture.b4 = Ratat: {best} ia {my} de pe {sq}.
-ex.missed_capture.b4.2 = {best} câștigă {my}, care era neapăra{my:agr_t}.
+ex.missed_capture.b4.2 = {best} câștigă {my}, care era fără apărare.
 ex.missed_capture.b4.3 = {my} era în priză: {best}.
 ex.missed_capture.b5 = {best} câștigă {my}; {move} {my:cl} lasă să scape.
-ex.missed_capture.b5.2 = {my} de pe {sq} era neapăra{my:agr_t}: {best}.
+ex.missed_capture.b5.2 = {my} de pe {sq} era fără apărare: {best}.
 ex.missed_capture.b6 = {best}! {my} de pe {sq} era în priză.
 ex.missed_capture.b6.2 = {best} câștiga {my}.
 
@@ -683,7 +685,7 @@ ex.missed_fork.b6.2 = {best}: furculiță, {t1} și {t2}.
 # {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
 # "The square" of the rule of the square is "pătratul (pionului)", the Romanian chess term.
 ex.promotion.b1 = {my} poate ajunge până pe {sq}, unde devine damă. {your} e prea departe.
-ex.promotion.b1.2 = Uite: nimic nu oprește {my} până pe {sq}. {your} nu {my:cl} poate prinde.
+ex.promotion.b1.2 = Uite: nimic nu împiedică {my} să ajungă pe {sq}. {your} nu {my:cl} poate prinde.
 ex.promotion.b1.3 = {my} e la {n:square} de {sq}, iar {your} e prea len{your:agr_t}.
 ex.promotion.b2 = {my} fuge spre {sq}, iar {your} nu {my:cl} poate prinde.
 ex.promotion.b2.2 = {my} are nevoie de {n:move} până pe {sq}; {your}, de {n2:move}. Prea încet!
@@ -781,13 +783,13 @@ ex.push_passed.b6.2 = {best}, pionul trecut.
 # Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
 ex.king_active.b1 = Adu {your} în față! În final, regele e o piesă puternică.
 ex.king_active.b1.2 = Acum {your} poate intra în luptă. Du{your:cl_imp} spre centru.
-ex.king_active.b1.3 = Cu puține piese rămase, {your} trebuie să iasă și să ajute.
+ex.king_active.b1.3 = Cu puține piese rămase, {your} ar trebui să iasă și să ajute.
 ex.king_active.b2 = În final, folosește {your}: adu{your:cl_imp} în centru.
-ex.king_active.b2.2 = Acum {your} trebuie să intre în joc. Du{your:cl_imp} înainte!
+ex.king_active.b2.2 = Acum {your} ar trebui să intre în joc. Du{your:cl_imp} înainte!
 ex.king_active.b3 = {best} activează regele. În final, regele luptă.
 ex.king_active.b3.2 = {best}: acum locul regelui e în centru.
 ex.king_active.b4 = {best} centralizează regele.
-ex.king_active.b4.2 = Regele trebuie să înainteze: {best}.
+ex.king_active.b4.2 = Regele ar trebui să înainteze: {best}.
 ex.king_active.b5 = {best}, cu activarea regelui: {line}.
 ex.king_active.b5.2 = Activitatea regelui: {best}.
 ex.king_active.b6 = {best}: {eval}.
@@ -903,7 +905,7 @@ praise.fork.b3.3 = O furculiță. Bine jucat.
 praise.capture.b1 = Bravo! Ai luat gratis {my}.
 praise.capture.b1.2 = Bine văzut! {my} nu era proteja{my:agr_t}.
 praise.capture.b1.3 = Da! Ai câștigat {my}.
-praise.capture.b2 = Captură bună! {my} era neapăra{my:agr_t}.
+praise.capture.b2 = Captură bună! {my} era fără apărare.
 praise.capture.b2.2 = Frumos, ai luat {my}.
 praise.capture.b2.3 = Bine observat: {my} era în priză.
 praise.best.b1 = Mutare bună!
@@ -970,7 +972,7 @@ tb.fixed.b1.2 = Da, așa e mai bine!
 tb.fixed.b1.3 = Bine, așa merge mult mai bine.
 tb.fixed = Așa e mai bine.
 tb.fixed.2 = Mai bine.
-tb.fixed.3 = Corectură bună.
+tb.fixed.3 = Bine corectat.
 tb.same = Iar aceeași mutare? Bine, să vedem.
 tb.same.2 = Îți place mutarea asta. Hai s-o jucăm până la capăt.
 # The retry after a hint-only offer is the move the coach had in mind.

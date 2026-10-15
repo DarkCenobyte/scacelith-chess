@@ -1,0 +1,371 @@
+# Coach speech (Latvian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "tu" (imperatives "paskaties", "uzmanies"); the coach is male ("es būtu
+# spēlējis", "esmu ieguvis"). The player's gender is unknown: finite verbs only for the player ("tu
+# palaidi garām", "tu varēji"), never "tu esi zaudējis"; "you're 3 points down" = "tev ir par 3
+# punktiem mazāk" ({pts:point_pacc}); "you've lost 3 points" = "tu zaudē 3 punktus" ({pts:point_acc}).
+# Pieces carry their possessive; forms from common.lang: acc gen dat, refl_* ("savs" when the player
+# or the coach is the subject: "Paskaties uz {your:refl_acc}"), pron pron_gen pron_dat pron_acc
+# ("tas / tā"), bare_nom, and the endings adj ("piesiet{your:adj}" = piesiets / piesieta), def, is
+# ("iesprūd{your:is}" = iesprūdis / iesprūdusi). "Attacks X" = "uzbrūk {x:dat}"; "pinned to X" =
+# "piesiet{your:adj} pie {t1:gen}"; "behind it" = "aiz {x:pron_gen}"; "in front of X" = "{t1:dat}
+# priekšā". Squares: "uz {sq}" (to / on a square, as Latvian chess writes "zirgs uz f3"), "no {sq}",
+# "lauciņš {sq}" in other cases; moves after a preposition get "gājiens" when the voice needs it
+# ("ar gājienu {best}"). "Mate in N" = "mats {m:move_loc}" (divos gājienos). Terms: dakša (fork),
+# iesms (skewer), piesaiste (pin), atklātais uzbrukums, pats (stalemate), caurejošais bandinieks,
+# opozīcija, bandinieku galotne, laidņu pāris, pēdējā horizontāle, brīvs lauciņš (luft).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Šahs! Mans karalis ir apdraudēts.
+ann.check.human.b1.2 = Šahs! Tu uzbrūc manam karalim.
+ann.check.human.b1.3 = Tas ir šahs! Manam karalim jāglābjas.
+ann.check.human = Šahs.
+ann.check.human.2 = Šahs!
+ann.check.human.3 = Un tas ir šahs.
+# The coach gives check.
+ann.check.coach = Šahs!
+ann.check.coach.2 = Šahs.
+ann.check.coach.3 = Un šahs!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Tas nozīmē, ka es uzbrūku {your:dat}. Tev jāaizsargājas no šaha.
+ann.check.coach.first.2 = Šahs nozīmē, ka {your} ir apdraudēt{your:adj}. Pārvieto {your:pron_acc}, aizsedzies vai paņem manu figūru.
+ann.double_check.coach = Dubultšahs! Divas manas figūras uzbrūk tavam karalim uzreiz, tāpēc tam jāiet prom.
+ann.double_check.coach.2 = Tas ir dubultšahs: tagad palīdzēs tikai karaļa gājiens.
+ann.double_check.human = Dubultšahs! Divas tavas figūras uzbrūk manam karalim uzreiz, tāpēc tam jāiet prom.
+ann.double_check.human.2 = Dubultšahs! Tagad mani var glābt tikai karaļa gājiens.
+# The player checkmates the coach.
+ann.mate.human.b1 = Mats! Tu uzvarēji! Mans karalis nevar aizbēgt.
+ann.mate.human.b1.2 = Tas ir mats! Lieliski, tu uzvarēji partijā!
+ann.mate.human.b1.3 = Mats! Mans karalis ir ieslēgts. Apsveicu!
+ann.mate.human = Mats. Labi nospēlēts.
+ann.mate.human.2 = Tas ir mats. Apsveicu.
+ann.mate.human.3 = Mats! Skaisti nospēlēts.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Tas ir mats. Tavam karalim nav izejas.
+ann.mate.coach.b1.2 = Mats. Es uzbrūku tavam karalim, un tas nevar aizbēgt.
+ann.mate.coach.b1.3 = Baidos, ka tas ir mats. Tavs karalis nevar izbēgt.
+ann.mate.coach = Mats.
+ann.mate.coach.2 = Un tas ir mats.
+ann.mate.coach.3 = Mats, diemžēl.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ups! Ar šo gājienu tu kaut ko atdod.
+ex.verdict.blunder.b1.2 = Uzmanīgi! Šis gājiens tev var dārgi maksāt.
+ex.verdict.blunder.b1.3 = Ak, pagaidi. Ar šo gājienu kaut kas nav kārtībā.
+ex.verdict.blunder.b2 = Hmm, ar šo gājienu ir problēma.
+ex.verdict.blunder.b2.2 = Tā ir liela kļūda.
+ex.verdict.blunder.b2.3 = Uzmanīgi, šis gājiens tev kaut ko maksā.
+ex.verdict.blunder.b3 = Tā ir rupja kļūda.
+ex.verdict.blunder.b3.2 = {move} ir īsta kļūda.
+ex.verdict.blunder.b3.3 = Ai, {move} ir liela kļūda.
+ex.verdict.blunder.b4 = {move} ir rupja kļūda.
+ex.verdict.blunder.b4.2 = {move} ir nopietna kļūda.
+ex.verdict.blunder.b4.3 = Diemžēl tā ir rupja kļūda.
+ex.verdict.blunder.b5 = {move} ir nopietna kļūda.
+ex.verdict.blunder.b5.2 = {move} ir rupja kļūda.
+ex.verdict.blunder.b5.3 = {move} ir dārga kļūda.
+ex.verdict.blunder.b6 = {move} ir smaga kļūda.
+ex.verdict.blunder.b6.2 = {move} ir rupja kļūda.
+ex.verdict.blunder.b6.3 = {move}? Rupja kļūda.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out). "Draudi" (threat) is plural only.
+ex.verdict.ignored.b1 = Ups! Tu neatbildēji uz maniem draudiem.
+ex.verdict.ignored.b1.2 = Uzmanīgi! Mani draudi vēl bija spēkā.
+ex.verdict.ignored.b1.3 = Ak, pagaidi. Tu aizmirsi par maniem draudiem.
+ex.verdict.ignored.b2 = Hmm, mani draudi vēl bija spēkā.
+ex.verdict.ignored.b2.2 = Tu atstāji manus draudus bez atbildes.
+ex.verdict.ignored.b2.3 = Uzmanīgi, tu neatbildēji uz maniem draudiem.
+ex.verdict.mistake.b3 = Tas nav labs gājiens.
+ex.verdict.mistake.b3.2 = Hmm, ar gājienu {move} kaut kas nav kārtībā.
+ex.verdict.mistake.b3.3 = Tā ir kļūda.
+ex.verdict.mistake.b4 = {move} ir kļūda.
+ex.verdict.mistake.b4.2 = {move} nav labs gājiens.
+ex.verdict.mistake.b4.3 = Tā ir kļūda.
+ex.verdict.mistake.b5 = {move} ir acīmredzama kļūda.
+ex.verdict.mistake.b5.2 = {move} ir kļūda.
+ex.verdict.mistake.b5.3 = {move} nav labs gājiens.
+ex.verdict.mistake.b6 = {move} ir kļūda.
+ex.verdict.mistake.b6.2 = {move}? Kļūda.
+ex.verdict.mistake.b6.3 = Ne {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario. A move is "gājiens"
+# (masculine): "{best} bija labāks".
+ex.verdict.inaccuracy.b3 = Nav slikti, bet {best} bija mazliet labāks.
+ex.verdict.inaccuracy.b3.2 = {best} bija nedaudz precīzāks.
+ex.verdict.inaccuracy.b3.3 = Neliels misēklis: šeit labāks bija {best}.
+ex.verdict.inaccuracy.b4 = Neprecīzi: {best} bija precīzāks.
+ex.verdict.inaccuracy.b4.2 = Neliela neprecizitāte. {best} bija mazliet labāks.
+ex.verdict.inaccuracy.b4.3 = Ne gluži labākais: {best} bija precīzāks.
+ex.verdict.inaccuracy.b5 = {move} ir neprecīzs; {best} bija spēcīgāks.
+ex.verdict.inaccuracy.b5.2 = Nedaudz neprecīzi. Es būtu spēlējis {best}.
+ex.verdict.inaccuracy.b5.3 = {best} bija precīzāks par {move}.
+ex.verdict.inaccuracy.b6 = {move} ir neprecīzs; {best}.
+ex.verdict.inaccuracy.b6.2 = Neprecīzi. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} bija labāks.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Iespējams, {best} bija mazliet precīzāks.
+ex.verdict.inaccuracy.maybe.2 = Es varbūt būtu spēlējis {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Šis gājiens izskatās apšaubāms.
+ex.verdict.dubious.2 = Šis gājiens šķiet apšaubāms.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ak, pagaidi! Tu palaidi garām kaut ko labu.
+ex.verdict.missed.b1.2 = Paskaties vēlreiz! Bija kaut kas labāks.
+ex.verdict.missed.b1.3 = Pagaidi, tev tur bija iespēja!
+ex.verdict.missed.b2 = Tu tur palaidi garām iespēju.
+ex.verdict.missed.b2.2 = Hmm, bija kaut kas labāks.
+ex.verdict.missed.b2.3 = Pagaidi, tev tur bija lielisks gājiens.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Labāk bija {best}.
+ex.better.b3.2 = Labāks gājiens bija {best}.
+ex.better.b3.3 = Tā vietā labs gājiens bija {best}.
+ex.better.b4 = {best} bija spēcīgāks.
+ex.better.b4.2 = Pareizais gājiens bija {best}.
+ex.better.b4.3 = Labāk bija {best}.
+ex.better.b5 = {best} ar ideju {line}.
+ex.better.b5.2 = Vajadzēja spēlēt {best}: {line}.
+ex.better.b5.3 = Labāk bija {best}, un tālāk {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Tā vietā {best}, {eval}.
+ex.better.b6.3 = Pēc {best} būtu {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Ar {your:acc} bija labāks gājiens.
+ex.hint.b1.2 = {your:dat} bija labāks gājiens.
+ex.hint.b2 = {your:dat} bija labāks gājiens.
+ex.hint.b2.2 = Ar {your:acc} bija labāks gājiens.
+ex.hint.b3 = {your:dat} bija labāks gājiens.
+ex.hint.b3.2 = Ar {your:acc} bija kaut kas labāks.
+ex.hint.b4 = {your:dat} bija labāks gājiens.
+ex.hint.b4.2 = Paskaties vēlreiz uz {your:refl_acc}: {your:pron_dat} bija kaut kas labāks.
+ex.hint.b5 = {your:dat} bija spēcīgāks gājiens.
+ex.hint.b5.2 = Ar {your:acc} bija spēcīgāks gājiens.
+ex.hint.b6 = {your:dat} bija kas labāks.
+ex.hint.b6.2 = Paskaties vēlreiz uz {your:refl_acc}.
+ex.hint.move = Bija labāks gājiens.
+ex.hint.move.2 = Tev tur bija labāks gājiens.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your:dat} bija labāks gājiens. Tas iegūst materiālu.
+ex.hint.gain.b1.2 = Ar {your:acc} bija labāks gājiens. Tas iegūst materiālu.
+ex.hint.gain.b2 = {your:dat} bija labāks gājiens. Tas iegūst materiālu.
+ex.hint.gain.b2.2 = Ar {your:acc} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b3 = {your:dat} bija labāks gājiens, kas iegūst materiālu.
+ex.hint.gain.b3.2 = Ar {your:acc} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b4 = {your:dat} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b4.2 = Paskaties vēlreiz uz {your:refl_acc}: {your:pron_dat} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b5 = {your:dat} bija spēcīgāks gājiens, kas iegūst materiālu.
+ex.hint.gain.b5.2 = Ar {your:acc} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b6 = {your:dat} bija gājiens, kas iegūst materiālu.
+ex.hint.gain.b6.2 = Paskaties vēlreiz uz {your:refl_acc}: varēja iegūt materiālu.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Labāk bija iet ar {your:acc} uz {sq}.
+ex.reveal.b1.2 = {your} varēja iet uz {sq}. Tā būtu labāk.
+ex.reveal.b2 = Gājiens ar {your:acc} uz {sq} bija labāks.
+ex.reveal.b2.2 = Labāk bija iet ar {your:acc} uz {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Noliksim figūras atpakaļ.
+ex.rewind.b1.2 = Tagad es visu nolikšu atpakaļ, kā bija.
+ex.rewind.b1.3 = Es salikšu figūras atpakaļ.
+ex.rewind.b2 = Noliksim visu atpakaļ.
+ex.rewind.b2.2 = Atpakaļ, kur bijām.
+ex.rewind.b2.3 = Es nolikšu figūras atpakaļ.
+ex.rewind.b3 = Atpakaļ pie partijas.
+ex.rewind.b3.2 = Atgriežamies.
+ex.rewind.b3.3 = Atpakaļ pie pozīcijas.
+ex.rewind.b4 = Atpakaļ pie partijas.
+ex.rewind.b4.2 = Atpakaļ.
+ex.rewind.b4.3 = Atgriezīsimies.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Vai gribi pamēģināt citu gājienu?
+ex.offer.b1.2 = Vai gribi atsaukt šo gājienu un mēģināt vēlreiz?
+ex.offer.b1.3 = Pamēģināsim citu gājienu?
+ex.offer.b2 = Vai vēlies pamēģināt citu gājienu?
+ex.offer.b2.2 = Vai gribi to atsaukt?
+ex.offer.b2.3 = Mēģināsi vēlreiz?
+ex.offer.b3 = Vai vēlies to atsaukt?
+ex.offer.b3.2 = Vai gribi mēģināt vēlreiz?
+ex.offer.b3.3 = Atsauksi gājienu?
+ex.offer.b4 = Atsauksi gājienu?
+ex.offer.b4.2 = Vai gribi to atsaukt?
+ex.offer.b4.3 = Mēģināsi citu gājienu?
+ex.offer.b5 = Atsaukt?
+ex.offer.b5.2 = Gribi atsaukt?
+ex.offer.b5.3 = Atsauksi?
+ex.offer.b6 = Atsaukt?
+ex.offer.b6.2 = Atsauksi?
+ex.offer.b6.3 = Vēlreiz?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Šis gājiens ir apšaubāms. Varbūt vari nospēlēt labāk?
+ex.dubious.b1.2 = Šis gājiens ir apšaubāms. Varbūt atradīsi labāku?
+ex.dubious.b2 = Apšaubāms gājiens. Varbūt vari nospēlēt labāk?
+ex.dubious.b2.2 = Šis gājiens ir apšaubāms. Varbūt ir kas labāks?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Tad {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} iet uz {sq}.
+demo.my.move.2 = Es pārvietoju {my:refl_acc} uz {sq}.
+demo.my.move.3 = Tad {my} iet uz {sq}.
+demo.my.take = Es paņemu {your:acc}.
+demo.my.take.2 = {my} ņem {your:acc}.
+demo.my.take.3 = Un es ņemu {your:acc}.
+demo.my.check = {my} iet uz {sq}. Šahs.
+demo.my.check.2 = Šahs ar {my:acc} uz {sq}.
+demo.my.check.3 = {my} uz {sq}, šahs!
+demo.my.mate = {my} iet uz {sq}. Mats.
+demo.my.mate.2 = Un {my} uz {sq} ir mats.
+demo.my.mate.3 = {my} uz {sq}. Tas ir mats.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Vispirms {my} ņem {your:acc}. {t1} var pagaidīt.
+demo.my.first.take.2 = {my} vispirms ņem {your:acc}. {t1} niekur nepazudīs.
+demo.my.first.check = {my} ņem {your:acc}, un tas ir šahs! {t1} var pagaidīt.
+demo.my.first.check.2 = Vispirms {my} ar šahu ņem {your:acc}. {t1} niekur nepazudīs.
+demo.my.first.check_move = Vispirms šahs ar {my:acc} uz {sq}. {t1} var pagaidīt.
+demo.my.first.check_move.2 = {my} iet uz {sq}: vispirms šahs! {t1} niekur nepazudīs.
+demo.my.first.move = Vispirms {my} iet uz {sq}. {t1} var pagaidīt.
+demo.my.first.move.2 = Vispirms {my} uz {sq}. {t1} niekur nepazudīs.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} ir apdraudēt{my:adj}, tāpēc {my:pron} vispirms ņem {your:acc}.
+demo.my.first.attacked.2 = {my} ir apdraudēt{my:adj}: {my:pron} vispirms paķer {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Vispirms {move}: {t1} var pagaidīt.
+demo.first.2 = Vispirms {move}. {t1} niekur nepazudīs.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Tagad es izdarīšu savu gājienu.
+demo.play_on.2 = Lūk, mans īstais gājiens.
+demo.play_on.3 = Un tagad mans gājiens pa īstam.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Tu pārvietotu {your:refl_acc} uz {sq}.
+demo.your.move.2 = Pieņemsim, ka tu pārvieto {your:refl_acc} uz {sq}.
+demo.your.move.3 = Tad {your} iet uz {sq}.
+demo.your.take = Tu paņemtu {my:acc}.
+demo.your.take.2 = Tu ņem {my:acc} ar {your:refl_acc}.
+demo.your.take.3 = Tad tu paņem {my:acc}.
+demo.your.back = Tu ņem atpakaļ.
+demo.your.back.2 = Tu ņem atpakaļ uz {sq}.
+demo.your.back.3 = Un tu atbildi ar ņemšanu.
+demo.your.king = Tavam karalim jāiet prom.
+demo.your.king.2 = Karalim jāatkāpjas uz {sq}.
+demo.your.king.3 = Tavs karalis bēg uz {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Tagad {t1:acc} vairs nevar izglābt.
+ex.point.piece.2 = Un {t1} ir zaudēt{t1:adj}.
+ex.point.piece.3 = Tālāk krīt {t1}.
+ex.point.two = Uzbrukums gan {t1:dat}, gan {t2:dat}: viena figūra kritīs.
+ex.point.two.2 = Tagad es uzbrūku {t1:dat} un {t2:dat}. Abas figūras tu nevari izglābt.
+ex.point.mate = Un tagad {reply:nomate} ir mats.
+ex.point.mate.2 = Tālāk seko {reply:nomate}, un tas ir mats.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Redzi? Tagad tev ir par {pts:point_pacc} mazāk.
+ex.result.b1.2 = Tā tu zaudē {pts:point_acc}.
+ex.result.b2 = Beigu beigās tu zaudēji {pts:point_acc}.
+ex.result.b2.2 = Tagad tev ir par {pts:point_pacc} mazāk.
+ex.result.b3 = Tas tev maksā {pts:point_acc}.
+ex.result.b3.2 = Beigās tev ir par {pts:point_pacc} mazāk.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Tu vari kaut ko paņemt atpakaļ, bet tev joprojām ir par {pts:point_pacc} mazāk.
+ex.result_back.b1.2 = Tu vari mazliet atgūt, bet tomēr zaudē {pts:point_acc}.
+ex.result_back.b2 = Daļu tu vari atgūt, bet tev joprojām ir par {pts:point_pacc} mazāk.
+ex.result_back.b2.2 = Pat ar ņemšanu atpakaļ tu zaudē {pts:point_acc}.
+ex.result_back.b3 = Pat pēc ņemšanas atpakaļ tev ir par {pts:point_pacc} mazāk.
+ex.result_back.b3.2 = Tu kaut ko atgūsti, bet tas tev tik un tā maksā {pts:point_acc}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Ja {your2} ņem atpakaļ, {my} paņem {your:acc}.
+ex.retake.b1.2 = Tu nevari ņemt atpakaļ ar {your2:refl_acc}: tad {my} paņems {your:acc}.
+ex.retake.b2 = Ja {your2} ņem atpakaļ, {my} paņem {your:acc}.
+ex.retake.b2.2 = Ņemšana atpakaļ ar {your2:acc} neder: {my} paņem {your:acc}.
+ex.retake.b3 = Ja tu ņem atpakaļ ar gājienu {move}, {reply} paņem {your:acc}.
+ex.retake.b3.2 = Ņemšana atpakaļ ar gājienu {move} neder: {reply} paņem {your:acc}.
+ex.retake.b4 = {move} neder, jo seko {reply}, kas paņem {your:acc}.
+ex.retake.b4.2 = Un ja {move}, tad {reply} paņem {your:acc}.
+ex.retake.b5 = Ņemšana atpakaļ {move} atduras pret {reply}, un {your} krīt.
+ex.retake.b5.2 = {move} neder, jo seko {reply}: {your} krīt.
+ex.retake.b6 = {move}? {reply} paņem {your:acc}.
+ex.retake.b6.2 = {move} neder: {reply} paņem {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Un te, lauciņā {sq}, tev būtu jauna dāma.
+demo.promote.2 = Tad {your} sasniedz lauciņu {sq} un pārvēršas dāmā.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Uzmanies: {my} var iet uz {sq}, un tas ir mats.
+ex.mate_allowed.b1.2 = Tagad {my} var iet uz {sq}. Tas būtu mats!
+ex.mate_allowed.b1.3 = Uzmanīgi! Ja {my} ies uz {sq}, būs mats.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Šis gājiens ļauj man pieteikt matu {your:dat} {m:move_loc}.
+ex.mate_allowed.b2.2 = Tagad es varu pieteikt matu {your:dat} {m:move_loc}. Skaties.
+ex.mate_allowed.b2.3 = Uzmanīgi! {your} ir briesmās: mats {m:move_loc}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Tas pieļauj matu {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.2 = Pēc tā man ir mats {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.3 = Tavam karalim būs mats: {line:nomate}.
+ex.mate_allowed.b4 = {move} pieļauj forsētu matu: {line:nomate}.
+ex.mate_allowed.b4.2 = Tas noved pie mata {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b4.3 = Pēc {move} seko {line:nomate}, un tas ir mats.
+ex.mate_allowed.b5 = {move} pieļauj forsētu matu {m:move_loc}.
+ex.mate_allowed.b5.2 = Tas noved pie mata {m:move_loc}.
+ex.mate_allowed.b5.3 = Tagad ir forsēts mats {m:move_loc}.
+ex.mate_allowed.b6 = Mats {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mats.
+ex.mate_allowed.b6.3 = Pēc {line:nomate} ir mats.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Skaties: {your:dat} vairs nav kur bēgt.
+ex.mate_allowed.tail.b1.2 = Redzi? {your} ir apdraudēt{your:adj} un nevar aizbēgt.
+ex.mate_allowed.tail.b1.3 = {your:dat} nav kur iet. Tas ir mats.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below, a
+# nominative noun phrase said after "ir".
+ex.mate_allowed.pattern = Šī mata nosaukums ir {text}.
+ex.mate_allowed.pattern.2 = Atceries šo: tas ir {text}.
+ex.mate_allowed.tip.b3 = Pirms katra gājiena pārbaudi, vai tavs karalis vēl ir drošībā.
+ex.mate_allowed.tip.b3.2 = Vienmēr jautā sev: vai pēc mana gājiena manam karalim var pieteikt matu?
+
+name.pattern.back_rank = mats pēdējā horizontālē
+name.pattern.smothered = nosmacētais mats
+name.pattern.support = mats ar aizsargātu dāmu
+name.pattern.ladder = kāpņu mats
+name.pattern.epaulette = epoletu mats
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Ar gājienu {best:nomate} tu varēji pieteikt matu {my:dat}!
+ex.mate_missed.b1.2 = {best:nomate} bija mats! {my} nevarētu aizbēgt.
+ex.mate_missed.b1.3 = Skaties! Pēc {best:nomate} {my:dat} būtu mats.
+ex.mate_missed.b2 = Tev bija mats {m:move_loc}, sākot ar {best:nomate}.
+ex.mate_missed.b2.2 = Ar {best:nomate} bija mats {m:move_loc}!
+ex.mate_missed.b2.3 = Ar {best:nomate} tu varēji man pieteikt matu.
+ex.mate_missed.b3 = Tu palaidi garām matu {m:move_loc}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} forsē matu {m:move_loc}: {line:nomate}.
+ex.mate_missed.b3.3 = Bija mats {m:move_loc}, sākot ar {best:nomate}.
+ex.mate_missed.b4 = Garām palaists mats: {line:nomate}, sākot ar {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} forsēja matu {m:move_loc}.
+ex.mate_missed.b4.3 = Ar {best:nomate} tev bija mats {m:move_loc}.
+ex.mate_missed.b5 = {best:nomate} forsē matu {m:move_loc}: {line:nomate}.
+ex.mate_missed.b5.2 = Garām palaists mats {m:move_loc}, sākot ar {best:nomate}.
+ex.mate_missed.b5.3 = Bija forsēts mats: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} noved pie mata: {line:nomate}.
+ex.mate_missed.b6.2 = Mats {m:move_loc} ar {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mats {m:move_loc}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Ātrāk bija {best:nomate}: mats {m:move_loc}.
+ex.mate_delayed.b5.2 = Ar {best:nomate} mats būtu ātrāk, {m:move_loc}.
+ex.mate_delayed.b6 = {best:nomate} forsē matu {m:move_loc}.
+ex.mate_delayed.b6.2 = Ātrāk: {best:nomate}, mats {m:move_loc}.

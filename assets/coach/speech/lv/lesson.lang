@@ -77,7 +77,7 @@ lesson.welcome.files.spoken = Kolonnas sauc par vertikālēm. Tās apzīmē ar b
 lesson.welcome.ranks = Rindas sauc par horizontālēm. Tās apzīmē ar cipariem no {@}viena līdz {@2}astoņiem, sākot no tavas puses.
 lesson.welcome.square = Katru lauciņu nosauc ar tā burtu un pēc tam ar ciparu. Šis lauciņš ir {sq}.
 lesson.welcome.square2 = Un šis ir {sq}.
-lesson.welcome.kings = Šie ir abi karaļi. Tavējais stāv uz {sq}, manējais uz {sq2}.
+lesson.welcome.kings = Šie ir abi karaļi. Tavējais stāv uz {sq}, manējais — uz {sq2}.
 lesson.welcome.ask = Tava kārta: pavirzi savu karali vienu lauciņu uz priekšu, uz {sq}.
 lesson.welcome.wrong = Tas ir {to}. Mums vajag {sq}: burts e, cipars divi.
 lesson.welcome.ok = Lieliski. Tavs karalis ir uz {sq}.
@@ -202,7 +202,7 @@ lesson.mate3.ok = Mats! Abi torņi strādāja kā kāpnes.
 # ---- Chapter 5: castling ---------------------------------------------------------------------------------------
 lesson.castle.what = Rokāde ir īpašs gājiens, kas palīdz parūpēties par karaļa drošību. Karalis un tornis pārvietojas kopā.
 lesson.castle.how = {@}Karalis paiet divus lauciņus torņa virzienā, un {@2}tornis pārlec pāri karalim uz tā otru pusi.
-lesson.castle.ask = Vienmēr vispirms pieskaries karalim. Tagad tu: veic īso rokādi, karaļa flangā.
+lesson.castle.ask = Vienmēr vispirms pieskaries karalim. Tagad tu: veic īso rokādi karaļa flangā.
 lesson.castle.rook = Tā tu pārvieto tikai torni. Lai veiktu rokādi, pārvieto karali divus lauciņus torņa virzienā.
 lesson.castle.long = Tā ir garā rokāde, arī atļauta! Šoreiz veic rokādi uz tuvākā torņa pusi.
 lesson.castle.one = Viens lauciņš ir parasts karaļa gājiens. Rokādē karalis paiet divus.
@@ -244,7 +244,7 @@ lesson.draws.agree = Spēlētāji var arī vienoties par neizšķirtu.
 lesson.draws.repeat = Neizšķirtu var panākt arī tad, ja pozīcija atkārtojas trīs reizes vai ja piecdesmit gājienos nav bijis nevienas ņemšanas un neviena bandinieka gājiena.
 
 # ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
-# Time controls: zibšahs (blitz), ātrais šahs (rapid), klasiskais šahs (classical).
+# Time controls as assets/i18n/lv.lang (tc.*): zibspēle (blitz), ātrspēle (rapid), klasiskais šahs.
 lesson.talk.rules = Tagad tu zini visus šaha noteikumus. Labi padarīts!
 lesson.talk.real = Ļauj man pastāstīt, kā notiek īstas partijas.
 lesson.talk.elo = Spēlētājiem ir reitings, ko sauc par Elo. Tas pieaug, kad tu uzvari, un samazinās, kad zaudē.
@@ -254,7 +254,7 @@ lesson.talk.clock = Šis ir {@}šaha pulkstenis. Katram spēlētājam ir savs la
 lesson.talk.press = Pēc sava gājiena tu nospied pulksteni ar to pašu roku. Tad sāk tecēt mans laiks.
 lesson.talk.flag = Ja tavs laiks beidzas, tu zaudē, ja vien es nekādi nevaru tev pieteikt matu.
 lesson.talk.increment = Pieci plus trīs nozīmē piecas minūtes katram un vēl trīs sekundes pēc katra gājiena.
-lesson.talk.speeds = Īsās partijas sauc par zibšahu, garākās par ātro šahu, bet visgarākās par klasisko šahu.
+lesson.talk.speeds = Īsās partijas sauc par zibspēli, garākās par ātrspēli, bet visgarākās par klasisko šahu.
 lesson.talk.no_clock = Ar mani pulkstenis ir izslēgts. Domā tik ilgi, cik tev vajag.
 lesson.talk.touch = Īstā partijā, ja tu pieskaries kādai no savām figūrām, tev ar to jāizdara gājiens.
 lesson.talk.touch_mine = Ja tu pieskaries kādai no manām figūrām, tev tā jāpaņem, ja vien tas ir iespējams.
