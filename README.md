@@ -38,8 +38,11 @@ real-time material shaders, physically based lighting.
 - **Online**: rated games, challenges and private games on the official server or a community
   one ([scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server)), or a
   direct match between two computers.
-- The interface in English, French, German, Spanish, Ukrainian, Russian, Arabic, Japanese,
-  Simplified Chinese and Traditional Chinese.
+- The interface in 34 languages: English, Bulgarian, Croatian, Czech, Danish, Dutch, Estonian,
+  Finnish, French, German, Greek, Hindi, Hungarian, Indonesian, Italian, Latvian, Lithuanian, Polish,
+  Portuguese (Portugal and Brazil), Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Turkish,
+  Ukrainian, Vietnamese, Arabic, Japanese, Korean, Simplified Chinese and Traditional Chinese. The
+  coach speaks all of them except Chinese (English with Chinese subtitles).
 
 How to play and every mode and option are described in [docs/GUIDE.md](docs/GUIDE.md).
 
@@ -121,7 +124,7 @@ on Windows, `./scacelith <options>` on Linux, `/Applications/Scacelith.app/Conte
 
 | Option | Effect |
 |---|---|
-| `--lang <code>` | the interface language for this session: `en`, `fr`, `de`, `es`, `uk`, `ru`, `ar`, `ja`, `zh-Hans` or `zh-Hant` |
+| `--lang <code>` | the interface language for this session: `en`, `bg`, `cs`, `da`, `de`, `el`, `es`, `et`, `fi`, `fr`, `hi`, `hr`, `hu`, `id`, `it`, `lt`, `lv`, `nl`, `pl`, `pt`, `pt-BR`, `ro`, `ru`, `sk`, `sl`, `sv`, `tr`, `uk`, `vi`, `ar`, `ja`, `ko`, `zh-Hans` or `zh-Hant` |
 | `--ini <file>` | read and write the settings in that file, with the saved logins beside it, instead of the user folder |
 | `--calibrate` | the brightness calibration before the title page, as on a first start |
 | `--coach-dir <folder>` | read (and download) the coach's voice model in that folder |
@@ -185,12 +188,15 @@ fonts, of Stockfish's authors, of the QR code generator and of the opening names
   that White is to play): CC0-1.0.
 - **Unicode Character Database** 14.0, from which the NFKD table of the coach's voice
   (`src/tts/nfkd_table.cpp`) is generated: Unicode licence (Unicode-DFS-2016), © Unicode, Inc.
-- **Fonts.** The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
-  fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
-  (Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under
-  the SIL Open Font License 1.1; the Arabic and CJK fonts (Amiri, Aref Ruqaa, Klee One, LXGW WenKai
-  / WenKai TC) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the
-  others are the upstream files unchanged. The chess figures of the promotion picker come from a
+- **Fonts.** The Cinzel, EB Garamond, Amiri (Khaled Hosny), Gowun Batang (Yanghee Ryu) and Tiro
+  Devanagari Hindi (Tiro Typeworks) interface fonts and the handwriting fonts Caveat (Impallari
+  Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa (Abdullah Aref, Khaled
+  Hosny), Klee One (Fontworks), LXGW WenKai / WenKai TC (LXGW), Nanum Pen Script (NHN Corporation),
+  Kalam (Indian Type Foundry) and Mynerve (Carolina Short) are under the SIL Open Font License 1.1;
+  the Arabic, CJK, Korean, Devanagari and Greek/Vietnamese handwriting fonts (Amiri, Aref Ruqaa,
+  Klee One, LXGW WenKai / WenKai TC, Gowun Batang, Nanum Pen Script, Tiro Devanagari Hindi, Kalam,
+  Mynerve) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the others
+  are the upstream files unchanged. The chess figures of the promotion picker come from a
   subset of GNU FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in
   `assets/fonts/` and `assets/fonts/hand/`.
 - **The compiler's runtime libraries**, linked into the Windows executable and the Linux release

@@ -107,6 +107,30 @@ TEST(i18n_devices_signed_out_note_is_about_another_device) {
         {"ja", {"\xE3\x81\x93\xE3\x81\xAE\xE3\x83\x87\xE3\x83\x90\xE3\x82\xA4\xE3\x82\xB9"}},                                               // このデバイス
         {"zh-Hans", {"\xE6\x9C\xAC\xE8\xAE\xBE\xE5\xA4\x87", "\xE6\xAD\xA4\xE8\xAE\xBE\xE5\xA4\x87"}},                                     // 本设备, 此设备
         {"zh-Hant", {"\xE6\x9C\xAC\xE8\xA3\x9D\xE7\xBD\xAE", "\xE6\xAD\xA4\xE8\xA3\x9D\xE7\xBD\xAE"}},                                     // 本裝置, 此裝置
+        {"pt", {"este dispositivo", "neste dispositivo", "deste dispositivo"}},  // este dispositivo, neste dispositivo, deste dispositivo
+        {"pt-BR", {"este dispositivo", "neste dispositivo", "deste dispositivo"}},  // este dispositivo, neste dispositivo, deste dispositivo
+        {"ko", {"\xEC\x9D\xB4 \xEA\xB8\xB0\xEA\xB8\xB0"}},  // 이 기기
+        {"bg", {"\xD1\x82\xD0\xBE\xD0\xB2\xD0\xB0 \xD1\x83\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x81\xD1\x82\xD0\xB2\xD0\xBE"}},  // това устройство
+        {"cs", {"toto za\xC5\x99\xC3\xADzen\xC3\xAD", "tomto za\xC5\x99\xC3\xADzen\xC3\xAD", "tohoto za\xC5\x99\xC3\xADzen\xC3\xAD"}},  // toto zařízení, tomto zařízení, tohoto zařízení
+        {"da", {"denne enhed"}},  // denne enhed
+        {"el", {"\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE \xCE\xB7 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE", "\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE \xCF\x84\xCE\xB7 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE", "\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE\xCF\x82 \xCF\x84\xCE\xB7\xCF\x82 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE\xCF\x82"}},  // αυτή η συσκευή, αυτή τη συσκευή, αυτής της συσκευής
+        {"et", {"see seade", "selle seadme", "selles seadmes", "sellest seadmest"}},  // see seade, selle seadme, selles seadmes, sellest seadmest
+        {"fi", {"t\xC3\xA4m\xC3\xA4 laite", "t\xC3\xA4m\xC3\xA4n laitteen", "t\xC3\xA4ss\xC3\xA4 laitteessa", "t\xC3\xA4st\xC3\xA4 laitteesta", "t\xC3\xA4t\xC3\xA4 laitetta"}},  // tämä laite, tämän laitteen, tässä laitteessa, tästä laitteesta, tätä laitetta
+        {"hi", {"\xE0\xA4\xAF\xE0\xA4\xB9 \xE0\xA4\xA1\xE0\xA4\xBF\xE0\xA4\xB5\xE0\xA4\xBE\xE0\xA4\x87\xE0\xA4\xB8", "\xE0\xA4\x87\xE0\xA4\xB8 \xE0\xA4\xA1\xE0\xA4\xBF\xE0\xA4\xB5\xE0\xA4\xBE\xE0\xA4\x87\xE0\xA4\xB8"}},  // यह डिवाइस, इस डिवाइस
+        {"hr", {"ovaj ure\xC4\x91" "aj", "ovog ure\xC4\x91" "aja", "ovom ure\xC4\x91" "aju"}},  // ovaj uređaj, ovog uređaja, ovom uređaju
+        {"hu", {"ez az eszk\xC3\xB6z", "ezt az eszk\xC3\xB6zt", "ezen az eszk\xC3\xB6z\xC3\xB6n", "err\xC5\x91l az eszk\xC3\xB6zr\xC5\x91l"}},  // ez az eszköz, ezt az eszközt, ezen az eszközön, erről az eszközről
+        {"id", {"perangkat ini"}},  // perangkat ini
+        {"it", {"questo dispositivo"}},  // questo dispositivo
+        {"lt", {"\xC5\xA1is \xC4\xAFrenginys", "\xC5\xA1io \xC4\xAFrenginio", "\xC5\xA1iame \xC4\xAFrenginyje", "\xC5\xA1\xC4\xAF \xC4\xAFrengin\xC4\xAF"}},  // šis įrenginys, šio įrenginio, šiame įrenginyje, šį įrenginį
+        {"lv", {"\xC5\xA1\xC4\xAB ier\xC4\xAB" "ce", "\xC5\xA1\xC4\xABs ier\xC4\xAB" "ces", "\xC5\xA1" "aj\xC4\x81 ier\xC4\xAB" "c\xC4\x93", "\xC5\xA1o ier\xC4\xAB" "ci"}},  // šī ierīce, šīs ierīces, šajā ierīcē, šo ierīci
+        {"nl", {"dit apparaat"}},  // dit apparaat
+        {"pl", {"to urz\xC4\x85" "dzenie", "tego urz\xC4\x85" "dzenia", "tym urz\xC4\x85" "dzeniu"}},  // to urządzenie, tego urządzenia, tym urządzeniu
+        {"ro", {"acest dispozitiv", "acestui dispozitiv", "dispozitivul acesta"}},  // acest dispozitiv, acestui dispozitiv, dispozitivul acesta
+        {"sk", {"toto zariadenie", "tohto zariadenia", "tomto zariaden\xC3\xAD"}},  // toto zariadenie, tohto zariadenia, tomto zariadení
+        {"sl", {"ta naprava", "te naprave", "tej napravi", "to napravo"}},  // ta naprava, te naprave, tej napravi, to napravo
+        {"sv", {"den h\xC3\xA4r enheten", "denna enhet"}},  // den här enheten, denna enhet
+        {"tr", {"bu cihaz", "bu cihaz\xC4\xB1n", "bu cihazda", "bu cihazdan"}},  // bu cihaz, bu cihazın, bu cihazda, bu cihazdan
+        {"vi", {"thi\xE1\xBA\xBFt b\xE1\xBB\x8B n\xC3\xA0y"}},  // thiết bị này
     };
     CHECK_EQ(int(thisDevice.size()), int(i18n::languages().size()));
     for (const i18n::Language& lang : i18n::languages()) {

@@ -408,9 +408,14 @@ during the loading, or a first run straight into a game, shows it the next time 
 never do). `--calibrate` opens the page again, and the UI viewer shows it with
 `--scene ui --ui-screen calibration`.
 
-The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
-to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
-system language; Options > Display > Language changes it at once. Options > Player holds your
+The interface speaks 34 languages: English, Bulgarian, Croatian, Czech, Danish, Dutch, Estonian,
+Finnish, French, German, Greek, Hindi, Hungarian, Indonesian, Italian, Latvian, Lithuanian, Polish,
+Portuguese (Portugal and Brazil), Romanian, Russian, Slovak, Slovenian, Spanish, Swedish, Turkish,
+Ukrainian, Vietnamese, Arabic (laid out right to left), Japanese, Korean, Simplified Chinese and
+Traditional Chinese. The coach speaks each of them in its own voice, except Chinese (English, with
+Chinese subtitles); Brazilian Portuguese is read by the Portuguese voice. The first start follows
+the system language; Options > Display > Language changes it at once (click the language box for
+the whole list). Options > Player holds your
 name and the handwriting in which you fill in your scoresheet, with a preview. Translations live
 in `assets/i18n/<code>.lang` (one `key = text` per line, English is the reference and the
 fallback); `--lang <code>` overrides the language for one session.

@@ -1,0 +1,153 @@
+# Coach speech (Hungarian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said
+# by the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Hungarian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "te" or "én" here: the players are "világos" and "sötét", lowercase inside a sentence,
+#   capital at its start (glossary). A piece comes with its side and article: {piece} {t1} {t2} =
+#   "a világos huszár"; the case forms of common.lang: {piece:acc} "a világos huszárt",
+#   {piece:dat} "a világos huszárnak" ("{piece:dat} nem volt védője").
+# - Never a suffix or an article on {move}, {best}, {reply}, {line}: they stand alone ("Jobb lett
+#   volna: {best}."), before a postposition ("{move} után") or before "lépéssel".
+# - Counted numbers (common.lang): {m:move_ine} "3 lépésben" (mate in 3), {m:move_adj} "3 lépéses",
+#   {pts:point_acc} "3 pontot", {pts:point_nyi} anyagot "3 pontnyi anyagot", {n:mistake} "2 hiba",
+#   {n:mistake_acc} "2 hibát", {m:blunder_acc} "1 baklövést", {acc_white:percent} "85%".
+# - "Forced mate" = kényszerített matt.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Nézzük át együtt ezt a játszmát.
+an.start.2 = Menjünk végig ezen a játszmán lépésről lépésre.
+an.start.3 = Íme a játszma. Lássuk, hogyan alakult.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Ez a játszma egy felállított állásból indul. Menjünk végig rajta.
+an.start.setup.2 = Játszma egy felállított állásból. Lássuk, hogyan alakult.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = A megnyitás {opening:def}.
+an.opening.2 = Ez {opening:def}.
+an.book_exit = {move} lépéssel a játszma elhagyja az ismert megnyitáselméletet.
+an.book_exit.2 = {move} az első lépés, amely már nincs benne a megnyitási könyvben.
+an.book_exit.3 = Itt ér véget a megnyitáselmélet, ezzel a lépéssel: {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} baklövés.
+an.blunder.2 = Itt {move} súlyos hiba.
+an.blunder.3 = Baklövés: {move}.
+an.mistake = {move} hiba.
+an.mistake.2 = {move} itt nem a jó lépés.
+an.mistake.3 = Hiba: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} elszalasztja az alkalmat, hogy megbüntesse ezt a hibát.
+an.missed_chance.2 = {move} lépéssel elúszik a lehetőség.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Most {reply:nomate} mattot ad.
+an.mate_allowed.one.2 = Erre jöhet {reply:nomate}, és az matt.
+an.mate_allowed = Ez kényszerített mattot tesz lehetővé {m:move_ine}, kezdve ezzel: {reply:nomate}.
+an.mate_allowed.2 = Most kényszerített matt van {m:move_ine}, kezdve ezzel: {reply:nomate}.
+an.fork = Most {reply} villával támadja {t1:acc} és {t2:acc}.
+an.fork.2 = Erre jöhet {reply}, amely egyszerre támadja {t1:acc} és {t2:acc}.
+an.fork.3 = {reply} egyszerre támadja {t1:acc} és {t2:acc}.
+an.hanging = Ez a lépés védtelenül hagyja {piece:acc}, és {reply} leüti.
+an.hanging.2 = {piece} védő nélkül marad: {reply} megnyeri.
+an.hanging.3 = {reply} egyszerűen leüti {piece:acc}, amelynek nem volt védője.
+an.material = Erre a válasz {line}, amely {pts:point_nyi} anyagot nyer.
+an.material.2 = Ezután {line}, és ez {pts:point_acc} nyer.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} mattot adott volna.
+an.mate_missed.one.2 = {best:nomate} matt lett volna.
+an.mate_missed = {best:nomate} lépéssel kikényszeríthető lett volna a matt {m:move_ine}.
+an.mate_missed.2 = Volt kényszerített matt {m:move_ine}, kezdve ezzel: {best:nomate}.
+an.missed_capture = {best} ingyen megnyerte volna {piece:acc}.
+an.missed_capture.2 = {piece:dat} nem volt védője: {best} leütötte volna.
+an.missed_fork = {best} villával támadta volna {t1:acc} és {t2:acc}.
+an.missed_fork.2 = {best} villa lett volna: egyszerre támadta volna {t1:acc} és {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = {best} erősebb volt.
+an.better.2 = Jobb lett volna: {best}.
+an.better.3 = {best} pontosabb volt.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} briliáns lépés: feláldozza {piece:acc}!
+an.brilliant.2 = Briliáns áldozat! {move} felajánlja {piece:acc}.
+an.brilliant.3 = {move}! Briliáns lépés, amely felajánlja {piece:acc}.
+an.brilliant.mate = Ez kényszerített matthoz vezet {m:move_ine}.
+an.brilliant.mate.2 = És kikényszeríti a mattot {m:move_ine}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} az egyetlen lépés, amely megtartja az előnyt.
+an.only.win.2 = Itt csak {move} tartja meg az előnyt. Ügyes megoldás.
+an.only.hold = {move} az egyetlen lépés, amely megtartja az egyensúlyt.
+an.only.hold.2 = Itt csak {move} tartja az állást.
+an.only.defend = {move} az egyetlen lépés, amellyel folytatódhat a küzdelem.
+an.only.defend.2 = Itt csak {move} tartja életben a játszmát. Jó védekezés.
+an.only.best = {move} itt messze a legerősebb lépés.
+an.only.best.2 = Pontos: {move} sokkal erősebb bármi másnál.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} kissé pontatlan: {best} pontosabb volt.
+an.inaccuracy.2 = Nem egészen a legjobb: {best} pontosabb volt, mint {move}.
+an.interesting = {move} érdekes ötlet: felajánlja {piece:acc}.
+an.interesting.2 = Érdekes próbálkozás: {move} odaadja {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Világosnak most {m:move_adj} kényszerített mattja van.
+an.mate_on.white.2 = Innen világos kikényszerítheti a mattot {m:move_ine}.
+an.mate_on.black = Sötétnek most {m:move_adj} kényszerített mattja van.
+an.mate_on.black.2 = Innen sötét kikényszerítheti a mattot {m:move_ine}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Matt. Világos megnyeri a játszmát.
+an.end.mate.white.2 = És ez matt: világos nyer.
+an.end.mate.black = Matt. Sötét megnyeri a játszmát.
+an.end.mate.black.2 = És ez matt: sötét nyer.
+an.end.resigned.white = Sötét feladta, így világos nyeri a játszmát.
+an.end.resigned.white.2 = A játszma itt véget ér: sötét feladja, és világos nyer.
+an.end.resigned.black = Világos feladta, így sötét nyeri a játszmát.
+an.end.resigned.black.2 = A játszma itt véget ér: világos feladja, és sötét nyer.
+an.end.timeout.white = Sötétnek lejárt az ideje, így világos nyer.
+an.end.timeout.white.2 = Világos időtúllépéssel nyer.
+an.end.timeout.black = Világosnak lejárt az ideje, így sötét nyer.
+an.end.timeout.black.2 = Sötét időtúllépéssel nyer.
+an.end.win.white = A játszma világos győzelmével ér véget.
+an.end.win.white.2 = Világos megnyeri a játszmát.
+an.end.win.black = A játszma sötét győzelmével ér véget.
+an.end.win.black.2 = Sötét megnyeri a játszmát.
+an.end.stalemate = Patt: a játszma döntetlen.
+an.end.stalemate.2 = Patt állt elő, így a játszma döntetlenre végződik.
+an.end.draw.agreement = A játékosok megegyeztek a döntetlenben.
+an.end.draw.agreement.2 = A játszma megegyezéses döntetlennel ér véget.
+an.end.draw.repetition = A játszma lépésismétlés miatt döntetlen.
+an.end.draw.repetition.2 = Ugyanaz az állás ismét előállt: döntetlen.
+an.end.draw.fifty = A játszma az ötvenlépéses szabály miatt döntetlen.
+an.end.draw.fifty.2 = Ötven lépés ütés és gyaloglépés nélkül: döntetlen.
+an.end.draw.seventy_five = A játszma a hetvenötlépéses szabály miatt döntetlen.
+an.end.draw.seventy_five.2 = Hetvenöt lépés ütés és gyaloglépés nélkül: döntetlen.
+an.end.draw.material = Már nem lehet mattot adni: a játszma döntetlen.
+an.end.draw.material.2 = Egyik fél sem tud már mattot adni, így döntetlen.
+an.end.draw = A játszma döntetlenre végződik.
+an.end.draw.2 = Döntetlen.
+an.end.unfinished = A játszma itt abbamarad, befejezetlenül.
+an.end.unfinished.2 = Itt ér véget a játszma: nem fejezték be.
+an.end.accuracy = Pontosság: világos {acc_white:percent}, sötét {acc_black:percent}.
+an.end.accuracy.2 = Világos pontossága {acc_white:percent} volt, sötété {acc_black:percent}.
+an.end.clean.white = Világos nem követett el sem hibát, sem baklövést.
+an.end.clean.white.2 = Világos játéka mentes volt a komoly hibáktól.
+an.end.clean.black = Sötét nem követett el sem hibát, sem baklövést.
+an.end.clean.black.2 = Sötét játéka mentes volt a komoly hibáktól.
+an.end.mistakes.white = Világos {n:mistake_acc} követett el, baklövést viszont egyet sem.
+an.end.mistakes.white.2 = Világosnál: {n:mistake}, baklövés nélkül.
+an.end.mistakes.black = Sötét {n:mistake_acc} követett el, baklövést viszont egyet sem.
+an.end.mistakes.black.2 = Sötétnél: {n:mistake}, baklövés nélkül.
+an.end.blunders.white = Világos {m:blunder_acc} követett el.
+an.end.blunders.white.2 = Világosnál: {m:blunder}.
+an.end.blunders.black = Sötét {m:blunder_acc} követett el.
+an.end.blunders.black.2 = Sötétnél: {m:blunder}.
+an.end.errors.white = Világos {n:mistake_acc} és {m:blunder_acc} követett el.
+an.end.errors.white.2 = Világosnál: {n:mistake} és {m:blunder}.
+an.end.errors.black = Sötét {n:mistake_acc} és {m:blunder_acc} követett el.
+an.end.errors.black.2 = Sötétnél: {n:mistake} és {m:blunder}.

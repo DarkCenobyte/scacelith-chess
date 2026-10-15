@@ -88,7 +88,9 @@ bool hasKey(const std::vector<OpeningLine>& lines, const std::string& key) {
 }
 
 const std::vector<std::string>& langs() {
-    static const std::vector<std::string> v = {"en", "fr", "de", "es", "ru", "uk", "ar", "ja", "zh-Hans", "zh-Hant"};
+    static const std::vector<std::string> v = {"en", "fr", "de", "es", "ru", "uk", "ar", "ja", "zh-Hans", "zh-Hant",
+                                                "pt", "pt-BR", "ko", "bg", "cs", "da", "el", "et", "fi", "hi", "hr", "hu",
+                                                "id", "it", "lt", "lv", "nl", "pl", "ro", "sk", "sl", "sv", "tr", "vi"};
     return v;
 }
 

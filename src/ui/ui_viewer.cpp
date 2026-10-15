@@ -49,7 +49,7 @@
 //     (early on, the review at work, the moves playing, no voice), analysis-hud-fen (an endgame set up
 //     from a FEN, Black's move first, seen by the player who had Black), analysis-hud-noengine
 //   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
-//   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
+//   --lang <code>   interface language (a code of i18n::languages(): en fr de pt-BR ko ...; read by game::Settings)
 //   --ui-name <name>, --ui-hand <0..2>   player name / handwriting shown by Options > Player
 //   "hand": sample names in every script, written in each handwriting style
 //   --ui-black      promotion picker for Black, --ui-draw   drawn game over card

@@ -67,7 +67,7 @@ why.NotYourTurn = Várj: én jövök.
 
 # ---- Chapter 0: welcome and the board -------------------------------------------------------------------
 lesson.welcome.hello = Szia! Én vagyok az edződ. Tanuljuk meg együtt a sakk szabályait, kis lépésekben.
-lesson.welcome.board = Ez a sakktábla: hatvannégy mező, világosak és sötétek, nyolc sorban nyolc-nyolc.
+lesson.welcome.board = Ez a sakktábla: hatvannégy világos és sötét mező, nyolc sorban, soronként nyolc.
 lesson.welcome.light = A tőled {@}jobbra eső sarokmező mindig világos. Jegyezd meg: jobbra a világos.
 lesson.welcome.files = A függőleges oszlopokat vonalaknak hívjuk. Betűjelük van, {@}a-tól {@2}h-ig.
 lesson.welcome.files.spoken = A függőleges oszlopokat vonalaknak hívjuk. Betűjelük van, {@}atól {@2}háig.
@@ -132,3 +132,134 @@ lesson.pawncap.diagonal = A gyalog viszont átlósan üt, egy mezőt előre.
 lesson.pawncap.ask = Üsd le {my:acc} a gyalogoddal.
 lesson.pawncap.use = Lépj {your:ins}: átlósan előre üt.
 lesson.pawncap.ok = Igen! Egyenesen lép, átlósan üt.
+# Values, set-up and the first moves
+lesson.values.pawn = Minden bábunak van pontértéke. A gyalog egy pontot ér.
+lesson.values.pieces = A huszár vagy a {@}futó hármat ér, a {@2}bástya ötöt, a {@3}vezér kilencet.
+lesson.values.king = A király felbecsülhetetlen értékű: soha nem adhatod oda.
+lesson.values.trade = Igyekezz sosem odaadni egy bábut annál kevesebbért, mint amennyit ér.
+lesson.setup.corners = Minden játszma így kezdődik: a bástyák a {@}sarkokban, mellettük a {@2}huszárok, aztán a {@3}futók.
+lesson.setup.queen = A vezér a saját színére kerül: a te vezéred világos mezőn áll.
+lesson.setup.king = A király mellette áll. Mindig világos kezd.
+lesson.first.ask = Kezdd el a játszmát: a királyod előtti gyaloggal lépj két mezőt, {sq} mezőre.
+lesson.first.wrong = Ez is szabályos lépés! Most viszont, kérlek, a királygyaloggal lépj {sq} mezőre.
+lesson.first.ok = Nagyszerű első lépés: utat nyit a vezérednek és a futódnak.
+lesson.first.reply = Én ugyanígy felelek. Most hozz ki egy huszárt: ugorj {sq} mezőről {sq2} mezőre.
+lesson.first.knight_wrong = A huszár átugorja a gyalogokat. Próbáld {sq} mezőről {sq2} mezőre.
+lesson.first.knight_ok = Tökéletes. A huszárok és a futók korán kijönnek.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Egy bábu védett, ha egy társa vissza tud ütni.
+lesson.safety.pawn = A {@}gyalogom védi {my:acc}.
+lesson.safety.free = {my:dat} viszont nincs védője. A vezéred mindkét bábut támadja.
+lesson.safety.ask = Üsd le a védtelen bábut!
+lesson.safety.watch = Figyeld, mi történik.
+lesson.safety.gave = Odaadtad a kilencet érő vezéredet a hármat érő huszáromért.
+lesson.safety.other = Próbáld inkább a másik bábut.
+lesson.safety.look = Keresd azt a bábut, amelyet semmi sem véd.
+lesson.safety.ok = Kitűnő! Mindig kérdezd meg magadtól: védett az a bábu?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = A bástyám az egész második sort uralja.
+lesson.danger.rule = A király sosem léphet olyan mezőre, ahol leüthetnék.
+lesson.danger.ask = Lépj a királyoddal biztonságos mezőre.
+lesson.danger.ok = Így van. Ott biztonságban van a királyod.
+lesson.check.what = A bástyám támadja a királyodat. Ezt nevezzük sakknak.
+lesson.check.must = Ha sakkban vagy, azonnal el kell hárítanod.
+lesson.check.ways = Három módja van: {@}ellépsz a királlyal, {@2}elzárod a támadás útját, vagy {@3}leütöd a támadót.
+lesson.check.ask = Itt lépj ki a sakkból a királyoddal.
+lesson.check.file = A királyod {to} mezőn még mindig a {@}bástyám vonalán áll. Lépj le erről a vonalról.
+lesson.check.ok = Jó: már nem vagy sakkban.
+lesson.block.again = Megint sakk! Most nincs szabad mezője a királyodnak.
+lesson.block.ask = Akkor zárd el a támadás útját: tegyél közé egy bábut.
+lesson.block.queen = Ez elzárja az utat! De a bástyám leüthetné a vezéredet. Zárj el egy olcsóbb bábuval.
+lesson.block.queen_ok = Működik. Jegyezd meg: a legolcsóbb bábuddal zárj el.
+lesson.block.ok = Tökéletes. A legkevésbé értékes bábuddal zárj el.
+lesson.capture.check = A vezérem sakkot ad, közvetlenül a királyod mellől.
+lesson.capture.ask = Üsd le a támadót!
+lesson.capture.king_ok = Igen! A vezéremnek nem volt védője, ezért a királyod leüthette.
+lesson.capture.knight_ok = Igen! A huszárod leütötte a támadót.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Matt: a király sakkban van, és nincs kiút. Aki mattot ad, megnyeri a játszmát.
+lesson.mate1.stuck = A királyom beszorult a {@}saját gyalogjai mögé.
+lesson.mate1.ask = Adj mattot egy lépésben!
+lesson.mate1.wrong = Közel jársz! Adj sakkot az alapsoromon, ahonnan a királyom nem tud elmenekülni.
+lesson.mate1.ok = Matt! Ez az alapsormatt. Jegyezd meg!
+lesson.mate2.ask = A királyod és a vezéred csapatként dolgozik. Adj mattot egy lépésben.
+lesson.mate2.wrong = Keress olyan sakkot, amely után a királyomnak egyetlen mezője sem marad.
+lesson.mate2.ok = Matt! A királyod védi a vezért, ezért az enyém nem ütheti le.
+lesson.mate2.ok_rank = Matt az alapsoron! A királyod őrzi az enyém előtti összes mezőt.
+lesson.mate3.edge = A hetedik soron álló bástyád a tábla szélén tartja a királyomat.
+lesson.mate3.ask = Most adj mattot {your:ins}.
+lesson.mate3.free = Sakk, de a hetedik sor most szabad, és a királyom elmenekül.
+lesson.mate3.takes = A királyom egyszerűen leüti a bástyádat.
+lesson.mate3.hint = Adj sakkot az alapsoron azzal a bástyával, amelyik nem a hetedik sort őrzi.
+lesson.mate3.ok = Matt! A két bástya úgy dolgozott, mint egy létra.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = A sáncolás különleges lépés, amely biztonságba helyezi a királyodat. A király és a bástya együtt lép.
+lesson.castle.how = A {@}király két mezőt lép az egyik bástya felé, a {@2}bástya pedig átugrik a király másik oldalára.
+lesson.castle.ask = Mindig a királyt fogd meg először. Most te jössz: sáncolj rövidre, a királyszárnyon.
+lesson.castle.rook = Ez csak a bástyát mozdítja el. A sáncoláshoz a királyoddal lépj két mezőt felé.
+lesson.castle.long = Ez a hosszú sánc, az is szabályos! Most viszont a közelebbi bástya felé sáncolj.
+lesson.castle.one = Egy mező sima királylépés. Sáncoláskor a király kettőt lép.
+lesson.castle.other = A sáncoláshoz lépj a királyoddal két mezőt a bástya felé, amely {sq} mezőn áll.
+lesson.castle.ok = Sáncoltál! A királyod biztonságban van, a bástyád pedig harcra kész.
+lesson.castle2.moved = Nem sáncolhatsz, ha a királyod vagy az a bástya már lépett.
+lesson.castle2.attacked = Sakkban sem, és akkor sem, ha a királyod támadott mezőn haladna át, vagy támadott mezőre érkezne.
+lesson.castle2.bishop = A futóm {sq} mezőt támadja. Ezért most ezen az oldalon nem szabad sáncolni.
+lesson.castle2.ask = Sáncolj a másik oldalra.
+lesson.castle2.other = Sáncolj a másik bástyád felé, a vezérszárnyon.
+lesson.castle2.ok = Helyes! A hosszú sánc után a királyod {sq} mezőre kerül.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Van egy különleges gyalogütés, az en passant. Jelentése: „menet közben”.
+lesson.ep.watch = Figyeld a gyalogomat: két mezőt lép, és közvetlenül a tiéd mellé érkezik.
+lesson.ep.how = A gyalogod úgy ütheti le, mintha az enyém csak egy mezőt lépett volna: ilyenkor {sq} mezőre lép.
+lesson.ep.now = De csak most, ebben a lépésben. Üss en passant!
+lesson.ep.gone = Elmúlt a lehetőség: en passant csak azonnal lehet ütni. Próbáljuk újra.
+lesson.ep.ok = En passant! A gyalogom lekerül {sq} mezőről.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Ha egy gyalog eléri az utolsó sort, átváltozik: vezér, bástya, futó vagy huszár lesz belőle.
+lesson.promo.ask = Szinte mindig vezért válassz. Most változtasd át a gyalogodat!
+lesson.promo.under = Szabályos! De a vezér erősebb. Válasszuk a vezért.
+lesson.promo.under_ok = Rendben. A legtöbb játékos azért vezért választ.
+lesson.promo.push = Told a gyalogodat az utolsó sorra, {sq} mezőre.
+lesson.promo.ok = Új vezér! Akár két vezéred is lehet egyszerre.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Én jövök. A királyom nincs sakkban, de körülötte {@}minden mező támadás alatt áll.
+lesson.stale.draw = Nincs szabályos lépésem. Ez a patt, és a játszma döntetlen.
+lesson.stale2.ask = Ha nyerésre állsz, vigyázz a pattra. Adj mattot egy lépésben, patt nélkül!
+lesson.stale2.wrong = Adj sakkot az alapsoromon, ahonnan a királyom nem tud elmenekülni.
+lesson.stale2.ok = Matt! Mindig hagyj lépést az ellenfél királyának, hacsak nem mattot adsz.
+lesson.draws.kings = Más döntetlenek: ha senki sem tud mattot adni, például ha csak a két király maradt, a játszma döntetlen.
+lesson.draws.agree = A játékosok döntetlenben is megegyezhetnek.
+lesson.draws.repeat = Döntetlent lehet kérni akkor is, ha ugyanaz az állás háromszor előfordul, vagy ha ötven lépésen át nem volt sem ütés, sem gyaloglépés.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Most már ismered a sakk összes szabályát. Szép munka!
+lesson.talk.real = Elmesélem, hogyan zajlanak az igazi játszmák.
+lesson.talk.elo = A játékosoknak értékszámuk van, ez az Élő-pontszám. Ha nyersz, nő, ha veszítesz, csökken.
+lesson.talk.elo_gap = Egy erősebb játékos legyőzése több pontot hoz, egy gyengébbtől elszenvedett vereség pedig többe kerül.
+lesson.talk.elo_start = Az értékszámod öt értékelt játszma után jelenik meg. A velem játszott játszmák csak gyakorlások, ezért nem számítanak bele az értékszámodba.
+lesson.talk.clock = Ez egy {@}sakkóra. Minden játékosnak saját ideje van, és az csak akkor fogy, amikor ő következik.
+lesson.talk.press = A lépésed után ugyanazzal a kezeddel nyomod meg az órát. Ezzel elindul az én időm.
+lesson.talk.flag = Ha lejár az időd, elveszíted a játszmát, kivéve, ha semmiképp sem tudnék mattot adni neked.
+lesson.talk.increment = Az öt plusz három azt jelenti: fejenként öt perc, plusz három másodperc minden lépés után.
+lesson.talk.speeds = A rövid játszmák neve villámsakk, a hosszabbaké rapid, a leghosszabbaké klasszikus.
+lesson.talk.no_clock = Velem nem jár az óra. Gondolkodj nyugodtan, ameddig csak kell.
+lesson.talk.touch = Igazi játszmában, ha megérinted az egyik bábudat, azzal lépned kell.
+lesson.talk.touch_mine = Ha az én egyik bábumat érinted meg, le kell ütnöd, ha tudod.
+lesson.talk.adjust = Ha lépés nélkül csak meg akarsz igazítani egy bábut, előbb mondd: „igazítok”.
+lesson.talk.release = Amint elengedsz egy bábut egy új mezőn, a lépés megtörtént.
+lesson.talk.sheet = Versenyeken mindkét játékos felír minden lépést egy {@}jegyzőlapra.
+# {move:letters} shows the Hungarian scoresheet letters ("Hf3"), which is what this line teaches.
+lesson.talk.notation = Felírjuk a bábu betűjelét és a mezőt, például így: {move:letters}. A gyalognál csak a mezőt.
+lesson.talk.robot = A robotod helyetted írja fel a lépéseidet. Gyors játszmákban nem kötelező lejegyezni a lépéseket.
+lesson.talk.handshake = A játszma kézfogással kezdődik és végződik. Azt jelenti: jó játékot, és köszönöm.
+lesson.talk.polite = Akár nyersz, akár veszítesz, maradj udvarias, és soha ne zavard az ellenfeledet, amíg gondolkodik.
+lesson.talk.tips = Három tanács a játszmáidhoz: {@}urald a centrumot, {@2}hozd ki a huszáraidat és a futóidat, és {@3}sáncolj korán.
+lesson.talk.next = Ha készen állsz, válaszd az „Első lépések” szintet. Kíméletesen játszom, és minden hiba után segítek.
+lesson.talk.welcome = Üdv a sakk világában! Fogjunk kezet.

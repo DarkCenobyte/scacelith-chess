@@ -21,7 +21,8 @@
    "it",
    "da",
    "et",
-   "fi"
+   "fi",
+   "hi"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -160,6 +161,10 @@
     "fi": {
      "name": "Kuningassotilaan avaus",
      "def": "kuningassotilaan avaus"
+    },
+    "hi": {
+     "name": "किंग्स पॉन ओपनिंग",
+     "def": "किंग्स पॉन ओपनिंग"
     }
    },
    "comment": {
@@ -272,6 +277,10 @@
     "fi": {
      "name": "Kuningatarsotilaan avaus",
      "def": "kuningatarsotilaan avaus"
+    },
+    "hi": {
+     "name": "क्वींस पॉन ओपनिंग",
+     "def": "क्वींस पॉन ओपनिंग"
     }
    },
    "comment": {
@@ -381,6 +390,10 @@
     "fi": {
      "name": "Kuningasratsun avaus",
      "def": "kuningasratsun avaus"
+    },
+    "hi": {
+     "name": "किंग्स नाइट ओपनिंग",
+     "def": "किंग्स नाइट ओपनिंग"
     }
    },
    "comment": {
@@ -493,6 +506,10 @@
     "fi": {
      "name": "Sisilialainen puolustus",
      "def": "sisilialainen puolustus"
+    },
+    "hi": {
+     "name": "सिसिलियन डिफ़ेंस",
+     "def": "सिसिलियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -602,6 +619,10 @@
     "fi": {
      "name": "Ranskalainen puolustus",
      "def": "ranskalainen puolustus"
+    },
+    "hi": {
+     "name": "फ़्रेंच डिफ़ेंस",
+     "def": "फ़्रेंच डिफ़ेंस"
     }
    },
    "comment": {
@@ -711,6 +732,10 @@
     "fi": {
      "name": "Caro-Kann-puolustus",
      "def": "Caro-Kann-puolustus"
+    },
+    "hi": {
+     "name": "कारो-कान डिफ़ेंस",
+     "def": "कारो-कान डिफ़ेंस"
     }
    },
    "comment": {
@@ -820,6 +845,10 @@
     "fi": {
      "name": "Skandinaavinen puolustus",
      "def": "skandinaavinen puolustus"
+    },
+    "hi": {
+     "name": "स्कैंडिनेवियन डिफ़ेंस",
+     "def": "स्कैंडिनेवियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -929,6 +958,10 @@
     "fi": {
      "name": "Italialainen peli",
      "def": "italialainen peli"
+    },
+    "hi": {
+     "name": "इटैलियन गेम",
+     "def": "इटैलियन गेम"
     }
    },
    "comment": {
@@ -1038,6 +1071,10 @@
     "fi": {
      "name": "Espanjalainen peli",
      "def": "espanjalainen peli"
+    },
+    "hi": {
+     "name": "रुई लोपेज़",
+     "def": "रुई लोपेज़"
     }
    },
    "comment": {
@@ -1147,6 +1184,10 @@
     "fi": {
      "name": "Skotlantilainen peli",
      "def": "skotlantilainen peli"
+    },
+    "hi": {
+     "name": "स्कॉच गेम",
+     "def": "स्कॉच गेम"
     }
    },
    "comment": {
@@ -1256,6 +1297,10 @@
     "fi": {
      "name": "Philidorin puolustus",
      "def": "Philidorin puolustus"
+    },
+    "hi": {
+     "name": "फ़िलिडोर डिफ़ेंस",
+     "def": "फ़िलिडोर डिफ़ेंस"
     }
    },
    "comment": {
@@ -1365,6 +1410,10 @@
     "fi": {
      "name": "Petrovin puolustus",
      "def": "Petrovin puolustus"
+    },
+    "hi": {
+     "name": "पेट्रोव डिफ़ेंस",
+     "def": "पेट्रोव डिफ़ेंस"
     }
    },
    "comment": {
@@ -1475,6 +1524,10 @@
     "fi": {
      "name": "Neljän ratsun peli",
      "def": "neljän ratsun peli"
+    },
+    "hi": {
+     "name": "फ़ोर नाइट्स गेम",
+     "def": "फ़ोर नाइट्स गेम"
     }
    },
    "comment": {
@@ -1585,6 +1638,10 @@
     "fi": {
      "name": "Englantilainen avaus",
      "def": "englantilainen avaus"
+    },
+    "hi": {
+     "name": "इंग्लिश ओपनिंग",
+     "def": "इंग्लिश ओपनिंग"
     }
    },
    "comment": {
@@ -1694,6 +1751,10 @@
     "fi": {
      "name": "Zukertortin avaus",
      "def": "Zukertortin avaus"
+    },
+    "hi": {
+     "name": "ज़ुकरटॉर्ट ओपनिंग",
+     "def": "ज़ुकरटॉर्ट ओपनिंग"
     }
    },
    "comment": {
@@ -1808,6 +1869,10 @@
     "fi": {
      "name": "Kuningatargambiitti",
      "def": "kuningatargambiitti"
+    },
+    "hi": {
+     "name": "क्वींस गैम्बिट",
+     "def": "क्वींस गैम्बिट"
     }
    },
    "comment": {
@@ -1917,6 +1982,10 @@
     "fi": {
      "name": "Hylätty kuningatargambiitti",
      "def": "hylätty kuningatargambiitti"
+    },
+    "hi": {
+     "name": "क्वींस गैम्बिट डिक्लाइंड",
+     "def": "क्वींस गैम्बिट डिक्लाइंड"
     }
    },
    "comment": {
@@ -2026,6 +2095,10 @@
     "fi": {
      "name": "Vastaanotettu kuningatargambiitti",
      "def": "vastaanotettu kuningatargambiitti"
+    },
+    "hi": {
+     "name": "क्वींस गैम्बिट एक्सेप्टेड",
+     "def": "क्वींस गैम्बिट एक्सेप्टेड"
     }
    },
    "comment": {
@@ -2136,6 +2209,10 @@
     "fi": {
      "name": "Slaavilainen puolustus",
      "def": "slaavilainen puolustus"
+    },
+    "hi": {
+     "name": "स्लाव डिफ़ेंस",
+     "def": "स्लाव डिफ़ेंस"
     }
    },
    "comment": {
@@ -2246,6 +2323,10 @@
     "fi": {
      "name": "Puolislaavilainen puolustus",
      "def": "puolislaavilainen puolustus"
+    },
+    "hi": {
+     "name": "सेमी-स्लाव डिफ़ेंस",
+     "def": "सेमी-स्लाव डिफ़ेंस"
     }
    },
    "comment": {
@@ -2356,6 +2437,10 @@
     "fi": {
      "name": "Intialainen puolustus",
      "def": "intialainen puolustus"
+    },
+    "hi": {
+     "name": "इंडियन डिफ़ेंस",
+     "def": "इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -2465,6 +2550,10 @@
     "fi": {
      "name": "Kuningasintialainen puolustus",
      "def": "kuningasintialainen puolustus"
+    },
+    "hi": {
+     "name": "किंग्स इंडियन डिफ़ेंस",
+     "def": "किंग्स इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -2579,6 +2668,10 @@
     "fi": {
      "name": "Lontoon järjestelmä",
      "def": "Lontoon järjestelmä"
+    },
+    "hi": {
+     "name": "लंदन सिस्टम",
+     "def": "लंदन सिस्टम"
     }
    },
    "comment": {
@@ -2690,6 +2783,10 @@
     "fi": {
      "name": "Moderni puolustus",
      "def": "moderni puolustus"
+    },
+    "hi": {
+     "name": "मॉडर्न डिफ़ेंस",
+     "def": "मॉडर्न डिफ़ेंस"
     }
    },
    "comment": {
@@ -2801,6 +2898,10 @@
     "fi": {
      "name": "Pircin puolustus",
      "def": "Pircin puolustus"
+    },
+    "hi": {
+     "name": "पिर्क डिफ़ेंस",
+     "def": "पिर्क डिफ़ेंस"
     }
    },
    "comment": {
@@ -2911,6 +3012,10 @@
     "fi": {
      "name": "Wieniläinen peli",
      "def": "wieniläinen peli"
+    },
+    "hi": {
+     "name": "वियना गेम",
+     "def": "वियना गेम"
     }
    },
    "comment": {
@@ -3020,6 +3125,10 @@
     "fi": {
      "name": "Lähettiavaus",
      "def": "lähettiavaus"
+    },
+    "hi": {
+     "name": "बिशप्स ओपनिंग",
+     "def": "बिशप्स ओपनिंग"
     }
    },
    "comment": {
@@ -3129,6 +3238,10 @@
     "fi": {
      "name": "Aljehinin puolustus",
      "def": "Aljehinin puolustus"
+    },
+    "hi": {
+     "name": "अलेखिन डिफ़ेंस",
+     "def": "अलेखिन डिफ़ेंस"
     }
    },
    "comment": {
@@ -3238,6 +3351,10 @@
     "fi": {
      "name": "Kuningasgambiitti",
      "def": "kuningasgambiitti"
+    },
+    "hi": {
+     "name": "किंग्स गैम्बिट",
+     "def": "किंग्स गैम्बिट"
     }
    },
    "comment": {
@@ -3347,6 +3464,10 @@
     "fi": {
      "name": "Vastaanotettu kuningasgambiitti",
      "def": "vastaanotettu kuningasgambiitti"
+    },
+    "hi": {
+     "name": "किंग्स गैम्बिट एक्सेप्टेड",
+     "def": "किंग्स गैम्बिट एक्सेप्टेड"
     }
    },
    "comment": {
@@ -3456,6 +3577,10 @@
     "fi": {
      "name": "Hylätty kuningasgambiitti",
      "def": "hylätty kuningasgambiitti"
+    },
+    "hi": {
+     "name": "किंग्स गैम्बिट डिक्लाइंड",
+     "def": "किंग्स गैम्बिट डिक्लाइंड"
     }
    },
    "comment": {
@@ -3565,6 +3690,10 @@
     "fi": {
      "name": "Nimzowitschin puolustus",
      "def": "Nimzowitschin puolustus"
+    },
+    "hi": {
+     "name": "निम्ज़ोविच डिफ़ेंस",
+     "def": "निम्ज़ोविच डिफ़ेंस"
     }
    },
    "comment": {
@@ -3679,6 +3808,10 @@
     "fi": {
      "name": "Owenin puolustus",
      "def": "Owenin puolustus"
+    },
+    "hi": {
+     "name": "ओवेन डिफ़ेंस",
+     "def": "ओवेन डिफ़ेंस"
     }
    },
    "comment": {
@@ -3789,6 +3922,10 @@
     "fi": {
      "name": "Horwitzin puolustus",
      "def": "Horwitzin puolustus"
+    },
+    "hi": {
+     "name": "हॉरविट्ज़ डिफ़ेंस",
+     "def": "हॉरविट्ज़ डिफ़ेंस"
     }
    },
    "comment": {
@@ -3898,6 +4035,10 @@
     "fi": {
      "name": "Van 't Kruijsin avaus",
      "def": "Van 't Kruijsin avaus"
+    },
+    "hi": {
+     "name": "वान्ट क्रुइस ओपनिंग",
+     "def": "वान्ट क्रुइस ओपनिंग"
     }
    },
    "comment": {
@@ -4008,6 +4149,10 @@
     "fi": {
      "name": "Keskustapeli",
      "def": "keskustapeli"
+    },
+    "hi": {
+     "name": "सेंटर गेम",
+     "def": "सेंटर गेम"
     }
    },
    "comment": {
@@ -4118,6 +4263,10 @@
     "fi": {
      "name": "Englundin gambiitti",
      "def": "Englundin gambiitti"
+    },
+    "hi": {
+     "name": "एंगलुंड गैम्बिट",
+     "def": "एंगलुंड गैम्बिट"
     }
    },
    "comment": {
@@ -4227,6 +4376,10 @@
     "fi": {
      "name": "Hollantilainen puolustus",
      "def": "hollantilainen puolustus"
+    },
+    "hi": {
+     "name": "डच डिफ़ेंस",
+     "def": "डच डिफ़ेंस"
     }
    },
    "comment": {
@@ -4336,6 +4489,10 @@
     "fi": {
      "name": "Nimzo-intialainen puolustus",
      "def": "Nimzo-intialainen puolustus"
+    },
+    "hi": {
+     "name": "निम्ज़ो-इंडियन डिफ़ेंस",
+     "def": "निम्ज़ो-इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -4447,6 +4604,10 @@
     "fi": {
      "name": "Kuningatarintialainen puolustus",
      "def": "kuningatarintialainen puolustus"
+    },
+    "hi": {
+     "name": "क्वींस इंडियन डिफ़ेंस",
+     "def": "क्वींस इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -4557,6 +4718,10 @@
     "fi": {
      "name": "Grünfeldin puolustus",
      "def": "Grünfeldin puolustus"
+    },
+    "hi": {
+     "name": "ग्रुनफ़ेल्ड डिफ़ेंस",
+     "def": "ग्रुनफ़ेल्ड डिफ़ेंस"
     }
    },
    "comment": {
@@ -4666,6 +4831,10 @@
     "fi": {
      "name": "Katalonialainen avaus",
      "def": "katalonialainen avaus"
+    },
+    "hi": {
+     "name": "कैटलन ओपनिंग",
+     "def": "कैटलन ओपनिंग"
     }
    },
    "comment": {
@@ -4775,6 +4944,10 @@
     "fi": {
      "name": "Benoni-puolustus",
      "def": "Benoni-puolustus"
+    },
+    "hi": {
+     "name": "बेनोनी डिफ़ेंस",
+     "def": "बेनोनी डिफ़ेंस"
     }
    },
    "comment": {
@@ -4886,6 +5059,10 @@
     "fi": {
      "name": "Benkon gambiitti",
      "def": "Benkon gambiitti"
+    },
+    "hi": {
+     "name": "बेन्को गैम्बिट",
+     "def": "बेन्को गैम्बिट"
     }
    },
    "comment": {
@@ -4995,6 +5172,10 @@
     "fi": {
      "name": "Rétin avaus",
      "def": "Rétin avaus"
+    },
+    "hi": {
+     "name": "रेटी ओपनिंग",
+     "def": "रेटी ओपनिंग"
     }
    },
    "comment": {
@@ -5104,6 +5285,10 @@
     "fi": {
      "name": "Kuningasintialainen hyökkäys",
      "def": "kuningasintialainen hyökkäys"
+    },
+    "hi": {
+     "name": "किंग्स इंडियन अटैक",
+     "def": "किंग्स इंडियन अटैक"
     }
    },
    "comment": {
@@ -5217,6 +5402,10 @@
     "fi": {
      "name": "Birdin avaus",
      "def": "Birdin avaus"
+    },
+    "hi": {
+     "name": "बर्ड ओपनिंग",
+     "def": "बर्ड ओपनिंग"
     }
    },
    "comment": {
@@ -5326,6 +5515,10 @@
     "fi": {
      "name": "Ponzianin avaus",
      "def": "Ponzianin avaus"
+    },
+    "hi": {
+     "name": "पोंज़ियानी ओपनिंग",
+     "def": "पोंज़ियानी ओपनिंग"
     }
    },
    "comment": {
@@ -5435,6 +5628,10 @@
     "fi": {
      "name": "Kolmen ratsun peli",
      "def": "kolmen ratsun peli"
+    },
+    "hi": {
+     "name": "थ्री नाइट्स ओपनिंग",
+     "def": "थ्री नाइट्स ओपनिंग"
     }
    },
    "comment": {
@@ -5546,6 +5743,10 @@
     "fi": {
      "name": "Tanskalainen gambiitti",
      "def": "tanskalainen gambiitti"
+    },
+    "hi": {
+     "name": "डेनिश गैम्बिट",
+     "def": "डेनिश गैम्बिट"
     }
    },
    "comment": {
@@ -5657,6 +5858,10 @@
     "fi": {
      "name": "Blackmar-Diemer-gambiitti",
      "def": "Blackmar-Diemer-gambiitti"
+    },
+    "hi": {
+     "name": "ब्लैकमार-डीमर गैम्बिट",
+     "def": "ब्लैकमार-डीमर गैम्बिट"
     }
    },
    "comment": {
@@ -5766,6 +5971,10 @@
     "fi": {
      "name": "Trompowskyn hyökkäys",
      "def": "Trompowskyn hyökkäys"
+    },
+    "hi": {
+     "name": "ट्रॉम्पोव्स्की अटैक",
+     "def": "ट्रॉम्पोव्स्की अटैक"
     }
    },
    "comment": {
@@ -5876,6 +6085,10 @@
     "fi": {
      "name": "Torren hyökkäys",
      "def": "Torren hyökkäys"
+    },
+    "hi": {
+     "name": "टोरे अटैक",
+     "def": "टोरे अटैक"
     }
    },
    "comment": {
@@ -5987,6 +6200,10 @@
     "fi": {
      "name": "Collen järjestelmä",
      "def": "Collen järjestelmä"
+    },
+    "hi": {
+     "name": "कोले सिस्टम",
+     "def": "कोले सिस्टम"
     }
    },
    "comment": {
@@ -6096,6 +6313,10 @@
     "fi": {
      "name": "Tarraschin puolustus",
      "def": "Tarraschin puolustus"
+    },
+    "hi": {
+     "name": "टाराश डिफ़ेंस",
+     "def": "टाराश डिफ़ेंस"
     }
    },
    "comment": {
@@ -6206,6 +6427,10 @@
     "fi": {
      "name": "Budapestin gambiitti",
      "def": "Budapestin gambiitti"
+    },
+    "hi": {
+     "name": "बुडापेस्ट गैम्बिट",
+     "def": "बुडापेस्ट गैम्बिट"
     }
    },
    "comment": {
@@ -6315,6 +6540,10 @@
     "fi": {
      "name": "Bogo-intialainen puolustus",
      "def": "Bogo-intialainen puolustus"
+    },
+    "hi": {
+     "name": "बोगो-इंडियन डिफ़ेंस",
+     "def": "बोगो-इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -6424,6 +6653,10 @@
     "fi": {
      "name": "Vanha intialainen puolustus",
      "def": "vanha intialainen puolustus"
+    },
+    "hi": {
+     "name": "ओल्ड इंडियन डिफ़ेंस",
+     "def": "ओल्ड इंडियन डिफ़ेंस"
     }
    },
    "comment": {
@@ -6538,6 +6771,10 @@
     "fi": {
      "name": "Tšigorinin puolustus",
      "def": "Tšigorinin puolustus"
+    },
+    "hi": {
+     "name": "चिगोरिन डिफ़ेंस",
+     "def": "चिगोरिन डिफ़ेंस"
     }
    },
    "comment": {
@@ -6647,6 +6884,10 @@
     "fi": {
      "name": "Albinin vastagambiitti",
      "def": "Albinin vastagambiitti"
+    },
+    "hi": {
+     "name": "अल्बिन काउंटरगैम्बिट",
+     "def": "अल्बिन काउंटरगैम्बिट"
     }
    },
    "comment": {
@@ -6757,6 +6998,10 @@
     "fi": {
      "name": "Latvialainen gambiitti",
      "def": "latvialainen gambiitti"
+    },
+    "hi": {
+     "name": "लातवियन गैम्बिट",
+     "def": "लातवियन गैम्बिट"
     }
    },
    "comment": {
@@ -6866,6 +7111,10 @@
     "fi": {
      "name": "Elefanttigambiitti",
      "def": "elefanttigambiitti"
+    },
+    "hi": {
+     "name": "एलिफ़ेंट गैम्बिट",
+     "def": "एलिफ़ेंट गैम्बिट"
     }
    },
    "comment": {
@@ -6980,6 +7229,10 @@
     "fi": {
      "name": "Nimzo-Larsenin hyökkäys",
      "def": "Nimzo-Larsenin hyökkäys"
+    },
+    "hi": {
+     "name": "निम्ज़ो-लार्सन अटैक",
+     "def": "निम्ज़ो-लार्सन अटैक"
     }
    },
    "comment": {
@@ -7089,6 +7342,10 @@
     "fi": {
      "name": "Puolalainen avaus",
      "def": "puolalainen avaus"
+    },
+    "hi": {
+     "name": "पोलिश ओपनिंग",
+     "def": "पोलिश ओपनिंग"
     }
    },
    "comment": {
@@ -7198,6 +7455,10 @@
     "fi": {
      "name": "Grobin avaus",
      "def": "Grobin avaus"
+    },
+    "hi": {
+     "name": "ग्रॉब ओपनिंग",
+     "def": "ग्रॉब ओपनिंग"
     }
    },
    "comment": {
@@ -7307,6 +7568,10 @@
     "fi": {
      "name": "Unkarilainen avaus",
      "def": "unkarilainen avaus"
+    },
+    "hi": {
+     "name": "हंगेरियन ओपनिंग",
+     "def": "हंगेरियन ओपनिंग"
     }
    },
    "comment": {
@@ -7417,6 +7682,10 @@
     "fi": {
      "name": "Miesesin avaus",
      "def": "Miesesin avaus"
+    },
+    "hi": {
+     "name": "मीज़ेस ओपनिंग",
+     "def": "मीज़ेस ओपनिंग"
     }
    },
    "comment": {
@@ -7526,6 +7795,10 @@
     "fi": {
      "name": "Zaragozan avaus",
      "def": "Zaragozan avaus"
+    },
+    "hi": {
+     "name": "सारागोसा ओपनिंग",
+     "def": "सारागोसा ओपनिंग"
     }
    },
    "comment": {
@@ -7635,6 +7908,10 @@
     "fi": {
      "name": "Van Geetin avaus",
      "def": "Van Geetin avaus"
+    },
+    "hi": {
+     "name": "वान गीट ओपनिंग",
+     "def": "वान गीट ओपनिंग"
     }
    },
    "comment": {
@@ -7744,6 +8021,10 @@
     "fi": {
      "name": "Jobava-Lontoon järjestelmä",
      "def": "Jobava-Lontoon järjestelmä"
+    },
+    "hi": {
+     "name": "जोबावा लंदन सिस्टम",
+     "def": "जोबावा लंदन सिस्टम"
     }
    },
    "comment": {
@@ -7853,6 +8134,10 @@
     "fi": {
      "name": "Stonewall-hyökkäys",
      "def": "Stonewall-hyökkäys"
+    },
+    "hi": {
+     "name": "स्टोनवॉल अटैक",
+     "def": "स्टोनवॉल अटैक"
     }
    },
    "comment": {
@@ -7962,6 +8247,10 @@
     "fi": {
      "name": "Richter-Veresov-hyökkäys",
      "def": "Richter-Veresov-hyökkäys"
+    },
+    "hi": {
+     "name": "रिक्टर-वेरेसोव अटैक",
+     "def": "रिक्टर-वेरेसोव अटैक"
     }
    },
    "comment": {
@@ -8071,6 +8360,10 @@
     "fi": {
      "name": "Pyhän Yrjön puolustus",
      "def": "Pyhän Yrjön puolustus"
+    },
+    "hi": {
+     "name": "सेंट जॉर्ज डिफ़ेंस",
+     "def": "सेंट जॉर्ज डिफ़ेंस"
     }
    },
    "comment": {
@@ -8180,6 +8473,10 @@
     "fi": {
      "name": "Borgin puolustus",
      "def": "Borgin puolustus"
+    },
+    "hi": {
+     "name": "बोर्ग डिफ़ेंस",
+     "def": "बोर्ग डिफ़ेंस"
     }
    },
    "comment": {
@@ -8289,6 +8586,10 @@
     "fi": {
      "name": "Virtahepopuolustus",
      "def": "virtahepopuolustus"
+    },
+    "hi": {
+     "name": "हिप्पोपोटेमस डिफ़ेंस",
+     "def": "हिप्पोपोटेमस डिफ़ेंस"
     }
    },
    "comment": {
@@ -8399,6 +8700,10 @@
     "fi": {
      "name": "Englantilainen puolustus",
      "def": "englantilainen puolustus"
+    },
+    "hi": {
+     "name": "इंग्लिश डिफ़ेंस",
+     "def": "इंग्लिश डिफ़ेंस"
     }
    },
    "comment": {
@@ -8508,6 +8813,10 @@
     "fi": {
      "name": "Pterodaktyylipuolustus",
      "def": "pterodaktyylipuolustus"
+    },
+    "hi": {
+     "name": "टेरोडैक्टिल डिफ़ेंस",
+     "def": "टेरोडैक्टिल डिफ़ेंस"
     }
    },
    "comment": {
@@ -8617,6 +8926,10 @@
     "fi": {
      "name": "Bongcloud-hyökkäys",
      "def": "Bongcloud-hyökkäys"
+    },
+    "hi": {
+     "name": "बोंगक्लाउड अटैक",
+     "def": "बोंगक्लाउड अटैक"
     }
    },
    "comment": {
@@ -8698,6 +9011,10 @@
     "fi": {
      "name": "Avoin sisilialainen",
      "def": "avoin sisilialainen"
+    },
+    "hi": {
+     "name": "ओपन सिसिलियन",
+     "def": "ओपन सिसिलियन"
     }
    },
    "comment": {
@@ -8771,6 +9088,10 @@
     "fi": {
      "name": "Suljettu sisilialainen",
      "def": "suljettu sisilialainen"
+    },
+    "hi": {
+     "name": "क्लोज़्ड सिसिलियन",
+     "def": "क्लोज़्ड सिसिलियन"
     }
    },
    "comment": {
@@ -8844,6 +9165,10 @@
     "fi": {
      "name": "Alapinin muunnelma",
      "def": "Alapinin muunnelma"
+    },
+    "hi": {
+     "name": "अलापिन वेरिएशन",
+     "def": "अलापिन वेरिएशन"
     }
    },
    "comment": {
@@ -8919,6 +9244,10 @@
     "fi": {
      "name": "Smith-Morra-gambiitti",
      "def": "Smith-Morra-gambiitti"
+    },
+    "hi": {
+     "name": "स्मिथ-मोरा गैम्बिट",
+     "def": "स्मिथ-मोरा गैम्बिट"
     }
    },
    "comment": {
@@ -8993,6 +9322,10 @@
     "fi": {
      "name": "Grand Prix -hyökkäys",
      "def": "Grand Prix -hyökkäys"
+    },
+    "hi": {
+     "name": "ग्रां प्री अटैक",
+     "def": "ग्रां प्री अटैक"
     }
    },
    "comment": {
@@ -9066,6 +9399,10 @@
     "fi": {
      "name": "Rossolimon muunnelma",
      "def": "Rossolimon muunnelma"
+    },
+    "hi": {
+     "name": "रोसोलिमो वेरिएशन",
+     "def": "रोसोलिमो वेरिएशन"
     }
    },
    "comment": {
@@ -9139,6 +9476,10 @@
     "fi": {
      "name": "Najdorfin muunnelma",
      "def": "Najdorfin muunnelma"
+    },
+    "hi": {
+     "name": "नाइडोर्फ़ वेरिएशन",
+     "def": "नाइडोर्फ़ वेरिएशन"
     }
    },
    "comment": {
@@ -9212,6 +9553,10 @@
     "fi": {
      "name": "Lohikäärmemuunnelma",
      "def": "lohikäärmemuunnelma"
+    },
+    "hi": {
+     "name": "ड्रैगन वेरिएशन",
+     "def": "ड्रैगन वेरिएशन"
     }
    },
    "comment": {
@@ -9287,6 +9632,10 @@
     "fi": {
      "name": "Nopeutettu lohikäärme",
      "def": "nopeutettu lohikäärme"
+    },
+    "hi": {
+     "name": "एक्सेलरेटेड ड्रैगन",
+     "def": "एक्सेलरेटेड ड्रैगन"
     }
    },
    "comment": {
@@ -9360,6 +9709,10 @@
     "fi": {
      "name": "Scheveningenin muunnelma",
      "def": "Scheveningenin muunnelma"
+    },
+    "hi": {
+     "name": "शेवेनिंगेन वेरिएशन",
+     "def": "शेवेनिंगेन वेरिएशन"
     }
    },
    "comment": {
@@ -9433,6 +9786,10 @@
     "fi": {
      "name": "Svešnikovin muunnelma",
      "def": "Svešnikovin muunnelma"
+    },
+    "hi": {
+     "name": "स्वेशनिकोव वेरिएशन",
+     "def": "स्वेशनिकोव वेरिएशन"
     }
    },
    "comment": {
@@ -9507,6 +9864,10 @@
     "fi": {
      "name": "Taimanovin muunnelma",
      "def": "Taimanovin muunnelma"
+    },
+    "hi": {
+     "name": "तैमानोव वेरिएशन",
+     "def": "तैमानोव वेरिएशन"
     }
    },
    "comment": {
@@ -9580,6 +9941,10 @@
     "fi": {
      "name": "Kanin muunnelma",
      "def": "Kanin muunnelma"
+    },
+    "hi": {
+     "name": "कान वेरिएशन",
+     "def": "कान वेरिएशन"
     }
    },
    "comment": {
@@ -9653,6 +10018,10 @@
     "fi": {
      "name": "Klassinen muunnelma",
      "def": "klassinen muunnelma"
+    },
+    "hi": {
+     "name": "क्लासिकल वेरिएशन",
+     "def": "क्लासिकल वेरिएशन"
     }
    },
    "comment": {
@@ -9726,6 +10095,10 @@
     "fi": {
      "name": "Etenemismuunnelma",
      "def": "etenemismuunnelma"
+    },
+    "hi": {
+     "name": "एडवांस वेरिएशन",
+     "def": "एडवांस वेरिएशन"
     }
    },
    "comment": {
@@ -9799,6 +10172,10 @@
     "fi": {
      "name": "Vaihtomuunnelma",
      "def": "vaihtomuunnelma"
+    },
+    "hi": {
+     "name": "एक्सचेंज वेरिएशन",
+     "def": "एक्सचेंज वेरिएशन"
     }
    },
    "comment": {
@@ -9872,6 +10249,10 @@
     "fi": {
      "name": "Tarraschin muunnelma",
      "def": "Tarraschin muunnelma"
+    },
+    "hi": {
+     "name": "टाराश वेरिएशन",
+     "def": "टाराश वेरिएशन"
     }
    },
    "comment": {
@@ -9945,6 +10326,10 @@
     "fi": {
      "name": "Winawerin muunnelma",
      "def": "Winawerin muunnelma"
+    },
+    "hi": {
+     "name": "विनावर वेरिएशन",
+     "def": "विनावर वेरिएशन"
     }
    },
    "comment": {
@@ -10018,6 +10403,10 @@
     "fi": {
      "name": "Klassinen muunnelma",
      "def": "klassinen muunnelma"
+    },
+    "hi": {
+     "name": "क्लासिकल वेरिएशन",
+     "def": "क्लासिकल वेरिएशन"
     }
    },
    "comment": {
@@ -10091,6 +10480,10 @@
     "fi": {
      "name": "Rubinsteinin muunnelma",
      "def": "Rubinsteinin muunnelma"
+    },
+    "hi": {
+     "name": "रुबिनस्टीन वेरिएशन",
+     "def": "रुबिनस्टीन वेरिएशन"
     }
    },
    "comment": {
@@ -10164,6 +10557,10 @@
     "fi": {
      "name": "Etenemismuunnelma",
      "def": "etenemismuunnelma"
+    },
+    "hi": {
+     "name": "एडवांस वेरिएशन",
+     "def": "एडवांस वेरिएशन"
     }
    },
    "comment": {
@@ -10237,6 +10634,10 @@
     "fi": {
      "name": "Vaihtomuunnelma",
      "def": "vaihtomuunnelma"
+    },
+    "hi": {
+     "name": "एक्सचेंज वेरिएशन",
+     "def": "एक्सचेंज वेरिएशन"
     }
    },
    "comment": {
@@ -10312,6 +10713,10 @@
     "fi": {
      "name": "Panovin hyökkäys",
      "def": "Panovin hyökkäys"
+    },
+    "hi": {
+     "name": "पानोव अटैक",
+     "def": "पानोव अटैक"
     }
    },
    "comment": {
@@ -10385,6 +10790,10 @@
     "fi": {
      "name": "Klassinen muunnelma",
      "def": "klassinen muunnelma"
+    },
+    "hi": {
+     "name": "क्लासिकल वेरिएशन",
+     "def": "क्लासिकल वेरिएशन"
     }
    },
    "comment": {
@@ -10458,6 +10867,10 @@
     "fi": {
      "name": "Kahden ratsun hyökkäys",
      "def": "kahden ratsun hyökkäys"
+    },
+    "hi": {
+     "name": "टू नाइट्स अटैक",
+     "def": "टू नाइट्स अटैक"
     }
    },
    "comment": {
@@ -10531,6 +10944,10 @@
     "fi": {
      "name": "Kahden ratsun puolustus",
      "def": "kahden ratsun puolustus"
+    },
+    "hi": {
+     "name": "टू नाइट्स डिफ़ेंस",
+     "def": "टू नाइट्स डिफ़ेंस"
     }
    },
    "comment": {
@@ -10577,13 +10994,13 @@
      "gender": "m"
     },
     "ko": {
-     "name": "주오코 피아노",
-     "def": "주오코 피아노",
+     "name": "지오코 피아노",
+     "def": "지오코 피아노",
      "forms": {
-      "obj": "주오코 피아노를",
-      "ins": "주오코 피아노로",
-      "cop": "주오코 피아노예요",
-      "was": "주오코 피아노였"
+      "obj": "지오코 피아노를",
+      "ins": "지오코 피아노로",
+      "cop": "지오코 피아노예요",
+      "was": "지오코 피아노였"
      }
     },
     "bg": {
@@ -10606,6 +11023,10 @@
     "fi": {
      "name": "Giuoco piano",
      "def": "Giuoco piano"
+    },
+    "hi": {
+     "name": "जियोको पियानो",
+     "def": "जियोको पियानो"
     }
    },
    "comment": {
@@ -10656,13 +11077,13 @@
      "gender": "m"
     },
     "ko": {
-     "name": "주오코 피아니시모",
-     "def": "주오코 피아니시모",
+     "name": "지오코 피아니시모",
+     "def": "지오코 피아니시모",
      "forms": {
-      "obj": "주오코 피아니시모를",
-      "ins": "주오코 피아니시모로",
-      "cop": "주오코 피아니시모예요",
-      "was": "주오코 피아니시모였"
+      "obj": "지오코 피아니시모를",
+      "ins": "지오코 피아니시모로",
+      "cop": "지오코 피아니시모예요",
+      "was": "지오코 피아니시모였"
      }
     },
     "bg": {
@@ -10685,6 +11106,10 @@
     "fi": {
      "name": "Giuoco pianissimo",
      "def": "Giuoco pianissimo"
+    },
+    "hi": {
+     "name": "जियोको पियानिसिमो",
+     "def": "जियोको पियानिसिमो"
     }
    },
    "comment": {
@@ -10762,6 +11187,10 @@
     "fi": {
      "name": "Evansin gambiitti",
      "def": "Evansin gambiitti"
+    },
+    "hi": {
+     "name": "इवांस गैम्बिट",
+     "def": "इवांस गैम्बिट"
     }
    },
    "comment": {
@@ -10835,6 +11264,10 @@
     "fi": {
      "name": "Fegatello-hyökkäys",
      "def": "Fegatello-hyökkäys"
+    },
+    "hi": {
+     "name": "फ़्राइड लिवर अटैक",
+     "def": "फ़्राइड लिवर अटैक"
     }
    },
    "comment": {
@@ -10914,6 +11347,10 @@
     "fi": {
      "name": "Traxlerin vastahyökkäys",
      "def": "Traxlerin vastahyökkäys"
+    },
+    "hi": {
+     "name": "ट्रैक्सलर काउंटरअटैक",
+     "def": "ट्रैक्सलर काउंटरअटैक"
     }
    },
    "comment": {
@@ -10987,6 +11424,10 @@
     "fi": {
      "name": "Berliinin puolustus",
      "def": "Berliinin puolustus"
+    },
+    "hi": {
+     "name": "बर्लिन डिफ़ेंस",
+     "def": "बर्लिन डिफ़ेंस"
     }
    },
    "comment": {
@@ -11060,6 +11501,10 @@
     "fi": {
      "name": "Morphyn puolustus",
      "def": "Morphyn puolustus"
+    },
+    "hi": {
+     "name": "मॉर्फ़ी डिफ़ेंस",
+     "def": "मॉर्फ़ी डिफ़ेंस"
     }
    },
    "comment": {
@@ -11133,6 +11578,10 @@
     "fi": {
      "name": "Suljettu espanjalainen",
      "def": "suljettu espanjalainen"
+    },
+    "hi": {
+     "name": "क्लोज़्ड रुई लोपेज़",
+     "def": "क्लोज़्ड रुई लोपेज़"
     }
    },
    "comment": {
@@ -11206,6 +11655,10 @@
     "fi": {
      "name": "Marshallin hyökkäys",
      "def": "Marshallin hyökkäys"
+    },
+    "hi": {
+     "name": "मार्शल अटैक",
+     "def": "मार्शल अटैक"
     }
    },
    "comment": {
@@ -11279,6 +11732,10 @@
     "fi": {
      "name": "Vaihtomuunnelma",
      "def": "vaihtomuunnelma"
+    },
+    "hi": {
+     "name": "एक्सचेंज वेरिएशन",
+     "def": "एक्सचेंज वेरिएशन"
     }
    },
    "comment": {
@@ -11352,6 +11809,10 @@
     "fi": {
      "name": "Avoin espanjalainen",
      "def": "avoin espanjalainen"
+    },
+    "hi": {
+     "name": "ओपन वेरिएशन",
+     "def": "ओपन वेरिएशन"
     }
    },
    "comment": {
@@ -11425,6 +11886,10 @@
     "fi": {
      "name": "Schliemannin puolustus",
      "def": "Schliemannin puolustus"
+    },
+    "hi": {
+     "name": "श्लीमान डिफ़ेंस",
+     "def": "श्लीमान डिफ़ेंस"
     }
    },
    "comment": {
@@ -11498,6 +11963,10 @@
     "fi": {
      "name": "Skotlantilainen gambiitti",
      "def": "skotlantilainen gambiitti"
+    },
+    "hi": {
+     "name": "स्कॉच गैम्बिट",
+     "def": "स्कॉच गैम्बिट"
     }
    },
    "comment": {
@@ -11572,6 +12041,10 @@
     "fi": {
      "name": "Wieniläinen gambiitti",
      "def": "wieniläinen gambiitti"
+    },
+    "hi": {
+     "name": "वियना गैम्बिट",
+     "def": "वियना गैम्बिट"
     }
    },
    "comment": {
@@ -11646,6 +12119,10 @@
     "fi": {
      "name": "Staffordin gambiitti",
      "def": "Staffordin gambiitti"
+    },
+    "hi": {
+     "name": "स्टैफ़र्ड गैम्बिट",
+     "def": "स्टैफ़र्ड गैम्बिट"
     }
    },
    "comment": {
@@ -11721,6 +12198,10 @@
     "fi": {
      "name": "Parhamin hyökkäys",
      "def": "Parhamin hyökkäys"
+    },
+    "hi": {
+     "name": "वेवर्ड क्वीन अटैक",
+     "def": "वेवर्ड क्वीन अटैक"
     }
    },
    "comment": {
@@ -11803,6 +12284,10 @@
     "fi": {
      "name": "Halloween-gambiitti",
      "def": "Halloween-gambiitti"
+    },
+    "hi": {
+     "name": "हैलोवीन गैम्बिट",
+     "def": "हैलोवीन गैम्बिट"
     }
    },
    "comment": {
@@ -11876,6 +12361,10 @@
     "fi": {
      "name": "Ortodoksinen puolustus",
      "def": "ortodoksinen puolustus"
+    },
+    "hi": {
+     "name": "ऑर्थोडॉक्स डिफ़ेंस",
+     "def": "ऑर्थोडॉक्स डिफ़ेंस"
     }
    },
    "comment": {
@@ -11949,6 +12438,10 @@
     "fi": {
      "name": "Vaihtomuunnelma",
      "def": "vaihtomuunnelma"
+    },
+    "hi": {
+     "name": "एक्सचेंज वेरिएशन",
+     "def": "एक्सचेंज वेरिएशन"
     }
    },
    "comment": {
@@ -12022,6 +12515,10 @@
     "fi": {
      "name": "Semi-Tarrasch-puolustus",
      "def": "semi-Tarrasch-puolustus"
+    },
+    "hi": {
+     "name": "सेमी-टाराश डिफ़ेंस",
+     "def": "सेमी-टाराश डिफ़ेंस"
     }
    },
    "comment": {
@@ -12099,6 +12596,10 @@
     "fi": {
      "name": "Meranin muunnelma",
      "def": "Meranin muunnelma"
+    },
+    "hi": {
+     "name": "मेरान वेरिएशन",
+     "def": "मेरान वेरिएशन"
     }
    },
    "comment": {
@@ -12172,6 +12673,10 @@
     "fi": {
      "name": "Klassinen muunnelma",
      "def": "klassinen muunnelma"
+    },
+    "hi": {
+     "name": "क्लासिकल वेरिएशन",
+     "def": "क्लासिकल वेरिएशन"
     }
    },
    "comment": {
@@ -12246,6 +12751,10 @@
     "fi": {
      "name": "Sämischin muunnelma",
      "def": "Sämischin muunnelma"
+    },
+    "hi": {
+     "name": "ज़ेमिश वेरिएशन",
+     "def": "ज़ेमिश वेरिएशन"
     }
    },
    "comment": {
@@ -12319,6 +12828,10 @@
     "fi": {
      "name": "Neljän sotilaan hyökkäys",
      "def": "neljän sotilaan hyökkäys"
+    },
+    "hi": {
+     "name": "फ़ोर पॉन्स अटैक",
+     "def": "फ़ोर पॉन्स अटैक"
     }
    },
    "comment": {
@@ -12392,6 +12905,10 @@
     "fi": {
      "name": "Fiankettomuunnelma",
      "def": "fiankettomuunnelma"
+    },
+    "hi": {
+     "name": "फ़ियांकेटो वेरिएशन",
+     "def": "फ़ियांकेटो वेरिएशन"
     }
    },
    "comment": {
@@ -12466,6 +12983,10 @@
     "fi": {
      "name": "Rubinsteinin muunnelma",
      "def": "Rubinsteinin muunnelma"
+    },
+    "hi": {
+     "name": "रुबिनस्टीन वेरिएशन",
+     "def": "रुबिनस्टीन वेरिएशन"
     }
    },
    "comment": {
@@ -12539,6 +13060,10 @@
     "fi": {
      "name": "Klassinen muunnelma",
      "def": "klassinen muunnelma"
+    },
+    "hi": {
+     "name": "क्लासिकल वेरिएशन",
+     "def": "क्लासिकल वेरिएशन"
     }
    },
    "comment": {
@@ -12612,6 +13137,10 @@
     "fi": {
      "name": "Sämischin muunnelma",
      "def": "Sämischin muunnelma"
+    },
+    "hi": {
+     "name": "ज़ेमिश वेरिएशन",
+     "def": "ज़ेमिश वेरिएशन"
     }
    },
    "comment": {
@@ -12685,6 +13214,10 @@
     "fi": {
      "name": "Vaihtomuunnelma",
      "def": "vaihtomuunnelma"
+    },
+    "hi": {
+     "name": "एक्सचेंज वेरिएशन",
+     "def": "एक्सचेंज वेरिएशन"
     }
    },
    "comment": {
@@ -12759,6 +13292,10 @@
     "fi": {
      "name": "Leningradin muunnelma",
      "def": "Leningradin muunnelma"
+    },
+    "hi": {
+     "name": "लेनिनग्राद वेरिएशन",
+     "def": "लेनिनग्राद वेरिएशन"
     }
    },
    "comment": {
@@ -12832,6 +13369,10 @@
     "fi": {
      "name": "Stonewall-muunnelma",
      "def": "Stonewall-muunnelma"
+    },
+    "hi": {
+     "name": "स्टोनवॉल वेरिएशन",
+     "def": "स्टोनवॉल वेरिएशन"
     }
    },
    "comment": {
@@ -12905,6 +13446,10 @@
     "fi": {
      "name": "Moderni Benoni",
      "def": "moderni Benoni"
+    },
+    "hi": {
+     "name": "मॉडर्न बेनोनी",
+     "def": "मॉडर्न बेनोनी"
     }
    },
    "comment": {
@@ -12978,6 +13523,10 @@
     "fi": {
      "name": "Avoin katalonialainen",
      "def": "avoin katalonialainen"
+    },
+    "hi": {
+     "name": "ओपन कैटलन",
+     "def": "ओपन कैटलन"
     }
    },
    "comment": {
@@ -13052,6 +13601,10 @@
     "fi": {
      "name": "Suljettu katalonialainen",
      "def": "suljettu katalonialainen"
+    },
+    "hi": {
+     "name": "क्लोज़्ड कैटलन",
+     "def": "क्लोज़्ड कैटलन"
     }
    },
    "comment": {
@@ -13125,6 +13678,10 @@
     "fi": {
      "name": "Symmetrinen muunnelma",
      "def": "symmetrinen muunnelma"
+    },
+    "hi": {
+     "name": "सिमेट्रिकल वेरिएशन",
+     "def": "सिमेट्रिकल वेरिएशन"
     }
    },
    "comment": {
@@ -13198,6 +13755,10 @@
     "fi": {
      "name": "Käänteinen sisilialainen",
      "def": "käänteinen sisilialainen"
+    },
+    "hi": {
+     "name": "रिवर्स्ड सिसिलियन",
+     "def": "रिवर्स्ड सिसिलियन"
     }
    },
    "comment": {
@@ -13275,6 +13836,10 @@
     "fi": {
      "name": "Neljän sotilaan hyökkäys",
      "def": "neljän sotilaan hyökkäys"
+    },
+    "hi": {
+     "name": "फ़ोर पॉन्स अटैक",
+     "def": "फ़ोर पॉन्स अटैक"
     }
    },
    "comment": {
@@ -13348,6 +13913,10 @@
     "fi": {
      "name": "Moderni muunnelma",
      "def": "moderni muunnelma"
+    },
+    "hi": {
+     "name": "मॉडर्न वेरिएशन",
+     "def": "मॉडर्न वेरिएशन"
     }
    },
    "comment": {
@@ -13421,6 +13990,10 @@
     "fi": {
      "name": "Itävaltalainen hyökkäys",
      "def": "itävaltalainen hyökkäys"
+    },
+    "hi": {
+     "name": "ऑस्ट्रियन अटैक",
+     "def": "ऑस्ट्रियन अटैक"
     }
    },
    "comment": {
@@ -13494,6 +14067,10 @@
     "fi": {
      "name": "Falkbeerin vastagambiitti",
      "def": "Falkbeerin vastagambiitti"
+    },
+    "hi": {
+     "name": "फ़ाल्कबीर काउंटरगैम्बिट",
+     "def": "फ़ाल्कबीर काउंटरगैम्बिट"
     }
    },
    "comment": {
@@ -13533,7 +14110,8 @@
     "it": "variante {X}",
     "da": "{X}-variant",
     "et": "{X:gen} variant",
-    "fi": "{X}-muunnelma"
+    "fi": "{X}-muunnelma",
+    "hi": "{X} वेरिएशन"
    },
    "id": "varian",
    "nl": "variant",
@@ -13544,7 +14122,8 @@
    "it": "variante",
    "da": "variant",
    "et": "variant",
-   "fi": "muunnelma"
+   "fi": "muunnelma",
+   "hi": "वेरिएशन"
   },
   "Attack": {
    "en": "Attack",
@@ -13576,7 +14155,8 @@
     "it": "attacco {X}",
     "da": "{X}-angreb",
     "et": "{X:gen} rünnak",
-    "fi": "{X}-hyökkäys"
+    "fi": "{X}-hyökkäys",
+    "hi": "{X} अटैक"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -13587,7 +14167,8 @@
    "it": "attacco",
    "da": "angreb",
    "et": "rünnak",
-   "fi": "hyökkäys"
+   "fi": "hyökkäys",
+   "hi": "अटैक"
   },
   "Gambit": {
    "en": "Gambit",
@@ -13619,7 +14200,8 @@
     "it": "gambetto {X}",
     "da": "{X}-gambit",
     "et": "{X:gen} gambiit",
-    "fi": "{X}-gambiitti"
+    "fi": "{X}-gambiitti",
+    "hi": "{X} गैम्बिट"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -13630,7 +14212,8 @@
    "it": "gambetto",
    "da": "gambit",
    "et": "gambiit",
-   "fi": "gambiitti"
+   "fi": "gambiitti",
+   "hi": "गैम्बिट"
   },
   "Defense": {
    "en": "Defense",
@@ -13662,7 +14245,8 @@
     "it": "difesa {X}",
     "da": "{X}-forsvar",
     "et": "{X:gen} kaitse",
-    "fi": "{X}-puolustus"
+    "fi": "{X}-puolustus",
+    "hi": "{X} डिफ़ेंस"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -13673,7 +14257,8 @@
    "it": "difesa",
    "da": "forsvar",
    "et": "kaitse",
-   "fi": "puolustus"
+   "fi": "puolustus",
+   "hi": "डिफ़ेंस"
   },
   "System": {
    "en": "System",
@@ -13705,7 +14290,8 @@
     "it": "sistema {X}",
     "da": "{X}-system",
     "et": "{X:gen} süsteem",
-    "fi": "{X}-järjestelmä"
+    "fi": "{X}-järjestelmä",
+    "hi": "{X} सिस्टम"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -13716,7 +14302,8 @@
    "it": "sistema",
    "da": "system",
    "et": "süsteem",
-   "fi": "järjestelmä"
+   "fi": "järjestelmä",
+   "hi": "सिस्टम"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -13748,7 +14335,8 @@
     "it": "controgambetto {X}",
     "da": "{X}-modgambit",
     "et": "{X:gen} vastugambiit",
-    "fi": "{X}-vastagambiitti"
+    "fi": "{X}-vastagambiitti",
+    "hi": "{X} काउंटरगैम्बिट"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -13759,7 +14347,8 @@
    "it": "controgambetto",
    "da": "modgambit",
    "et": "vastugambiit",
-   "fi": "vastagambiitti"
+   "fi": "vastagambiitti",
+   "hi": "काउंटरगैम्बिट"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -13791,7 +14380,8 @@
     "it": "contrattacco {X}",
     "da": "{X}-modangreb",
     "et": "{X:gen} vasturünnak",
-    "fi": "{X}-vastahyökkäys"
+    "fi": "{X}-vastahyökkäys",
+    "hi": "{X} काउंटरअटैक"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -13802,7 +14392,8 @@
    "it": "contrattacco",
    "da": "modangreb",
    "et": "vasturünnak",
-   "fi": "vastahyökkäys"
+   "fi": "vastahyökkäys",
+   "hi": "काउंटरअटैक"
   },
   "Opening": {
    "en": "Opening",
@@ -13834,7 +14425,8 @@
     "it": "apertura {X}",
     "da": "{X}-åbning",
     "et": "{X:gen} avang",
-    "fi": "{X}-avaus"
+    "fi": "{X}-avaus",
+    "hi": "{X} ओपनिंग"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -13845,7 +14437,8 @@
    "it": "apertura",
    "da": "åbning",
    "et": "avang",
-   "fi": "avaus"
+   "fi": "avaus",
+   "hi": "ओपनिंग"
   },
   "Game": {
    "en": "Game",
@@ -13867,7 +14460,8 @@
    "it": "partita",
    "da": "parti",
    "et": "partii",
-   "fi": "peli"
+   "fi": "peli",
+   "hi": "गेम"
   },
   "Line": {
    "en": "Line",
@@ -13899,7 +14493,8 @@
     "it": "linea {X}",
     "da": "{X}-fortsættelse",
     "et": "{X:gen} jätk",
-    "fi": "{X}-jatko"
+    "fi": "{X}-jatko",
+    "hi": "{X} लाइन"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -13910,7 +14505,8 @@
    "it": "linea",
    "da": "fortsættelse",
    "et": "jätk",
-   "fi": "jatko"
+   "fi": "jatko",
+   "hi": "लाइन"
   },
   "Formation": {
    "en": "Formation",
@@ -13932,7 +14528,8 @@
    "it": "schieramento",
    "da": "opstilling",
    "et": "ülesehitus",
-   "fi": "asetelma"
+   "fi": "asetelma",
+   "hi": "फ़ॉर्मेशन"
   },
   "Trap": {
    "en": "Trap",
@@ -13964,7 +14561,8 @@
     "it": "trappola di {X}",
     "da": "{X}-fælde",
     "et": "{X:gen} lõks",
-    "fi": "{X}-ansa"
+    "fi": "{X}-ansa",
+    "hi": "{X} ट्रैप"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -13975,7 +14573,8 @@
    "it": "trappola",
    "da": "fælde",
    "et": "lõks",
-   "fi": "ansa"
+   "fi": "ansa",
+   "hi": "ट्रैप"
   },
   "Accepted": {
    "en": "Accepted",
@@ -13997,7 +14596,8 @@
    "it": "accettato",
    "da": "antaget",
    "et": "vastuvõetud",
-   "fi": "vastaanotettu"
+   "fi": "vastaanotettu",
+   "hi": "एक्सेप्टेड"
   },
   "Declined": {
    "en": "Declined",
@@ -14019,7 +14619,8 @@
    "it": "rifiutato",
    "da": "afslået",
    "et": "tagasilükatud",
-   "fi": "hylätty"
+   "fi": "hylätty",
+   "hi": "डिक्लाइंड"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -14041,7 +14642,8 @@
    "it": "variante di cambio",
    "da": "afbytningsvariant",
    "et": "vahetusvariant",
-   "fi": "vaihtomuunnelma"
+   "fi": "vaihtomuunnelma",
+   "hi": "एक्सचेंज वेरिएशन"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -14063,7 +14665,8 @@
    "it": "variante di spinta",
    "da": "fremstødsvariant",
    "et": "edasitungivariant",
-   "fi": "etenemismuunnelma"
+   "fi": "etenemismuunnelma",
+   "hi": "एडवांस वेरिएशन"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -14085,7 +14688,8 @@
    "it": "variante classica",
    "da": "klassisk variant",
    "et": "klassikaline variant",
-   "fi": "klassinen muunnelma"
+   "fi": "klassinen muunnelma",
+   "hi": "क्लासिकल वेरिएशन"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -14107,7 +14711,8 @@
    "it": "variante moderna",
    "da": "moderne variant",
    "et": "moodne variant",
-   "fi": "moderni muunnelma"
+   "fi": "moderni muunnelma",
+   "hi": "मॉडर्न वेरिएशन"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -14129,7 +14734,8 @@
    "it": "variante aperta",
    "da": "åben variant",
    "et": "avatud variant",
-   "fi": "avoin muunnelma"
+   "fi": "avoin muunnelma",
+   "hi": "ओपन वेरिएशन"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -14151,7 +14757,8 @@
    "it": "variante chiusa",
    "da": "lukket variant",
    "et": "suletud variant",
-   "fi": "suljettu muunnelma"
+   "fi": "suljettu muunnelma",
+   "hi": "क्लोज़्ड वेरिएशन"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -14173,7 +14780,8 @@
    "it": "variante del fianchetto",
    "da": "fianchettovariant",
    "et": "fiankettovariant",
-   "fi": "fiankettomuunnelma"
+   "fi": "fiankettomuunnelma",
+   "hi": "फ़ियांकेटो वेरिएशन"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -14195,7 +14803,8 @@
    "it": "variante simmetrica",
    "da": "symmetrisk variant",
    "et": "sümmeetriline variant",
-   "fi": "symmetrinen muunnelma"
+   "fi": "symmetrinen muunnelma",
+   "hi": "सिमेट्रिकल वेरिएशन"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -14217,7 +14826,8 @@
    "it": "gambetto scozzese",
    "da": "skotsk gambit",
    "et": "Šoti gambiit",
-   "fi": "skotlantilainen gambiitti"
+   "fi": "skotlantilainen gambiitti",
+   "hi": "स्कॉच गैम्बिट"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -14239,7 +14849,8 @@
    "it": "variante scozzese",
    "da": "skotsk variant",
    "et": "Šoti variant",
-   "fi": "skotlantilainen muunnelma"
+   "fi": "skotlantilainen muunnelma",
+   "hi": "स्कॉच वेरिएशन"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -14261,7 +14872,8 @@
    "it": "variante danese",
    "da": "nordisk variant",
    "et": "Taani variant",
-   "fi": "tanskalainen muunnelma"
+   "fi": "tanskalainen muunnelma",
+   "hi": "डेनिश वेरिएशन"
   },
   "Main Line": {
    "en": "Main Line",
@@ -14283,7 +14895,8 @@
    "it": "linea principale",
    "da": "hovedvariant",
    "et": "peavariant",
-   "fi": "päämuunnelma"
+   "fi": "päämuunnelma",
+   "hi": "मेन लाइन"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -14305,7 +14918,8 @@
    "it": "accelerato",
    "da": "accelereret",
    "et": "kiirendatud",
-   "fi": "nopeutettu"
+   "fi": "nopeutettu",
+   "hi": "एक्सेलरेटेड"
   },
   "Deferred": {
    "en": "Deferred",
@@ -14327,7 +14941,8 @@
    "it": "differito",
    "da": "udskudt",
    "et": "edasilükatud",
-   "fi": "viivästetty"
+   "fi": "viivästetty",
+   "hi": "डिफ़र्ड"
   },
   "Reversed": {
    "en": "Reversed",
@@ -14349,7 +14964,8 @@
    "it": "a colori invertiti",
    "da": "med ombyttede farver",
    "et": "vahetatud värvidega",
-   "fi": "käänteinen"
+   "fi": "käänteinen",
+   "hi": "रिवर्स्ड"
   }
  },
  "eponyms": {
@@ -14405,6 +15021,10 @@
    "fi": {
     "nom": "Steinitz",
     "gen": "Steinitzin"
+   },
+   "hi": {
+    "nom": "स्टाइनिट्ज़",
+    "gen": "स्टाइनिट्ज़"
    }
   },
   "Rubinstein": {
@@ -14459,6 +15079,10 @@
    "fi": {
     "nom": "Rubinstein",
     "gen": "Rubinsteinin"
+   },
+   "hi": {
+    "nom": "रुबिनस्टीन",
+    "gen": "रुबिनस्टीन"
    }
   },
   "Winawer": {
@@ -14513,6 +15137,10 @@
    "fi": {
     "nom": "Winawer",
     "gen": "Winawerin"
+   },
+   "hi": {
+    "nom": "विनावर",
+    "gen": "विनावर"
    }
   },
   "Evans": {
@@ -14567,6 +15195,10 @@
    "fi": {
     "nom": "Evans",
     "gen": "Evansin"
+   },
+   "hi": {
+    "nom": "इवांस",
+    "gen": "इवांस"
    }
   },
   "Chigorin": {
@@ -14621,6 +15253,10 @@
    "fi": {
     "nom": "Tšigorin",
     "gen": "Tšigorinin"
+   },
+   "hi": {
+    "nom": "चिगोरिन",
+    "gen": "चिगोरिन"
    }
   },
   "Morphy": {
@@ -14675,6 +15311,10 @@
    "fi": {
     "nom": "Morphy",
     "gen": "Morphyn"
+   },
+   "hi": {
+    "nom": "मॉर्फ़ी",
+    "gen": "मॉर्फ़ी"
    }
   },
   "Tarrasch": {
@@ -14729,6 +15369,10 @@
    "fi": {
     "nom": "Tarrasch",
     "gen": "Tarraschin"
+   },
+   "hi": {
+    "nom": "टाराश",
+    "gen": "टाराश"
    }
   },
   "Alekhine": {
@@ -14783,6 +15427,10 @@
    "fi": {
     "nom": "Aljehin",
     "gen": "Aljehinin"
+   },
+   "hi": {
+    "nom": "अलेखिन",
+    "gen": "अलेखिन"
    }
   },
   "Sämisch": {
@@ -14837,6 +15485,10 @@
    "fi": {
     "nom": "Sämisch",
     "gen": "Sämischin"
+   },
+   "hi": {
+    "nom": "ज़ेमिश",
+    "gen": "ज़ेमिश"
    }
   },
   "Nimzowitsch": {
@@ -14891,6 +15543,10 @@
    "fi": {
     "nom": "Nimzowitsch",
     "gen": "Nimzowitschin"
+   },
+   "hi": {
+    "nom": "निम्ज़ोविच",
+    "gen": "निम्ज़ोविच"
    }
   },
   "Najdorf": {
@@ -14945,6 +15601,10 @@
    "fi": {
     "nom": "Najdorf",
     "gen": "Najdorfin"
+   },
+   "hi": {
+    "nom": "नाइडोर्फ़",
+    "gen": "नाइडोर्फ़"
    }
   },
   "Bogoljubow": {
@@ -14999,6 +15659,10 @@
    "fi": {
     "nom": "Bogoljubov",
     "gen": "Bogoljubovin"
+   },
+   "hi": {
+    "nom": "बोगोल्युबोव",
+    "gen": "बोगोल्युबोव"
    }
   },
   "Alapin": {
@@ -15053,6 +15717,10 @@
    "fi": {
     "nom": "Alapin",
     "gen": "Alapinin"
+   },
+   "hi": {
+    "nom": "अलापिन",
+    "gen": "अलापिन"
    }
   },
   "Botvinnik": {
@@ -15107,6 +15775,10 @@
    "fi": {
     "nom": "Botvinnik",
     "gen": "Botvinnikin"
+   },
+   "hi": {
+    "nom": "बोट्विनिक",
+    "gen": "बोट्विनिक"
    }
   },
   "Paulsen": {
@@ -15161,6 +15833,10 @@
    "fi": {
     "nom": "Paulsen",
     "gen": "Paulsenin"
+   },
+   "hi": {
+    "nom": "पॉलसन",
+    "gen": "पॉलसन"
    }
   },
   "Marshall": {
@@ -15215,6 +15891,10 @@
    "fi": {
     "nom": "Marshall",
     "gen": "Marshallin"
+   },
+   "hi": {
+    "nom": "मार्शल",
+    "gen": "मार्शल"
    }
   },
   "Kieseritzky": {
@@ -15269,6 +15949,10 @@
    "fi": {
     "nom": "Kieseritzky",
     "gen": "Kieseritzkyn"
+   },
+   "hi": {
+    "nom": "कीज़ेरित्स्की",
+    "gen": "कीज़ेरित्स्की"
    }
   },
   "Panov": {
@@ -15323,6 +16007,10 @@
    "fi": {
     "nom": "Panov",
     "gen": "Panovin"
+   },
+   "hi": {
+    "nom": "पानोव",
+    "gen": "पानोव"
    }
   },
   "Keres": {
@@ -15377,6 +16065,10 @@
    "fi": {
     "nom": "Keres",
     "gen": "Keresin"
+   },
+   "hi": {
+    "nom": "केरेस",
+    "gen": "केरेस"
    }
   },
   "Tartakower": {
@@ -15431,6 +16123,10 @@
    "fi": {
     "nom": "Tartakower",
     "gen": "Tartakowerin"
+   },
+   "hi": {
+    "nom": "टार्टाकोवर",
+    "gen": "टार्टाकोवर"
    }
   },
   "Maróczy": {
@@ -15485,6 +16181,10 @@
    "fi": {
     "nom": "Maróczy",
     "gen": "Maróczyn"
+   },
+   "hi": {
+    "nom": "मारोत्सी",
+    "gen": "मारोत्सी"
    }
   },
   "Falkbeer": {
@@ -15539,6 +16239,10 @@
    "fi": {
     "nom": "Falkbeer",
     "gen": "Falkbeerin"
+   },
+   "hi": {
+    "nom": "फ़ाल्कबीर",
+    "gen": "फ़ाल्कबीर"
    }
   },
   "Scheveningen": {
@@ -15593,6 +16297,10 @@
    "fi": {
     "nom": "Scheveningen",
     "gen": "Scheveningenin"
+   },
+   "hi": {
+    "nom": "शेवेनिंगेन",
+    "gen": "शेवेनिंगेन"
    }
   },
   "Richter-Rauzer": {
@@ -15647,6 +16355,10 @@
    "fi": {
     "nom": "Richter-Rauzer",
     "gen": "Richter-Rauzerin"
+   },
+   "hi": {
+    "nom": "रिक्टर-राउज़र",
+    "gen": "रिक्टर-राउज़र"
    }
   },
   "Lasker": {
@@ -15701,6 +16413,10 @@
    "fi": {
     "nom": "Lasker",
     "gen": "Laskerin"
+   },
+   "hi": {
+    "nom": "लास्कर",
+    "gen": "लास्कर"
    }
   },
   "Taimanov": {
@@ -15755,6 +16471,10 @@
    "fi": {
     "nom": "Taimanov",
     "gen": "Taimanovin"
+   },
+   "hi": {
+    "nom": "तैमानोव",
+    "gen": "तैमानोव"
    }
   },
   "Smyslov": {
@@ -15809,6 +16529,10 @@
    "fi": {
     "nom": "Smyslov",
     "gen": "Smyslovin"
+   },
+   "hi": {
+    "nom": "स्मिस्लोव",
+    "gen": "स्मिस्लोव"
    }
   },
   "Spassky": {
@@ -15863,6 +16587,10 @@
    "fi": {
     "nom": "Spasski",
     "gen": "Spasskin"
+   },
+   "hi": {
+    "nom": "स्पास्की",
+    "gen": "स्पास्की"
    }
   },
   "Spielmann": {
@@ -15917,6 +16645,10 @@
    "fi": {
     "nom": "Spielmann",
     "gen": "Spielmannin"
+   },
+   "hi": {
+    "nom": "श्पीलमान",
+    "gen": "श्पीलमान"
    }
   },
   "Averbakh": {
@@ -15971,6 +16703,10 @@
    "fi": {
     "nom": "Averbah",
     "gen": "Averbahin"
+   },
+   "hi": {
+    "nom": "अवेरबाख",
+    "gen": "अवेरबाख"
    }
   },
   "Greco": {
@@ -16025,6 +16761,10 @@
    "fi": {
     "nom": "Greco",
     "gen": "Grecon"
+   },
+   "hi": {
+    "nom": "ग्रेको",
+    "gen": "ग्रेको"
    }
   },
   "Capablanca": {
@@ -16079,6 +16819,10 @@
    "fi": {
     "nom": "Capablanca",
     "gen": "Capablancan"
+   },
+   "hi": {
+    "nom": "कापाब्लांका",
+    "gen": "कापाब्लांका"
    }
   },
   "Kan": {
@@ -16133,6 +16877,10 @@
    "fi": {
     "nom": "Kan",
     "gen": "Kanin"
+   },
+   "hi": {
+    "nom": "कान",
+    "gen": "कान"
    }
   },
   "Albin": {
@@ -16187,6 +16935,10 @@
    "fi": {
     "nom": "Albin",
     "gen": "Albinin"
+   },
+   "hi": {
+    "nom": "अल्बिन",
+    "gen": "अल्बिन"
    }
   },
   "Breyer": {
@@ -16241,6 +16993,10 @@
    "fi": {
     "nom": "Breyer",
     "gen": "Breyerin"
+   },
+   "hi": {
+    "nom": "ब्रेयर",
+    "gen": "ब्रेयर"
    }
   },
   "Schlechter": {
@@ -16295,6 +17051,10 @@
    "fi": {
     "nom": "Schlechter",
     "gen": "Schlechterin"
+   },
+   "hi": {
+    "nom": "श्लेक्टर",
+    "gen": "श्लेक्टर"
    }
   },
   "Jaenisch": {
@@ -16349,6 +17109,10 @@
    "fi": {
     "nom": "Jaenisch",
     "gen": "Jaenischin"
+   },
+   "hi": {
+    "nom": "येनिश",
+    "gen": "येनिश"
    }
   },
   "Karpov": {
@@ -16403,6 +17167,10 @@
    "fi": {
     "nom": "Karpov",
     "gen": "Karpovin"
+   },
+   "hi": {
+    "nom": "कार्पोव",
+    "gen": "कार्पोव"
    }
   },
   "Petrosian": {
@@ -16457,6 +17225,10 @@
    "fi": {
     "nom": "Petrosjan",
     "gen": "Petrosjanin"
+   },
+   "hi": {
+    "nom": "पेट्रोसियन",
+    "gen": "पेट्रोसियन"
    }
   },
   "Euwe": {
@@ -16511,6 +17283,10 @@
    "fi": {
     "nom": "Euwe",
     "gen": "Euwen"
+   },
+   "hi": {
+    "nom": "यूवे",
+    "gen": "यूवे"
    }
   },
   "Sozin": {
@@ -16565,6 +17341,10 @@
    "fi": {
     "nom": "Sozin",
     "gen": "Sozinin"
+   },
+   "hi": {
+    "nom": "सोज़िन",
+    "gen": "सोज़िन"
    }
   },
   "Schliemann": {
@@ -16619,6 +17399,10 @@
    "fi": {
     "nom": "Schliemann",
     "gen": "Schliemannin"
+   },
+   "hi": {
+    "nom": "श्लीमान",
+    "gen": "श्लीमान"
    }
   },
   "Anderssen": {
@@ -16673,6 +17457,10 @@
    "fi": {
     "nom": "Anderssen",
     "gen": "Anderssenin"
+   },
+   "hi": {
+    "nom": "एंडरसन",
+    "gen": "एंडरसन"
    }
   },
   "Philidor": {
@@ -16727,6 +17515,10 @@
    "fi": {
     "nom": "Philidor",
     "gen": "Philidorin"
+   },
+   "hi": {
+    "nom": "फ़िलिडोर",
+    "gen": "फ़िलिडोर"
    }
   },
   "Zaitsev": {
@@ -16781,6 +17573,10 @@
    "fi": {
     "nom": "Zaitsev",
     "gen": "Zaitsevin"
+   },
+   "hi": {
+    "nom": "ज़ैतसेव",
+    "gen": "ज़ैतसेव"
    }
   },
   "Sveshnikov": {
@@ -16835,6 +17631,10 @@
    "fi": {
     "nom": "Svešnikov",
     "gen": "Svešnikovin"
+   },
+   "hi": {
+    "nom": "स्वेशनिकोव",
+    "gen": "स्वेशनिकोव"
    }
   },
   "Kasparov": {
@@ -16889,6 +17689,10 @@
    "fi": {
     "nom": "Kasparov",
     "gen": "Kasparovin"
+   },
+   "hi": {
+    "nom": "कास्पारोव",
+    "gen": "कास्पारोव"
    }
   },
   "Fischer": {
@@ -16943,6 +17747,10 @@
    "fi": {
     "nom": "Fischer",
     "gen": "Fischerin"
+   },
+   "hi": {
+    "nom": "फ़िशर",
+    "gen": "फ़िशर"
    }
   },
   "Tal": {
@@ -16997,6 +17805,10 @@
    "fi": {
     "nom": "Tal",
     "gen": "Talin"
+   },
+   "hi": {
+    "nom": "ताल",
+    "gen": "ताल"
    }
   },
   "McCutcheon": {
@@ -17051,6 +17863,10 @@
    "fi": {
     "nom": "McCutcheon",
     "gen": "McCutcheonin"
+   },
+   "hi": {
+    "nom": "मैककचन",
+    "gen": "मैककचन"
    }
   },
   "Bronstein": {
@@ -17105,6 +17921,10 @@
    "fi": {
     "nom": "Bronstein",
     "gen": "Bronsteinin"
+   },
+   "hi": {
+    "nom": "ब्रॉनस्टीन",
+    "gen": "ब्रॉनस्टीन"
    }
   },
   "Janowski": {
@@ -17159,6 +17979,10 @@
    "fi": {
     "nom": "Janowski",
     "gen": "Janowskin"
+   },
+   "hi": {
+    "nom": "यानोव्स्की",
+    "gen": "यानोव्स्की"
    }
   },
   "Staunton": {
@@ -17213,6 +18037,10 @@
    "fi": {
     "nom": "Staunton",
     "gen": "Stauntonin"
+   },
+   "hi": {
+    "nom": "स्टॉन्टन",
+    "gen": "स्टॉन्टन"
    }
   },
   "Max Lange": {
@@ -17267,6 +18095,10 @@
    "fi": {
     "nom": "Max Lange",
     "gen": "Max Langen"
+   },
+   "hi": {
+    "nom": "मैक्स लांगे",
+    "gen": "मैक्स लांगे"
    }
   },
   "Petrov": {
@@ -17321,6 +18153,10 @@
    "fi": {
     "nom": "Petrov",
     "gen": "Petrovin"
+   },
+   "hi": {
+    "nom": "पेट्रोव",
+    "gen": "पेट्रोव"
    }
   },
   "Grünfeld": {
@@ -17375,6 +18211,10 @@
    "fi": {
     "nom": "Grünfeld",
     "gen": "Grünfeldin"
+   },
+   "hi": {
+    "nom": "ग्रुनफ़ेल्ड",
+    "gen": "ग्रुनफ़ेल्ड"
    }
   },
   "Colle": {
@@ -17429,6 +18269,10 @@
    "fi": {
     "nom": "Colle",
     "gen": "Collen"
+   },
+   "hi": {
+    "nom": "कोले",
+    "gen": "कोले"
    }
   },
   "Torre": {
@@ -17483,6 +18327,10 @@
    "fi": {
     "nom": "Torre",
     "gen": "Torren"
+   },
+   "hi": {
+    "nom": "टोरे",
+    "gen": "टोरे"
    }
   },
   "Réti": {
@@ -17537,6 +18385,10 @@
    "fi": {
     "nom": "Réti",
     "gen": "Rétin"
+   },
+   "hi": {
+    "nom": "रेटी",
+    "gen": "रेटी"
    }
   }
  },
@@ -17592,6 +18444,10 @@
   "fi": {
    "compose_proper_names": true,
    "file_pattern": "\\b(?P<f>[a-h])-(?=linj|sotil)"
+  },
+  "hi": {
+   "compose_proper_names": false,
+   "file_pattern": "(?<![A-Za-z0-9])(?P<f>[a-h])(?=-(?:फ़ाइल|प्याद))"
   }
  }
 }
