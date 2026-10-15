@@ -1,0 +1,42 @@
+# Coach openings: Lithuanian texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
+# families.json into assets/coach/openings/lt.lang.
+# The coach says "tu" to the player and is male; Lithuanian simple tenses have no gender, so "tu priėmei" is
+# fine for any player. Opening names inflect, so the templates only use them in the nominative ("def" = the
+# citation name with a lower-case first word unless it is a proper noun): after a dash ("Tavo debiutas –
+# ispanų partija") or after "Tai". The declined/accepted lines refer back to the gambit with "jo"/"jį":
+# White's opening there is always a "gambitas" (masculine).
+# Names follow Lithuanian chess usage: ethnonym genitives ("prancūzų gynyba", "ispanų partija"), "valdovė"
+# for the queen, eponyms spelled the Lithuanian way with a genitive ending ("Aliochino gynyba"), which the
+# voice also reads correctly. Squares as "e4", files as "c vertikalė", pawns as "d pėstininkas" (letter before
+# the noun; families.json lang_options.lt file_pattern spells the letter for the voice); pieces in words.
+
+# ---- Sentences. "pw" = the player (the listener) has White, "pb" = the player has Black.
+opening.say.pw.both = Tavo debiutas – {white:def}, o mano atsakas – {black:def}.
+opening.say.pw.both.2 = Taigi tavo pasirinkimas – {white:def}, o mano – {black:def}.
+opening.say.pb.both = Mano debiutas – {white:def}, o tavo atsakas – {black:def}.
+opening.say.pb.both.2 = Taigi mano pasirinkimas – {white:def}, o tavo – {black:def}.
+opening.say.pw.declined = Tavo debiutas – {white:def}, bet aš jo nepriėmiau.
+opening.say.pb.declined = Mano debiutas – {white:def}, bet tu jo nepriėmei.
+opening.say.pw.accepted = Tavo debiutas – {white:def}, ir aš jį priėmiau.
+opening.say.pb.accepted = Mano debiutas – {white:def}, ir tu jį priėmei.
+opening.say.pw.white = Tavo debiutas – {white:def}.
+opening.say.pw.white.2 = Tavo pasirinkimas – {white:def}.
+opening.say.pb.white = Mano debiutas – {white:def}.
+opening.say.pb.white.2 = Mano pasirinkimas – {white:def}.
+opening.say.pw.var_white = Mano atsakas – {black:def}, o tavo pasirinkimas – {white:def}.
+opening.say.pb.var_white = Tavo atsakas – {black:def}, o mano pasirinkimas – {white:def}.
+opening.say.pw.black = Mano atsakas – {black:def}.
+opening.say.pb.black = Tavo atsakas – {black:def}.
+opening.say.both = Mūsų debiutas – {both:def}.
+opening.say.both.2 = Tai {both:def}.
+opening.say.variation = Tiksliau, tai {variation:def}.
+opening.say.variations = Tiksliau: baltųjų pasirinkimas – {white:def}, juodųjų – {black:def}.
+opening.say.now_variation = Dabar lentoje – {variation:def}.
+opening.say.transposed = Dėl ėjimų perstatymo dabar lentoje – {opening:def}.
+opening.say.deep = Jei visai tiksliai: {line}.
+opening.say.left_book = Ką tik išėjome iš žinomos debiutų teorijos.
+opening.say.left_book_move = Iš žinomos debiutų teorijos išėjome ties ėjimu numeris {n}.
+opening.say.rare = Tai retas debiutas.
+opening.say.rare_named = Tai retas debiutas: {line}.
+
+# ---- Families: beginner (levels 1-3) and advanced (levels 4-6) comments

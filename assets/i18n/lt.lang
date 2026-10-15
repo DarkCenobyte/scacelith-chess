@@ -1215,3 +1215,230 @@ coach.hint.hint = H – gauti užuominą. Palietus figūrą, ieškoma toliau.
 coach.hint.accept = Užuomina
 coach.hint.decline = Ne, ačiū
 coach.hint.key = Užuomina
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Trenerio balsas
+options.coach_voice.help = Trenerio režimu treneris kalba garsiai. Jo balso modelis atsisiunčiamas pirmą kartą, kai jo prireikia (apie 399 MB). Išjungta: trenerio žodžiai tik rodomi ekrane.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Balso modelis
+options.voice_update.help = Treneris vis dar kalba senąja 8 bitų balso modelio versija. Atnaujinimas atsisiunčia oficialią Supertonic 3 versiją, kurią išleido Supertone, o prieš tai ištrina senus failus.
+options.voice_update.button = Atnaujinti ({0} MB)
+options.voice_update.running = Vyksta atsisiuntimas.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Balso kokybė
+options.voice_quality.help = Kiek tobulinimo žingsnių trenerio kalbos sintezė atlieka kiekvienai frazei: nuo „Žema“ (4) iki „Maksimali“ (9); numatytoji – „Vidutinė“ (5). Aukštesnis lygis duoda šiek tiek švaresnį balsą, bet skaičiuojama ilgiau, todėl treneris prabyla šiek tiek vėliau. Nustatyti galima, kai įdiegtas balso modelis ir įjungtas trenerio balsas.
+options.voice_quality.low = Žema
+options.voice_quality.medium = Vidutinė
+options.voice_quality.high = Aukšta
+options.voice_quality.very_high = Labai aukšta
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimali
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Trenerio balsas
+coach.download.text = Treneris kalba Supertonic 3 balsu – tai Supertone sukurtas kalbos sintezės modelis. Jis nepridedamas prie Scacelith: žaidimas gali jį atsisiųsti dabar iš Hugging Face ({0} MB, vieną kartą). Be jo treneris savo žodžius rašo ekrane.
+coach.download.licence = Modelis išleistas pagal OpenRAIL-M licenciją, kuri draudžia tam tikrus jo sukuriamo balso naudojimo būdus, pavyzdžiui, pateikti jį kaip žmogaus balsą ar mėgdžioti tikrą asmenį.
+coach.download.read_licence = Skaityti licenciją
+coach.download.accept = Pasirinkimas „Atsisiųsti“ reiškia, kad sutinkate su šios licencijos sąlygomis.
+# {0} = a folder
+coach.download.folder = Įrašoma į: {0}
+coach.download.not_now = Ne dabar
+# {0} = the size in megabytes
+coach.download.download = Atsisiųsti ({0} MB)
+coach.download.licence_title = OPENRAIL-M LICENCIJA
+coach.download.back = Atgal
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Naujas trenerio balsas
+coach.update.text = Trenerio balsas dabar naudoja oficialią Supertonic 3 versiją, kurią išleido Supertone, vietoje iki šiol įdiegtos 8 bitų konversijos. Žaidimas gali ją atsisiųsti dabar iš Hugging Face ({0} MB, vieną kartą); seni failai ({1} MB) pirmiausia ištrinami. Jei atsisakysite, treneris kalbės dabartiniu balsu, o atnaujinimas liks prieinamas skiltyje Nustatymai > Garsas.
+coach.update.download = Atnaujinti ({0} MB)
+coach.update.accept = Pasirinkimas „Atnaujinti“ reiškia, kad sutinkate su šios licencijos sąlygomis.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TRENERIO BALSAS
+coach.download.removing = Šalinama senoji versija…
+coach.download.checking = Tikrinami failai…
+coach.download.downloading = Atsisiunčiama…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Iš Hugging Face
+coach.download.from_archive = Iš Hugging Face (archyvinė kopija)
+coach.download.cancel = Atšaukti
+coach.download.failed = Atsisiųsti nepavyko.
+coach.download.error.network = Nepavyko pasiekti serverių. Patikrinkite interneto ryšį ir bandykite dar kartą.
+# {0} = a folder
+coach.download.error.disk = Nepavyko įrašyti failų į {0}. Patikrinkite, ar pakanka laisvos vietos, ir bandykite dar kartą.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serveriai atsiuntė netikėtą atsakymą ({0}). Bandykite vėliau.
+coach.download.retry = Bandyti dar kartą
+coach.download.close = Uždaryti
+# Notices
+coach.download.done = Trenerio balsas įdiegtas.
+coach.download.cancelled = Atsisiuntimas atšauktas: kitą kartą jis bus tęsiamas nuo ten, kur sustojo.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Įrašytos partijos
+options.save_games = Įrašyti mano partijas
+options.save_games.help = Pasibaigusios jūsų partijos su Stockfish, su treneriu, dviejų žaidėjų partijos prie šio kompiuterio ir jūsų tiesioginiai mačai įrašomi kaip PGN failai; juos rasite skiltyje „Įrašytos partijos“. Interneto partijas saugo serveris.
+library.title = ĮRAŠYTOS PARTIJOS
+library.section.games = PARTIJOS
+library.section.details = PARTIJA
+library.section.tags = ŽYMĖS
+library.section.moves = ĖJIMAI
+library.count = {0} partija|{0} partijos|{0} partijų
+library.filter = Rodyti
+library.filter.all = Visos partijos
+library.filter.play = Prieš Stockfish
+library.filter.coach = Su treneriu
+library.filter.hotseat = Du žaidėjai
+library.filter.direct = Tiesioginiai mačai
+library.filter.server = Interneto partijos
+library.filter.imported = Importuotos
+library.mode.play = Prieš Stockfish
+library.mode.coach = Su treneriu
+library.mode.hotseat = Du žaidėjai
+library.mode.direct = Tiesioginis mačas
+library.mode.server = Interneto partija
+library.mode.imported = Importuota
+library.coach_level = Lygis {0}
+library.unknown_player = Nežinomas
+library.unfinished = Nebaigta
+library.unreadable = Šios partijos neįmanoma perskaityti.
+library.moves = {0} ėjimas|{0} ėjimai|{0} ėjimų
+library.opening_variation = {0}: {1}
+library.file = Failas: {0}
+library.file_game = Failas: {0}, partija {1} iš {2}
+library.no_moves = Nepadaryta nė vieno ėjimo.
+library.none_selected = Pasirinkite partiją sąraše.
+library.reading = Skaitomos įrašytos partijos
+library.empty.title = Įrašytų partijų dar nėra
+library.empty.text = Jūsų partijos su Stockfish, su treneriu, dviejų žaidėjų partijos prie šio kompiuterio ir jūsų tiesioginiai mačai atsiras čia, kai tik pasibaigs. Į šį aplanką taip pat galite įdėti PGN failų: iš kitų programų ar svetainių eksportuotos partijos rodomos kartu su jūsiškėmis.
+library.empty.filter = Tokių partijų nėra.
+library.error.folder = Nepavyksta perskaityti įrašytų partijų aplanko
+library.error.game = Šios partijos neįmanoma perskaityti: {0}
+library.folder = Aplankas: {0}
+library.open_folder = Atidaryti aplanką
+library.open_failed = Nepavyko atidaryti aplanko.
+library.replay = Peržiūrėti
+library.delete = Ištrinti
+library.delete.title = IŠTRINTI PARTIJĄ
+library.delete.text = Partija {0} bus ištrinta iš šio kompiuterio kartu su jos failu. Šio veiksmo atšaukti negalima.
+library.delete.ok = Ištrinti
+library.delete.several = Šiame faile yra {0} partija: jį galima ištrinti tik iš aplanko.|Šiame faile yra {0} partijos: jį galima ištrinti tik iš aplanko.|Šiame faile yra {0} partijų: jį galima ištrinti tik iš aplanko.
+library.deleted = Partija ištrinta.
+library.delete.failed = Nepavyko ištrinti partijos.
+library.delete.changed = Failas pasikeitė: sąrašas atnaujintas.
+library.truncated = Šiame aplanke per daug partijų: rodomos tik naujausios ({0}).
+library.tag.Event = Varžybos
+library.tag.Site = Vieta
+library.tag.Date = Data
+library.tag.Time = Laikas
+library.tag.Round = Turas
+library.tag.White = Baltieji
+library.tag.Black = Juodieji
+library.tag.Result = Rezultatas
+library.tag.WhiteElo = Baltųjų Elo
+library.tag.BlackElo = Juodųjų Elo
+library.tag.TimeControl = Laiko kontrolė
+library.tag.Termination = Pabaigos būdas
+library.tag.Opening = Debiutas
+library.tag.Variation = Variantas
+library.tag.PlyCount = Pusėjimių skaičius
+library.tag.FEN = Pradinė pozicija
+library.tag.ScacelithMode = Režimas
+library.tag.CoachLevel = Trenerio lygis
+library.tag.ScacelithServer = Serveris
+library.tag.ScacelithGameId = Partijos numeris
+library.tag.UTCDate = Data (UTC)
+library.tag.UTCTime = Laikas (UTC)
+library.tag.WhiteRatingDiff = Baltųjų reitingo pokytis
+library.tag.BlackRatingDiff = Juodųjų reitingo pokytis
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analizė
+analysis.menu.title = ANALIZĖ
+analysis.menu.analyse = Analizuoti
+analysis.menu.paste = Įklijuoti PGN
+analysis.menu.online = Mano interneto partijos
+analysis.menu.folder = Įdėkite PGN failų į šį aplanką, kad galėtumėte juos analizuoti: {0}
+analysis.menu.empty.title = Įrašytų partijų dar nėra
+analysis.menu.empty.text = Jūsų partijos atsiras čia, kai tik pasibaigs, kaip ir PGN failai, įdėti į toliau nurodytą aplanką. Taip pat galite įklijuoti partiją, nukopijuotą kaip PGN tekstą.
+analysis.menu.empty.no_folder = Įklijuokite partiją, nukopijuotą kaip PGN tekstą, kad ją analizuotumėte.
+analysis.menu.paste.empty = Iškarpinė tuščia: pirmiausia nukopijuokite partiją kaip PGN tekstą.
+analysis.menu.paste.none = Iškarpinėje nerasta šachmatų partijos.
+analysis.menu.paste.several = Iškarpinėje yra kelios partijos: analizuojama pirmoji.
+analysis.menu.gameover = Analizuoti partiją
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Ėjimas {0} iš {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Akimirksniu
+replay.again = Peržiūrėti dar kartą
+replay.gameover.unfinished = Partija baigiasi po {0}-ojo ėjimo be rezultato.
+replay.tip.start = Partijos pradžia (Home)
+replay.tip.back = Vienu ėjimu atgal (J)
+replay.tip.pause = Pauzė (K)
+replay.tip.resume = Tęsti (K)
+replay.tip.forward = Vienu ėjimu pirmyn (L)
+replay.tip.end = Partijos pabaiga (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTARAS
+analysis.hud.accuracy = TIKSLUMAS
+analysis.hud.reviewing = Stockfish peržiūri partiją… {0}
+analysis.hud.no_engine = Nėra šachmatų variklio: ėjimai rodomi be analizės.
+analysis.hud.no_moves = Šioje partijoje nėra ėjimų.
+analysis.hud.tip.play = Leisti ėjimus (K)
+analysis.hud.tip.comments_off = Slėpti svarbiausių momentų komentarus (N)
+analysis.hud.tip.comments_on = Rodyti svarbiausių momentų komentarus (N)
+analysis.hud.tip.voice_off = Išjungti komentatoriaus balsą (M)
+analysis.hud.tip.voice_on = Klausytis komentarų balsu (M)
+analysis.hud.tip.voice_missing = Balso negirdėti: jo failai neįdiegti arba išjungtas nustatymas Nustatymai > Garsas > Trenerio balsas. Komentarai tik rodomi ekrane.
+analysis.hud.tip.arrows_off = Slėpti geresnių ėjimų rodykles (B)
+analysis.hud.tip.arrows_on = Rodyti geresnių ėjimų rodykles (B)
+analysis.hud.controls.play = Leisti / pauzė
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Rodyti / slėpti komentarus
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Komentatoriaus balsas įj. / išj.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Rodyti / slėpti rodykles
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Įrašyti kaip GIF
+gif.making = Kuriamas GIF: serveris piešia partiją…
+gif.saved = GIF įrašytas:
+gif.saved_as = GIF įrašytas: {0}
+gif.sign_in_first = Kad galėtumėte kurti GIF, prisijunkite prie interneto serverio: GIF piešia serveris.
+gif.busy_other = Kuriamas kitas GIF. Palaukite, kol jis bus paruoštas.
+gif.err.rate_limited_for = Per trumpą laiką sukūrėte daug GIF. Kitą galėsite sukurti po {0}.
+gif.err.rate_limited = Per trumpą laiką sukūrėte daug GIF. Bandykite vėliau.
+gif.err.server_busy_for = Serveris užimtas – piešia kitus GIF. Bandykite dar kartą po {0}.
+gif.err.server_busy = Serveris užimtas – piešia kitus GIF. Netrukus bandykite dar kartą.
+gif.err.signed_out = Jūsų seansas baigėsi. Kad sukurtumėte GIF, prisijunkite iš naujo.
+gif.err.game_too_long = Ši partija per ilga, kad iš jos būtų galima sukurti GIF.
+gif.err.pgn_too_large = Ši partija per ilga, kad iš jos būtų galima sukurti GIF.
+gif.err.invalid_pgn = Serveris negalėjo perskaityti šios partijos.
+gif.err.render_failed = Serveriui nepavyko sukurti šio GIF. Bandykite dar kartą.
+gif.err.gif_disabled = Šis serveris GIF nekuria.
+gif.err.write_failed = Nepavyko įrašyti GIF šiame kompiuteryje.
+gif.err.not_found = Šios partijos serveryje nebėra.
+# Only used after "po" ("in {0}" = after a wait): the genitive ("po 1 minutės", "po 5 minučių").
+gif.wait.seconds = {0} sekundės|{0} sekundžių|{0} sekundžių
+gif.wait.minutes = {0} minutės|{0} minučių|{0} minučių
+gif.wait.both = {0} ir {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Nepavyko paleisti OpenGL 4.6. Atnaujinkite vaizdo plokštės tvarkyklę.
+error.opengl_macos = Nepavyko paleisti OpenGL 4.6 šiame Mac kompiuteryje. Scacelith reikia Apple silicon lusto (M1 ar naujesnio) ir macOS 26 ar naujesnės versijos; žaidimas neveikia virtualiojoje mašinoje.
+error.renderer = Nepavyko paleisti atvaizdavimo variklio.
+error.scene = Nepavyko įkelti scenos.
+error.log_file = Išsami informacija pateikta žurnalo faile: {0}

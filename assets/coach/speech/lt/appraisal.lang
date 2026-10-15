@@ -29,10 +29,10 @@ appraisal.reason.repetition = dėl pozicijos pasikartojimo
 appraisal.reason.fifty = pagal penkiasdešimties ėjimų taisyklę
 appraisal.reason.agreement = abipusiu susitarimu
 appraisal.reason.other = pagal taisykles
-# The level names of the coach page (coach.level.<n>.name), said inside „...“.
+# The level names of assets/i18n/lt.lang (coach.level.<n>.name), said inside „...“.
 appraisal.level.l1 = Pirmieji žingsniai
 appraisal.level.l2 = Pradedantysis
-appraisal.level.l3 = Tobulėjantis žaidėjas
+appraisal.level.l3 = Mėgėjas
 appraisal.level.l4 = Klubo žaidėjas
 appraisal.level.l5 = Stiprus klubo žaidėjas
 appraisal.level.l6 = Ekspertas

@@ -11,7 +11,7 @@
 # poss_ins, and the endings past ("visel{my:past}") and adj / adj_acc ("kter{my:adj}").
 # A move as subject: "Tah {best} byl ..." or the impersonal neuter "Lepší bylo {best}", as Czech
 # annotations write it. Mate in N: "mat {m:ord_ins} tahem" (spoken "mat třetím tahem") or "mat za
-# {m:move}" (simpler, levels 1-3). Counted numbers: {pts:point}, {n:time} ("dvakrát"),
+# {m:move}" ("mat za tři tahy", the plainer words). Counted numbers: {pts:point}, {n:time} ("dvakrát"),
 # {n:attacker_acc}, {n2:defender_acc}, {n:square}; a piece's value "je za {n:point}".
 # Only prepositions that never change before {sq}, {move}, {best}, {reply}, {line} ("na", "po",
 # "do", "od", "o", "za"), or a fixed noun in between ("z pole {sq}", "k poli {sq}", "tahem {move}").
