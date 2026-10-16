@@ -389,7 +389,29 @@ move.mate.spoken = {move}, scacco matto
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the Italian voice misreads.
+# Words the voice misreads, respelled in every spoken line, opening texts included (src/coach/catalog.h;
+# the findings are in docs/PRONUNCIATION.md). Whole words only: an apostrophe or a hyphen ends a word
+# ("l’en passant", "Caro-Kann").
+# "fianchetto" is read with the c of "cena" (heard "fiancetto" 11 times in 21, right 7): k keeps the
+# hard c (right 16 in 21, never "fiancetto").
+respell.fianchetto = fianketto
+respell.fianchetti = fianketti
+# "en passant" the French way, as Italian players say it: the voice says "en passant" with its t
+# (heard "in passante", a t 19 times in 21; 6 in 21 respelled). "en" is only this French word here.
+respell.en = an
+respell.passant = passàn
+# "lettone" (gambetto lettone) is stressed on the first syllable, "lèttone" (heard "letto" 7 times in
+# 9); the accent puts the stress back on the o (heard right 8 times in 9).
+respell.lettone = lettóne
+# "settima" (the seventh rank) loses its stress on the first syllable (heard "settimana" 6 times in 9);
+# marked, it is heard right 9 times in 9.
+respell.settima = sèttima
+# Foreign words: Pirc ends in ts (the voice says "pirch", heard "Pirce", "Peach"), Grand Prix the French
+# way (the d and the x were said), the French "clou" is "clu" (the voice says "clo-u", heard "Clau").
+respell.pirc = Pirts
+respell.grand = Gran
+respell.prix = Prì
+respell.clou = clu
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, one word each as Italian writes them. 21-99 compose as "{tens}{units}"

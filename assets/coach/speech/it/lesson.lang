@@ -72,7 +72,9 @@ lesson.welcome.board = Questa è la scacchiera: sessantaquattro case, chiare e s
 lesson.welcome.light = La casa d’angolo alla tua {@}destra è sempre una casa chiara. Ricorda: chiara a destra.
 # Italian has no separate everyday word for "column": the line says "vertical lines are called files".
 lesson.welcome.files = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a alla {@2}h.
-lesson.welcome.files.spoken = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a all’{@2}acca.
+# Spoken: the letter a melts into "dalla" (heard "dalla lacca" 6 times in 6); a pause after it lets it
+# through (heard 2 times in 3).
+lesson.welcome.files.spoken = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a, fino all’{@2}acca.
 lesson.welcome.ranks = Le righe orizzontali si chiamano traverse. Hanno un numero, da {@}uno a {@2}otto, a partire dal tuo lato.
 lesson.welcome.square = Ogni casa si indica con la sua lettera e poi con il suo numero. Questa è la casa {sq}.
 lesson.welcome.square2 = E questa è {sq}.

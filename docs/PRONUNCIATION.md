@@ -309,3 +309,45 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   often lost or replaced (흑은 and 백은 are heard 이건, 하겐, 되게). It cannot write most eponyms (님조비치 as 닌조비치, 그륀펠트 as
   그린펠트). It turns short lines of names into English or into a caption ("Smart AdMate", "(끝)"). It cuts lines of
   more than about 50 syllables short.
+
+## Italian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetto, fianchetti | the c of "cena": heard "fiancetto" 11 times in 21, right 7 | `fianketto`, `fianketti` (respell.*): right 16 in 21, never "fiancetto" |
+| en passant | Italian, with the t: heard "in passante", a t 19 times in 21 | `an passàn` (respell.en, respell.passant): a t 6 times in 21 |
+| lettone (gambetto lettone) | stressed on the first syllable, "lèttone" (probe): heard "letto" 7 times in 9 | `lettóne` (respell): right 8 in 9 |
+| settima (the seventh rank) | the stress leaves the first syllable: heard "settimana" 6 times in 9 | `sèttima` (respell): right 9 in 9 |
+| Pirc | "pirch" (probe; heard "Pirce", "Peach") | `Pirts` (respell): heard "Piers", "Piez" |
+| Grand Prix | the d and the x said ("Grand Priks", probe; heard "freaks", "breaks", the line taken for English 3 times in 3) | `Gran Prì` (respell): no x in 6, the line heard in Italian 2 in 3 |
+| clou | "clo-u" (probe; heard "Clau" 3 times in 3) | `clu` (respell): heard "clou", "clú" |
+| dalla a all’acca (lesson.welcome.files) | the letter a melts into "dalla": "dalla lacca" 6 times in 6 | `dalla a, fino all’acca` (.spoken): a heard 2 in 3 |
+
+- Round trip over 750 lines (Parakeet, seed 0; 19% of words missed), then 3 seeds on 205 short segments
+  covering every word missed in more than a third of its uses (splits, joins and garbled transcripts set
+  aside), the reviewers' list, the file letters, the numbers and the opening names in carrier sentences
+  ("Hai aperto con la difesa ..."); probes (3-6 seeds) for the names, the homographs and the stress.
+- Checked and fine: the numbers (29 test lines in 30 written as the right digits: undici to novanta,
+  ventitré, quarantotto, per cento), Philidor ("Filidor"), Elo, blitz, rapid ("ràpid"), robot ("ròbot"),
+  acconcio, di’ ("dì"), ancora (ancóra), capitano (the verb), Mmm (hummed, not spelled), Ops, Ahi, Caspita,
+  elle, patta, alfiere, sull’ala, gambetto (probe: none read as the recogniser wrote them), the stress of
+  the frequent proparoxytones (muovere, prendere, ultima, pratica, debole...), Najdorf ("Naidorf"), Réti,
+  Morphy, Fischer, Sämisch, Tarrasch, Marshall, Sveshnikov (sh), Max Lange (hard g), Chigorin (heard
+  "Cigorin" as written: `Cigorin` heard no better), Maróczy, Kieseritzky, Steinitz, Rubinstein, Tartakower,
+  Schlechter, Zaitsev, Rossolimo, Halloween.
+- Left as is: the king "re" is heard badly (0 in 18 with Parakeet, 3 in 15 with Whisper in six lines): it
+  runs into the word before ("tuo re" heard "tuore", "tour"), but it is said (probe), and "Re", "rre",
+  "rè" did no better. The file letters e and a melt into a vowel before them ("da e quattro" heard "dai
+  quattro", "la casa a sei" "la casa 6"); "é", "eh", "à", "ah" did no better (e 9 times in 27 in such
+  lines, "é" 6, "eh" 9): as in Spanish, prefer a consonant before a square in new lines ("in e quattro").
+  "subito" is "sùbito" alone, a close call in "devi uscirne subito" (probe). Alekhine keeps its final e
+  ("Alekìne", stress right; without the e the stress moved to the first syllable). Close calls or no
+  settled Italian reading: Scheveningen (sh), Schliemann, Nimzowitsch (about "Nimzovic"), McCutcheon, Euwe
+  ("E-u-e"), Jaenisch, Jobava, Winawer, Bogoljubow, Breyer, Stonewall, Fajarowicz; Miles is "mi-les", but
+  `Mails` was heard no better.
+- Recogniser habits: it writes the verb forms its language model prefers ("guadagno di materiale" as
+  "guadagna", "catturo" as "cattur"; probe: the o is said), merges vowels across words ("Bianco ottiene"
+  as "Bianco tiene", "Stavolta arrocca" as "rocca", "di re" as "dire"), splits compounds ("campo chiaro",
+  "in chioda", "per mettere"), hears "patta" as "fatta", "acca otto" as "K8", "alfiere" as "alpiere", and
+  takes short lines, or a line that starts with an interjection or a foreign name, for another language
+  ("Gran bel salto!", "Ahi, ..." came out Finnish, Dutch or English).
