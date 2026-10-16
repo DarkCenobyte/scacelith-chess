@@ -2055,6 +2055,27 @@
   "von",
   "with"
  ],
+ "proper_name_languages": [
+  "fr",
+  "de",
+  "es",
+  "pt",
+  "pt-BR",
+  "da",
+  "fi",
+  "hu",
+  "id",
+  "it",
+  "nl",
+  "ro",
+  "sv",
+  "tr",
+  "vi"
+ ],
+ "name_dash_languages": [
+  "ru",
+  "uk"
+ ],
  "tts_en_respell": {
   "Giuoco Piano": "Jwoko Piano",
   "Giuoco Pianissimo": "Jwoko Pianissimo",
