@@ -44,6 +44,7 @@ options.unsaved.text = Unele opțiuni au fost modificate. Le aplicați înainte 
 
 options.language = Limbă
 options.language.help = Limba meniurilor și a mesajelor. Se schimbă imediat.
+options.language.not_adapted = Această limbă nu este încă adaptată complet: vocea antrenorului poate pronunța greșit unele cuvinte, iar unele texte pot suna încă ciudat.
 options.display_mode = Mod de afișare
 options.display_mode.help = Ecran complet: o fereastră fără margini peste tot ecranul, la rezoluția desktopului. Fereastră: o fereastră de dimensiunea de mai jos.
 options.fullscreen = Ecran complet

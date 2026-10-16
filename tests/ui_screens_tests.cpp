@@ -462,7 +462,9 @@ TEST(ui_screens_options_language_list) {
     d.clickRect(Rect(boxX - 40.0f, r.y, 80.0f, r.h));
     d.frames(20);
     CHECK_EQ(i18n::language(), std::string("en"));   // no step: the list is open
-    for (const i18n::Language& l : i18n::languages()) CHECK(d.has(l.nativeName));
+    // A language not adapted yet carries an asterisk.
+    for (const i18n::Language& l : i18n::languages())
+        CHECK(d.has(l.adapted ? std::string(l.nativeName) : std::string(l.nativeName) + " *"));
     REQUIRE(d.click("Deutsch"));
     d.frame();
     CHECK_EQ(i18n::language(), std::string("de"));
@@ -496,8 +498,13 @@ TEST(ui_screens_options_language_list) {
     d.press(plat::KEY_ENTER);
     d.frame();
     const int de = i18n::languageIndex("de");
-    CHECK_EQ(i18n::language(), std::string(i18n::languages()[size_t(de + 1)].code));
+    const i18n::Language& next = i18n::languages()[size_t(de + 1)];
+    CHECK_EQ(i18n::language(), std::string(next.code));
     CHECK(ui::optionsOpen());
+    // Estonian, not adapted yet: the page draws the note that explains the asterisk, in Estonian.
+    CHECK(!next.adapted);
+    CHECK(T("options.language.not_adapted") != std::string(i18n::english("options.language.not_adapted")));
+    d.frame();
 }
 
 // Leaving Options with changes asks first: Discard (or Esc) drops them, Apply stores them.

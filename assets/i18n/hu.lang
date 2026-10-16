@@ -45,6 +45,7 @@ options.unsaved.text = Egyes beállítások megváltoztak. Alkalmazza őket kil�
 
 options.language = Nyelv
 options.language.help = A menük és az üzenetek nyelve. Azonnal átvált.
+options.language.not_adapted = Ez a nyelv még nincs teljesen kicsiszolva: az edző hangja néhány szót hibásan ejthet ki, és egyes szövegek még furcsán hangozhatnak.
 options.display_mode = Megjelenítési mód
 options.display_mode.help = Teljes képernyő: keret nélküli ablak a teljes képernyőn, az asztal felbontásával. Ablakos: az alább megadott méretű ablak.
 options.fullscreen = Teljes képernyő

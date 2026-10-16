@@ -36,6 +36,7 @@ options.unsaved.text = 部分选项已更改。离开前要应用吗？
 
 options.language = 语言
 options.language.help = 菜单和消息的语言，立即生效。
+options.language.not_adapted = 此语言尚未完全适配：教练语音可能会读错部分字词，部分文字也可能仍不够通顺。
 options.display_mode = 显示模式
 options.display_mode.help = 全屏：以桌面分辨率覆盖整个屏幕的无边框窗口。窗口：使用下方所选大小的窗口。
 options.fullscreen = 全屏

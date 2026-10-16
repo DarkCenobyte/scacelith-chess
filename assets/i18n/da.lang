@@ -42,6 +42,7 @@ options.unsaved.text = Nogle indstillinger er ændret. Vil du anvende dem, før 
 
 options.language = Sprog
 options.language.help = Sproget i menuer og meddelelser. Det skifter med det samme.
+options.language.not_adapted = Dette sprog er endnu ikke helt tilpasset: trænerens stemme kan udtale nogle ord forkert, og nogle tekster kan stadig lyde lidt mærkelige.
 options.display_mode = Visningstilstand
 options.display_mode.help = Fuld skærm: et vindue uden kant over hele skærmen i skrivebordets opløsning. Vindue: et vindue i størrelsen nedenfor.
 options.fullscreen = Fuld skærm

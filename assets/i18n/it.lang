@@ -44,6 +44,7 @@ options.unsaved.text = Alcune opzioni sono state modificate. Vuoi applicarle pri
 
 options.language = Lingua
 options.language.help = Lingua dei menu e dei messaggi. Il cambio è immediato.
+options.language.not_adapted = Questa lingua non è ancora del tutto adattata: la voce dell’allenatore potrebbe pronunciare male alcune parole e alcuni testi potrebbero suonare ancora un po’ strani.
 options.display_mode = Modalità di visualizzazione
 options.display_mode.help = Schermo intero: una finestra senza bordi su tutto lo schermo, alla risoluzione del desktop. In finestra: una finestra delle dimensioni indicate qui sotto.
 options.fullscreen = Schermo intero

@@ -47,6 +47,7 @@ options.unsaved.text = Bazı seçenekler değiştirildi. Çıkmadan önce uygula
 
 options.language = Dil
 options.language.help = Menülerin ve mesajların dili. Hemen değişir.
+options.language.not_adapted = Bu dil henüz tam olarak uyarlanmadı: eğitmen sesi bazı kelimeleri yanlış telaffuz edebilir ve bazı metinler hâlâ tuhaf okunabilir.
 options.display_mode = Görüntü modu
 options.display_mode.help = Tam ekran: masaüstü çözünürlüğünde, bütün ekranı kaplayan kenarlıksız bir pencere. Pencereli: aşağıdaki boyutta bir pencere.
 options.fullscreen = Tam ekran

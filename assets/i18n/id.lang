@@ -44,6 +44,7 @@ options.unsaved.text = Beberapa opsi telah diubah. Terapkan sebelum keluar?
 
 options.language = Bahasa
 options.language.help = Bahasa untuk menu dan pesan. Perubahan langsung berlaku.
+options.language.not_adapted = Bahasa ini belum sepenuhnya disesuaikan: suara pelatih mungkin salah mengucapkan beberapa kata, dan beberapa teks mungkin masih terasa janggal.
 options.display_mode = Mode tampilan
 options.display_mode.help = Layar penuh: jendela tanpa bingkai yang menutupi seluruh layar, dengan resolusi desktop. Berjendela: jendela dengan ukuran di bawah ini.
 options.fullscreen = Layar penuh

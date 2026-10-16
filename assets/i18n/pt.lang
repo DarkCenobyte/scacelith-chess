@@ -41,6 +41,7 @@ options.unsaved.text = Algumas opções foram alteradas. Aplicá-las antes de sa
 
 options.language = Idioma
 options.language.help = Idioma dos menus e das mensagens. A alteração é imediata.
+options.language.not_adapted = Este idioma ainda não está totalmente adaptado: a voz do treinador pode pronunciar mal algumas palavras e alguns textos podem ainda soar um pouco estranhos.
 options.display_mode = Modo de ecrã
 options.display_mode.help = Ecrã inteiro: uma janela sem margens que ocupa todo o ecrã, na resolução do ambiente de trabalho. Em janela: uma janela com o tamanho indicado abaixo.
 options.fullscreen = Ecrã inteiro

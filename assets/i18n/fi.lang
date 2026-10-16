@@ -44,6 +44,7 @@ options.unsaved.text = Joitakin asetuksia on muutettu. Otatko ne käyttöön enn
 
 options.language = Kieli
 options.language.help = Valikkojen ja viestien kieli. Muutos tulee voimaan heti.
+options.language.not_adapted = Tätä kieltä ei ole vielä täysin viimeistelty: valmentajan ääni voi lausua joitakin sanoja väärin, ja jotkin tekstit voivat vielä kuulostaa oudoilta.
 options.display_mode = Näyttötila
 options.display_mode.help = Koko näyttö: reunaton ikkuna koko näytön kokoisena työpöydän tarkkuudella. Ikkunoitu: alla valitun kokoinen ikkuna.
 options.fullscreen = Koko näyttö

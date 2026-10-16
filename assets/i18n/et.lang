@@ -44,6 +44,7 @@ options.unsaved.text = Mõningaid seadeid on muudetud. Kas rakendada need enne l
 
 options.language = Keel
 options.language.help = Menüüde ja teadete keel. Muutub kohe.
+options.language.not_adapted = See keel pole veel täielikult kohandatud: treeneri hääl võib mõnda sõna valesti hääldada ja mõni tekst võib veel kohmakalt kõlada.
 options.display_mode = Kuvarežiim
 options.display_mode.help = Täisekraan: ääristeta aken üle kogu ekraani, töölaua eraldusvõimega. Aknas: allpool määratud suurusega aken.
 options.fullscreen = Täisekraan

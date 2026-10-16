@@ -47,6 +47,7 @@ options.unsaved.text = 일부 설정이 변경되었습니다. 나가기 전에 
 
 options.language = 언어
 options.language.help = 메뉴와 메시지의 언어입니다. 바로 바뀝니다.
+options.language.not_adapted = 이 언어는 아직 완전히 다듬어지지 않았습니다. 코치 음성이 일부 단어를 잘못 발음하거나 일부 문장이 어색하게 읽힐 수 있습니다.
 options.display_mode = 화면 모드
 options.display_mode.help = 전체 화면: 바탕 화면 해상도로 화면 전체를 덮는 테두리 없는 창입니다. 창 모드: 아래에서 정한 크기의 창입니다.
 options.fullscreen = 전체 화면

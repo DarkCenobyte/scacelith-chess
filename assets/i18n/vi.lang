@@ -44,6 +44,7 @@ options.unsaved.text = Một số tùy chọn đã được thay đổi. Áp d�
 
 options.language = Ngôn ngữ
 options.language.help = Ngôn ngữ của menu và thông báo. Thay đổi có hiệu lực ngay lập tức.
+options.language.not_adapted = Ngôn ngữ này chưa được hoàn thiện: giọng huấn luyện viên có thể phát âm sai một số từ và một số câu chữ có thể vẫn chưa tự nhiên.
 options.display_mode = Chế độ hiển thị
 options.display_mode.help = Toàn màn hình: một cửa sổ không viền phủ kín màn hình, ở độ phân giải của màn hình nền. Cửa sổ: một cửa sổ có kích thước chọn bên dưới.
 options.fullscreen = Toàn màn hình

@@ -44,6 +44,7 @@ options.unsaved.text = Kai kurie nustatymai pakeisti. Pritaikyti juos prieš iš
 
 options.language = Kalba
 options.language.help = Meniu ir pranešimų kalba. Pakeičiama iš karto.
+options.language.not_adapted = Ši kalba dar nėra visiškai pritaikyta: trenerio balsas gali neteisingai ištarti kai kuriuos žodžius, o kai kurie tekstai dar gali skambėti keistokai.
 options.display_mode = Ekrano režimas
 options.display_mode.help = Visas ekranas: langas be rėmelio per visą ekraną, darbalaukio skyra. Lange: toliau nurodyto dydžio langas.
 options.fullscreen = Visas ekranas

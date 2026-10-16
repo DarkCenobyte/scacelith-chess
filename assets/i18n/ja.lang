@@ -36,6 +36,7 @@ options.unsaved.text = 一部の設定が変更されています。終了する
 
 options.language = 言語
 options.language.help = メニューとメッセージの言語。すぐに切り替わります。
+options.language.not_adapted = この言語はまだ調整中です。コーチの音声が一部の単語を誤って発音したり、一部の文章が不自然に感じられたりすることがあります。
 options.display_mode = 表示モード
 options.display_mode.help = フルスクリーン：デスクトップの解像度で画面全体を覆う枠なしウィンドウ。ウィンドウ：下で選んだサイズのウィンドウ。
 options.fullscreen = フルスクリーン

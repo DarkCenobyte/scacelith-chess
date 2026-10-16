@@ -53,6 +53,7 @@ options.unsaved.text = Nekatere možnosti so bile spremenjene. Ali jih želite u
 
 options.language = Jezik
 options.language.help = Jezik menijev in sporočil. Spremeni se takoj.
+options.language.not_adapted = Ta jezik še ni povsem prilagojen: glas trenerja lahko nekatere besede napačno izgovori, nekatera besedila pa se morda še berejo nenavadno.
 options.display_mode = Način prikaza
 options.display_mode.help = Celozaslonski: okno brez robov čez ves zaslon, v ločljivosti namizja. V oknu: okno velikosti, nastavljene spodaj.
 options.fullscreen = Celozaslonski

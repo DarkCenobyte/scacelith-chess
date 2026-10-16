@@ -70,39 +70,40 @@ void ensureEnglish() {
 
 // The native names live here, not in the .lang files: the selector shows every language in its
 // own name whatever the current one. English first (the reference), then by native name: Latin
-// script (alphabetical), Greek, Cyrillic, Arabic, Devanagari, Hangul, Japanese, Chinese.
+// script (alphabetical), Greek, Cyrillic, Arabic, Devanagari, Hangul, Japanese, Chinese. The fourth
+// field false: not adapted yet (Language::adapted).
 const std::vector<Language>& languages() {
     static const std::vector<Language> list = {
         {"en", "English", false},
-        {"id", "Bahasa Indonesia", false},
-        {"cs", "\xC4\x8C" "e\xC5\xA1tina", false},                                   // Čeština
+        {"id", "Bahasa Indonesia", false, false},
+        {"cs", "\xC4\x8C" "e\xC5\xA1tina", false, false},                                   // Čeština
         {"da", "Dansk", false},
         {"de", "Deutsch", false},
-        {"et", "Eesti", false},
+        {"et", "Eesti", false, false},
         {"es", "Espa\xC3\xB1ol", false},
         {"fr", "Fran\xC3\xA7" "ais", false},
-        {"hr", "Hrvatski", false},
+        {"hr", "Hrvatski", false, false},
         {"it", "Italiano", false},
-        {"lv", "Latvie\xC5\xA1u", false},                                             // Latviešu
-        {"lt", "Lietuvi\xC5\xB3", false},                                             // Lietuvių
-        {"hu", "Magyar", false},
-        {"nl", "Nederlands", false},
-        {"pl", "Polski", false},
+        {"lv", "Latvie\xC5\xA1u", false, false},                                             // Latviešu
+        {"lt", "Lietuvi\xC5\xB3", false, false},                                             // Lietuvių
+        {"hu", "Magyar", false, false},
+        {"nl", "Nederlands", false, false},
+        {"pl", "Polski", false, false},
         {"pt-BR", "Portugu\xC3\xAAs (Brasil)", false},
         {"pt", "Portugu\xC3\xAAs (Portugal)", false},
-        {"ro", "Rom\xC3\xA2n\xC4\x83", false},                                        // Română
-        {"sk", "Sloven\xC4\x8Dina", false},                                           // Slovenčina
-        {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false},                                   // Slovenščina
-        {"fi", "Suomi", false},
-        {"sv", "Svenska", false},
-        {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false},                            // Tiếng Việt
-        {"tr", "T\xC3\xBCrk\xC3\xA7" "e", false},                                     // Türkçe
-        {"el", "\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA\xCE\xAC", false},  // Ελληνικά
-        {"bg", "\xD0\x91\xD1\x8A\xD0\xBB\xD0\xB3\xD0\xB0\xD1\x80\xD1\x81\xD0\xBA\xD0\xB8", false},  // Български
+        {"ro", "Rom\xC3\xA2n\xC4\x83", false, false},                                        // Română
+        {"sk", "Sloven\xC4\x8Dina", false, false},                                           // Slovenčina
+        {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false, false},                                   // Slovenščina
+        {"fi", "Suomi", false, false},
+        {"sv", "Svenska", false, false},
+        {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false, false},                            // Tiếng Việt
+        {"tr", "T\xC3\xBCrk\xC3\xA7" "e", false, false},                                     // Türkçe
+        {"el", "\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA\xCE\xAC", false, false},  // Ελληνικά
+        {"bg", "\xD0\x91\xD1\x8A\xD0\xBB\xD0\xB3\xD0\xB0\xD1\x80\xD1\x81\xD0\xBA\xD0\xB8", false, false},  // Български
         {"ru", "\xD0\xA0\xD1\x83\xD1\x81\xD1\x81\xD0\xBA\xD0\xB8\xD0\xB9", false},  // Русский
         {"uk", "\xD0\xA3\xD0\xBA\xD1\x80\xD0\xB0\xD1\x97\xD0\xBD\xD1\x81\xD1\x8C\xD0\xBA\xD0\xB0", false},  // Українська
         {"ar", "\xD8\xA7\xD9\x84\xD8\xB9\xD8\xB1\xD8\xA8\xD9\x8A\xD8\xA9", true},  // العربية
-        {"hi", "\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80", false},  // हिन्दी
+        {"hi", "\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80", false, false},  // हिन्दी
         {"ko", "\xED\x95\x9C\xEA\xB5\xAD\xEC\x96\xB4", false},                      // 한국어
         {"ja", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", false},                      // 日本語
         {"zh-Hans", "\xE7\xAE\x80\xE4\xBD\x93\xE4\xB8\xAD\xE6\x96\x87", false},  // 简体中文

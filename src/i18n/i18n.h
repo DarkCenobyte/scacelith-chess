@@ -25,6 +25,9 @@ struct Language {
     const char* code;        // file name in assets/i18n/ and .ini value ("fr", "zh-Hant", ...)
     const char* nativeName;  // shown in the language selector ("Français", "日本語", ...)
     bool rtl;                // right-to-left script (Arabic)
+    // Coach voice and texts checked by their pronunciation pass (docs/PRONUNCIATION.md). A language
+    // not adapted yet is offered with an asterisk and a note on the Display page.
+    bool adapted = true;
 };
 
 // The 34 languages of the game: English first, then by native name (see i18n.cpp).

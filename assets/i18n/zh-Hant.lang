@@ -36,6 +36,7 @@ options.unsaved.text = 部分選項已變更。離開前要套用嗎？
 
 options.language = 語言
 options.language.help = 選單與訊息的語言，立即生效。
+options.language.not_adapted = 此語言尚未完成調校：教練語音可能會唸錯部分字詞，部分文字也可能仍不夠通順。
 options.display_mode = 顯示模式
 options.display_mode.help = 全螢幕：以桌面解析度覆蓋整個螢幕的無邊框視窗。視窗：使用下方所選大小的視窗。
 options.fullscreen = 全螢幕

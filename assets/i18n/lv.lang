@@ -50,6 +50,7 @@ options.unsaved.text = Dažas opcijas ir mainītas. Vai lietot tās pirms izieš
 
 options.language = Valoda
 options.language.help = Izvēlņu un ziņojumu valoda. Tā mainās uzreiz.
+options.language.not_adapted = Šī valoda vēl nav pilnībā pielāgota: trenera balss dažus vārdus var izrunāt nepareizi, un daži teksti vēl var izklausīties neveikli.
 options.display_mode = Attēlošanas režīms
 options.display_mode.help = Pilnekrāns: logs bez rāmja pāri visam ekrānam, ar darbvirsmas izšķirtspēju. Logā: logs ar zemāk norādīto izmēru.
 options.fullscreen = Pilnekrāns

@@ -402,11 +402,13 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
 }
 
 // ---- Options page -----------------------------------------------------------------------------------
-// The languages of the game by their own names, in the order of i18n::languages().
+// The languages of the game by their own names, in the order of i18n::languages(); an asterisk
+// marks a language not adapted yet (the Display page says what it means).
 const std::vector<std::string>& languageNames() {
     static std::vector<std::string> names;
     if (names.empty())
-        for (const i18n::Language& l : i18n::languages()) names.push_back(l.nativeName);
+        for (const i18n::Language& l : i18n::languages())
+            names.push_back(l.adapted ? std::string(l.nativeName) : std::string(l.nativeName) + " *");
     return names;
 }
 
@@ -515,6 +517,11 @@ bool optionsPage(MenuAction& act) {
             im::tooltip(T("options.vsync.help"));
             im::sliderRow(L("options.render_scale"), s.renderScale, 0.5f, 2.0f, 0.05f, pct, row());
             im::tooltip(T("options.render_scale.help"));
+            // The asterisk of a language not adapted yet, explained under the rows.
+            if (!i18n::languages()[size_t(li)].adapted) {
+                TextStyle ns = style(font::FACE_ITALIC, 22.0f, muted, HAlign::Center);
+                gfx::textWrapped("* " + T("options.language.not_adapted"), rx + rw * 0.5f, y + 30.0f, rw - 40.0f, ns);
+            }
             break;
         }
         case 1: {

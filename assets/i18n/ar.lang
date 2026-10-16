@@ -39,6 +39,7 @@ options.unsaved.text = تغيّرت بعض الخيارات. هل تريد تط�
 
 options.language = اللغة
 options.language.help = لغة القوائم والرسائل. يسري التغيير فورًا.
+options.language.not_adapted = لم تكتمل مواءمة هذه اللغة بعد: قد يخطئ صوت المدرّب في نطق بعض الكلمات، وقد لا تبدو بعض النصوص طبيعية تمامًا بعد.
 options.display_mode = وضع العرض
 options.display_mode.help = ملء الشاشة: نافذة بلا إطار تغطي الشاشة كلها بدقة سطح المكتب. نافذة: نافذة بالحجم المحدد أدناه.
 options.fullscreen = ملء الشاشة

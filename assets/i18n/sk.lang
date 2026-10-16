@@ -49,6 +49,7 @@ options.unsaved.text = Niektoré možnosti sa zmenili. Chcete ich pred odchodom 
 
 options.language = Jazyk
 options.language.help = Jazyk ponúk a správ. Zmení sa okamžite.
+options.language.not_adapted = Tento jazyk ešte nie je úplne doladený: hlas trénera môže niektoré slová vysloviť nesprávne a niektoré texty môžu ešte znieť nezvyčajne.
 options.display_mode = Režim zobrazenia
 options.display_mode.help = Celá obrazovka: okno bez okrajov cez celú obrazovku, v rozlíšení pracovnej plochy. V okne: okno s veľkosťou nastavenou nižšie.
 options.fullscreen = Celá obrazovka

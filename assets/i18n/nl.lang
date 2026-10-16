@@ -40,6 +40,7 @@ options.unsaved.text = Er zijn opties gewijzigd. Wil je ze toepassen voordat je 
 
 options.language = Taal
 options.language.help = Taal van de menu's en berichten. De wijziging gaat meteen in.
+options.language.not_adapted = Deze taal is nog niet helemaal afgewerkt: de stem van de coach kan sommige woorden verkeerd uitspreken en sommige teksten kunnen nog wat vreemd overkomen.
 options.display_mode = Weergavemodus
 options.display_mode.help = Volledig scherm: een randloos venster over het hele scherm, op de resolutie van het bureaublad. Venster: een venster met de grootte hieronder.
 options.fullscreen = Volledig scherm

@@ -44,6 +44,8 @@ options.unsaved.text = Some options were changed. Apply them before leaving?
 
 options.language = Language
 options.language.help = Language of the menus and messages. It changes at once.
+# Under the Display rows when the current language is marked with an asterisk in the list.
+options.language.not_adapted = This language is not fully adapted yet: the coach's voice may mispronounce some words, and some texts may still read oddly.
 options.display_mode = Display mode
 options.display_mode.help = Fullscreen: a borderless window over the whole screen, at the desktop resolution. Windowed: a window of the size below.
 options.fullscreen = Fullscreen
