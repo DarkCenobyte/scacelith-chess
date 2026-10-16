@@ -1,0 +1,1451 @@
+# Scacelith - Türkçe
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other; a noun after a number
+# stays singular in Turkish ("1 hamle", "5 hamle"), so both forms are usually the same words.
+# Register: formal "siz" in sentences, instructions and questions, as in Microsoft and Apple Turkish
+# software; buttons, menu entries and control descriptions are bare imperatives or noun phrases in
+# sentence case ("Kaydet", "Yeni oyun"). Titles in capitals with Turkish casing (i -> İ, ı -> I).
+# Terms follow glossary/tr.md: game = oyun (never parti/maç), coach = eğitmen, resign = terk etmek,
+# rated / casual = puanlı / puansız, time control = süre kontrolü, scoresheet = notasyon kâğıdı,
+# illegal move = kural dışı hamle, legal move = geçerli hamle, flag fall = süre doldu.
+# No suffix is ever attached to a placeholder ({0} may be a name, a number or a word): the ending goes
+# on a noun next to it ("{0} sunucusuna", "{0} adlı oyuncunun"), a separate word (ile, için, olarak,
+# sonra, tarafından) follows it, or it stands after a colon.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Açık
+common.off = Kapalı
+common.back = Geri
+common.apply = Uygula
+common.discard = Yoksay
+common.cancel = İptal
+common.white = Beyaz
+common.black = Siyah
+common.main_menu = Ana menü
+# Decimal separator of numbers ("2,5 sn"); the percent sign comes first in Turkish ("%85").
+number.decimal = ,
+number.percent = %{0}
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kralların Oyunu
+menu.new_game = Yeni oyun
+menu.options = Seçenekler
+menu.credits = Emeği geçenler
+menu.quit = Çık
+menu.version = Sürüm {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = SEÇENEKLER
+options.tab.display = Ekran
+options.tab.graphics = Grafik
+options.tab.audio = Ses
+options.tab.gameplay = Oynanış
+options.tab.player = Oyuncu
+options.tab.controls = Kontroller
+options.pending = Değişiklikler uygulandığında geçerli olur.
+options.unsaved.title = KAYDEDİLMEMİŞ DEĞİŞİKLİKLER
+options.unsaved.text = Bazı seçenekler değiştirildi. Çıkmadan önce uygulansın mı?
+
+options.language = Dil
+options.language.help = Menülerin ve mesajların dili. Hemen değişir.
+options.display_mode = Görüntü modu
+options.display_mode.help = Tam ekran: masaüstü çözünürlüğünde, bütün ekranı kaplayan kenarlıksız bir pencere. Pencereli: aşağıdaki boyutta bir pencere.
+options.fullscreen = Tam ekran
+options.windowed = Pencereli
+options.window_size = Pencere boyutu
+options.window_size.help = Pencereli moddaki pencere boyutu. Tam ekran her zaman masaüstü çözünürlüğünü kullanır.
+options.vsync = Dikey senkronizasyon
+options.vsync.help = Görüntü yırtılmasını önlemek için kareleri ekranla eşitler.
+options.render_scale = İşleme ölçeği
+options.render_scale.help = 3B görüntünün iç çözünürlüğü. Düşük değer daha hızlı, yüksek değer daha keskin.
+
+options.quality = Kalite
+options.quality.very_low = Çok düşük
+options.quality.low = Düşük
+options.quality.medium = Orta
+options.quality.high = Yüksek
+options.quality.ultra = Ultra
+options.quality.custom = Özel
+options.quality.help = Aşağıdaki bütün seçenekleri tek seferde ayarlar: Çok düşük bütün efektleri kapatır, Ultra hepsini en üst düzeye çıkarır. Tek bir seçeneği ayrıca değiştirmek kaliteyi Özel yapar. Mütevazı bir ekran kartında işleme ölçeğini (Ekran) düşürmek de çok işe yarar.
+options.shadows = Gölgeler
+options.shadows.help = Güneşin oluşturduğu gölgelerin ayrıntısı ve kenarlarının yumuşaklığı. Düşük: çizilmesi hızlı, düz kenarlar.
+options.reflections = Yansımalar
+options.reflections.help = Zemin, masa ve tahta salonu yansıtır (salon her biri için bir kez daha çizilir: en çok kaynak isteyen seçeneklerden biri); Orta seviyeden itibaren parlak taşlar ve nesneler de çevrelerindekileri yansıtır.
+options.ambient_occlusion = Ortam perdeleme
+options.ambient_occlusion.help = Nesnelerin birleştiği yerlerde ve oyuklarda, yani daha az ışık giren yerlerde yumuşak gölgelendirme.
+options.indirect_light = Dolaylı ışık
+options.indirect_light.help = Duvarlardan, zeminden ve tavandan yansıyan gün ışığı. Düşük: bunun yerine eşit dağılmış bir ortam ışığı. Daha çok yükleme süresini etkiler.
+options.volumetric_light = Işık huzmeleri
+options.volumetric_light.help = Salonun tozlu havasından geçen güneş ışınları ve içlerinde parıldayan toz zerreleri.
+options.tessellation = Mozaikleme
+options.tessellation.help = Yakından görülen taşların kıvrımlarında pürüzsüz hatlar.
+options.tessellation.unavailable = Kullanılamıyor: bu ekran kartı sürücüsü mozaiklemeyi desteklemiyor.
+options.antialiasing = Kenar yumuşatma
+options.antialiasing.help = Tırtıklı kenarları ve titreşen parlamaları yumuşatır. Kapalı: daha keskin ama tırtıklı; bazı efektler grenli görünür.
+options.depth_of_field = Alan derinliği
+options.depth_of_field.help = Baktığınız şeyin epey önünde ya da arkasında kalanları, bir fotoğraf makinesi objektifi gibi yumuşatır.
+options.motion_blur = Hareket bulanıklığı
+options.motion_blur.help = Kameranın ve kolların hızlı hareketlerini, bir film kamerası gibi bulanıklaştırır.
+options.bloom = Işıma
+options.bloom.help = En parlak ışıkların çevresinde, bir kamera objektifindeki gibi yumuşak bir hale.
+options.brightness = Parlaklık
+options.brightness.neutral = Nötr
+options.brightness.value = {0} EV
+options.brightness.help = Kameranın pozlama telafisi. İlk açılıştaki kalibrasyon bunu, en koyu gölgeler zar zor görünecek şekilde ayarlar.
+
+options.master_volume = Ana ses düzeyi
+options.effects = Efektler
+options.ambience = Ortam sesi
+options.ambience.help = Salonun uğultusu: ateş, uzak ayak sesleri, eski saat.
+options.ambience_volume = Ortam sesi düzeyi
+options.voice_volume = Konuşma sesi düzeyi
+options.voice_volume.help = Eğitmen modunda eğitmenin sesinin düzeyi.
+options.subtitles = Altyazılar
+options.subtitles.auto = Otomatik
+options.subtitles.help = Eğitmenin sözleri, ekranın altında yazılı olarak. Otomatik: eğitmen menülerin dilini konuşmadığında gösterilir (menüler Çince olduğunda İngilizce konuşur). Sesi yüklü değilse her zaman gösterilir.
+
+options.legal_moves = Geçerli hamleleri göster
+options.legal_moves.help = Dokunulan taşın gidebileceği kareleri vurgular. Kapalıyken bir hamlenin geçerli olup olmadığını size hiçbir şey söylemez: kural dışı bir hamle, saate bastığınızda hakem tarafından cezalandırılır.
+options.coordinates = Tahta koordinatları
+options.auto_press = Saate otomatik bas
+options.auto_press.help = Hamleniz tahtaya konunca robotunuz saate kendiliğinden basar. Çevrimiçi oyunlarda buna sunucu, doğrudan oyunlarda ise oyunu kuran oyuncu karar verir.
+options.thinking_time = Gerçekçi düşünme süresi
+options.thinking_time.help = Rakibiniz hamlesini anında yapmak yerine, insan bir oyuncu gibi düşünmeye zaman ayırır.
+options.ignore_head = Rakibin baş hareketlerini yoksay
+options.ignore_head.help = Çevrimiçi ve doğrudan oyunlarda rakibin robotu, oyuncusunun baktığı yere bakar. Açıkken başını kendiliğinden hareket ettirir, Stockfish'e karşı oynarken olduğu gibi.
+options.mouse_sensitivity = Fare hassasiyeti
+options.invert_look = Dikey bakışı ters çevir
+options.handover = Oyuncu değişimi
+options.handover.cut = Anında geçiş
+options.handover.flight = Uçuş, {0} sn
+options.handover.help = Tek bilgisayarda iki oyuncu: her hamleden sonra görüntünün bir oyuncunun gözlerinden diğerininkine nasıl geçeceği. Anında geçiş kamera hareketini önler.
+options.game_cursor = Oyun imleci
+options.game_cursor.help = Masadayken oyun, bir tıklamanın ne yapacağını gösteren kendi imlecini çizer. Kapalı: sistemin olağan oku.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Ad
+player.name.help = Notasyon kâğıtlarının başına yazılan adınız; herhangi bir alfabeyle yazılabilir.
+player.default_name = İnsan
+player.handwriting = El yazısı
+player.handwriting.help = Hamlelerinizi yazan el yazısı. Arapça, Japonca ve Çince kendilerine özgü bir el yazısıyla yazılır.
+player.preview = NOTASYON KÂĞIDINIZDA
+hand.caveat = Gündelik
+hand.marck = Bitişik
+hand.badscript = Eğik
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+# Key names as on Turkish keyboards (glossary): Boşluk tuşu, Geri tuşu, ok tuşları; Tab, Esc, Shift kept.
+controls.touch.keys = Sol tık
+controls.touch = Taşa dokun, sonra oyna
+controls.clock.keys = Boşluk tuşu  veya  saate tıklama
+controls.clock = Saate bas
+controls.look.keys = Sağ fare tuşu basılı
+controls.look = Etrafına bak
+controls.sheet.keys = S
+controls.sheet = Notasyon kâğıdına bak ve geri dön
+controls.stand.keys = ↑
+controls.stand = Sandalyenin önünde ayağa kalk
+controls.side.keys = ←  /  →
+controls.side = Masanın sol / sağ ucunda dur
+controls.sit.keys = ↓
+controls.sit = Yeniden otur (yalnızca oturarak oynanır)
+controls.moves.keys = Tab
+controls.moves = Hamle listesini göster veya gizle
+controls.menu.keys = Esc
+controls.menu = Menü
+controls.coach_skip.keys = Boşluk tuşu
+controls.coach_skip = Eğitmen: konuşmayı atla
+controls.coach_takeback.keys = Geri tuşu
+controls.coach_takeback = Eğitmen: önerildiğinde hamleyi geri al
+controls.coach_hint.keys = H
+controls.coach_hint = Eğitmen meydan okumaları: ipucu iste
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = PARLAKLIK
+calibration.text = Siyah karedeki at zar zor görünene ya da artık hiç görünmeyene kadar kaydırıcıyı hareket ettirin.
+calibration.later = Bunu daha sonra Seçenekler > Grafik bölümünden değiştirebilirsiniz.
+calibration.continue = Devam
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = YENİ OYUN
+newgame.opponent = RAKİP
+newgame.time_control = SÜRE KONTROLÜ
+newgame.start = Başla
+newgame.elo = ~{0} Elo
+newgame.you_white = Beyaz taşlarla oynayacaksınız.
+newgame.you_black = Siyah taşlarla oynayacaksınız.
+newgame.colour_lot = İlk oyunda renkler kurayla belirlenir.
+newgame.colour_alternate = Sonra renkler oyundan oyuna sırayla değişir.
+newgame.opponent_kind = Rakip
+newgame.opponent_kind.help = Stockfish'e ya da bu bilgisayarın başındaki bir arkadaşınıza karşı oynayın: sırayla, her biriniz tahtanın kendi tarafından oynarsınız.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = İnsan, aynı bilgisayar
+
+# Custom opponent: Stockfish parameters
+engine.skill = Beceri seviyesi
+engine.skill.help = Stockfish'in “Skill Level” ayarı (0–20). Güç Elo ile sınırlıyken dikkate alınmaz.
+engine.limit_elo = Gücü sınırla (Elo)
+engine.limit_elo.help = UCI_LimitStrength: motor aşağıdaki Elo puanını hedefler.
+engine.elo = Elo
+engine.depth = Arama derinliği
+engine.plies = {0} yarım hamle|{0} yarım hamle
+engine.move_time = Hamle başına süre
+engine.nodes = Düğüm sınırı
+engine.no_limit = Yok
+engine.thousand = {0} bin
+engine.million = {0} milyon
+engine.dynamic_elo = Süreye göre dinamik Elo
+engine.dynamic_elo.help = Stockfish, insan bir oyuncu gibi, saati azaldıkça daha zayıf oynar: son dakikada biraz (hızlı ve yıldırım oyunlarda daha erken), zaman sıkıntısında çok daha zayıf. Yalnızca süreli oyunlarda.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish, kendi seviyesindeki bir insan gibi düşünmeye zaman ayırır. Bu beklemeyi atlamak için: Seçenekler > Oynanış > Gerçekçi düşünme süresi.
+engine.pace.instant = Stockfish, hesaplamasını bitirir bitirmez oynar. İnsan gibi zaman ayırması için: Seçenekler > Oynanış > Gerçekçi düşünme süresi.
+
+# Time controls ("3+2": minutes + increment in seconds). TSF names: Yıldırım (blitz), Hızlı (rapid),
+# Klasik; "Bullet" is kept, as Turkish players say it.
+tc.unlimited = Sınırsız
+tc.no_clock = Saatsiz
+tc.bullet = Bullet
+tc.blitz = Yıldırım
+tc.rapid = Hızlı
+tc.classical = Klasik
+tc.custom = Özel
+tc.your_own = Kendi ayarınız
+tc.base_time = Temel süre
+tc.base_time.help = Her saatteki başlangıç süresi (dakika : saniye).
+tc.increment = Ek süre
+tc.increment.help = Her hamleden sonra eklenen Fischer ek süresi.
+tc.delay = Gecikme
+tc.delay.help = Bronstein gecikmesi: bu gecikmeye kadar kullanılan süre her hamleden sonra geri verilir.
+tc.no_delay = Yok
+tc.seconds = {0} sn
+tc.minutes = {0} dk
+tc.summary_increment = {0} + {1} sn
+tc.summary_delay = {0}, gecikme {1} sn
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Acemi
+preset.novice.desc = Satrancı yeni öğrenmiş: taşlarını korumasız bırakır, basit tehditleri kaçırır.
+preset.beginner.name = Yeni başlayan
+preset.beginner.desc = Temel bilgileri biliyor ama hâlâ sık sık büyük hatalarla materyal kaybediyor.
+preset.casual.name = Hobi oyuncusu
+preset.casual.desc = Rahat bir akşam rakibi: mantıklı hamleler, sık hatalar.
+preset.club_player.name = Kulüp oyuncusu
+preset.club_player.desc = Bariz büyük hataları cezalandıran sağlam bir kulüp oyuncusu.
+preset.advanced.name = İleri seviye
+preset.advanced.desc = İyi taktik görüşü olan güçlü bir kulüp oyuncusu.
+preset.expert.name = Uzman
+preset.expert.desc = Turnuva uzmanı: nadiren hata yapar, üstünlüğünü galibiyete çevirir.
+preset.master.name = Usta
+preset.master.desc = Usta gücünde: derin hesap ve ince pozisyon oyunu.
+preset.grandmaster.name = Büyükusta
+preset.grandmaster.desc = Büyükusta seviyesi: yenmesi son derece zor.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Tam güçte Stockfish 19. Bol şans.
+preset.custom.name = Özel
+preset.custom.desc = Kendi motor ayarlarınız.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = EMEĞİ GEÇENLER
+credits.game.head = SCACELITH
+credits.game = Bir kraliyet salonunda, kendi geliştirdiğimiz OpenGL 4.6 motoru üzerinde bir satranç oyunu.
+credits.engine.head = SATRANÇ MOTORU
+credits.engine = Stockfish 19, Stockfish geliştiricileri tarafından.
+credits.engine.licence = GNU Genel Kamu Lisansı v3.
+credits.engine.data = Sinir ağı, Leela Chess Zero projesinin sağladığı ve Open Database License (ODbL) kapsamında kullanıma sunulan veriler üzerinde eğitildi.
+credits.voice.head = EĞİTMEN SESİ
+credits.voice = Eğitmen modu için Supertonic 3 ile üretilen sentetik konuşma.
+credits.voice.licence = Supertonic 3, Supertone'un bir modelidir ve OpenRAIL-M lisansıyla kullanılır; bu lisansın kullanım kısıtlamaları onu kullanan herkes için geçerlidir (bkz. Lisanslar).
+credits.openings.head = AÇILIŞLAR
+credits.openings = Açılış adları, lichess.org'un kamu malına adanmış (CC0) chess-openings veritabanından alınmıştır.
+credits.fonts.head = YAZI TİPLERİ
+credits.fonts = EB Garamond (Georg Duffner) ve Cinzel (Natanael Gama); Amiri (Khaled Hosny).
+credits.fonts.hand = El yazıları: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Satranç figürleri: GNU FreeFont (yazı tipi istisnalı GPL v3).
+credits.quote = “Satranç, analiz sanatıdır.”  — Mihail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Lisanslar
+licences.title = LİSANSLAR
+licences.note = Lisanslar özgün İngilizce metinleriyle gösterilir.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = DURAKLATILDI
+pause.resume = Devam et
+pause.offer_draw = Beraberlik teklif et
+pause.claim_draw = Beraberlik talep et
+pause.claim_draw.help = Üç kez tekrar veya 50 hamle kuralı.
+pause.resign = Terk et
+confirm.resign.title = TERK ET
+confirm.resign.text = Bu oyunu terk etmek istiyor musunuz? Rakibiniz kazanan ilan edilecek.
+confirm.resign.draw = Bu oyunu terk etmek istiyor musunuz? Rakibiniz artık mat edemez: oyun berabere bitecek.
+confirm.resign.ok = Terk et
+confirm.leave.title = OYUNDAN ÇIK
+confirm.leave.text = Ana menüye dönülsün mü? Devam eden oyun yarıda bırakılacak.
+confirm.leave.ok = Çık
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = TERFİ
+piece.queen = Vezir
+piece.rook = Kale
+piece.bishop = Fil
+piece.knight = At
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Oyun berabere bitti.
+gameover.draw_moves = Oyun {0} hamle sonunda berabere bitti.|Oyun {0} hamle sonunda berabere bitti.
+gameover.win = İyi oynadınız — kazandınız.
+gameover.win_moves = İyi oynadınız — {0} hamlede kazandınız.|İyi oynadınız — {0} hamlede kazandınız.
+gameover.loss = Rakibiniz kazandı.
+gameover.loss_moves = Rakibiniz {0} hamlede kazandı.|Rakibiniz {0} hamlede kazandı.
+gameover.rematch = Rövanş
+gameover.view_board = Tahtaya bak
+gameover.show = Göster
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Şah mat
+reason.resignation = Terk
+reason.timeout = Süreden kayıp
+reason.illegal_moves = İkinci kural dışı hamle (hükmen yenilgi)
+reason.stalemate = Pat
+reason.insufficient = Ölü pozisyon (yetersiz materyal)
+reason.timeout_vs_insufficient = Süre doldu, ama rakip mat edemez
+reason.fivefold = Beş kez tekrar
+reason.75_moves = 75 hamle kuralı
+reason.threefold_claim = Üç kez tekrar (talep edildi)
+reason.50_moves_claim = 50 hamle kuralı (talep edildi)
+reason.agreement = Anlaşmayla beraberlik
+reason.illegal_vs_insufficient = İkinci kural dışı hamle, ama rakip mat edemez
+reason.resignation_vs_insufficient = Terk, ama rakip mat edemez
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = HAMLELER
+movelist.empty = Henüz hamle yok.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Malzemeler hazırlanıyor
+loading.hall = Salon inşa ediliyor
+loading.furniture = Masa ve sandalyeler oyuluyor
+loading.board = Tahta cilalanıyor
+loading.pieces = Satranç takımı tornada işleniyor
+loading.clock = Saat birleştiriliyor
+loading.porcelain = Porselen fırınlanıyor
+loading.ready = Hazır
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move rule = "Dokunulan taş oynanır" (TSF wording of the rule).
+notify.no_draw_claim = Bu pozisyonda beraberlik talep edilemez.
+notify.flag_you = Süreniz doldu.
+notify.flag_opponent = Rakibinizin süresi doldu.
+notify.touched.pawn = Dokunulan taş oynanır: dokunduğunuz piyonu oynamalısınız.
+notify.touched.knight = Dokunulan taş oynanır: dokunduğunuz atı oynamalısınız.
+notify.touched.bishop = Dokunulan taş oynanır: dokunduğunuz fili oynamalısınız.
+notify.touched.rook = Dokunulan taş oynanır: dokunduğunuz kaleyi oynamalısınız.
+notify.touched.queen = Dokunulan taş oynanır: dokunduğunuz veziri oynamalısınız.
+notify.touched.king = Dokunulan taş oynanır: dokunduğunuz şahı oynamalısınız.
+notify.touched.piece = Dokunulan taş oynanır: dokunduğunuz taşı oynamalısınız.
+notify.touched_square = Dokunulan taş oynanır: {0} karesindeki taşı oynamalısınız.
+notify.press_clock = Hamlenizi tamamlamak için saate basın (Boşluk tuşu).
+notify.manual_clock = Bu oyunda her hamleden sonra saate kendiniz basın.
+notify.illegal = Kural dışı hamle.
+notify.cannot_move = Bu hamle yapılamaz.
+notify.move_first = Saate basmadan önce hamlenizi yapın.
+notify.stance.sit_to_play = Oynamak için yeniden oturun (Aşağı ok tuşu).
+notify.stance.first = Ayaktayken saatiniz işlemeye devam eder. Aşağı ok tuşu: yeniden oturun.
+notify.stance.first_untimed = Yalnızca sandalyenizden oynayabilirsiniz. Aşağı ok tuşu: yeniden oturun.
+notify.stance.finish_move = Önce hamlenizi bitirin.
+notify.draw_already_offered = Bu hamlede zaten beraberlik teklif ettiniz.
+notify.draw_accepted = Rakibiniz beraberliği kabul etti.
+notify.draw_declined = Rakibiniz beraberlik teklifini reddetti.
+notify.draw_claimed = Rakibiniz beraberlik talep etti.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+# Rulings in the aorist ("Beyaz oyunu kaybeder"); Beyaz / Siyah take suffixes without an apostrophe.
+arbiter.join = {0} {1}
+arbiter.no_move = Hakem: saate hamle yapılmadan basıldı; bu, kural dışı hamle sayılır.
+arbiter.unpromoted = Hakem: kural dışı hamle; saate basılmadan önce piyonun yerine yeni bir taş konmadı.
+arbiter.illegal = Hakem: kural dışı hamle.
+arbiter.second_loses.white = Bu, Beyazın ikinci kural dışı hamlesi: Beyaz oyunu kaybeder.
+arbiter.second_loses.black = Bu, Siyahın ikinci kural dışı hamlesi: Siyah oyunu kaybeder.
+arbiter.second_draw.white = Bu, Beyazın ikinci kural dışı hamlesi, ama Siyah mat edemez: oyun berabere biter.
+arbiter.second_draw.black = Bu, Siyahın ikinci kural dışı hamlesi, ama Beyaz mat edemez: oyun berabere biter.
+arbiter.queen = Piyon vezir olur.
+arbiter.queen_one_minute.white = Piyon vezir olur ve Beyaz bir dakika ek süre alır.
+arbiter.queen_one_minute.black = Piyon vezir olur ve Siyah bir dakika ek süre alır.
+arbiter.queen_two_minutes.white = Piyon vezir olur ve Beyaz iki dakika ek süre alır.
+arbiter.queen_two_minutes.black = Piyon vezir olur ve Siyah iki dakika ek süre alır.
+arbiter.restored = Pozisyon eski hâline getirilir.
+arbiter.restored_one_minute.white = Pozisyon eski hâline getirilir ve Beyaz bir dakika ek süre alır.
+arbiter.restored_one_minute.black = Pozisyon eski hâline getirilir ve Siyah bir dakika ek süre alır.
+arbiter.restored_two_minutes.white = Pozisyon eski hâline getirilir ve Beyaz iki dakika ek süre alır.
+arbiter.restored_two_minutes.black = Pozisyon eski hâline getirilir ve Siyah iki dakika ek süre alır.
+arbiter.one_minute.white = Beyaz bir dakika ek süre alır.
+arbiter.one_minute.black = Siyah bir dakika ek süre alır.
+arbiter.two_minutes.white = Beyaz iki dakika ek süre alır.
+arbiter.two_minutes.black = Siyah iki dakika ek süre alır.
+arbiter.second_loses = İkinci kural dışı hamle oyunu kaybettirir.
+arbiter.touched.white = Beyaz, dokunduğu taşı oynamak zorundadır.
+arbiter.touched.black = Siyah, dokunduğu taşı oynamak zorundadır.
+arbiter.game_over = Oyun bitti.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Oyun izle
+
+viewer.title = OYUN İZLE
+viewer.white = BEYAZ
+viewer.black = SİYAH
+viewer.time_control = SÜRE KONTROLÜ
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Renkleri değiştir
+viewer.note = İki oyuncu da Stockfish. Onlar oynarken salonda özgürce uçun: kimse sizi görmeyecek.
+viewer.summary = {0} – {1}
+viewer.custom = Özel
+viewer.tc.custom = Kendi ayarınız
+viewer.base_time = Temel süre
+viewer.increment = Ek süre
+viewer.delay = Gecikme
+viewer.off = Kapalı
+viewer.minutes = {0} dk
+viewer.seconds = {0} sn
+viewer.delay_summary = gecikme {0} sn
+viewer.back = Geri
+viewer.start = Başla
+
+viewer.paused = DURAKLATILDI
+viewer.resume = Devam et
+viewer.options = Seçenekler
+viewer.main_menu = Ana menü
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = KONTROLLER
+viewer.keys.move = W A S D  ·  Z Q S D  ·  ok tuşları
+viewer.controls.move = Hareket
+viewer.keys.updown = E, Boşluk  /  C, Ctrl
+viewer.controls.updown = Yukarı / aşağı
+viewer.keys.fast = Shift
+viewer.controls.fast = Daha hızlı
+viewer.keys.look = Sağ fare tuşu
+viewer.controls.look = Etrafına bak
+viewer.keys.speed = Fare tekerleği
+viewer.controls.speed = Hız
+viewer.keys.views = 1 – 9
+viewer.controls.views = Bakış noktaları
+viewer.keys.eyes = 0
+viewer.controls.eyes = Hamle sırası olan oyuncunun gözünden
+viewer.keys.moves = Tab
+viewer.controls.moves = Hamle listesi
+viewer.keys.menu = Esc
+viewer.controls.menu = Menü
+viewer.keys.hide = H
+viewer.controls.hide = Bu paneli gizle
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Duraklat / devam et
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Bir hamle geri / ileri
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Daha yavaş / daha hızlı
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Oyunun başı / sonu
+viewer.speed = Hız {0} m/sn
+viewer.view.0 = Oyuncuların gözünden
+viewer.view.1 = Masanın yanından
+viewer.view.2 = Tahtanın üstünden
+viewer.view.3 = Salon
+viewer.view.4 = Saat
+viewer.view.5 = Beyazın yüzü
+viewer.view.6 = Siyahın yüzü
+viewer.view.7 = Düello
+viewer.view.8 = Pencereler
+viewer.view.9 = Goblenler
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Beyaz
+viewer.side.black = Siyah
+viewer.flag.white = Beyazın süresi doldu.
+viewer.flag.black = Siyahın süresi doldu.
+viewer.claims_draw = {0} beraberlik talep ediyor.
+viewer.offer_accepted = {0} beraberlik teklif ediyor, {1} kabul ediyor.
+viewer.offer_declined = {0} beraberlik teklif ediyor, {1} reddediyor.
+viewer.gameover.white_wins = Beyaz {0}. hamleden sonra kazandı.
+viewer.gameover.black_wins = Siyah {0}. hamleden sonra kazandı.
+viewer.gameover.draw = Oyun {0}. hamleden sonra berabere bitti.
+viewer.gameover.players = {0} – {1}
+viewer.watch_again = Yeniden izle
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Henüz puanlı oyun yok
+elo.provisional = Geçici puan
+elo.peak = En yüksek {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo puanınız {0}
+elo.expected = beklenen skor %{0}
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · bu oyun puanlı değil
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Notasyon kâğıdı
+scoresheet.event = Turnuva
+scoresheet.date = Tarih
+scoresheet.round = Tur
+scoresheet.board = Masa
+scoresheet.page = Sayfa
+scoresheet.white = Beyaz
+scoresheet.black = Siyah
+scoresheet.elo = Elo
+scoresheet.result = Sonuç
+scoresheet.move_no = No.
+scoresheet.sign_white = Beyazın imzası
+scoresheet.sign_black = Siyahın imzası
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Turkish notation: Ş(ah) V(ezir) K(ale) F(il) A(t).
+scoresheet.pieces = Ş V K F A
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+# "Direct match" (no server) = "Doğrudan oyun"; host a game = "oyun kurmak"; router = "yönlendirici";
+# sign in / out = "giriş yapmak" / "çıkış yapmak" (another device: "oturumunu kapatmak").
+menu.online = Çevrimiçi oyna
+online.title = ÇEVRİMİÇİ OYNA
+online.continue = Devam
+online.retry = Yeniden dene
+online.copy = Kopyala
+online.copied = Kopyalandı
+online.copy.unavailable = Burada kopyalama kullanılamıyor: lütfen bir yere not edin.
+online.rated = Puanlı
+online.casual = Puansız
+online.casual_only = Yalnızca puansız
+online.color.random = Kurayla
+online.ping = {0} ms
+online.conn.online = Bağlı
+online.conn.connecting = Bağlanıyor…
+online.conn.reconnecting = Yeniden bağlanıyor…
+online.conn.offline = Bağlı değil
+online.conn.incompatible = Farklı sürüm
+online.no_server.text = Çevrimiçi oyun için bir Scacelith sunucusu gerekir. Seçeneklerde bir sunucu adresi girin ya da doğrudan oyunla bir arkadaşınıza karşı oynayın.
+online.no_server.settings = Sunucu ayarları
+
+# Options > Online server
+options.tab.online = Çevrimiçi sunucu
+options.online.server = Sunucu
+options.online.server.help = Resmî sunucu ya da başka birinin işlettiği özel (topluluk) bir sunucu; bağlantı, sunucunun güvenli web API'si ve güvenli WebSocket'i üzerinden kurulur. Her sunucuda ayrı ayrı giriş yaparsınız: hesaplar ve girişler sunucular arasında asla paylaşılmaz.
+options.online.official = Resmî sunucu — {0}
+options.online.community = Özel sunucu
+options.online.host = Ana bilgisayar
+options.online.host.hint = alan adı veya IP adresi
+options.online.host.help = Özel sunucunun, sahibinin verdiği alan adı veya IP adresi.
+options.online.api_port = HTTPS / API portu
+options.online.api_port.help = Sunucunun güvenli web API'sinin portu (Scacelith sunucularında 443).
+options.online.ws_port = WSS portu
+options.online.ws_port.hint = API portuyla aynı
+options.online.ws_port.help = Sunucunun güvenli WebSocket portu. API portuyla aynıysa boş bırakın.
+options.online.pin = Sertifika parmak izi (SHA-256)
+options.online.pin.hint = isteğe bağlı
+options.online.pin.help = Kendinden imzalı sertifikası olan bir sunucu için: sahibinin verdiği SHA-256 parmak izi (64 onaltılık karakter, iki nokta üst üste kullanılabilir). Sistemin sertifikalarına güvenmek için boş bırakın.
+options.online.pin.invalid = Parmak izi 64 onaltılık karakterden oluşur (iki nokta üst üste kullanılabilir).
+options.online.test = Bağlantıyı test et
+options.online.test_ok = {0}: bağlandı, bu sürümle uyumlu.
+options.online.test_incompatible = {0}: bağlandı, ancak Scacelith'in başka bir sürümünü gerektiriyor.
+options.online.in_game = Çevrimiçi oyun sırasında sunucu değiştirilemez.
+options.online.remember_session = Sistem anahtarlığı kullanılamadığında girişimi hatırla
+options.online.remember_session.help = Oturumunuzu saklayabilecek bir sistem anahtarlığı (GNOME Keyring, KWallet…) yoksa oturum, yalnızca kullanıcı hesabınızın okuyabileceği bir dosyaya kaydedilir. Dosyalarınızı ya da yedek gibi bir kopyalarını okuyabilen herkes bu oturumu kullanabilir. Kapalı: oyun kapanana kadar giriş yapmış olarak kalırsınız. Hesabınızdaki Giriş yapılmış cihazlar bölümünden herhangi bir cihazın oturumunu kapatabilirsiniz.
+
+# Sign in, create an account
+online.signin.lead = Çevrimiçi oynamak için {0} sunucusuna giriş yapın.
+online.field.user = Kullanıcı adı veya e-posta
+online.field.user.hint = ad veya adres
+online.field.password = Parola
+online.field.password.hint = en az 10 karakter
+online.field.password2 = Parolayı onayla
+online.field.current_password = Mevcut parola
+online.field.new_password = Yeni parola
+online.field.username = Kullanıcı adı
+online.field.username.hint = 3-24 karakter: harf, rakam, _ veya -
+online.field.email = E-posta
+online.field.new_email = Yeni e-posta
+online.field.code = Kod
+online.field.code.hint = 6 hane veya kurtarma kodu
+online.field.code6 = Uygulamadaki kod
+online.field.code6.hint = 6 hane
+online.signin.button = Giriş yap
+online.signin.google = Google ile devam et
+online.signin.register = Hesap oluştur
+online.signin.forgot = Parolanızı mı unuttunuz?
+online.mfa.title = DOĞRULAMA KODU
+online.mfa.lead = Kimlik doğrulama uygulamanızın gösterdiği 6 haneli kodu ya da kurtarma kodlarınızdan birini girin.
+online.mfa.verify = Doğrula
+online.register.title = HESAP OLUŞTUR
+online.register.lead = {0} sunucusunda ücretsiz bir hesap: adınız, puanlarınız ve oyunlarınız yalnızca bu sunucuda tutulur.
+online.register.button = Hesap oluştur
+online.register.working = Hesabınız oluşturuluyor… bu birkaç saniye sürebilir.
+online.register.ready = Hesabınız hazır. Oynamak için giriş yapın.
+online.password.mismatch = İki parola birbirinden farklı.
+online.check_email.title = E-POSTANIZI KONTROL EDİN
+online.check_email.text = {0} adresine bir bağlantı gönderdik. Hesabınızı etkinleştirmek için bağlantıyı açın, ardından buradan giriş yapın.
+online.check_email.ask = Etkinleştirme bağlantısını yeniden almak için hesabınızın adresini girin.
+online.check_email.resend = E-postayı yeniden gönder
+online.check_email.resent = E-posta yeniden gönderildi. Ulaşması birkaç dakika sürebilir; istenmeyen e-posta klasörünüzü de kontrol edin.
+online.forgot.title = PAROLAMI UNUTTUM
+online.forgot.lead = Hesabınızın e-posta adresini girin: yeni bir parola belirlemeniz için size bir bağlantı göndereceğiz.
+online.forgot.button = Bağlantıyı gönder
+online.forgot.sent = Bu adresi kullanan bir hesap varsa bağlantı yolda.
+online.sso.title = GOOGLE İLE GİRİŞ YAP
+online.sso.wait = Web tarayıcınızda devam edin: açılan pencerede Google hesabınızı seçin. Google sizi geri gönderir göndermez Scacelith devam eder.
+online.sso.name_title = ADINIZI SEÇİN
+online.sso.name_lead = Buraya ilk kez Google ile geliyorsunuz. Diğer oyuncuların göreceği adı seçin.
+online.sso.continue = Devam
+online.sso.finishing = Google sizi geri gönderdi. Giriş tamamlanıyor…
+online.sso.link_title = GOOGLE İLE GİRİŞ EKLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = {1} sunucusundaki {0} hesabı, bu Google hesabının e-posta adresini zaten kullanıyor. Bu hesaba Google ile girişi eklemek için hesabın parolasını girin. Bunu yalnızca bir kez yapmanız gerekir.
+online.sso.link_button = Google ile girişi ekle
+online.sso.link_mfa = Kod kabul edildiğinde Google ile giriş bu hesaba eklenir.
+online.sso.not_mine = Bu benim hesabım değil
+online.sso.not_mine_note = Google ile giriş eklenmedi. Bu e-posta adresi sizinse onunla "Parolanızı mı unuttunuz?" seçeneğini kullanın: bağlantı o posta kutusuna gider. Hesap, sizde olmayan bir iki faktörlü doğrulama kodu da istiyorsa sunucunun işletmecisiyle iletişime geçin.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google ile giriş
+online.sso.page.done_heading = Scacelith'e dönüş
+online.sso.page.done = Google sizi Scacelith'e geri gönderdi. Girişi tamamlamak için oyuna dönün; bu sekmeyi kapatabilirsiniz.
+online.sso.page.cancelled_heading = Giriş iptal edildi
+online.sso.page.cancelled = Google ile giriş iptal edildi. Bu sekmeyi kapatıp Scacelith'e dönebilirsiniz.
+online.sso.page.foreign_heading = Bu sayfa sizin için değil
+online.sso.page.foreign = Bu sayfa, Scacelith'in bu bilgisayarda beklediği girişle eşleşmiyor. Scacelith'te az önce bir Google girişi başlatmadıysanız bu bağlantıyı size başka biri göndermiş olabilir: bu sekmeyi kapatın.
+
+# Account
+online.account.button = Hesap
+online.account.title = HESAP
+online.account.section = HESAP
+online.account.username = KULLANICI ADI
+online.account.email = E-POSTA
+online.account.unverified = (doğrulanmadı)
+online.account.mfa = İKİ FAKTÖRLÜ KİMLİK DOĞRULAMA
+online.account.mfa_on = Açık
+online.account.mfa_off = Kapalı
+online.account.google = GOOGLE
+online.account.google_linked = Bir Google hesabına bağlı
+online.account.change_password = Parolayı değiştir
+online.account.mfa_setup = İki faktörlü doğrulamayı aç
+online.account.mfa_disable = İki faktörlü doğrulamayı kapat
+online.account.recovery = Yeni kurtarma kodları
+online.account.sign_out = Çıkış yap
+online.account.sign_out_all = Her yerden çıkış yap
+online.account.sign_out_all.help = Bu bilgisayar dahil, bütün bilgisayarlarda bu hesabın oturumunu kapatır.
+online.account.signed_out = Çıkış yaptınız.
+online.account.signed_out_all = Bütün bilgisayarlarda oturumunuz kapatıldı.
+online.account.signing_out_all = Bütün bilgisayarlarda oturum kapatılıyor…
+online.account.sign_out_all_failed = Diğer bilgisayarlarınızda oturum hâlâ açık olabilir: yeniden giriş yapın, ardından Giriş yapılmış cihazlar bölümünden o oturumları kapatın. {0}
+online.account.sign_out_all_retry = Diğer bilgisayarlarınızda oturum hâlâ açık olabilir. Her yerden çıkış yap seçeneğini yeniden deneyin. {0}
+online.account.ratings = PUANLAR
+online.account.col.tc = SÜRE KONTROLÜ
+online.account.col.rating = PUAN
+online.account.col.games = OYUN
+online.account.col.record = G / B / M
+online.account.provisional = Soru işareti geçici bir puanı gösterir (henüz az oyun oynanmış).
+online.password.title = PAROLAYI DEĞİŞTİR
+online.password.button = Parolayı değiştir
+online.password.changed = Parolanız değiştirildi.
+online.password.other_sessions = Diğer bilgisayarlarınızda yeniden giriş yapmanız gerekecek.
+online.mfa_setup.title = İKİ FAKTÖRLÜ KİMLİK DOĞRULAMA
+online.mfa_setup.lead = İki faktörlü kimlik doğrulama, her girişte telefonunuzdaki bir uygulamadan kod ister. Başlamak için parolanızı girin.
+online.mfa_setup.scan = 1. Bu kodu bir kimlik doğrulama uygulamasıyla tarayın ya da bu anahtarı uygulamaya yazın:
+online.mfa_setup.enter = 2. Uygulamanın gösterdiği 6 haneli kodu girin:
+online.mfa_setup.enable = Aç
+online.mfa_setup.done = İki faktörlü kimlik doğrulama açık.
+online.mfa_off.title = İKİ FAKTÖRLÜ DOĞRULAMAYI KAPAT
+online.mfa_off.lead = Parolanızı ve uygulamanızdan bir kod (ya da bir kurtarma kodu) girin.
+online.mfa_off.button = Kapat
+online.mfa.off_done = İki faktörlü kimlik doğrulama kapalı.
+online.recovery.title = KURTARMA KODLARI
+online.recovery.lead = Telefonunuzu kaybederseniz her kodla bir kez giriş yapabilirsiniz. Kodları güvenli bir yerde saklayın: yalnızca şimdi gösteriliyorlar.
+online.recovery.saved = Kaydettim
+online.recovery.new_title = YENİ KURTARMA KODLARI
+online.recovery.new_lead = Yeni kodlar eskilerinin yerini alır. Parolanızı ve uygulamanızdan bir kod girin.
+online.recovery.button = Yeni kodlar
+online.account.manage = GÜVENLİK VE VERİLER
+online.account.pending_email = Onay bekleniyor: {0}
+online.account.accept_challenges = Meydan okumaları kabul et
+online.account.accept_challenges.help = Diğer oyuncular kullanıcı adınızla size meydan okuyabilir. Kapalı: meydan okumaları reddedilir.
+online.account.history = Oyun geçmişi
+online.account.devices = Giriş yapılmış cihazlar
+online.account.change_email = E-postayı değiştir
+online.account.export = Verilerimi indir
+online.account.delete = Hesabı sil
+
+# Play
+online.play.signed_in = {0} olarak giriş yapıldı
+online.session.file = Girişinizi saklayabilecek bir sistem anahtarlığı bulunamadı: giriş, yalnızca kullanıcı hesabınızın okuyabileceği bir dosyada saklanıyor (Seçenekler > Çevrimiçi sunucu).
+online.session.memory = Girişinizi saklayabilecek bir sistem anahtarlığı bulunamadı ve giriş bir dosyaya da kaydedilmiyor: oyun kapanana kadar giriş yapmış olarak kalırsınız (Seçenekler > Çevrimiçi sunucu).
+online.play.find_section = RAKİP BUL
+online.play.friend_section = BİR ARKADAŞLA OYNA
+online.play.mode = Oyun türü
+online.play.mode.help = Puanlı oyunlar bu süre kontrolündeki puanınızı değiştirir; puansız oyunlar değiştirmez.
+online.play.find = Rakip bul
+online.play.connecting = Sunucuya bağlanılıyor…
+online.play.cooldown = {0} itibarıyla yeniden rakip arayabilirsiniz.
+online.play.banned = Bu hesap şu zamana kadar askıya alındı: {0}.
+online.play.challenge = Bir oyuncuya meydan oku
+online.play.challenge.desc = Çevrimiçi olan birini kullanıcı adıyla davet edin.
+online.play.private = Özel oyun
+online.play.private.desc = Bir arkadaşınıza vermek için kod oluşturun ya da onun koduyla katılın.
+online.play.direct = Doğrudan oyun
+online.play.direct.desc = Sunucusuz: doğrudan bir arkadaşınızın bilgisayarıyla oynayın.
+online.search.title = ARANIYOR
+online.search.window = Puan aralığı {0}
+online.search.queued = {0} oyuncu rakip arıyor|{0} oyuncu rakip arıyor
+online.search.wait = Seviyenize uygun bir rakip aranıyor…
+online.outgoing.challenge = MEYDAN OKUMA GÖNDERİLDİ
+online.outgoing.waiting = yanıt bekleniyor
+online.outgoing.private = ÖZEL OYUN
+online.outgoing.private_hint = Bu kodu arkadaşınıza verin: o katıldığında oyun başlar.
+online.challenge.title = BİR OYUNCUYA MEYDAN OKU
+online.challenge.opponent = RAKİP
+online.field.opponent = Kullanıcı adı
+online.field.opponent.hint = meydan okunacak oyuncu
+online.challenge.note = Rakibiniz menülerde nerede olursa olsun meydan okumayı görür ve yanıt vermek için bir dakikası vardır.
+online.challenge.send = Meydan okumayı gönder
+online.terms.rated = Puanlı
+online.terms.rated.help = Yalnızca resmî süre kontrolleri puanlı olabilir.
+online.terms.color = Renginiz
+online.private.title = ÖZEL OYUN
+online.private.create_section = OLUŞTUR
+online.private.create_note = Kısa bir kod alırsınız: bu kodu giren kişi sizinle oynar.
+online.private.create = Oyunu oluştur
+online.private.join_section = KATIL
+online.field.private_code = Kod
+online.private.join = Katıl
+online.private.joining = Oyuna katılınıyor…
+online.challenge.received = MEYDAN OKUMA
+online.challenge.accept = Kabul et
+online.challenge.decline = Reddet
+online.challenge.you_white = beyaz taşlarla oynarsınız
+online.challenge.you_black = siyah taşlarla oynarsınız
+online.challenge.you_random = renkler kurayla
+online.challenge.declined = {0} meydan okumanızı reddetti.
+online.challenge.expired = Meydan okumanızın süresi yanıt gelmeden doldu.
+online.challenge.unavailable = {0} şu anda müsait değil.
+online.challenge.lost = Bağlantı koptu: meydan okumanız iptal edildi.
+
+# At the table
+online.pause.clock_runs = Oyun sürüyor: saatiniz işlemeye devam ediyor.
+online.pause.abort = Oyunu iptal et
+online.pause.abort.help = İlk hamlenizi yapmadan önce oyun iptal edilebilir; sayılmaz.
+online.pause.leave = Oyundan çık
+online.confirm.resign.text = Bu oyunu terk etmek istiyor musunuz? Oyunu rakibiniz kazanır.
+online.confirm.leave.text = Çıkarsanız bu oyunu terk etmiş olursunuz: oyunu rakibiniz kazanır.
+online.confirm.leave.ok = Terk et ve çık
+online.confirm.leave_abort.text = İlk hamlenizden önce çıkmak istiyor musunuz? Oyun iptal edilir ve sayılmaz.
+online.confirm.leave_abort.ok = İptal et ve çık
+online.draw.card_title = BERABERLİK TEKLİFİ
+online.draw.card_text = Rakibiniz beraberlik teklif ediyor.
+online.draw.accept = Kabul et
+online.draw.decline = Reddet
+online.draw.offered = Rakibiniz beraberlik teklif ediyor.
+online.opponent_back = Rakibiniz geri döndü.
+online.opponent_away = Rakibin bağlantısı koptu — dönmesi için {0}
+online.first_move = İlk hamleniz · {0}
+online.reconnecting = YENİDEN BAĞLANILIYOR…
+online.reconnecting.text = Oyun sunucuda sürüyor ve saatiniz işlemeye devam ediyor.
+online.gameover.aborted = Oyun iptal edildi: sayılmaz.
+online.rating.casual = Puansız oyun: puanlar değişmedi.
+online.rating.change = Puan {0} → {1} ({2})
+online.rating.pending = Puan: …
+online.rematch.accept = Rövanşı kabul et
+online.rematch.offered = Rakibiniz rövanş teklif ediyor.
+online.rematch.waiting = Rövanş teklif edildi…
+online.rematch.gone = Rövanş yok
+online.rematch.declined = Bu sefer rövanş yok.
+online.report.button = Rakibi bildir
+online.report.title = BİLDİR
+online.report.lead = Bildirimler bu oyunla birlikte sunucunun moderatörlerine iletilir. Oyunun adil kalmasına yardımcı olduğunuz için teşekkürler.
+online.report.category = Neden
+online.report.cheating = Hile
+online.report.abuse = Taciz edici davranış
+online.report.other = Diğer
+online.report.comment = Yorum
+online.report.comment.hint = isteğe bağlı
+online.report.send = Bildirimi gönder
+online.report.sent = Bildirim gönderildi. Teşekkürler.
+online.report.queued = Bildiriminiz oyun bitince gönderilecek.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Çevrimiçi, {0} {1}
+online.sheet.rated = puanlı
+online.sheet.casual = puansız
+online.sheet.game = Oyun {0}
+# End reasons of online games
+reason.online.abandonment = Rakip oyundan ayrıldı
+reason.online.abandonment_vs_insufficient = Oyundan ayrıldı, ama rakip mat edemez
+reason.online.aborted = Oyun iptal edildi
+reason.online.no_show = İlk hamle zamanında yapılmadı (iptal)
+reason.online.forfeit = Hükmen yenilgi
+reason.online.server_aborted = Sunucu tarafından iptal edildi
+reason.online.both_disconnected = İki oyuncunun da bağlantısı koptu
+# Server notices
+online.notice.shutdown = Sunucu {0} sonra yeniden başlatılacak. Devam eden oyunlar kaydedilir.
+online.notice.revoked = Bu sunucudaki oturumunuz kapatıldı.
+online.notice.replaced = Hesabınız başka bir pencereden bağlandı; bu pencere artık çevrimdışı.
+online.notice.rating_restored = Puanınıza {0} puan iade edildi: bir rakibiniz hile nedeniyle yasaklandı.|Puanınıza {0} puan iade edildi: bir rakibiniz hile nedeniyle yasaklandı.
+# Errors
+online.err.rate_limited_for = Çok fazla deneme. {0} sonra yeniden deneyin.
+online.err.rate_limited = Çok fazla deneme. Biraz sonra yeniden deneyin.
+online.err.server_busy_for = Sunucu meşgul. {0} sonra yeniden deneyin.
+online.err.server_busy = Sunucu meşgul. Biraz sonra yeniden deneyin.
+online.err.banned_until = Bu hesap şu zamana kadar askıya alındı: {0}.
+online.err.banned = Bu hesap askıya alındı.
+online.err.invalid_credentials = Kullanıcı adı veya parola yanlış.
+online.err.invalid_credentials_pending = Kullanıcı adı veya parola yanlış. Yeni kaydolduysanız önce size gönderdiğimiz bağlantıyı açın.
+online.err.email_unverified = E-posta adresiniz henüz doğrulanmadı: size gönderdiğimiz bağlantıyı açın.
+online.err.network = Sunucuya ulaşılamıyor. Bağlantınızı ve sunucu adresini kontrol edin.
+online.err.tls = Sunucuyla güvenli bir bağlantı kurulamadı.
+online.err.certificate = Sunucunun sertifikası güvenilir değil (ya da seçeneklerdeki parmak iziyle eşleşmiyor).
+online.err.incompatible = Bu sunucu Scacelith'in başka bir sürümünü gerektiriyor.
+online.err.unauthorized = Oturumunuz sona erdi: lütfen yeniden giriş yapın.
+online.err.username_taken = Bu kullanıcı adı alınmış.
+online.err.email_taken = Bu e-posta adresini zaten bir hesap kullanıyor.
+online.err.invalid_username = Kullanıcı adı 3-24 karakter olmalıdır: harf, rakam, _ veya -.
+online.err.invalid_email = Bu e-posta adresi geçerli değil.
+online.err.weak_password = Bu parola çok zayıf: en az 10 karakter kullanın.
+online.err.invalid_code = Bu kod doğru değil.
+online.err.expired = Bu isteğin süresi doldu: lütfen baştan başlayın.
+online.err.registration_closed = Bu sunucu yeni hesap kabul etmiyor.
+online.err.sso_cancelled = Google ile giriş iptal edildi.
+online.err.sso_expired = Google ile giriş çok uzun sürdü ya da zaten kullanıldı. Lütfen baştan başlayın.
+online.err.sso_failed = Google ile giriş başarısız oldu. Lütfen yeniden deneyin.
+online.err.sso_listen = Scacelith, Google'ın yanıtını bu bilgisayarda alamadı. Lütfen yeniden deneyin.
+online.err.sso_origin = Google ile giriş bu sunucu adresi üzerinden çalışmıyor. Sunucuyu, işletmecisinin verdiği genel adla ekleyin, ardından yeniden deneyin.
+online.err.browser = Web tarayıcısı açılamadı.
+online.err.sso_email_unverified = Google, bu Google hesabının e-posta adresini doğrulamamış.
+online.err.sso_account_exists = Bu e-posta adresini zaten bir hesap kullanıyor ve bu hesap Google ile girişe bağlanamaz: parolasıyla giriş yapın ya da "Parolanızı mı unuttunuz?" seçeneğini kullanın.
+online.err.sso_already_linked = Bu Google hesabı zaten başka bir hesaba bağlı.
+online.err.account_disabled = Bu hesap artık kullanılamaz.
+online.err.server_error = Sunucuda bir sorun oluştu. Lütfen yeniden deneyin.
+online.err.timeout = Sunucu zamanında yanıt vermedi.
+online.err.offline = Sunucuya bağlı değilsiniz: bağlandıktan sonra yeniden deneyin.
+online.err.other = Sunucu reddetti ({0}).
+online.err.code = Sunucu reddetti (hata {0}).
+online.err.slow_down = Biraz yavaşlayın.
+online.err.server_full = Sunucu dolu. Daha sonra yeniden deneyin.
+online.err.restarting = Sunucu yeniden başlatılıyor. Biraz sonra yeniden deneyin.
+online.err.move_refused = Sunucu bu hamleyi reddetti: tahta eski hâline getirildi.
+online.err.game_over = Bu oyun zaten bitti.
+online.err.already_in_game = Zaten bir oyun oynuyorsunuz.
+online.err.invalid_category = Bu süre kontrolü burada sunulmuyor.
+online.err.draw_offer_limit = Şimdilik başka beraberlik teklifi yapamazsınız.
+online.err.abort_not_allowed = Oyun artık iptal edilemez.
+online.err.no_pending_offer = Yanıtlanacak bir teklif yok.
+online.err.flag_fell = Süreniz doldu.
+online.err.queue_not_allowed = Şu anda rakip arayamazsınız.
+online.err.challenge_not_found = Bu meydan okuma artık mevcut değil.
+online.err.user_unavailable = Bu oyuncu müsait değil.
+online.err.challenge_limit = Şimdilik çok fazla meydan okuma var. Daha sonra yeniden deneyin.
+online.err.challenge_self = Kendinize meydan okuyamazsınız.
+online.err.code_invalid = Bu koda sahip bir oyun yok.
+online.err.rated_official_tc = Yalnızca resmî süre kontrolleri puanlı olabilir.
+online.err.cooldown = Eşleştirme sizin için kısa bir süreliğine durduruldu.
+online.err.invalid_tc = Bu süre kontrolüne izin verilmiyor.
+online.err.rematch_unavailable = Rövanş artık mümkün değil.
+online.err.rated_repeat_limit = Şimdilik bu oyuncuya karşı yeterince puanlı oyun oynadınız. Puansız bir oyun oynayın ya da daha sonra yeniden deneyin.
+online.err.cheat_detected = Oyun, sunucunun adil oyun denetimleri tarafından durduruldu.
+online.err.invalid_password = Parola yanlış.
+online.err.mfa_code_required = Kimlik doğrulama uygulamanızdan bir kod (ya da bir kurtarma kodu) girin.
+online.err.password_not_set = Bu hesap Google ile giriş yapıyor ve henüz parolası yok. Önce giriş sayfasındaki "Parolanızı mı unuttunuz?" seçeneğiyle bir parola belirleyin.
+online.err.too_many_attempts = Çok fazla hatalı deneme. Daha sonra yeniden deneyin.
+online.err.too_many_attempts_for = Çok fazla hatalı deneme. {0} sonra yeniden deneyin.
+online.err.same_email = Bu zaten sizin e-posta adresiniz.
+online.err.not_found = Sunucuda bulunamadı.
+online.err.invalid_response = Sunucunun yanıtı okunamadı.
+online.err.storage = Oturum bu bilgisayara kaydedilemedi.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = OYUN GEÇMİŞİ
+online.history.filter.games = Oyunlar
+online.history.filter.result = Sonuç
+online.history.filter.all = Tümü
+online.history.filter.won = Kazanılan
+online.history.filter.lost = Kaybedilen
+online.history.filter.drawn = Berabere
+online.history.col.date = TARİH
+online.history.col.opponent = RAKİP
+online.history.col.result = SONUÇ
+online.history.col.tc = SÜRE KONTROLÜ
+online.history.col.kind = TÜR
+online.history.col.rating = PUAN
+online.history.won = Galibiyet
+online.history.lost = Mağlubiyet
+online.history.drawn = Beraberlik
+online.history.aborted = İptal
+online.history.page = Sayfa {0} / {1}
+online.history.total = {0} oyun|{0} oyun
+online.history.previous = Önceki
+online.history.next = Sonraki
+online.history.empty.title = HENÜZ OYUN YOK
+online.history.empty = Bu sunucudaki oyunlarınız bittikten sonra burada listelenir.
+online.history.empty_filter.title = OYUN YOK
+online.history.empty_filter = Bu filtrelere uyan oyun yok.
+online.history.error = GEÇMİŞ YÜKLENEMEDİ
+online.history.unavailable = BU SUNUCU OYUN GEÇMİŞİ SUNMUYOR
+online.game.title = OYUN
+online.game.players = OYUNCULAR
+online.game.you = SİZ
+online.game.unrated = Puansız
+online.game.you_won = Kazandınız
+online.game.you_lost = Kaybettiniz
+online.game.draw = Berabere
+online.game.you_left = Oyundan ayrıldınız
+online.game.date = TARİH
+online.game.time_control = SÜRE KONTROLÜ
+online.game.moves = HAMLELER
+online.game.move_count = {0} hamle|{0} hamle
+online.game.no_moves = Hiç hamle yapılmadı.
+online.game.moves_incomplete = Bazı hamleler okunamadı: liste oyunun sonuna ulaşmadan bitiyor.
+online.game.save = Oyunu kaydet
+online.game.saved_button = Kaydedildi
+online.game.saved = Oyun, kayıtlı oyunlarınız arasında.
+online.game.already_saved = Bu oyun zaten kayıtlı oyunlarınız arasında.
+online.game.save_failed = Oyun kaydedilemedi.
+online.game.invalid = Sunucu, okunamayan bir oyun kaydı gönderdi.
+online.game.replay = Yeniden oynat
+online.game.not_found = OYUN BULUNAMADI
+online.game.error = OYUN YÜKLENEMEDİ
+online.devices.title = GİRİŞ YAPILMIŞ CİHAZLAR
+online.devices.lead = Bu hesapla giriş yapılmış cihazlar. Tanımadığınız bir cihaz varsa oturumunu kapatın ve parolanızı değiştirin.
+online.devices.unknown = Bilinmeyen cihaz
+online.devices.this = BU CİHAZ
+online.devices.signed_in = Giriş: {0}
+online.devices.last_active = son etkinlik: {0}
+online.devices.active_now = şu anda kullanımda
+online.devices.sign_out = Oturumu kapat
+online.devices.signed_out = O cihazın oturumu kapatıldı.
+online.devices.error = CİHAZLAR YÜKLENEMEDİ
+online.devices.all.title = HER YERDEN ÇIKIŞ YAP
+online.email.title = E-POSTAYI DEĞİŞTİR
+online.email.current = Mevcut adres: {0}
+online.email.button = E-postayı değiştir
+online.email.sent = {0} adresine bir onay bağlantısı gönderildi.
+online.email.sent.hint = Adres, bağlantı açıldığında değişir. O zamana kadar mevcut adresiniz kullanılmaya devam eder.
+online.email.done = Tamam
+online.email.changed = E-posta adresiniz değiştirildi.
+online.export.title = VERİLERİMİ İNDİR
+online.export.lead = Bu sunucunun hesabınızla ilgili tuttuğu her şey (profil, puanlar, oyunlar, cihazlar, güvenlik olayları) bu bilgisayara bir JSON dosyası olarak kaydedilir. Onaylamak için parolanızı girin.
+online.export.button = İndir
+online.export.saved = Verileriniz bu bilgisayara kaydedildi.
+online.export.failed = Dosya yazılamadı.
+online.delete.title = HESABI SİL
+online.delete.warning = Hesabınız bu sunucudan silinecek: e-posta adresiniz, parolanız, iki faktörlü kimlik doğrulamanız ve cihazlarınız silinir ve bir daha giriş yapamazsınız. Bu işlem geri alınamaz.
+online.delete.games = Oyunlarınız ve puanlarınız sunucuda anonim bir adla kalır: {0}.
+online.delete.confirm_name = Onaylamak için kullanıcı adınızı ve parolanızı girin.
+online.delete.button = Hesabımı sil
+online.delete.done = Hesabınız silindi.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Doğrudan oyun
+online.direct.title = DOĞRUDAN OYUN
+online.direct.lead = İki bilgisayar arasında doğrudan bir dostluk oyunu: sunucu yok, hesap yok, hiçbir zaman puanlı değil.
+online.direct.host = Oyun kur
+online.direct.host.desc = Arkadaşınız size bağlanır: ona adresinizi ve bir kod verirsiniz.
+online.direct.join = Oyuna katıl
+online.direct.join.desc = Oyun kurmuş bir arkadaşınıza bağlanın.
+online.direct.host_title = OYUN KUR
+online.direct.your_color = Renginiz
+online.direct.auto_press.help = Bir hamle tahtaya konunca iki robot da saate kendiliğinden basar. Kapalı: her oyuncu her hamleden sonra saate kendisi basar.
+online.direct.unrated = Doğrudan oyunlar dostluk oyunlarıdır: hiçbir zaman puanlı değildir.
+online.direct.connection = BAĞLANTI
+online.direct.port = Port
+online.direct.port.help = Arkadaşınızın bağlanacağı TCP portu (kullanımda değilse 47100).
+online.direct.port_range = 1024 ile 65535 arasında bir port seçin.
+online.direct.upnp = Yönlendiricimde portu aç (UPnP)
+online.direct.upnp.help = Ev yönlendiricisinden portu bu bilgisayara yönlendirmesini ister ve oyundan sonra portu kapatır.
+online.direct.host_note_upnp = Oyun, yönlendiricinizden portu açmasını ister. Açamazsa hangi portu elle yönlendirmeniz gerektiği size söylenir.
+online.direct.host_note_manual = Yönlendiricinizde TCP portunu bu bilgisayara yönlendirin ya da aynı ağda oynayın.
+online.direct.host_button = Oyunu kur
+online.direct.wait_title = ARKADAŞINIZ BEKLENİYOR
+online.direct.opening = Yönlendiricinizde {0} numaralı port açılıyor…
+online.direct.give = Arkadaşınıza verin:
+online.direct.cap_address = ADRES
+online.direct.cap_port = PORT
+online.direct.cap_code = KOD
+online.direct.lan = Aynı ağda: {0}
+online.direct.router = yönlendiriciniz
+online.direct.upnp_searching = Yönlendiriciniz aranıyor…
+online.direct.upnp_mapped = Port, {0} üzerinde açıldı.
+online.direct.upnp_none = Hiçbir UPnP yönlendirici yanıt vermedi: {0} numaralı TCP portunu bu bilgisayara elle yönlendirin.
+online.direct.upnp_failed = Yönlendirici portu açmayı reddetti: {0} numaralı TCP portunu bu bilgisayara elle yönlendirin.
+online.direct.upnp_off = Yönlendiricinizde {0} numaralı TCP portunu bu bilgisayara yönlendirin.
+online.direct.upnp_cgnat = İnternet sağlayıcınız büyük olasılıkla internet adresinizi başkalarıyla paylaşıyor (CGNAT): IPv6 ya da bir VPN deneyin.
+online.direct.firewall = Windows, Scacelith'in bağlantı kabul edip edemeyeceğini sorarsa izin verin.
+online.direct.waiting = Arkadaşınız bekleniyor…
+online.direct.connecting_friend = Arkadaşınız bağlanıyor…
+online.direct.starting = Tahta hazırlanıyor…
+online.direct.join_title = OYUNA KATIL
+online.direct.join_lead = Arkadaşınızın size okuduğu bilgileri girin: adresi, portu ve kodu.
+online.direct.address = Adres
+online.direct.address.hint = IPv4, IPv6 veya ad
+online.direct.code = Kod
+online.direct.join_button = Katıl
+online.direct.connecting_to = Bağlanılıyor: {0}…
+online.direct.securing = Bağlantı güvenli hâle getiriliyor: {0}…
+direct.event = Dostluk oyunu
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Doğrudan, {0}
+direct.err.refused = Bu adreste ve portta oyun kurmuş kimse yok.
+direct.err.timeout = Yanıt yok: adresi ve portu, ayrıca arkadaşınızın yönlendiricisinin oyuna izin verdiğini kontrol edin.
+direct.err.wrong_code = Kod doğru değil.
+direct.err.invalid_code = Kod 12 karakterden oluşur (XXXX-XXXX-XXXX).
+direct.err.incompatible = Arkadaşınızda Scacelith'in başka bir sürümü var.
+direct.err.port_in_use = Bu port bu bilgisayarda zaten kullanılıyor: başka bir port seçin.
+direct.err.network = Ağ kullanılamadı.
+direct.err.too_many_attempts = Çok fazla yanlış kod: oyun kurma durduruldu. Yeni bir kod için oyunu yeniden kurun.
+direct.err.bad_address = Bu adres geçerli değil.
+direct.err.not_found = Bu ad bulunamadı.
+direct.err.unreachable = Bu adrese buradan ulaşılamıyor.
+direct.err.reset = Bağlantı kesildi.
+direct.err.closed = Bağlantı kapatıldı.
+direct.err.host_left = Arkadaşınız oyun kurmayı durdurdu.
+direct.err.other = Bağlantı başarısız oldu ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Oyuncu 2
+hotseat.white_player = Beyaz
+hotseat.black_player = Siyah
+hotseat.name.help = İki notasyon kâğıdına da yazılan ad; herhangi bir alfabeyle yazılabilir.
+hotseat.swap = Renkleri değiştir
+hotseat.left_hand = {0} sol eliyle oynuyor: saat onun sol tarafında duruyor.
+hotseat.rated = Puanlı oyun
+hotseat.rated.help = Her ad, bu bilgisayarda kendi iki kişilik oyun puanını korur. Stockfish'e karşı puanınız hiç değişmez.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = İki kişilik oyun puanları: {0} {1} · {2} {3}
+hotseat.new_rating = (yeni)
+hotseat.friendly_note = Dostluk oyunu: puanlar değişmez.
+hotseat.colours = {0} beyaz, {1} siyah taşlarla oynuyor.
+hotseat.colours_swap = Her rövanşta renkler değişir.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, sıra sizde
+hotseat.flag = {0} adlı oyuncunun süresi doldu.
+hotseat.confirm.resign = {0} adına oyun terk edilsin mi? {1} kazanan ilan edilecek.
+hotseat.confirm.resign_draw = {0} adına oyun terk edilsin mi? {1} artık mat edemez: oyun berabere bitecek.
+hotseat.draw.offer_noted = Beraberlik teklifiniz hamlenizle birlikte gider: {0} bunu, siz saate bastıktan sonra görecek.
+hotseat.draw.card_title = BERABERLİK TEKLİFİ
+hotseat.draw.offered = {0} beraberlik teklif ediyor.
+hotseat.draw.card_hint = Bir taşa dokunmak teklifi reddeder.
+hotseat.draw.accept = Kabul et
+hotseat.draw.decline = Reddet
+hotseat.draw.accepted = {0}, {1} tarafından teklif edilen beraberliği kabul etti.
+hotseat.draw.declined = {0}, {1} tarafından teklif edilen beraberliği reddetti.
+# Scoresheet header note
+hotseat.sheet.rated = Puanlı oyun
+hotseat.sheet.friendly = Dostluk oyunu
+# Game over card
+hotseat.gameover.wins = {0}, {1} hamlede kazandı.|{0}, {1} hamlede kazandı.
+hotseat.gameover.wins_now = {0} kazandı.
+hotseat.gameover.friendly = {0} – {1} · dostluk oyunu
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Bu oyun puanlı değil.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Eğitmen
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Eğitmen modu için {0} ile üretilen sentetik konuşma
+# Coach page
+coach.title = EĞİTMEN
+coach.section.level = SEVİYE
+coach.section.lesson = EĞİTMENLE
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Puanı {0} olan oyuncular için
+coach.completed = Tamamlandı
+coach.recommended = Önerilen
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+# The names are the ones the coach quotes (appraisal.level.* in assets/coach/speech/tr/appraisal.lang).
+coach.level.0.name = Satranç kuralları
+coach.level.0.desc = Etkileşimli bir ders, her seferinde bir kural.
+coach.level.0.detail = Eğitmen küçük pozisyonlar kurar ve her taşın nasıl hareket ettiğini ve nasıl taş aldığını, ardından rok, terfi, şah çekme ve şah matı gösterir. Her fikri tahtada kendiniz denersiniz.
+coach.level.1.name = İlk adımlar
+coach.level.1.desc = Saldırı altındaki ve korumasız kalan taşlar.
+coach.level.1.detail = Eğitmen nazik oynar ve sade konuşur: taşlarınızdan hangilerinin saldırı altında olduğunu, hangilerinin korumasız kaldığını ve onları nasıl koruyacağınızı söyler.
+coach.level.2.name = Başlangıç
+coach.level.2.desc = Basit taktikler, gelişim, şah güvenliği.
+coach.level.2.detail = Çatallar ve açmazlar adlarıyla anılır. Eğitmen taşlarınızı oyuna sokmaktan ve şahınızı güvende tutmaktan söz eder.
+coach.level.3.name = Gelişen oyuncu
+coach.level.3.desc = Planlar, piyon yapısı, tek hamleler.
+coach.level.3.detail = Eğitmen planları ve piyon yapılarını açıklar; pozisyonu yalnızca tek bir hamle tutabiliyorsa sizi uyarır.
+coach.level.4.name = Kulüp oyuncusu
+coach.level.4.desc = Aday hamleler, piyon cinsinden değerlendirme.
+coach.level.4.detail = Eğitmen aday hamleleri tartar ve değerlendirmeyi, bir kulüp antrenörünün yapacağı gibi piyon cinsinden verir.
+coach.level.5.name = Güçlü kulüp oyuncusu
+coach.level.5.desc = Kısa varyantlar, pozisyonel terimler.
+coach.level.5.detail = Kısa yorumlar, somut varyantlar ve pozisyon oyununun terimleri.
+coach.level.6.name = Uzman
+coach.level.6.desc = Çok kısa yorumlar, derin varyantlar, sayısal değerlendirme.
+coach.level.6.detail = Güçlü oyuncular arasındaki gibi az söz: birkaç hamle derinliğinde varyantlar ve sayısal değerlendirmeler.
+coach.note.clock = Saat yok: istediğiniz kadar düşünün.
+coach.note.takeback = Büyük bir hatadan sonra eğitmen neyin yanlış gittiğini gösterir ve hamleyi geri almayı önerir.
+coach.note.lesson = Beyaz taşlarla oynarsınız; eğitmen her alıştırmayı tahtada kurar.
+coach.note.unrated = Eğitmenle oynanan oyunlar puanlı değildir.
+coach.note.fallible = Eğitmen yanılmaz değildir: bazen bir hamleyi yanlış değerlendirebilir.
+coach.colour = Renginiz
+coach.colour.help = Eğitmene karşı oynadığınız renk. Sırayla: bir oyunda beyaz, sonrakinde siyah. Kurallar dersi her zaman beyaz taşlarla oynanır.
+coach.colour.alternate = Sırayla
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Eğitmenin sesi yüklü değil ya da kapalı (Seçenekler > Ses): sözleri ekranda yazılacak.
+# At the table
+coach.speaker = EĞİTMEN
+coach.skip = Atla
+coach.offer.title = HAMLE GERİ ALINSIN MI?
+coach.offer.text = Eğitmen, daha iyisini arayabilmeniz için son hamlenizi geri almayı öneriyor.
+coach.offer.hint = Geri tuşu hamleyi geri alır. Bir taşa dokunursanız oyun devam eder.
+coach.offer.accept = Geri al
+coach.offer.decline = Devam et
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Kalan geri alma hakkı: {0}
+coach.pause.take_back = Hamlemi geri al
+coach.pause.take_back.help = Son hamlenizi ve eğitmen oynadıysa onun cevabını geri alır.
+coach.confirm.resign = Bu oyunu terk etmek istiyor musunuz? Eğitmen kazanan ilan edilecek.
+coach.confirm.resign_draw = Bu oyunu terk etmek istiyor musunuz? Eğitmen artık mat edemez: oyun berabere bitecek.
+coach.confirm.leave = Ana menüye dönülsün mü? Eğitmenle oynadığınız bu oyun yarıda bırakılacak.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Yeniden oyna
+coach.gameover.unrated = Eğitmenle oynanan bu oyun puanlı değil.
+coach.lesson.done = TEBRİKLER
+coach.lesson.done.line = Artık satranç kurallarını biliyorsunuz.
+coach.lesson.next = İlk oyun
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+# Challenge names as the coach says them (ch.intro.* in assets/coach/speech/tr/challenge.lang).
+coach.tab.training = Antrenman
+coach.tab.challenges = Meydan okumalar
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATLAR
+challenge.group.tactics = TAKTİKLER
+challenge.group.defence = SAVUNMA
+challenge.group.endgames = OYUN SONLARI
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Tek hamlede mat
+challenge.mate1.desc = Tek bir hamle ve şah mat.
+challenge.mate1.detail = Önce şah çeken bütün hamlelere bakın: biri, şaha ne kaçacak kare, ne araya taş koyma ne de alma imkânı bırakır.
+challenge.mate2.name = İki hamlede mat
+challenge.mate2.desc = Savunma bırakmayan bir hamle, ardından mat.
+challenge.mate2.detail = İlk hamle çoğu zaman şahın elinden bir kareyi alan bir şah ya da bir fedadır. Eğitmen elinden geldiğince iyi savunur.
+challenge.mate3.name = Üç hamlede mat
+challenge.mate3.desc = Daha uzun zorlayıcı varyantlar.
+challenge.mate3.detail = Üç hamle derinliğinde şahlar, taş almalar ve tehditler. Bir taşa dokunmadan önce her adımda eğitmenin en iyi cevabını hesaplayın.
+challenge.backrank.name = Koridor matları
+challenge.backrank.desc = Kendi piyonlarının arkasında sıkışmış bir şah.
+challenge.backrank.detail = Rok yapmış bir şahın önündeki piyonlar hiç oynamamışsa son yataydaki bir kale ya da vezir mat edebilir. Önce savunucuları ortadan kaldırın ya da başka yere çekin.
+challenge.patterns.name = Mat kalıpları
+challenge.patterns.desc = Boğulmuş mat, Anastasia matı, Arap matı ve diğer klasikler.
+challenge.patterns.detail = Tekrar tekrar karşınıza çıkan ünlü mat ağları. Taşların dizilişini ve son darbeyi tanımayı öğrenin.
+challenge.hanging.name = Bedava taşlar
+challenge.hanging.desc = Korumasız kalanı bulun.
+challenge.hanging.detail = Kimsenin korumadığı bir taş ya da piyon kolayca alınabilir. Eğitmenin her taşını hangi taşların koruduğuna bakın.
+challenge.fork.name = Çatallar
+challenge.fork.desc = Bir taş aynı anda iki taşa saldırır.
+challenge.fork.detail = Atlar, piyonlar, vezirler, hatta şahlar çatal yapabilir. Rakip iki hedeften yalnızca birini kurtarabilir.
+challenge.pin.name = Açmazlar
+challenge.pin.desc = Arkasındakini kaybetmeden hareket edemeyen bir taş.
+challenge.pin.detail = Bir taşı şahına ya da daha değerli bir taşa karşı açmaza alın, sonra ona yeniden saldırın ya da hareket edememesinden yararlanın.
+challenge.skewer.name = Şişler
+challenge.skewer.desc = Değerli bir taşa saldırın ve arkasındakini kazanın.
+challenge.skewer.detail = Açmazın tersi: daha değerli taş öndedir, çekilmek zorundadır ve arkasındaki taşı açıkta bırakır.
+challenge.discovered.name = Açarak saldırılar
+challenge.discovered.desc = Bir taşı oynayarak başka bir taşın önünü açın.
+challenge.discovered.detail = Bir taş bir hattan çekildiğinde arkasındaki taş saldırıya geçer. Bu bir şahla ya da çifte şahla olursa rakibin iki tehdide birden cevap verecek zamanı olmaz.
+challenge.deflection.name = Saptırma ve cezbetme
+challenge.deflection.desc = Bir savunucuyu uzaklaştırın ya da ölümcül bir kareye çekin.
+challenge.deflection.detail = İki görevi olan bir savunucu ikisini birden yapamaz. Ona saldırın, ona bir şey sunun ya da bir taşı kaybedileceği kareye gitmeye zorlayın.
+challenge.intermezzo.name = Ara hamleler
+challenge.intermezzo.desc = Taşı hemen geri almayın: daha güçlü bir şey var.
+challenge.intermezzo.detail = Beklenen hamleden önce araya giren bir şah ya da daha büyük bir tehdit her şeyi değiştirir.
+challenge.trapped.name = Kapana kısılmış taşlar
+challenge.trapped.desc = Gidecek güvenli karesi kalmamış bir taş.
+challenge.trapped.detail = Bir taşın son kaçış karelerini elinden alın, sonra onu kazanın.
+challenge.promotion.name = Terfi
+challenge.promotion.desc = Bir piyonu son yataya kadar sürün.
+challenge.promotion.detail = İlerlemiş piyonlar çok değerlidir. Yolu açın, önünü kesen taşları saptırın ve yeni bir vezir çıkarın.
+challenge.quiet.name = Sessiz hamleler
+challenge.quiet.desc = Kazandıran hamle ne şah ne de taş alma.
+challenge.quiet.detail = Bazen en güçlü hamle yalnızca karşılanamayacak bir tehdit hazırlar. Görülmesi en zor hamle türüdür.
+challenge.opening.name = Açılış tuzakları
+challenge.opening.desc = Erken hataları cezalandırın.
+challenge.opening.detail = Tek bir dikkatsiz hamlenin hemen değerlendirilebildiği, gerçek oyunların ilk hamlelerinden pozisyonlar.
+challenge.escape.name = Kaçış yolunu bul
+challenge.escape.desc = Şahınız tehlikede: onu tek bir hamle kurtarır.
+challenge.escape.detail = Diğer bütün hamleler kaybettirir. Şahınıza yönelik bütün şahlara ve tehditlere bakın, sonra tek çıkış yolunu bulun.
+challenge.defend.name = Savunma hamleleri
+challenge.defend.desc = Materyal kaybetmeden tehdidi karşılayın.
+challenge.defend.detail = Eğitmen bir şeyi tehdit ediyor. Her şeyi bir arada tutan kesin hamleyi bulun.
+challenge.kq.name = Vezir ve şah, şaha karşı
+challenge.kq.desc = Vezirle mat edin.
+challenge.kq.detail = Yalnız kalan şahı vezirinizle kenara itin, kendi şahınızı yaklaştırın ve pata dikkat edin. Eğitmen en iyi hamleleriyle savunur.
+challenge.kr.name = Kale ve şah, şaha karşı
+challenge.kr.desc = Kaleyle mat edin.
+challenge.kr.detail = Kale, şahın yolunu yatay yatay keser; şahınız opozisyonu alır. Eğitmen en iyi hamleleriyle savunur.
+challenge.kp.name = Şah ve piyon, şaha karşı
+challenge.kp.desc = Opozisyonu kazanın ve terfi edin.
+challenge.kp.detail = Piyonla değil, şahınızla önden gidin. Opozisyonu alın ve eğitmenin yakalayamayacağı bir vezir çıkarın.
+challenge.kp_hold.name = Piyonu durdur
+challenge.kp_hold.desc = Şah ve piyona karşı yalnız şah: beraberliği koruyun.
+challenge.kp_hold.detail = Piyonun önünde durun ve opozisyonu koruyun. On hamle dayanın.
+challenge.rook.name = Kale oyun sonları
+challenge.rook.desc = Lucena köprüsü ve Philidor savunması.
+challenge.rook.detail = Her oyuncunun bilmesi gereken iki pozisyon: piyon yedinci yataydayken nasıl kazanılır, kale üçüncü yataydayken nasıl savunulur.
+challenge.endgame.name = Oyun sonu taktikleri
+challenge.endgame.desc = Az taş, keskin fikirler.
+challenge.endgame.detail = Gerçek oyunlardan piyon yarışları, yarmalar ve kale oyun sonları.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozisyon|{0} pozisyon
+coach.challenge.done = Tamamlandı
+coach.challenge.start = Başla
+coach.challenge.note.white = Beyaz taşlarla oynarsınız; eğitmen her pozisyonu tahtada kurar.
+coach.challenge.note.hint = Takıldınız mı? İpucu için H tuşuna basın. Birkaç denemeden sonra eğitmen size ipucu önerir.
+coach.challenge.note.unsaved = Meydan okumalar puanlanmaz ve kaydedilmez; tamamladıklarınızın yanında bir onay işareti görünür.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = MEYDAN OKUMA TAMAMLANDI
+coach.challenge.complete.line = Bütün pozisyonları çözdünüz.
+coach.challenge.next = Sonraki meydan okuma
+coach.challenge.again = Yeniden
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = İPUCU?
+coach.hint.text = Eğitmen size bir ipucu öneriyor.
+coach.hint.hint = H ipucunu verir. Bir taşa dokunursanız aramaya devam edersiniz.
+coach.hint.accept = İpucu
+coach.hint.decline = Hayır, teşekkürler
+coach.hint.key = İpucu
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Eğitmen sesi
+options.coach_voice.help = Eğitmen modunda eğitmen sesli konuşur. Ses modeli ilk gerektiğinde indirilir (yaklaşık 399 MB). Kapalı: eğitmenin sözleri yalnızca ekranda yazılır.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Ses modeli
+options.voice_update.help = Eğitmen hâlâ ses modelinin eski 8 bit sürümüyle konuşuyor. Güncelleme, Supertone'un yayımladığı resmî Supertonic 3 sürümünü indirir ve önce eski dosyaları siler.
+options.voice_update.button = Güncelle ({0} MB)
+options.voice_update.running = İndirme sürüyor.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Ses kalitesi
+options.voice_quality.help = Eğitmenin konuşma sentezinin her cümle için kaç iyileştirme adımı uyguladığı: Düşük (4) ile Maksimum (9) arasında; varsayılan Orta (5). Daha yüksek bir seviye biraz daha temiz bir ses verir ama hesaplanması daha uzun sürer, bu yüzden eğitmen konuşmaya biraz daha geç başlar. Ses modeli yüklendikten sonra, Eğitmen sesi açıkken ayarlanabilir.
+options.voice_quality.low = Düşük
+options.voice_quality.medium = Orta
+options.voice_quality.high = Yüksek
+options.voice_quality.very_high = Çok yüksek
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimum
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Eğitmenin Sesi
+coach.download.text = Eğitmen, Supertone'un bir konuşma sentezi modeli olan Supertonic 3 ile konuşur. Model Scacelith'e dahil değildir: oyun onu şimdi Hugging Face'ten indirebilir ({0} MB, bir kez). Model olmadan eğitmen sözlerini ekrana yazar.
+coach.download.licence = Model, ürettiği sesin bazı kullanımlarını (örneğin onu bir insan sesi gibi sunmayı ya da gerçek bir kişiyi taklit etmeyi) yasaklayan OpenRAIL-M lisansıyla yayımlanmıştır.
+coach.download.read_licence = Lisansı oku
+coach.download.accept = İndir düğmesini seçerek bu lisansın koşullarını kabul etmiş olursunuz.
+# {0} = a folder
+coach.download.folder = Kayıt yeri: {0}
+coach.download.not_now = Şimdi değil
+# {0} = the size in megabytes
+coach.download.download = İndir ({0} MB)
+coach.download.licence_title = OPENRAIL-M LİSANSI
+coach.download.back = Geri
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Eğitmene Yeni Bir Ses
+coach.update.text = Eğitmenin sesi artık, şimdiye kadar yüklü olan 8 bit dönüştürme yerine, Supertone'un yayımladığı resmî Supertonic 3 sürümünü kullanıyor. Oyun onu şimdi Hugging Face'ten indirebilir ({0} MB, bir kez); eski dosyalar ({1} MB) önce silinir. Reddederseniz eğitmen mevcut sesini korur ve güncelleme Seçenekler > Ses bölümünde kullanılabilir kalır.
+coach.update.download = Güncelle ({0} MB)
+coach.update.accept = Güncelle düğmesini seçerek bu lisansın koşullarını kabul etmiş olursunuz.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = EĞİTMENİN SESİ
+coach.download.removing = Eski sürüm kaldırılıyor…
+coach.download.checking = Dosyalar denetleniyor…
+coach.download.downloading = İndiriliyor…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Hugging Face'ten
+coach.download.from_archive = Hugging Face'ten (arşiv kopyası)
+coach.download.cancel = İptal
+coach.download.failed = İndirme başarısız oldu.
+coach.download.error.network = Sunuculara ulaşılamadı. Lütfen internet bağlantınızı kontrol edip yeniden deneyin.
+# {0} = a folder
+coach.download.error.disk = Dosyalar şu klasöre yazılamadı: {0}. Lütfen boş alanı kontrol edip yeniden deneyin.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Sunucular beklenmeyen bir yanıt gönderdi ({0}). Lütfen daha sonra yeniden deneyin.
+coach.download.retry = Yeniden dene
+coach.download.close = Kapat
+# Notices
+coach.download.done = Eğitmenin sesi yüklendi.
+coach.download.cancelled = İndirme iptal edildi: bir dahaki sefere kaldığı yerden devam edecek.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Kayıtlı oyunlar
+options.save_games = Oyunlarımı kaydet
+options.save_games.help = Stockfish'e karşı, eğitmenle ve bu bilgisayarda iki kişi arasında oynadığınız oyunlar ile doğrudan oyunlarınız, bittiklerinde PGN dosyaları olarak kaydedilir; onları Kayıtlı oyunlar bölümünde yeniden bulabilirsiniz. Çevrimiçi oyunları sunucu saklar.
+library.title = KAYITLI OYUNLAR
+library.section.games = OYUNLAR
+library.section.details = OYUN
+library.section.tags = ETİKETLER
+library.section.moves = HAMLELER
+library.count = {0} oyun|{0} oyun
+library.filter = Göster
+library.filter.all = Bütün oyunlar
+library.filter.play = Stockfish'e karşı
+library.filter.coach = Eğitmenle
+library.filter.hotseat = İki oyuncu
+library.filter.direct = Doğrudan oyunlar
+library.filter.server = Çevrimiçi oyunlar
+library.filter.imported = İçe aktarılan
+library.mode.play = Stockfish'e karşı
+library.mode.coach = Eğitmenle
+library.mode.hotseat = İki oyuncu
+library.mode.direct = Doğrudan oyun
+library.mode.server = Çevrimiçi oyun
+library.mode.imported = İçe aktarılan
+library.coach_level = Seviye {0}
+library.unknown_player = Bilinmeyen
+library.unfinished = Bitmemiş
+library.unreadable = Bu oyun okunamıyor.
+library.moves = {0} hamle|{0} hamle
+library.opening_variation = {0}: {1}
+library.file = Dosya: {0}
+library.file_game = Dosya: {0}, oyun {1} / {2}
+library.no_moves = Hiç hamle yapılmadı.
+library.none_selected = Listeden bir oyun seçin.
+library.reading = Kayıtlı oyunlar okunuyor
+library.empty.title = Henüz kayıtlı oyun yok
+library.empty.text = Stockfish'e karşı, eğitmenle ve bu bilgisayarda iki kişi arasında oynadığınız oyunlar ile doğrudan oyunlarınız, bittikten sonra burada görünür. Bu klasöre PGN dosyaları da koyabilirsiniz: başka programlardan ya da web sitelerinden dışa aktarılan oyunlar sizinkilerle birlikte listelenir.
+library.empty.filter = Bu türde oyun yok.
+library.error.folder = Kayıtlı oyunlar klasörü okunamıyor
+library.error.game = Bu oyun okunamıyor: {0}
+library.folder = Klasör: {0}
+library.open_folder = Klasörü aç
+library.open_failed = Klasör açılamadı.
+library.replay = Yeniden oynat
+library.delete = Sil
+library.delete.title = OYUNU SİL
+library.delete.text = {0} oyunu, dosyasıyla birlikte bu bilgisayardan silinecek. Bu işlem geri alınamaz.
+library.delete.ok = Sil
+library.delete.several = Bu dosyada {0} oyun var: dosya yalnızca klasörden silinebilir.|Bu dosyada {0} oyun var: dosya yalnızca klasörden silinebilir.
+library.deleted = Oyun silindi.
+library.delete.failed = Oyun silinemedi.
+library.delete.changed = Dosya değişti: liste güncellendi.
+library.truncated = Bu klasörde çok fazla oyun var: yalnızca en yeni {0} oyun listeleniyor.
+library.tag.Event = Etkinlik
+library.tag.Site = Yer
+library.tag.Date = Tarih
+library.tag.Time = Saat
+library.tag.Round = Tur
+library.tag.White = Beyaz
+library.tag.Black = Siyah
+library.tag.Result = Sonuç
+library.tag.WhiteElo = Beyazın Elo puanı
+library.tag.BlackElo = Siyahın Elo puanı
+library.tag.TimeControl = Süre kontrolü
+library.tag.Termination = Bitiş şekli
+library.tag.Opening = Açılış
+library.tag.Variation = Varyant
+library.tag.PlyCount = Yarım hamle sayısı
+library.tag.FEN = Başlangıç pozisyonu
+library.tag.ScacelithMode = Mod
+library.tag.CoachLevel = Eğitmen seviyesi
+library.tag.ScacelithServer = Sunucu
+library.tag.ScacelithGameId = Oyun numarası
+library.tag.UTCDate = Tarih (UTC)
+library.tag.UTCTime = Saat (UTC)
+library.tag.WhiteRatingDiff = Beyazın puan değişimi
+library.tag.BlackRatingDiff = Siyahın puan değişimi
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analiz
+analysis.menu.title = ANALİZ
+analysis.menu.analyse = Analiz et
+analysis.menu.paste = PGN yapıştır
+analysis.menu.online = Çevrimiçi oyunlarım
+analysis.menu.folder = Analiz etmek için PGN dosyalarını bu klasöre koyun: {0}
+analysis.menu.empty.title = Henüz kayıtlı oyun yok
+analysis.menu.empty.text = Oyunlarınız bittikten sonra burada görünür; aşağıdaki klasöre konan PGN dosyaları da öyle. PGN metni olarak kopyalanmış bir oyunu da yapıştırabilirsiniz.
+analysis.menu.empty.no_folder = Analiz etmek için PGN metni olarak kopyalanmış bir oyunu yapıştırın.
+analysis.menu.paste.empty = Pano boş: önce bir oyunu PGN metni olarak kopyalayın.
+analysis.menu.paste.none = Panoda satranç oyunu bulunamadı.
+analysis.menu.paste.several = Panoda birden fazla oyun var: ilki analiz ediliyor.
+analysis.menu.gameover = Oyunu analiz et
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Hamle {0} / {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Anında
+replay.again = Yeniden oynat
+replay.gameover.unfinished = Oyun, {0}. hamleden sonra sonuç olmadan kesiliyor.
+replay.tip.start = Oyunun başı (Home)
+replay.tip.back = Bir hamle geri (J)
+replay.tip.pause = Duraklat (K)
+replay.tip.resume = Devam et (K)
+replay.tip.forward = Bir hamle ileri (L)
+replay.tip.end = Oyunun sonu (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = YORUM
+analysis.hud.accuracy = DOĞRULUK
+analysis.hud.reviewing = Stockfish oyunu inceliyor… {0}
+analysis.hud.no_engine = Satranç motoru yok: hamleler analiz olmadan gösteriliyor.
+analysis.hud.no_moves = Bu oyunda hamle yok.
+analysis.hud.tip.play = Hamleleri oynat (K)
+analysis.hud.tip.comments_off = Kritik anlardaki yorumları gizle (N)
+analysis.hud.tip.comments_on = Kritik anlardaki yorumları göster (N)
+analysis.hud.tip.voice_off = Yorumcunun sesini kapat (M)
+analysis.hud.tip.voice_on = Yorumları sesli dinle (M)
+analysis.hud.tip.voice_missing = Ses duyulamıyor: dosyaları yüklü değil ya da Seçenekler > Ses > Eğitmen sesi kapalı. Yorumlar yalnızca ekranda yazılır.
+analysis.hud.tip.arrows_off = Daha iyi hamlelerin oklarını gizle (B)
+analysis.hud.tip.arrows_on = Daha iyi hamlelerin oklarını göster (B)
+analysis.hud.controls.play = Oynat / duraklat
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Yorumları göster / gizle
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Yorumcunun sesi açık / kapalı
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Okları göster / gizle
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = GIF olarak kaydet
+gif.making = GIF hazırlanıyor: sunucu oyunu çiziyor…
+gif.saved = GIF kaydedildi:
+gif.saved_as = GIF kaydedildi: {0}
+gif.sign_in_first = GIF oluşturmak için bir çevrimiçi sunucuya giriş yapın: GIF'leri sunucu çizer.
+gif.busy_other = Başka bir GIF hazırlanıyor. Lütfen hazır olana kadar bekleyin.
+gif.err.rate_limited_for = Kısa sürede çok sayıda GIF oluşturdunuz. Sonrakini {0} sonra oluşturabilirsiniz.
+gif.err.rate_limited = Kısa sürede çok sayıda GIF oluşturdunuz. Lütfen daha sonra yeniden deneyin.
+gif.err.server_busy_for = Sunucu başka GIF'leri çizmekle meşgul. Lütfen {0} sonra yeniden deneyin.
+gif.err.server_busy = Sunucu başka GIF'leri çizmekle meşgul. Lütfen biraz sonra yeniden deneyin.
+gif.err.signed_out = Oturumunuz sona erdi. GIF oluşturmak için lütfen yeniden giriş yapın.
+gif.err.game_too_long = Bu oyun GIF'e dönüştürülemeyecek kadar uzun.
+gif.err.pgn_too_large = Bu oyun GIF'e dönüştürülemeyecek kadar uzun.
+gif.err.invalid_pgn = Sunucu bu oyunu okuyamadı.
+gif.err.render_failed = Sunucu bu GIF'i oluşturamadı. Lütfen yeniden deneyin.
+gif.err.gif_disabled = Bu sunucu GIF oluşturmuyor.
+gif.err.write_failed = GIF bu bilgisayara kaydedilemedi.
+gif.err.not_found = Bu oyun artık sunucuda değil.
+# A duration ("1 dakika 30 saniye"): Turkish joins the two parts without "ve".
+gif.wait.seconds = {0} saniye|{0} saniye
+gif.wait.minutes = {0} dakika|{0} dakika
+gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 başlatılamadı. Lütfen ekran kartı sürücünüzü güncelleyin.
+error.opengl_macos = Bu Mac'te OpenGL 4.6 başlatılamadı. Scacelith, Apple çipli bir Mac (M1 veya sonrası) ve macOS 26 veya sonrasını gerektirir; sanal makinede çalışmaz.
+error.renderer = Görüntü oluşturucu başlatılamadı.
+error.scene = Sahne yüklenemedi.
+error.log_file = Ayrıntılar günlük dosyasında: {0}
