@@ -149,6 +149,8 @@ FILE_PATTERNS = {
     'ja': (r'([a-h])(ファイル|ポーン)', lambda m, w: w[m.group(1)] + m.group(2)),
 }
 SQUARE_RE = re.compile(r'(?<![A-Za-z0-9])([a-h])([1-8])(?![0-9A-Za-z])')
+# Turkish case suffix written after a square ("c4'e"): the voice says it joined to the rank word.
+TR_SQUARE_SUFFIX_RE = re.compile(r"(?<![A-Za-z0-9])([a-h])([1-8])['’]([a-zçğıöşü]+)")
 UPPER = 'A-ZА-ЯЁІЇЄҐ'
 NAME_DASH_RE = re.compile(r'([' + UPPER + r'][\w\'’]*) — ([' + UPPER + r'])')
 
@@ -283,6 +285,14 @@ def spoken(lang, text, respell, options=None):
                 a, b = m.span('f')
                 return m.group(0)[:a - m.start()] + fw[m.group('f')] + m.group(0)[b - m.start():]
             t = re.sub(pat, file_word, t)
+        if lang == 'tr':
+            # "c4'e" is said "ce dörde": the suffix joins the rank, and dört softens to dörd before a vowel.
+            def tr_suffix(m):
+                rank, suffix = ranks[int(m.group(2)) - 1], m.group(3)
+                if rank.endswith('t') and suffix[0] in 'aeıioöuü':
+                    rank = rank[:-1] + 'd'
+                return square.replace('{file}', fw[m.group(1)]).replace('{rank}', rank + suffix)
+            t = TR_SQUARE_SUFFIX_RE.sub(tr_suffix, t)
         return SQUARE_RE.sub(lambda m: square.replace('{file}', fw[m.group(1)])
                              .replace('{rank}', ranks[int(m.group(2)) - 1]), t)
     t = text
