@@ -1,0 +1,982 @@
+# Coach speech (Greek): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "εσύ"; he is male. The player's gender is unknown: no adjective or participle
+# about the player ("Κέρδιζες!", "προηγείσαι", "υστερείς κατά..." instead of "κερδισμένος").
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their article and owner ("ο ίππος σου"); forms from
+# common.lang: acc (object, after με / από / για / προς), gen, se ("επιτίθεται {t1:se}" = "στον ..."),
+# pron_acc / pron_acc_short (weak object pronoun), pron_gen ("πίσω {t1:pron_gen}"), os / o / os_st
+# (endings of καρφωμέν-, παγιδευμέν-, ακάλυπτ-, εκτεθειμέν-, μόν-, ανοιχτ-, ενεργ-).
+# Moves: "το {move}" / "το {best}" (the commentators' neuter), "η συνέχεια {line}" or "{line}" alone.
+# Counts: {m:move} "2 κινήσεις", {pts:point} "3 μονάδες", {n:time} "3 φορές", {n:piece} "3 κομμάτια",
+# {n:square}; {m:f} = a feminine number with "κινήσεις" understood ("ματ σε τρεις").
+# Typography: the Greek question mark ";" is not a sentence end for the program, so a piece placeholder
+# never starts the sentence after it. The English ";" is the ano teleia "·" here.
+# Levels 1-2: short, warm sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Σαχ! Ο βασιλιάς μου δέχεται επίθεση.
+ann.check.human.b1.2 = Σαχ! Επιτίθεσαι στον βασιλιά μου.
+ann.check.human.b1.3 = Αυτό είναι σαχ! Ο βασιλιάς μου πρέπει να ξεφύγει.
+ann.check.human = Σαχ.
+ann.check.human.2 = Σαχ!
+ann.check.human.3 = Κι αυτό είναι σαχ.
+# The coach gives check.
+ann.check.coach = Σαχ!
+ann.check.coach.2 = Σαχ.
+ann.check.coach.3 = Και σαχ!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Αυτό σημαίνει ότι {your} δέχεται επίθεση. Πρέπει να {your:pron_acc_short} βγάλεις από το σαχ.
+ann.check.coach.first.2 = Σαχ σημαίνει ότι {your} δέχεται επίθεση. Μετακίνησέ {your:pron_acc}, κλείσε τον δρόμο ή πάρε το κομμάτι μου.
+ann.double_check.coach = Διπλό σαχ! Δύο κομμάτια μου επιτίθενται ταυτόχρονα στον βασιλιά σου, άρα πρέπει να κινηθεί.
+ann.double_check.coach.2 = Αυτό είναι διπλό σαχ: τώρα σε βοηθά μόνο μια κίνηση του βασιλιά.
+ann.double_check.human = Διπλό σαχ! Δύο κομμάτια σου επιτίθενται ταυτόχρονα στον βασιλιά μου, άρα πρέπει να κινηθεί.
+ann.double_check.human.2 = Διπλό σαχ! Τώρα μόνο μια κίνηση του βασιλιά μπορεί να με σώσει.
+# The player checkmates the coach.
+ann.mate.human.b1 = Σαχ ματ! Κέρδισες! Ο βασιλιάς μου δεν μπορεί να ξεφύγει.
+ann.mate.human.b1.2 = Αυτό είναι ματ! Μπράβο, κέρδισες την παρτίδα!
+ann.mate.human.b1.3 = Σαχ ματ! Ο βασιλιάς μου παγιδεύτηκε. Συγχαρητήρια!
+ann.mate.human = Σαχ ματ. Καλά έπαιξες.
+ann.mate.human.2 = Αυτό είναι ματ. Συγχαρητήρια.
+ann.mate.human.3 = Σαχ ματ! Πολύ ωραία.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Αυτό είναι ματ. Ο βασιλιάς σου δεν έχει διέξοδο.
+ann.mate.coach.b1.2 = Σαχ ματ. Ο βασιλιάς σου δέχεται επίθεση και δεν μπορεί να ξεφύγει.
+ann.mate.coach.b1.3 = Φοβάμαι πως αυτό είναι ματ. Ο βασιλιάς σου δεν μπορεί να γλιτώσει.
+ann.mate.coach = Σαχ ματ.
+ann.mate.coach.2 = Και αυτό είναι ματ.
+ann.mate.coach.3 = Σαχ ματ, δυστυχώς.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ωχ! Αυτή η κίνηση χαρίζει κάτι.
+ex.verdict.blunder.b1.2 = Προσοχή! Αυτή η κίνηση μπορεί να σου κοστίσει.
+ex.verdict.blunder.b1.3 = Ωπ, μισό λεπτό. Αυτή η κίνηση έχει ένα πρόβλημα.
+ex.verdict.blunder.b2 = Χμ, αυτή η κίνηση έχει ένα πρόβλημα.
+ex.verdict.blunder.b2.2 = Αυτό είναι μεγάλο λάθος.
+ex.verdict.blunder.b2.3 = Προσοχή, αυτή η κίνηση σου κοστίζει κάτι.
+ex.verdict.blunder.b3 = Αυτό είναι σοβαρό λάθος.
+ex.verdict.blunder.b3.2 = Η κίνηση {move} είναι πραγματικό λάθος.
+ex.verdict.blunder.b3.3 = Αχ, η κίνηση {move} είναι μεγάλο λάθος.
+ex.verdict.blunder.b4 = Το {move} είναι σοβαρό λάθος.
+ex.verdict.blunder.b4.2 = Το {move} είναι σοβαρό σφάλμα.
+ex.verdict.blunder.b4.3 = Φοβάμαι πως αυτό είναι σοβαρό λάθος.
+ex.verdict.blunder.b5 = Το {move} είναι σοβαρό σφάλμα.
+ex.verdict.blunder.b5.2 = Το {move} είναι σοβαρό λάθος.
+ex.verdict.blunder.b5.3 = Το {move} είναι λάθος που κοστίζει ακριβά.
+ex.verdict.blunder.b6 = Το {move} είναι σοβαρό σφάλμα.
+ex.verdict.blunder.b6.2 = Το {move} είναι σοβαρό λάθος.
+ex.verdict.blunder.b6.3 = {move}; Σοβαρό λάθος.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ωχ! Δεν απάντησες στην απειλή μου.
+ex.verdict.ignored.b1.2 = Προσοχή! Η απειλή μου ήταν ακόμα εκεί.
+ex.verdict.ignored.b1.3 = Ωπ, μισό λεπτό. Ξέχασες την απειλή μου.
+ex.verdict.ignored.b2 = Χμ, η απειλή μου ήταν ακόμα εκεί.
+ex.verdict.ignored.b2.2 = Άφησες την απειλή μου χωρίς απάντηση.
+ex.verdict.ignored.b2.3 = Προσοχή, δεν απάντησες στην απειλή μου.
+ex.verdict.mistake.b3 = Αυτή δεν είναι καλή κίνηση.
+ex.verdict.mistake.b3.2 = Χμ, η κίνηση {move} έχει ένα πρόβλημα.
+ex.verdict.mistake.b3.3 = Αυτό είναι λάθος.
+ex.verdict.mistake.b4 = Το {move} είναι λάθος.
+ex.verdict.mistake.b4.2 = Το {move} δεν είναι καλό.
+ex.verdict.mistake.b4.3 = Αυτό είναι λάθος.
+ex.verdict.mistake.b5 = Το {move} είναι καθαρό λάθος.
+ex.verdict.mistake.b5.2 = Το {move} είναι λάθος.
+ex.verdict.mistake.b5.3 = Το {move} δεν είναι καλό.
+ex.verdict.mistake.b6 = Το {move} είναι λάθος.
+ex.verdict.mistake.b6.2 = {move}; Λάθος.
+ex.verdict.mistake.b6.3 = Όχι το {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Όχι άσχημα, αλλά το {best} ήταν λίγο καλύτερο.
+ex.verdict.inaccuracy.b3.2 = Το {best} ήταν λίγο πιο ακριβές.
+ex.verdict.inaccuracy.b3.3 = Μια μικρή αστοχία: εδώ το {best} ήταν καλύτερο.
+ex.verdict.inaccuracy.b4 = Ανακρίβεια: το {best} ήταν πιο ακριβές.
+ex.verdict.inaccuracy.b4.2 = Μια μικρή ανακρίβεια. Το {best} ήταν λίγο καλύτερο.
+ex.verdict.inaccuracy.b4.3 = Όχι ακριβώς η καλύτερη κίνηση: το {best} ήταν πιο ακριβές.
+ex.verdict.inaccuracy.b5 = Το {move} δεν είναι ακριβές· το {best} ήταν ισχυρότερο.
+ex.verdict.inaccuracy.b5.2 = Μικρή ανακρίβεια. Εγώ θα έπαιζα το {best}.
+ex.verdict.inaccuracy.b5.3 = Το {best} ήταν πιο ακριβές από το {move}.
+ex.verdict.inaccuracy.b6 = Το {move} είναι ανακριβές· {best}.
+ex.verdict.inaccuracy.b6.2 = Ανακρίβεια. {best}.
+ex.verdict.inaccuracy.b6.3 = Το {best} ήταν καλύτερο.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Το {best} ίσως ήταν λίγο πιο ακριβές.
+ex.verdict.inaccuracy.maybe.2 = Εγώ ίσως να έπαιζα το {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Αυτή η κίνηση μοιάζει αμφίβολη.
+ex.verdict.dubious.2 = Αυτή η κίνηση φαίνεται αμφίβολη.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Μισό λεπτό! Σου ξέφυγε κάτι καλό.
+ex.verdict.missed.b1.2 = Κοίτα ξανά! Υπήρχε κάτι καλύτερο.
+ex.verdict.missed.b1.3 = Περίμενε, εκεί είχες μια ευκαιρία!
+ex.verdict.missed.b2 = Εκεί έχασες μια ευκαιρία.
+ex.verdict.missed.b2.2 = Χμ, υπήρχε κάτι καλύτερο.
+ex.verdict.missed.b2.3 = Περίμενε, εκεί είχες μια εξαιρετική κίνηση.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Καλύτερο ήταν το {best}.
+ex.better.b3.2 = Το {best} ήταν η καλύτερη κίνηση.
+ex.better.b3.3 = Αντί γι’ αυτό, καλό ήταν το {best}.
+ex.better.b4 = Το {best} ήταν ισχυρότερο.
+ex.better.b4.2 = Το {best} ήταν η σωστή κίνηση.
+ex.better.b4.3 = Καλύτερο ήταν το {best}.
+ex.better.b5 = {best}, με την ιδέα {line}.
+ex.better.b5.2 = Η σωστή κίνηση ήταν το {best}: {line}.
+ex.better.b5.3 = Καλύτερο ήταν το {best}, και μετά {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Αντί γι’ αυτό {best}, {eval}.
+ex.better.b6.3 = Το {best} ήταν {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Υπήρχε καλύτερη κίνηση με {your:acc}.
+ex.hint.b1.2 = {your} είχε καλύτερη κίνηση.
+ex.hint.b2 = {your} είχε καλύτερη κίνηση.
+ex.hint.b2.2 = Υπήρχε καλύτερη κίνηση με {your:acc}.
+ex.hint.b3 = {your} είχε καλύτερη κίνηση.
+ex.hint.b3.2 = Υπήρχε κάτι καλύτερο με {your:acc}.
+ex.hint.b4 = {your} είχε καλύτερη κίνηση.
+ex.hint.b4.2 = Ξανακοίτα {your:acc}: είχε κάτι καλύτερο.
+ex.hint.b5 = {your} είχε ισχυρότερη κίνηση.
+ex.hint.b5.2 = Υπήρχε ισχυρότερη κίνηση με {your:acc}.
+ex.hint.b6 = {your} είχε κάτι καλύτερο.
+ex.hint.b6.2 = Ξανακοίτα {your:acc}.
+ex.hint.move = Υπήρχε καλύτερη κίνηση.
+ex.hint.move.2 = Εκεί είχες καλύτερη κίνηση.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} είχε καλύτερη κίνηση. Κερδίζει υλικό.
+ex.hint.gain.b1.2 = Υπήρχε καλύτερη κίνηση με {your:acc}. Κερδίζει υλικό.
+ex.hint.gain.b2 = {your} είχε καλύτερη κίνηση. Κερδίζει υλικό.
+ex.hint.gain.b2.2 = Υπήρχε μια κίνηση με {your:acc} που κερδίζει υλικό.
+ex.hint.gain.b3 = {your} είχε καλύτερη κίνηση, μία που κερδίζει υλικό.
+ex.hint.gain.b3.2 = Υπήρχε μια κίνηση με {your:acc} που κερδίζει υλικό.
+ex.hint.gain.b4 = {your} είχε μια κίνηση που κερδίζει υλικό.
+ex.hint.gain.b4.2 = Ξανακοίτα {your:acc}: είχε μια κίνηση που κερδίζει υλικό.
+ex.hint.gain.b5 = {your} είχε ισχυρότερη κίνηση, μία που κερδίζει υλικό.
+ex.hint.gain.b5.2 = Υπήρχε μια κίνηση με {your:acc} που κερδίζει υλικό.
+ex.hint.gain.b6 = {your} είχε μια κίνηση που κερδίζει υλικό.
+ex.hint.gain.b6.2 = Ξανακοίτα {your:acc}: υπήρχε υλικό να κερδίσεις.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Η καλύτερη κίνηση ήταν να πάει {your} στο {sq}.
+ex.reveal.b1.2 = {your} μπορούσε να πάει στο {sq}. Αυτό ήταν καλύτερο.
+ex.reveal.b2 = Καλύτερο ήταν να πάει {your} στο {sq}.
+ex.reveal.b2.2 = Η καλύτερη κίνηση ήταν να πάει {your} στο {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Ας ξαναβάλουμε τα κομμάτια στη θέση τους.
+ex.rewind.b1.2 = Τώρα θα τα ξαναβάλω όλα εκεί που ήταν.
+ex.rewind.b1.3 = Να ξαναστήσω τα κομμάτια.
+ex.rewind.b2 = Ας τα ξαναβάλουμε όλα στη θέση τους.
+ex.rewind.b2.2 = Πίσω εκεί που ήμασταν.
+ex.rewind.b2.3 = Θα ξαναβάλω τα κομμάτια στη θέση τους.
+ex.rewind.b3 = Πίσω στην παρτίδα.
+ex.rewind.b3.2 = Ας γυρίσουμε πίσω.
+ex.rewind.b3.3 = Πίσω στη θέση.
+ex.rewind.b4 = Πίσω στην παρτίδα.
+ex.rewind.b4.2 = Πίσω.
+ex.rewind.b4.3 = Ας γυρίσουμε πίσω.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Θέλεις να δοκιμάσεις άλλη κίνηση;
+ex.offer.b1.2 = Θέλεις να πάρεις πίσω την κίνηση και να ξαναδοκιμάσεις;
+ex.offer.b1.3 = Να δοκιμάσουμε μια διαφορετική κίνηση;
+ex.offer.b2 = Θα ήθελες να δοκιμάσεις άλλη κίνηση;
+ex.offer.b2.2 = Θέλεις να την πάρεις πίσω;
+ex.offer.b2.3 = Θέλεις να ξαναδοκιμάσεις;
+ex.offer.b3 = Θέλεις να την πάρεις πίσω;
+ex.offer.b3.2 = Θέλεις να ξαναδοκιμάσεις;
+ex.offer.b3.3 = Την παίρνεις πίσω;
+ex.offer.b4 = Την παίρνεις πίσω;
+ex.offer.b4.2 = Θέλεις να την πάρεις πίσω;
+ex.offer.b4.3 = Θέλεις να δοκιμάσεις άλλη κίνηση;
+ex.offer.b5 = Αναίρεση;
+ex.offer.b5.2 = Θέλεις να την πάρεις πίσω;
+ex.offer.b5.3 = Την παίρνεις πίσω;
+ex.offer.b6 = Αναίρεση;
+ex.offer.b6.2 = Την παίρνεις πίσω;
+ex.offer.b6.3 = Ξαναδοκιμάζεις;
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Αυτή η κίνηση είναι αμφίβολη. Μήπως μπορείς καλύτερα;
+ex.dubious.b1.2 = Αυτή η κίνηση είναι αμφίβολη. Μήπως βρίσκεις καλύτερη;
+ex.dubious.b2 = Αμφίβολη κίνηση. Μήπως μπορείς καλύτερα;
+ex.dubious.b2.2 = Αυτή η κίνηση είναι αμφίβολη. Μήπως υπάρχει κάτι καλύτερο;
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Μετά {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} πηγαίνει στο {sq}.
+demo.my.move.2 = Παίζω {my:acc} στο {sq}.
+demo.my.move.3 = Μετά {my} πηγαίνει στο {sq}.
+demo.my.take = Παίρνω {your:acc}.
+demo.my.take.2 = {my} παίρνει {your:acc}.
+demo.my.take.3 = Και παίρνω {your:acc}.
+demo.my.check = {my} πηγαίνει στο {sq}. Σαχ.
+demo.my.check.2 = Σαχ, με {my:acc} στο {sq}.
+demo.my.check.3 = {my} στο {sq}, σαχ!
+demo.my.mate = {my} πηγαίνει στο {sq}. Ματ.
+demo.my.mate.2 = Και {my} στο {sq} κάνει ματ.
+demo.my.mate.3 = {my} στο {sq}. Αυτό είναι ματ.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Πρώτα {my} παίρνει {your:acc}. {t1} μπορεί να περιμένει.
+demo.my.first.take.2 = {my} παίρνει πρώτα {your:acc}. {t1} θα είναι ακόμα εκεί.
+demo.my.first.check = {my} παίρνει {your:acc}, και είναι σαχ! {t1} μπορεί να περιμένει.
+demo.my.first.check.2 = Πρώτα {my} παίρνει {your:acc} με σαχ. {t1} θα είναι ακόμα εκεί.
+demo.my.first.check_move = Πρώτα σαχ, με {my:acc} στο {sq}. {t1} μπορεί να περιμένει.
+demo.my.first.check_move.2 = {my} πηγαίνει στο {sq}: πρώτα σαχ! {t1} θα είναι ακόμα εκεί.
+demo.my.first.move = Πρώτα {my} πηγαίνει στο {sq}. {t1} μπορεί να περιμένει.
+demo.my.first.move.2 = Πρώτα {my} στο {sq}. {t1} θα είναι ακόμα εκεί.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} δέχεται επίθεση, γι’ αυτό παίρνει πρώτα {your:acc}.
+demo.my.first.attacked.2 = {my} απειλείται: αρπάζει πρώτα {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Πρώτα {move}: {t1} μπορεί να περιμένει.
+demo.first.2 = Πρώτα {move}. {t1} θα είναι ακόμα εκεί.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Τώρα παίζω την κίνησή μου.
+demo.play_on.2 = Να η πραγματική μου κίνηση.
+demo.play_on.3 = Και τώρα παίζω στ’ αλήθεια.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Θα πήγαινες {your:acc} στο {sq}.
+demo.your.move.2 = Ας πούμε ότι παίζεις {your:acc} στο {sq}.
+demo.your.move.3 = Μετά {your} πηγαίνει στο {sq}.
+demo.your.take = Θα έπαιρνες {my:acc}.
+demo.your.take.2 = Παίρνεις {my:acc} με {your:acc}.
+demo.your.take.3 = Μετά παίρνεις {my:acc}.
+demo.your.back = Παίρνεις πίσω.
+demo.your.back.2 = Ξαναπαίρνεις στο {sq}.
+demo.your.back.3 = Και ξαναπαίρνεις.
+demo.your.king = Ο βασιλιάς σου πρέπει να κινηθεί.
+demo.your.king.2 = Ο βασιλιάς πρέπει να φύγει, στο {sq}.
+demo.your.king.3 = Ο βασιλιάς σου τρέχει στο {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Τώρα {t1} δεν μπορεί να σωθεί.
+ex.point.piece.2 = Και {t1} χάνεται.
+ex.point.piece.3 = Στη συνέχεια πέφτει {t1}.
+ex.point.two = {t1} και {t2} δέχονται επίθεση ταυτόχρονα: το ένα από τα δύο κομμάτια πέφτει.
+ex.point.two.2 = Τώρα επιτίθεμαι {t1:se} και {t2:se}. Δεν μπορείς να σώσεις και τα δύο.
+ex.point.mate = Και τώρα η κίνηση {reply:nomate} είναι ματ.
+ex.point.mate.2 = Ακολουθεί το {reply:nomate}, και είναι ματ.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Βλέπεις; Τώρα έχασες {pts:point}.
+ex.result.b1.2 = Έτσι χάνεις {pts:point}.
+ex.result.b2 = Στο τέλος, έχεις χάσει {pts:point}.
+ex.result.b2.2 = Τώρα είσαι πίσω κατά {pts:point}.
+ex.result.b3 = Αυτό σου κοστίζει {pts:point}.
+ex.result.b3.2 = Τελικά υστερείς κατά {pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Μπορείς να ξαναπάρεις κάτι, αλλά και πάλι χάνεις {pts:point}.
+ex.result_back.b1.2 = Μπορείς να πάρεις λίγα πίσω, αλλά και πάλι έχεις χάσει {pts:point}.
+ex.result_back.b2 = Μπορείς να πάρεις κάτι πίσω, αλλά υστερείς ακόμα κατά {pts:point}.
+ex.result_back.b2.2 = Ακόμα κι αφού ξαναπάρεις, έχεις χάσει {pts:point}.
+ex.result_back.b3 = Ακόμα κι αν ξαναπάρεις, υστερείς κατά {pts:point}.
+ex.result_back.b3.2 = Παίρνεις κάτι πίσω, αλλά και πάλι σου κοστίζει {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Αν {your2} ξαναπάρει, {my} παίρνει {your:acc}.
+ex.retake.b1.2 = Δεν μπορείς να ξαναπάρεις με {your2:acc}: τότε {my} παίρνει {your:acc}.
+ex.retake.b2 = Αν {your2} ξαναπάρει, {my} παίρνει {your:acc}.
+ex.retake.b2.2 = Αν ξαναπάρεις με {your2:acc}, δεν σου βγαίνει: {my} παίρνει {your:acc}.
+ex.retake.b3 = Αν ξαναπάρεις με το {move}, με το {reply} παίρνω {your:acc}.
+ex.retake.b3.2 = Δεν μπορείς να ξαναπάρεις με το {move}: με το {reply} παίρνω {your:acc}.
+ex.retake.b4 = Στο {move} απαντώ με το {reply}, που παίρνει {your:acc}.
+ex.retake.b4.2 = Κι αν {move}, τότε με το {reply} παίρνω {your:acc}.
+ex.retake.b5 = Αν ξαναπάρεις με το {move}, ακολουθεί το {reply} και πέφτει {your}.
+ex.retake.b5.2 = Στο {move} απαντώ με το {reply}: πέφτει {your}.
+ex.retake.b6 = {move}; Το {reply} παίρνει {your:acc}.
+ex.retake.b6.2 = Το {move} δεν δουλεύει: το {reply} παίρνει {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Και εδώ, στο {sq}, θα έπαιρνες νέα βασίλισσα.
+demo.promote.2 = Μετά {your} φτάνει στο {sq} και γίνεται βασίλισσα.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Πρόσεξε: {my} μπορεί να πάει στο {sq}, και αυτό είναι ματ.
+ex.mate_allowed.b1.2 = Τώρα {my} μπορεί να πάει στο {sq}. Αυτό θα ήταν ματ!
+ex.mate_allowed.b1.3 = Προσοχή! Αν {my} πάει στο {sq}, είναι ματ.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Αυτή η κίνηση μου επιτρέπει να κάνω ματ {your:se} σε {m:move}.
+ex.mate_allowed.b2.2 = Τώρα μπορώ να κάνω ματ {your:se} σε {m:move}. Κοίτα.
+ex.mate_allowed.b2.3 = Προσοχή! {your} κινδυνεύει: ματ σε {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Αυτό επιτρέπει ματ σε {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Μετά από αυτό έχω ματ σε {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Ο βασιλιάς σου δέχεται ματ: {line:nomate}.
+ex.mate_allowed.b4 = Το {move} επιτρέπει αναγκαστικό ματ: {line:nomate}.
+ex.mate_allowed.b4.2 = Έτσι δέχεσαι ματ σε {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Μετά το {move}, η συνέχεια {line:nomate} είναι ματ.
+ex.mate_allowed.b5 = Το {move} επιτρέπει αναγκαστικό ματ σε {m:move}.
+ex.mate_allowed.b5.2 = Μετά από αυτό δέχεσαι ματ σε {m:move}.
+ex.mate_allowed.b5.3 = Τώρα υπάρχει αναγκαστικό ματ σε {m:move}.
+ex.mate_allowed.b6 = Ματ σε {m:f}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, ματ.
+ex.mate_allowed.b6.3 = Μετά τη συνέχεια {line:nomate} είναι ματ.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Κοίτα: {your} δεν έχει πια τετράγωνο για να ξεφύγει.
+ex.mate_allowed.tail.b1.2 = Βλέπεις; Τώρα {your} δέχεται επίθεση και δεν μπορεί να ξεφύγει.
+ex.mate_allowed.tail.b1.3 = {your} δεν έχει πού να πάει. Αυτό είναι ματ.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below (all
+# neuter, headed by "ματ", without an article: said inside « »).
+ex.mate_allowed.pattern = Αυτό το μοτίβο λέγεται «{text}».
+ex.mate_allowed.pattern.2 = Να το θυμάσαι: είναι το λεγόμενο «{text}».
+ex.mate_allowed.tip.b3 = Πριν από κάθε κίνηση, έλεγξε αν ο βασιλιάς σου είναι ακόμα ασφαλής.
+ex.mate_allowed.tip.b3.2 = Ρώτα πάντα: μετά την κίνησή μου, μπορεί ο βασιλιάς μου να δεχτεί ματ;
+
+name.pattern.back_rank = ματ στην τελευταία γραμμή
+name.pattern.smothered = πνιγμένο ματ
+name.pattern.support = ματ με προστατευμένη βασίλισσα
+name.pattern.ladder = ματ της σκάλας
+name.pattern.epaulette = ματ των επωμίδων
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Με το {best:nomate} μπορούσες να κάνεις ματ {my:se}!
+ex.mate_missed.b1.2 = Το {best:nomate} ήταν ματ! {my} δεν θα μπορούσε να ξεφύγει.
+ex.mate_missed.b1.3 = Κοίτα! Με το {best:nomate} θα έκανες ματ {my:se}.
+ex.mate_missed.b2 = Είχες ματ σε {m:move}, ξεκινώντας με το {best:nomate}.
+ex.mate_missed.b2.2 = Το {best:nomate} ήταν ματ σε {m:move}!
+ex.mate_missed.b2.3 = Μπορούσες να μου κάνεις ματ με το {best:nomate}.
+ex.mate_missed.b3 = Σου ξέφυγε ματ σε {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = Το {best:nomate} κάνει ματ σε {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Υπήρχε ματ σε {m:move}, ξεκινώντας με το {best:nomate}.
+ex.mate_missed.b4 = Χαμένο ματ: {line:nomate}, ξεκινώντας με το {best:nomate}.
+ex.mate_missed.b4.2 = Το {best:nomate} έδινε αναγκαστικό ματ σε {m:move}.
+ex.mate_missed.b4.3 = Είχες ματ σε {m:move} με το {best:nomate}.
+ex.mate_missed.b5 = Το {best:nomate} κάνει ματ σε {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Χαμένο ματ σε {m:move}, ξεκινώντας με το {best:nomate}.
+ex.mate_missed.b5.3 = Υπήρχε αναγκαστικό ματ: {best:nomate}.
+ex.mate_missed.b6 = Το {best:nomate} κάνει ματ: {line:nomate}.
+ex.mate_missed.b6.2 = Ματ σε {m:f} με το {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, ματ σε {m:f}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Γρηγορότερο ήταν το {best:nomate}: ματ σε {m:move}.
+ex.mate_delayed.b5.2 = Το {best:nomate} έκανε ματ νωρίτερα, σε {m:move}.
+ex.mate_delayed.b6 = Το {best:nomate} κάνει ματ σε {m:f}.
+ex.mate_delayed.b6.2 = Γρηγορότερα: {best:nomate}, ματ σε {m:f}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ωχ όχι! {my} δεν μπορεί να κινηθεί και δεν δέχεται σαχ. Αυτό είναι πατ: ισοπαλία.
+ex.stalemate.b1.2 = Κοίτα: {my} δεν έχει ασφαλές τετράγωνο, αλλά δεν δέχεται σαχ. Είναι ισοπαλία!
+ex.stalemate.b1.3 = Αυτό είναι πατ. {my} δεν μπορεί να κινηθεί, άρα η παρτίδα λήγει ισόπαλη.
+ex.stalemate.b2 = Πατ! {my} δεν έχει νόμιμη κίνηση και δεν δέχεται σαχ. Ισοπαλία.
+ex.stalemate.b2.2 = Ωχ όχι, πατ: {my} δεν έχει πού να πάει, αλλά δεν δέχεται σαχ.
+ex.stalemate.b2.3 = Αυτό είναι ισοπαλία με πατ. {my} δεν μπορεί να κινηθεί.
+ex.stalemate.b3 = Αυτό είναι πατ: {my} δεν έχει νόμιμη κίνηση. Κέρδιζες!
+ex.stalemate.b3.2 = Πατ! {my} έχει κολλήσει, και μια κερδισμένη παρτίδα γίνεται ισοπαλία.
+ex.stalemate.b3.3 = {my} δεν έχει κινήσεις και δεν δέχεται σαχ: πατ.
+ex.stalemate.b4 = Πατ: {my} δεν έχει νόμιμη κίνηση. Έτσι πετάς τη νίκη.
+ex.stalemate.b4.2 = Το {move} αφήνει {my:acc} σε πατ. Ισοπαλία από κερδισμένη θέση.
+ex.stalemate.b4.3 = Αυτό είναι πατ· {my} έχει εγκλωβιστεί.
+ex.stalemate.b5 = Το {move} αφήνει {my:acc} σε πατ. Η νίκη χάθηκε.
+ex.stalemate.b5.2 = Πατ: {my} δεν έχει τετράγωνα.
+ex.stalemate.b5.3 = Αυτό είναι πατ, {my} έχει κολλήσει.
+ex.stalemate.b6 = Πατ. {my} δεν έχει κινήσεις.
+ex.stalemate.b6.2 = {move}, πατ: {my} έχει εγκλωβιστεί.
+ex.stalemate.b6.3 = Πατ· {my} δεν μπορεί να κινηθεί.
+ex.stalemate.tip.b1 = Όταν κερδίζεις, άφηνε πάντα στον βασιλιά μου ένα τετράγωνο να κινηθεί.
+ex.stalemate.tip.b1.2 = Θυμήσου: όταν προηγείσαι, άφησε στον βασιλιά μου λίγο χώρο.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Προσοχή! Μπορώ να χαρίσω τα κομμάτια μου, και μετά {my} δεν έχει κινήσεις: πατ.
+ex.stalemate_trick.b1.2 = Πρόσεξε: {my} έχει σχεδόν κολλήσει. Μπορώ να φέρω ισοπαλία.
+ex.stalemate_trick.b2 = Προσοχή: μπορώ να κάνω θυσία, και {my} θα βρισκόταν σε πατ.
+ex.stalemate_trick.b2.2 = {my} δεν έχει σχεδόν καθόλου τετράγωνα. Μπορώ να εξασφαλίσω πατ!
+ex.stalemate_trick.b3 = Αυτό μου επιτρέπει να γλιτώσω με πατ: {my} μένει χωρίς κινήσεις.
+ex.stalemate_trick.b3.2 = Προσοχή: μετά τη συνέχεια {line}, {my} μένει σε πατ.
+ex.stalemate_trick.b4 = Το {move} επιτρέπει ένα κόλπο με πατ: {line}, και {my} δεν μπορεί να κινηθεί.
+ex.stalemate_trick.b4.2 = Τώρα {my} μπορεί να κρυφτεί σε πατ: {line}.
+ex.stalemate_trick.b5 = Το {move} επιτρέπει πατ: {line}· {my} έχει εγκλωβιστεί.
+ex.stalemate_trick.b5.2 = Κόλπο με πατ: {line}, και {my} δεν έχει κινήσεις.
+ex.stalemate_trick.b6 = {line}, πατ: {my} έχει εγκλωβιστεί.
+ex.stalemate_trick.b6.2 = Πατ μετά τη συνέχεια {line}· {my} έχει κολλήσει.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} μπορεί να πάει στο {sq} και να επιτεθεί {t1:se} και {t2:se}.
+ex.fork.b1.2 = {my} πηγαίνει στο {sq} και επιτίθεται σε δύο κομμάτια: {t1:acc} και {t2:acc}.
+ex.fork.b1.3 = Πρόσεξε {my:acc}: από το {sq} επιτίθεται ταυτόχρονα {t1:se} και {t2:se}.
+ex.fork.b2 = Πιρούνι! {my} στο {sq} επιτίθεται ταυτόχρονα {t1:se} και {t2:se}.
+ex.fork.b2.2 = Μετά την κίνησή σου, {my} μπορεί να κάνει πιρούνι {t1:se} και {t2:se} από το {sq}.
+ex.fork.b2.3 = {my} πηγαίνει στο {sq}: διπλή επίθεση {t1:se} και {t2:se}.
+ex.fork.b3 = Το {move} επιτρέπει το {reply}, πιρούνι {t1:se} και {t2:se}.
+ex.fork.b3.2 = Μετά το {reply}, επιτίθεμαι ταυτόχρονα {t1:se} και {t2:se}.
+ex.fork.b3.3 = Το {reply} είναι πιρούνι: {t1} και {t2} δέχονται επίθεση μαζί.
+ex.fork.b4 = Το {reply} κάνει πιρούνι {t1:se} και {t2:se}· μετά τη συνέχεια {line}, έχεις χάσει {pts:point}.
+ex.fork.b4.2 = Το {reply} χτυπά ταυτόχρονα {t1:acc} και {t2:acc}.
+ex.fork.b4.3 = Το {move} επιτρέπει το πιρούνι {reply}, εναντίον {t1:gen} και {t2:gen}.
+ex.fork.b5 = Με το {move} πέφτεις στο πιρούνι {reply}, εναντίον {t1:gen} και {t2:gen}.
+ex.fork.b5.2 = Το {reply} κάνει πιρούνι {t1:se} και {t2:se}.
+ex.fork.b5.3 = Μετά το {reply}, {t1} και {t2} δέχονται επίθεση μαζί.
+ex.fork.b6 = Το {reply} κάνει πιρούνι.
+ex.fork.b6.2 = Το {move} επιτρέπει το {reply}, πιρούνι.
+ex.fork.b6.3 = {reply}, με πιρούνι.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Μπορείς να σώσεις μόνο ένα από τα δύο: {t1:acc} ή {t2:acc}.
+ex.fork.tail.b1.2 = Τώρα επιτίθεμαι σε δύο κομμάτια μαζί: {t1:acc} και {t2:acc}. Αυτό είναι πιρούνι!
+ex.fork.tail.b1.3 = Βλέπεις; Τώρα {t1} και {t2} δέχονται επίθεση. Το ένα από τα δύο κομμάτια θα πέσει.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} πρέπει να βγει από το σαχ, έτσι παίρνω {t1:acc}.
+ex.fork.tail_king.2 = Σαχ! {your} πρέπει να κινηθεί, και πέφτει {t1}.
+ex.fork.more.b3 = Πριν παίξεις, κοίτα το {sq}: από εκεί {my} μπορεί να κάνει πιρούνι.
+ex.fork.more.b3.2 = Πρόσεχε το {sq}. Από εκεί {my} κάνει πιρούνι.
+ex.fork.tip.knight = Πρόσεχε τα άλματα του ίππου κοντά στον βασιλιά και στη βασίλισσά σου!
+ex.fork.tip.knight.2 = Οι ίπποι λατρεύουν να επιτίθενται σε δύο κομμάτια μαζί. Κοίτα πού μπορούν να πηδήξουν.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Όταν {my} φύγει, {my2} επιτίθεται {t1:se}!
+ex.discovered.b1.2 = Κοίτα: {my} κλείνει τον δρόμο. Αν κινηθεί, {my2} χτυπά {t1:acc}.
+ex.discovered.b1.3 = {my} μπορεί να παραμερίσει, και τότε {my2} επιτίθεται {t1:se}.
+ex.discovered.b2 = Μια κρυφή επίθεση: {my} κινείται, και {my2} επιτίθεται {t1:se}.
+ex.discovered.b2.2 = Προσοχή: {my} μπορεί να φύγει, και {my2} χτυπά {t1:acc}.
+ex.discovered.b2.3 = {my} παραμερίζει και ανοίγει τον δρόμο {my2:gen} προς {t1:acc}.
+ex.discovered.b3 = Μετά το {reply}, μια αποκαλυπτόμενη επίθεση χτυπά {t1:acc}.
+ex.discovered.b3.2 = Το {reply} αποκαλύπτει επίθεση {t1:se}.
+ex.discovered.b3.3 = Το {move} επιτρέπει το {reply}, αποκαλυπτόμενη επίθεση {t1:se}.
+ex.discovered.b4 = Το {reply} ανοίγει γραμμή προς {t1:acc}: αποκαλυπτόμενη επίθεση.
+ex.discovered.b4.2 = Το {move} επιτρέπει την αποκαλυπτόμενη επίθεση {reply}, που κερδίζει {t1:acc}.
+ex.discovered.b4.3 = Μετά το {reply}, {t1} πέφτει θύμα αποκαλυπτόμενης επίθεσης.
+ex.discovered.b5 = Το {move} επιτρέπει την αποκαλυπτόμενη επίθεση {reply}.
+ex.discovered.b5.2 = Το {reply} είναι αποκαλυπτόμενη επίθεση.
+ex.discovered.b5.3 = Το {reply} αποκαλύπτει μια κρυφή επίθεση.
+ex.discovered.b6 = {reply}, με αποκαλυπτόμενη επίθεση {t1:se}.
+ex.discovered.b6.2 = {reply} και πέφτει {t1}.
+ex.discovered.b6.3 = Αποκαλυπτόμενη επίθεση: {reply}, που χτυπά {t1:acc}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} επιτίθεται {t1:se}. Όταν φύγει, παίρνω {t2:acc}, που βρίσκεται από πίσω.
+ex.skewer.b1.2 = Κοίτα: {my} χτυπά {t1:acc}, και {t2} είναι ακριβώς από πίσω.
+ex.skewer.b1.3 = {my} κυνηγά {t1:acc}. Πρέπει να φύγει, και τότε πέφτει {t2}.
+ex.skewer.b2 = Σούβλισμα: {my} επιτίθεται {t1:se}, και {t2} είναι από πίσω.
+ex.skewer.b2.2 = {my} σημαδεύει {t1:acc} και {t2:acc} στην ίδια γραμμή. Όταν φύγει το πρώτο κομμάτι, παίρνω το δεύτερο.
+ex.skewer.b2.3 = Προσοχή: {t1} και {t2} είναι στην ίδια γραμμή. {my} μπορεί να κάνει σούβλισμα.
+ex.skewer.b3 = Το {reply} κάνει σούβλισμα {t1:se} και {t2:se}.
+ex.skewer.b3.2 = Μετά το {reply}, {t1} πρέπει να φύγει και πέφτει {t2}.
+ex.skewer.b3.3 = Το {move} επιτρέπει το {reply}, σούβλισμα {t1:gen} και {t2:gen}.
+ex.skewer.b4 = Το {reply} κάνει σούβλισμα {t1:se}· {t2} από πίσω χάνεται.
+ex.skewer.b4.2 = Μετά το {move}, {t1} και {t2} στέκονται στην ίδια γραμμή: {reply}.
+ex.skewer.b4.3 = Μετά το {reply}, {t1} φεύγει και πέφτει {t2}.
+ex.skewer.b5 = Το {reply} κάνει σούβλισμα {t1:se} και {t2:se}.
+ex.skewer.b5.2 = Το {move} επιτρέπει το σούβλισμα {reply}, μέσα από {t1:acc} προς {t2:acc}.
+ex.skewer.b6 = Το {reply} κάνει σούβλισμα.
+ex.skewer.b6.2 = {reply}, σούβλισμα.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} μπορεί να πάει στο {sq}. Τότε {your} κολλάει μπροστά από {t1:acc}.
+ex.pin.b1.2 = Πρόσεξε {my:acc} στο {sq}: {your} κολλάει μπροστά από {t1:acc}.
+ex.pin.b1.3 = {my} μπορεί να καρφώσει {your:acc} {t1:se}. Τότε {your:pron_acc} κερδίζω.
+ex.pin.b2 = Κάρφωμα: {your} έχει κολλήσει μπροστά από {t1:acc}.
+ex.pin.b2.2 = {your} είναι καρφωμέν{your:os} {t1:se}. Τότε μπορώ να {your:pron_acc} κερδίσω.
+ex.pin.b2.3 = Τώρα {your} έχει κολλήσει μπροστά από {t1:acc}. Αυτό είναι κάρφωμα.
+ex.pin.b3 = {your} καρφώνεται {t1:se}, και {your:pron_acc} κερδίζω.
+ex.pin.b3.2 = Μετά από αυτό, {your} είναι καρφωμέν{your:os} {t1:se}.
+ex.pin.b3.3 = Το κάρφωμα {your:gen} κοστίζει υλικό: πίσω {your:pron_gen} βρίσκεται {t1}.
+ex.pin.b4 = Το {reply} καρφώνει και κερδίζει υλικό.
+ex.pin.b4.2 = Με το {move} πέφτεις στο κάρφωμα {reply}.
+ex.pin.b4.3 = Μετά το {reply}, το καρφωμένο κομμάτι πέφτει.
+ex.pin.b5 = Το {move} επιτρέπει το κάρφωμα {reply}.
+ex.pin.b5.2 = Το {reply} καρφώνει, και το κομμάτι χάνεται.
+ex.pin.b6 = Το {reply} καρφώνει.
+ex.pin.b6.2 = {reply}, με κάρφωμα.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} είναι καρφωμέν{your:os}, άρα δεν μπορεί να προστατεύσει το {sq}. Πίσω {your:pron_gen} είναι {t1}.
+ex.pin_defender.b1.2 = Κοίτα: {your} δεν μπορεί στ’ αλήθεια να προστατεύσει το {sq}, γιατί πίσω {your:pron_gen} είναι {t1}.
+ex.pin_defender.b2 = {your} είναι καρφωμέν{your:os} {t1:se}, άρα το {sq} δεν έχει πραγματικό υπερασπιστή.
+ex.pin_defender.b2.2 = Ένα καρφωμένο κομμάτι είναι κακός υπερασπιστής. {your} δεν μπορεί να προστατεύσει το {sq}: πίσω {your:pron_gen} είναι {t1}.
+ex.pin_defender.b3 = {your} είναι καρφωμέν{your:os} {t1:se}· δεν προστατεύει πραγματικά το {sq}.
+ex.pin_defender.b3.2 = Το {sq} μοιάζει προστατευμένο, αλλά {your} είναι καρφωμέν{your:os} μπροστά από {t1:acc}.
+ex.pin_defender.b4 = {your} είναι καρφωμέν{your:os}, άρα το {sq} δεν προστατεύεται πραγματικά.
+ex.pin_defender.b4.2 = Καρφωμέν{your:os} όπως είναι, {your} δεν μπορεί να προστατεύσει το {sq}.
+ex.pin_defender.b5 = {your} είναι καρφωμέν{your:os}· το {sq} μένει ακάλυπτο.
+ex.pin_defender.b5.2 = Το {sq} πέφτει: {your} είναι καρφωμέν{your:os}.
+ex.pin_defender.b6 = {your} είναι καρφωμέν{your:os}· το {sq} πέφτει.
+ex.pin_defender.b6.2 = {your} καρφωμέν{your:os}, το {sq} ακάλυπτο.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} είναι παγιδευμέν{your:os}. Κάθε τετράγωνο όπου μπορεί να πάει το ελέγχω εγώ.
+ex.trapped.b1.2 = Κοίτα {your:acc}: δεν έχει ασφαλές τετράγωνο για να φύγει.
+ex.trapped.b1.3 = {your} έχει κολλήσει. Μπορώ να {your:pron_acc} απειλήσω, και δεν μπορεί να ξεφύγει.
+ex.trapped.b2 = {your} δεν έχει ασφαλή τετράγωνα. Μπορώ να {your:pron_acc} κερδίσω.
+ex.trapped.b2.2 = {your} είναι παγιδευμέν{your:os}: όπου κι αν πάει, {your:pron_acc} παίρνω.
+ex.trapped.b2.3 = Προσοχή, {your} μένει χωρίς τετράγωνα.
+ex.trapped.b3 = {your} παγιδεύεται: δεν {your:pron_gen} μένει ασφαλές τετράγωνο.
+ex.trapped.b3.2 = Μετά από αυτό, {your} παγιδεύεται και χάνεται.
+ex.trapped.b3.3 = {your} έπεσε σε παγίδα: δεν μπορεί να βγει.
+ex.trapped.b4 = Το {move} αφήνει {your:acc} παγιδευμέν{your:o}.
+ex.trapped.b4.2 = {your} δεν έχει υποχώρηση· {your:pron_acc} κερδίζω.
+ex.trapped.b4.3 = {your} παγιδεύεται μετά το {reply}.
+ex.trapped.b5 = {your} καταλήγει παγιδευμέν{your:os}: {line}.
+ex.trapped.b5.2 = Το {move} αφήνει {your:acc} αποκομμέν{your:o}.
+ex.trapped.b6 = {your} είναι παγιδευμέν{your:os}.
+ex.trapped.b6.2 = Η συνέχεια {line} παγιδεύει {your:acc}.
+ex.trapped.tip.b1 = Πριν κινήσεις ένα κομμάτι, έλεγξε ότι μπορεί να γυρίσει πίσω.
+ex.trapped.tip.b1.2 = Τα κομμάτια που μπαίνουν βαθιά στο στρατόπεδό μου μπορεί να εγκλωβιστούν. Κράτα μια διέξοδο.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} έχει κλειστεί πίσω από τα πιόνια {your:pron_gen}. {my} μπορεί να {your:pron_gen} κάνει σαχ στην τελευταία γραμμή.
+ex.back_rank.b1.2 = Προσοχή: {your} δεν έχει τετράγωνο διαφυγής, και {my} μπορεί να φτάσει στο {sq}.
+ex.back_rank.b1.3 = {my} μπορεί να πάει στο {sq}. {your} είναι κλεισμέν{your:os} από τα πιόνια {your:pron_gen}.
+ex.back_rank.b2 = Κίνδυνος στην τελευταία γραμμή: {your} δεν έχει διέξοδο. {my} μπορεί να κάνει σαχ στο {sq}.
+ex.back_rank.b2.2 = {your} είναι κλεισμέν{your:os}. {my} πηγαίνει στο {sq} και κερδίζει υλικό.
+ex.back_rank.b2.3 = Η τελευταία σου γραμμή είναι αδύναμη: {my} μπορεί να κάνει σαχ {your:se} στο {sq}.
+ex.back_rank.b3 = Η τελευταία σου γραμμή είναι αδύναμη: {line}. {your} δεν έχει τετράγωνο διαφυγής.
+ex.back_rank.b3.2 = {your} δεν έχει διέξοδο, οπότε η συνέχεια {line} κερδίζει υλικό.
+ex.back_rank.b3.3 = Μετά τη συνέχεια {line}, η τελευταία γραμμή είναι καθοριστική: {your} έχει εγκλωβιστεί.
+ex.back_rank.b4 = Η τελευταία γραμμή: {line}, και {your} δεν έχει διέξοδο.
+ex.back_rank.b4.2 = Η συνέχεια {line} εκμεταλλεύεται την αδύναμη τελευταία γραμμή γύρω από {your:acc}.
+ex.back_rank.b4.3 = {your} δεν έχει τετράγωνο διαφυγής: {line}.
+ex.back_rank.b5 = Αδυναμία στην τελευταία γραμμή γύρω από {your:acc}: {line}.
+ex.back_rank.b5.2 = {line}· {your} δεν έχει διέξοδο.
+ex.back_rank.b6 = {line}, τελευταία γραμμή· {your} έχει εγκλωβιστεί.
+ex.back_rank.b6.2 = Τελευταία γραμμή: {line} ({your}).
+ex.back_rank.tip.b1 = Άφησε στον βασιλιά σου ένα μικρό παράθυρο: προχώρησε ένα από τα πιόνια μπροστά του.
+ex.back_rank.tip.b1.2 = Ένας βασιλιάς πίσω από τρία πιόνια μπορεί να δεχτεί ματ στην τελευταία γραμμή. Άνοιξέ του λίγο χώρο.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} στο {sq} δεν έχει προστασία. {my} μπορεί να {your:pron_acc} πάρει δωρεάν.
+ex.hanging.b1.2 = Κοίτα {your:acc}: τίποτα δεν {your:pron_acc} προστατεύει, και {my} {your:pron_acc} απειλεί.
+ex.hanging.b1.3 = {your} δεν προστατεύεται. {my} μπορεί απλώς να {your:pron_acc} πάρει.
+ex.hanging.b2 = {your} στο {sq} είναι ακάλυπτ{your:os}. {my} {your:pron_acc} παίρνει, και δεν μπορείς να ξαναπάρεις.
+ex.hanging.b2.2 = {my} μπορεί να πάρει {your:acc} δωρεάν. Τίποτα δεν {your:pron_acc} προστατεύει.
+ex.hanging.b2.3 = {your} έμεινε μόν{your:os} στο {sq}, και {my} {your:pron_acc} παίρνει.
+ex.hanging.b3 = Το {move} αφήνει {your:acc} απροστάτευτ{your:o}: {reply}, και κανένα κομμάτι δεν ξαναπαίρνει.
+ex.hanging.b3.2 = {your} στο {sq} χάνεται με το {reply}.
+ex.hanging.b3.3 = Μετά το {reply}, {your} χάνεται για το τίποτα.
+ex.hanging.b4 = Το {move} αφήνει {your:acc} ακάλυπτ{your:o}: το {reply} κερδίζει {pts:point}.
+ex.hanging.b4.2 = Το {reply} παίρνει {your:acc} χωρίς αντάλλαγμα.
+ex.hanging.b4.3 = {your} είναι ακάλυπτ{your:os}· το {reply} {your:pron_acc} παίρνει.
+ex.hanging.b5 = Το {move} αφήνει {your:acc} ακάλυπτ{your:o}· το {reply} {your:pron_acc} κερδίζει.
+ex.hanging.b5.2 = {your} στο {sq} χάνεται με το {reply}.
+ex.hanging.b5.3 = Το {reply} κερδίζει {your:acc}.
+ex.hanging.b6 = {move}; {reply} και πέφτει {your}.
+ex.hanging.b6.2 = Το {reply} κερδίζει {your:acc}.
+ex.hanging.b6.3 = {your} είναι ακάλυπτ{your:os}: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} προστάτευε {your:acc}. Τώρα {my} μπορεί να {your:pron_acc} πάρει.
+ex.hanging_guard.b1.2 = {your2} έφυγε, και τώρα {your} έμεινε μόν{your:os}. {my} {your:pron_acc} παίρνει.
+ex.hanging_guard.b2 = {your2} προστάτευε {your:acc}. Τώρα έμεινε μόν{your:os}, και {my} {your:pron_acc} παίρνει.
+ex.hanging_guard.b2.2 = Κινώντας {your2:acc}, άφησες {your:acc} απροστάτευτ{your:o} στη διάθεση {my:gen}.
+ex.hanging_guard.b3 = {your2} προστάτευε {your:acc}. Αν φύγει, {your} πέφτει με το {reply}.
+ex.hanging_guard.b3.2 = Χωρίς {your2:acc}, {your} είναι ακάλυπτ{your:os}: {reply}.
+ex.hanging_guard.b4 = Το {move} απομακρύνει τον υπερασπιστή: {your2} άφησε {your:acc}, και το {reply} {your:pron_acc} παίρνει.
+ex.hanging_guard.b4.2 = {your2} ήταν ο μόνος υπερασπιστής {your:gen}· το {reply} {your:pron_acc} κερδίζει.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} απειλούσε ήδη {your:acc}. Έλεγχε πάντα τι απειλεί η κίνησή μου.
+ex.hanging_threat.b1.2 = Δεν είδες την απειλή μου: {my} επιτίθεται {your:se}.
+ex.hanging_threat.b2 = Με την τελευταία μου κίνηση, {my} επιτέθηκε {your:se}. Κοίτα πάντα τις απειλές μου.
+ex.hanging_threat.b2.2 = {my} απειλούσε {your:acc}, και τώρα μπορώ να {your:pron_acc} πάρω.
+ex.hanging_threat.b3 = Σου ξέφυγε η απειλή μου: {my} επιτιθόταν {your:se}.
+ex.hanging_threat.b3.2 = {my} είχε {your:acc} στο στόχαστρο όλη αυτή την ώρα.
+ex.hanging.tip.b1 = Πριν από κάθε κίνηση, ρώτα τον εαυτό σου: είναι ασφαλή όλα τα κομμάτια μου;
+ex.hanging.tip.b1.2 = Καλή συνήθεια: μετά από κάθε κίνηση, έλεγξε ποια κομμάτια σου προστατεύονται.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} πήρε κάτι, αλλά {my} ξαναπαίρνει. Αυτή η ανταλλαγή σου κοστίζει μονάδες.
+ex.exchange_capture.b1.2 = {my} ξαναπαίρνει. {your} αξίζει {n:point}, αλλά εσύ πήρες μόνο {n2:point}.
+ex.exchange_capture.b1.3 = Προσοχή: {my} μπορεί να ξαναπάρει {your:acc}. Αυτή είναι κακή ανταλλαγή.
+ex.exchange_capture.b2 = Πρόσεχε τις ανταλλαγές: {your} αξίζει {n:point}. {my} ξαναπαίρνει, κι εσύ πήρες μόνο {n2:point}.
+ex.exchange_capture.b2.2 = {my} ξαναπαίρνει {your:acc}. Χάνεις {n:point} και κερδίζεις μόνο {n2:point}.
+ex.exchange_capture.b3 = Το να πάρεις στο {sq} δεν δουλεύει: μετά τη συνέχεια {line}, {your} χάνεται.
+ex.exchange_capture.b3.2 = {your} παίρνει στο {sq}, αλλά μετά τη συνέχεια {line}, έχεις χάσει {pts:point}.
+ex.exchange_capture.b4 = Με το {move} μετράς λάθος στο {sq}: η συνέχεια {line} σου κοστίζει {your:acc}.
+ex.exchange_capture.b4.2 = Αν πάρεις στο {sq}, χάνεις {your:acc}: {line}.
+ex.exchange_capture.b5 = Το {move} χάνει {your:acc} στις ανταλλαγές στο {sq}: {line}.
+ex.exchange_capture.b5.2 = Στο {sq}, {your} χάνεται: {line}.
+ex.exchange_capture.b6 = Το {move} χάνει {your:acc} στο {sq} μετά τη συνέχεια {line}.
+ex.exchange_capture.b6.2 = {line} στο {sq}, και {your} χάνεται.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Μέτρα: επιτίθεμαι {n:time} στο {sq}, εσύ το προστατεύεις {n2:time}.
+ex.exchange_count.b1.2 = Στο {sq} έχω {n:piece} στην επίθεση κι εσύ {n2:piece} στην άμυνα. Εκεί κερδίζω.
+ex.exchange_count.b2 = Το {sq} δέχεται επίθεση {n:time} και προστατεύεται {n2:time}. Εκεί θα χάσεις υλικό.
+ex.exchange_count.b2.2 = Μέτρα στο {sq}: {n:piece} στην επίθεση, {n2:piece} στην άμυνα.
+ex.exchange_count.b3 = Μέτρα πόσα κομμάτια επιτίθενται στο {sq} και πόσα το προστατεύουν: τα δικά μου είναι περισσότερα.
+ex.exchange_count.b3.2 = Η ανταλλαγή στο {sq} δεν δουλεύει: μετά τη συνέχεια {line}, έχεις χάσει {pts:point}.
+ex.exchange_count.b4 = Με το {move} μετράς λάθος στο {sq}: {line}, και έχεις χάσει {pts:point}.
+ex.exchange_count.b4.2 = Το {sq} χτυπιέται περισσότερες φορές απ’ όσες προστατεύεται: {line}.
+ex.exchange_count.b5 = Στο {sq}, {n:piece} στην επίθεση είναι περισσότερα από {n2:piece} στην άμυνα: {line}.
+ex.exchange_count.b5.2 = Μετά το {move}, η μέτρηση στο {sq} δεν σε ευνοεί.
+ex.exchange_count.b6 = {line} στο {sq}, και κέρδισα {pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n} εναντίον {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} αξίζει λιγότερο από {your:acc}. Αν πάρω, χάνεις μονάδες.
+ex.exchange_cheap.b1.2 = {my} επιτίθεται {your:se}. Αν ανταλλαχτούν, χάνεις εσύ.
+ex.exchange_cheap.b2 = {your} αξίζει {n:point}, και {my} μόνο {n2:point}. Αυτή η ανταλλαγή σου κοστίζει.
+ex.exchange_cheap.b2.2 = {my} αξίζει λιγότερο από {your:acc}, άρα η επίθεση κερδίζει υλικό.
+ex.exchange_cheap.b3 = {your} στο {sq} δέχεται επίθεση από φθηνότερο κομμάτι.
+ex.exchange_cheap.b3.2 = Ένα κομμάτι που αξίζει {n2:point} επιτίθεται {your:se} στο {sq}: {line}.
+ex.exchange_cheap.b4 = {your} στο {sq} δέχεται επίθεση από φθηνότερο κομμάτι· το {reply} κερδίζει υλικό.
+ex.exchange_cheap.b4.2 = Το {reply} χτυπά {your:acc} στο {sq} με φθηνότερο κομμάτι.
+ex.exchange_cheap.b5 = {your} στο {sq} είναι εκτεθειμέν{your:os} σε φθηνότερο κομμάτι: {line}.
+ex.exchange_cheap.b5.2 = Το {reply} κερδίζει υλικό στο {sq} εναντίον {your:gen}.
+ex.exchange_cheap.b6 = Το {reply} κερδίζει {your:acc} στο {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} στο {sq} χάνεται.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Προσοχή: τώρα μπορώ να κερδίσω {t1:acc}.
+ex.material.b1.2 = Μετά από αυτή την κίνηση, {t1} κινδυνεύει. Μπορώ να {t1:pron_acc} κερδίσω.
+ex.material.b2 = Αυτή η κίνηση μου επιτρέπει να κερδίσω {t1:acc}.
+ex.material.b2.2 = Τώρα {t1} μπλέκει, και {t1:pron_acc} κερδίζω.
+ex.material.b3 = Το {move} χάνει υλικό: μετά τη συνέχεια {line}, έχεις χάσει {pts:point}.
+ex.material.b3.2 = Μετά τη συνέχεια {line}, είσαι πίσω κατά {pts:point}.
+ex.material.b4 = Το {move} χάνει υλικό: {line}, και έχεις χάσει {pts:point}.
+ex.material.b4.2 = Μετά τη συνέχεια {line}, υστερείς κατά {pts:point}.
+ex.material.b5 = Το {move} χάνει υλικό: {line}.
+ex.material.b5.2 = Με τη συνέχεια {line} κερδίζω {pts:point}.
+ex.material.b6 = {line}, και κέρδισα {pts:point}.
+ex.material.b6.2 = Το {move} χάνει {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Το είδες; Στο {sq}, {my} ήταν χαρισμέν{my:os}. {your} μπορούσε να {my:pron_acc} πάρει.
+ex.missed_capture.b1.2 = Κοίτα: {my} δεν είχε προστασία. {your} μπορούσε να {my:pron_acc} πάρει.
+ex.missed_capture.b1.3 = {my} στο {sq} δεν προστατευόταν. {your} μπορούσε να {my:pron_acc} αρπάξει!
+ex.missed_capture.b2 = Σου ξέφυγε ένα δωρεάν κομμάτι: το {best} κερδίζει {my:acc}.
+ex.missed_capture.b2.2 = {my} ήταν ακάλυπτ{my:os} στο {sq}. Το {best} {my:pron_acc} παίρνει. Την επόμενη φορά, άρπαξέ {my:pron_acc}!
+ex.missed_capture.b2.3 = Το {best} θα κέρδιζε {my:acc} δωρεάν.
+ex.missed_capture.b3 = Το {best} θα κέρδιζε {my:acc} χωρίς αντάλλαγμα.
+ex.missed_capture.b3.2 = {my} στο {sq} ήταν απροστάτευτ{my:os}: {best}. Ψάχνε για ακάλυπτα κομμάτια σε κάθε κίνηση.
+ex.missed_capture.b3.3 = Μπορούσες να πάρεις {my:acc} με το {best}.
+ex.missed_capture.b4 = Σου ξέφυγε: το {best} παίρνει {my:acc} στο {sq}.
+ex.missed_capture.b4.2 = Το {best} κερδίζει {my:acc}, που ήταν ακάλυπτ{my:os}.
+ex.missed_capture.b4.3 = {my} ήταν ακάλυπτ{my:os}: {best}.
+ex.missed_capture.b5 = Το {best} κερδίζει {my:acc}· μετά το {move} γλιτώνει.
+ex.missed_capture.b5.2 = {my} στο {sq} ήταν ακάλυπτ{my:os}: {best}.
+ex.missed_capture.b6 = {best}! {my} στο {sq} ήταν ακάλυπτ{my:os}.
+ex.missed_capture.b6.2 = Το {best} κέρδιζε {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Είχες διπλή επίθεση: το {best} επιτίθεται {t1:se} και {t2:se}!
+ex.missed_fork.b1.2 = Κοίτα! Το {best} θα χτυπούσε ταυτόχρονα {t1:acc} και {t2:acc}.
+ex.missed_fork.b1.3 = Το {best} ήταν πιρούνι: επίθεση μαζί {t1:se} και {t2:se}.
+ex.missed_fork.b2 = Το {best} ήταν πιρούνι: {t1} και {t2}.
+ex.missed_fork.b2.2 = Σου ξέφυγε μια διπλή επίθεση: {best}, που χτυπά {t1:acc} και {t2:acc}.
+ex.missed_fork.b2.3 = Το {best} επιτίθεται μαζί {t1:se} και {t2:se}. Πιρούνι!
+ex.missed_fork.b3 = Το {best} ήταν πιρούνι: {t1} και {t2}.
+ex.missed_fork.b3.2 = Είχες το {best}, πιρούνι {t1:se} και {t2:se}.
+ex.missed_fork.b3.3 = Το {best} θα έκανε πιρούνι {t1:se} και {t2:se}.
+ex.missed_fork.b4 = Το {best} έκανε πιρούνι {t1:se} και {t2:se}.
+ex.missed_fork.b4.2 = Χαμένο πιρούνι: {best}, εναντίον {t1:gen} και {t2:gen}.
+ex.missed_fork.b5 = Το {best} έκανε πιρούνι {t1:se} και {t2:se}.
+ex.missed_fork.b5.2 = Το {best} χτυπούσε {t1:acc} και {t2:acc}.
+ex.missed_fork.b6 = Το {best} έκανε πιρούνι {t1:se} και {t2:se}.
+ex.missed_fork.b6.2 = {best}: πιρούνι {t1:se} και {t2:se}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} μπορεί να τρέξει στο {sq} και να γίνει βασίλισσα. {your} είναι πολύ μακριά.
+ex.promotion.b1.2 = Κοίτα: τίποτα δεν εμποδίζει {my:acc} να φτάσει στο {sq}. {your} δεν {my:pron_acc} προλαβαίνει.
+ex.promotion.b1.3 = {my} απέχει {n:square} από το {sq}, και {your} δεν προλαβαίνει.
+ex.promotion.b2 = {my} τρέχει στο {sq}, και {your} δεν {my:pron_acc} προλαβαίνει.
+ex.promotion.b2.2 = {my} χρειάζεται {n:move} για να φτάσει στο {sq}· {your} χρειάζεται {n2:f}. Πολύ αργά.
+ex.promotion.b2.3 = Προσοχή: {my} γίνεται βασίλισσα στο {sq}, και {your} είναι πολύ μακριά.
+ex.promotion.b3 = {my} είναι έξω από το τετράγωνο: {your} δεν {my:pron_acc} προλαβαίνει πριν από το {sq}.
+ex.promotion.b3.2 = Ο αγώνας δρόμου χάθηκε: {my} φτάνει στο {sq} πριν από {your:acc}.
+ex.promotion.b4 = {your} είναι έξω από το τετράγωνο του πιονιού· το πιόνι γίνεται βασίλισσα στο {sq}.
+ex.promotion.b4.2 = {my} προάγεται στο {sq}· {your} αργεί κατά μία κίνηση.
+ex.promotion.b5 = Ο αγώνας δρόμου των πιονιών χάθηκε: {your} είναι έξω από το τετράγωνο ({sq}).
+ex.promotion.b5.2 = {line}: βγάζω βασίλισσα στο {sq} και {your} φτάνει αργά.
+ex.promotion.b6 = {your} είναι έξω από το τετράγωνο· βγάζω βασίλισσα στο {sq}.
+ex.promotion.b6.2 = {line}, βασίλισσα στο {sq} ({your} φτάνει αργά).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Το πιόνι σου μπορούσε να τρέξει στο {sq} και να γίνει βασίλισσα!
+ex.promotion_missed.b1.2 = Κοίτα το {sq}! Το πιόνι σου μπορούσε να τρέξει ως εκεί.
+ex.promotion_missed.b2 = Το πιόνι σου μπορούσε να τρέξει στο {sq}. Σπρώχνε τα ελεύθερα πιόνια!
+ex.promotion_missed.b2.2 = Τίποτα δεν σταματούσε το πιόνι σου στον δρόμο του προς το {sq}.
+ex.promotion_missed.b3 = Το {best} κερδίζει τον αγώνα δρόμου προς το {sq}.
+ex.promotion_missed.b3.2 = Το πιόνι σου ήταν πιο γρήγορο: {best}, και γίνεται βασίλισσα στο {sq}.
+ex.promotion_missed.b4 = Το {best} κερδίζει τον αγώνα δρόμου των πιονιών προς το {sq}.
+ex.promotion_missed.b4.2 = {best}! Το πιόνι γίνεται βασίλισσα στο {sq}.
+ex.promotion_missed.b5 = Με το {best} το πιόνι σου γίνεται πρώτο βασίλισσα, στο {sq}.
+ex.promotion_missed.b5.2 = {best}, και το {sq} είναι δικό σου.
+ex.promotion_missed.b6 = Το {best} κερδίζει τον αγώνα δρόμου προς το {sq}.
+ex.promotion_missed.b6.2 = {best}· το πιόνι φτάνει πρώτο στο {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Εκείνο το πιόνι προστάτευε {your:acc}. Τώρα {your} έχει λιγότερη κάλυψη.
+ex.king_shield.b1.2 = Το πιόνι στο {sq} ήταν ασπίδα για {your:acc}. Τώρα τα κομμάτια μου μπορούν να μπουν.
+ex.king_shield.b2 = Με την κίνηση του πιονιού από το {sq} αποδυναμώνεις {your:acc}. Τα κομμάτια μου μπορούν τώρα να {your:pron_gen} επιτεθούν.
+ex.king_shield.b2.2 = {your} έχασε έναν φύλακα: το πιόνι στο {sq} ήταν η ασπίδα {your:pron_gen}.
+ex.king_shield.b3 = Αυτή η κίνηση πιονιού εκθέτει {your:acc} στην επίθεσή μου.
+ex.king_shield.b3.2 = {your} χάνει την κάλυψη των πιονιών {your:pron_gen}, και τα κομμάτια μου μπαίνουν.
+ex.king_shield.b4 = Το {move} αποδυναμώνει τα πιόνια γύρω από {your:acc}· η επίθεσή μου περνάει.
+ex.king_shield.b4.2 = Η ασπίδα γύρω από {your:acc} σπάει μετά το {move}.
+ex.king_shield.b5 = Το {move} χαλαρώνει την κάλυψη {your:gen}: {line}.
+ex.king_shield.b5.2 = Μετά το {move}, {your} εκτίθεται: {line}.
+ex.king_shield.b6 = Το {move} αποδυναμώνει {your:acc}: {line}.
+ex.king_shield.b6.2 = {line}· {your} είναι πολύ ανοιχτ{your:os_st}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} κινδυνεύει. Τα κομμάτια μου έρχονται κατά πάνω {your:pron_gen}.
+ex.king_exposed.b1.2 = Κοίτα πόσο ανοιχτ{your:os_st} είναι {your}. Κράτα {your:pron_acc} σε ασφάλεια πίσω από τα πιόνια {your:pron_gen}.
+ex.king_exposed.b2 = {your} είναι πολύ ανοιχτ{your:os_st}. Τώρα μπορώ να κάνω πολλά σαχ.
+ex.king_exposed.b2.2 = Προσοχή: {your} δεν έχει καταφύγιο, και τα κομμάτια μου {your:pron_gen} επιτίθενται.
+ex.king_exposed.b3 = {your} είναι εκτεθειμέν{your:os}· τα κομμάτια μου μπορούν να {your:pron_gen} επιτεθούν με σαχ.
+ex.king_exposed.b3.2 = Μετά από αυτό, {your} δεν έχει καταφύγιο.
+ex.king_exposed.b4 = {your} εκτίθεται: {line}.
+ex.king_exposed.b4.2 = Το {move} αφήνει {your:acc} εκτεθειμέν{your:o} σε επίθεση.
+ex.king_exposed.b5 = {your} είναι υπερβολικά εκτεθειμέν{your:os}: {line}.
+ex.king_exposed.b5.2 = Το {move} αφήνει {your:acc} ακάλυπτ{your:o}.
+ex.king_exposed.b6 = {line}· {your} είναι εκτεθειμέν{your:os}.
+ex.king_exposed.b6.2 = {your} είναι πολύ ανοιχτ{your:os_st}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Αυτή η ανταλλαγή οδηγεί σε φινάλε πιονιών που το κερδίζω.
+ex.bad_trade.b3.2 = Μετά τη συνέχεια {line}, μένουν μόνο πιόνια, και ο βασιλιάς μου στέκεται καλύτερα.
+ex.bad_trade.b4 = Οι ανταλλαγές οδηγούν σε χαμένο φινάλε πιονιών: {line}.
+ex.bad_trade.b4.2 = Με αυτές τις ανταλλαγές περνάς σε χαμένο φινάλε πιονιών.
+ex.bad_trade.b5 = Λάθος ανταλλαγή: το φινάλε πιονιών μετά τη συνέχεια {line} είναι χαμένο.
+ex.bad_trade.b5.2 = Το φινάλε πιονιών είναι χαμένο· κράτα κομμάτια στη σκακιέρα.
+ex.bad_trade.b6 = Το φινάλε πιονιών μετά τη συνέχεια {line} είναι χαμένο.
+ex.bad_trade.b6.2 = Χαμένο φινάλε πιονιών: {line}.
+ex.bishop_pair.b5 = Αυτή η ανταλλαγή σου κοστίζει το ζευγάρι των αξιωματικών.
+ex.bishop_pair.b5.2 = Με αυτή την ανταλλαγή δίνεις το ζευγάρι των αξιωματικών σου· το δικό μου μένει.
+ex.bishop_pair.b6 = Χάνεται το ζευγάρι των αξιωματικών.
+ex.bishop_pair.b6.2 = Το ζευγάρι των αξιωματικών χαρίστηκε.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = Το {best} παίρνει την αντιπαράθεση: οι βασιλιάδες στέκονται αντικριστά, με ένα τετράγωνο ανάμεσα.
+ex.opposition.b3.2 = Οι βασιλιάδες! Με το {best} θα έπαιρνες την αντιπαράθεση.
+ex.opposition.b4 = Το {best} παίρνει την αντιπαράθεση: αυτό είναι το κλειδί.
+ex.opposition.b4.2 = Η αντιπαράθεση κρίνει: {best}.
+ex.opposition.b5 = {best}, παίρνοντας την αντιπαράθεση.
+ex.opposition.b5.2 = Αντιπαράθεση: {best}.
+ex.opposition.b6 = {best}, αντιπαράθεση.
+ex.opposition.b6.2 = {best}: η αντιπαράθεση.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Το πιόνι σου μπορούσε να τρέξει στο {sq}. Τα ελεύθερα πιόνια θέλουν να προχωράνε!
+ex.push_passed.b1.2 = Σπρώξε το ελεύθερο πιόνι σου! Θέλει να φτάσει στο {sq}.
+ex.push_passed.b1.3 = Το ελεύθερο πιόνι σου θέλει να βαδίσει προς το {sq}. Σπρώξ’ το!
+ex.push_passed.b2 = {best}: σπρώξε το ελεύθερο πιόνι προς το {sq}.
+ex.push_passed.b2.2 = Το ελεύθερο πιόνι σου είναι δυνατό. Το {best} το σπρώχνει μπροστά.
+ex.push_passed.b2.3 = Σπρώξ’ το! Το {best} φέρνει το πιόνι πιο κοντά στο {sq}.
+ex.push_passed.b3 = Το {best} σπρώχνει το ελεύθερο πιόνι.
+ex.push_passed.b3.2 = Τα ελεύθερα πιόνια πρέπει να προχωρούν: {best}.
+ex.push_passed.b3.3 = Ο δρόμος ήταν το {best}: το πιόνι τρέχει προς το {sq}.
+ex.push_passed.b4 = {best}: το ελεύθερο πιόνι κρίνει την παρτίδα.
+ex.push_passed.b4.2 = Σπρώξε: {best}.
+ex.push_passed.b5 = {best}, σπρώχνοντας το ελεύθερο πιόνι: {eval}.
+ex.push_passed.b5.2 = Το ελεύθερο πιόνι: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, το ελεύθερο πιόνι.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Φέρε {your:acc} μπροστά! Στο φινάλε, ο βασιλιάς είναι δυνατό κομμάτι.
+ex.king_active.b1.2 = Τώρα {your} μπορεί να μπει στη μάχη. Φέρ’ {your:pron_acc} στη μέση.
+ex.king_active.b1.3 = Με λίγα κομμάτια στη σκακιέρα, {your} πρέπει να βγει και να βοηθήσει.
+ex.king_active.b2 = Στο φινάλε, χρησιμοποίησε {your:acc}: φέρ’ {your:pron_acc} στο κέντρο.
+ex.king_active.b2.2 = {your} πρέπει να γίνει ενεργ{your:os_st} τώρα. Φέρ’ {your:pron_acc} μπροστά.
+ex.king_active.b3 = Το {best} ενεργοποιεί τον βασιλιά. Στα φινάλε, ο βασιλιάς μάχεται.
+ex.king_active.b3.2 = {best}: τώρα η θέση του βασιλιά είναι στο κέντρο.
+ex.king_active.b4 = Το {best} φέρνει τον βασιλιά στο κέντρο.
+ex.king_active.b4.2 = Ο βασιλιάς πρέπει να βγει μπροστά: {best}.
+ex.king_active.b5 = {best}, ενεργοποιώντας τον βασιλιά: {line}.
+ex.king_active.b5.2 = Ενεργός βασιλιάς: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, ο βασιλιάς μπροστά.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = Το {best} κρατά καλύτερη θέση.
+ex.positional.b4.2 = Το {best} ήταν ισχυρότερο εδώ.
+ex.positional.b4.3 = Εγώ θα προτιμούσα το {best}.
+ex.positional.b5 = Το {best} ήταν ισχυρότερο: {line}.
+ex.positional.b5.2 = {best}, με την ιδέα {line}.
+ex.positional.b5.3 = Σκέψου το {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} βγήκε πολύ νωρίς. Βγάλε πρώτα τους ίππους και τους αξιωματικούς σου.
+tip.early_queen.b1.2 = Προσοχή με {your:acc} τόσο νωρίς: τα κομμάτια μου μπορούν να {your:pron_acc} κυνηγήσουν παντού.
+tip.early_queen.b1.3 = Έχει πλάκα να παίζεις {your:acc}, αλλά πρώτα ανάπτυξε τα ελαφρά κομμάτια.
+tip.early_queen.b2 = Αν παίζεις {your:acc} τόσο νωρίς, μπορώ να {your:pron_gen} επιτεθώ και να κερδίσω χρόνο.
+tip.early_queen.b2.2 = {your} έξω τόσο νωρίς; Πρώτα ίπποι και αξιωματικοί!
+tip.early_queen.b3 = Μια πρόωρη έξοδος {your:gen} μου δίνει κινήσεις με κέρδος χρόνου εναντίον {your:pron_gen}.
+tip.early_queen.b3.2 = {your} κυνηγιέται εύκολα τόσο νωρίς. Πρώτα ανάπτυξη.
+tip.queen_grab.b1 = {your} πήρε ένα μακρινό πιόνι, και τώρα μπορεί να μπλέξει.
+tip.queen_grab.b1.2 = Το να αρπάζεις πιόνια με {your:acc} κοστίζει χρόνο. Πρώτα ανάπτυξη!
+tip.queen_grab.b2 = {your} πήγε να αρπάξει πιόνια στην άκρη. Αυτό κοστίζει πολύ χρόνο.
+tip.queen_grab.b2.2 = Πρόσεχε όταν στέλνεις {your:acc} να κυνηγήσει μακρινά πιόνια.
+tip.queen_grab.b3 = Το κυνήγι πιονιών με {your:acc} τόσο νωρίς χάνει χρόνο.
+tip.queen_grab.b3.2 = {your} είναι τώρα μακριά από τη βάση {your:pron_gen}· η ανάπτυξή μου θα μετρήσει.
+tip.queen_grab.b4 = {your} κερδίζει ένα πιόνι αλλά χάνει πολύ χρόνο.
+tip.queen_grab.b4.2 = Το κυνήγι του πιονιού στην άκρη με {your:acc} κοστίζει χρόνο.
+tip.same_piece.b1 = Έπαιξες {your:acc} δύο φορές. Προσπάθησε να βγάζεις ένα καινούργιο κομμάτι σε κάθε κίνηση.
+tip.same_piece.b1.2 = Πάλι {your}; Βγάλε και τα άλλα κομμάτια σου.
+tip.same_piece.b1.3 = Σε κάθε κίνηση, προσπάθησε να αναπτύσσεις καινούργιο κομμάτι, όχι πάλι {your:acc}.
+tip.same_piece.b2 = Αν παίζεις {your:acc} δύο φορές στο άνοιγμα, χάνεις χρόνο.
+tip.same_piece.b2.2 = {your} κινήθηκε ξανά· τα άλλα κομμάτια σου είναι ακόμα στη θέση τους.
+tip.same_piece.b3 = Αν παίζεις {your:acc} δύο φορές, καθυστερεί η ανάπτυξη.
+tip.same_piece.b3.2 = Άλλη μια κίνηση με {your:acc}· ο υπόλοιπος στρατός σου περιμένει.
+tip.castle.b1 = {your} είναι ακόμα στη μέση. Με ροκέ θα ήταν σε ασφάλεια.
+tip.castle.b1.2 = Ώρα για ροκέ! Στη γωνία {your} κινδυνεύει λιγότερο.
+tip.castle.b1.3 = Σκέψου να κάνεις ροκέ σύντομα. {your} είναι εκτεθειμέν{your:os}.
+tip.castle.b2 = {your} είναι ακόμα στο κέντρο. Κάνε ροκέ σύντομα!
+tip.castle.b2.2 = Με ροκέ, {your} θα ήταν κρυμμέν{your:os} σε ασφάλεια.
+tip.castle.b3 = Με το κέντρο να ανοίγει, {your} πρέπει να κάνει ροκέ.
+tip.castle.b3.2 = {your} είναι ακόμα στο κέντρο· ήταν ώρα για ροκέ.
+# "A knight on the rim is dim": Greek has no such rhyme; the motto says "a knight on the edge, a knight
+# without strength".
+tip.knight_rim.b1 = {your} στην άκρη δεν κάνει πολλά. Στους ίππους αρέσει η μέση.
+tip.knight_rim.b1.2 = Ίππος στην άκρη, ίππος χωρίς δύναμη! Εκεί {your} ελέγχει λιγότερα τετράγωνα.
+tip.knight_rim.b2 = {your} στην άκρη ελέγχει λίγα τετράγωνα. Στόχευε στο κέντρο.
+tip.knight_rim.b2.2 = Ίππος στην άκρη, ίππος χωρίς δύναμη: {your} θέλει το κέντρο.
+tip.knight_rim.b3 = {your} είναι εκτός παιχνιδιού στην άκρη.
+tip.knight_rim.b3.2 = Η άκρη δεν είναι καλή θέση για {your:acc}.
+tip.flank.b1 = Προσπάθησε να κινείς πρώτα τα πιόνια της μέσης. Τα πιόνια στις άκρες δεν βοηθούν πολύ.
+tip.flank.b1.2 = Τα πιόνια στο πλάι δεν βοηθούν τα κομμάτια σου να βγουν. Χρησιμοποίησε τα μεσαία.
+tip.flank.b2 = Οι κινήσεις πιονιών στην άκρη δεν αναπτύσσουν τίποτα. Χρησιμοποίησε τα κεντρικά πιόνια.
+tip.flank.b2.2 = Πάρα πολλές κινήσεις πιονιών στο πλάι. Ανάπτυξε τα κομμάτια σου!
+tip.flank.b3 = Οι κινήσεις πιονιών στις πτέρυγες στο άνοιγμα καθυστερούν την ανάπτυξη.
+tip.flank.b3.2 = Τα πιόνια της άκρης μπορούν να περιμένουν· ανάπτυξε και πάλεψε για το κέντρο.
+tip.centre.b1 = Προσπάθησε να ελέγχεις τη μέση της σκακιέρας, όπως το {sq}.
+tip.centre.b1.2 = Το κέντρο είναι σημαντικό. Βάλε ένα πιόνι ή ένα κομμάτι κοντά στο {sq}.
+tip.centre.b1.3 = Τα κομμάτια στη μέση είναι δυνατά. Στόχευε σε τετράγωνα όπως το {sq}.
+tip.centre.b2 = Πάλεψε για το κέντρο: τετράγωνα όπως το {sq} μετράνε.
+tip.centre.b2.2 = Μου χαρίζεις το κέντρο. Κοίτα το {sq}.
+tip.centre.b3 = Δεν διεκδικείς το κέντρο· το {sq} είναι δικό μου.
+tip.centre.b3.2 = Διεκδίκησε το κέντρο, γύρω από το {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Όταν μου μένει μόνο ο βασιλιάς, σπρώξ’ τον στην άκρη και μετά κάνε ματ.
+tip.mate_technique.b1.2 = Συμβουλή: σπρώξε τον βασιλιά μου προς την άκρη. Κράτα και τον δικό σου βασιλιά κοντά.
+tip.fifty.b1 = Προσοχή: μετά από πενήντα κινήσεις χωρίς να παρθεί κομμάτι ή να κινηθεί πιόνι, είναι ισοπαλία.
+tip.fifty.b1.2 = Ο χρόνος τελειώνει: πενήντα κινήσεις χωρίς να παρθεί κομμάτι ή να κινηθεί πιόνι φέρνουν ισοπαλία.
+tip.repetition.b1 = Προσοχή! Αν η ίδια θέση εμφανιστεί για τρίτη φορά, είναι ισοπαλία.
+tip.repetition.b1.2 = Απόφυγε να επαναλαμβάνεις κινήσεις: μια τρίτη επανάληψη είναι ισοπαλία, κι εσύ κερδίζεις.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Πω πω, έδωσες ένα κομμάτι, και δουλεύει!
+praise.sacrifice.2 = Έξυπνη θυσία! Έπαιξες πολύ καλά.
+praise.brilliant.b3 = Λαμπρή κίνηση! Πραγματική θυσία.
+praise.brilliant.b3.2 = Πω πω, το {move} είναι σπουδαία θυσία!
+praise.brilliant.b4 = {move}! Λαμπρή θυσία.
+praise.brilliant.b4.2 = Λαμπρή κίνηση. Δεν την περίμενα.
+praise.brilliant.b5 = {move}!! Λαμπρά.
+praise.brilliant.b5.spoken = {move}. Λαμπρά!
+praise.brilliant.b5.2 = Λαμπρή θυσία.
+praise.brilliant.b6 = {move}!! Εξαιρετικά.
+praise.brilliant.b6.spoken = {move}. Εξαιρετικά!
+praise.brilliant.b6.2 = Λαμπρά.
+praise.great.b2 = Εξαιρετική κίνηση! Βρήκες τον τρόπο να αντισταθείς.
+praise.great.b2.2 = Αυτή είναι εξαιρετική κίνηση. Μπράβο που τη βρήκες!
+praise.great.b3 = Εξαιρετική κίνηση! Βρήκες τη μόνη καλή ιδέα.
+praise.great.b3.2 = Εξαιρετικά, το {move} ανατρέπει την κατάσταση.
+praise.great.b4 = {move}! Εξαιρετικό εύρημα.
+praise.great.b4.2 = Εξαιρετική κίνηση.
+praise.great.b5 = {move}! Καλό εύρημα.
+praise.great.b5.2 = Ισχυρή κίνηση: {move}.
+praise.great.b6 = {move}! Εξαιρετικό.
+praise.great.b6.2 = Εξαιρετικό εύρημα.
+praise.only.b2 = Ωραία! Αυτή ήταν η μόνη καλή κίνηση.
+praise.only.b2.2 = Μπράβο, βρήκες τη μόνη κίνηση που δουλεύει.
+praise.only.b3 = Η μόνη κίνηση, και τη βρήκες.
+praise.only.b3.2 = Ακριβώς! Τίποτα άλλο δεν δούλευε εδώ.
+praise.only.b4 = Η μόνη κίνηση. Μπράβο.
+praise.only.b4.2 = Μόνη κίνηση, και βρέθηκε.
+praise.only.b5 = Μόνη κίνηση. Καλά.
+praise.only.b5.2 = {move}, η μόνη κίνηση.
+praise.only.b6 = Μόνη κίνηση.
+praise.only.b6.2 = Με ακρίβεια: η μόνη κίνηση.
+praise.fork.b2 = Διπλή επίθεση! Μπράβο.
+praise.fork.b2.2 = Επιτίθεσαι σε δύο κομμάτια μαζί! Εξαιρετικά.
+praise.fork.b2.3 = Ωραία! Αυτό είναι πιρούνι.
+praise.fork.b3 = Ωραίο πιρούνι.
+praise.fork.b3.2 = Καλό πιρούνι!
+praise.fork.b3.3 = Πιρούνι. Καλά έπαιξες.
+praise.capture.b1 = Μπράβο! Κέρδισες {my:acc} χωρίς να δώσεις τίποτα.
+praise.capture.b1.2 = Καλό μάτι! {my} δεν προστατευόταν.
+praise.capture.b1.3 = Ναι! Κέρδισες {my:acc}.
+praise.capture.b2 = Ωραία το πήρες! {my} ήταν ακάλυπτ{my:os}.
+praise.capture.b2.2 = Ωραία, κέρδισες {my:acc}.
+praise.capture.b2.3 = Καλά το είδες: {my} ήταν ακάλυπτ{my:os}.
+praise.best.b1 = Καλή κίνηση!
+praise.best.b1.2 = Πολύ καλά!
+praise.best.b1.3 = Καλά έπαιξες!
+praise.best.b2 = Καλή κίνηση.
+praise.best.b2.2 = Πολύ ωραία.
+praise.best.b2.3 = Καλά έπαιξες.
+praise.best.b3 = Καλή κίνηση· δεν ήταν εύκολο να βρεθεί.
+praise.best.b3.2 = Καλό εύρημα.
+praise.best.b3.3 = Το {move} είναι η καλύτερη κίνηση εδώ. Μπράβο.
+praise.trade.b1 = Ωραία! Όταν προηγείσαι, οι ανταλλαγές σε βοηθούν.
+praise.trade.b1.2 = Ωραία ανταλλαγή. Προηγείσαι, άρα λιγότερα κομμάτια σε συμφέρουν.
+praise.trade.b2 = Καλή ανταλλαγή: προηγείσαι, άρα αντάλλαξε κομμάτια.
+praise.trade.b2.2 = Είναι έξυπνο να ανταλλάξεις {my:acc} όταν προηγείσαι.
+praise.trade.b3 = Σωστά: όταν προηγείσαι, ανταλλάσσεις.
+praise.trade.b3.2 = Λογική ανταλλαγή.
+praise.excellent.b3 = Εξαιρετική κίνηση.
+praise.excellent.b3.2 = Αυτή είναι δυνατή κίνηση.
+praise.excellent.b3.3 = Πολύ ακριβής κίνηση.
+praise.excellent.b4 = Με ακρίβεια.
+praise.excellent.b4.2 = Εξαιρετικά.
+praise.excellent.b4.3 = Ωραία, το {move} είναι ακριβές.
+praise.castle.b1 = Μπράβο! Έκανες ροκέ. Ο βασιλιάς σου είναι πιο ασφαλής τώρα.
+praise.castle.b1.2 = Ωραίο ροκέ! Ο βασιλιάς σου είναι κρυμμένος σε ασφάλεια.
+praise.saved.b1 = Μπράβο! Έσωσες το κομμάτι σου.
+praise.saved.b1.2 = Μπράβο, το έβαλες σε ασφάλεια.
+praise.book.b1 = Ωραία, αυτή είναι μια γνωστή κίνηση ανοίγματος.
+praise.book.b1.2 = Ωραία, έτσι ξεκινούν και οι δυνατοί παίκτες.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Προσοχή! Απειλώ ματ στο {sq}.
+threat.mate.b1.2 = Πρόσεξε: {my} θέλει να πάει στο {sq}. Αυτό θα ήταν ματ.
+threat.mate.b1.3 = Κοίτα το {sq}. Αν φτάσω εκεί, είναι ματ!
+threat.mate.b2 = Προσοχή, απειλώ ματ.
+threat.mate.b2.2 = Πρόσεξε: υπάρχει απειλή ματ στο {sq}.
+threat.mate.b2.3 = Κοίτα προσεκτικά: απειλώ ματ.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Κοίτα: {my} επιτίθεται {your:se}.
+threat.piece.b1.2 = Προσοχή! {your} δέχεται επίθεση από {my:acc}.
+threat.piece.b1.3 = Πρόσεξε, {my} θέλει να πάρει {your:acc}.
+threat.piece.b2 = Πρόσεχε {your:acc}.
+threat.piece.b2.2 = {your} δέχεται επίθεση.
+threat.piece.b2.3 = Πρόσεξε {your:acc}.
+threat.punish.b1 = Η τελευταία μου κίνηση ήταν λάθος. Μπορείς να το εκμεταλλευτείς;
+threat.punish.b1.2 = Χμ, νομίζω ότι έκανα λάθος. Μπορείς να το βρεις;
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Αυτή τη φορά, σκέψου {your:acc}.
+tb.hint.b1.2 = Έχε τον νου σου {your:se}.
+tb.hint.king.b1 = Σκέψου την ασφάλεια {your:gen}.
+tb.hint.king.b1.2 = Κοίτα πρώτα {your:acc}. Είναι σε ασφάλεια;
+tb.hint.missed.b1 = Ψάξε για κομμάτια που μπορείς να πάρεις δωρεάν.
+tb.hint.missed.b1.2 = Κοίτα προσεκτικά: υπάρχει κάτι που μπορείς να πάρεις;
+tb.hint.mate_missed.b1 = Κοίτα τον βασιλιά μου. Μπορείς να του κάνεις ματ;
+tb.hint.mate_missed.b1.2 = Δοκίμασε πρώτα τα σαχ. Ίσως υπάρχει ματ!
+tb.hint.general.b1 = Πάρε τον χρόνο σου και κοίτα όλη τη σκακιέρα.
+tb.hint.general.b1.2 = Προσπάθησε να βρεις μια πιο ασφαλή κίνηση.
+# The retry.
+tb.fixed.b1 = Πολύ καλύτερα!
+tb.fixed.b1.2 = Ναι, αυτό είναι καλύτερο!
+tb.fixed.b1.3 = Ωραία, αυτό δουλεύει πολύ καλύτερα.
+tb.fixed = Αυτό είναι καλύτερο.
+tb.fixed.2 = Καλύτερα.
+tb.fixed.3 = Καλή διόρθωση.
+tb.same = Πάλι την ίδια κίνηση; Εντάξει, ας δούμε.
+tb.same.2 = Σου αρέσει αυτή η κίνηση. Ας τη δούμε μέχρι το τέλος.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Ναι! Αυτή είναι η κίνηση που σκεφτόμουν.
+tb.found.b1.2 = Τη βρήκες! Αυτή είναι η καλύτερη κίνηση.
+tb.found = Αυτή είναι η κίνηση που είχα στο μυαλό μου.
+tb.found.2 = Ακριβώς, αυτή είναι.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Δεν έχεις άλλες αναιρέσεις σε αυτή την παρτίδα, δυστυχώς.
+tb.none_left.2 = Δεν σου έμειναν αναιρέσεις σε αυτή την παρτίδα.
