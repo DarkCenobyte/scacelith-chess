@@ -1,0 +1,173 @@
+# Coach speech (Polish): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ty" and is male ("wygrałem", "musiałem"); the
+# player's gender is unknown: no second-person past tense or conditional ("wygrałeś", "znalazłeś"),
+# no adjective about the player ("gotowy"). Instead: "udało ci się", "szło ci", impersonal forms
+# ("można było zbić"), nouns ("wygrana była w twoich rękach", "pozycja była wygrana"), the present
+# tense, or "we" ("zremisowaliśmy", "cofnęliśmy": virile, right for a mixed pair).
+# Move numbers are ordinals (common.lang): "w {n:nth_move_loc}" = "w 21. ruchu" (spoken "w
+# dwudziestym pierwszym ruchu"), "{n:nth_move}" = "21. ruch", "do {crit_no:nth_move_gen}" = "do 21.
+# ruchu". A move ({move}, {crit_best} ...) is spoken as its piece in the nominative ("skoczek ef
+# trzy", "krótka roszada" is feminine), so no case and no past-tense agreement hangs on it: the noun
+# "ruch" carries them ("ruch {crit_best} był lepszy", "zamiast ruchu {crit_move}"), or the line uses
+# the present tense ("{move} wygrywa materiał"), "a nie" / "niż" (nominative) or no verb.
+# Counts that can be zero (mistakes, checks, captures) stay in the nominative ("0 błędów").
+# Accuracy: "{acc:percent}" = "85%" (spoken "osiemdziesiąt pięć procent"), only where a nominative
+# or accusative fits (after a colon, "wyniosła", "miałem", "kontra"), never after "z dokładnością".
+# {eval} is always a pawn evaluation here ("+1,3", "równowaga"): "mniej więcej {eval}" (not "około",
+# which needs the genitive).
+# Names inserted by {text}, {theme}, {level}:
+#   appraisal.phase.*   nominatives "debiut" (m), "gra środkowa" (f), "końcówka" (f); their cases
+#                       ("{text:loc}" = "w debiucie") are in common.lang; no verb or adjective agrees
+#                       with {text} ("{text} to twoja najlepsza faza").
+#   appraisal.reason.*  a complement right after "Remis" ("Remis przez pata.", "zakończyła się
+#                       remisem za zgodą"), no comma before it.
+#   theme.*             a verbal-noun phrase in the nominative, lower case, no full stop ("patrzenie
+#                       na całą szachownicę przed ruchem"), always after a colon, so it never takes a
+#                       case; "swój" for the player's own pieces.
+#   appraisal.level.*   the level names of the coach page (coach.level.N.name), said inside „…” after
+#                       "poziom": "na poziom „Początkujący”", "spróbuj poziomu „Ekspert”".
+# {opening:def} is the opening's name as used inside a sentence (lower-case nominative, from the
+# opening texts), always after a colon or "to"; "{opening}" alone as a whole line.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = debiut
+appraisal.phase.middlegame = gra środkowa
+appraisal.phase.endgame = końcówka
+appraisal.reason.stalemate = przez pata
+appraisal.reason.material = z powodu niewystarczającego materiału
+appraisal.reason.repetition = przez powtórzenie pozycji
+appraisal.reason.fifty = zgodnie z zasadą pięćdziesięciu ruchów
+appraisal.reason.agreement = za zgodą
+appraisal.reason.other = zgodnie z przepisami
+appraisal.level.l1 = Pierwsze kroki
+appraisal.level.l2 = Początkujący
+appraisal.level.l3 = Średnio zaawansowany
+appraisal.level.l4 = Szachista klubowy
+appraisal.level.l5 = Silny szachista klubowy
+appraisal.level.l6 = Ekspert
+# What to practise, after "Jedna rzecz do przećwiczenia:" and similar (a nominative phrase, no full stop).
+theme.general = patrzenie na całą szachownicę przed ruchem
+theme.mate_allowed = sprawdzanie bezpieczeństwa swojego króla przed każdym ruchem
+theme.mate_missed = szukanie matów, począwszy od szachów
+theme.stalemate = zostawianie mojemu królowi wolnego pola, gdy wygrywasz
+theme.fork = wypatrywanie podwójnych ataków
+theme.discovered = wypatrywanie ataków ukrytych za moimi bierkami
+theme.skewer = niestawianie cennych figur na jednej linii
+theme.pin = dostrzeganie związań, zanim do nich dojdzie
+theme.trapped = zostawianie swoim figurom drogi ucieczki
+theme.back_rank = robienie okienka dla swojego króla
+theme.hanging = dbanie o obronę swoich bierek
+theme.exchange = liczenie atakujących i obrońców przed wymianą
+theme.missed_capture = szukanie w pierwszej kolejności bierek do zbicia za darmo
+theme.missed_fork = szukanie własnych podwójnych ataków
+theme.promotion = wyścigi pionków i reguła kwadratu
+theme.king_safety = trzymanie swojego króla bezpiecznie za osłoną pionków
+theme.bad_trade = wybieranie, które bierki wymieniać
+theme.opening = rozwijanie figur i wczesna roszada
+theme.endgame = włączanie króla do gry i pchanie wolnych pionków
+theme.positional = poprawianie swojej najgorzej ustawionej figury
+theme.material = sprawdzanie przed ruchem, co mogą zdobyć moje następne ruchy
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Mat! Wygrywasz. Dobrze zagrane!
+appraisal.open.win.b1.2 = Wygrana! Świetnie, że udało ci się doprowadzić partię do końca.
+appraisal.open.win.b1.3 = Tym razem to ja przegrałem! To była naprawdę dobra partia.
+appraisal.open.win.b2 = Dobrze zagrane! Wygrana w {moves:move_loc}.
+appraisal.open.win.b2.2 = Gratuluję zwycięstwa!
+appraisal.open.win.b2.3 = Zwycięstwo w {moves:move_loc}. Ładnie rozegrane!
+appraisal.open.win.b3 = Gratuluję, w pełni zasłużone zwycięstwo.
+appraisal.open.win.b3.2 = Dobrze zagrane. To zwycięstwo ci się należało.
+appraisal.open.win.b3.3 = Dobre zwycięstwo. Gratuluję.
+appraisal.open.win.b4 = Ładne zwycięstwo.
+appraisal.open.win.b4.2 = Dobrze zagrane, zasłużona wygrana.
+appraisal.open.win.b4.3 = Dobra wygrana.
+appraisal.open.win.b5 = Dobrze zagrane.
+appraisal.open.win.b5.2 = Ładnie wygrane.
+appraisal.open.win.b5.3 = Dobra partia, zasłużenie wygrana.
+appraisal.open.win.b6 = Dobrze zagrane.
+appraisal.open.win.b6.2 = Zasłużona wygrana.
+appraisal.open.win.b6.3 = Dobra partia.
+appraisal.open.draw.b1 = Remis! Tej partii nikt nie zdołał wygrać.
+appraisal.open.draw.b1.2 = Remis. To była zacięta partia!
+appraisal.open.draw.b1.3 = Remis: dzielimy się punktem. Dobrze zagrane!
+appraisal.open.draw.b2 = Remis: sprawiedliwy wynik.
+appraisal.open.draw.b2.2 = Zremisowaliśmy. Dobra walka!
+appraisal.open.draw.b2.3 = Remis po dobrej partii.
+appraisal.open.draw.b3 = Remis. Obie strony miały szanse.
+appraisal.open.draw.b3.2 = Sprawiedliwy remis.
+appraisal.open.draw.b3.3 = Remis {text}. Dobra walka.
+appraisal.open.draw.b4 = Remis {text}.
+appraisal.open.draw.b4.2 = Partia zakończyła się remisem {text}.
+appraisal.open.draw.b4.3 = Wynik: remis {text}.
+appraisal.open.draw.b5 = Remis.
+appraisal.open.draw.b5.2 = Remis {text}.
+appraisal.open.draw.b5.3 = Podział punktu.
+appraisal.open.draw.b6 = Remis.
+appraisal.open.draw.b6.2 = Remis {text}.
+appraisal.open.draw.b6.3 = Podział punktu.
+appraisal.open.stalemate.b1 = Remis przez pata, a wygrana była tak blisko! Następnym razem zostaw mojemu królowi wolne pole.
+appraisal.open.stalemate.b1.2 = Pat, czyli remis. Do wygranej brakowało tak niewiele!
+appraisal.open.stalemate.b2 = Remis przez pata. Wygrana była tak blisko!
+appraisal.open.stalemate.b2.2 = Pat: remis, choć pozycja była wygrana.
+appraisal.open.stalemate.b3 = Remis przez pata w wygranej pozycji.
+appraisal.open.stalemate.b3.2 = Pat. Wygrana wymknęła się na samym końcu.
+appraisal.open.stalemate.b4 = Remis przez pata.
+appraisal.open.stalemate.b4.2 = Pat: remis.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remis po pacie.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remis, pat.
+appraisal.open.loss.b1 = Tym razem wygrałem, ale kilka twoich ruchów było naprawdę dobrych.
+appraisal.open.loss.b1.2 = Dobra partia! Musiałem się nieźle napracować.
+appraisal.open.loss.b1.3 = Było fajnie! Tę partię wygrałem, ale szybko się uczysz.
+appraisal.open.loss.b2 = Dobra partia! Zobaczmy, co się udało, i jedną rzecz, którą warto wypróbować.
+appraisal.open.loss.b2.2 = Dzięki za partię! Było w niej kilka twoich dobrych pomysłów.
+appraisal.open.loss.b2.3 = Dobra partia. Zobaczmy, czego możemy się z niej nauczyć.
+appraisal.open.loss.b3 = Dobra partia.
+appraisal.open.loss.b3.2 = Dziękuję za partię.
+appraisal.open.loss.b3.3 = Dobra partia. Przyjrzyjmy się jej.
+appraisal.open.loss_close.b3 = Dobra walka. Partia długo była wyrównana.
+appraisal.open.loss_close.b3.2 = Dobra walka: przez długi czas była równowaga.
+appraisal.open.loss.b4 = Dobra partia. Oto, co ją rozstrzygnęło.
+appraisal.open.loss.b4.2 = Dobra partia. Rozstrzygnął jeden moment.
+appraisal.open.loss.b4.3 = Dzięki za partię. Zobaczmy, gdzie nastąpił przełom.
+appraisal.open.loss_close.b4 = Długo trwała wyrównana walka. Oto, co ją rozstrzygnęło.
+appraisal.open.loss_close.b4.2 = Dobra partia, długo wyrównana.
+appraisal.open.loss.b5 = Dobra partia.
+appraisal.open.loss.b5.2 = Dzięki za partię.
+appraisal.open.loss.b5.3 = Dobra walka.
+appraisal.open.loss.b6 = Dobra partia.
+appraisal.open.loss.b6.2 = Dzięki za partię.
+appraisal.open.loss.b6.3 = Dobra walka.
+appraisal.open.resigned.b1 = Poddanie partii też należy do szachów i wymaga odwagi. Dobra partia!
+appraisal.open.resigned.b1.2 = Nic nie szkodzi. Wiedzieć, kiedy się poddać, to też część szachów.
+appraisal.open.resigned.b2 = Poddanie się należy do szachów i wymaga odwagi.
+appraisal.open.resigned.b2.2 = W porządku. Poddanie się też wymaga odwagi.
+appraisal.open.resigned.b3 = Poddanie się to część szachów. Dobra partia.
+appraisal.open.resigned.b3.2 = W porządku. Dziękuję za partię.
+appraisal.open.resigned.b4 = Dobra partia.
+appraisal.open.resigned.b4.2 = Dziękuję za partię.
+appraisal.open.resigned.b5 = Dobra partia.
+appraisal.open.resigned.b5.2 = Dzięki za partię.
+appraisal.open.resigned.b6 = Dobra partia.
+appraisal.open.resigned.b6.2 = Dzięki.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Wiesz, to jeszcze nie był koniec: ocena mniej więcej {eval}.
+appraisal.resign_early.b3.2 = Właściwie szanse wciąż były: mniej więcej {eval}.
+appraisal.resign_early.b4 = To jeszcze nie był koniec: ocena mniej więcej {eval}.
+appraisal.resign_early.b4.2 = Wciąż było co grać: mniej więcej {eval}.
+appraisal.resign_early.b5 = To nie był koniec: {eval}.
+appraisal.resign_early.b5.2 = Dało się jeszcze grać, mniej więcej {eval}.
+appraisal.resign_early.b6 = Jeszcze nie koniec: {eval}.
+appraisal.resign_early.b6.2 = Ocena: {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Nasz debiut to {opening:def}.
+appraisal.opening.b3.2 = Debiut tej partii to {opening:def}.
+appraisal.opening.b4 = Nasz debiut: {opening:def}.
+appraisal.opening.b4.2 = Debiut: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Debiut: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Debiut: {opening:def}.

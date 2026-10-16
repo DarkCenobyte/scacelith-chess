@@ -170,3 +170,33 @@ Turm a drei gespielt" (ex.verdict.inaccuracy.b5.2) lost "Turm" 3 times in 4.
   pronunciation dictionaries give. Otherwise clean over 250 lines.
 - "Perhaps {best} was ..." lost the piece name in 2 renderings of 3 ("Perhaps A three"): the line starts
   with the move instead ("{best} may have been a little more precise", 8 times in 8).
+
+## European Portuguese
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e (squares) | swallowed after "em", "para", "era": "toma em é cinco" said "toma em cinco" | `éh` (file.e.spoken) |
+| xeque-mate, xeques, xadrez | an initial x read "s" ("seque-mate", "sékes", "sadrez"); "xeque" alone right | `cheque`, `cheques`, `chadrez` (respell.*; "xeque" in "xeque-mate" is a word of its own) |
+| en passant | "em passante" (with the t) | `ã passã` (respell.en, respell.passant) |
+| troco (a troco de nada) | "tróco", the open o of the verb | `trôco` (respell.troco: every line has the noun) |
+| Deste (you gave) starting a sentence | "dêste", the demonstrative | `Déste` (.spoken of appraisal.improve.coach_hung.b3, lesson.safety.gave) |
+| Najdorf, Nimzowitsch, Winawer, Bogoljubow, Tartakower, Janowski, Horwitz | w as in English, j as in "jogo": "Najedorf", "Nimzouitch", "Uinauer" | `Naidorf`, `Nimzóvitch`, `Vináver`, `Bogoliúbov`, `Tartakóver`, `Ianóvski`, `Hórvitz` |
+
+- Round trip over 750 lines (Parakeet, seed 0), then 3 seeds on every word missed in more than a third of
+  its uses, the reviewers' list, the file letters, the numbers and the opening names. The file letter: "é"
+  came through 55 times in 111 in hard positions, "éh" 82 times; "éé" did as well as "éh" on the first 42
+  but was sometimes heard as two vowels ("é a"); "á" after a vowel is heard "a" ("á", "áh", "áá" alike): left as is. The opening texts
+  take file.e.spoken when tools/gen_opening_lang.py runs again.
+- Checked and fine (probe, 4-8 seeds): acordo, esforço, cedo, este (closed), gambito (stress on bi),
+  fianqueto, ala (the dark l makes it sound like "aula" to the recogniser), ao ([aw], not "o"), saem, sei,
+  tens and the other 2nd-person -s (said; see below), Hum (said "um"), Elo, blitz, éle, á/agá said alone,
+  Philidor ("Filidôr"), Evans, Fischer, Marshall, Trompowsky, Scheveningen, Sämisch ("Sémisch").
+- Left as is: the verb "jogo" (eu jogo) is said with the closed o of the noun (probe, 6 seeds, two
+  contexts); "jógo" gives the open o, but the recogniser then hears "joga" 11 times in 21 against 4, so the
+  person could be misheard. "começo" (eu começo), "doze", "erro", "torre" are close calls between the open
+  and the closed vowel, changing with the context. "Ups!" is said "óps" (probe): the same interjection.
+- Recogniser habits: it writes Brazilian forms (tem for tens, pode for podes, suas for tuas, seu for teu)
+  while the -s and the t are said (probe: "tens" against "tem"); "é cinco" as "S5", "roque" as "rock",
+  "ala" as "aula"; it drops a line's first word when it is an interjection or a short title ("Olá!",
+  "Xeque-mate!"), and it cannot write most eponyms, nor short lines that end in one (it switches to English
+  or Polish).
