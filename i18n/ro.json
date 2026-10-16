@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — șah fotorealist, jucat la persoana întâi",
+      "description": "Șah fotorealist gratuit, la persoana întâi, pentru Windows, Linux și macOS: Stockfish 19, un antrenor, analiza partidelor și joc online într-o sală regală."
+    },
+    "players": {
+      "title": "Clasament și jucători — Scacelith",
+      "description": "Cei mai buni jucători de pe serverul oficial Scacelith în fiecare ritm de joc cu rating, ratingurile lor și ultimele lor partide."
+    },
+    "account": {
+      "title": "Contul dvs. — Scacelith",
+      "description": "Autentificați-vă în contul Scacelith: ratinguri, istoricul partidelor, descărcări PGN și GIF, dispozitive conectate și setări."
+    },
+    "gif": {
+      "title": "GIF animat — Scacelith",
+      "description": "Un GIF animat al unei partide Scacelith."
+    },
+    "legal": {
+      "title": "Informații legale, confidențialitate și condiții de utilizare — Scacelith",
+      "description": "Cine publică și găzduiește Scacelith, ce fac site-ul, jocul și serverul oficial cu datele personale, drepturile dvs. și regulile serverului oficial."
+    }
+  },
+  "brand": {
+    "tagline": "Jocul regilor"
+  },
+  "nav": {
+    "skip": "Salt la conținut",
+    "home": "Acasă",
+    "label": "Meniu principal",
+    "game": "Jocul",
+    "modes": "Moduri de joc",
+    "gallery": "Galerie",
+    "trailer": "Trailer",
+    "online": "Joc online",
+    "players": "Clasament",
+    "account": "Cont",
+    "language": "Limbă",
+    "menu": "Meniu",
+    "download": "Descărcare"
+  },
+  "hero": {
+    "image_alt": "Doi roboți de porțelan joacă șah la o masă de nuc, într-o sală de marmură scăldată în soare.",
+    "lead": "Luați loc la o masă de nuc ceruit, într-o sală regală scăldată în soare. De cealaltă parte a tablei, un robot de porțelan animat de Stockfish așteaptă prima dvs. mutare.",
+    "watch": "Urmăriți trailerul",
+    "meta": "Software liber · Windows, Linux, macOS (experimental) · Placă grafică cu OpenGL 4.6",
+    "caption": "Captură din joc: sala regală"
+  },
+  "highlights": {
+    "engine": "Motor OpenGL 4.6 dezvoltat intern",
+    "stockfish": "Stockfish 19 integrat",
+    "rules": "Regulile FIDE",
+    "online": "Joc online",
+    "languages": "34 de limbi"
+  },
+  "experience": {
+    "eyebrow": "Experiența",
+    "title": "Nu o tablă pe un ecran.<br><em>Un loc la masă.</em>",
+    "lead": "Scacelith readuce tot ce face o partidă adevărată: sala, liniștea, ceasul, un adversar care vă privește și ritualurile turneului.",
+    "presence": {
+      "title": "La persoana întâi",
+      "text": "Vedeți prin ochii robotului dvs.: priviți în jur prin sală, aplecați-vă deasupra tablei, ridicați privirea spre adversar, aruncați o privire pe foaia de notație sau ridicați-vă și mergeți până la un capăt al mesei."
+    },
+    "ritual": {
+      "title": "Reguli de turneu",
+      "text": "Piesa atinsă trebuie mutată, iar mâna dvs. apasă ceasul pentru a încheia mutarea. Când opțiunea „Afișare mutări legale” este dezactivată, arbitrul penalizează o mutare ilegală, iar a doua duce la pierderea partidei."
+    },
+    "scoresheet": {
+      "title": "Scris de mână",
+      "text": "Ambii jucători notează fiecare mutare pe propria foaie de notație, fiecare cu scrisul său, și întorc pagina la fiecare patruzeci de mutări. Auziți penița pe hârtie."
+    },
+    "opponent": {
+      "title": "Un adversar pe măsură",
+      "text": "Stockfish 19 la nivelul dvs., de la Debutant (800) la Stockfish Max (3500), cu un rating calculat conform regulilor FIDE după fiecare partidă."
+    },
+    "engine": {
+      "title": "Creat pentru acest joc",
+      "text": "Un motor scris de la zero: iluminare bazată pe fizică, marmură, lemn ceruit, porțelan și alamă, soarele prin ferestre, umbre moi și reflexii. Nivelurile de calitate, de la Foarte scăzut la Ultra, îl adaptează plăcii dvs. grafice."
+    },
+    "languages": {
+      "title": "34 de limbi",
+      "text": "Engleză, franceză, germană, spaniolă, portugheză din Portugalia și din Brazilia, italiană, neerlandeză, suedeză, daneză, finlandeză, estonă, letonă, lituaniană, poloneză, cehă, slovacă, slovenă, croată, maghiară, română, bulgară, greacă, turcă, ucraineană, rusă, arabă, hindi, indoneziană, vietnameză, coreeană, japoneză și chineză, simplificată și tradițională. Araba se afișează de la dreapta la stânga, iar antrenorul vorbește cu voce tare în toate limbile, cu excepția chinezei, unde cuvintele sale apar ca subtitrări."
+    }
+  },
+  "modes": {
+    "eyebrow": "Moduri de joc",
+    "title": "Fiecare partidă<br><em>are masa ei.</em>",
+    "lead": "Totul se joacă în aceeași sală, direct din ecranul de titlu. Fără internet, Stockfish este mereu gata pentru o partidă.",
+    "new_game": {
+      "name": "Partidă nouă",
+      "text": "Înfruntați-l pe Stockfish la forța aleasă de dvs., într-un ritm de joc de la bullet la clasic, sau jucați cu un prieten la același calculator, fiecare prin ochii propriului robot."
+    },
+    "coach": {
+      "name": "Antrenor",
+      "text": "Un profesor se așază în fața dvs., joacă la nivelul dvs. și vă comentează partida: amenințări, mutări bune, greșeli, arătându-vă cu propria mână ce costă o greșeală. De la regulile șahului până la nivel de expert, cu o voce sintetizată pe calculatorul dvs."
+    },
+    "challenges": {
+      "name": "Provocările antrenorului",
+      "text": "Serii scurte de poziții, fiecare exersând o singură abilitate: maturi în una, două sau trei mutări, furculițe, legări și alte procedee tactice, apărare și finalurile elementare jucate împotriva antrenorului. Indicii doar când le cereți și o bifă verde pentru fiecare serie terminată."
+    },
+    "analysis": {
+      "name": "Analiză",
+      "text": "Stockfish trece în revistă partidele dvs. salvate, partidele online sau orice PGN: o bară de evaluare, mutările-cheie marcate de la mutare genială la gafă, mutarea mai bună desenată ca o săgeată și comentarii cu voce tare și în subtitrări. Mâinile roboților joacă mutările pe măsură ce parcurgeți partida."
+    },
+    "online": {
+      "name": "Joc online",
+      "text": "Adversari reali printr-un server Scacelith: partide cu rating, căutare automată de adversar, provocări și partide private sau un meci direct între două calculatoare. Robotul adversarului se mișcă odată cu acesta, în direct."
+    },
+    "watch": {
+      "name": "Urmăriți o partidă",
+      "text": "Doi adversari Stockfish se înfruntă, în timp ce vă deplasați liber prin sală, fără să vă vadă nimeni, de la un punct de observație la altul."
+    },
+    "saved": {
+      "name": "Partide salvate",
+      "text": "Partidele dvs. sunt păstrate ca fișiere PGN. Revedeți-le în sală, cu timpii reali de gândire și ceasurile, sau importați partide din alte programe."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerie",
+    "title": "Văzut <em>din interiorul sălii</em>",
+    "lead": "Fiecare imagine este capturată în joc, în timp real, de propriul său motor.",
+    "title_screen": {
+      "alt": "Ecranul de titlu: meniul Scacelith lângă doi roboți care joacă șah în sală.",
+      "caption": "Ecranul de titlu"
+    },
+    "coach": {
+      "alt": "Antrenorul, un robot de porțelan cu „COACH” scris pe piept, vă salută de cealaltă parte a tablei; ce spune apare și ca subtitrare.",
+      "caption": "Antrenor"
+    },
+    "challenges": {
+      "alt": "Meniul Provocările antrenorului: serii de maturi și procedee tactice, cu dificultatea lor și cu cele deja terminate, lângă descrierea seriei selectate.",
+      "caption": "Provocările antrenorului"
+    },
+    "analysis": {
+      "alt": "Modul Analiză: bara de evaluare, o săgeată desenată pe tablă, mutările adnotate cu precizia fiecărei tabere și lista comenzilor.",
+      "caption": "Analiză"
+    },
+    "game": {
+      "alt": "Vedere laterală: un robot se întinde peste masă ca să mute o piesă, în timp ce celălalt așteaptă; piesele luate stau lângă tablă.",
+      "caption": "Urmăriți o partidă"
+    },
+    "hall": {
+      "alt": "Doi roboți față în față, de o parte și de alta a tablei de șah, în fotolii de catifea roșie, sub ferestre înalte.",
+      "caption": "Sala regală"
+    },
+    "opponent": {
+      "alt": "Prim-plan cu adversarul, un robot de porțelan, cu capul aplecat spre tablă.",
+      "caption": "Adversarul dvs."
+    },
+    "scoresheet": {
+      "alt": "Mâna unui robot notează mutările pe foaia de notație cu un stilou.",
+      "caption": "Foaia de notație"
+    },
+    "note": "Versiunea 1.0.0. Interfața din aceste imagini este în limba engleză.",
+    "viewer": "Vizualizator de imagini",
+    "close": "Închidere",
+    "previous": "Imaginea anterioară",
+    "next": "Imaginea următoare"
+  },
+  "trailer": {
+    "eyebrow": "Trailer",
+    "title": "Scacelith <em>în mișcare</em>",
+    "soon_title": "Trailerul va apărea în curând",
+    "soon_text": "Până atunci, luați loc: jocul este gata de descărcare.",
+    "privacy": "Nu se încarcă nimic de pe YouTube până când nu acceptați playerul său.",
+    "open_youtube": "Vizionați pe YouTube"
+  },
+  "online": {
+    "eyebrow": "Joc online",
+    "title": "Adversari adevărați,<br><em>aceeași sală.</em>",
+    "lead": "Autentificați-vă pe serverul oficial din joc și jucați cu oameni de pretutindeni, tot la persoana întâi.",
+    "point_rated": "Partide cu rating în fiecare ritm de joc oficial, fiecare cu propriul rating, calculat conform regulilor FIDE.",
+    "point_match": "Căutare automată de adversar, provocări după nume și partide private cu cod; sau un meci direct între două calculatoare, fără server și fără cont.",
+    "point_fair": "Fair-play: verificări automate, analiza partidelor încheiate cu motorul de șah și raportările jucătorilor.",
+    "point_history": "Istoricul partidelor dvs. pe acest site: descărcați fiecare partidă ca PGN sau ca GIF animat.",
+    "point_open": "Oricine poate găzdui un server comunitar: serverul este software liber, iar API-ul său este documentat.",
+    "create": "Creați un cont",
+    "signin": "Autentificare",
+    "server_title": "Serverul oficial",
+    "status_checking": "Verificare…",
+    "address": "Adresă",
+    "registration": "Înregistrări",
+    "categories": "Ritmuri de joc cu rating",
+    "top_players": "Cei mai buni jucători",
+    "category": "Ritm de joc",
+    "board_loading": "Se încarcă clasamentul…",
+    "full_board": "Clasamentul complet"
+  },
+  "download": {
+    "button": "Descărcare",
+    "choose": "Alegeți sistemul de operare",
+    "see_release": "Vedeți versiunea pe GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Toate versiunile",
+    "experimental": "Experimental",
+    "source": "Cod sursă",
+    "source_zip": "Arhivă ZIP",
+    "eyebrow": "Descărcare",
+    "title": "Luați loc.<br><em>Gratuit și cu cod sursă deschis.</em>",
+    "lead": "Dezarhivați și jucați: fără program de instalare pe Windows sau Linux, iar pe Mac, o simplă glisare în dosarul Aplicații. Fiecare fișier este compilat de GitHub Actions din sursa etichetată corespunzătoare, cu proveniența compilării atestată.",
+    "notes": "Note de versiune",
+    "macos_note": "Pentru Mac-uri cu Apple Silicon (M1 sau mai nou) și macOS 26 sau mai nou, nu într-o mașină virtuală; această versiune este mai nouă și mai puțin testată decât celelalte. Aplicația nu este semnată de un dezvoltator Apple înregistrat: prima dată, deschideți-o din Configurări sistem › Confidențialitate și securitate › Deschide oricum.",
+    "req_system": "Sistem",
+    "req_system_value": "Windows pe 64 de biți (x64); Linux pe 64 de biți (x86-64 sau aarch64) cu glibc 2.34, OpenSSL 3 și X11 sau XWayland, de exemplu Ubuntu 22.04 sau Debian 12; macOS 26 sau mai nou pe Apple Silicon (experimental)",
+    "req_gpu": "Grafică",
+    "req_gpu_value": "O placă grafică cu OpenGL 4.6 și un driver actualizat (pe Mac, jocul își aduce propriul OpenGL)",
+    "req_included": "Inclus",
+    "req_included_value": "Stockfish 19 și rețeaua sa neuronală: puteți juca imediat, fără internet",
+    "req_network": "Conexiune la internet",
+    "req_network_value": "Pentru jocul online, GIF-uri și vocea antrenorului și a analizei (o descărcare opțională de aproximativ 399 MB)",
+    "req_licence": "Licență",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Verificați descărcarea",
+    "verify_text": "Proveniența compilării fiecărui fișier este atestată de GitHub. Cu GitHub CLI:",
+    "checksums": "Sume de control SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Credite",
+    "title": "Credite și <em>mulțumiri</em>",
+    "engine_head": "Motor de șah",
+    "engine": "Stockfish 19, creat de dezvoltatorii Stockfish (GNU GPL v3). Rețeaua sa neuronală a fost antrenată pe date furnizate de proiectul Leela Chess Zero (Open Database License).",
+    "voice_head": "Voce",
+    "voice": "Supertonic 3 de la Supertone, sub licența BigScience Open RAIL-M: descărcat la cererea dvs., dă glas antrenorului și analizei, pe calculatorul dvs.",
+    "fonts_head": "Fonturi",
+    "fonts": "EB Garamond de Georg Duffner, Cinzel de Natanael Gama și Amiri de Khaled Hosny; scrisul de mână în Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One și LXGW WenKai (toate sub SIL Open Font License); figurile de șah provin din GNU FreeFont.",
+    "openings_head": "Deschideri și exerciții",
+    "openings": "Numele deschiderilor provin din baza de date chess-openings a lichess.org, iar exercițiile din provocările antrenorului, din baza de exerciții Lichess, ambele dedicate domeniului public (CC0).",
+    "quote": "„Șahul este arta analizei.”",
+    "quote_author": "Mihail Botvinnik"
+  },
+  "footer": {
+    "about": "Un joc de șah fotorealist, jucat la persoana întâi, pe un motor OpenGL 4.6 dezvoltat intern. Software liber sub licența GNU GPL v3.",
+    "game": "Jocul",
+    "online": "Joc online",
+    "api_docs": "Documentația API a serverului",
+    "source": "Cod sursă",
+    "game_source": "Jocul pe GitHub",
+    "server_source": "Serverul pe GitHub",
+    "releases": "Versiuni",
+    "licence": "Licență (GPL v3)",
+    "credits": "Stockfish este o marcă comercială a dezvoltatorilor săi. YouTube este o marcă comercială a Google LLC. Windows este o marcă comercială a Microsoft Corporation. macOS este o marcă comercială a Apple Inc. Linux este marca înregistrată a lui Linus Torvalds. OpenGL este o marcă înregistrată a Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Acest site nu setează cookie-uri și nu folosește instrumente de urmărire; playerul YouTube se încarcă doar dacă îl acceptați.",
+    "legal_link": "Informații legale, confidențialitate și condiții"
+  },
+  "common": {
+    "copy": "Copiere",
+    "loading": "Se încarcă…",
+    "noscript": "Această pagină are nevoie de JavaScript pentru a comunica cu serverul Scacelith."
+  },
+  "players": {
+    "title": "Clasament și jucători",
+    "lead": "Cei mai buni jucători de pe serverul oficial în fiecare ritm de joc cu rating. Căutați orice jucător pentru a-i vedea ratingurile și ultimele partide.",
+    "search_label": "Căutare jucător",
+    "search_placeholder": "Nume de utilizator",
+    "search_button": "Căutare",
+    "back": "Înapoi la clasament",
+    "recent_games": "Ultimele partide",
+    "board_title": "Clasament",
+    "category": "Ritm de joc",
+    "col_rank": "Loc",
+    "col_player": "Jucător",
+    "col_rating": "Rating",
+    "col_peak": "Maxim",
+    "col_games": "Partide",
+    "col_wdl": "V / R / Î",
+    "loading": "Se încarcă…"
+  },
+  "account": {
+    "title": "Contul dvs.",
+    "auth_foot": "Un singur cont pe serverul oficial, pentru joc și pentru acest site. V-ați creat contul cu Google în joc? Folosiți „Ați uitat parola?” pentru a-i seta o parolă.",
+    "common": {
+      "back": "Înapoi la autentificare"
+    },
+    "fields": {
+      "login": "Nume de utilizator sau adresă de e-mail",
+      "password": "Parolă",
+      "show_password": "Afișare parolă",
+      "username": "Nume de utilizator",
+      "email": "Adresă de e-mail",
+      "confirm_password": "Confirmarea parolei",
+      "current_password": "Parola actuală",
+      "new_password": "Parola nouă",
+      "new_email": "Adresa de e-mail nouă",
+      "mfa_code": "Cod de verificare (sau un cod de recuperare)"
+    },
+    "signin": {
+      "tab": "Autentificare",
+      "title": "Bine ați revenit",
+      "remember": "Păstrați sesiunea deschisă pe acest dispozitiv",
+      "submit": "Autentificare",
+      "forgot": "Ați uitat parola?",
+      "resend": "Retrimiteți e-mailul de confirmare"
+    },
+    "mfa": {
+      "title": "Autentificare în doi pași",
+      "text": "Introduceți codul de 6 cifre din aplicația de autentificare.",
+      "code": "Codul din aplicație",
+      "use_recovery": "Folosiți în schimb un cod de recuperare",
+      "submit": "Confirmare"
+    },
+    "google": {
+      "or": "sau",
+      "button": "Autentificare cu Google",
+      "username_title": "Alegeți numele de utilizator",
+      "username_text": "Contul dvs. Google este nou pe acest server. Alegeți numele pe care îl vor vedea ceilalți jucători: nu mai poate fi schimbat ulterior.",
+      "username_submit": "Creare cont",
+      "link_title": "Asociați contul Google",
+      "link_submit": "Asociere și autentificare",
+      "returning": "Autentificare cu Google în curs…"
+    },
+    "register": {
+      "tab": "Creare cont",
+      "title": "Un cont gratuit",
+      "closed": "Serverul nu acceptă conturi noi în acest moment.",
+      "username_hint": "Litere, cifre, _ și -, începând cu o literă sau o cifră.",
+      "password_hint": "Cel puțin 10 caractere, fără numele de utilizator sau adresa de e-mail.",
+      "pow_note": "Ca să țină roboții departe, browserul dvs. rezolvă o mică problemă de calcul la crearea contului. Durează câteva secunde.",
+      "submit": "Creare cont",
+      "done_title": "Verificați-vă e-mailul",
+      "done_text": "Am trimis un link de confirmare la adresa dvs. Deschideți-l pentru a crea contul, apoi autentificați-vă.",
+      "done_hint": "Linkul este valabil 24 de ore. Nu ați primit nimic? Verificați dosarul de spam sau cereți din nou e-mailul.",
+      "go_signin": "Mergeți la autentificare",
+      "legal_note": "Numele de utilizator, ratingurile și partidele dvs. vor fi publice. Prin crearea unui cont, acceptați condițiile de utilizare.",
+      "legal_link": "Confidențialitate și condiții de utilizare"
+    },
+    "forgot": {
+      "title": "Parolă uitată",
+      "text": "Introduceți adresa de e-mail a contului dvs. Dacă există un cont cu această adresă, vă trimitem un link pentru a alege o parolă nouă, valabil o oră.",
+      "submit": "Trimitere link"
+    },
+    "resend": {
+      "title": "Confirmați adresa de e-mail",
+      "text": "Nu ați primit e-mailul de confirmare sau linkul a expirat? Introduceți adresa pentru a primi unul nou.",
+      "submit": "Retrimitere"
+    },
+    "dash": {
+      "public_profile": "Profil public",
+      "signout": "Deconectare",
+      "tab_overview": "Prezentare generală",
+      "tab_games": "Partide",
+      "tab_devices": "Dispozitive",
+      "tab_settings": "Setări"
+    },
+    "overview": {
+      "info": "Informațiile dvs.",
+      "ratings": "Ratingurile dvs.",
+      "sanctions": "Sancțiuni",
+      "recent": "Ultimele partide",
+      "all_games": "Toate partidele dvs."
+    },
+    "games": {
+      "filter_category": "Ritm de joc",
+      "all": "Toate",
+      "custom": "Personalizat",
+      "filter_rated": "Tip",
+      "rated": "Cu rating",
+      "casual": "Amicale",
+      "filter_result": "Rezultat",
+      "wins": "Câștigate",
+      "losses": "Pierdute",
+      "draws": "Remize"
+    },
+    "devices": {
+      "title": "Dispozitive conectate",
+      "signout_all": "Deconectare peste tot",
+      "text": "Fiecare autentificare, în joc sau pe acest site, este un dispozitiv. Deconectați-le pe cele pe care nu le recunoașteți."
+    },
+    "settings": {
+      "challenges_title": "Provocări",
+      "challenges_text": "Alți jucători vă pot provoca din joc după numele de utilizator.",
+      "challenges_label": "Acceptare provocări",
+      "mfa_title": "Autentificare în doi pași",
+      "mfa_text": "Activați-o sau dezactivați-o și generați coduri de recuperare noi din pagina contului, în joc.",
+      "password_title": "Schimbare parolă",
+      "password_text": "Celelalte dispozitive ale dvs. sunt deconectate, iar acesta rămâne conectat.",
+      "password_submit": "Schimbare parolă",
+      "email_title": "Schimbare adresă de e-mail",
+      "email_submit": "Trimitere link de confirmare",
+      "export_title": "Descărcați datele mele",
+      "export_text": "Tot ce păstrează serverul despre contul dvs., într-un singur fișier JSON.",
+      "export_submit": "Descărcați datele mele",
+      "delete_title": "Ștergere cont",
+      "delete_text": "Această acțiune este ireversibilă. Partidele și ratingurile dvs. rămân, sub un nume anonim; adresa de e-mail, parola și dispozitivele dvs. sunt șterse.",
+      "delete_confirm": "Introduceți numele de utilizator pentru confirmare",
+      "delete_submit": "Ștergeți-mi contul"
+    }
+  },
+  "gif": {
+    "title": "GIF animat",
+    "preparing": "Se pregătește GIF-ul…",
+    "download": "Descărcare GIF",
+    "make": "Creare GIF",
+    "pause": "Întrerupere animație",
+    "back": "Înapoi la partidele mele",
+    "options": "Opțiuni",
+    "size": "Dimensiune",
+    "size_small": "Mică (284 × 350)",
+    "size_medium": "Medie (424 × 515)",
+    "size_large": "Mare (628 × 762)",
+    "orientation": "Tabla văzută de",
+    "orientation_white": "Albul",
+    "orientation_black": "Negrul",
+    "speed": "Viteză",
+    "speed_fast": "Rapidă (0,25 s pe mutare)",
+    "speed_normal": "Normală (0,5 s pe mutare)",
+    "speed_slow": "Lentă (1 s pe mutare)",
+    "speed_very_slow": "Foarte lentă (2 s pe mutare)",
+    "coords": "Afișare coordonate",
+    "regenerate": "Refacere GIF",
+    "note": "Serverul desenează fiecare GIF. Un GIF deja creat este disponibil imediat; cele noi sunt limitate la câteva pe minut."
+  },
+  "notfound": {
+    "title": "Pagina nu a fost găsită",
+    "text": "Acest câmp este gol. Este posibil ca pagina să se fi mutat.",
+    "home": "Înapoi la Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Se încarcă…",
+      "retry": "Reîncercare",
+      "close": "Închidere",
+      "copy": "Copiere",
+      "copied": "Copiat în clipboard.",
+      "copy_failed": "Copierea nu a reușit. Selectați textul și copiați-l manual.",
+      "load_more": "Afișați mai multe",
+      "show_password": "Afișare parolă",
+      "hide_password": "Ascundere parolă",
+      "signin_needed": "Autentificați-vă pentru a continua.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Serverul nu poate fi accesat. Verificați conexiunea și încercați din nou.",
+      "timeout": "Serverul a răspuns prea târziu. Încercați din nou.",
+      "server_busy": "Serverul este ocupat. Încercați din nou peste puțin timp.",
+      "rate_limited": "Prea multe cereri. Încercați din nou peste {time}.",
+      "rate_limited_short": "Prea multe cereri. Încercați din nou peste puțin timp.",
+      "internal_error": "Serverul a întâmpinat o eroare neașteptată. Încercați din nou mai târziu.",
+      "invalid_token": "Sesiunea dvs. a expirat. Vă rugăm să vă autentificați din nou.",
+      "unauthorized": "Vă rugăm să vă autentificați.",
+      "not_found": "Nu există pe server.",
+      "unknown": "A apărut o problemă ({code}).",
+      "invalid_credentials": "Nume de utilizator, adresă de e-mail sau parolă greșită.",
+      "too_many_attempts": "Prea multe încercări. Încercați din nou peste {time}.",
+      "banned": "Acest cont este suspendat până la {date}.",
+      "banned_permanent": "Acest cont este suspendat.",
+      "email_unverified": "Adresa dvs. de e-mail nu este încă confirmată. Deschideți linkul pe care vi l-am trimis sau cereți unul nou.",
+      "invalid_mfa_token": "Acest pas al autentificării a expirat. Vă rugăm să vă autentificați din nou.",
+      "invalid_code": "Cod greșit sau deja folosit.",
+      "mfa_code_required": "Introduceți codul de verificare.",
+      "invalid_password": "Parolă greșită.",
+      "password_not_set": "Acest cont nu are încă o parolă: folosiți „Ați uitat parola?” pe pagina de autentificare pentru a seta una.",
+      "registration_closed": "Serverul nu acceptă conturi noi în acest moment.",
+      "invalid_username": "Acest nume de utilizator nu este permis.",
+      "username_taken": "Acest nume de utilizator este deja folosit.",
+      "invalid_email": "Această adresă de e-mail nu este validă.",
+      "email_taken": "Această adresă de e-mail este deja folosită de un alt cont.",
+      "same_email": "Aceasta este deja adresa dvs. de e-mail.",
+      "weak_password": "Această parolă este prea slabă.",
+      "weak_too_short": "Parola este prea scurtă (număr minim de caractere: {min}).",
+      "weak_too_long": "Parola este prea lungă.",
+      "weak_contains_username": "Parola nu trebuie să conțină numele dvs. de utilizator.",
+      "weak_contains_email": "Parola nu trebuie să conțină adresa dvs. de e-mail.",
+      "weak_too_common": "Această parolă este folosită prea des. Alegeți alta.",
+      "pow_failed": "Verificarea anti-robot nu a reușit. Încercați din nou.",
+      "passwords_differ": "Cele două parole nu coincid.",
+      "required": "Completați acest câmp.",
+      "email_format": "Introduceți o adresă de e-mail validă.",
+      "username_format": "Număr de caractere: între {min} și {max}. Litere, cifre, _ și -, începând cu o literă sau o cifră.",
+      "password_length": "Număr minim de caractere: {min}.",
+      "confirm_name": "Introduceți numele de utilizator exact cum este afișat.",
+      "game_too_long": "Această partidă este prea lungă pentru a fi transformată în GIF.",
+      "gif_disabled": "Acest server nu creează GIF-uri.",
+      "render_failed": "Serverul nu a putut desena acest GIF.",
+      "invalid_game": "Această partidă nu există.",
+      "invalid_player": "Introduceți un nume de utilizator: între 2 și 24 de caractere (litere, cifre, _, . sau -).",
+      "player_not_found": "Niciun jucător cu acest nume.",
+      "sso_cancelled": "Autentificarea cu Google a fost anulată.",
+      "sso_mismatch": "Această autentificare cu Google nu a fost începută în această filă sau a fost deja folosită. Încercați din nou.",
+      "sso_expired": "Această autentificare cu Google a expirat. Încercați din nou.",
+      "invalid_verifier": "Această autentificare cu Google a fost începută în altă filă sau în alt browser. Reluați de pe această pagină.",
+      "sso_email_unverified": "Google nu a confirmat adresa de e-mail a acestui cont Google.",
+      "sso_account_exists": "Un cont folosește deja această adresă de e-mail, dar nu are o parolă prin care să poată fi asociat cu Google. Setați-i una cu „Ați uitat parola?”, apoi autentificați-vă din nou cu Google.",
+      "sso_failed": "Autentificarea cu Google nu a putut fi finalizată. Încercați din nou.",
+      "sso_disabled": "Autentificarea cu Google nu este disponibilă pe acest server.",
+      "sso_already_linked": "Acest cont Google este deja asociat cu un alt cont.",
+      "account_disabled": "Acest cont nu mai poate fi folosit.",
+      "sso_storage": "Browserul dvs. blochează stocarea datelor acestui site, de care are nevoie autentificarea cu Google. Permiteți-o sau autentificați-vă cu parola.",
+      "sso_url": "Serverul a răspuns cu o adresă Google neașteptată, așa că autentificarea cu Google a fost oprită."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} secundă",
+        "few": "{count} secunde",
+        "other": "{count} de secunde"
+      },
+      "minutes": {
+        "one": "{count} minut",
+        "few": "{count} minute",
+        "other": "{count} de minute"
+      }
+    },
+    "download": {
+      "exe": "Executabil",
+      "zip": "Arhivă ZIP",
+      "dmg": "Imagine de disc",
+      "archive": "Arhivă",
+      "file": "Fișier",
+      "unavailable": "Indisponibil",
+      "your_system": "Sistemul dvs.",
+      "eyebrow_release": "Versiunea {version}",
+      "published": "Publicată pe {date}",
+      "unreachable": "GitHub nu poate fi accesat acum: consultați pagina versiunilor.",
+      "available": "Disponibil",
+      "verify_file": "fișierul",
+      "no_build": "Deocamdată nu există nicio versiune a jocului pentru {os}.",
+      "x64": "64 de biți (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 de biți, Intel / AMD sau Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 sau mai nou",
+      "experimental": "Experimental"
+    },
+    "server": {
+      "online": "Disponibil",
+      "offline": "Inaccesibil",
+      "busy": "Ocupat",
+      "open": "Deschise",
+      "closed": "Închise",
+      "updated": "Actualizat {time}",
+      "min_games": "Numărul minim de partide cu rating în acest ritm de joc pentru a apărea în clasament: {count}.",
+      "empty": "Încă niciun jucător clasat în acest ritm de joc.",
+      "error": "Clasamentul nu poate fi încărcat acum."
+    },
+    "game": {
+      "number": "Partida nr. {id}",
+      "white": "Albul",
+      "black": "Negrul",
+      "you": "dvs.",
+      "vs": "contra",
+      "outcome_win": "Câștigată",
+      "outcome_loss": "Pierdută",
+      "outcome_draw": "Remiză",
+      "outcome_aborted": "Anulată",
+      "result_white": "Albul câștigă",
+      "result_black": "Negrul câștigă",
+      "result_draw": "Remiză",
+      "result_aborted": "Anulată",
+      "rated": "Cu rating",
+      "casual": "Amicală",
+      "custom": "Personalizat",
+      "moves": {
+        "one": "{count} mutare",
+        "few": "{count} mutări",
+        "other": "{count} de mutări"
+      },
+      "duration": "Durata: {time}",
+      "rating_diff": "Modificarea ratingului: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Descărcați partida în format PGN",
+      "copy_pgn": "Copiere",
+      "copy_pgn_title": "Copiați PGN-ul",
+      "gif": "GIF",
+      "gif_title": "Creați un GIF animat (se deschide o filă nouă)",
+      "gif_signin": "Autentificați-vă pentru a crea GIF-uri",
+      "pgn_copied": "PGN copiat în clipboard.",
+      "pgn_saved": "PGN descărcat.",
+      "none": "Încă nicio partidă. Partidele dvs. online vor apărea aici.",
+      "none_filtered": "Nicio partidă nu corespunde acestor filtre.",
+      "none_public": "Încă nicio partidă.",
+      "total": {
+        "one": "{count} partidă",
+        "few": "{count} partide",
+        "other": "{count} de partide"
+      },
+      "termination_unknown": "Partidă încheiată",
+      "reason": {
+        "1": "Șah mat",
+        "2": "Abandon",
+        "3": "Pierdere la timp",
+        "4": "A doua mutare ilegală (partidă pierdută)",
+        "5": "Pat",
+        "6": "Poziție moartă (material insuficient)",
+        "7": "Stegulețul a căzut, dar adversarul nu poate da mat",
+        "8": "Repetarea poziției de cinci ori",
+        "9": "Regula celor 75 de mutări",
+        "10": "Repetarea poziției de trei ori (cerută)",
+        "11": "Regula celor 50 de mutări (cerută)",
+        "12": "Remiză de comun acord",
+        "13": "A doua mutare ilegală, dar adversarul nu poate da mat",
+        "14": "Abandon, dar adversarul nu poate da mat",
+        "20": "Partidă părăsită (deconectare prea lungă)",
+        "21": "Partidă părăsită, dar adversarul nu poate da mat",
+        "22": "Partidă anulată",
+        "23": "Prima mutare nu a fost făcută la timp (anulată)",
+        "24": "Pierdere prin forfait (încălcarea regulilor de fair-play)",
+        "25": "Anulată de server",
+        "26": "Ambii jucători s-au deconectat"
+      }
+    },
+    "ratings": {
+      "category": "Ritm de joc",
+      "rating": "Rating",
+      "peak": "Maxim",
+      "games": "Partide",
+      "wdl": "V / R / Î",
+      "provisional": "Rating provizoriu",
+      "none": "Încă nicio partidă cu rating.",
+      "unrated_hint": "Un semn de întrebare indică un rating provizoriu (încă puține partide jucate)."
+    },
+    "account": {
+      "member_since": "Membru din {date}",
+      "last_login": "Ultima autentificare",
+      "created": "Cont creat",
+      "email": "Adresă de e-mail",
+      "pending_email": "Se așteaptă confirmarea: {email}",
+      "verified": "Confirmată",
+      "unverified": "Neconfirmată",
+      "mfa": "Autentificare în doi pași",
+      "mfa_on": "Activată",
+      "mfa_off": "Dezactivată",
+      "google": "Cont Google",
+      "google_on": "Asociat",
+      "google_off": "Neasociat",
+      "password": "Parolă",
+      "password_set": "Setată",
+      "password_unset": "Încă nesetată",
+      "challenges": "Provocări",
+      "challenges_all": "Acceptate",
+      "challenges_none": "Refuzate",
+      "badge_verified": "E-mail confirmat",
+      "badge_mfa": "Autentificare în doi pași",
+      "badge_google": "Google",
+      "ban_until": "Contul dvs. este suspendat până la {date}.",
+      "ban_permanent": "Contul dvs. este suspendat.",
+      "sanction_ban": "Suspendare",
+      "sanction_mm_block": "Căutare adversar blocată",
+      "sanction_warning": "Avertisment",
+      "sanction_until": "până la {date}",
+      "sanction_permanent": "fără termen",
+      "devices_current": "Acest dispozitiv",
+      "devices_unknown": "Dispozitiv fără nume",
+      "devices_signed_in": "Conectat pe {date}",
+      "devices_seen": "Ultima utilizare: {time}",
+      "devices_expires": "Expiră pe {date}",
+      "devices_revoke": "Deconectare",
+      "devices_revoked": "Dispozitivul a fost deconectat.",
+      "devices_none": "Niciun alt dispozitiv.",
+      "signout_all_confirm": "Deconectați toate dispozitivele, inclusiv pe acesta?",
+      "signed_out": "V-ați deconectat.",
+      "signed_in": "Bun venit, {name}.",
+      "prefs_saved": "Salvat.",
+      "password_changed": "Parola dvs. a fost schimbată. Celelalte dispozitive ale dvs. au fost deconectate.",
+      "email_sent": "Un link de confirmare a fost trimis la noua adresă. Adresa dvs. se schimbă când îl deschideți.",
+      "email_changed": "Adresa dvs. de e-mail este acum {email}.",
+      "email_current": "Adresa actuală: {email}.",
+      "email_pending": "Schimbarea adresei în {email} așteaptă confirmarea prin link.",
+      "export_done": "Datele dvs. au fost descărcate.",
+      "deleted": "Contul dvs. a fost șters.",
+      "delete_confirm_label": "Introduceți {name} pentru confirmare",
+      "register_done": "Am trimis un link de confirmare la {email}. Deschideți-l pentru a crea contul, apoi autentificați-vă.",
+      "register_ready": "Contul dvs. este gata. Vă puteți autentifica.",
+      "forgot_done": "Dacă există un cont cu această adresă, un link pentru alegerea unei parole noi este pe drum.",
+      "resend_done": "Dacă această adresă își așteaptă confirmarea, un link nou este pe drum.",
+      "pow_solving": "Se rezolvă problema anti-robot…",
+      "mfa_recovery": "Cod de recuperare",
+      "mfa_recovery_text": "Introduceți unul dintre codurile dvs. de recuperare. Fiecare cod funcționează o singură dată.",
+      "mfa_app": "Codul din aplicație",
+      "mfa_app_text": "Introduceți codul de 6 cifre din aplicația de autentificare.",
+      "mfa_state_on": "Autentificarea în doi pași este activată pentru acest cont.",
+      "mfa_state_off": "Autentificarea în doi pași este dezactivată pentru acest cont.",
+      "client_label": "Site-ul Scacelith ({browser})",
+      "username": "Nume de utilizator",
+      "password_rules": "Număr minim de caractere: {min}; fără numele de utilizator sau adresa de e-mail.",
+      "password_note": "Celelalte dispozitive ale dvs. sunt deconectate, iar acesta rămâne conectat.",
+      "signin_label": "Autentificare",
+      "google_link_text": "Contul {name} folosește deja această adresă de e-mail. Introduceți o singură dată parola acestuia pentru a-l asocia cu Google; după aceea, ajunge butonul „Autentificare cu Google”.",
+      "auth_foot_google": "Un singur cont pe serverul oficial, pentru joc și pentru acest site. L-ați creat cu Google în joc? Autentificați-vă și aici cu Google."
+    },
+    "players": {
+      "since": "Membru din {date}",
+      "games": "Partide",
+      "rated": "Cu rating",
+      "wins": "Victorii",
+      "draws": "Remize",
+      "losses": "Înfrângeri",
+      "view": "Vedeți profilul jucătorului {name}",
+      "you": "Dvs.",
+      "board": "Clasament"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partida nr. {id} · {date}",
+      "preparing": "Se pregătește GIF-ul…",
+      "rendering": "Serverul desenează GIF-ul. O partidă lungă poate dura câteva secunde…",
+      "ready": "GIF-ul dvs. este gata. Descărcarea a început.",
+      "ready_again": "GIF-ul dvs. este gata.",
+      "signin": "Autentificați-vă pentru a crea GIF-uri cu partidele dvs.",
+      "signin_button": "Autentificare",
+      "missing": "Nu a fost aleasă nicio partidă.",
+      "retry_in": "Puteți încerca din nou peste {time}.",
+      "confirm": "Apăsați „Creare GIF” pentru ca serverul să deseneze această partidă cu contul dvs.",
+      "retry_now": "Puteți încerca din nou acum."
+    },
+    "home": {
+      "create_account": "Creați un cont",
+      "my_account": "Contul meu",
+      "my_games": "Partidele mele",
+      "signin": "Autentificare"
+    },
+    "trailer": {
+      "title": "Trailerul Scacelith",
+      "notice": "Acest videoclip este găzduit de YouTube. Redarea lui aici încarcă playerul Google, care primește adresa dvs. IP și poate stoca cookie-uri sau alte instrumente de urmărire pe dispozitivul dvs.",
+      "accept": "Acceptare și redare",
+      "google_privacy": "Politica de confidențialitate Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Cadrul legal",
+    "title": "Informații legale, confidențialitate și condiții de utilizare",
+    "lead": "Cine publică și găzduiește Scacelith, ce se întâmplă cu datele dvs. pe acest site, în joc și pe serverul oficial, precum și regulile pentru a juca pe acesta.",
+    "updated": "Ultima actualizare: 11 octombrie 2026",
+    "toc": "Pe această pagină",
+    "notice": {
+      "title": "Informații legale",
+      "publisher_label": "Editor",
+      "publisher": "Scacelith este publicat de o persoană fizică, cu titlu neprofesional. Așa cum permite legislația franceză (art. 1-1 II din legea nr. 2004-575 din 21 iunie 2004), identitatea editorului nu este afișată aici; ea este cunoscută de furnizorul de găzduire.",
+      "contact_label": "Date de contact",
+      "contact": "Pentru orice întrebare despre acest site, serverul oficial sau datele dvs.",
+      "host_server": "Serverul oficial de joc și datele conturilor",
+      "host_server_note": "Servere în Franța.",
+      "host_site": "Acest site și documentația API (GitHub Pages)",
+      "host_domain": "Registrarul numelui de domeniu",
+      "licence_label": "Licență",
+      "licence": "Jocul și serverul său sunt software liber sub licența GNU General Public License v3, cu cod sursă public:",
+      "game_source": "jocul",
+      "server_source": "serverul",
+      "phone": "Telefon"
+    },
+    "privacy": {
+      "title": "Confidențialitate",
+      "intro": "Scacelith nu afișează publicitate, nu vinde date și nu măsoară audiența. Datele personale sunt folosite doar pentru funcționarea acestui site și a serverului oficial, așa cum este descris mai jos. Operatorul de date este editorul, care poate fi contactat la adresa de contact de mai sus.",
+      "site_title": "Pe acest site",
+      "site_hosting": "GitHub găzduiește site-ul și, ca orice furnizor de găzduire web, înregistrează adresele IP ale vizitatorilor în scopuri de securitate.",
+      "github_privacy": "Declarația de confidențialitate GitHub",
+      "site_requests": "Pentru a afișa cea mai nouă versiune, browserul dvs. interoghează API-ul GitHub (api.github.com); pentru a afișa starea serverului, clasamentul, jucătorii și contul dvs., interoghează serverul oficial (caissa.scacelith.com). Ambele primesc adresa dvs. IP, ca la orice cerere.",
+      "site_storage": "Site-ul nu setează cookie-uri și nu folosește instrumente de analiză a traficului. Păstrează în browserul dvs. doar limba aleasă și, după autentificare, sesiunea dvs.: numai pentru fila curentă sau pe acest dispozitiv, dacă bifați „Păstrați sesiunea deschisă”. O autentificare cu Google își păstrează, de asemenea, codurile de unică folosință în fila curentă, până când sunt folosite. Toate acestea sunt necesare pentru funcționarea site-ului și doar serverul oficial primește sesiunea și codurile.",
+      "site_trailer": "Trailerul este un videoclip YouTube. Nu se încarcă nimic de pe YouTube până când nu apăsați „Acceptare și redare”; YouTube (Google) primește atunci adresa dvs. IP și poate stoca cookie-uri sau alte instrumente de urmărire pe dispozitivul dvs. Răspunsul dvs. nu este memorat: întrebarea revine la următoarea vizită.",
+      "site_google": "Butonul „Autentificare cu Google” de pe pagina Cont nu încarcă nimic de la Google până când nu îl apăsați. Browserul dvs. merge atunci la pagina de autentificare Google (accounts.google.com), iar Google îl trimite înapoi pe acest site cu un cod de unică folosință, pe care site-ul îl transmite serverului oficial. Google primește adresa dvs. IP și ce introduceți pe pagina sa, conform propriei politici.",
+      "google_privacy": "Politica de confidențialitate Google",
+      "game_title": "În joc",
+      "game_local": "Jocul își păstrează setările, rezultatele dvs. locale și autentificarea pe calculatorul dvs. Autentificarea este păstrată în depozitul securizat al sistemului: DPAPI pe Windows, Keychain pe macOS, keyring-ul Secret Service pe Linux sau, în lipsa acestora, un fișier pe care numai contul dvs. de utilizator îl poate citi.",
+      "game_network": "Nu trimite nimic din proprie inițiativă: nicio telemetrie, nicio căutare de actualizări. Se conectează la serverul oficial doar când deschideți pagina de joc online, la Hugging Face doar când descărcați vocea antrenorului și, pentru un meci direct, la calculatorul adversarului, care află astfel adresa dvs. IP (jocul poate deschide și un port pe routerul dvs. prin UPnP).",
+      "account_title": "Contul dvs. pe serverul oficial",
+      "account_intro": "Crearea unui cont, în joc sau pe acest site, și jocul online trimit următoarele date către serverul oficial, găzduit de OVH în Franța:",
+      "data_account": "<strong>Cont:</strong> numele de utilizator, adresa de e-mail, parola (stocată doar ca hash Argon2id), secretul autentificării în doi pași (criptat) și codurile de recuperare (stocate ca hash), data înregistrării și data ultimei autentificări.",
+      "data_google": "<strong>Autentificare cu Google:</strong> Google trimite identificatorul contului dvs. Google, adresa dvs. de e-mail și numele dvs. Serverul păstrează identificatorul și adresa și folosește numele doar pentru a sugera un nume de utilizator.",
+      "data_sessions": "<strong>Dispozitive conectate:</strong> pentru fiecare autentificare, numele dispozitivului (versiunea jocului și sistemul, de exemplu „Scacelith/1.0.0 win64”, sau browserul și sistemul, pentru acest site), adresa IP și datele de utilizare.",
+      "data_games": "<strong>Partide și ratinguri:</strong> fiecare partidă online (jucători, mutări, timpul petrecut pe fiecare mutare, rezultat, date) și ratingurile dvs. În timpul unei partide, mișcările capului și ale mâinii dvs. sunt transmise în direct adversarului și nu sunt stocate niciodată.",
+      "data_security": "<strong>Jurnal de securitate:</strong> autentificări, încercări eșuate și modificări ale contului, cu adresa IP.",
+      "data_fairplay": "<strong>Fair-play:</strong> rapoartele făcute de dvs. sau despre dvs., cu comentariul lor; partidele părăsite și cele ratate; sancțiunile; și verificările efectuate asupra partidelor, de la mutări falsificate sau imposibile până la statisticile motorului Stockfish.",
+      "basis_title": "De ce și pe ce temei juridic",
+      "basis_contract": "Funcționarea contului dvs. și a jocului online (autentificare, meciuri, ratinguri, înregistrările partidelor, e-mailurile trimise de serviciu): serviciul la care vă înscrieți (art. 6 alin. (1) lit. (b) din RGPD).",
+      "basis_security": "Protejarea conturilor și a serverului și asigurarea corectitudinii partidelor (jurnal de securitate, adrese IP, verificări de fair-play, sancțiuni): interesul legitim al editorului și al jucătorilor (art. 6 alin. (1) lit. (f) din RGPD).",
+      "basis_trailer": "Redarea trailerului de pe YouTube: consimțământul dvs., dat prin buton (art. 6 alin. (1) lit. (a) din RGPD).",
+      "public_title": "Ce poate vedea oricine",
+      "public": "Numele de utilizator, data înregistrării, ratingurile și lista completă a partidelor dvs., cu fiecare mutare, sunt publice: pe acest site, prin API-ul serverului și în PGN-ul fiecărei partide. Adresa de e-mail, dispozitivele, autentificările, sancțiunile și datele de fair-play nu sunt afișate niciodată. Puteți refuza provocările directe, dar partidele nu pot fi ascunse.",
+      "auto_title": "Decizii automate",
+      "auto": "Unele încălcări ale protocolului jocului, precum un mesaj falsificat sau o mutare imposibilă în poziția respectivă, sunt dovezi sigure de trișare: serverul declară atunci partida pierdută prin forfait, suspendă contul timp de 24 de ore, îl elimină din clasament și restituie adversarilor punctele pierdute în fața lui în ultimele 60 de zile. Trei partide părăsite, anulate sau ratate în 24 de ore suspendă căutarea de adversar pentru partidele cu rating timp de 15 minute, apoi mai mult. Statisticile motorului nu duc niciodată singure la o sancțiune: decide o persoană. Puteți cere reexaminarea oricărei decizii la adresa de contact.",
+      "recipients_title": "Cine primește datele dvs.",
+      "recipient_ovh": "OVH SAS găzduiește serverul și datele acestuia, în Franța.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, Franța) trimite e-mailurile serverului: primește adresa dvs., numele de utilizator și mesajul.",
+      "recipient_google": "Google primește ce îi trimite browserul dvs. atunci când alegeți să vă autentificați cu Google, conform propriei politici de confidențialitate.",
+      "recipient_staff": "Administratorul și moderatorii serverului văd datele conturilor și datele de fair-play pentru a asigura funcționarea serviciului.",
+      "recipient_players": "Ceilalți jucători văd ce este public, iar adversarul dvs. vede mutările și mișcările dvs. în timpul unei partide.",
+      "recipient_none": "Nimeni altcineva: nicio dată nu este vândută, închiriată sau folosită în scopuri publicitare.",
+      "transfers": "Datele conturilor rămân în Franța. GitHub, Google și Porkbun (care redirecționează mesajele trimise la adresa de contact) au sediul în Statele Unite: ce primesc intră sub incidența propriilor politici și a garanțiilor lor pentru transferurile în afara Uniunii Europene.",
+      "retention_title": "Cât timp sunt păstrate",
+      "ret_account": "<strong>Cont:</strong> până când îl ștergeți. O înregistrare a cărei adresă nu este confirmată niciodată este ștearsă după 24 de ore.",
+      "ret_sessions": "<strong>Dispozitive conectate:</strong> până la deconectare, după 30 de zile fără utilizare și după cel mult 90 de zile.",
+      "ret_ip": "<strong>Adrese IP:</strong> șterse după 30 de zile. Jurnalele serverului păstrează doar adrese trunchiate.",
+      "ret_security": "<strong>Jurnal de securitate:</strong> 90 de zile.",
+      "ret_conduct": "<strong>Partide părăsite și ratate:</strong> 30 de zile.",
+      "ret_games": "<strong>Partide și ratinguri:</strong> atât timp cât serverul își păstrează înregistrările partidelor, care sunt și înregistrările adversarilor dvs. După ștergerea contului, numele dvs. din ele este înlocuit cu „deleted#” urmat de un număr.",
+      "ret_fairplay": "<strong>Sancțiuni, rapoarte și rezultate ale verificărilor de fair-play:</strong> păstrate, astfel încât jucătorii suspendați să nu poată reveni pur și simplu, iar ceilalți jucători să rămână protejați. După ștergerea contului, acestea rămân legate doar de numărul său.",
+      "ret_backups": "<strong>Copii de rezervă:</strong> datele șterse pot rămâne pentru scurt timp în copia de rezervă a serverului, până când aceasta este înlocuită.",
+      "ret_contact": "<strong>Mesajele trimise la adresa de contact:</strong> atât timp cât este necesar pentru a le răspunde.",
+      "rights_title": "Drepturile dvs.",
+      "rights": "Vă puteți accesa, rectifica, șterge și exporta datele, puteți restricționa utilizarea lor și vă puteți opune acesteia (art. 15–21 din RGPD).",
+      "rights_self": "Cele mai multe dintre acestea se fac din contul dvs., în joc sau pe pagina Cont a acestui site: descărcați datele contului într-un fișier JSON, schimbați adresa de e-mail sau parola, deconectați celelalte dispozitive sau ștergeți imediat contul.",
+      "rights_google": "Un cont creat cu Google nu are parolă: pentru a-l exporta sau a-l șterge, setați-i mai întâi una cu „Ați uitat parola?”.",
+      "rights_mail": "Pentru orice altceva, inclusiv pentru datele pe care exportul nu le conține (verificări de fair-play, rapoarte despre dvs.), scrieți la adresa de contact. Veți primi un răspuns în termen de o lună.",
+      "rights_cnil": "Dacă considerați că drepturile dvs. nu sunt respectate, puteți depune o plângere la CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, Franța) sau la autoritatea pentru protecția datelor din țara dvs.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Condiții de utilizare",
+      "intro": "Aceste condiții se aplică serverului oficial (caissa.scacelith.com) și paginilor de cont ale acestui site. Crearea unui cont sau jocul pe serverul oficial înseamnă acceptarea lor.",
+      "service": "<strong>Un serviciu gratuit.</strong> Jocul este software liber și gratuit. Serverul oficial este oferit gratuit și ca atare, fără nicio garanție de disponibilitate: se poate schimba, se poate opri temporar sau se poate închide.",
+      "account": "<strong>Contul dvs.</strong> Vă revine răspunderea pentru ce se face cu el și pentru păstrarea secretă a parolei sale. Scrieți imediat la adresa de contact dacă credeți că altcineva îl folosește.",
+      "username": "<strong>Numele dvs. de utilizator</strong> este public: nu trebuie să fie jignitor sau să incite la ură, să uzurpe identitatea altcuiva ori să dezvăluie datele personale ale cuiva.",
+      "fair": "<strong>Fair-play.</strong> În timpul unei partide cu rating, niciun ajutor de la un motor de șah, de la o altă persoană sau de la orice alt instrument. Niciun client de joc modificat, niciun mesaj falsificat și nicio supraîncărcare deliberată a serverului.",
+      "conduct": "<strong>Terminați-vă partidele.</strong> Părăsirea sau anularea unor partide ori ratarea partidelor care v-au fost atribuite, de trei ori în 24 de ore, suspendă pentru o vreme căutarea de adversar pentru partidele cu rating.",
+      "reports": "<strong>Rapoartele</strong> trebuie făcute cu bună-credință. Pentru a raporta un jucător sau un conținut ilegal, precum un nume de utilizator jignitor, folosiți butonul de raportare al unei partide sau scrieți la adresa de contact.",
+      "sanctions": "<strong>Sancțiuni.</strong> Încălcarea acestor reguli poate duce la pierderea partidei prin forfait, la un avertisment, la suspendarea contului și la eliminarea din clasament; punctele pierdute în fața unui trișor sunt restituite adversarilor acestuia. Doar dovezile sigure de trișare sunt sancționate automat; orice altceva este decis de o persoană. Puteți contesta o sancțiune la adresa de contact.",
+      "liability": "<strong>Răspundere.</strong> În limitele permise de lege, editorul nu răspunde pentru întreruperile serviciului sau pentru pierderea partidelor, a ratingurilor ori a datelor.",
+      "end": "<strong>Încetare.</strong> Vă puteți șterge contul oricând. Un cont care încalcă aceste condiții poate fi suspendat.",
+      "changes": "<strong>Modificări.</strong> Aceste condiții se pot schimba; data din partea de sus a acestei pagini indică versiunea în vigoare, iar continuarea jocului după o modificare înseamnă acceptarea acesteia.",
+      "law": "<strong>Legea aplicabilă.</strong> Aceste condiții sunt guvernate de legea franceză. În caz de litigiu, scrieți mai întâi la adresa de contact pentru a găsi împreună o soluție."
+    },
+    "version_note": "Această pagină există în mai multe limbi; dacă versiunile diferă, prevalează versiunea în limba franceză."
+  }
+}
