@@ -74,7 +74,7 @@ lesson.welcome.light = Narożne pole po twojej {@}prawej stronie jest zawsze jas
 lesson.welcome.files = Pionowe linie to kolumny. Oznaczamy je literami, od {@}a do {@2}h.
 lesson.welcome.files.spoken = Pionowe linie to kolumny. Oznaczamy je literami, od {@}a do {@2}ha.
 lesson.welcome.ranks = Poziome linie to rzędy. Mają numery od {@}jednego do {@2}ośmiu, licząc od twojej strony.
-lesson.welcome.square = Każde pole nazywamy jego literą, a potem numerem. To jest pole {sq}.
+lesson.welcome.square = Nazwa każdego pola to najpierw litera, potem numer. To jest pole {sq}.
 lesson.welcome.square2 = A to jest pole {sq}.
 lesson.welcome.kings = Oto dwa króle. Twój stoi na {sq}, mój na {sq2}.
 lesson.welcome.ask = Twoja kolej: przesuń króla o jedno pole do przodu, na {sq}.
@@ -156,7 +156,7 @@ lesson.safety.watch = Zobacz, co się stanie.
 lesson.safety.gave = Twój hetman, wart dziewięć, poszedł za mojego skoczka, wartego trzy.
 lesson.safety.other = Spróbuj zbić drugą bierkę.
 lesson.safety.look = Poszukaj bierki, której nic nie broni.
-lesson.safety.ok = Doskonale! Zawsze się zastanów: czy ta bierka jest broniona?
+lesson.safety.ok = Doskonale! Zawsze zadawaj sobie pytanie: czy ta bierka jest broniona?
 
 # ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
 lesson.danger.rank = Moja wieża kontroluje cały drugi rząd.
@@ -164,7 +164,7 @@ lesson.danger.rule = Król nigdy nie może wejść na pole, na którym mógłby 
 lesson.danger.ask = Przesuń króla na bezpieczne pole.
 lesson.danger.ok = Dobrze. Tam twój król jest bezpieczny.
 lesson.check.what = Moja wieża atakuje twojego króla. To się nazywa szach.
-lesson.check.must = Kiedy jesteś pod szachem, musisz od razu wyjść spod szacha.
+lesson.check.must = Kiedy jesteś pod szachem, musisz od razu się spod niego wydostać.
 lesson.check.ways = Są trzy sposoby: {@}ruszyć królem, {@2}zasłonić się albo {@3}zbić atakującą bierkę.
 lesson.check.ask = Tutaj wyprowadź króla spod szacha.
 lesson.check.file = Pole {to} jest wciąż na kolumnie {@}mojej wieży. Zejdź z tej linii.
@@ -180,7 +180,7 @@ lesson.capture.king_ok = Tak! Mój hetman nie miał obrony, więc twój król m�
 lesson.capture.knight_ok = Tak! Twój skoczek usunął atakującą bierkę.
 
 # ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
-lesson.mate1.what = Mat: król jest pod szachem i nie ma żadnego wyjścia. Mat wygrywa partię.
+lesson.mate1.what = Mat: król jest pod szachem i nie ma żadnego wyjścia. Tak wygrywa się partię.
 lesson.mate1.stuck = Mój król jest uwięziony za {@}własnymi pionkami.
 lesson.mate1.ask = Daj mi mata w jednym ruchu!
 lesson.mate1.wrong = Blisko! Daj szacha na mojej ostatniej linii, skąd mój król nie ucieknie.

@@ -40,8 +40,7 @@ ch.intro.kq = Valdovė ir karalius prieš karalių. {n:position}: paskelbk matą
 ch.intro.kr = Bokštas ir karalius prieš karalių. {n:position}: paskelbk matą mano karaliui, žingsnis po žingsnio.
 ch.intro.kp = Karalius ir pėstininkas prieš karalių. {n:position}: paversk pėstininką valdove. Kelią tegul rodo karalius.
 ch.intro.kp_hold = Sustabdyk pėstininką. {n:position}: turi tik karalių. Išlaikyk lygiąsias.
-ch.intro.rook = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Philidoro gynyba.
-ch.intro.rook.spoken = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Filidoro gynyba.
+ch.intro.rook = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Filidoro gynyba.
 ch.intro.endgame = Taktika endšpilyje. {n:position}, kur figūrų mažai, o idėjos aštrios.
 
 # ---- At each position: the task --------------------------------------------------------------------
