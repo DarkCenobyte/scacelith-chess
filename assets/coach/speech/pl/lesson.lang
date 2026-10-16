@@ -32,7 +32,7 @@ lesson.now_you.2 = Teraz twoja kolej.
 lesson.now_you.3 = Teraz ty.
 # Another wrong move after the demonstration.
 lesson.almost = Prawie! Zagraj ruch, który ci pokazałem.
-lesson.almost.2 = Nie całkiem. Spróbuj ruchu, który zademonstrowałem.
+lesson.almost.2 = Nie do końca. Spróbuj ruchu, który zademonstrowałem.
 lesson.almost.3 = Blisko. Przypomnij sobie, co przed chwilą pokazałem.
 # A wrong move without a line of its own.
 lesson.try_again = To nie to. Spróbuj jeszcze raz.
@@ -114,10 +114,12 @@ lesson.king.wrong = Twój król stoi tuż obok {my:gen}. Wejdź na {my:its} pole
 lesson.king.ok = Dobrze! Król jest powolny, ale z bliska silny.
 # Knight
 lesson.knight.intro = To jest {your}. Porusza się w kształcie litery L: dwa pola prosto, potem jedno w bok.
+lesson.knight.intro.spoken = To jest {your}. Porusza się w kształcie litery el: dwa pola prosto, potem jedno w bok.
 lesson.knight.l = O, {@}tak. Skoczek zawsze ląduje na polu innego koloru.
 lesson.knight.jump = Skoczek to jedyna bierka, która potrafi przeskakiwać nad innymi.
 lesson.knight.ask = Zbij {my:acc} skoczkiem!
 lesson.knight.wrong = To prawidłowy ruch skoczka, ale nie dochodzi do {my:gen}. Spróbuj innego „L”.
+lesson.knight.wrong.spoken = To prawidłowy ruch skoczka, ale nie dochodzi do {my:gen}. Spróbuj innego el.
 lesson.knight.ok = Świetny skok!
 # Pawn: moving
 lesson.pawn.intro = Teraz {your}. Porusza się prosto do przodu, o jedno pole, i nigdy do tyłu.
@@ -252,7 +254,7 @@ lesson.talk.flag = Jeśli skończy ci się czas, przegrywasz, chyba że nie mam 
 lesson.talk.increment = Pięć plus trzy oznacza po pięć minut dla każdego i trzy sekundy więcej po każdym ruchu.
 # Blitz, rapid and classical as Polish players and PZSzach name them (blitz, szachy szybkie, szachy
 # klasyczne); the time-control menu of assets/i18n/pl.lang may show them as short labels.
-lesson.talk.speeds = Krótkie partie to blitz, dłuższe – szachy szybkie, a najdłuższe – szachy klasyczne.
+lesson.talk.speeds = Krótkie partie to blitz, dłuższe – partie szybkie, a najdłuższe – klasyczne.
 lesson.talk.no_clock = Ze mną zegar jest wyłączony. Myśl tak długo, jak potrzebujesz.
 lesson.talk.touch = W prawdziwej partii, jeśli dotkniesz swojej bierki, musisz nią zagrać.
 lesson.talk.touch_mine = Jeśli dotkniesz mojej bierki, musisz ją zbić, o ile to możliwe.

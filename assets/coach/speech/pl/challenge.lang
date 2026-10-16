@@ -81,7 +81,7 @@ ch.last.2 = A teraz ostatnia.
 ch.good = Dobrze.
 ch.good.2 = Tak.
 ch.good.3 = Zgadza się.
-ch.good.4 = Właśnie.
+ch.good.4 = Dokładnie.
 # The position is solved.
 ch.solved = To jest to! Brawo.
 ch.solved.2 = Dokładnie tak.
@@ -98,7 +98,7 @@ ch.wrong.reply.2 = Nie całkiem: zagrałbym {move}.
 ch.wrong.reply.3 = Wtedy zagrałbym {move}.
 ch.wrong.mate = Uważaj: ruch {move:nomate} dałby mata.
 ch.wrong.mate.2 = Ostrożnie: odpowiedziałbym {move:nomate} i to byłby mat.
-ch.wrong.mated = Uważaj: po {move} mogę dać ci forsownego mata w {m:move_loc}.
+ch.wrong.mated = Uważaj: po {move} mogę wymusić mata w {m:move_loc}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = To też daje mata, ale trwa dłużej. Jest szybsza droga.
 # A move that mates just as fast, but is not the solution the coach answers.
@@ -108,7 +108,7 @@ ch.wrong.weaker = Nieźle, ale jest coś silniejszego. Popatrz jeszcze raz.
 ch.wrong.weaker.2 = Tak można grać, ale stać cię na więcej.
 ch.wrong.stalemate = Pat! Mój król nie może się ruszyć, a to tylko remis.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
-ch.wrong.draw = Nie ten ruch: po {move} utrzymam remis.
+ch.wrong.draw = Nie ten ruch: po {move} mogę utrzymać remis.
 ch.wrong.loses = Uważaj: po {move} to ja bym wygrywał.
 # No answer from the engine: the move is simply not the one.
 ch.wrong.plain = To nie to.

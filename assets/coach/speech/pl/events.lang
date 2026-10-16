@@ -75,7 +75,7 @@ event.encourage.mistake.2 = Nie martw się. Sprawdź, co atakuje mój ostatni ru
 event.encourage.mistake.3 = To zdarza się każdemu szachiście. Grajmy dalej.
 # The player is behind (material or evaluation).
 event.encourage.behind = Nie poddawaj się: szukaj szans i nie ułatwiaj mi zadania.
-event.encourage.behind.2 = Walcz dalej. Takie pozycje wciąż mogą się odwrócić.
+event.encourage.behind.2 = Walcz dalej. W takich pozycjach wszystko może się jeszcze odwrócić.
 event.encourage.behind.3 = Zachowaj spokój i szukaj moich słabości.
 # The player has played several good moves in a row.
 event.encourage.well = Zanim wykonasz ruch, sprawdzasz moje groźby. Brawo.
@@ -106,6 +106,6 @@ event.end.handshake = Podajmy sobie ręce.
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it
 # comes after a colon, or in quotes after "na temacie" (a quoted title keeps its nominative).
 event.lesson.resume = Witaj z powrotem! Kontynuujemy: {chapter}.
-event.lesson.resume.2 = Witaj ponownie! Zatrzymaliśmy się na temacie „{chapter}”.
+event.lesson.resume.2 = Witaj ponownie! Skończyliśmy na rozdziale „{chapter}”.
 event.lesson.next = Dalej: {chapter}.
 event.lesson.next.2 = A teraz: {chapter}.

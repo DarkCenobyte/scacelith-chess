@@ -49,9 +49,9 @@ an.mate_allowed.2 = Teraz jest forsowny mat w {m:move_loc}: pierwszy ruch to {re
 an.fork = Teraz {reply} bierze w widełki {t1:acc} i {t2:acc}.
 an.fork.2 = Ten ruch pozwala na {reply} z atakiem naraz na {t1:acc} i {t2:acc}.
 an.fork.3 = {reply} atakuje jednocześnie {t1:acc} i {t2:acc}.
-an.hanging = Ten ruch zostawia {piece:acc} bez obrony i {reply} {piece:pron_acc} zbija.
-an.hanging.2 = {piece} zostaje bez obrońcy: {reply} {piece:pron_acc} zdobywa.
-an.hanging.3 = {reply} po prostu zbija {piece:acc}, {piece:rel_gen} nic nie broniło.
+an.hanging = Ten ruch zostawia {piece:acc} bez obrony i przeciwnik {piece:pron_acc} zbija: {reply}.
+an.hanging.2 = {piece} zostaje bez obrońcy: po {reply} przepada.
+an.hanging.3 = {reply} i {piece} po prostu przepada: nic {piece:pron_gen} nie broniło.
 an.material = Odpowiedź {line} wygrywa {pts:point_acc} materiału.
 an.material.2 = Potem {line} wygrywa {pts:point_acc}.
 
@@ -90,15 +90,15 @@ an.only.best.2 = Precyzyjnie: ruch {move} jest dużo silniejszy od wszystkich in
 
 # ---- Smaller remarks, in quiet moments -------------------------------------------------------------
 an.inaccuracy = {move} to mała niedokładność: dokładniejszy był ruch {best}.
-an.inaccuracy.2 = Nie całkiem najlepiej: ruch {best} był dokładniejszy niż {move}.
+an.inaccuracy.2 = Nie do końca najlepszy wybór: ruch {best} był dokładniejszy niż {move}.
 an.interesting = {move} to ciekawy pomysł: poświęcenie {piece:gen}.
 an.interesting.2 = Ciekawa próba: {move} oddaje {piece:acc}.
 
 # ---- A forced mate appears -----------------------------------------------------------------------------
 an.mate_on.white = Białe mają teraz forsowny mat w {m:move_loc}.
-an.mate_on.white.2 = Od tego momentu białe mogą dać forsownego mata w {m:move_loc}.
+an.mate_on.white.2 = Od tego momentu białe mogą wymusić mata w {m:move_loc}.
 an.mate_on.black = Czarne mają teraz forsowny mat w {m:move_loc}.
-an.mate_on.black.2 = Od tego momentu czarne mogą dać forsownego mata w {m:move_loc}.
+an.mate_on.black.2 = Od tego momentu czarne mogą wymusić mata w {m:move_loc}.
 
 # ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
 an.end.mate.white = Mat. Białe wygrywają partię.

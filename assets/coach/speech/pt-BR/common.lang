@@ -336,7 +336,17 @@ move.mate.spoken = {move}, xeque-mate
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the voice misreads (src/coach/catalog.h).
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h; the findings are in
+# docs/PRONUNCIATION.md). The voice is the European Portuguese one: these only fix a wrong reading,
+# they do not try for a Brazilian accent. An initial "x" is unstable: often right in "xeque" alone,
+# but "s" in "xeque-mate" ("sec mate"), "xeques" ("sex"), "um xeque" and "xadrez" ("sadrez"): "ch"
+# is the same sound and always read right ("xeque" in "xeque-mate" is a word of its own, so one key
+# covers both). "en passant" is said "em passante", with the t: the French nasals instead.
+respell.xeque = cheque
+respell.xeques = cheques
+respell.xadrez = chadrez
+respell.en = ã
+respell.passant = passã
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, Brazilian forms (dezesseis, dezessete, dezenove, quatorze). 21-99 compose as
