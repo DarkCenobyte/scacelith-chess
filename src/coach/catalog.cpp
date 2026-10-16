@@ -408,7 +408,8 @@ std::string Catalog::pattern(Ctx& c, const std::string& key, const std::vector<L
 
 namespace {
 // True when text appended to 'out' starts a sentence (capitalise a placeholder's first letter).
-bool atSentenceStart(const std::string& out) {
+// Greek writes its question mark as ';' (U+037E normalises to U+003B).
+bool atSentenceStart(const std::string& out, bool greek) {
     std::u32string t = uni::decode(out);
     size_t i = t.size();
     while (i > 0 && (t[i - 1] == ' ' || t[i - 1] == 0x200E || t[i - 1] == 0x00A1 || t[i - 1] == 0x00BF ||
@@ -416,7 +417,7 @@ bool atSentenceStart(const std::string& out) {
         --i;
     if (i == 0) return true;
     char32_t p = t[i - 1];
-    return p == '.' || p == '!' || p == '?' || p == '\n' || p == 0x2026;
+    return p == '.' || p == '!' || p == '?' || p == '\n' || p == 0x2026 || p == 0x037E || (greek && p == ';');
 }
 
 std::string capitalizeFirst(const std::string& s, bool turkic) {
@@ -471,7 +472,7 @@ std::string Catalog::expand(Ctx& c, const std::string& tmpl, const std::vector<L
         std::string value = renderArg(c, *a, form);
         bool capitalise = a->kind == Arg::Kind::Piece || a->kind == Arg::Kind::Text || a->kind == Arg::Kind::Opening;
         // Only at the top level: a nested text is inserted inside the parent's sentence.
-        if (capitalise && top && atSentenceStart(out)) value = capitalizeFirst(value, c.lang == "tr");
+        if (capitalise && top && atSentenceStart(out, c.lang == "el")) value = capitalizeFirst(value, c.lang == "tr");
         if (top && c.out) c.out->anchors.push_back({name, int(out.size())});
         out += value;
     }

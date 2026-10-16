@@ -1,0 +1,442 @@
+# Coach speech (Greek): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "εσύ"; the player's gender is unknown: no adjective
+# or participle about the player ("έτοιμος", "σίγουρος", "κερδισμένος"); verbs instead ("Κέρδισες!",
+# "κέρδιζες", "Πάμε για την επόμενη;"), or a noun ("κερδισμένη θέση" agrees with θέση).
+# Names inserted by {text}, {theme}, {level} (written to fit every line that inserts them):
+#   appraisal.phase.*   neuter, with their article ("το άνοιγμα"); "{text:se}" = "στο άνοιγμα",
+#                       "{text:gen}" = "του ανοίγματος" (defined in common.lang).
+#   appraisal.reason.*  a complement after "Ισοπαλία, {text}." ("με τριπλή επανάληψη").
+#   theme.*             a "να" clause in the habitual aspect ("να κοιτάς όλη τη σκακιέρα πριν
+#                       παίξεις"), said after a colon or after "προσπάθησε".
+#   appraisal.level.*   the coach page's level name in « », said after "επίπεδο":
+#                       "στο επίπεδο «Αρχάριος»".
+# {opening} = the opening's name without article, as Greek players say it ("Παίξαμε Σικελική
+# Άμυνα."); {opening:def} is not used, so the lines do not depend on the case of its article.
+# Move numbers: "στην κίνηση {n}" (spoken as a neuter number). A move: "το {move}" (the commentators'
+# neuter) or "την κίνηση {move}". Accuracy: "{acc:percent}" = "85%", spoken "ογδόντα πέντε τοις εκατό".
+# A Greek question mark ";" does not start a sentence for the program: no piece, phase or opening
+# placeholder right after one.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = το άνοιγμα
+appraisal.phase.middlegame = το μέσο παιχνίδι
+appraisal.phase.endgame = το φινάλε
+appraisal.reason.stalemate = με πατ
+appraisal.reason.material = αφού κανείς δεν μπορούσε να κάνει ματ
+appraisal.reason.repetition = με επανάληψη της θέσης
+appraisal.reason.fifty = με τον κανόνα των πενήντα κινήσεων
+appraisal.reason.agreement = με κοινή συμφωνία
+appraisal.reason.other = χωρίς νικητή
+# The coach page's level names (coach.level.<n>.name of assets/i18n/el.lang), in guillemets.
+appraisal.level.l1 = «Πρώτα βήματα»
+appraisal.level.l2 = «Αρχάριος»
+appraisal.level.l3 = «Σε πρόοδο»
+appraisal.level.l4 = «Παίκτης συλλόγου»
+appraisal.level.l5 = «Δυνατός παίκτης συλλόγου»
+appraisal.level.l6 = «Ειδικός»
+# What to practise, after "Κάτι για εξάσκηση:" and after "προσπάθησε" (a "να" clause, no full stop).
+theme.general = να κοιτάς όλη τη σκακιέρα πριν παίξεις
+theme.mate_allowed = να ελέγχεις την ασφάλεια του βασιλιά σου πριν από κάθε κίνηση
+theme.mate_missed = να ψάχνεις για ματ, ξεκινώντας από τα σαχ
+theme.stalemate = να αφήνεις ένα τετράγωνο στον βασιλιά μου όταν κερδίζεις
+theme.fork = να προσέχεις τις διπλές επιθέσεις
+theme.discovered = να προσέχεις τις κρυφές επιθέσεις πίσω από τα κομμάτια μου
+theme.skewer = να μη βάζεις πολύτιμα κομμάτια στην ίδια ευθεία
+theme.pin = να εντοπίζεις τα καρφώματα πριν συμβούν
+theme.trapped = να αφήνεις στα κομμάτια σου δρόμο διαφυγής
+theme.back_rank = να δίνεις στον βασιλιά σου ένα τετράγωνο διαφυγής
+theme.hanging = να κρατάς τα κομμάτια σου προστατευμένα
+theme.exchange = να μετράς πόσα κομμάτια επιτίθενται και πόσα προστατεύουν πριν ανταλλάξεις
+theme.missed_capture = να ψάχνεις πρώτα για κομμάτια που μπορείς να πάρεις δωρεάν
+theme.missed_fork = να ψάχνεις για δικές σου διπλές επιθέσεις
+theme.promotion = να υπολογίζεις τις κούρσες των πιονιών, με τον κανόνα του τετραγώνου
+theme.king_safety = να κρατάς τον βασιλιά σου σε ασφάλεια πίσω από τα πιόνια του
+theme.bad_trade = να διαλέγεις ποια κομμάτια θα ανταλλάξεις
+theme.opening = να αναπτύσσεις τα κομμάτια σου και να κάνεις νωρίς ροκέ
+theme.endgame = να χρησιμοποιείς τον βασιλιά σου και να προωθείς τα ελεύθερα πιόνια
+theme.positional = να βελτιώνεις το χειρότερο κομμάτι σου
+theme.material = να ελέγχεις, πριν παίξεις, τι μπορούν να κερδίσουν οι επόμενες κινήσεις μου
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Σαχ ματ! Κέρδισες. Έπαιξες πολύ καλά!
+appraisal.open.win.b1.2 = Κέρδισες! Μπράβο που έφερες την παρτίδα ως το τέλος.
+appraisal.open.win.b1.3 = Με νίκησες! Ήταν πραγματικά πολύ καλή παρτίδα.
+appraisal.open.win.b2 = Μπράβο! Κέρδισες σε {moves:move}.
+appraisal.open.win.b2.2 = Συγχαρητήρια, κέρδισες!
+appraisal.open.win.b2.3 = Νίκη σε {moves:move}. Ωραία δουλειά!
+appraisal.open.win.b3 = Συγχαρητήρια, μια νίκη με το σπαθί σου.
+appraisal.open.win.b3.2 = Έπαιξες καλά. Την άξιζες αυτή τη νίκη.
+appraisal.open.win.b3.3 = Ωραία νίκη. Συγχαρητήρια.
+appraisal.open.win.b4 = Ωραία νίκη.
+appraisal.open.win.b4.2 = Μπράβο, άξια νίκη.
+appraisal.open.win.b4.3 = Καλή νίκη.
+appraisal.open.win.b5 = Καλά έπαιξες.
+appraisal.open.win.b5.2 = Κέρδισες ωραία.
+appraisal.open.win.b5.3 = Καλή παρτίδα, άξια νίκη.
+appraisal.open.win.b6 = Καλά έπαιξες.
+appraisal.open.win.b6.2 = Καθαρή νίκη.
+appraisal.open.win.b6.3 = Καλή παρτίδα.
+appraisal.open.draw.b1 = Ισοπαλία! Κανείς μας δεν κατάφερε να κερδίσει αυτή τη φορά.
+appraisal.open.draw.b1.2 = Ισοπαλία. Ήταν μια πολύ ισορροπημένη παρτίδα!
+appraisal.open.draw.b1.3 = Ισοπαλία: μοιραζόμαστε τον βαθμό. Καλά έπαιξες!
+appraisal.open.draw.b2 = Ισοπαλία: ένα δίκαιο αποτέλεσμα.
+appraisal.open.draw.b2.2 = Φέραμε ισοπαλία. Ωραία μάχη!
+appraisal.open.draw.b2.3 = Ισοπαλία, και μια ωραία παρτίδα.
+appraisal.open.draw.b3 = Ισοπαλία. Και οι δύο πλευρές είχαν ευκαιρίες.
+appraisal.open.draw.b3.2 = Δίκαιη ισοπαλία.
+appraisal.open.draw.b3.3 = Ισοπαλία, {text}. Ωραία μάχη.
+appraisal.open.draw.b4 = Ισοπαλία, {text}.
+appraisal.open.draw.b4.2 = Η παρτίδα έληξε ισόπαλη, {text}.
+appraisal.open.draw.b4.3 = Ισόπαλη παρτίδα, {text}.
+appraisal.open.draw.b5 = Ισοπαλία.
+appraisal.open.draw.b5.2 = Ισοπαλία, {text}.
+appraisal.open.draw.b5.3 = Ισόπαλη παρτίδα.
+appraisal.open.draw.b6 = Ισοπαλία.
+appraisal.open.draw.b6.2 = Ισοπαλία, {text}.
+appraisal.open.draw.b6.3 = Ισόπαλη παρτίδα.
+appraisal.open.stalemate.b1 = Ισοπαλία με πατ: ήσουν τόσο κοντά! Την επόμενη φορά, άφησε ένα τετράγωνο στον βασιλιά μου.
+appraisal.open.stalemate.b1.2 = Πατ, άρα ισοπαλία. Λίγο έλειψε να κερδίσεις!
+appraisal.open.stalemate.b2 = Ισοπαλία με πατ. Ήσουν τόσο κοντά στη νίκη!
+appraisal.open.stalemate.b2.2 = Πατ: ισοπαλία, ενώ κέρδιζες.
+appraisal.open.stalemate.b3 = Ισοπαλία με πατ, από κερδισμένη θέση.
+appraisal.open.stalemate.b3.2 = Πατ. Η νίκη ξέφυγε στο παρά πέντε.
+appraisal.open.stalemate.b4 = Ισοπαλία με πατ.
+appraisal.open.stalemate.b4.2 = Πατ: ισοπαλία.
+appraisal.open.stalemate.b5 = Πατ.
+appraisal.open.stalemate.b5.2 = Ισοπαλία, με πατ.
+appraisal.open.stalemate.b6 = Πατ.
+appraisal.open.stalemate.b6.2 = Ισοπαλία, πατ.
+appraisal.open.loss.b1 = Αυτή τη φορά κέρδισα εγώ, αλλά έπαιξες μερικές πολύ καλές κινήσεις.
+appraisal.open.loss.b1.2 = Ωραία παρτίδα! Με έβαλες να ιδρώσω.
+appraisal.open.loss.b1.3 = Ήταν διασκεδαστικό! Αυτή την κέρδισα εγώ, αλλά μαθαίνεις γρήγορα.
+appraisal.open.loss.b2 = Ωραία παρτίδα! Ας δούμε τι πήγε καλά, και κάτι να δοκιμάσεις.
+appraisal.open.loss.b2.2 = Ευχαριστώ για την παρτίδα! Είχες μερικές καλές ιδέες.
+appraisal.open.loss.b2.3 = Ωραία παρτίδα. Ας δούμε τι μπορούμε να μάθουμε από αυτήν.
+appraisal.open.loss.b3 = Καλή παρτίδα.
+appraisal.open.loss.b3.2 = Ευχαριστώ για την παρτίδα.
+appraisal.open.loss.b3.3 = Καλή παρτίδα. Πάμε να τη δούμε.
+appraisal.open.loss_close.b3 = Ωραία μάχη. Η παρτίδα ήταν ισορροπημένη για πολλή ώρα.
+appraisal.open.loss_close.b3.2 = Ωραία μάχη: η ισορροπία κράτησε για πολλή ώρα.
+appraisal.open.loss.b4 = Καλή παρτίδα. Να τι την έκρινε.
+appraisal.open.loss.b4.2 = Καλή παρτίδα. Την έκρινε μία στιγμή.
+appraisal.open.loss.b4.3 = Ευχαριστώ για την παρτίδα. Ας δούμε πού άλλαξε η ροή της.
+appraisal.open.loss_close.b4 = Μια μάχη ισορροπημένη για πολλή ώρα. Να τι την έκρινε.
+appraisal.open.loss_close.b4.2 = Καλή παρτίδα, ισορροπημένη για πολλή ώρα.
+appraisal.open.loss.b5 = Καλή παρτίδα.
+appraisal.open.loss.b5.2 = Ευχαριστώ για την παρτίδα.
+appraisal.open.loss.b5.3 = Καλή μάχη.
+appraisal.open.loss.b6 = Καλή παρτίδα.
+appraisal.open.loss.b6.2 = Ευχαριστώ για την παρτίδα.
+appraisal.open.loss.b6.3 = Καλή μάχη.
+appraisal.open.resigned.b1 = Η εγκατάλειψη είναι κι αυτή μέρος του σκακιού· θέλει θάρρος. Καλή παρτίδα!
+appraisal.open.resigned.b1.2 = Δεν πειράζει. Το να ξέρεις πότε να εγκαταλείψεις είναι κι αυτό μέρος του σκακιού.
+appraisal.open.resigned.b2 = Η εγκατάλειψη είναι μέρος του σκακιού· χρειάζεται θάρρος.
+appraisal.open.resigned.b2.2 = Λογικό. Και η εγκατάλειψη θέλει θάρρος.
+appraisal.open.resigned.b3 = Η εγκατάλειψη είναι μέρος του σκακιού. Καλή παρτίδα.
+appraisal.open.resigned.b3.2 = Λογικό. Ευχαριστώ για την παρτίδα.
+appraisal.open.resigned.b4 = Καλή παρτίδα.
+appraisal.open.resigned.b4.2 = Ευχαριστώ για την παρτίδα.
+appraisal.open.resigned.b5 = Καλή παρτίδα.
+appraisal.open.resigned.b5.2 = Ευχαριστώ για την παρτίδα.
+appraisal.open.resigned.b6 = Καλή παρτίδα.
+appraisal.open.resigned.b6.2 = Ευχαριστώ.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Ξέρεις, δεν είχε τελειώσει ακόμα: περίπου {eval}.
+appraisal.resign_early.b3.2 = Στην πραγματικότητα, είχες ακόμα ευκαιρίες: περίπου {eval}.
+appraisal.resign_early.b4 = Δεν είχε τελειώσει ακόμα: περίπου {eval}.
+appraisal.resign_early.b4.2 = Υπήρχε ακόμα παιχνίδι: περίπου {eval}.
+appraisal.resign_early.b5 = Δεν είχε τελειώσει: {eval}.
+appraisal.resign_early.b5.2 = Παιζόταν ακόμα, περίπου {eval}.
+appraisal.resign_early.b6 = Δεν είχε κριθεί: {eval}.
+appraisal.resign_early.b6.2 = Ήταν {eval}.
+# The opening played (levels 3-6): the bare name, as Greek players say "παίξαμε Σικελική".
+appraisal.opening.b3 = Παίξαμε {opening}.
+appraisal.opening.b3.2 = Το άνοιγμα της παρτίδας: {opening}.
+appraisal.opening.b4 = Είχαμε {opening}.
+appraisal.opening.b4.2 = Το άνοιγμα: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Άνοιγμα: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Άνοιγμα: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Τι θυσία στην κίνηση {n}: {move}!
+appraisal.best.brilliant.b1.2 = Η αγαπημένη μου στιγμή: {move}. Έδωσες ένα κομμάτι, και πέτυχε!
+appraisal.best.brilliant.b2 = Η καλύτερη στιγμή σου: η θυσία {move} στην κίνηση {n}.
+appraisal.best.brilliant.b2.2 = Το {move} στην κίνηση {n} ήταν μια τολμηρή θυσία. Μπράβο!
+appraisal.best.brilliant.b3 = Λαμπρή θυσία με το {move}.
+appraisal.best.brilliant.b3.2 = Η κορυφαία στιγμή: {move}, μια πραγματική θυσία, στην κίνηση {n}.
+appraisal.best.brilliant.b4 = Καλύτερη στιγμή: {move}, κίνηση {n}. Λαμπρή θυσία.
+appraisal.best.brilliant.b4.2 = Το {move} στην κίνηση {n} ήταν λαμπρό.
+appraisal.best.brilliant.b5 = Το {move} στην κίνηση {n} ήταν λαμπρό.
+appraisal.best.brilliant.b5.2 = Κίνηση {n}, {move}: λαμπρό.
+appraisal.best.brilliant.b6 = {move}!! στην κίνηση {n}.
+appraisal.best.brilliant.b6.spoken = Στην κίνηση {n}, {move}: λαμπρή κίνηση!
+appraisal.best.brilliant.b6.2 = Κίνηση {n}: {move}, λαμπρό.
+appraisal.best.great.b1 = Η αγαπημένη μου στιγμή: {move}. Ήταν εξαιρετική κίνηση!
+appraisal.best.great.b1.2 = Θυμάσαι την κίνηση {move}; Ήταν υπέροχο εύρημα.
+appraisal.best.great.b2 = Η καλύτερη στιγμή σου: {move} στην κίνηση {n}. Άλλαξε τη ροή της παρτίδας.
+appraisal.best.great.b2.2 = Το {move} στην κίνηση {n} ήταν εξαιρετικό.
+appraisal.best.great.b3 = Η κίνηση-κλειδί ήταν το {move}, στην κίνηση {n}: ανέτρεψε την κατάσταση.
+appraisal.best.great.b3.2 = Υπέροχο εύρημα: {move}, στην κίνηση {n}.
+appraisal.best.great.b4 = Τιμώρησες αμέσως το λάθος μου με το {move}.
+appraisal.best.great.b4.2 = Καλύτερη στιγμή: {move}, κίνηση {n}.
+appraisal.best.great.b5 = {move} στην κίνηση {n}. Ωραίο εύρημα.
+appraisal.best.great.b5.2 = Κίνηση {n}, {move}: υπέροχο εύρημα.
+appraisal.best.great.b6 = {move} στην κίνηση {n}. Ωραίο εύρημα.
+appraisal.best.great.b6.2 = Κίνηση {n}: {move}!
+appraisal.best.only.b1 = Η αγαπημένη μου στιγμή: {move}. Ήταν η μόνη καλή κίνηση!
+appraisal.best.only.b1.2 = Στην κίνηση {n} βρήκες τη μόνη καλή κίνηση: {move}. Εξαιρετικά!
+appraisal.best.only.b2 = Η καλύτερη στιγμή σου: {move}, η μόνη καλή κίνηση σε εκείνη τη θέση.
+appraisal.best.only.b2.2 = Στην κίνηση {n}, το {move} ήταν η μόνη κίνηση, και τη βρήκες.
+appraisal.best.only.b3 = Η κίνηση-κλειδί ήταν το {move}, στην κίνηση {n}: η μόνη που κρατούσε τη θέση.
+appraisal.best.only.b3.2 = Στην κίνηση {n}, μόνο το {move} κρατούσε τη θέση, και το βρήκες.
+appraisal.best.only.b4 = Καλύτερη στιγμή: {move}, κίνηση {n}. Η μόνη κίνηση.
+appraisal.best.only.b4.2 = Κίνηση {n}: {move}, η μόνη κίνηση.
+appraisal.best.only.b5 = Το {move} στην κίνηση {n} ήταν η μόνη κίνηση. Ωραίο εύρημα.
+appraisal.best.only.b5.2 = Στην κίνηση {n} υπήρχε μόνο μία λύση: {move}.
+appraisal.best.only.b6 = Το {move} στην κίνηση {n} ήταν η μόνη κίνηση. Ωραίο εύρημα.
+appraisal.best.only.b6.2 = Κίνηση {n}: {move}, μόνη κίνηση.
+appraisal.best.won.b1 = Η αγαπημένη μου στιγμή: {move}. Σου έφερε {pts:point} υλικού!
+appraisal.best.won.b1.2 = Θυμάσαι την κίνηση {move}; Με αυτήν κέρδισες {pts:point} υλικού. Μπράβο!
+appraisal.best.won.b2 = Η καλύτερη στιγμή σου: {move} στην κίνηση {n}, που κέρδισε {pts:point} υλικού.
+appraisal.best.won.b2.2 = Το {move} στην κίνηση {n} κέρδισε υλικό. Ωραία!
+appraisal.best.won.b3 = Η κίνηση-κλειδί ήταν το {move}, στην κίνηση {n}: κέρδισε {pts:point} υλικού.
+appraisal.best.won.b3.2 = Το {move} στην κίνηση {n} κέρδισε καθαρά υλικό.
+appraisal.best.won.b4 = Καλύτερη στιγμή: {move}, κίνηση {n}, με κέρδος υλικού.
+appraisal.best.won.b4.2 = Το {move} στην κίνηση {n} κέρδισε {pts:point}.
+appraisal.best.won.b5 = Το {move} στην κίνηση {n} κέρδισε υλικό.
+appraisal.best.won.b5.2 = Κίνηση {n}: {move}, με κέρδος υλικού.
+appraisal.best.won.b6 = {move} στην κίνηση {n}: κέρδος υλικού.
+appraisal.best.won.b6.2 = Κίνηση {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Κίνηση {n}: {move}, συν {pts:point}.
+appraisal.best.streak.b1 = Βρήκες την καλύτερη κίνηση {n:time} στη σειρά. Εξαιρετικά!
+appraisal.best.streak.b1.2 = {n:best_move} στη σειρά! Αυτό είναι σπουδαίο σκάκι.
+appraisal.best.streak.b2 = Βρήκες την καλύτερη κίνηση {n:time} στη σειρά.
+appraisal.best.streak.b2.2 = {n:best_move} στη σειρά. Πολύ καλά!
+appraisal.best.streak.b3 = Ένα σερί από {n:best_move}. Πολύ σταθερό παιχνίδι.
+appraisal.best.streak.b3.2 = {n:best_move}, η μία μετά την άλλη. Έπαιξες καλά.
+appraisal.best.streak.b4 = {n:best_move} στη σειρά.
+appraisal.best.streak.b4.2 = Ένα σερί από {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} στη σειρά.
+appraisal.best.streak.b5.2 = Σερί από {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} στη σειρά.
+appraisal.best.streak.b6.2 = Σερί: {n:best_move}.
+appraisal.best.capture.b1 = Η αγαπημένη μου στιγμή: {move}. Πήρες {my:acc} χωρίς να δώσεις τίποτα!
+appraisal.best.capture.b1.2 = Θυμάσαι την κίνηση {move}; Είδες ότι {my} ήταν ακάλυπτ{my:os}!
+appraisal.best.capture.b2 = Η καλύτερη στιγμή σου: {move}, που κέρδισε {my:acc}.
+appraisal.best.capture.b2.2 = Ωραία αιχμαλωσία στην κίνηση {n}: {move}.
+appraisal.best.capture.b3 = Καλή ματιά στην κίνηση {n}: το {move} κέρδισε {my:acc}.
+appraisal.best.capture.b3.2 = Το {move} στην κίνηση {n} μάζεψε {my:acc}.
+appraisal.best.capture.b4 = Καλύτερη στιγμή: {move}, κίνηση {n}, που κέρδισε {my:acc}.
+appraisal.best.capture.b4.2 = Το {move} στην κίνηση {n} κέρδισε υλικό.
+appraisal.best.capture.b5 = Το {move} στην κίνηση {n} κέρδισε {my:acc}.
+appraisal.best.capture.b5.2 = Κίνηση {n}: {move}.
+appraisal.best.capture.b6 = {move} στην κίνηση {n}.
+appraisal.best.capture.b6.2 = Κίνηση {n}: {move}, με κέρδος υλικού.
+appraisal.best.phase.b1 = Έπαιξες πολύ καλά {text:se}.
+appraisal.best.phase.b1.2 = {text} ήταν το καλύτερο μέρος της παρτίδας σου.
+appraisal.best.phase.b2 = Το πιο δυνατό σου σημείο ήταν {text}.
+appraisal.best.phase.b2.2 = Έπαιξες {text} πολύ καλά.
+appraisal.best.phase.b3 = Η καλύτερη φάση σου ήταν {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = Καλύτερα σου πήγε {text}: ακρίβεια {acc:percent}.
+appraisal.best.phase.b4 = Δυνατότερη φάση: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} ήταν η καλύτερη φάση σου, με {acc:percent}.
+appraisal.best.phase.b5 = Καλύτερη φάση: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Καλύτερη φάση: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 κομμάτι" / "3 κομμάτια") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included: "κομμάτια") and checks given ({m}); also the fallback without
+# the engine. The short levels give the number after a colon ("Κομμάτια που πήρες: 3", neuter; the
+# feminine "Αιχμαλωσίες: {n:f}"), which keeps it out of any agreement.
+appraisal.num.material.b1 = Μου πήρες {n:piece} και έκανες σαχ {m:time}.
+appraisal.num.material.b1.2 = Πήρες {n:piece} και έκανες σαχ στον βασιλιά μου {m:time}.
+appraisal.num.material.b2 = Πήρες {n:piece} και έκανες σαχ {m:time}.
+appraisal.num.material.b2.2 = Μου πήρες {n:piece} και μου έκανες σαχ {m:time}.
+appraisal.num.material.b3 = Πήρες {n:piece} και έκανες {m:check}.
+appraisal.num.material.b3.2 = Κομμάτια που πήρες: {n}. Σαχ που έκανες: {m}.
+appraisal.num.material.b4 = Κομμάτια που πήρες: {n}, σαχ: {m}.
+appraisal.num.material.b4.2 = Πήρες {n:piece} και έκανες {m:check}.
+appraisal.num.material.b5 = Αιχμαλωσίες: {n:f}· σαχ: {m}.
+appraisal.num.material.b5.2 = Πήρες {n:piece}· έκανες {m:check}.
+appraisal.num.material.b6 = Αιχμαλωσίες: {n:f}, σαχ: {m}.
+appraisal.num.material.b6.2 = Πήρες {n:piece}· σαχ: {m}.
+appraisal.num.material_nochecks.b1 = Μου πήρες {n:piece}.
+appraisal.num.material_nochecks.b1.2 = Σε αυτή την παρτίδα πήρες {n:piece}.
+appraisal.num.material_nochecks.b2 = Πήρες {n:piece}.
+appraisal.num.material_nochecks.b2.2 = Μου πήρες {n:piece} σε αυτή την παρτίδα.
+appraisal.num.material_nochecks.b3 = Πήρες {n:piece}.
+appraisal.num.material_nochecks.b3.2 = Κομμάτια που πήρες: {n}.
+appraisal.num.material_nochecks.b4 = Κομμάτια που πήρες: {n}.
+appraisal.num.material_nochecks.b4.2 = Πήρες {n:piece}.
+appraisal.num.material_nochecks.b5 = Αιχμαλωσίες: {n:f}.
+appraisal.num.material_nochecks.b5.2 = Κομμάτια που πήρες: {n}.
+appraisal.num.material_nochecks.b6 = Αιχμαλωσίες: {n:f}.
+appraisal.num.material_nochecks.b6.2 = Πήρες {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well ({m:f}: κινήσεις).
+appraisal.num.takebacks.b1 = Πήρες πίσω {n:move} και διόρθωσες {m:f}. Έτσι μαθαίνουμε!
+appraisal.num.takebacks.b1.2 = Πήρες πίσω {n:move}, και {m:time} βρήκες καλύτερη κίνηση. Τέλεια!
+appraisal.num.takebacks.b2 = Πήρες πίσω {n:move} και διόρθωσες {m:f}. Έτσι μαθαίνουμε.
+appraisal.num.takebacks.b2.2 = Από {n:move} που πήρες πίσω, διόρθωσες {m:f}. Καλή δουλειά!
+appraisal.num.takebacks.b3 = Πήρες πίσω {n:move} και διόρθωσες {m:f}.
+appraisal.num.takebacks.b3.2 = Πήρες πίσω {n:move}· διόρθωσες {m:f}. Ωραία.
+# Level 2: big mistakes ({n} = mistakes and blunders: "μεγάλο λάθος", not the blunder term), or the
+# best moves found ({n}).
+appraisal.num.clean.b2 = Κανένα μεγάλο λάθος: τέλεια!
+appraisal.num.clean.b2.2 = Ούτε ένα μεγάλο λάθος σε αυτή την παρτίδα. Εξαιρετικά!
+appraisal.num.clean.b2.3 = Δεν έκανες κανένα μεγάλο λάθος. Πολύ καλά!
+appraisal.num.few.b2 = Μόνο {n:mistake} σε αυτή την παρτίδα.
+appraisal.num.few.b2.2 = Μόλις {n:mistake} σε όλη την παρτίδα. Ωραία!
+appraisal.num.few.b2.3 = Μόνο {n:mistake} που αξίζει να αναφέρουμε. Μπράβο.
+appraisal.num.best.b2 = Βρήκες την καλύτερη κίνηση {n:time}.
+appraisal.num.best.b2.2 = Έπαιξες {n:time} ακριβώς την καλύτερη κίνηση.
+appraisal.num.best.b2.3 = {n:time} βρήκες την καλύτερη κίνηση.
+appraisal.num.acc.b3 = Η ακρίβειά σου ήταν {acc:percent}, με {n:mistake} και {m:blunder}.
+appraisal.num.acc.b3.2 = Ακρίβεια {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Έπαιξες με ακρίβεια {acc:percent}· έκανες {n:mistake} και {m:blunder}.
+appraisal.num.acc_explain.b3 = Η ακρίβεια συγκρίνει τις κινήσεις σου με την καλύτερη κίνηση σε κάθε θέση: το εκατό σημαίνει τέλειο παιχνίδι.
+appraisal.num.acc_explain.b3.2 = Η ακρίβεια μετρά πόσο κοντά ήταν οι κινήσεις σου στις καλύτερες. Το εκατό είναι η τελειότητα.
+appraisal.num.acc.b4 = Ακρίβεια {acc:percent}.
+appraisal.num.acc.b4.2 = Έπαιξες με ακρίβεια {acc:percent}.
+appraisal.num.acc.b4.3 = {acc:percent} ακρίβεια.
+appraisal.num.acc_phase.b4 = Ακρίβεια {acc:percent}· {text:se}, που ήταν η καλύτερη φάση σου, {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = Συνολικά {acc:percent}, {text:se} {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Έπαιξες με {acc:percent}· καλύτερα {text:se}, με {acc_phase:percent}.
+appraisal.num.coach.b4 = Εγώ έπαιξα με {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Η δική μου ακρίβεια ήταν {acc_coach:percent}.
+appraisal.num.acc.b5 = Ακρίβεια {acc:percent}· {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Ακρίβεια {acc:percent}, με {n:inaccuracy} και {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Έξοδος από τη θεωρία στην κίνηση {k}.
+appraisal.num.book.b5.2 = Αφήσαμε τη θεωρία στην κίνηση {k}.
+appraisal.num.acc.b6 = Εσύ {acc:percent}, εγώ {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc:percent} έναντι {acc_coach:percent}· {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Ακρίβεια {acc:percent}, η δική μου {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Ακρίβεια {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Ακρίβεια: {acc:percent}· {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Κάτι για εξάσκηση: {theme}.
+appraisal.improve.theme.b1.2 = Μια συμβουλή για την επόμενη φορά: {theme}.
+appraisal.improve.theme.b1.3 = Κάτι να δουλέψεις: {theme}.
+appraisal.improve.theme.b2 = Κάτι να εξασκήσεις: {theme}.
+appraisal.improve.theme.b2.2 = Μια ιδέα για την επόμενη φορά: {theme}.
+appraisal.improve.theme.b2.3 = Κάτι που αξίζει να δουλέψεις: {theme}.
+appraisal.improve.theme.b3 = Ένα θέμα αυτής της παρτίδας: {theme}.
+appraisal.improve.theme.b3.2 = Αξίζει εξάσκηση: {theme}.
+appraisal.improve.theme.b4 = Ένα θέμα που επανήλθε: {theme}.
+appraisal.improve.theme.b4.2 = Προέκυψε πάνω από μία φορά: {theme}.
+appraisal.improve.theme.b5 = Επανερχόμενο θέμα: {theme}.
+appraisal.improve.theme.b5.2 = Θέμα της παρτίδας: {theme}.
+appraisal.improve.theme.b6 = Επανερχόμενο: {theme}.
+appraisal.improve.theme.b6.2 = Θέμα: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = Η παρτίδα άλλαξε στην κίνηση {crit_no}. Την επόμενη φορά, προσπάθησε {theme}.
+appraisal.improve.critical.b2.2 = Η κρίσιμη στιγμή ήταν στην κίνηση {crit_no}: {crit_move}. Κάτι να εξασκήσεις: {theme}.
+appraisal.improve.critical.b3 = Η κρίσιμη στιγμή ήταν η κίνηση {crit_no}. Αντί για το {crit_move}, καλύτερο ήταν το {crit_best}.
+appraisal.improve.critical.b3.2 = Στην κίνηση {crit_no}, το {crit_best} ήταν καλύτερο από το {crit_move}. Κοίτα πρώτα τις αναγκαστικές κινήσεις μου.
+appraisal.improve.critical.b4 = Κρίσιμη στιγμή: κίνηση {crit_no}, {crit_move}. Καλύτερο ήταν το {crit_best}.
+appraisal.improve.critical.b4.2 = Η κίνηση {crit_no} ήταν η κρίσιμη στιγμή: {crit_best} αντί για το {crit_move}.
+appraisal.improve.critical.b5 = Κίνηση {crit_no}: {crit_best} αντί για το {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Κρίσιμη ήταν η κίνηση {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Κίνηση {crit_no}: {crit_best} αντί για το {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, όχι {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Κίνηση {crit_no}: {crit_best}, όχι {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words. "κέρδιζες" (levels 1-2) and "κερδισμένη θέση"
+# (agreeing with θέση) say "you were winning" without a word that agrees with the player.
+appraisal.improve.was_winning.b1 = Μέχρι την κίνηση {crit_no} κέρδιζες. Μια συμβουλή: {theme}.
+appraisal.improve.was_winning.b1.2 = Μέχρι την κίνηση {crit_no} τα πήγαινες τέλεια. Θυμήσου: {theme}.
+appraisal.improve.was_winning.b2 = Μέχρι την κίνηση {crit_no} κέρδιζες. Την επόμενη φορά: {theme}.
+appraisal.improve.was_winning.b2.2 = Ως την κίνηση {crit_no}, η θέση σου ήταν κερδισμένη. Κάτι να εξασκήσεις: {theme}.
+appraisal.improve.was_winning.b3 = Μέχρι την κίνηση {crit_no} είχες κερδισμένη θέση. Το {crit_best} κρατούσε το πλεονέκτημά σου.
+appraisal.improve.was_winning.b3.2 = Ως την κίνηση {crit_no} η θέση σου ήταν κερδισμένη· με το {crit_best} θα έμενε έτσι.
+appraisal.improve.was_winning.b4 = Μέχρι την κίνηση {crit_no} είχες κερδισμένη θέση. Το {crit_best} διατηρούσε το πλεονέκτημα.
+appraisal.improve.was_winning.b4.2 = Κερδισμένη θέση ως την κίνηση {crit_no}· το {crit_best} τη διατηρούσε.
+appraisal.improve.was_winning.b5 = Κερδισμένη θέση ως την κίνηση {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Κίνηση {crit_no}: το {crit_best} κρατούσε τη νίκη, {eval}.
+appraisal.improve.was_winning.b6 = Κίνηση {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = Το {crit_best} στην κίνηση {crit_no} κρατούσε τη νίκη: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Μια συμβουλή: όταν κερδίζεις, άφηνε πάντα στον βασιλιά μου ένα τετράγωνο για να κινηθεί.
+appraisal.improve.stalemate.b1.2 = Θυμήσου: προς το τέλος, πριν από κάθε κίνηση, κοίτα αν ο βασιλιάς μου μπορεί ακόμα να κινηθεί.
+appraisal.improve.stalemate.b2 = Όταν κερδίζεις, άφηνε πάντα ένα τετράγωνο στον βασιλιά μου, αλλιώς γίνεται πατ.
+appraisal.improve.stalemate.b2.2 = Την επόμενη φορά, πριν παίξεις, κοίτα αν ο βασιλιάς μου μπορεί ακόμα να κινηθεί.
+appraisal.improve.stalemate.b3 = Σε κερδισμένη θέση, έλεγχε σε κάθε κίνηση ότι ο βασιλιάς μου έχει ακόμα ελεύθερο τετράγωνο.
+appraisal.improve.stalemate.b3.2 = Πρόσεχε το πατ στα κερδισμένα φινάλε: άφηνε χώρο στον βασιλιά μου.
+appraisal.improve.stalemate.b4 = Στα κερδισμένα φινάλε, έλεγχε πάντα για πατ.
+appraisal.improve.stalemate.b4.2 = Προσοχή στο πατ: εδώ κόστισε τη νίκη.
+appraisal.improve.stalemate.b5 = Σε κερδισμένα φινάλε, πρόσεχε το πατ.
+appraisal.improve.stalemate.b5.2 = Το πατ κόστισε τη νίκη.
+appraisal.improve.stalemate.b6 = Προσοχή στο πατ.
+appraisal.improve.stalemate.b6.2 = Το πατ στοίχισε τη νίκη.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+# "ακάλυπτ{my:os}" / "απροστάτευτ{my:os}" agree with the coach's piece (ακάλυπτος / ακάλυπτη / ακάλυπτο).
+appraisal.improve.coach_hung.b1 = Στην κίνηση {n}, {my} ήταν ακάλυπτ{my:os}. Το είδες;
+appraisal.improve.coach_hung.b1.2 = Στην κίνηση {n}, μπορούσες να πάρεις {my:acc} δωρεάν. Ψάχνε πάντα για χαρισμένα κομμάτια!
+appraisal.improve.coach_hung.b2 = Στην κίνηση {n}, {my} έμεινε ακάλυπτ{my:os}. Το πρόσεξες;
+appraisal.improve.coach_hung.b2.2 = Στην κίνηση {n}, μπορούσες να πάρεις {my:acc} χωρίς αντάλλαγμα.
+appraisal.improve.coach_hung.b3 = Στην κίνηση {n}, {my} ήταν απροστάτευτ{my:os}. Το εντόπισες;
+appraisal.improve.coach_hung.b3.2 = {my} ήταν ακάλυπτ{my:os} στην κίνηση {n}. Σε κάθε κίνηση, ψάχνε για απροστάτευτα κομμάτια.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Συνέχισε να ελέγχεις ότι τα κομμάτια σου είναι ασφαλή, όπως σήμερα.
+appraisal.improve.clean.b1.2 = Συνέχισε να κοιτάς τι απειλώ πριν από κάθε κίνηση. Πιάνει!
+appraisal.improve.clean.b1.3 = Συνέχισε να παίζεις τόσο προσεκτικά!
+appraisal.improve.clean.b2 = Μια καθαρή παρτίδα. Συνέχισε να ελέγχεις έτσι τις απειλές μου.
+appraisal.improve.clean.b2.2 = Συνέχισε όπως σήμερα: κομμάτια προστατευμένα, καλές κινήσεις.
+appraisal.improve.clean.b3 = Μια καθαρή παρτίδα. Συνέχισε να κοιτάς πρώτα τις αναγκαστικές κινήσεις.
+appraisal.improve.clean.b3.2 = Κανένα μεγάλο λάθος: συνέχισε έτσι.
+appraisal.improve.clean.b4 = Μια καθαρή παρτίδα. Τίποτα σημαντικό για διόρθωση.
+appraisal.improve.clean.b4.2 = Κανένα κρίσιμο λάθος.
+appraisal.improve.clean.b5 = Κανένα κρίσιμο λάθος.
+appraisal.improve.clean.b5.2 = Καθαρή παρτίδα.
+appraisal.improve.clean.b6 = Καθαρή παρτίδα.
+appraisal.improve.clean.b6.2 = Χωρίς κρίσιμα λάθη.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = «Αρχάριος» ...: always after "επίπεδο" ("στο επίπεδο {level}", "για το επίπεδο {level}").
+# "Ήρθε η ώρα για..." and "μπορείς πια να..." instead of "είσαι έτοιμος" (gendered).
+appraisal.end.b1 = Βελτιώνεσαι σε κάθε παρτίδα. Παίζουμε άλλη μία;
+appraisal.end.b1.2 = Ήταν διασκεδαστικό! Παίζουμε ξανά;
+appraisal.end.b1.3 = Πολύ καλή προσπάθεια. Θέλεις να παίξουμε άλλη μια παρτίδα;
+appraisal.end.b2 = Βελτιώνεσαι σε κάθε παρτίδα. Άλλη μία;
+appraisal.end.b2.2 = Ωραία παρτίδα. Παίζουμε πάλι;
+appraisal.end.b2.3 = Καλά έπαιξες. Άλλη μια παρτίδα;
+appraisal.end.b3 = Σταθερό παιχνίδι. Πάμε για την επόμενη;
+appraisal.end.b3.2 = Καλή παρτίδα. Άλλη μία;
+appraisal.end.b3.3 = Καλά έπαιξες. Ξαναπαίζουμε;
+appraisal.end.b4 = Σταθερό παιχνίδι. Πάμε για την επόμενη;
+appraisal.end.b4.2 = Άλλη μια παρτίδα;
+appraisal.end.b4.3 = Καλή παρτίδα. Πάμε στην επόμενη;
+appraisal.end.b5 = Άλλη μία;
+appraisal.end.b5.2 = Επόμενη παρτίδα;
+appraisal.end.b5.3 = Ξανά;
+appraisal.end.b6 = Άλλη μία;
+appraisal.end.b6.2 = Επόμενη παρτίδα;
+appraisal.end.b6.3 = Ξανά;
+appraisal.end.up.b1 = Ήρθε η ώρα για το επίπεδο {level}. Θέλεις να το δοκιμάσεις;
+appraisal.end.up.b1.2 = Νομίζω ότι μπορείς πια να περάσεις στο επίπεδο {level}. Να το δοκιμάσουμε;
+appraisal.end.up.b2 = Ήρθε η ώρα για το επίπεδο {level}. Θέλεις να το δοκιμάσεις;
+appraisal.end.up.b2.2 = Τι λες για το επίπεδο {level}; Νομίζω ότι ήρθε η ώρα.
+appraisal.end.up.b3 = Αυτό το επίπεδο το ξεπέρασες: δοκίμασε το επίπεδο {level}.
+appraisal.end.up.b3.2 = Ώρα για το επίπεδο {level}; Νομίζω πως ναι.
+appraisal.end.up.b4 = Αυτό το επίπεδο το ξεπέρασες: δοκίμασε το επίπεδο {level}.
+appraisal.end.up.b4.2 = Ώρα για το επίπεδο {level};
+appraisal.end.up.b5 = Επόμενο βήμα: το επίπεδο {level}.
+appraisal.end.up.b5.2 = Και τώρα, το επίπεδο {level};
+appraisal.end.up.b6 = Επόμενο βήμα: το επίπεδο {level}.
+appraisal.end.up.b6.2 = Και τώρα, το επίπεδο {level};
+appraisal.end.down.b2 = Ας παίξουμε μία στο επίπεδο {level}, για να εξασκήσεις αυτές τις ιδέες.
+appraisal.end.down.b2.2 = Τι λες για μια παρτίδα στο επίπεδο {level}, για εξάσκηση;
+appraisal.end.down.b3 = Θέλεις να παίξουμε μία στο επίπεδο {level}, για να εξασκήσεις αυτές τις ιδέες;
+appraisal.end.down.b3.2 = Μια παρτίδα στο επίπεδο {level} θα μπορούσε να σε βοηθήσει να εξασκήσεις αυτές τις ιδέες.
+appraisal.end.down.b4 = Μια παρτίδα στο επίπεδο {level} ίσως βοηθήσει στην εξάσκηση αυτών των ιδεών.
+appraisal.end.down.b4.2 = Ίσως μία στο επίπεδο {level}, για εξάσκηση;
+appraisal.end.down.b5 = Ίσως μία στο επίπεδο {level};
+appraisal.end.down.b5.2 = Το επίπεδο {level}, για εξάσκηση;
+appraisal.end.down.b6 = Ίσως μία στο επίπεδο {level};
+appraisal.end.down.b6.2 = Το επίπεδο {level}, για εξάσκηση;

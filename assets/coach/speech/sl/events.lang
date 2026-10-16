@@ -30,7 +30,7 @@ event.greet.l6.3 = Pripravljen sem. Komentiral bom le kritične trenutke.
 # Who starts (said after the greeting).
 event.colour.white = Imaš bele figure, zato začneš ti.
 event.colour.white.2 = Igraš z belimi: prva poteza je tvoja.
-event.colour.black = Bele figure imam jaz, zato začnem jaz.
+event.colour.black = Bele figure imam jaz, zato začnem.
 event.colour.black.2 = Tokrat igraš s črnimi: prvo potezo naredim jaz.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
@@ -74,7 +74,7 @@ event.play_on.3 = Zdaj pa nazaj k najini partiji.
 # After the player's mistake has been explained (never mocking; praise the process, not the person).
 event.encourage.mistake = Takšne napake dela vsak. Pomembno je, da jih opaziš.
 event.encourage.mistake.2 = Ne skrbi. Preveri, kaj napada moja zadnja poteza, pa ti bo jasno.
-event.encourage.mistake.3 = To se zgodi vsakemu šahistu. Gremo naprej.
+event.encourage.mistake.3 = To se zgodi vsakemu šahistu. Greva naprej.
 # The player is behind (material or evaluation).
 event.encourage.behind = Ne vdaj se: išči priložnosti in mi ne olajšaj zmage.
 event.encourage.behind.2 = Bori se naprej. Takšne pozicije se še lahko obrnejo.
@@ -100,7 +100,7 @@ event.end.loss.3 = Dober boj. Poglejva, kaj se je zgodilo.
 event.end.draw = Remi. Dobra partija!
 event.end.draw.2 = Tokrat ni zmagovalca. Lepo sva se borila.
 event.end.draw.3 = Pravičen izid. Dobra partija.
-event.end.resigned = Partija je predana. Kljub temu je bil to dober boj.
+event.end.resigned = Torej predaja. Kljub temu je bil to dober boj.
 event.end.resigned.2 = Prav. Hvala za partijo.
 event.end.handshake = Seziva si v roke.
 

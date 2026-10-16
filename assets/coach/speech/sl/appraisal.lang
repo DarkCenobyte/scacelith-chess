@@ -25,7 +25,7 @@ appraisal.phase.endgame = končnica
 # Draw reasons, said right after "Remi" / "z remijem", with no comma ("Remi po dogovoru.").
 appraisal.reason.stalemate = zaradi pata
 appraisal.reason.material = zaradi nezadostnega materiala
-appraisal.reason.repetition = zaradi ponavljanja pozicije
+appraisal.reason.repetition = zaradi ponovitve pozicije
 appraisal.reason.fifty = po pravilu petdesetih potez
 appraisal.reason.agreement = po dogovoru
 appraisal.reason.other = po pravilih

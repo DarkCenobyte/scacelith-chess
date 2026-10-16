@@ -79,7 +79,7 @@ lesson.welcome.square = Vsako polje ima ime: najprej črka, nato številka. To p
 lesson.welcome.square2 = To pa je {sq}.
 lesson.welcome.kings = To sta oba kralja. Tvoj je na polju {sq}, moj na polju {sq2}.
 lesson.welcome.ask = Zdaj ti: premakni svojega kralja za eno polje naprej, na polje {sq}.
-lesson.welcome.wrong = To je polje {to}. Iščeva polje {sq}: črka e, številka dve.
+lesson.welcome.wrong = To je polje {to}. Iščeva polje {sq}: črka e, številka dva.
 lesson.welcome.ok = Odlično. Tvoj kralj je na polju {sq}.
 
 # ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
@@ -205,7 +205,7 @@ lesson.castle.how = {@}Kralj gre za dve polji proti trdnjavi, {@2}trdnjava pa pr
 lesson.castle.ask = Vedno se najprej dotakni kralja. Zdaj ti: naredi kratko rokado, na kraljevem krilu.
 lesson.castle.rook = S tem premakneš samo trdnjavo. Za rokado premakni kralja za dve polji proti njej.
 lesson.castle.long = To je dolga rokada, tudi dovoljena! Tokrat rokiraj proti bližji trdnjavi.
-lesson.castle.one = Za eno polje je navadna poteza s kraljem. Pri rokadi gre kralj za dve polji.
+lesson.castle.one = Premik za eno polje je navadna poteza s kraljem. Pri rokadi gre kralj za dve polji.
 lesson.castle.other = Za rokado premakni kralja za dve polji proti trdnjavi na polju {sq}.
 lesson.castle.ok = Rokada! Tvoj kralj je na varnem, trdnjava pa je pripravljena za igro.
 lesson.castle2.moved = Rokirati ne moreš, če je bila s kraljem ali s to trdnjavo poteza že narejena.
@@ -237,7 +237,7 @@ lesson.stale.draw = Nimam nobene dovoljene poteze. To je pat in partija se konč
 lesson.stale2.ask = Ko zmaguješ, pazi na pat. Daj mi mat v eni potezi, brez pata!
 lesson.stale2.wrong = Daj šah na moji zadnji vrsti, kjer moj kralj ne more pobegniti.
 lesson.stale2.ok = Mat! Nasprotnemu kralju vedno pusti potezo, razen če mu daješ mat.
-lesson.draws.kings = Še drugi remiji: kadar nihče ne more dati mata, na primer ko ostaneta sama kralja, je partija remi.
+lesson.draws.kings = Še drugi primeri remija: kadar nihče ne more dati mata, na primer ko ostaneta sama kralja, je partija remi.
 lesson.draws.agree = Igralca se lahko tudi dogovorita za remi.
 lesson.draws.repeat = Remi je mogoč tudi po trikratni ponovitvi pozicije ali po petdesetih potezah brez jemanja in brez poteze s kmetom.
 
@@ -252,7 +252,7 @@ lesson.talk.press = Po svoji potezi pritisneš na uro z isto roko. S tem začne 
 lesson.talk.flag = Če ti zmanjka časa, izgubiš, razen če ti nikakor ne morem dati mata.
 lesson.talk.increment = Pet plus tri pomeni pet minut za vsakega in še tri sekunde po vsaki potezi.
 # The three speeds as the time controls of assets/i18n/sl.lang (tc.blitz / tc.rapid / tc.classical).
-lesson.talk.speeds = Kratkim partijam pravimo hitropotezne, daljšim pospešene, najdaljšim pa klasične.
+lesson.talk.speeds = Kratke partije so hitropotezni šah, daljše pospešeni, najdaljše pa klasični.
 lesson.talk.no_clock = Z mano ura ne teče. Za razmislek si vzemi toliko časa, kolikor ga potrebuješ.
 lesson.talk.touch = V pravi partiji velja: če se dotakneš svoje figure, jo moraš premakniti.
 lesson.talk.touch_mine = Če se dotakneš moje figure, jo moraš vzeti, če je to mogoče.
