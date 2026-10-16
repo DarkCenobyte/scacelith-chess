@@ -386,7 +386,6 @@ respell.ग़लती = गलती
 respell.ग़लतियाँ = गलतियाँ
 respell.ग़लतियों = गलतियों
 respell.ग़लत = गलत
-respell.बग़ल = बगल
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. Hindi 0-99 do not compose (21 = इक्कीस, 99 = निन्यानबे): every one is listed, in the

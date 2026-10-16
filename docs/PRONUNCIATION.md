@@ -351,3 +351,33 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   "in chioda", "per mettere"), hears "patta" as "fatta", "acca otto" as "K8", "alfiere" as "alpiere", and
   takes short lines, or a line that starts with an interjection or a foreign name, for another language
   ("Gran bel salto!", "Ahi, ..." came out Finnish, Dutch or English).
+
+## Hindi
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| ग़लती, ग़लतियाँ, ग़लतियों, ग़लत | the nukta ग़ as a weak fricative that melts after a vowel or a nasal: "गंभीर ग़लती" heard "गम भी रलालती", "गम ही रहती" (the g heard 9 times in 18, in five contexts) | `गलती`, `गलतियाँ`, `गलतियों`, `गलत` (respell.*), as most Hindi speakers say them: the g heard 17 times in 18, "गंभीर गलती" 3 times in 3 against 0 |
+
+- The main round trip (300 lines, Whisper medium) is unusable as it stands: sherpa-onnx's Whisper allows about 6 tokens
+  per second of audio, and Hindi takes several byte tokens per word, so every transcript stops after a few words.
+  The audio padded with silence to 30 s lifts the limit (Whisper pads to 30 s anyway). Redone that way: 114 short lines,
+  3 seeds (file letters, squares, numbers 11-99, ordinals, decimals, the reviewers' list, the opening names and
+  eponyms, the words missed most), 25 lines of A/B variants, then probes (4 seeds). Spelling differences (nukta,
+  ँ/ं, ॉ, vowel length, ह dropped) were counted as heard right.
+- Checked and fine: the number words (29 to 99, 21-58, the -हत्तर family: पचहत्तर is said "pach-hattar", probe),
+  the ordinals, "दशमलव", "माइनस", "प्लस", the letters (एल, ई, जी, सी, ए, एच as "ech"), खड़ी/घोड़ा (ड़ said), schwa
+  deletion (हमला heard "हम्ला", ब्लिट्ज़ and पास्ड end without a vowel, probe), पिर्क (one syllable, the k said),
+  पानोव and बोगोल्युबोव (the v said), नाइडोर्फ़, निम्ज़ोविच, पोंज़ियानी, ब्लैकमार-डीमर, कापाब्लांका, फ़ायारोविच,
+  कंगारू, इतालवी, ट्रांसपोज़िशन, हाइपरमॉडर्न, सी-फ़ाइल. मोहरा is said "muhra", a common pronunciation.
+- Left as is: ऊँट, ऊंट and उँट are heard alike ("उंट", "ओट", "आउट", right about half the time); ओपनिंग is heard
+  "अपनिंग"/"आपनिंग" nearly every time, but once written "opening" in an English transcript, and "अोपनिंग" did no
+  better (nor "अोर" for ओर, heard "और"); the probe cannot tell ओ from औ or ऊ. एफ़ is heard "एप" in "घोड़ा एफ़ सात"
+  but "F3" in "चाल थी: घोड़ा एफ़ तीन": "ऐफ़" and "एफ़्फ़" did no better; "ऐच" no better than एच. "ए छह" is heard
+  "इच्छा" whatever the spelling of the six (छह, छः, छे). ख़ूब (heard "कूप") and बग़ल were heard no better without the
+  nukta. उफ़ at the start of a line is dropped (उफ़्फ़ heard once in 3). The v of -व्स्की (यानोव्स्की,
+  ट्रॉम्पोव्स्की) is weak, as in the Polish -wski. "एल आज़माओ" runs together ("है लाजमाओ"), a liaison.
+- Recogniser habits: it writes the frequent word for a letter or a number (बी as "भी", डी as "दी", सात as "साथ",
+  पहली as "पहले", उनसठ as "उनसे"), the retroflex ट/ड often as dental, ई as इ, final stops with the wrong voicing
+  ("तुरंद", "सफेथ", "मजबूट"), squares as notation ("F3", "D5"); it drops or garbles a line's first word and short
+  lines of English words (मिडिलगेम, स्टेलमेट, स्क्यूअर), cannot write most eponyms, and loops ("आपका आपका ...") on
+  some lines.
