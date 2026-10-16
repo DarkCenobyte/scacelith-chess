@@ -1,0 +1,212 @@
+# Coach speech (Polish): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Placeholders: {your} {your2} = the player's piece with "twój", {my} {my2} = the coach's piece with
+# "mój", {t1} {t2} = a piece of EITHER side (the possessive comes with it). The forms (acc gen dat ins
+# loc, refl_* = "swój" when the owner is the subject, bare_* without a possessive, pron* / npron*
+# pronouns, rel_* "który", its = "jego / jej", and the agreement endings a / y / al / was / could) are
+# listed at the top of common.lang. Counted nouns: {m:move_loc} = "w trzech ruchach", {pts:point_acc}
+# = "trzy punkty", {pts:point_gen} = "trzech punktów", {n:time} = "trzy razy"; a bare number of moves
+# after "mat w" is {m:loc} ("mat w 3", spoken "mat w trzech"). {text} = a mate pattern name
+# (name.pattern.*, nominative).
+# Rules (see the glossary): the player's gender is unknown, so no second-person past tense or
+# conditional and no adjective about the player: present or future tense, "można było", "był lepszy
+# ruch", "umknęła ci okazja". A piece as the subject of a past tense or of an adjective takes its
+# agreement form ("{my} {my:was} bez obrony", "{your} miał{your:a}", "związan{your:y}"), or the line
+# says "jest pod atakiem", "jest w pułapce", "nie ma obrony". A move as the subject of a past tense
+# follows "ruch" ("Ruch {best} był lepszy"). The coach is male ("wygrałem", "wolałbym").
+# Levels 1-2: simple words, short sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Szach! Mój król jest pod atakiem.
+ann.check.human.b1.2 = Szach! Atakujesz mojego króla.
+ann.check.human.b1.3 = To szach! Mój król musi uciec spod szacha.
+ann.check.human = Szach.
+ann.check.human.2 = Szach!
+ann.check.human.3 = I mamy szacha.
+# The coach gives check.
+ann.check.coach = Szach!
+ann.check.coach.2 = Szach.
+ann.check.coach.3 = I szach!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = To znaczy, że {your} jest pod atakiem. Musisz {your:pron_acc} wyprowadzić spod szacha.
+ann.check.coach.first.2 = Szach oznacza, że {your} jest pod atakiem. Odsuń {your:pron_acc}, zasłoń się albo zbij moją bierkę.
+ann.double_check.coach = Podwójny szach! Dwie moje bierki atakują naraz twojego króla, więc musi się on ruszyć.
+ann.double_check.coach.2 = To podwójny szach: teraz pomoże ci tylko ruch królem.
+ann.double_check.human = Podwójny szach! Dwie twoje bierki atakują naraz mojego króla, więc musi się on ruszyć.
+ann.double_check.human.2 = Podwójny szach! Teraz uratuje mnie tylko ruch królem.
+# The player checkmates the coach.
+ann.mate.human.b1 = Mat! Wygrywasz! Mój król nie może uciec.
+ann.mate.human.b1.2 = To mat! Brawo, partia jest twoja!
+ann.mate.human.b1.3 = Mat! Mój król jest w pułapce. Gratulacje!
+ann.mate.human = Mat. Dobrze zagrane.
+ann.mate.human.2 = To mat. Gratulacje.
+ann.mate.human.3 = Mat! Ładna robota.
+# The coach checkmates the player.
+ann.mate.coach.b1 = To mat. Twój król nie ma już wyjścia.
+ann.mate.coach.b1.2 = Mat. Twój król jest atakowany i nie może uciec.
+ann.mate.coach.b1.3 = Niestety, to mat. Twój król nie ma dokąd uciec.
+ann.mate.coach = Mat.
+ann.mate.coach.2 = I to jest mat.
+ann.mate.coach.3 = Niestety, mat.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ojej! Ten ruch coś oddaje.
+ex.verdict.blunder.b1.2 = Uwaga! Na tym ruchu możesz stracić.
+ex.verdict.blunder.b1.3 = Oj, chwileczkę. Z tym ruchem jest kłopot.
+ex.verdict.blunder.b2 = Hmm, z tym ruchem jest problem.
+ex.verdict.blunder.b2.2 = To duży błąd.
+ex.verdict.blunder.b2.3 = Uwaga, na tym ruchu coś tracisz.
+ex.verdict.blunder.b3 = To poważny błąd.
+ex.verdict.blunder.b3.2 = {move} to prawdziwy błąd.
+ex.verdict.blunder.b3.3 = Auć, {move} to duży błąd.
+ex.verdict.blunder.b4 = {move} to poważny błąd.
+ex.verdict.blunder.b4.2 = {move} to ciężki błąd.
+ex.verdict.blunder.b4.3 = Niestety, to poważny błąd.
+ex.verdict.blunder.b5 = {move} to ciężki błąd.
+ex.verdict.blunder.b5.2 = {move} to poważny błąd.
+ex.verdict.blunder.b5.3 = {move} to kosztowny błąd.
+ex.verdict.blunder.b6 = {move} to ciężki błąd.
+ex.verdict.blunder.b6.2 = {move} to poważny błąd.
+ex.verdict.blunder.b6.3 = {move}? Poważny błąd.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ojej! Moja groźba została bez odpowiedzi.
+ex.verdict.ignored.b1.2 = Uwaga! Moja groźba wciąż była aktualna.
+ex.verdict.ignored.b1.3 = Oj, chwileczkę. A co z moją groźbą?
+ex.verdict.ignored.b2 = Hmm, moja groźba wciąż była aktualna.
+ex.verdict.ignored.b2.2 = Moja groźba została bez odpowiedzi.
+ex.verdict.ignored.b2.3 = Uwaga, na moją groźbę trzeba było odpowiedzieć.
+ex.verdict.mistake.b3 = To nie jest dobry ruch.
+ex.verdict.mistake.b3.2 = Hmm, z ruchem {move} jest problem.
+ex.verdict.mistake.b3.3 = To błąd.
+ex.verdict.mistake.b4 = {move} to błąd.
+ex.verdict.mistake.b4.2 = Ruch {move} nie jest dobry.
+ex.verdict.mistake.b4.3 = To błąd.
+ex.verdict.mistake.b5 = {move} to wyraźny błąd.
+ex.verdict.mistake.b5.2 = {move} to błąd.
+ex.verdict.mistake.b5.3 = Ruch {move} nie jest dobry.
+ex.verdict.mistake.b6 = {move} to błąd.
+ex.verdict.mistake.b6.2 = {move}? Błąd.
+ex.verdict.mistake.b6.3 = Nie {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Nieźle, ale ruch {best} był trochę lepszy.
+ex.verdict.inaccuracy.b3.2 = Ruch {best} był odrobinę dokładniejszy.
+ex.verdict.inaccuracy.b3.3 = Drobne potknięcie: tu lepszy był ruch {best}.
+ex.verdict.inaccuracy.b4 = Niedokładnie: dokładniejszy był ruch {best}.
+ex.verdict.inaccuracy.b4.2 = Mała niedokładność. Ruch {best} był trochę lepszy.
+ex.verdict.inaccuracy.b4.3 = Nie do końca najlepszy ruch: {best} był dokładniejszy.
+ex.verdict.inaccuracy.b5 = Ruch {move} jest niedokładny; silniejszy był {best}.
+ex.verdict.inaccuracy.b5.2 = Trochę niedokładnie. Ja zagrałbym {best}.
+ex.verdict.inaccuracy.b5.3 = Ruch {best} był dokładniejszy niż {move}.
+ex.verdict.inaccuracy.b6 = {move} – niedokładnie; {best}.
+ex.verdict.inaccuracy.b6.2 = Niedokładnie. {best}.
+ex.verdict.inaccuracy.b6.3 = Lepszy był {best}.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Możliwe, że ruch {best} był odrobinę dokładniejszy.
+ex.verdict.inaccuracy.maybe.2 = Może zagrałbym {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Ten ruch wygląda wątpliwie.
+ex.verdict.dubious.2 = Ten ruch wydaje się wątpliwy.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oj, zaczekaj! Umknęło ci coś dobrego.
+ex.verdict.missed.b1.2 = Spójrz jeszcze raz! Było coś lepszego.
+ex.verdict.missed.b1.3 = Zaczekaj, tu była dla ciebie szansa!
+ex.verdict.missed.b2 = Tu umknęła ci okazja.
+ex.verdict.missed.b2.2 = Hmm, było coś lepszego.
+ex.verdict.missed.b2.3 = Zaczekaj, tu był świetny ruch.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Lepszy był ruch {best}.
+ex.better.b3.2 = Ruch {best} był lepszy.
+ex.better.b3.3 = Zamiast tego dobry był ruch {best}.
+ex.better.b4 = Silniejszy był ruch {best}.
+ex.better.b4.2 = Właściwy był ruch {best}.
+ex.better.b4.3 = Lepszy był ruch {best}.
+ex.better.b5 = {best}, z ideą {line}.
+ex.better.b5.2 = Należało zagrać {best}: {line}.
+ex.better.b5.3 = Lepszy był ruch {best}, a potem {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Zamiast tego {best}, {eval}.
+ex.better.b6.3 = Po {best}: {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Był lepszy ruch {your:ins}.
+ex.hint.b1.2 = {your} miał{your:a} lepszy ruch.
+ex.hint.b2 = {your} miał{your:a} lepszy ruch.
+ex.hint.b2.2 = Był lepszy ruch {your:ins}.
+ex.hint.b3 = {your} miał{your:a} lepszy ruch.
+ex.hint.b3.2 = {your:ins} można było zagrać lepiej.
+ex.hint.b4 = {your} miał{your:a} lepszy ruch.
+ex.hint.b4.2 = Spójrz jeszcze raz na {your:refl_acc}: miał{your:a} coś lepszego.
+ex.hint.b5 = {your} miał{your:a} silniejszy ruch.
+ex.hint.b5.2 = Był silniejszy ruch {your:ins}.
+ex.hint.b6 = {your} miał{your:a} coś lepszego.
+ex.hint.b6.2 = Spójrz jeszcze raz na {your:refl_acc}.
+ex.hint.move = Był lepszy ruch.
+ex.hint.move.2 = Tutaj był lepszy ruch.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} miał{your:a} lepszy ruch. Ten ruch wygrywa materiał.
+ex.hint.gain.b1.2 = Był lepszy ruch {your:ins}. Ten ruch wygrywa materiał.
+ex.hint.gain.b2 = {your} miał{your:a} lepszy ruch. Ten ruch wygrywa materiał.
+ex.hint.gain.b2.2 = Był ruch {your:ins}, który wygrywa materiał.
+ex.hint.gain.b3 = {your} miał{your:a} lepszy ruch, taki, który wygrywa materiał.
+ex.hint.gain.b3.2 = Był ruch {your:ins}, który wygrywa materiał.
+ex.hint.gain.b4 = {your} miał{your:a} ruch, który wygrywa materiał.
+ex.hint.gain.b4.2 = Spójrz jeszcze raz na {your:refl_acc}: miał{your:a} ruch, który wygrywa materiał.
+ex.hint.gain.b5 = {your} miał{your:a} silniejszy ruch, wygrywający materiał.
+ex.hint.gain.b5.2 = Był ruch {your:ins} wygrywający materiał.
+ex.hint.gain.b6 = {your} miał{your:a} ruch wygrywający materiał.
+ex.hint.gain.b6.2 = Spójrz jeszcze raz na {your:refl_acc}: można było wygrać materiał.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Lepiej było zagrać {your:bare_ins} na {sq}.
+ex.reveal.b1.2 = {your} {your:could} pójść na {sq}. To było lepsze.
+ex.reveal.b2 = Ruch {your:ins} na {sq} był lepszy.
+ex.reveal.b2.2 = Lepiej było zagrać {your:bare_ins} na {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Ustawmy bierki z powrotem.
+ex.rewind.b1.2 = Teraz ustawię wszystko tak, jak było.
+ex.rewind.b1.3 = Odstawię bierki na miejsce.
+ex.rewind.b2 = Cofnijmy wszystko.
+ex.rewind.b2.2 = Wracamy tam, gdzie byliśmy.
+ex.rewind.b2.3 = Odstawię bierki z powrotem.
+ex.rewind.b3 = Wracamy do partii.
+ex.rewind.b3.2 = Wróćmy.
+ex.rewind.b3.3 = Wracamy do pozycji.
+ex.rewind.b4 = Wracamy do partii.
+ex.rewind.b4.2 = Z powrotem.
+ex.rewind.b4.3 = Wróćmy.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Chcesz spróbować innego ruchu?
+ex.offer.b1.2 = Chcesz cofnąć ten ruch i spróbować jeszcze raz?
+ex.offer.b1.3 = Spróbujemy innego ruchu?
+ex.offer.b2 = Spróbujesz innego ruchu?
+ex.offer.b2.2 = Chcesz cofnąć ruch?
+ex.offer.b2.3 = Próbujemy jeszcze raz?
+ex.offer.b3 = Cofniesz ruch?
+ex.offer.b3.2 = Chcesz spróbować jeszcze raz?
+ex.offer.b3.3 = Cofamy?
+ex.offer.b4 = Cofasz ruch?
+ex.offer.b4.2 = Chcesz cofnąć ruch?
+ex.offer.b4.3 = Zagrasz inaczej?
+ex.offer.b5 = Cofnąć ruch?
+ex.offer.b5.2 = Cofniesz?
+ex.offer.b5.3 = Cofamy?
+ex.offer.b6 = Cofnąć?
+ex.offer.b6.2 = Cofasz?
+ex.offer.b6.3 = Jeszcze raz?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ten ruch jest wątpliwy. Może zagrasz lepiej?
+ex.dubious.b1.2 = Ten ruch jest wątpliwy. Może znajdziesz lepszy?
+ex.dubious.b2 = Wątpliwy ruch. Może zagrasz lepiej?
+ex.dubious.b2.2 = Ten ruch jest wątpliwy. Może jest coś lepszego?

@@ -99,10 +99,10 @@ ex.verdict.inaccuracy.b3.3 = Malé zaváhanie: tu bol lepší ťah {best}.
 ex.verdict.inaccuracy.b4 = Nepresné: presnejší bol ťah {best}.
 ex.verdict.inaccuracy.b4.2 = Malá nepresnosť. Ťah {best} bol o niečo lepší.
 ex.verdict.inaccuracy.b4.3 = Nie celkom najlepšie: presnejší bol ťah {best}.
-ex.verdict.inaccuracy.b5 = {move} je nepresné; silnejšie bolo {best}.
+ex.verdict.inaccuracy.b5 = {move} je nepresný ťah; silnejšie bolo {best}.
 ex.verdict.inaccuracy.b5.2 = Trochu nepresné. Ja by som zahral {best}.
-ex.verdict.inaccuracy.b5.3 = {best} bolo presnejšie ako {move}.
-ex.verdict.inaccuracy.b6 = {move} je nepresné; {best}.
+ex.verdict.inaccuracy.b5.3 = Ťah {best} bol presnejší ako {move}.
+ex.verdict.inaccuracy.b6 = {move} je nepresný ťah; {best}.
 ex.verdict.inaccuracy.b6.2 = Nepresné. {best}.
 ex.verdict.inaccuracy.b6.3 = Lepšie bolo {best}.
 # Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
@@ -653,7 +653,7 @@ ex.missed_capture.b2 = Ušlo ti branie zadarmo: {best} získava {my:acc}.
 ex.missed_capture.b2.2 = {my} na poli {sq} visel{my:past}. Stačilo {best}. Nabudúce {my:pron_acc} schmatni!
 ex.missed_capture.b2.3 = Ťah {best} by zadarmo získal {my:acc}.
 ex.missed_capture.b3 = Ťah {best} by získal {my:acc} úplne zadarmo.
-ex.missed_capture.b3.2 = {my} na poli {sq} bol{my:past} nekryt{my:adj}: {best}. Každý ťah hľadaj nekryté figúry.
+ex.missed_capture.b3.2 = {my} na poli {sq} bol{my:past} nekryt{my:adj}: {best}. Pri každom ťahu hľadaj nekryté figúry.
 ex.missed_capture.b3.3 = {my:acc} sa dalo vziať ťahom {best}.
 ex.missed_capture.b4 = Prehliadnuté: {best} získa {my:acc} na poli {sq}.
 ex.missed_capture.b4.2 = {best} získa {my:acc}, ktor{my:adj} bol{my:past} nekryt{my:adj}.
@@ -981,4 +981,4 @@ tb.found.2 = Presne, to je on.
 # Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
 # where the offer would have been).
 tb.none_left = Žiaľ, v tejto partii už ťahy vracať nemôžeš.
-tb.none_left.2 = V tejto partii ti už nezostali žiadne vrátenia ťahov.
+tb.none_left.2 = V tejto partii ti už nezostali žiadne vrátenia ťahu.

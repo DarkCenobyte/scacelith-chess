@@ -70,11 +70,12 @@ why.NotYourTurn = Počkaj: teraz som na ťahu ja.
 # ---- Chapter 0: welcome and the board -------------------------------------------------------------------
 lesson.welcome.hello = Ahoj! Som tvoj tréner. Naučme sa spolu pravidlá šachu, pekne krok za krokom.
 lesson.welcome.board = Toto je šachovnica: šesťdesiatštyri polí, svetlých a tmavých, osem radov po osem polí.
+lesson.welcome.board.spoken = Toto je šachovnica: šesťdesiat štyri polí, svetlých a tmavých, osem radov po osem polí.
 lesson.welcome.light = Rohové pole {@}vpravo od teba je vždy svetlé. Zapamätaj si: svetlé pole vpravo.
 lesson.welcome.files = Zvislé línie sa volajú stĺpce. Označujú sa písmenami od {@}a po {@2}h.
 lesson.welcome.files.spoken = Zvislé línie sa volajú stĺpce. Označujú sa písmenami od {@}á po {@2}há.
 lesson.welcome.ranks = Vodorovné línie sa volajú rady. Majú čísla od {@}jednotky po {@2}osmičku, od tvojej strany.
-lesson.welcome.square = Každé pole sa volá podľa svojho písmena a čísla. Toto pole je {sq}.
+lesson.welcome.square = Každé pole sa označuje najprv písmenom a potom číslom. Toto pole je {sq}.
 lesson.welcome.square2 = A toto je {sq}.
 lesson.welcome.kings = Toto sú dvaja králi. Tvoj stojí na {sq}, môj na {sq2}.
 lesson.welcome.ask = Teraz ty: posuň svojho kráľa o jedno pole dopredu, na {sq}.
@@ -115,10 +116,12 @@ lesson.king.wrong = Tvoj kráľ stojí hneď vedľa {my:gen}. Vstúp na {my:poss
 lesson.king.ok = Dobre! Kráľ je pomalý, ale zblízka silný.
 # Knight
 lesson.knight.intro = Toto je {your}. Pohybuje sa v tvare písmena L: dve polia rovno a potom jedno nabok.
+lesson.knight.intro.spoken = Toto je {your}. Pohybuje sa v tvare písmena el: dve polia rovno a potom jedno nabok.
 lesson.knight.l = {@}Takto. Vždy skončí na poli opačnej farby.
 lesson.knight.jump = Jazdec je jediná figúra, ktorá môže preskakovať iné.
 lesson.knight.ask = Vezmi {my:acc} svojím jazdcom!
 lesson.knight.wrong = To je správny ťah jazdcom, ale k {my:dat} sa ním nedostaneš. Skús iný skok v tvare L.
+lesson.knight.wrong.spoken = To je správny ťah jazdcom, ale k {my:dat} sa ním nedostaneš. Skús iný skok v tvare el.
 lesson.knight.ok = Skvelý skok!
 # Pawn: moving
 lesson.pawn.intro = Teraz {your}. Ide rovno dopredu, vždy o jedno pole, a nikdy necúva.
@@ -146,7 +149,7 @@ lesson.first.wrong = Aj to je povolený ťah! Teraz však, prosím, potiahni kr�
 lesson.first.ok = Výborný prvý ťah: otvára cestu tvojej dáme aj strelcovi.
 lesson.first.reply = Odpovedám rovnako. Teraz vyveď jazdca: skoč z poľa {sq} na {sq2}.
 lesson.first.knight_wrong = Jazdci preskakujú pešiakov. Skús to z poľa {sq} na {sq2}.
-lesson.first.knight_ok = Perfektné. Jazdcov a strelcov vyvíjame skoro.
+lesson.first.knight_ok = Perfektné. Jazdcov a strelcov vyvíjame zavčasu.
 
 # ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
 lesson.safety.defended = Figúra je krytá, keď ju chráni iná figúra rovnakej farby, ktorá môže brať späť.
