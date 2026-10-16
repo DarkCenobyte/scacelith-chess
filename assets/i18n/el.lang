@@ -1,0 +1,1443 @@
+# Scacelith - Ελληνικά (Greek)
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
+# Register: the polite plural "εσείς" of Greek software ("Επιλέξτε", "Πατήστε"); buttons and menu
+# entries are nouns ("Αποθήκευση", "Νέα παρτίδα"). The player's gender is unknown: no adjective or
+# participle that agrees with the player, and no article or genitive before a player's name {0}
+# (verbs carry no gender: "{0} κερδίζει", "{0}: ο χρόνος τελείωσε"). The sides: "τα λευκά / τα μαύρα",
+# the players "τα Λευκά / τα Μαύρα" (plural verb). Titles in capitals drop the tonos and keep the
+# dialytika (ΡΟΛΟΪ). Question mark ";", ano teleia "·", quotes « ». Chess words of the Greek federation.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Ενεργό
+common.off = Ανενεργό
+common.back = Πίσω
+common.apply = Εφαρμογή
+common.discard = Απόρριψη
+common.cancel = Άκυρο
+common.white = Λευκά
+common.black = Μαύρα
+common.main_menu = Κύριο μενού
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Το βασιλικό παιχνίδι
+menu.new_game = Νέα παρτίδα
+menu.options = Επιλογές
+menu.credits = Συντελεστές
+menu.quit = Έξοδος
+menu.version = Έκδοση {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = ΕΠΙΛΟΓΕΣ
+options.tab.display = Οθόνη
+options.tab.graphics = Γραφικά
+options.tab.audio = Ήχος
+options.tab.gameplay = Παιχνίδι
+options.tab.player = Παίκτης
+options.tab.controls = Χειρισμός
+options.pending = Οι αλλαγές ισχύουν μόλις εφαρμοστούν.
+options.unsaved.title = ΜΗ ΑΠΟΘΗΚΕΥΜΕΝΕΣ ΑΛΛΑΓΕΣ
+options.unsaved.text = Ορισμένες επιλογές άλλαξαν. Να εφαρμοστούν πριν από την έξοδο;
+
+options.language = Γλώσσα
+options.language.help = Η γλώσσα των μενού και των μηνυμάτων. Αλλάζει αμέσως.
+options.display_mode = Λειτουργία οθόνης
+options.display_mode.help = Πλήρης οθόνη: ένα παράθυρο χωρίς περίγραμμα σε όλη την οθόνη, στην ανάλυση της επιφάνειας εργασίας. Σε παράθυρο: ένα παράθυρο με το μέγεθος που ορίζεται παρακάτω.
+options.fullscreen = Πλήρης οθόνη
+options.windowed = Σε παράθυρο
+options.window_size = Μέγεθος παραθύρου
+options.window_size.help = Το μέγεθος του παραθύρου όταν το παιχνίδι εκτελείται σε παράθυρο. Η πλήρης οθόνη χρησιμοποιεί πάντα την ανάλυση της επιφάνειας εργασίας.
+options.vsync = Κατακόρυφος συγχρονισμός
+options.vsync.help = Συγχρονίζει τα καρέ με την οθόνη, ώστε να μη σκίζεται η εικόνα.
+options.render_scale = Κλίμακα απόδοσης
+options.render_scale.help = Η εσωτερική ανάλυση της τρισδιάστατης εικόνας. Χαμηλότερη τιμή: ταχύτερη απόδοση· υψηλότερη: πιο ευκρινής εικόνα.
+
+options.quality = Ποιότητα
+options.quality.very_low = Πολύ χαμηλή
+options.quality.low = Χαμηλή
+options.quality.medium = Μέτρια
+options.quality.high = Υψηλή
+options.quality.ultra = Υπερυψηλή
+options.quality.custom = Προσαρμοσμένη
+options.quality.help = Ρυθμίζει μονομιάς όλες τις παρακάτω επιλογές: η Πολύ χαμηλή απενεργοποιεί όλα τα εφέ, η Υπερυψηλή τα ανεβάζει όλα στο μέγιστο. Αν αλλάξετε μία επιλογή μεμονωμένα, η ποιότητα γίνεται Προσαρμοσμένη. Σε μια μέτρια κάρτα γραφικών βοηθά επίσης πολύ να μειώσετε την κλίμακα απόδοσης (Οθόνη).
+options.shadows = Σκιές
+options.shadows.help = Λεπτομέρεια των σκιών του ήλιου και απαλότητα των άκρων τους. Χαμηλή: απλά άκρα, που σχεδιάζονται γρήγορα.
+options.reflections = Αντανακλάσεις
+options.reflections.help = Το δάπεδο, το τραπέζι και η σκακιέρα αντανακλούν την αίθουσα (που σχεδιάζεται μία ακόμη φορά για καθένα από αυτά: από τις πιο απαιτητικές επιλογές)· από τη Μέτρια και πάνω, τα γυαλιστερά κομμάτια και αντικείμενα αντανακλούν επίσης ό,τι βρίσκεται γύρω τους.
+options.ambient_occlusion = Περιβαλλοντική σκίαση
+options.ambient_occlusion.help = Απαλή σκίαση εκεί όπου ενώνονται τα αντικείμενα και στις κοιλότητες, όπου φτάνει λιγότερο φως.
+options.indirect_light = Έμμεσος φωτισμός
+options.indirect_light.help = Το φως της ημέρας που ανακλάται στους τοίχους, στο δάπεδο και στην οροφή. Χαμηλή: ένα ομοιόμορφο φως περιβάλλοντος στη θέση του. Επηρεάζει κυρίως τον χρόνο φόρτωσης.
+options.volumetric_light = Ακτίνες φωτός
+options.volumetric_light.help = Δέσμες ηλιακού φωτός μέσα στον σκονισμένο αέρα της αίθουσας, και οι κόκκοι σκόνης που λαμπυρίζουν μέσα τους.
+options.tessellation = Ψηφίδωση
+options.tessellation.help = Ομαλά περιγράμματα στις καμπύλες των κομματιών, όταν τα βλέπετε από κοντά.
+options.tessellation.unavailable = Μη διαθέσιμη: αυτό το πρόγραμμα οδήγησης γραφικών δεν υποστηρίζει ψηφίδωση.
+options.antialiasing = Εξομάλυνση άκρων
+options.antialiasing.help = Εξομαλύνει τις οδοντωτές άκρες και τις λάμψεις που τρεμοπαίζουν. Ανενεργό: πιο ευκρινής αλλά οδοντωτή εικόνα, και ορισμένα εφέ δείχνουν κοκκώδη.
+options.depth_of_field = Βάθος πεδίου
+options.depth_of_field.help = Θολώνει ό,τι βρίσκεται αρκετά μπροστά ή πίσω από αυτό που κοιτάτε, όπως ο φακός μιας κάμερας.
+options.motion_blur = Θόλωμα κίνησης
+options.motion_blur.help = Θολώνει τις γρήγορες κινήσεις της κάμερας και των βραχιόνων, όπως μια κινηματογραφική κάμερα.
+options.bloom = Λάμψη
+options.bloom.help = Μια απαλή λάμψη γύρω από τα πιο φωτεινά σημεία, όπως στον φακό μιας κάμερας.
+options.brightness = Φωτεινότητα
+options.brightness.neutral = Ουδέτερη
+options.brightness.value = {0} EV
+options.brightness.help = Αντιστάθμιση έκθεσης της κάμερας. Η βαθμονόμηση της πρώτης εκκίνησης τη ρυθμίζει έτσι ώστε οι πιο σκοτεινές σκιές να διακρίνονται μόλις.
+
+options.master_volume = Κύρια ένταση
+options.effects = Εφέ
+options.ambience = Ήχοι περιβάλλοντος
+options.ambience.help = Το μουρμουρητό της αίθουσας: η φωτιά, βήματα από μακριά, το παλιό ρολόι.
+options.ambience_volume = Ένταση περιβάλλοντος
+options.voice_volume = Ένταση φωνής
+options.voice_volume.help = Η ένταση της φωνής του προπονητή στη λειτουργία Προπονητή.
+options.subtitles = Υπότιτλοι
+options.subtitles.auto = Αυτόματα
+options.subtitles.help = Τα λόγια του προπονητή, γραμμένα στο κάτω μέρος της οθόνης. Αυτόματα: εμφανίζονται όταν ο προπονητής δεν μιλά τη γλώσσα των μενού (με κινεζικά μενού μιλά αγγλικά). Εμφανίζονται πάντα όταν η φωνή του δεν είναι εγκατεστημένη.
+
+options.legal_moves = Εμφάνιση νόμιμων κινήσεων
+options.legal_moves.help = Επισημαίνει τα τετράγωνα όπου μπορεί να πάει ένα κομμάτι που αγγίξατε. Όταν είναι ανενεργό, τίποτα δεν σας δείχνει αν μια κίνηση είναι νόμιμη: ο διαιτητής τιμωρεί μια μη νόμιμη κίνηση μόλις πατήσετε το ρολόι.
+options.coordinates = Συντεταγμένες σκακιέρας
+options.auto_press = Αυτόματο πάτημα ρολογιού
+options.auto_press.help = Το ρομπότ σας πατά μόνο του το ρολόι μόλις η κίνησή σας βρεθεί στη σκακιέρα. Στις online παρτίδες αποφασίζει ο διακομιστής και, στους απευθείας αγώνες, ο παίκτης που φιλοξενεί τον αγώνα.
+options.thinking_time = Ρεαλιστικός χρόνος σκέψης
+options.thinking_time.help = Ο αντίπαλός σας παίρνει τον χρόνο του όπως ένας άνθρωπος, αντί να παίζει αμέσως.
+options.ignore_head = Αγνόηση κινήσεων κεφαλιού αντιπάλου
+options.ignore_head.help = Στις online παρτίδες και στους απευθείας αγώνες, το ρομπότ του αντιπάλου κοιτάζει όπου κοιτάζει ο παίκτης του. Όταν είναι ενεργό, κινεί το κεφάλι του μόνο του, όπως απέναντι στο Stockfish.
+options.mouse_sensitivity = Ευαισθησία ποντικιού
+options.invert_look = Αντιστροφή κατακόρυφου άξονα
+options.handover = Εναλλαγή παικτών
+options.handover.cut = Άμεση μετάβαση
+options.handover.flight = Πτήση, {0} δευτ.
+options.handover.help = Δύο παίκτες σε έναν υπολογιστή: πώς μεταφέρεται η οπτική γωνία από τα μάτια του ενός παίκτη στα μάτια του άλλου μετά από κάθε κίνηση. Η άμεση μετάβαση αποφεύγει την κίνηση της κάμερας.
+options.game_cursor = Δείκτης παιχνιδιού
+options.game_cursor.help = Στο τραπέζι, το παιχνίδι σχεδιάζει τον δικό του δείκτη, που δείχνει τι θα κάνει ένα κλικ. Ανενεργό: το συνηθισμένο βέλος του συστήματος.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Όνομα
+player.name.help = Το όνομά σας, όπως γράφεται στην κορυφή των φύλλων σημείωσης, σε οποιοδήποτε αλφάβητο.
+player.default_name = Άνθρωπος
+player.handwriting = Γραφικός χαρακτήρας
+player.handwriting.help = Το χέρι που γράφει τις κινήσεις σας. Τα αραβικά, τα ιαπωνικά και τα κινεζικά γράφονται με δικό τους γραφικό χαρακτήρα.
+player.preview = ΣΤΟ ΦΥΛΛΟ ΣΗΜΕΙΩΣΗΣ ΣΑΣ
+hand.caveat = Καθημερινός
+hand.marck = Καλλιγραφικός
+hand.badscript = Πλάγιος
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Αριστερό κλικ
+controls.touch = Αγγίξτε ένα κομμάτι και μετά μετακινήστε το
+controls.clock.keys = Διάστημα  ή  κλικ στο ρολόι
+controls.clock = Πατήστε το ρολόι
+controls.look.keys = Δεξί κουμπί, πατημένο
+controls.look = Κοιτάξτε γύρω σας
+controls.sheet.keys = S
+controls.sheet = Κοιτάξτε το φύλλο σημείωσης και επιστρέψτε
+controls.stand.keys = ↑
+controls.stand = Σηκωθείτε μπροστά από την καρέκλα σας
+controls.side.keys = ←  /  →
+controls.side = Σταθείτε στην αριστερή / δεξιά άκρη του τραπεζιού
+controls.sit.keys = ↓
+controls.sit = Καθίστε ξανά (παίζετε μόνο από την καρέκλα σας)
+controls.moves.keys = Tab
+controls.moves = Εμφανίστε ή κρύψτε τη λίστα κινήσεων
+controls.menu.keys = Esc
+controls.menu = Μενού
+controls.coach_skip.keys = Διάστημα
+controls.coach_skip = Προπονητής: προσπεράστε όσα λέει ο προπονητής
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Προπονητής: πάρτε πίσω την κίνηση όταν το προτείνει
+controls.coach_hint.keys = H
+controls.coach_hint = Προκλήσεις του προπονητή: ζητήστε υπόδειξη
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = ΦΩΤΕΙΝΟΤΗΤΑ
+calibration.text = Μετακινήστε το ρυθμιστικό μέχρι να διακρίνεται μόλις ο ίππος στο μαύρο τετράγωνο ή να μη φαίνεται πια.
+calibration.later = Μπορείτε να την αλλάξετε αργότερα στις Επιλογές > Γραφικά.
+calibration.continue = Συνέχεια
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = ΝΕΑ ΠΑΡΤΙΔΑ
+newgame.opponent = ΑΝΤΙΠΑΛΟΣ
+newgame.time_control = ΧΡΟΝΟΣ ΣΚΕΨΗΣ
+newgame.start = Έναρξη
+newgame.elo = ~{0} Elo
+newgame.you_white = Θα παίξετε με τα λευκά.
+newgame.you_black = Θα παίξετε με τα μαύρα.
+newgame.colour_lot = Τα χρώματα κληρώνονται για την πρώτη παρτίδα.
+newgame.colour_alternate = Έπειτα τα χρώματα εναλλάσσονται από παρτίδα σε παρτίδα.
+newgame.opponent_kind = Αντίπαλος
+newgame.opponent_kind.help = Παίξτε με το Stockfish ή με έναν φίλο που κάθεται σε αυτόν τον υπολογιστή: παίζετε εναλλάξ, από τις δύο πλευρές της σκακιέρας.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Άνθρωπος, ίδιο PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = Επίπεδο δεξιότητας
+engine.skill.help = Η ρύθμιση «Skill Level» του Stockfish (0–20). Αγνοείται όσο η δύναμη περιορίζεται μέσω Elo.
+engine.limit_elo = Περιορισμός δύναμης (Elo)
+engine.limit_elo.help = UCI_LimitStrength: η μηχανή στοχεύει στη βαθμολογία Elo που ορίζεται παρακάτω.
+engine.elo = Elo
+engine.depth = Βάθος αναζήτησης
+engine.plies = {0} ημικίνηση|{0} ημικινήσεις
+engine.move_time = Χρόνος ανά κίνηση
+engine.nodes = Όριο κόμβων
+engine.no_limit = Χωρίς όριο
+engine.thousand = {0} χιλ.
+engine.million = {0} εκατ.
+engine.dynamic_elo = Δυναμικό Elo ανάλογα με τον χρόνο
+engine.dynamic_elo.help = Όπως ένας άνθρωπος, το Stockfish παίζει πιο αδύναμα όταν λιγοστεύει ο χρόνος του: λίγο στο τελευταίο λεπτό (νωρίτερα στις παρτίδες ράπιντ και μπλιτς), πολύ πιο αδύναμα σε πίεση χρόνου. Μόνο σε παρτίδες με ρολόι.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Το Stockfish παίρνει τον χρόνο του, όπως ένας άνθρωπος του επιπέδου του. Για να παραλείψετε αυτή την παύση: Επιλογές > Παιχνίδι > Ρεαλιστικός χρόνος σκέψης.
+engine.pace.instant = Το Stockfish παίζει μόλις ολοκληρώσει τον υπολογισμό. Για ανθρώπινες παύσεις: Επιλογές > Παιχνίδι > Ρεαλιστικός χρόνος σκέψης.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Χωρίς όριο
+tc.no_clock = Χωρίς ρολόι
+tc.bullet = Μπούλετ
+tc.blitz = Μπλιτς
+tc.rapid = Ράπιντ
+tc.classical = Κλασικό
+tc.custom = Προσαρμοσμένο
+tc.your_own = Όπως θέλετε
+tc.base_time = Βασικός χρόνος
+tc.base_time.help = Ο αρχικός χρόνος σε κάθε ρολόι (λεπτά : δευτερόλεπτα).
+tc.increment = Προσαύξηση
+tc.increment.help = Προσαύξηση Φίσερ που προστίθεται μετά από κάθε κίνηση.
+tc.delay = Καθυστέρηση
+tc.delay.help = Καθυστέρηση Μπρονστάιν: ο χρόνος που καταναλώνεται έως αυτή την καθυστέρηση επιστρέφεται μετά από κάθε κίνηση.
+tc.no_delay = Καμία
+tc.seconds = {0} δευτ.
+tc.minutes = {0} λεπ.
+tc.summary_increment = {0} + {1} δευτ.
+tc.summary_delay = {0}, καθυστέρηση {1} δευτ.
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Πρωτάρης
+preset.novice.desc = Μόλις έμαθε τις κινήσεις: αφήνει κομμάτια ακάλυπτα και δεν βλέπει απλές απειλές.
+preset.beginner.name = Αρχάριος
+preset.beginner.desc = Ξέρει τα βασικά, αλλά ακόμη χάνει συχνά υλικό με σοβαρά λάθη.
+preset.casual.name = Ερασιτέχνης
+preset.casual.desc = Ένας χαλαρός αντίπαλος για το βράδυ: λογικές κινήσεις, συχνά λάθη.
+preset.club_player.name = Παίκτης συλλόγου
+preset.club_player.desc = Σταθερός παίκτης συλλόγου, που τιμωρεί τα προφανή σοβαρά λάθη.
+preset.advanced.name = Προχωρημένος
+preset.advanced.desc = Δυνατός παίκτης συλλόγου, με καλή τακτική αντίληψη.
+preset.expert.name = Ειδικός
+preset.expert.desc = Έμπειρος σε τουρνουά: σπάνια σφάλλει, αξιοποιεί τα πλεονεκτήματα.
+preset.master.name = Μάστερ
+preset.master.desc = Δύναμη μάστερ: βαθύς υπολογισμός και λεπτό στρατηγικό παιχνίδι.
+preset.grandmaster.name = Γκραν μετρ
+preset.grandmaster.desc = Επίπεδο γκραν μετρ: εξαιρετικά δύσκολο να τον νικήσετε.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Το Stockfish 19 σε πλήρη δύναμη. Καλή τύχη.
+preset.custom.name = Προσαρμοσμένος
+preset.custom.desc = Οι δικές σας ρυθμίσεις μηχανής.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = ΣΥΝΤΕΛΕΣΤΕΣ
+credits.game.head = SCACELITH
+credits.game = Ένα παιχνίδι σκακιού σε μια βασιλική αίθουσα, με δική του μηχανή γραφικών OpenGL 4.6.
+credits.engine.head = ΣΚΑΚΙΣΤΙΚΗ ΜΗΧΑΝΗ
+credits.engine = Stockfish 19, από τους προγραμματιστές του Stockfish.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Το νευρωνικό του δίκτυο εκπαιδεύτηκε με δεδομένα του έργου Leela Chess Zero, τα οποία διατίθενται με την άδεια Open Database License (ODbL).
+credits.voice.head = ΦΩΝΗ ΤΟΥ ΠΡΟΠΟΝΗΤΗ
+credits.voice = Συνθετική ομιλία που παράγεται από το Supertonic 3 για τη λειτουργία Προπονητή.
+credits.voice.licence = Το Supertonic 3 είναι μοντέλο της Supertone και χρησιμοποιείται με την άδεια OpenRAIL-M, της οποίας οι περιορισμοί χρήσης ισχύουν για όλους όσοι το χρησιμοποιούν (βλ. Άδειες).
+credits.openings.head = ΑΝΟΙΓΜΑΤΑ
+credits.openings = Ονομασίες ανοιγμάτων από τη βάση δεδομένων chess-openings του lichess.org, αφιερωμένη στο κοινό κτήμα (CC0).
+credits.fonts.head = ΓΡΑΜΜΑΤΟΣΕΙΡΕΣ
+credits.fonts = EB Garamond του Georg Duffner και Cinzel του Natanael Gama· Amiri του Khaled Hosny.
+credits.fonts.hand = Γραφικός χαρακτήρας: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Σκακιστικά σύμβολα από το GNU FreeFont (GPL v3 με εξαίρεση γραμματοσειράς).
+credits.quote = «Το σκάκι είναι η τέχνη της ανάλυσης.»  — Μιχαήλ Μποτβίνικ
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Άδειες
+licences.title = ΑΔΕΙΕΣ
+licences.note = Οι άδειες εμφανίζονται στο πρωτότυπο αγγλικό κείμενό τους.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = ΠΑΥΣΗ
+pause.resume = Συνέχεια
+pause.offer_draw = Πρόταση ισοπαλίας
+pause.claim_draw = Διεκδίκηση ισοπαλίας
+pause.claim_draw.help = Τριπλή επανάληψη ή κανόνας των 50 κινήσεων.
+pause.resign = Εγκατάλειψη
+confirm.resign.title = ΕΓΚΑΤΑΛΕΙΨΗ
+confirm.resign.text = Θέλετε να εγκαταλείψετε την παρτίδα; Νικητής θα ανακηρυχθεί ο αντίπαλός σας.
+confirm.resign.draw = Θέλετε να εγκαταλείψετε την παρτίδα; Ο αντίπαλός σας δεν μπορεί πια να κάνει ματ: η παρτίδα θα λήξει ισόπαλη.
+confirm.resign.ok = Εγκατάλειψη
+confirm.leave.title = ΕΞΟΔΟΣ ΑΠΟ ΤΗΝ ΠΑΡΤΙΔΑ
+confirm.leave.text = Επιστροφή στο κύριο μενού; Η τρέχουσα παρτίδα θα διακοπεί οριστικά.
+confirm.leave.ok = Έξοδος
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = ΠΡΟΑΓΩΓΗ ΣΕ
+piece.queen = Βασίλισσα
+piece.rook = Πύργος
+piece.bishop = Αξιωματικός
+piece.knight = Ίππος
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Η παρτίδα έληξε ισόπαλη.
+gameover.draw_moves = Η παρτίδα έληξε ισόπαλη μετά από {0} κίνηση.|Η παρτίδα έληξε ισόπαλη μετά από {0} κινήσεις.
+gameover.win = Μπράβο σας — κερδίσατε.
+gameover.win_moves = Μπράβο σας — κερδίσατε σε {0} κίνηση.|Μπράβο σας — κερδίσατε σε {0} κινήσεις.
+gameover.loss = Κέρδισε ο αντίπαλός σας.
+gameover.loss_moves = Ο αντίπαλός σας κέρδισε σε {0} κίνηση.|Ο αντίπαλός σας κέρδισε σε {0} κινήσεις.
+gameover.rematch = Ρεβάνς
+gameover.view_board = Προβολή σκακιέρας
+gameover.show = Εμφάνιση
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Ματ
+reason.resignation = Εγκατάλειψη
+reason.timeout = Ήττα λόγω χρόνου
+reason.illegal_moves = Δεύτερη μη νόμιμη κίνηση (ήττα)
+reason.stalemate = Πατ
+reason.insufficient = Νεκρή θέση (ανεπαρκές υλικό)
+reason.timeout_vs_insufficient = Λήξη χρόνου, αλλά ο αντίπαλος δεν μπορεί να κάνει ματ
+reason.fivefold = Πενταπλή επανάληψη
+reason.75_moves = Κανόνας των 75 κινήσεων
+reason.threefold_claim = Τριπλή επανάληψη (με διεκδίκηση)
+reason.50_moves_claim = Κανόνας των 50 κινήσεων (με διεκδίκηση)
+reason.agreement = Ισοπαλία με συμφωνία
+reason.illegal_vs_insufficient = Δεύτερη μη νόμιμη κίνηση, αλλά ο αντίπαλος δεν μπορεί να κάνει ματ
+reason.resignation_vs_insufficient = Εγκατάλειψη, αλλά ο αντίπαλος δεν μπορεί να κάνει ματ
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ΚΙΝΗΣΕΙΣ
+movelist.empty = Καμία κίνηση ακόμη.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Προετοιμασία των υλικών
+loading.hall = Ανέγερση της αίθουσας
+loading.furniture = Σκάλισμα του τραπεζιού και των καρεκλών
+loading.board = Γυάλισμα της σκακιέρας
+loading.pieces = Τόρνευση των κομματιών
+loading.clock = Συναρμολόγηση του ρολογιού
+loading.porcelain = Ψήσιμο της πορσελάνης
+loading.ready = Όλα έτοιμα
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Σε αυτή τη θέση δεν μπορεί να διεκδικηθεί ισοπαλία.
+notify.flag_you = Ο χρόνος σας τελείωσε.
+notify.flag_opponent = Ο χρόνος του αντιπάλου σας τελείωσε.
+notify.touched.pawn = Κανόνας αγγίγματος: πρέπει να κινήσετε το πιόνι που αγγίξατε.
+notify.touched.knight = Κανόνας αγγίγματος: πρέπει να κινήσετε τον ίππο που αγγίξατε.
+notify.touched.bishop = Κανόνας αγγίγματος: πρέπει να κινήσετε τον αξιωματικό που αγγίξατε.
+notify.touched.rook = Κανόνας αγγίγματος: πρέπει να κινήσετε τον πύργο που αγγίξατε.
+notify.touched.queen = Κανόνας αγγίγματος: πρέπει να κινήσετε τη βασίλισσα που αγγίξατε.
+notify.touched.king = Κανόνας αγγίγματος: πρέπει να κινήσετε τον βασιλιά που αγγίξατε.
+notify.touched.piece = Κανόνας αγγίγματος: πρέπει να κινήσετε το κομμάτι που αγγίξατε.
+notify.touched_square = Κανόνας αγγίγματος: πρέπει να κινήσετε το κομμάτι στο {0}.
+notify.press_clock = Πατήστε το ρολόι για να ολοκληρώσετε την κίνησή σας (Διάστημα).
+notify.manual_clock = Σε αυτή την παρτίδα, πατάτε εσείς το ρολόι μετά από κάθε κίνηση.
+notify.illegal = Μη νόμιμη κίνηση.
+notify.cannot_move = Αυτή η κίνηση δεν μπορεί να γίνει.
+notify.move_first = Κάντε την κίνησή σας πριν πατήσετε το ρολόι.
+notify.stance.sit_to_play = Καθίστε ξανά για να παίξετε (κάτω βέλος).
+notify.stance.first = Το ρολόι συνεχίζει να τρέχει όσο στέκεστε. Κάτω βέλος: καθίστε ξανά.
+notify.stance.first_untimed = Παίζετε μόνο από την καρέκλα σας. Κάτω βέλος: καθίστε ξανά.
+notify.stance.finish_move = Ολοκληρώστε πρώτα την κίνησή σας.
+notify.draw_already_offered = Έχετε ήδη προτείνει ισοπαλία σε αυτή την κίνηση.
+notify.draw_accepted = Ο αντίπαλός σας δέχεται την ισοπαλία.
+notify.draw_declined = Ο αντίπαλός σας απορρίπτει την πρόταση ισοπαλίας.
+notify.draw_claimed = Ο αντίπαλός σας διεκδικεί ισοπαλία.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Διαιτητής: το ρολόι πατήθηκε χωρίς να γίνει κίνηση, κάτι που μετρά ως μη νόμιμη κίνηση.
+arbiter.unpromoted = Διαιτητής: μη νόμιμη κίνηση, το πιόνι δεν αντικαταστάθηκε με νέο κομμάτι πριν πατηθεί το ρολόι.
+arbiter.illegal = Διαιτητής: μη νόμιμη κίνηση.
+arbiter.second_loses.white = Είναι η δεύτερη μη νόμιμη κίνηση των Λευκών: τα Λευκά χάνουν την παρτίδα.
+arbiter.second_loses.black = Είναι η δεύτερη μη νόμιμη κίνηση των Μαύρων: τα Μαύρα χάνουν την παρτίδα.
+arbiter.second_draw.white = Είναι η δεύτερη μη νόμιμη κίνηση των Λευκών, αλλά τα Μαύρα δεν μπορούν να κάνουν ματ: η παρτίδα λήγει ισόπαλη.
+arbiter.second_draw.black = Είναι η δεύτερη μη νόμιμη κίνηση των Μαύρων, αλλά τα Λευκά δεν μπορούν να κάνουν ματ: η παρτίδα λήγει ισόπαλη.
+arbiter.queen = Το πιόνι γίνεται βασίλισσα.
+arbiter.queen_one_minute.white = Το πιόνι γίνεται βασίλισσα και τα Λευκά παίρνουν ένα επιπλέον λεπτό.
+arbiter.queen_one_minute.black = Το πιόνι γίνεται βασίλισσα και τα Μαύρα παίρνουν ένα επιπλέον λεπτό.
+arbiter.queen_two_minutes.white = Το πιόνι γίνεται βασίλισσα και τα Λευκά παίρνουν δύο επιπλέον λεπτά.
+arbiter.queen_two_minutes.black = Το πιόνι γίνεται βασίλισσα και τα Μαύρα παίρνουν δύο επιπλέον λεπτά.
+arbiter.restored = Η θέση αποκαθίσταται.
+arbiter.restored_one_minute.white = Η θέση αποκαθίσταται και τα Λευκά παίρνουν ένα επιπλέον λεπτό.
+arbiter.restored_one_minute.black = Η θέση αποκαθίσταται και τα Μαύρα παίρνουν ένα επιπλέον λεπτό.
+arbiter.restored_two_minutes.white = Η θέση αποκαθίσταται και τα Λευκά παίρνουν δύο επιπλέον λεπτά.
+arbiter.restored_two_minutes.black = Η θέση αποκαθίσταται και τα Μαύρα παίρνουν δύο επιπλέον λεπτά.
+arbiter.one_minute.white = Τα Λευκά παίρνουν ένα επιπλέον λεπτό.
+arbiter.one_minute.black = Τα Μαύρα παίρνουν ένα επιπλέον λεπτό.
+arbiter.two_minutes.white = Τα Λευκά παίρνουν δύο επιπλέον λεπτά.
+arbiter.two_minutes.black = Τα Μαύρα παίρνουν δύο επιπλέον λεπτά.
+arbiter.second_loses = Με δεύτερη μη νόμιμη κίνηση, η παρτίδα χάνεται.
+arbiter.touched.white = Τα Λευκά πρέπει να κινήσουν το κομμάτι που άγγιξαν.
+arbiter.touched.black = Τα Μαύρα πρέπει να κινήσουν το κομμάτι που άγγιξαν.
+arbiter.game_over = Η παρτίδα έχει τελειώσει.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Παρακολούθηση παρτίδας
+
+viewer.title = ΠΑΡΑΚΟΛΟΥΘΗΣΗ ΠΑΡΤΙΔΑΣ
+viewer.white = ΛΕΥΚΑ
+viewer.black = ΜΑΥΡΑ
+viewer.time_control = ΧΡΟΝΟΣ ΣΚΕΨΗΣ
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Αλλαγή χρωμάτων
+viewer.note = Και οι δύο παίκτες είναι το Stockfish. Πετάξτε ελεύθερα μέσα στην αίθουσα όσο παίζουν: κανείς δεν θα σας δει.
+viewer.summary = {0} εναντίον {1}
+viewer.custom = Προσαρμοσμένο
+viewer.tc.custom = Όπως θέλετε
+viewer.base_time = Βασικός χρόνος
+viewer.increment = Προσαύξηση
+viewer.delay = Καθυστέρηση
+viewer.off = Καμία
+viewer.minutes = {0} λεπ.
+viewer.seconds = {0} δευτ.
+viewer.delay_summary = καθυστέρηση {0} δευτ.
+viewer.back = Πίσω
+viewer.start = Έναρξη
+
+viewer.paused = ΠΑΥΣΗ
+viewer.resume = Συνέχεια
+viewer.options = Επιλογές
+viewer.main_menu = Κύριο μενού
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = ΧΕΙΡΙΣΜΟΣ
+viewer.keys.move = W A S D  ·  Z Q S D  ·  βέλη
+viewer.controls.move = Μετακίνηση
+viewer.keys.updown = E, Διάστημα  /  C, Ctrl
+viewer.controls.updown = Πάνω / κάτω
+viewer.keys.fast = Shift
+viewer.controls.fast = Πιο γρήγορα
+viewer.keys.look = Δεξί κουμπί ποντικιού
+viewer.controls.look = Ματιά τριγύρω
+viewer.keys.speed = Ροδέλα ποντικιού
+viewer.controls.speed = Ταχύτητα
+viewer.keys.views = 1 – 9
+viewer.controls.views = Οπτικές γωνίες
+viewer.keys.eyes = 0
+viewer.controls.eyes = Μέσα από τα μάτια του παίκτη που έχει σειρά
+viewer.keys.moves = Tab
+viewer.controls.moves = Λίστα κινήσεων
+viewer.keys.menu = Esc
+viewer.controls.menu = Μενού
+viewer.keys.hide = H
+viewer.controls.hide = Απόκρυψη αυτού του πλαισίου
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Παύση / συνέχεια
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Μία κίνηση πίσω / μπροστά
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Πιο αργά / πιο γρήγορα
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Αρχή / τέλος της παρτίδας
+viewer.speed = Ταχύτητα {0} m/s
+viewer.view.0 = Μέσα από τα μάτια των παικτών
+viewer.view.1 = Δίπλα στο τραπέζι
+viewer.view.2 = Πάνω από τη σκακιέρα
+viewer.view.3 = Η αίθουσα
+viewer.view.4 = Το ρολόι
+viewer.view.5 = Το πρόσωπο των Λευκών
+viewer.view.6 = Το πρόσωπο των Μαύρων
+viewer.view.7 = Η μονομαχία
+viewer.view.8 = Τα παράθυρα
+viewer.view.9 = Οι ταπισερί
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+# Greek: the sides take their article and a plural verb ("Τα Λευκά προτείνουν"), so viewer.offer_*
+# are two sentences, each starting with a side.
+viewer.side.white = Τα Λευκά
+viewer.side.black = Τα Μαύρα
+viewer.flag.white = Ο χρόνος των Λευκών τελείωσε.
+viewer.flag.black = Ο χρόνος των Μαύρων τελείωσε.
+viewer.claims_draw = {0} διεκδικούν ισοπαλία.
+viewer.offer_accepted = {0} προτείνουν ισοπαλία. {1} δέχονται.
+viewer.offer_declined = {0} προτείνουν ισοπαλία. {1} αρνούνται.
+viewer.gameover.white_wins = Τα Λευκά κερδίζουν μετά την κίνηση {0}.
+viewer.gameover.black_wins = Τα Μαύρα κερδίζουν μετά την κίνηση {0}.
+viewer.gameover.draw = Η παρτίδα λήγει ισόπαλη μετά την κίνηση {0}.
+viewer.gameover.players = {0} εναντίον {1}
+viewer.watch_again = Ακόμη μία παρτίδα
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Καμία παρτίδα με βαθμολογία ακόμη
+elo.provisional = Προσωρινή βαθμολογία
+elo.peak = Μέγιστη {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Το Elo σας: {0}
+elo.expected = αναμενόμενο σκορ {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · αυτή η παρτίδα δεν βαθμολογείται
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Φύλλο σημείωσης
+scoresheet.event = Διοργάνωση
+scoresheet.date = Ημερομηνία
+scoresheet.round = Γύρος
+scoresheet.board = Σκακιέρα
+scoresheet.page = Σελίδα
+scoresheet.white = Λευκά
+scoresheet.black = Μαύρα
+scoresheet.elo = Elo
+scoresheet.result = Αποτέλεσμα
+scoresheet.move_no = Αρ.
+scoresheet.sign_white = Υπογραφή Λευκών
+scoresheet.sign_black = Υπογραφή Μαύρων
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = Ρ Β Π Α Ι
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Online παιχνίδι
+online.title = ONLINE ΠΑΙΧΝΙΔΙ
+online.continue = Συνέχεια
+online.retry = Νέα προσπάθεια
+online.copy = Αντιγραφή
+online.copied = Αντιγράφηκε
+online.copy.unavailable = Η αντιγραφή δεν είναι διαθέσιμη εδώ: σημειώστε το κάπου.
+online.rated = Με βαθμολογία
+online.casual = Φιλική
+online.casual_only = Μόνο φιλικές
+online.color.random = Κλήρωση
+online.ping = {0} ms
+online.conn.online = Συνδέθηκε
+online.conn.connecting = Σύνδεση…
+online.conn.reconnecting = Επανασύνδεση…
+online.conn.offline = Χωρίς σύνδεση
+online.conn.incompatible = Άλλη έκδοση
+online.no_server.text = Για το online παιχνίδι χρειάζεται ένας διακομιστής Scacelith. Εισαγάγετε τη διεύθυνση ενός διακομιστή στις επιλογές ή παίξτε με έναν φίλο σε απευθείας αγώνα.
+online.no_server.settings = Ρυθμίσεις διακομιστή
+
+# Options > Online server
+options.tab.online = Online διακομιστής
+options.online.server = Διακομιστής
+options.online.server.help = Ο επίσημος διακομιστής ή ένας προσαρμοσμένος (κοινοτικός) διακομιστής που διαχειρίζεται κάποιος άλλος, προσβάσιμος μέσω του ασφαλούς web API και του ασφαλούς WebSocket του. Συνδέεστε χωριστά σε κάθε διακομιστή: ένας λογαριασμός και η σύνδεσή του δεν μοιράζονται ποτέ μεταξύ διακομιστών.
+options.online.official = Επίσημος διακομιστής — {0}
+options.online.community = Προσαρμοσμένος διακομιστής
+options.online.host = Διεύθυνση
+options.online.host.hint = όνομα τομέα ή διεύθυνση IP
+options.online.host.help = Το όνομα τομέα ή η διεύθυνση IP του προσαρμοσμένου διακομιστή, όπως τα έδωσε ο κάτοχός του.
+options.online.api_port = Θύρα HTTPS / API
+options.online.api_port.help = Η θύρα του ασφαλούς web API του διακομιστή (443 στους διακομιστές Scacelith).
+options.online.ws_port = Θύρα WSS
+options.online.ws_port.hint = ίδια με τη θύρα API
+options.online.ws_port.help = Η θύρα του ασφαλούς WebSocket του διακομιστή. Αφήστε το πεδίο κενό όταν είναι ίδια με τη θύρα API.
+options.online.pin = Αποτύπωμα πιστοποιητικού (SHA-256)
+options.online.pin.hint = προαιρετικό
+options.online.pin.help = Για διακομιστή με αυτοϋπογεγραμμένο πιστοποιητικό: το αποτύπωμα SHA-256 που δίνει ο κάτοχός του (64 δεκαεξαδικοί χαρακτήρες, με ή χωρίς άνω και κάτω τελείες). Αφήστε το κενό για να εμπιστεύεστε τα πιστοποιητικά του συστήματος.
+options.online.pin.invalid = Ένα αποτύπωμα έχει 64 δεκαεξαδικούς χαρακτήρες (με ή χωρίς άνω και κάτω τελείες).
+options.online.test = Δοκιμή σύνδεσης
+options.online.test_ok = {0}: η σύνδεση πέτυχε· ο διακομιστής είναι συμβατός με αυτή την έκδοση.
+options.online.test_incompatible = {0}: η σύνδεση πέτυχε, αλλά ο διακομιστής απαιτεί άλλη έκδοση του Scacelith.
+options.online.in_game = Ο διακομιστής δεν μπορεί να αλλάξει κατά τη διάρκεια μιας online παρτίδας.
+options.online.remember_session = Απομνημόνευση της σύνδεσής μου όταν η κλειδοθήκη του συστήματος δεν είναι διαθέσιμη
+options.online.remember_session.help = Όταν καμία κλειδοθήκη συστήματος (GNOME Keyring, KWallet…) δεν μπορεί να κρατήσει τη συνεδρία σας, αυτή αποθηκεύεται σε ένα αρχείο που μπορεί να διαβάσει μόνο ο λογαριασμός χρήστη σας. Όποιος μπορεί να διαβάσει τα αρχεία σας ή ένα αντίγραφό τους, όπως ένα αντίγραφο ασφαλείας, θα μπορούσε να χρησιμοποιήσει αυτή τη συνεδρία. Ανενεργό: η σύνδεσή σας διατηρείται μέχρι να κλείσει το παιχνίδι. Μπορείτε να αποσυνδέσετε οποιαδήποτε συσκευή από τις Συνδεδεμένες συσκευές, στον λογαριασμό σας.
+
+# Sign in, create an account
+online.signin.lead = Συνδεθείτε στο {0} για να παίξετε online με άλλους παίκτες.
+online.field.user = Όνομα χρήστη ή email
+online.field.user.hint = όνομα ή διεύθυνση
+online.field.password = Κωδικός πρόσβασης
+online.field.password.hint = τουλάχιστον 10 χαρακτήρες
+online.field.password2 = Επιβεβαίωση κωδικού
+online.field.current_password = Τρέχων κωδικός πρόσβασης
+online.field.new_password = Νέος κωδικός πρόσβασης
+online.field.username = Όνομα χρήστη
+online.field.username.hint = 3 έως 24 γράμματα, ψηφία, _ ή -
+online.field.email = Email
+online.field.new_email = Νέο email
+online.field.code = Κωδικός
+online.field.code.hint = 6 ψηφία ή κωδικός ανάκτησης
+online.field.code6 = Κωδικός της εφαρμογής
+online.field.code6.hint = 6 ψηφία
+online.signin.button = Σύνδεση
+online.signin.google = Συνέχεια με Google
+online.signin.register = Δημιουργία λογαριασμού
+online.signin.forgot = Ξεχάσατε τον κωδικό;
+online.mfa.title = ΚΩΔΙΚΟΣ ΔΥΟ ΠΑΡΑΓΟΝΤΩΝ
+online.mfa.lead = Εισαγάγετε τον 6ψήφιο κωδικό που εμφανίζει η εφαρμογή ελέγχου ταυτότητας ή έναν από τους κωδικούς ανάκτησης.
+online.mfa.verify = Επαλήθευση
+online.register.title = ΔΗΜΙΟΥΡΓΙΑ ΛΟΓΑΡΙΑΣΜΟΥ
+online.register.lead = Ένας δωρεάν λογαριασμός στο {0}: το όνομά σας, οι βαθμολογίες και οι παρτίδες σας υπάρχουν μόνο σε αυτόν τον διακομιστή.
+online.register.button = Δημιουργία λογαριασμού
+online.register.working = Δημιουργία του λογαριασμού σας… Μπορεί να διαρκέσει μερικά δευτερόλεπτα.
+online.register.ready = Ο λογαριασμός σας είναι έτοιμος. Συνδεθείτε για να παίξετε.
+online.password.mismatch = Οι δύο κωδικοί πρόσβασης διαφέρουν.
+online.check_email.title = ΕΛΕΓΞΤΕ ΤΟ EMAIL ΣΑΣ
+online.check_email.text = Στείλαμε έναν σύνδεσμο στη διεύθυνση {0}. Ανοίξτε τον για να ενεργοποιήσετε τον λογαριασμό σας και μετά συνδεθείτε εδώ.
+online.check_email.ask = Εισαγάγετε τη διεύθυνση του λογαριασμού σας για να λάβετε ξανά τον σύνδεσμο ενεργοποίησης.
+online.check_email.resend = Νέα αποστολή του email
+online.check_email.resent = Το email στάλθηκε ξανά. Μπορεί να αργήσει μερικά λεπτά· ελέγξτε και τον φάκελο ανεπιθύμητης αλληλογραφίας.
+online.forgot.title = ΞΕΧΑΣΜΕΝΟΣ ΚΩΔΙΚΟΣ
+online.forgot.lead = Εισαγάγετε τη διεύθυνση email του λογαριασμού σας: θα σας στείλουμε έναν σύνδεσμο για να ορίσετε νέο κωδικό πρόσβασης.
+online.forgot.button = Αποστολή συνδέσμου
+online.forgot.sent = Αν κάποιος λογαριασμός χρησιμοποιεί αυτή τη διεύθυνση, ένας σύνδεσμος είναι καθ’ οδόν.
+online.sso.title = ΣΥΝΔΕΣΗ ΜΕ GOOGLE
+online.sso.wait = Συνεχίστε στο πρόγραμμα περιήγησης: επιλέξτε τον λογαριασμό σας Google στο παράθυρο που άνοιξε. Το Scacelith αναλαμβάνει μόλις η Google σας στείλει πίσω.
+online.sso.name_title = ΕΠΙΛΕΞΤΕ ΟΝΟΜΑ
+online.sso.name_lead = Είναι η πρώτη φορά που έρχεστε εδώ μέσω Google. Επιλέξτε το όνομα που θα βλέπουν οι άλλοι παίκτες.
+online.sso.continue = Συνέχεια
+online.sso.finishing = Η Google σας έστειλε πίσω. Ολοκλήρωση της σύνδεσης…
+online.sso.link_title = ΠΡΟΣΘΗΚΗ ΣΥΝΔΕΣΗΣ GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Ο λογαριασμός {0} στο {1} χρησιμοποιεί ήδη τη διεύθυνση email αυτού του λογαριασμού Google. Εισαγάγετε τον κωδικό πρόσβασης αυτού του λογαριασμού για να του προσθέσετε τη σύνδεση με Google. Αρκεί να το κάνετε μία φορά.
+online.sso.link_button = Προσθήκη σύνδεσης Google
+online.sso.link_mfa = Η σύνδεση με Google προστίθεται σε αυτόν τον λογαριασμό μόλις γίνει δεκτός ο κωδικός.
+online.sso.not_mine = Δεν είναι δικός μου λογαριασμός
+online.sso.not_mine_note = Η σύνδεση με Google δεν προστέθηκε. Αν αυτή η διεύθυνση email είναι δική σας, χρησιμοποιήστε την επιλογή «Ξεχάσατε τον κωδικό;» με αυτή τη διεύθυνση: ο σύνδεσμος θα σταλεί σε εκείνο το γραμματοκιβώτιο. Αν ο λογαριασμός ζητά επίσης κωδικό δύο παραγόντων που δεν έχετε, επικοινωνήστε με τον διαχειριστή του διακομιστή.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: σύνδεση με Google
+online.sso.page.done_heading = Πίσω στο Scacelith
+online.sso.page.done = Η Google σας έστειλε πίσω στο Scacelith. Επιστρέψτε στο παιχνίδι για να ολοκληρωθεί η σύνδεση· μπορείτε να κλείσετε αυτή την καρτέλα.
+online.sso.page.cancelled_heading = Η σύνδεση ακυρώθηκε
+online.sso.page.cancelled = Η σύνδεση με Google ακυρώθηκε. Μπορείτε να κλείσετε αυτή την καρτέλα και να επιστρέψετε στο Scacelith.
+online.sso.page.foreign_heading = Αυτή η σελίδα δεν προορίζεται για εσάς
+online.sso.page.foreign = Αυτή η σελίδα δεν αντιστοιχεί στη σύνδεση που περιμένει το Scacelith σε αυτόν τον υπολογιστή. Αν δεν ξεκινήσατε μόλις τώρα μια σύνδεση με Google στο Scacelith, κάποιος μπορεί να σας έστειλε αυτόν τον σύνδεσμο: κλείστε αυτή την καρτέλα.
+
+# Account
+online.account.button = Λογαριασμός
+online.account.title = ΛΟΓΑΡΙΑΣΜΟΣ
+online.account.section = ΛΟΓΑΡΙΑΣΜΟΣ
+online.account.username = ΟΝΟΜΑ ΧΡΗΣΤΗ
+online.account.email = EMAIL
+online.account.unverified = (δεν έχει επαληθευτεί)
+online.account.mfa = ΕΛΕΓΧΟΣ ΤΑΥΤΟΤΗΤΑΣ ΔΥΟ ΠΑΡΑΓΟΝΤΩΝ
+online.account.mfa_on = Ενεργός
+online.account.mfa_off = Ανενεργός
+online.account.google = GOOGLE
+online.account.google_linked = Συνδέεται με λογαριασμό Google
+online.account.change_password = Αλλαγή κωδικού πρόσβασης
+online.account.mfa_setup = Ενεργοποίηση δύο παραγόντων
+online.account.mfa_disable = Απενεργοποίηση δύο παραγόντων
+online.account.recovery = Νέοι κωδικοί ανάκτησης
+online.account.sign_out = Αποσύνδεση
+online.account.sign_out_all = Αποσύνδεση παντού
+online.account.sign_out_all.help = Αποσυνδέει αυτόν τον λογαριασμό από κάθε υπολογιστή, μαζί και από αυτόν εδώ.
+online.account.signed_out = Αποσυνδεθήκατε.
+online.account.signed_out_all = Αποσυνδεθήκατε από όλους τους υπολογιστές.
+online.account.signing_out_all = Αποσύνδεση όλων των υπολογιστών…
+online.account.sign_out_all_failed = Οι άλλοι υπολογιστές σας μπορεί να είναι ακόμη συνδεδεμένοι: συνδεθείτε ξανά και μετά αποσυνδέστε τους από τις Συνδεδεμένες συσκευές. {0}
+online.account.sign_out_all_retry = Οι άλλοι υπολογιστές σας μπορεί να είναι ακόμη συνδεδεμένοι. Δοκιμάστε ξανά την Αποσύνδεση παντού. {0}
+online.account.ratings = ΒΑΘΜΟΛΟΓΙΕΣ
+online.account.col.tc = ΧΡΟΝΟΣ ΣΚΕΨΗΣ
+online.account.col.rating = ΒΑΘΜΟΛΟΓΙΑ
+online.account.col.games = ΠΑΡΤΙΔΕΣ
+online.account.col.record = Ν / Ι / Η
+online.account.provisional = Το ερωτηματικό δείχνει προσωρινή βαθμολογία (λίγες παρτίδες ως τώρα).
+online.password.title = ΑΛΛΑΓΗ ΚΩΔΙΚΟΥ ΠΡΟΣΒΑΣΗΣ
+online.password.button = Αλλαγή κωδικού
+online.password.changed = Ο κωδικός πρόσβασής σας άλλαξε.
+online.password.other_sessions = Οι άλλοι υπολογιστές σας θα πρέπει να συνδεθούν ξανά.
+online.mfa_setup.title = ΕΛΕΓΧΟΣ ΤΑΥΤΟΤΗΤΑΣ ΔΥΟ ΠΑΡΑΓΟΝΤΩΝ
+online.mfa_setup.lead = Ο έλεγχος ταυτότητας δύο παραγόντων ζητά έναν κωδικό από μια εφαρμογή στο τηλέφωνό σας κάθε φορά που συνδέεστε. Εισαγάγετε τον κωδικό πρόσβασής σας για να ξεκινήσετε.
+online.mfa_setup.scan = 1. Σαρώστε αυτόν τον κωδικό με μια εφαρμογή ελέγχου ταυτότητας ή πληκτρολογήστε σε αυτήν το παρακάτω κλειδί:
+online.mfa_setup.enter = 2. Εισαγάγετε τον 6ψήφιο κωδικό που εμφανίζει η εφαρμογή:
+online.mfa_setup.enable = Ενεργοποίηση
+online.mfa_setup.done = Ο έλεγχος ταυτότητας δύο παραγόντων είναι ενεργός.
+online.mfa_off.title = ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ ΔΥΟ ΠΑΡΑΓΟΝΤΩΝ
+online.mfa_off.lead = Εισαγάγετε τον κωδικό πρόσβασής σας και έναν κωδικό από την εφαρμογή σας (ή έναν κωδικό ανάκτησης).
+online.mfa_off.button = Απενεργοποίηση
+online.mfa.off_done = Ο έλεγχος ταυτότητας δύο παραγόντων είναι ανενεργός.
+online.recovery.title = ΚΩΔΙΚΟΙ ΑΝΑΚΤΗΣΗΣ
+online.recovery.lead = Αν χάσετε το τηλέφωνό σας, κάθε κωδικός σάς συνδέει μία φορά. Φυλάξτε τους σε ασφαλές μέρος: εμφανίζονται μόνο τώρα.
+online.recovery.saved = Τους αποθήκευσα
+online.recovery.new_title = ΝΕΟΙ ΚΩΔΙΚΟΙ ΑΝΑΚΤΗΣΗΣ
+online.recovery.new_lead = Οι νέοι κωδικοί αντικαθιστούν τους παλιούς. Εισαγάγετε τον κωδικό πρόσβασής σας και έναν κωδικό από την εφαρμογή σας.
+online.recovery.button = Νέοι κωδικοί
+online.account.manage = ΑΣΦΑΛΕΙΑ ΚΑΙ ΔΕΔΟΜΕΝΑ
+online.account.pending_email = Σε αναμονή επιβεβαίωσης: {0}
+online.account.accept_challenges = Αποδοχή προκλήσεων
+online.account.accept_challenges.help = Οι άλλοι παίκτες μπορούν να σας προκαλέσουν μέσω του ονόματος χρήστη σας. Ανενεργό: οι προκλήσεις τους απορρίπτονται.
+online.account.history = Ιστορικό παρτίδων
+online.account.devices = Συνδεδεμένες συσκευές
+online.account.change_email = Αλλαγή email
+online.account.export = Λήψη των δεδομένων μου
+online.account.delete = Διαγραφή λογαριασμού
+
+# Play
+online.play.signed_in = Σύνδεση ως {0}
+online.session.file = Καμία κλειδοθήκη συστήματος δεν μπόρεσε να κρατήσει τη σύνδεσή σας: απομνημονεύεται σε ένα αρχείο που μπορεί να διαβάσει μόνο ο λογαριασμός χρήστη σας (Επιλογές > Online διακομιστής).
+online.session.memory = Καμία κλειδοθήκη συστήματος δεν μπόρεσε να κρατήσει τη σύνδεσή σας, και δεν αποθηκεύεται σε αρχείο: η σύνδεσή σας διατηρείται μέχρι να κλείσει το παιχνίδι (Επιλογές > Online διακομιστής).
+online.play.find_section = ΑΝΑΖΗΤΗΣΗ ΑΝΤΙΠΑΛΟΥ
+online.play.friend_section = ΠΑΙΧΝΙΔΙ ΜΕ ΦΙΛΟ
+online.play.mode = Παρτίδα
+online.play.mode.help = Οι παρτίδες με βαθμολογία αλλάζουν τη βαθμολογία σας σε αυτόν τον χρόνο σκέψης· οι φιλικές όχι.
+online.play.find = Εύρεση αντιπάλου
+online.play.connecting = Σύνδεση με τον διακομιστή…
+online.play.cooldown = Μπορείτε να ψάξετε ξανά αντίπαλο στις {0}.
+online.play.banned = Αυτός ο λογαριασμός έχει ανασταλεί έως {0}.
+online.play.challenge = Πρόκληση παίκτη
+online.play.challenge.desc = Προσκαλέστε κάποιον που είναι online, μέσω του ονόματος χρήστη του.
+online.play.private = Ιδιωτική παρτίδα
+online.play.private.desc = Δημιουργήστε έναν κωδικό για να τον δώσετε σε έναν φίλο ή μπείτε με τον δικό του.
+online.play.direct = Απευθείας αγώνας
+online.play.direct.desc = Χωρίς διακομιστή: παίξτε κατευθείαν με τον υπολογιστή ενός φίλου.
+online.search.title = ΑΝΑΖΗΤΗΣΗ
+online.search.window = Εύρος βαθμολογίας {0}
+online.search.queued = {0} παίκτης ψάχνει|{0} παίκτες ψάχνουν
+online.search.wait = Αναζήτηση αντιπάλου του επιπέδου σας…
+online.outgoing.challenge = Η ΠΡΟΚΛΗΣΗ ΣΤΑΛΘΗΚΕ
+online.outgoing.waiting = αναμονή απάντησης
+online.outgoing.private = ΙΔΙΩΤΙΚΗ ΠΑΡΤΙΔΑ
+online.outgoing.private_hint = Δώστε αυτόν τον κωδικό στον φίλο σας: η παρτίδα ξεκινά μόλις μπει.
+online.challenge.title = ΠΡΟΚΛΗΣΗ ΠΑΙΚΤΗ
+online.challenge.opponent = ΑΝΤΙΠΑΛΟΣ
+online.field.opponent = Όνομα χρήστη
+online.field.opponent.hint = ποιον θα προκαλέσετε
+online.challenge.note = Ο αντίπαλός σας βλέπει την πρόκληση όπου κι αν βρίσκεται στα μενού και έχει ένα λεπτό για να απαντήσει.
+online.challenge.send = Αποστολή πρόκλησης
+online.terms.rated = Με βαθμολογία
+online.terms.rated.help = Βαθμολογούνται μόνο οι παρτίδες με επίσημο χρόνο σκέψης.
+online.terms.color = Το χρώμα σας
+online.private.title = ΙΔΙΩΤΙΚΗ ΠΑΡΤΙΔΑ
+online.private.create_section = ΔΗΜΙΟΥΡΓΙΑ
+online.private.create_note = Λαμβάνετε έναν σύντομο κωδικό: όποιος τον εισαγάγει παίζει μαζί σας.
+online.private.create = Δημιουργία παρτίδας
+online.private.join_section = ΣΥΜΜΕΤΟΧΗ
+online.field.private_code = Κωδικός
+online.private.join = Συμμετοχή
+online.private.joining = Σύνδεση στην παρτίδα…
+online.challenge.received = ΠΡΟΚΛΗΣΗ
+online.challenge.accept = Αποδοχή
+online.challenge.decline = Απόρριψη
+online.challenge.you_white = παίζετε με τα λευκά
+online.challenge.you_black = παίζετε με τα μαύρα
+online.challenge.you_random = χρώματα με κλήρωση
+online.challenge.declined = {0} απέρριψε την πρόκλησή σας.
+online.challenge.expired = Η πρόκλησή σας έληξε χωρίς απάντηση.
+online.challenge.unavailable = Ο χρήστης {0} δεν είναι διαθέσιμος αυτή τη στιγμή.
+online.challenge.lost = Η σύνδεση χάθηκε: η πρόκλησή σας ακυρώθηκε.
+
+# At the table
+online.pause.clock_runs = Η παρτίδα συνεχίζεται: το ρολόι σας συνεχίζει να τρέχει.
+online.pause.abort = Ακύρωση παρτίδας
+online.pause.abort.help = Πριν από την πρώτη σας κίνηση, η παρτίδα μπορεί να ακυρωθεί· δεν μετράει.
+online.pause.leave = Έξοδος από την παρτίδα
+online.confirm.resign.text = Θέλετε να εγκαταλείψετε την παρτίδα; Θα την κερδίσει ο αντίπαλός σας.
+online.confirm.leave.text = Αν βγείτε, εγκαταλείπετε την παρτίδα: θα την κερδίσει ο αντίπαλός σας.
+online.confirm.leave.ok = Εγκατάλειψη και έξοδος
+online.confirm.leave_abort.text = Έξοδος πριν από την πρώτη σας κίνηση; Η παρτίδα ακυρώνεται και δεν μετράει.
+online.confirm.leave_abort.ok = Ακύρωση και έξοδος
+online.draw.card_title = ΠΡΟΤΑΣΗ ΙΣΟΠΑΛΙΑΣ
+online.draw.card_text = Ο αντίπαλός σας προτείνει ισοπαλία.
+online.draw.accept = Αποδοχή
+online.draw.decline = Απόρριψη
+online.draw.offered = Ο αντίπαλός σας προτείνει ισοπαλία.
+online.opponent_back = Ο αντίπαλός σας επέστρεψε.
+online.opponent_away = Ο αντίπαλος αποσυνδέθηκε — {0} για να επιστρέψει
+online.first_move = Η πρώτη σας κίνηση · {0}
+online.reconnecting = ΕΠΑΝΑΣΥΝΔΕΣΗ…
+online.reconnecting.text = Η παρτίδα συνεχίζεται στον διακομιστή και το ρολόι σας συνεχίζει να τρέχει.
+online.gameover.aborted = Η παρτίδα ακυρώθηκε: δεν μετράει.
+online.rating.casual = Φιλική παρτίδα: οι βαθμολογίες δεν αλλάζουν.
+online.rating.change = Βαθμολογία {0} → {1} ({2})
+online.rating.pending = Βαθμολογία: …
+online.rematch.accept = Αποδοχή ρεβάνς
+online.rematch.offered = Ο αντίπαλός σας προτείνει ρεβάνς.
+online.rematch.waiting = Προτάθηκε ρεβάνς…
+online.rematch.gone = Χωρίς ρεβάνς
+online.rematch.declined = Δεν θα γίνει ρεβάνς αυτή τη φορά.
+online.report.button = Αναφορά αντιπάλου
+online.report.title = ΑΝΑΦΟΡΑ
+online.report.lead = Οι αναφορές πηγαίνουν στους συντονιστές του διακομιστή μαζί με αυτή την παρτίδα. Σας ευχαριστούμε που βοηθάτε να παραμένει το παιχνίδι τίμιο.
+online.report.category = Λόγος
+online.report.cheating = Απάτη
+online.report.abuse = Υβριστική συμπεριφορά
+online.report.other = Άλλο
+online.report.comment = Σχόλιο
+online.report.comment.hint = προαιρετικό
+online.report.send = Αποστολή αναφοράς
+online.report.sent = Η αναφορά στάλθηκε. Σας ευχαριστούμε.
+online.report.queued = Η αναφορά σας θα σταλεί όταν τελειώσει η παρτίδα.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0}, {1}
+online.sheet.rated = με βαθμολογία
+online.sheet.casual = φιλική
+online.sheet.game = Παρτίδα {0}
+# End reasons of online games
+reason.online.abandonment = Ο αντίπαλος αποχώρησε από την παρτίδα
+reason.online.abandonment_vs_insufficient = Αποχώρηση από την παρτίδα, αλλά ο αντίπαλος δεν μπορεί να κάνει ματ
+reason.online.aborted = Η παρτίδα ακυρώθηκε
+reason.online.no_show = Καμία πρώτη κίνηση εγκαίρως (ακύρωση)
+reason.online.forfeit = Ήττα με μηδενισμό
+reason.online.server_aborted = Ακυρώθηκε από τον διακομιστή
+reason.online.both_disconnected = Αποσυνδέθηκαν και οι δύο παίκτες
+# Server notices
+online.notice.shutdown = Ο διακομιστής επανεκκινείται σε {0}. Οι παρτίδες σε εξέλιξη αποθηκεύονται.
+online.notice.revoked = Αποσυνδεθήκατε από αυτόν τον διακομιστή.
+online.notice.replaced = Ο λογαριασμός σας συνδέθηκε από άλλο παράθυρο· αυτό εδώ είναι πλέον εκτός σύνδεσης.
+online.notice.rating_restored = Η βαθμολογία σας αποκαταστάθηκε κατά {0} μονάδα: ένας αντίπαλος αποκλείστηκε για απάτη.|Η βαθμολογία σας αποκαταστάθηκε κατά {0} μονάδες: ένας αντίπαλος αποκλείστηκε για απάτη.
+# Errors
+online.err.rate_limited_for = Πάρα πολλές προσπάθειες. Δοκιμάστε ξανά σε {0}.
+online.err.rate_limited = Πάρα πολλές προσπάθειες. Δοκιμάστε ξανά σε λίγο.
+online.err.server_busy_for = Ο διακομιστής είναι απασχολημένος. Δοκιμάστε ξανά σε {0}.
+online.err.server_busy = Ο διακομιστής είναι απασχολημένος. Δοκιμάστε ξανά σε λίγο.
+online.err.banned_until = Αυτός ο λογαριασμός έχει ανασταλεί έως {0}.
+online.err.banned = Αυτός ο λογαριασμός έχει ανασταλεί.
+online.err.invalid_credentials = Λάθος όνομα χρήστη ή κωδικός πρόσβασης.
+online.err.invalid_credentials_pending = Λάθος όνομα χρήστη ή κωδικός πρόσβασης. Αν μόλις εγγραφήκατε, ανοίξτε πρώτα τον σύνδεσμο που σας στείλαμε.
+online.err.email_unverified = Η διεύθυνση email σας δεν έχει επαληθευτεί ακόμη: ανοίξτε τον σύνδεσμο που σας στείλαμε.
+online.err.network = Δεν είναι δυνατή η πρόσβαση στον διακομιστή. Ελέγξτε τη σύνδεσή σας και τη διεύθυνση του διακομιστή.
+online.err.tls = Δεν ήταν δυνατή η δημιουργία ασφαλούς σύνδεσης με τον διακομιστή.
+online.err.certificate = Το πιστοποιητικό του διακομιστή δεν είναι αξιόπιστο (ή δεν αντιστοιχεί στο αποτύπωμα που ορίστηκε στις επιλογές).
+online.err.incompatible = Αυτός ο διακομιστής απαιτεί άλλη έκδοση του Scacelith.
+online.err.unauthorized = Η συνεδρία σας έληξε: συνδεθείτε ξανά.
+online.err.username_taken = Αυτό το όνομα χρήστη χρησιμοποιείται ήδη.
+online.err.email_taken = Ένας λογαριασμός χρησιμοποιεί ήδη αυτή τη διεύθυνση email.
+online.err.invalid_username = Τα ονόματα χρήστη έχουν 3 έως 24 γράμματα, ψηφία, _ ή -.
+online.err.invalid_email = Αυτή η διεύθυνση email δεν είναι έγκυρη.
+online.err.weak_password = Αυτός ο κωδικός πρόσβασης είναι πολύ αδύναμος: χρησιμοποιήστε τουλάχιστον 10 χαρακτήρες.
+online.err.invalid_code = Αυτός ο κωδικός δεν είναι σωστός.
+online.err.expired = Αυτό το αίτημα έχει λήξει: ξεκινήστε από την αρχή.
+online.err.registration_closed = Αυτός ο διακομιστής δεν δέχεται νέους λογαριασμούς.
+online.err.sso_cancelled = Η σύνδεση με Google ακυρώθηκε.
+online.err.sso_expired = Η σύνδεση με Google άργησε πολύ ή έχει ήδη χρησιμοποιηθεί. Ξεκινήστε από την αρχή.
+online.err.sso_failed = Η σύνδεση με Google δεν πέτυχε. Δοκιμάστε ξανά.
+online.err.sso_listen = Το Scacelith δεν μπόρεσε να λάβει την απάντηση της Google σε αυτόν τον υπολογιστή. Δοκιμάστε ξανά.
+online.err.sso_origin = Η σύνδεση με Google δεν λειτουργεί μέσω αυτής της διεύθυνσης διακομιστή. Προσθέστε τον διακομιστή με το δημόσιο όνομα που δίνει ο διαχειριστής του και δοκιμάστε ξανά.
+online.err.browser = Δεν ήταν δυνατό να ανοίξει το πρόγραμμα περιήγησης.
+online.err.sso_email_unverified = Η Google δεν έχει επιβεβαιώσει τη διεύθυνση email αυτού του λογαριασμού Google.
+online.err.sso_account_exists = Ένας λογαριασμός χρησιμοποιεί ήδη αυτή τη διεύθυνση email και δεν μπορεί να αποκτήσει σύνδεση μέσω Google: συνδεθείτε με τον κωδικό πρόσβασής του ή χρησιμοποιήστε την επιλογή «Ξεχάσατε τον κωδικό;».
+online.err.sso_already_linked = Αυτός ο λογαριασμός Google είναι ήδη συνδεδεμένος με άλλον λογαριασμό.
+online.err.account_disabled = Αυτός ο λογαριασμός δεν μπορεί πλέον να χρησιμοποιηθεί.
+online.err.server_error = Ο διακομιστής αντιμετώπισε πρόβλημα. Δοκιμάστε ξανά.
+online.err.timeout = Ο διακομιστής δεν απάντησε εγκαίρως.
+online.err.offline = Δεν υπάρχει σύνδεση με τον διακομιστή: δοκιμάστε ξανά μόλις συνδεθείτε.
+online.err.other = Ο διακομιστής απέρριψε το αίτημα ({0}).
+online.err.code = Ο διακομιστής απέρριψε το αίτημα (σφάλμα {0}).
+online.err.slow_down = Λίγο πιο αργά, παρακαλώ.
+online.err.server_full = Ο διακομιστής είναι γεμάτος. Δοκιμάστε ξανά αργότερα.
+online.err.restarting = Ο διακομιστής επανεκκινείται. Δοκιμάστε ξανά σε λίγο.
+online.err.move_refused = Ο διακομιστής απέρριψε αυτή την κίνηση: η σκακιέρα επανέρχεται στην προηγούμενη θέση.
+online.err.game_over = Αυτή η παρτίδα έχει ήδη τελειώσει.
+online.err.already_in_game = Παίζετε ήδη μια παρτίδα.
+online.err.invalid_category = Αυτός ο χρόνος σκέψης δεν προσφέρεται εδώ.
+online.err.draw_offer_limit = Όχι άλλες προτάσεις ισοπαλίας προς το παρόν.
+online.err.abort_not_allowed = Η παρτίδα δεν μπορεί πλέον να ακυρωθεί.
+online.err.no_pending_offer = Δεν υπάρχει πρόταση για να απαντήσετε.
+online.err.flag_fell = Ο χρόνος σας τελείωσε.
+online.err.queue_not_allowed = Δεν μπορείτε να ψάξετε αντίπαλο αυτή τη στιγμή.
+online.err.challenge_not_found = Αυτή η πρόκληση δεν υπάρχει πια.
+online.err.user_unavailable = Αυτός ο παίκτης δεν είναι διαθέσιμος.
+online.err.challenge_limit = Πάρα πολλές προκλήσεις προς το παρόν. Δοκιμάστε ξανά αργότερα.
+online.err.challenge_self = Δεν μπορείτε να προκαλέσετε τον εαυτό σας.
+online.err.code_invalid = Καμία παρτίδα δεν έχει αυτόν τον κωδικό.
+online.err.rated_official_tc = Βαθμολογούνται μόνο οι παρτίδες με επίσημο χρόνο σκέψης.
+online.err.cooldown = Η αναζήτηση αντιπάλου είναι προσωρινά σε παύση για εσάς.
+online.err.invalid_tc = Αυτός ο χρόνος σκέψης δεν επιτρέπεται.
+online.err.rematch_unavailable = Η ρεβάνς δεν είναι πλέον δυνατή.
+online.err.rated_repeat_limit = Έχετε παίξει αρκετές παρτίδες με βαθμολογία απέναντι σε αυτόν τον παίκτη προς το παρόν. Παίξτε μια φιλική παρτίδα ή δοκιμάστε ξανά αργότερα.
+online.err.cheat_detected = Η παρτίδα διακόπηκε από τους ελέγχους ευ αγωνίζεσθαι του διακομιστή.
+online.err.invalid_password = Λάθος κωδικός πρόσβασης.
+online.err.mfa_code_required = Εισαγάγετε έναν κωδικό από την εφαρμογή ελέγχου ταυτότητας (ή έναν κωδικό ανάκτησης).
+online.err.password_not_set = Αυτός ο λογαριασμός συνδέεται μέσω Google και δεν έχει ακόμη κωδικό πρόσβασης. Ορίστε πρώτα έναν με την επιλογή «Ξεχάσατε τον κωδικό;» στη σελίδα σύνδεσης.
+online.err.too_many_attempts = Πάρα πολλές λανθασμένες προσπάθειες. Δοκιμάστε ξανά αργότερα.
+online.err.too_many_attempts_for = Πάρα πολλές λανθασμένες προσπάθειες. Δοκιμάστε ξανά σε {0}.
+online.err.same_email = Αυτή είναι ήδη η διεύθυνση email σας.
+online.err.not_found = Δεν βρέθηκε στον διακομιστή.
+online.err.invalid_response = Δεν ήταν δυνατή η ανάγνωση της απάντησης του διακομιστή.
+online.err.storage = Δεν ήταν δυνατή η αποθήκευση της συνεδρίας σε αυτόν τον υπολογιστή.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = ΙΣΤΟΡΙΚΟ ΠΑΡΤΙΔΩΝ
+online.history.filter.games = Παρτίδες
+online.history.filter.result = Αποτέλεσμα
+online.history.filter.all = Όλες
+online.history.filter.won = Νίκες
+online.history.filter.lost = Ήττες
+online.history.filter.drawn = Ισοπαλίες
+online.history.col.date = ΗΜΕΡΟΜΗΝΙΑ
+online.history.col.opponent = ΑΝΤΙΠΑΛΟΣ
+online.history.col.result = ΑΠΟΤΕΛΕΣΜΑ
+online.history.col.tc = ΧΡΟΝΟΣ ΣΚΕΨΗΣ
+online.history.col.kind = ΕΙΔΟΣ
+online.history.col.rating = ΒΑΘΜΟΛΟΓΙΑ
+online.history.won = Νίκη
+online.history.lost = Ήττα
+online.history.drawn = Ισοπαλία
+online.history.aborted = Ακυρωμένη
+online.history.page = Σελίδα {0} από {1}
+online.history.total = {0} παρτίδα|{0} παρτίδες
+online.history.previous = Προηγούμενη
+online.history.next = Επόμενη
+online.history.empty.title = ΚΑΜΙΑ ΠΑΡΤΙΔΑ ΑΚΟΜΗ
+online.history.empty = Οι παρτίδες σας σε αυτόν τον διακομιστή εμφανίζονται εδώ μόλις τελειώσουν.
+online.history.empty_filter.title = ΚΑΜΙΑ ΠΑΡΤΙΔΑ
+online.history.empty_filter = Καμία παρτίδα δεν ταιριάζει με αυτά τα φίλτρα.
+online.history.error = ΔΕΝ ΗΤΑΝ ΔΥΝΑΤΗ Η ΦΟΡΤΩΣΗ ΤΟΥ ΙΣΤΟΡΙΚΟΥ
+online.history.unavailable = ΑΥΤΟΣ Ο ΔΙΑΚΟΜΙΣΤΗΣ ΔΕΝ ΠΡΟΣΦΕΡΕΙ ΙΣΤΟΡΙΚΟ ΠΑΡΤΙΔΩΝ
+online.game.title = ΠΑΡΤΙΔΑ
+online.game.players = ΠΑΙΚΤΕΣ
+online.game.you = ΕΣΕΙΣ
+online.game.unrated = Χωρίς βαθμολογία
+online.game.you_won = Κερδίσατε
+online.game.you_lost = Χάσατε
+online.game.draw = Ισοπαλία
+online.game.you_left = Αποχωρήσατε από την παρτίδα
+online.game.date = ΗΜΕΡΟΜΗΝΙΑ
+online.game.time_control = ΧΡΟΝΟΣ ΣΚΕΨΗΣ
+online.game.moves = ΚΙΝΗΣΕΙΣ
+online.game.move_count = {0} κίνηση|{0} κινήσεις
+online.game.no_moves = Δεν παίχτηκε καμία κίνηση.
+online.game.moves_incomplete = Ορισμένες κινήσεις δεν ήταν δυνατό να διαβαστούν: η λίστα σταματά πριν από το τέλος.
+online.game.save = Αποθήκευση παρτίδας
+online.game.saved_button = Αποθηκεύτηκε
+online.game.saved = Η παρτίδα βρίσκεται στις αποθηκευμένες παρτίδες σας.
+online.game.already_saved = Αυτή η παρτίδα βρίσκεται ήδη στις αποθηκευμένες παρτίδες σας.
+online.game.save_failed = Δεν ήταν δυνατή η αποθήκευση της παρτίδας.
+online.game.invalid = Ο διακομιστής έστειλε μια καταγραφή παρτίδας που δεν μπορεί να διαβαστεί.
+online.game.replay = Αναπαραγωγή
+online.game.not_found = Η ΠΑΡΤΙΔΑ ΔΕΝ ΒΡΕΘΗΚΕ
+online.game.error = ΔΕΝ ΗΤΑΝ ΔΥΝΑΤΗ Η ΦΟΡΤΩΣΗ ΤΗΣ ΠΑΡΤΙΔΑΣ
+online.devices.title = ΣΥΝΔΕΔΕΜΕΝΕΣ ΣΥΣΚΕΥΕΣ
+online.devices.lead = Οι συσκευές στις οποίες είναι συνδεδεμένος αυτός ο λογαριασμός. Αν δεν αναγνωρίζετε κάποια, αποσυνδέστε την και αλλάξτε τον κωδικό πρόσβασής σας.
+online.devices.unknown = Άγνωστη συσκευή
+online.devices.this = ΑΥΤΗ Η ΣΥΣΚΕΥΗ
+online.devices.signed_in = Σύνδεση στις {0}
+online.devices.last_active = τελευταία δραστηριότητα {0}
+online.devices.active_now = σε χρήση τώρα
+online.devices.sign_out = Αποσύνδεση
+online.devices.signed_out = Η συσκευή αποσυνδέθηκε.
+online.devices.error = ΔΕΝ ΗΤΑΝ ΔΥΝΑΤΗ Η ΦΟΡΤΩΣΗ ΤΩΝ ΣΥΣΚΕΥΩΝ
+online.devices.all.title = ΑΠΟΣΥΝΔΕΣΗ ΠΑΝΤΟΥ
+online.email.title = ΑΛΛΑΓΗ EMAIL
+online.email.current = Τρέχουσα διεύθυνση: {0}
+online.email.button = Αλλαγή email
+online.email.sent = Στάλθηκε σύνδεσμος επιβεβαίωσης στη διεύθυνση {0}.
+online.email.sent.hint = Η διεύθυνση αλλάζει μόλις ανοίξετε τον σύνδεσμο. Ως τότε, χρησιμοποιείται η τρέχουσα διεύθυνσή σας.
+online.email.done = Τέλος
+online.email.changed = Η διεύθυνση email σας άλλαξε.
+online.export.title = ΛΗΨΗ ΤΩΝ ΔΕΔΟΜΕΝΩΝ ΜΟΥ
+online.export.lead = Όλα όσα κρατά αυτός ο διακομιστής για τον λογαριασμό σας (προφίλ, βαθμολογίες, παρτίδες, συσκευές, συμβάντα ασφαλείας) αποθηκεύονται σε ένα αρχείο JSON σε αυτόν τον υπολογιστή. Εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.
+online.export.button = Λήψη
+online.export.saved = Τα δεδομένα σας αποθηκεύτηκαν σε αυτόν τον υπολογιστή.
+online.export.failed = Δεν ήταν δυνατή η εγγραφή του αρχείου.
+online.delete.title = ΔΙΑΓΡΑΦΗ ΛΟΓΑΡΙΑΣΜΟΥ
+online.delete.warning = Ο λογαριασμός σας θα διαγραφεί από αυτόν τον διακομιστή: η διεύθυνση email, ο κωδικός πρόσβασης, ο έλεγχος ταυτότητας δύο παραγόντων και οι συσκευές σας διαγράφονται, και δεν θα μπορείτε πλέον να συνδεθείτε. Η ενέργεια αυτή δεν αναιρείται.
+online.delete.games = Οι παρτίδες και οι βαθμολογίες σας παραμένουν στον διακομιστή με το ανώνυμο όνομα {0}.
+online.delete.confirm_name = Για επιβεβαίωση, εισαγάγετε το όνομα χρήστη και τον κωδικό πρόσβασής σας.
+online.delete.button = Διαγραφή λογαριασμού
+online.delete.done = Ο λογαριασμός σας διαγράφηκε.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Απευθείας αγώνας
+online.direct.title = ΑΠΕΥΘΕΙΑΣ ΑΓΩΝΑΣ
+online.direct.lead = Μια φιλική παρτίδα κατευθείαν μεταξύ δύο υπολογιστών: χωρίς διακομιστή, χωρίς λογαριασμό, ποτέ με βαθμολογία.
+online.direct.host = Φιλοξενία παρτίδας
+online.direct.host.desc = Ο φίλος σας συνδέεται σε εσάς: του δίνετε τη διεύθυνσή σας και έναν κωδικό.
+online.direct.join = Σύνδεση σε παρτίδα
+online.direct.join.desc = Συνδεθείτε σε έναν φίλο που φιλοξενεί παρτίδα.
+online.direct.host_title = ΦΙΛΟΞΕΝΙΑ ΠΑΡΤΙΔΑΣ
+online.direct.your_color = Το χρώμα σας
+online.direct.auto_press.help = Και τα δύο ρομπότ πατούν μόνα τους το ρολόι μόλις μια κίνηση βρεθεί στη σκακιέρα. Ανενεργό: κάθε παίκτης πατά το ρολόι μετά από κάθε κίνηση.
+online.direct.unrated = Οι απευθείας αγώνες είναι φιλικές παρτίδες: ποτέ με βαθμολογία.
+online.direct.connection = ΣΥΝΔΕΣΗ
+online.direct.port = Θύρα
+online.direct.port.help = Η θύρα TCP στην οποία συνδέεται ο φίλος σας (47100, εκτός αν είναι κατειλημμένη).
+online.direct.port_range = Επιλέξτε μια θύρα από 1024 έως 65535.
+online.direct.upnp = Άνοιγμα της θύρας στον δρομολογητή μου (UPnP)
+online.direct.upnp.help = Ζητά από τον οικιακό δρομολογητή να προωθήσει τη θύρα σε αυτόν τον υπολογιστή και την κλείνει μετά την παρτίδα.
+online.direct.host_note_upnp = Το παιχνίδι ζητά από τον δρομολογητή σας να ανοίξει τη θύρα. Αν δεν τα καταφέρει, θα σας πει ποια θύρα να προωθήσετε χειροκίνητα.
+online.direct.host_note_manual = Προωθήστε τη θύρα TCP σε αυτόν τον υπολογιστή από τον δρομολογητή σας ή παίξτε στο ίδιο δίκτυο.
+online.direct.host_button = Φιλοξενία
+online.direct.wait_title = ΑΝΑΜΟΝΗ ΓΙΑ ΤΟΝ ΦΙΛΟ ΣΑΣ
+online.direct.opening = Άνοιγμα της θύρας {0} στον δρομολογητή σας…
+online.direct.give = Δώστε στον φίλο σας:
+online.direct.cap_address = ΔΙΕΥΘΥΝΣΗ
+online.direct.cap_port = ΘΥΡΑ
+online.direct.cap_code = ΚΩΔΙΚΟΣ
+online.direct.lan = Στο ίδιο δίκτυο: {0}
+# Greek: online.direct.upnp_mapped says "through {0}" ("μέσω {0}"), so the fallback router is a genitive.
+online.direct.router = του δρομολογητή σας
+online.direct.upnp_searching = Αναζήτηση του δρομολογητή σας…
+online.direct.upnp_mapped = Η θύρα άνοιξε μέσω {0}.
+online.direct.upnp_none = Κανένας δρομολογητής UPnP δεν απάντησε: προωθήστε χειροκίνητα τη θύρα TCP {0} σε αυτόν τον υπολογιστή.
+online.direct.upnp_failed = Ο δρομολογητής αρνήθηκε να ανοίξει τη θύρα: προωθήστε χειροκίνητα τη θύρα TCP {0} σε αυτόν τον υπολογιστή.
+online.direct.upnp_off = Προωθήστε τη θύρα TCP {0} σε αυτόν τον υπολογιστή από τον δρομολογητή σας.
+online.direct.upnp_cgnat = Ο πάροχός σας πιθανότατα μοιράζεται τη διεύθυνσή σας στο διαδίκτυο με άλλους (CGNAT): δοκιμάστε IPv6 ή ένα VPN.
+online.direct.firewall = Αν τα Windows ρωτήσουν αν το Scacelith μπορεί να δέχεται συνδέσεις, επιτρέψτε το.
+online.direct.waiting = Αναμονή για τον φίλο σας…
+online.direct.connecting_friend = Ο φίλος σας συνδέεται…
+online.direct.starting = Στήσιμο της σκακιέρας…
+online.direct.join_title = ΣΥΝΔΕΣΗ ΣΕ ΠΑΡΤΙΔΑ
+online.direct.join_lead = Εισαγάγετε όσα σας διαβάζει ο φίλος σας: τη διεύθυνσή του, τη θύρα και τον κωδικό.
+online.direct.address = Διεύθυνση
+online.direct.address.hint = IPv4, IPv6 ή όνομα
+online.direct.code = Κωδικός
+online.direct.join_button = Σύνδεση
+online.direct.connecting_to = Σύνδεση στο {0}…
+online.direct.securing = Ασφάλιση της σύνδεσης με το {0}…
+direct.event = Φιλικός αγώνας
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Απευθείας, {0}
+direct.err.refused = Κανείς δεν φιλοξενεί παρτίδα σε αυτή τη διεύθυνση και θύρα.
+direct.err.timeout = Καμία απάντηση: ελέγξτε τη διεύθυνση και τη θύρα, καθώς και ότι ο δρομολογητής του φίλου σας αφήνει το παιχνίδι να συνδεθεί.
+direct.err.wrong_code = Ο κωδικός δεν είναι σωστός.
+direct.err.invalid_code = Ένας κωδικός έχει 12 χαρακτήρες (XXXX-XXXX-XXXX).
+direct.err.incompatible = Ο φίλος σας έχει άλλη έκδοση του Scacelith.
+direct.err.port_in_use = Αυτή η θύρα χρησιμοποιείται ήδη σε αυτόν τον υπολογιστή: επιλέξτε άλλη.
+direct.err.network = Δεν ήταν δυνατή η χρήση του δικτύου.
+direct.err.too_many_attempts = Πάρα πολλοί λάθος κωδικοί: η φιλοξενία σταμάτησε. Φιλοξενήστε ξανά για νέο κωδικό.
+direct.err.bad_address = Αυτή η διεύθυνση δεν είναι έγκυρη.
+direct.err.not_found = Αυτό το όνομα δεν βρέθηκε.
+direct.err.unreachable = Αυτή η διεύθυνση δεν είναι προσβάσιμη από εδώ.
+direct.err.reset = Η σύνδεση διακόπηκε.
+direct.err.closed = Η σύνδεση έκλεισε.
+direct.err.host_left = Ο φίλος σας σταμάτησε τη φιλοξενία.
+direct.err.other = Η σύνδεση απέτυχε ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+# Greek: a player's name {0} takes no article and no genitive (its gender is unknown): the
+# sentences put it as the subject of a verb ("{0} παίζει", "Εγκαταλείπει {0};").
+hotseat.player2 = Παίκτης 2
+hotseat.white_player = Λευκά
+hotseat.black_player = Μαύρα
+hotseat.name.help = Το όνομα που γράφεται και στα δύο φύλλα σημείωσης, σε οποιοδήποτε αλφάβητο.
+hotseat.swap = Αλλαγή χρωμάτων
+hotseat.left_hand = {0} παίζει με το αριστερό χέρι: το ρολόι μπαίνει από την πλευρά του αριστερού χεριού.
+hotseat.rated = Παρτίδα με βαθμολογία
+hotseat.rated.help = Κάθε όνομα έχει τη δική του βαθμολογία για παρτίδες δύο παικτών σε αυτόν τον υπολογιστή. Η βαθμολογία σας απέναντι στο Stockfish δεν αλλάζει ποτέ.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Βαθμολογίες δύο παικτών: {0} {1} · {2} {3}
+hotseat.new_rating = (νέα)
+hotseat.friendly_note = Φιλική παρτίδα: οι βαθμολογίες δεν αλλάζουν.
+hotseat.colours = {0} παίζει με τα λευκά, {1} με τα μαύρα.
+hotseat.colours_swap = Τα χρώματα αλλάζουν σε κάθε ρεβάνς.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, σειρά σας
+hotseat.flag = {0}: ο χρόνος τελείωσε.
+hotseat.confirm.resign = Εγκαταλείπει {0}; Την παρτίδα θα την κερδίσει {1}.
+hotseat.confirm.resign_draw = Εγκαταλείπει {0}; {1} δεν μπορεί πια να κάνει ματ: η παρτίδα θα λήξει ισόπαλη.
+hotseat.draw.offer_noted = Η πρόταση ισοπαλίας σας συνοδεύει την κίνησή σας: θα τη δει {0} μόλις πατήσετε το ρολόι.
+hotseat.draw.card_title = ΠΡΟΤΑΣΗ ΙΣΟΠΑΛΙΑΣ
+hotseat.draw.offered = {0} προτείνει ισοπαλία.
+hotseat.draw.card_hint = Αν αγγίξετε ένα κομμάτι, την απορρίπτετε.
+hotseat.draw.accept = Αποδοχή
+hotseat.draw.decline = Απόρριψη
+hotseat.draw.accepted = {0} δέχεται την ισοπαλία που πρότεινε {1}.
+hotseat.draw.declined = {0} απορρίπτει την ισοπαλία που πρότεινε {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Παρτίδα με βαθμολογία
+hotseat.sheet.friendly = Φιλική παρτίδα
+# Game over card
+hotseat.gameover.wins = {0} κερδίζει σε {1} κίνηση.|{0} κερδίζει σε {1} κινήσεις.
+hotseat.gameover.wins_now = {0} κερδίζει.
+hotseat.gameover.friendly = {0} εναντίον {1} · φιλική παρτίδα
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Αυτή η παρτίδα δεν βαθμολογείται.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Προπονητής
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Συνθετική ομιλία που παράγεται από το {0} για τη λειτουργία Προπονητή
+# Coach page
+coach.title = ΠΡΟΠΟΝΗΤΗΣ
+coach.section.level = ΕΠΙΠΕΔΟ
+coach.section.lesson = ΜΕ ΤΟΝ ΠΡΟΠΟΝΗΤΗ
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Για παίκτες με βαθμολογία {0}
+coach.completed = Ολοκληρώθηκε
+coach.recommended = Προτείνεται
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Οι κανόνες του σκακιού
+coach.level.0.desc = Ένα διαδραστικό μάθημα, ένας κανόνας τη φορά.
+coach.level.0.detail = Ο προπονητής στήνει μικρές θέσεις και δείχνει πώς κινείται και πώς αιχμαλωτίζει κάθε κομμάτι, έπειτα το ροκέ, την προαγωγή, το σαχ και το ματ. Δοκιμάζετε κάθε ιδέα στη σκακιέρα με τα δικά σας χέρια.
+coach.level.1.name = Πρώτα βήματα
+coach.level.1.desc = Τι απειλείται, τι μένει απροστάτευτο.
+coach.level.1.detail = Ο προπονητής παίζει ήπια και μιλά απλά: ποια από τα κομμάτια σας απειλούνται, ποια μένουν χωρίς προστασία και πώς να τα κρατήσετε.
+coach.level.2.name = Αρχάριος
+coach.level.2.desc = Απλή τακτική, ανάπτυξη, ασφάλεια του βασιλιά.
+coach.level.2.detail = Τα πιρούνια και τα καρφώματα λέγονται με το όνομά τους. Ο προπονητής μιλά για την ανάπτυξη των κομματιών σας και την ασφάλεια του βασιλιά σας.
+coach.level.3.name = Σε πρόοδο
+coach.level.3.desc = Σχέδια, δομή πιονιών, η μόνη σωστή κίνηση.
+coach.level.3.detail = Ο προπονητής εξηγεί σχέδια και δομές πιονιών και σας προειδοποιεί όταν μόνο μία κίνηση κρατά τη θέση.
+coach.level.4.name = Παίκτης συλλόγου
+coach.level.4.desc = Υποψήφιες κινήσεις, αξιολόγηση σε πιόνια.
+coach.level.4.detail = Ο προπονητής σταθμίζει τις υποψήφιες κινήσεις και δίνει την αξιολόγηση σε πιόνια, όπως θα έκανε ένας προπονητής συλλόγου.
+coach.level.5.name = Δυνατός παίκτης συλλόγου
+coach.level.5.desc = Σύντομες συνέχειες, στρατηγικοί όροι.
+coach.level.5.detail = Σύντομα σχόλια, συγκεκριμένες συνέχειες και το λεξιλόγιο του στρατηγικού παιχνιδιού.
+coach.level.6.name = Ειδικός
+coach.level.6.desc = Λακωνικά σχόλια, βαθιές συνέχειες, αριθμητικές αξιολογήσεις.
+coach.level.6.detail = Λίγα λόγια, όπως μεταξύ δυνατών παικτών: συνέχειες πολλών κινήσεων σε βάθος και αξιολογήσεις σε αριθμούς.
+coach.note.clock = Χωρίς ρολόι: πάρτε όσο χρόνο χρειάζεστε.
+coach.note.takeback = Μετά από ένα σοβαρό λάθος, ο προπονητής δείχνει τι πήγε στραβά και προτείνει να πάρετε πίσω την κίνηση.
+coach.note.lesson = Παίζετε με τα λευκά· ο προπονητής στήνει κάθε άσκηση στη σκακιέρα.
+coach.note.unrated = Οι παρτίδες με τον προπονητή δεν βαθμολογούνται.
+coach.note.fallible = Ο προπονητής δεν είναι αλάνθαστος: μπορεί μερικές φορές να κρίνει λάθος μια κίνηση.
+coach.colour = Το χρώμα σας
+coach.colour.help = Το χρώμα με το οποίο παίζετε απέναντι στον προπονητή. Εναλλάξ: λευκά, μετά μαύρα, από παρτίδα σε παρτίδα. Το μάθημα των κανόνων παίζεται πάντα με τα λευκά.
+coach.colour.alternate = Εναλλάξ
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Η φωνή του προπονητή δεν είναι εγκατεστημένη ή είναι απενεργοποιημένη (Επιλογές > Ήχος): τα λόγια του θα εμφανίζονται γραμμένα στην οθόνη.
+# At the table
+coach.speaker = ΠΡΟΠΟΝΗΤΗΣ
+coach.skip = Παράλειψη
+coach.offer.title = ΑΝΑΙΡΕΣΗ ΚΙΝΗΣΗΣ;
+coach.offer.text = Ο προπονητής σάς προτείνει να πάρετε πίσω την τελευταία σας κίνηση, για να ψάξετε μια καλύτερη.
+coach.offer.hint = Το Backspace την παίρνει πίσω. Αν αγγίξετε ένα κομμάτι, το παιχνίδι συνεχίζεται.
+coach.offer.accept = Αναίρεση
+coach.offer.decline = Συνέχεια
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Αναιρέσεις που απομένουν: {0}
+coach.pause.take_back = Αναίρεση της κίνησής μου
+coach.pause.take_back.help = Παίρνει πίσω την τελευταία σας κίνηση, και την απάντηση του προπονητή αν την έχει ήδη παίξει.
+coach.confirm.resign = Θέλετε να εγκαταλείψετε την παρτίδα; Νικητής θα ανακηρυχθεί ο προπονητής.
+coach.confirm.resign_draw = Θέλετε να εγκαταλείψετε την παρτίδα; Ο προπονητής δεν μπορεί πια να κάνει ματ: η παρτίδα θα λήξει ισόπαλη.
+coach.confirm.leave = Επιστροφή στο κύριο μενού; Αυτή η παρτίδα με τον προπονητή θα διακοπεί οριστικά.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Νέα παρτίδα
+coach.gameover.unrated = Αυτή η παρτίδα με τον προπονητή δεν βαθμολογείται.
+coach.lesson.done = ΜΠΡΑΒΟ
+coach.lesson.done.line = Τώρα ξέρετε τους κανόνες του σκακιού.
+coach.lesson.next = Πρώτη παρτίδα
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Προπόνηση
+coach.tab.challenges = Προκλήσεις
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = ΜΑΤ
+challenge.group.tactics = ΤΑΚΤΙΚΗ
+challenge.group.defence = ΑΜΥΝΑ
+challenge.group.endgames = ΦΙΝΑΛΕ
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Ματ σε μία
+challenge.mate1.desc = Μία κίνηση, και είναι ματ.
+challenge.mate1.detail = Εξετάστε πρώτα κάθε σαχ: ένα από αυτά δεν αφήνει στον βασιλιά ούτε τετράγωνο διαφυγής, ούτε παρεμβολή, ούτε αιχμαλωσία.
+challenge.mate2.name = Ματ σε δύο
+challenge.mate2.desc = Μια κίνηση που δεν αφήνει άμυνα, και μετά ματ.
+challenge.mate2.detail = Η πρώτη κίνηση είναι συχνά ένα σαχ ή μια θυσία που αφαιρεί ένα τετράγωνο από τον βασιλιά. Ο προπονητής αμύνεται όσο καλύτερα μπορεί.
+challenge.mate3.name = Ματ σε τρεις
+challenge.mate3.desc = Μεγαλύτερες αναγκαστικές συνέχειες.
+challenge.mate3.detail = Σαχ, αιχμαλωσίες και απειλές, τρεις κινήσεις σε βάθος. Υπολογίστε την καλύτερη απάντηση του προπονητή σε κάθε βήμα πριν αγγίξετε κομμάτι.
+challenge.backrank.name = Ματ στην τελευταία γραμμή
+challenge.backrank.desc = Ένας βασιλιάς παγιδευμένος πίσω από τα δικά του πιόνια.
+challenge.backrank.detail = Όταν τα πιόνια μπροστά από έναν βασιλιά που έχει κάνει ροκέ δεν έχουν κινηθεί, ένας πύργος ή μια βασίλισσα στην τελευταία γραμμή μπορεί να δώσει ματ. Απομακρύνετε ή αποσπάστε πρώτα τους υπερασπιστές.
+challenge.patterns.name = Μοτίβα ματ
+challenge.patterns.desc = Πνιγμένο ματ, ματ της Αναστασίας, αραβικό ματ και άλλα κλασικά.
+challenge.patterns.detail = Διάσημα δίχτυα ματ που εμφανίζονται ξανά και ξανά. Μάθετε να αναγνωρίζετε τη διάταξη των κομματιών και το τελικό χτύπημα.
+challenge.hanging.name = Ακάλυπτα κομμάτια
+challenge.hanging.desc = Εντοπίστε ό,τι έχει μείνει απροστάτευτο.
+challenge.hanging.detail = Ένα κομμάτι ή ένα πιόνι που δεν το προστατεύει κανείς μπορεί απλώς να αιχμαλωτιστεί. Ελέγξτε από τι προστατεύεται κάθε κομμάτι του προπονητή.
+challenge.fork.name = Πιρούνια
+challenge.fork.desc = Ένα κομμάτι επιτίθεται σε δύο ταυτόχρονα.
+challenge.fork.detail = Ίπποι, πιόνια, βασίλισσες, ακόμη και βασιλιάδες μπορούν να κάνουν πιρούνι. Ο αντίπαλος μπορεί να σώσει μόνο τον έναν από τους δύο στόχους.
+challenge.pin.name = Καρφώματα
+challenge.pin.desc = Ένα κομμάτι που δεν μπορεί να κινηθεί χωρίς να χαθεί ό,τι βρίσκεται πίσω του.
+challenge.pin.detail = Καρφώστε ένα κομμάτι στον βασιλιά του ή σε ένα πιο πολύτιμο κομμάτι και μετά επιτεθείτε ξανά σε αυτό ή εκμεταλλευτείτε το ότι δεν μπορεί να κινηθεί.
+challenge.skewer.name = Σουβλίσματα
+challenge.skewer.desc = Επιτεθείτε σε ένα πολύτιμο κομμάτι και κερδίστε εκείνο που βρίσκεται πίσω του.
+challenge.skewer.detail = Το αντίστροφο του καρφώματος: το πιο πολύτιμο κομμάτι βρίσκεται μπροστά, πρέπει να φύγει και αποκαλύπτει το κομμάτι πίσω του.
+challenge.discovered.name = Αποκαλυπτόμενες επιθέσεις
+challenge.discovered.desc = Κινήστε ένα κομμάτι για να εξαπολύσετε ένα άλλο.
+challenge.discovered.detail = Όταν ένα κομμάτι παραμερίζει, το κομμάτι που βρίσκεται πίσω του επιτίθεται. Με σαχ ή με διπλό σαχ, ο αντίπαλος δεν έχει χρόνο να απαντήσει και στις δύο απειλές.
+challenge.deflection.name = Εκτροπή και προσέλκυση
+challenge.deflection.desc = Απομακρύνετε έναν υπερασπιστή ή παρασύρετέ τον σε μοιραίο τετράγωνο.
+challenge.deflection.detail = Ένας υπερασπιστής με δύο αποστολές δεν μπορεί να εκτελέσει και τις δύο. Επιτεθείτε σε αυτόν, προσφέρετέ του κάτι ή αναγκάστε ένα κομμάτι να πάει στο τετράγωνο όπου θα χαθεί.
+challenge.intermezzo.name = Ενδιάμεσες κινήσεις
+challenge.intermezzo.desc = Μην ξαναπάρετε αμέσως: υπάρχει κάτι πιο δυνατό.
+challenge.intermezzo.detail = Πριν από την αναμενόμενη κίνηση, ένα ενδιάμεσο σαχ ή μια μεγαλύτερη απειλή αλλάζει τα πάντα.
+challenge.trapped.name = Παγιδευμένα κομμάτια
+challenge.trapped.desc = Ένα κομμάτι χωρίς κανένα ασφαλές τετράγωνο.
+challenge.trapped.detail = Αφαιρέστε από ένα κομμάτι τα τελευταία τετράγωνα διαφυγής του και μετά κερδίστε το.
+challenge.promotion.name = Προαγωγή
+challenge.promotion.desc = Οδηγήστε ένα πιόνι ως την τελευταία γραμμή.
+challenge.promotion.detail = Τα προχωρημένα πιόνια αξίζουν πολύ. Ανοίξτε τον δρόμο, απομακρύνετε τα κομμάτια που τα εμποδίζουν και φτιάξτε νέα βασίλισσα.
+challenge.quiet.name = Ήσυχες κινήσεις
+challenge.quiet.desc = Η κίνηση που κερδίζει δεν είναι ούτε σαχ ούτε αιχμαλωσία.
+challenge.quiet.detail = Μερικές φορές η πιο δυνατή κίνηση απλώς προετοιμάζει μια απειλή που δεν μπορεί να αποκρουστεί. Το πιο δύσκολο είδος για να το δει κανείς.
+challenge.opening.name = Παγίδες στο άνοιγμα
+challenge.opening.desc = Τιμωρήστε τα πρόωρα λάθη.
+challenge.opening.detail = Θέσεις από τις πρώτες κινήσεις πραγματικών παρτίδων, όπου μία απρόσεκτη κίνηση μπορεί να τιμωρηθεί αμέσως.
+challenge.escape.name = Βρείτε τη διαφυγή
+challenge.escape.desc = Ο βασιλιάς σας κινδυνεύει: μία κίνηση τον σώζει.
+challenge.escape.detail = Κάθε άλλη κίνηση χάνει. Εξετάστε όλα τα σαχ και τις απειλές κατά του βασιλιά σας και βρείτε τη μόνη διέξοδο.
+challenge.defend.name = Αμυντικές κινήσεις
+challenge.defend.desc = Αποκρούστε την απειλή χωρίς να χάσετε υλικό.
+challenge.defend.detail = Ο προπονητής απειλεί κάτι. Βρείτε την ακριβή κίνηση που κρατά τα πάντα στη θέση τους.
+challenge.kq.name = Βασίλισσα και βασιλιάς εναντίον βασιλιά
+challenge.kq.desc = Ματ με τη βασίλισσα.
+challenge.kq.detail = Σπρώξτε τον μοναχικό βασιλιά στην άκρη με τη βασίλισσά σας, φέρτε κοντά τον δικό σας βασιλιά και προσέξτε το πατ. Ο προπονητής αμύνεται με τις καλύτερες κινήσεις του.
+challenge.kr.name = Πύργος και βασιλιάς εναντίον βασιλιά
+challenge.kr.desc = Ματ με τον πύργο.
+challenge.kr.detail = Ο πύργος αποκόπτει τον βασιλιά, γραμμή προς γραμμή· ο βασιλιάς σας παίρνει την αντιπαράθεση. Ο προπονητής αμύνεται με τις καλύτερες κινήσεις του.
+challenge.kp.name = Βασιλιάς και πιόνι εναντίον βασιλιά
+challenge.kp.desc = Κερδίστε την αντιπαράθεση και κάντε προαγωγή.
+challenge.kp.detail = Μπροστά πηγαίνει ο βασιλιάς σας, όχι το πιόνι. Πάρτε την αντιπαράθεση και φτιάξτε μια βασίλισσα που ο προπονητής δεν μπορεί να προλάβει.
+challenge.kp_hold.name = Σταματήστε το πιόνι
+challenge.kp_hold.desc = Μοναχικός βασιλιάς εναντίον βασιλιά και πιονιού: κρατήστε την ισοπαλία.
+challenge.kp_hold.detail = Σταθείτε μπροστά από το πιόνι και κρατήστε την αντιπαράθεση. Αντέξτε για δέκα κινήσεις.
+challenge.rook.name = Φινάλε πύργων
+challenge.rook.desc = Η γέφυρα Λουσένα και η άμυνα Φιλιντόρ.
+challenge.rook.detail = Οι δύο θέσεις που πρέπει να ξέρει κάθε παίκτης: πώς κερδίζετε με πιόνι στην έβδομη γραμμή και πώς αμύνεστε με τον πύργο στην τρίτη.
+challenge.endgame.name = Τακτική στο φινάλε
+challenge.endgame.desc = Λίγα κομμάτια, οξείες ιδέες.
+challenge.endgame.detail = Κούρσες πιονιών, διασπάσεις και φινάλε πύργων από πραγματικές παρτίδες.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} θέση|{0} θέσεις
+coach.challenge.done = Ολοκληρώθηκε
+coach.challenge.start = Έναρξη
+coach.challenge.note.white = Παίζετε με τα λευκά· ο προπονητής στήνει κάθε θέση στη σκακιέρα.
+coach.challenge.note.hint = Κολλήσατε; Πατήστε H για υπόδειξη. Μετά από μερικές προσπάθειες, ο προπονητής θα σας προτείνει μία.
+coach.challenge.note.unsaved = Οι προκλήσεις δεν βαθμολογούνται ούτε αποθηκεύονται· ένα σημάδι επιλογής δείχνει όσες έχετε ολοκληρώσει.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = Η ΠΡΟΚΛΗΣΗ ΟΛΟΚΛΗΡΩΘΗΚΕ
+coach.challenge.complete.line = Λύσατε όλες τις θέσεις.
+coach.challenge.next = Επόμενη πρόκληση
+coach.challenge.again = Ξανά
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ΥΠΟΔΕΙΞΗ;
+coach.hint.text = Ο προπονητής σάς προτείνει μια υπόδειξη.
+coach.hint.hint = Το H δίνει την υπόδειξη. Αν αγγίξετε ένα κομμάτι, συνεχίζετε να ψάχνετε.
+coach.hint.accept = Υπόδειξη
+coach.hint.decline = Όχι, ευχαριστώ
+coach.hint.key = Υπόδειξη
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Φωνή του προπονητή
+options.coach_voice.help = Ο προπονητής μιλά φωναχτά στη λειτουργία Προπονητή. Το μοντέλο της φωνής του λαμβάνεται την πρώτη φορά που χρειάζεται (περίπου 399 MB). Ανενεργό: τα λόγια του προπονητή εμφανίζονται μόνο γραμμένα στην οθόνη.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Μοντέλο φωνής
+options.voice_update.help = Ο προπονητής μιλά ακόμη με την παλιά 8-bit έκδοση του μοντέλου φωνής του. Η ενημέρωση κατεβάζει την επίσημη έκδοση του Supertonic 3, που δημοσιεύει η Supertone, και διαγράφει πρώτα τα παλιά αρχεία.
+options.voice_update.button = Ενημέρωση ({0} MB)
+options.voice_update.running = Η λήψη βρίσκεται σε εξέλιξη.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Ποιότητα φωνής
+options.voice_quality.help = Πόσα βήματα βελτίωσης κάνει η σύνθεση ομιλίας του προπονητή για κάθε φράση, από Χαμηλή (4) έως Μέγιστη (9)· Μέτρια (5) από προεπιλογή. Ένα υψηλότερο επίπεδο δίνει λίγο πιο καθαρή φωνή, αλλά απαιτεί περισσότερο χρόνο υπολογισμού, οπότε ο προπονητής αρχίζει να μιλά λίγο αργότερα. Ρυθμίζεται όταν το μοντέλο φωνής είναι εγκατεστημένο και η Φωνή του προπονητή είναι ενεργή.
+options.voice_quality.low = Χαμηλή
+options.voice_quality.medium = Μέτρια
+options.voice_quality.high = Υψηλή
+options.voice_quality.very_high = Πολύ υψηλή
+options.voice_quality.ultra = Υπερυψηλή
+options.voice_quality.max = Μέγιστη
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Η φωνή του προπονητή
+coach.download.text = Ο προπονητής μιλά με το Supertonic 3, ένα μοντέλο σύνθεσης ομιλίας της Supertone. Δεν περιλαμβάνεται στο Scacelith: το παιχνίδι μπορεί να το κατεβάσει τώρα από το Hugging Face ({0} MB, μία φορά). Χωρίς αυτό, ο προπονητής γράφει τα λόγια του στην οθόνη.
+coach.download.licence = Το μοντέλο δημοσιεύεται με την άδεια OpenRAIL-M, η οποία απαγορεύει ορισμένες χρήσεις της φωνής που παράγει, όπως να παρουσιάζεται ως ανθρώπινη φωνή ή να μιμείται ένα υπαρκτό πρόσωπο.
+coach.download.read_licence = Ανάγνωση της άδειας
+coach.download.accept = Επιλέγοντας «Λήψη», αποδέχεστε τους όρους αυτής της άδειας.
+# {0} = a folder
+coach.download.folder = Θέση αποθήκευσης: {0}
+coach.download.not_now = Όχι τώρα
+# {0} = the size in megabytes
+coach.download.download = Λήψη ({0} MB)
+coach.download.licence_title = ΑΔΕΙΑ OPENRAIL-M
+coach.download.back = Πίσω
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Νέα φωνή για τον προπονητή
+coach.update.text = Η φωνή του προπονητή χρησιμοποιεί πλέον την επίσημη έκδοση του Supertonic 3, που δημοσιεύει η Supertone, στη θέση της μετατροπής 8-bit που ήταν εγκατεστημένη ως τώρα. Το παιχνίδι μπορεί να την κατεβάσει τώρα από το Hugging Face ({0} MB, μία φορά)· τα παλιά αρχεία ({1} MB) διαγράφονται πρώτα. Αν αρνηθείτε, ο προπονητής κρατά την τρέχουσα φωνή του και η ενημέρωση παραμένει διαθέσιμη στις Επιλογές > Ήχος.
+coach.update.download = Ενημέρωση ({0} MB)
+coach.update.accept = Επιλέγοντας «Ενημέρωση», αποδέχεστε τους όρους αυτής της άδειας.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = Η ΦΩΝΗ ΤΟΥ ΠΡΟΠΟΝΗΤΗ
+coach.download.removing = Αφαίρεση της παλιάς έκδοσης…
+coach.download.checking = Έλεγχος των αρχείων…
+coach.download.downloading = Λήψη…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Από το Hugging Face
+coach.download.from_archive = Από το Hugging Face (αρχειοθετημένο αντίγραφο)
+coach.download.cancel = Άκυρο
+coach.download.failed = Η λήψη απέτυχε.
+coach.download.error.network = Δεν ήταν δυνατή η πρόσβαση στους διακομιστές. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο και δοκιμάστε ξανά.
+# {0} = a folder
+coach.download.error.disk = Δεν ήταν δυνατή η εγγραφή των αρχείων στον φάκελο {0}. Ελέγξτε τον ελεύθερο χώρο και δοκιμάστε ξανά.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Οι διακομιστές έστειλαν μια απρόσμενη απάντηση ({0}). Δοκιμάστε ξανά αργότερα.
+coach.download.retry = Νέα προσπάθεια
+coach.download.close = Κλείσιμο
+# Notices
+coach.download.done = Η φωνή του προπονητή εγκαταστάθηκε.
+coach.download.cancelled = Η λήψη ακυρώθηκε: την επόμενη φορά θα συνεχιστεί από εκεί που σταμάτησε.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Αποθηκευμένες παρτίδες
+options.save_games = Αποθήκευση των παρτίδων μου
+options.save_games.help = Όταν τελειώνουν, οι παρτίδες σας απέναντι στο Stockfish, με τον προπονητή, μεταξύ δύο παικτών σε αυτόν τον υπολογιστή και οι απευθείας αγώνες σας αποθηκεύονται ως αρχεία PGN, για να τις βρίσκετε ξανά στις Αποθηκευμένες παρτίδες. Τις online παρτίδες τις κρατά ο διακομιστής.
+library.title = ΑΠΟΘΗΚΕΥΜΕΝΕΣ ΠΑΡΤΙΔΕΣ
+library.section.games = ΠΑΡΤΙΔΕΣ
+library.section.details = Η ΠΑΡΤΙΔΑ
+library.section.tags = ΕΤΙΚΕΤΕΣ
+library.section.moves = ΚΙΝΗΣΕΙΣ
+library.count = {0} παρτίδα|{0} παρτίδες
+library.filter = Εμφάνιση
+library.filter.all = Όλες οι παρτίδες
+library.filter.play = Απέναντι στο Stockfish
+library.filter.coach = Με τον προπονητή
+library.filter.hotseat = Δύο παίκτες
+library.filter.direct = Απευθείας αγώνες
+library.filter.server = Online παρτίδες
+library.filter.imported = Εισαγόμενες
+library.mode.play = Απέναντι στο Stockfish
+library.mode.coach = Με τον προπονητή
+library.mode.hotseat = Δύο παίκτες
+library.mode.direct = Απευθείας αγώνας
+library.mode.server = Online παρτίδα
+library.mode.imported = Εισαγόμενη
+library.coach_level = Επίπεδο {0}
+library.unknown_player = Άγνωστο όνομα
+library.unfinished = Ημιτελής
+library.unreadable = Αυτή η παρτίδα δεν μπορεί να διαβαστεί.
+library.moves = {0} κίνηση|{0} κινήσεις
+library.opening_variation = {0}: {1}
+library.file = Αρχείο: {0}
+library.file_game = Αρχείο: {0}, παρτίδα {1} από {2}
+library.no_moves = Δεν παίχτηκε καμία κίνηση.
+library.none_selected = Επιλέξτε μια παρτίδα από τη λίστα.
+library.reading = Ανάγνωση των αποθηκευμένων παρτίδων
+library.empty.title = Καμία αποθηκευμένη παρτίδα ακόμη
+library.empty.text = Οι παρτίδες σας απέναντι στο Stockfish, με τον προπονητή, μεταξύ δύο παικτών σε αυτόν τον υπολογιστή και οι απευθείας αγώνες σας εμφανίζονται εδώ μόλις τελειώσουν. Μπορείτε επίσης να βάλετε αρχεία PGN σε αυτόν τον φάκελο: οι παρτίδες που έχουν εξαχθεί από άλλα προγράμματα ή ιστότοπους εμφανίζονται μαζί με τις δικές σας.
+library.empty.filter = Καμία παρτίδα αυτού του είδους.
+library.error.folder = Δεν είναι δυνατή η ανάγνωση του φακέλου των αποθηκευμένων παρτίδων
+library.error.game = Αυτή η παρτίδα δεν μπορεί να διαβαστεί: {0}
+library.folder = Φάκελος: {0}
+library.open_folder = Άνοιγμα φακέλου
+library.open_failed = Δεν ήταν δυνατό το άνοιγμα του φακέλου.
+library.replay = Αναπαραγωγή
+library.delete = Διαγραφή
+library.delete.title = ΔΙΑΓΡΑΦΗ ΤΗΣ ΠΑΡΤΙΔΑΣ
+library.delete.text = Η παρτίδα {0} θα διαγραφεί από αυτόν τον υπολογιστή, μαζί με το αρχείο της. Η ενέργεια αυτή δεν αναιρείται.
+library.delete.ok = Διαγραφή
+library.delete.several = Αυτό το αρχείο περιέχει {0} παρτίδα: μπορεί να διαγραφεί μόνο από τον φάκελο.|Αυτό το αρχείο περιέχει {0} παρτίδες: μπορεί να διαγραφεί μόνο από τον φάκελο.
+library.deleted = Η παρτίδα διαγράφηκε.
+library.delete.failed = Δεν ήταν δυνατή η διαγραφή της παρτίδας.
+library.delete.changed = Το αρχείο άλλαξε: η λίστα ενημερώθηκε.
+library.truncated = Αυτός ο φάκελος περιέχει πάρα πολλές παρτίδες: εμφανίζονται μόνο οι {0} πιο πρόσφατες.
+library.tag.Event = Διοργάνωση
+library.tag.Site = Τόπος
+library.tag.Date = Ημερομηνία
+library.tag.Time = Ώρα
+library.tag.Round = Γύρος
+library.tag.White = Λευκά
+library.tag.Black = Μαύρα
+library.tag.Result = Αποτέλεσμα
+library.tag.WhiteElo = Elo Λευκών
+library.tag.BlackElo = Elo Μαύρων
+library.tag.TimeControl = Χρόνος σκέψης
+library.tag.Termination = Τερματισμός
+library.tag.Opening = Άνοιγμα
+library.tag.Variation = Παραλλαγή
+library.tag.PlyCount = Ημικινήσεις
+library.tag.FEN = Αρχική θέση
+library.tag.ScacelithMode = Λειτουργία
+library.tag.CoachLevel = Επίπεδο προπονητή
+library.tag.ScacelithServer = Διακομιστής
+library.tag.ScacelithGameId = Αριθμός παρτίδας
+library.tag.UTCDate = Ημερομηνία (UTC)
+library.tag.UTCTime = Ώρα (UTC)
+library.tag.WhiteRatingDiff = Μεταβολή βαθμολογίας Λευκών
+library.tag.BlackRatingDiff = Μεταβολή βαθμολογίας Μαύρων
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Ανάλυση
+analysis.menu.title = ΑΝΑΛΥΣΗ
+analysis.menu.analyse = Ανάλυση
+analysis.menu.paste = Επικόλληση PGN
+analysis.menu.online = Οι online παρτίδες μου
+analysis.menu.folder = Βάλτε αρχεία PGN σε αυτόν τον φάκελο για να τα αναλύσετε: {0}
+analysis.menu.empty.title = Καμία αποθηκευμένη παρτίδα ακόμη
+analysis.menu.empty.text = Οι παρτίδες σας εμφανίζονται εδώ μόλις τελειώσουν, όπως και τα αρχεία PGN που βρίσκονται στον παρακάτω φάκελο. Μπορείτε επίσης να επικολλήσετε μια παρτίδα που αντιγράψατε ως κείμενο PGN.
+analysis.menu.empty.no_folder = Επικολλήστε μια παρτίδα που αντιγράψατε ως κείμενο PGN για να την αναλύσετε.
+analysis.menu.paste.empty = Το πρόχειρο είναι κενό: αντιγράψτε πρώτα μια παρτίδα ως κείμενο PGN.
+analysis.menu.paste.none = Δεν βρέθηκε καμία παρτίδα σκακιού στο πρόχειρο.
+analysis.menu.paste.several = Το πρόχειρο περιέχει πολλές παρτίδες: αναλύεται η πρώτη.
+analysis.menu.gameover = Ανάλυση της παρτίδας
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Κίνηση {0} από {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Άμεση
+replay.again = Ξανά από την αρχή
+replay.gameover.unfinished = Η παρτίδα σταματά μετά την κίνηση {0}, χωρίς αποτέλεσμα.
+replay.tip.start = Αρχή της παρτίδας (Home)
+replay.tip.back = Μία κίνηση πίσω (J)
+replay.tip.pause = Παύση (K)
+replay.tip.resume = Συνέχεια (K)
+replay.tip.forward = Μία κίνηση μπροστά (L)
+replay.tip.end = Τέλος της παρτίδας (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = ΣΧΟΛΙΑΣΜΟΣ
+analysis.hud.accuracy = ΑΚΡΙΒΕΙΑ
+analysis.hud.reviewing = Το Stockfish εξετάζει την παρτίδα… {0}
+analysis.hud.no_engine = Δεν υπάρχει σκακιστική μηχανή: οι κινήσεις εμφανίζονται χωρίς ανάλυση.
+analysis.hud.no_moves = Αυτή η παρτίδα δεν έχει κινήσεις.
+analysis.hud.tip.play = Αναπαραγωγή των κινήσεων (K)
+analysis.hud.tip.comments_off = Απόκρυψη των σχολίων στις κρίσιμες στιγμές (N)
+analysis.hud.tip.comments_on = Εμφάνιση των σχολίων στις κρίσιμες στιγμές (N)
+analysis.hud.tip.voice_off = Σίγαση της φωνής του σχολιαστή (M)
+analysis.hud.tip.voice_on = Εκφώνηση των σχολίων (M)
+analysis.hud.tip.voice_missing = Η φωνή δεν ακούγεται: τα αρχεία της δεν είναι εγκατεστημένα ή η επιλογή Επιλογές > Ήχος > Φωνή του προπονητή είναι ανενεργή. Τα σχόλια εμφανίζονται μόνο γραμμένα στην οθόνη.
+analysis.hud.tip.arrows_off = Απόκρυψη των βελών των καλύτερων κινήσεων (B)
+analysis.hud.tip.arrows_on = Εμφάνιση των βελών των καλύτερων κινήσεων (B)
+analysis.hud.controls.play = Αναπαραγωγή / παύση
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Εμφάνιση / απόκρυψη σχολίων
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Φωνή σχολιαστή ενεργή / ανενεργή
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Εμφάνιση / απόκρυψη βελών
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Αποθήκευση ως GIF
+gif.making = Δημιουργία του GIF: ο διακομιστής σχεδιάζει την παρτίδα…
+gif.saved = Το GIF αποθηκεύτηκε:
+gif.saved_as = Το GIF αποθηκεύτηκε: {0}
+gif.sign_in_first = Συνδεθείτε σε έναν online διακομιστή για να δημιουργείτε GIF: τα σχεδιάζει ο διακομιστής.
+gif.busy_other = Δημιουργείται ήδη ένα άλλο GIF. Περιμένετε μέχρι να είναι έτοιμο.
+gif.err.rate_limited_for = Δημιουργήσατε πολλά GIF σε σύντομο χρόνο. Μπορείτε να δημιουργήσετε το επόμενο σε {0}.
+gif.err.rate_limited = Δημιουργήσατε πολλά GIF σε σύντομο χρόνο. Δοκιμάστε ξανά αργότερα.
+gif.err.server_busy_for = Ο διακομιστής είναι απασχολημένος με τη σχεδίαση άλλων GIF. Δοκιμάστε ξανά σε {0}.
+gif.err.server_busy = Ο διακομιστής είναι απασχολημένος με τη σχεδίαση άλλων GIF. Δοκιμάστε ξανά σε λίγο.
+gif.err.signed_out = Η συνεδρία σας έληξε. Συνδεθείτε ξανά για να δημιουργήσετε GIF.
+gif.err.game_too_long = Αυτή η παρτίδα είναι πολύ μεγάλη για να γίνει GIF.
+gif.err.pgn_too_large = Αυτή η παρτίδα είναι πολύ μεγάλη για να γίνει GIF.
+gif.err.invalid_pgn = Ο διακομιστής δεν μπόρεσε να διαβάσει αυτή την παρτίδα.
+gif.err.render_failed = Ο διακομιστής δεν μπόρεσε να δημιουργήσει αυτό το GIF. Δοκιμάστε ξανά.
+gif.err.gif_disabled = Αυτός ο διακομιστής δεν δημιουργεί GIF.
+gif.err.write_failed = Δεν ήταν δυνατή η αποθήκευση του GIF σε αυτόν τον υπολογιστή.
+gif.err.not_found = Αυτή η παρτίδα δεν υπάρχει πια στον διακομιστή.
+gif.wait.seconds = {0} δευτερόλεπτο|{0} δευτερόλεπτα
+gif.wait.minutes = {0} λεπτό|{0} λεπτά
+gif.wait.both = {0} και {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Δεν ήταν δυνατή η εκκίνηση του OpenGL 4.6. Ενημερώστε το πρόγραμμα οδήγησης της κάρτας γραφικών σας.
+error.opengl_macos = Δεν ήταν δυνατή η εκκίνηση του OpenGL 4.6 σε αυτόν τον Mac. Το Scacelith απαιτεί Apple silicon (M1 ή νεότερο) και macOS 26 ή νεότερο, και δεν λειτουργεί σε εικονική μηχανή.
+error.renderer = Δεν ήταν δυνατή η εκκίνηση της μηχανής απόδοσης.
+error.scene = Δεν ήταν δυνατή η φόρτωση της σκηνής.
+error.log_file = Λεπτομέρειες υπάρχουν στο αρχείο καταγραφής: {0}
