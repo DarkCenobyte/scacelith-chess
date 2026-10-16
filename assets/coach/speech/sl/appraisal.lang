@@ -1,0 +1,448 @@
+# Coach speech (Slovenian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ti" and is male ("zmagal sem", "premagan sem"). The
+# player's gender is unknown: no "si zmagal", "si našel", "si imel", "pripravljen si", "boljši si".
+# Instead: nouns ("Zmaga je tvoja"), impersonal forms ("uspelo ti je", "ti je šlo", "je bilo mogoče"),
+# the dual "midva" ("remizirala sva", "igrava"), the indeclinable "kos si" (you are up to it), or a
+# noun subject for a move ("poteza {crit_best} bi ohranila", "{n:ord} poteza, {move}, je pridobila").
+# Forms from common.lang: move numbers are ordinals, "v {n:ord_loc} potezi" = "v 21. potezi" (spoken
+# "v enaindvajseti potezi"), "{n:ord} poteza" = "21. poteza", "do {crit_no:ord_gen} poteze";
+# "{acc:percent}" = "85 %" (spoken "petinosemdeset odstotkov"); "{n:piece_acc}" = "eno figuro";
+# "{n:capture}" = "tri jemanja"; "{n:best_move}" = "pet najboljših potez"; "{moves:move_loc}" =
+# "v 32 potezah"; "{text:loc}" = a phase in the locative ("v središčnici", common.lang).
+# Counts that can be 0 ({n} {m} {k} of the numbers section) never take _gen / _loc (no "ničih").
+# A move placeholder is never declined: "namesto poteze {crit_move}", "boljša kot {crit_move}".
+# {level}: the level name in »...« after a case of "stopnja" ("na stopnji »Začetnik«"), never declined.
+# {opening:def}: the opening's lower-case name, always after a colon; "{opening}" alone as a line.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases: feminine nominatives, so a word agreeing with {text} is always feminine ("{text} ti je šla
+# najbolje"); their case forms ("v {text:loc}") are in common.lang (appraisal.phase.<phase>.<case>).
+appraisal.phase.opening = otvoritev
+appraisal.phase.middlegame = središčnica
+appraisal.phase.endgame = končnica
+# Draw reasons, said right after "Remi" / "z remijem", with no comma ("Remi po dogovoru.").
+appraisal.reason.stalemate = zaradi pata
+appraisal.reason.material = zaradi nezadostnega materiala
+appraisal.reason.repetition = zaradi ponavljanja pozicije
+appraisal.reason.fifty = po pravilu petdesetih potez
+appraisal.reason.agreement = po dogovoru
+appraisal.reason.other = po pravilih
+# The coach level names (coach.level.<n>.name of assets/i18n/sl.lang).
+appraisal.level.l1 = Prvi koraki
+appraisal.level.l2 = Začetnik
+appraisal.level.l3 = Nadaljevalec
+appraisal.level.l4 = Klubski igralec
+appraisal.level.l5 = Močan klubski igralec
+appraisal.level.l6 = Strokovnjak
+# What to practise: an infinitive phrase in lower case, no full stop, always said after a colon.
+# "Svoj" for the player's own pieces (the player is the subject of the infinitive).
+theme.general = pogledati celo šahovnico, preden narediš potezo
+theme.mate_allowed = pred vsako potezo preveriti varnost svojega kralja
+theme.mate_missed = iskati mat in pri tem začeti s šahi
+theme.stalemate = mojemu kralju pustiti prosto polje, ko imaš dobljeno pozicijo
+theme.fork = paziti na dvojne napade
+theme.discovered = paziti na skrite napade za mojimi figurami
+theme.skewer = ne postavljati vrednih figur v isto črto
+theme.pin = opaziti vezave, še preden nastanejo
+theme.trapped = svojim figuram puščati pot za umik
+theme.back_rank = svojemu kralju odpreti polje za umik
+theme.hanging = skrbeti za zaščito svojih figur
+theme.exchange = pred menjavo prešteti napadalce in branilce
+theme.missed_capture = najprej poiskati figure, ki jih lahko vzameš zastonj
+theme.missed_fork = iskati lastne dvojne napade
+theme.promotion = računati dirke kmetov in upoštevati kvadrat kmeta
+theme.king_safety = držati svojega kralja na varnem za njegovimi kmeti
+theme.bad_trade = premisliti, katere figure zamenjati
+theme.opening = razviti svoje figure in zgodaj rokirati
+theme.endgame = vključiti svojega kralja v igro in potiskati proste kmete
+theme.positional = izboljšati svojo najslabšo figuro
+theme.material = preveriti, kaj lahko pridobijo moje naslednje poteze, preden odigraš svojo
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Mat! Zmaga je tvoja. Odlično odigrano!
+appraisal.open.win.b1.2 = Zmaga je tvoja! Bravo, partijo ti je uspelo pripeljati do konca.
+appraisal.open.win.b1.3 = Premagan sem! To je bila res dobra partija.
+appraisal.open.win.b2 = Dobro odigrano! Zmagati ti je uspelo v {moves:move_loc}.
+appraisal.open.win.b2.2 = Čestitam za zmago!
+appraisal.open.win.b2.3 = Zmaga v {moves:move_loc}. Lepo opravljeno!
+appraisal.open.win.b3 = Čestitam, zaslužena zmaga.
+appraisal.open.win.b3.2 = Dobro odigrano. Zmaga je povsem zaslužena.
+appraisal.open.win.b3.3 = Lepa zmaga. Čestitam.
+appraisal.open.win.b4 = Lepa zmaga.
+appraisal.open.win.b4.2 = Dobro odigrano, zaslužena zmaga.
+appraisal.open.win.b4.3 = Dobra zmaga.
+appraisal.open.win.b5 = Dobro odigrano.
+appraisal.open.win.b5.2 = Lepo dobljena partija.
+appraisal.open.win.b5.3 = Dobra partija, zasluženo dobljena.
+appraisal.open.win.b6 = Dobro odigrano.
+appraisal.open.win.b6.2 = Lepo dobljeno.
+appraisal.open.win.b6.3 = Dobra partija.
+appraisal.open.draw.b1 = Remi! V tej partiji ni zmagal nihče.
+appraisal.open.draw.b1.2 = Remi. Partija je bila zelo izenačena!
+appraisal.open.draw.b1.3 = Remi: točko si deliva. Dobro odigrano!
+appraisal.open.draw.b2 = Remi: pravičen izid.
+appraisal.open.draw.b2.2 = Remizirala sva. Dober boj!
+appraisal.open.draw.b2.3 = Remi, in to po dobri partiji.
+appraisal.open.draw.b3 = Remi. Obe strani sta imeli priložnosti.
+appraisal.open.draw.b3.2 = Pravičen remi.
+appraisal.open.draw.b3.3 = Remi {text}. Dober boj.
+appraisal.open.draw.b4 = Remi {text}.
+appraisal.open.draw.b4.2 = Partija se je končala z remijem {text}.
+appraisal.open.draw.b4.3 = Izid: remi {text}.
+appraisal.open.draw.b5 = Remi.
+appraisal.open.draw.b5.2 = Remi {text}.
+appraisal.open.draw.b5.3 = Izid: remi.
+appraisal.open.draw.b6 = Remi.
+appraisal.open.draw.b6.2 = Remi {text}.
+appraisal.open.draw.b6.3 = Izid: remi.
+appraisal.open.stalemate.b1 = Remi zaradi pata: zmaga je bila tako blizu! Naslednjič mojemu kralju pusti prosto polje.
+appraisal.open.stalemate.b1.2 = Pat, torej remi. Zmaga je bila čisto blizu!
+appraisal.open.stalemate.b2 = Remi zaradi pata. Do zmage je manjkalo tako malo!
+appraisal.open.stalemate.b2.2 = Pat: remi, čeprav je bila tvoja pozicija dobljena.
+appraisal.open.stalemate.b3 = Remi zaradi pata, in to iz dobljene pozicije.
+appraisal.open.stalemate.b3.2 = Pat. Zmaga je ušla čisto na koncu.
+appraisal.open.stalemate.b4 = Remi zaradi pata.
+appraisal.open.stalemate.b4.2 = Pat: remi.
+appraisal.open.stalemate.b5 = Pat.
+appraisal.open.stalemate.b5.2 = Remi zaradi pata.
+appraisal.open.stalemate.b6 = Pat.
+appraisal.open.stalemate.b6.2 = Remi, pat.
+appraisal.open.loss.b1 = Tokrat sem zmagal jaz, ampak nekatere tvoje poteze so bile res dobre.
+appraisal.open.loss.b1.2 = Dobra partija! Pošteno sem se moral potruditi.
+appraisal.open.loss.b1.3 = Bilo je zabavno! To partijo sem dobil jaz, ampak hitro se učiš.
+appraisal.open.loss.b2 = Dobra partija! Poglejva, kaj je šlo dobro, in še eno stvar, ki jo lahko poskusiš.
+appraisal.open.loss.b2.2 = Hvala za partijo! Nekaj tvojih zamisli je bilo dobrih.
+appraisal.open.loss.b2.3 = Dobra partija. Poglejva, kaj se lahko iz nje naučiva.
+appraisal.open.loss.b3 = Dobra partija.
+appraisal.open.loss.b3.2 = Hvala za partijo.
+appraisal.open.loss.b3.3 = Dobra partija. Poglejva si jo.
+appraisal.open.loss_close.b3 = Dober boj. Partija je bila dolgo izenačena.
+appraisal.open.loss_close.b3.2 = Dober boj: ravnotežje je trajalo dolgo.
+appraisal.open.loss.b4 = Dobra partija. Tole je bilo odločilno.
+appraisal.open.loss.b4.2 = Dobra partija. Odločil je en sam trenutek.
+appraisal.open.loss.b4.3 = Hvala za partijo. Poglejva, kje se je obrnila.
+appraisal.open.loss_close.b4 = Dolgo je bil to izenačen boj. Tole je bilo odločilno.
+appraisal.open.loss_close.b4.2 = Dobra partija, dolgo v ravnotežju.
+appraisal.open.loss.b5 = Dobra partija.
+appraisal.open.loss.b5.2 = Hvala za partijo.
+appraisal.open.loss.b5.3 = Dober boj.
+appraisal.open.loss.b6 = Dobra partija.
+appraisal.open.loss.b6.2 = Hvala za partijo.
+appraisal.open.loss.b6.3 = Dober boj.
+appraisal.open.resigned.b1 = Predaja je del šaha in zanjo je treba poguma. Dobra partija!
+appraisal.open.resigned.b1.2 = Nič hudega. Tudi vedeti, kdaj je čas za predajo, je del šaha.
+appraisal.open.resigned.b2 = Predaja je del šaha; zanjo je treba poguma.
+appraisal.open.resigned.b2.2 = Razumem. Tudi za predajo je treba poguma.
+appraisal.open.resigned.b3 = Predaja je del šaha. Dobra partija.
+appraisal.open.resigned.b3.2 = Razumem. Hvala za partijo.
+appraisal.open.resigned.b4 = Dobra partija.
+appraisal.open.resigned.b4.2 = Hvala za partijo.
+appraisal.open.resigned.b5 = Dobra partija.
+appraisal.open.resigned.b5.2 = Hvala za partijo.
+appraisal.open.resigned.b6 = Dobra partija.
+appraisal.open.resigned.b6.2 = Hvala.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Veš, še ni bilo konec: približno {eval}.
+appraisal.resign_early.b3.2 = Pravzaprav so ti še ostale možnosti: približno {eval}.
+appraisal.resign_early.b4 = Še ni bilo konec: približno {eval}.
+appraisal.resign_early.b4.2 = Še se je dalo igrati: približno {eval}.
+appraisal.resign_early.b5 = Ni bilo konec: {eval}.
+appraisal.resign_early.b5.2 = Partija je bila še živa, približno {eval}.
+appraisal.resign_early.b6 = Ni bilo konec: {eval}.
+appraisal.resign_early.b6.2 = Bilo je {eval}.
+# The opening played (levels 3-6). The name stays in its nominative, after a colon.
+appraisal.opening.b3 = Otvoritev, ki sva jo igrala: {opening:def}.
+appraisal.opening.b3.2 = Otvoritev te partije: {opening:def}.
+appraisal.opening.b4 = Najina otvoritev: {opening:def}.
+appraisal.opening.b4.2 = Otvoritev: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Otvoritev: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Otvoritev: {opening:def}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+# {move} has no gender: a past verb about it takes a noun subject ("{n:ord} poteza, {move}, je
+# pridobila ...", "Ključna poteza je bila {move}"). "{my} je pad{my:ag_el}" = "moj lovec je padel" /
+# "moja dama je padla".
+appraisal.best.brilliant.b1 = Kakšna žrtev v {n:ord_loc} potezi: {move}!
+appraisal.best.brilliant.b1.2 = Moj najljubši trenutek: {move}. Žrtev figure, ki se je obrestovala!
+appraisal.best.brilliant.b2 = Tvoj najboljši trenutek: žrtev {move} v {n:ord_loc} potezi.
+appraisal.best.brilliant.b2.2 = {move} v {n:ord_loc} potezi: pogumna žrtev. Bravo!
+appraisal.best.brilliant.b3 = Briljantna žrtev: {move}.
+appraisal.best.brilliant.b3.2 = Vrhunec partije: {move}, prava žrtev, v {n:ord_loc} potezi.
+appraisal.best.brilliant.b4 = Najboljši trenutek: {move}, {n:ord} poteza. Briljantna žrtev.
+appraisal.best.brilliant.b4.2 = {move} v {n:ord_loc} potezi: briljantna poteza.
+appraisal.best.brilliant.b5 = {move} v {n:ord_loc} potezi: briljantno.
+appraisal.best.brilliant.b5.2 = {n:ord} poteza, {move}: briljantno.
+appraisal.best.brilliant.b6 = {move}!! v {n:ord_loc} potezi.
+appraisal.best.brilliant.b6.spoken = {move}, briljantna poteza, v {n:ord_loc} potezi.
+appraisal.best.brilliant.b6.2 = {n:ord} poteza: {move}, briljantno.
+appraisal.best.great.b1 = Moj najljubši trenutek: {move}. To je bila odlična poteza!
+appraisal.best.great.b1.2 = Se spomniš poteze {move}? To je bila odlična najdba.
+appraisal.best.great.b2 = Tvoj najboljši trenutek: {move} v {n:ord_loc} potezi. Ta poteza je obrnila partijo.
+appraisal.best.great.b2.2 = {move} v {n:ord_loc} potezi: odlična poteza.
+appraisal.best.great.b3 = Ključna poteza je bila {move} v {n:ord_loc} potezi: obrnila je potek partije.
+appraisal.best.great.b3.2 = Odlična najdba: {move} v {n:ord_loc} potezi.
+appraisal.best.great.b4 = Mojo napako je takoj kaznovala poteza {move}.
+appraisal.best.great.b4.2 = Najboljši trenutek: {move}, {n:ord} poteza.
+appraisal.best.great.b5 = {move} v {n:ord_loc} potezi. Dobro najdeno.
+appraisal.best.great.b5.2 = {n:ord} poteza, {move}: odlična najdba.
+appraisal.best.great.b6 = {move} v {n:ord_loc} potezi. Dobro najdeno.
+appraisal.best.great.b6.2 = {n:ord} poteza: {move}!
+appraisal.best.only.b1 = Moj najljubši trenutek: {move}. To je bila edina dobra poteza!
+appraisal.best.only.b1.2 = V {n:ord_loc} potezi ti je uspelo najti edino dobro potezo: {move}. Odlično!
+appraisal.best.only.b2 = Tvoj najboljši trenutek: {move}, edina dobra poteza v tisti poziciji.
+appraisal.best.only.b2.2 = V {n:ord_loc} potezi je bila edina poteza {move} in uspelo ti jo je najti.
+appraisal.best.only.b3 = Ključna poteza je bila {move} v {n:ord_loc} potezi: edina, ki je držala pozicijo.
+appraisal.best.only.b3.2 = V {n:ord_loc} potezi je pozicijo držala samo poteza {move} in uspelo ti jo je najti.
+appraisal.best.only.b4 = Najboljši trenutek: {move}, {n:ord} poteza. Edina poteza.
+appraisal.best.only.b4.2 = {n:ord} poteza: {move}, edina poteza.
+appraisal.best.only.b5 = {move} v {n:ord_loc} potezi: edina poteza. Dobro najdeno.
+appraisal.best.only.b5.2 = Edina poteza v {n:ord_loc} potezi: {move}.
+appraisal.best.only.b6 = {move} v {n:ord_loc} potezi: edina poteza. Dobro najdeno.
+appraisal.best.only.b6.2 = {n:ord} poteza: {move}, edina poteza.
+appraisal.best.won.b1 = Moj najljubši trenutek: {move}. Ta poteza je pridobila {pts:point_acc} materiala!
+appraisal.best.won.b1.2 = Se spomniš poteze {move}? Prinesla ti je {pts:point_acc} materiala. Bravo!
+appraisal.best.won.b2 = Tvoj najboljši trenutek: {move} v {n:ord_loc} potezi, ki ti je prinesla {pts:point_acc} materiala.
+appraisal.best.won.b2.2 = {n:ord} poteza, {move}, je pridobila material. Lepo!
+appraisal.best.won.b3 = Ključna poteza je bila {move} v {n:ord_loc} potezi: pridobila je {pts:point_acc} materiala.
+appraisal.best.won.b3.2 = {n:ord} poteza, {move}, je čisto pridobila material.
+appraisal.best.won.b4 = Najboljši trenutek: {move}, {n:ord} poteza, z dobitkom materiala.
+appraisal.best.won.b4.2 = {n:ord} poteza, {move}, je pridobila {pts:point_acc}.
+appraisal.best.won.b5 = {move} v {n:ord_loc} potezi: pridobljen material.
+appraisal.best.won.b5.2 = {n:ord} poteza: {move}, z dobitkom materiala.
+appraisal.best.won.b6 = {move} v {n:ord_loc} potezi: pridobljen material.
+appraisal.best.won.b6.2 = {n:ord} poteza: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = {n:ord} poteza: {move}, plus {pts:point}.
+# A streak is at least 5 moves long, so the genitive "{n:best_move_gen}" is safe here.
+appraisal.best.streak.b1 = Najboljšo potezo ti je uspelo najti {n:time} zapored. Odlično!
+appraisal.best.streak.b1.2 = {n:best_move} zapored! To je odličen šah.
+appraisal.best.streak.b2 = Najboljšo potezo ti je uspelo najti {n:time} zapored.
+appraisal.best.streak.b2.2 = {n:best_move} zapored. Zelo dobro!
+appraisal.best.streak.b3 = Niz {n:best_move_gen} zapored. Zelo solidno.
+appraisal.best.streak.b3.2 = {n:best_move} zapored. Dobro odigrano.
+appraisal.best.streak.b4 = {n:best_move} zapored.
+appraisal.best.streak.b4.2 = Niz {n:best_move_gen}.
+appraisal.best.streak.b5 = {n:best_move} zapored.
+appraisal.best.streak.b5.2 = Niz {n:best_move_gen}.
+appraisal.best.streak.b6 = {n:best_move} zapored.
+appraisal.best.streak.b6.2 = Niz: {n:best_move}.
+appraisal.best.capture.b1 = Moj najljubši trenutek: {move}. Uspelo ti je vzeti {my:acc} zastonj!
+appraisal.best.capture.b1.2 = Se spomniš poteze {move}? Ni ti ušlo, da {my} visi!
+appraisal.best.capture.b2 = Tvoj najboljši trenutek: {move} in {my} je pad{my:ag_el}.
+appraisal.best.capture.b2.2 = Lepo jemanje v {n:ord_loc} potezi: {move}.
+appraisal.best.capture.b3 = Dobro opaženo v {n:ord_loc} potezi: s potezo {move} ti je uspelo dobiti {my:acc}.
+appraisal.best.capture.b3.2 = {n:ord} poteza, {move}, je pobrala {my:acc}.
+appraisal.best.capture.b4 = Najboljši trenutek: {move}, {n:ord} poteza, z dobitkom {my:gen}.
+appraisal.best.capture.b4.2 = {n:ord} poteza, {move}, je pridobila material.
+appraisal.best.capture.b5 = {n:ord} poteza, {move}, je pridobila {my:acc}.
+appraisal.best.capture.b5.2 = {n:ord} poteza: {move}.
+appraisal.best.capture.b6 = {move} v {n:ord_loc} potezi.
+appraisal.best.capture.b6.2 = {n:ord} poteza: {move}, z dobitkom materiala.
+appraisal.best.phase.b1 = V {text:loc} ti je šlo zelo dobro.
+appraisal.best.phase.b1.2 = {text} je bila najboljši del tvoje partije.
+appraisal.best.phase.b2 = Tvoja najmočnejša faza je bila {text}.
+appraisal.best.phase.b2.2 = {text} ti je šla zelo dobro od rok.
+appraisal.best.phase.b3 = Tvoja najboljša faza je bila {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} ti je šla najbolje: {acc:percent} natančnosti.
+appraisal.best.phase.b4 = Najmočnejša faza: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} je bila tvoja najboljša faza, z natančnostjo {acc:percent}.
+appraisal.best.phase.b5 = Najboljša faza: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Najboljša faza: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 figura" / "3 figure") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included: "figura" counts every chessman) and checks given ({m}); also
+# the fallback without the engine, where {n} can be 0. The short levels give the numbers after a
+# colon ("Vzetih figur: 3"); {n:f} says "ena / dve" for figure, {n:neut} "eno / dve" for jemanja.
+appraisal.num.material.b1 = Uspelo ti je vzeti {n:piece_acc} in {m:time} dati šah.
+appraisal.num.material.b1.2 = Izgubil sem {n:piece_acc}, moj kralj pa je bil {m:time} v šahu.
+appraisal.num.material.b2 = Uspelo ti je vzeti {n:piece_acc} in {m:time} dati šah.
+appraisal.num.material.b2.2 = Izgubil sem {n:piece_acc} in {m:time} sem bil v šahu.
+appraisal.num.material.b3 = Uspelo ti je vzeti {n:piece_acc} in {m:time} dati šah.
+appraisal.num.material.b3.2 = Vzetih figur: {n:f}, danih šahov: {m}.
+appraisal.num.material.b4 = Vzetih figur: {n:f}, danih šahov: {m}.
+appraisal.num.material.b4.2 = Tvoj izkupiček: {n:capture} in {m:check}.
+appraisal.num.material.b5 = Vzetih figur: {n:f}; šahov: {m}.
+appraisal.num.material.b5.2 = Jemanja: {n:neut}; šahi: {m}.
+appraisal.num.material.b6 = Vzetih figur: {n:f}, šahov: {m}.
+appraisal.num.material.b6.2 = Jemanja: {n:neut}; šahi: {m}.
+appraisal.num.material_nochecks.b1 = Uspelo ti je vzeti {n:piece_acc}.
+appraisal.num.material_nochecks.b1.2 = V tej partiji ti je uspelo vzeti {n:piece_acc}.
+appraisal.num.material_nochecks.b2 = Uspelo ti je vzeti {n:piece_acc}.
+appraisal.num.material_nochecks.b2.2 = V tej partiji sem izgubil {n:piece_acc}.
+appraisal.num.material_nochecks.b3 = Uspelo ti je vzeti {n:piece_acc}.
+appraisal.num.material_nochecks.b3.2 = Vzetih figur: {n:f}.
+appraisal.num.material_nochecks.b4 = Vzetih figur: {n:f}.
+appraisal.num.material_nochecks.b4.2 = Tvoj izkupiček: {n:capture}.
+appraisal.num.material_nochecks.b5 = Vzetih figur: {n:f}.
+appraisal.num.material_nochecks.b5.2 = Jemanja: {n:neut}.
+appraisal.num.material_nochecks.b6 = Vzetih figur: {n:f}.
+appraisal.num.material_nochecks.b6.2 = Jemanja: {n:neut}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well. "Vrnila sva" (we two
+# took back: the coach allows the takeback) needs no form agreeing with the player.
+appraisal.num.takebacks.b1 = Vrnila sva {n:move_acc} in {m:time} ti je uspelo najti boljšo potezo. Tako se učimo!
+appraisal.num.takebacks.b1.2 = Vrnila sva {n:move_acc} in {m:time} je bila nova poteza boljša. Super!
+appraisal.num.takebacks.b2 = Vrnila sva {n:move_acc} in {m:time} ti je uspelo najti boljšo potezo. Tako se učimo.
+appraisal.num.takebacks.b2.2 = Vrnjenih potez: {n:f}, popravljenih: {m:f}. Tako je prav!
+appraisal.num.takebacks.b3 = Vrnila sva {n:move_acc} in {m:time} je bila nova poteza boljša.
+appraisal.num.takebacks.b3.2 = Vrnjenih potez: {n:f}, od tega popravljenih: {m:f}. Dobro.
+# Level 2: big mistakes ({n} = mistakes and blunders, 1 or 2), or the best moves found ({n}).
+appraisal.num.clean.b2 = Niti ene velike napake: super!
+appraisal.num.clean.b2.2 = V tej partiji ni bilo niti ene velike napake. Odlično!
+appraisal.num.clean.b2.3 = Velikih napak ni bilo. Zelo dobro!
+appraisal.num.few.b2 = V tej partiji samo {n:mistake}.
+appraisal.num.few.b2.2 = V celi partiji le {n:mistake}. Dobro!
+appraisal.num.few.b2.3 = Omeniti velja le {n:mistake_acc}. Bravo.
+appraisal.num.best.b2 = Najboljšo potezo ti je uspelo najti {n:time}.
+appraisal.num.best.b2.2 = Tvoja poteza je bila {n:time} najboljša možna.
+appraisal.num.best.b2.3 = {n:time} se ti je posrečila najboljša poteza.
+appraisal.num.acc.b3 = Tvoja natančnost je bila {acc:percent}, pri tem sem naštel {n:mistake_acc} in {m:blunder_acc}.
+appraisal.num.acc.b3.2 = Natančnost {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Natančnost tvojih potez: {acc:percent}; med njimi {n:mistake} in {m:blunder}.
+appraisal.num.acc_explain.b3 = Natančnost primerja tvoje poteze z najboljšo potezo v vsaki poziciji: sto pomeni popolno igro.
+appraisal.num.acc_explain.b3.2 = Natančnost meri, kako blizu najboljšim so bile tvoje poteze. Sto je popoln rezultat.
+appraisal.num.acc.b4 = Natančnost: {acc:percent}.
+appraisal.num.acc.b4.2 = Tvoja igra: {acc:percent} natančnosti.
+appraisal.num.acc.b4.3 = {acc:percent} natančnosti.
+appraisal.num.acc_phase.b4 = Natančnost {acc:percent}, v {text:loc}, tvoji najmočnejši fazi, pa {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = Skupno {acc:percent}, v {text:loc} pa {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Tvoja natančnost je bila {acc:percent}; najbolje ti je šlo v {text:loc}: {acc_phase:percent}.
+appraisal.num.coach.b4 = Jaz sem igral z natančnostjo {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Moja natančnost je bila {acc_coach:percent}.
+appraisal.num.acc.b5 = Natančnost {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Natančnost {acc:percent}: {n:inaccuracy} in {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Konec teorije v {k:ord_loc} potezi.
+appraisal.num.book.b5.2 = Teorijo sva zapustila v {k:ord_loc} potezi.
+appraisal.num.acc.b6 = Ti {acc:percent}, jaz {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc:percent} pri tebi, {acc_coach:percent} pri meni; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Natančnost {acc:percent}, moja {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Natančnost {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Natančnost: {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Nekaj za vajo: {theme}.
+appraisal.improve.theme.b1.2 = Nasvet za naslednjič: {theme}.
+appraisal.improve.theme.b1.3 = Nekaj, na čemer lahko delaš: {theme}.
+appraisal.improve.theme.b2 = To je dobro vaditi: {theme}.
+appraisal.improve.theme.b2.2 = Zamisel za naslednjič: {theme}.
+appraisal.improve.theme.b2.3 = Dobro bi bilo vaditi: {theme}.
+appraisal.improve.theme.b3 = Tema te partije: {theme}.
+appraisal.improve.theme.b3.2 = Vredno vaje: {theme}.
+appraisal.improve.theme.b4 = Ponavljajoča se tema: {theme}.
+appraisal.improve.theme.b4.2 = Večkrat se je pokazalo: {theme}.
+appraisal.improve.theme.b5 = Ponavlja se: {theme}.
+appraisal.improve.theme.b5.2 = Tema partije: {theme}.
+appraisal.improve.theme.b6 = Ponavlja se: {theme}.
+appraisal.improve.theme.b6.2 = Tema: {theme}.
+# The critical moment (levels 2-6). "Forsirane poteze" = forcing moves (checks, captures, threats).
+appraisal.improve.critical.b2 = Partija se je obrnila v {crit_no:ord_loc} potezi. Za naslednjič vadi tole: {theme}.
+appraisal.improve.critical.b2.2 = Ključni trenutek je bil v {crit_no:ord_loc} potezi: {crit_move}. Za vajo: {theme}.
+appraisal.improve.critical.b3 = Kritični trenutek je bil v {crit_no:ord_loc} potezi. Namesto poteze {crit_move} je bila boljša poteza {crit_best}.
+appraisal.improve.critical.b3.2 = V {crit_no:ord_loc} potezi je bila poteza {crit_best} boljša kot {crit_move}. Najprej preveri moje forsirane poteze.
+appraisal.improve.critical.b4 = Kritični trenutek: {crit_no:ord} poteza, {crit_move}. Boljša je bila poteza {crit_best}.
+appraisal.improve.critical.b4.2 = {crit_no:ord} poteza je bila ključni trenutek: {crit_best} namesto poteze {crit_move}.
+appraisal.improve.critical.b5 = {crit_no:ord} poteza: {crit_best} namesto {crit_move}; {eval}.
+appraisal.improve.critical.b5.2 = Kritična je bila {crit_no:ord} poteza: {crit_best}; {eval}.
+appraisal.improve.critical.b6 = {crit_no:ord} poteza: {crit_best} namesto {crit_move}; {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, ne {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = {crit_no:ord} poteza: {crit_best}, ne {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = Do {crit_no:ord_gen} poteze je bila zmaga v tvojih rokah. Nasvet: {theme}.
+appraisal.improve.was_winning.b1.2 = Do {crit_no:ord_gen} poteze ti je šlo odlično. Zapomni si: {theme}.
+appraisal.improve.was_winning.b2 = Do {crit_no:ord_gen} poteze je bila tvoja pozicija dobljena. Za naslednjič: {theme}.
+appraisal.improve.was_winning.b2.2 = Vse do {crit_no:ord_gen} poteze je bila zmaga v tvojih rokah. Za vajo: {theme}.
+appraisal.improve.was_winning.b3 = Do {crit_no:ord_gen} poteze je bila tvoja pozicija dobljena. Poteza {crit_best} bi ohranila tvojo prednost.
+appraisal.improve.was_winning.b3.2 = Vse do {crit_no:ord_gen} poteze je bila pozicija dobljena; s potezo {crit_best} bi tako tudi ostalo.
+appraisal.improve.was_winning.b4 = Do {crit_no:ord_gen} poteze je bila tvoja pozicija dobljena. Poteza {crit_best} bi ohranila tvojo prednost.
+appraisal.improve.was_winning.b4.2 = Dobljena pozicija do {crit_no:ord_gen} poteze; poteza {crit_best} bi jo ohranila.
+appraisal.improve.was_winning.b5 = Dobljeno do {crit_no:ord_gen} poteze: {crit_best}; {eval}.
+appraisal.improve.was_winning.b5.2 = {crit_no:ord} poteza: zmago bi ohranila poteza {crit_best}; {eval}.
+appraisal.improve.was_winning.b6 = {crit_no:ord} poteza: {crit_best}; {eval}.
+appraisal.improve.was_winning.b6.2 = Zmago bi ohranila {crit_no:ord} poteza {crit_best}: {eval}.
+# The game ended in stalemate while the player was winning ("ko imaš dobljeno pozicijo" = when winning).
+appraisal.improve.stalemate.b1 = Nasvet: ko imaš dobljeno pozicijo, mojemu kralju vedno pusti polje, na katero se lahko premakne.
+appraisal.improve.stalemate.b1.2 = Zapomni si: proti koncu partije pred vsako potezo preveri, ali se moj kralj še lahko premakne.
+appraisal.improve.stalemate.b2 = Ko imaš dobljeno pozicijo, mojemu kralju vedno pusti prosto polje, sicer je pat.
+appraisal.improve.stalemate.b2.2 = Naslednjič pred svojo potezo preveri, ali se moj kralj še lahko premakne.
+appraisal.improve.stalemate.b3 = V dobljeni poziciji ob vsaki potezi preveri, ali ima moj kralj še prosto polje.
+appraisal.improve.stalemate.b3.2 = V dobljenih končnicah pazi na pat: mojemu kralju pusti nekaj prostora.
+appraisal.improve.stalemate.b4 = V dobljenih končnicah vedno preveri, ali grozi pat.
+appraisal.improve.stalemate.b4.2 = Pazi na pat: tu te je stal zmage.
+appraisal.improve.stalemate.b5 = V dobljenih končnicah preverjaj, ali grozi pat.
+appraisal.improve.stalemate.b5.2 = Pat te je stal zmage.
+appraisal.improve.stalemate.b6 = Pazi na pat.
+appraisal.improve.stalemate.b6.2 = Pat je odnesel zmago.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+# "{my} je visel{my:ag}" = "moj lovec je visel" / "moja dama je visela" (the ending after the piece
+# is named); "bi ti {my} pad{my:ag_el}" = "bi ti padel / padla" agrees with the piece, not the player.
+appraisal.improve.coach_hung.b1 = V {n:ord_loc} potezi je {my} visel{my:ag}. Ti je to padlo v oči?
+appraisal.improve.coach_hung.b1.2 = V {n:ord_loc} potezi je bilo mogoče zastonj vzeti {my:acc}. Vedno išči figure, ki jih lahko vzameš zastonj!
+appraisal.improve.coach_hung.b2 = V {n:ord_loc} potezi je {my} visel{my:ag}. Ali ti je to padlo v oči?
+appraisal.improve.coach_hung.b2.2 = V {n:ord_loc} potezi bi ti {my} pad{my:ag_el} zastonj.
+appraisal.improve.coach_hung.b3 = V {n:ord_loc} potezi je {my} ostal{my:ag} brez zaščite. Je to pritegnilo tvojo pozornost?
+appraisal.improve.coach_hung.b3.2 = {my} je v {n:ord_loc} potezi visel{my:ag}. Ob vsaki potezi išči nezaščitene figure.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Še naprej preverjaj, ali so tvoje figure na varnem, tako kot danes.
+appraisal.improve.clean.b1.2 = Še naprej pred vsako potezo poglej, kaj napadam. To deluje!
+appraisal.improve.clean.b1.3 = Kar tako naprej s previdno igro!
+appraisal.improve.clean.b2 = Čista partija. Še naprej tako preverjaj moje grožnje.
+appraisal.improve.clean.b2.2 = Še naprej igraj tako kot danes: figure na varnem, dobre poteze.
+appraisal.improve.clean.b3 = Čista partija. Še naprej najprej preverjaj forsirane poteze.
+appraisal.improve.clean.b3.2 = Brez velikih napak: kar tako naprej.
+appraisal.improve.clean.b4 = Čista partija. Ničesar resnega ni treba popraviti.
+appraisal.improve.clean.b4.2 = Kritičnih napak ni bilo.
+appraisal.improve.clean.b5 = Brez kritičnih napak.
+appraisal.improve.clean.b5.2 = Čista partija.
+appraisal.improve.clean.b6 = Čista partija.
+appraisal.improve.clean.b6.2 = Kritičnih napak ni bilo.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} always in »...« after "stopnja" in a fixed case ("na stopnji »Začetnik«"): the name never
+# declines. "Kos si stopnji" (you are up to the level) has no gender.
+appraisal.end.b1 = Z vsako partijo igraš bolje. Še eno?
+appraisal.end.b1.2 = Bilo je zabavno! Igrava še enkrat?
+appraisal.end.b1.3 = Odličen trud. Želiš igrati še eno partijo?
+appraisal.end.b2 = Z vsako partijo igraš bolje. Še eno?
+appraisal.end.b2.2 = Dobra partija. Igrava še enkrat?
+appraisal.end.b2.3 = Dobro odigrano. Še eno partijo?
+appraisal.end.b3 = Solidna partija. Greva na naslednjo?
+appraisal.end.b3.2 = Dobra partija. Še eno?
+appraisal.end.b3.3 = Dobro odigrano. Greva še enkrat?
+appraisal.end.b4 = Solidna partija. Greva na naslednjo?
+appraisal.end.b4.2 = Še eno partijo?
+appraisal.end.b4.3 = Dobra partija. Naslednja?
+appraisal.end.b5 = Še eno?
+appraisal.end.b5.2 = Naslednja partija?
+appraisal.end.b5.3 = Še enkrat?
+appraisal.end.b6 = Še eno?
+appraisal.end.b6.2 = Naslednja partija?
+appraisal.end.b6.3 = Še enkrat?
+appraisal.end.up.b1 = Zdaj si kos stopnji »{level}«. Jo poskusiva?
+appraisal.end.up.b1.2 = Mislim, da si že kos stopnji »{level}«. Poskusiva?
+appraisal.end.up.b2 = Zdaj si kos stopnji »{level}«. Jo poskusiva?
+appraisal.end.up.b2.2 = Kaj praviš na stopnjo »{level}«? Mislim, da si ji kos.
+appraisal.end.up.b3 = Ta stopnja ti je postala premajhna: poskusi stopnjo »{level}«.
+appraisal.end.up.b3.2 = Si kos stopnji »{level}«? Mislim, da si.
+appraisal.end.up.b4 = Ta stopnja ti je postala premajhna: poskusi stopnjo »{level}«.
+appraisal.end.up.b4.2 = Čas za stopnjo »{level}«?
+appraisal.end.up.b5 = Naslednjič poskusi stopnjo »{level}«.
+appraisal.end.up.b5.2 = Zdaj stopnja »{level}«?
+appraisal.end.up.b6 = Naslednjič poskusi stopnjo »{level}«.
+appraisal.end.up.b6.2 = Zdaj stopnja »{level}«?
+appraisal.end.down.b2 = Odigrajva eno partijo na stopnji »{level}«, da utrdiva te ideje.
+appraisal.end.down.b2.2 = Kaj praviš na partijo na stopnji »{level}«, za vajo?
+appraisal.end.down.b3 = Želiš odigrati eno partijo na stopnji »{level}« in utrditi te ideje?
+appraisal.end.down.b3.2 = Partija na stopnji »{level}« bi ti lahko pomagala utrditi te ideje.
+appraisal.end.down.b4 = Partija na stopnji »{level}« bi morda pomagala utrditi te ideje.
+appraisal.end.down.b4.2 = Morda eno na stopnji »{level}«, za vajo?
+appraisal.end.down.b5 = Morda eno na stopnji »{level}«?
+appraisal.end.down.b5.2 = Stopnja »{level}«, za vajo?
+appraisal.end.down.b6 = Morda eno na stopnji »{level}«?
+appraisal.end.down.b6.2 = Stopnja »{level}«, za vajo?

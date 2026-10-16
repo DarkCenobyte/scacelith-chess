@@ -297,12 +297,16 @@ owner.black.esse = {piece}
 # "a4" is not heard as the article "a" and "e4" not as the conjunction "e": e4 = "é quatro",
 # f5 = "efe cinco", h7 = "agá sete". A square takes no article: "para {sq}", "em {sq}", "de {sq}",
 # or "a casa {sq}" (never "no {sq}" / "na {sq}").
+# The e is written "éh" for the voice: a bare "é" melts into the word before it ("toma em é cinco" is
+# said "toma em cinco", "para é quatro" "para quatro", "até é quatro" "até quatro"); "éh" is the same
+# letter, held a little longer, and is heard far more often (36 times in 54 against 24, as in
+# European Portuguese).
 square.spoken = {file} {rank}
 file.a.spoken = á
 file.b.spoken = bê
 file.c.spoken = cê
 file.d.spoken = dê
-file.e.spoken = é
+file.e.spoken = éh
 file.f.spoken = efe
 file.g.spoken = gê
 file.h.spoken = agá

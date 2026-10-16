@@ -1,0 +1,138 @@
+# Coach speech (Slovenian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 pozicij", count.position in
+#            common.lang): it stands as a heading before a colon or a relative clause, so that no verb
+#            has to agree with the count; "{n:move_loc}" = "v 3 potezah" (mate in N), "{n:move_acc}"
+#            for "hold for N moves"
+#   {move}   one of the coach's moves, played on the board while the line is said; it never takes an
+#            ending: "po potezi {move}", "s potezo {move}"; "{move:nomate}" says a mating move without
+#            "mat" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use "svoj": {your:refl_acc} = "svojega skakača",
+#            {your:refl_loc} = "svojem skakaču"
+#   {sq}     a square, after the noun "polje" ("polje {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "ti" and is male ("odgovoril bi", "branil se
+# bom"); the player's gender is unknown: no past tense, future, conditional or adjective about the player.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat v eni potezi. {n:position}: v vsaki da mat ena sama poteza. Preveri vse šahe.
+ch.intro.mate2 = Mat v dveh potezah. {n:position}: tvoja prva poteza mi ne sme pustiti obrambe, nato daš mat.
+ch.intro.mate3 = Mat v treh potezah. {n:position}. Šahi, jemanja in grožnje: vsakič izračunaj moj najboljši odgovor.
+ch.intro.backrank = Mati na zadnji vrsti. {n:position}, kjer je kralj ujet za svojimi kmeti.
+ch.intro.patterns = Matni vzorci. {n:position} s klasičnimi matnimi mrežami. Prepoznaj vzorec in udari.
+ch.intro.hanging = Nezaščitene figure. {n:position}: nekaj mojega ostane brez zaščite. Poišči in vzemi.
+ch.intro.fork = Vilice. {n:position}: poišči potezo, ki napade dve stvari hkrati.
+ch.intro.pin = Vezave. {n:position}: veži figuro ali izkoristi vezavo.
+ch.intro.skewer = Ražnji. {n:position}: napadi dragoceno figuro in pridobi tisto, kar stoji za njo.
+ch.intro.discovered = Odkriti napadi. {n:position}: premakni eno figuro in tako sprosti drugo.
+ch.intro.deflection = Odvračanje in privabljanje. {n:position}: odvrni branilca ali ga privabi na usodno polje.
+ch.intro.intermezzo = Vmesne poteze. {n:position}: pred očitno potezo poišči močnejšo.
+ch.intro.trapped = Ujete figure. {n:position}: ena od mojih figur nima varnega umika. Pridobi jo.
+ch.intro.promotion = Promocija. {n:position}, kjer partijo odloči kmet, ki je že daleč napredoval.
+ch.intro.quiet = Tihe poteze. {n:position}: zmagovita poteza ni ne šah ne jemanje.
+ch.intro.opening = Otvoritvene pasti. {n:position} iz prvih potez pravih partij. Kaznuj mojo napako.
+ch.intro.escape = Poišči rešitev. {n:position}: tvoj kralj je v nevarnosti in reši ga lahko le ena poteza.
+ch.intro.defend = Obrambne poteze. {n:position}: poišči edino potezo, s katero tvoja pozicija zdrži.
+ch.intro.kq = Dama in kralj proti kralju. {n:position}: daj mat mojemu kralju. Pazi na pat.
+ch.intro.kr = Trdnjava in kralj proti kralju. {n:position}: korak za korakom daj mat mojemu kralju.
+ch.intro.kp = Kralj in kmet proti kralju. {n:position}: spremeni kmeta v damo. Pot naj mu utira tvoj kralj.
+ch.intro.kp_hold = Ustavi kmeta. {n:position}: imaš samo kralja. Ubrani remi.
+ch.intro.rook = Trdnjavske končnice. {n:position}: zgradi most za promocijo in ubrani remi s Philidorjevo obrambo.
+ch.intro.endgame = Taktika v končnici. {n:position}: figur je malo, ideje pa so ostre.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_loc}: "v 2 potezah").
+ch.task.mate = Mat v {n:move_loc}.
+ch.task.mate.2 = Poišči mat v {n:move_loc}.
+ch.task.hanging = Nekaj je ostalo brez zaščite.
+ch.task.hanging.2 = Kaj lahko vzameš zastonj?
+ch.task.fork = Poišči vilice.
+ch.task.fork.2 = Išči vilice.
+ch.task.pin = Ključ je tu vezava.
+ch.task.skewer = Tukaj zmaga raženj.
+ch.task.discovered = Tukaj zmaga odkriti napad.
+ch.task.deflection = Preobremeni ali privabi branilca.
+ch.task.intermezzo = Išči vmesno potezo.
+ch.task.trapped = Ena od mojih figur ne more pobegniti. Pridobi jo.
+ch.task.promotion = Izkoristi svojega kmeta, ki je že daleč napredoval.
+ch.task.quiet = Zmagovita poteza je tiha.
+ch.task.opening = Kaznuj mojo zadnjo potezo.
+ch.task.escape = Reši svojega kralja: deluje le ena poteza.
+ch.task.defend = Poišči edino dobro potezo.
+ch.task.endgame = Poišči najboljšo potezo.
+ch.task.default = Poišči najboljšo potezo.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Daj mat mojemu kralju. Branil se bom, kolikor bom mogel.
+ch.task.play.promote = Promoviraj svojega kmeta in ohrani zmago. Poskušal te bom ustaviti.
+ch.task.play.hold = Ubrani remi in zdrži {n:move_acc}. Poskušal bom zmagati.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Te pozicije so iz pravih partij. Jaz odigram zadnjo potezo, nato si na vrsti ti.
+ch.lead.first.2 = Vsaka pozicija je iz prave partije: odigram potezo, ki je pripeljala do nje, nato igraš ti.
+ch.next = Naslednja pozicija.
+ch.next.2 = Tu je naslednja.
+ch.next.3 = Gremo na naslednjo.
+ch.last = Zadnja pozicija.
+ch.last.2 = Zdaj pa še zadnja.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Dobro.
+ch.good.2 = Da.
+ch.good.3 = Tako je.
+ch.good.4 = Točno.
+# The position is solved.
+ch.solved = To je to! Bravo.
+ch.solved.2 = Povsem pravilno.
+ch.solved.3 = Zelo dobro.
+ch.solved.mate = Mat! Bravo.
+ch.solved.mate.2 = In to je mat. Zelo dobro.
+ch.solved.mate.3 = Mat. Lepo izpeljano.
+ch.solved.promote = Nova dama in zmaga je na varnem. Bravo.
+ch.solved.hold = Remi je ubranjen. Dobra obramba!
+ch.solved.draw = Na šahovnici je remi. Dobra obramba!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Ne ta: na to bi odigral {move}.
+ch.wrong.reply.2 = Ne povsem: odgovoril bi s potezo {move}.
+ch.wrong.reply.3 = Potem bi igral {move}.
+ch.wrong.mate = Previdno: poteza {move:nomate} bi bila mat.
+ch.wrong.mate.2 = Pazi: odgovoril bi s potezo {move:nomate} in to je mat.
+ch.wrong.mated = Previdno: po potezi {move} lahko izsilim mat v {m:move_loc}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Tudi to vodi do mata, a traja dlje. Obstaja hitrejša pot.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Tudi to da mat, a jaz imam v mislih drugo potezo. Poglej še enkrat.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Ni slabo, a obstaja nekaj močnejšega. Poglej še enkrat.
+ch.wrong.weaker.2 = To se da igrati, a lahko najdeš boljše.
+ch.wrong.stalemate = Pat! Moj kralj se ne more premakniti, to pa je samo remi.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Ne ta: po potezi {move} lahko ubranim remi.
+ch.wrong.loses = Previdno: po potezi {move} bi imel jaz dobljeno pozicijo.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = To ni to.
+ch.try_again = Poskusi znova.
+ch.try_again.2 = Poglej še enkrat.
+ch.try_again.3 = Poglej znova.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Ali želiš namig?
+ch.offer.2 = Naj ti dam namig?
+ch.no_hint = Prav. Kar išči naprej.
+ch.no_hint.2 = V redu, vzemi si čas.
+ch.hint.piece = Poglej {your:refl_acc}.
+ch.hint.piece.2 = Razmisli o {your:refl_loc}.
+ch.hint.square = Poglej polje {sq}.
+ch.hint.square.2 = Ključno polje je {sq}.
+ch.hint.square.3 = Pazi na polje {sq}.
+ch.hint.show = Tu je poteza. Glej.
+ch.hint.show.2 = Naj ti pokažem. Glej.
+ch.hint.now = Zdaj jo odigraj ti.
+ch.hint.now.2 = Na vrsti si: odigraj jo.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = To je bil celoten izziv. Bravo!
+ch.complete.2 = Vse pozicije so rešene. Bravo!

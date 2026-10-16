@@ -115,10 +115,12 @@ lesson.king.wrong = Din kung står precis bredvid {my}. Gå till {my:def_gen} ru
 lesson.king.ok = Bra! Kungen är långsam, men stark på nära håll.
 # Knight
 lesson.knight.intro = Det här är {your}. {your:den} går i ett L: två rutor rakt fram, sedan en åt sidan.
+lesson.knight.intro.spoken = Det här är {your}. {your:den} går i ett ell: två rutor rakt fram, sedan en åt sidan.
 lesson.knight.l = Så {@}här. Springaren hamnar alltid på en ruta av den andra färgen.
 lesson.knight.jump = Springaren är den enda pjäsen som kan hoppa över andra pjäser.
 lesson.knight.ask = Slå {my} med din springare!
 lesson.knight.wrong = Det är ett riktigt springardrag, men det når inte {my}. Försök med ett annat L.
+lesson.knight.wrong.spoken = Det är ett riktigt springardrag, men det når inte {my}. Försök med ett annat ell.
 lesson.knight.ok = Snyggt hopp!
 # Pawn: moving
 lesson.pawn.intro = Nu till {your}. {your:den} går rakt fram, en ruta i taget, och aldrig bakåt.

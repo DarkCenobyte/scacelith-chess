@@ -21,7 +21,7 @@ event.greet.l4 = Živjo! Tokrat bom navajal ocene in ti pokazal boljše kandidat
 event.greet.l4.2 = Igrajva. Po napaki ti bom povedal, kaj je bilo natančnejše.
 event.greet.l4.3 = Partija kot v klubu? Komentiral bom, kadar se ocena spremeni.
 event.greet.l5 = Igrajva. Moji komentarji bodo kratki.
-event.greet.l5.2 = Jaz sem pripravljen. Komentarji bodo samo kratki.
+event.greet.l5.2 = Pripravljen sem, ko boš ti. Komentarji bodo samo kratki.
 event.greet.l5.3 = Srečno. Oglasil se bom le, ko bo pomembno.
 event.greet.l6 = Srečno.
 event.greet.l6.2 = Igrajva.
@@ -86,7 +86,7 @@ event.encourage.well.3 = Danes dobro razmišljaš.
 
 # ---- Draw offers ------------------------------------------------------------------------------------------
 event.draw.accepted = Sprejmem. Torej remi.
-event.draw.accepted.2 = Dogovorjeno: remi je.
+event.draw.accepted.2 = Dogovorjeno: remi.
 event.draw.declined = Ne, hvala, igrajva naprej.
 event.draw.declined.2 = Raje bi nadaljeval.
 
