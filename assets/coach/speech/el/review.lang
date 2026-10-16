@@ -10,8 +10,10 @@
 # Moves: "το {move}" / "το {best}" (the commentators' neuter), "η συνέχεια {line}" or "{line}" alone.
 # Counts: {m:move} "2 κινήσεις", {pts:point} "3 μονάδες", {n:time} "3 φορές", {n:piece} "3 κομμάτια",
 # {n:square}; {m:f} = a feminine number with "κινήσεις" understood ("ματ σε τρεις").
-# Typography: the Greek question mark ";" is not a sentence end for the program, so a piece placeholder
-# never starts the sentence after it. The English ";" is the ano teleia "·" here.
+# Typography: the Greek question mark ";" ends a sentence for the program (catalog.cpp), so a piece
+# placeholder after it is capitalised. The English ";" is the ano teleia "·" here (no capital after it).
+# A line of a skewer or a pin is "ευθεία" (any line); "γραμμή" is a rank. Recapturing is "ξαναπαίρνω";
+# "παίρνω πίσω" is only the takeback.
 # Levels 1-2: short, warm sentences; levels 5-6: terse.
 
 # ---- Announcements (either side's move) -------------------------------------------------------
@@ -253,7 +255,7 @@ demo.your.move.3 = Μετά {your} πηγαίνει στο {sq}.
 demo.your.take = Θα έπαιρνες {my:acc}.
 demo.your.take.2 = Παίρνεις {my:acc} με {your:acc}.
 demo.your.take.3 = Μετά παίρνεις {my:acc}.
-demo.your.back = Παίρνεις πίσω.
+demo.your.back = Ξαναπαίρνεις.
 demo.your.back.2 = Ξαναπαίρνεις στο {sq}.
 demo.your.back.3 = Και ξαναπαίρνεις.
 demo.your.king = Ο βασιλιάς σου πρέπει να κινηθεί.
@@ -279,11 +281,11 @@ ex.result.b3 = Αυτό σου κοστίζει {pts:point}.
 ex.result.b3.2 = Τελικά υστερείς κατά {pts:point}.
 # The same when the player, to move, can still take something back ({pts} counts that capture).
 ex.result_back.b1 = Μπορείς να ξαναπάρεις κάτι, αλλά και πάλι χάνεις {pts:point}.
-ex.result_back.b1.2 = Μπορείς να πάρεις λίγα πίσω, αλλά και πάλι έχεις χάσει {pts:point}.
-ex.result_back.b2 = Μπορείς να πάρεις κάτι πίσω, αλλά υστερείς ακόμα κατά {pts:point}.
+ex.result_back.b1.2 = Μπορείς να ξανακερδίσεις λίγο υλικό, αλλά και πάλι έχεις χάσει {pts:point}.
+ex.result_back.b2 = Μπορείς να ανακτήσεις λίγο υλικό, αλλά υστερείς ακόμα κατά {pts:point}.
 ex.result_back.b2.2 = Ακόμα κι αφού ξαναπάρεις, έχεις χάσει {pts:point}.
 ex.result_back.b3 = Ακόμα κι αν ξαναπάρεις, υστερείς κατά {pts:point}.
-ex.result_back.b3.2 = Παίρνεις κάτι πίσω, αλλά και πάλι σου κοστίζει {pts:point}.
+ex.result_back.b3.2 = Ξανακερδίζεις κάτι, αλλά και πάλι σου κοστίζει {pts:point}.
 # Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
 # into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
 # from level 3 the moves.
@@ -327,7 +329,7 @@ ex.mate_allowed.b6.2 = {line:nomate}, ματ.
 ex.mate_allowed.b6.3 = Μετά τη συνέχεια {line:nomate} είναι ματ.
 # After the one-move demonstration ({your} = the king).
 ex.mate_allowed.tail.b1 = Κοίτα: {your} δεν έχει πια τετράγωνο για να ξεφύγει.
-ex.mate_allowed.tail.b1.2 = Βλέπεις; Τώρα {your} δέχεται επίθεση και δεν μπορεί να ξεφύγει.
+ex.mate_allowed.tail.b1.2 = Βλέπεις; {your} δέχεται επίθεση και δεν μπορεί να ξεφύγει.
 ex.mate_allowed.tail.b1.3 = {your} δεν έχει πού να πάει. Αυτό είναι ματ.
 # The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below (all
 # neuter, headed by "ματ", without an article: said inside « »).
@@ -424,9 +426,9 @@ ex.fork.b6.3 = {reply}, με πιρούνι.
 # Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = Μπορείς να σώσεις μόνο ένα από τα δύο: {t1:acc} ή {t2:acc}.
 ex.fork.tail.b1.2 = Τώρα επιτίθεμαι σε δύο κομμάτια μαζί: {t1:acc} και {t2:acc}. Αυτό είναι πιρούνι!
-ex.fork.tail.b1.3 = Βλέπεις; Τώρα {t1} και {t2} δέχονται επίθεση. Το ένα από τα δύο κομμάτια θα πέσει.
+ex.fork.tail.b1.3 = Βλέπεις; {t1} και {t2} δέχονται επίθεση. Το ένα από τα δύο κομμάτια θα πέσει.
 # The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
-ex.fork.tail_king = {your} πρέπει να βγει από το σαχ, έτσι παίρνω {t1:acc}.
+ex.fork.tail_king = {your} πρέπει να βγει από το σαχ, οπότε παίρνω {t1:acc}.
 ex.fork.tail_king.2 = Σαχ! {your} πρέπει να κινηθεί, και πέφτει {t1}.
 ex.fork.more.b3 = Πριν παίξεις, κοίτα το {sq}: από εκεί {my} μπορεί να κάνει πιρούνι.
 ex.fork.more.b3.2 = Πρόσεχε το {sq}. Από εκεί {my} κάνει πιρούνι.
@@ -458,13 +460,13 @@ ex.skewer.b1 = {my} επιτίθεται {t1:se}. Όταν φύγει, παίρ�
 ex.skewer.b1.2 = Κοίτα: {my} χτυπά {t1:acc}, και {t2} είναι ακριβώς από πίσω.
 ex.skewer.b1.3 = {my} κυνηγά {t1:acc}. Πρέπει να φύγει, και τότε πέφτει {t2}.
 ex.skewer.b2 = Σούβλισμα: {my} επιτίθεται {t1:se}, και {t2} είναι από πίσω.
-ex.skewer.b2.2 = {my} σημαδεύει {t1:acc} και {t2:acc} στην ίδια γραμμή. Όταν φύγει το πρώτο κομμάτι, παίρνω το δεύτερο.
-ex.skewer.b2.3 = Προσοχή: {t1} και {t2} είναι στην ίδια γραμμή. {my} μπορεί να κάνει σούβλισμα.
+ex.skewer.b2.2 = {my} σημαδεύει {t1:acc} και {t2:acc} στην ίδια ευθεία. Όταν φύγει το πρώτο κομμάτι, παίρνω το δεύτερο.
+ex.skewer.b2.3 = Προσοχή: {t1} και {t2} είναι στην ίδια ευθεία. {my} μπορεί να κάνει σούβλισμα.
 ex.skewer.b3 = Το {reply} κάνει σούβλισμα {t1:se} και {t2:se}.
 ex.skewer.b3.2 = Μετά το {reply}, {t1} πρέπει να φύγει και πέφτει {t2}.
 ex.skewer.b3.3 = Το {move} επιτρέπει το {reply}, σούβλισμα {t1:gen} και {t2:gen}.
 ex.skewer.b4 = Το {reply} κάνει σούβλισμα {t1:se}· {t2} από πίσω χάνεται.
-ex.skewer.b4.2 = Μετά το {move}, {t1} και {t2} στέκονται στην ίδια γραμμή: {reply}.
+ex.skewer.b4.2 = Μετά το {move}, {t1} και {t2} στέκονται στην ίδια ευθεία: {reply}.
 ex.skewer.b4.3 = Μετά το {reply}, {t1} φεύγει και πέφτει {t2}.
 ex.skewer.b5 = Το {reply} κάνει σούβλισμα {t1:se} και {t2:se}.
 ex.skewer.b5.2 = Το {move} επιτρέπει το σούβλισμα {reply}, μέσα από {t1:acc} προς {t2:acc}.
@@ -642,7 +644,7 @@ ex.material.b6 = {line}, και κέρδισα {pts:point}.
 ex.material.b6.2 = Το {move} χάνει {pts:point}: {line}.
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
-ex.missed_capture.b1 = Το είδες; Στο {sq}, {my} ήταν χαρισμέν{my:os}. {your} μπορούσε να {my:pron_acc} πάρει.
+ex.missed_capture.b1 = Το είδες; {my} στο {sq} ήταν χαρισμέν{my:os}. {your} μπορούσε να {my:pron_acc} πάρει.
 ex.missed_capture.b1.2 = Κοίτα: {my} δεν είχε προστασία. {your} μπορούσε να {my:pron_acc} πάρει.
 ex.missed_capture.b1.3 = {my} στο {sq} δεν προστατευόταν. {your} μπορούσε να {my:pron_acc} αρπάξει!
 ex.missed_capture.b2 = Σου ξέφυγε ένα δωρεάν κομμάτι: το {best} κερδίζει {my:acc}.
@@ -730,7 +732,7 @@ ex.king_exposed.b3.2 = Μετά από αυτό, {your} δεν έχει κατα
 ex.king_exposed.b4 = {your} εκτίθεται: {line}.
 ex.king_exposed.b4.2 = Το {move} αφήνει {your:acc} εκτεθειμέν{your:o} σε επίθεση.
 ex.king_exposed.b5 = {your} είναι υπερβολικά εκτεθειμέν{your:os}: {line}.
-ex.king_exposed.b5.2 = Το {move} αφήνει {your:acc} ακάλυπτ{your:o}.
+ex.king_exposed.b5.2 = Το {move} αφήνει {your:acc} χωρίς κάλυψη.
 ex.king_exposed.b6 = {line}· {your} είναι εκτεθειμέν{your:os}.
 ex.king_exposed.b6.2 = {your} είναι πολύ ανοιχτ{your:os_st}: {line}.
 
@@ -750,14 +752,14 @@ ex.bishop_pair.b6.2 = Το ζευγάρι των αξιωματικών χαρί
 
 # ---- 17. Endgame technique -------------------------------------------------------------------------
 # Opposition (levels 3-6; {best} pointed at).
-ex.opposition.b3 = Το {best} παίρνει την αντιπαράθεση: οι βασιλιάδες στέκονται αντικριστά, με ένα τετράγωνο ανάμεσα.
-ex.opposition.b3.2 = Οι βασιλιάδες! Με το {best} θα έπαιρνες την αντιπαράθεση.
-ex.opposition.b4 = Το {best} παίρνει την αντιπαράθεση: αυτό είναι το κλειδί.
-ex.opposition.b4.2 = Η αντιπαράθεση κρίνει: {best}.
-ex.opposition.b5 = {best}, παίρνοντας την αντιπαράθεση.
-ex.opposition.b5.2 = Αντιπαράθεση: {best}.
-ex.opposition.b6 = {best}, αντιπαράθεση.
-ex.opposition.b6.2 = {best}: η αντιπαράθεση.
+ex.opposition.b3 = Το {best} παίρνει την αντίθεση: οι βασιλιάδες στέκονται αντικριστά, με ένα τετράγωνο ανάμεσα.
+ex.opposition.b3.2 = Οι βασιλιάδες! Με το {best} θα έπαιρνες την αντίθεση.
+ex.opposition.b4 = Το {best} παίρνει την αντίθεση: αυτό είναι το κλειδί.
+ex.opposition.b4.2 = Η αντίθεση κρίνει: {best}.
+ex.opposition.b5 = {best}, παίρνοντας την αντίθεση.
+ex.opposition.b5.2 = Αντίθεση: {best}.
+ex.opposition.b6 = {best}, αντίθεση.
+ex.opposition.b6.2 = {best}: η αντίθεση.
 # Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
 ex.push_passed.b1 = Το πιόνι σου μπορούσε να τρέξει στο {sq}. Τα ελεύθερα πιόνια θέλουν να προχωράνε!
 ex.push_passed.b1.2 = Σπρώξε το ελεύθερο πιόνι σου! Θέλει να φτάσει στο {sq}.

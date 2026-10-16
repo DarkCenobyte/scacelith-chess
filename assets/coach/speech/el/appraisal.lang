@@ -31,7 +31,7 @@ appraisal.reason.other = χωρίς νικητή
 # The coach page's level names (coach.level.<n>.name of assets/i18n/el.lang), in guillemets.
 appraisal.level.l1 = «Πρώτα βήματα»
 appraisal.level.l2 = «Αρχάριος»
-appraisal.level.l3 = «Σε πρόοδο»
+appraisal.level.l3 = «Ανερχόμενος»
 appraisal.level.l4 = «Παίκτης συλλόγου»
 appraisal.level.l5 = «Δυνατός παίκτης συλλόγου»
 appraisal.level.l6 = «Ειδικός»
@@ -150,10 +150,11 @@ appraisal.resign_early.b5 = Δεν είχε τελειώσει: {eval}.
 appraisal.resign_early.b5.2 = Παιζόταν ακόμα, περίπου {eval}.
 appraisal.resign_early.b6 = Δεν είχε κριθεί: {eval}.
 appraisal.resign_early.b6.2 = Ήταν {eval}.
-# The opening played (levels 3-6): the bare name, as Greek players say "παίξαμε Σικελική".
-appraisal.opening.b3 = Παίξαμε {opening}.
+# The opening played (levels 3-6). The appraisal always names a family, whose names have the forms
+# "acc" ("τη Σικελική Άμυνα") and "def" in the openings fragment; the bare name after a colon.
+appraisal.opening.b3 = Παίξαμε {opening:acc}.
 appraisal.opening.b3.2 = Το άνοιγμα της παρτίδας: {opening}.
-appraisal.opening.b4 = Είχαμε {opening}.
+appraisal.opening.b4 = Είχαμε {opening:acc}.
 appraisal.opening.b4.2 = Το άνοιγμα: {opening}.
 appraisal.opening.b5 = {opening}.
 appraisal.opening.b5.2 = Άνοιγμα: {opening}.
