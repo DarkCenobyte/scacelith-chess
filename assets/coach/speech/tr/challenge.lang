@@ -110,7 +110,7 @@ ch.wrong.weaker.2 = Oynanabilir, ama daha iyisini yapabilirsin.
 ch.wrong.stalemate = Pat! Şahım hareket edemiyor ve bu yalnızca beraberlik.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
 ch.wrong.draw = Bu değil: {move} hamlemden sonra beraberliği koruyabilirim.
-ch.wrong.loses = Dikkat: {move} hamlemden sonra kazanan ben olurdum.
+ch.wrong.loses = Dikkat: {move} hamlemden sonra ben kazanan durumda olurdum.
 # No answer from the engine: the move is simply not the one.
 ch.wrong.plain = Bu değil.
 ch.try_again = Tekrar dene.
