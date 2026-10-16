@@ -159,7 +159,7 @@ appraisal.resign_early.b6.2 = Thế cờ lúc đó: {eval}.
 # The opening played (levels 3-6).
 appraisal.opening.b3 = Chúng ta đã chơi {opening:def}.
 appraisal.opening.b3.2 = Ván cờ mở đầu bằng {opening:def}.
-appraisal.opening.b4 = Ván này là {opening:def}.
+appraisal.opening.b4 = Ván này đi theo {opening:def}.
 appraisal.opening.b4.2 = Khai cuộc: {opening}.
 appraisal.opening.b5 = {opening}.
 appraisal.opening.b5.2 = Khai cuộc: {opening}.

@@ -22,7 +22,7 @@ an.start.setup = Ván cờ này bắt đầu từ một thế cờ được xế
 an.start.setup.2 = Một ván cờ bắt đầu từ thế cờ xếp sẵn. Hãy xem diễn biến ra sao.
 
 # ---- The opening (said where the game leaves the opening book) ------------------------------------
-an.opening = Khai cuộc là {opening:def}.
+an.opening = Ván cờ mở đầu bằng {opening:def}.
 an.opening.2 = Đây là {opening:def}.
 an.book_exit = Với nước {move}, ván cờ rời khỏi lý thuyết khai cuộc đã biết.
 an.book_exit.2 = Nước {move} là nước đầu tiên nằm ngoài sách khai cuộc.
