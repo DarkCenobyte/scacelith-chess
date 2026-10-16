@@ -95,7 +95,7 @@ const std::vector<Language>& languages() {
         {"sk", "Sloven\xC4\x8Dina", false, false},                                           // Slovenčina
         {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false, false},                                   // Slovenščina
         {"fi", "Suomi", false, false},
-        {"sv", "Svenska", false, false},
+        {"sv", "Svenska", false},
         {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false, false},                            // Tiếng Việt
         {"tr", "T\xC3\xBCrk\xC3\xA7" "e", false, false},                                     // Türkçe
         {"el", "\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA\xCE\xAC", false, false},  // Ελληνικά

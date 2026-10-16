@@ -290,9 +290,20 @@ move.mate.spoken = {move}, schackmatt
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the Swedish voice misreads (respell.<word>), likely
-# "en passant" (said the French way). Never respell "en" (the English file does, for "en passant"):
-# in Swedish it is the article and the number one.
+# Words the voice misreads, respelled in every spoken line, opening texts included (src/coach/catalog.h;
+# docs/PRONUNCIATION.md has the evidence). Never respell "en" (the English file does, for "en
+# passant"): in Swedish it is the article and the number one.
+# "passant" is said with its t ("en patient", "en procent"): "passang" gives the French ending.
+respell.passant = passang
+# English names read the Swedish way: "Birds" with the i of "bil", "Miles" in two syllables.
+respell.birds = Börds
+respell.miles = Majls
+# "Stonewall" in three Swedish syllables ("sto-ne-vall"); one entry per compound (whole words only).
+respell.stonewall = Stounwåll
+respell.stonewallangreppet = Stounwållangreppet
+respell.stonewallvarianten = Stounwållvarianten
+# "Grand Prix": the x is said ("Grand Priks").
+respell.prix = Pri
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Swedish writes the numbers under a thousand as one word: 21-99 compose as "{tens}{units}"
@@ -332,6 +343,16 @@ number.60.spoken = sextio
 number.70.spoken = sjuttio
 number.80.spoken = åttio
 number.90.spoken = nittio
+# 27 ... 97 with a space: joined, the voice splits the "sj" of "sju" ("fyrtios ju", probe) and the
+# seven is lost ("trettiosju" heard "trettioås u", "sextiosju" heard 60-80).
+number.27.spoken = tjugo sju
+number.37.spoken = trettio sju
+number.47.spoken = fyrtio sju
+number.57.spoken = femtio sju
+number.67.spoken = sextio sju
+number.77.spoken = sjuttio sju
+number.87.spoken = åttio sju
+number.97.spoken = nittio sju
 number.100.spoken = hundra
 number.tens.spoken = {tens}{units}
 number.hundreds.spoken = {n}hundra

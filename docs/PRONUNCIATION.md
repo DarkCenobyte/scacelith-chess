@@ -422,3 +422,40 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   "единайсет"-style colloquial numbers only, unstressed ъ as "а" or "е" (дъската as "даската"), and Russian
   spellings (сицилиянската, классически, "черни те"); it writes eponyms in English or Latin letters ("Gambit
   England", "Robinshine", "Morphy") and drops the a of a name after "защита" ("защита Лехини").
+
+## Swedish
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| en passant | with the t: heard "en patient", "en procent", "passent" 6 times in 9 | `passang` (respell.passant): no t in 9, "en passang" 3 in 3; "en" stays (the article) |
+| 27, 37 ... 97 (tjugosju, fyrtiosju ...) | the s of "sju" goes to the tens: "fyrtios ju" (probe), heard "trettioås u", "sextiosju" as 60-80; the right number 0 times in 12 | `fyrtio sju`... (number.X7.spoken, with a space): right 4 in 12, the sj said in most of the rest ("sker", "skik"); a hyphen did no better (0 in 6) |
+| Birds (Birds öppning) | the Swedish i, "Birrds" (probe), heard "bygds", "bereds" | `Börds` (respell.birds): heard "börs" 2 in 3 |
+| Miles (Tony Miles) | two syllables, "Mi les" (probe), heard "Bailas", "Meiles" | `Majls` (respell.miles): heard "Miles" 3 in 3, against 1 |
+| Stonewall, Stonewallangreppet, Stonewallvarianten | three Swedish syllables, "Stonevall" (probe), heard "stående av alla" 3 in 3 | `Stounwåll`... (respell.*, one per compound): two syllables, heard "stanboll", "stanvård" |
+| Grand Prix | the x said, "Grand Priks" (probe, far from "Grand Pri"), heard "pricks" 2 in 6 | `Pri` (respell.prix): no x in 3 |
+
+- The main round trip (300 lines, Whisper medium set to `sv`, seed 0; Parakeet missed 70 % of the words) ran
+  before the 30 s padding, so long lines were cut. Then 3 seeds on 110 short lines (the reviewers' list, the
+  file letters, the numbers, the opening names and eponyms in "Öppningen är X, inte Y.", the words missed
+  most), 49 lines of A/B variants, and probes (4 seeds) on the doubtful readings.
+- Checked and fine: the file letters (a, be, se, dé, é, eff, ghé, hå, heard as the letters or as notation),
+  `ell` (heard L 6 times in 6), Elo (probe: `Élo`, the long e; "yellow" is the recogniser), rating, Hmm (hummed),
+  Aj, Varsågod, dammatt, kvävningsmatt, epålettmatt, femtio- and sjuttiofemdragsregeln, blundrar, the numbers elva,
+  tolv, tretton, fjorton, sjutton, nitton, 21, 34, 64, 85 procent, 92, "plus ett komma fem", patt (probe: `pat`), Tarrasch (`Tarrasj`), Diemer
+  (`Dimer`), Bongcloud (`Bångklaud`), Caro-Kann, Philidor, Petrov, Zukertort, Aljechin, Nimzowitsch, Owen,
+  Horwitz, Ponziani, Torre, Colle, Bogo, Tjigorin, Nimzo-Larsen, Grob, Mieses, Van Geet, Jobava, From,
+  Karlsbad, Alapin, Smith-Morra, Rossolimo, Svesjnikov, Tajmanov, Winawer, Rubinstein, Panov, Giuoco piano,
+  Evans, Fegatello, Traxler, Morphy, Marshall, Parham, Halloween, Sämisch, Falkbeer, Maróczy, Känguru, Semi-Tarrasch,
+  Englund, Saragossa, Leningrad, Botvinnik, Karpov, Breyer, Zajtsev, Sozin, fianchetterar, remiaktig.
+- Left as is: "torn", "tornet", "tornen" are heard "tårn", "tån", "tånet" most of the time, and the probe puts
+  "torn" nearest "tårn"; `toorn` and `tuorn` were heard the same (the recogniser may also be writing
+  Norwegian). Pirc is read "Pirk" (probe); `Pirts` was heard "pitch", "pets", no better. Schliemann is read
+  "Sliman" and `Sjlimann` was heard the same. Fajarowicz ("Fire Witch") and `Fajarovitj`: the same. Pterodaktyl
+  (the "pte" garbled), Scheveningen, Richter ("Rikter"), Réti and Najdorf are heard badly, with no
+  candidate. "remi" before "enligt" is heard "rea med", "VME" (probe: `rémi`, no clear candidate). "arton"
+  and "sjuttioett" read well alone (probe), but after "tog" they were never heard right. "dam" is
+  sometimes heard "damm" or "dom" (probe: dam, damm and daam alike).
+- Recogniser habits: squares and numbers as notation; compounds joined or split ("i stället" written
+  "istället", "kungs flygel"); v heard as b ("Bits tid", "bitslöppare"); the sj sound written "sk", "ch" or
+  "tj"; the first word of a short line lost; eponyms garbled. Whisper writes the spelling it knows ("Grand
+  Prix", "Miles") whatever the voice says.
