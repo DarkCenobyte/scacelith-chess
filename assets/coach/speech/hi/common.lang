@@ -378,7 +378,15 @@ move.mate.spoken = {move}, शह और मात
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet (the pronunciation pass adds them).
+# Words the voice misreads, respelled in every spoken line, opening texts included (src/coach/catalog.h; the
+# findings are in docs/PRONUNCIATION.md). Whole words only: each form of a word has its own entry.
+# The nukta ग़ (Urdu ghain) comes out as a weak fricative that melts after a vowel or a nasal ("गंभीर ग़लती" heard
+# "गम भी रलालती"): the plain ग, as most Hindi speakers say these words, is heard.
+respell.ग़लती = गलती
+respell.ग़लतियाँ = गलतियाँ
+respell.ग़लतियों = गलतियों
+respell.ग़लत = गलत
+respell.बग़ल = बगल
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. Hindi 0-99 do not compose (21 = इक्कीस, 99 = निन्यानबे): every one is listed, in the
