@@ -293,7 +293,7 @@
       "resend": "Skicka bekräftelsemeddelandet igen"
     },
     "mfa": {
-      "title": "Tvåfaktorsautentisering",
+      "title": "Tvåfaktors\u00adautentisering",
       "text": "Ange den 6-siffriga koden från din autentiseringsapp.",
       "code": "Kod från appen",
       "use_recovery": "Använd en återställningskod i stället",
@@ -392,7 +392,7 @@
     "download": "Ladda ned GIF-bilden",
     "make": "Skapa GIF-bilden",
     "pause": "Pausa animationen",
-    "back": "Tillbaka till mina partier",
+    "back": "Till mina partier",
     "options": "Alternativ",
     "size": "Storlek",
     "size_small": "Liten (284 × 350)",
@@ -713,7 +713,7 @@
   },
   "legal": {
     "eyebrow": "Juridik",
-    "title": "Juridisk information, integritet och användarvillkor",
+    "title": "Juridisk information, integritet och användar\u00advillkor",
     "lead": "Vem som ger ut Scacelith och vem som är värd för det, vad som händer med dina uppgifter på den här webbplatsen, i spelet och på den officiella servern, och reglerna för att spela där.",
     "updated": "Senast uppdaterad: 11 oktober 2026",
     "toc": "På den här sidan",

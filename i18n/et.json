@@ -320,7 +320,7 @@
       "done_title": "Kontrollige oma e-posti",
       "done_text": "Saatsime teie aadressile kinnituslingi. Avage see, et konto luua, ja logige seejärel sisse.",
       "done_hint": "Link kehtib 24 tundi. Postkastis pole midagi? Kontrollige rämpsposti kausta või küsige e-kirja uuesti.",
-      "go_signin": "Mine sisselogimise juurde",
+      "go_signin": "Mine sisse logima",
       "legal_note": "Teie kasutajanimi, reitingud ja partiid on avalikud. Kontot luues nõustute kasutustingimustega.",
       "legal_link": "Privaatsus ja kasutustingimused"
     },
@@ -392,7 +392,7 @@
     "download": "Laadi GIF alla",
     "make": "Loo GIF",
     "pause": "Peata animatsioon",
-    "back": "Tagasi minu partiide juurde",
+    "back": "Tagasi partiide juurde",
     "options": "Seaded",
     "size": "Suurus",
     "size_small": "Väike (284 × 350)",
@@ -713,7 +713,7 @@
   },
   "legal": {
     "eyebrow": "Juriidiline teave",
-    "title": "Õiguslik teave, privaatsus ja kasutustingimused",
+    "title": "Õiguslik teave, privaatsus ja kasutus\u00adtingimused",
     "lead": "Kes Scacelithi avaldab ja majutab, mis juhtub teie andmetega sellel veebisaidil, mängus ja ametlikus serveris ning millised reeglid seal mängides kehtivad.",
     "updated": "Viimati uuendatud: 11. oktoober 2026",
     "toc": "Sellel lehel",

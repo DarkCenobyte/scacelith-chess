@@ -32,7 +32,7 @@
     "modes": "Modos de jogo",
     "gallery": "Galeria",
     "trailer": "Vídeo",
-    "online": "Jogo online",
+    "online": "Online",
     "players": "Classificação",
     "account": "Conta",
     "language": "Idioma",
@@ -42,7 +42,7 @@
   "hero": {
     "image_alt": "Dois robôs de porcelana jogam xadrez a uma mesa de nogueira, num salão de mármore banhado pelo sol.",
     "lead": "Ocupe o seu lugar a uma mesa de nogueira encerada, num salão régio banhado pelo sol. Do outro lado do tabuleiro, um robô de porcelana comandado pelo Stockfish aguarda o seu primeiro lance.",
-    "watch": "Ver o vídeo de apresentação",
+    "watch": "Ver o vídeo",
     "meta": "Software livre · Windows, Linux, macOS (experimental) · Placa gráfica com OpenGL 4.6",
     "caption": "Capturado no jogo: o salão régio"
   },
@@ -301,7 +301,7 @@
     },
     "google": {
       "or": "ou",
-      "button": "Iniciar sessão com o Google",
+      "button": "Iniciar sessão com Google",
       "username_title": "Escolha o seu nome de utilizador",
       "username_text": "A sua conta Google é nova neste servidor. Escolha o nome que os outros jogadores vão ver: não poderá ser alterado mais tarde.",
       "username_submit": "Criar a minha conta",
@@ -320,7 +320,7 @@
       "done_title": "Verifique o seu e-mail",
       "done_text": "Enviámos uma ligação de confirmação para o seu endereço. Abra-a para criar a sua conta e, depois, inicie sessão.",
       "done_hint": "A ligação é válida durante 24 horas. Nada na caixa de entrada? Verifique a pasta de spam ou peça o e-mail novamente.",
-      "go_signin": "Ir para o início de sessão",
+      "go_signin": "Iniciar sessão",
       "legal_note": "O seu nome de utilizador, as suas pontuações Elo e as suas partidas serão públicos. Ao criar uma conta, aceita os termos de utilização.",
       "legal_link": "Privacidade e termos de utilização"
     },
@@ -376,7 +376,7 @@
       "password_text": "A sessão é terminada nos seus outros dispositivos e mantém-se iniciada neste.",
       "password_submit": "Alterar a palavra-passe",
       "email_title": "Alterar o endereço de e-mail",
-      "email_submit": "Enviar a ligação de confirmação",
+      "email_submit": "Enviar a ligação",
       "export_title": "Transferir os meus dados",
       "export_text": "Tudo o que o servidor guarda sobre a sua conta, num único ficheiro JSON.",
       "export_submit": "Transferir os meus dados",
@@ -392,7 +392,7 @@
     "download": "Transferir o GIF",
     "make": "Criar o GIF",
     "pause": "Pausar a animação",
-    "back": "Voltar às minhas partidas",
+    "back": "Voltar às partidas",
     "options": "Opções",
     "size": "Tamanho",
     "size_small": "Pequeno (284 × 350)",

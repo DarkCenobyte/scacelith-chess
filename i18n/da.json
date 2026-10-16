@@ -58,7 +58,7 @@
     "title": "Ikke et bræt på en skærm.<br><em>En plads ved bordet.</em>",
     "lead": "Scacelith bringer det tilbage der gør et parti virkeligt: salen, stilheden, uret, en modstander der ser på dig, og turneringens ritualer.",
     "presence": {
-      "title": "I førstepersonsperspektiv",
+      "title": "I første person",
       "text": "Du ser gennem din robots øjne: kig rundt i salen, læn dig ind over brættet, se op på din modstander, kast et blik på din noteringsblanket, eller rejs dig, og gå hen til en af bordets ender."
     },
     "ritual": {
@@ -293,7 +293,7 @@
       "resend": "Send bekræftelsesmailen igen"
     },
     "mfa": {
-      "title": "Totrinsgodkendelse",
+      "title": "Totrins\u00adgodkendelse",
       "text": "Indtast den 6-cifrede kode fra din godkendelsesapp.",
       "code": "Kode fra appen",
       "use_recovery": "Brug en gendannelseskode i stedet",
@@ -391,8 +391,8 @@
     "preparing": "Forbereder GIF'en…",
     "download": "Download GIF'en",
     "make": "Lav GIF'en",
-    "pause": "Sæt animationen på pause",
-    "back": "Tilbage til mine partier",
+    "pause": "Sæt på pause",
+    "back": "Til mine partier",
     "options": "Indstillinger",
     "size": "Størrelse",
     "size_small": "Lille (284 × 350)",

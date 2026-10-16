@@ -206,7 +206,7 @@
     "req_gpu_value": "OpenGL 4.6-ot támogató videokártya naprakész illesztőprogrammal (Macen a játék saját OpenGL-megvalósítást hoz magával)",
     "req_included": "Mellékelve",
     "req_included_value": "Stockfish 19 és a neurális hálózata: azonnal játszhat, internet nélkül is",
-    "req_network": "Internetkapcsolat",
+    "req_network": "Internet",
     "req_network_value": "Az online játékhoz, a GIF-ekhez, valamint az edző és az elemzés hangjához (nem kötelező, kb. 399 MB-os letöltés)",
     "req_licence": "Licenc",
     "req_licence_value": "GNU General Public License v3",
@@ -301,16 +301,16 @@
     },
     "google": {
       "or": "vagy",
-      "button": "Bejelentkezés Google-fiókkal",
-      "username_title": "Válasszon felhasználónevet",
+      "button": "Belépés Google-fiókkal",
+      "username_title": "Felhasználónév választása",
       "username_text": "A Google-fiókja még új ezen a szerveren. Válassza ki a nevet, amelyet a többi játékos látni fog: később nem módosítható.",
       "username_submit": "Fiókom létrehozása",
       "link_title": "Google-fiók összekapcsolása",
-      "link_submit": "Összekapcsolás és bejelentkezés",
+      "link_submit": "Összekapcsolás és belépés",
       "returning": "Bejelentkezés Google-fiókkal…"
     },
     "register": {
-      "tab": "Fiók létrehozása",
+      "tab": "Új fiók",
       "title": "Ingyenes fiók",
       "closed": "A szerver jelenleg nem fogad új fiókokat.",
       "username_hint": "Betűk, számjegyek, _ és -, betűvel vagy számjeggyel kezdve.",
@@ -320,7 +320,7 @@
       "done_title": "Ellenőrizze a postafiókját",
       "done_text": "Megerősítő linket küldtünk az e-mail-címére. Nyissa meg a fiókja létrehozásához, majd jelentkezzen be.",
       "done_hint": "A link 24 óráig érvényes. Nem érkezett meg? Nézze meg a levélszemét mappát, vagy kérje újra az e-mailt.",
-      "go_signin": "Tovább a bejelentkezéshez",
+      "go_signin": "Tovább a belépéshez",
       "legal_note": "A felhasználóneve, az értékszámai és a játszmái nyilvánosak lesznek. A fiók létrehozásával elfogadja a felhasználási feltételeket.",
       "legal_link": "Adatvédelem és felhasználási feltételek"
     },
@@ -391,7 +391,7 @@
     "preparing": "A GIF előkészítése…",
     "download": "GIF letöltése",
     "make": "GIF készítése",
-    "pause": "Animáció szüneteltetése",
+    "pause": "Szüneteltetés",
     "back": "Vissza a játszmáimhoz",
     "options": "Beállítások",
     "size": "Méret",
@@ -413,7 +413,7 @@
   "notfound": {
     "title": "Az oldal nem található",
     "text": "Ez a mező üres. Lehet, hogy az oldal máshová került.",
-    "home": "Vissza a Scacelith kezdőlapjára"
+    "home": "Vissza a kezdőlapra"
   },
   "js": {
     "common": {
@@ -625,7 +625,7 @@
       "challenges_all": "Engedélyezve",
       "challenges_none": "Elutasítva",
       "badge_verified": "E-mail-cím megerősítve",
-      "badge_mfa": "Kétlépcsős azonosítás bekapcsolva",
+      "badge_mfa": "2FA bekapcsolva",
       "badge_google": "Google",
       "ban_until": "A fiókja fel van függesztve. A felfüggesztés vége: {date}.",
       "ban_permanent": "A fiókja fel van függesztve.",

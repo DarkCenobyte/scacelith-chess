@@ -363,7 +363,7 @@
     },
     "devices": {
       "title": "Perangkat yang masuk",
-      "signout_all": "Keluar dari semua perangkat",
+      "signout_all": "Keluar dari semuanya",
       "text": "Setiap proses masuk, di dalam game atau di situs ini, dihitung sebagai satu perangkat. Keluarkan perangkat yang tidak Anda kenali."
     },
     "settings": {
@@ -392,7 +392,7 @@
     "download": "Unduh GIF",
     "make": "Buat GIF",
     "pause": "Jeda animasi",
-    "back": "Kembali ke permainan saya",
+    "back": "Kembali ke permainan",
     "options": "Opsi",
     "size": "Ukuran",
     "size_small": "Kecil (284 × 350)",

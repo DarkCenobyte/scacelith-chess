@@ -629,7 +629,7 @@
       "challenges_all": "Přijímají se",
       "challenges_none": "Odmítají se",
       "badge_verified": "E-mail potvrzen",
-      "badge_mfa": "Dvoufázové ověření zapnuto",
+      "badge_mfa": "2FA zapnuto",
       "badge_google": "Google",
       "ban_until": "Váš účet je pozastaven do {date}.",
       "ban_permanent": "Váš účet je pozastaven.",

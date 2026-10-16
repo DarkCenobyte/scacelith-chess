@@ -363,7 +363,7 @@
     },
     "devices": {
       "title": "Dispositivos conectados",
-      "signout_all": "Sair em todos os dispositivos",
+      "signout_all": "Encerrar todas as sessões",
       "text": "Cada login, no jogo ou neste site, é um dispositivo. Desconecte os que você não reconhecer."
     },
     "settings": {
@@ -376,7 +376,7 @@
       "password_text": "Seus outros dispositivos serão desconectados, e este continuará conectado.",
       "password_submit": "Alterar a senha",
       "email_title": "Alterar o endereço de e-mail",
-      "email_submit": "Enviar o link de confirmação",
+      "email_submit": "Enviar o link",
       "export_title": "Baixar meus dados",
       "export_text": "Tudo o que o servidor guarda sobre a sua conta, em um arquivo JSON.",
       "export_submit": "Baixar meus dados",
@@ -392,7 +392,7 @@
     "download": "Baixar o GIF",
     "make": "Criar o GIF",
     "pause": "Pausar a animação",
-    "back": "Voltar às minhas partidas",
+    "back": "Voltar às partidas",
     "options": "Opções",
     "size": "Tamanho",
     "size_small": "Pequeno (284 × 350)",

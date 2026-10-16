@@ -198,6 +198,9 @@
   --track: 0;
   --track-wide: 0;
 }
+/* Devanagari letters hang from one joined headline: tracking between them breaks it. */
+:lang(hi) :is(.nav-list a, .section-title, .page-title, .legal-title, .form-title, .server-card-title, .verify-title, .chooser-title-small, .video-soon-title) { letter-spacing: 0; }
+:lang(hi) .video div.video-consent .cll .c-tl { letter-spacing: 0; }
 
 /* --------------------------------------------------------------------------------------------
    Base */

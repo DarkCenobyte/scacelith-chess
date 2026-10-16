@@ -206,7 +206,7 @@
     "req_gpu_value": "Een grafische kaart met OpenGL 4.6 en een actueel stuurprogramma (op een Mac brengt het spel zijn eigen OpenGL mee)",
     "req_included": "Inbegrepen",
     "req_included_value": "Stockfish 19 en zijn neurale netwerk: meteen offline spelen",
-    "req_network": "Internetverbinding",
+    "req_network": "Internet",
     "req_network_value": "Voor online spelen, GIF's, en de stem van de coach en van de analyse (een optionele download van ongeveer 399 MB)",
     "req_licence": "Licentie",
     "req_licence_value": "GNU General Public License v3",
@@ -293,7 +293,7 @@
       "resend": "Bevestigingsmail opnieuw sturen"
     },
     "mfa": {
-      "title": "Tweestapsverificatie",
+      "title": "Tweestaps\u00adverificatie",
       "text": "Voer de 6-cijferige code uit je authenticator-app in.",
       "code": "Code uit de app",
       "use_recovery": "Een herstelcode gebruiken",
@@ -392,7 +392,7 @@
     "download": "GIF downloaden",
     "make": "GIF maken",
     "pause": "Animatie pauzeren",
-    "back": "Terug naar mijn partijen",
+    "back": "Naar mijn partijen",
     "options": "Opties",
     "size": "Formaat",
     "size_small": "Klein (284 × 350)",
@@ -713,7 +713,7 @@
   },
   "legal": {
     "eyebrow": "Juridisch",
-    "title": "Wettelijke vermeldingen, privacy en gebruiksvoorwaarden",
+    "title": "Wettelijke vermeldingen, privacy en gebruiks\u00advoorwaarden",
     "lead": "Wie Scacelith uitgeeft en host, wat er met je gegevens gebeurt op deze website, in het spel en op de officiële server, en de regels voor het spelen op die server.",
     "updated": "Laatst bijgewerkt: 11 oktober 2026",
     "toc": "Op deze pagina",
