@@ -1,0 +1,84 @@
+# Coach openings: Polish texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
+# families.json into assets/coach/openings/pl.lang.
+# The coach's register: informal "ty". The coach is male; the player's gender is unknown: no second-person past
+# tense or conditional, the present instead ("grasz", "ty go przyjmujesz"). White / Black as players: "białe" /
+# "czarne" (plural, lower case mid-sentence; even their past tense shows no gender: "czarne odbiły").
+# Names appear only in the nominative: after "to" or "jest", after a dash or a colon, never as an object; the one
+# exception is "declined" / "accepted", where the name is always a gambit (masculine inanimate: accusative =
+# nominative) and "go" refers back to it. The "def" form of a name is its citation form with a lower-case first
+# letter ("obrona sycylijska", "wariant wymienny"); proper names keep their capital ("obrona Caro-Kann").
+# Composed lichess names: "wariant {X:gen}" with the eponym in the genitive ("wariant Steinitza", "atak Maxa
+# Langego"); any other name would need its own genitive, so only eponyms compose (compose_proper_names = false).
+# Italian names in -o stay uninflected, as in Polish chess usage ("wariant Rossolimo", "gambit Greco").
+# Squares as "e4"; files as "kolumna c", or "linia f" for an open or half-open file; pawns as "pionek d" (the
+# file_pattern of the fragment spells those letters out); pieces in words, no piece letters. A comma always
+# comes before the conjunction "a", so a lone "a" after one of those nouns is the a-file.
+
+# ---- Sentences. "pw" = the player has White, "pb" = the player has Black; the coach is the other side.
+opening.say.pw.both = Twój debiut to {white:def}, a moja odpowiedź to {black:def}.
+opening.say.pw.both.2 = Twoim debiutem jest {white:def}, a moją odpowiedzią – {black:def}.
+opening.say.pb.both = Mój debiut to {white:def}, a twoja odpowiedź to {black:def}.
+opening.say.pb.both.2 = Moim debiutem jest {white:def}, a twoją odpowiedzią – {black:def}.
+opening.say.pw.declined = Grasz {white:def}, a ja go odrzucam.
+opening.say.pb.declined = Gram {white:def}, a ty go odrzucasz.
+opening.say.pw.accepted = Grasz {white:def}, a ja go przyjmuję.
+opening.say.pb.accepted = Gram {white:def}, a ty go przyjmujesz.
+opening.say.pw.white = Twój debiut to {white:def}.
+opening.say.pw.white.2 = Twój wybór to {white:def}.
+opening.say.pb.white = Mój debiut to {white:def}.
+opening.say.pb.white.2 = Mój wybór to {white:def}.
+opening.say.pw.var_white = Moja odpowiedź to {black:def}, a twój wybór to {white:def}.
+opening.say.pb.var_white = Twoja odpowiedź to {black:def}, a mój wybór to {white:def}.
+opening.say.pw.black = Moja odpowiedź to {black:def}.
+opening.say.pb.black = Twoja odpowiedź to {black:def}.
+opening.say.both = Na szachownicy jest {both:def}.
+opening.say.both.2 = To {both:def}.
+opening.say.variation = Dokładniej mówiąc, to {variation:def}.
+opening.say.variations = Dokładniej: białe – {white:def}, czarne – {black:def}.
+opening.say.now_variation = Teraz to już {variation:def}.
+opening.say.transposed = Przez przestawienie ruchów jest to teraz {opening:def}.
+opening.say.deep = Ściśle mówiąc: {line}.
+opening.say.left_book = Właśnie wyszliśmy ze znanej teorii debiutowej.
+opening.say.left_book_move = Wyszliśmy ze znanej teorii debiutowej w ruchu numer {n}.
+opening.say.rare = To rzadki debiut.
+opening.say.rare_named = To rzadki debiut: {line}.
+
+# ---- Families: beginner (levels 1-3) and advanced (levels 4-6) comments
+opening.family.kings_pawn.beginner = Ruch pionkiem królewskim o dwa pola zajmuje centrum i od razu otwiera drogę hetmanowi i gońcowi: to najpopularniejszy pierwszy ruch.
+opening.family.kings_pawn.advanced = Po e5 ruch e4 prowadzi do otwartej, taktycznej gry, a przeciw obronie sycylijskiej, francuskiej czy Caro-Kann – do ostrej, niezrównoważonej walki.
+opening.family.queens_pawn.beginner = Pionek hetmański zajmuje centrum na d4, gdzie już chroni go hetman: partie toczą się zwykle wolniej i mają bardziej strategiczny charakter niż po e4.
+opening.family.queens_pawn.advanced = Debiuty pionka hetmańskiego prowadzą do zamkniętych pozycji, w których ustawienie figur, struktura pionkowa i uderzenia c4 oraz e4 znaczą więcej niż wczesna taktyka.
+opening.family.kings_knight.beginner = Skoczek wchodzi do gry i atakuje pionka e5: to najbardziej naturalny ruch rozwijający, na który zwykle odpowiada się obroną drugim skoczkiem.
+opening.family.kings_knight.advanced = Skoczek na f3 zostawia otwarte wszystkie klasyczne drogi – partię hiszpańską, włoską, szkocką czy partię czterech skoczków – i zmusza czarne do wyboru sposobu obrony e5.
+opening.family.sicilian.beginner = Czarne odpowiadają pionkiem c zamiast pionkiem e i zaburzają równowagę: czeka cię ostra walka, w której każda strona atakuje na swoim skrzydle.
+opening.family.sicilian.advanced = Po d4 i wymianie pionków czarne dostają półotwartą linię c i więcej pionków centralnych, a białe – szybszy rozwój i szanse ataku na skrzydle królewskim.
+opening.family.french.beginner = Czarne przygotowują d5 ruchem e6: to solidna obrona, ale goniec białopolowy często zostaje zamknięty za własnymi pionkami.
+opening.family.french.advanced = Gdy białe pchają pionka dalej na e5, powstaje zablokowany łańcuch pionków: białe atakują na skrzydle królewskim, a czarne uderzają w łańcuch ruchami c5 i f6.
+opening.family.caro_kann.beginner = Czarne przygotowują d5 ruchem c6 i nie zamykają gońca białopolowego: to bardzo solidna obrona z niewieloma słabościami.
+opening.family.caro_kann.advanced = Czarne mają zdrową strukturę pionkową i aktywnego gońca białopolowego; białe zdobywają przestrzeń albo niewielką przewagę w rozwoju, a czarne dążą do c5 lub do dobrej końcówki.
+opening.family.scandinavian.beginner = Czarne od razu atakują pionka e4 ruchem d5; gdy hetman odbija, białe zyskują tempa, goniąc go, więc musi on znaleźć bezpieczne pole.
+opening.family.scandinavian.advanced = Struktura podobna do obrony Caro-Kann, z gońcem białopolowym poza łańcuchem pionków: białe mają trochę więcej przestrzeni, czarne – solidne i proste ustawienie.
+opening.family.italian.beginner = Białe stawiają gońca na c4 i celują w słabe pole f7: to klasyczny debiut, w którym obie strony szybko rozwijają figury i robią roszadę.
+opening.family.italian.advanced = Współczesna partia włoska to powolna walka manewrowa z c3 i d3, które przygotowują późniejsze d4; ostrzejsze próby to gambit Evansa i skok skoczka na g5.
+opening.family.ruy_lopez.beginner = Goniec białych atakuje skoczka, który broni e5: to jeden z najstarszych i najgłębszych debiutów, bogaty w powolną grę strategiczną.
+opening.family.ruy_lopez.advanced = Białe ruchami c3 i d4 budują trwały nacisk na e5 i centrum, a czarne zdobywają przestrzeń na skrzydle hetmańskim ruchami a6 i b5; ostrym wyjątkiem jest atak Marshalla.
+opening.family.scotch.beginner = Białe od razu otwierają centrum ruchem d4: figury szybko wchodzą do gry, a pozycja wcześnie się otwiera.
+opening.family.scotch.advanced = Napięcie w centrum od razu znika; walka toczy się o aktywny rozwój czarnych i o struktury pionkowe po wymianie na c6.
+opening.family.philidor.beginner = Czarne bronią e5 pionkiem d: solidnie, ale nieco pasywnie, bo goniec czarnopolowy zostaje zamknięty.
+opening.family.philidor.advanced = Czarne oddają przestrzeń w zamian za mocny punkt e5; białe mają wygodny nacisk w centrum, a na poziomie klubowym częste są sztuczki na f7.
+opening.family.petrov.beginner = Czarne nie bronią e5, tylko kontratakują e4 skoczkiem: to solidna, symetryczna obrona; po prostu nie kopiuj zbyt długo ruchów białych.
+opening.family.petrov.advanced = Obrona Pietrowa prowadzi do symetrycznych, często remisowych struktur: białe utrzymują niewielką inicjatywę, a czarne szybko się rozwijają i dążą do wyrównujących wymian.
+opening.family.four_knights.beginner = Obie strony najpierw wyprowadzają skoczki: to zdrowy, spokojny debiut zgodny z zasadami rozwoju.
+opening.family.four_knights.advanced = Symetryczny, wyrównany debiut: białe wybierają ustawienie w duchu partii hiszpańskiej, szkockiej albo włoskiej, a czarne powinny znać kontrgambit Rubinsteina.
+opening.family.english.beginner = Białe zaczynają pionkiem c i kontrolują d5 z boku: to elastyczny debiut, w którym o centrum walczy się figurami.
+opening.family.english.advanced = Debiut angielski często przechodzi w debiuty pionka hetmańskiego; jego własne warianty to manewry z fianchettem, nacisk na d5 i gra na skrzydle hetmańskim.
+opening.family.zukertort.beginner = Skoczek królewski wychodzi pierwszy i pilnuje centrum, zanim białe zdecydują się na jakikolwiek ruch pionkiem.
+opening.family.zukertort.advanced = Narzędzie kolejności ruchów: może przejść w debiut Rétiego, debiut angielski, partię katalońską albo gambit hetmański, omijając przy tym niektóre obrony czarnych.
+opening.family.queens_gambit.beginner = Białe oferują pionka c, żeby odciągnąć pionka czarnych od centrum; to nie jest prawdziwe poświęcenie, bo białe zwykle mogą go odzyskać.
+opening.family.queens_gambit.advanced = Ruch c4 uderza w punkt oparcia d5: czarne albo go utrzymują, jak w gambicie odrzuconym czy w obronie słowiańskiej, albo z niego rezygnują w zamian za swobodny rozwój, jak w gambicie przyjętym.
+opening.family.qgd.beginner = Czarne utrzymują pionka na d5 i wspierają go ruchem e6: bardzo solidnie, ale o gońca białopolowego trzeba zadbać.
+opening.family.qgd.advanced = Klasyczne struktury: karlsbadzka z atakiem mniejszości białych, uwalnianie gry przez czarne ruchem c5 lub e5 i odwieczny problem gońca białopolowego.
+opening.family.qga.beginner = Czarne biorą pionka, ale nie próbują go utrzymać: chodzi o swobodny rozwój i uderzenie w centrum białych ruchem c5.
+opening.family.qga.advanced = Białe odzyskują pionka i często zostają z izolowanym pionkiem d: aktywność figur przeciw długotrwałej słabości struktury.
+opening.family.slav.beginner = Czarne wspierają d5 ruchem c6 i zostawiają gońcowi białopolowemu wolną drogę: to bardzo solidna obrona.
+opening.family.slav.advanced = Obrona słowiańska utrzymuje d5, nie zamykając gońca białopolowego; w głównych wariantach czarne biją na c4 i wyprowadzają tego gońca na f5 lub g4.

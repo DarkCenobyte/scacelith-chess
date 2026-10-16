@@ -302,6 +302,15 @@ respell.xadrez = chadrez
 respell.en = ã
 respell.passant = passã
 respell.troco = trôco
+# Eponyms: the voice reads a w as in English and a j as in "jogo" ("Nimzouitch", "Uinauer",
+# "Najedorf", "Bogojubou"); spelled as Portuguese players say them, with the stress where the name has it.
+respell.najdorf = naidorf
+respell.nimzowitsch = nimzóvitch
+respell.winawer = vináver
+respell.bogoljubow = bogoliúbov
+respell.tartakower = tartakóver
+respell.janowski = ianóvski
+respell.horwitz = hórvitz
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, as Portugal says them (catorze, dezasseis, dezassete, dezanove). 21-99
