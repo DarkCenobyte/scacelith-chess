@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — birinci şahıs bakışıyla oynanan fotogerçekçi satranç",
+      "description": "Windows, Linux ve macOS için ücretsiz, fotogerçekçi, birinci şahıs bakışıyla satranç: bir kraliyet salonunda Stockfish 19, eğitmen, oyun analizi ve çevrimiçi oyun."
+    },
+    "players": {
+      "title": "Sıralama ve oyuncular — Scacelith",
+      "description": "Resmî Scacelith sunucusunun her puanlı süre kontrolündeki en iyi oyuncuları, puanları ve son oyunları."
+    },
+    "account": {
+      "title": "Hesabınız — Scacelith",
+      "description": "Scacelith hesabınıza giriş yapın: puanlar, oyun geçmişi, PGN ve GIF indirmeleri, giriş yapılmış cihazlar ve ayarlar."
+    },
+    "gif": {
+      "title": "Animasyonlu GIF — Scacelith",
+      "description": "Bir Scacelith oyununun animasyonlu GIF'i."
+    },
+    "legal": {
+      "title": "Yasal bilgiler, gizlilik ve kullanım koşulları — Scacelith",
+      "description": "Scacelith'i kimin yayımladığı ve barındırdığı, web sitesinin, oyunun ve resmî sunucunun kişisel verilerle ne yaptığı, haklarınız ve resmî sunucunun kuralları."
+    }
+  },
+  "brand": {
+    "tagline": "Kralların Oyunu"
+  },
+  "nav": {
+    "skip": "İçeriğe geç",
+    "home": "Ana sayfa",
+    "label": "Ana menü",
+    "game": "Oyun",
+    "modes": "Oyun modları",
+    "gallery": "Galeri",
+    "trailer": "Fragman",
+    "online": "Çevrimiçi",
+    "players": "Sıralama",
+    "account": "Hesap",
+    "language": "Dil",
+    "menu": "Menü",
+    "download": "İndir"
+  },
+  "hero": {
+    "image_alt": "Güneş ışığıyla aydınlanan mermer bir salonda, ceviz bir masada iki porselen robot satranç oynuyor.",
+    "lead": "Güneşli bir kraliyet salonunda, cilalı ceviz bir masaya oturun. Tahtanın karşısında, Stockfish'in yönettiği porselen bir robot ilk hamlenizi bekliyor.",
+    "watch": "Fragmanı izle",
+    "meta": "Özgür yazılım · Windows, Linux, macOS (deneysel) · OpenGL 4.6 destekli ekran kartı",
+    "caption": "Oyun içi görüntü: kraliyet salonu"
+  },
+  "highlights": {
+    "engine": "Kendi OpenGL 4.6 motorumuz",
+    "stockfish": "Yerleşik Stockfish 19",
+    "rules": "FIDE kuralları",
+    "online": "Çevrimiçi oyun",
+    "languages": "34 dil"
+  },
+  "experience": {
+    "eyebrow": "Deneyim",
+    "title": "Ekrandaki bir tahta değil.<br><em>Masada bir yer.</em>",
+    "lead": "Scacelith, gerçek bir oyunu gerçek kılan her şeyi geri getiriyor: salon, sessizlik, saat, size bakan bir rakip ve turnuvanın ritüelleri.",
+    "presence": {
+      "title": "Birinci şahıs bakışıyla",
+      "text": "Robotunuzun gözlerinden görürsünüz: salonda etrafınıza bakın, tahtanın üzerine eğilin, başınızı kaldırıp rakibinize bakın, notasyon kâğıdınıza göz atın ya da ayağa kalkıp masanın bir ucuna yürüyün."
+    },
+    "ritual": {
+      "title": "Turnuva kuralları",
+      "text": "Dokunduğunuz taşı oynamak zorundasınız ve hamleyi tamamlamak için saate elinizle basarsınız. Geçerli hamleler gösterilmediğinde hakem kural dışı bir hamleyi cezalandırır, ikincisi ise oyunu kaybettirir."
+    },
+    "scoresheet": {
+      "title": "El yazısıyla",
+      "text": "İki oyuncu da her hamleyi kendi notasyon kâğıdına, her biri kendi el yazısıyla kaydeder ve her kırk hamlede sayfayı çevirir. Kalemin kâğıt üzerindeki sesini duyarsınız."
+    },
+    "opponent": {
+      "title": "Layık bir rakip",
+      "text": "Acemi (800) ile Stockfish Max (3500) arasında, sizin seviyenizde oynayan Stockfish 19. Puanınız her oyundan sonra FIDE kurallarına göre hesaplanır."
+    },
+    "engine": {
+      "title": "Bu oyun için yapıldı",
+      "text": "Sıfırdan yazılmış bir motor: fiziksel tabanlı aydınlatma, mermer, cilalı ahşap, porselen ve pirinç, pencerelerden giren güneş, yumuşak gölgeler ve yansımalar. Çok düşük ile Ultra arasındaki kalite ön ayarları, motoru ekran kartınıza göre uyarlar."
+    },
+    "languages": {
+      "title": "34 dil",
+      "text": "İngilizce, Fransızca, Almanca, İspanyolca, Portekiz ve Brezilya Portekizcesi, İtalyanca, Felemenkçe, İsveççe, Danca, Fince, Estonca, Letonca, Litvanca, Lehçe, Çekçe, Slovakça, Slovence, Hırvatça, Macarca, Rumence, Bulgarca, Yunanca, Türkçe, Ukraynaca, Rusça, Arapça, Hintçe, Endonezce, Vietnamca, Korece, Japonca ile basitleştirilmiş ve geleneksel Çince. Arapça sağdan sola görüntülenir; eğitmen, sözlerinin altyazı olarak göründüğü Çince dışında her dilde sesli konuşur."
+    }
+  },
+  "modes": {
+    "eyebrow": "Oyun modları",
+    "title": "Her oyunun<br><em>bir masası var.</em>",
+    "lead": "Her şey, başlangıç ekranından başlayarak aynı salonda oynanır. Çevrimdışıyken Stockfish her zaman bir oyuna hazırdır.",
+    "new_game": {
+      "name": "Yeni oyun",
+      "text": "Dilediğiniz güçteki Stockfish'le, Bullet ile Klasik arasında istediğiniz süre kontrolünde karşılaşın ya da aynı bilgisayarda bir arkadaşınızla oynayın; her biriniz kendi robotunuzun gözlerinden bakarsınız."
+    },
+    "coach": {
+      "name": "Eğitmen",
+      "text": "Karşınıza bir öğretmen oturur, sizin seviyenizde oynar ve oyun boyunca size yol gösterir: tehditler, iyi hamleler, hatalar; bir hatanın neye mal olduğunu da kendi eliyle oynayarak gösterir. Satranç kurallarından Uzman seviyesine kadar, bilgisayarınızda sentezlenen bir sesle."
+    },
+    "challenges": {
+      "name": "Eğitmen meydan okumaları",
+      "text": "Her biri tek bir beceriyi çalıştıran kısa pozisyon setleri: bir ila üç hamlede matlar, çatallar, açmazlar ve diğer taktikler, savunma ve eğitmene karşı temel oyun sonları. İpucu yalnızca siz isterseniz verilir ve tamamladığınız her set yeşil bir onay işareti alır."
+    },
+    "analysis": {
+      "name": "Analiz",
+      "text": "Stockfish kayıtlı oyunlarınızı, çevrimiçi oyunlarınızı ya da herhangi bir PGN'yi inceler: değerlendirme çubuğu, parlak hamleden büyük hataya kadar işaretlenen kilit hamleler, okla çizilen daha iyi hamle ve hem sesli hem altyazılı yorumlar. Siz oyunda ilerledikçe hamleleri robotların elleri oynar."
+    },
+    "online": {
+      "name": "Çevrimiçi oyna",
+      "text": "Bir Scacelith sunucusu üzerinden gerçek rakipler: puanlı oyunlar, eşleştirme, meydan okumalar ve özel oyunlar ya da iki bilgisayar arasında doğrudan oyun. Rakibinizin robotu, rakibinizle birlikte canlı olarak hareket eder."
+    },
+    "watch": {
+      "name": "Oyun izle",
+      "text": "İki Stockfish oyuncusu karşı karşıya gelirken siz görünmez biçimde salonda dolaşır, bir bakış açısından diğerine serbestçe geçersiniz."
+    },
+    "saved": {
+      "name": "Kayıtlı oyunlar",
+      "text": "Oyunlarınız PGN dosyaları olarak saklanır. Onları gerçek düşünme süreleri ve saatlerle salonda yeniden oynatın ya da başka programlardaki oyunları içe aktarın."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galeri",
+    "title": "<em>Salonun içinden</em> bakış",
+    "lead": "Her görüntü, oyunun kendi motoru tarafından oyun içinde, gerçek zamanlı olarak yakalandı.",
+    "title_screen": {
+      "alt": "Başlangıç ekranı: salonda satranç oynayan iki robotun yanında Scacelith menüsü.",
+      "caption": "Başlangıç ekranı"
+    },
+    "coach": {
+      "alt": "Göğsünde “COACH” yazan porselen robot eğitmen, tahtanın karşısından sizi selamlıyor; söyledikleri altyazı olarak da görünüyor.",
+      "caption": "Eğitmen"
+    },
+    "challenges": {
+      "alt": "Eğitmen meydan okumaları menüsü: zorluk dereceleri ve tamamlananlarla birlikte mat ve taktik setleri, yanında seçili setin açıklaması.",
+      "caption": "Eğitmen meydan okumaları"
+    },
+    "analysis": {
+      "alt": "Analiz modu: değerlendirme çubuğu, tahtaya çizilmiş bir ok, her iki tarafın doğruluk oranıyla birlikte işaretlenmiş hamleler ve kontrollerin listesi.",
+      "caption": "Analiz"
+    },
+    "game": {
+      "alt": "Yandan görünüm: robotlardan biri bir taşı oynamak için masanın üzerinden uzanırken diğeri bekliyor; alınan taşlar tahtanın yanında duruyor.",
+      "caption": "Oyun izle"
+    },
+    "hall": {
+      "alt": "Yüksek pencerelerin altında, kırmızı kadife koltuklarda oturan iki robot satranç tahtasının iki yanında karşı karşıya.",
+      "caption": "Kraliyet salonu"
+    },
+    "opponent": {
+      "alt": "Porselen robot rakibin yakın çekimi; başı tahtaya doğru eğik.",
+      "caption": "Rakibiniz"
+    },
+    "scoresheet": {
+      "alt": "Bir robotun eli, dolma kalemle hamleleri notasyon kâğıdına yazıyor.",
+      "caption": "Notasyon kâğıdı"
+    },
+    "note": "Sürüm 1.0.0. Bu görüntülerdeki arayüz İngilizcedir.",
+    "viewer": "Resim görüntüleyici",
+    "close": "Kapat",
+    "previous": "Önceki resim",
+    "next": "Sonraki resim"
+  },
+  "trailer": {
+    "eyebrow": "Fragman",
+    "title": "Scacelith <em>hareket hâlinde</em>",
+    "soon_title": "Fragman yakında geliyor",
+    "soon_text": "Bu arada yerinizi alın: oyun indirilmeye hazır.",
+    "privacy": "Oynatıcısını kabul edene kadar YouTube'dan hiçbir şey yüklenmez.",
+    "open_youtube": "YouTube'da izle"
+  },
+  "online": {
+    "eyebrow": "Çevrimiçi",
+    "title": "Gerçek rakipler,<br><em>aynı salon.</em>",
+    "lead": "Oyunun içinden resmî sunucuya giriş yapın ve dünyanın dört bir yanından insanlarla, yine birinci şahıs bakışıyla oynayın.",
+    "point_rated": "Her resmî süre kontrolünde puanlı oyunlar; her birinin FIDE kurallarına göre hesaplanan kendi puanı vardır.",
+    "point_match": "Eşleştirme, kullanıcı adıyla meydan okuma ve kodla özel oyunlar ya da sunucu ve hesap gerektirmeden iki bilgisayar arasında doğrudan oyun.",
+    "point_fair": "Adil oyun: otomatik denetimler, biten oyunların motorla analizi ve oyuncu bildirimleri.",
+    "point_history": "Oyun geçmişiniz bu sitede: her oyunu PGN ya da animasyonlu GIF olarak indirin.",
+    "point_open": "Herkes bir topluluk sunucusu işletebilir: sunucu özgür yazılımdır ve API'si belgelenmiştir.",
+    "create": "Hesap oluştur",
+    "signin": "Giriş yap",
+    "server_title": "Resmî sunucu",
+    "status_checking": "Kontrol ediliyor…",
+    "address": "Adres",
+    "registration": "Kayıt",
+    "categories": "Puanlı süre kontrolleri",
+    "top_players": "En iyi oyuncular",
+    "category": "Süre kontrolü",
+    "board_loading": "Sıralama yükleniyor…",
+    "full_board": "Tüm sıralama"
+  },
+  "download": {
+    "button": "İndir",
+    "choose": "Sisteminizi seçin",
+    "see_release": "Sürümü GitHub'da gör",
+    "latest": "Scacelith",
+    "all_releases": "Tüm sürümler",
+    "experimental": "Deneysel",
+    "source": "Kaynak kodu",
+    "source_zip": "ZIP arşivi",
+    "eyebrow": "İndirme",
+    "title": "Yerinizi alın.<br><em>Ücretsiz ve açık kaynak.</em>",
+    "lead": "Arşivden çıkarın ve oynayın: Windows ve Linux'ta kurulum programı yok, Mac'te ise Uygulamalar klasörüne sürüklemeniz yeterli. Her dosya, etiketli kaynak kodundan GitHub Actions ile derlenir ve onaylı bir derleme kökeni kaydı taşır.",
+    "notes": "Sürüm notları",
+    "macos_note": "macOS 26 veya üzeri yüklü Apple Silicon (M1 veya daha yeni) Mac'ler içindir; sanal makinede çalışmaz. Diğer derlemelerden daha yenidir ve daha az test edilmiştir. Uygulama kayıtlı bir Apple geliştiricisi tarafından imzalanmamıştır: ilk seferde Sistem Ayarları › Gizlilik ve Güvenlik › Yine de Aç yoluyla açın.",
+    "req_system": "Sistem",
+    "req_system_value": "Windows 64 bit (x64); glibc 2.34, OpenSSL 3 ve X11 veya XWayland bulunan 64 bit Linux (x86-64 veya aarch64), örneğin Ubuntu 22.04 veya Debian 12; Apple Silicon üzerinde macOS 26 veya üzeri (deneysel)",
+    "req_gpu": "Grafik",
+    "req_gpu_value": "OpenGL 4.6 destekleyen ve sürücüsü güncel bir ekran kartı (Mac'te oyun kendi OpenGL katmanıyla gelir)",
+    "req_included": "Dahil",
+    "req_included_value": "Stockfish 19 ve sinir ağı: hemen çevrimdışı oynayın",
+    "req_network": "İnternet",
+    "req_network_value": "Çevrimiçi oyun, GIF'ler ve eğitmen ile analizin sesi için (yaklaşık 399 MB'lık isteğe bağlı bir indirme)",
+    "req_licence": "Lisans",
+    "req_licence_value": "GNU Genel Kamu Lisansı v3",
+    "verify_title": "İndirdiğiniz dosyayı doğrulayın",
+    "verify_text": "Her dosyanın derleme kökeni GitHub tarafından onaylanır. GitHub CLI ile:",
+    "checksums": "SHA-256 sağlama toplamları (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Emeği geçenler",
+    "title": "Emeği geçenler ve <em>teşekkürler</em>",
+    "engine_head": "Satranç motoru",
+    "engine": "Stockfish 19, Stockfish geliştiricileri tarafından (GNU GPL v3). Sinir ağı, Leela Chess Zero projesinin sağladığı veriler üzerinde eğitildi (Open Database License).",
+    "voice_head": "Ses",
+    "voice": "Supertone'un Supertonic 3 modeli, BigScience Open RAIL-M lisansıyla: isteğiniz üzerine indirilir ve bilgisayarınızda eğitmene ve analize ses verir.",
+    "fonts_head": "Yazı tipleri",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) ve Amiri (Khaled Hosny); el yazıları için Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One ve LXGW WenKai (tümü SIL Open Font License kapsamında); satranç figürleri GNU FreeFont'tan.",
+    "openings_head": "Açılışlar ve bulmacalar",
+    "openings": "Açılış adları lichess.org'un chess-openings veritabanından, eğitmen meydan okumalarındaki bulmacalar ise Lichess bulmaca veritabanından alınmıştır; ikisi de kamu malına adanmıştır (CC0).",
+    "quote": "“Satranç, analiz sanatıdır.”",
+    "quote_author": "Mihail Botvinnik"
+  },
+  "footer": {
+    "about": "Kendi OpenGL 4.6 motorumuz üzerinde, birinci şahıs bakışıyla oynanan fotogerçekçi bir satranç oyunu. GNU GPL v3 lisanslı özgür yazılım.",
+    "game": "Oyun",
+    "online": "Çevrimiçi",
+    "api_docs": "Sunucu API belgeleri",
+    "source": "Kaynak kodu",
+    "game_source": "GitHub'da oyun",
+    "server_source": "GitHub'da sunucu",
+    "releases": "Sürümler",
+    "licence": "Lisans (GPL v3)",
+    "credits": "Stockfish, geliştiricilerinin ticari markasıdır. YouTube, Google LLC'nin ticari markasıdır. Windows, Microsoft Corporation'ın ticari markasıdır. macOS, Apple Inc.'in ticari markasıdır. Linux, Linus Torvalds'ın tescilli ticari markasıdır. OpenGL, Hewlett Packard Enterprise'ın tescilli ticari markasıdır.",
+    "legal": "Scacelith",
+    "made": "Bu site çerez bırakmaz ve izleyici kullanmaz; YouTube oynatıcısı yalnızca siz kabul ederseniz yüklenir.",
+    "legal_link": "Yasal bilgiler, gizlilik ve koşullar"
+  },
+  "common": {
+    "copy": "Kopyala",
+    "loading": "Yükleniyor…",
+    "noscript": "Bu sayfanın Scacelith sunucusuyla iletişim kurabilmesi için JavaScript gerekir."
+  },
+  "players": {
+    "title": "Sıralama ve oyuncular",
+    "lead": "Resmî sunucunun her puanlı süre kontrolündeki en iyi oyuncuları. Puanlarını ve son oyunlarını görmek için herhangi bir oyuncuyu arayın.",
+    "search_label": "Oyuncu bul",
+    "search_placeholder": "Kullanıcı adı",
+    "search_button": "Ara",
+    "back": "Sıralamaya dön",
+    "recent_games": "Son oyunlar",
+    "board_title": "Sıralama",
+    "category": "Süre kontrolü",
+    "col_rank": "Sıra",
+    "col_player": "Oyuncu",
+    "col_rating": "Puan",
+    "col_peak": "En yüksek",
+    "col_games": "Oyun",
+    "col_wdl": "G / B / M",
+    "loading": "Yükleniyor…"
+  },
+  "account": {
+    "title": "Hesabınız",
+    "auth_foot": "Resmî sunucuda, oyun ve bu site için tek bir hesap. Hesabınızı oyunda Google ile mi oluşturdunuz? Hesaba bir parola vermek için “Parolanızı mı unuttunuz?” bağlantısını kullanın.",
+    "common": {
+      "back": "Girişe dön"
+    },
+    "fields": {
+      "login": "Kullanıcı adı veya e-posta",
+      "password": "Parola",
+      "show_password": "Parolayı göster",
+      "username": "Kullanıcı adı",
+      "email": "E-posta",
+      "confirm_password": "Parolayı onaylayın",
+      "current_password": "Mevcut parola",
+      "new_password": "Yeni parola",
+      "new_email": "Yeni e-posta adresi",
+      "mfa_code": "İki faktörlü doğrulama kodu (veya bir kurtarma kodu)"
+    },
+    "signin": {
+      "tab": "Giriş yap",
+      "title": "Tekrar hoş geldiniz",
+      "remember": "Bu cihazda oturumum açık kalsın",
+      "submit": "Giriş yap",
+      "forgot": "Parolanızı mı unuttunuz?",
+      "resend": "Onay e-postasını yeniden gönder"
+    },
+    "mfa": {
+      "title": "İki faktörlü kimlik doğrulama",
+      "text": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.",
+      "code": "Uygulamadaki kod",
+      "use_recovery": "Bunun yerine kurtarma kodu kullan",
+      "submit": "Onayla"
+    },
+    "google": {
+      "or": "veya",
+      "button": "Google ile giriş yap",
+      "username_title": "Kullanıcı adınızı seçin",
+      "username_text": "Google hesabınız bu sunucuda yeni. Diğer oyuncuların göreceği adı seçin: bu ad daha sonra değiştirilemez.",
+      "username_submit": "Hesabımı oluştur",
+      "link_title": "Google hesabınızı bağlayın",
+      "link_submit": "Bağla ve giriş yap",
+      "returning": "Google ile giriş yapılıyor…"
+    },
+    "register": {
+      "tab": "Hesap oluştur",
+      "title": "Ücretsiz bir hesap",
+      "closed": "Sunucu şu anda yeni hesap kabul etmiyor.",
+      "username_hint": "Harf, rakam, _ ve -; bir harf veya rakamla başlamalı.",
+      "password_hint": "En az 10 karakter; kullanıcı adınızı veya e-posta adresinizi içermemeli.",
+      "pow_note": "Robotları uzak tutmak için tarayıcınız kayıt sırasında küçük bir bulmaca çözer. Bu birkaç saniye sürer.",
+      "submit": "Hesap oluştur",
+      "done_title": "E-postanızı kontrol edin",
+      "done_text": "Adresinize bir onay bağlantısı gönderdik. Hesabınızı oluşturmak için bağlantıyı açın, ardından giriş yapın.",
+      "done_hint": "Bağlantı 24 saat geçerlidir. Gelen kutunuzda bir şey yok mu? İstenmeyen e-posta klasörünüzü kontrol edin ya da e-postayı yeniden isteyin.",
+      "go_signin": "Girişe git",
+      "legal_note": "Kullanıcı adınız, puanlarınız ve oyunlarınız herkese açık olacaktır. Hesap oluşturarak kullanım koşullarını kabul etmiş olursunuz.",
+      "legal_link": "Gizlilik ve kullanım koşulları"
+    },
+    "forgot": {
+      "title": "Parolamı unuttum",
+      "text": "Hesabınızın e-posta adresini girin. Bu adresi kullanan bir hesap varsa, size yeni bir parola seçmeniz için bir saat geçerli bir bağlantı göndeririz.",
+      "submit": "Bağlantıyı gönder"
+    },
+    "resend": {
+      "title": "E-postanızı onaylayın",
+      "text": "Onay e-postası size ulaşmadı mı ya da bağlantının süresi mi doldu? Yenisini almak için adresinizi girin.",
+      "submit": "Yeniden gönder"
+    },
+    "dash": {
+      "public_profile": "Herkese açık profil",
+      "signout": "Çıkış yap",
+      "tab_overview": "Genel bakış",
+      "tab_games": "Oyunlar",
+      "tab_devices": "Cihazlar",
+      "tab_settings": "Ayarlar"
+    },
+    "overview": {
+      "info": "Bilgileriniz",
+      "ratings": "Puanlarınız",
+      "sanctions": "Yaptırımlar",
+      "recent": "Son oyunlar",
+      "all_games": "Tüm oyunlarınız"
+    },
+    "games": {
+      "filter_category": "Süre kontrolü",
+      "all": "Tümü",
+      "custom": "Özel",
+      "filter_rated": "Tür",
+      "rated": "Puanlı",
+      "casual": "Puansız",
+      "filter_result": "Sonuç",
+      "wins": "Kazanılan",
+      "losses": "Kaybedilen",
+      "draws": "Berabere"
+    },
+    "devices": {
+      "title": "Giriş yapılmış cihazlar",
+      "signout_all": "Her yerden çıkış yap",
+      "text": "Oyunda ya da bu sitede yapılan her giriş bir cihazdır. Tanımadıklarınızın oturumunu kapatın."
+    },
+    "settings": {
+      "challenges_title": "Meydan okumalar",
+      "challenges_text": "Diğer oyuncular oyunun içinden kullanıcı adınızla size meydan okuyabilir.",
+      "challenges_label": "Meydan okumaları kabul et",
+      "mfa_title": "İki faktörlü kimlik doğrulama",
+      "mfa_text": "Oyunun hesap sayfasından bu özelliği açıp kapatabilir ve yeni kurtarma kodları oluşturabilirsiniz.",
+      "password_title": "Parolayı değiştir",
+      "password_text": "Diğer cihazlarınızda oturum kapatılır, bu cihazda ise oturumunuz açık kalır.",
+      "password_submit": "Parolayı değiştir",
+      "email_title": "E-posta adresini değiştir",
+      "email_submit": "Onay bağlantısını gönder",
+      "export_title": "Verilerimi indir",
+      "export_text": "Sunucunun hesabınızla ilgili tuttuğu her şey, tek bir JSON dosyasında.",
+      "export_submit": "Verilerimi indir",
+      "delete_title": "Hesabı sil",
+      "delete_text": "Bu işlem geri alınamaz. Oyunlarınız ve puanlarınız anonim bir ad altında kalır; e-posta adresiniz, parolanız ve cihazlarınız silinir.",
+      "delete_confirm": "Onaylamak için kullanıcı adınızı yazın",
+      "delete_submit": "Hesabımı sil"
+    }
+  },
+  "gif": {
+    "title": "Animasyonlu GIF",
+    "preparing": "GIF hazırlanıyor…",
+    "download": "GIF'i indir",
+    "make": "GIF'i oluştur",
+    "pause": "Animasyonu duraklat",
+    "back": "Oyunlarıma dön",
+    "options": "Seçenekler",
+    "size": "Boyut",
+    "size_small": "Küçük (284 × 350)",
+    "size_medium": "Orta (424 × 515)",
+    "size_large": "Büyük (628 × 762)",
+    "orientation": "Tahtaya bakan taraf",
+    "orientation_white": "Beyaz",
+    "orientation_black": "Siyah",
+    "speed": "Hız",
+    "speed_fast": "Hızlı (hamle başına 0,25 sn)",
+    "speed_normal": "Normal (hamle başına 0,5 sn)",
+    "speed_slow": "Yavaş (hamle başına 1 sn)",
+    "speed_very_slow": "Çok yavaş (hamle başına 2 sn)",
+    "coords": "Koordinatları göster",
+    "regenerate": "Yeniden oluştur",
+    "note": "Her GIF'i sunucu çizer. Daha önce oluşturduğunuz bir GIF hemen gelir; yeni GIF'ler dakikada birkaç taneyle sınırlıdır."
+  },
+  "notfound": {
+    "title": "Sayfa bulunamadı",
+    "text": "Bu kare boş. Sayfa taşınmış olabilir.",
+    "home": "Scacelith'e dön"
+  },
+  "js": {
+    "common": {
+      "loading": "Yükleniyor…",
+      "retry": "Tekrar dene",
+      "close": "Kapat",
+      "copy": "Kopyala",
+      "copied": "Panoya kopyalandı.",
+      "copy_failed": "Kopyalanamadı. Metni seçip elle kopyalayın.",
+      "load_more": "Daha fazla göster",
+      "show_password": "Parolayı göster",
+      "hide_password": "Parolayı gizle",
+      "signin_needed": "Devam etmek için giriş yapın.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip tekrar deneyin.",
+      "timeout": "Sunucunun yanıt vermesi çok uzun sürdü. Tekrar deneyin.",
+      "server_busy": "Sunucu meşgul. Birazdan tekrar deneyin.",
+      "rate_limited": "Çok fazla istek. {time} sonra tekrar deneyin.",
+      "rate_limited_short": "Çok fazla istek. Birazdan tekrar deneyin.",
+      "internal_error": "Sunucuda beklenmeyen bir hata oluştu. Daha sonra tekrar deneyin.",
+      "invalid_token": "Oturumunuz sona erdi. Lütfen yeniden giriş yapın.",
+      "unauthorized": "Lütfen giriş yapın.",
+      "not_found": "Bulunamadı.",
+      "unknown": "Bir sorun oluştu ({code}).",
+      "invalid_credentials": "Kullanıcı adı, e-posta veya parola yanlış.",
+      "too_many_attempts": "Çok fazla deneme. {time} sonra tekrar deneyin.",
+      "banned": "Bu hesap şu zamana kadar askıya alındı: {date}.",
+      "banned_permanent": "Bu hesap askıya alındı.",
+      "email_unverified": "E-posta adresiniz henüz onaylanmadı. Size gönderdiğimiz bağlantıyı açın ya da yenisini isteyin.",
+      "invalid_mfa_token": "Bu giriş adımının süresi doldu. Lütfen yeniden giriş yapın.",
+      "invalid_code": "Kod yanlış ya da daha önce kullanılmış.",
+      "mfa_code_required": "İki faktörlü doğrulama kodunuzu girin.",
+      "invalid_password": "Parola yanlış.",
+      "password_not_set": "Bu hesabın henüz parolası yok: parola belirlemek için giriş sayfasındaki “Parolanızı mı unuttunuz?” bağlantısını kullanın.",
+      "registration_closed": "Sunucu şu anda yeni hesap kabul etmiyor.",
+      "invalid_username": "Bu kullanıcı adına izin verilmiyor.",
+      "username_taken": "Bu kullanıcı adı zaten alınmış.",
+      "invalid_email": "Bu e-posta adresi geçerli değil.",
+      "email_taken": "Bu e-posta adresi zaten başka bir hesap tarafından kullanılıyor.",
+      "same_email": "Bu zaten sizin e-posta adresiniz.",
+      "weak_password": "Bu parola çok zayıf.",
+      "weak_too_short": "Parola çok kısa (en az {min} karakter).",
+      "weak_too_long": "Parola çok uzun.",
+      "weak_contains_username": "Parola kullanıcı adınızı içermemelidir.",
+      "weak_contains_email": "Parola e-posta adresinizi içermemelidir.",
+      "weak_too_common": "Bu parola çok yaygın. Başka bir parola seçin.",
+      "pow_failed": "Robot karşıtı doğrulama başarısız oldu. Tekrar deneyin.",
+      "passwords_differ": "İki parola birbirinden farklı.",
+      "required": "Bu alanı doldurun.",
+      "email_format": "Geçerli bir e-posta adresi girin.",
+      "username_format": "{min} ile {max} karakter arası: harf, rakam, _ ve -; bir harf veya rakamla başlamalı.",
+      "password_length": "En az {min} karakter.",
+      "confirm_name": "Kullanıcı adınızı tam olarak gösterildiği gibi yazın.",
+      "game_too_long": "Bu oyun GIF'e dönüştürülemeyecek kadar uzun.",
+      "gif_disabled": "Bu sunucu GIF oluşturmuyor.",
+      "render_failed": "Sunucu bu GIF'i çizemedi.",
+      "invalid_game": "Bu oyun mevcut değil.",
+      "invalid_player": "Bir kullanıcı adı girin: 2 ile 24 arası harf, rakam, _, . veya -.",
+      "player_not_found": "Bu adda bir oyuncu yok.",
+      "sso_cancelled": "Google ile giriş iptal edildi.",
+      "sso_mismatch": "Bu Google girişi bu sekmede başlatılmadı ya da daha önce kullanıldı. Tekrar deneyin.",
+      "sso_expired": "Bu Google girişinin süresi doldu. Tekrar deneyin.",
+      "invalid_verifier": "Bu Google girişi başka bir sekmede veya tarayıcıda başlatıldı. Bu sayfadan yeniden başlayın.",
+      "sso_email_unverified": "Google, bu Google hesabının e-posta adresini doğrulamamış.",
+      "sso_account_exists": "Bu e-posta adresini zaten bir hesap kullanıyor, ancak bu hesabın Google'ı bağlamak için gereken bir parolası yok. “Parolanızı mı unuttunuz?” ile hesaba bir parola verin, ardından yeniden Google ile giriş yapın.",
+      "sso_failed": "Google ile giriş tamamlanamadı. Tekrar deneyin.",
+      "sso_disabled": "Google ile giriş bu sunucuda kullanılamıyor.",
+      "sso_already_linked": "Bu Google hesabı zaten başka bir hesaba bağlı.",
+      "account_disabled": "Bu hesap artık kullanılamaz.",
+      "sso_storage": "Tarayıcınız bu sitenin, Google ile giriş için gereken depolama alanını engelliyor. Buna izin verin ya da parolanızla giriş yapın.",
+      "sso_url": "Sunucu beklenmeyen bir Google adresiyle yanıt verdi; bu yüzden Google ile giriş durduruldu."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} saniye",
+        "other": "{count} saniye"
+      },
+      "minutes": {
+        "one": "{count} dakika",
+        "other": "{count} dakika"
+      }
+    },
+    "download": {
+      "exe": "Çalıştırılabilir dosya",
+      "zip": "ZIP arşivi",
+      "dmg": "Disk görüntüsü",
+      "archive": "Arşiv",
+      "file": "Dosya",
+      "unavailable": "Mevcut değil",
+      "your_system": "Sisteminiz",
+      "eyebrow_release": "Sürüm {version}",
+      "published": "Yayın tarihi: {date}",
+      "unreachable": "GitHub'a şu anda ulaşılamıyor: sürümler sayfasına bakın.",
+      "available": "Mevcut",
+      "verify_file": "dosya",
+      "no_build": "Şu anda {os} için oyunun bir derlemesi yok.",
+      "x64": "64 bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bit, Intel / AMD veya Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 veya üzeri",
+      "experimental": "Deneysel"
+    },
+    "server": {
+      "online": "Çevrimiçi",
+      "offline": "Ulaşılamıyor",
+      "busy": "Meşgul",
+      "open": "Açık",
+      "closed": "Kapalı",
+      "updated": "Güncelleme: {time}",
+      "min_games": "Bu süre kontrolünde en az {count} puanlı oyun oynamış oyuncular.",
+      "empty": "Bu süre kontrolünde henüz sıralamaya giren oyuncu yok.",
+      "error": "Sıralama şu anda yüklenemiyor."
+    },
+    "game": {
+      "number": "Oyun #{id}",
+      "white": "Beyaz",
+      "black": "Siyah",
+      "you": "siz",
+      "vs": "–",
+      "outcome_win": "Galibiyet",
+      "outcome_loss": "Mağlubiyet",
+      "outcome_draw": "Beraberlik",
+      "outcome_aborted": "İptal",
+      "result_white": "Beyaz kazandı",
+      "result_black": "Siyah kazandı",
+      "result_draw": "Berabere",
+      "result_aborted": "İptal edildi",
+      "rated": "Puanlı",
+      "casual": "Puansız",
+      "custom": "Özel",
+      "moves": {
+        "one": "{count} hamle",
+        "other": "{count} hamle"
+      },
+      "duration": "Süre: {time}",
+      "rating_diff": "Puan değişimi: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Oyunu PGN olarak indir",
+      "copy_pgn": "Kopyala",
+      "copy_pgn_title": "PGN'yi kopyala",
+      "gif": "GIF",
+      "gif_title": "Animasyonlu GIF oluştur (yeni sekmede açılır)",
+      "gif_signin": "GIF oluşturmak için giriş yapın",
+      "pgn_copied": "PGN panoya kopyalandı.",
+      "pgn_saved": "PGN indirildi.",
+      "none": "Henüz oyun yok. Çevrimiçi oyunlarınız burada görünecek.",
+      "none_filtered": "Bu filtrelere uyan oyun yok.",
+      "none_public": "Henüz oyun yok.",
+      "total": {
+        "one": "{count} oyun",
+        "other": "{count} oyun"
+      },
+      "termination_unknown": "Oyun bitti",
+      "reason": {
+        "1": "Şah mat",
+        "2": "Terk",
+        "3": "Süreden kayıp",
+        "4": "İkinci kural dışı hamle (hükmen yenilgi)",
+        "5": "Pat",
+        "6": "Ölü pozisyon (yetersiz materyal)",
+        "7": "Süre doldu, ama rakip mat edemez",
+        "8": "Beş kez tekrar",
+        "9": "75 hamle kuralı",
+        "10": "Üç kez tekrar (talep edildi)",
+        "11": "50 hamle kuralı (talep edildi)",
+        "12": "Anlaşmayla beraberlik",
+        "13": "İkinci kural dışı hamle, ama rakip mat edemez",
+        "14": "Terk, ama rakip mat edemez",
+        "20": "Oyundan ayrıldı (bağlantısı çok uzun süre kesik kaldı)",
+        "21": "Oyundan ayrıldı, ama rakip mat edemez",
+        "22": "Oyun iptal edildi",
+        "23": "İlk hamle zamanında yapılmadı (iptal)",
+        "24": "Hükmen yenilgi (adil oyun ihlali)",
+        "25": "Sunucu tarafından iptal edildi",
+        "26": "İki oyuncunun da bağlantısı koptu"
+      }
+    },
+    "ratings": {
+      "category": "Süre kontrolü",
+      "rating": "Puan",
+      "peak": "En yüksek",
+      "games": "Oyun",
+      "wdl": "G / B / M",
+      "provisional": "Geçici puan",
+      "none": "Henüz puanlı oyun yok.",
+      "unrated_hint": "Soru işareti geçici bir puanı gösterir (henüz az oyun oynanmış)."
+    },
+    "account": {
+      "member_since": "{date} tarihinden beri üye",
+      "last_login": "Son giriş",
+      "created": "Oluşturulma tarihi",
+      "email": "E-posta",
+      "pending_email": "Onay bekleniyor: {email}",
+      "verified": "Onaylandı",
+      "unverified": "Onaylanmadı",
+      "mfa": "İki faktörlü kimlik doğrulama",
+      "mfa_on": "Açık",
+      "mfa_off": "Kapalı",
+      "google": "Google ile giriş",
+      "google_on": "Bağlı",
+      "google_off": "Bağlı değil",
+      "password": "Parola",
+      "password_set": "Belirlendi",
+      "password_unset": "Henüz belirlenmedi",
+      "challenges": "Meydan okumalar",
+      "challenges_all": "Kabul ediliyor",
+      "challenges_none": "Reddediliyor",
+      "badge_verified": "E-posta onaylı",
+      "badge_mfa": "İki faktörlü doğrulama açık",
+      "badge_google": "Google",
+      "ban_until": "Hesabınız şu zamana kadar askıya alındı: {date}.",
+      "ban_permanent": "Hesabınız askıya alındı.",
+      "sanction_ban": "Askıya alma",
+      "sanction_mm_block": "Eşleştirme engeli",
+      "sanction_warning": "Uyarı",
+      "sanction_until": "{date} tarihine kadar",
+      "sanction_permanent": "süresiz",
+      "devices_current": "Bu cihaz",
+      "devices_unknown": "Adsız cihaz",
+      "devices_signed_in": "Giriş: {date}",
+      "devices_seen": "Son kullanım: {time}",
+      "devices_expires": "Sona erme: {date}",
+      "devices_revoke": "Oturumu kapat",
+      "devices_revoked": "Cihazın oturumu kapatıldı.",
+      "devices_none": "Başka cihaz yok.",
+      "signout_all_confirm": "Bu cihaz dahil bütün cihazlarda oturum kapatılsın mı?",
+      "signed_out": "Çıkış yaptınız.",
+      "signed_in": "Hoş geldiniz, {name}.",
+      "prefs_saved": "Kaydedildi.",
+      "password_changed": "Parolanız değiştirildi. Diğer cihazlarınızda oturum kapatıldı.",
+      "email_sent": "Yeni adrese bir onay bağlantısı gönderildi. Bağlantıyı açtığınızda adresiniz değişir.",
+      "email_changed": "Yeni e-posta adresiniz: {email}.",
+      "email_current": "Mevcut adres: {email}.",
+      "email_pending": "{email} adresine geçiş, onay bağlantısının açılmasını bekliyor.",
+      "export_done": "Verileriniz indirildi.",
+      "deleted": "Hesabınız silindi.",
+      "delete_confirm_label": "Onaylamak için {name} yazın",
+      "register_done": "{email} adresine bir onay bağlantısı gönderdik. Hesabınızı oluşturmak için bağlantıyı açın, ardından giriş yapın.",
+      "register_ready": "Hesabınız hazır. Giriş yapabilirsiniz.",
+      "forgot_done": "Bu adresi kullanan bir hesap varsa, yeni bir parola seçmeniz için bir bağlantı gönderildi.",
+      "resend_done": "Bu adres onay bekliyorsa, yeni bir bağlantı gönderildi.",
+      "pow_solving": "Robot karşıtı bulmaca çözülüyor…",
+      "mfa_recovery": "Kurtarma kodu",
+      "mfa_recovery_text": "Kurtarma kodlarınızdan birini girin. Her kod yalnızca bir kez çalışır.",
+      "mfa_app": "Uygulamadaki kod",
+      "mfa_app_text": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.",
+      "mfa_state_on": "Bu hesapta iki faktörlü kimlik doğrulama açık.",
+      "mfa_state_off": "Bu hesapta iki faktörlü kimlik doğrulama kapalı.",
+      "client_label": "Scacelith web sitesi ({browser})",
+      "username": "Kullanıcı adı",
+      "password_rules": "En az {min} karakter; kullanıcı adınızı veya e-posta adresinizi içermemeli.",
+      "password_note": "Diğer cihazlarınızda oturum kapatılır, bu cihazda ise oturumunuz açık kalır.",
+      "signin_label": "Giriş yap",
+      "google_link_text": "{name} hesabı bu e-posta adresini zaten kullanıyor. Bu hesabı Google'a bağlamak için parolasını bir kez girin; bundan sonra “Google ile giriş yap” yeterli olur.",
+      "auth_foot_google": "Resmî sunucuda, oyun ve bu site için tek bir hesap. Hesabınızı oyunda Google ile mi oluşturdunuz? Burada da Google ile giriş yapın."
+    },
+    "players": {
+      "since": "{date} tarihinden beri üye",
+      "games": "Oyun",
+      "rated": "Puanlı",
+      "wins": "Galibiyet",
+      "draws": "Beraberlik",
+      "losses": "Mağlubiyet",
+      "view": "{name} adlı oyuncunun profilini gör",
+      "you": "Siz",
+      "board": "Sıralama"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Oyun #{id} · {date}",
+      "preparing": "GIF hazırlanıyor…",
+      "rendering": "Sunucu GIF'i çiziyor. Uzun bir oyun birkaç saniye sürebilir…",
+      "ready": "GIF'iniz hazır. İndirme başladı.",
+      "ready_again": "GIF'iniz hazır.",
+      "signin": "Oyunlarınızın GIF'lerini oluşturmak için giriş yapın.",
+      "signin_button": "Giriş yap",
+      "missing": "Hiçbir oyun seçilmedi.",
+      "retry_in": "{time} sonra tekrar deneyebilirsiniz.",
+      "confirm": "Bu oyunun sunucu tarafından hesabınızla çizilmesi için “GIF'i oluştur” düğmesine basın.",
+      "retry_now": "Şimdi tekrar deneyebilirsiniz."
+    },
+    "home": {
+      "create_account": "Hesap oluştur",
+      "my_account": "Hesabım",
+      "my_games": "Oyunlarım",
+      "signin": "Giriş yap"
+    },
+    "trailer": {
+      "title": "Scacelith fragmanı",
+      "notice": "Bu video YouTube'da barındırılıyor. Videoyu burada oynatırsanız, IP adresinizi alan ve cihazınıza çerez veya başka izleyiciler kaydedebilen Google oynatıcısı yüklenir.",
+      "accept": "Kabul et ve oynat",
+      "google_privacy": "Google'ın gizlilik politikası"
+    }
+  },
+  "legal": {
+    "eyebrow": "Yasal",
+    "title": "Yasal bilgiler, gizlilik ve kullanım koşulları",
+    "lead": "Scacelith'i kimin yayımladığı ve barındırdığı; bu web sitesinde, oyunda ve resmî sunucuda verilerinize ne olduğu ve orada oynamanın kuralları.",
+    "updated": "Son güncelleme: 11 Ekim 2026",
+    "toc": "Bu sayfada",
+    "notice": {
+      "title": "Yasal bilgiler",
+      "publisher_label": "Yayımcı",
+      "publisher": "Scacelith, bir gerçek kişi tarafından, mesleki olmayan bir faaliyet olarak yayımlanır. Fransız hukukunun izin verdiği üzere (21 Haziran 2004 tarihli ve 2004-575 sayılı Kanun, madde 1-1 II), yayımcının kimliği burada gösterilmez; kimlik, barındırma sağlayıcısı tarafından bilinmektedir.",
+      "contact_label": "İletişim",
+      "contact": "Bu web sitesi, resmî sunucu veya verilerinizle ilgili her türlü soru için.",
+      "host_server": "Resmî oyun sunucusu ve hesap verileri",
+      "host_server_note": "Sunucular Fransa'dadır.",
+      "host_site": "Bu web sitesi ve API belgeleri (GitHub Pages)",
+      "host_domain": "Alan adı kayıt kuruluşu",
+      "licence_label": "Lisans",
+      "licence": "Oyun ve sunucusu, GNU Genel Kamu Lisansı v3 kapsamında, kaynak kodu herkese açık özgür yazılımlardır:",
+      "game_source": "oyun",
+      "server_source": "sunucu",
+      "phone": "Telefon"
+    },
+    "privacy": {
+      "title": "Gizlilik",
+      "intro": "Scacelith reklam göstermez, veri satmaz ve ziyaretçi ölçümü yapmaz. Kişisel veriler, aşağıda açıklandığı gibi yalnızca bu web sitesini ve resmî sunucuyu işletmek için kullanılır. Veri sorumlusu, yukarıdaki iletişim adresinden ulaşılabilen yayımcıdır.",
+      "site_title": "Bu web sitesinde",
+      "site_hosting": "Siteyi GitHub barındırır ve her web barındırma sağlayıcısı gibi, güvenlik amacıyla ziyaretçilerin IP adreslerini kaydeder.",
+      "github_privacy": "GitHub'ın gizlilik bildirimi",
+      "site_requests": "En yeni sürümü göstermek için tarayıcınız GitHub'ın API'sine (api.github.com), sunucunun durumunu, sıralamayı, oyuncuları ve hesabınızı göstermek için ise resmî sunucuya (caissa.scacelith.com) istek gönderir. Her ikisi de, her istekte olduğu gibi IP adresinizi alır.",
+      "site_storage": "Site çerez bırakmaz ve analiz aracı kullanmaz. Tarayıcınızda yalnızca dil seçiminizi ve giriş yaptıktan sonra oturumunuzu saklar: yalnızca geçerli sekme için ya da “Bu cihazda oturumum açık kalsın” kutusunu işaretlerseniz bu cihazda. Google ile giriş de tek kullanımlık kodlarını, kullanılana kadar geçerli sekmede saklar. Bunların hepsi sitenin çalışması için gereklidir ve oturumu ve kodları yalnızca resmî sunucu alır.",
+      "site_trailer": "Fragman bir YouTube videosudur. Siz “Kabul et ve oynat” düğmesine basana kadar YouTube'dan hiçbir şey yüklenmez; bastığınızda YouTube (Google) IP adresinizi alır ve cihazınıza çerez veya başka izleyiciler kaydedebilir. Yanıtınız hatırlanmaz: soru bir sonraki ziyaretinizde yeniden sorulur.",
+      "site_google": "Hesap sayfasındaki “Google ile giriş yap” düğmesi, siz ona basana kadar Google'dan hiçbir şey yüklemez. Bastığınızda tarayıcınız Google'ın giriş sayfasına (accounts.google.com) gider ve Google onu, sitenin resmî sunucuya ilettiği tek kullanımlık bir kodla bu siteye geri gönderir. Google, kendi politikası çerçevesinde IP adresinizi ve kendi sayfasına girdiğiniz bilgileri alır.",
+      "google_privacy": "Google'ın gizlilik politikası",
+      "game_title": "Oyunda",
+      "game_local": "Oyun, ayarlarını, yerel sonuçlarınızı ve giriş bilgilerinizi bilgisayarınızda saklar. Giriş bilgileri sistemin güvenli deposunda tutulur: Windows'ta DPAPI, macOS'ta Anahtar Zinciri, Linux'ta Secret Service anahtarlığı ya da bunlar yoksa yalnızca kullanıcı hesabınızın okuyabildiği bir dosya.",
+      "game_network": "Oyun kendiliğinden hiçbir şey göndermez: telemetri yok, güncelleme denetimi yok. Resmî sunucuya yalnızca çevrimiçi oyun sayfasını açtığınızda, Hugging Face'e yalnızca eğitmenin sesini indirdiğinizde, doğrudan oyunda ise rakibinizin bilgisayarına bağlanır; rakibiniz böylece IP adresinizi öğrenir (oyun, UPnP ile yönlendiricinizde bir port da açabilir).",
+      "account_title": "Resmî sunucudaki hesabınız",
+      "account_intro": "Oyunda veya bu web sitesinde hesap oluşturmak ve çevrimiçi oynamak, Fransa'da OVH tarafından barındırılan resmî sunucuya aşağıdaki verileri gönderir:",
+      "data_account": "<strong>Hesap:</strong> kullanıcı adı, e-posta adresi, parola (yalnızca Argon2id karması olarak saklanır), iki adımlı doğrulama gizli anahtarı (şifrelenmiş) ve kurtarma kodları (karma olarak), kayıt tarihi ve son giriş tarihi.",
+      "data_google": "<strong>Google ile giriş:</strong> Google, Google hesabınızın tanımlayıcısını, e-posta adresinizi ve adınızı gönderir. Sunucu tanımlayıcıyı ve adresi saklar, adı ise yalnızca bir kullanıcı adı önermek için kullanır.",
+      "data_sessions": "<strong>Giriş yapılmış cihazlar:</strong> her giriş için cihazın adı (oyunun sürümü ve sistem, örneğin “Scacelith/1.0.0 win64”, bu web sitesi için ise tarayıcı ve sistem), IP adresi ve kullanım tarihleri.",
+      "data_games": "<strong>Oyunlar ve puanlar:</strong> her çevrimiçi oyun (oyuncular, hamleler, her hamlede harcanan süre, sonuç, tarihler) ve puanlarınız. Oyun sırasında başınızın ve elinizin hareketleri canlı olarak rakibinize iletilir ve hiçbir zaman saklanmaz.",
+      "data_security": "<strong>Güvenlik kaydı:</strong> girişler, başarısız denemeler ve hesaptaki değişiklikler, IP adresiyle birlikte.",
+      "data_fairplay": "<strong>Adil oyun:</strong> sizin yaptığınız ya da sizinle ilgili yapılan bildirimler, yorumlarıyla birlikte; yarıda bırakılan ve kaçırılan oyunlar; yaptırımlar; ve sahte ya da imkânsız hamlelerden Stockfish motorunun istatistiklerine kadar oyunlar üzerinde yapılan denetimler.",
+      "basis_title": "Neden ve hangi hukuki dayanakla",
+      "basis_contract": "Hesabınızı ve çevrimiçi oyunu işletmek (giriş, eşleşmeler, puanlar, oyun kayıtları, hizmetin gönderdiği e-postalar): kaydolduğunuz hizmet (GDPR madde 6(1)(b)).",
+      "basis_security": "Hesapları ve sunucuyu korumak, oyunların adil kalmasını sağlamak (güvenlik kaydı, IP adresleri, adil oyun denetimleri, yaptırımlar): yayımcının ve oyuncuların meşru menfaati (GDPR madde 6(1)(f)).",
+      "basis_trailer": "Fragmanı YouTube'dan oynatmak: düğmeyle verdiğiniz rıza (GDPR madde 6(1)(a)).",
+      "public_title": "Herkesin görebileceği bilgiler",
+      "public": "Kullanıcı adınız, kayıt tarihiniz, puanlarınız ve her hamlesiyle birlikte oyunlarınızın tam listesi herkese açıktır: bu web sitesinde, sunucunun API'si üzerinden ve her oyunun PGN'sinde. E-posta adresiniz, cihazlarınız, girişleriniz, yaptırımlarınız ve adil oyun kayıtlarınız hiçbir zaman gösterilmez. Doğrudan meydan okumaları reddedebilirsiniz, ancak oyunlar gizlenemez.",
+      "auto_title": "Otomatik kararlar",
+      "auto": "Oyun protokolünün bazı ihlalleri, örneğin sahte bir mesaj ya da pozisyonda imkânsız bir hamle, hilenin kesin kanıtıdır: bu durumda sunucu oyunu hükmen kaybettirir, hesabı 24 saat süreyle yasaklar, sıralamadan çıkarır ve son 60 gün içinde rakiplerinin bu hesaba karşı kaybettiği puanları geri verir. 24 saat içinde yarıda bırakılan, iptal edilen veya kaçırılan üç oyun, puanlı eşleştirmeyi 15 dakika, sonrasında daha uzun süre durdurur. Motor istatistikleri tek başına hiçbir zaman yaptırıma yol açmaz: kararı bir insan verir. Herhangi bir kararın yeniden incelenmesini iletişim adresinden isteyebilirsiniz.",
+      "recipients_title": "Verilerinizi kimler alır",
+      "recipient_ovh": "OVH SAS, sunucuyu ve verilerini Fransa'da barındırır.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) sunucunun e-postalarını gönderir: adresinizi, kullanıcı adınızı ve iletiyi alır.",
+      "recipient_google": "Google, Google ile giriş yapmayı seçtiğinizde tarayıcınızın ona gönderdiklerini kendi gizlilik politikası çerçevesinde alır.",
+      "recipient_staff": "Sunucunun yöneticisi ve moderatörleri, hizmeti işletmek için hesap ve adil oyun verilerini görür.",
+      "recipient_players": "Diğer oyuncular herkese açık olanı görür; rakibiniz ise oyun sırasında hamlelerinizi ve hareketlerinizi görür.",
+      "recipient_none": "Başka hiç kimse: hiçbir veri satılmaz, kiralanmaz ya da reklam için kullanılmaz.",
+      "transfers": "Hesap verileri Fransa'da kalır. GitHub, Google ve Porkbun (iletişim adresine gönderilen iletileri yönlendirir) Amerika Birleşik Devletleri'nde yerleşiktir: aldıkları veriler, kendi politikalarına ve Avrupa Birliği dışına aktarımlar için sağladıkları güvencelere tabidir.",
+      "retention_title": "Ne kadar süre saklanır",
+      "ret_account": "<strong>Hesap:</strong> siz silene kadar. Adresi hiç onaylanmayan bir kayıt 24 saat sonra silinir.",
+      "ret_sessions": "<strong>Giriş yapılmış cihazlar:</strong> çıkış yapana kadar; 30 gün kullanılmayan cihazlar silinir ve hiçbir cihaz 90 günden uzun saklanmaz.",
+      "ret_ip": "<strong>IP adresleri:</strong> 30 gün sonra silinir. Sunucunun günlükleri yalnızca kısaltılmış adresleri tutar.",
+      "ret_security": "<strong>Güvenlik kaydı:</strong> 90 gün.",
+      "ret_conduct": "<strong>Yarıda bırakılan ve kaçırılan oyunlar:</strong> 30 gün.",
+      "ret_games": "<strong>Oyunlar ve puanlar:</strong> sunucu, aynı zamanda rakiplerinizin de kaydı olan oyun kayıtlarını sakladığı sürece. Hesabınız silindiğinde bu kayıtlardaki adınızın yerine “deleted#” ve bir numara konur.",
+      "ret_fairplay": "<strong>Yaptırımlar, bildirimler ve adil oyun sonuçları:</strong> yasaklanan oyuncuların kolayca geri dönememesi ve diğer oyuncuların korunmaya devam etmesi için saklanır. Hesabınız silindiğinde bunlar yalnızca hesabın numarasına bağlı kalır.",
+      "ret_backups": "<strong>Yedekler:</strong> silinen veriler, sunucunun yedek kopyasında, bu kopya yenisiyle değiştirilene kadar kısa bir süre kalabilir.",
+      "ret_contact": "<strong>İletişim adresine gönderilen iletiler:</strong> yanıtlamak için gerektiği sürece.",
+      "rights_title": "Haklarınız",
+      "rights": "Verilerinize erişebilir, onları düzeltebilir, silebilir ve dışa aktarabilir, kullanımlarını kısıtlayabilir ve kullanımlarına itiraz edebilirsiniz (GDPR madde 15 ila 21).",
+      "rights_self": "Bunların çoğunu oyunda ya da bu web sitesinin Hesap sayfasında, kendi hesabınızdan yapabilirsiniz: hesap verilerinizi bir JSON dosyası olarak indirmek, e-posta adresinizi veya parolanızı değiştirmek, diğer cihazlarda oturumu kapatmak ya da hesabı hemen silmek.",
+      "rights_google": "Google ile oluşturulan bir hesabın parolası yoktur: hesabı dışa aktarmak veya silmek için önce “Parolanızı mı unuttunuz?” ile ona bir parola verin.",
+      "rights_mail": "Diğer her şey için, dışa aktarımda bulunmayan veriler de dahil (adil oyun denetimleri, sizinle ilgili bildirimler), iletişim adresine yazın. Bir ay içinde yanıt alırsınız.",
+      "rights_cnil": "Haklarınıza uyulmadığını düşünüyorsanız CNIL'e (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) ya da ülkenizin veri koruma otoritesine şikâyette bulunabilirsiniz.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Kullanım koşulları",
+      "intro": "Bu koşullar resmî sunucu (caissa.scacelith.com) ve bu web sitesinin hesap sayfaları için geçerlidir. Resmî sunucuda hesap oluşturmak veya oynamak, bu koşulları kabul etmek anlamına gelir.",
+      "service": "<strong>Ücretsiz bir hizmet.</strong> Oyun ücretsiz bir özgür yazılımdır. Resmî sunucu ücretsiz ve olduğu gibi, erişilebilirlik garantisi olmadan sunulur: değişebilir, bir süre durabilir ya da kapanabilir.",
+      "account": "<strong>Hesabınız.</strong> Hesabınızla yapılanlardan ve parolasını gizli tutmaktan siz sorumlusunuz. Başka birinin hesabınızı kullandığını düşünüyorsanız hemen iletişim adresine yazın.",
+      "username": "<strong>Kullanıcı adınız</strong> herkese açıktır: hakaret ya da nefret içermemeli, başkasının kimliğine bürünmemeli ve kimsenin kişisel verilerini açığa çıkarmamalıdır.",
+      "fair": "<strong>Adil oyun.</strong> Puanlı bir oyun sırasında satranç motorundan, başka bir kişiden ya da başka herhangi bir araçtan yardım almak yasaktır. Değiştirilmiş oyun istemcisi, sahte mesajlar ve sunucuyu kasıtlı olarak aşırı yüklemek de yasaktır.",
+      "conduct": "<strong>Oyunlarınızı bitirin.</strong> 24 saat içinde üç kez oyunu yarıda bırakmak, iptal etmek ya da eşleştirildiğiniz oyunları kaçırmak, puanlı eşleştirmeyi bir süreliğine durdurur.",
+      "reports": "<strong>Bildirimler</strong> iyi niyetle yapılmalıdır. Bir oyuncuyu ya da hakaret içeren bir kullanıcı adı gibi yasa dışı bir içeriği bildirmek için bir oyunun bildirme düğmesini kullanın veya iletişim adresine yazın.",
+      "sanctions": "<strong>Yaptırımlar.</strong> Bu kuralları çiğnemek hükmen yenilgiye, uyarıya, yasaklamaya ve sıralamadan çıkarılmaya yol açabilir; hileciye karşı kaybedilen puanlar rakiplerine geri verilir. Yalnızca hilenin kesin kanıtı otomatik olarak yaptırıma bağlanır; diğer her şeye bir insan karar verir. Bir yaptırıma iletişim adresinden itiraz edebilirsiniz.",
+      "liability": "<strong>Sorumluluk.</strong> Yasanın izin verdiği sınırlar içinde yayımcı, hizmetteki kesintilerden veya oyunların, puanların ya da verilerin kaybından sorumlu değildir.",
+      "end": "<strong>Sona erme.</strong> Hesabınızı istediğiniz zaman silebilirsiniz. Bu koşulları ihlal eden bir hesap yasaklanabilir.",
+      "changes": "<strong>Değişiklikler.</strong> Bu koşullar değişebilir; bu sayfanın üstündeki tarih geçerli sürümü gösterir ve bir değişiklikten sonra oynamaya devam etmek, değişikliği kabul etmek anlamına gelir.",
+      "law": "<strong>Uygulanacak hukuk.</strong> Bu koşullar Fransız hukukuna tabidir. Bir anlaşmazlık durumunda, birlikte bir çözüm bulmak için önce iletişim adresine yazın."
+    },
+    "version_note": "Bu sayfa birden fazla dilde mevcuttur; aralarında farklılık olması durumunda Fransızca sürüm esas alınır."
+  }
+}
