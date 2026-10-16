@@ -285,6 +285,19 @@ TEST(coach_catalog_pieces_squares_numbers) {
     CHECK_EQ(written(c, lit), std::string("Next: anything else."));
 }
 
+TEST(coach_catalog_greek_question_mark_starts_a_sentence) {
+    // Greek writes its question mark as ';' (U+037E is normalised to it): a piece after it starts a
+    // sentence. In other languages ';' is a semicolon, so the piece after it stays lowercase.
+    Catalog c;
+    testCatalog(c, "q = Why; {my} attacks.\n");
+    c.addFile("el", "common", realFile("el", "common"));
+    c.addFile("el", "test", "q = Γιατί; {my} επιτίθεται.\n");
+    Line l = line("q");
+    l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false));
+    CHECK_EQ(written(c, l, "el"), std::string("Γιατί; Ο πύργος μου επιτίθεται."));
+    CHECK_EQ(written(c, l), std::string("Why; my rook attacks."));
+}
+
 TEST(coach_catalog_moves_and_lines) {
     Catalog c;
     testCatalog(c, "m = Play {move}.\nl = The line: {line}.\nw = Like {move:letters}.\n"
