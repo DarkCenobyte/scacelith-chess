@@ -192,7 +192,7 @@ engine.no_limit = Fără limită
 # Written in figures: "1 mie / 2 mii / 20 de mii" would need a plural this key does not have.
 engine.thousand = {0}.000
 engine.million = {0} mil.
-engine.dynamic_elo = Elo dinamic în funcție de timp
+engine.dynamic_elo = Elo dinamic după timp
 engine.dynamic_elo.help = Ca un jucător uman, Stockfish joacă mai slab când îi rămâne puțin timp pe ceas: puțin mai slab în ultimul minut (mai devreme în ritm rapid și blitz), mult mai slab în criză de timp. Doar în partidele cu ceas.
 # New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
 # Realistic thinking time on (realistic) or off (instant).
@@ -652,7 +652,7 @@ online.mfa_setup.scan = 1. Scanați acest cod cu o aplicație de autentificare s
 online.mfa_setup.enter = 2. Introduceți codul de 6 cifre afișat de aplicație:
 online.mfa_setup.enable = Activare
 online.mfa_setup.done = Autentificarea în doi pași este activată.
-online.mfa_off.title = DEZACTIVAREA AUTENTIFICĂRII ÎN DOI PAȘI
+online.mfa_off.title = DEZACTIVARE 2FA
 online.mfa_off.lead = Introduceți parola și un cod din aplicație (sau un cod de recuperare).
 online.mfa_off.button = Dezactivare
 online.mfa.off_done = Autentificarea în doi pași este dezactivată.

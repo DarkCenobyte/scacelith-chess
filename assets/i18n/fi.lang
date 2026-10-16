@@ -645,7 +645,7 @@ online.mfa_setup.scan = 1. Skannaa tämä koodi todennussovelluksella tai kirjoi
 online.mfa_setup.enter = 2. Anna sovelluksen näyttämä 6-numeroinen koodi:
 online.mfa_setup.enable = Ota käyttöön
 online.mfa_setup.done = Kaksivaiheinen vahvistus on käytössä.
-online.mfa_off.title = POISTA KAKSIVAIHEINEN VAHVISTUS
+online.mfa_off.title = POISTA 2FA
 online.mfa_off.lead = Anna salasanasi ja sovelluksesi koodi (tai palautuskoodi).
 online.mfa_off.button = Poista käytöstä
 online.mfa.off_done = Kaksivaiheinen vahvistus on poistettu käytöstä.
@@ -1269,7 +1269,7 @@ coach.download.error.network = Palvelimiin ei saatu yhteyttä. Tarkista internet
 coach.download.error.disk = Tiedostoja ei voitu kirjoittaa kansioon {0}. Tarkista vapaa levytila ja yritä uudelleen.
 # {0} = a short technical code ("http 503", "hash")
 coach.download.error.server = Palvelimet lähettivät odottamattoman vastauksen ({0}). Yritä myöhemmin uudelleen.
-coach.download.retry = Yritä uudelleen
+coach.download.retry = Yritä taas
 coach.download.close = Sulje
 # Notices
 coach.download.done = Valmentajan ääni on asennettu.

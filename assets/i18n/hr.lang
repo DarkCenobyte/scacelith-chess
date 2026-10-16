@@ -195,7 +195,7 @@ engine.no_limit = Isključeno
 # Abbreviations (tis. = tisuća, mil. = milijun): one form fits every count.
 engine.thousand = {0} tis.
 engine.million = {0} mil.
-engine.dynamic_elo = Dinamični Elo prema vremenu
+engine.dynamic_elo = Elo ovisan o vremenu
 engine.dynamic_elo.help = Poput ljudskog igrača, Stockfish igra slabije kad mu na satu ponestaje vremena: malo slabije u posljednjoj minuti (u ubrzanim i brzopoteznim partijama i ranije), mnogo slabije u vremenskoj stisci. Samo u partijama sa satom.
 # New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
 # Realistic thinking time on (realistic) or off (instant).
@@ -581,7 +581,7 @@ online.signin.google = Nastavi s Googleom
 online.signin.register = Izradi račun
 online.signin.forgot = Zaboravljena lozinka?
 # Two-factor: "dvofaktorska provjera" everywhere (headings, buttons, messages).
-online.mfa.title = KOD ZA DVOFAKTORSKU PROVJERU
+online.mfa.title = DVOFAKTORSKI KOD
 online.mfa.lead = Unesite šesteroznamenkasti kod koji prikazuje vaša aplikacija za autentifikaciju ili jedan od svojih kodova za oporavak.
 online.mfa.verify = Potvrdi
 online.register.title = IZRADA RAČUNA
@@ -662,7 +662,7 @@ online.mfa_setup.scan = 1. Skenirajte ovaj kod aplikacijom za autentifikaciju il
 online.mfa_setup.enter = 2. Unesite šesteroznamenkasti kod koji prikazuje aplikacija:
 online.mfa_setup.enable = Uključi
 online.mfa_setup.done = Dvofaktorska provjera je uključena.
-online.mfa_off.title = ISKLJUČIVANJE DVOFAKTORSKE PROVJERE
+online.mfa_off.title = ISKLJUČIVANJE 2FA
 online.mfa_off.lead = Unesite lozinku i kod iz aplikacije (ili kod za oporavak).
 online.mfa_off.button = Isključi
 online.mfa.off_done = Dvofaktorska provjera je isključena.
@@ -1290,7 +1290,7 @@ coach.download.error.network = Poslužitelji nisu dostupni. Provjerite internets
 coach.download.error.disk = Datoteke nije moguće zapisati u {0}. Provjerite slobodan prostor i pokušajte ponovno.
 # {0} = a short technical code ("http 503", "hash")
 coach.download.error.server = Poslužitelji su poslali neočekivan odgovor ({0}). Pokušajte ponovno kasnije.
-coach.download.retry = Pokušaj ponovno
+coach.download.retry = Ponovi
 coach.download.close = Zatvori
 # Notices
 coach.download.done = Trenerov glas je instaliran.

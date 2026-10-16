@@ -190,7 +190,7 @@ engine.no_limit = Nessun limite
 # Italian: digit groups instead of "mila" / "milioni" (1 would need "mille", "un milione").
 engine.thousand = {0}.000
 engine.million = {0}.000.000
-engine.dynamic_elo = Elo dinamico in base al tempo
+engine.dynamic_elo = Elo dinamico col tempo
 engine.dynamic_elo.help = Come un giocatore umano, Stockfish gioca peggio quando il suo tempo sta per finire: un po’ nell’ultimo minuto (prima nelle partite rapid e blitz), molto peggio in crisi di tempo. Solo partite con l’orologio.
 # New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
 # Realistic thinking time on (realistic) or off (instant).
@@ -730,7 +730,7 @@ online.confirm.resign.text = Vuoi abbandonare questa partita? La vittoria va al 
 online.confirm.leave.text = Uscire equivale ad abbandonare questa partita: la vittoria va al tuo avversario.
 online.confirm.leave.ok = Abbandona ed esci
 online.confirm.leave_abort.text = Vuoi uscire prima della tua prima mossa? La partita viene annullata e non conta.
-online.confirm.leave_abort.ok = Annulla la partita ed esci
+online.confirm.leave_abort.ok = Annulla ed esci
 online.draw.card_title = PROPOSTA DI PATTA
 online.draw.card_text = Il tuo avversario propone la patta.
 online.draw.accept = Accetta

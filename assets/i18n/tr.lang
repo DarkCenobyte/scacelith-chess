@@ -655,7 +655,7 @@ online.mfa_setup.scan = 1. Bu kodu bir kimlik doğrulama uygulamasıyla tarayın
 online.mfa_setup.enter = 2. Uygulamanın gösterdiği 6 haneli kodu girin:
 online.mfa_setup.enable = Aç
 online.mfa_setup.done = İki faktörlü kimlik doğrulama açık.
-online.mfa_off.title = İKİ FAKTÖRLÜ DOĞRULAMAYI KAPAT
+online.mfa_off.title = 2FA'YI KAPAT
 online.mfa_off.lead = Parolanızı ve uygulamanızdan bir kod (ya da bir kurtarma kodu) girin.
 online.mfa_off.button = Kapat
 online.mfa.off_done = İki faktörlü kimlik doğrulama kapalı.
@@ -1220,7 +1220,7 @@ coach.hint.title = İPUCU?
 coach.hint.text = Eğitmen size bir ipucu öneriyor.
 coach.hint.hint = H ipucunu verir. Bir taşa dokunursanız aramaya devam edersiniz.
 coach.hint.accept = İpucu
-coach.hint.decline = Hayır, teşekkürler
+coach.hint.decline = Hayır, sağ ol
 coach.hint.key = İpucu
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------

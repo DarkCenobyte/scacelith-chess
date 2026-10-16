@@ -643,7 +643,7 @@ online.mfa_setup.scan = 1. Scan deze code met een authenticator-app, of typ deze
 online.mfa_setup.enter = 2. Voer de 6-cijferige code in die de app toont:
 online.mfa_setup.enable = Aanzetten
 online.mfa_setup.done = Tweestapsverificatie staat aan.
-online.mfa_off.title = TWEESTAPSVERIFICATIE UITZETTEN
+online.mfa_off.title = 2FA UITZETTEN
 online.mfa_off.lead = Voer je wachtwoord in en een code uit je app (of een herstelcode).
 online.mfa_off.button = Uitzetten
 online.mfa.off_done = Tweestapsverificatie staat uit.
@@ -925,7 +925,7 @@ online.delete.title = ACCOUNT VERWIJDEREN
 online.delete.warning = Je account wordt van deze server verwijderd: je e-mailadres, wachtwoord, tweestapsverificatie en apparaten worden gewist en je kunt niet meer inloggen. Dit kan niet ongedaan worden gemaakt.
 online.delete.games = Je partijen en ratings blijven op de server staan onder de anonieme naam {0}.
 online.delete.confirm_name = Voer ter bevestiging je gebruikersnaam en je wachtwoord in.
-online.delete.button = Mijn account verwijderen
+online.delete.button = Account verwijderen
 online.delete.done = Je account is verwijderd.
 
 # ---- Direct match (no server) ----------------------------------------------------------------------
@@ -1269,7 +1269,7 @@ coach.download.error.network = De servers zijn niet bereikbaar. Controleer je in
 coach.download.error.disk = De bestanden konden niet worden geschreven in {0}. Controleer de vrije ruimte en probeer het opnieuw.
 # {0} = a short technical code ("http 503", "hash")
 coach.download.error.server = De servers gaven een onverwacht antwoord ({0}). Probeer het later opnieuw.
-coach.download.retry = Opnieuw proberen
+coach.download.retry = Opnieuw
 coach.download.close = Sluiten
 # Notices
 coach.download.done = De stem van de coach is geïnstalleerd.

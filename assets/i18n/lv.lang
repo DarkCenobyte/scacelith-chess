@@ -196,7 +196,7 @@ engine.nodes = Mezglu limits
 engine.no_limit = Neierobežots
 engine.thousand = {0} tūkst.
 engine.million = {0} milj.
-engine.dynamic_elo = Dinamisks Elo atkarībā no laika
+engine.dynamic_elo = Dinamisks Elo pēc laika
 engine.dynamic_elo.help = Tāpat kā cilvēks, Stockfish spēlē vājāk, kad pulkstenī atliek maz laika: nedaudz vājāk pēdējā minūtē (ātrspēlē un zibspēlē agrāk), daudz vājāk laika trūkumā. Tikai partijās ar pulksteni.
 # New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
 # Realistic thinking time on (realistic) or off (instant).
@@ -658,7 +658,7 @@ online.mfa_setup.scan = 1. Noskenējiet šo kodu ar autentifikācijas lietotni v
 online.mfa_setup.enter = 2. Ievadiet 6 ciparu kodu, ko rāda lietotne:
 online.mfa_setup.enable = Ieslēgt
 online.mfa_setup.done = Divu faktoru autentifikācija ir ieslēgta.
-online.mfa_off.title = IZSLĒGT DIVU FAKTORU AUTENTIFIKĀCIJU
+online.mfa_off.title = IZSLĒGT 2FA
 online.mfa_off.lead = Ievadiet paroli un kodu no lietotnes (vai atkopšanas kodu).
 online.mfa_off.button = Izslēgt
 online.mfa.off_done = Divu faktoru autentifikācija ir izslēgta.
@@ -1285,7 +1285,7 @@ coach.download.error.network = Serverus nevarēja sasniegt. Lūdzu, pārbaudiet 
 coach.download.error.disk = Failus nevarēja ierakstīt mapē {0}. Lūdzu, pārbaudiet brīvo vietu un mēģiniet vēlreiz.
 # {0} = a short technical code ("http 503", "hash")
 coach.download.error.server = Serveri nosūtīja negaidītu atbildi ({0}). Lūdzu, mēģiniet vēlreiz vēlāk.
-coach.download.retry = Mēģināt vēlreiz
+coach.download.retry = Atkārtot
 coach.download.close = Aizvērt
 # Notices
 coach.download.done = Trenera balss ir instalēta.
@@ -1374,7 +1374,7 @@ analysis.menu.entry = Analīze
 analysis.menu.title = ANALĪZE
 analysis.menu.analyse = Analizēt
 analysis.menu.paste = Ielīmēt PGN
-analysis.menu.online = Manas tiešsaistes partijas
+analysis.menu.online = Tiešsaistes partijas
 analysis.menu.folder = Ievietojiet PGN failus šajā mapē, lai tos analizētu: {0}
 analysis.menu.empty.title = Vēl nav saglabātu partiju
 analysis.menu.empty.text = Jūsu partijas parādās šeit, tiklīdz tās ir beigušās, tāpat arī PGN faili, kas ievietoti zemāk norādītajā mapē. Varat arī ielīmēt partiju, kas nokopēta kā PGN teksts.
