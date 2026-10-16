@@ -236,3 +236,39 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   short lines and interjections such as "Hum" dropped, eponyms unwritable), plus the reduced final e of
   Brazilian imperatives and subjunctives written as other forms ("Pense" as "pensa", "avance" as "avança", "Tente" as
   "sente" or "tem"), "peão" as "pião" or "pão", "doze" as "dose", "Este é" as "Eu sou".
+
+## Danish
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| remis | with the s: "remiss" (probe), heard "ramis", "remiss", "remise" 9 times in 9 | `remi` (respell.remis): no s in 9 ("Remy", "rem i") |
+| en passant | "en pasant", with the t (heard "pasant", "patient") | `passang` (respell.passant): heard "passang", "passering" 8 times in 9; "en" stays (the article: "ang passang" heard no better, 6 in 9 against 8) |
+| fianchetto, fianchettoen, fianchetterer, ... | "fiantjetto" (probe), heard "fjernshadow", "fjernsjættere" | `fianketto`, `fianketterer`... (respell.*, one per form): heard "fianchetto" 2 times in 6 against 0 |
+| Grand Prix | the x said: "grand priks" (probe), heard "pricks" | `pri` (respell.prix): "Grand Prix" 2 in 3 against 0 |
+| epauletmat | the "au" said, heard "i Paulemat" | `epoletmat` (respell): "epolemat", "jepolet", no "au" in 6 |
+| ratede | a vowel too many, heard "rejattede" 4 times in 6 | `rejtede` (respell): "rejtede" 4 in 6 |
+| elleve | three syllables, as written (probe); never heard as 11 in 6 | `elve` (respell): 11 three times in 6 |
+| 21, 31 ... 91; 22, 32 ... 92 | "enog", "toog" run together: 71 heard "81", "endnu halvfjerds"; 92 "2,5" | `en-og-halvfjerds` (number.X1.spoken), `to-og-halvfems` (respell.toog*): 71 three in 3 against 0, 32 two in 3 against 0, 92 five in 6 against 2; 52 the same either way, 86 worse with hyphens, so other units stay joined |
+
+- Parakeet could not do Danish: its language detection wrote English or German (or nothing) for 592 of the 750
+  lines of the first round trip. Redone with Whisper medium set to `da`: 219 lines covering 1,120 words (seed
+  0; the second chunk stopped at the time limit), then 3 seeds on 103 lines (the reviewers' list, file
+  letters, numbers, eponyms, every fix), and probes. Even then 35% of the words come back wrong: the voice's
+  Danish is soft and the recogniser guesses.
+- Checked and fine: rating (heard "rating" 5 in 6, once "raiding"; `rejting` heard worse), Elo, `æl` for the L
+  (heard "el" 3 in 3), `ét` (long e, probe), `Én` starting a sentence, be, se (B5, C3 every time in a
+  sentence), hå (H3, H5 mostly), dé (heard "de", the letter's name), Wow, Ups, Hmm (said, probe), 13, 17, 19,
+  86, 103, "ét komma fem", the v and d of halvtreds, halvfjerds, halvfems silent (probe), sort ("sårt"),
+  Philidors ("Filidors"), Caro-Kann, Tarrasch ("tarrasj"), Nimzowitsch ("nimzovitsj"), Sämisch, Schliemann
+  ("sjliman"), Morphy, Fischer, Ponziani, Horwitz, Winawer, Trompowsky, Stonewall (heard right), Bongcloud,
+  Halloween, Breyer, Colle, Torre, Grünfeld ("grynfeld"), Aljechins, Fajarowicz, Marshall.
+- Left as is: the file letter é is heard "E" about half the time, "i" otherwise; `ee` and `eh` did no better
+  (`eh` heard as "F"). The letter a is heard as A once in about 20 ("at", "af", "R", or lost): `ah` and `á`
+  did no better; the recogniser takes Danish A and R for each other. "ge to" was heard "K2" 3 times in 3 ("ge
+  tre" is G3). "Fair nok": `Fær nok` heard worse (0 in 6 against 1). Miles is read "mi-les" (probe), but
+  `Majls` was heard the same. "remisen", "remisagtige", "remisvåben" keep the s (`remien` heard worse). Close
+  calls, left: Giuoco ("gjuoko"), Owens, Evans, Birds, Parham (read the Danish way), Zukertort ("sukertort"),
+  Scheveningen ("sh"), Av; the 't of Van 't Kruijs is swallowed.
+- Recogniser habits: hvid as "ved" (the voice says "vid": probe), bonden as "bånden", mat as "mad", ad as
+  "af", felter as "fælder", én and ét written "en", "et"; it drops "Hmm"; it often writes the numbers from 50
+  up as pieces ("enoghalvfjerds" heard "en halv fjerts") though the v and d are silent as they should be (probe).
