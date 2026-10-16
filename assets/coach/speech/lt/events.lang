@@ -14,7 +14,7 @@ event.greet.l2.2 = Sveikinu! Vystyk figūras ir saugok savo karalių. Padėsiu t
 event.greet.l2.3 = Vėl prie lentos! Atidžiai sek šakutes ir surišimus: jais laimimos partijos.
 event.greet.l3 = Labas! Sužaiskime tikrą partiją. Komentuosiu tavo planus ir didesnes klaidas.
 event.greet.l3.2 = Sveikinu! Pagalvok apie planą savo figūroms. Pasakysiu, kai ėjimu ką nors praleisi.
-event.greet.l3.3 = Žaiskime! Atkreipsiu dėmesį į vienintelius ėjimus ir į klaidingus ėjimus.
+event.greet.l3.3 = Žaiskime! Atkreipsiu tavo dėmesį į vienintelius ėjimus ir į klaidingus ėjimus.
 event.greet.l4 = Labas! Šį kartą pateiksiu įvertinimus ir parodysiu geresnius ėjimus kandidatus.
 event.greet.l4.2 = Žaiskime. Po klaidos pasakysiu, kas būtų buvę tiksliau.
 event.greet.l4.3 = Sužaidžiame kaip klube? Komentuosiu, kai pasikeis įvertinimas.
@@ -35,11 +35,11 @@ event.colour.black.2 = Šį kartą tu žaidi juodosiomis: pirmas einu aš.
 # The level names (coach.level.<n>.name) chosen for assets/i18n/lt.lang: Pirmieji žingsniai,
 # Pradedantysis, Mėgėjas, Klubo žaidėjas, Stiprus klubo žaidėjas, Ekspertas.
 event.level.l1 = Pirmieji žingsniai: žaidžiu švelniai ir kiekvieną klaidą paaiškinu paprastais žodžiais.
-event.level.l2 = Pradedantysis: žaidžiu kiek stipriau ir įvardiju paprastą taktiką, pavyzdžiui, šakutes ir surišimus.
+event.level.l2 = Pradedantysis: žaidžiu kiek stipriau ir įvardiju paprastus taktinius motyvus, pavyzdžiui, šakutes ir surišimus.
 event.level.l3 = Mėgėjas: kalbu apie planus ir pėstininkų struktūrą, rodau trumpus variantus.
 event.level.l4 = Klubo žaidėjas: įvertinimus pateikiu pėstininkais ir siūlau ėjimus kandidatus.
 event.level.l5 = Stiprus klubo žaidėjas: trumpi komentarai, o kai svarbu, ir ilgesni variantai.
-event.level.l6 = Ekspertas: žaidžiu visa jėga ir komentuoju tik kritinius momentus.
+event.level.l6 = Ekspertas: žaidžiu iš visų jėgų ir komentuoju tik kritinius momentus.
 
 # ---- Turn-taking -------------------------------------------------------------------------------------
 # After an explanation or a demonstration, when the player may move again.
@@ -50,7 +50,7 @@ event.your_move.3 = Dabar tu.
 event.take_time = Neskubėk.
 event.take_time.2 = Skubėti nėra kur: mūsų partijose laikrodžio nėra.
 # Short filler while the coach is still looking at the position.
-event.filler = Hmm.
+event.filler = Hm.
 event.filler.2 = Pažiūrėkime.
 event.filler.3 = Leisk man pažiūrėti.
 
@@ -93,7 +93,7 @@ event.end.win = Gerai sužaista. Sveikinu!
 event.end.win.2 = Pelnyta pergalė. Šaunu!
 event.end.win.3 = Sveikinu: įveikei mane sąžiningai.
 event.end.loss = Gera partija. Kitą kartą atsigriebsi.
-event.end.loss.2 = Ačiū už partiją. Kiekvienas pralaimėjimas ko nors išmoko.
+event.end.loss.2 = Ačiū už partiją. Kiekvienas pralaimėjimas ko nors pamoko.
 event.end.loss.3 = Gera kova. Pažiūrėkime, kas nutiko.
 event.end.draw = Lygiosios. Gera partija!
 event.end.draw.2 = Šį kartą nugalėtojo nėra. Gerai pakovojome.

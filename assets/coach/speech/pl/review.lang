@@ -404,3 +404,242 @@ ex.stalemate_trick.b5 = {move} dopuszcza pata: {line}; {my} jest w potrzasku.
 ex.stalemate_trick.b5.2 = Pułapka patowa: {line} i {my} nie ma ruchów.
 ex.stalemate_trick.b6 = {line}, pat: {my} w potrzasku.
 ex.stalemate_trick.b6.2 = Pat po {line}; {my} bez ruchu.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} może pójść na {sq} i zaatakować {t1:acc} i {t2:acc}.
+ex.fork.b1.2 = {my} idzie na {sq} i atakuje dwie bierki: {t1:acc} i {t2:acc}.
+ex.fork.b1.3 = Patrz na {my:acc}: z pola {sq} atakuje naraz {t1:acc} i {t2:acc}.
+ex.fork.b2 = Widełki! {my} na {sq} atakuje naraz {t1:acc} i {t2:acc}.
+ex.fork.b2.2 = Po twoim ruchu {my} może z pola {sq} zrobić widełki na {t1:acc} i {t2:acc}.
+ex.fork.b2.3 = {my} idzie na {sq}: podwójny atak na {t1:acc} i {t2:acc}.
+ex.fork.b3 = {move} pozwala na {reply} z widełkami na {t1:acc} i {t2:acc}.
+ex.fork.b3.2 = Po {reply} atakuję jednocześnie {t1:acc} i {t2:acc}.
+ex.fork.b3.3 = {reply} to widełki: {t1} i {t2} są pod atakiem.
+ex.fork.b4 = {reply} daje widełki na {t1:acc} i {t2:acc}; po {line} tracisz {pts:point_acc}.
+ex.fork.b4.2 = {reply} uderza naraz w {t1:acc} i {t2:acc}.
+ex.fork.b4.3 = {move} pozwala na widełki {reply} na {t1:acc} i {t2:acc}.
+ex.fork.b5 = {move} nadziewa się na widełki {reply}: {t1} i {t2}.
+ex.fork.b5.2 = {reply}: widełki na {t1:acc} i {t2:acc}.
+ex.fork.b5.3 = Po {reply} pod atakiem są {t1} i {t2}.
+ex.fork.b6 = {reply} daje widełki.
+ex.fork.b6.2 = {move} pozwala na {reply}, widełki.
+ex.fork.b6.3 = {reply}, widełki.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Uratujesz tylko jedną bierkę: {t1:acc} albo {t2:acc}.
+ex.fork.tail.b1.2 = Teraz atakuję naraz dwie bierki: {t1:acc} i {t2:acc}. To są widełki!
+ex.fork.tail.b1.3 = Widzisz? {t1} i {t2} są pod atakiem. Jedna z tych bierek padnie.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} musi uciec spod szacha, więc biorę {t1:acc}.
+ex.fork.tail_king.2 = Szach! {your} musi się ruszyć i {t1} pada.
+ex.fork.more.b3 = Przed ruchem sprawdź pole {sq}: stamtąd {my} robi widełki.
+ex.fork.more.b3.2 = Pilnuj pola {sq}. Stamtąd {my} daje widełki.
+ex.fork.tip.knight = Uważaj na skoki skoczków w pobliżu swojego króla i hetmana!
+ex.fork.tip.knight.2 = Skoczki uwielbiają atakować dwie bierki naraz. Sprawdzaj, dokąd mogą skoczyć.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Kiedy {my} odejdzie, {my2} zaatakuje {t1:acc}!
+ex.discovered.b1.2 = Popatrz: {my} stoi na drodze. Jeśli się ruszy, {my2} uderzy w {t1:acc}.
+ex.discovered.b1.3 = {my} może zejść z drogi, a wtedy {my2} zaatakuje {t1:acc}.
+ex.discovered.b2 = Ukryty atak: {my} się rusza, a {my2} atakuje {t1:acc}.
+ex.discovered.b2.2 = Uwaga: {my} może odejść, a {my2} uderzy w {t1:acc}.
+ex.discovered.b2.3 = {my} odchodzi i otwiera {my2:dat} drogę do {t1:gen}.
+ex.discovered.b3 = Po {reply} atak z odsłony trafia w {t1:acc}.
+ex.discovered.b3.2 = {reply} odsłania atak na {t1:acc}.
+ex.discovered.b3.3 = {move} pozwala na {reply}, atak z odsłony na {t1:acc}.
+ex.discovered.b4 = {reply} otwiera linię na {t1:acc}: atak z odsłony.
+ex.discovered.b4.2 = {move} pozwala na atak z odsłony {reply}, który wygrywa {t1:acc}.
+ex.discovered.b4.3 = Po {reply} atak z odsłony zabiera {t1:acc}.
+ex.discovered.b5 = {move} pozwala na atak z odsłony {reply}.
+ex.discovered.b5.2 = {reply} to atak z odsłony.
+ex.discovered.b5.3 = {reply} odsłania ukryty atak.
+ex.discovered.b6 = {reply}, atak z odsłony na {t1:acc}.
+ex.discovered.b6.2 = {reply} i {t1} pada.
+ex.discovered.b6.3 = Atak z odsłony: {reply}, uderzenie w {t1:acc}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} atakuje {t1:acc}. Kiedy {t1:pron} się ruszy, zbiję {t2:acc} za {t1:npron_ins}.
+ex.skewer.b1.2 = Popatrz: {my} uderza w {t1:acc}, a tuż za {t1:npron_ins} stoi {t2}.
+ex.skewer.b1.3 = {my} atakuje {t1:acc}. {t1} musi uciec, a wtedy pada {t2}.
+ex.skewer.b2 = Przeszycie: {my} atakuje {t1:acc}, a za {t1:npron_ins} stoi {t2}.
+ex.skewer.b2.2 = {my} atakuje {t1:acc} i {t2:acc} na jednej linii. Gdy pierwsza bierka ucieknie, zbiję drugą.
+ex.skewer.b2.3 = Uwaga: {t1} i {t2} stoją na jednej linii. {my} może je przeszyć.
+ex.skewer.b3 = {reply}: przeszycie {t1:gen} i {t2:gen}.
+ex.skewer.b3.2 = Po {reply} musi uciec {t1}, a pada {t2}.
+ex.skewer.b3.3 = {move} pozwala na {reply}, przeszycie {t1:gen} i {t2:gen}.
+ex.skewer.b4 = {reply} – przeszycie {t1:gen}; {t2} za {t1:npron_ins} przepada.
+ex.skewer.b4.2 = Po {move} na jednej linii stoją {t1} i {t2}: {reply}.
+ex.skewer.b4.3 = Po {reply} ucieka {t1}, a pada {t2}.
+ex.skewer.b5 = {reply} – przeszycie {t1:gen} i {t2:gen}.
+ex.skewer.b5.2 = {move} pozwala na przeszycie {reply} przez {t1:acc} na {t2:acc}.
+ex.skewer.b6 = {reply} z przeszyciem.
+ex.skewer.b6.2 = {reply}, przeszycie.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} może pójść na {sq}. Wtedy {your} utknie przed {t1:ins}.
+ex.pin.b1.2 = Popatrz, {my} na {sq}: {your} utknie przed {t1:ins}.
+ex.pin.b1.3 = {my} może związać {your:acc} z {t1:ins}. Wtedy {your:pron_acc} wygram.
+ex.pin.b2 = Związanie: {your} utkn{your:al} przed {t1:ins}.
+ex.pin.b2.2 = {your} jest związan{your:y} z {t1:ins}. Wtedy mogę {your:pron_acc} wygrać.
+ex.pin.b2.3 = Teraz {your} utkn{your:al} przed {t1:ins}. To jest związanie.
+ex.pin.b3 = {your} zostaje związan{your:y} z {t1:ins} i wygrywam {your:pron_acc}.
+ex.pin.b3.2 = Po tym ruchu {your} jest związan{your:y} z {t1:ins}.
+ex.pin.b3.3 = Związanie {your:gen} kosztuje materiał: za {your:npron_ins} stoi {t1}.
+ex.pin.b4 = {reply} wiąże i wygrywa materiał.
+ex.pin.b4.2 = {move} nadziewa się na związanie {reply}.
+ex.pin.b4.3 = Po {reply} związana bierka pada.
+ex.pin.b5 = {move} pozwala na związanie {reply}.
+ex.pin.b5.2 = {reply} wiąże i bierka przepada.
+ex.pin.b6 = {reply} wiąże.
+ex.pin.b6.2 = {reply}, związanie.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} jest związan{your:y}, więc nie może bronić pola {sq}. Za {your:npron_ins} stoi {t1}.
+ex.pin_defender.b1.2 = Popatrz: {your} tak naprawdę nie broni pola {sq}, bo za {your:npron_ins} stoi {t1}.
+ex.pin_defender.b2 = {your} jest związan{your:y} z {t1:ins}, więc pole {sq} nie ma prawdziwego obrońcy.
+ex.pin_defender.b2.2 = Związana bierka to słaby obrońca. {your} nie upilnuje pola {sq}: za {your:npron_ins} stoi {t1}.
+ex.pin_defender.b3 = {your} jest związan{your:y} z {t1:ins}; tak naprawdę nie broni pola {sq}.
+ex.pin_defender.b3.2 = Pole {sq} wydaje się bronione, ale {your} jest związan{your:y} z {t1:ins}.
+ex.pin_defender.b4 = {your} jest związan{your:y}, więc pole {sq} jest tak naprawdę bez obrony.
+ex.pin_defender.b4.2 = {your}, związan{your:y}, nie upilnuje pola {sq}.
+ex.pin_defender.b5 = {your} jest związan{your:y}; pole {sq} jest bez obrony.
+ex.pin_defender.b5.2 = Pola {sq} nie da się utrzymać: {your} jest związan{your:y}.
+ex.pin_defender.b6 = {your} związan{your:y}; {sq} nie do utrzymania.
+ex.pin_defender.b6.2 = Związanie {your:gen}, pole {sq} bez obrony.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} jest w pułapce. Każde pole, na które może pójść, jest atakowane.
+ex.trapped.b1.2 = Spójrz na {your:refl_acc}: nie ma bezpiecznego pola do ucieczki.
+ex.trapped.b1.3 = {your} utkn{your:al}. Jeśli {your:pron_acc} zaatakuję, nie ucieknie.
+ex.trapped.b2 = {your} nie ma bezpiecznych pól. Mogę {your:pron_acc} wygrać.
+ex.trapped.b2.2 = {your} jest w pułapce: gdziekolwiek pójdzie, zbiję {your:pron_acc}.
+ex.trapped.b2.3 = Uwaga, {your:dat} kończą się pola.
+ex.trapped.b3 = {your} wpada w pułapkę: nie ma już bezpiecznego pola.
+ex.trapped.b3.2 = Po tym ruchu {your} jest w pułapce i przepada.
+ex.trapped.b3.3 = {your} wpada w pułapkę, z której nie ma wyjścia.
+ex.trapped.b4 = {move} zostawia {your:acc} w pułapce.
+ex.trapped.b4.2 = {your} nie ma odwrotu; wygrywam {your:pron_acc}.
+ex.trapped.b4.3 = {your} jest w pułapce po {reply}.
+ex.trapped.b5 = {your} ląduje w pułapce: {line}.
+ex.trapped.b5.2 = {move} zostawia {your:acc} bez odwrotu.
+ex.trapped.b6 = {your} w pułapce.
+ex.trapped.b6.2 = {line}: {your} w pułapce.
+ex.trapped.tip.b1 = Zanim ruszysz bierką, sprawdź, czy zdoła potem wrócić.
+ex.trapped.tip.b1.2 = Bierki głęboko w moim obozie mogą utknąć. Zostaw im drogę odwrotu.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} utkn{your:al} za swoimi pionkami. {my} może dać {your:pron_dat} szacha na ostatniej linii.
+ex.back_rank.b1.2 = Uwaga: {your} nie ma pola ucieczki, a {my} może dojść na {sq}.
+ex.back_rank.b1.3 = {my} może pójść na {sq}. {your} jest zamknięt{your:y} przez własne pionki.
+ex.back_rank.b2 = Groźba na ostatniej linii: {your} nie ma okienka. {my} może dać szacha na {sq}.
+ex.back_rank.b2.2 = {your} jest zamknięt{your:y}. {my} idzie na {sq} i wygrywa materiał.
+ex.back_rank.b2.3 = Twoja ostatnia linia jest słaba: {my} może dać szacha {your:dat} na {sq}.
+ex.back_rank.b3 = Twoja ostatnia linia jest słaba: {line}. {your} nie ma pola ucieczki.
+ex.back_rank.b3.2 = {your} nie ma okienka, więc {line} wygrywa materiał.
+ex.back_rank.b3.3 = Po {line} decyduje ostatnia linia: {your} jest w potrzasku.
+ex.back_rank.b4 = Ostatnia linia: {line}, a {your} nie ma okienka.
+ex.back_rank.b4.2 = {line} wykorzystuje słabość ostatniej linii wokół {your:gen}.
+ex.back_rank.b4.3 = {your:dat} brakuje pola ucieczki: {line}.
+ex.back_rank.b5 = Słabość ostatniej linii wokół {your:gen}: {line}.
+ex.back_rank.b5.2 = {line}; {your} nie ma okienka.
+ex.back_rank.b6 = {line}, ostatnia linia; {your} w potrzasku.
+ex.back_rank.b6.2 = Ostatnia linia: {line} ({your}).
+ex.back_rank.tip.b1 = Zrób swojemu królowi okienko: rusz jednym z pionków przed nim.
+ex.back_rank.tip.b1.2 = Król za trzema pionkami może dostać mata na ostatniej linii. Zrób mu trochę miejsca.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} na {sq} nie ma obrony. {my} może {your:pron_acc} zbić za darmo.
+ex.hanging.b1.2 = Spójrz na {your:refl_acc}: nic {your:pron_gen} nie broni, a {my} {your:pron_acc} atakuje.
+ex.hanging.b1.3 = {your} nie ma obrony. {my} może {your:pron_acc} po prostu zbić.
+ex.hanging.b2 = {your} na {sq} wisi. {my} {your:pron_acc} bije, a ty nie możesz odbić.
+ex.hanging.b2.2 = {my} może za darmo zbić {your:acc}. Nic {your:pron_gen} nie broni.
+ex.hanging.b2.3 = {your} zostaje sam{your:a} na {sq}, a {my} {your:pron_acc} bije.
+ex.hanging.b3 = {move} zostawia {your:acc} bez obrony: {reply} i nie ma czym odbić.
+ex.hanging.b3.2 = {your} na {sq} wisi: {reply}.
+ex.hanging.b3.3 = Po {reply} przepada za darmo {your}.
+ex.hanging.b4 = {move} podstawia {your:acc}: {reply} wygrywa {pts:point_acc}.
+ex.hanging.b4.2 = {reply} zgarnia {your:acc} za darmo.
+ex.hanging.b4.3 = {your} nie ma obrony; {reply} {your:pron_acc} bije.
+ex.hanging.b5 = {move} zostawia {your:acc} bez obrony; {reply} {your:pron_acc} wygrywa.
+ex.hanging.b5.2 = {your} na {sq} pada po {reply}.
+ex.hanging.b5.3 = {reply} wygrywa {your:acc}.
+ex.hanging.b6 = {move}? {reply} i {your} pada.
+ex.hanging.b6.2 = {reply} wygrywa {your:acc}.
+ex.hanging.b6.3 = {your} wisi: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} bronił{your2:a} {your:gen}. Teraz {my} może {your:pron_acc} zbić.
+ex.hanging_guard.b1.2 = {your2} odchodzi i {your} zostaje sam{your:a}. {my} {your:pron_acc} bije.
+ex.hanging_guard.b2 = {your2} bronił{your2:a} {your:gen}. Teraz {your} jest sam{your:a} i {my} {your:pron_acc} bije.
+ex.hanging_guard.b2.2 = Ruch {your2:ins} zostawił {your:acc} bez obrony przed {my:ins}.
+ex.hanging_guard.b3 = {your2} pilnował{your2:a} {your:gen}. Gdy {your2:pron} odchodzi, {reply} wygrywa {your:acc}.
+ex.hanging_guard.b3.2 = Bez {your2:gen} {your} nie ma obrony: {reply}.
+ex.hanging_guard.b4 = {move} usuwa obrońcę: {your2} zostawia {your:acc}, a {reply} {your:pron_acc} zgarnia.
+ex.hanging_guard.b4.2 = {your2} {your2:was} jedynym obrońcą {your:gen}; {reply} {your:pron_acc} wygrywa.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} już atakował{my:a} {your:acc}. Zawsze sprawdzaj, czym grozi mój ruch.
+ex.hanging_threat.b1.2 = Moja groźba umknęła ci uwadze: {my} atakuje {your:acc}.
+ex.hanging_threat.b2 = Moim ostatnim ruchem zaatakowałem {your:acc} {my:refl_ins}. Zawsze patrz na moje groźby.
+ex.hanging_threat.b2.2 = {my} groził{my:a} {your:dat}, a teraz mogę {your:pron_acc} zbić.
+ex.hanging_threat.b3 = Przeoczona groźba: {my} atakował{my:a} {your:acc}.
+ex.hanging_threat.b3.2 = {my} przez cały czas miał{my:a} {your:acc} na celowniku.
+ex.hanging.tip.b1 = Przed każdym ruchem zadaj sobie pytanie: „Czy wszystkie moje bierki są bezpieczne?”
+ex.hanging.tip.b1.2 = Dobry nawyk: po każdym ruchu sprawdzaj, które z twoich bierek są bronione.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} bije, ale {my} odbija. Na tej wymianie tracisz punkty.
+ex.exchange_capture.b1.2 = {my} odbija. {your} jest wart{your:a} {n:point_acc}, a dostajesz tylko {n2:point_acc}.
+ex.exchange_capture.b1.3 = Uwaga: {my} może odbić {your:acc}. To zła wymiana.
+ex.exchange_capture.b2 = Uważaj na wymiany: {your} jest wart{your:a} {n:point_acc}. {my} odbija, a ty dostajesz tylko {n2:point_acc}.
+ex.exchange_capture.b2.2 = {my} odbija {your:acc}. Tracisz {n:point_acc}, a zyskujesz tylko {n2:point_acc}.
+ex.exchange_capture.b3 = Bicie na {sq} nie wychodzi: {your} przepada po {line}.
+ex.exchange_capture.b3.2 = {your} bije na {sq}, ale po {line} tracisz {pts:point_acc}.
+ex.exchange_capture.b4 = {move} to błąd w rachunku na {sq}: {line} i {your} przepada.
+ex.exchange_capture.b4.2 = Bicie na {sq} kosztuje {your:acc}: {line}.
+ex.exchange_capture.b5 = {move} traci {your:acc} w wymianach na {sq}: {line}.
+ex.exchange_capture.b5.2 = Na {sq} przepada {your}: {line}.
+ex.exchange_capture.b6 = {move} traci {your:acc} na {sq} po {line}.
+ex.exchange_capture.b6.2 = {line} na {sq} i {your} przepada.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Policz: atakuję pole {sq} {n:time}, a ty bronisz go {n2:time}.
+ex.exchange_count.b1.2 = Na {sq} mam {n:attacker_acc}, a ty masz {n2:defender_acc}. Ta wymiana jest moja.
+ex.exchange_count.b2 = Pole {sq} jest atakowane {n:time}, a bronione {n2:time}. Tam stracisz materiał.
+ex.exchange_count.b2.2 = Policz na {sq}: {n:attacker} przeciw {n2:defender_dat}.
+ex.exchange_count.b3 = Policz bierki atakujące i broniące pole {sq}: moich jest więcej.
+ex.exchange_count.b3.2 = Wymiana na {sq} nie wychodzi: po {line} tracisz {pts:point_acc}.
+ex.exchange_count.b4 = {move} to błąd w rachunku na {sq}: {line} i tracisz {pts:point_acc}.
+ex.exchange_count.b4.2 = Pole {sq} jest atakowane częściej niż bronione: {line}.
+ex.exchange_count.b5 = Na {sq} {n:attacker} przeciw {n2:defender_dat}: {line}.
+ex.exchange_count.b5.2 = {move} – błąd w rachunku na {sq}.
+ex.exchange_count.b6 = {line} na {sq} i wygrałem {pts:point_acc}.
+ex.exchange_count.b6.2 = {sq}: {n} przeciw {n2:dat}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} jest wart{my:a} mniej niż {your}. Jeśli zbiję, stracisz punkty.
+ex.exchange_cheap.b1.2 = {my} atakuje {your:acc}. Taka wymiana jest dla ciebie zła.
+ex.exchange_cheap.b2 = {your} jest wart{your:a} {n:point_acc}, a {my} tylko {n2:point_acc}. Ta wymiana jest dla ciebie niekorzystna.
+ex.exchange_cheap.b2.2 = {my} jest tańsz{my:y} niż {your}, więc atak wygrywa materiał.
+ex.exchange_cheap.b3 = Tańsza bierka atakuje {your:acc} na {sq}.
+ex.exchange_cheap.b3.2 = Bierka warta {n2:point_acc} atakuje {your:acc} na {sq}: {line}.
+ex.exchange_cheap.b4 = Tańsza bierka atakuje {your:acc} na {sq}; {reply} wygrywa materiał.
+ex.exchange_cheap.b4.2 = {reply} uderza tańszą bierką w {your:acc} na {sq}.
+ex.exchange_cheap.b5 = {your} na {sq} jest celem tańszej bierki: {line}.
+ex.exchange_cheap.b5.2 = {reply} wygrywa materiał na {sq} kosztem {your:gen}.
+ex.exchange_cheap.b6 = {reply} wygrywa {your:acc} na {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} na {sq} przepada.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Uwaga: teraz mogę wygrać {t1:acc}.
+ex.material.b1.2 = Po tym ruchu {t1} ma kłopoty. Mogę {t1:pron_acc} wygrać.
+ex.material.b2 = Ten ruch pozwala mi wygrać {t1:acc}.
+ex.material.b2.2 = Teraz {t1} wpada w kłopoty i wygrywam {t1:pron_acc}.
+ex.material.b3 = {move} traci materiał: po {line} masz o {pts:point_acc} mniej.
+ex.material.b3.2 = Po {line} brakuje ci {pts:point_gen}.
+ex.material.b4 = {move} traci materiał: {line} i masz o {pts:point_acc} mniej.
+ex.material.b4.2 = Po {line} masz o {pts:point_acc} mniej.
+ex.material.b5 = {move} oddaje materiał: {line}.
+ex.material.b5.2 = {line} i zyskuję {pts:point_acc}.
+ex.material.b6 = {line} i wygrałem {pts:point_acc}.
+ex.material.b6.2 = {move} traci {pts:point_acc}: {line}.

@@ -53,7 +53,7 @@ an.fork.3 = {reply} tuo pačiu metu puola {t1:acc} ir {t2:acc}.
 an.hanging = Šis ėjimas palieka {piece:acc} neapgintą, ir {reply} {piece:pron_acc} nukerta.
 an.hanging.2 = {piece} lieka be gynėjo: {reply} {piece:pron_acc} laimi.
 an.hanging.3 = {reply} tiesiog kerta {piece:acc}, {piece:rel} neturėjo gynėjo.
-an.material = Atsakymas {line} laimi medžiagos už {pts:point_acc}.
+an.material = Atsakymas {line} laimi {pts:point_gen} vertės medžiagos.
 an.material.2 = Tada {line} laimi {pts:point_acc}.
 
 # What it misses ({best} is the better move).
@@ -61,7 +61,7 @@ an.mate_missed.one = Ėjimu {best:nomate} buvo galima paskelbti matą.
 an.mate_missed.one.2 = Ėjimas {best:nomate} būtų buvęs matas.
 an.mate_missed = Po ėjimo {best:nomate} būtų buvęs priverstinis matas per {m:move_acc}.
 an.mate_missed.2 = Buvo priverstinis matas per {m:move_acc}, pradedant ėjimu {best:nomate}.
-an.missed_capture = Ėjimu {best} buvo galima veltui laimėti {piece:acc}.
+an.missed_capture = Ėjimu {best} buvo galima už dyką laimėti {piece:acc}.
 an.missed_capture.2 = {piece} neturėjo gynėjo: ėjimu {best} buvo galima {piece:pron_acc} kirsti.
 an.missed_fork = Ėjimu {best} buvo galima padaryti šakutę {t1:dat} ir {t2:dat}.
 an.missed_fork.2 = Ėjimas {best} buvo šakutė, puolanti iš karto {t1:acc} ir {t2:acc}.
@@ -86,7 +86,7 @@ an.only.hold = {move} – vienintelis ėjimas, išlaikantis pusiausvyrą.
 an.only.hold.2 = Čia poziciją išlaiko tik {move}.
 an.only.defend = {move} – vienintelis ėjimas, leidžiantis tęsti kovą.
 an.only.defend.2 = Čia tik {move} išsaugo šansus. Gera gynyba.
-an.only.best = Čia {move} – neabejotinai stipriausias ėjimas.
+an.only.best = Čia {move} – stipriausias ėjimas, gerokai pranokstantis kitus.
 an.only.best.2 = Tiksliai: {move} daug stipresnis už visus kitus ėjimus.
 
 # ---- Smaller remarks, in quiet moments -------------------------------------------------------------
@@ -97,9 +97,9 @@ an.interesting.2 = Įdomus bandymas: {move} atiduoda {piece:acc}.
 
 # ---- A forced mate appears -----------------------------------------------------------------------------
 an.mate_on.white = Dabar baltieji turi priverstinį matą per {m:move_acc}.
-an.mate_on.white.2 = Nuo čia baltieji gali priverstinai paskelbti matą per {m:move_acc}.
+an.mate_on.white.2 = Nuo šiol baltieji gali priverstinai paskelbti matą per {m:move_acc}.
 an.mate_on.black = Dabar juodieji turi priverstinį matą per {m:move_acc}.
-an.mate_on.black.2 = Nuo čia juodieji gali priverstinai paskelbti matą per {m:move_acc}.
+an.mate_on.black.2 = Nuo šiol juodieji gali priverstinai paskelbti matą per {m:move_acc}.
 
 # ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
 an.end.mate.white = Matas. Baltieji laimi partiją.
@@ -111,9 +111,9 @@ an.end.resigned.white.2 = Partija čia baigiasi: juodieji pasidavė, ir laimi ba
 an.end.resigned.black = Baltieji pasidavė, tad partiją laimi juodieji.
 an.end.resigned.black.2 = Partija čia baigiasi: baltieji pasidavė, ir laimi juodieji.
 an.end.timeout.white = Juodiesiems baigėsi laikas, tad laimi baltieji.
-an.end.timeout.white.2 = Baltieji laimi pagal laiką.
+an.end.timeout.white.2 = Baltieji laimi dėl laiko.
 an.end.timeout.black = Baltiesiems baigėsi laikas, tad laimi juodieji.
-an.end.timeout.black.2 = Juodieji laimi pagal laiką.
+an.end.timeout.black.2 = Juodieji laimi dėl laiko.
 an.end.win.white = Partija baigiasi baltųjų pergale.
 an.end.win.white.2 = Baltieji laimi partiją.
 an.end.win.black = Partija baigiasi juodųjų pergale.

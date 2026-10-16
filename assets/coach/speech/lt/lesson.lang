@@ -47,7 +47,7 @@ lesson.and_back = Ir atgal.
 lesson.check_escape = Šachas, bet mano karalius pabėga į {esc}.
 lesson.check_takes = Šachas, bet mano karalius tiesiog kerta {your:acc}.
 lesson.check_block = Šachas, bet galiu užsidengti kita figūra.
-lesson.stalemate = Patas! Mano karalius negali pajudėti, ir jam nėra šacho. Lygiosios, nors tavo pozicija buvo laiminti!
+lesson.stalemate = Patas! Mano karalius negali pajudėti, ir jam nėra šacho. Lygiosios, nors tavo pozicija buvo laimėta!
 
 # ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
 # {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
@@ -144,7 +144,7 @@ lesson.setup.corners = Kiekviena partija prasideda taip: bokštai {@}kampuose, �
 lesson.setup.queen = Valdovė stovi savo spalvos langelyje: tavo valdovė – šviesiame langelyje.
 lesson.setup.king = Karalius stovi šalia jos. Baltieji visada eina pirmieji.
 lesson.first.ask = Pradėk partiją: pėstininką, kuris stovi priešais tavo karalių, pastumk du langelius į priekį, į {sq}.
-lesson.first.wrong = Toks ėjimas irgi taisyklingas! Bet dabar, prašau, eik karaliaus pėstininku į {sq}.
+lesson.first.wrong = Toks ėjimas irgi leistinas! Bet dabar, prašau, eik karaliaus pėstininku į {sq}.
 lesson.first.ok = Puikus pirmasis ėjimas: jis atveria kelią tavo valdovei ir rikiui.
 lesson.first.reply = Aš atsakau taip pat. Dabar išvesk žirgą: šok iš {sq} į {sq2}.
 lesson.first.knight_wrong = Žirgai peršoka per pėstininkus. Pabandyk iš {sq} į {sq2}.
@@ -183,7 +183,7 @@ lesson.capture.king_ok = Taip! Mano valdovė neturėjo gynėjo, todėl tavo kara
 lesson.capture.knight_ok = Taip! Tavo žirgas pašalino puolančią figūrą.
 
 # ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
-lesson.mate1.what = Matas: karaliui paskelbtas šachas, ir jis neturi kur pasitraukti. Taip laimima partija.
+lesson.mate1.what = Matas: karaliui paskelbtas šachas, ir jam nėra jokios išeities. Taip laimima partija.
 lesson.mate1.stuck = Mano karalius įstrigo už {@}savo pėstininkų.
 lesson.mate1.ask = Paskelbk man matą vienu ėjimu!
 lesson.mate1.wrong = Arti! Paskelbk šachą paskutinėje mano horizontalėje, iš kurios mano karalius negali pabėgti.
@@ -204,7 +204,7 @@ lesson.castle.what = Rokiruotė – ypatingas ėjimas, kuris apsaugo tavo karali
 lesson.castle.how = {@}Karalius paeina du langelius bokšto link, o {@2}bokštas peršoka per jį ir atsistoja kitoje pusėje.
 lesson.castle.ask = Visada pirmiausia liesk karalių. Dabar tu: atlik rokiruotę karaliaus flange.
 lesson.castle.rook = Taip eina tik bokštas. Rokiruotei paeik karaliumi du langelius jo link.
-lesson.castle.long = Tai rokiruotė valdovės flange, irgi taisyklinga! Šį kartą rokiruokis artimesnio bokšto link.
+lesson.castle.long = Tai rokiruotė valdovės flange, irgi leistina! Šį kartą rokiruokis artimesnio bokšto link.
 lesson.castle.one = Vienu langeliu – paprastas karaliaus ėjimas. Per rokiruotę karalius paeina du.
 lesson.castle.other = Rokiruotei paeik karaliumi du langelius link bokšto, stovinčio langelyje {sq}.
 lesson.castle.ok = Rokiruotė atlikta! Tavo karalius saugiai paslėptas, o bokštas pasiruošęs žaisti.
@@ -228,13 +228,13 @@ lesson.ep.ok = Kirtimas prasilenkiant! Mano pėstininkas langelyje {sq} nuimamas
 lesson.promo.what = Kai pėstininkas pasiekia paskutinę horizontalę, jis virsta valdove, bokštu, rikiu arba žirgu.
 lesson.promo.ask = Beveik visada rinkis valdovę. Dabar atlik pėstininko virsmą!
 lesson.promo.under = Taip galima! Bet valdovė stipresnė. Rinkimės valdovę.
-lesson.promo.under_ok = Gerai. Nors dauguma žaidėjų renkasi valdovę.
+lesson.promo.under_ok = Gerai. Vis dėlto dauguma žaidėjų renkasi valdovę.
 lesson.promo.push = Stumk pėstininką į paskutinę horizontalę, į {sq}.
 lesson.promo.ok = Nauja valdovė! Gali turėti net dvi valdoves vienu metu.
 
 # ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
 lesson.stale.what = Mano ėjimas. Mano karaliui nėra šacho, bet {@}visi langeliai aplink jį puolami.
-lesson.stale.draw = Neturiu nė vieno taisyklingo ėjimo. Tai patas, ir partija baigiasi lygiosiomis.
+lesson.stale.draw = Neturiu nė vieno leistino ėjimo. Tai patas, ir partija baigiasi lygiosiomis.
 lesson.stale2.ask = Kai laimi, saugokis pato. Paskelbk man matą vienu ėjimu, be pato!
 lesson.stale2.wrong = Paskelbk šachą paskutinėje mano horizontalėje, iš kurios mano karalius negali pabėgti.
 lesson.stale2.ok = Matas! Visada palik priešininko karaliui ėjimą, nebent skelbi matą.

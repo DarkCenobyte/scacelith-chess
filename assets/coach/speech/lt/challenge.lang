@@ -41,6 +41,7 @@ ch.intro.kr = Bokštas ir karalius prieš karalių. {n:position}: paskelbk matą
 ch.intro.kp = Karalius ir pėstininkas prieš karalių. {n:position}: paversk pėstininką valdove. Kelią tegul rodo karalius.
 ch.intro.kp_hold = Sustabdyk pėstininką. {n:position}: turi tik karalių. Išlaikyk lygiąsias.
 ch.intro.rook = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Philidoro gynyba.
+ch.intro.rook.spoken = Bokštų endšpiliai. {n:position}: pastatyk tiltą, kad pėstininkas virstų valdove, ir išlaikyk lygiąsias Filidoro gynyba.
 ch.intro.endgame = Taktika endšpilyje. {n:position}, kur figūrų mažai, o idėjos aštrios.
 
 # ---- At each position: the task --------------------------------------------------------------------
@@ -48,7 +49,7 @@ ch.intro.endgame = Taktika endšpilyje. {n:position}, kur figūrų mažai, o id�
 ch.task.mate = Matas per {n:move_acc}.
 ch.task.mate.2 = Rask matą per {n:move_acc}.
 ch.task.hanging = Kažkas liko be gynybos.
-ch.task.hanging.2 = Ką gali kirsti veltui?
+ch.task.hanging.2 = Ką gali kirsti už dyką?
 ch.task.fork = Rask šakutę.
 ch.task.fork.2 = Ieškok šakutės.
 ch.task.pin = Čia viską lemia surišimas.
@@ -112,7 +113,7 @@ ch.wrong.weaker.2 = Taip žaisti galima, bet gali ir geriau.
 ch.wrong.stalemate = Patas! Mano karalius negali pajudėti, o tai tik lygiosios.
 # Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
 ch.wrong.draw = Ne šis ėjimas: po {move} galiu išlaikyti lygiąsias.
-ch.wrong.loses = Atsargiai: po {move} mano pozicija būtų laiminti.
+ch.wrong.loses = Atsargiai: po {move} mano pozicija būtų laimėta.
 # No answer from the engine: the move is simply not the one.
 ch.wrong.plain = Ne tai.
 ch.try_again = Bandyk dar kartą.

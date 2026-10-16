@@ -7,7 +7,7 @@
 # Forms from common.lang:
 #   move numbers are ordinals: "{n:nth_move_loc}" = "21-ajame ėjime" (at move 21), "{n:nth_move}" =
 #   "21-asis ėjimas" (Move 21: ...), "{crit_no:nth_move_gen}" = "iki 21-ojo ėjimo" (until move 21);
-#   "{moves:move_acc}" = "per 34 ėjimus"; "{pts:point_acc} medžiagos" = "3 taškus medžiagos";
+#   "{moves:move_acc}" = "per 34 ėjimus"; "{pts:point_gen} vertės medžiagos" = "3 taškų vertės medžiagos";
 #   "{n:time_acc}" = "3 kartus"; "{n:best_move}" = "5 geriausi ėjimai"; "{n:capture}" = "5 kirtimai"
 #   (pawns included, from level 3; "figūra" loosely at levels 1-2, as English "pieces");
 #   "{m:check_acc}" = "2 šachus"; "{m:acc}" = a bare number in the accusative ("pataisei du");
@@ -27,7 +27,7 @@ appraisal.reason.stalemate = dėl pato
 appraisal.reason.material = dėl nepakankamos medžiagos
 appraisal.reason.repetition = dėl pozicijos pasikartojimo
 appraisal.reason.fifty = pagal penkiasdešimties ėjimų taisyklę
-appraisal.reason.agreement = abipusiu susitarimu
+appraisal.reason.agreement = susitarus
 appraisal.reason.other = pagal taisykles
 # The level names of assets/i18n/lt.lang (coach.level.<n>.name), said inside „...“.
 appraisal.level.l1 = Pirmieji žingsniai
@@ -51,7 +51,7 @@ theme.trapped = palikti savo figūroms atsitraukimo kelią
 theme.back_rank = palikti savo karaliui pabėgimo langelį
 theme.hanging = laikyti savo figūras apgintas
 theme.exchange = prieš mainus suskaičiuoti puolėjus ir gynėjus
-theme.missed_capture = pirmiausia ieškoti figūrų, kurias galima kirsti dovanai
+theme.missed_capture = pirmiausia ieškoti figūrų, kurias galima kirsti už dyką
 theme.missed_fork = ieškoti savo dvigubų puolimų
 theme.promotion = skaičiuoti pėstininkų lenktynes ir taikyti kvadrato taisyklę
 theme.king_safety = laikyti savo karalių saugiai už jo pėstininkų
@@ -113,7 +113,7 @@ appraisal.open.stalemate.b6.2 = Lygiosios, patas.
 appraisal.open.loss.b1 = Šįkart laimėjau aš, bet tu padarei tikrai gerų ėjimų.
 appraisal.open.loss.b1.2 = Gera partija! Privertei mane gerokai paplušėti.
 appraisal.open.loss.b1.3 = Buvo smagu! Šią partiją laimėjau aš, bet tu greitai mokaisi.
-appraisal.open.loss.b2 = Gera partija! Pažiūrėkime, kas pavyko, ir vieną patarimą kitam kartui.
+appraisal.open.loss.b2 = Gera partija! Pažiūrėkime, kas pavyko, ir vieną dalyką, kurį verta pabandyti.
 appraisal.open.loss.b2.2 = Ačiū už partiją! Turėjai gerų idėjų.
 appraisal.open.loss.b2.3 = Gera partija. Pažiūrėkime, ko iš jos galime pasimokyti.
 appraisal.open.loss.b3 = Gera partija.
@@ -201,14 +201,14 @@ appraisal.best.only.b5 = {n:nth_move_loc} {move} buvo vienintelis ėjimas. Gerai
 appraisal.best.only.b5.2 = {n:nth_move_loc} tiko tik {move}.
 appraisal.best.only.b6 = {n:nth_move_loc} {move} – vienintelis ėjimas. Gerai rasta.
 appraisal.best.only.b6.2 = {n:nth_move}: {move}, vienintelis.
-appraisal.best.won.b1 = Mano mėgstamiausia akimirka: {move}. Šis ėjimas laimėjo {pts:point_acc} medžiagos!
-appraisal.best.won.b1.2 = Prisimeni ėjimą {move}? Jis tau atnešė {pts:point_acc} medžiagos. Šaunu!
-appraisal.best.won.b2 = Tavo geriausia akimirka – {move} {n:nth_move_loc}: laimėjai {pts:point_acc} medžiagos.
+appraisal.best.won.b1 = Mano mėgstamiausia akimirka: {move}. Šis ėjimas laimėjo {pts:point_gen} vertės medžiagos!
+appraisal.best.won.b1.2 = Prisimeni ėjimą {move}? Jis tau atnešė {pts:point_gen} vertės medžiagos. Šaunu!
+appraisal.best.won.b2 = Tavo geriausia akimirka – {move} {n:nth_move_loc}: laimėjai {pts:point_gen} vertės medžiagos.
 appraisal.best.won.b2.2 = {move} {n:nth_move_loc} laimėjo medžiagos. Puiku!
-appraisal.best.won.b3 = Lemiamas ėjimas – {move} {n:nth_move_loc}: jis laimėjo {pts:point_acc} medžiagos.
+appraisal.best.won.b3 = Lemiamas ėjimas – {move} {n:nth_move_loc}: jis laimėjo {pts:point_gen} vertės medžiagos.
 appraisal.best.won.b3.2 = {move} {n:nth_move_loc} švariai laimėjo medžiagos.
 appraisal.best.won.b4 = Geriausia akimirka: {move} {n:nth_move_loc}, laimėta medžiaga.
-appraisal.best.won.b4.2 = {move} {n:nth_move_loc} laimėjo {pts:point_acc} medžiagos.
+appraisal.best.won.b4.2 = {move} {n:nth_move_loc} laimėjo {pts:point_gen} vertės medžiagos.
 appraisal.best.won.b5 = {move} {n:nth_move_loc} laimėjo medžiagos.
 appraisal.best.won.b5.2 = {n:nth_move}: {move}, medžiagos laimėjimas.
 appraisal.best.won.b6 = {move} {n:nth_move_loc}: medžiagos laimėjimas.
@@ -226,7 +226,7 @@ appraisal.best.streak.b5 = {n:best_move} iš eilės.
 appraisal.best.streak.b5.2 = {n:best_move_gen} serija.
 appraisal.best.streak.b6 = {n:best_move} iš eilės.
 appraisal.best.streak.b6.2 = Serija: {n:best_move}.
-appraisal.best.capture.b1 = Mano mėgstamiausia akimirka: {move}. Kirtai {my:acc} dovanai!
+appraisal.best.capture.b1 = Mano mėgstamiausia akimirka: {move}. Kirtai {my:acc} už dyką!
 appraisal.best.capture.b1.2 = Prisimeni ėjimą {move}? Pastebėjai, kad {my} stovi be gynybos!
 appraisal.best.capture.b2 = Tavo geriausia akimirka – {move}: laimėjai {my:acc}.
 appraisal.best.capture.b2.2 = Gražus kirtimas {n:nth_move_loc}: {move}.
@@ -377,9 +377,9 @@ appraisal.improve.stalemate.b6 = Saugokis pato.
 appraisal.improve.stalemate.b6.2 = Patas kainavo pergalę.
 # The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
 appraisal.improve.coach_hung.b1 = {n:nth_move_loc} {my} stovėjo be gynybos. Ar pastebėjai?
-appraisal.improve.coach_hung.b1.2 = {n:nth_move_loc} galėjai dovanai kirsti {my:acc}. Visada ieškok figūrų, kurias galima kirsti dovanai!
+appraisal.improve.coach_hung.b1.2 = {n:nth_move_loc} galėjai už dyką kirsti {my:acc}. Visada ieškok figūrų, kurias galima kirsti už dyką!
 appraisal.improve.coach_hung.b2 = {n:nth_move_loc} {my} kabojo. Ar pastebėjai?
-appraisal.improve.coach_hung.b2.2 = {n:nth_move_loc} galėjai dovanai kirsti {my:acc}.
+appraisal.improve.coach_hung.b2.2 = {n:nth_move_loc} galėjai už dyką kirsti {my:acc}.
 appraisal.improve.coach_hung.b3 = {n:nth_move_loc} {my} liko neapgint{my:agr_as_a}. Ar pastebėjai?
 appraisal.improve.coach_hung.b3.2 = {my} kabojo {n:nth_move_loc}. Kiekvieną ėjimą ieškok neapgintų figūrų.
 # A clean game: keep doing it.
