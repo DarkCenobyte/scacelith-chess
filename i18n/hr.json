@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotorealističan šah iz prvog lica",
+      "description": "Besplatan fotorealističan šah iz prvog lica za Windows, Linux i macOS: Stockfish 19, trener, analiza partija i igra na mreži u kraljevskoj dvorani."
+    },
+    "players": {
+      "title": "Ljestvica i igrači — Scacelith",
+      "description": "Najbolji igrači službenog poslužitelja Scacelitha u svakom tempu igre za rejting, njihovi rejtinzi i posljednje partije."
+    },
+    "account": {
+      "title": "Vaš račun — Scacelith",
+      "description": "Prijavite se u svoj račun za Scacelith: rejtinzi, povijest partija, preuzimanje u formatima PGN i GIF, prijavljeni uređaji i postavke."
+    },
+    "gif": {
+      "title": "Animirani GIF — Scacelith",
+      "description": "Animirani GIF jedne partije iz Scacelitha."
+    },
+    "legal": {
+      "title": "Pravna obavijest, privatnost i uvjeti korištenja — Scacelith",
+      "description": "Tko izdaje Scacelith i tko mu pruža hosting, što web-mjesto, igra i službeni poslužitelj čine s osobnim podacima, vaša prava i pravila službenog poslužitelja."
+    }
+  },
+  "brand": {
+    "tagline": "Kraljevska igra"
+  },
+  "nav": {
+    "skip": "Preskoči na sadržaj",
+    "home": "Početna",
+    "label": "Glavni izbornik",
+    "game": "Igra",
+    "modes": "Načini igre",
+    "gallery": "Galerija",
+    "trailer": "Najava",
+    "online": "Na mreži",
+    "players": "Ljestvica",
+    "account": "Račun",
+    "language": "Jezik",
+    "menu": "Izbornik",
+    "download": "Preuzmi"
+  },
+  "hero": {
+    "image_alt": "Dva porculanska robota igraju šah za stolom od orahovine u suncem obasjanoj mramornoj dvorani.",
+    "lead": "Sjednite za navošteni stol od orahovine u suncem obasjanoj kraljevskoj dvorani. S druge strane ploče porculanski robot kojim upravlja Stockfish čeka vaš prvi potez.",
+    "watch": "Pogledaj najavu",
+    "meta": "Slobodni softver · Windows, Linux, macOS (eksperimentalno) · Grafička kartica s podrškom za OpenGL 4.6",
+    "caption": "Snimljeno u igri: kraljevska dvorana"
+  },
+  "highlights": {
+    "engine": "Vlastiti pogon na OpenGL-u 4.6",
+    "stockfish": "Ugrađen Stockfish 19",
+    "rules": "Pravila FIDE-a",
+    "online": "Igra na mreži",
+    "languages": "34 jezika"
+  },
+  "experience": {
+    "eyebrow": "Doživljaj",
+    "title": "Ne ploča na zaslonu.<br><em>Mjesto za stolom.</em>",
+    "lead": "Scacelith vraća ono što čini pravu partiju: dvoranu, tišinu, sat, protivnika koji vas gleda i turnirske rituale.",
+    "presence": {
+      "title": "Iz prvog lica",
+      "text": "Gledate očima svog robota: možete razgledati dvoranu, nagnuti se nad ploču, podignuti glavu prema protivniku, baciti pogled na svoj zapisnik ili ustati i prošetati do jednog kraja stola."
+    },
+    "ritual": {
+      "title": "Turnirska pravila",
+      "text": "Dodirnutu figuru morate pomaknuti, a potez završava kad vaša ruka pritisne sat. Kad je prikaz mogućih poteza isključen, sudac kažnjava nepravilan potez, a drugi takav potez donosi poraz."
+    },
+    "scoresheet": {
+      "title": "Rukom pisano",
+      "text": "Oba igrača zapisuju svaki potez u svoj zapisnik, svaki vlastitim rukopisom, i okreću stranicu svakih četrdeset poteza. Čujete šum pera po papiru."
+    },
+    "opponent": {
+      "title": "Dostojan protivnik",
+      "text": "Stockfish 19 na vašoj razini, od razine Novak (800) do razine Stockfish Max (3500), s rejtingom koji se nakon svake partije izračunava prema pravilima FIDE-a."
+    },
+    "engine": {
+      "title": "Stvoren za ovu igru",
+      "text": "Pogon napisan od nule: fizikalno utemeljeno osvjetljenje, mramor, navošteno drvo, porculan i mjed, sunce kroz prozore, meke sjene i odrazi. Razine kvalitete, od „Vrlo niska“ do „Ultra“, prilagođavaju ga vašoj grafičkoj kartici."
+    },
+    "languages": {
+      "title": "34 jezika",
+      "text": "Engleski, francuski, njemački, španjolski, europski i brazilski portugalski, talijanski, nizozemski, švedski, danski, finski, estonski, latvijski, litavski, poljski, češki, slovački, slovenski, hrvatski, mađarski, rumunjski, bugarski, grčki, turski, ukrajinski, ruski, arapski, hindski, indonezijski, vijetnamski, korejski, japanski te pojednostavljeni i tradicionalni kineski. Arapski se prikazuje zdesna nalijevo, a trener govori naglas na svim jezicima osim kineskog, na kojem se njegove riječi prikazuju kao titlovi."
+    }
+  },
+  "modes": {
+    "eyebrow": "Načini igre",
+    "title": "Svaka partija<br><em>ima svoj stol.</em>",
+    "lead": "Sve se igra u istoj dvorani, s naslovnog zaslona. Izvan mreže Stockfish je uvijek spreman za partiju.",
+    "new_game": {
+      "name": "Nova partija",
+      "text": "Igrajte protiv Stockfisha one jačine koju odaberete, u tempu igre od bulleta do klasičnog, ili protiv prijatelja za istim računalom, svatko gledajući očima svog robota."
+    },
+    "coach": {
+      "name": "Trener",
+      "text": "Učitelj sjedi nasuprot vama, igra na vašoj razini i vodi vas kroz partiju: upozorava na prijetnje, ističe dobre poteze i pogreške te vlastitom rukom na ploči pokazuje koliko pogreška stoji. Od pravila šaha do razine stručnjaka, s glasom koji se sintetizira na vašem računalu."
+    },
+    "challenges": {
+      "name": "Izazovi trenera",
+      "text": "Kratki nizovi pozicija, svaki za vježbanje jedne vještine: matovi u jednom do tri poteza, vilice, vezanja i druge taktike, obrana te osnovne završnice protiv trenera. Savjeti samo kad ih zatražite i zelena kvačica za svaki riješeni niz."
+    },
+    "analysis": {
+      "name": "Analiza",
+      "text": "Stockfish pregledava vaše spremljene partije, vaše partije na mreži ili bilo koji PGN: traka procjene, ključni potezi označeni od briljantnih do grubih pogrešaka, bolji potez nacrtan strelicom te komentari naglas i u titlovima. Ruke robota odigravaju poteze dok prolazite kroz partiju."
+    },
+    "online": {
+      "name": "Igraj na mreži",
+      "text": "Pravi protivnici preko poslužitelja za Scacelith: partije za rejting, automatsko traženje protivnika, izazovi i privatne partije ili izravni meč između dvaju računala. Robot vašeg protivnika uživo prati njegove pokrete."
+    },
+    "watch": {
+      "name": "Gledaj partiju",
+      "text": "Stockfish igra protiv Stockfisha dok se vi slobodno i nevidljivo krećete dvoranom, od jednog motrišta do drugog."
+    },
+    "saved": {
+      "name": "Spremljene partije",
+      "text": "Vaše se partije čuvaju kao datoteke PGN. Reproducirajte ih u dvorani, sa stvarnim vremenima razmišljanja i satovima, ili uvezite partije iz drugih programa."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerija",
+    "title": "Pogled <em>iz same dvorane</em>",
+    "lead": "Svaka je slika snimljena u igri, u stvarnom vremenu, njezinim vlastitim pogonom.",
+    "title_screen": {
+      "alt": "Naslovni zaslon: izbornik Scacelitha pokraj dvaju robota koji igraju šah u dvorani.",
+      "caption": "Naslovni zaslon"
+    },
+    "coach": {
+      "alt": "Trener, porculanski robot s natpisom „COACH“ na prsima, pozdravlja vas s druge strane ploče; ono što govori pojavljuje se i kao titl.",
+      "caption": "Trener"
+    },
+    "challenges": {
+      "alt": "Izbornik Izazovi trenera: nizovi matova i taktičkih zadataka s njihovom težinom i oznakom već riješenih, pokraj opisa odabranog niza.",
+      "caption": "Izazovi trenera"
+    },
+    "analysis": {
+      "alt": "Način Analiza: traka procjene, strelica nacrtana na ploči, označeni potezi s točnošću svake strane i popis tipki za upravljanje.",
+      "caption": "Analiza"
+    },
+    "game": {
+      "alt": "Pogled sa strane: jedan robot pruža ruku preko stola kako bi pomaknuo figuru dok drugi čeka; uzete figure stoje pokraj ploče.",
+      "caption": "Gledaj partiju"
+    },
+    "hall": {
+      "alt": "Dva robota sjede jedan nasuprot drugome za šahovskom pločom, u stolcima od crvenog baršuna, ispod visokih prozora.",
+      "caption": "Kraljevska dvorana"
+    },
+    "opponent": {
+      "alt": "Krupni plan porculanskog robota protivnika, glave spuštene prema ploči.",
+      "caption": "Vaš protivnik"
+    },
+    "scoresheet": {
+      "alt": "Ruka robota nalivperom zapisuje poteze u zapisnik.",
+      "caption": "Zapisnik"
+    },
+    "note": "Verzija 1.0.0. Sučelje je na ovim slikama na engleskom jeziku.",
+    "viewer": "Preglednik slika",
+    "close": "Zatvori",
+    "previous": "Prethodna slika",
+    "next": "Sljedeća slika"
+  },
+  "trailer": {
+    "eyebrow": "Najava",
+    "title": "Scacelith <em>u pokretu</em>",
+    "soon_title": "Najava stiže uskoro",
+    "soon_text": "U međuvremenu zauzmite svoje mjesto: igra je spremna za preuzimanje.",
+    "privacy": "Ništa se ne učitava s YouTubea dok ne prihvatite njegov reproduktor.",
+    "open_youtube": "Pogledaj na YouTubeu"
+  },
+  "online": {
+    "eyebrow": "Na mreži",
+    "title": "Pravi protivnici,<br><em>ista dvorana.</em>",
+    "lead": "Prijavite se na službeni poslužitelj iz igre i igrajte s ljudima iz cijelog svijeta, i dalje iz prvog lica.",
+    "point_rated": "Partije za rejting u svim službenim tempovima igre, svaki s vlastitim rejtingom koji se izračunava prema pravilima FIDE-a.",
+    "point_match": "Automatsko traženje protivnika, izazovi po imenu i privatne partije s kodom; ili izravni meč između dvaju računala, bez poslužitelja i bez računa.",
+    "point_fair": "Poštena igra: automatske provjere, analiza završenih partija šahovskim programom i prijave igrača.",
+    "point_history": "Vaša povijest partija na ovom web-mjestu: preuzmite svaku partiju kao PGN ili kao animirani GIF.",
+    "point_open": "Svatko može pokrenuti poslužitelj zajednice: poslužitelj je slobodni softver, a njegov je API dokumentiran.",
+    "create": "Izradi račun",
+    "signin": "Prijavi se",
+    "server_title": "Službeni poslužitelj",
+    "status_checking": "Provjera…",
+    "address": "Adresa",
+    "registration": "Registracija",
+    "categories": "Tempovi igre za rejting",
+    "top_players": "Najbolji igrači",
+    "category": "Tempo igre",
+    "board_loading": "Učitavanje ljestvice…",
+    "full_board": "Cijela ljestvica"
+  },
+  "download": {
+    "button": "Preuzmi",
+    "choose": "Odaberite svoj sustav",
+    "see_release": "Pogledaj izdanje na GitHubu",
+    "latest": "Scacelith",
+    "all_releases": "Sva izdanja",
+    "experimental": "Eksperimentalno",
+    "source": "Izvorni kod",
+    "source_zip": "Arhiva ZIP",
+    "eyebrow": "Preuzimanje",
+    "title": "Zauzmite svoje mjesto.<br><em>Besplatno i otvorenog koda.</em>",
+    "lead": "Raspakirajte i igrajte: u sustavima Windows i Linux bez instalacijskog programa, a na Macu dovoljno je povući aplikaciju u mapu Aplikacije. Svaku datoteku GitHub Actions gradi iz označenog izvornog koda, s ovjerenim podrijetlom izgradnje.",
+    "notes": "Bilješke o izdanju",
+    "macos_note": "Za Mac računala s čipom Apple Silicon (M1 ili noviji) i macOS-om 26 ili novijim, ne u virtualnom računalu; ova je verzija novija i manje ispitana od ostalih. Aplikaciju nije potpisao registrirani Appleov razvojni programer: prvi put je otvorite putem Postavke sustava › Privatnost i sigurnost › Ipak otvori.",
+    "req_system": "Sustav",
+    "req_system_value": "64-bitni Windows (x64); 64-bitni Linux (x86-64 ili aarch64) s glibc 2.34, OpenSSL 3 i X11 ili XWayland, kao što su Ubuntu 22.04 ili Debian 12; macOS 26 ili noviji na Apple Siliconu (eksperimentalno)",
+    "req_gpu": "Grafika",
+    "req_gpu_value": "Grafička kartica s podrškom za OpenGL 4.6 i ažurnim upravljačkim programom (na Macu igra donosi vlastiti OpenGL)",
+    "req_included": "Uključeno",
+    "req_included_value": "Stockfish 19 i njegova neuronska mreža: odmah igrajte izvan mreže",
+    "req_network": "Internet",
+    "req_network_value": "Za igru na mreži, GIF-ove te glas trenera i analize (neobavezno preuzimanje od oko 399 MB)",
+    "req_licence": "Licenca",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Provjerite preuzimanje",
+    "verify_text": "Podrijetlo izgradnje svake datoteke ovjerava GitHub. Pomoću alata GitHub CLI:",
+    "checksums": "Kontrolni zbrojevi SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Zasluge",
+    "title": "Zasluge i <em>zahvale</em>",
+    "engine_head": "Šahovski program",
+    "engine": "Stockfish 19, djelo razvijatelja Stockfisha (GNU GPL v3). Njegova je neuronska mreža trenirana na podacima projekta Leela Chess Zero (Open Database License).",
+    "voice_head": "Glas",
+    "voice": "Supertonic 3 tvrtke Supertone, pod licencom BigScience Open RAIL-M: preuzima se na vaš zahtjev i na vašem računalu daje glas treneru i analizi.",
+    "fonts_head": "Pisma",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) i Amiri (Khaled Hosny); rukopisna pisma Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One i LXGW WenKai (sva pod licencom SIL Open Font License); simboli šahovskih figura iz pisma GNU FreeFont.",
+    "openings_head": "Otvaranja i zadaci",
+    "openings": "Nazivi otvaranja iz baze chess-openings stranice lichess.org, a zadaci izazova trenera iz Lichessove baze zadataka; obje su ustupljene javnoj domeni (CC0).",
+    "quote": "„Šah je umjetnost analize.“",
+    "quote_author": "Mihail Botvinik"
+  },
+  "footer": {
+    "about": "Fotorealistična šahovska igra iz prvog lica, na vlastitom pogonu temeljenom na OpenGL-u 4.6. Slobodni softver pod licencom GNU GPL v3.",
+    "game": "Igra",
+    "online": "Na mreži",
+    "api_docs": "Dokumentacija API-ja poslužitelja",
+    "source": "Izvorni kod",
+    "game_source": "Igra na GitHubu",
+    "server_source": "Poslužitelj na GitHubu",
+    "releases": "Izdanja",
+    "licence": "Licenca (GPL v3)",
+    "credits": "Stockfish je zaštitni znak njegovih razvijatelja. YouTube je zaštitni znak tvrtke Google LLC. Windows je zaštitni znak tvrtke Microsoft Corporation. macOS je zaštitni znak tvrtke Apple Inc. Linux je registrirani zaštitni znak Linusa Torvaldsa. OpenGL je registrirani zaštitni znak tvrtke Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Ovo web-mjesto ne postavlja kolačiće i ne koristi alate za praćenje; YouTubeov reproduktor učitava se samo ako ga prihvatite.",
+    "legal_link": "Pravna obavijest, privatnost i uvjeti"
+  },
+  "common": {
+    "copy": "Kopiraj",
+    "loading": "Učitavanje…",
+    "noscript": "Ova stranica treba JavaScript za komunikaciju s poslužiteljem igre Scacelith."
+  },
+  "players": {
+    "title": "Ljestvica i igrači",
+    "lead": "Najbolji igrači službenog poslužitelja u svakom tempu igre za rejting. Potražite bilo kojeg igrača kako biste vidjeli njegove rejtinge i posljednje partije.",
+    "search_label": "Pronađi igrača",
+    "search_placeholder": "Korisničko ime",
+    "search_button": "Traži",
+    "back": "Natrag na ljestvicu",
+    "recent_games": "Posljednje partije",
+    "board_title": "Ljestvica",
+    "category": "Tempo igre",
+    "col_rank": "Mjesto",
+    "col_player": "Igrač",
+    "col_rating": "Rejting",
+    "col_peak": "Najviši",
+    "col_games": "Partije",
+    "col_wdl": "+ / = / −",
+    "loading": "Učitavanje…"
+  },
+  "account": {
+    "title": "Vaš račun",
+    "auth_foot": "Jedan račun na službenom poslužitelju, za igru i za ovo web-mjesto. Ako je vaš račun izrađen putem Googlea u igri, upotrijebite „Zaboravljena lozinka?“ kako biste mu postavili lozinku.",
+    "common": {
+      "back": "Natrag na prijavu"
+    },
+    "fields": {
+      "login": "Korisničko ime ili e-pošta",
+      "password": "Lozinka",
+      "show_password": "Prikaži lozinku",
+      "username": "Korisničko ime",
+      "email": "E-pošta",
+      "confirm_password": "Potvrdite lozinku",
+      "current_password": "Trenutna lozinka",
+      "new_password": "Nova lozinka",
+      "new_email": "Nova adresa e-pošte",
+      "mfa_code": "Kod za dvofaktorsku provjeru (ili kod za oporavak)"
+    },
+    "signin": {
+      "tab": "Prijava",
+      "title": "Dobro došli natrag",
+      "remember": "Zadrži prijavu na ovom uređaju",
+      "submit": "Prijavi se",
+      "forgot": "Zaboravljena lozinka?",
+      "resend": "Ponovno pošalji e-poruku za potvrdu"
+    },
+    "mfa": {
+      "title": "Dvofaktorska provjera",
+      "text": "Unesite šesteroznamenkasti kod iz aplikacije za autentifikaciju.",
+      "code": "Kod iz aplikacije",
+      "use_recovery": "Upotrijebi kod za oporavak",
+      "submit": "Potvrdi"
+    },
+    "google": {
+      "or": "ili",
+      "button": "Prijavi se putem Googlea",
+      "username_title": "Odaberite korisničko ime",
+      "username_text": "Vaš je Google račun nov na ovom poslužitelju. Odaberite ime koje će vidjeti drugi igrači: kasnije se ne može promijeniti.",
+      "username_submit": "Izradi moj račun",
+      "link_title": "Povezivanje Google računa",
+      "link_submit": "Poveži i prijavi se",
+      "returning": "Prijava putem Googlea…"
+    },
+    "register": {
+      "tab": "Izrada računa",
+      "title": "Besplatan račun",
+      "closed": "Poslužitelj trenutačno ne prima nove račune.",
+      "username_hint": "Slova, znamenke, _ i -; prvi znak mora biti slovo ili znamenka.",
+      "password_hint": "Najmanje 10 znakova, bez vašeg korisničkog imena ili adrese e-pošte.",
+      "pow_note": "Radi zaštite od robota vaš preglednik pri registraciji rješava malu zagonetku. To traje nekoliko sekundi.",
+      "submit": "Izradi račun",
+      "done_title": "Provjerite e-poštu",
+      "done_text": "Poslali smo poveznicu za potvrdu na vašu adresu. Otvorite je kako biste izradili račun, a zatim se prijavite.",
+      "done_hint": "Poveznica vrijedi 24 sata. Ništa nije stiglo? Provjerite mapu neželjene pošte ili ponovno zatražite e-poruku.",
+      "go_signin": "Idi na prijavu",
+      "legal_note": "Vaše korisničko ime, rejtinzi i partije bit će javni. Izradom računa prihvaćate uvjete korištenja.",
+      "legal_link": "Privatnost i uvjeti korištenja"
+    },
+    "forgot": {
+      "title": "Zaboravljena lozinka",
+      "text": "Unesite adresu e-pošte svog računa. Ako takav račun postoji, poslat ćemo vam poveznicu za odabir nove lozinke, koja vrijedi jedan sat.",
+      "submit": "Pošalji poveznicu"
+    },
+    "resend": {
+      "title": "Potvrdite e-poštu",
+      "text": "E-poruka za potvrdu nije stigla ili je poveznica istekla? Unesite svoju adresu kako biste dobili novu.",
+      "submit": "Pošalji ponovno"
+    },
+    "dash": {
+      "public_profile": "Javni profil",
+      "signout": "Odjavi se",
+      "tab_overview": "Pregled",
+      "tab_games": "Partije",
+      "tab_devices": "Uređaji",
+      "tab_settings": "Postavke"
+    },
+    "overview": {
+      "info": "Vaši podaci",
+      "ratings": "Vaši rejtinzi",
+      "sanctions": "Sankcije",
+      "recent": "Posljednje partije",
+      "all_games": "Sve vaše partije"
+    },
+    "games": {
+      "filter_category": "Tempo igre",
+      "all": "Sve",
+      "custom": "Prilagođeno",
+      "filter_rated": "Vrsta",
+      "rated": "Za rejting",
+      "casual": "Bez rejtinga",
+      "filter_result": "Rezultat",
+      "wins": "Pobjede",
+      "losses": "Porazi",
+      "draws": "Remiji"
+    },
+    "devices": {
+      "title": "Prijavljeni uređaji",
+      "signout_all": "Odjavi se svugdje",
+      "text": "Svaka prijava, u igri ili na ovom web-mjestu, jedan je uređaj. Odjavite one koje ne prepoznajete."
+    },
+    "settings": {
+      "challenges_title": "Izazovi",
+      "challenges_text": "Drugi igrači mogu vas u igri izazvati po imenu.",
+      "challenges_label": "Prihvaćaj izazove",
+      "mfa_title": "Dvofaktorska provjera",
+      "mfa_text": "Uključite je ili isključite i izradite nove kodove za oporavak na stranici računa u igri.",
+      "password_title": "Promjena lozinke",
+      "password_text": "Vaši se ostali uređaji odjavljuju, a ovaj ostaje prijavljen.",
+      "password_submit": "Promijeni lozinku",
+      "email_title": "Promjena adrese e-pošte",
+      "email_submit": "Pošalji poveznicu za potvrdu",
+      "export_title": "Preuzimanje mojih podataka",
+      "export_text": "Sve što poslužitelj čuva o vašem računu, u jednoj datoteci JSON.",
+      "export_submit": "Preuzmi moje podatke",
+      "delete_title": "Brisanje računa",
+      "delete_text": "To se ne može poništiti. Vaše partije i rejtinzi ostaju, pod anonimnim imenom; vaša adresa e-pošte, lozinka i uređaji brišu se.",
+      "delete_confirm": "Za potvrdu upišite svoje korisničko ime",
+      "delete_submit": "Izbriši moj račun"
+    }
+  },
+  "gif": {
+    "title": "Animirani GIF",
+    "preparing": "Priprema GIF-a…",
+    "download": "Preuzmi GIF",
+    "make": "Izradi GIF",
+    "pause": "Pauziraj animaciju",
+    "back": "Natrag na moje partije",
+    "options": "Postavke",
+    "size": "Veličina",
+    "size_small": "Mala (284 × 350)",
+    "size_medium": "Srednja (424 × 515)",
+    "size_large": "Velika (628 × 762)",
+    "orientation": "Pogled na ploču",
+    "orientation_white": "Sa strane bijelih",
+    "orientation_black": "Sa strane crnih",
+    "speed": "Brzina",
+    "speed_fast": "Brzo (0,25 s po potezu)",
+    "speed_normal": "Normalno (0,5 s po potezu)",
+    "speed_slow": "Sporo (1 s po potezu)",
+    "speed_very_slow": "Vrlo sporo (2 s po potezu)",
+    "coords": "Prikaži koordinate",
+    "regenerate": "Izradi ponovno",
+    "note": "Svaki GIF iscrtava poslužitelj. Već izrađeni GIF vraća se odmah; broj novih ograničen je na nekoliko u minuti."
+  },
+  "notfound": {
+    "title": "Stranica nije pronađena",
+    "text": "Ovo je polje prazno. Stranica je možda premještena.",
+    "home": "Natrag na Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Učitavanje…",
+      "retry": "Pokušaj ponovno",
+      "close": "Zatvori",
+      "copy": "Kopiraj",
+      "copied": "Kopirano u međuspremnik.",
+      "copy_failed": "Kopiranje nije uspjelo. Označite tekst i kopirajte ga ručno.",
+      "load_more": "Prikaži više",
+      "show_password": "Prikaži lozinku",
+      "hide_password": "Sakrij lozinku",
+      "signin_needed": "Prijavite se za nastavak.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Poslužitelj nije dostupan. Provjerite vezu i pokušajte ponovno.",
+      "timeout": "Poslužitelj nije odgovorio na vrijeme. Pokušajte ponovno.",
+      "server_busy": "Poslužitelj je zauzet. Pokušajte ponovno za trenutak.",
+      "rate_limited": "Previše zahtjeva. Pokušajte ponovno za {time}.",
+      "rate_limited_short": "Previše zahtjeva. Pokušajte ponovno za trenutak.",
+      "internal_error": "Na poslužitelju je došlo do neočekivane pogreške. Pokušajte ponovno kasnije.",
+      "invalid_token": "Vaša je sesija završila. Ponovno se prijavite.",
+      "unauthorized": "Prijavite se.",
+      "not_found": "Nije pronađeno.",
+      "unknown": "Došlo je do pogreške ({code}).",
+      "invalid_credentials": "Pogrešno korisničko ime, e-pošta ili lozinka.",
+      "too_many_attempts": "Previše pokušaja. Pokušajte ponovno za {time}.",
+      "banned": "Ovaj je račun suspendiran do {date}.",
+      "banned_permanent": "Ovaj je račun suspendiran.",
+      "email_unverified": "Vaša adresa e-pošte još nije potvrđena. Otvorite poveznicu koju smo vam poslali ili zatražite novu.",
+      "invalid_mfa_token": "Ovaj je korak prijave istekao. Ponovno se prijavite.",
+      "invalid_code": "Kod je pogrešan ili je već iskorišten.",
+      "mfa_code_required": "Unesite kod za dvofaktorsku provjeru.",
+      "invalid_password": "Pogrešna lozinka.",
+      "password_not_set": "Ovaj račun još nema lozinku: postavite je pomoću „Zaboravljena lozinka?“ na stranici za prijavu.",
+      "registration_closed": "Poslužitelj trenutačno ne prima nove račune.",
+      "invalid_username": "Ovo korisničko ime nije dopušteno.",
+      "username_taken": "Ovo je korisničko ime već zauzeto.",
+      "invalid_email": "Ova adresa e-pošte nije valjana.",
+      "email_taken": "Ovu adresu e-pošte već koristi drugi račun.",
+      "same_email": "To je već vaša adresa e-pošte.",
+      "weak_password": "Ova je lozinka preslaba.",
+      "weak_too_short": "Lozinka je prekratka (najmanji broj znakova: {min}).",
+      "weak_too_long": "Lozinka je preduga.",
+      "weak_contains_username": "Lozinka ne smije sadržavati vaše korisničko ime.",
+      "weak_contains_email": "Lozinka ne smije sadržavati vašu adresu e-pošte.",
+      "weak_too_common": "Ova je lozinka previše uobičajena. Odaberite drugu.",
+      "pow_failed": "Provjera protiv robota nije uspjela. Pokušajte ponovno.",
+      "passwords_differ": "Lozinke se ne podudaraju.",
+      "required": "Ispunite ovo polje.",
+      "email_format": "Unesite valjanu adresu e-pošte.",
+      "username_format": "Broj znakova: od {min} do {max}; slova, znamenke, _ i -, a prvi znak mora biti slovo ili znamenka.",
+      "password_length": "Najmanji broj znakova: {min}.",
+      "confirm_name": "Upišite svoje korisničko ime točno kako je prikazano.",
+      "game_too_long": "Ova je partija preduga da bi se od nje izradio GIF.",
+      "gif_disabled": "Ovaj poslužitelj ne izrađuje GIF-ove.",
+      "render_failed": "Poslužitelj nije uspio iscrtati ovaj GIF.",
+      "invalid_game": "Ova partija ne postoji.",
+      "invalid_player": "Unesite korisničko ime: 2 do 24 slova, znamenke, _, . ili -.",
+      "player_not_found": "Nema igrača s tim imenom.",
+      "sso_cancelled": "Prijava putem Googlea je otkazana.",
+      "sso_mismatch": "Ova prijava putem Googlea nije pokrenuta u ovoj kartici ili je već iskorištena. Pokušajte ponovno.",
+      "sso_expired": "Ova je prijava putem Googlea istekla. Pokušajte ponovno.",
+      "invalid_verifier": "Ova je prijava putem Googlea pokrenuta u drugoj kartici ili drugom pregledniku. Počnite ispočetka s ove stranice.",
+      "sso_email_unverified": "Google nije potvrdio adresu e-pošte ovog Google računa.",
+      "sso_account_exists": "Ovu adresu e-pošte već koristi račun, ali on nema lozinku pomoću koje bi se povezao s Googleom. Postavite mu lozinku putem „Zaboravljena lozinka?“, a zatim se ponovno prijavite putem Googlea.",
+      "sso_failed": "Prijavu putem Googlea nije bilo moguće dovršiti. Pokušajte ponovno.",
+      "sso_disabled": "Prijava putem Googlea nije dostupna na ovom poslužitelju.",
+      "sso_already_linked": "Ovaj je Google račun već povezan s drugim računom.",
+      "account_disabled": "Ovaj se račun više ne može koristiti.",
+      "sso_storage": "Vaš preglednik blokira pohranu ovog web-mjesta, koja je potrebna za prijavu putem Googlea. Dopustite je ili se prijavite lozinkom.",
+      "sso_url": "Poslužitelj je odgovorio neočekivanom Googleovom adresom pa je prijava putem Googlea zaustavljena."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekundu",
+        "few": "{count} sekunde",
+        "other": "{count} sekundi"
+      },
+      "minutes": {
+        "one": "{count} minutu",
+        "few": "{count} minute",
+        "other": "{count} minuta"
+      }
+    },
+    "download": {
+      "exe": "Izvršna datoteka",
+      "zip": "Arhiva ZIP",
+      "dmg": "Slika diska",
+      "archive": "Arhiva",
+      "file": "Datoteka",
+      "unavailable": "Nije dostupno",
+      "your_system": "Vaš sustav",
+      "eyebrow_release": "Verzija {version}",
+      "published": "Objavljeno {date}",
+      "unreachable": "GitHub trenutačno nije dostupan: pogledajte stranicu s izdanjima.",
+      "available": "Dostupno",
+      "verify_file": "datoteka",
+      "no_build": "Za {os} trenutačno nema verzije igre.",
+      "x64": "64-bitni (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bitni, Intel / AMD ili Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 ili noviji",
+      "experimental": "Eksperimentalno"
+    },
+    "server": {
+      "online": "Na mreži",
+      "offline": "Nedostupan",
+      "busy": "Zauzet",
+      "open": "Otvorena",
+      "closed": "Zatvorena",
+      "updated": "Ažurirano {time}",
+      "min_games": "Igrači s dovoljno partija za rejting u ovom tempu igre (najmanje {count}).",
+      "empty": "U ovom tempu igre još nema igrača na ljestvici.",
+      "error": "Ljestvicu trenutačno nije moguće učitati."
+    },
+    "game": {
+      "number": "Partija br. {id}",
+      "white": "Bijeli",
+      "black": "Crni",
+      "you": "vi",
+      "vs": "protiv",
+      "outcome_win": "Pobjeda",
+      "outcome_loss": "Poraz",
+      "outcome_draw": "Remi",
+      "outcome_aborted": "Poništena",
+      "result_white": "Bijeli pobjeđuje",
+      "result_black": "Crni pobjeđuje",
+      "result_draw": "Remi",
+      "result_aborted": "Poništena",
+      "rated": "Za rejting",
+      "casual": "Bez rejtinga",
+      "custom": "Prilagođeno",
+      "moves": {
+        "one": "{count} potez",
+        "few": "{count} poteza",
+        "other": "{count} poteza"
+      },
+      "duration": "Trajanje: {time}",
+      "rating_diff": "Promjena rejtinga: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Preuzmi partiju kao PGN",
+      "copy_pgn": "Kopiraj",
+      "copy_pgn_title": "Kopiraj PGN",
+      "gif": "GIF",
+      "gif_title": "Izradi animirani GIF (otvara se nova kartica)",
+      "gif_signin": "Prijavite se za izradu GIF-ova",
+      "pgn_copied": "PGN je kopiran u međuspremnik.",
+      "pgn_saved": "PGN je preuzet.",
+      "none": "Još nema partija. Ovdje će se pojaviti vaše partije na mreži.",
+      "none_filtered": "Nijedna partija ne odgovara ovim filtrima.",
+      "none_public": "Još nema partija.",
+      "total": {
+        "one": "{count} partija",
+        "few": "{count} partije",
+        "other": "{count} partija"
+      },
+      "termination_unknown": "Kraj partije",
+      "reason": {
+        "1": "Mat",
+        "2": "Predaja",
+        "3": "Poraz zbog isteka vremena",
+        "4": "Drugi nepravilan potez (poraz)",
+        "5": "Pat",
+        "6": "Mrtva pozicija (nedovoljno materijala)",
+        "7": "Isteklo vrijeme, ali protivnik ne može dati mat",
+        "8": "Peterostruko ponavljanje pozicije",
+        "9": "Pravilo 75 poteza",
+        "10": "Trostruko ponavljanje pozicije (na zahtjev)",
+        "11": "Pravilo 50 poteza (na zahtjev)",
+        "12": "Remi dogovorom",
+        "13": "Drugi nepravilan potez, ali protivnik ne može dati mat",
+        "14": "Predaja, ali protivnik ne može dati mat",
+        "20": "Napuštanje partije (predugo bez veze)",
+        "21": "Napuštanje partije, ali protivnik ne može dati mat",
+        "22": "Partija poništena",
+        "23": "Prvi potez nije odigran na vrijeme (poništeno)",
+        "24": "Kontumacija (kršenje pravila poštene igre)",
+        "25": "Poslužitelj je poništio partiju",
+        "26": "Oba su igrača izgubila vezu"
+      }
+    },
+    "ratings": {
+      "category": "Tempo igre",
+      "rating": "Rejting",
+      "peak": "Najviši",
+      "games": "Partije",
+      "wdl": "+ / = / −",
+      "provisional": "Privremeni rejting",
+      "none": "Još nema partija za rejting.",
+      "unrated_hint": "Upitnik označava privremeni rejting (zasad je odigrano malo partija)."
+    },
+    "account": {
+      "member_since": "Član od {date}",
+      "last_login": "Posljednja prijava",
+      "created": "Račun izrađen",
+      "email": "E-pošta",
+      "pending_email": "Čeka se potvrda: {email}",
+      "verified": "Potvrđena",
+      "unverified": "Nije potvrđena",
+      "mfa": "Dvofaktorska provjera",
+      "mfa_on": "Uključena",
+      "mfa_off": "Isključena",
+      "google": "Prijava putem Googlea",
+      "google_on": "Povezana",
+      "google_off": "Nije povezana",
+      "password": "Lozinka",
+      "password_set": "Postavljena",
+      "password_unset": "Još nije postavljena",
+      "challenges": "Izazovi",
+      "challenges_all": "Prihvaćaju se",
+      "challenges_none": "Odbijaju se",
+      "badge_verified": "E-pošta potvrđena",
+      "badge_mfa": "Dvofaktorska provjera uključena",
+      "badge_google": "Google",
+      "ban_until": "Vaš je račun suspendiran do {date}.",
+      "ban_permanent": "Vaš je račun suspendiran.",
+      "sanction_ban": "Suspenzija",
+      "sanction_mm_block": "Traženje protivnika blokirano",
+      "sanction_warning": "Upozorenje",
+      "sanction_until": "do {date}",
+      "sanction_permanent": "trajno",
+      "devices_current": "Ovaj uređaj",
+      "devices_unknown": "Uređaj bez naziva",
+      "devices_signed_in": "Prijavljen {date}",
+      "devices_seen": "Posljednja upotreba {time}",
+      "devices_expires": "Istječe {date}",
+      "devices_revoke": "Odjavi",
+      "devices_revoked": "Uređaj je odjavljen.",
+      "devices_none": "Nema drugih uređaja.",
+      "signout_all_confirm": "Želite li odjaviti sve uređaje, uključujući ovaj?",
+      "signed_out": "Odjava je uspjela.",
+      "signed_in": "Dobro došli, {name}.",
+      "prefs_saved": "Spremljeno.",
+      "password_changed": "Vaša je lozinka promijenjena. Vaši su ostali uređaji odjavljeni.",
+      "email_sent": "Poveznica za potvrdu poslana je na novu adresu. Adresa se mijenja kad je otvorite.",
+      "email_changed": "Vaša je adresa e-pošte sada {email}.",
+      "email_current": "Trenutna adresa: {email}.",
+      "email_pending": "Promjena adrese u {email} čeka potvrdu putem poveznice.",
+      "export_done": "Vaši su podaci preuzeti.",
+      "deleted": "Vaš je račun izbrisan.",
+      "delete_confirm_label": "Za potvrdu upišite {name}",
+      "register_done": "Poslali smo poveznicu za potvrdu na {email}. Otvorite je kako biste izradili račun, a zatim se prijavite.",
+      "register_ready": "Vaš je račun spreman. Možete se prijaviti.",
+      "forgot_done": "Ako neki račun koristi ovu adresu, poveznica za odabir nove lozinke je na putu.",
+      "resend_done": "Ako ova adresa čeka potvrdu, nova je poveznica na putu.",
+      "pow_solving": "Rješavanje zagonetke protiv robota…",
+      "mfa_recovery": "Kod za oporavak",
+      "mfa_recovery_text": "Unesite jedan od svojih kodova za oporavak. Svaki kod vrijedi samo jednom.",
+      "mfa_app": "Kod iz aplikacije",
+      "mfa_app_text": "Unesite šesteroznamenkasti kod iz aplikacije za autentifikaciju.",
+      "mfa_state_on": "Dvofaktorska provjera uključena je za ovaj račun.",
+      "mfa_state_off": "Dvofaktorska provjera isključena je za ovaj račun.",
+      "client_label": "Web-mjesto Scacelitha ({browser})",
+      "username": "Korisničko ime",
+      "password_rules": "Najmanji broj znakova: {min}. Bez vašeg korisničkog imena i adrese e-pošte.",
+      "password_note": "Vaši se ostali uređaji odjavljuju, a ovaj ostaje prijavljen.",
+      "signin_label": "Prijava",
+      "google_link_text": "Račun {name} već koristi ovu adresu e-pošte. Jednom unesite njegovu lozinku kako biste ga povezali s Googleom; nakon toga dovoljno je „Prijavi se putem Googlea“.",
+      "auth_foot_google": "Jedan račun na službenom poslužitelju, za igru i za ovo web-mjesto. Ako je račun izrađen putem Googlea u igri, i ovdje se prijavite putem Googlea."
+    },
+    "players": {
+      "since": "Član od {date}",
+      "games": "Partije",
+      "rated": "Za rejting",
+      "wins": "Pobjede",
+      "draws": "Remiji",
+      "losses": "Porazi",
+      "view": "Pogledaj profil igrača {name}",
+      "you": "Vi",
+      "board": "Ljestvica"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partija br. {id} · {date}",
+      "preparing": "Priprema GIF-a…",
+      "rendering": "Poslužitelj iscrtava GIF. Duga partija može potrajati nekoliko sekundi…",
+      "ready": "Vaš je GIF spreman. Preuzimanje je započelo.",
+      "ready_again": "Vaš je GIF spreman.",
+      "signin": "Prijavite se za izradu GIF-ova svojih partija.",
+      "signin_button": "Prijavi se",
+      "missing": "Nije odabrana nijedna partija.",
+      "retry_in": "Možete pokušati ponovno za {time}.",
+      "confirm": "Pritisnite „Izradi GIF“ kako bi poslužitelj iscrtao ovu partiju putem vašeg računa.",
+      "retry_now": "Sada možete pokušati ponovno."
+    },
+    "home": {
+      "create_account": "Izradi račun",
+      "my_account": "Moj račun",
+      "my_games": "Moje partije",
+      "signin": "Prijavi se"
+    },
+    "trailer": {
+      "title": "Najava za Scacelith",
+      "notice": "Ovaj videozapis nalazi se na YouTubeu. Reprodukcijom ovdje učitava se Googleov reproduktor, koji prima vašu IP adresu i može na vaš uređaj spremiti kolačiće ili druge alate za praćenje.",
+      "accept": "Prihvati i reproduciraj",
+      "google_privacy": "Googleova pravila o privatnosti"
+    }
+  },
+  "legal": {
+    "eyebrow": "Pravne informacije",
+    "title": "Pravna obavijest, privatnost i uvjeti korištenja",
+    "lead": "Tko izdaje Scacelith i tko mu pruža hosting, što se događa s vašim podacima na ovom web-mjestu, u igri i na službenom poslužitelju te pravila igre na tom poslužitelju.",
+    "updated": "Posljednje ažuriranje: 11. listopada 2026.",
+    "toc": "Na ovoj stranici",
+    "notice": {
+      "title": "Pravna obavijest",
+      "publisher_label": "Izdavač",
+      "publisher": "Scacelith izdaje fizička osoba u neprofesionalnom svojstvu. Kako dopušta francusko pravo (članak 1-1 II zakona br. 2004-575 od 21. lipnja 2004.), identitet izdavača ovdje se ne navodi; poznat je pružatelju usluge hostinga.",
+      "contact_label": "Kontakt",
+      "contact": "Za sva pitanja o ovom web-mjestu, službenom poslužitelju ili vašim podacima.",
+      "host_server": "Službeni poslužitelj igre i podaci o računima",
+      "host_server_note": "Poslužitelji u Francuskoj.",
+      "host_site": "Ovo web-mjesto i dokumentacija API-ja (GitHub Pages)",
+      "host_domain": "Registrar naziva domene",
+      "licence_label": "Licenca",
+      "licence": "Igra i njezin poslužitelj slobodni su softver pod licencom GNU General Public License v3, s javno dostupnim izvornim kodom:",
+      "game_source": "igra",
+      "server_source": "poslužitelj",
+      "phone": "Telefon"
+    },
+    "privacy": {
+      "title": "Privatnost",
+      "intro": "Scacelith ne prikazuje oglase, ne prodaje podatke i ne mjeri posjećenost. Osobni podaci upotrebljavaju se samo za rad ovog web-mjesta i službenog poslužitelja, kako je opisano u nastavku. Voditelj obrade je izdavač, dostupan na gore navedenoj adresi za kontakt.",
+      "site_title": "Na ovom web-mjestu",
+      "site_hosting": "GitHub pruža hosting za ovo web-mjesto i, kao i svaki pružatelj web-hostinga, bilježi IP adrese posjetitelja u sigurnosne svrhe.",
+      "github_privacy": "GitHubova izjava o privatnosti",
+      "site_requests": "Kako bi prikazao najnovije izdanje, vaš preglednik šalje upit GitHubovu API-ju (api.github.com); kako bi prikazao stanje poslužitelja, ljestvicu, igrače i vaš račun, šalje upit službenom poslužitelju (caissa.scacelith.com). Oba primaju vašu IP adresu, kao i pri svakom zahtjevu.",
+      "site_storage": "Web-mjesto ne postavlja kolačiće i nema analitiku. U vašem pregledniku čuva samo vaš odabir jezika i, nakon prijave, vašu sesiju: samo za trenutačnu karticu ili, ako označite „Zadrži prijavu na ovom uređaju“, na tom uređaju. Prijava putem Googlea također čuva svoje jednokratne kodove u trenutačnoj kartici dok se ne iskoriste. Sve je to potrebno za rad web-mjesta, a sesiju i kodove prima samo službeni poslužitelj.",
+      "site_trailer": "Najava je videozapis na YouTubeu. Ništa se ne učitava s YouTubea dok ne pritisnete „Prihvati i reproduciraj“; YouTube (Google) tada prima vašu IP adresu i može na vaš uređaj spremiti kolačiće ili druge alate za praćenje. Vaš se odgovor ne pamti: pitanje se ponovno pojavljuje pri vašem sljedećem posjetu.",
+      "site_google": "„Prijavi se putem Googlea“ na stranici Račun ne učitava ništa s Googlea dok ga ne pritisnete. Vaš preglednik tada odlazi na Googleovu stranicu za prijavu (accounts.google.com), a Google ga vraća na ovo web-mjesto s jednokratnim kodom koji web-mjesto predaje službenom poslužitelju. Google prima vašu IP adresu i ono što unesete na njegovoj stranici, u skladu s vlastitim pravilima.",
+      "google_privacy": "Googleova pravila o privatnosti",
+      "game_title": "U igri",
+      "game_local": "Igra čuva svoje postavke, vaše lokalne rezultate i vašu prijavu na vašem računalu. Prijava se čuva u sigurnom spremištu sustava: DPAPI u sustavu Windows, Keychain na macOS-u, spremište ključeva Secret Service na Linuxu ili, ako ga nema, datoteka koju može čitati samo vaš korisnički račun.",
+      "game_network": "Sama od sebe ne šalje ništa: nema telemetrije ni provjere ažuriranja. Sa službenim poslužiteljem povezuje se samo kad otvorite stranicu „Igraj na mreži“, s Hugging Faceom samo kad preuzimate trenerov glas, a za izravni meč s računalom vašeg protivnika, koje tada zna vašu IP adresu (igra može i otvoriti port na vašem usmjerivaču putem UPnP-a).",
+      "account_title": "Vaš račun na službenom poslužitelju",
+      "account_intro": "Izrada računa, u igri ili na ovom web-mjestu, i igra na mreži šalju sljedeće podatke službenom poslužitelju, čiji je hosting kod OVH-a u Francuskoj:",
+      "data_account": "<strong>Račun:</strong> korisničko ime, adresa e-pošte, lozinka (pohranjena samo kao sažetak Argon2id), tajni ključ dvofaktorske provjere (šifriran) i kodovi za oporavak (kao sažeci), datum registracije i datum posljednje prijave.",
+      "data_google": "<strong>Prijava putem Googlea:</strong> Google šalje identifikator vašeg Google računa, vašu adresu e-pošte i vaše ime. Poslužitelj čuva identifikator i adresu, a ime upotrebljava samo za prijedlog korisničkog imena.",
+      "data_sessions": "<strong>Prijavljeni uređaji:</strong> za svaku prijavu naziv uređaja (verzija igre i sustav, npr. „Scacelith/1.0.0 win64“, ili preglednik i sustav za ovo web-mjesto), IP adresa i datumi upotrebe.",
+      "data_games": "<strong>Partije i rejtinzi:</strong> svaka partija na mreži (igrači, potezi, vrijeme utrošeno na svaki potez, rezultat, datumi) i vaši rejtinzi. Tijekom partije pokreti vaše glave i ruke prenose se protivniku uživo i nikad se ne pohranjuju.",
+      "data_security": "<strong>Sigurnosni dnevnik:</strong> prijave, neuspjeli pokušaji i promjene računa, s IP adresom.",
+      "data_fairplay": "<strong>Poštena igra:</strong> prijave koje podnosite vi ili koje se odnose na vas, s njihovim komentarom; napuštene i propuštene partije; sankcije; te provjere partija, od krivotvorenih ili nemogućih poteza do statistike šahovskog programa Stockfish.",
+      "basis_title": "Zašto i na kojoj pravnoj osnovi",
+      "basis_contract": "Vođenje vašeg računa i igre na mreži (prijava, mečevi, rejtinzi, zapisi partija, e-poruke koje usluga šalje): usluga za koju se registrirate (članak 6. stavak 1. točka (b) GDPR-a).",
+      "basis_security": "Zaštita računa i poslužitelja te očuvanje poštenosti partija (sigurnosni dnevnik, IP adrese, provjere poštene igre, sankcije): legitimni interes izdavača i igrača (članak 6. stavak 1. točka (f) GDPR-a).",
+      "basis_trailer": "Reprodukcija najave s YouTubea: vaša privola, dana gumbom (članak 6. stavak 1. točka (a) GDPR-a).",
+      "public_title": "Što svi mogu vidjeti",
+      "public": "Vaše korisničko ime, datum registracije, rejtinzi i potpuni popis partija, sa svim potezima, javni su: na ovom web-mjestu, putem API-ja poslužitelja i u PGN-u svake partije. Vaša adresa e-pošte, uređaji, prijave, sankcije i zapisi o poštenoj igri nikad se ne prikazuju. Izravne izazove možete odbijati, ali partije se ne mogu sakriti.",
+      "auto_title": "Automatske odluke",
+      "auto": "Neka kršenja protokola igre, poput krivotvorene poruke ili poteza koji je u danoj poziciji nemoguć, siguran su dokaz varanja: poslužitelj tada partiju proglašava izgubljenom kontumacijom, suspendira račun na 24 sata, uklanja ga s ljestvice i vraća bodove koje su njegovi protivnici izgubili protiv njega u posljednjih 60 dana. Tri napuštene, poništene ili propuštene partije unutar 24 sata zaustavljaju traženje protivnika za partije za rejting na 15 minuta, a zatim na dulje. Statistika šahovskog programa nikad sama po sebi ne dovodi do sankcije: odluku donosi osoba. Na adresi za kontakt možete zatražiti preispitivanje bilo koje odluke.",
+      "recipients_title": "Tko prima vaše podatke",
+      "recipient_ovh": "OVH SAS pruža hosting za poslužitelj i njegove podatke, u Francuskoj.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, Francuska) šalje e-poruke poslužitelja: prima vašu adresu, vaše korisničko ime i poruku.",
+      "recipient_google": "Google prima ono što mu vaš preglednik pošalje kad se odlučite prijaviti putem Googlea, u skladu s vlastitim pravilima o privatnosti.",
+      "recipient_staff": "Administrator i moderatori poslužitelja vide podatke o računima i poštenoj igri radi vođenja usluge.",
+      "recipient_players": "Drugi igrači vide ono što je javno, a vaš protivnik tijekom partije vidi vaše poteze i pokrete.",
+      "recipient_none": "Nitko drugi: nijedan se podatak ne prodaje, ne iznajmljuje niti upotrebljava za oglašavanje.",
+      "transfers": "Podaci o računima ostaju u Francuskoj. GitHub, Google i Porkbun (koji prosljeđuje poruke poslane na adresu za kontakt) imaju sjedište u Sjedinjenim Američkim Državama: ono što prime podliježe njihovim vlastitim pravilima i njihovim zaštitnim mjerama za prijenose izvan Europske unije.",
+      "retention_title": "Koliko se dugo čuvaju",
+      "ret_account": "<strong>Račun:</strong> dok ga ne izbrišete. Registracija čija adresa nikad nije potvrđena briše se nakon 24 sata.",
+      "ret_sessions": "<strong>Prijavljeni uređaji:</strong> do vaše odjave, nakon 30 dana neupotrebe, a najkasnije nakon 90 dana.",
+      "ret_ip": "<strong>IP adrese:</strong> brišu se nakon 30 dana. Dnevnici poslužitelja čuvaju samo skraćene adrese.",
+      "ret_security": "<strong>Sigurnosni dnevnik:</strong> 90 dana.",
+      "ret_conduct": "<strong>Napuštene i propuštene partije:</strong> 30 dana.",
+      "ret_games": "<strong>Partije i rejtinzi:</strong> dokle god poslužitelj čuva svoje zapise partija, koji su ujedno i zapisi vaših protivnika. Nakon brisanja vašeg računa vaše se ime u njima zamjenjuje oznakom „deleted#“ i brojem.",
+      "ret_fairplay": "<strong>Sankcije, prijave i rezultati provjera poštene igre:</strong> čuvaju se kako se suspendirani igrači ne bi mogli jednostavno vratiti i kako bi ostali igrači bili zaštićeni. Nakon brisanja vašeg računa ostaju povezani samo s njegovim brojem.",
+      "ret_backups": "<strong>Sigurnosne kopije:</strong> izbrisani podaci mogu kratko vrijeme ostati u sigurnosnoj kopiji poslužitelja, dok se ona ne zamijeni.",
+      "ret_contact": "<strong>Poruke na adresu za kontakt:</strong> onoliko dugo koliko je potrebno da se na njih odgovori.",
+      "rights_title": "Vaša prava",
+      "rights": "Možete pristupiti svojim podacima, ispraviti ih, izbrisati i izvesti, ograničiti njihovu upotrebu i uložiti prigovor na nju (članci od 15. do 21. GDPR-a).",
+      "rights_self": "Većina toga nalazi se u vašem računu, u igri ili na stranici Račun ovog web-mjesta: preuzmite podatke svog računa kao datoteku JSON, promijenite adresu e-pošte ili lozinku, odjavite ostale uređaje ili odmah izbrišite račun.",
+      "rights_google": "Račun izrađen putem Googlea nema lozinku: kako biste ga izvezli ili izbrisali, najprije mu postavite lozinku pomoću „Zaboravljena lozinka?“.",
+      "rights_mail": "Za sve ostalo, uključujući podatke koje izvoz ne sadrži (provjere poštene igre, prijave koje se odnose na vas), pišite na adresu za kontakt. Odgovor ćete dobiti u roku od mjesec dana.",
+      "rights_cnil": "Ako smatrate da se vaša prava ne poštuju, možete podnijeti pritužbu CNIL-u (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, Francuska) ili tijelu za zaštitu podataka u svojoj zemlji.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Uvjeti korištenja",
+      "intro": "Ovi uvjeti vrijede za službeni poslužitelj (caissa.scacelith.com) i za stranice računa na ovom web-mjestu. Izradom računa ili igrom na službenom poslužitelju prihvaćate ih.",
+      "service": "<strong>Besplatna usluga.</strong> Igra je slobodni softver i besplatna je. Službeni poslužitelj nudi se besplatno i takav kakav jest, bez jamstva dostupnosti: može se promijeniti, neko vrijeme ne raditi ili se ugasiti.",
+      "account": "<strong>Vaš račun.</strong> Vi snosite odgovornost za ono što se s njim čini i za čuvanje njegove lozinke u tajnosti. Odmah pišite na adresu za kontakt ako mislite da ga netko drugi koristi.",
+      "username": "<strong>Vaše korisničko ime</strong> javno je: ne smije biti uvredljivo ni sadržavati govor mržnje, ne smije lažno predstavljati drugu osobu niti otkrivati ičije osobne podatke.",
+      "fair": "<strong>Poštena igra.</strong> Tijekom partije za rejting nije dopuštena pomoć šahovskog programa, druge osobe ni bilo kojeg drugog alata. Nisu dopušteni izmijenjeni klijenti igre, krivotvorene poruke ni namjerno preopterećivanje poslužitelja.",
+      "conduct": "<strong>Završite svoje partije.</strong> Ako tri puta unutar 24 sata napustite ili poništite partiju ili propustite partiju dodijeljenu pri traženju protivnika, traženje protivnika za partije za rejting zaustavlja se na neko vrijeme.",
+      "reports": "<strong>Prijave</strong> se moraju podnositi u dobroj vjeri. Za prijavu igrača ili nezakonitog sadržaja, poput uvredljivog korisničkog imena, upotrijebite gumb za prijavu u partiji ili pišite na adresu za kontakt.",
+      "sanctions": "<strong>Sankcije.</strong> Kršenje ovih pravila može dovesti do kontumacije, upozorenja, suspenzije i uklanjanja s ljestvice; bodovi izgubljeni protiv varalice vraćaju se njegovim protivnicima. Automatski se sankcionira samo siguran dokaz varanja; o svemu ostalom odlučuje osoba. Sankciju možete osporiti na adresi za kontakt.",
+      "liability": "<strong>Odgovornost.</strong> U granicama dopuštenima zakonom izdavač nije odgovoran za prekide usluge ni za gubitak partija, rejtinga ili podataka.",
+      "end": "<strong>Prestanak.</strong> Svoj račun možete izbrisati u bilo kojem trenutku. Račun koji krši ove uvjete može biti suspendiran.",
+      "changes": "<strong>Izmjene.</strong> Ovi se uvjeti mogu mijenjati; datum na vrhu ove stranice označava trenutačnu verziju, a nastavak igre nakon izmjene znači njezino prihvaćanje.",
+      "law": "<strong>Mjerodavno pravo.</strong> Na ove se uvjete primjenjuje francusko pravo. U slučaju spora najprije pišite na adresu za kontakt kako biste zajedno pronašli rješenje."
+    },
+    "version_note": "Ova stranica postoji na više jezika; u slučaju razlika mjerodavna je francuska verzija."
+  }
+}
