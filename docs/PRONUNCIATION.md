@@ -181,6 +181,7 @@ Turm a drei gespielt" (ex.verdict.inaccuracy.b5.2) lost "Turm" 3 times in 4.
 | troco (a troco de nada) | "tróco", the open o of the verb | `trôco` (respell.troco: every line has the noun) |
 | Deste (you gave) starting a sentence | "dêste", the demonstrative | `Déste` (.spoken of appraisal.improve.coach_hung.b3, lesson.safety.gave) |
 | Najdorf, Nimzowitsch, Winawer, Bogoljubow, Tartakower, Janowski, Horwitz | w as in English, j as in "jogo": "Najedorf", "Nimzouitch", "Uinauer" | `Naidorf`, `Nimzóvitch`, `Vináver`, `Bogoliúbov`, `Tartakóver`, `Ianóvski`, `Hórvitz` |
+| Fajarowicz | "Fajaro X", "Fajarwix" | `faiaróvitch` (found in the Brazilian pass, same voice) |
 
 - Round trip over 750 lines (Parakeet, seed 0), then 3 seeds on every word missed in more than a third of
   its uses, the reviewers' list, the file letters, the numbers and the opening names. The file letter: "é"
@@ -200,3 +201,38 @@ Turm a drei gespielt" (ex.verdict.inaccuracy.b5.2) lost "Turm" 3 times in 4.
   "ala" as "aula"; it drops a line's first word when it is an interjection or a short title ("Olá!",
   "Xeque-mate!"), and it cannot write most eponyms, nor short lines that end in one (it switches to English
   or Polish).
+
+## Brazilian Portuguese
+
+The European Portuguese voice reads the Brazilian text (language `pt`): only misreadings are respelled, a
+European vowel is left as it is. Most findings of the European Portuguese pass hold here too.
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e (squares) | swallowed after "em", "para", "até": "toma em é cinco" said "toma em cinco" | `éh` (file.e.spoken): heard 36 times in 54 against 24 |
+| até {sq} | the letter melts into "até", even as "éh": "até quatro", "até a quatro" (right 2 times in 9) | `até a casa {sq}` (.spoken of lesson.first.ask, ex.promotion.b1/b2, ex.promotion_missed.*, ex.push_passed.*): 6 in 9 |
+| xeque-mate, um xeque, xeques, xadrez | an initial x read "s" ("sec mate", "sex", "sadrez"); "xeque" alone mostly right | `cheque`, `cheques`, `chadrez` (respell.*): 37 times in 78 heard with "ch", 61 respelled; xadrez 2 in 12, 11 respelled |
+| en passant | "em passante", with the t (8 times in 15) | `ã passã` (respell.en, respell.passant): no t in 15 |
+| troco (a troco de nada), torno (em torno de) | the open o of the verb: "a troca de nada" 6 times in 6; probe "tórno" in two contexts | `trôco` ("troco" 4 in 6), `tôrno` (respell.*: every use is the noun) |
+| para, the verb (lesson.knight.l, lesson.ep.watch, an.end.unfinished, .2) | the preposition "pra" (probe, 3 contexts): "ele sempre pode", "parabéns ao lado" | `pára` (.spoken): heard "para" 9 times in 12 against 4 |
+| força, the verb (an.brilliant.mate.2) | the noun "fôrça" (probe, 6 seeds) | `fórça` (.spoken) |
+| Tente starting lesson.values.trade | "A gente nunca entregar" (5 times in 7) | `Tênte` (.spoken): right 5 in 7 |
+| Najdorf, Nimzowitsch, Winawer, Bogoljubow, Tartakower, Janowski, Horwitz, Fajarowicz | w as in English, j as in "jogo": "Nash-dorf", "Nimzo-witch", "Tarta-call", "Fajaro-wix" | `Naidorf`, `Nimzóvitch`, `Vináver`, `Bogoliúbov`, `Tartakóver`, `Ianóvski`, `Hórvitz`, `Faiaróvitch` |
+
+- Round trip over 720 lines (Parakeet, seed 0), then 3 seeds on the words missed in more than a third of
+  their uses, the reviewers' list, the file letters, the numbers, the opening names, and every fix; probes
+  (4-6 seeds) for the homographs. The opening texts take `éh` from file.e.spoken ("o peão éh", no longer
+  the verb); "chegar a éh quatro" is heard 5 times in 6.
+- Checked and fine: rating (said "rêitin", probe), Elo, blitz, Philidor ("Filidor"), éle, á/agá said alone,
+  "letra é", Uau, Opa, the numbers (quatorze, dezesseis, dezessete, dezenove, vinte e uma, cinquenta...
+  written as the right digits, 3 seeds), pode (open o), sobre, the verb jogo in "jogo com calma" (open o,
+  probe), Meran, Leningrado, Iugoslavo, Moscou.
+- Left as is: close calls between the open and the closed vowel, changing with the context (probe): "eu
+  tomo", "eu começo", "olho" (open alone and in "Fique de olho", a tie in longer contexts), erros, "cerca de" (no candidate close;
+  "cerca" alone is "cêrca"). "Tente" elsewhere: "Tênte" did no better over 36 renderings (9 against 9).
+  "onze" is read "ônze" (probe) but heard only 5 times in 12 ("ônze" 8, the same reading). Jaenisch
+  ("Jaenich", j of "jogo") and Euwe ("Eu-ue"): no settled Brazilian reading to respell to.
+- Recogniser habits: as in European Portuguese ("ala" as "aula", "roque" as "rock", "mate" as "match",
+  short lines and interjections such as "Hum" dropped, eponyms unwritable), plus the reduced final e of
+  Brazilian imperatives and subjunctives written as other forms ("Pense" as "pensa", "avance" as "avança", "Tente" as
+  "sente" or "tem"), "peão" as "pião" or "pão", "doze" as "dose", "Este é" as "Eu sou".

@@ -304,6 +304,7 @@ respell.passant = passã
 respell.troco = trôco
 # Eponyms: the voice reads a w as in English and a j as in "jogo" ("Nimzouitch", "Uinauer",
 # "Najedorf", "Bogojubou"): spelled as Portuguese players say them, stressed as the names are.
+respell.fajarowicz = faiaróvitch
 respell.najdorf = naidorf
 respell.nimzowitsch = nimzóvitch
 respell.winawer = vináver

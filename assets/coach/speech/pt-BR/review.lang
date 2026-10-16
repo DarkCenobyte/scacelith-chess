@@ -684,10 +684,15 @@ ex.missed_fork.b6.2 = {best}: garfo {t1:no} e {t2:no}.
 
 # ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
 # {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# Spoken "até a casa {sq}" here and in ex.promotion_missed, ex.push_passed: right after "até" the
+# file letter melts into its é ("até éh quatro" heard "até quatro" or "até a quatro", right 2 times
+# in 9; "até a casa éh quatro" 6 in 9).
 ex.promotion.b1 = {my} pode correr até {sq} e virar dama. {your} está longe demais.
+ex.promotion.b1.spoken = {my} pode correr até a casa {sq} e virar dama. {your} está longe demais.
 ex.promotion.b1.2 = Veja: nada impede {my:art} de chegar à casa {sq}. {your} não consegue alcançá-{my:lo}.
 ex.promotion.b1.3 = {my} está a {n:square} de {sq}, e {your} é lent{your:o} demais.
 ex.promotion.b2 = {my} corre até {sq}, e {your} não consegue alcançá-{my:lo}.
+ex.promotion.b2.spoken = {my} corre até a casa {sq}, e {your} não consegue alcançá-{my:lo}.
 ex.promotion.b2.2 = {my} precisa de {n:move} para chegar a {sq}; {your} precisa de {n2:move}. Não dá tempo.
 ex.promotion.b2.3 = Cuidado: {my} vira dama em {sq}, e {your} está longe demais.
 ex.promotion.b3 = {my} está fora do quadrado: {your} não consegue alcançá-{my:lo} antes de {sq}.
@@ -700,16 +705,21 @@ ex.promotion.b6 = {your} está fora do quadrado; eu faço dama em {sq}.
 ex.promotion.b6.2 = {line}, dama em {sq} ({your} tarde demais).
 # The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
 ex.promotion_missed.b1 = Seu peão podia correr até {sq} e virar dama!
+ex.promotion_missed.b1.spoken = Seu peão podia correr até a casa {sq} e virar dama!
 ex.promotion_missed.b1.2 = Olhe a casa {sq}! Seu peão podia ter corrido até lá.
 ex.promotion_missed.b2 = Seu peão podia ter corrido até {sq}. Avance os peões passados!
+ex.promotion_missed.b2.spoken = Seu peão podia ter corrido até a casa {sq}. Avance os peões passados!
 ex.promotion_missed.b2.2 = Nada parava o seu peão a caminho de {sq}.
 ex.promotion_missed.b3 = {best} vence a corrida até {sq}.
+ex.promotion_missed.b3.spoken = {best} vence a corrida até a casa {sq}.
 ex.promotion_missed.b3.2 = Seu peão era mais rápido: {best}, e ele vira dama em {sq}.
 ex.promotion_missed.b4 = {best} vence a corrida de peões até {sq}.
+ex.promotion_missed.b4.spoken = {best} vence a corrida de peões até a casa {sq}.
 ex.promotion_missed.b4.2 = {best}! O peão vira dama em {sq}.
 ex.promotion_missed.b5 = {best} faz dama primeiro, em {sq}.
 ex.promotion_missed.b5.2 = {best}, e você fica com a casa {sq}.
 ex.promotion_missed.b6 = {best} vence a corrida até {sq}.
+ex.promotion_missed.b6.spoken = {best} vence a corrida até a casa {sq}.
 ex.promotion_missed.b6.2 = {best}; primeiro em {sq}.
 
 # ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
@@ -766,14 +776,17 @@ ex.opposition.b6 = {best}, oposição.
 ex.opposition.b6.2 = {best}: a oposição.
 # Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
 ex.push_passed.b1 = Seu peão podia correr até {sq}. Peões passados querem avançar!
+ex.push_passed.b1.spoken = Seu peão podia correr até a casa {sq}. Peões passados querem avançar!
 ex.push_passed.b1.2 = Avance o seu peão livre! Ele quer chegar à casa {sq}.
 ex.push_passed.b1.3 = Seu peão passado quer marchar até {sq}. Avance-o!
+ex.push_passed.b1.3.spoken = Seu peão passado quer marchar até a casa {sq}. Avance-o!
 ex.push_passed.b2 = {best}: avance o peão passado rumo a {sq}.
 ex.push_passed.b2.2 = Seu peão passado é forte. {best} avança esse peão.
 ex.push_passed.b2.3 = Avance! {best} leva o peão para mais perto de {sq}.
 ex.push_passed.b3 = {best} avança o peão passado.
 ex.push_passed.b3.2 = Peões passados devem avançar: {best}.
 ex.push_passed.b3.3 = O caminho era {best}: o peão corre até {sq}.
+ex.push_passed.b3.3.spoken = O caminho era {best}: o peão corre até a casa {sq}.
 ex.push_passed.b4 = {best}: o peão passado decide.
 ex.push_passed.b4.2 = Avance: {best}.
 ex.push_passed.b5 = {best}, avançando o peão passado: {eval}.

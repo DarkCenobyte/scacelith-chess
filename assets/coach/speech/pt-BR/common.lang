@@ -351,6 +351,22 @@ respell.xeques = cheques
 respell.xadrez = chadrez
 respell.en = ã
 respell.passant = passã
+# Nouns read with the open o of the verb ("eu tróco", "eu tórno"): "a troco de nada" (heard "a troca
+# de nada" 6 times in 6, "troco" 4 in 6 respelled) and "em torno de" (every use is the noun; a line
+# with the verb would need its own .spoken line).
+respell.troco = trôco
+respell.torno = tôrno
+# Eponyms: the voice reads a w as in English and a j as in "jogo" ("Nimzo-witch", "Nash-dorf",
+# "Tarta-call", "Horweeds", "Fajaro-wix"): spelled as Brazilian players say them, stressed as the
+# names are.
+respell.fajarowicz = faiaróvitch
+respell.najdorf = naidorf
+respell.nimzowitsch = nimzóvitch
+respell.winawer = vináver
+respell.bogoljubow = bogoliúbov
+respell.tartakower = tartakóver
+respell.janowski = ianóvski
+respell.horwitz = hórvitz
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, Brazilian forms (dezesseis, dezessete, dezenove, quatorze). 21-99 compose as

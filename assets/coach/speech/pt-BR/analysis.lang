@@ -79,7 +79,9 @@ an.brilliant = {move} é brilhante: o lance entrega {piece}!
 an.brilliant.2 = Um sacrifício brilhante! {move} oferece {piece}.
 an.brilliant.3 = {move}! Um lance brilhante, que oferece {piece}.
 an.brilliant.mate = O lance leva a um mate forçado em {m:move}.
+# The verb "força" is read as the noun ("fôrça"): "fórça" in the spoken line.
 an.brilliant.mate.2 = E força o mate em {m:move}.
+an.brilliant.mate.2.spoken = E fórça o mate em {m:move}.
 # The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
 # or simply far better than anything else.
 an.only.win = {move} é o único lance que mantém a vantagem.
@@ -134,8 +136,11 @@ an.end.draw.material = O xeque-mate já não é possível: a partida termina emp
 an.end.draw.material.2 = Nenhum dos lados consegue mais dar xeque-mate, então é empate.
 an.end.draw = A partida termina em empate.
 an.end.draw.2 = Empate.
+# The verb "para" (stops) is read as the preposition ("pra"): "pára" in the spoken lines.
 an.end.unfinished = A partida para aqui, inacabada.
+an.end.unfinished.spoken = A partida pára aqui, inacabada.
 an.end.unfinished.2 = É aqui que a partida para: ela não foi concluída.
+an.end.unfinished.2.spoken = É aqui que a partida pára: ela não foi concluída.
 an.end.accuracy = Precisão: {acc_white:percent} para as Brancas, {acc_black:percent} para as Pretas.
 an.end.accuracy.2 = As Brancas jogaram com {acc_white:percent} de precisão, e as Pretas, com {acc_black:percent}.
 an.end.clean.white = As Brancas não cometeram nenhum erro, nem simples nem grave.

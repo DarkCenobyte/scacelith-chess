@@ -118,7 +118,9 @@ lesson.king.ok = Boa! O rei é lento, mas forte de perto.
 # Knight
 lesson.knight.intro = {your:esse} é {your:art}. {your:ele} anda em L: duas casas em linha reta e depois uma para o lado.
 lesson.knight.intro.spoken = {your:esse} é {your:art}. {your:ele} anda em éle: duas casas em linha reta e depois uma para o lado.
+# The verb "para" (stops) is read as the preposition ("pra"): "pára" in the spoken lines.
 lesson.knight.l = {@}Assim. Ele sempre para numa casa da outra cor.
+lesson.knight.l.spoken = {@}Assim. Ele sempre pára numa casa da outra cor.
 lesson.knight.jump = O cavalo é a única peça que pode pular por cima das outras.
 lesson.knight.ask = Capture {my} com o seu cavalo!
 lesson.knight.wrong = Esse é um lance de cavalo de verdade, mas não alcança {my}. Tente outro L.
@@ -141,11 +143,15 @@ lesson.pawncap.ok = Isso! Reto para andar, na diagonal para capturar.
 lesson.values.pawn = Cada peça tem um valor em pontos. Um peão vale um ponto.
 lesson.values.pieces = Um cavalo ou um {@}bispo, três. Uma {@2}torre, cinco. A {@3}dama, nove.
 lesson.values.king = O rei não tem preço: você nunca pode entregá-lo.
+# Opening the line, "Tente" is heard "A gente" 5 times in 7 (right once); "Tênte" is heard right 5 in 7.
 lesson.values.trade = Tente nunca entregar uma peça por menos do que ela vale.
+lesson.values.trade.spoken = Tênte nunca entregar uma peça por menos do que ela vale.
 lesson.setup.corners = Toda partida começa assim: as torres nos {@}cantos, depois os {@2}cavalos, depois os {@3}bispos.
 lesson.setup.queen = A dama fica numa casa da cor dela: a sua dama está numa casa clara.
 lesson.setup.king = O rei fica ao lado dela. As Brancas sempre jogam primeiro.
+# Spoken "até a casa {sq}": right after "até" the file letter melts into its é (see review.lang).
 lesson.first.ask = Comece a partida: avance duas casas o peão que está na frente do seu rei, até {sq}.
+lesson.first.ask.spoken = Comece a partida: avance duas casas o peão que está na frente do seu rei, até a casa {sq}.
 lesson.first.wrong = Esse lance também é válido! Por enquanto, jogue o peão do seu rei para {sq}, por favor.
 lesson.first.ok = Um ótimo primeiro lance: ele abre linhas para a sua dama e o seu bispo.
 lesson.first.reply = Eu respondo da mesma forma. Agora coloque um cavalo em jogo: pule de {sq} para {sq2}.
@@ -221,6 +227,7 @@ lesson.castle2.ok = Correto! O roque grande leva o seu rei para {sq}.
 # ---- Chapter 6: en passant ------------------------------------------------------------------------------------
 lesson.ep.what = Existe uma captura especial de peão chamada en passant. Quer dizer “de passagem”.
 lesson.ep.watch = Veja o meu peão: ele avança duas casas e para bem ao lado do seu.
+lesson.ep.watch.spoken = Veja o meu peão: ele avança duas casas e pára bem ao lado do seu.
 lesson.ep.how = Seu peão pode capturá-lo como se ele tivesse avançado só uma casa: indo para {sq}.
 lesson.ep.now = Mas só agora, neste lance. Capture en passant!
 lesson.ep.gone = A chance passou: o en passant só vale na hora. Vamos tentar de novo.
