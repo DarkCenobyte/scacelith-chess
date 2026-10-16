@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotoreālistisks šahs pirmās personas skatā",
+      "description": "Bezmaksas fotoreālistisks šahs pirmās personas skatā operētājsistēmām Windows, Linux un macOS: Stockfish 19, treneris, partiju analīze un tiešsaistes spēle karaliskā zālē."
+    },
+    "players": {
+      "title": "Līderu saraksts un spēlētāji — Scacelith",
+      "description": "Oficiālā Scacelith servera labākie spēlētāji katrā reitinga laika kontrolē, viņu reitingi un pēdējās partijas."
+    },
+    "account": {
+      "title": "Jūsu konts — Scacelith",
+      "description": "Pierakstieties savā Scacelith kontā: reitingi, partiju vēsture, PGN un GIF lejupielādes, pierakstītās ierīces un iestatījumi."
+    },
+    "gif": {
+      "title": "Animēts GIF — Scacelith",
+      "description": "Scacelith partijas animēts GIF."
+    },
+    "legal": {
+      "title": "Juridiskā informācija, privātums un lietošanas noteikumi — Scacelith",
+      "description": "Kas izdod un mitina Scacelith, ko vietne, spēle un oficiālais serveris dara ar personas datiem, jūsu tiesības un oficiālā servera noteikumi."
+    }
+  },
+  "brand": {
+    "tagline": "Karaliskā spēle"
+  },
+  "nav": {
+    "skip": "Pāriet uz saturu",
+    "home": "Sākums",
+    "label": "Galvenā izvēlne",
+    "game": "Spēle",
+    "modes": "Spēles režīmi",
+    "gallery": "Galerija",
+    "trailer": "Treileris",
+    "online": "Tiešsaistē",
+    "players": "Līderu saraksts",
+    "account": "Konts",
+    "language": "Valoda",
+    "menu": "Izvēlne",
+    "download": "Lejupielādēt"
+  },
+  "hero": {
+    "image_alt": "Divi porcelāna roboti spēlē šahu pie riekstkoka galda saules apspīdētā marmora zālē.",
+    "lead": "Ieņemiet vietu pie vaskota riekstkoka galda saules pielietā karaliskā zālē. Otrpus galdiņa jūsu pirmo gājienu gaida porcelāna robots, ko vada Stockfish.",
+    "watch": "Skatīties treileri",
+    "meta": "Brīvā programmatūra · Windows, Linux, macOS (eksperimentāla versija) · Grafikas karte ar OpenGL 4.6",
+    "caption": "Uzņemts spēlē: karaliskā zāle"
+  },
+  "highlights": {
+    "engine": "Pašu izstrādāts OpenGL 4.6 dzinējs",
+    "stockfish": "Iebūvēts Stockfish 19",
+    "rules": "FIDE noteikumi",
+    "online": "Tiešsaistes spēle",
+    "languages": "34 valodas"
+  },
+  "experience": {
+    "eyebrow": "Pieredze",
+    "title": "Nevis galdiņš ekrānā,<br><em>bet vieta pie galda.</em>",
+    "lead": "Scacelith atgriež to, kas veido īstu partiju: zāli, klusumu, pulksteni, pretinieku, kas skatās uz jums, un turnīra rituālus.",
+    "presence": {
+      "title": "Pirmās personas skatā",
+      "text": "Jūs redzat ar sava robota acīm: varat palūkoties apkārt zālē, noliekties pār galdiņu, paskatīties uz pretinieku, ielūkoties savā pieraksta lapā vai piecelties un aiziet līdz galda galam."
+    },
+    "ritual": {
+      "title": "Turnīra noteikumi",
+      "text": "Figūra, kurai pieskaraties, ir jāpārvieto, un gājienu jūs pabeidzat, ar roku nospiežot pulksteni. Ja opcija „Rādīt atļautos gājienus” ir izslēgta, tiesnesis soda par neatļautu gājienu, bet otrais neatļautais gājiens nozīmē zaudētu partiju."
+    },
+    "scoresheet": {
+      "title": "Rakstīts ar roku",
+      "text": "Abi spēlētāji katru gājienu pieraksta savā pieraksta lapā, katrs ar savu rokrakstu, un ik pēc četrdesmit gājieniem pāršķir lapu. Jūs dzirdat, kā spalva slīd pa papīru."
+    },
+    "opponent": {
+      "title": "Cienīgs pretinieks",
+      "text": "Stockfish 19 jūsu līmenī, no līmeņa „Jaunpienācējs” (800) līdz „Stockfish Max” (3500), ar reitingu, kas pēc katras partijas tiek aprēķināts pēc FIDE noteikumiem."
+    },
+    "engine": {
+      "title": "Radīts tieši šai spēlei",
+      "text": "No nulles uzrakstīts dzinējs: fizikāli pamatota gaisma, marmors, vaskots koks, porcelāns un misiņš, saule caur logiem, mīkstas ēnas un atspulgi. Kvalitātes iestatījumi no „Ļoti zema” līdz „Ultra” to pielāgo jūsu grafikas kartei."
+    },
+    "languages": {
+      "title": "34 valodas",
+      "text": "Angļu, franču, vācu, spāņu, portugāļu (Portugāles un Brazīlijas), itāļu, nīderlandiešu, zviedru, dāņu, somu, igauņu, latviešu, lietuviešu, poļu, čehu, slovāku, slovēņu, horvātu, ungāru, rumāņu, bulgāru, grieķu, turku, ukraiņu, krievu, arābu, hindi, indonēziešu, vjetnamiešu, korejiešu, japāņu un ķīniešu (vienkāršotā un tradicionālā). Arābu valodā teksts tiek izkārtots no labās uz kreiso, un treneris runā skaļi visās valodās, izņemot ķīniešu, kurā viņa vārdi parādās kā subtitri."
+    }
+  },
+  "modes": {
+    "eyebrow": "Spēles režīmi",
+    "title": "Katrai partijai<br><em>savs galds.</em>",
+    "lead": "Viss notiek tajā pašā zālē, sākot jau ar sākuma ekrānu. Bezsaistē Stockfish vienmēr ir gatavs partijai.",
+    "new_game": {
+      "name": "Jauna partija",
+      "text": "Spēlējiet pret Stockfish izvēlētajā spēka līmenī ar laika kontroli no „Bullets” līdz „Klasiskais šahs” vai spēlējiet ar draugu pie tā paša datora — katrs ar sava robota acīm."
+    },
+    "coach": {
+      "name": "Treneris",
+      "text": "Pretī jums sēž skolotājs, kurš spēlē jūsu līmenī un partijas gaitā visu izskaidro: draudus, labus gājienus, kļūdas — un ar savu roku izspēlē, ko kļūda maksā. No šaha noteikumiem līdz eksperta līmenim, ar balsi, kas tiek sintezēta jūsu datorā."
+    },
+    "challenges": {
+      "name": "Trenera izaicinājumi",
+      "text": "Īsas pozīciju sērijas, katra trenē vienu prasmi: mats vienā, divos vai trijos gājienos, dakšas, piesaistes un citi taktiskie paņēmieni, aizsardzība un pamata galotnes pret treneri. Mājieni tikai tad, kad tos lūdzat, un zaļš ķeksītis par katru pabeigto sēriju."
+    },
+    "analysis": {
+      "name": "Analīze",
+      "text": "Stockfish apskata jūsu saglabātās partijas, tiešsaistes partijas vai jebkuru PGN: novērtējuma josla, svarīgākie gājieni ar atzīmēm no „izcils” līdz „rupja kļūda”, ar bultu parādīts labākais gājiens un komentāri balsī un subtitros. Kamēr pārvietojaties pa partiju, gājienus izdara robotu rokas."
+    },
+    "online": {
+      "name": "Spēlēt tiešsaistē",
+      "text": "Īsti pretinieki caur Scacelith serveri: reitinga partijas, pretinieku meklēšana, izaicinājumi un privātas partijas vai tiešais mačs starp diviem datoriem. Pretinieka robots reāllaikā atkārto viņa kustības."
+    },
+    "watch": {
+      "name": "Vērot partiju",
+      "text": "Divi Stockfish spēlētāji cīnās viens pret otru, bet jūs brīvi un neredzami pārvietojaties pa zāli no viena skatpunkta uz citu."
+    },
+    "saved": {
+      "name": "Saglabātās partijas",
+      "text": "Jūsu partijas tiek glabātas PGN failos. Atskaņojiet tās zālē ar īstajiem domāšanas laikiem un pulksteņu rādījumiem vai ievietojiet partijas no citām programmām."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerija",
+    "title": "Skats <em>no pašas zāles</em>",
+    "lead": "Katrs attēls ir uzņemts spēlē reāllaikā ar spēles pašas dzinēju.",
+    "title_screen": {
+      "alt": "Sākuma ekrāns: Scacelith izvēlne blakus diviem robotiem, kas zālē spēlē šahu.",
+      "caption": "Sākuma ekrāns"
+    },
+    "coach": {
+      "alt": "Treneris — porcelāna robots ar uzrakstu „COACH” uz krūtīm — sveic jūs pāri galdiņam; viņa teiktais parādās arī kā subtitri.",
+      "caption": "Treneris"
+    },
+    "challenges": {
+      "alt": "Trenera izaicinājumu izvēlne: mata un taktikas uzdevumu sērijas ar grūtības pakāpi un atzīmētām jau pabeigtajām sērijām, blakus izvēlētās sērijas apraksts.",
+      "caption": "Trenera izaicinājumi"
+    },
+    "analysis": {
+      "alt": "Analīzes režīms: novērtējuma josla, uz galdiņa uzzīmēta bulta, anotētie gājieni ar katras puses precizitāti un vadības taustiņu saraksts.",
+      "caption": "Analīze"
+    },
+    "game": {
+      "alt": "Skats no sāniem: viens robots sniedzas pāri galdam, lai pārvietotu figūru, bet otrs gaida; paņemtās figūras stāv blakus galdiņam.",
+      "caption": "Vērot partiju"
+    },
+    "hall": {
+      "alt": "Divi roboti sarkanos samta krēslos sēž viens pret otru pie šaha galdiņa zem augstiem logiem.",
+      "caption": "Karaliskā zāle"
+    },
+    "opponent": {
+      "alt": "Porcelāna robota pretinieka tuvplāns; tā galva noliekta pret galdiņu.",
+      "caption": "Jūsu pretinieks"
+    },
+    "scoresheet": {
+      "alt": "Robota roka ar tintes pildspalvu ieraksta gājienus pieraksta lapā.",
+      "caption": "Pieraksta lapa"
+    },
+    "note": "Versija 1.0.0. Šajos attēlos saskarne ir angļu valodā.",
+    "viewer": "Attēlu skatītājs",
+    "close": "Aizvērt",
+    "previous": "Iepriekšējais attēls",
+    "next": "Nākamais attēls"
+  },
+  "trailer": {
+    "eyebrow": "Treileris",
+    "title": "Scacelith <em>kustībā</em>",
+    "soon_title": "Treileris drīzumā",
+    "soon_text": "Pa to laiku ieņemiet vietu: spēle ir gatava lejupielādei.",
+    "privacy": "No YouTube nekas netiek ielādēts, līdz jūs piekrītat tā atskaņotājam.",
+    "open_youtube": "Skatīties YouTube"
+  },
+  "online": {
+    "eyebrow": "Tiešsaistē",
+    "title": "Īsti pretinieki,<br><em>tā pati zāle.</em>",
+    "lead": "Pierakstieties oficiālajā serverī no spēles un spēlējiet ar cilvēkiem no visas pasaules — joprojām pirmās personas skatā.",
+    "point_rated": "Reitinga partijas katrā oficiālajā laika kontrolē, katrā ar savu reitingu, ko aprēķina pēc FIDE noteikumiem.",
+    "point_match": "Pretinieku meklēšana, izaicinājumi pēc lietotājvārda un privātas partijas ar kodu vai tiešais mačs starp diviem datoriem bez servera un konta.",
+    "point_fair": "Godīga spēle: automātiskas pārbaudes, pabeigto partiju analīze ar šaha dzinēju un spēlētāju ziņojumi.",
+    "point_history": "Jūsu partiju vēsture šajā vietnē: lejupielādējiet katru partiju PGN formātā vai kā animētu GIF.",
+    "point_open": "Kopienas serveri var uzturēt ikviens: serveris ir brīvā programmatūra, un tā API ir dokumentēts.",
+    "create": "Izveidot kontu",
+    "signin": "Pierakstīties",
+    "server_title": "Oficiālais serveris",
+    "status_checking": "Pārbauda…",
+    "address": "Adrese",
+    "registration": "Reģistrācija",
+    "categories": "Reitinga laika kontroles",
+    "top_players": "Labākie spēlētāji",
+    "category": "Laika kontrole",
+    "board_loading": "Ielādē līderu sarakstu…",
+    "full_board": "Viss līderu saraksts"
+  },
+  "download": {
+    "button": "Lejupielādēt",
+    "choose": "Izvēlieties savu sistēmu",
+    "see_release": "Skatīt versiju vietnē GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Visas versijas",
+    "experimental": "Eksperimentāla",
+    "source": "Pirmkods",
+    "source_zip": "ZIP arhīvs",
+    "eyebrow": "Lejupielāde",
+    "title": "Ieņemiet vietu.<br><em>Bez maksas un ar atvērtu pirmkodu.</em>",
+    "lead": "Izpakojiet un spēlējiet: operētājsistēmā Windows vai Linux nekas nav jāinstalē, bet Mac datorā lietotne tikai jāievelk mapē „Applications”. Katru failu no versijas atzīmes pirmkoda būvē GitHub Actions, un būvējuma izcelsme ir apliecināta.",
+    "notes": "Versijas piezīmes",
+    "macos_note": "Apple Silicon Mac datoriem (M1 vai jaunākiem) ar macOS 26 vai jaunāku versiju, ne virtuālajā mašīnā; šis būvējums ir jaunāks un mazāk pārbaudīts nekā pārējie. Lietotni nav parakstījis reģistrēts Apple izstrādātājs: pirmajā reizē atveriet to, izvēloties System Settings › Privacy & Security › Open Anyway.",
+    "req_system": "Sistēma",
+    "req_system_value": "64 bitu Windows (x64); 64 bitu Linux (x86-64 vai aarch64) ar glibc 2.34, OpenSSL 3 un X11 vai XWayland, piemēram, Ubuntu 22.04 vai Debian 12; macOS 26 vai jaunāka versija datoros ar Apple Silicon (eksperimentāli)",
+    "req_gpu": "Grafika",
+    "req_gpu_value": "Grafikas karte ar OpenGL 4.6 un atjauninātu draiveri (Mac datorā spēlei ir pašai savs OpenGL)",
+    "req_included": "Iekļauts",
+    "req_included_value": "Stockfish 19 un tā neironu tīkls: bezsaistē varat spēlēt uzreiz",
+    "req_network": "Internets",
+    "req_network_value": "Tiešsaistes spēlei, GIF failiem un trenera un analīzes balsij (neobligāta lejupielāde, aptuveni 399 MB)",
+    "req_licence": "Licence",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Pārbaudiet lejupielādi",
+    "verify_text": "Katra faila būvējuma izcelsmi apliecina GitHub. Ar GitHub CLI:",
+    "checksums": "SHA-256 kontrolsummas (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Veidotāji",
+    "title": "Veidotāji un <em>pateicības</em>",
+    "engine_head": "Šaha dzinējs",
+    "engine": "Stockfish 19 — Stockfish izstrādātāju darbs (GNU GPL v3). Tā neironu tīkls ir apmācīts ar datiem, ko nodrošinājis projekts Leela Chess Zero (Open Database License).",
+    "voice_head": "Balss",
+    "voice": "Supertone izstrādātais Supertonic 3, ko izmanto saskaņā ar BigScience Open RAIL-M licenci: tas tiek lejupielādēts pēc jūsu pieprasījuma un jūsu datorā piešķir balsi trenerim un analīzei.",
+    "fonts_head": "Šrifti",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) un Amiri (Khaled Hosny); rokraksti: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One un LXGW WenKai (visi saskaņā ar SIL Open Font License); šaha figūru simboli no GNU FreeFont.",
+    "openings_head": "Atklātnes un uzdevumi",
+    "openings": "Atklātņu nosaukumi no lichess.org atklātņu datubāzes (chess-openings), bet trenera izaicinājumu uzdevumi no Lichess uzdevumu datubāzes; abas ir nodotas publiskajā īpašumā (CC0).",
+    "quote": "„Šahs ir analīzes māksla.”",
+    "quote_author": "Mihails Botviņņiks"
+  },
+  "footer": {
+    "about": "Fotoreālistiska šaha spēle pirmās personas skatā, veidota ar pašu izstrādātu OpenGL 4.6 dzinēju. Brīvā programmatūra saskaņā ar GNU GPL v3.",
+    "game": "Spēle",
+    "online": "Tiešsaistē",
+    "api_docs": "Servera API dokumentācija",
+    "source": "Pirmkods",
+    "game_source": "Spēle vietnē GitHub",
+    "server_source": "Serveris vietnē GitHub",
+    "releases": "Versijas",
+    "licence": "Licence (GPL v3)",
+    "credits": "Stockfish ir tā izstrādātāju preču zīme. YouTube ir Google LLC preču zīme. Windows ir Microsoft Corporation preču zīme. macOS ir Apple Inc. preču zīme. Linux ir Linusa Torvalda reģistrēta preču zīme. OpenGL ir Hewlett Packard Enterprise reģistrēta preču zīme.",
+    "legal": "Scacelith",
+    "made": "Šī vietne neiestata sīkdatnes un neizmanto izsekotājus; YouTube atskaņotājs tiek ielādēts tikai tad, ja jūs tam piekrītat.",
+    "legal_link": "Juridiskā informācija, privātums un noteikumi"
+  },
+  "common": {
+    "copy": "Kopēt",
+    "loading": "Ielādē…",
+    "noscript": "Lai sazinātos ar Scacelith serveri, šai lapai ir nepieciešams JavaScript."
+  },
+  "players": {
+    "title": "Līderu saraksts un spēlētāji",
+    "lead": "Oficiālā servera labākie spēlētāji katrā reitinga laika kontrolē. Meklējiet jebkuru spēlētāju, lai redzētu viņa reitingus un pēdējās partijas.",
+    "search_label": "Atrast spēlētāju",
+    "search_placeholder": "Lietotājvārds",
+    "search_button": "Meklēt",
+    "back": "Atpakaļ uz līderu sarakstu",
+    "recent_games": "Pēdējās partijas",
+    "board_title": "Līderu saraksts",
+    "category": "Laika kontrole",
+    "col_rank": "Vieta",
+    "col_player": "Spēlētājs",
+    "col_rating": "Reitings",
+    "col_peak": "Augstākais",
+    "col_games": "Partijas",
+    "col_wdl": "U / N / Z",
+    "loading": "Ielādē…"
+  },
+  "account": {
+    "title": "Jūsu konts",
+    "auth_foot": "Viens konts oficiālajā serverī — gan spēlei, gan šai vietnei. Kontu izveidojāt spēlē ar Google? Izmantojiet „Aizmirsāt paroli?”, lai tam iestatītu paroli.",
+    "common": {
+      "back": "Atpakaļ uz pierakstīšanos"
+    },
+    "fields": {
+      "login": "Lietotājvārds vai e-pasts",
+      "password": "Parole",
+      "show_password": "Rādīt paroli",
+      "username": "Lietotājvārds",
+      "email": "E-pasts",
+      "confirm_password": "Parole vēlreiz",
+      "current_password": "Pašreizējā parole",
+      "new_password": "Jaunā parole",
+      "new_email": "Jaunā e-pasta adrese",
+      "mfa_code": "Divu faktoru kods (vai atkopšanas kods)"
+    },
+    "signin": {
+      "tab": "Pierakstīties",
+      "title": "Laipni lūdzam atpakaļ",
+      "remember": "Saglabāt pierakstīšanos šajā ierīcē",
+      "submit": "Pierakstīties",
+      "forgot": "Aizmirsāt paroli?",
+      "resend": "Nosūtīt apstiprinājuma e-pastu vēlreiz"
+    },
+    "mfa": {
+      "title": "Divu faktoru autentifikācija",
+      "text": "Ievadiet 6 ciparu kodu no savas autentifikācijas lietotnes.",
+      "code": "Kods no lietotnes",
+      "use_recovery": "Izmantot atkopšanas kodu",
+      "submit": "Apstiprināt"
+    },
+    "google": {
+      "or": "vai",
+      "button": "Pierakstīties ar Google",
+      "username_title": "Izvēlieties lietotājvārdu",
+      "username_text": "Jūsu Google konts šajā serverī ir jauns. Izvēlieties vārdu, ko redzēs citi spēlētāji: vēlāk to vairs nevarēs mainīt.",
+      "username_submit": "Izveidot manu kontu",
+      "link_title": "Sasaistiet savu Google kontu",
+      "link_submit": "Sasaistīt un pierakstīties",
+      "returning": "Notiek pierakstīšanās ar Google…"
+    },
+    "register": {
+      "tab": "Izveidot kontu",
+      "title": "Bezmaksas konts",
+      "closed": "Serveris pašlaik nepieņem jaunus kontus.",
+      "username_hint": "Burti, cipari, _ un -; jāsākas ar burtu vai ciparu.",
+      "password_hint": "Vismaz 10 rakstzīmes, bez jūsu lietotājvārda vai e-pasta.",
+      "pow_note": "Lai atturētu robotus, reģistrācijas laikā jūsu pārlūks atrisina nelielu uzdevumu. Tas aizņem dažas sekundes.",
+      "submit": "Izveidot kontu",
+      "done_title": "Pārbaudiet e-pastu",
+      "done_text": "Mēs nosūtījām apstiprinājuma saiti uz jūsu adresi. Atveriet to, lai izveidotu kontu, un pēc tam pierakstieties.",
+      "done_hint": "Saite ir derīga 24 stundas. Iesūtnē nekā nav? Pārbaudiet surogātpasta mapi vai pieprasiet e-pastu vēlreiz.",
+      "go_signin": "Uz pierakstīšanos",
+      "legal_note": "Jūsu lietotājvārds, reitingi un partijas būs publiski. Izveidojot kontu, jūs piekrītat lietošanas noteikumiem.",
+      "legal_link": "Privātums un lietošanas noteikumi"
+    },
+    "forgot": {
+      "title": "Aizmirsta parole",
+      "text": "Ievadiet sava konta e-pasta adresi. Ja kādam kontam ir šī adrese, mēs nosūtīsim saiti jaunas paroles izvēlei, kas būs derīga vienu stundu.",
+      "submit": "Nosūtīt saiti"
+    },
+    "resend": {
+      "title": "Apstipriniet e-pastu",
+      "text": "Nesaņēmāt apstiprinājuma e-pastu vai saites derīgums ir beidzies? Ievadiet savu adresi, lai saņemtu jaunu.",
+      "submit": "Nosūtīt vēlreiz"
+    },
+    "dash": {
+      "public_profile": "Publiskais profils",
+      "signout": "Izrakstīties",
+      "tab_overview": "Pārskats",
+      "tab_games": "Partijas",
+      "tab_devices": "Ierīces",
+      "tab_settings": "Iestatījumi"
+    },
+    "overview": {
+      "info": "Jūsu informācija",
+      "ratings": "Jūsu reitingi",
+      "sanctions": "Sankcijas",
+      "recent": "Pēdējās partijas",
+      "all_games": "Visas jūsu partijas"
+    },
+    "games": {
+      "filter_category": "Laika kontrole",
+      "all": "Visas",
+      "custom": "Pielāgota",
+      "filter_rated": "Veids",
+      "rated": "Ar reitingu",
+      "casual": "Bez reitinga",
+      "filter_result": "Rezultāts",
+      "wins": "Uzvarētās",
+      "losses": "Zaudētās",
+      "draws": "Neizšķirtās"
+    },
+    "devices": {
+      "title": "Pierakstītās ierīces",
+      "signout_all": "Izrakstīties visur",
+      "text": "Katra pierakstīšanās — spēlē vai šajā vietnē — ir ierīce. Izrakstiet tās, kuras neatpazīstat."
+    },
+    "settings": {
+      "challenges_title": "Izaicinājumi",
+      "challenges_text": "Citi spēlētāji var jūs izaicināt no spēles, norādot jūsu lietotājvārdu.",
+      "challenges_label": "Pieņemt izaicinājumus",
+      "mfa_title": "Divu faktoru autentifikācija",
+      "mfa_text": "Ieslēdziet vai izslēdziet to un izveidojiet jaunus atkopšanas kodus spēles konta lapā.",
+      "password_title": "Mainīt paroli",
+      "password_text": "Citas jūsu ierīces tiks izrakstītas, bet šī paliks pierakstīta.",
+      "password_submit": "Mainīt paroli",
+      "email_title": "Mainīt e-pasta adresi",
+      "email_submit": "Nosūtīt apstiprinājuma saiti",
+      "export_title": "Lejupielādēt manus datus",
+      "export_text": "Viss, ko serveris glabā par jūsu kontu, vienā JSON failā.",
+      "export_submit": "Lejupielādēt manus datus",
+      "delete_title": "Dzēst kontu",
+      "delete_text": "To nevar atsaukt. Jūsu partijas un reitingi paliek ar anonīmu vārdu; jūsu e-pasta adrese, parole un ierīces tiek izdzēstas.",
+      "delete_confirm": "Lai apstiprinātu, ierakstiet savu lietotājvārdu",
+      "delete_submit": "Dzēst manu kontu"
+    }
+  },
+  "gif": {
+    "title": "Animēts GIF",
+    "preparing": "Sagatavo GIF…",
+    "download": "Lejupielādēt GIF",
+    "make": "Izveidot GIF",
+    "pause": "Pauzēt animāciju",
+    "back": "Atpakaļ uz manām partijām",
+    "options": "Opcijas",
+    "size": "Izmērs",
+    "size_small": "Mazs (284 × 350)",
+    "size_medium": "Vidējs (424 × 515)",
+    "size_large": "Liels (628 × 762)",
+    "orientation": "Skats no",
+    "orientation_white": "Balto puses",
+    "orientation_black": "Melno puses",
+    "speed": "Ātrums",
+    "speed_fast": "Ātri (0,25 s uz gājienu)",
+    "speed_normal": "Normāli (0,5 s uz gājienu)",
+    "speed_slow": "Lēni (1 s uz gājienu)",
+    "speed_very_slow": "Ļoti lēni (2 s uz gājienu)",
+    "coords": "Rādīt koordinātas",
+    "regenerate": "Izveidot vēlreiz",
+    "note": "Katru GIF zīmē serveris. Jau izveidots GIF tiek atgriezts uzreiz, bet jaunus var izveidot tikai dažus minūtē."
+  },
+  "notfound": {
+    "title": "Lapa nav atrasta",
+    "text": "Šis lauciņš ir tukšs. Iespējams, lapa ir pārvietota.",
+    "home": "Atpakaļ uz Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Ielādē…",
+      "retry": "Mēģināt vēlreiz",
+      "close": "Aizvērt",
+      "copy": "Kopēt",
+      "copied": "Nokopēts starpliktuvē.",
+      "copy_failed": "Neizdevās nokopēt. Atlasiet tekstu un nokopējiet to manuāli.",
+      "load_more": "Rādīt vairāk",
+      "show_password": "Rādīt paroli",
+      "hide_password": "Slēpt paroli",
+      "signin_needed": "Lai turpinātu, pierakstieties.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Serveris nav sasniedzams. Pārbaudiet savienojumu un mēģiniet vēlreiz.",
+      "timeout": "Serveris pārāk ilgi neatbildēja. Mēģiniet vēlreiz.",
+      "server_busy": "Serveris ir aizņemts. Mēģiniet vēlreiz pēc brīža.",
+      "rate_limited": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc {time}.",
+      "rate_limited_short": "Pārāk daudz pieprasījumu. Mēģiniet vēlreiz pēc brīža.",
+      "internal_error": "Serverī radās neparedzēta kļūda. Mēģiniet vēlreiz vēlāk.",
+      "invalid_token": "Jūsu sesija ir beigusies. Lūdzu, pierakstieties vēlreiz.",
+      "unauthorized": "Lūdzu, pierakstieties.",
+      "not_found": "Nav atrasts.",
+      "unknown": "Radās kļūda ({code}).",
+      "invalid_credentials": "Nepareizs lietotājvārds, e-pasts vai parole.",
+      "too_many_attempts": "Pārāk daudz mēģinājumu. Mēģiniet vēlreiz pēc {time}.",
+      "banned": "Šis konts ir apturēts līdz {date}.",
+      "banned_permanent": "Šis konts ir apturēts.",
+      "email_unverified": "Jūsu e-pasta adrese vēl nav apstiprināta. Atveriet saiti, ko jums nosūtījām, vai pieprasiet jaunu.",
+      "invalid_mfa_token": "Šī pierakstīšanās posma derīgums ir beidzies. Lūdzu, pierakstieties vēlreiz.",
+      "invalid_code": "Nepareizs vai jau izmantots kods.",
+      "mfa_code_required": "Ievadiet divu faktoru kodu.",
+      "invalid_password": "Nepareiza parole.",
+      "password_not_set": "Šim kontam vēl nav paroles: lai to iestatītu, pierakstīšanās lapā izmantojiet „Aizmirsāt paroli?”.",
+      "registration_closed": "Serveris pašlaik nepieņem jaunus kontus.",
+      "invalid_username": "Šis lietotājvārds nav atļauts.",
+      "username_taken": "Šis lietotājvārds jau ir aizņemts.",
+      "invalid_email": "Šī e-pasta adrese nav derīga.",
+      "email_taken": "Šo e-pasta adresi jau izmanto cits konts.",
+      "same_email": "Šī jau ir jūsu e-pasta adrese.",
+      "weak_password": "Šī parole ir pārāk vāja.",
+      "weak_too_short": "Parole ir pārāk īsa (nepieciešamas vismaz {min} rakstzīmes).",
+      "weak_too_long": "Parole ir pārāk gara.",
+      "weak_contains_username": "Parole nedrīkst saturēt jūsu lietotājvārdu.",
+      "weak_contains_email": "Parole nedrīkst saturēt jūsu e-pasta adresi.",
+      "weak_too_common": "Šī parole ir pārāk izplatīta. Izvēlieties citu.",
+      "pow_failed": "Pretrobotu pārbaude neizdevās. Mēģiniet vēlreiz.",
+      "passwords_differ": "Abas paroles atšķiras.",
+      "required": "Aizpildiet šo lauku.",
+      "email_format": "Ievadiet derīgu e-pasta adresi.",
+      "username_format": "{min}–{max} rakstzīmes: burti, cipari, _ un -; jāsākas ar burtu vai ciparu.",
+      "password_length": "Vismaz {min} rakstzīmes.",
+      "confirm_name": "Ierakstiet savu lietotājvārdu tieši tā, kā parādīts.",
+      "game_too_long": "Šī partija ir pārāk gara, lai no tās izveidotu GIF.",
+      "gif_disabled": "Šis serveris neveido GIF.",
+      "render_failed": "Serveris nevarēja uzzīmēt šo GIF.",
+      "invalid_game": "Šāda partija nepastāv.",
+      "invalid_player": "Ievadiet lietotājvārdu: 2–24 burti, cipari, _, . vai -.",
+      "player_not_found": "Spēlētājs ar šādu vārdu nav atrasts.",
+      "sso_cancelled": "Pierakstīšanās ar Google tika atcelta.",
+      "sso_mismatch": "Šī pierakstīšanās ar Google netika sākta šajā cilnē vai jau ir izmantota. Mēģiniet vēlreiz.",
+      "sso_expired": "Šīs pierakstīšanās ar Google derīgums ir beidzies. Mēģiniet vēlreiz.",
+      "invalid_verifier": "Šī pierakstīšanās ar Google tika sākta citā cilnē vai pārlūkā. Sāciet no jauna šajā lapā.",
+      "sso_email_unverified": "Google nav apstiprinājis šī Google konta e-pasta adresi.",
+      "sso_account_exists": "Šo e-pasta adresi jau izmanto kāds konts, bet tam nav paroles, ar ko to sasaistīt ar Google. Iestatiet paroli ar „Aizmirsāt paroli?” un tad vēlreiz pierakstieties ar Google.",
+      "sso_failed": "Pierakstīšanos ar Google neizdevās pabeigt. Mēģiniet vēlreiz.",
+      "sso_disabled": "Pierakstīšanās ar Google šajā serverī nav pieejama.",
+      "sso_already_linked": "Šis Google konts jau ir saistīts ar citu kontu.",
+      "account_disabled": "Šo kontu vairs nevar izmantot.",
+      "sso_storage": "Jūsu pārlūks bloķē šīs vietnes datu krātuvi, bez kuras pierakstīšanās ar Google nedarbojas. Atļaujiet to vai pierakstieties ar paroli.",
+      "sso_url": "Serveris atbildēja ar neparedzētu Google adresi, tāpēc pierakstīšanās ar Google tika apturēta."
+    },
+    "time": {
+      "seconds": {
+        "zero": "{count} sekundēm",
+        "one": "{count} sekundes",
+        "other": "{count} sekundēm"
+      },
+      "minutes": {
+        "zero": "{count} minūtēm",
+        "one": "{count} minūtes",
+        "other": "{count} minūtēm"
+      }
+    },
+    "download": {
+      "exe": "Izpildāmais fails",
+      "zip": "ZIP arhīvs",
+      "dmg": "Diska attēls",
+      "archive": "Arhīvs",
+      "file": "Fails",
+      "unavailable": "Nav pieejams",
+      "your_system": "Jūsu sistēma",
+      "eyebrow_release": "Versija {version}",
+      "published": "Publicēta: {date}",
+      "unreachable": "GitHub pašlaik nav sasniedzams: skatiet versiju lapu.",
+      "available": "Pieejams",
+      "verify_file": "fails",
+      "no_build": "Pašlaik spēlei nav būvējuma sistēmai {os}.",
+      "x64": "64 bitu (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bitu, Intel / AMD vai Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 vai jaunāka",
+      "experimental": "Eksperimentāla"
+    },
+    "server": {
+      "online": "Pieejams",
+      "offline": "Nav sasniedzams",
+      "busy": "Aizņemts",
+      "open": "Atvērta",
+      "closed": "Slēgta",
+      "updated": "Dati atjaunināti {time}",
+      "min_games": "Spēlētāji, kuru reitinga partiju skaits šajā laika kontrolē ir vismaz {count}.",
+      "empty": "Šajā laika kontrolē sarakstā vēl nav neviena spēlētāja.",
+      "error": "Līderu sarakstu pašlaik nevar ielādēt."
+    },
+    "game": {
+      "number": "Partija Nr. {id}",
+      "white": "Baltie",
+      "black": "Melnie",
+      "you": "jūs",
+      "vs": "pret",
+      "outcome_win": "Uzvara",
+      "outcome_loss": "Zaudējums",
+      "outcome_draw": "Neizšķirts",
+      "outcome_aborted": "Anulēta",
+      "result_white": "Uzvar baltie",
+      "result_black": "Uzvar melnie",
+      "result_draw": "Neizšķirts",
+      "result_aborted": "Anulēta",
+      "rated": "Ar reitingu",
+      "casual": "Bez reitinga",
+      "custom": "Pielāgota",
+      "moves": {
+        "zero": "{count} gājienu",
+        "one": "{count} gājiens",
+        "other": "{count} gājieni"
+      },
+      "duration": "Ilgums: {time}",
+      "rating_diff": "Reitinga izmaiņa: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Lejupielādēt partiju PGN formātā",
+      "copy_pgn": "Kopēt",
+      "copy_pgn_title": "Kopēt PGN",
+      "gif": "GIF",
+      "gif_title": "Izveidot animētu GIF (atveras jaunā cilnē)",
+      "gif_signin": "Pierakstieties, lai veidotu GIF",
+      "pgn_copied": "PGN nokopēts starpliktuvē.",
+      "pgn_saved": "PGN lejupielādēts.",
+      "none": "Vēl nav partiju. Šeit parādīsies jūsu tiešsaistes partijas.",
+      "none_filtered": "Neviena partija neatbilst šiem filtriem.",
+      "none_public": "Vēl nav partiju.",
+      "total": {
+        "zero": "{count} partiju",
+        "one": "{count} partija",
+        "other": "{count} partijas"
+      },
+      "termination_unknown": "Partija beigusies",
+      "reason": {
+        "1": "Mats",
+        "2": "Padošanās",
+        "3": "Laika pārsniegšana",
+        "4": "Otrais neatļautais gājiens (zaudējums)",
+        "5": "Pats",
+        "6": "Mats nav iespējams (nepietiekams materiāls)",
+        "7": "Karodziņš nokrita, bet pretinieks nevar pieteikt matu",
+        "8": "Pieckārtēja atkārtošanās",
+        "9": "75 gājienu noteikums",
+        "10": "Trīskārtēja atkārtošanās (pēc pieprasījuma)",
+        "11": "50 gājienu noteikums (pēc pieprasījuma)",
+        "12": "Neizšķirts pēc vienošanās",
+        "13": "Otrais neatļautais gājiens, bet pretinieks nevar pieteikt matu",
+        "14": "Padošanās, bet pretinieks nevar pieteikt matu",
+        "20": "Partija pamesta (pārāk ilgi bez savienojuma)",
+        "21": "Partija pamesta, bet pretinieks nevar pieteikt matu",
+        "22": "Partija anulēta",
+        "23": "Pirmais gājiens netika izdarīts laikā (anulēta)",
+        "24": "Tehniskais zaudējums (godīgas spēles pārkāpums)",
+        "25": "Serveris anulēja partiju",
+        "26": "Abi spēlētāji atvienojās"
+      }
+    },
+    "ratings": {
+      "category": "Laika kontrole",
+      "rating": "Reitings",
+      "peak": "Augstākais",
+      "games": "Partijas",
+      "wdl": "U / N / Z",
+      "provisional": "Provizorisks reitings",
+      "none": "Vēl nav nevienas reitinga partijas.",
+      "unrated_hint": "Jautājuma zīme apzīmē provizorisku reitingu (nospēlēts vēl maz partiju)."
+    },
+    "account": {
+      "member_since": "Reģistrācijas datums: {date}",
+      "last_login": "Pēdējā pierakstīšanās",
+      "created": "Izveidots",
+      "email": "E-pasts",
+      "pending_email": "Gaida apstiprinājumu: {email}",
+      "verified": "Apstiprināts",
+      "unverified": "Nav apstiprināts",
+      "mfa": "Divu faktoru autentifikācija",
+      "mfa_on": "Ieslēgta",
+      "mfa_off": "Izslēgta",
+      "google": "Pierakstīšanās ar Google",
+      "google_on": "Sasaistīta",
+      "google_off": "Nav sasaistīta",
+      "password": "Parole",
+      "password_set": "Iestatīta",
+      "password_unset": "Vēl nav iestatīta",
+      "challenges": "Izaicinājumi",
+      "challenges_all": "Tiek pieņemti",
+      "challenges_none": "Tiek noraidīti",
+      "badge_verified": "E-pasts apstiprināts",
+      "badge_mfa": "2FA ieslēgta",
+      "badge_google": "Google",
+      "ban_until": "Jūsu konts ir apturēts līdz {date}.",
+      "ban_permanent": "Jūsu konts ir apturēts.",
+      "sanction_ban": "Konta apturēšana",
+      "sanction_mm_block": "Pretinieku meklēšana bloķēta",
+      "sanction_warning": "Brīdinājums",
+      "sanction_until": "līdz {date}",
+      "sanction_permanent": "beztermiņa",
+      "devices_current": "Šī ierīce",
+      "devices_unknown": "Ierīce bez nosaukuma",
+      "devices_signed_in": "Pierakstīšanās: {date}",
+      "devices_seen": "Pēdējoreiz lietota {time}",
+      "devices_expires": "Derīguma termiņš: {date}",
+      "devices_revoke": "Izrakstīt",
+      "devices_revoked": "Ierīce ir izrakstīta.",
+      "devices_none": "Citu ierīču nav.",
+      "signout_all_confirm": "Izrakstīt visas ierīces, arī šo?",
+      "signed_out": "Jūs izrakstījāties.",
+      "signed_in": "Laipni lūdzam, {name}!",
+      "prefs_saved": "Saglabāts.",
+      "password_changed": "Jūsu parole ir nomainīta. Citas jūsu ierīces ir izrakstītas.",
+      "email_sent": "Apstiprinājuma saite ir nosūtīta uz jauno adresi. Adrese mainīsies, kad atvērsiet saiti.",
+      "email_changed": "Jūsu e-pasta adrese tagad ir {email}.",
+      "email_current": "Pašreizējā adrese: {email}.",
+      "email_pending": "Adreses maiņa uz {email} gaida apstiprinājumu ar saiti.",
+      "export_done": "Jūsu dati ir lejupielādēti.",
+      "deleted": "Jūsu konts ir dzēsts.",
+      "delete_confirm_label": "Lai apstiprinātu, ierakstiet {name}",
+      "register_done": "Mēs nosūtījām apstiprinājuma saiti uz {email}. Atveriet to, lai izveidotu kontu, un pēc tam pierakstieties.",
+      "register_ready": "Jūsu konts ir gatavs. Varat pierakstīties.",
+      "forgot_done": "Ja šo adresi izmanto kāds konts, saite jaunas paroles izvēlei jau ir ceļā.",
+      "resend_done": "Ja šī adrese gaida apstiprinājumu, jauna saite jau ir ceļā.",
+      "pow_solving": "Risina pretrobotu uzdevumu…",
+      "mfa_recovery": "Atkopšanas kods",
+      "mfa_recovery_text": "Ievadiet vienu no saviem atkopšanas kodiem. Katru kodu var izmantot vienu reizi.",
+      "mfa_app": "Kods no lietotnes",
+      "mfa_app_text": "Ievadiet 6 ciparu kodu no savas autentifikācijas lietotnes.",
+      "mfa_state_on": "Šim kontam ir ieslēgta divu faktoru autentifikācija.",
+      "mfa_state_off": "Šim kontam ir izslēgta divu faktoru autentifikācija.",
+      "client_label": "Scacelith vietne ({browser})",
+      "username": "Lietotājvārds",
+      "password_rules": "Vismaz {min} rakstzīmes, bez jūsu lietotājvārda vai e-pasta.",
+      "password_note": "Citas jūsu ierīces tiks izrakstītas, bet šī paliks pierakstīta.",
+      "signin_label": "Pierakstīties",
+      "google_link_text": "Konts {name} jau izmanto šo e-pasta adresi. Vienreiz ievadiet tā paroli, lai to sasaistītu ar Google; pēc tam pietiks ar „Pierakstīties ar Google”.",
+      "auth_foot_google": "Viens konts oficiālajā serverī — gan spēlei, gan šai vietnei. Izveidojāt to spēlē ar Google? Arī šeit pierakstieties ar Google."
+    },
+    "players": {
+      "since": "Reģistrācijas datums: {date}",
+      "games": "Partijas",
+      "rated": "Ar reitingu",
+      "wins": "Uzvaras",
+      "draws": "Neizšķirti",
+      "losses": "Zaudējumi",
+      "view": "Skatīt spēlētāja {name} profilu",
+      "you": "Jūs",
+      "board": "Līderu saraksts"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partija Nr. {id} · {date}",
+      "preparing": "Sagatavo GIF…",
+      "rendering": "Serveris zīmē GIF. Gara partija var aizņemt dažas sekundes…",
+      "ready": "Jūsu GIF ir gatavs. Lejupielāde ir sākusies.",
+      "ready_again": "Jūsu GIF ir gatavs.",
+      "signin": "Pierakstieties, lai veidotu savu partiju GIF.",
+      "signin_button": "Pierakstīties",
+      "missing": "Nav izvēlēta neviena partija.",
+      "retry_in": "Varat mēģināt vēlreiz pēc {time}.",
+      "confirm": "Nospiediet „Izveidot GIF”, lai serveris, izmantojot jūsu kontu, uzzīmētu šo partiju.",
+      "retry_now": "Tagad varat mēģināt vēlreiz."
+    },
+    "home": {
+      "create_account": "Izveidot kontu",
+      "my_account": "Mans konts",
+      "my_games": "Manas partijas",
+      "signin": "Pierakstīties"
+    },
+    "trailer": {
+      "title": "Scacelith treileris",
+      "notice": "Šo video mitina YouTube. Atskaņojot to šeit, tiek ielādēts Google atskaņotājs, kas saņem jūsu IP adresi un var saglabāt jūsu ierīcē sīkdatnes vai citus izsekotājus.",
+      "accept": "Piekrist un atskaņot",
+      "google_privacy": "Google privātuma politika"
+    }
+  },
+  "legal": {
+    "eyebrow": "Juridiskie jautājumi",
+    "title": "Juridiskā informācija, privātums un lietošanas noteikumi",
+    "lead": "Kas izdod un mitina Scacelith, kas notiek ar jūsu datiem šajā vietnē, spēlē un oficiālajā serverī, un noteikumi, kas jāievēro, tur spēlējot.",
+    "updated": "Pēdējoreiz atjaunināts 2026. gada 11. oktobrī",
+    "toc": "Šajā lapā",
+    "notice": {
+      "title": "Juridiskā informācija",
+      "publisher_label": "Izdevējs",
+      "publisher": "Scacelith izdod privātpersona, kas to nedara profesionālas darbības ietvaros. Kā to pieļauj Francijas likums (2004. gada 21. jūnija likuma Nr. 2004-575 1-1. panta II daļa), izdevēja identitāte šeit nav norādīta; tā ir zināma mitināšanas pakalpojuma sniedzējam.",
+      "contact_label": "Saziņa",
+      "contact": "Jebkuriem jautājumiem par šo vietni, oficiālo serveri vai jūsu datiem.",
+      "host_server": "Oficiālais spēles serveris un kontu dati",
+      "host_server_note": "Serveri atrodas Francijā.",
+      "host_site": "Šī vietne un API dokumentācija (GitHub Pages)",
+      "host_domain": "Domēna vārda reģistrators",
+      "licence_label": "Licence",
+      "licence": "Spēle un tās serveris ir brīvā programmatūra saskaņā ar GNU General Public License v3, ar publiski pieejamu pirmkodu:",
+      "game_source": "spēle",
+      "server_source": "serveris",
+      "phone": "Tālr."
+    },
+    "privacy": {
+      "title": "Privātums",
+      "intro": "Scacelith nerāda reklāmas, nepārdod datus un neveic apmeklējuma mērījumus. Personas dati tiek izmantoti tikai šīs vietnes un oficiālā servera darbībai, kā aprakstīts tālāk. Pārzinis ir izdevējs, ar kuru var sazināties, izmantojot iepriekš norādīto saziņas adresi.",
+      "site_title": "Šajā vietnē",
+      "site_hosting": "Vietni mitina GitHub, kas, tāpat kā jebkurš tīmekļa mitinātājs, drošības nolūkos reģistrē apmeklētāju IP adreses.",
+      "github_privacy": "GitHub privātuma paziņojums",
+      "site_requests": "Lai parādītu jaunāko versiju, jūsu pārlūks vēršas pie GitHub API (api.github.com); lai parādītu servera statusu, līderu sarakstu, spēlētājus un jūsu kontu, tas vēršas pie oficiālā servera (caissa.scacelith.com). Abi saņem jūsu IP adresi, kā tas notiek ar jebkuru pieprasījumu.",
+      "site_storage": "Vietne neiestata sīkdatnes un neizmanto analītiku. Jūsu pārlūkā tā glabā tikai jūsu valodas izvēli un pēc pierakstīšanās — jūsu sesiju: tikai pašreizējā cilnē vai šajā ierīcē, ja atzīmējat „Saglabāt pierakstīšanos šajā ierīcē”. Pierakstoties ar Google, pašreizējā cilnē līdz izmantošanai tiek glabāti arī vienreizējie kodi. Tas viss ir nepieciešams vietnes darbībai, un sesiju un kodus saņem tikai oficiālais serveris.",
+      "site_trailer": "Treileris ir YouTube video. No YouTube nekas netiek ielādēts, līdz jūs nospiežat „Piekrist un atskaņot”; tad YouTube (Google) saņem jūsu IP adresi un var saglabāt jūsu ierīcē sīkdatnes vai citus izsekotājus. Jūsu atbilde netiek atcerēta: nākamajā apmeklējumā jautājums tiks uzdots atkal.",
+      "site_google": "Poga „Pierakstīties ar Google” lapā „Konts” neko neielādē no Google, līdz jūs to nospiežat. Tad jūsu pārlūks pāriet uz Google pierakstīšanās lapu (accounts.google.com), un Google to nosūta atpakaļ uz šo vietni ar vienreizēju kodu, ko vietne nodod oficiālajam serverim. Google saņem jūsu IP adresi un to, ko ievadāt tā lapā, saskaņā ar savu politiku.",
+      "google_privacy": "Google privātuma politika",
+      "game_title": "Spēlē",
+      "game_local": "Spēle jūsu datorā glabā savus iestatījumus, jūsu lokālos rezultātus un jūsu pierakstīšanos. Pierakstīšanās tiek glabāta sistēmas drošajā krātuvē (Windows — DPAPI, macOS — Keychain, Linux — Secret Service atslēgu saišķis) vai arī failā, ko var lasīt tikai jūsu lietotāja konts.",
+      "game_network": "Pati no sevis tā neko nesūta: nav telemetrijas, nav atjauninājumu pārbaudes. Tā pieslēdzas oficiālajam serverim tikai tad, kad atverat tiešsaistes lapu, Hugging Face — tikai tad, kad lejupielādējat trenera balsi, bet tiešajā mačā — pretinieka datoram, kas tad uzzina jūsu IP adresi (spēle var arī atvērt portu jūsu maršrutētājā ar UPnP).",
+      "account_title": "Jūsu konts oficiālajā serverī",
+      "account_intro": "Izveidojot kontu spēlē vai šajā vietnē un spēlējot tiešsaistē, oficiālajam serverim, ko Francijā mitina OVH, tiek nosūtīti šādi dati:",
+      "data_account": "<strong>Konts:</strong> lietotājvārds, e-pasta adrese, parole (tiek glabāta tikai kā Argon2id jaucējvērtība), divu faktoru autentifikācijas slepenā atslēga (šifrēta) un atkopšanas kodi (jaucējvērtību veidā), reģistrācijas datums un pēdējās pierakstīšanās datums.",
+      "data_google": "<strong>Pierakstīšanās ar Google:</strong> Google nosūta jūsu Google konta identifikatoru, e-pasta adresi un vārdu. Serveris saglabā identifikatoru un adresi, bet vārdu izmanto tikai tam, lai ieteiktu lietotājvārdu.",
+      "data_sessions": "<strong>Pierakstītās ierīces:</strong> katrai pierakstīšanās reizei — ierīces nosaukums (spēles versija un sistēma, piemēram, „Scacelith/1.0.0 win64”, vai šajā vietnē — pārlūks un sistēma), IP adrese un lietošanas datumi.",
+      "data_games": "<strong>Partijas un reitingi:</strong> katra tiešsaistes partija (spēlētāji, gājieni, katram gājienam patērētais laiks, rezultāts, datumi) un jūsu reitingi. Partijas laikā jūsu galvas un rokas kustības reāllaikā tiek pārsūtītas pretiniekam un nekad netiek saglabātas.",
+      "data_security": "<strong>Drošības žurnāls:</strong> pierakstīšanās reizes, neveiksmīgi mēģinājumi un konta izmaiņas, kopā ar IP adresi.",
+      "data_fairplay": "<strong>Godīga spēle:</strong> ziņojumi, ko iesniedzat jūs vai kas iesniegti par jums, ar to komentāriem; pamestas un nokavētas partijas; sankcijas; kā arī partiju pārbaudes — no viltotiem vai neiespējamiem gājieniem līdz Stockfish dzinēja statistikai.",
+      "basis_title": "Kāpēc un uz kāda juridiskā pamata",
+      "basis_contract": "Jūsu konta un tiešsaistes spēles nodrošināšana (pierakstīšanās, partijas, reitingi, partiju ieraksti, pakalpojuma sūtītie e-pasta ziņojumi): pakalpojums, kuram jūs reģistrējaties (Vispārīgās datu aizsardzības regulas jeb VDAR 6. panta 1. punkta b) apakšpunkts).",
+      "basis_security": "Kontu un servera aizsardzība un godīgas spēles nodrošināšana (drošības žurnāls, IP adreses, godīgas spēles pārbaudes, sankcijas): izdevēja un spēlētāju leģitīmās intereses (VDAR 6. panta 1. punkta f) apakšpunkts).",
+      "basis_trailer": "Treilera atskaņošana no YouTube: jūsu piekrišana, kas dota ar pogu (VDAR 6. panta 1. punkta a) apakšpunkts).",
+      "public_title": "Ko var redzēt ikviens",
+      "public": "Jūsu lietotājvārds, reģistrācijas datums, reitingi un pilns partiju saraksts ar visiem gājieniem ir publiski: šajā vietnē, caur servera API un katras partijas PGN. Jūsu e-pasta adrese, ierīces, pierakstīšanās reizes, sankcijas un godīgas spēles ieraksti nekad netiek rādīti. Jūs varat atteikties no tiešajiem izaicinājumiem, bet partijas paslēpt nevar.",
+      "auto_title": "Automatizēti lēmumi",
+      "auto": "Daži spēles protokola pārkāpumi, piemēram, viltots ziņojums vai pozīcijā neiespējams gājiens, ir drošs krāpšanās pierādījums: tad serveris piešķir partijā tehnisko zaudējumu, bloķē kontu uz 24 stundām, izņem to no līderu saraksta un atdod pretiniekiem punktus, ko tie tam zaudējuši pēdējo 60 dienu laikā. Pēc trim pamestām, anulētām vai nokavētām partijām 24 stundu laikā reitinga pretinieku meklēšana tiek apturēta uz 15 minūtēm, pēc tam uz ilgāku laiku. Dzinēja statistika pati par sevi nekad nerada sankciju: lēmumu pieņem cilvēks. Jūs varat lūgt pārskatīt jebkuru lēmumu, rakstot uz saziņas adresi.",
+      "recipients_title": "Kas saņem jūsu datus",
+      "recipient_ovh": "OVH SAS mitina serveri un tā datus Francijā.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) sūta servera e-pasta ziņojumus: tas saņem jūsu adresi, lietotājvārdu un ziņojumu.",
+      "recipient_google": "Google saņem to, ko jūsu pārlūks tam nosūta, kad izvēlaties pierakstīties ar Google, saskaņā ar savu privātuma politiku.",
+      "recipient_staff": "Servera administrators un moderatori redz kontu un godīgas spēles datus, lai nodrošinātu pakalpojuma darbību.",
+      "recipient_players": "Citi spēlētāji redz to, kas ir publisks, un pretinieks partijas laikā redz jūsu gājienus un kustības.",
+      "recipient_none": "Neviens cits: dati netiek pārdoti, iznomāti vai izmantoti reklāmai.",
+      "transfers": "Kontu dati paliek Francijā. GitHub, Google un Porkbun (kas pārsūta uz saziņas adresi nosūtītos ziņojumus) atrodas Amerikas Savienotajās Valstīs: uz to, ko tie saņem, attiecas to pašu politikas un to garantijas datu nosūtīšanai ārpus Eiropas Savienības.",
+      "retention_title": "Cik ilgi dati tiek glabāti",
+      "ret_account": "<strong>Konts:</strong> līdz brīdim, kad jūs to izdzēšat. Reģistrācija, kuras adrese netiek apstiprināta, tiek dzēsta pēc 24 stundām.",
+      "ret_sessions": "<strong>Pierakstītās ierīces:</strong> līdz jūs izrakstāties, bet ne ilgāk kā 30 dienas bez lietošanas un ne ilgāk kā 90 dienas kopumā.",
+      "ret_ip": "<strong>IP adreses:</strong> tiek dzēstas pēc 30 dienām. Servera žurnālos tiek glabātas tikai saīsinātas adreses.",
+      "ret_security": "<strong>Drošības žurnāls:</strong> 90 dienas.",
+      "ret_conduct": "<strong>Pamestas un nokavētas partijas:</strong> 30 dienas.",
+      "ret_games": "<strong>Partijas un reitingi:</strong> tik ilgi, kamēr serveris glabā savus partiju ierakstus, kas ir arī jūsu pretinieku ieraksti. Pēc konta dzēšanas jūsu vārds tajos tiek aizstāts ar „deleted#” un numuru.",
+      "ret_fairplay": "<strong>Sankcijas, ziņojumi un godīgas spēles pārbaužu rezultāti:</strong> tiek saglabāti, lai bloķēti spēlētāji nevarētu vienkārši atgriezties un citi spēlētāji paliktu aizsargāti. Pēc konta dzēšanas tie paliek saistīti tikai ar tā numuru.",
+      "ret_backups": "<strong>Rezerves kopijas:</strong> dzēsti dati vēl īsu laiku var palikt servera rezerves kopijā, līdz tā tiek aizstāta.",
+      "ret_contact": "<strong>Ziņojumi uz saziņas adresi:</strong> tik ilgi, cik nepieciešams, lai uz tiem atbildētu.",
+      "rights_title": "Jūsu tiesības",
+      "rights": "Jūs varat piekļūt saviem datiem, tos labot, dzēst un eksportēt, ierobežot to izmantošanu un iebilst pret to (VDAR 15.–21. pants).",
+      "rights_self": "Lielāko daļu no tā varat izdarīt savā kontā — spēlē vai šīs vietnes lapā „Konts”: lejupielādēt konta datus JSON failā, mainīt e-pasta adresi vai paroli, izrakstīt citas ierīces vai uzreiz dzēst kontu.",
+      "rights_google": "Kontam, kas izveidots ar Google, nav paroles: lai to eksportētu vai dzēstu, vispirms iestatiet tam paroli ar „Aizmirsāt paroli?”.",
+      "rights_mail": "Visos citos gadījumos, arī attiecībā uz datiem, kas neietilpst eksportā (godīgas spēles pārbaudes, ziņojumi par jums), rakstiet uz saziņas adresi. Jūs saņemsiet atbildi viena mēneša laikā.",
+      "rights_cnil": "Ja uzskatāt, ka jūsu tiesības netiek ievērotas, varat iesniegt sūdzību CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) vai savas valsts datu aizsardzības iestādē.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Lietošanas noteikumi",
+      "intro": "Šie noteikumi attiecas uz oficiālo serveri (caissa.scacelith.com) un šīs vietnes konta lapām. Izveidojot kontu vai spēlējot oficiālajā serverī, jūs tiem piekrītat.",
+      "service": "<strong>Bezmaksas pakalpojums.</strong> Spēle ir bezmaksas brīvā programmatūra. Oficiālais serveris tiek piedāvāts bez maksas un tāds, kāds tas ir, bez pieejamības garantijas: tas var mainīties, uz laiku apstāties vai tikt slēgts.",
+      "account": "<strong>Jūsu konts.</strong> Jūs atbildat par to, kas ar to tiek darīts, un par tā paroles neizpaušanu. Ja domājat, ka to izmanto kāds cits, nekavējoties rakstiet uz saziņas adresi.",
+      "username": "<strong>Jūsu lietotājvārds</strong> ir publisks: tas nedrīkst būt aizskarošs vai naidīgs, uzdoties par kādu citu vai atklāt kāda personas datus.",
+      "fair": "<strong>Godīga spēle.</strong> Reitinga partijas laikā nav pieļaujama nekāda palīdzība no šaha dzinēja, citas personas vai jebkura cita rīka. Nav pieļaujams modificēts spēles klients, viltoti ziņojumi vai apzināta servera pārslogošana.",
+      "conduct": "<strong>Pabeidziet savas partijas.</strong> Ja 24 stundu laikā trīs reizes pametat vai anulējat partiju vai nokavējat partiju, kurai jums atrasts pretinieks, reitinga pretinieku meklēšana uz laiku tiek apturēta.",
+      "reports": "<strong>Ziņojumi</strong> jāiesniedz godprātīgi. Lai ziņotu par spēlētāju vai nelikumīgu saturu, piemēram, aizskarošu lietotājvārdu, izmantojiet partijas ziņošanas pogu vai rakstiet uz saziņas adresi.",
+      "sanctions": "<strong>Sankcijas.</strong> Šo noteikumu pārkāpšana var novest pie tehniskā zaudējuma, brīdinājuma, bloķēšanas un izņemšanas no līderu saraksta; krāpniekam zaudētie punkti tiek atdoti viņa pretiniekiem. Automātiski sankcijas tiek piemērotas tikai par drošu krāpšanās pierādījumu; par visu pārējo lemj cilvēks. Sankciju varat apstrīdēt, rakstot uz saziņas adresi.",
+      "liability": "<strong>Atbildība.</strong> Likumā pieļautajās robežās izdevējs neatbild par pakalpojuma pārtraukumiem vai partiju, reitingu vai datu zudumu.",
+      "end": "<strong>Izbeigšana.</strong> Jūs jebkurā laikā varat dzēst savu kontu. Kontu, kas pārkāpj šos noteikumus, var bloķēt.",
+      "changes": "<strong>Izmaiņas.</strong> Šie noteikumi var mainīties; datums šīs lapas augšdaļā norāda pašreizējo versiju, un, turpinot spēlēt pēc izmaiņām, jūs tām piekrītat.",
+      "law": "<strong>Piemērojamie tiesību akti.</strong> Šos noteikumus regulē Francijas tiesību akti. Strīda gadījumā vispirms rakstiet uz saziņas adresi, lai kopīgi rastu risinājumu."
+    },
+    "version_note": "Šī lapa ir pieejama vairākās valodās; ja tās atšķiras, noteicošā ir versija franču valodā."
+  }
+}
