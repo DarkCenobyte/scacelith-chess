@@ -33,7 +33,8 @@
    "vi",
    "pl",
    "sv",
-   "sl"
+   "sl",
+   "tr"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -236,6 +237,10 @@
     "sl": {
      "name": "Otvoritev kraljevega kmeta",
      "def": "otvoritev kraljevega kmeta"
+    },
+    "tr": {
+     "name": "Şah Piyonu Açılışı",
+     "def": "Şah Piyonu Açılışı"
     }
    },
    "comment": {
@@ -412,6 +417,10 @@
     "sl": {
      "name": "Otvoritev daminega kmeta",
      "def": "otvoritev daminega kmeta"
+    },
+    "tr": {
+     "name": "Vezir Piyonu Açılışı",
+     "def": "Vezir Piyonu Açılışı"
     }
    },
    "comment": {
@@ -585,6 +594,10 @@
     "sl": {
      "name": "Otvoritev kraljevega skakača",
      "def": "otvoritev kraljevega skakača"
+    },
+    "tr": {
+     "name": "Şah Atı Açılışı",
+     "def": "Şah Atı Açılışı"
     }
    },
    "comment": {
@@ -761,6 +774,10 @@
     "sl": {
      "name": "Sicilijanska obramba",
      "def": "sicilijanska obramba"
+    },
+    "tr": {
+     "name": "Sicilya Savunması",
+     "def": "Sicilya Savunması"
     }
    },
    "comment": {
@@ -934,6 +951,10 @@
     "sl": {
      "name": "Francoska obramba",
      "def": "francoska obramba"
+    },
+    "tr": {
+     "name": "Fransız Savunması",
+     "def": "Fransız Savunması"
     }
    },
    "comment": {
@@ -1107,6 +1128,10 @@
     "sl": {
      "name": "Caro-Kannova obramba",
      "def": "Caro-Kannova obramba"
+    },
+    "tr": {
+     "name": "Caro-Kann Savunması",
+     "def": "Caro-Kann Savunması"
     }
    },
    "comment": {
@@ -1280,6 +1305,10 @@
     "sl": {
      "name": "Skandinavska obramba",
      "def": "skandinavska obramba"
+    },
+    "tr": {
+     "name": "İskandinav Savunması",
+     "def": "İskandinav Savunması"
     }
    },
    "comment": {
@@ -1453,6 +1482,10 @@
     "sl": {
      "name": "Italijanska partija",
      "def": "italijanska partija"
+    },
+    "tr": {
+     "name": "İtalyan Oyunu",
+     "def": "İtalyan Oyunu"
     }
    },
    "comment": {
@@ -1626,6 +1659,10 @@
     "sl": {
      "name": "Španska partija",
      "def": "španska partija"
+    },
+    "tr": {
+     "name": "İspanyol Açılışı",
+     "def": "İspanyol Açılışı"
     }
    },
    "comment": {
@@ -1799,6 +1836,10 @@
     "sl": {
      "name": "Škotska partija",
      "def": "škotska partija"
+    },
+    "tr": {
+     "name": "İskoç Oyunu",
+     "def": "İskoç Oyunu"
     }
    },
    "comment": {
@@ -1972,6 +2013,10 @@
     "sl": {
      "name": "Philidorjeva obramba",
      "def": "Philidorjeva obramba"
+    },
+    "tr": {
+     "name": "Philidor Savunması",
+     "def": "Philidor Savunması"
     }
    },
    "comment": {
@@ -2145,6 +2190,10 @@
     "sl": {
      "name": "Petrovova obramba",
      "def": "Petrovova obramba"
+    },
+    "tr": {
+     "name": "Petrov Savunması",
+     "def": "Petrov Savunması"
     }
    },
    "comment": {
@@ -2319,6 +2368,10 @@
     "sl": {
      "name": "Partija štirih skakačev",
      "def": "partija štirih skakačev"
+    },
+    "tr": {
+     "name": "Dört At Oyunu",
+     "def": "Dört At Oyunu"
     }
    },
    "comment": {
@@ -2493,6 +2546,10 @@
     "sl": {
      "name": "Angleška otvoritev",
      "def": "angleška otvoritev"
+    },
+    "tr": {
+     "name": "İngiliz Açılışı",
+     "def": "İngiliz Açılışı"
     }
    },
    "comment": {
@@ -2666,6 +2723,10 @@
     "sl": {
      "name": "Zukertortova otvoritev",
      "def": "Zukertortova otvoritev"
+    },
+    "tr": {
+     "name": "Zukertort Açılışı",
+     "def": "Zukertort Açılışı"
     }
    },
    "comment": {
@@ -2844,6 +2905,10 @@
     "sl": {
      "name": "Damin gambit",
      "def": "damin gambit"
+    },
+    "tr": {
+     "name": "Vezir Gambiti",
+     "def": "Vezir Gambiti"
     }
    },
    "comment": {
@@ -3017,6 +3082,10 @@
     "sl": {
      "name": "Odklonjeni damin gambit",
      "def": "odklonjeni damin gambit"
+    },
+    "tr": {
+     "name": "Kabul Edilmemiş Vezir Gambiti",
+     "def": "Kabul Edilmemiş Vezir Gambiti"
     }
    },
    "comment": {
@@ -3190,6 +3259,10 @@
     "sl": {
      "name": "Sprejeti damin gambit",
      "def": "sprejeti damin gambit"
+    },
+    "tr": {
+     "name": "Kabul Edilmiş Vezir Gambiti",
+     "def": "Kabul Edilmiş Vezir Gambiti"
     }
    },
    "comment": {
@@ -3364,6 +3437,10 @@
     "sl": {
      "name": "Slovanska obramba",
      "def": "slovanska obramba"
+    },
+    "tr": {
+     "name": "Slav Savunması",
+     "def": "Slav Savunması"
     }
    },
    "comment": {
@@ -3538,6 +3615,10 @@
     "sl": {
      "name": "Polslovanska obramba",
      "def": "polslovanska obramba"
+    },
+    "tr": {
+     "name": "Yarı Slav Savunması",
+     "def": "Yarı Slav Savunması"
     }
    },
    "comment": {
@@ -3712,6 +3793,10 @@
     "sl": {
      "name": "Indijska obramba",
      "def": "indijska obramba"
+    },
+    "tr": {
+     "name": "Hint Savunması",
+     "def": "Hint Savunması"
     }
    },
    "comment": {
@@ -3885,6 +3970,10 @@
     "sl": {
      "name": "Kraljeva indijska obramba",
      "def": "kraljeva indijska obramba"
+    },
+    "tr": {
+     "name": "Şah Hint Savunması",
+     "def": "Şah Hint Savunması"
     }
    },
    "comment": {
@@ -4063,6 +4152,10 @@
     "sl": {
      "name": "Londonski sistem",
      "def": "londonski sistem"
+    },
+    "tr": {
+     "name": "Londra Sistemi",
+     "def": "Londra Sistemi"
     }
    },
    "comment": {
@@ -4238,6 +4331,10 @@
     "sl": {
      "name": "Moderna obramba",
      "def": "moderna obramba"
+    },
+    "tr": {
+     "name": "Modern Savunma",
+     "def": "Modern Savunma"
     }
    },
    "comment": {
@@ -4413,6 +4510,10 @@
     "sl": {
      "name": "Pirčeva obramba",
      "def": "Pirčeva obramba"
+    },
+    "tr": {
+     "name": "Pirc Savunması",
+     "def": "Pirc Savunması"
     }
    },
    "comment": {
@@ -4587,6 +4688,10 @@
     "sl": {
      "name": "Dunajska partija",
      "def": "dunajska partija"
+    },
+    "tr": {
+     "name": "Viyana Oyunu",
+     "def": "Viyana Oyunu"
     }
    },
    "comment": {
@@ -4760,6 +4865,10 @@
     "sl": {
      "name": "Lovčeva otvoritev",
      "def": "lovčeva otvoritev"
+    },
+    "tr": {
+     "name": "Fil Açılışı",
+     "def": "Fil Açılışı"
     }
    },
    "comment": {
@@ -4933,6 +5042,10 @@
     "sl": {
      "name": "Aljehinova obramba",
      "def": "Aljehinova obramba"
+    },
+    "tr": {
+     "name": "Alekhine Savunması",
+     "def": "Alekhine Savunması"
     }
    },
    "comment": {
@@ -5106,6 +5219,10 @@
     "sl": {
      "name": "Kraljev gambit",
      "def": "kraljev gambit"
+    },
+    "tr": {
+     "name": "Şah Gambiti",
+     "def": "Şah Gambiti"
     }
    },
    "comment": {
@@ -5279,6 +5396,10 @@
     "sl": {
      "name": "Sprejeti kraljev gambit",
      "def": "sprejeti kraljev gambit"
+    },
+    "tr": {
+     "name": "Kabul Edilmiş Şah Gambiti",
+     "def": "Kabul Edilmiş Şah Gambiti"
     }
    },
    "comment": {
@@ -5452,6 +5573,10 @@
     "sl": {
      "name": "Odklonjeni kraljev gambit",
      "def": "odklonjeni kraljev gambit"
+    },
+    "tr": {
+     "name": "Kabul Edilmemiş Şah Gambiti",
+     "def": "Kabul Edilmemiş Şah Gambiti"
     }
    },
    "comment": {
@@ -5625,6 +5750,10 @@
     "sl": {
      "name": "Nimcovičeva obramba",
      "def": "Nimcovičeva obramba"
+    },
+    "tr": {
+     "name": "Nimzowitsch Savunması",
+     "def": "Nimzowitsch Savunması"
     }
    },
    "comment": {
@@ -5803,6 +5932,10 @@
     "sl": {
      "name": "Owenova obramba",
      "def": "Owenova obramba"
+    },
+    "tr": {
+     "name": "Owen Savunması",
+     "def": "Owen Savunması"
     }
    },
    "comment": {
@@ -5977,6 +6110,10 @@
     "sl": {
      "name": "Horwitzeva obramba",
      "def": "Horwitzeva obramba"
+    },
+    "tr": {
+     "name": "Horwitz Savunması",
+     "def": "Horwitz Savunması"
     }
    },
    "comment": {
@@ -6150,6 +6287,10 @@
     "sl": {
      "name": "Van't Kruijsova otvoritev",
      "def": "Van't Kruijsova otvoritev"
+    },
+    "tr": {
+     "name": "Van't Kruijs Açılışı",
+     "def": "Van't Kruijs Açılışı"
     }
    },
    "comment": {
@@ -6324,6 +6465,10 @@
     "sl": {
      "name": "Centralna partija",
      "def": "centralna partija"
+    },
+    "tr": {
+     "name": "Merkez Oyunu",
+     "def": "Merkez Oyunu"
     }
    },
    "comment": {
@@ -6498,6 +6643,10 @@
     "sl": {
      "name": "Englundov gambit",
      "def": "Englundov gambit"
+    },
+    "tr": {
+     "name": "Englund Gambiti",
+     "def": "Englund Gambiti"
     }
    },
    "comment": {
@@ -6671,6 +6820,10 @@
     "sl": {
      "name": "Holandska obramba",
      "def": "holandska obramba"
+    },
+    "tr": {
+     "name": "Hollanda Savunması",
+     "def": "Hollanda Savunması"
     }
    },
    "comment": {
@@ -6844,6 +6997,10 @@
     "sl": {
      "name": "Nimcoindijska obramba",
      "def": "nimcoindijska obramba"
+    },
+    "tr": {
+     "name": "Nimzo-Hint Savunması",
+     "def": "Nimzo-Hint Savunması"
     }
    },
    "comment": {
@@ -7019,6 +7176,10 @@
     "sl": {
      "name": "Damina indijska obramba",
      "def": "damina indijska obramba"
+    },
+    "tr": {
+     "name": "Vezir Hint Savunması",
+     "def": "Vezir Hint Savunması"
     }
    },
    "comment": {
@@ -7193,6 +7354,10 @@
     "sl": {
      "name": "Grünfeldova obramba",
      "def": "Grünfeldova obramba"
+    },
+    "tr": {
+     "name": "Grünfeld Savunması",
+     "def": "Grünfeld Savunması"
     }
    },
    "comment": {
@@ -7366,6 +7531,10 @@
     "sl": {
      "name": "Katalonska otvoritev",
      "def": "katalonska otvoritev"
+    },
+    "tr": {
+     "name": "Katalan Açılışı",
+     "def": "Katalan Açılışı"
     }
    },
    "comment": {
@@ -7539,6 +7708,10 @@
     "sl": {
      "name": "Obramba Benoni",
      "def": "obramba Benoni"
+    },
+    "tr": {
+     "name": "Benoni Savunması",
+     "def": "Benoni Savunması"
     }
    },
    "comment": {
@@ -7714,6 +7887,10 @@
     "sl": {
      "name": "Benkov gambit",
      "def": "Benkov gambit"
+    },
+    "tr": {
+     "name": "Benko Gambiti",
+     "def": "Benko Gambiti"
     }
    },
    "comment": {
@@ -7887,6 +8064,10 @@
     "sl": {
      "name": "Rétijeva otvoritev",
      "def": "Rétijeva otvoritev"
+    },
+    "tr": {
+     "name": "Réti Açılışı",
+     "def": "Réti Açılışı"
     }
    },
    "comment": {
@@ -8060,6 +8241,10 @@
     "sl": {
      "name": "Kraljev indijski napad",
      "def": "kraljev indijski napad"
+    },
+    "tr": {
+     "name": "Şah Hint Atağı",
+     "def": "Şah Hint Atağı"
     }
    },
    "comment": {
@@ -8237,6 +8422,10 @@
     "sl": {
      "name": "Birdova otvoritev",
      "def": "Birdova otvoritev"
+    },
+    "tr": {
+     "name": "Bird Açılışı",
+     "def": "Bird Açılışı"
     }
    },
    "comment": {
@@ -8410,6 +8599,10 @@
     "sl": {
      "name": "Ponzianijeva otvoritev",
      "def": "Ponzianijeva otvoritev"
+    },
+    "tr": {
+     "name": "Ponziani Açılışı",
+     "def": "Ponziani Açılışı"
     }
    },
    "comment": {
@@ -8583,6 +8776,10 @@
     "sl": {
      "name": "Partija treh skakačev",
      "def": "partija treh skakačev"
+    },
+    "tr": {
+     "name": "Üç At Açılışı",
+     "def": "Üç At Açılışı"
     }
    },
    "comment": {
@@ -8758,6 +8955,10 @@
     "sl": {
      "name": "Danski gambit",
      "def": "danski gambit"
+    },
+    "tr": {
+     "name": "Danimarka Gambiti",
+     "def": "Danimarka Gambiti"
     }
    },
    "comment": {
@@ -8933,6 +9134,10 @@
     "sl": {
      "name": "Blackmar-Diemerjev gambit",
      "def": "Blackmar-Diemerjev gambit"
+    },
+    "tr": {
+     "name": "Blackmar-Diemer Gambiti",
+     "def": "Blackmar-Diemer Gambiti"
     }
    },
    "comment": {
@@ -9106,6 +9311,10 @@
     "sl": {
      "name": "Trompowskyjev napad",
      "def": "Trompowskyjev napad"
+    },
+    "tr": {
+     "name": "Trompowsky Atağı",
+     "def": "Trompowsky Atağı"
     }
    },
    "comment": {
@@ -9280,6 +9489,10 @@
     "sl": {
      "name": "Torrejev napad",
      "def": "Torrejev napad"
+    },
+    "tr": {
+     "name": "Torre Atağı",
+     "def": "Torre Atağı"
     }
    },
    "comment": {
@@ -9455,6 +9668,10 @@
     "sl": {
      "name": "Collov sistem",
      "def": "Collov sistem"
+    },
+    "tr": {
+     "name": "Colle Sistemi",
+     "def": "Colle Sistemi"
     }
    },
    "comment": {
@@ -9628,6 +9845,10 @@
     "sl": {
      "name": "Tarrascheva obramba",
      "def": "Tarrascheva obramba"
+    },
+    "tr": {
+     "name": "Tarrasch Savunması",
+     "def": "Tarrasch Savunması"
     }
    },
    "comment": {
@@ -9802,6 +10023,10 @@
     "sl": {
      "name": "Budimpeštanski gambit",
      "def": "budimpeštanski gambit"
+    },
+    "tr": {
+     "name": "Budapeşte Gambiti",
+     "def": "Budapeşte Gambiti"
     }
    },
    "comment": {
@@ -9975,6 +10200,10 @@
     "sl": {
      "name": "Bogoindijska obramba",
      "def": "bogoindijska obramba"
+    },
+    "tr": {
+     "name": "Bogo-Hint Savunması",
+     "def": "Bogo-Hint Savunması"
     }
    },
    "comment": {
@@ -10148,6 +10377,10 @@
     "sl": {
      "name": "Staroindijska obramba",
      "def": "staroindijska obramba"
+    },
+    "tr": {
+     "name": "Eski Hint Savunması",
+     "def": "Eski Hint Savunması"
     }
    },
    "comment": {
@@ -10326,6 +10559,10 @@
     "sl": {
      "name": "Čigorinova obramba",
      "def": "Čigorinova obramba"
+    },
+    "tr": {
+     "name": "Çigorin Savunması",
+     "def": "Çigorin Savunması"
     }
    },
    "comment": {
@@ -10499,6 +10736,10 @@
     "sl": {
      "name": "Albinov protigambit",
      "def": "Albinov protigambit"
+    },
+    "tr": {
+     "name": "Albin Karşı Gambiti",
+     "def": "Albin Karşı Gambiti"
     }
    },
    "comment": {
@@ -10673,6 +10914,10 @@
     "sl": {
      "name": "Latvijski gambit",
      "def": "latvijski gambit"
+    },
+    "tr": {
+     "name": "Letonya Gambiti",
+     "def": "Letonya Gambiti"
     }
    },
    "comment": {
@@ -10846,6 +11091,10 @@
     "sl": {
      "name": "Slonji gambit",
      "def": "slonji gambit"
+    },
+    "tr": {
+     "name": "Elephant Gambiti",
+     "def": "Elephant Gambiti"
     }
    },
    "comment": {
@@ -11024,6 +11273,10 @@
     "sl": {
      "name": "Nimcovič-Larsenov napad",
      "def": "Nimcovič-Larsenov napad"
+    },
+    "tr": {
+     "name": "Nimzo-Larsen Atağı",
+     "def": "Nimzo-Larsen Atağı"
     }
    },
    "comment": {
@@ -11197,6 +11450,10 @@
     "sl": {
      "name": "Poljska otvoritev",
      "def": "poljska otvoritev"
+    },
+    "tr": {
+     "name": "Polonya Açılışı",
+     "def": "Polonya Açılışı"
     }
    },
    "comment": {
@@ -11370,6 +11627,10 @@
     "sl": {
      "name": "Grobova otvoritev",
      "def": "Grobova otvoritev"
+    },
+    "tr": {
+     "name": "Grob Açılışı",
+     "def": "Grob Açılışı"
     }
    },
    "comment": {
@@ -11543,6 +11804,10 @@
     "sl": {
      "name": "Madžarska otvoritev",
      "def": "madžarska otvoritev"
+    },
+    "tr": {
+     "name": "Macar Açılışı",
+     "def": "Macar Açılışı"
     }
    },
    "comment": {
@@ -11717,6 +11982,10 @@
     "sl": {
      "name": "Miesesova otvoritev",
      "def": "Miesesova otvoritev"
+    },
+    "tr": {
+     "name": "Mieses Açılışı",
+     "def": "Mieses Açılışı"
     }
    },
    "comment": {
@@ -11890,6 +12159,10 @@
     "sl": {
      "name": "Zaragoška otvoritev",
      "def": "zaragoška otvoritev"
+    },
+    "tr": {
+     "name": "Saragossa Açılışı",
+     "def": "Saragossa Açılışı"
     }
    },
    "comment": {
@@ -12063,6 +12336,10 @@
     "sl": {
      "name": "Van Geetova otvoritev",
      "def": "Van Geetova otvoritev"
+    },
+    "tr": {
+     "name": "Van Geet Açılışı",
+     "def": "Van Geet Açılışı"
     }
    },
    "comment": {
@@ -12236,6 +12513,10 @@
     "sl": {
      "name": "Jobavov londonski sistem",
      "def": "Jobavov londonski sistem"
+    },
+    "tr": {
+     "name": "Jobava Londra Sistemi",
+     "def": "Jobava Londra Sistemi"
     }
    },
    "comment": {
@@ -12409,6 +12690,10 @@
     "sl": {
      "name": "Napad Stonewall",
      "def": "napad Stonewall"
+    },
+    "tr": {
+     "name": "Stonewall Atağı",
+     "def": "Stonewall Atağı"
     }
    },
    "comment": {
@@ -12582,6 +12867,10 @@
     "sl": {
      "name": "Richter-Veresovov napad",
      "def": "Richter-Veresovov napad"
+    },
+    "tr": {
+     "name": "Richter-Veresov Atağı",
+     "def": "Richter-Veresov Atağı"
     }
    },
    "comment": {
@@ -12755,6 +13044,10 @@
     "sl": {
      "name": "Obramba svetega Jurija",
      "def": "obramba svetega Jurija"
+    },
+    "tr": {
+     "name": "Aziz George Savunması",
+     "def": "Aziz George Savunması"
     }
    },
    "comment": {
@@ -12928,6 +13221,10 @@
     "sl": {
      "name": "Borgova obramba",
      "def": "Borgova obramba"
+    },
+    "tr": {
+     "name": "Borg Savunması",
+     "def": "Borg Savunması"
     }
    },
    "comment": {
@@ -13101,6 +13398,10 @@
     "sl": {
      "name": "Obramba povodnega konja",
      "def": "obramba povodnega konja"
+    },
+    "tr": {
+     "name": "Hipopotam Savunması",
+     "def": "Hipopotam Savunması"
     }
    },
    "comment": {
@@ -13275,6 +13576,10 @@
     "sl": {
      "name": "Angleška obramba",
      "def": "angleška obramba"
+    },
+    "tr": {
+     "name": "İngiliz Savunması",
+     "def": "İngiliz Savunması"
     }
    },
    "comment": {
@@ -13448,6 +13753,10 @@
     "sl": {
      "name": "Obramba pterodaktila",
      "def": "obramba pterodaktila"
+    },
+    "tr": {
+     "name": "Pterodaktil Savunması",
+     "def": "Pterodaktil Savunması"
     }
    },
    "comment": {
@@ -13621,6 +13930,10 @@
     "sl": {
      "name": "Napad Bongcloud",
      "def": "napad Bongcloud"
+    },
+    "tr": {
+     "name": "Bongcloud Atağı",
+     "def": "Bongcloud Atağı"
     }
    },
    "comment": {
@@ -13766,6 +14079,10 @@
     "sl": {
      "name": "Odprta sicilijanska obramba",
      "def": "odprta sicilijanska obramba"
+    },
+    "tr": {
+     "name": "Açık Sicilya",
+     "def": "Açık Sicilya"
     }
    },
    "comment": {
@@ -13903,6 +14220,10 @@
     "sl": {
      "name": "Zaprta sicilijanska obramba",
      "def": "zaprta sicilijanska obramba"
+    },
+    "tr": {
+     "name": "Kapalı Sicilya",
+     "def": "Kapalı Sicilya"
     }
    },
    "comment": {
@@ -14040,6 +14361,10 @@
     "sl": {
      "name": "Alapinova varianta",
      "def": "Alapinova varianta"
+    },
+    "tr": {
+     "name": "Alapin Varyantı",
+     "def": "Alapin Varyantı"
     }
    },
    "comment": {
@@ -14179,6 +14504,10 @@
     "sl": {
      "name": "Smith-Morrov gambit",
      "def": "Smith-Morrov gambit"
+    },
+    "tr": {
+     "name": "Smith-Morra Gambiti",
+     "def": "Smith-Morra Gambiti"
     }
    },
    "comment": {
@@ -14317,6 +14646,10 @@
     "sl": {
      "name": "Napad Grand Prix",
      "def": "napad Grand Prix"
+    },
+    "tr": {
+     "name": "Grand Prix Atağı",
+     "def": "Grand Prix Atağı"
     }
    },
    "comment": {
@@ -14454,6 +14787,10 @@
     "sl": {
      "name": "Rossolimova varianta",
      "def": "Rossolimova varianta"
+    },
+    "tr": {
+     "name": "Rossolimo Varyantı",
+     "def": "Rossolimo Varyantı"
     }
    },
    "comment": {
@@ -14591,6 +14928,10 @@
     "sl": {
      "name": "Najdorfova varianta",
      "def": "Najdorfova varianta"
+    },
+    "tr": {
+     "name": "Najdorf Varyantı",
+     "def": "Najdorf Varyantı"
     }
    },
    "comment": {
@@ -14728,6 +15069,10 @@
     "sl": {
      "name": "Zmajeva varianta",
      "def": "zmajeva varianta"
+    },
+    "tr": {
+     "name": "Ejderha Varyantı",
+     "def": "Ejderha Varyantı"
     }
    },
    "comment": {
@@ -14867,6 +15212,10 @@
     "sl": {
      "name": "Pospešeni zmaj",
      "def": "pospešeni zmaj"
+    },
+    "tr": {
+     "name": "Hızlandırılmış Ejderha",
+     "def": "Hızlandırılmış Ejderha"
     }
    },
    "comment": {
@@ -15004,6 +15353,10 @@
     "sl": {
      "name": "Scheveningenska varianta",
      "def": "scheveningenska varianta"
+    },
+    "tr": {
+     "name": "Scheveningen Varyantı",
+     "def": "Scheveningen Varyantı"
     }
    },
    "comment": {
@@ -15141,6 +15494,10 @@
     "sl": {
      "name": "Svešnikovova varianta",
      "def": "Svešnikovova varianta"
+    },
+    "tr": {
+     "name": "Sveşnikov Varyantı",
+     "def": "Sveşnikov Varyantı"
     }
    },
    "comment": {
@@ -15279,6 +15636,10 @@
     "sl": {
      "name": "Tajmanovova varianta",
      "def": "Tajmanovova varianta"
+    },
+    "tr": {
+     "name": "Taymanov Varyantı",
+     "def": "Taymanov Varyantı"
     }
    },
    "comment": {
@@ -15416,6 +15777,10 @@
     "sl": {
      "name": "Kanova varianta",
      "def": "Kanova varianta"
+    },
+    "tr": {
+     "name": "Kan Varyantı",
+     "def": "Kan Varyantı"
     }
    },
    "comment": {
@@ -15553,6 +15918,10 @@
     "sl": {
      "name": "Klasična varianta",
      "def": "klasična varianta"
+    },
+    "tr": {
+     "name": "Klasik Varyant",
+     "def": "Klasik Varyant"
     }
    },
    "comment": {
@@ -15690,6 +16059,10 @@
     "sl": {
      "name": "Varianta napredovanja",
      "def": "varianta napredovanja"
+    },
+    "tr": {
+     "name": "İlerleme Varyantı",
+     "def": "İlerleme Varyantı"
     }
    },
    "comment": {
@@ -15827,6 +16200,10 @@
     "sl": {
      "name": "Menjalna varianta",
      "def": "menjalna varianta"
+    },
+    "tr": {
+     "name": "Değişim Varyantı",
+     "def": "Değişim Varyantı"
     }
    },
    "comment": {
@@ -15964,6 +16341,10 @@
     "sl": {
      "name": "Tarrascheva varianta",
      "def": "Tarrascheva varianta"
+    },
+    "tr": {
+     "name": "Tarrasch Varyantı",
+     "def": "Tarrasch Varyantı"
     }
    },
    "comment": {
@@ -16101,6 +16482,10 @@
     "sl": {
      "name": "Winawerjeva varianta",
      "def": "Winawerjeva varianta"
+    },
+    "tr": {
+     "name": "Winawer Varyantı",
+     "def": "Winawer Varyantı"
     }
    },
    "comment": {
@@ -16238,6 +16623,10 @@
     "sl": {
      "name": "Klasična varianta",
      "def": "klasična varianta"
+    },
+    "tr": {
+     "name": "Klasik Varyant",
+     "def": "Klasik Varyant"
     }
    },
    "comment": {
@@ -16375,6 +16764,10 @@
     "sl": {
      "name": "Rubinsteinova varianta",
      "def": "Rubinsteinova varianta"
+    },
+    "tr": {
+     "name": "Rubinstein Varyantı",
+     "def": "Rubinstein Varyantı"
     }
    },
    "comment": {
@@ -16512,6 +16905,10 @@
     "sl": {
      "name": "Varianta napredovanja",
      "def": "varianta napredovanja"
+    },
+    "tr": {
+     "name": "İlerleme Varyantı",
+     "def": "İlerleme Varyantı"
     }
    },
    "comment": {
@@ -16649,6 +17046,10 @@
     "sl": {
      "name": "Menjalna varianta",
      "def": "menjalna varianta"
+    },
+    "tr": {
+     "name": "Değişim Varyantı",
+     "def": "Değişim Varyantı"
     }
    },
    "comment": {
@@ -16788,6 +17189,10 @@
     "sl": {
      "name": "Panovov napad",
      "def": "Panovov napad"
+    },
+    "tr": {
+     "name": "Panov Atağı",
+     "def": "Panov Atağı"
     }
    },
    "comment": {
@@ -16925,6 +17330,10 @@
     "sl": {
      "name": "Klasična varianta",
      "def": "klasična varianta"
+    },
+    "tr": {
+     "name": "Klasik Varyant",
+     "def": "Klasik Varyant"
     }
    },
    "comment": {
@@ -17062,6 +17471,10 @@
     "sl": {
      "name": "Napad dveh skakačev",
      "def": "napad dveh skakačev"
+    },
+    "tr": {
+     "name": "İki At Atağı",
+     "def": "İki At Atağı"
     }
    },
    "comment": {
@@ -17199,6 +17612,10 @@
     "sl": {
      "name": "Obramba dveh skakačev",
      "def": "obramba dveh skakačev"
+    },
+    "tr": {
+     "name": "İki At Savunması",
+     "def": "İki At Savunması"
     }
    },
    "comment": {
@@ -17338,6 +17755,10 @@
     "sl": {
      "name": "Giuoco piano",
      "def": "giuoco piano"
+    },
+    "tr": {
+     "name": "Giuoco Piano",
+     "def": "Giuoco Piano"
     }
    },
    "comment": {
@@ -17481,6 +17902,10 @@
     "sl": {
      "name": "Giuoco pianissimo",
      "def": "giuoco pianissimo"
+    },
+    "tr": {
+     "name": "Giuoco Pianissimo",
+     "def": "Giuoco Pianissimo"
     }
    },
    "comment": {
@@ -17622,6 +18047,10 @@
     "sl": {
      "name": "Evansov gambit",
      "def": "Evansov gambit"
+    },
+    "tr": {
+     "name": "Evans Gambiti",
+     "def": "Evans Gambiti"
     }
    },
    "comment": {
@@ -17759,6 +18188,10 @@
     "sl": {
      "name": "Napad Fegatello",
      "def": "napad Fegatello"
+    },
+    "tr": {
+     "name": "Kızarmış Ciğer Atağı",
+     "def": "Kızarmış Ciğer Atağı"
     }
    },
    "comment": {
@@ -17902,6 +18335,10 @@
     "sl": {
      "name": "Traxlerjev protinapad",
      "def": "Traxlerjev protinapad"
+    },
+    "tr": {
+     "name": "Traxler Karşı Atağı",
+     "def": "Traxler Karşı Atağı"
     }
    },
    "comment": {
@@ -18039,6 +18476,10 @@
     "sl": {
      "name": "Berlinska obramba",
      "def": "berlinska obramba"
+    },
+    "tr": {
+     "name": "Berlin Savunması",
+     "def": "Berlin Savunması"
     }
    },
    "comment": {
@@ -18176,6 +18617,10 @@
     "sl": {
      "name": "Morphyjeva obramba",
      "def": "Morphyjeva obramba"
+    },
+    "tr": {
+     "name": "Morphy Savunması",
+     "def": "Morphy Savunması"
     }
    },
    "comment": {
@@ -18313,6 +18758,10 @@
     "sl": {
      "name": "Zaprta španska partija",
      "def": "zaprta španska partija"
+    },
+    "tr": {
+     "name": "Kapalı İspanyol",
+     "def": "Kapalı İspanyol"
     }
    },
    "comment": {
@@ -18450,6 +18899,10 @@
     "sl": {
      "name": "Marshallov napad",
      "def": "Marshallov napad"
+    },
+    "tr": {
+     "name": "Marshall Atağı",
+     "def": "Marshall Atağı"
     }
    },
    "comment": {
@@ -18587,6 +19040,10 @@
     "sl": {
      "name": "Menjalna varianta",
      "def": "menjalna varianta"
+    },
+    "tr": {
+     "name": "Değişim Varyantı",
+     "def": "Değişim Varyantı"
     }
    },
    "comment": {
@@ -18724,6 +19181,10 @@
     "sl": {
      "name": "Odprta španska partija",
      "def": "odprta španska partija"
+    },
+    "tr": {
+     "name": "Açık İspanyol",
+     "def": "Açık İspanyol"
     }
    },
    "comment": {
@@ -18861,6 +19322,10 @@
     "sl": {
      "name": "Schliemannova obramba",
      "def": "Schliemannova obramba"
+    },
+    "tr": {
+     "name": "Schliemann Savunması",
+     "def": "Schliemann Savunması"
     }
    },
    "comment": {
@@ -18998,6 +19463,10 @@
     "sl": {
      "name": "Škotski gambit",
      "def": "škotski gambit"
+    },
+    "tr": {
+     "name": "İskoç Gambiti",
+     "def": "İskoç Gambiti"
     }
    },
    "comment": {
@@ -19136,6 +19605,10 @@
     "sl": {
      "name": "Dunajski gambit",
      "def": "dunajski gambit"
+    },
+    "tr": {
+     "name": "Viyana Gambiti",
+     "def": "Viyana Gambiti"
     }
    },
    "comment": {
@@ -19274,6 +19747,10 @@
     "sl": {
      "name": "Staffordov gambit",
      "def": "Staffordov gambit"
+    },
+    "tr": {
+     "name": "Stafford Gambiti",
+     "def": "Stafford Gambiti"
     }
    },
    "comment": {
@@ -19413,6 +19890,10 @@
     "sl": {
      "name": "Parhamov napad",
      "def": "Parhamov napad"
+    },
+    "tr": {
+     "name": "Parham Atağı",
+     "def": "Parham Atağı"
     }
    },
    "comment": {
@@ -19559,6 +20040,10 @@
     "sl": {
      "name": "Gambit Halloween",
      "def": "gambit Halloween"
+    },
+    "tr": {
+     "name": "Halloween Gambiti",
+     "def": "Halloween Gambiti"
     }
    },
    "comment": {
@@ -19696,6 +20181,10 @@
     "sl": {
      "name": "Ortodoksna obramba",
      "def": "ortodoksna obramba"
+    },
+    "tr": {
+     "name": "Ortodoks Savunma",
+     "def": "Ortodoks Savunma"
     }
    },
    "comment": {
@@ -19833,6 +20322,10 @@
     "sl": {
      "name": "Menjalna varianta",
      "def": "menjalna varianta"
+    },
+    "tr": {
+     "name": "Değişim Varyantı",
+     "def": "Değişim Varyantı"
     }
    },
    "comment": {
@@ -19970,6 +20463,10 @@
     "sl": {
      "name": "Pol-Tarrascheva obramba",
      "def": "pol-Tarrascheva obramba"
+    },
+    "tr": {
+     "name": "Yarı Tarrasch Savunması",
+     "def": "Yarı Tarrasch Savunması"
     }
    },
    "comment": {
@@ -20111,6 +20608,10 @@
     "sl": {
      "name": "Meranska varianta",
      "def": "meranska varianta"
+    },
+    "tr": {
+     "name": "Meran Varyantı",
+     "def": "Meran Varyantı"
     }
    },
    "comment": {
@@ -20248,6 +20749,10 @@
     "sl": {
      "name": "Klasična varianta",
      "def": "klasična varianta"
+    },
+    "tr": {
+     "name": "Klasik Varyant",
+     "def": "Klasik Varyant"
     }
    },
    "comment": {
@@ -20386,6 +20891,10 @@
     "sl": {
      "name": "Sämischeva varianta",
      "def": "Sämischeva varianta"
+    },
+    "tr": {
+     "name": "Sämisch Varyantı",
+     "def": "Sämisch Varyantı"
     }
    },
    "comment": {
@@ -20523,6 +21032,10 @@
     "sl": {
      "name": "Napad štirih kmetov",
      "def": "napad štirih kmetov"
+    },
+    "tr": {
+     "name": "Dört Piyon Atağı",
+     "def": "Dört Piyon Atağı"
     }
    },
    "comment": {
@@ -20660,6 +21173,10 @@
     "sl": {
      "name": "Varianta s fianketom",
      "def": "varianta s fianketom"
+    },
+    "tr": {
+     "name": "Fiyanketto Varyantı",
+     "def": "Fiyanketto Varyantı"
     }
    },
    "comment": {
@@ -20798,6 +21315,10 @@
     "sl": {
      "name": "Rubinsteinova varianta",
      "def": "Rubinsteinova varianta"
+    },
+    "tr": {
+     "name": "Rubinstein Varyantı",
+     "def": "Rubinstein Varyantı"
     }
    },
    "comment": {
@@ -20935,6 +21456,10 @@
     "sl": {
      "name": "Klasična varianta",
      "def": "klasična varianta"
+    },
+    "tr": {
+     "name": "Klasik Varyant",
+     "def": "Klasik Varyant"
     }
    },
    "comment": {
@@ -21072,6 +21597,10 @@
     "sl": {
      "name": "Sämischeva varianta",
      "def": "Sämischeva varianta"
+    },
+    "tr": {
+     "name": "Sämisch Varyantı",
+     "def": "Sämisch Varyantı"
     }
    },
    "comment": {
@@ -21209,6 +21738,10 @@
     "sl": {
      "name": "Menjalna varianta",
      "def": "menjalna varianta"
+    },
+    "tr": {
+     "name": "Değişim Varyantı",
+     "def": "Değişim Varyantı"
     }
    },
    "comment": {
@@ -21347,6 +21880,10 @@
     "sl": {
      "name": "Leningrajska varianta",
      "def": "leningrajska varianta"
+    },
+    "tr": {
+     "name": "Leningrad Varyantı",
+     "def": "Leningrad Varyantı"
     }
    },
    "comment": {
@@ -21484,6 +22021,10 @@
     "sl": {
      "name": "Varianta Stonewall",
      "def": "varianta Stonewall"
+    },
+    "tr": {
+     "name": "Stonewall Varyantı",
+     "def": "Stonewall Varyantı"
     }
    },
    "comment": {
@@ -21621,6 +22162,10 @@
     "sl": {
      "name": "Moderna obramba Benoni",
      "def": "moderna obramba Benoni"
+    },
+    "tr": {
+     "name": "Modern Benoni",
+     "def": "Modern Benoni"
     }
    },
    "comment": {
@@ -21758,6 +22303,10 @@
     "sl": {
      "name": "Odprta katalonska otvoritev",
      "def": "odprta katalonska otvoritev"
+    },
+    "tr": {
+     "name": "Açık Katalan",
+     "def": "Açık Katalan"
     }
    },
    "comment": {
@@ -21896,6 +22445,10 @@
     "sl": {
      "name": "Zaprta katalonska otvoritev",
      "def": "zaprta katalonska otvoritev"
+    },
+    "tr": {
+     "name": "Kapalı Katalan",
+     "def": "Kapalı Katalan"
     }
    },
    "comment": {
@@ -22033,6 +22586,10 @@
     "sl": {
      "name": "Simetrična varianta",
      "def": "simetrična varianta"
+    },
+    "tr": {
+     "name": "Simetrik Varyant",
+     "def": "Simetrik Varyant"
     }
    },
    "comment": {
@@ -22170,6 +22727,10 @@
     "sl": {
      "name": "Sicilijanska obramba z zamenjanimi barvami",
      "def": "sicilijanska obramba z zamenjanimi barvami"
+    },
+    "tr": {
+     "name": "Ters Sicilya",
+     "def": "Ters Sicilya"
     }
    },
    "comment": {
@@ -22311,6 +22872,10 @@
     "sl": {
      "name": "Napad štirih kmetov",
      "def": "napad štirih kmetov"
+    },
+    "tr": {
+     "name": "Dört Piyon Atağı",
+     "def": "Dört Piyon Atağı"
     }
    },
    "comment": {
@@ -22448,6 +23013,10 @@
     "sl": {
      "name": "Moderna varianta",
      "def": "moderna varianta"
+    },
+    "tr": {
+     "name": "Modern Varyant",
+     "def": "Modern Varyant"
     }
    },
    "comment": {
@@ -22585,6 +23154,10 @@
     "sl": {
      "name": "Avstrijski napad",
      "def": "avstrijski napad"
+    },
+    "tr": {
+     "name": "Avusturya Atağı",
+     "def": "Avusturya Atağı"
     }
    },
    "comment": {
@@ -22722,6 +23295,10 @@
     "sl": {
      "name": "Falkbeerjev protigambit",
      "def": "Falkbeerjev protigambit"
+    },
+    "tr": {
+     "name": "Falkbeer Karşı Gambiti",
+     "def": "Falkbeer Karşı Gambiti"
     }
    },
    "comment": {
@@ -22773,7 +23350,8 @@
     "vi": "Biến thể {X}",
     "pl": "wariant {X:gen}",
     "sv": "{X}-varianten",
-    "sl": "{X:gen}a varianta"
+    "sl": "{X:gen}a varianta",
+    "tr": "{X} Varyantı"
    },
    "id": "varian",
    "nl": "variant",
@@ -22796,7 +23374,8 @@
    "vi": "biến thể",
    "pl": "wariant",
    "sv": "variant",
-   "sl": "varianta"
+   "sl": "varianta",
+   "tr": "varyant"
   },
   "Attack": {
    "en": "Attack",
@@ -22840,7 +23419,8 @@
     "vi": "Tấn công {X}",
     "pl": "atak {X:gen}",
     "sv": "{X}-angreppet",
-    "sl": "{X:gen} napad"
+    "sl": "{X:gen} napad",
+    "tr": "{X} Atağı"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -22863,7 +23443,8 @@
    "vi": "tấn công",
    "pl": "atak",
    "sv": "angrepp",
-   "sl": "napad"
+   "sl": "napad",
+   "tr": "atak"
   },
   "Gambit": {
    "en": "Gambit",
@@ -22907,7 +23488,8 @@
     "vi": "Gambit {X}",
     "pl": "gambit {X:gen}",
     "sv": "{X}-gambiten",
-    "sl": "{X:gen} gambit"
+    "sl": "{X:gen} gambit",
+    "tr": "{X} Gambiti"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -22930,7 +23512,8 @@
    "vi": "gambit",
    "pl": "gambit",
    "sv": "gambit",
-   "sl": "gambit"
+   "sl": "gambit",
+   "tr": "gambit"
   },
   "Defense": {
    "en": "Defense",
@@ -22974,7 +23557,8 @@
     "vi": "Phòng thủ {X}",
     "pl": "obrona {X:gen}",
     "sv": "{X}-försvaret",
-    "sl": "{X:gen}a obramba"
+    "sl": "{X:gen}a obramba",
+    "tr": "{X} Savunması"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -22997,7 +23581,8 @@
    "vi": "phòng thủ",
    "pl": "obrona",
    "sv": "försvar",
-   "sl": "obramba"
+   "sl": "obramba",
+   "tr": "savunma"
   },
   "System": {
    "en": "System",
@@ -23041,7 +23626,8 @@
     "vi": "Hệ thống {X}",
     "pl": "system {X:gen}",
     "sv": "{X}-systemet",
-    "sl": "{X:gen} sistem"
+    "sl": "{X:gen} sistem",
+    "tr": "{X} Sistemi"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -23064,7 +23650,8 @@
    "vi": "hệ thống",
    "pl": "system",
    "sv": "system",
-   "sl": "sistem"
+   "sl": "sistem",
+   "tr": "sistem"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -23108,7 +23695,8 @@
     "vi": "Phản gambit {X}",
     "pl": "kontrgambit {X:gen}",
     "sv": "{X}-motgambiten",
-    "sl": "{X:gen} protigambit"
+    "sl": "{X:gen} protigambit",
+    "tr": "{X} Karşı Gambiti"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -23131,7 +23719,8 @@
    "vi": "phản gambit",
    "pl": "kontrgambit",
    "sv": "motgambit",
-   "sl": "protigambit"
+   "sl": "protigambit",
+   "tr": "karşı gambit"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -23175,7 +23764,8 @@
     "vi": "Phản công {X}",
     "pl": "kontratak {X:gen}",
     "sv": "{X}-motangreppet",
-    "sl": "{X:gen} protinapad"
+    "sl": "{X:gen} protinapad",
+    "tr": "{X} Karşı Atağı"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -23198,7 +23788,8 @@
    "vi": "phản công",
    "pl": "kontratak",
    "sv": "motangrepp",
-   "sl": "protinapad"
+   "sl": "protinapad",
+   "tr": "karşı atak"
   },
   "Opening": {
    "en": "Opening",
@@ -23242,7 +23833,8 @@
     "vi": "Khai cuộc {X}",
     "pl": "debiut {X:gen}",
     "sv": "{X}-öppningen",
-    "sl": "{X:gen}a otvoritev"
+    "sl": "{X:gen}a otvoritev",
+    "tr": "{X} Açılışı"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -23265,7 +23857,8 @@
    "vi": "khai cuộc",
    "pl": "debiut",
    "sv": "öppning",
-   "sl": "otvoritev"
+   "sl": "otvoritev",
+   "tr": "açılış"
   },
   "Game": {
    "en": "Game",
@@ -23299,7 +23892,8 @@
    "vi": "khai cuộc",
    "pl": "partia",
    "sv": "parti",
-   "sl": "partija"
+   "sl": "partija",
+   "tr": "oyun"
   },
   "Line": {
    "en": "Line",
@@ -23343,7 +23937,8 @@
     "vi": "Phương án {X}",
     "pl": "kontynuacja {X:gen}",
     "sv": "{X}-fortsättningen",
-    "sl": "{X:gen}o nadaljevanje"
+    "sl": "{X:gen}o nadaljevanje",
+    "tr": "{X} Devamı"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -23366,7 +23961,8 @@
    "vi": "phương án",
    "pl": "kontynuacja",
    "sv": "fortsättning",
-   "sl": "nadaljevanje"
+   "sl": "nadaljevanje",
+   "tr": "devam"
   },
   "Formation": {
    "en": "Formation",
@@ -23400,7 +23996,8 @@
    "vi": "thế trận",
    "pl": "ustawienie",
    "sv": "uppställning",
-   "sl": "postavitev"
+   "sl": "postavitev",
+   "tr": "diziliş"
   },
   "Trap": {
    "en": "Trap",
@@ -23444,7 +24041,8 @@
     "vi": "Bẫy {X}",
     "pl": "pułapka {X:gen}",
     "sv": "{X}-fällan",
-    "sl": "{X:gen}a past"
+    "sl": "{X:gen}a past",
+    "tr": "{X} Tuzağı"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -23467,7 +24065,8 @@
    "vi": "bẫy",
    "pl": "pułapka",
    "sv": "fälla",
-   "sl": "past"
+   "sl": "past",
+   "tr": "tuzak"
   },
   "Accepted": {
    "en": "Accepted",
@@ -23501,7 +24100,8 @@
    "vi": "chấp nhận",
    "pl": "przyjęty",
    "sv": "antagen",
-   "sl": "sprejeti"
+   "sl": "sprejeti",
+   "tr": "kabul edilmiş"
   },
   "Declined": {
    "en": "Declined",
@@ -23535,7 +24135,8 @@
    "vi": "từ chối",
    "pl": "odrzucony",
    "sv": "avböjd",
-   "sl": "odklonjeni"
+   "sl": "odklonjeni",
+   "tr": "kabul edilmemiş"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -23569,7 +24170,8 @@
    "vi": "Biến thể đổi quân",
    "pl": "wariant wymienny",
    "sv": "avbytesvarianten",
-   "sl": "menjalna varianta"
+   "sl": "menjalna varianta",
+   "tr": "Değişim Varyantı"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -23603,7 +24205,8 @@
    "vi": "Biến thể tiến Tốt",
    "pl": "wariant zaawansowany",
    "sv": "avancemangsvarianten",
-   "sl": "varianta napredovanja"
+   "sl": "varianta napredovanja",
+   "tr": "İlerleme Varyantı"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -23637,7 +24240,8 @@
    "vi": "Biến thể cổ điển",
    "pl": "wariant klasyczny",
    "sv": "klassiska varianten",
-   "sl": "klasična varianta"
+   "sl": "klasična varianta",
+   "tr": "Klasik Varyant"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -23671,7 +24275,8 @@
    "vi": "Biến thể hiện đại",
    "pl": "wariant nowoczesny",
    "sv": "moderna varianten",
-   "sl": "moderna varianta"
+   "sl": "moderna varianta",
+   "tr": "Modern Varyant"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -23705,7 +24310,8 @@
    "vi": "Biến thể mở",
    "pl": "wariant otwarty",
    "sv": "öppna varianten",
-   "sl": "odprta varianta"
+   "sl": "odprta varianta",
+   "tr": "Açık Varyant"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -23739,7 +24345,8 @@
    "vi": "Biến thể đóng",
    "pl": "wariant zamknięty",
    "sv": "stängda varianten",
-   "sl": "zaprta varianta"
+   "sl": "zaprta varianta",
+   "tr": "Kapalı Varyant"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -23773,7 +24380,8 @@
    "vi": "Biến thể fianchetto",
    "pl": "wariant z fianchettem",
    "sv": "fianchettovarianten",
-   "sl": "varianta s fianketom"
+   "sl": "varianta s fianketom",
+   "tr": "Fiyanketto Varyantı"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -23807,7 +24415,8 @@
    "vi": "Biến thể đối xứng",
    "pl": "wariant symetryczny",
    "sv": "symmetriska varianten",
-   "sl": "simetrična varianta"
+   "sl": "simetrična varianta",
+   "tr": "Simetrik Varyant"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -23841,7 +24450,8 @@
    "vi": "Gambit Scotland",
    "pl": "gambit szkocki",
    "sv": "skotsk gambit",
-   "sl": "škotski gambit"
+   "sl": "škotski gambit",
+   "tr": "İskoç Gambiti"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -23875,7 +24485,8 @@
    "vi": "Biến thể Scotland",
    "pl": "wariant szkocki",
    "sv": "skotska varianten",
-   "sl": "škotska varianta"
+   "sl": "škotska varianta",
+   "tr": "İskoç Varyantı"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -23909,7 +24520,8 @@
    "vi": "Biến thể Đan Mạch",
    "pl": "wariant duński",
    "sv": "nordiska varianten",
-   "sl": "danska varianta"
+   "sl": "danska varianta",
+   "tr": "Danimarka Varyantı"
   },
   "Main Line": {
    "en": "Main Line",
@@ -23943,7 +24555,8 @@
    "vi": "phương án chính",
    "pl": "wariant główny",
    "sv": "huvudvariant",
-   "sl": "glavna varianta"
+   "sl": "glavna varianta",
+   "tr": "Ana Varyant"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -23977,7 +24590,8 @@
    "vi": "cấp tốc",
    "pl": "przyspieszony",
    "sv": "accelererad",
-   "sl": "pospešeni"
+   "sl": "pospešeni",
+   "tr": "hızlandırılmış"
   },
   "Deferred": {
    "en": "Deferred",
@@ -24011,7 +24625,8 @@
    "vi": "trì hoãn",
    "pl": "odroczony",
    "sv": "fördröjd",
-   "sl": "odloženi"
+   "sl": "odloženi",
+   "tr": "ertelenmiş"
   },
   "Reversed": {
    "en": "Reversed",
@@ -24045,7 +24660,8 @@
    "vi": "đảo màu quân",
    "pl": "z odwróconymi kolorami",
    "sv": "med ombytta färger",
-   "sl": "z zamenjanimi barvami"
+   "sl": "z zamenjanimi barvami",
+   "tr": "renkleri ters"
   }
  },
  "eponyms": {
@@ -24149,6 +24765,10 @@
    "sl": {
     "nom": "Steinitz",
     "gen": "Steinitzev"
+   },
+   "tr": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
    }
   },
   "Rubinstein": {
@@ -24251,6 +24871,10 @@
    "sl": {
     "nom": "Rubinstein",
     "gen": "Rubinsteinov"
+   },
+   "tr": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
    }
   },
   "Winawer": {
@@ -24353,6 +24977,10 @@
    "sl": {
     "nom": "Winawer",
     "gen": "Winawerjev"
+   },
+   "tr": {
+    "nom": "Winawer",
+    "gen": "Winawer"
    }
   },
   "Evans": {
@@ -24455,6 +25083,10 @@
    "sl": {
     "nom": "Evans",
     "gen": "Evansov"
+   },
+   "tr": {
+    "nom": "Evans",
+    "gen": "Evans"
    }
   },
   "Chigorin": {
@@ -24557,6 +25189,10 @@
    "sl": {
     "nom": "Čigorin",
     "gen": "Čigorinov"
+   },
+   "tr": {
+    "nom": "Çigorin",
+    "gen": "Çigorin"
    }
   },
   "Morphy": {
@@ -24659,6 +25295,10 @@
    "sl": {
     "nom": "Morphy",
     "gen": "Morphyjev"
+   },
+   "tr": {
+    "nom": "Morphy",
+    "gen": "Morphy"
    }
   },
   "Tarrasch": {
@@ -24761,6 +25401,10 @@
    "sl": {
     "nom": "Tarrasch",
     "gen": "Tarraschev"
+   },
+   "tr": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
    }
   },
   "Alekhine": {
@@ -24863,6 +25507,10 @@
    "sl": {
     "nom": "Aljehin",
     "gen": "Aljehinov"
+   },
+   "tr": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
    }
   },
   "Sämisch": {
@@ -24965,6 +25613,10 @@
    "sl": {
     "nom": "Sämisch",
     "gen": "Sämischev"
+   },
+   "tr": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
    }
   },
   "Nimzowitsch": {
@@ -25067,6 +25719,10 @@
    "sl": {
     "nom": "Nimcovič",
     "gen": "Nimcovičev"
+   },
+   "tr": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
    }
   },
   "Najdorf": {
@@ -25169,6 +25825,10 @@
    "sl": {
     "nom": "Najdorf",
     "gen": "Najdorfov"
+   },
+   "tr": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
    }
   },
   "Bogoljubow": {
@@ -25271,6 +25931,10 @@
    "sl": {
     "nom": "Bogoljubov",
     "gen": "Bogoljubovov"
+   },
+   "tr": {
+    "nom": "Bogolyubov",
+    "gen": "Bogolyubov"
    }
   },
   "Alapin": {
@@ -25373,6 +26037,10 @@
    "sl": {
     "nom": "Alapin",
     "gen": "Alapinov"
+   },
+   "tr": {
+    "nom": "Alapin",
+    "gen": "Alapin"
    }
   },
   "Botvinnik": {
@@ -25475,6 +26143,10 @@
    "sl": {
     "nom": "Botvinik",
     "gen": "Botvinikov"
+   },
+   "tr": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
    }
   },
   "Paulsen": {
@@ -25577,6 +26249,10 @@
    "sl": {
     "nom": "Paulsen",
     "gen": "Paulsenov"
+   },
+   "tr": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
    }
   },
   "Marshall": {
@@ -25679,6 +26355,10 @@
    "sl": {
     "nom": "Marshall",
     "gen": "Marshallov"
+   },
+   "tr": {
+    "nom": "Marshall",
+    "gen": "Marshall"
    }
   },
   "Kieseritzky": {
@@ -25781,6 +26461,10 @@
    "sl": {
     "nom": "Kieseritzky",
     "gen": "Kieseritzkyjev"
+   },
+   "tr": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
    }
   },
   "Panov": {
@@ -25883,6 +26567,10 @@
    "sl": {
     "nom": "Panov",
     "gen": "Panovov"
+   },
+   "tr": {
+    "nom": "Panov",
+    "gen": "Panov"
    }
   },
   "Keres": {
@@ -25985,6 +26673,10 @@
    "sl": {
     "nom": "Keres",
     "gen": "Keresov"
+   },
+   "tr": {
+    "nom": "Keres",
+    "gen": "Keres"
    }
   },
   "Tartakower": {
@@ -26087,6 +26779,10 @@
    "sl": {
     "nom": "Tartakower",
     "gen": "Tartakowerjev"
+   },
+   "tr": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
    }
   },
   "Maróczy": {
@@ -26189,6 +26885,10 @@
    "sl": {
     "nom": "Maróczy",
     "gen": "Maróczyjev"
+   },
+   "tr": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
    }
   },
   "Falkbeer": {
@@ -26291,6 +26991,10 @@
    "sl": {
     "nom": "Falkbeer",
     "gen": "Falkbeerjev"
+   },
+   "tr": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
    }
   },
   "Scheveningen": {
@@ -26393,6 +27097,10 @@
    "sl": {
     "nom": "Scheveningen",
     "gen": "scheveningensk"
+   },
+   "tr": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
    }
   },
   "Richter-Rauzer": {
@@ -26495,6 +27203,10 @@
    "sl": {
     "nom": "Richter-Rauzer",
     "gen": "Richter-Rauzerjev"
+   },
+   "tr": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
    }
   },
   "Lasker": {
@@ -26597,6 +27309,10 @@
    "sl": {
     "nom": "Lasker",
     "gen": "Laskerjev"
+   },
+   "tr": {
+    "nom": "Lasker",
+    "gen": "Lasker"
    }
   },
   "Taimanov": {
@@ -26699,6 +27415,10 @@
    "sl": {
     "nom": "Tajmanov",
     "gen": "Tajmanovov"
+   },
+   "tr": {
+    "nom": "Taymanov",
+    "gen": "Taymanov"
    }
   },
   "Smyslov": {
@@ -26801,6 +27521,10 @@
    "sl": {
     "nom": "Smislov",
     "gen": "Smislovov"
+   },
+   "tr": {
+    "nom": "Smislov",
+    "gen": "Smislov"
    }
   },
   "Spassky": {
@@ -26903,6 +27627,10 @@
    "sl": {
     "nom": "Spaski",
     "gen": "Spaskijev"
+   },
+   "tr": {
+    "nom": "Spasski",
+    "gen": "Spasski"
    }
   },
   "Spielmann": {
@@ -27005,6 +27733,10 @@
    "sl": {
     "nom": "Spielmann",
     "gen": "Spielmannov"
+   },
+   "tr": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
    }
   },
   "Averbakh": {
@@ -27107,6 +27839,10 @@
    "sl": {
     "nom": "Averbah",
     "gen": "Averbahov"
+   },
+   "tr": {
+    "nom": "Averbah",
+    "gen": "Averbah"
    }
   },
   "Greco": {
@@ -27209,6 +27945,10 @@
    "sl": {
     "nom": "Greco",
     "gen": "Grecov"
+   },
+   "tr": {
+    "nom": "Greco",
+    "gen": "Greco"
    }
   },
   "Capablanca": {
@@ -27311,6 +28051,10 @@
    "sl": {
     "nom": "Capablanca",
     "gen": "Capablancov"
+   },
+   "tr": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
    }
   },
   "Kan": {
@@ -27413,6 +28157,10 @@
    "sl": {
     "nom": "Kan",
     "gen": "Kanov"
+   },
+   "tr": {
+    "nom": "Kan",
+    "gen": "Kan"
    }
   },
   "Albin": {
@@ -27515,6 +28263,10 @@
    "sl": {
     "nom": "Albin",
     "gen": "Albinov"
+   },
+   "tr": {
+    "nom": "Albin",
+    "gen": "Albin"
    }
   },
   "Breyer": {
@@ -27617,6 +28369,10 @@
    "sl": {
     "nom": "Breyer",
     "gen": "Breyerjev"
+   },
+   "tr": {
+    "nom": "Breyer",
+    "gen": "Breyer"
    }
   },
   "Schlechter": {
@@ -27719,6 +28475,10 @@
    "sl": {
     "nom": "Schlechter",
     "gen": "Schlechterjev"
+   },
+   "tr": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
    }
   },
   "Jaenisch": {
@@ -27821,6 +28581,10 @@
    "sl": {
     "nom": "Jaenisch",
     "gen": "Jaenischev"
+   },
+   "tr": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
    }
   },
   "Karpov": {
@@ -27923,6 +28687,10 @@
    "sl": {
     "nom": "Karpov",
     "gen": "Karpovov"
+   },
+   "tr": {
+    "nom": "Karpov",
+    "gen": "Karpov"
    }
   },
   "Petrosian": {
@@ -28025,6 +28793,10 @@
    "sl": {
     "nom": "Petrosjan",
     "gen": "Petrosjanov"
+   },
+   "tr": {
+    "nom": "Petrosyan",
+    "gen": "Petrosyan"
    }
   },
   "Euwe": {
@@ -28127,6 +28899,10 @@
    "sl": {
     "nom": "Euwe",
     "gen": "Euwejev"
+   },
+   "tr": {
+    "nom": "Euwe",
+    "gen": "Euwe"
    }
   },
   "Sozin": {
@@ -28229,6 +29005,10 @@
    "sl": {
     "nom": "Sozin",
     "gen": "Sozinov"
+   },
+   "tr": {
+    "nom": "Sozin",
+    "gen": "Sozin"
    }
   },
   "Schliemann": {
@@ -28331,6 +29111,10 @@
    "sl": {
     "nom": "Schliemann",
     "gen": "Schliemannov"
+   },
+   "tr": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
    }
   },
   "Anderssen": {
@@ -28433,6 +29217,10 @@
    "sl": {
     "nom": "Anderssen",
     "gen": "Anderssenov"
+   },
+   "tr": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
    }
   },
   "Philidor": {
@@ -28535,6 +29323,10 @@
    "sl": {
     "nom": "Philidor",
     "gen": "Philidorjev"
+   },
+   "tr": {
+    "nom": "Philidor",
+    "gen": "Philidor"
    }
   },
   "Zaitsev": {
@@ -28637,6 +29429,10 @@
    "sl": {
     "nom": "Zajcev",
     "gen": "Zajcevov"
+   },
+   "tr": {
+    "nom": "Zaytsev",
+    "gen": "Zaytsev"
    }
   },
   "Sveshnikov": {
@@ -28739,6 +29535,10 @@
    "sl": {
     "nom": "Svešnikov",
     "gen": "Svešnikovov"
+   },
+   "tr": {
+    "nom": "Sveşnikov",
+    "gen": "Sveşnikov"
    }
   },
   "Kasparov": {
@@ -28841,6 +29641,10 @@
    "sl": {
     "nom": "Kasparov",
     "gen": "Kasparovov"
+   },
+   "tr": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
    }
   },
   "Fischer": {
@@ -28943,6 +29747,10 @@
    "sl": {
     "nom": "Fischer",
     "gen": "Fischerjev"
+   },
+   "tr": {
+    "nom": "Fischer",
+    "gen": "Fischer"
    }
   },
   "Tal": {
@@ -29045,6 +29853,10 @@
    "sl": {
     "nom": "Tal",
     "gen": "Talov"
+   },
+   "tr": {
+    "nom": "Tal",
+    "gen": "Tal"
    }
   },
   "McCutcheon": {
@@ -29147,6 +29959,10 @@
    "sl": {
     "nom": "McCutcheon",
     "gen": "McCutcheonov"
+   },
+   "tr": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
    }
   },
   "Bronstein": {
@@ -29249,6 +30065,10 @@
    "sl": {
     "nom": "Bronštejn",
     "gen": "Bronštejnov"
+   },
+   "tr": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
    }
   },
   "Janowski": {
@@ -29351,6 +30171,10 @@
    "sl": {
     "nom": "Janowski",
     "gen": "Janowskijev"
+   },
+   "tr": {
+    "nom": "Janowski",
+    "gen": "Janowski"
    }
   },
   "Staunton": {
@@ -29453,6 +30277,10 @@
    "sl": {
     "nom": "Staunton",
     "gen": "Stauntonov"
+   },
+   "tr": {
+    "nom": "Staunton",
+    "gen": "Staunton"
    }
   },
   "Max Lange": {
@@ -29555,6 +30383,10 @@
    "sl": {
     "nom": "Max Lange",
     "gen": "Max Langejev"
+   },
+   "tr": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
    }
   },
   "Petrov": {
@@ -29657,6 +30489,10 @@
    "sl": {
     "nom": "Petrov",
     "gen": "Petrovov"
+   },
+   "tr": {
+    "nom": "Petrov",
+    "gen": "Petrov"
    }
   },
   "Grünfeld": {
@@ -29759,6 +30595,10 @@
    "sl": {
     "nom": "Grünfeld",
     "gen": "Grünfeldov"
+   },
+   "tr": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
    }
   },
   "Colle": {
@@ -29861,6 +30701,10 @@
    "sl": {
     "nom": "Colle",
     "gen": "Collov"
+   },
+   "tr": {
+    "nom": "Colle",
+    "gen": "Colle"
    }
   },
   "Torre": {
@@ -29963,6 +30807,10 @@
    "sl": {
     "nom": "Torre",
     "gen": "Torrejev"
+   },
+   "tr": {
+    "nom": "Torre",
+    "gen": "Torre"
    }
   },
   "Réti": {
@@ -30065,6 +30913,10 @@
    "sl": {
     "nom": "Réti",
     "gen": "Rétijev"
+   },
+   "tr": {
+    "nom": "Réti",
+    "gen": "Réti"
    }
   }
  },
@@ -30168,6 +31020,10 @@
   "sl": {
    "compose_proper_names": false,
    "file_pattern": "(?:\\b[Ll]inij\\w*|\\b[Kk]met\\w*|(?<=\\b[a-h] in)) (?P<f>[a-h])\\b"
+  },
+  "tr": {
+   "compose_proper_names": true,
+   "file_pattern": "(?<![\\w'’-])(?P<f>[a-h])(?=(?: ve [a-h])? (?:dikey|piyon))"
   }
  }
 }
