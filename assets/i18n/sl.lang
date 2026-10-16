@@ -1,0 +1,273 @@
+# Scacelith - Slovenščina
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have four forms:
+# one (1, 101...)|two (2, 102...)|few (3-4, 103-104...)|other (0, 5-100...).
+# Register: formal "vi" (lower case mid-sentence), as Microsoft and Google Slovenian software: help
+# texts and prompts in the formal imperative or a "vi" question ("Izberite", "Ali želite ..."); buttons,
+# menu entries and commands in the short command form, a 2nd person singular imperative or a noun
+# ("Shrani", "Prekliči", "Ponudi remi", "Nova partija"); sentence case. Titles are in capitals (the
+# title face is an inscriptional capital face).
+# The player's gender is unknown: the polite past tense ("ste ponudili") is the standard plural form
+# for any reader, but nouns, the present tense or impersonal phrasing are preferred ("Zmaga", "Vaš
+# poraz", "Odjava je uspela"); no adjective or passive participle agreeing with the player.
+# Chess terms of the Slovenian chess federation (ŠZS): kralj, dama, trdnjava, lovec, skakač, kmet;
+# poteza (f), zapisnik (scoresheet), tempo igre (time control), rating, remi, sodnik (arbiter),
+# polpoteza (ply). White / Black as players: "beli" / "črni" (masculine).
+# Quality levels are feminine (they agree with "kakovost"); gif.wait.* are accusative (they only
+# follow "čez"). engine.million uses the abbreviation "mio." (no agreement with the number).
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Vklopljeno
+common.off = Izklopljeno
+common.back = Nazaj
+common.apply = Uporabi
+common.discard = Zavrzi
+common.cancel = Prekliči
+# The players (masculine "beli" / "črni"), also the choices of the colour selectors.
+common.white = Beli
+common.black = Črni
+common.main_menu = Glavni meni
+# Decimal separator of numbers ("2,5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kraljevska igra
+menu.new_game = Nova partija
+menu.options = Možnosti
+menu.credits = Zasluge
+menu.quit = Izhod
+menu.version = Različica {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = MOŽNOSTI
+options.tab.display = Zaslon
+options.tab.graphics = Grafika
+options.tab.audio = Zvok
+options.tab.gameplay = Igranje
+options.tab.player = Igralec
+options.tab.controls = Upravljanje
+options.pending = Spremembe začnejo veljati, ko jih uporabite.
+options.unsaved.title = NESHRANJENE SPREMEMBE
+options.unsaved.text = Nekatere možnosti so bile spremenjene. Ali jih želite uporabiti pred izhodom?
+
+options.language = Jezik
+options.language.help = Jezik menijev in sporočil. Spremeni se takoj.
+options.display_mode = Način prikaza
+options.display_mode.help = Celozaslonski: okno brez robov čez ves zaslon, v ločljivosti namizja. V oknu: okno velikosti, nastavljene spodaj.
+options.fullscreen = Celozaslonski
+options.windowed = V oknu
+options.window_size = Velikost okna
+options.window_size.help = Velikost okna v okenskem načinu. Celozaslonski način vedno uporablja ločljivost namizja.
+options.vsync = Navpična sinhronizacija
+options.vsync.help = Uskladi sličice z osveževanjem zaslona, da se slika ne trga.
+options.render_scale = Merilo upodabljanja
+options.render_scale.help = Notranja ločljivost 3D-slike. Nižja je hitrejša, višja je ostrejša.
+
+options.quality = Kakovost
+options.quality.very_low = Zelo nizka
+options.quality.low = Nizka
+options.quality.medium = Srednja
+options.quality.high = Visoka
+options.quality.ultra = Ultra
+options.quality.custom = Po meri
+options.quality.help = Nastavi vse spodnje možnosti hkrati: Zelo nizka izklopi vse učinke, Ultra jih vse nastavi na največ. Če spremenite posamezno možnost, se kakovost preklopi na Po meri. Na skromnejši grafični kartici zelo pomaga tudi nižje merilo upodabljanja (Zaslon).
+options.shadows = Sence
+options.shadows.help = Podrobnost sončnih senc in mehkoba njihovih robov. Nizka: preprosti robovi, hitro izrisovanje.
+options.reflections = Odsevi
+options.reflections.help = Tla, miza in šahovnica odsevajo dvorano (za vsakega od njih se izriše še enkrat: med najzahtevnejšimi možnostmi); od stopnje Srednja naprej tudi svetleče figure in predmeti odsevajo svojo okolico.
+options.ambient_occlusion = Ambientna okluzija
+options.ambient_occlusion.help = Mehko senčenje tam, kjer se predmeti stikajo, in v vdolbinah, kamor pride manj svetlobe.
+options.indirect_light = Posredna svetloba
+options.indirect_light.help = Dnevna svetloba, ki se odbija od sten, tal in stropa. Nizka: namesto nje enakomerna ambientna svetloba. Vpliva predvsem na čas nalaganja.
+options.volumetric_light = Svetlobni snopi
+options.volumetric_light.help = Snopi sončne svetlobe skozi zaprašeni zrak dvorane in prašni delci, ki se lesketajo v njih.
+options.tessellation = Teselacija
+options.tessellation.help = Gladki obrisi zaobljenih delov figur, ko jih gledate od blizu.
+options.tessellation.unavailable = Ni na voljo: ta grafični gonilnik ne podpira teselacije.
+options.antialiasing = Glajenje robov
+options.antialiasing.help = Zgladi nazobčane robove in migetajoče odbleske. Izklopljeno: ostrejša, a nazobčana slika, nekateri učinki pa so zrnati.
+options.depth_of_field = Globinska ostrina
+options.depth_of_field.help = Zmehča tisto, kar je precej pred tem, kar gledate, ali za njim, kot to naredi objektiv fotoaparata.
+options.motion_blur = Zameglitev gibanja
+options.motion_blur.help = Zamegli hitre premike kamere in rok, kot to naredi filmska kamera.
+options.bloom = Sij
+options.bloom.help = Mehak sij okoli najsvetlejših odbleskov, kot v objektivu fotoaparata.
+options.brightness = Svetlost
+options.brightness.neutral = Nevtralna
+options.brightness.value = {0} EV
+options.brightness.help = Kompenzacija osvetlitve kamere. Umerjanje ob prvem zagonu jo nastavi tako, da so najtemnejše sence komaj vidne.
+
+options.master_volume = Glavna glasnost
+options.effects = Učinki
+options.ambience = Zvoki okolice
+options.ambience.help = Zvoki dvorane: ogenj, oddaljeni koraki, stara ura.
+options.ambience_volume = Glasnost okolice
+options.voice_volume = Glasnost glasu
+options.voice_volume.help = Glasnost trenerjevega glasu v načinu Trener.
+options.subtitles = Podnapisi
+options.subtitles.auto = Samodejno
+options.subtitles.help = Trenerjeve besede, izpisane na dnu zaslona. Samodejno: prikazane, kadar trener ne govori jezika menijev (pri kitajskih menijih govori angleško). Vedno prikazane, kadar njegov glas ni nameščen.
+
+options.legal_moves = Prikaži dovoljene poteze
+options.legal_moves.help = Označi polja, na katera se lahko premakne dotaknjena figura. Ko je izklopljeno, vam nič ne pove, ali je poteza dovoljena: nepravilno potezo sodnik kaznuje, ko pritisnete uro.
+options.coordinates = Koordinate šahovnice
+options.auto_press = Samodejni pritisk ure
+options.auto_press.help = Vaš robot sam pritisne uro, ko je vaša poteza na šahovnici. V spletnih partijah o tem odloča strežnik, v neposrednem dvoboju pa igralec, ki ga gosti.
+options.thinking_time = Realističen čas razmisleka
+options.thinking_time.help = Nasprotnik si vzame čas kot človeški igralec, namesto da bi potegnil v trenutku.
+options.ignore_head = Prezri nasprotnikove premike glave
+options.ignore_head.help = V spletnih partijah in neposrednih dvobojih nasprotnikov robot gleda tja, kamor gleda njegov igralec. Ko je vklopljeno, glavo premika sam, kot proti Stockfishu.
+options.mouse_sensitivity = Občutljivost miške
+options.invert_look = Obrni navpični pogled
+options.handover = Prehod med igralcema
+options.handover.cut = Takojšnji rez
+options.handover.flight = Prelet, {0} s
+options.handover.help = Dva igralca za enim računalnikom: kako se pogled po vsaki potezi prenese iz oči enega igralca v oči drugega. Takojšnji rez se izogne gibanju kamere.
+options.game_cursor = Kazalec igre
+options.game_cursor.help = Za mizo igra riše svoj kazalec, ki pokaže, kaj bo naredil klik. Izklopljeno: običajna sistemska puščica.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Ime
+player.name.help = Vaše ime, kot je zapisano na vrhu zapisnikov, v kateri koli pisavi.
+player.default_name = Človek
+player.handwriting = Pisava
+player.handwriting.help = Roka, ki zapisuje vaše poteze. Arabščina, japonščina in kitajščina imajo vsaka svojo pisavo.
+player.preview = NA VAŠEM ZAPISNIKU
+# Handwriting styles: feminine, agreeing with "pisava"
+hand.caveat = Sproščena
+hand.marck = Vezana
+hand.badscript = Poševna
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Levi klik
+controls.touch = Dotaknite se figure, nato jo premaknite
+controls.clock.keys = Preslednica  ali  klik na uro
+controls.clock = Pritisnite uro
+controls.look.keys = Desna tipka miške, pridržite
+controls.look = Ozrite se naokoli
+controls.sheet.keys = S
+controls.sheet = Poglejte svoj zapisnik in nazaj
+controls.stand.keys = ↑
+controls.stand = Vstanite pred svojim stolom
+controls.side.keys = ←  /  →
+controls.side = Stopite na levi / desni konec mize
+controls.sit.keys = ↓
+controls.sit = Spet sedite (igrate lahko samo sede)
+controls.moves.keys = Tab
+controls.moves = Prikažite ali skrijte seznam potez
+controls.menu.keys = Esc
+controls.menu = Meni
+controls.coach_skip.keys = Preslednica
+controls.coach_skip = Trener: preskočite, kar govori trener
+controls.coach_takeback.keys = Vračalka
+controls.coach_takeback = Trener: vrnite potezo, ko vam to ponudi
+controls.coach_hint.keys = H
+controls.coach_hint = Trenerjevi izzivi: prosite za namig
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = SVETLOST
+calibration.text = Premikajte drsnik, dokler skakač na črnem polju ni komaj viden ali ga sploh ne vidite več.
+calibration.later = Pozneje jo lahko spremenite v razdelku Možnosti > Grafika.
+calibration.continue = Nadaljuj
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOVA PARTIJA
+newgame.opponent = NASPROTNIK
+newgame.time_control = TEMPO IGRE
+newgame.start = Začni
+newgame.elo = ~{0} Elo
+newgame.you_white = Igrate z belimi.
+newgame.you_black = Igrate s črnimi.
+newgame.colour_lot = Za prvo partijo se barvi izžrebata.
+newgame.colour_alternate = Nato se barvi od partije do partije izmenjujeta.
+newgame.opponent_kind = Nasprotnik
+newgame.opponent_kind.help = Igrajte proti Stockfishu ali proti prijatelju za tem računalnikom: izmenjujeta se, vsak s svoje strani šahovnice.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Človek, isti računalnik
+
+# Custom opponent: Stockfish parameters
+engine.skill = Stopnja spretnosti
+engine.skill.help = Stockfishova nastavitev »Skill Level« (0–20). Ne upošteva se, dokler je moč omejena z ratingom Elo.
+engine.limit_elo = Omeji moč (Elo)
+engine.limit_elo.help = UCI_LimitStrength: program skuša igrati z ratingom Elo, nastavljenim spodaj.
+engine.elo = Elo
+engine.depth = Globina iskanja
+engine.plies = {0} polpoteza|{0} polpotezi|{0} polpoteze|{0} polpotez
+engine.move_time = Čas na potezo
+engine.nodes = Omejitev vozlišč
+engine.no_limit = Brez omejitve
+engine.thousand = {0} tisoč
+engine.million = {0} mio.
+engine.dynamic_elo = Dinamični Elo glede na čas
+engine.dynamic_elo.help = Kot človeški igralec Stockfish igra slabše, ko mu zmanjkuje časa: malo v zadnji minuti (v pospešenih in hitropoteznih partijah prej), v časovni stiski pa precej slabše. Samo v partijah z uro.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish si vzame čas kot človek njegove ravni. Če želite preskočiti ta premor: Možnosti > Igranje > Realističen čas razmisleka.
+engine.pace.instant = Stockfish potegne takoj, ko izračuna. Za premore, kot jih dela človek: Možnosti > Igranje > Realističen čas razmisleka.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Brez omejitve
+tc.no_clock = Brez ure
+tc.bullet = Bullet
+tc.blitz = Hitropotezni
+tc.rapid = Pospešeni
+tc.classical = Klasični
+tc.custom = Po meri
+tc.your_own = Po želji
+tc.base_time = Osnovni čas
+tc.base_time.help = Začetni čas na vsaki uri (minute : sekunde).
+tc.increment = Dodatek
+tc.increment.help = Fischerjev dodatek, ki se prišteje po vsaki potezi.
+tc.delay = Zamik
+tc.delay.help = Bronsteinov zamik: čas, porabljen do tega zamika, se po vsaki potezi vrne.
+tc.no_delay = Brez zamika
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, zamik {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novinec
+preset.novice.desc = Pravkar se je naučil potez: pušča figure brez zaščite in spregleda preproste grožnje.
+preset.beginner.name = Začetnik
+preset.beginner.desc = Pozna osnove, a še vedno redno izgublja material z grobimi napakami.
+preset.casual.name = Ljubitelj
+preset.casual.desc = Sproščen večerni nasprotnik: smiselne poteze, pogoste napake.
+preset.club_player.name = Klubski igralec
+preset.club_player.desc = Soliden klubski igralec, ki kaznuje očitne grobe napake.
+preset.advanced.name = Napredni igralec
+preset.advanced.desc = Močan klubski igralec z dobrim taktičnim čutom.
+preset.expert.name = Strokovnjak
+preset.expert.desc = Turnirski strokovnjak: redko se zmoti in zanesljivo unovči prednost.
+preset.master.name = Mojster
+preset.master.desc = Mojstrska moč: globoko računanje in prefinjena pozicijska igra.
+preset.grandmaster.name = Velemojster
+preset.grandmaster.desc = Raven velemojstra: izjemno ga je težko premagati.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 s polno močjo. Srečno.
+preset.custom.name = Po meri
+preset.custom.desc = Vaše lastne nastavitve programa.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = ZASLUGE
+credits.game.head = SCACELITH
+credits.game = Šahovska partija v kraljevski dvorani, z lastnim grafičnim pogonom OpenGL 4.6.
+credits.engine.head = ŠAHOVSKI PROGRAM
+credits.engine = Stockfish 19, delo razvijalcev Stockfisha.
+credits.engine.licence = Licenca GNU General Public License v3.
+credits.engine.data = Njegova nevronska mreža je bila naučena s podatki projekta Leela Chess Zero, ki so na voljo pod licenco Open Database License (ODbL).
+credits.voice.head = GLAS TRENERJA
+credits.voice = Sintetični govor, ustvarjen z modelom Supertonic 3 za način Trener.
+credits.voice.licence = Supertonic 3 je model podjetja Supertone, ki se uporablja pod licenco OpenRAIL-M; njene omejitve uporabe veljajo za vse, ki ga uporabljajo (glejte Licence).
+credits.openings.head = OTVORITVE
+credits.openings = Imena otvoritev iz podatkovne zbirke chess-openings spletnega mesta lichess.org, dane v javno domeno (CC0).
+credits.fonts.head = PISAVE
+credits.fonts = EB Garamond (Georg Duffner) in Cinzel (Natanael Gama); Amiri (Khaled Hosny).
+credits.fonts.hand = Rokopisne pisave: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Šahovske figure iz pisave GNU FreeFont (GPL v3 z izjemo za pisave).
+credits.quote = »Šah je umetnost analize.«  — Mihail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licence
+licences.title = LICENCE
+licences.note = Licence so prikazane v izvirnem angleškem besedilu.
