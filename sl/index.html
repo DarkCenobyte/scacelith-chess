@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="sl" dir="ltr" class="no-js" data-page="home" data-root="../" data-api="https://caissa.scacelith.com/api/v1" data-repo="DarkCenobyte/scacelith-chess">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data: blob:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27; https://caissa.scacelith.com https://api.github.com; frame-src https://www.youtube-nocookie.com; worker-src &#x27;self&#x27;; manifest-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;; object-src &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#100e0b">
+<title>Scacelith — fotorealistični šah iz prvoosebnega pogleda</title>
+<meta name="description" content="Brezplačen fotorealističen šah iz prvoosebnega pogleda za Windows, Linux in macOS: Stockfish 19, trener, analiza partij in igra na spletu v kraljevski dvorani.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://scacelith.com/sl/">
+<link rel="alternate" hreflang="en" href="https://scacelith.com/en/">
+<link rel="alternate" hreflang="id" href="https://scacelith.com/id/">
+<link rel="alternate" hreflang="cs" href="https://scacelith.com/cs/">
+<link rel="alternate" hreflang="da" href="https://scacelith.com/da/">
+<link rel="alternate" hreflang="de" href="https://scacelith.com/de/">
+<link rel="alternate" hreflang="et" href="https://scacelith.com/et/">
+<link rel="alternate" hreflang="es" href="https://scacelith.com/es/">
+<link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/">
+<link rel="alternate" hreflang="hr" href="https://scacelith.com/hr/">
+<link rel="alternate" hreflang="it" href="https://scacelith.com/it/">
+<link rel="alternate" hreflang="lv" href="https://scacelith.com/lv/">
+<link rel="alternate" hreflang="lt" href="https://scacelith.com/lt/">
+<link rel="alternate" hreflang="hu" href="https://scacelith.com/hu/">
+<link rel="alternate" hreflang="nl" href="https://scacelith.com/nl/">
+<link rel="alternate" hreflang="pl" href="https://scacelith.com/pl/">
+<link rel="alternate" hreflang="pt-BR" href="https://scacelith.com/pt-BR/">
+<link rel="alternate" hreflang="pt" href="https://scacelith.com/pt/">
+<link rel="alternate" hreflang="ro" href="https://scacelith.com/ro/">
+<link rel="alternate" hreflang="sk" href="https://scacelith.com/sk/">
+<link rel="alternate" hreflang="sl" href="https://scacelith.com/sl/">
+<link rel="alternate" hreflang="fi" href="https://scacelith.com/fi/">
+<link rel="alternate" hreflang="sv" href="https://scacelith.com/sv/">
+<link rel="alternate" hreflang="vi" href="https://scacelith.com/vi/">
+<link rel="alternate" hreflang="tr" href="https://scacelith.com/tr/">
+<link rel="alternate" hreflang="el" href="https://scacelith.com/el/">
+<link rel="alternate" hreflang="bg" href="https://scacelith.com/bg/">
+<link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/">
+<link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/">
+<link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/">
+<link rel="alternate" hreflang="hi" href="https://scacelith.com/hi/">
+<link rel="alternate" hreflang="ko" href="https://scacelith.com/ko/">
+<link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/">
+<link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/">
+<link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/">
+<link rel="alternate" hreflang="x-default" href="https://scacelith.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scacelith">
+<meta property="og:title" content="Scacelith — fotorealistični šah iz prvoosebnega pogleda">
+<meta property="og:description" content="Brezplačen fotorealističen šah iz prvoosebnega pogleda za Windows, Linux in macOS: Stockfish 19, trener, analiza partij in igra na spletu v kraljevski dvorani.">
+<meta property="og:url" content="https://scacelith.com/sl/">
+<meta property="og:image" content="https://scacelith.com/assets/img/og-scacelith.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dva porcelanasta robota igrata šah za mizo iz orehovine v sončni marmorni dvorani.">
+<meta property="og:locale" content="sl_SI">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="id_ID">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="da_DK">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="et_EE">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="lv_LV">
+<meta property="og:locale:alternate" content="lt_LT">
+<meta property="og:locale:alternate" content="hu_HU">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="pt_BR">
+<meta property="og:locale:alternate" content="pt_PT">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="fi_FI">
+<meta property="og:locale:alternate" content="sv_SE">
+<meta property="og:locale:alternate" content="vi_VN">
+<meta property="og:locale:alternate" content="tr_TR">
+<meta property="og:locale:alternate" content="el_GR">
+<meta property="og:locale:alternate" content="bg_BG">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="ar_AR">
+<meta property="og:locale:alternate" content="hi_IN">
+<meta property="og:locale:alternate" content="ko_KR">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta property="og:locale:alternate" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icons/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="../assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="preload" href="../assets/fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/site.css">
+<script src="../assets/js/boot.js"></script>
+<link rel="stylesheet" href="../assets/vendor/iframemanager/iframemanager.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"Scacelith","url":"https://scacelith.com/sl/","description":"Brezplačen fotorealističen šah iz prvoosebnega pogleda za Windows, Linux in macOS: Stockfish 19, trener, analiza partij in igra na spletu v kraljevski dvorani.","image":"https://scacelith.com/assets/img/og-scacelith.jpg","inLanguage":"sl","genre":["Chess"],"gamePlatform":"PC","operatingSystem":"Windows, Linux, macOS","applicationCategory":"GameApplication","playMode":["SinglePlayer","MultiPlayer"],"license":"https://www.gnu.org/licenses/gpl-3.0.html","sameAs":["https://github.com/DarkCenobyte/scacelith-chess"],"downloadUrl":"https://github.com/DarkCenobyte/scacelith-chess/releases","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"softwareVersion":"1.0.0"}</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Preskoči na vsebino</a>
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M12 3.5v11.5m0 0-4.5-4.5M12 15l4.5-4.5M4.5 16.5v2.25c0 .97.78 1.75 1.75 1.75h11.5c.97 0 1.75-.78 1.75-1.75V16.5"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m6.5 9.5 5.5 5.5 5.5-5.5"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-5.5-5.5M19.5 12l-5.5 5.5"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></g></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.75"/><path d="M4.75 19.75c.9-3.6 3.75-5.5 7.25-5.5s6.35 1.9 7.25 5.5"/></g></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7.25 5h3v14h-3zm6.5 0h3v14h-3z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .78.85 1.26 1.52.86l10.4-6.4a1 1 0 0 0 0-1.72L9.52 4.74A1 1 0 0 0 8 5.6Z"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8.25" y="8.25" width="11.5" height="11.5" rx="1.75"/><path d="M15.75 8.25V6a1.75 1.75 0 0 0-1.75-1.75H6A1.75 1.75 0 0 0 4.25 6v8c0 .97.78 1.75 1.75 1.75h2.25"/></g></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-film" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="3.75" y="4.75" width="16.5" height="14.5" rx="1.75"/><path d="M7.75 4.75v14.5M16.25 4.75v14.5M3.75 9h4M3.75 15h4M16.25 9h4M16.25 15h4"/></g></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13.75 3.75H7.5A1.75 1.75 0 0 0 5.75 5.5v13c0 .97.78 1.75 1.75 1.75h9c.97 0 1.75-.78 1.75-1.75V8.25Z"/><path d="M13.75 3.75v4.5h4.5M9 13h6M9 16.25h4"/></g></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5h6v6M19.5 4.5l-8.25 8.25M17.25 14v4.25c0 .69-.56 1.25-1.25 1.25H5.75c-.69 0-1.25-.56-1.25-1.25V8c0-.69.56-1.25 1.25-1.25H10"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.75" cy="10.75" r="6.25"/><path d="m15.5 15.5 4.5 4.5"/></g></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" d="M12 3.5 5 6.25v5.5c0 4.2 2.9 7.6 7 8.75 4.1-1.15 7-4.55 7-8.75v-5.5Z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2.2 2.2L15.2 10"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="3.75" y="5.75" width="16.5" height="12.5" rx="1.75"/><path d="m4.5 7 7.5 6 7.5-6"/></g></symbol>
+<symbol id="i-device" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="3.75" y="4.75" width="16.5" height="11" rx="1.5"/><path d="M9 19.25h6M12 15.75v3.5"/></g></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M14.25 7.5V5.75c0-.97-.78-1.75-1.75-1.75h-6c-.97 0-1.75.78-1.75 1.75v12.5c0 .97.78 1.75 1.75 1.75h6c.97 0 1.75-.78 1.75-1.75V16.5M10 12h10m0 0-3-3m3 3-3 3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.25"/><path d="M12 7.5V12l3 2"/></g></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19.25 12a7.25 7.25 0 1 1-2.12-5.13M19.25 4.5v3.75H15.5"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.75 12S6 5.75 12 5.75 21.25 12 21.25 12 18 18.25 12 18.25 2.75 12 2.75 12Z"/><circle cx="12" cy="12" r="2.75"/></g></symbol>
+<symbol id="i-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.4 4.6 3.2 17.5c-.7 1.2.2 2.75 1.6 2.75h14.4c1.4 0 2.3-1.55 1.6-2.75L13.6 4.6c-.7-1.25-2.5-1.25-3.2 0Z"/><path d="M12 9.5v4.25M12 16.75v.01"/></g></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.25"/><path d="M12 11v5.25M12 7.75v.01"/></g></symbol>
+<symbol id="i-windows" viewBox="0 0 24 24"><path fill="currentColor" d="M3.5 5.6 10.25 4.7v6.55H3.5Zm7.75-1.05L20.5 3.25v8H11.25ZM3.5 12.75h6.75v6.55L3.5 18.4Zm7.75 0h9.25v8l-9.25-1.3Z"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.7c0-2.1 1.7-3.1 1.8-3.2-1-1.5-2.6-1.7-3.1-1.7-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.9.9-3.6 2.2-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.8 2.2 1.1 0 1.6-.7 2.9-.7 1.4 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.4-.9-2.5-3.6ZM14.3 6.3c.6-.7 1-1.7.9-2.8-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.7-1 2.7 1 .1 2.1-.5 2.7-1.2Z"/></symbol>
+<symbol id="i-linux" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.75c-2.2 0-3.4 1.8-3.4 4.1 0 1 .1 1.9-.3 2.8-.6 1.3-2.4 3.2-2.9 5.6-.2 1 .1 1.7.5 2.1-.5.4-1.6.6-1.7 1.4-.1.9 1.2 1.2 2.4 1.6 1.1.4 1.9 1 2.7 1 .7 0 1.2-.4 1.5-.9h2.4c.3.5.8.9 1.5.9.8 0 1.6-.6 2.7-1 1.2-.4 2.5-.7 2.4-1.6-.1-.8-1.2-1-1.7-1.4.4-.4.7-1.1.5-2.1-.5-2.4-2.3-4.3-2.9-5.6-.4-.9-.3-1.8-.3-2.8 0-2.3-1.2-4.1-3.4-4.1Zm-1.4 3.4c.4 0 .7.5.7 1.1s-.3 1-.7 1-.7-.4-.7-1 .3-1.1.7-1.1Zm2.8 0c.4 0 .7.5.7 1.1s-.3 1-.7 1-.7-.4-.7-1 .3-1.1.7-1.1ZM12 8.6c.9 0 2 .5 2 .9s-1.1 1.1-2 1.1-2-.7-2-1.1.9-.9 2-.9Zm-2.6 3.1c.7.6 1.6 1 2.6 1s1.9-.4 2.6-1c.6 1.1 1.4 2.4 1.4 4.2 0 .6-.1 1.2-.3 1.7H8.3c-.2-.5-.3-1.1-.3-1.7 0-1.8.8-3.1 1.4-4.2Z"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m8.5 7.5-4.5 4.5 4.5 4.5M15.5 7.5l4.5 4.5-4.5 4.5M13.25 5l-2.5 14"/></symbol>
+<symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5a9.5 9.5 0 0 0-3 18.52c.48.09.65-.2.65-.46v-1.6c-2.64.57-3.2-1.27-3.2-1.27-.43-1.1-1.06-1.39-1.06-1.39-.86-.59.07-.58.07-.58.95.07 1.45.98 1.45.98.85 1.45 2.22 1.03 2.76.79.09-.61.33-1.03.6-1.27-2.1-.24-4.32-1.06-4.32-4.7 0-1.04.37-1.89.98-2.55-.1-.24-.42-1.21.09-2.52 0 0 .8-.26 2.62.97a9.1 9.1 0 0 1 4.77 0c1.82-1.23 2.62-.97 2.62-.97.51 1.31.19 2.28.1 2.52.6.66.97 1.51.97 2.55 0 3.65-2.22 4.45-4.34 4.69.34.29.65.87.65 1.75v2.6c0 .26.17.56.66.46A9.5 9.5 0 0 0 12 2.5Z"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" d="M12 6.5c-1.6-1.2-3.9-1.75-7.25-1.75v13c3.35 0 5.65.55 7.25 1.75 1.6-1.2 3.9-1.75 7.25-1.75v-13c-3.35 0-5.65.55-7.25 1.75Zm0 0v13"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.25h9v4.5a4.5 4.5 0 0 1-9 0Z"/><path d="M7.5 6H4.75v1.25A3 3 0 0 0 7.75 10.25M16.5 6h2.75v1.25a3 3 0 0 1-3 3M12 13.25v3M8.75 19.75h6.5l-.75-3.5h-5Z"/></g></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M10.5 13.5a3.75 3.75 0 0 0 5.3 0l3-3a3.75 3.75 0 0 0-5.3-5.3l-1.2 1.2M13.5 10.5a3.75 3.75 0 0 0-5.3 0l-3 3a3.75 3.75 0 0 0 5.3 5.3l1.2-1.2"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="3.75"/><path d="m10.75 12.75 8.5-8.5M16.25 7.25l2.5 2.5M14 9.5l2 2"/></g></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.75 6.75h14.5M9.5 6.75V4.75h5v2M6.5 6.75l.85 12.1c.07.9.82 1.65 1.75 1.65h5.8c.93 0 1.68-.75 1.75-1.65l.85-12.1M10 10.5v6M14 10.5v6"/></symbol>
+</svg>
+<header class="site-header" data-header>
+  <div class="shell header-bar">
+    <a class="brand" href="../sl/">
+      <img class="brand-icon" src="../assets/icons/logo-128.webp" width="34" height="34" alt="">
+      <span class="brand-word">Scacelith</span>
+      <span class="visually-hidden">Domov</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="Glavni meni" data-nav>
+      <ul class="nav-list">
+        <li><a href="../sl/#experience" data-nav-section="experience">Igra</a></li>
+        <li><a href="../sl/#modes" data-nav-section="modes">Načini igre</a></li>
+        <li><a href="../sl/#gallery" data-nav-section="gallery">Galerija</a></li>
+        <li><a href="../sl/#online" data-nav-section="online">Na spletu</a></li>
+        <li><a href="../sl/players/" data-nav-page="players">Lestvica</a></li>
+      </ul>
+      <div class="nav-extra">
+        <a class="nav-account" href="../sl/account/" data-nav-page="account" data-account-link>
+          <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+          <span data-account-label>Račun</span>
+        </a>
+      </div>
+    </nav>
+    <div class="header-tools">
+      <details class="menu lang-menu" data-menu>
+        <summary class="tool-button" title="Jezik">
+          <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+          <span class="lang-code">sl</span>
+          <span class="visually-hidden">Jezik: Slovenščina</span>
+        </summary>
+        <div class="menu-panel lang-panel">
+          <p class="menu-title">Jezik</p>
+          <ul class="lang-list" data-lang-list>
+<li><a href="../en/" hreflang="en" lang="en" dir="ltr" data-lang="en">English</a></li>
+<li><a href="../id/" hreflang="id" lang="id" dir="ltr" data-lang="id">Bahasa Indonesia</a></li>
+<li><a href="../cs/" hreflang="cs" lang="cs" dir="ltr" data-lang="cs">Čeština</a></li>
+<li><a href="../da/" hreflang="da" lang="da" dir="ltr" data-lang="da">Dansk</a></li>
+<li><a href="../de/" hreflang="de" lang="de" dir="ltr" data-lang="de">Deutsch</a></li>
+<li><a href="../et/" hreflang="et" lang="et" dir="ltr" data-lang="et">Eesti</a></li>
+<li><a href="../es/" hreflang="es" lang="es" dir="ltr" data-lang="es">Español</a></li>
+<li><a href="../fr/" hreflang="fr" lang="fr" dir="ltr" data-lang="fr">Français</a></li>
+<li><a href="../hr/" hreflang="hr" lang="hr" dir="ltr" data-lang="hr">Hrvatski</a></li>
+<li><a href="../it/" hreflang="it" lang="it" dir="ltr" data-lang="it">Italiano</a></li>
+<li><a href="../lv/" hreflang="lv" lang="lv" dir="ltr" data-lang="lv">Latviešu</a></li>
+<li><a href="../lt/" hreflang="lt" lang="lt" dir="ltr" data-lang="lt">Lietuvių</a></li>
+<li><a href="../hu/" hreflang="hu" lang="hu" dir="ltr" data-lang="hu">Magyar</a></li>
+<li><a href="../nl/" hreflang="nl" lang="nl" dir="ltr" data-lang="nl">Nederlands</a></li>
+<li><a href="../pl/" hreflang="pl" lang="pl" dir="ltr" data-lang="pl">Polski</a></li>
+<li><a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR" dir="ltr" data-lang="pt-BR">Português (Brasil)</a></li>
+<li><a href="../pt/" hreflang="pt" lang="pt" dir="ltr" data-lang="pt">Português (Portugal)</a></li>
+<li><a href="../ro/" hreflang="ro" lang="ro" dir="ltr" data-lang="ro">Română</a></li>
+<li><a href="../sk/" hreflang="sk" lang="sk" dir="ltr" data-lang="sk">Slovenčina</a></li>
+<li><a href="../sl/" hreflang="sl" lang="sl" dir="ltr" data-lang="sl" aria-current="true">Slovenščina</a></li>
+<li><a href="../fi/" hreflang="fi" lang="fi" dir="ltr" data-lang="fi">Suomi</a></li>
+<li><a href="../sv/" hreflang="sv" lang="sv" dir="ltr" data-lang="sv">Svenska</a></li>
+<li><a href="../vi/" hreflang="vi" lang="vi" dir="ltr" data-lang="vi">Tiếng Việt</a></li>
+<li><a href="../tr/" hreflang="tr" lang="tr" dir="ltr" data-lang="tr">Türkçe</a></li>
+<li><a href="../el/" hreflang="el" lang="el" dir="ltr" data-lang="el">Ελληνικά</a></li>
+<li><a href="../bg/" hreflang="bg" lang="bg" dir="ltr" data-lang="bg">Български</a></li>
+<li><a href="../ru/" hreflang="ru" lang="ru" dir="ltr" data-lang="ru">Русский</a></li>
+<li><a href="../uk/" hreflang="uk" lang="uk" dir="ltr" data-lang="uk">Українська</a></li>
+<li><a href="../ar/" hreflang="ar" lang="ar" dir="rtl" data-lang="ar">العربية</a></li>
+<li><a href="../hi/" hreflang="hi" lang="hi" dir="ltr" data-lang="hi">हिन्दी</a></li>
+<li><a href="../ko/" hreflang="ko" lang="ko" dir="ltr" data-lang="ko">한국어</a></li>
+<li><a href="../ja/" hreflang="ja" lang="ja" dir="ltr" data-lang="ja">日本語</a></li>
+<li><a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans" dir="ltr" data-lang="zh-Hans">简体中文</a></li>
+<li><a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant" dir="ltr" data-lang="zh-Hant">繁體中文</a></li>
+          </ul>
+        </div>
+      </details>
+      <a class="tool-button account-button" href="../sl/account/" data-account-link data-nav-page="account">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span class="account-button-label" data-account-label>Račun</span>
+      </a>
+      <div class="header-download">
+<details class="menu download-menu" data-menu data-download-menu>
+  <summary class="btn btn-gold download-summary">
+    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+    <span class="download-label">Prenesi</span>
+    <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+  </summary>
+  <div class="menu-panel download-panel">
+    <p class="menu-title">Izberite svoj sistem</p>
+    <ul class="os-list" data-os-list>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="windows"><svg class="icon os-icon" aria-hidden="true"><use href="#i-windows"></use></svg><span class="os-text"><span class="os-name">Windows</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="macos"><svg class="icon os-icon" aria-hidden="true"><use href="#i-apple"></use></svg><span class="os-text"><span class="os-name">macOS <span class="os-flag">Eksperimentalno</span></span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="linux"><svg class="icon os-icon" aria-hidden="true"><use href="#i-linux"></use></svg><span class="os-text"><span class="os-name">Linux</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+    </ul>
+    <a class="os-item os-source" href="https://github.com/DarkCenobyte/scacelith-chess/archive/refs/tags/v1.0.0.zip" rel="noopener" data-source-link><svg class="icon os-icon" aria-hidden="true"><use href="#i-code"></use></svg><span class="os-text"><span class="os-name">Izvorna koda</span><span class="os-meta" data-source-meta>Arhiv ZIP · <bdi>v1.0.0</bdi></span></span></a>
+    <p class="menu-foot"><span data-release-label>Scacelith</span> · <a href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-release-link>Vse izdaje</a></p>
+  </div>
+</details>
+      </div>
+      <button class="tool-button nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"></use></svg>
+        <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
+        <span class="visually-hidden">Meni</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-media">
+    <picture>
+      <source type="image/webp" srcset="../assets/img/hero-960.webp 960w, ../assets/img/hero.webp 1920w" sizes="(min-width: 901px) 74vw, 100vw">
+      <img src="../assets/img/hero.webp" width="1920" height="1080" alt="Dva porcelanasta robota igrata šah za mizo iz orehovine v sončni marmorni dvorani." fetchpriority="high" decoding="async">
+    </picture>
+  </div>
+  <div class="shell hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow"><span class="diamond" aria-hidden="true"></span><span data-release-eyebrow>Različica 1.0.0</span></p>
+      <h1 class="hero-title" id="hero-title">Scacelith</h1>
+      <div class="ornament-rule" aria-hidden="true"><span class="diamond"></span></div>
+      <p class="hero-tagline">Kraljevska igra</p>
+      <p class="hero-lead">Sedite za povoščeno mizo iz orehovine v kraljevski dvorani, obsijani s soncem. Na drugi strani šahovnice porcelanasti robot, ki ga poganja Stockfish, čaka na vašo prvo potezo.</p>
+      <div class="hero-actions">
+<details class="menu download-menu" data-menu data-download-menu>
+  <summary class="btn btn-gold download-summary">
+    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+    <span class="download-label">Prenesi</span>
+    <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+  </summary>
+  <div class="menu-panel download-panel">
+    <p class="menu-title">Izberite svoj sistem</p>
+    <ul class="os-list" data-os-list>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="windows"><svg class="icon os-icon" aria-hidden="true"><use href="#i-windows"></use></svg><span class="os-text"><span class="os-name">Windows</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="macos"><svg class="icon os-icon" aria-hidden="true"><use href="#i-apple"></use></svg><span class="os-text"><span class="os-name">macOS <span class="os-flag">Eksperimentalno</span></span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="linux"><svg class="icon os-icon" aria-hidden="true"><use href="#i-linux"></use></svg><span class="os-text"><span class="os-name">Linux</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+    </ul>
+    <a class="os-item os-source" href="https://github.com/DarkCenobyte/scacelith-chess/archive/refs/tags/v1.0.0.zip" rel="noopener" data-source-link><svg class="icon os-icon" aria-hidden="true"><use href="#i-code"></use></svg><span class="os-text"><span class="os-name">Izvorna koda</span><span class="os-meta" data-source-meta>Arhiv ZIP · <bdi>v1.0.0</bdi></span></span></a>
+    <p class="menu-foot"><span data-release-label>Scacelith</span> · <a href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-release-link>Vse izdaje</a></p>
+  </div>
+</details>
+        <a class="btn btn-ghost" href="#trailer" data-trailer-link hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
+          <span>Oglej si napovednik</span>
+        </a>
+      </div>
+      <p class="hero-meta">Prosto programje · Windows, Linux, macOS (eksperimentalno) · Grafična kartica z OpenGL 4.6</p>
+    </div>
+  </div>
+  <p class="hero-caption"><span class="diamond" aria-hidden="true"></span>Posneto v igri: kraljevska dvorana</p>
+</section>
+<div class="shell">
+  <ul class="highlights">
+    <li>Lasten grafični pogon OpenGL 4.6</li>
+    <li>Vgrajen Stockfish 19</li>
+    <li>Pravila FIDE</li>
+    <li>Igra na spletu</li>
+    <li>34 jezikov</li>
+  </ul>
+</div>
+<section class="section" id="experience" aria-labelledby="experience-title">
+  <div class="shell">
+    <header class="section-head">
+      <p class="eyebrow"><span class="eyebrow-num">I</span>Doživetje</p>
+      <h2 class="section-title" id="experience-title">Ne šahovnica na zaslonu.<br><em>Mesto za mizo.</em></h2>
+      <p class="section-lead">Scacelith obudi vse, kar sestavlja pravo partijo: dvorano, tišino, uro, nasprotnika, ki vas gleda, in turnirske obrede.</p>
+    </header>
+    <div class="features">
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♔</span>
+        <h3 class="feature-title">Prvoosebni pogled</h3>
+        <p>Vidite skozi oči svojega robota: ozrite se po dvorani, sklonite se nad šahovnico, dvignite pogled k nasprotniku, pokukajte v svoj zapisnik ali vstanite in stopite do konca mize.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♖</span>
+        <h3 class="feature-title">Turnirska pravila</h3>
+        <p>Dotaknjeno figuro morate premakniti, poteza pa je končana, ko vaša roka pritisne uro. Ko je prikaz dovoljenih potez izklopljen, sodnik kaznuje nepravilno potezo, druga nepravilna poteza pa pomeni izgubo partije.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♗</span>
+        <h3 class="feature-title">Pisano na roko</h3>
+        <p>Oba igralca vsako potezo zapišeta v svoj zapisnik, vsak s svojim rokopisom, in vsakih štirideset potez obrneta stran. Slišite praskanje peresa po papirju.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♕</span>
+        <h3 class="feature-title">Vreden nasprotnik</h3>
+        <p>Stockfish 19 na vaši ravni, od stopnje Novinec (800) do Stockfish Max (3500), z ratingom, ki se po vsaki partiji izračuna po pravilih FIDE.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♘</span>
+        <h3 class="feature-title">Zasnovan za to igro</h3>
+        <p>Pogon, napisan od temeljev: fizikalno osnovana svetloba, marmor, povoščen les, porcelan in medenina, sonce skozi okna, mehke sence in odsevi. Prednastavitve kakovosti, od »Zelo nizka« do »Ultra«, ga prilagodijo vaši grafični kartici.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-piece piece" aria-hidden="true">♙</span>
+        <h3 class="feature-title">34 jezikov</h3>
+        <p>Angleščina, francoščina, nemščina, španščina, evropska in brazilska portugalščina, italijanščina, nizozemščina, švedščina, danščina, finščina, estonščina, latvijščina, litovščina, poljščina, češčina, slovaščina, slovenščina, hrvaščina, madžarščina, romunščina, bolgarščina, grščina, turščina, ukrajinščina, ruščina, arabščina, hindijščina, indonezijščina, vietnamščina, korejščina, japonščina ter poenostavljena in tradicionalna kitajščina. Arabščina se prikazuje od desne proti levi, trener pa govori naglas v vseh jezikih razen v kitajščini, kjer se njegove besede prikažejo kot podnapisi.</p>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="section section-modes" id="modes" aria-labelledby="modes-title">
+  <div class="modes-backdrop" aria-hidden="true"></div>
+  <div class="shell modes-grid">
+    <header class="section-head">
+      <p class="eyebrow"><span class="eyebrow-num">II</span>Načini igre</p>
+      <h2 class="section-title" id="modes-title">Vsaka partija<br><em>ima svojo mizo.</em></h2>
+      <p class="section-lead">Vse se igra v isti dvorani, z začetnega zaslona. Tudi brez internetne povezave je Stockfish vedno pripravljen na partijo.</p>
+    </header>
+    <ol class="mode-list">
+      <li class="mode">
+        <h3 class="mode-name">Nova partija</h3>
+        <p class="mode-text">Pomerite se s Stockfishom pri moči, ki jo izberete, v tempu igre od bulleta do klasičnega, ali igrajte s prijateljem za istim računalnikom, vsak skozi oči svojega robota.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Trener</h3>
+        <p class="mode-text">Učitelj sede nasproti vas, igra na vaši ravni in vas vodi skozi partijo: opozarja na grožnje, dobre poteze in napake ter z lastno roko odigra, kaj napaka stane. Od pravil šaha do ravni strokovnjaka, z glasom, ki ga ustvari vaš računalnik.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Trenerjevi izzivi</h3>
+        <p class="mode-text">Kratki nizi pozicij, vsak za urjenje ene veščine: mat v eni do treh potezah, vilice, vezave in drugi taktični motivi, obramba ter osnovne končnice proti trenerju. Namigi samo, ko jih zahtevate, in zelena kljukica za vsak opravljen niz.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Analiza</h3>
+        <p class="mode-text">Stockfish pregleda vaše shranjene partije, vaše spletne partije ali kateri koli PGN: merilnik ocene, ključne poteze, označene od briljantnih do grobih napak, boljša poteza, narisana s puščico, ter komentarji naglas in v podnapisih. Roke robotov odigrajo poteze, ko se premikate skozi partijo.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Igraj na spletu</h3>
+        <p class="mode-text">Pravi nasprotniki prek strežnika Scacelith: partije za rating, iskanje nasprotnika, izzivi in zasebne partije ali neposredni dvoboj med dvema računalnikoma. Robot vašega nasprotnika se v živo premika skupaj z njim.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Oglej si partijo</h3>
+        <p class="mode-text">Dva Stockfisha se pomerita med seboj, vi pa se prosto in nevidno gibljete po dvorani, od enega zornega kota do drugega.</p>
+      </li>
+      <li class="mode">
+        <h3 class="mode-name">Shranjene partije</h3>
+        <p class="mode-text">Vaše partije se hranijo kot datoteke PGN. Znova jih predvajajte v dvorani, z dejanskimi časi razmisleka in urami, ali uvozite partije iz drugih programov.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+<section class="section" id="gallery" aria-labelledby="gallery-title">
+  <div class="shell">
+    <header class="section-head section-head-row">
+      <div>
+        <p class="eyebrow"><span class="eyebrow-num">III</span>Galerija</p>
+        <h2 class="section-title" id="gallery-title">Pogled <em>iz same dvorane</em></h2>
+      </div>
+      <p class="section-lead">Vsaka slika je posneta v igri, v realnem času, z lastnim pogonom igre.</p>
+    </header>
+    <ul class="gallery" data-gallery>
+      <li class="shot shot-wide">
+        <a href="../assets/img/title-screen.webp" data-shot>
+          <img src="../assets/img/title-screen-1000.webp" srcset="../assets/img/title-screen-1000.webp 1000w, ../assets/img/title-screen.webp 2560w" sizes="(min-width: 1100px) 50vw, 100vw" width="1000" height="563" alt="Začetni zaslon: meni igre Scacelith ob dveh robotih, ki v dvorani igrata šah." loading="lazy" decoding="async">
+          <span class="shot-caption">Začetni zaslon</span>
+        </a>
+      </li>
+      <li class="shot">
+        <a href="../assets/img/the-coach.webp" data-shot>
+          <img src="../assets/img/the-coach-1000.webp" width="1000" height="563" alt="Trener, porcelanasti robot z napisom »COACH« na prsih, vas pozdravlja z druge strani šahovnice; kar reče, se prikaže tudi kot podnapis." loading="lazy" decoding="async">
+          <span class="shot-caption">Trener</span>
+        </a>
+      </li>
+      <li class="shot">
+        <a href="../assets/img/coach-challenges.webp" data-shot>
+          <img src="../assets/img/coach-challenges-1000.webp" width="1000" height="563" alt="Meni Trenerjevi izzivi: nizi matov in taktičnih nalog z njihovo težavnostjo in oznako že opravljenih, ob opisu izbranega niza." loading="lazy" decoding="async">
+          <span class="shot-caption">Trenerjevi izzivi</span>
+        </a>
+      </li>
+      <li class="shot">
+        <a href="../assets/img/analysis-mode.webp" data-shot>
+          <img src="../assets/img/analysis-mode-1000.webp" width="1000" height="563" alt="Način Analiza: merilnik ocene, puščica na šahovnici, komentirane poteze z natančnostjo vsake strani in seznam tipk za upravljanje." loading="lazy" decoding="async">
+          <span class="shot-caption">Analiza</span>
+        </a>
+      </li>
+      <li class="shot">
+        <a href="../assets/img/watching-a-game.webp" data-shot>
+          <img src="../assets/img/watching-a-game-1000.webp" width="1000" height="563" alt="Pogled s strani: en robot sega čez mizo, da bi premaknil figuro, drugi pa čaka; vzete figure stojijo ob šahovnici." loading="lazy" decoding="async">
+          <span class="shot-caption">Ogled partije</span>
+        </a>
+      </li>
+      <li class="shot shot-third">
+        <a href="../assets/img/the-opponent.webp" data-shot>
+          <img src="../assets/img/the-opponent-1000.webp" width="1000" height="563" alt="Bližnji posnetek porcelanastega robota nasprotnika z glavo, sklonjeno proti šahovnici." loading="lazy" decoding="async">
+          <span class="shot-caption">Vaš nasprotnik</span>
+        </a>
+      </li>
+      <li class="shot shot-third">
+        <a href="../assets/img/the-grand-hall.webp" data-shot>
+          <img src="../assets/img/the-grand-hall-1000.webp" width="1000" height="563" alt="Dva robota sedita drug nasproti drugemu za šahovnico, v naslanjačih iz rdečega žameta, pod visokimi okni." loading="lazy" decoding="async">
+          <span class="shot-caption">Kraljevska dvorana</span>
+        </a>
+      </li>
+      <li class="shot shot-third">
+        <a href="../assets/img/the-scoresheet.webp" data-shot>
+          <img src="../assets/img/the-scoresheet-1000.webp" width="1000" height="563" alt="Robotova roka z nalivnim peresom zapisuje poteze v zapisnik." loading="lazy" decoding="async">
+          <span class="shot-caption">Zapisnik</span>
+        </a>
+      </li>
+    </ul>
+    <p class="gallery-note">Različica 1.0.0. Vmesnik na teh slikah je v angleščini.</p>
+  </div>
+  <dialog class="lightbox" data-lightbox aria-label="Pregledovalnik slik">
+    <div class="lightbox-frame">
+      <img class="lightbox-image" data-lightbox-image src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
+      <p class="lightbox-caption" data-lightbox-caption></p>
+    </div>
+    <button class="lightbox-button lightbox-close" type="button" data-lightbox-close aria-label="Zapri"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
+    <button class="lightbox-button lightbox-prev" type="button" data-lightbox-prev aria-label="Prejšnja slika"><svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+    <button class="lightbox-button lightbox-next" type="button" data-lightbox-next aria-label="Naslednja slika"><svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></button>
+    <p class="lightbox-count" data-lightbox-count aria-live="polite"></p>
+  </dialog>
+</section>
+<section class="section section-trailer" id="trailer" aria-labelledby="trailer-title">
+  <div class="shell">
+    <header class="section-head section-head-center">
+      <p class="eyebrow"><span class="eyebrow-num">IV</span>Napovednik</p>
+      <h2 class="section-title" id="trailer-title">Scacelith <em>v gibanju</em></h2>
+    </header>
+    <div class="video" data-video>
+      <img class="video-poster" src="../assets/img/hero.webp" srcset="../assets/img/hero-960.webp 960w, ../assets/img/hero.webp 1920w" sizes="(min-width: 1100px) 1040px, 100vw" width="1920" height="1080" alt="" loading="lazy" decoding="async">
+      <div class="video-overlay" data-video-overlay>
+        <p class="video-soon" data-video-soon>
+          <span class="video-soon-title">Napovednik prihaja kmalu</span>
+          <span class="video-soon-text">Medtem že zasedite svoje mesto: igra je pripravljena za prenos.</span>
+        </p>
+      </div>
+    </div>
+    <p class="video-note" data-video-note hidden>Z YouTuba se ne naloži nič, dokler ne sprejmete njegovega predvajalnika. <a href="#" data-video-external rel="noopener">Oglej si na YouTubu</a></p>
+  </div>
+</section>
+<section class="section section-online" id="online" aria-labelledby="online-title">
+  <div class="shell online-grid">
+    <div class="online-copy">
+      <header class="section-head">
+        <p class="eyebrow"><span class="eyebrow-num">V</span>Na spletu</p>
+        <h2 class="section-title" id="online-title">Pravi nasprotniki,<br><em>ista dvorana.</em></h2>
+        <p class="section-lead">V igri se prijavite na uradni strežnik in igrajte z ljudmi z vsega sveta, še vedno iz prvoosebnega pogleda.</p>
+      </header>
+      <ul class="checklist">
+        <li>Partije za rating v vseh uradnih tempih igre, vsak s svojim ratingom, izračunanim po pravilih FIDE.</li>
+        <li>Iskanje nasprotnika, izzivi po imenu in zasebne partije s kodo; ali neposredni dvoboj med dvema računalnikoma, brez strežnika in računa.</li>
+        <li>Poštena igra: samodejni pregledi, analiza končanih partij s šahovskim programom in prijave igralcev.</li>
+        <li>Vaša zgodovina partij na tem spletnem mestu: vsako partijo prenesite kot PGN ali kot animirani GIF.</li>
+        <li>Vsakdo lahko poganja skupnostni strežnik: strežnik je prosto programje, njegov API pa je dokumentiran.</li>
+      </ul>
+      <div class="button-row">
+        <a class="btn btn-gold" href="account/#register" data-online-primary>Ustvari račun</a>
+        <a class="btn btn-ghost" href="account/" data-online-secondary>Prijava</a>
+      </div>
+    </div>
+    <aside class="server-card" aria-labelledby="server-card-title" data-server-card>
+      <header class="server-card-head">
+        <p class="card-brand" data-server-name>caissa.scacelith.com</p>
+        <h3 class="server-card-title" id="server-card-title">Uradni strežnik</h3>
+        <p class="status" data-server-status><span class="status-dot" aria-hidden="true"></span><span data-server-status-text>Preverjanje …</span></p>
+      </header>
+      <dl class="server-facts">
+        <div><dt>Naslov</dt><dd><code>caissa.scacelith.com</code></dd></div>
+        <div><dt>Registracija</dt><dd data-server-registration>—</dd></div>
+        <div><dt>Tempi igre za rating</dt><dd data-server-categories>—</dd></div>
+      </dl>
+      <div class="mini-board">
+        <div class="mini-board-head">
+          <h4 class="mini-board-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"></use></svg>Najboljši igralci</h4>
+          <label class="select-wrap select-small">
+            <span class="visually-hidden">Tempo igre</span>
+            <select data-mini-category disabled></select>
+          </label>
+        </div>
+        <ol class="mini-board-list" data-mini-board>
+          <li class="placeholder">Nalaganje lestvice …</li>
+        </ol>
+        <a class="text-link" href="players/" data-full-board>Celotna lestvica <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+      </div>
+    </aside>
+  </div>
+</section>
+<section class="section section-download" id="download" aria-labelledby="download-title">
+  <div class="shell">
+    <div class="download-grid">
+      <div class="download-copy">
+        <header class="section-head">
+          <p class="eyebrow"><span class="eyebrow-num">VI</span>Prenos</p>
+          <h2 class="section-title" id="download-title">Zasedite svoje mesto.<br><em>Brezplačno in odprtokodno.</em></h2>
+          <p class="section-lead">Razpakirajte in igrajte: v sistemih Windows in Linux brez namestitvenega programa, na Macu pa aplikacijo le povlecite v mapo Aplikacije. Vsako datoteko iz označene izvorne kode zgradi GitHub Actions, s potrjenim izvorom gradnje.</p>
+        </header>
+        <p class="release-line" data-release-line>
+          <span class="release-name" data-release-name>Scacelith</span>
+          <span class="release-date" data-release-date></span>
+        </p>
+        <div class="button-row">
+<details class="menu download-menu" data-menu data-download-menu>
+  <summary class="btn btn-gold download-summary">
+    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+    <span class="download-label">Prenesi</span>
+    <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+  </summary>
+  <div class="menu-panel download-panel">
+    <p class="menu-title">Izberite svoj sistem</p>
+    <ul class="os-list" data-os-list>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="windows"><svg class="icon os-icon" aria-hidden="true"><use href="#i-windows"></use></svg><span class="os-text"><span class="os-name">Windows</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="macos"><svg class="icon os-icon" aria-hidden="true"><use href="#i-apple"></use></svg><span class="os-text"><span class="os-name">macOS <span class="os-flag">Eksperimentalno</span></span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="linux"><svg class="icon os-icon" aria-hidden="true"><use href="#i-linux"></use></svg><span class="os-text"><span class="os-name">Linux</span><span class="os-meta">Oglej si izdajo na GitHubu</span></span></a></li>
+    </ul>
+    <a class="os-item os-source" href="https://github.com/DarkCenobyte/scacelith-chess/archive/refs/tags/v1.0.0.zip" rel="noopener" data-source-link><svg class="icon os-icon" aria-hidden="true"><use href="#i-code"></use></svg><span class="os-text"><span class="os-name">Izvorna koda</span><span class="os-meta" data-source-meta>Arhiv ZIP · <bdi>v1.0.0</bdi></span></span></a>
+    <p class="menu-foot"><span data-release-label>Scacelith</span> · <a href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-release-link>Vse izdaje</a></p>
+  </div>
+</details>
+          <a class="btn btn-ghost" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-release-notes rel="noopener">
+            <svg class="icon" aria-hidden="true"><use href="#i-book"></use></svg>
+            <span>Opombe ob izdaji</span>
+          </a>
+        </div>
+        <dl class="requirements">
+          <div><dt>Sistem</dt><dd>64-bitni Windows (x64); 64-bitni Linux (x86-64 ali aarch64) z glibc 2.34, OpenSSL 3 in X11 ali XWayland, na primer Ubuntu 22.04 ali Debian 12; macOS 26 ali novejši na Apple Silicon (eksperimentalno)</dd></div>
+          <div><dt>Grafika</dt><dd>Grafična kartica z OpenGL 4.6 in posodobljenim gonilnikom (na Macu igra prinese svoj OpenGL)</dd></div>
+          <div><dt>Vključeno</dt><dd>Stockfish 19 in njegova nevronska mreža: brez povezave lahko igrate takoj</dd></div>
+          <div><dt>Internet</dt><dd>Za igro na spletu, GIF-e ter glas trenerja in analize (neobvezen prenos, velik približno 399 MB)</dd></div>
+          <div><dt>Licenca</dt><dd>GNU General Public License v3</dd></div>
+        </dl>
+      </div>
+      <div class="download-side">
+        <ul class="platforms" data-platforms>
+          <li class="platform" data-platform="windows">
+            <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-windows"></use></svg><h3 class="platform-name">Windows</h3><span class="platform-state" data-platform-state></span></div>
+            <div class="platform-files" data-platform-files><a class="text-link" href="https://github.com/DarkCenobyte/scacelith-chess/releases">Oglej si izdajo na GitHubu</a></div>
+          </li>
+          <li class="platform" data-platform="macos">
+            <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-apple"></use></svg><h3 class="platform-name">macOS</h3><span class="platform-state" data-platform-state><span class="badge badge-accent">Eksperimentalno</span></span></div>
+            <div class="platform-files" data-platform-files><a class="text-link" href="https://github.com/DarkCenobyte/scacelith-chess/releases">Oglej si izdajo na GitHubu</a></div>
+            <p class="platform-note" data-platform-note>Za računalnike Mac s čipom Apple Silicon (M1 ali novejšim) in sistemom macOS 26 ali novejšim, ne v navideznem računalniku; ta različica je novejša in manj preizkušena od drugih. Aplikacije ni podpisal razvijalec, registriran pri Applu: prvič jo odprite v Sistemskih nastavitvah › Zasebnost in varnost › Vseeno odpri.</p>
+          </li>
+          <li class="platform" data-platform="linux">
+            <div class="platform-head"><svg class="icon platform-icon" aria-hidden="true"><use href="#i-linux"></use></svg><h3 class="platform-name">Linux</h3><span class="platform-state" data-platform-state></span></div>
+            <div class="platform-files" data-platform-files><a class="text-link" href="https://github.com/DarkCenobyte/scacelith-chess/releases">Oglej si izdajo na GitHubu</a></div>
+          </li>
+        </ul>
+        <div class="verify">
+          <h3 class="verify-title"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>Preverite prenos</h3>
+          <p>GitHub potrjuje izvor gradnje vsake datoteke. Z orodjem GitHub CLI:</p>
+          <div class="code-line">
+            <code data-verify-command>gh attestation verify Scacelith-…-windows-x64.zip --repo DarkCenobyte/scacelith-chess</code>
+            <button class="icon-button" type="button" data-copy-target="[data-verify-command]" aria-label="Kopiraj" title="Kopiraj"><svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg></button>
+          </div>
+          <p class="verify-sums"><a class="text-link" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-sums-link>Kontrolne vsote SHA-256 (SHA256SUMS)</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section-credits" aria-labelledby="credits-title">
+  <div class="shell">
+    <header class="section-head section-head-center">
+      <p class="eyebrow"><span class="eyebrow-num">VII</span>Zasluge</p>
+      <h2 class="section-title" id="credits-title">Zasluge in <em>zahvale</em></h2>
+    </header>
+    <dl class="credits">
+      <div><dt>Šahovski program</dt><dd>Stockfish 19, delo razvijalcev Stockfisha (GNU GPL v3). Njegova nevronska mreža je bila naučena na podatkih, ki jih je zagotovil projekt Leela Chess Zero (Open Database License).</dd></div>
+      <div><dt>Glas</dt><dd>Supertonic 3 podjetja Supertone, pod licenco BigScience Open RAIL-M: prenese se na vašo zahtevo in na vašem računalniku posodi glas trenerju in analizi.</dd></div>
+      <div><dt>Pisave</dt><dd>EB Garamond (Georg Duffner), Cinzel (Natanael Gama) in Amiri (Khaled Hosny); rokopisne pisave Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One in LXGW WenKai (vse pod licenco SIL Open Font License); šahovske figure iz pisave GNU FreeFont.</dd></div>
+      <div><dt>Otvoritve in naloge</dt><dd>Imena otvoritev iz podatkovne zbirke chess-openings spletnega mesta lichess.org, naloge trenerjevih izzivov pa iz zbirke nalog Lichess; obe sta dani v javno domeno (CC0).</dd></div>
+    </dl>
+    <blockquote class="quote"><p>»Šah je umetnost analize.«</p><footer>Mihail Botvinik</footer></blockquote>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="../sl/">
+        <img class="brand-icon" src="../assets/icons/logo-128.webp" width="44" height="44" alt="" loading="lazy">
+        <span class="brand-word">Scacelith</span>
+      </a>
+      <p class="footer-tagline">Kraljevska igra</p>
+      <p class="footer-text">Fotorealistična šahovska igra iz prvoosebnega pogleda, z lastnim grafičnim pogonom OpenGL 4.6. Prosto programje pod licenco GNU GPL v3.</p>
+    </div>
+    <nav class="footer-col" aria-labelledby="footer-game">
+      <h2 class="footer-head" id="footer-game">Igra</h2>
+      <ul>
+        <li><a href="../sl/#experience">Igra</a></li>
+        <li><a href="../sl/#modes">Načini igre</a></li>
+        <li><a href="../sl/#gallery">Galerija</a></li>
+        <li><a href="../sl/#trailer">Napovednik</a></li>
+        <li><a href="../sl/#download">Prenesi</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-online">
+      <h2 class="footer-head" id="footer-online">Na spletu</h2>
+      <ul>
+        <li><a href="../sl/#online">Na spletu</a></li>
+        <li><a href="../sl/players/">Lestvica</a></li>
+        <li><a href="../sl/account/">Račun</a></li>
+        <li><a href="https://docs.scacelith.com/sl/" rel="noopener">Dokumentacija API-ja strežnika</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-source">
+      <h2 class="footer-head" id="footer-source">Izvorna koda</h2>
+      <ul>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess" rel="noopener">Igra na GitHubu</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess-server" rel="noopener">Strežnik na GitHubu</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess/releases" rel="noopener">Izdaje</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess/blob/master/LICENSE" rel="noopener">Licenca (GPL v3)</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col footer-langs" aria-labelledby="footer-langs">
+      <h2 class="footer-head" id="footer-langs">Jezik</h2>
+      <ul class="lang-columns">
+<li><a href="../en/" hreflang="en" lang="en" dir="ltr" data-lang="en">English</a></li>
+<li><a href="../id/" hreflang="id" lang="id" dir="ltr" data-lang="id">Bahasa Indonesia</a></li>
+<li><a href="../cs/" hreflang="cs" lang="cs" dir="ltr" data-lang="cs">Čeština</a></li>
+<li><a href="../da/" hreflang="da" lang="da" dir="ltr" data-lang="da">Dansk</a></li>
+<li><a href="../de/" hreflang="de" lang="de" dir="ltr" data-lang="de">Deutsch</a></li>
+<li><a href="../et/" hreflang="et" lang="et" dir="ltr" data-lang="et">Eesti</a></li>
+<li><a href="../es/" hreflang="es" lang="es" dir="ltr" data-lang="es">Español</a></li>
+<li><a href="../fr/" hreflang="fr" lang="fr" dir="ltr" data-lang="fr">Français</a></li>
+<li><a href="../hr/" hreflang="hr" lang="hr" dir="ltr" data-lang="hr">Hrvatski</a></li>
+<li><a href="../it/" hreflang="it" lang="it" dir="ltr" data-lang="it">Italiano</a></li>
+<li><a href="../lv/" hreflang="lv" lang="lv" dir="ltr" data-lang="lv">Latviešu</a></li>
+<li><a href="../lt/" hreflang="lt" lang="lt" dir="ltr" data-lang="lt">Lietuvių</a></li>
+<li><a href="../hu/" hreflang="hu" lang="hu" dir="ltr" data-lang="hu">Magyar</a></li>
+<li><a href="../nl/" hreflang="nl" lang="nl" dir="ltr" data-lang="nl">Nederlands</a></li>
+<li><a href="../pl/" hreflang="pl" lang="pl" dir="ltr" data-lang="pl">Polski</a></li>
+<li><a href="../pt-BR/" hreflang="pt-BR" lang="pt-BR" dir="ltr" data-lang="pt-BR">Português (Brasil)</a></li>
+<li><a href="../pt/" hreflang="pt" lang="pt" dir="ltr" data-lang="pt">Português (Portugal)</a></li>
+<li><a href="../ro/" hreflang="ro" lang="ro" dir="ltr" data-lang="ro">Română</a></li>
+<li><a href="../sk/" hreflang="sk" lang="sk" dir="ltr" data-lang="sk">Slovenčina</a></li>
+<li><a href="../sl/" hreflang="sl" lang="sl" dir="ltr" data-lang="sl" aria-current="true">Slovenščina</a></li>
+<li><a href="../fi/" hreflang="fi" lang="fi" dir="ltr" data-lang="fi">Suomi</a></li>
+<li><a href="../sv/" hreflang="sv" lang="sv" dir="ltr" data-lang="sv">Svenska</a></li>
+<li><a href="../vi/" hreflang="vi" lang="vi" dir="ltr" data-lang="vi">Tiếng Việt</a></li>
+<li><a href="../tr/" hreflang="tr" lang="tr" dir="ltr" data-lang="tr">Türkçe</a></li>
+<li><a href="../el/" hreflang="el" lang="el" dir="ltr" data-lang="el">Ελληνικά</a></li>
+<li><a href="../bg/" hreflang="bg" lang="bg" dir="ltr" data-lang="bg">Български</a></li>
+<li><a href="../ru/" hreflang="ru" lang="ru" dir="ltr" data-lang="ru">Русский</a></li>
+<li><a href="../uk/" hreflang="uk" lang="uk" dir="ltr" data-lang="uk">Українська</a></li>
+<li><a href="../ar/" hreflang="ar" lang="ar" dir="rtl" data-lang="ar">العربية</a></li>
+<li><a href="../hi/" hreflang="hi" lang="hi" dir="ltr" data-lang="hi">हिन्दी</a></li>
+<li><a href="../ko/" hreflang="ko" lang="ko" dir="ltr" data-lang="ko">한국어</a></li>
+<li><a href="../ja/" hreflang="ja" lang="ja" dir="ltr" data-lang="ja">日本語</a></li>
+<li><a href="../zh-Hans/" hreflang="zh-Hans" lang="zh-Hans" dir="ltr" data-lang="zh-Hans">简体中文</a></li>
+<li><a href="../zh-Hant/" hreflang="zh-Hant" lang="zh-Hant" dir="ltr" data-lang="zh-Hant">繁體中文</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="shell footer-credits">
+    <p>Stockfish je blagovna znamka njegovih razvijalcev. YouTube je blagovna znamka družbe Google LLC. Windows je blagovna znamka družbe Microsoft Corporation. macOS je blagovna znamka družbe Apple Inc. Linux je registrirana blagovna znamka Linusa Torvaldsa. OpenGL je registrirana blagovna znamka družbe Hewlett Packard Enterprise.</p>
+    <p class="footer-legal"><span>Scacelith</span> <span class="diamond" aria-hidden="true"></span> <span>To spletno mesto ne nastavlja piškotkov in ne uporablja sledilnikov; predvajalnik YouTube se naloži le, če ga sprejmete.</span> <span class="diamond" aria-hidden="true"></span> <a href="../sl/legal/">Pravno obvestilo, zasebnost in pogoji</a></p>
+  </div>
+</footer>
+<div class="toasts" data-toasts aria-live="polite" aria-atomic="false"></div>
+<script type="application/json" id="i18n">{"lang":"sl","dir":"ltr","strings":{"common":{"loading":"Nalaganje …","retry":"Poskusi znova","close":"Zapri","copy":"Kopiraj","copied":"Kopirano v odložišče.","copy_failed":"Kopiranje ni uspelo. Izberite besedilo in ga kopirajte ročno.","load_more":"Pokaži več","show_password":"Pokaži geslo","hide_password":"Skrij geslo","signin_needed":"Za nadaljevanje se prijavite.","dash":"—"},"errors":{"network":"Strežnik ni dosegljiv. Preverite povezavo in poskusite znova.","timeout":"Strežnik ni odgovoril dovolj hitro. Poskusite znova.","server_busy":"Strežnik je zaseden. Poskusite znova čez trenutek.","rate_limited":"Preveč zahtev. Poskusite znova čez {time}.","rate_limited_short":"Preveč zahtev. Poskusite znova čez trenutek.","internal_error":"V strežniku je prišlo do nepričakovane napake. Poskusite znova pozneje.","invalid_token":"Vaša seja je potekla. Prijavite se znova.","unauthorized":"Prijavite se.","not_found":"Ni najdeno.","unknown":"Prišlo je do napake ({code}).","invalid_credentials":"Napačno uporabniško ime, e-poštni naslov ali geslo.","too_many_attempts":"Preveč poskusov. Poskusite znova čez {time}.","banned":"Ta račun je začasno blokiran do {date}.","banned_permanent":"Ta račun je blokiran.","email_unverified":"Vaš e-poštni naslov še ni potrjen. Odprite povezavo, ki smo vam jo poslali, ali zahtevajte novo.","invalid_mfa_token":"Ta korak prijave je potekel. Prijavite se znova.","invalid_code":"Koda je napačna ali že uporabljena.","mfa_code_required":"Vnesite kodo za dvofaktorsko preverjanje.","invalid_password":"Napačno geslo.","password_not_set":"Ta račun še nima gesla: nastavite ga z možnostjo »Pozabljeno geslo?« na strani za prijavo.","registration_closed":"Strežnik trenutno ne sprejema novih računov.","invalid_username":"To uporabniško ime ni dovoljeno.","username_taken":"To uporabniško ime je že zasedeno.","invalid_email":"Ta e-poštni naslov ni veljaven.","email_taken":"Ta e-poštni naslov že uporablja drug račun.","same_email":"To je že vaš e-poštni naslov.","weak_password":"To geslo je prešibko.","weak_too_short":"Geslo je prekratko (vsaj {min} znakov).","weak_too_long":"Geslo je predolgo.","weak_contains_username":"Geslo ne sme vsebovati vašega uporabniškega imena.","weak_contains_email":"Geslo ne sme vsebovati vašega e-poštnega naslova.","weak_too_common":"To geslo je preveč pogosto. Izberite drugo.","pow_failed":"Preverjanje proti robotom ni uspelo. Poskusite znova.","passwords_differ":"Gesli se ne ujemata.","required":"Izpolnite to polje.","email_format":"Vnesite veljaven e-poštni naslov.","username_format":"Od {min} do {max} znakov: črke, števke, _ in -; prvi znak mora biti črka ali števka.","password_length":"Vsaj {min} znakov.","confirm_name":"Vnesite uporabniško ime natanko tako, kot je prikazano.","game_too_long":"Ta partija je predolga za GIF.","gif_disabled":"Ta strežnik ne ustvarja GIF-ov.","render_failed":"Strežnik tega GIF-a ni mogel izrisati.","invalid_game":"Ta partija ne obstaja.","invalid_player":"Vnesite uporabniško ime: od 2 do 24 črk, števk, _, . ali -.","player_not_found":"Igralca s tem imenom ni.","sso_cancelled":"Prijava z Googlom je bila preklicana.","sso_mismatch":"Ta prijava z Googlom se ni začela v tem zavihku ali pa je bila že uporabljena. Poskusite znova.","sso_expired":"Ta prijava z Googlom je potekla. Poskusite znova.","invalid_verifier":"Ta prijava z Googlom se je začela v drugem zavihku ali brskalniku. Začnite znova na tej strani.","sso_email_unverified":"Google ni potrdil e-poštnega naslova tega Googlovega računa.","sso_account_exists":"Ta e-poštni naslov že uporablja račun, ki pa nima gesla za povezavo z Googlom. Nastavite mu ga z možnostjo »Pozabljeno geslo?«, nato se znova prijavite z Googlom.","sso_failed":"Prijave z Googlom ni bilo mogoče dokončati. Poskusite znova.","sso_disabled":"Prijava z Googlom na tem strežniku ni na voljo.","sso_already_linked":"Ta Googlov račun je že povezan z drugim računom.","account_disabled":"Tega računa ni več mogoče uporabljati.","sso_storage":"Vaš brskalnik blokira shrambo tega spletnega mesta, ki jo prijava z Googlom potrebuje. Dovolite jo ali se prijavite z geslom.","sso_url":"Strežnik je odgovoril z nepričakovanim Googlovim naslovom, zato je bila prijava z Googlom ustavljena."},"time":{"seconds":{"one":"{count} sekundo","two":"{count} sekundi","few":"{count} sekunde","other":"{count} sekund"},"minutes":{"one":"{count} minuto","two":"{count} minuti","few":"{count} minute","other":"{count} minut"}},"download":{"exe":"Izvršljiva datoteka","zip":"Arhiv ZIP","dmg":"Slika diska","archive":"Arhiv","file":"Datoteka","unavailable":"Ni na voljo","your_system":"Vaš sistem","eyebrow_release":"Različica {version}","published":"Objavljeno: {date}","unreachable":"GitHub trenutno ni dosegljiv: oglejte si stran z izdajami.","available":"Na voljo","verify_file":"datoteka","no_build":"Za {os} trenutno ni različice igre.","x64":"64-bitni (x64)","arch_x64":"Intel / AMD (x86-64)","arch_arm64":"Arm (aarch64)","several_arches":"64-bitni, Intel / AMD ali Arm","macos_arm64":"Apple Silicon, macOS 26 ali novejši","experimental":"Eksperimentalno"},"server":{"online":"Deluje","offline":"Ni dosegljiv","busy":"Zaseden","open":"Odprta","closed":"Zaprta","updated":"Posodobljeno {time}","min_games":"Igralci, ki so v tem tempu igre odigrali dovolj partij za rating (vsaj {count}).","empty":"V tem tempu igre še ni igralcev na lestvici.","error":"Lestvice trenutno ni mogoče naložiti."},"game":{"number":"Partija št. {id}","white":"Beli","black":"Črni","you":"vi","vs":"proti","outcome_win":"Zmaga","outcome_loss":"Poraz","outcome_draw":"Remi","outcome_aborted":"Preklicana","result_white":"Zmaga belega","result_black":"Zmaga črnega","result_draw":"Remi","result_aborted":"Preklicana","rated":"Za rating","casual":"Prijateljska","custom":"Po meri","moves":{"one":"{count} poteza","two":"{count} potezi","few":"{count} poteze","other":"{count} potez"},"duration":"Trajanje: {time}","rating_diff":"Sprememba ratinga: {diff}","pgn":"PGN","pgn_title":"Prenesi partijo kot PGN","copy_pgn":"Kopiraj","copy_pgn_title":"Kopiraj PGN","gif":"GIF","gif_title":"Ustvari animirani GIF (odpre nov zavihek)","gif_signin":"Za ustvarjanje GIF-ov se prijavite","pgn_copied":"PGN je kopiran v odložišče.","pgn_saved":"PGN je prenesen.","none":"Še ni partij. Tukaj se bodo prikazale vaše spletne partije.","none_filtered":"Nobena partija se ne ujema s temi filtri.","none_public":"Še ni partij.","total":{"one":"{count} partija","two":"{count} partiji","few":"{count} partije","other":"{count} partij"},"termination_unknown":"Konec partije","reason":{"1":"Mat","2":"Predaja","3":"Poraz na čas","4":"Druga nepravilna poteza (izguba partije)","5":"Pat","6":"Mrtva pozicija (nezadosten material)","7":"Padec zastavice, a nasprotnik ne more dati mata","8":"Petkratna ponovitev pozicije","9":"Pravilo 75 potez","10":"Trikratna ponovitev pozicije (na zahtevo)","11":"Pravilo 50 potez (na zahtevo)","12":"Remi po dogovoru","13":"Druga nepravilna poteza, a nasprotnik ne more dati mata","14":"Predaja, a nasprotnik ne more dati mata","20":"Zapuščena partija (predolgo brez povezave)","21":"Zapuščena partija, a nasprotnik ne more dati mata","22":"Partija je preklicana","23":"Prva poteza ni bila pravočasno odigrana (preklicano)","24":"Poraz zaradi kršitve pravil poštene igre","25":"Partijo je preklical strežnik","26":"Oba igralca sta izgubila povezavo"}},"ratings":{"category":"Tempo igre","rating":"Rating","peak":"Najvišji","games":"Partije","wdl":"Z / R / P","provisional":"Začasni rating","none":"Še brez partije za rating.","unrated_hint":"Vprašaj označuje začasni rating (odigranih je še malo partij)."},"account":{"member_since":"Registracija: {date}","last_login":"Zadnja prijava","created":"Račun ustvarjen","email":"E-pošta","pending_email":"Čaka na potrditev: {email}","verified":"Potrjen","unverified":"Ni potrjen","mfa":"Dvofaktorsko preverjanje pristnosti","mfa_on":"Vklopljeno","mfa_off":"Izklopljeno","google":"Prijava z Googlom","google_on":"Povezana","google_off":"Ni povezana","password":"Geslo","password_set":"Nastavljeno","password_unset":"Še ni nastavljeno","challenges":"Izzivi","challenges_all":"Sprejeti","challenges_none":"Zavrnjeni","badge_verified":"E-pošta potrjena","badge_mfa":"Dvofaktorsko preverjanje","badge_google":"Google","ban_until":"Vaš račun je začasno blokiran do {date}.","ban_permanent":"Vaš račun je blokiran.","sanction_ban":"Blokada računa","sanction_mm_block":"Blokirano iskanje nasprotnika","sanction_warning":"Opozorilo","sanction_until":"do {date}","sanction_permanent":"trajno","devices_current":"Ta naprava","devices_unknown":"Neimenovana naprava","devices_signed_in":"Prijava: {date}","devices_seen":"Nazadnje v uporabi {time}","devices_expires":"Poteče: {date}","devices_revoke":"Odjavi","devices_revoked":"Naprava je odjavljena.","devices_none":"Ni drugih naprav.","signout_all_confirm":"Ali želite odjaviti vse naprave, vključno s to?","signed_out":"Odjava je uspela.","signed_in":"Pozdravljeni, {name}.","prefs_saved":"Shranjeno.","password_changed":"Geslo je bilo spremenjeno. Vaše druge naprave so odjavljene.","email_sent":"Na novi naslov smo poslali povezavo za potrditev. Naslov se spremeni, ko jo odprete.","email_changed":"Vaš e-poštni naslov je zdaj {email}.","email_current":"Trenutni naslov: {email}.","email_pending":"Sprememba na naslov {email} čaka na potrditev prek povezave.","export_done":"Vaši podatki so preneseni.","deleted":"Vaš račun je izbrisan.","delete_confirm_label":"Za potrditev vnesite {name}","register_done":"Na {email} smo poslali povezavo za potrditev. Odprite jo, da ustvarite račun, nato se prijavite.","register_ready":"Vaš račun je pripravljen. Zdaj se lahko prijavite.","forgot_done":"Če ta naslov uporablja kateri od računov, je povezava za izbiro novega gesla na poti.","resend_done":"Če ta naslov čaka na potrditev, je nova povezava na poti.","pow_solving":"Reševanje uganke proti robotom …","mfa_recovery":"Obnovitvena koda","mfa_recovery_text":"Vnesite eno od svojih obnovitvenih kod. Vsaka koda deluje samo enkrat.","mfa_app":"Koda iz aplikacije","mfa_app_text":"Vnesite 6-mestno kodo iz aplikacije za preverjanje pristnosti.","mfa_state_on":"Dvofaktorsko preverjanje pristnosti je za ta račun vklopljeno.","mfa_state_off":"Dvofaktorsko preverjanje pristnosti je za ta račun izklopljeno.","client_label":"Spletno mesto Scacelith ({browser})","username":"Uporabniško ime","password_rules":"Vsaj {min} znakov, brez vašega uporabniškega imena ali e-poštnega naslova.","password_note":"Vaše druge naprave se odjavijo, ta pa ostane prijavljena.","signin_label":"Prijava","google_link_text":"Račun {name} že uporablja ta e-poštni naslov. Enkrat vnesite njegovo geslo, da ga povežete z Googlom; potem zadostuje »Prijava z Googlom«.","auth_foot_google":"En račun na uradnem strežniku, za igro in za to spletno mesto. Je bil vaš račun v igri ustvarjen z Googlom? Potem se tudi tukaj prijavite z Googlom."},"players":{"since":"Registracija: {date}","games":"Partije","rated":"Za rating","wins":"Zmage","draws":"Remiji","losses":"Porazi","view":"Oglej si profil igralca {name}","you":"vi","board":"Lestvica"},"gif":{"title":"{white} – {black}","subtitle":"Partija št. {id} · {date}","preparing":"Pripravljanje GIF-a …","rendering":"Strežnik izrisuje GIF. Pri dolgi partiji lahko to traja nekaj sekund …","ready":"Vaš GIF je pripravljen. Prenos se je začel.","ready_again":"Vaš GIF je pripravljen.","signin":"Za ustvarjanje GIF-ov svojih partij se prijavite.","signin_button":"Prijava","missing":"Nobena partija ni bila izbrana.","retry_in":"Znova lahko poskusite čez {time}.","confirm":"Pritisnite »Ustvari GIF«, da strežnik z vašim računom izriše to partijo.","retry_now":"Zdaj lahko poskusite znova."},"home":{"create_account":"Ustvari račun","my_account":"Moj račun","my_games":"Moje partije","signin":"Prijava"},"trailer":{"title":"Napovednik za Scacelith","notice":"Ta videoposnetek gosti YouTube. Če ga predvajate tukaj, se naloži Googlov predvajalnik, ki prejme vaš naslov IP in lahko v vašo napravo shrani piškotke ali druge sledilnike.","accept":"Sprejmi in predvajaj","google_privacy":"Googlov pravilnik o zasebnosti"}}}</script>
+<script type="application/json" id="release-fallback">{"tag":"v1.0.0","name":"Scacelith 1.0.0","published":"2026-10-11T14:01:33Z","assets":[{"name":"Scacelith-1.0.0-linux-aarch64.tar.gz","size":95113523},{"name":"Scacelith-1.0.0-linux-x86_64.tar.gz","size":96318391},{"name":"Scacelith-1.0.0-macos-arm64-experimental.dmg","size":109408086},{"name":"Scacelith-1.0.0-windows-x64.exe","size":132992512},{"name":"Scacelith-1.0.0-windows-x64.zip","size":95817804},{"name":"SHA256SUMS","size":512}]}</script>
+<script src="../config.js"></script>
+<script type="module" src="../assets/js/home.js"></script>
+</body>
+</html>
