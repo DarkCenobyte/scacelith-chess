@@ -1,0 +1,805 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — cờ vua chân thực như ảnh chụp, ở góc nhìn thứ nhất",
+      "description": "Cờ vua miễn phí, chân thực như ảnh chụp, ở góc nhìn thứ nhất cho Windows, Linux và macOS: Stockfish 19, huấn luyện viên, phân tích ván cờ và chơi trực tuyến trong một đại sảnh hoàng gia."
+    },
+    "players": {
+      "title": "Bảng xếp hạng và người chơi — Scacelith",
+      "description": "Những người chơi giỏi nhất trên máy chủ Scacelith chính thức ở mọi mức thời gian thi đấu tính điểm, hệ số Elo của họ và những ván cờ gần đây nhất."
+    },
+    "account": {
+      "title": "Tài khoản của bạn — Scacelith",
+      "description": "Đăng nhập vào tài khoản Scacelith của bạn: hệ số Elo, lịch sử ván đấu, tải xuống PGN và GIF, thiết bị đã đăng nhập và cài đặt."
+    },
+    "gif": {
+      "title": "GIF động — Scacelith",
+      "description": "Ảnh GIF động của một ván cờ Scacelith."
+    },
+    "legal": {
+      "title": "Thông tin pháp lý, quyền riêng tư và điều khoản sử dụng — Scacelith",
+      "description": "Ai phát hành và lưu trữ Scacelith, trang web, trò chơi và máy chủ chính thức làm gì với dữ liệu cá nhân, quyền của bạn, và các quy định của máy chủ chính thức."
+    }
+  },
+  "brand": {
+    "tagline": "Trò chơi của bậc vương giả"
+  },
+  "nav": {
+    "skip": "Chuyển đến nội dung",
+    "home": "Trang chủ",
+    "label": "Menu chính",
+    "game": "Trò chơi",
+    "modes": "Chế độ chơi",
+    "gallery": "Thư viện ảnh",
+    "trailer": "Đoạn giới thiệu",
+    "online": "Trực tuyến",
+    "players": "Bảng xếp hạng",
+    "account": "Tài khoản",
+    "language": "Ngôn ngữ",
+    "menu": "Menu",
+    "download": "Tải xuống"
+  },
+  "hero": {
+    "image_alt": "Hai robot bằng sứ chơi cờ vua bên chiếc bàn gỗ óc chó trong một đại sảnh lát đá cẩm thạch ngập nắng.",
+    "lead": "Hãy ngồi vào chiếc bàn gỗ óc chó đánh sáp trong một đại sảnh hoàng gia ngập nắng. Phía bên kia bàn cờ, một robot bằng sứ do Stockfish điều khiển đang chờ nước đi đầu tiên của bạn.",
+    "watch": "Xem đoạn giới thiệu",
+    "meta": "Phần mềm tự do · Windows, Linux, macOS (thử nghiệm) · Card đồ họa hỗ trợ OpenGL 4.6",
+    "caption": "Ảnh chụp trong trò chơi: đại sảnh hoàng gia"
+  },
+  "highlights": {
+    "engine": "Bộ máy đồ họa OpenGL 4.6 tự phát triển",
+    "stockfish": "Tích hợp sẵn Stockfish 19",
+    "rules": "Luật FIDE",
+    "online": "Chơi trực tuyến",
+    "languages": "34 ngôn ngữ"
+  },
+  "experience": {
+    "eyebrow": "Trải nghiệm",
+    "title": "Không phải bàn cờ trên màn hình.<br><em>Mà là một chỗ ngồi bên bàn cờ.</em>",
+    "lead": "Scacelith mang lại những gì làm nên một ván cờ thật: đại sảnh, sự tĩnh lặng, chiếc đồng hồ, một đối thủ nhìn thẳng vào bạn, và những nghi thức của giải đấu.",
+    "presence": {
+      "title": "Ở góc nhìn thứ nhất",
+      "text": "Bạn nhìn qua đôi mắt robot của mình: nhìn quanh đại sảnh, cúi người xuống bàn cờ, ngước lên nhìn đối thủ, liếc xuống biên bản ván đấu, hoặc đứng dậy và đi tới một đầu bàn."
+    },
+    "ritual": {
+      "title": "Luật thi đấu",
+      "text": "Đã chạm vào quân nào thì phải đi quân đó, và tay bạn bấm đồng hồ để hoàn tất nước đi. Khi tắt chức năng hiện nước đi hợp lệ, trọng tài sẽ phạt nước đi không hợp lệ, và nước đi không hợp lệ thứ hai sẽ khiến bạn thua ván cờ."
+    },
+    "scoresheet": {
+      "title": "Viết tay",
+      "text": "Cả hai người chơi ghi lại từng nước đi trên biên bản ván đấu của mình, mỗi người một nét chữ riêng, và lật trang sau mỗi bốn mươi nước. Bạn nghe được cả tiếng ngòi bút trên giấy."
+    },
+    "opponent": {
+      "title": "Một đối thủ xứng tầm",
+      "text": "Stockfish 19 ở trình độ của bạn, từ Mới tập chơi (800) đến Stockfish tối đa (3500), cùng hệ số Elo được tính theo luật FIDE sau mỗi ván."
+    },
+    "engine": {
+      "title": "Được xây dựng cho trò chơi này",
+      "text": "Một bộ máy đồ họa được viết từ con số không: ánh sáng dựa trên vật lý, đá cẩm thạch, gỗ đánh sáp, sứ và đồng thau, ánh nắng xuyên qua cửa sổ, bóng đổ mềm và phản chiếu. Các mức chất lượng thiết lập sẵn, từ Rất thấp đến Cực cao, giúp trò chơi phù hợp với card đồ họa của bạn."
+    },
+    "languages": {
+      "title": "34 ngôn ngữ",
+      "text": "Tiếng Anh, tiếng Pháp, tiếng Đức, tiếng Tây Ban Nha, tiếng Bồ Đào Nha (Bồ Đào Nha và Brazil), tiếng Ý, tiếng Hà Lan, tiếng Thụy Điển, tiếng Đan Mạch, tiếng Phần Lan, tiếng Estonia, tiếng Latvia, tiếng Litva, tiếng Ba Lan, tiếng Séc, tiếng Slovakia, tiếng Slovenia, tiếng Croatia, tiếng Hungary, tiếng Romania, tiếng Bulgaria, tiếng Hy Lạp, tiếng Thổ Nhĩ Kỳ, tiếng Ukraina, tiếng Nga, tiếng Ả Rập, tiếng Hindi, tiếng Indonesia, tiếng Việt, tiếng Hàn, tiếng Nhật, cùng tiếng Trung giản thể và phồn thể. Tiếng Ả Rập được trình bày từ phải sang trái, và huấn luyện viên nói thành tiếng ở mọi ngôn ngữ trừ tiếng Trung, khi đó lời nói được hiển thị dưới dạng phụ đề."
+    }
+  },
+  "modes": {
+    "eyebrow": "Chế độ chơi",
+    "title": "Mỗi ván cờ<br><em>một bàn cờ riêng.</em>",
+    "lead": "Mọi chế độ đều diễn ra trong cùng một đại sảnh, ngay từ màn hình chính. Khi ngoại tuyến, Stockfish luôn sẵn sàng cho một ván cờ.",
+    "new_game": {
+      "name": "Ván mới",
+      "text": "Đấu với Stockfish ở sức mạnh bạn chọn, với thời gian thi đấu từ cờ siêu chớp đến cờ tiêu chuẩn, hoặc chơi với một người bạn trên cùng máy tính, mỗi người nhìn qua đôi mắt robot của mình."
+    },
+    "coach": {
+      "name": "Huấn luyện viên",
+      "text": "Một huấn luyện viên ngồi đối diện bạn, chơi ở trình độ của bạn và giải thích cho bạn trong suốt ván cờ: các mối đe dọa, nước đi hay, sai lầm, và tự tay đi tiếp để cho bạn thấy cái giá của một sai lầm. Từ luật cờ vua đến trình độ chuyên gia, với giọng nói được tổng hợp ngay trên máy tính của bạn."
+    },
+    "challenges": {
+      "name": "Thử thách của huấn luyện viên",
+      "text": "Những loạt thế cờ ngắn, mỗi loạt rèn một kỹ năng: chiếu hết sau một đến ba nước, đòn chĩa đôi, đòn ghim và các đòn chiến thuật khác, phòng thủ, và các tàn cuộc cơ bản khi đấu với huấn luyện viên. Chỉ có gợi ý khi bạn yêu cầu, và một dấu tích xanh cho mỗi loạt bạn hoàn thành."
+    },
+    "analysis": {
+      "name": "Phân tích",
+      "text": "Stockfish xem lại các ván đã lưu, các ván trực tuyến của bạn hoặc bất kỳ ván PGN nào: thanh đánh giá, các nước then chốt được đánh dấu từ nước đi xuất sắc đến sai lầm nghiêm trọng, nước đi hay hơn được vẽ bằng mũi tên, cùng lời bình luận bằng giọng nói và phụ đề. Tay các robot đi từng nước khi bạn lần lượt xem qua ván cờ."
+    },
+    "online": {
+      "name": "Chơi trực tuyến",
+      "text": "Đối thủ thật qua một máy chủ Scacelith: ván tính điểm, ghép đối thủ, thách đấu và ván riêng, hoặc đấu trực tiếp giữa hai máy tính. Robot của đối thủ cử động theo đúng người điều khiển nó, theo thời gian thực."
+    },
+    "watch": {
+      "name": "Xem ván cờ",
+      "text": "Stockfish đấu với Stockfish trong khi bạn tự do di chuyển quanh đại sảnh, vô hình, từ góc nhìn này sang góc nhìn khác."
+    },
+    "saved": {
+      "name": "Ván đã lưu",
+      "text": "Các ván cờ của bạn được lưu thành tệp PGN. Hãy phát lại chúng trong đại sảnh, với đúng thời gian suy nghĩ và đồng hồ thực tế, hoặc nhập các ván cờ từ những chương trình khác."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Thư viện ảnh",
+    "title": "Nhìn từ <em>bên trong đại sảnh</em>",
+    "lead": "Mọi hình ảnh đều được chụp trong trò chơi, theo thời gian thực, bằng chính bộ máy đồ họa của trò chơi.",
+    "title_screen": {
+      "alt": "Màn hình chính: menu Scacelith bên cạnh hai robot đang chơi cờ trong đại sảnh.",
+      "caption": "Màn hình chính"
+    },
+    "coach": {
+      "alt": "Huấn luyện viên, một robot bằng sứ có chữ “COACH” trên ngực, chào bạn từ phía bên kia bàn cờ; lời nói của huấn luyện viên cũng hiện thành phụ đề.",
+      "caption": "Huấn luyện viên"
+    },
+    "challenges": {
+      "alt": "Menu Thử thách của huấn luyện viên: các loạt bài chiếu hết và chiến thuật kèm độ khó, cùng những loạt đã hoàn thành, bên cạnh phần mô tả của loạt đang chọn.",
+      "caption": "Thử thách của huấn luyện viên"
+    },
+    "analysis": {
+      "alt": "Chế độ Phân tích: thanh đánh giá, một mũi tên vẽ trên bàn cờ, các nước đi có chú giải kèm độ chính xác của mỗi bên, và danh sách phím điều khiển.",
+      "caption": "Phân tích"
+    },
+    "game": {
+      "alt": "Nhìn từ bên cạnh, một robot vươn tay qua bàn để đi một quân trong khi robot kia chờ đợi; các quân bị bắt được đặt bên cạnh bàn cờ.",
+      "caption": "Xem ván cờ"
+    },
+    "hall": {
+      "alt": "Hai robot ngồi đối diện nhau qua bàn cờ, trên những chiếc ghế nhung đỏ, dưới những ô cửa sổ cao.",
+      "caption": "Đại sảnh hoàng gia"
+    },
+    "opponent": {
+      "alt": "Cận cảnh robot đối thủ bằng sứ, đầu cúi xuống nhìn bàn cờ.",
+      "caption": "Đối thủ của bạn"
+    },
+    "scoresheet": {
+      "alt": "Tay một robot ghi các nước đi lên biên bản ván đấu bằng bút máy.",
+      "caption": "Biên bản ván đấu"
+    },
+    "note": "Phiên bản 1.0.0. Giao diện trong các hình ảnh này là tiếng Anh.",
+    "viewer": "Trình xem ảnh",
+    "close": "Đóng",
+    "previous": "Ảnh trước",
+    "next": "Ảnh tiếp theo"
+  },
+  "trailer": {
+    "eyebrow": "Đoạn giới thiệu",
+    "title": "Scacelith <em>sống động</em>",
+    "soon_title": "Đoạn giới thiệu sắp ra mắt",
+    "soon_text": "Trong lúc chờ đợi, mời bạn ngồi vào bàn: trò chơi đã sẵn sàng để tải xuống.",
+    "privacy": "Không có gì được tải từ YouTube cho đến khi bạn chấp nhận trình phát của YouTube.",
+    "open_youtube": "Xem trên YouTube"
+  },
+  "online": {
+    "eyebrow": "Trực tuyến",
+    "title": "Đối thủ thật,<br><em>cùng một đại sảnh.</em>",
+    "lead": "Đăng nhập vào máy chủ chính thức từ trong trò chơi và chơi với mọi người khắp nơi, vẫn ở góc nhìn thứ nhất.",
+    "point_rated": "Ván tính điểm ở mọi mức thời gian thi đấu chính thức, mỗi mức có hệ số Elo riêng, được tính theo luật của FIDE.",
+    "point_match": "Ghép đối thủ, thách đấu theo tên và ván riêng bằng mã; hoặc đấu trực tiếp giữa hai máy tính, không cần máy chủ hay tài khoản.",
+    "point_fair": "Chơi công bằng: kiểm tra tự động, phân tích các ván đã kết thúc bằng chương trình cờ, và báo cáo từ người chơi.",
+    "point_history": "Lịch sử ván đấu của bạn trên trang web này: tải từng ván xuống dưới dạng PGN hoặc ảnh GIF động.",
+    "point_open": "Ai cũng có thể vận hành một máy chủ cộng đồng: máy chủ là phần mềm tự do, và API của máy chủ có tài liệu công khai.",
+    "create": "Tạo tài khoản",
+    "signin": "Đăng nhập",
+    "server_title": "Máy chủ chính thức",
+    "status_checking": "Đang kiểm tra…",
+    "address": "Địa chỉ",
+    "registration": "Đăng ký",
+    "categories": "Thời gian thi đấu tính điểm",
+    "top_players": "Người chơi hàng đầu",
+    "category": "Thời gian thi đấu",
+    "board_loading": "Đang tải bảng xếp hạng…",
+    "full_board": "Toàn bộ bảng xếp hạng"
+  },
+  "download": {
+    "button": "Tải xuống",
+    "choose": "Chọn hệ điều hành của bạn",
+    "see_release": "Xem bản phát hành trên GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Tất cả các bản phát hành",
+    "experimental": "Thử nghiệm",
+    "source": "Mã nguồn",
+    "source_zip": "Tệp nén ZIP",
+    "eyebrow": "Tải xuống",
+    "title": "Mời bạn ngồi vào bàn.<br><em>Miễn phí và mã nguồn mở.</em>",
+    "lead": "Giải nén và chơi: không cần trình cài đặt trên Windows hay Linux, và chỉ cần kéo vào thư mục Applications trên máy Mac. Mỗi tệp được GitHub Actions xây dựng từ mã nguồn đã gắn thẻ phiên bản, kèm chứng thực nguồn gốc bản dựng.",
+    "notes": "Ghi chú phát hành",
+    "macos_note": "Dành cho máy Mac dùng Apple Silicon (M1 trở lên) với macOS 26 trở lên, không chạy trong máy ảo; bản này mới hơn và ít được kiểm thử hơn các bản dựng khác. Ứng dụng không được ký bởi một nhà phát triển Apple đã đăng ký: ở lần đầu tiên, hãy mở ứng dụng từ Cài đặt hệ thống › Quyền riêng tư & Bảo mật › Vẫn mở.",
+    "req_system": "Hệ điều hành",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 hoặc aarch64) có glibc 2.34, OpenSSL 3 và X11 hoặc XWayland, chẳng hạn Ubuntu 22.04 hoặc Debian 12; macOS 26 trở lên trên Apple Silicon (thử nghiệm)",
+    "req_gpu": "Đồ họa",
+    "req_gpu_value": "Card đồ họa hỗ trợ OpenGL 4.6 với trình điều khiển được cập nhật (trên máy Mac, trò chơi mang theo OpenGL riêng)",
+    "req_included": "Đi kèm",
+    "req_included_value": "Stockfish 19 và mạng nơ-ron của nó: chơi ngoại tuyến được ngay",
+    "req_network": "Kết nối Internet",
+    "req_network_value": "Để chơi trực tuyến, tạo GIF, và tải giọng nói của huấn luyện viên và phần phân tích (không bắt buộc, khoảng 399 MB)",
+    "req_licence": "Giấy phép",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Kiểm tra tệp tải xuống",
+    "verify_text": "Nguồn gốc bản dựng của mỗi tệp được GitHub chứng thực. Với GitHub CLI:",
+    "checksums": "Tổng kiểm tra SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Ghi công",
+    "title": "Ghi công và <em>lời cảm ơn</em>",
+    "engine_head": "Chương trình cờ",
+    "engine": "Stockfish 19, của các nhà phát triển Stockfish (GNU GPL v3). Mạng nơ-ron của Stockfish được huấn luyện trên dữ liệu do dự án Leela Chess Zero cung cấp (Open Database License).",
+    "voice_head": "Giọng nói",
+    "voice": "Supertonic 3 của Supertone, theo giấy phép BigScience Open RAIL-M: được tải xuống khi bạn yêu cầu, mô hình này tạo giọng nói cho huấn luyện viên và phần phân tích, ngay trên máy tính của bạn.",
+    "fonts_head": "Phông chữ",
+    "fonts": "EB Garamond của Georg Duffner, Cinzel của Natanael Gama và Amiri của Khaled Hosny; chữ viết tay bằng Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One và LXGW WenKai (tất cả theo SIL Open Font License); hình quân cờ từ GNU FreeFont.",
+    "openings_head": "Khai cuộc và bài tập",
+    "openings": "Tên các khai cuộc lấy từ cơ sở dữ liệu chess-openings của lichess.org, và các bài tập trong thử thách của huấn luyện viên lấy từ cơ sở dữ liệu bài tập của Lichess, cả hai đều được đưa vào phạm vi công cộng (CC0).",
+    "quote": "“Cờ vua là nghệ thuật phân tích.”",
+    "quote_author": "Mikhail Botvinnik"
+  },
+  "footer": {
+    "about": "Trò chơi cờ vua chân thực như ảnh chụp, chơi ở góc nhìn thứ nhất, trên bộ máy đồ họa OpenGL 4.6 tự phát triển. Phần mềm tự do theo giấy phép GNU GPL v3.",
+    "game": "Trò chơi",
+    "online": "Trực tuyến",
+    "api_docs": "Tài liệu API của máy chủ",
+    "source": "Mã nguồn",
+    "game_source": "Trò chơi trên GitHub",
+    "server_source": "Máy chủ trên GitHub",
+    "releases": "Các bản phát hành",
+    "licence": "Giấy phép (GPL v3)",
+    "credits": "Stockfish là nhãn hiệu của các nhà phát triển Stockfish. YouTube là nhãn hiệu của Google LLC. Windows là nhãn hiệu của Microsoft Corporation. macOS là nhãn hiệu của Apple Inc. Linux là nhãn hiệu đã đăng ký của Linus Torvalds. OpenGL là nhãn hiệu đã đăng ký của Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Trang web này không đặt cookie và không dùng công cụ theo dõi; trình phát của YouTube chỉ được tải nếu bạn chấp nhận.",
+    "legal_link": "Thông tin pháp lý, quyền riêng tư và điều khoản"
+  },
+  "common": {
+    "copy": "Sao chép",
+    "loading": "Đang tải…",
+    "noscript": "Trang này cần JavaScript để giao tiếp với máy chủ Scacelith."
+  },
+  "players": {
+    "title": "Bảng xếp hạng và người chơi",
+    "lead": "Những người chơi giỏi nhất của máy chủ chính thức ở mỗi mức thời gian thi đấu tính điểm. Hãy tìm bất kỳ người chơi nào để xem hệ số Elo và những ván cờ gần đây nhất của họ.",
+    "search_label": "Tìm người chơi",
+    "search_placeholder": "Tên người dùng",
+    "search_button": "Tìm kiếm",
+    "back": "Quay lại bảng xếp hạng",
+    "recent_games": "Ván cờ gần đây",
+    "board_title": "Bảng xếp hạng",
+    "category": "Thời gian thi đấu",
+    "col_rank": "Hạng",
+    "col_player": "Người chơi",
+    "col_rating": "Hệ số",
+    "col_peak": "Cao nhất",
+    "col_games": "Số ván",
+    "col_wdl": "T / H / B",
+    "loading": "Đang tải…"
+  },
+  "account": {
+    "title": "Tài khoản của bạn",
+    "auth_foot": "Một tài khoản trên máy chủ chính thức, dùng cho cả trò chơi và trang web này. Bạn đã tạo tài khoản bằng Google trong trò chơi? Hãy dùng “Quên mật khẩu?” để đặt mật khẩu cho tài khoản.",
+    "common": {
+      "back": "Quay lại đăng nhập"
+    },
+    "fields": {
+      "login": "Tên người dùng hoặc email",
+      "password": "Mật khẩu",
+      "show_password": "Hiện mật khẩu",
+      "username": "Tên người dùng",
+      "email": "Email",
+      "confirm_password": "Xác nhận mật khẩu",
+      "current_password": "Mật khẩu hiện tại",
+      "new_password": "Mật khẩu mới",
+      "new_email": "Địa chỉ email mới",
+      "mfa_code": "Mã xác thực hai yếu tố (hoặc mã khôi phục)"
+    },
+    "signin": {
+      "tab": "Đăng nhập",
+      "title": "Chào mừng bạn trở lại",
+      "remember": "Duy trì đăng nhập trên thiết bị này",
+      "submit": "Đăng nhập",
+      "forgot": "Quên mật khẩu?",
+      "resend": "Gửi lại email xác nhận"
+    },
+    "mfa": {
+      "title": "Xác thực hai yếu tố",
+      "text": "Nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+      "code": "Mã từ ứng dụng",
+      "use_recovery": "Dùng mã khôi phục thay thế",
+      "submit": "Xác nhận"
+    },
+    "google": {
+      "or": "hoặc",
+      "button": "Đăng nhập bằng Google",
+      "username_title": "Chọn tên người dùng",
+      "username_text": "Tài khoản Google của bạn chưa từng được dùng trên máy chủ này. Hãy chọn tên mà những người chơi khác sẽ thấy: tên này không thể thay đổi về sau.",
+      "username_submit": "Tạo tài khoản của tôi",
+      "link_title": "Liên kết tài khoản Google",
+      "link_submit": "Liên kết và đăng nhập",
+      "returning": "Đang đăng nhập bằng Google…"
+    },
+    "register": {
+      "tab": "Tạo tài khoản",
+      "title": "Tài khoản miễn phí",
+      "closed": "Máy chủ hiện không nhận tài khoản mới.",
+      "username_hint": "Chữ cái, chữ số, _ và -, bắt đầu bằng một chữ cái hoặc chữ số.",
+      "password_hint": "Ít nhất 10 ký tự, không chứa tên người dùng hoặc email của bạn.",
+      "pow_note": "Để chặn robot, trình duyệt của bạn sẽ giải một câu đố nhỏ khi bạn đăng ký. Việc này mất vài giây.",
+      "submit": "Tạo tài khoản",
+      "done_title": "Kiểm tra email của bạn",
+      "done_text": "Chúng tôi đã gửi một liên kết xác nhận tới địa chỉ của bạn. Hãy mở liên kết đó để tạo tài khoản, rồi đăng nhập.",
+      "done_hint": "Liên kết có hiệu lực trong 24 giờ. Không thấy gì trong hộp thư đến? Hãy kiểm tra thư mục thư rác, hoặc yêu cầu gửi lại email.",
+      "go_signin": "Đến trang đăng nhập",
+      "legal_note": "Tên người dùng, hệ số Elo và các ván cờ của bạn sẽ được công khai. Khi tạo tài khoản, bạn chấp nhận các điều khoản sử dụng.",
+      "legal_link": "Quyền riêng tư và điều khoản sử dụng"
+    },
+    "forgot": {
+      "title": "Quên mật khẩu",
+      "text": "Nhập địa chỉ email của tài khoản. Nếu có tài khoản dùng địa chỉ này, chúng tôi sẽ gửi cho bạn một liên kết để chọn mật khẩu mới, có hiệu lực trong một giờ.",
+      "submit": "Gửi liên kết"
+    },
+    "resend": {
+      "title": "Xác nhận email",
+      "text": "Không nhận được email xác nhận, hoặc liên kết đã hết hạn? Hãy nhập địa chỉ của bạn để nhận liên kết mới.",
+      "submit": "Gửi lại"
+    },
+    "dash": {
+      "public_profile": "Hồ sơ công khai",
+      "signout": "Đăng xuất",
+      "tab_overview": "Tổng quan",
+      "tab_games": "Ván cờ",
+      "tab_devices": "Thiết bị",
+      "tab_settings": "Cài đặt"
+    },
+    "overview": {
+      "info": "Thông tin của bạn",
+      "ratings": "Hệ số Elo của bạn",
+      "sanctions": "Xử phạt",
+      "recent": "Ván cờ gần đây",
+      "all_games": "Tất cả ván cờ của bạn"
+    },
+    "games": {
+      "filter_category": "Thời gian thi đấu",
+      "all": "Tất cả",
+      "custom": "Tùy chỉnh",
+      "filter_rated": "Loại ván",
+      "rated": "Tính điểm",
+      "casual": "Giao hữu",
+      "filter_result": "Kết quả",
+      "wins": "Thắng",
+      "losses": "Thua",
+      "draws": "Hòa"
+    },
+    "devices": {
+      "title": "Thiết bị đã đăng nhập",
+      "signout_all": "Đăng xuất mọi nơi",
+      "text": "Mỗi lần đăng nhập, trong trò chơi hay trên trang web này, là một thiết bị. Hãy đăng xuất những thiết bị bạn không nhận ra."
+    },
+    "settings": {
+      "challenges_title": "Thách đấu",
+      "challenges_text": "Người chơi khác có thể thách đấu bạn theo tên từ trong trò chơi.",
+      "challenges_label": "Nhận lời thách đấu",
+      "mfa_title": "Xác thực hai yếu tố",
+      "mfa_text": "Bật hoặc tắt tính năng này, và tạo mã khôi phục mới, từ trang tài khoản trong trò chơi.",
+      "password_title": "Đổi mật khẩu",
+      "password_text": "Các thiết bị khác của bạn sẽ bị đăng xuất, còn thiết bị này vẫn đăng nhập.",
+      "password_submit": "Đổi mật khẩu",
+      "email_title": "Đổi địa chỉ email",
+      "email_submit": "Gửi liên kết xác nhận",
+      "export_title": "Tải xuống dữ liệu của tôi",
+      "export_text": "Mọi thông tin máy chủ lưu giữ về tài khoản của bạn, trong một tệp JSON.",
+      "export_submit": "Tải xuống dữ liệu của tôi",
+      "delete_title": "Xóa tài khoản",
+      "delete_text": "Không thể hoàn tác thao tác này. Các ván cờ và hệ số Elo của bạn vẫn được giữ lại dưới một tên ẩn danh; địa chỉ email, mật khẩu và các thiết bị của bạn sẽ bị xóa.",
+      "delete_confirm": "Nhập tên người dùng của bạn để xác nhận",
+      "delete_submit": "Xóa tài khoản của tôi"
+    }
+  },
+  "gif": {
+    "title": "GIF động",
+    "preparing": "Đang chuẩn bị GIF…",
+    "download": "Tải GIF xuống",
+    "make": "Tạo GIF",
+    "pause": "Tạm dừng hoạt ảnh",
+    "back": "Quay lại ván cờ của tôi",
+    "options": "Tùy chọn",
+    "size": "Kích thước",
+    "size_small": "Nhỏ (284 × 350)",
+    "size_medium": "Trung bình (424 × 515)",
+    "size_large": "Lớn (628 × 762)",
+    "orientation": "Nhìn bàn cờ từ phía",
+    "orientation_white": "Trắng",
+    "orientation_black": "Đen",
+    "speed": "Tốc độ",
+    "speed_fast": "Nhanh (0,25 giây mỗi nước)",
+    "speed_normal": "Bình thường (0,5 giây mỗi nước)",
+    "speed_slow": "Chậm (1 giây mỗi nước)",
+    "speed_very_slow": "Rất chậm (2 giây mỗi nước)",
+    "coords": "Hiện tọa độ",
+    "regenerate": "Tạo lại",
+    "note": "Máy chủ vẽ từng GIF. GIF bạn đã tạo trước đó sẽ có ngay; GIF mới bị giới hạn ở vài GIF mỗi phút."
+  },
+  "notfound": {
+    "title": "Không tìm thấy trang",
+    "text": "Ô này trống. Có thể trang đã được chuyển đi nơi khác.",
+    "home": "Quay lại Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Đang tải…",
+      "retry": "Thử lại",
+      "close": "Đóng",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép vào bảng tạm.",
+      "copy_failed": "Không thể sao chép. Hãy chọn văn bản và sao chép thủ công.",
+      "load_more": "Xem thêm",
+      "show_password": "Hiện mật khẩu",
+      "hide_password": "Ẩn mật khẩu",
+      "signin_needed": "Hãy đăng nhập để tiếp tục.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Không thể kết nối tới máy chủ. Hãy kiểm tra kết nối mạng và thử lại.",
+      "timeout": "Máy chủ phản hồi quá lâu. Hãy thử lại.",
+      "server_busy": "Máy chủ đang bận. Hãy thử lại sau giây lát.",
+      "rate_limited": "Quá nhiều yêu cầu. Hãy thử lại sau {time}.",
+      "rate_limited_short": "Quá nhiều yêu cầu. Hãy thử lại sau giây lát.",
+      "internal_error": "Máy chủ gặp lỗi không mong đợi. Hãy thử lại sau.",
+      "invalid_token": "Phiên đăng nhập của bạn đã kết thúc. Vui lòng đăng nhập lại.",
+      "unauthorized": "Vui lòng đăng nhập.",
+      "not_found": "Không tìm thấy.",
+      "unknown": "Đã xảy ra lỗi ({code}).",
+      "invalid_credentials": "Sai tên người dùng, email hoặc mật khẩu.",
+      "too_many_attempts": "Quá nhiều lần thử. Hãy thử lại sau {time}.",
+      "banned": "Tài khoản này bị đình chỉ đến {date}.",
+      "banned_permanent": "Tài khoản này bị đình chỉ.",
+      "email_unverified": "Địa chỉ email của bạn chưa được xác nhận. Hãy mở liên kết chúng tôi đã gửi cho bạn, hoặc yêu cầu liên kết mới.",
+      "invalid_mfa_token": "Bước đăng nhập này đã hết hạn. Vui lòng đăng nhập lại.",
+      "invalid_code": "Mã sai hoặc đã được sử dụng.",
+      "mfa_code_required": "Hãy nhập mã xác thực hai yếu tố.",
+      "invalid_password": "Sai mật khẩu.",
+      "password_not_set": "Tài khoản này chưa có mật khẩu: hãy dùng “Quên mật khẩu?” trên trang đăng nhập để đặt mật khẩu.",
+      "registration_closed": "Máy chủ hiện không nhận tài khoản mới.",
+      "invalid_username": "Tên người dùng này không được phép.",
+      "username_taken": "Tên người dùng này đã được sử dụng.",
+      "invalid_email": "Địa chỉ email này không hợp lệ.",
+      "email_taken": "Địa chỉ email này đã được một tài khoản khác sử dụng.",
+      "same_email": "Đây đã là địa chỉ email của bạn.",
+      "weak_password": "Mật khẩu này quá yếu.",
+      "weak_too_short": "Mật khẩu quá ngắn (ít nhất {min} ký tự).",
+      "weak_too_long": "Mật khẩu quá dài.",
+      "weak_contains_username": "Mật khẩu không được chứa tên người dùng của bạn.",
+      "weak_contains_email": "Mật khẩu không được chứa địa chỉ email của bạn.",
+      "weak_too_common": "Mật khẩu này quá phổ biến. Hãy chọn mật khẩu khác.",
+      "pow_failed": "Kiểm tra chống robot không thành công. Hãy thử lại.",
+      "passwords_differ": "Hai mật khẩu không khớp nhau.",
+      "required": "Hãy điền vào trường này.",
+      "email_format": "Hãy nhập một địa chỉ email hợp lệ.",
+      "username_format": "Từ {min} đến {max} ký tự: chữ cái, chữ số, _ và -, bắt đầu bằng một chữ cái hoặc chữ số.",
+      "password_length": "Ít nhất {min} ký tự.",
+      "confirm_name": "Hãy nhập tên người dùng chính xác như đang hiển thị.",
+      "game_too_long": "Ván cờ này quá dài để tạo thành GIF.",
+      "gif_disabled": "Máy chủ này không tạo GIF.",
+      "render_failed": "Máy chủ không thể vẽ GIF này.",
+      "invalid_game": "Ván cờ này không tồn tại.",
+      "invalid_player": "Hãy nhập tên người dùng: 2 đến 24 chữ cái, chữ số, _, . hoặc -.",
+      "player_not_found": "Không có người chơi nào mang tên này.",
+      "sso_cancelled": "Đăng nhập bằng Google đã bị hủy.",
+      "sso_mismatch": "Lần đăng nhập bằng Google này không được bắt đầu trong thẻ này, hoặc đã được sử dụng. Hãy thử lại.",
+      "sso_expired": "Lần đăng nhập bằng Google này đã hết hạn. Hãy thử lại.",
+      "invalid_verifier": "Lần đăng nhập bằng Google này đã được bắt đầu trong một thẻ hoặc trình duyệt khác. Hãy bắt đầu lại từ trang này.",
+      "sso_email_unverified": "Google chưa xác nhận địa chỉ email của tài khoản Google này.",
+      "sso_account_exists": "Đã có một tài khoản dùng địa chỉ email này, nhưng tài khoản đó chưa có mật khẩu để liên kết với Google. Hãy đặt mật khẩu bằng “Quên mật khẩu?”, rồi đăng nhập lại bằng Google.",
+      "sso_failed": "Không thể hoàn tất đăng nhập bằng Google. Hãy thử lại.",
+      "sso_disabled": "Máy chủ này không hỗ trợ đăng nhập bằng Google.",
+      "sso_already_linked": "Tài khoản Google này đã được liên kết với một tài khoản khác.",
+      "account_disabled": "Tài khoản này không thể sử dụng được nữa.",
+      "sso_storage": "Trình duyệt của bạn đang chặn trang web này lưu trữ dữ liệu, trong khi đăng nhập bằng Google cần đến việc này. Hãy cho phép, hoặc đăng nhập bằng mật khẩu.",
+      "sso_url": "Máy chủ đã trả về một địa chỉ Google không mong đợi, nên quá trình đăng nhập bằng Google đã bị dừng."
+    },
+    "time": {
+      "seconds": {
+        "other": "{count} giây"
+      },
+      "minutes": {
+        "other": "{count} phút"
+      }
+    },
+    "download": {
+      "exe": "Tệp thực thi",
+      "zip": "Tệp nén ZIP",
+      "dmg": "Ảnh đĩa",
+      "archive": "Tệp nén",
+      "file": "Tệp",
+      "unavailable": "Không có sẵn",
+      "your_system": "Hệ điều hành của bạn",
+      "eyebrow_release": "Phiên bản {version}",
+      "published": "Phát hành ngày {date}",
+      "unreachable": "Hiện không thể kết nối tới GitHub: hãy xem trang các bản phát hành.",
+      "available": "Có sẵn",
+      "verify_file": "tệp",
+      "no_build": "Hiện chưa có bản dựng của trò chơi cho {os}.",
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD hoặc Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 trở lên",
+      "experimental": "Thử nghiệm"
+    },
+    "server": {
+      "online": "Trực tuyến",
+      "offline": "Không thể kết nối",
+      "busy": "Đang bận",
+      "open": "Đang mở",
+      "closed": "Đã đóng",
+      "updated": "Cập nhật {time}",
+      "min_games": "Người chơi có ít nhất {count} ván tính điểm ở mức thời gian thi đấu này.",
+      "empty": "Chưa có người chơi nào được xếp hạng ở mức thời gian thi đấu này.",
+      "error": "Hiện không thể tải bảng xếp hạng."
+    },
+    "game": {
+      "number": "Ván #{id}",
+      "white": "Trắng",
+      "black": "Đen",
+      "you": "bạn",
+      "vs": "đấu với",
+      "outcome_win": "Thắng",
+      "outcome_loss": "Thua",
+      "outcome_draw": "Hòa",
+      "outcome_aborted": "Đã hủy",
+      "result_white": "Trắng thắng",
+      "result_black": "Đen thắng",
+      "result_draw": "Hòa",
+      "result_aborted": "Đã hủy",
+      "rated": "Tính điểm",
+      "casual": "Giao hữu",
+      "custom": "Tùy chỉnh",
+      "moves": {
+        "other": "{count} nước"
+      },
+      "duration": "Thời lượng {time}",
+      "rating_diff": "Thay đổi hệ số {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Tải ván cờ xuống dưới dạng PGN",
+      "copy_pgn": "Sao chép",
+      "copy_pgn_title": "Sao chép PGN",
+      "gif": "GIF",
+      "gif_title": "Tạo GIF động (mở thẻ mới)",
+      "gif_signin": "Đăng nhập để tạo GIF",
+      "pgn_copied": "Đã sao chép PGN vào bảng tạm.",
+      "pgn_saved": "Đã tải PGN xuống.",
+      "none": "Chưa có ván nào. Các ván trực tuyến của bạn sẽ xuất hiện ở đây.",
+      "none_filtered": "Không có ván nào khớp với các bộ lọc này.",
+      "none_public": "Chưa có ván nào.",
+      "total": {
+        "other": "{count} ván"
+      },
+      "termination_unknown": "Ván cờ đã kết thúc",
+      "reason": {
+        "1": "Chiếu hết",
+        "2": "Xin thua",
+        "3": "Thua do hết giờ",
+        "4": "Nước đi không hợp lệ thứ hai (xử thua)",
+        "5": "Hết nước đi",
+        "6": "Thế cờ chết (không đủ lực lượng)",
+        "7": "Hết giờ, nhưng đối thủ không thể chiếu hết",
+        "8": "Lặp lại thế cờ năm lần",
+        "9": "Luật 75 nước",
+        "10": "Lặp lại thế cờ ba lần (theo yêu cầu)",
+        "11": "Luật 50 nước (theo yêu cầu)",
+        "12": "Hòa theo thỏa thuận",
+        "13": "Nước đi không hợp lệ thứ hai, nhưng đối thủ không thể chiếu hết",
+        "14": "Xin thua, nhưng đối thủ không thể chiếu hết",
+        "20": "Bỏ dở ván cờ (mất kết nối quá lâu)",
+        "21": "Bỏ dở ván cờ, nhưng đối thủ không thể chiếu hết",
+        "22": "Ván cờ bị hủy",
+        "23": "Không đi nước đầu tiên kịp giờ (đã hủy)",
+        "24": "Xử thua (vi phạm luật chơi công bằng)",
+        "25": "Bị máy chủ hủy",
+        "26": "Cả hai người chơi đều mất kết nối"
+      }
+    },
+    "ratings": {
+      "category": "Thời gian thi đấu",
+      "rating": "Hệ số",
+      "peak": "Cao nhất",
+      "games": "Số ván",
+      "wdl": "T / H / B",
+      "provisional": "Hệ số tạm thời",
+      "none": "Chưa có ván tính điểm nào.",
+      "unrated_hint": "Dấu chấm hỏi đánh dấu hệ số tạm thời (mới chơi ít ván)."
+    },
+    "account": {
+      "member_since": "Thành viên từ ngày {date}",
+      "last_login": "Lần đăng nhập cuối",
+      "created": "Ngày tạo",
+      "email": "Email",
+      "pending_email": "Đang chờ xác nhận: {email}",
+      "verified": "Đã xác nhận",
+      "unverified": "Chưa xác nhận",
+      "mfa": "Xác thực hai yếu tố",
+      "mfa_on": "Bật",
+      "mfa_off": "Tắt",
+      "google": "Đăng nhập bằng Google",
+      "google_on": "Đã liên kết",
+      "google_off": "Chưa liên kết",
+      "password": "Mật khẩu",
+      "password_set": "Đã đặt",
+      "password_unset": "Chưa đặt",
+      "challenges": "Thách đấu",
+      "challenges_all": "Chấp nhận",
+      "challenges_none": "Từ chối",
+      "badge_verified": "Email đã xác nhận",
+      "badge_mfa": "Đã bật xác thực hai yếu tố",
+      "badge_google": "Google",
+      "ban_until": "Tài khoản của bạn bị đình chỉ đến {date}.",
+      "ban_permanent": "Tài khoản của bạn bị đình chỉ.",
+      "sanction_ban": "Đình chỉ",
+      "sanction_mm_block": "Chặn ghép đối thủ",
+      "sanction_warning": "Cảnh cáo",
+      "sanction_until": "đến {date}",
+      "sanction_permanent": "vĩnh viễn",
+      "devices_current": "Thiết bị này",
+      "devices_unknown": "Thiết bị không tên",
+      "devices_signed_in": "Đăng nhập ngày {date}",
+      "devices_seen": "Dùng lần cuối {time}",
+      "devices_expires": "Hết hạn ngày {date}",
+      "devices_revoke": "Đăng xuất",
+      "devices_revoked": "Thiết bị đã được đăng xuất.",
+      "devices_none": "Không có thiết bị nào khác.",
+      "signout_all_confirm": "Đăng xuất mọi thiết bị, kể cả thiết bị này?",
+      "signed_out": "Bạn đã đăng xuất.",
+      "signed_in": "Chào mừng, {name}.",
+      "prefs_saved": "Đã lưu.",
+      "password_changed": "Mật khẩu của bạn đã được thay đổi. Các thiết bị khác của bạn đã bị đăng xuất.",
+      "email_sent": "Một liên kết xác nhận đã được gửi tới địa chỉ mới. Địa chỉ của bạn sẽ thay đổi khi bạn mở liên kết đó.",
+      "email_changed": "Địa chỉ email của bạn giờ là {email}.",
+      "email_current": "Địa chỉ hiện tại: {email}.",
+      "email_pending": "Thay đổi sang {email} đang chờ xác nhận qua liên kết.",
+      "export_done": "Dữ liệu của bạn đã được tải xuống.",
+      "deleted": "Tài khoản của bạn đã bị xóa.",
+      "delete_confirm_label": "Nhập {name} để xác nhận",
+      "register_done": "Chúng tôi đã gửi một liên kết xác nhận tới {email}. Hãy mở liên kết đó để tạo tài khoản, rồi đăng nhập.",
+      "register_ready": "Tài khoản của bạn đã sẵn sàng. Bạn có thể đăng nhập.",
+      "forgot_done": "Nếu có tài khoản dùng địa chỉ này, một liên kết để chọn mật khẩu mới đang được gửi tới.",
+      "resend_done": "Nếu địa chỉ này đang chờ xác nhận, một liên kết mới đang được gửi tới.",
+      "pow_solving": "Đang giải câu đố chống robot…",
+      "mfa_recovery": "Mã khôi phục",
+      "mfa_recovery_text": "Nhập một trong các mã khôi phục của bạn. Mỗi mã chỉ dùng được một lần.",
+      "mfa_app": "Mã từ ứng dụng",
+      "mfa_app_text": "Nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+      "mfa_state_on": "Xác thực hai yếu tố đang bật cho tài khoản này.",
+      "mfa_state_off": "Xác thực hai yếu tố đang tắt cho tài khoản này.",
+      "client_label": "Trang web Scacelith ({browser})",
+      "username": "Tên người dùng",
+      "password_rules": "Ít nhất {min} ký tự, không chứa tên người dùng hoặc email của bạn.",
+      "password_note": "Các thiết bị khác của bạn sẽ bị đăng xuất, còn thiết bị này vẫn đăng nhập.",
+      "signin_label": "Đăng nhập",
+      "google_link_text": "Tài khoản {name} đã dùng địa chỉ email này. Hãy nhập mật khẩu của tài khoản đó một lần để liên kết với Google; sau đó, chỉ cần “Đăng nhập bằng Google” là đủ.",
+      "auth_foot_google": "Một tài khoản trên máy chủ chính thức, dùng cho cả trò chơi và trang web này. Bạn đã tạo tài khoản bằng Google trong trò chơi? Hãy đăng nhập bằng Google ở đây nữa."
+    },
+    "players": {
+      "since": "Thành viên từ ngày {date}",
+      "games": "Số ván",
+      "rated": "Tính điểm",
+      "wins": "Thắng",
+      "draws": "Hòa",
+      "losses": "Thua",
+      "view": "Xem hồ sơ của {name}",
+      "you": "Bạn",
+      "board": "Bảng xếp hạng"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Ván #{id} · {date}",
+      "preparing": "Đang chuẩn bị GIF…",
+      "rendering": "Máy chủ đang vẽ GIF. Ván cờ dài có thể mất vài giây…",
+      "ready": "GIF của bạn đã sẵn sàng. Quá trình tải xuống đã bắt đầu.",
+      "ready_again": "GIF của bạn đã sẵn sàng.",
+      "signin": "Đăng nhập để tạo GIF cho các ván cờ của bạn.",
+      "signin_button": "Đăng nhập",
+      "missing": "Chưa chọn ván cờ nào.",
+      "retry_in": "Bạn có thể thử lại sau {time}.",
+      "confirm": "Nhấn “Tạo GIF” để máy chủ vẽ ván cờ này bằng tài khoản của bạn.",
+      "retry_now": "Bạn có thể thử lại ngay bây giờ."
+    },
+    "home": {
+      "create_account": "Tạo tài khoản",
+      "my_account": "Tài khoản của tôi",
+      "my_games": "Ván cờ của tôi",
+      "signin": "Đăng nhập"
+    },
+    "trailer": {
+      "title": "Đoạn giới thiệu Scacelith",
+      "notice": "Video này được lưu trữ trên YouTube. Phát video tại đây sẽ tải trình phát của Google, trình phát này nhận địa chỉ IP của bạn và có thể lưu cookie hoặc công cụ theo dõi khác trên thiết bị của bạn.",
+      "accept": "Chấp nhận và phát",
+      "google_privacy": "Chính sách quyền riêng tư của Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Pháp lý",
+    "title": "Thông tin pháp lý, quyền riêng tư và điều khoản sử dụng",
+    "lead": "Ai phát hành và lưu trữ Scacelith, điều gì xảy ra với dữ liệu của bạn trên trang web này, trong trò chơi và trên máy chủ chính thức, và các quy định khi chơi trên máy chủ đó.",
+    "updated": "Cập nhật lần cuối: ngày 11 tháng 10 năm 2026",
+    "toc": "Trên trang này",
+    "notice": {
+      "title": "Thông tin pháp lý",
+      "publisher_label": "Người phát hành",
+      "publisher": "Scacelith do một cá nhân phát hành, không trong khuôn khổ hoạt động nghề nghiệp. Như pháp luật Pháp cho phép (điều 1-1 II của luật số 2004-575 ngày 21 tháng 6 năm 2004), danh tính của người phát hành không được công bố ở đây; nhà cung cấp dịch vụ lưu trữ biết danh tính này.",
+      "contact_label": "Liên hệ",
+      "contact": "Dành cho mọi câu hỏi về trang web này, máy chủ chính thức hoặc dữ liệu của bạn.",
+      "host_server": "Máy chủ trò chơi chính thức và dữ liệu tài khoản",
+      "host_server_note": "Máy chủ đặt tại Pháp.",
+      "host_site": "Trang web này và tài liệu API (GitHub Pages)",
+      "host_domain": "Đơn vị đăng ký tên miền",
+      "licence_label": "Giấy phép",
+      "licence": "Trò chơi và máy chủ của trò chơi là phần mềm tự do theo giấy phép GNU General Public License v3, với mã nguồn công khai:",
+      "game_source": "trò chơi",
+      "server_source": "máy chủ",
+      "phone": "Điện thoại"
+    },
+    "privacy": {
+      "title": "Quyền riêng tư",
+      "intro": "Scacelith không hiển thị quảng cáo, không bán dữ liệu và không đo lường lượng truy cập. Dữ liệu cá nhân chỉ được dùng để vận hành trang web này và máy chủ chính thức, như được mô tả dưới đây. Bên kiểm soát dữ liệu là người phát hành, có thể liên hệ qua địa chỉ liên hệ ở trên.",
+      "site_title": "Trên trang web này",
+      "site_hosting": "GitHub lưu trữ trang web và, như mọi dịch vụ lưu trữ web khác, ghi lại địa chỉ IP của khách truy cập vì mục đích bảo mật.",
+      "github_privacy": "Tuyên bố về quyền riêng tư của GitHub",
+      "site_requests": "Để hiển thị bản phát hành mới nhất, trình duyệt của bạn gửi yêu cầu tới API của GitHub (api.github.com); để hiển thị trạng thái của máy chủ, bảng xếp hạng, người chơi và tài khoản của bạn, trình duyệt gửi yêu cầu tới máy chủ chính thức (caissa.scacelith.com). Cả hai đều nhận được địa chỉ IP của bạn, như với mọi yêu cầu khác.",
+      "site_storage": "Trang web không đặt cookie và không có công cụ phân tích. Trong trình duyệt của bạn, trang web chỉ lưu lựa chọn ngôn ngữ và, khi bạn đăng nhập, phiên đăng nhập của bạn: chỉ cho thẻ hiện tại, hoặc trên thiết bị này nếu bạn đánh dấu “Duy trì đăng nhập”. Khi đăng nhập bằng Google, trang web cũng lưu các mã dùng một lần trong thẻ hiện tại cho đến khi chúng được sử dụng. Tất cả những điều này đều cần thiết để trang web hoạt động, và chỉ máy chủ chính thức nhận được phiên đăng nhập và các mã đó.",
+      "site_trailer": "Đoạn giới thiệu là một video YouTube. Không có gì được tải từ YouTube cho đến khi bạn nhấn “Chấp nhận và phát”; khi đó YouTube (Google) nhận được địa chỉ IP của bạn và có thể lưu cookie hoặc công cụ theo dõi khác trên thiết bị của bạn. Câu trả lời của bạn không được ghi nhớ: câu hỏi sẽ xuất hiện lại ở lần truy cập sau.",
+      "site_google": "Nút “Đăng nhập bằng Google” trên trang Tài khoản không tải gì từ Google cho đến khi bạn nhấn vào. Khi đó trình duyệt của bạn chuyển đến trang đăng nhập của Google (accounts.google.com), và Google đưa trình duyệt trở lại trang web này kèm một mã dùng một lần mà trang web chuyển cho máy chủ chính thức. Google nhận được địa chỉ IP của bạn và những gì bạn nhập trên trang của Google, theo chính sách riêng của Google.",
+      "google_privacy": "Chính sách quyền riêng tư của Google",
+      "game_title": "Trong trò chơi",
+      "game_local": "Trò chơi lưu các cài đặt, kết quả cục bộ và thông tin đăng nhập của bạn trên máy tính của bạn. Thông tin đăng nhập được giữ trong kho lưu trữ bảo mật của hệ thống: DPAPI trên Windows, Chuỗi khóa (Keychain) trên macOS, kho khóa Secret Service trên Linux, hoặc nếu không có thì trong một tệp mà chỉ tài khoản người dùng của bạn đọc được.",
+      "game_network": "Trò chơi không tự gửi đi bất cứ thứ gì: không có dữ liệu đo từ xa, không kiểm tra cập nhật. Trò chơi chỉ kết nối tới máy chủ chính thức khi bạn mở trang trực tuyến, tới Hugging Face chỉ khi bạn tải giọng nói của huấn luyện viên, và, trong chế độ đấu trực tiếp, tới máy tính của đối thủ, nên đối thủ sẽ biết địa chỉ IP của bạn (trò chơi cũng có thể mở một cổng trên bộ định tuyến của bạn bằng UPnP).",
+      "account_title": "Tài khoản của bạn trên máy chủ chính thức",
+      "account_intro": "Việc tạo tài khoản, trong trò chơi hoặc trên trang web này, và việc chơi trực tuyến sẽ gửi các dữ liệu sau tới máy chủ chính thức, do OVH lưu trữ tại Pháp:",
+      "data_account": "<strong>Tài khoản:</strong> tên người dùng, địa chỉ email, mật khẩu (chỉ được lưu dưới dạng giá trị băm Argon2id), khóa bí mật xác minh hai bước (được mã hóa) và mã khôi phục (được băm), ngày đăng ký và ngày đăng nhập gần nhất.",
+      "data_google": "<strong>Đăng nhập bằng Google:</strong> Google gửi mã định danh tài khoản Google, địa chỉ email và tên của bạn. Máy chủ lưu mã định danh và địa chỉ email, và chỉ dùng tên để gợi ý tên người dùng.",
+      "data_sessions": "<strong>Thiết bị đã đăng nhập:</strong> với mỗi lần đăng nhập, tên của thiết bị (phiên bản trò chơi và hệ điều hành, chẳng hạn “Scacelith/1.0.0 win64”, hoặc trình duyệt và hệ điều hành đối với trang web này), địa chỉ IP và thời gian sử dụng.",
+      "data_games": "<strong>Ván cờ và hệ số Elo:</strong> mọi ván cờ trực tuyến (người chơi, nước đi, thời gian dành cho mỗi nước, kết quả, ngày giờ) và hệ số Elo của bạn. Trong ván cờ, chuyển động đầu và tay của bạn được chuyển trực tiếp tới đối thủ và không bao giờ được lưu lại.",
+      "data_security": "<strong>Nhật ký bảo mật:</strong> các lần đăng nhập, các lần thử không thành công và các thay đổi đối với tài khoản, kèm địa chỉ IP.",
+      "data_fairplay": "<strong>Chơi công bằng:</strong> các báo cáo do bạn gửi hoặc về bạn, kèm nhận xét; các ván bị bỏ dở và các ván bị lỡ; các hình thức xử phạt; và các kiểm tra được thực hiện trên ván cờ, từ nước đi giả mạo hoặc không thể có đến số liệu thống kê từ chương trình cờ Stockfish.",
+      "basis_title": "Mục đích và cơ sở pháp lý",
+      "basis_contract": "Vận hành tài khoản của bạn và việc chơi trực tuyến (đăng nhập, trận đấu, hệ số Elo, bản ghi ván cờ, các email mà dịch vụ gửi): dịch vụ mà bạn đăng ký sử dụng (điều 6(1)(b) GDPR).",
+      "basis_security": "Bảo vệ tài khoản và máy chủ, và giữ cho các ván cờ công bằng (nhật ký bảo mật, địa chỉ IP, kiểm tra chơi công bằng, xử phạt): lợi ích hợp pháp của người phát hành và của người chơi (điều 6(1)(f) GDPR).",
+      "basis_trailer": "Phát đoạn giới thiệu từ YouTube: sự đồng ý của bạn, được thể hiện bằng nút bấm (điều 6(1)(a) GDPR).",
+      "public_title": "Những gì mọi người đều thấy",
+      "public": "Tên người dùng, ngày đăng ký, hệ số Elo và toàn bộ danh sách ván cờ của bạn, kèm từng nước đi, đều được công khai: trên trang web này, qua API của máy chủ và trong tệp PGN của mỗi ván. Địa chỉ email, thiết bị, các lần đăng nhập, xử phạt và hồ sơ chơi công bằng của bạn không bao giờ được hiển thị. Bạn có thể từ chối lời thách đấu trực tiếp, nhưng không thể ẩn các ván cờ.",
+      "auto_title": "Quyết định tự động",
+      "auto": "Một số vi phạm giao thức của trò chơi, chẳng hạn một thông điệp giả mạo hoặc một nước đi không thể có trong thế cờ, là bằng chứng chắc chắn về gian lận: khi đó máy chủ xử thua ván cờ, cấm tài khoản trong 24 giờ, xóa tài khoản khỏi bảng xếp hạng và hoàn lại cho các đối thủ số điểm họ đã mất khi đấu với tài khoản đó trong 60 ngày gần nhất. Ba ván bị bỏ dở, bị hủy hoặc bị lỡ trong 24 giờ sẽ khiến việc ghép đối thủ cho ván tính điểm bị tạm dừng trong 15 phút, rồi lâu hơn. Số liệu thống kê của chương trình cờ không bao giờ tự nó dẫn đến xử phạt: một con người sẽ ra quyết định. Bạn có thể yêu cầu xem xét lại bất kỳ quyết định nào qua địa chỉ liên hệ.",
+      "recipients_title": "Ai nhận dữ liệu của bạn",
+      "recipient_ovh": "OVH SAS lưu trữ máy chủ và dữ liệu của máy chủ, tại Pháp.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) gửi email của máy chủ: Scaleway nhận địa chỉ email, tên người dùng của bạn và nội dung thư.",
+      "recipient_google": "Google nhận những gì trình duyệt của bạn gửi tới khi bạn chọn đăng nhập bằng Google, theo chính sách quyền riêng tư của chính Google.",
+      "recipient_staff": "Quản trị viên và người kiểm duyệt của máy chủ xem dữ liệu tài khoản và dữ liệu chơi công bằng để vận hành dịch vụ.",
+      "recipient_players": "Những người chơi khác thấy những gì được công khai, và đối thủ của bạn thấy các nước đi và cử động của bạn trong ván cờ.",
+      "recipient_none": "Không ai khác: không có dữ liệu nào được bán, cho thuê hoặc dùng cho quảng cáo.",
+      "transfers": "Dữ liệu tài khoản được lưu tại Pháp. GitHub, Google và Porkbun (đơn vị chuyển tiếp các thư gửi tới địa chỉ liên hệ) có trụ sở tại Hoa Kỳ: những gì họ nhận được tuân theo chính sách riêng của họ và các biện pháp bảo vệ của họ đối với việc chuyển dữ liệu ra ngoài Liên minh châu Âu.",
+      "retention_title": "Thời gian lưu giữ",
+      "ret_account": "<strong>Tài khoản:</strong> cho đến khi bạn xóa tài khoản. Một lượt đăng ký có địa chỉ email không bao giờ được xác nhận sẽ bị xóa sau 24 giờ.",
+      "ret_sessions": "<strong>Thiết bị đã đăng nhập:</strong> cho đến khi bạn đăng xuất, hoặc sau 30 ngày không sử dụng, và không quá 90 ngày.",
+      "ret_ip": "<strong>Địa chỉ IP:</strong> bị xóa sau 30 ngày. Nhật ký của máy chủ chỉ lưu địa chỉ đã được rút gọn.",
+      "ret_security": "<strong>Nhật ký bảo mật:</strong> 90 ngày.",
+      "ret_conduct": "<strong>Ván bị bỏ dở và ván bị lỡ:</strong> 30 ngày.",
+      "ret_games": "<strong>Ván cờ và hệ số Elo:</strong> chừng nào máy chủ còn lưu giữ các bản ghi ván cờ, vốn cũng là bản ghi của các đối thủ của bạn. Khi tài khoản của bạn bị xóa, tên của bạn trong các bản ghi đó được thay bằng “deleted#” kèm một con số.",
+      "ret_fairplay": "<strong>Xử phạt, báo cáo và kết quả kiểm tra chơi công bằng:</strong> được lưu giữ, để người chơi bị cấm không thể đơn giản quay lại và những người chơi khác vẫn được bảo vệ. Khi tài khoản của bạn bị xóa, các dữ liệu này chỉ còn gắn với số hiệu của tài khoản.",
+      "ret_backups": "<strong>Bản sao lưu:</strong> dữ liệu đã xóa có thể còn tồn tại trong một thời gian ngắn trong bản sao lưu của máy chủ, cho đến khi bản sao lưu đó được thay thế.",
+      "ret_contact": "<strong>Thư gửi tới địa chỉ liên hệ:</strong> trong thời gian cần thiết để trả lời.",
+      "rights_title": "Quyền của bạn",
+      "rights": "Bạn có thể truy cập, chỉnh sửa, xóa và xuất dữ liệu của mình, hạn chế việc sử dụng dữ liệu và phản đối việc sử dụng đó (điều 15 đến 21 GDPR).",
+      "rights_self": "Phần lớn những việc này có thể thực hiện trong tài khoản của bạn, trong trò chơi hoặc trên trang Tài khoản của trang web này: tải dữ liệu tài khoản xuống dưới dạng tệp JSON, đổi địa chỉ email hoặc mật khẩu, đăng xuất các thiết bị khác, hoặc xóa tài khoản ngay lập tức.",
+      "rights_google": "Tài khoản được tạo bằng Google không có mật khẩu: để xuất dữ liệu hoặc xóa tài khoản đó, trước tiên hãy đặt mật khẩu bằng “Quên mật khẩu?”.",
+      "rights_mail": "Với mọi yêu cầu khác, kể cả dữ liệu không có trong tệp xuất (kiểm tra chơi công bằng, báo cáo về bạn), hãy viết thư tới địa chỉ liên hệ. Bạn sẽ nhận được câu trả lời trong vòng một tháng.",
+      "rights_cnil": "Nếu bạn cho rằng quyền của mình không được tôn trọng, bạn có thể khiếu nại tới CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) hoặc tới cơ quan bảo vệ dữ liệu của quốc gia bạn.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Điều khoản sử dụng",
+      "intro": "Các điều khoản này áp dụng cho máy chủ chính thức (caissa.scacelith.com) và các trang tài khoản của trang web này. Việc tạo tài khoản hoặc chơi trên máy chủ chính thức đồng nghĩa với việc chấp nhận các điều khoản này.",
+      "service": "<strong>Dịch vụ miễn phí.</strong> Trò chơi là phần mềm tự do, miễn phí. Máy chủ chính thức được cung cấp miễn phí và theo hiện trạng, không đảm bảo tính sẵn sàng: máy chủ có thể thay đổi, tạm ngừng một thời gian hoặc đóng cửa.",
+      "account": "<strong>Tài khoản của bạn.</strong> Bạn chịu trách nhiệm về những gì được thực hiện với tài khoản và về việc giữ bí mật mật khẩu. Hãy viết thư ngay tới địa chỉ liên hệ nếu bạn cho rằng có người khác đang sử dụng tài khoản của bạn.",
+      "username": "<strong>Tên người dùng của bạn</strong> được công khai: tên này không được mang tính xúc phạm hoặc thù ghét, mạo danh người khác hoặc tiết lộ dữ liệu cá nhân của bất kỳ ai.",
+      "fair": "<strong>Chơi công bằng.</strong> Trong ván tính điểm, không được nhận trợ giúp từ chương trình cờ, từ người khác hay từ bất kỳ công cụ nào khác. Không được dùng phần mềm trò chơi đã bị chỉnh sửa, gửi thông điệp giả mạo hoặc cố ý làm quá tải máy chủ.",
+      "conduct": "<strong>Chơi hết ván cờ.</strong> Bỏ dở hoặc hủy ván cờ, hoặc bỏ lỡ ván cờ đã được ghép cho bạn, ba lần trong 24 giờ sẽ khiến việc ghép đối thủ cho ván tính điểm bị tạm dừng một thời gian.",
+      "reports": "<strong>Báo cáo</strong> phải được thực hiện một cách thiện chí. Để báo cáo một người chơi hoặc nội dung bất hợp pháp, chẳng hạn một tên người dùng mang tính xúc phạm, hãy dùng nút báo cáo của ván cờ hoặc viết thư tới địa chỉ liên hệ.",
+      "sanctions": "<strong>Xử phạt.</strong> Vi phạm các quy định này có thể dẫn đến bị xử thua, bị cảnh cáo, bị cấm và bị xóa khỏi bảng xếp hạng; số điểm bị mất vào tay kẻ gian lận sẽ được hoàn lại cho các đối thủ của người đó. Chỉ bằng chứng gian lận chắc chắn mới bị xử phạt tự động; mọi trường hợp khác đều do một con người quyết định. Bạn có thể khiếu nại về một hình thức xử phạt qua địa chỉ liên hệ.",
+      "liability": "<strong>Trách nhiệm.</strong> Trong giới hạn pháp luật cho phép, người phát hành không chịu trách nhiệm về việc dịch vụ bị gián đoạn hoặc việc mất ván cờ, hệ số Elo hay dữ liệu.",
+      "end": "<strong>Chấm dứt.</strong> Bạn có thể xóa tài khoản bất cứ lúc nào. Tài khoản vi phạm các điều khoản này có thể bị cấm.",
+      "changes": "<strong>Thay đổi.</strong> Các điều khoản này có thể thay đổi; ngày ở đầu trang này cho biết phiên bản hiện hành, và việc tiếp tục chơi sau khi có thay đổi đồng nghĩa với việc chấp nhận thay đổi đó.",
+      "law": "<strong>Luật áp dụng.</strong> Các điều khoản này chịu sự điều chỉnh của pháp luật Pháp. Trong trường hợp có tranh chấp, trước tiên hãy viết thư tới địa chỉ liên hệ để cùng tìm giải pháp."
+    },
+    "version_note": "Trang này có ở nhiều ngôn ngữ; nếu các bản có khác biệt, bản tiếng Pháp được ưu tiên áp dụng."
+  }
+}
