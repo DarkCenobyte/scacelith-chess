@@ -44,7 +44,7 @@ TEST(i18n_lang_files_match_english) {
         CHECK(!ref.count(kv.first));
         ref[kv.first] = kv.second;
     }
-    CHECK_EQ(int(i18n::languages().size()), 10);
+    CHECK_EQ(int(i18n::languages().size()), 34);
     for (const i18n::Language& lang : i18n::languages()) {
         std::string path = std::string("assets/i18n/") + lang.code + ".lang";
         CHECK(embedded::find(path.c_str()) != nullptr);
@@ -159,7 +159,8 @@ TEST(i18n_devices_signed_out_note_is_about_another_device) {
 }
 
 // Every language names the five pieces of its scoresheet notation with distinct letters that cannot be
-// read as a file (a-h), a capture (x) or castling (O), and writes the date with day, month and year once each.
+// read as a file (a-h), a capture (x) or castling (O; Estonian's bishop aside), and writes the date with day,
+// month and year once each.
 TEST(i18n_scoresheet_pieces_and_date) {
     for (const i18n::Language& lang : i18n::languages()) {
         std::string path = std::string("assets/i18n/") + lang.code + ".lang";
@@ -180,8 +181,12 @@ TEST(i18n_scoresheet_pieces_and_date) {
         if (letters.size() != 5) std::fprintf(stderr, "  %s: scoresheet.pieces needs 5 letters\n", lang.code);
         CHECK_EQ(int(letters.size()), 5);
         CHECK_EQ(int(std::set<std::string>(letters.begin(), letters.end()).size()), int(letters.size()));
-        for (const std::string& l : letters) {
-            bool clash = l.size() == 1 && std::string("abcdefghxO").find(l[0]) != std::string::npos;
+        for (size_t i = 0; i < letters.size(); ++i) {
+            const std::string& l = letters[i];
+            // Estonian books write the bishop (oda) O: a bishop move has its square right after the letter
+            // ("Oc4"), castling a hyphen ("O-O"), so the sheet keeps the letter its players know.
+            const bool estonianBishop = std::string(lang.code) == "et" && i == 3 && l == "O";
+            bool clash = !estonianBishop && l.size() == 1 && std::string("abcdefghxO").find(l[0]) != std::string::npos;
             if (clash) std::fprintf(stderr, "  %s: piece letter %s reads as a square or move\n", lang.code, l.c_str());
             CHECK(!clash);
         }
@@ -661,9 +666,22 @@ TEST(unicode_devanagari_precomposed_syllables) {
 
 // Every syllable of the Hindi texts (UI, coach subtitles, opening names) is drawn right: either a
 // precomposed glyph of the fonts, or letters the fonts draw side by side (a consonant or vowel with
-// spacing vowel signs only). tools/prepare_fonts.py must be run again when this fails.
+// spacing vowel signs only, or a syllable prepare_fonts.py found the fonts draw right as plain glyphs:
+// the "- " lines of devanagari-clusters.txt). tools/prepare_fonts.py must be run again when this fails.
 TEST(devanagari_clusters_cover_the_hindi_texts) {
     i18n::tr("menu.play");
+    std::set<std::u32string> drawnPlain;
+    {
+        const std::string list = embedded::text("assets/fonts/devanagari-clusters.txt");
+        size_t pos = 0;
+        while (pos < list.size()) {
+            size_t end = list.find('\n', pos);
+            if (end == std::string::npos) end = list.size();
+            if (list.compare(pos, 2, "- ") == 0) drawnPlain.insert(uni::decode(list.substr(pos + 2, end - pos - 2)));
+            pos = end + 1;
+        }
+    }
+    CHECK(!drawnPlain.empty());
     auto plain = [](const std::u32string& syl) {
         for (size_t i = 1; i < syl.size(); ++i) {
             const char32_t c = syl[i];
@@ -693,7 +711,7 @@ TEST(devanagari_clusters_cover_the_hindi_texts) {
             ++texts;
             for (const auto& s : uni::devanagariSyllables(v)) {
                 const std::u32string syl = v.substr(size_t(s.first), size_t(s.second - s.first));
-                if (syl.size() < 2 || plain(syl) || uni::devanagariCluster(syl)) continue;
+                if (syl.size() < 2 || plain(syl) || uni::devanagariCluster(syl) || drawnPlain.count(syl)) continue;
                 if (++missing <= 10) std::fprintf(stderr, "  %s: syllable \"%s\" has no precomposed glyph\n", path.c_str(), uni::encode(syl).c_str());
             }
         }

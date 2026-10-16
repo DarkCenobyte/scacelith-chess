@@ -739,8 +739,23 @@ TEST(openings_lang_files_match_english) {
                 CHECK(false);
             }
         }
+        // A language may add its own forms of a name (opening.family.<id>.<form>, with its .spoken), which
+        // only its own lines use; any other key English lacks is a mistake.
+        auto ownForm = [&](std::string k) {
+            if (k.size() > 7 && k.compare(k.size() - 7, 7, ".spoken") == 0) k.resize(k.size() - 7);
+            const size_t dot = k.rfind('.');
+            if (dot == std::string::npos || !en.count(k.substr(0, dot))) return false;
+            const std::string base = k.substr(0, dot), form = k.substr(dot + 1);
+            // base must be a name's own key: opening.family.<id> or opening.variation.<id>
+            if (base.rfind("opening.family.", 0) != 0 && base.rfind("opening.variation.", 0) != 0) return false;
+            if (std::count(base.begin(), base.end(), '.') != 2) return false;
+            if (form.empty() || form == "def" || form == "beginner" || form == "advanced") return false;
+            for (char ch : form)
+                if (!((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') || ch == '_')) return false;
+            return true;
+        };
         for (const auto& kv : got)
-            if (!en.count(kv.first)) {
+            if (!en.count(kv.first) && !ownForm(kv.first)) {
                 std::fprintf(stderr, "  %s: extra key %s\n", code.c_str(), kv.first.c_str());
                 CHECK(false);
             }
@@ -757,7 +772,8 @@ TEST(openings_every_name_and_form_in_every_language) {
             if (kv.first.rfind("opening.say.", 0) == 0)
                 for (const std::string& p : placeholders(kv.second, false)) {
                     const size_t c = p.find(':');
-                    if (c != std::string::npos && p.substr(c + 1) != "nom") forms.insert(p.substr(c + 1));
+                    // {n:ord} is a form of the move number (count.ord of the speech catalog), not of a name.
+                    if (c != std::string::npos && p.substr(0, c) != "n" && p.substr(c + 1) != "nom") forms.insert(p.substr(c + 1));
                 }
         CHECK(lang != "en" || forms.count("def") == 1);
         for (const OpeningFamily& f : b.families()) {
