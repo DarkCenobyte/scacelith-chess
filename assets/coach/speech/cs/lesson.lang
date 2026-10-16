@@ -223,7 +223,7 @@ lesson.ep.gone = Příležitost je pryč: mimochodem se dá brát jen hned. Zkus
 lesson.ep.ok = Braní mimochodem! Můj pěšec z pole {sq} mizí.
 
 # ---- Chapter 7: promotion -------------------------------------------------------------------------------------
-lesson.promo.what = Když pěšec dojde na poslední řadu, promění se: stane se z něj dáma, věž, střelec, nebo jezdec.
+lesson.promo.what = Když pěšec dojde na poslední řadu, promění se: stane se z něj dáma, věž, střelec nebo jezdec.
 lesson.promo.ask = Skoro vždycky si vyber dámu. A teď pěšce proměň!
 lesson.promo.under = To je povolené! Ale dáma je silnější. Vybereme dámu.
 lesson.promo.under_ok = Dobře. Většina hráčů si ale vybírá dámu.
@@ -251,7 +251,7 @@ lesson.talk.press = Po svém tahu stiskneš hodiny stejnou rukou. Tím se spust�
 lesson.talk.flag = Když ti dojde čas, prohraješ, ledaže bych ti vůbec nemohl dát mat.
 lesson.talk.increment = Pět plus tři znamená pět minut pro každého a k tomu tři sekundy po každém tahu.
 # The time controls as in assets/i18n/cs.lang (tc.blitz, tc.rapid, tc.classical: Blitz, Rapid, Klasické).
-lesson.talk.speeds = Krátkým partiím se říká blitz, delším rapid a nejdelším klasické partie.
+lesson.talk.speeds = Krátké partie se nazývají blitz, delší rapid a nejdelší klasické.
 lesson.talk.no_clock = Se mnou hodiny neběží. Na přemýšlení si vezmi tolik času, kolik potřebuješ.
 lesson.talk.touch = Ve skutečné partii platí: když se dotkneš své figury, musíš s ní táhnout.
 lesson.talk.touch_mine = Když se dotkneš mé figury, musíš ji vzít, pokud to jde.

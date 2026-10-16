@@ -51,9 +51,9 @@ an.mate_allowed.2 = Teď vede {reply:nomate} k vynucenému matu {m:ord_ins} tahe
 an.fork = Teď {reply} dává vidličku na {t1:acc} a {t2:acc}.
 an.fork.2 = Připouští tah {reply}, který napadne {t1:acc} i {t2:acc} najednou.
 an.fork.3 = {reply} napadá současně {t1:acc} i {t2:acc}.
-an.hanging = Nechává {piece:acc} bez krytí a {reply} {piece:pron_acc} sebere.
+an.hanging = Nechává {piece:acc} bez krytí a tah {reply} {piece:pron_acc} sebere.
 an.hanging.2 = {piece} zůstává bez obránce: získá {piece:pron_acc} tah {reply}.
-an.hanging.3 = {reply} prostě bere {piece:acc}, kter{piece:adj} neměl{piece:past} obránce.
+an.hanging.3 = Po {reply} prostě padne {piece}, kter{piece:adj} neměl{piece:past} obránce.
 an.material = Odpověď {line} získá {pts:point} materiálu.
 an.material.2 = Pak {line} získá {pts:point}.
 
@@ -92,7 +92,7 @@ an.only.best.2 = Přesná hra: {move} je mnohem silnější než všechno ostatn
 
 # ---- Smaller remarks, in quiet moments -------------------------------------------------------------
 an.inaccuracy = {move} je drobná nepřesnost: přesnější byl tah {best}.
-an.inaccuracy.2 = Ne zcela nejlepší: {best} byl přesnější tah než {move}.
+an.inaccuracy.2 = Ne zcela nejlepší: tah {best} byl přesnější než {move}.
 an.interesting = {move} je zajímavý nápad, který nabízí {piece:acc}.
 an.interesting.2 = Zajímavý pokus: {move} obětuje {piece:acc}.
 

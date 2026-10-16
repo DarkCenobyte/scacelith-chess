@@ -1,0 +1,148 @@
+# Coach speech (Polish): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("twoja wieża", "mój skoczek"),
+# with the forms of common.lang ({my:acc}, {my:gen}, {my:pron_acc}, {my:its}, {your:refl_gen},
+# {your:bare_ins}, {your:y} ...); {sq}, {sq2}, {to}, {esc} = squares ("na {sq}", "z pola {sq}": never
+# "z" / "ze" right before a square); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach
+# points at something while saying the word right after the mark. A ".spoken" key is what the voice
+# says instead (here: file letters spelled for the voice).
+# Rules the lines follow: no second-person past tense or conditional and no adjective about the player
+# (their gender varies): "Twój hetman poszedł za...", "pozycja była wygrana"; "swój" when the player
+# acts with their own piece ("Użyj {your:refl_gen}"). Files = kolumny, ranks = rzędy, back rank =
+# ostatnia linia; en passant = bicie w przelocie (Polish never says "en passant").
+
+# ---- Chapter titles (said inside "Kontynuujemy: {chapter}.") ------------------------------------
+# Nominative, lower case (see event.lesson.* in events.lang).
+lesson.title.welcome = szachownica
+lesson.title.pieces = jak poruszają się bierki
+lesson.title.safety = bezpieczne i niebezpieczne bicia
+lesson.title.check = szach
+lesson.title.mate = mat
+lesson.title.castling = roszada
+lesson.title.en_passant = bicie w przelocie
+lesson.title.promotion = promocja
+lesson.title.draws = pat i remisy
+lesson.title.etiquette = ranking, zegar i dobre obyczaje w prawdziwych partiach
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Teraz spróbuj ty.
+lesson.now_you.2 = Teraz twoja kolej.
+lesson.now_you.3 = Teraz ty.
+# Another wrong move after the demonstration.
+lesson.almost = Prawie! Zagraj ruch, który ci pokazałem.
+lesson.almost.2 = Nie całkiem. Spróbuj ruchu, który zademonstrowałem.
+lesson.almost.3 = Blisko. Przypomnij sobie, co przed chwilą pokazałem.
+# A wrong move without a line of its own.
+lesson.try_again = To nie to. Spróbuj jeszcze raz.
+lesson.try_again.2 = Nie ten ruch. Spróbuj ponownie.
+lesson.try_again.3 = Spróbujmy jeszcze raz.
+lesson.use_your = Użyj {your:refl_gen}.
+lesson.use_your.2 = Spróbuj {your:bare_ins}.
+lesson.watch = Patrz.
+lesson.like_this = Właśnie tak.
+lesson.and_back = I z powrotem.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Szach, ale mój król ucieka na {esc}.
+lesson.check_takes = Szach, ale mój król po prostu zbija {your:acc}.
+lesson.check_block = Szach, ale mogę zasłonić się bierką.
+lesson.stalemate = Pat! Mój król nie może się ruszyć i nie jest pod szachem. Remis, choć pozycja była wygrana!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Nie na {sq}: to pole atakuje {my}. Król nigdy nie wchodzi na atakowane pole.
+why.PathBlocked = Coś stoi na {@}drodze: bierki nie przeskakują innych, z wyjątkiem skoczka.
+why.WrongGeometry = {your} tak się nie porusza.
+why.MustAnswerCheck = Jesteś pod {@}szachem: najpierw musisz się przed nim obronić.
+why.CastlingThroughCheck = Twój król przeszedłby przez {sq}, a to pole atakuje {my}.
+why.CastlingNoRights = Ten król albo ta wieża już się ruszały: roszada jest niemożliwa.
+why.CastlingBlocked = Do roszady pola między królem a wieżą muszą być puste.
+why.CastlingOutOfCheck = Pod szachem nie można zrobić roszady.
+why.PawnForwardBlocked = Pionki nie biją prosto do przodu: to pole jest {@}zablokowane.
+why.LeavesKingInCheck = {your} jest związan{your:y}: ten ruch wystawiłby twojego króla na atak {my:gen}.
+why.OwnPieceOnTarget = Nie możesz stanąć na polu zajętym przez własną bierkę.
+why.PawnCaptureNeedsVictim = Pionek idzie na ukos tylko wtedy, gdy bije.
+why.EnPassantExpired = Bicie w przelocie jest możliwe tylko zaraz po ruchu pionka o dwa pola.
+why.NotYourTurn = Zaczekaj: teraz mój ruch.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Cześć! Jestem twoim trenerem. Poznajmy razem zasady szachów, małymi krokami.
+lesson.welcome.board = To jest szachownica: sześćdziesiąt cztery pola, jasne i ciemne, osiem rzędów po osiem.
+lesson.welcome.light = Narożne pole po twojej {@}prawej stronie jest zawsze jasne. Zapamiętaj: jasne po prawej.
+lesson.welcome.files = Pionowe linie to kolumny. Oznaczamy je literami, od {@}a do {@2}h.
+lesson.welcome.files.spoken = Pionowe linie to kolumny. Oznaczamy je literami, od {@}a do {@2}ha.
+lesson.welcome.ranks = Poziome linie to rzędy. Mają numery od {@}jednego do {@2}ośmiu, licząc od twojej strony.
+lesson.welcome.square = Każde pole nazywamy jego literą, a potem numerem. To jest pole {sq}.
+lesson.welcome.square2 = A to jest pole {sq}.
+lesson.welcome.kings = Oto dwa króle. Twój stoi na {sq}, mój na {sq2}.
+lesson.welcome.ask = Twoja kolej: przesuń króla o jedno pole do przodu, na {sq}.
+lesson.welcome.wrong = To jest {to}. Chodzi o {sq}: litera e, cyfra dwa.
+lesson.welcome.ok = Świetnie. Twój król stoi na {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = To jest {your}. Porusza się po liniach prostych, wzdłuż kolumn i rzędów, na dowolną odległość.
+lesson.rook.lines = W górę kolumny {@}albo wzdłuż rzędu.
+lesson.rook.capture = Bijąc, bierka staje na polu {@}bierki przeciwnika, a tamta schodzi z szachownicy.
+lesson.rook.ask = Zbij {my:acc} wieżą!
+lesson.rook.short = Dobry kierunek! Idź dalej w górę kolumny, aż do {my:gen}.
+lesson.rook.rank = To ruch wzdłuż rzędu. {my} stoi wyżej, na kolumnie.
+lesson.rook.king = To twój król. Użyj {your:refl_gen} z rogu szachownicy.
+lesson.rook.ok = Jest! {my} schodzi z szachownicy.
+# Pieces don't jump
+lesson.jump.blocked = Bierki nie przeskakują nad innymi. Twój pionek na {sq} zagradza wieży drogę.
+lesson.jump.knight = Skakać potrafi tylko skoczek. Wkrótce go poznamy.
+# Bishop
+lesson.bishop.intro = To jest {your}. Porusza się po przekątnych, na dowolną odległość.
+lesson.bishop.colour = Goniec zawsze zostaje na polach tego samego koloru.
+lesson.bishop.ask = {my} stoi na tej przekątnej. Zbij {my:pron_acc}!
+lesson.bishop.short = Dobra przekątna! Idź dalej, aż dojdziesz do {my:gen}.
+lesson.bishop.other = To druga przekątna. Patrz w stronę {my:gen}.
+lesson.bishop.ok = Doskonale. Gońce uwielbiają długie przekątne.
+# Queen
+lesson.queen.intro = To jest {your}, najsilniejsza bierka. Porusza się jak wieża i goniec razem.
+lesson.queen.ask = Znajdź {my:acc} i zbij {my:pron_acc} hetmanem.
+lesson.queen.wrong = Twój hetman może dojść do {my:gen} jednym ruchem, po przekątnej.
+lesson.queen.ok = Brawo! Pilnuj swojego hetmana: jest dużo wart.
+# King
+lesson.king.intro = Król porusza się tylko o jedno pole, w dowolnym kierunku.
+lesson.king.important = Król to najważniejsza bierka. Jeśli wpadnie w pułapkę, partia jest przegrana.
+lesson.king.ask = Król też może bić. Zbij {my:acc}!
+lesson.king.wrong = Twój król stoi tuż obok {my:gen}. Wejdź na {my:its} pole, żeby {my:pron_acc} zbić.
+lesson.king.ok = Dobrze! Król jest powolny, ale z bliska silny.
+# Knight
+lesson.knight.intro = To jest {your}. Porusza się w kształcie litery L: dwa pola prosto, potem jedno w bok.
+lesson.knight.l = O, {@}tak. Skoczek zawsze ląduje na polu innego koloru.
+lesson.knight.jump = Skoczek to jedyna bierka, która potrafi przeskakiwać nad innymi.
+lesson.knight.ask = Zbij {my:acc} skoczkiem!
+lesson.knight.wrong = To prawidłowy ruch skoczka, ale nie dochodzi do {my:gen}. Spróbuj innego „L”.
+lesson.knight.ok = Świetny skok!
+# Pawn: moving
+lesson.pawn.intro = Teraz {your}. Porusza się prosto do przodu, o jedno pole, i nigdy do tyłu.
+lesson.pawn.first = W swoim pierwszym ruchu pionek może pójść o jedno albo o dwa pola.
+lesson.pawn.ask = Przesuń pionka o dwa pola do przodu.
+lesson.pawn.one = To tylko jedno pole: tak wolno, ale tym razem idź o dwa.
+lesson.pawn.use = Użyj pionka.
+lesson.pawn.ok = Dobrze.
+# Pawn: capturing
+lesson.pawncap.blocked = Mój pionek blokuje twojego. Pionki nie biją prosto do przodu.
+lesson.pawncap.diagonal = Za to pionek bije na ukos, o jedno pole do przodu.
+lesson.pawncap.ask = Zbij {my:acc} pionkiem.
+lesson.pawncap.use = Użyj {your:refl_gen}: bije na ukos do przodu.
+lesson.pawncap.ok = Tak! Prosto, żeby iść, na ukos, żeby bić.
+# Values, set-up and the first moves
+lesson.values.pawn = Każda bierka ma wartość w punktach. Pionek jest wart jeden punkt.
+lesson.values.pieces = Skoczek albo {@}goniec – trzy. {@2}Wieża – pięć. {@3}Hetman – dziewięć.
+lesson.values.king = Król jest bezcenny: nigdy nie wolno go oddać.
+lesson.values.trade = Staraj się nigdy nie oddawać bierki za mniej, niż jest warta.
+lesson.setup.corners = Każda partia zaczyna się tak: wieże w {@}rogach, obok nich {@2}skoczki, potem {@3}gońce.
+lesson.setup.queen = Hetman stoi na polu swojego koloru: twój hetman stoi na jasnym polu.
+lesson.setup.king = Obok niego stoi król. Białe zawsze zaczynają.
+lesson.first.ask = Zacznij partię: przesuń pionka sprzed króla o dwa pola, na {sq}.
+lesson.first.wrong = To też prawidłowy ruch! Ale na razie zagraj, proszę, pionkiem sprzed króla na {sq}.
+lesson.first.ok = Świetny pierwszy ruch: otwiera drogę twojemu hetmanowi i gońcowi.
+lesson.first.reply = Odpowiadam tak samo. Teraz wyprowadź skoczka: skocz z pola {sq} na pole {sq2}.
+lesson.first.knight_wrong = Skoczki przeskakują nad pionkami. Spróbuj z pola {sq} na pole {sq2}.
+lesson.first.knight_ok = Doskonale. Skoczki i gońce wyprowadza się wcześnie.

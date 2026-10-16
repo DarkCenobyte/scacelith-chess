@@ -210,3 +210,197 @@ ex.dubious.b1 = Ten ruch jest wątpliwy. Może zagrasz lepiej?
 ex.dubious.b1.2 = Ten ruch jest wątpliwy. Może znajdziesz lepszy?
 ex.dubious.b2 = Wątpliwy ruch. Może zagrasz lepiej?
 ex.dubious.b2.2 = Ten ruch jest wątpliwy. Może jest coś lepszego?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Potem {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} idzie na {sq}.
+demo.my.move.2 = Idę {my:bare_ins} na {sq}.
+demo.my.move.3 = Potem {my} przechodzi na {sq}.
+demo.my.take = Biję {your:acc}.
+demo.my.take.2 = {my} bije {your:acc}.
+demo.my.take.3 = I zbijam {your:acc}.
+demo.my.check = {my} idzie na {sq}. Szach.
+demo.my.check.2 = Szach: {my} na {sq}.
+demo.my.check.3 = {my} na {sq}, szach!
+demo.my.mate = {my} idzie na {sq}. Mat.
+demo.my.mate.2 = I {my} na {sq} daje mata.
+demo.my.mate.3 = {my} na {sq}. To mat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Najpierw {my} bije {your:acc}. {t1} poczeka.
+demo.my.first.take.2 = {my} najpierw bije {your:acc}. {t1} nigdzie nie ucieknie.
+demo.my.first.check = {my} bije {your:acc} i jest szach! {t1} poczeka.
+demo.my.first.check.2 = Najpierw {my} bije {your:acc} z szachem. {t1} nigdzie nie ucieknie.
+demo.my.first.check_move = Najpierw szach: {my} na {sq}. {t1} poczeka.
+demo.my.first.check_move.2 = {my} idzie na {sq}: najpierw szach! {t1} nigdzie nie ucieknie.
+demo.my.first.move = Najpierw {my} idzie na {sq}. {t1} poczeka.
+demo.my.first.move.2 = Najpierw {my} na {sq}. {t1} nigdzie nie ucieknie.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} jest pod atakiem, więc najpierw bije {your:acc}.
+demo.my.first.attacked.2 = {my} jest pod atakiem: najpierw zgarnia {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Najpierw {move}: {t1} poczeka.
+demo.first.2 = Najpierw {move}. {t1} nigdzie nie ucieknie.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Teraz wykonuję swój ruch.
+demo.play_on.2 = A oto mój prawdziwy ruch.
+demo.play_on.3 = A teraz gram już naprawdę.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Przesuwasz {your:refl_acc} na {sq}.
+demo.your.move.2 = Powiedzmy, że {your} idzie na {sq}.
+demo.your.move.3 = Potem {your} idzie na {sq}.
+demo.your.take = Bijesz {my:acc}.
+demo.your.take.2 = Bijesz {my:acc} {your:refl_ins}.
+demo.your.take.3 = Potem zbijasz {my:acc}.
+demo.your.back = Odbijasz.
+demo.your.back.2 = Odbijasz na {sq}.
+demo.your.back.3 = I odbijasz.
+demo.your.king = Twój król musi się ruszyć.
+demo.your.king.2 = Król musi ustąpić na {sq}.
+demo.your.king.3 = Twój król ucieka na {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Teraz {t1:gen} nie da się już uratować.
+ex.point.piece.2 = I {t1} przepada.
+ex.point.piece.3 = Zaraz padnie {t1}.
+ex.point.two = {t1} i {t2} są pod atakiem: jedna z tych bierek padnie.
+ex.point.two.2 = Teraz atakuję {t1:acc} i {t2:acc}. Obu nie uratujesz.
+ex.point.mate = A teraz {reply:nomate} daje mata.
+ex.point.mate.2 = Dalej {reply:nomate} i to jest mat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Widzisz? Teraz masz o {pts:point_acc} mniej.
+ex.result.b1.2 = Tak właśnie tracisz {pts:point_acc}.
+ex.result.b2 = W sumie tracisz {pts:point_acc}.
+ex.result.b2.2 = Teraz brakuje ci {pts:point_gen}.
+ex.result.b3 = To kosztuje cię {pts:point_acc}.
+ex.result.b3.2 = Ostatecznie masz o {pts:point_acc} mniej.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Możesz coś odbić, ale i tak masz o {pts:point_acc} mniej.
+ex.result_back.b1.2 = Możesz trochę odzyskać, ale i tak tracisz {pts:point_acc}.
+ex.result_back.b2 = Część możesz odzyskać, ale i tak brakuje ci {pts:point_gen}.
+ex.result_back.b2.2 = Nawet po odbiciu tracisz {pts:point_acc}.
+ex.result_back.b3 = Nawet po twoim odbiciu masz o {pts:point_acc} mniej.
+ex.result_back.b3.2 = Coś odzyskujesz, ale i tak kosztuje cię to {pts:point_acc}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Jeśli {your2} odbije, {my} zbije {your:acc}.
+ex.retake.b1.2 = Nie możesz odbić {your2:refl_ins}: wtedy {my} zbije {your:acc}.
+ex.retake.b2 = Jeśli {your2} odbije, {my} zbije {your:acc}.
+ex.retake.b2.2 = Odbicie {your2:ins} nie działa: {my} bije {your:acc}.
+ex.retake.b3 = Jeśli odbijesz ruchem {move}, to {reply} bije {your:acc}.
+ex.retake.b3.2 = Odbicie {move} nie wychodzi: {reply} bije {your:acc}.
+ex.retake.b4 = Na {move} jest odpowiedź {reply}, która bije {your:acc}.
+ex.retake.b4.2 = A jeśli {move}, to {reply} bije {your:acc}.
+ex.retake.b5 = Odbicie {move} napotyka {reply} i {your} pada.
+ex.retake.b5.2 = {move} nie przechodzi z powodu {reply}: {your} pada.
+ex.retake.b6 = {move}? {reply} bije {your:acc}.
+ex.retake.b6.2 = {move} nie przechodzi: {reply} bije {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = A tu, na {sq}, zyskujesz nowego hetmana.
+demo.promote.2 = Potem {your} dochodzi do pola {sq} i zamienia się w hetmana.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Uważaj: {my} może pójść na {sq}, a to jest mat.
+ex.mate_allowed.b1.2 = Teraz {my} może pójść na {sq}. To byłby mat!
+ex.mate_allowed.b1.3 = Ostrożnie! Jeśli {my} pójdzie na {sq}, będzie mat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Ten ruch pozwala mi dać mata {your:dat} w {m:move_loc}.
+ex.mate_allowed.b2.2 = Teraz mogę dać mata {your:dat} w {m:move_loc}. Patrz.
+ex.mate_allowed.b2.3 = Uwaga! {your} jest w niebezpieczeństwie: mat w {m:move_loc}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = To dopuszcza mata w {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.2 = Teraz mam mata w {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.3 = Twój król dostaje mata: {line:nomate}.
+ex.mate_allowed.b4 = {move} dopuszcza forsownego mata: {line:nomate}.
+ex.mate_allowed.b4.2 = Ten ruch prowadzi do mata w {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b4.3 = Po {move} następuje mat: {line:nomate}.
+ex.mate_allowed.b5 = {move} dopuszcza forsownego mata w {m:move_loc}.
+ex.mate_allowed.b5.2 = To prowadzi do mata w {m:move_loc}.
+ex.mate_allowed.b5.3 = Teraz jest forsowny mat w {m:move_loc}.
+ex.mate_allowed.b6 = Mat w {m:loc}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = Po {line:nomate} jest mat.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Popatrz: {your} nie ma już dokąd uciec.
+ex.mate_allowed.tail.b1.2 = Widzisz? {your} jest pod atakiem i nie może uciec.
+ex.mate_allowed.tail.b1.3 = {your} nie ma gdzie się ruszyć. To mat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Ten motyw nazywa się {text}.
+ex.mate_allowed.pattern.2 = Zapamiętaj ten motyw: to {text}.
+ex.mate_allowed.tip.b3 = Przed każdym ruchem sprawdź, czy twój król jest nadal bezpieczny.
+ex.mate_allowed.tip.b3.2 = Zawsze się zastanów: „Czy po moim ruchu mój król może dostać mata?”
+
+# Nominative noun phrases (said after "to" and "nazywa się").
+name.pattern.back_rank = mat na ostatniej linii
+name.pattern.smothered = mat zduszony
+name.pattern.support = mat chronionym hetmanem
+name.pattern.ladder = mat liniowy
+name.pattern.epaulette = mat epoletowy
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Ruchem {best:nomate} można było dać mata {my:dat}!
+ex.mate_missed.b1.2 = Ruch {best:nomate} dawał mata! {my} nie {my:could}by uciec.
+ex.mate_missed.b1.3 = Popatrz! Ruch {best:nomate} dałby mata {my:dat}.
+ex.mate_missed.b2 = Tu był mat w {m:move_loc}, zaczynający się od {best:nomate}.
+ex.mate_missed.b2.2 = Ruch {best:nomate} dawał mata w {m:move_loc}!
+ex.mate_missed.b2.3 = Ruchem {best:nomate} można było dać mi mata.
+ex.mate_missed.b3 = Umknął ci mat w {m:move_loc}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} daje mata w {m:move_loc}: {line:nomate}.
+ex.mate_missed.b3.3 = Był mat w {m:move_loc}, zaczynający się od {best:nomate}.
+ex.mate_missed.b4 = Przegapiony mat: {line:nomate}, zaczynając od {best:nomate}.
+ex.mate_missed.b4.2 = Ruch {best:nomate} wymuszał mata w {m:move_loc}.
+ex.mate_missed.b4.3 = Był mat w {m:move_loc}: {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} daje mata w {m:move_loc}: {line:nomate}.
+ex.mate_missed.b5.2 = Przegapiony mat w {m:move_loc}, od ruchu {best:nomate}.
+ex.mate_missed.b5.3 = Był forsowny mat: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} matuje: {line:nomate}.
+ex.mate_missed.b6.2 = Mat w {m:loc}, od ruchu {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat w {m:loc}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Szybszy był ruch {best:nomate}: mat w {m:move_loc}.
+ex.mate_delayed.b5.2 = Ruch {best:nomate} matował szybciej, w {m:move_loc}.
+ex.mate_delayed.b6 = {best:nomate} matuje w {m:loc}.
+ex.mate_delayed.b6.2 = Szybciej: {best:nomate}, mat w {m:loc}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = O nie! {my} nie może się ruszyć i nie ma szacha. To pat, czyli remis.
+ex.stalemate.b1.2 = Popatrz: {my} nie ma bezpiecznego pola, ale nie ma też szacha. Remis!
+ex.stalemate.b1.3 = To pat. {my} nie może się ruszyć, więc partia kończy się remisem.
+ex.stalemate.b2 = Pat! {my} nie ma żadnego dozwolonego ruchu, a szacha nie ma. Remis.
+ex.stalemate.b2.2 = O nie, pat: {my} utkn{my:al}, ale nie ma szacha.
+ex.stalemate.b2.3 = To remis przez pata. {my} nie może się ruszyć.
+ex.stalemate.b3 = To pat: {my} nie ma dozwolonego ruchu. A pozycja była wygrana!
+ex.stalemate.b3.2 = Pat! {my} utkn{my:al} i wygrana partia kończy się remisem.
+ex.stalemate.b3.3 = {my} nie ma ruchu, a szacha nie ma: pat.
+ex.stalemate.b4 = Pat: {my} nie ma dozwolonego ruchu. Wygrana przepada.
+ex.stalemate.b4.2 = Po {move} {my} jest w pacie. Remis w wygranej pozycji.
+ex.stalemate.b4.3 = To pat; {my} jest w potrzasku.
+ex.stalemate.b5 = Po {move} {my} jest w pacie. Wygrana przepadła.
+ex.stalemate.b5.2 = Pat: {my} nie ma pól.
+ex.stalemate.b5.3 = To pat, {my} utkn{my:al}.
+ex.stalemate.b6 = Pat. {my} nie ma ruchów.
+ex.stalemate.b6.2 = {move}, pat: {my} w potrzasku.
+ex.stalemate.b6.3 = Pat; {my} nie może się ruszyć.
+ex.stalemate.tip.b1 = Kiedy wygrywasz, zawsze zostaw mojemu królowi wolne pole.
+ex.stalemate.tip.b1.2 = Pamiętaj: kiedy masz przewagę, daj mojemu królowi trochę miejsca.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Uwaga! Mogę oddać swoje bierki, a wtedy {my} zostaje bez ruchu: pat.
+ex.stalemate_trick.b1.2 = Uważaj: {my} prawie nie może się ruszyć. Mogę doprowadzić do remisu.
+ex.stalemate_trick.b2 = Uwaga: mogę coś poświęcić i {my} będzie w pacie.
+ex.stalemate_trick.b2.2 = {my} nie ma prawie żadnych pól. Mogę wymusić pata!
+ex.stalemate_trick.b3 = To pozwala mi uratować się patem: {my} nie ma już ruchów.
+ex.stalemate_trick.b3.2 = Uwaga: {my} jest w pacie po {line}.
+ex.stalemate_trick.b4 = {move} pozwala na pułapkę patową: {line} i {my} nie może się ruszyć.
+ex.stalemate_trick.b4.2 = Teraz {my} może się schować w pacie: {line}.
+ex.stalemate_trick.b5 = {move} dopuszcza pata: {line}; {my} jest w potrzasku.
+ex.stalemate_trick.b5.2 = Pułapka patowa: {line} i {my} nie ma ruchów.
+ex.stalemate_trick.b6 = {line}, pat: {my} w potrzasku.
+ex.stalemate_trick.b6.2 = Pat po {line}; {my} bez ruchu.

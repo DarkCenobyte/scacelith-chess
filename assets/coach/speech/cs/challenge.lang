@@ -12,9 +12,9 @@
 #   {sq}     a square ("pole {sq}": never v/s/z/k right before it); the coach points at it on that word
 # The player always has the white pieces. The coach says "ty" to the player and is male
 # ("odpověděl bych"); the player's gender is unknown: no past tense or adjective about the player.
-# The challenge names are those of assets/i18n/cs.lang (challenge.<id>.name), said with the coach's
-# "ty" where the menu has the formal imperative ("Najděte únik" -> "Najdi únik", "Zastavte pěšce" ->
-# "Zastav pěšce"); the written "Mat 1. tahem" titles have a ".spoken" line with the ordinal in words.
+# The challenge names are exactly those of assets/i18n/cs.lang (challenge.<id>.name); a name in the
+# menu's formal imperative is quoted as a title ("Výzva „Najděte únik“."), so the coach's "ty" stays
+# intact; the written "Mat 1. tahem" titles have a ".spoken" line with the ordinal in words.
 
 # ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
 ch.intro.mate1 = Mat 1. tahem. {n:position} a v každé dá mat jediný tah. Prověř každý šach.
@@ -36,12 +36,12 @@ ch.intro.trapped = Chycené figury. {n:position}: jedna z mých figur nemá kam 
 ch.intro.promotion = Proměna. {n:position}, kde partii rozhodne daleko postoupený pěšec.
 ch.intro.quiet = Tiché tahy. {n:position}: vítězný tah není šach ani braní.
 ch.intro.opening = Pasti v zahájení. {n:position} z prvních tahů skutečných partií. Potrestej moji chybu.
-ch.intro.escape = Najdi únik. {n:position}: tvůj král je v nebezpečí a zachrání ho jen jeden tah.
+ch.intro.escape = Výzva „Najděte únik“. {n:position}: tvůj král je v nebezpečí a zachrání ho jen jeden tah.
 ch.intro.defend = Obranné tahy. {n:position}: najdi ten jediný tah, který udrží tvou pozici pohromadě.
 ch.intro.kq = Dáma a král proti králi. {n:position}: dej mat mému králi. Pozor na pat.
 ch.intro.kr = Věž a král proti králi. {n:position}: dej mat mému králi, krok za krokem.
-ch.intro.kp = Král a pěšec proti králi. {n:position}: udělej si novou dámu. Král musí jít pěšci napřed.
-ch.intro.kp_hold = Zastav pěšce. {n:position}: máš jen krále. Udrž remízu.
+ch.intro.kp = Král a pěšec proti králi. {n:position}: udělej si novou dámu. Pěšce veď králem.
+ch.intro.kp_hold = Výzva „Zastavte pěšce“. {n:position}: máš jen krále. Udrž remízu.
 ch.intro.rook = Věžové koncovky. {n:position}: postav most k proměně a udrž remízu Philidorovou obranou.
 ch.intro.endgame = Taktika v koncovce. {n:position} s několika málo figurami a ostrými nápady.
 

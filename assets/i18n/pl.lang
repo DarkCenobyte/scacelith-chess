@@ -1,0 +1,251 @@
+# Scacelith - Polski
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1)|few (2-4, 22-24, 32-34...)|many (0, 5-21, 25-31...).
+# Register: informal "ty", as Polish system software uses. Buttons and commands in the imperative
+# ("Zapisz", "Cofnij ruch"), status messages impersonal or as nouns ("Zapisano partię").
+# The player's and the opponent's gender is unknown: no second-person past tense, no adjective or
+# participle agreeing with a person; present tense, impersonal forms or nouns instead.
+# Terms follow the Polish glossary (partia, bierka, sędzia, tempo gry, blankiet, remis na żądanie).
+# Titles are written in capitals (the title face is an inscriptional capital face).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Włączone
+common.off = Wyłączone
+common.back = Wstecz
+common.apply = Zastosuj
+common.discard = Odrzuć
+common.cancel = Anuluj
+common.white = Białe
+common.black = Czarne
+common.main_menu = Menu główne
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Królewska gra
+menu.new_game = Nowa partia
+menu.options = Opcje
+menu.credits = Autorzy
+menu.quit = Wyjdź
+menu.version = Wersja {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPCJE
+options.tab.display = Ekran
+options.tab.graphics = Grafika
+options.tab.audio = Dźwięk
+options.tab.gameplay = Rozgrywka
+options.tab.player = Gracz
+options.tab.controls = Sterowanie
+options.pending = Zmiany zaczną działać po zastosowaniu.
+options.unsaved.title = NIEZAPISANE ZMIANY
+options.unsaved.text = Niektóre opcje zostały zmienione. Zastosować je przed wyjściem?
+
+options.language = Język
+options.language.help = Język menu i komunikatów. Zmienia się od razu.
+options.display_mode = Tryb wyświetlania
+options.display_mode.help = Pełny ekran: okno bez ramki na cały ekran, w rozdzielczości pulpitu. W oknie: okno o rozmiarze ustawionym poniżej.
+options.fullscreen = Pełny ekran
+options.windowed = W oknie
+options.window_size = Rozmiar okna
+options.window_size.help = Rozmiar okna w trybie okienkowym. Pełny ekran zawsze używa rozdzielczości pulpitu.
+options.vsync = Synchronizacja pionowa
+options.vsync.help = Synchronizuje klatki z odświeżaniem ekranu, aby uniknąć rozrywania obrazu.
+options.render_scale = Skala renderowania
+options.render_scale.help = Wewnętrzna rozdzielczość obrazu 3D. Niższa jest szybsza, wyższa – ostrzejsza.
+
+options.quality = Jakość
+options.quality.very_low = Bardzo niska
+options.quality.low = Niska
+options.quality.medium = Średnia
+options.quality.high = Wysoka
+options.quality.ultra = Ultra
+options.quality.custom = Własna
+options.quality.help = Ustawia naraz wszystkie opcje poniżej: „Bardzo niska” wyłącza wszystkie efekty, „Ultra” ustawia je wszystkie na maksimum. Zmiana pojedynczej opcji przełącza na „Własna”. Na słabszej karcie graficznej bardzo pomaga też obniżenie skali renderowania (Ekran).
+options.shadows = Cienie
+options.shadows.help = Szczegółowość cieni rzucanych przez słońce i miękkość ich krawędzi. Niska: zwykłe, twarde krawędzie, szybkie w rysowaniu.
+options.reflections = Odbicia
+options.reflections.help = Podłoga, stół i szachownica odbijają salę (dla każdej z tych powierzchni sala jest rysowana jeszcze raz: to jedna z najbardziej wymagających opcji); od poziomu „Średnia” błyszczące bierki i przedmioty też odbijają swoje otoczenie.
+options.ambient_occlusion = Okluzja otoczenia
+options.ambient_occlusion.help = Miękkie cieniowanie w miejscach styku przedmiotów i we wgłębieniach, do których dociera mniej światła.
+options.indirect_light = Światło pośrednie
+options.indirect_light.help = Światło dzienne odbite od ścian, podłogi i sufitu. Niska: zamiast niego równomierne światło otoczenia. Wpływa głównie na czas wczytywania.
+options.volumetric_light = Smugi światła
+options.volumetric_light.help = Promienie słońca w zakurzonym powietrzu sali i połyskujące w nich drobinki kurzu.
+options.tessellation = Teselacja
+options.tessellation.help = Gładkie kontury na krzywiznach bierek oglądanych z bliska.
+options.tessellation.unavailable = Niedostępne: ten sterownik grafiki nie obsługuje teselacji.
+options.antialiasing = Wygładzanie krawędzi
+options.antialiasing.help = Wygładza poszarpane krawędzie i migoczące odblaski. Wyłączone: obraz ostrzejszy, ale z ząbkami, a niektóre efekty wyglądają ziarniście.
+options.depth_of_field = Głębia ostrości
+options.depth_of_field.help = Rozmywa to, co leży daleko przed lub za tym, na co patrzysz, tak jak obiektyw aparatu.
+options.motion_blur = Rozmycie ruchu
+options.motion_blur.help = Rozmywa szybkie ruchy kamery i ramion, tak jak kamera filmowa.
+options.bloom = Poświata
+options.bloom.help = Delikatna poświata wokół najjaśniejszych odblasków, jak w obiektywie aparatu.
+options.brightness = Jasność
+options.brightness.neutral = Neutralna
+options.brightness.value = {0} EV
+options.brightness.help = Korekcja ekspozycji kamery. Kalibracja przy pierwszym uruchomieniu ustawia ją tak, aby najciemniejsze cienie były ledwo widoczne.
+
+options.master_volume = Głośność ogólna
+options.effects = Efekty
+options.ambience = Dźwięki otoczenia
+options.ambience.help = Odgłosy sali: trzask ognia, odległe kroki, stary zegar.
+options.ambience_volume = Głośność otoczenia
+options.voice_volume = Głośność głosu
+options.voice_volume.help = Głośność głosu trenera w trybie „Trener”.
+options.subtitles = Napisy
+options.subtitles.auto = Automatycznie
+options.subtitles.help = Słowa trenera wyświetlane u dołu ekranu. Automatycznie: widoczne, gdy trener nie mówi w języku menu (przy chińskim menu mówi po angielsku). Zawsze widoczne, gdy jego głos nie jest zainstalowany.
+
+options.legal_moves = Pokazuj dozwolone ruchy
+options.legal_moves.help = Podświetla pola, na które może przejść dotknięta bierka. Gdy ta opcja jest wyłączona, nic nie podpowiada, czy ruch jest dozwolony: za nieprawidłowy ruch sędzia ukarze cię, gdy tylko naciśniesz zegar.
+options.coordinates = Współrzędne szachownicy
+options.auto_press = Automatyczne naciskanie zegara
+options.auto_press.help = Twój robot sam naciska zegar, gdy tylko twój ruch jest na szachownicy. W partiach online decyduje serwer, a w grze bezpośredniej – gospodarz gry.
+options.thinking_time = Realistyczny czas namysłu
+options.thinking_time.help = Przeciwnik zastanawia się nad ruchem jak żywy gracz, zamiast grać natychmiast.
+options.ignore_head = Ignoruj ruchy głowy przeciwnika
+options.ignore_head.help = W partiach online i w grze bezpośredniej robot przeciwnika patrzy tam, gdzie patrzy jego gracz. Gdy ta opcja jest włączona, robot sam porusza głową, jak w grze ze Stockfishem.
+options.mouse_sensitivity = Czułość myszy
+options.invert_look = Odwróć oś pionową
+options.handover = Zmiana gracza
+options.handover.cut = Natychmiastowa
+options.handover.flight = Przelot, {0} s
+options.handover.help = Dwóch graczy przy jednym komputerze: jak po każdym ruchu widok przechodzi z oczu jednego gracza do oczu drugiego. Natychmiastowa zmiana pomija ruch kamery.
+options.game_cursor = Kursor gry
+options.game_cursor.help = Przy stole gra rysuje własny kursor, który pokazuje, co zrobi kliknięcie. Wyłączone: zwykła strzałka systemowa.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Imię
+player.name.help = Twoje imię wpisywane u góry blankietów, w dowolnym alfabecie.
+player.default_name = Człowiek
+player.handwriting = Charakter pisma
+player.handwriting.help = Pismo, którym zapisywane są twoje ruchy. Arabski, japoński i chiński mają własny charakter pisma.
+player.preview = NA TWOIM BLANKIECIE
+hand.caveat = Swobodny
+hand.marck = Kaligraficzny
+hand.badscript = Pochyły
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Lewy przycisk myszy
+controls.touch = Dotknij bierki, a potem ją przestaw
+controls.clock.keys = Spacja  lub  kliknięcie zegara
+controls.clock = Naciśnij zegar
+controls.look.keys = Prawy przycisk, przytrzymaj
+controls.look = Rozejrzyj się
+controls.sheet.keys = S
+controls.sheet = Spójrz na swój blankiet i z powrotem
+controls.stand.keys = ↑
+controls.stand = Wstań przed swoim krzesłem
+controls.side.keys = ←  /  →
+controls.side = Stań przy lewym / prawym końcu stołu
+controls.sit.keys = ↓
+controls.sit = Usiądź z powrotem (grać można tylko na siedząco)
+controls.moves.keys = Tab
+controls.moves = Pokaż lub ukryj listę ruchów
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Spacja
+controls.coach_skip = Trener: pomiń to, co mówi trener
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Trener: cofnij ruch, gdy trener to zaproponuje
+controls.coach_hint.keys = H
+controls.coach_hint = Wyzwania trenera: poproś o podpowiedź
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = JASNOŚĆ
+calibration.text = Przesuwaj suwak, aż skoczek na czarnym polu będzie ledwo widoczny albo zupełnie zniknie.
+calibration.later = Możesz to zmienić później w menu Opcje > Grafika.
+calibration.continue = Dalej
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOWA PARTIA
+newgame.opponent = PRZECIWNIK
+newgame.time_control = TEMPO GRY
+newgame.start = Rozpocznij
+newgame.elo = ~{0} Elo
+newgame.you_white = Zagrasz białymi.
+newgame.you_black = Zagrasz czarnymi.
+newgame.colour_lot = W pierwszej partii kolory zostaną rozlosowane.
+newgame.colour_alternate = Potem kolory zmieniają się w każdej kolejnej partii.
+newgame.opponent_kind = Przeciwnik
+newgame.opponent_kind.help = Graj ze Stockfishem albo ze znajomym siedzącym przy tym komputerze: gracie na zmianę, każdy ze swojej strony szachownicy.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Człowiek, ten sam PC
+
+# Custom opponent: Stockfish parameters
+engine.skill = Poziom umiejętności
+engine.skill.help = „Skill Level” Stockfisha (0–20). Ignorowany, gdy siła jest ograniczona przez Elo.
+engine.limit_elo = Ogranicz siłę (Elo)
+engine.limit_elo.help = UCI_LimitStrength: silnik dąży do rankingu Elo ustawionego poniżej.
+engine.elo = Elo
+engine.depth = Głębokość przeszukiwania
+engine.plies = {0} półruch|{0} półruchy|{0} półruchów
+engine.move_time = Czas na ruch
+engine.nodes = Limit węzłów
+engine.no_limit = Bez limitu
+engine.thousand = {0} tys.
+engine.million = {0} mln
+engine.dynamic_elo = Dynamiczne Elo zależne od czasu
+engine.dynamic_elo.help = Jak żywy gracz, Stockfish gra słabiej, gdy kończy mu się czas: trochę słabiej w ostatniej minucie (wcześniej w partiach szybkich i blitzach), dużo słabiej w niedoczasie. Tylko w partiach z zegarem.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish zastanawia się nad ruchem jak człowiek na jego poziomie. Aby pominąć tę pauzę: Opcje > Rozgrywka > Realistyczny czas namysłu.
+engine.pace.instant = Stockfish gra, gdy tylko skończy obliczenia. Aby robił przerwy jak człowiek: Opcje > Rozgrywka > Realistyczny czas namysłu.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Bez limitu
+tc.no_clock = Bez zegara
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Szybkie
+tc.classical = Klasyczne
+tc.custom = Własne
+tc.your_own = Do wyboru
+tc.base_time = Czas podstawowy
+tc.base_time.help = Początkowy czas każdego gracza na zegarze (minuty : sekundy).
+tc.increment = Dodatek
+tc.increment.help = Dodatek Fischera doliczany po każdym ruchu.
+tc.delay = Opóźnienie
+tc.delay.help = Opóźnienie Bronsteina: czas zużyty w granicach tego opóźnienia jest zwracany po każdym ruchu.
+tc.no_delay = Brak
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, opóźnienie {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+# The presets are masculine nouns ("Nowicjusz", "Mistrz"): their descriptions avoid past tenses.
+preset.novice.name = Nowicjusz
+preset.novice.desc = Zna dopiero ruchy bierek: podstawia bierki i nie widzi prostych groźb.
+preset.beginner.name = Początkujący
+preset.beginner.desc = Zna podstawy, ale wciąż regularnie podstawia materiał.
+preset.casual.name = Amator
+preset.casual.desc = Rywal na spokojny wieczór: rozsądne ruchy, częste błędy.
+preset.club_player.name = Gracz klubowy
+preset.club_player.desc = Solidny gracz klubowy, który karze za oczywiste podstawki.
+preset.advanced.name = Zaawansowany
+preset.advanced.desc = Silny gracz klubowy z dobrym wyczuciem taktycznym.
+preset.expert.name = Ekspert
+preset.expert.desc = Doświadczony turniejowiec: rzadko się myli, wykorzystuje przewagę.
+preset.master.name = Mistrz
+preset.master.desc = Siła mistrzowska: głębokie liczenie wariantów i subtelna gra pozycyjna.
+preset.grandmaster.name = Arcymistrz
+preset.grandmaster.desc = Poziom arcymistrzowski: niezwykle trudny do pokonania.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 z pełną siłą. Powodzenia.
+preset.custom.name = Własny
+preset.custom.desc = Twoje własne ustawienia silnika.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = AUTORZY
+credits.game.head = SCACELITH
+credits.game = Partia szachów w królewskiej sali, na własnym silniku OpenGL 4.6.
+credits.engine.head = SILNIK SZACHOWY
+credits.engine = Stockfish 19, dzieło twórców Stockfisha.
+credits.engine.licence = Licencja GNU General Public License v3.
+credits.engine.data = Jego sieć neuronowa została wytrenowana na danych udostępnionych przez projekt Leela Chess Zero na licencji Open Database License (ODbL).
+credits.voice.head = GŁOS TRENERA

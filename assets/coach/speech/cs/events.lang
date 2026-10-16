@@ -11,8 +11,8 @@ event.greet.l1 = Ahoj! Zahrajeme si přátelskou partii. Kdykoli se něco pokaz�
 event.greet.l1.2 = Zdravím tě! Budu hrát zlehka a ukážu ti, na co si dávat pozor.
 event.greet.l1.3 = Vítej! Nespěchej: řeknu ti, když bude některá figura v nebezpečí.
 event.greet.l2 = Ahoj! Pojďme hrát. Jakmile se objeví vidlička nebo vazba, ukážu ti ji.
-event.greet.l2.2 = Zdravím tě! Vyvíjej figury a drž krále v bezpečí. Cestou ti budu pomáhat.
-event.greet.l2.3 = Vítej zpátky u šachovnice! Hlídej vidličky a vazby: ty vyhrávají partie.
+event.greet.l2.2 = Zdravím tě! Vyvíjej figury a drž krále v bezpečí. Průběžně ti budu pomáhat.
+event.greet.l2.3 = Vítej zpátky u šachovnice! Hlídej vidličky a vazby: díky nim se vyhrávají partie.
 event.greet.l3 = Ahoj! Zahrajeme si opravdovou partii. Budu komentovat tvoje plány a větší chyby.
 event.greet.l3.2 = Zdravím tě! Promysli si plán pro své figury. Řeknu ti, když ti v tahu něco unikne.
 event.greet.l3.3 = Hrajme! Ukážu ti jediné tahy a upozorním tě na tahy, které nevycházejí.
@@ -62,7 +62,7 @@ event.takeback.taken.2 = Dobrý nápad. Podívej se na to ještě jednou.
 event.takeback.taken.3 = Tah jde zpátky. Zkus to znovu.
 # The player declined the offer and played on.
 event.takeback.declined = Dobře, hrajeme dál.
-event.takeback.declined.2 = Platí, partie pokračuje.
+event.takeback.declined.2 = Tak dobře, partie pokračuje.
 event.takeback.declined.3 = Jak chceš. Pokračujeme.
 # After an explanation without an offer.
 event.play_on = Hrajme dál.
@@ -71,7 +71,7 @@ event.play_on.3 = A teď zpátky k naší partii.
 
 # ---- Encouragement -------------------------------------------------------------------------------------
 # After the player's mistake has been explained (never mocking; praise the process, not the person).
-event.encourage.mistake = Takové chyby dělá každý. Hlavní je naučit se jich všímat.
+event.encourage.mistake = Takové chyby dělá každý. Hlavní je si jich všímat.
 event.encourage.mistake.2 = Nic si z toho nedělej. Podívej se, co napadá můj poslední tah, a přijdeš na to.
 event.encourage.mistake.3 = To se stává každému hráči. Pokračujme.
 # The player is behind (material or evaluation).
