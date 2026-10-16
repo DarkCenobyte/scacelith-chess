@@ -9,9 +9,12 @@
 # or as the subject. In "declined" / "accepted" White's opening is always a gambit (dámský / královský gambit,
 # masculine inanimate, accusative = nominative), and "ho" refers back to it.
 # Composed lichess names (opening.compose.*): Czech names a variation after a person with a possessive
-# adjective whose ending agrees with the noun ("Steinitzova varianta", "Steinitzův gambit", "Steinitzovo
-# zahájení"), so the eponyms' "gen" form in the names fragment holds the stem those endings attach to
-# ("Steinitz", "Capablanc"), and only eponyms compose (compose_proper_names = false).
+# adjective that agrees with the noun ("Steinitzova varianta", "Steinitzův gambit"), or with the invariant
+# genitive for names in -y/-i and adjectival names ("Rétiho", "Morphyho", "Kieseritzkého gambit"). So in the
+# names fragment an eponym's "nom" is its feminine form ("Steinitzova", "Rétiho") and its "gen" its masculine
+# form ("Steinitzův", "Rétiho"); every compose noun is feminine ({X}: varianta, obrana, past, "hra" for Opening)
+# or masculine ({X:gen}: útok, gambit, systém...), never neuter. Only eponyms compose (compose_proper_names =
+# false).
 # Squares as "e4"; files as "sloupec c" and pawns as "pěšec d" (the file_pattern of the fragment spells those
 # letters out; a pawn letter is never "a", the conjunction); pieces in words, no piece letters.
 
@@ -74,7 +77,7 @@ opening.family.four_knights.advanced = Symetrické, vyrovnané zahájení: bíl�
 opening.family.english.beginner = Bílý začíná pěšcem c a kontroluje d5 ze strany: pružné zahájení, ve kterém se o centrum bojuje figurami.
 opening.family.english.advanced = Anglické zahájení často přechází do her dámským pěšcem; jeho vlastní varianty přinášejí manévrování s fianchettem, tlak na d5 a hru na dámském křídle.
 opening.family.zukertort.beginner = Královský jezdec vyjde jako první a hlídá centrum, aniž by se bílý zatím rozhodl, kam postaví pěšce.
-opening.family.zukertort.advanced = Nástroj pořadí tahů: může přejít do Rétiho, anglického či katalánského zahájení nebo do dámského gambitu a přitom obejít některé obrany černého.
+opening.family.zukertort.advanced = Hra s pořadím tahů: může přejít do Rétiho, anglického či katalánského zahájení nebo do dámského gambitu a přitom obejít některé obrany černého.
 opening.family.queens_gambit.beginner = Bílý nabízí pěšce c, aby odlákal černého pěšce z centra; není to skutečná oběť, protože bílý ho obvykle získá zpět.
 opening.family.queens_gambit.advanced = Tah c4 útočí na opěrný bod d5: černý ho buď udrží, jako v odmítnutém gambitu nebo ve slovanské obraně, nebo se ho vzdá za volný vývin, jako v přijatém gambitu.
 opening.family.qgd.beginner = Černý drží pěšce na d5 a podpírá ho tahem e6: velmi solidní, ale bělopolnému střelci je třeba věnovat pozornost.

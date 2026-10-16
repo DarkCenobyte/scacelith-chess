@@ -29,7 +29,8 @@
    "lv",
    "sk",
    "cs",
-   "lt"
+   "lt",
+   "vi"
   ],
   "fields": {
    "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
@@ -215,6 +216,10 @@
     "lt": {
      "name": "Karaliaus pėstininko debiutas",
      "def": "karaliaus pėstininko debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Tốt Vua",
+     "def": "Khai cuộc Tốt Vua"
     }
    },
    "comment": {
@@ -374,6 +379,10 @@
     "lt": {
      "name": "Valdovės pėstininko debiutas",
      "def": "valdovės pėstininko debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Tốt Hậu",
+     "def": "Khai cuộc Tốt Hậu"
     }
    },
    "comment": {
@@ -530,6 +539,10 @@
     "lt": {
      "name": "Karaliaus žirgo debiutas",
      "def": "karaliaus žirgo debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Mã Vua",
+     "def": "Khai cuộc Mã Vua"
     }
    },
    "comment": {
@@ -689,6 +702,10 @@
     "lt": {
      "name": "Sicilijos gynyba",
      "def": "Sicilijos gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Sicilia",
+     "def": "Phòng thủ Sicilia"
     }
    },
    "comment": {
@@ -845,6 +862,10 @@
     "lt": {
      "name": "Prancūzų gynyba",
      "def": "prancūzų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Pháp",
+     "def": "Phòng thủ Pháp"
     }
    },
    "comment": {
@@ -1001,6 +1022,10 @@
     "lt": {
      "name": "Karo-Kano gynyba",
      "def": "Karo-Kano gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Caro-Kann",
+     "def": "Phòng thủ Caro-Kann"
     }
    },
    "comment": {
@@ -1157,6 +1182,10 @@
     "lt": {
      "name": "Skandinavų gynyba",
      "def": "skandinavų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Scandinavia",
+     "def": "Phòng thủ Scandinavia"
     }
    },
    "comment": {
@@ -1313,6 +1342,10 @@
     "lt": {
      "name": "Italų partija",
      "def": "italų partija"
+    },
+    "vi": {
+     "name": "Khai cuộc Ý",
+     "def": "Khai cuộc Ý"
     }
    },
    "comment": {
@@ -1469,6 +1502,10 @@
     "lt": {
      "name": "Ispanų partija",
      "def": "ispanų partija"
+    },
+    "vi": {
+     "name": "Khai cuộc Tây Ban Nha",
+     "def": "Khai cuộc Tây Ban Nha"
     }
    },
    "comment": {
@@ -1625,6 +1662,10 @@
     "lt": {
      "name": "Škotų partija",
      "def": "škotų partija"
+    },
+    "vi": {
+     "name": "Khai cuộc Scotland",
+     "def": "Khai cuộc Scotland"
     }
    },
    "comment": {
@@ -1781,6 +1822,10 @@
     "lt": {
      "name": "Filidoro gynyba",
      "def": "Filidoro gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Philidor",
+     "def": "Phòng thủ Philidor"
     }
    },
    "comment": {
@@ -1937,6 +1982,10 @@
     "lt": {
      "name": "Rusų partija",
      "def": "rusų partija"
+    },
+    "vi": {
+     "name": "Phòng thủ Petrov",
+     "def": "Phòng thủ Petrov"
     }
    },
    "comment": {
@@ -2094,6 +2143,10 @@
     "lt": {
      "name": "Keturių žirgų partija",
      "def": "keturių žirgų partija"
+    },
+    "vi": {
+     "name": "Khai cuộc bốn Mã",
+     "def": "Khai cuộc bốn Mã"
     }
    },
    "comment": {
@@ -2251,6 +2304,10 @@
     "lt": {
      "name": "Anglų debiutas",
      "def": "anglų debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Anh",
+     "def": "Khai cuộc Anh"
     }
    },
    "comment": {
@@ -2407,6 +2464,10 @@
     "lt": {
      "name": "Cukertorto debiutas",
      "def": "Cukertorto debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Zukertort",
+     "def": "Khai cuộc Zukertort"
     }
    },
    "comment": {
@@ -2568,6 +2629,10 @@
     "lt": {
      "name": "Valdovės gambitas",
      "def": "valdovės gambitas"
+    },
+    "vi": {
+     "name": "Gambit Hậu",
+     "def": "Gambit Hậu"
     }
    },
    "comment": {
@@ -2724,6 +2789,10 @@
     "lt": {
      "name": "Nepriimtas valdovės gambitas",
      "def": "nepriimtas valdovės gambitas"
+    },
+    "vi": {
+     "name": "Gambit Hậu từ chối",
+     "def": "Gambit Hậu từ chối"
     }
    },
    "comment": {
@@ -2880,6 +2949,10 @@
     "lt": {
      "name": "Priimtas valdovės gambitas",
      "def": "priimtas valdovės gambitas"
+    },
+    "vi": {
+     "name": "Gambit Hậu chấp nhận",
+     "def": "Gambit Hậu chấp nhận"
     }
    },
    "comment": {
@@ -3037,6 +3110,10 @@
     "lt": {
      "name": "Slavų gynyba",
      "def": "slavų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Slav",
+     "def": "Phòng thủ Slav"
     }
    },
    "comment": {
@@ -3194,6 +3271,10 @@
     "lt": {
      "name": "Pusiau slavų gynyba",
      "def": "pusiau slavų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ bán Slav",
+     "def": "Phòng thủ bán Slav"
     }
    },
    "comment": {
@@ -3351,6 +3432,10 @@
     "lt": {
      "name": "Indų gynyba",
      "def": "indų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Ấn Độ",
+     "def": "Phòng thủ Ấn Độ"
     }
    },
    "comment": {
@@ -3507,6 +3592,10 @@
     "lt": {
      "name": "Karaliaus indų gynyba",
      "def": "karaliaus indų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Ấn Độ của Vua",
+     "def": "Phòng thủ Ấn Độ của Vua"
     }
    },
    "comment": {
@@ -3668,6 +3757,10 @@
     "lt": {
      "name": "Londono sistema",
      "def": "Londono sistema"
+    },
+    "vi": {
+     "name": "Hệ thống London",
+     "def": "Hệ thống London"
     }
    },
    "comment": {
@@ -3826,6 +3919,10 @@
     "lt": {
      "name": "Šiuolaikinė gynyba",
      "def": "šiuolaikinė gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ hiện đại",
+     "def": "Phòng thủ hiện đại"
     }
    },
    "comment": {
@@ -3984,6 +4081,10 @@
     "lt": {
      "name": "Pirco gynyba",
      "def": "Pirco gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Pirc",
+     "def": "Phòng thủ Pirc"
     }
    },
    "comment": {
@@ -4141,6 +4242,10 @@
     "lt": {
      "name": "Vienos partija",
      "def": "Vienos partija"
+    },
+    "vi": {
+     "name": "Khai cuộc Vienna",
+     "def": "Khai cuộc Vienna"
     }
    },
    "comment": {
@@ -4297,6 +4402,10 @@
     "lt": {
      "name": "Rikio debiutas",
      "def": "rikio debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Tượng",
+     "def": "Khai cuộc Tượng"
     }
    },
    "comment": {
@@ -4453,6 +4562,10 @@
     "lt": {
      "name": "Aliochino gynyba",
      "def": "Aliochino gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Alekhine",
+     "def": "Phòng thủ Alekhine"
     }
    },
    "comment": {
@@ -4609,6 +4722,10 @@
     "lt": {
      "name": "Karaliaus gambitas",
      "def": "karaliaus gambitas"
+    },
+    "vi": {
+     "name": "Gambit Vua",
+     "def": "Gambit Vua"
     }
    },
    "comment": {
@@ -4765,6 +4882,10 @@
     "lt": {
      "name": "Priimtas karaliaus gambitas",
      "def": "priimtas karaliaus gambitas"
+    },
+    "vi": {
+     "name": "Gambit Vua chấp nhận",
+     "def": "Gambit Vua chấp nhận"
     }
    },
    "comment": {
@@ -4921,6 +5042,10 @@
     "lt": {
      "name": "Nepriimtas karaliaus gambitas",
      "def": "nepriimtas karaliaus gambitas"
+    },
+    "vi": {
+     "name": "Gambit Vua từ chối",
+     "def": "Gambit Vua từ chối"
     }
    },
    "comment": {
@@ -5077,6 +5202,10 @@
     "lt": {
      "name": "Nimcovičiaus gynyba",
      "def": "Nimcovičiaus gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Nimzowitsch",
+     "def": "Phòng thủ Nimzowitsch"
     }
    },
    "comment": {
@@ -5238,6 +5367,10 @@
     "lt": {
      "name": "Oveno gynyba",
      "def": "Oveno gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Owen",
+     "def": "Phòng thủ Owen"
     }
    },
    "comment": {
@@ -5395,6 +5528,10 @@
     "lt": {
      "name": "Horvico gynyba",
      "def": "Horvico gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Horwitz",
+     "def": "Phòng thủ Horwitz"
     }
    },
    "comment": {
@@ -5551,6 +5688,10 @@
     "lt": {
      "name": "Van Kruiso debiutas",
      "def": "van Kruiso debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Van't Kruijs",
+     "def": "Khai cuộc Van't Kruijs"
     }
    },
    "comment": {
@@ -5708,6 +5849,10 @@
     "lt": {
      "name": "Centrinis debiutas",
      "def": "centrinis debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc trung tâm",
+     "def": "Khai cuộc trung tâm"
     }
    },
    "comment": {
@@ -5865,6 +6010,10 @@
     "lt": {
      "name": "Englundo gambitas",
      "def": "Englundo gambitas"
+    },
+    "vi": {
+     "name": "Gambit Englund",
+     "def": "Gambit Englund"
     }
    },
    "comment": {
@@ -6021,6 +6170,10 @@
     "lt": {
      "name": "Olandų gynyba",
      "def": "olandų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Hà Lan",
+     "def": "Phòng thủ Hà Lan"
     }
    },
    "comment": {
@@ -6177,6 +6330,10 @@
     "lt": {
      "name": "Nimco-indų gynyba",
      "def": "Nimco-indų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Nimzo-Ấn Độ",
+     "def": "Phòng thủ Nimzo-Ấn Độ"
     }
    },
    "comment": {
@@ -6335,6 +6492,10 @@
     "lt": {
      "name": "Valdovės indų gynyba",
      "def": "valdovės indų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Ấn Độ của Hậu",
+     "def": "Phòng thủ Ấn Độ của Hậu"
     }
    },
    "comment": {
@@ -6492,6 +6653,10 @@
     "lt": {
      "name": "Griunfeldo gynyba",
      "def": "Griunfeldo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Grünfeld",
+     "def": "Phòng thủ Grünfeld"
     }
    },
    "comment": {
@@ -6648,6 +6813,10 @@
     "lt": {
      "name": "Katalonų debiutas",
      "def": "katalonų debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Catalan",
+     "def": "Khai cuộc Catalan"
     }
    },
    "comment": {
@@ -6804,6 +6973,10 @@
     "lt": {
      "name": "Benoni gynyba",
      "def": "Benoni gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Benoni",
+     "def": "Phòng thủ Benoni"
     }
    },
    "comment": {
@@ -6962,6 +7135,10 @@
     "lt": {
      "name": "Benko gambitas",
      "def": "Benko gambitas"
+    },
+    "vi": {
+     "name": "Gambit Benko",
+     "def": "Gambit Benko"
     }
    },
    "comment": {
@@ -7118,6 +7295,10 @@
     "lt": {
      "name": "Retio debiutas",
      "def": "Retio debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Réti",
+     "def": "Khai cuộc Réti"
     }
    },
    "comment": {
@@ -7274,6 +7455,10 @@
     "lt": {
      "name": "Karaliaus indų ataka",
      "def": "karaliaus indų ataka"
+    },
+    "vi": {
+     "name": "Tấn công Ấn Độ của Vua",
+     "def": "Tấn công Ấn Độ của Vua"
     }
    },
    "comment": {
@@ -7434,6 +7619,10 @@
     "lt": {
      "name": "Berdo debiutas",
      "def": "Berdo debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Bird",
+     "def": "Khai cuộc Bird"
     }
    },
    "comment": {
@@ -7590,6 +7779,10 @@
     "lt": {
      "name": "Poncianio debiutas",
      "def": "Poncianio debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Ponziani",
+     "def": "Khai cuộc Ponziani"
     }
    },
    "comment": {
@@ -7746,6 +7939,10 @@
     "lt": {
      "name": "Trijų žirgų partija",
      "def": "trijų žirgų partija"
+    },
+    "vi": {
+     "name": "Khai cuộc ba Mã",
+     "def": "Khai cuộc ba Mã"
     }
    },
    "comment": {
@@ -7904,6 +8101,10 @@
     "lt": {
      "name": "Danų gambitas",
      "def": "danų gambitas"
+    },
+    "vi": {
+     "name": "Gambit Đan Mạch",
+     "def": "Gambit Đan Mạch"
     }
    },
    "comment": {
@@ -8062,6 +8263,10 @@
     "lt": {
      "name": "Blekmaro-Dimerio gambitas",
      "def": "Blekmaro-Dimerio gambitas"
+    },
+    "vi": {
+     "name": "Gambit Blackmar-Diemer",
+     "def": "Gambit Blackmar-Diemer"
     }
    },
    "comment": {
@@ -8218,6 +8423,10 @@
     "lt": {
      "name": "Trompovskio ataka",
      "def": "Trompovskio ataka"
+    },
+    "vi": {
+     "name": "Tấn công Trompowsky",
+     "def": "Tấn công Trompowsky"
     }
    },
    "comment": {
@@ -8375,6 +8584,10 @@
     "lt": {
      "name": "Torės ataka",
      "def": "Torės ataka"
+    },
+    "vi": {
+     "name": "Tấn công Torre",
+     "def": "Tấn công Torre"
     }
    },
    "comment": {
@@ -8533,6 +8746,10 @@
     "lt": {
      "name": "Kolės sistema",
      "def": "Kolės sistema"
+    },
+    "vi": {
+     "name": "Hệ thống Colle",
+     "def": "Hệ thống Colle"
     }
    },
    "comment": {
@@ -8689,6 +8906,10 @@
     "lt": {
      "name": "Tarašo gynyba",
      "def": "Tarašo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Tarrasch",
+     "def": "Phòng thủ Tarrasch"
     }
    },
    "comment": {
@@ -8846,6 +9067,10 @@
     "lt": {
      "name": "Budapešto gambitas",
      "def": "Budapešto gambitas"
+    },
+    "vi": {
+     "name": "Gambit Budapest",
+     "def": "Gambit Budapest"
     }
    },
    "comment": {
@@ -9002,6 +9227,10 @@
     "lt": {
      "name": "Bogoliubovo gynyba",
      "def": "Bogoliubovo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Bogo-Ấn Độ",
+     "def": "Phòng thủ Bogo-Ấn Độ"
     }
    },
    "comment": {
@@ -9158,6 +9387,10 @@
     "lt": {
      "name": "Senoji indų gynyba",
      "def": "senoji indų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Ấn Độ cổ",
+     "def": "Phòng thủ Ấn Độ cổ"
     }
    },
    "comment": {
@@ -9319,6 +9552,10 @@
     "lt": {
      "name": "Čigorino gynyba",
      "def": "Čigorino gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Chigorin",
+     "def": "Phòng thủ Chigorin"
     }
    },
    "comment": {
@@ -9475,6 +9712,10 @@
     "lt": {
      "name": "Albino kontrgambitas",
      "def": "Albino kontrgambitas"
+    },
+    "vi": {
+     "name": "Phản gambit Albin",
+     "def": "Phản gambit Albin"
     }
    },
    "comment": {
@@ -9632,6 +9873,10 @@
     "lt": {
      "name": "Latvių gambitas",
      "def": "latvių gambitas"
+    },
+    "vi": {
+     "name": "Gambit Latvia",
+     "def": "Gambit Latvia"
     }
    },
    "comment": {
@@ -9788,6 +10033,10 @@
     "lt": {
      "name": "Dramblio gambitas",
      "def": "dramblio gambitas"
+    },
+    "vi": {
+     "name": "Gambit Voi",
+     "def": "Gambit Voi"
     }
    },
    "comment": {
@@ -9949,6 +10198,10 @@
     "lt": {
      "name": "Nimcovičiaus-Larseno debiutas",
      "def": "Nimcovičiaus-Larseno debiutas"
+    },
+    "vi": {
+     "name": "Tấn công Nimzo-Larsen",
+     "def": "Tấn công Nimzo-Larsen"
     }
    },
    "comment": {
@@ -10105,6 +10358,10 @@
     "lt": {
      "name": "Sokolskio debiutas",
      "def": "Sokolskio debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Ba Lan",
+     "def": "Khai cuộc Ba Lan"
     }
    },
    "comment": {
@@ -10261,6 +10518,10 @@
     "lt": {
      "name": "Grobo debiutas",
      "def": "Grobo debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Grob",
+     "def": "Khai cuộc Grob"
     }
    },
    "comment": {
@@ -10417,6 +10678,10 @@
     "lt": {
      "name": "Vengrų debiutas",
      "def": "vengrų debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Hungary",
+     "def": "Khai cuộc Hungary"
     }
    },
    "comment": {
@@ -10574,6 +10839,10 @@
     "lt": {
      "name": "Mizeso debiutas",
      "def": "Mizeso debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Mieses",
+     "def": "Khai cuộc Mieses"
     }
    },
    "comment": {
@@ -10730,6 +10999,10 @@
     "lt": {
      "name": "Saragosos debiutas",
      "def": "Saragosos debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Saragossa",
+     "def": "Khai cuộc Saragossa"
     }
    },
    "comment": {
@@ -10886,6 +11159,10 @@
     "lt": {
      "name": "Van Geto debiutas",
      "def": "van Geto debiutas"
+    },
+    "vi": {
+     "name": "Khai cuộc Van Geet",
+     "def": "Khai cuộc Van Geet"
     }
    },
    "comment": {
@@ -11042,6 +11319,10 @@
     "lt": {
      "name": "Džobavos Londono sistema",
      "def": "Džobavos Londono sistema"
+    },
+    "vi": {
+     "name": "Hệ thống London Jobava",
+     "def": "Hệ thống London Jobava"
     }
    },
    "comment": {
@@ -11198,6 +11479,10 @@
     "lt": {
      "name": "Akmeninės sienos ataka",
      "def": "akmeninės sienos ataka"
+    },
+    "vi": {
+     "name": "Tấn công Stonewall",
+     "def": "Tấn công Stonewall"
     }
    },
    "comment": {
@@ -11354,6 +11639,10 @@
     "lt": {
      "name": "Richterio-Veresovo ataka",
      "def": "Richterio-Veresovo ataka"
+    },
+    "vi": {
+     "name": "Tấn công Richter-Veresov",
+     "def": "Tấn công Richter-Veresov"
     }
    },
    "comment": {
@@ -11510,6 +11799,10 @@
     "lt": {
      "name": "Šventojo Jurgio gynyba",
      "def": "Šventojo Jurgio gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Thánh George",
+     "def": "Phòng thủ Thánh George"
     }
    },
    "comment": {
@@ -11666,6 +11959,10 @@
     "lt": {
      "name": "Borgo gynyba",
      "def": "Borgo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Borg",
+     "def": "Phòng thủ Borg"
     }
    },
    "comment": {
@@ -11822,6 +12119,10 @@
     "lt": {
      "name": "Hipopotamo gynyba",
      "def": "hipopotamo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Hà mã",
+     "def": "Phòng thủ Hà mã"
     }
    },
    "comment": {
@@ -11979,6 +12280,10 @@
     "lt": {
      "name": "Anglų gynyba",
      "def": "anglų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Anh",
+     "def": "Phòng thủ Anh"
     }
    },
    "comment": {
@@ -12135,6 +12440,10 @@
     "lt": {
      "name": "Pterodaktilio gynyba",
      "def": "pterodaktilio gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Thằn lằn bay",
+     "def": "Phòng thủ Thằn lằn bay"
     }
    },
    "comment": {
@@ -12291,6 +12600,10 @@
     "lt": {
      "name": "Bongklaudo ataka",
      "def": "Bongklaudo ataka"
+    },
+    "vi": {
+     "name": "Tấn công Bongcloud",
+     "def": "Tấn công Bongcloud"
     }
    },
    "comment": {
@@ -12419,6 +12732,10 @@
     "lt": {
      "name": "Atvirasis variantas",
      "def": "atvirasis variantas"
+    },
+    "vi": {
+     "name": "Sicilia mở",
+     "def": "Sicilia mở"
     }
    },
    "comment": {
@@ -12539,6 +12856,10 @@
     "lt": {
      "name": "Uždarasis variantas",
      "def": "uždarasis variantas"
+    },
+    "vi": {
+     "name": "Sicilia đóng",
+     "def": "Sicilia đóng"
     }
    },
    "comment": {
@@ -12659,6 +12980,10 @@
     "lt": {
      "name": "Alapino variantas",
      "def": "Alapino variantas"
+    },
+    "vi": {
+     "name": "Biến thể Alapin",
+     "def": "Biến thể Alapin"
     }
    },
    "comment": {
@@ -12781,6 +13106,10 @@
     "lt": {
      "name": "Smito-Moros gambitas",
      "def": "Smito-Moros gambitas"
+    },
+    "vi": {
+     "name": "Gambit Smith-Morra",
+     "def": "Gambit Smith-Morra"
     }
    },
    "comment": {
@@ -12900,8 +13229,12 @@
      "gender": "m"
     },
     "lt": {
-     "name": "Gran Pri ataka",
-     "def": "Gran Pri ataka"
+     "name": "Grand Prix ataka",
+     "def": "Grand Prix ataka"
+    },
+    "vi": {
+     "name": "Tấn công Grand Prix",
+     "def": "Tấn công Grand Prix"
     }
    },
    "comment": {
@@ -13022,6 +13355,10 @@
     "lt": {
      "name": "Rosolimo variantas",
      "def": "Rosolimo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Rossolimo",
+     "def": "Biến thể Rossolimo"
     }
    },
    "comment": {
@@ -13142,6 +13479,10 @@
     "lt": {
      "name": "Naidorfo variantas",
      "def": "Naidorfo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Najdorf",
+     "def": "Biến thể Najdorf"
     }
    },
    "comment": {
@@ -13262,6 +13603,10 @@
     "lt": {
      "name": "Drakono variantas",
      "def": "drakono variantas"
+    },
+    "vi": {
+     "name": "Biến thể Rồng",
+     "def": "Biến thể Rồng"
     }
    },
    "comment": {
@@ -13384,6 +13729,10 @@
     "lt": {
      "name": "Paspartintasis drakonas",
      "def": "paspartintasis drakonas"
+    },
+    "vi": {
+     "name": "Biến thể Rồng cấp tốc",
+     "def": "Biến thể Rồng cấp tốc"
     }
    },
    "comment": {
@@ -13504,6 +13853,10 @@
     "lt": {
      "name": "Ševeningeno variantas",
      "def": "Ševeningeno variantas"
+    },
+    "vi": {
+     "name": "Biến thể Scheveningen",
+     "def": "Biến thể Scheveningen"
     }
    },
    "comment": {
@@ -13624,6 +13977,10 @@
     "lt": {
      "name": "Svešnikovo variantas",
      "def": "Svešnikovo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Sveshnikov",
+     "def": "Biến thể Sveshnikov"
     }
    },
    "comment": {
@@ -13745,6 +14102,10 @@
     "lt": {
      "name": "Taimanovo variantas",
      "def": "Taimanovo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Taimanov",
+     "def": "Biến thể Taimanov"
     }
    },
    "comment": {
@@ -13865,6 +14226,10 @@
     "lt": {
      "name": "Kano variantas",
      "def": "Kano variantas"
+    },
+    "vi": {
+     "name": "Biến thể Kan",
+     "def": "Biến thể Kan"
     }
    },
    "comment": {
@@ -13985,6 +14350,10 @@
     "lt": {
      "name": "Klasikinis variantas",
      "def": "klasikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể cổ điển",
+     "def": "Biến thể cổ điển"
     }
    },
    "comment": {
@@ -14105,6 +14474,10 @@
     "lt": {
      "name": "Išstūmimo variantas",
      "def": "išstūmimo variantas"
+    },
+    "vi": {
+     "name": "Biến thể tiến Tốt",
+     "def": "Biến thể tiến Tốt"
     }
    },
    "comment": {
@@ -14225,6 +14598,10 @@
     "lt": {
      "name": "Mainų variantas",
      "def": "mainų variantas"
+    },
+    "vi": {
+     "name": "Biến thể đổi quân",
+     "def": "Biến thể đổi quân"
     }
    },
    "comment": {
@@ -14345,6 +14722,10 @@
     "lt": {
      "name": "Tarašo variantas",
      "def": "Tarašo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Tarrasch",
+     "def": "Biến thể Tarrasch"
     }
    },
    "comment": {
@@ -14465,6 +14846,10 @@
     "lt": {
      "name": "Vinaverio variantas",
      "def": "Vinaverio variantas"
+    },
+    "vi": {
+     "name": "Biến thể Winawer",
+     "def": "Biến thể Winawer"
     }
    },
    "comment": {
@@ -14585,6 +14970,10 @@
     "lt": {
      "name": "Klasikinis variantas",
      "def": "klasikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể cổ điển",
+     "def": "Biến thể cổ điển"
     }
    },
    "comment": {
@@ -14705,6 +15094,10 @@
     "lt": {
      "name": "Rubinšteino variantas",
      "def": "Rubinšteino variantas"
+    },
+    "vi": {
+     "name": "Biến thể Rubinstein",
+     "def": "Biến thể Rubinstein"
     }
    },
    "comment": {
@@ -14825,6 +15218,10 @@
     "lt": {
      "name": "Išstūmimo variantas",
      "def": "išstūmimo variantas"
+    },
+    "vi": {
+     "name": "Biến thể tiến Tốt",
+     "def": "Biến thể tiến Tốt"
     }
    },
    "comment": {
@@ -14945,6 +15342,10 @@
     "lt": {
      "name": "Mainų variantas",
      "def": "mainų variantas"
+    },
+    "vi": {
+     "name": "Biến thể đổi quân",
+     "def": "Biến thể đổi quân"
     }
    },
    "comment": {
@@ -15067,6 +15468,10 @@
     "lt": {
      "name": "Panovo ataka",
      "def": "Panovo ataka"
+    },
+    "vi": {
+     "name": "Tấn công Panov",
+     "def": "Tấn công Panov"
     }
    },
    "comment": {
@@ -15187,6 +15592,10 @@
     "lt": {
      "name": "Klasikinis variantas",
      "def": "klasikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể cổ điển",
+     "def": "Biến thể cổ điển"
     }
    },
    "comment": {
@@ -15307,6 +15716,10 @@
     "lt": {
      "name": "Dviejų žirgų ataka",
      "def": "dviejų žirgų ataka"
+    },
+    "vi": {
+     "name": "Tấn công hai Mã",
+     "def": "Tấn công hai Mã"
     }
    },
    "comment": {
@@ -15427,6 +15840,10 @@
     "lt": {
      "name": "Dviejų žirgų gynyba",
      "def": "dviejų žirgų gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ hai Mã",
+     "def": "Phòng thủ hai Mã"
     }
    },
    "comment": {
@@ -15549,6 +15966,10 @@
     "lt": {
      "name": "Džiuoko piano",
      "def": "Džiuoko piano"
+    },
+    "vi": {
+     "name": "Giuoco Piano",
+     "def": "Giuoco Piano"
     }
    },
    "comment": {
@@ -15675,6 +16096,10 @@
     "lt": {
      "name": "Džiuoko pianisimo",
      "def": "Džiuoko pianisimo"
+    },
+    "vi": {
+     "name": "Giuoco Pianissimo",
+     "def": "Giuoco Pianissimo"
     }
    },
    "comment": {
@@ -15799,6 +16224,10 @@
     "lt": {
      "name": "Evanso gambitas",
      "def": "Evanso gambitas"
+    },
+    "vi": {
+     "name": "Gambit Evans",
+     "def": "Gambit Evans"
     }
    },
    "comment": {
@@ -15919,6 +16348,10 @@
     "lt": {
      "name": "Fegatelo ataka",
      "def": "Fegatelo ataka"
+    },
+    "vi": {
+     "name": "Tấn công gan rán",
+     "def": "Tấn công gan rán"
     }
    },
    "comment": {
@@ -16045,6 +16478,10 @@
     "lt": {
      "name": "Trakslerio kontrataka",
      "def": "Trakslerio kontrataka"
+    },
+    "vi": {
+     "name": "Phản công Traxler",
+     "def": "Phản công Traxler"
     }
    },
    "comment": {
@@ -16165,6 +16602,10 @@
     "lt": {
      "name": "Berlyno gynyba",
      "def": "Berlyno gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Berlin",
+     "def": "Phòng thủ Berlin"
     }
    },
    "comment": {
@@ -16285,6 +16726,10 @@
     "lt": {
      "name": "Morfio gynyba",
      "def": "Morfio gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Morphy",
+     "def": "Phòng thủ Morphy"
     }
    },
    "comment": {
@@ -16405,6 +16850,10 @@
     "lt": {
      "name": "Uždarasis variantas",
      "def": "uždarasis variantas"
+    },
+    "vi": {
+     "name": "Tây Ban Nha đóng",
+     "def": "Tây Ban Nha đóng"
     }
    },
    "comment": {
@@ -16525,6 +16974,10 @@
     "lt": {
      "name": "Maršalo ataka",
      "def": "Maršalo ataka"
+    },
+    "vi": {
+     "name": "Tấn công Marshall",
+     "def": "Tấn công Marshall"
     }
    },
    "comment": {
@@ -16645,6 +17098,10 @@
     "lt": {
      "name": "Mainų variantas",
      "def": "mainų variantas"
+    },
+    "vi": {
+     "name": "Biến thể đổi quân",
+     "def": "Biến thể đổi quân"
     }
    },
    "comment": {
@@ -16765,6 +17222,10 @@
     "lt": {
      "name": "Atvirasis variantas",
      "def": "atvirasis variantas"
+    },
+    "vi": {
+     "name": "Biến thể mở",
+     "def": "Biến thể mở"
     }
    },
    "comment": {
@@ -16885,6 +17346,10 @@
     "lt": {
      "name": "Šlimano gynyba",
      "def": "Šlimano gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ Schliemann",
+     "def": "Phòng thủ Schliemann"
     }
    },
    "comment": {
@@ -17005,6 +17470,10 @@
     "lt": {
      "name": "Škotų gambitas",
      "def": "škotų gambitas"
+    },
+    "vi": {
+     "name": "Gambit Scotland",
+     "def": "Gambit Scotland"
     }
    },
    "comment": {
@@ -17126,6 +17595,10 @@
     "lt": {
      "name": "Vienos gambitas",
      "def": "Vienos gambitas"
+    },
+    "vi": {
+     "name": "Gambit Vienna",
+     "def": "Gambit Vienna"
     }
    },
    "comment": {
@@ -17247,6 +17720,10 @@
     "lt": {
      "name": "Stafordo gambitas",
      "def": "Stafordo gambitas"
+    },
+    "vi": {
+     "name": "Gambit Stafford",
+     "def": "Gambit Stafford"
     }
    },
    "comment": {
@@ -17369,6 +17846,10 @@
     "lt": {
      "name": "Parhamo ataka",
      "def": "Parhamo ataka"
+    },
+    "vi": {
+     "name": "Tấn công Parham",
+     "def": "Tấn công Parham"
     }
    },
    "comment": {
@@ -17498,6 +17979,10 @@
     "lt": {
      "name": "Helovino gambitas",
      "def": "Helovino gambitas"
+    },
+    "vi": {
+     "name": "Gambit Halloween",
+     "def": "Gambit Halloween"
     }
    },
    "comment": {
@@ -17618,6 +18103,10 @@
     "lt": {
      "name": "Ortodoksinė gynyba",
      "def": "ortodoksinė gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ chính thống",
+     "def": "Phòng thủ chính thống"
     }
    },
    "comment": {
@@ -17738,6 +18227,10 @@
     "lt": {
      "name": "Mainų variantas",
      "def": "mainų variantas"
+    },
+    "vi": {
+     "name": "Biến thể đổi quân",
+     "def": "Biến thể đổi quân"
     }
    },
    "comment": {
@@ -17858,6 +18351,10 @@
     "lt": {
      "name": "Pusiau Tarašo gynyba",
      "def": "pusiau Tarašo gynyba"
+    },
+    "vi": {
+     "name": "Phòng thủ bán Tarrasch",
+     "def": "Phòng thủ bán Tarrasch"
     }
    },
    "comment": {
@@ -17982,6 +18479,10 @@
     "lt": {
      "name": "Merano variantas",
      "def": "Merano variantas"
+    },
+    "vi": {
+     "name": "Biến thể Meran",
+     "def": "Biến thể Meran"
     }
    },
    "comment": {
@@ -18102,6 +18603,10 @@
     "lt": {
      "name": "Klasikinis variantas",
      "def": "klasikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể cổ điển",
+     "def": "Biến thể cổ điển"
     }
    },
    "comment": {
@@ -18223,6 +18728,10 @@
     "lt": {
      "name": "Zemišo variantas",
      "def": "Zemišo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Sämisch",
+     "def": "Biến thể Sämisch"
     }
    },
    "comment": {
@@ -18343,6 +18852,10 @@
     "lt": {
      "name": "Keturių pėstininkų ataka",
      "def": "keturių pėstininkų ataka"
+    },
+    "vi": {
+     "name": "Tấn công bốn Tốt",
+     "def": "Tấn công bốn Tốt"
     }
    },
    "comment": {
@@ -18463,6 +18976,10 @@
     "lt": {
      "name": "Fianketo variantas",
      "def": "fianketo variantas"
+    },
+    "vi": {
+     "name": "Biến thể fianchetto",
+     "def": "Biến thể fianchetto"
     }
    },
    "comment": {
@@ -18584,6 +19101,10 @@
     "lt": {
      "name": "Rubinšteino variantas",
      "def": "Rubinšteino variantas"
+    },
+    "vi": {
+     "name": "Biến thể Rubinstein",
+     "def": "Biến thể Rubinstein"
     }
    },
    "comment": {
@@ -18704,6 +19225,10 @@
     "lt": {
      "name": "Klasikinis variantas",
      "def": "klasikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể cổ điển",
+     "def": "Biến thể cổ điển"
     }
    },
    "comment": {
@@ -18824,6 +19349,10 @@
     "lt": {
      "name": "Zemišo variantas",
      "def": "Zemišo variantas"
+    },
+    "vi": {
+     "name": "Biến thể Sämisch",
+     "def": "Biến thể Sämisch"
     }
    },
    "comment": {
@@ -18944,6 +19473,10 @@
     "lt": {
      "name": "Mainų variantas",
      "def": "mainų variantas"
+    },
+    "vi": {
+     "name": "Biến thể đổi quân",
+     "def": "Biến thể đổi quân"
     }
    },
    "comment": {
@@ -19065,6 +19598,10 @@
     "lt": {
      "name": "Leningrado variantas",
      "def": "Leningrado variantas"
+    },
+    "vi": {
+     "name": "Biến thể Leningrad",
+     "def": "Biến thể Leningrad"
     }
    },
    "comment": {
@@ -19185,6 +19722,10 @@
     "lt": {
      "name": "Akmeninės sienos variantas",
      "def": "akmeninės sienos variantas"
+    },
+    "vi": {
+     "name": "Biến thể Stonewall",
+     "def": "Biến thể Stonewall"
     }
    },
    "comment": {
@@ -19305,6 +19846,10 @@
     "lt": {
      "name": "Šiuolaikinė Benoni gynyba",
      "def": "šiuolaikinė Benoni gynyba"
+    },
+    "vi": {
+     "name": "Benoni hiện đại",
+     "def": "Benoni hiện đại"
     }
    },
    "comment": {
@@ -19425,6 +19970,10 @@
     "lt": {
      "name": "Atvirasis katalonų debiutas",
      "def": "atvirasis katalonų debiutas"
+    },
+    "vi": {
+     "name": "Catalan mở",
+     "def": "Catalan mở"
     }
    },
    "comment": {
@@ -19546,6 +20095,10 @@
     "lt": {
      "name": "Uždarasis katalonų debiutas",
      "def": "uždarasis katalonų debiutas"
+    },
+    "vi": {
+     "name": "Catalan đóng",
+     "def": "Catalan đóng"
     }
    },
    "comment": {
@@ -19666,6 +20219,10 @@
     "lt": {
      "name": "Simetrinis variantas",
      "def": "simetrinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể đối xứng",
+     "def": "Biến thể đối xứng"
     }
    },
    "comment": {
@@ -19786,6 +20343,10 @@
     "lt": {
      "name": "Sicilijos gynyba su sukeistomis spalvomis",
      "def": "Sicilijos gynyba su sukeistomis spalvomis"
+    },
+    "vi": {
+     "name": "Sicilia đảo ngược",
+     "def": "Sicilia đảo ngược"
     }
    },
    "comment": {
@@ -19910,6 +20471,10 @@
     "lt": {
      "name": "Keturių pėstininkų ataka",
      "def": "keturių pėstininkų ataka"
+    },
+    "vi": {
+     "name": "Tấn công bốn Tốt",
+     "def": "Tấn công bốn Tốt"
     }
    },
    "comment": {
@@ -20030,6 +20595,10 @@
     "lt": {
      "name": "Šiuolaikinis variantas",
      "def": "šiuolaikinis variantas"
+    },
+    "vi": {
+     "name": "Biến thể hiện đại",
+     "def": "Biến thể hiện đại"
     }
    },
    "comment": {
@@ -20150,6 +20719,10 @@
     "lt": {
      "name": "Austrų ataka",
      "def": "austrų ataka"
+    },
+    "vi": {
+     "name": "Tấn công Áo",
+     "def": "Tấn công Áo"
     }
    },
    "comment": {
@@ -20270,6 +20843,10 @@
     "lt": {
      "name": "Falkbėro kontrgambitas",
      "def": "Falkbėro kontrgambitas"
+    },
+    "vi": {
+     "name": "Phản gambit Falkbeer",
+     "def": "Phản gambit Falkbeer"
     }
    },
    "comment": {
@@ -20316,8 +20893,9 @@
     "ro": "varianta {X}",
     "lv": "{X:gen} variants",
     "sk": "{X:gen} variant",
-    "cs": "{X:gen}ova varianta",
-    "lt": "{X:gen} variantas"
+    "cs": "{X} varianta",
+    "lt": "{X:gen} variantas",
+    "vi": "Biến thể {X}"
    },
    "id": "varian",
    "nl": "variant",
@@ -20336,7 +20914,8 @@
    "lv": "variants",
    "sk": "variant",
    "cs": "varianta",
-   "lt": "variantas"
+   "lt": "variantas",
+   "vi": "biến thể"
   },
   "Attack": {
    "en": "Attack",
@@ -20375,8 +20954,9 @@
     "ro": "atacul {X}",
     "lv": "{X:gen} uzbrukums",
     "sk": "{X:gen} útok",
-    "cs": "{X:gen}ův útok",
-    "lt": "{X:gen} ataka"
+    "cs": "{X:gen} útok",
+    "lt": "{X:gen} ataka",
+    "vi": "Tấn công {X}"
    },
    "id": "serangan",
    "nl": "aanval",
@@ -20395,7 +20975,8 @@
    "lv": "uzbrukums",
    "sk": "útok",
    "cs": "útok",
-   "lt": "ataka"
+   "lt": "ataka",
+   "vi": "tấn công"
   },
   "Gambit": {
    "en": "Gambit",
@@ -20434,8 +21015,9 @@
     "ro": "gambitul {X}",
     "lv": "{X:gen} gambīts",
     "sk": "{X:gen} gambit",
-    "cs": "{X:gen}ův gambit",
-    "lt": "{X:gen} gambitas"
+    "cs": "{X:gen} gambit",
+    "lt": "{X:gen} gambitas",
+    "vi": "Gambit {X}"
    },
    "id": "gambit",
    "nl": "gambiet",
@@ -20454,7 +21036,8 @@
    "lv": "gambīts",
    "sk": "gambit",
    "cs": "gambit",
-   "lt": "gambitas"
+   "lt": "gambitas",
+   "vi": "gambit"
   },
   "Defense": {
    "en": "Defense",
@@ -20493,8 +21076,9 @@
     "ro": "apărarea {X}",
     "lv": "{X:gen} aizsardzība",
     "sk": "{X} obrana",
-    "cs": "{X:gen}ova obrana",
-    "lt": "{X:gen} gynyba"
+    "cs": "{X} obrana",
+    "lt": "{X:gen} gynyba",
+    "vi": "Phòng thủ {X}"
    },
    "id": "pertahanan",
    "nl": "verdediging",
@@ -20513,7 +21097,8 @@
    "lv": "aizsardzība",
    "sk": "obrana",
    "cs": "obrana",
-   "lt": "gynyba"
+   "lt": "gynyba",
+   "vi": "phòng thủ"
   },
   "System": {
    "en": "System",
@@ -20552,8 +21137,9 @@
     "ro": "sistemul {X}",
     "lv": "{X:gen} sistēma",
     "sk": "{X:gen} systém",
-    "cs": "{X:gen}ův systém",
-    "lt": "{X:gen} sistema"
+    "cs": "{X:gen} systém",
+    "lt": "{X:gen} sistema",
+    "vi": "Hệ thống {X}"
    },
    "id": "sistem",
    "nl": "systeem",
@@ -20572,7 +21158,8 @@
    "lv": "sistēma",
    "sk": "systém",
    "cs": "systém",
-   "lt": "sistema"
+   "lt": "sistema",
+   "vi": "hệ thống"
   },
   "Countergambit": {
    "en": "Countergambit",
@@ -20611,8 +21198,9 @@
     "ro": "contragambitul {X}",
     "lv": "{X:gen} pretgambīts",
     "sk": "{X:gen} protigambit",
-    "cs": "{X:gen}ův protigambit",
-    "lt": "{X:gen} kontrgambitas"
+    "cs": "{X:gen} protigambit",
+    "lt": "{X:gen} kontrgambitas",
+    "vi": "Phản gambit {X}"
    },
    "id": "gambit balasan",
    "nl": "tegengambiet",
@@ -20631,7 +21219,8 @@
    "lv": "pretgambīts",
    "sk": "protigambit",
    "cs": "protigambit",
-   "lt": "kontrgambitas"
+   "lt": "kontrgambitas",
+   "vi": "phản gambit"
   },
   "Counterattack": {
    "en": "Counterattack",
@@ -20670,8 +21259,9 @@
     "ro": "contraatacul {X}",
     "lv": "{X:gen} pretuzbrukums",
     "sk": "{X:gen} protiútok",
-    "cs": "{X:gen}ův protiútok",
-    "lt": "{X:gen} kontrataka"
+    "cs": "{X:gen} protiútok",
+    "lt": "{X:gen} kontrataka",
+    "vi": "Phản công {X}"
    },
    "id": "serangan balik",
    "nl": "tegenaanval",
@@ -20690,7 +21280,8 @@
    "lv": "pretuzbrukums",
    "sk": "protiútok",
    "cs": "protiútok",
-   "lt": "kontrataka"
+   "lt": "kontrataka",
+   "vi": "phản công"
   },
   "Opening": {
    "en": "Opening",
@@ -20729,8 +21320,9 @@
     "ro": "deschiderea {X}",
     "lv": "{X:gen} atklātne",
     "sk": "{X:gen}o otvorenie",
-    "cs": "{X:gen}ovo zahájení",
-    "lt": "{X:gen} debiutas"
+    "cs": "{X} hra",
+    "lt": "{X:gen} debiutas",
+    "vi": "Khai cuộc {X}"
    },
    "id": "pembukaan",
    "nl": "opening",
@@ -20749,7 +21341,8 @@
    "lv": "atklātne",
    "sk": "otvorenie",
    "cs": "zahájení",
-   "lt": "debiutas"
+   "lt": "debiutas",
+   "vi": "khai cuộc"
   },
   "Game": {
    "en": "Game",
@@ -20779,7 +21372,8 @@
    "lv": "partija",
    "sk": "hra",
    "cs": "hra",
-   "lt": "partija"
+   "lt": "partija",
+   "vi": "khai cuộc"
   },
   "Line": {
    "en": "Line",
@@ -20818,8 +21412,9 @@
     "ro": "varianta {X}",
     "lv": "{X:gen} turpinājums",
     "sk": "{X:gen} variant",
-    "cs": "{X:gen}ovo pokračování",
-    "lt": "{X:gen} tęsinys"
+    "cs": "{X} varianta",
+    "lt": "{X:gen} tęsinys",
+    "vi": "Phương án {X}"
    },
    "id": "jalur",
    "nl": "voortzetting",
@@ -20838,7 +21433,8 @@
    "lv": "turpinājums",
    "sk": "pokračovanie",
    "cs": "pokračování",
-   "lt": "tęsinys"
+   "lt": "tęsinys",
+   "vi": "phương án"
   },
   "Formation": {
    "en": "Formation",
@@ -20868,7 +21464,8 @@
    "lv": "izvietojums",
    "sk": "postavenie",
    "cs": "sestava",
-   "lt": "išsidėstymas"
+   "lt": "išsidėstymas",
+   "vi": "thế trận"
   },
   "Trap": {
    "en": "Trap",
@@ -20907,8 +21504,9 @@
     "ro": "capcana {X}",
     "lv": "{X:gen} slazds",
     "sk": "{X} pasca",
-    "cs": "{X:gen}ova past",
-    "lt": "{X:gen} spąstai"
+    "cs": "{X} past",
+    "lt": "{X:gen} spąstai",
+    "vi": "Bẫy {X}"
    },
    "id": "jebakan",
    "nl": "valstrik",
@@ -20927,7 +21525,8 @@
    "lv": "slazds",
    "sk": "pasca",
    "cs": "past",
-   "lt": "spąstai"
+   "lt": "spąstai",
+   "vi": "bẫy"
   },
   "Accepted": {
    "en": "Accepted",
@@ -20957,7 +21556,8 @@
    "lv": "pieņemtais",
    "sk": "prijatý",
    "cs": "přijatý",
-   "lt": "priimtas"
+   "lt": "priimtas",
+   "vi": "chấp nhận"
   },
   "Declined": {
    "en": "Declined",
@@ -20987,7 +21587,8 @@
    "lv": "nepieņemtais",
    "sk": "odmietnutý",
    "cs": "odmítnutý",
-   "lt": "nepriimtas"
+   "lt": "nepriimtas",
+   "vi": "từ chối"
   },
   "Exchange Variation": {
    "en": "Exchange Variation",
@@ -21017,7 +21618,8 @@
    "lv": "maiņas variants",
    "sk": "výmenný variant",
    "cs": "výměnná varianta",
-   "lt": "mainų variantas"
+   "lt": "mainų variantas",
+   "vi": "Biến thể đổi quân"
   },
   "Advance Variation": {
    "en": "Advance Variation",
@@ -21047,7 +21649,8 @@
    "lv": "virzīšanas variants",
    "sk": "postupový variant",
    "cs": "postupová varianta",
-   "lt": "išstūmimo variantas"
+   "lt": "išstūmimo variantas",
+   "vi": "Biến thể tiến Tốt"
   },
   "Classical Variation": {
    "en": "Classical Variation",
@@ -21077,7 +21680,8 @@
    "lv": "klasiskais variants",
    "sk": "klasický variant",
    "cs": "klasická varianta",
-   "lt": "klasikinis variantas"
+   "lt": "klasikinis variantas",
+   "vi": "Biến thể cổ điển"
   },
   "Modern Variation": {
    "en": "Modern Variation",
@@ -21107,7 +21711,8 @@
    "lv": "modernais variants",
    "sk": "moderný variant",
    "cs": "moderní varianta",
-   "lt": "šiuolaikinis variantas"
+   "lt": "šiuolaikinis variantas",
+   "vi": "Biến thể hiện đại"
   },
   "Open Variation": {
    "en": "Open Variation",
@@ -21137,7 +21742,8 @@
    "lv": "atklātais variants",
    "sk": "otvorený variant",
    "cs": "otevřená varianta",
-   "lt": "atvirasis variantas"
+   "lt": "atvirasis variantas",
+   "vi": "Biến thể mở"
   },
   "Closed Variation": {
    "en": "Closed Variation",
@@ -21167,7 +21773,8 @@
    "lv": "slēgtais variants",
    "sk": "zatvorený variant",
    "cs": "zavřená varianta",
-   "lt": "uždarasis variantas"
+   "lt": "uždarasis variantas",
+   "vi": "Biến thể đóng"
   },
   "Fianchetto Variation": {
    "en": "Fianchetto Variation",
@@ -21197,7 +21804,8 @@
    "lv": "fianketo variants",
    "sk": "variant s fianchettom",
    "cs": "varianta s fianchettem",
-   "lt": "fianketo variantas"
+   "lt": "fianketo variantas",
+   "vi": "Biến thể fianchetto"
   },
   "Symmetrical Variation": {
    "en": "Symmetrical Variation",
@@ -21227,7 +21835,8 @@
    "lv": "simetriskais variants",
    "sk": "symetrický variant",
    "cs": "symetrická varianta",
-   "lt": "simetrinis variantas"
+   "lt": "simetrinis variantas",
+   "vi": "Biến thể đối xứng"
   },
   "Scotch Gambit": {
    "en": "Scotch Gambit",
@@ -21257,7 +21866,8 @@
    "lv": "skotu gambīts",
    "sk": "škótsky gambit",
    "cs": "skotský gambit",
-   "lt": "škotų gambitas"
+   "lt": "škotų gambitas",
+   "vi": "Gambit Scotland"
   },
   "Scotch Variation": {
    "en": "Scotch Variation",
@@ -21287,7 +21897,8 @@
    "lv": "skotu variants",
    "sk": "škótsky variant",
    "cs": "skotská varianta",
-   "lt": "škotų variantas"
+   "lt": "škotų variantas",
+   "vi": "Biến thể Scotland"
   },
   "Danish Variation": {
    "en": "Danish Variation",
@@ -21317,7 +21928,8 @@
    "lv": "dāņu variants",
    "sk": "dánsky variant",
    "cs": "severská varianta",
-   "lt": "danų variantas"
+   "lt": "danų variantas",
+   "vi": "Biến thể Đan Mạch"
   },
   "Main Line": {
    "en": "Main Line",
@@ -21347,7 +21959,8 @@
    "lv": "galvenais variants",
    "sk": "hlavný variant",
    "cs": "hlavní varianta",
-   "lt": "pagrindinis variantas"
+   "lt": "pagrindinis variantas",
+   "vi": "phương án chính"
   },
   "Accelerated": {
    "en": "Accelerated",
@@ -21377,7 +21990,8 @@
    "lv": "paātrinātais",
    "sk": "zrýchlený",
    "cs": "zrychlený",
-   "lt": "paspartintas"
+   "lt": "paspartintas",
+   "vi": "cấp tốc"
   },
   "Deferred": {
    "en": "Deferred",
@@ -21407,7 +22021,8 @@
    "lv": "atliktais",
    "sk": "odložený",
    "cs": "odložený",
-   "lt": "atidėtas"
+   "lt": "atidėtas",
+   "vi": "trì hoãn"
   },
   "Reversed": {
    "en": "Reversed",
@@ -21437,7 +22052,8 @@
    "lv": "ar mainītām krāsām",
    "sk": "s obrátenými farbami",
    "cs": "s obrácenými barvami",
-   "lt": "su sukeistomis spalvomis"
+   "lt": "su sukeistomis spalvomis",
+   "vi": "đảo màu quân"
   }
  },
  "eponyms": {
@@ -21519,12 +22135,16 @@
     "gen": "Steinitzov"
    },
    "cs": {
-    "nom": "Steinitz",
-    "gen": "Steinitz"
+    "nom": "Steinitzova",
+    "gen": "Steinitzův"
    },
    "lt": {
     "nom": "Šteinicas",
     "gen": "Šteinico"
+   },
+   "vi": {
+    "nom": "Steinitz",
+    "gen": "Steinitz"
    }
   },
   "Rubinstein": {
@@ -21605,12 +22225,16 @@
     "gen": "Rubinsteinov"
    },
    "cs": {
-    "nom": "Rubinstein",
-    "gen": "Rubinstein"
+    "nom": "Rubinsteinova",
+    "gen": "Rubinsteinův"
    },
    "lt": {
     "nom": "Rubinšteinas",
     "gen": "Rubinšteino"
+   },
+   "vi": {
+    "nom": "Rubinstein",
+    "gen": "Rubinstein"
    }
   },
   "Winawer": {
@@ -21691,12 +22315,16 @@
     "gen": "Winawerov"
    },
    "cs": {
-    "nom": "Winawer",
-    "gen": "Winawer"
+    "nom": "Winawerova",
+    "gen": "Winawerův"
    },
    "lt": {
     "nom": "Vinaveris",
     "gen": "Vinaverio"
+   },
+   "vi": {
+    "nom": "Winawer",
+    "gen": "Winawer"
    }
   },
   "Evans": {
@@ -21777,12 +22405,16 @@
     "gen": "Evansov"
    },
    "cs": {
-    "nom": "Evans",
-    "gen": "Evans"
+    "nom": "Evansova",
+    "gen": "Evansův"
    },
    "lt": {
     "nom": "Evansas",
     "gen": "Evanso"
+   },
+   "vi": {
+    "nom": "Evans",
+    "gen": "Evans"
    }
   },
   "Chigorin": {
@@ -21863,12 +22495,16 @@
     "gen": "Čigorinov"
    },
    "cs": {
-    "nom": "Čigorin",
-    "gen": "Čigorin"
+    "nom": "Čigorinova",
+    "gen": "Čigorinův"
    },
    "lt": {
     "nom": "Čigorinas",
     "gen": "Čigorino"
+   },
+   "vi": {
+    "nom": "Chigorin",
+    "gen": "Chigorin"
    }
   },
   "Morphy": {
@@ -21949,12 +22585,16 @@
     "gen": "Morphyho"
    },
    "cs": {
-    "nom": "Morphy",
-    "gen": "Morphy"
+    "nom": "Morphyho",
+    "gen": "Morphyho"
    },
    "lt": {
     "nom": "Morfis",
     "gen": "Morfio"
+   },
+   "vi": {
+    "nom": "Morphy",
+    "gen": "Morphy"
    }
   },
   "Tarrasch": {
@@ -22035,12 +22675,16 @@
     "gen": "Tarraschov"
    },
    "cs": {
-    "nom": "Tarrasch",
-    "gen": "Tarrasch"
+    "nom": "Tarraschova",
+    "gen": "Tarraschův"
    },
    "lt": {
     "nom": "Tarašas",
     "gen": "Tarašo"
+   },
+   "vi": {
+    "nom": "Tarrasch",
+    "gen": "Tarrasch"
    }
   },
   "Alekhine": {
@@ -22121,12 +22765,16 @@
     "gen": "Aljechinov"
    },
    "cs": {
-    "nom": "Aljechin",
-    "gen": "Aljechin"
+    "nom": "Aljechinova",
+    "gen": "Aljechinův"
    },
    "lt": {
     "nom": "Aliochinas",
     "gen": "Aliochino"
+   },
+   "vi": {
+    "nom": "Alekhine",
+    "gen": "Alekhine"
    }
   },
   "Sämisch": {
@@ -22207,12 +22855,16 @@
     "gen": "Sämischov"
    },
    "cs": {
-    "nom": "Sämisch",
-    "gen": "Sämisch"
+    "nom": "Sämischova",
+    "gen": "Sämischův"
    },
    "lt": {
     "nom": "Zemišas",
     "gen": "Zemišo"
+   },
+   "vi": {
+    "nom": "Sämisch",
+    "gen": "Sämisch"
    }
   },
   "Nimzowitsch": {
@@ -22293,12 +22945,16 @@
     "gen": "Nimcovičov"
    },
    "cs": {
-    "nom": "Nimcovič",
-    "gen": "Nimcovič"
+    "nom": "Nimcovičova",
+    "gen": "Nimcovičův"
    },
    "lt": {
     "nom": "Nimcovičius",
     "gen": "Nimcovičiaus"
+   },
+   "vi": {
+    "nom": "Nimzowitsch",
+    "gen": "Nimzowitsch"
    }
   },
   "Najdorf": {
@@ -22379,12 +23035,16 @@
     "gen": "Najdorfov"
    },
    "cs": {
-    "nom": "Najdorf",
-    "gen": "Najdorf"
+    "nom": "Najdorfova",
+    "gen": "Najdorfův"
    },
    "lt": {
     "nom": "Naidorfas",
     "gen": "Naidorfo"
+   },
+   "vi": {
+    "nom": "Najdorf",
+    "gen": "Najdorf"
    }
   },
   "Bogoljubow": {
@@ -22465,12 +23125,16 @@
     "gen": "Bogoljubovov"
    },
    "cs": {
-    "nom": "Bogoljubov",
-    "gen": "Bogoljubov"
+    "nom": "Bogoljubovova",
+    "gen": "Bogoljubovův"
    },
    "lt": {
     "nom": "Bogoliubovas",
     "gen": "Bogoliubovo"
+   },
+   "vi": {
+    "nom": "Bogoljubow",
+    "gen": "Bogoljubow"
    }
   },
   "Alapin": {
@@ -22551,12 +23215,16 @@
     "gen": "Alapinov"
    },
    "cs": {
-    "nom": "Alapin",
-    "gen": "Alapin"
+    "nom": "Alapinova",
+    "gen": "Alapinův"
    },
    "lt": {
     "nom": "Alapinas",
     "gen": "Alapino"
+   },
+   "vi": {
+    "nom": "Alapin",
+    "gen": "Alapin"
    }
   },
   "Botvinnik": {
@@ -22637,12 +23305,16 @@
     "gen": "Botvinnikov"
    },
    "cs": {
-    "nom": "Botvinnik",
-    "gen": "Botvinnik"
+    "nom": "Botvinnikova",
+    "gen": "Botvinnikův"
    },
    "lt": {
     "nom": "Botvinikas",
     "gen": "Botviniko"
+   },
+   "vi": {
+    "nom": "Botvinnik",
+    "gen": "Botvinnik"
    }
   },
   "Paulsen": {
@@ -22723,12 +23395,16 @@
     "gen": "Paulsenov"
    },
    "cs": {
-    "nom": "Paulsen",
-    "gen": "Paulsen"
+    "nom": "Paulsenova",
+    "gen": "Paulsenův"
    },
    "lt": {
     "nom": "Paulsenas",
     "gen": "Paulseno"
+   },
+   "vi": {
+    "nom": "Paulsen",
+    "gen": "Paulsen"
    }
   },
   "Marshall": {
@@ -22809,12 +23485,16 @@
     "gen": "Marshallov"
    },
    "cs": {
-    "nom": "Marshall",
-    "gen": "Marshall"
+    "nom": "Marshallova",
+    "gen": "Marshallův"
    },
    "lt": {
     "nom": "Maršalas",
     "gen": "Maršalo"
+   },
+   "vi": {
+    "nom": "Marshall",
+    "gen": "Marshall"
    }
   },
   "Kieseritzky": {
@@ -22895,12 +23575,16 @@
     "gen": "Kieseritzkého"
    },
    "cs": {
-    "nom": "Kieseritzky",
-    "gen": "Kieseritzky"
+    "nom": "Kieseritzkého",
+    "gen": "Kieseritzkého"
    },
    "lt": {
     "nom": "Kizerickis",
     "gen": "Kizerickio"
+   },
+   "vi": {
+    "nom": "Kieseritzky",
+    "gen": "Kieseritzky"
    }
   },
   "Panov": {
@@ -22981,12 +23665,16 @@
     "gen": "Panovov"
    },
    "cs": {
-    "nom": "Panov",
-    "gen": "Panov"
+    "nom": "Panovova",
+    "gen": "Panovův"
    },
    "lt": {
     "nom": "Panovas",
     "gen": "Panovo"
+   },
+   "vi": {
+    "nom": "Panov",
+    "gen": "Panov"
    }
   },
   "Keres": {
@@ -23067,12 +23755,16 @@
     "gen": "Keresov"
    },
    "cs": {
-    "nom": "Keres",
-    "gen": "Keres"
+    "nom": "Keresova",
+    "gen": "Keresův"
    },
    "lt": {
     "nom": "Keresas",
     "gen": "Kereso"
+   },
+   "vi": {
+    "nom": "Keres",
+    "gen": "Keres"
    }
   },
   "Tartakower": {
@@ -23153,12 +23845,16 @@
     "gen": "Tartakowerov"
    },
    "cs": {
-    "nom": "Tartakower",
-    "gen": "Tartakower"
+    "nom": "Tartakowerova",
+    "gen": "Tartakowerův"
    },
    "lt": {
     "nom": "Tartakoveris",
     "gen": "Tartakoverio"
+   },
+   "vi": {
+    "nom": "Tartakower",
+    "gen": "Tartakower"
    }
   },
   "Maróczy": {
@@ -23239,12 +23935,16 @@
     "gen": "Maróczyho"
    },
    "cs": {
-    "nom": "Maróczy",
-    "gen": "Maróczy"
+    "nom": "Maróczyho",
+    "gen": "Maróczyho"
    },
    "lt": {
     "nom": "Marocis",
     "gen": "Marocio"
+   },
+   "vi": {
+    "nom": "Maróczy",
+    "gen": "Maróczy"
    }
   },
   "Falkbeer": {
@@ -23325,12 +24025,16 @@
     "gen": "Falkbeerov"
    },
    "cs": {
-    "nom": "Falkbeer",
-    "gen": "Falkbeer"
+    "nom": "Falkbeerova",
+    "gen": "Falkbeerův"
    },
    "lt": {
     "nom": "Falkbėras",
     "gen": "Falkbėro"
+   },
+   "vi": {
+    "nom": "Falkbeer",
+    "gen": "Falkbeer"
    }
   },
   "Scheveningen": {
@@ -23411,12 +24115,16 @@
     "gen": "scheveningenský"
    },
    "cs": {
-    "nom": "Scheveningen",
-    "gen": "Scheveningen"
+    "nom": "scheveningenská",
+    "gen": "scheveningenský"
    },
    "lt": {
     "nom": "Ševeningenas",
     "gen": "Ševeningeno"
+   },
+   "vi": {
+    "nom": "Scheveningen",
+    "gen": "Scheveningen"
    }
   },
   "Richter-Rauzer": {
@@ -23497,12 +24205,16 @@
     "gen": "Richterov-Rauzerov"
    },
    "cs": {
-    "nom": "Richter-Rauzer",
-    "gen": "Richter-Rauzer"
+    "nom": "Richter-Rauzerova",
+    "gen": "Richter-Rauzerův"
    },
    "lt": {
     "nom": "Richteris-Rauzeris",
     "gen": "Richterio-Rauzerio"
+   },
+   "vi": {
+    "nom": "Richter-Rauzer",
+    "gen": "Richter-Rauzer"
    }
   },
   "Lasker": {
@@ -23583,12 +24295,16 @@
     "gen": "Laskerov"
    },
    "cs": {
-    "nom": "Lasker",
-    "gen": "Lasker"
+    "nom": "Laskerova",
+    "gen": "Laskerův"
    },
    "lt": {
     "nom": "Laskeris",
     "gen": "Laskerio"
+   },
+   "vi": {
+    "nom": "Lasker",
+    "gen": "Lasker"
    }
   },
   "Taimanov": {
@@ -23669,12 +24385,16 @@
     "gen": "Tajmanovov"
    },
    "cs": {
-    "nom": "Tajmanov",
-    "gen": "Tajmanov"
+    "nom": "Tajmanovova",
+    "gen": "Tajmanovův"
    },
    "lt": {
     "nom": "Taimanovas",
     "gen": "Taimanovo"
+   },
+   "vi": {
+    "nom": "Taimanov",
+    "gen": "Taimanov"
    }
   },
   "Smyslov": {
@@ -23755,12 +24475,16 @@
     "gen": "Smyslovov"
    },
    "cs": {
-    "nom": "Smyslov",
-    "gen": "Smyslov"
+    "nom": "Smyslovova",
+    "gen": "Smyslovův"
    },
    "lt": {
     "nom": "Smyslovas",
     "gen": "Smyslovo"
+   },
+   "vi": {
+    "nom": "Smyslov",
+    "gen": "Smyslov"
    }
   },
   "Spassky": {
@@ -23841,12 +24565,16 @@
     "gen": "Spasského"
    },
    "cs": {
-    "nom": "Spasskij",
-    "gen": "Spasskij"
+    "nom": "Spasského",
+    "gen": "Spasského"
    },
    "lt": {
     "nom": "Spaskis",
     "gen": "Spaskio"
+   },
+   "vi": {
+    "nom": "Spassky",
+    "gen": "Spassky"
    }
   },
   "Spielmann": {
@@ -23927,12 +24655,16 @@
     "gen": "Spielmannov"
    },
    "cs": {
-    "nom": "Spielmann",
-    "gen": "Spielmann"
+    "nom": "Spielmannova",
+    "gen": "Spielmannův"
    },
    "lt": {
     "nom": "Špilmanas",
     "gen": "Špilmano"
+   },
+   "vi": {
+    "nom": "Spielmann",
+    "gen": "Spielmann"
    }
   },
   "Averbakh": {
@@ -24013,12 +24745,16 @@
     "gen": "Averbachov"
    },
    "cs": {
-    "nom": "Averbach",
-    "gen": "Averbach"
+    "nom": "Averbachova",
+    "gen": "Averbachův"
    },
    "lt": {
     "nom": "Averbachas",
     "gen": "Averbacho"
+   },
+   "vi": {
+    "nom": "Averbakh",
+    "gen": "Averbakh"
    }
   },
   "Greco": {
@@ -24099,12 +24835,16 @@
     "gen": "Grecov"
    },
    "cs": {
-    "nom": "Greco",
-    "gen": "Grec"
+    "nom": "Grecova",
+    "gen": "Grecův"
    },
    "lt": {
     "nom": "Grekas",
     "gen": "Greko"
+   },
+   "vi": {
+    "nom": "Greco",
+    "gen": "Greco"
    }
   },
   "Capablanca": {
@@ -24185,12 +24925,16 @@
     "gen": "Capablancov"
    },
    "cs": {
-    "nom": "Capablanca",
-    "gen": "Capablanc"
+    "nom": "Capablancova",
+    "gen": "Capablancův"
    },
    "lt": {
     "nom": "Kapablanka",
     "gen": "Kapablankos"
+   },
+   "vi": {
+    "nom": "Capablanca",
+    "gen": "Capablanca"
    }
   },
   "Kan": {
@@ -24271,12 +25015,16 @@
     "gen": "Kanov"
    },
    "cs": {
-    "nom": "Kan",
-    "gen": "Kan"
+    "nom": "Kanova",
+    "gen": "Kanův"
    },
    "lt": {
     "nom": "Kanas",
     "gen": "Kano"
+   },
+   "vi": {
+    "nom": "Kan",
+    "gen": "Kan"
    }
   },
   "Albin": {
@@ -24357,12 +25105,16 @@
     "gen": "Albinov"
    },
    "cs": {
-    "nom": "Albin",
-    "gen": "Albin"
+    "nom": "Albinova",
+    "gen": "Albinův"
    },
    "lt": {
     "nom": "Albinas",
     "gen": "Albino"
+   },
+   "vi": {
+    "nom": "Albin",
+    "gen": "Albin"
    }
   },
   "Breyer": {
@@ -24443,12 +25195,16 @@
     "gen": "Breyerov"
    },
    "cs": {
-    "nom": "Breyer",
-    "gen": "Breyer"
+    "nom": "Breyerova",
+    "gen": "Breyerův"
    },
    "lt": {
     "nom": "Brejeris",
     "gen": "Brejerio"
+   },
+   "vi": {
+    "nom": "Breyer",
+    "gen": "Breyer"
    }
   },
   "Schlechter": {
@@ -24529,12 +25285,16 @@
     "gen": "Schlechterov"
    },
    "cs": {
-    "nom": "Schlechter",
-    "gen": "Schlechter"
+    "nom": "Schlechterova",
+    "gen": "Schlechterův"
    },
    "lt": {
     "nom": "Šlechteris",
     "gen": "Šlechterio"
+   },
+   "vi": {
+    "nom": "Schlechter",
+    "gen": "Schlechter"
    }
   },
   "Jaenisch": {
@@ -24615,12 +25375,16 @@
     "gen": "Jaenischov"
    },
    "cs": {
-    "nom": "Jaenisch",
-    "gen": "Jaenisch"
+    "nom": "Jaenischova",
+    "gen": "Jaenischův"
    },
    "lt": {
     "nom": "Janišas",
     "gen": "Janišo"
+   },
+   "vi": {
+    "nom": "Jaenisch",
+    "gen": "Jaenisch"
    }
   },
   "Karpov": {
@@ -24701,12 +25465,16 @@
     "gen": "Karpovov"
    },
    "cs": {
-    "nom": "Karpov",
-    "gen": "Karpov"
+    "nom": "Karpovova",
+    "gen": "Karpovův"
    },
    "lt": {
     "nom": "Karpovas",
     "gen": "Karpovo"
+   },
+   "vi": {
+    "nom": "Karpov",
+    "gen": "Karpov"
    }
   },
   "Petrosian": {
@@ -24787,12 +25555,16 @@
     "gen": "Petrosjanov"
    },
    "cs": {
-    "nom": "Petrosjan",
-    "gen": "Petrosjan"
+    "nom": "Petrosjanova",
+    "gen": "Petrosjanův"
    },
    "lt": {
     "nom": "Petrosianas",
     "gen": "Petrosiano"
+   },
+   "vi": {
+    "nom": "Petrosian",
+    "gen": "Petrosian"
    }
   },
   "Euwe": {
@@ -24873,12 +25645,16 @@
     "gen": "Euweho"
    },
    "cs": {
-    "nom": "Euwe",
-    "gen": "Euwe"
+    "nom": "Euweho",
+    "gen": "Euweho"
    },
    "lt": {
     "nom": "Eivė",
     "gen": "Eivės"
+   },
+   "vi": {
+    "nom": "Euwe",
+    "gen": "Euwe"
    }
   },
   "Sozin": {
@@ -24959,12 +25735,16 @@
     "gen": "Sozinov"
    },
    "cs": {
-    "nom": "Sozin",
-    "gen": "Sozin"
+    "nom": "Sozinova",
+    "gen": "Sozinův"
    },
    "lt": {
     "nom": "Sozinas",
     "gen": "Sozino"
+   },
+   "vi": {
+    "nom": "Sozin",
+    "gen": "Sozin"
    }
   },
   "Schliemann": {
@@ -25045,12 +25825,16 @@
     "gen": "Schliemannov"
    },
    "cs": {
-    "nom": "Schliemann",
-    "gen": "Schliemann"
+    "nom": "Schliemannova",
+    "gen": "Schliemannův"
    },
    "lt": {
     "nom": "Šlimanas",
     "gen": "Šlimano"
+   },
+   "vi": {
+    "nom": "Schliemann",
+    "gen": "Schliemann"
    }
   },
   "Anderssen": {
@@ -25131,12 +25915,16 @@
     "gen": "Anderssenov"
    },
    "cs": {
-    "nom": "Anderssen",
-    "gen": "Anderssen"
+    "nom": "Anderssenova",
+    "gen": "Anderssenův"
    },
    "lt": {
     "nom": "Andersenas",
     "gen": "Anderseno"
+   },
+   "vi": {
+    "nom": "Anderssen",
+    "gen": "Anderssen"
    }
   },
   "Philidor": {
@@ -25217,12 +26005,16 @@
     "gen": "Philidorov"
    },
    "cs": {
-    "nom": "Philidor",
-    "gen": "Philidor"
+    "nom": "Philidorova",
+    "gen": "Philidorův"
    },
    "lt": {
     "nom": "Filidoras",
     "gen": "Filidoro"
+   },
+   "vi": {
+    "nom": "Philidor",
+    "gen": "Philidor"
    }
   },
   "Zaitsev": {
@@ -25303,12 +26095,16 @@
     "gen": "Zajcevov"
    },
    "cs": {
-    "nom": "Zajcev",
-    "gen": "Zajcev"
+    "nom": "Zajcevova",
+    "gen": "Zajcevův"
    },
    "lt": {
     "nom": "Zaicevas",
     "gen": "Zaicevo"
+   },
+   "vi": {
+    "nom": "Zaitsev",
+    "gen": "Zaitsev"
    }
   },
   "Sveshnikov": {
@@ -25389,12 +26185,16 @@
     "gen": "Svešnikovov"
    },
    "cs": {
-    "nom": "Svešnikov",
-    "gen": "Svešnikov"
+    "nom": "Svešnikovova",
+    "gen": "Svešnikovův"
    },
    "lt": {
     "nom": "Svešnikovas",
     "gen": "Svešnikovo"
+   },
+   "vi": {
+    "nom": "Sveshnikov",
+    "gen": "Sveshnikov"
    }
   },
   "Kasparov": {
@@ -25475,12 +26275,16 @@
     "gen": "Kasparovov"
    },
    "cs": {
-    "nom": "Kasparov",
-    "gen": "Kasparov"
+    "nom": "Kasparovova",
+    "gen": "Kasparovův"
    },
    "lt": {
     "nom": "Kasparovas",
     "gen": "Kasparovo"
+   },
+   "vi": {
+    "nom": "Kasparov",
+    "gen": "Kasparov"
    }
   },
   "Fischer": {
@@ -25561,12 +26365,16 @@
     "gen": "Fischerov"
    },
    "cs": {
-    "nom": "Fischer",
-    "gen": "Fischer"
+    "nom": "Fischerova",
+    "gen": "Fischerův"
    },
    "lt": {
     "nom": "Fišeris",
     "gen": "Fišerio"
+   },
+   "vi": {
+    "nom": "Fischer",
+    "gen": "Fischer"
    }
   },
   "Tal": {
@@ -25647,12 +26455,16 @@
     "gen": "Talov"
    },
    "cs": {
-    "nom": "Tal",
-    "gen": "Tal"
+    "nom": "Talova",
+    "gen": "Talův"
    },
    "lt": {
     "nom": "Talis",
     "gen": "Talio"
+   },
+   "vi": {
+    "nom": "Tal",
+    "gen": "Tal"
    }
   },
   "McCutcheon": {
@@ -25733,12 +26545,16 @@
     "gen": "McCutcheonov"
    },
    "cs": {
-    "nom": "McCutcheon",
-    "gen": "McCutcheon"
+    "nom": "McCutcheonova",
+    "gen": "McCutcheonův"
    },
    "lt": {
     "nom": "Makačenas",
     "gen": "Makačeno"
+   },
+   "vi": {
+    "nom": "McCutcheon",
+    "gen": "McCutcheon"
    }
   },
   "Bronstein": {
@@ -25819,12 +26635,16 @@
     "gen": "Bronštejnov"
    },
    "cs": {
-    "nom": "Bronštejn",
-    "gen": "Bronštejn"
+    "nom": "Bronštejnova",
+    "gen": "Bronštejnův"
    },
    "lt": {
     "nom": "Bronšteinas",
     "gen": "Bronšteino"
+   },
+   "vi": {
+    "nom": "Bronstein",
+    "gen": "Bronstein"
    }
   },
   "Janowski": {
@@ -25905,12 +26725,16 @@
     "gen": "Janowského"
    },
    "cs": {
-    "nom": "Janowski",
-    "gen": "Janowski"
+    "nom": "Janowského",
+    "gen": "Janowského"
    },
    "lt": {
     "nom": "Janovskis",
     "gen": "Janovskio"
+   },
+   "vi": {
+    "nom": "Janowski",
+    "gen": "Janowski"
    }
   },
   "Staunton": {
@@ -25991,12 +26815,16 @@
     "gen": "Stauntonov"
    },
    "cs": {
-    "nom": "Staunton",
-    "gen": "Staunton"
+    "nom": "Stauntonova",
+    "gen": "Stauntonův"
    },
    "lt": {
     "nom": "Stauntonas",
     "gen": "Stauntono"
+   },
+   "vi": {
+    "nom": "Staunton",
+    "gen": "Staunton"
    }
   },
   "Max Lange": {
@@ -26077,12 +26905,16 @@
     "gen": "Maxa Langeho"
    },
    "cs": {
-    "nom": "Max Lange",
-    "gen": "Max Lange"
+    "nom": "Langeho",
+    "gen": "Langeho"
    },
    "lt": {
     "nom": "Maksas Langė",
     "gen": "Makso Langės"
+   },
+   "vi": {
+    "nom": "Max Lange",
+    "gen": "Max Lange"
    }
   },
   "Petrov": {
@@ -26163,12 +26995,16 @@
     "gen": "Petrovov"
    },
    "cs": {
-    "nom": "Petrov",
-    "gen": "Petrov"
+    "nom": "Petrovova",
+    "gen": "Petrovův"
    },
    "lt": {
     "nom": "Petrovas",
     "gen": "Petrovo"
+   },
+   "vi": {
+    "nom": "Petrov",
+    "gen": "Petrov"
    }
   },
   "Grünfeld": {
@@ -26249,12 +27085,16 @@
     "gen": "Grünfeldov"
    },
    "cs": {
-    "nom": "Grünfeld",
-    "gen": "Grünfeld"
+    "nom": "Grünfeldova",
+    "gen": "Grünfeldův"
    },
    "lt": {
     "nom": "Griunfeldas",
     "gen": "Griunfeldo"
+   },
+   "vi": {
+    "nom": "Grünfeld",
+    "gen": "Grünfeld"
    }
   },
   "Colle": {
@@ -26335,12 +27175,16 @@
     "gen": "Colleho"
    },
    "cs": {
-    "nom": "Colle",
-    "gen": "Colle"
+    "nom": "Colleova",
+    "gen": "Colleův"
    },
    "lt": {
     "nom": "Kolė",
     "gen": "Kolės"
+   },
+   "vi": {
+    "nom": "Colle",
+    "gen": "Colle"
    }
   },
   "Torre": {
@@ -26421,12 +27265,16 @@
     "gen": "Torreho"
    },
    "cs": {
-    "nom": "Torre",
-    "gen": "Torre"
+    "nom": "Torreova",
+    "gen": "Torreův"
    },
    "lt": {
     "nom": "Torė",
     "gen": "Torės"
+   },
+   "vi": {
+    "nom": "Torre",
+    "gen": "Torre"
    }
   },
   "Réti": {
@@ -26507,12 +27355,16 @@
     "gen": "Rétiho"
    },
    "cs": {
-    "nom": "Réti",
-    "gen": "Réti"
+    "nom": "Rétiho",
+    "gen": "Rétiho"
    },
    "lt": {
     "nom": "Retis",
     "gen": "Retio"
+   },
+   "vi": {
+    "nom": "Réti",
+    "gen": "Réti"
    }
   }
  },
@@ -26600,6 +27452,10 @@
   "lt": {
    "compose_proper_names": false,
    "file_pattern": "(?<![\\w-])(?P<f>[a-h])(?=(?: ir [a-h])* (?:vertikal|pėstinink))"
+  },
+  "vi": {
+   "compose_proper_names": true,
+   "file_pattern": "\\b(?:[Cc]ột|Tốt) (?P<f>[a-h])\\b"
   }
  }
 }
