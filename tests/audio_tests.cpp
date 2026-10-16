@@ -1874,13 +1874,17 @@ TEST(audio_voice_live_engine) {
     st = waitVoice(v2, 0.5f, [](const VoiceStatus& s) { return isState(s, VoiceState::Playing); });
     CHECK_EQ(st.state, VoiceState::Playing);
     std::this_thread::sleep_for(100ms);
+    // The audio thread takes the pause at its next callback, which can come well over 60 ms later
+    // (CI's macOS runner, 2026-10-15: still Playing 60 ms after the call), and reads Paused from
+    // then on while it fades out over kSpeechPauseFade. So: wait for Paused, then the position
+    // moves on by no more than that fade (part of which may already be in `paused.played`).
     setVoicePaused(v2, true);
-    std::this_thread::sleep_for(60ms);
-    const VoiceStatus p1 = voiceStatus(v2);
-    std::this_thread::sleep_for(100ms);
-    const VoiceStatus p2 = voiceStatus(v2);
-    CHECK_EQ(p1.state, VoiceState::Paused);
-    CHECK_EQ(p1.played, p2.played);
+    const VoiceStatus paused = waitVoice(v2, 1.0f, [](const VoiceStatus& s) { return isState(s, VoiceState::Paused); });
+    CHECK_EQ(paused.state, VoiceState::Paused);
+    std::this_thread::sleep_for(200ms);
+    const VoiceStatus held = voiceStatus(v2);
+    CHECK_EQ(held.state, VoiceState::Paused);
+    CHECK(held.played - paused.played <= double(kSpeechPauseFade) + 2.0 / kSrcRate);
     setVoicePaused(v2, false);
     closeVoice(v2);
     st = waitVoice(v2, 2.0f, finished);

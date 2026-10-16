@@ -46,11 +46,13 @@ require_apple_silicon() {
         die "Apple Silicon only: this shell runs as $(uname -m) (an Intel Mac, or a shell under Rosetta)"
 }
 
-# A Python 3.10 or later (Meson and dmgbuild need it; macOS's own python3 is 3.9): python3 when
-# it is recent enough, else the newest python3.N on the PATH.
+# A Python 3.10 or later (Meson and dmgbuild need it; macOS's own python3 is 3.9): the newest
+# python3.N of 3.14 down to 3.10, else python3 when it is recent enough. 3.14 first: the pinned
+# wheels of PyYAML 6.0.3 (requirements-mesa.txt) stop at CPython 3.14, and with --only-binary a
+# newer python3 (3.15) finds none.
 find_python() {
     local p
-    for p in python3 python3.15 python3.14 python3.13 python3.12 python3.11 python3.10; do
+    for p in python3.14 python3.13 python3.12 python3.11 python3.10 python3; do
         command -v "$p" > /dev/null 2>&1 || continue
         if "$p" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2> /dev/null; then
             command -v "$p"

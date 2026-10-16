@@ -1,9 +1,9 @@
 # Release: on a version tag (v1.0.0, v1.0.0-beta.1, ...), the CI runs again on the tagged commit,
-# the game is built from scratch (no cache) for Windows x64, Linux x86-64, Linux aarch64 and,
-# experimentally, macOS on Apple Silicon, the build provenance of the files is attested
-# (actions/attest) and a GitHub release is published with them. A manual
-# run builds the branch or tag it is started on; it publishes only from a tag and when asked to,
-# and otherwise keeps the files as workflow artifacts (a dry run).
+# the game is built from scratch (no cache) for Windows x64, Linux x86-64 (an archive and an
+# AppImage), Linux aarch64 and, experimentally, macOS on Apple Silicon, the build provenance of the
+# files is attested (actions/attest) and a GitHub release is published with them. A manual run
+# builds the branch or tag it is started on; it publishes only from a tag and when asked to, and
+# otherwise keeps the files as workflow artifacts (a dry run).
 name: Release
 
 on:
@@ -276,6 +276,12 @@ jobs:
             -C dist -c "$name" | gzip -9n > "dist/$name.tar.gz"
           rm -r "${dir:?}"
 
+      # The same executable, launcher, icons and licences in one file that runs without unpacking
+      # (tools/linux/make-appimage.sh, which also checks it), with nothing else bundled: the same
+      # system requirements as the archive.
+      - name: AppImage
+        run: tools/linux/make-appimage.sh build/scacelith "dist/Scacelith-$VERSION-linux-x86_64.AppImage"
+
       - name: Upload the Linux files
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -533,13 +539,14 @@ jobs:
           name: release-files
           path: dist
 
-      - name: Attest the archives and the executable
+      - name: Attest the archives, the executables and the images
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           subject-path: |
             dist/*.zip
             dist/*.exe
             dist/*.tar.gz
+            dist/*.AppImage
             dist/*.dmg
 
   publish:
@@ -590,6 +597,11 @@ jobs:
           - **Linux aarch64** (64-bit Arm): \`Scacelith-$VERSION-linux-aarch64.tar.gz\`, the same contents
             and requirements; OpenGL 4.6 on Arm means an NVIDIA GPU (Jetson Orin, discrete cards), an
             AMD discrete card or Asahi Linux on Apple M1/M2 (not a Raspberry Pi).
+          - **Linux x86-64, AppImage**: \`Scacelith-$VERSION-linux-x86_64.AppImage\`, the game of the
+            x86-64 archive in a single file that runs without unpacking: make it executable
+            (\`chmod +x\`) and run it. The same requirements as the archive, and FUSE's
+            \`fusermount3\` or \`fusermount\` (package fuse3 or fuse; libfuse2 is not needed); without
+            them, \`--appimage-extract-and-run\` runs it from a temporary copy.
           $macos
 
           Every file is built by the release workflow from tag \`$TAG\`, and its build provenance is

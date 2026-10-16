@@ -49,8 +49,9 @@ How to play and every mode and option are described in [docs/GUIDE.md](docs/GUID
 ## Installing
 
 The [releases](https://github.com/DarkCenobyte/scacelith-chess/releases) hold the game for Windows
-x64, Linux x86-64 and Linux aarch64, and an experimental build for Apple Silicon Macs; all need a
-GPU with OpenGL 4.6 (the Mac build brings its own), and Stockfish 19 is built in.
+x64, Linux x86-64 (an archive or an AppImage) and Linux aarch64, and an experimental build for Apple
+Silicon Macs; all need a GPU with OpenGL 4.6 (the Mac build brings its own), and Stockfish 19 is
+built in.
 
 - **Windows**: unpack `Scacelith-<version>-windows-x64.zip` anywhere and run `Scacelith.exe` (or
   download the executable alone).
@@ -64,6 +65,12 @@ GPU with OpenGL 4.6 (the Mac build brings its own), and Stockfish 19 is built in
   asks for its password when you sign in or connect), otherwise to a file only you can read: the
   game says so after the sign-in, and Options > Online server can keep them until the game closes
   instead (`install.sh` says when libsecret is missing, and the log says why the file is used).
+- **Linux, AppImage**: `Scacelith-<version>-linux-x86_64.AppImage` is the same game in one file
+  that runs without unpacking: make it executable (`chmod +x`, or the file's properties) and run
+  it. It needs what the archive needs, and FUSE's `fusermount3` or `fusermount` (package `fuse3`
+  or `fuse`; libfuse2 is not needed); without them, `--appimage-extract-and-run` runs it from a
+  temporary copy. It keeps its settings and files in the same folders as the archive's game.
+  AppImageLauncher or Gear Lever, for instance, add it to the applications menu.
 - **Linux on 64-bit Arm**: `Scacelith-<version>-linux-aarch64.tar.gz`, the same as above, for an
   aarch64 system with a GPU driver of OpenGL 4.6: NVIDIA (Jetson Orin, discrete cards), AMD
   discrete cards, Asahi Linux on Apple M1/M2. A Raspberry Pi 4 or 5 cannot run it (OpenGL 3.1).
@@ -221,6 +228,15 @@ and listed with their versions in `Contents/Resources/macOS-dependencies.txt`:
   OpenSSL Project Authors.
 
 Their licence texts are in the app's `Contents/Resources/licences/`.
+
+### At the start of the Linux AppImage
+
+The AppImage begins with the [AppImage type 2 runtime](https://github.com/AppImage/type2-runtime)
+(release 20251108), the program that mounts or extracts the rest of the file: MIT, © probonopd. It
+is statically linked with musl libc (MIT), libfuse (LGPL-2.1), squashfuse (BSD-2-Clause), zstd
+(BSD-3-Clause) and zlib (zlib licence); its repository holds its source code and how to build it.
+Their licence texts are in `res/linux/appimage-runtime/`, and in the AppImage's
+`usr/share/doc/scacelith/licences/AppImage-runtime/`.
 
 ### Code adapted from other projects
 

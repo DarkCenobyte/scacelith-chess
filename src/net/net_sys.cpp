@@ -399,6 +399,19 @@ bool makeDirectories(const std::string& dir) {
 
 #endif
 
+#if !defined(_WIN32) && !defined(__APPLE__)
+bool insideAppImage(const std::string& dir) {
+    const char* appdir = getenv("APPDIR");
+    if (!appdir || appdir[0] != '/') return false;
+    // exeDirectory() is a real path (/proc/self/exe): so is the root it is compared with, when it
+    // can be resolved.
+    char real[PATH_MAX];
+    std::string root = realpath(appdir, real) ? real : appdir;
+    if (root.back() != '/') root += '/';
+    return dir.compare(0, root.size(), root) == 0;
+}
+#endif
+
 #ifdef __APPLE__
 bool insideAppBundle(const std::string& dir) {
     static const char kTail[] = ".app/Contents/MacOS/";
@@ -416,6 +429,12 @@ std::string settingsDirectory() {
     // An application bundle is no portable install: Gatekeeper runs a quarantined app from a
     // random read-only copy (App Translocation), and an update replaces the whole bundle.
     if (insideAppBundle(exe)) return userDataDirectory();
+#elif !defined(_WIN32)
+    // An AppImage is no portable install either: its executable's folder is the AppImage's
+    // read-only mount, or a copy that the runtime extracts again to the temporary folder at each
+    // start (extract-and-run mode). The AppImage's own portable mode (a "<file>.AppImage.config"
+    // folder next to it) sets XDG_CONFIG_HOME, which userDataDirectory() follows.
+    if (insideAppImage(exe)) return userDataDirectory();
 #endif
     if (fileExists(exe + "Scacelith.ini")) return exe;   // portable
     const std::string data = userDataDirectory();
