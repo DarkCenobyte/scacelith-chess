@@ -10,6 +10,7 @@
 #include "chess/chess.h"
 #include "game/settings.h"
 #include "i18n/i18n.h"
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -237,6 +238,15 @@ TEST(ui_game_screens_game_over_card) {
     };
     settle(d);
     CHECK(!ui::gameOverFolded());
+    // A reason too long for one line takes two: the card grows by a line, around its centre.
+    REQUIRE(d.has(T("common.main_menu")));
+    const float oneLine = d.find(T("common.main_menu"))->r.y;
+    reason = T("reason.illegal_vs_insufficient");
+    d.frames(2);
+    REQUIRE(d.has(T("common.main_menu")));
+    CHECK(std::fabs(d.find(T("common.main_menu"))->r.y - (oneLine + 16.0f)) < 0.5f);
+    reason = "Checkmate";
+    d.frames(2);
     REQUIRE(d.click(T("gameover.rematch")));
     CHECK_EQ(count(acts, MenuAction::Rematch), 1);
     REQUIRE(d.click(T("common.main_menu")));

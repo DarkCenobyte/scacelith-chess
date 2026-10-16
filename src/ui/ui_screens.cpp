@@ -2010,7 +2010,20 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
     if (fold < 0.999f) {
         float ct = t * (1.0f - fold);
         float w = analyse ? std::max(700.0f, 3.0f * bw + 2.0f * bgap + 132.0f) : 700.0f;
-        float h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f);
+        // The reason: one line, shrunk to 85 % at most; a longer one (a flag fall against
+        // insufficient material, in most languages) wraps onto two balanced lines.
+        TextStyle why = style(font::FACE_TITLE, 24.0f, ivory, HAlign::Center, 0.2f);
+        const std::string reasonText = upper(reason);
+        const float reasonW = gfx::textWidth(reasonText, why);
+        float reasonWrap = 0.0f;
+        int reasonLines = 1;
+        if (reasonW * 0.85f > w - 60.0f) {
+            reasonWrap = std::min(w - 60.0f, reasonW * 0.6f);
+            if (gfx::wrapLineCount(reasonText, reasonWrap, why) > 2) reasonWrap = w - 60.0f;
+            reasonLines = gfx::wrapLineCount(reasonText, reasonWrap, why);
+        }
+        const float reasonLineH = 32.0f, extra = float(reasonLines - 1) * reasonLineH;
+        float h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f) + extra;
         Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + 60.0f + (1.0f - t) * 20.0f + fold * 40.0f, w, h);
         im::captureMouseRect(p);
         gfx::Layer prev = gfx::layer();
@@ -2032,9 +2045,12 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         gfx::text(res, p.cx(), p.y + 118.0f, glow);
         gfx::text(res, p.cx(), p.y + 118.0f, rs);
         im::ornamentRule(p.cx(), p.y + 146.0f, 190.0f);
-        TextStyle why = style(font::FACE_TITLE, 24.0f, ivory, HAlign::Center, 0.2f);
-        why.size = gfx::fitSize(upper(reason), why, w - 60.0f);
-        gfx::text(upper(reason), p.cx(), p.y + 196.0f, why);
+        if (reasonWrap > 0.0f) {
+            gfx::textWrapped(reasonText, p.cx(), p.y + 196.0f, reasonWrap, why, reasonLineH);
+        } else {
+            why.size = gfx::fitSize(reasonText, why, w - 60.0f);
+            gfx::text(reasonText, p.cx(), p.y + 196.0f, why);
+        }
         std::string line;
         if (draw) line = moveCount > 0 ? i18n::trn("gameover.draw_moves", moveCount) : T("gameover.draw");
         else if (playerWon) line = moveCount > 0 ? i18n::trn("gameover.win_moves", moveCount) : T("gameover.win");
@@ -2042,8 +2058,8 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         if (!S.goExtras.line.empty()) line = S.goExtras.line;
         TextStyle ls = style(font::FACE_ITALIC, 25.0f, ivoryDim, HAlign::Center);
         ls.size = gfx::fitSize(line, ls, w - 60.0f);
-        gfx::text(line, p.cx(), p.y + 238.0f, ls);
-        if (!S.goExtras.detail.empty()) detail::gameOverDetail(S.goExtras.detail, p.cx(), p.y + 276.0f);
+        gfx::text(line, p.cx(), p.y + 238.0f + extra, ls);
+        if (!S.goExtras.detail.empty()) detail::gameOverDetail(S.goExtras.detail, p.cx(), p.y + 276.0f + extra);
         // Main menu, (Analyse the game,) Rematch: centred, the primary one on the end side.
         const float bh = 56.0f, gap = bgap;
         const float by = p.b() - 44.0f - bh;

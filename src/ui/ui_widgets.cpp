@@ -1234,6 +1234,15 @@ void tooltip(const std::string& text, const Rect& within) {
     drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false, within);
 }
 
+float dialogWidth(const std::string& title, float viewWidth) {
+    TextStyle st;
+    st.face = font::FACE_TITLE;
+    st.size = kPageTitle;
+    st.tracking = 0.2f;
+    // 80 units of margin on each side of the title (its ornament rule reaches 70 past each end).
+    return std::clamp(gfx::textWidth(title, st) + 160.0f, 760.0f, std::max(760.0f, viewWidth - 80.0f));
+}
+
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
                   const std::string& cancelLabel, [[maybe_unused]] bool dangerous) {
     Id id = makeId(idStr);
@@ -1255,13 +1264,13 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     ms.size = kBody;
     ms.color = ivoryDim;
     ms.align = HAlign::Center;
-    float w = 760.0f;
+    float w = dialogWidth(title, view.x);
     int lines = gfx::wrapLineCount(message, w - 120.0f, ms);
     float h = 250.0f + float(lines) * ms.size * 1.35f;
     Rect r(view.x * 0.5f - w * 0.5f, view.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
     gfx::fill(r, vec4(0.035f, 0.03f, 0.027f, 1.0f), 3.0f);  // opaque: hide the page below
     panel(r);
-    pageTitle(title, r.cx(), r.y + 72.0f);
+    pageTitle(title, r.cx(), r.y + 72.0f, w - 160.0f);
     gfx::textWrapped(message, r.cx(), r.y + 142.0f, w - 120.0f, ms, ms.size * 1.35f);
     float bw = 250.0f, bh = 56.0f, gap = 30.0f;
     float by = r.b() - 44.0f - bh;

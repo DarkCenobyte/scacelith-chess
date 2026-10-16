@@ -202,6 +202,10 @@ void pageTitle(const std::string& title, float cx, float y, float maxWidth = 0.0
 void sectionLabel(const std::string& text, float x, float y, float width);
 void rowHighlight(const Rect& r, float t);
 
+// The width of a confirmation dialog: 760, wider for a title that needs more room (a title never wraps;
+// past the screen's width less 40 on each side, it shrinks to fit).
+float dialogWidth(const std::string& title, float viewWidth);
+
 // Modal confirmation. Returns -1 while open, 1 = confirmed, 0 = cancelled (Esc / cancel button).
 // 'dangerous' marks destructive actions; it does not change the look (the confirm button is Primary).
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
