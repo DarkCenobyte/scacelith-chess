@@ -226,7 +226,7 @@ preset.beginner.desc = Zna podstawy, ale wciąż regularnie podstawia materiał.
 preset.casual.name = Amator
 preset.casual.desc = Rywal na spokojny wieczór: rozsądne ruchy, częste błędy.
 preset.club_player.name = Gracz klubowy
-preset.club_player.desc = Solidny gracz klubowy, który karze za oczywiste podstawki.
+preset.club_player.desc = Solidny gracz klubowy, który karze za rażące błędy.
 preset.advanced.name = Zaawansowany
 preset.advanced.desc = Silny gracz klubowy z dobrym wyczuciem taktycznym.
 preset.expert.name = Ekspert
@@ -249,3 +249,256 @@ credits.engine = Stockfish 19, dzieło twórców Stockfisha.
 credits.engine.licence = Licencja GNU General Public License v3.
 credits.engine.data = Jego sieć neuronowa została wytrenowana na danych udostępnionych przez projekt Leela Chess Zero na licencji Open Database License (ODbL).
 credits.voice.head = GŁOS TRENERA
+credits.voice = Mowa syntetyczna generowana przez Supertonic 3 w trybie „Trener”.
+credits.voice.licence = Supertonic 3 to model firmy Supertone, używany na licencji OpenRAIL-M, której ograniczenia użytkowania dotyczą każdego, kto z niego korzysta (zob. Licencje).
+credits.openings.head = DEBIUTY
+credits.openings = Nazwy debiutów z bazy chess-openings serwisu lichess.org, przekazanej do domeny publicznej (CC0).
+credits.fonts.head = KROJE PISMA
+credits.fonts = EB Garamond – Georg Duffner, Cinzel – Natanael Gama; Amiri – Khaled Hosny.
+credits.fonts.hand = Pismo odręczne: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Symbole bierek z GNU FreeFont (GPL v3 z wyjątkiem dotyczącym fontów).
+credits.quote = „Szachy to sztuka analizy.”  – Michaił Botwinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licencje
+licences.title = LICENCJE
+licences.note = Licencje są wyświetlane w oryginalnej wersji angielskiej.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+# "Claim a draw" follows the Polish FIDE Laws: "żądanie remisu", "remis na żądanie".
+pause.title = PAUZA
+pause.resume = Wznów
+pause.offer_draw = Zaproponuj remis
+pause.claim_draw = Zażądaj remisu
+pause.claim_draw.help = Trzykrotne powtórzenie pozycji lub zasada 50 ruchów.
+pause.resign = Poddaj partię
+confirm.resign.title = PODDANIE PARTII
+confirm.resign.text = Poddać tę partię? Zwycięzcą zostanie ogłoszony przeciwnik.
+confirm.resign.draw = Poddać tę partię? Przeciwnik nie może już dać mata: partia zakończy się remisem.
+confirm.resign.ok = Poddaj partię
+confirm.leave.title = WYJŚCIE Z PARTII
+confirm.leave.text = Wrócić do menu głównego? Bieżąca partia zostanie porzucona.
+confirm.leave.ok = Wyjdź
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOCJA NA
+piece.queen = Hetman
+piece.rook = Wieża
+piece.bishop = Goniec
+piece.knight = Skoczek
+
+# ---- Game over ---------------------------------------------------------------------------------
+# "w {0} ruchu / ruchach" (locative): few and many are the same words.
+gameover.draw = Partia kończy się remisem.
+gameover.draw_moves = Partia kończy się remisem po {0} ruchu.|Partia kończy się remisem po {0} ruchach.|Partia kończy się remisem po {0} ruchach.
+gameover.win = Dobrze zagrane – wygrywasz.
+gameover.win_moves = Dobrze zagrane – wygrywasz w {0} ruchu.|Dobrze zagrane – wygrywasz w {0} ruchach.|Dobrze zagrane – wygrywasz w {0} ruchach.
+gameover.loss = Wygrywa przeciwnik.
+gameover.loss_moves = Przeciwnik wygrywa w {0} ruchu.|Przeciwnik wygrywa w {0} ruchach.|Przeciwnik wygrywa w {0} ruchach.
+gameover.rematch = Rewanż
+gameover.view_board = Zobacz szachownicę
+gameover.show = Pokaż
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Mat
+reason.resignation = Poddanie partii
+reason.timeout = Przegrana na czas
+reason.illegal_moves = Drugi nieprawidłowy ruch (przegrana)
+reason.stalemate = Pat
+reason.insufficient = Martwa pozycja (niewystarczający materiał)
+reason.timeout_vs_insufficient = Opadnięcie chorągiewki, ale przeciwnik nie może dać mata
+reason.fivefold = Pięciokrotne powtórzenie pozycji
+reason.75_moves = Zasada 75 ruchów
+reason.threefold_claim = Trzykrotne powtórzenie pozycji (na żądanie)
+reason.50_moves_claim = Zasada 50 ruchów (na żądanie)
+reason.agreement = Remis za zgodą
+reason.illegal_vs_insufficient = Drugi nieprawidłowy ruch, ale przeciwnik nie może dać mata
+reason.resignation_vs_insufficient = Poddanie partii, ale przeciwnik nie może dać mata
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = RUCHY
+movelist.empty = Na razie brak ruchów.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Przygotowywanie materiałów
+loading.hall = Wznoszenie sali
+loading.furniture = Rzeźbienie stołu i krzeseł
+loading.board = Polerowanie szachownicy
+loading.pieces = Toczenie bierek
+loading.clock = Składanie zegara
+loading.porcelain = Wypalanie porcelany
+loading.ready = Gotowe
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move is the Polish saying "dotknięta – ruszona"; the touched piece "musi zagrać".
+notify.no_draw_claim = W tej pozycji nie można żądać remisu.
+notify.flag_you = Twoja chorągiewka opadła.
+notify.flag_opponent = Chorągiewka przeciwnika opadła.
+notify.touched.pawn = Dotknięta – ruszona: musisz zagrać dotkniętym pionkiem.
+notify.touched.knight = Dotknięta – ruszona: musisz zagrać dotkniętym skoczkiem.
+notify.touched.bishop = Dotknięta – ruszona: musisz zagrać dotkniętym gońcem.
+notify.touched.rook = Dotknięta – ruszona: musisz zagrać dotkniętą wieżą.
+notify.touched.queen = Dotknięta – ruszona: musisz zagrać dotkniętym hetmanem.
+notify.touched.king = Dotknięta – ruszona: musisz zagrać dotkniętym królem.
+notify.touched.piece = Dotknięta – ruszona: musisz zagrać dotkniętą bierką.
+notify.touched_square = Dotknięta – ruszona: musisz zagrać bierką z pola {0}.
+notify.press_clock = Naciśnij zegar, aby zakończyć ruch (spacja).
+notify.manual_clock = W tej partii po każdym ruchu musisz samodzielnie nacisnąć zegar.
+notify.illegal = Nieprawidłowy ruch.
+notify.cannot_move = Tego ruchu nie można wykonać.
+notify.move_first = Wykonaj ruch, zanim naciśniesz zegar.
+notify.stance.sit_to_play = Usiądź, aby grać (strzałka w dół).
+notify.stance.first = Gdy stoisz, twój zegar dalej chodzi. Strzałka w dół: usiądź z powrotem.
+notify.stance.first_untimed = Grać można tylko z krzesła. Strzałka w dół: usiądź z powrotem.
+notify.stance.finish_move = Najpierw dokończ ruch.
+notify.draw_already_offered = Twoja propozycja remisu w tym ruchu już padła.
+notify.draw_accepted = Przeciwnik przyjmuje remis.
+notify.draw_declined = Przeciwnik odrzuca propozycję remisu.
+notify.draw_claimed = Przeciwnik żąda remisu.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Sędzia: zegar został naciśnięty bez wykonania ruchu, co liczy się jako nieprawidłowy ruch.
+arbiter.unpromoted = Sędzia: nieprawidłowy ruch – przed naciśnięciem zegara pionek nie został zastąpiony nową figurą.
+arbiter.illegal = Sędzia: nieprawidłowy ruch.
+arbiter.second_loses.white = To drugi nieprawidłowy ruch białych: białe przegrywają partię.
+arbiter.second_loses.black = To drugi nieprawidłowy ruch czarnych: czarne przegrywają partię.
+arbiter.second_draw.white = To drugi nieprawidłowy ruch białych, ale czarne nie mogą dać mata: partia kończy się remisem.
+arbiter.second_draw.black = To drugi nieprawidłowy ruch czarnych, ale białe nie mogą dać mata: partia kończy się remisem.
+arbiter.queen = Pionek zamienia się w hetmana.
+arbiter.queen_one_minute.white = Pionek zamienia się w hetmana, a białe otrzymują dodatkową minutę.
+arbiter.queen_one_minute.black = Pionek zamienia się w hetmana, a czarne otrzymują dodatkową minutę.
+arbiter.queen_two_minutes.white = Pionek zamienia się w hetmana, a białe otrzymują dwie dodatkowe minuty.
+arbiter.queen_two_minutes.black = Pionek zamienia się w hetmana, a czarne otrzymują dwie dodatkowe minuty.
+arbiter.restored = Pozycja zostaje przywrócona.
+arbiter.restored_one_minute.white = Pozycja zostaje przywrócona, a białe otrzymują dodatkową minutę.
+arbiter.restored_one_minute.black = Pozycja zostaje przywrócona, a czarne otrzymują dodatkową minutę.
+arbiter.restored_two_minutes.white = Pozycja zostaje przywrócona, a białe otrzymują dwie dodatkowe minuty.
+arbiter.restored_two_minutes.black = Pozycja zostaje przywrócona, a czarne otrzymują dwie dodatkowe minuty.
+arbiter.one_minute.white = Białe otrzymują dodatkową minutę.
+arbiter.one_minute.black = Czarne otrzymują dodatkową minutę.
+arbiter.two_minutes.white = Białe otrzymują dwie dodatkowe minuty.
+arbiter.two_minutes.black = Czarne otrzymują dwie dodatkowe minuty.
+arbiter.second_loses = Drugi nieprawidłowy ruch oznacza przegraną.
+arbiter.touched.white = Białe muszą zagrać dotkniętą bierką.
+arbiter.touched.black = Czarne muszą zagrać dotkniętą bierką.
+arbiter.game_over = Partia jest już zakończona.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Oglądaj partię
+
+viewer.title = OGLĄDANIE PARTII
+viewer.white = BIAŁE
+viewer.black = CZARNE
+viewer.time_control = TEMPO GRY
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Zamień kolory
+viewer.note = Po obu stronach gra Stockfish. W trakcie partii możesz swobodnie latać po sali: nikt cię nie zobaczy.
+viewer.summary = {0} kontra {1}
+viewer.custom = Własne
+viewer.tc.custom = Do wyboru
+viewer.base_time = Czas podstawowy
+viewer.increment = Dodatek
+viewer.delay = Opóźnienie
+viewer.off = Brak
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = opóźnienie {0} s
+viewer.back = Wstecz
+viewer.start = Rozpocznij
+
+viewer.paused = PAUZA
+viewer.resume = Wznów
+viewer.options = Opcje
+viewer.main_menu = Menu główne
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = STEROWANIE
+viewer.keys.move = W A S D  ·  Z Q S D  ·  strzałki
+viewer.controls.move = Poruszanie się
+viewer.keys.updown = E, spacja  /  C, Ctrl
+viewer.controls.updown = W górę / w dół
+viewer.keys.fast = Shift
+viewer.controls.fast = Szybciej
+viewer.keys.look = Prawy przycisk myszy
+viewer.controls.look = Rozglądanie się
+viewer.keys.speed = Kółko myszy
+viewer.controls.speed = Prędkość
+viewer.keys.views = 1 – 9
+viewer.controls.views = Widoki
+viewer.keys.eyes = 0
+viewer.controls.eyes = Oczami gracza, który ma ruch
+viewer.keys.moves = Tab
+viewer.controls.moves = Lista ruchów
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Ukryj tę nakładkę
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauza / wznowienie
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Ruch do tyłu / do przodu
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Wolniej / szybciej
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Początek / koniec partii
+viewer.speed = Prędkość {0} m/s
+viewer.view.0 = Oczami graczy
+viewer.view.1 = Obok stołu
+viewer.view.2 = Nad szachownicą
+viewer.view.3 = Sala
+viewer.view.4 = Zegar
+viewer.view.5 = Twarz grającego białymi
+viewer.view.6 = Twarz grającego czarnymi
+viewer.view.7 = Pojedynek
+viewer.view.8 = Okna
+viewer.view.9 = Gobeliny
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+# The sides are lowercase plural nouns ("białe" / "czarne"): the sentences never start with them.
+viewer.side.white = białe
+viewer.side.black = czarne
+viewer.flag.white = Chorągiewka białych opadła.
+viewer.flag.black = Chorągiewka czarnych opadła.
+viewer.claims_draw = Remisu żądają {0}.
+viewer.offer_accepted = Remis proponują {0}, a {1} go przyjmują.
+viewer.offer_declined = Remis proponują {0}, ale {1} odmawiają.
+viewer.gameover.white_wins = Białe wygrywają po {0}. ruchu.
+viewer.gameover.black_wins = Czarne wygrywają po {0}. ruchu.
+viewer.gameover.draw = Partia kończy się remisem po {0}. ruchu.
+viewer.gameover.players = {0} kontra {1}
+viewer.watch_again = Obejrzyj ponownie
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Brak partii rankingowych
+elo.provisional = Ranking tymczasowy
+elo.peak = Najwyższy: {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Twoje Elo: {0}
+elo.expected = oczekiwany wynik: {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ta partia nie jest rankingowa
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Zapis partii
+scoresheet.event = Turniej
+scoresheet.date = Data
+scoresheet.round = Runda
+scoresheet.board = Szachownica
+scoresheet.page = Strona
+scoresheet.white = Białe
+scoresheet.black = Czarne
+scoresheet.elo = Elo
+scoresheet.result = Wynik
+scoresheet.move_no = Nr
+scoresheet.sign_white = Podpis białych
+scoresheet.sign_black = Podpis czarnych
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K H W G S
+scoresheet.date_format = {0}.{1}.{2}

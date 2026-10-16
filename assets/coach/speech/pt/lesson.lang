@@ -154,6 +154,7 @@ lesson.safety.free = Mas {my} não tem defensor. A tua dama ataca as duas peças
 lesson.safety.ask = Captura a peça indefesa!
 lesson.safety.watch = Vê o que acontece.
 lesson.safety.gave = Deste a tua dama, que vale nove, pelo meu cavalo, que vale três.
+lesson.safety.gave.spoken = Déste a tua dama, que vale nove, pelo meu cavalo, que vale três.
 lesson.safety.other = Experimenta a outra peça.
 lesson.safety.look = Procura a peça que nada defende.
 lesson.safety.ok = Excelente! Pergunta sempre: essa peça está defendida?

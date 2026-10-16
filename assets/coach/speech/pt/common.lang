@@ -248,13 +248,15 @@ owner.black.esse = {piece}
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # File letters are said by their Portuguese names: "á quatro", "bê cinco", "é quatro", "efe três",
 # "agá sete". The "a" carries its accent so that the voice says the letter, not the unstressed
-# article or preposition "a" ("a quatro").
+# article or preposition "a" ("a quatro"). A bare "é" melts into the word before it ("toma em é
+# cinco" is said "toma em cinco", "para é quatro" adds 10 ms to "para quatro"): "éh" is the same
+# letter, held a little longer, and is heard far more often (82 times in 111 against 55).
 square.spoken = {file} {rank}
 file.a.spoken = á
 file.b.spoken = bê
 file.c.spoken = cê
 file.d.spoken = dê
-file.e.spoken = é
+file.e.spoken = éh
 file.f.spoken = efe
 file.g.spoken = gê
 file.h.spoken = agá

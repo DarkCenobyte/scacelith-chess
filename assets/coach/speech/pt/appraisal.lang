@@ -380,6 +380,7 @@ appraisal.improve.coach_hung.b1.2 = No lance {n}, {my} estava à tua mercê. Pro
 appraisal.improve.coach_hung.b2 = No lance {n}, {my} estava indefes{my:o}. Reparaste?
 appraisal.improve.coach_hung.b2.2 = No lance {n}, podias ter tomado {my} de graça.
 appraisal.improve.coach_hung.b3 = No lance {n}, {my} estava solt{my:o}. Deste por isso?
+appraisal.improve.coach_hung.b3.spoken = No lance {n}, {my} estava solt{my:o}. Déste por isso?
 appraisal.improve.coach_hung.b3.2 = {my} estava sem defesa no lance {n}. Procura peças soltas a cada lance.
 # A clean game: keep doing it.
 appraisal.improve.clean.b1 = Continua a verificar se as tuas peças estão seguras, como hoje.
