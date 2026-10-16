@@ -459,3 +459,43 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   "istället", "kungs flygel"); v heard as b ("Bits tid", "bitslöppare"); the sj sound written "sk", "ch" or
   "tj"; the first word of a short line lost; eponyms garbled. Whisper writes the spelling it knows ("Grand
   Prix", "Miles") whatever the voice says.
+
+## Polish
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares) | runs into the word before it: "na a sześć" heard "na sześć", "ruch a trzy" heard "rucha trzy" (the probe puts "na a sześć" near "na sześć") | `aa` (file.a.spoken): heard as the a-file 22 times in 30, against 12 for "a", over 10 contexts |
+| sto (appraisal.num.acc_explain.b3, .b3.2) | said, but heard as "co", "to" or "z" 8 times in 8 | `sto procent` (.spoken): 6 times in 6 |
+| fianchetto, fianchetta, fianchettem, fianchettami | "fiancetto" (probe), heard "Jan Szeto", "Piętrze to" | `fianketto`... (respell.*): heard with a k ("fialkietem", "ankietem") |
+| Giuoco | "gi-uoko" (probe: Dżuoko far), heard "Duoco", "Głoco" | `dżuoko`: heard "Dżłoko" 2 times in 3 |
+| Grand Prix | the d and the x said ("Grand Priks", probe), heard "pliks", "freaks" | `gran pri` (respell.grand, respell.prix): no x in 3 |
+| Ponzianiego | "Ponzjaniego" (probe), heard "Pundzianiego" | `poncjaniego`: heard "poncieniego", "Punc Janiego" |
+| Steinitz(a), Rubinstein(a), Spielmann(a), Schliemann(a) | as written: "Stejnica", "Rubinstejna", "Spilmana", "Szlemana" (probe) | `sztajnic(a)`, `rubinsztajn(a)`, `szpilman(a)`, `szliman(a)`: heard "Sztajnica", "Spielmana" 3 in 3 (against "Spearman", "spiralny"), "ślimana" |
+| Sämisch(a), Jaenisch(a), Grünfeld(a), Miesesa | "Samisza", "Ja-e-nisza", "Grunfelda", "Mjesesa" (probe) | `zemisz(a)`, `jenisz(a)`, `grynfeld(a)`, `mizesa`: "Zemisza" 3 in 3 (against "Samisha"), "Grimfelda", "mi zesa" |
+| Kieseritzky | "Kjeseritzki" (probe) | `kizericki` ("Kizericki'ego"): heard "Kizerickiego", "Kizeryckiego" |
+| Maróczy | the Polish ó: "Maruczy" (probe, heard "maruczego" 2 in 3) | `maroczy`: "maroczego" 3 in 3 |
+| Réti, Rétiego | é as "ej" or "y": "Rejtiego" (probe), heard "Rytiego", "rytmiego" | `reti`, `retiego`: heard "retiego", "trzeciego" |
+| Owena, Milesa, McCutcheon(a), Kruijsa, Geeta, Jobavy | read as Polish: "Owena" (w = v), "Milesa", "Mkuczona", "Krui-sa", "Gieta", "Jobawy" (probe) | `ołena`, `majlsa`, `makaczon(a)`, `krajsa`, `chejta`, `dżobawy`: "Majsa", "makaczona" 2 in 3 (against none), "drzabawy" (against "obawy" 3 in 3) |
+
+- Parakeet missed most words; the round trips are Whisper medium set to `pl`: 300 lines (seed 0, 18% of words
+  missed), then 3 seeds on 109 lines (the reviewers' list, 100 opening names and eponyms in short carrier
+  lines, the file letters, the L, numbers 11 to 100, decimals, the words missed most), on 32 lines of fixes,
+  and on 32 lines of A/B variants of the file letters; probes (4 seeds) for every name and doubtful word.
+- Checked and fine: goniec, gońca, gońcem (probe: "koniec", "końca" far; the recogniser often writes a k),
+  hetman (the h said; heard "headman", "hitman"), the numbers (jedenaście to dziewięćdziesiąt dziewięć,
+  sześćdziesiąt cztery, dwudziesty pierwszy, "plus dwa przecinek trzy" as the right digits, 3 seeds), el for the
+  L, Hmm, Elo, blitz ("blic"), „poprawiam”, w przelocie ("pszelocie"), umknęło, zagram, epoletowy, jeż ("jesz"),
+  Caro-Kann, Philidora (= "Filidora"), Horwitza, Collego, Tarrascha, Scheveningen (= "Szeweningen"), Marshalla,
+  Morphy'ego, Halloween, Breyera, Evansa, Fischera, Schlechtera, Capablanki, Greco, Maxa Langego, Najdorfa,
+  Richtera-Rauzera, Czigorina, Torrego, Bongcloud (= "Bongklaud"), Smitha (= "Smita"), Blackmara (= "Blekmara"),
+  Falkbeera (= "Falkbera"), Stauntona ("Stałntona", near the English), the Russian and Polish names.
+- Left as is: the file letter e melts the same way ("na e cztery" near "na cztery", a line-initial "e bije"
+  lost), but `ee` did no clearly better (17 times in 33 against 14; heard "i" or "A"; `eh` is said "ech"). The
+  opening texts keep "a" until tools/gen_opening_lang.py runs again (their squares come from file.*.spoken).
+  Close calls in the probe, the recogniser hearing another word: czarne ("czarny"), bierki ("bielki"), roszadę
+  ("ruszadę", "rozsada"). No settled Polish reading, left: Stonewall (no candidate close), Euwe ("Ełwe"),
+  Nimzowitscha and nimzoindyjska (said with z, as many Polish players do), Diemera ("Djemera": `Dimera` heard the
+  same), Van't.
+- Recogniser habits: it writes "piąka" for pionka (the same sound: [pʲɔŋka]), splits "skoczka" as "z koczka",
+  writes gońca as "końca", final -ę as -e and -e as -y ("czarny", "matę"), roszada as "rozsada", squares as
+  notation (A6, E4), and garbles short lines and lines of names.

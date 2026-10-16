@@ -313,6 +313,9 @@ appraisal.num.acc.b3.2 = Dokładność {acc:percent}: {n:mistake}, {m:blunder}.
 appraisal.num.acc.b3.3 = Dokładność twojej gry to {acc:percent}; {n:mistake} i {m:blunder}.
 appraisal.num.acc_explain.b3 = Dokładność porównuje twoje ruchy z najlepszym ruchem w każdej pozycji: sto oznacza grę idealną.
 appraisal.num.acc_explain.b3.2 = Dokładność mierzy, jak blisko najlepszych były twoje ruchy. Sto to ideał.
+# "sto" alone was heard as "co", "to" or "z" 8 times in 8; "sto procent" 6 times in 6 (docs/PRONUNCIATION.md).
+appraisal.num.acc_explain.b3.spoken = Dokładność porównuje twoje ruchy z najlepszym ruchem w każdej pozycji: sto procent oznacza grę idealną.
+appraisal.num.acc_explain.b3.2.spoken = Dokładność mierzy, jak blisko najlepszych były twoje ruchy. Sto procent to ideał.
 appraisal.num.acc.b4 = Dokładność: {acc:percent}.
 appraisal.num.acc.b4.2 = Twoja dokładność: {acc:percent}.
 appraisal.num.acc.b4.3 = {acc:percent} dokładności.

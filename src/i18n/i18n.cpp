@@ -88,7 +88,7 @@ const std::vector<Language>& languages() {
         {"lt", "Lietuvi\xC5\xB3", false, false},                                             // Lietuvių
         {"hu", "Magyar", false, false},
         {"nl", "Nederlands", false, false},
-        {"pl", "Polski", false, false},
+        {"pl", "Polski", false},
         {"pt-BR", "Portugu\xC3\xAAs (Brasil)", false},
         {"pt", "Portugu\xC3\xAAs (Portugal)", false},
         {"ro", "Rom\xC3\xA2n\xC4\x83", false, false},                                        // Română

@@ -598,7 +598,9 @@ owner.black.could = {piece}
 # Written squares are always "e4". The voice says the Polish letter name, then the rank as a
 # cardinal number, as Polish players read a square: "e cztery", "ef trzy", "gie pięć", "ha siedem".
 square.spoken = {file} {rank}
-file.a.spoken = a
+# The letter a alone melts into the word before it ("na a sześć" heard "na sześć", "ruch a trzy" "rucha
+# trzy"): a long `aa` was heard as the a-file 22 times in 30, the plain "a" 12 (docs/PRONUNCIATION.md).
+file.a.spoken = aa
 file.b.spoken = be
 file.c.spoken = ce
 file.d.spoken = de
@@ -637,8 +639,48 @@ move.mate.spoken = {move}, mat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the voice misreads. Polish says "bicie w przelocie",
-# not "en passant".
+# Words the voice misreads (docs/PRONUNCIATION.md, Polish). Polish says "bicie w przelocie", not "en
+# passant". The voice reads foreign names letter by letter as Polish: they are spelled as Polish
+# players say them. Italian ch = k (it said "fiancetto"):
+respell.fianchetto = fianketto
+respell.fianchetta = fianketta
+respell.fianchettem = fiankettem
+respell.fianchettami = fiankettami
+# Italian gi = dż ("gi-uoko"), z = c ("ponzjaniego"); Grand Prix with its d and x said:
+respell.giuoco = dżuoko
+respell.ponzianiego = poncjaniego
+respell.grand = gran
+respell.prix = pri
+# German: st = szt, ei = aj, sch = sz, ie = i, ü = y, ä = e, a voiced s before a vowel ("stejnica",
+# "rubinstejna", "spilmana", "samisza", "grunfelda", "mjesesa" as said):
+respell.steinitz = sztajnic
+respell.steinitza = sztajnica
+respell.rubinstein = rubinsztajn
+respell.rubinsteina = rubinsztajna
+respell.spielmann = szpilman
+respell.spielmanna = szpilmana
+respell.schliemann = szliman
+respell.schliemanna = szlimana
+respell.sämisch = zemisz
+respell.sämischa = zemisza
+respell.jaenisch = jenisz
+respell.jaenischa = jenisza
+respell.grünfeld = grynfeld
+respell.grünfelda = grynfelda
+respell.miesesa = mizesa
+respell.kieseritzky = kizericki
+# Hungarian ó is o, not the Polish u ("maruczego"); Hungarian/French é is e, not "ej" ("rejtiego"):
+respell.maróczy = maroczy
+respell.réti = reti
+respell.rétiego = retiego
+# English and Dutch names; Georgian J = dż ("jobawy" said with a Polish j):
+respell.milesa = majlsa
+respell.owena = ołena
+respell.mccutcheon = makaczon
+respell.mccutcheona = makaczona
+respell.kruijsa = krajsa
+respell.geeta = chejta
+respell.jobavy = dżobawy
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, nominative masculine (the neuter "jedno" and the feminine "jedna", "dwie" are
