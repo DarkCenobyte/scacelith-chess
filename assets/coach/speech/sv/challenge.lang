@@ -1,0 +1,140 @@
+# Coach speech (Swedish): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 ställningar", count.position in
+#            common.lang), "{n:move}" likewise ("3 drag": "matt i 3 drag", spoken "matt i tre drag")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "schackmatt" (the line says it)
+#   {your}   one of the player's pieces ("din springare", "ditt torn"); the coach points at it on
+#            that word
+#   {sq}     a square ("rutan {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "du" to the player.
+# A counted noun never starts a sentence (a number is never capitalised, see common.lang): the
+# introductions say "Här kommer {n:position}", "Du får {n:position}", "I {n:position} ...".
+# The challenge names at the start of each introduction are those of the challenge page
+# (challenge.<id>.name in assets/i18n/sv.lang). Tactical terms: gaffel, bindning, spett,
+# avdragsangrepp, avledning, lockning, mellandrag, instängd pjäs, tyst drag; "Philidors försvar" is
+# the rook-endgame defence here, as on the challenge page.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matt i ett drag. Här kommer {n:position}, och varje gång sätter ett enda drag matt. Titta på varje schack.
+ch.intro.mate2 = Matt i två drag. Här kommer {n:position}: ditt första drag måste lämna mig utan försvar, sedan sätter du matt.
+ch.intro.mate3 = Matt i tre drag. Här kommer {n:position}. Schackar, slag och hot: räkna ut mitt bästa svar varje gång.
+ch.intro.backrank = Baslinjematt. Här kommer {n:position} där en kung sitter fast bakom sina egna bönder.
+ch.intro.patterns = Mattmönster. Du får {n:position} med klassiska mattnät. Känn igen mönstret och slå sedan till.
+ch.intro.hanging = Gratispjäser. Här kommer {n:position}: något av mitt står oskyddat. Hitta det och ta det.
+ch.intro.fork = Gafflar. I {n:position} ska du hitta draget som angriper två saker på en gång.
+ch.intro.pin = Bindningar. Här kommer {n:position}: bind en pjäs, eller utnyttja en bindning.
+ch.intro.skewer = Spett. Här kommer {n:position}: angrip en värdefull pjäs och vinn det som står bakom den.
+ch.intro.discovered = Avdragsangrepp. Här kommer {n:position}: flytta en pjäs för att släppa loss en annan.
+ch.intro.deflection = Avledning och lockning. Här kommer {n:position}: locka bort en försvarare, eller till en ödesdiger ruta.
+ch.intro.intermezzo = Mellandrag. I {n:position} ska du hitta ett starkare drag före det självklara.
+ch.intro.trapped = Instängda pjäser. Här kommer {n:position}: en av mina pjäser har ingen säker ruta att gå till. Vinn den.
+ch.intro.promotion = Förvandling. Du får {n:position} där en framskjuten bonde avgör partiet.
+ch.intro.quiet = Tysta drag. Här kommer {n:position}: det vinnande draget är varken en schack eller ett slag.
+ch.intro.opening = Öppningsfällor. Du får {n:position} från de första dragen i riktiga partier. Straffa mitt misstag.
+ch.intro.escape = Hitta räddningen. Här kommer {n:position}: din kung är i fara, och bara ett drag räddar den.
+ch.intro.defend = Försvarsdrag. I {n:position} ska du hitta det enda drag som håller ihop din ställning.
+ch.intro.kq = Dam och kung mot kung. Här kommer {n:position}: sätt min kung matt. Se upp för patt.
+ch.intro.kr = Torn och kung mot kung. Här kommer {n:position}: sätt min kung matt, ett steg i taget.
+ch.intro.kp = Kung och bonde mot kung. Här kommer {n:position}: skaffa dig en ny dam. Låt kungen gå före bonden.
+ch.intro.kp_hold = Stoppa bonden. Här kommer {n:position}: du har bara din kung. Håll remi.
+ch.intro.rook = Tornslutspel. Här kommer {n:position}: bygg bron för att förvandla bonden, och håll remi med Philidors försvar.
+ch.intro.endgame = Slutspelstaktik. Du får {n:position} med få pjäser och skarpa idéer.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "matt i 2 drag").
+ch.task.mate = Matt i {n:move}.
+ch.task.mate.2 = Hitta matten i {n:move}.
+ch.task.hanging = Något står oskyddat.
+ch.task.hanging.2 = Vad kan du ta gratis?
+ch.task.fork = Hitta gaffeln.
+ch.task.fork.2 = Leta efter en gaffel.
+ch.task.pin = En bindning är nyckeln här.
+ch.task.skewer = Ett spett vinner här.
+ch.task.discovered = Ett avdragsangrepp vinner här.
+ch.task.deflection = Överbelasta en försvarare, eller locka den till fel ruta.
+ch.task.intermezzo = Leta efter ett mellandrag.
+ch.task.trapped = En av mina pjäser kan inte fly. Vinn den.
+ch.task.promotion = Använd din framskjutna bonde.
+ch.task.quiet = Det vinnande draget är ett tyst drag.
+ch.task.opening = Straffa mitt senaste drag.
+ch.task.escape = Rädda din kung: bara ett drag fungerar.
+ch.task.defend = Hitta det enda bra draget.
+ch.task.endgame = Hitta det bästa draget.
+ch.task.default = Hitta det bästa draget.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Sätt min kung matt. Jag försvarar mig så gott jag kan.
+ch.task.play.promote = Förvandla din bonde, och behåll vinsten. Jag ska försöka stoppa dig.
+ch.task.play.hold = Håll remi i {n:move}. Jag ska försöka vinna.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = De här ställningarna kommer från riktiga partier. Jag spelar det sista draget, sedan är det din tur.
+ch.lead.first.2 = Varje ställning kommer från ett riktigt parti: jag spelar draget som ledde dit, sedan spelar du.
+ch.next = Nästa ställning.
+ch.next.2 = Här är nästa.
+ch.next.3 = Vidare till nästa.
+ch.last = Den sista ställningen.
+ch.last.2 = Och nu den sista.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Bra.
+ch.good.2 = Ja.
+ch.good.3 = Rätt.
+ch.good.4 = Precis.
+# The position is solved.
+ch.solved = Där satt den! Bra gjort.
+ch.solved.2 = Helt rätt.
+ch.solved.3 = Mycket bra.
+ch.solved.mate = Schackmatt! Bra gjort.
+ch.solved.mate.2 = Och det är matt. Mycket bra.
+ch.solved.mate.3 = Schackmatt. Snyggt gjort.
+ch.solved.promote = En ny dam, och vinsten är säkrad. Bra gjort.
+ch.solved.hold = Remin håller. Bra försvarat!
+ch.solved.draw = Remi på brädet. Bra försvarat!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Inte det här: jag skulle svara {move}.
+ch.wrong.reply.2 = Inte riktigt: jag skulle svara med {move}.
+ch.wrong.reply.3 = Då skulle jag spela {move}.
+ch.wrong.mate = Se upp: {move:nomate} skulle vara schackmatt.
+ch.wrong.mate.2 = Akta dig: jag skulle svara {move:nomate}, och det är matt.
+ch.wrong.mated = Se upp: efter {move} kan jag tvinga fram matt i {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Det blir också matt, men det tar längre tid. Det finns en snabbare väg.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Det blir också matt, men jag har ett annat drag i tankarna. Titta igen.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Inte dåligt, men det finns något starkare. Titta igen.
+ch.wrong.weaker.2 = Det går att spela, men du kan bättre.
+ch.wrong.stalemate = Patt! Min kung kan inte röra sig, och det är bara remi.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Inte det här: efter {move} kan jag hålla remi.
+ch.wrong.loses = Se upp: efter {move} skulle jag stå på vinst.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Det var inte det.
+ch.try_again = Försök igen.
+ch.try_again.2 = Titta en gång till.
+ch.try_again.3 = Titta igen.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Vill du ha en ledtråd?
+ch.offer.2 = Ska jag ge dig en ledtråd?
+ch.no_hint = Okej. Fortsätt leta.
+ch.no_hint.2 = Visst, ta god tid på dig.
+ch.hint.piece = Titta på {your}.
+ch.hint.piece.2 = Tänk på {your}.
+ch.hint.square = Titta på rutan {sq}.
+ch.hint.square.2 = Nyckelrutan är {sq}.
+ch.hint.square.3 = Håll ett öga på rutan {sq}.
+ch.hint.show = Här är draget. Titta.
+ch.hint.show.2 = Jag visar dig. Titta.
+ch.hint.now = Nu spelar du det.
+ch.hint.now.2 = Din tur: spela det.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Det var hela utmaningen. Bra gjort!
+ch.complete.2 = Alla ställningar är lösta. Bra gjort!

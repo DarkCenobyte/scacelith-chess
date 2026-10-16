@@ -1,0 +1,555 @@
+# Coach speech (Swedish): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "du" to the player and "jag" / "min" / "mitt" of himself. Swedish verbs,
+# participles and adjectives never agree with a person's gender, so past tenses are fine ("du missade").
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their possessive ("din springare", "mitt torn").
+# Forms of common.lang: {x:den} = den / det, the pronoun pointing back at the piece; {x:def} = the
+# definite noun; {x:gen} = "din kungs"; {x:poss} + {x:bare} = "din bundna springare"; the endings of a
+# word that agrees with the piece: oskydda{x:d_t} (oskyddad / oskyddat), bund{x:en_et} (bunden /
+# bundet), säker{x:t} (säker / säkert), vär{x:d_t} (värd / värt). Words that never change are written
+# plain (utsatt, inlåst, hängande, lätt, säkrare, billigare).
+# Squares: "på {sq}", "till {sq}", "från {sq}", "rutan {sq}"; nothing is ever glued to a square, a move
+# or a number. Two spoken numbers never stand side by side ("rutan {sq} angriper jag {n:time}").
+# Counted numbers: {m:move} "3 drag", {pts:point} "2 poäng" (also a piece's value, where English says
+# "worth {n}"), {n:time} "3 gånger", {n:square} "3 rutor", {n:attacker} / {n2:defender} (where English
+# writes a bare {n} attackers or {n2:piece} defending). A bare {m} ("matt i {m}") or {n2} ("behöver
+# {n2}", moves) says the neuter "ett", right for the implied "drag".
+# Recapture is always "slå tillbaka"; "ta tillbaka" is only the takeback (noun "återtagning").
+# Terms (glossary): blunder, misstag, onoggrannhet, tveksamt drag (dubious), gaffel / gaffla,
+# dubbelangrepp, avdragsangrepp / avdrag, spett, bindning / binda / bunden, instängd, hänger / oskyddad,
+# baslinjen (back rank; "bakersta raden" to a beginner), luft / flyktruta, bondens kvadrat,
+# kapplöpning (race), fribonde, oppositionen, löparparet, bondeslutspel, slagväxling (the exchange
+# sequence on a square), patt (sätta patt, stå patt), remi, schackmatt / sätta matt, stå på vinst.
+# Praise: brilliant = briljant, great = utmärkt, excellent = mycket bra / exakt.
+# Levels 1-2: short main clauses, everyday words; levels 5-6: terse club language.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Schack! Min kung är angripen.
+ann.check.human.b1.2 = Schack! Du angriper min kung.
+ann.check.human.b1.3 = Det är schack! Min kung måste komma ur schack.
+ann.check.human = Schack.
+ann.check.human.2 = Schack!
+ann.check.human.3 = Och det är schack.
+# The coach gives check.
+ann.check.coach = Schack!
+ann.check.coach.2 = Schack.
+ann.check.coach.3 = Och schack!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Det betyder att {your} är angrip{your:en_et}. Du måste få {your:den} ur schack.
+ann.check.coach.first.2 = Schack betyder att {your} är angrip{your:en_et}. Flytta {your:den}, ställ en pjäs emellan eller slå min pjäs.
+ann.double_check.coach = Dubbelschack! Två av mina pjäser angriper din kung samtidigt, så den måste flytta.
+ann.double_check.coach.2 = Det är dubbelschack: bara ett kungsdrag hjälper dig nu.
+ann.double_check.human = Dubbelschack! Två av dina pjäser angriper min kung samtidigt, så den måste flytta.
+ann.double_check.human.2 = Dubbelschack! Bara ett kungsdrag kan rädda mig nu.
+# The player checkmates the coach.
+ann.mate.human.b1 = Schackmatt! Du vann! Min kung kan inte fly.
+ann.mate.human.b1.2 = Det är schackmatt! Bra gjort, du vann partiet!
+ann.mate.human.b1.3 = Schackmatt! Min kung är instängd. Grattis!
+ann.mate.human = Schackmatt. Bra spelat.
+ann.mate.human.2 = Det är matt. Gratulerar.
+ann.mate.human.3 = Schackmatt! Snyggt gjort.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Det är schackmatt. Din kung har ingen väg ut.
+ann.mate.coach.b1.2 = Schackmatt. Din kung är angripen och kan inte fly.
+ann.mate.coach.b1.3 = Tyvärr är det schackmatt. Din kung kan inte komma undan.
+ann.mate.coach = Schackmatt.
+ann.mate.coach.2 = Och det är matt.
+ann.mate.coach.3 = Schackmatt, tyvärr.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Hoppsan! Det draget ger bort något.
+ex.verdict.blunder.b1.2 = Akta dig! Det draget kan straffa sig.
+ex.verdict.blunder.b1.3 = Oj, vänta. Det draget har ett problem.
+ex.verdict.blunder.b2 = Hmm, det finns ett problem med det draget.
+ex.verdict.blunder.b2.2 = Det är ett stort misstag.
+ex.verdict.blunder.b2.3 = Se upp, det draget kostar dig något.
+ex.verdict.blunder.b3 = Det är en blunder.
+ex.verdict.blunder.b3.2 = {move} är ett riktigt misstag.
+ex.verdict.blunder.b3.3 = Aj, {move} är ett stort misstag.
+ex.verdict.blunder.b4 = {move} är en blunder.
+ex.verdict.blunder.b4.2 = {move} är ett allvarligt misstag.
+ex.verdict.blunder.b4.3 = Det är tyvärr en blunder.
+ex.verdict.blunder.b5 = {move} är ett allvarligt misstag.
+ex.verdict.blunder.b5.2 = {move} är en blunder.
+ex.verdict.blunder.b5.3 = {move} är ett dyrt misstag.
+ex.verdict.blunder.b6 = {move} är ett allvarligt fel.
+ex.verdict.blunder.b6.2 = {move} är en blunder.
+ex.verdict.blunder.b6.3 = {move}? En blunder.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hoppsan! Du svarade inte på mitt hot.
+ex.verdict.ignored.b1.2 = Akta dig! Mitt hot fanns fortfarande kvar.
+ex.verdict.ignored.b1.3 = Oj, vänta. Du glömde bort mitt hot.
+ex.verdict.ignored.b2 = Hmm, mitt hot fanns kvar.
+ex.verdict.ignored.b2.2 = Du lämnade mitt hot obesvarat.
+ex.verdict.ignored.b2.3 = Se upp, du svarade inte på mitt hot.
+ex.verdict.mistake.b3 = Det är inget bra drag.
+ex.verdict.mistake.b3.2 = Hmm, det finns ett problem med {move}.
+ex.verdict.mistake.b3.3 = Det är ett misstag.
+ex.verdict.mistake.b4 = {move} är ett misstag.
+ex.verdict.mistake.b4.2 = {move} är inte bra.
+ex.verdict.mistake.b4.3 = Det är ett misstag.
+ex.verdict.mistake.b5 = {move} är ett klart misstag.
+ex.verdict.mistake.b5.2 = {move} är ett misstag.
+ex.verdict.mistake.b5.3 = {move} är inte bra.
+ex.verdict.mistake.b6 = {move} är ett misstag.
+ex.verdict.mistake.b6.2 = {move}? Ett misstag.
+ex.verdict.mistake.b6.3 = Inte {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Inte dåligt, men {best} var lite bättre.
+ex.verdict.inaccuracy.b3.2 = {best} var något mer exakt.
+ex.verdict.inaccuracy.b3.3 = Ett litet snedsteg: {best} var bättre här.
+ex.verdict.inaccuracy.b4 = Onoggrant: {best} var mer exakt.
+ex.verdict.inaccuracy.b4.2 = En liten onoggrannhet. {best} var lite bättre.
+ex.verdict.inaccuracy.b4.3 = Inte riktigt det bästa: {best} var noggrannare.
+ex.verdict.inaccuracy.b5 = {move} är onoggrant; {best} var starkare.
+ex.verdict.inaccuracy.b5.2 = Lite onoggrant. Jag hade spelat {best}.
+ex.verdict.inaccuracy.b5.3 = {best} var mer exakt än {move}.
+ex.verdict.inaccuracy.b6 = {move} är onoggrant; {best}.
+ex.verdict.inaccuracy.b6.2 = Onoggrant. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} var bättre.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} var kanske lite mer exakt.
+ex.verdict.inaccuracy.maybe.2 = Jag hade kanske spelat {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Det draget ser tveksamt ut.
+ex.verdict.dubious.2 = Det draget verkar tveksamt.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oj, vänta! Du missade något bra.
+ex.verdict.missed.b1.2 = Titta igen! Det fanns något bättre.
+ex.verdict.missed.b1.3 = Vänta lite, där hade du en chans!
+ex.verdict.missed.b2 = Där missade du en chans.
+ex.verdict.missed.b2.2 = Hmm, det fanns något bättre.
+ex.verdict.missed.b2.3 = Vänta, där hade du ett riktigt bra drag.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Bättre var {best}.
+ex.better.b3.2 = {best} var det bättre draget.
+ex.better.b3.3 = {best} hade varit bra i stället.
+ex.better.b4 = {best} var starkare.
+ex.better.b4.2 = {best} var rätt drag.
+ex.better.b4.3 = Bättre var {best}.
+ex.better.b5 = {best}, med idén {line}.
+ex.better.b5.2 = Rätt drag var {best}: {line}.
+ex.better.b5.3 = Bättre var {best}, följt av {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = {best} i stället, {eval}.
+ex.better.b6.3 = {best} var {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Det fanns ett bättre drag med {your}.
+ex.hint.b1.2 = {your} hade ett bättre drag.
+ex.hint.b2 = {your} hade ett bättre drag.
+ex.hint.b2.2 = Det fanns ett bättre drag med {your}.
+ex.hint.b3 = {your} hade ett bättre drag.
+ex.hint.b3.2 = Det fanns något bättre med {your}.
+ex.hint.b4 = {your} hade ett bättre drag.
+ex.hint.b4.2 = Titta igen på {your}: {your:den} hade något bättre.
+ex.hint.b5 = {your} hade ett starkare drag.
+ex.hint.b5.2 = Det fanns ett starkare drag med {your}.
+ex.hint.b6 = {your} hade något bättre.
+ex.hint.b6.2 = Titta på {your} igen.
+ex.hint.move = Det fanns ett bättre drag.
+ex.hint.move.2 = Där hade du ett bättre drag.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} hade ett bättre drag. Det vinner material.
+ex.hint.gain.b1.2 = Det fanns ett bättre drag med {your}. Det vinner material.
+ex.hint.gain.b2 = {your} hade ett bättre drag. Det vinner material.
+ex.hint.gain.b2.2 = Det fanns ett drag med {your} som vinner material.
+ex.hint.gain.b3 = {your} hade ett bättre drag, ett som vinner material.
+ex.hint.gain.b3.2 = Det fanns ett drag med {your} som vinner material.
+ex.hint.gain.b4 = {your} hade ett drag som vinner material.
+ex.hint.gain.b4.2 = Titta igen på {your}: {your:den} hade ett drag som vinner material.
+ex.hint.gain.b5 = {your} hade ett starkare drag, ett som vinner material.
+ex.hint.gain.b5.2 = Det fanns ett drag med {your} som vinner material.
+ex.hint.gain.b6 = {your} hade ett drag som vinner material.
+ex.hint.gain.b6.2 = Titta på {your} igen: där fanns material att vinna.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Det var bättre att flytta {your} till {sq}.
+ex.reveal.b1.2 = {your} kunde gå till {sq}. Det var bättre.
+ex.reveal.b2 = {your} till {sq} var det bättre draget.
+ex.reveal.b2.2 = Bättre var att flytta {your} till {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Nu ställer vi tillbaka pjäserna.
+ex.rewind.b1.2 = Nu ställer jag tillbaka allt som det var.
+ex.rewind.b1.3 = Jag ställer tillbaka pjäserna.
+ex.rewind.b2 = Vi ställer tillbaka allt.
+ex.rewind.b2.2 = Tillbaka dit vi var.
+ex.rewind.b2.3 = Jag sätter tillbaka pjäserna.
+ex.rewind.b3 = Tillbaka till partiet.
+ex.rewind.b3.2 = Vi går tillbaka.
+ex.rewind.b3.3 = Tillbaka till ställningen.
+ex.rewind.b4 = Tillbaka till partiet.
+ex.rewind.b4.2 = Tillbaka.
+ex.rewind.b4.3 = Vi går tillbaka.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Vill du prova ett annat drag?
+ex.offer.b1.2 = Vill du ta tillbaka draget och försöka igen?
+ex.offer.b1.3 = Ska vi prova ett annat drag?
+ex.offer.b2 = Vill du prova ett annat drag?
+ex.offer.b2.2 = Vill du ta tillbaka det?
+ex.offer.b2.3 = Vill du försöka igen?
+ex.offer.b3 = Vill du ta tillbaka det?
+ex.offer.b3.2 = Vill du försöka igen?
+ex.offer.b3.3 = Ta tillbaka det?
+ex.offer.b4 = Ta tillbaka?
+ex.offer.b4.2 = Vill du ta tillbaka det?
+ex.offer.b4.3 = Vill du prova ett annat drag?
+ex.offer.b5 = Ta tillbaka?
+ex.offer.b5.2 = Vill du ta tillbaka?
+ex.offer.b5.3 = Ta tillbaka draget?
+ex.offer.b6 = Ta tillbaka?
+ex.offer.b6.2 = Ta tillbaka draget?
+ex.offer.b6.3 = Nytt försök?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Det draget är tveksamt. Kanske hittar du något bättre?
+ex.dubious.b1.2 = Det draget är tveksamt. Kanske hittar du ett bättre drag?
+ex.dubious.b2 = Ett tveksamt drag. Kanske hittar du något bättre?
+ex.dubious.b2.2 = Det draget är tveksamt. Kanske finns det något bättre?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Sedan {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} går till {sq}.
+demo.my.move.2 = Jag flyttar {my} till {sq}.
+demo.my.move.3 = Sedan går {my} till {sq}.
+demo.my.take = Jag slår {your}.
+demo.my.take.2 = {my} slår {your}.
+demo.my.take.3 = Och jag tar {your}.
+demo.my.check = {my} går till {sq}. Schack.
+demo.my.check.2 = Schack med {my} på {sq}.
+demo.my.check.3 = {my} till {sq}, schack!
+demo.my.mate = {my} går till {sq}. Schackmatt.
+demo.my.mate.2 = Och {my} till {sq} är schackmatt.
+demo.my.mate.3 = {my} till {sq}. Det är schackmatt.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Först slår {my} {your}. {t1} kan vänta.
+demo.my.first.take.2 = {my} slår {your} först. {t1} står kvar ändå.
+demo.my.first.check = {my} slår {your}, och det är schack! {t1} kan vänta.
+demo.my.first.check.2 = Först slår {my} {your}, med schack. {t1} står kvar ändå.
+demo.my.first.check_move = Först schack med {my} på {sq}. {t1} kan vänta.
+demo.my.first.check_move.2 = {my} går till {sq}: schack först! {t1} står kvar ändå.
+demo.my.first.move = Först går {my} till {sq}. {t1} kan vänta.
+demo.my.first.move.2 = {my} till {sq} först. {t1} står kvar ändå.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} är angrip{my:en_et}, så {my:den} slår {your} först.
+demo.my.first.attacked.2 = {my} är hota{my:d_t}: {my:den} passar på att ta {your} först.
+# Levels 4-6, the same in-between move.
+demo.first = {move} först: {t1} kan vänta.
+demo.first.2 = Först {move}. {t1} står kvar ändå.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Nu spelar jag mitt drag.
+demo.play_on.2 = Här är mitt riktiga drag.
+demo.play_on.3 = Och nu mitt drag på riktigt.
+# Levels 1-3, the player's moves (what they would play). "Du skulle" is avoided: it also means
+# "you should".
+demo.your.move = Då flyttar du {your} till {sq}.
+demo.your.move.2 = Säg att du flyttar {your} till {sq}.
+demo.your.move.3 = Sedan går {your} till {sq}.
+demo.your.take = Då slår du {my}.
+demo.your.take.2 = Du slår {my} med {your}.
+demo.your.take.3 = Sedan tar du {my}.
+demo.your.back = Du slår tillbaka.
+demo.your.back.2 = Du slår tillbaka på {sq}.
+demo.your.back.3 = Och du slår tillbaka.
+demo.your.king = Din kung måste flytta.
+demo.your.king.2 = Kungen måste gå undan, till {sq}.
+demo.your.king.3 = Din kung flyr till {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Nu kan {t1} inte räddas.
+ex.point.piece.2 = Och {t1} är förlora{t1:d_t}.
+ex.point.piece.3 = Härnäst faller {t1}.
+ex.point.two = {t1} och {t2} är båda angripna: en av dem faller.
+ex.point.two.2 = Nu angriper jag {t1} och {t2}. Du kan inte rädda båda.
+ex.point.mate = Och nu är {reply:nomate} schackmatt.
+ex.point.mate.2 = Sedan kommer {reply:nomate}, och det är schackmatt.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Ser du? Nu har du förlorat {pts:point}.
+ex.result.b1.2 = Så förlorar du {pts:point}.
+ex.result.b2 = Till slut har du förlorat {pts:point}.
+ex.result.b2.2 = Nu ligger du under med {pts:point}.
+ex.result.b3 = Det kostar dig {pts:point}.
+ex.result.b3.2 = Du hamnar under med {pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Du kan slå tillbaka, men du ligger ändå under med {pts:point}.
+ex.result_back.b1.2 = Du kan vinna tillbaka lite, men du har ändå förlorat {pts:point}.
+ex.result_back.b2 = Du kan ta igen en del, men du ligger ändå under med {pts:point}.
+ex.result_back.b2.2 = Även när du har slagit tillbaka har du förlorat {pts:point}.
+ex.result_back.b3 = Även efter att du slagit tillbaka ligger du under med {pts:point}.
+ex.result_back.b3.2 = Du vinner tillbaka något, men det kostar dig ändå {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves. A spoken capture move already says "slår", so "{reply} slår {your}" is
+# avoided: "jag svarar {reply} och tar {your}", "{reply}, och {your} faller".
+ex.retake.b1 = Om {your2} slår tillbaka, slår {my} {your}.
+ex.retake.b1.2 = Du kan inte slå tillbaka med {your2}: då slår {my} {your}.
+ex.retake.b2 = Om {your2} slår tillbaka, slår {my} {your}.
+ex.retake.b2.2 = Att slå tillbaka med {your2} fungerar inte: {my} slår {your}.
+ex.retake.b3 = Om du slår tillbaka med {move}, svarar jag {reply} och tar {your}.
+ex.retake.b3.2 = Att slå tillbaka med {move} fungerar inte: jag svarar {reply} och tar {your}.
+ex.retake.b4 = {move} går inte: jag svarar {reply} och tar {your}.
+ex.retake.b4.2 = Och på {move} svarar jag {reply} och tar {your}.
+ex.retake.b5 = Att slå tillbaka med {move} stöter på {reply}, och {your} faller.
+ex.retake.b5.2 = {move} går inte på grund av {reply}: {your} faller.
+ex.retake.b6 = {move}? {reply}, och {your} faller.
+ex.retake.b6.2 = {move} går inte: {reply}, och {your} faller.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Och här, på {sq}, skulle du få en ny dam.
+demo.promote.2 = Sedan når {your} fram till {sq} och blir dam.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Se upp: {my} kan gå till {sq}, och det är schackmatt.
+ex.mate_allowed.b1.2 = Nu kan {my} flytta till {sq}. Det skulle bli schackmatt!
+ex.mate_allowed.b1.3 = Akta dig! Om {my} går till {sq} är det schackmatt.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Det här draget låter mig sätta {your} matt i {m:move}.
+ex.mate_allowed.b2.2 = Nu kan jag sätta {your} matt i {m:move}. Titta.
+ex.mate_allowed.b2.3 = Akta dig! {your} är i fara: matt i {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Det här ger mig matt i {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Efter det här har jag matt i {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Din kung blir matt: {line:nomate}.
+ex.mate_allowed.b4 = {move} tillåter en forcerad matt: {line:nomate}.
+ex.mate_allowed.b4.2 = Det här går rakt in i en matt i {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Efter {move} är {line:nomate} matt.
+ex.mate_allowed.b5 = {move} tillåter en forcerad matt i {m:move}.
+ex.mate_allowed.b5.2 = Det leder rakt in i en matt i {m:move}.
+ex.mate_allowed.b5.3 = Nu finns det en forcerad matt i {m:move}.
+ex.mate_allowed.b6 = Matt i {m}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, matt.
+ex.mate_allowed.b6.3 = Det är matt efter {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Titta: {your} har ingen ruta kvar att fly till.
+ex.mate_allowed.tail.b1.2 = Ser du? {your} är angrip{your:en_et} och kan inte fly.
+ex.mate_allowed.tail.b1.3 = {your} har ingenstans att ta vägen. Det är schackmatt.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Det mönstret kallas {text}.
+ex.mate_allowed.pattern.2 = Kom ihåg den här: det är {text}.
+ex.mate_allowed.tip.b3 = Kontrollera före varje drag att din kung fortfarande står säkert.
+ex.mate_allowed.tip.b3.2 = Fråga dig alltid: kan min kung bli matt efter mitt drag?
+
+name.pattern.back_rank = en baslinjematt
+name.pattern.smothered = en kvävmatt
+name.pattern.support = en dammatt med stöd
+name.pattern.ladder = en trappmatt
+name.pattern.epaulette = en epålettmatt
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Med {best:nomate} kunde du ha satt {my} matt!
+ex.mate_missed.b1.2 = {best:nomate} var schackmatt! {my} hade inte kunnat fly.
+ex.mate_missed.b1.3 = Titta! {best:nomate} hade satt {my} matt.
+ex.mate_missed.b2 = Du hade matt i {m:move}, med {best:nomate} som första drag.
+ex.mate_missed.b2.2 = {best:nomate} gav matt i {m:move}!
+ex.mate_missed.b2.3 = Du kunde ha satt mig matt med {best:nomate}.
+ex.mate_missed.b3 = Du missade matt i {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} sätter matt i {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Det fanns en matt i {m:move}, med {best:nomate} som första drag.
+ex.mate_missed.b4 = Missad matt: {line:nomate}, som börjar med {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} tvingade fram matt i {m:move}.
+ex.mate_missed.b4.3 = Du hade matt i {m:move} med {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} sätter matt i {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Missad matt i {m:move}, som börjar med {best:nomate}.
+ex.mate_missed.b5.3 = Det fanns en forcerad matt: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} sätter matt: {line:nomate}.
+ex.mate_missed.b6.2 = Matt i {m} med {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, matt i {m}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Snabbare var {best:nomate}: matt i {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} gav matt snabbare, i {m:move}.
+ex.mate_delayed.b6 = {best:nomate} sätter matt i {m}.
+ex.mate_delayed.b6.2 = Snabbare: {best:nomate}, matt i {m}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Åh nej! {my} kan inte flytta och står inte i schack. Det är patt – remi.
+ex.stalemate.b1.2 = Titta: {my} har ingen säker ruta, men {my:den} står inte i schack. Det blir remi!
+ex.stalemate.b1.3 = Det är patt. {my} kan inte flytta, så partiet blir remi.
+ex.stalemate.b2 = Patt! {my} har inget lagligt drag och står inte i schack. Remi.
+ex.stalemate.b2.2 = Åh nej, patt: {my} sitter fast men står inte i schack.
+ex.stalemate.b2.3 = Det är remi genom patt. {my} kan inte flytta.
+ex.stalemate.b3 = Det är patt: {my} har inget lagligt drag. Du stod på vinst!
+ex.stalemate.b3.2 = Patt! {my} sitter fast, och ett vunnet parti blir remi.
+ex.stalemate.b3.3 = {my} har inga drag och står inte i schack: patt.
+ex.stalemate.b4 = Patt: {my} har inget lagligt drag. Så kastar du bort vinsten.
+ex.stalemate.b4.2 = {move} sätter {my} patt. Remi från en vinstställning.
+ex.stalemate.b4.3 = Det är patt; {my} är instäng{my:d_t}.
+ex.stalemate.b5 = {move} sätter {my} patt. Vinsten är borta.
+ex.stalemate.b5.2 = Patt: {my} har inga rutor.
+ex.stalemate.b5.3 = Det är patt, {my} sitter fast.
+ex.stalemate.b6 = Patt. {my} har inga drag.
+ex.stalemate.b6.2 = {move}, patt: {my} är instäng{my:d_t}.
+ex.stalemate.b6.3 = Patt; {my} kan inte flytta.
+ex.stalemate.tip.b1 = När du står på vinst ska du alltid lämna en ruta åt min kung.
+ex.stalemate.tip.b1.2 = Kom ihåg: när du ligger före, ge min kung lite utrymme.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Akta dig! Jag kan ge bort mina pjäser, och sedan har {my} inga drag: patt.
+ex.stalemate_trick.b1.2 = Se upp: {my} sitter nästan fast. Jag kan få remi.
+ex.stalemate_trick.b2 = Akta dig: jag kan offra, och då står {my} patt.
+ex.stalemate_trick.b2.2 = {my} har nästan inga rutor. Jag kan tvinga fram patt!
+ex.stalemate_trick.b3 = Nu kan jag rädda mig med patt: {my} får slut på drag.
+ex.stalemate_trick.b3.2 = Akta dig: efter {line} står {my} patt.
+ex.stalemate_trick.b4 = {move} tillåter en pattfälla: {line}, och {my} kan inte flytta.
+ex.stalemate_trick.b4.2 = Nu kan {my} gömma sig i ett patt: {line}.
+ex.stalemate_trick.b5 = {move} tillåter patt: {line}; {my} är instäng{my:d_t}.
+ex.stalemate_trick.b5.2 = Pattfälla: {line}, och {my} har inga drag.
+ex.stalemate_trick.b6 = {line}, patt: {my} är instäng{my:d_t}.
+ex.stalemate_trick.b6.2 = Patt efter {line}; {my} sitter fast.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} kan gå till {sq} och angripa {t1} och {t2}.
+ex.fork.b1.2 = {my} går till {sq} och angriper två pjäser: {t1} och {t2}.
+ex.fork.b1.3 = Håll ögonen på {my}: {my:den} angriper {t1} och {t2} samtidigt från {sq}.
+ex.fork.b2 = Gaffel! {my} på {sq} angriper {t1} och {t2} samtidigt.
+ex.fork.b2.2 = Efter ditt drag kan {my} gaffla {t1} och {t2} från {sq}.
+ex.fork.b2.3 = {my} går till {sq}: ett dubbelangrepp mot {t1} och {t2}.
+ex.fork.b3 = {move} tillåter {reply}, som gafflar {t1} och {t2}.
+ex.fork.b3.2 = Efter {reply} angriper jag {t1} och {t2} samtidigt.
+ex.fork.b3.3 = {reply} är en gaffel: både {t1} och {t2} är angripna.
+ex.fork.b4 = {reply} gafflar {t1} och {t2}; efter {line} har du förlorat {pts:point}.
+ex.fork.b4.2 = {reply} angriper {t1} och {t2} på en gång.
+ex.fork.b4.3 = {move} tillåter gaffeln {reply} mot {t1} och {t2}.
+ex.fork.b5 = {move} går rakt in i gaffeln {reply}, mot {t1} och {t2}.
+ex.fork.b5.2 = {reply} gafflar {t1} och {t2}.
+ex.fork.b5.3 = Efter {reply} är både {t1} och {t2} angripna.
+ex.fork.b6 = {reply} gafflar.
+ex.fork.b6.2 = {move} tillåter {reply}, en gaffel.
+ex.fork.b6.3 = {reply}, gaffel.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Du kan bara rädda en av dem: {t1} eller {t2}.
+ex.fork.tail.b1.2 = Nu angriper jag två pjäser på en gång: {t1} och {t2}. Det är en gaffel!
+ex.fork.tail.b1.3 = Ser du? Både {t1} och {t2} är angripna. En av dem kommer att falla.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} måste komma ur schack, så jag slår {t1}.
+ex.fork.tail_king.2 = Schack! {your} måste flytta, och {t1} faller.
+ex.fork.more.b3 = Titta på rutan {sq} innan du drar: därifrån kan {my} gaffla.
+ex.fork.more.b3.2 = Håll ett öga på {sq}. {my} gafflar därifrån.
+ex.fork.tip.knight = Se upp för springarhopp nära din kung och din dam!
+ex.fork.tip.knight.2 = Springare älskar att angripa två pjäser på en gång. Titta vart de kan hoppa.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = När {my} flyttar undan angriper {my2} {t1}!
+ex.discovered.b1.2 = Titta: {my} står i vägen. Om {my:den} flyttar, angriper {my2} {t1}.
+ex.discovered.b1.3 = {my} kan kliva åt sidan, och då angriper {my2} {t1}.
+ex.discovered.b2 = Ett dolt angrepp: {my} flyttar, och {my2} angriper {t1}.
+ex.discovered.b2.2 = Akta dig: {my} kan flytta undan, och då angriper {my2} {t1}.
+ex.discovered.b2.3 = {my} kliver undan och öppnar vägen för {my2} mot {t1}.
+ex.discovered.b3 = Efter {reply} angrips {t1} genom ett avdrag.
+ex.discovered.b3.2 = {reply} öppnar ett angrepp mot {t1}.
+ex.discovered.b3.3 = {move} tillåter {reply}, ett avdragsangrepp mot {t1}.
+ex.discovered.b4 = {reply} öppnar en linje mot {t1}: ett avdragsangrepp.
+ex.discovered.b4.2 = {move} tillåter avdraget {reply}, som vinner {t1}.
+ex.discovered.b4.3 = Efter {reply} faller {t1} för ett avdragsangrepp.
+ex.discovered.b5 = {move} tillåter avdragsangreppet {reply}.
+ex.discovered.b5.2 = {reply} är ett avdragsangrepp.
+ex.discovered.b5.3 = {reply} öppnar ett dolt angrepp.
+ex.discovered.b6 = {reply}, avdrag mot {t1}.
+ex.discovered.b6.2 = {reply}, och {t1} faller.
+ex.discovered.b6.3 = Avdragsangrepp: {reply}, mot {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} angriper {t1}. När {t1:den} flyttar, slår jag {t2} som står bakom.
+ex.skewer.b1.2 = Titta: {my} angriper {t1}, och {t2} står precis bakom.
+ex.skewer.b1.3 = {my} ger sig på {t1}. {t1:den} måste flytta, och sedan faller {t2}.
+ex.skewer.b2 = Ett spett: {my} angriper {t1}, och {t2} står bakom.
+ex.skewer.b2.2 = {my} siktar genom {t1} mot {t2}. När den första flyttar, slår jag den andra.
+ex.skewer.b2.3 = Akta dig: {t1} och {t2} står på samma linje. {my} kan angripa dem med ett spett.
+ex.skewer.b3 = {reply} är ett spett mot {t1} och {t2}.
+ex.skewer.b3.2 = Efter {reply} måste {t1} flytta, och {t2} faller.
+ex.skewer.b3.3 = {move} tillåter {reply}, ett spett mot {t1} och {t2}.
+ex.skewer.b4 = {reply} är ett spett mot {t1}; {t2} som står bakom faller.
+ex.skewer.b4.2 = Efter {move} står {t1} och {t2} på samma linje: {reply}.
+ex.skewer.b4.3 = Efter {reply} flyttar {t1}, och {t2} faller.
+ex.skewer.b5 = {reply} är ett spett mot {t1} och {t2}.
+ex.skewer.b5.2 = {move} tillåter spettet {reply} genom {t1} mot {t2}.
+ex.skewer.b6 = {reply} är ett spett.
+ex.skewer.b6.2 = {reply}, spett.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} kan gå till {sq}. Då sitter {your} fast framför {t1}.
+ex.pin.b1.2 = Se upp för {my} på {sq}: {your} fastnar framför {t1}.
+ex.pin.b1.3 = {my} kan binda {your} mot {t1}. Sedan vinner jag {your:den}.
+ex.pin.b2 = En bindning: {your} sitter fast framför {t1}.
+ex.pin.b2.2 = {your} är bund{your:en_et} mot {t1}. Sedan kan jag vinna {your:den}.
+ex.pin.b2.3 = Nu sitter {your} fast framför {t1}. Det är en bindning.
+ex.pin.b3 = {your} blir bund{your:en_et} mot {t1}, och jag vinner {your:den}.
+ex.pin.b3.2 = Efter det här är {your} bund{your:en_et} mot {t1}.
+ex.pin.b3.3 = Bindningen av {your} kostar material: {t1} står bakom.
+ex.pin.b4 = {reply} binder och vinner material.
+ex.pin.b4.2 = {move} går rakt in i bindningen {reply}.
+ex.pin.b4.3 = Efter {reply} faller den bundna pjäsen.
+ex.pin.b5 = {move} tillåter bindningen {reply}.
+ex.pin.b5.2 = {reply} binder, och pjäsen går förlorad.
+ex.pin.b6 = {reply} binder.
+ex.pin.b6.2 = {reply}, bindning.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} är bund{your:en_et}, så {your:den} kan inte skydda {sq}. {t1} står bakom.
+ex.pin_defender.b1.2 = Titta: {your} kan inte riktigt försvara {sq}, eftersom {t1} står bakom.
+ex.pin_defender.b2 = {your} är bund{your:en_et} mot {t1}, så {sq} har ingen riktig försvarare.
+ex.pin_defender.b2.2 = En bunden pjäs är en dålig försvarare. {your} kan inte skydda {sq}: {t1} står bakom.
+ex.pin_defender.b3 = {your} är bund{your:en_et} mot {t1}; {your:den} försvarar inte {sq} på riktigt.
+ex.pin_defender.b3.2 = Rutan {sq} ser försvarad ut, men {your} är bund{your:en_et} framför {t1}.
+ex.pin_defender.b4 = {your} är bund{your:en_et}, så rutan {sq} är inte riktigt försvarad.
+ex.pin_defender.b4.2 = {your:poss} bundna {your:bare} kan inte skydda {sq}.
+ex.pin_defender.b5 = {your} är bund{your:en_et}; rutan {sq} är oskyddad.
+ex.pin_defender.b5.2 = {sq} faller: {your} är bund{your:en_et}.
+ex.pin_defender.b6 = {your} är bund{your:en_et}; {sq} faller.
+ex.pin_defender.b6.2 = Bund{your:en_et} {your:bare}, oskyddad {sq}.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} är instäng{your:d_t}. Varje ruta som {your:den} kan gå till är angripen.
+ex.trapped.b1.2 = Titta på {your}: {your:den} har ingen säker ruta att fly till.
+ex.trapped.b1.3 = {your} sitter fast. Jag kan angripa {your:den}, och {your:den} kan inte fly.
+ex.trapped.b2 = {your} har inga säkra rutor. Jag kan vinna {your:den}.
+ex.trapped.b2.2 = {your} är instäng{your:d_t}: vart {your:den} än går, slår jag {your:den}.
+ex.trapped.b2.3 = Akta dig, {your} håller på att få slut på rutor.
+ex.trapped.b3 = {your} blir instäng{your:d_t}: ingen säker ruta kvar.
+ex.trapped.b3.2 = Efter det här är {your} instäng{your:d_t} och förlora{your:d_t}.
+ex.trapped.b3.3 = {your} har gått i en fälla: {your:den} kommer inte ut.
+ex.trapped.b4 = Efter {move} är {your} instäng{your:d_t}.
+ex.trapped.b4.2 = {your} har ingen reträttväg; jag vinner {your:den}.
+ex.trapped.b4.3 = {your} är instäng{your:d_t} efter {reply}.
+ex.trapped.b5 = {your} blir till slut instäng{your:d_t}: {line}.
+ex.trapped.b5.2 = {move} skär av {your}.
+ex.trapped.b6 = {your} är instäng{your:d_t}.
+ex.trapped.b6.2 = {line} stänger in {your}.
+ex.trapped.tip.b1 = Innan du flyttar en pjäs, kontrollera att den kan ta sig ut igen.
+ex.trapped.tip.b1.2 = Pjäser djupt inne i mitt läger kan fastna. Se till att ha en väg ut.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} sitter fast bakom sina bönder. {my} kan ge {your:den} schack på bakersta raden.
+ex.back_rank.b1.2 = Akta dig: {your} har ingen flyktruta, och {my} kan nå {sq}.
+ex.back_rank.b1.3 = {my} kan gå till {sq}. {your} är inlåst av sina bönder.
+ex.back_rank.b2 = Fara på baslinjen: {your} har ingen luft. {my} kan ge schack på {sq}.
+ex.back_rank.b2.2 = {your} är inlåst. {my} går till {sq} och vinner material.
+ex.back_rank.b2.3 = Din baslinje är svag: {my} kan ge {your} schack på {sq}.
+ex.back_rank.b3 = Din baslinje är svag: {line}. {your} har ingen flyktruta.
+ex.back_rank.b3.2 = {your} har ingen luft, så {line} vinner material.
+ex.back_rank.b3.3 = Efter {line} avgör baslinjen: {your} är instäng{your:d_t}.
+ex.back_rank.b4 = Baslinjen: {line}, och {your} har ingen luft.
+ex.back_rank.b4.2 = {line} utnyttjar den svaga baslinjen vid {your}.
+ex.back_rank.b4.3 = {your} saknar flyktruta: {line}.
+ex.back_rank.b5 = Baslinjesvaghet kring {your}: {line}.
+ex.back_rank.b5.2 = {line}; {your} har ingen luft.
+ex.back_rank.b6 = {line}, baslinjen; {your} är instäng{your:d_t}.
+ex.back_rank.b6.2 = Baslinjen: {line} ({your}).
+ex.back_rank.tip.b1 = Ge din kung ett litet fönster: flytta en av bönderna framför den.
+ex.back_rank.tip.b1.2 = En kung bakom tre bönder kan bli matt på bakersta raden. Ge den lite utrymme.
