@@ -381,3 +381,44 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   ("तुरंद", "सफेथ", "मजबूट"), squares as notation ("F3", "D5"); it drops or garbles a line's first word and short
   lines of English words (मिडिलगेम, स्टेलमेट, स्क्यूअर), cannot write most eponyms, and loops ("आपका आपका ...") on
   some lines.
+
+## Bulgarian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares) | melts into the word before it: "на а три" heard "на три" (4 times in 12 heard as A) | `а́` (file.a.spoken): heard A 8 times in 12, and twice more as "ная" |
+| дъската | "дъ́ската" (probe, 3 contexts), heard "диската" 7 times in 9 | `дъска́та` (respell): heard "диската" 3 times in 9 |
+| ан пасан | "па́сан" (probe, alone and in "се нарича ан пасан") | `паса́н` (respell.пасан) |
+| пропусна, Изпусна, отдръпна (aorist, "you missed") | the present: "пропу́сна", "изпу́сна", "отдръ́пна" (probe, alone and in "Тук пропусна шанс", "Пропусна мат", "Изпусна от поглед") | `пропусна́` (respell); `Изпусна́`, `отдръпна́` (.spoken of ex.verdict.ignored.b1.3, praise.saved.b1.2) |
+| Върна (aorist, appraisal.num.takebacks.*) | the present: "Въ́рна един ход" (probe) | `Върна́` (.spoken) |
+| права линия (lesson.rook.intro) | "права́" (feminine of "прав", right) instead of "пра́ва" (straight) | `пра́ва` (.spoken) |
+| царя | "царя́" in "Пази царя си", "шах на царя" (probe); царят, конят, коня are right | `ца́ря` (respell) |
+| полета | "поле́та" (probe, alone, "две полета направо", "шестдесет и четири полета") | `полета́` (respell) |
+| единадесет ... деветнадесет | stressed "-наде́сет" (probe, every teen); heard "едно на десет" | `едина́десет` ... `деветна́десет` (respell.*): heard as 16 to 19 8 times in 24 (3 of them as whole numbers), never with the plain spelling |
+| Мароци | "Маро́ци" (probe) | `ма́роци` (respell) |
+
+- Bulgarian writes no stress, and the voice guesses it: the stress of the 120 most frequent words (and of the
+  reviewers' homographs) was compared over every vowel with U+0301, which the voice follows (вода́ against
+  во́да), then in a phrase where a word came out wrong alone. Parakeet could not do Bulgarian (English or
+  nothing for most lines); the round trip is Whisper medium set to `bg`: 300 lines (seed 0), then 3 seeds on
+  about 50 lines (fixes against the plain text, the file letters, the numbers) and 1 seed on 84 more (the
+  reviewers' list, 27 opening names, 30 eponyms in carrier sentences).
+- Checked and fine (probe): реми (реми́), Филидор in "защитата на Филидор" (Филидо́р), Следи, води, търси, удари
+  (both stresses as close), подред, отказа (отка́за, the aorist as the dictionary has it), затова, срещу,
+  добър, център, ендшпил, дебют, гамбит, вилица, позиция, атака, черните, царят, конят, коня, губиш, опитай,
+  груба, седем, осем, Бенони, Оуен. Heard right (round trip): реми, Опа, Леле, Ох, Хм (mostly), луфт,
+  кандидат-ходове, буквата гъ ("га"), от а до аш, the eponyms and opening names that Whisper can write.
+- Left as is: the file letter е after "ни" or "е" melts into the vowel ("Трябва ни е четири" heard "ни 4");
+  `е́` fixes that (3 in 3) but after "на", the commonest context, it is heard "я" (4 in 6 against 0), so it stays
+  "е". "ще върна" (present, ex.rewind) is a close call (probe), and `въ́рна` was heard "върнеш", "върнем": left.
+  еф after a vowel is heard "в" ("напада еф седем" as "нападе в седем"); `е́ф` did no better. фианкето is
+  said "фиа́нкето" (probe), but `фианке́то` was heard worse ("ФНК ето", "хиянкия": 1 good in 6 against 4).
+  двадесет leans to "двадесе́т" alone, a tie in "ход двадесет"; четири leans to "четири́" alone, a tie in "на е
+  четири"; рапид is "ра́пид" (the English word's stress); Коле is "Ко́ле", Торе a reduced "Тора", Ело a tie.
+  The opening texts take `а́` when tools/gen_opening_lang.py runs again (squares come from file.*.spoken).
+- Whisper hears a final stressed а as "ая" or "ай" (`пропусна́` as "пропусная" 2 times in 3, `Върна́` once as
+  "Върнай"), though the probe puts `пропусна́` as close to "пропусна" as to "пропусная": kept for the grammar.
+- Recogniser habits: it writes squares as notation (б5, ц3, D4, Ж8, "аж 8" for аш осем), teens as "N на 10",
+  "единайсет"-style colloquial numbers only, unstressed ъ as "а" or "е" (дъската as "даската"), and Russian
+  spellings (сицилиянската, классически, "черни те"); it writes eponyms in English or Latin letters ("Gambit
+  England", "Robinshine", "Morphy") and drops the a of a name after "защита" ("защита Лехини").

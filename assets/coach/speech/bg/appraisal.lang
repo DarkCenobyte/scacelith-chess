@@ -276,10 +276,15 @@ appraisal.num.material_nochecks.b6 = Вземания: {n}.
 appraisal.num.material_nochecks.b6.2 = {n:capture}.
 # Takebacks, always positive: {n} moves taken back, {m} of them replayed well ({m:m}: "два" хода).
 appraisal.num.takebacks.b1 = Върна {n:move} и поправи {m:m} от тях. Така се учим!
+appraisal.num.takebacks.b1.spoken = Върна́ {n:move} и поправи {m:m} от тях. Така се учим!
 appraisal.num.takebacks.b1.2 = Върна {n:move} и {m:time} откри по-добър. Чудесно!
+appraisal.num.takebacks.b1.2.spoken = Върна́ {n:move} и {m:time} откри по-добър. Чудесно!
 appraisal.num.takebacks.b2 = Върна {n:move} и поправи {m:m} от тях. Така се учим.
+appraisal.num.takebacks.b2.spoken = Върна́ {n:move} и поправи {m:m} от тях. Така се учим.
 appraisal.num.takebacks.b2.2 = Върна {n:move} и поправи {m:m} от тях. Добре се учиш!
+appraisal.num.takebacks.b2.2.spoken = Върна́ {n:move} и поправи {m:m} от тях. Добре се учиш!
 appraisal.num.takebacks.b3 = Върна {n:move} и поправи {m:m} от тях.
+appraisal.num.takebacks.b3.spoken = Върна́ {n:move} и поправи {m:m} от тях.
 appraisal.num.takebacks.b3.2 = Върнати ходове: {n:m}, поправени: {m:m}. Добре.
 # Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
 # A line never starts with {n:time}: for 1 it is the word "веднъж", which the program does not capitalise.

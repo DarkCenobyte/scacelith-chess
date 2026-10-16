@@ -269,8 +269,10 @@ owner.black.a = {piece}
 # Written squares are "e4" (Latin letters, as in Bulgarian notation). The voice says the letter names
 # Bulgarian players use for the files, in Cyrillic so that the voice reads them as Bulgarian:
 # "е четири", "еф три", "же седем", "аш осем". Ranks are the neutral counting numbers ("а едно").
+# The file a is said with a stress mark ("а́"): a bare "а" melts into the word before it ("на а три" heard
+# "на три"); see docs/PRONUNCIATION.md.
 square.spoken = {file} {rank}
-file.a.spoken = а
+file.a.spoken = а́
 file.b.spoken = бе
 file.c.spoken = це
 file.d.spoken = де
@@ -308,7 +310,24 @@ move.mate.spoken = {move}, мат
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: words the voice misreads are respelled by the pronunciation pass (respell.<word> = ...).
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h; docs/PRONUNCIATION.md).
+# The voice guesses the stress (Bulgarian writes none); a stress mark (U+0301 after the vowel) sets it.
+# One entry per form: a new form of these words needs its own. Homographs are fixed per line (.spoken).
+respell.пасан = паса́н
+respell.пропусна = пропусна́
+respell.дъската = дъска́та
+respell.царя = ца́ря
+respell.полета = полета́
+respell.мароци = ма́роци
+respell.единадесет = едина́десет
+respell.дванадесет = двана́десет
+respell.тринадесет = трина́десет
+respell.четиринадесет = четирина́десет
+respell.петнадесет = петна́десет
+respell.шестнадесет = шестна́десет
+respell.седемнадесет = седемна́десет
+respell.осемнадесет = осемна́десет
+respell.деветнадесет = деветна́десет
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. The plain word is the neutral counting form (also the neuter): "едно", "две"
