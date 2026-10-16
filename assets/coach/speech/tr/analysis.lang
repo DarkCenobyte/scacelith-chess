@@ -1,0 +1,154 @@
+# Coach speech (Turkish): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Turkish:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "sen" or "ben" here: the players are "Beyaz" and "Siyah", capitalised, the suffix
+#   without an apostrophe ("Beyazın", "Siyahın süresi"). A piece comes with its colour, lower case:
+#   {piece} {t1} {t2} = "beyaz at", "siyah vezir"; the case comes from common.lang ({piece:acc}
+#   "beyaz atı", {t1:dat} "siyah vezire", {piece:gen}); the program capitalises one that starts a
+#   sentence.
+# - Never a suffix after {move} {best} {reply} {line} {m} {opening}: "{move} hamlesi", "{best} ile",
+#   "{reply} hamlesiyle", "{line} cevabı", "{m} hamlede mat"; "Daha iyisi {best} idi."
+# - {opening:def} stays a nominative (after a colon or as a predicate).
+# - Counted numbers (common.lang): {pts:point} "3 puan" ("{pts:point}lık" = "3 puanlık"),
+#   {n:mistake} "2 hata", {m:blunder} "1 büyük hata"; accuracy {acc_white:percent} = "%87",
+#   spoken "yüzde seksen yedi".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Bu oyunu birlikte gözden geçirelim.
+an.start.2 = Bu oyunu hamle hamle inceleyelim.
+an.start.3 = İşte oyun. Bakalım nasıl geçmiş.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Bu oyun, tahtaya kurulmuş bir pozisyondan başlıyor. Birlikte inceleyelim.
+an.start.setup.2 = Kurulmuş bir pozisyondan oynanan bir oyun. Bakalım nasıl geçmiş.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Açılış: {opening:def}.
+an.opening.2 = Oynanan açılış {opening:def}.
+an.book_exit = {move} hamlesiyle oyun, bilinen açılış teorisinden çıkıyor.
+an.book_exit.2 = {move}, açılış kitabının dışındaki ilk hamle.
+an.book_exit.3 = Açılış teorisi burada, {move} hamlesiyle bitiyor.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} hamlesi büyük bir hata.
+an.blunder.2 = Burada {move} hamlesi ciddi bir hata.
+an.blunder.3 = Büyük hata: {move}.
+an.mistake = {move} hamlesi bir hata.
+an.mistake.2 = {move} burada doğru hamle değil.
+an.mistake.3 = Hata: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} hamlesi, bu hatayı cezalandırma fırsatını kaçırıyor.
+an.missed_chance.2 = {move} hamlesiyle fırsat kaçıyor.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Artık {reply:nomate} hamlesi mat ediyor.
+an.mate_allowed.one.2 = {reply:nomate} hamlesine izin veriyor; bu da şah mat.
+an.mate_allowed = {reply:nomate} ile başlayan, {m} hamlede zorunlu bir mata izin veriyor.
+an.mate_allowed.2 = Artık {reply:nomate} hamlesiyle başlayan, {m} hamlede zorunlu bir mat var.
+an.fork = Şimdi {reply} hamlesi {t1:acc} ve {t2:acc} çatala alıyor.
+an.fork.2 = {reply} hamlesine izin veriyor; bu hamle aynı anda {t1:dat} ve {t2:dat} saldırıyor.
+an.fork.3 = {reply} hamlesi aynı anda hem {t1:dat} hem {t2:dat} vuruyor.
+an.hanging = {piece:acc} korumasız bırakıyor ve {reply} hamlesi onu alıyor.
+an.hanging.2 = {piece} korumasız kalıyor: {reply} hamlesi onu kazanıyor.
+an.hanging.3 = {reply} hamlesi, koruması olmayan {piece:acc} alıveriyor.
+an.material = {line} cevabı {pts:point}lık materyal kazandırıyor.
+an.material.2 = Ardından {line} varyantı {pts:point} kazandırıyor.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} hamlesi mattı.
+an.mate_missed.one.2 = {best:nomate} hamlesi mat ederdi.
+an.mate_missed = {best:nomate} hamlesi {m} hamlede zorunlu mat getirirdi.
+an.mate_missed.2 = {best:nomate} ile başlayan, {m} hamlede zorunlu bir mat vardı.
+an.missed_capture = {best} hamlesi {piece:acc} bedavaya kazanırdı.
+an.missed_capture.2 = {piece:gen} koruyanı yoktu: {best} hamlesi onu alırdı.
+an.missed_fork = {best} hamlesi {t1:acc} ve {t2:acc} çatala alırdı.
+an.missed_fork.2 = {best} bir çataldı: {t1:dat} ve {t2:dat} saldırıyordu.
+
+# The better move, when nothing above named it.
+an.better = {best} hamlesi daha güçlüydü.
+an.better.2 = Daha iyisi {best} idi.
+an.better.3 = {best} hamlesi daha isabetliydi.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} parlak bir hamle: {piece:acc} feda ediyor!
+an.brilliant.2 = Parlak bir feda! {move} hamlesi {piece:acc} rakibe sunuyor.
+an.brilliant.3 = {move}! {piece:acc} feda eden parlak bir hamle.
+an.brilliant.mate = {m} hamlede zorunlu mata götürüyor.
+an.brilliant.mate.2 = Üstelik {m} hamlede mata zorluyor.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = Üstünlüğü koruyan tek hamle {move}.
+an.only.win.2 = Burada üstünlüğü yalnızca {move} koruyor. İyi bulunmuş.
+an.only.hold = Dengeyi koruyan tek hamle {move}.
+an.only.hold.2 = Burada pozisyonu yalnızca {move} ayakta tutuyor.
+an.only.defend = Mücadeleyi sürdüren tek hamle {move}.
+an.only.defend.2 = Burada oyunu yalnızca {move} hayatta tutuyor. İyi savunma.
+an.only.best = {move}, burada açık ara en güçlü hamle.
+an.only.best.2 = İsabetli: {move}, diğer bütün hamlelerden çok daha güçlü.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} hamlesi biraz kusurlu: {best} daha isabetliydi.
+an.inaccuracy.2 = En iyisi değil: {best}, {move} hamlesinden daha isabetliydi.
+an.interesting = {move} ilginç bir fikir: {piece:acc} rakibe sunuyor.
+an.interesting.2 = İlginç bir deneme: {move} hamlesi {piece:acc} gözden çıkarıyor.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Beyazın artık {m} hamlede zorunlu matı var.
+an.mate_on.white.2 = Beyaz buradan itibaren {m} hamlede mata zorlayabilir.
+an.mate_on.black = Siyahın artık {m} hamlede zorunlu matı var.
+an.mate_on.black.2 = Siyah buradan itibaren {m} hamlede mata zorlayabilir.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Şah mat. Oyunu Beyaz kazanıyor.
+an.end.mate.white.2 = Ve şah mat: Beyaz kazanıyor.
+an.end.mate.black = Şah mat. Oyunu Siyah kazanıyor.
+an.end.mate.black.2 = Ve şah mat: Siyah kazanıyor.
+an.end.resigned.white = Siyah terk etti, bu yüzden oyunu Beyaz kazanıyor.
+an.end.resigned.white.2 = Oyun burada bitiyor: Siyah terk etti ve Beyaz kazanıyor.
+an.end.resigned.black = Beyaz terk etti, bu yüzden oyunu Siyah kazanıyor.
+an.end.resigned.black.2 = Oyun burada bitiyor: Beyaz terk etti ve Siyah kazanıyor.
+an.end.timeout.white = Siyahın süresi bitti, bu yüzden Beyaz kazanıyor.
+an.end.timeout.white.2 = Beyaz süreden kazanıyor.
+an.end.timeout.black = Beyazın süresi bitti, bu yüzden Siyah kazanıyor.
+an.end.timeout.black.2 = Siyah süreden kazanıyor.
+an.end.win.white = Oyun, Beyazın galibiyetiyle bitiyor.
+an.end.win.white.2 = Oyunu Beyaz kazanıyor.
+an.end.win.black = Oyun, Siyahın galibiyetiyle bitiyor.
+an.end.win.black.2 = Oyunu Siyah kazanıyor.
+an.end.stalemate = Pat: oyun berabere.
+an.end.stalemate.2 = Bu bir pat, dolayısıyla oyun berabere bitiyor.
+an.end.draw.agreement = Oyuncular beraberlikte anlaştı.
+an.end.draw.agreement.2 = Oyun, anlaşmayla berabere bitiyor.
+an.end.draw.repetition = Oyun, pozisyon tekrarıyla berabere.
+an.end.draw.repetition.2 = Aynı pozisyon yeniden ortaya çıktı: beraberlik.
+an.end.draw.fifty = Oyun, elli hamle kuralıyla berabere.
+an.end.draw.fifty.2 = Taş alınmadan ve piyon oynanmadan elli hamle: beraberlik.
+an.end.draw.seventy_five = Oyun, yetmiş beş hamle kuralıyla berabere.
+an.end.draw.seventy_five.2 = Taş alınmadan ve piyon oynanmadan yetmiş beş hamle: beraberlik.
+an.end.draw.material = Artık mat mümkün değil: oyun berabere.
+an.end.draw.material.2 = Artık iki taraf da mat edemez, bu yüzden oyun berabere.
+an.end.draw = Oyun berabere bitiyor.
+an.end.draw.2 = Beraberlik.
+an.end.unfinished = Oyun burada, bitmeden duruyor.
+an.end.unfinished.2 = Oyun burada kalıyor: bitirilmemişti.
+an.end.accuracy = Doğruluk: Beyaz için {acc_white:percent}, Siyah için {acc_black:percent}.
+an.end.accuracy.2 = Beyaz {acc_white:percent} doğrulukla oynadı, Siyah ise {acc_black:percent} doğrulukla.
+an.end.clean.white = Beyaz ne hata ne de büyük hata yaptı.
+an.end.clean.white.2 = Beyazın oyununda ciddi bir hata yoktu.
+an.end.clean.black = Siyah ne hata ne de büyük hata yaptı.
+an.end.clean.black.2 = Siyahın oyununda ciddi bir hata yoktu.
+an.end.mistakes.white = Beyaz {n:mistake} yaptı, büyük hata yapmadı.
+an.end.mistakes.white.2 = Beyaz için: {n:mistake}, büyük hata yok.
+an.end.mistakes.black = Siyah {n:mistake} yaptı, büyük hata yapmadı.
+an.end.mistakes.black.2 = Siyah için: {n:mistake}, büyük hata yok.
+an.end.blunders.white = Beyaz {m:blunder} yaptı.
+an.end.blunders.white.2 = Beyaz için: {m:blunder}.
+an.end.blunders.black = Siyah {m:blunder} yaptı.
+an.end.blunders.black.2 = Siyah için: {m:blunder}.
+an.end.errors.white = Beyaz {n:mistake} ve {m:blunder} yaptı.
+an.end.errors.white.2 = Beyaz için: {n:mistake} ve {m:blunder}.
+an.end.errors.black = Siyah {n:mistake} ve {m:blunder} yaptı.
+an.end.errors.black.2 = Siyah için: {n:mistake} ve {m:blunder}.
