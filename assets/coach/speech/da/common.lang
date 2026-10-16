@@ -257,16 +257,6 @@ respell.ratede = rejtede
 respell.elleve = elve
 # The French "au" of "epaulet" is an o; the voice says "au" (heard "i Paulemat").
 respell.epauletmat = epoletmat
-# 22, 32 ... 92: "toog" runs into one long o (92 heard "2,5"); hyphens keep "to" and "og" apart,
-# as number.21.spoken ... number.91.spoken do for "en". Other units read right without them.
-respell.toogtyve = to-og-tyve
-respell.toogtredive = to-og-tredive
-respell.toogfyrre = to-og-fyrre
-respell.tooghalvtreds = to-og-halvtreds
-respell.toogtres = to-og-tres
-respell.tooghalvfjerds = to-og-halvfjerds
-respell.toogfirs = to-og-firs
-respell.tooghalvfems = to-og-halvfems
 # The Italian ch of "fianchetto" is a k; the voice says "fiantjetto" (heard "fjernshadow").
 respell.fianchetto = fianketto
 respell.fianchettoen = fiankettoen
@@ -281,9 +271,10 @@ respell.fianchettovarianten = fiankettovarianten
 # from fifty (halvtreds, tres, halvfjerds, firs, halvfems): 21-99 compose as "{units}og{tens}"
 # ("treogtyve", "femoghalvfjerds", "nioghalvfems"); 21, 31 ... 91 are listed, since "en" inside the
 # compound never changes ("enogtyve" before any noun). Spoken with hyphens ("en-og-tyve"): the voice
-# runs "enog" together (71 heard as "endnu ... halvfjerds", "81"); the "to" compounds take the same
-# hyphens through respell.toog* below. 100-199 say "hundrede", 200-999 "to hundrede"
-# ... with "og" before the rest ("hundrede og ti", "tre hundrede og femogfyrre").
+# runs "enog" together (71 heard as "endnu ... halvfjerds", "81"), and "toog" into one long o (92
+# heard "2,5"), so 22, 32 ... 92 are listed too; the other units read right composed (a respelling
+# is one word, so the hyphens live here). 100-199 say "hundrede", 200-999 "to hundrede" ... with
+# "og" before the rest ("hundrede og ti", "tre hundrede og femogfyrre").
 # Forms of 1: the plain number is the neuter "ét", the form in which Danish names and reads a
 # number and counts a neuter noun ("træk ét", "mat i ét", "ét træk", "ét point", "ét felt"); the
 # form "en" ("{n:en}", count.en) says "én" before a common-gender noun ("én bonde", "én fejl").
@@ -312,20 +303,28 @@ number.18.spoken = atten
 number.19.spoken = nitten
 number.20.spoken = tyve
 number.21.spoken = en-og-tyve
+number.22.spoken = to-og-tyve
 number.30.spoken = tredive
 number.31.spoken = en-og-tredive
+number.32.spoken = to-og-tredive
 number.40.spoken = fyrre
 number.41.spoken = en-og-fyrre
+number.42.spoken = to-og-fyrre
 number.50.spoken = halvtreds
 number.51.spoken = en-og-halvtreds
+number.52.spoken = to-og-halvtreds
 number.60.spoken = tres
 number.61.spoken = en-og-tres
+number.62.spoken = to-og-tres
 number.70.spoken = halvfjerds
 number.71.spoken = en-og-halvfjerds
+number.72.spoken = to-og-halvfjerds
 number.80.spoken = firs
 number.81.spoken = en-og-firs
+number.82.spoken = to-og-firs
 number.90.spoken = halvfems
 number.91.spoken = en-og-halvfems
+number.92.spoken = to-og-halvfems
 number.100.spoken = hundrede
 number.tens.spoken = {units}og{tens}
 number.hundreds.spoken = {n} hundrede

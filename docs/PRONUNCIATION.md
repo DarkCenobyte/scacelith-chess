@@ -11,8 +11,9 @@ keeps what was found per language, so that new lines and translations avoid the 
   and file letters in words, a respelled word in that line only).
 - `respell.<word> = <spoken>` in `common.lang`: the word is replaced in every spoken line of the
   language, whole words in any case ("Mat !" keeps its capital). `respell.<word>.pause` replaces it only
-  before a pause (punctuation or the end of the line; a hyphen joining the next word is no pause). See
-  `src/coach/catalog.h`.
+  before a pause (punctuation or the end of the line; a hyphen joining the next word is no pause). The
+  spoken form is one word too (no space or hyphen; the unit test below counts it as one): a number said
+  with hyphens goes in `number.<n>.spoken` instead (Danish `to-og-tyve`). See `src/coach/catalog.h`.
 - Opening texts are generated: `tools/gen_opening_lang.py` spells squares with `FILE_WORDS` and
   `RANK_WORDS` and respells words with `SPOKEN_WORDS`; run it again after a change (`--check` tells
   whether the files are up to date). The respell.* keys apply to the opening lines too.
@@ -248,7 +249,7 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
 | epauletmat | the "au" said, heard "i Paulemat" | `epoletmat` (respell): "epolemat", "jepolet", no "au" in 6 |
 | ratede | a vowel too many, heard "rejattede" 4 times in 6 | `rejtede` (respell): "rejtede" 4 in 6 |
 | elleve | three syllables, as written (probe); never heard as 11 in 6 | `elve` (respell): 11 three times in 6 |
-| 21, 31 ... 91; 22, 32 ... 92 | "enog", "toog" run together: 71 heard "81", "endnu halvfjerds"; 92 "2,5" | `en-og-halvfjerds` (number.X1.spoken), `to-og-halvfems` (respell.toog*): 71 three in 3 against 0, 32 two in 3 against 0, 92 five in 6 against 2; 52 the same either way, 86 worse with hyphens, so other units stay joined |
+| 21, 31 ... 91; 22, 32 ... 92 | "enog", "toog" run together: 71 heard "81", "endnu halvfjerds"; 92 "2,5" | `en-og-halvfjerds` (number.X1.spoken), `to-og-halvfems` (number.X2.spoken): 71 three in 3 against 0, 32 two in 3 against 0, 92 five in 6 against 2; 52 the same either way, 86 worse with hyphens, so other units stay joined |
 
 - Parakeet could not do Danish: its language detection wrote English or German (or nothing) for 592 of the 750
   lines of the first round trip. Redone with Whisper medium set to `da`: 219 lines covering 1,120 words (seed
