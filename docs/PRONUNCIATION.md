@@ -273,3 +273,39 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
 - Recogniser habits: hvid as "ved" (the voice says "vid": probe), bonden as "bånden", mat as "mad", ad as
   "af", felter as "fælder", én and ét written "en", "et"; it drops "Hmm"; it often writes the numbers from 50
   up as pieces ("enoghalvfjerds" heard "en halv fjerts") though the v and d are silent as they should be (probe).
+
+## Korean
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| 퀸과 (the queen and/with) | "큉과": the final ㄴ turns into ㅇ before the ㄱ, and the recogniser hears 킹과 (the king) 10 times in 16 (퀸 4 times) | `퀸하고` (respell.퀸과, the same "and/with"): 퀸 15 times in 24, 킹 once |
+| 퀸까지 (as far as the queen) | "큉까지": 킹까지 8 times in 13 (퀸 3 times) | `퀸에까지` (respell.퀸까지): 퀸 9 times in 15, never 킹 |
+| 퀸 근처 (ex.fork.tip.knight) | the same across the space: 킹 근처 3 times in 3 | `퀸의 근처` (.spoken): 퀸 2 times in 3 |
+
+- Round trip over 300 lines (Whisper medium, seed 0), then 3 seeds on about 110 lines: the reviewers'
+  list, the file letters, the numbers, the opening names and eponyms and the words missed most, and
+  `tools/tts_pronunciation.py --probe` (4-5 seeds) on the doubtful ones. The voice turns a final ㄴ into
+  ㅇ before ㄱ ㄲ ㅋ, which standard Korean does not do (퀸과 is [퀸과]). A space does not stop it ("퀸 과",
+  "퀸 까지": 킹 7 times in 15). Only 퀸 becomes another piece. "폰과" is said "퐁과" (heard 펑과, 폼과) and
+  레닌그라드 is said 레닝그라드: both left as they are. In a new line, avoid 퀸 right before ㄱ ㄲ ㅋ ("이른
+  퀸 공격" came through 3 times in 3, "퀸 근처" never).
+- Checked and fine: 흑은 [흐근], 백은 [배근], 백의 [배게], 갬빗 (= 겜빗), 피앙케토 (= 피앙캐토, not
+  피앙차토), 이른 (not 이런), 수째 (tense, not 수제), 십구 [십꾸], 견고한, 기보지 (not 기본지), 중앙,
+  체스, 동형 (with the ㅎ weakened, as Korean speakers say it), 엘로 3 times in 3, 정돈합니다, 오 플러스 삼 3 times in 3,
+  칠십오 수 and 오십 수 6 times in 6, 백 점 (heard 100점), 예순네 칸, 최선수, 더블 체크, 칠 랭크, 위나워 (not
+  위나와), 나이도르프 (not 나이돌프), 보트비닉 3 times in 3. Also the file letters (에이 비 씨 디 이 에프 지 에이치: after
+  a pause 디 is [ti], as with other Korean lax stops) and the hyphen of 블랙마-디머 and 님조-라르센 (a short pause). 엘자 is said
+  [엘짜] (probe); written `엘짜` it came through 2 times in 3, against 1 time in 3, too few to change it.
+- Left as is: 스테일메이트 is heard 스틸, 스테이 or 스텔 메이트 (right 1 time in 17). The probe puts it near
+  스테이메이트 (a weak l, as in 마일스, heard 마이스), and "스테일 메이트" with a space did no better (0 in 9).
+  폰 is heard 푼, 톤 or 펀 about two times in five, but the probe has 폰을 = 포늘, far from 푼을 and 펀을.
+  두셨어요 was heard 드셨어요 ("you ate") or 주셨어요 5 times in 5. The probe cannot tell ㅜ from ㅡ there (nor in
+  주셨어요), and there is no other spelling. 브레이어 at the start of a sentence was heard with a ㄱ (그래요,
+  그레이어) 4 times in 4. The probe cannot tell it from 그레이어. 칠십오 is said [칠시보], not [칠씨보]. "나이트 에프
+  칠" was heard "나이트의 부츠" 2 times in 3: the f melts into the vowel before it, as e does in Spanish.
+- Recogniser habits: it writes 예요 as 에요 (and 무승부예요 as 무승부해요), 백의 as 배개 or 되게, 흑은 as
+  혹은 or 흙은, and 기물을 as 기무를 (its sound). It also writes 씨 as 시, 갬빗 as 겐빗, 무승부 as 무슨 부, and 스큐어 as
+  스퀘어 (`스큐우어` gave 스퀴어). It writes squares and numbers as notation ("e4", "100점"). The first word of a line is
+  often lost or replaced (흑은 and 백은 are heard 이건, 하겐, 되게). It cannot write most eponyms (님조비치 as 닌조비치, 그륀펠트 as
+  그린펠트). It turns short lines of names into English or into a caption ("Smart AdMate", "(끝)"). It cuts lines of
+  more than about 50 syllables short.

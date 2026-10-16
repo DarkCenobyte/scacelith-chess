@@ -294,7 +294,12 @@ move.mate.spoken = {move}, 체크메이트
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet for Korean (the pronunciation pass adds the words the voice misreads).
+# The voice assimilates a final ㄴ to the velar that follows (퀸과 said 큉과): "퀸과", "퀸까지" are heard
+# 킹과, 킹까지, the king. The spoken text gives 퀸 a vowel or ㅎ after it: 퀸하고 (and/with, the same
+# meaning), 퀸에까지 (as far as). "퀸 근처" across a space does it too: ex.fork.tip.knight.spoken.
+# In a new line, avoid 퀸 right before ㄱ ㄲ ㅋ. See docs/PRONUNCIATION.md (Korean).
+respell.퀸과 = 퀸하고
+respell.퀸까지 = 퀸에까지
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Sino-Korean numbers (일 이 삼 ...) are the default: ranks, points (점), percentages, move numbers

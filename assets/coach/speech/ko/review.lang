@@ -432,6 +432,7 @@ ex.fork.tail_king.2 = 체크! {your:subj} 움직여야 하니까 {t1:subj} 잡�
 ex.fork.more.b3 = 두기 전에 {sq} 칸을 확인하세요. {my:subj} 포크를 걸 수 있는 칸이에요.
 ex.fork.more.b3.2 = {sq} 칸을 잘 보세요. {my:subj} 거기서 포크를 걸어요.
 ex.fork.tip.knight = 킹과 퀸 근처로 뛰어드는 나이트를 조심하세요!
+ex.fork.tip.knight.spoken = 킹과 퀸의 근처로 뛰어드는 나이트를 조심하세요!
 ex.fork.tip.knight.2 = 나이트는 두 기물을 한꺼번에 공격하는 걸 좋아해요. 나이트가 어디로 뛸 수 있는지 보세요.
 
 # ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
