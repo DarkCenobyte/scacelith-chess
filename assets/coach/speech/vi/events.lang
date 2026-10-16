@@ -31,12 +31,13 @@ event.colour.black = Tôi cầm quân trắng, nên tôi sẽ đi trước.
 event.colour.black.2 = Lần này bạn chơi bên Đen: tôi đi trước.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-# The level names are those of the coach page (assets/i18n/vi.lang coach.level.<n>.name).
+# The level names are those of the coach page (assets/i18n/vi.lang coach.level.<n>.name); a line of
+# moves is "biến", as the level descriptions of that page say it.
 event.level.l1 = Bước đầu: tôi chơi nhẹ nhàng và giải thích mọi sai lầm bằng lời lẽ đơn giản.
 event.level.l2 = Người mới chơi: tôi chơi mạnh hơn một chút, và gọi tên các đòn chiến thuật đơn giản như chĩa đôi và ghim.
-event.level.l3 = Đang tiến bộ: tôi nói về kế hoạch và cấu trúc Tốt, và chỉ ra những chuỗi nước đi ngắn.
+event.level.l3 = Đang tiến bộ: tôi nói về kế hoạch và cấu trúc Tốt, và chỉ ra những biến ngắn.
 event.level.l4 = Kỳ thủ câu lạc bộ: tôi đưa ra đánh giá tính theo đơn vị Tốt và gợi ý các nước ứng viên.
-event.level.l5 = Kỳ thủ câu lạc bộ mạnh: nhận xét ngắn gọn, và những chuỗi nước dài hơn khi cần thiết.
+event.level.l5 = Kỳ thủ câu lạc bộ mạnh: nhận xét ngắn gọn, và những biến dài hơn khi cần thiết.
 event.level.l6 = Chuyên gia: tôi chơi hết sức và chỉ nhận xét những thời điểm then chốt.
 
 # ---- Turn-taking -------------------------------------------------------------------------------------

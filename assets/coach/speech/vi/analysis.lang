@@ -54,7 +54,7 @@ an.material = Đáp lại bằng {line} sẽ giành được {pts:point} về l�
 an.material.2 = Sau đó, {line} giành được {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = Khi đó, nước {best:nomate} là chiếu hết.
+an.mate_missed.one = Nước {best:nomate} mới là nước chiếu hết.
 an.mate_missed.one.2 = Nước {best:nomate} lẽ ra đã chiếu hết.
 an.mate_missed = Nước {best:nomate} lẽ ra đã buộc chiếu hết sau {m:move}.
 an.mate_missed.2 = Đã có cách buộc chiếu hết sau {m:move}, bắt đầu bằng nước {best:nomate}.

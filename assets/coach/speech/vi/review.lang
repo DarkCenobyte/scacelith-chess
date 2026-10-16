@@ -486,7 +486,7 @@ ex.pin.b2.2 = {your} bị ghim vào {t1:bare}. Rồi tôi có thể ăn nó.
 ex.pin.b2.3 = Giờ {your} bị kẹt trước {t1:bare}. Đó là đòn ghim.
 ex.pin.b3 = {your} bị ghim vào {t1:bare}, và tôi ăn nó.
 ex.pin.b3.2 = Sau nước này, {your} bị ghim vào {t1:bare}.
-ex.pin.b3.3 = Đòn ghim {your} làm bạn mất quân: {t1:bare} ở phía sau.
+ex.pin.b3.3 = Đòn ghim vào {your} làm bạn mất quân: {t1:bare} ở phía sau.
 ex.pin.b4 = {reply} ghim và ăn quân.
 ex.pin.b4.2 = Nước {move} mắc vào đòn ghim {reply}.
 ex.pin.b4.3 = Sau {reply}, quân bị ghim sẽ mất.
@@ -571,8 +571,8 @@ ex.hanging.b6.3 = {your:short} bị treo: {reply}.
 ex.hanging_guard.b1 = Lúc nãy {your2} bảo vệ {your}. Giờ {my} có thể bắt nó.
 ex.hanging_guard.b1.2 = {your2} đã đi chỗ khác, và giờ {your} bị bỏ lại một mình. {my} bắt nó.
 ex.hanging_guard.b2 = Trước đó {your2} bảo vệ {your}. Giờ {your:bare} chỉ còn một mình, và {my} bắt nó.
-ex.hanging_guard.b2.2 = Khi đi {your2:refl}, bạn đã bỏ {your:refl} không được bảo vệ trước {my}.
-ex.hanging_guard.b3 = {your2} đang canh {your}. Di chuyển {your2:bare} thì {reply} sẽ bắt {your:bare}.
+ex.hanging_guard.b2.2 = Khi đi {your2:refl}, bạn đã để {your:refl} không còn được bảo vệ trước {my}.
+ex.hanging_guard.b3 = {your2} vốn đang canh {your}. Di chuyển {your2:bare} thì {reply} sẽ bắt {your:bare}.
 ex.hanging_guard.b3.2 = Không có {your2}, {your} bị treo: {reply}.
 ex.hanging_guard.b4 = Nước {move} bỏ mất quân canh: {your2} rời bỏ {your}, và {reply} ăn nó.
 ex.hanging_guard.b4.2 = {your2} là quân duy nhất bảo vệ {your}; {reply} ăn nó.
@@ -714,7 +714,7 @@ ex.promotion_missed.b6.2 = {best}; đến ô {sq} trước.
 
 # ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
 # A pawn in front of the castled king moved ({sq} = where it stood).
-ex.king_shield.b1 = Con Tốt đó che chắn cho {your}. Giờ {your:bare} ít được che chắn hơn.
+ex.king_shield.b1 = Con Tốt đó vốn che chắn cho {your}. Giờ {your:bare} ít được che chắn hơn.
 ex.king_shield.b1.2 = Con Tốt ở ô {sq} là lá chắn cho {your}. Giờ quân của tôi có thể xông vào.
 ex.king_shield.b2 = Đi con Tốt ở ô {sq} làm {your} yếu đi. Giờ quân của tôi có thể tấn công nó.
 ex.king_shield.b2.2 = {your} mất một vệ sĩ: con Tốt ở ô {sq} là lá chắn của nó.
@@ -736,7 +736,7 @@ ex.king_exposed.b3.2 = Sau nước này, {your} không còn chỗ trú.
 ex.king_exposed.b4 = {your} bị lộ ra: {line}.
 ex.king_exposed.b4.2 = Nước {move} để {your} hở trước đòn tấn công.
 ex.king_exposed.b5 = {your} quá lộ: {line}.
-ex.king_exposed.b5.2 = Nước {move} để {your} trơ trọi giữa bàn cờ.
+ex.king_exposed.b5.2 = Nước {move} để {your} trơ trọi, không còn chỗ trú.
 ex.king_exposed.b6 = {line}; {your:short} bị lộ.
 ex.king_exposed.b6.2 = {your:short} quá hở: {line}.
 
@@ -952,7 +952,7 @@ threat.piece.b2 = Cẩn thận với {your}.
 threat.piece.b2.2 = {your} đang bị tấn công.
 threat.piece.b2.3 = Để ý {your} nhé.
 threat.punish.b1 = Nước vừa rồi của tôi là một sai lầm. Bạn có trừng phạt được không?
-threat.punish.b1.2 = Hừm, hình như tôi vừa mắc sai lầm. Bạn tìm ra không?
+threat.punish.b1.2 = Hừm, hình như tôi vừa mắc sai lầm. Bạn có tìm ra không?
 
 # ---- Takebacks ------------------------------------------------------------------------------------
 # After the takeback is accepted, a hint (levels 1-2).

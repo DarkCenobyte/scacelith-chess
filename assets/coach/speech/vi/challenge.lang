@@ -58,7 +58,7 @@ ch.task.promotion = Hãy tận dụng con Tốt đã tiến sâu của bạn.
 ch.task.quiet = Nước thắng là một nước đi lặng.
 ch.task.opening = Hãy trừng phạt nước đi vừa rồi của tôi.
 ch.task.escape = Hãy cứu Vua của bạn: chỉ có một nước đi cứu được.
-ch.task.defend = Hãy tìm nước đi hay duy nhất.
+ch.task.defend = Hãy tìm nước đi đúng duy nhất.
 ch.task.endgame = Hãy tìm nước đi tốt nhất.
 ch.task.default = Hãy tìm nước đi tốt nhất.
 # The endgames played out: the coach defends, or tries to win, with its best moves.

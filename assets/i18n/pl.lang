@@ -1004,5 +1004,451 @@ direct.err.not_found = Nie znaleziono tej nazwy.
 direct.err.unreachable = Ten adres jest stąd nieosiągalny.
 direct.err.reset = Połączenie zostało zerwane.
 direct.err.closed = Połączenie zostało zamknięte.
-direct.err.host_left = Znajomy zamknął grę.
+direct.err.host_left = Znajomy nie prowadzi już gry.
 direct.err.other = Połączenie nie powiodło się ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# Player names do not decline: "gracza {0}" / "przez gracza {1}" keeps them in the nominative.
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Gracz 2
+hotseat.white_player = Białe
+hotseat.black_player = Czarne
+hotseat.name.help = Imię wpisywane na obu blankietach, w dowolnym alfabecie.
+hotseat.swap = Zamień kolory
+hotseat.left_hand = {0} gra lewą ręką: zegar stoi po lewej stronie.
+hotseat.rated = Partia rankingowa
+hotseat.rated.help = Każde imię ma na tym komputerze własny ranking gry we dwoje. Twój ranking w partiach ze Stockfishem nigdy się nie zmienia.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Rankingi gry we dwoje: {0} {1} · {2} {3}
+hotseat.new_rating = (nowy)
+hotseat.friendly_note = Partia towarzyska: rankingi się nie zmieniają.
+hotseat.colours = {0} gra białymi, {1} gra czarnymi.
+hotseat.colours_swap = Kolory zmieniają się przy każdym rewanżu.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, twój ruch
+hotseat.flag = {0}: chorągiewka opadła.
+hotseat.confirm.resign = Poddać partię w imieniu gracza {0}? Wygra ją {1}.
+hotseat.confirm.resign_draw = Poddać partię w imieniu gracza {0}? {1} nie może już dać mata: partia zakończy się remisem.
+hotseat.draw.offer_noted = Twoja propozycja remisu zostanie przekazana razem z ruchem: {0} zobaczy ją, gdy naciśniesz zegar.
+hotseat.draw.card_title = PROPOZYCJA REMISU
+hotseat.draw.offered = {0} proponuje remis.
+hotseat.draw.card_hint = Dotknięcie bierki oznacza odrzucenie propozycji.
+hotseat.draw.accept = Przyjmij
+hotseat.draw.decline = Odrzuć
+hotseat.draw.accepted = {0} przyjmuje remis zaproponowany przez gracza {1}.
+hotseat.draw.declined = {0} odrzuca remis zaproponowany przez gracza {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Partia rankingowa
+hotseat.sheet.friendly = Partia towarzyska
+# Game over card
+hotseat.gameover.wins = {0} wygrywa w {1} ruchu.|{0} wygrywa w {1} ruchach.|{0} wygrywa w {1} ruchach.
+hotseat.gameover.wins_now = {0} wygrywa.
+hotseat.gameover.friendly = {0} kontra {1} · partia towarzyska
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Ta partia nie jest rankingowa.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+# The coach is "trener" (m). Level names are the ones the coach quotes in assets/coach/speech/pl.
+menu.coach = Trener
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Mowa syntetyczna generowana przez {0} w trybie „Trener”
+# Coach page
+coach.title = TRENER
+coach.section.level = POZIOM
+coach.section.lesson = Z TRENEREM
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Dla graczy z rankingiem {0}
+coach.completed = Ukończone
+coach.recommended = Polecany
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Zasady gry w szachy
+coach.level.0.desc = Interaktywna lekcja, po jednej zasadzie naraz.
+coach.level.0.detail = Trener ustawia małe pozycje i pokazuje, jak porusza się i bije każda bierka, a potem roszadę, promocję, szach i mat. Każdy pomysł wypróbowujesz samodzielnie na szachownicy.
+coach.level.1.name = Pierwsze kroki
+coach.level.1.desc = Co jest atakowane, a co zostaje bez obrony.
+coach.level.1.detail = Trener gra łagodnie i mówi prostymi słowami: które z twoich bierek są atakowane, które zostają bez obrony i jak je utrzymać.
+coach.level.2.name = Początkujący
+coach.level.2.desc = Prosta taktyka, rozwój, bezpieczeństwo króla.
+coach.level.2.detail = Widełki i związania są nazywane po imieniu. Trener mówi o wyprowadzaniu figur i o bezpieczeństwie twojego króla.
+coach.level.3.name = Średnio zaawansowany
+coach.level.3.desc = Plany, struktura pionkowa, jedyne ruchy.
+coach.level.3.detail = Trener objaśnia plany i struktury pionkowe oraz ostrzega cię, gdy pozycję utrzymuje tylko jeden ruch.
+coach.level.4.name = Gracz klubowy
+coach.level.4.desc = Ruchy kandydackie, ocena w pionkach.
+coach.level.4.detail = Trener rozważa ruchy kandydackie i podaje ocenę w pionkach, tak jak trener w klubie.
+coach.level.5.name = Silny gracz klubowy
+coach.level.5.desc = Zwięzłe warianty, terminologia pozycyjna.
+coach.level.5.detail = Krótkie uwagi, konkretne warianty i słownictwo gry pozycyjnej.
+coach.level.6.name = Ekspert
+coach.level.6.desc = Lakoniczne uwagi, głębokie warianty, oceny liczbowe.
+coach.level.6.detail = Mało słów, jak między silnymi graczami: warianty na kilka ruchów w głąb i liczbowe oceny pozycji.
+coach.note.clock = Bez zegara: masz tyle czasu, ile potrzebujesz.
+coach.note.takeback = Po poważnym błędzie trener pokazuje, co poszło nie tak, i proponuje cofnięcie ruchu.
+coach.note.lesson = Grasz białymi; trener ustawia każde ćwiczenie na szachownicy.
+coach.note.unrated = Partie z trenerem nie są rankingowe.
+coach.note.fallible = Trener nie jest nieomylny: czasem może źle ocenić ruch.
+coach.colour = Twój kolor
+coach.colour.help = Kolor, którym grasz przeciwko trenerowi. Na zmianę: białe, potem czarne, w kolejnych partiach. Lekcję zasad zawsze gra się białymi.
+coach.colour.alternate = Na zmianę
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Głos trenera nie jest zainstalowany lub jest wyłączony (Opcje > Dźwięk): jego słowa będą wyświetlane na ekranie.
+# At the table
+coach.speaker = TRENER
+coach.skip = Pomiń
+coach.offer.title = COFNĄĆ RUCH?
+coach.offer.text = Trener proponuje cofnięcie twojego ostatniego ruchu, aby można było poszukać lepszego.
+coach.offer.hint = Backspace cofa ruch. Dotknięcie bierki oznacza dalszą grę.
+coach.offer.accept = Cofnij
+coach.offer.decline = Graj dalej
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Pozostałe cofnięcia: {0}
+coach.pause.take_back = Cofnij mój ruch
+coach.pause.take_back.help = Cofa twój ostatni ruch, a także odpowiedź trenera, jeśli już ją zagrał.
+coach.confirm.resign = Poddać tę partię? Zwycięzcą zostanie ogłoszony trener.
+coach.confirm.resign_draw = Poddać tę partię? Trener nie może już dać mata: partia zakończy się remisem.
+coach.confirm.leave = Wrócić do menu głównego? Ta partia z trenerem zostanie porzucona.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Zagraj ponownie
+coach.gameover.unrated = Ta partia z trenerem nie jest rankingowa.
+coach.lesson.done = BRAWO
+coach.lesson.done.line = Znasz już zasady gry w szachy.
+coach.lesson.next = Pierwsza partia
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# Challenge names are the ones the coach says at the start of each challenge (ch.intro.* in
+# assets/coach/speech/pl/challenge.lang).
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Trening
+coach.tab.challenges = Wyzwania
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATY
+challenge.group.tactics = TAKTYKA
+challenge.group.defence = OBRONA
+challenge.group.endgames = KOŃCÓWKI
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat w jednym ruchu
+challenge.mate1.desc = Jeden ruch i jest mat.
+challenge.mate1.detail = Najpierw sprawdź wszystkie szachy: po jednym z nich król nie ma ani pola ucieczki, ani zasłony, ani bicia.
+challenge.mate2.name = Mat w dwóch ruchach
+challenge.mate2.desc = Ruch, po którym nie ma obrony, a potem mat.
+challenge.mate2.detail = Pierwszy ruch to często szach albo poświęcenie, które odbiera królowi pole. Trener broni się najlepiej, jak potrafi.
+challenge.mate3.name = Mat w trzech ruchach
+challenge.mate3.desc = Dłuższe warianty forsujące.
+challenge.mate3.detail = Szachy, bicia i groźby na trzy ruchy w głąb. Zanim dotkniesz bierki, na każdym kroku wylicz najlepszą odpowiedź trenera.
+challenge.backrank.name = Maty na ostatniej linii
+challenge.backrank.desc = Król uwięziony za własnymi pionkami.
+challenge.backrank.detail = Gdy pionki przed królem po roszadzie się nie ruszyły, wieża lub hetman na ostatniej linii mogą dać mata. Najpierw usuń albo odciągnij obrońców.
+challenge.patterns.name = Typowe maty
+challenge.patterns.desc = Mat zduszony, mat Anastazji, mat arabski i inne klasyki.
+challenge.patterns.detail = Słynne sieci matowe, które powracają raz za razem. Naucz się rozpoznawać ustawienie bierek i ostatni cios.
+challenge.hanging.name = Bierki bez obrony
+challenge.hanging.desc = Wypatrz, co zostało bez obrony.
+challenge.hanging.detail = Figurę lub pionka, których nikt nie broni, można po prostu zbić. Sprawdź, co chroni każdą bierkę trenera.
+challenge.fork.name = Widełki
+challenge.fork.desc = Jedna bierka atakuje dwie naraz.
+challenge.fork.detail = Widełki mogą dać skoczki, pionki, hetmany, a nawet króle. Przeciwnik może uratować tylko jeden z dwóch celów.
+challenge.pin.name = Związania
+challenge.pin.desc = Bierka, która nie może się ruszyć bez utraty tego, co stoi za nią.
+challenge.pin.detail = Zwiąż bierkę z jej królem lub z cenniejszą bierką, a potem zaatakuj ją ponownie albo wykorzystaj to, że nie może się ruszyć.
+challenge.skewer.name = Przeszycia
+challenge.skewer.desc = Zaatakuj cenną bierkę i zdobądź tę, która stoi za nią.
+challenge.skewer.detail = Odwrotność związania: cenniejsza bierka stoi z przodu, musi zejść z linii i odsłania bierkę za sobą.
+challenge.discovered.name = Ataki z odsłony
+challenge.discovered.desc = Rusz jedną bierkę, aby uwolnić drugą.
+challenge.discovered.detail = Gdy bierka zejdzie z linii, atakuje bierka stojąca za nią. Przy szachu z odsłony lub podwójnym szachu przeciwnik nie zdąży odpowiedzieć na obie groźby.
+challenge.deflection.name = Odciągnięcie i zwabienie
+challenge.deflection.desc = Odciągnij obrońcę albo zwab go na zgubne pole.
+challenge.deflection.detail = Obrońca, który ma dwa zadania, nie wykona obu. Zaatakuj go, zaoferuj mu coś albo zmuś bierkę do wejścia na pole, na którym zginie.
+challenge.intermezzo.name = Ruchy pośrednie
+challenge.intermezzo.desc = Nie odbijaj od razu: jest coś silniejszego.
+challenge.intermezzo.detail = Przed oczekiwanym ruchem szach albo większa groźba wtrącona po drodze zmienia wszystko.
+challenge.trapped.name = Uwięzione bierki
+challenge.trapped.desc = Bierka, której nie zostało już żadne bezpieczne pole.
+challenge.trapped.detail = Odbierz bierce ostatnie pola ucieczki, a potem ją zdobądź.
+challenge.promotion.name = Promocja
+challenge.promotion.desc = Przeprowadź pionka na ostatnią linię.
+challenge.promotion.detail = Wysunięte pionki są dużo warte. Oczyść drogę, odciągnij blokujące bierki i zrób nowego hetmana.
+challenge.quiet.name = Ciche ruchy
+challenge.quiet.desc = Wygrywający ruch nie jest ani szachem, ani biciem.
+challenge.quiet.detail = Czasem najsilniejszy ruch tylko przygotowuje groźbę, której nie da się odeprzeć. Takie ruchy najtrudniej dostrzec.
+challenge.opening.name = Pułapki debiutowe
+challenge.opening.desc = Ukarz wczesne błędy.
+challenge.opening.detail = Pozycje z pierwszych ruchów prawdziwych partii, w których jeden nieostrożny ruch można od razu wykorzystać.
+challenge.escape.name = Znajdź ucieczkę
+challenge.escape.desc = Twój król jest w niebezpieczeństwie: ratuje go jeden ruch.
+challenge.escape.detail = Każdy inny ruch przegrywa. Przejrzyj wszystkie szachy i groźby wobec twojego króla, a potem znajdź jedyne wyjście.
+challenge.defend.name = Ruchy obronne
+challenge.defend.desc = Odeprzyj groźbę bez straty materiału.
+challenge.defend.detail = Trener czymś grozi. Znajdź precyzyjny ruch, który utrzymuje całą pozycję.
+challenge.kq.name = Hetman i król przeciw królowi
+challenge.kq.desc = Mat hetmanem.
+challenge.kq.detail = Zepchnij hetmanem samotnego króla na brzeg szachownicy, podprowadź własnego króla i uważaj na pata. Trener broni się najlepszymi ruchami.
+challenge.kr.name = Wieża i król przeciw królowi
+challenge.kr.desc = Mat wieżą.
+challenge.kr.detail = Wieża odcina króla rząd po rzędzie; twój król zajmuje opozycję. Trener broni się najlepszymi ruchami.
+challenge.kp.name = Król i pionek przeciw królowi
+challenge.kp.desc = Zdobądź opozycję i przeprowadź pionka.
+challenge.kp.detail = Prowadź królem, nie pionkiem. Zajmij opozycję i zrób hetmana, którego trener nie zdoła zatrzymać.
+challenge.kp_hold.name = Zatrzymaj pionka
+challenge.kp_hold.desc = Samotny król przeciw królowi z pionkiem: utrzymaj remis.
+challenge.kp_hold.detail = Stań przed pionkiem i trzymaj opozycję. Wytrzymaj dziesięć ruchów.
+challenge.rook.name = Końcówki wieżowe
+challenge.rook.desc = Most Luceny i obrona Philidora.
+challenge.rook.detail = Dwie pozycje, które powinien znać każdy gracz: jak wygrać z pionkiem na siódmym rzędzie i jak bronić się wieżą na trzecim.
+challenge.endgame.name = Taktyka w końcówce
+challenge.endgame.desc = Mało bierek, ostre pomysły.
+challenge.endgame.detail = Wyścigi pionków, przełamania i końcówki wieżowe z prawdziwych partii.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozycja|{0} pozycje|{0} pozycji
+coach.challenge.done = Ukończone
+coach.challenge.start = Rozpocznij
+coach.challenge.note.white = Grasz białymi; trener ustawia każdą pozycję na szachownicy.
+coach.challenge.note.hint = Nie wiesz, co dalej? Naciśnij H, aby dostać podpowiedź. Po kilku próbach trener sam ją zaproponuje.
+coach.challenge.note.unsaved = Wyzwania nie są rankingowe ani zapisywane; ukończone są oznaczone ptaszkiem.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = WYZWANIE UKOŃCZONE
+coach.challenge.complete.line = Wszystkie pozycje rozwiązane.
+coach.challenge.next = Następne wyzwanie
+coach.challenge.again = Jeszcze raz
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = PODPOWIEDŹ?
+coach.hint.text = Trener proponuje ci podpowiedź.
+coach.hint.hint = H daje podpowiedź. Dotknięcie bierki oznacza dalsze szukanie.
+coach.hint.accept = Podpowiedź
+coach.hint.decline = Nie, dziękuję
+coach.hint.key = Podpowiedź
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Głos trenera
+options.coach_voice.help = W trybie „Trener” trener mówi na głos. Model jego głosu jest pobierany wtedy, gdy jest potrzebny po raz pierwszy (ok. 399 MB). Wyłączone: słowa trenera są tylko wyświetlane na ekranie.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Model głosu
+options.voice_update.help = Trener wciąż mówi starą, 8-bitową wersją swojego modelu głosu. Aktualizacja pobiera oficjalną wersję Supertonic 3 opublikowaną przez Supertone, a wcześniej usuwa stare pliki.
+options.voice_update.button = Aktualizuj ({0} MB)
+options.voice_update.running = Trwa pobieranie.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Jakość głosu
+options.voice_quality.help = Liczba kroków dopracowania, które synteza mowy trenera wykonuje dla każdej wypowiedzi: od „Niska” (4) do „Maksymalna” (9); domyślnie „Średnia” (5). Wyższy poziom daje nieco czystszy głos, ale obliczenia trwają dłużej, więc trener zaczyna mówić trochę później. Można ją ustawić po zainstalowaniu modelu głosu, gdy głos trenera jest włączony.
+options.voice_quality.low = Niska
+options.voice_quality.medium = Średnia
+options.voice_quality.high = Wysoka
+options.voice_quality.very_high = Bardzo wysoka
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksymalna
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Głos trenera
+coach.download.text = Trener mówi głosem Supertonic 3, modelu syntezy mowy firmy Supertone. Model nie jest dołączony do Scacelith: gra może go teraz pobrać z Hugging Face ({0} MB, jednorazowo). Bez niego trener wyświetla swoje słowa na ekranie.
+coach.download.licence = Model jest udostępniony na licencji OpenRAIL-M, która zabrania niektórych zastosowań wytwarzanego przez niego głosu, np. przedstawiania go jako głosu człowieka lub naśladowania prawdziwej osoby.
+coach.download.read_licence = Przeczytaj licencję
+coach.download.accept = Wybierając „Pobierz”, akceptujesz warunki tej licencji.
+# {0} = a folder
+coach.download.folder = Miejsce zapisu: {0}
+coach.download.not_now = Nie teraz
+# {0} = the size in megabytes
+coach.download.download = Pobierz ({0} MB)
+coach.download.licence_title = LICENCJA OPENRAIL-M
+coach.download.back = Wstecz
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Nowy głos trenera
+coach.update.text = Głos trenera korzysta teraz z oficjalnej wersji Supertonic 3, opublikowanej przez Supertone, zamiast zainstalowanej dotąd konwersji 8-bitowej. Gra może ją teraz pobrać z Hugging Face ({0} MB, jednorazowo); najpierw zostaną usunięte stare pliki ({1} MB). Jeśli odmówisz, trener zachowa obecny głos, a aktualizacja pozostanie dostępna w menu Opcje > Dźwięk.
+coach.update.download = Aktualizuj ({0} MB)
+coach.update.accept = Wybierając „Aktualizuj”, akceptujesz warunki tej licencji.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = GŁOS TRENERA
+coach.download.removing = Usuwanie starej wersji…
+coach.download.checking = Sprawdzanie plików…
+coach.download.downloading = Pobieranie…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Z Hugging Face
+coach.download.from_archive = Z Hugging Face (kopia archiwalna)
+coach.download.cancel = Anuluj
+coach.download.failed = Pobieranie nie powiodło się.
+coach.download.error.network = Nie udało się połączyć z serwerami. Sprawdź połączenie z internetem i spróbuj ponownie.
+# {0} = a folder
+coach.download.error.disk = Nie udało się zapisać plików w folderze {0}. Sprawdź ilość wolnego miejsca i spróbuj ponownie.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serwery przesłały nieoczekiwaną odpowiedź ({0}). Spróbuj ponownie później.
+coach.download.retry = Ponów
+coach.download.close = Zamknij
+# Notices
+coach.download.done = Głos trenera jest zainstalowany.
+coach.download.cancelled = Pobieranie anulowane: następnym razem zostanie wznowione od miejsca przerwania.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Zapisane partie
+options.save_games = Zapisuj moje partie
+options.save_games.help = Po zakończeniu twoje partie ze Stockfishem, z trenerem, we dwoje przy tym komputerze oraz partie bezpośrednie są zapisywane jako pliki PGN, które można potem znaleźć w menu „Zapisane partie”. Partie online przechowuje serwer.
+library.title = ZAPISANE PARTIE
+library.section.games = PARTIE
+library.section.details = PARTIA
+library.section.tags = ZNACZNIKI
+library.section.moves = RUCHY
+library.count = {0} partia|{0} partie|{0} partii
+library.filter = Pokaż
+library.filter.all = Wszystkie partie
+library.filter.play = Ze Stockfishem
+library.filter.coach = Z trenerem
+library.filter.hotseat = We dwoje
+library.filter.direct = Partie bezpośrednie
+library.filter.server = Partie online
+library.filter.imported = Zaimportowane
+library.mode.play = Ze Stockfishem
+library.mode.coach = Z trenerem
+library.mode.hotseat = We dwoje
+library.mode.direct = Partia bezpośrednia
+library.mode.server = Partia online
+library.mode.imported = Zaimportowana
+library.coach_level = Poziom {0}
+library.unknown_player = Nieznany
+library.unfinished = Niedokończona
+library.unreadable = Nie można odczytać tej partii.
+library.moves = {0} ruch|{0} ruchy|{0} ruchów
+library.opening_variation = {0}: {1}
+library.file = Plik: {0}
+library.file_game = Plik: {0}, partia {1} z {2}
+library.no_moves = Nie wykonano żadnego ruchu.
+library.none_selected = Wybierz partię z listy.
+library.reading = Wczytywanie zapisanych partii
+library.empty.title = Na razie brak zapisanych partii
+library.empty.text = Twoje partie ze Stockfishem, z trenerem, we dwoje przy tym komputerze oraz partie bezpośrednie pojawią się tutaj po zakończeniu. Możesz też umieścić w tym folderze pliki PGN: partie wyeksportowane z innych programów lub stron internetowych pojawią się na liście razem z twoimi.
+library.empty.filter = Brak partii tego rodzaju.
+library.error.folder = Nie można odczytać folderu zapisanych partii
+library.error.game = Nie można odczytać tej partii: {0}
+library.folder = Folder: {0}
+library.open_folder = Otwórz folder
+library.open_failed = Nie udało się otworzyć folderu.
+library.replay = Odtwórz
+library.delete = Usuń
+library.delete.title = USUWANIE PARTII
+library.delete.text = Partia {0} zostanie usunięta z tego komputera razem ze swoim plikiem. Tej operacji nie można cofnąć.
+library.delete.ok = Usuń
+library.delete.several = Ten plik zawiera {0} partię: tę partię można usunąć tylko bezpośrednio w folderze.|Ten plik zawiera {0} partie: tę partię można usunąć tylko bezpośrednio w folderze.|Ten plik zawiera {0} partii: tę partię można usunąć tylko bezpośrednio w folderze.
+library.deleted = Partia została usunięta.
+library.delete.failed = Nie udało się usunąć partii.
+library.delete.changed = Plik się zmienił: lista została zaktualizowana.
+library.truncated = W tym folderze jest zbyt wiele partii: na liście są tylko najnowsze ({0}).
+library.tag.Event = Turniej
+library.tag.Site = Miejsce
+library.tag.Date = Data
+library.tag.Time = Godzina
+library.tag.Round = Runda
+library.tag.White = Białe
+library.tag.Black = Czarne
+library.tag.Result = Wynik
+library.tag.WhiteElo = Elo białych
+library.tag.BlackElo = Elo czarnych
+library.tag.TimeControl = Tempo gry
+library.tag.Termination = Zakończenie
+library.tag.Opening = Debiut
+library.tag.Variation = Wariant
+library.tag.PlyCount = Półruchy
+library.tag.FEN = Pozycja początkowa
+library.tag.ScacelithMode = Tryb
+library.tag.CoachLevel = Poziom trenera
+library.tag.ScacelithServer = Serwer
+library.tag.ScacelithGameId = Numer partii
+library.tag.UTCDate = Data (UTC)
+library.tag.UTCTime = Godzina (UTC)
+library.tag.WhiteRatingDiff = Zmiana rankingu białych
+library.tag.BlackRatingDiff = Zmiana rankingu czarnych
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analiza
+analysis.menu.title = ANALIZA
+analysis.menu.analyse = Analizuj
+analysis.menu.paste = Wklej PGN
+analysis.menu.online = Moje partie online
+analysis.menu.folder = Umieść pliki PGN w tym folderze, aby je przeanalizować: {0}
+analysis.menu.empty.title = Na razie brak zapisanych partii
+analysis.menu.empty.text = Twoje partie pojawią się tutaj po zakończeniu, podobnie jak pliki PGN umieszczone w folderze poniżej. Możesz też wkleić partię skopiowaną jako tekst PGN.
+analysis.menu.empty.no_folder = Wklej partię skopiowaną jako tekst PGN, aby ją przeanalizować.
+analysis.menu.paste.empty = Schowek jest pusty: najpierw skopiuj partię jako tekst PGN.
+analysis.menu.paste.none = W schowku nie znaleziono żadnej partii szachowej.
+analysis.menu.paste.several = Schowek zawiera kilka partii: analizowana jest pierwsza z nich.
+analysis.menu.gameover = Analizuj partię
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Ruch {0} z {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Natychmiast
+replay.again = Odtwórz ponownie
+replay.gameover.unfinished = Partia kończy się po {0}. ruchu, bez wyniku.
+replay.tip.start = Początek partii (Home)
+replay.tip.back = Ruch do tyłu (J)
+replay.tip.pause = Pauza (K)
+replay.tip.resume = Wznów (K)
+replay.tip.forward = Ruch do przodu (L)
+replay.tip.end = Koniec partii (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTARZ
+analysis.hud.accuracy = DOKŁADNOŚĆ
+analysis.hud.reviewing = Stockfish analizuje partię… {0}
+analysis.hud.no_engine = Brak silnika szachowego: ruchy są pokazywane bez analizy.
+analysis.hud.no_moves = Ta partia nie zawiera ruchów.
+analysis.hud.tip.play = Odtwarzaj ruchy (K)
+analysis.hud.tip.comments_off = Ukryj komentarze do kluczowych momentów (N)
+analysis.hud.tip.comments_on = Pokaż komentarze do kluczowych momentów (N)
+analysis.hud.tip.voice_off = Wycisz głos komentatora (M)
+analysis.hud.tip.voice_on = Czytaj komentarze na głos (M)
+analysis.hud.tip.voice_missing = Głosu nie słychać: jego pliki nie są zainstalowane albo opcja Opcje > Dźwięk > Głos trenera jest wyłączona. Komentarze są tylko wyświetlane na ekranie.
+analysis.hud.tip.arrows_off = Ukryj strzałki lepszych ruchów (B)
+analysis.hud.tip.arrows_on = Pokaż strzałki lepszych ruchów (B)
+analysis.hud.controls.play = Odtwarzanie / pauza
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Pokaż / ukryj komentarze
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Głos komentatora: wł. / wył.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Pokaż / ukryj strzałki
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+# gif.wait.* only follow "za" ("in {0}"): they are in the accusative ("za 1 minutę", "za 5 sekund").
+gif.save = Zapisz jako GIF
+gif.making = Tworzenie GIF-a: serwer rysuje partię…
+gif.saved = GIF został zapisany:
+gif.saved_as = Zapisano GIF: {0}
+gif.sign_in_first = Zaloguj się na serwerze online, aby tworzyć GIF-y: rysuje je serwer.
+gif.busy_other = Trwa tworzenie innego GIF-a. Zaczekaj, aż będzie gotowy.
+gif.err.rate_limited_for = Utworzono wiele GIF-ów w krótkim czasie. Następny możesz utworzyć za {0}.
+gif.err.rate_limited = Utworzono wiele GIF-ów w krótkim czasie. Spróbuj ponownie później.
+gif.err.server_busy_for = Serwer jest zajęty rysowaniem innych GIF-ów. Spróbuj ponownie za {0}.
+gif.err.server_busy = Serwer jest zajęty rysowaniem innych GIF-ów. Spróbuj ponownie za chwilę.
+gif.err.signed_out = Twoja sesja wygasła. Zaloguj się ponownie, aby utworzyć GIF.
+gif.err.game_too_long = Ta partia jest za długa, aby zrobić z niej GIF.
+gif.err.pgn_too_large = Ta partia jest za długa, aby zrobić z niej GIF.
+gif.err.invalid_pgn = Serwer nie mógł odczytać tej partii.
+gif.err.render_failed = Serwer nie mógł utworzyć tego GIF-a. Spróbuj ponownie.
+gif.err.gif_disabled = Ten serwer nie tworzy GIF-ów.
+gif.err.write_failed = Nie udało się zapisać GIF-a na tym komputerze.
+gif.err.not_found = Tej partii nie ma już na serwerze.
+gif.wait.seconds = {0} sekundę|{0} sekundy|{0} sekund
+gif.wait.minutes = {0} minutę|{0} minuty|{0} minut
+gif.wait.both = {0} i {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Nie udało się uruchomić OpenGL 4.6. Zaktualizuj sterownik karty graficznej.
+error.opengl_macos = Nie udało się uruchomić OpenGL 4.6 na tym Macu. Scacelith wymaga układu Apple Silicon (M1 lub nowszego) i systemu macOS 26 lub nowszego, a także nie działa w maszynie wirtualnej.
+error.renderer = Nie udało się uruchomić renderera.
+error.scene = Nie udało się wczytać sceny.
+error.log_file = Szczegóły znajdziesz w pliku dziennika: {0}
