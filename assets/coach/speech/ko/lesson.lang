@@ -1,0 +1,279 @@
+# Coach speech (Korean): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("룩" / "제 나이트": the player's
+# pieces carry no possessive word); their particles come from the forms of common.lang ({my:obj} =
+# "제 나이트를", {your:cop} = "룩이에요", {your:ins} = "룩으로"), or are invariant ({my}까지, {my}에게).
+# {sq}, {sq2}, {to}, {esc} = squares: never a particle after them, always the noun 칸 ("{sq} 칸으로").
+# {move:letters} = a move with the scoresheet letters (Korean players write K Q R B N).
+# {@}, {@2}, {@3} are invisible marks: the coach points while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead: Latin letters and digits in Hangul (a = 에이,
+# h = 에이치, e = 이, ranks and points Sino-Korean: 2랭크 = 이 랭크, 3점 = 삼 점, Elo = 엘로).
+# Chapter titles are noun phrases said inside events.lang lines ("{chapter}부터 이어서 해 봐요").
+
+# ---- Chapter titles (said inside "Let's continue with {chapter}.") ------------------------------------
+lesson.title.welcome = 체스판
+lesson.title.pieces = 기물의 움직임
+lesson.title.safety = 안전한 잡기와 위험한 잡기
+lesson.title.check = 체크
+lesson.title.mate = 체크메이트
+lesson.title.castling = 캐슬링
+lesson.title.en_passant = 앙파상
+lesson.title.promotion = 프로모션
+lesson.title.draws = 스테일메이트와 무승부
+lesson.title.etiquette = 실전 게임의 레이팅, 시계, 매너
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = 이제 해 보세요.
+lesson.now_you.2 = 이제 두실 차례예요.
+lesson.now_you.3 = 자, 해 보세요.
+# Another wrong move after the demonstration.
+lesson.almost = 거의 다 왔어요! 제가 보여 드린 수를 두세요.
+lesson.almost.2 = 조금 달라요. 제가 시범으로 보여 드린 수를 둬 보세요.
+lesson.almost.3 = 아까워요. 방금 보여 드린 걸 떠올려 보세요.
+# A wrong move without a line of its own.
+lesson.try_again = 그 수가 아니에요. 다시 해 보세요.
+lesson.try_again.2 = 이 수는 아니에요. 한 번 더 해 보세요.
+lesson.try_again.3 = 한 번 더 해 봐요.
+lesson.use_your = {your:ins} 두세요.
+lesson.use_your.2 = {your:ins} 해 보세요.
+lesson.watch = 잘 보세요.
+lesson.like_this = 이렇게요.
+lesson.and_back = 그리고 다시 제자리로.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = 체크지만, 제 킹은 {esc} 칸으로 피해요.
+lesson.check_takes = 체크지만, 제 킹이 그냥 {your:obj} 잡아요.
+lesson.check_block = 체크지만, 제가 기물로 막을 수 있어요.
+lesson.stalemate = 스테일메이트예요! 제 킹은 움직일 수 없고, 체크도 아니에요. 이기고 계셨는데도 무승부예요!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = {sq} 칸은 안 돼요. {my:subj} 그 칸을 공격하고 있어요. 킹은 절대 위험한 칸으로 가지 않아요.
+why.PathBlocked = {@}길이 막혀 있어요. 나이트 말고는 다른 기물을 뛰어넘을 수 없어요.
+why.WrongGeometry = {your:top} 그렇게 움직이지 않아요.
+why.MustAnswerCheck = {@}체크를 받았어요. 먼저 체크부터 해결해야 해요.
+why.CastlingThroughCheck = 킹이 {sq} 칸을 지나가야 하는데, {my:subj} 그 칸을 공격하고 있어요.
+why.CastlingNoRights = 그 킹이나 룩이 이미 움직였어요. 캐슬링할 수 없어요.
+why.CastlingBlocked = 캐슬링하려면 킹과 룩 사이의 칸이 모두 비어 있어야 해요.
+why.CastlingOutOfCheck = 체크를 받고 있을 때는 캐슬링할 수 없어요.
+why.PawnForwardBlocked = 폰은 바로 앞에 있는 기물을 잡을 수 없어요. 그 칸은 {@}막혀 있어요.
+why.LeavesKingInCheck = {your:top} 핀에 걸려 있어요. 움직이면 킹이 {my}에게 공격받게 돼요.
+why.OwnPieceOnTarget = 같은 편 기물이 있는 칸으로는 갈 수 없어요.
+why.PawnCaptureNeedsVictim = 폰은 잡을 때만 대각선으로 움직여요.
+why.EnPassantExpired = 앙파상은 상대 폰이 두 칸 전진한 바로 다음에만 할 수 있어요.
+why.NotYourTurn = 잠깐만요, 제 차례예요.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = 안녕하세요! 저는 코치예요. 체스 규칙을 한 걸음씩 차근차근 같이 배워 봐요.
+lesson.welcome.board = 이게 체스판이에요. 밝은 칸과 어두운 칸이 모두 64칸, 여덟 칸씩 여덟 줄이에요.
+lesson.welcome.board.spoken = 이게 체스판이에요. 밝은 칸과 어두운 칸이 모두 예순네 칸, 여덟 칸씩 여덟 줄이에요.
+lesson.welcome.light = 앉아 계신 쪽의 {@}오른쪽 구석 칸은 언제나 밝은 칸이에요. “오른쪽엔 밝은 칸”, 꼭 기억하세요.
+lesson.welcome.files = 세로줄은 파일이라고 해요. {@}a부터 {@2}h까지 알파벳이 붙어 있어요.
+lesson.welcome.files.spoken = 세로줄은 파일이라고 해요. {@}에이부터 {@2}에이치까지 알파벳이 붙어 있어요.
+lesson.welcome.ranks = 가로줄은 랭크라고 해요. 앉아 계신 쪽부터 {@}1에서 {@2}8까지 숫자가 붙어 있어요.
+lesson.welcome.ranks.spoken = 가로줄은 랭크라고 해요. 앉아 계신 쪽부터 {@}일에서 {@2}팔까지 숫자가 붙어 있어요.
+lesson.welcome.square = 칸 이름은 알파벳 다음에 숫자를 붙여서 불러요. 이 칸은 {sq} 칸이에요.
+lesson.welcome.square2 = 그리고 이 칸은 {sq} 칸이에요.
+lesson.welcome.kings = 이게 두 킹이에요. 직접 움직이실 킹은 {sq} 칸에, 제 킹은 {sq2} 칸에 있어요.
+lesson.welcome.ask = 이제 해 보세요. 킹을 한 칸 앞으로, {sq} 칸으로 옮기세요.
+lesson.welcome.wrong = 거긴 {to} 칸이에요. {sq} 칸으로 가야 해요. 알파벳은 e, 숫자는 2예요.
+lesson.welcome.wrong.spoken = 거긴 {to} 칸이에요. {sq} 칸으로 가야 해요. 알파벳은 이, 숫자는 이예요.
+lesson.welcome.ok = 완벽해요. 킹이 {sq} 칸에 있어요.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = 이건 {your:cop}. 파일과 랭크를 따라 직선으로, 원하는 만큼 멀리 움직여요.
+lesson.rook.lines = 파일을 따라 위로, {@}또는 랭크를 따라 옆으로요.
+lesson.rook.capture = 기물을 잡을 때는 {@}상대 기물이 있는 칸으로 가요. 잡힌 기물은 체스판 밖으로 나가요.
+lesson.rook.ask = 룩으로 {my:obj} 잡으세요!
+lesson.rook.short = 방향은 맞아요! 파일을 따라 {my}까지 쭉 올라가세요.
+lesson.rook.rank = 그건 랭크를 따라 간 거예요. {my:top} 파일 위쪽에 있어요.
+lesson.rook.king = 그건 킹이에요. 구석에 있는 {your:ins} 두세요.
+lesson.rook.ok = 잡으셨어요! {my:subj} 체스판 밖으로 나가요.
+# Pieces don't jump
+lesson.jump.blocked = 기물은 다른 기물을 뛰어넘을 수 없어요. {sq} 칸의 폰이 룩의 길을 막고 있어요.
+lesson.jump.knight = 뛰어넘을 수 있는 건 나이트뿐이에요. 곧 만나 볼 거예요.
+# Bishop
+lesson.bishop.intro = 이건 {your:cop}. 대각선으로 원하는 만큼 멀리 움직여요.
+lesson.bishop.colour = 비숍은 언제나 같은 색 칸 위에서만 움직여요.
+lesson.bishop.ask = {my:subj} 비숍이 다니는 대각선 위에 있어요. 잡으세요!
+lesson.bishop.short = 대각선은 맞아요! {my}까지 더 가세요.
+lesson.bishop.other = 그건 다른 대각선이에요. {my} 쪽을 보세요.
+lesson.bishop.ok = 훌륭해요. 비숍은 긴 대각선을 좋아해요.
+# Queen
+lesson.queen.intro = 이건 가장 강한 기물, {your:cop}. 룩과 비숍을 합친 것처럼 움직여요.
+lesson.queen.ask = {my:obj} 찾아서 퀸으로 잡으세요.
+lesson.queen.wrong = 퀸은 대각선을 따라 한 수 만에 {my}까지 갈 수 있어요.
+lesson.queen.ok = 잘하셨어요! 퀸은 안전하게 지키세요. 아주 값진 기물이에요.
+# King
+lesson.king.intro = 킹은 어느 방향으로든 딱 한 칸만 움직여요.
+lesson.king.important = 킹은 가장 중요한 기물이에요. 킹이 갇히면 게임에서 져요.
+lesson.king.ask = 킹도 기물을 잡을 수 있어요. {my:obj} 잡으세요!
+lesson.king.wrong = 킹이 {my} 바로 옆에 있어요. 그 칸으로 가서 잡으세요.
+lesson.king.ok = 좋아요! 킹은 느리지만, 가까이에서는 강해요.
+# Knight
+lesson.knight.intro = 이건 {your:cop}. L자 모양으로 움직여요. 곧게 두 칸, 그다음 옆으로 한 칸이에요.
+lesson.knight.intro.spoken = 이건 {your:cop}. 엘자 모양으로 움직여요. 곧게 두 칸, 그다음 옆으로 한 칸이에요.
+lesson.knight.l = {@}이렇게요. 나이트는 언제나 다른 색 칸에 내려앉아요.
+lesson.knight.jump = 나이트는 다른 기물을 뛰어넘을 수 있는 유일한 기물이에요.
+lesson.knight.ask = 나이트로 {my:obj} 잡으세요!
+lesson.knight.wrong = 나이트의 움직임은 맞지만, {my}까지 닿지 않아요. 다른 L자로 가 보세요.
+lesson.knight.wrong.spoken = 나이트의 움직임은 맞지만, {my}까지 닿지 않아요. 다른 엘자로 가 보세요.
+lesson.knight.ok = 멋진 점프예요!
+# Pawn: moving
+lesson.pawn.intro = 이번엔 {your:cop}. 한 번에 한 칸씩 똑바로 앞으로만 가고, 절대 뒤로는 가지 않아요.
+lesson.pawn.first = 폰은 처음 움직일 때 한 칸이나 두 칸을 갈 수 있어요.
+lesson.pawn.ask = 폰을 두 칸 앞으로 옮기세요.
+lesson.pawn.one = 한 칸 가셨네요. 규칙에는 맞지만, 이번엔 두 칸 가세요.
+lesson.pawn.use = 폰으로 두세요.
+lesson.pawn.ok = 좋아요.
+# Pawn: capturing
+lesson.pawncap.blocked = 제 폰이 앞을 막고 있어요. 폰은 바로 앞에 있는 기물을 잡을 수 없어요.
+lesson.pawncap.diagonal = 하지만 폰은 대각선 앞으로 한 칸 떨어진 기물을 잡을 수 있어요.
+lesson.pawncap.ask = 폰으로 {my:obj} 잡으세요.
+lesson.pawncap.use = {your:ins} 두세요. 폰은 대각선 앞으로 잡아요.
+lesson.pawncap.ok = 맞아요! 움직일 때는 똑바로, 잡을 때는 대각선으로.
+# Values, set-up and the first moves
+lesson.values.pawn = 기물마다 점수로 매긴 가치가 있어요. 폰은 1점이에요.
+lesson.values.pawn.spoken = 기물마다 점수로 매긴 가치가 있어요. 폰은 일 점이에요.
+lesson.values.pieces = 나이트나 {@}비숍은 3점, {@2}룩은 5점, {@3}퀸은 9점이에요.
+lesson.values.pieces.spoken = 나이트나 {@}비숍은 삼 점, {@2}룩은 오 점, {@3}퀸은 구 점이에요.
+lesson.values.king = 킹은 값을 매길 수 없어요. 절대 내줄 수 없는 기물이에요.
+lesson.values.trade = 기물을 그 가치보다 싸게 내주지 않도록 하세요.
+lesson.setup.corners = 모든 게임은 이렇게 시작해요. {@}구석에 룩, 그 옆에 {@2}나이트, 그다음 {@3}비숍이에요.
+lesson.setup.queen = 퀸은 자기와 같은 색 칸에 놓여요. 보시면 퀸이 밝은 칸에 있죠.
+lesson.setup.king = 킹은 퀸 옆에 놓여요. 언제나 백이 먼저 둬요.
+lesson.first.ask = 게임을 시작해 봐요. 킹 앞의 폰을 두 칸 전진해서 {sq} 칸으로 옮기세요.
+lesson.first.wrong = 그것도 규칙에 맞는 수예요! 하지만 지금은 킹 앞의 폰을 {sq} 칸으로 옮겨 주세요.
+lesson.first.ok = 훌륭한 첫수예요. 퀸과 비숍이 나올 길이 열려요.
+lesson.first.reply = 저도 똑같이 받을게요. 이제 나이트를 꺼내 보세요. {sq} 칸에서 {sq2} 칸으로 뛰어요.
+lesson.first.knight_wrong = 나이트는 폰을 뛰어넘어요. {sq} 칸에서 {sq2} 칸으로 해 보세요.
+lesson.first.knight_ok = 완벽해요. 나이트와 비숍은 일찍 꺼내는 기물이에요.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = 같은 편 기물이 되잡을 수 있으면, 그 기물은 보호받고 있는 거예요.
+lesson.safety.pawn = 제 {@}폰이 {my:obj} 지키고 있어요.
+lesson.safety.free = 하지만 {my}에게는 지켜 주는 기물이 없어요. 퀸이 두 기물을 모두 공격하고 있어요.
+lesson.safety.ask = 아무도 지키지 않는 기물을 잡으세요!
+lesson.safety.watch = 어떻게 되는지 보세요.
+lesson.safety.gave = 9점짜리 퀸을 내주고, 3점짜리 제 나이트를 잡으신 거예요.
+lesson.safety.gave.spoken = 구 점짜리 퀸을 내주고, 삼 점짜리 제 나이트를 잡으신 거예요.
+lesson.safety.other = 다른 기물을 노려 보세요.
+lesson.safety.look = 아무것도 지키지 않는 기물을 찾아보세요.
+lesson.safety.ok = 훌륭해요! “저 기물을 지키는 기물이 있나?” 항상 확인하세요.
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = 제 룩이 2랭크 전체를 장악하고 있어요.
+lesson.danger.rank.spoken = 제 룩이 두 번째 랭크 전체를 장악하고 있어요.
+lesson.danger.rule = 킹은 잡힐 수 있는 칸으로는 절대 갈 수 없어요.
+lesson.danger.ask = 킹을 안전한 칸으로 옮기세요.
+lesson.danger.ok = 맞아요. 거기라면 킹이 안전해요.
+lesson.check.what = 제 룩이 킹을 공격하고 있어요. 이걸 체크라고 해요.
+lesson.check.must = 체크를 받으면 바로 체크에서 벗어나야 해요.
+lesson.check.ways = 방법은 세 가지예요. {@}킹을 옮기거나, {@2}공격을 막거나, {@3}공격하는 기물을 잡는 거예요.
+lesson.check.ask = 여기서는 킹을 옮겨서 체크에서 벗어나세요.
+lesson.check.file = {to} 칸은 아직 {@}제 룩의 파일 위에 있어요. 그 줄에서 벗어나세요.
+lesson.check.ok = 좋아요. 체크에서 벗어났어요.
+lesson.block.again = 또 체크예요! 이번에는 킹이 갈 수 있는 빈칸이 없어요.
+lesson.block.ask = 그러니 공격을 막으세요. 사이에 기물을 놓는 거예요.
+lesson.block.queen = 막긴 했어요! 하지만 제 룩이 퀸을 잡을 수 있어요. 더 싼 기물로 막으세요.
+lesson.block.queen_ok = 이것도 통해요. 기억하세요. 막을 때는 가장 싼 기물로 막아요.
+lesson.block.ok = 완벽해요. 가장 가치가 낮은 기물로 막으세요.
+lesson.capture.check = 제 퀸이 킹 바로 옆에서 체크를 걸고 있어요.
+lesson.capture.ask = 공격하는 기물을 잡으세요!
+lesson.capture.king_ok = 맞아요! 제 퀸을 지키는 기물이 없어서 킹이 잡을 수 있었어요.
+lesson.capture.knight_ok = 맞아요! 나이트가 공격하던 기물을 없앴어요.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = 체크메이트는 킹이 체크를 받았는데 빠져나갈 방법이 없는 거예요. 그러면 게임에서 이겨요.
+lesson.mate1.stuck = 제 킹은 {@}자기 폰들 뒤에 갇혀 있어요.
+lesson.mate1.ask = 한 수 만에 체크메이트해 보세요!
+lesson.mate1.wrong = 아까워요! 제 킹이 빠져나갈 수 없는 제 뒷줄에서 체크를 거세요.
+lesson.mate1.ok = 체크메이트! 이게 뒷줄 메이트예요. 꼭 기억하세요!
+lesson.mate2.ask = 킹과 퀸이 한 팀으로 움직여요. 한 수 만에 체크메이트하세요.
+lesson.mate2.wrong = 제 킹이 갈 칸이 하나도 남지 않는 체크를 찾아보세요.
+lesson.mate2.ok = 체크메이트! 킹이 퀸을 지키고 있어서 제 킹이 퀸을 잡을 수 없어요.
+lesson.mate2.ok_rank = 뒷줄에서 체크메이트! 킹이 제 킹 앞의 칸을 모두 지키고 있어요.
+lesson.mate3.edge = 7랭크의 룩이 제 킹을 가장자리에 가둬 두고 있어요.
+lesson.mate3.edge.spoken = 칠 랭크의 룩이 제 킹을 가장자리에 가둬 두고 있어요.
+lesson.mate3.ask = 이제 {your:ins} 체크메이트하세요.
+lesson.mate3.free = 체크지만, 이제 7랭크가 비어서 제 킹이 빠져나가요.
+lesson.mate3.free.spoken = 체크지만, 이제 칠 랭크가 비어서 제 킹이 빠져나가요.
+lesson.mate3.takes = 제 킹이 그냥 룩을 잡아요.
+lesson.mate3.hint = 7랭크를 지키고 있지 않은 룩으로 뒷줄에서 체크를 거세요.
+lesson.mate3.hint.spoken = 칠 랭크를 지키고 있지 않은 룩으로 뒷줄에서 체크를 거세요.
+lesson.mate3.ok = 체크메이트! 두 룩이 사다리처럼 움직였어요.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = 캐슬링은 킹을 안전하게 지켜 주는 특별한 수예요. 킹과 룩이 함께 움직여요.
+lesson.castle.how = {@}킹이 룩 쪽으로 두 칸 움직이고, {@2}룩은 킹을 넘어 반대편으로 가요.
+lesson.castle.ask = 언제나 킹부터 만지세요. 이제 해 보세요. 킹사이드로 캐슬링하세요.
+lesson.castle.rook = 그건 룩만 움직인 거예요. 캐슬링하려면 킹을 룩 쪽으로 두 칸 옮기세요.
+lesson.castle.long = 그건 퀸사이드 캐슬링이에요. 그것도 규칙에 맞아요! 이번에는 더 가까운 룩 쪽으로 캐슬링하세요.
+lesson.castle.one = 한 칸은 보통의 킹 이동이에요. 캐슬링할 때는 킹이 두 칸 움직여요.
+lesson.castle.other = 캐슬링하려면 {sq} 칸의 룩 쪽으로 킹을 두 칸 옮기세요.
+lesson.castle.ok = 캐슬링 성공! 킹은 안전한 곳에 자리 잡았고, 룩은 활약할 준비가 됐어요.
+lesson.castle2.moved = 킹이나 그 룩이 이미 움직였다면 캐슬링할 수 없어요.
+lesson.castle2.attacked = 체크를 받고 있을 때도, 킹이 공격받는 칸을 지나가거나 그 칸에 도착하게 될 때도 안 돼요.
+lesson.castle2.bishop = 제 비숍이 {sq} 칸을 공격하고 있어요. 그래서 지금은 이쪽으로 캐슬링할 수 없어요.
+lesson.castle2.ask = 반대쪽으로 캐슬링하세요.
+lesson.castle2.other = 퀸사이드에 있는 다른 룩 쪽으로 캐슬링하세요.
+lesson.castle2.ok = 정답이에요! 퀸사이드 캐슬링을 하면 킹이 {sq} 칸으로 가요.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = 폰에게는 앙파상이라는 특별한 잡기가 있어요. “지나가는 길에”라는 뜻이에요.
+lesson.ep.watch = 제 폰을 잘 보세요. 두 칸 전진해서 폰 바로 옆에 나란히 서요.
+lesson.ep.how = 그 폰이 한 칸만 전진한 것처럼 여기고, 폰으로 잡을 수 있어요. {sq} 칸으로 가면서요.
+lesson.ep.now = 단, 바로 지금 이 수에서만이에요. 앙파상으로 잡으세요!
+lesson.ep.gone = 기회가 지나갔어요. 앙파상은 그 즉시 해야 해요. 다시 해 봐요.
+lesson.ep.ok = 앙파상! {sq} 칸의 제 폰이 사라졌어요.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = 폰이 마지막 랭크에 닿으면 프로모션해요. 퀸, 룩, 비숍, 나이트 중 하나가 돼요.
+lesson.promo.ask = 거의 언제나 퀸을 고르세요. 이제 폰을 프로모션하세요!
+lesson.promo.under = 그것도 돼요! 하지만 퀸이 더 강해요. 퀸을 골라 봐요.
+lesson.promo.under_ok = 좋아요. 그래도 대부분은 퀸을 골라요.
+lesson.promo.push = 폰을 마지막 랭크까지, {sq} 칸으로 밀어 올리세요.
+lesson.promo.ok = 새 퀸이에요! 퀸을 한꺼번에 두 개 가질 수도 있어요.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = 제 차례예요. 제 킹은 체크를 받고 있지 않지만, {@}주변의 모든 칸이 공격받고 있어요.
+lesson.stale.draw = 저는 둘 수 있는 수가 없어요. 이게 스테일메이트고, 게임은 무승부예요.
+lesson.stale2.ask = 이기고 있을 때는 스테일메이트를 조심하세요. 스테일메이트 없이 한 수 만에 체크메이트하세요!
+lesson.stale2.wrong = 제 킹이 빠져나갈 수 없는 제 뒷줄에서 체크를 거세요.
+lesson.stale2.ok = 체크메이트! 메이트를 거는 게 아니라면, 상대 킹에게 항상 둘 수 있는 수를 남겨 두세요.
+lesson.draws.kings = 다른 무승부도 있어요. 킹 두 개만 남았을 때처럼 아무도 체크메이트할 수 없으면 무승부예요.
+lesson.draws.agree = 두 플레이어가 합의해서 무승부로 할 수도 있어요.
+lesson.draws.repeat = 같은 포지션이 세 번 나오거나, 잡기도 폰 이동도 없이 50수가 지나도 무승부가 될 수 있어요.
+lesson.draws.repeat.spoken = 같은 포지션이 세 번 나오거나, 잡기도 폰 이동도 없이 오십 수가 지나도 무승부가 될 수 있어요.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = 이제 체스 규칙을 모두 아시게 됐어요. 잘하셨어요!
+lesson.talk.real = 실전 게임은 어떻게 두는지 알려 드릴게요.
+lesson.talk.elo = 플레이어마다 Elo라는 레이팅이 있어요. 이기면 오르고, 지면 내려가요.
+lesson.talk.elo.spoken = 플레이어마다 엘로라는 레이팅이 있어요. 이기면 오르고, 지면 내려가요.
+lesson.talk.elo_gap = 더 강한 상대를 이기면 점수가 더 많이 오르고, 더 약한 상대에게 지면 더 많이 내려가요.
+lesson.talk.elo_start = 레이팅은 레이팅 게임을 다섯 판 두면 나타나요. 코치와 두는 게임은 연습이라서 레이팅에 반영되지 않아요.
+lesson.talk.clock = 이게 {@}체스 시계예요. 플레이어마다 자기 시간이 있고, 그 시간은 자기 차례일 때만 흘러가요.
+lesson.talk.press = 수를 둔 다음, 둔 손과 같은 손으로 시계를 눌러요. 그러면 제 시간이 흐르기 시작해요.
+lesson.talk.flag = 시간이 다 떨어지면 져요. 제가 어떻게 해도 체크메이트할 수 없는 경우만 빼고요.
+lesson.talk.increment = 5+3은 각자 5분씩, 그리고 한 수 둘 때마다 3초가 더해진다는 뜻이에요.
+lesson.talk.increment.spoken = 오 플러스 삼은 각자 오 분씩, 그리고 한 수 둘 때마다 삼 초가 더해진다는 뜻이에요.
+lesson.talk.speeds = 짧은 게임은 블리츠, 그보다 긴 게임은 래피드, 가장 긴 게임은 클래식이라고 해요.
+lesson.talk.no_clock = 저랑 둘 때는 시계를 꺼 둬요. 생각할 시간은 얼마든지 쓰세요.
+lesson.talk.touch = 실전에서는 자기 기물을 만지면 그 기물을 움직여야 해요.
+lesson.talk.touch_mine = 제 기물을 만지면, 잡을 수 있는 경우 그 기물을 잡아야 해요.
+lesson.talk.adjust = 기물을 움직이지 않고 바로 놓기만 하려면, 먼저 “정돈합니다”라고 말하세요.
+lesson.talk.release = 기물을 새 칸에 놓고 손을 떼면, 그 수는 둔 거예요.
+lesson.talk.sheet = 대회에서는 두 플레이어 모두 모든 수를 {@}기보지에 적어요.
+# {move:letters} shows the scoresheet letters (K Q R B N, as Korean players write them), which is what
+# this line teaches.
+lesson.talk.notation = 기물의 알파벳과 칸을 적어요. {move:letters}, 이렇게요. 폰은 칸만 적어요.
+lesson.talk.robot = 로봇이 대신 수를 적어 줘요. 빠른 게임에서는 기보를 적지 않아도 돼요.
+lesson.talk.handshake = 게임은 악수로 시작해서 악수로 끝나요. “좋은 게임, 고마워요”라는 뜻이에요.
+lesson.talk.polite = 이기든 지든 예의를 지키고, 상대가 생각하는 동안에는 절대 방해하지 마세요.
+lesson.talk.tips = 게임을 위한 팁 세 가지예요. {@}중앙을 장악하고, {@2}나이트와 비숍을 꺼내고, {@3}일찍 캐슬링하세요.
+lesson.talk.next = 준비되시면 “첫걸음”을 고르세요. 살살 두면서 실수할 때마다 도와 드릴게요.
+lesson.talk.welcome = 체스의 세계에 오신 걸 환영해요! 악수해요.

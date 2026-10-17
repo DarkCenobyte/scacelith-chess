@@ -1,0 +1,1440 @@
+# Scacelith - Čeština
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one (1)|few (2-4)|other (0, 5+).
+# Register: formal "vy" (lower case), help texts in the formal imperative, buttons and menu
+# commands in the infinitive ("Uložit", "Vzdát se"), sentence case; titles in capitals as in English.
+# The player's gender is unknown: no past tense or participle agreeing with "vy" ("vyhrál jste",
+# "jste přihlášen"); nouns, the present tense or impersonal phrasing instead ("Výhra", "Odhlášení").
+# Quality levels are feminine (they agree with "kvalita"); engine.thousand/million use "tis."/"mil."
+# (no agreement); gif.wait.* are accusative (they only follow "za"). Terms as in the cs glossary.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Zapnuto
+common.off = Vypnuto
+common.back = Zpět
+common.apply = Použít
+common.discard = Zahodit
+common.cancel = Zrušit
+# common.white/black are only the choices of the "Vaše barva" selectors: feminine, agreeing with "barva".
+common.white = Bílá
+common.black = Černá
+common.main_menu = Hlavní nabídka
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Královská hra
+menu.new_game = Nová partie
+menu.options = Možnosti
+menu.credits = Tvůrci
+menu.quit = Ukončit
+menu.version = Verze {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = MOŽNOSTI
+options.tab.display = Zobrazení
+options.tab.graphics = Grafika
+options.tab.audio = Zvuk
+options.tab.gameplay = Hra
+options.tab.player = Hráč
+options.tab.controls = Ovládání
+options.pending = Změny se projeví po jejich použití.
+options.unsaved.title = NEULOŽENÉ ZMĚNY
+options.unsaved.text = Některé možnosti byly změněny. Chcete je před odchodem použít?
+
+options.language = Jazyk
+options.language.help = Jazyk nabídek a zpráv. Změní se okamžitě.
+options.language.not_adapted = Tento jazyk ještě není zcela doladěný: hlas trenéra může některá slova vyslovit špatně a některé texty mohou ještě znít trochu neobratně.
+options.display_mode = Režim zobrazení
+options.display_mode.help = Celá obrazovka: okno bez okraje přes celou obrazovku v rozlišení plochy. V okně: okno o velikosti zvolené níže.
+options.fullscreen = Celá obrazovka
+options.windowed = V okně
+options.window_size = Velikost okna
+options.window_size.help = Velikost okna v okenním režimu. Celá obrazovka vždy používá rozlišení plochy.
+options.vsync = Vertikální synchronizace
+options.vsync.help = Synchronizuje snímky s obrazovkou, aby se obraz netrhal.
+options.render_scale = Měřítko vykreslování
+options.render_scale.help = Vnitřní rozlišení 3D obrazu. Nižší je rychlejší, vyšší je ostřejší.
+
+options.quality = Kvalita
+options.quality.very_low = Velmi nízká
+options.quality.low = Nízká
+options.quality.medium = Střední
+options.quality.high = Vysoká
+options.quality.ultra = Ultra
+options.quality.custom = Vlastní
+options.quality.help = Nastaví najednou všechny možnosti níže: Velmi nízká vypne všechny efekty, Ultra je všechny nastaví na maximum. Když změníte jednu možnost samostatně, kvalita se přepne na Vlastní. Se slabší grafickou kartou hodně pomůže i snížit měřítko vykreslování (Zobrazení).
+options.shadows = Stíny
+options.shadows.help = Detail stínů od slunce a měkkost jejich okrajů. Nízká: tvrdé okraje, rychlé vykreslování.
+options.reflections = Odrazy
+options.reflections.help = Podlaha, stůl a šachovnice odrážejí místnost (ta se kvůli každému z nich vykresluje ještě jednou: patří to k nejnáročnějším možnostem); od úrovně Střední odrážejí své okolí i lesklé figury a předměty.
+options.ambient_occlusion = Ambientní okluze
+options.ambient_occlusion.help = Jemné stínování tam, kde se předměty stýkají, a v prohlubních, kam proniká méně světla.
+options.indirect_light = Nepřímé světlo
+options.indirect_light.help = Denní světlo odražené od stěn, podlahy a stropu. Nízká: místo toho rovnoměrné okolní světlo. Ovlivňuje hlavně dobu načítání.
+options.volumetric_light = Světelné paprsky
+options.volumetric_light.help = Sluneční paprsky v prašném vzduchu sálu a smítka, která se v nich třpytí.
+options.tessellation = Teselace
+options.tessellation.help = Hladké obrysy zaoblených částí figur při pohledu zblízka.
+options.tessellation.unavailable = Nedostupné: tento grafický ovladač teselaci nepodporuje.
+options.antialiasing = Vyhlazování hran
+options.antialiasing.help = Vyhlazuje zubaté hrany a mihotavé odlesky. Vypnuto: ostřejší, ale zubaté, a některé efekty vypadají zrnitě.
+options.depth_of_field = Hloubka ostrosti
+options.depth_of_field.help = Rozostří vše, co je výrazně blíž nebo dál než místo, na které se díváte, jako to dělá objektiv fotoaparátu.
+options.motion_blur = Rozmazání pohybem
+options.motion_blur.help = Rozmaže rychlé pohyby kamery a paží, jako to dělá filmová kamera.
+options.bloom = Záře
+options.bloom.help = Jemná záře kolem nejjasnějších odlesků, jako v objektivu fotoaparátu.
+options.brightness = Jas
+options.brightness.neutral = Neutrální
+options.brightness.value = {0} EV
+options.brightness.help = Korekce expozice kamery. Kalibrace při prvním spuštění ji nastaví tak, aby nejtmavší stíny byly sotva viditelné.
+
+options.master_volume = Celková hlasitost
+options.effects = Efekty
+options.ambience = Zvuky prostředí
+options.ambience.help = Šum sálu: oheň, vzdálené kroky, staré hodiny.
+options.ambience_volume = Hlasitost prostředí
+options.voice_volume = Hlasitost hlasu
+options.voice_volume.help = Hlasitost trenérova hlasu v režimu Trenér.
+options.subtitles = Titulky
+options.subtitles.auto = Automaticky
+options.subtitles.help = Trenérova slova vypsaná dole na obrazovce. Automaticky: zobrazí se, když trenér nemluví jazykem nabídek (s čínskými nabídkami mluví anglicky). Zobrazí se vždy, když jeho hlas není nainstalován.
+
+options.legal_moves = Zobrazit přípustné tahy
+options.legal_moves.help = Zvýrazní pole, na která může dotčená figura táhnout. Když je vypnuto, nic vám neprozradí, zda je tah přípustný: nepřípustný tah rozhodčí potrestá, jakmile stisknete hodiny.
+options.coordinates = Souřadnice šachovnice
+options.auto_press = Automaticky stisknout hodiny
+options.auto_press.help = Váš robot stiskne hodiny sám, jakmile je váš tah na šachovnici. V online partiích o tom rozhoduje server, v přímém zápase hráč, který ho hostuje.
+options.thinking_time = Realistická doba přemýšlení
+options.thinking_time.help = Soupeř si dává na čas jako lidský hráč, místo aby táhl okamžitě.
+options.ignore_head = Ignorovat pohyby soupeřovy hlavy
+options.ignore_head.help = V online partiích a přímých zápasech se soupeřův robot dívá tam, kam se dívá jeho hráč. Když je zapnuto, hýbe hlavou sám, jako proti Stockfishi.
+options.mouse_sensitivity = Citlivost myši
+options.invert_look = Obrátit svislý pohled
+options.handover = Předávání pohledu
+options.handover.cut = Okamžitý střih
+options.handover.flight = Přelet, {0} s
+options.handover.help = Dva hráči u jednoho počítače: jak pohled po každém tahu přechází od očí jednoho hráče k očím druhého. Okamžitý střih se vyhne pohybu kamery.
+options.game_cursor = Herní ukazatel
+options.game_cursor.help = U stolu hra kreslí vlastní ukazatel, který ukazuje, co kliknutí udělá. Vypnuto: obvyklá systémová šipka.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Jméno
+player.name.help = Vaše jméno, jak je napsané v záhlaví partiářů, v libovolném písmu.
+player.default_name = Člověk
+player.handwriting = Rukopis
+player.handwriting.help = Ruka, která zapisuje vaše tahy. Arabština, japonština a čínština se píší vlastním rukopisem.
+player.preview = NA VAŠEM PARTIÁŘI
+hand.caveat = Ležérní
+hand.marck = Psací
+hand.badscript = Šikmý
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Levé tlačítko
+controls.touch = Dotknout se figury, pak s ní táhnout
+controls.clock.keys = Mezerník  nebo  klik na hodiny
+controls.clock = Stisknout hodiny
+controls.look.keys = Pravé tlačítko, držet
+controls.look = Rozhlížet se
+controls.sheet.keys = S
+controls.sheet = Podívat se na partiář a zpět
+controls.stand.keys = ↑
+controls.stand = Vstát před židlí
+controls.side.keys = ←  /  →
+controls.side = Postavit se k levému / pravému konci stolu
+controls.sit.keys = ↓
+controls.sit = Znovu se posadit (hraje se jen vsedě)
+controls.moves.keys = Tab
+controls.moves = Zobrazit nebo skrýt seznam tahů
+controls.menu.keys = Esc
+controls.menu = Nabídka
+controls.coach_skip.keys = Mezerník
+controls.coach_skip = Trenér: přeskočit, co trenér říká
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Trenér: vrátit tah, když to nabídne
+controls.coach_hint.keys = H
+controls.coach_hint = Výzvy trenéra: požádat o nápovědu
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = JAS
+calibration.text = Posouvejte posuvník, dokud jezdec na černém poli nebude sotva vidět nebo dokud nezmizí úplně.
+calibration.later = Později to můžete změnit v nabídce Možnosti > Grafika.
+calibration.continue = Pokračovat
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOVÁ PARTIE
+newgame.opponent = SOUPEŘ
+newgame.time_control = TEMPO HRY
+newgame.start = Začít
+newgame.elo = ~{0} Elo
+newgame.you_white = Budete hrát bílými.
+newgame.you_black = Budete hrát černými.
+newgame.colour_lot = Barvy se pro první partii losují.
+newgame.colour_alternate = Potom se barvy od partie k partii střídají.
+newgame.opponent_kind = Soupeř
+newgame.opponent_kind.help = Hrajte proti Stockfishi, nebo s přítelem u tohoto počítače: střídáte se, každý ze své strany šachovnice.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Člověk, stejný počítač
+
+# Custom opponent: Stockfish parameters
+engine.skill = Úroveň dovednosti
+engine.skill.help = „Skill Level“ Stockfishe (0–20). Nepoužije se, když je síla omezena ratingem Elo.
+engine.limit_elo = Omezit sílu (Elo)
+engine.limit_elo.help = UCI_LimitStrength: program se snaží hrát na rating Elo zadaný níže.
+engine.elo = Elo
+engine.depth = Hloubka propočtu
+engine.plies = {0} půltah|{0} půltahy|{0} půltahů
+engine.move_time = Čas na tah
+engine.nodes = Limit uzlů
+engine.no_limit = Vypnuto
+engine.thousand = {0} tis.
+engine.million = {0} mil.
+engine.dynamic_elo = Dynamické Elo podle času
+engine.dynamic_elo.help = Jako lidský hráč hraje Stockfish slaběji, když mu na hodinách dochází čas: trochu v poslední minutě (v rapidu a blitzu dříve), v časové tísni mnohem slaběji. Jen partie s hodinami.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish si dává na čas jako člověk jeho úrovně. Chcete-li tuto pauzu přeskočit: Možnosti > Hra > Realistická doba přemýšlení.
+engine.pace.instant = Stockfish táhne, jakmile dopočítá. Chcete-li pauzy jako u člověka: Možnosti > Hra > Realistická doba přemýšlení.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Neomezeně
+tc.no_clock = Bez hodin
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapid
+tc.classical = Klasické
+tc.custom = Vlastní
+tc.your_own = Na míru
+tc.base_time = Základní čas
+tc.base_time.help = Počáteční čas každého hráče na hodinách (minuty : sekundy).
+tc.increment = Přídavek
+tc.increment.help = Fischerův přídavek připočtený po každém tahu.
+tc.delay = Prodleva
+tc.delay.help = Bronsteinova prodleva: čas spotřebovaný až do délky této prodlevy se po každém tahu vrací.
+tc.no_delay = Vypnuto
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, prodleva {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Nováček
+preset.novice.desc = Sotva zná tahy figur: nechává figury viset a přehlíží jednoduché hrozby.
+preset.beginner.name = Začátečník
+preset.beginner.desc = Zná základy, ale stále pravidelně ztrácí materiál hrubými chybami.
+preset.casual.name = Rekreační hráč
+preset.casual.desc = Pohodový soupeř na večer: rozumné tahy, časté chyby.
+preset.club_player.name = Klubový hráč
+preset.club_player.desc = Solidní klubový hráč, který trestá zjevné hrubé chyby.
+preset.advanced.name = Pokročilý
+preset.advanced.desc = Silný klubový hráč s dobrým taktickým přehledem.
+preset.expert.name = Expert
+preset.expert.desc = Turnajový expert: chybuje zřídka a výhody umí zužitkovat.
+preset.master.name = Mistr
+preset.master.desc = Mistrovská síla: hluboký propočet a jemná poziční hra.
+preset.grandmaster.name = Velmistr
+preset.grandmaster.desc = Velmistrovská úroveň: porazit ho je nesmírně těžké.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 v plné síle. Hodně štěstí.
+preset.custom.name = Vlastní
+preset.custom.desc = Vaše vlastní nastavení programu.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = TVŮRCI
+credits.game.head = SCACELITH
+credits.game = Šachová partie v královském sále, na vlastním enginu postaveném na OpenGL 4.6.
+credits.engine.head = ŠACHOVÝ PROGRAM
+credits.engine = Stockfish 19 od vývojářů Stockfishe.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Jeho neuronová síť byla natrénována na datech z projektu Leela Chess Zero, která jsou k dispozici pod licencí Open Database License (ODbL).
+credits.voice.head = HLAS TRENÉRA
+credits.voice = Syntetickou řeč pro režim Trenér generuje Supertonic 3.
+credits.voice.licence = Supertonic 3 je model společnosti Supertone používaný v rámci licence OpenRAIL-M, jejíž omezení použití platí pro každého, kdo ho používá (viz Licence).
+credits.openings.head = ZAHÁJENÍ
+credits.openings = Názvy zahájení z databáze chess-openings serveru lichess.org, uvolněné jako volné dílo (CC0).
+credits.fonts.head = PÍSMA
+credits.fonts = EB Garamond od Georga Duffnera a Cinzel od Natanaela Gamy; Amiri od Khaleda Hosnyho.
+credits.fonts.hand = Rukopisná písma: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Šachové figurky z GNU FreeFont (GPL v3 s výjimkou pro písma).
+credits.quote = „Šachy jsou uměním analýzy.“  – Michail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licence
+licences.title = LICENCE
+licences.note = Licence jsou zobrazeny v původním anglickém znění.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUZA
+pause.resume = Pokračovat
+pause.offer_draw = Nabídnout remízu
+pause.claim_draw = Reklamovat remízu
+pause.claim_draw.help = Trojí opakování pozice nebo pravidlo 50 tahů.
+pause.resign = Vzdát se
+confirm.resign.title = VZDÁT SE
+confirm.resign.text = Chcete tuto partii vzdát? Vítězem bude vyhlášen váš soupeř.
+confirm.resign.draw = Chcete tuto partii vzdát? Váš soupeř už nemůže dát mat: partie skončí remízou.
+confirm.resign.ok = Vzdát se
+confirm.leave.title = OPUSTIT PARTII
+confirm.leave.text = Chcete se vrátit do hlavní nabídky? Rozehraná partie bude opuštěna.
+confirm.leave.ok = Odejít
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMĚNA PĚŠCE
+piece.queen = Dáma
+piece.rook = Věž
+piece.bishop = Střelec
+piece.knight = Jezdec
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partie skončila remízou.
+gameover.draw_moves = Partie skončila remízou po {0} tahu.|Partie skončila remízou po {0} tazích.|Partie skončila remízou po {0} tazích.
+gameover.win = Dobře zahráno – vítězství je vaše.
+gameover.win_moves = Dobře zahráno – vítězství za {0} tah.|Dobře zahráno – vítězství za {0} tahy.|Dobře zahráno – vítězství za {0} tahů.
+gameover.loss = Vyhrál váš soupeř.
+gameover.loss_moves = Váš soupeř vyhrál za {0} tah.|Váš soupeř vyhrál za {0} tahy.|Váš soupeř vyhrál za {0} tahů.
+gameover.rematch = Odveta
+gameover.view_board = Zobrazit šachovnici
+gameover.show = Zobrazit
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Mat
+reason.resignation = Vzdání se
+reason.timeout = Prohra na čas
+reason.illegal_moves = Druhý nepřípustný tah (kontumace)
+reason.stalemate = Pat
+reason.insufficient = Mrtvá pozice (nedostatečný materiál)
+reason.timeout_vs_insufficient = Překročení času, ale soupeř nemůže dát mat
+reason.fivefold = Pětinásobné opakování pozice
+reason.75_moves = Pravidlo 75 tahů
+reason.threefold_claim = Trojí opakování pozice (reklamováno)
+reason.50_moves_claim = Pravidlo 50 tahů (reklamováno)
+reason.agreement = Remíza dohodou
+reason.illegal_vs_insufficient = Druhý nepřípustný tah, ale soupeř nemůže dát mat
+reason.resignation_vs_insufficient = Vzdání se, ale soupeř nemůže dát mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = TAHY
+movelist.empty = Zatím žádné tahy.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Příprava materiálů
+loading.hall = Stavba sálu
+loading.furniture = Řezba stolu a židlí
+loading.board = Leštění šachovnice
+loading.pieces = Soustružení šachových figur
+loading.clock = Sestavování hodin
+loading.porcelain = Vypalování porcelánu
+loading.ready = Připraveno
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = V této pozici nelze reklamovat remízu.
+notify.flag_you = Spadl vám praporek.
+notify.flag_opponent = Soupeři spadl praporek.
+notify.touched.pawn = Dotknuto – táhnuto: musíte táhnout dotčeným pěšcem.
+notify.touched.knight = Dotknuto – táhnuto: musíte táhnout dotčeným jezdcem.
+notify.touched.bishop = Dotknuto – táhnuto: musíte táhnout dotčeným střelcem.
+notify.touched.rook = Dotknuto – táhnuto: musíte táhnout dotčenou věží.
+notify.touched.queen = Dotknuto – táhnuto: musíte táhnout dotčenou dámou.
+notify.touched.king = Dotknuto – táhnuto: musíte táhnout dotčeným králem.
+notify.touched.piece = Dotknuto – táhnuto: musíte táhnout dotčenou figurou.
+notify.touched_square = Dotknuto – táhnuto: musíte táhnout figurou na {0}.
+notify.press_clock = Stisknutím hodin dokončete svůj tah (mezerník).
+notify.manual_clock = V této partii po každém tahu stiskněte hodiny ručně.
+notify.illegal = Nepřípustný tah.
+notify.cannot_move = Tento tah nelze zahrát.
+notify.move_first = Než stisknete hodiny, zahrajte svůj tah.
+notify.stance.sit_to_play = Chcete-li hrát, znovu se posaďte (šipka dolů).
+notify.stance.first = Dokud stojíte, hodiny běží dál. Šipka dolů: znovu se posadit.
+notify.stance.first_untimed = Hrát se dá jen ze židle. Šipka dolů: znovu se posadit.
+notify.stance.finish_move = Nejprve dokončete svůj tah.
+notify.draw_already_offered = V tomto tahu už byla remíza nabídnuta.
+notify.draw_accepted = Soupeř remízu přijímá.
+notify.draw_declined = Soupeř nabídku remízy odmítá.
+notify.draw_claimed = Soupeř reklamuje remízu.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Rozhodčí: hodiny byly stisknuty bez provedení tahu, což se počítá jako nepřípustný tah.
+arbiter.unpromoted = Rozhodčí: nepřípustný tah, pěšec nebyl před stisknutím hodin nahrazen novou figurou.
+arbiter.illegal = Rozhodčí: nepřípustný tah.
+arbiter.second_loses.white = Je to druhý nepřípustný tah bílého: bílý partii prohrává.
+arbiter.second_loses.black = Je to druhý nepřípustný tah černého: černý partii prohrává.
+arbiter.second_draw.white = Je to druhý nepřípustný tah bílého, ale černý nemůže dát mat: partie končí remízou.
+arbiter.second_draw.black = Je to druhý nepřípustný tah černého, ale bílý nemůže dát mat: partie končí remízou.
+arbiter.queen = Pěšec se proměňuje v dámu.
+arbiter.queen_one_minute.white = Pěšec se proměňuje v dámu a bílý dostává jednu minutu navíc.
+arbiter.queen_one_minute.black = Pěšec se proměňuje v dámu a černý dostává jednu minutu navíc.
+arbiter.queen_two_minutes.white = Pěšec se proměňuje v dámu a bílý dostává dvě minuty navíc.
+arbiter.queen_two_minutes.black = Pěšec se proměňuje v dámu a černý dostává dvě minuty navíc.
+arbiter.restored = Pozice je obnovena.
+arbiter.restored_one_minute.white = Pozice je obnovena a bílý dostává jednu minutu navíc.
+arbiter.restored_one_minute.black = Pozice je obnovena a černý dostává jednu minutu navíc.
+arbiter.restored_two_minutes.white = Pozice je obnovena a bílý dostává dvě minuty navíc.
+arbiter.restored_two_minutes.black = Pozice je obnovena a černý dostává dvě minuty navíc.
+arbiter.one_minute.white = Bílý dostává jednu minutu navíc.
+arbiter.one_minute.black = Černý dostává jednu minutu navíc.
+arbiter.two_minutes.white = Bílý dostává dvě minuty navíc.
+arbiter.two_minutes.black = Černý dostává dvě minuty navíc.
+arbiter.second_loses = Druhý nepřípustný tah znamená prohru partie.
+arbiter.touched.white = Bílý musí táhnout dotčenou figurou.
+arbiter.touched.black = Černý musí táhnout dotčenou figurou.
+arbiter.game_over = Partie skončila.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Sledovat partii
+
+viewer.title = SLEDOVAT PARTII
+viewer.white = BÍLÝ
+viewer.black = ČERNÝ
+viewer.time_control = TEMPO HRY
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Prohodit barvy
+viewer.note = Oba hráči jsou Stockfish. Zatímco hrají, létejte volně po sále: nikdo vás neuvidí.
+viewer.summary = {0} – {1}
+viewer.custom = Vlastní
+viewer.tc.custom = Na míru
+viewer.base_time = Základní čas
+viewer.increment = Přídavek
+viewer.delay = Prodleva
+viewer.off = Vypnuto
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = prodleva {0} s
+viewer.back = Zpět
+viewer.start = Začít
+
+viewer.paused = PAUZA
+viewer.resume = Pokračovat
+viewer.options = Možnosti
+viewer.main_menu = Hlavní nabídka
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = OVLÁDÁNÍ
+viewer.keys.move = W A S D  ·  Z Q S D  ·  šipky
+viewer.controls.move = Pohyb
+viewer.keys.updown = E, mezerník  /  C, Ctrl
+viewer.controls.updown = Nahoru / dolů
+viewer.keys.fast = Shift
+viewer.controls.fast = Rychleji
+viewer.keys.look = Pravé tlačítko myši
+viewer.controls.look = Rozhlížení
+viewer.keys.speed = Kolečko myši
+viewer.controls.speed = Rychlost
+viewer.keys.views = 1 – 9
+viewer.controls.views = Pohledy
+viewer.keys.eyes = 0
+viewer.controls.eyes = Očima hráče na tahu
+viewer.keys.moves = Tab
+viewer.controls.moves = Seznam tahů
+viewer.keys.menu = Esc
+viewer.controls.menu = Nabídka
+viewer.keys.hide = H
+viewer.controls.hide = Skrýt tento panel
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauza / pokračovat
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = O tah zpět / vpřed
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Pomaleji / rychleji
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Začátek / konec partie
+viewer.speed = Rychlost {0} m/s
+viewer.view.0 = Očima hráčů
+viewer.view.1 = Vedle stolu
+viewer.view.2 = Nad šachovnicí
+viewer.view.3 = Sál
+viewer.view.4 = Hodiny
+viewer.view.5 = Tvář bílého
+viewer.view.6 = Tvář černého
+viewer.view.7 = Souboj
+viewer.view.8 = Okna
+viewer.view.9 = Tapiserie
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Bílý
+viewer.side.black = Černý
+viewer.flag.white = Bílému spadl praporek.
+viewer.flag.black = Černému spadl praporek.
+viewer.claims_draw = {0} reklamuje remízu.
+viewer.offer_accepted = {0} nabízí remízu, {1} přijímá.
+viewer.offer_declined = {0} nabízí remízu, {1} odmítá.
+viewer.gameover.white_wins = Bílý vyhrál po {0}. tahu.
+viewer.gameover.black_wins = Černý vyhrál po {0}. tahu.
+viewer.gameover.draw = Partie skončila remízou po {0}. tahu.
+viewer.gameover.players = {0} – {1}
+viewer.watch_again = Sledovat znovu
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Zatím žádná partie na rating
+elo.provisional = Prozatímní rating
+elo.peak = Maximum {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Vaše Elo {0}
+elo.expected = očekávaný výsledek {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · tato partie není na rating
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partiář
+scoresheet.event = Turnaj
+scoresheet.date = Datum
+scoresheet.round = Kolo
+scoresheet.board = Šachovnice
+scoresheet.page = Strana
+scoresheet.white = Bílý
+scoresheet.black = Černý
+scoresheet.elo = Elo
+scoresheet.result = Výsledek
+scoresheet.move_no = Č.
+scoresheet.sign_white = Podpis bílého
+scoresheet.sign_black = Podpis černého
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D V S J
+scoresheet.date_format = {0}. {1}. {2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Hrát online
+online.title = HRÁT ONLINE
+online.continue = Pokračovat
+online.retry = Zkusit znovu
+online.copy = Kopírovat
+online.copied = Zkopírováno
+online.copy.unavailable = Kopírování tu není k dispozici: zapište si to prosím.
+online.rated = Na rating
+online.casual = Bez ratingu
+online.casual_only = Jen bez ratingu
+online.color.random = Losem
+online.ping = {0} ms
+online.conn.online = Připojeno
+online.conn.connecting = Připojování…
+online.conn.reconnecting = Obnovování připojení…
+online.conn.offline = Nepřipojeno
+online.conn.incompatible = Jiná verze
+online.no_server.text = Hra online vyžaduje server Scacelith. Zadejte v možnostech adresu serveru, nebo si s přítelem zahrajte přímý zápas.
+online.no_server.settings = Nastavení serveru
+
+# Options > Online server
+options.tab.online = Online server
+options.online.server = Server
+options.online.server.help = Oficiální server, nebo vlastní (komunitní) server provozovaný někým jiným, dostupný přes jeho zabezpečené webové API a zabezpečený WebSocket. Na každém serveru se přihlašujete zvlášť: účet ani přihlášení k němu se mezi servery nikdy nesdílejí.
+options.online.official = Oficiální server – {0}
+options.online.community = Vlastní server
+options.online.host = Hostitel
+options.online.host.hint = doménové jméno nebo IP adresa
+options.online.host.help = Doménové jméno nebo IP adresa vlastního serveru, jak je uvedl jeho vlastník.
+options.online.api_port = Port HTTPS / API
+options.online.api_port.help = Port zabezpečeného webového API serveru (na serverech Scacelith 443).
+options.online.ws_port = Port WSS
+options.online.ws_port.hint = stejný jako port API
+options.online.ws_port.help = Port zabezpečeného WebSocketu serveru. Pokud je stejný jako port API, nechte pole prázdné.
+options.online.pin = Otisk certifikátu (SHA-256)
+options.online.pin.hint = nepovinné
+options.online.pin.help = Pro server s certifikátem podepsaným sám sebou: otisk SHA-256, který uvádí jeho vlastník (64 šestnáctkových znaků, dvojtečky jsou povoleny). Chcete-li důvěřovat certifikátům systému, nechte pole prázdné.
+options.online.pin.invalid = Otisk má 64 šestnáctkových znaků (dvojtečky jsou povoleny).
+options.online.test = Otestovat připojení
+options.online.test_ok = {0}: připojeno, kompatibilní s touto verzí.
+options.online.test_incompatible = {0}: připojeno, ale server vyžaduje jinou verzi Scacelithu.
+options.online.in_game = Během online partie nelze server změnit.
+options.online.remember_session = Pamatovat si přihlášení, když není dostupná systémová klíčenka
+options.online.remember_session.help = Když vaši relaci nemůže uchovat žádná systémová klíčenka (GNOME Keyring, KWallet…), uloží se do souboru, který může číst jen váš uživatelský účet. Kdokoli, kdo může číst vaše soubory nebo jejich kopii, například zálohu, by tuto relaci mohl použít. Vypnuto: přihlášení vydrží, dokud hru nezavřete. Kterékoli zařízení můžete odhlásit ve svém účtu v části Přihlášená zařízení.
+
+# Sign in, create an account
+online.signin.lead = Přihlaste se k serveru {0} a hrajte s lidmi online.
+online.field.user = Uživatelské jméno nebo e-mail
+online.field.user.hint = jméno nebo adresa
+online.field.password = Heslo
+online.field.password.hint = alespoň 10 znaků
+online.field.password2 = Potvrzení hesla
+online.field.current_password = Současné heslo
+online.field.new_password = Nové heslo
+online.field.username = Uživatelské jméno
+online.field.username.hint = 3 až 24 písmen, číslic, _ nebo -
+online.field.email = E-mail
+online.field.new_email = Nový e-mail
+online.field.code = Kód
+online.field.code.hint = 6 číslic nebo záložní kód
+online.field.code6 = Kód z aplikace
+online.field.code6.hint = 6 číslic
+online.signin.button = Přihlásit se
+online.signin.google = Pokračovat přes Google
+online.signin.register = Vytvořit účet
+online.signin.forgot = Zapomenuté heslo?
+online.mfa.title = OVĚŘOVACÍ KÓD
+online.mfa.lead = Zadejte šestimístný kód z ověřovací aplikace, nebo jeden ze svých záložních kódů.
+online.mfa.verify = Ověřit
+online.register.title = VYTVOŘIT ÚČET
+online.register.lead = Bezplatný účet na serveru {0}: vaše jméno, ratingy a partie jsou uloženy jen na tomto serveru.
+online.register.button = Vytvořit účet
+online.register.working = Vytváření účtu… může to trvat několik sekund.
+online.register.ready = Váš účet je připraven. Přihlaste se a hrajte.
+online.password.mismatch = Hesla se neshodují.
+online.check_email.title = ZKONTROLUJTE E-MAIL
+online.check_email.text = Na adresu {0} jsme poslali odkaz. Otevřete ho, aby se váš účet aktivoval, a pak se tu přihlaste.
+online.check_email.ask = Zadejte adresu svého účtu a aktivační odkaz vám přijde znovu.
+online.check_email.resend = Znovu poslat e-mail
+online.check_email.resent = E-mail byl odeslán znovu. Může to trvat několik minut; podívejte se i do složky se spamem.
+online.forgot.title = ZAPOMENUTÉ HESLO
+online.forgot.lead = Zadejte e-mailovou adresu svého účtu: pošleme vám odkaz, přes který si zvolíte nové heslo.
+online.forgot.button = Poslat odkaz
+online.forgot.sent = Pokud tuto adresu používá nějaký účet, odkaz je na cestě.
+online.sso.title = PŘIHLÁŠENÍ PŘES GOOGLE
+online.sso.wait = Pokračujte ve webovém prohlížeči: v okně, které se otevřelo, vyberte svůj účet Google. Scacelith převezme řízení, jakmile vás Google pošle zpět.
+online.sso.name_title = ZVOLTE SI JMÉNO
+online.sso.name_lead = Jste tu s Googlem poprvé. Zvolte si jméno, které uvidí ostatní hráči.
+online.sso.continue = Pokračovat
+online.sso.finishing = Google vás poslal zpět. Dokončování přihlášení…
+online.sso.link_title = PŘIDAT PŘIHLÁŠENÍ PŘES GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Účet {0} na serveru {1} už používá e-mailovou adresu tohoto účtu Google. Zadejte heslo tohoto účtu a přidejte k němu přihlášení přes Google. Stačí to udělat jen jednou.
+online.sso.link_button = Přidat přihlášení přes Google
+online.sso.link_mfa = Přihlášení přes Google se k tomuto účtu přidá, jakmile bude kód přijat.
+online.sso.not_mine = Tohle není můj účet
+online.sso.not_mine_note = Přihlášení přes Google nebylo přidáno. Pokud je tato e-mailová adresa vaše, použijte s ní „Zapomenuté heslo?“: odkaz přijde do této schránky. Pokud účet požaduje i kód dvoufázového ověření, který nemáte, obraťte se na provozovatele serveru.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: přihlášení přes Google
+online.sso.page.done_heading = Zpět do Scacelithu
+online.sso.page.done = Google vás poslal zpět do Scacelithu. Vraťte se do hry a dokončete přihlášení; tuto kartu můžete zavřít.
+online.sso.page.cancelled_heading = Přihlášení zrušeno
+online.sso.page.cancelled = Přihlášení přes Google bylo zrušeno. Tuto kartu můžete zavřít a vrátit se do Scacelithu.
+online.sso.page.foreign_heading = Tato stránka není pro vás
+online.sso.page.foreign = Tato stránka neodpovídá přihlášení, na které Scacelith na tomto počítači čeká. Pokud se právě nepřihlašujete ve Scacelithu přes Google, možná vám tento odkaz poslal někdo jiný: zavřete tuto kartu.
+
+# Account
+online.account.button = Účet
+online.account.title = ÚČET
+online.account.section = ÚČET
+online.account.username = UŽIVATELSKÉ JMÉNO
+online.account.email = E-MAIL
+online.account.unverified = (neověřeno)
+online.account.mfa = DVOUFÁZOVÉ OVĚŘENÍ
+online.account.mfa_on = Zapnuto
+online.account.mfa_off = Vypnuto
+online.account.google = GOOGLE
+online.account.google_linked = Propojeno s účtem Google
+online.account.change_password = Změnit heslo
+online.account.mfa_setup = Zapnout dvoufázové ověření
+online.account.mfa_disable = Vypnout dvoufázové ověření
+online.account.recovery = Nové záložní kódy
+online.account.sign_out = Odhlásit se
+online.account.sign_out_all = Odhlásit všude
+online.account.sign_out_all.help = Odhlásí tento účet na všech počítačích včetně tohoto.
+online.account.signed_out = Odhlášení proběhlo.
+online.account.signed_out_all = Odhlášení proběhlo na všech počítačích.
+online.account.signing_out_all = Odhlašování všech počítačů…
+online.account.sign_out_all_failed = Vaše ostatní počítače možná zůstaly přihlášené: přihlaste se znovu a pak je odhlaste v části Přihlášená zařízení. {0}
+online.account.sign_out_all_retry = Vaše ostatní počítače možná zůstaly přihlášené. Zkuste znovu Odhlásit všude. {0}
+online.account.ratings = RATINGY
+online.account.col.tc = TEMPO HRY
+online.account.col.rating = RATING
+online.account.col.games = PARTIE
+online.account.col.record = V / R / P
+online.account.provisional = Otazník označuje prozatímní rating (zatím odehráno málo partií).
+online.password.title = ZMĚNA HESLA
+online.password.button = Změnit heslo
+online.password.changed = Vaše heslo bylo změněno.
+online.password.other_sessions = Vaše ostatní počítače se budou muset přihlásit znovu.
+online.mfa_setup.title = DVOUFÁZOVÉ OVĚŘENÍ
+online.mfa_setup.lead = Dvoufázové ověření při každém přihlášení požaduje kód z aplikace ve vašem telefonu. Začněte zadáním hesla.
+online.mfa_setup.scan = 1. Naskenujte tento kód ověřovací aplikací, nebo do ní zadejte tento klíč:
+online.mfa_setup.enter = 2. Zadejte šestimístný kód, který aplikace zobrazuje:
+online.mfa_setup.enable = Zapnout
+online.mfa_setup.done = Dvoufázové ověření je zapnuto.
+online.mfa_off.title = VYPNOUT 2FA
+online.mfa_off.lead = Zadejte své heslo a kód z aplikace (nebo záložní kód).
+online.mfa_off.button = Vypnout
+online.mfa.off_done = Dvoufázové ověření je vypnuto.
+online.recovery.title = ZÁLOŽNÍ KÓDY
+online.recovery.lead = Pokud ztratíte telefon, každý kód vás jednou přihlásí. Uschovejte je na bezpečném místě: zobrazují se jen teď.
+online.recovery.saved = Mám je uložené
+online.recovery.new_title = NOVÉ ZÁLOŽNÍ KÓDY
+online.recovery.new_lead = Nové kódy nahradí ty staré. Zadejte své heslo a kód z aplikace.
+online.recovery.button = Nové kódy
+online.account.manage = ZABEZPEČENÍ A DATA
+online.account.pending_email = Čeká na potvrzení: {0}
+online.account.accept_challenges = Přijímat výzvy
+online.account.accept_challenges.help = Ostatní hráči vás mohou vyzvat podle vašeho uživatelského jména. Vypnuto: jejich výzvy se odmítají.
+online.account.history = Historie partií
+online.account.devices = Přihlášená zařízení
+online.account.change_email = Změnit e-mail
+online.account.export = Stáhnout moje data
+online.account.delete = Smazat účet
+
+# Play
+online.play.signed_in = Přihlášený účet: {0}
+online.session.file = Vaše přihlášení nemohla uchovat žádná systémová klíčenka: pamatuje se v souboru, který může číst jen váš uživatelský účet (Možnosti > Online server).
+online.session.memory = Vaše přihlášení nemohla uchovat žádná systémová klíčenka a do souboru se neukládá: platí, dokud hru nezavřete (Možnosti > Online server).
+online.play.find_section = NAJÍT SOUPEŘE
+online.play.friend_section = HRÁT S PŘÍTELEM
+online.play.mode = Partie
+online.play.mode.help = Partie na rating mění váš rating v tomto tempu hry, partie bez ratingu ne.
+online.play.find = Najít soupeře
+online.play.connecting = Připojování k serveru…
+online.play.cooldown = Soupeře můžete znovu hledat od {0}.
+online.play.banned = Tento účet je pozastaven do {0}.
+online.play.challenge = Vyzvat hráče
+online.play.challenge.desc = Pozvěte někoho, kdo je online, podle jeho uživatelského jména.
+online.play.private = Soukromá partie
+online.play.private.desc = Vytvořte kód, který dáte příteli, nebo se připojte s jeho kódem.
+online.play.direct = Přímý zápas
+online.play.direct.desc = Bez serveru: přímé spojení s počítačem přítele.
+online.search.title = HLEDÁNÍ
+online.search.window = Rozsah ratingu {0}
+online.search.queued = {0} hráč hledá|{0} hráči hledají|{0} hráčů hledá
+online.search.wait = Hledá se soupeř vaší úrovně…
+online.outgoing.challenge = VÝZVA ODESLÁNA
+online.outgoing.waiting = čeká se na odpověď
+online.outgoing.private = SOUKROMÁ PARTIE
+online.outgoing.private_hint = Dejte tento kód příteli: partie začne, jakmile se připojí.
+online.challenge.title = VYZVAT HRÁČE
+online.challenge.opponent = SOUPEŘ
+online.field.opponent = Uživatelské jméno
+online.field.opponent.hint = koho vyzvat
+online.challenge.note = Soupeř uvidí výzvu, ať je v nabídkách kdekoli, a na odpověď má minutu.
+online.challenge.send = Poslat výzvu
+online.terms.rated = Na rating
+online.terms.rated.help = Na rating lze hrát jen v oficiálních tempech hry.
+online.terms.color = Vaše barva
+online.private.title = SOUKROMÁ PARTIE
+online.private.create_section = VYTVOŘIT
+online.private.create_note = Dostanete krátký kód: kdo ho zadá, hraje s vámi.
+online.private.create = Vytvořit partii
+online.private.join_section = PŘIPOJIT SE
+online.field.private_code = Kód
+online.private.join = Připojit se
+online.private.joining = Připojování k partii…
+online.challenge.received = VÝZVA
+online.challenge.accept = Přijmout
+online.challenge.decline = Odmítnout
+online.challenge.you_white = hrajete bílými
+online.challenge.you_black = hrajete černými
+online.challenge.you_random = barvy losem
+online.challenge.declined = {0} vaši výzvu odmítá.
+online.challenge.expired = Vaše výzva vypršela bez odpovědi.
+online.challenge.unavailable = {0} teď není k dispozici.
+online.challenge.lost = Spojení se přerušilo: vaše výzva byla zrušena.
+
+# At the table
+online.pause.clock_runs = Partie pokračuje: vaše hodiny běží dál.
+online.pause.abort = Zrušit partii
+online.pause.abort.help = Před vaším prvním tahem lze partii zrušit; nezapočítává se.
+online.pause.leave = Opustit partii
+online.confirm.resign.text = Chcete tuto partii vzdát? Vyhraje ji váš soupeř.
+online.confirm.leave.text = Odchodem tuto partii vzdáváte: vyhraje ji váš soupeř.
+online.confirm.leave.ok = Vzdát a odejít
+online.confirm.leave_abort.text = Chcete odejít před svým prvním tahem? Partie se zruší a nezapočítá se.
+online.confirm.leave_abort.ok = Zrušit a odejít
+online.draw.card_title = NABÍDKA REMÍZY
+online.draw.card_text = Soupeř nabízí remízu.
+online.draw.accept = Přijmout
+online.draw.decline = Odmítnout
+online.draw.offered = Soupeř nabízí remízu.
+online.opponent_back = Soupeř je zpět.
+online.opponent_away = Soupeř se odpojil – na návrat má {0}
+online.first_move = Váš první tah · {0}
+online.reconnecting = OBNOVOVÁNÍ PŘIPOJENÍ…
+online.reconnecting.text = Partie na serveru pokračuje a vaše hodiny běží dál.
+online.gameover.aborted = Partie byla zrušena: nezapočítává se.
+online.rating.casual = Partie bez ratingu: ratingy se nemění.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Přijmout odvetu
+online.rematch.offered = Soupeř nabízí odvetu.
+online.rematch.waiting = Odveta nabídnuta…
+online.rematch.gone = Bez odvety
+online.rematch.declined = Tentokrát odveta nebude.
+online.report.button = Nahlásit soupeře
+online.report.title = NAHLÁSIT
+online.report.lead = Hlášení jdou spolu s touto partií moderátorům serveru. Děkujeme, že pomáháte udržet férovou hru.
+online.report.category = Důvod
+online.report.cheating = Podvádění
+online.report.abuse = Urážlivé chování
+online.report.other = Jiné
+online.report.comment = Komentář
+online.report.comment.hint = nepovinné
+online.report.send = Odeslat hlášení
+online.report.sent = Hlášení odesláno. Děkujeme.
+online.report.queued = Vaše hlášení bude odesláno po skončení partie.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = na rating
+online.sheet.casual = bez ratingu
+online.sheet.game = Partie {0}
+# End reasons of online games
+reason.online.abandonment = Soupeř opustil partii
+reason.online.abandonment_vs_insufficient = Opuštění partie, ale soupeř nemůže dát mat
+reason.online.aborted = Partie zrušena
+reason.online.no_show = První tah nebyl zahrán včas (zrušeno)
+reason.online.forfeit = Kontumace
+reason.online.server_aborted = Zrušeno serverem
+reason.online.both_disconnected = Oba hráči se odpojili
+# Server notices
+online.notice.shutdown = Server se za {0} restartuje. Rozehrané partie se uloží.
+online.notice.revoked = Tento server vás odhlásil.
+online.notice.replaced = Váš účet se připojil z jiného okna; toto okno je teď offline.
+online.notice.rating_restored = Byl vám vrácen {0} bod ratingu: jeden ze soupeřů byl zablokován za podvádění.|Byly vám vráceny {0} body ratingu: jeden ze soupeřů byl zablokován za podvádění.|Bylo vám vráceno {0} bodů ratingu: jeden ze soupeřů byl zablokován za podvádění.
+# Errors
+online.err.rate_limited_for = Příliš mnoho pokusů. Zkuste to znovu za {0}.
+online.err.rate_limited = Příliš mnoho pokusů. Zkuste to znovu za chvíli.
+online.err.server_busy_for = Server je přetížený. Zkuste to znovu za {0}.
+online.err.server_busy = Server je přetížený. Zkuste to znovu za chvíli.
+online.err.banned_until = Tento účet je pozastaven do {0}.
+online.err.banned = Tento účet je pozastaven.
+online.err.invalid_credentials = Nesprávné uživatelské jméno nebo heslo.
+online.err.invalid_credentials_pending = Nesprávné uživatelské jméno nebo heslo. Jde-li o novou registraci, nejprve otevřete odkaz, který jsme vám poslali.
+online.err.email_unverified = Vaše e-mailová adresa ještě není ověřená: otevřete odkaz, který jsme vám poslali.
+online.err.network = Server je nedostupný. Zkontrolujte připojení a adresu serveru.
+online.err.tls = Zabezpečené spojení se serverem se nepodařilo navázat.
+online.err.certificate = Certifikát serveru není důvěryhodný (nebo neodpovídá otisku v možnostech).
+online.err.incompatible = Tento server vyžaduje jinou verzi Scacelithu.
+online.err.unauthorized = Vaše relace skončila: přihlaste se prosím znovu.
+online.err.username_taken = Toto uživatelské jméno je obsazené.
+online.err.email_taken = Tuto e-mailovou adresu už používá jiný účet.
+online.err.invalid_username = Uživatelské jméno má 3 až 24 písmen, číslic, _ nebo -.
+online.err.invalid_email = Tato e-mailová adresa není platná.
+online.err.weak_password = Toto heslo je příliš slabé: použijte alespoň 10 znaků.
+online.err.invalid_code = Tento kód není správný.
+online.err.expired = Platnost tohoto požadavku vypršela: začněte prosím znovu.
+online.err.registration_closed = Tento server nepřijímá nové účty.
+online.err.sso_cancelled = Přihlášení přes Google bylo zrušeno.
+online.err.sso_expired = Přihlášení přes Google trvalo příliš dlouho nebo už bylo použito. Začněte prosím znovu.
+online.err.sso_failed = Přihlášení přes Google nefungovalo. Zkuste to prosím znovu.
+online.err.sso_listen = Scacelith nemohl na tomto počítači přijmout odpověď od Googlu. Zkuste to prosím znovu.
+online.err.sso_origin = Přihlášení přes Google přes tuto adresu serveru nefunguje. Přidejte server pod veřejným názvem, který uvádí jeho provozovatel, a zkuste to znovu.
+online.err.browser = Webový prohlížeč se nepodařilo otevřít.
+online.err.sso_email_unverified = Google nepotvrdil e-mailovou adresu tohoto účtu Google.
+online.err.sso_account_exists = Tuto e-mailovou adresu už používá účet, který nelze propojit s přihlášením přes Google: přihlaste se jeho heslem, nebo použijte „Zapomenuté heslo?“.
+online.err.sso_already_linked = Tento účet Google je už propojen s jiným účtem.
+online.err.account_disabled = Tento účet už nelze používat.
+online.err.server_error = Na serveru došlo k chybě. Zkuste to prosím znovu.
+online.err.timeout = Server neodpověděl včas.
+online.err.offline = Spojení se serverem není navázáno: zkuste to znovu po připojení.
+online.err.other = Server požadavek odmítl ({0}).
+online.err.code = Server požadavek odmítl (chyba {0}).
+online.err.slow_down = Trochu zpomalte.
+online.err.server_full = Server je plný. Zkuste to později.
+online.err.restarting = Server se restartuje. Zkuste to znovu za chvíli.
+online.err.move_refused = Server tento tah odmítl: pozice na šachovnici se vrací zpět.
+online.err.game_over = Tato partie už skončila.
+online.err.already_in_game = Už hrajete partii.
+online.err.invalid_category = Toto tempo hry tu není k dispozici.
+online.err.draw_offer_limit = Další nabídky remízy teď nejsou možné.
+online.err.abort_not_allowed = Partii už nelze zrušit.
+online.err.no_pending_offer = Žádná nabídka nečeká na odpověď.
+online.err.flag_fell = Váš čas vypršel.
+online.err.queue_not_allowed = Teď nemůžete hledat soupeře.
+online.err.challenge_not_found = Tato výzva už neexistuje.
+online.err.user_unavailable = Tento hráč není k dispozici.
+online.err.challenge_limit = Prozatím příliš mnoho výzev. Zkuste to později.
+online.err.challenge_self = Vlastní účet nelze vyzvat.
+online.err.code_invalid = Žádná partie nemá tento kód.
+online.err.rated_official_tc = Na rating lze hrát jen v oficiálních tempech hry.
+online.err.cooldown = Hledání soupeře je pro vás na chvíli pozastaveno.
+online.err.invalid_tc = Toto tempo hry není povoleno.
+online.err.rematch_unavailable = Odveta už není možná.
+online.err.rated_repeat_limit = S tímto hráčem máte prozatím odehráno dost partií na rating. Zahrajte si partii bez ratingu, nebo to zkuste později.
+online.err.cheat_detected = Partii zastavila kontrola fair play na serveru.
+online.err.invalid_password = Nesprávné heslo.
+online.err.mfa_code_required = Zadejte kód z ověřovací aplikace (nebo záložní kód).
+online.err.password_not_set = Tento účet se přihlašuje přes Google a zatím nemá heslo. Nejprve si ho nastavte přes „Zapomenuté heslo?“ na přihlašovací stránce.
+online.err.too_many_attempts = Příliš mnoho chybných pokusů. Zkuste to později.
+online.err.too_many_attempts_for = Příliš mnoho chybných pokusů. Zkuste to znovu za {0}.
+online.err.same_email = Tohle už je vaše e-mailová adresa.
+online.err.not_found = Na serveru nenalezeno.
+online.err.invalid_response = Odpověď serveru nelze přečíst.
+online.err.storage = Relaci se na tomto počítači nepodařilo uložit.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = HISTORIE PARTIÍ
+online.history.filter.games = Partie
+online.history.filter.result = Výsledek
+online.history.filter.all = Vše
+online.history.filter.won = Výhry
+online.history.filter.lost = Prohry
+online.history.filter.drawn = Remízy
+online.history.col.date = DATUM
+online.history.col.opponent = SOUPEŘ
+online.history.col.result = VÝSLEDEK
+online.history.col.tc = TEMPO HRY
+online.history.col.kind = TYP
+online.history.col.rating = RATING
+online.history.won = Výhra
+online.history.lost = Prohra
+online.history.drawn = Remíza
+online.history.aborted = Zrušeno
+online.history.page = Strana {0} z {1}
+online.history.total = {0} partie|{0} partie|{0} partií
+online.history.previous = Předchozí
+online.history.next = Další
+online.history.empty.title = ZATÍM ŽÁDNÉ PARTIE
+online.history.empty = Vaše partie na tomto serveru se tu zobrazí, jakmile skončí.
+online.history.empty_filter.title = ŽÁDNÉ PARTIE
+online.history.empty_filter = Těmto filtrům neodpovídá žádná partie.
+online.history.error = HISTORII SE NEPODAŘILO NAČÍST
+online.history.unavailable = TENTO SERVER NENABÍZÍ HISTORII PARTIÍ
+online.game.title = PARTIE
+online.game.players = HRÁČI
+online.game.you = VY
+online.game.unrated = Bez ratingu
+online.game.you_won = Vaše výhra
+online.game.you_lost = Vaše prohra
+online.game.draw = Remíza
+online.game.you_left = Odchod z partie
+online.game.date = DATUM
+online.game.time_control = TEMPO HRY
+online.game.moves = TAHY
+online.game.move_count = {0} tah|{0} tahy|{0} tahů
+online.game.no_moves = Nebyl zahrán žádný tah.
+online.game.moves_incomplete = Některé tahy nešlo přečíst: seznam končí před koncem partie.
+online.game.save = Uložit partii
+online.game.saved_button = Uloženo
+online.game.saved = Partie je mezi vašimi uloženými partiemi.
+online.game.already_saved = Tato partie už je mezi vašimi uloženými partiemi.
+online.game.save_failed = Partii se nepodařilo uložit.
+online.game.invalid = Server poslal záznam partie, který nelze přečíst.
+online.game.replay = Přehrát
+online.game.not_found = PARTIE NENALEZENA
+online.game.error = PARTII SE NEPODAŘILO NAČÍST
+online.devices.title = PŘIHLÁŠENÁ ZAŘÍZENÍ
+online.devices.lead = Zařízení, na kterých je tento účet přihlášen. Pokud některé nepoznáváte, odhlaste ho a změňte si heslo.
+online.devices.unknown = Neznámé zařízení
+online.devices.this = TOTO ZAŘÍZENÍ
+online.devices.signed_in = Přihlášeno {0}
+online.devices.last_active = naposledy aktivní {0}
+online.devices.active_now = právě používáno
+online.devices.sign_out = Odhlásit
+online.devices.signed_out = Zařízení bylo odhlášeno.
+online.devices.error = ZAŘÍZENÍ SE NEPODAŘILO NAČÍST
+online.devices.all.title = ODHLÁSIT VŠUDE
+online.email.title = ZMĚNA E-MAILU
+online.email.current = Současná adresa: {0}
+online.email.button = Změnit e-mail
+online.email.sent = Na adresu {0} byl odeslán potvrzovací odkaz.
+online.email.sent.hint = Adresa se změní po otevření odkazu. Do té doby se používá vaše současná adresa.
+online.email.done = Hotovo
+online.email.changed = Vaše e-mailová adresa byla změněna.
+online.export.title = STÁHNOUT MOJE DATA
+online.export.lead = Vše, co tento server o vašem účtu uchovává (profil, ratingy, partie, zařízení, bezpečnostní události), se uloží jako soubor JSON do tohoto počítače. Pro potvrzení zadejte své heslo.
+online.export.button = Stáhnout
+online.export.saved = Vaše data byla uložena do tohoto počítače.
+online.export.failed = Soubor se nepodařilo zapsat.
+online.delete.title = SMAZAT ÚČET
+online.delete.warning = Váš účet bude z tohoto serveru smazán: vaše e-mailová adresa, heslo, dvoufázové ověření a zařízení se vymažou a už se nebude možné přihlásit. Tuto akci nelze vrátit zpět.
+online.delete.games = Vaše partie a ratingy zůstanou na serveru pod anonymním jménem {0}.
+online.delete.confirm_name = Pro potvrzení zadejte své uživatelské jméno a heslo.
+online.delete.button = Smazat můj účet
+online.delete.done = Váš účet byl smazán.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Přímý zápas
+online.direct.title = PŘÍMÝ ZÁPAS
+online.direct.lead = Přátelská partie přímo mezi dvěma počítači: bez serveru, bez účtu, nikdy na rating.
+online.direct.host = Hostovat partii
+online.direct.host.desc = Přítel se připojí k vám pomocí vaší adresy a kódu.
+online.direct.join = Připojit se k partii
+online.direct.join.desc = Připojte se k příteli, který partii hostuje.
+online.direct.host_title = HOSTOVAT PARTII
+online.direct.your_color = Vaše barva
+online.direct.auto_press.help = Oba roboti stisknou hodiny sami, jakmile je tah na šachovnici. Vypnuto: každý hráč po každém tahu stiskne hodiny.
+online.direct.unrated = Přímé zápasy jsou přátelské partie: nikdy nejsou na rating.
+online.direct.connection = PŘIPOJENÍ
+online.direct.port = Port
+online.direct.port.help = Port TCP, ke kterému se přítel připojí (47100, pokud není obsazený).
+online.direct.port_range = Zvolte port od 1024 do 65535.
+online.direct.upnp = Otevřít port na mém routeru (UPnP)
+online.direct.upnp.help = Požádá domácí router, aby port přesměroval na tento počítač, a po partii ho zavře.
+online.direct.host_note_upnp = Hra požádá váš router o otevření portu. Pokud to nepůjde, dozvíte se, který port máte přesměrovat ručně.
+online.direct.host_note_manual = Přesměrujte na routeru port TCP na tento počítač, nebo hrajte ve stejné síti.
+online.direct.host_button = Hostovat
+online.direct.wait_title = ČEKÁNÍ NA PŘÍTELE
+online.direct.opening = Otevírání portu {0} na vašem routeru…
+online.direct.give = Sdělte příteli:
+online.direct.cap_address = ADRESA
+online.direct.cap_port = PORT
+online.direct.cap_code = KÓD
+online.direct.lan = Ve stejné síti: {0}
+online.direct.router = váš router
+online.direct.upnp_searching = Hledání routeru…
+online.direct.upnp_mapped = Port otevřen: {0}.
+online.direct.upnp_none = Žádný router UPnP neodpověděl: přesměrujte port TCP {0} na tento počítač ručně.
+online.direct.upnp_failed = Router odmítl otevřít port: přesměrujte port TCP {0} na tento počítač ručně.
+online.direct.upnp_off = Přesměrujte na routeru port TCP {0} na tento počítač.
+online.direct.upnp_cgnat = Váš poskytovatel nejspíš sdílí vaši internetovou adresu (CGNAT): zkuste IPv6 nebo VPN.
+online.direct.firewall = Pokud se systém Windows zeptá, zda může Scacelith přijímat připojení, povolte to.
+online.direct.waiting = Čekání na přítele…
+online.direct.connecting_friend = Přítel se připojuje…
+online.direct.starting = Příprava šachovnice…
+online.direct.join_title = PŘIPOJIT SE K PARTII
+online.direct.join_lead = Zadejte, co vám přítel nadiktuje: jeho adresu, port a kód.
+online.direct.address = Adresa
+online.direct.address.hint = IPv4, IPv6 nebo název
+online.direct.code = Kód
+online.direct.join_button = Připojit se
+online.direct.connecting_to = Připojování k adrese {0}…
+online.direct.securing = Zabezpečování spojení s adresou {0}…
+direct.event = Přátelský zápas
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Přímý zápas, {0}
+direct.err.refused = Na této adrese a portu nikdo partii nehostuje.
+direct.err.timeout = Žádná odpověď: zkontrolujte adresu a port a také to, zda router přítele hru pustí dovnitř.
+direct.err.wrong_code = Kód není správný.
+direct.err.invalid_code = Kód má 12 znaků (XXXX-XXXX-XXXX).
+direct.err.incompatible = Přítel má jinou verzi Scacelithu.
+direct.err.port_in_use = Tento port už se na tomto počítači používá: zvolte jiný.
+direct.err.network = Síť nelze použít.
+direct.err.too_many_attempts = Příliš mnoho chybných kódů: hostování bylo ukončeno. Pro nový kód začněte hostovat znovu.
+direct.err.bad_address = Tato adresa není platná.
+direct.err.not_found = Tento název nebyl nalezen.
+direct.err.unreachable = Tato adresa je odsud nedosažitelná.
+direct.err.reset = Spojení bylo přerušeno.
+direct.err.closed = Spojení bylo ukončeno.
+direct.err.host_left = Přítel přestal hostovat.
+direct.err.other = Spojení selhalo ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Hráč 2
+hotseat.white_player = Bílý
+hotseat.black_player = Černý
+hotseat.name.help = Jméno zapsané na obou partiářích, v libovolném písmu.
+hotseat.swap = Prohodit barvy
+hotseat.left_hand = {0} hraje levou rukou: hodiny stojí po levé ruce.
+hotseat.rated = Partie na rating
+hotseat.rated.help = Každé jméno má na tomto počítači vlastní rating pro hru dvou hráčů. Váš rating proti Stockfishi se nikdy nemění.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Ratingy pro dva hráče: {0} {1} · {2} {3}
+hotseat.new_rating = (nový)
+hotseat.friendly_note = Přátelská partie: ratingy se nemění.
+hotseat.colours = {0} hraje bílými, {1} hraje černými.
+hotseat.colours_swap = Při každé odvetě se barvy prohodí.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, jste na tahu
+hotseat.flag = {0}: spadl praporek.
+hotseat.confirm.resign = {0}: chcete partii vzdát? Vyhraje ji {1}.
+hotseat.confirm.resign_draw = {0}: chcete partii vzdát? {1} už nemůže dát mat: partie skončí remízou.
+hotseat.draw.offer_noted = Vaše nabídka remízy půjde spolu s vaším tahem: {0} ji uvidí po stisknutí hodin.
+hotseat.draw.card_title = NABÍDKA REMÍZY
+hotseat.draw.offered = {0} nabízí remízu.
+hotseat.draw.card_hint = Dotknutím figury ji odmítnete.
+hotseat.draw.accept = Přijmout
+hotseat.draw.decline = Odmítnout
+hotseat.draw.accepted = {1} nabízí remízu a {0} ji přijímá.
+hotseat.draw.declined = {1} nabízí remízu a {0} ji odmítá.
+# Scoresheet header note
+hotseat.sheet.rated = Partie na rating
+hotseat.sheet.friendly = Přátelská partie
+# Game over card
+hotseat.gameover.wins = {0} vítězí za {1} tah.|{0} vítězí za {1} tahy.|{0} vítězí za {1} tahů.
+hotseat.gameover.wins_now = {0} vítězí.
+hotseat.gameover.friendly = {0} – {1} · přátelská partie
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Tato partie není na rating.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Trenér
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Syntetickou řeč pro režim Trenér generuje {0}
+# Coach page
+coach.title = TRENÉR
+coach.section.level = ÚROVEŇ
+coach.section.lesson = S TRENÉREM
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Pro hráče s ratingem {0}
+coach.completed = Dokončeno
+coach.recommended = Doporučeno
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Pravidla šachu
+coach.level.0.desc = Interaktivní lekce, jedno pravidlo po druhém.
+coach.level.0.detail = Trenér rozestavuje malé pozice a ukazuje, jak každá figura táhne a bere, pak rošádu, proměnu, šach a mat. Každý nápad si vyzkoušíte přímo na šachovnici.
+coach.level.1.name = První kroky
+coach.level.1.desc = Co je napadeno, co zůstalo bez krytí.
+coach.level.1.detail = Trenér hraje mírně a mluví jednoduše: které vaše figury jsou napadené, které zůstaly bez krytí a jak o ně nepřijít.
+coach.level.2.name = Začátečník
+coach.level.2.desc = Jednoduchá taktika, vývin figur, bezpečí krále.
+coach.level.2.detail = Trenér nazývá vidličky a vazby jejich jmény. Mluví o vývinu vašich figur a o tom, jak udržet krále v bezpečí.
+coach.level.3.name = Mírně pokročilý
+coach.level.3.desc = Plány, pěšcová struktura, jediné tahy.
+coach.level.3.detail = Trenér vysvětluje plány a pěšcové struktury a upozorní vás, když pozici drží jen jediný tah.
+coach.level.4.name = Klubový hráč
+coach.level.4.desc = Kandidátní tahy, hodnocení v pěšcích.
+coach.level.4.detail = Trenér zvažuje kandidátní tahy a uvádí hodnocení v pěšcích, jak by to dělal klubový trenér.
+coach.level.5.name = Silný klubový hráč
+coach.level.5.desc = Stručné varianty, poziční pojmy.
+coach.level.5.detail = Krátké poznámky, konkrétní varianty a slovník poziční hry.
+coach.level.6.name = Expert
+coach.level.6.desc = Strohé poznámky, hluboké varianty, číselné hodnocení.
+coach.level.6.detail = Málo slov, jako mezi silnými hráči: varianty na několik tahů dopředu a číselné hodnocení.
+coach.note.clock = Bez hodin: dejte si na čas, kolik potřebujete.
+coach.note.takeback = Po hrubé chybě trenér ukáže, co se pokazilo, a nabídne vrácení tahu.
+coach.note.lesson = Hrajete bílými; trenér na šachovnici rozestaví každé cvičení.
+coach.note.unrated = Partie s trenérem nejsou na rating.
+coach.note.fallible = Trenér není neomylný: občas může tah posoudit špatně.
+coach.colour = Vaše barva
+coach.colour.help = Barva, kterou hrajete proti trenérovi. Střídavě: jednu partii bílými, další černými. Lekce pravidel se vždy hraje bílými.
+coach.colour.alternate = Střídavě
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Trenérův hlas není nainstalován nebo je vypnutý (Možnosti > Zvuk): jeho slova se budou vypisovat na obrazovku.
+# At the table
+coach.speaker = TRENÉR
+coach.skip = Přeskočit
+coach.offer.title = VRÁTIT TAH?
+coach.offer.text = Trenér nabízí, že váš poslední tah vrátí, a vy tak můžete hledat lepší.
+coach.offer.hint = Backspace tah vrátí. Dotknutím figury hrajete dál.
+coach.offer.accept = Vrátit tah
+coach.offer.decline = Hrát dál
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Zbývající vrácení tahů: {0}
+coach.pause.take_back = Vrátit můj tah
+coach.pause.take_back.help = Vrátí váš poslední tah a také odpověď trenéra, pokud už ji zahrál.
+coach.confirm.resign = Chcete tuto partii vzdát? Vítězem bude vyhlášen trenér.
+coach.confirm.resign_draw = Chcete tuto partii vzdát? Trenér už nemůže dát mat: partie skončí remízou.
+coach.confirm.leave = Chcete se vrátit do hlavní nabídky? Tato partie s trenérem bude opuštěna.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Hrát znovu
+coach.gameover.unrated = Tato partie s trenérem není na rating.
+coach.lesson.done = VÝBORNĚ
+coach.lesson.done.line = Teď znáte pravidla šachu.
+coach.lesson.next = První partie
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Trénink
+coach.tab.challenges = Výzvy
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATY
+challenge.group.tactics = TAKTIKA
+challenge.group.defence = OBRANA
+challenge.group.endgames = KONCOVKY
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat 1. tahem
+challenge.mate1.desc = Jeden tah a je to mat.
+challenge.mate1.detail = Nejprve se podívejte na všechny šachy: po jednom z nich král nemá kam ustoupit, šach nelze zaclonit a šachující figuru nelze vzít.
+challenge.mate2.name = Mat 2. tahem
+challenge.mate2.desc = Tah, proti kterému není obrana, a pak mat.
+challenge.mate2.detail = První tah je často šach nebo oběť, která králi vezme jedno pole. Trenér se brání, jak nejlépe umí.
+challenge.mate3.name = Mat 3. tahem
+challenge.mate3.desc = Delší vynucené varianty.
+challenge.mate3.detail = Šachy, braní a hrozby do hloubky tří tahů. Než se dotknete figury, propočítejte v každém kroku nejlepší odpověď trenéra.
+challenge.backrank.name = Maty na základní řadě
+challenge.backrank.desc = Král uvězněný za vlastními pěšci.
+challenge.backrank.detail = Když se pěšci před králem po rošádě nepohnuli, může věž nebo dáma na poslední řadě dát mat. Nejprve obránce odstraňte nebo odlákejte.
+challenge.patterns.name = Matové obrazce
+challenge.patterns.desc = Dušený mat, Anastázin mat, arabský mat a další klasické maty.
+challenge.patterns.detail = Slavné matové sítě, které se objevují znovu a znovu. Naučte se poznávat rozestavení figur a závěrečný úder.
+challenge.hanging.name = Figury zadarmo
+challenge.hanging.desc = Najděte, co zůstalo bez krytí.
+challenge.hanging.detail = Figuru nebo pěšce, které nikdo nebrání, lze prostě vzít. Zkontrolujte, čím je kryta každá trenérova figura.
+challenge.fork.name = Vidličky
+challenge.fork.desc = Jedna figura napadá dvě najednou.
+challenge.fork.detail = Vidličku umí jezdci, pěšci, dámy, a dokonce i králové. Soupeř může zachránit jen jeden ze dvou cílů.
+challenge.pin.name = Vazby
+challenge.pin.desc = Figura, která nemůže táhnout, aniž by ztratila, co stojí za ní.
+challenge.pin.detail = Svažte figuru s jejím králem nebo s cennější figurou, pak ji napadněte ještě jednou, nebo využijte toho, že nemůže táhnout.
+challenge.skewer.name = Napíchnutí
+challenge.skewer.desc = Napadněte cennou figuru a získejte tu, která stojí za ní.
+challenge.skewer.detail = Opak vazby: cennější figura stojí vpředu, musí ustoupit a odkryje figuru za sebou.
+challenge.discovered.name = Odtažné útoky
+challenge.discovered.desc = Táhněte jednou figurou a uvolněte jinou.
+challenge.discovered.detail = Když figura odejde z linie, zaútočí figura za ní. Se šachem nebo s dvojitým šachem nemá soupeř čas odpovědět na obě hrozby.
+challenge.deflection.name = Odlákání a vlákání
+challenge.deflection.desc = Odlákejte obránce, nebo ho vlákejte na osudné pole.
+challenge.deflection.detail = Obránce, který má dva úkoly, nezvládne oba. Napadněte ho, něco mu nabídněte, nebo donuťte figuru vstoupit na pole, kde bude ztracena.
+challenge.intermezzo.name = Mezitahy
+challenge.intermezzo.desc = Neberte hned zpět: je tu něco silnějšího.
+challenge.intermezzo.detail = Šach nebo větší hrozba vložená před očekávaný tah změní všechno.
+challenge.trapped.name = Chycené figury
+challenge.trapped.desc = Figura, která už nemá žádné bezpečné pole.
+challenge.trapped.detail = Vezměte figuře poslední úniková pole a pak ji získejte.
+challenge.promotion.name = Proměna
+challenge.promotion.desc = Protlačte pěšce až na poslední řadu.
+challenge.promotion.detail = Daleko postoupení pěšci mají velkou cenu. Uvolněte cestu, odlákejte blokující figury a udělejte si novou dámu.
+challenge.quiet.name = Tiché tahy
+challenge.quiet.desc = Vítězný tah není ani šach, ani braní.
+challenge.quiet.detail = Někdy nejsilnější tah jen připraví hrozbu, kterou nelze odvrátit. Takový tah se hledá nejhůř.
+challenge.opening.name = Pasti v zahájení
+challenge.opening.desc = Potrestejte brzké chyby.
+challenge.opening.detail = Pozice z prvních tahů skutečných partií, kde lze jeden neopatrný tah okamžitě využít.
+challenge.escape.name = Najděte únik
+challenge.escape.desc = Váš král je v nebezpečí: zachrání ho jediný tah.
+challenge.escape.detail = Každý jiný tah prohrává. Prohlédněte si všechny šachy a hrozby proti vašemu králi a pak najděte jedinou cestu ven.
+challenge.defend.name = Obranné tahy
+challenge.defend.desc = Odvraťte hrozbu bez ztráty materiálu.
+challenge.defend.detail = Trenér něčím hrozí. Najděte přesný tah, který všechno udrží pohromadě.
+challenge.kq.name = Dáma a král proti králi
+challenge.kq.desc = Mat dámou.
+challenge.kq.detail = Zatlačte osamělého krále dámou na okraj, přiveďte blíž vlastního krále a dejte si pozor na pat. Trenér se brání svými nejlepšími tahy.
+challenge.kr.name = Věž a král proti králi
+challenge.kr.desc = Mat věží.
+challenge.kr.detail = Věž odřízne krále řadu po řadě; váš král zaujme opozici. Trenér se brání svými nejlepšími tahy.
+challenge.kp.name = Král a pěšec proti králi
+challenge.kp.desc = Získejte opozici a proměňte pěšce.
+challenge.kp.detail = Veďte králem, ne pěšcem. Zaujměte opozici a proměňte pěšce v dámu tak, aby ho trenér nemohl chytit.
+challenge.kp_hold.name = Zastavte pěšce
+challenge.kp_hold.desc = Osamělý král proti králi a pěšci: udržte remízu.
+challenge.kp_hold.detail = Postavte se před pěšce a držte opozici. Vydržte deset tahů.
+challenge.rook.name = Věžové koncovky
+challenge.rook.desc = Lucenův most a Philidorova obrana.
+challenge.rook.detail = Dvě pozice, které by měl znát každý hráč: jak vyhrát s pěšcem na sedmé řadě a jak se bránit s věží na třetí.
+challenge.endgame.name = Taktika v koncovce
+challenge.endgame.desc = Málo figur, ostré nápady.
+challenge.endgame.detail = Pěšcové závody, průlomy a věžové koncovky ze skutečných partií.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozice|{0} pozice|{0} pozic
+coach.challenge.done = Dokončeno
+coach.challenge.start = Začít
+coach.challenge.note.white = Hrajete bílými; trenér na šachovnici rozestaví každou pozici.
+coach.challenge.note.hint = Nevíte si rady? Stiskněte H pro nápovědu. Po několika pokusech ji trenér nabídne sám.
+coach.challenge.note.unsaved = Výzvy nejsou na rating a neukládají se; ty dokončené označuje fajfka.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = VÝZVA SPLNĚNA
+coach.challenge.complete.line = Všechny pozice jsou vyřešené.
+coach.challenge.next = Další výzva
+coach.challenge.again = Znovu
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = NÁPOVĚDA?
+coach.hint.text = Trenér vám nabízí nápovědu.
+coach.hint.hint = Klávesa H nápovědu zobrazí. Dotknutím figury hledáte dál.
+coach.hint.accept = Nápověda
+coach.hint.decline = Ne, děkuji
+coach.hint.key = Nápověda
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Hlas trenéra
+options.coach_voice.help = V režimu Trenér mluví trenér nahlas. Jeho hlasový model se stáhne, až bude poprvé potřeba (asi 399 MB). Vypnuto: trenérova slova se jen vypisují na obrazovku.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Hlasový model
+options.voice_update.help = Trenér stále mluví starou 8bitovou verzí svého hlasového modelu. Aktualizace stáhne oficiální verzi Supertonic 3 vydanou společností Supertone a nejprve smaže staré soubory.
+options.voice_update.button = Aktualizovat ({0} MB)
+options.voice_update.running = Stahování probíhá.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Kvalita hlasu
+options.voice_quality.help = Kolik zpřesňujících kroků provede syntéza trenérovy řeči u každé věty, od Nízká (4) po Maximální (9); výchozí je Střední (5). Vyšší úroveň dává o něco čistší hlas, ale výpočet trvá déle, takže trenér začne mluvit o něco později. Nastavit ji lze, jakmile je hlasový model nainstalován a Hlas trenéra je zapnutý.
+options.voice_quality.low = Nízká
+options.voice_quality.medium = Střední
+options.voice_quality.high = Vysoká
+options.voice_quality.very_high = Velmi vysoká
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maximální
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Hlas trenéra
+coach.download.text = Trenér mluví hlasem Supertonic 3, modelu syntézy řeči od společnosti Supertone. Model není součástí Scacelithu: hra ho teď může stáhnout z Hugging Face ({0} MB, jednorázově). Bez něj trenér svá slova vypisuje na obrazovku.
+coach.download.licence = Model je vydán pod licencí OpenRAIL-M, která zakazuje určitá použití hlasu, který vytváří, například vydávat ho za lidský hlas nebo napodobovat skutečnou osobu.
+coach.download.read_licence = Přečíst licenci
+coach.download.accept = Volbou Stáhnout přijímáte podmínky této licence.
+# {0} = a folder
+coach.download.folder = Uloženo do: {0}
+coach.download.not_now = Teď ne
+# {0} = the size in megabytes
+coach.download.download = Stáhnout ({0} MB)
+coach.download.licence_title = LICENCE OPENRAIL-M
+coach.download.back = Zpět
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Nový hlas trenéra
+coach.update.text = Trenérův hlas teď používá oficiální verzi Supertonic 3 vydanou společností Supertone místo 8bitové konverze, která byla dosud nainstalována. Hra ji teď může stáhnout z Hugging Face ({0} MB, jednorázově); staré soubory ({1} MB) se nejprve smažou. Pokud aktualizaci odmítnete, trenér si ponechá svůj současný hlas a aktualizace zůstane k dispozici v nabídce Možnosti > Zvuk.
+coach.update.download = Aktualizovat ({0} MB)
+coach.update.accept = Volbou Aktualizovat přijímáte podmínky této licence.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = HLAS TRENÉRA
+coach.download.removing = Odstraňování staré verze…
+coach.download.checking = Kontrola souborů…
+coach.download.downloading = Stahování…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Z Hugging Face
+coach.download.from_archive = Z Hugging Face (archivní kopie)
+coach.download.cancel = Zrušit
+coach.download.failed = Stahování se nezdařilo.
+coach.download.error.network = Servery jsou nedostupné. Zkontrolujte prosím připojení k internetu a zkuste to znovu.
+# {0} = a folder
+coach.download.error.disk = Soubory se nepodařilo zapsat do složky {0}. Zkontrolujte prosím volné místo a zkuste to znovu.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Servery poslaly neočekávanou odpověď ({0}). Zkuste to prosím později.
+coach.download.retry = Zkusit znovu
+coach.download.close = Zavřít
+# Notices
+coach.download.done = Hlas trenéra je nainstalován.
+coach.download.cancelled = Stahování zrušeno: příště bude pokračovat tam, kde skončilo.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Uložené partie
+options.save_games = Ukládat moje partie
+options.save_games.help = Po skončení se vaše partie proti Stockfishi, s trenérem, mezi dvěma hráči u tohoto počítače a vaše přímé zápasy uloží jako soubory PGN, které pak najdete v nabídce Uložené partie. Online partie uchovává server.
+library.title = ULOŽENÉ PARTIE
+library.section.games = PARTIE
+library.section.details = VYBRANÁ PARTIE
+library.section.tags = ZÁHLAVÍ PGN
+library.section.moves = TAHY
+library.count = {0} partie|{0} partie|{0} partií
+library.filter = Zobrazit
+library.filter.all = Všechny partie
+library.filter.play = Proti Stockfishi
+library.filter.coach = S trenérem
+library.filter.hotseat = Dva hráči
+library.filter.direct = Přímé zápasy
+library.filter.server = Online partie
+library.filter.imported = Importované
+library.mode.play = Proti Stockfishi
+library.mode.coach = S trenérem
+library.mode.hotseat = Dva hráči
+library.mode.direct = Přímý zápas
+library.mode.server = Online partie
+library.mode.imported = Importovaná
+library.coach_level = Úroveň {0}
+library.unknown_player = Neznámý
+library.unfinished = Nedohráno
+library.unreadable = Tuto partii nelze přečíst.
+library.moves = {0} tah|{0} tahy|{0} tahů
+library.opening_variation = {0}: {1}
+library.file = Soubor: {0}
+library.file_game = Soubor: {0}, partie {1} z {2}
+library.no_moves = Nebyl zahrán žádný tah.
+library.none_selected = Vyberte partii v seznamu.
+library.reading = Načítání uložených partií
+library.empty.title = Zatím žádné uložené partie
+library.empty.text = Vaše partie proti Stockfishi, s trenérem, mezi dvěma hráči u tohoto počítače a vaše přímé zápasy se tu zobrazí, jakmile skončí. Do této složky můžete také vložit soubory PGN: partie exportované z jiných programů nebo webů se zobrazí spolu s vašimi.
+library.empty.filter = Žádná partie tohoto druhu.
+library.error.folder = Složku uložených partií nelze přečíst
+library.error.game = Tuto partii nelze přečíst: {0}
+library.folder = Složka: {0}
+library.open_folder = Otevřít složku
+library.open_failed = Složku se nepodařilo otevřít.
+library.replay = Přehrát
+library.delete = Smazat
+library.delete.title = SMAZAT PARTII
+library.delete.text = Partie {0} bude z tohoto počítače smazána i se svým souborem. Tuto akci nelze vrátit zpět.
+library.delete.ok = Smazat
+library.delete.several = Tento soubor obsahuje {0} partii: smazat ho lze jen ve složce.|Tento soubor obsahuje {0} partie: smazat ho lze jen ve složce.|Tento soubor obsahuje {0} partií: smazat ho lze jen ve složce.
+library.deleted = Partie byla smazána.
+library.delete.failed = Partii se nepodařilo smazat.
+library.delete.changed = Soubor se změnil: seznam byl aktualizován.
+library.truncated = V této složce je příliš mnoho partií: zobrazuje se jen {0} nejnovějších.
+library.tag.Event = Turnaj
+library.tag.Site = Místo
+library.tag.Date = Datum
+library.tag.Time = Čas
+library.tag.Round = Kolo
+library.tag.White = Bílý
+library.tag.Black = Černý
+library.tag.Result = Výsledek
+library.tag.WhiteElo = Elo bílého
+library.tag.BlackElo = Elo černého
+library.tag.TimeControl = Tempo hry
+library.tag.Termination = Ukončení
+library.tag.Opening = Zahájení
+library.tag.Variation = Varianta
+library.tag.PlyCount = Půltahy
+library.tag.FEN = Výchozí pozice
+library.tag.ScacelithMode = Režim
+library.tag.CoachLevel = Úroveň trenéra
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Číslo partie
+library.tag.UTCDate = Datum (UTC)
+library.tag.UTCTime = Čas (UTC)
+library.tag.WhiteRatingDiff = Změna ratingu bílého
+library.tag.BlackRatingDiff = Změna ratingu černého
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analýza
+analysis.menu.title = ANALÝZA
+analysis.menu.analyse = Analyzovat
+analysis.menu.paste = Vložit PGN
+analysis.menu.online = Moje online partie
+analysis.menu.folder = Chcete-li partie analyzovat, vložte soubory PGN do této složky: {0}
+analysis.menu.empty.title = Zatím žádné uložené partie
+analysis.menu.empty.text = Vaše partie se tu zobrazí, jakmile skončí, stejně jako soubory PGN vložené do složky níže. Můžete také vložit partii zkopírovanou jako text PGN.
+analysis.menu.empty.no_folder = Chcete-li partii analyzovat, vložte ji zkopírovanou jako text PGN.
+analysis.menu.paste.empty = Schránka je prázdná: nejprve zkopírujte partii jako text PGN.
+analysis.menu.paste.none = Ve schránce nebyla nalezena žádná šachová partie.
+analysis.menu.paste.several = Schránka obsahuje několik partií: analyzuje se první z nich.
+analysis.menu.gameover = Analyzovat partii
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Tah {0} z {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Okamžitě
+replay.again = Přehrát znovu
+replay.gameover.unfinished = Partie končí po {0}. tahu bez výsledku.
+replay.tip.start = Začátek partie (Home)
+replay.tip.back = O tah zpět (J)
+replay.tip.pause = Pauza (K)
+replay.tip.resume = Pokračovat (K)
+replay.tip.forward = O tah vpřed (L)
+replay.tip.end = Konec partie (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTÁŘ
+analysis.hud.accuracy = PŘESNOST
+analysis.hud.reviewing = Stockfish prochází partii… {0}
+analysis.hud.no_engine = Žádný šachový program: tahy se zobrazují bez analýzy.
+analysis.hud.no_moves = Tato partie nemá žádné tahy.
+analysis.hud.tip.play = Přehrát tahy (K)
+analysis.hud.tip.comments_off = Skrýt komentáře ke klíčovým okamžikům (N)
+analysis.hud.tip.comments_on = Zobrazit komentáře ke klíčovým okamžikům (N)
+analysis.hud.tip.voice_off = Ztlumit hlas komentátora (M)
+analysis.hud.tip.voice_on = Poslouchat komentáře nahlas (M)
+analysis.hud.tip.voice_missing = Hlas nelze přehrát: jeho soubory nejsou nainstalované, nebo je vypnutá volba Možnosti > Zvuk > Hlas trenéra. Komentáře se jen vypisují na obrazovku.
+analysis.hud.tip.arrows_off = Skrýt šipky lepších tahů (B)
+analysis.hud.tip.arrows_on = Zobrazit šipky lepších tahů (B)
+analysis.hud.controls.play = Přehrát / pauza
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Zobrazit / skrýt komentáře
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Hlas komentátora zap. / vyp.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Zobrazit / skrýt šipky
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Uložit jako GIF
+gif.making = Vytváření GIFu: server kreslí partii…
+gif.saved = GIF byl uložen:
+gif.saved_as = GIF uložen: {0}
+gif.sign_in_first = Chcete-li vytvářet GIFy, přihlaste se k online serveru: kreslí je server.
+gif.busy_other = Vytváří se jiný GIF. Počkejte prosím, až bude hotový.
+gif.err.rate_limited_for = Za krátkou dobu vzniklo mnoho vašich GIFů. Další můžete vytvořit za {0}.
+gif.err.rate_limited = Za krátkou dobu vzniklo mnoho vašich GIFů. Zkuste to prosím později.
+gif.err.server_busy_for = Server je zaneprázdněn kreslením jiných GIFů. Zkuste to prosím znovu za {0}.
+gif.err.server_busy = Server je zaneprázdněn kreslením jiných GIFů. Zkuste to prosím znovu za chvíli.
+gif.err.signed_out = Vaše relace skončila. Chcete-li vytvořit GIF, přihlaste se prosím znovu.
+gif.err.game_too_long = Tato partie je na GIF příliš dlouhá.
+gif.err.pgn_too_large = Tato partie je na GIF příliš dlouhá.
+gif.err.invalid_pgn = Server tuto partii nedokázal přečíst.
+gif.err.render_failed = Server tento GIF nedokázal vytvořit. Zkuste to prosím znovu.
+gif.err.gif_disabled = Tento server GIFy nevytváří.
+gif.err.write_failed = GIF se nepodařilo uložit do tohoto počítače.
+gif.err.not_found = Tato partie už na serveru není.
+gif.wait.seconds = {0} sekundu|{0} sekundy|{0} sekund
+gif.wait.minutes = {0} minutu|{0} minuty|{0} minut
+gif.wait.both = {0} a {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 se nepodařilo spustit. Aktualizujte prosím ovladač grafické karty.
+error.opengl_macos = OpenGL 4.6 se na tomto Macu nepodařilo spustit. Scacelith vyžaduje Mac s čipem Apple Silicon (M1 nebo novější) a macOS 26 nebo novější a ve virtuálním počítači nefunguje.
+error.renderer = Vykreslovací modul se nepodařilo spustit.
+error.scene = Scénu se nepodařilo načíst.
+error.log_file = Podrobnosti najdete v souboru protokolu: {0}

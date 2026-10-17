@@ -1,0 +1,1290 @@
+# Coach speech (Estonian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Estonian needs.
+# Register: the coach says "sina" to the player ("sa", "sinu", imperatives in the singular); the game
+# menus stay formal ("te"). Estonian has no grammatical gender: nothing agrees with the sex of the coach
+# or of the player, and a pronoun standing for a piece is the same for every piece. See the glossary
+# (glossary/et.md of the translation brief) for the chess terms.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: ettur, ratsu, oda, vanker, lipp, kuningas (no gender). The possessives "sinu" / "minu" do not
+# inflect, so the case lives on the noun only; the colours "valge" / "must" (Analysis mode) agree in
+# case with the noun, except in the terminative, essive, abessive and comitative, where an attribute
+# stays in the genitive ("valge ratsuga", not "valgega ratsuga").
+#
+# Every form below is defined for all six pieces and all four owners (your, my, white, black). Three
+# series of the 14 cases:
+#   <case>       with the possessive: sinu / minu ratsu (your, my), valge / must ratsu (white, black)
+#   own_<case>   with the reflexive "oma": Estonian says "oma", not "sinu" / "minu", whenever the owner
+#                is the subject of the clause, also the implied subject of an imperative or of an
+#                infinitive: "Kaitse oma kuningat!", "Ma toon oma vankri mängu.", "Valge kaotab oma
+#                lipu." Use "sinu" / "minu" only when someone else is the subject: "Minu oda ründab
+#                sinu vankrit."
+#   bare_<case>  the noun alone, no possessive: for a statement about the kind of piece, or where the
+#                owner is plain ("Ratsu käib L-tähe kujuliselt.", "Käi ratsuga.")
+# Objects: a total object is in the genitive in a statement ("Ma löön {your:gen}." = "sinu vankri"),
+# in the nominative in an imperative, a passive or after "tuleb / peab + da" ("Löö {my}!" = "minu
+# vanker"); a partial object is in the partitive: unfinished actions, verbs of attacking, defending,
+# threatening, moving, looking ("ründab {your:part}"), and every object of a negative verb.
+# Pronouns: no form is needed: "see" (it) is the same for every piece; write it directly (see, selle,
+# seda, sellesse, selles, sellest, sellele, sellel, sellelt, selleks, selleni, sellena, selleta,
+# sellega), or "ta / tema" where the piece acts ("Vanker on tugev. Ta liigub sirgjooneliselt.").
+# Never attach an ending to a placeholder: "{your}ga" is wrong, "{your:com}" is right.
+#
+# Form         your (my, white, black)      example
+#   nom        sinu ratsu (valge ratsu)     "{your} on ohus." / imperative object "Löö {my}!"
+#   gen        sinu vankri (valge vankri)   "Ma löön {your:gen}.", "{my:gen} ees", "{your:gen} kõrval"
+#   part       sinu vankrit (valget vankrit) "Ma ründan {your:part}.", "Ära jäta {my:part} tähelepanuta."
+#   ill        sinu lipusse (valgesse lipusse) "See ähvardus puutub {my:ill}." (into; rare)
+#   ine        sinu lipus (valges lipus)    "Kogu jõud on {your:ine}." (in)
+#   ela        sinu odast (valgest odast)   "Räägime {my:ela}.", "{your:ela} sõltub kõik." (from, about)
+#   all        sinu kuningale (valgele kuningale) "Ma annan {your:all} tuld.", "Ma lähenen {your:all}." (to, onto)
+#   ade        sinu ratsul (valgel ratsul)  "{your:ade} pole kaitset." (on; X has)
+#   abl        sinu vankrilt (valgelt vankrilt) "Ma võtan {your:abl} kaitse ära." (off, from)
+#   tra        sinu lipuks (valgeks lipuks) "See ettur muundub peagi {my:tra}." (into, as a result)
+#   ter        sinu kuningani (valge kuningani) "Minu vanker jõuab {your:ter}." (as far as)
+#   ess        sinu lipuna (valge lipuna)   "Ettur jätkab mängu {your:ess}." (as)
+#   abe        sinu liputa (valge liputa)   "{your:abe} oleks sul raske." (without)
+#   com        sinu ratsuga (valge ratsuga) "Minu oda vahetub {your:com}." (with)
+#   own_nom    oma vanker                   "Too {your:own_nom} mängu!" (imperative total object)
+#   own_gen    oma vankri                   "Sa jätsid {your:own_gen} kaitseta.", "Ma toon {my:own_gen} mängu."
+#   own_part   oma kuningat                 "Kaitse {your:own_part}!", "Ma liigutan {my:own_part}."
+#   own_ill    oma lipusse                  "Ära kiindu {your:own_ill}."
+#   own_ine    oma vankris                  "Kas oled {your:own_ine} kindel?"
+#   own_ela    oma odast                    "Sa loobusid {your:own_ela}."
+#   own_all    oma kuningale                "Mõtle {your:own_all}!"
+#   own_ade    oma ratsul                   "Lase {your:own_ade} töötada."
+#   own_abl    oma ratsult                  "Sa võtsid {your:own_abl} kaitse ära."
+#   own_tra    oma lipuks                   "Sa võid selle etturi teha {your:own_tra}."
+#   own_ter    oma etturini                 "Vii kuningas {your:own_ter}."
+#   own_ess    oma lipuna                   "Sa saad etturi tagasi {your:own_ess}."
+#   own_abe    oma liputa                   "Sa jäid {your:own_abe}."
+#   own_com    oma ratsuga                  "Löö {your:own_com}!", "Ma lõin {my:own_com}."
+#   bare_nom   ratsu                        "{your:bare_nom} käib L-tähe kujuliselt."
+#   bare_gen   ratsu                        "See on tüüpiline {your:bare_gen} käik."
+#   bare_part  ratsut                       "Liiguta {your:bare_part}."
+#   bare_ill   kuningasse                   "Kõik puutub {your:bare_ill}."
+#   bare_ine   ratsus                       "{your:bare_ine} on peidus suur jõud."
+#   bare_ela   ratsust                      "Alusta {your:bare_ela}."
+#   bare_all   ratsule                      "Anna {your:bare_all} vaba väli."
+#   bare_ade   ratsul                       "{your:bare_ade} on kaheksa võimalikku käiku."
+#   bare_abl   vankrilt                     "Mine {my:bare_abl} eemale."
+#   bare_tra   lipuks                       "Ettur muundub {your:bare_tra}."
+#   bare_ter   kuningani                    "Sa jõuad {my:bare_ter}."
+#   bare_ess   lipuna                       "Ettur jätkab {your:bare_ess}."
+#   bare_abe   liputa                       "{your:bare_abe} on raske kaitsta."
+#   bare_com   ratsuga                      "Käi {your:bare_com}."
+# The same forms exist for {t1} {t2} {your2} {my2}, and for {piece} {t1} {t2} of the Analysis mode
+# (owner white / black: "valge ratsu", "musta vankrit", "valgele lipule"; own_ = "oma", bare_ = noun).
+piece.pawn.nom = ettur
+piece.pawn.gen = etturi
+piece.pawn.part = etturit
+piece.pawn.ill = etturisse
+piece.pawn.ine = etturis
+piece.pawn.ela = etturist
+piece.pawn.all = etturile
+piece.pawn.ade = etturil
+piece.pawn.abl = etturilt
+piece.pawn.tra = etturiks
+piece.pawn.ter = etturini
+piece.pawn.ess = etturina
+piece.pawn.abe = etturita
+piece.pawn.com = etturiga
+piece.pawn.own_nom = ettur
+piece.pawn.own_gen = etturi
+piece.pawn.own_part = etturit
+piece.pawn.own_ill = etturisse
+piece.pawn.own_ine = etturis
+piece.pawn.own_ela = etturist
+piece.pawn.own_all = etturile
+piece.pawn.own_ade = etturil
+piece.pawn.own_abl = etturilt
+piece.pawn.own_tra = etturiks
+piece.pawn.own_ter = etturini
+piece.pawn.own_ess = etturina
+piece.pawn.own_abe = etturita
+piece.pawn.own_com = etturiga
+piece.pawn.bare_nom = ettur
+piece.pawn.bare_gen = etturi
+piece.pawn.bare_part = etturit
+piece.pawn.bare_ill = etturisse
+piece.pawn.bare_ine = etturis
+piece.pawn.bare_ela = etturist
+piece.pawn.bare_all = etturile
+piece.pawn.bare_ade = etturil
+piece.pawn.bare_abl = etturilt
+piece.pawn.bare_tra = etturiks
+piece.pawn.bare_ter = etturini
+piece.pawn.bare_ess = etturina
+piece.pawn.bare_abe = etturita
+piece.pawn.bare_com = etturiga
+piece.knight.nom = ratsu
+piece.knight.gen = ratsu
+piece.knight.part = ratsut
+piece.knight.ill = ratsusse
+piece.knight.ine = ratsus
+piece.knight.ela = ratsust
+piece.knight.all = ratsule
+piece.knight.ade = ratsul
+piece.knight.abl = ratsult
+piece.knight.tra = ratsuks
+piece.knight.ter = ratsuni
+piece.knight.ess = ratsuna
+piece.knight.abe = ratsuta
+piece.knight.com = ratsuga
+piece.knight.own_nom = ratsu
+piece.knight.own_gen = ratsu
+piece.knight.own_part = ratsut
+piece.knight.own_ill = ratsusse
+piece.knight.own_ine = ratsus
+piece.knight.own_ela = ratsust
+piece.knight.own_all = ratsule
+piece.knight.own_ade = ratsul
+piece.knight.own_abl = ratsult
+piece.knight.own_tra = ratsuks
+piece.knight.own_ter = ratsuni
+piece.knight.own_ess = ratsuna
+piece.knight.own_abe = ratsuta
+piece.knight.own_com = ratsuga
+piece.knight.bare_nom = ratsu
+piece.knight.bare_gen = ratsu
+piece.knight.bare_part = ratsut
+piece.knight.bare_ill = ratsusse
+piece.knight.bare_ine = ratsus
+piece.knight.bare_ela = ratsust
+piece.knight.bare_all = ratsule
+piece.knight.bare_ade = ratsul
+piece.knight.bare_abl = ratsult
+piece.knight.bare_tra = ratsuks
+piece.knight.bare_ter = ratsuni
+piece.knight.bare_ess = ratsuna
+piece.knight.bare_abe = ratsuta
+piece.knight.bare_com = ratsuga
+piece.bishop.nom = oda
+piece.bishop.gen = oda
+piece.bishop.part = oda
+piece.bishop.ill = odasse
+piece.bishop.ine = odas
+piece.bishop.ela = odast
+piece.bishop.all = odale
+piece.bishop.ade = odal
+piece.bishop.abl = odalt
+piece.bishop.tra = odaks
+piece.bishop.ter = odani
+piece.bishop.ess = odana
+piece.bishop.abe = odata
+piece.bishop.com = odaga
+piece.bishop.own_nom = oda
+piece.bishop.own_gen = oda
+piece.bishop.own_part = oda
+piece.bishop.own_ill = odasse
+piece.bishop.own_ine = odas
+piece.bishop.own_ela = odast
+piece.bishop.own_all = odale
+piece.bishop.own_ade = odal
+piece.bishop.own_abl = odalt
+piece.bishop.own_tra = odaks
+piece.bishop.own_ter = odani
+piece.bishop.own_ess = odana
+piece.bishop.own_abe = odata
+piece.bishop.own_com = odaga
+piece.bishop.bare_nom = oda
+piece.bishop.bare_gen = oda
+piece.bishop.bare_part = oda
+piece.bishop.bare_ill = odasse
+piece.bishop.bare_ine = odas
+piece.bishop.bare_ela = odast
+piece.bishop.bare_all = odale
+piece.bishop.bare_ade = odal
+piece.bishop.bare_abl = odalt
+piece.bishop.bare_tra = odaks
+piece.bishop.bare_ter = odani
+piece.bishop.bare_ess = odana
+piece.bishop.bare_abe = odata
+piece.bishop.bare_com = odaga
+piece.rook.nom = vanker
+piece.rook.gen = vankri
+piece.rook.part = vankrit
+piece.rook.ill = vankrisse
+piece.rook.ine = vankris
+piece.rook.ela = vankrist
+piece.rook.all = vankrile
+piece.rook.ade = vankril
+piece.rook.abl = vankrilt
+piece.rook.tra = vankriks
+piece.rook.ter = vankrini
+piece.rook.ess = vankrina
+piece.rook.abe = vankrita
+piece.rook.com = vankriga
+piece.rook.own_nom = vanker
+piece.rook.own_gen = vankri
+piece.rook.own_part = vankrit
+piece.rook.own_ill = vankrisse
+piece.rook.own_ine = vankris
+piece.rook.own_ela = vankrist
+piece.rook.own_all = vankrile
+piece.rook.own_ade = vankril
+piece.rook.own_abl = vankrilt
+piece.rook.own_tra = vankriks
+piece.rook.own_ter = vankrini
+piece.rook.own_ess = vankrina
+piece.rook.own_abe = vankrita
+piece.rook.own_com = vankriga
+piece.rook.bare_nom = vanker
+piece.rook.bare_gen = vankri
+piece.rook.bare_part = vankrit
+piece.rook.bare_ill = vankrisse
+piece.rook.bare_ine = vankris
+piece.rook.bare_ela = vankrist
+piece.rook.bare_all = vankrile
+piece.rook.bare_ade = vankril
+piece.rook.bare_abl = vankrilt
+piece.rook.bare_tra = vankriks
+piece.rook.bare_ter = vankrini
+piece.rook.bare_ess = vankrina
+piece.rook.bare_abe = vankrita
+piece.rook.bare_com = vankriga
+piece.queen.nom = lipp
+piece.queen.gen = lipu
+piece.queen.part = lippu
+piece.queen.ill = lipusse
+piece.queen.ine = lipus
+piece.queen.ela = lipust
+piece.queen.all = lipule
+piece.queen.ade = lipul
+piece.queen.abl = lipult
+piece.queen.tra = lipuks
+piece.queen.ter = lipuni
+piece.queen.ess = lipuna
+piece.queen.abe = liputa
+piece.queen.com = lipuga
+piece.queen.own_nom = lipp
+piece.queen.own_gen = lipu
+piece.queen.own_part = lippu
+piece.queen.own_ill = lipusse
+piece.queen.own_ine = lipus
+piece.queen.own_ela = lipust
+piece.queen.own_all = lipule
+piece.queen.own_ade = lipul
+piece.queen.own_abl = lipult
+piece.queen.own_tra = lipuks
+piece.queen.own_ter = lipuni
+piece.queen.own_ess = lipuna
+piece.queen.own_abe = liputa
+piece.queen.own_com = lipuga
+piece.queen.bare_nom = lipp
+piece.queen.bare_gen = lipu
+piece.queen.bare_part = lippu
+piece.queen.bare_ill = lipusse
+piece.queen.bare_ine = lipus
+piece.queen.bare_ela = lipust
+piece.queen.bare_all = lipule
+piece.queen.bare_ade = lipul
+piece.queen.bare_abl = lipult
+piece.queen.bare_tra = lipuks
+piece.queen.bare_ter = lipuni
+piece.queen.bare_ess = lipuna
+piece.queen.bare_abe = liputa
+piece.queen.bare_com = lipuga
+piece.king.nom = kuningas
+piece.king.gen = kuninga
+piece.king.part = kuningat
+piece.king.ill = kuningasse
+piece.king.ine = kuningas
+piece.king.ela = kuningast
+piece.king.all = kuningale
+piece.king.ade = kuningal
+piece.king.abl = kuningalt
+piece.king.tra = kuningaks
+piece.king.ter = kuningani
+piece.king.ess = kuningana
+piece.king.abe = kuningata
+piece.king.com = kuningaga
+piece.king.own_nom = kuningas
+piece.king.own_gen = kuninga
+piece.king.own_part = kuningat
+piece.king.own_ill = kuningasse
+piece.king.own_ine = kuningas
+piece.king.own_ela = kuningast
+piece.king.own_all = kuningale
+piece.king.own_ade = kuningal
+piece.king.own_abl = kuningalt
+piece.king.own_tra = kuningaks
+piece.king.own_ter = kuningani
+piece.king.own_ess = kuningana
+piece.king.own_abe = kuningata
+piece.king.own_com = kuningaga
+piece.king.bare_nom = kuningas
+piece.king.bare_gen = kuninga
+piece.king.bare_part = kuningat
+piece.king.bare_ill = kuningasse
+piece.king.bare_ine = kuningas
+piece.king.bare_ela = kuningast
+piece.king.bare_all = kuningale
+piece.king.bare_ade = kuningal
+piece.king.bare_abl = kuningalt
+piece.king.bare_tra = kuningaks
+piece.king.bare_ter = kuningani
+piece.king.bare_ess = kuningana
+piece.king.bare_abe = kuningata
+piece.king.bare_com = kuningaga
+# The possessives (they do not inflect): "sinu" (your), "minu" (my), and the reflexive "oma".
+owner.your.nom = sinu {piece}
+owner.your.gen = sinu {piece}
+owner.your.part = sinu {piece}
+owner.your.ill = sinu {piece}
+owner.your.ine = sinu {piece}
+owner.your.ela = sinu {piece}
+owner.your.all = sinu {piece}
+owner.your.ade = sinu {piece}
+owner.your.abl = sinu {piece}
+owner.your.tra = sinu {piece}
+owner.your.ter = sinu {piece}
+owner.your.ess = sinu {piece}
+owner.your.abe = sinu {piece}
+owner.your.com = sinu {piece}
+owner.my.nom = minu {piece}
+owner.my.gen = minu {piece}
+owner.my.part = minu {piece}
+owner.my.ill = minu {piece}
+owner.my.ine = minu {piece}
+owner.my.ela = minu {piece}
+owner.my.all = minu {piece}
+owner.my.ade = minu {piece}
+owner.my.abl = minu {piece}
+owner.my.tra = minu {piece}
+owner.my.ter = minu {piece}
+owner.my.ess = minu {piece}
+owner.my.abe = minu {piece}
+owner.my.com = minu {piece}
+owner.your.own_nom = oma {piece}
+owner.your.own_gen = oma {piece}
+owner.your.own_part = oma {piece}
+owner.your.own_ill = oma {piece}
+owner.your.own_ine = oma {piece}
+owner.your.own_ela = oma {piece}
+owner.your.own_all = oma {piece}
+owner.your.own_ade = oma {piece}
+owner.your.own_abl = oma {piece}
+owner.your.own_tra = oma {piece}
+owner.your.own_ter = oma {piece}
+owner.your.own_ess = oma {piece}
+owner.your.own_abe = oma {piece}
+owner.your.own_com = oma {piece}
+owner.my.own_nom = oma {piece}
+owner.my.own_gen = oma {piece}
+owner.my.own_part = oma {piece}
+owner.my.own_ill = oma {piece}
+owner.my.own_ine = oma {piece}
+owner.my.own_ela = oma {piece}
+owner.my.own_all = oma {piece}
+owner.my.own_ade = oma {piece}
+owner.my.own_abl = oma {piece}
+owner.my.own_tra = oma {piece}
+owner.my.own_ter = oma {piece}
+owner.my.own_ess = oma {piece}
+owner.my.own_abe = oma {piece}
+owner.my.own_com = oma {piece}
+owner.your.bare_nom = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_part = {piece}
+owner.your.bare_ill = {piece}
+owner.your.bare_ine = {piece}
+owner.your.bare_ela = {piece}
+owner.your.bare_all = {piece}
+owner.your.bare_ade = {piece}
+owner.your.bare_abl = {piece}
+owner.your.bare_tra = {piece}
+owner.your.bare_ter = {piece}
+owner.your.bare_ess = {piece}
+owner.your.bare_abe = {piece}
+owner.your.bare_com = {piece}
+owner.my.bare_nom = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_part = {piece}
+owner.my.bare_ill = {piece}
+owner.my.bare_ine = {piece}
+owner.my.bare_ela = {piece}
+owner.my.bare_all = {piece}
+owner.my.bare_ade = {piece}
+owner.my.bare_abl = {piece}
+owner.my.bare_tra = {piece}
+owner.my.bare_ter = {piece}
+owner.my.bare_ess = {piece}
+owner.my.bare_abe = {piece}
+owner.my.bare_com = {piece}
+# The Analysis mode names a piece by its side, nobody being "sina" or "mina" there: the colour
+# adjective in the case of the noun ("valge ratsu", "valget ratsut", "mustale vankrile", "musta
+# vankriga"). own_ ("oma") is for a side that is the subject of its clause ("Valge kaotab oma lipu.").
+owner.white.nom = valge {piece}
+owner.white.gen = valge {piece}
+owner.white.part = valget {piece}
+owner.white.ill = valgesse {piece}
+owner.white.ine = valges {piece}
+owner.white.ela = valgest {piece}
+owner.white.all = valgele {piece}
+owner.white.ade = valgel {piece}
+owner.white.abl = valgelt {piece}
+owner.white.tra = valgeks {piece}
+owner.white.ter = valge {piece}
+owner.white.ess = valge {piece}
+owner.white.abe = valge {piece}
+owner.white.com = valge {piece}
+owner.black.nom = must {piece}
+owner.black.gen = musta {piece}
+owner.black.part = musta {piece}
+owner.black.ill = mustasse {piece}
+owner.black.ine = mustas {piece}
+owner.black.ela = mustast {piece}
+owner.black.all = mustale {piece}
+owner.black.ade = mustal {piece}
+owner.black.abl = mustalt {piece}
+owner.black.tra = mustaks {piece}
+owner.black.ter = musta {piece}
+owner.black.ess = musta {piece}
+owner.black.abe = musta {piece}
+owner.black.com = musta {piece}
+owner.white.own_nom = oma {piece}
+owner.white.own_gen = oma {piece}
+owner.white.own_part = oma {piece}
+owner.white.own_ill = oma {piece}
+owner.white.own_ine = oma {piece}
+owner.white.own_ela = oma {piece}
+owner.white.own_all = oma {piece}
+owner.white.own_ade = oma {piece}
+owner.white.own_abl = oma {piece}
+owner.white.own_tra = oma {piece}
+owner.white.own_ter = oma {piece}
+owner.white.own_ess = oma {piece}
+owner.white.own_abe = oma {piece}
+owner.white.own_com = oma {piece}
+owner.black.own_nom = oma {piece}
+owner.black.own_gen = oma {piece}
+owner.black.own_part = oma {piece}
+owner.black.own_ill = oma {piece}
+owner.black.own_ine = oma {piece}
+owner.black.own_ela = oma {piece}
+owner.black.own_all = oma {piece}
+owner.black.own_ade = oma {piece}
+owner.black.own_abl = oma {piece}
+owner.black.own_tra = oma {piece}
+owner.black.own_ter = oma {piece}
+owner.black.own_ess = oma {piece}
+owner.black.own_abe = oma {piece}
+owner.black.own_com = oma {piece}
+owner.white.bare_nom = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_part = {piece}
+owner.white.bare_ill = {piece}
+owner.white.bare_ine = {piece}
+owner.white.bare_ela = {piece}
+owner.white.bare_all = {piece}
+owner.white.bare_ade = {piece}
+owner.white.bare_abl = {piece}
+owner.white.bare_tra = {piece}
+owner.white.bare_ter = {piece}
+owner.white.bare_ess = {piece}
+owner.white.bare_abe = {piece}
+owner.white.bare_com = {piece}
+owner.black.bare_nom = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_part = {piece}
+owner.black.bare_ill = {piece}
+owner.black.bare_ine = {piece}
+owner.black.bare_ela = {piece}
+owner.black.bare_all = {piece}
+owner.black.bare_ade = {piece}
+owner.black.bare_abl = {piece}
+owner.black.bare_tra = {piece}
+owner.black.bare_ter = {piece}
+owner.black.bare_ess = {piece}
+owner.black.bare_abe = {piece}
+owner.black.bare_com = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice says the Estonian letter names, as players read squares aloud: e4 = "ee neli", c5 = "tsee
+# viis", f3 = "eff kolm", h7 = "haa seitse". A square never takes a case ending: the lines put it next
+# to a noun that carries the case ("väljale {sq}", "välja {sq} pärast").
+square.spoken = {file} {rank}
+file.a.spoken = aa
+file.b.spoken = bee
+file.c.spoken = tsee
+file.d.spoken = dee
+file.e.spoken = ee
+file.f.spoken = eff
+file.g.spoken = gee
+file.h.spoken = haa
+rank.1.spoken = üks
+rank.2.spoken = kaks
+rank.3.spoken = kolm
+rank.4.spoken = neli
+rank.5.spoken = viis
+rank.6.spoken = kuus
+rank.7.spoken = seitse
+rank.8.spoken = kaheksa
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Estonian scoresheet letters: K(uningas) L(ipp) V(anker) O(da) R(atsu): "Rf3", "Vad1", "Kxe2".
+move.letters = K L V O R
+# Spoken as Estonian players read notation: "ratsu eff kolm", "ratsu lööb ee viis", "ratsu bee dee
+# seitse", "ee-ettur lööb dee viis", "ettur lööb tagasi", "lühike vangerdus", "lipp gee neli, tuli".
+# {piece} is always the nominative here, so the promotion names the new piece after a colon
+# ("muundub lipuks" would need the translative): "ee kaheksa, muundumine: lipp".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} lööb {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} lööb {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file}-ettur lööb {to}
+move.recapture.spoken = {piece} lööb tagasi
+move.castle_short.spoken = lühike vangerdus
+move.castle_long.spoken = pikk vangerdus
+move.promotion.spoken = {move}, muundumine: {piece}
+move.check.spoken = {move}, tuli
+move.mate.spoken = {move}, matt
+# A line that says the mate itself uses "{best:nomate}" (or {line:nomate}, {reply:nomate}): the voice
+# then says the mating move without "matt".
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Estonian says "möödaminnes löömine" for en passant, so the French words need no respelling here.
+# The voice reads foreign names letter by letter, the Estonian way: the names below are respelled as
+# Estonian players say them (see docs/PRONUNCIATION.md, Estonian).
+respell.prix = prii
+respell.giuoco = džuoko
+respell.milesi = mailsi
+respell.birdi = bördi
+respell.breyer = braier
+respell.breyeri = braieri
+respell.parhami = paarami
+respell.sämisch = sämiš
+respell.sämischi = sämiši
+respell.nimzo = nimtso
+respell.nimzowitsch = nimtsovitš
+respell.nimzowitschi = nimtsovitši
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words, written apart as Estonian writes them: 21-99 compose as "{tens} {units}"
+# ("kakskümmend kolm"), 200-900 as "{n}sada" ("kakssada", "viissada"), 101-999 as "{hundreds} {rest}"
+# ("sada kakskümmend", "kolmsada viis").
+number.0.spoken = null
+number.1.spoken = üks
+number.2.spoken = kaks
+number.3.spoken = kolm
+number.4.spoken = neli
+number.5.spoken = viis
+number.6.spoken = kuus
+number.7.spoken = seitse
+number.8.spoken = kaheksa
+number.9.spoken = üheksa
+number.10.spoken = kümme
+number.11.spoken = üksteist
+number.12.spoken = kaksteist
+number.13.spoken = kolmteist
+number.14.spoken = neliteist
+number.15.spoken = viisteist
+number.16.spoken = kuusteist
+number.17.spoken = seitseteist
+number.18.spoken = kaheksateist
+number.19.spoken = üheksateist
+number.20.spoken = kakskümmend
+number.30.spoken = kolmkümmend
+number.40.spoken = nelikümmend
+number.50.spoken = viiskümmend
+number.60.spoken = kuuskümmend
+number.70.spoken = seitsekümmend
+number.80.spoken = kaheksakümmend
+number.90.spoken = üheksakümmend
+number.100.spoken = sada
+number.tens.spoken = {tens} {units}
+number.hundreds.spoken = {n}sada
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = miinus {n}
+# A decimal number: Estonian writes a decimal comma ("1,3") and says "üks koma kolm".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} koma {frac}
+# Numbers in the genitive ("{n:gen}", and in the count forms below): "kolme käiguga", "kahekümne ühe
+# käigu". Every part of a compound numeral inflects, but the program composes only its last part, so
+# 0-99 and the round hundreds are listed; 101-999 say their hundreds in the nominative ("sada kahe").
+number.0.gen.spoken = nulli
+number.1.gen.spoken = ühe
+number.2.gen.spoken = kahe
+number.3.gen.spoken = kolme
+number.4.gen.spoken = nelja
+number.5.gen.spoken = viie
+number.6.gen.spoken = kuue
+number.7.gen.spoken = seitsme
+number.8.gen.spoken = kaheksa
+number.9.gen.spoken = üheksa
+number.10.gen.spoken = kümne
+number.11.gen.spoken = üheteistkümne
+number.12.gen.spoken = kaheteistkümne
+number.13.gen.spoken = kolmeteistkümne
+number.14.gen.spoken = neljateistkümne
+number.15.gen.spoken = viieteistkümne
+number.16.gen.spoken = kuueteistkümne
+number.17.gen.spoken = seitsmeteistkümne
+number.18.gen.spoken = kaheksateistkümne
+number.19.gen.spoken = üheksateistkümne
+number.20.gen.spoken = kahekümne
+number.21.gen.spoken = kahekümne ühe
+number.22.gen.spoken = kahekümne kahe
+number.23.gen.spoken = kahekümne kolme
+number.24.gen.spoken = kahekümne nelja
+number.25.gen.spoken = kahekümne viie
+number.26.gen.spoken = kahekümne kuue
+number.27.gen.spoken = kahekümne seitsme
+number.28.gen.spoken = kahekümne kaheksa
+number.29.gen.spoken = kahekümne üheksa
+number.30.gen.spoken = kolmekümne
+number.31.gen.spoken = kolmekümne ühe
+number.32.gen.spoken = kolmekümne kahe
+number.33.gen.spoken = kolmekümne kolme
+number.34.gen.spoken = kolmekümne nelja
+number.35.gen.spoken = kolmekümne viie
+number.36.gen.spoken = kolmekümne kuue
+number.37.gen.spoken = kolmekümne seitsme
+number.38.gen.spoken = kolmekümne kaheksa
+number.39.gen.spoken = kolmekümne üheksa
+number.40.gen.spoken = neljakümne
+number.41.gen.spoken = neljakümne ühe
+number.42.gen.spoken = neljakümne kahe
+number.43.gen.spoken = neljakümne kolme
+number.44.gen.spoken = neljakümne nelja
+number.45.gen.spoken = neljakümne viie
+number.46.gen.spoken = neljakümne kuue
+number.47.gen.spoken = neljakümne seitsme
+number.48.gen.spoken = neljakümne kaheksa
+number.49.gen.spoken = neljakümne üheksa
+number.50.gen.spoken = viiekümne
+number.51.gen.spoken = viiekümne ühe
+number.52.gen.spoken = viiekümne kahe
+number.53.gen.spoken = viiekümne kolme
+number.54.gen.spoken = viiekümne nelja
+number.55.gen.spoken = viiekümne viie
+number.56.gen.spoken = viiekümne kuue
+number.57.gen.spoken = viiekümne seitsme
+number.58.gen.spoken = viiekümne kaheksa
+number.59.gen.spoken = viiekümne üheksa
+number.60.gen.spoken = kuuekümne
+number.61.gen.spoken = kuuekümne ühe
+number.62.gen.spoken = kuuekümne kahe
+number.63.gen.spoken = kuuekümne kolme
+number.64.gen.spoken = kuuekümne nelja
+number.65.gen.spoken = kuuekümne viie
+number.66.gen.spoken = kuuekümne kuue
+number.67.gen.spoken = kuuekümne seitsme
+number.68.gen.spoken = kuuekümne kaheksa
+number.69.gen.spoken = kuuekümne üheksa
+number.70.gen.spoken = seitsmekümne
+number.71.gen.spoken = seitsmekümne ühe
+number.72.gen.spoken = seitsmekümne kahe
+number.73.gen.spoken = seitsmekümne kolme
+number.74.gen.spoken = seitsmekümne nelja
+number.75.gen.spoken = seitsmekümne viie
+number.76.gen.spoken = seitsmekümne kuue
+number.77.gen.spoken = seitsmekümne seitsme
+number.78.gen.spoken = seitsmekümne kaheksa
+number.79.gen.spoken = seitsmekümne üheksa
+number.80.gen.spoken = kaheksakümne
+number.81.gen.spoken = kaheksakümne ühe
+number.82.gen.spoken = kaheksakümne kahe
+number.83.gen.spoken = kaheksakümne kolme
+number.84.gen.spoken = kaheksakümne nelja
+number.85.gen.spoken = kaheksakümne viie
+number.86.gen.spoken = kaheksakümne kuue
+number.87.gen.spoken = kaheksakümne seitsme
+number.88.gen.spoken = kaheksakümne kaheksa
+number.89.gen.spoken = kaheksakümne üheksa
+number.90.gen.spoken = üheksakümne
+number.91.gen.spoken = üheksakümne ühe
+number.92.gen.spoken = üheksakümne kahe
+number.93.gen.spoken = üheksakümne kolme
+number.94.gen.spoken = üheksakümne nelja
+number.95.gen.spoken = üheksakümne viie
+number.96.gen.spoken = üheksakümne kuue
+number.97.gen.spoken = üheksakümne seitsme
+number.98.gen.spoken = üheksakümne kaheksa
+number.99.gen.spoken = üheksakümne üheksa
+number.100.gen.spoken = saja
+number.200.gen.spoken = kahesaja
+number.300.gen.spoken = kolmesaja
+number.400.gen.spoken = neljasaja
+number.500.gen.spoken = viiesaja
+number.600.gen.spoken = kuuesaja
+number.700.gen.spoken = seitsmesaja
+number.800.gen.spoken = kaheksasaja
+number.900.gen.spoken = üheksasaja
+# Ordinal numbers for move numbers ("{n:ord}" = "21." / "kahekümne esimene", see count.ord below):
+# nominative "ord", genitive "ord_gen", partitive "ord_part", adessive "ord_ade" ("21. käigul" =
+# "kahekümne esimesel käigul"). A compound ordinal keeps its first parts in the genitive ("kahekümne
+# esimesel"): 1-99 and the round hundreds are listed; 101-999 say their hundreds in the nominative.
+number.1.ord.spoken = esimene
+number.2.ord.spoken = teine
+number.3.ord.spoken = kolmas
+number.4.ord.spoken = neljas
+number.5.ord.spoken = viies
+number.6.ord.spoken = kuues
+number.7.ord.spoken = seitsmes
+number.8.ord.spoken = kaheksas
+number.9.ord.spoken = üheksas
+number.10.ord.spoken = kümnes
+number.11.ord.spoken = üheteistkümnes
+number.12.ord.spoken = kaheteistkümnes
+number.13.ord.spoken = kolmeteistkümnes
+number.14.ord.spoken = neljateistkümnes
+number.15.ord.spoken = viieteistkümnes
+number.16.ord.spoken = kuueteistkümnes
+number.17.ord.spoken = seitsmeteistkümnes
+number.18.ord.spoken = kaheksateistkümnes
+number.19.ord.spoken = üheksateistkümnes
+number.20.ord.spoken = kahekümnes
+number.21.ord.spoken = kahekümne esimene
+number.22.ord.spoken = kahekümne teine
+number.23.ord.spoken = kahekümne kolmas
+number.24.ord.spoken = kahekümne neljas
+number.25.ord.spoken = kahekümne viies
+number.26.ord.spoken = kahekümne kuues
+number.27.ord.spoken = kahekümne seitsmes
+number.28.ord.spoken = kahekümne kaheksas
+number.29.ord.spoken = kahekümne üheksas
+number.30.ord.spoken = kolmekümnes
+number.31.ord.spoken = kolmekümne esimene
+number.32.ord.spoken = kolmekümne teine
+number.33.ord.spoken = kolmekümne kolmas
+number.34.ord.spoken = kolmekümne neljas
+number.35.ord.spoken = kolmekümne viies
+number.36.ord.spoken = kolmekümne kuues
+number.37.ord.spoken = kolmekümne seitsmes
+number.38.ord.spoken = kolmekümne kaheksas
+number.39.ord.spoken = kolmekümne üheksas
+number.40.ord.spoken = neljakümnes
+number.41.ord.spoken = neljakümne esimene
+number.42.ord.spoken = neljakümne teine
+number.43.ord.spoken = neljakümne kolmas
+number.44.ord.spoken = neljakümne neljas
+number.45.ord.spoken = neljakümne viies
+number.46.ord.spoken = neljakümne kuues
+number.47.ord.spoken = neljakümne seitsmes
+number.48.ord.spoken = neljakümne kaheksas
+number.49.ord.spoken = neljakümne üheksas
+number.50.ord.spoken = viiekümnes
+number.51.ord.spoken = viiekümne esimene
+number.52.ord.spoken = viiekümne teine
+number.53.ord.spoken = viiekümne kolmas
+number.54.ord.spoken = viiekümne neljas
+number.55.ord.spoken = viiekümne viies
+number.56.ord.spoken = viiekümne kuues
+number.57.ord.spoken = viiekümne seitsmes
+number.58.ord.spoken = viiekümne kaheksas
+number.59.ord.spoken = viiekümne üheksas
+number.60.ord.spoken = kuuekümnes
+number.61.ord.spoken = kuuekümne esimene
+number.62.ord.spoken = kuuekümne teine
+number.63.ord.spoken = kuuekümne kolmas
+number.64.ord.spoken = kuuekümne neljas
+number.65.ord.spoken = kuuekümne viies
+number.66.ord.spoken = kuuekümne kuues
+number.67.ord.spoken = kuuekümne seitsmes
+number.68.ord.spoken = kuuekümne kaheksas
+number.69.ord.spoken = kuuekümne üheksas
+number.70.ord.spoken = seitsmekümnes
+number.71.ord.spoken = seitsmekümne esimene
+number.72.ord.spoken = seitsmekümne teine
+number.73.ord.spoken = seitsmekümne kolmas
+number.74.ord.spoken = seitsmekümne neljas
+number.75.ord.spoken = seitsmekümne viies
+number.76.ord.spoken = seitsmekümne kuues
+number.77.ord.spoken = seitsmekümne seitsmes
+number.78.ord.spoken = seitsmekümne kaheksas
+number.79.ord.spoken = seitsmekümne üheksas
+number.80.ord.spoken = kaheksakümnes
+number.81.ord.spoken = kaheksakümne esimene
+number.82.ord.spoken = kaheksakümne teine
+number.83.ord.spoken = kaheksakümne kolmas
+number.84.ord.spoken = kaheksakümne neljas
+number.85.ord.spoken = kaheksakümne viies
+number.86.ord.spoken = kaheksakümne kuues
+number.87.ord.spoken = kaheksakümne seitsmes
+number.88.ord.spoken = kaheksakümne kaheksas
+number.89.ord.spoken = kaheksakümne üheksas
+number.90.ord.spoken = üheksakümnes
+number.91.ord.spoken = üheksakümne esimene
+number.92.ord.spoken = üheksakümne teine
+number.93.ord.spoken = üheksakümne kolmas
+number.94.ord.spoken = üheksakümne neljas
+number.95.ord.spoken = üheksakümne viies
+number.96.ord.spoken = üheksakümne kuues
+number.97.ord.spoken = üheksakümne seitsmes
+number.98.ord.spoken = üheksakümne kaheksas
+number.99.ord.spoken = üheksakümne üheksas
+number.100.ord.spoken = sajas
+number.200.ord.spoken = kahesajas
+number.300.ord.spoken = kolmesajas
+number.400.ord.spoken = neljasajas
+number.500.ord.spoken = viiesajas
+number.600.ord.spoken = kuuesajas
+number.700.ord.spoken = seitsmesajas
+number.800.ord.spoken = kaheksasajas
+number.900.ord.spoken = üheksasajas
+number.1.ord_gen.spoken = esimese
+number.2.ord_gen.spoken = teise
+number.3.ord_gen.spoken = kolmanda
+number.4.ord_gen.spoken = neljanda
+number.5.ord_gen.spoken = viienda
+number.6.ord_gen.spoken = kuuenda
+number.7.ord_gen.spoken = seitsmenda
+number.8.ord_gen.spoken = kaheksanda
+number.9.ord_gen.spoken = üheksanda
+number.10.ord_gen.spoken = kümnenda
+number.11.ord_gen.spoken = üheteistkümnenda
+number.12.ord_gen.spoken = kaheteistkümnenda
+number.13.ord_gen.spoken = kolmeteistkümnenda
+number.14.ord_gen.spoken = neljateistkümnenda
+number.15.ord_gen.spoken = viieteistkümnenda
+number.16.ord_gen.spoken = kuueteistkümnenda
+number.17.ord_gen.spoken = seitsmeteistkümnenda
+number.18.ord_gen.spoken = kaheksateistkümnenda
+number.19.ord_gen.spoken = üheksateistkümnenda
+number.20.ord_gen.spoken = kahekümnenda
+number.21.ord_gen.spoken = kahekümne esimese
+number.22.ord_gen.spoken = kahekümne teise
+number.23.ord_gen.spoken = kahekümne kolmanda
+number.24.ord_gen.spoken = kahekümne neljanda
+number.25.ord_gen.spoken = kahekümne viienda
+number.26.ord_gen.spoken = kahekümne kuuenda
+number.27.ord_gen.spoken = kahekümne seitsmenda
+number.28.ord_gen.spoken = kahekümne kaheksanda
+number.29.ord_gen.spoken = kahekümne üheksanda
+number.30.ord_gen.spoken = kolmekümnenda
+number.31.ord_gen.spoken = kolmekümne esimese
+number.32.ord_gen.spoken = kolmekümne teise
+number.33.ord_gen.spoken = kolmekümne kolmanda
+number.34.ord_gen.spoken = kolmekümne neljanda
+number.35.ord_gen.spoken = kolmekümne viienda
+number.36.ord_gen.spoken = kolmekümne kuuenda
+number.37.ord_gen.spoken = kolmekümne seitsmenda
+number.38.ord_gen.spoken = kolmekümne kaheksanda
+number.39.ord_gen.spoken = kolmekümne üheksanda
+number.40.ord_gen.spoken = neljakümnenda
+number.41.ord_gen.spoken = neljakümne esimese
+number.42.ord_gen.spoken = neljakümne teise
+number.43.ord_gen.spoken = neljakümne kolmanda
+number.44.ord_gen.spoken = neljakümne neljanda
+number.45.ord_gen.spoken = neljakümne viienda
+number.46.ord_gen.spoken = neljakümne kuuenda
+number.47.ord_gen.spoken = neljakümne seitsmenda
+number.48.ord_gen.spoken = neljakümne kaheksanda
+number.49.ord_gen.spoken = neljakümne üheksanda
+number.50.ord_gen.spoken = viiekümnenda
+number.51.ord_gen.spoken = viiekümne esimese
+number.52.ord_gen.spoken = viiekümne teise
+number.53.ord_gen.spoken = viiekümne kolmanda
+number.54.ord_gen.spoken = viiekümne neljanda
+number.55.ord_gen.spoken = viiekümne viienda
+number.56.ord_gen.spoken = viiekümne kuuenda
+number.57.ord_gen.spoken = viiekümne seitsmenda
+number.58.ord_gen.spoken = viiekümne kaheksanda
+number.59.ord_gen.spoken = viiekümne üheksanda
+number.60.ord_gen.spoken = kuuekümnenda
+number.61.ord_gen.spoken = kuuekümne esimese
+number.62.ord_gen.spoken = kuuekümne teise
+number.63.ord_gen.spoken = kuuekümne kolmanda
+number.64.ord_gen.spoken = kuuekümne neljanda
+number.65.ord_gen.spoken = kuuekümne viienda
+number.66.ord_gen.spoken = kuuekümne kuuenda
+number.67.ord_gen.spoken = kuuekümne seitsmenda
+number.68.ord_gen.spoken = kuuekümne kaheksanda
+number.69.ord_gen.spoken = kuuekümne üheksanda
+number.70.ord_gen.spoken = seitsmekümnenda
+number.71.ord_gen.spoken = seitsmekümne esimese
+number.72.ord_gen.spoken = seitsmekümne teise
+number.73.ord_gen.spoken = seitsmekümne kolmanda
+number.74.ord_gen.spoken = seitsmekümne neljanda
+number.75.ord_gen.spoken = seitsmekümne viienda
+number.76.ord_gen.spoken = seitsmekümne kuuenda
+number.77.ord_gen.spoken = seitsmekümne seitsmenda
+number.78.ord_gen.spoken = seitsmekümne kaheksanda
+number.79.ord_gen.spoken = seitsmekümne üheksanda
+number.80.ord_gen.spoken = kaheksakümnenda
+number.81.ord_gen.spoken = kaheksakümne esimese
+number.82.ord_gen.spoken = kaheksakümne teise
+number.83.ord_gen.spoken = kaheksakümne kolmanda
+number.84.ord_gen.spoken = kaheksakümne neljanda
+number.85.ord_gen.spoken = kaheksakümne viienda
+number.86.ord_gen.spoken = kaheksakümne kuuenda
+number.87.ord_gen.spoken = kaheksakümne seitsmenda
+number.88.ord_gen.spoken = kaheksakümne kaheksanda
+number.89.ord_gen.spoken = kaheksakümne üheksanda
+number.90.ord_gen.spoken = üheksakümnenda
+number.91.ord_gen.spoken = üheksakümne esimese
+number.92.ord_gen.spoken = üheksakümne teise
+number.93.ord_gen.spoken = üheksakümne kolmanda
+number.94.ord_gen.spoken = üheksakümne neljanda
+number.95.ord_gen.spoken = üheksakümne viienda
+number.96.ord_gen.spoken = üheksakümne kuuenda
+number.97.ord_gen.spoken = üheksakümne seitsmenda
+number.98.ord_gen.spoken = üheksakümne kaheksanda
+number.99.ord_gen.spoken = üheksakümne üheksanda
+number.100.ord_gen.spoken = sajanda
+number.200.ord_gen.spoken = kahesajanda
+number.300.ord_gen.spoken = kolmesajanda
+number.400.ord_gen.spoken = neljasajanda
+number.500.ord_gen.spoken = viiesajanda
+number.600.ord_gen.spoken = kuuesajanda
+number.700.ord_gen.spoken = seitsmesajanda
+number.800.ord_gen.spoken = kaheksasajanda
+number.900.ord_gen.spoken = üheksasajanda
+number.1.ord_part.spoken = esimest
+number.2.ord_part.spoken = teist
+number.3.ord_part.spoken = kolmandat
+number.4.ord_part.spoken = neljandat
+number.5.ord_part.spoken = viiendat
+number.6.ord_part.spoken = kuuendat
+number.7.ord_part.spoken = seitsmendat
+number.8.ord_part.spoken = kaheksandat
+number.9.ord_part.spoken = üheksandat
+number.10.ord_part.spoken = kümnendat
+number.11.ord_part.spoken = üheteistkümnendat
+number.12.ord_part.spoken = kaheteistkümnendat
+number.13.ord_part.spoken = kolmeteistkümnendat
+number.14.ord_part.spoken = neljateistkümnendat
+number.15.ord_part.spoken = viieteistkümnendat
+number.16.ord_part.spoken = kuueteistkümnendat
+number.17.ord_part.spoken = seitsmeteistkümnendat
+number.18.ord_part.spoken = kaheksateistkümnendat
+number.19.ord_part.spoken = üheksateistkümnendat
+number.20.ord_part.spoken = kahekümnendat
+number.21.ord_part.spoken = kahekümne esimest
+number.22.ord_part.spoken = kahekümne teist
+number.23.ord_part.spoken = kahekümne kolmandat
+number.24.ord_part.spoken = kahekümne neljandat
+number.25.ord_part.spoken = kahekümne viiendat
+number.26.ord_part.spoken = kahekümne kuuendat
+number.27.ord_part.spoken = kahekümne seitsmendat
+number.28.ord_part.spoken = kahekümne kaheksandat
+number.29.ord_part.spoken = kahekümne üheksandat
+number.30.ord_part.spoken = kolmekümnendat
+number.31.ord_part.spoken = kolmekümne esimest
+number.32.ord_part.spoken = kolmekümne teist
+number.33.ord_part.spoken = kolmekümne kolmandat
+number.34.ord_part.spoken = kolmekümne neljandat
+number.35.ord_part.spoken = kolmekümne viiendat
+number.36.ord_part.spoken = kolmekümne kuuendat
+number.37.ord_part.spoken = kolmekümne seitsmendat
+number.38.ord_part.spoken = kolmekümne kaheksandat
+number.39.ord_part.spoken = kolmekümne üheksandat
+number.40.ord_part.spoken = neljakümnendat
+number.41.ord_part.spoken = neljakümne esimest
+number.42.ord_part.spoken = neljakümne teist
+number.43.ord_part.spoken = neljakümne kolmandat
+number.44.ord_part.spoken = neljakümne neljandat
+number.45.ord_part.spoken = neljakümne viiendat
+number.46.ord_part.spoken = neljakümne kuuendat
+number.47.ord_part.spoken = neljakümne seitsmendat
+number.48.ord_part.spoken = neljakümne kaheksandat
+number.49.ord_part.spoken = neljakümne üheksandat
+number.50.ord_part.spoken = viiekümnendat
+number.51.ord_part.spoken = viiekümne esimest
+number.52.ord_part.spoken = viiekümne teist
+number.53.ord_part.spoken = viiekümne kolmandat
+number.54.ord_part.spoken = viiekümne neljandat
+number.55.ord_part.spoken = viiekümne viiendat
+number.56.ord_part.spoken = viiekümne kuuendat
+number.57.ord_part.spoken = viiekümne seitsmendat
+number.58.ord_part.spoken = viiekümne kaheksandat
+number.59.ord_part.spoken = viiekümne üheksandat
+number.60.ord_part.spoken = kuuekümnendat
+number.61.ord_part.spoken = kuuekümne esimest
+number.62.ord_part.spoken = kuuekümne teist
+number.63.ord_part.spoken = kuuekümne kolmandat
+number.64.ord_part.spoken = kuuekümne neljandat
+number.65.ord_part.spoken = kuuekümne viiendat
+number.66.ord_part.spoken = kuuekümne kuuendat
+number.67.ord_part.spoken = kuuekümne seitsmendat
+number.68.ord_part.spoken = kuuekümne kaheksandat
+number.69.ord_part.spoken = kuuekümne üheksandat
+number.70.ord_part.spoken = seitsmekümnendat
+number.71.ord_part.spoken = seitsmekümne esimest
+number.72.ord_part.spoken = seitsmekümne teist
+number.73.ord_part.spoken = seitsmekümne kolmandat
+number.74.ord_part.spoken = seitsmekümne neljandat
+number.75.ord_part.spoken = seitsmekümne viiendat
+number.76.ord_part.spoken = seitsmekümne kuuendat
+number.77.ord_part.spoken = seitsmekümne seitsmendat
+number.78.ord_part.spoken = seitsmekümne kaheksandat
+number.79.ord_part.spoken = seitsmekümne üheksandat
+number.80.ord_part.spoken = kaheksakümnendat
+number.81.ord_part.spoken = kaheksakümne esimest
+number.82.ord_part.spoken = kaheksakümne teist
+number.83.ord_part.spoken = kaheksakümne kolmandat
+number.84.ord_part.spoken = kaheksakümne neljandat
+number.85.ord_part.spoken = kaheksakümne viiendat
+number.86.ord_part.spoken = kaheksakümne kuuendat
+number.87.ord_part.spoken = kaheksakümne seitsmendat
+number.88.ord_part.spoken = kaheksakümne kaheksandat
+number.89.ord_part.spoken = kaheksakümne üheksandat
+number.90.ord_part.spoken = üheksakümnendat
+number.91.ord_part.spoken = üheksakümne esimest
+number.92.ord_part.spoken = üheksakümne teist
+number.93.ord_part.spoken = üheksakümne kolmandat
+number.94.ord_part.spoken = üheksakümne neljandat
+number.95.ord_part.spoken = üheksakümne viiendat
+number.96.ord_part.spoken = üheksakümne kuuendat
+number.97.ord_part.spoken = üheksakümne seitsmendat
+number.98.ord_part.spoken = üheksakümne kaheksandat
+number.99.ord_part.spoken = üheksakümne üheksandat
+number.100.ord_part.spoken = sajandat
+number.200.ord_part.spoken = kahesajandat
+number.300.ord_part.spoken = kolmesajandat
+number.400.ord_part.spoken = neljasajandat
+number.500.ord_part.spoken = viiesajandat
+number.600.ord_part.spoken = kuuesajandat
+number.700.ord_part.spoken = seitsmesajandat
+number.800.ord_part.spoken = kaheksasajandat
+number.900.ord_part.spoken = üheksasajandat
+number.1.ord_ade.spoken = esimesel
+number.2.ord_ade.spoken = teisel
+number.3.ord_ade.spoken = kolmandal
+number.4.ord_ade.spoken = neljandal
+number.5.ord_ade.spoken = viiendal
+number.6.ord_ade.spoken = kuuendal
+number.7.ord_ade.spoken = seitsmendal
+number.8.ord_ade.spoken = kaheksandal
+number.9.ord_ade.spoken = üheksandal
+number.10.ord_ade.spoken = kümnendal
+number.11.ord_ade.spoken = üheteistkümnendal
+number.12.ord_ade.spoken = kaheteistkümnendal
+number.13.ord_ade.spoken = kolmeteistkümnendal
+number.14.ord_ade.spoken = neljateistkümnendal
+number.15.ord_ade.spoken = viieteistkümnendal
+number.16.ord_ade.spoken = kuueteistkümnendal
+number.17.ord_ade.spoken = seitsmeteistkümnendal
+number.18.ord_ade.spoken = kaheksateistkümnendal
+number.19.ord_ade.spoken = üheksateistkümnendal
+number.20.ord_ade.spoken = kahekümnendal
+number.21.ord_ade.spoken = kahekümne esimesel
+number.22.ord_ade.spoken = kahekümne teisel
+number.23.ord_ade.spoken = kahekümne kolmandal
+number.24.ord_ade.spoken = kahekümne neljandal
+number.25.ord_ade.spoken = kahekümne viiendal
+number.26.ord_ade.spoken = kahekümne kuuendal
+number.27.ord_ade.spoken = kahekümne seitsmendal
+number.28.ord_ade.spoken = kahekümne kaheksandal
+number.29.ord_ade.spoken = kahekümne üheksandal
+number.30.ord_ade.spoken = kolmekümnendal
+number.31.ord_ade.spoken = kolmekümne esimesel
+number.32.ord_ade.spoken = kolmekümne teisel
+number.33.ord_ade.spoken = kolmekümne kolmandal
+number.34.ord_ade.spoken = kolmekümne neljandal
+number.35.ord_ade.spoken = kolmekümne viiendal
+number.36.ord_ade.spoken = kolmekümne kuuendal
+number.37.ord_ade.spoken = kolmekümne seitsmendal
+number.38.ord_ade.spoken = kolmekümne kaheksandal
+number.39.ord_ade.spoken = kolmekümne üheksandal
+number.40.ord_ade.spoken = neljakümnendal
+number.41.ord_ade.spoken = neljakümne esimesel
+number.42.ord_ade.spoken = neljakümne teisel
+number.43.ord_ade.spoken = neljakümne kolmandal
+number.44.ord_ade.spoken = neljakümne neljandal
+number.45.ord_ade.spoken = neljakümne viiendal
+number.46.ord_ade.spoken = neljakümne kuuendal
+number.47.ord_ade.spoken = neljakümne seitsmendal
+number.48.ord_ade.spoken = neljakümne kaheksandal
+number.49.ord_ade.spoken = neljakümne üheksandal
+number.50.ord_ade.spoken = viiekümnendal
+number.51.ord_ade.spoken = viiekümne esimesel
+number.52.ord_ade.spoken = viiekümne teisel
+number.53.ord_ade.spoken = viiekümne kolmandal
+number.54.ord_ade.spoken = viiekümne neljandal
+number.55.ord_ade.spoken = viiekümne viiendal
+number.56.ord_ade.spoken = viiekümne kuuendal
+number.57.ord_ade.spoken = viiekümne seitsmendal
+number.58.ord_ade.spoken = viiekümne kaheksandal
+number.59.ord_ade.spoken = viiekümne üheksandal
+number.60.ord_ade.spoken = kuuekümnendal
+number.61.ord_ade.spoken = kuuekümne esimesel
+number.62.ord_ade.spoken = kuuekümne teisel
+number.63.ord_ade.spoken = kuuekümne kolmandal
+number.64.ord_ade.spoken = kuuekümne neljandal
+number.65.ord_ade.spoken = kuuekümne viiendal
+number.66.ord_ade.spoken = kuuekümne kuuendal
+number.67.ord_ade.spoken = kuuekümne seitsmendal
+number.68.ord_ade.spoken = kuuekümne kaheksandal
+number.69.ord_ade.spoken = kuuekümne üheksandal
+number.70.ord_ade.spoken = seitsmekümnendal
+number.71.ord_ade.spoken = seitsmekümne esimesel
+number.72.ord_ade.spoken = seitsmekümne teisel
+number.73.ord_ade.spoken = seitsmekümne kolmandal
+number.74.ord_ade.spoken = seitsmekümne neljandal
+number.75.ord_ade.spoken = seitsmekümne viiendal
+number.76.ord_ade.spoken = seitsmekümne kuuendal
+number.77.ord_ade.spoken = seitsmekümne seitsmendal
+number.78.ord_ade.spoken = seitsmekümne kaheksandal
+number.79.ord_ade.spoken = seitsmekümne üheksandal
+number.80.ord_ade.spoken = kaheksakümnendal
+number.81.ord_ade.spoken = kaheksakümne esimesel
+number.82.ord_ade.spoken = kaheksakümne teisel
+number.83.ord_ade.spoken = kaheksakümne kolmandal
+number.84.ord_ade.spoken = kaheksakümne neljandal
+number.85.ord_ade.spoken = kaheksakümne viiendal
+number.86.ord_ade.spoken = kaheksakümne kuuendal
+number.87.ord_ade.spoken = kaheksakümne seitsmendal
+number.88.ord_ade.spoken = kaheksakümne kaheksandal
+number.89.ord_ade.spoken = kaheksakümne üheksandal
+number.90.ord_ade.spoken = üheksakümnendal
+number.91.ord_ade.spoken = üheksakümne esimesel
+number.92.ord_ade.spoken = üheksakümne teisel
+number.93.ord_ade.spoken = üheksakümne kolmandal
+number.94.ord_ade.spoken = üheksakümne neljandal
+number.95.ord_ade.spoken = üheksakümne viiendal
+number.96.ord_ade.spoken = üheksakümne kuuendal
+number.97.ord_ade.spoken = üheksakümne seitsmendal
+number.98.ord_ade.spoken = üheksakümne kaheksandal
+number.99.ord_ade.spoken = üheksakümne üheksandal
+number.100.ord_ade.spoken = sajandal
+number.200.ord_ade.spoken = kahesajandal
+number.300.ord_ade.spoken = kolmesajandal
+number.400.ord_ade.spoken = neljasajandal
+number.500.ord_ade.spoken = viiesajandal
+number.600.ord_ade.spoken = kuuesajandal
+number.700.ord_ade.spoken = seitsmesajandal
+number.800.ord_ade.spoken = kaheksasajandal
+number.900.ord_ade.spoken = üheksasajandal
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Estonian plural rule (assets/i18n): one (1) | other (0, 2-20, 21, ...). After any number but "üks"
+# the noun is in the partitive singular ("kolm käiku", "kakskümmend üks viga"); in the other cases
+# the number and the noun take the same case ("kolme käiguga"). Written: digits; spoken: words.
+# Every noun has four forms:
+#   {n:move}       nominative: subject, predicate, quantity, imperative object: "1 käik", "3 käiku"
+#                  ("Kuus seisu.", "Pea vastu {n:move}.")
+#   {n:move_obj}   the total object of a statement: "1 käigu" (= "ühe käigu"), "3 käiku":
+#                  "Valge tegi {n:mistake_obj}." = "ühe vea" / "kaks viga"
+#   {n:move_gen}   the genitive (both forms): "3 käigu" = "kolme käigu", before a postposition
+#                  ("{n:move_gen} jooksul", "{n:move_gen} pärast") and as the first member of a list
+#                  whose last member carries the ending ("{n:mistake_gen} ja {m:blunder_com}")
+#   {n:move_com}   the comitative: "3 käiguga" = "kolme käiguga": "matt {m:move_com}"
+# Other cases (inessive "kolmes partiis", elative "kümnest seisust"...) are not composed: say them
+# with a genitive and a postposition ("{n:game_gen} jooksul", "{n:position_gen} hulgast").
+count.move = {n} käik|{n} käiku
+count.move_obj = {n:gen} käigu|{n} käiku
+count.move_gen = {n:gen} käigu|{n:gen} käigu
+count.move_com = {n:gen} käiguga|{n:gen} käiguga
+count.point = {n} punkt|{n} punkti
+count.point_obj = {n:gen} punkti|{n} punkti
+count.point_gen = {n:gen} punkti|{n:gen} punkti
+count.point_com = {n:gen} punktiga|{n:gen} punktiga
+count.pawn = {n} ettur|{n} etturit
+count.pawn_obj = {n:gen} etturi|{n} etturit
+count.pawn_gen = {n:gen} etturi|{n:gen} etturi
+count.pawn_com = {n:gen} etturiga|{n:gen} etturiga
+count.piece = {n} malend|{n} malendit
+count.piece_obj = {n:gen} malendi|{n} malendit
+count.piece_gen = {n:gen} malendi|{n:gen} malendi
+count.piece_com = {n:gen} malendiga|{n:gen} malendiga
+count.mistake = {n} viga|{n} viga
+count.mistake_obj = {n:gen} vea|{n} viga
+count.mistake_gen = {n:gen} vea|{n:gen} vea
+count.mistake_com = {n:gen} veaga|{n:gen} veaga
+count.blunder = {n} jäme viga|{n} jämedat viga
+count.blunder_obj = {n:gen} jämeda vea|{n} jämedat viga
+count.blunder_gen = {n:gen} jämeda vea|{n:gen} jämeda vea
+count.blunder_com = {n:gen} jämeda veaga|{n:gen} jämeda veaga
+count.inaccuracy = {n} ebatäpsus|{n} ebatäpsust
+count.inaccuracy_obj = {n:gen} ebatäpsuse|{n} ebatäpsust
+count.inaccuracy_gen = {n:gen} ebatäpsuse|{n:gen} ebatäpsuse
+count.inaccuracy_com = {n:gen} ebatäpsusega|{n:gen} ebatäpsusega
+count.game = {n} partii|{n} partiid
+count.game_obj = {n:gen} partii|{n} partiid
+count.game_gen = {n:gen} partii|{n:gen} partii
+count.game_com = {n:gen} partiiga|{n:gen} partiiga
+# "kord" (a time, "üks kord", "kolm korda"); "ühe korra" also means "once". No comitative: "kolme
+# korraga" means "three at a time".
+count.time = {n} kord|{n} korda
+count.time_obj = {n:gen} korra|{n} korda
+count.time_gen = {n:gen} korra|{n:gen} korra
+count.square = {n} väli|{n} välja
+count.square_obj = {n:gen} välja|{n} välja
+count.square_gen = {n:gen} välja|{n:gen} välja
+count.square_com = {n:gen} väljaga|{n:gen} väljaga
+count.position = {n} seis|{n} seisu
+count.position_obj = {n:gen} seisu|{n} seisu
+count.position_gen = {n:gen} seisu|{n:gen} seisu
+count.position_com = {n:gen} seisuga|{n:gen} seisuga
+# More counted nouns for review.lang and appraisal.lang: attackers and defenders of a square ("kolm
+# ründajat kahe kaitsja vastu"), checks given ("kolm tuld"), captures, and the best moves of a streak
+# ("viis parimat käiku järjest").
+count.attacker = {n} ründaja|{n} ründajat
+count.attacker_obj = {n:gen} ründaja|{n} ründajat
+count.attacker_gen = {n:gen} ründaja|{n:gen} ründaja
+count.attacker_com = {n:gen} ründajaga|{n:gen} ründajaga
+count.defender = {n} kaitsja|{n} kaitsjat
+count.defender_obj = {n:gen} kaitsja|{n} kaitsjat
+count.defender_gen = {n:gen} kaitsja|{n:gen} kaitsja
+count.defender_com = {n:gen} kaitsjaga|{n:gen} kaitsjaga
+count.check = {n} tuli|{n} tuld
+count.check_obj = {n:gen} tule|{n} tuld
+count.check_gen = {n:gen} tule|{n:gen} tule
+count.check_com = {n:gen} tulega|{n:gen} tulega
+count.capture = {n} löömine|{n} löömist
+count.capture_obj = {n:gen} löömise|{n} löömist
+count.capture_gen = {n:gen} löömise|{n:gen} löömise
+count.capture_com = {n:gen} löömisega|{n:gen} löömisega
+count.best_move = {n} parim käik|{n} parimat käiku
+count.best_move_obj = {n:gen} parima käigu|{n} parimat käiku
+count.best_move_gen = {n:gen} parima käigu|{n:gen} parima käigu
+count.best_move_com = {n:gen} parima käiguga|{n:gen} parima käiguga
+# Percentages (accuracy): "{acc:percent}" = "85 %" in the subtitles, "kaheksakümmend viis protsenti"
+# spoken; "{acc:percent_gen}" = "kaheksakümne viie protsendi" ("{acc:percent_gen} täpsusega").
+count.percent = {n} %|{n} %
+count.percent.spoken = {n} protsent|{n} protsenti
+count.percent_gen = {n} %|{n} %
+count.percent_gen.spoken = {n:gen} protsendi|{n:gen} protsendi
+# A bare number in the genitive: "{m:gen}" = "3" / "kolme" (a number with a noun that is not counted
+# here: "{m:gen} sammu kaugusel").
+count.gen = {n:gen}|{n:gen}
+# Move numbers as ordinals: "{n:ord}" = "21." / "kahekümne esimene" ("{n:ord} käik"), "{n:ord_gen}" =
+# "kahekümne esimese" ("{n:ord_gen} käigu järel", "kuni {n:ord_gen} käiguni"), "{n:ord_part}" =
+# "kahekümne esimest" ("pärast {n:ord_part} käiku"), "{n:ord_ade}" = "kahekümne esimesel" ("{n:ord_ade}
+# käigul" = "at move 21"). The subtitles write the number with its period: "21. käigul".
+count.ord = {n}.|{n}.
+count.ord.spoken = {n:ord}|{n:ord}
+count.ord_gen = {n}.|{n}.
+count.ord_gen.spoken = {n:ord_gen}|{n:ord_gen}
+count.ord_part = {n}.|{n}.
+count.ord_part.spoken = {n:ord_part}|{n:ord_part}
+count.ord_ade = {n}.|{n}.
+count.ord_ade.spoken = {n:ord_ade}|{n:ord_ade}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves: the
+# genitive number with "käiguga" ("matt kolme käiguga"; the subtitles: "matt 3 käiguga").
+eval.up = +{x}
+eval.up.spoken = pluss {x}
+eval.down = −{x}
+eval.down.spoken = miinus {x}
+eval.even = 0,0
+eval.even.spoken = võrdne seis
+eval.mate_win = matt {n:gen} käiguga
+eval.mate_loss = sulle matt {n:gen} käiguga
+
+# ---- Added for appraisal.lang ------------------------------------------------------------------------
+# The phases of the game (appraisal.phase.* = "avang", "keskmäng", "lõppmäng") in other cases:
+# "{text:ine}" = "avangus / keskmängus / lõppmängus" ("Kõige paremini mängisid {text:ine}."), "{text:gen}",
+# "{text:part}", "{text:ill}" ("jõudsime lõppmängu"), "{text:ela}". A level name ({level}) has no forms:
+# put the case on "tase" ("Proovi taset „{level}“.").
+appraisal.phase.opening.gen = avangu
+appraisal.phase.opening.part = avangut
+appraisal.phase.opening.ill = avangusse
+appraisal.phase.opening.ine = avangus
+appraisal.phase.opening.ela = avangust
+appraisal.phase.middlegame.gen = keskmängu
+appraisal.phase.middlegame.part = keskmängu
+appraisal.phase.middlegame.ill = keskmängu
+appraisal.phase.middlegame.ine = keskmängus
+appraisal.phase.middlegame.ela = keskmängust
+appraisal.phase.endgame.gen = lõppmängu
+appraisal.phase.endgame.part = lõppmängu
+appraisal.phase.endgame.ill = lõppmängu
+appraisal.phase.endgame.ine = lõppmängus
+appraisal.phase.endgame.ela = lõppmängust

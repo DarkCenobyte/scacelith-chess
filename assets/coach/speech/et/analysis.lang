@@ -1,0 +1,155 @@
+# Coach speech (Estonian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Estonian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "sina" or "mina" here: the players are "valge" and "must" (singular nouns, lowercase
+#   inside a sentence, glossary/et.md): "valge võidab", "mustal on eelis". A piece comes with its
+#   side: {piece} {t1} {t2} = "valge ratsu", "musta vankrit" (common.lang, owner.white / owner.black):
+#   gen for a total object of a statement ("jätab {piece:gen} kaitseta"), part for attacking
+#   ("ründab {t1:part}") and offering ("pakub ohvriks {piece:part}"), ade for "has" ("{piece:ade}
+#   polnud kaitsjat"). The program capitalises a piece at the start of a sentence.
+# - A move never takes a case ending: "käiguga {move}", "pärast käiku {best}".
+# - Counted numbers (common.lang): forced mate "forsseeritud matt {m:move_com}" ("3 käiguga");
+#   "{pts:point_gen} väärtuses materjali", "{pts:point_obj}"; "{n:mistake_obj}" and
+#   "{m:blunder_obj}" as objects of "tegi" ("ühe vea", "kaks jämedat viga"); accuracy
+#   "{acc_white:percent}" ("85 %", spoken "kaheksakümmend viis protsenti").
+# - {opening:def} stands as a nominative predicate only ("Avang on {opening:def}.").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Vaatame selle partii koos üle.
+an.start.2 = Käime selle partii läbi, käik-käigult.
+an.start.3 = Siin on partii. Vaatame, kuidas see kulges.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = See partii algab laual üles seatud seisust. Käime selle läbi.
+an.start.setup.2 = Partii üles seatud seisust. Vaatame, kuidas see kulges.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Avang on {opening:def}.
+an.opening.2 = See on {opening:def}.
+an.book_exit = Käiguga {move} lahkub partii tuntud avanguteooriast.
+an.book_exit.2 = {move} on esimene käik, mis väljub avanguteooriast.
+an.book_exit.3 = Avanguteooria lõpeb siin, käiguga {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} on jäme viga.
+an.blunder.2 = Siin on {move} tõsine viga.
+an.blunder.3 = Jäme viga: {move}.
+an.mistake = {move} on viga.
+an.mistake.2 = {move} ei ole siin õige käik.
+an.mistake.3 = Viga: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} laseb käest võimaluse seda viga karistada.
+an.missed_chance.2 = Käiguga {move} läheb võimalus kaotsi.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Nüüd on {reply:nomate} matt.
+an.mate_allowed.one.2 = See lubab käiku {reply:nomate} ja see on matt.
+an.mate_allowed = See lubab forsseeritud matti {m:move_com}, alates käigust {reply:nomate}.
+an.mate_allowed.2 = Nüüd on forsseeritud matt {m:move_com}, mis algab käiguga {reply:nomate}.
+an.fork = Nüüd teeb {reply} kahvli, rünnates {t1:part} ja {t2:part}.
+an.fork.2 = See lubab käiku {reply}, mis ründab korraga {t1:part} ja {t2:part}.
+an.fork.3 = {reply} ründab samal ajal {t1:part} ja {t2:part}.
+an.hanging = See jätab {piece:gen} kaitseta ja {reply} lööb selle ära.
+an.hanging.2 = {piece} jääb kaitsjata: {reply} võidab selle.
+an.hanging.3 = {reply} lööb lihtsalt {piece:gen}, millel polnud kaitsjat.
+an.material = Vastus {line} võidab {pts:point_gen} väärtuses materjali.
+an.material.2 = Seejärel võidab {line} materjalis {pts:point_obj}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} oli matt.
+an.mate_missed.one.2 = {best:nomate} oleks olnud matt.
+an.mate_missed = {best:nomate} oleks forsseerinud mati {m:move_com}.
+an.mate_missed.2 = Oli olemas forsseeritud matt {m:move_com}, alates käigust {best:nomate}.
+an.missed_capture = {best} oleks võitnud tasuta {piece:gen}.
+an.missed_capture.2 = {piece:ade} polnud kaitsjat: {best} oleks selle löönud.
+an.missed_fork = {best} oleks teinud kahvli, rünnates {t1:part} ja {t2:part}.
+an.missed_fork.2 = {best} oli kahvel, mis ründas {t1:part} ja {t2:part}.
+
+# The better move, when nothing above named it.
+an.better = {best} oli tugevam.
+an.better.2 = Parem oli {best}.
+an.better.3 = {best} oli täpsem.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} on hiilgav: see ohverdab {piece:gen}!
+an.brilliant.2 = Hiilgav ohverdus! {move} pakub ohvriks {piece:part}.
+an.brilliant.3 = {move}! Hiilgav käik, mis pakub ohvriks {piece:part}.
+an.brilliant.mate = See viib forsseeritud matini {m:move_com}.
+an.brilliant.mate.2 = Ja see forsseerib mati {m:move_com}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} on ainus käik, mis säilitab eelise.
+an.only.win.2 = Ainult {move} hoiab siin eelist. Hästi leitud.
+an.only.hold = {move} on ainus käik, mis säilitab tasakaalu.
+an.only.hold.2 = Ainult {move} hoiab siin seisu.
+an.only.defend = {move} on ainus käik, mis hoiab võitluse käimas.
+an.only.defend.2 = Ainult {move} hoiab siin partii elus. Hea kaitse.
+an.only.best = {move} on siin kaugelt tugevaim käik.
+an.only.best.2 = Täpne: {move} on palju tugevam kui kõik muu.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} on veidi ebatäpne: {best} oli täpsem.
+an.inaccuracy.2 = Mitte päris parim: {best} oli täpsem kui {move}.
+an.interesting = {move} on huvitav idee, mis pakub ohvriks {piece:part}.
+an.interesting.2 = Huvitav katse: {move} annab ära {piece:gen}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Valgel on nüüd forsseeritud matt {m:move_com}.
+an.mate_on.white.2 = Siit alates saab valge forsseerida mati {m:move_com}.
+an.mate_on.black = Mustal on nüüd forsseeritud matt {m:move_com}.
+an.mate_on.black.2 = Siit alates saab must forsseerida mati {m:move_com}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Matt. Valge võidab partii.
+an.end.mate.white.2 = Ja see on matt: valge võidab.
+an.end.mate.black = Matt. Must võidab partii.
+an.end.mate.black.2 = Ja see on matt: must võidab.
+an.end.resigned.white = Must andis alla, nii et valge võidab partii.
+an.end.resigned.white.2 = Partii lõpeb siin: must annab alla ja valge võidab.
+an.end.resigned.black = Valge andis alla, nii et must võidab partii.
+an.end.resigned.black.2 = Partii lõpeb siin: valge annab alla ja must võidab.
+an.end.timeout.white = Mustal sai aeg otsa, nii et valge võidab.
+an.end.timeout.white.2 = Valge võidab aja ületamisega.
+an.end.timeout.black = Valgel sai aeg otsa, nii et must võidab.
+an.end.timeout.black.2 = Must võidab aja ületamisega.
+an.end.win.white = Partii lõpeb valge võiduga.
+an.end.win.white.2 = Valge võidab partii.
+an.end.win.black = Partii lõpeb musta võiduga.
+an.end.win.black.2 = Must võidab partii.
+an.end.stalemate = Patt: partii lõpeb viigiga.
+an.end.stalemate.2 = See on patt, seega on partii viik.
+an.end.draw.agreement = Mängijad leppisid kokku viigis.
+an.end.draw.agreement.2 = Partii lõpeb kokkuleppelise viigiga.
+an.end.draw.repetition = Partii lõpeb viigiga seisu kordumise tõttu.
+an.end.draw.repetition.2 = Sama seis kordus jälle: viik.
+an.end.draw.fifty = Partii lõpeb viigiga viiekümne käigu reegli järgi.
+an.end.draw.fifty.2 = Viiskümmend käiku ilma löömise ja etturikäiguta: viik.
+an.end.draw.seventy_five = Partii lõpeb viigiga seitsmekümne viie käigu reegli järgi.
+an.end.draw.seventy_five.2 = Seitsekümmend viis käiku ilma löömise ja etturikäiguta: viik.
+an.end.draw.material = Matt ei ole enam võimalik: partii on viik.
+an.end.draw.material.2 = Kumbki pool ei saa enam matti panna, seega on viik.
+an.end.draw = Partii lõpeb viigiga.
+an.end.draw.2 = Viik.
+an.end.unfinished = Partii katkeb siin, lõpetamata.
+an.end.unfinished.2 = Siin partii lõpeb: seda ei mängitud lõpuni.
+an.end.accuracy = Täpsus: valgel {acc_white:percent}, mustal {acc_black:percent}.
+an.end.accuracy.2 = Valge mängis {acc_white:percent_gen} täpsusega, must {acc_black:percent_gen} täpsusega.
+an.end.clean.white = Valge ei teinud ühtegi viga ega jämedat viga.
+an.end.clean.white.2 = Valge mäng oli tõsistest vigadest vaba.
+an.end.clean.black = Must ei teinud ühtegi viga ega jämedat viga.
+an.end.clean.black.2 = Musta mäng oli tõsistest vigadest vaba.
+an.end.mistakes.white = Valge tegi {n:mistake_obj}, aga ühtegi jämedat viga mitte.
+an.end.mistakes.white.2 = Valge: {n:mistake}, jämedaid vigu pole.
+an.end.mistakes.black = Must tegi {n:mistake_obj}, aga ühtegi jämedat viga mitte.
+an.end.mistakes.black.2 = Must: {n:mistake}, jämedaid vigu pole.
+an.end.blunders.white = Valge tegi {m:blunder_obj}.
+an.end.blunders.white.2 = Valge: {m:blunder}.
+an.end.blunders.black = Must tegi {m:blunder_obj}.
+an.end.blunders.black.2 = Must: {m:blunder}.
+an.end.errors.white = Valge tegi {n:mistake_obj} ja {m:blunder_obj}.
+an.end.errors.white.2 = Valge: {n:mistake} ja {m:blunder}.
+an.end.errors.black = Must tegi {n:mistake_obj} ja {m:blunder_obj}.
+an.end.errors.black.2 = Must: {n:mistake} ja {m:blunder}.

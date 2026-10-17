@@ -1,0 +1,1449 @@
+# Scacelith - हिन्दी (Hindi)
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (0 and 1 are "one").
+# Register: formal "आप", as in Microsoft and Apple Hindi software. Buttons and commands use the polite
+# imperative in -ें / -एँ (चुनें, सहेजें, रद्द करें, हार मानें). Hindi has no capitals: titles are plain text.
+# The player's gender is unknown, and a Hindi verb agrees with its subject (also with "आप"). With the
+# player as the subject the lines use only the imperative, the subjunctive, the present copula "हैं",
+# ने with a transitive perfective (आपने बाज़ी छोड़ दी), dative subjects (आपको ... मिलेगा), nouns
+# (आपकी जीत हुई, आपके मोहरे सफ़ेद होंगे) or the passive (बदला जा सकता है); never "आप जीत गए",
+# "आप खेलेंगे", "आप कर सकते हैं", "पासवर्ड भूल गए?". Other people named by {0} get the same care.
+# Terms: see the Hindi glossary (बाज़ी, चाल, शह, मात, स्टेलमेट, ड्रॉ, हार मानें, टाइम कंट्रोल, स्कोरशीट...).
+# Named keys keep the names printed on Indian (English) keyboards: Space, Shift, Ctrl, Backspace, Home / End.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = चालू
+common.off = बंद
+common.back = वापस
+common.apply = लागू करें
+common.discard = त्यागें
+common.cancel = रद्द करें
+common.white = सफ़ेद
+common.black = काला
+common.main_menu = मुख्य मेनू
+# Decimal separator of numbers ("2.5 s").
+number.decimal = .
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = शाही खेल
+menu.new_game = नई बाज़ी
+menu.options = विकल्प
+menu.credits = क्रेडिट्स
+menu.quit = बाहर निकलें
+menu.version = संस्करण {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = विकल्प
+options.tab.display = डिस्प्ले
+options.tab.graphics = ग्राफ़िक्स
+options.tab.audio = ऑडियो
+options.tab.gameplay = गेमप्ले
+options.tab.player = खिलाड़ी
+options.tab.controls = नियंत्रण
+options.pending = बदलाव लागू करने के बाद प्रभावी होते हैं।
+options.unsaved.title = लागू न किए गए बदलाव
+options.unsaved.text = कुछ विकल्प बदले गए हैं। जाने से पहले उन्हें लागू करें?
+
+options.language = भाषा
+options.language.help = मेनू और संदेशों की भाषा। यह तुरंत बदल जाती है।
+options.language.not_adapted = यह भाषा अभी पूरी तरह अनुकूलित नहीं हुई है: कोच की आवाज़ कुछ शब्दों का उच्चारण ग़लत कर सकती है, और कुछ पाठ अभी अटपटे लग सकते हैं।
+options.display_mode = डिस्प्ले मोड
+options.display_mode.help = फ़ुलस्क्रीन: डेस्कटॉप रिज़ॉल्यूशन पर पूरी स्क्रीन ढकने वाली, बिना किनारे की विंडो। विंडो मोड: नीचे दिए गए आकार की विंडो।
+options.fullscreen = फ़ुलस्क्रीन
+options.windowed = विंडो मोड
+options.window_size = विंडो का आकार
+options.window_size.help = विंडो मोड में विंडो का आकार। फ़ुलस्क्रीन में हमेशा डेस्कटॉप रिज़ॉल्यूशन रहता है।
+options.vsync = वर्टिकल सिंक
+options.vsync.help = तस्वीर फटने (टियरिंग) से बचाने के लिए फ़्रेम को डिस्प्ले के साथ सिंक करता है।
+options.render_scale = रेंडर स्केल
+options.render_scale.help = 3D तस्वीर का आंतरिक रिज़ॉल्यूशन। कम मान से गेम तेज़ चलता है, ज़्यादा मान से तस्वीर ज़्यादा साफ़ होती है।
+
+options.quality = गुणवत्ता
+options.quality.very_low = बहुत कम
+options.quality.low = कम
+options.quality.medium = मध्यम
+options.quality.high = उच्च
+options.quality.ultra = अल्ट्रा
+options.quality.custom = कस्टम
+options.quality.help = नीचे के सभी विकल्प एक साथ सेट करता है: "बहुत कम" हर इफ़ेक्ट बंद कर देता है, "अल्ट्रा" सभी को अधिकतम पर सेट करता है। किसी एक विकल्प को अलग से बदलने पर यह "कस्टम" हो जाता है। साधारण ग्राफ़िक्स कार्ड पर रेंडर स्केल (डिस्प्ले) कम करने से भी काफ़ी मदद मिलती है।
+options.shadows = परछाइयाँ
+options.shadows.help = धूप से बनी परछाइयों की बारीकी और उनके किनारों की कोमलता। कम: सादे किनारे, जल्दी बनते हैं।
+options.reflections = प्रतिबिंब
+options.reflections.help = फ़र्श, मेज़ और बोर्ड में कमरे का प्रतिबिंब दिखता है (हर एक के लिए कमरा एक बार और बनाया जाता है: यह सबसे भारी विकल्पों में से एक है); मध्यम और उससे ऊपर, चमकदार मोहरों और वस्तुओं में भी आस-पास की चीज़ों का प्रतिबिंब दिखता है।
+options.ambient_occlusion = एम्बिएंट ऑक्लूज़न
+options.ambient_occlusion.help = वस्तुओं के मिलने की जगहों पर और खोखली जगहों में हल्की छाया, जहाँ रोशनी कम पहुँचती है।
+options.indirect_light = अप्रत्यक्ष रोशनी
+options.indirect_light.help = दीवारों, फ़र्श और छत से टकराकर लौटती दिन की रोशनी। कम: इसकी जगह हर ओर एक जैसी रोशनी। इसका असर ज़्यादातर लोडिंग के समय पर पड़ता है।
+options.volumetric_light = रोशनी की किरणें
+options.volumetric_light.help = हॉल की धूल भरी हवा से गुज़रती धूप की किरणें, और उनमें चमकते धूल के कण।
+options.tessellation = टेसलेशन
+options.tessellation.help = पास से देखने पर मोहरों की गोलाइयों की चिकनी रूपरेखा।
+options.tessellation.unavailable = उपलब्ध नहीं: यह ग्राफ़िक्स ड्राइवर टेसलेशन का समर्थन नहीं करता।
+options.antialiasing = एंटी-एलियासिंग
+options.antialiasing.help = दाँतेदार किनारों और झिलमिलाती चमक को चिकना करता है। बंद: तस्वीर ज़्यादा तीखी पर दाँतेदार, और कुछ इफ़ेक्ट दानेदार दिखते हैं।
+options.depth_of_field = डेप्थ ऑफ़ फ़ील्ड
+options.depth_of_field.help = जिस चीज़ पर नज़र है, उससे काफ़ी आगे या पीछे की चीज़ों को धुंधला करता है, जैसे कैमरे का लेंस करता है।
+options.motion_blur = मोशन ब्लर
+options.motion_blur.help = कैमरे और बाँहों की तेज़ हलचल को धुंधला करता है, जैसे फ़िल्म कैमरा करता है।
+options.bloom = ब्लूम
+options.bloom.help = सबसे चमकीले हिस्सों के आस-पास हल्की आभा, जैसे कैमरे के लेंस में।
+options.brightness = चमक
+options.brightness.neutral = सामान्य
+options.brightness.value = {0} EV
+options.brightness.help = कैमरे का एक्सपोज़र समायोजन। पहली बार शुरू करने पर होने वाला कैलिब्रेशन इसे इस तरह सेट करता है कि सबसे गहरी परछाइयाँ मुश्किल से दिखें।
+
+options.master_volume = मुख्य वॉल्यूम
+options.effects = साउंड इफ़ेक्ट
+options.ambience = माहौल
+options.ambience.help = हॉल की धीमी आवाज़ें: आग, दूर के क़दमों की आहट, पुरानी घड़ी।
+options.ambience_volume = माहौल का वॉल्यूम
+options.voice_volume = आवाज़ का वॉल्यूम
+options.voice_volume.help = कोच मोड में कोच की आवाज़ का वॉल्यूम।
+options.subtitles = सबटाइटल
+options.subtitles.auto = स्वचालित
+options.subtitles.help = कोच की बातें, स्क्रीन के नीचे लिखी हुई। स्वचालित: तब दिखते हैं जब कोच मेनू की भाषा नहीं बोलता (चीनी मेनू के साथ वह अंग्रेज़ी बोलता है)। जब उसकी आवाज़ इंस्टॉल न हो, तब हमेशा दिखते हैं।
+
+options.legal_moves = वैध चालें दिखाएँ
+options.legal_moves.help = छुआ गया मोहरा जिन खानों तक जा सकता है, उन्हें हाइलाइट करता है। बंद होने पर कोई संकेत नहीं मिलता कि चाल वैध है या नहीं: घड़ी दबाते ही आर्बिटर अवैध चाल पर दंड देता है।
+options.coordinates = बोर्ड के निर्देशांक
+options.auto_press = घड़ी अपने-आप दबाना
+options.auto_press.help = आपकी चाल बोर्ड पर होते ही आपका रोबोट अपने-आप घड़ी दबा देता है। ऑनलाइन बाज़ियों में यह सर्वर तय करता है, और डायरेक्ट मैच में उसे होस्ट करने वाला खिलाड़ी।
+options.thinking_time = स्वाभाविक सोचने का समय
+options.thinking_time.help = आपका प्रतिद्वंद्वी तुरंत चाल चलने के बजाय इंसानी खिलाड़ी की तरह सोचने में समय लेता है।
+options.ignore_head = प्रतिद्वंद्वी के सिर की हरकतें अनदेखी करें
+options.ignore_head.help = ऑनलाइन बाज़ियों और डायरेक्ट मैच में प्रतिद्वंद्वी का रोबोट वहीं देखता है जहाँ उसे चलाने वाला खिलाड़ी देखता है। चालू होने पर रोबोट अपना सिर ख़ुद घुमाता है, जैसे Stockfish के ख़िलाफ़।
+options.mouse_sensitivity = माउस संवेदनशीलता
+options.invert_look = ऊपर-नीचे देखना उलटें
+options.handover = हॉट-सीट में दृश्य बदलना
+options.handover.cut = तुरंत कट
+options.handover.flight = उड़ान, {0} सेकंड
+options.handover.help = एक PC पर दो खिलाड़ी: हर चाल के बाद दृश्य एक खिलाड़ी की आँखों से दूसरे की आँखों तक कैसे पहुँचता है। तुरंत कट में कैमरा हिलता नहीं।
+options.game_cursor = गेम पॉइंटर
+options.game_cursor.help = मेज़ पर गेम अपना पॉइंटर बनाता है, जो दिखाता है कि क्लिक करने से क्या होगा। बंद: सिस्टम का सामान्य तीर।
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = नाम
+player.name.help = स्कोरशीट के ऊपर लिखा जाने वाला आपका नाम, किसी भी लिपि में।
+player.default_name = इंसान
+player.handwriting = लिखावट
+player.handwriting.help = वह हाथ जो आपकी चालें लिखता है। अरबी, जापानी और चीनी अपनी अलग लिखावट में लिखी जाती हैं।
+player.preview = आपकी स्कोरशीट पर
+hand.caveat = सहज
+hand.marck = घसीट
+hand.badscript = तिरछी
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = बायाँ क्लिक
+controls.touch = मोहरा छुएँ, फिर उसे चलाएँ
+controls.clock.keys = Space  या  घड़ी पर क्लिक
+controls.clock = घड़ी दबाएँ
+controls.look.keys = दायाँ माउस बटन, दबाए रखें
+controls.look = चारों ओर देखें
+controls.sheet.keys = S
+controls.sheet = अपनी स्कोरशीट देखें, और फिर वापस
+controls.stand.keys = ↑
+controls.stand = उठकर अपनी कुर्सी के सामने आएँ
+controls.side.keys = ←  /  →
+controls.side = मेज़ के बाएँ / दाएँ सिरे पर जाएँ
+controls.sit.keys = ↓
+controls.sit = वापस बैठें (खेलना केवल बैठकर होता है)
+controls.moves.keys = Tab
+controls.moves = चालों की सूची दिखाएँ या छिपाएँ
+controls.menu.keys = Esc
+controls.menu = मेनू
+controls.coach_skip.keys = Space
+controls.coach_skip = कोच: कोच की बात छोड़ें
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = कोच: पेशकश मिलने पर चाल वापस लें
+controls.coach_hint.keys = H
+controls.coach_hint = कोच की चुनौतियाँ: संकेत माँगें
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = चमक
+calibration.text = स्लाइडर को तब तक खिसकाएँ, जब तक काले खाने पर रखा घोड़ा मुश्किल से दिखे, या दिखना बंद हो जाए।
+calibration.later = इसे बाद में विकल्प > ग्राफ़िक्स में बदला जा सकता है।
+calibration.continue = जारी रखें
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = नई बाज़ी
+newgame.opponent = प्रतिद्वंद्वी
+newgame.time_control = टाइम कंट्रोल
+newgame.start = शुरू करें
+newgame.elo = ~{0} Elo
+newgame.you_white = आपके मोहरे सफ़ेद होंगे।
+newgame.you_black = आपके मोहरे काले होंगे।
+newgame.colour_lot = पहली बाज़ी के रंग टॉस से तय होते हैं।
+newgame.colour_alternate = उसके बाद हर अगली बाज़ी में रंग बदलते रहते हैं।
+newgame.opponent_kind = प्रतिद्वंद्वी
+newgame.opponent_kind.help = Stockfish से खेलें, या इसी कंप्यूटर पर बैठे किसी दोस्त से: बारी-बारी से, हर कोई बोर्ड की अपनी तरफ़ से।
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = इंसान, इसी PC पर
+
+# Custom opponent: Stockfish parameters
+engine.skill = कौशल स्तर
+engine.skill.help = Stockfish का “Skill Level” (0–20)। जब ताक़त Elo से सीमित हो, तब इसे अनदेखा किया जाता है।
+engine.limit_elo = ताक़त सीमित करें (Elo)
+engine.limit_elo.help = UCI_LimitStrength: इंजन नीचे दी गई Elo रेटिंग के स्तर पर खेलने की कोशिश करता है।
+engine.elo = Elo
+engine.depth = खोज की गहराई
+engine.plies = {0} अर्ध-चाल|{0} अर्ध-चालें
+engine.move_time = प्रति चाल समय
+engine.nodes = नोड सीमा
+engine.no_limit = बंद
+engine.thousand = {0} हज़ार
+engine.million = {0} मिलियन
+engine.dynamic_elo = समय पर निर्भर Elo
+engine.dynamic_elo.help = इंसानी खिलाड़ी की तरह, घड़ी में समय कम होने पर Stockfish कमज़ोर खेलता है: आख़िरी मिनट में थोड़ा (रैपिड और ब्लिट्ज़ में उससे पहले), और समय की भारी कमी में काफ़ी कमज़ोर। केवल घड़ी वाली बाज़ियों में।
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish अपने स्तर के इंसान की तरह सोचने में समय लेता है। यह ठहराव हटाने के लिए: विकल्प > गेमप्ले > स्वाभाविक सोचने का समय।
+engine.pace.instant = Stockfish गणना पूरी होते ही चाल चलता है। इंसानों जैसे ठहराव के लिए: विकल्प > गेमप्ले > स्वाभाविक सोचने का समय।
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = असीमित
+tc.no_clock = बिना घड़ी
+tc.bullet = बुलेट
+tc.blitz = ब्लिट्ज़
+tc.rapid = रैपिड
+tc.classical = क्लासिकल
+tc.custom = कस्टम
+tc.your_own = अपनी पसंद का
+tc.base_time = मूल समय
+tc.base_time.help = हर घड़ी पर शुरुआती समय (मिनट : सेकंड)।
+tc.increment = इंक्रीमेंट
+tc.increment.help = हर चाल के बाद जुड़ने वाला फ़िशर इंक्रीमेंट।
+tc.delay = डिले
+tc.delay.help = ब्रॉनस्टीन डिले: इस डिले तक इस्तेमाल हुआ समय हर चाल के बाद वापस मिल जाता है।
+tc.no_delay = बंद
+tc.seconds = {0} सेकंड
+tc.minutes = {0} मिनट
+tc.summary_increment = {0} + {1} सेकंड
+tc.summary_delay = {0}, डिले {1} सेकंड
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = नौसिखिया
+preset.novice.desc = अभी-अभी चालें सीखी हैं: मोहरे असुरक्षित छोड़ देता है और आसान ख़तरे नहीं देख पाता।
+preset.beginner.name = शुरुआती
+preset.beginner.desc = बुनियादी बातें जानता है, पर अब भी अक्सर ब्लंडर करके मटीरियल गँवा देता है।
+preset.casual.name = शौकिया
+preset.casual.desc = शाम की आरामदेह बाज़ी का प्रतिद्वंद्वी: समझदारी भरी चालें, बार-बार ग़लतियाँ।
+preset.club_player.name = क्लब खिलाड़ी
+preset.club_player.desc = ठोस क्लब खिलाड़ी, जो साफ़ दिखने वाले ब्लंडर की सज़ा देता है।
+preset.advanced.name = उन्नत
+preset.advanced.desc = अच्छी टैक्टिकल नज़र वाला मज़बूत क्लब खिलाड़ी।
+preset.expert.name = विशेषज्ञ
+preset.expert.desc = टूर्नामेंट विशेषज्ञ: शायद ही कभी ग़लती करता है, बढ़त को जीत में बदलता है।
+preset.master.name = मास्टर
+preset.master.desc = मास्टर स्तर: गहरी गणना और बारीक पोज़िशनल खेल।
+preset.grandmaster.name = ग्रैंडमास्टर
+preset.grandmaster.desc = ग्रैंडमास्टर स्तर: हराना बेहद मुश्किल।
+preset.stockfish_max.name = Stockfish मैक्स
+preset.stockfish_max.desc = पूरी ताक़त पर Stockfish 19। शुभकामनाएँ।
+preset.custom.name = कस्टम
+preset.custom.desc = आपकी अपनी इंजन सेटिंग्स।
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = क्रेडिट्स
+credits.game.head = SCACELITH
+credits.game = एक शाही हॉल में शतरंज की बाज़ी, ख़ुद बनाए गए OpenGL 4.6 इंजन पर।
+credits.engine.head = शतरंज इंजन
+credits.engine = Stockfish 19, Stockfish के डेवलपरों द्वारा।
+credits.engine.licence = GNU General Public License v3 के तहत।
+credits.engine.data = इसके न्यूरल नेटवर्क को Leela Chess Zero प्रोजेक्ट द्वारा दिए गए डेटा पर प्रशिक्षित किया गया है, जो Open Database License (ODbL) के तहत उपलब्ध है।
+credits.voice.head = कोच की आवाज़
+credits.voice = कोच मोड के लिए Supertonic 3 द्वारा बनाई गई सिंथेटिक आवाज़।
+credits.voice.licence = Supertonic 3 एक मॉडल है, जिसे Supertone ने बनाया है और जिसका उपयोग OpenRAIL-M लाइसेंस के तहत किया गया है; इसके उपयोग पर लगी पाबंदियाँ इसे इस्तेमाल करने वाले हर व्यक्ति पर लागू होती हैं (लाइसेंस देखें)।
+credits.openings.head = ओपनिंग
+credits.openings = ओपनिंग के नाम lichess.org के chess-openings डेटाबेस से लिए गए हैं, जो पब्लिक डोमेन (CC0) को समर्पित है।
+credits.fonts.head = टाइपफ़ेस
+credits.fonts = Georg Duffner का EB Garamond और Natanael Gama का Cinzel; Khaled Hosny का Amiri।
+credits.fonts.hand = लिखावट: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License)।
+credits.fonts.figures = शतरंज के चिह्न GNU FreeFont से (फ़ॉन्ट अपवाद के साथ GPL v3)।
+credits.quote = “शतरंज विश्लेषण की कला है।”  — मिखाइल बोतविनिक
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = लाइसेंस
+licences.title = लाइसेंस
+licences.note = लाइसेंस अपने मूल अंग्रेज़ी पाठ में दिखाए गए हैं।
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = विराम
+pause.resume = फिर शुरू करें
+pause.offer_draw = ड्रॉ की पेशकश करें
+pause.claim_draw = ड्रॉ का दावा करें
+pause.claim_draw.help = स्थिति का तीन बार दोहराव या पचास चालों का नियम।
+pause.resign = हार मानें
+confirm.resign.title = हार मानें
+confirm.resign.text = इस बाज़ी में हार मानें? आपके प्रतिद्वंद्वी को विजेता घोषित किया जाएगा।
+confirm.resign.draw = इस बाज़ी में हार मानें? आपके प्रतिद्वंद्वी के लिए अब मात देना संभव नहीं: बाज़ी ड्रॉ होगी।
+confirm.resign.ok = हार मानें
+confirm.leave.title = बाज़ी छोड़ें
+confirm.leave.text = मुख्य मेनू पर लौटें? मौजूदा बाज़ी छोड़ दी जाएगी।
+confirm.leave.ok = छोड़ें
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = प्रमोशन
+piece.queen = वज़ीर
+piece.rook = हाथी
+piece.bishop = ऊँट
+piece.knight = घोड़ा
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = बाज़ी ड्रॉ रही।
+gameover.draw_moves = {0} चाल के बाद बाज़ी ड्रॉ रही।|{0} चालों के बाद बाज़ी ड्रॉ रही।
+gameover.win = शानदार खेल — आपकी जीत हुई।
+gameover.win_moves = शानदार खेल — {0} चाल में आपकी जीत हुई।|शानदार खेल — {0} चालों में आपकी जीत हुई।
+gameover.loss = आपके प्रतिद्वंद्वी की जीत हुई।
+gameover.loss_moves = {0} चाल में आपके प्रतिद्वंद्वी की जीत हुई।|{0} चालों में आपके प्रतिद्वंद्वी की जीत हुई।
+gameover.rematch = रीमैच
+gameover.view_board = बोर्ड देखें
+gameover.show = दिखाएँ
+
+# Reasons (chess::endReasonText)
+reason.checkmate = मात
+reason.resignation = हार मान ली गई
+reason.timeout = समय ख़त्म होने से हार
+reason.illegal_moves = दूसरी अवैध चाल (हार घोषित)
+reason.stalemate = स्टेलमेट
+reason.insufficient = मृत स्थिति (अपर्याप्त मटीरियल)
+reason.timeout_vs_insufficient = समय ख़त्म, पर प्रतिद्वंद्वी के लिए मात देना संभव नहीं
+reason.fivefold = पाँच बार दोहराव
+reason.75_moves = 75 चालों का नियम
+reason.threefold_claim = तीन बार दोहराव (दावा किया गया)
+reason.50_moves_claim = 50 चालों का नियम (दावा किया गया)
+reason.agreement = आपसी सहमति से ड्रॉ
+reason.illegal_vs_insufficient = दूसरी अवैध चाल, पर प्रतिद्वंद्वी के लिए मात देना संभव नहीं
+reason.resignation_vs_insufficient = हार मान ली गई, पर प्रतिद्वंद्वी के लिए मात देना संभव नहीं
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = चालें
+movelist.empty = अभी तक कोई चाल नहीं।
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = सामग्री तैयार की जा रही है
+loading.hall = हॉल खड़ा किया जा रहा है
+loading.furniture = मेज़ और कुर्सियाँ तराशी जा रही हैं
+loading.board = बोर्ड चमकाया जा रहा है
+loading.pieces = मोहरे खराद पर गढ़े जा रहे हैं
+loading.clock = घड़ी जोड़ी जा रही है
+loading.porcelain = चीनी मिट्टी भट्ठी में पकाई जा रही है
+loading.ready = तैयार
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = इस स्थिति में ड्रॉ का दावा नहीं किया जा सकता।
+notify.flag_you = आपका समय ख़त्म हो गया।
+notify.flag_opponent = आपके प्रतिद्वंद्वी का समय ख़त्म हो गया।
+notify.touched.pawn = टच-मूव: छुआ हुआ प्यादा ही चलना होगा।
+notify.touched.knight = टच-मूव: छुआ हुआ घोड़ा ही चलना होगा।
+notify.touched.bishop = टच-मूव: छुआ हुआ ऊँट ही चलना होगा।
+notify.touched.rook = टच-मूव: छुआ हुआ हाथी ही चलना होगा।
+notify.touched.queen = टच-मूव: छुआ हुआ वज़ीर ही चलना होगा।
+notify.touched.king = टच-मूव: छुआ हुआ राजा ही चलना होगा।
+notify.touched.piece = टच-मूव: छुआ हुआ मोहरा ही चलना होगा।
+notify.touched_square = टच-मूव: {0} पर रखा मोहरा ही चलना होगा।
+notify.press_clock = अपनी चाल पूरी करने के लिए घड़ी दबाएँ (Space)।
+notify.manual_clock = इस बाज़ी में हर चाल के बाद घड़ी ख़ुद दबाएँ।
+notify.illegal = अवैध चाल।
+notify.cannot_move = यह चाल नहीं चली जा सकती।
+notify.move_first = घड़ी दबाने से पहले अपनी चाल चलें।
+notify.stance.sit_to_play = खेलने के लिए वापस बैठें (↓ कुंजी)।
+notify.stance.first = खड़े रहने पर भी घड़ी चलती रहती है। ↓ कुंजी: वापस बैठें।
+notify.stance.first_untimed = खेलना केवल कुर्सी पर बैठकर होता है। ↓ कुंजी: वापस बैठें।
+notify.stance.finish_move = पहले अपनी चाल पूरी करें।
+notify.draw_already_offered = इस चाल में ड्रॉ की पेशकश पहले ही की जा चुकी है।
+notify.draw_accepted = आपके प्रतिद्वंद्वी ने ड्रॉ स्वीकार कर लिया।
+notify.draw_declined = आपके प्रतिद्वंद्वी ने ड्रॉ की पेशकश ठुकरा दी।
+notify.draw_claimed = आपके प्रतिद्वंद्वी ने ड्रॉ का दावा किया।
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+# Hindi: White or Black may be the player, so no verb agrees with them ("सफ़ेद की हार होती है",
+# "सफ़ेद को ... मिलता है").
+arbiter.join = {0} {1}
+arbiter.no_move = आर्बिटर: बिना चाल चले घड़ी दबाई गई, जिसे अवैध चाल माना जाता है।
+arbiter.unpromoted = आर्बिटर: अवैध चाल, घड़ी दबाने से पहले प्यादे की जगह नया मोहरा नहीं रखा गया।
+arbiter.illegal = आर्बिटर: अवैध चाल।
+arbiter.second_loses.white = यह सफ़ेद की दूसरी अवैध चाल है: बाज़ी में सफ़ेद की हार हुई।
+arbiter.second_loses.black = यह काले की दूसरी अवैध चाल है: बाज़ी में काले की हार हुई।
+arbiter.second_draw.white = यह सफ़ेद की दूसरी अवैध चाल है, पर काले के लिए मात देना संभव नहीं: बाज़ी ड्रॉ हुई।
+arbiter.second_draw.black = यह काले की दूसरी अवैध चाल है, पर सफ़ेद के लिए मात देना संभव नहीं: बाज़ी ड्रॉ हुई।
+arbiter.queen = प्यादा वज़ीर बन जाता है।
+arbiter.queen_one_minute.white = प्यादा वज़ीर बन जाता है और सफ़ेद को एक मिनट अतिरिक्त मिलता है।
+arbiter.queen_one_minute.black = प्यादा वज़ीर बन जाता है और काले को एक मिनट अतिरिक्त मिलता है।
+arbiter.queen_two_minutes.white = प्यादा वज़ीर बन जाता है और सफ़ेद को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.queen_two_minutes.black = प्यादा वज़ीर बन जाता है और काले को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.restored = पिछली स्थिति फिर से लगाई जाती है।
+arbiter.restored_one_minute.white = पिछली स्थिति फिर से लगाई जाती है और सफ़ेद को एक मिनट अतिरिक्त मिलता है।
+arbiter.restored_one_minute.black = पिछली स्थिति फिर से लगाई जाती है और काले को एक मिनट अतिरिक्त मिलता है।
+arbiter.restored_two_minutes.white = पिछली स्थिति फिर से लगाई जाती है और सफ़ेद को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.restored_two_minutes.black = पिछली स्थिति फिर से लगाई जाती है और काले को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.one_minute.white = सफ़ेद को एक मिनट अतिरिक्त मिलता है।
+arbiter.one_minute.black = काले को एक मिनट अतिरिक्त मिलता है।
+arbiter.two_minutes.white = सफ़ेद को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.two_minutes.black = काले को दो मिनट अतिरिक्त मिलते हैं।
+arbiter.second_loses = दूसरी अवैध चाल का मतलब है बाज़ी में हार।
+arbiter.touched.white = सफ़ेद को छुआ हुआ मोहरा ही चलना होगा।
+arbiter.touched.black = काले को छुआ हुआ मोहरा ही चलना होगा।
+arbiter.game_over = बाज़ी ख़त्म हो चुकी है।
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = बाज़ी देखें
+
+viewer.title = बाज़ी देखें
+viewer.white = सफ़ेद
+viewer.black = काला
+viewer.time_control = टाइम कंट्रोल
+viewer.elo_approx = ~{0} Elo
+viewer.swap = रंग बदलें
+viewer.note = दोनों खिलाड़ी Stockfish हैं। उनकी बाज़ी के दौरान हॉल में बेझिझक कहीं भी उड़ें: आपको कोई नहीं देखेगा।
+viewer.summary = {0} बनाम {1}
+viewer.custom = कस्टम
+viewer.tc.custom = अपनी पसंद का
+viewer.base_time = मूल समय
+viewer.increment = इंक्रीमेंट
+viewer.delay = डिले
+viewer.off = बंद
+viewer.minutes = {0} मिनट
+viewer.seconds = {0} सेकंड
+viewer.delay_summary = डिले {0} सेकंड
+viewer.back = वापस
+viewer.start = शुरू करें
+
+viewer.paused = विराम
+viewer.resume = फिर शुरू करें
+viewer.options = विकल्प
+viewer.main_menu = मुख्य मेनू
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = नियंत्रण
+viewer.keys.move = W A S D  ·  Z Q S D  ·  तीर कुंजियाँ
+viewer.controls.move = घूमें
+viewer.keys.updown = E, Space  /  C, Ctrl
+viewer.controls.updown = ऊपर / नीचे
+viewer.keys.fast = Shift
+viewer.controls.fast = तेज़
+viewer.keys.look = दायाँ माउस बटन
+viewer.controls.look = चारों ओर देखें
+viewer.keys.speed = माउस व्हील
+viewer.controls.speed = गति
+viewer.keys.views = 1 – 9
+viewer.controls.views = दृश्य
+viewer.keys.eyes = 0
+viewer.controls.eyes = जिसकी चाल है, उस खिलाड़ी की आँखों से
+viewer.keys.moves = Tab
+viewer.controls.moves = चालों की सूची
+viewer.keys.menu = Esc
+viewer.controls.menu = मेनू
+viewer.keys.hide = H
+viewer.controls.hide = यह ओवरले छिपाएँ
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = रोकें / फिर शुरू करें
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = एक चाल पीछे / आगे
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = धीमा / तेज़
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = बाज़ी की शुरुआत / अंत
+viewer.speed = गति {0} मी/से
+viewer.view.0 = खिलाड़ियों की आँखों से
+viewer.view.1 = मेज़ के बगल से
+viewer.view.2 = बोर्ड के ऊपर से
+viewer.view.3 = हॉल
+viewer.view.4 = घड़ी
+viewer.view.5 = सफ़ेद का चेहरा
+viewer.view.6 = काले का चेहरा
+viewer.view.7 = आमने-सामने
+viewer.view.8 = खिड़कियाँ
+viewer.view.9 = दीवार पर टँगे कालीन
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+# Hindi: these names are used only before "ने", so Black is in the oblique case (काले ने); सफ़ेद does not change.
+viewer.side.white = सफ़ेद
+viewer.side.black = काले
+viewer.flag.white = सफ़ेद का समय ख़त्म हो गया।
+viewer.flag.black = काले का समय ख़त्म हो गया।
+viewer.claims_draw = {0} ने ड्रॉ का दावा किया।
+viewer.offer_accepted = {0} ने ड्रॉ की पेशकश की, {1} ने स्वीकार कर ली।
+viewer.offer_declined = {0} ने ड्रॉ की पेशकश की, {1} ने ठुकरा दी।
+viewer.gameover.white_wins = चाल {0} के बाद सफ़ेद की जीत।
+viewer.gameover.black_wins = चाल {0} के बाद काले की जीत।
+viewer.gameover.draw = चाल {0} के बाद बाज़ी ड्रॉ रही।
+viewer.gameover.players = {0} बनाम {1}
+viewer.watch_again = फिर से देखें
+
+# The player's rating
+elo.label = Elo
+elo.no_games = अभी तक कोई रेटेड बाज़ी नहीं
+elo.provisional = अस्थायी रेटिंग
+elo.peak = सर्वोच्च {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = आपकी Elo {0}
+elo.expected = अपेक्षित स्कोर {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · यह बाज़ी रेटेड नहीं है
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = स्कोरशीट
+scoresheet.event = प्रतियोगिता
+scoresheet.date = दिनांक
+scoresheet.round = राउंड
+scoresheet.board = बोर्ड
+scoresheet.page = पृष्ठ
+scoresheet.white = सफ़ेद
+scoresheet.black = काला
+scoresheet.elo = Elo
+scoresheet.result = परिणाम
+scoresheet.move_no = क्र.
+scoresheet.sign_white = सफ़ेद के हस्ताक्षर
+scoresheet.sign_black = काले के हस्ताक्षर
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Hindi: Indian scoresheets use the English piece letters; dates are written DD/MM/YYYY.
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = ऑनलाइन खेलें
+online.title = ऑनलाइन खेलें
+online.continue = जारी रखें
+online.retry = फिर कोशिश करें
+online.copy = कॉपी करें
+online.copied = कॉपी हो गया
+online.copy.unavailable = यहाँ कॉपी करना उपलब्ध नहीं है: कृपया इसे लिख लें।
+online.rated = रेटेड
+online.casual = कैज़ुअल
+online.casual_only = केवल कैज़ुअल
+online.color.random = टॉस से
+online.ping = {0} ms
+online.conn.online = कनेक्ट है
+online.conn.connecting = कनेक्ट हो रहा है…
+online.conn.reconnecting = फिर से कनेक्ट हो रहा है…
+online.conn.offline = कनेक्ट नहीं है
+online.conn.incompatible = दूसरा संस्करण
+online.no_server.text = ऑनलाइन खेलने के लिए Scacelith सर्वर चाहिए। विकल्पों में किसी सर्वर का पता डालें, या डायरेक्ट मैच में सीधे किसी दोस्त से खेलें।
+online.no_server.settings = सर्वर सेटिंग्स
+
+# Options > Online server
+options.tab.online = ऑनलाइन सर्वर
+options.online.server = सर्वर
+options.online.server.help = आधिकारिक सर्वर, या किसी और का चलाया कस्टम (कम्युनिटी) सर्वर, जिससे कनेक्शन उसके सुरक्षित वेब API और सुरक्षित WebSocket के ज़रिए होता है। हर सर्वर पर अलग से साइन इन करना होता है: कोई खाता और उसका साइन-इन कभी दो सर्वरों के बीच साझा नहीं होता।
+options.online.official = आधिकारिक सर्वर — {0}
+options.online.community = कस्टम सर्वर
+options.online.host = होस्ट
+options.online.host.hint = डोमेन नाम या IP पता
+options.online.host.help = कस्टम सर्वर का डोमेन नाम या IP पता, जैसा उसके मालिक ने दिया है।
+options.online.api_port = HTTPS / API पोर्ट
+options.online.api_port.help = सर्वर के सुरक्षित वेब API का पोर्ट (Scacelith सर्वरों पर 443)।
+options.online.ws_port = WSS पोर्ट
+options.online.ws_port.hint = API पोर्ट जैसा ही
+options.online.ws_port.help = सर्वर के सुरक्षित WebSocket का पोर्ट। अगर यह API पोर्ट ही है, तो इसे ख़ाली छोड़ दें।
+options.online.pin = सर्टिफ़िकेट फ़िंगरप्रिंट (SHA-256)
+options.online.pin.hint = वैकल्पिक
+options.online.pin.help = सेल्फ़-साइन्ड सर्टिफ़िकेट वाले सर्वर के लिए: उसके मालिक का दिया हुआ SHA-256 फ़िंगरप्रिंट (64 हेक्साडेसिमल वर्ण, कोलन की अनुमति है)। सिस्टम के सर्टिफ़िकेट पर भरोसा करने के लिए इसे ख़ाली छोड़ दें।
+options.online.pin.invalid = फ़िंगरप्रिंट में 64 हेक्साडेसिमल वर्ण होते हैं (कोलन की अनुमति है)।
+options.online.test = कनेक्शन जाँचें
+options.online.test_ok = {0}: कनेक्ट है, इस संस्करण के अनुकूल।
+options.online.test_incompatible = {0}: कनेक्ट है, लेकिन इसके लिए Scacelith का दूसरा संस्करण चाहिए।
+options.online.in_game = ऑनलाइन बाज़ी के दौरान सर्वर नहीं बदला जा सकता।
+options.online.remember_session = सिस्टम कीरिंग उपलब्ध न होने पर मेरा साइन-इन याद रखें
+options.online.remember_session.help = जब कोई सिस्टम कीरिंग (GNOME Keyring, KWallet…) आपका सेशन नहीं रख पाता, तो वह एक ऐसी फ़ाइल में सहेजा जाता है जिसे केवल आपका उपयोगकर्ता खाता पढ़ सकता है। जो भी आपकी फ़ाइलें, या उनकी कोई कॉपी (जैसे बैकअप) पढ़ सके, वह उस सेशन का उपयोग कर सकता है। बंद: गेम बंद होने तक ही साइन-इन बना रहता है। अपने खाते में "साइन-इन वाले डिवाइस" से किसी भी डिवाइस को साइन आउट किया जा सकता है।
+
+# Sign in, create an account
+online.signin.lead = लोगों के साथ ऑनलाइन खेलने के लिए {0} पर साइन इन करें।
+online.field.user = उपयोगकर्ता नाम या ईमेल
+online.field.user.hint = नाम या पता
+online.field.password = पासवर्ड
+online.field.password.hint = कम से कम 10 वर्ण
+online.field.password2 = पासवर्ड की पुष्टि करें
+online.field.current_password = मौजूदा पासवर्ड
+online.field.new_password = नया पासवर्ड
+online.field.username = उपयोगकर्ता नाम
+online.field.username.hint = 3 से 24 अक्षर, अंक, _ या -
+online.field.email = ईमेल
+online.field.new_email = नया ईमेल
+online.field.code = कोड
+online.field.code.hint = 6 अंक या रिकवरी कोड
+online.field.code6 = ऐप से मिला कोड
+online.field.code6.hint = 6 अंक
+online.signin.button = साइन इन करें
+online.signin.google = Google के साथ जारी रखें
+online.signin.register = खाता बनाएँ
+# Hindi: "पासवर्ड भूल गए?" would agree with the player's gender; "पासवर्ड याद नहीं?" is quoted as is below.
+online.signin.forgot = पासवर्ड याद नहीं?
+online.mfa.title = दो-चरणीय सत्यापन कोड
+online.mfa.lead = अपने ऑथेंटिकेटर ऐप में दिखने वाला 6 अंकों का कोड, या अपना कोई रिकवरी कोड डालें।
+online.mfa.verify = सत्यापित करें
+online.register.title = खाता बनाएँ
+online.register.lead = {0} पर एक मुफ़्त खाता: आपका नाम, रेटिंग और बाज़ियाँ केवल इसी सर्वर पर रहती हैं।
+online.register.button = खाता बनाएँ
+online.register.working = आपका खाता बनाया जा रहा है… इसमें कुछ सेकंड लग सकते हैं।
+online.register.ready = आपका खाता तैयार है। खेलने के लिए साइन इन करें।
+online.password.mismatch = दोनों पासवर्ड अलग-अलग हैं।
+online.check_email.title = अपना ईमेल देखें
+online.check_email.text = हमने {0} पर एक लिंक भेजा है। अपना खाता सक्रिय करने के लिए उसे खोलें, फिर यहाँ साइन इन करें।
+online.check_email.ask = सक्रियण लिंक दोबारा पाने के लिए अपने खाते का पता डालें।
+online.check_email.resend = ईमेल दोबारा भेजें
+online.check_email.resent = ईमेल दोबारा भेज दिया गया। इसमें कुछ मिनट लग सकते हैं; अपना स्पैम फ़ोल्डर भी देखें।
+online.forgot.title = पासवर्ड याद नहीं
+online.forgot.lead = अपने खाते का ईमेल पता डालें: हम आपको नया पासवर्ड चुनने के लिए एक लिंक भेजेंगे।
+online.forgot.button = लिंक भेजें
+online.forgot.sent = अगर कोई खाता इस पते का उपयोग करता है, तो उसके लिए लिंक भेजा जा रहा है।
+online.sso.title = Google से साइन इन करें
+online.sso.wait = अपने वेब ब्राउज़र में आगे बढ़ें: खुली हुई विंडो में अपना Google खाता चुनें। Google के वापस भेजते ही Scacelith आगे का काम सँभाल लेगा।
+online.sso.name_title = अपना नाम चुनें
+online.sso.name_lead = Google के साथ यहाँ यह आपका पहला साइन-इन है। वह नाम चुनें जो दूसरे खिलाड़ियों को दिखेगा।
+online.sso.continue = जारी रखें
+online.sso.finishing = Google ने आपको वापस भेज दिया है। साइन-इन पूरा हो रहा है…
+online.sso.link_title = Google साइन-इन जोड़ें
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = {1} पर खाता {0} पहले से इस Google खाते का ईमेल पता इस्तेमाल करता है। उसमें Google साइन-इन जोड़ने के लिए इस खाते का पासवर्ड डालें। यह केवल एक बार करना होगा।
+online.sso.link_button = Google साइन-इन जोड़ें
+online.sso.link_mfa = कोड स्वीकार होते ही इस खाते में Google साइन-इन जुड़ जाएगा।
+online.sso.not_mine = यह मेरा खाता नहीं है
+online.sso.not_mine_note = Google साइन-इन नहीं जोड़ा गया। अगर यह ईमेल पता आपका है, तो इसके साथ "पासवर्ड याद नहीं?" का उपयोग करें: लिंक उसी मेलबॉक्स में जाएगा। अगर खाता ऐसा दो-चरणीय सत्यापन कोड भी माँगता है जो आपके पास नहीं है, तो सर्वर के संचालक से संपर्क करें।
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google साइन-इन
+online.sso.page.done_heading = Scacelith पर वापस
+online.sso.page.done = Google ने आपको Scacelith पर वापस भेज दिया है। साइन-इन पूरा करने के लिए गेम पर लौटें; यह टैब बंद किया जा सकता है।
+online.sso.page.cancelled_heading = साइन-इन रद्द हुआ
+online.sso.page.cancelled = Google साइन-इन रद्द कर दिया गया। यह टैब बंद करके Scacelith पर लौटा जा सकता है।
+online.sso.page.foreign_heading = यह पेज आपके लिए नहीं है
+online.sso.page.foreign = यह पेज उस साइन-इन से मेल नहीं खाता जिसका Scacelith इस कंप्यूटर पर इंतज़ार कर रहा है। अगर आपने अभी-अभी Scacelith में Google साइन-इन शुरू नहीं किया है, तो हो सकता है किसी ने आपको यह लिंक भेजा हो: यह टैब बंद कर दें।
+
+# Account
+online.account.button = खाता
+online.account.title = खाता
+online.account.section = खाता
+online.account.username = उपयोगकर्ता नाम
+online.account.email = ईमेल
+online.account.unverified = (सत्यापित नहीं)
+online.account.mfa = दो-चरणीय सत्यापन
+online.account.mfa_on = चालू
+online.account.mfa_off = बंद
+online.account.google = Google
+online.account.google_linked = Google खाते से जुड़ा है
+online.account.change_password = पासवर्ड बदलें
+online.account.mfa_setup = दो-चरणीय सत्यापन चालू करें
+online.account.mfa_disable = दो-चरणीय सत्यापन बंद करें
+online.account.recovery = नए रिकवरी कोड
+online.account.sign_out = साइन आउट करें
+online.account.sign_out_all = हर जगह से साइन आउट करें
+online.account.sign_out_all.help = इस खाते को हर कंप्यूटर से साइन आउट करता है, इस कंप्यूटर से भी।
+online.account.signed_out = आपका साइन आउट हो गया है।
+online.account.signed_out_all = हर कंप्यूटर से आपका साइन आउट हो गया है।
+online.account.signing_out_all = हर कंप्यूटर से साइन आउट किया जा रहा है…
+online.account.sign_out_all_failed = हो सकता है आपके दूसरे कंप्यूटर अब भी साइन इन हों: फिर से साइन इन करें, फिर उन्हें "साइन-इन वाले डिवाइस" से साइन आउट करें। {0}
+online.account.sign_out_all_retry = हो सकता है आपके दूसरे कंप्यूटर अब भी साइन इन हों। "हर जगह से साइन आउट करें" फिर से आज़माएँ। {0}
+online.account.ratings = रेटिंग
+online.account.col.tc = टाइम कंट्रोल
+online.account.col.rating = रेटिंग
+online.account.col.games = बाज़ियाँ
+online.account.col.record = जीत / ड्रॉ / हार
+online.account.provisional = प्रश्नचिह्न अस्थायी रेटिंग दर्शाता है (अभी तक कम बाज़ियाँ खेली गई हैं)।
+online.password.title = पासवर्ड बदलें
+online.password.button = पासवर्ड बदलें
+online.password.changed = आपका पासवर्ड बदल दिया गया।
+online.password.other_sessions = आपके दूसरे कंप्यूटरों पर फिर से साइन इन करना होगा।
+online.mfa_setup.title = दो-चरणीय सत्यापन
+online.mfa_setup.lead = दो-चरणीय सत्यापन में हर साइन-इन पर आपके फ़ोन के एक ऐप से कोड माँगा जाता है। शुरू करने के लिए अपना पासवर्ड डालें।
+online.mfa_setup.scan = 1. इस कोड को किसी ऑथेंटिकेटर ऐप से स्कैन करें, या यह कुंजी उसमें टाइप करें:
+online.mfa_setup.enter = 2. ऐप में दिखने वाला 6 अंकों का कोड डालें:
+online.mfa_setup.enable = चालू करें
+online.mfa_setup.done = दो-चरणीय सत्यापन चालू है।
+online.mfa_off.title = दो-चरणीय सत्यापन बंद करें
+online.mfa_off.lead = अपना पासवर्ड और अपने ऐप से एक कोड (या कोई रिकवरी कोड) डालें।
+online.mfa_off.button = बंद करें
+online.mfa.off_done = दो-चरणीय सत्यापन बंद है।
+online.recovery.title = रिकवरी कोड
+online.recovery.lead = फ़ोन खो जाने पर हर कोड से एक बार साइन इन किया जा सकता है। इन्हें किसी सुरक्षित जगह रखें: ये केवल अभी दिखाए जा रहे हैं।
+online.recovery.saved = मैंने इन्हें सहेज लिया
+online.recovery.new_title = नए रिकवरी कोड
+online.recovery.new_lead = नए कोड पुराने कोड की जगह ले लेते हैं। अपना पासवर्ड और अपने ऐप से एक कोड डालें।
+online.recovery.button = नए कोड
+online.account.manage = सुरक्षा और डेटा
+online.account.pending_email = पुष्टि का इंतज़ार: {0}
+online.account.accept_challenges = चुनौतियाँ स्वीकार करें
+online.account.accept_challenges.help = दूसरे खिलाड़ी आपके उपयोगकर्ता नाम से आपको चुनौती दे सकते हैं। बंद: उनकी चुनौतियाँ अस्वीकार कर दी जाती हैं।
+online.account.history = बाज़ियों का इतिहास
+online.account.devices = साइन-इन वाले डिवाइस
+online.account.change_email = ईमेल बदलें
+online.account.export = मेरा डेटा डाउनलोड करें
+online.account.delete = खाता हटाएँ
+
+# Play
+online.play.signed_in = साइन इन: {0}
+online.session.file = कोई सिस्टम कीरिंग आपका साइन-इन नहीं रख सका: यह एक ऐसी फ़ाइल में याद रखा गया है जिसे केवल आपका उपयोगकर्ता खाता पढ़ सकता है (विकल्प > ऑनलाइन सर्वर)।
+online.session.memory = कोई सिस्टम कीरिंग आपका साइन-इन नहीं रख सका, और यह किसी फ़ाइल में सहेजा नहीं गया है: गेम बंद होने तक ही साइन-इन बना रहेगा (विकल्प > ऑनलाइन सर्वर)।
+online.play.find_section = प्रतिद्वंद्वी खोजें
+online.play.friend_section = दोस्त से खेलें
+online.play.mode = बाज़ी का प्रकार
+online.play.mode.help = रेटेड बाज़ियाँ इस टाइम कंट्रोल में आपकी रेटिंग बदलती हैं; कैज़ुअल बाज़ियाँ नहीं।
+online.play.find = प्रतिद्वंद्वी खोजें
+online.play.connecting = सर्वर से कनेक्ट हो रहा है…
+online.play.cooldown = {0} से फिर से प्रतिद्वंद्वी खोजा जा सकता है।
+online.play.banned = यह खाता {0} तक निलंबित है।
+online.play.challenge = किसी खिलाड़ी को चुनौती दें
+online.play.challenge.desc = ऑनलाइन मौजूद किसी खिलाड़ी को उसके उपयोगकर्ता नाम से आमंत्रित करें।
+online.play.private = निजी बाज़ी
+online.play.private.desc = किसी दोस्त को देने के लिए कोड बनाएँ, या उनके कोड से जुड़ें।
+online.play.direct = डायरेक्ट मैच
+online.play.direct.desc = कोई सर्वर नहीं: सीधे दोस्त के कंप्यूटर से खेलें।
+online.search.title = खोज जारी है
+online.search.window = रेटिंग दायरा {0}
+online.search.queued = खोज में {0} खिलाड़ी|खोज में {0} खिलाड़ी
+online.search.wait = आपके स्तर का प्रतिद्वंद्वी खोजा जा रहा है…
+online.outgoing.challenge = चुनौती भेजी गई
+online.outgoing.waiting = जवाब का इंतज़ार
+online.outgoing.private = निजी बाज़ी
+online.outgoing.private_hint = यह कोड अपने दोस्त को दें: उनके जुड़ते ही बाज़ी शुरू हो जाएगी।
+online.challenge.title = किसी खिलाड़ी को चुनौती दें
+online.challenge.opponent = प्रतिद्वंद्वी
+online.field.opponent = उपयोगकर्ता नाम
+online.field.opponent.hint = किसे चुनौती देनी है
+online.challenge.note = आपके प्रतिद्वंद्वी को मेनू में कहीं भी यह चुनौती दिखती है, और जवाब देने के लिए उनके पास एक मिनट होता है।
+online.challenge.send = चुनौती भेजें
+online.terms.rated = रेटेड
+online.terms.rated.help = केवल आधिकारिक टाइम कंट्रोल ही रेटेड हो सकते हैं।
+online.terms.color = आपका रंग
+online.private.title = निजी बाज़ी
+online.private.create_section = बनाएँ
+online.private.create_note = आपको एक छोटा कोड मिलेगा: जो भी उसे डाले, आपकी बाज़ी उसी से होगी।
+online.private.create = बाज़ी बनाएँ
+online.private.join_section = जुड़ें
+online.field.private_code = कोड
+online.private.join = जुड़ें
+online.private.joining = बाज़ी से जुड़ा जा रहा है…
+online.challenge.received = चुनौती
+online.challenge.accept = स्वीकार करें
+online.challenge.decline = अस्वीकार करें
+online.challenge.you_white = आपके मोहरे सफ़ेद
+online.challenge.you_black = आपके मोहरे काले
+online.challenge.you_random = रंग टॉस से
+online.challenge.declined = {0} ने आपकी चुनौती अस्वीकार कर दी।
+online.challenge.expired = आपकी चुनौती का जवाब नहीं आया और वह समाप्त हो गई।
+online.challenge.unavailable = {0} अभी उपलब्ध नहीं हैं।
+online.challenge.lost = कनेक्शन टूट गया: आपकी चुनौती रद्द कर दी गई।
+
+# At the table
+online.pause.clock_runs = बाज़ी जारी है: आपकी घड़ी चलती रहती है।
+online.pause.abort = बाज़ी रद्द करें
+online.pause.abort.help = आपकी पहली चाल से पहले बाज़ी रद्द की जा सकती है; वह गिनी नहीं जाती।
+online.pause.leave = बाज़ी छोड़ें
+online.confirm.resign.text = इस बाज़ी में हार मानें? जीत आपके प्रतिद्वंद्वी की होगी।
+online.confirm.leave.text = छोड़ने का मतलब है इस बाज़ी में हार मानना: जीत आपके प्रतिद्वंद्वी की होगी।
+online.confirm.leave.ok = हार मानें और छोड़ें
+online.confirm.leave_abort.text = अपनी पहली चाल से पहले छोड़ें? बाज़ी रद्द हो जाएगी और गिनी नहीं जाएगी।
+online.confirm.leave_abort.ok = रद्द करें और छोड़ें
+online.draw.card_title = ड्रॉ की पेशकश
+online.draw.card_text = आपके प्रतिद्वंद्वी ने ड्रॉ की पेशकश की है।
+online.draw.accept = स्वीकार करें
+online.draw.decline = अस्वीकार करें
+online.draw.offered = आपके प्रतिद्वंद्वी ने ड्रॉ की पेशकश की है।
+online.opponent_back = आपका प्रतिद्वंद्वी फिर से कनेक्ट है।
+online.opponent_away = प्रतिद्वंद्वी का कनेक्शन टूटा — लौटने के लिए {0}
+online.first_move = आपकी पहली चाल · {0}
+online.reconnecting = फिर से कनेक्ट हो रहा है…
+online.reconnecting.text = बाज़ी सर्वर पर जारी है और आपकी घड़ी चलती रहती है।
+online.gameover.aborted = बाज़ी रद्द कर दी गई: यह गिनी नहीं जाएगी।
+online.rating.casual = कैज़ुअल बाज़ी: रेटिंग में कोई बदलाव नहीं।
+online.rating.change = रेटिंग {0} → {1} ({2})
+online.rating.pending = रेटिंग: …
+online.rematch.accept = रीमैच स्वीकार करें
+online.rematch.offered = आपके प्रतिद्वंद्वी ने रीमैच की पेशकश की है।
+online.rematch.waiting = रीमैच की पेशकश भेजी गई…
+online.rematch.gone = रीमैच नहीं
+online.rematch.declined = इस बार रीमैच नहीं।
+online.report.button = प्रतिद्वंद्वी की शिकायत करें
+online.report.title = शिकायत
+online.report.lead = शिकायतें इस बाज़ी के साथ सर्वर के मॉडरेटरों तक जाती हैं। खेल को निष्पक्ष रखने में मदद के लिए धन्यवाद।
+online.report.category = कारण
+online.report.cheating = धोखाधड़ी
+online.report.abuse = अपमानजनक व्यवहार
+online.report.other = अन्य
+online.report.comment = टिप्पणी
+online.report.comment.hint = वैकल्पिक
+online.report.send = शिकायत भेजें
+online.report.sent = शिकायत भेज दी गई। धन्यवाद।
+online.report.queued = आपकी शिकायत बाज़ी ख़त्म होने पर भेजी जाएगी।
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = ऑनलाइन, {0} {1}
+online.sheet.rated = रेटेड
+online.sheet.casual = कैज़ुअल
+online.sheet.game = बाज़ी {0}
+# End reasons of online games
+reason.online.abandonment = प्रतिद्वंद्वी ने बाज़ी छोड़ दी
+reason.online.abandonment_vs_insufficient = बाज़ी छोड़ दी गई, पर प्रतिद्वंद्वी के लिए मात देना संभव नहीं
+reason.online.aborted = बाज़ी रद्द
+reason.online.no_show = समय पर पहली चाल नहीं (रद्द)
+reason.online.forfeit = हार घोषित
+reason.online.server_aborted = सर्वर द्वारा रद्द
+reason.online.both_disconnected = दोनों खिलाड़ियों का कनेक्शन टूट गया
+# Server notices
+online.notice.shutdown = सर्वर {0} बाद फिर से शुरू होगा। जारी बाज़ियाँ सहेज ली जाती हैं।
+online.notice.revoked = आपको इस सर्वर से साइन आउट कर दिया गया।
+online.notice.replaced = आपका खाता दूसरी विंडो से कनेक्ट हुआ; यह विंडो अब ऑफ़लाइन है।
+online.notice.rating_restored = आपकी रेटिंग में {0} अंक वापस जोड़ा गया: एक प्रतिद्वंद्वी को धोखाधड़ी के लिए प्रतिबंधित किया गया।|आपकी रेटिंग में {0} अंक वापस जोड़े गए: एक प्रतिद्वंद्वी को धोखाधड़ी के लिए प्रतिबंधित किया गया।
+# Errors
+online.err.rate_limited_for = बहुत ज़्यादा प्रयास। {0} बाद फिर कोशिश करें।
+online.err.rate_limited = बहुत ज़्यादा प्रयास। थोड़ी देर बाद फिर कोशिश करें।
+online.err.server_busy_for = सर्वर व्यस्त है। {0} बाद फिर कोशिश करें।
+online.err.server_busy = सर्वर व्यस्त है। थोड़ी देर बाद फिर कोशिश करें।
+online.err.banned_until = यह खाता {0} तक निलंबित है।
+online.err.banned = यह खाता निलंबित है।
+online.err.invalid_credentials = ग़लत उपयोगकर्ता नाम या पासवर्ड।
+online.err.invalid_credentials_pending = ग़लत उपयोगकर्ता नाम या पासवर्ड। अगर आपने अभी-अभी साइन अप किया है, तो पहले हमारा भेजा हुआ लिंक खोलें।
+online.err.email_unverified = आपका ईमेल पता अभी सत्यापित नहीं है: हमारा भेजा हुआ लिंक खोलें।
+online.err.network = सर्वर तक नहीं पहुँचा जा सका। अपना कनेक्शन और सर्वर का पता जाँचें।
+online.err.tls = सर्वर से सुरक्षित कनेक्शन नहीं बन सका।
+online.err.certificate = सर्वर के सर्टिफ़िकेट पर भरोसा नहीं किया जा सकता (या वह विकल्पों में दिए फ़िंगरप्रिंट से मेल नहीं खाता)।
+online.err.incompatible = इस सर्वर के लिए Scacelith का दूसरा संस्करण चाहिए।
+online.err.unauthorized = आपका सेशन ख़त्म हो गया है: कृपया फिर से साइन इन करें।
+online.err.username_taken = यह उपयोगकर्ता नाम पहले से लिया जा चुका है।
+online.err.email_taken = यह ईमेल पता पहले से किसी खाते में इस्तेमाल हो रहा है।
+online.err.invalid_username = उपयोगकर्ता नाम में 3 से 24 अक्षर, अंक, _ या - होते हैं।
+online.err.invalid_email = यह ईमेल पता मान्य नहीं है।
+online.err.weak_password = यह पासवर्ड बहुत कमज़ोर है: कम से कम 10 वर्ण इस्तेमाल करें।
+online.err.invalid_code = यह कोड सही नहीं है।
+online.err.expired = इस अनुरोध की अवधि ख़त्म हो गई है: कृपया फिर से शुरू करें।
+online.err.registration_closed = यह सर्वर नए खाते स्वीकार नहीं करता।
+online.err.sso_cancelled = Google साइन-इन रद्द कर दिया गया।
+online.err.sso_expired = Google साइन-इन में बहुत देर लगी या उसका उपयोग पहले ही हो चुका है। कृपया फिर से शुरू करें।
+online.err.sso_failed = Google साइन-इन नहीं हो सका। कृपया फिर कोशिश करें।
+online.err.sso_listen = Scacelith इस कंप्यूटर पर Google का जवाब नहीं पा सका। कृपया फिर कोशिश करें।
+online.err.sso_origin = इस सर्वर पते से Google साइन-इन काम नहीं करता। सर्वर को उस सार्वजनिक नाम से जोड़ें जो उसका संचालक देता है, फिर दोबारा कोशिश करें।
+online.err.browser = वेब ब्राउज़र नहीं खोला जा सका।
+online.err.sso_email_unverified = Google ने इस Google खाते के ईमेल पते की पुष्टि नहीं की है।
+online.err.sso_account_exists = यह ईमेल पता पहले से एक ऐसे खाते में इस्तेमाल हो रहा है, जिसे Google साइन-इन से नहीं जोड़ा जा सकता: उसके पासवर्ड से साइन इन करें, या "पासवर्ड याद नहीं?" का उपयोग करें।
+online.err.sso_already_linked = यह Google खाता पहले से किसी दूसरे खाते से जुड़ा है।
+online.err.account_disabled = यह खाता अब इस्तेमाल नहीं किया जा सकता।
+online.err.server_error = सर्वर में कोई समस्या आई। कृपया फिर कोशिश करें।
+online.err.timeout = सर्वर ने समय पर जवाब नहीं दिया।
+online.err.offline = सर्वर से कनेक्ट नहीं है: कनेक्ट होने के बाद फिर कोशिश करें।
+online.err.other = सर्वर ने अनुरोध अस्वीकार किया ({0})।
+online.err.code = सर्वर ने अनुरोध अस्वीकार किया (त्रुटि {0})।
+online.err.slow_down = थोड़ा धीरे-धीरे करें।
+online.err.server_full = सर्वर भरा हुआ है। बाद में फिर कोशिश करें।
+online.err.restarting = सर्वर फिर से शुरू हो रहा है। थोड़ी देर बाद फिर कोशिश करें।
+online.err.move_refused = सर्वर ने यह चाल अस्वीकार कर दी: बोर्ड पहले जैसा कर दिया गया है।
+online.err.game_over = यह बाज़ी पहले ही ख़त्म हो चुकी है।
+online.err.already_in_game = आपकी एक बाज़ी पहले से चल रही है।
+online.err.invalid_category = यह टाइम कंट्रोल यहाँ उपलब्ध नहीं है।
+online.err.draw_offer_limit = फ़िलहाल ड्रॉ की और पेशकश नहीं की जा सकती।
+online.err.abort_not_allowed = बाज़ी अब रद्द नहीं की जा सकती।
+online.err.no_pending_offer = जवाब देने के लिए कोई पेशकश नहीं है।
+online.err.flag_fell = आपका समय ख़त्म हो गया।
+online.err.queue_not_allowed = अभी प्रतिद्वंद्वी नहीं खोजा जा सकता।
+online.err.challenge_not_found = यह चुनौती अब मौजूद नहीं है।
+online.err.user_unavailable = यह खिलाड़ी उपलब्ध नहीं है।
+online.err.challenge_limit = फ़िलहाल बहुत ज़्यादा चुनौतियाँ। बाद में फिर कोशिश करें।
+online.err.challenge_self = ख़ुद को चुनौती नहीं दी जा सकती।
+online.err.code_invalid = इस कोड वाली कोई बाज़ी नहीं है।
+online.err.rated_official_tc = केवल आधिकारिक टाइम कंट्रोल ही रेटेड हो सकते हैं।
+online.err.cooldown = आपके लिए मैचमेकिंग कुछ देर के लिए रुकी हुई है।
+online.err.invalid_tc = इस टाइम कंट्रोल की अनुमति नहीं है।
+online.err.rematch_unavailable = अब रीमैच संभव नहीं है।
+online.err.rated_repeat_limit = फ़िलहाल इस खिलाड़ी के साथ आपकी काफ़ी रेटेड बाज़ियाँ हो चुकी हैं। कैज़ुअल बाज़ी खेलें, या बाद में फिर कोशिश करें।
+online.err.cheat_detected = सर्वर की फ़ेयर-प्ले जाँच ने बाज़ी रोक दी।
+online.err.invalid_password = ग़लत पासवर्ड।
+online.err.mfa_code_required = अपने ऑथेंटिकेटर ऐप का कोड (या कोई रिकवरी कोड) डालें।
+online.err.password_not_set = यह खाता Google से साइन इन करता है और इसका अभी कोई पासवर्ड नहीं है। पहले साइन-इन पेज पर "पासवर्ड याद नहीं?" से पासवर्ड सेट करें।
+online.err.too_many_attempts = बहुत ज़्यादा ग़लत प्रयास। बाद में फिर कोशिश करें।
+online.err.too_many_attempts_for = बहुत ज़्यादा ग़लत प्रयास। {0} बाद फिर कोशिश करें।
+online.err.same_email = यह पहले से आपका ईमेल पता है।
+online.err.not_found = सर्वर पर नहीं मिला।
+online.err.invalid_response = सर्वर का जवाब पढ़ा नहीं जा सका।
+online.err.storage = इस कंप्यूटर पर सेशन सहेजा नहीं जा सका।
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = बाज़ियों का इतिहास
+online.history.filter.games = बाज़ियाँ
+online.history.filter.result = परिणाम
+online.history.filter.all = सभी
+online.history.filter.won = जीत
+online.history.filter.lost = हार
+online.history.filter.drawn = ड्रॉ
+online.history.col.date = दिनांक
+online.history.col.opponent = प्रतिद्वंद्वी
+online.history.col.result = परिणाम
+online.history.col.tc = टाइम कंट्रोल
+online.history.col.kind = प्रकार
+online.history.col.rating = रेटिंग
+online.history.won = जीत
+online.history.lost = हार
+online.history.drawn = ड्रॉ
+online.history.aborted = रद्द
+online.history.page = पृष्ठ {0} / {1}
+online.history.total = {0} बाज़ी|{0} बाज़ियाँ
+online.history.previous = पिछला
+online.history.next = अगला
+online.history.empty.title = अभी तक कोई बाज़ी नहीं
+online.history.empty = इस सर्वर पर आपकी बाज़ियाँ ख़त्म होने के बाद यहाँ दिखती हैं।
+online.history.empty_filter.title = कोई बाज़ी नहीं
+online.history.empty_filter = इन फ़िल्टरों से कोई बाज़ी मेल नहीं खाती।
+online.history.error = इतिहास लोड नहीं हो सका
+online.history.unavailable = यह सर्वर बाज़ियों का इतिहास नहीं देता
+online.game.title = बाज़ी
+online.game.players = खिलाड़ी
+online.game.you = आप
+online.game.unrated = कोई रेटिंग नहीं
+online.game.you_won = आपकी जीत
+online.game.you_lost = आपकी हार
+online.game.draw = ड्रॉ
+online.game.you_left = आपने बाज़ी छोड़ दी
+online.game.date = दिनांक
+online.game.time_control = टाइम कंट्रोल
+online.game.moves = चालें
+online.game.move_count = {0} चाल|{0} चालें
+online.game.no_moves = कोई चाल नहीं चली गई।
+online.game.moves_incomplete = कुछ चालें पढ़ी नहीं जा सकीं: सूची अंत से पहले रुक जाती है।
+online.game.save = बाज़ी सहेजें
+online.game.saved_button = सहेजी गई
+online.game.saved = यह बाज़ी आपकी सहेजी गई बाज़ियों में है।
+online.game.already_saved = यह बाज़ी पहले से आपकी सहेजी गई बाज़ियों में है।
+online.game.save_failed = बाज़ी सहेजी नहीं जा सकी।
+online.game.invalid = सर्वर ने बाज़ी का ऐसा रिकॉर्ड भेजा जो पढ़ा नहीं जा सकता।
+online.game.replay = रीप्ले
+online.game.not_found = बाज़ी नहीं मिली
+online.game.error = बाज़ी लोड नहीं हो सकी
+online.devices.title = साइन-इन वाले डिवाइस
+online.devices.lead = वे डिवाइस जिन पर यह खाता साइन इन है। अगर कोई डिवाइस अनजाना लगे, तो उसे साइन आउट करें और अपना पासवर्ड बदलें।
+online.devices.unknown = अज्ञात डिवाइस
+online.devices.this = यह डिवाइस
+online.devices.signed_in = {0} को साइन इन किया गया
+online.devices.last_active = पिछली बार सक्रिय: {0}
+online.devices.active_now = अभी उपयोग में
+online.devices.sign_out = साइन आउट करें
+online.devices.signed_out = वह डिवाइस साइन आउट हो गया है।
+online.devices.error = डिवाइस लोड नहीं हो सके
+online.devices.all.title = हर जगह से साइन आउट करें
+online.email.title = ईमेल बदलें
+online.email.current = मौजूदा पता: {0}
+online.email.button = ईमेल बदलें
+online.email.sent = पुष्टि का लिंक {0} पर भेजा गया है।
+online.email.sent.hint = लिंक खोले जाने पर पता बदल जाता है। तब तक आपका मौजूदा पता ही इस्तेमाल होता रहेगा।
+online.email.done = हो गया
+online.email.changed = आपका ईमेल पता बदल दिया गया।
+online.export.title = मेरा डेटा डाउनलोड करें
+online.export.lead = यह सर्वर आपके खाते के बारे में जो कुछ भी रखता है (प्रोफ़ाइल, रेटिंग, बाज़ियाँ, डिवाइस, सुरक्षा से जुड़ी घटनाएँ), वह सब इस कंप्यूटर पर एक JSON फ़ाइल के रूप में सहेजा जाता है। पुष्टि के लिए अपना पासवर्ड डालें।
+online.export.button = डाउनलोड करें
+online.export.saved = आपका डेटा इस कंप्यूटर पर सहेज लिया गया है।
+online.export.failed = फ़ाइल लिखी नहीं जा सकी।
+online.delete.title = खाता हटाएँ
+online.delete.warning = आपका खाता इस सर्वर से हटा दिया जाएगा: आपका ईमेल पता, पासवर्ड, दो-चरणीय सत्यापन और डिवाइस मिटा दिए जाते हैं, और फिर साइन इन नहीं किया जा सकेगा। इसे पूर्ववत नहीं किया जा सकता।
+online.delete.games = आपकी बाज़ियाँ और रेटिंग सर्वर पर गुमनाम नाम {0} के तहत बनी रहती हैं।
+online.delete.confirm_name = पुष्टि के लिए अपना उपयोगकर्ता नाम और अपना पासवर्ड डालें।
+online.delete.button = मेरा खाता हटाएँ
+online.delete.done = आपका खाता हटा दिया गया है।
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = डायरेक्ट मैच
+online.direct.title = डायरेक्ट मैच
+online.direct.lead = दो कंप्यूटरों के बीच सीधी दोस्ताना बाज़ी: न सर्वर, न खाता, कभी रेटेड नहीं।
+online.direct.host = बाज़ी होस्ट करें
+online.direct.host.desc = दोस्त का कंप्यूटर आपके कंप्यूटर से कनेक्ट होता है: उन्हें अपना पता और एक कोड दें।
+online.direct.join = बाज़ी से जुड़ें
+online.direct.join.desc = होस्ट कर रहे दोस्त के कंप्यूटर से कनेक्ट करें।
+online.direct.host_title = बाज़ी होस्ट करें
+online.direct.your_color = आपका रंग
+online.direct.auto_press.help = चाल बोर्ड पर होते ही दोनों रोबोट अपने-आप घड़ी दबाते हैं। बंद: हर खिलाड़ी हर चाल के बाद ख़ुद घड़ी दबाता है।
+online.direct.unrated = डायरेक्ट मैच दोस्ताना बाज़ियाँ हैं: कभी रेटेड नहीं।
+online.direct.connection = कनेक्शन
+online.direct.port = पोर्ट
+online.direct.port.help = वह TCP पोर्ट जिस पर आपके दोस्त का कंप्यूटर कनेक्ट होता है (47100, जब तक वह पहले से इस्तेमाल में न हो)।
+online.direct.port_range = 1024 और 65535 के बीच का पोर्ट चुनें।
+online.direct.upnp = मेरे राउटर पर पोर्ट खोलें (UPnP)
+online.direct.upnp.help = घर के राउटर से यह पोर्ट इस कंप्यूटर पर फ़ॉरवर्ड करने को कहता है, और बाज़ी के बाद इसे बंद कर देता है।
+online.direct.host_note_upnp = गेम आपके राउटर से पोर्ट खोलने को कहता है। अगर वह न खोल पाए, तो आपको बताया जाएगा कि कौन सा पोर्ट ख़ुद फ़ॉरवर्ड करना है।
+online.direct.host_note_manual = अपने राउटर पर TCP पोर्ट को इस कंप्यूटर पर फ़ॉरवर्ड करें, या एक ही नेटवर्क पर खेलें।
+online.direct.host_button = होस्ट करें
+online.direct.wait_title = दोस्त का इंतज़ार
+online.direct.opening = आपके राउटर पर पोर्ट {0} खोला जा रहा है…
+online.direct.give = अपने दोस्त को दें:
+online.direct.cap_address = पता
+online.direct.cap_port = पोर्ट
+online.direct.cap_code = कोड
+online.direct.lan = एक ही नेटवर्क पर: {0}
+online.direct.router = आपका राउटर
+online.direct.upnp_searching = आपका राउटर खोजा जा रहा है…
+online.direct.upnp_mapped = {0} पर पोर्ट खोल दिया गया।
+online.direct.upnp_none = किसी UPnP राउटर ने जवाब नहीं दिया: TCP पोर्ट {0} को ख़ुद इस कंप्यूटर पर फ़ॉरवर्ड करें।
+online.direct.upnp_failed = राउटर ने पोर्ट खोलने से मना कर दिया: TCP पोर्ट {0} को ख़ुद इस कंप्यूटर पर फ़ॉरवर्ड करें।
+online.direct.upnp_off = अपने राउटर पर TCP पोर्ट {0} को इस कंप्यूटर पर फ़ॉरवर्ड करें।
+online.direct.upnp_cgnat = शायद आपका इंटरनेट प्रोवाइडर आपका इंटरनेट पता दूसरों के साथ साझा करता है (CGNAT): IPv6 या VPN आज़माएँ।
+online.direct.firewall = अगर Windows पूछे कि क्या Scacelith कनेक्शन स्वीकार कर सकता है, तो अनुमति दें।
+online.direct.waiting = दोस्त का इंतज़ार है…
+online.direct.connecting_friend = दोस्त का कंप्यूटर कनेक्ट हो रहा है…
+online.direct.starting = बोर्ड सजाया जा रहा है…
+online.direct.join_title = बाज़ी से जुड़ें
+online.direct.join_lead = आपके दोस्त जो पढ़कर बताएँ, वह डालें: उनका पता, पोर्ट और कोड।
+online.direct.address = पता
+online.direct.address.hint = IPv4, IPv6 या नाम
+online.direct.code = कोड
+online.direct.join_button = जुड़ें
+online.direct.connecting_to = {0} से कनेक्ट हो रहा है…
+online.direct.securing = {0} के साथ कनेक्शन सुरक्षित किया जा रहा है…
+direct.event = दोस्ताना मैच
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = डायरेक्ट, {0}
+direct.err.refused = इस पते और पोर्ट पर कोई बाज़ी होस्ट नहीं हो रही।
+direct.err.timeout = कोई जवाब नहीं: पता और पोर्ट जाँचें, और यह भी कि आपके दोस्त का राउटर गेम को अंदर आने देता है।
+direct.err.wrong_code = कोड सही नहीं है।
+direct.err.invalid_code = कोड में 12 वर्ण होते हैं (XXXX-XXXX-XXXX)।
+direct.err.incompatible = आपके दोस्त के पास Scacelith का दूसरा संस्करण है।
+direct.err.port_in_use = यह पोर्ट इस कंप्यूटर पर पहले से इस्तेमाल में है: कोई दूसरा चुनें।
+direct.err.network = नेटवर्क का उपयोग नहीं किया जा सका।
+direct.err.too_many_attempts = बहुत ज़्यादा ग़लत कोड: होस्टिंग रोक दी गई। नए कोड के लिए फिर से होस्ट करें।
+direct.err.bad_address = यह पता मान्य नहीं है।
+direct.err.not_found = यह नाम नहीं मिला।
+direct.err.unreachable = यहाँ से इस पते तक नहीं पहुँचा जा सकता।
+direct.err.reset = कनेक्शन कट गया।
+direct.err.closed = कनेक्शन बंद कर दिया गया।
+direct.err.host_left = आपके दोस्त ने होस्ट करना बंद कर दिया।
+direct.err.other = कनेक्शन नहीं हो सका ({0})।
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+# Hindi: the players' names ({0}, {1}) never take a verb that agrees with them: "{0} की जीत",
+# "{0} ने ... स्वीकार कर ली", "{0} के मोहरे सफ़ेद".
+hotseat.player2 = खिलाड़ी 2
+hotseat.white_player = सफ़ेद
+hotseat.black_player = काला
+hotseat.name.help = दोनों स्कोरशीट पर लिखा जाने वाला नाम, किसी भी लिपि में।
+hotseat.swap = रंग बदलें
+hotseat.left_hand = {0} का खेलने वाला हाथ बायाँ है: घड़ी उनकी बाईं ओर है।
+hotseat.rated = रेटेड बाज़ी
+hotseat.rated.help = इस कंप्यूटर पर हर नाम की अपनी अलग दो-खिलाड़ी रेटिंग रहती है। Stockfish के ख़िलाफ़ आपकी रेटिंग कभी नहीं बदलती।
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = दो-खिलाड़ी रेटिंग: {0} {1} · {2} {3}
+hotseat.new_rating = (नई)
+hotseat.friendly_note = दोस्ताना बाज़ी: रेटिंग में कोई बदलाव नहीं।
+hotseat.colours = {0} के मोहरे सफ़ेद, {1} के मोहरे काले।
+hotseat.colours_swap = हर रीमैच पर रंग बदल जाते हैं।
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, आपकी चाल
+hotseat.flag = {0} का समय ख़त्म हो गया।
+hotseat.confirm.resign = {0} की ओर से हार मानें? {1} को विजेता घोषित किया जाएगा।
+hotseat.confirm.resign_draw = {0} की ओर से हार मानें? {1} के लिए अब मात देना संभव नहीं: बाज़ी ड्रॉ होगी।
+hotseat.draw.offer_noted = आपकी ड्रॉ की पेशकश आपकी चाल के साथ जाती है: आपके घड़ी दबाने के बाद यह {0} को दिखेगी।
+hotseat.draw.card_title = ड्रॉ की पेशकश
+hotseat.draw.offered = {0} ने ड्रॉ की पेशकश की है।
+hotseat.draw.card_hint = कोई मोहरा छूने पर पेशकश अस्वीकार हो जाती है।
+hotseat.draw.accept = स्वीकार करें
+hotseat.draw.decline = अस्वीकार करें
+hotseat.draw.accepted = {0} ने {1} की ड्रॉ की पेशकश स्वीकार कर ली।
+hotseat.draw.declined = {0} ने {1} की ड्रॉ की पेशकश अस्वीकार कर दी।
+# Scoresheet header note
+hotseat.sheet.rated = रेटेड बाज़ी
+hotseat.sheet.friendly = दोस्ताना बाज़ी
+# Game over card
+hotseat.gameover.wins = {1} चाल में {0} की जीत।|{1} चालों में {0} की जीत।
+hotseat.gameover.wins_now = {0} की जीत।
+hotseat.gameover.friendly = {0} बनाम {1} · दोस्ताना बाज़ी
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = यह बाज़ी रेटेड नहीं है।
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+# Hindi: the coach is male (कोच ... दिखाता है), as in the coach's own lines.
+menu.coach = कोच
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = कोच मोड के लिए {0} द्वारा बनाई गई सिंथेटिक आवाज़
+# Coach page
+coach.title = कोच
+coach.section.level = स्तर
+coach.section.lesson = कोच के साथ
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = {0} रेटिंग वाले खिलाड़ियों के लिए
+coach.completed = पूरा हुआ
+coach.recommended = सुझाया गया
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = शतरंज के नियम
+coach.level.0.desc = एक इंटरैक्टिव पाठ, एक बार में एक नियम।
+coach.level.0.detail = कोच छोटी-छोटी स्थितियाँ लगाता है और दिखाता है कि हर मोहरा कैसे चलता और काटता है, फिर कैसलिंग, प्रमोशन, शह और मात। हर विचार को बोर्ड पर ख़ुद आज़माने का मौक़ा मिलता है।
+coach.level.1.name = पहले क़दम
+coach.level.1.desc = किस पर हमला है, क्या बिना बचाव के छूटा है।
+coach.level.1.detail = कोच नरमी से खेलता है और सीधी-सादी भाषा में बताता है: आपके किन मोहरों पर हमला है, कौन से बिना बचाव के छूटे हैं, और उन्हें कैसे बचाया जाए।
+coach.level.2.name = शुरुआती
+coach.level.2.desc = आसान टैक्टिक्स, मोहरों का विकास, राजा की सुरक्षा।
+coach.level.2.detail = फ़ोर्क और पिन को उनके नाम से पुकारा जाता है। कोच मोहरों को बाहर निकालने और राजा को सुरक्षित रखने की बात करता है।
+coach.level.3.name = उभरता खिलाड़ी
+coach.level.3.desc = योजनाएँ, प्यादों की संरचना, एकमात्र चालें।
+coach.level.3.detail = कोच योजनाएँ और प्यादों की संरचना समझाता है, और जब केवल एक ही चाल स्थिति बचा सकती हो, तब आपको सावधान करता है।
+coach.level.4.name = क्लब खिलाड़ी
+coach.level.4.desc = संभावित चालें, प्यादों में मूल्यांकन।
+coach.level.4.detail = कोच संभावित चालों को तौलता है और मूल्यांकन प्यादों में बताता है, जैसे कोई क्लब ट्रेनर बताता।
+coach.level.5.name = मज़बूत क्लब खिलाड़ी
+coach.level.5.desc = संक्षिप्त लाइनें, पोज़िशनल शब्दावली।
+coach.level.5.detail = छोटी टिप्पणियाँ, ठोस लाइनें और पोज़िशनल खेल की शब्दावली।
+coach.level.6.name = विशेषज्ञ
+coach.level.6.desc = संक्षिप्त टिप्पणियाँ, गहरी लाइनें, मूल्यांकन के आँकड़े।
+coach.level.6.detail = कम शब्द, जैसे मज़बूत खिलाड़ियों के बीच होते हैं: कई चालों तक गहरी लाइनें और मूल्यांकन के आँकड़े।
+coach.note.clock = कोई घड़ी नहीं: जितना चाहें, उतना समय लें।
+coach.note.takeback = ब्लंडर के बाद कोच दिखाता है कि क्या ग़लत हुआ और चाल वापस लेने की पेशकश करता है।
+coach.note.lesson = आपके मोहरे सफ़ेद हैं; कोच हर अभ्यास बोर्ड पर लगाता है।
+coach.note.unrated = कोच के साथ बाज़ियाँ रेटेड नहीं होतीं।
+coach.note.fallible = कोच अचूक नहीं है: कभी-कभी वह किसी चाल का ग़लत आकलन कर सकता है।
+coach.colour = आपका रंग
+coach.colour.help = कोच के ख़िलाफ़ आपके मोहरों का रंग। बारी-बारी: एक बाज़ी में सफ़ेद, अगली में काला। नियमों का पाठ हमेशा सफ़ेद मोहरों से खेला जाता है।
+coach.colour.alternate = बारी-बारी
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = कोच की आवाज़ इंस्टॉल नहीं है या बंद है (विकल्प > ऑडियो): उसकी बातें स्क्रीन पर लिखी जाएँगी।
+# At the table
+coach.speaker = कोच
+coach.skip = छोड़ें
+coach.offer.title = चाल वापस लें?
+coach.offer.text = कोच आपकी पिछली चाल वापस लेने की पेशकश करता है, ताकि आप उससे बेहतर चाल खोज सकें।
+coach.offer.hint = Backspace से चाल वापस होती है। कोई मोहरा छूने पर खेल जारी रहता है।
+coach.offer.accept = वापस लें
+coach.offer.decline = खेल जारी रखें
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = चाल वापसी के बाक़ी मौक़े: {0}
+coach.pause.take_back = अपनी चाल वापस लें
+coach.pause.take_back.help = आपकी पिछली चाल वापस लेता है, और अगर कोच जवाब दे चुका हो, तो उसकी चाल भी।
+coach.confirm.resign = इस बाज़ी में हार मानें? कोच को विजेता घोषित किया जाएगा।
+coach.confirm.resign_draw = इस बाज़ी में हार मानें? कोच के लिए अब मात देना संभव नहीं: बाज़ी ड्रॉ होगी।
+coach.confirm.leave = मुख्य मेनू पर लौटें? कोच के साथ यह बाज़ी छोड़ दी जाएगी।
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = फिर से खेलें
+coach.gameover.unrated = कोच के साथ यह बाज़ी रेटेड नहीं है।
+coach.lesson.done = शाबाश
+coach.lesson.done.line = अब आपको शतरंज के नियम आते हैं।
+coach.lesson.next = पहली बाज़ी
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = अभ्यास
+coach.tab.challenges = चुनौतियाँ
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = मात
+challenge.group.tactics = टैक्टिक्स
+challenge.group.defence = बचाव
+challenge.group.endgames = एंडगेम
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = एक चाल में मात
+challenge.mate1.desc = एक ही चाल में शह और मात।
+challenge.mate1.detail = पहले हर शह को देखें: उनमें से एक के बाद न राजा के लिए कोई खाना बचता है, न बीच में मोहरा लाकर बचाव, न शह देने वाले मोहरे को काटने का मौक़ा।
+challenge.mate2.name = दो चालों में मात
+challenge.mate2.desc = ऐसी चाल जिसका कोई बचाव न हो, फिर मात।
+challenge.mate2.detail = पहली चाल अक्सर शह या बलिदान होती है, जो राजा से एक खाना छीन लेती है। कोच जितना हो सके, उतना अच्छा बचाव करता है।
+challenge.mate3.name = तीन चालों में मात
+challenge.mate3.desc = मजबूर करने वाली लंबी लाइनें।
+challenge.mate3.detail = शह, काटने की चालें और ख़तरे, तीन चालों की गहराई तक। मोहरा छूने से पहले हर क़दम पर कोच के सबसे अच्छे जवाब की गणना करें।
+challenge.backrank.name = पिछली रैंक पर मात
+challenge.backrank.desc = अपने ही प्यादों के पीछे फँसा राजा।
+challenge.backrank.detail = जब कैसलिंग किए हुए राजा के सामने के प्यादे अपनी जगह से न हिले हों, तो आख़िरी रैंक पर आया हाथी या वज़ीर मात दे सकता है। पहले रक्षकों को हटाएँ या उनका ध्यान भटकाएँ।
+challenge.patterns.name = मात के पैटर्न
+challenge.patterns.desc = स्मदर्ड मात, अनास्तासिया मात, अरेबियन मात जैसे क्लासिक पैटर्न।
+challenge.patterns.detail = मात के मशहूर जाल, जो बार-बार सामने आते हैं। मोहरों की जमावट और आख़िरी वार पहचानना सीखें।
+challenge.hanging.name = मुफ़्त मोहरे
+challenge.hanging.desc = पहचानें कि क्या बिना बचाव के छूटा है।
+challenge.hanging.detail = जिस मोहरे या प्यादे का कोई बचाव नहीं कर रहा, उसे सीधे काटा जा सकता है। देखें कि कोच के हर मोहरे की रक्षा कौन कर रहा है।
+challenge.fork.name = फ़ोर्क
+challenge.fork.desc = एक मोहरा एक साथ दो पर हमला करता है।
+challenge.fork.detail = घोड़े, प्यादे, वज़ीर और राजा तक फ़ोर्क कर सकते हैं। प्रतिद्वंद्वी दोनों निशानों में से केवल एक को बचा सकता है।
+challenge.pin.name = पिन
+challenge.pin.desc = ऐसा मोहरा जो अपने पीछे खड़ा मोहरा गँवाए बिना हिल नहीं सकता।
+challenge.pin.detail = किसी मोहरे को उसके राजा या किसी ज़्यादा क़ीमती मोहरे के आगे पिन करें, फिर उस पर दोबारा हमला करें, या इस बात का फ़ायदा उठाएँ कि वह हिल नहीं सकता।
+challenge.skewer.name = स्क्यूअर
+challenge.skewer.desc = किसी क़ीमती मोहरे पर हमला करें और उसके पीछे वाला मोहरा जीतें।
+challenge.skewer.detail = पिन का उलटा: ज़्यादा क़ीमती मोहरा आगे खड़ा होता है, उसे हटना पड़ता है, और उसके पीछे का मोहरा खुल जाता है।
+challenge.discovered.name = डिस्कवर्ड अटैक
+challenge.discovered.desc = एक मोहरा हटाकर दूसरे का हमला खोलें।
+challenge.discovered.detail = जब कोई मोहरा किसी लाइन से हटता है, तो उसके पीछे वाला मोहरा हमला करता है। अगर साथ में शह हो, या दोहरी शह, तो प्रतिद्वंद्वी के पास दोनों ख़तरों का जवाब देने का समय नहीं होता।
+challenge.deflection.name = डिफ़्लेक्शन और डिकॉय
+challenge.deflection.desc = किसी रक्षक को दूर भटकाएँ, या किसी घातक खाने पर खींच लाएँ।
+challenge.deflection.detail = जिस रक्षक के ज़िम्मे दो काम हों, वह दोनों नहीं कर सकता। उस पर हमला करें, उसे कुछ पेश करें, या किसी मोहरे को उस खाने पर आने के लिए मजबूर करें जहाँ वह खो जाएगा।
+challenge.intermezzo.name = बीच की चालें
+challenge.intermezzo.desc = तुरंत वापस न काटें: इससे ज़्यादा ताक़तवर चाल मौजूद है।
+challenge.intermezzo.detail = अपेक्षित चाल से पहले, बीच में दी गई एक शह या उससे बड़ा ख़तरा सब कुछ बदल देता है।
+challenge.trapped.name = फँसे हुए मोहरे
+challenge.trapped.desc = ऐसा मोहरा जिसके पास कोई सुरक्षित खाना नहीं बचा।
+challenge.trapped.detail = किसी मोहरे के बचकर निकलने के आख़िरी खाने छीन लें, फिर उसे जीत लें।
+challenge.promotion.name = प्रमोशन
+challenge.promotion.desc = प्यादे को आख़िरी रैंक तक पहुँचाएँ।
+challenge.promotion.detail = आगे बढ़े हुए प्यादे बहुत क़ीमती होते हैं। रास्ता साफ़ करें, रोकने वालों को हटाएँ और नया वज़ीर बनाएँ।
+challenge.quiet.name = शांत चालें
+challenge.quiet.desc = जीतने वाली चाल न शह है, न काटने की चाल।
+challenge.quiet.detail = कभी-कभी सबसे ताक़तवर चाल बस एक ऐसा ख़तरा तैयार करती है जिसे रोका नहीं जा सकता। ऐसी चालें देखना सबसे मुश्किल होता है।
+challenge.opening.name = ओपनिंग के जाल
+challenge.opening.desc = शुरुआती ग़लतियों की सज़ा दें।
+challenge.opening.detail = असली बाज़ियों की पहली चालों से ली गई स्थितियाँ, जहाँ एक लापरवाह चाल का तुरंत फ़ायदा उठाया जा सकता है।
+challenge.escape.name = बचने का रास्ता खोजें
+challenge.escape.desc = आपका राजा ख़तरे में है: केवल एक चाल उसे बचाती है।
+challenge.escape.detail = बाक़ी हर चाल हार की ओर ले जाती है। अपने राजा के ख़िलाफ़ सभी शह और ख़तरे देखें, फिर बचने का एकमात्र रास्ता खोजें।
+challenge.defend.name = बचाव की चालें
+challenge.defend.desc = मटीरियल गँवाए बिना ख़तरा टालें।
+challenge.defend.detail = कोच कोई ख़तरा पैदा करता है। वह सटीक चाल खोजें जो सब कुछ सँभाले रखे।
+challenge.kq.name = वज़ीर और राजा बनाम राजा
+challenge.kq.desc = वज़ीर से मात।
+challenge.kq.detail = अकेले राजा को अपने वज़ीर से किनारे की ओर धकेलें, अपने राजा को पास लाएँ, और स्टेलमेट से सावधान रहें। कोच अपनी सबसे अच्छी चालों से बचाव करता है।
+challenge.kr.name = हाथी और राजा बनाम राजा
+challenge.kr.desc = हाथी से मात।
+challenge.kr.detail = हाथी रैंक दर रैंक राजा का रास्ता बंद करता है; आपका राजा ऑपोज़िशन लेता है। कोच अपनी सबसे अच्छी चालों से बचाव करता है।
+challenge.kp.name = राजा और प्यादा बनाम राजा
+challenge.kp.desc = ऑपोज़िशन जीतें और प्यादे को वज़ीर बनाएँ।
+challenge.kp.detail = प्यादे से पहले अपने राजा को आगे बढ़ाएँ। ऑपोज़िशन लें और ऐसा वज़ीर बनाएँ जिसे कोच पकड़ न सके।
+challenge.kp_hold.name = प्यादे को रोकें
+challenge.kp_hold.desc = राजा और प्यादे के ख़िलाफ़ अकेला राजा: ड्रॉ बचाएँ।
+challenge.kp_hold.detail = प्यादे के सामने रहें और ऑपोज़िशन बनाए रखें। दस चालों तक ड्रॉ बचाए रखें।
+challenge.rook.name = हाथी के एंडगेम
+challenge.rook.desc = लुसेना का पुल और फ़िलिडोर का बचाव।
+challenge.rook.detail = वे दो स्थितियाँ जो हर खिलाड़ी को पता होनी चाहिए: सातवीं रैंक पर प्यादे के साथ कैसे जीतें, और तीसरी रैंक पर हाथी रखकर कैसे बचाव करें।
+challenge.endgame.name = एंडगेम टैक्टिक्स
+challenge.endgame.desc = कम मोहरे, तीखे विचार।
+challenge.endgame.detail = असली बाज़ियों से प्यादों की दौड़, ब्रेकथ्रू और हाथी के एंडगेम।
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} स्थिति|{0} स्थितियाँ
+coach.challenge.done = पूरी हुई
+coach.challenge.start = शुरू करें
+coach.challenge.note.white = आपके मोहरे सफ़ेद हैं; कोच हर स्थिति बोर्ड पर लगाता है।
+coach.challenge.note.hint = रास्ता नहीं सूझ रहा? संकेत के लिए H दबाएँ। कुछ प्रयासों के बाद कोच ख़ुद संकेत की पेशकश करेगा।
+coach.challenge.note.unsaved = चुनौतियाँ न रेटेड होती हैं, न सहेजी जाती हैं; जिन्हें आपने पूरा किया है, उन पर सही का निशान दिखता है।
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = चुनौती पूरी हुई
+coach.challenge.complete.line = आपने हर स्थिति हल कर ली।
+coach.challenge.next = अगली चुनौती
+coach.challenge.again = फिर से
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = संकेत चाहिए?
+coach.hint.text = कोच आपको एक संकेत देने की पेशकश करता है।
+coach.hint.hint = H दबाने पर संकेत मिलता है। कोई मोहरा छूने पर खोज जारी रहती है।
+coach.hint.accept = संकेत
+coach.hint.decline = नहीं, धन्यवाद
+coach.hint.key = संकेत
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = कोच की आवाज़
+options.coach_voice.help = कोच मोड में कोच बोलकर बताता है। उसकी आवाज़ का मॉडल पहली बार ज़रूरत पड़ने पर डाउनलोड होता है (लगभग 399 MB)। बंद: कोच की बातें केवल स्क्रीन पर लिखी जाती हैं।
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = आवाज़ का मॉडल
+options.voice_update.help = कोच अब भी अपने आवाज़ मॉडल के पुराने 8-बिट संस्करण से बोलता है। अपडेट Supertone द्वारा प्रकाशित Supertonic 3 का आधिकारिक संस्करण डाउनलोड करता है, और पहले पुरानी फ़ाइलें हटा देता है।
+options.voice_update.button = अपडेट करें ({0} MB)
+options.voice_update.running = डाउनलोड जारी है।
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = आवाज़ की गुणवत्ता
+options.voice_quality.help = कोच की आवाज़ बनाने में हर पंक्ति पर सुधार के कितने चरण चलते हैं, कम (4) से अधिकतम (9) तक; डिफ़ॉल्ट रूप से मध्यम (5)। ऊँचे स्तर पर आवाज़ थोड़ी ज़्यादा साफ़ होती है, पर गणना में ज़्यादा समय लगता है, इसलिए कोच थोड़ी देर से बोलना शुरू करता है। आवाज़ का मॉडल इंस्टॉल होने और कोच की आवाज़ चालू होने पर इसे सेट किया जा सकता है।
+options.voice_quality.low = कम
+options.voice_quality.medium = मध्यम
+options.voice_quality.high = उच्च
+options.voice_quality.very_high = बहुत उच्च
+options.voice_quality.ultra = अल्ट्रा
+options.voice_quality.max = अधिकतम
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = कोच की आवाज़
+coach.download.text = कोच Supertonic 3 से बोलता है, जो Supertone का एक स्पीच सिंथेसिस मॉडल है। यह Scacelith के साथ शामिल नहीं है: गेम इसे अभी Hugging Face से डाउनलोड कर सकता है ({0} MB, एक बार)। इसके बिना कोच अपनी बातें स्क्रीन पर लिखता है।
+coach.download.licence = मॉडल OpenRAIL-M लाइसेंस के तहत प्रकाशित है, जो इससे बनी आवाज़ के कुछ उपयोगों पर रोक लगाता है, जैसे उसे इंसानी आवाज़ बताकर पेश करना या किसी असली व्यक्ति की नक़ल करना।
+coach.download.read_licence = लाइसेंस पढ़ें
+coach.download.accept = "डाउनलोड करें" चुनने का अर्थ है इस लाइसेंस की शर्तें स्वीकार करना।
+# {0} = a folder
+coach.download.folder = यहाँ सहेजा जाएगा: {0}
+coach.download.not_now = अभी नहीं
+# {0} = the size in megabytes
+coach.download.download = डाउनलोड करें ({0} MB)
+coach.download.licence_title = OpenRAIL-M लाइसेंस
+coach.download.back = वापस
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = कोच के लिए नई आवाज़
+coach.update.text = अब कोच की आवाज़ के लिए, अब तक इंस्टॉल किए गए 8-बिट रूपांतरण की जगह, Supertone द्वारा प्रकाशित Supertonic 3 का आधिकारिक संस्करण इस्तेमाल होता है। गेम इसे अभी Hugging Face से डाउनलोड कर सकता है ({0} MB, एक बार); पहले पुरानी फ़ाइलें ({1} MB) हटाई जाती हैं। अगर आप मना करें, तो कोच अपनी मौजूदा आवाज़ बनाए रखता है, और अपडेट विकल्प > ऑडियो में उपलब्ध रहता है।
+coach.update.download = अपडेट करें ({0} MB)
+coach.update.accept = "अपडेट करें" चुनने का अर्थ है इस लाइसेंस की शर्तें स्वीकार करना।
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = कोच की आवाज़
+coach.download.removing = पुराना संस्करण हटाया जा रहा है…
+coach.download.checking = फ़ाइलें जाँची जा रही हैं…
+coach.download.downloading = डाउनलोड हो रहा है…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Hugging Face से
+coach.download.from_archive = Hugging Face से (आर्काइव कॉपी)
+coach.download.cancel = रद्द करें
+coach.download.failed = डाउनलोड नहीं हो सका।
+coach.download.error.network = सर्वरों तक नहीं पहुँचा जा सका। कृपया अपना इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।
+# {0} = a folder
+coach.download.error.disk = फ़ाइलें {0} में नहीं लिखी जा सकीं। कृपया ख़ाली जगह जाँचें और फिर कोशिश करें।
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = सर्वरों ने अप्रत्याशित जवाब भेजा ({0})। कृपया बाद में फिर कोशिश करें।
+coach.download.retry = फिर कोशिश करें
+coach.download.close = बंद करें
+# Notices
+coach.download.done = कोच की आवाज़ इंस्टॉल हो गई है।
+coach.download.cancelled = डाउनलोड रद्द हुआ: अगली बार यह वहीं से आगे बढ़ेगा जहाँ रुका था।
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = सहेजी गई बाज़ियाँ
+options.save_games = अपनी बाज़ियाँ सहेजें
+options.save_games.help = बाज़ी ख़त्म होने पर Stockfish के ख़िलाफ़, कोच के साथ और इस कंप्यूटर पर दो खिलाड़ियों के बीच की आपकी बाज़ियाँ, और आपके डायरेक्ट मैच, PGN फ़ाइलों के रूप में सहेजे जाते हैं; इन्हें "सहेजी गई बाज़ियाँ" में फिर से देखा जा सकता है। ऑनलाइन बाज़ियाँ सर्वर रखता है।
+library.title = सहेजी गई बाज़ियाँ
+library.section.games = बाज़ियाँ
+library.section.details = बाज़ी
+library.section.tags = टैग
+library.section.moves = चालें
+library.count = {0} बाज़ी|{0} बाज़ियाँ
+library.filter = दिखाएँ
+library.filter.all = सभी बाज़ियाँ
+library.filter.play = Stockfish के ख़िलाफ़
+library.filter.coach = कोच के साथ
+library.filter.hotseat = दो खिलाड़ी
+library.filter.direct = डायरेक्ट मैच
+library.filter.server = ऑनलाइन बाज़ियाँ
+library.filter.imported = आयातित
+library.mode.play = Stockfish के ख़िलाफ़
+library.mode.coach = कोच के साथ
+library.mode.hotseat = दो खिलाड़ी
+library.mode.direct = डायरेक्ट मैच
+library.mode.server = ऑनलाइन बाज़ी
+library.mode.imported = आयातित
+library.coach_level = स्तर {0}
+library.unknown_player = अज्ञात
+library.unfinished = अधूरी
+library.unreadable = यह बाज़ी पढ़ी नहीं जा सकती।
+library.moves = {0} चाल|{0} चालें
+library.opening_variation = {0}: {1}
+library.file = फ़ाइल: {0}
+library.file_game = फ़ाइल: {0}, {2} में से बाज़ी {1}
+library.no_moves = कोई चाल नहीं चली गई।
+library.none_selected = सूची में से कोई बाज़ी चुनें।
+library.reading = सहेजी गई बाज़ियाँ पढ़ी जा रही हैं
+library.empty.title = अभी तक कोई सहेजी गई बाज़ी नहीं
+library.empty.text = Stockfish के ख़िलाफ़, कोच के साथ और इस कंप्यूटर पर दो खिलाड़ियों के बीच की आपकी बाज़ियाँ, और आपके डायरेक्ट मैच, ख़त्म होने के बाद यहाँ दिखते हैं। इस फ़ोल्डर में PGN फ़ाइलें भी रखी जा सकती हैं: दूसरे प्रोग्रामों या वेबसाइटों से निर्यात की गई बाज़ियाँ आपकी बाज़ियों के साथ दिखती हैं।
+library.empty.filter = इस तरह की कोई बाज़ी नहीं।
+library.error.folder = सहेजी गई बाज़ियों का फ़ोल्डर पढ़ा नहीं जा सकता
+library.error.game = यह बाज़ी पढ़ी नहीं जा सकती: {0}
+library.folder = फ़ोल्डर: {0}
+library.open_folder = फ़ोल्डर खोलें
+library.open_failed = फ़ोल्डर खोला नहीं जा सका।
+library.replay = रीप्ले
+library.delete = हटाएँ
+library.delete.title = बाज़ी हटाएँ
+library.delete.text = बाज़ी {0} अपनी फ़ाइल समेत इस कंप्यूटर से हटा दी जाएगी। इसे पूर्ववत नहीं किया जा सकता।
+library.delete.ok = हटाएँ
+library.delete.several = इस फ़ाइल में {0} बाज़ी है: यह बाज़ी केवल फ़ोल्डर में जाकर ही हटाई जा सकती है।|इस फ़ाइल में {0} बाज़ियाँ हैं: यह बाज़ी केवल फ़ोल्डर में जाकर ही हटाई जा सकती है।
+library.deleted = बाज़ी हटा दी गई है।
+library.delete.failed = बाज़ी हटाई नहीं जा सकी।
+library.delete.changed = फ़ाइल बदल गई है: सूची अपडेट कर दी गई है।
+library.truncated = इस फ़ोल्डर में बहुत ज़्यादा बाज़ियाँ हैं: केवल {0} सबसे नई बाज़ियाँ दिखाई गई हैं।
+library.tag.Event = प्रतियोगिता
+library.tag.Site = स्थान
+library.tag.Date = दिनांक
+library.tag.Time = समय
+library.tag.Round = राउंड
+library.tag.White = सफ़ेद
+library.tag.Black = काला
+library.tag.Result = परिणाम
+library.tag.WhiteElo = सफ़ेद की Elo
+library.tag.BlackElo = काले की Elo
+library.tag.TimeControl = टाइम कंट्रोल
+library.tag.Termination = समाप्ति का कारण
+library.tag.Opening = ओपनिंग
+library.tag.Variation = वेरिएशन
+library.tag.PlyCount = अर्ध-चालें
+library.tag.FEN = शुरुआती स्थिति
+library.tag.ScacelithMode = मोड
+library.tag.CoachLevel = कोच का स्तर
+library.tag.ScacelithServer = सर्वर
+library.tag.ScacelithGameId = बाज़ी संख्या
+library.tag.UTCDate = दिनांक (UTC)
+library.tag.UTCTime = समय (UTC)
+library.tag.WhiteRatingDiff = सफ़ेद की रेटिंग में बदलाव
+library.tag.BlackRatingDiff = काले की रेटिंग में बदलाव
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = विश्लेषण
+analysis.menu.title = विश्लेषण
+analysis.menu.analyse = विश्लेषण करें
+analysis.menu.paste = PGN पेस्ट करें
+analysis.menu.online = मेरी ऑनलाइन बाज़ियाँ
+analysis.menu.folder = विश्लेषण के लिए PGN फ़ाइलें इस फ़ोल्डर में रखें: {0}
+analysis.menu.empty.title = अभी तक कोई सहेजी गई बाज़ी नहीं
+analysis.menu.empty.text = आपकी बाज़ियाँ ख़त्म होने के बाद यहाँ दिखती हैं, और नीचे दिए फ़ोल्डर में रखी गई PGN फ़ाइलें भी। PGN टेक्स्ट के रूप में कॉपी की गई बाज़ी पेस्ट भी की जा सकती है।
+analysis.menu.empty.no_folder = विश्लेषण के लिए PGN टेक्स्ट के रूप में कॉपी की गई बाज़ी पेस्ट करें।
+analysis.menu.paste.empty = क्लिपबोर्ड ख़ाली है: पहले किसी बाज़ी को PGN टेक्स्ट के रूप में कॉपी करें।
+analysis.menu.paste.none = क्लिपबोर्ड में शतरंज की कोई बाज़ी नहीं मिली।
+analysis.menu.paste.several = क्लिपबोर्ड में कई बाज़ियाँ हैं: पहली बाज़ी का विश्लेषण किया जा रहा है।
+analysis.menu.gameover = बाज़ी का विश्लेषण करें
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = चाल {0} / {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = तुरंत
+replay.again = फिर से रीप्ले करें
+replay.gameover.unfinished = बाज़ी चाल {0} के बाद बिना परिणाम के रुक जाती है।
+replay.tip.start = बाज़ी की शुरुआत (Home)
+replay.tip.back = एक चाल पीछे (J)
+replay.tip.pause = रोकें (K)
+replay.tip.resume = फिर शुरू करें (K)
+replay.tip.forward = एक चाल आगे (L)
+replay.tip.end = बाज़ी का अंत (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = कमेंट्री
+analysis.hud.accuracy = सटीकता
+analysis.hud.reviewing = Stockfish बाज़ी की समीक्षा कर रहा है… {0}
+analysis.hud.no_engine = कोई शतरंज इंजन नहीं: चालें बिना विश्लेषण के दिखाई जा रही हैं।
+analysis.hud.no_moves = इस बाज़ी में कोई चाल नहीं है।
+analysis.hud.tip.play = चालें चलाएँ (K)
+analysis.hud.tip.comments_off = अहम पलों की टिप्पणियाँ छिपाएँ (N)
+analysis.hud.tip.comments_on = अहम पलों की टिप्पणियाँ दिखाएँ (N)
+analysis.hud.tip.voice_off = कमेंटेटर की आवाज़ बंद करें (M)
+analysis.hud.tip.voice_on = टिप्पणियाँ आवाज़ में सुनें (M)
+analysis.hud.tip.voice_missing = आवाज़ सुनाई नहीं दे सकती: उसकी फ़ाइलें इंस्टॉल नहीं हैं, या विकल्प > ऑडियो > कोच की आवाज़ बंद है। टिप्पणियाँ केवल स्क्रीन पर लिखी जाती हैं।
+analysis.hud.tip.arrows_off = बेहतर चालों के तीर छिपाएँ (B)
+analysis.hud.tip.arrows_on = बेहतर चालों के तीर दिखाएँ (B)
+analysis.hud.controls.play = चलाएँ / रोकें
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = टिप्पणियाँ दिखाएँ / छिपाएँ
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = कमेंटेटर की आवाज़ चालू / बंद
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = तीर दिखाएँ / छिपाएँ
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = GIF के रूप में सहेजें
+gif.making = GIF बनाया जा रहा है: सर्वर बाज़ी का चित्र बना रहा है…
+gif.saved = GIF सहेज लिया गया है:
+gif.saved_as = GIF सहेजा गया: {0}
+gif.sign_in_first = GIF बनाने के लिए किसी ऑनलाइन सर्वर पर साइन इन करें: GIF सर्वर ही बनाता है।
+gif.busy_other = एक और GIF बनाया जा रहा है। कृपया उसके तैयार होने तक इंतज़ार करें।
+gif.err.rate_limited_for = आपने कम समय में कई GIF बनाए हैं। अगला GIF {0} बाद बनाया जा सकता है।
+gif.err.rate_limited = आपने कम समय में कई GIF बनाए हैं। कृपया बाद में फिर कोशिश करें।
+gif.err.server_busy_for = सर्वर दूसरे GIF बनाने में व्यस्त है। कृपया {0} बाद फिर कोशिश करें।
+gif.err.server_busy = सर्वर दूसरे GIF बनाने में व्यस्त है। कृपया थोड़ी देर बाद फिर कोशिश करें।
+gif.err.signed_out = आपका सेशन ख़त्म हो गया है। GIF बनाने के लिए कृपया फिर से साइन इन करें।
+gif.err.game_too_long = यह बाज़ी GIF बनाने के लिए बहुत लंबी है।
+gif.err.pgn_too_large = यह बाज़ी GIF बनाने के लिए बहुत लंबी है।
+gif.err.invalid_pgn = सर्वर यह बाज़ी नहीं पढ़ सका।
+gif.err.render_failed = सर्वर यह GIF नहीं बना सका। कृपया फिर कोशिश करें।
+gif.err.gif_disabled = यह सर्वर GIF नहीं बनाता।
+gif.err.write_failed = GIF इस कंप्यूटर पर सहेजा नहीं जा सका।
+gif.err.not_found = यह बाज़ी अब सर्वर पर नहीं है।
+gif.wait.seconds = {0} सेकंड|{0} सेकंड
+gif.wait.minutes = {0} मिनट|{0} मिनट
+gif.wait.both = {0} और {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 शुरू नहीं हो सका। कृपया अपना ग्राफ़िक्स ड्राइवर अपडेट करें।
+error.opengl_macos = इस Mac पर OpenGL 4.6 शुरू नहीं हो सका। Scacelith के लिए Apple silicon (M1 या उसके बाद का) और macOS 26 या उसके बाद का संस्करण चाहिए, और यह वर्चुअल मशीन में नहीं चलता।
+error.renderer = रेंडरर शुरू नहीं हो सका।
+error.scene = दृश्य लोड नहीं हो सका।
+error.log_file = विवरण लॉग फ़ाइल में है: {0}

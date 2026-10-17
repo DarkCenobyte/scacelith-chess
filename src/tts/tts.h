@@ -33,8 +33,9 @@ struct Options {
                                 // same line always sounds the same
 };
 
-// Speech languages for a UI language code: en fr de es ru uk ar ja (false for zh-Hans, zh-Hant and
-// anything else the coach does not speak). The one list: coach::speechSupported asks it.
+// Speech languages for a UI language code: every language of the voice (Supertonic 3: 32 of the
+// game's 34, "pt-BR" with the Portuguese voice; false for zh-Hans, zh-Hant and anything else the
+// coach does not speak). The one list: coach::speechSupported asks it.
 bool languageSupported(const std::string& uiCode);
 
 // Voice used when Options::voice is -1: "M3", the male "teacher" voice chosen by listening (the only

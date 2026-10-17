@@ -123,9 +123,10 @@ std::string modelTag(const std::string& lang) {
 }  // namespace
 
 bool languageSupported(const std::string& uiCode) {
-    for (const char* l : {"en", "fr", "de", "es", "ru", "uk", "ar", "ja"})
-        if (uiCode == l) return true;
-    return false;
+    // The voice's own list (Supertonic 3 has no Chinese); a regional UI code speaks its language
+    // ("pt-BR" -> "pt").
+    const std::string l = uiCode.substr(0, uiCode.find('-'));
+    return !l.empty() && l != "na" && text::modelLanguage(l);
 }
 
 const char* defaultVoiceName() { return kDefaultVoice; }
@@ -205,7 +206,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
     std::string err;
     auto cancelled = [cancel] { return cancel && cancel->load(std::memory_order_relaxed); };
 
-    for (const std::string& piece : text::chunk(textIn, text::chunkLength(tag))) {
+    for (const std::string& piece : text::chunk(text::spokenPunctuation(textIn, tag), text::chunkLength(tag))) {
         if (cancelled()) return {};
         int dropped = 0;
         std::vector<int64_t> ids = text::indices(text::preprocess(piece, tag), eng.indexer(), &dropped);

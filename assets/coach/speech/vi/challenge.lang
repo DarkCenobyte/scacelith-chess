@@ -1,0 +1,137 @@
+# Coach speech (Vietnamese): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 thế cờ", count.position in
+#            common.lang), "{n:move}" likewise ("2 nước"): "chiếu hết sau {n:move}" = "mate in 2"
+#   {move}   one of the coach's moves, played on the board while the line is said; written after
+#            the noun "nước" ("sau nước {move}"); "{move:nomate}" says a mating move without
+#            "chiếu hết" (the line says it)
+#   {your}   one of the player's pieces ("con Mã của bạn"); the coach points at it on that word
+#   {sq}     a square, always after the noun "ô" ("ô {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach calls himself "tôi" and the player "bạn".
+# Each intro starts with the challenge's name as the coach page shows it (assets/i18n/vi.lang
+# challenge.<id>.name).
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Chiếu hết sau một nước. Có {n:position}, và ở mỗi thế cờ, chỉ cần một nước là chiếu hết. Hãy xem xét mọi nước chiếu.
+ch.intro.mate2 = Chiếu hết sau hai nước. Có {n:position}: nước đầu tiên của bạn phải khiến tôi không còn cách phòng thủ, rồi bạn chiếu hết.
+ch.intro.mate3 = Chiếu hết sau ba nước. Có {n:position}. Chiếu, bắt quân và đe dọa: mỗi lần hãy tính ra nước đáp trả tốt nhất của tôi.
+ch.intro.backrank = Chiếu hết ở hàng cuối. Có {n:position} trong đó một con Vua bị kẹt sau các con Tốt của chính mình.
+ch.intro.patterns = Các mẫu chiếu hết. Có {n:position} với những mạng lưới chiếu hết kinh điển. Hãy nhận ra mẫu hình, rồi ra đòn.
+ch.intro.hanging = Quân cho không. Có {n:position}: có một quân của tôi không được bảo vệ. Hãy tìm ra và bắt nó.
+ch.intro.fork = Đòn chĩa đôi. Có {n:position}: hãy tìm nước đi tấn công hai mục tiêu cùng lúc.
+ch.intro.pin = Đòn ghim. Có {n:position}: hãy ghim một quân, hoặc tận dụng một đòn ghim.
+ch.intro.skewer = Đòn xiên. Có {n:position}: hãy tấn công một quân giá trị và ăn quân đứng sau nó.
+ch.intro.discovered = Đòn tấn công mở. Có {n:position}: hãy di chuyển một quân để mở đường cho quân khác.
+ch.intro.deflection = Đánh lạc hướng và dụ quân. Có {n:position}: hãy kéo một quân phòng thủ ra xa, hoặc dụ nó vào một ô chết người.
+ch.intro.intermezzo = Nước trung gian. Có {n:position}: trước nước đi hiển nhiên, hãy tìm một nước mạnh hơn.
+ch.intro.trapped = Quân bị nhốt. Có {n:position}: một quân của tôi không còn ô an toàn nào để đi. Hãy ăn nó.
+ch.intro.promotion = Phong cấp. Có {n:position} trong đó một con Tốt đã tiến sâu quyết định ván cờ.
+ch.intro.quiet = Nước đi lặng. Có {n:position}: nước thắng không phải nước chiếu, cũng không phải nước bắt quân.
+ch.intro.opening = Bẫy khai cuộc. Có {n:position} từ những nước đầu tiên của các ván đấu thật. Hãy trừng phạt sai lầm của tôi.
+ch.intro.escape = Tìm lối thoát. Có {n:position}: Vua của bạn đang gặp nguy hiểm, và chỉ một nước đi cứu được nó.
+ch.intro.defend = Nước phòng thủ. Có {n:position}: hãy tìm nước đi duy nhất giữ vững được thế cờ của bạn.
+ch.intro.kq = Hậu và Vua đấu Vua. Có {n:position}: hãy chiếu hết Vua của tôi. Cẩn thận với thế hết nước đi.
+ch.intro.kr = Xe và Vua đấu Vua. Có {n:position}: hãy chiếu hết Vua của tôi, từng bước một.
+ch.intro.kp = Vua và Tốt đấu Vua. Có {n:position}: hãy phong Hậu. Để Vua của bạn đi trước dẫn đường.
+ch.intro.kp_hold = Chặn Tốt. Có {n:position}: bạn chỉ có Vua. Hãy giữ hòa.
+ch.intro.rook = Tàn cuộc Xe. Có {n:position}: hãy bắc cầu để phong cấp, và giữ hòa bằng thế phòng thủ Philidor.
+ch.intro.endgame = Chiến thuật tàn cuộc. Có {n:position} với ít quân và những ý tưởng sắc bén.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 nước").
+ch.task.mate = Chiếu hết sau {n:move}.
+ch.task.mate.2 = Hãy tìm cách chiếu hết sau {n:move}.
+ch.task.hanging = Có một quân không được bảo vệ.
+ch.task.hanging.2 = Bạn có thể bắt quân nào mà không mất gì?
+ch.task.fork = Hãy tìm đòn chĩa đôi.
+ch.task.fork.2 = Hãy tìm một nước chĩa đôi.
+ch.task.pin = Mấu chốt ở đây là một đòn ghim.
+ch.task.skewer = Ở đây, một đòn xiên sẽ thắng.
+ch.task.discovered = Ở đây, một đòn tấn công mở sẽ thắng.
+ch.task.deflection = Hãy làm quá tải hoặc dụ một quân phòng thủ.
+ch.task.intermezzo = Hãy tìm một nước trung gian.
+ch.task.trapped = Một quân của tôi không thể thoát. Hãy ăn nó.
+ch.task.promotion = Hãy tận dụng con Tốt đã tiến sâu của bạn.
+ch.task.quiet = Nước thắng là một nước đi lặng.
+ch.task.opening = Hãy trừng phạt nước đi vừa rồi của tôi.
+ch.task.escape = Hãy cứu Vua của bạn: chỉ có một nước đi cứu được.
+ch.task.defend = Hãy tìm nước đi đúng duy nhất.
+ch.task.endgame = Hãy tìm nước đi tốt nhất.
+ch.task.default = Hãy tìm nước đi tốt nhất.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Hãy chiếu hết Vua của tôi. Tôi sẽ phòng thủ hết sức có thể.
+ch.task.play.promote = Hãy phong cấp cho Tốt, và giữ vững chiến thắng. Tôi sẽ cố ngăn bạn.
+ch.task.play.hold = Hãy giữ hòa trong {n:move}. Tôi sẽ cố giành chiến thắng.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Những thế cờ này lấy từ các ván đấu thật. Tôi đi nước cuối cùng, rồi đến lượt bạn.
+ch.lead.first.2 = Mỗi thế cờ đều lấy từ một ván đấu thật: tôi đi nước dẫn đến thế cờ đó, rồi bạn đi.
+ch.next = Thế cờ tiếp theo.
+ch.next.2 = Đây là thế tiếp theo.
+ch.next.3 = Sang thế tiếp theo nào.
+ch.last = Thế cờ cuối cùng.
+ch.last.2 = Và bây giờ là thế cuối cùng.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it). Never "Tốt." for "Good." (it is
+# heard as "Pawn.").
+ch.good = Được đấy.
+ch.good.2 = Đúng.
+ch.good.3 = Đúng rồi.
+ch.good.4 = Chính xác.
+# The position is solved.
+ch.solved = Đúng thế! Giỏi lắm.
+ch.solved.2 = Hoàn toàn chính xác.
+ch.solved.3 = Rất hay.
+ch.solved.mate = Chiếu hết! Giỏi lắm.
+ch.solved.mate.2 = Và đó là chiếu hết. Rất hay.
+ch.solved.mate.3 = Chiếu hết. Đẹp lắm.
+ch.solved.promote = Một Hậu mới, và chiến thắng đã chắc chắn. Giỏi lắm.
+ch.solved.hold = Đã giữ được hòa. Phòng thủ hay lắm!
+ch.solved.draw = Ván cờ hòa trên bàn cờ. Phòng thủ hay lắm!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Không phải nước này: tôi sẽ đáp lại bằng nước {move}.
+ch.wrong.reply.2 = Chưa đúng lắm: tôi sẽ đi {move}.
+ch.wrong.reply.3 = Khi đó tôi sẽ đi {move}.
+ch.wrong.mate = Cẩn thận: nước {move:nomate} sẽ là chiếu hết.
+ch.wrong.mate.2 = Coi chừng: tôi sẽ đáp lại bằng nước {move:nomate}, và đó là chiếu hết.
+ch.wrong.mated = Cẩn thận: sau nước {move}, tôi có thể buộc chiếu hết sau {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Nước này cũng chiếu hết, nhưng lâu hơn. Có cách nhanh hơn.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Nước này cũng chiếu hết, nhưng tôi đang nghĩ đến một nước khác. Hãy xem lại.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Không tệ, nhưng có nước mạnh hơn. Hãy xem lại.
+ch.wrong.weaker.2 = Nước đó đi được, nhưng bạn có thể làm tốt hơn.
+ch.wrong.stalemate = Hết nước đi! Vua của tôi không thể di chuyển, và như vậy chỉ là hòa.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Không phải nước này: sau nước {move}, tôi có thể giữ hòa.
+ch.wrong.loses = Cẩn thận: sau nước {move}, tôi sẽ nắm thế thắng.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Không phải nước đó.
+ch.try_again = Thử lại nhé.
+ch.try_again.2 = Hãy xem lại lần nữa.
+ch.try_again.3 = Nhìn kỹ lại xem.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Bạn có muốn một gợi ý không?
+ch.offer.2 = Tôi gợi ý cho bạn nhé?
+ch.no_hint = Được rồi. Cứ tiếp tục tìm nhé.
+ch.no_hint.2 = Được thôi, cứ từ từ.
+ch.hint.piece = Hãy nhìn {your}.
+ch.hint.piece.2 = Hãy nghĩ đến {your}.
+ch.hint.square = Hãy nhìn ô {sq}.
+ch.hint.square.2 = Ô then chốt là ô {sq}.
+ch.hint.square.3 = Hãy để mắt đến ô {sq}.
+ch.hint.show = Đây là nước đi. Xem này.
+ch.hint.show.2 = Để tôi chỉ cho bạn. Xem này.
+ch.hint.now = Giờ bạn đi nước đó nhé.
+ch.hint.now.2 = Đến lượt bạn: hãy đi nước đó.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Vậy là xong toàn bộ thử thách. Giỏi lắm!
+ch.complete.2 = Tất cả các thế cờ đã được giải. Giỏi lắm!

@@ -1,0 +1,441 @@
+# Coach speech (Bulgarian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "ти"; the player's gender is unknown: no
+# l-participle and no adjective about the player ("ти спечели", "печелеше", "играеш все по-добре",
+# "вече можеш да играеш на ниво ..." instead of "готов"). A 2nd person aorist that looks like an
+# imperative ("спечели", "намери", "направи") gets "ти" or another verb ("откри").
+# Forms from common.lang: "{acc:percent}" = "85%" (spoken "осемдесет и пет процента"), "{n:capture}" =
+# "3 вземания" (pawns included), "{m:check}" = "2 шаха", "{n:best_move}" = "5 най-добри хода",
+# "{m:m}" = a bare masculine number ("два" хода). Move numbers: "на ход {n}", "до ход {crit_no}".
+# Never "с" before a number or a percentage (it becomes "със" before "седем", "сто"...): a colon instead.
+# {opening} is the citation name, always after a colon ("Дебют: {opening}."), so that no article or
+# preposition has to agree with it.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases: the masculine nouns with the FULL article (дебютът, мителшпилът, ендшпилът). The lines use
+# {text} only as a subject, after "беше" or after a colon, never after a preposition or as an object.
+appraisal.phase.opening = дебютът
+appraisal.phase.middlegame = мителшпилът
+appraisal.phase.endgame = ендшпилът
+# Draw reasons, said right after "Реми" or "завърши реми" ("Реми по взаимно съгласие.").
+appraisal.reason.stalemate = поради пат
+appraisal.reason.material = поради недостатъчен материал за мат
+appraisal.reason.repetition = чрез повторение на позицията
+appraisal.reason.fifty = по правилото на петдесетте хода
+appraisal.reason.agreement = по взаимно съгласие
+appraisal.reason.other = по правилата
+# The coach level names (coach.level.<n>.name of assets/i18n/bg.lang), quoted in the lines: ниво „{level}“.
+appraisal.level.l1 = Първи стъпки
+appraisal.level.l2 = Начинаещ
+appraisal.level.l3 = Напредващ
+appraisal.level.l4 = Клубен играч
+appraisal.level.l5 = Силен клубен играч
+appraisal.level.l6 = Експерт
+# What to practise: a phrase in lower case, no full stop, always said after a colon ("Един съвет: ...",
+# "Тема: ..."): a verbal noun ("оглеждане", "търсене") or a short noun phrase.
+theme.general = оглеждане на цялата дъска, преди да играеш
+theme.mate_allowed = проверка дали царят ти е в безопасност преди всеки ход
+theme.mate_missed = търсене на мат, като започваш с шаховете
+theme.stalemate = оставяне на свободно поле за царя ми, когато печелиш
+theme.fork = внимание към двойните удари
+theme.discovered = внимание към скритите атаки зад фигурите ми
+theme.skewer = ценните фигури да не стоят на една линия
+theme.pin = предвиждане на свръзките, преди да възникнат
+theme.trapped = оставяне на път за отстъпление на фигурите ти
+theme.back_rank = малко въздух за царя ти
+theme.hanging = защитата на фигурите ти
+theme.exchange = броене на нападащите и защитаващите фигури преди размяна
+theme.missed_capture = търсене преди всичко на фигури, които можеш да вземеш даром
+theme.missed_fork = търсене на собствени двойни удари
+theme.promotion = надпреварата на пешките и правилото на квадрата
+theme.king_safety = сигурността на царя ти зад пешките му
+theme.bad_trade = избор кои фигури да разменяш
+theme.opening = развитие на фигурите и ранна рокада
+theme.endgame = използване на царя и придвижване на проходните пешки
+theme.positional = подобряване на най-лошата ти фигура
+theme.material = проверка какво могат да спечелят следващите ми ходове, преди да играеш
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Мат! Ти спечели. Браво!
+appraisal.open.win.b1.2 = Ти спечели! Браво, че доведе партията докрай.
+appraisal.open.win.b1.3 = Ти ме победи! Това беше наистина хубава партия.
+appraisal.open.win.b2 = Добре изиграно! Ти спечели за {moves:move}.
+appraisal.open.win.b2.2 = Поздравления, ти спечели!
+appraisal.open.win.b2.3 = Победа за {moves:move}. Чудесно!
+appraisal.open.win.b3 = Поздравления, напълно заслужена победа.
+appraisal.open.win.b3.2 = Добре изиграно. Тази победа е заслужена.
+appraisal.open.win.b3.3 = Хубава победа. Поздравления.
+appraisal.open.win.b4 = Хубава победа.
+appraisal.open.win.b4.2 = Добре изиграно, заслужена победа.
+appraisal.open.win.b4.3 = Добра победа.
+appraisal.open.win.b5 = Добре изиграно.
+appraisal.open.win.b5.2 = Красиво спечелено.
+appraisal.open.win.b5.3 = Добра партия, добре спечелена.
+appraisal.open.win.b6 = Добре изиграно.
+appraisal.open.win.b6.2 = Заслужена победа.
+appraisal.open.win.b6.3 = Добра партия.
+appraisal.open.draw.b1 = Реми! В тази партия никой не успя да победи.
+appraisal.open.draw.b1.2 = Реми. Партията беше много оспорвана!
+appraisal.open.draw.b1.3 = Реми: делим си точката. Браво!
+appraisal.open.draw.b2 = Реми – справедлив резултат.
+appraisal.open.draw.b2.2 = Завършихме реми. Хубава битка!
+appraisal.open.draw.b2.3 = Реми в една хубава партия.
+appraisal.open.draw.b3 = Реми. И двете страни имаха шансове.
+appraisal.open.draw.b3.2 = Справедливо реми.
+appraisal.open.draw.b3.3 = Реми {text}. Добра битка.
+appraisal.open.draw.b4 = Реми {text}.
+appraisal.open.draw.b4.2 = Партията завърши реми {text}.
+appraisal.open.draw.b4.3 = Завършихме реми {text}.
+appraisal.open.draw.b5 = Реми.
+appraisal.open.draw.b5.2 = Реми {text}.
+appraisal.open.draw.b5.3 = Равен резултат.
+appraisal.open.draw.b6 = Реми.
+appraisal.open.draw.b6.2 = Реми {text}.
+appraisal.open.draw.b6.3 = Наравно.
+appraisal.open.stalemate.b1 = Реми поради пат – беше толкова близо! Следващия път остави на царя ми свободно поле.
+appraisal.open.stalemate.b1.2 = Пат, значи реми. Победата беше съвсем близо!
+appraisal.open.stalemate.b2 = Реми поради пат. Беше толкова близо до победата!
+appraisal.open.stalemate.b2.2 = Пат: реми, въпреки че печелеше.
+appraisal.open.stalemate.b3 = Реми поради пат в печеливша позиция.
+appraisal.open.stalemate.b3.2 = Пат. Победата се изплъзна в самия край.
+appraisal.open.stalemate.b4 = Реми поради пат.
+appraisal.open.stalemate.b4.2 = Пат: реми.
+appraisal.open.stalemate.b5 = Пат.
+appraisal.open.stalemate.b5.2 = Реми поради пат.
+appraisal.open.stalemate.b6 = Пат.
+appraisal.open.stalemate.b6.2 = Реми, пат.
+appraisal.open.loss.b1 = Този път спечелих аз, но ти изигра няколко наистина добри хода.
+appraisal.open.loss.b1.2 = Хубава партия! Накара ме да се потрудя.
+appraisal.open.loss.b1.3 = Беше забавно! Тази спечелих аз, но ти се учиш бързо.
+appraisal.open.loss.b2 = Хубава партия! Да видим какво се получи добре и едно нещо, което да опиташ.
+appraisal.open.loss.b2.2 = Благодаря за партията! Ти имаше няколко добри идеи.
+appraisal.open.loss.b2.3 = Хубава партия. Да видим какво можем да научим от нея.
+appraisal.open.loss.b3 = Добра партия.
+appraisal.open.loss.b3.2 = Благодаря за партията.
+appraisal.open.loss.b3.3 = Добра партия. Да я разгледаме.
+appraisal.open.loss_close.b3 = Добра битка. Дълго време партията беше равна.
+appraisal.open.loss_close.b3.2 = Добра битка: дълго време имаше равновесие.
+appraisal.open.loss.b4 = Добра партия. Ето какво я реши.
+appraisal.open.loss.b4.2 = Добра партия. Реши я един момент.
+appraisal.open.loss.b4.3 = Благодаря за партията. Да видим къде настъпи обратът.
+appraisal.open.loss_close.b4 = Дълго време борбата беше равна. Ето какво я реши.
+appraisal.open.loss_close.b4.2 = Добра партия, дълго време равна.
+appraisal.open.loss.b5 = Добра партия.
+appraisal.open.loss.b5.2 = Благодаря за партията.
+appraisal.open.loss.b5.3 = Добра битка.
+appraisal.open.loss.b6 = Добра партия.
+appraisal.open.loss.b6.2 = Благодаря за партията.
+appraisal.open.loss.b6.3 = Добра битка.
+appraisal.open.resigned.b1 = Предаването е част от шаха и за него се иска смелост. Хубава партия!
+appraisal.open.resigned.b1.2 = Няма нищо. Да знаеш кога да се предадеш, също е част от шаха.
+appraisal.open.resigned.b2 = Предаването е част от шаха и изисква смелост.
+appraisal.open.resigned.b2.2 = Разбирам. И за предаването се иска смелост.
+appraisal.open.resigned.b3 = Предаването е част от шаха. Добра партия.
+appraisal.open.resigned.b3.2 = Разбирам. Благодаря за партията.
+appraisal.open.resigned.b4 = Добра партия.
+appraisal.open.resigned.b4.2 = Благодаря за партията.
+appraisal.open.resigned.b5 = Добра партия.
+appraisal.open.resigned.b5.2 = Благодаря за партията.
+appraisal.open.resigned.b6 = Добра партия.
+appraisal.open.resigned.b6.2 = Благодаря.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Знаеш ли, още нищо не беше решено: около {eval}.
+appraisal.resign_early.b3.2 = Всъщност още имаше шансове: около {eval}.
+appraisal.resign_early.b4 = Партията още не беше решена: около {eval}.
+appraisal.resign_early.b4.2 = Още имаше игра: около {eval}.
+appraisal.resign_early.b5 = Не беше решено: {eval}.
+appraisal.resign_early.b5.2 = Още можеше да се играе, около {eval}.
+appraisal.resign_early.b6 = Не беше краят: {eval}.
+appraisal.resign_early.b6.2 = Оценката беше {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Дебютът, който изиграхме: {opening}.
+appraisal.opening.b3.2 = Дебютът на партията: {opening}.
+appraisal.opening.b4 = Нашият дебют: {opening}.
+appraisal.opening.b4.2 = Дебютът: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Дебют: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Дебют: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Каква жертва на ход {n}: {move}!
+appraisal.best.brilliant.b1.2 = Любимият ми момент: {move}. Пожертва фигура – и се получи!
+appraisal.best.brilliant.b2 = Най-добрият ти момент: жертвата {move} на ход {n}.
+appraisal.best.brilliant.b2.2 = {move} на ход {n} беше смела жертва. Браво!
+appraisal.best.brilliant.b3 = Блестяща жертва: {move}.
+appraisal.best.brilliant.b3.2 = Върхът на партията: {move}, истинска жертва, на ход {n}.
+appraisal.best.brilliant.b4 = Най-добър момент: {move}, ход {n}. Блестяща жертва.
+appraisal.best.brilliant.b4.2 = {move} на ход {n} беше блестящ ход.
+appraisal.best.brilliant.b5 = {move} на ход {n}: блестящо.
+appraisal.best.brilliant.b5.2 = Ход {n}, {move}: блестящо.
+appraisal.best.brilliant.b6 = {move}!! на ход {n}.
+appraisal.best.brilliant.b6.spoken = {move}, блестящо, на ход {n}.
+appraisal.best.brilliant.b6.2 = Ход {n}: {move}, блестящо.
+appraisal.best.great.b1 = Любимият ми момент: {move}. Това беше страхотен ход!
+appraisal.best.great.b1.2 = Помниш ли {move}? Това беше страхотна находка.
+appraisal.best.great.b2 = Най-добрият ти момент: {move} на ход {n}. Този ход обърна партията.
+appraisal.best.great.b2.2 = {move} на ход {n} беше страхотен ход.
+appraisal.best.great.b3 = Ключовият ход беше {move} на ход {n}: той обърна нещата.
+appraisal.best.great.b3.2 = Страхотна находка: {move} на ход {n}.
+appraisal.best.great.b4 = Веднага наказа грешката ми: {move}.
+appraisal.best.great.b4.2 = Най-добър момент: {move}, ход {n}.
+appraisal.best.great.b5 = {move} на ход {n}. Добре намерено.
+appraisal.best.great.b5.2 = Ход {n}, {move}: страхотна находка.
+appraisal.best.great.b6 = {move} на ход {n}. Добре намерено.
+appraisal.best.great.b6.2 = Ход {n}: {move}!
+appraisal.best.only.b1 = Любимият ми момент: {move}. Това беше единственият добър ход!
+appraisal.best.only.b1.2 = На ход {n} ти откри {move} – единствения добър ход. Отлично!
+appraisal.best.only.b2 = Най-добрият ти момент: {move}, единственият добър ход в онази позиция.
+appraisal.best.only.b2.2 = {move} на ход {n} беше единственият ход и ти го откри.
+appraisal.best.only.b3 = Ключовият ход беше {move} на ход {n}: единственият, който държеше позицията.
+appraisal.best.only.b3.2 = На ход {n} позицията държеше само {move} и ти го откри.
+appraisal.best.only.b4 = Най-добър момент: {move}, ход {n}. Единствен ход.
+appraisal.best.only.b4.2 = Ход {n}: {move}, единственият ход.
+appraisal.best.only.b5 = {move} на ход {n} беше единственият ход. Добре намерено.
+appraisal.best.only.b5.2 = Ход {n}, единственото продължение: {move}.
+appraisal.best.only.b6 = {move} на ход {n} беше единственият ход. Добре намерено.
+appraisal.best.only.b6.2 = Ход {n}: {move}, единствен ход.
+appraisal.best.won.b1 = Любимият ми момент: {move}. Този ход ти донесе {pts:point}!
+appraisal.best.won.b1.2 = Помниш ли {move}? Той ти донесе {pts:point}. Браво!
+appraisal.best.won.b2 = Най-добрият ти момент: {move} на ход {n}, с печалба от {pts:point}.
+appraisal.best.won.b2.2 = {move} на ход {n} спечели материал. Чудесно!
+appraisal.best.won.b3 = Ключовият ход беше {move} на ход {n}: той спечели {pts:point}.
+appraisal.best.won.b3.2 = {move} на ход {n} спечели чисто материал.
+appraisal.best.won.b4 = Най-добър момент: {move}, ход {n}, с печалба на материал.
+appraisal.best.won.b4.2 = {move} на ход {n} спечели {pts:point}.
+appraisal.best.won.b5 = {move} на ход {n} спечели материал.
+appraisal.best.won.b5.2 = Ход {n}: {move}, с печалба на материал.
+appraisal.best.won.b6 = {move} на ход {n} спечели материал.
+appraisal.best.won.b6.2 = Ход {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Ход {n}: {move}, плюс {pts}.
+appraisal.best.streak.b1 = Откри най-добрия ход {n:time} подред. Отлично!
+appraisal.best.streak.b1.2 = {n:best_move} подред! Това е страхотен шах.
+appraisal.best.streak.b2 = Откри най-добрия ход {n:time} подред.
+appraisal.best.streak.b2.2 = {n:best_move} подред. Много добре!
+appraisal.best.streak.b3 = Серия от {n:best_move} подред. Много солидно.
+appraisal.best.streak.b3.2 = {n:best_move} подред. Добре изиграно.
+appraisal.best.streak.b4 = {n:best_move} подред.
+appraisal.best.streak.b4.2 = Серия от {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} подред.
+appraisal.best.streak.b5.2 = Серия от {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} подред.
+appraisal.best.streak.b6.2 = Серия: {n:best_move}.
+appraisal.best.capture.b1 = Любимият ми момент: {move}. Взе {my:obj} даром!
+appraisal.best.capture.b1.2 = Помниш ли {move}? Забеляза, че {my} виси!
+appraisal.best.capture.b2 = Най-добрият ти момент: {move}, с който спечели {my:obj}.
+appraisal.best.capture.b2.2 = Хубаво вземане на ход {n}: {move}.
+appraisal.best.capture.b3 = Добре забелязано на ход {n}: {move} спечели {my:obj}.
+appraisal.best.capture.b3.2 = {move} на ход {n} прибра {my:obj}.
+appraisal.best.capture.b4 = Най-добър момент: {move}, ход {n}, с печалба на {my:obj}.
+appraisal.best.capture.b4.2 = {move} на ход {n} спечели материал.
+appraisal.best.capture.b5 = {move} на ход {n} спечели {my:obj}.
+appraisal.best.capture.b5.2 = Ход {n}: {move}.
+appraisal.best.capture.b6 = {move} на ход {n}.
+appraisal.best.capture.b6.2 = Ход {n}: {move}, с печалба на материал.
+appraisal.best.phase.b1 = Много добре ти се получи {text}.
+appraisal.best.phase.b1.2 = {text} беше най-добрата част от партията ти.
+appraisal.best.phase.b2 = Най-силната част от играта ти беше {text}.
+appraisal.best.phase.b2.2 = {text} ти се удаде много добре.
+appraisal.best.phase.b3 = Най-добрата ти фаза беше {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = Най-добре ти се получи {text}: точност {acc:percent}.
+appraisal.best.phase.b4 = Най-силна фаза: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} беше най-добрата ти фаза: {acc:percent}.
+appraisal.best.phase.b5 = Най-добра фаза: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Най-добра фаза: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# Levels 1-2 say "фигури" loosely, as English "pieces"; from level 3 "{n:capture}" ("3 вземания"),
+# exact with pawns. Labels say the number alone: "Вземания: {n}" (neuter, as the noun), "шахове: {m:m}".
+appraisal.num.material.b1 = Взе ми {n:piece} и даде шах {m:time}.
+appraisal.num.material.b1.2 = Взе {n:piece} и даде шах на царя ми {m:time}.
+appraisal.num.material.b2 = Взе {n:piece} и даде шах {m:time}.
+appraisal.num.material.b2.2 = Взе ми {n:piece} и ми даде шах {m:time}.
+appraisal.num.material.b3 = Ти направи {n:capture} и даде шах {m:time}.
+appraisal.num.material.b3.2 = {n:capture} и {m:check} за цялата партия.
+appraisal.num.material.b4 = {n:capture}, {m:check}.
+appraisal.num.material.b4.2 = Ти направи {n:capture} и даде {m:check}.
+appraisal.num.material.b5 = Вземания: {n}; шахове: {m:m}.
+appraisal.num.material.b5.2 = {n:capture}; {m:check}.
+appraisal.num.material.b6 = Вземания: {n}, шахове: {m:m}.
+appraisal.num.material.b6.2 = {n:capture}; {m:check}.
+appraisal.num.material_nochecks.b1 = Взе ми {n:piece}.
+appraisal.num.material_nochecks.b1.2 = В тази партия взе {n:piece}.
+appraisal.num.material_nochecks.b2 = Взе {n:piece}.
+appraisal.num.material_nochecks.b2.2 = В тази партия ми взе {n:piece}.
+appraisal.num.material_nochecks.b3 = Ти направи {n:capture}.
+appraisal.num.material_nochecks.b3.2 = Вземания: {n}.
+appraisal.num.material_nochecks.b4 = Вземания: {n}.
+appraisal.num.material_nochecks.b4.2 = Ти направи {n:capture}.
+appraisal.num.material_nochecks.b5 = Вземания: {n}.
+appraisal.num.material_nochecks.b5.2 = {n:capture}.
+appraisal.num.material_nochecks.b6 = Вземания: {n}.
+appraisal.num.material_nochecks.b6.2 = {n:capture}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well ({m:m}: "два" хода).
+appraisal.num.takebacks.b1 = Върна {n:move} и поправи {m:m} от тях. Така се учим!
+appraisal.num.takebacks.b1.spoken = Върна́ {n:move} и поправи {m:m} от тях. Така се учим!
+appraisal.num.takebacks.b1.2 = Върна {n:move} и {m:time} откри по-добър. Чудесно!
+appraisal.num.takebacks.b1.2.spoken = Върна́ {n:move} и {m:time} откри по-добър. Чудесно!
+appraisal.num.takebacks.b2 = Върна {n:move} и поправи {m:m} от тях. Така се учим.
+appraisal.num.takebacks.b2.spoken = Върна́ {n:move} и поправи {m:m} от тях. Така се учим.
+appraisal.num.takebacks.b2.2 = Върна {n:move} и поправи {m:m} от тях. Добре се учиш!
+appraisal.num.takebacks.b2.2.spoken = Върна́ {n:move} и поправи {m:m} от тях. Добре се учиш!
+appraisal.num.takebacks.b3 = Върна {n:move} и поправи {m:m} от тях.
+appraisal.num.takebacks.b3.spoken = Върна́ {n:move} и поправи {m:m} от тях.
+appraisal.num.takebacks.b3.2 = Върнати ходове: {n:m}, поправени: {m:m}. Добре.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+# A line never starts with {n:time}: for 1 it is the word "веднъж", which the program does not capitalise.
+appraisal.num.clean.b2 = Никакви сериозни грешки – страхотно!
+appraisal.num.clean.b2.2 = Нито една сериозна грешка в тази партия. Отлично!
+appraisal.num.clean.b2.3 = Не допусна нито една сериозна грешка. Много добре!
+appraisal.num.few.b2 = Само {n:mistake} в тази партия.
+appraisal.num.few.b2.2 = Едва {n:mistake} за цялата партия. Добре!
+appraisal.num.few.b2.3 = Само {n:mistake} за отбелязване. Браво.
+appraisal.num.best.b2 = Откри най-добрия ход {n:time}.
+appraisal.num.best.b2.2 = Изигра най-силния възможен ход {n:time}.
+appraisal.num.best.b2.3 = Най-добрия ход го откри {n:time}.
+appraisal.num.acc.b3 = Точността ти беше {acc:percent}. Допусна {n:mistake} и {m:blunder}.
+appraisal.num.acc.b3.2 = Точност {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Игра с точност {acc:percent}, като допусна {n:mistake} и {m:blunder}.
+appraisal.num.acc_explain.b3 = Точността сравнява ходовете ти с най-добрия ход във всяка позиция: сто означава безупречна игра.
+appraisal.num.acc_explain.b3.2 = Точността показва колко близо бяха ходовете ти до най-добрите. Сто е идеалът.
+appraisal.num.acc.b4 = Точност {acc:percent}.
+appraisal.num.acc.b4.2 = Изигра партията с точност {acc:percent}.
+appraisal.num.acc.b4.3 = {acc:percent} точност.
+appraisal.num.acc_phase.b4 = Точност {acc:percent}; {text}, най-силната ти фаза: {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = Общо {acc:percent}, а {text} – {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Игра с точност {acc:percent}; най-добре ти се получи {text}: {acc_phase:percent}.
+appraisal.num.coach.b4 = Аз играх с точност {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Моята точност беше {acc_coach:percent}.
+appraisal.num.acc.b5 = Точност {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Точност {acc:percent}: {n:inaccuracy} и {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Извън теорията от ход {k}.
+appraisal.num.book.b5.2 = Излязохме от теорията на ход {k}.
+appraisal.num.acc.b6 = {acc:percent} срещу моите {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = Ти {acc:percent}, аз {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Точност {acc:percent}, моята – {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Точност {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = {acc:percent} точност; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level. {theme} always after a colon.
+appraisal.improve.theme.b1 = Едно нещо за упражняване: {theme}.
+appraisal.improve.theme.b1.2 = Един съвет за следващия път: {theme}.
+appraisal.improve.theme.b1.3 = Нещо, върху което да поработиш: {theme}.
+appraisal.improve.theme.b2 = Нещо за упражняване: {theme}.
+appraisal.improve.theme.b2.2 = Една идея за следващия път: {theme}.
+appraisal.improve.theme.b2.3 = Добре е да поработиш върху това: {theme}.
+appraisal.improve.theme.b3 = Тема от тази партия: {theme}.
+appraisal.improve.theme.b3.2 = Струва си да се упражнява: {theme}.
+appraisal.improve.theme.b4 = Повтаряща се тема: {theme}.
+appraisal.improve.theme.b4.2 = Появи се неведнъж: {theme}.
+appraisal.improve.theme.b5 = Повтаря се: {theme}.
+appraisal.improve.theme.b5.2 = Тема на партията: {theme}.
+appraisal.improve.theme.b6 = Повтаря се: {theme}.
+appraisal.improve.theme.b6.2 = Тема: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = Партията се обърна на ход {crit_no}. За следващия път: {theme}.
+appraisal.improve.critical.b2.2 = Ключовият момент беше ход {crit_no}, {crit_move}. Нещо за упражняване: {theme}.
+appraisal.improve.critical.b3 = Критичният момент беше ход {crit_no}. Вместо {crit_move} по-добре беше {crit_best}.
+appraisal.improve.critical.b3.2 = На ход {crit_no} по-добрият ход беше {crit_best}, а не {crit_move}. Първо проверявай моите форсиращи ходове.
+appraisal.improve.critical.b4 = Критичен момент: ход {crit_no}, {crit_move}. По-добрият ход беше {crit_best}.
+appraisal.improve.critical.b4.2 = Ход {crit_no} беше ключовият момент: {crit_best} вместо {crit_move}.
+appraisal.improve.critical.b5 = Ход {crit_no}: {crit_best} вместо {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Критичен беше ход {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Ход {crit_no}: {crit_best} вместо {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, а не {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Ход {crit_no}: {crit_best}, а не {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = До ход {crit_no} печелеше. Един съвет: {theme}.
+appraisal.improve.was_winning.b1.2 = До ход {crit_no} играеше чудесно. Запомни: {theme}.
+appraisal.improve.was_winning.b2 = До ход {crit_no} печелеше. За следващия път: {theme}.
+appraisal.improve.was_winning.b2.2 = До ход {crit_no} позицията ти беше печеливша. Нещо за упражняване: {theme}.
+appraisal.improve.was_winning.b3 = До ход {crit_no} печелеше. {crit_best} запазваше предимството ти.
+appraisal.improve.was_winning.b3.2 = До ход {crit_no} печелеше; {crit_best} щеше да запази предимството.
+appraisal.improve.was_winning.b4 = До ход {crit_no} печелеше. {crit_best} запазваше предимството ти.
+appraisal.improve.was_winning.b4.2 = Печеливша позиция до ход {crit_no}; {crit_best} я запазваше.
+appraisal.improve.was_winning.b5 = Печеливша позиция до ход {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Ход {crit_no}: {crit_best} запазваше победата, {eval}.
+appraisal.improve.was_winning.b6 = Ход {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} на ход {crit_no} запазваше победата: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Един съвет: когато печелиш, винаги оставяй на царя ми поле, на което да се премести.
+appraisal.improve.stalemate.b1.2 = Запомни: към края, преди всеки ход, проверявай дали царят ми още може да се движи.
+appraisal.improve.stalemate.b2 = Когато печелиш, винаги оставяй на царя ми свободно поле, иначе става пат.
+appraisal.improve.stalemate.b2.2 = Следващия път, преди да играеш, провери дали царят ми още може да се движи.
+appraisal.improve.stalemate.b3 = Когато печелиш, на всеки ход проверявай дали царят ми още има свободно поле.
+appraisal.improve.stalemate.b3.2 = Внимавай за пат в спечелени ендшпили: давай въздух на царя ми.
+appraisal.improve.stalemate.b4 = В спечелени ендшпили винаги проверявай за пат.
+appraisal.improve.stalemate.b4.2 = Внимание към пата: тук той ти отне победата.
+appraisal.improve.stalemate.b5 = Проверявай за пат в спечелени ендшпили.
+appraisal.improve.stalemate.b5.2 = Патът отне победата.
+appraisal.improve.stalemate.b6 = Пази се от пат.
+appraisal.improve.stalemate.b6.2 = Пат вместо победа.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = На ход {n} {my} висеше. Забеляза ли?
+appraisal.improve.coach_hung.b1.2 = На ход {n} можеше да вземеш {my:obj} даром. Винаги търси незащитени фигури!
+appraisal.improve.coach_hung.b2 = На ход {n} {my} висеше. Видя ли?
+appraisal.improve.coach_hung.b2.2 = На ход {n} можеше да вземеш {my:obj} даром.
+appraisal.improve.coach_hung.b3 = На ход {n} {my} беше без защита. Забеляза ли?
+appraisal.improve.coach_hung.b3.2 = {my} висеше на ход {n}. На всеки ход търси незащитени фигури.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Продължавай да проверяваш дали фигурите ти са в безопасност, както днес.
+appraisal.improve.clean.b1.2 = И занапред преди всеки ход гледай какво нападам. Действа!
+appraisal.improve.clean.b1.3 = Продължавай да играеш все така внимателно!
+appraisal.improve.clean.b2 = Чиста партия. Продължавай да проверяваш заплахите ми по същия начин.
+appraisal.improve.clean.b2.2 = Продължавай както днес: защитени фигури, добри ходове.
+appraisal.improve.clean.b3 = Чиста партия. Продължавай първо да проверяваш форсиращите ходове.
+appraisal.improve.clean.b3.2 = Без сериозни грешки – продължавай така.
+appraisal.improve.clean.b4 = Чиста партия. Нищо сериозно за поправяне.
+appraisal.improve.clean.b4.2 = Без критични грешки.
+appraisal.improve.clean.b5 = Без критични грешки.
+appraisal.improve.clean.b5.2 = Чиста партия.
+appraisal.improve.clean.b6 = Чиста партия.
+appraisal.improve.clean.b6.2 = Никакви критични грешки.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = a level name, always in quotes after "ниво" or alone: ниво „{level}“. Never "готов".
+appraisal.end.b1 = С всяка партия играеш все по-добре. Още една?
+appraisal.end.b1.2 = Беше забавно! Да играем пак?
+appraisal.end.b1.3 = Чудесно се постара. Искаш ли още една партия?
+appraisal.end.b2 = С всяка партия играеш все по-добре. Още една?
+appraisal.end.b2.2 = Хубава партия. Да изиграем още една?
+appraisal.end.b2.3 = Добре изиграно. Още една партия?
+appraisal.end.b3 = Солидна партия. Да продължим със следващата?
+appraisal.end.b3.2 = Добра партия. Още една?
+appraisal.end.b3.3 = Добре изиграно. Да играем пак?
+appraisal.end.b4 = Солидна партия. Продължаваме ли със следващата?
+appraisal.end.b4.2 = Още една партия?
+appraisal.end.b4.3 = Добра партия. Следващата?
+appraisal.end.b5 = Още една?
+appraisal.end.b5.2 = Следваща партия?
+appraisal.end.b5.3 = Пак?
+appraisal.end.b6 = Още една?
+appraisal.end.b6.2 = Следваща партия?
+appraisal.end.b6.3 = Пак?
+appraisal.end.up.b1 = Вече можеш да играеш на ниво „{level}“. Искаш ли да опиташ?
+appraisal.end.up.b1.2 = Мисля, че ниво „{level}“ вече е по силите ти. Да опитаме ли?
+appraisal.end.up.b2 = Вече можеш да играеш на ниво „{level}“. Ще опиташ ли?
+appraisal.end.up.b2.2 = Какво ще кажеш за ниво „{level}“? Мисля, че е време.
+appraisal.end.up.b3 = Надрасна това ниво: опитай „{level}“.
+appraisal.end.up.b3.2 = Време ли е за ниво „{level}“? Мисля, че да.
+appraisal.end.up.b4 = Надрасна това ниво: опитай „{level}“.
+appraisal.end.up.b4.2 = Време за ниво „{level}“?
+appraisal.end.up.b5 = Следващия път опитай „{level}“.
+appraisal.end.up.b5.2 = Сега ниво „{level}“?
+appraisal.end.up.b6 = Следващия път опитай „{level}“.
+appraisal.end.up.b6.2 = Сега ниво „{level}“?
+appraisal.end.down.b2 = Да изиграем една партия на ниво „{level}“, за да упражним идеите.
+appraisal.end.down.b2.2 = Какво ще кажеш за партия на ниво „{level}“, за упражнение?
+appraisal.end.down.b3 = Искаш ли една партия на ниво „{level}“, за да упражниш тези идеи?
+appraisal.end.down.b3.2 = Партия на ниво „{level}“ би помогнала да упражниш тези идеи.
+appraisal.end.down.b4 = Партия на ниво „{level}“ може да помогне за упражняване на тези идеи.
+appraisal.end.down.b4.2 = Може би една на ниво „{level}“, за упражнение?
+appraisal.end.down.b5 = Може би една на ниво „{level}“?
+appraisal.end.down.b5.2 = Ниво „{level}“ за упражнение?
+appraisal.end.down.b6 = Може би една на ниво „{level}“?
+appraisal.end.down.b6.2 = Ниво „{level}“ за упражнение?

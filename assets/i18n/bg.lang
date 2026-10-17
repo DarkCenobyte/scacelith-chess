@@ -1,0 +1,1447 @@
+# Scacelith - Български (Bulgarian)
+#
+# Translation of assets/i18n/en.lang (same keys, same order, same {n}). Plurals: one|other (only 1 is
+# "one"); a masculine noun that is not a person takes its count form after a number ("1 ход|3 хода").
+# Register: polite plural "вие", lowercase in running text (вие, ви, ваш); buttons and menu commands
+# in the 2nd person singular imperative or a noun ("Запази", "Предай се", "Настройки"), as in Windows.
+# The player's gender is unknown: no form agrees with it (aorist, present, nouns, or the plural
+# participles of the polite "вие"). Terms follow glossary/bg.md (дама, топ, офицер, кон, цар; реми).
+# Titles in Cyrillic capitals: the title face is an inscriptional capital face.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Вкл.
+common.off = Изкл.
+common.back = Назад
+common.apply = Приложи
+common.discard = Отхвърли
+common.cancel = Отказ
+common.white = Бели
+common.black = Черни
+common.main_menu = Главно меню
+# Decimal separator of numbers ("2,5 с"); percent written "85%", no space.
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Кралската игра
+menu.new_game = Нова партия
+menu.options = Настройки
+menu.credits = Автори
+menu.quit = Изход
+menu.version = Версия {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = НАСТРОЙКИ
+options.tab.display = Екран
+options.tab.graphics = Графика
+options.tab.audio = Звук
+options.tab.gameplay = Игра
+options.tab.player = Играч
+options.tab.controls = Управление
+options.pending = Промените влизат в сила, след като бъдат приложени.
+options.unsaved.title = НЕЗАПАЗЕНИ ПРОМЕНИ
+options.unsaved.text = Някои настройки са променени. Да бъдат ли приложени, преди да излезете?
+
+options.language = Език
+options.language.help = Езикът на менютата и съобщенията. Сменя се веднага.
+options.language.not_adapted = Този език още не е напълно адаптиран: гласът на треньора може да произнася грешно някои думи, а някои текстове може още да звучат странно.
+options.display_mode = Режим на екрана
+options.display_mode.help = Цял екран: прозорец без рамка върху целия екран, с разделителната способност на работния плот. В прозорец: прозорец с размера, избран по-долу.
+options.fullscreen = Цял екран
+options.windowed = В прозорец
+options.window_size = Размер на прозореца
+options.window_size.help = Размерът на прозореца в режим „В прозорец“. В режим „Цял екран“ винаги се използва разделителната способност на работния плот.
+options.vsync = Верт. синхронизация
+options.vsync.help = Синхронизира кадрите с екрана, за да се избегне накъсването на образа.
+options.render_scale = Мащаб на рендиране
+options.render_scale.help = Вътрешната разделителна способност на 3D изображението. По-ниска – по-бързо, по-висока – по-рязко.
+
+# Quality levels agree with "качество" (neuter): Много ниско ... Потребителско.
+options.quality = Качество
+options.quality.very_low = Много ниско
+options.quality.low = Ниско
+options.quality.medium = Средно
+options.quality.high = Високо
+options.quality.ultra = Ултра
+options.quality.custom = Потребителско
+options.quality.help = Задава наведнъж всички настройки по-долу: „Много ниско“ изключва всички ефекти, „Ултра“ ги поставя на максимум. Ако промените само една настройка, качеството става „Потребителско“. При по-скромна видеокарта помага много и намаляването на мащаба на рендиране (Екран).
+options.shadows = Сенки
+options.shadows.help = Детайлност на сенките от слънцето и мекота на ръбовете им. Ниско: прости ръбове, бързо изчертаване.
+options.reflections = Отражения
+options.reflections.help = Подът, масата и дъската отразяват залата (тя се изчертава още веднъж за всяко от тях: една от най-тежките настройки); от „Средно“ нагоре лъскавите фигури и предмети също отразяват това, което е около тях.
+options.ambient_occlusion = Фоново засенчване
+options.ambient_occlusion.help = Меко засенчване там, където предметите се допират, и във вдлъбнатините, където прониква по-малко светлина.
+options.indirect_light = Непряка светлина
+options.indirect_light.help = Дневната светлина, отразена от стените, пода и тавана. Ниско: вместо нея равномерна околна светлина. Влияе главно на времето за зареждане.
+options.volumetric_light = Слънчеви лъчи
+options.volumetric_light.help = Снопове слънчева светлина в прашния въздух на залата и прашинките, които проблясват в тях.
+options.tessellation = Теселация
+options.tessellation.help = Гладки контури по извивките на фигурите, гледани отблизо.
+options.tessellation.unavailable = Недостъпно: този графичен драйвер не поддържа теселация.
+options.antialiasing = Изглаждане на ръбове
+options.antialiasing.help = Изглажда назъбените ръбове и трептящите отблясъци. Изкл.: по-рязко, но назъбено, а някои ефекти изглеждат зърнести.
+options.depth_of_field = Дълбочина на рязкост
+options.depth_of_field.help = Размива това, което е доста пред или зад мястото, към което гледате, както прави обективът на фотоапарат.
+options.motion_blur = Размазване при движение
+options.motion_blur.help = Размазва бързите движения на камерата и ръцете, както прави кинокамерата.
+options.bloom = Сияние
+options.bloom.help = Меко сияние около най-ярките отблясъци, както в обектива на фотоапарат.
+options.brightness = Яркост
+options.brightness.neutral = Неутрална
+options.brightness.value = {0} EV
+options.brightness.help = Компенсация на експозицията на камерата. Калибрирането при първото стартиране я настройва така, че най-тъмните сенки едва да се виждат.
+
+options.master_volume = Обща сила на звука
+options.effects = Ефекти
+options.ambience = Околни звуци
+options.ambience.help = Шумът на залата: огънят, далечни стъпки, старият часовник.
+options.ambience_volume = Сила на околните звуци
+options.voice_volume = Сила на гласа
+options.voice_volume.help = Силата на гласа на треньора в режим „Треньор“.
+options.subtitles = Субтитри
+options.subtitles.auto = Автоматично
+options.subtitles.help = Думите на треньора, изписани в долната част на екрана. Автоматично: показват се, когато треньорът не говори езика на менютата (при менюта на китайски той говори английски). Винаги се показват, когато гласът му не е инсталиран.
+
+options.legal_moves = Възможни ходове
+options.legal_moves.help = Осветява полетата, до които може да стигне докоснатата фигура. Когато е изключено, нищо не подсказва дали ходът е правилен: съдията наказва неправилния ход, щом натиснете часовника.
+options.coordinates = Координати на дъската
+options.auto_press = Автоматично натискане на часовника
+options.auto_press.help = Вашият робот сам натиска часовника, щом ходът ви е на дъската. В онлайн партиите решава сървърът, а в директния мач – играчът домакин.
+options.thinking_time = Реалистично време за мислене
+options.thinking_time.help = Противникът ви мисли като човек, вместо да играе мигновено.
+options.ignore_head = Игнориране на движенията на главата на противника
+options.ignore_head.help = В онлайн партиите и директните мачове роботът на противника гледа натам, накъдето гледа неговият играч. Когато е включено, той движи главата си сам, както срещу Stockfish.
+options.mouse_sensitivity = Чувствителност на мишката
+options.invert_look = Обърната вертикална ос
+options.handover = Смяна между играчите
+options.handover.cut = Мигновена смяна
+options.handover.flight = Прелитане, {0} с
+options.handover.help = Двама играчи на един компютър: как гледната точка преминава от очите на единия играч към очите на другия след всеки ход. Мигновената смяна избягва движението на камерата.
+options.game_cursor = Курсор на играта
+options.game_cursor.help = На масата играта рисува собствен курсор, който показва какво ще направи щракването. Изкл.: обичайната системна стрелка.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Име
+player.name.help = Името ви, както е изписано в горната част на протоколите, с каквато и да е азбука.
+player.default_name = Човек
+player.handwriting = Почерк
+player.handwriting.help = Ръката, която записва ходовете ви. Арабският, японският и китайският се пишат със собствен почерк.
+player.preview = ВЪВ ВАШИЯ ПРОТОКОЛ
+hand.caveat = Небрежен
+hand.marck = Калиграфски
+hand.badscript = Наклонен
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+# Actions are nouns ("Натискане на часовника"); Space is "Интервал" on Bulgarian keyboards.
+controls.touch.keys = Ляв бутон
+controls.touch = Докосване на фигура, после ход с нея
+controls.clock.keys = Интервал  или  щракване върху часовника
+controls.clock = Натискане на часовника
+controls.look.keys = Задържан десен бутон
+controls.look = Оглеждане
+controls.sheet.keys = S
+controls.sheet = Поглед към протокола и обратно
+controls.stand.keys = ↑
+controls.stand = Изправяне пред стола
+controls.side.keys = ←  /  →
+controls.side = Заставане в левия / десния край на масата
+controls.sit.keys = ↓
+controls.sit = Сядане обратно (играе се само от стола)
+controls.moves.keys = Tab
+controls.moves = Показване или скриване на списъка с ходове
+controls.menu.keys = Esc
+controls.menu = Меню
+controls.coach_skip.keys = Интервал
+controls.coach_skip = Треньор: прескачане на репликата му
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Треньор: връщане на хода, когато го предложи
+controls.coach_hint.keys = H
+controls.coach_hint = Предизвикателства: искане на подсказка
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = ЯРКОСТ
+calibration.text = Местете плъзгача, докато конят на черното поле едва се вижда или вече не се вижда.
+calibration.later = Можете да я промените по-късно от Настройки > Графика.
+calibration.continue = Продължи
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = НОВА ПАРТИЯ
+newgame.opponent = ПРОТИВНИК
+newgame.time_control = КОНТРОЛА НА ВРЕМЕТО
+newgame.start = Започни
+newgame.elo = ~{0} Elo
+newgame.you_white = Ще играете с белите.
+newgame.you_black = Ще играете с черните.
+newgame.colour_lot = В първата партия цветовете се определят чрез жребий.
+newgame.colour_alternate = След това цветовете се редуват от партия на партия.
+newgame.opponent_kind = Противник
+newgame.opponent_kind.help = Играйте срещу Stockfish или срещу приятел на този компютър: редувате се на ход, всеки от своята страна на дъската.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Човек на същия компютър
+
+# Custom opponent: Stockfish parameters ("engine" is "шахматна програма", "програмата")
+engine.skill = Ниво на игра
+engine.skill.help = „Skill Level“ на Stockfish (0–20). Не се взема предвид, докато силата е ограничена по Elo.
+engine.limit_elo = Ограничаване на силата (Elo)
+engine.limit_elo.help = UCI_LimitStrength: програмата се стреми към рейтинга Elo по-долу.
+engine.elo = Elo
+engine.depth = Дълбочина на търсене
+engine.plies = {0} полуход|{0} полухода
+engine.move_time = Време за ход
+engine.nodes = Лимит на възлите
+engine.no_limit = Изкл.
+engine.thousand = {0} хил.
+engine.million = {0} млн.
+engine.dynamic_elo = Динамично Elo по времето
+engine.dynamic_elo.help = Подобно на човек, Stockfish играе по-слабо, когато времето му изтича: малко по-слабо в последната минута (по-рано в партиите рапид и блиц), много по-слабо при цайтнот. Само в партии с часовник.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish мисли над хода като човек от своето ниво. За да пропуснете тази пауза: Настройки > Игра > Реалистично време за мислене.
+engine.pace.instant = Stockfish играе веднага щом пресметне хода. За паузи като при човек: Настройки > Игра > Реалистично време за мислене.
+
+# Time controls ("3+2": minutes + increment in seconds). Categories as the coach says them
+# (lesson.lang): булет, блиц, рапид, класически (шахмат).
+tc.unlimited = Без ограничение
+tc.no_clock = Без часовник
+tc.bullet = Булет
+tc.blitz = Блиц
+tc.rapid = Рапид
+tc.classical = Класически
+tc.custom = По избор
+tc.your_own = Ваша контрола
+tc.base_time = Основно време
+tc.base_time.help = Началното време на всеки часовник (минути : секунди).
+tc.increment = Добавка
+tc.increment.help = Добавка по Фишер след всеки ход.
+tc.delay = Забавяне
+tc.delay.help = Забавяне по Бронщайн: времето, изразходвано до тази граница, се връща след всеки ход.
+tc.no_delay = Изкл.
+tc.seconds = {0} с
+tc.minutes = {0} мин
+tc.summary_increment = {0} + {1} с
+tc.summary_delay = {0}, забавяне {1} с
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Новак
+preset.novice.desc = Едва знае ходовете: оставя фигури под удар и пропуска прости заплахи.
+preset.beginner.name = Начинаещ
+preset.beginner.desc = Знае основите, но все още редовно губи материал с груби грешки.
+preset.casual.name = Любител
+preset.casual.desc = Спокоен противник за вечерна партия: разумни ходове, чести грешки.
+preset.club_player.name = Клубен играч
+preset.club_player.desc = Солиден клубен играч, който наказва очевидните груби грешки.
+preset.advanced.name = Напреднал
+preset.advanced.desc = Силен клубен играч с добро тактическо зрение.
+preset.expert.name = Експерт
+preset.expert.desc = Турнирен експерт: рядко греши, реализира предимствата си.
+preset.master.name = Майстор
+preset.master.desc = Сила на майстор: дълбоко пресмятане и фина позиционна игра.
+preset.grandmaster.name = Гросмайстор
+preset.grandmaster.desc = Ниво на гросмайстор: изключително труден за побеждаване.
+preset.stockfish_max.name = Stockfish Макс
+preset.stockfish_max.desc = Stockfish 19 с пълна сила. Успех!
+preset.custom.name = По избор
+preset.custom.desc = Ваши собствени настройки на програмата.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = АВТОРИ
+credits.game.head = SCACELITH
+credits.game = Шахматна партия в кралска зала, със собствен графичен двигател на OpenGL 4.6.
+credits.engine.head = ШАХМАТНА ПРОГРАМА
+credits.engine = Stockfish 19, от разработчиците на Stockfish.
+credits.engine.licence = Лиценз GNU General Public License v3.
+credits.engine.data = Невронната мрежа на Stockfish е обучена с данни от проекта Leela Chess Zero, предоставени под лиценза Open Database License (ODbL).
+credits.voice.head = ГЛАСЪТ НА ТРЕНЬОРА
+credits.voice = Синтетичната реч е създадена със Supertonic 3 за режим „Треньор“.
+credits.voice.licence = Supertonic 3 е модел на Supertone, използван по лиценза OpenRAIL-M, чиито ограничения за употреба важат за всеки, който го използва (вж. „Лицензи“).
+credits.openings.head = ДЕБЮТИ
+credits.openings = Имената на дебютите са от базата данни chess-openings на lichess.org, предоставена за обществено достояние (CC0).
+credits.fonts.head = ШРИФТОВЕ
+credits.fonts = EB Garamond от Георг Дуфнер и Cinzel от Натанаел Гама; Amiri от Халед Хосни.
+credits.fonts.hand = Ръкописни шрифтове: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Шахматните символи са от GNU FreeFont (GPL v3 с изключение за шрифтове).
+credits.quote = „Шахът е изкуството на анализа.“  — Михаил Ботвиник
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Лицензи
+licences.title = ЛИЦЕНЗИ
+licences.note = Лицензите са показани в оригиналния си текст на английски език.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = ПАУЗА
+pause.resume = Продължи
+pause.offer_draw = Предложи реми
+pause.claim_draw = Поискай реми
+pause.claim_draw.help = Трикратно повторение или правилото на 50-те хода.
+pause.resign = Предай се
+confirm.resign.title = ПРЕДАВАНЕ
+confirm.resign.text = Да предадете ли партията? Противникът ви ще бъде обявен за победител.
+confirm.resign.draw = Да предадете ли партията? Противникът ви вече не може да даде мат: партията ще завърши реми.
+confirm.resign.ok = Предай се
+confirm.leave.title = НАПУСКАНЕ
+confirm.leave.text = Да се върнете ли в главното меню? Текущата партия ще бъде прекратена.
+confirm.leave.ok = Напусни
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = ПРОИЗВЕЖДАНЕ В
+piece.queen = Дама
+piece.rook = Топ
+piece.bishop = Офицер
+piece.knight = Кон
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Партията завърши реми.
+gameover.draw_moves = Партията завърши реми след {0} ход.|Партията завърши реми след {0} хода.
+gameover.win = Добре изиграно – спечелихте.
+gameover.win_moves = Добре изиграно – спечелихте за {0} ход.|Добре изиграно – спечелихте за {0} хода.
+gameover.loss = Противникът ви спечели.
+gameover.loss_moves = Противникът ви спечели за {0} ход.|Противникът ви спечели за {0} хода.
+gameover.rematch = Реванш
+gameover.view_board = Виж дъската
+gameover.show = Покажи
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Мат
+reason.resignation = Предаване
+reason.timeout = Загуба по време
+reason.illegal_moves = Втори неправилен ход (служебна загуба)
+reason.stalemate = Пат
+reason.insufficient = Мъртва позиция (недостатъчен материал)
+reason.timeout_vs_insufficient = Падна флагчето, но противникът не може да даде мат
+reason.fivefold = Петкратно повторение
+reason.75_moves = Правилото на 75-те хода
+reason.threefold_claim = Трикратно повторение (по искане)
+reason.50_moves_claim = Правилото на 50-те хода (по искане)
+reason.agreement = Реми по взаимно съгласие
+reason.illegal_vs_insufficient = Втори неправилен ход, но противникът не може да даде мат
+reason.resignation_vs_insufficient = Предаване, но противникът не може да даде мат
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ХОДОВЕ
+movelist.empty = Все още няма ходове.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Подготвяне на материалите
+loading.hall = Издигане на залата
+loading.furniture = Резбоване на масата и столовете
+loading.board = Полиране на дъската
+loading.pieces = Струговане на фигурите
+loading.clock = Сглобяване на часовника
+loading.porcelain = Изпичане на порцелана
+loading.ready = Готово
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+# Touch-move is "пипнато – местено"; "you touched" is the aorist "докоснахте" (no gender).
+notify.no_draw_claim = В тази позиция не може да се поиска реми.
+notify.flag_you = Флагчето ви падна.
+notify.flag_opponent = Флагчето на противника ви падна.
+notify.touched.pawn = Пипнато – местено: трябва да преместите пешката, която докоснахте.
+notify.touched.knight = Пипнато – местено: трябва да преместите коня, който докоснахте.
+notify.touched.bishop = Пипнато – местено: трябва да преместите офицера, който докоснахте.
+notify.touched.rook = Пипнато – местено: трябва да преместите топа, който докоснахте.
+notify.touched.queen = Пипнато – местено: трябва да преместите дамата, която докоснахте.
+notify.touched.king = Пипнато – местено: трябва да преместите царя, който докоснахте.
+notify.touched.piece = Пипнато – местено: трябва да преместите фигурата, която докоснахте.
+notify.touched_square = Пипнато – местено: трябва да преместите фигурата на {0}.
+notify.press_clock = Натиснете часовника, за да завършите хода си (Интервал).
+notify.manual_clock = В тази партия натискайте часовника сами след всеки ход.
+notify.illegal = Неправилен ход.
+notify.cannot_move = Този ход не може да бъде изигран.
+notify.move_first = Изиграйте хода си, преди да натиснете часовника.
+notify.stance.sit_to_play = Седнете отново, за да играете (стрелка надолу).
+notify.stance.first = Часовникът ви продължава да тече, докато стоите. Стрелка надолу: сядане обратно.
+notify.stance.first_untimed = Играете само от стола си. Стрелка надолу: сядане обратно.
+notify.stance.finish_move = Първо завършете хода си.
+notify.draw_already_offered = Вече предложихте реми на този ход.
+notify.draw_accepted = Противникът ви приема ремито.
+notify.draw_declined = Противникът ви отклонява предложението за реми.
+notify.draw_claimed = Противникът ви поиска реми.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about. White / Black are the
+# plural "белите" / "черните" (plural verbs).
+arbiter.join = {0} {1}
+arbiter.no_move = Съдия: часовникът е натиснат, без да е изигран ход, което се смята за неправилен ход.
+arbiter.unpromoted = Съдия: неправилен ход – пешката не е заменена с нова фигура преди натискането на часовника.
+arbiter.illegal = Съдия: неправилен ход.
+arbiter.second_loses.white = Това е вторият неправилен ход на белите: белите губят партията.
+arbiter.second_loses.black = Това е вторият неправилен ход на черните: черните губят партията.
+arbiter.second_draw.white = Това е вторият неправилен ход на белите, но черните не могат да дадат мат: партията завършва реми.
+arbiter.second_draw.black = Това е вторият неправилен ход на черните, но белите не могат да дадат мат: партията завършва реми.
+arbiter.queen = Пешката става дама.
+arbiter.queen_one_minute.white = Пешката става дама и белите получават една допълнителна минута.
+arbiter.queen_one_minute.black = Пешката става дама и черните получават една допълнителна минута.
+arbiter.queen_two_minutes.white = Пешката става дама и белите получават две допълнителни минути.
+arbiter.queen_two_minutes.black = Пешката става дама и черните получават две допълнителни минути.
+arbiter.restored = Позицията е възстановена.
+arbiter.restored_one_minute.white = Позицията е възстановена и белите получават една допълнителна минута.
+arbiter.restored_one_minute.black = Позицията е възстановена и черните получават една допълнителна минута.
+arbiter.restored_two_minutes.white = Позицията е възстановена и белите получават две допълнителни минути.
+arbiter.restored_two_minutes.black = Позицията е възстановена и черните получават две допълнителни минути.
+arbiter.one_minute.white = Белите получават една допълнителна минута.
+arbiter.one_minute.black = Черните получават една допълнителна минута.
+arbiter.two_minutes.white = Белите получават две допълнителни минути.
+arbiter.two_minutes.black = Черните получават две допълнителни минути.
+arbiter.second_loses = Вторият неправилен ход губи партията.
+arbiter.touched.white = Белите трябва да преместят докоснатата фигура.
+arbiter.touched.black = Черните трябва да преместят докоснатата фигура.
+arbiter.game_over = Партията е приключила.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Гледане на партия
+
+viewer.title = ГЛЕДАНЕ НА ПАРТИЯ
+viewer.white = БЕЛИ
+viewer.black = ЧЕРНИ
+viewer.time_control = КОНТРОЛА НА ВРЕМЕТО
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Размени цветовете
+viewer.note = И двамата играчи са Stockfish. Летете свободно из залата, докато играят: никой няма да ви види.
+viewer.summary = {0} срещу {1}
+viewer.custom = По избор
+viewer.tc.custom = Ваша контрола
+viewer.base_time = Основно време
+viewer.increment = Добавка
+viewer.delay = Забавяне
+viewer.off = Изкл.
+viewer.minutes = {0} мин
+viewer.seconds = {0} с
+viewer.delay_summary = забавяне {0} с
+viewer.back = Назад
+viewer.start = Започни
+
+viewer.paused = ПАУЗА
+viewer.resume = Продължи
+viewer.options = Настройки
+viewer.main_menu = Главно меню
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = УПРАВЛЕНИЕ
+viewer.keys.move = W A S D  ·  Z Q S D  ·  стрелки
+viewer.controls.move = Движение
+viewer.keys.updown = E, Интервал  /  C, Ctrl
+viewer.controls.updown = Нагоре / надолу
+viewer.keys.fast = Shift
+viewer.controls.fast = По-бързо
+viewer.keys.look = Десен бутон на мишката
+viewer.controls.look = Оглеждане
+viewer.keys.speed = Колелце на мишката
+viewer.controls.speed = Скорост
+viewer.keys.views = 1 – 9
+viewer.controls.views = Гледни точки
+viewer.keys.eyes = 0
+viewer.controls.eyes = През очите на играча, който е на ход
+viewer.keys.moves = Tab
+viewer.controls.moves = Списък с ходове
+viewer.keys.menu = Esc
+viewer.controls.menu = Меню
+viewer.keys.hide = H
+viewer.controls.hide = Скриване на този панел
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Пауза / продължаване
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Един ход назад / напред
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = По-бавно / по-бързо
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Начало / край на партията
+viewer.speed = Скорост {0} м/с
+viewer.view.0 = През очите на играчите
+viewer.view.1 = До масата
+viewer.view.2 = Над дъската
+viewer.view.3 = Залата
+viewer.view.4 = Часовникът
+viewer.view.5 = Лицето на играча с белите
+viewer.view.6 = Лицето на играча с черните
+viewer.view.7 = Двубоят
+viewer.view.8 = Прозорците
+viewer.view.9 = Гоблените
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black: both plural, plural verbs)
+viewer.side.white = Белите
+viewer.side.black = Черните
+viewer.flag.white = Флагчето на белите падна.
+viewer.flag.black = Флагчето на черните падна.
+viewer.claims_draw = {0} поискаха реми.
+viewer.offer_accepted = {0} предлагат реми, {1} приемат.
+viewer.offer_declined = {0} предлагат реми, {1} отказват.
+viewer.gameover.white_wins = Белите печелят след ход {0}.
+viewer.gameover.black_wins = Черните печелят след ход {0}.
+viewer.gameover.draw = Партията завършва реми след ход {0}.
+viewer.gameover.players = {0} срещу {1}
+viewer.watch_again = Гледай отново
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Още няма партия с рейтинг
+elo.provisional = Предварителен рейтинг
+elo.peak = Най-висок {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Вашият рейтинг: {0}
+elo.expected = очакван резултат {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · тази партия не се отчита за рейтинга
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Протокол
+scoresheet.event = Състезание
+scoresheet.date = Дата
+scoresheet.round = Кръг
+scoresheet.board = Дъска
+scoresheet.page = Лист
+scoresheet.white = Бели
+scoresheet.black = Черни
+scoresheet.elo = Elo
+scoresheet.result = Резултат
+scoresheet.move_no = №
+scoresheet.sign_white = Подпис на белите
+scoresheet.sign_black = Подпис на черните
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = Цр Д Т О К
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+# Rated / casual: "с рейтинг" / "приятелска (партия)"; in sentences "не се отчита за рейтинга".
+menu.online = Игра онлайн
+online.title = ИГРА ОНЛАЙН
+online.continue = Продължи
+online.retry = Опитай отново
+online.copy = Копирай
+online.copied = Копирано
+online.copy.unavailable = Копирането не е възможно тук: моля, запишете го.
+online.rated = С рейтинг
+online.casual = Приятелска
+online.casual_only = Само приятелски
+online.color.random = По жребий
+online.ping = {0} ms
+online.conn.online = Има връзка
+online.conn.connecting = Свързване…
+online.conn.reconnecting = Повторно свързване…
+online.conn.offline = Няма връзка
+online.conn.incompatible = Друга версия
+online.no_server.text = Онлайн играта изисква сървър на Scacelith. Въведете адреса на сървър в настройките или играйте с приятел чрез директен мач.
+online.no_server.settings = Настройки на сървъра
+
+# Options > Online server
+options.tab.online = Онлайн сървър
+options.online.server = Сървър
+options.online.server.help = Официалният сървър или потребителски (общностен) сървър, поддържан от някой друг, с който играта се свързва чрез защитения му уеб API и защитен WebSocket. Във всеки сървър влизате поотделно: акаунтът и входът в него никога не се споделят между сървърите.
+options.online.official = Официален сървър – {0}
+options.online.community = Потребителски сървър
+options.online.host = Хост
+options.online.host.hint = име на домейн или IP адрес
+options.online.host.help = Името на домейна или IP адресът на потребителския сървър, както ги е дал собственикът му.
+options.online.api_port = HTTPS / API порт
+options.online.api_port.help = Портът на защитения уеб API на сървъра (443 при сървърите на Scacelith).
+options.online.ws_port = WSS порт
+options.online.ws_port.hint = същият като API порта
+options.online.ws_port.help = Портът на защитения WebSocket на сървъра. Оставете полето празно, когато е същият като API порта.
+options.online.pin = Отпечатък на сертификата (SHA-256)
+options.online.pin.hint = незадължително
+options.online.pin.help = За сървър със самоподписан сертификат: SHA-256 отпечатъкът, който дава собственикът му (64 шестнадесетични знака, двоеточията са позволени). Оставете полето празно, за да се доверите на сертификатите на системата.
+options.online.pin.invalid = Отпечатъкът се състои от 64 шестнадесетични знака (двоеточията са позволени).
+options.online.test = Провери връзката
+options.online.test_ok = {0}: връзката е успешна, сървърът е съвместим с тази версия.
+options.online.test_incompatible = {0}: връзката е успешна, но сървърът изисква друга версия на Scacelith.
+options.online.in_game = Сървърът не може да се сменя по време на онлайн партия.
+options.online.remember_session = Запомняне на входа ми, когато няма системно хранилище за пароли
+options.online.remember_session.help = Когато никое системно хранилище за пароли (GNOME Keyring, KWallet…) не може да пази сесията ви, тя се записва във файл, който може да чете само вашият потребителски акаунт. Всеки, който може да чете файловете ви или тяхно копие, например резервно, би могъл да използва тази сесия. Изкл.: оставате влезли, докато играта не бъде затворена. Можете да прекратите сесията на всяко устройство от „Устройства с активен вход“ в акаунта си.
+
+# Sign in, create an account
+online.signin.lead = Влезте в {0}, за да играете с хора онлайн.
+online.field.user = Потребителско име или имейл
+online.field.user.hint = име или адрес
+online.field.password = Парола
+online.field.password.hint = поне 10 знака
+online.field.password2 = Потвърждение на паролата
+online.field.current_password = Текуща парола
+online.field.new_password = Нова парола
+online.field.username = Потребителско име
+online.field.username.hint = от 3 до 24 букви, цифри, _ или -
+online.field.email = Имейл
+online.field.new_email = Нов имейл
+online.field.code = Код
+online.field.code.hint = 6 цифри или код за възстановяване
+online.field.code6 = Код от приложението
+online.field.code6.hint = 6 цифри
+online.signin.button = Вход
+online.signin.google = Продължи с Google
+online.signin.register = Създай акаунт
+online.signin.forgot = Забравена парола?
+online.mfa.title = ДВУФАКТОРЕН КОД
+online.mfa.lead = Въведете 6-цифрения код от приложението си за удостоверяване или един от кодовете си за възстановяване.
+online.mfa.verify = Потвърди
+online.register.title = СЪЗДАВАНЕ НА АКАУНТ
+online.register.lead = Безплатен акаунт в {0}: името, рейтингите и партиите ви се пазят само на този сървър.
+online.register.button = Създай акаунт
+online.register.working = Създаване на акаунта ви… Това може да отнеме няколко секунди.
+online.register.ready = Акаунтът ви е готов. Влезте, за да играете.
+online.password.mismatch = Двете пароли са различни.
+online.check_email.title = ПРОВЕРЕТЕ ИМЕЙЛА СИ
+online.check_email.text = Изпратихме връзка на {0}. Отворете я, за да активирате акаунта си, след което влезте оттук.
+online.check_email.ask = Въведете адреса на акаунта си, за да получите отново връзката за активиране.
+online.check_email.resend = Изпрати имейла отново
+online.check_email.resent = Имейлът е изпратен отново. Може да отнеме няколко минути; проверете и папката за спам.
+online.forgot.title = ЗАБРАВЕНА ПАРОЛА
+online.forgot.lead = Въведете имейл адреса на акаунта си: ще ви изпратим връзка, с която да изберете нова парола.
+online.forgot.button = Изпрати връзката
+online.forgot.sent = Ако някой акаунт използва този адрес, връзката вече е на път.
+online.sso.title = ВХОД С GOOGLE
+online.sso.wait = Продължете в уеб браузъра си: изберете акаунта си в Google в отворения прозорец. Scacelith поема отново, щом Google ви върне обратно.
+online.sso.name_title = ИЗБЕРЕТЕ ИМЕ
+online.sso.name_lead = За първи път сте тук с Google. Изберете името, което другите играчи ще виждат.
+online.sso.continue = Продължи
+online.sso.finishing = Google ви върна обратно. Завършване на входа…
+online.sso.link_title = ДОБАВЯНЕ НА ВХОД С GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Акаунтът {0} в {1} вече използва имейл адреса на този акаунт в Google. Въведете паролата на акаунта, за да добавите към него вход с Google. Това е нужно само веднъж.
+online.sso.link_button = Добави вход с Google
+online.sso.link_mfa = Входът с Google се добавя към този акаунт, щом кодът бъде приет.
+online.sso.not_mine = Това не е моят акаунт
+online.sso.not_mine_note = Входът с Google не беше добавен. Ако този имейл адрес е ваш, използвайте с него „Забравена парола?“: връзката отива в тази пощенска кутия. Ако акаунтът иска и двуфакторен код, който нямате, свържете се с оператора на сървъра.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: вход с Google
+online.sso.page.done_heading = Обратно към Scacelith
+online.sso.page.done = Google ви върна към Scacelith. Върнете се в играта, за да завършите влизането; можете да затворите този раздел.
+online.sso.page.cancelled_heading = Входът е отменен
+online.sso.page.cancelled = Входът с Google беше отменен. Можете да затворите този раздел и да се върнете в Scacelith.
+online.sso.page.foreign_heading = Тази страница не е за вас
+online.sso.page.foreign = Тази страница не отговаря на влизането, което Scacelith очаква на този компютър. Ако не сте започнали току-що вход с Google в Scacelith, някой може да ви е изпратил тази връзка: затворете този раздел.
+
+# Account
+online.account.button = Акаунт
+online.account.title = АКАУНТ
+online.account.section = АКАУНТ
+online.account.username = ПОТРЕБИТЕЛСКО ИМЕ
+online.account.email = ИМЕЙЛ
+online.account.unverified = (непотвърден)
+online.account.mfa = ДВУФАКТОРНО УДОСТОВЕРЯВАНЕ
+online.account.mfa_on = Вкл.
+online.account.mfa_off = Изкл.
+online.account.google = GOOGLE
+online.account.google_linked = Свързан с акаунт в Google
+online.account.change_password = Смени паролата
+online.account.mfa_setup = Включи двуфакторното удостоверяване
+online.account.mfa_disable = Изключи двуфакторното удостоверяване
+online.account.recovery = Нови кодове за възстановяване
+online.account.sign_out = Изход
+online.account.sign_out_all = Изход навсякъде
+online.account.sign_out_all.help = Излиза от този акаунт на всички компютри, включително на този.
+online.account.signed_out = Излязохте от акаунта.
+online.account.signed_out_all = Излязохте от акаунта на всички компютри.
+online.account.signing_out_all = Излизане от всички компютри…
+online.account.sign_out_all_failed = Другите ви компютри може все още да са с активен вход: влезте отново, след което прекратете сесиите им от „Устройства с активен вход“. {0}
+online.account.sign_out_all_retry = Другите ви компютри може все още да са с активен вход. Опитайте отново „Изход навсякъде“. {0}
+online.account.ratings = РЕЙТИНГИ
+online.account.col.tc = КОНТРОЛА
+online.account.col.rating = РЕЙТИНГ
+online.account.col.games = ПАРТИИ
+online.account.col.record = П / Р / З
+online.account.provisional = Въпросителният знак отбелязва предварителен рейтинг (все още малко изиграни партии).
+online.password.title = СМЯНА НА ПАРОЛАТА
+online.password.button = Смени паролата
+online.password.changed = Паролата ви е сменена.
+online.password.other_sessions = Другите ви компютри ще трябва да влязат отново.
+online.mfa_setup.title = ДВУФАКТОРНО УДОСТОВЕРЯВАНЕ
+online.mfa_setup.lead = Двуфакторното удостоверяване изисква код от приложение на телефона ви при всяко влизане. Въведете паролата си, за да започнете.
+online.mfa_setup.scan = 1. Сканирайте този код с приложение за удостоверяване или въведете в него този ключ:
+online.mfa_setup.enter = 2. Въведете 6-цифрения код, който показва приложението:
+online.mfa_setup.enable = Включи
+online.mfa_setup.done = Двуфакторното удостоверяване е включено.
+online.mfa_off.title = ИЗКЛЮЧВАНЕ НА 2FA
+online.mfa_off.lead = Въведете паролата си и код от приложението (или код за възстановяване).
+online.mfa_off.button = Изключи
+online.mfa.off_done = Двуфакторното удостоверяване е изключено.
+online.recovery.title = КОДОВЕ ЗА ВЪЗСТАНОВЯВАНЕ
+online.recovery.lead = Всеки код ви позволява да влезете веднъж, ако загубите телефона си. Пазете ги на сигурно място: показват се само сега.
+online.recovery.saved = Запазих ги
+online.recovery.new_title = НОВИ КОДОВЕ
+online.recovery.new_lead = Новите кодове заменят старите. Въведете паролата си и код от приложението.
+online.recovery.button = Нови кодове
+online.account.manage = СИГУРНОСТ И ДАННИ
+online.account.pending_email = Очаква потвърждение: {0}
+online.account.accept_challenges = Приемане на предизвикателства
+online.account.accept_challenges.help = Другите играчи могат да ви предизвикват по потребителското ви име. Изкл.: предизвикателствата им се отказват.
+online.account.history = История на партиите
+online.account.devices = Устройства с активен вход
+online.account.change_email = Смени имейла
+online.account.export = Изтегли данните ми
+online.account.delete = Изтрий акаунта
+
+# Play
+online.play.signed_in = Влезли сте като {0}
+online.session.file = Нито едно системно хранилище за пароли не можа да запази входа ви: той се помни във файл, който може да чете само вашият потребителски акаунт (Настройки > Онлайн сървър).
+online.session.memory = Нито едно системно хранилище за пароли не можа да запази входа ви и той не се записва във файл: оставате влезли, докато играта не бъде затворена (Настройки > Онлайн сървър).
+online.play.find_section = ТЪРСЕНЕ НА ПРОТИВНИК
+online.play.friend_section = ИГРА С ПРИЯТЕЛ
+online.play.mode = Партия
+online.play.mode.help = Партиите с рейтинг променят рейтинга ви в тази контрола на времето; приятелските – не.
+online.play.find = Намери противник
+online.play.connecting = Свързване със сървъра…
+online.play.cooldown = Можете отново да търсите противник в {0}.
+online.play.banned = Този акаунт е блокиран до {0}.
+online.play.challenge = Предизвикай играч
+online.play.challenge.desc = Поканете някого, който е онлайн, по потребителското му име.
+online.play.private = Частна партия
+online.play.private.desc = Създайте код, който да дадете на приятел, или се присъединете с неговия.
+online.play.direct = Директен мач
+online.play.direct.desc = Без сървър: играйте направо с компютъра на приятел.
+online.search.title = ТЪРСЕНЕ
+online.search.window = Диапазон на рейтинга {0}
+online.search.queued = {0} играч търси|{0} играчи търсят
+online.search.wait = Търсене на противник от вашето ниво…
+online.outgoing.challenge = ИЗПРАТЕНО ПРЕДИЗВИКАТЕЛСТВО
+online.outgoing.waiting = изчакване на отговор
+online.outgoing.private = ЧАСТНА ПАРТИЯ
+online.outgoing.private_hint = Дайте този код на приятеля си: партията започва, когато се присъедини.
+online.challenge.title = ПРЕДИЗВИКВАНЕ НА ИГРАЧ
+online.challenge.opponent = ПРОТИВНИК
+online.field.opponent = Потребителско име
+online.field.opponent.hint = кого да предизвикате
+online.challenge.note = Противникът ви вижда предизвикателството, където и да се намира в менютата, и има една минута да отговори.
+online.challenge.send = Предизвикай
+online.terms.rated = С рейтинг
+online.terms.rated.help = Само официалните контроли на времето могат да бъдат с рейтинг.
+online.terms.color = Вашият цвят
+online.private.title = ЧАСТНА ПАРТИЯ
+online.private.create_section = СЪЗДАВАНЕ
+online.private.create_note = Получавате кратък код: който го въведе, играе срещу вас.
+online.private.create = Създай партията
+online.private.join_section = ПРИСЪЕДИНЯВАНЕ
+online.field.private_code = Код
+online.private.join = Присъедини се
+online.private.joining = Присъединяване към партията…
+online.challenge.received = ПРЕДИЗВИКАТЕЛСТВО
+online.challenge.accept = Приеми
+online.challenge.decline = Откажи
+online.challenge.you_white = играете с белите
+online.challenge.you_black = играете с черните
+online.challenge.you_random = цветове по жребий
+online.challenge.declined = {0} отказа предизвикателството ви.
+online.challenge.expired = Предизвикателството ви изтече без отговор.
+online.challenge.unavailable = {0} не е на разположение в момента.
+online.challenge.lost = Връзката прекъсна: предизвикателството ви е отменено.
+
+# At the table ("abort" = анулирам: the game does not count)
+online.pause.clock_runs = Партията продължава: часовникът ви тече.
+online.pause.abort = Анулирай партията
+online.pause.abort.help = Преди първия ви ход партията може да бъде анулирана; тя не се брои.
+online.pause.leave = Напусни партията
+online.confirm.resign.text = Да предадете ли партията? Противникът ви я печели.
+online.confirm.leave.text = Напускането означава предаване на партията: противникът ви я печели.
+online.confirm.leave.ok = Предай се и излез
+online.confirm.leave_abort.text = Да напуснете ли преди първия си ход? Партията се анулира и не се брои.
+online.confirm.leave_abort.ok = Анулирай и излез
+online.draw.card_title = ПРЕДЛОЖЕНИЕ ЗА РЕМИ
+online.draw.card_text = Противникът ви предлага реми.
+online.draw.accept = Приеми
+online.draw.decline = Откажи
+online.draw.offered = Противникът ви предлага реми.
+online.opponent_back = Противникът ви се върна.
+online.opponent_away = Противникът прекъсна връзката – {0} за връщане
+online.first_move = Вашият първи ход · {0}
+online.reconnecting = ПОВТОРНО СВЪРЗВАНЕ…
+online.reconnecting.text = Партията продължава на сървъра и часовникът ви тече.
+online.gameover.aborted = Партията е анулирана: тя не се брои.
+online.rating.casual = Приятелска партия: рейтингите не се променят.
+online.rating.change = Рейтинг {0} → {1} ({2})
+online.rating.pending = Рейтинг: …
+online.rematch.accept = Приеми реванша
+online.rematch.offered = Противникът ви предлага реванш.
+online.rematch.waiting = Предложен реванш…
+online.rematch.gone = Няма реванш
+online.rematch.declined = Този път няма реванш.
+online.report.button = Подай сигнал
+online.report.title = СИГНАЛ
+online.report.lead = Сигналите се изпращат до модераторите на сървъра заедно с тази партия. Благодарим ви, че помагате играта да остане честна.
+online.report.category = Причина
+online.report.cheating = Измама
+online.report.abuse = Обидно поведение
+online.report.other = Друго
+online.report.comment = Коментар
+online.report.comment.hint = незадължително
+online.report.send = Изпрати сигнала
+online.report.sent = Сигналът е изпратен. Благодарим ви.
+online.report.queued = Сигналът ви ще бъде изпратен, когато партията приключи.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Онлайн, {0} {1}
+online.sheet.rated = с рейтинг
+online.sheet.casual = приятелска
+online.sheet.game = Партия {0}
+# End reasons of online games
+reason.online.abandonment = Противникът напусна партията
+reason.online.abandonment_vs_insufficient = Напускане на партията, но противникът не може да даде мат
+reason.online.aborted = Анулирана партия
+reason.online.no_show = Няма първи ход навреме (анулирана)
+reason.online.forfeit = Служебна загуба
+reason.online.server_aborted = Анулирана от сървъра
+reason.online.both_disconnected = И двамата играчи прекъснаха връзката
+# Server notices
+online.notice.shutdown = Сървърът се рестартира след {0}. Текущите партии се запазват.
+online.notice.revoked = Сесията ви на този сървър е прекратена.
+online.notice.replaced = Акаунтът ви се свърза от друг прозорец; този вече е офлайн.
+online.notice.rating_restored = Рейтингът ви беше възстановен с {0} точка: ваш противник беше блокиран заради измама.|Рейтингът ви беше възстановен с {0} точки: ваш противник беше блокиран заради измама.
+# Errors
+online.err.rate_limited_for = Твърде много опити. Опитайте отново след {0}.
+online.err.rate_limited = Твърде много опити. Опитайте отново след малко.
+online.err.server_busy_for = Сървърът е зает. Опитайте отново след {0}.
+online.err.server_busy = Сървърът е зает. Опитайте отново след малко.
+online.err.banned_until = Този акаунт е блокиран до {0}.
+online.err.banned = Този акаунт е блокиран.
+online.err.invalid_credentials = Грешно потребителско име или парола.
+online.err.invalid_credentials_pending = Грешно потребителско име или парола. Ако току-що сте се регистрирали, първо отворете връзката, която ви изпратихме.
+online.err.email_unverified = Имейл адресът ви още не е потвърден: отворете връзката, която ви изпратихме.
+online.err.network = Сървърът е недостъпен. Проверете връзката си и адреса на сървъра.
+online.err.tls = Не можа да се установи защитена връзка със сървъра.
+online.err.certificate = Сертификатът на сървъра не е надежден (или не съвпада с отпечатъка в настройките).
+online.err.incompatible = Този сървър изисква друга версия на Scacelith.
+online.err.unauthorized = Сесията ви изтече: моля, влезте отново.
+online.err.username_taken = Това потребителско име е заето.
+online.err.email_taken = Вече има акаунт с този имейл адрес.
+online.err.invalid_username = Потребителското име съдържа от 3 до 24 букви, цифри, _ или -.
+online.err.invalid_email = Този имейл адрес не е валиден.
+online.err.weak_password = Паролата е твърде слаба: използвайте поне 10 знака.
+online.err.invalid_code = Кодът не е верен.
+online.err.expired = Заявката е изтекла: моля, започнете отначало.
+online.err.registration_closed = Този сървър не приема нови акаунти.
+online.err.sso_cancelled = Входът с Google беше отменен.
+online.err.sso_expired = Входът с Google отне твърде дълго или вече е използван. Моля, започнете отначало.
+online.err.sso_failed = Входът с Google не успя. Моля, опитайте отново.
+online.err.sso_listen = Scacelith не можа да получи отговора на Google на този компютър. Моля, опитайте отново.
+online.err.sso_origin = Входът с Google не работи през този адрес на сървъра. Добавете сървъра с публичното име, което дава операторът му, после опитайте отново.
+online.err.browser = Уеб браузърът не можа да бъде отворен.
+online.err.sso_email_unverified = Google не е потвърдил имейл адреса на този акаунт в Google.
+online.err.sso_account_exists = Вече има акаунт с този имейл адрес и той не може да бъде свързан с вход с Google: влезте с паролата му или използвайте „Забравена парола?“.
+online.err.sso_already_linked = Този акаунт в Google вече е свързан с друг акаунт.
+online.err.account_disabled = Този акаунт вече не може да се използва.
+online.err.server_error = Сървърът срещна проблем. Моля, опитайте отново.
+online.err.timeout = Сървърът не отговори навреме.
+online.err.offline = Няма връзка със сървъра: опитайте отново, щом връзката се възстанови.
+online.err.other = Сървърът отказа ({0}).
+online.err.code = Сървърът отказа (грешка {0}).
+online.err.slow_down = Малко по-бавно.
+online.err.server_full = Сървърът е пълен. Опитайте отново по-късно.
+online.err.restarting = Сървърът се рестартира. Опитайте отново след малко.
+online.err.move_refused = Сървърът отказа този ход: дъската е върната.
+online.err.game_over = Тази партия вече е приключила.
+online.err.already_in_game = Вече играете партия.
+online.err.invalid_category = Тази контрола на времето не се предлага тук.
+online.err.draw_offer_limit = Засега не можете да предлагате повече реми.
+online.err.abort_not_allowed = Партията вече не може да бъде анулирана.
+online.err.no_pending_offer = Няма предложение, на което да отговорите.
+online.err.flag_fell = Времето ви изтече.
+online.err.queue_not_allowed = В момента не можете да търсите противник.
+online.err.challenge_not_found = Това предизвикателство вече не съществува.
+online.err.user_unavailable = Този играч не е на разположение.
+online.err.challenge_limit = Засега има твърде много предизвикателства. Опитайте отново по-късно.
+online.err.challenge_self = Не можете да предизвикате себе си.
+online.err.code_invalid = Няма партия с този код.
+online.err.rated_official_tc = Само официалните контроли на времето могат да бъдат с рейтинг.
+online.err.cooldown = Търсенето на противник е временно спряно за вас.
+online.err.invalid_tc = Тази контрола на времето не е разрешена.
+online.err.rematch_unavailable = Реваншът вече не е възможен.
+online.err.rated_repeat_limit = Засега изиграхте достатъчно партии с рейтинг срещу този играч. Изиграйте приятелска партия или опитайте отново по-късно.
+online.err.cheat_detected = Партията беше спряна от проверките за честна игра на сървъра.
+online.err.invalid_password = Грешна парола.
+online.err.mfa_code_required = Въведете код от приложението си за удостоверяване (или код за възстановяване).
+online.err.password_not_set = Този акаунт влиза с Google и още няма парола. Първо задайте парола чрез „Забравена парола?“ на страницата за вход.
+online.err.too_many_attempts = Твърде много грешни опити. Опитайте отново по-късно.
+online.err.too_many_attempts_for = Твърде много грешни опити. Опитайте отново след {0}.
+online.err.same_email = Това вече е вашият имейл адрес.
+online.err.not_found = Не е намерено на сървъра.
+online.err.invalid_response = Отговорът на сървъра не можа да бъде прочетен.
+online.err.storage = Сесията не можа да бъде запазена на този компютър.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = ИСТОРИЯ НА ПАРТИИТЕ
+online.history.filter.games = Партии
+online.history.filter.result = Резултат
+online.history.filter.all = Всички
+online.history.filter.won = Спечелени
+online.history.filter.lost = Загубени
+online.history.filter.drawn = Реми
+online.history.col.date = ДАТА
+online.history.col.opponent = ПРОТИВНИК
+online.history.col.result = РЕЗУЛТАТ
+online.history.col.tc = КОНТРОЛА
+online.history.col.kind = ВИД
+online.history.col.rating = РЕЙТИНГ
+online.history.won = Победа
+online.history.lost = Загуба
+online.history.drawn = Реми
+online.history.aborted = Анулирана
+online.history.page = Страница {0} от {1}
+online.history.total = {0} партия|{0} партии
+online.history.previous = Предишна
+online.history.next = Следваща
+online.history.empty.title = ОЩЕ НЯМА ПАРТИИ
+online.history.empty = Партиите ви на този сървър се показват тук, след като приключат.
+online.history.empty_filter.title = НЯМА ПАРТИИ
+online.history.empty_filter = Няма партия, която да отговаря на тези филтри.
+online.history.error = ИСТОРИЯТА НЕ МОЖА ДА БЪДЕ ЗАРЕДЕНА
+online.history.unavailable = ТОЗИ СЪРВЪР НЕ ПРЕДЛАГА ИСТОРИЯ НА ПАРТИИТЕ
+online.game.title = ПАРТИЯ
+online.game.players = ИГРАЧИ
+online.game.you = ВИЕ
+online.game.unrated = Без рейтинг
+online.game.you_won = Спечелихте
+online.game.you_lost = Загубихте
+online.game.draw = Реми
+online.game.you_left = Напуснахте партията
+online.game.date = ДАТА
+online.game.time_control = КОНТРОЛА НА ВРЕМЕТО
+online.game.moves = ХОДОВЕ
+online.game.move_count = {0} ход|{0} хода
+online.game.no_moves = Не е изигран нито един ход.
+online.game.moves_incomplete = Някои ходове не можаха да бъдат прочетени: списъкът спира преди края.
+online.game.save = Запази партията
+online.game.saved_button = Запазена
+online.game.saved = Партията е в запазените ви партии.
+online.game.already_saved = Тази партия вече е в запазените ви партии.
+online.game.save_failed = Партията не можа да бъде запазена.
+online.game.invalid = Сървърът изпрати запис на партия, който не може да бъде прочетен.
+online.game.replay = Възпроизведи
+online.game.not_found = ПАРТИЯТА НЕ Е НАМЕРЕНА
+online.game.error = ПАРТИЯТА НЕ МОЖА ДА БЪДЕ ЗАРЕДЕНА
+online.devices.title = УСТРОЙСТВА С АКТИВЕН ВХОД
+online.devices.lead = Устройствата, на които е влязъл този акаунт. Ако не разпознавате някое от тях, прекратете сесията му и сменете паролата си.
+online.devices.unknown = Неизвестно устройство
+online.devices.this = ТОВА УСТРОЙСТВО
+online.devices.signed_in = Вход на {0}
+online.devices.last_active = последна активност: {0}
+online.devices.active_now = използва се в момента
+online.devices.sign_out = Изход
+online.devices.signed_out = Сесията на устройството е прекратена.
+online.devices.error = УСТРОЙСТВАТА НЕ МОЖАХА ДА БЪДАТ ЗАРЕДЕНИ
+online.devices.all.title = ИЗХОД НАВСЯКЪДЕ
+online.email.title = СМЯНА НА ИМЕЙЛА
+online.email.current = Текущ адрес: {0}
+online.email.button = Смени имейла
+online.email.sent = Връзка за потвърждение беше изпратена на {0}.
+online.email.sent.hint = Адресът се сменя, след като връзката бъде отворена. Дотогава се използва текущият ви адрес.
+online.email.done = Готово
+online.email.changed = Имейл адресът ви е сменен.
+online.export.title = ИЗТЕГЛЯНЕ НА ДАННИТЕ МИ
+online.export.lead = Всичко, което този сървър пази за акаунта ви (профил, рейтинги, партии, устройства, събития, свързани със сигурността), се запазва като JSON файл на този компютър. Въведете паролата си за потвърждение.
+online.export.button = Изтегли
+online.export.saved = Данните ви са запазени на този компютър.
+online.export.failed = Файлът не можа да бъде записан.
+online.delete.title = ИЗТРИВАНЕ НА АКАУНТА
+online.delete.warning = Акаунтът ви ще бъде изтрит от този сървър: имейл адресът, паролата, двуфакторното удостоверяване и устройствата ви се изтриват и вече няма да можете да влизате. Това действие е необратимо.
+online.delete.games = Партиите и рейтингите ви остават на сървъра под анонимното име {0}.
+online.delete.confirm_name = За потвърждение въведете потребителското си име и паролата си.
+online.delete.button = Изтрий акаунта ми
+online.delete.done = Акаунтът ви е изтрит.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Директен мач
+online.direct.title = ДИРЕКТЕН МАЧ
+online.direct.lead = Приятелска партия направо между два компютъра: без сървър, без акаунт, никога с рейтинг.
+online.direct.host = Създай партия
+online.direct.host.desc = Приятелят ви се свързва с вас: давате му адреса си и код.
+online.direct.join = Присъедини се
+online.direct.join.desc = Свържете се с приятел, който е домакин на партия.
+online.direct.host_title = СЪЗДАВАНЕ НА ПАРТИЯ
+online.direct.your_color = Вашият цвят
+online.direct.auto_press.help = И двата робота натискат часовника сами, щом ходът е на дъската. Изкл.: всеки играч натиска часовника след всеки ход.
+online.direct.unrated = Директните мачове са приятелски партии: никога не са с рейтинг.
+online.direct.connection = ВРЪЗКА
+online.direct.port = Порт
+online.direct.port.help = TCP портът, към който се свързва приятелят ви (47100, освен ако не е зает).
+online.direct.port_range = Изберете порт между 1024 и 65535.
+online.direct.upnp = Отвори порта на рутера ми (UPnP)
+online.direct.upnp.help = Иска от домашния рутер да пренасочи порта към този компютър и го затваря след партията.
+online.direct.host_note_upnp = Играта иска от рутера ви да отвори порта. Ако не успее, ще ви бъде казано кой порт да пренасочите ръчно.
+online.direct.host_note_manual = Пренасочете TCP порта към този компютър в рутера си или играйте в същата мрежа.
+online.direct.host_button = Създай
+online.direct.wait_title = ИЗЧАКВАНЕ НА ПРИЯТЕЛЯ ВИ
+online.direct.opening = Отваряне на порт {0} на рутера ви…
+online.direct.give = Дайте на приятеля си:
+online.direct.cap_address = АДРЕС
+online.direct.cap_port = ПОРТ
+online.direct.cap_code = КОД
+online.direct.lan = В същата мрежа: {0}
+online.direct.router = вашия рутер
+online.direct.upnp_searching = Търсене на рутера ви…
+online.direct.upnp_mapped = Портът е отворен на {0}.
+online.direct.upnp_none = Не отговори нито един UPnP рутер: пренасочете ръчно TCP порт {0} към този компютър.
+online.direct.upnp_failed = Рутерът отказа да отвори порта: пренасочете ръчно TCP порт {0} към този компютър.
+online.direct.upnp_off = Пренасочете TCP порт {0} към този компютър в рутера си.
+online.direct.upnp_cgnat = Доставчикът ви вероятно споделя интернет адреса ви (CGNAT): опитайте с IPv6 или VPN.
+online.direct.firewall = Ако Windows попита дали Scacelith може да приема връзки, разрешете го.
+online.direct.waiting = Изчакване на приятеля ви…
+online.direct.connecting_friend = Приятелят ви се свързва…
+online.direct.starting = Подреждане на дъската…
+online.direct.join_title = ПРИСЪЕДИНЯВАНЕ
+online.direct.join_lead = Въведете това, което ви продиктува приятелят ви: адреса му, порта и кода.
+online.direct.address = Адрес
+online.direct.address.hint = IPv4, IPv6 или име
+online.direct.code = Код
+online.direct.join_button = Присъедини се
+online.direct.connecting_to = Свързване с {0}…
+online.direct.securing = Защитаване на връзката с {0}…
+direct.event = Приятелски мач
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Директно, {0}
+direct.err.refused = На този адрес и порт няма създадена партия.
+direct.err.timeout = Няма отговор: проверете адреса и порта, както и дали рутерът на приятеля ви пропуска играта.
+direct.err.wrong_code = Кодът не е верен.
+direct.err.invalid_code = Кодът се състои от 12 знака (XXXX-XXXX-XXXX).
+direct.err.incompatible = Приятелят ви има друга версия на Scacelith.
+direct.err.port_in_use = Този порт вече се използва на този компютър: изберете друг.
+direct.err.network = Мрежата не можа да бъде използвана.
+direct.err.too_many_attempts = Твърде много грешни кодове: партията е спряна. Създайте я отново, за да получите нов код.
+direct.err.bad_address = Този адрес не е валиден.
+direct.err.not_found = Това име не беше намерено.
+direct.err.unreachable = Този адрес е недостъпен оттук.
+direct.err.reset = Връзката беше прекъсната.
+direct.err.closed = Връзката беше затворена.
+direct.err.host_left = Приятелят ви прекрати партията.
+direct.err.other = Връзката не успя ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Играч 2
+hotseat.white_player = Бели
+hotseat.black_player = Черни
+hotseat.name.help = Името, което се записва в двата протокола, с каквато и да е азбука.
+hotseat.swap = Размени цветовете
+hotseat.left_hand = {0} играе с лявата ръка: часовникът е поставен отляво.
+hotseat.rated = Партия с рейтинг
+hotseat.rated.help = Всяко име има свой рейтинг за игра между двама на този компютър. Рейтингът ви срещу Stockfish никога не се променя.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Рейтинги за игра между двама: {0} {1} · {2} {3}
+hotseat.new_rating = (нов)
+hotseat.friendly_note = Приятелска партия: рейтингите не се променят.
+hotseat.colours = {0} играе с белите, {1} играе с черните.
+hotseat.colours_swap = Цветовете се разменят при всеки реванш.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names; no form agrees with their gender)
+hotseat.your_move = {0}, ваш ход
+hotseat.flag = Флагчето на {0} падна.
+hotseat.confirm.resign = {0} предава ли партията? Победата ще бъде присъдена на {1}.
+hotseat.confirm.resign_draw = {0} предава ли партията? {1} вече не може да даде мат: партията ще завърши реми.
+hotseat.draw.offer_noted = Предложението ви за реми върви с хода ви: {0} ще го види, след като натиснете часовника.
+hotseat.draw.card_title = ПРЕДЛОЖЕНИЕ ЗА РЕМИ
+hotseat.draw.offered = {0} предлага реми.
+hotseat.draw.card_hint = Докосването на фигура го отклонява.
+hotseat.draw.accept = Приеми
+hotseat.draw.decline = Откажи
+hotseat.draw.accepted = {0} приема ремито, предложено от {1}.
+hotseat.draw.declined = {0} отказва ремито, предложено от {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Партия с рейтинг
+hotseat.sheet.friendly = Приятелска партия
+# Game over card
+hotseat.gameover.wins = {0} печели за {1} ход.|{0} печели за {1} хода.
+hotseat.gameover.wins_now = {0} печели.
+hotseat.gameover.friendly = {0} срещу {1} · приятелска партия
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Тази партия не се отчита за рейтинга.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Треньор
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Синтетичната реч е създадена със {0} за режим „Треньор“
+# Coach page
+coach.title = ТРЕНЬОР
+coach.section.level = НИВО
+coach.section.lesson = С ТРЕНЬОРА
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = За играчи с рейтинг {0}
+coach.completed = Завършено
+coach.recommended = Препоръчано
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column.
+# The names are quoted by the coach (events.lang, appraisal.lang, lesson.lang): keep them in step.
+coach.level.0.name = Правилата на шаха
+coach.level.0.desc = Интерактивен урок, правило по правило.
+coach.level.0.detail = Треньорът подрежда малки позиции и показва как се движи и взема всяка фигура, после рокадата, произвеждането, шахът и матът. Сами изпробвате всяка идея на дъската.
+coach.level.1.name = Първи стъпки
+coach.level.1.desc = Какво е под удар и какво е останало без защита.
+coach.level.1.detail = Треньорът играе по-меко и говори просто: кои от фигурите ви са под удар, кои са останали без защита и как да ги опазите.
+coach.level.2.name = Начинаещ
+coach.level.2.desc = Проста тактика, развитие, безопасност на царя.
+coach.level.2.detail = Вилиците и свръзките се назовават с имената си. Треньорът говори за извеждането на фигурите и за безопасността на царя ви.
+coach.level.3.name = Напредващ
+coach.level.3.desc = Планове, пешечна структура, единствени ходове.
+coach.level.3.detail = Треньорът обяснява плановете и пешечните структури и ви предупреждава, когато само един ход задържа позицията.
+coach.level.4.name = Клубен играч
+coach.level.4.desc = Кандидат-ходове, оценка в пешки.
+coach.level.4.detail = Треньорът претегля кандидат-ходовете и дава оценката в пешки, както би направил клубен треньор.
+coach.level.5.name = Силен клубен играч
+coach.level.5.desc = Кратки варианти, позиционни термини.
+coach.level.5.detail = Кратки забележки, конкретни варианти и речникът на позиционната игра.
+coach.level.6.name = Експерт
+coach.level.6.desc = Пестеливи забележки, дълбоки варианти, числови оценки.
+coach.level.6.detail = Малко думи, както между силни играчи: варианти на няколко хода напред и числови оценки.
+coach.note.clock = Без часовник: отделете си толкова време, колкото ви трябва.
+coach.note.takeback = След груба грешка треньорът показва какво се е объркало и предлага да върнете хода.
+coach.note.lesson = Играете с белите; треньорът подрежда всяко упражнение на дъската.
+coach.note.unrated = Партиите с треньора не се отчитат за рейтинга.
+coach.note.fallible = Треньорът не е непогрешим: понякога може да прецени погрешно някой ход.
+coach.colour = Вашият цвят
+coach.colour.help = Цветът, с който играете срещу треньора. Редуване: с белите, после с черните, от партия на партия. Урокът по правилата винаги се играе с белите.
+coach.colour.alternate = Редуване
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Гласът на треньора не е инсталиран или е изключен (Настройки > Звук): думите му ще се изписват на екрана.
+# At the table
+coach.speaker = ТРЕНЬОР
+coach.skip = Пропусни
+coach.offer.title = ВРЪЩАНЕ НА ХОДА?
+coach.offer.text = Треньорът предлага да върнете последния си ход, за да потърсите по-добър.
+coach.offer.hint = Backspace връща хода. Докосването на фигура продължава играта.
+coach.offer.accept = Върни хода
+coach.offer.decline = Продължи
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Оставащи връщания: {0}
+coach.pause.take_back = Върни хода ми
+coach.pause.take_back.help = Връща последния ви ход, както и отговора на треньора, ако вече е играл.
+coach.confirm.resign = Да предадете ли партията? Треньорът ще бъде обявен за победител.
+coach.confirm.resign_draw = Да предадете ли партията? Треньорът вече не може да даде мат: партията ще завърши реми.
+coach.confirm.leave = Да се върнете ли в главното меню? Тази партия с треньора ще бъде прекратена.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Играй отново
+coach.gameover.unrated = Тази партия с треньора не се отчита за рейтинга.
+coach.lesson.done = БРАВО
+coach.lesson.done.line = Вече знаете правилата на шаха.
+coach.lesson.next = Първа партия
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Тренировка
+coach.tab.challenges = Предизвикателства
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = МАТОВЕ
+challenge.group.tactics = ТАКТИКА
+challenge.group.defence = ЗАЩИТА
+challenge.group.endgames = ЕНДШПИЛИ
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge. The names are those the coach
+# says in challenge.lang (ch.intro.*); a name that is an order takes the singular imperative, as a menu entry.
+challenge.mate1.name = Мат в един ход
+challenge.mate1.desc = Един ход и е мат.
+challenge.mate1.detail = Първо разгледайте всеки шах: един от тях не оставя на царя нито поле, нито закриване, нито вземане.
+challenge.mate2.name = Мат в два хода
+challenge.mate2.desc = Ход, който не оставя защита, и после мат.
+challenge.mate2.detail = Първият ход често е шах или жертва, която отнема поле от царя. Треньорът се защитава колкото може по-добре.
+challenge.mate3.name = Мат в три хода
+challenge.mate3.desc = По-дълги форсирани варианти.
+challenge.mate3.detail = Шахове, вземания и заплахи, три хода в дълбочина. Пресметнете най-добрия отговор на треньора на всяка стъпка, преди да докоснете фигура.
+challenge.backrank.name = Матове на задната линия
+challenge.backrank.desc = Цар, заклещен зад собствените си пешки.
+challenge.backrank.detail = Когато пешките пред рокирания цар не са помръднали, топ или дама на последната хоризонтала може да даде мат. Първо отстранете или отклонете защитниците.
+challenge.patterns.name = Матови схеми
+challenge.patterns.desc = Задушен мат, матът на Анастасия, арабският мат и други класики.
+challenge.patterns.detail = Известни матови мрежи, които се появяват отново и отново. Научете се да разпознавате разположението на фигурите и последния удар.
+challenge.hanging.name = Незащитени фигури
+challenge.hanging.desc = Забележете какво е останало без защита.
+challenge.hanging.detail = Фигура или пешка, която никой не защитава, може просто да бъде взета. Проверете с какво е защитена всяка от фигурите на треньора.
+challenge.fork.name = Вилици
+challenge.fork.desc = Една фигура напада две наведнъж.
+challenge.fork.detail = Конете, пешките, дамите и дори царете могат да направят вилица. Противникът може да спаси само едната от двете цели.
+challenge.pin.name = Свръзки
+challenge.pin.desc = Фигура, която не може да се помръдне, без да загуби това, което стои зад нея.
+challenge.pin.detail = Свържете фигура към нейния цар или към по-ценна фигура, после я нападнете отново или се възползвайте от това, че не може да се движи.
+challenge.skewer.name = Линейни удари
+challenge.skewer.desc = Нападнете ценна фигура и спечелете тази зад нея.
+challenge.skewer.detail = Обратното на свръзката: по-ценната фигура стои отпред, трябва да се отмести и открива фигурата зад себе си.
+challenge.discovered.name = Открити атаки
+challenge.discovered.desc = Преместете една фигура, за да отприщите друга.
+challenge.discovered.detail = Когато една фигура напусне линията, фигурата зад нея напада. Със шах или с двоен шах противникът няма време да отговори и на двете заплахи.
+challenge.deflection.name = Отклоняване и привличане
+challenge.deflection.desc = Отклонете защитник или го привлечете на гибелно поле.
+challenge.deflection.detail = Защитник с две задачи не може да изпълни и двете. Нападнете го, предложете му нещо или принудете фигура да застане на поле, където ще бъде загубена.
+challenge.intermezzo.name = Междинни ходове
+challenge.intermezzo.desc = Не вземайте обратно веднага: има нещо по-силно.
+challenge.intermezzo.detail = Преди очаквания ход един междинен шах или по-голяма заплаха променя всичко.
+challenge.trapped.name = Фигури в капан
+challenge.trapped.desc = Фигура, на която не е останало безопасно поле.
+challenge.trapped.detail = Отнемете последните полета за бягство на една фигура, после я спечелете.
+challenge.promotion.name = Произвеждане
+challenge.promotion.desc = Прокарайте пешка до последната хоризонтала.
+challenge.promotion.detail = Напредналите пешки струват много. Разчистете пътя, отклонете блокиращите фигури и направете нова дама.
+challenge.quiet.name = Тихи ходове
+challenge.quiet.desc = Печелившият ход не е нито шах, нито вземане.
+challenge.quiet.detail = Понякога най-силният ход просто подготвя заплаха, която не може да бъде отбита. Такива ходове се виждат най-трудно.
+challenge.opening.name = Дебютни капани
+challenge.opening.desc = Наказвайте ранните грешки.
+challenge.opening.detail = Позиции от първите ходове на истински партии, в които един небрежен ход може да бъде използван веднага.
+challenge.escape.name = Намери спасението
+challenge.escape.desc = Царят ви е в опасност: един ход го спасява.
+challenge.escape.detail = Всеки друг ход губи. Разгледайте всички шахове и заплахи срещу царя си, после намерете единствения изход.
+challenge.defend.name = Защитни ходове
+challenge.defend.desc = Отбийте заплахата, без да губите материал.
+challenge.defend.detail = Треньорът заплашва нещо. Намерете точния ход, който удържа всичко.
+challenge.kq.name = Дама и цар срещу цар
+challenge.kq.desc = Мат с дамата.
+challenge.kq.detail = Изтласкайте самотния цар към края на дъската с дамата, приближете своя цар и внимавайте за пат. Треньорът се защитава с най-добрите си ходове.
+challenge.kr.name = Топ и цар срещу цар
+challenge.kr.desc = Мат с топа.
+challenge.kr.detail = Топът отрязва царя хоризонтала след хоризонтала; вашият цар заема опозиция. Треньорът се защитава с най-добрите си ходове.
+challenge.kp.name = Цар и пешка срещу цар
+challenge.kp.desc = Спечелете опозицията и произведете пешката.
+challenge.kp.detail = Водете с царя, не с пешката. Заемете опозиция и направете дама, която треньорът не може да догони.
+challenge.kp_hold.name = Спри пешката
+challenge.kp_hold.desc = Самотен цар срещу цар и пешка: удържете реми.
+challenge.kp_hold.detail = Застанете пред пешката и запазвайте опозицията. Удържете десет хода.
+challenge.rook.name = Топови ендшпили
+challenge.rook.desc = Мостът на Лусена и защитата на Филидор.
+challenge.rook.detail = Двете позиции, които всеки играч трябва да знае: как се печели с пешка на седмата хоризонтала и как се защитава с топ на третата.
+challenge.endgame.name = Тактика в ендшпила
+challenge.endgame.desc = Малко фигури, остри идеи.
+challenge.endgame.detail = Надбягвания на пешки, пробиви и топови ендшпили от истински партии.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} позиция|{0} позиции
+coach.challenge.done = Завършено
+coach.challenge.start = Започни
+coach.challenge.note.white = Играете с белите; треньорът подрежда всяка позиция на дъската.
+coach.challenge.note.hint = Затруднявате ли се? Натиснете H за подсказка. След няколко опита треньорът сам ще ви предложи такава.
+coach.challenge.note.unsaved = Предизвикателствата не се отчитат за рейтинга и не се запазват; отметка показва тези, които сте завършили.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = ИЗПЪЛНЕНО
+coach.challenge.complete.line = Решихте всички позиции.
+coach.challenge.next = Към следващото
+coach.challenge.again = Отново
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ПОДСКАЗКА?
+coach.hint.text = Треньорът ви предлага подсказка.
+coach.hint.hint = H показва подсказката. Докосването на фигура продължава търсенето.
+coach.hint.accept = Подсказка
+coach.hint.decline = Не, благодаря
+coach.hint.key = Подсказка
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Глас на треньора
+options.coach_voice.help = Треньорът говори на глас в режим „Треньор“. Гласовият му модел се изтегля при първа нужда (около 399 MB). Изкл.: думите на треньора само се изписват на екрана.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398,7")
+options.voice_update = Гласов модел
+options.voice_update.help = Треньорът все още говори със старата 8-битова версия на гласовия си модел. Обновяването изтегля официалната версия на Supertonic 3, публикувана от Supertone, като първо изтрива старите файлове.
+options.voice_update.button = Обнови ({0} MB)
+options.voice_update.running = Изтеглянето е в ход.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed. The levels agree with "качество" (neuter).
+options.voice_quality = Качество на гласа
+options.voice_quality.help = Колко стъпки за изчистване прави синтезът на речта на треньора за всяка реплика – от „Ниско“ (4) до „Максимално“ (9); по подразбиране „Средно“ (5). По-високото ниво дава малко по-чист глас, но изчислението отнема повече време, така че треньорът започва да говори малко по-късно. Може да се настрои, след като гласовият модел е инсталиран и гласът на треньора е включен.
+options.voice_quality.low = Ниско
+options.voice_quality.medium = Средно
+options.voice_quality.high = Високо
+options.voice_quality.very_high = Много високо
+options.voice_quality.ultra = Ултра
+options.voice_quality.max = Максимално
+# The prompt. {0} = the size in megabytes ("398,7")
+coach.download.title = Гласът на треньора
+coach.download.text = Треньорът говори със Supertonic 3 – модел за синтез на реч от Supertone. Той не е включен в Scacelith: играта може да го изтегли сега от Hugging Face ({0} MB, еднократно). Без него треньорът изписва думите си на екрана.
+coach.download.licence = Моделът е публикуван под лиценза OpenRAIL-M, който забранява някои употреби на създавания от него глас, например представянето му като човешки глас или имитирането на реален човек.
+coach.download.read_licence = Прочети лиценза
+coach.download.accept = Като изберете „Изтегли“, приемате условията на този лиценз.
+# {0} = a folder
+coach.download.folder = Запазва се в: {0}
+coach.download.not_now = Не сега
+# {0} = the size in megabytes
+coach.download.download = Изтегли ({0} MB)
+coach.download.licence_title = ЛИЦЕНЗ OPENRAIL-M
+coach.download.back = Назад
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Нов глас за треньора
+coach.update.text = Гласът на треньора вече използва официалната версия на Supertonic 3, публикувана от Supertone, вместо инсталираното досега 8-битово преобразуване. Играта може да я изтегли сега от Hugging Face ({0} MB, еднократно); първо се изтриват старите файлове ({1} MB). Ако откажете, треньорът запазва сегашния си глас, а обновяването остава достъпно от Настройки > Звук.
+coach.update.download = Обнови ({0} MB)
+coach.update.accept = Като изберете „Обнови“, приемате условията на този лиценз.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = ГЛАСЪТ НА ТРЕНЬОРА
+coach.download.removing = Премахване на старата версия…
+coach.download.checking = Проверка на файловете…
+coach.download.downloading = Изтегляне…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = От Hugging Face
+coach.download.from_archive = От Hugging Face (архивно копие)
+coach.download.cancel = Отказ
+coach.download.failed = Изтеглянето не успя.
+coach.download.error.network = Сървърите са недостъпни. Моля, проверете интернет връзката си и опитайте отново.
+# {0} = a folder
+coach.download.error.disk = Файловете не можаха да бъдат записани в {0}. Моля, проверете свободното място и опитайте отново.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Сървърите изпратиха неочакван отговор ({0}). Моля, опитайте отново по-късно.
+coach.download.retry = Повтори
+coach.download.close = Затвори
+# Notices
+coach.download.done = Гласът на треньора е инсталиран.
+coach.download.cancelled = Изтеглянето е отменено: следващия път ще продължи оттам, докъдето е стигнало.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Запазени партии
+options.save_games = Запазване на партиите ми
+options.save_games.help = Когато приключат, партиите ви срещу Stockfish, с треньора, между двама играчи на този компютър и директните ви мачове се запазват като PGN файлове, които ще намерите отново в „Запазени партии“. Онлайн партиите се пазят от сървъра.
+library.title = ЗАПАЗЕНИ ПАРТИИ
+library.section.games = ПАРТИИ
+library.section.details = ПАРТИЯТА
+library.section.tags = ТАГОВЕ
+library.section.moves = ХОДОВЕ
+library.count = {0} партия|{0} партии
+library.filter = Покажи
+library.filter.all = Всички партии
+library.filter.play = Срещу Stockfish
+library.filter.coach = С треньора
+library.filter.hotseat = Двама играчи
+library.filter.direct = Директни мачове
+library.filter.server = Онлайн партии
+library.filter.imported = Импортирани
+library.mode.play = Срещу Stockfish
+library.mode.coach = С треньора
+library.mode.hotseat = Двама играчи
+library.mode.direct = Директен мач
+library.mode.server = Онлайн партия
+library.mode.imported = Импортирана
+library.coach_level = Ниво {0}
+library.unknown_player = Без име
+library.unfinished = Незавършена
+library.unreadable = Тази партия не може да бъде прочетена.
+library.moves = {0} ход|{0} хода
+library.opening_variation = {0}: {1}
+library.file = Файл: {0}
+library.file_game = Файл: {0}, партия {1} от {2}
+library.no_moves = Не е изигран нито един ход.
+library.none_selected = Изберете партия от списъка.
+library.reading = Четене на запазените партии
+library.empty.title = Още няма запазени партии
+library.empty.text = Партиите ви срещу Stockfish, с треньора, между двама играчи на този компютър и директните ви мачове се появяват тук, след като приключат. Можете също да поставите PGN файлове в тази папка: партиите, експортирани от други програми или сайтове, се показват заедно с вашите.
+library.empty.filter = Няма партии от този вид.
+library.error.folder = Папката със запазени партии не може да бъде прочетена
+library.error.game = Тази партия не може да бъде прочетена: {0}
+library.folder = Папка: {0}
+library.open_folder = Отвори папката
+library.open_failed = Папката не можа да бъде отворена.
+library.replay = Възпроизведи
+library.delete = Изтрий
+library.delete.title = ИЗТРИВАНЕ
+library.delete.text = Партията {0} ще бъде изтрита от този компютър заедно с файла си. Това действие е необратимо.
+library.delete.ok = Изтрий
+library.delete.several = Този файл съдържа {0} партия: изтриването е възможно само от папката.|Този файл съдържа {0} партии: изтриването е възможно само от папката.
+library.deleted = Партията е изтрита.
+library.delete.failed = Партията не можа да бъде изтрита.
+library.delete.changed = Файлът е променен: списъкът е обновен.
+library.truncated = Тази папка съдържа твърде много партии: показани са само последните {0}.
+library.tag.Event = Състезание
+library.tag.Site = Място
+library.tag.Date = Дата
+library.tag.Time = Час
+library.tag.Round = Кръг
+library.tag.White = Бели
+library.tag.Black = Черни
+library.tag.Result = Резултат
+library.tag.WhiteElo = Elo на белите
+library.tag.BlackElo = Elo на черните
+library.tag.TimeControl = Контрола на времето
+library.tag.Termination = Завършване
+library.tag.Opening = Дебют
+library.tag.Variation = Вариант
+library.tag.PlyCount = Полуходове
+library.tag.FEN = Начална позиция
+library.tag.ScacelithMode = Режим
+library.tag.CoachLevel = Ниво на треньора
+library.tag.ScacelithServer = Сървър
+library.tag.ScacelithGameId = Номер на партията
+library.tag.UTCDate = Дата (UTC)
+library.tag.UTCTime = Час (UTC)
+library.tag.WhiteRatingDiff = Промяна в рейтинга на белите
+library.tag.BlackRatingDiff = Промяна в рейтинга на черните
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Анализ
+analysis.menu.title = АНАЛИЗ
+analysis.menu.analyse = Анализирай
+analysis.menu.paste = Постави PGN
+analysis.menu.online = Моите онлайн партии
+analysis.menu.folder = Поставете PGN файлове в тази папка, за да ги анализирате: {0}
+analysis.menu.empty.title = Още няма запазени партии
+analysis.menu.empty.text = Партиите ви се появяват тук, след като приключат, както и PGN файловете, поставени в папката по-долу. Можете също да поставите партия, копирана като PGN текст.
+analysis.menu.empty.no_folder = Поставете партия, копирана като PGN текст, за да я анализирате.
+analysis.menu.paste.empty = Клипбордът е празен: първо копирайте партия като PGN текст.
+analysis.menu.paste.none = В клипборда не беше намерена шахматна партия.
+analysis.menu.paste.several = Клипбордът съдържа няколко партии: анализира се първата.
+analysis.menu.gameover = Анализирай партията
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Ход {0} от {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Мигновено
+replay.again = Възпроизведи отново
+replay.gameover.unfinished = Партията спира след ход {0}, без резултат.
+replay.tip.start = Начало на партията (Home)
+replay.tip.back = Един ход назад (J)
+replay.tip.pause = Пауза (K)
+replay.tip.resume = Продължи (K)
+replay.tip.forward = Един ход напред (L)
+replay.tip.end = Край на партията (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = КОМЕНТАР
+analysis.hud.accuracy = ТОЧНОСТ
+analysis.hud.reviewing = Stockfish прави разбор на партията… {0}
+analysis.hud.no_engine = Няма шахматна програма: ходовете се показват без анализ.
+analysis.hud.no_moves = Тази партия няма ходове.
+analysis.hud.tip.play = Пусни ходовете (K)
+analysis.hud.tip.comments_off = Скрий коментарите за ключовите моменти (N)
+analysis.hud.tip.comments_on = Покажи коментарите за ключовите моменти (N)
+analysis.hud.tip.voice_off = Изключи гласа на коментатора (M)
+analysis.hud.tip.voice_on = Чуй коментарите на глас (M)
+analysis.hud.tip.voice_missing = Гласът не може да се чуе: файловете му не са инсталирани или опцията Настройки > Звук > Глас на треньора е изключена. Коментарите само се изписват на екрана.
+analysis.hud.tip.arrows_off = Скрий стрелките на по-добрите ходове (B)
+analysis.hud.tip.arrows_on = Покажи стрелките на по-добрите ходове (B)
+analysis.hud.controls.play = Пускане / пауза
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Показване / скриване на коментарите
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Глас на коментатора вкл. / изкл.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Показване / скриване на стрелките
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Запази като GIF
+gif.making = Създаване на GIF: сървърът рисува партията…
+gif.saved = GIF файлът е запазен:
+gif.saved_as = GIF файлът е запазен: {0}
+gif.sign_in_first = Влезте в онлайн сървър, за да създавате GIF файлове: сървърът ги рисува.
+gif.busy_other = В момента се създава друг GIF. Моля, изчакайте, докато е готов.
+gif.err.rate_limited_for = Създадохте много GIF файлове за кратко време. Можете да създадете следващия след {0}.
+gif.err.rate_limited = Създадохте много GIF файлове за кратко време. Моля, опитайте отново по-късно.
+gif.err.server_busy_for = Сървърът е зает с рисуването на други GIF файлове. Моля, опитайте отново след {0}.
+gif.err.server_busy = Сървърът е зает с рисуването на други GIF файлове. Моля, опитайте отново след малко.
+gif.err.signed_out = Сесията ви изтече. Моля, влезте отново, за да създадете GIF.
+gif.err.game_too_long = Тази партия е твърде дълга, за да бъде превърната в GIF.
+gif.err.pgn_too_large = Тази партия е твърде дълга, за да бъде превърната в GIF.
+gif.err.invalid_pgn = Сървърът не можа да прочете тази партия.
+gif.err.render_failed = Сървърът не можа да създаде този GIF. Моля, опитайте отново.
+gif.err.gif_disabled = Този сървър не създава GIF файлове.
+gif.err.write_failed = GIF файлът не можа да бъде запазен на този компютър.
+gif.err.not_found = Тази партия вече не е на сървъра.
+gif.wait.seconds = {0} секунда|{0} секунди
+gif.wait.minutes = {0} минута|{0} минути
+gif.wait.both = {0} и {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 не можа да бъде стартиран. Моля, обновете драйвера на видеокартата си.
+error.opengl_macos = OpenGL 4.6 не можа да бъде стартиран на този Mac. Scacelith изисква Apple silicon (M1 или по-нов) и macOS 26 или по-нова версия и не работи във виртуална машина.
+error.renderer = Модулът за изобразяване не можа да бъде стартиран.
+error.scene = Сцената не можа да бъде заредена.
+error.log_file = Подробности ще намерите в лог файла: {0}

@@ -1,0 +1,268 @@
+# Coach speech (Swedish): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("din springare", "mitt torn"),
+# with the forms of common.lang: {my:den} = "den" / "det" (the pronoun for that piece), {my:def_gen}
+# = "tornets", {your:en_et} = the ending of "bunden" / "bundet"; so every sentence agrees with
+# whatever piece the program passes. {sq}, {sq2}, {to}, {esc} = squares (never glued to anything);
+# {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points while saying the word right
+# after the mark. A ".spoken" key is what the voice says instead (here: file letters spelled for the
+# voice, with the letter names of common.lang).
+# Files = linjer, ranks = rader, back rank = baslinjen, kingside / queenside castling = kort / lång
+# rockad; for beginners the sides are "kungens sida" / "damens sida".
+
+# ---- Chapter titles (said inside "Nu fortsätter vi med {chapter}.") ------------------------------------
+# Lowercase noun phrases that fit after "med", "om" and a colon (see event.lesson.* in events.lang).
+# "kungen i schack", not "schack" alone: "fortsätter vi med schack" would mean "go on playing chess".
+lesson.title.welcome = brädet
+lesson.title.pieces = hur pjäserna går
+lesson.title.safety = säkra och osäkra slag
+lesson.title.check = kungen i schack
+lesson.title.mate = schackmatt
+lesson.title.castling = rockad
+lesson.title.en_passant = en passant
+lesson.title.promotion = förvandling
+lesson.title.draws = patt och remi
+lesson.title.etiquette = riktiga partier: rating, klocka och etikett
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Nu får du försöka.
+lesson.now_you.2 = Nu är det din tur.
+lesson.now_you.3 = Nu du.
+# Another wrong move after the demonstration.
+lesson.almost = Nästan! Spela draget jag visade dig.
+lesson.almost.2 = Inte riktigt. Gör som i min demonstration.
+lesson.almost.3 = Nära. Kom ihåg vad jag just visade dig.
+# A wrong move without a line of its own.
+lesson.try_again = Det var inte det. Försök igen.
+lesson.try_again.2 = Inte det här draget. Gör ett nytt försök.
+lesson.try_again.3 = Vi försöker en gång till.
+lesson.use_your = Använd {your}.
+lesson.use_your.2 = Försök med {your}.
+lesson.watch = Titta.
+lesson.like_this = Så här.
+lesson.and_back = Och tillbaka.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Schack, men min kung flyr till {esc}.
+lesson.check_takes = Schack, men min kung slår helt enkelt {your}.
+lesson.check_block = Schack, men jag kan ställa en pjäs emellan.
+lesson.stalemate = Patt! Min kung kan inte gå någonstans, och den står inte i schack. Det blir remi, fast du stod på vinst!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Inte {sq}: {my} angriper den rutan. En kung går aldrig in i fara.
+why.PathBlocked = Något står i {@}vägen: pjäser kan inte hoppa, utom springaren.
+why.WrongGeometry = {your} går inte så.
+why.MustAnswerCheck = Du står i {@}schack: det måste du ta hand om först.
+why.CastlingThroughCheck = Din kung skulle passera {sq}, och {my} angriper den rutan.
+why.CastlingNoRights = Den kungen eller det tornet har redan flyttats: ingen rockad.
+why.CastlingBlocked = För att rockera måste rutorna mellan kungen och tornet vara tomma.
+why.CastlingOutOfCheck = Du kan inte rockera när du står i schack.
+why.PawnForwardBlocked = Bönder kan inte slå rakt fram: den rutan är {@}blockerad.
+why.LeavesKingInCheck = {your} är bund{your:en_et}: flyttar du {your:den} blottar du din kung för {my}.
+why.OwnPieceOnTarget = Du kan inte flytta till en ruta där en av dina egna pjäser står.
+why.PawnCaptureNeedsVictim = En bonde går bara diagonalt när den slår.
+why.EnPassantExpired = En passant är bara tillåtet direkt efter att bonden har gått två rutor framåt.
+why.NotYourTurn = Vänta: det är min tur.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Hej! Jag är din tränare. Nu lär vi oss schackreglerna tillsammans, ett litet steg i taget.
+lesson.welcome.board = Det här är schackbrädet: sextiofyra rutor, ljusa och mörka, åtta gånger åtta.
+lesson.welcome.light = Hörnrutan till {@}höger om dig är alltid en ljus ruta. Kom ihåg: ljus ruta till höger.
+lesson.welcome.files = De lodräta kolumnerna kallas linjer. De har bokstäver, från {@}a till {@2}h.
+lesson.welcome.files.spoken = De lodräta kolumnerna kallas linjer. De har bokstäver, från {@}a till {@2}hå.
+lesson.welcome.ranks = De vågräta raderna kallas helt enkelt rader. De har siffror, från {@}ett till {@2}åtta, räknat från din sida.
+lesson.welcome.square = Varje ruta får sitt namn av bokstaven och sedan siffran. Den här rutan heter {sq}.
+lesson.welcome.square2 = Och den här heter {sq}.
+lesson.welcome.kings = Det här är de två kungarna. Din står på {sq}, min står på {sq2}.
+lesson.welcome.ask = Din tur: flytta din kung en ruta framåt, till {sq}.
+lesson.welcome.wrong = Det där är {to}. Vi vill till {sq}: bokstaven e, siffran två.
+lesson.welcome.wrong.spoken = Det där är {to}. Vi vill till {sq}: bokstaven é, siffran två.
+lesson.welcome.ok = Perfekt. Din kung står på {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Det här är {your}. {your:den} går rakt, längs linjer och rader, hur långt som helst.
+lesson.rook.lines = Uppåt längs linjen, {@}eller längs raden.
+lesson.rook.capture = För att slå går en pjäs till en ruta där en {@}motståndarpjäs står. Motståndarpjäsen lämnar då brädet.
+lesson.rook.ask = Slå {my} med ditt torn!
+lesson.rook.short = Rätt riktning! Fortsätt uppåt längs linjen, ända fram till {my}.
+lesson.rook.rank = Det där är längs raden. {my} står längre upp på linjen.
+lesson.rook.king = Det där är din kung. Använd {your} i hörnet.
+lesson.rook.ok = Bra slag! {my} lämnar brädet.
+# Pieces don't jump
+lesson.jump.blocked = Pjäser kan inte hoppa över andra pjäser. Din bonde på {sq} står i vägen för tornet.
+lesson.jump.knight = Bara springaren kan hoppa. Den får vi snart träffa.
+# Bishop
+lesson.bishop.intro = Det här är {your}. {your:den} går diagonalt, hur långt som helst.
+lesson.bishop.colour = En löpare stannar alltid på rutor av samma färg.
+lesson.bishop.ask = {my} står på din löpares diagonal. Slå {my:den}!
+lesson.bishop.short = Rätt diagonal! Gå längre, ända fram till {my}.
+lesson.bishop.other = Det där är den andra diagonalen. Sikta mot {my}.
+lesson.bishop.ok = Utmärkt. Löpare älskar långa diagonaler.
+# Queen
+lesson.queen.intro = Det här är {your}, den starkaste pjäsen. {your:den} går som ett torn och en löpare på en gång.
+lesson.queen.ask = Hitta {my} och slå {my:den} med din dam.
+lesson.queen.wrong = Din dam kan nå {my} med ett enda drag, längs en diagonal.
+lesson.queen.ok = Bra gjort! Var rädd om din dam: den är värd mycket.
+# King
+lesson.king.intro = Kungen går bara en ruta, åt vilket håll som helst.
+lesson.king.important = Kungen är den viktigaste pjäsen. Blir den fångad är partiet förlorat.
+lesson.king.ask = Kungen kan också slå. Slå {my}!
+lesson.king.wrong = Din kung står precis bredvid {my}. Gå till {my:def_gen} ruta för att slå {my:den}.
+lesson.king.ok = Bra! Kungen är långsam, men stark på nära håll.
+# Knight
+lesson.knight.intro = Det här är {your}. {your:den} går i ett L: två rutor rakt fram, sedan en åt sidan.
+lesson.knight.intro.spoken = Det här är {your}. {your:den} går i ett ell: två rutor rakt fram, sedan en åt sidan.
+lesson.knight.l = Så {@}här. Springaren hamnar alltid på en ruta av den andra färgen.
+lesson.knight.jump = Springaren är den enda pjäsen som kan hoppa över andra pjäser.
+lesson.knight.ask = Slå {my} med din springare!
+lesson.knight.wrong = Det är ett riktigt springardrag, men det når inte {my}. Försök med ett annat L.
+lesson.knight.wrong.spoken = Det är ett riktigt springardrag, men det når inte {my}. Försök med ett annat ell.
+lesson.knight.ok = Snyggt hopp!
+# Pawn: moving
+lesson.pawn.intro = Nu till {your}. {your:den} går rakt fram, en ruta i taget, och aldrig bakåt.
+lesson.pawn.first = I sitt första drag får en bonde gå en eller två rutor.
+lesson.pawn.ask = Flytta din bonde två rutor framåt.
+lesson.pawn.one = Det där är en ruta: tillåtet, men den här gången ska du gå två.
+lesson.pawn.use = Använd bonden.
+lesson.pawn.ok = Bra.
+# Pawn: capturing
+lesson.pawncap.blocked = Min bonde står i vägen för din. Bönder kan inte slå rakt fram.
+lesson.pawncap.diagonal = Men en bonde slår diagonalt, en ruta framåt.
+lesson.pawncap.ask = Slå {my} med din bonde.
+lesson.pawncap.use = Använd {your}: {your:den} slår diagonalt framåt.
+lesson.pawncap.ok = Ja! Rakt fram för att gå, snett för att slå.
+# Values, set-up and the first moves
+lesson.values.pawn = Varje pjäs har ett värde i poäng. En bonde är värd en poäng.
+lesson.values.pieces = En springare eller en {@}löpare är värd tre, ett {@2}torn fem och {@3}damen nio.
+lesson.values.king = Kungen är ovärderlig: du kan aldrig ge bort den.
+lesson.values.trade = Försök att aldrig ge bort en pjäs för mindre än den är värd.
+lesson.setup.corners = Varje parti börjar så här: tornen i {@}hörnen, sedan {@2}springarna, sedan {@3}löparna.
+lesson.setup.queen = Damen står på sin egen färg: din dam står på en ljus ruta.
+lesson.setup.king = Kungen står bredvid damen. Vit gör alltid det första draget.
+lesson.first.ask = Börja partiet: flytta bonden framför din kung två rutor framåt, till {sq}.
+lesson.first.wrong = Det är också ett tillåtet drag! Men just nu vill jag att du spelar din kungsbonde till {sq}.
+lesson.first.ok = Ett utmärkt första drag: det öppnar linjer för din dam och din löpare.
+lesson.first.reply = Jag svarar likadant. Ta nu ut en springare: hoppa från {sq} till {sq2}.
+lesson.first.knight_wrong = Springare hoppar över bönderna. Försök från {sq} till {sq2}.
+lesson.first.knight_ok = Perfekt. Springare och löpare kommer ut tidigt.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = En pjäs är försvarad när en annan pjäs av samma färg kan slå tillbaka.
+lesson.safety.pawn = Min {@}bonde försvarar {my}.
+lesson.safety.free = Men {my} har ingen försvarare. Din dam angriper båda pjäserna.
+lesson.safety.ask = Slå den oskyddade pjäsen!
+lesson.safety.watch = Titta vad som händer.
+lesson.safety.gave = Du gav bort din dam, värd nio, för min springare, värd tre.
+lesson.safety.other = Försök med den andra pjäsen.
+lesson.safety.look = Leta efter pjäsen som ingenting försvarar.
+lesson.safety.ok = Utmärkt! Fråga dig alltid: är den pjäsen försvarad?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Mitt torn kontrollerar hela andra raden.
+lesson.danger.rule = En kung får aldrig flytta till en ruta där den skulle kunna slås.
+lesson.danger.ask = Flytta din kung till en säker ruta.
+lesson.danger.ok = Rätt. Där är din kung säker.
+lesson.check.what = Mitt torn angriper din kung. Det kallas schack.
+lesson.check.must = När du står i schack måste du genast ta dig ur schack.
+lesson.check.ways = Det finns tre sätt: {@}flytta kungen, {@2}blockera angreppet eller {@3}slå angriparen.
+lesson.check.ask = Här ska du flytta din kung ur schack.
+lesson.check.file = Rutan {to} ligger fortfarande på {@}mitt torns linje. Gå bort från linjen.
+lesson.check.ok = Bra: nu står du inte längre i schack.
+lesson.block.again = Schack igen! Den här gången har din kung ingen fri ruta.
+lesson.block.ask = Blockera alltså angreppet: ställ en pjäs emellan.
+lesson.block.queen = Det blockerar! Men mitt torn skulle kunna slå din dam. Blockera med en billigare pjäs.
+lesson.block.queen_ok = Det fungerar. Kom ihåg: blockera med din billigaste pjäs.
+lesson.block.ok = Perfekt. Blockera med din minst värdefulla pjäs.
+lesson.capture.check = Min dam ger schack, precis bredvid din kung.
+lesson.capture.ask = Slå angriparen!
+lesson.capture.king_ok = Ja! Min dam hade ingen försvarare, så din kung kunde slå den.
+lesson.capture.knight_ok = Ja! Din springare gjorde sig av med angriparen.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Schackmatt: kungen står i schack och har ingen utväg. Då är partiet vunnet.
+lesson.mate1.stuck = Min kung sitter fast bakom sina {@}egna bönder.
+lesson.mate1.ask = Sätt mig matt i ett drag!
+lesson.mate1.wrong = Nära! Ge schack på min baslinje, där min kung inte kan fly.
+lesson.mate1.ok = Schackmatt! Det kallas baslinjematt. Kom ihåg det mönstret!
+lesson.mate2.ask = Din kung och din dam samarbetar. Sätt mig matt i ett drag.
+lesson.mate2.wrong = Ge schack så att min kung inte har en enda ruta kvar.
+lesson.mate2.ok = Schackmatt! Din kung skyddar damen, så min kung kan inte slå den.
+lesson.mate2.ok_rank = Schackmatt på baslinjen! Din kung bevakar alla rutor framför min.
+lesson.mate3.edge = Ditt torn på sjunde raden håller kvar min kung vid kanten.
+lesson.mate3.ask = Använd nu {your} för att sätta matt.
+lesson.mate3.free = Schack, men nu är sjunde raden fri, och min kung slipper undan.
+lesson.mate3.takes = Min kung slår helt enkelt ditt torn.
+lesson.mate3.hint = Ge schack på baslinjen med det torn som inte bevakar sjunde raden.
+lesson.mate3.ok = Schackmatt! De två tornen arbetade som en stege.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rockad är ett specialdrag som ställer din kung i säkerhet. Kungen och tornet flyttas tillsammans.
+lesson.castle.how = {@}Kungen går två rutor mot ett torn, och {@2}tornet hoppar över till kungens andra sida.
+lesson.castle.ask = Rör alltid kungen först. Nu du: gör kort rockad, mot tornet på kungens sida.
+lesson.castle.rook = Där flyttar du bara tornet. För att rockera flyttar du kungen två rutor mot tornet.
+lesson.castle.long = Det där är lång rockad, och den är också tillåten! Men rockera den här gången mot det närmaste tornet.
+lesson.castle.one = En ruta är ett vanligt kungsdrag. Vid rockad går kungen två rutor.
+lesson.castle.other = För att rockera flyttar du kungen två rutor mot tornet på {sq}.
+lesson.castle.ok = Nu har du rockerat! Din kung står i skydd, och ditt torn är redo att komma in i spelet.
+lesson.castle2.moved = Du kan inte rockera om din kung eller det tornet redan har flyttats.
+lesson.castle2.attacked = Inte heller när du står i schack, eller om din kung skulle passera eller hamna på en angripen ruta.
+lesson.castle2.bishop = Min löpare angriper {sq}. Därför får du inte rockera åt det här hållet just nu.
+lesson.castle2.ask = Rockera åt andra hållet.
+lesson.castle2.other = Rockera mot ditt andra torn, på damens sida.
+lesson.castle2.ok = Rätt! Med lång rockad hamnar din kung på {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Ett speciellt bondeslag kallas en passant. Det betyder ”i förbigående”.
+lesson.ep.watch = Titta på min bonde: den går två rutor och hamnar precis bredvid din.
+lesson.ep.how = Din bonde får slå min bonde som om den bara hade gått en ruta: till {sq}.
+lesson.ep.now = Men bara nu, i just det här draget. Slå en passant!
+lesson.ep.gone = Chansen är borta: en passant går bara direkt. Vi försöker igen.
+lesson.ep.ok = En passant! Min bonde på {sq} tas bort.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = När en bonde når sista raden förvandlas den: den blir en dam, ett torn, en löpare eller en springare.
+lesson.promo.ask = Nästan alltid väljer man dam. Förvandla din bonde nu!
+lesson.promo.under = Det är tillåtet! Men en dam är starkare. Vi väljer damen.
+lesson.promo.under_ok = Okej. Men de flesta spelare väljer damen.
+lesson.promo.push = Flytta fram din bonde till sista raden, till {sq}.
+lesson.promo.ok = En ny dam! Du kan till och med ha två damer samtidigt.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Det är min tur. Min kung står inte i schack, men {@}varje ruta runt den är angripen.
+lesson.stale.draw = Jag har inget tillåtet drag. Det är patt, och partiet blir remi.
+lesson.stale2.ask = När du står på vinst ska du se upp för patt. Sätt mig matt i ett drag, utan att det blir patt!
+lesson.stale2.wrong = Ge schack på min baslinje, där min kung inte kan fly.
+lesson.stale2.ok = Schackmatt! Lämna alltid motståndarens kung ett drag, om du inte sätter matt.
+lesson.draws.kings = Andra sätt att få remi: när ingen kan sätta matt, till exempel med bara två kungar kvar, blir partiet remi.
+lesson.draws.agree = Spelarna kan också komma överens om remi.
+lesson.draws.repeat = Om samma ställning upprepas tre gånger, eller om det går femtio drag utan slag eller bondedrag, kan det också bli remi.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Nu kan du alla schackregler. Bra jobbat!
+lesson.talk.real = Nu ska jag berätta hur riktiga partier går till.
+lesson.talk.elo = Spelare har en rating, som kallas Elo. Den stiger när du vinner och sjunker när du förlorar.
+lesson.talk.elo_gap = Vinner du mot en starkare spelare får du fler poäng, och förlorar du mot en svagare kostar det fler.
+lesson.talk.elo_start = Din rating visas efter fem ratingpartier. Partier mot tränaren är träning, så de räknas inte in i ratingen.
+lesson.talk.clock = Det här är en {@}schackklocka. Varje spelare har sin egen tid, och den går bara när det är den spelarens tur.
+lesson.talk.press = Efter ditt drag trycker du på klockan med samma hand. Då börjar min tid gå.
+lesson.talk.flag = Tar din tid slut förlorar du, om det inte är helt omöjligt för mig att sätta dig matt.
+lesson.talk.increment = Fem plus tre betyder fem minuter per spelare, plus tre sekunder efter varje drag.
+lesson.talk.speeds = Korta partier kallas blixt, längre snabbschack och de längsta klassiskt schack.
+lesson.talk.no_clock = Med mig är klockan avstängd. Ta all tid du behöver för att tänka.
+lesson.talk.touch = Rör du en av dina pjäser i ett riktigt parti måste du flytta den.
+lesson.talk.touch_mine = Rör du en av mina pjäser måste du slå den, om du kan.
+lesson.talk.adjust = Vill du rätta till en pjäs utan att flytta den säger du först ”jag rättar till”.
+lesson.talk.release = När du väl har släppt en pjäs på en ny ruta är draget gjort.
+lesson.talk.sheet = I turneringar skriver båda spelarna ner varje drag i ett {@}protokoll.
+# {move:letters} shows the Swedish scoresheet letters ("Sf3"), which is what this line teaches.
+lesson.talk.notation = Man skriver pjäsens bokstav och rutan, till exempel {move:letters}. För en bonde skriver man bara rutan.
+lesson.talk.robot = Din robot skriver ner dina drag åt dig. I snabba partier behöver man inte föra protokoll.
+lesson.talk.handshake = Partier börjar och slutar med ett handslag. Det betyder: bra parti, och tack.
+lesson.talk.polite = Oavsett om du vinner eller förlorar: var artig, och stör aldrig en motståndare som sitter och tänker.
+lesson.talk.tips = Tre tips för dina partier: {@}kontrollera centrum, {@2}få ut dina springare och löpare, och {@3}rockera tidigt.
+lesson.talk.next = När du är redo väljer du ”Första stegen”. Jag spelar snällt och hjälper dig efter varje misstag.
+lesson.talk.welcome = Välkommen till schackets värld! Nu tar vi i hand.

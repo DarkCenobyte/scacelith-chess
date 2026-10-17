@@ -1,0 +1,985 @@
+# Coach speech (Hungarian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "te" (tegezés) and speaks of himself in the 1st person. Hungarian has no
+# grammatical gender: nothing agrees with the coach, the player or a piece.
+# Pieces ({your} {your2} {my} {my2} {t1} {t2}) are whole noun phrases with article and possessive
+# ("a huszárod", "a vezérem"); the case comes from the form (common.lang): {your:acc} "a huszárodat",
+# {your:dat} "a huszárodnak" ("{your:dat} volt jobb lépése" = your knight had a better move),
+# {your:ins}, {your:sub}, {your:ade} (than), {your:ill} ("{your:ill} kerül" = it costs your knight),
+# {t1:sup} ("{t1:sup} keresztül"), {t2:noart} after another word ("a mögötte álló {t2:noart_acc}").
+# Squares: "{sq} mezőre / mezőn / mezőről / mezőt", no article; moves stand alone or in apposition
+# ("{best} lépéssel", "{reply} után", "Jobb lett volna: {best}"), never with a suffix or "a/az".
+# Counted numbers: {pts:point_acc} "3 pontot" (vesztettél), {pts:point_ins} hátrányban "3 ponttal",
+# {m:move_ine} "2 lépésben" (matt 2 lépésben), {m:move_adj} matt "2 lépéses matt"; the counts of
+# attackers and defenders use {n:attacker_ins} / {n2:defender_ins} ("3 támadóval támadom") instead of
+# "N times", which reads badly in Hungarian.
+# Terms (glossary): villa, "villába fog" (fork), kötés / leköt / kötésben van (pin), nyárs (skewer),
+# felfedett támadás, lóg / védtelen (hanging), alapsor, menekülőmező, oppozíció, szabadgyalog,
+# a gyalog négyzete (the square of the pawn), forszírozott matt (forced mate).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Sakk! A királyom támadás alatt áll.
+ann.check.human.b1.2 = Sakk! Megtámadtad a királyomat.
+ann.check.human.b1.3 = Ez sakk! Ki kell mentenem a királyomat a sakkból.
+ann.check.human = Sakk.
+ann.check.human.2 = Sakk!
+ann.check.human.3 = Ez pedig sakk.
+# The coach gives check.
+ann.check.coach = Sakk!
+ann.check.coach.2 = Sakk.
+ann.check.coach.3 = És sakk!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Ez azt jelenti, hogy {your} támadás alatt áll. Ki kell mentened a sakkból.
+ann.check.coach.first.2 = A sakk azt jelenti, hogy {your} támadás alatt áll. Lépj el vele, állíts elé valamit, vagy üsd le a bábumat.
+ann.double_check.coach = Kettős sakk! Két bábum egyszerre támadja a királyodat, ezért a királlyal kell lépned.
+ann.double_check.coach.2 = Ez kettős sakk: most csak egy királylépés segít.
+ann.double_check.human = Kettős sakk! Két bábud egyszerre támadja a királyomat, ezért a királlyal kell lépnem.
+ann.double_check.human.2 = Kettős sakk! Most már csak egy királylépés menthet meg.
+# The player checkmates the coach.
+ann.mate.human.b1 = Matt! Nyertél! A királyom nem tud elmenekülni.
+ann.mate.human.b1.2 = Ez matt! Szép volt, megnyerted a játszmát!
+ann.mate.human.b1.3 = Matt! A királyom csapdába esett. Gratulálok!
+ann.mate.human = Matt. Szépen játszottál.
+ann.mate.human.2 = Ez matt. Gratulálok.
+ann.mate.human.3 = Matt! Szép munka.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Ez matt. A királyodnak nincs hová lépnie.
+ann.mate.coach.b1.2 = Matt. A királyod támadás alatt áll, és nem tud elmenekülni.
+ann.mate.coach.b1.3 = Sajnos ez matt. A királyod nem tud elszökni.
+ann.mate.coach = Matt.
+ann.mate.coach.2 = És ez matt.
+ann.mate.coach.3 = Sajnos matt.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Hoppá! Ezzel a lépéssel odaadsz valamit.
+ex.verdict.blunder.b1.2 = Vigyázz! Ennek a lépésnek ára lehet.
+ex.verdict.blunder.b1.3 = Ó, várj csak. Ezzel a lépéssel baj van.
+ex.verdict.blunder.b2 = Hmm, ezzel a lépéssel baj van.
+ex.verdict.blunder.b2.2 = Ez nagy hiba.
+ex.verdict.blunder.b2.3 = Vigyázz, ezzel a lépéssel elveszítesz valamit.
+ex.verdict.blunder.b3 = Ez baklövés.
+ex.verdict.blunder.b3.2 = {move} igazi hiba.
+ex.verdict.blunder.b3.3 = Ajaj, {move} nagy hiba.
+ex.verdict.blunder.b4 = {move} baklövés.
+ex.verdict.blunder.b4.2 = {move} súlyos hiba.
+ex.verdict.blunder.b4.3 = Sajnos ez baklövés.
+ex.verdict.blunder.b5 = {move} súlyos hiba.
+ex.verdict.blunder.b5.2 = {move} baklövés.
+ex.verdict.blunder.b5.3 = {move} drága hiba.
+ex.verdict.blunder.b6 = {move} komoly hiba.
+ex.verdict.blunder.b6.2 = {move} baklövés.
+ex.verdict.blunder.b6.3 = {move}? Baklövés.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hoppá! Nem válaszoltál a fenyegetésemre.
+ex.verdict.ignored.b1.2 = Vigyázz! A fenyegetésem még megvolt.
+ex.verdict.ignored.b1.3 = Ó, várj csak. Megfeledkeztél a fenyegetésemről.
+ex.verdict.ignored.b2 = Hmm, a fenyegetésem még megvolt.
+ex.verdict.ignored.b2.2 = Válasz nélkül hagytad a fenyegetésemet.
+ex.verdict.ignored.b2.3 = Vigyázz, nem válaszoltál a fenyegetésemre.
+ex.verdict.mistake.b3 = Ez nem jó lépés.
+ex.verdict.mistake.b3.2 = Hmm, {move} lépéssel baj van.
+ex.verdict.mistake.b3.3 = Ez hiba.
+ex.verdict.mistake.b4 = {move} hiba.
+ex.verdict.mistake.b4.2 = {move} nem jó.
+ex.verdict.mistake.b4.3 = Ez bizony hiba.
+ex.verdict.mistake.b5 = {move} egyértelmű hiba.
+ex.verdict.mistake.b5.2 = {move} hiba.
+ex.verdict.mistake.b5.3 = {move} nem jó.
+ex.verdict.mistake.b6 = {move} hiba.
+ex.verdict.mistake.b6.2 = {move}? Hiba.
+ex.verdict.mistake.b6.3 = {move}? Nem.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Nem rossz, de {best} egy kicsit jobb volt.
+ex.verdict.inaccuracy.b3.2 = {best} kicsit pontosabb volt.
+ex.verdict.inaccuracy.b3.3 = Apró botlás: itt {best} jobb volt.
+ex.verdict.inaccuracy.b4 = Pontatlan: {best} pontosabb volt.
+ex.verdict.inaccuracy.b4.2 = Kis pontatlanság. {best} egy kicsit jobb volt.
+ex.verdict.inaccuracy.b4.3 = Nem egészen a legjobb: {best} pontosabb volt.
+ex.verdict.inaccuracy.b5 = {move} pontatlan; {best} erősebb volt.
+ex.verdict.inaccuracy.b5.2 = Kissé pontatlan. Én ezt játszottam volna: {best}.
+ex.verdict.inaccuracy.b5.3 = {best} pontosabb volt, mint {move}.
+ex.verdict.inaccuracy.b6 = {move} pontatlan; {best}.
+ex.verdict.inaccuracy.b6.2 = Pontatlan. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} jobb volt.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Talán {best} egy kicsit pontosabb lett volna.
+ex.verdict.inaccuracy.maybe.2 = Én talán ezt játszottam volna: {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Ez a lépés kétesnek tűnik.
+ex.verdict.dubious.2 = Ez a lépés kétesnek látszik.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ó, várj csak! Kihagytál valami jót.
+ex.verdict.missed.b1.2 = Nézd meg újra! Volt jobb is.
+ex.verdict.missed.b1.3 = Egy pillanat, itt volt egy lehetőséged!
+ex.verdict.missed.b2 = Itt kihagytál egy lehetőséget.
+ex.verdict.missed.b2.2 = Hmm, volt ennél jobb is.
+ex.verdict.missed.b2.3 = Várj, itt volt egy remek lépésed.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Jobb lett volna: {best}.
+ex.better.b3.2 = {best} lett volna a jobb lépés.
+ex.better.b3.3 = Helyette {best} jó lett volna.
+ex.better.b4 = {best} erősebb volt.
+ex.better.b4.2 = {best} lett volna a helyes lépés.
+ex.better.b4.3 = Jobb volt: {best}.
+ex.better.b5 = {best}, a terv: {line}.
+ex.better.b5.2 = {best} volt a lépés: {line}.
+ex.better.b5.3 = Jobb lett volna {best}, majd {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Inkább {best}, {eval}.
+ex.better.b6.3 = {best} értékelése: {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = {your:ins} volt egy jobb lépés.
+ex.hint.b1.2 = {your:dat} volt jobb lépése.
+ex.hint.b2 = {your:dat} volt jobb lépése.
+ex.hint.b2.2 = {your:ins} volt egy jobb lépés.
+ex.hint.b3 = {your:dat} volt jobb lépése.
+ex.hint.b3.2 = {your:ins} volt valami jobb is.
+ex.hint.b4 = {your:dat} volt jobb lépése.
+ex.hint.b4.2 = Nézd meg újra {your:acc}: volt jobb lépése.
+ex.hint.b5 = {your:dat} volt erősebb lépése.
+ex.hint.b5.2 = {your:ins} volt egy erősebb lépés.
+ex.hint.b6 = {your:ins} volt jobb.
+ex.hint.b6.2 = Nézd meg újra {your:acc}.
+ex.hint.move = Volt jobb lépés.
+ex.hint.move.2 = Itt volt egy jobb lépésed.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your:dat} volt jobb lépése. Az a lépés anyagot nyer.
+ex.hint.gain.b1.2 = {your:ins} volt egy jobb lépés. Az a lépés anyagot nyer.
+ex.hint.gain.b2 = {your:dat} volt jobb lépése. Az a lépés anyagot nyer.
+ex.hint.gain.b2.2 = {your:ins} volt egy anyagot nyerő lépés.
+ex.hint.gain.b3 = {your:dat} volt egy jobb, anyagot nyerő lépése.
+ex.hint.gain.b3.2 = {your:ins} volt egy anyagot nyerő lépés.
+ex.hint.gain.b4 = {your:dat} volt egy anyagot nyerő lépése.
+ex.hint.gain.b4.2 = Nézd meg újra {your:acc}: volt egy anyagot nyerő lépése.
+ex.hint.gain.b5 = {your:dat} volt egy erősebb, anyagot nyerő lépése.
+ex.hint.gain.b5.2 = {your:ins} volt egy anyagot nyerő lépés.
+ex.hint.gain.b6 = {your:dat} volt anyagot nyerő lépése.
+ex.hint.gain.b6.2 = Nézd meg újra {your:acc}: anyagot lehetett nyerni.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Jobb lett volna, ha {your} {sq} mezőre lép.
+ex.reveal.b1.2 = {your} {sq} mezőre léphetett volna. Az jobb lett volna.
+ex.reveal.b2 = Az lett volna a jobb lépés, ha {your} {sq} mezőre lép.
+ex.reveal.b2.2 = A jobb lépés: {your} {sq} mezőre.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Tegyük vissza a bábukat.
+ex.rewind.b1.2 = Most mindent visszateszek a helyére.
+ex.rewind.b1.3 = Hadd tegyem vissza a bábukat.
+ex.rewind.b2 = Tegyünk vissza mindent.
+ex.rewind.b2.2 = Vissza oda, ahol tartottunk.
+ex.rewind.b2.3 = Visszateszem a bábukat.
+ex.rewind.b3 = Vissza a játszmához.
+ex.rewind.b3.2 = Menjünk vissza.
+ex.rewind.b3.3 = Vissza az álláshoz.
+ex.rewind.b4 = Vissza a játszmához.
+ex.rewind.b4.2 = Vissza.
+ex.rewind.b4.3 = Menjünk vissza.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Szeretnél egy másik lépést kipróbálni?
+ex.offer.b1.2 = Visszavonod ezt a lépést, és megpróbálod újra?
+ex.offer.b1.3 = Kipróbáljunk egy másik lépést?
+ex.offer.b2 = Szeretnél másik lépést kipróbálni?
+ex.offer.b2.2 = Visszavonod?
+ex.offer.b2.3 = Megpróbálod újra?
+ex.offer.b3 = Szeretnéd visszavonni?
+ex.offer.b3.2 = Megpróbálod újra?
+ex.offer.b3.3 = Visszavonod?
+ex.offer.b4 = Visszavonod?
+ex.offer.b4.2 = Szeretnéd visszavonni?
+ex.offer.b4.3 = Próbálsz egy másik lépést?
+ex.offer.b5 = Visszavonás?
+ex.offer.b5.2 = Visszavonod?
+ex.offer.b5.3 = Visszavonod a lépést?
+ex.offer.b6 = Visszavonás?
+ex.offer.b6.2 = Visszavonod?
+ex.offer.b6.3 = Újra?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ez a lépés kétes. Hátha tudsz jobbat?
+ex.dubious.b1.2 = Ez a lépés kétes. Talán találsz jobbat?
+ex.dubious.b2 = Kétes lépés. Hátha tudsz jobbat?
+ex.dubious.b2.2 = Ez a lépés kétes. Talán van jobb is?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Aztán {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} {sq} mezőre lép.
+demo.my.move.2 = {my:ins} {sq} mezőre lépek.
+demo.my.move.3 = Aztán {my} {sq} mezőre lép.
+demo.my.take = Leütöm {your:acc}.
+demo.my.take.2 = {my} leüti {your:acc}.
+demo.my.take.3 = És leütöm {your:acc}.
+demo.my.check = {my} {sq} mezőre lép. Sakk.
+demo.my.check.2 = Sakk: {my} {sq} mezőre lép.
+demo.my.check.3 = {my} {sq} mezőre, sakk!
+demo.my.mate = {my} {sq} mezőre lép. Matt.
+demo.my.mate.2 = És {my} {sq} mezőre lép: matt.
+demo.my.mate.3 = {my} {sq} mezőre. Ez matt.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Előbb {my} leüti {your:acc}. {t1} várhat.
+demo.my.first.take.2 = {my} először {your:acc} üti le. {t1} úgyis ott marad.
+demo.my.first.check = {my} leüti {your:acc}, és ez sakk! {t1} várhat.
+demo.my.first.check.2 = Előbb {my} leüti {your:acc}, sakkal. {t1} úgyis ott marad.
+demo.my.first.check_move = Előbb sakkot adok: {my} {sq} mezőre lép. {t1} várhat.
+demo.my.first.check_move.2 = {my} {sq} mezőre lép: előbb sakk! {t1} úgyis ott marad.
+demo.my.first.move = Előbb {my} {sq} mezőre lép. {t1} várhat.
+demo.my.first.move.2 = Előbb {my} {sq} mezőre. {t1} úgyis ott marad.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} támadás alatt áll, ezért előbb leüti {your:acc}.
+demo.my.first.attacked.2 = {my} meg van támadva: előbb lecsap {your:sub}.
+# Levels 4-6, the same in-between move.
+demo.first = Előbb {move}: {t1} várhat.
+demo.first.2 = Előbb {move}. {t1} úgyis ott marad.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Most megteszem a lépésemet.
+demo.play_on.2 = Ez az igazi lépésem.
+demo.play_on.3 = És most jöjjön a valódi lépésem.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Te {your:ins} {sq} mezőre lépnél.
+demo.your.move.2 = Tegyük fel, hogy {your:ins} {sq} mezőre lépsz.
+demo.your.move.3 = Aztán {your} {sq} mezőre lép.
+demo.your.take = Te leütnéd {my:acc}.
+demo.your.take.2 = {your:ins} leütöd {my:acc}.
+demo.your.take.3 = Aztán leütöd {my:acc}.
+demo.your.back = Visszaütsz.
+demo.your.back.2 = Visszaütsz {sq} mezőn.
+demo.your.back.3 = És visszaütsz.
+demo.your.king = A királyodnak lépnie kell.
+demo.your.king.2 = A király kénytelen ellépni, {sq} mezőre.
+demo.your.king.3 = A királyod {sq} mezőre menekül.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Most már {t1} nem menthető meg.
+ex.point.piece.2 = És {t1} elveszett.
+ex.point.piece.3 = Ezután {t1} esik el.
+ex.point.two = {t1} is, {t2} is támadás alatt áll: az egyikük elesik.
+ex.point.two.2 = Most {t1:acc} és {t2:acc} is támadom. Nem mentheted meg mindkettőt.
+ex.point.mate = És most {reply:nomate}: matt.
+ex.point.mate.2 = Ezután jön {reply:nomate}, és az matt.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Látod? Most {pts:point_acc} vesztettél.
+ex.result.b1.2 = Így veszítesz {pts:point_acc}.
+ex.result.b2 = A végén {pts:point_acc} vesztettél.
+ex.result.b2.2 = Most {pts:point_ins} hátrányban vagy.
+ex.result.b3 = Ezzel {pts:point_acc} veszítesz.
+ex.result.b3.2 = Végül {pts:point_ins} hátrányba kerülsz.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Valamit vissza tudsz ütni, de így is {pts:point_ins} hátrányban maradsz.
+ex.result_back.b1.2 = Egy kicsit vissza tudsz nyerni, de így is {pts:point_acc} vesztettél.
+ex.result_back.b2 = Valamit visszaüthetsz, de így is {pts:point_ins} hátrányban vagy.
+ex.result_back.b2.2 = Még a visszaütés után is {pts:point_acc} vesztettél.
+ex.result_back.b3 = Még a visszaütés után is {pts:point_ins} hátrányban vagy.
+ex.result_back.b3.2 = Valamit visszanyersz, de így is {pts:point_acc} veszítesz.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Ha {your2} visszaüt, {my} leüti {your:acc}.
+ex.retake.b1.2 = Nem üthetsz vissza {your2:ins}: akkor {my} leüti {your:acc}.
+ex.retake.b2 = Ha {your2} visszaüt, {my} leüti {your:acc}.
+ex.retake.b2.2 = {your2:ins} nem megy a visszaütés: {my} leüti {your:acc}.
+ex.retake.b3 = Ha {move} lépéssel visszaütsz, {reply} leüti {your:acc}.
+ex.retake.b3.2 = Visszaütni {move} lépéssel nem jó: {reply} leüti {your:acc}.
+ex.retake.b4 = {move} nem megy {reply} miatt, ami leüti {your:acc}.
+ex.retake.b4.2 = Ha pedig {move}, akkor {reply} leüti {your:acc}.
+ex.retake.b5 = {move} visszaütésre jön {reply}, és {your} elesik.
+ex.retake.b5.2 = {move} nem megy {reply} miatt: {your} elesik.
+ex.retake.b6 = {move}? {reply} leüti {your:acc}.
+ex.retake.b6.2 = {move} nem megy: {reply} leüti {your:acc}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = És itt, {sq} mezőn, új vezért kapnál.
+demo.promote.2 = Aztán {your} beér {sq} mezőre, és vezérré változik.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Vigyázz: {my} {sq} mezőre léphet, és az matt.
+ex.mate_allowed.b1.2 = Most {my} {sq} mezőre léphet. Az matt lenne!
+ex.mate_allowed.b1.3 = Vigyázz! Ha {my} {sq} mezőre lép, az matt.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Ezzel lehetővé teszed, hogy {m:move_ine} mattot adjak {your:dat}.
+ex.mate_allowed.b2.2 = Most {m:move_ine} mattot adhatok {your:dat}. Nézd.
+ex.mate_allowed.b2.3 = Vigyázz! {your} veszélyben van: matt {m:move_ine}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Ezzel {m:move_adj} mattot engedsz: {line:nomate}.
+ex.mate_allowed.b3.2 = Ezután {m:move_adj} mattom van: {line:nomate}.
+ex.mate_allowed.b3.3 = A királyod mattot kap: {line:nomate}.
+ex.mate_allowed.b4 = {move} forszírozott mattot enged: {line:nomate}.
+ex.mate_allowed.b4.2 = Ezzel {m:move_adj} mattba sétálsz bele: {line:nomate}.
+ex.mate_allowed.b4.3 = {move} után {line:nomate} matt.
+ex.mate_allowed.b5 = {move} {m:move_adj} forszírozott mattot enged.
+ex.mate_allowed.b5.2 = Ezzel {m:move_adj} mattba sétálsz.
+ex.mate_allowed.b5.3 = Most {m:move_adj} forszírozott matt van.
+ex.mate_allowed.b6 = Matt {m:move_ine}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, matt.
+ex.mate_allowed.b6.3 = {line:nomate} után matt.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Nézd: {your:dat} nincs hová menekülnie.
+ex.mate_allowed.tail.b1.2 = Látod? {your} támadás alatt áll, és nem tud elfutni.
+ex.mate_allowed.tail.b1.3 = {your:dat} nincs hová lépnie. Ez matt.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below
+# (a name without article, said after "úgy hívják:" or "ez").
+ex.mate_allowed.pattern = Ezt a mattképet úgy hívják: {text}.
+ex.mate_allowed.pattern.2 = Ezt jegyezd meg: ez {text}.
+ex.mate_allowed.tip.b3 = Minden lépés előtt nézd meg, hogy a királyod biztonságban van-e még.
+ex.mate_allowed.tip.b3.2 = Mindig kérdezd meg magadtól: a lépésem után kaphat-e mattot a királyom?
+
+name.pattern.back_rank = alapsormatt
+name.pattern.smothered = fojtott matt
+name.pattern.support = fedezett vezérmatt
+name.pattern.ladder = létramatt
+name.pattern.epaulette = epolettmatt
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = {best:nomate} lépéssel mattot adhattál volna {my:dat}!
+ex.mate_missed.b1.2 = {best:nomate} matt lett volna! {my} nem tudott volna elmenekülni.
+ex.mate_missed.b1.3 = Nézd! {best:nomate} mattot adott volna {my:dat}.
+ex.mate_missed.b2 = Volt egy mattod {m:move_ine}, ezzel kezdve: {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} {m:move_ine} mattot adott volna!
+ex.mate_missed.b2.3 = {best:nomate} lépéssel mattot adhattál volna nekem.
+ex.mate_missed.b3 = Kihagytál egy mattot {m:move_ine}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} {m:move_ine} mattot ad: {line:nomate}.
+ex.mate_missed.b3.3 = Volt egy matt {m:move_ine}, ezzel kezdve: {best:nomate}.
+ex.mate_missed.b4 = Kihagyott matt: {line:nomate}, {best:nomate} lépéssel kezdve.
+ex.mate_missed.b4.2 = {best:nomate} {m:move_ine} forszírozott mattot adott volna.
+ex.mate_missed.b4.3 = Mattod volt {m:move_ine}: {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} {m:move_ine} mattot ad: {line:nomate}.
+ex.mate_missed.b5.2 = Kihagyott matt {m:move_ine}; az első lépés: {best:nomate}.
+ex.mate_missed.b5.3 = Forszírozott matt volt: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} mattot ad: {line:nomate}.
+ex.mate_missed.b6.2 = Matt {m:move_ine}: {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, matt {m:move_ine}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Gyorsabb lett volna: {best:nomate}, matt {m:move_ine}.
+ex.mate_delayed.b5.2 = {best:nomate} hamarabb mattot adott volna, {m:move_ine}.
+ex.mate_delayed.b6 = {best:nomate} {m:move_ine} mattot ad.
+ex.mate_delayed.b6.2 = Gyorsabb: {best:nomate}, matt {m:move_ine}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Jaj, ne! {my} nem tud lépni, és nincs sakkban. Ez patt: döntetlen.
+ex.stalemate.b1.2 = Nézd: {my:dat} nincs biztonságos mezője, de nincs sakkban. Döntetlen!
+ex.stalemate.b1.3 = Ez patt. {my} nem tud lépni, így a játszma döntetlen.
+ex.stalemate.b2 = Patt! {my:dat} nincs szabályos lépése, és nincs sakkban. Döntetlen.
+ex.stalemate.b2.2 = Jaj, ne, patt: {my} beszorult, de nincs sakkban.
+ex.stalemate.b2.3 = Patt miatt döntetlen. {my} nem tud lépni.
+ex.stalemate.b3 = Ez patt: {my:dat} nincs szabályos lépése. Pedig nyerő állásod volt!
+ex.stalemate.b3.2 = Patt! {my} beszorult, és a megnyert játszmából döntetlen lesz.
+ex.stalemate.b3.3 = {my:dat} nincs lépése, és nincs sakkban: patt.
+ex.stalemate.b4 = Patt: {my:dat} nincs szabályos lépése. Ezzel elúszik a győzelem.
+ex.stalemate.b4.2 = {move} patthelyzetbe hozza {my:acc}. Döntetlen nyerő állásból.
+ex.stalemate.b4.3 = Ez patt; {my} be van szorítva.
+ex.stalemate.b5 = {move} patthelyzetbe hozza {my:acc}. A győzelem odavan.
+ex.stalemate.b5.2 = Patt: {my:dat} nincs mezője.
+ex.stalemate.b5.3 = Ez patt, {my} beszorult.
+ex.stalemate.b6 = Patt. {my:dat} nincs lépése.
+ex.stalemate.b6.2 = {move}, patt: {my} be van szorítva.
+ex.stalemate.b6.3 = Patt; {my} nem tud lépni.
+ex.stalemate.tip.b1 = Ha nyerésre állsz, mindig hagyj egy szabad mezőt a királyomnak.
+ex.stalemate.tip.b1.2 = Ne feledd: ha előnyben vagy, hagyj egy kis helyet a királyomnak.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Vigyázz! Odaadhatom a bábuimat, és akkor {my} nem tud lépni: patt.
+ex.stalemate_trick.b1.2 = Vigyázz: {my} majdnem beszorult. Döntetlenre menthetem a játszmát.
+ex.stalemate_trick.b2 = Vigyázz: áldozhatok, és akkor {my} patthelyzetbe kerülne.
+ex.stalemate_trick.b2.2 = {my:dat} alig van mezője. Ki tudom kényszeríteni a pattot!
+ex.stalemate_trick.b3 = Ezzel pattal menekülhetek meg: {my:dat} elfogynak a lépései.
+ex.stalemate_trick.b3.2 = Vigyázz: {line} után {my} patthelyzetbe kerül.
+ex.stalemate_trick.b4 = {move} pattcselt enged: {line}, és {my} nem tud lépni.
+ex.stalemate_trick.b4.2 = Most {my} patthelyzetbe menekülhet: {line}.
+ex.stalemate_trick.b5 = {move} pattot enged: {line}; {my} be van szorítva.
+ex.stalemate_trick.b5.2 = Pattcsel: {line}, és {my:dat} nincs lépése.
+ex.stalemate_trick.b6 = {line}, patt: {my} be van szorítva.
+ex.stalemate_trick.b6.2 = {line} után patt; {my} beszorult.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} {sq} mezőre léphet, és megtámadja {t1:acc} és {t2:acc}.
+ex.fork.b1.2 = {my} {sq} mezőre lép, és két dolgot támad: {t1:acc} és {t2:acc}.
+ex.fork.b1.3 = Figyeld {my:acc}: {sq} mezőről egyszerre támadja {t1:acc} és {t2:acc}.
+ex.fork.b2 = Villa! {my} {sq} mezőn egyszerre támadja {t1:acc} és {t2:acc}.
+ex.fork.b2.2 = A lépésed után {my} {sq} mezőről villába foghatja {t1:acc} és {t2:acc}.
+ex.fork.b2.3 = {my} {sq} mezőre lép: kettős támadás {t1} és {t2} ellen.
+ex.fork.b3 = {move} után jöhet {reply}, villába fogva {t1:acc} és {t2:acc}.
+ex.fork.b3.2 = {reply} után egyszerre támadom {t1:acc} és {t2:acc}.
+ex.fork.b3.3 = {reply} villát ad: {t1} és {t2} egyaránt támadás alatt áll.
+ex.fork.b4 = {reply} villába fogja {t1:acc} és {t2:acc}; {line} után {pts:point_acc} vesztettél.
+ex.fork.b4.2 = {reply} egyszerre támadja {t1:acc} és {t2:acc}.
+ex.fork.b4.3 = {move} után jön a villa: {reply}, {t1} és {t2} ellen.
+ex.fork.b5 = {move} belesétál a villába: {reply}, {t1} és {t2} ellen.
+ex.fork.b5.2 = {reply} villába fogja {t1:acc} és {t2:acc}.
+ex.fork.b5.3 = {reply} után {t1} és {t2} egyaránt támadás alatt áll.
+ex.fork.b6 = {reply} villát ad.
+ex.fork.b6.2 = {move} után {reply}: villa.
+ex.fork.b6.3 = {reply}, villa.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Csak az egyiket mentheted meg: {t1:acc} vagy {t2:acc}.
+ex.fork.tail.b1.2 = Most egyszerre két dolgot támadok: {t1:acc} és {t2:acc}. Ez a villa!
+ex.fork.tail.b1.3 = Látod? {t1} és {t2} egyaránt támadás alatt áll. Az egyik elesik.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:acc} ki kell mentened a sakkból, így leütöm {t1:acc}.
+ex.fork.tail_king.2 = Sakk! {your:dat} lépnie kell, és {t1} elesik.
+ex.fork.more.b3 = Lépés előtt figyelj {sq} mezőre: onnan {my} villát adhat.
+ex.fork.more.b3.2 = Tartsd szemmel {sq} mezőt. Onnan {my} villát ad.
+ex.fork.tip.knight = Vigyázz a huszárugrásokra a királyod és a vezéred közelében!
+ex.fork.tip.knight.2 = A huszárok imádnak egyszerre két bábut támadni. Nézd meg, hová ugorhatnak.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Ha {my} ellép, {my2} megtámadja {t1:acc}!
+ex.discovered.b1.2 = Nézd: {my} útban van. Ha ellép, {my2} támadja {t1:acc}.
+ex.discovered.b1.3 = {my} félreállhat, és akkor {my2} megtámadja {t1:acc}.
+ex.discovered.b2 = Rejtett támadás: {my} ellép, és {my2} támadja {t1:acc}.
+ex.discovered.b2.2 = Vigyázz: {my} elléphet, és {my2} támadja {t1:acc}.
+ex.discovered.b2.3 = {my} ellép, és szabad utat nyit {my2:dat} {t1} ellen.
+ex.discovered.b3 = {reply} után felfedett támadás éri {t1:acc}.
+ex.discovered.b3.2 = {reply} felfedett támadást indít {t1} ellen.
+ex.discovered.b3.3 = {move} után jöhet {reply}, felfedett támadás {t1} ellen.
+ex.discovered.b4 = {reply} vonalat nyit {t1} felé: felfedett támadás.
+ex.discovered.b4.2 = {move} után {reply} felfedett támadással megnyeri {t1:acc}.
+ex.discovered.b4.3 = {reply} után {t1} egy felfedett támadás áldozata lesz.
+ex.discovered.b5 = {move} után jöhet a felfedett támadás: {reply}.
+ex.discovered.b5.2 = {reply} felfedett támadás.
+ex.discovered.b5.3 = {reply} rejtett támadást fed fel.
+ex.discovered.b6 = {reply}, felfedett támadás {t1} ellen.
+ex.discovered.b6.2 = {reply}, és {t1} elesik.
+ex.discovered.b6.3 = Felfedett támadás: {reply}, {t1} ellen.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} támadja {t1:acc}. Ha ellép, leütöm a mögötte álló {t2:noart_acc}.
+ex.skewer.b1.2 = Nézd: {my} támadja {t1:acc}, és {t2} közvetlenül mögötte áll.
+ex.skewer.b1.3 = {my} rátámad {t1:sub}. El kell lépnie, és akkor {t2} elesik.
+ex.skewer.b2 = Nyárs: {my} támadja {t1:acc}, és mögötte ott áll {t2}.
+ex.skewer.b2.2 = {my} egy vonalon támadja {t1:acc} és {t2:acc}. Ha az első ellép, leütöm a másodikat.
+ex.skewer.b2.3 = Vigyázz: {t1} és {t2} egy vonalon áll. {my} nyárssal támadhatja őket.
+ex.skewer.b3 = {reply} nyárs {t1} és {t2} ellen.
+ex.skewer.b3.2 = {reply} után {t1:dat} el kell lépnie, és {t2} elesik.
+ex.skewer.b3.3 = {move} után jöhet {reply}, nyárs {t1} és {t2} ellen.
+ex.skewer.b4 = {reply} nyárs {t1} ellen; a mögötte álló {t2:noart} elvész.
+ex.skewer.b4.2 = {move} után {t1} és {t2} egy vonalon áll: {reply}.
+ex.skewer.b4.3 = {reply} után {t1} ellép, és {t2} elesik.
+ex.skewer.b5 = {reply} nyárs {t1} és {t2} ellen.
+ex.skewer.b5.2 = {move} után jöhet a nyárs: {reply}, {t1:sup} keresztül {t2} ellen.
+ex.skewer.b6 = {reply}: nyárs.
+ex.skewer.b6.2 = {reply}, nyárs.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} {sq} mezőre léphet. Akkor {your} ott ragad {t1} előtt.
+ex.pin.b1.2 = Figyeld {my:acc} {sq} mezőn: {your} ott ragad {t1} előtt.
+ex.pin.b1.3 = {my} lekötheti {your:acc}, mert mögötte {t1} áll. Aztán megnyerem.
+ex.pin.b2 = Kötés: {your} ott ragad {t1} előtt.
+ex.pin.b2.2 = {your} kötésben van, mögötte {t1} áll. Így megnyerhetem.
+ex.pin.b2.3 = Most {your} ott ragadt {t1} előtt. Ez a kötés.
+ex.pin.b3 = {your} kötésbe kerül {t1} előtt, és megnyerem.
+ex.pin.b3.2 = Ezután {your} kötésben van {t1} előtt.
+ex.pin.b3.3 = {your} kötésben van, és ez anyagba kerül: mögötte {t1} áll.
+ex.pin.b4 = {reply} leköt, és anyagot nyer.
+ex.pin.b4.2 = {move} belesétál a kötésbe: {reply}.
+ex.pin.b4.3 = {reply} után a kötött bábu elesik.
+ex.pin.b5 = {move} után jöhet a kötés: {reply}.
+ex.pin.b5.2 = {reply} leköt, és a bábu elvész.
+ex.pin.b6 = {reply} leköt.
+ex.pin.b6.2 = {reply}, kötés.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} kötésben van, ezért nem tudja védeni {sq} mezőt. Mögötte {t1} áll.
+ex.pin_defender.b1.2 = Nézd: {your} valójában nem tudja védeni {sq} mezőt, mert mögötte {t1} áll.
+ex.pin_defender.b2 = {your} kötésben van {t1} előtt, így {sq} mezőnek nincs igazi védője.
+ex.pin_defender.b2.2 = A kötött bábu rossz védő. {your} nem tudja védeni {sq} mezőt: mögötte {t1} áll.
+ex.pin_defender.b3 = {your} kötésben van {t1} előtt; valójában nem védi {sq} mezőt.
+ex.pin_defender.b3.2 = {sq} mező védettnek látszik, de {your} kötésben van {t1} előtt.
+ex.pin_defender.b4 = {your} kötésben van, így {sq} mező valójában nincs védve.
+ex.pin_defender.b4.2 = A kötött {your:noart} nem tudja védeni {sq} mezőt.
+ex.pin_defender.b5 = {your} kötésben van; {sq} mező védtelen.
+ex.pin_defender.b5.2 = {sq} mező elesik: {your} kötésben van.
+ex.pin_defender.b6 = {your} kötésben; {sq} elesik.
+ex.pin_defender.b6.2 = Kötött {your:noart}, védtelen {sq}.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} csapdába esett. Minden mező, ahová léphet, támadás alatt áll.
+ex.trapped.b1.2 = Nézd {your:acc}: nincs biztonságos mező, ahová menekülhetne.
+ex.trapped.b1.3 = {your} beszorult. Megtámadhatom, és nem tud elmenekülni.
+ex.trapped.b2 = {your:dat} nincs biztonságos mezője. Megnyerhetem.
+ex.trapped.b2.2 = {your} csapdában van: bárhová lép, leütöm.
+ex.trapped.b2.3 = Vigyázz, {your:dat} fogynak a mezői.
+ex.trapped.b3 = {your} csapdába esik: nem maradt biztonságos mezője.
+ex.trapped.b3.2 = Ezután {your} csapdában van, és elveszett.
+ex.trapped.b3.3 = {your} csapdába sétált: nem tud kijutni.
+ex.trapped.b4 = {move} után {your} csapdában marad.
+ex.trapped.b4.2 = {your:dat} nincs hová visszavonulnia; megnyerem.
+ex.trapped.b4.3 = {reply} után {your} csapdában van.
+ex.trapped.b5 = {your} csapdába kerül: {line}.
+ex.trapped.b5.2 = {move} után {your} csapdában reked.
+ex.trapped.b6 = {your} csapdában.
+ex.trapped.b6.2 = {line}, és {your} csapdában.
+ex.trapped.tip.b1 = Mielőtt lépsz egy bábuval, nézd meg, hogy vissza is tud-e jönni.
+ex.trapped.tip.b1.2 = A táboromba mélyen behatolt bábuk beszorulhatnak. Hagyj nekik kiutat.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} beszorult a saját gyalogjai mögé. {my} sakkot adhat neki az alapsoron.
+ex.back_rank.b1.2 = Vigyázz: {your:dat} nincs menekülőmezője, és {my} eljuthat {sq} mezőre.
+ex.back_rank.b1.3 = {my} {sq} mezőre léphet. {your:acc} bezárják a saját gyalogjai.
+ex.back_rank.b2 = Alapsorveszély: {your:dat} nincs levegője. {my} sakkot adhat {sq} mezőn.
+ex.back_rank.b2.2 = {your} be van zárva. {my} {sq} mezőre lép, és anyagot nyer.
+ex.back_rank.b2.3 = Gyenge az alapsorod: {my} sakkot adhat {your:dat} {sq} mezőn.
+ex.back_rank.b3 = Gyenge az alapsorod: {line}. {your:dat} nincs menekülőmezője.
+ex.back_rank.b3.2 = {your:dat} nincs levegője, így {line} anyagot nyer.
+ex.back_rank.b3.3 = {line} után az alapsor dönt: {your} be van szorítva.
+ex.back_rank.b4 = Az alapsor: {line}, és {your:dat} nincs menekülőmezője.
+ex.back_rank.b4.2 = {line} kihasználja a gyenge alapsort {your} körül.
+ex.back_rank.b4.3 = {your:dat} nincs menekülőmezője: {line}.
+ex.back_rank.b5 = Alapsorgyengeség {your} körül: {line}.
+ex.back_rank.b5.2 = {line}; {your:dat} nincs menekülőmezője.
+ex.back_rank.b6 = {line}, alapsor; {your} be van szorítva.
+ex.back_rank.b6.2 = Alapsor: {line} ({your}).
+ex.back_rank.tip.b1 = Adj egy kis levegőt a királyodnak: lépj előre az egyik előtte álló gyaloggal.
+ex.back_rank.tip.b1.2 = A három gyalog mögött álló király mattot kaphat az alapsoron. Csinálj neki egy kis helyet.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your:acc} {sq} mezőn semmi sem védi. {my} ingyen leütheti.
+ex.hanging.b1.2 = Nézd {your:acc}: semmi sem védi, és {my} támadja.
+ex.hanging.b1.3 = {your} nincs védve. {my} egyszerűen leütheti.
+ex.hanging.b2 = {your} {sq} mezőn lóg. {my} leüti, és nem tudsz visszaütni.
+ex.hanging.b2.2 = {my} ingyen leütheti {your:acc}. Semmi sem védi.
+ex.hanging.b2.3 = {your} egyedül maradt {sq} mezőn, és {my} leüti.
+ex.hanging.b3 = {move} védtelenül hagyja {your:acc}: {reply}, és semmi sem üt vissza.
+ex.hanging.b3.2 = {your} {sq} mezőn lóg: {reply}.
+ex.hanging.b3.3 = {reply} után {your} ellenérték nélkül elvész.
+ex.hanging.b4 = {move} ütésben hagyja {your:acc}: {reply}, és {pts:point_acc} nyerek.
+ex.hanging.b4.2 = {reply} ingyen leüti {your:acc}.
+ex.hanging.b4.3 = {your} védtelen; {reply} leüti.
+ex.hanging.b5 = {move} védtelenül hagyja {your:acc}; {reply} megnyeri.
+ex.hanging.b5.2 = {your} {sq} mezőn elesik: {reply}.
+ex.hanging.b5.3 = {reply} megnyeri {your:acc}.
+ex.hanging.b6 = {move}? {reply}, és {your} elesik.
+ex.hanging.b6.2 = {reply} megnyeri {your:acc}.
+ex.hanging.b6.3 = {your} lóg: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} védte {your:acc}. Most {my} leütheti.
+ex.hanging_guard.b1.2 = {your2} ellépett, és most {your} egyedül maradt. {my} leüti.
+ex.hanging_guard.b2 = Eddig {your2} védte {your:acc}. Most egyedül maradt, és {my} leüti.
+ex.hanging_guard.b2.2 = Azzal, hogy {your2:ins} léptél, {my} prédájává tetted {your:acc}.
+ex.hanging_guard.b3 = {your2} védte {your:acc}. Az ellépése után {reply} leüti.
+ex.hanging_guard.b3.2 = {your2} nélkül {your} védtelen: {reply}.
+ex.hanging_guard.b4 = {move} megszünteti a védelmet: {your2} elhagyta {your:acc}, és {reply} begyűjti.
+ex.hanging_guard.b4.2 = {your2} volt {your} egyetlen védője; {reply} megnyeri.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} már támadta {your:acc}. Mindig nézd meg, mit fenyeget a lépésem.
+ex.hanging_threat.b1.2 = Nem vetted észre a fenyegetésemet: {my} támadja {your:acc}.
+ex.hanging_threat.b2 = Az előző lépésemben {my:ins} megtámadtam {your:acc}. Mindig figyeld a fenyegetéseimet.
+ex.hanging_threat.b2.2 = {my} fenyegette {your:acc}, és most leüthetem.
+ex.hanging_threat.b3 = Nem vetted észre a fenyegetésemet: {my} támadta {your:acc}.
+ex.hanging_threat.b3.2 = {my} végig szemmel tartotta {your:acc}.
+ex.hanging.tip.b1 = Minden lépés előtt kérdezd meg magadtól: biztonságban van minden bábum?
+ex.hanging.tip.b1.2 = Jó szokás: minden lépés után nézd meg, melyik bábud van védve.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} ütött, de {my} visszaüt. Ezzel a cserével pontokat veszítesz.
+ex.exchange_capture.b1.2 = {my} visszaüt. {your} {n:point_acc} ér, te viszont csak {n2:point_acc} kaptál.
+ex.exchange_capture.b1.3 = Vigyázz: {my} visszaütheti {your:acc}. Ez rossz csere.
+ex.exchange_capture.b2 = Vigyázz a cserékkel: {your} {n:point_acc} ér. {my} visszaüt, te pedig csak {n2:point_acc} kaptál.
+ex.exchange_capture.b2.2 = {my} visszaüti {your:acc}. Elveszítesz {n:point_acc}, és csak {n2:point_acc} nyersz.
+ex.exchange_capture.b3 = Az ütés {sq} mezőn nem működik: {line} után {your} elvész.
+ex.exchange_capture.b3.2 = {your} üt {sq} mezőn, de {line} után {pts:point_acc} vesztettél.
+ex.exchange_capture.b4 = {move} rossz számítás {sq} mezőn: {line}, és {your} elvész.
+ex.exchange_capture.b4.2 = Az ütés {sq} mezőn {your:ill} kerül: {line}.
+ex.exchange_capture.b5 = {move} után {your} elvész az ütésváltásban {sq} mezőn: {line}.
+ex.exchange_capture.b5.2 = {your} elvész {sq} mezőn: {line}.
+ex.exchange_capture.b6 = {move} után {line}, és {your} elvész {sq} mezőn.
+ex.exchange_capture.b6.2 = {line} {sq} mezőn, és {your} odavan.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Számold meg: {sq} mezőt {n:attacker_ins} támadom, te {n2:defender_ins} véded.
+ex.exchange_count.b1.2 = Nálam {n:attacker} van {sq} mezőn, nálad {n2:defender}. Ezt én nyerem.
+ex.exchange_count.b2 = {sq} mezőn {n:attacker} áll szemben {n2:defender_ins}. Ott anyagot fogsz veszíteni.
+ex.exchange_count.b2.2 = Számolj {sq} mezőn: {n:attacker} {n2:defender} ellen.
+ex.exchange_count.b3 = Számold meg a támadókat és a védőket {sq} mezőn: nekem több van.
+ex.exchange_count.b3.2 = A csere {sq} mezőn nem működik: {line} után {pts:point_acc} vesztettél.
+ex.exchange_count.b4 = {move} rossz számítás {sq} mezőn: {line}, és {pts:point_acc} vesztettél.
+ex.exchange_count.b4.2 = {sq} mezőt többször támadják, mint ahányszor védik: {line}.
+ex.exchange_count.b5 = {sq} mezőn {n:attacker} legyőz {n2:defender_acc}: {line}.
+ex.exchange_count.b5.2 = {move} után {sq} mezőn nem jön ki a számolás.
+ex.exchange_count.b6 = {line} {sq} mezőn, és {pts:point_acc} nyertem.
+ex.exchange_count.b6.2 = {sq}: {n:attacker} {n2:defender} ellen.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} kevesebbet ér {your:ade}. Ha ütök, pontokat veszítesz.
+ex.exchange_cheap.b1.2 = {my} támadja {your:acc}. Ez a csere neked rossz.
+ex.exchange_cheap.b2 = {your} {n:point_acc} ér, {my} csak {n2:point_acc}. Ez a csere neked veszteséges.
+ex.exchange_cheap.b2.2 = {my} olcsóbb {your:ade}, ezért a támadás anyagot nyer.
+ex.exchange_cheap.b3 = {your:acc} {sq} mezőn egy olcsóbb bábu támadja.
+ex.exchange_cheap.b3.2 = {your:acc} {sq} mezőn {n2:point_adj} bábu támadja: {line}.
+ex.exchange_cheap.b4 = {your:acc} {sq} mezőn egy olcsóbb bábu támadja; {reply} anyagot nyer.
+ex.exchange_cheap.b4.2 = {reply} egy olcsóbb bábuval támadja {your:acc} {sq} mezőn.
+ex.exchange_cheap.b5 = {your} {sq} mezőn ki van téve egy olcsóbb támadónak: {line}.
+ex.exchange_cheap.b5.2 = {reply} anyagot nyer {sq} mezőn {your} ellen.
+ex.exchange_cheap.b6 = {reply} megnyeri {your:acc} {sq} mezőn.
+ex.exchange_cheap.b6.2 = {line}: {your} {sq} mezőn elvész.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Vigyázz: most megnyerhetem {t1:acc}.
+ex.material.b1.2 = Ez a lépés bajba sodorja {t1:acc}. Megnyerhetem.
+ex.material.b2 = Ezzel a lépéssel hagyod, hogy megnyerjem {t1:acc}.
+ex.material.b2.2 = Most {t1} bajba kerül, és megnyerem.
+ex.material.b3 = {move} anyagot veszít: {line} után {pts:point_acc} vesztettél.
+ex.material.b3.2 = {line} után {pts:point_ins} hátrányban vagy.
+ex.material.b4 = {move} anyagot veszít: {line}, és {pts:point_acc} vesztettél.
+ex.material.b4.2 = {line} után {pts:point_ins} hátrányban vagy.
+ex.material.b5 = {move} anyagba kerül: {line}.
+ex.material.b5.2 = {line}, és {pts:point_acc} nyerek.
+ex.material.b6 = {line}, és {pts:point_acc} nyertem.
+ex.material.b6.2 = {move} után {pts:point_acc} veszítesz: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Láttad? {my} {sq} mezőn ingyen elvihető volt. {your} leüthette volna.
+ex.missed_capture.b1.2 = Nézd: {my:dat} nem volt védője. {your} leüthette volna.
+ex.missed_capture.b1.3 = {my} {sq} mezőn nem volt védve. {your} lecsaphatott volna rá!
+ex.missed_capture.b2 = Kihagytál egy ingyen ütést: {best} megnyeri {my:acc}.
+ex.missed_capture.b2.2 = {my} {sq} mezőn lógott. {best} leüti. Legközelebb üsd le!
+ex.missed_capture.b2.3 = {best} ingyen megnyerte volna {my:acc}.
+ex.missed_capture.b3 = {best} ellenérték nélkül megnyerte volna {my:acc}.
+ex.missed_capture.b3.2 = {my} {sq} mezőn védtelen volt: {best}. Minden lépésnél keresd a védtelen bábukat.
+ex.missed_capture.b3.3 = {best} lépéssel leüthetted volna {my:acc}.
+ex.missed_capture.b4 = Kimaradt: {best} begyűjti {my:acc} {sq} mezőn.
+ex.missed_capture.b4.2 = {best} megnyeri a védtelen {my:noart_acc}.
+ex.missed_capture.b4.3 = {my} lógott: {best}.
+ex.missed_capture.b5 = {best} megnyeri {my:acc}; {move} után elmenekül.
+ex.missed_capture.b5.2 = {my} {sq} mezőn védtelen volt: {best}.
+ex.missed_capture.b6 = {best}! {my} {sq} mezőn védtelen volt.
+ex.missed_capture.b6.2 = {best} megnyerte volna {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Kettős támadásod volt: {best} támadja {t1:acc} és {t2:acc}!
+ex.missed_fork.b1.2 = Nézd! {best} egyszerre támadta volna {t1:acc} és {t2:acc}.
+ex.missed_fork.b1.3 = {best} villa lett volna: {t1} és {t2} egyaránt támadás alatt.
+ex.missed_fork.b2 = {best} villa lett volna: {t1} és {t2}.
+ex.missed_fork.b2.2 = Kihagytál egy kettős támadást: {best}, {t1} és {t2} ellen.
+ex.missed_fork.b2.3 = {best} egyszerre támadja {t1:acc} és {t2:acc}. Villa!
+ex.missed_fork.b3 = {best} villa volt: {t1} és {t2}.
+ex.missed_fork.b3.2 = Ott volt {best}, villába fogva {t1:acc} és {t2:acc}.
+ex.missed_fork.b3.3 = {best} villába fogta volna {t1:acc} és {t2:acc}.
+ex.missed_fork.b4 = {best}: villa {t1} és {t2} ellen.
+ex.missed_fork.b4.2 = Kihagyott villa: {best}, {t1} és {t2} ellen.
+ex.missed_fork.b5 = {best} villába fogta volna {t1:acc} és {t2:acc}.
+ex.missed_fork.b5.2 = {best} támadta volna {t1:acc} és {t2:acc}.
+ex.missed_fork.b6 = {best} villa volt {t1} és {t2} ellen.
+ex.missed_fork.b6.2 = {best}: villa, {t1} és {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# "The square of the pawn" (the rule of the square) is "a gyalog négyzete" in Hungarian.
+ex.promotion.b1 = {my} elfuthat {sq} mezőig, és vezér lesz belőle. {your} túl messze van.
+ex.promotion.b1.2 = Nézd: semmi sem akadályozza meg, hogy {my} eljusson {sq} mezőig. {your} nem éri utol.
+ex.promotion.b1.3 = {my} {n:square_nyi} távolságra van {sq} mezőtől, {your} pedig túl lassú.
+ex.promotion.b2 = {my} {sq} mezőig fut, és {your} nem éri utol.
+ex.promotion.b2.2 = {my:dat} {n:move} kell {sq} mezőig, {your:dat} {n2:move}. Túl lassú.
+ex.promotion.b2.3 = Vigyázz: {my} vezérré változik {sq} mezőn, és {your} túl messze van.
+ex.promotion.b3 = {your} kívül van {my} négyzetén: nem éri utol, mielőtt {sq} mezőre érne.
+ex.promotion.b3.2 = A versenyfutás elveszett: {my} hamarabb ér {sq} mezőre, mint {your}.
+ex.promotion.b4 = {your} a gyalog négyzetén kívül áll; a gyalog {sq} mezőn átváltozik.
+ex.promotion.b4.2 = {my} {sq} mezőn átváltozik; {your:dat} egy lépés hiányzik.
+ex.promotion.b5 = Elveszett a gyalogverseny: {your} a négyzeten kívül áll, a cél {sq} mező.
+ex.promotion.b5.2 = {line}: {sq} mezőn új vezért kapok, és {your} elkésik.
+ex.promotion.b6 = {your} a négyzeten kívül; {sq} mezőn új vezért kapok.
+ex.promotion.b6.2 = {line}, átváltozás {sq} mezőn ({your} elkésik).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = A gyalogod elfuthatott volna {sq} mezőig, és vezér lett volna belőle!
+ex.promotion_missed.b1.2 = Nézd meg {sq} mezőt! A gyalogod odaszaladhatott volna.
+ex.promotion_missed.b2 = A gyalogod elfuthatott volna {sq} mezőig. A szabadgyalogokat tolni kell!
+ex.promotion_missed.b2.2 = Semmi sem állta el a gyalogod útját {sq} mező felé.
+ex.promotion_missed.b3 = {best} megnyeri a versenyfutást {sq} mezőig.
+ex.promotion_missed.b3.2 = A gyalogod gyorsabb volt: {best}, és {sq} mezőn átváltozik.
+ex.promotion_missed.b4 = {best} megnyeri a gyalogversenyt {sq} mezőig.
+ex.promotion_missed.b4.2 = {best}! A gyalog {sq} mezőn átváltozik.
+ex.promotion_missed.b5 = {best}, és elsőként érsz be {sq} mezőre.
+ex.promotion_missed.b5.2 = {best}, és {sq} mező a tiéd.
+ex.promotion_missed.b6 = {best} megnyeri a versenyt {sq} mezőig.
+ex.promotion_missed.b6.2 = {best}; elsőként {sq} mezőn.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Az a gyalog védte {your:acc}. Most {your} kevésbé védett.
+ex.king_shield.b1.2 = A gyalog, amely {sq} mezőn állt, pajzs volt {your} számára. Most bejöhetnek a bábuim.
+ex.king_shield.b2 = A gyalog ellépése {sq} mezőről gyengíti {your:acc}. Most a bábuim megtámadhatják.
+ex.king_shield.b2.2 = {your} elvesztett egy védőt: a gyalog {sq} mezőn volt a pajzsa.
+ex.king_shield.b3 = Ez a gyaloglépés kiteszi {your:acc} a támadásomnak.
+ex.king_shield.b3.2 = {your} elveszíti a gyalogfedezékét, és a bábuim betörnek.
+ex.king_shield.b4 = {move} gyengíti a gyalogokat {your} körül; a támadásom betör.
+ex.king_shield.b4.2 = {move} után megtörik a pajzs {your} körül.
+ex.king_shield.b5 = {move} meglazítja {your} fedezékét: {line}.
+ex.king_shield.b5.2 = {move} után {your} fedezék nélkül marad: {line}.
+ex.king_shield.b6 = {move} gyengíti {your:acc}: {line}.
+ex.king_shield.b6.2 = {line}; {your} túl nyitott.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} veszélyben van. A bábuim közelednek felé.
+ex.king_exposed.b1.2 = Nézd, milyen nyitott {your}. Tartsd biztonságban a gyalogjai mögött.
+ex.king_exposed.b2 = {your} túl nyitott. Most sok sakkot adhatok.
+ex.king_exposed.b2.2 = Vigyázz: {your:dat} nincs fedezéke, és a bábuim támadják.
+ex.king_exposed.b3 = {your} nyitottan áll; a bábuim sakkokkal támadhatják.
+ex.king_exposed.b3.2 = Ezután {your:dat} nincs fedezéke.
+ex.king_exposed.b4 = {your} nyitottá válik: {line}.
+ex.king_exposed.b4.2 = {move} után {your} nyitott a támadásra.
+ex.king_exposed.b5 = {your} túl nyitott: {line}.
+ex.king_exposed.b5.2 = {move} után {your} nyílt terepen marad.
+ex.king_exposed.b6 = {line}; {your} nyitott.
+ex.king_exposed.b6.2 = {your} túl nyitott: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Ez a csere olyan gyalogvégjátékhoz vezet, amelyet én nyerek.
+ex.bad_trade.b3.2 = {line} után csak gyalogok maradnak, és az én királyom jobban áll.
+ex.bad_trade.b4 = A cserék vesztett gyalogvégjátékhoz vezetnek: {line}.
+ex.bad_trade.b4.2 = Ha lecserélsz ebbe a gyalogvégjátékba, veszítesz.
+ex.bad_trade.b5 = Rossz csere: {line} után a gyalogvégjáték vesztett.
+ex.bad_trade.b5.2 = A gyalogvégjáték vesztett; tarts tiszteket a táblán.
+ex.bad_trade.b6 = {line} után a gyalogvégjáték vesztett.
+ex.bad_trade.b6.2 = Vesztett gyalogvégjáték: {line}.
+ex.bishop_pair.b5 = Ez a csere a futópárodba kerül.
+ex.bishop_pair.b5.2 = Ezzel a cserével feladod a futópárodat; az enyém megmarad.
+ex.bishop_pair.b6 = Odavan a futópár.
+ex.bishop_pair.b6.2 = Futópár elajándékozva.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} megszerzi az oppozíciót: a királyok szemben állnak, köztük egy mezővel.
+ex.opposition.b3.2 = A királyok! {best} lépéssel megszerezted volna az oppozíciót.
+ex.opposition.b4 = {best} megszerzi az oppozíciót: ez a kulcs.
+ex.opposition.b4.2 = Az oppozíció dönt: {best}.
+ex.opposition.b5 = {best}, oppozícióval.
+ex.opposition.b5.2 = Oppozíció: {best}.
+ex.opposition.b6 = {best}, oppozíció.
+ex.opposition.b6.2 = {best}: az oppozíció.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = A gyalogod elfuthatna {sq} mezőig. A szabadgyalog előre akar menni!
+ex.push_passed.b1.2 = Told előre a szabadgyalogodat! El akar jutni {sq} mezőre.
+ex.push_passed.b1.3 = A szabadgyalogod {sq} mezőig akar menetelni. Told előre!
+ex.push_passed.b2 = {best}: told a szabadgyalogot {sq} mező felé.
+ex.push_passed.b2.2 = Erős a szabadgyalogod. {best} előretolja.
+ex.push_passed.b2.3 = Told előre! {best} közelebb viszi a gyalogot {sq} mezőhöz.
+ex.push_passed.b3 = {best} előretolja a szabadgyalogot.
+ex.push_passed.b3.2 = A szabadgyalogot tolni kell: {best}.
+ex.push_passed.b3.3 = {best} volt az út: a gyalog {sq} mezőig fut.
+ex.push_passed.b4 = {best}: a szabadgyalog dönt.
+ex.push_passed.b4.2 = Előre: {best}.
+ex.push_passed.b5 = {best}, előre a szabadgyaloggal: {eval}.
+ex.push_passed.b5.2 = A szabadgyalog: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, a szabadgyalog.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Hozd előre {your:acc}! A végjátékban a király erős bábu.
+ex.king_active.b1.2 = Most {your} is beszállhat a harcba. Vezesd a tábla közepére.
+ex.king_active.b1.3 = Kevés bábu maradt, ezért {your:dat} is ki kellene jönnie segíteni.
+ex.king_active.b2 = A végjátékban használd {your:acc}: hozd a centrumba.
+ex.king_active.b2.2 = {your:dat} most aktívnak kell lennie. Vonulj vele előre.
+ex.king_active.b3 = {best} aktivizálja a királyt. A végjátékban a király is harcol.
+ex.king_active.b3.2 = {best}: a király helye most a centrumban van.
+ex.king_active.b4 = {best} centralizálja a királyt.
+ex.king_active.b4.2 = A királynak előre kell jönnie: {best}.
+ex.king_active.b5 = {best}, aktivizálva a királyt: {line}.
+ex.king_active.b5.2 = Aktív király: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, király előre.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} megőrzi a jobb állást.
+ex.positional.b4.2 = {best} erősebb volt itt.
+ex.positional.b4.3 = Én inkább ezt választottam volna: {best}.
+ex.positional.b5 = {best} erősebb volt: {line}.
+ex.positional.b5.2 = {best}, a terv: {line}.
+ex.positional.b5.3 = Érdemes megnézni: {best}, majd {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} nagyon korán kijött. Előbb a huszárokat és a futókat hozd ki.
+tip.early_queen.b1.2 = Óvatosan {your:ins} ilyen korán: a bábuim kergethetik.
+tip.early_queen.b1.3 = Jó móka {your:ins} lépni, de előbb a huszárokat és a futókat fejleszd.
+tip.early_queen.b2 = Ha ilyen korán lépsz {your:ins}, megtámadhatom, és időt nyerek.
+tip.early_queen.b2.2 = Ilyen hamar kint van {your}? Előbb a huszárok és a futók!
+tip.early_queen.b3 = {your} korai kirándulása tempókat ad nekem: támadhatom.
+tip.early_queen.b3.2 = Ilyen korán {your:acc} könnyű kergetni. Előbb fejleszd a tisztjeidet.
+tip.queen_grab.b1 = {your} leütött egy távoli gyalogot, és most bajba kerülhet.
+tip.queen_grab.b1.2 = A gyalogszedés {your:ins} időbe kerül. Előbb hozd ki a tisztjeidet!
+tip.queen_grab.b2 = {your} gyalogot szedni ment a szárnyra. Ez sok időbe kerül.
+tip.queen_grab.b2.2 = Vigyázz, ha {your:acc} távoli gyalogok után küldöd.
+tip.queen_grab.b3 = Ilyen korán gyalogot szedni {your:ins} időveszteség.
+tip.queen_grab.b3.2 = {your} most messze van otthonról; a fejlődésem számítani fog.
+tip.queen_grab.b4 = {your} nyer egy gyalogot, de túl sok időt veszít.
+tip.queen_grab.b4.2 = A félreeső gyalog leütése {your:ins} tempóba kerül.
+tip.same_piece.b1 = Kétszer léptél {your:ins}. Próbálj minden lépéssel új bábut kihozni.
+tip.same_piece.b1.2 = Megint {your}? Hozd ki a többi bábudat is.
+tip.same_piece.b1.3 = Minden lépésben próbálj új bábut fejleszteni, ne megint {your:acc}.
+tip.same_piece.b2 = Ha a megnyitásban kétszer lépsz {your:ins}, időt veszítesz.
+tip.same_piece.b2.2 = {your} megint lépett; a többi bábud még otthon van.
+tip.same_piece.b3 = Ha kétszer lépsz {your:ins}, lemaradsz a fejlődésben.
+tip.same_piece.b3.2 = Még egy lépés {your:ins}; a sereged többi része vár.
+tip.castle.b1 = {your} még mindig középen van. A sáncolás biztonságba helyezné.
+tip.castle.b1.2 = Ideje sáncolni! {your} a sarokban nagyobb biztonságban van.
+tip.castle.b1.3 = Gondolj hamar a sáncolásra. {your} nyílt terepen áll.
+tip.castle.b2 = {your} még mindig a centrumban van. Sáncolj hamar!
+tip.castle.b2.2 = A sáncolás biztonságba helyezné {your:acc}.
+tip.castle.b3 = A centrum nyílik, {your:dat} sáncolnia kellene.
+tip.castle.b3.2 = {your} még a centrumban van; ideje volt sáncolni.
+tip.knight_rim.b1 = {your} a szélen nem sokat csinál. A huszárok a tábla közepét szeretik.
+tip.knight_rim.b1.2 = A szélen álló huszár gyenge! {your} ott kevesebb mezőt ellenőriz.
+tip.knight_rim.b2 = {your} a szélen kevés mezőt ellenőriz. Irány a centrum!
+tip.knight_rim.b2.2 = A szélen álló huszár gyenge: {your} a centrumba vágyik.
+tip.knight_rim.b3 = {your} a szélen félreesik a játéktól.
+tip.knight_rim.b3.2 = A tábla széle rossz hely {your} számára.
+tip.flank.b1 = Próbáld előbb a középső gyalogokat lépni. A szélső gyalogok nem sokat segítenek.
+tip.flank.b1.2 = A szélső gyalogok nem segítik a bábuidat kijönni. Használd a középsőket.
+tip.flank.b2 = A szélső gyalogokkal nem fejlesztesz semmit. Használd a centrumgyalogokat.
+tip.flank.b2.2 = Túl sok szélső gyaloglépés. Fejleszd a tisztjeidet!
+tip.flank.b3 = A szárnygyalog-lépések a megnyitásban lassítják a fejlődést.
+tip.flank.b3.2 = A szélső gyalogok várhatnak; fejlődj, és harcolj a centrumért.
+tip.centre.b1 = Próbáld uralni a tábla közepét, például {sq} mezőt.
+tip.centre.b1.2 = A centrum fontos. Tegyél egy gyalogot vagy egy tisztet {sq} mező közelébe.
+tip.centre.b1.3 = A tábla közepén a bábuk erősek. Célozz meg olyan mezőket, mint {sq}.
+tip.centre.b2 = Harcolj a centrumért: az olyan mezők, mint {sq}, fontosak.
+tip.centre.b2.2 = Átengeded nekem a centrumot. Nézd meg {sq} mezőt.
+tip.centre.b3 = Nem harcolsz a centrumért; {sq} mező az enyém.
+tip.centre.b3.2 = Szállj harcba a centrumért, {sq} mező körül.
+# Endgame technique tips.
+tip.mate_technique.b1 = Ha már csak egy magányos király maradt, szorítsd a tábla szélére, aztán adj mattot.
+tip.mate_technique.b1.2 = Tipp: szorítsd a királyomat a tábla széle felé. A királyod is legyen közel.
+tip.fifty.b1 = Vigyázz: ha ötven lépésen át nincs ütés és gyaloglépés, a játszma döntetlen.
+tip.fifty.b1.2 = Fogy az idő: ötven lépés ütés és gyaloglépés nélkül döntetlen.
+tip.repetition.b1 = Vigyázz! Ha ugyanaz az állás harmadszor is előáll, döntetlen.
+tip.repetition.b1.2 = Ne ismételd a lépéseket: a harmadik ismétlés döntetlen, pedig te nyerésre állsz.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Hű, odaadtál egy bábut, és működik!
+praise.sacrifice.2 = Ügyes áldozat! Nagyon szépen játszottad.
+praise.brilliant.b3 = Briliáns! Igazi áldozat.
+praise.brilliant.b3.2 = Hű, {move} nagyszerű áldozat!
+praise.brilliant.b4 = {move}! Briliáns áldozat.
+praise.brilliant.b4.2 = Briliáns. Erre nem számítottam.
+praise.brilliant.b5 = {move}!! Briliáns.
+praise.brilliant.b5.spoken = {move}. Briliáns!
+praise.brilliant.b5.2 = Briliáns áldozat.
+praise.brilliant.b6 = {move}!! Kiváló.
+praise.brilliant.b6.spoken = {move}. Kiváló!
+praise.brilliant.b6.2 = Briliáns.
+praise.great.b2 = Nagyszerű lépés! Megtaláltad, hogyan vághatsz vissza.
+praise.great.b2.2 = Ez nagyszerű lépés. Szép találat!
+praise.great.b3 = Nagyszerű lépés! Megtaláltad az egyetlen jó ötletet.
+praise.great.b3.2 = Kiváló, {move} fordít a helyzeten.
+praise.great.b4 = {move}! Remek találat.
+praise.great.b4.2 = Nagyszerű lépés.
+praise.great.b5 = {move}! Szép találat.
+praise.great.b5.2 = Erős: {move}.
+praise.great.b6 = {move}! Nagyszerű.
+praise.great.b6.2 = Remek találat.
+praise.only.b2 = Jó! Ez volt az egyetlen jó lépés.
+praise.only.b2.2 = Ügyes, megtaláltad az egyetlen működő lépést.
+praise.only.b3 = Az egyetlen lépés, és megtaláltad.
+praise.only.b3.2 = Pontosan! Itt semmi más nem működött.
+praise.only.b4 = Az egyetlen lépés. Ügyes.
+praise.only.b4.2 = Egyetlen lépés, megtalálva.
+praise.only.b5 = Egyetlen lépés. Jó.
+praise.only.b5.2 = {move}, az egyetlen lépés.
+praise.only.b6 = Egyetlen lépés.
+praise.only.b6.2 = Pontos: az egyetlen lépés.
+praise.fork.b2 = Kettős támadás! Ügyes.
+praise.fork.b2.2 = Egyszerre két bábut támadsz! Nagyszerű.
+praise.fork.b2.3 = Szép! Ez villa.
+praise.fork.b3 = Szép villa.
+praise.fork.b3.2 = Jó villa!
+praise.fork.b3.3 = Villa. Szépen játszottad.
+praise.capture.b1 = Ügyes! Ingyen leütötted {my:acc}.
+praise.capture.b1.2 = Jó szemed van! {my} nem volt védve.
+praise.capture.b1.3 = Igen! Megnyerted {my:acc}.
+praise.capture.b2 = Jó ütés! {my} védtelen volt.
+praise.capture.b2.2 = Szép, begyűjtötted {my:acc}.
+praise.capture.b2.3 = Jól láttad: {my} lógott.
+praise.best.b1 = Jó lépés!
+praise.best.b1.2 = Nagyon jó!
+praise.best.b1.3 = Szép volt!
+praise.best.b2 = Jó lépés.
+praise.best.b2.2 = Nagyon szép.
+praise.best.b2.3 = Jól játszottad.
+praise.best.b3 = Jó lépés: nem volt könnyű megtalálni.
+praise.best.b3.2 = Szépen megtaláltad.
+praise.best.b3.3 = {move} a legjobb lépés itt. Jó.
+praise.trade.b1 = Jó! Ha előnyben vagy, a csere neked segít.
+praise.trade.b1.2 = Szép csere. Előnyben vagy, így a kevesebb bábu neked jó.
+praise.trade.b2 = Jó csere: előnyben vagy, úgyhogy cserélj.
+praise.trade.b2.2 = Okos dolog lecserélni {my:acc}, ha előnyben vagy.
+praise.trade.b3 = Jó: előnyben érdemes cserélni.
+praise.trade.b3.2 = Értelmes csere.
+praise.excellent.b3 = Kiváló lépés.
+praise.excellent.b3.2 = Ez erős lépés.
+praise.excellent.b3.3 = Nagyon pontos.
+praise.excellent.b4 = Pontos.
+praise.excellent.b4.2 = Kiváló.
+praise.excellent.b4.3 = Jó, {move} pontos.
+praise.castle.b1 = Jó! Sáncoltál. A királyod most nagyobb biztonságban van.
+praise.castle.b1.2 = Szép sáncolás! A királyod biztonságos helyre került.
+praise.saved.b1 = Jó! Megmentetted a bábudat.
+praise.saved.b1.2 = Ügyes, biztonságba vitted.
+praise.book.b1 = Jó, ez egy jól ismert megnyitási lépés.
+praise.book.b1.2 = Szép, az erős játékosok is így kezdenek.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Vigyázz! Mattal fenyegetek {sq} mezőn.
+threat.mate.b1.2 = Vigyázz: {my} {sq} mezőre akar lépni. Az matt lenne.
+threat.mate.b1.3 = Nézd meg {sq} mezőt. Ha odaérek, az matt!
+threat.mate.b2 = Vigyázz, mattal fenyegetek.
+threat.mate.b2.2 = Vigyázz: mattfenyegetés van {sq} mezőn.
+threat.mate.b2.3 = Nézd meg jól: mattal fenyegetek.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Nézd: {my} támadja {your:acc}.
+threat.piece.b1.2 = Vigyázz! {your:acc} {my} támadja.
+threat.piece.b1.3 = Vigyázz, {my} le akarja ütni {your:acc}.
+threat.piece.b2 = Vigyázz {your:sub}.
+threat.piece.b2.2 = {your} támadás alatt áll.
+threat.piece.b2.3 = Figyelj {your:sub}.
+threat.punish.b1 = Az előző lépésem hiba volt. Meg tudod büntetni?
+threat.punish.b1.2 = Hmm, azt hiszem, hibáztam. Megtalálod?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Ezúttal gondolj {your:sub}.
+tb.hint.b1.2 = Tartsd szemmel {your:acc}.
+tb.hint.king.b1 = Gondolj {your} biztonságára.
+tb.hint.king.b1.2 = Előbb nézd meg {your:acc}. Biztonságban van?
+tb.hint.missed.b1 = Keress olyan bábut, amit ingyen leüthetsz.
+tb.hint.missed.b1.2 = Nézz körül alaposan: van valami, amit leüthetsz?
+tb.hint.mate_missed.b1 = Nézd a királyomat. Tudsz neki mattot adni?
+tb.hint.mate_missed.b1.2 = Próbáld előbb a sakkokat. Talán van matt!
+tb.hint.general.b1 = Ne siess, nézd át az egész táblát.
+tb.hint.general.b1.2 = Próbálj biztonságosabb lépést találni.
+# The retry.
+tb.fixed.b1 = Sokkal jobb!
+tb.fixed.b1.2 = Igen, ez jobb!
+tb.fixed.b1.3 = Jó, ez sokkal jobban működik.
+tb.fixed = Ez jobb.
+tb.fixed.2 = Jobb.
+tb.fixed.3 = Jó javítás.
+tb.same = Megint ugyanaz a lépés? Rendben, lássuk.
+tb.same.2 = Tetszik neked ez a lépés. Játsszuk végig.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Igen! Erre a lépésre gondoltam.
+tb.found.b1.2 = Megtaláltad! Ez a jobb lépés.
+tb.found = Erre a lépésre gondoltam.
+tb.found.2 = Pontosan, ez az.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Sajnos ebben a játszmában nincs több visszavonásod.
+tb.none_left.2 = Ebben a játszmában már nem maradt visszavonásod.

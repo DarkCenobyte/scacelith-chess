@@ -1,0 +1,111 @@
+# Coach speech (Slovak): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "ty" and is male ("som pripravený", "radšej by som pokračoval"); the player's gender
+# is unknown: no second-person past tense or adjective about the player ("vyhral si", "pripravený"):
+# present or future tense and nouns instead ("Zaslúžená výhra", "Partia je vzdaná").
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Ahoj! Zahrajme si priateľskú partiu. Vždy, keď sa niečo pokazí, pomôžem ti.
+event.greet.l1.2 = Zdravím ťa! Budem hrať jemne a ukážem ti, na čo si treba dávať pozor.
+event.greet.l1.3 = Vitaj! Nikam sa neponáhľaj: keď bude niektorá figúra v ohrození, poviem ti to.
+event.greet.l2 = Ahoj! Poďme hrať. Keď sa objaví vidlička alebo väzba, ukážem ti ju.
+event.greet.l2.2 = Zdravím ťa! Vyvíjaj svoje figúry a maj kráľa v bezpečí. Počas partie ti budem pomáhať.
+event.greet.l2.3 = Vitaj späť pri šachovnici! Sleduj vidličky a väzby: tie vyhrávajú partie.
+event.greet.l3 = Ahoj! Zahrajme si poriadnu partiu. Budem komentovať tvoje plány a väčšie chyby.
+event.greet.l3.2 = Zdravím ťa! Premysli si plán pre svoje figúry. Keď ti pri ťahu niečo ujde, poviem ti to.
+event.greet.l3.3 = Poďme hrať! Upozorním ťa na jediné ťahy aj na ťahy, ktoré nevyjdú.
+event.greet.l4 = Ahoj! Tentoraz budem uvádzať hodnotenie pozície a ukazovať ti lepšie kandidátske ťahy.
+event.greet.l4.2 = Poďme hrať. Po chybe ti poviem, čo bolo presnejšie.
+event.greet.l4.3 = Čo tak klubová partia? Ozvem sa, keď sa zmení hodnotenie.
+event.greet.l5 = Poďme hrať. Moje komentáre budú stručné.
+event.greet.l5.2 = Som pripravený, môžeme začať, kedykoľvek chceš. Len krátke komentáre.
+event.greet.l5.3 = Veľa šťastia. Ozvem sa, len keď na tom bude záležať.
+event.greet.l6 = Veľa šťastia.
+event.greet.l6.2 = Hráme.
+event.greet.l6.3 = Som pripravený. Komentovať budem len kritické momenty.
+
+# Who starts (said after the greeting).
+event.colour.white = Máš biele figúry, takže začínaš ty.
+event.colour.white.2 = Hráš bielymi: prvý ťah je tvoj.
+event.colour.black = Ja mám biele, takže začínam ja.
+event.colour.black.2 = Tentoraz hráš čiernymi: prvý ťah je môj.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of assets/i18n/sk.lang (coach.level.<n>.name): Prvé kroky,
+# Začiatočník, Mierne pokročilý, Klubový hráč, Silný klubový hráč, Expert.
+event.level.l1 = Prvé kroky: hrám jemne a každú chybu vysvetlím jednoduchými slovami.
+event.level.l2 = Začiatočník: hrám o niečo silnejšie a pomenúvam jednoduché taktické motívy, ako sú vidličky a väzby.
+event.level.l3 = Mierne pokročilý: hovorím o plánoch a pešiakovej štruktúre a ukazujem krátke varianty.
+event.level.l4 = Klubový hráč: hodnotenie uvádzam v pešiakoch a navrhujem kandidátske ťahy.
+event.level.l5 = Silný klubový hráč: krátke komentáre a dlhšie varianty, keď na tom záleží.
+event.level.l6 = Expert: hrám naplno a komentujem len kritické momenty.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Si na ťahu.
+event.your_move.2 = Tvoj ťah.
+event.your_move.3 = Teraz ty.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Nikam sa neponáhľaj.
+event.take_time.2 = Žiadny zhon: v našich partiách nehráme s hodinami.
+# Short filler while the coach is still looking at the position.
+event.filler = Hm.
+event.filler.2 = Pozrime sa.
+event.filler.3 = Hneď sa pozriem.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Dobre, vráťme ten ťah.
+event.takeback.taken.2 = Dobrý nápad. Pozri sa na to ešte raz.
+event.takeback.taken.3 = Ťah je vrátený. Skús to znova.
+# The player declined the offer and played on.
+event.takeback.declined = Dobre, hráme ďalej.
+event.takeback.declined.2 = Ako chceš, partia pokračuje.
+event.takeback.declined.3 = Tvoja voľba. Pokračujme.
+# After an explanation without an offer.
+event.play_on = Hrajme ďalej.
+event.play_on.2 = Pokračujme.
+event.play_on.3 = A teraz späť k našej partii.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Takéto chyby robí každý. Dôležité je vedieť ich odhaliť.
+event.encourage.mistake.2 = Nič sa nedeje. Pozri sa, čo napáda môj posledný ťah, a nájdeš to.
+event.encourage.mistake.3 = To sa stáva každému hráčovi. Pokračujme.
+# The player is behind (material or evaluation).
+event.encourage.behind = Nevzdávaj sa: hľadaj šance a nedaj mi to zadarmo.
+event.encourage.behind.2 = Bojuj ďalej. Takéto pozície sa ešte dajú otočiť.
+event.encourage.behind.3 = Zachovaj pokoj a hľadaj moje slabiny.
+# The player has played several good moves in a row.
+event.encourage.well = Skôr než ťaháš, kontroluješ moje hrozby. Výborne.
+event.encourage.well.2 = Opatrné, solídne ťahy. Len tak ďalej.
+event.encourage.well.3 = Dnes ti to pekne myslí.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Prijímam. Takže remíza.
+event.draw.accepted.2 = Dohodnuté: je to remíza.
+event.draw.declined = Nie, ďakujem, hrajme ďalej.
+event.draw.declined.2 = Radšej by som pokračoval.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Dobre zahrané. Gratulujem!
+event.end.win.2 = Zaslúžená výhra. Výborne!
+event.end.win.3 = Gratulujem: tvoja výhra je úplne férová.
+event.end.loss = Dobrá partia. Nabudúce ma dostaneš.
+event.end.loss.2 = Ďakujem za partiu. Každá prehra ťa niečo naučí.
+event.end.loss.3 = Pekný boj. Pozrime sa, čo sa stalo.
+event.end.draw = Remíza. Dobrá partia!
+event.end.draw.2 = Tentoraz nikto nevyhral. Pekne zabojované.
+event.end.draw.3 = Spravodlivý výsledok. Dobrá partia.
+event.end.resigned = Partia je vzdaná. Aj tak to bol dobrý boj.
+event.end.resigned.2 = Dobre. Ďakujem za partiu.
+event.end.handshake = Podajme si ruky.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it
+# comes after a colon, or in quotes after "témou" / "pri téme" (a quoted title keeps its nominative).
+event.lesson.resume = Vitaj späť! Pokračujeme témou „{chapter}“.
+event.lesson.resume.2 = Zdravím ťa znova! Skončili sme pri téme „{chapter}“.
+event.lesson.next = Ďalej: {chapter}.
+event.lesson.next.2 = A teraz: {chapter}.

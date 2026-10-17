@@ -1,7 +1,8 @@
 // Engine-free Unicode text logic used by the UI text shaper (src/ui/text_shape.cpp) and the unit
-// tests: UTF-8 <-> UTF-32, Arabic contextual shaping to the Unicode presentation forms, a
-// simplified Unicode bidirectional algorithm for one line, bracket mirroring, line break
-// opportunities (spaces, CJK with basic kinsoku rules) and simple upper-casing.
+// tests: UTF-8 <-> UTF-32, Arabic contextual shaping to the Unicode presentation forms, Devanagari
+// syllables to the fonts' precomposed glyphs, a simplified Unicode bidirectional algorithm for one
+// line, bracket mirroring, line break opportunities (spaces, CJK with basic kinsoku rules) and
+// simple upper-casing.
 //
 // Everything works on codepoints; fonts and glyphs are the UI's business.
 #pragma once
@@ -26,6 +27,8 @@ bool isHan(char32_t cp);            // CJK ideographs
 bool isKana(char32_t cp);           // hiragana, katakana (incl. half-width)
 bool isCjkPunct(char32_t cp);       // CJK symbols and punctuation, full-width forms
 bool isCjk(char32_t cp);            // any of the three above (no spaces between words)
+bool isHangul(char32_t cp);         // Hangul syllables and jamo
+bool isDevanagari(char32_t cp);     // Devanagari block and the fonts' precomposed syllables (below)
 bool isMark(char32_t cp);           // combining mark (zero advance, drawn on its base)
 bool isSpace(char32_t cp);
 bool containsRtl(const std::u32string& text);
@@ -55,6 +58,28 @@ struct Shaped {
 // Arabic is returned unchanged.
 Shaped shapeArabic(const std::u32string& logical);
 
+// ---- Devanagari syllables -----------------------------------------------------------------------------
+// stb_truetype has no OpenType shaping either: every orthographic syllable that the game's
+// Devanagari fonts draw otherwise than its letters side by side (reordered short i, conjuncts,
+// marks placed on their consonant, reph) is a precomposed glyph at a Private Use codepoint of
+// U+E000..U+EFFF, the same in every Devanagari face. tools/prepare_fonts.py bakes them and lists
+// them in assets/fonts/devanagari-clusters.txt, which i18n loads.
+constexpr char32_t kDevanagariClusterFirst = 0xE000, kDevanagariClusterLast = 0xEFFF;
+// The syllables of a text, [begin, end) each, in order (consonant clusters joined by virama with
+// their nukta, vowel signs and bindus; an independent vowel with its signs). Other characters
+// belong to none. Must match deva_syllables in tools/prepare_fonts.py.
+std::vector<std::pair<int, int>> devanagariSyllables(const std::u32string& text);
+// Loads the syllable table (lines "<hex codepoint> <syllable>", '#' comments) for
+// shapeDevanagari; replaces the previous one. Returns the number of syllables.
+int setDevanagariClusters(const std::string& fileText);
+// Precomposed codepoint of a syllable, 0 when the fonts draw it from its letters.
+char32_t devanagariCluster(const std::u32string& syllable);
+// Replaces every syllable that has a precomposed glyph by its codepoint (its source: the
+// syllable's first character). Text without Devanagari is returned unchanged.
+Shaped shapeDevanagari(const Shaped& in);
+// Everything the fonts need before drawing: shapeArabic, then shapeDevanagari.
+Shaped shape(const std::u32string& logical);
+
 // ---- Bidirectional text ---------------------------------------------------------------------------------
 // Simplified Unicode Bidirectional Algorithm (UAX #9) for a single line without explicit
 // embeddings or isolates: weak types (W1-W7), neutrals (N1-N2), implicit levels (I1-I2), trailing
@@ -83,9 +108,14 @@ bool breakBetween(char32_t before, char32_t after);
 float trackingScale(char32_t before, char32_t after);
 
 // ---- Case ------------------------------------------------------------------------------------------------
-// Simple upper-case mapping for Latin (incl. Latin-1 and Extended-A), Greek and Cyrillic; ß -> SS.
-char32_t toUpper(char32_t cp);
+// Simple upper-case mapping for Latin (Latin-1, Extended-A, the Extended-B letters of Romanian and
+// Vietnamese, Latin Extended Additional), Greek and Cyrillic. toUpper keeps accents (a sentence's
+// first letter: "Ένα"); toCapital is the all-caps form: Greek capitals drop the tonos ("ΕΝΑ"), and
+// in Turkish (turkic) i becomes İ.
+char32_t toUpper(char32_t cp, bool turkic = false);
+char32_t toCapital(char32_t cp, bool turkic = false);
 bool isLower(char32_t cp);
-std::string toUpper(const std::string& utf8);
+// All caps (toCapital; ß -> SS). lang: the text's language code ("tr": dotted capital İ).
+std::string toUpper(const std::string& utf8, const std::string& lang = std::string());
 
 }  // namespace uni

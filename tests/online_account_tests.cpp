@@ -934,7 +934,9 @@ TEST(account_gif_wait_in_words) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(waitText(150), std::string("2 minutes et 30 secondes"));
     CHECK_EQ(waitText(1), std::string("1 seconde"));
-    for (const char* lang : {"de", "es", "uk", "ru", "ar", "ja", "zh-Hans", "zh-Hant"}) {
+    for (const i18n::Language& l : i18n::languages()) {
+        const std::string lang = l.code;
+        if (lang == "en" || lang == "fr") continue;
         CHECK(i18n::setLanguage(lang));
         for (int s : {1, 2, 3, 11, 59, 61, 150, 299, 1800}) {
             const std::string w = waitText(s);

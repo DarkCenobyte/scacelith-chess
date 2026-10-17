@@ -155,6 +155,7 @@ TEST(unicode_gaps_upper_case_greek_cyrillic_latin) {
     };
     for (const auto& c : cases) CHECK(uni::toUpper(c.first) == c.second);
     CHECK(uni::isLower(0x03C2) && uni::isLower(0x04CF) && !uni::isLower(0x0391) && !uni::isLower(0x0138));
-    CHECK_EQ(uni::toUpper("\xCE\xBA\xCE\xB1\xCE\xBB\xCE\xB7\xCE\xBC\xCE\xAD\xCF\x81\xCE\xB1"),   // καλημέρα
-             std::string("\xCE\x9A\xCE\x91\xCE\x9B\xCE\x97\xCE\x9C\xCE\x88\xCE\xA1\xCE\x91"));
+    // All caps: Greek drops the tonos (καλημέρα -> ΚΑΛΗΜΕΡΑ); a single letter keeps it (above).
+    CHECK_EQ(uni::toUpper("\xCE\xBA\xCE\xB1\xCE\xBB\xCE\xB7\xCE\xBC\xCE\xAD\xCF\x81\xCE\xB1"),
+             std::string("\xCE\x9A\xCE\x91\xCE\x9B\xCE\x97\xCE\x9C\xCE\x95\xCE\xA1\xCE\x91"));
 }

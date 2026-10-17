@@ -1,0 +1,111 @@
+# Coach speech (Romanian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "tu" and is male ("sunt gata"); the player's gender is unknown: no adjective or
+# participle about the player ("ești pregătit", "rămâi calm"), only the invariable active perfect
+# ("ai meritat", "ai abandonat"), the present, the future and nouns.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Salut! Hai să jucăm o partidă prietenească. Te ajut ori de câte ori ceva nu merge bine.
+event.greet.l1.2 = Bună! Voi juca blând și îți voi arăta la ce trebuie să ai grijă.
+event.greet.l1.3 = Bine ai venit! Nu te grăbi: îți spun când o piesă e în pericol.
+event.greet.l2 = Salut! Hai să jucăm. Când apare o furculiță sau o legare, ți-o arăt.
+event.greet.l2.2 = Bună! Scoate-ți piesele și ține-ți regele în siguranță. Te ajut pe parcurs.
+event.greet.l2.3 = Bine ai revenit la tablă! Atenție la furculițe și legări: ele câștigă partide.
+event.greet.l3 = Salut! Hai să jucăm o partidă adevărată. Îți voi comenta planurile și greșelile mai mari.
+event.greet.l3.2 = Bună! Gândește-te la un plan pentru piesele tale. Îți spun când o mutare scapă ceva din vedere.
+event.greet.l3.3 = Hai să jucăm! Îți voi semnala singurele mutări bune și mutările care nu merg.
+event.greet.l4 = Salut! De data asta îți dau evaluări și îți arăt mutările candidate mai bune.
+event.greet.l4.2 = Să jucăm. După o greșeală, îți spun ce era mai precis.
+event.greet.l4.3 = O partidă ca la club? Comentez când se schimbă evaluarea.
+event.greet.l5 = Să jucăm. Voi fi scurt în comentarii.
+event.greet.l5.2 = Sunt gata când vrei. Doar comentarii scurte.
+event.greet.l5.3 = Succes. Vorbesc doar când contează.
+event.greet.l6 = Succes.
+event.greet.l6.2 = Să jucăm.
+event.greet.l6.3 = Sunt gata. Comentez doar momentele critice.
+
+# Who starts (said after the greeting).
+event.colour.white = Ai piesele albe, deci începi tu.
+event.colour.white.2 = Joci cu albele: prima mutare e a ta.
+event.colour.black = Eu am albele, deci încep eu.
+event.colour.black.2 = De data asta joci cu negrele: eu mut primul.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/ro.lang coach.level.<n>.name): Primii pași,
+# Începător, Intermediar, Jucător de club, Jucător de club puternic, Expert.
+event.level.l1 = Primii pași: joc blând și îți explic fiecare greșeală în cuvinte simple.
+event.level.l2 = Începător: joc ceva mai tare și numesc tacticile simple, cum ar fi furculițele și legările.
+event.level.l3 = Intermediar: vorbesc despre planuri și structura de pioni și îți arăt variante scurte.
+event.level.l4 = Jucător de club: dau evaluări în pioni și îți propun mutări candidate.
+event.level.l5 = Jucător de club puternic: comentarii scurte și variante mai lungi când contează.
+event.level.l6 = Expert: joc cât pot de bine și comentez doar momentele critice.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Tu muți.
+event.your_move.2 = E rândul tău.
+event.your_move.3 = Acum tu.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Ia-ți tot timpul de care ai nevoie.
+event.take_time.2 = Nu ne grăbim: partidele noastre nu se joacă cu ceas.
+# Short filler while the coach is still looking at the position.
+event.filler = Hm.
+event.filler.2 = Să vedem.
+event.filler.3 = Stai să mă uit.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Bine, luăm mutarea înapoi.
+event.takeback.taken.2 = Bună idee. Mai uită-te o dată.
+event.takeback.taken.3 = Gata, mutarea e anulată. Mai încearcă.
+# The player declined the offer and played on.
+event.takeback.declined = Bine, jucăm mai departe.
+event.takeback.declined.2 = În regulă, partida continuă.
+event.takeback.declined.3 = Tu decizi. Continuăm.
+# After an explanation without an offer.
+event.play_on = Hai să jucăm mai departe.
+event.play_on.2 = Să continuăm.
+event.play_on.3 = Acum, înapoi la partida noastră.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Toată lumea face astfel de greșeli. Important e să le observi.
+event.encourage.mistake.2 = Nu-ți face griji. Uită-te ce atacă ultima mea mutare și o să găsești.
+event.encourage.mistake.3 = I se întâmplă oricărui jucător. Mergem mai departe.
+# The player is behind (material or evaluation).
+event.encourage.behind = Nu renunța: caută-ți șansele și nu-mi face viața ușoară.
+event.encourage.behind.2 = Luptă mai departe. Pozițiile de felul ăsta se mai pot întoarce.
+event.encourage.behind.3 = Păstrează-ți calmul și caută-mi slăbiciunile.
+# The player has played several good moves in a row.
+event.encourage.well = Îmi verifici amenințările înainte să muți. Bravo.
+event.encourage.well.2 = Mutări atente și solide. Tot așa.
+event.encourage.well.3 = Azi gândești bine.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Accept. Remiză, deci.
+event.draw.accepted.2 = De acord: e remiză.
+event.draw.declined = Nu, mulțumesc, hai să jucăm mai departe.
+event.draw.declined.2 = Prefer să continuăm.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Bine jucat. Felicitări!
+event.end.win.2 = Ai meritat-o. Bravo!
+event.end.win.3 = Felicitări: m-ai învins pe drept.
+event.end.loss = O partidă frumoasă. Data viitoare mă bați tu.
+event.end.loss.2 = Mulțumesc pentru partidă. Fiecare înfrângere te învață ceva.
+event.end.loss.3 = Ai luptat frumos. Hai să vedem ce s-a întâmplat.
+event.end.draw = Remiză. O partidă frumoasă!
+event.end.draw.2 = De data asta nu câștigă nimeni. A fost o luptă frumoasă.
+event.end.draw.3 = Un rezultat corect. O partidă bună.
+event.end.resigned = Ai abandonat. Totuși, ai luptat frumos.
+event.end.resigned.2 = Bine. Mulțumesc pentru partidă.
+event.end.handshake = Hai să dăm mâna.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lower-case noun phrase with its
+# article: it always follows a colon, never a preposition ("la", "cu" would change the article).
+event.lesson.resume = Bine ai revenit! Continuăm lecția: {chapter}.
+event.lesson.resume.2 = Salut din nou! Reluăm de unde am rămas: {chapter}.
+event.lesson.next = Urmează: {chapter}.
+event.lesson.next.2 = Și acum: {chapter}.

@@ -1,0 +1,110 @@
+# Coach speech (Korean): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# Register: warm polite 해요체, -시- for the player's own actions (두세요, 잡으셨어요); the coach is
+# 저 / 제가 and never names the player (no 당신 / 너). His help is humble -아/어 드릴게요.
+# Level names as on the coach page (assets/i18n/ko.lang coach.level.<n>.name).
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = 안녕하세요! 편하게 한 판 둬요. 뭔가 잘못되면 언제든 도와 드릴게요.
+event.greet.l1.2 = 반가워요! 살살 두면서 어떤 걸 조심해야 하는지 알려 드릴게요.
+event.greet.l1.3 = 어서 오세요! 천천히 두세요. 기물이 위험해지면 말씀드릴게요.
+event.greet.l2 = 안녕하세요! 시작해 볼까요? 포크나 핀이 나오면 보여 드릴게요.
+event.greet.l2.2 = 반가워요! 기물을 전개하고 킹을 안전하게 지키세요. 두는 동안 도와 드릴게요.
+event.greet.l2.3 = 다시 체스판 앞에 오셨네요! 포크와 핀을 잘 살펴보세요. 게임을 이기게 해 주는 무기예요.
+event.greet.l3 = 안녕하세요! 제대로 한 판 둬 봐요. 세우신 계획과 큰 실수를 짚어 드릴게요.
+event.greet.l3.2 = 반가워요! 기물을 어떻게 쓸지 계획을 세워 보세요. 뭔가를 놓친 수가 나오면 알려 드릴게요.
+event.greet.l3.3 = 시작해요! 유일한 수, 그리고 잘못된 수를 짚어 드릴게요.
+event.greet.l4 = 안녕하세요! 이번에는 평가치를 알려 드리고, 더 좋은 후보수도 보여 드릴게요.
+event.greet.l4.2 = 시작해 볼까요? 실수가 나오면 무엇이 더 정확했는지 알려 드릴게요.
+event.greet.l4.3 = 클럽에서처럼 한 판 둘 준비되셨어요? 평가치가 바뀌면 코멘트할게요.
+event.greet.l5 = 시작하죠. 코멘트는 짧게 할게요.
+event.greet.l5.2 = 준비되시면 언제든 시작해요. 코멘트는 짧게만 할게요.
+event.greet.l5.3 = 행운을 빌어요. 중요할 때만 말할게요.
+event.greet.l6 = 행운을 빌어요.
+event.greet.l6.2 = 시작하죠.
+event.greet.l6.3 = 준비됐어요. 승부처에서만 코멘트할게요.
+
+# Who starts (said after the greeting).
+event.colour.white = 백 기물을 잡으셨으니 먼저 시작하세요.
+event.colour.white.2 = 백으로 두시네요. 첫 수를 두세요.
+event.colour.black = 제가 백이니까 먼저 둘게요.
+event.colour.black.2 = 이번에는 흑으로 두시네요. 제가 먼저 둘게요.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/ko.lang coach.level.<n>.name).
+event.level.l1 = 첫걸음: 살살 두면서 모든 실수를 쉬운 말로 설명해 드려요.
+event.level.l2 = 초보자: 조금 더 세게 두고, 포크나 핀 같은 간단한 전술을 이름으로 짚어 드려요.
+event.level.l3 = 중급자: 계획과 폰 구조를 이야기하고, 짧은 수순을 보여 드려요.
+event.level.l4 = 클럽 플레이어: 평가치를 폰 단위로 알려 드리고, 후보수를 제안해요.
+event.level.l5 = 강한 클럽 플레이어: 코멘트는 짧게 하고, 중요할 때는 더 긴 수순을 보여 드려요.
+event.level.l6 = 전문가: 최선을 다해 두고, 승부처에서만 코멘트해요.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = 두실 차례예요.
+event.your_move.2 = 이제 두세요.
+event.your_move.3 = 자, 두세요.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = 천천히 하세요.
+event.take_time.2 = 서두를 것 없어요. 우리 게임에는 시계가 없거든요.
+# Short filler while the coach is still looking at the position.
+event.filler = 음.
+event.filler.2 = 어디 볼까요.
+event.filler.3 = 잠깐 볼게요.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = 좋아요, 그 수는 무르죠.
+event.takeback.taken.2 = 좋은 생각이에요. 다시 한번 보세요.
+event.takeback.taken.3 = 수를 되돌렸어요. 다시 해 보세요.
+# The player declined the offer and played on.
+event.takeback.declined = 좋아요, 계속 둬요.
+event.takeback.declined.2 = 알겠어요, 게임은 계속돼요.
+event.takeback.declined.3 = 결정하신 대로 해요. 계속하죠.
+# After an explanation without an offer.
+event.play_on = 계속 둬요.
+event.play_on.2 = 계속하죠.
+event.play_on.3 = 자, 다시 게임으로 돌아가요.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = 누구나 이런 실수를 해요. 중요한 건 실수를 알아차리는 거예요.
+event.encourage.mistake.2 = 걱정 마세요. 제 마지막 수가 무엇을 공격하는지 확인해 보시면 찾으실 거예요.
+event.encourage.mistake.3 = 어떤 플레이어든 겪는 일이에요. 계속해 봐요.
+# The player is behind (material or evaluation).
+event.encourage.behind = 포기하지 마세요. 기회를 찾고, 제가 쉽게 이기지 못하게 하세요.
+event.encourage.behind.2 = 끝까지 싸워요. 이런 포지션은 아직 뒤집힐 수 있어요.
+event.encourage.behind.3 = 침착하게 제 약점을 찾아보세요.
+# The player has played several good moves in a row.
+event.encourage.well = 두기 전에 제 위협을 확인하고 계시네요. 잘하고 계세요.
+event.encourage.well.2 = 신중하고 탄탄한 수들이에요. 그대로 계속하세요.
+event.encourage.well.3 = 오늘 생각을 잘하고 계시네요.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = 받아들일게요. 그럼 무승부예요.
+event.draw.accepted.2 = 좋아요, 무승부예요.
+event.draw.declined = 아뇨, 괜찮아요. 계속 둬요.
+event.draw.declined.2 = 저는 계속 두고 싶어요.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = 잘 두셨어요. 축하해요!
+event.end.win.2 = 충분히 이기실 만했어요. 잘하셨어요!
+event.end.win.3 = 축하해요. 정정당당하게 저를 이기셨어요.
+event.end.loss = 좋은 게임이었어요. 다음엔 저를 이기실 거예요.
+event.end.loss.2 = 같이 둬 주셔서 고마워요. 모든 패배에는 배울 점이 있어요.
+event.end.loss.3 = 잘 싸우셨어요. 어떻게 된 건지 같이 봐요.
+event.end.draw = 무승부예요. 좋은 게임이었어요!
+event.end.draw.2 = 이번엔 승자가 없네요. 잘 싸우셨어요.
+event.end.draw.3 = 공평한 결과예요. 좋은 게임이었어요.
+event.end.resigned = 기권하셨네요. 그래도 잘 싸우셨어요.
+event.end.resigned.2 = 알겠어요. 같이 둬 주셔서 고마워요.
+event.end.handshake = 악수해요.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a noun phrase whose last sound
+# varies: only invariant particles follow it (부터, 에서, 에 대해).
+event.lesson.resume = 다시 오셨네요! {chapter}부터 이어서 해 봐요.
+event.lesson.resume.2 = 또 만났네요! 지난번엔 {chapter}에서 멈췄어요.
+event.lesson.next = 다음은 {chapter}.
+event.lesson.next.2 = 이제 {chapter}에 대해 알아봐요.

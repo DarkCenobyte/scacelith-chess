@@ -1,0 +1,269 @@
+# Coach speech (Lithuanian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("tavo bokštas", "mano žirgas"),
+# with the case forms of common.lang ({my:acc}, {my:gen}, {my:pron_acc}, {your:bare_ins},
+# {your:refl_ins} ...); {sq}, {sq2}, {to}, {esc} = squares, never inflected ("į {sq}", "langelyje
+# {sq}"); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at something while
+# saying the word right after the mark. A ".spoken" key is what the voice says instead (here: letters
+# said by their Lithuanian names, "ha", "el", and the French "en passant" said "an pasan").
+# Rules the lines follow: no adjective, participle or half-participle about the player ("norėdamas",
+# "būk mandagus" -> "Rokiruotei paeik...", "elkis mandagiai"); "savo" when the player acts with
+# their own piece ({your:refl_ins}); files = vertikalės, ranks = horizontalės, back rank = paskutinė
+# horizontalė; kingside / queenside = karaliaus / valdovės flangas.
+
+# ---- Chapter titles (said inside "Tęskime pamoką: {chapter}.") ----------------------------------------
+# Nominative, lower case (see event.lesson.* in events.lang).
+lesson.title.welcome = šachmatų lenta
+lesson.title.pieces = kaip eina figūros
+lesson.title.safety = saugūs ir nesaugūs kirtimai
+lesson.title.check = šachas
+lesson.title.mate = matas
+lesson.title.castling = rokiruotė
+lesson.title.en_passant = kirtimas prasilenkiant
+lesson.title.promotion = pėstininko virsmas
+lesson.title.draws = patas ir lygiosios
+lesson.title.etiquette = reitingas, laikrodis ir etiketas tikrose partijose
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Dabar pabandyk tu.
+lesson.now_you.2 = Dabar tavo eilė.
+lesson.now_you.3 = Dabar tu.
+# Another wrong move after the demonstration.
+lesson.almost = Beveik! Padaryk ėjimą, kurį parodžiau.
+lesson.almost.2 = Ne visai. Pabandyk ėjimą iš mano pavyzdžio.
+lesson.almost.3 = Arti. Prisimink mano ką tik parodytą ėjimą.
+# A wrong move without a line of its own.
+lesson.try_again = Ne tai. Bandyk dar kartą.
+lesson.try_again.2 = Ne šis ėjimas. Mėgink dar.
+lesson.try_again.3 = Pabandykime dar kartą.
+lesson.use_your = Eik {your:bare_ins}.
+lesson.use_your.2 = Pabandyk {your:refl_ins}.
+lesson.watch = Žiūrėk.
+lesson.like_this = Štai taip.
+lesson.and_back = Ir atgal.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Šachas, bet mano karalius pabėga į {esc}.
+lesson.check_takes = Šachas, bet mano karalius tiesiog kerta {your:acc}.
+lesson.check_block = Šachas, bet galiu užsidengti kita figūra.
+lesson.stalemate = Patas! Mano karalius negali pajudėti, ir jam nėra šacho. Lygiosios, nors tavo pozicija buvo laimėta!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Ne į {sq}: tą langelį puola {my}. Karalius niekada neina į pavojų.
+why.PathBlocked = Kažkas užstoja {@}kelią: peršokti per figūras gali tik žirgas.
+why.WrongGeometry = {your} taip neina.
+why.MustAnswerCheck = Tau {@}šachas: pirmiausia turi nuo jo apsiginti.
+why.CastlingThroughCheck = Tavo karalius pereitų per {sq}, o tą langelį puola {my}.
+why.CastlingNoRights = Karalius arba šis bokštas jau ėjo, todėl rokiruotis negalima.
+why.CastlingBlocked = Rokiruotei reikia, kad langeliai tarp karaliaus ir bokšto būtų tušti.
+why.CastlingOutOfCheck = Kai tau šachas, rokiruotis negalima.
+why.PawnForwardBlocked = Pėstininkai nekerta tiesiai į priekį: tas langelis {@}užimtas.
+# The pinned piece takes its ending: surištas / surišta.
+why.LeavesKingInCheck = {your} surišt{your:agr_as_a}: jei {your:pron} pasitrauktų, {my} pultų tavo karalių.
+why.OwnPieceOnTarget = Negali eiti į langelį, kuriame stovi tavo figūra.
+why.PawnCaptureNeedsVictim = Įstrižai pėstininkas eina tik kirsdamas.
+why.EnPassantExpired = Kirsti prasilenkiant galima tik iškart po to, kai pėstininkas paėjo du langelius.
+why.NotYourTurn = Palauk: dabar mano ėjimas.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Labas! Aš tavo treneris. Kartu išmokime šachmatų taisykles, po mažą žingsnelį.
+lesson.welcome.board = Tai šachmatų lenta: šešiasdešimt keturi langeliai, šviesūs ir tamsūs, aštuonios eilės po aštuonis langelius.
+lesson.welcome.light = Kampinis langelis tavo {@}dešinėje visada šviesus. Įsimink: dešinėje – šviesus.
+lesson.welcome.files = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}h.
+lesson.welcome.files.spoken = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}ha.
+lesson.welcome.ranks = Eilės vadinamos horizontalėmis. Jos žymimos skaičiais nuo {@}vieno iki {@2}aštuonių, pradedant nuo tavo pusės.
+lesson.welcome.square = Langelio pavadinimas – pirma raidė, paskui skaičius. Šis langelis – {sq}.
+lesson.welcome.square2 = O šis – {sq}.
+lesson.welcome.kings = Štai du karaliai. Tavasis stovi langelyje {sq}, manasis – langelyje {sq2}.
+lesson.welcome.ask = Tavo eilė: paeik karaliumi vienu langeliu į priekį, į {sq}.
+lesson.welcome.wrong = Tai langelis {to}. Mums reikia langelio {sq}: raidė e, skaičius du.
+lesson.welcome.ok = Puiku. Tavo karalius stovi langelyje {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Tai {your}. {your:pron} eina tiesiomis linijomis, vertikalėmis ir horizontalėmis, bet kokiu atstumu.
+lesson.rook.lines = Aukštyn vertikale {@}arba išilgai horizontalės.
+lesson.rook.capture = Kirsdama figūra stoja į {@}priešininko figūros langelį, o ši palieka lentą.
+lesson.rook.ask = Kirsk {my:acc} bokštu!
+lesson.rook.short = Kryptis teisinga! Eik toliau vertikale aukštyn, iki pat {my:gen}.
+lesson.rook.rank = Tai ėjimas horizontale. {my} stovi aukščiau, toje pačioje vertikalėje.
+lesson.rook.king = Tai tavo karalius. Eik {your:bare_ins}: {your:pron} stovi kampe.
+lesson.rook.ok = Nukirsta! {my} palieka lentą.
+# Pieces don't jump
+lesson.jump.blocked = Figūros negali peršokti per kitas. Tavo pėstininkas langelyje {sq} užstoja bokštui kelią.
+lesson.jump.knight = Peršokti gali tik žirgas. Su juo netrukus susipažinsime.
+# Bishop
+lesson.bishop.intro = Tai {your}. {your:pron} eina įstrižainėmis bet kokiu atstumu.
+lesson.bishop.colour = Rikis visada lieka tos pačios spalvos langeliuose.
+lesson.bishop.ask = {my} stovi toje įstrižainėje. Kirsk {my:pron_acc}!
+lesson.bishop.short = Įstrižainė teisinga! Eik toliau, iki {my:gen}.
+lesson.bishop.other = Tai kita įstrižainė. Žiūrėk {my:gen} pusėn.
+lesson.bishop.ok = Puiku. Rikiai mėgsta ilgas įstrižaines.
+# Queen
+lesson.queen.intro = Tai {your}, stipriausia figūra. {your:pron} eina kaip bokštas ir rikis kartu.
+lesson.queen.ask = Rask {my:acc} ir kirsk {my:pron_acc} valdove.
+lesson.queen.wrong = Tavo valdovė gali pasiekti {my:acc} vienu ėjimu, įstrižaine.
+lesson.queen.ok = Šaunu! Saugok savo valdovę: ji labai vertinga.
+# King
+lesson.king.intro = Karalius eina tik vienu langeliu, į bet kurią pusę.
+lesson.king.important = Karalius – svarbiausia figūra. Jei jam nebėra kur dėtis, partija pralaimėta.
+lesson.king.ask = Karalius irgi gali kirsti. Kirsk {my:acc}!
+lesson.king.wrong = Tavo karalius stovi visai šalia {my:gen}. Stok į {my:pron_gen} langelį ir nukirsk {my:pron_acc}.
+lesson.king.ok = Gerai! Karalius lėtas, bet iš arti stiprus.
+# Knight
+lesson.knight.intro = Tai {your}. {your:pron} eina raide L: du langelius tiesiai, paskui vieną į šoną.
+lesson.knight.intro.spoken = Tai {your}. {your:pron} eina raide el: du langelius tiesiai, paskui vieną į šoną.
+lesson.knight.l = Štai {@}taip. Žirgas visada atsiduria kitos spalvos langelyje.
+lesson.knight.jump = Žirgas – vienintelė figūra, galinti peršokti per kitas.
+lesson.knight.ask = Kirsk {my:acc} žirgu!
+lesson.knight.wrong = Tai tikras žirgo ėjimas, bet juo nepasieksi {my:gen}. Pabandyk kitą L raidę.
+lesson.knight.wrong.spoken = Tai tikras žirgo ėjimas, bet juo nepasieksi {my:gen}. Pabandyk kitą el raidę.
+lesson.knight.ok = Puikus šuolis!
+# Pawn: moving
+lesson.pawn.intro = Dabar {your}. {your:pron} eina tiesiai į priekį, po vieną langelį, ir niekada atgal.
+lesson.pawn.first = Pirmuoju ėjimu pėstininkas gali paeiti vieną arba du langelius.
+lesson.pawn.ask = Paeik pėstininku du langelius į priekį.
+lesson.pawn.one = Tai tik vienas langelis: taip galima, bet šį kartą paeik du.
+lesson.pawn.use = Eik pėstininku.
+lesson.pawn.ok = Gerai.
+# Pawn: capturing
+lesson.pawncap.blocked = Mano pėstininkas užstoja tavąjį. Pėstininkai nekerta tiesiai į priekį.
+lesson.pawncap.diagonal = Tačiau pėstininkas kerta įstrižai, vienu langeliu į priekį.
+lesson.pawncap.ask = Kirsk {my:acc} pėstininku.
+lesson.pawncap.use = Eik {your:bare_ins}: {your:pron} kerta įstrižai į priekį.
+lesson.pawncap.ok = Taip! Eina tiesiai, kerta įstrižai.
+# Values, set-up and the first moves
+lesson.values.pawn = Kiekviena figūra turi vertę taškais. Pėstininkas vertas vieno taško.
+lesson.values.pieces = Žirgas arba {@}rikis – trys taškai. {@2}Bokštas – penki. {@3}Valdovė – devyni.
+lesson.values.king = Karalius neįkainojamas: jo niekada negalima atiduoti.
+lesson.values.trade = Stenkis niekada neatiduoti figūros pigiau, nei ji verta.
+lesson.setup.corners = Kiekviena partija prasideda taip: bokštai {@}kampuose, šalia jų {@2}žirgai, toliau {@3}rikiai.
+lesson.setup.queen = Valdovė stovi savo spalvos langelyje: tavo valdovė – šviesiame langelyje.
+lesson.setup.king = Karalius stovi šalia jos. Baltieji visada eina pirmieji.
+lesson.first.ask = Pradėk partiją: pėstininką, kuris stovi priešais tavo karalių, pastumk du langelius į priekį, į {sq}.
+lesson.first.wrong = Toks ėjimas irgi leistinas! Bet dabar, prašau, eik karaliaus pėstininku į {sq}.
+lesson.first.ok = Puikus pirmasis ėjimas: jis atveria kelią tavo valdovei ir rikiui.
+lesson.first.reply = Aš atsakau taip pat. Dabar išvesk žirgą: šok iš {sq} į {sq2}.
+lesson.first.knight_wrong = Žirgai peršoka per pėstininkus. Pabandyk iš {sq} į {sq2}.
+lesson.first.knight_ok = Puiku. Žirgai ir rikiai išvedami anksti.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Figūra apginta, kai kita tos pačios spalvos figūra gali kirsti atgal.
+lesson.safety.pawn = Mano {@}pėstininkas gina {my:acc}.
+lesson.safety.free = O {my} neturi gynėjo. Tavo valdovė puola abi figūras.
+lesson.safety.ask = Kirsk neapgintą figūrą!
+lesson.safety.watch = Žiūrėk, kas bus.
+lesson.safety.gave = Atidavei savo valdovę, vertą devynių, už mano žirgą, vertą trijų.
+lesson.safety.other = Pabandyk kitą figūrą.
+lesson.safety.look = Ieškok figūros, kurios niekas negina.
+lesson.safety.ok = Puiku! Visada klausk savęs: ar ta figūra apginta?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Mano bokštas kontroliuoja visą antrąją horizontalę.
+lesson.danger.rule = Karalius niekada negali eiti į langelį, kuriame jį galėtų nukirsti.
+lesson.danger.ask = Perkelk karalių į saugų langelį.
+lesson.danger.ok = Teisingai. Ten tavo karalius saugus.
+lesson.check.what = Mano bokštas puola tavo karalių. Tai vadinama šachu.
+lesson.check.must = Kai tau šachas, turi nuo jo tuoj pat apsiginti.
+lesson.check.ways = Yra trys būdai: {@}pasitraukti karaliumi, {@2}užsidengti arba {@3}nukirsti puolančią figūrą.
+lesson.check.ask = Čia pasitrauk karaliumi nuo šacho.
+lesson.check.file = Langelis {to} vis dar {@}mano bokšto vertikalėje. Pasitrauk iš šios linijos.
+lesson.check.ok = Gerai: šacho nebėra.
+lesson.block.again = Vėl šachas! Šį kartą tavo karaliui nėra laisvo langelio.
+lesson.block.ask = Tada užsidenk: pastatyk figūrą puolimui ant kelio.
+lesson.block.queen = Užsidengta! Bet mano bokštas galėtų kirsti tavo valdovę. Užsidenk pigesne figūra.
+lesson.block.queen_ok = Pavyko. Įsimink: užsidenk pigiausia figūra.
+lesson.block.ok = Puiku. Užsidenk mažiausiai vertinga figūra.
+lesson.capture.check = Mano valdovė skelbia šachą visai šalia tavo karaliaus.
+lesson.capture.ask = Kirsk puolančią figūrą!
+lesson.capture.king_ok = Taip! Mano valdovė neturėjo gynėjo, todėl tavo karalius galėjo ją nukirsti.
+lesson.capture.knight_ok = Taip! Tavo žirgas pašalino puolančią figūrą.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Matas: karaliui paskelbtas šachas, ir jam nėra jokios išeities. Taip laimima partija.
+lesson.mate1.stuck = Mano karalius įstrigo už {@}savo pėstininkų.
+lesson.mate1.ask = Paskelbk man matą vienu ėjimu!
+lesson.mate1.wrong = Arti! Paskelbk šachą paskutinėje mano horizontalėje, iš kurios mano karalius negali pabėgti.
+lesson.mate1.ok = Matas! Tai matas paskutinėje horizontalėje. Įsimink jį!
+lesson.mate2.ask = Tavo karalius ir valdovė veikia kaip komanda. Paskelbk man matą vienu ėjimu.
+lesson.mate2.wrong = Rask šachą, po kurio mano karaliui neliks nė vieno langelio.
+lesson.mate2.ok = Matas! Tavo karalius gina valdovę, todėl manasis negali jos kirsti.
+lesson.mate2.ok_rank = Matas paskutinėje horizontalėje! Tavo karalius kontroliuoja visus langelius priešais manąjį.
+lesson.mate3.edge = Tavo bokštas septintojoje horizontalėje laiko mano karalių prie krašto.
+lesson.mate3.ask = Dabar paskelbk matą {your:refl_ins}.
+lesson.mate3.free = Šachas, bet septintoji horizontalė dabar laisva, ir mano karalius pabėga.
+lesson.mate3.takes = Mano karalius tiesiog kerta tavo bokštą.
+lesson.mate3.hint = Paskelbk šachą paskutinėje horizontalėje tuo bokštu, kuris nesaugo septintosios.
+lesson.mate3.ok = Matas! Du bokštai veikė kaip kopėčios.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rokiruotė – ypatingas ėjimas, kuris apsaugo tavo karalių. Karalius ir bokštas eina kartu.
+lesson.castle.how = {@}Karalius paeina du langelius bokšto link, o {@2}bokštas peršoka per jį ir atsistoja kitoje pusėje.
+lesson.castle.ask = Visada pirmiausia liesk karalių. Dabar tu: atlik rokiruotę karaliaus flange.
+lesson.castle.rook = Taip eina tik bokštas. Rokiruotei paeik karaliumi du langelius jo link.
+lesson.castle.long = Tai rokiruotė valdovės flange, irgi leistina! Šį kartą rokiruokis artimesnio bokšto link.
+lesson.castle.one = Vienu langeliu – paprastas karaliaus ėjimas. Per rokiruotę karalius paeina du.
+lesson.castle.other = Rokiruotei paeik karaliumi du langelius link bokšto, stovinčio langelyje {sq}.
+lesson.castle.ok = Rokiruotė atlikta! Tavo karalius saugiai paslėptas, o bokštas pasiruošęs žaisti.
+lesson.castle2.moved = Rokiruotis negalima, jei tavo karalius ar tas bokštas jau ėjo.
+lesson.castle2.attacked = Taip pat negalima, kai tau šachas, ar jei karalius pereitų per puolamą langelį arba atsidurtų jame.
+lesson.castle2.bishop = Mano rikis puola langelį {sq}. Todėl rokiruotis šiame flange dabar negalima.
+lesson.castle2.ask = Rokiruokis kitame flange.
+lesson.castle2.other = Rokiruokis kito savo bokšto link, valdovės flange.
+lesson.castle2.ok = Teisingai! Po ilgosios rokiruotės tavo karalius atsiduria langelyje {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Vienas ypatingas pėstininko kirtimas vadinamas kirtimu prasilenkiant, prancūziškai – en passant.
+lesson.ep.what.spoken = Vienas ypatingas pėstininko kirtimas vadinamas kirtimu prasilenkiant, prancūziškai – an pasan.
+lesson.ep.watch = Stebėk mano pėstininką: jis paeina du langelius ir atsiduria greta tavojo.
+lesson.ep.how = Tavo pėstininkas gali jį kirsti taip, lyg mano pėstininkas būtų paėjęs tik vieną langelį: į {sq}.
+lesson.ep.now = Bet tik dabar, šiuo ėjimu. Kirsk prasilenkiant!
+lesson.ep.gone = Proga praleista: kirsti prasilenkiant galima tik iškart. Pabandykime dar kartą.
+lesson.ep.ok = Kirtimas prasilenkiant! Mano pėstininkas langelyje {sq} nuimamas nuo lentos.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Kai pėstininkas pasiekia paskutinę horizontalę, jis virsta valdove, bokštu, rikiu arba žirgu.
+lesson.promo.ask = Beveik visada rinkis valdovę. Dabar atlik pėstininko virsmą!
+lesson.promo.under = Taip galima! Bet valdovė stipresnė. Rinkimės valdovę.
+lesson.promo.under_ok = Gerai. Vis dėlto dauguma žaidėjų renkasi valdovę.
+lesson.promo.push = Stumk pėstininką į paskutinę horizontalę, į {sq}.
+lesson.promo.ok = Nauja valdovė! Gali turėti net dvi valdoves vienu metu.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Mano ėjimas. Mano karaliui nėra šacho, bet {@}visi langeliai aplink jį puolami.
+lesson.stale.draw = Neturiu nė vieno leistino ėjimo. Tai patas, ir partija baigiasi lygiosiomis.
+lesson.stale2.ask = Kai laimi, saugokis pato. Paskelbk man matą vienu ėjimu, be pato!
+lesson.stale2.wrong = Paskelbk šachą paskutinėje mano horizontalėje, iš kurios mano karalius negali pabėgti.
+lesson.stale2.ok = Matas! Visada palik priešininko karaliui ėjimą, nebent skelbi matą.
+lesson.draws.kings = Kitos lygiosios: kai niekas negali paskelbti mato, pavyzdžiui, kai lentoje lieka tik du karaliai, partija baigiasi lygiosiomis.
+lesson.draws.agree = Žaidėjai taip pat gali susitarti dėl lygiųjų.
+lesson.draws.repeat = Lygiosios galimos ir tada, kai ta pati pozicija pasikartoja tris kartus arba kai penkiasdešimt ėjimų nebuvo nei kirtimų, nei pėstininkų ėjimų.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Dabar žinai visas šachmatų taisykles. Šaunu!
+lesson.talk.real = Papasakosiu, kaip žaidžiamos tikros partijos.
+lesson.talk.elo = Žaidėjai turi reitingą, vadinamą Elo. Kai laimi, jis kyla, o kai pralaimi, krinta.
+lesson.talk.elo_gap = Nugalėjus stipresnį žaidėją, gaunama daugiau taškų, o pralaimėjus silpnesniam, prarandama daugiau.
+lesson.talk.elo_start = Tavo reitingas atsiras po penkių reitinginių partijų. Partijos su treneriu – tai treniruotė, todėl jos neturi įtakos reitingui.
+lesson.talk.clock = Tai {@}šachmatų laikrodis. Kiekvienas žaidėjas turi savo laiką, kuris eina tik jo ėjimo metu.
+lesson.talk.press = Po ėjimo paspausk laikrodį ta pačia ranka. Tada pradeda eiti mano laikas.
+lesson.talk.flag = Jei tau baigsis laikas, pralaimėsi, nebent aš niekaip negalėčiau tau paskelbti mato.
+lesson.talk.increment = „Penki plius trys“ reiškia: kiekvienam po penkias minutes ir dar po tris sekundes už kiekvieną ėjimą.
+lesson.talk.speeds = Trumpos partijos vadinamos žaibo šachmatais, ilgesnės – greitaisiais, o pačios ilgiausios – klasikiniais.
+lesson.talk.no_clock = Su manimi laikrodis išjungtas. Galvok tiek, kiek reikia.
+lesson.talk.touch = Tikroje partijoje, jei paliesi savo figūrą, privalai ja eiti.
+lesson.talk.touch_mine = Jei paliesi mano figūrą, privalai ją kirsti, jei tik gali.
+lesson.talk.adjust = Jei nori tik pataisyti figūrą langelyje, pirma pasakyk „taisau“.
+lesson.talk.release = Kai tik paleidi figūrą naujame langelyje, ėjimas padarytas.
+lesson.talk.sheet = Turnyruose abu žaidėjai kiekvieną ėjimą užrašo {@}partijos blanke.
+# {move:letters} shows the Lithuanian scoresheet letters ("Žf3"), which is what this line teaches.
+lesson.talk.notation = Rašoma figūros raidė ir langelis, pavyzdžiui, {move:letters}. Pėstininko ėjimui – tik langelis.
+lesson.talk.robot = Tavo robotas užrašo ėjimus už tave. Greitose partijose užrašinėti nebūtina.
+lesson.talk.handshake = Partijos prasideda ir baigiasi rankos paspaudimu. Tai reiškia: gera partija, ačiū.
+lesson.talk.polite = Laimi ar pralaimi, visada elkis mandagiai ir niekada netrukdyk varžovui galvoti.
+lesson.talk.tips = Trys patarimai tavo partijoms: {@}kontroliuok centrą, {@2}išvesk žirgus ir rikius ir {@3}anksti rokiruokis.
+lesson.talk.next = Kai norėsi, pasirink lygį „Pirmieji žingsniai“. Žaisiu švelniai ir padėsiu po kiekvienos klaidos.
+lesson.talk.welcome = Sveikinu šachmatų pasaulyje! Paspauskime rankas.

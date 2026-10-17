@@ -1,0 +1,1439 @@
+# Scacelith - Tiếng Việt
+# Translation of assets/i18n/en.lang (same keys, same {n}). Vietnamese has a single plural form: a
+# noun after a number never changes ("1 nước", "3 nước").
+# Register: Vietnamese software (Microsoft, Apple): buttons, tabs and titles are short verbs or nouns
+# with no pronoun; the player is "bạn" when a pronoun is needed. Piece names are capitalised (Vua, Hậu,
+# Xe, Tượng, Mã, Tốt), and so are the sides as players (Trắng, Đen). Titles in capitals, every
+# diacritic kept. Time controls: Cờ siêu chớp (bullet), Cờ chớp (blitz), Cờ nhanh (rapid), Cờ tiêu
+# chuẩn (classical). "Friend" is "người bạn" / "bạn bè" (never "bạn của bạn"). Terms: glossary/vi.md.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Bật
+common.off = Tắt
+common.back = Quay lại
+common.apply = Áp dụng
+common.discard = Bỏ thay đổi
+common.cancel = Hủy
+common.white = Trắng
+common.black = Đen
+common.main_menu = Menu chính
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Trò chơi của bậc vương giả
+menu.new_game = Ván mới
+menu.options = Tùy chọn
+menu.credits = Ghi công
+menu.quit = Thoát
+menu.version = Phiên bản {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = TÙY CHỌN
+options.tab.display = Hiển thị
+options.tab.graphics = Đồ họa
+options.tab.audio = Âm thanh
+options.tab.gameplay = Lối chơi
+options.tab.player = Người chơi
+options.tab.controls = Điều khiển
+options.pending = Thay đổi có hiệu lực sau khi được áp dụng.
+options.unsaved.title = THAY ĐỔI CHƯA ÁP DỤNG
+options.unsaved.text = Một số tùy chọn đã được thay đổi. Áp dụng trước khi rời đi?
+
+options.language = Ngôn ngữ
+options.language.help = Ngôn ngữ của menu và thông báo. Thay đổi có hiệu lực ngay lập tức.
+options.language.not_adapted = Ngôn ngữ này chưa được hoàn thiện: giọng huấn luyện viên có thể phát âm sai một số từ và một số câu chữ có thể vẫn chưa tự nhiên.
+options.display_mode = Chế độ hiển thị
+options.display_mode.help = Toàn màn hình: một cửa sổ không viền phủ kín màn hình, ở độ phân giải của màn hình nền. Cửa sổ: một cửa sổ có kích thước chọn bên dưới.
+options.fullscreen = Toàn màn hình
+options.windowed = Cửa sổ
+options.window_size = Kích thước cửa sổ
+options.window_size.help = Kích thước của cửa sổ ở chế độ Cửa sổ. Chế độ Toàn màn hình luôn dùng độ phân giải của màn hình nền.
+options.vsync = Đồng bộ dọc
+options.vsync.help = Đồng bộ khung hình với màn hình để tránh hiện tượng xé hình.
+options.render_scale = Tỷ lệ kết xuất
+options.render_scale.help = Độ phân giải nội bộ của hình ảnh 3D. Thấp hơn thì nhanh hơn, cao hơn thì sắc nét hơn.
+
+options.quality = Chất lượng
+options.quality.very_low = Rất thấp
+options.quality.low = Thấp
+options.quality.medium = Trung bình
+options.quality.high = Cao
+options.quality.ultra = Cực cao
+options.quality.custom = Tùy chỉnh
+options.quality.help = Đặt cùng lúc mọi tùy chọn bên dưới: Rất thấp tắt mọi hiệu ứng, Cực cao đặt tất cả ở mức tối đa. Thay đổi riêng một tùy chọn sẽ chuyển chất lượng sang Tùy chỉnh. Với card đồ họa cấu hình khiêm tốn, giảm tỷ lệ kết xuất (Hiển thị) cũng giúp ích rất nhiều.
+options.shadows = Bóng đổ
+options.shadows.help = Độ chi tiết của bóng nắng và độ mềm của viền bóng. Thấp: viền đơn giản, vẽ nhanh.
+options.reflections = Phản chiếu
+options.reflections.help = Sàn nhà, mặt bàn và bàn cờ phản chiếu căn phòng (căn phòng được vẽ thêm một lần cho mỗi bề mặt: thuộc nhóm tùy chọn nặng nhất); từ mức Trung bình, các quân cờ và đồ vật bóng loáng cũng phản chiếu những gì xung quanh.
+options.ambient_occlusion = Che khuất môi trường
+options.ambient_occlusion.help = Đổ bóng mềm ở nơi các vật tiếp giáp nhau và trong các hốc, nơi ít ánh sáng lọt vào.
+options.indirect_light = Ánh sáng gián tiếp
+options.indirect_light.help = Ánh sáng ban ngày dội lại từ tường, sàn và trần nhà. Thấp: thay bằng ánh sáng môi trường đồng đều. Chủ yếu ảnh hưởng đến thời gian tải.
+options.volumetric_light = Chùm tia sáng
+options.volumetric_light.help = Những chùm nắng xuyên qua không khí bụi bặm của đại sảnh, và những hạt bụi lấp lánh trong đó.
+options.tessellation = Chia nhỏ đa giác
+options.tessellation.help = Đường viền mượt trên các phần cong của quân cờ khi nhìn gần.
+options.tessellation.unavailable = Không khả dụng: trình điều khiển đồ họa này không hỗ trợ chia nhỏ đa giác (tessellation).
+options.antialiasing = Khử răng cưa
+options.antialiasing.help = Làm mượt các cạnh răng cưa và các điểm sáng nhấp nháy. Tắt: sắc nét hơn nhưng có răng cưa, và một số hiệu ứng trông bị nhiễu hạt.
+options.depth_of_field = Độ sâu trường ảnh
+options.depth_of_field.help = Làm mờ những gì nằm khá xa phía trước hoặc phía sau vật bạn đang nhìn, như ống kính máy ảnh.
+options.motion_blur = Nhòe chuyển động
+options.motion_blur.help = Làm nhòe các chuyển động nhanh của camera và cánh tay, như máy quay phim.
+options.bloom = Tỏa sáng
+options.bloom.help = Quầng sáng dịu quanh những điểm sáng nhất, như qua ống kính máy ảnh.
+options.brightness = Độ sáng
+options.brightness.neutral = Trung tính
+options.brightness.value = {0} EV
+options.brightness.help = Bù phơi sáng của camera. Bước hiệu chỉnh ở lần khởi động đầu tiên đặt giá trị này sao cho những vùng tối nhất chỉ vừa đủ nhìn thấy.
+
+options.master_volume = Âm lượng tổng
+options.effects = Hiệu ứng
+options.ambience = Âm thanh nền
+options.ambience.help = Tiếng rì rầm của đại sảnh: tiếng lửa cháy, tiếng bước chân xa xa, chiếc đồng hồ cổ.
+options.ambience_volume = Âm lượng âm thanh nền
+options.voice_volume = Âm lượng giọng nói
+options.voice_volume.help = Âm lượng giọng nói của huấn luyện viên ở chế độ Huấn luyện viên.
+options.subtitles = Phụ đề
+options.subtitles.auto = Tự động
+options.subtitles.help = Lời của huấn luyện viên, hiển thị ở cuối màn hình. Tự động: hiện khi huấn luyện viên không nói ngôn ngữ của menu (với menu tiếng Trung, huấn luyện viên nói tiếng Anh). Luôn hiện khi giọng nói chưa được cài đặt.
+
+options.legal_moves = Hiện nước đi hợp lệ
+options.legal_moves.help = Đánh dấu các ô mà quân vừa chạm có thể đi tới. Khi tắt, không có gì cho bạn biết một nước đi có hợp lệ hay không: nước đi không hợp lệ sẽ bị trọng tài phạt ngay khi bạn bấm đồng hồ.
+options.coordinates = Tọa độ bàn cờ
+options.auto_press = Tự động bấm đồng hồ
+options.auto_press.help = Robot của bạn tự bấm đồng hồ ngay khi nước đi của bạn đã nằm trên bàn cờ. Trong ván trực tuyến, máy chủ quyết định việc này; trong trận đấu trực tiếp, người tạo ván quyết định.
+options.thinking_time = Thời gian suy nghĩ thực tế
+options.thinking_time.help = Đối thủ của bạn dành thời gian suy nghĩ như người thật thay vì đi ngay lập tức.
+options.ignore_head = Bỏ qua chuyển động đầu của đối thủ
+options.ignore_head.help = Trong ván trực tuyến và trận đấu trực tiếp, robot của đối thủ nhìn theo hướng người chơi điều khiển nó đang nhìn. Khi bật, robot tự chuyển động đầu, như khi đấu với Stockfish.
+options.mouse_sensitivity = Độ nhạy chuột
+options.invert_look = Đảo ngược trục nhìn dọc
+options.handover = Chuyển lượt (hai người)
+options.handover.cut = Chuyển tức thì
+options.handover.flight = Camera bay, {0} giây
+options.handover.help = Hai người chơi trên một máy tính: cách góc nhìn chuyển từ mắt người chơi này sang người chơi kia sau mỗi nước đi. Chuyển tức thì giúp tránh chuyển động của camera.
+options.game_cursor = Con trỏ trò chơi
+options.game_cursor.help = Tại bàn cờ, trò chơi vẽ con trỏ riêng, cho biết một cú nhấp chuột sẽ làm gì. Tắt: mũi tên thông thường của hệ thống.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Tên
+player.name.help = Tên của bạn được ghi ở đầu biên bản ván đấu, bằng bất kỳ hệ chữ nào.
+player.default_name = Người chơi
+player.handwriting = Nét chữ
+player.handwriting.help = Nét chữ ghi lại các nước đi của bạn. Tiếng Ả Rập, tiếng Nhật và tiếng Trung được viết bằng nét chữ riêng.
+player.preview = TRÊN BIÊN BẢN CỦA BẠN
+hand.caveat = Phóng khoáng
+hand.marck = Liền nét
+hand.badscript = Nghiêng
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Nhấp chuột trái
+controls.touch = Chạm vào một quân, rồi di chuyển nó
+controls.clock.keys = Phím cách  hoặc  nhấp vào đồng hồ
+controls.clock = Bấm đồng hồ
+controls.look.keys = Giữ chuột phải
+controls.look = Nhìn xung quanh
+controls.sheet.keys = S
+controls.sheet = Xem biên bản ván đấu, rồi quay lại
+controls.stand.keys = ↑
+controls.stand = Đứng dậy trước ghế
+controls.side.keys = ←  /  →
+controls.side = Đứng ở đầu bàn bên trái / bên phải
+controls.sit.keys = ↓
+controls.sit = Ngồi xuống lại (bạn chỉ chơi khi ngồi)
+controls.moves.keys = Tab
+controls.moves = Hiện hoặc ẩn danh sách nước đi
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Phím cách
+controls.coach_skip = Huấn luyện viên: bỏ qua lời đang nói
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Huấn luyện viên: đi lại nước vừa rồi khi được đề nghị
+controls.coach_hint.keys = H
+controls.coach_hint = Thử thách của huấn luyện viên: xin gợi ý
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = ĐỘ SÁNG
+calibration.text = Kéo thanh trượt cho đến khi con Mã trên ô đen chỉ vừa đủ nhìn thấy, hoặc không còn nhìn thấy nữa.
+calibration.later = Bạn có thể thay đổi sau trong Tùy chọn > Đồ họa.
+calibration.continue = Tiếp tục
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = VÁN MỚI
+newgame.opponent = ĐỐI THỦ
+newgame.time_control = THỜI GIAN THI ĐẤU
+newgame.start = Bắt đầu
+newgame.elo = ~{0} Elo
+newgame.you_white = Bạn sẽ chơi bên Trắng.
+newgame.you_black = Bạn sẽ chơi bên Đen.
+newgame.colour_lot = Màu quân của ván đầu tiên được bốc thăm.
+newgame.colour_alternate = Sau đó màu quân luân phiên từ ván này sang ván sau.
+newgame.opponent_kind = Đối thủ
+newgame.opponent_kind.help = Đấu với Stockfish, hoặc với một người bạn ngồi cùng máy tính này: hai người lần lượt đi, mỗi người từ phía bàn cờ của mình.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Người chơi, cùng máy
+
+# Custom opponent: Stockfish parameters
+engine.skill = Cấp độ kỹ năng
+engine.skill.help = “Skill Level” của Stockfish (0–20). Bị bỏ qua khi sức mạnh được giới hạn theo Elo.
+engine.limit_elo = Giới hạn sức mạnh (Elo)
+engine.limit_elo.help = UCI_LimitStrength: chương trình cờ nhắm tới hệ số Elo bên dưới.
+engine.elo = Elo
+engine.depth = Độ sâu tìm kiếm
+engine.plies = {0} nửa nước
+engine.move_time = Thời gian mỗi nước
+engine.nodes = Giới hạn số nút
+engine.no_limit = Tắt
+engine.thousand = {0} nghìn
+engine.million = {0} triệu
+engine.dynamic_elo = Elo thay đổi theo đồng hồ
+engine.dynamic_elo.help = Như người chơi thật, Stockfish chơi yếu hơn khi đồng hồ sắp hết giờ: yếu đi một chút ở phút cuối cùng (sớm hơn trong cờ nhanh và cờ chớp), yếu đi nhiều khi bị thiếu thời gian trầm trọng. Chỉ áp dụng cho ván có đồng hồ.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish suy nghĩ lâu như một người chơi ở trình độ tương ứng. Để bỏ khoảng dừng này: Tùy chọn > Lối chơi > Thời gian suy nghĩ thực tế.
+engine.pace.instant = Stockfish đi ngay khi tính xong. Để có khoảng dừng như người thật: Tùy chọn > Lối chơi > Thời gian suy nghĩ thực tế.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Không giới hạn
+tc.no_clock = Không đồng hồ
+tc.bullet = Cờ siêu chớp
+tc.blitz = Cờ chớp
+tc.rapid = Cờ nhanh
+tc.classical = Cờ tiêu chuẩn
+tc.custom = Tùy chỉnh
+tc.your_own = Tự chọn
+tc.base_time = Thời gian cơ bản
+tc.base_time.help = Thời gian ban đầu trên mỗi đồng hồ (phút : giây).
+tc.increment = Cộng thêm
+tc.increment.help = Thời gian cộng thêm kiểu Fischer sau mỗi nước đi.
+tc.delay = Độ trễ
+tc.delay.help = Độ trễ kiểu Bronstein: thời gian đã dùng, tối đa bằng độ trễ này, được trả lại sau mỗi nước đi.
+tc.no_delay = Tắt
+tc.seconds = {0} giây
+tc.minutes = {0} phút
+tc.summary_increment = {0} + {1} giây
+tc.summary_delay = {0}, trễ {1} giây
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Mới tập chơi
+preset.novice.desc = Vừa học cách đi quân: để quân bị ăn không và bỏ sót những mối đe dọa đơn giản.
+preset.beginner.name = Người mới chơi
+preset.beginner.desc = Nắm được những điều cơ bản, nhưng vẫn thường mất quân vì sai lầm nghiêm trọng.
+preset.casual.name = Giải trí
+preset.casual.desc = Đối thủ thư thả cho buổi tối: nước đi hợp lý, sai lầm thường xuyên.
+preset.club_player.name = Kỳ thủ câu lạc bộ
+preset.club_player.desc = Kỳ thủ câu lạc bộ vững vàng, biết trừng phạt những sai lầm hiển nhiên.
+preset.advanced.name = Nâng cao
+preset.advanced.desc = Kỳ thủ câu lạc bộ mạnh với nhãn quan chiến thuật sắc bén.
+preset.expert.name = Chuyên gia
+preset.expert.desc = Chuyên gia thi đấu: hiếm khi sai sót, biết biến ưu thế thành chiến thắng.
+preset.master.name = Kiện tướng
+preset.master.desc = Trình độ kiện tướng: tính toán sâu và lối chơi thế trận tinh tế.
+preset.grandmaster.name = Đại kiện tướng
+preset.grandmaster.desc = Trình độ đại kiện tướng: cực kỳ khó đánh bại.
+preset.stockfish_max.name = Stockfish tối đa
+preset.stockfish_max.desc = Stockfish 19 với toàn bộ sức mạnh. Chúc may mắn.
+preset.custom.name = Tùy chỉnh
+preset.custom.desc = Thiết lập chương trình cờ theo ý bạn.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = GHI CÔNG
+credits.game.head = SCACELITH
+credits.game = Một ván cờ trong đại sảnh hoàng gia, trên bộ máy đồ họa OpenGL 4.6 tự phát triển.
+credits.engine.head = CHƯƠNG TRÌNH CỜ
+credits.engine = Stockfish 19, của các nhà phát triển Stockfish.
+credits.engine.licence = Giấy phép GNU General Public License v3.
+credits.engine.data = Mạng nơ-ron của Stockfish được huấn luyện trên dữ liệu do dự án Leela Chess Zero cung cấp; dữ liệu này được phát hành theo giấy phép Open Database License (ODbL).
+credits.voice.head = GIỌNG HUẤN LUYỆN VIÊN
+credits.voice = Giọng nói tổng hợp do Supertonic 3 tạo ra cho chế độ Huấn luyện viên.
+credits.voice.licence = Supertonic 3 là mô hình của Supertone, được sử dụng theo giấy phép OpenRAIL-M; các hạn chế sử dụng của giấy phép này áp dụng cho mọi người dùng mô hình (xem Giấy phép).
+credits.openings.head = KHAI CUỘC
+credits.openings = Tên các khai cuộc lấy từ cơ sở dữ liệu chess-openings của lichess.org, được đưa vào phạm vi công cộng (CC0).
+credits.fonts.head = PHÔNG CHỮ
+credits.fonts = EB Garamond của Georg Duffner và Cinzel của Natanael Gama; Amiri của Khaled Hosny.
+credits.fonts.hand = Chữ viết tay: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Hình quân cờ từ GNU FreeFont (GPL v3 kèm ngoại lệ phông chữ).
+credits.quote = “Cờ vua là nghệ thuật phân tích.”  — Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Giấy phép
+licences.title = GIẤY PHÉP
+licences.note = Các giấy phép được hiển thị bằng nguyên bản tiếng Anh.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = TẠM DỪNG
+pause.resume = Tiếp tục
+pause.offer_draw = Cầu hòa
+pause.claim_draw = Yêu cầu xử hòa
+pause.claim_draw.help = Lặp lại thế cờ ba lần hoặc luật 50 nước.
+pause.resign = Xin thua
+confirm.resign.title = XIN THUA
+confirm.resign.text = Xin thua ván này? Đối thủ của bạn sẽ được xử thắng.
+confirm.resign.draw = Xin thua ván này? Đối thủ của bạn không còn khả năng chiếu hết: ván cờ sẽ được xử hòa.
+confirm.resign.ok = Xin thua
+confirm.leave.title = RỜI VÁN CỜ
+confirm.leave.text = Quay về menu chính? Ván cờ hiện tại sẽ bị bỏ dở.
+confirm.leave.ok = Rời đi
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PHONG CẤP THÀNH
+piece.queen = Hậu
+piece.rook = Xe
+piece.bishop = Tượng
+piece.knight = Mã
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Ván cờ hòa.
+gameover.draw_moves = Ván cờ hòa sau {0} nước.
+gameover.win = Chơi hay lắm — bạn đã thắng.
+gameover.win_moves = Chơi hay lắm — bạn thắng sau {0} nước.
+gameover.loss = Đối thủ của bạn thắng.
+gameover.loss_moves = Đối thủ của bạn thắng sau {0} nước.
+gameover.rematch = Tái đấu
+gameover.view_board = Xem bàn cờ
+gameover.show = Hiện
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Chiếu hết
+reason.resignation = Xin thua
+reason.timeout = Thua do hết giờ
+reason.illegal_moves = Nước đi không hợp lệ thứ hai (xử thua)
+reason.stalemate = Hết nước đi
+reason.insufficient = Thế cờ chết (không đủ lực lượng)
+reason.timeout_vs_insufficient = Hết giờ, nhưng đối thủ không thể chiếu hết
+reason.fivefold = Lặp lại thế cờ năm lần
+reason.75_moves = Luật 75 nước
+reason.threefold_claim = Lặp lại thế cờ ba lần (theo yêu cầu)
+reason.50_moves_claim = Luật 50 nước (theo yêu cầu)
+reason.agreement = Hòa theo thỏa thuận
+reason.illegal_vs_insufficient = Nước đi không hợp lệ thứ hai, nhưng đối thủ không thể chiếu hết
+reason.resignation_vs_insufficient = Xin thua, nhưng đối thủ không thể chiếu hết
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = NƯỚC ĐI
+movelist.empty = Chưa có nước đi nào.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Chuẩn bị vật liệu
+loading.hall = Dựng đại sảnh
+loading.furniture = Chạm khắc bàn ghế
+loading.board = Đánh bóng bàn cờ
+loading.pieces = Tiện bộ quân cờ
+loading.clock = Lắp ráp đồng hồ
+loading.porcelain = Nung đồ sứ
+loading.ready = Sẵn sàng
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Không thể yêu cầu xử hòa ở thế cờ này.
+notify.flag_you = Bạn đã hết giờ.
+notify.flag_opponent = Đối thủ của bạn đã hết giờ.
+notify.touched.pawn = Luật chạm quân: bạn phải đi con Tốt đã chạm.
+notify.touched.knight = Luật chạm quân: bạn phải đi con Mã đã chạm.
+notify.touched.bishop = Luật chạm quân: bạn phải đi con Tượng đã chạm.
+notify.touched.rook = Luật chạm quân: bạn phải đi con Xe đã chạm.
+notify.touched.queen = Luật chạm quân: bạn phải đi con Hậu đã chạm.
+notify.touched.king = Luật chạm quân: bạn phải đi con Vua đã chạm.
+notify.touched.piece = Luật chạm quân: bạn phải đi quân đã chạm.
+notify.touched_square = Luật chạm quân: bạn phải đi quân ở ô {0}.
+notify.press_clock = Bấm đồng hồ để hoàn tất nước đi (phím cách).
+notify.manual_clock = Trong ván này, hãy tự bấm đồng hồ sau mỗi nước đi.
+notify.illegal = Nước đi không hợp lệ.
+notify.cannot_move = Không thể thực hiện nước đi đó.
+notify.move_first = Hãy đi quân trước khi bấm đồng hồ.
+notify.stance.sit_to_play = Ngồi xuống để chơi (phím mũi tên xuống).
+notify.stance.first = Đồng hồ vẫn chạy khi bạn đứng. Mũi tên xuống: ngồi xuống lại.
+notify.stance.first_untimed = Bạn chỉ chơi được khi ngồi trên ghế. Mũi tên xuống: ngồi xuống lại.
+notify.stance.finish_move = Hãy hoàn tất nước đi trước.
+notify.draw_already_offered = Bạn đã cầu hòa ở nước này rồi.
+notify.draw_accepted = Đối thủ của bạn chấp nhận hòa.
+notify.draw_declined = Đối thủ của bạn từ chối lời cầu hòa.
+notify.draw_claimed = Đối thủ của bạn yêu cầu xử hòa.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Trọng tài: đồng hồ đã được bấm mà chưa đi quân, việc này được tính là một nước đi không hợp lệ.
+arbiter.unpromoted = Trọng tài: nước đi không hợp lệ, con Tốt chưa được thay bằng quân mới trước khi bấm đồng hồ.
+arbiter.illegal = Trọng tài: nước đi không hợp lệ.
+arbiter.second_loses.white = Đây là nước đi không hợp lệ thứ hai của Trắng: Trắng thua ván cờ.
+arbiter.second_loses.black = Đây là nước đi không hợp lệ thứ hai của Đen: Đen thua ván cờ.
+arbiter.second_draw.white = Đây là nước đi không hợp lệ thứ hai của Trắng, nhưng Đen không thể chiếu hết: ván cờ hòa.
+arbiter.second_draw.black = Đây là nước đi không hợp lệ thứ hai của Đen, nhưng Trắng không thể chiếu hết: ván cờ hòa.
+arbiter.queen = Con Tốt được phong Hậu.
+arbiter.queen_one_minute.white = Con Tốt được phong Hậu và Trắng được cộng thêm một phút.
+arbiter.queen_one_minute.black = Con Tốt được phong Hậu và Đen được cộng thêm một phút.
+arbiter.queen_two_minutes.white = Con Tốt được phong Hậu và Trắng được cộng thêm hai phút.
+arbiter.queen_two_minutes.black = Con Tốt được phong Hậu và Đen được cộng thêm hai phút.
+arbiter.restored = Thế cờ được khôi phục.
+arbiter.restored_one_minute.white = Thế cờ được khôi phục và Trắng được cộng thêm một phút.
+arbiter.restored_one_minute.black = Thế cờ được khôi phục và Đen được cộng thêm một phút.
+arbiter.restored_two_minutes.white = Thế cờ được khôi phục và Trắng được cộng thêm hai phút.
+arbiter.restored_two_minutes.black = Thế cờ được khôi phục và Đen được cộng thêm hai phút.
+arbiter.one_minute.white = Trắng được cộng thêm một phút.
+arbiter.one_minute.black = Đen được cộng thêm một phút.
+arbiter.two_minutes.white = Trắng được cộng thêm hai phút.
+arbiter.two_minutes.black = Đen được cộng thêm hai phút.
+arbiter.second_loses = Đi nước không hợp lệ lần thứ hai sẽ bị xử thua.
+arbiter.touched.white = Trắng phải đi quân đã chạm.
+arbiter.touched.black = Đen phải đi quân đã chạm.
+arbiter.game_over = Ván cờ đã kết thúc.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Xem ván cờ
+
+viewer.title = XEM VÁN CỜ
+viewer.white = TRẮNG
+viewer.black = ĐEN
+viewer.time_control = THỜI GIAN THI ĐẤU
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Đổi màu quân
+viewer.note = Cả hai bên đều do Stockfish cầm quân. Hãy tự do bay quanh đại sảnh trong khi ván cờ diễn ra: không ai nhìn thấy bạn.
+viewer.summary = {0} đấu {1}
+viewer.custom = Tùy chỉnh
+viewer.tc.custom = Tự chọn
+viewer.base_time = Thời gian cơ bản
+viewer.increment = Cộng thêm
+viewer.delay = Độ trễ
+viewer.off = Tắt
+viewer.minutes = {0} phút
+viewer.seconds = {0} giây
+viewer.delay_summary = trễ {0} giây
+viewer.back = Quay lại
+viewer.start = Bắt đầu
+
+viewer.paused = TẠM DỪNG
+viewer.resume = Tiếp tục
+viewer.options = Tùy chọn
+viewer.main_menu = Menu chính
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = ĐIỀU KHIỂN
+viewer.keys.move = W A S D  ·  Z Q S D  ·  phím mũi tên
+viewer.controls.move = Di chuyển
+viewer.keys.updown = E, phím cách  /  C, Ctrl
+viewer.controls.updown = Lên / xuống
+viewer.keys.fast = Shift
+viewer.controls.fast = Nhanh hơn
+viewer.keys.look = Nút chuột phải
+viewer.controls.look = Nhìn xung quanh
+viewer.keys.speed = Con lăn chuột
+viewer.controls.speed = Tốc độ
+viewer.keys.views = 1 – 9
+viewer.controls.views = Góc nhìn
+viewer.keys.eyes = 0
+viewer.controls.eyes = Qua mắt người chơi đến lượt đi
+viewer.keys.moves = Tab
+viewer.controls.moves = Danh sách nước đi
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Ẩn bảng hướng dẫn này
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Tạm dừng / tiếp tục
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Lùi / tiến một nước
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Chậm hơn / nhanh hơn
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Đầu / cuối ván cờ
+viewer.speed = Tốc độ {0} m/s
+viewer.view.0 = Qua mắt người chơi
+viewer.view.1 = Bên cạnh bàn
+viewer.view.2 = Phía trên bàn cờ
+viewer.view.3 = Đại sảnh
+viewer.view.4 = Đồng hồ
+viewer.view.5 = Gương mặt bên Trắng
+viewer.view.6 = Gương mặt bên Đen
+viewer.view.7 = Cuộc song đấu
+viewer.view.8 = Những ô cửa sổ
+viewer.view.9 = Những tấm thảm treo tường
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Trắng
+viewer.side.black = Đen
+viewer.flag.white = Trắng đã hết giờ.
+viewer.flag.black = Đen đã hết giờ.
+viewer.claims_draw = {0} yêu cầu xử hòa.
+viewer.offer_accepted = {0} cầu hòa, {1} chấp nhận.
+viewer.offer_declined = {0} cầu hòa, {1} từ chối.
+viewer.gameover.white_wins = Trắng thắng sau nước thứ {0}.
+viewer.gameover.black_wins = Đen thắng sau nước thứ {0}.
+viewer.gameover.draw = Ván cờ hòa sau nước thứ {0}.
+viewer.gameover.players = {0} đấu với {1}
+viewer.watch_again = Xem lại
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Chưa có ván tính điểm nào
+elo.provisional = Hệ số tạm thời
+elo.peak = Cao nhất {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo của bạn: {0}
+elo.expected = điểm kỳ vọng {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ván này không tính điểm
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Biên bản ván đấu
+scoresheet.event = Giải đấu
+scoresheet.date = Ngày
+scoresheet.round = Vòng
+scoresheet.board = Bàn
+scoresheet.page = Trang
+scoresheet.white = Trắng
+scoresheet.black = Đen
+scoresheet.elo = Elo
+scoresheet.result = Kết quả
+scoresheet.move_no = STT
+scoresheet.sign_white = Chữ ký bên Trắng
+scoresheet.sign_black = Chữ ký bên Đen
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = V H X T M
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Chơi trực tuyến
+online.title = CHƠI TRỰC TUYẾN
+online.continue = Tiếp tục
+online.retry = Thử lại
+online.copy = Sao chép
+online.copied = Đã sao chép
+online.copy.unavailable = Không thể sao chép ở đây: vui lòng ghi lại.
+online.rated = Tính điểm
+online.casual = Giao hữu
+online.casual_only = Chỉ giao hữu
+online.color.random = Bốc thăm
+online.ping = {0} ms
+online.conn.online = Đã kết nối
+online.conn.connecting = Đang kết nối…
+online.conn.reconnecting = Đang kết nối lại…
+online.conn.offline = Chưa kết nối
+online.conn.incompatible = Khác phiên bản
+online.no_server.text = Chơi trực tuyến cần một máy chủ Scacelith. Hãy nhập địa chỉ máy chủ trong phần tùy chọn, hoặc chơi thẳng với một người bạn bằng chế độ Đấu trực tiếp.
+online.no_server.settings = Cài đặt máy chủ
+
+# Options > Online server
+options.tab.online = Máy chủ trực tuyến
+options.online.server = Máy chủ
+options.online.server.help = Máy chủ chính thức, hoặc một máy chủ tùy chỉnh (của cộng đồng) do người khác vận hành, kết nối qua API web bảo mật và WebSocket bảo mật của máy chủ đó. Bạn đăng nhập riêng trên từng máy chủ: tài khoản và thông tin đăng nhập không bao giờ được dùng chung giữa các máy chủ.
+options.online.official = Máy chủ chính thức — {0}
+options.online.community = Máy chủ tùy chỉnh
+options.online.host = Địa chỉ
+options.online.host.hint = tên miền hoặc địa chỉ IP
+options.online.host.help = Tên miền hoặc địa chỉ IP của máy chủ tùy chỉnh, đúng như chủ sở hữu máy chủ đã cung cấp.
+options.online.api_port = Cổng HTTPS / API
+options.online.api_port.help = Cổng của API web bảo mật trên máy chủ (443 trên các máy chủ Scacelith).
+options.online.ws_port = Cổng WSS
+options.online.ws_port.hint = giống cổng API
+options.online.ws_port.help = Cổng WebSocket bảo mật của máy chủ. Để trống nếu trùng với cổng API.
+options.online.pin = Dấu vân tay chứng chỉ (SHA-256)
+options.online.pin.hint = không bắt buộc
+options.online.pin.help = Dành cho máy chủ có chứng chỉ tự ký: dấu vân tay SHA-256 do chủ sở hữu máy chủ cung cấp (64 ký tự thập lục phân, được phép có dấu hai chấm). Để trống để tin cậy các chứng chỉ của hệ thống.
+options.online.pin.invalid = Dấu vân tay gồm 64 ký tự thập lục phân (được phép có dấu hai chấm).
+options.online.test = Kiểm tra kết nối
+options.online.test_ok = {0}: đã kết nối, tương thích với phiên bản này.
+options.online.test_incompatible = {0}: đã kết nối, nhưng máy chủ cần một phiên bản Scacelith khác.
+options.online.in_game = Không thể đổi máy chủ trong khi đang chơi ván trực tuyến.
+options.online.remember_session = Ghi nhớ đăng nhập khi không có kho khóa của hệ thống
+options.online.remember_session.help = Khi không có kho khóa hệ thống nào (GNOME Keyring, KWallet…) lưu giữ được phiên đăng nhập của bạn, phiên được lưu trong một tệp mà chỉ tài khoản người dùng của bạn đọc được. Bất kỳ ai đọc được các tệp của bạn, hoặc một bản sao của chúng như bản sao lưu, đều có thể dùng phiên đó. Tắt: bạn vẫn đăng nhập cho đến khi đóng trò chơi. Bạn có thể đăng xuất bất kỳ thiết bị nào trong mục Thiết bị đã đăng nhập, trong tài khoản của bạn.
+
+# Sign in, create an account
+online.signin.lead = Đăng nhập vào {0} để chơi với người khác qua mạng.
+online.field.user = Tên người dùng hoặc email
+online.field.user.hint = tên hoặc địa chỉ
+online.field.password = Mật khẩu
+online.field.password.hint = ít nhất 10 ký tự
+online.field.password2 = Xác nhận mật khẩu
+online.field.current_password = Mật khẩu hiện tại
+online.field.new_password = Mật khẩu mới
+online.field.username = Tên người dùng
+online.field.username.hint = 3 đến 24 chữ cái, chữ số, _ hoặc -
+online.field.email = Email
+online.field.new_email = Email mới
+online.field.code = Mã xác thực
+online.field.code.hint = 6 chữ số hoặc mã khôi phục
+online.field.code6 = Mã từ ứng dụng
+online.field.code6.hint = 6 chữ số
+online.signin.button = Đăng nhập
+online.signin.google = Tiếp tục với Google
+online.signin.register = Tạo tài khoản
+online.signin.forgot = Quên mật khẩu?
+online.mfa.title = MÃ XÁC THỰC HAI YẾU TỐ
+online.mfa.lead = Nhập mã 6 chữ số hiển thị trong ứng dụng xác thực của bạn, hoặc một trong các mã khôi phục.
+online.mfa.verify = Xác minh
+online.register.title = TẠO TÀI KHOẢN
+online.register.lead = Tài khoản miễn phí trên {0}: tên, hệ số Elo và các ván cờ của bạn chỉ được lưu trên máy chủ này.
+online.register.button = Tạo tài khoản
+online.register.working = Đang tạo tài khoản… việc này có thể mất vài giây.
+online.register.ready = Tài khoản của bạn đã sẵn sàng. Hãy đăng nhập để chơi.
+online.password.mismatch = Hai mật khẩu không khớp nhau.
+online.check_email.title = KIỂM TRA EMAIL
+online.check_email.text = Chúng tôi đã gửi một liên kết tới {0}. Hãy mở liên kết đó để kích hoạt tài khoản, rồi đăng nhập tại đây.
+online.check_email.ask = Nhập địa chỉ email của tài khoản để nhận lại liên kết kích hoạt.
+online.check_email.resend = Gửi lại email
+online.check_email.resent = Email đã được gửi lại. Có thể mất vài phút; hãy kiểm tra cả thư mục thư rác.
+online.forgot.title = QUÊN MẬT KHẨU
+online.forgot.lead = Nhập địa chỉ email của tài khoản: chúng tôi sẽ gửi cho bạn một liên kết để chọn mật khẩu mới.
+online.forgot.button = Gửi liên kết
+online.forgot.sent = Nếu có tài khoản dùng địa chỉ này, một liên kết đang được gửi tới.
+online.sso.title = ĐĂNG NHẬP BẰNG GOOGLE
+online.sso.wait = Hãy tiếp tục trong trình duyệt web: chọn tài khoản Google của bạn trong cửa sổ vừa mở. Scacelith sẽ tiếp tục ngay khi Google đưa bạn trở lại.
+online.sso.name_title = CHỌN TÊN CỦA BẠN
+online.sso.name_lead = Đây là lần đầu bạn đến đây bằng Google. Hãy chọn tên mà những người chơi khác sẽ thấy.
+online.sso.continue = Tiếp tục
+online.sso.finishing = Google đã đưa bạn trở lại. Đang hoàn tất đăng nhập…
+online.sso.link_title = THÊM ĐĂNG NHẬP BẰNG GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Tài khoản {0} trên {1} đã dùng địa chỉ email của tài khoản Google này. Nhập mật khẩu của tài khoản đó để thêm đăng nhập bằng Google vào tài khoản. Bạn chỉ cần làm việc này một lần.
+online.sso.link_button = Thêm đăng nhập Google
+online.sso.link_mfa = Đăng nhập bằng Google sẽ được thêm vào tài khoản này khi mã được chấp nhận.
+online.sso.not_mine = Đây không phải tài khoản của tôi
+online.sso.not_mine_note = Chưa thêm đăng nhập bằng Google. Nếu địa chỉ email này là của bạn, hãy dùng “Quên mật khẩu?” với địa chỉ đó: liên kết sẽ được gửi tới hộp thư đó. Nếu tài khoản còn yêu cầu mã xác thực hai yếu tố mà bạn không có, hãy liên hệ người vận hành máy chủ.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: đăng nhập bằng Google
+online.sso.page.done_heading = Quay lại Scacelith
+online.sso.page.done = Google đã đưa bạn trở lại Scacelith. Hãy quay lại trò chơi để hoàn tất đăng nhập; bạn có thể đóng thẻ này.
+online.sso.page.cancelled_heading = Đã hủy đăng nhập
+online.sso.page.cancelled = Đăng nhập bằng Google đã bị hủy. Bạn có thể đóng thẻ này và quay lại Scacelith.
+online.sso.page.foreign_heading = Trang này không dành cho bạn
+online.sso.page.foreign = Trang này không khớp với yêu cầu đăng nhập mà Scacelith đang chờ trên máy tính này. Nếu bạn không vừa bắt đầu đăng nhập bằng Google trong Scacelith, có thể ai đó đã gửi cho bạn liên kết này: hãy đóng thẻ này.
+
+# Account
+online.account.button = Tài khoản
+online.account.title = TÀI KHOẢN
+online.account.section = TÀI KHOẢN
+online.account.username = TÊN NGƯỜI DÙNG
+online.account.email = EMAIL
+online.account.unverified = (chưa xác minh)
+online.account.mfa = XÁC THỰC HAI YẾU TỐ
+online.account.mfa_on = Bật
+online.account.mfa_off = Tắt
+online.account.google = GOOGLE
+online.account.google_linked = Đã liên kết với tài khoản Google
+online.account.change_password = Đổi mật khẩu
+online.account.mfa_setup = Bật xác thực hai yếu tố
+online.account.mfa_disable = Tắt xác thực hai yếu tố
+online.account.recovery = Mã khôi phục mới
+online.account.sign_out = Đăng xuất
+online.account.sign_out_all = Đăng xuất mọi nơi
+online.account.sign_out_all.help = Đăng xuất tài khoản này trên mọi máy tính, kể cả máy này.
+online.account.signed_out = Bạn đã đăng xuất.
+online.account.signed_out_all = Bạn đã đăng xuất trên mọi máy tính.
+online.account.signing_out_all = Đang đăng xuất trên mọi máy tính…
+online.account.sign_out_all_failed = Các máy tính khác của bạn có thể vẫn đang đăng nhập: hãy đăng nhập lại, rồi đăng xuất chúng trong mục Thiết bị đã đăng nhập. {0}
+online.account.sign_out_all_retry = Các máy tính khác của bạn có thể vẫn đang đăng nhập. Hãy thử lại Đăng xuất mọi nơi. {0}
+online.account.ratings = HỆ SỐ ELO
+online.account.col.tc = THỜI GIAN
+online.account.col.rating = HỆ SỐ
+online.account.col.games = SỐ VÁN
+online.account.col.record = T / H / B
+online.account.provisional = Dấu chấm hỏi đánh dấu hệ số tạm thời (mới chơi ít ván).
+online.password.title = ĐỔI MẬT KHẨU
+online.password.button = Đổi mật khẩu
+online.password.changed = Mật khẩu của bạn đã được thay đổi.
+online.password.other_sessions = Các máy tính khác của bạn sẽ phải đăng nhập lại.
+online.mfa_setup.title = XÁC THỰC HAI YẾU TỐ
+online.mfa_setup.lead = Xác thực hai yếu tố yêu cầu một mã từ ứng dụng trên điện thoại mỗi lần bạn đăng nhập. Nhập mật khẩu để bắt đầu.
+online.mfa_setup.scan = 1. Quét mã này bằng ứng dụng xác thực, hoặc nhập khóa này vào ứng dụng:
+online.mfa_setup.enter = 2. Nhập mã 6 chữ số mà ứng dụng hiển thị:
+online.mfa_setup.enable = Bật
+online.mfa_setup.done = Đã bật xác thực hai yếu tố.
+online.mfa_off.title = TẮT XÁC THỰC HAI YẾU TỐ
+online.mfa_off.lead = Nhập mật khẩu và một mã từ ứng dụng của bạn (hoặc một mã khôi phục).
+online.mfa_off.button = Tắt
+online.mfa.off_done = Đã tắt xác thực hai yếu tố.
+online.recovery.title = MÃ KHÔI PHỤC
+online.recovery.lead = Nếu bạn mất điện thoại, mỗi mã cho phép đăng nhập một lần. Hãy cất giữ chúng ở nơi an toàn: các mã chỉ hiển thị lúc này.
+online.recovery.saved = Tôi đã lưu lại
+online.recovery.new_title = MÃ KHÔI PHỤC MỚI
+online.recovery.new_lead = Mã mới sẽ thay thế mã cũ. Nhập mật khẩu và một mã từ ứng dụng của bạn.
+online.recovery.button = Mã mới
+online.account.manage = BẢO MẬT VÀ DỮ LIỆU
+online.account.pending_email = Đang chờ xác nhận: {0}
+online.account.accept_challenges = Nhận lời thách đấu
+online.account.accept_challenges.help = Người chơi khác có thể thách đấu bạn qua tên người dùng. Tắt: lời thách đấu của họ sẽ bị từ chối.
+online.account.history = Lịch sử ván đấu
+online.account.devices = Thiết bị đã đăng nhập
+online.account.change_email = Đổi email
+online.account.export = Tải xuống dữ liệu của tôi
+online.account.delete = Xóa tài khoản
+
+# Play
+online.play.signed_in = Đã đăng nhập với tên {0}
+online.session.file = Không có kho khóa hệ thống nào lưu giữ được phiên đăng nhập của bạn: phiên được ghi nhớ trong một tệp mà chỉ tài khoản người dùng của bạn đọc được (Tùy chọn > Máy chủ trực tuyến).
+online.session.memory = Không có kho khóa hệ thống nào lưu giữ được phiên đăng nhập của bạn, và phiên không được lưu vào tệp: bạn vẫn đăng nhập cho đến khi đóng trò chơi (Tùy chọn > Máy chủ trực tuyến).
+online.play.find_section = TÌM ĐỐI THỦ
+online.play.friend_section = CHƠI VỚI BẠN BÈ
+online.play.mode = Loại ván
+online.play.mode.help = Ván tính điểm làm thay đổi hệ số Elo của bạn ở mức thời gian thi đấu này; ván giao hữu thì không.
+online.play.find = Tìm đối thủ
+online.play.connecting = Đang kết nối tới máy chủ…
+online.play.cooldown = Bạn có thể tìm đối thủ lại vào lúc {0}.
+online.play.banned = Tài khoản này bị đình chỉ đến {0}.
+online.play.challenge = Thách đấu người chơi
+online.play.challenge.desc = Mời một người đang trực tuyến qua tên người dùng của họ.
+online.play.private = Ván riêng
+online.play.private.desc = Tạo một mã để đưa cho bạn bè, hoặc tham gia bằng mã của họ.
+online.play.direct = Đấu trực tiếp
+online.play.direct.desc = Không cần máy chủ: kết nối thẳng tới máy tính của người bạn.
+online.search.title = ĐANG TÌM KIẾM
+online.search.window = Khoảng hệ số {0}
+online.search.queued = {0} người chơi đang tìm
+online.search.wait = Đang tìm đối thủ cùng trình độ…
+online.outgoing.challenge = ĐÃ GỬI LỜI THÁCH ĐẤU
+online.outgoing.waiting = đang chờ trả lời
+online.outgoing.private = VÁN RIÊNG
+online.outgoing.private_hint = Đưa mã này cho người bạn: ván cờ bắt đầu khi họ tham gia.
+online.challenge.title = THÁCH ĐẤU NGƯỜI CHƠI
+online.challenge.opponent = ĐỐI THỦ
+online.field.opponent = Tên người dùng
+online.field.opponent.hint = người mà bạn muốn thách đấu
+online.challenge.note = Đối thủ sẽ thấy lời thách đấu dù đang ở bất kỳ menu nào, và có một phút để trả lời.
+online.challenge.send = Gửi lời thách đấu
+online.terms.rated = Tính điểm
+online.terms.rated.help = Chỉ các mức thời gian thi đấu chính thức mới có thể tính điểm.
+online.terms.color = Màu quân của bạn
+online.private.title = VÁN RIÊNG
+online.private.create_section = TẠO VÁN
+online.private.create_note = Bạn sẽ nhận được một mã ngắn: ai nhập mã đó sẽ đấu với bạn.
+online.private.create = Tạo ván
+online.private.join_section = THAM GIA
+online.field.private_code = Mã ván
+online.private.join = Tham gia
+online.private.joining = Đang tham gia ván cờ…
+online.challenge.received = LỜI THÁCH ĐẤU
+online.challenge.accept = Chấp nhận
+online.challenge.decline = Từ chối
+online.challenge.you_white = bạn chơi bên Trắng
+online.challenge.you_black = bạn chơi bên Đen
+online.challenge.you_random = màu quân bốc thăm
+online.challenge.declined = {0} đã từ chối lời thách đấu của bạn.
+online.challenge.expired = Lời thách đấu của bạn đã hết hạn mà không có trả lời.
+online.challenge.unavailable = {0} hiện không sẵn sàng.
+online.challenge.lost = Mất kết nối: lời thách đấu của bạn đã bị hủy.
+
+# At the table
+online.pause.clock_runs = Ván cờ vẫn tiếp diễn: đồng hồ của bạn vẫn chạy.
+online.pause.abort = Hủy ván cờ
+online.pause.abort.help = Trước nước đi đầu tiên của bạn, ván cờ có thể được hủy; ván đó không được tính.
+online.pause.leave = Rời ván cờ
+online.confirm.resign.text = Xin thua ván này? Đối thủ của bạn sẽ thắng.
+online.confirm.leave.text = Rời đi đồng nghĩa với xin thua ván này: đối thủ của bạn sẽ thắng.
+online.confirm.leave.ok = Xin thua và rời đi
+online.confirm.leave_abort.text = Rời đi trước nước đi đầu tiên? Ván cờ sẽ bị hủy và không được tính.
+online.confirm.leave_abort.ok = Hủy ván và rời đi
+online.draw.card_title = LỜI CẦU HÒA
+online.draw.card_text = Đối thủ của bạn cầu hòa.
+online.draw.accept = Chấp nhận
+online.draw.decline = Từ chối
+online.draw.offered = Đối thủ của bạn cầu hòa.
+online.opponent_back = Đối thủ của bạn đã quay lại.
+online.opponent_away = Đối thủ mất kết nối — còn {0} để quay lại
+online.first_move = Nước đi đầu tiên của bạn · {0}
+online.reconnecting = ĐANG KẾT NỐI LẠI…
+online.reconnecting.text = Ván cờ vẫn tiếp diễn trên máy chủ và đồng hồ của bạn vẫn chạy.
+online.gameover.aborted = Ván cờ đã bị hủy: không được tính.
+online.rating.casual = Ván giao hữu: hệ số không thay đổi.
+online.rating.change = Hệ số {0} → {1} ({2})
+online.rating.pending = Hệ số: …
+online.rematch.accept = Chấp nhận tái đấu
+online.rematch.offered = Đối thủ của bạn đề nghị tái đấu.
+online.rematch.waiting = Đã đề nghị tái đấu…
+online.rematch.gone = Không tái đấu
+online.rematch.declined = Lần này không tái đấu.
+online.report.button = Báo cáo đối thủ
+online.report.title = BÁO CÁO
+online.report.lead = Báo cáo được gửi tới người kiểm duyệt của máy chủ cùng với ván cờ này. Cảm ơn bạn đã góp phần giữ cho cuộc chơi công bằng.
+online.report.category = Lý do
+online.report.cheating = Gian lận
+online.report.abuse = Hành vi xúc phạm
+online.report.other = Khác
+online.report.comment = Nhận xét
+online.report.comment.hint = không bắt buộc
+online.report.send = Gửi báo cáo
+online.report.sent = Đã gửi báo cáo. Cảm ơn bạn.
+online.report.queued = Báo cáo của bạn sẽ được gửi khi ván cờ kết thúc.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Trực tuyến, {0}, {1}
+online.sheet.rated = tính điểm
+online.sheet.casual = giao hữu
+online.sheet.game = Ván {0}
+# End reasons of online games
+reason.online.abandonment = Đối thủ đã rời ván cờ
+reason.online.abandonment_vs_insufficient = Rời ván cờ, nhưng đối thủ không thể chiếu hết
+reason.online.aborted = Ván cờ bị hủy
+reason.online.no_show = Không đi nước đầu tiên kịp giờ (đã hủy)
+reason.online.forfeit = Xử thua
+reason.online.server_aborted = Bị máy chủ hủy
+reason.online.both_disconnected = Cả hai người chơi đều mất kết nối
+# Server notices
+online.notice.shutdown = Máy chủ sẽ khởi động lại sau {0}. Các ván đang diễn ra được lưu lại.
+online.notice.revoked = Bạn đã bị đăng xuất khỏi máy chủ này.
+online.notice.replaced = Tài khoản của bạn đã kết nối từ một cửa sổ khác; cửa sổ này hiện đã ngoại tuyến.
+online.notice.rating_restored = Hệ số của bạn đã được hoàn lại {0} điểm: một đối thủ đã bị cấm vì gian lận.
+# Errors
+online.err.rate_limited_for = Quá nhiều lần thử. Hãy thử lại sau {0}.
+online.err.rate_limited = Quá nhiều lần thử. Hãy thử lại sau giây lát.
+online.err.server_busy_for = Máy chủ đang bận. Hãy thử lại sau {0}.
+online.err.server_busy = Máy chủ đang bận. Hãy thử lại sau giây lát.
+online.err.banned_until = Tài khoản này bị đình chỉ đến {0}.
+online.err.banned = Tài khoản này bị đình chỉ.
+online.err.invalid_credentials = Sai tên người dùng hoặc mật khẩu.
+online.err.invalid_credentials_pending = Sai tên người dùng hoặc mật khẩu. Nếu bạn vừa đăng ký, trước tiên hãy mở liên kết chúng tôi đã gửi cho bạn.
+online.err.email_unverified = Địa chỉ email của bạn chưa được xác minh: hãy mở liên kết chúng tôi đã gửi cho bạn.
+online.err.network = Không thể kết nối tới máy chủ. Hãy kiểm tra kết nối mạng và địa chỉ máy chủ.
+online.err.tls = Không thể thiết lập kết nối bảo mật tới máy chủ.
+online.err.certificate = Chứng chỉ của máy chủ không đáng tin cậy (hoặc không khớp với dấu vân tay trong phần tùy chọn).
+online.err.incompatible = Máy chủ này cần một phiên bản Scacelith khác.
+online.err.unauthorized = Phiên đăng nhập của bạn đã kết thúc: vui lòng đăng nhập lại.
+online.err.username_taken = Tên người dùng này đã được sử dụng.
+online.err.email_taken = Đã có tài khoản sử dụng địa chỉ email này.
+online.err.invalid_username = Tên người dùng gồm 3 đến 24 chữ cái, chữ số, _ hoặc -.
+online.err.invalid_email = Địa chỉ email này không hợp lệ.
+online.err.weak_password = Mật khẩu này quá yếu: hãy dùng ít nhất 10 ký tự.
+online.err.invalid_code = Mã này không đúng.
+online.err.expired = Yêu cầu này đã hết hạn: vui lòng bắt đầu lại.
+online.err.registration_closed = Máy chủ này không nhận tài khoản mới.
+online.err.sso_cancelled = Đăng nhập bằng Google đã bị hủy.
+online.err.sso_expired = Đăng nhập bằng Google mất quá nhiều thời gian hoặc đã được sử dụng. Vui lòng bắt đầu lại.
+online.err.sso_failed = Đăng nhập bằng Google không thành công. Vui lòng thử lại.
+online.err.sso_listen = Scacelith không thể nhận phản hồi của Google trên máy tính này. Vui lòng thử lại.
+online.err.sso_origin = Đăng nhập bằng Google không hoạt động qua địa chỉ máy chủ này. Hãy thêm máy chủ bằng tên công khai mà người vận hành cung cấp, rồi thử lại.
+online.err.browser = Không thể mở trình duyệt web.
+online.err.sso_email_unverified = Google chưa xác nhận địa chỉ email của tài khoản Google này.
+online.err.sso_account_exists = Đã có tài khoản sử dụng địa chỉ email này và tài khoản đó không thể liên kết với đăng nhập bằng Google: hãy đăng nhập bằng mật khẩu của tài khoản, hoặc dùng “Quên mật khẩu?”.
+online.err.sso_already_linked = Tài khoản Google này đã được liên kết với một tài khoản khác.
+online.err.account_disabled = Tài khoản này không thể sử dụng được nữa.
+online.err.server_error = Máy chủ gặp sự cố. Vui lòng thử lại.
+online.err.timeout = Máy chủ không phản hồi kịp thời.
+online.err.offline = Chưa kết nối tới máy chủ: hãy thử lại khi đã kết nối.
+online.err.other = Máy chủ đã từ chối ({0}).
+online.err.code = Máy chủ đã từ chối (lỗi {0}).
+online.err.slow_down = Hãy chậm lại một chút.
+online.err.server_full = Máy chủ đã đầy. Hãy thử lại sau.
+online.err.restarting = Máy chủ đang khởi động lại. Hãy thử lại sau giây lát.
+online.err.move_refused = Máy chủ đã từ chối nước đi đó: bàn cờ được đặt lại như trước.
+online.err.game_over = Ván cờ này đã kết thúc.
+online.err.already_in_game = Bạn đang chơi một ván cờ rồi.
+online.err.invalid_category = Mức thời gian thi đấu này không có ở đây.
+online.err.draw_offer_limit = Tạm thời bạn không thể cầu hòa thêm.
+online.err.abort_not_allowed = Ván cờ không thể hủy được nữa.
+online.err.no_pending_offer = Không có lời đề nghị nào để trả lời.
+online.err.flag_fell = Bạn đã hết giờ.
+online.err.queue_not_allowed = Lúc này bạn không thể tìm đối thủ.
+online.err.challenge_not_found = Lời thách đấu này không còn tồn tại.
+online.err.user_unavailable = Người chơi này hiện không sẵn sàng.
+online.err.challenge_limit = Tạm thời có quá nhiều lời thách đấu. Hãy thử lại sau.
+online.err.challenge_self = Bạn không thể thách đấu chính mình.
+online.err.code_invalid = Không có ván cờ nào có mã này.
+online.err.rated_official_tc = Chỉ các mức thời gian thi đấu chính thức mới có thể tính điểm.
+online.err.cooldown = Việc ghép đối thủ cho bạn đang tạm dừng trong giây lát.
+online.err.invalid_tc = Mức thời gian thi đấu này không được phép.
+online.err.rematch_unavailable = Không thể tái đấu nữa.
+online.err.rated_repeat_limit = Tạm thời bạn đã chơi đủ số ván tính điểm với người chơi này. Hãy chơi một ván giao hữu, hoặc thử lại sau.
+online.err.cheat_detected = Ván cờ đã bị dừng bởi cơ chế kiểm tra chơi công bằng của máy chủ.
+online.err.invalid_password = Sai mật khẩu.
+online.err.mfa_code_required = Hãy nhập một mã từ ứng dụng xác thực của bạn (hoặc một mã khôi phục).
+online.err.password_not_set = Tài khoản này đăng nhập bằng Google và chưa có mật khẩu. Hãy đặt mật khẩu trước bằng “Quên mật khẩu?” trên trang đăng nhập.
+online.err.too_many_attempts = Quá nhiều lần thử sai. Hãy thử lại sau.
+online.err.too_many_attempts_for = Quá nhiều lần thử sai. Hãy thử lại sau {0}.
+online.err.same_email = Đây đã là địa chỉ email của bạn.
+online.err.not_found = Không tìm thấy trên máy chủ.
+online.err.invalid_response = Không đọc được phản hồi của máy chủ.
+online.err.storage = Không thể lưu phiên đăng nhập trên máy tính này.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = LỊCH SỬ VÁN ĐẤU
+online.history.filter.games = Loại ván
+online.history.filter.result = Kết quả
+online.history.filter.all = Tất cả
+online.history.filter.won = Thắng
+online.history.filter.lost = Thua
+online.history.filter.drawn = Hòa
+online.history.col.date = NGÀY
+online.history.col.opponent = ĐỐI THỦ
+online.history.col.result = KẾT QUẢ
+online.history.col.tc = THỜI GIAN
+online.history.col.kind = LOẠI
+online.history.col.rating = HỆ SỐ
+online.history.won = Thắng
+online.history.lost = Thua
+online.history.drawn = Hòa
+online.history.aborted = Đã hủy
+online.history.page = Trang {0}/{1}
+online.history.total = {0} ván
+online.history.previous = Trước
+online.history.next = Tiếp
+online.history.empty.title = CHƯA CÓ VÁN NÀO
+online.history.empty = Các ván cờ của bạn trên máy chủ này sẽ được liệt kê ở đây sau khi kết thúc.
+online.history.empty_filter.title = KHÔNG CÓ VÁN NÀO
+online.history.empty_filter = Không có ván nào khớp với các bộ lọc này.
+online.history.error = KHÔNG THỂ TẢI LỊCH SỬ
+online.history.unavailable = MÁY CHỦ NÀY KHÔNG CÓ LỊCH SỬ VÁN ĐẤU
+online.game.title = VÁN CỜ
+online.game.players = NGƯỜI CHƠI
+online.game.you = BẠN
+online.game.unrated = Không tính điểm
+online.game.you_won = Bạn thắng
+online.game.you_lost = Bạn thua
+online.game.draw = Hòa
+online.game.you_left = Bạn đã rời ván cờ
+online.game.date = NGÀY
+online.game.time_control = THỜI GIAN THI ĐẤU
+online.game.moves = NƯỚC ĐI
+online.game.move_count = {0} nước
+online.game.no_moves = Không có nước đi nào.
+online.game.moves_incomplete = Không đọc được một số nước đi: danh sách dừng lại trước khi ván cờ kết thúc.
+online.game.save = Lưu ván cờ
+online.game.saved_button = Đã lưu
+online.game.saved = Ván cờ đã có trong danh sách ván đã lưu của bạn.
+online.game.already_saved = Ván cờ này đã có sẵn trong danh sách ván đã lưu của bạn.
+online.game.save_failed = Không thể lưu ván cờ.
+online.game.invalid = Máy chủ đã gửi một bản ghi ván cờ không đọc được.
+online.game.replay = Phát lại
+online.game.not_found = KHÔNG TÌM THẤY VÁN CỜ
+online.game.error = KHÔNG THỂ TẢI VÁN CỜ
+online.devices.title = THIẾT BỊ ĐÃ ĐĂNG NHẬP
+online.devices.lead = Các thiết bị đang đăng nhập tài khoản này. Nếu bạn không nhận ra một thiết bị, hãy đăng xuất thiết bị đó và đổi mật khẩu.
+online.devices.unknown = Thiết bị không xác định
+online.devices.this = THIẾT BỊ NÀY
+online.devices.signed_in = Đăng nhập ngày {0}
+online.devices.last_active = hoạt động lần cuối {0}
+online.devices.active_now = đang sử dụng
+online.devices.sign_out = Đăng xuất
+online.devices.signed_out = Thiết bị đó đã được đăng xuất.
+online.devices.error = KHÔNG THỂ TẢI DANH SÁCH THIẾT BỊ
+online.devices.all.title = ĐĂNG XUẤT MỌI NƠI
+online.email.title = ĐỔI EMAIL
+online.email.current = Địa chỉ hiện tại: {0}
+online.email.button = Đổi email
+online.email.sent = Đã gửi liên kết xác nhận tới {0}.
+online.email.sent.hint = Địa chỉ sẽ thay đổi khi liên kết được mở. Trước đó, địa chỉ hiện tại của bạn vẫn được sử dụng.
+online.email.done = Xong
+online.email.changed = Địa chỉ email của bạn đã được thay đổi.
+online.export.title = TẢI XUỐNG DỮ LIỆU CỦA TÔI
+online.export.lead = Mọi thông tin máy chủ này lưu giữ về tài khoản của bạn (hồ sơ, hệ số Elo, ván cờ, thiết bị, sự kiện bảo mật) sẽ được lưu thành một tệp JSON trên máy tính này. Nhập mật khẩu để xác nhận.
+online.export.button = Tải xuống
+online.export.saved = Dữ liệu của bạn đã được lưu trên máy tính này.
+online.export.failed = Không thể ghi tệp.
+online.delete.title = XÓA TÀI KHOẢN
+online.delete.warning = Tài khoản của bạn sẽ bị xóa khỏi máy chủ này: địa chỉ email, mật khẩu, xác thực hai yếu tố và các thiết bị sẽ bị xóa, và bạn sẽ không thể đăng nhập được nữa. Không thể hoàn tác thao tác này.
+online.delete.games = Các ván cờ và hệ số Elo của bạn vẫn được giữ trên máy chủ dưới tên ẩn danh {0}.
+online.delete.confirm_name = Để xác nhận, hãy nhập tên người dùng và mật khẩu của bạn.
+online.delete.button = Xóa tài khoản của tôi
+online.delete.done = Tài khoản của bạn đã bị xóa.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Đấu trực tiếp
+online.direct.title = ĐẤU TRỰC TIẾP
+online.direct.lead = Ván giao hữu kết nối thẳng giữa hai máy tính: không máy chủ, không tài khoản, không bao giờ tính điểm.
+online.direct.host = Tạo ván đấu
+online.direct.host.desc = Người bạn kết nối tới máy của bạn: bạn đưa cho họ địa chỉ của mình và một mã.
+online.direct.join = Tham gia ván đấu
+online.direct.join.desc = Kết nối tới một người bạn đang tạo ván.
+online.direct.host_title = TẠO VÁN ĐẤU
+online.direct.your_color = Màu quân của bạn
+online.direct.auto_press.help = Cả hai robot tự bấm đồng hồ ngay khi nước đi đã nằm trên bàn cờ. Tắt: mỗi người chơi tự bấm đồng hồ sau mỗi nước đi.
+online.direct.unrated = Đấu trực tiếp là ván giao hữu: không bao giờ tính điểm.
+online.direct.connection = KẾT NỐI
+online.direct.port = Cổng
+online.direct.port.help = Cổng TCP mà người bạn kết nối tới (47100, trừ khi cổng này đã bị chiếm).
+online.direct.port_range = Hãy chọn một cổng từ 1024 đến 65535.
+online.direct.upnp = Mở cổng trên bộ định tuyến của tôi (UPnP)
+online.direct.upnp.help = Yêu cầu bộ định tuyến gia đình chuyển tiếp cổng tới máy tính này, và đóng cổng sau ván đấu.
+online.direct.host_note_upnp = Trò chơi sẽ yêu cầu bộ định tuyến của bạn mở cổng. Nếu không được, bạn sẽ được cho biết cổng nào cần chuyển tiếp thủ công.
+online.direct.host_note_manual = Hãy chuyển tiếp cổng TCP tới máy tính này trên bộ định tuyến, hoặc chơi trong cùng một mạng.
+online.direct.host_button = Tạo ván
+online.direct.wait_title = ĐANG CHỜ NGƯỜI BẠN
+online.direct.opening = Đang mở cổng {0} trên bộ định tuyến…
+online.direct.give = Đưa cho người bạn:
+online.direct.cap_address = ĐỊA CHỈ
+online.direct.cap_port = CỔNG
+online.direct.cap_code = MÃ
+online.direct.lan = Trong cùng mạng: {0}
+online.direct.router = bộ định tuyến của bạn
+online.direct.upnp_searching = Đang tìm bộ định tuyến…
+online.direct.upnp_mapped = Đã mở cổng trên {0}.
+online.direct.upnp_none = Không có bộ định tuyến UPnP nào phản hồi: hãy chuyển tiếp thủ công cổng TCP {0} tới máy tính này.
+online.direct.upnp_failed = Bộ định tuyến từ chối mở cổng: hãy chuyển tiếp thủ công cổng TCP {0} tới máy tính này.
+online.direct.upnp_off = Hãy chuyển tiếp cổng TCP {0} tới máy tính này trên bộ định tuyến.
+online.direct.upnp_cgnat = Nhà mạng có lẽ đang dùng chung địa chỉ internet của bạn với người khác (CGNAT): hãy thử IPv6 hoặc VPN.
+online.direct.firewall = Nếu Windows hỏi có cho phép Scacelith nhận kết nối không, hãy cho phép.
+online.direct.waiting = Đang chờ người bạn…
+online.direct.connecting_friend = Người bạn đang kết nối…
+online.direct.starting = Đang bày bàn cờ…
+online.direct.join_title = THAM GIA VÁN ĐẤU
+online.direct.join_lead = Nhập những gì người bạn đọc cho bạn: địa chỉ, cổng và mã.
+online.direct.address = Địa chỉ
+online.direct.address.hint = IPv4, IPv6 hoặc tên
+online.direct.code = Mã
+online.direct.join_button = Tham gia
+online.direct.connecting_to = Đang kết nối tới {0}…
+online.direct.securing = Đang bảo mật kết nối với {0}…
+direct.event = Trận giao hữu
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Trực tiếp, {0}
+direct.err.refused = Không có ai đang tạo ván ở địa chỉ và cổng này.
+direct.err.timeout = Không có phản hồi: hãy kiểm tra địa chỉ và cổng, và xem bộ định tuyến của người bạn có cho trò chơi kết nối vào không.
+direct.err.wrong_code = Mã không đúng.
+direct.err.invalid_code = Mã gồm 12 ký tự (XXXX-XXXX-XXXX).
+direct.err.incompatible = Người bạn đang dùng một phiên bản Scacelith khác.
+direct.err.port_in_use = Cổng này đang được sử dụng trên máy tính này: hãy chọn cổng khác.
+direct.err.network = Không thể sử dụng mạng.
+direct.err.too_many_attempts = Quá nhiều lần nhập sai mã: đã dừng tạo ván. Hãy tạo ván lại để có mã mới.
+direct.err.bad_address = Địa chỉ này không hợp lệ.
+direct.err.not_found = Không tìm thấy tên này.
+direct.err.unreachable = Không thể kết nối tới địa chỉ này từ đây.
+direct.err.reset = Kết nối đã bị cắt.
+direct.err.closed = Kết nối đã bị đóng.
+direct.err.host_left = Người bạn đã ngừng tạo ván.
+direct.err.other = Kết nối thất bại ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Người chơi 2
+hotseat.white_player = Trắng
+hotseat.black_player = Đen
+hotseat.name.help = Tên được ghi trên cả hai biên bản, bằng bất kỳ hệ chữ nào.
+hotseat.swap = Đổi màu quân
+hotseat.left_hand = {0} chơi bằng tay trái: đồng hồ được đặt bên trái người này.
+hotseat.rated = Ván tính điểm
+hotseat.rated.help = Mỗi tên có hệ số hai người chơi riêng trên máy tính này. Hệ số Elo của bạn khi đấu với Stockfish không bao giờ thay đổi.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Hệ số hai người chơi: {0} {1} · {2} {3}
+hotseat.new_rating = (mới)
+hotseat.friendly_note = Ván giao hữu: hệ số không thay đổi.
+hotseat.colours = {0} chơi bên Trắng, {1} chơi bên Đen.
+hotseat.colours_swap = Màu quân được đổi sau mỗi lần tái đấu.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, đến lượt bạn
+hotseat.flag = {0} đã hết giờ.
+hotseat.confirm.resign = Xin thua thay cho {0}? {1} sẽ được xử thắng.
+hotseat.confirm.resign_draw = Xin thua thay cho {0}? {1} không còn khả năng chiếu hết: ván cờ sẽ được xử hòa.
+hotseat.draw.offer_noted = Lời cầu hòa của bạn đi kèm nước đi: {0} sẽ thấy lời cầu hòa sau khi bạn bấm đồng hồ.
+hotseat.draw.card_title = LỜI CẦU HÒA
+hotseat.draw.offered = {0} cầu hòa.
+hotseat.draw.card_hint = Chạm vào một quân là từ chối.
+hotseat.draw.accept = Chấp nhận
+hotseat.draw.decline = Từ chối
+hotseat.draw.accepted = {0} chấp nhận lời cầu hòa của {1}.
+hotseat.draw.declined = {0} từ chối lời cầu hòa của {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Ván tính điểm
+hotseat.sheet.friendly = Ván giao hữu
+# Game over card
+hotseat.gameover.wins = {0} thắng sau {1} nước.
+hotseat.gameover.wins_now = {0} thắng.
+hotseat.gameover.friendly = {0} đấu với {1} · ván giao hữu
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Ván này không tính điểm.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Huấn luyện viên
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Giọng nói tổng hợp do {0} tạo ra cho chế độ Huấn luyện viên
+# Coach page
+coach.title = HUẤN LUYỆN VIÊN
+coach.section.level = CẤP ĐỘ
+coach.section.lesson = CÙNG HUẤN LUYỆN VIÊN
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Dành cho người chơi có hệ số {0}
+coach.completed = Đã hoàn thành
+coach.recommended = Đề xuất
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Luật cờ vua
+coach.level.0.desc = Bài học tương tác, từng luật một.
+coach.level.0.detail = Huấn luyện viên bày những thế cờ nhỏ và cho bạn thấy cách mỗi quân đi và bắt quân, rồi đến nhập thành, phong cấp, chiếu và chiếu hết. Bạn tự thử từng ý tưởng trên bàn cờ.
+coach.level.1.name = Bước đầu
+coach.level.1.desc = Quân nào bị tấn công, quân nào không được bảo vệ.
+coach.level.1.detail = Huấn luyện viên chơi nhẹ nhàng và nói dễ hiểu: những quân nào của bạn đang bị tấn công, những quân nào không được bảo vệ, và cách giữ chúng.
+coach.level.2.name = Người mới chơi
+coach.level.2.desc = Chiến thuật đơn giản, phát triển quân, an toàn cho Vua.
+coach.level.2.detail = Đòn chĩa đôi và đòn ghim được gọi đúng tên. Huấn luyện viên nói về việc đưa quân ra và giữ an toàn cho Vua của bạn.
+coach.level.3.name = Đang tiến bộ
+coach.level.3.desc = Kế hoạch, cấu trúc Tốt, nước đi duy nhất.
+coach.level.3.detail = Huấn luyện viên giải thích các kế hoạch và cấu trúc Tốt, và báo cho bạn khi chỉ còn một nước đi duy nhất giữ được thế cờ.
+coach.level.4.name = Kỳ thủ câu lạc bộ
+coach.level.4.desc = Nước đi ứng viên, đánh giá theo đơn vị Tốt.
+coach.level.4.detail = Huấn luyện viên cân nhắc các nước đi ứng viên và đưa ra đánh giá theo đơn vị Tốt, như một huấn luyện viên câu lạc bộ.
+coach.level.5.name = Kỳ thủ câu lạc bộ mạnh
+coach.level.5.desc = Biến ngắn gọn, thuật ngữ thế trận.
+coach.level.5.detail = Nhận xét ngắn, các biến cụ thể và thuật ngữ của lối chơi thế trận.
+coach.level.6.name = Chuyên gia
+coach.level.6.desc = Nhận xét cô đọng, biến sâu, điểm đánh giá bằng số.
+coach.level.6.detail = Ít lời, như giữa những kỳ thủ mạnh: các biến sâu nhiều nước và điểm đánh giá bằng con số.
+coach.note.clock = Không có đồng hồ: bạn có thể suy nghĩ bao lâu tùy thích.
+coach.note.takeback = Sau một sai lầm nghiêm trọng, huấn luyện viên chỉ ra chỗ sai và đề nghị cho bạn đi lại.
+coach.note.lesson = Bạn chơi bên Trắng; huấn luyện viên bày từng bài tập lên bàn cờ.
+coach.note.unrated = Các ván với huấn luyện viên không được tính điểm.
+coach.note.fallible = Huấn luyện viên không phải lúc nào cũng đúng: đôi khi có thể đánh giá sai một nước đi.
+coach.colour = Màu quân của bạn
+coach.colour.help = Màu quân bạn chơi khi đấu với huấn luyện viên. Luân phiên: Trắng, rồi Đen, từ ván này sang ván sau. Bài học về luật cờ luôn được chơi bên Trắng.
+coach.colour.alternate = Luân phiên
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Giọng nói của huấn luyện viên chưa được cài đặt hoặc đang tắt (Tùy chọn > Âm thanh): lời của huấn luyện viên sẽ được hiển thị trên màn hình.
+# At the table
+coach.speaker = HUẤN LUYỆN VIÊN
+coach.skip = Bỏ qua
+coach.offer.title = ĐI LẠI NƯỚC NÀY?
+coach.offer.text = Huấn luyện viên đề nghị cho bạn đi lại nước vừa rồi, để bạn tìm một nước đi hay hơn.
+coach.offer.hint = Nhấn Backspace để đi lại. Chạm vào một quân để chơi tiếp.
+coach.offer.accept = Đi lại
+coach.offer.decline = Chơi tiếp
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Số lần đi lại còn lại: {0}
+coach.pause.take_back = Đi lại nước của tôi
+coach.pause.take_back.help = Đi lại nước vừa rồi của bạn, và cả nước đáp của huấn luyện viên nếu đã đi.
+coach.confirm.resign = Xin thua ván này? Huấn luyện viên sẽ được xử thắng.
+coach.confirm.resign_draw = Xin thua ván này? Huấn luyện viên không còn khả năng chiếu hết: ván cờ sẽ được xử hòa.
+coach.confirm.leave = Quay về menu chính? Ván cờ với huấn luyện viên sẽ bị bỏ dở.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Chơi lại
+coach.gameover.unrated = Ván cờ với huấn luyện viên không được tính điểm.
+coach.lesson.done = GIỎI LẮM
+coach.lesson.done.line = Giờ bạn đã biết luật cờ vua.
+coach.lesson.next = Ván đầu tiên
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Luyện tập
+coach.tab.challenges = Thử thách
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = CHIẾU HẾT
+challenge.group.tactics = CHIẾN THUẬT
+challenge.group.defence = PHÒNG THỦ
+challenge.group.endgames = TÀN CUỘC
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Chiếu hết sau một nước
+challenge.mate1.desc = Một nước đi, và đó là chiếu hết.
+challenge.mate1.detail = Hãy xem xét mọi nước chiếu trước tiên: một trong số đó khiến Vua không còn ô để chạy, không thể chặn và không thể bắt quân chiếu.
+challenge.mate2.name = Chiếu hết sau hai nước
+challenge.mate2.desc = Một nước đi khiến đối phương hết cách phòng thủ, rồi chiếu hết.
+challenge.mate2.detail = Nước đầu tiên thường là một nước chiếu hoặc một nước thí quân lấy đi một ô của Vua. Huấn luyện viên phòng thủ hết sức có thể.
+challenge.mate3.name = Chiếu hết sau ba nước
+challenge.mate3.desc = Những biến cưỡng bức dài hơn.
+challenge.mate3.detail = Chiếu, bắt quân và đe dọa, sâu ba nước. Hãy tính nước đáp tốt nhất của huấn luyện viên ở mỗi bước trước khi chạm vào quân.
+challenge.backrank.name = Chiếu hết ở hàng cuối
+challenge.backrank.desc = Vua bị nhốt sau chính các con Tốt của mình.
+challenge.backrank.detail = Khi các con Tốt trước con Vua đã nhập thành vẫn chưa di chuyển, một con Xe hoặc Hậu ở hàng cuối có thể chiếu hết. Hãy loại bỏ hoặc đánh lạc hướng các quân phòng thủ trước.
+challenge.patterns.name = Các mẫu chiếu hết
+challenge.patterns.desc = Chiếu hết ngạt thở, thế Anastasia, Ả Rập và các thế kinh điển khác.
+challenge.patterns.detail = Những mạng lưới chiếu hết nổi tiếng xuất hiện hết lần này đến lần khác. Hãy học cách nhận ra cách bố trí các quân và đòn kết liễu.
+challenge.hanging.name = Quân cho không
+challenge.hanging.desc = Phát hiện những quân không được bảo vệ.
+challenge.hanging.detail = Một quân hay một con Tốt không được bảo vệ có thể bị bắt ngay. Hãy kiểm tra xem mỗi quân của huấn luyện viên được những quân nào bảo vệ.
+challenge.fork.name = Đòn chĩa đôi
+challenge.fork.desc = Một quân tấn công hai quân cùng lúc.
+challenge.fork.detail = Mã, Tốt, Hậu và cả Vua đều có thể chĩa đôi. Đối thủ chỉ cứu được một trong hai mục tiêu.
+challenge.pin.name = Đòn ghim
+challenge.pin.desc = Một quân không thể di chuyển mà không làm mất quân đứng sau nó.
+challenge.pin.detail = Hãy ghim một quân vào Vua hoặc vào một quân giá trị hơn, rồi tấn công nó thêm lần nữa, hoặc tận dụng việc nó không thể di chuyển.
+challenge.skewer.name = Đòn xiên
+challenge.skewer.desc = Tấn công một quân giá trị và ăn quân đứng sau nó.
+challenge.skewer.detail = Ngược lại với đòn ghim: quân giá trị hơn đứng phía trước, buộc phải tránh đi, và để lộ quân đứng sau.
+challenge.discovered.name = Đòn tấn công mở
+challenge.discovered.desc = Di chuyển một quân để mở đường cho quân khác.
+challenge.discovered.detail = Khi một quân rời khỏi một đường, quân đứng sau nó sẽ tấn công. Kèm theo nước chiếu, hoặc chiếu đôi, đối thủ không có thời gian đối phó cả hai mối đe dọa.
+challenge.deflection.name = Đánh lạc hướng và dụ quân
+challenge.deflection.desc = Kéo quân phòng thủ đi chỗ khác, hoặc dụ nó vào một ô chết người.
+challenge.deflection.detail = Một quân phòng thủ có hai nhiệm vụ thì không làm tròn được cả hai. Hãy tấn công nó, đưa mồi cho nó, hoặc buộc một quân phải vào ô mà nó sẽ bị mất.
+challenge.intermezzo.name = Nước trung gian
+challenge.intermezzo.desc = Đừng bắt lại ngay: có nước mạnh hơn.
+challenge.intermezzo.detail = Trước nước đi mà ai cũng chờ đợi, một nước chiếu hoặc một mối đe dọa lớn hơn chen vào giữa sẽ thay đổi tất cả.
+challenge.trapped.name = Quân bị nhốt
+challenge.trapped.desc = Một quân không còn ô an toàn nào.
+challenge.trapped.detail = Lấy đi những ô thoát cuối cùng của một quân, rồi ăn quân đó.
+challenge.promotion.name = Phong cấp
+challenge.promotion.desc = Đưa một con Tốt tiến tới hàng cuối.
+challenge.promotion.detail = Những con Tốt đã tiến xa rất có giá trị. Hãy dọn đường, đánh lạc hướng các quân cản, và tạo ra một Hậu mới.
+challenge.quiet.name = Nước đi lặng
+challenge.quiet.desc = Nước thắng không phải nước chiếu, cũng không phải nước bắt quân.
+challenge.quiet.detail = Đôi khi nước mạnh nhất chỉ chuẩn bị một mối đe dọa không thể ngăn chặn. Đây là loại nước khó thấy nhất.
+challenge.opening.name = Bẫy khai cuộc
+challenge.opening.desc = Trừng phạt những sai lầm sớm.
+challenge.opening.detail = Các thế cờ từ những nước đầu tiên của các ván đấu thật, nơi một nước đi bất cẩn có thể bị khai thác ngay lập tức.
+challenge.escape.name = Tìm lối thoát
+challenge.escape.desc = Vua của bạn gặp nguy: một nước đi sẽ cứu nó.
+challenge.escape.detail = Mọi nước khác đều thua. Hãy xem xét tất cả các nước chiếu và mối đe dọa nhắm vào Vua của bạn, rồi tìm lối thoát duy nhất.
+challenge.defend.name = Nước phòng thủ
+challenge.defend.desc = Ngăn chặn mối đe dọa mà không mất lực lượng.
+challenge.defend.detail = Huấn luyện viên đang đe dọa điều gì đó. Hãy tìm nước đi chính xác giữ cho mọi thứ vững chắc.
+challenge.kq.name = Hậu và Vua đấu Vua
+challenge.kq.desc = Chiếu hết bằng Hậu.
+challenge.kq.detail = Dùng Hậu dồn Vua đơn độc ra mép bàn cờ, đưa Vua của bạn lại gần, và coi chừng thế hết nước đi. Huấn luyện viên phòng thủ bằng những nước tốt nhất.
+challenge.kr.name = Xe và Vua đấu Vua
+challenge.kr.desc = Chiếu hết bằng Xe.
+challenge.kr.detail = Con Xe cắt đường Vua đối phương, từng hàng một; Vua của bạn giành thế đối Vua. Huấn luyện viên phòng thủ bằng những nước tốt nhất.
+challenge.kp.name = Vua và Tốt đấu Vua
+challenge.kp.desc = Giành thế đối Vua và phong cấp.
+challenge.kp.detail = Hãy dẫn đường bằng Vua, không phải bằng Tốt. Giành thế đối Vua và phong Hậu mà huấn luyện viên không kịp ngăn cản.
+challenge.kp_hold.name = Chặn Tốt
+challenge.kp_hold.desc = Vua đơn độc chống Vua và Tốt: giữ hòa.
+challenge.kp_hold.detail = Đứng chắn trước con Tốt và giữ thế đối Vua. Cầm cự trong mười nước.
+challenge.rook.name = Tàn cuộc Xe
+challenge.rook.desc = Thế bắc cầu Lucena và thế phòng thủ Philidor.
+challenge.rook.detail = Hai thế cờ mà mọi người chơi đều nên biết: cách thắng với con Tốt ở hàng bảy, và cách phòng thủ với con Xe ở hàng ba.
+challenge.endgame.name = Chiến thuật tàn cuộc
+challenge.endgame.desc = Ít quân, ý tưởng sắc bén.
+challenge.endgame.detail = Đua Tốt, đột phá và tàn cuộc Xe từ các ván đấu thật.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} thế cờ
+coach.challenge.done = Đã hoàn thành
+coach.challenge.start = Bắt đầu
+coach.challenge.note.white = Bạn chơi bên Trắng; huấn luyện viên bày từng thế cờ lên bàn cờ.
+coach.challenge.note.hint = Bí nước? Nhấn H để xem gợi ý. Sau vài lần thử, huấn luyện viên sẽ đề nghị gợi ý cho bạn.
+coach.challenge.note.unsaved = Thử thách không được tính điểm hay lưu lại; dấu tích cho biết những thử thách bạn đã hoàn thành.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = HOÀN THÀNH THỬ THÁCH
+coach.challenge.complete.line = Bạn đã giải được mọi thế cờ.
+coach.challenge.next = Thử thách tiếp theo
+coach.challenge.again = Làm lại
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = XEM GỢI Ý?
+coach.hint.text = Huấn luyện viên đề nghị cho bạn một gợi ý.
+coach.hint.hint = Nhấn H để xem gợi ý. Chạm vào một quân để tiếp tục tự tìm.
+coach.hint.accept = Gợi ý
+coach.hint.decline = Không, cảm ơn
+coach.hint.key = Gợi ý
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Giọng huấn luyện viên
+options.coach_voice.help = Huấn luyện viên nói thành tiếng ở chế độ Huấn luyện viên. Mô hình giọng nói được tải xuống vào lần đầu tiên cần đến (khoảng 399 MB). Tắt: lời của huấn luyện viên chỉ được hiển thị trên màn hình.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Mô hình giọng nói
+options.voice_update.help = Huấn luyện viên vẫn đang nói bằng phiên bản 8-bit cũ của mô hình giọng nói. Bản cập nhật sẽ tải xuống phiên bản chính thức của Supertonic 3 do Supertone phát hành, và xóa các tệp cũ trước.
+options.voice_update.button = Cập nhật ({0} MB)
+options.voice_update.running = Đang tải xuống.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Chất lượng giọng nói
+options.voice_quality.help = Số bước tinh chỉnh mà bộ tổng hợp giọng nói của huấn luyện viên thực hiện cho mỗi câu, từ Thấp (4) đến Tối đa (9); mặc định là Trung bình (5). Mức cao hơn cho giọng nói trong hơn một chút nhưng cần nhiều thời gian tính toán hơn, nên huấn luyện viên bắt đầu nói muộn hơn một chút. Có thể thiết lập khi mô hình giọng nói đã được cài đặt và Giọng huấn luyện viên đang bật.
+options.voice_quality.low = Thấp
+options.voice_quality.medium = Trung bình
+options.voice_quality.high = Cao
+options.voice_quality.very_high = Rất cao
+options.voice_quality.ultra = Cực cao
+options.voice_quality.max = Tối đa
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Giọng nói của huấn luyện viên
+coach.download.text = Huấn luyện viên nói bằng Supertonic 3, một mô hình tổng hợp giọng nói của Supertone. Mô hình này không đi kèm Scacelith: trò chơi có thể tải xuống ngay bây giờ từ Hugging Face ({0} MB, một lần duy nhất). Nếu không có mô hình, huấn luyện viên sẽ hiển thị lời nói trên màn hình.
+coach.download.licence = Mô hình được phát hành theo giấy phép OpenRAIL-M, giấy phép này cấm một số cách sử dụng giọng nói do mô hình tạo ra, chẳng hạn như giới thiệu đó là giọng người thật hoặc bắt chước một người có thật.
+coach.download.read_licence = Đọc giấy phép
+coach.download.accept = Khi chọn Tải xuống, bạn chấp nhận các điều khoản của giấy phép này.
+# {0} = a folder
+coach.download.folder = Lưu tại: {0}
+coach.download.not_now = Để sau
+# {0} = the size in megabytes
+coach.download.download = Tải xuống ({0} MB)
+coach.download.licence_title = GIẤY PHÉP OPENRAIL-M
+coach.download.back = Quay lại
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Giọng nói mới cho huấn luyện viên
+coach.update.text = Giọng nói của huấn luyện viên giờ đây dùng phiên bản chính thức của Supertonic 3 do Supertone phát hành, thay cho bản chuyển đổi 8-bit đã được cài đặt từ trước đến nay. Trò chơi có thể tải xuống ngay bây giờ từ Hugging Face ({0} MB, một lần duy nhất); các tệp cũ ({1} MB) sẽ bị xóa trước. Nếu bạn từ chối, huấn luyện viên vẫn giữ giọng nói hiện tại, và bản cập nhật vẫn có sẵn trong Tùy chọn > Âm thanh.
+coach.update.download = Cập nhật ({0} MB)
+coach.update.accept = Khi chọn Cập nhật, bạn chấp nhận các điều khoản của giấy phép này.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = GIỌNG NÓI CỦA HUẤN LUYỆN VIÊN
+coach.download.removing = Đang gỡ bỏ phiên bản cũ…
+coach.download.checking = Đang kiểm tra các tệp…
+coach.download.downloading = Đang tải xuống…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Từ Hugging Face
+coach.download.from_archive = Từ Hugging Face (bản lưu trữ)
+coach.download.cancel = Hủy
+coach.download.failed = Tải xuống thất bại.
+coach.download.error.network = Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối Internet và thử lại.
+# {0} = a folder
+coach.download.error.disk = Không thể ghi các tệp vào {0}. Vui lòng kiểm tra dung lượng trống và thử lại.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Máy chủ gửi về phản hồi không mong đợi ({0}). Vui lòng thử lại sau.
+coach.download.retry = Thử lại
+coach.download.close = Đóng
+# Notices
+coach.download.done = Giọng nói của huấn luyện viên đã được cài đặt.
+coach.download.cancelled = Đã hủy tải xuống: lần sau sẽ tiếp tục từ chỗ đã dừng.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Ván đã lưu
+options.save_games = Lưu các ván của tôi
+options.save_games.help = Khi kết thúc, các ván của bạn với Stockfish, với huấn luyện viên, giữa hai người chơi trên máy tính này và các trận đấu trực tiếp được lưu thành tệp PGN, có thể tìm lại trong mục Ván đã lưu. Các ván trực tuyến do máy chủ lưu giữ.
+library.title = VÁN ĐÃ LƯU
+library.section.games = CÁC VÁN
+library.section.details = VÁN CỜ
+library.section.tags = THẺ
+library.section.moves = NƯỚC ĐI
+library.count = {0} ván
+library.filter = Hiển thị
+library.filter.all = Tất cả các ván
+library.filter.play = Đấu với Stockfish
+library.filter.coach = Với huấn luyện viên
+library.filter.hotseat = Hai người chơi
+library.filter.direct = Đấu trực tiếp
+library.filter.server = Ván trực tuyến
+library.filter.imported = Đã nhập
+library.mode.play = Đấu với Stockfish
+library.mode.coach = Với huấn luyện viên
+library.mode.hotseat = Hai người chơi
+library.mode.direct = Đấu trực tiếp
+library.mode.server = Ván trực tuyến
+library.mode.imported = Đã nhập
+library.coach_level = Cấp độ {0}
+library.unknown_player = Không rõ
+library.unfinished = Chưa kết thúc
+library.unreadable = Không thể đọc ván cờ này.
+library.moves = {0} nước
+library.opening_variation = {0}: {1}
+library.file = Tệp: {0}
+library.file_game = Tệp: {0}, ván {1}/{2}
+library.no_moves = Không có nước đi nào.
+library.none_selected = Chọn một ván trong danh sách.
+library.reading = Đang đọc các ván đã lưu
+library.empty.title = Chưa có ván nào được lưu
+library.empty.text = Các ván của bạn với Stockfish, với huấn luyện viên, giữa hai người chơi trên máy tính này và các trận đấu trực tiếp sẽ xuất hiện ở đây sau khi kết thúc. Bạn cũng có thể đặt tệp PGN vào thư mục này: các ván xuất từ chương trình hoặc trang web khác sẽ được liệt kê cùng với ván của bạn.
+library.empty.filter = Không có ván nào thuộc loại này.
+library.error.folder = Không thể đọc thư mục ván đã lưu
+library.error.game = Không thể đọc ván cờ này: {0}
+library.folder = Thư mục: {0}
+library.open_folder = Mở thư mục
+library.open_failed = Không thể mở thư mục.
+library.replay = Phát lại
+library.delete = Xóa
+library.delete.title = XÓA VÁN CỜ
+library.delete.text = Ván cờ {0} sẽ bị xóa khỏi máy tính này, cùng với tệp chứa nó. Không thể hoàn tác thao tác này.
+library.delete.ok = Xóa
+library.delete.several = Tệp này chứa {0} ván: chỉ có thể xóa tệp từ thư mục.
+library.deleted = Ván cờ đã được xóa.
+library.delete.failed = Không thể xóa ván cờ.
+library.delete.changed = Tệp đã thay đổi: danh sách đã được cập nhật.
+library.truncated = Thư mục này chứa quá nhiều ván: chỉ {0} ván gần đây nhất được liệt kê.
+library.tag.Event = Giải đấu
+library.tag.Site = Địa điểm
+library.tag.Date = Ngày
+library.tag.Time = Giờ
+library.tag.Round = Vòng
+library.tag.White = Trắng
+library.tag.Black = Đen
+library.tag.Result = Kết quả
+library.tag.WhiteElo = Elo Trắng
+library.tag.BlackElo = Elo Đen
+library.tag.TimeControl = Thời gian thi đấu
+library.tag.Termination = Cách kết thúc
+library.tag.Opening = Khai cuộc
+library.tag.Variation = Biến thể
+library.tag.PlyCount = Số nửa nước
+library.tag.FEN = Thế cờ ban đầu
+library.tag.ScacelithMode = Chế độ
+library.tag.CoachLevel = Cấp độ huấn luyện viên
+library.tag.ScacelithServer = Máy chủ
+library.tag.ScacelithGameId = Số hiệu ván
+library.tag.UTCDate = Ngày (UTC)
+library.tag.UTCTime = Giờ (UTC)
+library.tag.WhiteRatingDiff = Thay đổi hệ số của Trắng
+library.tag.BlackRatingDiff = Thay đổi hệ số của Đen
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Phân tích
+analysis.menu.title = PHÂN TÍCH
+analysis.menu.analyse = Phân tích
+analysis.menu.paste = Dán PGN
+analysis.menu.online = Ván trực tuyến của tôi
+analysis.menu.folder = Đặt tệp PGN vào thư mục này để phân tích: {0}
+analysis.menu.empty.title = Chưa có ván nào được lưu
+analysis.menu.empty.text = Các ván của bạn sẽ xuất hiện ở đây sau khi kết thúc, cùng với các tệp PGN đặt trong thư mục bên dưới. Bạn cũng có thể dán một ván cờ đã sao chép dưới dạng văn bản PGN.
+analysis.menu.empty.no_folder = Dán một ván cờ đã sao chép dưới dạng văn bản PGN để phân tích.
+analysis.menu.paste.empty = Bảng tạm đang trống: hãy sao chép một ván cờ dưới dạng văn bản PGN trước.
+analysis.menu.paste.none = Không tìm thấy ván cờ nào trong bảng tạm.
+analysis.menu.paste.several = Bảng tạm chứa nhiều ván: ván đầu tiên sẽ được phân tích.
+analysis.menu.gameover = Phân tích ván cờ
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Nước {0}/{1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Tức thì
+replay.again = Phát lại từ đầu
+replay.gameover.unfinished = Ván cờ dừng lại sau nước thứ {0}, không có kết quả.
+replay.tip.start = Đầu ván cờ (Home)
+replay.tip.back = Lùi một nước (J)
+replay.tip.pause = Tạm dừng (K)
+replay.tip.resume = Tiếp tục (K)
+replay.tip.forward = Tiến một nước (L)
+replay.tip.end = Cuối ván cờ (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = BÌNH LUẬN
+analysis.hud.accuracy = ĐỘ CHÍNH XÁC
+analysis.hud.reviewing = Stockfish đang xem lại ván cờ… {0}
+analysis.hud.no_engine = Không có chương trình cờ: các nước đi được hiển thị mà không có phân tích.
+analysis.hud.no_moves = Ván cờ này không có nước đi nào.
+analysis.hud.tip.play = Chạy các nước đi (K)
+analysis.hud.tip.comments_off = Ẩn bình luận về các thời điểm then chốt (N)
+analysis.hud.tip.comments_on = Hiện bình luận về các thời điểm then chốt (N)
+analysis.hud.tip.voice_off = Tắt giọng bình luận viên (M)
+analysis.hud.tip.voice_on = Nghe bình luận bằng giọng nói (M)
+analysis.hud.tip.voice_missing = Không thể nghe giọng nói: các tệp chưa được cài đặt, hoặc Tùy chọn > Âm thanh > Giọng huấn luyện viên đang tắt. Bình luận chỉ được hiển thị trên màn hình.
+analysis.hud.tip.arrows_off = Ẩn mũi tên chỉ các nước đi hay hơn (B)
+analysis.hud.tip.arrows_on = Hiện mũi tên chỉ các nước đi hay hơn (B)
+analysis.hud.controls.play = Chạy / tạm dừng
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Hiện / ẩn bình luận
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Bật / tắt giọng bình luận viên
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Hiện / ẩn mũi tên
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Lưu thành GIF
+gif.making = Đang tạo GIF: máy chủ đang vẽ ván cờ…
+gif.saved = Đã lưu GIF:
+gif.saved_as = Đã lưu GIF: {0}
+gif.sign_in_first = Hãy đăng nhập vào một máy chủ trực tuyến để tạo GIF: máy chủ sẽ vẽ các GIF.
+gif.busy_other = Một GIF khác đang được tạo. Vui lòng chờ đến khi GIF đó hoàn tất.
+gif.err.rate_limited_for = Bạn đã tạo nhiều GIF trong thời gian ngắn. Bạn có thể tạo GIF tiếp theo sau {0}.
+gif.err.rate_limited = Bạn đã tạo nhiều GIF trong thời gian ngắn. Vui lòng thử lại sau.
+gif.err.server_busy_for = Máy chủ đang bận vẽ các GIF khác. Vui lòng thử lại sau {0}.
+gif.err.server_busy = Máy chủ đang bận vẽ các GIF khác. Vui lòng thử lại sau giây lát.
+gif.err.signed_out = Phiên đăng nhập của bạn đã kết thúc. Vui lòng đăng nhập lại để tạo GIF.
+gif.err.game_too_long = Ván cờ này quá dài để tạo thành GIF.
+gif.err.pgn_too_large = Ván cờ này quá dài để tạo thành GIF.
+gif.err.invalid_pgn = Máy chủ không thể đọc ván cờ này.
+gif.err.render_failed = Máy chủ không thể tạo GIF này. Vui lòng thử lại.
+gif.err.gif_disabled = Máy chủ này không tạo GIF.
+gif.err.write_failed = Không thể lưu GIF trên máy tính này.
+gif.err.not_found = Ván cờ này không còn trên máy chủ.
+gif.wait.seconds = {0} giây
+gif.wait.minutes = {0} phút
+gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Không thể khởi động OpenGL 4.6. Vui lòng cập nhật trình điều khiển đồ họa.
+error.opengl_macos = Không thể khởi động OpenGL 4.6 trên máy Mac này. Scacelith cần chip Apple silicon (M1 trở lên) và macOS 26 trở lên, và không chạy được trong máy ảo.
+error.renderer = Không thể khởi động bộ kết xuất.
+error.scene = Không thể tải cảnh.
+error.log_file = Chi tiết có trong tệp nhật ký: {0}

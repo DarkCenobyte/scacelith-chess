@@ -1,0 +1,161 @@
+# Coach speech (Brazilian Portuguese): the commentary of the Analysis mode
+# (src/analysis/commentary.cpp), said by the voice and shown as subtitles while a finished game is
+# replayed. Same keys and variants as assets/coach/speech/en/analysis.lang (its header documents
+# every placeholder: read it first).
+#
+# Notes for Brazilian Portuguese:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "você" or "eu" here: the players are "as Brancas" and "as Pretas" (capitalised,
+#   feminine plural, as assets/i18n/pt-BR.lang). A piece comes with its side and its article:
+#   {piece} {t1} {t2} = "o cavalo branco", "a torre preta" (common.lang, owner.white / owner.black).
+#   Never de, em, a or por right before them: "{t1:no}" = "no cavalo branco / na torre preta"
+#   ("um garfo no rei e na dama"). A pronoun that stands for the piece uses its form
+#   ("{reply} {piece:o} captura" = "o / a"), or the line repeats the noun without its side
+#   ("{piece:the}" = "o cavalo / a torre"). "Peça" is not used for a piece that may be a pawn.
+# - {opening:def} is the opening's name with its article ("a Defesa Siciliana", "o Gambito da
+#   Dama"): the lines put it after a verb, never after de, em, a or por, and agree with nothing.
+# - Counted numbers (common.lang): {m:move} "mate em 3 lances", {pts:point} "3 pontos",
+#   {n:mistake} "2 erros", {m:blunder} "1 erro grave", {acc_white:percent} "87%" (spoken
+#   "oitenta e sete por cento").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Vamos rever esta partida juntos.
+an.start.2 = Vamos percorrer esta partida, lance a lance.
+an.start.3 = Aqui está a partida. Vamos ver como ela foi.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Esta partida começa a partir de uma posição montada no tabuleiro. Vamos percorrê-la.
+an.start.setup.2 = Uma partida a partir de uma posição montada. Vamos ver como ela foi.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = A abertura é {opening:def}.
+an.opening.2 = Temos aqui {opening:def}.
+an.book_exit = Com {move}, a partida sai da teoria conhecida.
+an.book_exit.2 = {move} é o primeiro lance fora da teoria de aberturas.
+an.book_exit.3 = A teoria de aberturas termina aqui, com {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} é um erro grave.
+an.blunder.2 = Aqui, {move} é um erro sério.
+an.blunder.3 = Um erro grave: {move}.
+an.mistake = {move} é um erro.
+an.mistake.2 = {move} não é o lance certo aqui.
+an.mistake.3 = Um erro: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} deixa passar a chance de punir esse erro.
+an.missed_chance.2 = Com {move}, a chance escapa.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Agora {reply:nomate} é xeque-mate.
+an.mate_allowed.one.2 = Esse lance permite {reply:nomate}, e é xeque-mate.
+an.mate_allowed = Esse lance permite um mate forçado em {m:move}, começando com {reply:nomate}.
+an.mate_allowed.2 = Agora há um mate forçado em {m:move}, que começa com {reply:nomate}.
+an.fork = Agora {reply} dá um garfo {t1:no} e {t2:no}.
+an.fork.2 = Esse lance permite {reply}, que ataca ao mesmo tempo {t1} e {t2}.
+an.fork.3 = {reply} ataca {t1} e {t2} ao mesmo tempo.
+an.hanging = Esse lance deixa {piece} sem proteção, e {reply} {piece:o} captura.
+an.hanging.2 = {piece} fica sem defensor: {reply} ganha {piece:the}.
+an.hanging.3 = {reply} simplesmente toma {piece}, que não tinha defensor.
+an.material = A resposta {line} ganha {pts:point} de material.
+an.material.2 = Então {line} ganha {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} era xeque-mate.
+an.mate_missed.one.2 = {best:nomate} teria sido xeque-mate.
+an.mate_missed = {best:nomate} teria forçado o mate em {m:move}.
+an.mate_missed.2 = Havia um mate forçado em {m:move}, começando com {best:nomate}.
+an.missed_capture = {best} teria ganhado {piece} de graça.
+an.missed_capture.2 = {piece} não tinha defensor: {best} teria tomado {piece:the}.
+an.missed_fork = {best} teria dado um garfo {t1:no} e {t2:no}.
+an.missed_fork.2 = {best} era um garfo, que atacava {t1} e {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} era mais forte.
+an.better.2 = Melhor era {best}.
+an.better.3 = {best} era mais preciso.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} é brilhante: o lance entrega {piece}!
+an.brilliant.2 = Um sacrifício brilhante! {move} oferece {piece}.
+an.brilliant.3 = {move}! Um lance brilhante, que oferece {piece}.
+an.brilliant.mate = O lance leva a um mate forçado em {m:move}.
+# The verb "força" is read as the noun ("fôrça"): "fórça" in the spoken line.
+an.brilliant.mate.2 = E força o mate em {m:move}.
+an.brilliant.mate.2.spoken = E fórça o mate em {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} é o único lance que mantém a vantagem.
+an.only.win.2 = Só {move} mantém a vantagem aqui. Belo achado.
+an.only.hold = {move} é o único lance que mantém o equilíbrio.
+an.only.hold.2 = Só {move} segura a posição aqui.
+an.only.defend = {move} é o único lance que permite continuar lutando.
+an.only.defend.2 = Só {move} mantém a partida viva aqui. Boa defesa.
+an.only.best = {move} é, de longe, o lance mais forte aqui.
+an.only.best.2 = Lance preciso: {move} é muito mais forte do que qualquer outra opção.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} é um pouco impreciso: {best} era mais exato.
+an.inaccuracy.2 = Não é bem o melhor lance: {best} era mais preciso do que {move}.
+an.interesting = {move} é uma ideia interessante, que oferece {piece}.
+an.interesting.2 = Uma tentativa interessante: {move} entrega {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = As Brancas agora têm um mate forçado em {m:move}.
+an.mate_on.white.2 = A partir daqui, as Brancas podem forçar o mate em {m:move}.
+an.mate_on.black = As Pretas agora têm um mate forçado em {m:move}.
+an.mate_on.black.2 = A partir daqui, as Pretas podem forçar o mate em {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Xeque-mate. As Brancas vencem a partida.
+an.end.mate.white.2 = E é xeque-mate: as Brancas vencem.
+an.end.mate.black = Xeque-mate. As Pretas vencem a partida.
+an.end.mate.black.2 = E é xeque-mate: as Pretas vencem.
+an.end.resigned.white = As Pretas abandonaram, então as Brancas vencem a partida.
+an.end.resigned.white.2 = A partida termina aqui: as Pretas abandonaram, e as Brancas vencem.
+an.end.resigned.black = As Brancas abandonaram, então as Pretas vencem a partida.
+an.end.resigned.black.2 = A partida termina aqui: as Brancas abandonaram, e as Pretas vencem.
+an.end.timeout.white = O tempo das Pretas acabou, então as Brancas vencem.
+an.end.timeout.white.2 = As Brancas vencem por tempo.
+an.end.timeout.black = O tempo das Brancas acabou, então as Pretas vencem.
+an.end.timeout.black.2 = As Pretas vencem por tempo.
+an.end.win.white = A partida termina com a vitória das Brancas.
+an.end.win.white.2 = As Brancas vencem a partida.
+an.end.win.black = A partida termina com a vitória das Pretas.
+an.end.win.black.2 = As Pretas vencem a partida.
+an.end.stalemate = Afogamento: a partida termina empatada.
+an.end.stalemate.2 = O rei está afogado, então a partida termina em empate.
+an.end.draw.agreement = Os jogadores combinaram o empate.
+an.end.draw.agreement.2 = A partida termina empatada por acordo.
+an.end.draw.repetition = A partida termina empatada por repetição.
+an.end.draw.repetition.2 = A mesma posição voltou a aparecer: empate.
+an.end.draw.fifty = A partida termina empatada pela regra dos cinquenta lances.
+an.end.draw.fifty.2 = Cinquenta lances sem captura nem lance de peão: empate.
+an.end.draw.seventy_five = A partida termina empatada pela regra dos setenta e cinco lances.
+an.end.draw.seventy_five.2 = Setenta e cinco lances sem captura nem lance de peão: empate.
+an.end.draw.material = O xeque-mate já não é possível: a partida termina empatada.
+an.end.draw.material.2 = Nenhum dos lados consegue mais dar xeque-mate, então é empate.
+an.end.draw = A partida termina em empate.
+an.end.draw.2 = Empate.
+# The verb "para" (stops) is read as the preposition ("pra"): "pára" in the spoken lines.
+an.end.unfinished = A partida para aqui, inacabada.
+an.end.unfinished.spoken = A partida pára aqui, inacabada.
+an.end.unfinished.2 = É aqui que a partida para: ela não foi concluída.
+an.end.unfinished.2.spoken = É aqui que a partida pára: ela não foi concluída.
+an.end.accuracy = Precisão: {acc_white:percent} para as Brancas, {acc_black:percent} para as Pretas.
+an.end.accuracy.2 = As Brancas jogaram com {acc_white:percent} de precisão, e as Pretas, com {acc_black:percent}.
+an.end.clean.white = As Brancas não cometeram nenhum erro, nem simples nem grave.
+an.end.clean.white.2 = O jogo das Brancas não teve erros sérios.
+an.end.clean.black = As Pretas não cometeram nenhum erro, nem simples nem grave.
+an.end.clean.black.2 = O jogo das Pretas não teve erros sérios.
+an.end.mistakes.white = As Brancas cometeram {n:mistake} e nenhum erro grave.
+an.end.mistakes.white.2 = Para as Brancas: {n:mistake}, nenhum erro grave.
+an.end.mistakes.black = As Pretas cometeram {n:mistake} e nenhum erro grave.
+an.end.mistakes.black.2 = Para as Pretas: {n:mistake}, nenhum erro grave.
+an.end.blunders.white = As Brancas cometeram {m:blunder}.
+an.end.blunders.white.2 = Para as Brancas: {m:blunder}.
+an.end.blunders.black = As Pretas cometeram {m:blunder}.
+an.end.blunders.black.2 = Para as Pretas: {m:blunder}.
+an.end.errors.white = As Brancas cometeram {n:mistake} e {m:blunder}.
+an.end.errors.white.2 = Para as Brancas: {n:mistake} e {m:blunder}.
+an.end.errors.black = As Pretas cometeram {n:mistake} e {m:blunder}.
+an.end.errors.black.2 = Para as Pretas: {n:mistake} e {m:blunder}.

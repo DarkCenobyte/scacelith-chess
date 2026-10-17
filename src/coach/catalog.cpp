@@ -310,7 +310,7 @@ std::vector<std::string> Catalog::keys(const std::string& lang, const std::strin
 std::vector<uint32_t> Catalog::codepoints(const std::string& lang) const {
     std::set<uint32_t> cps;
     auto addText = [&](const std::string& s) {
-        for (char32_t c : uni::decode(s))
+        for (char32_t c : uni::shape(uni::decode(s)).text)   // as drawn: Arabic forms, Devanagari syllables
             if (c >= 0x20) cps.insert(uint32_t(c));
     };
     if (const Language* L = language(lang))
@@ -408,7 +408,8 @@ std::string Catalog::pattern(Ctx& c, const std::string& key, const std::vector<L
 
 namespace {
 // True when text appended to 'out' starts a sentence (capitalise a placeholder's first letter).
-bool atSentenceStart(const std::string& out) {
+// Greek writes its question mark as ';' (U+037E normalises to U+003B).
+bool atSentenceStart(const std::string& out, bool greek) {
     std::u32string t = uni::decode(out);
     size_t i = t.size();
     while (i > 0 && (t[i - 1] == ' ' || t[i - 1] == 0x200E || t[i - 1] == 0x00A1 || t[i - 1] == 0x00BF ||
@@ -416,14 +417,14 @@ bool atSentenceStart(const std::string& out) {
         --i;
     if (i == 0) return true;
     char32_t p = t[i - 1];
-    return p == '.' || p == '!' || p == '?' || p == '\n' || p == 0x2026;
+    return p == '.' || p == '!' || p == '?' || p == '\n' || p == 0x2026 || p == 0x037E || (greek && p == ';');
 }
 
-std::string capitalizeFirst(const std::string& s) {
+std::string capitalizeFirst(const std::string& s, bool turkic) {
     std::u32string t = uni::decode(s);
     for (char32_t& ch : t) {
         if (ch == ' ' || ch == 0x200E) continue;
-        ch = uni::toUpper(ch);
+        ch = uni::toUpper(ch, turkic);
         break;
     }
     return uni::encode(t);
@@ -471,7 +472,7 @@ std::string Catalog::expand(Ctx& c, const std::string& tmpl, const std::vector<L
         std::string value = renderArg(c, *a, form);
         bool capitalise = a->kind == Arg::Kind::Piece || a->kind == Arg::Kind::Text || a->kind == Arg::Kind::Opening;
         // Only at the top level: a nested text is inserted inside the parent's sentence.
-        if (capitalise && top && atSentenceStart(out)) value = capitalizeFirst(value);
+        if (capitalise && top && atSentenceStart(out, c.lang == "el")) value = capitalizeFirst(value, c.lang == "tr");
         if (top && c.out) c.out->anchors.push_back({name, int(out.size())});
         out += value;
     }
@@ -750,7 +751,8 @@ namespace {
 // A letter or digit of a word ("dix-huit", "l’échec" and "mat." end their words at - ’ and .).
 bool isWordChar(char32_t c) {
     if (c < 0x80) return std::isalnum(int(c)) != 0;
-    return c >= 0xC0 && c != 0xD7 && c != 0xF7 && !(c >= 0x2000 && c <= 0x206F) && !(c >= 0x3000 && c <= 0x303F);
+    return c >= 0xC0 && c != 0xD7 && c != 0xF7 && !(c >= 0x2000 && c <= 0x206F) && !(c >= 0x3000 && c <= 0x303F) &&
+           c != 0x37E && c != 0x387 && c != 0x964 && c != 0x965;   // Greek and Devanagari punctuation
 }
 }  // namespace
 

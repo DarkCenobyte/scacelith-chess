@@ -796,7 +796,10 @@ void GameScene::analysisOptionsChanged() {
     if (!a.prewarmedLanguages.count(ui)) {
         a.prewarmedLanguages.insert(ui);
         std::vector<std::pair<int, uint32_t>> glyphs;
-        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) glyphs.push_back({ui::font::FACE_TEXT, cp});
+        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) {
+            const int face = ui::font::resolveFace(ui::font::FACE_TEXT, cp);   // the face that will draw it
+            if (face >= 0) glyphs.push_back({face, cp});
+        }
         ui::font::prewarm(glyphs);
     }
     if (a.loaded) a.opening = openingName(a.review, replayRecord_);

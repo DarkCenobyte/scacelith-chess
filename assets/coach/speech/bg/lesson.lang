@@ -1,0 +1,272 @@
+# Coach speech (Bulgarian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("конят ти", "офицерът ми"),
+# with the forms of common.lang: {my:obj} after a verb or a preposition ("Вземи коня ми"),
+# {your:refl} when the player acts with their own piece ("Използвай коня си"), {your:pron} /
+# {my:pron_obj} / {my:pron_dat} for the pronouns (той/тя, го/я, му/ѝ), {your:a} for the feminine
+# ending of a participle ("свързан{your:a}"). {sq}, {sq2}, {to}, {esc} = squares ("на {sq}",
+# "полето {to}"); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at
+# something while saying the word right after the mark. A ".spoken" key is what the voice says
+# instead (here: the Latin file letters said as their Cyrillic names, "Elo" in Cyrillic, and the
+# letter "Г" of the knight's move said as its letter name "гъ").
+# Files = вертикали, ranks = хоризонтали, back rank = задната линия, castling kingside / queenside =
+# малка / голяма рокада. No l-participle or adjective about the player (gender unknown).
+
+# ---- Chapter titles (said inside "Да продължим с темата „{chapter}“.") ---------------------------------
+# Lower-case noun phrases (see event.lesson.* in events.lang).
+lesson.title.welcome = шахматната дъска
+lesson.title.pieces = как се движат фигурите
+lesson.title.safety = безопасни и опасни вземания
+lesson.title.check = шах
+lesson.title.mate = мат
+lesson.title.castling = рокада
+lesson.title.en_passant = вземане ан пасан
+lesson.title.promotion = произвеждане на пешка
+lesson.title.draws = пат и реми
+lesson.title.etiquette = рейтинг, часовник и поведение в истинските партии
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Сега опитай ти.
+lesson.now_you.2 = Сега ти си на ход.
+lesson.now_you.3 = Сега ти.
+# Another wrong move after the demonstration.
+lesson.almost = Почти! Изиграй хода, който ти показах.
+lesson.almost.2 = Не съвсем. Опитай хода от моя пример.
+lesson.almost.3 = Близо си. Спомни си какво ти показах току-що.
+# A wrong move without a line of its own.
+lesson.try_again = Не е това. Опитай пак.
+lesson.try_again.2 = Не този ход. Пробвай отново.
+lesson.try_again.3 = Да опитаме още веднъж.
+lesson.use_your = Използвай {your:refl}.
+lesson.use_your.2 = Опитай с {your:refl}.
+lesson.watch = Гледай.
+lesson.like_this = Ето така.
+lesson.and_back = И обратно.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Шах, но царят ми бяга на {esc}.
+lesson.check_takes = Шах, но царят ми просто взема {your:obj}.
+lesson.check_block = Шах, но мога да се закрия с фигура.
+lesson.stalemate = Пат! Царят ми няма ход и не е под шах. Реми, макар че печелеше!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Не на {sq}: {my} напада това поле. Царят никога не застава под удар.
+why.PathBlocked = Нещо препречва {@}пътя: фигурите не могат да прескачат други, освен коня.
+why.WrongGeometry = {your} не се движи така.
+why.MustAnswerCheck = Под {@}шах си: първо трябва да се справиш с него.
+why.CastlingThroughCheck = Царят ти би минал през {sq}, а {my} напада това поле.
+why.CastlingNoRights = Този цар или топ вече се е движил: рокада не е възможна.
+why.CastlingBlocked = За рокада полетата между царя и топа трябва да са празни.
+why.CastlingOutOfCheck = Не можеш да правиш рокада, докато си под шах.
+why.PawnForwardBlocked = Пешките не вземат право напред: това поле е {@}заето.
+why.LeavesKingInCheck = {your} е свързан{your:a}: ако {your:pron_obj} преместиш, царят ти ще остане под удара на {my:obj}.
+why.OwnPieceOnTarget = Не можеш да стъпиш на поле, заето от твоя собствена фигура.
+why.PawnCaptureNeedsVictim = Пешката се движи по диагонал само когато взема.
+why.EnPassantExpired = Вземане ан пасан е позволено само веднага след хода на пешката с две полета.
+why.NotYourTurn = Чакай: сега е мой ход.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Здравей! Аз съм твоят треньор. Да научим заедно правилата на шаха, стъпка по стъпка.
+lesson.welcome.board = Това е шахматната дъска: шестдесет и четири полета, светли и тъмни, осем реда по осем.
+lesson.welcome.light = Ъгловото поле {@}вдясно от теб винаги е светло. Запомни: вдясно – светло.
+lesson.welcome.files = Колоните се наричат вертикали. Те се означават с букви, от {@}a до {@2}h.
+lesson.welcome.files.spoken = Колоните се наричат вертикали. Те се означават с букви, от {@}а до {@2}аш.
+lesson.welcome.ranks = Редовете се наричат хоризонтали. Те се означават с числа, от {@}едно до {@2}осем, като започват от твоята страна.
+lesson.welcome.square = Всяко поле се назовава с буквата си, а после с числото си. Това поле е {sq}.
+lesson.welcome.square2 = А това е {sq}.
+lesson.welcome.kings = Това са двата царя. Твоят е на {sq}, моят – на {sq2}.
+lesson.welcome.ask = Твой ход: премести царя си едно поле напред, на {sq}.
+lesson.welcome.wrong = Това е {to}. Трябва ни {sq}: буквата e, числото две.
+lesson.welcome.wrong.spoken = Това е {to}. Трябва ни {sq}: буквата е, числото две.
+lesson.welcome.ok = Отлично. Царят ти е на {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Това е {your}. {your:pron} се движи по права линия, по вертикалите и хоризонталите, на колкото полета поиска.
+lesson.rook.intro.spoken = Това е {your}. {your:pron} се движи по пра́ва линия, по вертикалите и хоризонталите, на колкото полета поиска.
+lesson.rook.lines = Нагоре по вертикалата {@}или по хоризонталата.
+lesson.rook.capture = За да вземе, фигурата застава на мястото на {@}противникова фигура, а тя напуска дъската.
+lesson.rook.ask = Вземи {my:obj} с топа си!
+lesson.rook.short = Посоката е правилна! Продължи нагоре по вертикалата, чак до {my:obj}.
+lesson.rook.rank = Това е по хоризонталата. {my} е нагоре по вертикалата.
+lesson.rook.king = Това е царят ти. Използвай {your:refl} в ъгъла.
+lesson.rook.ok = Готово! {my} напуска дъската.
+# Pieces don't jump
+lesson.jump.blocked = Фигурите не могат да прескачат други фигури. Пешката ти на {sq} препречва пътя на топа.
+lesson.jump.knight = Само конят може да прескача. Скоро ще се запознаем с него.
+# Bishop
+lesson.bishop.intro = Това е {your}. {your:pron} се движи по диагонал, на колкото полета поиска.
+lesson.bishop.colour = Офицерът винаги остава на полета от един и същ цвят.
+lesson.bishop.ask = {my} стои на диагонала на офицера ти. Вземи {my:pron_obj}!
+lesson.bishop.short = Правилният диагонал! Продължи, докато стигнеш до {my:obj}.
+lesson.bishop.other = Това е другият диагонал. Погледни към {my:obj}.
+lesson.bishop.ok = Отлично. Офицерите обичат дългите диагонали.
+# Queen
+lesson.queen.intro = Това е {your}, най-силната фигура. {your:pron} се движи като топ и офицер, взети заедно.
+lesson.queen.ask = Намери {my:obj} и {my:pron_obj} вземи с дамата си.
+lesson.queen.wrong = Дамата ти може да стигне до {my:obj} с един ход, по диагонал.
+lesson.queen.ok = Браво! Пази дамата си: тя струва много.
+# King
+lesson.king.intro = Царят се движи само с едно поле, във всяка посока.
+lesson.king.important = Царят е най-важната фигура. Ако попадне в капан, партията е загубена.
+lesson.king.ask = Царят също може да взема. Вземи {my:obj}!
+lesson.king.wrong = Царят ти е точно до {my:obj}. Стъпи на полето {my:pron_dat}, за да {my:pron_obj} вземеш.
+lesson.king.ok = Добре! Царят е бавен, но отблизо е силен.
+# Knight
+lesson.knight.intro = Това е {your}. {your:pron} се движи като буквата Г: две полета направо, после едно встрани.
+lesson.knight.intro.spoken = Това е {your}. {your:pron} се движи като буквата гъ: две полета направо, после едно встрани.
+lesson.knight.l = Ето {@}така. Конят винаги попада на поле от другия цвят.
+lesson.knight.jump = Конят е единствената фигура, която може да прескача други.
+lesson.knight.ask = Вземи {my:obj} с коня си!
+lesson.knight.wrong = Това е истински ход на кон, но не стига до {my:obj}. Опитай друго Г.
+lesson.knight.wrong.spoken = Това е истински ход на кон, но не стига до {my:obj}. Опитай друго гъ.
+lesson.knight.ok = Страхотен скок!
+# Pawn: moving
+lesson.pawn.intro = А сега – {your}. {your:pron} се движи право напред, по едно поле, и никога назад.
+lesson.pawn.first = При първия си ход пешката може да се придвижи с едно или с две полета.
+lesson.pawn.ask = Премести пешката си две полета напред.
+lesson.pawn.one = Това е едно поле: позволено е, но този път я премести с две.
+lesson.pawn.use = Използвай пешката.
+lesson.pawn.ok = Добре.
+# Pawn: capturing
+lesson.pawncap.blocked = Пешката ми спира твоята. Пешките не могат да вземат право напред.
+lesson.pawncap.diagonal = Но пешката взема по диагонал, едно поле напред.
+lesson.pawncap.ask = Вземи {my:obj} с пешката си.
+lesson.pawncap.use = Използвай {your:refl}: {your:pron} взема по диагонал напред.
+lesson.pawncap.ok = Да! Право напред – за ход, по диагонал – за вземане.
+# Values, set-up and the first moves
+lesson.values.pawn = Всяка фигура има стойност в точки. Пешката струва една точка.
+lesson.values.pieces = Конят или {@}офицерът – три. {@2}Топът – пет. {@3}Дамата – девет.
+lesson.values.king = Царят е безценен: никога не можеш да го дадеш.
+lesson.values.trade = Старай се никога да не даваш фигура за по-малко, отколкото струва.
+lesson.setup.corners = Всяка партия започва така: топовете в {@}ъглите, после {@2}конете, после {@3}офицерите.
+lesson.setup.queen = Дамата стои на поле от своя цвят: дамата ти е на светло поле.
+lesson.setup.king = Царят стои до нея. Белите винаги започват първи.
+lesson.first.ask = Започни партията: премести пешката пред царя си с две полета, на {sq}.
+lesson.first.wrong = И това е позволен ход! Но засега, моля те, изиграй царската си пешка на {sq}.
+lesson.first.ok = Чудесен първи ход: той отваря път на дамата и офицера ти.
+lesson.first.reply = Отговарям по същия начин. Сега изведи кон: скочи от {sq} на {sq2}.
+lesson.first.knight_wrong = Конете прескачат пешките. Опитай от {sq} на {sq2}.
+lesson.first.knight_ok = Отлично. Конете и офицерите излизат рано.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Фигурата е защитена, когато друга фигура от същия цвят може да вземе обратно.
+lesson.safety.pawn = {@}Пешката ми защитава {my:obj}.
+lesson.safety.free = Но {my} няма защитник. Дамата ти напада и двете фигури.
+lesson.safety.ask = Вземи незащитената фигура!
+lesson.safety.watch = Гледай какво става.
+lesson.safety.gave = Даде дамата си, която струва девет, за коня ми, който струва три.
+lesson.safety.other = Опитай с другата фигура.
+lesson.safety.look = Търси фигурата, която нищо не защитава.
+lesson.safety.ok = Отлично! Винаги се питай: защитена ли е тази фигура?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Топът ми контролира цялата втора хоризонтала.
+lesson.danger.rule = Царят никога не може да отиде на поле, където би могъл да бъде взет.
+lesson.danger.ask = Премести царя си на безопасно поле.
+lesson.danger.ok = Правилно. Там царят ти е в безопасност.
+lesson.check.what = Топът ми напада царя ти. Това се нарича шах.
+lesson.check.must = Когато си под шах, трябва веднага да се измъкнеш от него.
+lesson.check.ways = Има три начина: да {@}преместиш царя, да {@2}закриеш атаката или да {@3}вземеш нападащата фигура.
+lesson.check.ask = Тук измъкни царя си от шаха.
+lesson.check.file = Полето {to} все още е на {@}вертикалата на топа ми. Излез от тази линия.
+lesson.check.ok = Добре: вече не си под шах.
+lesson.block.again = Пак шах! Този път царят ти няма свободно поле.
+lesson.block.ask = Затова закрий атаката: постави фигура на пътя ѝ.
+lesson.block.queen = Това закрива шаха! Но топът ми може да вземе дамата ти. Закрий с по-евтина фигура.
+lesson.block.queen_ok = Получава се. Запомни: закривай с най-евтината си фигура.
+lesson.block.ok = Отлично. Закривай с най-малко ценната си фигура.
+lesson.capture.check = Дамата ми дава шах, точно до царя ти.
+lesson.capture.ask = Вземи нападащата фигура!
+lesson.capture.king_ok = Да! Дамата ми нямаше защитник, затова царят ти можа да я вземе.
+lesson.capture.knight_ok = Да! Конят ти премахна нападащата фигура.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Мат: царят е под шах и няма изход. Така се печели партията.
+lesson.mate1.stuck = Царят ми е заклещен зад {@}собствените си пешки.
+lesson.mate1.ask = Дай ми мат в един ход!
+lesson.mate1.wrong = Близо си! Дай шах на задната ми линия, откъдето царят ми не може да избяга.
+lesson.mate1.ok = Мат! Това е мат на задната линия. Запомни го!
+lesson.mate2.ask = Царят и дамата ти работят като отбор. Дай ми мат в един ход.
+lesson.mate2.wrong = Намери шах, след който на царя ми не остава нито едно поле.
+lesson.mate2.ok = Мат! Царят ти пази дамата, затова моят не може да я вземе.
+lesson.mate2.ok_rank = Мат на задната линия! Царят ти пази всички полета пред моя.
+lesson.mate3.edge = Топът ти на седмата хоризонтала държи царя ми на ръба на дъската.
+lesson.mate3.ask = Сега дай мат с {your:refl}.
+lesson.mate3.free = Шах, но сега седмата хоризонтала е свободна и царят ми избягва.
+lesson.mate3.takes = Царят ми просто взема топа ти.
+lesson.mate3.hint = Дай шах на задната линия с топа, който не пази седмата хоризонтала.
+lesson.mate3.ok = Мат! Двата топа работиха като стълбичка.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Рокадата е специален ход, който пази царя в безопасност. Царят и топът се местят заедно.
+lesson.castle.how = {@}Царят се премества с две полета към топа, а {@2}топът прескача от другата страна на царя.
+lesson.castle.ask = Винаги докосвай първо царя. Сега ти: направи малка рокада.
+lesson.castle.rook = Така се мести само топът. За рокада премести царя си с две полета към него.
+lesson.castle.long = Това е голяма рокада – и тя е позволена! Този път направи рокада към по-близкия топ.
+lesson.castle.one = Едно поле е обикновен ход на царя. При рокада царят се мести с две.
+lesson.castle.other = За рокада премести царя си с две полета към топа на {sq}.
+lesson.castle.ok = Рокадата е направена! Царят ти е на сигурно място, а топът ти е готов за игра.
+lesson.castle2.moved = Не можеш да правиш рокада, ако царят ти или този топ вече са се движили.
+lesson.castle2.attacked = Нито докато си под шах, нито ако царят ти трябва да мине през нападнато поле или да застане на такова.
+lesson.castle2.bishop = Офицерът ми напада {sq}. Затова рокадата от тази страна сега е забранена.
+lesson.castle2.ask = Направи рокада от другата страна.
+lesson.castle2.other = Направи рокада към другия си топ, към дамския фланг.
+lesson.castle2.ok = Правилно! При голямата рокада царят ти отива на {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Едно специално вземане с пешка се нарича ан пасан. Това е френски израз и означава „мимоходом“.
+lesson.ep.watch = Гледай пешката ми: тя се придвижва с две полета и застава точно до твоята.
+lesson.ep.how = Пешката ти може да я вземе така, сякаш тя е минала само едно поле: на {sq}.
+lesson.ep.now = Но само сега, на този ход. Вземи ан пасан!
+lesson.ep.gone = Шансът отмина: ан пасан е възможно само веднага. Да опитаме пак.
+lesson.ep.ok = Ан пасан! Пешката ми на {sq} напуска дъската.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Когато пешка стигне последната хоризонтала, тя се произвежда: превръща се в дама, топ, офицер или кон.
+lesson.promo.ask = Почти винаги избирай дама. Произведи пешката си сега!
+lesson.promo.under = Позволено е! Но дамата е по-силна. Да изберем дама.
+lesson.promo.under_ok = Добре. Все пак повечето играчи избират дама.
+lesson.promo.push = Придвижи пешката си до последната хоризонтала, на {sq}.
+lesson.promo.ok = Нова дама! Можеш да имаш дори две дами едновременно.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Мой ход е. Царят ми не е под шах, но {@}всяко поле около него е нападнато.
+lesson.stale.draw = Нямам нито един позволен ход. Това е пат и партията завършва реми.
+lesson.stale2.ask = Когато печелиш, пази се от пат. Дай ми мат в един ход, без пат!
+lesson.stale2.wrong = Дай шах на задната ми линия, където царят ми не може да избяга.
+lesson.stale2.ok = Мат! Винаги оставяй ход на противниковия цар, освен ако не му даваш мат.
+lesson.draws.kings = Има и други случаи на реми: когато никой не може да даде мат, например при два сами царя, партията е реми.
+lesson.draws.agree = Играчите могат и да се споразумеят за реми.
+lesson.draws.repeat = Трикратното повторение на позиция или петдесет хода без вземане и без ход с пешка също позволяват реми.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Вече знаеш всички правила на шаха. Браво!
+lesson.talk.real = Нека ти разкажа как се играят истинските партии.
+# "Elo" is written in Latin letters (glossary); the voice reads it in Cyrillic.
+lesson.talk.elo = Играчите имат рейтинг, наречен Elo. Той расте, когато печелиш, и пада, когато губиш.
+lesson.talk.elo.spoken = Играчите имат рейтинг, наречен Ело. Той расте, когато печелиш, и пада, когато губиш.
+lesson.talk.elo_gap = Победата над по-силен играч носи повече точки, а загубата от по-слаб струва повече.
+lesson.talk.elo_start = Рейтингът ти се появява след пет партии с рейтинг. Партиите с треньора са тренировка, затова не се отчитат за рейтинг.
+lesson.talk.clock = Това е {@}шахматен часовник. Всеки играч има свое време, което тече само когато той е на ход.
+lesson.talk.press = След хода си натискаш часовника със същата ръка. Така пускаш моето време.
+lesson.talk.flag = Ако времето ти изтече, губиш, освен ако аз по никакъв начин не мога да ти дам мат.
+lesson.talk.increment = „Пет плюс три“ означава по пет минути за всеки играч плюс три секунди след всеки ход.
+lesson.talk.speeds = Кратките партии се наричат блиц, по-дългите – рапид, а най-дългите – класически.
+lesson.talk.no_clock = С мен часовникът е изключен. Мисли колкото ти е нужно.
+lesson.talk.touch = В истинска партия, ако докоснеш някоя от своите фигури, трябва да я преместиш.
+lesson.talk.touch_mine = Ако докоснеш някоя от моите фигури, трябва да я вземеш, ако е възможно.
+lesson.talk.adjust = За да оправиш фигура, без да я местиш, първо кажи „поправям“.
+lesson.talk.release = Щом пуснеш фигурата на ново поле, ходът е направен.
+lesson.talk.sheet = На турнирите двамата играчи записват всеки ход в {@}протокол на партията.
+# {move:letters} shows the Bulgarian scoresheet letters ("Кf3"), which is what this line teaches.
+lesson.talk.notation = Записваме буквата на фигурата и полето, например {move:letters}. За пешките – само полето.
+lesson.talk.robot = Твоят робот записва ходовете вместо теб. В бързите партии записването не е задължително.
+lesson.talk.handshake = Партиите започват и завършват с ръкостискане. То означава: „хубава партия и благодаря“.
+lesson.talk.polite = Независимо дали печелиш, или губиш, дръж се учтиво и никога не пречи на противника си, докато мисли.
+lesson.talk.tips = Три съвета за партиите ти: {@}контролирай центъра, {@2}развий конете и офицерите си и {@3}направи рокада рано.
+lesson.talk.next = Когато решиш, избери „Първи стъпки“. Ще играя по-меко и ще ти помагам след всяка грешка.
+lesson.talk.welcome = Приветствам те в света на шаха! Да си стиснем ръцете.

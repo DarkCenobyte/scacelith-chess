@@ -1,0 +1,349 @@
+# Coach speech (Vietnamese): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Vietnamese needs.
+# Register: a friendly male teacher who calls himself "tôi" and the player "bạn"; "we / let's" is
+# "chúng ta". Never em / con / cậu / anh / thầy, never "mình" for "I": "của mình" only means "one's
+# own" (the form refl below). Warm particles with restraint (nhé, nhỉ, nào, đi), "Hãy ..." for advice.
+# Vietnamese has no gender, no case and a single plural form: nothing agrees with the player's or the
+# coach's gender, and a noun after a number never changes ("1 nước", "3 nước").
+# Piece names are capitalised when they mean the chess piece (Vua, Hậu, Xe, Tượng, Mã, Tốt): this keeps
+# "Tốt" (pawn) apart from "tốt" (good). In speech they sound alike: good move = "nước đi hay", never
+# "nước đi tốt". Glossary: the translators' glossary/vi.md.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns of Vietnamese chess books and of the game menus: Tốt, Mã, Tượng, Xe, Hậu, Vua. piece.<type>.nom
+# is the bare noun ("Mã"), as the spoken moves need it ("Mã ép ba"); the owner patterns add the friendly
+# classifier "con" in front and the owner after the noun. The Analysis mode (owners white / black) names
+# a piece by its colour, lowercase, as Vietnamese commentary does ("con Mã trắng"), and says the side
+# itself capitalised where it stands alone ("của Trắng").
+# Forms (each defined for all six pieces and the four owners your, my, white, black):
+#   nom    con Mã của bạn / con Mã của tôi /          "{my} bắt {your}."
+#          con Mã trắng / con Mã đen                  = "Con Mã của tôi bắt con Hậu của bạn."
+#          The default ("{your}" = "{your:nom}"): subject, object, after any verb or preposition
+#          ("bằng {your}", "trước {t1}", "an toàn cho {your}").
+#   short  Mã của bạn / Mã của tôi / Mã trắng / Mã đen  "{your:short} bị ghim, ô {sq} bị bỏ ngỏ."
+#          No classifier, as commentary writes: terse levels and lists ("{reply} chĩa đôi {t1:short}
+#          và {t2:short}.").
+#   refl   con Mã của mình (every owner)              "Bạn đã đi {your:refl} hai lần."
+#          The owner is the subject of the same clause ("one's own"): Vietnamese says "của mình" there,
+#          not "của bạn" / "của tôi" ("Tôi để {my:refl} không được bảo vệ.").
+#   bare   con Mã (every owner)                       "Đây là {your}. {your:bare} đi theo hình chữ L."
+#          The piece again without its owner, once the owner is clear; with a demonstrative after it
+#          ("{your:bare} đó" = "that knight", "{your:bare} này"); and for two pieces of one owner, the
+#          owner said once at the end: "{t1:bare} và {t2}" = "con Vua và con Hậu của bạn".
+#   noun   Mã (every owner)                           "Hãy đi {your:noun}." = "Hãy đi Mã."
+#          The noun alone: no classifier, no owner (after "đi"; "một nước {your:noun}" = "a knight move").
+#   of     của bạn / của tôi / của Trắng / của Đen     "{your:bare} bị ghim {your:of}"
+#          The owner alone, after a bare form and its modifier (= "con Mã bị ghim của bạn"), or after
+#          two bare forms: "{t1:bare} và {t2:bare} {t2:of}" = "con Vua và con Hậu của Đen".
+#   pron   nó (every piece and owner)                 "{your} bị nhốt: {your:pron} không còn ô nào để đi."
+#          "It", subject or object ("Tôi sẽ bắt {your:pron}."); writing "nó" directly is the same.
+# The program capitalises a placeholder that starts a sentence ("Con Mã của bạn ...", "Mã trắng ...",
+# "Nó ..."). Never write "của bạn", "của tôi", "của mình", "trắng" or "đen" after a nom, short or refl
+# form: the owner is already in it. A piece written by hand takes the same shapes ("con Vua của bạn").
+piece.pawn.nom = Tốt
+piece.knight.nom = Mã
+piece.bishop.nom = Tượng
+piece.rook.nom = Xe
+piece.queen.nom = Hậu
+piece.king.nom = Vua
+piece.pawn.short = Tốt
+piece.knight.short = Mã
+piece.bishop.short = Tượng
+piece.rook.short = Xe
+piece.queen.short = Hậu
+piece.king.short = Vua
+piece.pawn.refl = Tốt
+piece.knight.refl = Mã
+piece.bishop.refl = Tượng
+piece.rook.refl = Xe
+piece.queen.refl = Hậu
+piece.king.refl = Vua
+piece.pawn.bare = Tốt
+piece.knight.bare = Mã
+piece.bishop.bare = Tượng
+piece.rook.bare = Xe
+piece.queen.bare = Hậu
+piece.king.bare = Vua
+piece.pawn.noun = Tốt
+piece.knight.noun = Mã
+piece.bishop.noun = Tượng
+piece.rook.noun = Xe
+piece.queen.noun = Hậu
+piece.king.noun = Vua
+# "of" says the owner only: the noun is required by the lookup but not said.
+piece.pawn.of = Tốt
+piece.knight.of = Mã
+piece.bishop.of = Tượng
+piece.rook.of = Xe
+piece.queen.of = Hậu
+piece.king.of = Vua
+piece.pawn.pron = nó
+piece.knight.pron = nó
+piece.bishop.pron = nó
+piece.rook.pron = nó
+piece.queen.pron = nó
+piece.king.pron = nó
+owner.your.nom = con {piece} của bạn
+owner.my.nom = con {piece} của tôi
+owner.white.nom = con {piece} trắng
+owner.black.nom = con {piece} đen
+owner.your.short = {piece} của bạn
+owner.my.short = {piece} của tôi
+owner.white.short = {piece} trắng
+owner.black.short = {piece} đen
+owner.your.refl = con {piece} của mình
+owner.my.refl = con {piece} của mình
+owner.white.refl = con {piece} của mình
+owner.black.refl = con {piece} của mình
+owner.your.bare = con {piece}
+owner.my.bare = con {piece}
+owner.white.bare = con {piece}
+owner.black.bare = con {piece}
+owner.your.noun = {piece}
+owner.my.noun = {piece}
+owner.white.noun = {piece}
+owner.black.noun = {piece}
+owner.your.of = của bạn
+owner.my.of = của tôi
+owner.white.of = của Trắng
+owner.black.of = của Đen
+owner.your.pron = {piece}
+owner.my.pron = {piece}
+owner.white.pron = {piece}
+owner.black.pron = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The files are said by the names Vietnamese gives Latin letters when spelling (as in "DVD" = "đê vê
+# đê"), the ranks as number words: e4 = "e bốn", f3 = "ép ba", c6 = "xê sáu", d5 = "đê năm",
+# g7 = "giê bảy", h8 = "hát tám", b1 = "bê một".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = bê
+file.c.spoken = xê
+file.d.spoken = đê
+file.e.spoken = e
+file.f.spoken = ép
+file.g.spoken = giê
+file.h.spoken = hát
+rank.1.spoken = một
+rank.2.spoken = hai
+rank.3.spoken = ba
+rank.4.spoken = bốn
+rank.5.spoken = năm
+rank.6.spoken = sáu
+rank.7.spoken = bảy
+rank.8.spoken = tám
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Vietnamese notation letters: V(ua) H(ậu) X(e) T(ượng) M(ã): "Mf3", "Xad1", "Vxe2".
+move.letters = V H X T M
+# Spoken as Vietnamese players read moves aloud: "Mã ép ba", "Mã bắt e năm", "Mã bê đê hai",
+# "Tốt e bắt đê năm", "Tốt bắt lại" (a recapture in a line), "nhập thành ngắn", "e tám, phong Hậu",
+# "Hậu giê bốn, chiếu", "... chiếu hết". {piece} is the bare noun (piece.<type>.nom).
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} bắt {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} bắt {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = Tốt {file} bắt {to}
+move.recapture.spoken = {piece} bắt lại
+move.castle_short.spoken = nhập thành ngắn
+move.castle_long.spoken = nhập thành dài
+move.promotion.spoken = {move}, phong {piece}
+move.check.spoken = {move}, chiếu
+move.mate.spoken = {move}, chiếu hết
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the respell.* words the Vietnamese voice misreads.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. 0-20 and the tens are listed (10 = "mười", 20-90 = "<n> mươi"); 21-99 compose
+# as "{tens} {units}" ("hai mươi hai"), except where Vietnamese changes the unit after "mươi":
+# 1 becomes "mốt" (21, 31 ... 91) and 5 becomes "lăm" (25, 35 ... 95; 15 = "mười lăm"), listed below.
+# 100-999 compose as "{n} trăm" + the rest ("một trăm hai mươi mốt", "ba trăm mười lăm"); a rest of 1-9
+# takes "linh" and keeps "một" / "năm" ("một trăm linh một", "hai trăm linh năm"), listed below.
+number.0.spoken = không
+number.1.spoken = một
+number.2.spoken = hai
+number.3.spoken = ba
+number.4.spoken = bốn
+number.5.spoken = năm
+number.6.spoken = sáu
+number.7.spoken = bảy
+number.8.spoken = tám
+number.9.spoken = chín
+number.10.spoken = mười
+number.11.spoken = mười một
+number.12.spoken = mười hai
+number.13.spoken = mười ba
+number.14.spoken = mười bốn
+number.15.spoken = mười lăm
+number.16.spoken = mười sáu
+number.17.spoken = mười bảy
+number.18.spoken = mười tám
+number.19.spoken = mười chín
+number.20.spoken = hai mươi
+number.30.spoken = ba mươi
+number.40.spoken = bốn mươi
+number.50.spoken = năm mươi
+number.60.spoken = sáu mươi
+number.70.spoken = bảy mươi
+number.80.spoken = tám mươi
+number.90.spoken = chín mươi
+number.21.spoken = hai mươi mốt
+number.31.spoken = ba mươi mốt
+number.41.spoken = bốn mươi mốt
+number.51.spoken = năm mươi mốt
+number.61.spoken = sáu mươi mốt
+number.71.spoken = bảy mươi mốt
+number.81.spoken = tám mươi mốt
+number.91.spoken = chín mươi mốt
+number.25.spoken = hai mươi lăm
+number.35.spoken = ba mươi lăm
+number.45.spoken = bốn mươi lăm
+number.55.spoken = năm mươi lăm
+number.65.spoken = sáu mươi lăm
+number.75.spoken = bảy mươi lăm
+number.85.spoken = tám mươi lăm
+number.95.spoken = chín mươi lăm
+number.101.spoken = một trăm linh một
+number.102.spoken = một trăm linh hai
+number.103.spoken = một trăm linh ba
+number.104.spoken = một trăm linh bốn
+number.105.spoken = một trăm linh năm
+number.106.spoken = một trăm linh sáu
+number.107.spoken = một trăm linh bảy
+number.108.spoken = một trăm linh tám
+number.109.spoken = một trăm linh chín
+number.201.spoken = hai trăm linh một
+number.202.spoken = hai trăm linh hai
+number.203.spoken = hai trăm linh ba
+number.204.spoken = hai trăm linh bốn
+number.205.spoken = hai trăm linh năm
+number.206.spoken = hai trăm linh sáu
+number.207.spoken = hai trăm linh bảy
+number.208.spoken = hai trăm linh tám
+number.209.spoken = hai trăm linh chín
+number.301.spoken = ba trăm linh một
+number.302.spoken = ba trăm linh hai
+number.303.spoken = ba trăm linh ba
+number.304.spoken = ba trăm linh bốn
+number.305.spoken = ba trăm linh năm
+number.306.spoken = ba trăm linh sáu
+number.307.spoken = ba trăm linh bảy
+number.308.spoken = ba trăm linh tám
+number.309.spoken = ba trăm linh chín
+number.401.spoken = bốn trăm linh một
+number.402.spoken = bốn trăm linh hai
+number.403.spoken = bốn trăm linh ba
+number.404.spoken = bốn trăm linh bốn
+number.405.spoken = bốn trăm linh năm
+number.406.spoken = bốn trăm linh sáu
+number.407.spoken = bốn trăm linh bảy
+number.408.spoken = bốn trăm linh tám
+number.409.spoken = bốn trăm linh chín
+number.501.spoken = năm trăm linh một
+number.502.spoken = năm trăm linh hai
+number.503.spoken = năm trăm linh ba
+number.504.spoken = năm trăm linh bốn
+number.505.spoken = năm trăm linh năm
+number.506.spoken = năm trăm linh sáu
+number.507.spoken = năm trăm linh bảy
+number.508.spoken = năm trăm linh tám
+number.509.spoken = năm trăm linh chín
+number.601.spoken = sáu trăm linh một
+number.602.spoken = sáu trăm linh hai
+number.603.spoken = sáu trăm linh ba
+number.604.spoken = sáu trăm linh bốn
+number.605.spoken = sáu trăm linh năm
+number.606.spoken = sáu trăm linh sáu
+number.607.spoken = sáu trăm linh bảy
+number.608.spoken = sáu trăm linh tám
+number.609.spoken = sáu trăm linh chín
+number.701.spoken = bảy trăm linh một
+number.702.spoken = bảy trăm linh hai
+number.703.spoken = bảy trăm linh ba
+number.704.spoken = bảy trăm linh bốn
+number.705.spoken = bảy trăm linh năm
+number.706.spoken = bảy trăm linh sáu
+number.707.spoken = bảy trăm linh bảy
+number.708.spoken = bảy trăm linh tám
+number.709.spoken = bảy trăm linh chín
+number.801.spoken = tám trăm linh một
+number.802.spoken = tám trăm linh hai
+number.803.spoken = tám trăm linh ba
+number.804.spoken = tám trăm linh bốn
+number.805.spoken = tám trăm linh năm
+number.806.spoken = tám trăm linh sáu
+number.807.spoken = tám trăm linh bảy
+number.808.spoken = tám trăm linh tám
+number.809.spoken = tám trăm linh chín
+number.901.spoken = chín trăm linh một
+number.902.spoken = chín trăm linh hai
+number.903.spoken = chín trăm linh ba
+number.904.spoken = chín trăm linh bốn
+number.905.spoken = chín trăm linh năm
+number.906.spoken = chín trăm linh sáu
+number.907.spoken = chín trăm linh bảy
+number.908.spoken = chín trăm linh tám
+number.909.spoken = chín trăm linh chín
+number.tens.spoken = {tens} {units}
+number.hundreds.spoken = {n} trăm
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = âm {n}
+# A decimal number: Vietnamese writes a decimal comma ("1,3") and says "một phẩy ba".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} phẩy {frac}
+# Ordinals ("{n:ord}", "{n:moveno}" below): "thứ" + the number, except 1 = "thứ nhất" and 4 = "thứ tư"
+# (also inside a composed number: 24 = "thứ hai mươi tư"); 14 stays "thứ mười bốn".
+number.1.ord.spoken = nhất
+number.4.ord.spoken = tư
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Vietnamese has a single plural form: the noun after a number never changes ("1 nước", "3 nước"). A
+# bare "{n}" followed by a noun written by hand works as well (the voice reads the number in words).
+count.move = {n} nước
+count.point = {n} điểm
+count.pawn = {n} con Tốt
+count.piece = {n} quân
+count.mistake = {n} sai lầm
+count.blunder = {n} sai lầm nghiêm trọng
+count.inaccuracy = {n} nước thiếu chính xác
+count.game = {n} ván
+count.time = {n} lần
+count.square = {n} ô
+count.position = {n} thế cờ
+# Vietnamese helpers for the other coach files:
+#   attacker / defender  "{n:attacker}" = "2 quân tấn công", "{n2:defender}" = "1 quân bảo vệ"
+#   best_move            "{n:best_move}" = "5 nước đi tốt nhất" (a streak: "{n:best_move} liên tiếp")
+#   check / capture      "{m:check}" = "2 nước chiếu", "{n:capture}" = "3 lần bắt quân"
+#   ord                  an ordinal, "lần {n:ord}" = "lần thứ 2" (spoken "lần thứ hai"; 1 = "thứ nhất")
+#   moveno               a move number, "ở {n:moveno}" = "ở nước thứ 12", spoken "ở nước thứ mười hai"
+#                        ("nước thứ nhất", "nước thứ tư", "nước thứ hai mươi mốt")
+#   percent              an accuracy, "độ chính xác {acc:percent}" = "độ chính xác 85%", spoken
+#                        "tám mươi lăm phần trăm"
+count.attacker = {n} quân tấn công
+count.defender = {n} quân bảo vệ
+count.best_move = {n} nước đi tốt nhất
+count.check = {n} nước chiếu
+count.capture = {n} lần bắt quân
+count.ord = thứ {n}
+count.ord.spoken = thứ {n:ord}
+count.moveno = nước thứ {n}
+count.moveno.spoken = nước thứ {n:ord}
+count.percent = {n}%
+count.percent.spoken = {n} phần trăm
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# Vietnamese reads an engine score "cộng một phẩy ba" / "trừ hai phẩy năm"; "chiếu hết sau 3 nước" is
+# the usual wording of "mate in 3" (puzzles, engines).
+eval.up = +{x}
+eval.up.spoken = cộng {x}
+eval.down = −{x}
+eval.down.spoken = trừ {x}
+eval.even = 0,0
+eval.even.spoken = cân bằng
+eval.mate_win = chiếu hết sau {n} nước
+eval.mate_loss = bị chiếu hết sau {n} nước

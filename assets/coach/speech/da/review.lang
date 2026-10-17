@@ -1,0 +1,988 @@
+# Coach speech (Danish): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "du" to the player and "jeg" / "min" of himself. Danish verbs, participles
+# and adjectives never agree with a person, so past tenses are fine ("du overså", "du havde").
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their possessive ("din springer", "mit tårn");
+# forms of common.lang: {x:den} den / det (the pronoun pointing back at the piece), {x:gen} "din
+# konges", {x:def_gen} "springerens", {x:poss} + {x:bare} "din bundne springer". Adjectives after a
+# piece are words that never change (bundet, fanget, angrebet, udækket, ubeskyttet, blottet) or
+# only appear with the king (åben, aktiv, langsom).
+# Squares: "på {sq}", "til {sq}", "fra {sq}"; nothing is ever glued to a square, a move or a number.
+# Counted numbers: {m:move} "2 træk", {pts:point} "3 point" (also a piece's value: {n:point}),
+# {n:time} "3 gange", {n:square} "3 felter", {n:attacker} "2 angribere", {n2:defender} "1 forsvarer"
+# (where English writes a bare {n} attackers or {n2:piece} defending), {n:en} "én" before an implied
+# common-gender noun. A bare {m} ("mat i {m}") says the neuter "ét", right for the implied "træk".
+# Terms (glossary): brøler, fejl, unøjagtighed, tvivlsomt træk (dubious), gaffel, binding / bundet,
+# spid / spidde, afdækket angreb, fanget, hænger / udækket, grundrækken (back rank; "bagerste række"
+# where English says "back row" to a beginner), luft / flugtfelt, kvadratet (square of the pawn),
+# fribonde, opposition, løberparret, bondeslutspil, pat, remis, skakmat / sætte mat.
+# Praise: great = fremragende, excellent = glimrende, brilliant = genialt.
+# Commas as the glossary: no comma before an at/som/der clause that follows its main clause.
+# Levels 1-2: short main clauses, everyday words; levels 5-6: terse club language.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Skak! Min konge er angrebet.
+ann.check.human.b1.2 = Skak! Du angriber min konge.
+ann.check.human.b1.3 = Det er skak! Min konge skal ud af skakken.
+ann.check.human = Skak.
+ann.check.human.2 = Skak!
+ann.check.human.3 = Og det er skak.
+# The coach gives check.
+ann.check.coach = Skak!
+ann.check.coach.2 = Skak.
+ann.check.coach.3 = Og skak!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Det betyder at {your} er angrebet. Du skal have {your:den} ud af skak.
+ann.check.coach.first.2 = Skak betyder at {your} er angrebet. Flyt {your:den}, sæt en brik imellem eller slå min brik.
+ann.double_check.coach = Dobbeltskak! To af mine brikker angriber din konge på én gang, så den skal flytte.
+ann.double_check.coach.2 = Det er dobbeltskak: nu hjælper kun et kongetræk.
+ann.double_check.human = Dobbeltskak! To af dine brikker angriber min konge på én gang, så den skal flytte.
+ann.double_check.human.2 = Dobbeltskak! Nu kan kun et kongetræk redde mig.
+# The player checkmates the coach.
+ann.mate.human.b1 = Skakmat! Du har vundet! Min konge kan ikke slippe væk.
+ann.mate.human.b1.2 = Det er skakmat! Flot klaret, du har vundet partiet!
+ann.mate.human.b1.3 = Skakmat! Min konge er fanget. Tillykke!
+ann.mate.human = Skakmat. Godt spillet.
+ann.mate.human.2 = Det er mat. Tillykke.
+ann.mate.human.3 = Skakmat! Flot gjort.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Det er skakmat. Din konge har ingen vej ud.
+ann.mate.coach.b1.2 = Skakmat. Din konge er angrebet og kan ikke slippe væk.
+ann.mate.coach.b1.3 = Det er desværre skakmat. Din konge kan ikke komme væk.
+ann.mate.coach = Skakmat.
+ann.mate.coach.2 = Og det er mat.
+ann.mate.coach.3 = Skakmat, desværre.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ups! Det træk giver noget væk.
+ex.verdict.blunder.b1.2 = Pas på! Det træk kan koste dig noget.
+ex.verdict.blunder.b1.3 = Åh, vent. Der er et problem med det træk.
+ex.verdict.blunder.b2 = Hmm, der er et problem med det træk.
+ex.verdict.blunder.b2.2 = Det er en stor fejl.
+ex.verdict.blunder.b2.3 = Pas på, det træk koster dig noget.
+ex.verdict.blunder.b3 = Det er en brøler.
+ex.verdict.blunder.b3.2 = {move} er virkelig en fejl.
+ex.verdict.blunder.b3.3 = Av, {move} er en stor fejl.
+ex.verdict.blunder.b4 = {move} er en brøler.
+ex.verdict.blunder.b4.2 = {move} er en alvorlig fejl.
+ex.verdict.blunder.b4.3 = Det er desværre en brøler.
+ex.verdict.blunder.b5 = {move} er en alvorlig fejl.
+ex.verdict.blunder.b5.2 = {move} er en brøler.
+ex.verdict.blunder.b5.3 = {move} er en dyr fejl.
+ex.verdict.blunder.b6 = {move} er en grov fejl.
+ex.verdict.blunder.b6.2 = {move} er en brøler.
+ex.verdict.blunder.b6.3 = {move}? En brøler.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ups! Du gjorde ikke noget ved min trussel.
+ex.verdict.ignored.b1.2 = Pas på! Min trussel var der stadig.
+ex.verdict.ignored.b1.3 = Åh, vent. Du glemte min trussel.
+ex.verdict.ignored.b2 = Hmm, min trussel var der stadig.
+ex.verdict.ignored.b2.2 = Du lod min trussel stå ubesvaret.
+ex.verdict.ignored.b2.3 = Pas på, du gjorde ikke noget ved min trussel.
+ex.verdict.mistake.b3 = Det er ikke et godt træk.
+ex.verdict.mistake.b3.2 = Hmm, der er et problem med {move}.
+ex.verdict.mistake.b3.3 = Det er en fejl.
+ex.verdict.mistake.b4 = {move} er en fejl.
+ex.verdict.mistake.b4.2 = {move} er ikke godt.
+ex.verdict.mistake.b4.3 = Det er en fejl.
+ex.verdict.mistake.b5 = {move} er en klar fejl.
+ex.verdict.mistake.b5.2 = {move} er en fejl.
+ex.verdict.mistake.b5.3 = {move} er ikke godt.
+ex.verdict.mistake.b6 = {move} er en fejl.
+ex.verdict.mistake.b6.2 = {move}? En fejl.
+ex.verdict.mistake.b6.3 = Ikke {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Ikke dårligt, men {best} var lidt bedre.
+ex.verdict.inaccuracy.b3.2 = {best} var en anelse mere præcist.
+ex.verdict.inaccuracy.b3.3 = En lille smutter: {best} var bedre her.
+ex.verdict.inaccuracy.b4 = Unøjagtigt: {best} var mere præcist.
+ex.verdict.inaccuracy.b4.2 = En lille unøjagtighed. {best} var lidt bedre.
+ex.verdict.inaccuracy.b4.3 = Ikke helt det bedste: {best} var mere nøjagtigt.
+ex.verdict.inaccuracy.b5 = {move} er unøjagtigt; {best} var stærkere.
+ex.verdict.inaccuracy.b5.2 = Lidt unøjagtigt. Jeg ville have spillet {best}.
+ex.verdict.inaccuracy.b5.3 = {best} var mere præcist end {move}.
+ex.verdict.inaccuracy.b6 = {move} er unøjagtigt; {best}.
+ex.verdict.inaccuracy.b6.2 = Unøjagtigt. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} var bedre.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} var måske en anelse mere præcist.
+ex.verdict.inaccuracy.maybe.2 = Jeg ville måske have spillet {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Det træk ser tvivlsomt ud.
+ex.verdict.dubious.2 = Det træk virker tvivlsomt.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Åh, vent! Du overså noget godt.
+ex.verdict.missed.b1.2 = Kig igen! Der var noget bedre.
+ex.verdict.missed.b1.3 = Vent lidt, der havde du en chance!
+ex.verdict.missed.b2 = Der lod du en chance gå fra dig.
+ex.verdict.missed.b2.2 = Hmm, der var noget bedre.
+ex.verdict.missed.b2.3 = Vent, der havde du et fremragende træk.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Bedre var {best}.
+ex.better.b3.2 = {best} var det bedre træk.
+ex.better.b3.3 = I stedet var {best} godt.
+ex.better.b4 = {best} var stærkere.
+ex.better.b4.2 = {best} var det rigtige træk.
+ex.better.b4.3 = Bedre var {best}.
+ex.better.b5 = {best}, med idéen {line}.
+ex.better.b5.2 = {best} var trækket: {line}.
+ex.better.b5.3 = Bedre var {best}, efterfulgt af {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = {best} i stedet, {eval}.
+ex.better.b6.3 = {best} var {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Der var et bedre træk med {your}.
+ex.hint.b1.2 = {your} havde et bedre træk.
+ex.hint.b2 = {your} havde et bedre træk.
+ex.hint.b2.2 = Der var et bedre træk med {your}.
+ex.hint.b3 = {your} havde et bedre træk.
+ex.hint.b3.2 = Der var noget bedre med {your}.
+ex.hint.b4 = {your} havde et bedre træk.
+ex.hint.b4.2 = Se igen på {your}: {your:den} havde noget bedre.
+ex.hint.b5 = {your} havde et stærkere træk.
+ex.hint.b5.2 = Der var et stærkere træk med {your}.
+ex.hint.b6 = {your} havde noget bedre.
+ex.hint.b6.2 = Se på {your} igen.
+ex.hint.move = Der var et bedre træk.
+ex.hint.move.2 = Der havde du et bedre træk.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} havde et bedre træk. Det vinder materiale.
+ex.hint.gain.b1.2 = Der var et bedre træk med {your}. Det vinder materiale.
+ex.hint.gain.b2 = {your} havde et bedre træk. Det vinder materiale.
+ex.hint.gain.b2.2 = Der var et træk med {your} som vinder materiale.
+ex.hint.gain.b3 = {your} havde et bedre træk, et træk som vinder materiale.
+ex.hint.gain.b3.2 = Der var et træk med {your} som vinder materiale.
+ex.hint.gain.b4 = {your} havde et træk som vinder materiale.
+ex.hint.gain.b4.2 = Se igen på {your}: {your:den} havde et træk som vinder materiale.
+ex.hint.gain.b5 = {your} havde et stærkere træk, et træk som vinder materiale.
+ex.hint.gain.b5.2 = Der var et træk med {your} som vinder materiale.
+ex.hint.gain.b6 = {your} havde et træk som vinder materiale.
+ex.hint.gain.b6.2 = Se på {your} igen: der var materiale at vinde.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Det bedre træk var {your} til {sq}.
+ex.reveal.b1.2 = {your} kunne gå til {sq}. Det var bedre.
+ex.reveal.b2 = {your} til {sq} var det bedre træk.
+ex.reveal.b2.2 = Det bedre træk var {your} til {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Lad os sætte brikkerne tilbage.
+ex.rewind.b1.2 = Nu sætter jeg det hele tilbage som det var.
+ex.rewind.b1.3 = Jeg stiller lige brikkerne tilbage.
+ex.rewind.b2 = Lad os sætte det hele tilbage.
+ex.rewind.b2.2 = Tilbage til udgangspunktet.
+ex.rewind.b2.3 = Jeg sætter brikkerne tilbage.
+ex.rewind.b3 = Tilbage til partiet.
+ex.rewind.b3.2 = Lad os gå tilbage.
+ex.rewind.b3.3 = Tilbage til stillingen.
+ex.rewind.b4 = Tilbage til partiet.
+ex.rewind.b4.2 = Tilbage.
+ex.rewind.b4.3 = Lad os gå tilbage.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Vil du prøve et andet træk?
+ex.offer.b1.2 = Vil du tage trækket tilbage og prøve igen?
+ex.offer.b1.3 = Skal vi prøve et andet træk?
+ex.offer.b2 = Kunne du tænke dig at prøve et andet træk?
+ex.offer.b2.2 = Vil du tage det tilbage?
+ex.offer.b2.3 = Prøve igen?
+ex.offer.b3 = Vil du tage trækket tilbage?
+ex.offer.b3.2 = Vil du prøve igen?
+ex.offer.b3.3 = Tage det tilbage?
+ex.offer.b4 = Tage det tilbage?
+ex.offer.b4.2 = Vil du tage det tilbage?
+ex.offer.b4.3 = Prøve et andet træk?
+ex.offer.b5 = Tage tilbage?
+ex.offer.b5.2 = Vil du tage det tilbage?
+ex.offer.b5.3 = Tage trækket tilbage?
+ex.offer.b6 = Tage tilbage?
+ex.offer.b6.2 = Tage trækket tilbage?
+ex.offer.b6.3 = Prøve igen?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Det træk er tvivlsomt. Måske kan du gøre det bedre?
+ex.dubious.b1.2 = Det træk er tvivlsomt. Måske kan du finde et bedre?
+ex.dubious.b2 = Et tvivlsomt træk. Måske kan du gøre det bedre?
+ex.dubious.b2.2 = Det træk er tvivlsomt. Måske er der noget bedre?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Så {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} går til {sq}.
+demo.my.move.2 = Jeg flytter {my} til {sq}.
+demo.my.move.3 = Så går {my} til {sq}.
+demo.my.take = Jeg slår {your}.
+demo.my.take.2 = {my} slår {your}.
+demo.my.take.3 = Og så slår jeg {your}.
+demo.my.check = {my} går til {sq}. Skak.
+demo.my.check.2 = Skak med {my} på {sq}.
+demo.my.check.3 = {my} til {sq}, skak!
+demo.my.mate = {my} går til {sq}. Skakmat.
+demo.my.mate.2 = Og {my} til {sq} er skakmat.
+demo.my.mate.3 = {my} til {sq}. Det er skakmat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+# "{t1} står der stadig bagefter" = "{t1} will still be there".
+demo.my.first.take = Først slår {my} {your}. {t1} kan vente.
+demo.my.first.take.2 = {my} slår {your} først. {t1} står der stadig bagefter.
+demo.my.first.check = {my} slår {your}, og det er skak! {t1} kan vente.
+demo.my.first.check.2 = Først slår {my} {your} med skak. {t1} står der stadig bagefter.
+demo.my.first.check_move = Først skak med {my} på {sq}. {t1} kan vente.
+demo.my.first.check_move.2 = {my} går til {sq}: først skak! {t1} står der stadig bagefter.
+demo.my.first.move = Først går {my} til {sq}. {t1} kan vente.
+demo.my.first.move.2 = Først {my} til {sq}. {t1} står der stadig bagefter.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} er angrebet, så {my:den} slår {your} først.
+demo.my.first.attacked.2 = {my} er under angreb: {my:den} snupper {your} først.
+# Levels 4-6, the same in-between move.
+demo.first = Først {move}: {t1} kan vente.
+demo.first.2 = Først {move}. {t1} står der stadig bagefter.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Nu spiller jeg mit træk.
+demo.play_on.2 = Her er mit rigtige træk.
+demo.play_on.3 = Og nu mit træk for alvor.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Du ville flytte {your} til {sq}.
+demo.your.move.2 = Lad os sige at du flytter {your} til {sq}.
+demo.your.move.3 = Så går {your} til {sq}.
+demo.your.take = Du ville slå {my}.
+demo.your.take.2 = Du slår {my} med {your}.
+demo.your.take.3 = Så slår du {my}.
+demo.your.back = Du slår tilbage.
+demo.your.back.2 = Du slår tilbage på {sq}.
+demo.your.back.3 = Og så slår du tilbage.
+demo.your.king = Din konge skal flytte.
+demo.your.king.2 = Kongen må træde til side, til {sq}.
+demo.your.king.3 = Din konge flygter til {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Nu kan {t1} ikke reddes.
+ex.point.piece.2 = Og {t1} er tabt.
+ex.point.piece.3 = Derefter falder {t1}.
+ex.point.two = {t1} og {t2} er begge angrebet: den ene af dem falder.
+ex.point.two.2 = Nu angriber jeg {t1} og {t2}. Du kan ikke redde dem begge.
+ex.point.mate = Og nu er {reply:nomate} skakmat.
+ex.point.mate.2 = Derefter kommer {reply:nomate}, og det er skakmat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Kan du se? Nu har du tabt {pts:point}.
+ex.result.b1.2 = Sådan taber du {pts:point}.
+ex.result.b2 = Til sidst har du tabt {pts:point}.
+ex.result.b2.2 = Nu er du {pts:point} bagud.
+ex.result.b3 = Det koster dig {pts:point}.
+ex.result.b3.2 = Du ender {pts:point} bagud.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Du kan slå noget tilbage, men du er stadig {pts:point} bagud.
+ex.result_back.b1.2 = Du kan vinde lidt tilbage, men du har stadig tabt {pts:point}.
+ex.result_back.b2 = Du kan få lidt tilbage, men du er stadig {pts:point} bagud.
+ex.result_back.b2.2 = Selv når du slår tilbage, har du tabt {pts:point}.
+ex.result_back.b3 = Selv når du har slået tilbage, er du {pts:point} bagud.
+ex.result_back.b3.2 = Du vinder noget tilbage, men det koster dig stadig {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves. "strander på" = "fails to" (runs aground on).
+ex.retake.b1 = Hvis {your2} slår tilbage, slår {my} {your}.
+ex.retake.b1.2 = Du kan ikke slå tilbage med {your2}: så slår {my} {your}.
+ex.retake.b2 = Hvis {your2} slår tilbage, slår {my} {your}.
+ex.retake.b2.2 = At slå tilbage med {your2} virker ikke: {my} slår {your}.
+ex.retake.b3 = Hvis du slår tilbage med {move}, følger {reply}, som slår {your}.
+ex.retake.b3.2 = At slå tilbage med {move} går ikke: {reply} slår {your}.
+ex.retake.b4 = {move} strander på {reply}, som slår {your}.
+ex.retake.b4.2 = Og hvis {move}, så slår {reply} {your}.
+ex.retake.b5 = At slå tilbage med {move} strander på {reply}, og {your} falder.
+ex.retake.b5.2 = {move} strander på {reply}: {your} falder.
+ex.retake.b6 = {move}? {reply} slår {your}.
+ex.retake.b6.2 = {move} går ikke: {reply} slår {your}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Og her, på {sq}, ville du få en ny dronning.
+demo.promote.2 = Så når {your} frem til {sq} og bliver dronning.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Pas på: {my} kan gå til {sq}, og det er skakmat.
+ex.mate_allowed.b1.2 = Nu kan {my} gå til {sq}. Det ville være skakmat!
+ex.mate_allowed.b1.3 = Pas på! Hvis {my} går til {sq}, er det skakmat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Efter det træk kan jeg sætte {your} mat i {m:move}.
+ex.mate_allowed.b2.2 = Nu kan jeg sætte {your} mat i {m:move}. Se her.
+ex.mate_allowed.b2.3 = Pas på! {your} er i fare: mat i {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Det tillader mat i {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Herefter har jeg mat i {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Din konge bliver sat mat: {line:nomate}.
+ex.mate_allowed.b4 = {move} tillader tvungen mat: {line:nomate}.
+ex.mate_allowed.b4.2 = Det fører lige ind i mat i {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Efter {move} er {line:nomate} mat.
+ex.mate_allowed.b5 = {move} tillader tvungen mat i {m:move}.
+ex.mate_allowed.b5.2 = Det fører lige ind i mat i {m:move}.
+ex.mate_allowed.b5.3 = Nu er der tvungen mat i {m:move}.
+ex.mate_allowed.b6 = Mat i {m}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = Det er mat efter {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Se: {your} har intet felt tilbage at flygte til.
+ex.mate_allowed.tail.b1.2 = Kan du se? {your} er angrebet og kan ikke flygte.
+ex.mate_allowed.tail.b1.3 = {your} kan ingen steder gå hen. Det er skakmat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Det kalder man {text}.
+ex.mate_allowed.pattern.2 = Husk dette mønster: det er {text}.
+ex.mate_allowed.tip.b3 = Tjek før hvert træk om din konge stadig står sikkert.
+ex.mate_allowed.tip.b3.2 = Spørg altid dig selv: kan min konge blive sat mat efter mit træk?
+
+# Said after "Det kalder man ..." (the indefinite article belongs to the name, as in English).
+name.pattern.back_rank = en grundrækkemat
+name.pattern.smothered = en kvælningsmat
+name.pattern.support = en mat med dækket dronning
+name.pattern.ladder = en trappemat
+name.pattern.epaulette = en epauletmat
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Med {best:nomate} kunne du have sat {my} mat!
+ex.mate_missed.b1.2 = {best:nomate} var skakmat! {my} kunne ikke være sluppet væk.
+ex.mate_missed.b1.3 = Se! {best:nomate} ville have sat {my} mat.
+ex.mate_missed.b2 = Du havde mat i {m:move} med {best:nomate} som første træk.
+ex.mate_missed.b2.2 = {best:nomate} gav skakmat i {m:move}!
+ex.mate_missed.b2.3 = Du kunne have sat mig mat med {best:nomate}.
+ex.mate_missed.b3 = Du overså mat i {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} sætter mat i {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Der var mat i {m:move} med {best:nomate} som første træk.
+ex.mate_missed.b4 = Overset mat: {line:nomate}, med {best:nomate} som første træk.
+ex.mate_missed.b4.2 = {best:nomate} gennemtvang mat i {m:move}.
+ex.mate_missed.b4.3 = Du havde mat i {m:move} med {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} sætter mat i {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Overset mat i {m:move}, med {best:nomate} som første træk.
+ex.mate_missed.b5.3 = Der var tvungen mat: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} sætter mat: {line:nomate}.
+ex.mate_missed.b6.2 = Mat i {m} med {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat i {m}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Hurtigere var {best:nomate}: mat i {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} satte mat hurtigere, i {m:move}.
+ex.mate_delayed.b6 = {best:nomate} sætter mat i {m}.
+ex.mate_delayed.b6.2 = Hurtigere: {best:nomate}, mat i {m}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Åh nej! {my} kan ikke flytte og står ikke i skak. Det er pat: remis.
+ex.stalemate.b1.2 = Se: {my} har intet sikkert felt, men står ikke i skak. Det er remis!
+ex.stalemate.b1.3 = Det er pat. {my} kan ikke flytte, så partiet er remis.
+ex.stalemate.b2 = Pat! {my} har intet lovligt træk, og det er ikke skak. Remis.
+ex.stalemate.b2.2 = Åh nej, pat: {my} sidder fast, men står ikke i skak.
+ex.stalemate.b2.3 = Det er remis ved pat. {my} kan ikke flytte.
+ex.stalemate.b3 = Det er pat: {my} har intet lovligt træk. Du havde en vundet stilling!
+ex.stalemate.b3.2 = Pat! {my} sidder fast, og et vundet parti bliver remis.
+ex.stalemate.b3.3 = {my} har ingen træk og står ikke i skak: pat.
+ex.stalemate.b4 = Pat: {my} har intet lovligt træk. Dermed smider du gevinsten væk.
+ex.stalemate.b4.2 = {move} sætter {my} pat. Remis fra en vundet stilling.
+ex.stalemate.b4.3 = Det er pat; {my} er lukket inde.
+ex.stalemate.b5 = {move} sætter {my} pat. Gevinsten er væk.
+ex.stalemate.b5.2 = Pat: {my} har ingen felter.
+ex.stalemate.b5.3 = Det er pat, {my} sidder fast.
+ex.stalemate.b6 = Pat. {my} har ingen træk.
+ex.stalemate.b6.2 = {move}, pat: {my} er lukket inde.
+ex.stalemate.b6.3 = Pat; {my} kan ikke flytte.
+ex.stalemate.tip.b1 = Når du står til at vinde, så giv altid min konge et felt at gå til.
+ex.stalemate.tip.b1.2 = Husk: når du fører, så giv min konge lidt plads.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Pas på! Jeg kan give mine brikker væk, og så har {my} ingen træk: pat.
+ex.stalemate_trick.b1.2 = Pas på: {my} sidder næsten fast. Jeg kan gøre det til remis.
+ex.stalemate_trick.b2 = Pas på: jeg kan ofre, og så står {my} pat.
+ex.stalemate_trick.b2.2 = {my} har næsten ingen felter. Jeg kan fremtvinge pat!
+ex.stalemate_trick.b3 = Det lader mig slippe væk med pat: {my} løber tør for træk.
+ex.stalemate_trick.b3.2 = Pas på: efter {line} står {my} pat.
+ex.stalemate_trick.b4 = {move} tillader en patfælde: {line}, og {my} kan ikke flytte.
+ex.stalemate_trick.b4.2 = Nu kan {my} gemme sig i en patstilling: {line}.
+ex.stalemate_trick.b5 = {move} tillader pat: {line}; {my} er lukket inde.
+ex.stalemate_trick.b5.2 = Patfælde: {line}, og {my} har ingen træk.
+ex.stalemate_trick.b6 = {line}, pat: {my} er lukket inde.
+ex.stalemate_trick.b6.2 = Pat efter {line}; {my} sidder fast.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} kan gå til {sq} og angribe {t1} og {t2}.
+ex.fork.b1.2 = {my} går til {sq} og angriber to brikker: {t1} og {t2}.
+ex.fork.b1.3 = Hold øje med {my}: fra {sq} angriber {my:den} {t1} og {t2} på én gang.
+ex.fork.b2 = Gaffel! {my} på {sq} angriber {t1} og {t2} på én gang.
+ex.fork.b2.2 = Efter dit træk kan {my} give gaffel på {t1} og {t2} fra {sq}.
+ex.fork.b2.3 = {my} går til {sq}: et dobbeltangreb på {t1} og {t2}.
+ex.fork.b3 = {move} tillader {reply}, med gaffel på {t1} og {t2}.
+ex.fork.b3.2 = Efter {reply} angriber jeg {t1} og {t2} på samme tid.
+ex.fork.b3.3 = {reply} er en gaffel: {t1} og {t2} er begge angrebet.
+ex.fork.b4 = {reply} giver gaffel på {t1} og {t2}; efter {line} har du tabt {pts:point}.
+ex.fork.b4.2 = {reply} rammer {t1} og {t2} på én gang.
+ex.fork.b4.3 = {move} tillader gaflen {reply} mod {t1} og {t2}.
+ex.fork.b5 = {move} går lige i gaflen {reply}, på {t1} og {t2}.
+ex.fork.b5.2 = {reply} giver gaffel på {t1} og {t2}.
+ex.fork.b5.3 = Efter {reply} er {t1} og {t2} begge angrebet.
+ex.fork.b6 = {reply} giver gaffel.
+ex.fork.b6.2 = {move} tillader {reply}, en gaffel.
+ex.fork.b6.3 = {reply}, gaffel.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Du kan kun redde den ene: {t1} eller {t2}.
+ex.fork.tail.b1.2 = Nu angriber jeg to brikker på én gang: {t1} og {t2}. Det er en gaffel!
+ex.fork.tail.b1.3 = Kan du se? {t1} og {t2} er begge angrebet. Den ene af dem falder.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} skal ud af skak, så jeg slår {t1}.
+ex.fork.tail_king.2 = Skak! {your} skal flytte, og {t1} falder.
+ex.fork.more.b3 = Se på {sq} før du trækker: det er et gaffelfelt for {my}.
+ex.fork.more.b3.2 = Hold øje med {sq}. Derfra giver {my} gaffel.
+ex.fork.tip.knight = Pas på springerhop tæt på din konge og din dronning!
+ex.fork.tip.knight.2 = Springere elsker at angribe to brikker på én gang. Se hvor de kan hoppe hen.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Når {my} flytter væk, angriber {my2} {t1}!
+ex.discovered.b1.2 = Se: {my} står i vejen. Hvis {my:den} flytter, rammer {my2} {t1}.
+ex.discovered.b1.3 = {my} kan træde til side, og så angriber {my2} {t1}.
+ex.discovered.b2 = Et skjult angreb: {my} flytter, og {my2} angriber {t1}.
+ex.discovered.b2.2 = Pas på: {my} kan flytte væk, og så rammer {my2} {t1}.
+ex.discovered.b2.3 = {my} træder til side og åbner vejen for {my2} mod {t1}.
+ex.discovered.b3 = Efter {reply} rammer et afdækket angreb {t1}.
+ex.discovered.b3.2 = {reply} afdækker et angreb på {t1}.
+ex.discovered.b3.3 = {move} tillader {reply}, et afdækket angreb på {t1}.
+ex.discovered.b4 = {reply} åbner en linje mod {t1}: et afdækket angreb.
+ex.discovered.b4.2 = {move} tillader det afdækkede angreb {reply}, som vinder {t1}.
+ex.discovered.b4.3 = Efter {reply} falder {t1} for et afdækket angreb.
+ex.discovered.b5 = {move} tillader det afdækkede angreb {reply}.
+ex.discovered.b5.2 = {reply} er et afdækket angreb.
+ex.discovered.b5.3 = {reply} afdækker et skjult angreb.
+ex.discovered.b6 = {reply}, afdækket angreb på {t1}.
+ex.discovered.b6.2 = {reply}, og {t1} falder.
+ex.discovered.b6.3 = Afdækket angreb: {reply}, som rammer {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} angriber {t1}. Når {t1:den} flytter, slår jeg {t2}, som står bagved.
+ex.skewer.b1.2 = Se: {my} rammer {t1}, og {t2} står lige bagved.
+ex.skewer.b1.3 = {my} går efter {t1}. {t1:den} må flytte, og så falder {t2}.
+ex.skewer.b2 = Et spid: {my} angriber {t1}, og {t2} står bagved.
+ex.skewer.b2.2 = {my} har {t1} og {t2} på samme linje. Når den forreste flytter, slår jeg den bagerste.
+ex.skewer.b2.3 = Pas på: {t1} og {t2} står på samme linje. {my} kan spidde dem.
+ex.skewer.b3 = {reply} spidder {t1} og {t2}.
+ex.skewer.b3.2 = Efter {reply} må {t1} flytte, og {t2} falder.
+ex.skewer.b3.3 = {move} tillader {reply}, et spid mod {t1} og {t2}.
+ex.skewer.b4 = {reply} spidder {t1}; {t2} bagved går tabt.
+ex.skewer.b4.2 = Efter {move} står {t1} og {t2} på samme linje: {reply}.
+ex.skewer.b4.3 = Efter {reply} flytter {t1}, og {t2} falder.
+ex.skewer.b5 = {reply} spidder {t1} og {t2}.
+ex.skewer.b5.2 = {move} tillader spiddet {reply} gennem {t1} mod {t2}.
+ex.skewer.b6 = {reply} spidder.
+ex.skewer.b6.2 = {reply}, et spid.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} kan gå til {sq}. Så sidder {your} fast foran {t1}.
+ex.pin.b1.2 = Hold øje med {my} på {sq}: {your} kommer til at sidde fast foran {t1}.
+ex.pin.b1.3 = {my} kan binde {your} til {t1}. Så vinder jeg {your:den}.
+ex.pin.b2 = En binding: {your} sidder fast foran {t1}.
+ex.pin.b2.2 = {your} er bundet til {t1}. Så kan jeg vinde {your:den}.
+ex.pin.b2.3 = Nu sidder {your} fast foran {t1}. Det er en binding.
+ex.pin.b3 = {your} bliver bundet til {t1}, og jeg vinder {your:den}.
+ex.pin.b3.2 = Herefter er {your} bundet til {t1}.
+ex.pin.b3.3 = Bindingen af {your} koster materiale: {t1} står bagved.
+ex.pin.b4 = {reply} binder og vinder materiale.
+ex.pin.b4.2 = {move} går lige i bindingen {reply}.
+ex.pin.b4.3 = Efter {reply} falder den bundne brik.
+ex.pin.b5 = {move} tillader bindingen {reply}.
+ex.pin.b5.2 = {reply} binder, og brikken går tabt.
+ex.pin.b6 = {reply} binder.
+ex.pin.b6.2 = {reply}, med binding.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} er bundet, så {your:den} kan ikke dække {sq}. {t1} står bagved.
+ex.pin_defender.b1.2 = Se: {your} kan ikke rigtig forsvare {sq}, for {t1} står bagved.
+ex.pin_defender.b2 = {your} er bundet til {t1}, så {sq} har ingen rigtig forsvarer.
+ex.pin_defender.b2.2 = En bundet brik er en dårlig forsvarer. {your} kan ikke dække {sq}: {t1} står bagved.
+ex.pin_defender.b3 = {your} er bundet til {t1}; {your:den} dækker ikke rigtig {sq}.
+ex.pin_defender.b3.2 = {sq} ser dækket ud, men {your} er bundet foran {t1}.
+ex.pin_defender.b4 = {your} er bundet, så {sq} er ikke rigtig dækket.
+ex.pin_defender.b4.2 = {your:poss} bundne {your:bare} kan ikke dække {sq}.
+ex.pin_defender.b5 = {your} er bundet; {sq} er udækket.
+ex.pin_defender.b5.2 = {sq} falder: {your} er bundet.
+ex.pin_defender.b6 = {your} er bundet; {sq} falder.
+ex.pin_defender.b6.2 = {your} bundet, {sq} udækket.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} er fanget. Alle {your:def_gen} felter er angrebet.
+ex.trapped.b1.2 = Se på {your}: {your:den} har intet sikkert felt at flygte til.
+ex.trapped.b1.3 = {your} sidder fast. Jeg kan angribe {your:den}, og {your:den} kan ikke slippe væk.
+ex.trapped.b2 = {your} har ingen sikre felter. Jeg kan vinde {your:den}.
+ex.trapped.b2.2 = {your} er fanget: uanset hvor {your:den} går hen, slår jeg {your:den}.
+ex.trapped.b2.3 = Pas på, {your} er ved at løbe tør for felter.
+ex.trapped.b3 = {your} bliver fanget: der er intet sikkert felt tilbage.
+ex.trapped.b3.2 = Herefter er {your} fanget og tabt.
+ex.trapped.b3.3 = {your} er gået i en fælde: {your:den} kan ikke komme ud.
+ex.trapped.b4 = Efter {move} er {your} fanget.
+ex.trapped.b4.2 = {your} har intet tilbagetog; jeg vinder {your:den}.
+ex.trapped.b4.3 = {your} er fanget efter {reply}.
+ex.trapped.b5 = {your} ender med at være fanget: {line}.
+ex.trapped.b5.2 = {move} efterlader {your} uden udvej.
+ex.trapped.b6 = {your} er fanget.
+ex.trapped.b6.2 = {line} fanger {your}.
+ex.trapped.tip.b1 = Før du flytter en brik, så tjek at den kan komme ud igen.
+ex.trapped.tip.b1.2 = Brikker dybt inde i min lejr kan sidde fast. Sørg for en vej ud.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} sidder fast bag sine bønder. {my} kan give {your:den} skak på bagerste række.
+ex.back_rank.b1.2 = Pas på: {your} har intet flugtfelt, og {my} kan nå {sq}.
+ex.back_rank.b1.3 = {my} kan gå til {sq}. {your} er lukket inde af sine egne bønder.
+ex.back_rank.b2 = Fare på grundrækken: {your} har ingen luft. {my} kan give skak på {sq}.
+ex.back_rank.b2.2 = {your} er lukket inde. {my} går til {sq} og vinder materiale.
+ex.back_rank.b2.3 = Din bagerste række er svag: {my} kan give {your} skak på {sq}.
+ex.back_rank.b3 = Din grundrække er svag: {line}. {your} har intet flugtfelt.
+ex.back_rank.b3.2 = {your} har ingen luft, så {line} vinder materiale.
+ex.back_rank.b3.3 = Efter {line} afgør grundrækken: {your} er lukket inde.
+ex.back_rank.b4 = Grundrækken: {line}, og {your} har ingen luft.
+ex.back_rank.b4.2 = {line} udnytter den svage grundrække omkring {your}.
+ex.back_rank.b4.3 = {your} mangler et flugtfelt: {line}.
+ex.back_rank.b5 = Svag grundrække omkring {your}: {line}.
+ex.back_rank.b5.2 = {line}; {your} har ingen luft.
+ex.back_rank.b6 = {line}, grundrækken; {your} er lukket inde.
+ex.back_rank.b6.2 = Grundrækken: {line} ({your}).
+ex.back_rank.tip.b1 = Giv din konge lidt luft: ryk en af bønderne foran den frem.
+ex.back_rank.tip.b1.2 = En konge bag tre bønder kan sættes mat på bagerste række. Giv den lidt plads.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} på {sq} er ikke dækket. {my} kan slå {your:den} gratis.
+ex.hanging.b1.2 = Se på {your}: intet dækker {your:den}, og {my} angriber {your:den}.
+ex.hanging.b1.3 = {your} er ikke dækket. {my} kan bare slå {your:den}.
+ex.hanging.b2 = {your} på {sq} hænger. {my} slår {your:den}, og du kan ikke slå tilbage.
+ex.hanging.b2.2 = {my} kan slå {your} gratis. Intet dækker {your:den}.
+ex.hanging.b2.3 = {your} står alene på {sq}, og {my} slår {your:den}.
+ex.hanging.b3 = {move} efterlader {your} udækket: {reply}, og intet kan slå tilbage.
+ex.hanging.b3.2 = {your} på {sq} hænger: {reply}.
+ex.hanging.b3.3 = Efter {reply} er {your} væk for ingenting.
+ex.hanging.b4 = {move} lader {your} hænge: {reply} vinder {pts:point}.
+ex.hanging.b4.2 = {reply} snupper {your} gratis.
+ex.hanging.b4.3 = {your} er udækket; {reply} slår {your:den}.
+ex.hanging.b5 = {move} efterlader {your} udækket; {reply} vinder {your:den}.
+ex.hanging.b5.2 = {your} på {sq} falder for {reply}.
+ex.hanging.b5.3 = {reply} vinder {your}.
+ex.hanging.b6 = {move}? {reply}, og {your} falder.
+ex.hanging.b6.2 = {reply} vinder {your}.
+ex.hanging.b6.3 = {your} hænger: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} dækkede {your}. Nu kan {my} slå {your:den}.
+ex.hanging_guard.b1.2 = {your2} flyttede væk, og nu står {your} alene. {my} slår {your:den}.
+ex.hanging_guard.b2 = {your2} plejede at dække {your}. Nu står {your:den} alene, og {my} slår {your:den}.
+ex.hanging_guard.b2.2 = Da du flyttede {your2}, efterlod du {your} udækket for {my}.
+ex.hanging_guard.b3 = {your2} dækkede {your}. Når {your2:den} flytter, falder {your} for {reply}.
+ex.hanging_guard.b3.2 = Uden {your2} er {your} udækket: {reply}.
+ex.hanging_guard.b4 = {move} fjerner dækningen: {your2} forlod {your}, og {reply} indkasserer {your:den}.
+ex.hanging_guard.b4.2 = {your2} var den eneste forsvarer af {your}; {reply} vinder {your:den}.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} angreb allerede {your}. Tjek altid hvad mit træk truer med.
+ex.hanging_threat.b1.2 = Du så ikke min trussel: {my} angriber {your}.
+ex.hanging_threat.b2 = Mit sidste træk angreb {your} med {my}. Se altid efter mine trusler.
+ex.hanging_threat.b2.2 = {my} truede {your}, og nu kan jeg slå {your:den}.
+ex.hanging_threat.b3 = Du overså min trussel: {my} angreb {your}.
+ex.hanging_threat.b3.2 = {my} havde {your} i sigtekornet hele tiden.
+ex.hanging.tip.b1 = Spørg dig selv før hvert træk: står alle mine brikker sikkert?
+ex.hanging.tip.b1.2 = En god vane: tjek efter hvert træk hvilke af dine brikker der er dækket.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. "afvikling" = a forced sequence of captures.
+ex.exchange_capture.b1 = {your} slog en brik, men {my} slår tilbage. Den afbytning taber point.
+ex.exchange_capture.b1.2 = {my} slår tilbage. {your} er {n:point} værd, men du fik kun {n2:point}.
+ex.exchange_capture.b1.3 = Pas på: bagefter kan {my} slå {your}. Det er en dårlig afbytning.
+ex.exchange_capture.b2 = Pas på med afbytninger: {your} er {n:point} værd. {my} slår tilbage, og du fik kun {n2:point}.
+ex.exchange_capture.b2.2 = Jeg slår tilbage: {my} slår {your}. Du taber {n:point} og vinder kun {n2:point}.
+ex.exchange_capture.b3 = Slaget på {sq} holder ikke: {your} går tabt efter {line}.
+ex.exchange_capture.b3.2 = {your} slår på {sq}, men efter {line} har du tabt {pts:point}.
+ex.exchange_capture.b4 = {move} er en fejlberegning på {sq}: efter {line} er {your} tabt.
+ex.exchange_capture.b4.2 = At slå på {sq} koster {your}: {line}.
+ex.exchange_capture.b5 = {move} taber {your} i afviklingen på {sq}: {line}.
+ex.exchange_capture.b5.2 = På {sq} går {your} tabt: {line}.
+ex.exchange_capture.b6 = {move} taber {your} på {sq} efter {line}.
+ex.exchange_capture.b6.2 = {line} på {sq}, og {your} er væk.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Tæl efter: jeg angriber {sq} {n:time}, og du dækker feltet {n2:time}.
+ex.exchange_count.b1.2 = På {sq} har jeg {n:attacker}, og du har {n2:defender}. Den kamp vinder jeg.
+ex.exchange_count.b2 = {sq} er angrebet {n:time} og dækket {n2:time}. Der taber du materiale.
+ex.exchange_count.b2.2 = Tæl på {sq}: {n:attacker} mod {n2:defender}.
+ex.exchange_count.b3 = Tæl angribere og forsvarere på {sq}: jeg har flere.
+ex.exchange_count.b3.2 = Afbytningen på {sq} holder ikke: efter {line} har du tabt {pts:point}.
+ex.exchange_count.b4 = {move} er en fejlberegning på {sq}: {line}, og du har tabt {pts:point}.
+ex.exchange_count.b4.2 = {sq} er angrebet flere gange end det er dækket: {line}.
+ex.exchange_count.b5 = På {sq} vinder {n:attacker} over {n2:defender}: {line}.
+ex.exchange_count.b5.2 = Efter {move} går regnestykket på {sq} ikke op.
+ex.exchange_count.b6 = {line} på {sq}, og jeg har vundet {pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n:en} mod {n2:en}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} er mindre værd end {your}. Hvis jeg slår, taber du point.
+ex.exchange_cheap.b1.2 = {my} angriber {your}. Det er dårligt for dig at bytte dem.
+ex.exchange_cheap.b2 = {your} er {n:point} værd, og {my} kun {n2:point}. Den afbytning koster dig.
+ex.exchange_cheap.b2.2 = {my} er billigere end {your}, så angrebet vinder materiale.
+ex.exchange_cheap.b3 = {your} på {sq} er angrebet af en billigere brik.
+ex.exchange_cheap.b3.2 = En brik til en værdi af {n2:point} angriber {your} på {sq}: {line}.
+ex.exchange_cheap.b4 = {your} på {sq} er angrebet af en billigere brik; {reply} vinder materiale.
+ex.exchange_cheap.b4.2 = {reply} rammer {your} på {sq} med en billigere brik.
+ex.exchange_cheap.b5 = {your} på {sq} står udsat for en billigere angriber: {line}.
+ex.exchange_cheap.b5.2 = {reply} vinder materiale på {sq} mod {your}.
+ex.exchange_cheap.b6 = {reply} vinder {your} på {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} på {sq} er tabt.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Pas på: nu kan jeg vinde {t1}.
+ex.material.b1.2 = Det træk bringer {t1} i knibe. Jeg kan vinde {t1:den}.
+ex.material.b2 = Med det træk kan jeg vinde {t1}.
+ex.material.b2.2 = Nu kommer {t1} i knibe, og jeg vinder {t1:den}.
+ex.material.b3 = {move} taber materiale: efter {line} har du tabt {pts:point}.
+ex.material.b3.2 = Efter {line} er du {pts:point} bagud.
+ex.material.b4 = {move} taber materiale: {line}, og du har tabt {pts:point}.
+ex.material.b4.2 = Efter {line} er du {pts:point} bagud.
+ex.material.b5 = {move} taber materiale: {line}.
+ex.material.b5.2 = {line} vinder {pts:point} til mig.
+ex.material.b6 = {line}, og jeg har vundet {pts:point}.
+ex.material.b6.2 = {move} taber {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Så du det? {my} på {sq} var gratis. {your} kunne have slået {my:den}.
+ex.missed_capture.b1.2 = Se: {my} havde ingen forsvarer. {your} kunne have slået {my:den}.
+ex.missed_capture.b1.3 = {my} på {sq} var ikke dækket. {your} kunne have snuppet {my:den}!
+ex.missed_capture.b2 = Du overså et gratis slag: {best} vinder {my}.
+ex.missed_capture.b2.2 = {my} hang på {sq}. {best} slår {my:den}. Snup {my:den} næste gang!
+ex.missed_capture.b2.3 = {best} ville have vundet {my} gratis.
+ex.missed_capture.b3 = {best} ville have vundet {my} for ingenting.
+ex.missed_capture.b3.2 = {my} på {sq} var udækket: {best}. Kig efter udækkede brikker i hvert træk.
+ex.missed_capture.b3.3 = Du kunne have slået {my} med {best}.
+ex.missed_capture.b4 = Overset: {best} snupper {my} på {sq}.
+ex.missed_capture.b4.2 = {best} vinder {my}, som var udækket.
+ex.missed_capture.b4.3 = {my} hang: {best}.
+ex.missed_capture.b5 = {best} vinder {my}; {move} lader {my:den} slippe væk.
+ex.missed_capture.b5.2 = {my} på {sq} var udækket: {best}.
+ex.missed_capture.b6 = {best}! {my} på {sq} var udækket.
+ex.missed_capture.b6.2 = {best} vandt {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Du havde et dobbeltangreb: {best} angriber {t1} og {t2}!
+ex.missed_fork.b1.2 = Se! {best} ville ramme {t1} og {t2} på samme tid.
+ex.missed_fork.b1.3 = {best} var en gaffel: {t1} og {t2} var begge angrebet.
+ex.missed_fork.b2 = {best} var en gaffel: {t1} og {t2}.
+ex.missed_fork.b2.2 = Du overså et dobbeltangreb: {best}, som rammer {t1} og {t2}.
+ex.missed_fork.b2.3 = {best} angriber {t1} og {t2} på én gang. En gaffel!
+ex.missed_fork.b3 = {best} var en gaffel: {t1} og {t2}.
+ex.missed_fork.b3.2 = Du havde {best}, med gaffel på {t1} og {t2}.
+ex.missed_fork.b3.3 = {best} ville have givet gaffel på {t1} og {t2}.
+ex.missed_fork.b4 = {best} gav gaffel på {t1} og {t2}.
+ex.missed_fork.b4.2 = Overset gaffel: {best} mod {t1} og {t2}.
+ex.missed_fork.b5 = {best} gav gaffel på {t1} og {t2}.
+ex.missed_fork.b5.2 = {best} ramte {t1} og {t2}.
+ex.missed_fork.b6 = {best} gav gaffel på {t1} og {t2}.
+ex.missed_fork.b6.2 = {best}: gaffel på {t1} og {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} kan løbe til {sq} og blive dronning. {your} er for langt væk.
+ex.promotion.b1.2 = Se: intet stopper {my} på vej til {sq}. {your} kan ikke nå at indhente {my:den}.
+ex.promotion.b1.3 = {my} er {n:square} fra {sq}, og {your} er for langsom.
+ex.promotion.b2 = {my} løber til {sq}, og {your} kan ikke indhente {my:den}.
+ex.promotion.b2.2 = {my} skal bruge {n:move} for at nå {sq}; {your} skal bruge {n2}. Det er for langsomt.
+ex.promotion.b2.3 = Pas på: {my} bliver dronning på {sq}, og {your} er for langt væk.
+ex.promotion.b3 = {my} er uden for kvadratet: {your} kan ikke indhente {my:den} før {sq}.
+ex.promotion.b3.2 = Kapløbet er tabt: {my} når {sq} før {your}.
+ex.promotion.b4 = {your} står uden for bondens kvadrat; bonden bliver dronning på {sq}.
+ex.promotion.b4.2 = {my} bliver dronning på {sq}; {your} mangler ét træk.
+ex.promotion.b5 = Bondekapløbet er tabt: {your} står uden for kvadratet, {sq}.
+ex.promotion.b5.2 = {line}: jeg får dronning på {sq}, og {your} kommer for sent.
+ex.promotion.b6 = {your} er uden for kvadratet; jeg får dronning på {sq}.
+ex.promotion.b6.2 = {line}, dronning på {sq} ({your} for sent).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Din bonde kunne være løbet til {sq} og blevet dronning!
+ex.promotion_missed.b1.2 = Se på {sq}! Din bonde kunne have spurtet derhen.
+ex.promotion_missed.b2 = Din bonde kunne være løbet til {sq}. Fribønder skal frem!
+ex.promotion_missed.b2.2 = Intet stoppede din bonde på vej til {sq}.
+ex.promotion_missed.b3 = {best} vinder kapløbet til {sq}.
+ex.promotion_missed.b3.2 = Din bonde var hurtigere: {best}, og den bliver dronning på {sq}.
+ex.promotion_missed.b4 = {best} vinder bondekapløbet til {sq}.
+ex.promotion_missed.b4.2 = {best}! Bonden bliver dronning på {sq}.
+ex.promotion_missed.b5 = {best} får dronning først på {sq}.
+ex.promotion_missed.b5.2 = {best}, og {sq} er dit.
+ex.promotion_missed.b6 = {best} vinder kapløbet til {sq}.
+ex.promotion_missed.b6.2 = {best}; {sq} først.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Den bonde beskyttede {your}. Nu har {your} mindre dækning.
+ex.king_shield.b1.2 = Bonden fra {sq} var et skjold for {your}. Nu kan mine brikker komme ind.
+ex.king_shield.b2 = At flytte bonden fra {sq} svækker {your}. Mine brikker kan angribe {your:den} nu.
+ex.king_shield.b2.2 = {your} mistede en vagt: bonden på {sq} var {your:def_gen} skjold.
+ex.king_shield.b3 = Det bondetræk blotter {your} for mit angreb.
+ex.king_shield.b3.2 = {your} mister sit bondedække, og mine brikker trænger ind.
+ex.king_shield.b4 = {move} svækker bønderne omkring {your}; mit angreb trænger igennem.
+ex.king_shield.b4.2 = Skjoldet omkring {your} er brudt efter {move}.
+ex.king_shield.b5 = {move} svækker dækningen af {your}: {line}.
+ex.king_shield.b5.2 = Efter {move} er {your} blottet: {line}.
+ex.king_shield.b6 = {move} svækker {your}: {line}.
+ex.king_shield.b6.2 = {line}; {your} er for åben.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} er i fare. Mine brikker er på vej mod {your:den}.
+ex.king_exposed.b1.2 = Se hvor åben {your} står. Hold {your:den} i sikkerhed bag dine bønder.
+ex.king_exposed.b2 = {your} er for åben. Jeg kan give mange skakker nu.
+ex.king_exposed.b2.2 = Pas på: {your} har intet ly, og mine brikker angriber {your:den}.
+ex.king_exposed.b3 = {your} er blottet; mine brikker kan angribe {your:den} med skak.
+ex.king_exposed.b3.2 = Herefter har {your} intet ly.
+ex.king_exposed.b4 = {your} bliver blottet: {line}.
+ex.king_exposed.b4.2 = {move} efterlader {your} åben for angreb.
+ex.king_exposed.b5 = {your} er for blottet: {line}.
+ex.king_exposed.b5.2 = {move} efterlader {your} ude i det fri.
+ex.king_exposed.b6 = {line}; {your} er blottet.
+ex.king_exposed.b6.2 = {your} er for åben: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Den afbytning fører til et bondeslutspil som jeg vinder.
+ex.bad_trade.b3.2 = Efter {line} er der kun bønder tilbage, og min konge står bedre.
+ex.bad_trade.b4 = Afbytningerne fører til et tabt bondeslutspil: {line}.
+ex.bad_trade.b4.2 = At bytte af til dette bondeslutspil taber.
+ex.bad_trade.b5 = Forkert afbytning: bondeslutspillet efter {line} er tabt.
+ex.bad_trade.b5.2 = Bondeslutspillet er tabt; behold brikkerne på brættet.
+ex.bad_trade.b6 = Bondeslutspillet efter {line} er tabt.
+ex.bad_trade.b6.2 = Tabt bondeslutspil: {line}.
+ex.bishop_pair.b5 = Den afbytning koster dig løberparret.
+ex.bishop_pair.b5.2 = Med den afbytning giver du løberparret fra dig; mit er der stadig.
+ex.bishop_pair.b6 = Løberparret ryger.
+ex.bishop_pair.b6.2 = Løberparret givet væk.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} tager oppositionen: kongerne står over for hinanden med ét felt imellem.
+ex.opposition.b3.2 = Kongerne! {best} ville have taget oppositionen.
+ex.opposition.b4 = {best} tager oppositionen: det er nøglen.
+ex.opposition.b4.2 = Oppositionen afgør: {best}.
+ex.opposition.b5 = {best}, som tager oppositionen.
+ex.opposition.b5.2 = Opposition: {best}.
+ex.opposition.b6 = {best}, opposition.
+ex.opposition.b6.2 = {best}: oppositionen.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Din bonde kunne løbe til {sq}. Fribønder vil gerne frem!
+ex.push_passed.b1.2 = Ryk din fribonde frem! Den vil gerne nå {sq}.
+ex.push_passed.b1.3 = Din fribonde vil gerne marchere til {sq}. Ryk den frem!
+ex.push_passed.b2 = {best}: ryk fribonden frem mod {sq}.
+ex.push_passed.b2.2 = Din fribonde er stærk. {best} rykker den frem.
+ex.push_passed.b2.3 = Frem med den! {best} bringer bonden tættere på {sq}.
+ex.push_passed.b3 = {best} rykker fribonden frem.
+ex.push_passed.b3.2 = Fribønder skal frem: {best}.
+ex.push_passed.b3.3 = {best} var vejen frem: bonden løber mod {sq}.
+ex.push_passed.b4 = {best}: fribonden afgør.
+ex.push_passed.b4.2 = Frem: {best}.
+ex.push_passed.b5 = {best}, frem med fribonden: {eval}.
+ex.push_passed.b5.2 = Fribonden: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, fribonden.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Få {your} frem! I slutspillet er kongen en stærk brik.
+ex.king_active.b1.2 = Nu kan {your} være med i kampen. Gå med {your:den} ind mod midten.
+ex.king_active.b1.3 = Når der er få brikker tilbage, bør {your} komme frem og hjælpe.
+ex.king_active.b2 = Brug {your} i slutspillet: før {your:den} ind mod centrum.
+ex.king_active.b2.2 = {your} bør være aktiv nu. Gå frem med {your:den}.
+ex.king_active.b3 = {best} aktiverer kongen. I slutspil kæmper kongen med.
+ex.king_active.b3.2 = {best}: kongen hører hjemme i centrum nu.
+ex.king_active.b4 = {best} centraliserer kongen.
+ex.king_active.b4.2 = Kongen skal frem: {best}.
+ex.king_active.b5 = {best}, som aktiverer kongen: {line}.
+ex.king_active.b5.2 = Kongeaktivitet: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, kongen frem.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} bevarer en bedre stilling.
+ex.positional.b4.2 = {best} var stærkere her.
+ex.positional.b4.3 = Jeg ville have foretrukket {best}.
+ex.positional.b5 = {best} var stærkere: {line}.
+ex.positional.b5.2 = {best}, med idéen {line}.
+ex.positional.b5.3 = Overvej {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} kom meget tidligt ud. Få dine springere og løbere ud først.
+tip.early_queen.b1.2 = Pas på med {your} så tidligt: mine brikker kan jage {your:den} rundt.
+tip.early_queen.b1.3 = Det er sjovt at flytte {your}, men udvikl springerne og løberne først.
+tip.early_queen.b2 = Når du flytter {your} så tidligt, kan jeg angribe {your:den} og vinde tid.
+tip.early_queen.b2.2 = {your} ude allerede? Springere og løbere først!
+tip.early_queen.b3 = En tidlig udflugt med {your} giver mig tempotræk mod {your:den}.
+tip.early_queen.b3.2 = {your} er let at jage så tidligt. Udvikl først.
+tip.queen_grab.b1 = {your} slog en bonde langt væk, og nu kan {your:den} komme i knibe.
+tip.queen_grab.b1.2 = Det koster tid at snuppe bønder med {your}. Udvikl først!
+tip.queen_grab.b2 = {your} gik på bondejagt ude på fløjen. Det koster meget tid.
+tip.queen_grab.b2.2 = Pas på med at sende {your} efter bønder langt væk.
+tip.queen_grab.b3 = Bondejagt med {your} så tidligt taber tid.
+tip.queen_grab.b3.2 = {your} er langt hjemmefra nu; min udvikling kommer til at tælle.
+tip.queen_grab.b4 = {your} snupper en bonde, men taber for meget tid.
+tip.queen_grab.b4.2 = Bondejagten ude på fløjen med {your} koster tempo.
+tip.same_piece.b1 = Du flyttede {your} to gange. Prøv at få en ny brik ud i hvert træk.
+tip.same_piece.b1.2 = {your} igen? Få også dine andre brikker ud.
+tip.same_piece.b1.3 = Prøv at udvikle en ny brik i hvert træk, ikke {your} igen.
+tip.same_piece.b2 = At flytte {your} to gange i åbningen taber tid.
+tip.same_piece.b2.2 = Du har flyttet {your} igen; dine andre brikker står stadig hjemme.
+tip.same_piece.b3 = At flytte {your} to gange koster udvikling.
+tip.same_piece.b3.2 = Endnu et træk med {your}; resten af din hær venter.
+tip.castle.b1 = {your} står stadig i midten. En rokade ville bringe {your:den} i sikkerhed.
+tip.castle.b1.2 = Tid til at rokere! {your} står sikrere i hjørnet.
+tip.castle.b1.3 = Tænk på at rokere snart. {your} står ude i det fri.
+tip.castle.b2 = {your} står stadig i centrum. Rokér snart!
+tip.castle.b2.2 = En rokade ville gemme {your} godt af vejen.
+tip.castle.b3 = Når centrum åbner sig, bør du rokere {your} i sikkerhed.
+tip.castle.b3.2 = {your} står stadig i centrum; det var tid til rokade.
+tip.knight_rim.b1 = {your} på kanten gør ikke meget. Springere kan lide midten.
+tip.knight_rim.b1.2 = En springer på kanten gør sjældent gavn! {your} kontrollerer færre felter der.
+tip.knight_rim.b2 = {your} på kanten kontrollerer få felter. Sigt mod centrum.
+tip.knight_rim.b2.2 = En springer på kanten gør sjældent gavn: {your} vil ind mod centrum.
+tip.knight_rim.b3 = {your} står ude af spillet på kanten.
+tip.knight_rim.b3.2 = Kanten er et dårligt sted for {your}.
+tip.flank.b1 = Prøv at flytte de midterste bønder først. Kantbønder hjælper ikke meget.
+tip.flank.b1.2 = Bønderne ude i siden hjælper ikke dine brikker ud. Brug de midterste.
+tip.flank.b2 = Træk med kantbønderne udvikler ikke noget. Brug centrumbønderne.
+tip.flank.b2.2 = For mange bondetræk ude i siden. Udvikl dine brikker!
+tip.flank.b3 = Bondetræk på fløjene i åbningen koster udvikling.
+tip.flank.b3.2 = Kantbønderne kan vente; udvikl og kæmp om centrum.
+tip.centre.b1 = Prøv at kontrollere midten af brættet, for eksempel {sq}.
+tip.centre.b1.2 = Centrum er vigtigt. Sæt en bonde eller en brik tæt på {sq}.
+tip.centre.b1.3 = Brikker i midten er stærke. Gå efter felter som {sq}.
+tip.centre.b2 = Kæmp om centrum: felter som {sq} betyder noget.
+tip.centre.b2.2 = Du overlader centrum til mig. Se på {sq}.
+tip.centre.b3 = Du kæmper ikke om centrum; {sq} er mit.
+tip.centre.b3.2 = Gå i kamp om centrum omkring {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Mod en enlig konge: pres den ud mod kanten, og sæt den så mat.
+tip.mate_technique.b1.2 = Tip: pres min konge ud mod kanten. Hold også din egen konge tæt på.
+tip.fifty.b1 = Pas på: efter halvtreds træk uden slag eller bondetræk er det remis.
+tip.fifty.b1.2 = Tiden er ved at løbe ud: halvtreds træk uden slag eller bondetræk er remis.
+tip.repetition.b1 = Pas på! Hvis den samme stilling kommer for tredje gang, er det remis.
+tip.repetition.b1.2 = Undgå at gentage træk: tredje gentagelse er remis, og du står til at vinde.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Wow, du ofrede en brik, og det virker!
+praise.sacrifice.2 = Et snedigt offer! Meget godt spillet.
+praise.brilliant.b3 = Genialt! Et ægte offer.
+praise.brilliant.b3.2 = Wow, {move} er et flot offer!
+praise.brilliant.b4 = {move}! Et genialt offer.
+praise.brilliant.b4.2 = Genialt. Det havde jeg ikke regnet med.
+praise.brilliant.b5 = {move}!! Genialt.
+praise.brilliant.b5.spoken = {move}. Genialt!
+praise.brilliant.b5.2 = Et genialt offer.
+praise.brilliant.b6 = {move}!! Glimrende.
+praise.brilliant.b6.spoken = {move}. Glimrende!
+praise.brilliant.b6.2 = Genialt.
+praise.great.b2 = Fremragende træk! Du fandt måden at kæmpe imod på.
+praise.great.b2.2 = Det er et fremragende træk. Godt fundet!
+praise.great.b3 = Fremragende træk! Du fandt den eneste gode idé.
+praise.great.b3.2 = Glimrende, {move} vender det hele.
+praise.great.b4 = {move}! Et fremragende fund.
+praise.great.b4.2 = Fremragende træk.
+praise.great.b5 = {move}! Godt fundet.
+praise.great.b5.2 = Stærkt: {move}.
+praise.great.b6 = {move}! Fremragende.
+praise.great.b6.2 = Flot fundet.
+praise.only.b2 = Godt! Det var det eneste gode træk.
+praise.only.b2.2 = Flot, du fandt det ene træk der virker.
+praise.only.b3 = Det eneste træk, og du fandt det.
+praise.only.b3.2 = Præcis! Intet andet virkede her.
+praise.only.b4 = Det eneste træk. Godt gået.
+praise.only.b4.2 = Eneste træk, fundet.
+praise.only.b5 = Eneste træk. Godt.
+praise.only.b5.2 = {move}, det eneste træk.
+praise.only.b6 = Eneste træk.
+praise.only.b6.2 = Præcist: det eneste træk.
+praise.fork.b2 = Et dobbeltangreb! Flot klaret.
+praise.fork.b2.2 = Du angriber to brikker på én gang! Flot.
+praise.fork.b2.3 = Fint! Det er en gaffel.
+praise.fork.b3 = Fin gaffel.
+praise.fork.b3.2 = God gaffel!
+praise.fork.b3.3 = En gaffel. Godt spillet.
+praise.capture.b1 = Flot! Du slog {my} gratis.
+praise.capture.b1.2 = Godt set! {my} var ikke dækket.
+praise.capture.b1.3 = Ja! Du vandt {my}.
+praise.capture.b2 = Godt slag! {my} var udækket.
+praise.capture.b2.2 = Fint, du snuppede {my}.
+praise.capture.b2.3 = Godt set: {my} hang.
+praise.best.b1 = Godt træk!
+praise.best.b1.2 = Meget godt!
+praise.best.b1.3 = Godt spillet!
+praise.best.b2 = Godt træk.
+praise.best.b2.2 = Meget fint.
+praise.best.b2.3 = Godt spillet.
+praise.best.b3 = Godt træk: det er ikke let at finde.
+praise.best.b3.2 = Flot fundet.
+praise.best.b3.3 = {move} er det bedste træk her. Godt.
+praise.trade.b1 = Godt! Når du fører, hjælper det dig at bytte brikker.
+praise.trade.b1.2 = Fin afbytning. Du fører, så færre brikker er godt for dig.
+praise.trade.b2 = God afbytning: du fører, så byt brikker af.
+praise.trade.b2.2 = Det er klogt at bytte {my} af når du fører.
+praise.trade.b3 = Godt: byt af når du fører.
+praise.trade.b3.2 = Fornuftig afbytning.
+praise.excellent.b3 = Glimrende træk.
+praise.excellent.b3.2 = Det er et stærkt træk.
+praise.excellent.b3.3 = Meget præcist.
+praise.excellent.b4 = Præcist.
+praise.excellent.b4.2 = Glimrende.
+praise.excellent.b4.3 = Godt, {move} er nøjagtigt.
+praise.castle.b1 = Godt! Du rokerede. Din konge står mere sikkert nu.
+praise.castle.b1.2 = Fin rokade! Din konge er gemt godt af vejen.
+praise.saved.b1 = Godt! Du reddede din brik.
+praise.saved.b1.2 = Flot, du flyttede den i sikkerhed.
+praise.book.b1 = Godt, det er et velkendt åbningstræk.
+praise.book.b1.2 = Fint, sådan starter stærke spillere også.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Pas på! Jeg truer med skakmat på {sq}.
+threat.mate.b1.2 = Pas på: {my} vil gerne til {sq}. Det ville være skakmat.
+threat.mate.b1.3 = Se på {sq}. Hvis jeg kommer derhen, er det skakmat!
+threat.mate.b2 = Pas på, jeg truer med mat.
+threat.mate.b2.2 = Pas på: der er en mattrussel på {sq}.
+threat.mate.b2.3 = Se godt efter: jeg truer med skakmat.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Se: {my} angriber {your}.
+threat.piece.b1.2 = Pas på! {your} er angrebet af {my}.
+threat.piece.b1.3 = Pas på, {my} vil gerne slå {your}.
+threat.piece.b2 = Pas på {your}.
+threat.piece.b2.2 = {your} er under angreb.
+threat.piece.b2.3 = Hold øje med {your}.
+threat.punish.b1 = Mit sidste træk var en fejl. Kan du straffe det?
+threat.punish.b1.2 = Hmm, jeg tror jeg lavede en fejl. Kan du finde den?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Tænk på {your} denne gang.
+tb.hint.b1.2 = Hold øje med {your}.
+tb.hint.king.b1 = Tænk på {your:gen} sikkerhed.
+tb.hint.king.b1.2 = Se på {your} først. Står {your:den} sikkert?
+tb.hint.missed.b1 = Kig efter brikker du kan slå gratis.
+tb.hint.missed.b1.2 = Se godt efter: er der noget du kan slå?
+tb.hint.mate_missed.b1 = Se på min konge. Kan du sætte den mat?
+tb.hint.mate_missed.b1.2 = Prøv skakkerne først. Måske er der skakmat!
+tb.hint.general.b1 = Tag dig god tid og se på hele brættet.
+tb.hint.general.b1.2 = Prøv at finde et sikrere træk.
+# The retry.
+tb.fixed.b1 = Meget bedre!
+tb.fixed.b1.2 = Ja, det er bedre!
+tb.fixed.b1.3 = Godt, det virker meget bedre.
+tb.fixed = Det er bedre.
+tb.fixed.2 = Bedre.
+tb.fixed.3 = God rettelse.
+tb.same = Det samme træk igen? Godt så, lad os se.
+tb.same.2 = Du kan godt lide det træk. Lad os spille det til ende.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Ja! Det er det træk jeg tænkte på.
+tb.found.b1.2 = Du fandt det! Det er det bedre træk.
+tb.found = Det er det træk jeg havde i tankerne.
+tb.found.2 = Præcis, det er det.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Der er desværre ikke flere tilbagetagninger i dette parti.
+tb.none_left.2 = Du har ikke flere tilbagetagninger i dette parti.

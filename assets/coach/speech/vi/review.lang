@@ -1,0 +1,986 @@
+# Coach speech (Vietnamese): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach calls himself "tôi" and the player "bạn" ("we / let's" = "chúng ta"), as in the
+# glossary (glossary/vi.md). Vietnamese has no gender agreement: nothing depends on the player's gender.
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their owner ("con Mã của bạn"). Forms from
+# common.lang: short ("Mã của bạn", terse levels), bare ("con Mã": the same piece named again, or two
+# pieces of one owner with the owner said once: "{t1:bare} và {t2}" = "con Vua và con Hậu của bạn"),
+# noun ("Mã"), of ("của bạn"), refl ("con Mã của mình").
+# No word is glued to a square or a move: squares follow the noun "ô" ("ở ô {sq}"), moves often follow
+# "nước" ("Nước {move} là một sai lầm."). Counts: {pts:point} "3 điểm", {m:move} "2 nước", {n:time}
+# "2 lần", {n:attacker} / {n2:defender}; where English gives a piece's value as a bare number ("is
+# worth {n}"), the line says {n:point} ("đáng giá 3 điểm").
+# Terms: blunder = sai lầm nghiêm trọng, serious mistake = sai lầm nặng, dubious = đáng ngờ, hanging =
+# không được bảo vệ (terse: bị treo), take for free = bắt ... mà không mất gì (not "ăn không":
+# "có thể ăn không" also reads as a question), forced mate = chiếu hết bắt buộc,
+# opposition = thế đối Vua, the square (pawn race) = hình vuông. A better move = "nước (đi) hay hơn",
+# never "nước đi tốt": spoken "tốt" sounds like "Tốt" (pawn).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Chiếu! Con Vua của tôi bị tấn công.
+ann.check.human.b1.2 = Chiếu! Bạn đang tấn công con Vua của tôi.
+ann.check.human.b1.3 = Chiếu rồi! Con Vua của tôi phải thoát chiếu.
+ann.check.human = Chiếu.
+ann.check.human.2 = Chiếu!
+ann.check.human.3 = Và thế là chiếu.
+# The coach gives check.
+ann.check.coach = Chiếu!
+ann.check.coach.2 = Chiếu.
+ann.check.coach.3 = Và chiếu!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Như vậy nghĩa là {your} đang bị tấn công. Bạn phải giúp nó thoát chiếu.
+ann.check.coach.first.2 = Chiếu nghĩa là {your} đang bị tấn công. Hãy di chuyển nó, chặn lại, hoặc bắt quân của tôi.
+ann.double_check.coach = Chiếu đôi! Hai quân của tôi cùng lúc tấn công con Vua của bạn, nên nó phải chạy.
+ann.double_check.coach.2 = Đó là chiếu đôi: giờ chỉ có nước đi Vua mới cứu được bạn.
+ann.double_check.human = Chiếu đôi! Hai quân của bạn cùng lúc tấn công con Vua của tôi, nên nó phải chạy.
+ann.double_check.human.2 = Chiếu đôi! Giờ chỉ có nước đi Vua mới cứu được tôi.
+# The player checkmates the coach.
+ann.mate.human.b1 = Chiếu hết! Bạn thắng rồi! Con Vua của tôi không thể thoát.
+ann.mate.human.b1.2 = Chiếu hết rồi! Giỏi lắm, bạn đã thắng ván cờ!
+ann.mate.human.b1.3 = Chiếu hết! Con Vua của tôi bị vây chặt. Chúc mừng bạn!
+ann.mate.human = Chiếu hết. Chơi hay lắm.
+ann.mate.human.2 = Chiếu hết rồi. Chúc mừng bạn.
+ann.mate.human.3 = Chiếu hết! Làm tốt lắm.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Chiếu hết rồi. Con Vua của bạn không còn đường thoát.
+ann.mate.coach.b1.2 = Chiếu hết. Con Vua của bạn bị tấn công và không thể thoát.
+ann.mate.coach.b1.3 = Rất tiếc, chiếu hết rồi. Con Vua của bạn không chạy thoát được.
+ann.mate.coach = Chiếu hết.
+ann.mate.coach.2 = Và thế là chiếu hết.
+ann.mate.coach.3 = Chiếu hết rồi, rất tiếc.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ối! Nước này làm bạn thiệt rồi.
+ex.verdict.blunder.b1.2 = Cẩn thận! Nước này có thể khiến bạn thiệt.
+ex.verdict.blunder.b1.3 = Ồ, khoan đã. Nước này có vấn đề.
+ex.verdict.blunder.b2 = Hừm, nước này có vấn đề.
+ex.verdict.blunder.b2.2 = Đó là một sai lầm lớn.
+ex.verdict.blunder.b2.3 = Cẩn thận, nước này làm bạn thiệt đấy.
+ex.verdict.blunder.b3 = Đó là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b3.2 = Nước {move} là một sai lầm thật sự.
+ex.verdict.blunder.b3.3 = Ôi, nước {move} là một sai lầm lớn.
+ex.verdict.blunder.b4 = Nước {move} là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b4.2 = Nước {move} là một sai lầm nặng.
+ex.verdict.blunder.b4.3 = Rất tiếc, đó là một sai lầm nghiêm trọng.
+ex.verdict.blunder.b5 = Nước {move} là một sai lầm nặng.
+ex.verdict.blunder.b5.2 = {move} là sai lầm nghiêm trọng.
+ex.verdict.blunder.b5.3 = {move} là một sai lầm đắt giá.
+ex.verdict.blunder.b6 = {move}: sai lầm nặng.
+ex.verdict.blunder.b6.2 = {move} là sai lầm nghiêm trọng.
+ex.verdict.blunder.b6.3 = {move}? Sai lầm nghiêm trọng.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Ối! Bạn chưa đối phó với mối đe dọa của tôi.
+ex.verdict.ignored.b1.2 = Cẩn thận! Mối đe dọa của tôi vẫn còn đó.
+ex.verdict.ignored.b1.3 = Ồ, khoan đã. Bạn quên mối đe dọa của tôi rồi.
+ex.verdict.ignored.b2 = Hừm, mối đe dọa của tôi vẫn còn đó.
+ex.verdict.ignored.b2.2 = Bạn đã bỏ qua mối đe dọa của tôi.
+ex.verdict.ignored.b2.3 = Cẩn thận, bạn chưa đối phó với mối đe dọa của tôi.
+ex.verdict.mistake.b3 = Đó không phải là nước đi hay.
+ex.verdict.mistake.b3.2 = Hừm, nước {move} có vấn đề.
+ex.verdict.mistake.b3.3 = Đó là một sai lầm.
+ex.verdict.mistake.b4 = Nước {move} là một sai lầm.
+ex.verdict.mistake.b4.2 = Nước {move} không ổn.
+ex.verdict.mistake.b4.3 = Đó là một sai lầm.
+ex.verdict.mistake.b5 = Nước {move} rõ ràng là một sai lầm.
+ex.verdict.mistake.b5.2 = {move} là một sai lầm.
+ex.verdict.mistake.b5.3 = {move} không ổn.
+ex.verdict.mistake.b6 = {move}: sai lầm.
+ex.verdict.mistake.b6.2 = {move}? Sai lầm.
+ex.verdict.mistake.b6.3 = Không phải {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Không tệ, nhưng nước {best} hay hơn một chút.
+ex.verdict.inaccuracy.b3.2 = Nước {best} chính xác hơn một chút.
+ex.verdict.inaccuracy.b3.3 = Một sơ suất nhỏ: ở đây nước {best} hay hơn.
+ex.verdict.inaccuracy.b4 = Thiếu chính xác: nước {best} chính xác hơn.
+ex.verdict.inaccuracy.b4.2 = Hơi thiếu chính xác. Nước {best} hay hơn một chút.
+ex.verdict.inaccuracy.b4.3 = Chưa phải nước tốt nhất: nước {best} chính xác hơn.
+ex.verdict.inaccuracy.b5 = Nước {move} thiếu chính xác; {best} mạnh hơn.
+ex.verdict.inaccuracy.b5.2 = Hơi thiếu chính xác. Là tôi thì tôi đã đi {best}.
+ex.verdict.inaccuracy.b5.3 = Nước {best} chính xác hơn nước {move}.
+ex.verdict.inaccuracy.b6 = {move} thiếu chính xác; {best}.
+ex.verdict.inaccuracy.b6.2 = Thiếu chính xác. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} hay hơn.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Có lẽ nước {best} chính xác hơn một chút.
+ex.verdict.inaccuracy.maybe.2 = Có lẽ tôi sẽ đi {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Nước đi này trông đáng ngờ.
+ex.verdict.dubious.2 = Nước đi này có vẻ đáng ngờ.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ồ, khoan đã! Bạn đã bỏ lỡ một nước hay.
+ex.verdict.missed.b1.2 = Hãy nhìn lại! Có nước hay hơn đấy.
+ex.verdict.missed.b1.3 = Khoan, lúc nãy bạn có cơ hội đấy!
+ex.verdict.missed.b2 = Bạn đã bỏ lỡ một cơ hội.
+ex.verdict.missed.b2.2 = Hừm, có nước hay hơn đấy.
+ex.verdict.missed.b2.3 = Khoan, lúc nãy bạn có một nước rất hay.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Nước hay hơn là {best}.
+ex.better.b3.2 = {best} là nước đi hay hơn.
+ex.better.b3.3 = Thay vào đó, đi {best} thì hay.
+ex.better.b4 = {best} mạnh hơn.
+ex.better.b4.2 = Nước đúng là {best}.
+ex.better.b4.3 = Nên đi {best} thì hơn.
+ex.better.b5 = {best}, với ý đồ {line}.
+ex.better.b5.2 = Nước cần đi là {best}: {line}.
+ex.better.b5.3 = Hay hơn là {best}, tiếp theo là {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Nên đi {best}, {eval}.
+ex.better.b6.3 = {best} cho {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Có một nước hay hơn cho {your}.
+ex.hint.b1.2 = {your} có một nước đi hay hơn.
+ex.hint.b2 = {your} có một nước đi hay hơn.
+ex.hint.b2.2 = Có một nước hay hơn cho {your}.
+ex.hint.b3 = {your} có một nước đi hay hơn.
+ex.hint.b3.2 = Có nước hay hơn cho {your}.
+ex.hint.b4 = {your} có một nước đi hay hơn.
+ex.hint.b4.2 = Hãy nhìn lại {your}: nó có nước hay hơn.
+ex.hint.b5 = {your} có một nước mạnh hơn.
+ex.hint.b5.2 = Có một nước mạnh hơn cho {your}.
+ex.hint.b6 = {your:short} có nước hay hơn.
+ex.hint.b6.2 = Xem lại {your}.
+ex.hint.move = Đã có một nước đi hay hơn.
+ex.hint.move.2 = Lúc đó bạn có nước đi hay hơn.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} có một nước hay hơn. Nước đó ăn được quân.
+ex.hint.gain.b1.2 = Có một nước hay hơn cho {your}. Nước đó ăn được quân.
+ex.hint.gain.b2 = {your} có một nước hay hơn. Nước đó ăn được quân.
+ex.hint.gain.b2.2 = {your} có một nước giúp bạn ăn được quân.
+ex.hint.gain.b3 = {your} có một nước hay hơn, một nước ăn được quân.
+ex.hint.gain.b3.2 = {your} có một nước giúp bạn ăn được quân.
+ex.hint.gain.b4 = {your} có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b4.2 = Hãy nhìn lại {your}: nó có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b5 = {your} có một nước mạnh hơn, giành được lợi thế lực lượng.
+ex.hint.gain.b5.2 = Với {your}, có một nước giành được lợi thế lực lượng.
+ex.hint.gain.b6 = {your:short} có nước giành lợi thế lực lượng.
+ex.hint.gain.b6.2 = Xem lại {your}: đã có quân để ăn.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Nước hay hơn là đi {your} đến ô {sq}.
+ex.reveal.b1.2 = {your} có thể đi đến ô {sq}. Như thế hay hơn.
+ex.reveal.b2 = Đi {your} đến ô {sq} là nước hay hơn.
+ex.reveal.b2.2 = Nước hay hơn là đi {your} đến ô {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Chúng ta đặt các quân lại chỗ cũ nhé.
+ex.rewind.b1.2 = Giờ tôi sẽ đặt mọi thứ về như cũ.
+ex.rewind.b1.3 = Để tôi xếp các quân lại nhé.
+ex.rewind.b2 = Chúng ta đặt lại mọi thứ nhé.
+ex.rewind.b2.2 = Quay lại chỗ lúc nãy.
+ex.rewind.b2.3 = Tôi sẽ đặt các quân lại.
+ex.rewind.b3 = Quay lại ván cờ.
+ex.rewind.b3.2 = Chúng ta quay lại nhé.
+ex.rewind.b3.3 = Quay lại thế cờ.
+ex.rewind.b4 = Quay lại ván cờ.
+ex.rewind.b4.2 = Quay lại.
+ex.rewind.b4.3 = Quay lại nào.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Bạn có muốn thử nước khác không?
+ex.offer.b1.2 = Bạn có muốn đi lại nước đó và thử lần nữa không?
+ex.offer.b1.3 = Chúng ta thử một nước khác nhé?
+ex.offer.b2 = Bạn muốn thử một nước khác không?
+ex.offer.b2.2 = Bạn có muốn đi lại không?
+ex.offer.b2.3 = Thử lại nhé?
+ex.offer.b3 = Bạn có muốn đi lại nước này không?
+ex.offer.b3.2 = Bạn có muốn thử lại không?
+ex.offer.b3.3 = Đi lại nhé?
+ex.offer.b4 = Đi lại không?
+ex.offer.b4.2 = Bạn muốn đi lại không?
+ex.offer.b4.3 = Thử nước khác không?
+ex.offer.b5 = Đi lại?
+ex.offer.b5.2 = Muốn đi lại không?
+ex.offer.b5.3 = Đi lại không?
+ex.offer.b6 = Đi lại?
+ex.offer.b6.2 = Đi lại không?
+ex.offer.b6.3 = Thử lại?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Nước đi này đáng ngờ. Có lẽ bạn đi được nước hay hơn?
+ex.dubious.b1.2 = Nước đi này đáng ngờ. Bạn thử tìm nước hay hơn xem?
+ex.dubious.b2 = Một nước đi đáng ngờ. Có lẽ bạn đi được nước hay hơn?
+ex.dubious.b2.2 = Nước đi này đáng ngờ. Có lẽ còn nước hay hơn?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Tiếp theo, {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} đi đến ô {sq}.
+demo.my.move.2 = Tôi đi {my:refl} đến ô {sq}.
+demo.my.move.3 = Rồi {my} đi đến ô {sq}.
+demo.my.take = Tôi bắt {your}.
+demo.my.take.2 = {my} bắt {your}.
+demo.my.take.3 = Rồi tôi bắt {your}.
+demo.my.check = {my} đi đến ô {sq}. Chiếu.
+demo.my.check.2 = Chiếu, bằng {my} ở ô {sq}.
+demo.my.check.3 = {my} đến ô {sq}, chiếu!
+demo.my.mate = {my} đi đến ô {sq}. Chiếu hết.
+demo.my.mate.2 = Và {my} đến ô {sq} là chiếu hết.
+demo.my.mate.3 = {my} đến ô {sq}. Thế là chiếu hết.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Trước tiên, {my} bắt {your}. {t1} để sau cũng được.
+demo.my.first.take.2 = {my} bắt {your} trước. {t1} vẫn còn ở đó.
+demo.my.first.check = {my} bắt {your}, và đó là nước chiếu! {t1} để sau cũng được.
+demo.my.first.check.2 = Trước tiên {my} bắt {your}, kèm nước chiếu. {t1} vẫn còn ở đó.
+demo.my.first.check_move = Trước tiên, chiếu bằng {my} ở ô {sq}. {t1} để sau cũng được.
+demo.my.first.check_move.2 = {my} đi đến ô {sq}: chiếu trước đã! {t1} vẫn còn ở đó.
+demo.my.first.move = Trước tiên, {my} đi đến ô {sq}. {t1} để sau cũng được.
+demo.my.first.move.2 = {my} đến ô {sq} trước. {t1} vẫn còn ở đó.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} đang bị tấn công, nên nó bắt {your} trước.
+demo.my.first.attacked.2 = {my} đang bị đe dọa: nó chộp lấy {your} trước.
+# Levels 4-6, the same in-between move.
+demo.first = Trước hết là {move}: {t1} để sau cũng được.
+demo.first.2 = Trước tiên là {move}. {t1} vẫn còn ở đó.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Bây giờ tôi đi nước của mình.
+demo.play_on.2 = Đây là nước đi thật của tôi.
+demo.play_on.3 = Còn bây giờ, tôi đi thật nhé.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Bạn sẽ đi {your:refl} đến ô {sq}.
+demo.your.move.2 = Giả sử bạn đi {your:refl} đến ô {sq}.
+demo.your.move.3 = Rồi {your} đi đến ô {sq}.
+demo.your.take = Bạn sẽ bắt {my}.
+demo.your.take.2 = Bạn dùng {your:refl} bắt {my}.
+demo.your.take.3 = Rồi bạn bắt {my}.
+demo.your.back = Bạn bắt lại.
+demo.your.back.2 = Bạn bắt lại ở ô {sq}.
+demo.your.back.3 = Và bạn bắt lại quân.
+demo.your.king = Con Vua của bạn phải di chuyển.
+demo.your.king.2 = Con Vua phải tránh đi, sang ô {sq}.
+demo.your.king.3 = Con Vua của bạn chạy sang ô {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Giờ thì không cứu được {t1} nữa.
+ex.point.piece.2 = Và {t1} sẽ mất.
+ex.point.piece.3 = Tiếp theo, {t1} sẽ bị bắt.
+ex.point.two = {t1:bare} và {t2} đều bị tấn công: một trong hai sẽ mất.
+ex.point.two.2 = Giờ tôi tấn công {t1:bare} và {t2}. Bạn không thể cứu cả hai.
+ex.point.mate = Và giờ {reply:nomate} là chiếu hết.
+ex.point.mate.2 = Tiếp theo là {reply:nomate}, và thế là chiếu hết.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Thấy chưa? Giờ bạn đã mất {pts:point}.
+ex.result.b1.2 = Thế là bạn mất {pts:point}.
+ex.result.b2 = Cuối cùng, bạn đã mất {pts:point}.
+ex.result.b2.2 = Giờ bạn đang kém {pts:point}.
+ex.result.b3 = Điều đó khiến bạn mất {pts:point}.
+ex.result.b3.2 = Rốt cuộc bạn kém {pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Bạn có thể bắt lại một quân, nhưng vẫn kém {pts:point}.
+ex.result_back.b1.2 = Bạn có thể gỡ lại một ít, nhưng vẫn mất {pts:point}.
+ex.result_back.b2 = Bạn có thể bắt lại một phần, nhưng vẫn kém {pts:point}.
+ex.result_back.b2.2 = Ngay cả khi bắt lại, bạn vẫn mất {pts:point}.
+ex.result_back.b3 = Kể cả sau khi bắt lại, bạn vẫn kém {pts:point}.
+ex.result_back.b3.2 = Bạn gỡ lại được một ít, nhưng vẫn mất {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Nếu {your2} bắt lại, {my} sẽ bắt {your}.
+ex.retake.b1.2 = Bạn không thể bắt lại bằng {your2:refl}: khi đó {my} sẽ bắt {your}.
+ex.retake.b2 = Nếu {your2} bắt lại, {my} sẽ bắt {your}.
+ex.retake.b2.2 = Bắt lại bằng {your2} không được: {my} sẽ bắt {your}.
+ex.retake.b3 = Nếu bạn bắt lại bằng nước {move}, tôi đi {reply}, bắt {your}.
+ex.retake.b3.2 = Bắt lại bằng nước {move} không được: tôi đi {reply}, bắt {your}.
+ex.retake.b4 = Nước {move} thất bại vì {reply}, bắt mất {your}.
+ex.retake.b4.2 = Còn nếu {move}, thì {reply} bắt {your}.
+ex.retake.b5 = Nước bắt lại {move} vấp phải {reply}, và {your} bị mất.
+ex.retake.b5.2 = Nước {move} thất bại vì {reply}: mất {your}.
+ex.retake.b6 = {move}? {reply} bắt {your:short}.
+ex.retake.b6.2 = {move} không được: {reply} bắt {your:short}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Và ở đây, tại ô {sq}, bạn sẽ có một con Hậu mới.
+demo.promote.2 = Rồi {your} đến ô {sq} và được phong Hậu.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Coi chừng: {my} có thể đến ô {sq}, và đó là chiếu hết.
+ex.mate_allowed.b1.2 = Giờ {my} có thể đến ô {sq}. Như thế là chiếu hết!
+ex.mate_allowed.b1.3 = Cẩn thận! Nếu {my} đến ô {sq}, đó là chiếu hết.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Nước này giúp tôi chiếu hết {your} sau {m:move}.
+ex.mate_allowed.b2.2 = Giờ tôi có thể chiếu hết {your} sau {m:move}. Xem này.
+ex.mate_allowed.b2.3 = Cẩn thận! {your} đang gặp nguy: chiếu hết sau {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Nước này để tôi chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Sau nước này, tôi có đòn chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Con Vua của bạn bị chiếu hết: {line:nomate}.
+ex.mate_allowed.b4 = Nước {move} để lọt một đòn chiếu hết bắt buộc: {line:nomate}.
+ex.mate_allowed.b4.2 = Nước này dẫn thẳng đến chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Sau {move}, {line:nomate} là chiếu hết.
+ex.mate_allowed.b5 = Nước {move} để lọt đòn chiếu hết bắt buộc sau {m:move}.
+ex.mate_allowed.b5.2 = Nước này dẫn đến chiếu hết sau {m:move}.
+ex.mate_allowed.b5.3 = Giờ đã có đòn chiếu hết bắt buộc sau {m:move}.
+ex.mate_allowed.b6 = Chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, chiếu hết.
+ex.mate_allowed.b6.3 = Chiếu hết sau {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Nhìn này: {your} không còn ô nào để thoát.
+ex.mate_allowed.tail.b1.2 = Thấy chưa? {your} bị tấn công và không thể chạy thoát.
+ex.mate_allowed.tail.b1.3 = {your} không còn chỗ nào để đi. Đó là chiếu hết.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Người ta gọi kiểu này là {text}.
+ex.mate_allowed.pattern.2 = Hãy nhớ kiểu này nhé: đó là {text}.
+ex.mate_allowed.tip.b3 = Trước mỗi nước, hãy kiểm tra xem con Vua của mình còn an toàn không.
+ex.mate_allowed.tip.b3.2 = Luôn tự hỏi: sau nước đi này, con Vua của mình có thể bị chiếu hết không?
+
+# The pattern names, said after "gọi kiểu này là" / "đó là" (no article in Vietnamese).
+name.pattern.back_rank = chiếu hết ở hàng cuối
+name.pattern.smothered = chiếu hết ngạt thở
+name.pattern.support = chiếu hết bằng Hậu có yểm trợ
+name.pattern.ladder = chiếu hết kiểu bậc thang
+name.pattern.epaulette = chiếu hết kiểu cầu vai
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Lẽ ra bạn đã chiếu hết được {my} bằng {best:nomate}!
+ex.mate_missed.b1.2 = {best:nomate} là chiếu hết đấy! {my} sẽ không có đường thoát.
+ex.mate_missed.b1.3 = Nhìn này! Nước {best:nomate} đã có thể chiếu hết {my}.
+ex.mate_missed.b2 = Bạn đã có thể chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b2.2 = Nước {best:nomate} là chiếu hết sau {m:move}!
+ex.mate_missed.b2.3 = Lẽ ra bạn đã chiếu hết được tôi bằng {best:nomate}.
+ex.mate_missed.b3 = Bạn đã bỏ lỡ đòn chiếu hết sau {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Đã có đòn chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b4 = Bỏ lỡ chiếu hết: {line:nomate}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} dẫn đến chiếu hết bắt buộc sau {m:move}.
+ex.mate_missed.b4.3 = Bạn đã có đòn chiếu hết sau {m:move} với {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} chiếu hết sau {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Bỏ lỡ chiếu hết sau {m:move}, bắt đầu bằng {best:nomate}.
+ex.mate_missed.b5.3 = Đã có đòn chiếu hết bắt buộc: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} chiếu hết: {line:nomate}.
+ex.mate_missed.b6.2 = Chiếu hết sau {m:move} với {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, chiếu hết sau {m:move}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Nhanh hơn là {best:nomate}: chiếu hết sau {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} chiếu hết sớm hơn, sau {m:move}.
+ex.mate_delayed.b6 = {best:nomate} chiếu hết sau {m:move}.
+ex.mate_delayed.b6.2 = Nhanh hơn: {best:nomate}, chiếu hết sau {m:move}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ôi không! {my} không đi được và không bị chiếu. Thế là hết nước đi: ván cờ hòa.
+ex.stalemate.b1.2 = Nhìn này: {my} không còn ô an toàn, nhưng không bị chiếu. Hòa rồi!
+ex.stalemate.b1.3 = Đó là hết nước đi. {my} không đi được, nên ván cờ hòa.
+ex.stalemate.b2 = Hết nước đi! {my} không có nước đi hợp lệ, và không bị chiếu. Hòa.
+ex.stalemate.b2.2 = Ôi không, hết nước đi: {my} bị kẹt nhưng không bị chiếu.
+ex.stalemate.b2.3 = Đó là hòa do hết nước đi. {my} không đi được.
+ex.stalemate.b3 = Hết nước đi: {my} không có nước đi hợp lệ. Bạn đang ở thế thắng cơ mà!
+ex.stalemate.b3.2 = Hết nước đi! {my} bị kẹt, và một ván thắng thành ván hòa.
+ex.stalemate.b3.3 = {my} không còn nước đi mà không bị chiếu: thế hết nước đi.
+ex.stalemate.b4 = Hết nước đi: {my} không có nước đi hợp lệ. Thế là mất chiến thắng.
+ex.stalemate.b4.2 = Nước {move} làm {my} hết nước đi. Hòa từ một thế thắng.
+ex.stalemate.b4.3 = Hết nước đi; {my} bị vây kín.
+ex.stalemate.b5 = Nước {move} làm {my} hết nước đi. Chiến thắng đã tuột mất.
+ex.stalemate.b5.2 = Hết nước đi: {my} không còn ô nào.
+ex.stalemate.b5.3 = Hết nước đi, {my} bị kẹt.
+ex.stalemate.b6 = Hết nước đi. {my:short} không đi được.
+ex.stalemate.b6.2 = {move}, hết nước đi: {my:short} bị vây kín.
+ex.stalemate.b6.3 = Hết nước đi; {my:short} không thể di chuyển.
+ex.stalemate.tip.b1 = Khi đang thắng, hãy luôn chừa cho con Vua của tôi một ô để đi.
+ex.stalemate.tip.b1.2 = Hãy nhớ: khi đang dẫn trước, hãy chừa chỗ cho con Vua của tôi.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Cẩn thận! Tôi có thể cho đi các quân của mình, rồi {my} sẽ hết nước đi.
+ex.stalemate_trick.b1.2 = Coi chừng: {my} gần như bị kẹt. Tôi có thể cầm hòa.
+ex.stalemate_trick.b2 = Cẩn thận: tôi có thể thí quân, và {my} sẽ hết nước đi.
+ex.stalemate_trick.b2.2 = {my} gần như không còn ô nào. Tôi có thể ép thành thế hết nước đi!
+ex.stalemate_trick.b3 = Nước này giúp tôi thoát thua nhờ thế hết nước đi: {my} không còn nước nào.
+ex.stalemate_trick.b3.2 = Cẩn thận: sau {line}, {my} hết nước đi.
+ex.stalemate_trick.b4 = Nước {move} cho tôi gài bẫy hết nước đi: {line}, và {my} không đi được.
+ex.stalemate_trick.b4.2 = Giờ {my} có thể trốn vào thế hết nước đi: {line}.
+ex.stalemate_trick.b5 = Nước {move} để lọt thế hết nước đi: {line}; {my} bị vây kín.
+ex.stalemate_trick.b5.2 = Bẫy hết nước đi: {line}, và {my} không còn nước đi.
+ex.stalemate_trick.b6 = {line}, hết nước đi: {my:short} bị vây kín.
+ex.stalemate_trick.b6.2 = Hết nước đi sau {line}; {my:short} bị kẹt.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+# The two targets belong to one side: "{t1:bare} và {t2}" says the owner once.
+ex.fork.b1 = {my} có thể đến ô {sq} và tấn công cả {t1:bare} lẫn {t2}.
+ex.fork.b1.2 = {my} đến ô {sq} và tấn công hai quân: {t1:bare} và {t2}.
+ex.fork.b1.3 = Để ý {my}: từ ô {sq}, nó tấn công cùng lúc {t1:bare} và {t2}.
+ex.fork.b2 = Chĩa đôi! {my} ở ô {sq} tấn công cùng lúc {t1:bare} và {t2}.
+ex.fork.b2.2 = Sau nước đi của bạn, {my} có thể chĩa đôi {t1:bare} và {t2} từ ô {sq}.
+ex.fork.b2.3 = {my} đến ô {sq}: đòn tấn công kép vào {t1:bare} và {t2}.
+ex.fork.b3 = Nước {move} cho phép tôi đi {reply}, chĩa đôi {t1:bare} và {t2}.
+ex.fork.b3.2 = Sau {reply}, tôi tấn công cùng lúc {t1:bare} và {t2}.
+ex.fork.b3.3 = {reply} là đòn chĩa đôi: {t1:bare} và {t2} đều bị tấn công.
+ex.fork.b4 = {reply} chĩa đôi {t1:bare} và {t2}; sau {line}, bạn đã mất {pts:point}.
+ex.fork.b4.2 = {reply} đánh cùng lúc vào {t1:bare} và {t2}.
+ex.fork.b4.3 = Nước {move} để lọt đòn chĩa đôi {reply} vào {t1:bare} và {t2}.
+ex.fork.b5 = Nước {move} mắc vào đòn chĩa đôi {reply}, nhắm vào {t1:noun} và {t2:short}.
+ex.fork.b5.2 = {reply} chĩa đôi {t1:noun} và {t2:short}.
+ex.fork.b5.3 = Sau {reply}, cả {t1:noun} lẫn {t2:short} đều bị tấn công.
+ex.fork.b6 = {reply} chĩa đôi.
+ex.fork.b6.2 = {move} để lọt {reply}, chĩa đôi.
+ex.fork.b6.3 = {reply}: đòn chĩa đôi.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Bạn chỉ cứu được một trong hai: {t1:bare} hoặc {t2}.
+ex.fork.tail.b1.2 = Giờ tôi tấn công hai quân cùng lúc: {t1:bare} và {t2}. Đó là đòn chĩa đôi!
+ex.fork.tail.b1.3 = Thấy chưa? {t1:bare} và {t2} đều bị tấn công. Một trong hai sẽ mất.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} phải thoát chiếu, nên tôi bắt {t1}.
+ex.fork.tail_king.2 = Chiếu! {your} phải chạy, và {t1} sẽ mất.
+ex.fork.more.b3 = Trước khi đi, hãy để ý ô {sq}: từ đó {my} có thể chĩa đôi.
+ex.fork.more.b3.2 = Hãy để mắt đến ô {sq}. {my} chĩa đôi từ đó.
+ex.fork.tip.knight = Hãy coi chừng những bước nhảy của Mã gần con Vua và con Hậu của bạn!
+ex.fork.tip.knight.2 = Mã rất thích tấn công hai quân cùng lúc. Hãy xem chúng có thể nhảy đến đâu.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Khi {my} đi chỗ khác, {my2} sẽ tấn công {t1}!
+ex.discovered.b1.2 = Nhìn này: {my} đang chắn đường. Nếu nó đi, {my2} sẽ đánh vào {t1}.
+ex.discovered.b1.3 = {my} có thể tránh sang bên, rồi {my2} tấn công {t1}.
+ex.discovered.b2 = Một đòn tấn công ẩn: {my} đi, và {my2} tấn công {t1}.
+ex.discovered.b2.2 = Cẩn thận: {my} có thể đi chỗ khác, và {my2} đánh vào {t1}.
+ex.discovered.b2.3 = {my} tránh đi và mở đường cho {my2} tấn công {t1}.
+ex.discovered.b3 = Sau {reply}, một đòn tấn công mở đánh vào {t1}.
+ex.discovered.b3.2 = {reply} mở ra đòn tấn công vào {t1}.
+ex.discovered.b3.3 = Nước {move} cho phép {reply}, một đòn tấn công mở vào {t1}.
+ex.discovered.b4 = {reply} mở đường tấn công vào {t1}: đòn tấn công mở.
+ex.discovered.b4.2 = Nước {move} cho phép đòn tấn công mở {reply}, ăn {t1}.
+ex.discovered.b4.3 = Sau {reply}, {t1} bị mất vì đòn tấn công mở.
+ex.discovered.b5 = Nước {move} cho phép đòn tấn công mở {reply}.
+ex.discovered.b5.2 = {reply} là đòn tấn công mở.
+ex.discovered.b5.3 = {reply} mở ra một đòn tấn công ẩn.
+ex.discovered.b6 = {reply}, tấn công mở vào {t1:short}.
+ex.discovered.b6.2 = {reply}, và mất {t1:short}.
+ex.discovered.b6.3 = Tấn công mở: {reply}, đánh vào {t1:short}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} tấn công {t1}. Khi {t1:bare} tránh đi, tôi bắt {t2:bare} ở phía sau.
+ex.skewer.b1.2 = Nhìn này: {my} đánh vào {t1}, và {t2:bare} ở ngay phía sau.
+ex.skewer.b1.3 = {my} nhắm vào {t1}. {t1:bare} phải tránh đi, và rồi {t2:bare} sẽ mất.
+ex.skewer.b2 = Đòn xiên: {my} tấn công {t1}, và {t2:bare} ở phía sau.
+ex.skewer.b2.2 = {my} nhắm vào {t1:bare} và {t2} trên cùng một đường. Khi quân trước tránh đi, tôi bắt quân sau.
+ex.skewer.b2.3 = Cẩn thận: {t1:bare} và {t2} nằm trên cùng một đường. {my} có thể xiên chúng.
+ex.skewer.b3 = {reply} xiên {t1:bare} và {t2}.
+ex.skewer.b3.2 = Sau {reply}, {t1} phải tránh đi và {t2:bare} sẽ mất.
+ex.skewer.b3.3 = Nước {move} cho phép {reply}, đòn xiên {t1:bare} và {t2}.
+ex.skewer.b4 = {reply} xiên {t1}; {t2:bare} phía sau sẽ mất.
+ex.skewer.b4.2 = Sau {move}, {t1:bare} và {t2} nằm trên cùng một đường: {reply}.
+ex.skewer.b4.3 = Sau {reply}, {t1} phải tránh, và {t2:bare} bị bắt.
+ex.skewer.b5 = {reply} xiên {t1:noun} và {t2:short}.
+ex.skewer.b5.2 = Nước {move} cho phép đòn xiên {reply}, xuyên qua {t1:noun} tới {t2:short}.
+ex.skewer.b6 = {reply} xiên.
+ex.skewer.b6.2 = {reply}, đòn xiên.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it (also the player's:
+# {t1:bare}).
+ex.pin.b1 = {my} có thể đến ô {sq}. Khi đó {your} bị kẹt trước {t1:bare}.
+ex.pin.b1.2 = Để ý {my} ở ô {sq}: {your} sẽ bị kẹt trước {t1:bare}.
+ex.pin.b1.3 = {my} có thể ghim {your} vào {t1:bare}. Rồi tôi sẽ ăn nó.
+ex.pin.b2 = Đòn ghim: {your} bị kẹt trước {t1:bare}.
+ex.pin.b2.2 = {your} bị ghim vào {t1:bare}. Rồi tôi có thể ăn nó.
+ex.pin.b2.3 = Giờ {your} bị kẹt trước {t1:bare}. Đó là đòn ghim.
+ex.pin.b3 = {your} bị ghim vào {t1:bare}, và tôi ăn nó.
+ex.pin.b3.2 = Sau nước này, {your} bị ghim vào {t1:bare}.
+ex.pin.b3.3 = Đòn ghim vào {your} làm bạn mất quân: {t1:bare} ở phía sau.
+ex.pin.b4 = {reply} ghim và ăn quân.
+ex.pin.b4.2 = Nước {move} mắc vào đòn ghim {reply}.
+ex.pin.b4.3 = Sau {reply}, quân bị ghim sẽ mất.
+ex.pin.b5 = Nước {move} để lọt đòn ghim {reply}.
+ex.pin.b5.2 = {reply} ghim, và quân đó sẽ mất.
+ex.pin.b6 = {reply} ghim.
+ex.pin.b6.2 = {reply}, đòn ghim.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} bị ghim, nên không thể bảo vệ ô {sq}. {t1:bare} ở phía sau nó.
+ex.pin_defender.b1.2 = Nhìn này: {your} không thật sự bảo vệ được ô {sq}, vì {t1:bare} ở phía sau.
+ex.pin_defender.b2 = {your} bị ghim vào {t1:bare}, nên ô {sq} không thật sự được bảo vệ.
+ex.pin_defender.b2.2 = Quân bị ghim là quân bảo vệ kém. {your} không giữ được ô {sq}: {t1:bare} ở phía sau.
+ex.pin_defender.b3 = {your} bị ghim vào {t1:bare}; nó không thật sự bảo vệ ô {sq}.
+ex.pin_defender.b3.2 = Ô {sq} trông như được bảo vệ, nhưng {your} bị ghim trước {t1:bare}.
+ex.pin_defender.b4 = {your} bị ghim, nên ô {sq} không thật sự được bảo vệ.
+ex.pin_defender.b4.2 = {your:bare} bị ghim {your:of} không giữ được ô {sq}.
+ex.pin_defender.b5 = {your:short} bị ghim; ô {sq} bị bỏ ngỏ.
+ex.pin_defender.b5.2 = Ô {sq} thất thủ: {your:short} bị ghim.
+ex.pin_defender.b6 = {your:short} bị ghim; ô {sq} thất thủ.
+ex.pin_defender.b6.2 = {your:short} bị ghim, ô {sq} bỏ ngỏ.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} bị nhốt. Mọi ô nó có thể đến đều bị tấn công.
+ex.trapped.b1.2 = Nhìn {your} xem: nó không còn ô an toàn nào để chạy.
+ex.trapped.b1.3 = {your} bị kẹt. Tôi có thể tấn công nó, và nó không thoát được.
+ex.trapped.b2 = {your} không còn ô an toàn nào. Tôi có thể ăn nó.
+ex.trapped.b2.2 = {your} bị nhốt: nó đi đâu, tôi cũng bắt được.
+ex.trapped.b2.3 = Cẩn thận, {your} sắp hết ô để đi.
+ex.trapped.b3 = {your} bị nhốt: không còn ô an toàn nào.
+ex.trapped.b3.2 = Sau nước này, {your} bị nhốt và sẽ mất.
+ex.trapped.b3.3 = {your} đã sa vào bẫy: nó không ra được.
+ex.trapped.b4 = Nước {move} khiến {your} bị nhốt.
+ex.trapped.b4.2 = {your} không có đường lui; tôi ăn được nó.
+ex.trapped.b4.3 = {your} bị nhốt sau {reply}.
+ex.trapped.b5 = Rốt cuộc {your} bị nhốt: {line}.
+ex.trapped.b5.2 = Nước {move} khiến {your} mắc kẹt.
+ex.trapped.b6 = {your:short} bị nhốt.
+ex.trapped.b6.2 = {line} nhốt {your:short}.
+ex.trapped.tip.b1 = Trước khi đi một quân, hãy xem nó có đường quay ra không.
+ex.trapped.tip.b1.2 = Quân đi sâu vào phía bên tôi có thể bị kẹt. Hãy chừa đường lui.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} bị kẹt sau các con Tốt của mình. {my} có thể chiếu nó ở hàng cuối.
+ex.back_rank.b1.2 = Cẩn thận: {your} không có ô thoát, và {my} có thể đến ô {sq}.
+ex.back_rank.b1.3 = {my} có thể đến ô {sq}. {your} bị chính các con Tốt của mình chặn kín.
+ex.back_rank.b2 = Nguy hiểm ở hàng cuối: {your} không có chỗ thở. {my} có thể chiếu ở ô {sq}.
+ex.back_rank.b2.2 = {your} bị nhốt kín. {my} đến ô {sq} và ăn quân.
+ex.back_rank.b2.3 = Hàng cuối của bạn yếu: {my} có thể chiếu {your} ở ô {sq}.
+ex.back_rank.b3 = Hàng cuối của bạn yếu: {line}. {your} không có ô thoát.
+ex.back_rank.b3.2 = {your} không có chỗ thở, nên {line} giúp tôi ăn quân.
+ex.back_rank.b3.3 = Sau {line}, hàng cuối quyết định tất cả: {your} bị vây kín.
+ex.back_rank.b4 = Hàng cuối: {line}, và {your} không có ô thoát.
+ex.back_rank.b4.2 = {line} khai thác điểm yếu ở hàng cuối quanh {your}.
+ex.back_rank.b4.3 = {your} thiếu ô thoát: {line}.
+ex.back_rank.b5 = Điểm yếu hàng cuối quanh {your:short}: {line}.
+ex.back_rank.b5.2 = {line}; {your:short} không có ô thoát.
+ex.back_rank.b6 = {line}, hàng cuối; {your:short} bị vây kín.
+ex.back_rank.b6.2 = Hàng cuối: {line} ({your:short}).
+ex.back_rank.tip.b1 = Hãy cho con Vua của mình một lối thoát nhỏ: đẩy một con Tốt phía trước nó.
+ex.back_rank.tip.b1.2 = Vua đứng sau ba con Tốt có thể bị chiếu hết ở hàng cuối. Hãy tạo chỗ cho nó.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} ở ô {sq} không được bảo vệ. {my} có thể bắt nó mà không mất gì.
+ex.hanging.b1.2 = Nhìn {your} xem: không quân nào bảo vệ nó, và {my} đang tấn công nó.
+ex.hanging.b1.3 = {your} không được bảo vệ. {my} có thể bắt nó ngay.
+ex.hanging.b2 = {your} ở ô {sq} không được bảo vệ. {my} bắt nó, và bạn không bắt lại được.
+ex.hanging.b2.2 = {my} có thể bắt {your} mà không mất gì. Không quân nào bảo vệ nó.
+ex.hanging.b2.3 = {your} bị bỏ trơ trọi ở ô {sq}, và {my} bắt nó.
+ex.hanging.b3 = Nước {move} để {your} không được bảo vệ: {reply}, và không quân nào bắt lại được.
+ex.hanging.b3.2 = {your} ở ô {sq} không được bảo vệ: {reply}.
+ex.hanging.b3.3 = Sau {reply}, {your} mất không.
+ex.hanging.b4 = Nước {move} bỏ mặc {your}: {reply} giành được {pts:point}.
+ex.hanging.b4.2 = {reply} bắt {your} mà không mất gì.
+ex.hanging.b4.3 = {your} bị treo; {reply} bắt nó.
+ex.hanging.b5 = Nước {move} để {your} bị treo; {reply} ăn nó.
+ex.hanging.b5.2 = {your} ở ô {sq} mất vì {reply}.
+ex.hanging.b5.3 = {reply} ăn {your}.
+ex.hanging.b6 = {move}? {reply}, và mất {your:short}.
+ex.hanging.b6.2 = {reply} ăn {your:short}.
+ex.hanging.b6.3 = {your:short} bị treo: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = Lúc nãy {your2} bảo vệ {your}. Giờ {my} có thể bắt nó.
+ex.hanging_guard.b1.2 = {your2} đã đi chỗ khác, và giờ {your} bị bỏ lại một mình. {my} bắt nó.
+ex.hanging_guard.b2 = Trước đó {your2} bảo vệ {your}. Giờ {your:bare} chỉ còn một mình, và {my} bắt nó.
+ex.hanging_guard.b2.2 = Khi đi {your2:refl}, bạn đã để {your:refl} không còn được bảo vệ trước {my}.
+ex.hanging_guard.b3 = {your2} vốn đang canh {your}. Di chuyển {your2:bare} thì {reply} sẽ bắt {your:bare}.
+ex.hanging_guard.b3.2 = Không có {your2}, {your} bị treo: {reply}.
+ex.hanging_guard.b4 = Nước {move} bỏ mất quân canh: {your2} rời bỏ {your}, và {reply} ăn nó.
+ex.hanging_guard.b4.2 = {your2} là quân duy nhất bảo vệ {your}; {reply} ăn nó.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} đã tấn công {your} từ trước. Hãy luôn xem nước đi của tôi đe dọa gì.
+ex.hanging_threat.b1.2 = Bạn chưa thấy mối đe dọa của tôi: {my} đang tấn công {your}.
+ex.hanging_threat.b2 = Nước vừa rồi của tôi dùng {my} tấn công {your}. Hãy luôn để ý các mối đe dọa của tôi.
+ex.hanging_threat.b2.2 = {my} đã đe dọa {your}, và giờ tôi có thể bắt nó.
+ex.hanging_threat.b3 = Bạn đã bỏ sót mối đe dọa của tôi: {my} đang tấn công {your}.
+ex.hanging_threat.b3.2 = {my} đã nhắm vào {your} từ lâu rồi.
+ex.hanging.tip.b1 = Trước mỗi nước, hãy tự hỏi: các quân của mình có an toàn hết không?
+ex.hanging.tip.b1.2 = Một thói quen nên có: sau mỗi nước, hãy xem quân nào của bạn được bảo vệ.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} đã bắt quân, nhưng {my} bắt lại. Đổi như vậy là thiệt điểm.
+ex.exchange_capture.b1.2 = {my} bắt lại. {your} đáng giá {n:point}, nhưng bạn chỉ được {n2:point}.
+ex.exchange_capture.b1.3 = Cẩn thận: {my} có thể bắt lại {your}. Đổi như vậy là thiệt.
+ex.exchange_capture.b2 = Cẩn thận khi đổi quân: {your} đáng giá {n:point}. {my} bắt lại, và bạn chỉ được {n2:point}.
+ex.exchange_capture.b2.2 = {my} bắt lại {your}. Bạn mất {n:point} mà chỉ được {n2:point}.
+ex.exchange_capture.b3 = Bắt quân ở ô {sq} không ổn: sau {line}, bạn mất {your:refl}.
+ex.exchange_capture.b3.2 = {your} bắt ở ô {sq}, nhưng sau {line}, bạn đã mất {pts:point}.
+ex.exchange_capture.b4 = Nước {move} tính sai ở ô {sq}: sau {line}, {your} bị mất.
+ex.exchange_capture.b4.2 = Bắt ở ô {sq} làm bạn mất {your:refl}: {line}.
+ex.exchange_capture.b5 = Nước {move} làm mất {your} trong chuỗi đổi quân ở ô {sq}: {line}.
+ex.exchange_capture.b5.2 = Ở ô {sq}, {your} bị mất: {line}.
+ex.exchange_capture.b6 = {move} mất {your:short} ở ô {sq} sau {line}.
+ex.exchange_capture.b6.2 = {line} ở ô {sq}, và mất {your:short}.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Đếm xem: ô {sq} bị tôi tấn công {n:time}, được bạn bảo vệ {n2:time}.
+ex.exchange_count.b1.2 = Ở ô {sq}, tôi có {n:attacker}, còn bạn có {n2:defender}. Tôi thắng ở đó.
+ex.exchange_count.b2 = Ô {sq} bị tấn công {n:time} và được bảo vệ {n2:time}. Bạn sẽ mất quân ở đó.
+ex.exchange_count.b2.2 = Đếm ở ô {sq}: {n:attacker} đấu với {n2:defender}.
+ex.exchange_count.b3 = Hãy đếm quân tấn công và quân bảo vệ ở ô {sq}: tôi có nhiều hơn.
+ex.exchange_count.b3.2 = Đổi quân ở ô {sq} không ổn: sau {line}, bạn đã mất {pts:point}.
+ex.exchange_count.b4 = Nước {move} tính sai ở ô {sq}: {line}, và bạn đã mất {pts:point}.
+ex.exchange_count.b4.2 = Ô {sq} bị tấn công nhiều hơn được bảo vệ: {line}.
+ex.exchange_count.b5 = Ở ô {sq}, {n:attacker} thắng {n2:defender}: {line}.
+ex.exchange_count.b5.2 = Với {move}, bạn thua về số quân ở ô {sq}.
+ex.exchange_count.b6 = {line} ở ô {sq}, và tôi được {pts:point}.
+ex.exchange_count.b6.2 = Ô {sq}: {n} đấu {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} có giá trị thấp hơn {your}. Nếu tôi bắt, bạn sẽ mất điểm.
+ex.exchange_cheap.b1.2 = {my} tấn công {your}. Đổi hai quân này thì bạn thiệt.
+ex.exchange_cheap.b2 = {your} đáng giá {n:point}, còn {my} chỉ đáng {n2:point}. Đổi như vậy bạn thiệt.
+ex.exchange_cheap.b2.2 = {my} có giá trị thấp hơn {your}, nên đòn tấn công này giúp tôi ăn quân.
+ex.exchange_cheap.b3 = {your} ở ô {sq} bị một quân giá trị thấp hơn tấn công.
+ex.exchange_cheap.b3.2 = Một quân trị giá {n2:point} tấn công {your} ở ô {sq}: {line}.
+ex.exchange_cheap.b4 = {your} ở ô {sq} bị một quân giá trị thấp hơn tấn công; {reply} ăn quân.
+ex.exchange_cheap.b4.2 = {reply} dùng một quân giá trị thấp hơn tấn công {your} ở ô {sq}.
+ex.exchange_cheap.b5 = {your} ở ô {sq} bị một quân giá trị thấp hơn uy hiếp: {line}.
+ex.exchange_cheap.b5.2 = {reply} giành lợi thế lực lượng ở ô {sq}, nhắm vào {your}.
+ex.exchange_cheap.b6 = {reply} ăn {your:short} ở ô {sq}.
+ex.exchange_cheap.b6.2 = {line}: mất {your:short} ở ô {sq}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Cẩn thận: giờ tôi có thể ăn {t1}.
+ex.material.b1.2 = Nước đó khiến {t1} gặp nguy. Tôi có thể ăn nó.
+ex.material.b2 = Nước này giúp tôi ăn được {t1}.
+ex.material.b2.2 = Giờ {t1} gặp nguy, và tôi ăn được nó.
+ex.material.b3 = Nước {move} làm mất quân: sau {line}, bạn đã mất {pts:point}.
+ex.material.b3.2 = Sau {line}, bạn kém {pts:point}.
+ex.material.b4 = Nước {move} làm mất quân: {line}, và bạn đã mất {pts:point}.
+ex.material.b4.2 = Sau {line}, bạn đang kém {pts:point}.
+ex.material.b5 = Nước {move} mất quân: {line}.
+ex.material.b5.2 = {line} giúp tôi được {pts:point}.
+ex.material.b6 = {line}, và tôi được {pts:point}.
+ex.material.b6.2 = {move} mất {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Bạn có thấy không? {my} ở ô {sq} là quân cho không. {your} đã có thể bắt nó.
+ex.missed_capture.b1.2 = Nhìn này: {my} không có quân bảo vệ. {your} đã có thể bắt nó.
+ex.missed_capture.b1.3 = {my} ở ô {sq} không được bảo vệ. Lẽ ra {your} đã chộp được nó!
+ex.missed_capture.b2 = Bạn đã bỏ lỡ một quân cho không: {best} ăn {my}.
+ex.missed_capture.b2.2 = {my} ở ô {sq} không được bảo vệ. {best} bắt được nó. Lần sau, hãy chộp lấy nhé!
+ex.missed_capture.b2.3 = Với {best}, lẽ ra bạn đã bắt {my} mà không mất gì.
+ex.missed_capture.b3 = Nước {best} đã có thể bắt {my} mà không mất gì.
+ex.missed_capture.b3.2 = {my} ở ô {sq} không được bảo vệ: {best}. Mỗi nước, hãy tìm những quân bị treo.
+ex.missed_capture.b3.3 = Bạn đã có thể bắt {my} bằng {best}.
+ex.missed_capture.b4 = Bỏ lỡ: {best} ăn {my} ở ô {sq}.
+ex.missed_capture.b4.2 = {best} ăn {my}, một quân đang bị treo.
+ex.missed_capture.b4.3 = {my} bị treo: {best}.
+ex.missed_capture.b5 = {best} ăn {my}; nước {move} để nó thoát.
+ex.missed_capture.b5.2 = {my} ở ô {sq} bị treo: {best}.
+ex.missed_capture.b6 = {best}! {my:short} ở ô {sq} bị treo.
+ex.missed_capture.b6.2 = {best} ăn được {my:short}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Bạn đã có đòn tấn công kép: {best} tấn công cả {t1:bare} lẫn {t2}!
+ex.missed_fork.b1.2 = Nhìn này! {best} sẽ đánh cùng lúc vào {t1:bare} và {t2}.
+ex.missed_fork.b1.3 = {best} là đòn chĩa đôi: cả {t1:bare} và {t2} đều bị tấn công.
+ex.missed_fork.b2 = {best} là đòn chĩa đôi: {t1:bare} và {t2}.
+ex.missed_fork.b2.2 = Bạn đã bỏ lỡ đòn tấn công kép: {best}, đánh vào {t1:bare} và {t2}.
+ex.missed_fork.b2.3 = {best} tấn công cùng lúc {t1:bare} và {t2}. Chĩa đôi!
+ex.missed_fork.b3 = {best} là đòn chĩa đôi vào {t1:bare} và {t2}.
+ex.missed_fork.b3.2 = Bạn đã có {best}, chĩa đôi {t1:bare} và {t2}.
+ex.missed_fork.b3.3 = Lẽ ra {best} đã chĩa đôi {t1:bare} và {t2}.
+ex.missed_fork.b4 = {best} chĩa đôi {t1:bare} và {t2}.
+ex.missed_fork.b4.2 = Bỏ lỡ đòn chĩa đôi: {best} vào {t1:bare} và {t2}.
+ex.missed_fork.b5 = {best} chĩa đôi {t1:noun} và {t2:short}.
+ex.missed_fork.b5.2 = {best} đánh vào {t1:noun} và {t2:short}.
+ex.missed_fork.b6 = {best} chĩa đôi {t1:noun} và {t2:short}.
+ex.missed_fork.b6.2 = {best}: chĩa đôi, {t1:noun} và {t2:short}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# "The square" of the pawn race is "hình vuông" (quy tắc hình vuông, the rule of the square).
+ex.promotion.b1 = {my} có thể chạy đến ô {sq} và phong Hậu. {your} ở quá xa.
+ex.promotion.b1.2 = Nhìn này: không gì cản được {my} đến ô {sq}. {your} không đuổi kịp nó.
+ex.promotion.b1.3 = {my} còn {n:square} nữa là đến ô {sq}, còn {your} thì quá chậm.
+ex.promotion.b2 = {my} chạy đến ô {sq}, và {your} không đuổi kịp nó.
+ex.promotion.b2.2 = {my} cần {n:move} để đến ô {sq}; {your} cần {n2:move}. Quá chậm.
+ex.promotion.b2.3 = Cẩn thận: {my} phong Hậu ở ô {sq}, và {your} ở quá xa.
+ex.promotion.b3 = Theo quy tắc hình vuông, {your} không thể bắt kịp {my} trước ô {sq}.
+ex.promotion.b3.2 = Cuộc đua đã thua: {my} đến ô {sq} trước {your}.
+ex.promotion.b4 = {your} nằm ngoài hình vuông của con Tốt; con Tốt sẽ phong Hậu ở ô {sq}.
+ex.promotion.b4.2 = {my} phong cấp ở ô {sq}; {your} chậm một nước.
+ex.promotion.b5 = Cuộc đua Tốt đã thua: {your} nằm ngoài hình vuông, và tôi phong Hậu ở ô {sq}.
+ex.promotion.b5.2 = {line}: tôi phong Hậu ở ô {sq} và {your} đến quá muộn.
+ex.promotion.b6 = {your:short} ngoài hình vuông; tôi phong Hậu ở ô {sq}.
+ex.promotion.b6.2 = {line}, phong Hậu ở ô {sq} ({your:short} quá muộn).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Con Tốt của bạn đã có thể chạy đến ô {sq} và phong Hậu!
+ex.promotion_missed.b1.2 = Nhìn ô {sq} kìa! Con Tốt của bạn đã có thể lao tới đó.
+ex.promotion_missed.b2 = Con Tốt của bạn đã có thể chạy đến ô {sq}. Hãy đẩy Tốt thông!
+ex.promotion_missed.b2.2 = Không gì cản được con Tốt của bạn trên đường đến ô {sq}.
+ex.promotion_missed.b3 = {best} thắng cuộc đua đến ô {sq}.
+ex.promotion_missed.b3.2 = Con Tốt của bạn nhanh hơn: {best}, và nó phong Hậu ở ô {sq}.
+ex.promotion_missed.b4 = {best} thắng cuộc đua Tốt đến ô {sq}.
+ex.promotion_missed.b4.2 = {best}! Tốt phong Hậu ở ô {sq}.
+ex.promotion_missed.b5 = {best} giúp bạn phong Hậu trước ở ô {sq}.
+ex.promotion_missed.b5.2 = {best}, và ô {sq} là của bạn.
+ex.promotion_missed.b6 = {best} thắng cuộc đua đến ô {sq}.
+ex.promotion_missed.b6.2 = {best}; đến ô {sq} trước.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Con Tốt đó vốn che chắn cho {your}. Giờ {your:bare} ít được che chắn hơn.
+ex.king_shield.b1.2 = Con Tốt ở ô {sq} là lá chắn cho {your}. Giờ quân của tôi có thể xông vào.
+ex.king_shield.b2 = Đi con Tốt ở ô {sq} làm {your} yếu đi. Giờ quân của tôi có thể tấn công nó.
+ex.king_shield.b2.2 = {your} mất một vệ sĩ: con Tốt ở ô {sq} là lá chắn của nó.
+ex.king_shield.b3 = Nước Tốt đó để lộ {your} trước đòn tấn công của tôi.
+ex.king_shield.b3.2 = {your} mất lớp Tốt che chắn, và quân của tôi tràn vào.
+ex.king_shield.b4 = Nước {move} làm yếu hàng Tốt quanh {your}; đòn tấn công của tôi lọt vào được.
+ex.king_shield.b4.2 = Sau {move}, lá chắn quanh {your} bị phá vỡ.
+ex.king_shield.b5 = Nước {move} làm lỏng lớp che chắn của {your}: {line}.
+ex.king_shield.b5.2 = Sau {move}, {your} bị lộ ra: {line}.
+ex.king_shield.b6 = {move} làm yếu {your:short}: {line}.
+ex.king_shield.b6.2 = {line}; {your:short} quá hở.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} đang gặp nguy. Quân của tôi đang kéo đến.
+ex.king_exposed.b1.2 = Nhìn xem {your} trống trải thế nào. Hãy giữ nó an toàn sau các con Tốt.
+ex.king_exposed.b2 = {your} quá trống trải. Giờ tôi có thể chiếu nhiều lần.
+ex.king_exposed.b2.2 = Cẩn thận: {your} không có chỗ trú, và quân của tôi đang tấn công nó.
+ex.king_exposed.b3 = {your} bị lộ; quân của tôi có thể tấn công nó bằng các nước chiếu.
+ex.king_exposed.b3.2 = Sau nước này, {your} không còn chỗ trú.
+ex.king_exposed.b4 = {your} bị lộ ra: {line}.
+ex.king_exposed.b4.2 = Nước {move} để {your} hở trước đòn tấn công.
+ex.king_exposed.b5 = {your} quá lộ: {line}.
+ex.king_exposed.b5.2 = Nước {move} để {your} trơ trọi, không còn chỗ trú.
+ex.king_exposed.b6 = {line}; {your:short} bị lộ.
+ex.king_exposed.b6.2 = {your:short} quá hở: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Cuộc đổi quân này dẫn đến một tàn cuộc Tốt mà tôi thắng.
+ex.bad_trade.b3.2 = Sau {line}, chỉ còn lại Tốt, và con Vua của tôi ở vị trí thuận lợi hơn.
+ex.bad_trade.b4 = Các nước đổi quân dẫn đến một tàn cuộc Tốt thua: {line}.
+ex.bad_trade.b4.2 = Đổi quân để vào tàn cuộc Tốt này là thua.
+ex.bad_trade.b5 = Đổi sai: tàn cuộc Tốt sau {line} là thua.
+ex.bad_trade.b5.2 = Tàn cuộc Tốt là thua; hãy giữ quân lại.
+ex.bad_trade.b6 = Tàn cuộc Tốt sau {line}: thua.
+ex.bad_trade.b6.2 = Tàn cuộc Tốt thua: {line}.
+ex.bishop_pair.b5 = Đổi như vậy làm bạn mất cặp Tượng.
+ex.bishop_pair.b5.2 = Cuộc đổi đó làm mất cặp Tượng của bạn; cặp Tượng của tôi vẫn còn.
+ex.bishop_pair.b6 = Mất cặp Tượng.
+ex.bishop_pair.b6.2 = Bỏ mất cặp Tượng.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} giành thế đối Vua: hai con Vua đối mặt nhau, cách nhau một ô.
+ex.opposition.b3.2 = Hai con Vua! Lẽ ra {best} đã giành được thế đối Vua.
+ex.opposition.b4 = {best} giành thế đối Vua: đó là mấu chốt.
+ex.opposition.b4.2 = Thế đối Vua quyết định: {best}.
+ex.opposition.b5 = {best}, giành thế đối Vua.
+ex.opposition.b5.2 = Đối Vua: {best}.
+ex.opposition.b6 = {best}, đối Vua.
+ex.opposition.b6.2 = {best}: thế đối Vua.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Con Tốt của bạn có thể chạy đến ô {sq}. Tốt thông luôn muốn tiến lên!
+ex.push_passed.b1.2 = Hãy đẩy con Tốt thông của bạn! Nó muốn đến ô {sq}.
+ex.push_passed.b1.3 = Con Tốt thông của bạn muốn tiến đến ô {sq}. Đẩy nó lên đi!
+ex.push_passed.b2 = {best}: đẩy Tốt thông về phía ô {sq}.
+ex.push_passed.b2.2 = Con Tốt thông của bạn là một quân mạnh. {best} đẩy nó lên.
+ex.push_passed.b2.3 = Đẩy lên đi! {best} đưa con Tốt đến gần ô {sq} hơn.
+ex.push_passed.b3 = {best} đẩy Tốt thông.
+ex.push_passed.b3.2 = Tốt thông phải được đẩy lên: {best}.
+ex.push_passed.b3.3 = Cách đúng là {best}: con Tốt chạy đến ô {sq}.
+ex.push_passed.b4 = {best}: Tốt thông quyết định.
+ex.push_passed.b4.2 = Đẩy Tốt: {best}.
+ex.push_passed.b5 = {best}, đẩy Tốt thông: {eval}.
+ex.push_passed.b5.2 = Tốt thông: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, Tốt thông.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Hãy đưa {your} lên! Ở tàn cuộc, Vua là một quân mạnh.
+ex.king_active.b1.2 = Giờ {your} có thể tham chiến. Hãy đưa nó vào giữa bàn cờ.
+ex.king_active.b1.3 = Khi còn ít quân, {your} nên ra ngoài giúp sức.
+ex.king_active.b2 = Ở tàn cuộc, hãy dùng {your}: đưa nó vào trung tâm.
+ex.king_active.b2.2 = Giờ {your} nên hoạt động tích cực. Hãy cho nó tiến lên.
+ex.king_active.b3 = {best} đưa Vua vào cuộc. Ở tàn cuộc, Vua cũng chiến đấu.
+ex.king_active.b3.2 = {best}: giờ chỗ của Vua là ở trung tâm.
+ex.king_active.b4 = {best} đưa Vua vào trung tâm.
+ex.king_active.b4.2 = Vua nên tiến lên: {best}.
+ex.king_active.b5 = {best}, đưa Vua vào cuộc: {line}.
+ex.king_active.b5.2 = Vua tích cực: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, Vua tiến lên.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} giữ được thế cờ khá hơn.
+ex.positional.b4.2 = Ở đây {best} mạnh hơn.
+ex.positional.b4.3 = Nếu là tôi, tôi sẽ chọn {best}.
+ex.positional.b5 = {best} mạnh hơn: {line}.
+ex.positional.b5.2 = {best}, với ý đồ {line}.
+ex.positional.b5.3 = Hãy cân nhắc {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} đã ra trận rất sớm. Hãy đưa Mã và Tượng ra trước.
+tip.early_queen.b1.2 = Cẩn thận với {your} khi còn sớm thế này: quân của tôi có thể đuổi nó chạy khắp nơi.
+tip.early_queen.b1.3 = Đi {your} thì vui thật, nhưng hãy phát triển các quân nhẹ trước.
+tip.early_queen.b2 = Đi {your} sớm như vậy giúp tôi tấn công nó và giành thêm thời gian.
+tip.early_queen.b2.2 = {your} ra sớm vậy sao? Mã và Tượng trước đã!
+tip.early_queen.b3 = Đưa {your} ra sớm cho tôi cơ hội đuổi nó để giành thời gian.
+tip.early_queen.b3.2 = Ra sớm thế này, {your} dễ bị đuổi. Hãy phát triển quân trước.
+tip.queen_grab.b1 = {your} đã bắt một con Tốt ở xa, và giờ nó có thể gặp rắc rối.
+tip.queen_grab.b1.2 = Dùng {your} đi ăn Tốt thì mất thời gian. Hãy phát triển quân trước!
+tip.queen_grab.b2 = {your} đã đi ăn Tốt ở cánh. Việc đó tốn rất nhiều thời gian.
+tip.queen_grab.b2.2 = Hãy cẩn thận khi đưa {your} đi ăn những con Tốt ở xa.
+tip.queen_grab.b3 = Dùng {your} ăn Tốt sớm như vậy là mất thời gian.
+tip.queen_grab.b3.2 = Giờ {your} ở xa nhà; lợi thế phát triển quân của tôi sẽ phát huy tác dụng.
+tip.queen_grab.b4 = {your} ăn được một con Tốt nhưng mất quá nhiều thời gian.
+tip.queen_grab.b4.2 = Dùng {your} đi ăn Tốt ở xa trận địa làm mất thời gian.
+tip.same_piece.b1 = Bạn đã đi {your:refl} hai lần. Mỗi nước, hãy cố đưa một quân mới ra.
+tip.same_piece.b1.2 = Lại là {your} à? Hãy đưa cả các quân khác của bạn ra nữa.
+tip.same_piece.b1.3 = Mỗi nước, hãy cố phát triển một quân mới, đừng đi {your} thêm lần nữa.
+tip.same_piece.b2 = Đi {your} hai lần trong khai cuộc là mất thời gian.
+tip.same_piece.b2.2 = {your} lại đi nữa; các quân khác của bạn vẫn còn ở nhà.
+tip.same_piece.b3 = Đi {your} hai lần làm chậm việc phát triển quân.
+tip.same_piece.b3.2 = Thêm một nước với {your}; cả đội quân còn lại của bạn vẫn đang chờ.
+tip.castle.b1 = {your} vẫn ở giữa. Nhập thành sẽ giữ nó an toàn.
+tip.castle.b1.2 = Đến lúc nhập thành rồi! {your} sẽ an toàn hơn ở góc.
+tip.castle.b1.3 = Hãy nghĩ đến chuyện nhập thành sớm. {your} đang bị hở.
+tip.castle.b2 = {your} vẫn ở trung tâm. Hãy nhập thành sớm!
+tip.castle.b2.2 = Nhập thành sẽ đưa {your} vào chỗ an toàn.
+tip.castle.b3 = Trung tâm đang mở ra, {your} nên nhập thành.
+tip.castle.b3.2 = {your} vẫn ở trung tâm; lẽ ra đã phải nhập thành rồi.
+tip.knight_rim.b1 = {your} ở mép bàn cờ không làm được gì nhiều. Mã thích ở giữa.
+tip.knight_rim.b1.2 = Mã ở biên thì yếu! Ở đó {your} kiểm soát ít ô hơn.
+tip.knight_rim.b2 = {your} ở biên kiểm soát ít ô. Hãy hướng vào trung tâm.
+tip.knight_rim.b2.2 = Mã ở biên thì yếu: {your} muốn vào trung tâm.
+tip.knight_rim.b3 = {your} ở biên, xa khỏi trận đánh.
+tip.knight_rim.b3.2 = Mép bàn cờ là chỗ đứng kém cho {your}.
+tip.flank.b1 = Hãy cố đi các con Tốt ở giữa trước. Tốt ở biên không giúp được nhiều.
+tip.flank.b1.2 = Tốt ở cánh không giúp các quân của bạn ra trận. Hãy dùng các con Tốt ở giữa.
+tip.flank.b2 = Đi Tốt biên không phát triển được gì. Hãy dùng Tốt trung tâm.
+tip.flank.b2.2 = Quá nhiều nước đi Tốt ở cánh. Hãy phát triển quân!
+tip.flank.b3 = Đi Tốt cánh trong khai cuộc làm chậm việc phát triển quân.
+tip.flank.b3.2 = Tốt biên có thể chờ; hãy phát triển quân và tranh giành trung tâm.
+tip.centre.b1 = Hãy cố kiểm soát giữa bàn cờ, như ô {sq}.
+tip.centre.b1.2 = Trung tâm rất quan trọng. Hãy đặt một con Tốt hoặc một quân gần ô {sq}.
+tip.centre.b1.3 = Quân ở giữa bàn cờ rất mạnh. Hãy nhắm đến những ô như {sq}.
+tip.centre.b2 = Hãy tranh giành trung tâm: những ô như {sq} rất quan trọng.
+tip.centre.b2.2 = Bạn đang nhường trung tâm cho tôi. Hãy nhìn ô {sq}.
+tip.centre.b3 = Bạn không tranh giành trung tâm; ô {sq} thuộc về tôi.
+tip.centre.b3.2 = Hãy tranh giành trung tâm, quanh ô {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Khi bên kia chỉ còn Vua, hãy dồn nó ra mép bàn cờ, rồi chiếu hết.
+tip.mate_technique.b1.2 = Mẹo: dồn con Vua của tôi ra mép bàn cờ. Nhớ đưa con Vua của mình lại gần nữa.
+tip.fifty.b1 = Cẩn thận: sau năm mươi nước không bắt quân và không đi Tốt, ván cờ sẽ hòa.
+tip.fifty.b1.2 = Không còn nhiều nước nữa: năm mươi nước không bắt quân hay đi Tốt là hòa.
+tip.repetition.b1 = Cẩn thận! Nếu cùng một thế cờ lặp lại lần thứ ba, ván cờ sẽ hòa.
+tip.repetition.b1.2 = Tránh lặp lại nước đi: lặp lại lần thứ ba là hòa, mà bạn đang thắng.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Chà, bạn thí một quân, và nó hiệu quả!
+praise.sacrifice.2 = Một nước thí quân thông minh! Chơi rất hay.
+praise.brilliant.b3 = Xuất sắc! Một nước thí quân thực sự.
+praise.brilliant.b3.2 = Chà, {move} là một nước thí quân tuyệt vời!
+praise.brilliant.b4 = {move}! Một nước thí quân xuất sắc.
+praise.brilliant.b4.2 = Xuất sắc. Tôi không ngờ đến nước đó.
+praise.brilliant.b5 = {move}!! Xuất sắc.
+praise.brilliant.b5.spoken = {move}. Xuất sắc!
+praise.brilliant.b5.2 = Một nước thí quân xuất sắc.
+praise.brilliant.b6 = {move}!! Tuyệt vời.
+praise.brilliant.b6.spoken = {move}. Tuyệt vời!
+praise.brilliant.b6.2 = Xuất sắc.
+praise.great.b2 = Nước đi rất hay! Bạn đã tìm ra cách phản công.
+praise.great.b2.2 = Đó là một nước đi rất hay. Tìm giỏi lắm!
+praise.great.b3 = Nước đi rất hay! Bạn đã tìm ra ý tưởng đúng duy nhất.
+praise.great.b3.2 = Tuyệt vời, {move} xoay chuyển tình thế.
+praise.great.b4 = {move}! Một phát hiện tuyệt vời.
+praise.great.b4.2 = Nước đi rất hay.
+praise.great.b5 = {move}! Tìm hay lắm.
+praise.great.b5.2 = Nước mạnh: {move}.
+praise.great.b6 = {move}! Rất hay.
+praise.great.b6.2 = Phát hiện hay.
+praise.only.b2 = Hay lắm! Đó là nước đúng duy nhất.
+praise.only.b2.2 = Giỏi lắm, bạn đã tìm ra nước duy nhất hiệu quả.
+praise.only.b3 = Nước đi duy nhất, và bạn đã tìm ra.
+praise.only.b3.2 = Chính xác! Ở đây không nước nào khác được.
+praise.only.b4 = Nước đi duy nhất. Giỏi lắm.
+praise.only.b4.2 = Nước duy nhất, đã tìm ra.
+praise.only.b5 = Nước đi duy nhất. Hay.
+praise.only.b5.2 = {move}, nước đi duy nhất.
+praise.only.b6 = Nước đi duy nhất.
+praise.only.b6.2 = Chính xác: nước đi duy nhất.
+praise.fork.b2 = Tấn công kép! Giỏi lắm.
+praise.fork.b2.2 = Bạn tấn công hai quân cùng lúc! Tuyệt.
+praise.fork.b2.3 = Hay! Đó là đòn chĩa đôi.
+praise.fork.b3 = Chĩa đôi đẹp.
+praise.fork.b3.2 = Chĩa đôi hay lắm!
+praise.fork.b3.3 = Đòn chĩa đôi. Chơi hay lắm.
+praise.capture.b1 = Giỏi lắm! Bạn đã bắt {my} mà không mất gì.
+praise.capture.b1.2 = Tinh mắt lắm! {my} không được bảo vệ.
+praise.capture.b1.3 = Đúng rồi! Bạn đã ăn được {my}.
+praise.capture.b2 = Bắt quân hay lắm! {my} không được bảo vệ.
+praise.capture.b2.2 = Hay lắm, bạn đã ăn được {my}.
+praise.capture.b2.3 = Phát hiện tinh lắm: {my} không có quân bảo vệ.
+praise.best.b1 = Nước đi hay!
+praise.best.b1.2 = Rất hay!
+praise.best.b1.3 = Chơi hay lắm!
+praise.best.b2 = Nước đi hay.
+praise.best.b2.2 = Rất đẹp.
+praise.best.b2.3 = Chơi hay.
+praise.best.b3 = Nước đi hay: không dễ tìm ra.
+praise.best.b3.2 = Tìm hay lắm.
+praise.best.b3.3 = {move} là nước đi tốt nhất ở đây. Hay lắm.
+praise.trade.b1 = Tốt lắm! Khi đang dẫn trước, đổi quân sẽ có lợi cho bạn.
+praise.trade.b1.2 = Đổi quân hay. Bạn đang dẫn trước, nên càng ít quân càng có lợi cho bạn.
+praise.trade.b2 = Đổi quân hay: bạn đang dẫn trước, nên hãy đổi quân.
+praise.trade.b2.2 = Đổi {my} khi đang dẫn trước là khôn ngoan.
+praise.trade.b3 = Hay: dẫn trước thì đổi quân.
+praise.trade.b3.2 = Đổi quân hợp lý.
+praise.excellent.b3 = Nước đi tuyệt vời.
+praise.excellent.b3.2 = Đó là một nước đi mạnh.
+praise.excellent.b3.3 = Rất chính xác.
+praise.excellent.b4 = Chính xác.
+praise.excellent.b4.2 = Tuyệt vời.
+praise.excellent.b4.3 = Hay lắm, {move} chính xác.
+praise.castle.b1 = Tốt lắm! Bạn đã nhập thành. Giờ con Vua của bạn an toàn hơn.
+praise.castle.b1.2 = Nhập thành đẹp lắm! Con Vua của bạn đã vào chỗ an toàn.
+praise.saved.b1 = Tốt lắm! Bạn đã cứu được quân của mình.
+praise.saved.b1.2 = Giỏi lắm, bạn đã đưa nó đến chỗ an toàn.
+praise.book.b1 = Hay lắm, đó là một nước khai cuộc quen thuộc.
+praise.book.b1.2 = Hay đấy, các kỳ thủ mạnh cũng bắt đầu như vậy.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Cẩn thận! Tôi đang dọa chiếu hết ở ô {sq}.
+threat.mate.b1.2 = Coi chừng: {my} muốn đến ô {sq}. Như thế sẽ là chiếu hết.
+threat.mate.b1.3 = Nhìn ô {sq} xem. Nếu tôi đến được đó, sẽ là chiếu hết!
+threat.mate.b2 = Cẩn thận, tôi đang dọa chiếu hết.
+threat.mate.b2.2 = Coi chừng: có mối đe dọa chiếu hết ở ô {sq}.
+threat.mate.b2.3 = Nhìn kỹ nhé: tôi đang đe dọa chiếu hết.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Nhìn này: {my} đang tấn công {your}.
+threat.piece.b1.2 = Cẩn thận! {your} đang bị {my} tấn công.
+threat.piece.b1.3 = Coi chừng, {my} muốn bắt {your}.
+threat.piece.b2 = Cẩn thận với {your}.
+threat.piece.b2.2 = {your} đang bị tấn công.
+threat.piece.b2.3 = Để ý {your} nhé.
+threat.punish.b1 = Nước vừa rồi của tôi là một sai lầm. Bạn có trừng phạt được không?
+threat.punish.b1.2 = Hừm, hình như tôi vừa mắc sai lầm. Bạn có tìm ra không?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Lần này hãy nghĩ đến {your}.
+tb.hint.b1.2 = Hãy để mắt đến {your}.
+tb.hint.king.b1 = Hãy nghĩ đến sự an toàn của {your}.
+tb.hint.king.b1.2 = Hãy nhìn {your} trước. Nó có an toàn không?
+tb.hint.missed.b1 = Hãy tìm những quân bạn có thể bắt mà không mất gì.
+tb.hint.missed.b1.2 = Nhìn kỹ nhé: có quân nào bạn bắt được không?
+tb.hint.mate_missed.b1 = Nhìn con Vua của tôi xem. Bạn có chiếu hết được nó không?
+tb.hint.mate_missed.b1.2 = Hãy thử các nước chiếu trước. Biết đâu có chiếu hết!
+tb.hint.general.b1 = Cứ từ từ, hãy nhìn toàn bộ bàn cờ.
+tb.hint.general.b1.2 = Hãy thử tìm một nước đi an toàn hơn.
+# The retry.
+tb.fixed.b1 = Hay hơn nhiều!
+tb.fixed.b1.2 = Đúng rồi, thế này hay hơn!
+tb.fixed.b1.3 = Tốt lắm, thế này hiệu quả hơn nhiều.
+tb.fixed = Thế này hay hơn.
+tb.fixed.2 = Khá hơn.
+tb.fixed.3 = Sửa sai hay đấy.
+tb.same = Lại nước đi đó à? Được, chúng ta cùng xem.
+tb.same.2 = Bạn thích nước đó nhỉ. Chúng ta cứ đi tiếp xem sao.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Đúng rồi! Đó chính là nước tôi đang nghĩ đến.
+tb.found.b1.2 = Bạn tìm ra rồi! Đó là nước đi hay hơn.
+tb.found = Đó chính là nước tôi đã nghĩ đến.
+tb.found.2 = Chính xác, đúng là nước đó.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Rất tiếc, ván này không còn lượt đi lại nào nữa.
+tb.none_left.2 = Bạn đã hết lượt đi lại trong ván này.

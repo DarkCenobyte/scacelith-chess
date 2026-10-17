@@ -1,0 +1,109 @@
+# Coach speech (Swedish): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "du" to the player and "jag" of himself; no word agrees with anyone's gender.
+# Sides as in the glossary: "vit" / "svart", lowercase in running text ("du spelar med vit").
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Hej! Nu spelar vi ett vänskapligt parti. Jag hjälper dig så fort något går snett.
+event.greet.l1.2 = Hej på dig! Jag spelar snällt och visar vad du ska se upp med.
+event.greet.l1.3 = Välkommen! Ta god tid på dig: jag säger till när en pjäs är i fara.
+event.greet.l2 = Hej! Nu spelar vi. När en gaffel eller en bindning dyker upp visar jag dig den.
+event.greet.l2.2 = Hej på dig! Få ut dina pjäser och håll din kung i säkerhet. Jag hjälper dig på vägen.
+event.greet.l2.3 = Välkommen tillbaka till brädet! Håll utkik efter gafflar och bindningar: de vinner partier.
+event.greet.l3 = Hej! Nu spelar vi ett riktigt parti. Jag kommenterar dina planer och de större misstagen.
+event.greet.l3.2 = Hej på dig! Tänk ut en plan för dina pjäser. Jag säger till när ett drag missar något.
+event.greet.l3.3 = Nu kör vi! Jag säger till när bara ett drag fungerar, och när ett drag går snett.
+event.greet.l4 = Hej! Den här gången ger jag värderingar och visar dig de bättre kandidatdragen.
+event.greet.l4.2 = Nu spelar vi. Efter ett misstag säger jag vad som var mer exakt.
+event.greet.l4.3 = Redo för ett klubbparti? Jag kommenterar när värderingen ändras.
+event.greet.l5 = Nu spelar vi. Jag håller kommentarerna korta.
+event.greet.l5.2 = Jag är redo när du är det. Bara korta kommentarer.
+event.greet.l5.3 = Lycka till. Jag säger bara något när det spelar roll.
+event.greet.l6 = Lycka till.
+event.greet.l6.2 = Då kör vi.
+event.greet.l6.3 = Redo. Jag kommenterar bara de kritiska ögonblicken.
+
+# Who starts (said after the greeting).
+event.colour.white = Du har de vita pjäserna, så du börjar.
+event.colour.white.2 = Du spelar med vit: första draget är ditt.
+event.colour.black = Jag har vit, så jag börjar.
+event.colour.black.2 = Du spelar med svart den här gången: jag gör första draget.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (coach.level.<n>.name in assets/i18n/sv.lang).
+event.level.l1 = Första stegen: jag spelar snällt och förklarar varje misstag med enkla ord.
+event.level.l2 = Nybörjare: jag spelar lite starkare, och jag sätter namn på enkla taktiska motiv som gafflar och bindningar.
+event.level.l3 = Fortsättare: jag pratar om planer och bondestruktur, och jag visar korta varianter.
+event.level.l4 = Klubbspelare: jag ger värderingar i bönder och föreslår kandidatdrag.
+event.level.l5 = Stark klubbspelare: korta kommentarer, och längre varianter när det spelar roll.
+event.level.l6 = Expert: jag spelar så starkt jag kan och kommenterar bara de kritiska ögonblicken.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Ditt drag.
+event.your_move.2 = Din tur.
+event.your_move.3 = Varsågod.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Ta god tid på dig.
+event.take_time.2 = Ingen brådska: vi spelar ju utan klocka.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Få se.
+event.filler.3 = Låt mig titta.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Okej, vi tar tillbaka draget.
+event.takeback.taken.2 = Bra idé. Titta en gång till.
+event.takeback.taken.3 = Då backar vi. Försök igen.
+# The player declined the offer and played on.
+event.takeback.declined = Okej, vi spelar vidare.
+event.takeback.declined.2 = Visst, partiet fortsätter.
+event.takeback.declined.3 = Du bestämmer. Vi fortsätter.
+# After an explanation without an offer.
+event.play_on = Vi spelar vidare.
+event.play_on.2 = Vi fortsätter.
+event.play_on.3 = Så, tillbaka till vårt parti.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Alla gör sådana misstag. Det viktiga är att upptäcka dem.
+event.encourage.mistake.2 = Oroa dig inte. Kolla vad mitt senaste drag angriper, så hittar du det.
+event.encourage.mistake.3 = Det händer alla spelare. Vi kör vidare.
+# The player is behind (material or evaluation).
+event.encourage.behind = Ge inte upp: leta efter chanser, och gör det inte lätt för mig.
+event.encourage.behind.2 = Fortsätt kämpa. Sådana här ställningar kan fortfarande vända.
+event.encourage.behind.3 = Behåll lugnet och leta efter mina svagheter.
+# The player has played several good moves in a row.
+event.encourage.well = Du kollar mina hot innan du drar. Bra jobbat.
+event.encourage.well.2 = Försiktiga, solida drag. Fortsätt så.
+event.encourage.well.3 = Du tänker bra i dag.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Jag tackar ja. Då blir det remi.
+event.draw.accepted.2 = Vi är överens: det blir remi.
+event.draw.declined = Nej tack, vi spelar vidare.
+event.draw.declined.2 = Jag fortsätter hellre.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Bra spelat. Grattis!
+event.end.win.2 = Det var välförtjänt. Bra gjort!
+event.end.win.3 = Grattis: du slog mig helt rättvist.
+event.end.loss = Bra parti. Nästa gång slår du mig.
+event.end.loss.2 = Tack för partiet. Varje förlust lär dig något.
+event.end.loss.3 = Bra kämpat. Nu tittar vi på vad som hände.
+event.end.draw = Remi. Bra parti!
+event.end.draw.2 = Ingen vinner den här gången. Bra kämpat.
+event.end.draw.3 = Ett rättvist resultat. Bra parti.
+event.end.resigned = Du gav upp. Bra kämpat ändå.
+event.end.resigned.2 = Okej. Tack för partiet.
+event.end.handshake = Nu tar vi i hand.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lowercase noun phrase that fits
+# after "med", "om" and a colon ("Nu fortsätter vi med rockad.", "kapitlet om rockad").
+event.lesson.resume = Välkommen tillbaka! Nu fortsätter vi med {chapter}.
+event.lesson.resume.2 = Hej igen! Vi slutade vid kapitlet om {chapter}.
+event.lesson.next = Nästa kapitel: {chapter}.
+event.lesson.next.2 = Och nu: {chapter}.

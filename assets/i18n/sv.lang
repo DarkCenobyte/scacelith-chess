@@ -1,0 +1,1439 @@
+# Scacelith - Svenska (Swedish)
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
+# Register: "du" (informal), as all Swedish software; buttons and menu entries in sentence case,
+# titles in capitals. Terms follow the Swedish glossary (Sveriges Schackförbund usage): springare,
+# löpare, torn, dam; schack, matt, patt, remi; protokoll (scoresheet), betänketid (time control).
+# Sides "vit" / "svart" lowercase in running text, capitalised in labels. Decimal comma, percent
+# with a no-break space, ISO dates; quotation marks ” ”, spaced en dash " – ".
+# Illegal move = "otillåtet drag" (Swedish FIDE Laws); claim a draw = "kräva remi"; the Options menu
+# is "Inställningar" everywhere ("Inställningar > Spel").
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = På
+common.off = Av
+common.back = Tillbaka
+common.apply = Använd
+common.discard = Förkasta
+common.cancel = Avbryt
+common.white = Vit
+common.black = Svart
+common.main_menu = Huvudmeny
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Det kungliga spelet
+menu.new_game = Nytt parti
+menu.options = Inställningar
+menu.credits = Medverkande
+menu.quit = Avsluta
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = INSTÄLLNINGAR
+options.tab.display = Skärm
+options.tab.graphics = Grafik
+options.tab.audio = Ljud
+options.tab.gameplay = Spel
+options.tab.player = Spelare
+options.tab.controls = Kontroller
+options.pending = Ändringarna gäller först när du väljer Använd.
+options.unsaved.title = OSPARADE ÄNDRINGAR
+options.unsaved.text = Några inställningar har ändrats. Vill du använda dem innan du lämnar sidan?
+
+options.language = Språk
+options.language.help = Språket i menyer och meddelanden. Ändringen gäller direkt.
+options.language.not_adapted = Det här språket är inte helt anpassat än: tränarens röst kan uttala vissa ord fel, och vissa texter kan fortfarande låta lite konstiga.
+options.display_mode = Visningsläge
+options.display_mode.help = Helskärm: ett ramlöst fönster över hela skärmen, med skrivbordets upplösning. Fönsterläge: ett fönster i storleken nedan.
+options.fullscreen = Helskärm
+options.windowed = Fönsterläge
+options.window_size = Fönsterstorlek
+options.window_size.help = Fönstrets storlek i fönsterläge. Helskärm använder alltid skrivbordets upplösning.
+options.vsync = Vertikal synk
+options.vsync.help = Synkroniserar bildrutorna med skärmen för att undvika bildrivning (tearing).
+options.render_scale = Renderingsskala
+options.render_scale.help = Den interna upplösningen för 3D-bilden. Lägre går snabbare, högre ger skarpare bild.
+
+options.quality = Kvalitet
+options.quality.very_low = Mycket låg
+options.quality.low = Låg
+options.quality.medium = Medel
+options.quality.high = Hög
+options.quality.ultra = Ultra
+options.quality.custom = Anpassad
+options.quality.help = Ställer in alla inställningar nedan på en gång: Mycket låg stänger av alla effekter, Ultra sätter alla på max. Ändrar du en enskild inställning blir det Anpassad. På ett enklare grafikkort hjälper det också mycket att sänka renderingsskalan (Skärm).
+options.shadows = Skuggor
+options.shadows.help = Detaljnivån i solens skuggor och hur mjuka deras kanter är. Låg: enkla kanter, snabba att rita.
+options.reflections = Reflektioner
+options.reflections.help = Golvet, bordet och brädet speglar rummet (det ritas en gång till för var och en: bland de mest krävande inställningarna); från Medel speglar även de blanka pjäserna och föremålen sin omgivning.
+options.ambient_occlusion = Omgivningsskuggning
+options.ambient_occlusion.help = Mjuk skuggning där föremål möts och i fördjupningar, dit mindre ljus når.
+options.indirect_light = Indirekt ljus
+options.indirect_light.help = Dagsljus som studsar mot väggarna, golvet och taket. Låg: ett jämnt omgivande ljus i stället. Påverkar främst laddningstiden.
+options.volumetric_light = Ljusstrålar
+options.volumetric_light.help = Solstrålar genom salens dammiga luft, och dammkornen som glittrar i dem.
+options.tessellation = Tessellering
+options.tessellation.help = Mjuka konturer på pjäsernas rundningar när de ses på nära håll.
+options.tessellation.unavailable = Inte tillgänglig: den här grafikdrivrutinen stöder inte tessellering.
+options.antialiasing = Kantutjämning
+options.antialiasing.help = Jämnar ut hackiga kanter och flimrande högdagrar. Av: skarpare men med hackiga kanter, och vissa effekter ser korniga ut.
+options.depth_of_field = Skärpedjup
+options.depth_of_field.help = Gör det som ligger en bra bit framför eller bakom det du tittar på oskarpt, som ett kameraobjektiv gör.
+options.motion_blur = Rörelseoskärpa
+options.motion_blur.help = Gör kamerans och armarnas snabba rörelser suddiga, som en filmkamera gör.
+options.bloom = Ljusglöd
+options.bloom.help = Ett mjukt sken runt de ljusaste högdagrarna, som i ett kameraobjektiv.
+options.brightness = Ljusstyrka
+options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
+options.brightness.help = Kamerans exponeringskompensation. Kalibreringen vid första starten ställer in den så att de mörkaste skuggorna nätt och jämnt syns.
+
+options.master_volume = Huvudvolym
+options.effects = Effekter
+options.ambience = Bakgrundsljud
+options.ambience.help = Salens sorl: brasan, avlägsna steg, den gamla klockan.
+options.ambience_volume = Bakgrundsvolym
+options.voice_volume = Röstvolym
+options.voice_volume.help = Volymen för tränarens röst i tränarläget.
+options.subtitles = Undertexter
+options.subtitles.auto = Automatiskt
+options.subtitles.help = Tränarens ord, skrivna längst ned på skärmen. Automatiskt: visas när tränaren inte talar menyernas språk (med kinesiska menyer talar han engelska). Visas alltid när hans röst inte är installerad.
+
+options.legal_moves = Visa tillåtna drag
+options.legal_moves.help = Markerar rutorna som pjäsen du rör kan nå. När inställningen är av visar ingenting om ett drag är tillåtet: ett otillåtet drag bestraffas av domaren när du trycker på klockan.
+options.coordinates = Koordinater på brädet
+options.auto_press = Automatiskt klocktryck
+options.auto_press.help = Din robot trycker själv på klockan när ditt drag står på brädet. I onlinepartier avgör servern, och i en direktmatch den spelare som är värd för den.
+options.thinking_time = Realistisk tänketid
+options.thinking_time.help = Din motståndare tar tid på sig som en mänsklig spelare i stället för att dra direkt.
+options.ignore_head = Ignorera motståndarens huvudrörelser
+options.ignore_head.help = I onlinepartier och direktmatcher tittar motståndarens robot dit dess spelare tittar. När inställningen är på rör roboten huvudet på egen hand, som mot Stockfish.
+options.mouse_sensitivity = Muskänslighet
+options.invert_look = Invertera Y-axeln
+options.handover = Spelarbyte
+options.handover.cut = Direkt klipp
+options.handover.flight = Flygning, {0} s
+options.handover.help = Två spelare vid en dator: hur vyn går från den ena spelarens ögon till den andras efter varje drag. Det direkta klippet undviker kamerarörelsen.
+options.game_cursor = Spelpekare
+options.game_cursor.help = Vid bordet ritar spelet en egen pekare, som visar vad ett klick kommer att göra. Av: systemets vanliga pil.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Namn
+player.name.help = Ditt namn som det står överst på protokollen, i vilket alfabet som helst.
+player.default_name = Människa
+player.handwriting = Handstil
+player.handwriting.help = Handen som skriver dina drag. Arabiska, japanska och kinesiska skrivs med en egen handstil.
+player.preview = PÅ DITT PROTOKOLL
+hand.caveat = Ledig
+hand.marck = Skrivstil
+hand.badscript = Lutande
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Vänsterklick
+controls.touch = Rör en pjäs och flytta den sedan
+controls.clock.keys = Mellanslag  eller  klicka på klockan
+controls.clock = Tryck på klockan
+controls.look.keys = Håll ned höger musknapp
+controls.look = Se dig omkring
+controls.sheet.keys = S
+controls.sheet = Titta på ditt protokoll och tillbaka igen
+controls.stand.keys = ↑
+controls.stand = Res dig upp framför stolen
+controls.side.keys = ←  /  →
+controls.side = Ställ dig vid bordets vänstra / högra kortände
+controls.sit.keys = ↓
+controls.sit = Sätt dig igen (du spelar bara sittande)
+controls.moves.keys = Tabb
+controls.moves = Visa eller dölj draglistan
+controls.menu.keys = Esc
+controls.menu = Meny
+controls.coach_skip.keys = Mellanslag
+controls.coach_skip = Tränare: hoppa över det tränaren säger
+controls.coach_takeback.keys = Backsteg
+controls.coach_takeback = Tränare: ta tillbaka draget när han erbjuder det
+controls.coach_hint.keys = H
+controls.coach_hint = Tränarens utmaningar: be om en ledtråd
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = LJUSSTYRKA
+calibration.text = Flytta reglaget tills springaren på den svarta rutan nätt och jämnt syns, eller inte längre syns.
+calibration.later = Du kan ändra det senare under Inställningar > Grafik.
+calibration.continue = Fortsätt
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NYTT PARTI
+newgame.opponent = MOTSTÅNDARE
+newgame.time_control = BETÄNKETID
+newgame.start = Starta
+newgame.elo = ~{0} Elo
+newgame.you_white = Du spelar med vit.
+newgame.you_black = Du spelar med svart.
+newgame.colour_lot = Färgerna lottas i det första partiet.
+newgame.colour_alternate = Därefter växlar färgerna från parti till parti.
+newgame.opponent_kind = Motståndare
+newgame.opponent_kind.help = Spela mot Stockfish, eller mot en vän vid den här datorn: ni turas om, var och en från sin sida av brädet.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Människa, samma dator
+
+# Custom opponent: Stockfish parameters
+engine.skill = Färdighetsnivå
+engine.skill.help = Stockfish ”Skill Level” (0–20). Ignoreras när styrkan begränsas med Elo.
+engine.limit_elo = Begränsa styrkan (Elo)
+engine.limit_elo.help = UCI_LimitStrength: schackmotorn siktar på Elo-ratingen nedan.
+engine.elo = Elo
+engine.depth = Sökdjup
+engine.plies = {0} halvdrag|{0} halvdrag
+engine.move_time = Tid per drag
+engine.nodes = Nodgräns
+engine.no_limit = Av
+engine.thousand = {0} tusen
+engine.million = {0} milj.
+engine.dynamic_elo = Dynamisk Elo efter tid
+engine.dynamic_elo.help = Som en mänsklig spelare spelar Stockfish svagare när tiden börjar ta slut: lite under den sista minuten (tidigare i snabbschack och blixt), mycket svagare i tidsnöd. Endast partier med klocka.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish tar tid på sig som en mänsklig spelare på samma nivå. För att hoppa över pausen: Inställningar > Spel > Realistisk tänketid.
+engine.pace.instant = Stockfish drar så snart beräkningen är klar. För mänskliga pauser: Inställningar > Spel > Realistisk tänketid.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Obegränsad
+tc.no_clock = Ingen klocka
+tc.bullet = Bullet
+tc.blitz = Blixt
+tc.rapid = Snabbschack
+tc.classical = Klassiskt
+tc.custom = Anpassad
+tc.your_own = Egen
+tc.base_time = Grundtid
+tc.base_time.help = Starttid på varje klocka (minuter : sekunder).
+tc.increment = Tillägg
+tc.increment.help = Fischertillägg som läggs till efter varje drag.
+tc.delay = Fördröjning
+tc.delay.help = Bronsteinfördröjning: tid som förbrukas upp till den här fördröjningen ges tillbaka efter varje drag.
+tc.no_delay = Av
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, fördröjning {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novis
+preset.novice.desc = Har just lärt sig hur pjäserna går: lämnar pjäser oskyddade och missar enkla hot.
+preset.beginner.name = Nybörjare
+preset.beginner.desc = Kan grunderna men blundrar fortfarande ofta bort material.
+preset.casual.name = Hobbyspelare
+preset.casual.desc = En avslappnad kvällsmotståndare: vettiga drag, många misstag.
+preset.club_player.name = Klubbspelare
+preset.club_player.desc = Stabil klubbspelare som straffar uppenbara blundrar.
+preset.advanced.name = Avancerad
+preset.advanced.desc = Stark klubbspelare med god taktisk blick.
+preset.expert.name = Expert
+preset.expert.desc = Turneringsexpert: gör sällan fel, omsätter fördelar till vinst.
+preset.master.name = Mästare
+preset.master.desc = Mästarstyrka: djupa beräkningar och fint positionsspel.
+preset.grandmaster.name = Stormästare
+preset.grandmaster.desc = Stormästarnivå: extremt svår att slå.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 med full styrka. Lycka till.
+preset.custom.name = Anpassad
+preset.custom.desc = Dina egna motorinställningar.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = MEDVERKANDE
+credits.game.head = SCACELITH
+credits.game = Schack i en kunglig sal, på en egenutvecklad OpenGL 4.6-motor.
+credits.engine.head = SCHACKMOTOR
+credits.engine = Stockfish 19, av Stockfish-utvecklarna.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Dess neurala nätverk har tränats på data från projektet Leela Chess Zero, som tillhandahålls under Open Database License (ODbL).
+credits.voice.head = TRÄNARENS RÖST
+credits.voice = Syntetiskt tal genererat av Supertonic 3 för tränarläget.
+credits.voice.licence = Supertonic 3 är en modell från Supertone som används under licensen OpenRAIL-M, vars användningsbegränsningar gäller alla som använder den (se Licenser).
+credits.openings.head = ÖPPNINGAR
+credits.openings = Öppningsnamnen kommer från databasen chess-openings på lichess.org, som har släppts som allmän egendom (CC0).
+credits.fonts.head = TYPSNITT
+credits.fonts = EB Garamond av Georg Duffner och Cinzel av Natanael Gama; Amiri av Khaled Hosny.
+credits.fonts.hand = Handstilar: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Pjässymboler från GNU FreeFont (GPL v3 med typsnittsundantag).
+credits.quote = ”Schack är analysens konst.”  – Michail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenser
+licences.title = LICENSER
+licences.note = Licenserna visas i sin engelska originaltext.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUS
+pause.resume = Fortsätt
+pause.offer_draw = Erbjud remi
+pause.claim_draw = Kräv remi
+pause.claim_draw.help = Trefaldig upprepning eller 50-dragsregeln.
+pause.resign = Ge upp
+confirm.resign.title = GE UPP
+confirm.resign.text = Vill du ge upp partiet? Din motståndare förklaras som vinnare.
+confirm.resign.draw = Vill du ge upp partiet? Din motståndare kan inte längre sätta matt: partiet blir remi.
+confirm.resign.ok = Ge upp
+confirm.leave.title = LÄMNA PARTIET
+confirm.leave.text = Vill du gå tillbaka till huvudmenyn? Det pågående partiet överges.
+confirm.leave.ok = Lämna
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = FÖRVANDLA TILL
+piece.queen = Dam
+piece.rook = Torn
+piece.bishop = Löpare
+piece.knight = Springare
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partiet slutar remi.
+gameover.draw_moves = Partiet slutar remi efter {0} drag.|Partiet slutar remi efter {0} drag.
+gameover.win = Bra spelat – du vinner.
+gameover.win_moves = Bra spelat – du vinner på {0} drag.|Bra spelat – du vinner på {0} drag.
+gameover.loss = Din motståndare vinner.
+gameover.loss_moves = Din motståndare vinner på {0} drag.|Din motståndare vinner på {0} drag.
+gameover.rematch = Revansch
+gameover.view_board = Visa brädet
+gameover.show = Visa
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Schackmatt
+reason.resignation = Uppgivet parti
+reason.timeout = Förlust på tid
+reason.illegal_moves = Andra otillåtna draget (förlust)
+reason.stalemate = Patt
+reason.insufficient = Död ställning (otillräckligt material)
+reason.timeout_vs_insufficient = Flaggan föll, men motståndaren kan inte sätta matt
+reason.fivefold = Femfaldig upprepning
+reason.75_moves = 75-dragsregeln
+reason.threefold_claim = Trefaldig upprepning (på begäran)
+reason.50_moves_claim = 50-dragsregeln (på begäran)
+reason.agreement = Remi efter överenskommelse
+reason.illegal_vs_insufficient = Andra otillåtna draget, men motståndaren kan inte sätta matt
+reason.resignation_vs_insufficient = Uppgivet parti, men motståndaren kan inte sätta matt
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = DRAG
+movelist.empty = Inga drag ännu.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Förbereder materialen
+loading.hall = Reser salen
+loading.furniture = Snidar bord och stolar
+loading.board = Polerar brädet
+loading.pieces = Svarvar schackpjäserna
+loading.clock = Monterar klockan
+loading.porcelain = Bränner porslinet
+loading.ready = Klart
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Ingen remi kan krävas i den här ställningen.
+notify.flag_you = Din flagga har fallit.
+notify.flag_opponent = Motståndarens flagga har fallit.
+notify.touched.pawn = Rörd pjäs: bonden du rörde måste flyttas.
+notify.touched.knight = Rörd pjäs: springaren du rörde måste flyttas.
+notify.touched.bishop = Rörd pjäs: löparen du rörde måste flyttas.
+notify.touched.rook = Rörd pjäs: tornet du rörde måste flyttas.
+notify.touched.queen = Rörd pjäs: damen du rörde måste flyttas.
+notify.touched.king = Rörd pjäs: kungen du rörde måste flyttas.
+notify.touched.piece = Rörd pjäs: pjäsen du rörde måste flyttas.
+notify.touched_square = Rörd pjäs: du måste flytta pjäsen på {0}.
+notify.press_clock = Tryck på klockan för att fullborda ditt drag (Mellanslag).
+notify.manual_clock = Tryck själv på klockan efter varje drag i det här partiet.
+notify.illegal = Otillåtet drag.
+notify.cannot_move = Det draget går inte att göra.
+notify.move_first = Gör ditt drag innan du trycker på klockan.
+notify.stance.sit_to_play = Sätt dig igen för att spela (Nedpil).
+notify.stance.first = Klockan fortsätter att gå medan du står. Nedpil: sätt dig igen.
+notify.stance.first_untimed = Du spelar bara från din stol. Nedpil: sätt dig igen.
+notify.stance.finish_move = Gör klart ditt drag först.
+notify.draw_already_offered = Du har redan erbjudit remi i det här draget.
+notify.draw_accepted = Din motståndare accepterar remi.
+notify.draw_declined = Din motståndare avböjer remierbjudandet.
+notify.draw_claimed = Din motståndare kräver remi.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Domaren: klockan trycktes in utan att något drag gjordes, vilket räknas som ett otillåtet drag.
+arbiter.unpromoted = Domaren: otillåtet drag, bonden ersattes inte med en ny pjäs innan klockan trycktes in.
+arbiter.illegal = Domaren: otillåtet drag.
+arbiter.second_loses.white = Det här är vits andra otillåtna drag: vit förlorar partiet.
+arbiter.second_loses.black = Det här är svarts andra otillåtna drag: svart förlorar partiet.
+arbiter.second_draw.white = Det här är vits andra otillåtna drag, men svart kan inte sätta matt: partiet blir remi.
+arbiter.second_draw.black = Det här är svarts andra otillåtna drag, men vit kan inte sätta matt: partiet blir remi.
+arbiter.queen = Bonden blir dam.
+arbiter.queen_one_minute.white = Bonden blir dam och vit får en extra minut.
+arbiter.queen_one_minute.black = Bonden blir dam och svart får en extra minut.
+arbiter.queen_two_minutes.white = Bonden blir dam och vit får två extra minuter.
+arbiter.queen_two_minutes.black = Bonden blir dam och svart får två extra minuter.
+arbiter.restored = Ställningen återställs.
+arbiter.restored_one_minute.white = Ställningen återställs och vit får en extra minut.
+arbiter.restored_one_minute.black = Ställningen återställs och svart får en extra minut.
+arbiter.restored_two_minutes.white = Ställningen återställs och vit får två extra minuter.
+arbiter.restored_two_minutes.black = Ställningen återställs och svart får två extra minuter.
+arbiter.one_minute.white = Vit får en extra minut.
+arbiter.one_minute.black = Svart får en extra minut.
+arbiter.two_minutes.white = Vit får två extra minuter.
+arbiter.two_minutes.black = Svart får två extra minuter.
+arbiter.second_loses = Ett andra otillåtet drag innebär förlust.
+arbiter.touched.white = Vit måste flytta den rörda pjäsen.
+arbiter.touched.black = Svart måste flytta den rörda pjäsen.
+arbiter.game_over = Partiet är slut.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Se ett parti
+
+viewer.title = SE ETT PARTI
+viewer.white = VIT
+viewer.black = SVART
+viewer.time_control = BETÄNKETID
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Byt färger
+viewer.note = Båda spelarna är Stockfish. Flyg fritt runt i salen medan de spelar: ingen kommer att se dig.
+viewer.summary = {0} mot {1}
+viewer.custom = Anpassad
+viewer.tc.custom = Egen
+viewer.base_time = Grundtid
+viewer.increment = Tillägg
+viewer.delay = Fördröjning
+viewer.off = Av
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = fördröjning {0} s
+viewer.back = Tillbaka
+viewer.start = Starta
+
+viewer.paused = PAUS
+viewer.resume = Fortsätt
+viewer.options = Inställningar
+viewer.main_menu = Huvudmeny
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = KONTROLLER
+viewer.keys.move = W A S D  ·  Z Q S D  ·  piltangenterna
+viewer.controls.move = Förflytta dig
+viewer.keys.updown = E, Mellanslag  /  C, Ctrl
+viewer.controls.updown = Upp / ned
+viewer.keys.fast = Skift
+viewer.controls.fast = Snabbare
+viewer.keys.look = Höger musknapp
+viewer.controls.look = Se dig omkring
+viewer.keys.speed = Mushjul
+viewer.controls.speed = Hastighet
+viewer.keys.views = 1 – 9
+viewer.controls.views = Vyer
+viewer.keys.eyes = 0
+viewer.controls.eyes = Genom ögonen på spelaren som är vid draget
+viewer.keys.moves = Tabb
+viewer.controls.moves = Draglista
+viewer.keys.menu = Esc
+viewer.controls.menu = Meny
+viewer.keys.hide = H
+viewer.controls.hide = Dölj den här panelen
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Paus / fortsätt
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Ett drag bakåt / framåt
+viewer.keys.replay_speed = Skift + J  /  L
+viewer.controls.replay_speed = Långsammare / snabbare
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partiets början / slut
+viewer.speed = Hastighet {0} m/s
+viewer.view.0 = Genom spelarnas ögon
+viewer.view.1 = Bredvid bordet
+viewer.view.2 = Ovanför brädet
+viewer.view.3 = Salen
+viewer.view.4 = Klockan
+viewer.view.5 = Vits ansikte
+viewer.view.6 = Svarts ansikte
+viewer.view.7 = Duellen
+viewer.view.8 = Fönstren
+viewer.view.9 = Gobelängerna
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Vit
+viewer.side.black = Svart
+viewer.flag.white = Vits flagga har fallit.
+viewer.flag.black = Svarts flagga har fallit.
+viewer.claims_draw = {0} kräver remi.
+viewer.offer_accepted = {0} erbjuder remi, {1} accepterar.
+viewer.offer_declined = {0} erbjuder remi, {1} avböjer.
+viewer.gameover.white_wins = Vit vinner efter drag {0}.
+viewer.gameover.black_wins = Svart vinner efter drag {0}.
+viewer.gameover.draw = Partiet slutar remi efter drag {0}.
+viewer.gameover.players = {0} mot {1}
+viewer.watch_again = Se igen
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Inga ratingpartier ännu
+elo.provisional = Preliminär rating
+elo.peak = Högsta {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Din Elo {0}
+elo.expected = förväntat resultat {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · det här partiet räknas inte in i ratingen
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Protokoll
+scoresheet.event = Tävling
+scoresheet.date = Datum
+scoresheet.round = Rond
+scoresheet.board = Bord
+scoresheet.page = Sida
+scoresheet.white = Vit
+scoresheet.black = Svart
+scoresheet.elo = Elo
+scoresheet.result = Resultat
+scoresheet.move_no = Nr
+scoresheet.sign_white = Vits underskrift
+scoresheet.sign_black = Svarts underskrift
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {2}-{1}-{0}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Spela online
+online.title = SPELA ONLINE
+online.continue = Fortsätt
+online.retry = Försök igen
+online.copy = Kopiera
+online.copied = Kopierat
+online.copy.unavailable = Det går inte att kopiera här: skriv upp det.
+online.rated = Med rating
+online.casual = Utan rating
+online.casual_only = Endast utan rating
+online.color.random = Lottas
+online.ping = {0} ms
+online.conn.online = Ansluten
+online.conn.connecting = Ansluter…
+online.conn.reconnecting = Återansluter…
+online.conn.offline = Inte ansluten
+online.conn.incompatible = Annan version
+online.no_server.text = Onlinespel kräver en Scacelith-server. Ange adressen till en server i inställningarna, eller spela direkt mot en vän i en direktmatch.
+online.no_server.settings = Serverinställningar
+
+# Options > Online server
+options.tab.online = Onlineserver
+options.online.server = Server
+options.online.server.help = Den officiella servern, eller en anpassad server (community) som drivs av någon annan och nås via sitt säkra webb-API och sin säkra WebSocket. Du loggar in separat på varje server: ett konto och dess inloggning delas aldrig mellan servrar.
+options.online.official = Officiell server – {0}
+options.online.community = Anpassad server
+options.online.host = Värd
+options.online.host.hint = domännamn eller IP-adress
+options.online.host.help = Den anpassade serverns domännamn eller IP-adress, så som ägaren har angett den.
+options.online.api_port = HTTPS-/API-port
+options.online.api_port.help = Porten för serverns säkra webb-API (443 på Scacelith-servrar).
+options.online.ws_port = WSS-port
+options.online.ws_port.hint = samma som API-porten
+options.online.ws_port.help = Porten för serverns säkra WebSocket. Lämna fältet tomt om det är samma port som API-porten.
+options.online.pin = Certifikatets fingeravtryck (SHA-256)
+options.online.pin.hint = valfritt
+options.online.pin.help = För en server med självsignerat certifikat: SHA-256-fingeravtrycket som ägaren anger (64 hexadecimala tecken, kolon tillåtna). Lämna fältet tomt för att lita på systemets certifikat.
+options.online.pin.invalid = Ett fingeravtryck består av 64 hexadecimala tecken (kolon tillåtna).
+options.online.test = Testa anslutningen
+options.online.test_ok = {0}: ansluten, kompatibel med den här versionen.
+options.online.test_incompatible = {0}: ansluten, men servern kräver en annan version av Scacelith.
+options.online.in_game = Servern kan inte bytas under ett onlineparti.
+options.online.remember_session = Kom ihåg min inloggning när systemets nyckelring inte är tillgänglig
+options.online.remember_session.help = När ingen nyckelring i systemet (GNOME Keyring, KWallet…) kan förvara din session sparas den i en fil som bara ditt användarkonto kan läsa. Den som kan läsa dina filer, eller en kopia av dem som till exempel en säkerhetskopia, skulle kunna använda sessionen. Av: du förblir inloggad tills spelet stängs. Du kan logga ut vilken enhet som helst under Inloggade enheter, i ditt konto.
+
+# Sign in, create an account
+online.signin.lead = Logga in på {0} för att spela mot andra online.
+online.field.user = Användarnamn eller e-post
+online.field.user.hint = namn eller adress
+online.field.password = Lösenord
+online.field.password.hint = minst 10 tecken
+online.field.password2 = Bekräfta lösenordet
+online.field.current_password = Nuvarande lösenord
+online.field.new_password = Nytt lösenord
+online.field.username = Användarnamn
+online.field.username.hint = 3–24 bokstäver, siffror, _ eller -
+online.field.email = E-post
+online.field.new_email = Ny e-postadress
+online.field.code = Kod
+online.field.code.hint = 6 siffror eller en återställningskod
+online.field.code6 = Kod från appen
+online.field.code6.hint = 6 siffror
+online.signin.button = Logga in
+online.signin.google = Fortsätt med Google
+online.signin.register = Skapa ett konto
+online.signin.forgot = Glömt lösenordet?
+online.mfa.title = TVÅFAKTORSKOD
+online.mfa.lead = Ange den 6-siffriga koden som visas i din autentiseringsapp, eller en av dina återställningskoder.
+online.mfa.verify = Verifiera
+online.register.title = SKAPA ETT KONTO
+online.register.lead = Ett gratiskonto på {0}: ditt namn, din rating och dina partier finns bara på den här servern.
+online.register.button = Skapa konto
+online.register.working = Ditt konto skapas… det kan ta några sekunder.
+online.register.ready = Ditt konto är klart. Logga in för att spela.
+online.password.mismatch = De två lösenorden är olika.
+online.check_email.title = KONTROLLERA DIN E-POST
+online.check_email.text = Vi har skickat en länk till {0}. Öppna den för att aktivera ditt konto och logga sedan in här.
+online.check_email.ask = Ange adressen till ditt konto för att få aktiveringslänken igen.
+online.check_email.resend = Skicka meddelandet igen
+online.check_email.resent = E-postmeddelandet har skickats igen. Det kan ta några minuter; titta även i skräppostmappen.
+online.forgot.title = GLÖMT LÖSENORDET
+online.forgot.lead = Ange e-postadressen till ditt konto: vi skickar en länk där du kan välja ett nytt lösenord.
+online.forgot.button = Skicka länken
+online.forgot.sent = Om ett konto använder den här adressen är en länk på väg.
+online.sso.title = LOGGA IN MED GOOGLE
+online.sso.wait = Fortsätt i webbläsaren: välj ditt Google-konto i fönstret som öppnades. Scacelith tar över så snart Google skickar tillbaka dig.
+online.sso.name_title = VÄLJ DITT NAMN
+online.sso.name_lead = Det är första gången du är här med Google. Välj det namn som andra spelare ska se.
+online.sso.continue = Fortsätt
+online.sso.finishing = Google har skickat tillbaka dig. Inloggningen slutförs…
+online.sso.link_title = LÄGG TILL GOOGLE-INLOGGNING
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Kontot {0} på {1} använder redan e-postadressen för det här Google-kontot. Ange kontots lösenord för att lägga till Google-inloggning på det. Du behöver bara göra det här en gång.
+online.sso.link_button = Lägg till Google-inloggning
+online.sso.link_mfa = Google-inloggningen läggs till på kontot när koden har godkänts.
+online.sso.not_mine = Det här är inte mitt konto
+online.sso.not_mine_note = Google-inloggningen lades inte till. Om den här e-postadressen är din, använd ”Glömt lösenordet?” med den: länken skickas till den inkorgen. Om kontot dessutom kräver en tvåfaktorskod som du inte har, kontakta serverns operatör.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google-inloggning
+online.sso.page.done_heading = Tillbaka till Scacelith
+online.sso.page.done = Google har skickat dig tillbaka till Scacelith. Gå tillbaka till spelet för att slutföra inloggningen; du kan stänga den här fliken.
+online.sso.page.cancelled_heading = Inloggningen avbröts
+online.sso.page.cancelled = Google-inloggningen avbröts. Du kan stänga den här fliken och gå tillbaka till Scacelith.
+online.sso.page.foreign_heading = Den här sidan är inte till för dig
+online.sso.page.foreign = Den här sidan hör inte till den inloggning som Scacelith på den här datorn väntar på. Om du inte precis har startat en Google-inloggning i Scacelith kan någon ha skickat den här länken till dig: stäng fliken.
+
+# Account
+online.account.button = Konto
+online.account.title = KONTO
+online.account.section = KONTO
+online.account.username = ANVÄNDARNAMN
+online.account.email = E-POST
+online.account.unverified = (inte verifierad)
+online.account.mfa = TVÅFAKTORSAUTENTISERING
+online.account.mfa_on = På
+online.account.mfa_off = Av
+online.account.google = GOOGLE
+online.account.google_linked = Kopplat till ett Google-konto
+online.account.change_password = Byt lösenord
+online.account.mfa_setup = Slå på tvåfaktor
+online.account.mfa_disable = Stäng av tvåfaktor
+online.account.recovery = Nya återställningskoder
+online.account.sign_out = Logga ut
+online.account.sign_out_all = Logga ut överallt
+online.account.sign_out_all.help = Loggar ut det här kontot på alla datorer, även den här.
+online.account.signed_out = Du är utloggad.
+online.account.signed_out_all = Du är utloggad på alla datorer.
+online.account.signing_out_all = Loggar ut alla datorer…
+online.account.sign_out_all_failed = Dina andra datorer kan fortfarande vara inloggade: logga in igen och logga sedan ut dem under Inloggade enheter. {0}
+online.account.sign_out_all_retry = Dina andra datorer kan fortfarande vara inloggade. Försök med Logga ut överallt igen. {0}
+online.account.ratings = RATING
+online.account.col.tc = BETÄNKETID
+online.account.col.rating = RATING
+online.account.col.games = PARTIER
+online.account.col.record = V / R / F
+online.account.provisional = Ett frågetecken markerar en preliminär rating (få spelade partier hittills).
+online.password.title = BYT LÖSENORD
+online.password.button = Byt lösenord
+online.password.changed = Ditt lösenord har ändrats.
+online.password.other_sessions = Dina andra datorer måste logga in igen.
+online.mfa_setup.title = TVÅFAKTORSAUTENTISERING
+online.mfa_setup.lead = Med tvåfaktorsautentisering krävs en kod från en app i din telefon varje gång du loggar in. Ange ditt lösenord för att börja.
+online.mfa_setup.scan = 1. Skanna den här koden med en autentiseringsapp, eller skriv in den här nyckeln i appen:
+online.mfa_setup.enter = 2. Ange den 6-siffriga koden som appen visar:
+online.mfa_setup.enable = Slå på
+online.mfa_setup.done = Tvåfaktorsautentisering är på.
+online.mfa_off.title = STÄNG AV TVÅFAKTOR
+online.mfa_off.lead = Ange ditt lösenord och en kod från din app (eller en återställningskod).
+online.mfa_off.button = Stäng av
+online.mfa.off_done = Tvåfaktorsautentisering är avstängd.
+online.recovery.title = ÅTERSTÄLLNINGSKODER
+online.recovery.lead = Varje kod loggar in dig en gång om du blir av med din telefon. Förvara dem på ett säkert ställe: de visas bara nu.
+online.recovery.saved = Jag har sparat dem
+online.recovery.new_title = NYA ÅTERSTÄLLNINGSKODER
+online.recovery.new_lead = Nya koder ersätter de gamla. Ange ditt lösenord och en kod från din app.
+online.recovery.button = Nya koder
+online.account.manage = SÄKERHET OCH DATA
+online.account.pending_email = Väntar på bekräftelse: {0}
+online.account.accept_challenges = Ta emot utmaningar
+online.account.accept_challenges.help = Andra spelare kan utmana dig via ditt användarnamn. Av: deras utmaningar avvisas.
+online.account.history = Partihistorik
+online.account.devices = Inloggade enheter
+online.account.change_email = Byt e-postadress
+online.account.export = Ladda ned mina data
+online.account.delete = Radera kontot
+
+# Play
+online.play.signed_in = Inloggad som {0}
+online.session.file = Ingen nyckelring i systemet kunde förvara din inloggning: den sparas i en fil som bara ditt användarkonto kan läsa (Inställningar > Onlineserver).
+online.session.memory = Ingen nyckelring i systemet kunde förvara din inloggning, och den sparas inte i någon fil: du förblir inloggad tills spelet stängs (Inställningar > Onlineserver).
+online.play.find_section = HITTA EN MOTSTÅNDARE
+online.play.friend_section = SPELA MOT EN VÄN
+online.play.mode = Partityp
+online.play.mode.help = Partier med rating påverkar din rating i den här betänketiden; partier utan rating gör det inte.
+online.play.find = Hitta motståndare
+online.play.connecting = Ansluter till servern…
+online.play.cooldown = Du kan söka efter en motståndare igen från {0}.
+online.play.banned = Det här kontot är avstängt till {0}.
+online.play.challenge = Utmana en spelare
+online.play.challenge.desc = Bjud in någon som är online via användarnamnet.
+online.play.private = Privat parti
+online.play.private.desc = Skapa en kod att ge till en vän, eller anslut med vännens kod.
+online.play.direct = Direktmatch
+online.play.direct.desc = Ingen server: spela direkt mot en väns dator.
+online.search.title = SÖKER
+online.search.window = Ratingintervall {0}
+online.search.queued = {0} spelare söker|{0} spelare söker
+online.search.wait = Söker efter en motståndare på din nivå…
+online.outgoing.challenge = UTMANING SKICKAD
+online.outgoing.waiting = väntar på svar
+online.outgoing.private = PRIVAT PARTI
+online.outgoing.private_hint = Ge den här koden till din vän: partiet börjar när vännen ansluter.
+online.challenge.title = UTMANA EN SPELARE
+online.challenge.opponent = MOTSTÅNDARE
+online.field.opponent = Användarnamn
+online.field.opponent.hint = vem du vill utmana
+online.challenge.note = Din motståndare ser utmaningen var som helst i menyerna och har en minut på sig att svara.
+online.challenge.send = Skicka utmaning
+online.terms.rated = Med rating
+online.terms.rated.help = Bara de officiella betänketiderna kan spelas med rating.
+online.terms.color = Din färg
+online.private.title = PRIVAT PARTI
+online.private.create_section = SKAPA
+online.private.create_note = Du får en kort kod: den som anger den spelar mot dig.
+online.private.create = Skapa partiet
+online.private.join_section = ANSLUT
+online.field.private_code = Kod
+online.private.join = Anslut
+online.private.joining = Ansluter till partiet…
+online.challenge.received = UTMANING
+online.challenge.accept = Acceptera
+online.challenge.decline = Avböj
+online.challenge.you_white = du spelar med vit
+online.challenge.you_black = du spelar med svart
+online.challenge.you_random = färgerna lottas
+online.challenge.declined = {0} avböjde din utmaning.
+online.challenge.expired = Din utmaning gick ut utan svar.
+online.challenge.unavailable = {0} är inte tillgänglig just nu.
+online.challenge.lost = Anslutningen bröts: din utmaning avbröts.
+
+# At the table
+online.pause.clock_runs = Partiet fortsätter: din klocka går.
+online.pause.abort = Avbryt partiet
+online.pause.abort.help = Före ditt första drag kan ett parti avbrytas; det räknas då inte.
+online.pause.leave = Lämna partiet
+online.confirm.resign.text = Vill du ge upp partiet? Din motståndare vinner det.
+online.confirm.leave.text = Om du lämnar ger du upp partiet: din motståndare vinner det.
+online.confirm.leave.ok = Ge upp och lämna
+online.confirm.leave_abort.text = Vill du lämna före ditt första drag? Partiet avbryts och räknas inte.
+online.confirm.leave_abort.ok = Avbryt och lämna
+online.draw.card_title = REMIERBJUDANDE
+online.draw.card_text = Din motståndare erbjuder remi.
+online.draw.accept = Acceptera
+online.draw.decline = Avböj
+online.draw.offered = Din motståndare erbjuder remi.
+online.opponent_back = Din motståndare är tillbaka.
+online.opponent_away = Motståndaren är frånkopplad – har {0} på sig att komma tillbaka
+online.first_move = Ditt första drag · {0}
+online.reconnecting = ÅTERANSLUTER…
+online.reconnecting.text = Partiet fortsätter på servern och din klocka går.
+online.gameover.aborted = Partiet avbröts: det räknas inte.
+online.rating.casual = Parti utan rating: ratingen påverkas inte.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Acceptera revansch
+online.rematch.offered = Din motståndare erbjuder revansch.
+online.rematch.waiting = Revansch erbjuden…
+online.rematch.gone = Ingen revansch
+online.rematch.declined = Ingen revansch den här gången.
+online.report.button = Anmäl motståndaren
+online.report.title = ANMÄLAN
+online.report.lead = Anmälningar skickas till serverns moderatorer tillsammans med det här partiet. Tack för att du hjälper till att värna om rent spel.
+online.report.category = Anledning
+online.report.cheating = Fusk
+online.report.abuse = Kränkande beteende
+online.report.other = Annat
+online.report.comment = Kommentar
+online.report.comment.hint = valfritt
+online.report.send = Skicka anmälan
+online.report.sent = Anmälan skickad. Tack.
+online.report.queued = Din anmälan skickas när partiet är slut.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = med rating
+online.sheet.casual = utan rating
+online.sheet.game = Parti {0}
+# End reasons of online games
+reason.online.abandonment = Motståndaren lämnade partiet
+reason.online.abandonment_vs_insufficient = Lämnade partiet, men motståndaren kan inte sätta matt
+reason.online.aborted = Partiet avbrutet
+reason.online.no_show = Inget första drag i tid (avbrutet)
+reason.online.forfeit = Tilldömd förlust
+reason.online.server_aborted = Avbrutet av servern
+reason.online.both_disconnected = Båda spelarna tappade anslutningen
+# Server notices
+online.notice.shutdown = Om {0} startas servern om. Pågående partier sparas.
+online.notice.revoked = Du har loggats ut från den här servern.
+online.notice.replaced = Ditt konto anslöt från ett annat fönster; det här fönstret är nu frånkopplat.
+online.notice.rating_restored = Du har fått tillbaka {0} ratingpoäng: en motståndare har stängts av för fusk.|Du har fått tillbaka {0} ratingpoäng: en motståndare har stängts av för fusk.
+# Errors
+online.err.rate_limited_for = För många försök. Försök igen om {0}.
+online.err.rate_limited = För många försök. Försök igen om en stund.
+online.err.server_busy_for = Servern är upptagen. Försök igen om {0}.
+online.err.server_busy = Servern är upptagen. Försök igen om en stund.
+online.err.banned_until = Det här kontot är avstängt till {0}.
+online.err.banned = Det här kontot är avstängt.
+online.err.invalid_credentials = Fel användarnamn eller lösenord.
+online.err.invalid_credentials_pending = Fel användarnamn eller lösenord. Om du nyss har registrerat dig måste du först öppna länken vi skickade till dig.
+online.err.email_unverified = Din e-postadress är inte verifierad än: öppna länken vi skickade till dig.
+online.err.network = Servern går inte att nå. Kontrollera din anslutning och serverns adress.
+online.err.tls = Det gick inte att upprätta en säker anslutning till servern.
+online.err.certificate = Serverns certifikat är inte betrott (eller stämmer inte med fingeravtrycket i inställningarna).
+online.err.incompatible = Den här servern kräver en annan version av Scacelith.
+online.err.unauthorized = Din session har upphört: logga in igen.
+online.err.username_taken = Användarnamnet är upptaget.
+online.err.email_taken = Ett konto använder redan den här e-postadressen.
+online.err.invalid_username = Ett användarnamn består av 3–24 bokstäver, siffror, _ eller -.
+online.err.invalid_email = Den här e-postadressen är inte giltig.
+online.err.weak_password = Lösenordet är för svagt: använd minst 10 tecken.
+online.err.invalid_code = Koden stämmer inte.
+online.err.expired = Begäran har gått ut: börja om.
+online.err.registration_closed = Den här servern tar inte emot nya konton.
+online.err.sso_cancelled = Google-inloggningen avbröts.
+online.err.sso_expired = Google-inloggningen tog för lång tid eller har redan använts. Börja om.
+online.err.sso_failed = Google-inloggningen fungerade inte. Försök igen.
+online.err.sso_listen = Scacelith kunde inte ta emot Googles svar på den här datorn. Försök igen.
+online.err.sso_origin = Google-inloggning fungerar inte via den här serveradressen. Lägg till servern under det offentliga namn som operatören anger och försök sedan igen.
+online.err.browser = Webbläsaren kunde inte öppnas.
+online.err.sso_email_unverified = Google har inte bekräftat e-postadressen för det här Google-kontot.
+online.err.sso_account_exists = Ett konto använder redan den här e-postadressen och kan inte kopplas till Google-inloggning: logga in med kontots lösenord, eller använd ”Glömt lösenordet?”.
+online.err.sso_already_linked = Det här Google-kontot är redan kopplat till ett annat konto.
+online.err.account_disabled = Det här kontot kan inte längre användas.
+online.err.server_error = Servern fick ett problem. Försök igen.
+online.err.timeout = Servern svarade inte i tid.
+online.err.offline = Inte ansluten till servern: försök igen när du är ansluten.
+online.err.other = Servern nekade ({0}).
+online.err.code = Servern nekade (fel {0}).
+online.err.slow_down = Sakta ned lite.
+online.err.server_full = Servern är full. Försök igen senare.
+online.err.restarting = Servern startas om. Försök igen om en stund.
+online.err.move_refused = Servern godtog inte draget: brädet återställs.
+online.err.game_over = Det här partiet är redan slut.
+online.err.already_in_game = Du spelar redan ett parti.
+online.err.invalid_category = Den här betänketiden erbjuds inte här.
+online.err.draw_offer_limit = Inga fler remierbjudanden just nu.
+online.err.abort_not_allowed = Partiet kan inte längre avbrytas.
+online.err.no_pending_offer = Det finns inget erbjudande att svara på.
+online.err.flag_fell = Din tid tog slut.
+online.err.queue_not_allowed = Du kan inte söka efter en motståndare just nu.
+online.err.challenge_not_found = Den här utmaningen finns inte längre.
+online.err.user_unavailable = Den här spelaren är inte tillgänglig.
+online.err.challenge_limit = För många utmaningar just nu. Försök igen senare.
+online.err.challenge_self = Du kan inte utmana dig själv.
+online.err.code_invalid = Inget parti har den här koden.
+online.err.rated_official_tc = Bara de officiella betänketiderna kan spelas med rating.
+online.err.cooldown = Matchningen är pausad för dig en kort stund.
+online.err.invalid_tc = Den här betänketiden är inte tillåten.
+online.err.rematch_unavailable = En revansch är inte längre möjlig.
+online.err.rated_repeat_limit = Du har spelat tillräckligt många ratingpartier mot den här spelaren för tillfället. Spela ett parti utan rating, eller försök igen senare.
+online.err.cheat_detected = Partiet stoppades av serverns kontroller för rent spel.
+online.err.invalid_password = Fel lösenord.
+online.err.mfa_code_required = Ange en kod från din autentiseringsapp (eller en återställningskod).
+online.err.password_not_set = Det här kontot loggar in med Google och har inget lösenord än. Välj först ett med ”Glömt lösenordet?” på inloggningssidan.
+online.err.too_many_attempts = För många felaktiga försök. Försök igen senare.
+online.err.too_many_attempts_for = För många felaktiga försök. Försök igen om {0}.
+online.err.same_email = Det här är redan din e-postadress.
+online.err.not_found = Hittades inte på servern.
+online.err.invalid_response = Serverns svar gick inte att läsa.
+online.err.storage = Sessionen kunde inte sparas på den här datorn.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PARTIHISTORIK
+online.history.filter.games = Partier
+online.history.filter.result = Resultat
+online.history.filter.all = Alla
+online.history.filter.won = Vunna
+online.history.filter.lost = Förlorade
+online.history.filter.drawn = Remi
+online.history.col.date = DATUM
+online.history.col.opponent = MOTSTÅNDARE
+online.history.col.result = RESULTAT
+online.history.col.tc = BETÄNKETID
+online.history.col.kind = TYP
+online.history.col.rating = RATING
+online.history.won = Vinst
+online.history.lost = Förlust
+online.history.drawn = Remi
+online.history.aborted = Avbrutet
+online.history.page = Sida {0} av {1}
+online.history.total = {0} parti|{0} partier
+online.history.previous = Föregående
+online.history.next = Nästa
+online.history.empty.title = INGA PARTIER ÄNNU
+online.history.empty = Dina partier på den här servern listas här när de är slut.
+online.history.empty_filter.title = INGA PARTIER
+online.history.empty_filter = Inget parti matchar de här filtren.
+online.history.error = HISTORIKEN KUNDE INTE LÄSAS IN
+online.history.unavailable = DEN HÄR SERVERN HAR INGEN PARTIHISTORIK
+online.game.title = PARTI
+online.game.players = SPELARE
+online.game.you = DU
+online.game.unrated = Utan rating
+online.game.you_won = Du vann
+online.game.you_lost = Du förlorade
+online.game.draw = Remi
+online.game.you_left = Du lämnade partiet
+online.game.date = DATUM
+online.game.time_control = BETÄNKETID
+online.game.moves = DRAG
+online.game.move_count = {0} drag|{0} drag
+online.game.no_moves = Inget drag spelades.
+online.game.moves_incomplete = Vissa drag kunde inte läsas: listan tar slut i förtid.
+online.game.save = Spara partiet
+online.game.saved_button = Sparat
+online.game.saved = Partiet finns bland dina sparade partier.
+online.game.already_saved = Det här partiet finns redan bland dina sparade partier.
+online.game.save_failed = Partiet kunde inte sparas.
+online.game.invalid = Servern skickade ett partiprotokoll som inte går att läsa.
+online.game.replay = Spela upp
+online.game.not_found = PARTIET HITTADES INTE
+online.game.error = PARTIET KUNDE INTE LÄSAS IN
+online.devices.title = INLOGGADE ENHETER
+online.devices.lead = Enheterna där det här kontot är inloggat. Om du inte känner igen en av dem, logga ut den och byt lösenord.
+online.devices.unknown = Okänd enhet
+online.devices.this = DEN HÄR ENHETEN
+online.devices.signed_in = Inloggad {0}
+online.devices.last_active = senast aktiv {0}
+online.devices.active_now = används nu
+online.devices.sign_out = Logga ut
+online.devices.signed_out = Enheten är utloggad.
+online.devices.error = ENHETERNA KUNDE INTE LÄSAS IN
+online.devices.all.title = LOGGA UT ÖVERALLT
+online.email.title = BYT E-POSTADRESS
+online.email.current = Nuvarande adress: {0}
+online.email.button = Byt e-postadress
+online.email.sent = En bekräftelselänk har skickats till {0}.
+online.email.sent.hint = Adressen ändras när länken öppnas. Fram till dess används din nuvarande adress.
+online.email.done = Klar
+online.email.changed = Din e-postadress har ändrats.
+online.export.title = LADDA NED MINA DATA
+online.export.lead = Allt som den här servern har sparat om ditt konto (profil, rating, partier, enheter, säkerhetshändelser) sparas som en JSON-fil på den här datorn. Ange ditt lösenord för att bekräfta.
+online.export.button = Ladda ned
+online.export.saved = Dina data har sparats på den här datorn.
+online.export.failed = Filen kunde inte skrivas.
+online.delete.title = RADERA KONTOT
+online.delete.warning = Ditt konto raderas från den här servern: din e-postadress, ditt lösenord, din tvåfaktorsautentisering och dina enheter tas bort, och du kan inte längre logga in. Det går inte att ångra.
+online.delete.games = Dina partier och din rating finns kvar på servern under det anonyma namnet {0}.
+online.delete.confirm_name = Bekräfta genom att ange ditt användarnamn och ditt lösenord.
+online.delete.button = Radera mitt konto
+online.delete.done = Ditt konto har raderats.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Direktmatch
+online.direct.title = DIREKTMATCH
+online.direct.lead = Ett vänskapsparti direkt mellan två datorer: ingen server, inget konto och aldrig någon rating.
+online.direct.host = Var värd för ett parti
+online.direct.host.desc = Din vän ansluter till dig: du ger vännen din adress och en kod.
+online.direct.join = Anslut till ett parti
+online.direct.join.desc = Anslut till en vän som är värd.
+online.direct.host_title = VAR VÄRD FÖR ETT PARTI
+online.direct.your_color = Din färg
+online.direct.auto_press.help = Båda robotarna trycker själva på klockan när ett drag står på brädet. Av: varje spelare trycker på klockan efter varje drag.
+online.direct.unrated = Direktmatcher är vänskapspartier: de ger aldrig någon rating.
+online.direct.connection = ANSLUTNING
+online.direct.port = Port
+online.direct.port.help = TCP-porten som din vän ansluter till (47100 om den inte är upptagen).
+online.direct.port_range = Välj en port mellan 1024 och 65535.
+online.direct.upnp = Öppna porten i min router (UPnP)
+online.direct.upnp.help = Ber hemroutern att vidarebefordra porten till den här datorn, och stänger den efter partiet.
+online.direct.host_note_upnp = Spelet ber din router att öppna porten. Om det inte går får du veta vilken port du ska vidarebefordra manuellt.
+online.direct.host_note_manual = Vidarebefordra TCP-porten till den här datorn i din router, eller spela på samma nätverk.
+online.direct.host_button = Var värd
+online.direct.wait_title = VÄNTAR PÅ DIN VÄN
+online.direct.opening = Öppnar port {0} i din router…
+online.direct.give = Ge din vän:
+online.direct.cap_address = ADRESS
+online.direct.cap_port = PORT
+online.direct.cap_code = KOD
+online.direct.lan = På samma nätverk: {0}
+online.direct.router = din router
+online.direct.upnp_searching = Letar efter din router…
+online.direct.upnp_mapped = Porten har öppnats i {0}.
+online.direct.upnp_none = Ingen UPnP-router svarade: vidarebefordra TCP-port {0} till den här datorn manuellt.
+online.direct.upnp_failed = Routern vägrade öppna porten: vidarebefordra TCP-port {0} till den här datorn manuellt.
+online.direct.upnp_off = Vidarebefordra TCP-port {0} till den här datorn i din router.
+online.direct.upnp_cgnat = Din internetleverantör delar troligen din internetadress med andra (CGNAT): prova IPv6 eller ett VPN.
+online.direct.firewall = Om Windows frågar om Scacelith får ta emot anslutningar, tillåt det.
+online.direct.waiting = Väntar på din vän…
+online.direct.connecting_friend = Din vän ansluter…
+online.direct.starting = Ställer upp brädet…
+online.direct.join_title = ANSLUT TILL ETT PARTI
+online.direct.join_lead = Ange det som din vän läser upp för dig: adressen, porten och koden.
+online.direct.address = Adress
+online.direct.address.hint = IPv4, IPv6 eller namn
+online.direct.code = Kod
+online.direct.join_button = Anslut
+online.direct.connecting_to = Ansluter till {0}…
+online.direct.securing = Säkrar anslutningen med {0}…
+direct.event = Vänskapsmatch
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Direkt, {0}
+direct.err.refused = Ingen är värd på den här adressen och porten.
+direct.err.timeout = Inget svar: kontrollera adressen och porten, och att din väns router släpper in spelet.
+direct.err.wrong_code = Koden stämmer inte.
+direct.err.invalid_code = En kod har 12 tecken (XXXX-XXXX-XXXX).
+direct.err.incompatible = Din vän har en annan version av Scacelith.
+direct.err.port_in_use = Porten används redan på den här datorn: välj en annan.
+direct.err.network = Nätverket kunde inte användas.
+direct.err.too_many_attempts = För många felaktiga koder: värdskapet har avbrutits. Var värd igen för att få en ny kod.
+direct.err.bad_address = Den här adressen är inte giltig.
+direct.err.not_found = Namnet hittades inte.
+direct.err.unreachable = Den här adressen går inte att nå härifrån.
+direct.err.reset = Anslutningen bröts.
+direct.err.closed = Anslutningen stängdes.
+direct.err.host_left = Din vän slutade vara värd.
+direct.err.other = Anslutningen misslyckades ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Spelare 2
+hotseat.white_player = Vit
+hotseat.black_player = Svart
+hotseat.name.help = Namnet som skrivs på båda protokollen, i vilket alfabet som helst.
+hotseat.swap = Byt färger
+hotseat.left_hand = {0} spelar med vänster hand: klockan står på vänster sida.
+hotseat.rated = Ratingparti
+hotseat.rated.help = Varje namn har sin egen tvåspelarrating på den här datorn. Din rating mot Stockfish ändras aldrig.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Tvåspelarrating: {0} {1} · {2} {3}
+hotseat.new_rating = (ny)
+hotseat.friendly_note = Ett vänskapsparti: ingen rating ändras.
+hotseat.colours = {0} spelar med vit, {1} spelar med svart.
+hotseat.colours_swap = Färgerna byts vid varje revansch.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, ditt drag
+hotseat.flag = Flaggan har fallit för {0}.
+hotseat.confirm.resign = Ge upp för {0}? {1} förklaras som vinnare.
+hotseat.confirm.resign_draw = Ge upp för {0}? {1} kan inte längre sätta matt: partiet blir remi.
+hotseat.draw.offer_noted = Ditt remierbjudande följer med ditt drag: {0} ser det när du har tryckt på klockan.
+hotseat.draw.card_title = REMIERBJUDANDE
+hotseat.draw.offered = {0} erbjuder remi.
+hotseat.draw.card_hint = Rör du en pjäs avböjer du.
+hotseat.draw.accept = Acceptera
+hotseat.draw.decline = Avböj
+hotseat.draw.accepted = {0} accepterar remierbjudandet från {1}.
+hotseat.draw.declined = {0} avböjer remierbjudandet från {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Ratingparti
+hotseat.sheet.friendly = Vänskapsparti
+# Game over card
+hotseat.gameover.wins = {0} vinner på {1} drag.|{0} vinner på {1} drag.
+hotseat.gameover.wins_now = {0} vinner.
+hotseat.gameover.friendly = {0} mot {1} · vänskapsparti
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Det här partiet räknas inte in i ratingen.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Tränare
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Syntetiskt tal genererat av {0} för tränarläget
+# Coach page
+coach.title = TRÄNARE
+coach.section.level = NIVÅ
+coach.section.lesson = MED TRÄNAREN
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = För spelare med rating {0}
+coach.completed = Avklarad
+coach.recommended = Rekommenderas
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Schackets regler
+coach.level.0.desc = En interaktiv lektion, en regel i taget.
+coach.level.0.detail = Tränaren ställer upp små ställningar och visar hur varje pjäs går och slår, sedan rockad, förvandling, schack och schackmatt. Du prövar varje idé själv på brädet.
+coach.level.1.name = Första stegen
+coach.level.1.desc = Vad som är angripet, vad som står oskyddat.
+coach.level.1.detail = Tränaren spelar försiktigt och talar enkelt: vilka av dina pjäser som är angripna, vilka som står utan skydd och hur du behåller dem.
+coach.level.2.name = Nybörjare
+coach.level.2.desc = Enkel taktik, utveckling, kungens säkerhet.
+coach.level.2.detail = Gafflar och bindningar nämns vid namn. Tränaren pratar om att få ut pjäserna och hålla kungen säker.
+coach.level.3.name = Fortsättare
+coach.level.3.desc = Planer, bondestruktur, enda drag som håller.
+coach.level.3.detail = Tränaren förklarar planer och bondestrukturer, och varnar dig när bara ett enda drag håller ställningen.
+coach.level.4.name = Klubbspelare
+coach.level.4.desc = Kandidatdrag, värdering i bönder.
+coach.level.4.detail = Tränaren väger kandidatdragen mot varandra och anger värderingen i bönder, som en klubbtränare skulle göra.
+coach.level.5.name = Stark klubbspelare
+coach.level.5.desc = Koncisa varianter, positionella begrepp.
+coach.level.5.detail = Korta kommentarer, konkreta varianter och positionsspelets vokabulär.
+coach.level.6.name = Expert
+coach.level.6.desc = Kortfattade kommentarer, djupa varianter, värderingssiffror.
+coach.level.6.detail = Få ord, som mellan starka spelare: varianter som går flera drag djupt och värderingar i siffror.
+coach.note.clock = Ingen klocka: ta all tid du behöver.
+coach.note.takeback = Efter en blunder visar tränaren vad som gick fel och erbjuder dig att ta tillbaka draget.
+coach.note.lesson = Du spelar med vit; tränaren ställer upp varje övning på brädet.
+coach.note.unrated = Partier med tränaren räknas inte in i ratingen.
+coach.note.fallible = Tränaren är inte ofelbar: han kan ibland bedöma ett drag fel.
+coach.colour = Din färg
+coach.colour.help = Färgen du spelar med mot tränaren. Växla: vit, sedan svart, från parti till parti. Lektionen om reglerna spelas alltid med vit.
+coach.colour.alternate = Växla
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Tränarens röst är inte installerad eller är avstängd (Inställningar > Ljud): hans ord skrivs ut på skärmen.
+# At the table
+coach.speaker = TRÄNAREN
+coach.skip = Hoppa över
+coach.offer.title = TA TILLBAKA DRAGET?
+coach.offer.text = Tränaren erbjuder dig att ta tillbaka ditt senaste drag, så att du kan leta efter ett bättre.
+coach.offer.hint = Backsteg tar tillbaka draget. Rör du en pjäs spelar du vidare.
+coach.offer.accept = Ta tillbaka
+coach.offer.decline = Spela vidare
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Återtagningar kvar: {0}
+coach.pause.take_back = Ta tillbaka mitt drag
+coach.pause.take_back.help = Tar tillbaka ditt senaste drag, och tränarens svar om han redan har spelat det.
+coach.confirm.resign = Vill du ge upp partiet? Tränaren förklaras som vinnare.
+coach.confirm.resign_draw = Vill du ge upp partiet? Tränaren kan inte längre sätta matt: partiet blir remi.
+coach.confirm.leave = Vill du gå tillbaka till huvudmenyn? Det här partiet med tränaren överges.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Spela igen
+coach.gameover.unrated = Det här partiet med tränaren räknas inte in i ratingen.
+coach.lesson.done = BRA GJORT
+coach.lesson.done.line = Nu kan du schackets regler.
+coach.lesson.next = Första partiet
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Träning
+coach.tab.challenges = Utmaningar
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = SCHACKMATT
+challenge.group.tactics = TAKTIK
+challenge.group.defence = FÖRSVAR
+challenge.group.endgames = SLUTSPEL
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Matt i ett drag
+challenge.mate1.desc = Ett drag, och det är schackmatt.
+challenge.mate1.detail = Titta först på alla schackar: en av dem lämnar kungen utan ruta att fly till, utan pjäs att ställa emellan och utan något att slå.
+challenge.mate2.name = Matt i två drag
+challenge.mate2.desc = Ett drag som inte lämnar något försvar, sedan matt.
+challenge.mate2.detail = Det första draget är ofta en schack eller ett offer som tar en ruta från kungen. Tränaren försvarar sig så gott han kan.
+challenge.mate3.name = Matt i tre drag
+challenge.mate3.desc = Längre forcerande varianter.
+challenge.mate3.detail = Schackar, slag och hot, tre drag djupt. Räkna ut tränarens bästa svar i varje steg innan du rör en pjäs.
+challenge.backrank.name = Baslinjematt
+challenge.backrank.desc = En kung instängd bakom sina egna bönder.
+challenge.backrank.detail = När bönderna framför en rockerad kung inte har flyttats kan ett torn eller en dam på sista raden sätta matt. Ta först bort eller avled försvararna.
+challenge.patterns.name = Mattmönster
+challenge.patterns.desc = Kvävningsmatt, Anastasias matt, arabisk matt med flera.
+challenge.patterns.detail = Berömda mattnät som återkommer gång på gång. Lär dig känna igen pjäsernas uppställning och det avgörande slaget.
+challenge.hanging.name = Gratispjäser
+challenge.hanging.desc = Hitta det som står oskyddat.
+challenge.hanging.detail = En pjäs eller bonde som ingen försvarar kan helt enkelt slås. Kontrollera vad var och en av tränarens pjäser skyddas av.
+challenge.fork.name = Gafflar
+challenge.fork.desc = En pjäs angriper två samtidigt.
+challenge.fork.detail = Springare, bönder, damer och till och med kungar kan gaffla. Motståndaren kan bara rädda det ena av de två målen.
+challenge.pin.name = Bindningar
+challenge.pin.desc = En pjäs som inte kan flytta utan att förlora det bakom sig.
+challenge.pin.detail = Bind en pjäs mot kungen eller mot en mer värdefull pjäs, och angrip den sedan en gång till, eller utnyttja att den inte kan flytta.
+challenge.skewer.name = Spett
+challenge.skewer.desc = Angrip en värdefull pjäs och vinn den som står bakom.
+challenge.skewer.detail = Motsatsen till en bindning: den mer värdefulla pjäsen står framför, måste flytta undan och blottar pjäsen bakom sig.
+challenge.discovered.name = Avdragsangrepp
+challenge.discovered.desc = Flytta en pjäs för att släppa loss en annan.
+challenge.discovered.detail = När en pjäs kliver ut ur en linje angriper pjäsen bakom den. Med schack, eller med dubbelschack, hinner motståndaren inte möta båda hoten.
+challenge.deflection.name = Avledning och lockning
+challenge.deflection.desc = Locka bort en försvarare, eller in på en ödesdiger ruta.
+challenge.deflection.detail = En försvarare som har två uppgifter kan inte klara båda. Angrip den, erbjud den något, eller tvinga in en pjäs på rutan där den går förlorad.
+challenge.intermezzo.name = Mellandrag
+challenge.intermezzo.desc = Slå inte tillbaka direkt: det finns något starkare.
+challenge.intermezzo.detail = En inskjuten schack eller ett större hot före det väntade draget ändrar allt.
+challenge.trapped.name = Instängda pjäser
+challenge.trapped.desc = En pjäs utan någon säker ruta kvar.
+challenge.trapped.detail = Ta ifrån en pjäs dess sista flyktrutor och vinn den sedan.
+challenge.promotion.name = Förvandling
+challenge.promotion.desc = Driv fram en bonde till sista raden.
+challenge.promotion.detail = Långt framskjutna bönder är värda mycket. Röj vägen, locka bort blockörerna och gör en ny dam.
+challenge.quiet.name = Tysta drag
+challenge.quiet.desc = Det vinnande draget är varken en schack eller ett slag.
+challenge.quiet.detail = Ibland förbereder det starkaste draget bara ett hot som inte går att parera. Den svåraste sorten att se.
+challenge.opening.name = Öppningsfällor
+challenge.opening.desc = Straffa tidiga misstag.
+challenge.opening.detail = Ställningar från de första dragen i verkliga partier, där ett slarvigt drag kan utnyttjas direkt.
+challenge.escape.name = Hitta räddningen
+challenge.escape.desc = Din kung är i fara: ett drag räddar den.
+challenge.escape.detail = Alla andra drag förlorar. Titta på alla schackar och hot mot din kung, och hitta den enda vägen ut.
+challenge.defend.name = Försvarsdrag
+challenge.defend.desc = Parera hotet utan att förlora material.
+challenge.defend.detail = Tränaren hotar något. Hitta det exakta draget som håller ihop allt.
+challenge.kq.name = Dam och kung mot kung
+challenge.kq.desc = Sätt matt med damen.
+challenge.kq.detail = Driv den ensamma kungen mot kanten med din dam, för din egen kung närmare och se upp för patt. Tränaren försvarar sig med sina bästa drag.
+challenge.kr.name = Torn och kung mot kung
+challenge.kr.desc = Sätt matt med tornet.
+challenge.kr.detail = Tornet skär av kungen, rad för rad; din kung tar oppositionen. Tränaren försvarar sig med sina bästa drag.
+challenge.kp.name = Kung och bonde mot kung
+challenge.kp.desc = Vinn oppositionen och förvandla bonden.
+challenge.kp.detail = Gå före med kungen, inte med bonden. Ta oppositionen och gör dam utan att tränaren hinner ifatt.
+challenge.kp_hold.name = Stoppa bonden
+challenge.kp_hold.desc = Ensam kung mot kung och bonde: håll remi.
+challenge.kp_hold.detail = Ställ dig framför bonden och behåll oppositionen. Håll ut i tio drag.
+challenge.rook.name = Tornslutspel
+challenge.rook.desc = Lucenas brobygge och Philidors försvar.
+challenge.rook.detail = De två ställningarna som varje spelare bör kunna: hur man vinner med en bonde på sjunde raden, och hur man försvarar sig med tornet på tredje.
+challenge.endgame.name = Slutspelstaktik
+challenge.endgame.desc = Få pjäser, skarpa idéer.
+challenge.endgame.detail = Bondekapplöpningar, genombrott och tornslutspel från verkliga partier.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} ställning|{0} ställningar
+coach.challenge.done = Avklarad
+coach.challenge.start = Starta
+coach.challenge.note.white = Du spelar med vit; tränaren ställer upp varje ställning på brädet.
+coach.challenge.note.hint = Kört fast? Tryck på H för en ledtråd. Efter några försök erbjuder tränaren dig en.
+coach.challenge.note.unsaved = Utmaningar räknas inte in i ratingen och sparas inte; en bock visar dem du har klarat.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = UTMANINGEN KLARAD
+coach.challenge.complete.line = Du löste alla ställningar.
+coach.challenge.next = Nästa utmaning
+coach.challenge.again = Igen
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = EN LEDTRÅD?
+coach.hint.text = Tränaren erbjuder dig en ledtråd.
+coach.hint.hint = H ger ledtråden. Rör du en pjäs fortsätter du att leta.
+coach.hint.accept = Ledtråd
+coach.hint.decline = Nej tack
+coach.hint.key = Ledtråd
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Tränarens röst
+options.coach_voice.help = Tränaren talar högt i tränarläget. Hans röstmodell laddas ned första gången den behövs (cirka 399 MB). Av: tränarens ord skrivs bara ut på skärmen.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Röstmodell
+options.voice_update.help = Tränaren talar fortfarande med den gamla 8-bitarsversionen av sin röstmodell. Uppdateringen laddar ned den officiella versionen av Supertonic 3, utgiven av Supertone, och raderar först de gamla filerna.
+options.voice_update.button = Uppdatera ({0} MB)
+options.voice_update.running = Nedladdningen pågår.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Röstkvalitet
+options.voice_quality.help = Hur många förfiningssteg tränarens talsyntes tar för varje replik, från Låg (4) till Maximal (9); Medel (5) som standard. En högre nivå ger en något renare röst men tar längre tid att beräkna, så tränaren börjar tala lite senare. Kan ställas in när röstmodellen är installerad och Tränarens röst är på.
+options.voice_quality.low = Låg
+options.voice_quality.medium = Medel
+options.voice_quality.high = Hög
+options.voice_quality.very_high = Mycket hög
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maximal
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Tränarens röst
+coach.download.text = Tränaren talar med Supertonic 3, en talsyntesmodell från Supertone. Den ingår inte i Scacelith: spelet kan ladda ned den nu från Hugging Face ({0} MB, en gång). Utan den skriver tränaren sina ord på skärmen.
+coach.download.licence = Modellen ges ut under licensen OpenRAIL-M, som förbjuder vissa användningar av rösten den skapar, till exempel att utge den för en mänsklig röst eller att härma en verklig person.
+coach.download.read_licence = Läs licensen
+coach.download.accept = Genom att välja Ladda ned godkänner du villkoren i den här licensen.
+# {0} = a folder
+coach.download.folder = Sparas i: {0}
+coach.download.not_now = Inte nu
+# {0} = the size in megabytes
+coach.download.download = Ladda ned ({0} MB)
+coach.download.licence_title = LICENSEN OPENRAIL-M
+coach.download.back = Tillbaka
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = En ny röst för tränaren
+coach.update.text = Tränarens röst använder nu den officiella versionen av Supertonic 3, utgiven av Supertone, i stället för den 8-bitarskonvertering som har varit installerad hittills. Spelet kan ladda ned den nu från Hugging Face ({0} MB, en gång); de gamla filerna ({1} MB) raderas först. Om du tackar nej behåller tränaren sin nuvarande röst, och uppdateringen finns kvar under Inställningar > Ljud.
+coach.update.download = Uppdatera ({0} MB)
+coach.update.accept = Genom att välja Uppdatera godkänner du villkoren i den här licensen.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TRÄNARENS RÖST
+coach.download.removing = Tar bort den gamla versionen…
+coach.download.checking = Kontrollerar filerna…
+coach.download.downloading = Laddar ned…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Från Hugging Face
+coach.download.from_archive = Från Hugging Face (arkivkopia)
+coach.download.cancel = Avbryt
+coach.download.failed = Nedladdningen misslyckades.
+coach.download.error.network = Servrarna gick inte att nå. Kontrollera din internetanslutning och försök igen.
+# {0} = a folder
+coach.download.error.disk = Filerna kunde inte skrivas i {0}. Kontrollera det lediga utrymmet och försök igen.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Servrarna skickade ett oväntat svar ({0}). Försök igen senare.
+coach.download.retry = Försök igen
+coach.download.close = Stäng
+# Notices
+coach.download.done = Tränarens röst är installerad.
+coach.download.cancelled = Nedladdningen avbröts: den fortsätter där den slutade nästa gång.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Sparade partier
+options.save_games = Spara mina partier
+options.save_games.help = När de är slut sparas dina partier mot Stockfish, med tränaren, mellan två spelare vid den här datorn och dina direktmatcher som PGN-filer, som du hittar igen under Sparade partier. Onlinepartier sparas av servern.
+library.title = SPARADE PARTIER
+library.section.games = PARTIER
+library.section.details = PARTIET
+library.section.tags = TAGGAR
+library.section.moves = DRAG
+library.count = {0} parti|{0} partier
+library.filter = Visa
+library.filter.all = Alla partier
+library.filter.play = Mot Stockfish
+library.filter.coach = Med tränaren
+library.filter.hotseat = Två spelare
+library.filter.direct = Direktmatcher
+library.filter.server = Onlinepartier
+library.filter.imported = Importerade
+library.mode.play = Mot Stockfish
+library.mode.coach = Med tränaren
+library.mode.hotseat = Två spelare
+library.mode.direct = Direktmatch
+library.mode.server = Onlineparti
+library.mode.imported = Importerat
+library.coach_level = Nivå {0}
+library.unknown_player = Okänd
+library.unfinished = Ej avslutat
+library.unreadable = Det här partiet kan inte läsas.
+library.moves = {0} drag|{0} drag
+library.opening_variation = {0}: {1}
+library.file = Fil: {0}
+library.file_game = Fil: {0}, parti {1} av {2}
+library.no_moves = Inget drag spelades.
+library.none_selected = Välj ett parti i listan.
+library.reading = Läser in de sparade partierna
+library.empty.title = Inga sparade partier ännu
+library.empty.text = Dina partier mot Stockfish, med tränaren, mellan två spelare vid den här datorn och dina direktmatcher visas här när de är slut. Du kan också lägga PGN-filer i den här mappen: partier som har exporterats från andra program eller webbplatser listas tillsammans med dina.
+library.empty.filter = Inga partier av det här slaget.
+library.error.folder = Mappen med sparade partier kan inte läsas
+library.error.game = Det här partiet kan inte läsas: {0}
+library.folder = Mapp: {0}
+library.open_folder = Öppna mappen
+library.open_failed = Mappen kunde inte öppnas.
+library.replay = Spela upp
+library.delete = Radera
+library.delete.title = RADERA PARTIET
+library.delete.text = Partiet {0} raderas från den här datorn, tillsammans med sin fil. Det går inte att ångra.
+library.delete.ok = Radera
+library.delete.several = Den här filen innehåller {0} parti: den kan bara raderas från mappen.|Den här filen innehåller {0} partier: den kan bara raderas från mappen.
+library.deleted = Partiet har raderats.
+library.delete.failed = Partiet kunde inte raderas.
+library.delete.changed = Filen har ändrats: listan har uppdaterats.
+library.truncated = Den här mappen innehåller för många partier: bara de {0} senaste listas.
+library.tag.Event = Tävling
+library.tag.Site = Plats
+library.tag.Date = Datum
+library.tag.Time = Tid
+library.tag.Round = Rond
+library.tag.White = Vit
+library.tag.Black = Svart
+library.tag.Result = Resultat
+library.tag.WhiteElo = Vits Elo
+library.tag.BlackElo = Svarts Elo
+library.tag.TimeControl = Betänketid
+library.tag.Termination = Avslutning
+library.tag.Opening = Öppning
+library.tag.Variation = Variant
+library.tag.PlyCount = Halvdrag
+library.tag.FEN = Utgångsställning
+library.tag.ScacelithMode = Läge
+library.tag.CoachLevel = Tränarnivå
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Partinummer
+library.tag.UTCDate = Datum (UTC)
+library.tag.UTCTime = Tid (UTC)
+library.tag.WhiteRatingDiff = Vits ratingändring
+library.tag.BlackRatingDiff = Svarts ratingändring
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analys
+analysis.menu.title = ANALYS
+analysis.menu.analyse = Analysera
+analysis.menu.paste = Klistra in PGN
+analysis.menu.online = Mina onlinepartier
+analysis.menu.folder = Lägg PGN-filer i den här mappen för att analysera dem: {0}
+analysis.menu.empty.title = Inga sparade partier ännu
+analysis.menu.empty.text = Dina partier visas här när de är slut, liksom PGN-filerna i mappen nedan. Du kan också klistra in ett parti som har kopierats som PGN-text.
+analysis.menu.empty.no_folder = Klistra in ett parti som har kopierats som PGN-text för att analysera det.
+analysis.menu.paste.empty = Urklippet är tomt: kopiera först ett parti som PGN-text.
+analysis.menu.paste.none = Inget schackparti hittades i urklippet.
+analysis.menu.paste.several = Urklippet innehåller flera partier: det första analyseras.
+analysis.menu.gameover = Analysera partiet
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Drag {0} av {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Direkt
+replay.again = Spela upp igen
+replay.gameover.unfinished = Partiet slutar efter drag {0}, utan resultat.
+replay.tip.start = Partiets början (Home)
+replay.tip.back = Ett drag bakåt (J)
+replay.tip.pause = Paus (K)
+replay.tip.resume = Fortsätt (K)
+replay.tip.forward = Ett drag framåt (L)
+replay.tip.end = Partiets slut (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAR
+analysis.hud.accuracy = NOGGRANNHET
+analysis.hud.reviewing = Stockfish går igenom partiet… {0}
+analysis.hud.no_engine = Ingen schackmotor: dragen visas utan analys.
+analysis.hud.no_moves = Det här partiet har inga drag.
+analysis.hud.tip.play = Spela upp dragen (K)
+analysis.hud.tip.comments_off = Dölj kommentarerna till nyckelögonblicken (N)
+analysis.hud.tip.comments_on = Visa kommentarerna till nyckelögonblicken (N)
+analysis.hud.tip.voice_off = Stäng av kommentatorns röst (M)
+analysis.hud.tip.voice_on = Hör kommentarerna upplästa (M)
+analysis.hud.tip.voice_missing = Rösten kan inte höras: dess filer är inte installerade, eller så är Inställningar > Ljud > Tränarens röst av. Kommentarerna skrivs bara ut på skärmen.
+analysis.hud.tip.arrows_off = Dölj pilarna för de bättre dragen (B)
+analysis.hud.tip.arrows_on = Visa pilarna för de bättre dragen (B)
+analysis.hud.controls.play = Spela upp / paus
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Visa / dölj kommentarerna
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Kommentatorns röst på / av
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Visa / dölj pilarna
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Spara som GIF
+gif.making = GIF:en skapas: servern ritar partiet…
+gif.saved = GIF:en har sparats:
+gif.saved_as = GIF sparad: {0}
+gif.sign_in_first = Logga in på en onlineserver för att skapa GIF:ar: servern ritar dem.
+gif.busy_other = En annan GIF skapas just nu. Vänta tills den är klar.
+gif.err.rate_limited_for = Du har skapat många GIF:ar på kort tid. Du kan skapa nästa om {0}.
+gif.err.rate_limited = Du har skapat många GIF:ar på kort tid. Försök igen senare.
+gif.err.server_busy_for = Servern är upptagen med att rita andra GIF:ar. Försök igen om {0}.
+gif.err.server_busy = Servern är upptagen med att rita andra GIF:ar. Försök igen om en stund.
+gif.err.signed_out = Din session har upphört. Logga in igen för att skapa en GIF.
+gif.err.game_too_long = Det här partiet är för långt för att göras till en GIF.
+gif.err.pgn_too_large = Det här partiet är för långt för att göras till en GIF.
+gif.err.invalid_pgn = Servern kunde inte läsa det här partiet.
+gif.err.render_failed = Servern kunde inte skapa den här GIF:en. Försök igen.
+gif.err.gif_disabled = Den här servern skapar inte GIF:ar.
+gif.err.write_failed = GIF:en kunde inte sparas på den här datorn.
+gif.err.not_found = Det här partiet finns inte längre på servern.
+gif.wait.seconds = {0} sekund|{0} sekunder
+gif.wait.minutes = {0} minut|{0} minuter
+gif.wait.both = {0} och {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Det gick inte att starta OpenGL 4.6. Uppdatera din grafikdrivrutin.
+error.opengl_macos = Det gick inte att starta OpenGL 4.6 på den här Macen. Scacelith kräver Apple silicon (M1 eller senare) och macOS 26 eller senare, och fungerar inte i en virtuell maskin.
+error.renderer = Renderaren kunde inte startas.
+error.scene = Scenen kunde inte läsas in.
+error.log_file = Detaljer finns i loggfilen: {0}

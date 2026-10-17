@@ -1,0 +1,1446 @@
+# Scacelith - Lietuvių
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31..., not 11)|few (2-9, 22-29..., not 12-19)|other (0, 10-20, 30...).
+# Register: formal "jūs" (lowercase), instructions in the plural imperative ("Įveskite"), buttons and
+# menu commands in the infinitive ("Įrašyti", "Pasiduoti"). The player's gender is unknown: no
+# adjective, participle or half-participle agrees with the player (no "prisijungęs", "norėdami",
+# "patys"); impersonal forms instead ("Prisijungta kaip {0}", "Atsijungta", "sėdint").
+# Titles in capitals. Quotes „…“, decimal comma, "85 %". Save = "įrašyti" (VLKK, Microsoft).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Įjungta
+common.off = Išjungta
+common.back = Atgal
+common.apply = Taikyti
+common.discard = Atmesti
+common.cancel = Atšaukti
+common.white = Baltieji
+common.black = Juodieji
+common.main_menu = Pagrindinis meniu
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Karališkasis žaidimas
+menu.new_game = Nauja partija
+menu.options = Nustatymai
+menu.credits = Kūrėjai
+menu.quit = Išeiti
+menu.version = Versija {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = NUSTATYMAI
+options.tab.display = Ekranas
+options.tab.graphics = Grafika
+options.tab.audio = Garsas
+options.tab.gameplay = Žaidimas
+options.tab.player = Žaidėjas
+options.tab.controls = Valdymas
+options.pending = Pakeitimai įsigalios, kai juos pritaikysite.
+options.unsaved.title = NEĮRAŠYTI PAKEITIMAI
+options.unsaved.text = Kai kurie nustatymai pakeisti. Pritaikyti juos prieš išeinant?
+
+options.language = Kalba
+options.language.help = Meniu ir pranešimų kalba. Pakeičiama iš karto.
+options.language.not_adapted = Ši kalba dar nėra visiškai pritaikyta: trenerio balsas gali neteisingai ištarti kai kuriuos žodžius, o kai kurie tekstai dar gali skambėti keistokai.
+options.display_mode = Ekrano režimas
+options.display_mode.help = Visas ekranas: langas be rėmelio per visą ekraną, darbalaukio skyra. Lange: toliau nurodyto dydžio langas.
+options.fullscreen = Visas ekranas
+options.windowed = Lange
+options.window_size = Lango dydis
+options.window_size.help = Lango dydis, kai žaidžiama lange. Visas ekranas visada naudoja darbalaukio skyrą.
+options.vsync = Vertikalusis sinchronizavimas
+options.vsync.help = Sinchronizuoja kadrus su ekranu, kad vaizdas neplyštų.
+options.render_scale = Atvaizdavimo mastelis
+options.render_scale.help = Vidinė 3D vaizdo skyra. Mažesnė – greičiau, didesnė – ryškiau.
+
+options.quality = Kokybė
+options.quality.very_low = Labai žema
+options.quality.low = Žema
+options.quality.medium = Vidutinė
+options.quality.high = Aukšta
+options.quality.ultra = Ultra
+options.quality.custom = Pasirinktinė
+options.quality.help = Iš karto nustato visas toliau esančias parinktis: „Labai žema“ išjungia visus efektus, „Ultra“ juos visus nustato maksimaliai. Pakeitus vieną parinktį atskirai, kokybė tampa „Pasirinktinė“. Silpnesnei vaizdo plokštei taip pat labai padeda sumažintas atvaizdavimo mastelis (skirtukas „Ekranas“).
+options.shadows = Šešėliai
+options.shadows.help = Saulės šešėlių detalumas ir jų kraštų švelnumas. „Žema“: paprasti kraštai, greitai piešiama.
+options.reflections = Atspindžiai
+options.reflections.help = Grindys, stalas ir lenta atspindi salę (kiekvienam iš jų ji piešiama dar kartą – tai viena reikliausių parinkčių); nuo lygio „Vidutinė“ blizgios figūros ir daiktai taip pat atspindi tai, kas yra aplink.
+options.ambient_occlusion = Aplinkos okliuzija
+options.ambient_occlusion.help = Švelnus šešėliavimas ten, kur daiktai susiliečia, ir įdubose, į kurias patenka mažiau šviesos.
+options.indirect_light = Netiesioginė šviesa
+options.indirect_light.help = Dienos šviesa, atsispindinti nuo sienų, grindų ir lubų. „Žema“: vietoj jos tolygi aplinkos šviesa. Daugiausia turi įtakos įkėlimo trukmei.
+options.volumetric_light = Šviesos spinduliai
+options.volumetric_light.help = Saulės spinduliai, krentantys pro dulkėtą salės orą, ir juose žibančios dulkelės.
+options.tessellation = Teseliacija
+options.tessellation.help = Glotnūs figūrų išlinkimų kontūrai, žiūrint iš arti.
+options.tessellation.unavailable = Neprieinama: ši vaizdo plokštės tvarkyklė nepalaiko teseliacijos.
+options.antialiasing = Kraštų glodinimas
+options.antialiasing.help = Išlygina dantytus kraštus ir mirgančius atšvaitus. Išjungta: ryškiau, bet kraštai dantyti, o kai kurie efektai atrodo grūdėti.
+options.depth_of_field = Ryškumo gylis
+options.depth_of_field.help = Sulieja tai, kas yra gerokai priekyje arba už to, į ką žiūrite, kaip fotoaparato objektyvas.
+options.motion_blur = Judesio suliejimas
+options.motion_blur.help = Sulieja greitus kameros ir rankų judesius, kaip kino kamera.
+options.bloom = Švytėjimas
+options.bloom.help = Švelnus švytėjimas aplink ryškiausius atšvaitus, kaip fotoaparato objektyve.
+options.brightness = Ryškumas
+options.brightness.neutral = Neutralus
+options.brightness.value = {0} EV
+options.brightness.help = Kameros ekspozicijos korekcija. Pirmojo paleidimo kalibravimas ją nustato taip, kad tamsiausi šešėliai būtų vos matomi.
+
+options.master_volume = Bendras garsumas
+options.effects = Efektai
+options.ambience = Aplinkos garsai
+options.ambience.help = Salės šurmulys: ugnis, tolimi žingsniai, senas laikrodis.
+options.ambience_volume = Aplinkos garsų garsumas
+options.voice_volume = Balso garsumas
+options.voice_volume.help = Trenerio balso garsumas trenerio režimu.
+options.subtitles = Subtitrai
+options.subtitles.auto = Automatiškai
+options.subtitles.help = Trenerio žodžiai, rašomi ekrano apačioje. Automatiškai: rodomi, kai treneris nekalba meniu kalba (kai meniu kinų kalba, jis kalba angliškai). Visada rodomi, kai jo balsas neįdiegtas.
+
+options.legal_moves = Rodyti galimus ėjimus
+options.legal_moves.help = Paryškina langelius, į kuriuos gali eiti paliesta figūra. Kai išjungta, niekas nepasako, ar ėjimas leistinas: už neleistiną ėjimą teisėjas baudžia, kai tik paspaudžiate laikrodį.
+options.coordinates = Lentos koordinatės
+options.auto_press = Automatiškai spausti laikrodį
+options.auto_press.help = Jūsų robotas pats paspaudžia laikrodį, kai tik jūsų ėjimas padarytas lentoje. Interneto partijose tai lemia serveris, o tiesioginiame mače – jį surengęs žaidėjas.
+options.thinking_time = Realistiškas mąstymo laikas
+options.thinking_time.help = Varžovas neskuba, kaip žmogus, užuot ėjęs akimirksniu.
+options.ignore_head = Nepaisyti varžovo galvos judesių
+options.ignore_head.help = Interneto partijose ir tiesioginiuose mačuose varžovo robotas žiūri ten, kur žiūri jo žaidėjas. Kai įjungta, robotas galvą judina savarankiškai, kaip žaidžiant su Stockfish.
+options.mouse_sensitivity = Pelės jautrumas
+options.invert_look = Invertuoti vertikalią ašį
+options.handover = Perėjimas tarp žaidėjų
+options.handover.cut = Staigus perjungimas
+options.handover.flight = Skrydis, {0} s
+options.handover.help = Du žaidėjai prie vieno kompiuterio: kaip po kiekvieno ėjimo vaizdas pereina iš vieno žaidėjo akių į kito. Staigus perjungimas apsieina be kameros judesio.
+options.game_cursor = Žaidimo žymiklis
+options.game_cursor.help = Prie stalo žaidimas piešia savo žymiklį, kuris parodo, ką padarys spustelėjimas. Išjungta: įprasta sistemos rodyklė.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Vardas
+player.name.help = Jūsų vardas, rašomas partijos blankų viršuje, bet kuria abėcėle.
+player.default_name = Žmogus
+player.handwriting = Rašysena
+player.handwriting.help = Ranka, kuri užrašo jūsų ėjimus. Arabų, japonų ir kinų kalbomis rašoma atskira rašysena.
+player.preview = JŪSŲ PARTIJOS BLANKE
+hand.caveat = Kasdienė
+hand.marck = Rišlioji
+hand.badscript = Pasvirusi
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Kairysis pelės mygtukas
+controls.touch = Paliesti figūrą, tada ją perkelti
+controls.clock.keys = Tarpas  arba  laikrodžio spustelėjimas
+controls.clock = Paspausti laikrodį
+controls.look.keys = Dešinysis pelės mygtukas, laikyti
+controls.look = Apsidairyti
+controls.sheet.keys = S
+controls.sheet = Pažiūrėti į savo partijos blanką ir atgal
+controls.stand.keys = ↑
+controls.stand = Atsistoti priešais savo kėdę
+controls.side.keys = ←  /  →
+controls.side = Atsistoti kairiajame / dešiniajame stalo gale
+controls.sit.keys = ↓
+controls.sit = Vėl atsisėsti (žaidžiama tik sėdint)
+controls.moves.keys = Tab
+controls.moves = Rodyti arba slėpti ėjimų sąrašą
+controls.menu.keys = Esc
+controls.menu = Meniu
+controls.coach_skip.keys = Tarpas
+controls.coach_skip = Treneris: praleisti trenerio kalbą
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Treneris: atšaukti ėjimą, kai tai siūloma
+controls.coach_hint.keys = H
+controls.coach_hint = Trenerio iššūkiai: paprašyti užuominos
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = RYŠKUMAS
+calibration.text = Stumkite šliaužiklį, kol žirgas ant tamsaus langelio bus vos matomas arba visai nebematomas.
+calibration.later = Vėliau tai galėsite pakeisti: Nustatymai > Grafika.
+calibration.continue = Tęsti
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NAUJA PARTIJA
+newgame.opponent = VARŽOVAS
+newgame.time_control = LAIKO KONTROLĖ
+newgame.start = Pradėti
+newgame.elo = ~{0} Elo
+newgame.you_white = Žaisite baltosiomis.
+newgame.you_black = Žaisite juodosiomis.
+newgame.colour_lot = Pirmojoje partijoje spalvos nustatomos burtų keliu.
+newgame.colour_alternate = Vėliau spalvos keičiasi kas partiją.
+newgame.opponent_kind = Varžovas
+newgame.opponent_kind.help = Žaiskite su Stockfish arba su draugu prie šio kompiuterio: ėjimus darote paeiliui, kiekvienas žaidėjas – iš savo lentos pusės.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Žmogus prie šio kompiuterio
+
+# Custom opponent: Stockfish parameters
+engine.skill = Žaidimo lygis
+engine.skill.help = Stockfish parametras „Skill Level“ (0–20). Nepaisomas, kai stiprumas ribojamas pagal Elo.
+engine.limit_elo = Riboti stiprumą (Elo)
+engine.limit_elo.help = UCI_LimitStrength: variklis siekia toliau nurodyto Elo reitingo.
+engine.elo = Elo
+engine.depth = Paieškos gylis
+engine.plies = {0} pusėjimis|{0} pusėjimiai|{0} pusėjimių
+engine.move_time = Laikas ėjimui
+engine.nodes = Mazgų riba
+engine.no_limit = Išjungta
+engine.thousand = {0} tūkst.
+engine.million = {0} mln.
+engine.dynamic_elo = Dinaminis Elo pagal laiką
+engine.dynamic_elo.help = Kaip ir žmogus, Stockfish žaidžia silpniau, kai jo laikas senka: šiek tiek silpniau paskutinę minutę (greituosiuose ir žaibo šachmatuose – anksčiau), daug silpniau, kai laiko beveik nelieka. Tik partijose su laikrodžiu.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish galvoja tiek, kiek savo lygio žmogus. Kad praleistumėte šią pauzę: Nustatymai > Žaidimas > Realistiškas mąstymo laikas.
+engine.pace.instant = Stockfish eina, vos tik apskaičiuoja. Kad pauzės būtų kaip žmogaus: Nustatymai > Žaidimas > Realistiškas mąstymo laikas.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Neribota
+tc.no_clock = Be laikrodžio
+tc.bullet = Kulka
+tc.blitz = Žaibas
+tc.rapid = Greitieji
+tc.classical = Klasikiniai
+tc.custom = Pasirinktinė
+tc.your_own = Savo nuožiūra
+tc.base_time = Pradinis laikas
+tc.base_time.help = Pradinis laikas kiekvieno žaidėjo laikrodyje (minutės : sekundės).
+tc.increment = Pridėtinis laikas
+tc.increment.help = Fischerio pridėtinis laikas, pridedamas po kiekvieno ėjimo.
+tc.delay = Delsa
+tc.delay.help = Bronšteino delsa: per šią delsą sunaudotas laikas po kiekvieno ėjimo grąžinamas.
+tc.no_delay = Nėra
+tc.seconds = {0} s
+tc.minutes = {0} min.
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, delsa {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Naujokas
+preset.novice.desc = Ką tik išmoko ėjimus: palieka figūras be apsaugos ir nepastebi paprastų grėsmių.
+preset.beginner.name = Pradedantysis
+preset.beginner.desc = Moka pagrindus, bet vis dar dažnai šiurkščiai klysta ir praranda medžiagą.
+preset.casual.name = Laisvalaikio žaidėjas
+preset.casual.desc = Ramus vakaro varžovas: protingi ėjimai, dažnos klaidos.
+preset.club_player.name = Klubo žaidėjas
+preset.club_player.desc = Tvirtas klubo žaidėjas, baudžiantis už akivaizdžias šiurkščias klaidas.
+preset.advanced.name = Pažengęs
+preset.advanced.desc = Stiprus klubo žaidėjas, gerai matantis taktiką.
+preset.expert.name = Ekspertas
+preset.expert.desc = Turnyrų ekspertas: retai klysta, pranašumą paverčia pergale.
+preset.master.name = Meistras
+preset.master.desc = Meistro stiprumas: gilus skaičiavimas ir subtilus pozicinis žaidimas.
+preset.grandmaster.name = Didmeistris
+preset.grandmaster.desc = Didmeistrio lygis: įveikti ypač sunku.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 visu pajėgumu. Sėkmės.
+preset.custom.name = Pasirinktinis
+preset.custom.desc = Variklio nustatymai jūsų nuožiūra.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = KŪRĖJAI
+credits.game.head = SCACELITH
+credits.game = Šachmatų žaidimas karališkoje salėje, veikiantis savo kūrimo OpenGL 4.6 varikliu.
+credits.engine.head = ŠACHMATŲ VARIKLIS
+credits.engine = Stockfish 19, sukurtas Stockfish kūrėjų.
+credits.engine.licence = GNU bendroji viešoji licencija v3.
+credits.engine.data = Jo neuroninis tinklas apmokytas duomenimis, kuriuos pateikė projektas Leela Chess Zero; jie platinami pagal Open Database License (ODbL).
+credits.voice.head = TRENERIO BALSAS
+credits.voice = Sintetinę kalbą trenerio režimui sugeneravo Supertonic 3.
+credits.voice.licence = Supertonic 3 – Supertone sukurtas modelis, naudojamas pagal OpenRAIL-M licenciją, kurios naudojimo apribojimai taikomi visiems jo naudotojams (žr. „Licencijos“).
+credits.openings.head = DEBIUTAI
+credits.openings = Debiutų pavadinimai paimti iš lichess.org šachmatų debiutų duomenų bazės, perduotos į viešąją sritį (CC0).
+credits.fonts.head = ŠRIFTAI
+credits.fonts = EB Garamond – Georg Duffner, Cinzel – Natanael Gama; Amiri – Khaled Hosny.
+credits.fonts.hand = Rašysena: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Šachmatų figūros iš GNU FreeFont (GPL v3 su šrifto išimtimi).
+credits.quote = „Šachmatai – analizės menas.“  — Michailas Botvinikas
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licencijos
+licences.title = LICENCIJOS
+licences.note = Licencijos pateikiamos originaliu tekstu anglų kalba.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUZĖ
+pause.resume = Tęsti
+pause.offer_draw = Siūlyti lygiąsias
+pause.claim_draw = Reikalauti lygiųjų
+pause.claim_draw.help = Trigubas pozicijos pasikartojimas arba penkiasdešimties ėjimų taisyklė.
+pause.resign = Pasiduoti
+confirm.resign.title = PASIDUOTI
+confirm.resign.text = Pasiduoti šioje partijoje? Laimėtoju bus paskelbtas varžovas.
+confirm.resign.draw = Pasiduoti šioje partijoje? Varžovas nebegali paskelbti mato: partija baigsis lygiosiomis.
+confirm.resign.ok = Pasiduoti
+confirm.leave.title = PALIKTI PARTIJĄ
+confirm.leave.text = Grįžti į pagrindinį meniu? Dabartinė partija bus nutraukta.
+confirm.leave.ok = Išeiti
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PĖSTININKO VIRSMAS
+piece.queen = Valdovė
+piece.rook = Bokštas
+piece.bishop = Rikis
+piece.knight = Žirgas
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partija baigėsi lygiosiomis.
+gameover.draw_moves = Partija baigėsi lygiosiomis po {0} ėjimo.|Partija baigėsi lygiosiomis po {0} ėjimų.|Partija baigėsi lygiosiomis po {0} ėjimų.
+gameover.win = Puikiai sužaista – jūs laimėjote.
+gameover.win_moves = Puikiai sužaista – laimėjote per {0} ėjimą.|Puikiai sužaista – laimėjote per {0} ėjimus.|Puikiai sužaista – laimėjote per {0} ėjimų.
+gameover.loss = Laimėjo varžovas.
+gameover.loss_moves = Varžovas laimėjo per {0} ėjimą.|Varžovas laimėjo per {0} ėjimus.|Varžovas laimėjo per {0} ėjimų.
+gameover.rematch = Revanšas
+gameover.view_board = Pažiūrėti lentą
+gameover.show = Rodyti
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Matas
+reason.resignation = Pasidavimas
+reason.timeout = Pralaimėjimas dėl laiko
+reason.illegal_moves = Antrasis neleistinas ėjimas (pralaimėjimas)
+reason.stalemate = Patas
+reason.insufficient = Negyva pozicija (nepakanka medžiagos)
+reason.timeout_vs_insufficient = Baigėsi laikas, bet varžovas negali paskelbti mato
+reason.fivefold = Penkiagubas pozicijos pasikartojimas
+reason.75_moves = 75 ėjimų taisyklė
+reason.threefold_claim = Trigubas pozicijos pasikartojimas (pareikalauta)
+reason.50_moves_claim = 50 ėjimų taisyklė (pareikalauta)
+reason.agreement = Lygiosios susitarus
+reason.illegal_vs_insufficient = Antrasis neleistinas ėjimas, bet varžovas negali paskelbti mato
+reason.resignation_vs_insufficient = Pasidavimas, bet varžovas negali paskelbti mato
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ĖJIMAI
+movelist.empty = Ėjimų dar nėra.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Ruošiamos medžiagos
+loading.hall = Statoma salė
+loading.furniture = Drožiami stalas ir kėdės
+loading.board = Poliruojama lenta
+loading.pieces = Tekinamos šachmatų figūros
+loading.clock = Surenkamas laikrodis
+loading.porcelain = Degamas porcelianas
+loading.ready = Paruošta
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Šioje pozicijoje reikalauti lygiųjų negalima.
+notify.flag_you = Jūsų laikas baigėsi.
+notify.flag_opponent = Varžovo laikas baigėsi.
+notify.touched.pawn = Paliestos figūros taisyklė: turite eiti paliestu pėstininku.
+notify.touched.knight = Paliestos figūros taisyklė: turite eiti paliestu žirgu.
+notify.touched.bishop = Paliestos figūros taisyklė: turite eiti paliestu rikiu.
+notify.touched.rook = Paliestos figūros taisyklė: turite eiti paliestu bokštu.
+notify.touched.queen = Paliestos figūros taisyklė: turite eiti paliesta valdove.
+notify.touched.king = Paliestos figūros taisyklė: turite eiti paliestu karaliumi.
+notify.touched.piece = Paliestos figūros taisyklė: turite eiti paliesta figūra.
+notify.touched_square = Paliestos figūros taisyklė: turite eiti figūra iš langelio {0}.
+notify.press_clock = Paspauskite laikrodį, kad užbaigtumėte ėjimą (tarpas).
+notify.manual_clock = Šioje partijoje laikrodis automatiškai nespaudžiamas: paspauskite jį po kiekvieno ėjimo.
+notify.illegal = Neleistinas ėjimas.
+notify.cannot_move = Tokio ėjimo padaryti negalima.
+notify.move_first = Pirma padarykite ėjimą, tada spauskite laikrodį.
+notify.stance.sit_to_play = Atsisėskite, kad galėtumėte žaisti (rodyklė žemyn).
+notify.stance.first = Kol stovite, laikrodis eina. Rodyklė žemyn – atsisėsti.
+notify.stance.first_untimed = Žaisti galima tik sėdint savo kėdėje. Rodyklė žemyn – atsisėsti.
+notify.stance.finish_move = Pirma užbaikite ėjimą.
+notify.draw_already_offered = Šiame ėjime lygiąsias jau pasiūlėte.
+notify.draw_accepted = Varžovas sutinka su lygiosiomis.
+notify.draw_declined = Varžovas atmeta lygiųjų pasiūlymą.
+notify.draw_claimed = Varžovas reikalauja lygiųjų.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Teisėjas: laikrodis paspaustas nepadarius ėjimo – tai laikoma neleistinu ėjimu.
+arbiter.unpromoted = Teisėjas: neleistinas ėjimas – prieš paspaudžiant laikrodį pėstininkas nebuvo pakeistas nauja figūra.
+arbiter.illegal = Teisėjas: neleistinas ėjimas.
+arbiter.second_loses.white = Tai antrasis baltųjų neleistinas ėjimas: baltieji pralaimi partiją.
+arbiter.second_loses.black = Tai antrasis juodųjų neleistinas ėjimas: juodieji pralaimi partiją.
+arbiter.second_draw.white = Tai antrasis baltųjų neleistinas ėjimas, bet juodieji negali paskelbti mato: partija baigiasi lygiosiomis.
+arbiter.second_draw.black = Tai antrasis juodųjų neleistinas ėjimas, bet baltieji negali paskelbti mato: partija baigiasi lygiosiomis.
+arbiter.queen = Pėstininkas virsta valdove.
+arbiter.queen_one_minute.white = Pėstininkas virsta valdove, o baltieji gauna vieną papildomą minutę.
+arbiter.queen_one_minute.black = Pėstininkas virsta valdove, o juodieji gauna vieną papildomą minutę.
+arbiter.queen_two_minutes.white = Pėstininkas virsta valdove, o baltieji gauna dvi papildomas minutes.
+arbiter.queen_two_minutes.black = Pėstininkas virsta valdove, o juodieji gauna dvi papildomas minutes.
+arbiter.restored = Pozicija atkurta.
+arbiter.restored_one_minute.white = Pozicija atkurta, o baltieji gauna vieną papildomą minutę.
+arbiter.restored_one_minute.black = Pozicija atkurta, o juodieji gauna vieną papildomą minutę.
+arbiter.restored_two_minutes.white = Pozicija atkurta, o baltieji gauna dvi papildomas minutes.
+arbiter.restored_two_minutes.black = Pozicija atkurta, o juodieji gauna dvi papildomas minutes.
+arbiter.one_minute.white = Baltieji gauna vieną papildomą minutę.
+arbiter.one_minute.black = Juodieji gauna vieną papildomą minutę.
+arbiter.two_minutes.white = Baltieji gauna dvi papildomas minutes.
+arbiter.two_minutes.black = Juodieji gauna dvi papildomas minutes.
+arbiter.second_loses = Antrasis neleistinas ėjimas reiškia pralaimėjimą.
+arbiter.touched.white = Baltieji privalo eiti paliesta figūra.
+arbiter.touched.black = Juodieji privalo eiti paliesta figūra.
+arbiter.game_over = Partija baigta.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Stebėti partiją
+
+viewer.title = STEBĖTI PARTIJĄ
+viewer.white = BALTIEJI
+viewer.black = JUODIEJI
+viewer.time_control = LAIKO KONTROLĖ
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Sukeisti spalvas
+viewer.note = Abu žaidėjai – Stockfish. Kol jie žaidžia, laisvai skraidykite po salę: niekas jūsų nematys.
+viewer.summary = {0} prieš {1}
+viewer.custom = Pasirinktinė
+viewer.tc.custom = Savo nuožiūra
+viewer.base_time = Pradinis laikas
+viewer.increment = Pridėtinis laikas
+viewer.delay = Delsa
+viewer.off = Išjungta
+viewer.minutes = {0} min.
+viewer.seconds = {0} s
+viewer.delay_summary = delsa {0} s
+viewer.back = Atgal
+viewer.start = Pradėti
+
+viewer.paused = PAUZĖ
+viewer.resume = Tęsti
+viewer.options = Nustatymai
+viewer.main_menu = Pagrindinis meniu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = VALDYMAS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  rodyklės
+viewer.controls.move = Judėti
+viewer.keys.updown = E, Tarpas  /  C, Ctrl
+viewer.controls.updown = Aukštyn / žemyn
+viewer.keys.fast = Shift
+viewer.controls.fast = Greičiau
+viewer.keys.look = Dešinysis pelės mygtukas
+viewer.controls.look = Apsidairyti
+viewer.keys.speed = Pelės ratukas
+viewer.controls.speed = Greitis
+viewer.keys.views = 1 – 9
+viewer.controls.views = Žiūrėjimo taškai
+viewer.keys.eyes = 0
+viewer.controls.eyes = Ėjimą darančio žaidėjo akimis
+viewer.keys.moves = Tab
+viewer.controls.moves = Ėjimų sąrašas
+viewer.keys.menu = Esc
+viewer.controls.menu = Meniu
+viewer.keys.hide = H
+viewer.controls.hide = Slėpti šį skydelį
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pauzė / tęsti
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Vienu ėjimu atgal / pirmyn
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Lėčiau / greičiau
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partijos pradžia / pabaiga
+viewer.speed = Greitis {0} m/s
+viewer.view.0 = Žaidėjų akimis
+viewer.view.1 = Prie stalo
+viewer.view.2 = Virš lentos
+viewer.view.3 = Salė
+viewer.view.4 = Laikrodis
+viewer.view.5 = Baltųjų veidas
+viewer.view.6 = Juodųjų veidas
+viewer.view.7 = Dvikova
+viewer.view.8 = Langai
+viewer.view.9 = Gobelenai
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Baltieji
+viewer.side.black = Juodieji
+viewer.flag.white = Baltųjų laikas baigėsi.
+viewer.flag.black = Juodųjų laikas baigėsi.
+viewer.claims_draw = {0} reikalauja lygiųjų.
+viewer.offer_accepted = {0} siūlo lygiąsias. {1} sutinka.
+viewer.offer_declined = {0} siūlo lygiąsias. {1} atsisako.
+viewer.gameover.white_wins = Baltieji laimėjo po ėjimo Nr. {0}.
+viewer.gameover.black_wins = Juodieji laimėjo po ėjimo Nr. {0}.
+viewer.gameover.draw = Partija baigėsi lygiosiomis po ėjimo Nr. {0}.
+viewer.gameover.players = {0} prieš {1}
+viewer.watch_again = Žiūrėti dar kartą
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Reitinginių partijų dar nėra
+elo.provisional = Preliminarus reitingas
+elo.peak = Aukščiausias: {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Jūsų Elo: {0}
+elo.expected = tikėtinas rezultatas {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · ši partija neturi įtakos reitingui
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partijos blankas
+scoresheet.event = Varžybos
+scoresheet.date = Data
+scoresheet.round = Turas
+scoresheet.board = Lenta
+scoresheet.page = Puslapis
+scoresheet.white = Baltieji
+scoresheet.black = Juodieji
+scoresheet.elo = Elo
+scoresheet.result = Rezultatas
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Baltųjų parašas
+scoresheet.sign_black = Juodųjų parašas
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Lithuanian letters: K karalius, V valdovė, B bokštas, R rikis, Ž žirgas; ISO date 2026-10-14.
+scoresheet.pieces = K V B R Ž
+scoresheet.date_format = {2}-{1}-{0}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Žaisti internetu
+online.title = ŽAISTI INTERNETU
+online.continue = Tęsti
+online.retry = Bandyti dar kartą
+online.copy = Kopijuoti
+online.copied = Nukopijuota
+online.copy.unavailable = Čia kopijuoti negalima: užsirašykite.
+online.rated = Reitinginė
+online.casual = Draugiška
+online.casual_only = Tik draugiška
+online.color.random = Burtų keliu
+online.ping = {0} ms
+online.conn.online = Prisijungta
+online.conn.connecting = Jungiamasi…
+online.conn.reconnecting = Jungiamasi iš naujo…
+online.conn.offline = Neprisijungta
+online.conn.incompatible = Kita versija
+online.no_server.text = Žaidimui internetu reikia Scacelith serverio. Nustatymuose įveskite serverio adresą arba žaiskite su draugu tiesioginiame mače.
+online.no_server.settings = Serverio nustatymai
+
+# Options > Online server
+options.tab.online = Interneto serveris
+options.online.server = Serveris
+options.online.server.help = Oficialus serveris arba pasirinktinis (bendruomenės) serveris, kurį valdo kas nors kitas; jis pasiekiamas per saugią žiniatinklio API ir saugų WebSocket ryšį. Kiekviename serveryje prisijungiate atskirai: paskyra ir jos prisijungimas niekada nebendrinami tarp serverių.
+options.online.official = Oficialus serveris – {0}
+options.online.community = Pasirinktinis serveris
+options.online.host = Serverio adresas
+options.online.host.hint = domeno vardas arba IP adresas
+options.online.host.help = Pasirinktinio serverio domeno vardas arba IP adresas, kaip jį nurodė serverio savininkas.
+options.online.api_port = API prievadas
+options.online.api_port.help = Serverio saugios žiniatinklio API prievadas (Scacelith serveriuose – 443).
+options.online.ws_port = WSS prievadas
+options.online.ws_port.hint = toks pat kaip API prievadas
+options.online.ws_port.help = Serverio saugaus WebSocket ryšio prievadas. Palikite tuščią, jei jis sutampa su API prievadu.
+options.online.pin = Sertifikato kontrolinis kodas (SHA-256)
+options.online.pin.hint = nebūtina
+options.online.pin.help = Serveriui su savarankiškai pasirašytu sertifikatu: SHA-256 kontrolinis kodas, kurį pateikia serverio savininkas (64 šešioliktainiai simboliai, dvitaškiai leidžiami). Palikite tuščią, kad būtų pasitikima sistemos sertifikatais.
+options.online.pin.invalid = Kontrolinį kodą sudaro 64 šešioliktainiai simboliai (dvitaškiai leidžiami).
+options.online.test = Tikrinti ryšį
+options.online.test_ok = {0}: prisijungta, suderinama su šia versija.
+options.online.test_incompatible = {0}: prisijungta, bet reikia kitos Scacelith versijos.
+options.online.in_game = Interneto partijos metu serverio pakeisti negalima.
+options.online.remember_session = Prisiminti mano prisijungimą, kai sistemos raktų saugykla nepasiekiama
+options.online.remember_session.help = Kai jokia sistemos raktų saugykla (GNOME Keyring, KWallet…) negali išsaugoti jūsų seanso, jis įrašomas į failą, kurį gali skaityti tik jūsų naudotojo paskyra. Kiekvienas, galintis skaityti jūsų failus ar jų kopiją, pavyzdžiui, atsarginę, galėtų tuo seansu pasinaudoti. Išjungta: prisijungimas galioja, kol žaidimas uždaromas. Bet kurį įrenginį galite atjungti skiltyje „Prisijungę įrenginiai“ savo paskyroje.
+
+# Sign in, create an account
+online.signin.lead = Prisijunkite prie {0}, kad galėtumėte žaisti su kitais žmonėmis internetu.
+online.field.user = Naudotojo vardas arba el. paštas
+online.field.user.hint = vardas arba adresas
+online.field.password = Slaptažodis
+online.field.password.hint = bent 10 simbolių
+online.field.password2 = Pakartokite slaptažodį
+online.field.current_password = Dabartinis slaptažodis
+online.field.new_password = Naujas slaptažodis
+online.field.username = Naudotojo vardas
+online.field.username.hint = 3–24 raidės, skaitmenys, _ arba -
+online.field.email = El. paštas
+online.field.new_email = Naujas el. paštas
+online.field.code = Kodas
+online.field.code.hint = 6 skaitmenys arba atkūrimo kodas
+online.field.code6 = Programėlės kodas
+online.field.code6.hint = 6 skaitmenys
+online.signin.button = Prisijungti
+online.signin.google = Tęsti su Google
+online.signin.register = Sukurti paskyrą
+online.signin.forgot = Pamiršote slaptažodį?
+online.mfa.title = DVIEJŲ VEIKSNIŲ KODAS
+online.mfa.lead = Įveskite 6 skaitmenų kodą, kurį rodo jūsų autentifikavimo programėlė, arba vieną iš atkūrimo kodų.
+online.mfa.verify = Patvirtinti
+online.register.title = SUKURTI PASKYRĄ
+online.register.lead = Nemokama paskyra serveryje {0}: jūsų vardas, reitingai ir partijos saugomi tik šiame serveryje.
+online.register.button = Sukurti paskyrą
+online.register.working = Kuriama jūsų paskyra… tai gali užtrukti kelias sekundes.
+online.register.ready = Paskyra paruošta. Prisijunkite ir žaiskite.
+online.password.mismatch = Slaptažodžiai nesutampa.
+online.check_email.title = PATIKRINKITE EL. PAŠTĄ
+online.check_email.text = Išsiuntėme nuorodą adresu {0}. Atidarykite ją, kad aktyvintumėte paskyrą, tada prisijunkite čia.
+online.check_email.ask = Įveskite savo paskyros el. pašto adresą, kad aktyvinimo nuoroda būtų atsiųsta dar kartą.
+online.check_email.resend = Siųsti laišką dar kartą
+online.check_email.resent = Laiškas išsiųstas dar kartą. Jis gali ateiti per kelias minutes; patikrinkite ir šlamšto aplanką.
+online.forgot.title = PAMIRŠOTE SLAPTAŽODĮ
+online.forgot.lead = Įveskite savo paskyros el. pašto adresą: atsiųsime nuorodą naujam slaptažodžiui pasirinkti.
+online.forgot.button = Siųsti nuorodą
+online.forgot.sent = Jei šiuo adresu užregistruota paskyra, nuoroda jau siunčiama.
+online.sso.title = PRISIJUNGIMAS SU GOOGLE
+online.sso.wait = Tęskite žiniatinklio naršyklėje: atsidariusiame lange pasirinkite savo Google paskyrą. Kai tik Google jus nukreips atgal, Scacelith tęs darbą.
+online.sso.name_title = PASIRINKITE VARDĄ
+online.sso.name_lead = Čia jungiatės su Google pirmą kartą. Pasirinkite vardą, kurį matys kiti žaidėjai.
+online.sso.continue = Tęsti
+online.sso.finishing = Google jus grąžino. Baigiamas prisijungimas…
+online.sso.link_title = PRIDĖTI PRISIJUNGIMĄ SU GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Paskyra {0} serveryje {1} jau naudoja šios Google paskyros el. pašto adresą. Įveskite tos paskyros slaptažodį, kad pridėtumėte prie jos prisijungimą su Google. Tai reikia padaryti tik vieną kartą.
+online.sso.link_button = Pridėti prisijungimą su Google
+online.sso.link_mfa = Prisijungimas su Google bus pridėtas prie šios paskyros, kai kodas bus priimtas.
+online.sso.not_mine = Tai ne mano paskyra
+online.sso.not_mine_note = Prisijungimas su Google nepridėtas. Jei šis el. pašto adresas jūsų, pasinaudokite su juo funkcija „Pamiršote slaptažodį?“: nuoroda bus išsiųsta į tą pašto dėžutę. Jei paskyra dar prašo dviejų veiksnių kodo, kurio neturite, kreipkitės į serverio administratorių.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: prisijungimas su Google
+online.sso.page.done_heading = Atgal į Scacelith
+online.sso.page.done = Google grąžino jus į Scacelith. Grįžkite į žaidimą, kad užbaigtumėte prisijungimą; šį skirtuką galite uždaryti.
+online.sso.page.cancelled_heading = Prisijungimas atšauktas
+online.sso.page.cancelled = Prisijungimas su Google atšauktas. Galite uždaryti šį skirtuką ir grįžti į Scacelith.
+online.sso.page.foreign_heading = Šis puslapis skirtas ne jums
+online.sso.page.foreign = Šis puslapis neatitinka prisijungimo, kurio Scacelith laukia šiame kompiuteryje. Jei ką tik nepradėjote prisijungimo su Google per Scacelith, gali būti, kad kažkas jums atsiuntė šią nuorodą: uždarykite šį skirtuką.
+
+# Account
+online.account.button = Paskyra
+online.account.title = PASKYRA
+online.account.section = PASKYRA
+online.account.username = NAUDOTOJO VARDAS
+online.account.email = EL. PAŠTAS
+online.account.unverified = (nepatvirtintas)
+online.account.mfa = DVIEJŲ VEIKSNIŲ AUTENTIFIKAVIMAS
+online.account.mfa_on = Įjungtas
+online.account.mfa_off = Išjungtas
+online.account.google = GOOGLE
+online.account.google_linked = Susieta su Google paskyra
+online.account.change_password = Keisti slaptažodį
+online.account.mfa_setup = Įjungti dviejų veiksnių autentifikavimą
+online.account.mfa_disable = Išjungti dviejų veiksnių autentifikavimą
+online.account.recovery = Nauji atkūrimo kodai
+online.account.sign_out = Atsijungti
+online.account.sign_out_all = Atsijungti visur
+online.account.sign_out_all.help = Atjungia šią paskyrą visuose kompiuteriuose, įskaitant šį.
+online.account.signed_out = Atsijungta.
+online.account.signed_out_all = Atsijungta visuose kompiuteriuose.
+online.account.signing_out_all = Atjungiami visi kompiuteriai…
+online.account.sign_out_all_failed = Kiti jūsų kompiuteriai gali būti vis dar prisijungę: prisijunkite dar kartą ir atjunkite juos skiltyje „Prisijungę įrenginiai“. {0}
+online.account.sign_out_all_retry = Kiti jūsų kompiuteriai gali būti vis dar prisijungę. Dar kartą pabandykite „Atsijungti visur“. {0}
+online.account.ratings = REITINGAI
+online.account.col.tc = LAIKO KONTROLĖ
+online.account.col.rating = REITINGAS
+online.account.col.games = PARTIJOS
+# Wins / draws / losses as in chess notation (+ = −): no clear three-letter Lithuanian abbreviation.
+online.account.col.record = + / = / −
+online.account.provisional = Klaustukas žymi preliminarų reitingą (sužaista dar nedaug partijų).
+online.password.title = KEISTI SLAPTAŽODĮ
+online.password.button = Keisti slaptažodį
+online.password.changed = Slaptažodis pakeistas.
+online.password.other_sessions = Kituose jūsų kompiuteriuose reikės prisijungti iš naujo.
+online.mfa_setup.title = DVIEJŲ VEIKSNIŲ AUTENTIFIKAVIMAS
+online.mfa_setup.lead = Dviejų veiksnių autentifikavimas kiekvieną kartą prisijungiant paprašo kodo iš programėlės jūsų telefone. Įveskite slaptažodį, kad pradėtumėte.
+online.mfa_setup.scan = 1. Nuskaitykite šį kodą autentifikavimo programėle arba įveskite į ją šį raktą:
+online.mfa_setup.enter = 2. Įveskite 6 skaitmenų kodą, kurį rodo programėlė:
+online.mfa_setup.enable = Įjungti
+online.mfa_setup.done = Dviejų veiksnių autentifikavimas įjungtas.
+# Short on purpose: this page title is not fitted, and the full term overflows its 980 px panel.
+online.mfa_off.title = IŠJUNGTI 2FA
+online.mfa_off.lead = Įveskite slaptažodį ir kodą iš programėlės (arba atkūrimo kodą).
+online.mfa_off.button = Išjungti
+online.mfa.off_done = Dviejų veiksnių autentifikavimas išjungtas.
+online.recovery.title = ATKŪRIMO KODAI
+online.recovery.lead = Jei pamestumėte telefoną, kiekvienu kodu galėsite prisijungti vieną kartą. Laikykite juos saugioje vietoje: jie rodomi tik dabar.
+online.recovery.saved = Išsaugojau
+online.recovery.new_title = NAUJI ATKŪRIMO KODAI
+online.recovery.new_lead = Nauji kodai pakeičia senuosius. Įveskite slaptažodį ir kodą iš programėlės.
+online.recovery.button = Nauji kodai
+online.account.manage = SAUGUMAS IR DUOMENYS
+online.account.pending_email = Laukiama patvirtinimo: {0}
+online.account.accept_challenges = Priimti iššūkius
+online.account.accept_challenges.help = Kiti žaidėjai gali mesti jums iššūkį pagal jūsų naudotojo vardą. Išjungta: jų iššūkiai atmetami.
+online.account.history = Partijų istorija
+online.account.devices = Prisijungę įrenginiai
+online.account.change_email = Keisti el. paštą
+online.account.export = Atsisiųsti mano duomenis
+online.account.delete = Ištrinti paskyrą
+
+# Play
+online.play.signed_in = Prisijungta kaip {0}
+online.session.file = Jokia sistemos raktų saugykla negalėjo išsaugoti jūsų prisijungimo: jis įsimenamas faile, kurį gali skaityti tik jūsų naudotojo paskyra (Nustatymai > Interneto serveris).
+online.session.memory = Jokia sistemos raktų saugykla negalėjo išsaugoti jūsų prisijungimo, o į failą jis neįrašomas: prisijungimas galioja, kol žaidimas uždaromas (Nustatymai > Interneto serveris).
+online.play.find_section = RASTI VARŽOVĄ
+online.play.friend_section = ŽAISTI SU DRAUGU
+online.play.mode = Partija
+online.play.mode.help = Reitinginės partijos keičia jūsų reitingą šioje laiko kontrolėje, draugiškos – ne.
+online.play.find = Rasti varžovą
+online.play.connecting = Jungiamasi prie serverio…
+online.play.cooldown = Varžovo vėl galėsite ieškoti nuo {0}.
+online.play.banned = Ši paskyra sustabdyta iki {0}.
+online.play.challenge = Mesti iššūkį žaidėjui
+online.play.challenge.desc = Pakvieskite prisijungusį žaidėją pagal jo naudotojo vardą.
+online.play.private = Privati partija
+online.play.private.desc = Sukurkite kodą ir duokite jį draugui arba prisijunkite su draugo kodu.
+online.play.direct = Tiesioginis mačas
+online.play.direct.desc = Be serverio: žaiskite tiesiogiai su draugo kompiuteriu.
+online.search.title = IEŠKOMA
+online.search.window = Reitingų intervalas {0}
+online.search.queued = {0} žaidėjas ieško|{0} žaidėjai ieško|{0} žaidėjų ieško
+online.search.wait = Ieškoma jūsų lygio varžovo…
+online.outgoing.challenge = IŠŠŪKIS IŠSIŲSTAS
+online.outgoing.waiting = laukiama atsakymo
+online.outgoing.private = PRIVATI PARTIJA
+online.outgoing.private_hint = Duokite šį kodą draugui: partija prasidės, kai draugas prisijungs.
+online.challenge.title = MESTI IŠŠŪKĮ ŽAIDĖJUI
+online.challenge.opponent = VARŽOVAS
+online.field.opponent = Naudotojo vardas
+online.field.opponent.hint = kam mesti iššūkį
+online.challenge.note = Varžovas pamatys iššūkį, kad ir kurioje meniu vietoje būtų, ir turės minutę atsakyti.
+online.challenge.send = Siųsti iššūkį
+online.terms.rated = Reitinginė
+online.terms.rated.help = Reitinginės gali būti tik oficialių laiko kontrolių partijos.
+online.terms.color = Jūsų spalva
+online.private.title = PRIVATI PARTIJA
+online.private.create_section = SUKURTI
+online.private.create_note = Gausite trumpą kodą: kas jį įves, žais su jumis.
+online.private.create = Sukurti partiją
+online.private.join_section = PRISIJUNGTI
+online.field.private_code = Kodas
+online.private.join = Prisijungti
+online.private.joining = Jungiamasi prie partijos…
+online.challenge.received = IŠŠŪKIS
+online.challenge.accept = Priimti
+online.challenge.decline = Atmesti
+online.challenge.you_white = jūs žaidžiate baltosiomis
+online.challenge.you_black = jūs žaidžiate juodosiomis
+online.challenge.you_random = spalvos burtų keliu
+online.challenge.declined = {0} atmetė jūsų iššūkį.
+online.challenge.expired = Į jūsų iššūkį neatsakyta – jis nebegalioja.
+online.challenge.unavailable = {0} šiuo metu negali priimti iššūkio.
+online.challenge.lost = Ryšys nutrūko: jūsų iššūkis atšauktas.
+
+# At the table
+online.pause.clock_runs = Partija tęsiasi: jūsų laikrodis eina.
+online.pause.abort = Nutraukti partiją
+online.pause.abort.help = Iki pirmojo jūsų ėjimo partiją galima nutraukti; ji neįskaitoma.
+online.pause.leave = Palikti partiją
+online.confirm.resign.text = Pasiduoti šioje partijoje? Ją laimės varžovas.
+online.confirm.leave.text = Išėjimas reiškia pasidavimą šioje partijoje: ją laimės varžovas.
+online.confirm.leave.ok = Pasiduoti ir išeiti
+online.confirm.leave_abort.text = Išeiti prieš pirmąjį savo ėjimą? Partija bus nutraukta ir neįskaityta.
+online.confirm.leave_abort.ok = Nutraukti ir išeiti
+online.draw.card_title = LYGIŲJŲ PASIŪLYMAS
+online.draw.card_text = Varžovas siūlo lygiąsias.
+online.draw.accept = Priimti
+online.draw.decline = Atmesti
+online.draw.offered = Varžovas siūlo lygiąsias.
+online.opponent_back = Varžovas sugrįžo.
+online.opponent_away = Varžovas atsijungė – grįžti liko {0}
+online.first_move = Jūsų pirmasis ėjimas · {0}
+online.reconnecting = JUNGIAMASI IŠ NAUJO…
+online.reconnecting.text = Partija serveryje tęsiasi ir jūsų laikrodis eina.
+online.gameover.aborted = Partija nutraukta: ji neįskaitoma.
+online.rating.casual = Draugiška partija: reitingai nepakito.
+online.rating.change = Reitingas {0} → {1} ({2})
+online.rating.pending = Reitingas: …
+online.rematch.accept = Priimti revanšą
+online.rematch.offered = Varžovas siūlo revanšą.
+online.rematch.waiting = Revanšas pasiūlytas…
+online.rematch.gone = Revanšo nebus
+online.rematch.declined = Šį kartą revanšo nebus.
+online.report.button = Pranešti apie varžovą
+online.report.title = PRANEŠIMAS
+online.report.lead = Pranešimai kartu su šia partija perduodami serverio moderatoriams. Ačiū, kad padedate išlaikyti sąžiningą žaidimą.
+online.report.category = Priežastis
+online.report.cheating = Sukčiavimas
+online.report.abuse = Įžeidus elgesys
+online.report.other = Kita
+online.report.comment = Komentaras
+online.report.comment.hint = nebūtina
+online.report.send = Siųsti pranešimą
+online.report.sent = Pranešimas išsiųstas. Ačiū.
+online.report.queued = Jūsų pranešimas bus išsiųstas, kai partija baigsis.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Internetu, {0}, {1}
+online.sheet.rated = reitinginė
+online.sheet.casual = draugiška
+online.sheet.game = Partija Nr. {0}
+# End reasons of online games
+reason.online.abandonment = Varžovas paliko partiją
+reason.online.abandonment_vs_insufficient = Partija palikta, bet varžovas negali paskelbti mato
+reason.online.aborted = Partija nutraukta
+reason.online.no_show = Laiku nepadarytas pirmasis ėjimas (nutraukta)
+reason.online.forfeit = Techninis pralaimėjimas
+reason.online.server_aborted = Nutraukė serveris
+reason.online.both_disconnected = Abu žaidėjai atsijungė
+# Server notices
+online.notice.shutdown = Serveris bus paleistas iš naujo po {0}. Vykstančios partijos išsaugomos.
+online.notice.revoked = Jūsų prisijungimas prie šio serverio nutrauktas.
+online.notice.replaced = Jūsų paskyra prisijungė iš kito lango; šiame lange ryšys nutrauktas.
+online.notice.rating_restored = Jums grąžintas {0} reitingo taškas: varžovas užblokuotas už sukčiavimą.|Jums grąžinti {0} reitingo taškai: varžovas užblokuotas už sukčiavimą.|Jums grąžinta {0} reitingo taškų: varžovas užblokuotas už sukčiavimą.
+# Errors
+online.err.rate_limited_for = Per daug bandymų. Bandykite dar kartą po {0}.
+online.err.rate_limited = Per daug bandymų. Netrukus bandykite dar kartą.
+online.err.server_busy_for = Serveris užimtas. Bandykite dar kartą po {0}.
+online.err.server_busy = Serveris užimtas. Netrukus bandykite dar kartą.
+online.err.banned_until = Ši paskyra sustabdyta iki {0}.
+online.err.banned = Ši paskyra sustabdyta.
+online.err.invalid_credentials = Neteisingas naudotojo vardas arba slaptažodis.
+online.err.invalid_credentials_pending = Neteisingas naudotojo vardas arba slaptažodis. Jei ką tik užsiregistravote, pirmiausia atidarykite mūsų atsiųstą nuorodą.
+online.err.email_unverified = Jūsų el. pašto adresas dar nepatvirtintas: atidarykite mūsų atsiųstą nuorodą.
+online.err.network = Nepavyksta pasiekti serverio. Patikrinkite ryšį ir serverio adresą.
+online.err.tls = Nepavyko užmegzti saugaus ryšio su serveriu.
+online.err.certificate = Serverio sertifikatas nepatikimas (arba neatitinka nustatymuose nurodyto kontrolinio kodo).
+online.err.incompatible = Šiam serveriui reikia kitos Scacelith versijos.
+online.err.unauthorized = Jūsų seansas baigėsi: prisijunkite iš naujo.
+online.err.username_taken = Šis naudotojo vardas jau užimtas.
+online.err.email_taken = Šiuo el. pašto adresu jau užregistruota paskyra.
+online.err.invalid_username = Naudotojo vardą sudaro 3–24 raidės, skaitmenys, _ arba -.
+online.err.invalid_email = Šis el. pašto adresas netinkamas.
+online.err.weak_password = Šis slaptažodis per silpnas: naudokite bent 10 simbolių.
+online.err.invalid_code = Šis kodas neteisingas.
+online.err.expired = Šios užklausos galiojimas baigėsi: pradėkite iš naujo.
+online.err.registration_closed = Šis serveris nepriima naujų paskyrų.
+online.err.sso_cancelled = Prisijungimas su Google atšauktas.
+online.err.sso_expired = Prisijungimas su Google užtruko per ilgai arba jau buvo panaudotas. Pradėkite iš naujo.
+online.err.sso_failed = Prisijungti su Google nepavyko. Bandykite dar kartą.
+online.err.sso_listen = Scacelith negalėjo gauti Google atsakymo šiame kompiuteryje. Bandykite dar kartą.
+online.err.sso_origin = Prisijungimas su Google neveikia per šį serverio adresą. Pridėkite serverį viešuoju vardu, kurį nurodo jo administratorius, ir bandykite dar kartą.
+online.err.browser = Nepavyko atidaryti žiniatinklio naršyklės.
+online.err.sso_email_unverified = Google nepatvirtino šios Google paskyros el. pašto adreso.
+online.err.sso_account_exists = Šiuo el. pašto adresu jau užregistruota paskyra, kurios negalima susieti su prisijungimu per Google: prisijunkite jos slaptažodžiu arba pasinaudokite funkcija „Pamiršote slaptažodį?“.
+online.err.sso_already_linked = Ši Google paskyra jau susieta su kita paskyra.
+online.err.account_disabled = Šios paskyros nebegalima naudoti.
+online.err.server_error = Serveryje įvyko klaida. Bandykite dar kartą.
+online.err.timeout = Serveris laiku neatsakė.
+online.err.offline = Neprisijungta prie serverio: bandykite dar kartą, kai ryšys bus atkurtas.
+online.err.other = Serveris atmetė užklausą ({0}).
+online.err.code = Serveris atmetė užklausą (klaida {0}).
+online.err.slow_down = Šiek tiek sulėtinkite tempą.
+online.err.server_full = Serveris perpildytas. Bandykite vėliau.
+online.err.restarting = Serveris paleidžiamas iš naujo. Netrukus bandykite dar kartą.
+online.err.move_refused = Serveris atmetė šį ėjimą: lentoje atkurta ankstesnė padėtis.
+online.err.game_over = Ši partija jau baigta.
+online.err.already_in_game = Jūs jau žaidžiate partiją.
+online.err.invalid_category = Ši laiko kontrolė čia nesiūloma.
+online.err.draw_offer_limit = Kol kas daugiau lygiųjų siūlyti negalima.
+online.err.abort_not_allowed = Partijos nutraukti nebegalima.
+online.err.no_pending_offer = Nėra pasiūlymo, į kurį reikėtų atsakyti.
+online.err.flag_fell = Jūsų laikas baigėsi.
+online.err.queue_not_allowed = Šiuo metu negalite ieškoti varžovo.
+online.err.challenge_not_found = Šio iššūkio nebėra.
+online.err.user_unavailable = Šis žaidėjas nepasiekiamas.
+online.err.challenge_limit = Kol kas per daug iššūkių. Bandykite vėliau.
+online.err.challenge_self = Negalite mesti iššūkio sau.
+online.err.code_invalid = Partijos su tokiu kodu nėra.
+online.err.rated_official_tc = Reitinginės gali būti tik oficialių laiko kontrolių partijos.
+online.err.cooldown = Varžovų paieška jums trumpam sustabdyta.
+online.err.invalid_tc = Ši laiko kontrolė neleidžiama.
+online.err.rematch_unavailable = Revanšas nebegalimas.
+online.err.rated_repeat_limit = Kol kas su šiuo žaidėju sužaidėte pakankamai reitinginių partijų. Sužaiskite draugišką partiją arba bandykite vėliau.
+online.err.cheat_detected = Partiją sustabdė serverio sąžiningo žaidimo patikra.
+online.err.invalid_password = Neteisingas slaptažodis.
+online.err.mfa_code_required = Įveskite kodą iš autentifikavimo programėlės (arba atkūrimo kodą).
+online.err.password_not_set = Ši paskyra prisijungia per Google ir dar neturi slaptažodžio. Pirmiausia jį nustatykite prisijungimo puslapyje, per funkciją „Pamiršote slaptažodį?“.
+online.err.too_many_attempts = Per daug nesėkmingų bandymų. Bandykite vėliau.
+online.err.too_many_attempts_for = Per daug nesėkmingų bandymų. Bandykite dar kartą po {0}.
+online.err.same_email = Tai jau yra jūsų el. pašto adresas.
+online.err.not_found = Serveryje nerasta.
+online.err.invalid_response = Nepavyko perskaityti serverio atsakymo.
+online.err.storage = Nepavyko išsaugoti seanso šiame kompiuteryje.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PARTIJŲ ISTORIJA
+online.history.filter.games = Partijos
+online.history.filter.result = Rezultatas
+online.history.filter.all = Visos
+online.history.filter.won = Laimėtos
+online.history.filter.lost = Pralaimėtos
+online.history.filter.drawn = Lygiosios
+online.history.col.date = DATA
+online.history.col.opponent = VARŽOVAS
+online.history.col.result = REZULTATAS
+online.history.col.tc = LAIKO KONTROLĖ
+online.history.col.kind = TIPAS
+online.history.col.rating = REITINGAS
+online.history.won = Pergalė
+online.history.lost = Pralaimėjimas
+online.history.drawn = Lygiosios
+online.history.aborted = Nutraukta
+online.history.page = Puslapis {0} iš {1}
+online.history.total = {0} partija|{0} partijos|{0} partijų
+online.history.previous = Ankstesnis
+online.history.next = Kitas
+online.history.empty.title = PARTIJŲ DAR NĖRA
+online.history.empty = Čia bus rodomos jūsų šiame serveryje sužaistos partijos, kai tik jos baigsis.
+online.history.empty_filter.title = PARTIJŲ NĖRA
+online.history.empty_filter = Nė viena partija neatitinka šių filtrų.
+online.history.error = NEPAVYKO ĮKELTI ISTORIJOS
+online.history.unavailable = ŠIS SERVERIS NETEIKIA PARTIJŲ ISTORIJOS
+online.game.title = PARTIJA
+online.game.players = ŽAIDĖJAI
+online.game.you = JŪS
+online.game.unrated = Be reitingo
+online.game.you_won = Laimėjote
+online.game.you_lost = Pralaimėjote
+online.game.draw = Lygiosios
+online.game.you_left = Palikote partiją
+online.game.date = DATA
+online.game.time_control = LAIKO KONTROLĖ
+online.game.moves = ĖJIMAI
+online.game.move_count = {0} ėjimas|{0} ėjimai|{0} ėjimų
+online.game.no_moves = Nepadaryta nė vieno ėjimo.
+online.game.moves_incomplete = Kai kurių ėjimų nepavyko perskaityti: sąrašas nutrūksta anksčiau nei partija.
+online.game.save = Įrašyti partiją
+online.game.saved_button = Įrašyta
+online.game.saved = Partija įrašyta: ją rasite skiltyje „Įrašytos partijos“.
+online.game.already_saved = Ši partija jau yra skiltyje „Įrašytos partijos“.
+online.game.save_failed = Nepavyko įrašyti partijos.
+online.game.invalid = Serveris atsiuntė partijos įrašą, kurio neįmanoma perskaityti.
+online.game.replay = Peržiūrėti
+online.game.not_found = PARTIJA NERASTA
+online.game.error = NEPAVYKO ĮKELTI PARTIJOS
+online.devices.title = PRISIJUNGĘ ĮRENGINIAI
+online.devices.lead = Įrenginiai, kuriuose prisijungta prie šios paskyros. Jei kurio nors neatpažįstate, atjunkite jį ir pakeiskite slaptažodį.
+online.devices.unknown = Nežinomas įrenginys
+online.devices.this = ŠIS ĮRENGINYS
+online.devices.signed_in = Prisijungta: {0}
+online.devices.last_active = paskutinė veikla: {0}
+online.devices.active_now = naudojamas dabar
+online.devices.sign_out = Atjungti
+online.devices.signed_out = Tas įrenginys atjungtas.
+online.devices.error = NEPAVYKO ĮKELTI ĮRENGINIŲ
+online.devices.all.title = ATSIJUNGTI VISUR
+online.email.title = KEISTI EL. PAŠTĄ
+online.email.current = Dabartinis adresas: {0}
+online.email.button = Keisti el. paštą
+online.email.sent = Patvirtinimo nuoroda išsiųsta adresu {0}.
+online.email.sent.hint = Adresas bus pakeistas, kai atidarysite nuorodą. Iki tol naudojamas dabartinis adresas.
+online.email.done = Baigta
+online.email.changed = Jūsų el. pašto adresas pakeistas.
+online.export.title = ATSISIŲSTI MANO DUOMENIS
+online.export.lead = Viskas, ką šis serveris saugo apie jūsų paskyrą (profilis, reitingai, partijos, įrenginiai, saugos įvykiai), įrašoma į JSON failą šiame kompiuteryje. Įveskite slaptažodį, kad patvirtintumėte.
+online.export.button = Atsisiųsti
+online.export.saved = Jūsų duomenys įrašyti šiame kompiuteryje.
+online.export.failed = Nepavyko įrašyti failo.
+online.delete.title = IŠTRINTI PASKYRĄ
+online.delete.warning = Jūsų paskyra bus ištrinta iš šio serverio: el. pašto adresas, slaptažodis, dviejų veiksnių autentifikavimas ir įrenginiai bus panaikinti ir nebegalėsite prisijungti. Šio veiksmo atšaukti negalima.
+online.delete.games = Jūsų partijos ir reitingai liks serveryje anoniminiu vardu {0}.
+online.delete.confirm_name = Kad patvirtintumėte, įveskite savo naudotojo vardą ir slaptažodį.
+online.delete.button = Ištrinti mano paskyrą
+online.delete.done = Jūsų paskyra ištrinta.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Tiesioginis mačas
+online.direct.title = TIESIOGINIS MAČAS
+online.direct.lead = Draugiška partija tiesiogiai tarp dviejų kompiuterių: be serverio, be paskyros, niekada neturi įtakos reitingui.
+online.direct.host = Surengti partiją
+online.direct.host.desc = Draugas jungiasi prie jūsų: perduodate draugui savo adresą ir kodą.
+online.direct.join = Prisijungti prie partijos
+online.direct.join.desc = Prisijunkite prie draugo surengtos partijos.
+online.direct.host_title = SURENGTI PARTIJĄ
+online.direct.your_color = Jūsų spalva
+online.direct.auto_press.help = Abu robotai patys paspaudžia laikrodį, kai tik ėjimas padarytas lentoje. Išjungta: laikrodį po kiekvieno ėjimo spaudžia pats žaidėjas.
+online.direct.unrated = Tiesioginiai mačai yra draugiškos partijos: jos niekada neturi įtakos reitingui.
+online.direct.connection = RYŠYS
+online.direct.port = Prievadas
+online.direct.port.help = TCP prievadas, prie kurio jungiasi jūsų draugas (47100, jei jis neužimtas).
+online.direct.port_range = Pasirinkite prievadą nuo 1024 iki 65535.
+online.direct.upnp = Atverti prievadą maršrutizatoriuje (UPnP)
+online.direct.upnp.help = Paprašo namų maršrutizatoriaus nukreipti prievadą į šį kompiuterį, o po partijos jį uždaro.
+online.direct.host_note_upnp = Žaidimas paprašys maršrutizatoriaus atverti prievadą. Jei nepavyks, sužinosite, kurį prievadą nukreipti rankiniu būdu.
+online.direct.host_note_manual = Maršrutizatoriuje nukreipkite TCP prievadą į šį kompiuterį arba žaiskite tame pačiame tinkle.
+online.direct.host_button = Surengti
+online.direct.wait_title = LAUKIAMA DRAUGO
+online.direct.opening = Atveriamas prievadas {0} maršrutizatoriuje…
+online.direct.give = Perduokite draugui:
+online.direct.cap_address = ADRESAS
+online.direct.cap_port = PRIEVADAS
+online.direct.cap_code = KODAS
+online.direct.lan = Tame pačiame tinkle: {0}
+online.direct.router = jūsų maršrutizatorius
+online.direct.upnp_searching = Ieškoma jūsų maršrutizatoriaus…
+online.direct.upnp_mapped = Prievadą atvėrė {0}.
+online.direct.upnp_none = Neatsakė joks UPnP maršrutizatorius: rankiniu būdu nukreipkite TCP prievadą {0} į šį kompiuterį.
+online.direct.upnp_failed = Maršrutizatorius atsisakė atverti prievadą: rankiniu būdu nukreipkite TCP prievadą {0} į šį kompiuterį.
+online.direct.upnp_off = Maršrutizatoriuje nukreipkite TCP prievadą {0} į šį kompiuterį.
+online.direct.upnp_cgnat = Jūsų interneto paslaugų teikėjas tikriausiai bendrina jūsų interneto adresą (CGNAT): pabandykite IPv6 arba VPN.
+online.direct.firewall = Jei Windows paklaus, ar leisti Scacelith priimti ryšius, leiskite.
+online.direct.waiting = Laukiama draugo…
+online.direct.connecting_friend = Draugas jungiasi…
+online.direct.starting = Ruošiama lenta…
+online.direct.join_title = PRISIJUNGTI PRIE PARTIJOS
+online.direct.join_lead = Įveskite tai, ką pasakys draugas: adresą, prievadą ir kodą.
+online.direct.address = Adresas
+online.direct.address.hint = IPv4, IPv6 arba vardas
+online.direct.code = Kodas
+online.direct.join_button = Prisijungti
+online.direct.connecting_to = Jungiamasi prie {0}…
+online.direct.securing = Apsaugomas ryšys su {0}…
+direct.event = Draugiškas mačas
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Tiesioginis, {0}
+direct.err.refused = Šiuo adresu ir prievadu niekas nerengia partijos.
+direct.err.timeout = Atsakymo nėra: patikrinkite adresą ir prievadą, taip pat ar draugo maršrutizatorius praleidžia žaidimą.
+direct.err.wrong_code = Kodas neteisingas.
+direct.err.invalid_code = Kodą sudaro 12 simbolių (XXXX-XXXX-XXXX).
+direct.err.incompatible = Jūsų draugas turi kitą Scacelith versiją.
+direct.err.port_in_use = Šis prievadas šiame kompiuteryje jau naudojamas: pasirinkite kitą.
+direct.err.network = Nepavyko pasinaudoti tinklu.
+direct.err.too_many_attempts = Per daug neteisingų kodų: partijos rengimas sustabdytas. Surenkite partiją iš naujo, kad gautumėte naują kodą.
+direct.err.bad_address = Šis adresas netinkamas.
+direct.err.not_found = Šis vardas nerastas.
+direct.err.unreachable = Šis adresas iš čia nepasiekiamas.
+direct.err.reset = Ryšys nutrauktas.
+direct.err.closed = Ryšys uždarytas.
+direct.err.host_left = Jūsų draugas nutraukė partijos rengimą.
+direct.err.other = Nepavyko užmegzti ryšio ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Žaidėjas 2
+hotseat.white_player = Baltieji
+hotseat.black_player = Juodieji
+hotseat.name.help = Vardas, rašomas abiejuose partijos blankuose, bet kuria abėcėle.
+hotseat.swap = Sukeisti spalvas
+hotseat.left_hand = {0} žaidžia kaire ranka: laikrodis stovi kairėje.
+hotseat.rated = Reitinginė partija
+hotseat.rated.help = Kiekvienas vardas šiame kompiuteryje turi savo dviejų žaidėjų reitingą. Jūsų reitingas prieš Stockfish niekada nesikeičia.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Dviejų žaidėjų reitingai: {0} {1} · {2} {3}
+hotseat.new_rating = (naujas)
+hotseat.friendly_note = Draugiška partija: reitingai nesikeičia.
+hotseat.colours = {0} žaidžia baltosiomis, {1} – juodosiomis.
+hotseat.colours_swap = Kiekviename revanše spalvos sukeičiamos.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+# Names cannot be declined: they stay in the nominative ("{0} pasiduoda?"), never after a genitive.
+hotseat.your_move = {0}, jūsų ėjimas
+hotseat.flag = {0}: laikas baigėsi.
+hotseat.confirm.resign = {0} pasiduoda? Partiją laimės {1}.
+hotseat.confirm.resign_draw = {0} pasiduoda? {1} nebegali paskelbti mato: partija baigsis lygiosiomis.
+hotseat.draw.offer_noted = Jūsų lygiųjų pasiūlymas perduodamas kartu su ėjimu: {0} jį pamatys, kai paspausite laikrodį.
+hotseat.draw.card_title = LYGIŲJŲ PASIŪLYMAS
+hotseat.draw.offered = {0} siūlo lygiąsias.
+hotseat.draw.card_hint = Palietus figūrą, pasiūlymas atmetamas.
+hotseat.draw.accept = Priimti
+hotseat.draw.decline = Atmesti
+hotseat.draw.accepted = {1} pasiūlė lygiąsias – {0} sutinka.
+hotseat.draw.declined = {1} pasiūlė lygiąsias – {0} atsisako.
+# Scoresheet header note
+hotseat.sheet.rated = Reitinginė partija
+hotseat.sheet.friendly = Draugiška partija
+# Game over card
+hotseat.gameover.wins = {0} laimėjo per {1} ėjimą.|{0} laimėjo per {1} ėjimus.|{0} laimėjo per {1} ėjimų.
+hotseat.gameover.wins_now = {0} laimėjo.
+hotseat.gameover.friendly = {0} prieš {1} · draugiška partija
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Ši partija neturi įtakos reitingui.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Treneris
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Sintetinę kalbą trenerio režimui sugeneravo {0}
+# Coach page
+coach.title = TRENERIS
+coach.section.level = LYGIS
+coach.section.lesson = SU TRENERIU
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Žaidėjams, kurių reitingas {0}
+coach.completed = Įveikta
+coach.recommended = Rekomenduojama
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+# Level names as the coach quotes them (appraisal.level.* in assets/coach/speech/lt/appraisal.lang).
+coach.level.0.name = Šachmatų taisyklės
+coach.level.0.desc = Interaktyvi pamoka, po vieną taisyklę.
+coach.level.0.detail = Treneris išdėsto nedideles pozicijas ir parodo, kaip kiekviena figūra eina ir kerta, o paskui – rokiruotę, pėstininko virsmą, šachą ir matą. Kiekvieną idėją lentoje išbandote savarankiškai.
+coach.level.1.name = Pirmieji žingsniai
+coach.level.1.desc = Kas puolama, kas paliekama neapginta.
+coach.level.1.detail = Treneris žaidžia švelniai ir kalba paprastai: kurios jūsų figūros puolamos, kurios paliktos be apsaugos ir kaip jas išsaugoti.
+coach.level.2.name = Pradedantysis
+coach.level.2.desc = Paprasta taktika, figūrų vystymas, karaliaus saugumas.
+coach.level.2.detail = Šakutės ir surišimai vadinami savo vardais. Treneris kalba apie figūrų išvedimą ir karaliaus saugumą.
+coach.level.3.name = Mėgėjas
+coach.level.3.desc = Planai, pėstininkų struktūra, vieninteliai ėjimai.
+coach.level.3.detail = Treneris aiškina planus ir pėstininkų struktūras bei įspėja, kai poziciją išlaiko tik vienas ėjimas.
+coach.level.4.name = Klubo žaidėjas
+coach.level.4.desc = Ėjimai kandidatai, įvertinimas pėstininkais.
+coach.level.4.detail = Treneris pasveria ėjimus kandidatus ir pateikia įvertinimą pėstininkais, kaip tai darytų klubo treneris.
+coach.level.5.name = Stiprus klubo žaidėjas
+coach.level.5.desc = Glausti variantai, pozicinės sąvokos.
+coach.level.5.detail = Trumpos pastabos, konkretūs variantai ir pozicinio žaidimo žodynas.
+coach.level.6.name = Ekspertas
+coach.level.6.desc = Lakoniškos pastabos, gilūs variantai, įvertinimai skaičiais.
+coach.level.6.detail = Nedaug žodžių, kaip tarp stiprių žaidėjų: kelių ėjimų gylio variantai ir įvertinimai skaičiais.
+coach.note.clock = Be laikrodžio: galvokite tiek, kiek reikia.
+coach.note.takeback = Po šiurkščios klaidos treneris parodo, kas nutiko, ir pasiūlo ėjimą atšaukti.
+coach.note.lesson = Žaidžiate baltosiomis; treneris kiekvieną pratimą išdėsto lentoje.
+coach.note.unrated = Partijos su treneriu neturi įtakos reitingui.
+coach.note.fallible = Treneris nėra neklystantis: kartais jis gali klaidingai įvertinti ėjimą.
+coach.colour = Jūsų spalva
+coach.colour.help = Kokiomis figūromis žaidžiate prieš trenerį. Pakaitomis: vieną partiją baltosiomis, kitą – juodosiomis. Pamoka apie taisykles visada žaidžiama baltosiomis.
+coach.colour.alternate = Pakaitomis
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Trenerio balsas neįdiegtas arba išjungtas (Nustatymai > Garsas): jo žodžiai bus rodomi ekrane.
+# At the table
+coach.speaker = TRENERIS
+coach.skip = Praleisti
+coach.offer.title = ATŠAUKTI ĖJIMĄ?
+coach.offer.text = Treneris siūlo atšaukti paskutinį jūsų ėjimą, kad galėtumėte paieškoti geresnio.
+coach.offer.hint = Backspace – atšaukti. Palietus figūrą, žaidimas tęsiamas.
+coach.offer.accept = Atšaukti ėjimą
+coach.offer.decline = Žaisti toliau
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Liko ėjimo atšaukimų: {0}
+coach.pause.take_back = Atšaukti mano ėjimą
+coach.pause.take_back.help = Atšaukia paskutinį jūsų ėjimą ir trenerio atsakymą, jei jis jau buvo padarytas.
+coach.confirm.resign = Pasiduoti šioje partijoje? Laimėtoju bus paskelbtas treneris.
+coach.confirm.resign_draw = Pasiduoti šioje partijoje? Treneris nebegali paskelbti mato: partija baigsis lygiosiomis.
+coach.confirm.leave = Grįžti į pagrindinį meniu? Ši partija su treneriu bus nutraukta.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Žaisti dar kartą
+coach.gameover.unrated = Ši partija su treneriu neturi įtakos reitingui.
+coach.lesson.done = PUIKU
+coach.lesson.done.line = Dabar jau žinote šachmatų taisykles.
+coach.lesson.next = Pirmoji partija
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Treniruotės
+coach.tab.challenges = Iššūkiai
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATAI
+challenge.group.tactics = TAKTIKA
+challenge.group.defence = GYNYBA
+challenge.group.endgames = ENDŠPILIAI
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+# Names as the coach quotes them (challenge.lang); the two imperative names take the formal form here.
+challenge.mate1.name = Matas per vieną ėjimą
+challenge.mate1.desc = Vienas ėjimas – ir matas.
+challenge.mate1.detail = Pirmiausia peržiūrėkite visus šachus: vienas iš jų nepalieka karaliui nei laisvo langelio, nei galimybės užsidengti ar kirsti.
+challenge.mate2.name = Matas per du ėjimus
+challenge.mate2.desc = Ėjimas, po kurio nebėra gynybos, o tada – matas.
+challenge.mate2.detail = Pirmasis ėjimas dažnai būna šachas arba auka, atimanti iš karaliaus langelį. Treneris ginasi, kiek tik gali.
+challenge.mate3.name = Matas per tris ėjimus
+challenge.mate3.desc = Ilgesni priverstiniai variantai.
+challenge.mate3.detail = Šachai, kirtimai ir grėsmės trijų ėjimų gyliu. Prieš liečiant figūrą, kiekviename žingsnyje apskaičiuokite geriausią trenerio atsakymą.
+challenge.backrank.name = Matai paskutinėje horizontalėje
+challenge.backrank.desc = Karalius įkalintas už savo pėstininkų.
+challenge.backrank.detail = Kai pėstininkai prieš rokiruotą karalių dar nepajudėjo, bokštas ar valdovė paskutinėje horizontalėje gali paskelbti matą. Pirmiausia pašalinkite arba atitraukite gynėjus.
+challenge.patterns.name = Tipiniai matai
+challenge.patterns.desc = Uždusintas matas, Anastasijos, arabiškasis ir kita klasika.
+challenge.patterns.detail = Garsūs matiniai tinklai, kurie kartojasi vėl ir vėl. Išmokite atpažinti figūrų išsidėstymą ir lemiamą smūgį.
+challenge.hanging.name = Neapgintos figūros
+challenge.hanging.desc = Pastebėkite, kas paliekama neapginta.
+challenge.hanging.detail = Figūrą ar pėstininką, kurio niekas negina, galima tiesiog nukirsti. Patikrinkite, kas saugo kiekvieną trenerio figūrą.
+challenge.fork.name = Šakutės
+challenge.fork.desc = Viena figūra puola dvi iš karto.
+challenge.fork.detail = Šakutę gali padaryti žirgai, pėstininkai, valdovės ir net karaliai. Varžovas gali išgelbėti tik vieną iš dviejų taikinių.
+challenge.pin.name = Surišimai
+challenge.pin.desc = Figūra, kuri negali pajudėti neprarasdama to, kas stovi už jos.
+challenge.pin.detail = Suriškite figūrą su jos karaliumi arba su vertingesne figūra, tada pulkite ją dar kartą arba pasinaudokite tuo, kad ji negali pajudėti.
+challenge.skewer.name = Pradūrimai
+challenge.skewer.desc = Pulkite vertingą figūrą ir laimėkite už jos stovinčią.
+challenge.skewer.detail = Surišimo priešingybė: vertingesnė figūra stovi priekyje, turi pasitraukti ir atidengia už jos esančią figūrą.
+challenge.discovered.name = Atidengti puolimai
+challenge.discovered.desc = Pajudinkite vieną figūrą ir paleiskite į kovą kitą.
+challenge.discovered.detail = Kai figūra pasitraukia iš linijos, už jos stovinti figūra ima pulti. Su šachu ar dvigubu šachu varžovas nespėja atremti abiejų grėsmių.
+challenge.deflection.name = Nukreipimas ir suviliojimas
+challenge.deflection.desc = Atitraukite gynėją arba suviliokite figūrą į pražūtingą langelį.
+challenge.deflection.detail = Gynėjas, turintis dvi užduotis, negali atlikti abiejų. Pulkite jį, ką nors jam pasiūlykite arba priverskite figūrą užeiti į langelį, kuriame ji bus prarasta.
+challenge.intermezzo.name = Tarpiniai ėjimai
+challenge.intermezzo.desc = Nekirskite atgal iš karto: yra kai kas stipresnio.
+challenge.intermezzo.detail = Prieš laukiamą ėjimą įterptas šachas ar didesnė grėsmė viską pakeičia.
+challenge.trapped.name = Įkalintos figūros
+challenge.trapped.desc = Figūra, kuriai nebeliko saugių langelių.
+challenge.trapped.detail = Atimkite iš figūros paskutinius pasitraukimo langelius, tada laimėkite ją.
+challenge.promotion.name = Pėstininko virsmas
+challenge.promotion.desc = Prasiveržkite pėstininku iki paskutinės horizontalės.
+challenge.promotion.detail = Pažengę pėstininkai labai vertingi. Atlaisvinkite kelią, nukreipkite blokuojančias figūras ir pasidarykite naują valdovę.
+challenge.quiet.name = Tylūs ėjimai
+challenge.quiet.desc = Laimintis ėjimas nėra nei šachas, nei kirtimas.
+challenge.quiet.detail = Kartais stipriausias ėjimas tik paruošia grėsmę, kurios neįmanoma atremti. Tokius ėjimus pamatyti sunkiausia.
+challenge.opening.name = Debiuto spąstai
+challenge.opening.desc = Nubauskite už ankstyvas klaidas.
+challenge.opening.detail = Pozicijos iš pirmųjų tikrų partijų ėjimų, kuriose vieną neapdairų ėjimą galima iš karto išnaudoti.
+challenge.escape.name = Raskite išsigelbėjimą
+challenge.escape.desc = Jūsų karaliui gresia pavojus: jį išgelbės vienas ėjimas.
+challenge.escape.detail = Visi kiti ėjimai pralaimi. Peržiūrėkite visus šachus ir grėsmes jūsų karaliui, tada raskite vienintelę išeitį.
+challenge.defend.name = Gynybiniai ėjimai
+challenge.defend.desc = Atremkite grėsmę be medžiagos nuostolių.
+challenge.defend.detail = Treneris kuo nors grasina. Raskite tikslų ėjimą, kuris viską išlaiko.
+challenge.kq.name = Valdovė ir karalius prieš karalių
+challenge.kq.desc = Matas valdove.
+challenge.kq.detail = Valdove nustumkite vienišą karalių prie lentos krašto, atveskite arčiau savo karalių ir saugokitės pato. Treneris ginasi geriausiais ėjimais.
+challenge.kr.name = Bokštas ir karalius prieš karalių
+challenge.kr.desc = Matas bokštu.
+challenge.kr.detail = Bokštas atkerta karalių horizontalė po horizontalės, o jūsų karalius užima opoziciją. Treneris ginasi geriausiais ėjimais.
+challenge.kp.name = Karalius ir pėstininkas prieš karalių
+challenge.kp.desc = Užimkite opoziciją ir paverskite pėstininką valdove.
+challenge.kp.detail = Pirmiausia veskite karalių, o ne pėstininką. Užimkite opoziciją ir pasidarykite valdovę, kurios treneris nebepagaus.
+challenge.kp_hold.name = Sustabdykite pėstininką
+challenge.kp_hold.desc = Vienišas karalius prieš karalių ir pėstininką: išlaikykite lygiąsias.
+challenge.kp_hold.detail = Stovėkite priešais pėstininką ir išlaikykite opoziciją. Išsilaikykite dešimt ėjimų.
+challenge.rook.name = Bokštų endšpiliai
+challenge.rook.desc = Lucenos tiltas ir Filidoro gynyba.
+challenge.rook.detail = Dvi pozicijos, kurias turėtų žinoti kiekvienas žaidėjas: kaip laimėti, kai pėstininkas septintoje horizontalėje, ir kaip gintis, kai bokštas trečioje.
+challenge.endgame.name = Taktika endšpilyje
+challenge.endgame.desc = Mažai figūrų, aštrios idėjos.
+challenge.endgame.detail = Pėstininkų lenktynės, prasiveržimai ir bokštų endšpiliai iš tikrų partijų.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} pozicija|{0} pozicijos|{0} pozicijų
+coach.challenge.done = Įveikta
+coach.challenge.start = Pradėti
+coach.challenge.note.white = Žaidžiate baltosiomis; treneris kiekvieną poziciją išdėsto lentoje.
+coach.challenge.note.hint = Įstrigote? Paspauskite H ir gausite užuominą. Po kelių bandymų treneris ją pasiūlys pats.
+coach.challenge.note.unsaved = Iššūkiai neturi įtakos reitingui ir neįrašomi; varnelė žymi tuos, kuriuos jau įveikėte.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = IŠŠŪKIS ĮVEIKTAS
+coach.challenge.complete.line = Išsprendėte visas pozicijas.
+coach.challenge.next = Kitas iššūkis
+coach.challenge.again = Dar kartą
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = UŽUOMINA?
+coach.hint.text = Treneris siūlo jums užuominą.
+coach.hint.hint = H – gauti užuominą. Palietus figūrą, ieškoma toliau.
+coach.hint.accept = Užuomina
+coach.hint.decline = Ne, ačiū
+coach.hint.key = Užuomina
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Trenerio balsas
+options.coach_voice.help = Trenerio režimu treneris kalba garsiai. Jo balso modelis atsisiunčiamas pirmą kartą, kai jo prireikia (apie 399 MB). Išjungta: trenerio žodžiai tik rodomi ekrane.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Balso modelis
+options.voice_update.help = Treneris vis dar kalba senąja 8 bitų balso modelio versija. Atnaujinimas atsisiunčia oficialią Supertonic 3 versiją, kurią išleido Supertone, o prieš tai ištrina senus failus.
+options.voice_update.button = Atnaujinti ({0} MB)
+options.voice_update.running = Vyksta atsisiuntimas.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Balso kokybė
+options.voice_quality.help = Kiek tobulinimo žingsnių trenerio kalbos sintezė atlieka kiekvienai frazei: nuo „Žema“ (4) iki „Maksimali“ (9); numatytoji – „Vidutinė“ (5). Aukštesnis lygis duoda šiek tiek švaresnį balsą, bet skaičiuojama ilgiau, todėl treneris prabyla šiek tiek vėliau. Nustatyti galima, kai įdiegtas balso modelis ir įjungtas trenerio balsas.
+options.voice_quality.low = Žema
+options.voice_quality.medium = Vidutinė
+options.voice_quality.high = Aukšta
+options.voice_quality.very_high = Labai aukšta
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimali
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Trenerio balsas
+coach.download.text = Treneris kalba Supertonic 3 balsu – tai Supertone sukurtas kalbos sintezės modelis. Jis nepridedamas prie Scacelith: žaidimas gali jį atsisiųsti dabar iš Hugging Face ({0} MB, vieną kartą). Be jo treneris savo žodžius rašo ekrane.
+coach.download.licence = Modelis išleistas pagal OpenRAIL-M licenciją, kuri draudžia tam tikrus jo sukuriamo balso naudojimo būdus, pavyzdžiui, pateikti jį kaip žmogaus balsą ar mėgdžioti tikrą asmenį.
+coach.download.read_licence = Skaityti licenciją
+coach.download.accept = Pasirinkimas „Atsisiųsti“ reiškia, kad sutinkate su šios licencijos sąlygomis.
+# {0} = a folder
+coach.download.folder = Įrašoma į: {0}
+coach.download.not_now = Ne dabar
+# {0} = the size in megabytes
+coach.download.download = Atsisiųsti ({0} MB)
+coach.download.licence_title = OPENRAIL-M LICENCIJA
+coach.download.back = Atgal
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Naujas trenerio balsas
+coach.update.text = Trenerio balsas dabar naudoja oficialią Supertonic 3 versiją, kurią išleido Supertone, vietoje iki šiol įdiegtos 8 bitų konversijos. Žaidimas gali ją atsisiųsti dabar iš Hugging Face ({0} MB, vieną kartą); seni failai ({1} MB) pirmiausia ištrinami. Jei atsisakysite, treneris kalbės dabartiniu balsu, o atnaujinimas liks prieinamas skiltyje Nustatymai > Garsas.
+coach.update.download = Atnaujinti ({0} MB)
+coach.update.accept = Pasirinkimas „Atnaujinti“ reiškia, kad sutinkate su šios licencijos sąlygomis.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TRENERIO BALSAS
+coach.download.removing = Šalinama senoji versija…
+coach.download.checking = Tikrinami failai…
+coach.download.downloading = Atsisiunčiama…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Iš Hugging Face
+coach.download.from_archive = Iš Hugging Face (archyvinė kopija)
+coach.download.cancel = Atšaukti
+coach.download.failed = Atsisiųsti nepavyko.
+coach.download.error.network = Nepavyko pasiekti serverių. Patikrinkite interneto ryšį ir bandykite dar kartą.
+# {0} = a folder
+coach.download.error.disk = Nepavyko įrašyti failų į {0}. Patikrinkite, ar pakanka laisvos vietos, ir bandykite dar kartą.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serveriai atsiuntė netikėtą atsakymą ({0}). Bandykite vėliau.
+coach.download.retry = Kartoti
+coach.download.close = Uždaryti
+# Notices
+coach.download.done = Trenerio balsas įdiegtas.
+coach.download.cancelled = Atsisiuntimas atšauktas: kitą kartą jis bus tęsiamas nuo ten, kur sustojo.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Įrašytos partijos
+options.save_games = Įrašyti mano partijas
+options.save_games.help = Pasibaigusios jūsų partijos su Stockfish, su treneriu, dviejų žaidėjų partijos prie šio kompiuterio ir jūsų tiesioginiai mačai įrašomi kaip PGN failai; juos rasite skiltyje „Įrašytos partijos“. Interneto partijas saugo serveris.
+library.title = ĮRAŠYTOS PARTIJOS
+library.section.games = PARTIJOS
+library.section.details = PARTIJA
+library.section.tags = ŽYMĖS
+library.section.moves = ĖJIMAI
+library.count = {0} partija|{0} partijos|{0} partijų
+library.filter = Rodyti
+library.filter.all = Visos partijos
+library.filter.play = Prieš Stockfish
+library.filter.coach = Su treneriu
+library.filter.hotseat = Du žaidėjai
+library.filter.direct = Tiesioginiai mačai
+library.filter.server = Interneto partijos
+library.filter.imported = Importuotos
+library.mode.play = Prieš Stockfish
+library.mode.coach = Su treneriu
+library.mode.hotseat = Du žaidėjai
+library.mode.direct = Tiesioginis mačas
+library.mode.server = Interneto partija
+library.mode.imported = Importuota
+library.coach_level = Lygis {0}
+library.unknown_player = Nežinomas
+library.unfinished = Nebaigta
+library.unreadable = Šios partijos neįmanoma perskaityti.
+library.moves = {0} ėjimas|{0} ėjimai|{0} ėjimų
+library.opening_variation = {0}: {1}
+library.file = Failas: {0}
+library.file_game = Failas: {0}, partija {1} iš {2}
+library.no_moves = Nepadaryta nė vieno ėjimo.
+library.none_selected = Pasirinkite partiją sąraše.
+library.reading = Skaitomos įrašytos partijos
+library.empty.title = Įrašytų partijų dar nėra
+library.empty.text = Jūsų partijos su Stockfish, su treneriu, dviejų žaidėjų partijos prie šio kompiuterio ir jūsų tiesioginiai mačai atsiras čia, kai tik pasibaigs. Į šį aplanką taip pat galite įdėti PGN failų: iš kitų programų ar svetainių eksportuotos partijos rodomos kartu su jūsiškėmis.
+library.empty.filter = Tokių partijų nėra.
+library.error.folder = Nepavyksta perskaityti įrašytų partijų aplanko
+library.error.game = Šios partijos neįmanoma perskaityti: {0}
+library.folder = Aplankas: {0}
+library.open_folder = Atidaryti aplanką
+library.open_failed = Nepavyko atidaryti aplanko.
+library.replay = Peržiūrėti
+library.delete = Ištrinti
+library.delete.title = IŠTRINTI PARTIJĄ
+library.delete.text = Partija {0} bus ištrinta iš šio kompiuterio kartu su jos failu. Šio veiksmo atšaukti negalima.
+library.delete.ok = Ištrinti
+library.delete.several = Šiame faile yra {0} partija: jį galima ištrinti tik iš aplanko.|Šiame faile yra {0} partijos: jį galima ištrinti tik iš aplanko.|Šiame faile yra {0} partijų: jį galima ištrinti tik iš aplanko.
+library.deleted = Partija ištrinta.
+library.delete.failed = Nepavyko ištrinti partijos.
+library.delete.changed = Failas pasikeitė: sąrašas atnaujintas.
+library.truncated = Šiame aplanke per daug partijų: rodomos tik naujausios ({0}).
+library.tag.Event = Varžybos
+library.tag.Site = Vieta
+library.tag.Date = Data
+library.tag.Time = Laikas
+library.tag.Round = Turas
+library.tag.White = Baltieji
+library.tag.Black = Juodieji
+library.tag.Result = Rezultatas
+library.tag.WhiteElo = Baltųjų Elo
+library.tag.BlackElo = Juodųjų Elo
+library.tag.TimeControl = Laiko kontrolė
+library.tag.Termination = Pabaigos būdas
+library.tag.Opening = Debiutas
+library.tag.Variation = Variantas
+library.tag.PlyCount = Pusėjimiai
+library.tag.FEN = Pradinė pozicija
+library.tag.ScacelithMode = Režimas
+library.tag.CoachLevel = Trenerio lygis
+library.tag.ScacelithServer = Serveris
+library.tag.ScacelithGameId = Partijos numeris
+library.tag.UTCDate = Data (UTC)
+library.tag.UTCTime = Laikas (UTC)
+library.tag.WhiteRatingDiff = Baltųjų reitingo pokytis
+library.tag.BlackRatingDiff = Juodųjų reitingo pokytis
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analizė
+analysis.menu.title = ANALIZĖ
+analysis.menu.analyse = Analizuoti
+analysis.menu.paste = Įklijuoti PGN
+analysis.menu.online = Interneto partijos
+analysis.menu.folder = Įdėkite PGN failų į šį aplanką, kad galėtumėte juos analizuoti: {0}
+analysis.menu.empty.title = Įrašytų partijų dar nėra
+analysis.menu.empty.text = Jūsų partijos atsiras čia, kai tik pasibaigs, kaip ir PGN failai, įdėti į toliau nurodytą aplanką. Taip pat galite įklijuoti partiją, nukopijuotą kaip PGN tekstą.
+analysis.menu.empty.no_folder = Įklijuokite partiją, nukopijuotą kaip PGN tekstą, kad ją analizuotumėte.
+analysis.menu.paste.empty = Iškarpinė tuščia: pirmiausia nukopijuokite partiją kaip PGN tekstą.
+analysis.menu.paste.none = Iškarpinėje nerasta šachmatų partijos.
+analysis.menu.paste.several = Iškarpinėje yra kelios partijos: analizuojama pirmoji.
+analysis.menu.gameover = Analizuoti partiją
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Ėjimas {0} iš {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Akimirksniu
+replay.again = Peržiūrėti dar kartą
+replay.gameover.unfinished = Partija baigiasi po ėjimo Nr. {0} be rezultato.
+replay.tip.start = Partijos pradžia (Home)
+replay.tip.back = Vienu ėjimu atgal (J)
+replay.tip.pause = Pauzė (K)
+replay.tip.resume = Tęsti (K)
+replay.tip.forward = Vienu ėjimu pirmyn (L)
+replay.tip.end = Partijos pabaiga (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTARAS
+analysis.hud.accuracy = TIKSLUMAS
+analysis.hud.reviewing = Stockfish peržiūri partiją… {0}
+analysis.hud.no_engine = Nėra šachmatų variklio: ėjimai rodomi be analizės.
+analysis.hud.no_moves = Šioje partijoje nėra ėjimų.
+analysis.hud.tip.play = Leisti ėjimus (K)
+analysis.hud.tip.comments_off = Slėpti svarbiausių momentų komentarus (N)
+analysis.hud.tip.comments_on = Rodyti svarbiausių momentų komentarus (N)
+analysis.hud.tip.voice_off = Išjungti komentatoriaus balsą (M)
+analysis.hud.tip.voice_on = Klausytis komentarų balsu (M)
+analysis.hud.tip.voice_missing = Balso negirdėti: jo failai neįdiegti arba išjungtas nustatymas Nustatymai > Garsas > Trenerio balsas. Komentarai tik rodomi ekrane.
+analysis.hud.tip.arrows_off = Slėpti geresnių ėjimų rodykles (B)
+analysis.hud.tip.arrows_on = Rodyti geresnių ėjimų rodykles (B)
+analysis.hud.controls.play = Leisti / pauzė
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Rodyti / slėpti komentarus
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Komentatoriaus balsas įj. / išj.
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Rodyti / slėpti rodykles
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Įrašyti kaip GIF
+gif.making = Kuriamas GIF: serveris piešia partiją…
+gif.saved = GIF įrašytas:
+gif.saved_as = GIF įrašytas: {0}
+gif.sign_in_first = Kad galėtumėte kurti GIF, prisijunkite prie interneto serverio: GIF piešia serveris.
+gif.busy_other = Kuriamas kitas GIF. Palaukite, kol jis bus paruoštas.
+gif.err.rate_limited_for = Per trumpą laiką sukūrėte daug GIF. Kitą galėsite sukurti po {0}.
+gif.err.rate_limited = Per trumpą laiką sukūrėte daug GIF. Bandykite vėliau.
+gif.err.server_busy_for = Serveris užimtas – piešia kitus GIF. Bandykite dar kartą po {0}.
+gif.err.server_busy = Serveris užimtas – piešia kitus GIF. Netrukus bandykite dar kartą.
+gif.err.signed_out = Jūsų seansas baigėsi. Kad sukurtumėte GIF, prisijunkite iš naujo.
+gif.err.game_too_long = Ši partija per ilga, kad iš jos būtų galima sukurti GIF.
+gif.err.pgn_too_large = Ši partija per ilga, kad iš jos būtų galima sukurti GIF.
+gif.err.invalid_pgn = Serveris negalėjo perskaityti šios partijos.
+gif.err.render_failed = Serveriui nepavyko sukurti šio GIF. Bandykite dar kartą.
+gif.err.gif_disabled = Šis serveris GIF nekuria.
+gif.err.write_failed = Nepavyko įrašyti GIF šiame kompiuteryje.
+gif.err.not_found = Šios partijos serveryje nebėra.
+# Only used after "po" ("in {0}" = after a wait): the genitive ("po 1 minutės", "po 5 minučių").
+gif.wait.seconds = {0} sekundės|{0} sekundžių|{0} sekundžių
+gif.wait.minutes = {0} minutės|{0} minučių|{0} minučių
+gif.wait.both = {0} ir {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Nepavyko paleisti OpenGL 4.6. Atnaujinkite vaizdo plokštės tvarkyklę.
+error.opengl_macos = Nepavyko paleisti OpenGL 4.6 šiame Mac kompiuteryje. Scacelith reikia Apple silicon lusto (M1 ar naujesnio) ir macOS 26 ar naujesnės versijos; žaidimas neveikia virtualiojoje mašinoje.
+error.renderer = Nepavyko paleisti atvaizdavimo variklio.
+error.scene = Nepavyko įkelti scenos.
+error.log_file = Išsami informacija pateikta žurnalo faile: {0}

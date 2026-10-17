@@ -1,0 +1,137 @@
+# Coach speech (Italian): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 posizioni", "una posizione":
+#            count.position in common.lang), "{n:move}" likewise ("2 mosse", "una mossa"). Nothing
+#            after it agrees with the count ("{n:position} in cui...", never "...tratte da").
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "scacco matto" (the line says it)
+#   {your}   one of the player's pieces ("il tuo cavallo", "la tua torre"); the coach points at it
+#            on that word
+#   {sq}     a square ("la casa {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "tu" to the player and is male; the
+# player's gender is unknown: no adjective or participle agrees with the player ("Ottima difesa!",
+# not "Ben difeso!").
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matto in una. {n:position}, e ogni volta una sola mossa dà scacco matto. Guarda tutti gli scacchi.
+ch.intro.mate2 = Matto in due. {n:position}: la tua prima mossa non deve lasciarmi difese, poi dai matto.
+ch.intro.mate3 = Matto in tre. {n:position}. Scacchi, catture e minacce: calcola ogni volta la mia risposta migliore.
+ch.intro.backrank = Matti del corridoio. {n:position} in cui un re è chiuso dietro i propri pedoni.
+ch.intro.patterns = Schemi di matto. {n:position} con classiche reti di matto. Riconosci lo schema, poi colpisci.
+ch.intro.hanging = Pezzi in presa. {n:position}: qualcosa di mio è rimasto senza protezione. Trovalo e prendilo.
+ch.intro.fork = Forchette. {n:position}: trova la mossa che attacca due cose contemporaneamente.
+ch.intro.pin = Inchiodature. {n:position}: inchioda un pezzo, oppure sfrutta un’inchiodatura.
+ch.intro.skewer = Infilate. {n:position}: attacca un pezzo di valore e vinci quello che c’è dietro.
+ch.intro.discovered = Attacchi di scoperta. {n:position}: muovi un pezzo per scatenarne un altro.
+ch.intro.deflection = Deviazione e adescamento. {n:position}: allontana un difensore, o attiralo su una casa fatale.
+ch.intro.intermezzo = Mosse intermedie. {n:position}: prima della mossa ovvia, trovane una più forte.
+ch.intro.trapped = Pezzi intrappolati. {n:position}: uno dei miei pezzi non ha case sicure dove andare. Vincilo.
+ch.intro.promotion = Promozione. {n:position} in cui un pedone avanzato decide la partita.
+ch.intro.quiet = Mosse tranquille. {n:position}: la mossa vincente non è né uno scacco né una cattura.
+ch.intro.opening = Trappole d’apertura. {n:position}, dalle prime mosse di partite vere. Punisci il mio errore.
+ch.intro.escape = Trova la via di fuga. {n:position}: il tuo re è in pericolo, e solo una mossa lo salva.
+ch.intro.defend = Mosse difensive. {n:position}: trova l’unica mossa che tiene in piedi la tua posizione.
+ch.intro.kq = Donna e re contro re. {n:position}: dai scacco matto al mio re. Attenzione allo stallo.
+ch.intro.kr = Torre e re contro re. {n:position}: dai scacco matto al mio re, un passo alla volta.
+ch.intro.kp = Re e pedone contro re. {n:position}: porta il pedone a donna. Fagli strada con il re.
+ch.intro.kp_hold = Ferma il pedone. {n:position}: hai solo il tuo re. Tieni la patta.
+ch.intro.rook = Finali di torre. {n:position}: costruisci il ponte per promuovere, e tieni la patta con la difesa di Philidor.
+ch.intro.endgame = Tattica nei finali. {n:position} con pochi pezzi e idee taglienti.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 mosse").
+ch.task.mate = Matto in {n:move}.
+ch.task.mate.2 = Trova il matto in {n:move}.
+ch.task.hanging = Qualcosa è rimasto senza protezione.
+ch.task.hanging.2 = Che cosa puoi prendere gratis?
+ch.task.fork = Trova la forchetta.
+ch.task.fork.2 = Cerca una forchetta.
+ch.task.pin = Qui la chiave è un’inchiodatura.
+ch.task.skewer = Qui vince un’infilata.
+ch.task.discovered = Qui vince un attacco di scoperta.
+ch.task.deflection = Sovraccarica un difensore, oppure adescalo.
+ch.task.intermezzo = Cerca una mossa intermedia.
+ch.task.trapped = Uno dei miei pezzi non può scappare. Vincilo.
+ch.task.promotion = Usa il tuo pedone avanzato.
+ch.task.quiet = La mossa vincente è una mossa tranquilla.
+ch.task.opening = Punisci la mia ultima mossa.
+ch.task.escape = Salva il tuo re: funziona una sola mossa.
+ch.task.defend = Trova l’unica mossa buona.
+ch.task.endgame = Trova la mossa migliore.
+ch.task.default = Trova la mossa migliore.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Dai scacco matto al mio re. Mi difenderò come meglio posso.
+ch.task.play.promote = Promuovi il tuo pedone e conserva la vittoria. Cercherò di fermarti.
+ch.task.play.hold = Tieni la patta per {n:move}. Io proverò a vincere.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Queste posizioni vengono da partite vere. Gioco io l’ultima mossa, poi tocca a te.
+ch.lead.first.2 = Ogni posizione viene da una partita vera: gioco la mossa che ha portato a quella posizione, poi giochi tu.
+ch.next = Prossima posizione.
+ch.next.2 = Ecco la prossima.
+ch.next.3 = Passiamo alla prossima.
+ch.last = L’ultima posizione.
+ch.last.2 = E ora l’ultima.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Bene.
+ch.good.2 = Sì.
+ch.good.3 = Giusto.
+ch.good.4 = Esatto.
+# The position is solved.
+ch.solved = Proprio così! Ben fatto.
+ch.solved.2 = Esattamente.
+ch.solved.3 = Molto bene.
+ch.solved.mate = Scacco matto! Ben fatto.
+ch.solved.mate.2 = Ed è matto. Molto bene.
+ch.solved.mate.3 = Scacco matto. Ben giocato.
+ch.solved.promote = Una nuova donna, e la vittoria è al sicuro. Ben fatto.
+ch.solved.hold = La patta regge. Ottima difesa!
+ch.solved.draw = Patta sulla scacchiera. Ottima difesa!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Non questa: risponderei {move}.
+ch.wrong.reply.2 = Non proprio: replicherei {move}.
+ch.wrong.reply.3 = Allora giocherei {move}.
+ch.wrong.mate = Attenzione: {move:nomate} sarebbe scacco matto.
+ch.wrong.mate.2 = Occhio: risponderei {move:nomate}, ed è matto.
+ch.wrong.mated = Attenzione: dopo {move}, posso forzare il matto in {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Anche così dai matto, ma ci vuole di più. C’è una via più rapida.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Anche così dai matto, ma ho in mente un’altra mossa. Guarda ancora.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Non male, ma c’è qualcosa di più forte. Guarda ancora.
+ch.wrong.weaker.2 = È giocabile, ma puoi fare di meglio.
+ch.wrong.stalemate = Stallo! Il mio re non può muoversi, e così è solo patta.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Non questa: dopo {move}, riesco a tenere la patta.
+ch.wrong.loses = Attenzione: dopo {move}, avrei io una posizione vincente.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Non è questa.
+ch.try_again = Riprova.
+ch.try_again.2 = Dai un’altra occhiata.
+ch.try_again.3 = Guarda ancora.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Vuoi un suggerimento?
+ch.offer.2 = Ti do un suggerimento?
+ch.no_hint = Va bene. Continua a cercare.
+ch.no_hint.2 = D’accordo, fai con calma.
+ch.hint.piece = Guarda {your}.
+ch.hint.piece.2 = Pensa {your:a}.
+ch.hint.square = Guarda la casa {sq}.
+ch.hint.square.2 = La casa chiave è {sq}.
+ch.hint.square.3 = Tieni d’occhio la casa {sq}.
+ch.hint.show = Ecco la mossa. Guarda.
+ch.hint.show.2 = Te la mostro io. Guarda.
+ch.hint.now = Ora giocala tu.
+ch.hint.now.2 = Tocca a te: giocala.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Sfida completata. Ben fatto!
+ch.complete.2 = Hai risolto tutte le posizioni. Ben fatto!

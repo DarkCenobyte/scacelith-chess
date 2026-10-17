@@ -1,0 +1,987 @@
+# Coach speech (Dutch): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "je" ("jij" / "jouw" only for a contrast) and "ik" / "mijn" for himself.
+# Dutch verbs, participles and adjectives never agree with a person, so past tenses are fine
+# ("je hebt ... gemist", "je stond gewonnen").
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their possessive ("je paard", "mijn toren"); the
+# forms of common.lang give the words that point back at them: {x:subj} hij / het / ze, {x:obj}
+# hem / het / haar, {x:poss} zijn / haar, {x:rel} die / dat, {x:bare} the noun after an adjective
+# ("je gepende {your:bare}"). A move ("de zet") is "die" / "hij".
+# Squares: "op {sq}", "naar {sq}", "vanaf {sq}"; a move or square never takes an ending.
+# Counted numbers: {m:move} "2 zetten", {pts:point} "3 punten", {n:time} "3 keer", {n:square}
+# "3 velden", {n:attacker} "2 aanvallers", {n2:defender} "1 verdediger" (where English writes a bare
+# {n} attackers or {n2:piece} defenders: the counted nouns keep singular and plural right, and
+# "stuk" would leave out the pawns), {n:point} for a piece's value.
+# Terms (glossary): blunder, fout, onnauwkeurigheid, twijfelachtig (dubious), vork, penning / gepend,
+# spies, aftrekaanval, ingesloten (trapped), ongedekt / hangt, achterste rij, luchtgat, vierkant,
+# vrijpion, oppositie, pat, remise, schaakmat / mat zetten / mat gaan.
+# Levels 1-2: short main clauses, everyday words; levels 5-6: terse club language.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Schaak! Mijn koning wordt aangevallen.
+ann.check.human.b1.2 = Schaak! Je valt mijn koning aan.
+ann.check.human.b1.3 = Dat is schaak! Mijn koning moet uit het schaak.
+ann.check.human = Schaak.
+ann.check.human.2 = Schaak!
+ann.check.human.3 = En dat is schaak.
+# The coach gives check.
+ann.check.coach = Schaak!
+ann.check.coach.2 = Schaak.
+ann.check.coach.3 = En schaak!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Dat betekent dat {your} wordt aangevallen. Je moet het schaak opheffen.
+ann.check.coach.first.2 = Schaak betekent dat {your} wordt aangevallen. Zet {your:obj} weg, zet er iets tussen of sla mijn stuk.
+ann.double_check.coach = Dubbelschaak! Twee van mijn stukken vallen je koning tegelijk aan, dus hij moet weg.
+ann.double_check.coach.2 = Dat is dubbelschaak: nu helpt alleen nog een koningszet.
+ann.double_check.human = Dubbelschaak! Twee van je stukken vallen mijn koning tegelijk aan, dus hij moet weg.
+ann.double_check.human.2 = Dubbelschaak! Alleen een koningszet kan me nu nog redden.
+# The player checkmates the coach.
+ann.mate.human.b1 = Schaakmat! Je hebt gewonnen! Mijn koning kan niet ontsnappen.
+ann.mate.human.b1.2 = Dat is schaakmat! Goed gedaan, je hebt de partij gewonnen!
+ann.mate.human.b1.3 = Schaakmat! Mijn koning zit vast. Gefeliciteerd!
+ann.mate.human = Schaakmat. Goed gespeeld.
+ann.mate.human.2 = Dat is mat. Gefeliciteerd.
+ann.mate.human.3 = Schaakmat! Mooi gedaan.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Dat is schaakmat. Je koning kan nergens meer heen.
+ann.mate.coach.b1.2 = Schaakmat. Je koning wordt aangevallen en kan niet ontsnappen.
+ann.mate.coach.b1.3 = Helaas, dat is schaakmat. Je koning kan niet meer weg.
+ann.mate.coach = Schaakmat.
+ann.mate.coach.2 = En dat is mat.
+ann.mate.coach.3 = Schaakmat, vrees ik.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Oeps! Met die zet geef je iets weg.
+ex.verdict.blunder.b1.2 = Pas op! Die zet kan je iets kosten.
+ex.verdict.blunder.b1.3 = O, wacht. Er is iets mis met die zet.
+ex.verdict.blunder.b2 = Hmm, er is iets mis met die zet.
+ex.verdict.blunder.b2.2 = Dat is een grote fout.
+ex.verdict.blunder.b2.3 = Pas op, die zet kost je iets.
+ex.verdict.blunder.b3 = Dat is een blunder.
+ex.verdict.blunder.b3.2 = {move} is een echte fout.
+ex.verdict.blunder.b3.3 = Au, {move} is een grote fout.
+ex.verdict.blunder.b4 = {move} is een blunder.
+ex.verdict.blunder.b4.2 = {move} is een ernstige fout.
+ex.verdict.blunder.b4.3 = Dat is een blunder, vrees ik.
+ex.verdict.blunder.b5 = {move} is een ernstige fout.
+ex.verdict.blunder.b5.2 = {move} is een blunder.
+ex.verdict.blunder.b5.3 = {move} is een dure fout.
+ex.verdict.blunder.b6 = {move} is een zware fout.
+ex.verdict.blunder.b6.2 = {move} is een blunder.
+ex.verdict.blunder.b6.3 = {move}? Een blunder.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Oeps! Je hebt niets gedaan tegen mijn dreiging.
+ex.verdict.ignored.b1.2 = Pas op! Mijn dreiging was er nog steeds.
+ex.verdict.ignored.b1.3 = O, wacht. Je bent mijn dreiging vergeten.
+ex.verdict.ignored.b2 = Hmm, mijn dreiging was er nog steeds.
+ex.verdict.ignored.b2.2 = Je hebt mijn dreiging onbeantwoord gelaten.
+ex.verdict.ignored.b2.3 = Pas op, je hebt niets gedaan tegen mijn dreiging.
+ex.verdict.mistake.b3 = Dat is geen goede zet.
+ex.verdict.mistake.b3.2 = Hmm, er is iets mis met {move}.
+ex.verdict.mistake.b3.3 = Dat is een fout.
+ex.verdict.mistake.b4 = {move} is een fout.
+ex.verdict.mistake.b4.2 = {move} is niet goed.
+ex.verdict.mistake.b4.3 = Dat is een fout.
+ex.verdict.mistake.b5 = {move} is een duidelijke fout.
+ex.verdict.mistake.b5.2 = {move} is een fout.
+ex.verdict.mistake.b5.3 = {move} is niet goed.
+ex.verdict.mistake.b6 = {move} is een fout.
+ex.verdict.mistake.b6.2 = {move}? Een fout.
+ex.verdict.mistake.b6.3 = Niet {move}.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Niet slecht, maar {best} was iets beter.
+ex.verdict.inaccuracy.b3.2 = {best} was net iets nauwkeuriger.
+ex.verdict.inaccuracy.b3.3 = Een kleine misstap: {best} was hier beter.
+ex.verdict.inaccuracy.b4 = Onnauwkeurig: {best} was preciezer.
+ex.verdict.inaccuracy.b4.2 = Een kleine onnauwkeurigheid. {best} was iets beter.
+ex.verdict.inaccuracy.b4.3 = Niet helemaal de beste zet: {best} was nauwkeuriger.
+ex.verdict.inaccuracy.b5 = {move} is onnauwkeurig; {best} was sterker.
+ex.verdict.inaccuracy.b5.2 = Iets onnauwkeurig. Ik had {best} gespeeld.
+ex.verdict.inaccuracy.b5.3 = {best} was preciezer dan {move}.
+ex.verdict.inaccuracy.b6 = {move} is onnauwkeurig; {best}.
+ex.verdict.inaccuracy.b6.2 = Onnauwkeurig. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} was beter.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} was misschien net iets preciezer.
+ex.verdict.inaccuracy.maybe.2 = Ik had misschien {best} gespeeld.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Die zet ziet er twijfelachtig uit.
+ex.verdict.dubious.2 = Die zet lijkt twijfelachtig.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = O, wacht! Je hebt iets goeds gemist.
+ex.verdict.missed.b1.2 = Kijk nog eens! Er was iets beters.
+ex.verdict.missed.b1.3 = Wacht even, daar had je een kans!
+ex.verdict.missed.b2 = Daar heb je een kans laten liggen.
+ex.verdict.missed.b2.2 = Hmm, er was iets beters.
+ex.verdict.missed.b2.3 = Wacht, daar had je een uitstekende zet.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Beter was {best}.
+ex.better.b3.2 = {best} was de betere zet.
+ex.better.b3.3 = In plaats daarvan was {best} goed.
+ex.better.b4 = {best} was sterker.
+ex.better.b4.2 = {best} was de juiste zet.
+ex.better.b4.3 = Beter was {best}.
+ex.better.b5 = {best}, met het idee {line}.
+ex.better.b5.2 = {best} was de zet: {line}.
+ex.better.b5.3 = Beter was {best}, gevolgd door {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Liever {best}, {eval}.
+ex.better.b6.3 = {best} was {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Er was een betere zet met {your}.
+ex.hint.b1.2 = {your} had een betere zet.
+ex.hint.b2 = {your} had een betere zet.
+ex.hint.b2.2 = Er was een betere zet met {your}.
+ex.hint.b3 = {your} had een betere zet.
+ex.hint.b3.2 = Er was iets beters met {your}.
+ex.hint.b4 = {your} had een betere zet.
+ex.hint.b4.2 = Kijk nog eens naar {your}: {your:subj} had iets beters.
+ex.hint.b5 = {your} had een sterkere zet.
+ex.hint.b5.2 = Er was een sterkere zet met {your}.
+ex.hint.b6 = {your} kon beter.
+ex.hint.b6.2 = Kijk nog eens naar {your}.
+ex.hint.move = Er was een betere zet.
+ex.hint.move.2 = Daar had je een betere zet.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} had een betere zet. Die wint materiaal.
+ex.hint.gain.b1.2 = Er was een betere zet met {your}. Die wint materiaal.
+ex.hint.gain.b2 = {your} had een betere zet. Die wint materiaal.
+ex.hint.gain.b2.2 = Er was een zet met {your} die materiaal wint.
+ex.hint.gain.b3 = {your} had een betere zet, een zet die materiaal wint.
+ex.hint.gain.b3.2 = Er was een zet met {your} die materiaal wint.
+ex.hint.gain.b4 = {your} had een zet die materiaal wint.
+ex.hint.gain.b4.2 = Kijk nog eens naar {your}: {your:subj} had een zet die materiaal wint.
+ex.hint.gain.b5 = {your} had een sterkere zet, een zet die materiaal wint.
+ex.hint.gain.b5.2 = Er was een zet met {your} die materiaal wint.
+ex.hint.gain.b6 = {your} had een zet die materiaal wint.
+ex.hint.gain.b6.2 = Kijk nog eens naar {your}: er viel materiaal te winnen.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = De betere zet was {your} naar {sq}.
+ex.reveal.b1.2 = {your} kon naar {sq}. Dat was beter.
+ex.reveal.b2 = {your} naar {sq} was de betere zet.
+ex.reveal.b2.2 = De betere zet was {your} naar {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Laten we de stukken terugzetten.
+ex.rewind.b1.2 = Nu zet ik alles terug zoals het was.
+ex.rewind.b1.3 = Ik zet de stukken even terug.
+ex.rewind.b2 = Laten we alles terugzetten.
+ex.rewind.b2.2 = Terug naar waar we waren.
+ex.rewind.b2.3 = Ik zet de stukken terug.
+ex.rewind.b3 = Terug naar de partij.
+ex.rewind.b3.2 = We gaan terug.
+ex.rewind.b3.3 = Terug naar de stelling.
+ex.rewind.b4 = Terug naar de partij.
+ex.rewind.b4.2 = Terug.
+ex.rewind.b4.3 = We gaan terug.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Wil je een andere zet proberen?
+ex.offer.b1.2 = Wil je die zet terugnemen en het opnieuw proberen?
+ex.offer.b1.3 = Zullen we een andere zet proberen?
+ex.offer.b2 = Zou je een andere zet willen proberen?
+ex.offer.b2.2 = Wil je de zet terugnemen?
+ex.offer.b2.3 = Nog een keer proberen?
+ex.offer.b3 = Zou je de zet willen terugnemen?
+ex.offer.b3.2 = Wil je het opnieuw proberen?
+ex.offer.b3.3 = Terugnemen?
+ex.offer.b4 = Terugnemen?
+ex.offer.b4.2 = Wil je de zet terugnemen?
+ex.offer.b4.3 = Een andere zet proberen?
+ex.offer.b5 = Terugnemen?
+ex.offer.b5.2 = Wil je hem terugnemen?
+ex.offer.b5.3 = Zet terugnemen?
+ex.offer.b6 = Terugnemen?
+ex.offer.b6.2 = Zet terugnemen?
+ex.offer.b6.3 = Opnieuw?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Die zet is twijfelachtig. Misschien kun je het beter doen?
+ex.dubious.b1.2 = Die zet is twijfelachtig. Misschien vind je een betere?
+ex.dubious.b2 = Een twijfelachtige zet. Misschien kun je het beter doen?
+ex.dubious.b2.2 = Die zet is twijfelachtig. Misschien is er iets beters?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Dan {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} gaat naar {sq}.
+demo.my.move.2 = Ik speel {my} naar {sq}.
+demo.my.move.3 = Dan gaat {my} naar {sq}.
+demo.my.take = Ik sla {your}.
+demo.my.take.2 = {my} slaat {your}.
+demo.my.take.3 = En ik neem {your}.
+demo.my.check = {my} gaat naar {sq}. Schaak.
+demo.my.check.2 = Schaak, met {my} op {sq}.
+demo.my.check.3 = {my} naar {sq}, schaak!
+demo.my.mate = {my} gaat naar {sq}. Schaakmat.
+demo.my.mate.2 = En {my} naar {sq} is schaakmat.
+demo.my.mate.3 = {my} naar {sq}. Dat is schaakmat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+# "{t1} loopt niet weg" (it won't run away) = "{t1} will still be there".
+demo.my.first.take = Eerst slaat {my} {your}. {t1} kan wachten.
+demo.my.first.take.2 = {my} slaat eerst {your}. {t1} loopt niet weg.
+demo.my.first.check = {my} slaat {your}, en dat is schaak! {t1} kan wachten.
+demo.my.first.check.2 = Eerst slaat {my} {your}, met schaak. {t1} loopt niet weg.
+demo.my.first.check_move = Eerst schaak met {my} op {sq}. {t1} kan wachten.
+demo.my.first.check_move.2 = {my} gaat naar {sq}: eerst schaak! {t1} loopt niet weg.
+demo.my.first.move = Eerst gaat {my} naar {sq}. {t1} kan wachten.
+demo.my.first.move.2 = Eerst {my} naar {sq}. {t1} loopt niet weg.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} wordt aangevallen, dus {my:subj} slaat eerst {your}.
+demo.my.first.attacked.2 = {my} staat aangevallen: {my:subj} pakt eerst {your}.
+# Levels 4-6, the same in-between move.
+demo.first = Eerst {move}: {t1} kan wachten.
+demo.first.2 = Eerst {move}. {t1} loopt niet weg.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Nu speel ik mijn zet.
+demo.play_on.2 = Hier is mijn echte zet.
+demo.play_on.3 = En nu mijn zet, dit keer echt.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Je zou {your} naar {sq} spelen.
+demo.your.move.2 = Stel, je speelt {your} naar {sq}.
+demo.your.move.3 = Dan gaat {your} naar {sq}.
+demo.your.take = Je zou {my} slaan.
+demo.your.take.2 = Je slaat {my} met {your}.
+demo.your.take.3 = Dan sla je {my}.
+demo.your.back = Je slaat terug.
+demo.your.back.2 = Je slaat terug op {sq}.
+demo.your.back.3 = En dan sla jij terug.
+demo.your.king = Je koning moet weg.
+demo.your.king.2 = De koning moet opzij, naar {sq}.
+demo.your.king.3 = Je koning vlucht naar {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Nu is {t1} niet meer te redden.
+ex.point.piece.2 = En {t1} gaat verloren.
+ex.point.piece.3 = Daarna valt {t1}.
+ex.point.two = {t1} en {t2} worden allebei aangevallen: een van de twee gaat verloren.
+ex.point.two.2 = Nu val ik {t1} en {t2} aan. Je kunt ze niet allebei redden.
+ex.point.mate = En nu is {reply:nomate} schaakmat.
+ex.point.mate.2 = Daarna volgt {reply:nomate}, en dat is schaakmat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Zie je? Nu heb je {pts:point} verloren.
+ex.result.b1.2 = Zo verlies je {pts:point}.
+ex.result.b2 = Uiteindelijk heb je {pts:point} verloren.
+ex.result.b2.2 = Nu sta je {pts:point} achter.
+ex.result.b3 = Dat kost je {pts:point}.
+ex.result.b3.2 = Je komt {pts:point} achter te staan.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Je kunt iets terugslaan, maar je staat nog steeds {pts:point} achter.
+ex.result_back.b1.2 = Je kunt een beetje terugwinnen, maar je bent toch {pts:point} kwijt.
+ex.result_back.b2 = Je kunt iets terugpakken, maar je staat nog steeds {pts:point} achter.
+ex.result_back.b2.2 = Ook als je terugslaat, ben je {pts:point} kwijt.
+ex.result_back.b3 = Ook na het terugslaan sta je {pts:point} achter.
+ex.result_back.b3.2 = Je wint iets terug, maar het kost je toch {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves. "faalt op" = "fails to" (Dutch annotation usage).
+ex.retake.b1 = Als {your2} terugslaat, slaat {my} {your}.
+ex.retake.b1.2 = Je kunt niet terugslaan met {your2}: dan slaat {my} {your}.
+ex.retake.b2 = Als {your2} terugslaat, slaat {my} {your}.
+ex.retake.b2.2 = Terugslaan met {your2} werkt niet: {my} slaat {your}.
+ex.retake.b3 = Als je terugslaat met {move}, dan slaat {reply} {your}.
+ex.retake.b3.2 = Terugslaan met {move} mislukt: {reply} slaat {your}.
+ex.retake.b4 = {move} strandt op {reply}, die {your} slaat.
+ex.retake.b4.2 = En na {move} slaat {reply} {your}.
+ex.retake.b5 = Terugslaan met {move} stuit op {reply}, en {your} valt.
+ex.retake.b5.2 = {move} strandt op {reply}: {your} valt.
+ex.retake.b6 = {move}? {reply} slaat {your}.
+ex.retake.b6.2 = {move} werkt niet: {reply} slaat {your}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = En hier, op {sq}, zou je een nieuwe dame krijgen.
+demo.promote.2 = {your} bereikt dan {sq} en wordt een dame.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Let op: {my} kan naar {sq}, en dat is schaakmat.
+ex.mate_allowed.b1.2 = Nu kan {my} naar {sq}. Dat zou schaakmat zijn!
+ex.mate_allowed.b1.3 = Pas op! Als {my} naar {sq} gaat, is het schaakmat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Door deze zet kan ik {your} in {m:move} mat zetten.
+ex.mate_allowed.b2.2 = Nu kan ik {your} in {m:move} mat zetten. Kijk maar.
+ex.mate_allowed.b2.3 = Pas op! {your} is in gevaar: mat in {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Dit laat mat in {m:move} toe: {line:nomate}.
+ex.mate_allowed.b3.2 = Hierna heb ik mat in {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Je koning gaat mat: {line:nomate}.
+ex.mate_allowed.b4 = {move} laat een geforceerd mat toe: {line:nomate}.
+ex.mate_allowed.b4.2 = Hiermee loop je in een mat in {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Na {move} is {line:nomate} mat.
+ex.mate_allowed.b5 = {move} laat een geforceerd mat in {m:move} toe.
+ex.mate_allowed.b5.2 = Daarmee loop je in een mat in {m:move}.
+ex.mate_allowed.b5.3 = Nu is er een geforceerd mat in {m:move}.
+ex.mate_allowed.b6 = Mat in {m}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = Het is mat na {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Kijk: {your} heeft geen veld meer om naartoe te vluchten.
+ex.mate_allowed.tail.b1.2 = Zie je? {your} wordt aangevallen en kan niet wegvluchten.
+ex.mate_allowed.tail.b1.3 = {your} kan nergens heen. Dat is schaakmat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Dat patroon noemen we {text}.
+ex.mate_allowed.pattern.2 = Onthoud dit patroon goed: dit is {text}.
+ex.mate_allowed.tip.b3 = Kijk voor elke zet of je koning nog veilig staat.
+ex.mate_allowed.tip.b3.2 = Vraag je altijd af: kan mijn koning na mijn zet mat gaan?
+
+# Said after "Dat patroon heet ..." (the indefinite article belongs to the name, as in English).
+name.pattern.back_rank = een mat op de achterste rij
+name.pattern.smothered = een stikmat
+name.pattern.support = een mat met een gedekte dame
+name.pattern.ladder = een trapjesmat
+name.pattern.epaulette = een epauletmat
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Met {best:nomate} had je {my} mat kunnen zetten!
+ex.mate_missed.b1.2 = {best:nomate} was schaakmat! {my} had niet kunnen ontsnappen.
+ex.mate_missed.b1.3 = Kijk! {best:nomate} had {my} mat gezet.
+ex.mate_missed.b2 = Je had mat in {m:move}, te beginnen met {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} was schaakmat in {m:move}!
+ex.mate_missed.b2.3 = Met {best:nomate} had je me mat kunnen zetten.
+ex.mate_missed.b3 = Je hebt mat in {m:move} gemist: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} geeft mat in {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Er was een mat in {m:move}, te beginnen met {best:nomate}.
+ex.mate_missed.b4 = Mat gemist: {line:nomate}, te beginnen met {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} dwingt mat in {m:move} af.
+ex.mate_missed.b4.3 = Je had mat in {m:move} met {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} geeft mat in {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Mat in {m:move} gemist, te beginnen met {best:nomate}.
+ex.mate_missed.b5.3 = Er was een geforceerd mat: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} geeft mat: {line:nomate}.
+ex.mate_missed.b6.2 = Mat in {m} met {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat in {m}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Sneller was {best:nomate}: mat in {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} geeft sneller mat, in {m:move}.
+ex.mate_delayed.b6 = {best:nomate} geeft mat in {m}.
+ex.mate_delayed.b6.2 = Sneller: {best:nomate}, mat in {m}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = O nee! {my} kan nergens heen en staat niet schaak. Dat is pat: remise.
+ex.stalemate.b1.2 = Kijk: {my} heeft geen veilig veld, maar staat niet schaak. Het is remise!
+ex.stalemate.b1.3 = Dat is pat. {my} kan geen zet doen, dus de partij is remise.
+ex.stalemate.b2 = Pat! {my} heeft geen legale zet, en het is geen schaak. Remise.
+ex.stalemate.b2.2 = O nee, pat: {my} zit vast, maar staat niet schaak.
+ex.stalemate.b2.3 = Dat is remise door pat. {my} kan geen zet doen.
+ex.stalemate.b3 = Dat is pat: {my} heeft geen legale zet. Je stond gewonnen!
+ex.stalemate.b3.2 = Pat! {my} zit vast, en een gewonnen partij wordt remise.
+ex.stalemate.b3.3 = {my} heeft geen zetten en staat niet schaak: pat.
+ex.stalemate.b4 = Pat: {my} heeft geen legale zet. Zo gooi je de winst weg.
+ex.stalemate.b4.2 = {move} zet {my} pat. Remise vanuit een gewonnen stelling.
+ex.stalemate.b4.3 = Dat is pat; {my} zit opgesloten.
+ex.stalemate.b5 = {move} zet {my} pat. De winst is weg.
+ex.stalemate.b5.2 = Pat: {my} heeft geen velden.
+ex.stalemate.b5.3 = Dat is pat, {my} zit vast.
+ex.stalemate.b6 = Pat. {my} heeft geen zetten.
+ex.stalemate.b6.2 = {move}, pat: {my} zit opgesloten.
+ex.stalemate.b6.3 = Pat; {my} kan geen kant op.
+ex.stalemate.tip.b1 = Sta je gewonnen? Laat mijn koning dan altijd een veld om naartoe te gaan.
+ex.stalemate.tip.b1.2 = Onthoud: als je voorstaat, geef mijn koning dan wat ruimte.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Pas op! Ik kan mijn stukken weggeven, en dan heeft {my} geen zetten meer: pat.
+ex.stalemate_trick.b1.2 = Let op: {my} zit bijna vast. Ik kan er remise van maken.
+ex.stalemate_trick.b2 = Pas op: ik kan offeren, en dan staat {my} pat.
+ex.stalemate_trick.b2.2 = {my} heeft bijna geen velden meer. Ik kan pat afdwingen!
+ex.stalemate_trick.b3 = Hierdoor kan ik me redden met pat: {my} heeft geen zetten meer.
+ex.stalemate_trick.b3.2 = Pas op: na {line} staat {my} pat.
+ex.stalemate_trick.b4 = {move} laat een pattruc toe: {line}, en {my} kan geen kant op.
+ex.stalemate_trick.b4.2 = Nu kan {my} zich in een pat verschuilen: {line}.
+ex.stalemate_trick.b5 = {move} laat pat toe: {line}; {my} zit opgesloten.
+ex.stalemate_trick.b5.2 = Pattruc: {line}, en {my} heeft geen zetten.
+ex.stalemate_trick.b6 = {line}, pat: {my} zit opgesloten.
+ex.stalemate_trick.b6.2 = Pat na {line}; {my} zit vast.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} kan naar {sq} gaan en dan {t1} en {t2} aanvallen.
+ex.fork.b1.2 = {my} gaat naar {sq} en valt er twee tegelijk aan: {t1} en {t2}.
+ex.fork.b1.3 = Let op {my}: vanaf {sq} valt {my:subj} {t1} en {t2} tegelijk aan.
+ex.fork.b2 = Vork! {my} op {sq} valt {t1} en {t2} tegelijk aan.
+ex.fork.b2.2 = Na jouw zet kan {my} vanaf {sq} een vork zetten op {t1} en {t2}.
+ex.fork.b2.3 = {my} gaat naar {sq}: een dubbele aanval op {t1} en {t2}.
+ex.fork.b3 = {move} laat {reply} toe, een vork op {t1} en {t2}.
+ex.fork.b3.2 = Na {reply} val ik {t1} en {t2} tegelijk aan.
+ex.fork.b3.3 = {reply} is een vork: {t1} en {t2} worden allebei aangevallen.
+ex.fork.b4 = {reply} is een vork op {t1} en {t2}; na {line} heb je {pts:point} verloren.
+ex.fork.b4.2 = {reply} valt {t1} en {t2} tegelijk aan.
+ex.fork.b4.3 = {move} laat de vork {reply} op {t1} en {t2} toe.
+ex.fork.b5 = {move} loopt in de vork {reply}, op {t1} en {t2}.
+ex.fork.b5.2 = {reply} vorkt {t1} en {t2}.
+ex.fork.b5.3 = Na {reply} worden {t1} en {t2} allebei aangevallen.
+ex.fork.b6 = {reply} vorkt.
+ex.fork.b6.2 = {move} laat {reply} toe, een vork.
+ex.fork.b6.3 = {reply}, met een vork.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Je kunt er maar één redden: {t1} of {t2}.
+ex.fork.tail.b1.2 = Nu val ik er twee tegelijk aan: {t1} en {t2}. Dat is een vork!
+ex.fork.tail.b1.3 = Zie je? {t1} en {t2} worden allebei aangevallen. Een van de twee gaat verloren.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} moet uit het schaak, dus ik sla {t1}.
+ex.fork.tail_king.2 = Schaak! {your} moet weg, en {t1} valt.
+ex.fork.more.b3 = Kijk naar {sq} voordat je zet: vanaf daar kan {my} een vork zetten.
+ex.fork.more.b3.2 = Houd {sq} in de gaten. Daarvandaan zet {my} een vork.
+ex.fork.tip.knight = Pas op voor paardensprongen bij je koning en je dame!
+ex.fork.tip.knight.2 = Paarden vallen graag twee stukken tegelijk aan. Kijk waar ze heen kunnen springen.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Als {my} weggaat, valt {my2} {t1} aan!
+ex.discovered.b1.2 = Kijk: {my} staat in de weg. Als {my:subj} weggaat, valt {my2} {t1} aan.
+ex.discovered.b1.3 = {my} kan opzij gaan, en dan valt {my2} {t1} aan.
+ex.discovered.b2 = Een verborgen aanval: {my} gaat weg, en {my2} valt {t1} aan.
+ex.discovered.b2.2 = Pas op: {my} kan weggaan, en dan valt {my2} {t1} aan.
+ex.discovered.b2.3 = {my} gaat opzij en opent de weg voor {my2} naar {t1}.
+ex.discovered.b3 = Na {reply} treft een aftrekaanval {t1}.
+ex.discovered.b3.2 = Met {reply} komt er een aanval op {t1} vrij.
+ex.discovered.b3.3 = {move} laat {reply} toe, een aftrekaanval op {t1}.
+ex.discovered.b4 = {reply} opent de weg naar {t1}: een aftrekaanval.
+ex.discovered.b4.2 = {move} laat de aftrekaanval {reply} toe, die {t1} wint.
+ex.discovered.b4.3 = Na {reply} valt {t1} door een aftrekaanval.
+ex.discovered.b5 = {move} laat de aftrekaanval {reply} toe.
+ex.discovered.b5.2 = {reply} is een aftrekaanval.
+ex.discovered.b5.3 = {reply} opent een verborgen aanval.
+ex.discovered.b6 = {reply}, aftrekaanval op {t1}.
+ex.discovered.b6.2 = {reply} en {t1} valt.
+ex.discovered.b6.3 = Aftrekaanval: {reply}, op {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} valt {t1} aan. Als {t1:subj} weggaat, sla ik {t2}, {t2:rel} erachter staat.
+ex.skewer.b1.2 = Kijk: {my} valt {t1} aan, en {t2} staat er vlak achter.
+ex.skewer.b1.3 = {my} jaagt op {t1}. {t1:subj} moet weg, en dan valt {t2}.
+ex.skewer.b2 = Een spies: {my} valt {t1} aan, en {t2} staat erachter.
+ex.skewer.b2.2 = {my} valt {t1} en {t2} op één lijn aan. Als de eerste weggaat, sla ik de tweede.
+ex.skewer.b2.3 = Pas op: {t1} en {t2} staan op één lijn. {my} kan er een spies op zetten.
+ex.skewer.b3 = {reply} is een spies op {t1} en {t2}.
+ex.skewer.b3.2 = Na {reply} moet {t1} weg en valt {t2}.
+ex.skewer.b3.3 = {move} laat {reply} toe, een spies op {t1} en {t2}.
+ex.skewer.b4 = {reply} is een spies op {t1}; {t2} erachter gaat verloren.
+ex.skewer.b4.2 = Na {move} staan {t1} en {t2} op één lijn: {reply}.
+ex.skewer.b4.3 = Na {reply} gaat {t1} weg en valt {t2}.
+ex.skewer.b5 = {reply}: spies op {t1} en {t2}.
+ex.skewer.b5.2 = {move} laat de spies {reply} toe, door {t1} heen op {t2}.
+ex.skewer.b6 = {reply}, spies.
+ex.skewer.b6.2 = {reply}: een spies.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} kan naar {sq}. Dan staat {your} vast voor {t1}.
+ex.pin.b1.2 = Let op {my} op {sq}: {your} komt vast te staan voor {t1}.
+ex.pin.b1.3 = {my} kan {your} tegen {t1} penen. Dan win ik {your:obj}.
+ex.pin.b2 = Een penning: {your} staat vast voor {t1}.
+ex.pin.b2.2 = {your} staat gepend tegen {t1}. Zo kan ik {your:obj} winnen.
+ex.pin.b2.3 = Nu staat {your} vast voor {t1}. Dat is een penning.
+ex.pin.b3 = {your} komt gepend te staan tegen {t1}, en ik win {your:obj}.
+ex.pin.b3.2 = Hierna staat {your} gepend tegen {t1}.
+ex.pin.b3.3 = De penning op {your} kost materiaal: {t1} staat erachter.
+ex.pin.b4 = {reply} pent en wint materiaal.
+ex.pin.b4.2 = {move} loopt in de penning {reply}.
+ex.pin.b4.3 = Na {reply} valt het gepende stuk.
+ex.pin.b5 = {move} laat de penning {reply} toe.
+ex.pin.b5.2 = {reply} pent, en het stuk gaat verloren.
+ex.pin.b6 = {reply} pent.
+ex.pin.b6.2 = {reply}, met penning.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} staat gepend, dus {your:subj} kan {sq} niet dekken. {t1} staat erachter.
+ex.pin_defender.b1.2 = Kijk: {your} kan {sq} niet echt verdedigen, want {t1} staat erachter.
+ex.pin_defender.b2 = {your} staat gepend tegen {t1}, dus {sq} heeft geen echte verdediger.
+ex.pin_defender.b2.2 = Een gepend stuk is een slechte verdediger. {your} kan {sq} niet dekken: {t1} staat erachter.
+ex.pin_defender.b3 = {your} staat gepend tegen {t1}; {your:subj} verdedigt {sq} niet echt.
+ex.pin_defender.b3.2 = {sq} lijkt gedekt, maar {your} staat gepend voor {t1}.
+ex.pin_defender.b4 = {your} staat gepend, dus {sq} is niet echt gedekt.
+ex.pin_defender.b4.2 = Je gepende {your:bare} kan {sq} niet dekken.
+ex.pin_defender.b5 = {your} staat gepend; {sq} is onbeschermd.
+ex.pin_defender.b5.2 = {sq} valt: {your} staat gepend.
+ex.pin_defender.b6 = {your} staat gepend; {sq} valt.
+ex.pin_defender.b6.2 = {your} gepend, {sq} onbeschermd.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} zit ingesloten. Elk veld waar {your:subj} heen kan, wordt aangevallen.
+ex.trapped.b1.2 = Kijk naar {your}: {your:subj} heeft geen veilig veld om naartoe te vluchten.
+ex.trapped.b1.3 = {your} zit vast. Ik kan {your:obj} aanvallen, en {your:subj} kan niet ontsnappen.
+ex.trapped.b2 = {your} heeft geen veilige velden. Ik kan {your:obj} winnen.
+ex.trapped.b2.2 = {your} zit ingesloten: waar {your:subj} ook heen gaat, ik sla {your:obj}.
+ex.trapped.b2.3 = Pas op, {your} heeft bijna geen velden meer.
+ex.trapped.b3 = {your} raakt ingesloten: geen veilig veld meer.
+ex.trapped.b3.2 = Hierna zit {your} ingesloten: {your:subj} is verloren.
+ex.trapped.b3.3 = {your} is in een val gelopen: {your:subj} kan er niet meer uit.
+ex.trapped.b4 = Na {move} zit {your} ingesloten.
+ex.trapped.b4.2 = {your} kan niet meer terug; ik win {your:obj}.
+ex.trapped.b4.3 = Na {reply} zit {your} ingesloten.
+ex.trapped.b5 = {your} raakt ingesloten: {line}.
+ex.trapped.b5.2 = {move} zet {your} klem.
+ex.trapped.b6 = {your} zit ingesloten.
+ex.trapped.b6.2 = {line} sluit {your} in.
+ex.trapped.tip.b1 = Kijk, voordat je een stuk verplaatst, of het er ook weer uit kan.
+ex.trapped.tip.b1.2 = Stukken diep in mijn kamp kunnen vast komen te zitten. Zorg voor een uitweg.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} zit vast achter {your:poss} pionnen. {my} kan schaak geven op de achterste rij.
+ex.back_rank.b1.2 = Pas op: {your} heeft geen vluchtveld, en {my} kan {sq} bereiken.
+ex.back_rank.b1.3 = {my} kan naar {sq}. {your} zit opgesloten door {your:poss} eigen pionnen.
+ex.back_rank.b2 = Gevaar op de achterste rij: {your} heeft geen luchtgat. {my} kan schaak geven op {sq}.
+ex.back_rank.b2.2 = {your} zit opgesloten. {my} gaat naar {sq} en wint materiaal.
+ex.back_rank.b2.3 = Je achterste rij is zwak: {my} kan {your} schaak geven op {sq}.
+ex.back_rank.b3 = Je achterste rij is zwak: {line}. {your} heeft geen vluchtveld.
+ex.back_rank.b3.2 = {your} heeft geen luchtgat, dus {line} wint materiaal.
+ex.back_rank.b3.3 = Na {line} beslist de achterste rij: {your} zit opgesloten.
+ex.back_rank.b4 = De achterste rij: {line}, en {your} heeft geen luchtgat.
+ex.back_rank.b4.2 = {line} buit de zwakke achterste rij rond {your} uit.
+ex.back_rank.b4.3 = {your} mist een vluchtveld: {line}.
+ex.back_rank.b5 = Zwakke achterste rij rond {your}: {line}.
+ex.back_rank.b5.2 = {line}; {your} heeft geen luchtgat.
+ex.back_rank.b6 = {line}, achterste rij; {your} zit opgesloten.
+ex.back_rank.b6.2 = Achterste rij: {line} ({your}).
+ex.back_rank.tip.b1 = Geef je koning wat lucht: speel een van de pionnen ervoor een veld op.
+ex.back_rank.tip.b1.2 = Een koning achter drie pionnen kan mat gaan op de achterste rij. Geef hem wat ruimte.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} op {sq} is niet gedekt. {my} kan {your:obj} gratis slaan.
+ex.hanging.b1.2 = Kijk naar {your}: niets dekt {your:obj}, en {my} valt {your:obj} aan.
+ex.hanging.b1.3 = {your} is niet gedekt. {my} kan {your:obj} gewoon slaan.
+ex.hanging.b2 = {your} op {sq} hangt. {my} slaat {your:obj}, en jij kunt niet terugslaan.
+ex.hanging.b2.2 = {my} kan {your} gratis slaan. Niets dekt {your:obj}.
+ex.hanging.b2.3 = {your} staat alleen op {sq}, en {my} slaat {your:obj}.
+ex.hanging.b3 = {move} laat {your} ongedekt staan: {reply}, en niets slaat terug.
+ex.hanging.b3.2 = {your} op {sq} gaat verloren door {reply}.
+ex.hanging.b3.3 = Na {reply} is {your} zomaar weg.
+ex.hanging.b4 = {move} laat {your} hangen: {reply} wint {pts:point}.
+ex.hanging.b4.2 = {reply} slaat {your} gratis.
+ex.hanging.b4.3 = {your} staat ongedekt; {reply} slaat {your:obj}.
+ex.hanging.b5 = {move} laat {your} ongedekt staan; {reply} wint {your:obj}.
+ex.hanging.b5.2 = {your} op {sq} gaat verloren door {reply}.
+ex.hanging.b5.3 = {reply} wint {your}.
+ex.hanging.b6 = {move}? {reply} en {your} valt.
+ex.hanging.b6.2 = {reply} wint {your}.
+ex.hanging.b6.3 = {your} hangt: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} dekte {your}. Nu kan {my} {your:obj} slaan.
+ex.hanging_guard.b1.2 = {your2} is weggegaan, en nu staat {your} alleen. {my} slaat {your:obj}.
+ex.hanging_guard.b2 = {your2} dekte {your} eerst. Nu staat {your:subj} alleen, en {my} slaat {your:obj}.
+ex.hanging_guard.b2.2 = Door {your2} te verplaatsen, heb je {your} ongedekt gelaten voor {my}.
+ex.hanging_guard.b3 = {your2} dekte {your}. Na die zet valt {your:subj} door {reply}.
+ex.hanging_guard.b3.2 = Zonder {your2} staat {your} ongedekt: {reply}.
+ex.hanging_guard.b4 = {move} haalt de verdediger weg: {your2} liet {your} staan, en {reply} pikt {your:obj} op.
+ex.hanging_guard.b4.2 = {your2} was de enige verdediger van {your}; {reply} wint {your:obj}.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} viel {your} al aan. Kijk altijd wat mijn zet dreigt.
+ex.hanging_threat.b1.2 = Je hebt mijn dreiging niet gezien: {my} valt {your} aan.
+ex.hanging_threat.b2 = Met mijn vorige zet viel {my} {your} aan. Kijk altijd naar mijn dreigingen.
+ex.hanging_threat.b2.2 = {my} bedreigde {your}, en nu kan ik {your:obj} slaan.
+ex.hanging_threat.b3 = Je hebt mijn dreiging gemist: {my} viel {your} aan.
+ex.hanging_threat.b3.2 = {my} had {your} de hele tijd al in het vizier.
+ex.hanging.tip.b1 = Vraag je voor elke zet af: staan al mijn stukken veilig?
+ex.hanging.tip.b1.2 = Een goede gewoonte: kijk na elke zet welke van je stukken gedekt zijn.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. "afwikkeling" = a forced sequence of captures.
+ex.exchange_capture.b1 = {your} heeft geslagen, maar {my} slaat terug. Die ruil kost je punten.
+ex.exchange_capture.b1.2 = {my} slaat terug. {your} is {n:point} waard, maar je kreeg maar {n2:point}.
+ex.exchange_capture.b1.3 = Pas op: {my} kan {your} terugslaan. Dat is een slechte ruil.
+ex.exchange_capture.b2 = Pas op met ruilen: {your} is {n:point} waard. {my} slaat terug, en jij kreeg maar {n2:point}.
+ex.exchange_capture.b2.2 = {my} slaat {your} terug. Je verliest {n:point} en wint maar {n2:point}.
+ex.exchange_capture.b3 = Het slaan op {sq} werkt niet: na {line} gaat {your} verloren.
+ex.exchange_capture.b3.2 = {your} slaat op {sq}, maar na {line} heb je {pts:point} verloren.
+ex.exchange_capture.b4 = Met {move} tel je verkeerd op {sq}: na {line} gaat {your} verloren.
+ex.exchange_capture.b4.2 = Slaan op {sq} kost {your}: {line}.
+ex.exchange_capture.b5 = {move} verliest {your} in de afwikkeling op {sq}: {line}.
+ex.exchange_capture.b5.2 = Op {sq} gaat {your} verloren: {line}.
+ex.exchange_capture.b6 = {move} verliest {your} op {sq} na {line}.
+ex.exchange_capture.b6.2 = {line} op {sq}, en {your} is weg.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Tel ze maar: ik val {sq} {n:time} aan, jij dekt het {n2:time}.
+ex.exchange_count.b1.2 = Op {sq} heb ik {n:attacker} en heb jij {n2:defender}. Dat win ik.
+ex.exchange_count.b2 = {sq} wordt {n:time} aangevallen en {n2:time} gedekt. Daar verlies je materiaal.
+ex.exchange_count.b2.2 = Tel op {sq}: {n:attacker} tegen {n2:defender}.
+ex.exchange_count.b3 = Tel de aanvallers en verdedigers op {sq}: ik heb er meer.
+ex.exchange_count.b3.2 = De ruil op {sq} werkt niet: na {line} heb je {pts:point} verloren.
+ex.exchange_count.b4 = Met {move} tel je verkeerd op {sq}: {line}, en je hebt {pts:point} verloren.
+ex.exchange_count.b4.2 = {sq} wordt vaker aangevallen dan gedekt: {line}.
+ex.exchange_count.b5 = Op {sq} wint de aanval, {n:attacker} tegen {n2:defender}: {line}.
+ex.exchange_count.b5.2 = Na {move} kom je op {sq} tekort.
+ex.exchange_count.b6 = {line} op {sq}, en ik heb {pts:point} gewonnen.
+ex.exchange_count.b6.2 = {sq}: {n} tegen {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} is minder waard dan {your}. Als ik sla, verlies jij punten.
+ex.exchange_cheap.b1.2 = {my} valt {your} aan. Ruilen is slecht voor jou.
+ex.exchange_cheap.b2 = {your} is {n:point} waard, en {my} maar {n2}. Die ruil kost je wat.
+ex.exchange_cheap.b2.2 = {my} is goedkoper dan {your}, dus de aanval wint materiaal.
+ex.exchange_cheap.b3 = {your} op {sq} wordt aangevallen door iets wat minder waard is.
+ex.exchange_cheap.b3.2 = Een aanvaller van {n2:point} valt {your} op {sq} aan: {line}.
+ex.exchange_cheap.b4 = {your} op {sq} wordt aangevallen door iets wat minder waard is; {reply} wint materiaal.
+ex.exchange_cheap.b4.2 = {reply} valt {your} op {sq} aan met iets wat minder waard is.
+ex.exchange_cheap.b5 = {your} op {sq} staat bloot aan een goedkopere aanvaller: {line}.
+ex.exchange_cheap.b5.2 = {reply} wint materiaal op {sq} tegen {your}.
+ex.exchange_cheap.b6 = {reply} wint {your} op {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} op {sq} gaat verloren.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Pas op: nu kan ik {t1} winnen.
+ex.material.b1.2 = Door die zet komt {t1} in de problemen. Ik kan {t1:obj} winnen.
+ex.material.b2 = Door deze zet kan ik {t1} winnen.
+ex.material.b2.2 = Nu komt {t1} in de problemen, en ik win {t1:obj}.
+ex.material.b3 = {move} verliest materiaal: na {line} heb je {pts:point} verloren.
+ex.material.b3.2 = Na {line} sta je {pts:point} achter.
+ex.material.b4 = {move} verliest materiaal: {line}, en je hebt {pts:point} verloren.
+ex.material.b4.2 = Na {line} sta je {pts:point} achter.
+ex.material.b5 = {move} kost materiaal: {line}.
+ex.material.b5.2 = {line} wint {pts:point} voor mij.
+ex.material.b6 = {line}, en ik heb {pts:point} gewonnen.
+ex.material.b6.2 = {move} verliest {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Zag je het? {my} op {sq} stond voor het oprapen. {your} had {my:obj} kunnen slaan.
+ex.missed_capture.b1.2 = Kijk: {my} had geen verdediger. {your} had {my:obj} kunnen slaan.
+ex.missed_capture.b1.3 = {my} op {sq} was niet gedekt. {your} had {my:obj} kunnen pakken!
+ex.missed_capture.b2 = Je hebt een gratis slag gemist: {best} wint {my}.
+ex.missed_capture.b2.2 = {my} hing op {sq}. {best} slaat {my:obj}. Pak zoiets de volgende keer!
+ex.missed_capture.b2.3 = {best} had {my} gratis gewonnen.
+ex.missed_capture.b3 = {best} had {my} voor niets gewonnen.
+ex.missed_capture.b3.2 = {my} op {sq} stond ongedekt: {best}. Kijk elke zet naar ongedekte stukken.
+ex.missed_capture.b3.3 = Je had {my} kunnen slaan met {best}.
+ex.missed_capture.b4 = Gemist: {best} wint {my} op {sq}.
+ex.missed_capture.b4.2 = {best} wint {my}, {my:rel} ongedekt stond.
+ex.missed_capture.b4.3 = {my} hing: {best}.
+ex.missed_capture.b5 = {best} wint {my}; {move} laat {my:obj} ontsnappen.
+ex.missed_capture.b5.2 = {my} op {sq} stond ongedekt: {best}.
+ex.missed_capture.b6 = {best}! {my} op {sq} hing.
+ex.missed_capture.b6.2 = {best} wint {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Je had een dubbele aanval: {best} valt {t1} en {t2} aan!
+ex.missed_fork.b1.2 = Kijk! {best} had {t1} en {t2} tegelijk aangevallen.
+ex.missed_fork.b1.3 = {best} was een vork: {t1} en {t2} worden allebei aangevallen.
+ex.missed_fork.b2 = {best} was een vork: {t1} en {t2}.
+ex.missed_fork.b2.2 = Je hebt een dubbele aanval gemist: {best}, op {t1} en {t2}.
+ex.missed_fork.b2.3 = {best} valt {t1} en {t2} tegelijk aan. Een vork!
+ex.missed_fork.b3 = {best} was een vork: {t1} en {t2}.
+ex.missed_fork.b3.2 = Je had {best}, met een vork op {t1} en {t2}.
+ex.missed_fork.b3.3 = {best} had {t1} en {t2} gevorkt.
+ex.missed_fork.b4 = {best} vorkt {t1} en {t2}.
+ex.missed_fork.b4.2 = Vork gemist: {best} op {t1} en {t2}.
+ex.missed_fork.b5 = {best} vorkt {t1} en {t2}.
+ex.missed_fork.b5.2 = {best} valt {t1} en {t2} aan.
+ex.missed_fork.b6 = {best} vorkt {t1} en {t2}.
+ex.missed_fork.b6.2 = {best}: vork op {t1} en {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} kan naar {sq} lopen en dame worden. {your} staat te ver weg.
+ex.promotion.b1.2 = Kijk: niets houdt {my} tegen op weg naar {sq}. {your} kan {my:obj} niet inhalen.
+ex.promotion.b1.3 = {my} staat {n:square} van {sq} af, en {your} is te langzaam.
+ex.promotion.b2 = {my} loopt naar {sq}, en {your} kan {my:obj} niet inhalen.
+ex.promotion.b2.2 = {my} heeft {n:move} nodig tot {sq}; {your} heeft er {n2} nodig. Te langzaam.
+ex.promotion.b2.3 = Pas op: {my} promoveert op {sq}, en {your} staat te ver weg.
+ex.promotion.b3 = {my} staat buiten het vierkant: {your} haalt {my:obj} niet in vóór {sq}.
+ex.promotion.b3.2 = De wedloop is verloren: {my} bereikt {sq} eerder dan {your}.
+ex.promotion.b4 = {your} staat buiten het vierkant van de pion; die promoveert op {sq}.
+ex.promotion.b4.2 = {my} promoveert op {sq}; {your} komt een zet te kort.
+ex.promotion.b5 = De pionnenwedloop is verloren: {your} staat buiten het vierkant en is te laat voor {sq}.
+ex.promotion.b5.2 = {line}: ik promoveer op {sq} en {your} komt te laat.
+ex.promotion.b6 = {your} staat buiten het vierkant; ik promoveer op {sq}.
+ex.promotion.b6.2 = {line}, promotie op {sq} ({your} te laat).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Je pion had naar {sq} kunnen lopen en dame kunnen worden!
+ex.promotion_missed.b1.2 = Kijk naar {sq}! Je pion had erheen kunnen rennen.
+ex.promotion_missed.b2 = Je pion had naar {sq} kunnen lopen. Speel vrijpionnen op!
+ex.promotion_missed.b2.2 = Niets hield je pion tegen op weg naar {sq}.
+ex.promotion_missed.b3 = {best} wint de wedloop naar {sq}.
+ex.promotion_missed.b3.2 = Je pion was sneller: {best}, en hij wordt dame op {sq}.
+ex.promotion_missed.b4 = {best} wint de pionnenwedloop naar {sq}.
+ex.promotion_missed.b4.2 = {best}! De pion wordt dame op {sq}.
+ex.promotion_missed.b5 = {best} promoveert als eerste op {sq}.
+ex.promotion_missed.b5.2 = {best}, en {sq} is van jou.
+ex.promotion_missed.b6 = {best} wint de wedloop naar {sq}.
+ex.promotion_missed.b6.2 = {best}; als eerste op {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Die pion beschermde {your}. Nu heeft {your} minder dekking.
+ex.king_shield.b1.2 = De pion die op {sq} stond, was een schild voor {your}. Nu kunnen mijn stukken binnenkomen.
+ex.king_shield.b2 = Door de pion van {sq} weg te zetten, verzwak je {your}. Mijn stukken kunnen {your:obj} nu aanvallen.
+ex.king_shield.b2.2 = {your} heeft een beschermer verloren: de pion op {sq} was {your:poss} schild.
+ex.king_shield.b3 = Die pionzet stelt {your} bloot aan mijn aanval.
+ex.king_shield.b3.2 = {your} verliest {your:poss} pionnendekking, en mijn stukken komen binnen.
+ex.king_shield.b4 = {move} verzwakt de pionnen rond {your}; mijn aanval komt erdoor.
+ex.king_shield.b4.2 = Na {move} is het schild rond {your} gebroken.
+ex.king_shield.b5 = {move} verzwakt de dekking van {your}: {line}.
+ex.king_shield.b5.2 = Na {move} staat {your} bloot: {line}.
+ex.king_shield.b6 = {move} verzwakt {your}: {line}.
+ex.king_shield.b6.2 = {line}; {your} staat te open.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} is in gevaar. Mijn stukken komen erop af.
+ex.king_exposed.b1.2 = Kijk eens hoe open {your} staat. Houd {your:obj} veilig achter {your:poss} pionnen.
+ex.king_exposed.b2 = {your} staat te open. Ik kan nu vaak schaak geven.
+ex.king_exposed.b2.2 = Pas op: {your} heeft geen beschutting, en mijn stukken vallen {your:obj} aan.
+ex.king_exposed.b3 = {your} staat bloot; mijn stukken kunnen {your:obj} met schaakzetten aanvallen.
+ex.king_exposed.b3.2 = Hierna heeft {your} geen beschutting meer.
+ex.king_exposed.b4 = {your} komt bloot te staan: {line}.
+ex.king_exposed.b4.2 = {move} laat {your} open voor een aanval.
+ex.king_exposed.b5 = {your} staat te bloot: {line}.
+ex.king_exposed.b5.2 = Na {move} staat {your} onbeschut.
+ex.king_exposed.b6 = {line}; {your} staat bloot.
+ex.king_exposed.b6.2 = {your} staat te open: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Deze ruil leidt tot een pionneneindspel dat ik win.
+ex.bad_trade.b3.2 = Na {line} zijn er alleen pionnen over, en mijn koning staat beter.
+ex.bad_trade.b4 = De ruilen leiden tot een verloren pionneneindspel: {line}.
+ex.bad_trade.b4.2 = Afruilen naar dit pionneneindspel verliest.
+ex.bad_trade.b5 = Verkeerde ruil: het pionneneindspel na {line} is verloren.
+ex.bad_trade.b5.2 = Het pionneneindspel is verloren; houd stukken op het bord.
+ex.bad_trade.b6 = Het pionneneindspel na {line} is verloren.
+ex.bad_trade.b6.2 = Verloren pionneneindspel: {line}.
+ex.bishop_pair.b5 = Die ruil kost je het loperpaar.
+ex.bishop_pair.b5.2 = Met die ruil geef jij je loperpaar op; het mijne blijft.
+ex.bishop_pair.b6 = Het loperpaar is weg.
+ex.bishop_pair.b6.2 = Loperpaar weggegeven.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} neemt de oppositie: de koningen staan tegenover elkaar met één veld ertussen.
+ex.opposition.b3.2 = De koningen! {best} had de oppositie genomen.
+ex.opposition.b4 = {best} neemt de oppositie: daar draait het om.
+ex.opposition.b4.2 = De oppositie beslist: {best}.
+ex.opposition.b5 = {best}, met oppositie.
+ex.opposition.b5.2 = Oppositie: {best}.
+ex.opposition.b6 = {best}, oppositie.
+ex.opposition.b6.2 = {best}: de oppositie.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Je pion kon naar {sq} lopen. Vrijpionnen willen vooruit!
+ex.push_passed.b1.2 = Speel je vrije pion op! Hij wil {sq} bereiken.
+ex.push_passed.b1.3 = Je vrijpion wil naar {sq} marcheren. Speel hem op!
+ex.push_passed.b2 = {best}: speel de vrijpion op richting {sq}.
+ex.push_passed.b2.2 = Je vrijpion is sterk. {best} speelt hem op.
+ex.push_passed.b2.3 = Opspelen! {best} brengt de pion dichter bij {sq}.
+ex.push_passed.b3 = {best} speelt de vrijpion op.
+ex.push_passed.b3.2 = Vrijpionnen moeten lopen: {best}.
+ex.push_passed.b3.3 = {best} was de weg: de pion loopt naar {sq}.
+ex.push_passed.b4 = {best}: de vrijpion beslist.
+ex.push_passed.b4.2 = Opspelen: {best}.
+ex.push_passed.b5 = {best}, de vrijpion loopt door: {eval}.
+ex.push_passed.b5.2 = De vrijpion: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, de vrijpion.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Breng {your} naar voren! In het eindspel is de koning een sterk stuk.
+ex.king_active.b1.2 = Nu kan {your} meedoen. Loop ermee naar het midden.
+ex.king_active.b1.3 = Met weinig stukken op het bord moet {your} naar buiten komen om te helpen.
+ex.king_active.b2 = Gebruik {your} in het eindspel: breng {your:obj} naar het centrum.
+ex.king_active.b2.2 = {your} moet nu actief worden. Breng {your:obj} naar voren.
+ex.king_active.b3 = {best} activeert de koning. In het eindspel vecht de koning mee.
+ex.king_active.b3.2 = {best}: de koning hoort nu in het centrum.
+ex.king_active.b4 = {best} centraliseert de koning.
+ex.king_active.b4.2 = De koning moet naar voren: {best}.
+ex.king_active.b5 = {best} activeert de koning: {line}.
+ex.king_active.b5.2 = Koningsactiviteit: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, koning naar voren.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = Met {best} houd je een betere stelling.
+ex.positional.b4.2 = {best} was hier sterker.
+ex.positional.b4.3 = Ik had de voorkeur gegeven aan {best}.
+ex.positional.b5 = {best} was sterker: {line}.
+ex.positional.b5.2 = {best}, met het idee {line}.
+ex.positional.b5.3 = Overweeg {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+# "Een paard aan de rand is een schande" is the Dutch rhyme for "a knight on the rim is dim".
+tip.early_queen.b1 = {your} kwam heel vroeg naar buiten. Breng eerst je paarden en lopers in het spel.
+tip.early_queen.b1.2 = Pas op met {your} zo vroeg: mijn stukken kunnen {your:obj} opjagen.
+tip.early_queen.b1.3 = Spelen met {your} is leuk, maar breng eerst de lichte stukken naar buiten.
+tip.early_queen.b2 = Als je {your} zo vroeg speelt, kan ik {your:obj} aanvallen en tijd winnen.
+tip.early_queen.b2.2 = {your} nu al naar buiten? Eerst paarden en lopers!
+tip.early_queen.b3 = Komt {your} zo vroeg naar buiten, dan win ik tempo door {your:obj} aan te vallen.
+tip.early_queen.b3.2 = {your} is zo vroeg makkelijk op te jagen. Eerst ontwikkelen.
+tip.queen_grab.b1 = {your} heeft een verre pion geslagen, en nu kan {your:subj} in de problemen komen.
+tip.queen_grab.b1.2 = Pionnen pakken met {your} kost tijd. Eerst ontwikkelen!
+tip.queen_grab.b2 = {your} ging op pionnenjacht aan de zijkant. Dat kost veel tijd.
+tip.queen_grab.b2.2 = Wees voorzichtig als je {your} op verre pionnen afstuurt.
+tip.queen_grab.b3 = Zo vroeg pionnen pakken met {your} kost tijd.
+tip.queen_grab.b3.2 = {your} staat nu ver van huis; mijn ontwikkeling gaat tellen.
+tip.queen_grab.b4 = {your} pakt een pion, maar verliest te veel tijd.
+tip.queen_grab.b4.2 = De pionnenroof aan de zijkant met {your} kost tempo.
+tip.same_piece.b1 = Je hebt twee keer met {your} gespeeld. Probeer elke zet een nieuw stuk naar buiten te brengen.
+tip.same_piece.b1.2 = Alweer {your}? Breng je andere stukken ook naar buiten.
+tip.same_piece.b1.3 = Probeer elke zet een nieuw stuk te ontwikkelen, niet weer {your}.
+tip.same_piece.b2 = Twee keer met {your} spelen in de opening kost tijd.
+tip.same_piece.b2.2 = Je speelt alweer met {your}; je andere stukken staan nog thuis.
+tip.same_piece.b3 = Twee keer met {your} spelen kost ontwikkeling.
+tip.same_piece.b3.2 = Weer een zet met {your}; de rest van je leger wacht.
+tip.castle.b1 = {your} staat nog in het midden. Met een rokade zet je {your:obj} veilig.
+tip.castle.b1.2 = Tijd om te rokeren! {your} staat veiliger in de hoek.
+tip.castle.b1.3 = Denk eraan om snel te rokeren. {your} staat open en bloot.
+tip.castle.b2 = {your} staat nog in het centrum. Rokeer snel!
+tip.castle.b2.2 = Met een rokade breng je {your} in veiligheid.
+tip.castle.b3 = Nu het centrum opengaat, moet {your} rokeren.
+tip.castle.b3.2 = {your} staat nog in het centrum; het was tijd om te rokeren.
+tip.knight_rim.b1 = {your} aan de rand doet niet veel. Paarden staan graag in het midden.
+tip.knight_rim.b1.2 = Een paard aan de rand is een schande! {your} beheerst daar minder velden.
+tip.knight_rim.b2 = {your} beheerst aan de rand weinig velden. Mik op het centrum.
+tip.knight_rim.b2.2 = Een paard aan de rand is een schande: {your} wil naar het centrum.
+tip.knight_rim.b3 = {your} staat buitenspel aan de rand.
+tip.knight_rim.b3.2 = De rand is een slechte plek voor {your}.
+tip.flank.b1 = Probeer eerst de middenpionnen te spelen. Randpionnen helpen niet veel.
+tip.flank.b1.2 = Pionnen aan de zijkant helpen je stukken niet naar buiten. Gebruik de middelste.
+tip.flank.b2 = Randpionzetten ontwikkelen niets. Gebruik de centrumpionnen.
+tip.flank.b2.2 = Te veel pionzetten aan de zijkant. Ontwikkel je stukken!
+tip.flank.b3 = Pionzetten op de vleugel kosten in de opening ontwikkeling.
+tip.flank.b3.2 = De randpionnen kunnen wachten; ontwikkel en vecht om het centrum.
+tip.centre.b1 = Probeer het midden van het bord te beheersen, zoals het veld {sq}.
+tip.centre.b1.2 = Het centrum is belangrijk. Zet een pion of een stuk in de buurt van {sq}.
+tip.centre.b1.3 = Stukken in het midden zijn sterk. Mik op velden zoals {sq}.
+tip.centre.b2 = Vecht om het centrum: velden zoals {sq} zijn belangrijk.
+tip.centre.b2.2 = Je geeft me het centrum. Kijk naar {sq}.
+tip.centre.b3 = Je bestrijdt het centrum niet; {sq} is van mij.
+tip.centre.b3.2 = Betwist het centrum, rond {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Tegen een kale koning: drijf hem naar de rand en zet hem dan mat.
+tip.mate_technique.b1.2 = Tip: drijf mijn koning naar de rand. Houd je eigen koning ook dichtbij.
+tip.fifty.b1 = Pas op: na vijftig zetten zonder slagzet of pionzet is het remise.
+tip.fifty.b1.2 = De tijd dringt: vijftig zetten zonder slagzetten of pionzetten is remise.
+tip.repetition.b1 = Pas op! Als dezelfde stelling voor de derde keer op het bord komt, is het remise.
+tip.repetition.b1.2 = Herhaal geen zetten: een derde herhaling is remise, en jij staat gewonnen.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+# great = "uitstekend" (glossary); excellent = "heel sterk" / "precies", so the two stay apart.
+praise.sacrifice = Wauw, je gaf een stuk weg, en het werkt!
+praise.sacrifice.2 = Een slim offer! Heel goed gespeeld.
+praise.brilliant.b3 = Briljant! Een echt offer.
+praise.brilliant.b3.2 = Wauw, {move} is een geweldig offer!
+praise.brilliant.b4 = {move}! Een briljant offer.
+praise.brilliant.b4.2 = Briljant. Dat had ik niet verwacht.
+praise.brilliant.b5 = {move}!! Briljant.
+praise.brilliant.b5.spoken = {move}. Briljant!
+praise.brilliant.b5.2 = Een briljant offer.
+praise.brilliant.b6 = {move}!! Uitstekend.
+praise.brilliant.b6.spoken = {move}. Uitstekend!
+praise.brilliant.b6.2 = Briljant.
+praise.great.b2 = Uitstekende zet! Je hebt de weg gevonden om terug te vechten.
+praise.great.b2.2 = Dat is een uitstekende zet. Goed gevonden!
+praise.great.b3 = Uitstekende zet! Je hebt het enige goede idee gevonden.
+praise.great.b3.2 = Uitstekend, {move} draait de zaak om.
+praise.great.b4 = {move}! Een uitstekende vondst.
+praise.great.b4.2 = Uitstekende zet.
+praise.great.b5 = {move}! Goed gevonden.
+praise.great.b5.2 = Sterk: {move}.
+praise.great.b6 = {move}! Uitstekend.
+praise.great.b6.2 = Mooie vondst.
+praise.only.b2 = Goed! Dat was de enige goede zet.
+praise.only.b2.2 = Goed gedaan, je hebt de enige zet gevonden die werkt.
+praise.only.b3 = De enige zet, en je hebt hem gevonden.
+praise.only.b3.2 = Precies! Niets anders werkte hier.
+praise.only.b4 = De enige zet. Goed gedaan.
+praise.only.b4.2 = Enige zet, gevonden.
+praise.only.b5 = Enige zet. Goed.
+praise.only.b5.2 = {move}, de enige zet.
+praise.only.b6 = Enige zet.
+praise.only.b6.2 = Nauwkeurig: de enige zet.
+praise.fork.b2 = Een dubbele aanval! Goed gedaan.
+praise.fork.b2.2 = Je valt twee stukken tegelijk aan! Geweldig.
+praise.fork.b2.3 = Mooi! Dat is een vork.
+praise.fork.b3 = Mooie vork.
+praise.fork.b3.2 = Goede vork!
+praise.fork.b3.3 = Een vork. Goed gespeeld.
+praise.capture.b1 = Goed gedaan! Je hebt {my} gratis geslagen.
+praise.capture.b1.2 = Goed gezien! {my} was niet gedekt.
+praise.capture.b1.3 = Ja! Je hebt {my} gewonnen.
+praise.capture.b2 = Goede slag! {my} stond ongedekt.
+praise.capture.b2.2 = Mooi, je hebt {my} opgepikt.
+praise.capture.b2.3 = Goed gezien: {my} hing.
+praise.best.b1 = Goede zet!
+praise.best.b1.2 = Heel goed!
+praise.best.b1.3 = Goed gespeeld!
+praise.best.b2 = Goede zet.
+praise.best.b2.2 = Heel mooi.
+praise.best.b2.3 = Goed gespeeld.
+praise.best.b3 = Goede zet: niet makkelijk te vinden.
+praise.best.b3.2 = Mooi gevonden.
+praise.best.b3.3 = {move} is hier de beste zet. Goed.
+praise.trade.b1 = Goed! Als je voorstaat, helpt ruilen je.
+praise.trade.b1.2 = Mooie ruil. Je staat voor, dus minder stukken is goed voor jou.
+praise.trade.b2 = Goede ruil: je staat voor, dus ruil stukken af.
+praise.trade.b2.2 = Het is slim om {my} af te ruilen als je voorstaat.
+praise.trade.b3 = Goed: ruilen als je voorstaat.
+praise.trade.b3.2 = Verstandige ruil.
+praise.excellent.b3 = Heel sterke zet.
+praise.excellent.b3.2 = Dat is een sterke zet.
+praise.excellent.b3.3 = Heel precies.
+praise.excellent.b4 = Nauwkeurig.
+praise.excellent.b4.2 = Heel sterk.
+praise.excellent.b4.3 = Goed, {move} is nauwkeurig.
+praise.castle.b1 = Goed! Je hebt gerokeerd. Je koning staat nu veiliger.
+praise.castle.b1.2 = Mooie rokade! Je koning zit veilig weggestopt.
+praise.saved.b1 = Goed! Je hebt je stuk gered.
+praise.saved.b1.2 = Goed gedaan, je stuk staat weer veilig.
+praise.book.b1 = Goed, dat is een bekende openingszet.
+praise.book.b1.2 = Mooi, zo beginnen sterke spelers ook.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Pas op! Ik dreig schaakmat op {sq}.
+threat.mate.b1.2 = Let op: {my} wil naar {sq}. Dat zou schaakmat zijn.
+threat.mate.b1.3 = Kijk naar {sq}. Als ik daar kom, is het schaakmat!
+threat.mate.b2 = Pas op, ik dreig mat.
+threat.mate.b2.2 = Let op: er dreigt mat op {sq}.
+threat.mate.b2.3 = Kijk goed: ik dreig schaakmat.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Kijk: {my} valt {your} aan.
+threat.piece.b1.2 = Pas op! {your} wordt aangevallen door {my}.
+threat.piece.b1.3 = Let op, {my} wil {your} slaan.
+threat.piece.b2 = Pas op met {your}.
+threat.piece.b2.2 = {your} wordt aangevallen.
+threat.piece.b2.3 = Let op {your}.
+threat.punish.b1 = Mijn vorige zet was een fout. Kun je dat afstraffen?
+threat.punish.b1.2 = Hmm, ik denk dat ik een fout heb gemaakt. Kun je hem vinden?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Denk deze keer aan {your}.
+tb.hint.b1.2 = Houd {your} in de gaten.
+tb.hint.king.b1 = Denk aan de veiligheid van {your}.
+tb.hint.king.b1.2 = Kijk eerst naar {your}. Staat {your:subj} veilig?
+tb.hint.missed.b1 = Zoek naar stukken die je gratis kunt slaan.
+tb.hint.missed.b1.2 = Kijk goed: is er iets wat je kunt slaan?
+tb.hint.mate_missed.b1 = Kijk naar mijn koning. Kun je hem mat zetten?
+tb.hint.mate_missed.b1.2 = Probeer eerst de schaakzetten. Misschien is er een schaakmat!
+tb.hint.general.b1 = Neem de tijd en kijk naar het hele bord.
+tb.hint.general.b1.2 = Probeer een veiligere zet te vinden.
+# The retry.
+tb.fixed.b1 = Veel beter!
+tb.fixed.b1.2 = Ja, dat is beter!
+tb.fixed.b1.3 = Goed, dat werkt veel beter.
+tb.fixed = Dat is beter.
+tb.fixed.2 = Beter.
+tb.fixed.3 = Goed verbeterd.
+tb.same = Weer dezelfde zet? Goed, we zullen zien.
+tb.same.2 = Die zet bevalt je wel. Laten we kijken waar hij toe leidt.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Ja! Dat is de zet die ik bedoelde.
+tb.found.b1.2 = Je hebt hem gevonden! Dat is de betere zet.
+tb.found = Dat is de zet die ik in gedachten had.
+tb.found.2 = Precies, dat is hem.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Je kunt in deze partij geen zetten meer terugnemen, vrees ik.
+tb.none_left.2 = Je kunt in deze partij niets meer terugnemen.

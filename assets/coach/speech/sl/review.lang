@@ -1,0 +1,966 @@
+# Coach speech (Slovenian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# The coach says "ti"; he is male ("nisem pričakoval", "jaz bi igral"). The player's gender is unknown:
+# no past tense, future or conditional with the player as subject ("si vzel", "bi lahko vzel"), and no
+# adjective about the player. Used instead: the present ("izgubiš", "imaš {pts:point_acc} manj"), the
+# imperative, impersonal turns ("ušla ti je priložnost", "bilo je mogoče vzeti", "uspelo ti je najti")
+# and noun subjects ("zmaga je tvoja", "poteza {best} bi dobila ...").
+# A move placeholder has no gender: as the subject of a past or conditional it gets the noun "poteza"
+# ("Poteza {best} je bila boljša"), or the neuter impersonal of Slovenian annotation ("Boljše je bilo
+# {best}"). Prepositions s / z never stand before {move}/{best}/{reply}: "s potezo {best}".
+# Pieces: case forms of sl/common.lang ({your:acc}, {my:gen}, {your:with} = "s tvojim ..."), "svoj"
+# forms (refl_*) when the player or the coach owning the piece is the subject, clitics ({your:cl_acc}
+# = ga / jo) after the piece has been named, agreement endings (vezan{your:ag}, vred{your:ag_en}).
+# Counts: "mat v {m:move_loc}" (written "v 3 potezah"), "Mat v {m:mv}" for the terse levels (written
+# "Mat v 3", spoken "mat v treh potezah"), lost points "imaš {pts:point_acc} manj".
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Šah! Moj kralj je napaden.
+ann.check.human.b1.2 = Šah! Napadaš mojega kralja.
+ann.check.human.b1.3 = To je šah! Moj kralj se mora rešiti iz šaha.
+ann.check.human = Šah.
+ann.check.human.2 = Šah!
+ann.check.human.3 = In to je šah.
+# The coach gives check.
+ann.check.coach = Šah!
+ann.check.coach.2 = Šah.
+ann.check.coach.3 = In šah!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = To pomeni, da je {your} pod napadom. Moraš {your:cl_acc} rešiti iz šaha.
+ann.check.coach.first.2 = Šah pomeni, da je {your} pod napadom. Umakni {your:cl_acc}, postavi kaj vmes ali vzemi mojo figuro.
+ann.double_check.coach = Dvojni šah! Dve moji figuri hkrati napadata tvojega kralja, zato se mora umakniti.
+ann.double_check.coach.2 = To je dvojni šah: zdaj ti pomaga samo poteza s kraljem.
+ann.double_check.human = Dvojni šah! Dve tvoji figuri hkrati napadata mojega kralja, zato se mora umakniti.
+ann.double_check.human.2 = Dvojni šah! Zdaj me lahko reši samo poteza s kraljem.
+# The player checkmates the coach.
+ann.mate.human.b1 = Mat! Zmaga je tvoja! Moj kralj ne more pobegniti.
+ann.mate.human.b1.2 = To je mat! Bravo, partija je tvoja!
+ann.mate.human.b1.3 = Mat! Moj kralj je ujet. Čestitam!
+ann.mate.human = Mat. Lepo odigrano.
+ann.mate.human.2 = To je mat. Čestitam.
+ann.mate.human.3 = Mat! Lepo izpeljano.
+# The coach checkmates the player.
+ann.mate.coach.b1 = To je mat. Tvoj kralj nima izhoda.
+ann.mate.coach.b1.2 = Mat. Tvoj kralj je napaden in ne more pobegniti.
+ann.mate.coach.b1.3 = Bojim se, da je to mat. Tvoj kralj ne more uiti.
+ann.mate.coach = Mat.
+ann.mate.coach.2 = In to je mat.
+ann.mate.coach.3 = Mat, žal.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ojoj! Ta poteza nekaj podari.
+ex.verdict.blunder.b1.2 = Previdno! Ta poteza te lahko drago stane.
+ex.verdict.blunder.b1.3 = Oh, počakaj. S to potezo je nekaj narobe.
+ex.verdict.blunder.b2 = Hm, ta poteza ni v redu.
+ex.verdict.blunder.b2.2 = To je velika napaka.
+ex.verdict.blunder.b2.3 = Previdno, ta poteza te nekaj stane.
+ex.verdict.blunder.b3 = To je groba napaka.
+ex.verdict.blunder.b3.2 = {move} je prava napaka.
+ex.verdict.blunder.b3.3 = Joj, {move} je velika napaka.
+ex.verdict.blunder.b4 = {move} je groba napaka.
+ex.verdict.blunder.b4.2 = {move} je resna napaka.
+ex.verdict.blunder.b4.3 = Bojim se, da je to groba napaka.
+ex.verdict.blunder.b5 = {move} je resna napaka.
+ex.verdict.blunder.b5.2 = {move} je groba napaka.
+ex.verdict.blunder.b5.3 = {move} je napaka, ki drago stane.
+ex.verdict.blunder.b6 = {move} je resna napaka.
+ex.verdict.blunder.b6.2 = {move} je groba napaka.
+ex.verdict.blunder.b6.3 = {move}? Groba napaka.
+# A blunder that leaves the coach's threat standing (levels 1-2).
+ex.verdict.ignored.b1 = Ojoj! Moja grožnja je ostala brez odgovora.
+ex.verdict.ignored.b1.2 = Previdno! Moja grožnja je bila še vedno tu.
+ex.verdict.ignored.b1.3 = Oh, počakaj. Kaj pa moja grožnja?
+ex.verdict.ignored.b2 = Hm, moja grožnja je bila še vedno tu.
+ex.verdict.ignored.b2.2 = Moja grožnja je ostala brez odgovora.
+ex.verdict.ignored.b2.3 = Previdno, na mojo grožnjo je bilo treba odgovoriti.
+ex.verdict.mistake.b3 = To ni dobra poteza.
+ex.verdict.mistake.b3.2 = Hm, s potezo {move} je nekaj narobe.
+ex.verdict.mistake.b3.3 = To je napaka.
+ex.verdict.mistake.b4 = {move} je napaka.
+ex.verdict.mistake.b4.2 = Poteza {move} ni dobra.
+ex.verdict.mistake.b4.3 = To je napaka.
+ex.verdict.mistake.b5 = {move} je očitna napaka.
+ex.verdict.mistake.b5.2 = {move} je napaka.
+ex.verdict.mistake.b5.3 = Poteza {move} ni dobra.
+ex.verdict.mistake.b6 = {move} je napaka.
+ex.verdict.mistake.b6.2 = {move}? Napaka.
+ex.verdict.mistake.b6.3 = Ne {move}.
+# A dubious move (an inaccuracy): only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Ni slabo, a poteza {best} je bila malo boljša.
+ex.verdict.inaccuracy.b3.2 = Poteza {best} je bila malo natančnejša.
+ex.verdict.inaccuracy.b3.3 = Majhen spodrsljaj: tu je bila boljša poteza {best}.
+ex.verdict.inaccuracy.b4 = Nenatančno: poteza {best} je bila natančnejša.
+ex.verdict.inaccuracy.b4.2 = Majhna nenatančnost. Poteza {best} je bila malo boljša.
+ex.verdict.inaccuracy.b4.3 = Ne povsem najboljše: poteza {best} je bila natančnejša.
+ex.verdict.inaccuracy.b5 = {move} je nenatančno; močnejše je bilo {best}.
+ex.verdict.inaccuracy.b5.2 = Malo nenatančno. Jaz bi igral {best}.
+ex.verdict.inaccuracy.b5.3 = Poteza {best} je bila natančnejša kot {move}.
+ex.verdict.inaccuracy.b6 = {move} je nenatančno; {best}.
+ex.verdict.inaccuracy.b6.2 = Nenatančno. {best}.
+ex.verdict.inaccuracy.b6.3 = Boljše je bilo {best}.
+# Level 6, an inaccuracy at the bottom of its class: a hedged word.
+ex.verdict.inaccuracy.maybe = Morda je bila poteza {best} malo natančnejša.
+ex.verdict.inaccuracy.maybe.2 = Jaz bi morda igral {best}.
+# A dubious move that loses material (levels 3-6): the remark alone.
+ex.verdict.dubious = Ta poteza je videti dvomljiva.
+ex.verdict.dubious.2 = Ta poteza se zdi dvomljiva.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oh, počakaj! Nekaj dobrega ti je ušlo.
+ex.verdict.missed.b1.2 = Poglej še enkrat! Bilo je nekaj boljšega.
+ex.verdict.missed.b1.3 = Počakaj, tu je bila priložnost!
+ex.verdict.missed.b2 = Tu ti je ušla priložnost.
+ex.verdict.missed.b2.2 = Hm, bilo je nekaj boljšega.
+ex.verdict.missed.b2.3 = Počakaj, tu je bila na voljo odlična poteza.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = Boljša je bila poteza {best}.
+ex.better.b3.2 = Poteza {best} je bila boljša.
+ex.better.b3.3 = Namesto tega je bila dobra poteza {best}.
+ex.better.b4 = Močnejša je bila poteza {best}.
+ex.better.b4.2 = Prava poteza je bila {best}.
+ex.better.b4.3 = Boljše je bilo {best}.
+ex.better.b5 = {best}, z idejo {line}.
+ex.better.b5.2 = Prava poteza je bila {best}: {line}.
+ex.better.b5.3 = Boljše je bilo {best}, nato pa {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Namesto tega {best}, {eval}.
+ex.better.b6.3 = Po potezi {best}: {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# {your} = the piece that had the better move; the move itself is not named.
+ex.hint.b1 = {your:with} je bila na voljo boljša poteza.
+ex.hint.b1.2 = {your} je imel{your:ag} boljšo potezo.
+ex.hint.b2 = {your} je imel{your:ag} boljšo potezo.
+ex.hint.b2.2 = {your:with} je bila na voljo boljša poteza.
+ex.hint.b3 = {your} je imel{your:ag} boljšo potezo.
+ex.hint.b3.2 = {your:with} je bilo mogoče nekaj boljšega.
+ex.hint.b4 = {your} je imel{your:ag} boljšo potezo.
+ex.hint.b4.2 = Še enkrat poglej {your:refl_acc}: imel{your:ag} je nekaj boljšega.
+ex.hint.b5 = {your} je imel{your:ag} močnejšo potezo.
+ex.hint.b5.2 = {your:with} je bila na voljo močnejša poteza.
+ex.hint.b6 = {your} je imel{your:ag} boljšo potezo.
+ex.hint.b6.2 = Še enkrat poglej {your:refl_acc}.
+ex.hint.move = Obstajala je boljša poteza.
+ex.hint.move.2 = Tu je bila na voljo boljša poteza.
+# The same when the better move plainly wins material for good; the move is still not named.
+ex.hint.gain.b1 = {your} je imel{your:ag} boljšo potezo. Z njo dobiš material.
+ex.hint.gain.b1.2 = {your:with} je bila na voljo boljša poteza. Z njo dobiš material.
+ex.hint.gain.b2 = {your} je imel{your:ag} boljšo potezo. Z njo dobiš material.
+ex.hint.gain.b2.2 = {your:with} je bila na voljo poteza, ki dobi material.
+ex.hint.gain.b3 = {your} je imel{your:ag} boljšo potezo, ki dobi material.
+ex.hint.gain.b3.2 = {your:with} je bila na voljo poteza, ki dobi material.
+ex.hint.gain.b4 = {your} je imel{your:ag} potezo, ki dobi material.
+ex.hint.gain.b4.2 = Še enkrat poglej {your:refl_acc}: imel{your:ag} je potezo, ki dobi material.
+ex.hint.gain.b5 = {your} je imel{your:ag} močnejšo potezo, ki dobi material.
+ex.hint.gain.b5.2 = {your:with} je bila na voljo poteza, ki dobi material.
+ex.hint.gain.b6 = {your} je imel{your:ag} potezo, ki dobi material.
+ex.hint.gain.b6.2 = Še enkrat poglej {your:refl_acc}: bilo je mogoče dobiti material.
+# Levels 1-2: the better move as the piece and its square; levels 3-6 say ex.better.
+ex.reveal.b1 = Boljša poteza je bila {your:with} na {sq}.
+ex.reveal.b1.2 = {your} bi lahko š{your:ag_el} na {sq}. To bi bilo boljše.
+ex.reveal.b2 = Boljše je bilo iti {your:with} na {sq}.
+ex.reveal.b2.2 = Boljša poteza je bila {your:with} na {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Postaviva figure nazaj.
+ex.rewind.b1.2 = Zdaj bom vse postavil nazaj, kot je bilo.
+ex.rewind.b1.3 = Naj postavim figure nazaj.
+ex.rewind.b2 = Postaviva vse nazaj.
+ex.rewind.b2.2 = Nazaj tja, kjer sva bila.
+ex.rewind.b2.3 = Figure bom postavil nazaj.
+ex.rewind.b3 = Nazaj k partiji.
+ex.rewind.b3.2 = Pojdiva nazaj.
+ex.rewind.b3.3 = Nazaj k poziciji.
+ex.rewind.b4 = Nazaj k partiji.
+ex.rewind.b4.2 = Nazaj.
+ex.rewind.b4.3 = Pojdiva nazaj.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Želiš poskusiti drugo potezo?
+ex.offer.b1.2 = Želiš vrniti to potezo in poskusiti znova?
+ex.offer.b1.3 = Poskusiva drugo potezo?
+ex.offer.b2 = Želiš poskusiti drugo potezo?
+ex.offer.b2.2 = Ali jo želiš vrniti?
+ex.offer.b2.3 = Poskusiš znova?
+ex.offer.b3 = Ali jo želiš vrniti?
+ex.offer.b3.2 = Želiš poskusiti znova?
+ex.offer.b3.3 = Vrneš potezo?
+ex.offer.b4 = Vrneš potezo?
+ex.offer.b4.2 = Želiš vrniti potezo?
+ex.offer.b4.3 = Poskusiš drugo potezo?
+ex.offer.b5 = Vrneš?
+ex.offer.b5.2 = Vrneš jo?
+ex.offer.b5.3 = Vrneš potezo?
+ex.offer.b6 = Vrneš?
+ex.offer.b6.2 = Vrneš potezo?
+ex.offer.b6.3 = Še enkrat?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Ta poteza je dvomljiva. Morda najdeš kaj boljšega?
+ex.dubious.b1.2 = Ta poteza je dvomljiva. Morda najdeš boljšo?
+ex.dubious.b2 = Dvomljiva poteza. Morda zmoreš bolje?
+ex.dubious.b2.2 = Ta poteza je dvomljiva. Morda obstaja kaj boljšega?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Nato {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} gre na {sq}.
+demo.my.move.2 = Premaknem {my:refl_acc} na {sq}.
+demo.my.move.3 = Nato gre {my} na {sq}.
+demo.my.take = Vzamem {your:acc}.
+demo.my.take.2 = {my} vzame {your:acc}.
+demo.my.take.3 = In vzamem {your:acc}.
+demo.my.check = {my} gre na {sq}. Šah.
+demo.my.check.2 = Šah {my:with} na {sq}.
+demo.my.check.3 = {my} na {sq}, šah!
+demo.my.mate = {my} gre na {sq}. Mat.
+demo.my.mate.2 = In {my} na {sq} da mat.
+demo.my.mate.3 = {my} na {sq}. To je mat.
+# Levels 1-3, the coach's in-between move while a bigger piece of the player's ({t1}) is attacked.
+demo.my.first.take = Najprej {my} vzame {your:acc}. {t1} lahko počaka.
+demo.my.first.take.2 = {my} najprej vzame {your:acc}. {t1} bo še vedno tam.
+demo.my.first.check = {my} vzame {your:acc} in to je šah! {t1} lahko počaka.
+demo.my.first.check.2 = Najprej {my} vzame {your:acc}, s šahom. {t1} bo še vedno tam.
+demo.my.first.check_move = Najprej šah {my:with} na {sq}. {t1} lahko počaka.
+demo.my.first.check_move.2 = {my} gre na {sq}: najprej šah! {t1} bo še vedno tam.
+demo.my.first.move = Najprej gre {my} na {sq}. {t1} lahko počaka.
+demo.my.first.move.2 = Najprej {my} na {sq}. {t1} bo še vedno tam.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} je pod napadom, zato najprej vzame {your:acc}.
+demo.my.first.attacked.2 = {my} je pod napadom: najprej zgrabi {your:acc}.
+# Levels 4-6, the same in-between move.
+demo.first = Najprej {move}: {t1} lahko počaka.
+demo.first.2 = Najprej {move}. {t1} bo še vedno tam.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Zdaj odigram svojo potezo.
+demo.play_on.2 = Tu je moja prava poteza.
+demo.play_on.3 = Zdaj pa moja poteza zares.
+# Levels 1-3, the player's moves (what they would play): the present tense, no conditional.
+demo.your.move = Premakneš {your:refl_acc} na {sq}.
+demo.your.move.2 = Recimo, da greš {your:refl_with} na {sq}.
+demo.your.move.3 = Nato gre {your} na {sq}.
+demo.your.take = Vzameš {my:acc}.
+demo.your.take.2 = {my:acc} vzameš {your:refl_with}.
+demo.your.take.3 = Nato vzameš {my:acc}.
+demo.your.back = Vzameš nazaj.
+demo.your.back.2 = Vzameš nazaj na {sq}.
+demo.your.back.3 = In vzameš nazaj.
+demo.your.king = Tvoj kralj se mora umakniti.
+demo.your.king.2 = Kralj se mora umakniti na {sq}.
+demo.your.king.3 = Tvoj kralj zbeži na {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): where the demonstration stops.
+ex.point.piece = Zdaj {t1:gen} ni več mogoče rešiti.
+ex.point.piece.2 = In {t1} je izgubljen{t1:ag}.
+ex.point.piece.3 = Potem pade {t1}.
+ex.point.two = {t1} in {t2} sta pod napadom: ena od obeh figur pade.
+ex.point.two.2 = Zdaj napadam {t1:acc} in {t2:acc}. Obeh ne moreš rešiti.
+ex.point.mate = In zdaj {reply:nomate} da mat.
+ex.point.mate.2 = Sledi {reply:nomate} in to je mat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost.
+ex.result.b1 = Vidiš? Zdaj imaš {pts:point_acc} manj.
+ex.result.b1.2 = Tako izgubiš {pts:point_acc}.
+ex.result.b2 = Na koncu imaš {pts:point_acc} manj.
+ex.result.b2.2 = Zdaj imaš {pts:point_acc} manj od mene.
+ex.result.b3 = To te stane {pts:point_acc}.
+ex.result.b3.2 = Na koncu imaš {pts:point_acc} manj.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Nekaj lahko vzameš nazaj, a imaš še vedno {pts:point_acc} manj.
+ex.result_back.b1.2 = Nekaj lahko dobiš nazaj, a še vedno izgubiš {pts:point_acc}.
+ex.result_back.b2 = Nekaj dobiš nazaj, a še vedno imaš {pts:point_acc} manj.
+ex.result_back.b2.2 = Tudi ko vzameš nazaj, izgubiš {pts:point_acc}.
+ex.result_back.b3 = Tudi po jemanju nazaj imaš {pts:point_acc} manj.
+ex.result_back.b3.2 = Nekaj dobiš nazaj, a te še vedno stane {pts:point_acc}.
+# Why the player cannot take back where the sequence stops. Levels 1-2 name the pieces, from 3 the moves.
+ex.retake.b1 = Če {your2} vzame nazaj, {my} vzame {your:acc}.
+ex.retake.b1.2 = Ne moreš vzeti nazaj {your2:refl_with}: potem {my} vzame {your:acc}.
+ex.retake.b2 = Če {your2} vzame nazaj, {my} vzame {your:acc}.
+ex.retake.b2.2 = Jemanje nazaj {your2:with} ne gre: {my} vzame {your:acc}.
+ex.retake.b3 = Če vzameš nazaj s potezo {move}, sledi {reply} in {your} pade.
+ex.retake.b3.2 = Jemanje nazaj s potezo {move} ne gre: sledi {reply} in {your} pade.
+ex.retake.b4 = Na potezo {move} sledi {reply} in {your} pade.
+ex.retake.b4.2 = In če {move}, potem {reply} in {your} pade.
+ex.retake.b5 = Jemanje nazaj s potezo {move} naleti na odgovor {reply} in {your} pade.
+ex.retake.b5.2 = {move} ne gre zaradi poteze {reply}: {your} pade.
+ex.retake.b6 = {move}? {reply} in {your} pade.
+ex.retake.b6.2 = {move} ne gre: {reply} in {your} je izgubljen{your:ag}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = In tu, na polju {sq}, dobiš novo damo.
+demo.promote.2 = Nato {your} pride na {sq} in postane dama.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Pazi: {my} lahko gre na {sq} in to je mat.
+ex.mate_allowed.b1.2 = Zdaj lahko {my} pride na {sq}. To bi bil mat!
+ex.mate_allowed.b1.3 = Previdno! Če gre {my} na {sq}, je to mat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Po tej potezi lahko dam mat {your:dat} v {m:move_loc}.
+ex.mate_allowed.b2.2 = Zdaj lahko dam mat {your:dat} v {m:move_loc}. Poglej.
+ex.mate_allowed.b2.3 = Previdno! {your} je v nevarnosti: mat v {m:move_loc}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = To dovoli mat v {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.2 = Po tem imam mat v {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b3.3 = Tvoj kralj dobi mat: {line:nomate}.
+ex.mate_allowed.b4 = {move} dovoli prisilni mat: {line:nomate}.
+ex.mate_allowed.b4.2 = Po tem sledi mat v {m:move_loc}: {line:nomate}.
+ex.mate_allowed.b4.3 = Po potezi {move} sledi {line:nomate} in mat.
+ex.mate_allowed.b5 = {move} dovoli prisilni mat v {m:move_loc}.
+ex.mate_allowed.b5.2 = To dopusti mat v {m:move_loc}.
+ex.mate_allowed.b5.3 = Zdaj je tu prisilni mat v {m:move_loc}.
+ex.mate_allowed.b6 = Mat v {m:mv}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = Po {line:nomate} je mat.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Poglej: {your} nima več polja za umik.
+ex.mate_allowed.tail.b1.2 = Vidiš? {your} je pod napadom in ne more pobegniti.
+ex.mate_allowed.tail.b1.3 = {your} nima kam. To je mat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below (nominative).
+ex.mate_allowed.pattern = Ta matni vzorec se imenuje {text}.
+ex.mate_allowed.pattern.2 = Zapomni si ga: to je {text}.
+ex.mate_allowed.tip.b3 = Pred vsako potezo preveri, ali je tvoj kralj še varen.
+ex.mate_allowed.tip.b3.2 = Vedno se vprašaj: ali lahko moj kralj po moji potezi dobi mat?
+
+name.pattern.back_rank = mat na zadnji vrsti
+name.pattern.smothered = zadušeni mat
+name.pattern.support = mat s podprto damo
+name.pattern.ladder = stopničasti mat
+name.pattern.epaulette = epoletni mat
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = S potezo {best:nomate} je bilo mogoče dati mat {my:dat}!
+ex.mate_missed.b1.2 = Poteza {best:nomate} bi dala mat! {my} ne bi mog{my:ag_el} uiti.
+ex.mate_missed.b1.3 = Poglej! Poteza {best:nomate} bi dala mat {my:dat}.
+ex.mate_missed.b2 = Na voljo je bil mat v {m:move_loc}. Prva poteza: {best:nomate}.
+ex.mate_missed.b2.2 = Poteza {best:nomate} bi dala mat v {m:move_loc}!
+ex.mate_missed.b2.3 = S potezo {best:nomate} bi jaz dobil mat.
+ex.mate_missed.b3 = Zamujen mat v {m:move_loc}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} da mat v {m:move_loc}: {line:nomate}.
+ex.mate_missed.b3.3 = Na voljo je bil mat v {m:move_loc}, začenši s potezo {best:nomate}.
+ex.mate_missed.b4 = Zamujen mat: {line:nomate}, začenši s potezo {best:nomate}.
+ex.mate_missed.b4.2 = Poteza {best:nomate} bi izsilila mat v {m:move_loc}.
+ex.mate_missed.b4.3 = S potezo {best:nomate} je bil na voljo mat v {m:move_loc}.
+ex.mate_missed.b5 = {best:nomate} da mat v {m:move_loc}: {line:nomate}.
+ex.mate_missed.b5.2 = Zamujen mat v {m:move_loc}, začenši s potezo {best:nomate}.
+ex.mate_missed.b5.3 = Na voljo je bil prisilni mat: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} da mat: {line:nomate}.
+ex.mate_missed.b6.2 = Mat v {m:mv} s potezo {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat v {m:mv}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Hitrejša je bila poteza {best:nomate}: mat v {m:move_loc}.
+ex.mate_delayed.b5.2 = Poteza {best:nomate} bi dala mat prej, v {m:move_loc}.
+ex.mate_delayed.b6 = {best:nomate} da mat v {m:mv}.
+ex.mate_delayed.b6.2 = Hitreje: {best:nomate}, mat v {m:mv}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Oh ne! {my} se ne more premakniti in ni v šahu. To je pat: remi.
+ex.stalemate.b1.2 = Poglej: {my} nima varnega polja, a ni v šahu. To je remi!
+ex.stalemate.b1.3 = To je pat. {my} se ne more premakniti, zato je partija remi.
+ex.stalemate.b2 = Pat! {my} nima dovoljene poteze in ni v šahu. Remi.
+ex.stalemate.b2.2 = Oh ne, pat: {my} je ujet{my:ag}, a ni v šahu.
+ex.stalemate.b2.3 = To je remi zaradi pata. {my} se ne more premakniti.
+ex.stalemate.b3 = To je pat: {my} nima dovoljene poteze. Partija je bila dobljena!
+ex.stalemate.b3.2 = Pat! {my} je ujet{my:ag} in dobljena partija se konča z remijem.
+ex.stalemate.b3.3 = {my} nima potez in ni v šahu: pat.
+ex.stalemate.b4 = Pat: {my} nima dovoljene poteze. S tem je zmaga zapravljena.
+ex.stalemate.b4.2 = Po potezi {move} je {my} v patu. Remi iz dobljene pozicije.
+ex.stalemate.b4.3 = To je pat; {my} je zaprt{my:ag}.
+ex.stalemate.b5 = Po potezi {move} je {my} v patu. Zmage ni več.
+ex.stalemate.b5.2 = Pat: {my} nima polj.
+ex.stalemate.b5.3 = To je pat, {my} je ujet{my:ag}.
+ex.stalemate.b6 = Pat. {my} nima potez.
+ex.stalemate.b6.2 = {move}, pat: {my} je zaprt{my:ag}.
+ex.stalemate.b6.3 = Pat; {my} se ne more premakniti.
+ex.stalemate.tip.b1 = Ko imaš dobljeno pozicijo, vedno pusti mojemu kralju kakšno prosto polje.
+ex.stalemate.tip.b1.2 = Zapomni si: ko imaš prednost, pusti mojemu kralju nekaj prostora.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Previdno! Lahko podarim svoje figure, potem pa {my} nima potez: pat.
+ex.stalemate_trick.b1.2 = Pazi: {my} je skoraj ujet{my:ag}. Lahko dosežem remi.
+ex.stalemate_trick.b2 = Previdno: lahko žrtvujem figure in {my} bo v patu.
+ex.stalemate_trick.b2.2 = {my} nima skoraj nobenega polja. Lahko izsilim pat!
+ex.stalemate_trick.b3 = S tem se lahko rešim s patom: {my} ostane brez potez.
+ex.stalemate_trick.b3.2 = Previdno: po {line} je {my} v patu.
+ex.stalemate_trick.b4 = {move} dovoli patno past: {line} in {my} se ne more premakniti.
+ex.stalemate_trick.b4.2 = Zdaj se {my} lahko skrije v pat: {line}.
+ex.stalemate_trick.b5 = {move} dovoli pat: {line}; {my} je zaprt{my:ag}.
+ex.stalemate_trick.b5.2 = Patna past: {line} in {my} nima potez.
+ex.stalemate_trick.b6 = {line}, pat: {my} je zaprt{my:ag}.
+ex.stalemate_trick.b6.2 = Pat po {line}; {my} je ujet{my:ag}.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} lahko gre na {sq} in napade {t1:acc} in {t2:acc}.
+ex.fork.b1.2 = {my} gre na {sq} in napade dve stvari: {t1:acc} in {t2:acc}.
+ex.fork.b1.3 = Pazi na {my:acc}: s polja {sq} napada {t1:acc} in {t2:acc} hkrati.
+ex.fork.b2 = Vilice! {my} na {sq} hkrati napada {t1:acc} in {t2:acc}.
+ex.fork.b2.2 = Po tvoji potezi lahko {my} s polja {sq} z vilicami napade {t1:acc} in {t2:acc}.
+ex.fork.b2.3 = {my} gre na {sq}: dvojni napad na {t1:acc} in {t2:acc}.
+ex.fork.b3 = {move} dovoli {reply} z vilicami na {t1:acc} in {t2:acc}.
+ex.fork.b3.2 = Po potezi {reply} napadam {t1:acc} in {t2:acc} hkrati.
+ex.fork.b3.3 = S potezo {reply} postavim vilice: {t1} in {t2} sta pod napadom.
+ex.fork.b4 = {reply} z vilicami napade {t1:acc} in {t2:acc}; po {line} imaš {pts:point_acc} manj.
+ex.fork.b4.2 = {reply} hkrati napade {t1:acc} in {t2:acc}.
+ex.fork.b4.3 = {move} dovoli vilice {reply} na {t1:acc} in {t2:acc}.
+ex.fork.b5 = Po potezi {move} sledijo vilice {reply} na {t1:acc} in {t2:acc}.
+ex.fork.b5.2 = {reply} z vilicami napade {t1:acc} in {t2:acc}.
+ex.fork.b5.3 = Po potezi {reply} sta {t1} in {t2} pod napadom.
+ex.fork.b6 = {reply}, vilice.
+ex.fork.b6.2 = {move} dovoli {reply}, vilice.
+ex.fork.b6.3 = {reply} z vilicami.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Rešiš lahko le eno figuro: {t1:acc} ali {t2:acc}.
+ex.fork.tail.b1.2 = Zdaj napadam dve figuri hkrati: {t1:acc} in {t2:acc}. To so vilice!
+ex.fork.tail.b1.3 = Vidiš? {t1} in {t2} sta pod napadom. Ena od obeh figur bo padla.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} se mora umakniti iz šaha, zato vzamem {t1:acc}.
+ex.fork.tail_king.2 = Šah! {your} se mora premakniti in {t1} pade.
+ex.fork.more.b3 = Pred potezo preveri polje {sq}: od tam grozijo vilice {my:gen}.
+ex.fork.more.b3.2 = Pazi na polje {sq}. Od tam {my} napade z vilicami.
+ex.fork.tip.knight = Pazi na skoke skakačev blizu svojega kralja in svoje dame!
+ex.fork.tip.knight.2 = Skakači radi napadajo dve figuri hkrati. Poglej, kam lahko skočijo.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Ko se {my} umakne, {my2} napade {t1:acc}!
+ex.discovered.b1.2 = Poglej: {my} je na poti. Če se premakne, {my2} napade {t1:acc}.
+ex.discovered.b1.3 = {my} se lahko umakne, potem pa {my2} napade {t1:acc}.
+ex.discovered.b2 = Skriti napad: {my} se premakne in {my2} napade {t1:acc}.
+ex.discovered.b2.2 = Previdno: {my} se lahko umakne in {my2} napade {t1:acc}.
+ex.discovered.b2.3 = {my} stopi vstran in odpre pot {my2:dat} do {t1:gen}.
+ex.discovered.b3 = Po potezi {reply} odkriti napad zadene {t1:acc}.
+ex.discovered.b3.2 = {reply} odkrije napad na {t1:acc}.
+ex.discovered.b3.3 = {move} dovoli {reply}, odkriti napad na {t1:acc}.
+ex.discovered.b4 = {reply} odpre pot do {t1:gen}: odkriti napad.
+ex.discovered.b4.2 = {move} dovoli odkriti napad {reply}, ki dobi {t1:acc}.
+ex.discovered.b4.3 = Po potezi {reply} pade {t1} zaradi odkritega napada.
+ex.discovered.b5 = {move} dovoli odkriti napad {reply}.
+ex.discovered.b5.2 = {reply} je odkriti napad.
+ex.discovered.b5.3 = {reply} odkrije skriti napad.
+ex.discovered.b6 = {reply}, odkriti napad na {t1:acc}.
+ex.discovered.b6.2 = {reply} in {t1} pade.
+ex.discovered.b6.3 = Odkriti napad: {reply}, ki zadene {t1:acc}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} napade {t1:acc}. Ko se umakne, vzamem {t2:acc} za {t1:pron_ins}.
+ex.skewer.b1.2 = Poglej: {my} napade {t1:acc}, {t2} pa stoji tik za {t1:pron_ins}.
+ex.skewer.b1.3 = {my} gre nad {t1:acc}. Umakniti se mora, potem pa pade {t2}.
+ex.skewer.b2 = Raženj: {my} napade {t1:acc}, za {t1:pron_ins} pa je {t2}.
+ex.skewer.b2.2 = {my} napada {t1:acc} in {t2:acc} po isti črti. Ko se prva figura umakne, vzamem drugo.
+ex.skewer.b2.3 = Previdno: {t1} in {t2} stojita v isti črti. {my} ju lahko napade z ražnjem.
+ex.skewer.b3 = {reply} z ražnjem napade {t1:acc} in {t2:acc}.
+ex.skewer.b3.2 = Po potezi {reply} se mora {t1} umakniti in {t2} pade.
+ex.skewer.b3.3 = {move} dovoli {reply}, raženj na {t1:acc} in {t2:acc}.
+ex.skewer.b4 = {reply} z ražnjem napade {t1:acc}; {t2} za {t1:pron_ins} je izgubljen{t2:ag}.
+ex.skewer.b4.2 = Po potezi {move} stojita {t1} in {t2} v isti črti: {reply}.
+ex.skewer.b4.3 = Po potezi {reply} se {t1} umakne in {t2} pade.
+ex.skewer.b5 = {reply} je raženj na {t1:acc} in {t2:acc}.
+ex.skewer.b5.2 = {move} dovoli raženj {reply} skozi {t1:acc} do {t2:gen}.
+ex.skewer.b6 = {reply}, raženj.
+ex.skewer.b6.2 = {reply} z ražnjem.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} lahko gre na {sq}. Potem {your} obtiči pred {t1:ins}.
+ex.pin.b1.2 = Pazi na {my:acc} na polju {sq}: {your} obtiči pred {t1:ins}.
+ex.pin.b1.3 = {my} lahko veže {your:acc} na {t1:acc}. Potem {your:cl_acc} dobim.
+ex.pin.b2 = Vezava: {your} obtiči pred {t1:ins}.
+ex.pin.b2.2 = {your} je vezan{your:ag} na {t1:acc}. Potem {your:cl_acc} lahko dobim.
+ex.pin.b2.3 = Zdaj {your} obtiči pred {t1:ins}. To je vezava.
+ex.pin.b3 = {your} postane vezan{your:ag} na {t1:acc} in {your:cl_acc} dobim.
+ex.pin.b3.2 = Po tem je {your} vezan{your:ag} na {t1:acc}.
+ex.pin.b3.3 = Vezava {your:gen} stane material: za {your:pron_ins} je {t1}.
+ex.pin.b4 = {reply} veže in dobi material.
+ex.pin.b4.2 = Po potezi {move} sledi vezava {reply}.
+ex.pin.b4.3 = Po potezi {reply} vezana figura pade.
+ex.pin.b5 = {move} dovoli vezavo {reply}.
+ex.pin.b5.2 = {reply} veže in figura je izgubljena.
+ex.pin.b6 = {reply} veže.
+ex.pin.b6.2 = {reply}, vezava.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} je vezan{your:ag}, zato ne more ščititi polja {sq}. Za {your:pron_ins} je {t1}.
+ex.pin_defender.b1.2 = Poglej: {your} v resnici ne more braniti polja {sq}, ker je za {your:pron_ins} {t1}.
+ex.pin_defender.b2 = {your} je vezan{your:ag} na {t1:acc}, zato polje {sq} nima pravega branilca.
+ex.pin_defender.b2.2 = Vezana figura je slab branilec. {your} ne more varovati polja {sq}: za {your:pron_ins} je {t1}.
+ex.pin_defender.b3 = {your} je vezan{your:ag} na {t1:acc}; polja {sq} v resnici ne brani.
+ex.pin_defender.b3.2 = Polje {sq} je videti branjeno, a {your} je vezan{your:ag} na {t1:acc}.
+ex.pin_defender.b4 = {your} je vezan{your:ag}, zato polje {sq} ni zares branjeno.
+ex.pin_defender.b4.2 = {your} je vezan{your:ag} in ne more varovati polja {sq}.
+ex.pin_defender.b5 = {your} je vezan{your:ag}; polje {sq} je nezaščiteno.
+ex.pin_defender.b5.2 = Polje {sq} je izgubljeno: {your} je vezan{your:ag}.
+ex.pin_defender.b6 = {your} je vezan{your:ag}; polje {sq} je izgubljeno.
+ex.pin_defender.b6.2 = Vezava {your:gen}, polje {sq} nezaščiteno.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} je ujet{your:ag}. Vsa polja, kamor lahko gre, so napadena.
+ex.trapped.b1.2 = Poglej {your:refl_acc}: nima varnega polja za umik.
+ex.trapped.b1.3 = {your} je ujet{your:ag}. Lahko {your:cl_acc} napadem in ne more pobegniti.
+ex.trapped.b2 = {your} nima varnih polj. Lahko {your:cl_acc} dobim.
+ex.trapped.b2.2 = {your} je ujet{your:ag}: kamor koli gre, {your:cl_acc} vzamem.
+ex.trapped.b2.3 = Previdno, {your:dat} zmanjkuje polj.
+ex.trapped.b3 = {your} zaide v past: nima več varnega polja.
+ex.trapped.b3.2 = Po tem je {your} ujet{your:ag} in izgubljen{your:ag}.
+ex.trapped.b3.3 = {your} je v pasti in ne more ven.
+ex.trapped.b4 = Po potezi {move} je {your} ujet{your:ag}.
+ex.trapped.b4.2 = {your} nima umika; dobim {your:cl_acc}.
+ex.trapped.b4.3 = Po potezi {reply} je {your} ujet{your:ag}.
+ex.trapped.b5 = {your} na koncu ostane ujet{your:ag}: {line}.
+ex.trapped.b5.2 = {move} pusti {your:acc} brez izhoda.
+ex.trapped.b6 = {your} je ujet{your:ag}.
+ex.trapped.b6.2 = {line} ujame {your:acc}.
+ex.trapped.tip.b1 = Preden premakneš figuro, preveri, ali se lahko vrne nazaj.
+ex.trapped.tip.b1.2 = Figure globoko v mojem taboru lahko ostanejo ujete. Pusti si izhod.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} je zaprt{your:ag} za svojimi kmeti. {my} {your:cl_dat} lahko da šah na zadnji vrsti.
+ex.back_rank.b1.2 = Previdno: {your} nima polja za umik in {my} lahko pride na {sq}.
+ex.back_rank.b1.3 = {my} lahko gre na {sq}. {your} je zaprt{your:ag} za svojimi kmeti.
+ex.back_rank.b2 = Nevarnost na zadnji vrsti: {your} nima kam. {my} lahko da šah na {sq}.
+ex.back_rank.b2.2 = {your} je zaprt{your:ag}. {my} gre na {sq} in dobi material.
+ex.back_rank.b2.3 = Tvoja zadnja vrsta je šibka: {my} lahko da šah {your:dat} na {sq}.
+ex.back_rank.b3 = Tvoja zadnja vrsta je šibka: {line}. {your} nima polja za umik.
+ex.back_rank.b3.2 = {your} nima polja za umik, zato {line} dobi material.
+ex.back_rank.b3.3 = Po {line} odloči zadnja vrsta: {your} je zaprt{your:ag}.
+ex.back_rank.b4 = Zadnja vrsta: {line}, {your} pa nima polja za umik.
+ex.back_rank.b4.2 = {line} izkoristi šibko zadnjo vrsto okoli {your:gen}.
+ex.back_rank.b4.3 = {your:dat} manjka polje za umik: {line}.
+ex.back_rank.b5 = Šibka zadnja vrsta okoli {your:gen}: {line}.
+ex.back_rank.b5.2 = {line}; {your} nima polja za umik.
+ex.back_rank.b6 = {line}, zadnja vrsta; {your} je zaprt{your:ag}.
+ex.back_rank.b6.2 = Zadnja vrsta: {line} ({your}).
+ex.back_rank.tip.b1 = Daj svojemu kralju malo prostora: premakni enega od kmetov pred njim.
+ex.back_rank.tip.b1.2 = Kralj za tremi kmeti lahko dobi mat na zadnji vrsti. Naredi mu nekaj prostora.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} na {sq} nima zaščite. {my} {your:cl_acc} lahko vzame zastonj.
+ex.hanging.b1.2 = Poglej {your:refl_acc}: nič {your:cl_gen} ne brani, {my} pa {your:cl_acc} napada.
+ex.hanging.b1.3 = {your} ni zaščiten{your:ag}. {my} {your:cl_acc} lahko kar vzame.
+ex.hanging.b2 = {your} na {sq} visi. {my} {your:cl_acc} vzame, ti pa ne moreš vzeti nazaj.
+ex.hanging.b2.2 = {my} lahko zastonj vzame {your:acc}. Nič {your:cl_gen} ne ščiti.
+ex.hanging.b2.3 = {your} je ostal{your:ag} sam{your:ag} na {sq} in {my} {your:cl_acc} vzame.
+ex.hanging.b3 = Po potezi {move} je {your} brez zaščite: {reply} in nič ne vzame nazaj.
+ex.hanging.b3.2 = {your} na {sq} pade po potezi {reply}.
+ex.hanging.b3.3 = Po potezi {reply} je {your} izgubljen{your:ag} za nič.
+ex.hanging.b4 = {move} pusti {your:acc} viseti: {reply} dobi {pts:point_acc}.
+ex.hanging.b4.2 = S potezo {reply} zastonj poberem {your:acc}.
+ex.hanging.b4.3 = {your} je brez zaščite; po potezi {reply} {your:cl_acc} izgubiš.
+ex.hanging.b5 = {move} pusti {your:acc} brez zaščite; po potezi {reply} {your:cl_acc} izgubiš.
+ex.hanging.b5.2 = {your} na {sq} pade po potezi {reply}.
+ex.hanging.b5.3 = {reply} dobi {your:acc}.
+ex.hanging.b6 = {move}? {reply} in {your} pade.
+ex.hanging.b6.2 = {reply} dobi {your:acc}.
+ex.hanging.b6.3 = {your} visi: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} je ščitil{your2:ag} {your:acc}. Zdaj {your:cl_acc} lahko vzame {my}.
+ex.hanging_guard.b1.2 = {your2} se je umaknil{your2:ag} in zdaj je {your} sam{your:ag}. {my} {your:cl_acc} vzame.
+ex.hanging_guard.b2 = {your2} je prej ščitil{your2:ag} {your:acc}. Zdaj {your:cl_gen} nihče ne ščiti in {my} {your:cl_acc} vzame.
+ex.hanging_guard.b2.2 = Ko premakneš {your2:refl_acc}, ostane {your} brez zaščite pred {my:ins}.
+ex.hanging_guard.b3 = {your2} je varoval{your2:ag} {your:acc}. Ko se umakne, {your:cl_acc} izgubiš po potezi {reply}.
+ex.hanging_guard.b3.2 = Brez {your2:gen} je {your} brez zaščite: {reply}.
+ex.hanging_guard.b4 = {move} odstrani branilca: {your2} je zapustil{your2:ag} {your:acc} in po potezi {reply} {your:cl_acc} izgubiš.
+ex.hanging_guard.b4.2 = {your2} je bil{your2:ag} edini branilec {your:gen}; s potezo {reply} {your:cl_acc} dobim.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} je že napadal{my:ag} {your:acc}. Vedno preveri, s čim grozi moja poteza.
+ex.hanging_threat.b1.2 = Moja grožnja ti je ušla: {my} napada {your:acc}.
+ex.hanging_threat.b2 = Z zadnjo potezo sem {my:refl_with} napadel {your:acc}. Vedno poglej moje grožnje.
+ex.hanging_threat.b2.2 = {my} je grozil{my:ag} {your:dat}, zdaj pa {your:cl_acc} lahko vzamem.
+ex.hanging_threat.b3 = Moja grožnja ti je ušla: {my} je napadal{my:ag} {your:acc}.
+ex.hanging_threat.b3.2 = {my} je ves čas meril{my:ag} na {your:acc}.
+ex.hanging.tip.b1 = Pred vsako potezo se vprašaj: ali so vse moje figure varne?
+ex.hanging.tip.b1.2 = Dobra navada: po vsaki potezi preveri, katere tvoje figure so zaščitene.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured. "vreden" + accusative, as Slovenian chess books count values: "vreden tri točke".
+ex.exchange_capture.b1 = {your} je nekaj vzel{your:ag}, a {my} vzame nazaj. S to menjavo izgubiš točke.
+ex.exchange_capture.b1.2 = {my} vzame nazaj. {your} je vred{your:ag_en} {n:point_acc}, ti pa dobiš le {n2:point_acc}.
+ex.exchange_capture.b1.3 = Previdno: {my} lahko v odgovor vzame {your:acc}. To je slaba menjava.
+ex.exchange_capture.b2 = Pazi pri menjavah: {your} je vred{your:ag_en} {n:point_acc}. {my} vzame nazaj, ti pa dobiš le {n2:point_acc}.
+ex.exchange_capture.b2.2 = {my} v odgovor vzame {your:acc}. Izgubiš {n:point_acc}, dobiš pa le {n2:point_acc}.
+ex.exchange_capture.b3 = Jemanje na {sq} ne gre: po {line} je {your} izgubljen{your:ag}.
+ex.exchange_capture.b3.2 = {your} vzame na {sq}, a po {line} imaš {pts:point_acc} manj.
+ex.exchange_capture.b4 = Pri potezi {move} je račun na polju {sq} napačen: po {line} je {your} izgubljen{your:ag}.
+ex.exchange_capture.b4.2 = Jemanje na {sq} stane {your:acc}: {line}.
+ex.exchange_capture.b5 = {move} izgubi {your:acc} v menjavah na {sq}: {line}.
+ex.exchange_capture.b5.2 = Na {sq} je {your} izgubljen{your:ag}: {line}.
+ex.exchange_capture.b6 = {move} izgubi {your:acc} na {sq} po {line}.
+ex.exchange_capture.b6.2 = {line} na {sq} in {your:gen} ni več.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Preštej: polje {sq} napadam {n:time}, ti pa ga braniš {n2:time}.
+ex.exchange_count.b1.2 = Na polju {sq} imam {n:attacker_acc}, ti pa {n2:defender_acc}. Tu zmagam jaz.
+ex.exchange_count.b2 = Polje {sq} je napadeno {n:time} in branjeno {n2:time}. Tam izgubiš material.
+ex.exchange_count.b2.2 = Preštej na polju {sq}: {n:attacker} in {n2:defender}.
+ex.exchange_count.b3 = Preštej napadalce in branilce na polju {sq}: jaz jih imam več.
+ex.exchange_count.b3.2 = Menjava na polju {sq} ne gre: po {line} imaš {pts:point_acc} manj.
+ex.exchange_count.b4 = Pri potezi {move} je račun na polju {sq} napačen: po {line} imaš {pts:point_acc} manj.
+ex.exchange_count.b4.2 = Polje {sq} je večkrat napadeno kot branjeno: {line}.
+ex.exchange_count.b5 = Na polju {sq} imam več napadalcev, {n} proti {n2}: {line}.
+ex.exchange_count.b5.2 = S potezo {move} izgubiš boj za polje {sq}.
+ex.exchange_count.b6 = {line} na {sq} in dobil sem {pts:point_acc}.
+ex.exchange_count.b6.2 = {sq}: {n} proti {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} je vred{my:ag_en} manj kot {your}. Če vzamem, izgubiš točke.
+ex.exchange_cheap.b1.2 = {my} napada {your:acc}. Menjava med njima je zate slaba.
+ex.exchange_cheap.b2 = {your} je vred{your:ag_en} {n:point_acc}, {my} pa le {n2:point_acc}. Ta menjava te stane.
+ex.exchange_cheap.b2.2 = {my} je cenejš{my:agi} od {your:gen}, zato napad dobi material.
+ex.exchange_cheap.b3 = {your} na {sq} je pod napadom cenejše figure.
+ex.exchange_cheap.b3.2 = Figura, vredna {n2:point_acc}, napada {your:acc} na {sq}: {line}.
+ex.exchange_cheap.b4 = {your} na {sq} je pod napadom cenejše figure; {reply} dobi material.
+ex.exchange_cheap.b4.2 = {reply} s cenejšo figuro napade {your:acc} na {sq}.
+ex.exchange_cheap.b5 = {your} na {sq} je izpostavljen{your:ag} cenejšemu napadalcu: {line}.
+ex.exchange_cheap.b5.2 = {reply} dobi material na {sq} proti {your:dat}.
+ex.exchange_cheap.b6 = {reply} dobi {your:acc} na {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} na {sq} je izgubljen{your:ag}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Previdno: zdaj lahko dobim {t1:acc}.
+ex.material.b1.2 = Po tej potezi je {t1} v težavah. Lahko {t1:cl_acc} dobim.
+ex.material.b2 = Po tej potezi lahko dobim {t1:acc}.
+ex.material.b2.2 = Zdaj {t1} zaide v težave in {t1:cl_acc} dobim.
+ex.material.b3 = {move} izgubi material: po {line} imaš {pts:point_acc} manj.
+ex.material.b3.2 = Po {line} imaš {pts:point_acc} manj.
+ex.material.b4 = {move} izgubi material: {line} in imaš {pts:point_acc} manj.
+ex.material.b4.2 = Po {line} si ob {pts:point_acc}.
+ex.material.b5 = {move} izgubi material: {line}.
+ex.material.b5.2 = {line} mi prinese {pts:point_acc}.
+ex.material.b6 = {line} in dobil sem {pts:point_acc}.
+ex.material.b6.2 = {move} izgubi {pts:point_acc}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Vidiš? {my} na {sq} je bil{my:ag} zastonj. {your} bi {my:cl_acc} lahko vzel{your:ag}.
+ex.missed_capture.b1.2 = Poglej: {my} ni imel{my:ag} branilca. {your} bi {my:cl_acc} lahko vzel{your:ag}.
+ex.missed_capture.b1.3 = {my} na {sq} ni bil{my:ag} zaščiten{my:ag}. {your} bi {my:cl_acc} lahko zgrabil{your:ag}!
+ex.missed_capture.b2 = Ušlo ti je jemanje zastonj: {best} dobi {my:acc}.
+ex.missed_capture.b2.2 = {my} je visel{my:ag} na {sq}. S potezo {best} {my:cl_acc} vzameš. Naslednjič {my:cl_acc} zgrabi!
+ex.missed_capture.b2.3 = Poteza {best} bi zastonj dobila {my:acc}.
+ex.missed_capture.b3 = Poteza {best} bi dobila {my:acc} za nič.
+ex.missed_capture.b3.2 = {my} na {sq} ni bil{my:ag} zaščiten{my:ag}: {best}. Pri vsaki potezi preveri, ali kaj visi.
+ex.missed_capture.b3.3 = S potezo {best} je bilo mogoče vzeti {my:acc}.
+ex.missed_capture.b4 = Zamujeno: {best} pobere {my:acc} na {sq}.
+ex.missed_capture.b4.2 = {best} dobi {my:acc}, ki je bil{my:ag} nezaščiten{my:ag}.
+ex.missed_capture.b4.3 = {my} je visel{my:ag}: {best}.
+ex.missed_capture.b5 = {best} dobi {my:acc}; {move} pa {my:cl_dat} dovoli pobeg.
+ex.missed_capture.b5.2 = {my} na {sq} je bil{my:ag} nezaščiten{my:ag}: {best}.
+ex.missed_capture.b6 = {best}! {my} na {sq} je visel{my:ag}.
+ex.missed_capture.b6.2 = {best} dobi {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Na voljo je bil dvojni napad: {best} napade {t1:acc} in {t2:acc}!
+ex.missed_fork.b1.2 = Poglej! {best} napade {t1:acc} in {t2:acc} hkrati.
+ex.missed_fork.b1.3 = S potezo {best} so bile na voljo vilice: {t1} in {t2} sta pod napadom.
+ex.missed_fork.b2 = S potezo {best} so bile na voljo vilice: {t1} in {t2}.
+ex.missed_fork.b2.2 = Ušel ti je dvojni napad: {best}, ki zadene {t1:acc} in {t2:acc}.
+ex.missed_fork.b2.3 = {best} hkrati napade {t1:acc} in {t2:acc}. Vilice!
+ex.missed_fork.b3 = S potezo {best} so bile na voljo vilice na {t1:acc} in {t2:acc}.
+ex.missed_fork.b3.2 = Na voljo je bila poteza {best} z vilicami na {t1:acc} in {t2:acc}.
+ex.missed_fork.b3.3 = Poteza {best} bi z vilicami napadla {t1:acc} in {t2:acc}.
+ex.missed_fork.b4 = Poteza {best} bi z vilicami napadla {t1:acc} in {t2:acc}.
+ex.missed_fork.b4.2 = Zamujene vilice: {best} na {t1:acc} in {t2:acc}.
+ex.missed_fork.b5 = {best} z vilicami na {t1:acc} in {t2:acc}.
+ex.missed_fork.b5.2 = {best} napade {t1:acc} in {t2:acc}.
+ex.missed_fork.b6 = {best}, vilice na {t1:acc} in {t2:acc}.
+ex.missed_fork.b6.2 = {best}: vilice na {t1:acc} in {t2:acc}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} lahko steče do {sq} in postane dama. {your} je predaleč.
+ex.promotion.b1.2 = Poglej: nič ne ustavi {my:gen} na poti do {sq}. {your} {my:cl_gen} ne more ujeti.
+ex.promotion.b1.3 = Do polja {sq} ima {my} še {n:square_acc}, {your} pa ne pride pravočasno.
+ex.promotion.b2 = {my} teče na {sq} in {your} {my:cl_gen} ne more ujeti.
+ex.promotion.b2.2 = {my} potrebuje {n:move_acc} do polja {sq}, {your} pa {n2:move_acc}. Prepočasi.
+ex.promotion.b2.3 = Previdno: {my} postane dama na {sq}, {your} pa je predaleč.
+ex.promotion.b3 = {my} uide: {your} je zunaj kvadrata in {my:cl_gen} ne ujame pred poljem {sq}.
+ex.promotion.b3.2 = Dirka je izgubljena: {my} pride na {sq} pred {your:ins}.
+ex.promotion.b4 = {your} je zunaj kvadrata kmeta; kmet postane dama na {sq}.
+ex.promotion.b4.2 = {my} postane dama na {sq}; {your:dat} manjka ena poteza.
+ex.promotion.b5 = Dirka kmetov je izgubljena: {your} je zunaj kvadrata, kmet gre na {sq}.
+ex.promotion.b5.2 = {line}: na {sq} dobim damo, {your} pa zamudi.
+ex.promotion.b6 = {your} je zunaj kvadrata; na {sq} dobim damo.
+ex.promotion.b6.2 = {line}, promocija na {sq} ({your} zamudi).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Tvoj kmet bi lahko stekel do {sq} in postal dama!
+ex.promotion_missed.b1.2 = Poglej polje {sq}! Tvoj kmet bi lahko stekel tja.
+ex.promotion_missed.b2 = Tvoj kmet bi lahko stekel do {sq}. Proste kmete potiskaj naprej!
+ex.promotion_missed.b2.2 = Nič ni ustavljalo tvojega kmeta na poti do {sq}.
+ex.promotion_missed.b3 = {best} dobi dirko do {sq}.
+ex.promotion_missed.b3.2 = Tvoj kmet je bil hitrejši: {best} in na {sq} postane dama.
+ex.promotion_missed.b4 = {best} dobi dirko kmetov do {sq}.
+ex.promotion_missed.b4.2 = {best}! Kmet postane dama na {sq}.
+ex.promotion_missed.b5 = Po potezi {best} dobiš damo na {sq} pred mano.
+ex.promotion_missed.b5.2 = {best} in polje {sq} je tvoje.
+ex.promotion_missed.b6 = {best} dobi dirko do {sq}.
+ex.promotion_missed.b6.2 = {best}; dama na {sq} prej.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Ta kmet je ščitil {your:acc}. Zdaj ima {your} manj zaščite.
+ex.king_shield.b1.2 = Kmet s polja {sq} je bil ščit {your:gen}. Zdaj lahko moje figure vdrejo.
+ex.king_shield.b2 = Premik kmeta s polja {sq} oslabi {your:acc}. Zdaj {your:cl_acc} lahko napadejo moje figure.
+ex.king_shield.b2.2 = {your} je izgubil{your:ag} varuha: kmet na {sq} je bil {your:poss} ščit.
+ex.king_shield.b3 = Ta poteza kmeta odpre {your:acc} mojemu napadu.
+ex.king_shield.b3.2 = {your} izgubi kmečko zaščito in moje figure vdrejo.
+ex.king_shield.b4 = {move} oslabi kmete okoli {your:gen}; moj napad prodre.
+ex.king_shield.b4.2 = Po potezi {move} je ščit okoli {your:gen} razbit.
+ex.king_shield.b5 = {move} zrahlja zaščito {your:gen}: {line}.
+ex.king_shield.b5.2 = Po potezi {move} je {your} izpostavljen{your:ag}: {line}.
+ex.king_shield.b6 = {move} oslabi {your:acc}: {line}.
+ex.king_shield.b6.2 = {line}; {your} je preveč odprt{your:ag}.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} je v nevarnosti. Moje figure se {your:cl_dat} približujejo.
+ex.king_exposed.b1.2 = Poglej, kako je {your} izpostavljen{your:ag}. Skrij {your:cl_acc} za kmete.
+ex.king_exposed.b2 = {your} je preveč odprt{your:ag}. Zdaj ti lahko dam veliko šahov.
+ex.king_exposed.b2.2 = Previdno: {your} nima zavetja in moje figure {your:cl_acc} napadajo.
+ex.king_exposed.b3 = {your} je izpostavljen{your:ag}; moje figure {your:cl_acc} lahko napadajo s šahi.
+ex.king_exposed.b3.2 = Po tem {your} nima zavetja.
+ex.king_exposed.b4 = {your} postane izpostavljen{your:ag}: {line}.
+ex.king_exposed.b4.2 = Po potezi {move} je {your} odprt{your:ag} za napad.
+ex.king_exposed.b5 = {your} je preveč izpostavljen{your:ag}: {line}.
+ex.king_exposed.b5.2 = Po potezi {move} je {your} na odprtem.
+ex.king_exposed.b6 = {line}; {your} je izpostavljen{your:ag}.
+ex.king_exposed.b6.2 = {your} je preveč odprt{your:ag}: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Ta menjava vodi v kmečko končnico, ki jo dobim.
+ex.bad_trade.b3.2 = Po {line} ostanejo samo kmetje in moj kralj je boljši.
+ex.bad_trade.b4 = Menjave vodijo v izgubljeno kmečko končnico: {line}.
+ex.bad_trade.b4.2 = Prehod v to kmečko končnico izgubi.
+ex.bad_trade.b5 = Napačna menjava: kmečka končnica po {line} je izgubljena.
+ex.bad_trade.b5.2 = Kmečka končnica je izgubljena; obdrži figure na šahovnici.
+ex.bad_trade.b6 = Kmečka končnica po {line} je izgubljena.
+ex.bad_trade.b6.2 = Izgubljena kmečka končnica: {line}.
+ex.bishop_pair.b5 = Ta menjava te stane par lovcev.
+ex.bishop_pair.b5.2 = S to menjavo se odpoveš paru lovcev; moj ostane.
+ex.bishop_pair.b6 = Par lovcev je izgubljen.
+ex.bishop_pair.b6.2 = Par lovcev podarjen.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} zavzame opozicijo: kralja stojita drug nasproti drugemu, med njima je eno polje.
+ex.opposition.b3.2 = Kralja! Poteza {best} bi zavzela opozicijo.
+ex.opposition.b4 = {best} zavzame opozicijo: to je ključ.
+ex.opposition.b4.2 = Odloči opozicija: {best}.
+ex.opposition.b5 = {best}, z opozicijo.
+ex.opposition.b5.2 = Opozicija: {best}.
+ex.opposition.b6 = {best}, opozicija.
+ex.opposition.b6.2 = {best}: opozicija.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Tvoj kmet bi lahko stekel do {sq}. Prosti kmeti hočejo naprej!
+ex.push_passed.b1.2 = Potisni svojega prostega kmeta! Hoče priti do {sq}.
+ex.push_passed.b1.3 = Tvoj prosti kmet hoče korakati do {sq}. Potisni ga!
+ex.push_passed.b2 = {best}: potisni prostega kmeta proti polju {sq}.
+ex.push_passed.b2.2 = Tvoj prosti kmet je močan. {best} ga potisne naprej.
+ex.push_passed.b2.3 = Potisni ga! {best} približa kmeta polju {sq}.
+ex.push_passed.b3 = {best} potisne prostega kmeta.
+ex.push_passed.b3.2 = Proste kmete je treba potiskati: {best}.
+ex.push_passed.b3.3 = Prava pot je bila {best}: kmet teče proti polju {sq}.
+ex.push_passed.b4 = {best}: prosti kmet odloči.
+ex.push_passed.b4.2 = Naprej: {best}.
+ex.push_passed.b5 = {best}, s prostim kmetom naprej: {eval}.
+ex.push_passed.b5.2 = Prosti kmet: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, prosti kmet.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Pripelji {your:refl_acc} naprej! V končnici je kralj močna figura.
+ex.king_active.b1.2 = Zdaj se {your} lahko pridruži boju. Pripelji {your:cl_acc} na sredino.
+ex.king_active.b1.3 = Ko je figur malo, naj {your} pride ven in pomaga.
+ex.king_active.b2 = V končnici uporabi {your:refl_acc}: pripelji {your:cl_acc} v center.
+ex.king_active.b2.2 = {your} mora biti zdaj aktiv{your:ag_en}. Pošlji {your:cl_acc} naprej.
+ex.king_active.b3 = {best} aktivira kralja. V končnicah se kralj bori.
+ex.king_active.b3.2 = {best}: kralj zdaj spada v center.
+ex.king_active.b4 = {best} centralizira kralja.
+ex.king_active.b4.2 = Kralj mora naprej: {best}.
+ex.king_active.b5 = {best}, aktivacija kralja: {line}.
+ex.king_active.b5.2 = Aktivnost kralja: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, kralj naprej.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} ohrani boljšo pozicijo.
+ex.positional.b4.2 = Tu je bila močnejša poteza {best}.
+ex.positional.b4.3 = Jaz bi raje igral {best}.
+ex.positional.b5 = Močnejša je bila poteza {best}: {line}.
+ex.positional.b5.2 = {best}, z idejo {line}.
+ex.positional.b5.3 = Razmisli o potezi {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} je zelo zgodaj v igri. Najprej razvij skakače in lovce.
+tip.early_queen.b1.2 = Previdno {your:with} tako zgodaj: moje figure {your:cl_acc} lahko preganjajo.
+tip.early_queen.b1.3 = Premikati {your:refl_acc} je zabavno, a najprej razvij lahke figure.
+tip.early_queen.b2 = Če tako zgodaj premikaš {your:refl_acc}, {your:cl_acc} lahko napadam in pridobim čas.
+tip.early_queen.b2.2 = {your} že zunaj? Najprej skakači in lovci!
+tip.early_queen.b3 = Zgodnji izlet {your:gen} mi prinese tempe, ko {your:cl_acc} napadam.
+tip.early_queen.b3.2 = {your:acc} je tako zgodaj lahko preganjati. Najprej razvij figure.
+tip.queen_grab.b1 = {your} je vzel{your:ag} oddaljenega kmeta in zdaj lahko zaide v težave.
+tip.queen_grab.b1.2 = Lov na kmete {your:with} stane čas. Najprej razvij figure!
+tip.queen_grab.b2 = {your} je š{your:ag_el} na lov za kmeti na krilo. To stane veliko časa.
+tip.queen_grab.b2.2 = Previdno, ko pošiljaš {your:refl_acc} po oddaljene kmete.
+tip.queen_grab.b3 = Lov na kmete {your:with} tako zgodaj izgubi čas.
+tip.queen_grab.b3.2 = {your} je zdaj daleč od doma; moj razvoj bo štel.
+tip.queen_grab.b4 = {your} pobere kmeta, a izgubi preveč časa.
+tip.queen_grab.b4.2 = Lov na kmeta na krilu {your:with} stane tempo.
+tip.same_piece.b1 = {your} se je premaknil{your:ag} že dvakrat. Poskusi z vsako potezo razviti novo figuro.
+tip.same_piece.b1.2 = Spet {your}? Razvij še druge figure.
+tip.same_piece.b1.3 = Z vsako potezo poskusi razviti novo figuro, namesto da spet premikaš {your:refl_acc}.
+tip.same_piece.b2 = Dvakratni premik {your:gen} v otvoritvi izgubi čas.
+tip.same_piece.b2.2 = {your} se je spet premaknil{your:ag}; tvoje druge figure so še doma.
+tip.same_piece.b3 = Dvakratni premik {your:gen} zavira razvoj.
+tip.same_piece.b3.2 = Še ena poteza {your:with}; preostanek tvoje vojske čaka.
+tip.castle.b1 = {your} je še vedno na sredini. Z rokado bi bil{your:ag} var{your:ag_en}.
+tip.castle.b1.2 = Čas je za rokado! {your} je v kotu varnejš{your:agi}.
+tip.castle.b1.3 = Kmalu razmisli o rokadi. {your} je na odprtem.
+tip.castle.b2 = {your} je še vedno v centru. Kmalu rokiraj!
+tip.castle.b2.2 = Rokada bi {your:acc} varno skrila.
+tip.castle.b3 = Center se odpira: čas je za rokado {your:gen}.
+tip.castle.b3.2 = {your} je še vedno v centru; rokada je bila že na vrsti.
+tip.knight_rim.b1 = {your} na robu ne naredi veliko. Skakači imajo radi sredino.
+tip.knight_rim.b1.2 = Skakač na robu je slab skakač! {your} tam nadzoruje manj polj.
+tip.knight_rim.b2 = {your} na robu nadzoruje malo polj. Meri na center.
+tip.knight_rim.b2.2 = Skakač na robu je slab skakač: {your} spada v center.
+tip.knight_rim.b3 = {your} je na robu izven igre.
+tip.knight_rim.b3.2 = Rob je slab dom za {your:acc}.
+tip.flank.b1 = Najprej poskusi premikati sredinske kmete. Robni kmeti ne pomagajo veliko.
+tip.flank.b1.2 = Kmeti ob strani ne pomagajo figuram ven. Uporabi tiste na sredini.
+tip.flank.b2 = Poteze z robnimi kmeti ne razvijejo ničesar. Uporabi centralne kmete.
+tip.flank.b2.2 = Preveč potez s kmeti na krilu. Razvij figure!
+tip.flank.b3 = Poteze s kmeti na krilu v otvoritvi zavirajo razvoj.
+tip.flank.b3.2 = Robni kmeti lahko počakajo; razvijaj figure in se bori za center.
+tip.centre.b1 = Poskusi nadzorovati sredino šahovnice, na primer polje {sq}.
+tip.centre.b1.2 = Center je pomemben. Postavi kmeta ali figuro blizu polja {sq}.
+tip.centre.b1.3 = Figure na sredini so močne. Meri na polja, kot je {sq}.
+tip.centre.b2 = Bori se za center: polja, kot je {sq}, so pomembna.
+tip.centre.b2.2 = Center mi prepuščaš. Poglej polje {sq}.
+tip.centre.b3 = Za center se ne boriš; polje {sq} je moje.
+tip.centre.b3.2 = Napadi center okoli polja {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Ko mi ostane sam kralj, ga potisni na rob, nato pa daj mat.
+tip.mate_technique.b1.2 = Namig: potiskaj mojega kralja proti robu. Tudi svojega kralja imej blizu.
+tip.fifty.b1 = Previdno: po petdesetih potezah brez jemanja ali poteze kmeta je remi.
+tip.fifty.b1.2 = Čas se izteka: petdeset potez brez jemanja ali poteze kmeta pomeni remi.
+tip.repetition.b1 = Previdno! Če se ista pozicija ponovi tretjič, je remi.
+tip.repetition.b1.2 = Ne ponavljaj potez: tretja ponovitev je remi, ti pa imaš dobljeno pozicijo.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Vau, žrtvuješ figuro in deluje!
+praise.sacrifice.2 = Pametna žrtev! Zelo dobro odigrano.
+praise.brilliant.b3 = Briljantno! Prava žrtev.
+praise.brilliant.b3.2 = Vau, {move} je odlična žrtev!
+praise.brilliant.b4 = {move}! Briljantna žrtev.
+praise.brilliant.b4.2 = Briljantno. Tega nisem pričakoval.
+praise.brilliant.b5 = {move}!! Briljantno.
+praise.brilliant.b5.spoken = {move}. Briljantno!
+praise.brilliant.b5.2 = Briljantna žrtev.
+praise.brilliant.b6 = {move}!! Odlično.
+praise.brilliant.b6.spoken = {move}. Odlično!
+praise.brilliant.b6.2 = Briljantno.
+praise.great.b2 = Odlična poteza! Uspelo ti je najti protiudarec.
+praise.great.b2.2 = To je odlična poteza. Lepo najdeno!
+praise.great.b3 = Odlična poteza! Uspelo ti je najti edino dobro idejo.
+praise.great.b3.2 = Odlično, {move} obrne potek partije.
+praise.great.b4 = {move}! Odlična najdba.
+praise.great.b4.2 = Odlična poteza.
+praise.great.b5 = {move}! Lepo najdeno.
+praise.great.b5.2 = Močno: {move}.
+praise.great.b6 = {move}! Odlično.
+praise.great.b6.2 = Odlična najdba.
+praise.only.b2 = Dobro! To je bila edina dobra poteza.
+praise.only.b2.2 = Bravo, uspelo ti je najti edino potezo, ki deluje.
+praise.only.b3 = To je bila edina poteza in uspelo ti jo je najti.
+praise.only.b3.2 = Natanko tako! Nič drugega tu ni delovalo.
+praise.only.b4 = Edina poteza. Bravo.
+praise.only.b4.2 = Edina poteza, najdena.
+praise.only.b5 = Edina poteza. Dobro.
+praise.only.b5.2 = {move}, edina poteza.
+praise.only.b6 = Edina poteza.
+praise.only.b6.2 = Natančno: edina poteza.
+praise.fork.b2 = Dvojni napad! Bravo.
+praise.fork.b2.2 = Napadaš dve figuri hkrati! Odlično.
+praise.fork.b2.3 = Lepo! To so vilice.
+praise.fork.b3 = Lepe vilice.
+praise.fork.b3.2 = Dobre vilice!
+praise.fork.b3.3 = Vilice. Lepo odigrano.
+praise.capture.b1 = Bravo! Zastonj dobiš {my:acc}.
+praise.capture.b1.2 = Dobro oko! {my} ni bil{my:ag} zaščiten{my:ag}.
+praise.capture.b1.3 = Tako je! {my} je tvoj{my:ag}.
+praise.capture.b2 = Dobro jemanje! {my} je bil{my:ag} nezaščiten{my:ag}.
+praise.capture.b2.2 = Lepo, pobereš {my:acc}.
+praise.capture.b2.3 = Dobro opaženo: {my} je visel{my:ag}.
+praise.best.b1 = Dobra poteza!
+praise.best.b1.2 = Zelo dobro!
+praise.best.b1.3 = Lepo odigrano!
+praise.best.b2 = Dobra poteza.
+praise.best.b2.2 = Zelo lepo.
+praise.best.b2.3 = Lepo odigrano.
+praise.best.b3 = Dobra poteza: ni je lahko najti.
+praise.best.b3.2 = Lepo najdeno.
+praise.best.b3.3 = {move} je tu najboljša poteza. Dobro.
+praise.trade.b1 = Dobro! Ko imaš prednost, ti menjave figur pomagajo.
+praise.trade.b1.2 = Lepa menjava. Imaš prednost, zato je manj figur zate dobro.
+praise.trade.b2 = Dobra menjava: imaš prednost, zato menjaj figure.
+praise.trade.b2.2 = Zamenjati {my:acc}, ko imaš prednost, je pametno.
+praise.trade.b3 = Dobro: ko imaš prednost, menjaj.
+praise.trade.b3.2 = Smiselna menjava.
+praise.excellent.b3 = Odlična poteza.
+praise.excellent.b3.2 = To je močna poteza.
+praise.excellent.b3.3 = Zelo natančno.
+praise.excellent.b4 = Natančno.
+praise.excellent.b4.2 = Odlično.
+praise.excellent.b4.3 = Dobro, {move} je natančna poteza.
+praise.castle.b1 = Dobro, rokada! Tvoj kralj je zdaj bolj varen.
+praise.castle.b1.2 = Lepa rokada! Tvoj kralj je na varnem.
+praise.saved.b1 = Dobro! Tvoja figura je rešena.
+praise.saved.b1.2 = Bravo, figura je zdaj na varnem.
+praise.book.b1 = Dobro, to je znana otvoritvena poteza.
+praise.book.b1.2 = Lepo, tako začenjajo tudi močni igralci.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Previdno! Grozim z matom na {sq}.
+threat.mate.b1.2 = Pazi: {my} hoče iti na {sq}. To bi bil mat.
+threat.mate.b1.3 = Poglej polje {sq}. Če pridem tja, je mat!
+threat.mate.b2 = Previdno, grozim z matom.
+threat.mate.b2.2 = Pazi: na {sq} grozi mat.
+threat.mate.b2.3 = Dobro poglej: grozim z matom.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Poglej: {my} napada {your:acc}.
+threat.piece.b1.2 = Previdno! {your} je pod napadom {my:gen}.
+threat.piece.b1.3 = Pazi, {my} hoče vzeti {your:acc}.
+threat.piece.b2 = Pazi na {your:refl_acc}.
+threat.piece.b2.2 = {your} je pod napadom.
+threat.piece.b2.3 = Pozor: {your}.
+threat.punish.b1 = Moja zadnja poteza je bila napaka. Ali jo lahko izkoristiš?
+threat.punish.b1.2 = Hm, mislim, da sem naredil napako. Ali jo najdeš?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Tokrat pomisli na {your:refl_acc}.
+tb.hint.b1.2 = Pazi na {your:refl_acc}.
+tb.hint.king.b1 = Pomisli na varnost {your:refl_gen}.
+tb.hint.king.b1.2 = Najprej poglej {your:refl_acc}. Ali je na varnem?
+tb.hint.missed.b1 = Poišči figure, ki jih lahko vzameš zastonj.
+tb.hint.missed.b1.2 = Dobro poglej: ali lahko kaj vzameš?
+tb.hint.mate_missed.b1 = Poglej mojega kralja. Ali mu lahko daš mat?
+tb.hint.mate_missed.b1.2 = Najprej preizkusi šahe. Morda je tu mat!
+tb.hint.general.b1 = Vzemi si čas in poglej vso šahovnico.
+tb.hint.general.b1.2 = Poskusi najti varnejšo potezo.
+# The retry.
+tb.fixed.b1 = Veliko bolje!
+tb.fixed.b1.2 = Ja, tako je bolje!
+tb.fixed.b1.3 = Dobro, tako gre veliko bolje.
+tb.fixed = Tako je bolje.
+tb.fixed.2 = Bolje.
+tb.fixed.3 = Dober popravek.
+tb.same = Spet ista poteza? Prav, poglejva.
+tb.same.2 = Ta poteza ti je všeč. Odigrajva jo do konca.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Ja! To je poteza, na katero sem mislil.
+tb.found.b1.2 = Uspelo ti je! To je boljša poteza.
+tb.found = To je poteza, ki sem jo imel v mislih.
+tb.found.2 = Natanko, to je ta.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time.
+tb.none_left = Žal v tej partiji ne moreš več vrniti nobene poteze.
+tb.none_left.2 = V tej partiji ti ne ostane nobena vrnitev poteze.

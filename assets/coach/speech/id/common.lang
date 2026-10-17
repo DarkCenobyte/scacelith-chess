@@ -1,0 +1,179 @@
+# Coach speech (Indonesian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Indonesian needs.
+# Register: the coach says "kamu" to the player and "aku" for himself, with the possessive suffixes
+# "-mu" / "-ku" ("langkahmu", "kudaku"); the game menus stay formal ("Anda"). Conversational standard
+# Indonesian: "tidak", "saja", "sudah" (never "nggak", "aja", "udah").
+# Indonesian has no grammatical gender, no cases and a single plural form: no word agrees with the
+# player's (or the coach's) gender, and a noun after a number never changes ("1 langkah", "3 langkah").
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns as in the game UI and Indonesian chess books (PERCASI): pion, kuda, gajah, benteng, menteri,
+# raja. No gender, so no "piece.<type>.gender". The possessive is a suffix glued to the noun, which
+# itself never changes ("kuda" + "-mu" = "kudamu"): one pattern per owner serves all six pieces. The
+# Analysis mode puts the side after the noun, capitalised as the players' names: "kuda Putih".
+# Forms (each defined for all six pieces and the four owners your, my, white, black):
+#   nom    kudamu / kudaku / kuda Putih / kuda Hitam      "{my} memakan {your}."
+#          The default ("{your}" = "{your:nom}"): subject, object, and after any preposition or
+#          noun ("dengan {your}", "keamanan {your}"), since Indonesian has no cases.
+#   bare   kuda (the same for every owner)                "Ini {your}. {your:bare} bergerak membentuk huruf L."
+#          The noun alone, to name the piece again instead of "it".
+#   milik  kuda milikmu / kuda milikku /                  "Yang terancam {your:milik}, bukan {my:milik}."
+#          kuda milik Putih / kuda milik Hitam
+#          The stressed owner, only for a contrast.
+# A placeholder that starts a sentence is capitalised by the program ("Kudamu ...", "Kuda Putih ...").
+# Never add "-mu", "-ku", "-nya", "milik", "Putih" or "Hitam" to a piece placeholder: the owner is
+# already in it. "It" for a piece: repeat it ({your:bare}), or "-nya" on the verb or noun
+# ("memakannya", "petaknya"), or "ia" as a subject.
+piece.pawn.nom = pion
+piece.knight.nom = kuda
+piece.bishop.nom = gajah
+piece.rook.nom = benteng
+piece.queen.nom = menteri
+piece.king.nom = raja
+piece.pawn.bare = pion
+piece.knight.bare = kuda
+piece.bishop.bare = gajah
+piece.rook.bare = benteng
+piece.queen.bare = menteri
+piece.king.bare = raja
+piece.pawn.milik = pion
+piece.knight.milik = kuda
+piece.bishop.milik = gajah
+piece.rook.milik = benteng
+piece.queen.milik = menteri
+piece.king.milik = raja
+# The owners: "-mu" (the player's), "-ku" (the coach's), the side after the noun (Analysis mode).
+owner.your.nom = {piece}mu
+owner.my.nom = {piece}ku
+owner.white.nom = {piece} Putih
+owner.black.nom = {piece} Hitam
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+owner.your.milik = {piece} milikmu
+owner.my.milik = {piece} milikku
+owner.white.milik = {piece} milik Putih
+owner.black.milik = {piece} milik Hitam
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The files are said by the Indonesian names of their letters (a, be, ce, de, e, ef, ge, ha), the
+# ranks as number words: e4 = "e empat", f3 = "ef tiga", h8 = "ha delapan".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = ef
+file.g.spoken = ge
+file.h.spoken = ha
+rank.1.spoken = satu
+rank.2.spoken = dua
+rank.3.spoken = tiga
+rank.4.spoken = empat
+rank.5.spoken = lima
+rank.6.spoken = enam
+rank.7.spoken = tujuh
+rank.8.spoken = delapan
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Indonesian notation letters: R(aja) M(enteri) B(enteng) G(ajah) K(uda): "Kf3", "Bad1", "Rxe2".
+move.letters = R M B G K
+# Spoken as Indonesian players read moves aloud: "kuda ef tiga", "kuda makan e lima", "kuda be de dua",
+# "pion de makan e lima", "pion makan kembali" (a recapture in a line), "rokade pendek",
+# "e delapan, promosi menjadi menteri", "menteri ge empat, skak", "... skakmat".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} makan {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} makan {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = pion {file} makan {to}
+move.recapture.spoken = {piece} makan kembali
+move.castle_short.spoken = rokade pendek
+move.castle_long.spoken = rokade panjang
+move.promotion.spoken = {move}, promosi menjadi {piece}
+move.check.spoken = {move}, skak
+move.mate.spoken = {move}, skakmat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# None yet: the pronunciation pass adds the respell.* words the Indonesian voice misreads.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. "se-" means one in sepuluh (10), sebelas (11) and seratus (100), listed with
+# 0-20 and the tens; 12-19 are "<unit> belas". 21-99 compose as "{tens} {units}" ("dua puluh satu"),
+# 200-900 as "{n} ratus" ("dua ratus"), 101-999 as "{hundreds} {rest}" ("seratus dua puluh tiga",
+# "dua ratus lima", "tiga ratus sebelas").
+number.0.spoken = nol
+number.1.spoken = satu
+number.2.spoken = dua
+number.3.spoken = tiga
+number.4.spoken = empat
+number.5.spoken = lima
+number.6.spoken = enam
+number.7.spoken = tujuh
+number.8.spoken = delapan
+number.9.spoken = sembilan
+number.10.spoken = sepuluh
+number.11.spoken = sebelas
+number.12.spoken = dua belas
+number.13.spoken = tiga belas
+number.14.spoken = empat belas
+number.15.spoken = lima belas
+number.16.spoken = enam belas
+number.17.spoken = tujuh belas
+number.18.spoken = delapan belas
+number.19.spoken = sembilan belas
+number.20.spoken = dua puluh
+number.30.spoken = tiga puluh
+number.40.spoken = empat puluh
+number.50.spoken = lima puluh
+number.60.spoken = enam puluh
+number.70.spoken = tujuh puluh
+number.80.spoken = delapan puluh
+number.90.spoken = sembilan puluh
+number.100.spoken = seratus
+number.tens.spoken = {tens} {units}
+number.hundreds.spoken = {n} ratus
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Indonesian writes a decimal comma ("1,3") and says "satu koma tiga".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} koma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Indonesian has a single plural form: the noun after a number stays as it is ("1 langkah",
+# "3 langkah"; never "3 langkah-langkah"). "buah catur" rather than "buah" alone, which after a number
+# reads as a mere classifier ("3 buah" = "3 items").
+count.move = {n} langkah
+count.point = {n} poin
+count.pawn = {n} pion
+count.piece = {n} buah catur
+count.mistake = {n} kesalahan
+count.blunder = {n} blunder
+count.inaccuracy = {n} ketidakakuratan
+count.game = {n} permainan
+count.time = {n} kali
+count.square = {n} petak
+count.position = {n} posisi
+# Indonesian helpers for the other coach files:
+#   ord      an ordinal, "langkah {n:ord}" = "langkah ke-12", spoken "langkah kedua belas" ("ke-" plus
+#            the number word, 1 = "kesatu"); never write "ke-{n}" by hand
+#   percent  an accuracy, "akurasi {acc:percent}" = "akurasi 85%", spoken "delapan puluh lima persen"
+count.ord = ke-{n}
+count.ord.spoken = ke{n}
+count.percent = {n}%
+count.percent.spoken = {n} persen
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# "Mat dalam 3 langkah" is the usual Indonesian wording of "mate in 3" (puzzles, engines).
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = seimbang
+eval.mate_win = mat dalam {n} langkah
+eval.mate_loss = kena mat dalam {n} langkah

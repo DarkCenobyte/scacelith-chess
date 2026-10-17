@@ -37,6 +37,7 @@ options.unsaved.text = Des options ont été modifiées. Les appliquer avant de 
 
 options.language = Langue
 options.language.help = Langue des menus et des messages. Le changement est immédiat.
+options.language.not_adapted = Cette langue n’est pas encore entièrement adaptée : la voix du coach peut mal prononcer certains mots, et certains textes peuvent encore sembler maladroits.
 options.display_mode = Mode d’affichage
 options.display_mode.help = Plein écran : une fenêtre sans bordure sur tout l’écran, à la résolution du bureau. Fenêtré : une fenêtre de la taille ci-dessous.
 options.fullscreen = Plein écran

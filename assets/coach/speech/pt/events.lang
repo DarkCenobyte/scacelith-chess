@@ -1,0 +1,110 @@
+# Coach speech (European Portuguese): events of a coach game and of the rules lesson (greetings,
+# turn-taking, takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp
+# says them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "tu" and is male ("estou pronto", "obrigado" when he thanks). The player's gender is
+# unknown: no adjective or participle about the player ("pronto", "bem-vindo", "derrotado"); verbs never
+# agree with gender, so every tense is fine ("ganhaste", "abandonaste").
+# The level names are those of the coach page (assets/i18n/pt.lang coach.level.<n>.name).
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Olá! Vamos jogar uma partida amigável. Ajudo-te sempre que alguma coisa correr mal.
+event.greet.l1.2 = Viva! Vou jogar com calma e mostrar-te onde é preciso ter cuidado.
+event.greet.l1.3 = Boas-vindas! Não tenhas pressa: eu aviso-te quando uma peça estiver em perigo.
+event.greet.l2 = Olá! Vamos jogar. Quando aparecer um garfo ou uma cravada, eu mostro-te.
+event.greet.l2.2 = Viva! Põe as tuas peças em jogo e mantém o teu rei em segurança. Eu ajudo-te pelo caminho.
+event.greet.l2.3 = De volta ao tabuleiro! Atenção aos garfos e às cravadas: são eles que ganham partidas.
+event.greet.l3 = Olá! Vamos jogar uma partida a sério. Vou comentar os teus planos e os erros mais importantes.
+event.greet.l3.2 = Viva! Pensa num plano para as tuas peças. Eu digo-te quando um lance deixar escapar alguma coisa.
+event.greet.l3.3 = Vamos jogar! Vou assinalar os lances únicos e os lances que não resultam.
+event.greet.l4 = Olá! Desta vez vou dar avaliações e mostrar-te os melhores lances candidatos.
+event.greet.l4.2 = Vamos jogar. Depois de um erro, digo-te o que era mais preciso.
+event.greet.l4.3 = Que tal uma partida como no clube? Comento sempre que a avaliação mudar.
+event.greet.l5 = Vamos jogar. Vou ser breve nos comentários.
+event.greet.l5.2 = Estou pronto quando quiseres. Só comentários curtos.
+event.greet.l5.3 = Boa sorte. Só falo quando for importante.
+event.greet.l6 = Boa sorte.
+event.greet.l6.2 = Vamos a isso.
+event.greet.l6.3 = Estou pronto. Só comento os momentos críticos.
+
+# Who starts (said after the greeting).
+event.colour.white = Tens as peças brancas, por isso começas tu.
+event.colour.white.2 = Jogas com as brancas: o primeiro lance é teu.
+event.colour.black = Eu tenho as brancas, por isso começo eu.
+event.colour.black.2 = Desta vez jogas com as pretas: eu jogo primeiro.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+event.level.l1 = Primeiros passos: jogo com calma e explico cada erro por palavras simples.
+event.level.l2 = Principiante: jogo um pouco mais forte e dou nome às táticas simples, como os garfos e as cravadas.
+event.level.l3 = Intermédio: falo de planos e de estrutura de peões, e mostro variantes curtas.
+event.level.l4 = Jogador de clube: dou a avaliação em peões e sugiro lances candidatos.
+event.level.l5 = Jogador de clube forte: comentários curtos, e variantes mais longas quando for importante.
+event.level.l6 = Especialista: jogo o melhor que sei e só comento os momentos críticos.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Jogas tu.
+event.your_move.2 = É a tua vez.
+event.your_move.3 = Agora é contigo.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Não tenhas pressa.
+event.take_time.2 = Sem pressa: nas nossas partidas não há relógio.
+# Short filler while the coach is still looking at the position.
+event.filler = Hum.
+event.filler.2 = Vejamos.
+event.filler.3 = Deixa-me ver.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Muito bem, vamos voltar atrás.
+event.takeback.taken.2 = Boa ideia. Olha outra vez.
+event.takeback.taken.3 = Lance anulado. Tenta outra vez.
+# The player declined the offer and played on.
+event.takeback.declined = Muito bem, continuamos a jogar.
+event.takeback.declined.2 = Está bem, a partida continua.
+event.takeback.declined.3 = Tu é que decides. Vamos continuar.
+# After an explanation without an offer.
+event.play_on = Vamos continuar a jogar.
+event.play_on.2 = Continuemos.
+event.play_on.3 = Agora, voltemos à nossa partida.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Toda a gente comete erros destes. O importante é dar por eles.
+event.encourage.mistake.2 = Não te preocupes. Vê o que o meu último lance ataca e vais descobrir.
+event.encourage.mistake.3 = Isso acontece a todos os jogadores. Vamos em frente.
+# The player is behind (material or evaluation).
+event.encourage.behind = Não desistas: procura as tuas oportunidades e dá-me trabalho.
+event.encourage.behind.2 = Continua a lutar. Ainda é possível dar a volta a posições destas.
+event.encourage.behind.3 = Mantém a calma e procura as minhas fraquezas.
+# The player has played several good moves in a row.
+event.encourage.well = Estás a verificar as minhas ameaças antes de jogar. Muito bem.
+event.encourage.well.2 = Lances cuidadosos e sólidos. Continua assim.
+event.encourage.well.3 = Hoje estás a pensar bem.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Aceito. Então, é empate.
+event.draw.accepted.2 = Combinado: é empate.
+event.draw.declined = Não, obrigado, vamos continuar a jogar.
+event.draw.declined.2 = Prefiro continuar.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Bem jogado. Parabéns!
+event.end.win.2 = Mereceste. Muito bem!
+event.end.win.3 = Parabéns: ganhaste-me com toda a justiça.
+event.end.loss = Boa partida. Da próxima vez, ganhas-me tu.
+event.end.loss.2 = Obrigado pela partida. Cada derrota ensina-te alguma coisa.
+event.end.loss.3 = Boa luta. Vamos ver o que aconteceu.
+event.end.draw = Empate. Boa partida!
+event.end.draw.2 = Desta vez ninguém ganha. Foi uma partida bem disputada.
+event.end.draw.3 = Um resultado justo. Boa partida.
+event.end.resigned = Abandonaste. Mesmo assim, foi uma boa luta.
+event.end.resigned.2 = Está bem. Obrigado pela partida.
+event.end.handshake = Vamos dar um aperto de mão.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title with its article ("o roque", lesson.title.* in lesson.lang): never
+# put de, a, em or por right before it (they would have to merge with the article).
+event.lesson.resume = Que bom ver-te outra vez! Vamos continuar com {chapter}.
+event.lesson.resume.2 = Olá de novo! Tínhamos ficado aqui: {chapter}.
+event.lesson.next = A seguir: {chapter}.
+event.lesson.next.2 = Agora, {chapter}.

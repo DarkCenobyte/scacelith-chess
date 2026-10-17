@@ -1,0 +1,437 @@
+# Coach speech (Hungarian): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# The appraisal is always positive and never blames. The coach says "te" (tegezés) and speaks of himself
+# as "én"; Hungarian has no grammatical gender, nothing agrees with the player.
+#
+# Names inserted by {text}, {theme}, {level}: {text} takes no form (a form would need a key in common.lang),
+# so each name is written to fit every sentence that inserts it, in the nominative:
+#   appraisal.phase.*   with the article ("a középjáték"): "{text} ment a legjobban", "{text} volt".
+#   appraisal.reason.*  an adverbial said after "Döntetlen, {text}." ("lépésismétlés miatt").
+#   theme.*             an infinitive phrase in lower case, no full stop ("figyelni a kettős támadásokra"),
+#                       said after a colon, "fontos" or "próbálj meg".
+#   appraisal.level.*   the level name of the coach page in „…” WITH its article, as a/az depends on the
+#                       name: "{level} szintre" = "a „Kezdő” szintre", "az „Első lépések” szintre".
+# {opening:def} = the opening's name with its article ("a szicíliai védelem"); bare {opening} only after a
+# colon or alone.
+# Move numbers: {n:ord} ("21.", spoken "huszonegyedik") never after "a"/"az": "{n:ord} lépésként",
+# "a játszma {n:ord} lépésében", "{n:ord} lépés: {move}". A move stands alone, before "helyett" or "lépéssel".
+# Accuracy: {acc:percent} = "85%", {acc:percent_adj} = "85%-os" (spoken "nyolcvanöt százalék(os)").
+# {n:time} never starts a sentence (its "egyszer" would stay in lower case).
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = a megnyitás
+appraisal.phase.middlegame = a középjáték
+appraisal.phase.endgame = a végjáték
+appraisal.reason.stalemate = patt miatt
+appraisal.reason.material = mert egyikünk sem tudott volna mattot adni
+appraisal.reason.repetition = lépésismétlés miatt
+appraisal.reason.fifty = az ötvenlépéses szabály miatt
+appraisal.reason.agreement = közös megegyezéssel
+appraisal.reason.other = a szabályok szerint
+# The coach level names (coach.level.<n>.name of assets/i18n/hu.lang) with their article.
+appraisal.level.l1 = az „Első lépések”
+appraisal.level.l2 = a „Kezdő”
+appraisal.level.l3 = a „Fejlődő játékos”
+appraisal.level.l4 = a „Klubjátékos”
+appraisal.level.l5 = az „Erős klubjátékos”
+appraisal.level.l6 = a „Szakértő”
+# What to practise, after "Érdemes gyakorolni:" and similar (an infinitive phrase, no full stop).
+theme.general = átnézni az egész táblát, mielőtt lépsz
+theme.mate_allowed = minden lépés előtt ellenőrizni a királyod biztonságát
+theme.mate_missed = mattot keresni, a sakkokkal kezdve
+theme.stalemate = szabad mezőt hagyni a királyomnak, amikor nyerésre állsz
+theme.fork = figyelni a kettős támadásokra
+theme.discovered = figyelni a bábuim mögött rejtőző támadásokra
+theme.skewer = ügyelni, hogy az értékes bábuid ne álljanak egy egyenesben
+theme.pin = észrevenni a kötéseket, még mielőtt létrejönnek
+theme.trapped = menekülőutat hagyni a bábuidnak
+theme.back_rank = menekülőmezőt nyitni a királyodnak
+theme.hanging = védve tartani a bábuidat
+theme.exchange = csere előtt megszámolni a támadókat és a védőket
+theme.missed_capture = először az ingyen leüthető bábukat keresni
+theme.missed_fork = a saját kettős támadásaidat keresni
+theme.promotion = kiszámolni a gyalogversenyeket, és használni a négyzetszabályt
+theme.king_safety = biztonságban tartani a királyodat a gyalogjai mögött
+theme.bad_trade = jól megválasztani, melyik bábut cseréld le
+theme.opening = kihozni a tisztjeidet, és korán sáncolni
+theme.endgame = bevetni a királyodat, és előretolni a szabadgyalogjaidat
+theme.positional = javítani a legrosszabb bábud helyzetén
+theme.material = lépés előtt megnézni, mit nyerhetnek a következő lépéseim
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Matt! Nyertél. Szépen játszottál!
+appraisal.open.win.b1.2 = Nyertél! Szép munka, hogy végig is vitted a játszmát.
+appraisal.open.win.b1.3 = Megvertél! Ez nagyon jó játszma volt.
+appraisal.open.win.b2 = Szépen játszottál! {moves:move_ine} nyertél.
+appraisal.open.win.b2.2 = Gratulálok, nyertél!
+appraisal.open.win.b2.3 = Győzelem {moves:move_ine}. Szép munka!
+appraisal.open.win.b3 = Gratulálok, megérdemelt győzelem.
+appraisal.open.win.b3.2 = Szépen játszottál. Megérdemelted ezt a győzelmet.
+appraisal.open.win.b3.3 = Szép győzelem. Gratulálok.
+appraisal.open.win.b4 = Szép győzelem.
+appraisal.open.win.b4.2 = Jól játszottál, megérdemelt győzelem.
+appraisal.open.win.b4.3 = Szép győzelem volt.
+appraisal.open.win.b5 = Jól játszottál.
+appraisal.open.win.b5.2 = Szépen nyertél.
+appraisal.open.win.b5.3 = Jó játszma, szépen megnyerted.
+appraisal.open.win.b6 = Jól játszottál.
+appraisal.open.win.b6.2 = Szép győzelem.
+appraisal.open.win.b6.3 = Jó játszma.
+appraisal.open.draw.b1 = Döntetlen! Ezt a játszmát senki sem tudta megnyerni.
+appraisal.open.draw.b1.2 = Döntetlen lett. Szoros játszma volt!
+appraisal.open.draw.b1.3 = Döntetlen: megosztozunk a ponton. Szépen játszottál!
+appraisal.open.draw.b2 = Döntetlen: igazságos eredmény.
+appraisal.open.draw.b2.2 = Döntetlent játszottunk. Szép küzdelem volt!
+appraisal.open.draw.b2.3 = Döntetlen, és jó játszma volt.
+appraisal.open.draw.b3 = Döntetlen. Mindkét félnek voltak esélyei.
+appraisal.open.draw.b3.2 = Igazságos döntetlen.
+appraisal.open.draw.b3.3 = Döntetlen, {text}. Szép küzdelem volt.
+appraisal.open.draw.b4 = Döntetlen, {text}.
+appraisal.open.draw.b4.2 = Döntetlen lett, {text}.
+appraisal.open.draw.b4.3 = A játszma döntetlenül végződött, {text}.
+appraisal.open.draw.b5 = Döntetlen.
+appraisal.open.draw.b5.2 = Döntetlen, {text}.
+appraisal.open.draw.b5.3 = Döntetlen lett.
+appraisal.open.draw.b6 = Döntetlen.
+appraisal.open.draw.b6.2 = Döntetlen, {text}.
+appraisal.open.draw.b6.3 = Döntetlen lett.
+appraisal.open.stalemate.b1 = Döntetlen, patt miatt: pedig olyan közel voltál! Legközelebb hagyj egy szabad mezőt a királyomnak.
+appraisal.open.stalemate.b1.2 = Patt, vagyis döntetlen. Majdnem sikerült!
+appraisal.open.stalemate.b2 = Döntetlen, patt miatt. Olyan közel voltál a győzelemhez!
+appraisal.open.stalemate.b2.2 = Patt: döntetlen, pedig nyerésre álltál.
+appraisal.open.stalemate.b3 = Döntetlen patt miatt, nyerő állásból.
+appraisal.open.stalemate.b3.2 = Patt. A győzelem az utolsó pillanatban csúszott ki a kezedből.
+appraisal.open.stalemate.b4 = Pattal döntetlen.
+appraisal.open.stalemate.b4.2 = Patt: döntetlen.
+appraisal.open.stalemate.b5 = Patt.
+appraisal.open.stalemate.b5.2 = Döntetlen, patt miatt.
+appraisal.open.stalemate.b6 = Patt.
+appraisal.open.stalemate.b6.2 = Döntetlen, patt.
+appraisal.open.loss.b1 = Most én nyertem, de nagyon jó lépéseid is voltak.
+appraisal.open.loss.b1.2 = Jó játszma volt! Alaposan megdolgoztattál.
+appraisal.open.loss.b1.3 = Jó móka volt! Ezt most én nyertem, de gyorsan tanulsz.
+appraisal.open.loss.b2 = Jó játszma volt! Nézzük meg, mi ment jól, és mi az az egy dolog, amit kipróbálhatsz.
+appraisal.open.loss.b2.2 = Köszönöm a játszmát! Volt néhány jó ötleted.
+appraisal.open.loss.b2.3 = Jó játszma volt. Nézzük, mit tanulhatunk belőle.
+appraisal.open.loss.b3 = Jó játszma volt.
+appraisal.open.loss.b3.2 = Köszönöm a játszmát.
+appraisal.open.loss.b3.3 = Jó játszma volt. Nézzük meg.
+appraisal.open.loss_close.b3 = Szép küzdelem. Sokáig szoros volt a játszma.
+appraisal.open.loss_close.b3.2 = Szép küzdelem: sokáig kiegyenlített volt az állás.
+appraisal.open.loss.b4 = Jó játszma volt. Lássuk, mi döntötte el.
+appraisal.open.loss.b4.2 = Jó játszma volt. Egyetlen pillanat döntötte el.
+appraisal.open.loss.b4.3 = Köszönöm a játszmát. Nézzük, hol fordult meg.
+appraisal.open.loss_close.b4 = Sokáig szoros küzdelem volt. Lássuk, mi döntötte el.
+appraisal.open.loss_close.b4.2 = Jó játszma, sokáig kiegyenlített.
+appraisal.open.loss.b5 = Jó játszma.
+appraisal.open.loss.b5.2 = Köszönöm a játszmát.
+appraisal.open.loss.b5.3 = Szép küzdelem.
+appraisal.open.loss.b6 = Jó játszma.
+appraisal.open.loss.b6.2 = Köszönöm a játszmát.
+appraisal.open.loss.b6.3 = Szép küzdelem.
+appraisal.open.resigned.b1 = A feladás is a sakk része, és bátorság kell hozzá. Jó játszma volt!
+appraisal.open.resigned.b1.2 = Semmi baj. Az is a sakk része, hogy tudd, mikor kell feladni.
+appraisal.open.resigned.b2 = A feladás is a sakk része, és bátorság kell hozzá.
+appraisal.open.resigned.b2.2 = Rendben van. A feladáshoz is bátorság kell.
+appraisal.open.resigned.b3 = A feladás is a sakk része. Jó játszma volt.
+appraisal.open.resigned.b3.2 = Rendben. Köszönöm a játszmát.
+appraisal.open.resigned.b4 = Jó játszma volt.
+appraisal.open.resigned.b4.2 = Köszönöm a játszmát.
+appraisal.open.resigned.b5 = Jó játszma.
+appraisal.open.resigned.b5.2 = Köszönöm a játszmát.
+appraisal.open.resigned.b6 = Jó játszma.
+appraisal.open.resigned.b6.2 = Köszönöm.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Tudod, még nem volt vége: az értékelés nagyjából {eval} volt.
+appraisal.resign_early.b3.2 = Pedig még voltak esélyeid: nagyjából {eval}.
+appraisal.resign_early.b4 = Még nem volt vége: nagyjából {eval}.
+appraisal.resign_early.b4.2 = Volt még benne játék: nagyjából {eval}.
+appraisal.resign_early.b5 = Nem volt még vége: {eval}.
+appraisal.resign_early.b5.2 = Még játszható volt, nagyjából {eval}.
+appraisal.resign_early.b6 = Nem volt vége: {eval}.
+appraisal.resign_early.b6.2 = Az értékelés: {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = {opening:def} került a táblára.
+appraisal.opening.b3.2 = A megnyitás {opening:def} volt.
+appraisal.opening.b4 = {opening:def} volt a megnyitásunk.
+appraisal.opening.b4.2 = A megnyitás: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Megnyitás: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Megnyitás: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Micsoda áldozat {n:ord} lépésként: {move}!
+appraisal.best.brilliant.b1.2 = A kedvenc pillanatom: {move}. Feláldoztál egy bábut, és bejött!
+appraisal.best.brilliant.b2 = A legjobb pillanatod a játszma {n:ord} lépésében jött: {move}, egy áldozat.
+appraisal.best.brilliant.b2.2 = Bátor áldozat volt {n:ord} lépésként: {move}. Szép munka!
+appraisal.best.brilliant.b3 = Briliáns áldozat: {move}.
+appraisal.best.brilliant.b3.2 = A csúcspont: {move}, igazi áldozat, a játszma {n:ord} lépésében.
+appraisal.best.brilliant.b4 = Legjobb pillanat: {move}, {n:ord} lépés. Briliáns áldozat.
+appraisal.best.brilliant.b4.2 = {n:ord} lépésként {move} briliáns volt.
+appraisal.best.brilliant.b5 = {n:ord} lépésként {move} briliáns volt.
+appraisal.best.brilliant.b5.2 = {n:ord} lépés, {move}: briliáns.
+appraisal.best.brilliant.b6 = {move}!! {n:ord} lépésként.
+appraisal.best.brilliant.b6.spoken = {move}, briliáns lépés, {n:ord} lépésként.
+appraisal.best.brilliant.b6.2 = {n:ord} lépés: {move}, briliáns.
+appraisal.best.great.b1 = A kedvenc pillanatom: {move}. Remek lépés volt!
+appraisal.best.great.b1.2 = Emlékszel még erre: {move}? Remek ötlet volt.
+appraisal.best.great.b2 = A legjobb pillanatod: {move}, {n:ord} lépésként. Ez megfordította a játszmát.
+appraisal.best.great.b2.2 = {n:ord} lépésként {move} remek lépés volt.
+appraisal.best.great.b3 = A kulcslépés {move} volt, {n:ord} lépésként: megfordította a játszmát.
+appraisal.best.great.b3.2 = Remek ötlet: {move}, {n:ord} lépésként.
+appraisal.best.great.b4 = Azonnal megbüntetted a hibámat: {move}.
+appraisal.best.great.b4.2 = Legjobb pillanat: {move}, {n:ord} lépés.
+appraisal.best.great.b5 = {n:ord} lépés: {move}. Jól megtaláltad.
+appraisal.best.great.b5.2 = {n:ord} lépés, {move}: remek ötlet.
+appraisal.best.great.b6 = {move}, {n:ord} lépés. Jól megtaláltad.
+appraisal.best.great.b6.2 = {n:ord} lépés: {move}!
+appraisal.best.only.b1 = A kedvenc pillanatom: {move}. Ez volt az egyetlen jó lépés!
+appraisal.best.only.b1.2 = {n:ord} lépésként megtaláltad az egyetlen jó lépést: {move}. Kiváló!
+appraisal.best.only.b2 = A legjobb pillanatod: {move}, az egyetlen jó lépés abban az állásban.
+appraisal.best.only.b2.2 = {n:ord} lépésként {move} volt az egyetlen lépés, és megtaláltad.
+appraisal.best.only.b3 = A kulcslépés {move} volt, {n:ord} lépésként: egyedül ez tartotta az állást.
+appraisal.best.only.b3.2 = A játszma {n:ord} lépésében csak {move} tartotta az állást, és megtaláltad.
+appraisal.best.only.b4 = Legjobb pillanat: {move}, {n:ord} lépés. Egyetlen lépés.
+appraisal.best.only.b4.2 = {n:ord} lépés: {move}, az egyetlen lépés.
+appraisal.best.only.b5 = {n:ord} lépésként {move} volt az egyetlen lépés. Jól megtaláltad.
+appraisal.best.only.b5.2 = {n:ord} lépésként egyetlen lépés volt: {move}.
+appraisal.best.only.b6 = {n:ord} lépés: {move}, az egyetlen lépés. Jól megtaláltad.
+appraisal.best.only.b6.2 = {n:ord} lépés: {move}, egyetlen lépés.
+appraisal.best.won.b1 = A kedvenc pillanatom: {move}. Ezzel {pts:point_nyi} anyagot nyertél!
+appraisal.best.won.b1.2 = Emlékszel még erre: {move}? Ezzel {pts:point_nyi} anyagot nyertél. Szép munka!
+appraisal.best.won.b2 = A legjobb pillanatod: {move}, {n:ord} lépésként, amivel {pts:point_nyi} anyagot nyertél.
+appraisal.best.won.b2.2 = {n:ord} lépésként {move} anyagot nyert. Szép!
+appraisal.best.won.b3 = A kulcslépés {move} volt, {n:ord} lépésként: {pts:point_nyi} anyagot nyert.
+appraisal.best.won.b3.2 = {n:ord} lépésként {move} tisztán nyert anyagot.
+appraisal.best.won.b4 = Legjobb pillanat: {move}, {n:ord} lépés, anyagnyeréssel.
+appraisal.best.won.b4.2 = {n:ord} lépés: {move}, ami {pts:point_nyi} anyagot nyert.
+appraisal.best.won.b5 = {n:ord} lépésként {move} anyagot nyert.
+appraisal.best.won.b5.2 = {n:ord} lépés: {move}, anyagnyeréssel.
+appraisal.best.won.b6 = {n:ord} lépés: {move} anyagot nyert.
+appraisal.best.won.b6.2 = {n:ord} lépés: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = {n:ord} lépés: {move}, plusz {pts}.
+appraisal.best.streak.b1 = Egymás után {n:time} megtaláltad a legjobb lépést. Kiváló!
+appraisal.best.streak.b1.2 = {n:best_move} zsinórban! Ez nagyszerű sakkjáték.
+appraisal.best.streak.b2 = Egymás után {n:time} megtaláltad a legjobb lépést.
+appraisal.best.streak.b2.2 = Zsinórban {n:best_move_acc} játszottál. Nagyon jó!
+appraisal.best.streak.b3 = Egymás után {n:best_move}. Nagyon megbízható játék.
+appraisal.best.streak.b3.2 = Zsinórban {n:best_move}. Szépen játszottál.
+appraisal.best.streak.b4 = {n:best_move} egymás után.
+appraisal.best.streak.b4.2 = Sorozatban {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} zsinórban.
+appraisal.best.streak.b5.2 = Sorozatban {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} zsinórban.
+appraisal.best.streak.b6.2 = Sorozat: {n:best_move}.
+appraisal.best.capture.b1 = A kedvenc pillanatom: {move}. Ingyen leütötted {my:acc}!
+appraisal.best.capture.b1.2 = Emlékszel még erre: {move}? Észrevetted, hogy {my} ingyen leüthető!
+appraisal.best.capture.b2 = A legjobb pillanatod: {move}, amivel elnyerted {my:acc}.
+appraisal.best.capture.b2.2 = Szép ütés {n:ord} lépésként: {move}.
+appraisal.best.capture.b3 = Jó szemed volt a játszma {n:ord} lépésében: {move} elnyerte {my:acc}.
+appraisal.best.capture.b3.2 = {n:ord} lépésként {move} begyűjtötte {my:acc}.
+appraisal.best.capture.b4 = Legjobb pillanat: {move}, {n:ord} lépés, amivel elnyerted {my:acc}.
+appraisal.best.capture.b4.2 = {n:ord} lépésként {move} anyagot nyert.
+appraisal.best.capture.b5 = {n:ord} lépés: {move} elnyerte {my:acc}.
+appraisal.best.capture.b5.2 = {n:ord} lépés: {move}.
+appraisal.best.capture.b6 = {move}, {n:ord} lépés.
+appraisal.best.capture.b6.2 = {n:ord} lépés: {move}, anyagnyeréssel.
+appraisal.best.phase.b1 = {text} nagyon jól sikerült neked.
+appraisal.best.phase.b1.2 = A játszmából {text} sikerült a legjobban.
+appraisal.best.phase.b2 = A legerősebb részed {text} volt.
+appraisal.best.phase.b2.2 = {text} nagyon jól ment.
+appraisal.best.phase.b3 = A legjobb szakaszod {text} volt: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} ment a legjobban: {acc:percent_adj} pontosság.
+appraisal.best.phase.b4 = Legerősebb szakasz: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} volt a legjobb szakaszod, {acc:percent_adj} pontossággal.
+appraisal.best.phase.b5 = Legjobb szakasz: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Legjobb szakasz: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece_acc}" = "3 bábut", "{m:check_acc}" = "2 sakkot") come from count.<noun> in
+# common.lang. The short levels give a bare number after a colon ("Leütött bábuk: 3").
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = Elvettél tőlem {n:piece_acc}, és {m:check_acc} adtál.
+appraisal.num.material.b1.2 = Leütöttél {n:piece_acc}, és {m:time} sakkot adtál a királyomnak.
+appraisal.num.material.b2 = Leütöttél {n:piece_acc}, és {m:check_acc} adtál.
+appraisal.num.material.b2.2 = Elvettél tőlem {n:piece_acc}, és {m:time} sakkot adtál nekem.
+appraisal.num.material.b3 = Leütöttél {n:piece_acc}, és {m:check_acc} adtál.
+appraisal.num.material.b3.2 = Leütött bábuk: {n}, adott sakkok: {m}.
+appraisal.num.material.b4 = Leütött bábuk: {n}, sakkok: {m}.
+appraisal.num.material.b4.2 = {n:piece_acc} ütöttél le, és {m:check_acc} adtál.
+appraisal.num.material.b5 = Leütött bábuk: {n}; sakkok: {m}.
+appraisal.num.material.b5.2 = Ütések: {n}; sakkok: {m}.
+appraisal.num.material.b6 = Ütések: {n}, sakkok: {m}.
+appraisal.num.material.b6.2 = Ütés: {n}; sakk: {m}.
+appraisal.num.material_nochecks.b1 = Elvettél tőlem {n:piece_acc}.
+appraisal.num.material_nochecks.b1.2 = Ebben a játszmában {n:piece_acc} ütöttél le.
+appraisal.num.material_nochecks.b2 = Leütöttél {n:piece_acc}.
+appraisal.num.material_nochecks.b2.2 = Ebben a játszmában elvettél tőlem {n:piece_acc}.
+appraisal.num.material_nochecks.b3 = {n:piece_acc} ütöttél le.
+appraisal.num.material_nochecks.b3.2 = Leütött bábuk: {n}.
+appraisal.num.material_nochecks.b4 = Leütött bábuk: {n}.
+appraisal.num.material_nochecks.b4.2 = {n:piece_acc} ütöttél le.
+appraisal.num.material_nochecks.b5 = Leütött bábuk: {n}.
+appraisal.num.material_nochecks.b5.2 = Leütve: {n:piece}.
+appraisal.num.material_nochecks.b6 = Leütött bábuk: {n}.
+appraisal.num.material_nochecks.b6.2 = Leütve: {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = {n:move_acc} vontál vissza, és ebből {m:move_acc} ki is javítottál. Így tanulunk!
+appraisal.num.takebacks.b1.2 = {n:move_acc} vontál vissza, és {m:time} jobbat is találtál. Nagyszerű!
+appraisal.num.takebacks.b2 = {n:move_acc} vontál vissza, és ebből {m:move_acc} kijavítottál. Így tanulunk.
+appraisal.num.takebacks.b2.2 = A visszavont {n:move} közül {m:move_acc} javítottál ki. Szépen tanulsz!
+appraisal.num.takebacks.b3 = {n:move_acc} vontál vissza, és ebből {m:move_acc} kijavítottál.
+appraisal.num.takebacks.b3.2 = Visszavont lépések: {n}, ebből kijavítva: {m}. Jó.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Egyáltalán nem volt nagy hibád: nagyszerű!
+appraisal.num.clean.b2.2 = Ebben a játszmában egyetlen nagy hibát sem követtél el. Kiváló!
+appraisal.num.clean.b2.3 = Nem követtél el nagy hibát. Nagyon jó!
+appraisal.num.few.b2 = Ebben a játszmában csak {n:mistake} volt.
+appraisal.num.few.b2.2 = Az egész játszmában mindössze {n:mistake} volt. Jó!
+appraisal.num.few.b2.3 = Említésre méltó: csak {n:mistake}. Szép munka.
+appraisal.num.best.b2 = A legjobb lépést {n:time} találtad meg.
+appraisal.num.best.b2.2 = A lehető legjobb lépést {n:time} játszottad.
+appraisal.num.best.b2.3 = Összesen {n:best_move_acc} találtál.
+appraisal.num.acc.b3 = A pontosságod {acc:percent} volt, {n:mistake_ins} és {m:blunder_ins}.
+appraisal.num.acc.b3.2 = {acc:percent_adj} pontosság: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = {acc:percent_adj} pontossággal játszottál, {n:mistake_ins} és {m:blunder_ins}.
+appraisal.num.acc_explain.b3 = A pontosság minden állásban a legjobb lépéshez hasonlítja a lépésedet: a száz a tökéletes.
+appraisal.num.acc_explain.b3.2 = A pontosság azt méri, mennyire voltak közel a lépéseid a legjobbakhoz. A száz jelenti a tökéletest.
+appraisal.num.acc.b4 = Pontosság: {acc:percent}.
+appraisal.num.acc.b4.2 = {acc:percent_adj} pontossággal játszottál.
+appraisal.num.acc.b4.3 = {acc:percent_adj} pontosság.
+appraisal.num.acc_phase.b4 = Pontosság: {acc:percent}. A legerősebb szakaszod {text} volt, {acc_phase:percent_adj} pontossággal.
+appraisal.num.acc_phase.b4.2 = Összességében {acc:percent}, {text} pedig {acc_phase:percent_adj} volt.
+appraisal.num.acc_phase.b4.3 = {acc:percent_adj} pontossággal játszottál; a legjobban {text} ment, {acc_phase:percent_adj} pontossággal.
+appraisal.num.coach.b4 = Én {acc_coach:percent_adj} pontossággal játszottam.
+appraisal.num.coach.b4.2 = Az én pontosságom {acc_coach:percent} volt.
+appraisal.num.acc.b5 = {acc:percent_adj} pontosság; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Pontosság: {acc:percent}, {n:inaccuracy_ins} és {m:mistake_ins}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Kilépés az elméletből: {k:ord} lépés.
+appraisal.num.book.b5.2 = A játszma {k:ord} lépésében hagytuk el az elméletet.
+appraisal.num.acc.b6 = Te {acc:percent}, én {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc:percent} kontra {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Pontosság: {acc:percent}, az enyém {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = {acc:percent_adj} pontosság. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Pontosság: {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Egy dolog, amit érdemes gyakorolni: {theme}.
+appraisal.improve.theme.b1.2 = Egy tipp legközelebbre: {theme}.
+appraisal.improve.theme.b1.3 = Ezen érdemes dolgozni: {theme}.
+appraisal.improve.theme.b2 = Érdemes gyakorolni: {theme}.
+appraisal.improve.theme.b2.2 = Egy ötlet a következő játszmára: {theme}.
+appraisal.improve.theme.b2.3 = Jó volna ezen dolgozni: {theme}.
+appraisal.improve.theme.b3 = A játszma egyik témája: {theme}.
+appraisal.improve.theme.b3.2 = Gyakorlásra érdemes: {theme}.
+appraisal.improve.theme.b4 = Visszatérő téma: {theme}.
+appraisal.improve.theme.b4.2 = Többször is előjött: {theme}.
+appraisal.improve.theme.b5 = Visszatérő motívum: {theme}.
+appraisal.improve.theme.b5.2 = A játszma témája: {theme}.
+appraisal.improve.theme.b6 = Visszatérő motívum: {theme}.
+appraisal.improve.theme.b6.2 = Téma: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = A fordulópont a játszma {crit_no:ord} lépése volt. Legközelebb próbálj meg {theme}.
+appraisal.improve.critical.b2.2 = A kulcspillanat a játszma {crit_no:ord} lépése volt: {crit_move}. Érdemes gyakorolni: {theme}.
+appraisal.improve.critical.b3 = A kritikus pillanat a játszma {crit_no:ord} lépése volt. Ott {crit_move} helyett {crit_best} volt a jobb.
+appraisal.improve.critical.b3.2 = A játszma {crit_no:ord} lépésében {crit_best} jobb volt, mint {crit_move}. Először az én kényszerítő lépéseimet nézd meg.
+appraisal.improve.critical.b4 = Kritikus pillanat: {crit_no:ord} lépés, {crit_move}. A jobb lépés {crit_best} volt.
+appraisal.improve.critical.b4.2 = A kulcspillanat a játszma {crit_no:ord} lépése volt: {crit_move} helyett {crit_best}.
+appraisal.improve.critical.b5 = {crit_no:ord} lépés: {crit_move} helyett {crit_best}, {eval}.
+appraisal.improve.critical.b5.2 = Kritikus pont: {crit_no:ord} lépés; {crit_best}, {eval}.
+appraisal.improve.critical.b6 = {crit_no:ord} lépés: {crit_move} helyett {crit_best}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no:ord} {crit_best}, nem {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = {crit_no:ord} lépés: {crit_best}, nem {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = A játszma {crit_no:ord} lépéséig nyerésre álltál. Egy tipp: {theme}.
+appraisal.improve.was_winning.b1.2 = A játszma {crit_no:ord} lépéséig nagyszerűen ment. Ne feledd: fontos {theme}.
+appraisal.improve.was_winning.b2 = A játszma {crit_no:ord} lépéséig nyerésre álltál. Legközelebb próbálj meg {theme}.
+appraisal.improve.was_winning.b2.2 = Egészen a játszma {crit_no:ord} lépéséig nyerő állásod volt. Érdemes gyakorolni: {theme}.
+appraisal.improve.was_winning.b3 = A játszma {crit_no:ord} lépéséig nyerésre álltál. Az előnyöd {crit_best} lépéssel megmaradt volna.
+appraisal.improve.was_winning.b3.2 = Egészen a játszma {crit_no:ord} lépéséig nyerésre álltál; {crit_best} lépéssel ez megmaradt volna.
+appraisal.improve.was_winning.b4 = A játszma {crit_no:ord} lépéséig nyerésre álltál. Az előnyödet {crit_best} őrizte volna meg.
+appraisal.improve.was_winning.b4.2 = Nyerő állás a játszma {crit_no:ord} lépéséig; {crit_best} megtartotta volna.
+appraisal.improve.was_winning.b5 = Nyerő állás a játszma {crit_no:ord} lépéséig: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = {crit_no:ord} lépés: {crit_best} megtartotta volna a nyert állást, {eval}.
+appraisal.improve.was_winning.b6 = {crit_no:ord} lépés: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_no:ord} lépésként {crit_best} megtartotta volna: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Egy tipp: ha nyerésre állsz, mindig hagyj egy szabad mezőt a királyomnak, ahová léphet.
+appraisal.improve.stalemate.b1.2 = Ne feledd: a játszma végén minden lépés előtt nézd meg, hogy a királyom tud-e még lépni.
+appraisal.improve.stalemate.b2 = Ha nyerésre állsz, mindig hagyj egy szabad mezőt a királyomnak, különben patt lesz.
+appraisal.improve.stalemate.b2.2 = Legközelebb lépés előtt nézd meg, hogy a királyom tud-e még lépni.
+appraisal.improve.stalemate.b3 = Nyerő állásban minden lépésnél ellenőrizd, hogy a királyomnak van-e még szabad mezője.
+appraisal.improve.stalemate.b3.2 = Nyert végjátékban vigyázz a pattra: hagyj levegőt a királyomnak.
+appraisal.improve.stalemate.b4 = Nyert végjátékban mindig ellenőrizd, nem lesz-e patt.
+appraisal.improve.stalemate.b4.2 = Figyelni kell a pattra: itt a győzelembe került.
+appraisal.improve.stalemate.b5 = Nyert végjátékban figyelj a pattra.
+appraisal.improve.stalemate.b5.2 = A patt a győzelembe került.
+appraisal.improve.stalemate.b6 = Vigyázz a pattra.
+appraisal.improve.stalemate.b6.2 = A patt elvitte a győzelmet.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = A játszma {n:ord} lépésénél {my} védtelenül állt. Észrevetted?
+appraisal.improve.coach_hung.b1.2 = {n:ord} lépésként ingyen leüthetted volna {my:acc}. Mindig keresd az ingyen leüthető bábukat!
+appraisal.improve.coach_hung.b2 = A játszma {n:ord} lépésénél {my} ütésben állt. Láttad?
+appraisal.improve.coach_hung.b2.2 = {n:ord} lépésként ingyen leüthetted volna {my:acc}.
+appraisal.improve.coach_hung.b3 = A játszma {n:ord} lépésénél {my} lógott. Kiszúrtad?
+appraisal.improve.coach_hung.b3.2 = {my} védtelen volt a játszma {n:ord} lépésénél. Minden lépésnél keresd a védtelen bábukat.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Továbbra is figyeld, hogy biztonságban vannak-e a bábuid, mint ma.
+appraisal.improve.clean.b1.2 = Továbbra is nézd meg minden lépés előtt, mit támadok. Működik!
+appraisal.improve.clean.b1.3 = Csak így tovább, ilyen figyelmesen!
+appraisal.improve.clean.b2 = Tiszta játszma. Továbbra is így figyeld a fenyegetéseimet.
+appraisal.improve.clean.b2.2 = Csináld továbbra is úgy, mint ma: biztonságban lévő bábuk, jó lépések.
+appraisal.improve.clean.b3 = Tiszta játszma. Továbbra is a kényszerítő lépéseket nézd meg először.
+appraisal.improve.clean.b3.2 = Nagy hiba nem volt: csak így tovább.
+appraisal.improve.clean.b4 = Tiszta játszma. Nincs komolyabb javítanivaló.
+appraisal.improve.clean.b4.2 = Kritikus hiba nem volt.
+appraisal.improve.clean.b5 = Nem volt kritikus hiba.
+appraisal.improve.clean.b5.2 = Tiszta játszma.
+appraisal.improve.clean.b6 = Tiszta játszma.
+appraisal.improve.clean.b6.2 = Kritikus hiba nem volt.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = the article and the level name in „…": always before "szint" with its case ending.
+appraisal.end.b1 = Minden játszmával egyre jobb vagy. Még egyet?
+appraisal.end.b1.2 = Ez jó móka volt! Játsszunk még egyet?
+appraisal.end.b1.3 = Szép volt! Van kedved még egy játszmához?
+appraisal.end.b2 = Minden játszmával egyre jobb vagy. Még egyet?
+appraisal.end.b2.2 = Jó játszma volt. Játsszunk még egyet?
+appraisal.end.b2.3 = Szépen játszottál. Még egy játszma?
+appraisal.end.b3 = Megbízható játék volt. Jöhet a következő?
+appraisal.end.b3.2 = Jó játszma volt. Még egyet?
+appraisal.end.b3.3 = Szépen játszottál. Mehet még egy?
+appraisal.end.b4 = Megbízható játék volt. Jöhet a következő?
+appraisal.end.b4.2 = Még egy játszma?
+appraisal.end.b4.3 = Jó játszma. A következő?
+appraisal.end.b5 = Még egyet?
+appraisal.end.b5.2 = Következő játszma?
+appraisal.end.b5.3 = Újra?
+appraisal.end.b6 = Még egyet?
+appraisal.end.b6.2 = Következő játszma?
+appraisal.end.b6.3 = Újra?
+appraisal.end.up.b1 = Készen állsz {level} szintre. Kipróbálod?
+appraisal.end.up.b1.2 = Szerintem készen állsz {level} szintre. Kipróbáljuk?
+appraisal.end.up.b2 = Készen állsz {level} szintre. Kipróbálod?
+appraisal.end.up.b2.2 = Mit szólnál legközelebb {level} szinthez? Szerintem készen állsz.
+appraisal.end.up.b3 = Ezt a szintet már kinőtted: próbáld ki {level} szintet.
+appraisal.end.up.b3.2 = Készen állsz {level} szintre? Szerintem igen.
+appraisal.end.up.b4 = Ezt a szintet már kinőtted: próbáld ki {level} szintet.
+appraisal.end.up.b4.2 = Ideje váltani {level} szintre?
+appraisal.end.up.b5 = Legközelebb próbáld ki {level} szintet.
+appraisal.end.up.b5.2 = Legközelebb {level} szint?
+appraisal.end.up.b6 = Legközelebb próbáld ki {level} szintet.
+appraisal.end.up.b6.2 = Legközelebb {level} szint?
+appraisal.end.down.b2 = Játsszunk egyet {level} szinten, hogy begyakoroljuk az ötleteket.
+appraisal.end.down.b2.2 = Mit szólnál egy játszmához {level} szinten, gyakorlásképpen?
+appraisal.end.down.b3 = Játszol egyet {level} szinten, hogy begyakoroljuk ezeket az ötleteket?
+appraisal.end.down.b3.2 = Egy játszma {level} szinten segíthet begyakorolni ezeket az ötleteket.
+appraisal.end.down.b4 = Egy játszma {level} szinten talán segítene begyakorolni ezeket az ötleteket.
+appraisal.end.down.b4.2 = Esetleg egy játszma {level} szinten, gyakorlásnak?
+appraisal.end.down.b5 = Esetleg egyet {level} szinten?
+appraisal.end.down.b5.2 = {level} szint, gyakorlásnak?
+appraisal.end.down.b6 = Esetleg egyet {level} szinten?
+appraisal.end.down.b6.2 = {level} szint, gyakorlásnak?

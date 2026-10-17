@@ -147,8 +147,10 @@ bool sliderRow(const std::string& label, float& value, float lo, float hi, float
 bool stepperRow(const std::string& label, int& index, int count, const std::function<std::string(int)>& format,
                 const Rect& r, bool enabled = true);
 // valueW: width of the selector's box (the arrows and the value) at the end of the row.
+// openList (a long list, shown whole by choiceDialog): a click on the value or Enter on the row
+// sets *openList instead of stepping to the next option; the arrows still step.
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
-                 bool enabled = true, float valueW = 250.0f);
+                 bool enabled = true, float valueW = 250.0f, bool* openList = nullptr);
 // Single-line text input row (label, then an edit box). Click the box or press Enter on the row to
 // type; Enter or Tab keeps the text, Esc restores it, and moving the focus away ends the edit.
 // The text fields of a page (those drawn enabled, outside a blocked layer, in drawing order) form
@@ -200,10 +202,20 @@ void pageTitle(const std::string& title, float cx, float y, float maxWidth = 0.0
 void sectionLabel(const std::string& text, float x, float y, float width);
 void rowHighlight(const Rect& r, float t);
 
+// The width of a confirmation dialog: 760, wider for a title that needs more room (a title never wraps;
+// past the screen's width less 40 on each side, it shrinks to fit).
+float dialogWidth(const std::string& title, float viewWidth);
+
 // Modal confirmation. Returns -1 while open, 1 = confirmed, 0 = cancelled (Esc / cancel button).
 // 'dangerous' marks destructive actions; it does not change the look (the confirm button is Primary).
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
                   const std::string& cancelLabel, bool dangerous);
+// Modal list of choices in up to 'columns' columns, read top to bottom, then column after column
+// in the reading direction. The current choice is marked, and has the focus as the list opens.
+// Returns -1 while open, the index chosen, or -2 when closed without a choice (Esc, or a click
+// outside the panel).
+int choiceDialog(const char* idStr, const std::string& title, const std::vector<std::string>& options, int current,
+                 int columns = 3);
 
 }  // namespace im
 }  // namespace ui

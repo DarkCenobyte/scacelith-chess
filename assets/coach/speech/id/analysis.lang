@@ -1,0 +1,151 @@
+# Coach speech (Indonesian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said
+# by the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Indonesian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+#   "Mari kita" (let's) includes the listener; nobody is "kamu" or "aku" in the game itself.
+# - The players are "Putih" and "Hitam", capitalised as names. A piece comes with its side:
+#   {piece} {t1} {t2} = "kuda Putih", "menteri Hitam" (common.lang, owner.white / owner.black);
+#   never add "Putih", "Hitam", "milik" or "-nya" to them.
+# - Counted numbers (common.lang): {m:move} "mat dalam 3 langkah", {pts:point} "3 poin",
+#   {n:mistake} "2 kesalahan", {m:blunder} "1 blunder", {acc_white:percent} "85%" (spoken
+#   "delapan puluh lima persen").
+# - A forced mate is "mat paksa"; a mate on the board is "skakmat".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Mari kita tinjau kembali permainan ini bersama-sama.
+an.start.2 = Mari kita telusuri permainan ini, langkah demi langkah.
+an.start.3 = Inilah permainannya. Mari kita lihat jalannya.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Permainan ini dimulai dari posisi yang disusun khusus. Mari kita telusuri.
+an.start.setup.2 = Permainan dari posisi yang disusun khusus. Mari kita lihat jalannya.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Pembukaannya adalah {opening:def}.
+an.opening.2 = Ini {opening:def}.
+an.book_exit = Dengan {move}, permainan keluar dari teori pembukaan yang dikenal.
+an.book_exit.2 = {move} adalah langkah pertama di luar buku pembukaan.
+an.book_exit.3 = Teori pembukaan berakhir di sini, dengan {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} adalah blunder.
+an.blunder.2 = Di sini, {move} adalah kesalahan serius.
+an.blunder.3 = Sebuah blunder: {move}.
+an.mistake = {move} adalah kesalahan.
+an.mistake.2 = {move} bukan langkah yang tepat di sini.
+an.mistake.3 = Sebuah kesalahan: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} melewatkan kesempatan untuk menghukum kesalahan itu.
+an.missed_chance.2 = Dengan {move}, kesempatan itu terlepas.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Sekarang {reply:nomate} adalah skakmat.
+an.mate_allowed.one.2 = Langkah ini membiarkan {reply:nomate}, dan itu skakmat.
+an.mate_allowed = Langkah ini memungkinkan mat paksa dalam {m:move}, dimulai dengan {reply:nomate}.
+an.mate_allowed.2 = Sekarang ada mat paksa dalam {m:move}, diawali dengan {reply:nomate}.
+an.fork = Sekarang {reply} menggarpu {t1} dan {t2}.
+an.fork.2 = Langkah ini memungkinkan {reply}, yang menyerang {t1} dan {t2} sekaligus.
+an.fork.3 = {reply} menyerang {t1} dan {t2} pada saat yang sama.
+an.hanging = Langkah ini membiarkan {piece} tak terlindungi, dan {reply} memakannya.
+an.hanging.2 = {piece} dibiarkan tanpa pelindung: {reply} merebutnya.
+an.hanging.3 = {reply} tinggal memakan {piece}, yang tidak punya pelindung.
+an.material = Balasan {line} memenangkan {pts:point} materi.
+an.material.2 = Lalu {line} memenangkan {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Padahal {best:nomate} adalah skakmat.
+an.mate_missed.one.2 = {best:nomate} sebenarnya bisa langsung skakmat.
+an.mate_missed = {best:nomate} sebenarnya bisa memaksakan mat dalam {m:move}.
+an.mate_missed.2 = Sebenarnya ada mat paksa dalam {m:move}, dimulai dengan {best:nomate}.
+an.missed_capture = {best} sebenarnya bisa merebut {piece} secara gratis.
+an.missed_capture.2 = {piece} tidak punya pelindung: {best} sebenarnya bisa memakannya.
+an.missed_fork = {best} sebenarnya bisa menggarpu {t1} dan {t2}.
+an.missed_fork.2 = {best} adalah garpu yang mengincar {t1} dan {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} lebih kuat.
+an.better.2 = Lebih baik {best}.
+an.better.3 = {best} lebih tepat.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} sungguh brilian: langkah ini mengorbankan {piece}!
+an.brilliant.2 = Pengorbanan yang brilian! {move} menawarkan {piece}.
+an.brilliant.3 = {move}! Langkah brilian yang menawarkan {piece}.
+an.brilliant.mate = Langkah ini berujung pada mat paksa dalam {m:move}.
+an.brilliant.mate.2 = Dan langkah ini memaksakan mat dalam {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} adalah satu-satunya langkah yang mempertahankan keunggulan.
+an.only.win.2 = Hanya {move} yang mempertahankan keunggulan di sini. Langkah yang jeli.
+an.only.hold = {move} adalah satu-satunya langkah yang menjaga keseimbangan.
+an.only.hold.2 = Hanya {move} yang mempertahankan posisi di sini.
+an.only.defend = {move} adalah satu-satunya langkah yang membuat perlawanan tetap berlanjut.
+an.only.defend.2 = Hanya {move} yang menjaga permainan tetap hidup di sini. Pertahanan yang bagus.
+an.only.best = {move} adalah langkah terkuat di sini, jauh di atas yang lain.
+an.only.best.2 = Tepat: {move} jauh lebih kuat daripada langkah lain mana pun.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} sedikit kurang tepat: {best} lebih akurat.
+an.inaccuracy.2 = Belum yang terbaik: {best} lebih tepat daripada {move}.
+an.interesting = {move} adalah ide yang menarik: langkah ini menawarkan {piece}.
+an.interesting.2 = Percobaan yang menarik: {move} mengorbankan {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Putih sekarang punya mat paksa dalam {m:move}.
+an.mate_on.white.2 = Dari sini, Putih bisa memaksakan mat dalam {m:move}.
+an.mate_on.black = Hitam sekarang punya mat paksa dalam {m:move}.
+an.mate_on.black.2 = Dari sini, Hitam bisa memaksakan mat dalam {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Skakmat. Putih memenangkan permainan.
+an.end.mate.white.2 = Dan itu skakmat: Putih menang.
+an.end.mate.black = Skakmat. Hitam memenangkan permainan.
+an.end.mate.black.2 = Dan itu skakmat: Hitam menang.
+an.end.resigned.white = Hitam menyerah, jadi Putih memenangkan permainan.
+an.end.resigned.white.2 = Permainan berakhir di sini: Hitam menyerah, dan Putih menang.
+an.end.resigned.black = Putih menyerah, jadi Hitam memenangkan permainan.
+an.end.resigned.black.2 = Permainan berakhir di sini: Putih menyerah, dan Hitam menang.
+an.end.timeout.white = Hitam kehabisan waktu, jadi Putih menang.
+an.end.timeout.white.2 = Putih menang karena lawan kehabisan waktu.
+an.end.timeout.black = Putih kehabisan waktu, jadi Hitam menang.
+an.end.timeout.black.2 = Hitam menang karena lawan kehabisan waktu.
+an.end.win.white = Permainan berakhir dengan kemenangan Putih.
+an.end.win.white.2 = Putih memenangkan permainan.
+an.end.win.black = Permainan berakhir dengan kemenangan Hitam.
+an.end.win.black.2 = Hitam memenangkan permainan.
+an.end.stalemate = Pat: permainan berakhir remis.
+an.end.stalemate.2 = Terjadi pat, jadi permainan berakhir remis.
+an.end.draw.agreement = Para pemain sepakat remis.
+an.end.draw.agreement.2 = Permainan berakhir remis atas kesepakatan.
+an.end.draw.repetition = Permainan berakhir remis karena pengulangan posisi.
+an.end.draw.repetition.2 = Posisi yang sama muncul kembali: remis.
+an.end.draw.fifty = Permainan berakhir remis karena aturan lima puluh langkah.
+an.end.draw.fifty.2 = Lima puluh langkah tanpa ada buah yang dimakan dan tanpa langkah pion: remis.
+an.end.draw.seventy_five = Permainan berakhir remis karena aturan tujuh puluh lima langkah.
+an.end.draw.seventy_five.2 = Tujuh puluh lima langkah tanpa ada buah yang dimakan dan tanpa langkah pion: remis.
+an.end.draw.material = Skakmat tidak mungkin lagi: permainan berakhir remis.
+an.end.draw.material.2 = Tidak ada pihak yang masih bisa memberi skakmat, jadi hasilnya remis.
+an.end.draw = Permainan berakhir remis.
+an.end.draw.2 = Remis.
+an.end.unfinished = Permainan berhenti di sini, belum selesai.
+an.end.unfinished.2 = Di sinilah permainan berhenti: permainan ini belum selesai.
+an.end.accuracy = Akurasi: {acc_white:percent} untuk Putih, {acc_black:percent} untuk Hitam.
+an.end.accuracy.2 = Putih bermain dengan akurasi {acc_white:percent}, Hitam {acc_black:percent}.
+an.end.clean.white = Putih tidak membuat kesalahan maupun blunder.
+an.end.clean.white.2 = Permainan Putih bersih dari kesalahan serius.
+an.end.clean.black = Hitam tidak membuat kesalahan maupun blunder.
+an.end.clean.black.2 = Permainan Hitam bersih dari kesalahan serius.
+an.end.mistakes.white = Putih membuat {n:mistake}, dan tidak ada blunder.
+an.end.mistakes.white.2 = Untuk Putih: {n:mistake}, tanpa blunder.
+an.end.mistakes.black = Hitam membuat {n:mistake}, dan tidak ada blunder.
+an.end.mistakes.black.2 = Untuk Hitam: {n:mistake}, tanpa blunder.
+an.end.blunders.white = Putih membuat {m:blunder}.
+an.end.blunders.white.2 = Untuk Putih: {m:blunder}.
+an.end.blunders.black = Hitam membuat {m:blunder}.
+an.end.blunders.black.2 = Untuk Hitam: {m:blunder}.
+an.end.errors.white = Putih membuat {n:mistake} dan {m:blunder}.
+an.end.errors.white.2 = Untuk Putih: {n:mistake} dan {m:blunder}.
+an.end.errors.black = Hitam membuat {n:mistake} dan {m:blunder}.
+an.end.errors.black.2 = Untuk Hitam: {n:mistake} dan {m:blunder}.

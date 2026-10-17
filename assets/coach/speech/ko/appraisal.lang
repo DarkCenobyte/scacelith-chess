@@ -1,0 +1,443 @@
+# Coach speech (Korean): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. Register: warm polite 해요체; -시- on the player's own actions where a
+# teacher uses it (이기셨어요, 잘 두셨어요, 잡으셨어요), never on the coach. The player is never named by a
+# pronoun; levels 5-6 may end on a noun (깔끔한 게임., 스테일메이트.).
+# Forms from common.lang: a move NUMBER is "{n:moveno}" = "23수째" (spoken "이십삼 수째"), also for
+# {crit_no} and {k}; "{moves:move}" = "32수" (a count); "{n:piece}" = "기물 3개"; "{m:time}" = "2번";
+# "{pts:point}" = "3점"; "{acc:percent}" = "85%" (spoken "팔십오 퍼센트"), also where English writes a
+# bare {acc}; "{n:mistake}" "{m:blunder}" "{n:inaccuracy}"; "{my:obj}" = "제 나이트를". A counted value
+# may take a particle ("{n:piece}를", "{acc:percent}였어요"); moves, {eval}, {opening}, {level} and
+# {text} never take a sound-dependent one: "{move}, 이 수가 ...", "{crit_move} 대신 {crit_best}".
+# Names inserted by {text}, {theme}, {level} (written to fit every sentence that inserts them):
+#   appraisal.phase.*   bare nouns, followed only by 에서 or by the noun 단계 ("{text} 단계였어요").
+#   appraisal.reason.*  an adverbial phrase that carries its own particle, said right before
+#                       무승부 / 비겼어요 ("{text} 무승부예요" = "합의로 무승부예요").
+#   theme.*             a nominal -기 phrase, no full stop, always said after a colon.
+#   appraisal.level.*   the level name, said in quotes before 레벨 ("“중급자” 레벨").
+# The opening name ends the sentence: "{opening:cop}" (시실리안 디펜스예요), "{opening:was}어요" (시실리안
+# 디펜스였어요), forms of every family and variation in the openings fragment; or {opening} alone after a colon.
+# Terms shared with review.lang: 통과한 폰, 폰의 사각형, 숨 쉴 칸, 무방비, 강제수 (forcing move,
+# glossed at level 3 as "체크, 잡기, 위협 같은 강제수").
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = 오프닝
+appraisal.phase.middlegame = 미들게임
+appraisal.phase.endgame = 엔드게임
+appraisal.reason.stalemate = 스테일메이트로
+appraisal.reason.material = 어느 쪽도 메이트할 수 없어서
+appraisal.reason.repetition = 동형 반복으로
+appraisal.reason.fifty = 50수 규칙으로
+appraisal.reason.fifty.spoken = 오십 수 규칙으로
+appraisal.reason.agreement = 합의로
+appraisal.reason.other = 결국
+# The coach level names (coach.level.<n>.name of assets/i18n/ko.lang).
+appraisal.level.l1 = 첫걸음
+appraisal.level.l2 = 초보자
+appraisal.level.l3 = 중급자
+appraisal.level.l4 = 클럽 플레이어
+appraisal.level.l5 = 강한 클럽 플레이어
+appraisal.level.l6 = 전문가
+# What to practise: a nominal -기 phrase, said after a colon ("연습할 점: ..."). The player's pieces
+# carry no possessive, the coach's carry 제.
+theme.general = 두기 전에 체스판 전체를 살펴보기
+theme.mate_allowed = 매번 두기 전에 킹이 안전한지 확인하기
+theme.mate_missed = 체크부터 살펴보면서 체크메이트 찾기
+theme.stalemate = 이기고 있을 때 제 킹에게 움직일 칸을 남겨 두기
+theme.fork = 이중 공격 조심하기
+theme.discovered = 제 기물 뒤에 숨은 공격 조심하기
+theme.skewer = 값진 기물을 같은 줄에 두지 않기
+theme.pin = 핀이 걸리기 전에 미리 알아차리기
+theme.trapped = 기물이 빠져나갈 길을 남겨 두기
+theme.back_rank = 킹에게 숨 쉴 칸 하나 만들어 주기
+theme.hanging = 기물을 늘 지켜진 상태로 두기
+theme.exchange = 교환하기 전에 공격 기물과 수비 기물의 수 세기
+theme.missed_capture = 공짜로 잡을 수 있는 기물부터 찾기
+theme.missed_fork = 직접 이중 공격을 걸 기회 찾기
+theme.promotion = 폰 경주, 그리고 폰의 사각형
+theme.king_safety = 킹을 폰 뒤에 안전하게 두기
+theme.bad_trade = 어떤 기물을 교환할지 고르기
+theme.opening = 기물을 전개하고 일찍 캐슬링하기
+theme.endgame = 킹을 활용하고 통과한 폰 밀어 올리기
+theme.positional = 가장 나쁜 기물 개선하기
+theme.material = 두기 전에 제 다음 수로 무엇을 따낼 수 있는지 확인하기
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = 체크메이트! 이기셨어요. 정말 잘 두셨어요!
+appraisal.open.win.b1.2 = 이기셨어요! 끝까지 잘 마무리하셨어요.
+appraisal.open.win.b1.3 = 저를 이기셨네요! 정말 좋은 게임이었어요.
+appraisal.open.win.b2 = 잘 두셨어요! {moves:move} 만에 이기셨어요.
+appraisal.open.win.b2.2 = 축하해요, 이기셨어요!
+appraisal.open.win.b2.3 = {moves:move} 만에 승리! 아주 잘하셨어요!
+appraisal.open.win.b3 = 축하해요. 실력으로 얻은 승리예요.
+appraisal.open.win.b3.2 = 잘 두셨어요. 이길 만한 게임이었어요.
+appraisal.open.win.b3.3 = 좋은 승리예요. 축하해요.
+appraisal.open.win.b4 = 멋진 승리예요.
+appraisal.open.win.b4.2 = 잘 두셨어요. 충분히 이길 만했어요.
+appraisal.open.win.b4.3 = 좋은 승리예요.
+appraisal.open.win.b5 = 잘 두셨어요.
+appraisal.open.win.b5.2 = 깔끔한 승리예요.
+appraisal.open.win.b5.3 = 좋은 게임이었어요. 잘 이기셨어요.
+appraisal.open.win.b6 = 잘 두셨어요.
+appraisal.open.win.b6.2 = 깔끔한 승리.
+appraisal.open.win.b6.3 = 좋은 게임이었어요.
+appraisal.open.draw.b1 = 무승부예요! 이번엔 아무도 못 이겼네요.
+appraisal.open.draw.b1.2 = 무승부예요. 정말 팽팽한 게임이었어요!
+appraisal.open.draw.b1.3 = 무승부라서 반 점씩 나눠 가져요. 잘 두셨어요!
+appraisal.open.draw.b2 = 무승부예요. 공평한 결과죠.
+appraisal.open.draw.b2.2 = 비겼네요. 좋은 승부였어요!
+appraisal.open.draw.b2.3 = 무승부예요. 좋은 게임이었어요.
+appraisal.open.draw.b3 = 무승부예요. 양쪽 모두 기회가 있었어요.
+appraisal.open.draw.b3.2 = 공평한 무승부예요.
+appraisal.open.draw.b3.3 = {text} 무승부예요. 좋은 승부였어요.
+appraisal.open.draw.b4 = {text} 무승부예요.
+appraisal.open.draw.b4.2 = {text} 비겼어요.
+appraisal.open.draw.b4.3 = {text} 무승부로 끝났어요.
+appraisal.open.draw.b5 = 무승부예요.
+appraisal.open.draw.b5.2 = {text} 무승부.
+appraisal.open.draw.b5.3 = 비겼어요.
+appraisal.open.draw.b6 = 무승부.
+appraisal.open.draw.b6.2 = {text} 무승부.
+appraisal.open.draw.b6.3 = 비겼어요.
+appraisal.open.stalemate.b1 = 스테일메이트로 무승부예요. 정말 아까웠어요! 다음엔 제 킹이 움직일 칸을 남겨 주세요.
+appraisal.open.stalemate.b1.2 = 스테일메이트라서 무승부예요. 승리가 코앞이었어요!
+appraisal.open.stalemate.b2 = 스테일메이트로 무승부예요. 이기기 직전이었어요!
+appraisal.open.stalemate.b2.2 = 스테일메이트예요. 이기고 계셨는데 무승부가 됐어요.
+appraisal.open.stalemate.b3 = 이기는 포지션에서 스테일메이트로 무승부가 됐어요.
+appraisal.open.stalemate.b3.2 = 스테일메이트예요. 마지막 순간에 승리가 날아갔어요.
+appraisal.open.stalemate.b4 = 스테일메이트로 무승부예요.
+appraisal.open.stalemate.b4.2 = 스테일메이트, 무승부예요.
+appraisal.open.stalemate.b5 = 스테일메이트예요.
+appraisal.open.stalemate.b5.2 = 스테일메이트로 무승부.
+appraisal.open.stalemate.b6 = 스테일메이트.
+appraisal.open.stalemate.b6.2 = 무승부, 스테일메이트.
+appraisal.open.loss.b1 = 이번엔 제가 이겼지만, 정말 좋은 수도 여러 번 두셨어요.
+appraisal.open.loss.b1.2 = 좋은 게임이었어요! 저도 진땀 뺐어요.
+appraisal.open.loss.b1.3 = 재미있었어요! 이번 판은 제가 이겼지만, 실력이 정말 빨리 늘고 있어요.
+appraisal.open.loss.b2 = 좋은 게임이었어요! 잘된 점과 다음에 해 볼 것 하나를 같이 봐요.
+appraisal.open.loss.b2.2 = 함께 둬 주셔서 고마워요! 좋은 아이디어가 몇 가지 있었어요.
+appraisal.open.loss.b2.3 = 좋은 게임이었어요. 여기서 배울 점을 같이 찾아봐요.
+appraisal.open.loss.b3 = 좋은 게임이었어요.
+appraisal.open.loss.b3.2 = 함께 둬 주셔서 고마워요.
+appraisal.open.loss.b3.3 = 좋은 게임이었어요. 한번 살펴봐요.
+appraisal.open.loss_close.b3 = 좋은 승부였어요. 오랫동안 팽팽한 게임이었어요.
+appraisal.open.loss_close.b3.2 = 좋은 승부였어요. 오랫동안 균형이 이어졌어요.
+appraisal.open.loss.b4 = 좋은 게임이었어요. 승부를 가른 건 이거예요.
+appraisal.open.loss.b4.2 = 좋은 게임이었어요. 한순간이 승부를 갈랐어요.
+appraisal.open.loss.b4.3 = 함께 둬 주셔서 고마워요. 어디서 흐름이 바뀌었는지 봐요.
+appraisal.open.loss_close.b4 = 오랫동안 팽팽한 승부였어요. 승부를 가른 건 이거예요.
+appraisal.open.loss_close.b4.2 = 좋은 게임이었어요. 꽤 오래 균형이 이어졌어요.
+appraisal.open.loss.b5 = 좋은 게임이었어요.
+appraisal.open.loss.b5.2 = 함께 둬 주셔서 고마워요.
+appraisal.open.loss.b5.3 = 좋은 승부였어요.
+appraisal.open.loss.b6 = 좋은 게임이었어요.
+appraisal.open.loss.b6.2 = 함께 둬 주셔서 고마워요.
+appraisal.open.loss.b6.3 = 좋은 승부였어요.
+appraisal.open.resigned.b1 = 기권도 체스의 일부예요. 용기가 필요한 일이죠. 좋은 게임이었어요!
+appraisal.open.resigned.b1.2 = 괜찮아요. 언제 기권할지 아는 것도 체스의 일부예요.
+appraisal.open.resigned.b2 = 기권도 체스의 일부예요. 용기가 필요한 일이죠.
+appraisal.open.resigned.b2.2 = 그럴 수 있어요. 기권하는 데도 용기가 필요해요.
+appraisal.open.resigned.b3 = 기권도 체스의 일부예요. 좋은 게임이었어요.
+appraisal.open.resigned.b3.2 = 그럴 수 있죠. 함께 둬 주셔서 고마워요.
+appraisal.open.resigned.b4 = 좋은 게임이었어요.
+appraisal.open.resigned.b4.2 = 함께 둬 주셔서 고마워요.
+appraisal.open.resigned.b5 = 좋은 게임이었어요.
+appraisal.open.resigned.b5.2 = 함께 둬 주셔서 고마워요.
+appraisal.open.resigned.b6 = 좋은 게임이었어요.
+appraisal.open.resigned.b6.2 = 고마워요.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = 사실 아직 끝난 게 아니었어요. 평가치가 대략 {eval} 정도였거든요.
+appraisal.resign_early.b3.2 = 실은 아직 기회가 있었어요. 대략 {eval} 정도였어요.
+appraisal.resign_early.b4 = 아직 끝난 게 아니었어요. 대략 {eval} 정도였어요.
+appraisal.resign_early.b4.2 = 아직 둘 만했어요. 대략 {eval} 정도였어요.
+appraisal.resign_early.b5 = 끝난 게 아니었어요: {eval}.
+appraisal.resign_early.b5.2 = 아직 둘 만했어요. 약 {eval}.
+appraisal.resign_early.b6 = 끝나지 않았어요: {eval}.
+appraisal.resign_early.b6.2 = 평가치: {eval}.
+# The opening played (levels 3-6): the name always ends the sentence.
+appraisal.opening.b3 = 오늘 우리가 둔 오프닝은 {opening:cop}.
+appraisal.opening.b3.2 = 이번 게임의 오프닝은 {opening:was}어요.
+appraisal.opening.b4 = 이번 오프닝은 {opening:was}어요.
+appraisal.opening.b4.2 = 오프닝: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = 오프닝: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = 오프닝: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+# {n} is the move number ("{n:moveno}에 두신 {move}"), except in appraisal.best.streak, where it counts
+# the best moves in a row ("{n:time} 연속").
+appraisal.best.brilliant.b1 = {n:moveno}에 두신 {move}, 정말 멋진 희생이었어요!
+appraisal.best.brilliant.b1.2 = {move}, 이 수가 제일 마음에 들었어요. 기물을 내주셨는데, 그게 통했어요!
+appraisal.best.brilliant.b2 = 가장 빛난 순간: {n:moveno}에 나온 희생, {move}.
+appraisal.best.brilliant.b2.2 = {n:moveno}에 두신 {move}, 용감한 희생이었어요. 잘하셨어요!
+appraisal.best.brilliant.b3 = {move}, 기막힌 희생이었어요.
+appraisal.best.brilliant.b3.2 = 하이라이트는 {n:moveno}의 {move}. 진짜 희생이었어요.
+appraisal.best.brilliant.b4 = 최고의 장면: {n:moveno} {move}. 희생으로 만든 묘수예요.
+appraisal.best.brilliant.b4.2 = {n:moveno}의 {move}, 묘수였어요.
+appraisal.best.brilliant.b5 = {n:moveno}의 {move}, 묘수였어요.
+appraisal.best.brilliant.b5.2 = {n:moveno}, {move}: 묘수.
+appraisal.best.brilliant.b6 = {n:moveno} {move}!!
+appraisal.best.brilliant.b6.spoken = {n:moveno}, {move}. 묘수예요.
+appraisal.best.brilliant.b6.2 = {n:moveno}: {move}, 묘수.
+appraisal.best.great.b1 = {move}, 이 수가 제일 마음에 들었어요. 정말 훌륭한 수였어요!
+appraisal.best.great.b1.2 = {move}, 기억나세요? 정말 잘 찾으신 수예요.
+appraisal.best.great.b2 = 가장 빛난 순간: {n:moveno}에 두신 {move}. 이 수로 게임이 뒤집혔어요.
+appraisal.best.great.b2.2 = {n:moveno}에 두신 {move}, 훌륭한 수였어요.
+appraisal.best.great.b3 = {n:moveno}의 {move}, 이게 핵심 수였어요. 흐름을 뒤집었죠.
+appraisal.best.great.b3.2 = {n:moveno}의 {move}, 정말 잘 찾으셨어요.
+appraisal.best.great.b4 = {move}, 이 수로 제 실수를 바로 응징하셨어요.
+appraisal.best.great.b4.2 = 최고의 장면: {n:moveno} {move}.
+appraisal.best.great.b5 = {n:moveno}의 {move}. 잘 찾으셨어요.
+appraisal.best.great.b5.2 = {n:moveno}, {move}: 잘 찾은 훌륭한 수.
+appraisal.best.great.b6 = {n:moveno} {move}. 잘 찾으셨어요.
+appraisal.best.great.b6.2 = {n:moveno}: {move}!
+appraisal.best.only.b1 = {move}, 이 수가 제일 마음에 들었어요. 유일하게 좋은 수였거든요!
+appraisal.best.only.b1.2 = {n:moveno}에 유일하게 좋은 수를 찾으셨어요: {move}. 훌륭해요!
+appraisal.best.only.b2 = 가장 빛난 순간: {move}. 그 자리에서 유일하게 좋은 수였어요.
+appraisal.best.only.b2.2 = {n:moveno}의 {move}, 유일한 수였는데 그걸 찾아내셨어요.
+appraisal.best.only.b3 = {n:moveno}의 {move}, 이게 핵심 수였어요. 버틸 수 있는 유일한 수였죠.
+appraisal.best.only.b3.2 = {n:moveno}에는 오직 {move}, 이 수만 버틸 수 있었는데, 그걸 찾아내셨어요.
+appraisal.best.only.b4 = 최고의 장면: {n:moveno} {move}. 유일한 수.
+appraisal.best.only.b4.2 = {n:moveno}: {move}, 유일한 수.
+appraisal.best.only.b5 = {n:moveno}의 {move}, 유일한 수였어요. 잘 찾으셨어요.
+appraisal.best.only.b5.2 = {n:moveno}의 유일한 수: {move}.
+appraisal.best.only.b6 = {n:moveno} {move}, 유일한 수. 잘 찾으셨어요.
+appraisal.best.only.b6.2 = {n:moveno}: {move}, 유일한 수.
+appraisal.best.won.b1 = {move}, 이 수가 제일 마음에 들었어요. 이 수로 {pts:point}만큼 기물 이득을 보셨어요!
+appraisal.best.won.b1.2 = {move}, 기억나세요? 그 수로 {pts:point}만큼 기물 이득을 보셨어요. 잘하셨어요!
+appraisal.best.won.b2 = 가장 빛난 순간: {n:moveno}에 두신 {move}. {pts:point}만큼 기물 이득을 보셨어요.
+appraisal.best.won.b2.2 = {n:moveno}에 두신 {move}, 이 수로 기물 이득을 보셨어요. 좋아요!
+appraisal.best.won.b3 = {n:moveno}의 {move}, 이게 핵심 수였어요. {pts:point}만큼 기물 이득을 보셨죠.
+appraisal.best.won.b3.2 = {n:moveno}의 {move}, 이 수로 깔끔하게 기물 이득을 보셨어요.
+appraisal.best.won.b4 = 최고의 장면: {n:moveno} {move}, 기물 이득.
+appraisal.best.won.b4.2 = {n:moveno}의 {move}, {pts:point} 이득이었어요.
+appraisal.best.won.b5 = {n:moveno}의 {move}, 기물 이득을 보셨어요.
+appraisal.best.won.b5.2 = {n:moveno}: {move}, 기물 이득.
+appraisal.best.won.b6 = {n:moveno} {move}, 기물 이득.
+appraisal.best.won.b6.2 = {n:moveno}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = {n:moveno}: {move}, 플러스 {pts}.
+appraisal.best.streak.b1 = {n:time} 연속으로 최선의 수를 찾으셨어요. 훌륭해요!
+appraisal.best.streak.b1.2 = {n:time} 연속 최선수! 이게 바로 좋은 체스예요.
+appraisal.best.streak.b2 = 최선의 수를 {n:time} 연속으로 찾으셨어요.
+appraisal.best.streak.b2.2 = {n:time} 연속 최선수예요. 아주 좋아요!
+appraisal.best.streak.b3 = 최선수를 {n:time} 연달아 두셨어요. 아주 탄탄해요.
+appraisal.best.streak.b3.2 = {n:time} 연속으로 최선수. 잘 두셨어요.
+appraisal.best.streak.b4 = {n:time} 연속 최선수.
+appraisal.best.streak.b4.2 = 최선수 {n:time} 연속.
+appraisal.best.streak.b5 = {n:time} 연속 최선수.
+appraisal.best.streak.b5.2 = 최선수가 {n:time} 이어졌어요.
+appraisal.best.streak.b6 = {n:time} 연속 최선수.
+appraisal.best.streak.b6.2 = 연속 최선수: {n:time}.
+appraisal.best.capture.b1 = {move}, 이 수가 제일 마음에 들었어요. {my:obj} 공짜로 잡으셨어요!
+appraisal.best.capture.b1.2 = {move}, 기억나세요? {my:subj} 공짜라는 걸 알아채셨어요!
+appraisal.best.capture.b2 = 가장 빛난 순간: {move}. {my:obj} 잡으셨어요.
+appraisal.best.capture.b2.2 = {n:moveno}에 멋지게 잡으셨어요: {move}.
+appraisal.best.capture.b3 = {n:moveno}에 잘 보셨어요. {move}, 이 수로 {my:obj} 잡으셨죠.
+appraisal.best.capture.b3.2 = {n:moveno}의 {move}, 이 수로 {my:obj} 챙기셨어요.
+appraisal.best.capture.b4 = 최고의 장면: {n:moveno} {move}, {my:obj} 잡은 수.
+appraisal.best.capture.b4.2 = {n:moveno}의 {move}, 기물 이득을 보셨어요.
+appraisal.best.capture.b5 = {n:moveno}의 {move}, {my:obj} 잡으셨어요.
+appraisal.best.capture.b5.2 = {n:moveno}: {move}.
+appraisal.best.capture.b6 = {n:moveno} {move}.
+appraisal.best.capture.b6.2 = {n:moveno}: {move}, 기물 이득.
+appraisal.best.phase.b1 = {text}에서 아주 잘 두셨어요.
+appraisal.best.phase.b1.2 = 게임에서 가장 잘 두신 건 {text} 단계였어요.
+appraisal.best.phase.b2 = 가장 강했던 부분은 {text} 단계였어요.
+appraisal.best.phase.b2.2 = {text} 단계를 아주 잘 풀어 가셨어요.
+appraisal.best.phase.b3 = 가장 좋았던 단계는 {text}, 정확도 {acc:percent}였어요.
+appraisal.best.phase.b3.2 = {text}에서 가장 잘 두셨어요. 정확도가 {acc:percent}였어요.
+appraisal.best.phase.b4 = 가장 강했던 단계: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} 단계가 가장 좋았어요: {acc:percent}.
+appraisal.best.phase.b5 = 가장 좋았던 단계: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = 최고 단계: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns come from count.<noun> in common.lang ("{n:piece}" = "기물 3개", "{m:time}" = "2번").
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = 제 {n:piece}를 잡고, 체크를 {m:time} 거셨어요.
+appraisal.num.material.b1.2 = {n:piece}를 잡고, 제 킹에게 체크를 {m:time} 거셨어요.
+appraisal.num.material.b2 = {n:piece}를 잡고 체크를 {m:time} 거셨어요.
+appraisal.num.material.b2.2 = {n:piece}를 잡고, 저한테 체크를 {m:time} 거셨어요.
+appraisal.num.material.b3 = {n:piece}를 잡고 체크를 {m:time} 거셨어요.
+appraisal.num.material.b3.2 = {n:piece}를 잡으셨고, 체크도 {m:time} 거셨어요.
+appraisal.num.material.b4 = {n:piece}를 잡으셨고, 체크는 {m:time}.
+appraisal.num.material.b4.2 = {n:piece}를 잡고 체크를 {m:time} 거셨어요.
+appraisal.num.material.b5 = {n:piece} 잡음, 체크 {m:time}.
+appraisal.num.material.b5.2 = {n:piece}를 잡고, 체크 {m:time}.
+appraisal.num.material.b6 = {n:piece} 잡음, 체크 {m:time}.
+appraisal.num.material.b6.2 = {n:piece}를 잡고, 체크 {m:time}.
+appraisal.num.material_nochecks.b1 = 제 {n:piece}를 잡으셨어요.
+appraisal.num.material_nochecks.b1.2 = 이번 게임에서 {n:piece}를 잡으셨어요.
+appraisal.num.material_nochecks.b2 = {n:piece}를 잡으셨어요.
+appraisal.num.material_nochecks.b2.2 = 이번 게임에서 {n:piece}를 잡으셨네요.
+appraisal.num.material_nochecks.b3 = {n:piece}를 잡으셨어요.
+appraisal.num.material_nochecks.b3.2 = {n:piece}를 잡으셨네요.
+appraisal.num.material_nochecks.b4 = {n:piece}를 잡으셨네요.
+appraisal.num.material_nochecks.b4.2 = {n:piece}를 잡으셨어요.
+appraisal.num.material_nochecks.b5 = {n:piece} 잡음.
+appraisal.num.material_nochecks.b5.2 = 잡은 기물: {n:piece}.
+appraisal.num.material_nochecks.b6 = {n:piece} 잡음.
+appraisal.num.material_nochecks.b6.2 = {n:piece}를 잡으셨어요.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = {n:move}를 무르고, 그중 {m:move}를 더 좋은 수로 고치셨어요. 이렇게 배우는 거예요!
+appraisal.num.takebacks.b1.2 = {n:move}를 무르셨는데, {m:time}은 더 좋은 수를 찾으셨어요. 멋져요!
+appraisal.num.takebacks.b2 = {n:move}를 무르고, 그중 {m:move}를 더 좋은 수로 고치셨어요. 이렇게 배우는 거죠.
+appraisal.num.takebacks.b2.2 = 무르신 {n:move} 중에서 {m:move}를 고치셨어요. 좋은 공부가 됐네요!
+appraisal.num.takebacks.b3 = {n:move}를 무르고, 그중 {m:move}를 고치셨어요.
+appraisal.num.takebacks.b3.2 = {n:move}를 무르셨고, 그중 {m:move}를 고치셨어요. 좋아요.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = 큰 실수가 하나도 없었어요. 훌륭해요!
+appraisal.num.clean.b2.2 = 이번 게임에서는 큰 실수가 단 한 번도 없었어요. 아주 훌륭해요!
+appraisal.num.clean.b2.3 = 큰 실수 없이 두셨어요. 아주 좋아요!
+appraisal.num.few.b2 = 이번 게임에서 실수는 {n:time}뿐이었어요.
+appraisal.num.few.b2.2 = 게임 전체에서 실수가 {n:time}밖에 없었어요. 좋아요!
+appraisal.num.few.b2.3 = 짚어 볼 만한 실수는 {n:time}뿐이에요. 잘하셨어요.
+appraisal.num.best.b2 = 최선의 수를 {n:time} 찾으셨어요.
+appraisal.num.best.b2.2 = 가장 좋은 수를 {n:time} 두셨어요.
+appraisal.num.best.b2.3 = 최선의 수를 찾으신 게 {n:time}이에요.
+appraisal.num.acc.b3 = 정확도는 {acc:percent}였고, {n:mistake}과 {m:blunder}이 있었어요.
+appraisal.num.acc.b3.2 = 정확도 {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = {acc:percent}의 정확도로 두셨고, {n:mistake}과 {m:blunder}이 있었어요.
+appraisal.num.acc_explain.b3 = 정확도는 두신 수를 각 포지션의 최선의 수와 비교한 값이에요. 100점이 만점이에요.
+appraisal.num.acc_explain.b3.spoken = 정확도는 두신 수를 각 포지션의 최선의 수와 비교한 값이에요. 백 점이 만점이에요.
+appraisal.num.acc_explain.b3.2 = 정확도는 두신 수가 최선의 수에 얼마나 가까웠는지 보여 줘요. 100점이 만점이에요.
+appraisal.num.acc_explain.b3.2.spoken = 정확도는 두신 수가 최선의 수에 얼마나 가까웠는지 보여 줘요. 백 점이 만점이에요.
+appraisal.num.acc.b4 = 정확도 {acc:percent}.
+appraisal.num.acc.b4.2 = 정확도 {acc:percent}로 두셨어요.
+appraisal.num.acc.b4.3 = 정확도는 {acc:percent}였어요.
+appraisal.num.acc_phase.b4 = 정확도 {acc:percent}. 가장 강했던 {text} 단계에서는 {acc_phase:percent}였어요.
+appraisal.num.acc_phase.b4.2 = 전체 {acc:percent}, {text}에서는 {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = 정확도 {acc:percent}로 두셨고, {text}에서 {acc_phase:percent}로 가장 좋았어요.
+appraisal.num.coach.b4 = 저는 정확도 {acc_coach:percent}로 뒀어요.
+appraisal.num.coach.b4.2 = 제 정확도는 {acc_coach:percent}였어요.
+appraisal.num.acc.b5 = 정확도 {acc:percent}. {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = 정확도 {acc:percent}, {n:inaccuracy}과 {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = {k:moveno}에 오프닝 이론을 벗어났어요.
+appraisal.num.book.b5.2 = {k:moveno}에 이론 수순을 벗어났어요.
+appraisal.num.acc.b6 = {acc:percent} 대 제 {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc:percent} 대 {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = 정확도 {acc:percent}, 저는 {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = 정확도 {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = 정확도 {acc:percent}: {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = 한 가지 연습해 볼 점: {theme}.
+appraisal.improve.theme.b1.2 = 다음을 위한 팁 하나: {theme}.
+appraisal.improve.theme.b1.3 = 연습해 볼 점: {theme}.
+appraisal.improve.theme.b2 = 연습할 점: {theme}.
+appraisal.improve.theme.b2.2 = 다음 게임을 위한 아이디어 하나: {theme}.
+appraisal.improve.theme.b2.3 = 연습하면 좋은 점: {theme}.
+appraisal.improve.theme.b3 = 이번 게임의 주제: {theme}.
+appraisal.improve.theme.b3.2 = 연습해 둘 만한 것: {theme}.
+appraisal.improve.theme.b4 = 반복해서 나온 주제: {theme}.
+appraisal.improve.theme.b4.2 = 두 번 이상 나온 주제예요: {theme}.
+appraisal.improve.theme.b5 = 반복된 주제: {theme}.
+appraisal.improve.theme.b5.2 = 이번 게임의 주제: {theme}.
+appraisal.improve.theme.b6 = 반복: {theme}.
+appraisal.improve.theme.b6.2 = 주제: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = {crit_no:moveno}에 흐름이 바뀌었어요. 다음엔 이걸 연습해 보세요: {theme}.
+appraisal.improve.critical.b2.2 = {crit_no:moveno}의 {crit_move}, 여기가 결정적인 순간이었어요. 연습할 점: {theme}.
+appraisal.improve.critical.b3 = 결정적인 순간은 {crit_no:moveno}였어요. {crit_move} 대신 {crit_best}, 이 수가 더 좋았어요.
+appraisal.improve.critical.b3.2 = {crit_no:moveno}에는 {crit_move} 말고 {crit_best}, 이 수가 더 좋았어요. 제가 둘 수 있는 체크, 잡기, 위협 같은 강제수부터 먼저 확인해 보세요.
+appraisal.improve.critical.b4 = 결정적인 순간: {crit_no:moveno} {crit_move}. {crit_best}, 이 수가 더 좋았어요.
+appraisal.improve.critical.b4.2 = {crit_no:moveno}가 승부처였어요: {crit_move} 대신 {crit_best}.
+appraisal.improve.critical.b5 = {crit_no:moveno}: {crit_move} 대신 {crit_best}, {eval}.
+appraisal.improve.critical.b5.2 = 승부처는 {crit_no:moveno}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = {crit_no:moveno}: {crit_move} 대신 {crit_best}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no:moveno}: {crit_move} 말고 {crit_best}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = {crit_no:moveno}까지는 이기고 계셨어요. 팁 하나: {theme}.
+appraisal.improve.was_winning.b1.2 = {crit_no:moveno}까지는 아주 잘하고 계셨어요. 기억해 두세요: {theme}.
+appraisal.improve.was_winning.b2 = {crit_no:moveno}까지는 이기고 계셨어요. 다음엔 이걸 연습해 봐요: {theme}.
+appraisal.improve.was_winning.b2.2 = {crit_no:moveno}까지는 이기는 형세였어요. 연습할 점: {theme}.
+appraisal.improve.was_winning.b3 = {crit_no:moveno}까지는 이기고 계셨어요. {crit_best}, 이 수였다면 우위를 지킬 수 있었어요.
+appraisal.improve.was_winning.b3.2 = {crit_no:moveno}까지는 이기는 형세였어요. {crit_best}, 이 수를 두셨다면 우위를 지켰을 거예요.
+appraisal.improve.was_winning.b4 = {crit_no:moveno}까지는 이기는 형세였어요. {crit_best}, 이 수면 우위를 지킬 수 있었어요.
+appraisal.improve.was_winning.b4.2 = {crit_no:moveno}까지 이기는 형세. {crit_best}, 이 수면 유지할 수 있었어요.
+appraisal.improve.was_winning.b5 = {crit_no:moveno}까지 이기는 형세: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = {crit_no:moveno}: {crit_best}, 이 수면 이기는 형세 유지. {eval}.
+appraisal.improve.was_winning.b6 = {crit_no:moveno}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_no:moveno}엔 {crit_best}, 이 수면 유지: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = 팁 하나: 이기고 있을 때는 제 킹이 움직일 칸을 꼭 남겨 두세요.
+appraisal.improve.stalemate.b1.2 = 기억해 두세요: 게임이 끝나 갈 때는 매번 두기 전에 제 킹이 아직 움직일 수 있는지 확인하세요.
+appraisal.improve.stalemate.b2 = 이기고 있을 때는 제 킹에게 칸 하나를 꼭 남겨 두세요. 안 그러면 스테일메이트예요.
+appraisal.improve.stalemate.b2.2 = 다음엔 두기 전에 제 킹이 아직 움직일 수 있는지 확인해 보세요.
+appraisal.improve.stalemate.b3 = 이기고 있을 때는 매 수마다 제 킹에게 아직 갈 칸이 있는지 확인하세요.
+appraisal.improve.stalemate.b3.2 = 이기는 엔드게임에서는 스테일메이트를 조심하세요. 제 킹에게 숨 쉴 칸을 주세요.
+appraisal.improve.stalemate.b4 = 이기는 엔드게임에서는 항상 스테일메이트를 확인하세요.
+appraisal.improve.stalemate.b4.2 = 스테일메이트 주의: 이번엔 그 때문에 승리를 놓쳤어요.
+appraisal.improve.stalemate.b5 = 이기는 엔드게임에선 스테일메이트를 확인하세요.
+appraisal.improve.stalemate.b5.2 = 스테일메이트로 승리를 놓쳤어요.
+appraisal.improve.stalemate.b6 = 스테일메이트 주의.
+appraisal.improve.stalemate.b6.2 = 스테일메이트로 승리를 놓쳤어요.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = {n:moveno}에는 {my:obj} 공짜로 잡을 수 있었어요. 보셨어요?
+appraisal.improve.coach_hung.b1.2 = {n:moveno}에는 {my:subj} 공짜였어요. 공짜로 잡을 기물이 있는지 늘 찾아보세요!
+appraisal.improve.coach_hung.b2 = {n:moveno}에 {my:subj} 지켜지지 않고 있었어요. 보셨어요?
+appraisal.improve.coach_hung.b2.2 = {n:moveno}에 {my:obj} 공짜로 잡을 수 있었어요.
+appraisal.improve.coach_hung.b3 = {n:moveno}에 {my:subj} 무방비 상태였어요. 눈치채셨어요?
+appraisal.improve.coach_hung.b3.2 = {n:moveno}에 {my:subj} 지켜지지 않고 있었어요. 매 수마다 무방비인 기물을 찾아보세요.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = 오늘처럼 기물이 안전한지 계속 확인하세요.
+appraisal.improve.clean.b1.2 = 두기 전에 제가 무엇을 공격하는지 계속 살펴보세요. 효과가 있어요!
+appraisal.improve.clean.b1.3 = 지금처럼 신중하게 두세요!
+appraisal.improve.clean.b2 = 깔끔한 게임이었어요. 지금처럼 제 위협을 계속 확인하세요.
+appraisal.improve.clean.b2.2 = 오늘처럼만 하세요: 안전한 기물, 좋은 수.
+appraisal.improve.clean.b3 = 깔끔한 게임이었어요. 앞으로도 체크, 잡기, 위협 같은 강제수부터 먼저 확인하세요.
+appraisal.improve.clean.b3.2 = 큰 실수가 없었어요. 이대로 계속해요.
+appraisal.improve.clean.b4 = 깔끔한 게임이었어요. 크게 고칠 점은 없어요.
+appraisal.improve.clean.b4.2 = 결정적인 실수는 없었어요.
+appraisal.improve.clean.b5 = 결정적인 실수는 없었어요.
+appraisal.improve.clean.b5.2 = 깔끔한 게임.
+appraisal.improve.clean.b6 = 깔끔한 게임.
+appraisal.improve.clean.b6.2 = 결정적 실수 없음.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+appraisal.end.b1 = 게임할 때마다 실력이 늘고 있어요. 한 판 더 할까요?
+appraisal.end.b1.2 = 재미있었어요! 다시 한 판 둘까요?
+appraisal.end.b1.3 = 정말 열심히 하셨어요. 한 판 더 두실래요?
+appraisal.end.b2 = 판마다 실력이 늘고 있어요. 한 판 더 할까요?
+appraisal.end.b2.2 = 좋은 게임이었어요. 한 판 더 둘까요?
+appraisal.end.b2.3 = 잘 두셨어요. 한 판 더 할까요?
+appraisal.end.b3 = 탄탄한 게임이었어요. 다음 판 준비되셨어요?
+appraisal.end.b3.2 = 좋은 게임이었어요. 한 판 더 할까요?
+appraisal.end.b3.3 = 잘 두셨어요. 다시 해 볼까요?
+appraisal.end.b4 = 탄탄한 게임이었어요. 다음 판 준비되셨어요?
+appraisal.end.b4.2 = 한 판 더 할까요?
+appraisal.end.b4.3 = 좋은 게임이었어요. 다음 판 할까요?
+appraisal.end.b5 = 한 판 더?
+appraisal.end.b5.2 = 다음 판 할까요?
+appraisal.end.b5.3 = 또 둘까요?
+appraisal.end.b6 = 한 판 더?
+appraisal.end.b6.2 = 다음 판?
+appraisal.end.b6.3 = 다시 둘까요?
+appraisal.end.up.b1 = 이제 “{level}” 레벨에 도전할 준비가 됐어요. 해 보실래요?
+appraisal.end.up.b1.2 = “{level}” 레벨에 도전해도 될 것 같아요. 한번 해 볼까요?
+appraisal.end.up.b2 = 이제 “{level}” 레벨에 도전할 준비가 됐어요. 해 보실래요?
+appraisal.end.up.b2.2 = 다음엔 “{level}” 레벨 어때요? 준비가 된 것 같아요.
+appraisal.end.up.b3 = 이 레벨은 이제 졸업이에요. “{level}” 레벨에 도전해 보세요.
+appraisal.end.up.b3.2 = “{level}” 레벨, 준비되셨나요? 저는 그렇다고 봐요.
+appraisal.end.up.b4 = 이 레벨은 이제 졸업이에요. “{level}” 레벨에 도전해 보세요.
+appraisal.end.up.b4.2 = 이제 “{level}” 레벨로 가 볼까요?
+appraisal.end.up.b5 = 다음엔 “{level}” 레벨로 해 보세요.
+appraisal.end.up.b5.2 = 다음은 “{level}” 레벨?
+appraisal.end.up.b6 = 다음엔 “{level}” 레벨로.
+appraisal.end.up.b6.2 = 다음은 “{level}” 레벨?
+appraisal.end.down.b2 = “{level}” 레벨에서 한 판 두면서 오늘 본 아이디어를 연습해 봐요.
+appraisal.end.down.b2.2 = 연습 삼아 “{level}” 레벨에서 한 판 어때요?
+appraisal.end.down.b3 = 이 아이디어들을 연습할 겸 “{level}” 레벨에서 한 판 두실래요?
+appraisal.end.down.b3.2 = “{level}” 레벨에서 한 판 두면 이 아이디어들을 연습하는 데 도움이 될 수 있어요.
+appraisal.end.down.b4 = “{level}” 레벨에서 한 판 두면 이 아이디어들을 연습하는 데 도움이 될지도 몰라요.
+appraisal.end.down.b4.2 = “{level}” 레벨에서 연습 삼아 한 판 해 볼까요?
+appraisal.end.down.b5 = “{level}” 레벨에서 한 판 어때요?
+appraisal.end.down.b5.2 = 연습으로 “{level}” 레벨?
+appraisal.end.down.b6 = “{level}” 레벨에서 한 판 어때요?
+appraisal.end.down.b6.2 = 연습으로 “{level}” 레벨?

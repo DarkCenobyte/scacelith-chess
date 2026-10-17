@@ -1,0 +1,153 @@
+# Coach speech (Romanian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Romanian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tu" or "eu" here: the players are "Albul" and "Negrul" (capitalised, genitive
+#   "Albului" / "Negrului"; "pentru Alb" without the article, as commentary writes it). A piece comes
+#   with its side: {piece} {t1} {t2} = "calul alb", "dama neagră" (common.lang); {piece:cl} = "îl" / "o".
+#   Never write "alb", "negru" or an article next to them.
+# - No adjective agrees with a move placeholder: the voice says "cal ef trei", which would clash with a
+#   feminine ending, so the line names "mutarea {best}" or uses an adverb ("Mai bine era {best}.").
+# - Counted numbers (common.lang): {m:in_move} "mat în 3 mutări" / "mat într-o mutare" (it carries its
+#   "în"), {pts:point} "3 puncte", {n:mistake} "2 greșeli", {m:blunder} "o gafă",
+#   {acc_white:percent} "87 %" (spoken "optzeci și șapte la sută").
+# - {opening:def} = the opening's name with its article ("apărarea siciliană"), after a verb or "cu".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Să revedem împreună această partidă.
+an.start.2 = Să parcurgem partida, mutare cu mutare.
+an.start.3 = Iată partida. Să vedem cum a decurs.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Această partidă începe dintr-o poziție aranjată pe tablă. S-o parcurgem.
+an.start.setup.2 = O partidă dintr-o poziție aranjată. Să vedem cum a decurs.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = S-a jucat {opening:def}.
+an.opening.2 = Partida a început cu {opening:def}.
+an.book_exit = Cu {move}, partida iese din teoria cunoscută.
+an.book_exit.2 = {move} este prima mutare din afara teoriei deschiderilor.
+an.book_exit.3 = Teoria deschiderii se termină aici, cu {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} este o gafă.
+an.blunder.2 = Aici, {move} este o greșeală gravă.
+an.blunder.3 = O gafă: {move}.
+an.mistake = {move} este o greșeală.
+an.mistake.2 = {move} nu este mutarea potrivită aici.
+an.mistake.3 = O greșeală: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} ratează ocazia de a pedepsi acea greșeală.
+an.missed_chance.2 = Cu {move}, ocazia se pierde.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Acum {reply:nomate} este șah mat.
+an.mate_allowed.one.2 = Mutarea permite {reply:nomate}, și e șah mat.
+an.mate_allowed = Mutarea permite un mat forțat {m:in_move}, care începe cu {reply:nomate}.
+an.mate_allowed.2 = Acum există un mat forțat {m:in_move}, începând cu {reply:nomate}.
+an.fork = Acum {reply} atacă dublu {t1} și {t2}.
+an.fork.2 = Mutarea permite {reply}, care atacă deodată {t1} și {t2}.
+an.fork.3 = {reply} prinde în furculiță {t1} și {t2}.
+an.hanging = Mutarea lasă {piece} fără apărare, iar {reply} ia piesa.
+an.hanging.2 = {piece} rămâne fără apărător: {reply} {piece:cl} câștigă.
+an.hanging.3 = {reply} ia pur și simplu {piece}, care nu avea niciun apărător.
+an.material = Răspunsul {line} câștigă {pts:point} de material.
+an.material.2 = Apoi {line} câștigă {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} era șah mat.
+an.mate_missed.one.2 = {best:nomate} ar fi fost șah mat.
+an.mate_missed = {best:nomate} ar fi forțat matul {m:in_move}.
+an.mate_missed.2 = Exista un mat forțat {m:in_move}, care începea cu {best:nomate}.
+an.missed_capture = {best} ar fi câștigat gratuit {piece}.
+an.missed_capture.2 = {piece} nu avea niciun apărător: {best} ar fi câștigat piesa.
+an.missed_fork = {best} ar fi atacat dublu {t1} și {t2}.
+an.missed_fork.2 = {best} era o furculiță, care ataca {t1} și {t2}.
+
+# The better move, when nothing above named it.
+an.better = Mutarea {best} era mai puternică.
+an.better.2 = Mai bine era {best}.
+an.better.3 = Mutarea {best} era mai precisă.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} e o mutare genială: sacrifică {piece}!
+an.brilliant.2 = Un sacrificiu genial! {move} oferă {piece}.
+an.brilliant.3 = {move}! O mutare genială, care oferă {piece}.
+an.brilliant.mate = Duce la un mat forțat {m:in_move}.
+an.brilliant.mate.2 = Și forțează matul {m:in_move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} e singura mutare care păstrează avantajul.
+an.only.win.2 = Doar {move} păstrează aici avantajul. O mutare bine găsită.
+an.only.hold = {move} e singura mutare care păstrează echilibrul.
+an.only.hold.2 = Doar {move} ține aici poziția.
+an.only.defend = {move} e singura mutare care menține lupta.
+an.only.defend.2 = Doar {move} ține aici partida în viață. O apărare bună.
+an.only.best = {move} e de departe cea mai puternică mutare aici.
+an.only.best.2 = Joc precis: mutarea {move} e mult mai puternică decât oricare alta.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} e o mică inexactitate: mutarea {best} era mai precisă.
+an.inaccuracy.2 = Nu chiar cea mai bună alegere: mutarea {best} era mai precisă decât {move}.
+an.interesting = {move} e o idee interesantă, care oferă {piece}.
+an.interesting.2 = O încercare interesantă: {move} renunță la {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Albul are acum un mat forțat {m:in_move}.
+an.mate_on.white.2 = De aici, Albul poate forța matul {m:in_move}.
+an.mate_on.black = Negrul are acum un mat forțat {m:in_move}.
+an.mate_on.black.2 = De aici, Negrul poate forța matul {m:in_move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Șah mat. Albul câștigă partida.
+an.end.mate.white.2 = Și e șah mat: Albul câștigă.
+an.end.mate.black = Șah mat. Negrul câștigă partida.
+an.end.mate.black.2 = Și e șah mat: Negrul câștigă.
+an.end.resigned.white = Negrul a abandonat, așa că Albul câștigă partida.
+an.end.resigned.white.2 = Partida se termină aici: Negrul abandonează, iar Albul câștigă.
+an.end.resigned.black = Albul a abandonat, așa că Negrul câștigă partida.
+an.end.resigned.black.2 = Partida se termină aici: Albul abandonează, iar Negrul câștigă.
+an.end.timeout.white = Negrul a rămas fără timp, așa că Albul câștigă.
+an.end.timeout.white.2 = Albul câștigă la timp.
+an.end.timeout.black = Albul a rămas fără timp, așa că Negrul câștigă.
+an.end.timeout.black.2 = Negrul câștigă la timp.
+an.end.win.white = Partida se încheie cu victoria Albului.
+an.end.win.white.2 = Albul câștigă partida.
+an.end.win.black = Partida se încheie cu victoria Negrului.
+an.end.win.black.2 = Negrul câștigă partida.
+an.end.stalemate = Pat: partida e remiză.
+an.end.stalemate.2 = E pat, deci partida se încheie remiză.
+an.end.draw.agreement = Jucătorii au căzut de acord asupra remizei.
+an.end.draw.agreement.2 = Partida se încheie remiză de comun acord.
+an.end.draw.repetition = Partida e remiză prin repetarea poziției.
+an.end.draw.repetition.2 = Aceeași poziție a apărut din nou: remiză.
+an.end.draw.fifty = Partida e remiză prin regula celor cincizeci de mutări.
+an.end.draw.fifty.2 = Cincizeci de mutări fără captură și fără mutare de pion: remiză.
+an.end.draw.seventy_five = Partida e remiză prin regula celor șaptezeci și cinci de mutări.
+an.end.draw.seventy_five.2 = Șaptezeci și cinci de mutări fără captură și fără mutare de pion: remiză.
+an.end.draw.material = Matul nu mai e posibil: partida e remiză.
+an.end.draw.material.2 = Niciuna dintre părți nu mai poate da mat, deci e remiză.
+an.end.draw = Partida se încheie remiză.
+an.end.draw.2 = Remiză.
+an.end.unfinished = Partida se oprește aici, neterminată.
+an.end.unfinished.2 = Aici se oprește partida: nu a fost terminată.
+an.end.accuracy = Precizie: {acc_white:percent} pentru Alb, {acc_black:percent} pentru Negru.
+an.end.accuracy.2 = Albul a jucat cu o precizie de {acc_white:percent}, Negrul cu {acc_black:percent}.
+an.end.clean.white = Albul nu a făcut nicio greșeală și nicio gafă.
+an.end.clean.white.2 = Jocul Albului a fost lipsit de erori grave.
+an.end.clean.black = Negrul nu a făcut nicio greșeală și nicio gafă.
+an.end.clean.black.2 = Jocul Negrului a fost lipsit de erori grave.
+an.end.mistakes.white = Albul a făcut {n:mistake}, fără nicio gafă.
+an.end.mistakes.white.2 = Pentru Alb: {n:mistake}, nicio gafă.
+an.end.mistakes.black = Negrul a făcut {n:mistake}, fără nicio gafă.
+an.end.mistakes.black.2 = Pentru Negru: {n:mistake}, nicio gafă.
+an.end.blunders.white = Albul a făcut {m:blunder}.
+an.end.blunders.white.2 = Pentru Alb: {m:blunder}.
+an.end.blunders.black = Negrul a făcut {m:blunder}.
+an.end.blunders.black.2 = Pentru Negru: {m:blunder}.
+an.end.errors.white = Albul a făcut {n:mistake} și {m:blunder}.
+an.end.errors.white.2 = Pentru Alb: {n:mistake} și {m:blunder}.
+an.end.errors.black = Negrul a făcut {n:mistake} și {m:blunder}.
+an.end.errors.black.2 = Pentru Negru: {n:mistake} și {m:blunder}.

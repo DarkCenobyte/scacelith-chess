@@ -1,0 +1,151 @@
+# Coach speech (Vietnamese): the commentary of the Analysis mode (src/analysis/commentary.cpp), said
+# by the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Vietnamese:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "bạn" or "tôi" here ("chúng ta" = the commentator and the viewer): the players are
+#   "Trắng" and "Đen", capitalised as players. A piece comes with its side: {piece} {t1} {t2} =
+#   "con Mã trắng", "con Hậu đen" (common.lang, owner.white / owner.black); never add "trắng" or
+#   "đen" after them. "nó" = "it" for any piece.
+# - A move is written after the noun "nước" ("nước {move}"), never glued to another word.
+# - Counted numbers (common.lang): {m:move} "chiếu hết sau 3 nước", {pts:point} "3 điểm",
+#   {n:mistake} "2 sai lầm", {m:blunder} "1 sai lầm nghiêm trọng", {acc_white:percent} "87%"
+#   (spoken "tám mươi bảy phần trăm"). Forced mate = "buộc chiếu hết" / "chiếu hết bắt buộc".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Chúng ta cùng nhìn lại ván cờ này nhé.
+an.start.2 = Chúng ta cùng điểm lại ván cờ này, từng nước một.
+an.start.3 = Đây là ván cờ. Hãy xem diễn biến ra sao.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Ván cờ này bắt đầu từ một thế cờ được xếp sẵn. Chúng ta cùng xem nhé.
+an.start.setup.2 = Một ván cờ bắt đầu từ thế cờ xếp sẵn. Hãy xem diễn biến ra sao.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Ván cờ mở đầu bằng {opening:def}.
+an.opening.2 = Đây là {opening:def}.
+an.book_exit = Với nước {move}, ván cờ rời khỏi lý thuyết khai cuộc đã biết.
+an.book_exit.2 = Nước {move} là nước đầu tiên nằm ngoài sách khai cuộc.
+an.book_exit.3 = Lý thuyết khai cuộc kết thúc ở đây, với nước {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = Nước {move} là một sai lầm nghiêm trọng.
+an.blunder.2 = Ở đây, nước {move} là một sai lầm nặng nề.
+an.blunder.3 = Sai lầm nghiêm trọng: {move}.
+an.mistake = Nước {move} là một sai lầm.
+an.mistake.2 = Ở đây, nước {move} không phải là nước đúng.
+an.mistake.3 = Sai lầm: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = Nước {move} bỏ lỡ cơ hội trừng phạt sai lầm đó.
+an.missed_chance.2 = Với nước {move}, cơ hội đã vuột mất.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Bây giờ, nước {reply:nomate} là chiếu hết.
+an.mate_allowed.one.2 = Nước này cho phép đối phương đi {reply:nomate}, và đó là chiếu hết.
+an.mate_allowed = Nước này cho phép đối phương buộc chiếu hết sau {m:move}, bắt đầu bằng nước {reply:nomate}.
+an.mate_allowed.2 = Giờ đã có một đòn chiếu hết bắt buộc sau {m:move}, mở đầu bằng nước {reply:nomate}.
+an.fork = Bây giờ, nước {reply} chĩa đôi {t1} và {t2}.
+an.fork.2 = Nước này cho phép đối phương đi {reply}, tấn công cùng lúc {t1} và {t2}.
+an.fork.3 = Nước {reply} đánh vào {t1} và {t2} cùng một lúc.
+an.hanging = Nước này để {piece} không được bảo vệ, và nước {reply} bắt nó.
+an.hanging.2 = {piece} không còn quân bảo vệ: nước {reply} ăn được nó.
+an.hanging.3 = Nước {reply} bắt gọn {piece}, vốn không có quân bảo vệ.
+an.material = Đáp lại bằng {line} sẽ giành được {pts:point} về lực lượng.
+an.material.2 = Sau đó, {line} giành được {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Nước {best:nomate} mới là nước chiếu hết.
+an.mate_missed.one.2 = Nước {best:nomate} lẽ ra đã chiếu hết.
+an.mate_missed = Nước {best:nomate} lẽ ra đã buộc chiếu hết sau {m:move}.
+an.mate_missed.2 = Đã có cách buộc chiếu hết sau {m:move}, bắt đầu bằng nước {best:nomate}.
+an.missed_capture = Nước {best} lẽ ra đã ăn được {piece} mà không mất gì.
+an.missed_capture.2 = {piece} không có quân bảo vệ: nước {best} lẽ ra đã bắt được nó.
+an.missed_fork = Nước {best} lẽ ra đã chĩa đôi {t1} và {t2}.
+an.missed_fork.2 = Nước {best} là một đòn chĩa đôi, tấn công {t1} và {t2}.
+
+# The better move, when nothing above named it.
+an.better = Nước {best} mạnh hơn.
+an.better.2 = Hay hơn là nước {best}.
+an.better.3 = Nước {best} chính xác hơn.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = Nước {move} thật xuất sắc: nó thí {piece}!
+an.brilliant.2 = Một đòn thí quân xuất sắc! Nước {move} thí {piece}.
+an.brilliant.3 = Nước {move}! Một nước đi xuất sắc, thí {piece}.
+an.brilliant.mate = Nước này dẫn tới chiếu hết bắt buộc sau {m:move}.
+an.brilliant.mate.2 = Và nó buộc chiếu hết sau {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = Nước {move} là nước duy nhất giữ được ưu thế.
+an.only.win.2 = Ở đây chỉ có nước {move} giữ được lợi thế. Một phát hiện hay.
+an.only.hold = Nước {move} là nước duy nhất giữ được thế cân bằng.
+an.only.hold.2 = Ở đây chỉ có nước {move} giữ vững được thế cờ.
+an.only.defend = Nước {move} là nước duy nhất giúp cuộc chiến tiếp diễn.
+an.only.defend.2 = Ở đây chỉ có nước {move} giữ cho ván cờ còn cơ hội. Phòng thủ hay.
+an.only.best = Nước {move} là nước mạnh nhất ở đây, vượt xa các nước khác.
+an.only.best.2 = Chính xác: nước {move} mạnh hơn hẳn mọi nước khác.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = Nước {move} hơi thiếu chính xác: nước {best} chính xác hơn.
+an.inaccuracy.2 = Chưa hẳn là nước tốt nhất: nước {best} chính xác hơn nước {move}.
+an.interesting = Nước {move} là một ý tưởng thú vị, thí {piece}.
+an.interesting.2 = Một ý đồ thú vị: nước {move} thí {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Bây giờ Trắng đã có đòn chiếu hết bắt buộc sau {m:move}.
+an.mate_on.white.2 = Từ đây, Trắng có thể buộc chiếu hết sau {m:move}.
+an.mate_on.black = Bây giờ Đen đã có đòn chiếu hết bắt buộc sau {m:move}.
+an.mate_on.black.2 = Từ đây, Đen có thể buộc chiếu hết sau {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Chiếu hết. Trắng thắng ván cờ.
+an.end.mate.white.2 = Và đó là chiếu hết: Trắng thắng.
+an.end.mate.black = Chiếu hết. Đen thắng ván cờ.
+an.end.mate.black.2 = Và đó là chiếu hết: Đen thắng.
+an.end.resigned.white = Đen đã xin thua, nên Trắng thắng ván cờ.
+an.end.resigned.white.2 = Ván cờ kết thúc tại đây: Đen xin thua, và Trắng thắng.
+an.end.resigned.black = Trắng đã xin thua, nên Đen thắng ván cờ.
+an.end.resigned.black.2 = Ván cờ kết thúc tại đây: Trắng xin thua, và Đen thắng.
+an.end.timeout.white = Đen đã hết giờ, nên Trắng thắng.
+an.end.timeout.white.2 = Trắng thắng do Đen hết giờ.
+an.end.timeout.black = Trắng đã hết giờ, nên Đen thắng.
+an.end.timeout.black.2 = Đen thắng do Trắng hết giờ.
+an.end.win.white = Ván cờ kết thúc với chiến thắng của Trắng.
+an.end.win.white.2 = Trắng thắng ván cờ.
+an.end.win.black = Ván cờ kết thúc với chiến thắng của Đen.
+an.end.win.black.2 = Đen thắng ván cờ.
+an.end.stalemate = Hết nước đi: ván cờ hòa.
+an.end.stalemate.2 = Đây là thế hết nước đi, nên ván cờ kết thúc với kết quả hòa.
+an.end.draw.agreement = Hai bên đã thỏa thuận hòa.
+an.end.draw.agreement.2 = Ván cờ kết thúc hòa theo thỏa thuận.
+an.end.draw.repetition = Ván cờ hòa do lặp lại thế cờ.
+an.end.draw.repetition.2 = Cùng một thế cờ đã lặp lại: hòa.
+an.end.draw.fifty = Ván cờ hòa theo luật năm mươi nước.
+an.end.draw.fifty.2 = Năm mươi nước liền không có bắt quân hay đi Tốt: hòa.
+an.end.draw.seventy_five = Ván cờ hòa theo luật bảy mươi lăm nước.
+an.end.draw.seventy_five.2 = Bảy mươi lăm nước liền không có bắt quân hay đi Tốt: hòa.
+an.end.draw.material = Không thể chiếu hết được nữa: ván cờ hòa.
+an.end.draw.material.2 = Không bên nào còn có thể chiếu hết, nên ván cờ hòa.
+an.end.draw = Ván cờ kết thúc với kết quả hòa.
+an.end.draw.2 = Hòa.
+an.end.unfinished = Ván cờ dừng ở đây, chưa kết thúc.
+an.end.unfinished.2 = Ván cờ dừng lại tại đây: nó chưa được chơi xong.
+an.end.accuracy = Độ chính xác: Trắng {acc_white:percent}, Đen {acc_black:percent}.
+an.end.accuracy.2 = Trắng chơi với độ chính xác {acc_white:percent}, Đen {acc_black:percent}.
+an.end.clean.white = Trắng không mắc sai lầm nào, cũng không mắc sai lầm nghiêm trọng nào.
+an.end.clean.white.2 = Lối chơi của Trắng không có sai lầm đáng kể nào.
+an.end.clean.black = Đen không mắc sai lầm nào, cũng không mắc sai lầm nghiêm trọng nào.
+an.end.clean.black.2 = Lối chơi của Đen không có sai lầm đáng kể nào.
+an.end.mistakes.white = Trắng mắc {n:mistake}, và không có sai lầm nghiêm trọng nào.
+an.end.mistakes.white.2 = Về phía Trắng: {n:mistake}, không có sai lầm nghiêm trọng.
+an.end.mistakes.black = Đen mắc {n:mistake}, và không có sai lầm nghiêm trọng nào.
+an.end.mistakes.black.2 = Về phía Đen: {n:mistake}, không có sai lầm nghiêm trọng.
+an.end.blunders.white = Trắng mắc {m:blunder}.
+an.end.blunders.white.2 = Về phía Trắng: {m:blunder}.
+an.end.blunders.black = Đen mắc {m:blunder}.
+an.end.blunders.black.2 = Về phía Đen: {m:blunder}.
+an.end.errors.white = Trắng mắc {n:mistake} và {m:blunder}.
+an.end.errors.white.2 = Về phía Trắng: {n:mistake} và {m:blunder}.
+an.end.errors.black = Đen mắc {n:mistake} và {m:blunder}.
+an.end.errors.black.2 = Về phía Đen: {n:mistake} và {m:blunder}.

@@ -44,7 +44,7 @@ TEST(i18n_lang_files_match_english) {
         CHECK(!ref.count(kv.first));
         ref[kv.first] = kv.second;
     }
-    CHECK_EQ(int(i18n::languages().size()), 10);
+    CHECK_EQ(int(i18n::languages().size()), 34);
     for (const i18n::Language& lang : i18n::languages()) {
         std::string path = std::string("assets/i18n/") + lang.code + ".lang";
         CHECK(embedded::find(path.c_str()) != nullptr);
@@ -107,6 +107,30 @@ TEST(i18n_devices_signed_out_note_is_about_another_device) {
         {"ja", {"\xE3\x81\x93\xE3\x81\xAE\xE3\x83\x87\xE3\x83\x90\xE3\x82\xA4\xE3\x82\xB9"}},                                               // このデバイス
         {"zh-Hans", {"\xE6\x9C\xAC\xE8\xAE\xBE\xE5\xA4\x87", "\xE6\xAD\xA4\xE8\xAE\xBE\xE5\xA4\x87"}},                                     // 本设备, 此设备
         {"zh-Hant", {"\xE6\x9C\xAC\xE8\xA3\x9D\xE7\xBD\xAE", "\xE6\xAD\xA4\xE8\xA3\x9D\xE7\xBD\xAE"}},                                     // 本裝置, 此裝置
+        {"pt", {"este dispositivo", "neste dispositivo", "deste dispositivo"}},  // este dispositivo, neste dispositivo, deste dispositivo
+        {"pt-BR", {"este dispositivo", "neste dispositivo", "deste dispositivo"}},  // este dispositivo, neste dispositivo, deste dispositivo
+        {"ko", {"\xEC\x9D\xB4 \xEA\xB8\xB0\xEA\xB8\xB0"}},  // 이 기기
+        {"bg", {"\xD1\x82\xD0\xBE\xD0\xB2\xD0\xB0 \xD1\x83\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x81\xD1\x82\xD0\xB2\xD0\xBE"}},  // това устройство
+        {"cs", {"toto za\xC5\x99\xC3\xADzen\xC3\xAD", "tomto za\xC5\x99\xC3\xADzen\xC3\xAD", "tohoto za\xC5\x99\xC3\xADzen\xC3\xAD"}},  // toto zařízení, tomto zařízení, tohoto zařízení
+        {"da", {"denne enhed"}},  // denne enhed
+        {"el", {"\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE \xCE\xB7 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE", "\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE \xCF\x84\xCE\xB7 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE", "\xCE\xB1\xCF\x85\xCF\x84\xCE\xAE\xCF\x82 \xCF\x84\xCE\xB7\xCF\x82 \xCF\x83\xCF\x85\xCF\x83\xCE\xBA\xCE\xB5\xCF\x85\xCE\xAE\xCF\x82"}},  // αυτή η συσκευή, αυτή τη συσκευή, αυτής της συσκευής
+        {"et", {"see seade", "selle seadme", "selles seadmes", "sellest seadmest"}},  // see seade, selle seadme, selles seadmes, sellest seadmest
+        {"fi", {"t\xC3\xA4m\xC3\xA4 laite", "t\xC3\xA4m\xC3\xA4n laitteen", "t\xC3\xA4ss\xC3\xA4 laitteessa", "t\xC3\xA4st\xC3\xA4 laitteesta", "t\xC3\xA4t\xC3\xA4 laitetta"}},  // tämä laite, tämän laitteen, tässä laitteessa, tästä laitteesta, tätä laitetta
+        {"hi", {"\xE0\xA4\xAF\xE0\xA4\xB9 \xE0\xA4\xA1\xE0\xA4\xBF\xE0\xA4\xB5\xE0\xA4\xBE\xE0\xA4\x87\xE0\xA4\xB8", "\xE0\xA4\x87\xE0\xA4\xB8 \xE0\xA4\xA1\xE0\xA4\xBF\xE0\xA4\xB5\xE0\xA4\xBE\xE0\xA4\x87\xE0\xA4\xB8"}},  // यह डिवाइस, इस डिवाइस
+        {"hr", {"ovaj ure\xC4\x91" "aj", "ovog ure\xC4\x91" "aja", "ovom ure\xC4\x91" "aju"}},  // ovaj uređaj, ovog uređaja, ovom uređaju
+        {"hu", {"ez az eszk\xC3\xB6z", "ezt az eszk\xC3\xB6zt", "ezen az eszk\xC3\xB6z\xC3\xB6n", "err\xC5\x91l az eszk\xC3\xB6zr\xC5\x91l"}},  // ez az eszköz, ezt az eszközt, ezen az eszközön, erről az eszközről
+        {"id", {"perangkat ini"}},  // perangkat ini
+        {"it", {"questo dispositivo"}},  // questo dispositivo
+        {"lt", {"\xC5\xA1is \xC4\xAFrenginys", "\xC5\xA1io \xC4\xAFrenginio", "\xC5\xA1iame \xC4\xAFrenginyje", "\xC5\xA1\xC4\xAF \xC4\xAFrengin\xC4\xAF"}},  // šis įrenginys, šio įrenginio, šiame įrenginyje, šį įrenginį
+        {"lv", {"\xC5\xA1\xC4\xAB ier\xC4\xAB" "ce", "\xC5\xA1\xC4\xABs ier\xC4\xAB" "ces", "\xC5\xA1" "aj\xC4\x81 ier\xC4\xAB" "c\xC4\x93", "\xC5\xA1o ier\xC4\xAB" "ci"}},  // šī ierīce, šīs ierīces, šajā ierīcē, šo ierīci
+        {"nl", {"dit apparaat"}},  // dit apparaat
+        {"pl", {"to urz\xC4\x85" "dzenie", "tego urz\xC4\x85" "dzenia", "tym urz\xC4\x85" "dzeniu"}},  // to urządzenie, tego urządzenia, tym urządzeniu
+        {"ro", {"acest dispozitiv", "acestui dispozitiv", "dispozitivul acesta"}},  // acest dispozitiv, acestui dispozitiv, dispozitivul acesta
+        {"sk", {"toto zariadenie", "tohto zariadenia", "tomto zariaden\xC3\xAD"}},  // toto zariadenie, tohto zariadenia, tomto zariadení
+        {"sl", {"ta naprava", "te naprave", "tej napravi", "to napravo"}},  // ta naprava, te naprave, tej napravi, to napravo
+        {"sv", {"den h\xC3\xA4r enheten", "denna enhet"}},  // den här enheten, denna enhet
+        {"tr", {"bu cihaz", "bu cihaz\xC4\xB1n", "bu cihazda", "bu cihazdan"}},  // bu cihaz, bu cihazın, bu cihazda, bu cihazdan
+        {"vi", {"thi\xE1\xBA\xBFt b\xE1\xBB\x8B n\xC3\xA0y"}},  // thiết bị này
     };
     CHECK_EQ(int(thisDevice.size()), int(i18n::languages().size()));
     for (const i18n::Language& lang : i18n::languages()) {
@@ -135,7 +159,8 @@ TEST(i18n_devices_signed_out_note_is_about_another_device) {
 }
 
 // Every language names the five pieces of its scoresheet notation with distinct letters that cannot be
-// read as a file (a-h), a capture (x) or castling (O), and writes the date with day, month and year once each.
+// read as a file (a-h), a capture (x) or castling (O; Estonian's bishop aside), and writes the date with day,
+// month and year once each.
 TEST(i18n_scoresheet_pieces_and_date) {
     for (const i18n::Language& lang : i18n::languages()) {
         std::string path = std::string("assets/i18n/") + lang.code + ".lang";
@@ -156,8 +181,12 @@ TEST(i18n_scoresheet_pieces_and_date) {
         if (letters.size() != 5) std::fprintf(stderr, "  %s: scoresheet.pieces needs 5 letters\n", lang.code);
         CHECK_EQ(int(letters.size()), 5);
         CHECK_EQ(int(std::set<std::string>(letters.begin(), letters.end()).size()), int(letters.size()));
-        for (const std::string& l : letters) {
-            bool clash = l.size() == 1 && std::string("abcdefghxO").find(l[0]) != std::string::npos;
+        for (size_t i = 0; i < letters.size(); ++i) {
+            const std::string& l = letters[i];
+            // Estonian books write the bishop (oda) O: a bishop move has its square right after the letter
+            // ("Oc4"), castling a hyphen ("O-O"), so the sheet keeps the letter its players know.
+            const bool estonianBishop = std::string(lang.code) == "et" && i == 3 && l == "O";
+            bool clash = !estonianBishop && l.size() == 1 && std::string("abcdefghxO").find(l[0]) != std::string::npos;
             if (clash) std::fprintf(stderr, "  %s: piece letter %s reads as a square or move\n", lang.code, l.c_str());
             CHECK(!clash);
         }
@@ -291,6 +320,42 @@ TEST(i18n_plural_rules) {
     CHECK_EQ(i18n::pluralIndex("ja", 5), 0);
     CHECK_EQ(i18n::pluralForms("ar"), 6);
     CHECK_EQ(i18n::pluralForms("zh-Hant"), 1);
+    // The languages added in 1.1: {count, form} per rule.
+    const int hr[][2] = {{1, 0}, {21, 0}, {11, 2}, {2, 1}, {24, 1}, {12, 2}, {5, 2}, {0, 2}};
+    for (auto& c : hr) CHECK_EQ(i18n::pluralIndex("hr", c[0]), c[1]);
+    const int pl[][2] = {{1, 0}, {2, 1}, {4, 1}, {22, 1}, {5, 2}, {12, 2}, {21, 2}, {112, 2}, {0, 2}};
+    for (auto& c : pl) CHECK_EQ(i18n::pluralIndex("pl", c[0]), c[1]);
+    const int cs[][2] = {{1, 0}, {2, 1}, {4, 1}, {5, 2}, {0, 2}, {21, 2}, {22, 2}};
+    for (auto& c : cs) {
+        CHECK_EQ(i18n::pluralIndex("cs", c[0]), c[1]);
+        CHECK_EQ(i18n::pluralIndex("sk", c[0]), c[1]);
+    }
+    const int lt[][2] = {{1, 0}, {21, 0}, {101, 0}, {2, 1}, {9, 1}, {22, 1}, {0, 2}, {10, 2}, {11, 2}, {12, 2}, {19, 2}, {20, 2}};
+    for (auto& c : lt) CHECK_EQ(i18n::pluralIndex("lt", c[0]), c[1]);
+    const int lv[][2] = {{0, 0}, {10, 0}, {11, 0}, {111, 0}, {1, 1}, {21, 1}, {2, 2}, {9, 2}, {22, 2}};
+    for (auto& c : lv) CHECK_EQ(i18n::pluralIndex("lv", c[0]), c[1]);
+    const int ro[][2] = {{1, 0}, {0, 1}, {2, 1}, {19, 1}, {101, 1}, {119, 1}, {20, 2}, {100, 2}, {120, 2}};
+    for (auto& c : ro) CHECK_EQ(i18n::pluralIndex("ro", c[0]), c[1]);
+    const int sl[][2] = {{1, 0}, {101, 0}, {2, 1}, {102, 1}, {3, 2}, {4, 2}, {5, 3}, {0, 3}, {11, 3}};
+    for (auto& c : sl) CHECK_EQ(i18n::pluralIndex("sl", c[0]), c[1]);
+    for (const char* code : {"pt-BR", "hi"}) {
+        CHECK_EQ(i18n::pluralIndex(code, 0), 0);
+        CHECK_EQ(i18n::pluralIndex(code, 1), 0);
+        CHECK_EQ(i18n::pluralIndex(code, 2), 1);
+    }
+    CHECK_EQ(i18n::pluralIndex("pt", 0), 1);
+    CHECK_EQ(i18n::pluralIndex("pt", 1), 0);
+    for (const char* code : {"ko", "id", "vi"}) {
+        CHECK_EQ(i18n::pluralIndex(code, 1), 0);
+        CHECK_EQ(i18n::pluralIndex(code, 7), 0);
+        CHECK_EQ(i18n::pluralForms(code), 1);
+    }
+    CHECK_EQ(i18n::pluralForms("sl"), 4);
+    CHECK_EQ(i18n::pluralForms("lv"), 3);
+    CHECK_EQ(i18n::pluralForms("ro"), 3);
+    CHECK_EQ(i18n::pluralForms("pt-BR"), 2);
+    // Every language of the list has a rule (the default two forms are right for the others).
+    for (const i18n::Language& l : i18n::languages()) CHECK(i18n::pluralForms(l.code) >= 1);
 }
 
 // The toast of the points given back after a cheater's ban: a refund of 1 point is common (a
@@ -337,7 +402,18 @@ TEST(i18n_match_locale) {
     CHECK_EQ(i18n::matchLocale("zh_CN"), std::string("zh-Hans"));
     CHECK_EQ(i18n::matchLocale("zh-SG"), std::string("zh-Hans"));
     CHECK_EQ(i18n::matchLocale("zh"), std::string("zh-Hans"));
-    CHECK_EQ(i18n::matchLocale("pt_BR"), std::string("en"));
+    CHECK_EQ(i18n::matchLocale("pt_BR"), std::string("pt-BR"));
+    CHECK_EQ(i18n::matchLocale("pt-BR"), std::string("pt-BR"));
+    CHECK_EQ(i18n::matchLocale("pt_PT.UTF-8"), std::string("pt"));
+    CHECK_EQ(i18n::matchLocale("pt-AO"), std::string("pt"));
+    CHECK_EQ(i18n::matchLocale("pt"), std::string("pt"));
+    CHECK_EQ(i18n::matchLocale("in_ID"), std::string("id"));   // Indonesian's old code
+    CHECK_EQ(i18n::matchLocale("id-ID"), std::string("id"));
+    CHECK_EQ(i18n::matchLocale("ko_KR.UTF-8"), std::string("ko"));
+    CHECK_EQ(i18n::matchLocale("hi-IN"), std::string("hi"));
+    CHECK_EQ(i18n::matchLocale("el_GR"), std::string("el"));
+    CHECK_EQ(i18n::matchLocale("sv_FI"), std::string("sv"));
+    CHECK_EQ(i18n::matchLocale("nb_NO"), std::string("en"));   // not a game language
     CHECK_EQ(i18n::matchLocale("C"), std::string("en"));
     CHECK_EQ(i18n::matchLocale(""), std::string("en"));
 }
@@ -494,4 +570,152 @@ TEST(unicode_upper_case) {
     CHECK(uni::toUpper(char32_t(0x0153)) == 0x0152);  // œ
     CHECK(uni::toUpper(char32_t(0x3042)) == 0x3042);  // no case
     CHECK(uni::isLower('a') && !uni::isLower('A') && !uni::isLower(0x0628));
+    // Romanian comma-below letters, Vietnamese horn and dot-below letters.
+    CHECK(uni::toUpper(char32_t(0x0219)) == 0x0218);  // ș
+    CHECK(uni::toUpper(char32_t(0x021B)) == 0x021A);  // ț
+    CHECK(uni::toUpper(char32_t(0x01A1)) == 0x01A0);  // ơ
+    CHECK(uni::toUpper(char32_t(0x01B0)) == 0x01AF);  // ư
+    CHECK(uni::toUpper(char32_t(0x1EA1)) == 0x1EA0);  // ạ
+    CHECK(uni::toUpper(char32_t(0x1EC5)) == 0x1EC4);  // ễ
+    CHECK(uni::toUpper(char32_t(0x1EF9)) == 0x1EF8);  // ỹ
+    CHECK(uni::toUpper(char32_t(0x1EA0)) == 0x1EA0);
+    CHECK(uni::isLower(0x1EDD) && !uni::isLower(0x1EDC));  // ờ / Ờ
+    CHECK_EQ(uni::toUpper("c\xE1\xBB\x9D vua"), std::string("C\xE1\xBB\x9C VUA"));   // cờ vua
+    // Greek: a sentence's first letter keeps its tonos, all caps drop it (the diaeresis stays).
+    CHECK(uni::toUpper(char32_t(0x03AD)) == 0x0388);   // έ -> Έ
+    CHECK(uni::toCapital(0x03AD) == 0x0395);           // έ -> Ε
+    CHECK(uni::toCapital(0x0388) == 0x0395);           // Έ -> Ε
+    CHECK(uni::toCapital(0x03CA) == 0x03AA);           // ϊ -> Ϊ
+    CHECK(uni::toCapital(0x0390) == 0x03AA);           // ΐ -> Ϊ
+    CHECK(uni::toUpper(char32_t(0x03C2)) == 0x03A3);   // final sigma
+    CHECK_EQ(uni::toUpper("\xCE\xBA\xCE\xAF\xCE\xBD\xCE\xB7\xCF\x83\xCE\xB7"),
+             std::string("\xCE\x9A\xCE\x99\xCE\x9D\xCE\x97\xCE\xA3\xCE\x97"));   // κίνηση -> ΚΙΝΗΣΗ
+    // Turkish dotted and dotless i.
+    CHECK(uni::toUpper(char32_t('i'), true) == 0x0130);
+    CHECK(uni::toUpper(char32_t('i')) == 'I');
+    CHECK(uni::toUpper(char32_t(0x0131), true) == 'I');
+    CHECK_EQ(uni::toUpper("bitir", "tr"), std::string("B\xC4\xB0T\xC4\xB0R"));   // BİTİR
+    CHECK_EQ(uni::toUpper("bitir", "en"), std::string("BITIR"));
+    CHECK_EQ(uni::toUpper("\xC4\xB1sl\xC4\xB1k", "tr"), std::string("ISLIK"));   // ıslık
+}
+
+// Hangul and Devanagari are their own scripts (their own fonts); Devanagari's non-spacing signs
+// are marks, its spacing vowel signs are not.
+TEST(unicode_hangul_and_devanagari_scripts) {
+    CHECK(uni::isHangul(0xD55C) && uni::isHangul(0xAC00) && uni::isHangul(0xD7A3) && uni::isHangul(0x3131));
+    CHECK(!uni::isHangul(0x4E00) && !uni::isHangul('a'));
+    CHECK(uni::isDevanagari(0x0939) && uni::isDevanagari(0x094D) && uni::isDevanagari(uni::kDevanagariClusterFirst));
+    CHECK(!uni::isDevanagari(0x0627) && !uni::isDevanagari(0xF000));
+    CHECK(uni::isMark(0x0941) && uni::isMark(0x094D) && uni::isMark(0x0902) && uni::isMark(0x093C));
+    CHECK(!uni::isMark(0x093F) && !uni::isMark(0x0940) && !uni::isMark(0x093E) && !uni::isMark(0x0903));
+    CHECK(!uni::isMark(0x0939) && !uni::isMark(0x0964));
+}
+
+// Devanagari orthographic syllables: consonant clusters joined by virama with their signs and
+// bindus, independent vowels with theirs; anything else belongs to no syllable.
+TEST(unicode_devanagari_syllables) {
+    auto syllables = [](const char* utf8) {
+        std::u32string t = U(utf8);
+        std::vector<std::string> out;
+        for (const auto& s : uni::devanagariSyllables(t)) out.push_back(uni::encode(t.substr(size_t(s.first), size_t(s.second - s.first))));
+        return out;
+    };
+    // हिन्दी = हि + न्दी
+    CHECK(syllables("\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80") ==
+          std::vector<std::string>({"\xE0\xA4\xB9\xE0\xA4\xBF", "\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80"}));
+    // ऊँट = ऊँ + ट; a final virama stays with its consonant (क्)
+    CHECK(syllables("\xE0\xA4\x8A\xE0\xA4\x81\xE0\xA4\x9F") ==
+          std::vector<std::string>({"\xE0\xA4\x8A\xE0\xA4\x81", "\xE0\xA4\x9F"}));
+    CHECK(syllables("\xE0\xA4\x95\xE0\xA5\x8D") == std::vector<std::string>({"\xE0\xA4\x95\xE0\xA5\x8D"}));
+    // घोड़ा: the nukta stays with its consonant (ड़ा)
+    CHECK(syllables("\xE0\xA4\x98\xE0\xA5\x8B\xE0\xA4\xA1\xE0\xA4\xBC\xE0\xA4\xBE") ==
+          std::vector<std::string>({"\xE0\xA4\x98\xE0\xA5\x8B", "\xE0\xA4\xA1\xE0\xA4\xBC\xE0\xA4\xBE"}));
+    // Latin, digits, spaces and the danda are outside syllables.
+    const std::u32string mixed = U("e4 \xE0\xA4\x95\xE0\xA4\xBE\xE0\xA5\xA4");   // e4 का।
+    const auto spans = uni::devanagariSyllables(mixed);
+    REQUIRE(spans.size() == 1u);
+    CHECK_EQ(spans[0].first, 3);
+    CHECK_EQ(spans[0].second, 5);
+}
+
+// The fonts' precomposed syllables (assets/fonts/devanagari-clusters.txt, loaded by i18n) replace
+// the syllables of a text; every other character and the sources stay as they were.
+TEST(unicode_devanagari_precomposed_syllables) {
+    i18n::tr("menu.play");   // loads English and the syllable table
+    const std::u32string hi = U("\xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80");   // हिन्दी
+    const char32_t a = uni::devanagariCluster(hi.substr(0, 2));
+    const char32_t b = uni::devanagariCluster(hi.substr(2));
+    REQUIRE(a >= uni::kDevanagariClusterFirst && a <= uni::kDevanagariClusterLast);
+    REQUIRE(b >= uni::kDevanagariClusterFirst && b <= uni::kDevanagariClusterLast);
+    CHECK(a != b);
+    const uni::Shaped sh = uni::shape(U("A \xE0\xA4\xB9\xE0\xA4\xBF\xE0\xA4\xA8\xE0\xA5\x8D\xE0\xA4\xA6\xE0\xA5\x80!"));
+    REQUIRE(sh.text.size() == 5u);
+    CHECK(sh.text[0] == 'A' && sh.text[1] == ' ' && sh.text[2] == a && sh.text[3] == b && sh.text[4] == '!');
+    CHECK(sh.source == std::vector<int>({0, 1, 2, 4, 8}));
+    CHECK(uni::devanagariCluster(U("ab")) == 0);
+    // The table's own format: hexadecimal codepoint, a space, the syllable; '#' comments.
+    CHECK_EQ(uni::setDevanagariClusters("# test\nE001 \xE0\xA4\x95\xE0\xA4\xBF\nzz\n12 \xE0\xA4\x95\xE0\xA5\x81\n"), 1);
+    CHECK(uni::devanagariCluster(U("\xE0\xA4\x95\xE0\xA4\xBF")) == 0xE001);
+    CHECK(uni::devanagariCluster(U("\xE0\xA4\x95\xE0\xA5\x81")) == 0);   // outside the Private Use range
+    CHECK_EQ(uni::setDevanagariClusters(embedded::text("assets/fonts/devanagari-clusters.txt")) > 1000, true);
+    // No table: the text is left as it is.
+    uni::setDevanagariClusters("");
+    CHECK(uni::shape(hi).text == hi);
+    uni::setDevanagariClusters(embedded::text("assets/fonts/devanagari-clusters.txt"));
+}
+
+// Every syllable of the Hindi texts (UI, coach subtitles, opening names) is drawn right: either a
+// precomposed glyph of the fonts, or letters the fonts draw side by side (a consonant or vowel with
+// spacing vowel signs only, or a syllable prepare_fonts.py found the fonts draw right as plain glyphs:
+// the "- " lines of devanagari-clusters.txt). tools/prepare_fonts.py must be run again when this fails.
+TEST(devanagari_clusters_cover_the_hindi_texts) {
+    i18n::tr("menu.play");
+    std::set<std::u32string> drawnPlain;
+    {
+        const std::string list = embedded::text("assets/fonts/devanagari-clusters.txt");
+        size_t pos = 0;
+        while (pos < list.size()) {
+            size_t end = list.find('\n', pos);
+            if (end == std::string::npos) end = list.size();
+            if (list.compare(pos, 2, "- ") == 0) drawnPlain.insert(uni::decode(list.substr(pos + 2, end - pos - 2)));
+            pos = end + 1;
+        }
+    }
+    CHECK(!drawnPlain.empty());
+    auto plain = [](const std::u32string& syl) {
+        for (size_t i = 1; i < syl.size(); ++i) {
+            const char32_t c = syl[i];
+            if (!(c == 0x093E || c == 0x0940 || (c >= 0x0949 && c <= 0x094C) || c == 0x0903 || c == 0x093B ||
+                  c == 0x094E || c == 0x094F))
+                return false;
+        }
+        return true;
+    };
+    std::vector<std::string> paths = {"assets/i18n/hi.lang", "assets/coach/openings/hi.lang"};
+    for (const char* f : {"common", "events", "lesson", "challenge", "analysis", "appraisal", "review"})
+        paths.push_back(std::string("assets/coach/speech/hi/") + f + ".lang");
+    int texts = 0, missing = 0;
+    for (const std::string& path : paths) {
+        REQUIRE(embedded::find(path.c_str()) != nullptr);
+        const std::string text = embedded::text(path.c_str());
+        size_t pos = 0;
+        while (pos < text.size()) {
+            size_t end = text.find('\n', pos);
+            if (end == std::string::npos) end = text.size();
+            const std::string line = text.substr(pos, end - pos);
+            pos = end + 1;
+            const size_t eq = line.find('=');
+            if (line.empty() || line[0] == '#' || eq == std::string::npos) continue;
+            if (line.substr(0, eq).find(".spoken") != std::string::npos) continue;
+            const std::u32string v = uni::decode(line.substr(eq + 1));
+            ++texts;
+            for (const auto& s : uni::devanagariSyllables(v)) {
+                const std::u32string syl = v.substr(size_t(s.first), size_t(s.second - s.first));
+                if (syl.size() < 2 || plain(syl) || uni::devanagariCluster(syl) || drawnPlain.count(syl)) continue;
+                if (++missing <= 10) std::fprintf(stderr, "  %s: syllable \"%s\" has no precomposed glyph\n", path.c_str(), uni::encode(syl).c_str());
+            }
+        }
+    }
+    CHECK(texts > 1000);
+    CHECK_EQ(missing, 0);
 }

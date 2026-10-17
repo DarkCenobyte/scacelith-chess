@@ -1,0 +1,137 @@
+# Coach speech (Hindi): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 स्थितियाँ", count.position in common.lang);
+#            "{n:move_obl}" is the oblique count before a postposition: "{n:move_obl} में मात" = "3 चालों में
+#            मात" / "1 चाल में मात", "{n:move_obl} तक" = "3 चालों तक"
+#   {move}   one of the coach's moves, played on the board while the line is said; a spoken move may
+#            hold a verb ("... पर काटता है"), so it comes after a colon or before a comma, never before
+#            a postposition or a verb; "{move:nomate}" says a mating move without "शह और मात"
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the subject
+#            of these lines (imperatives), so they use the reflexive "अपना": {your:refl_ko} = "अपने घोड़े को"
+#   {sq}     a square; the coach points at it on that word ("{sq} पर", "{sq} खाने को")
+# The player always has the white pieces. The coach says "तुम" and is male ("मैं जवाब देता"); no verb
+# agrees with the player. Each intro starts with the challenge's name exactly as assets/i18n/hi.lang
+# writes it (challenge.<id>.name), even where the menu's polite "-ें" form differs from the coach's "तुम".
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = एक चाल में मात। {n:position}, और हर बार सिर्फ़ एक चाल से मात होती है। हर शह को देखो।
+ch.intro.mate2 = दो चालों में मात। {n:position}: तुम्हारी पहली चाल के बाद मेरे पास कोई बचाव नहीं बचना चाहिए, फिर मात दो।
+ch.intro.mate3 = तीन चालों में मात। {n:position}। शह, काटने वाली चालें और ख़तरे: हर बार मेरा सबसे अच्छा जवाब निकालो।
+ch.intro.backrank = पिछली रैंक पर मात। {n:position}, जहाँ राजा अपने ही प्यादों के पीछे फँसा है।
+ch.intro.patterns = मात के पैटर्न। क्लासिक मात-जाल वाली {n:position}। पैटर्न पहचानो, फिर वार करो।
+ch.intro.hanging = मुफ़्त मोहरे। {n:position}: मेरा कुछ न कुछ असुरक्षित छूटा है। उसे ढूँढो और काट लो।
+ch.intro.fork = फ़ोर्क। {n:position}: वह चाल ढूँढो, जो एक साथ दो चीज़ों पर हमला करे।
+ch.intro.pin = पिन। {n:position}: किसी मोहरे को पिन करो, या किसी पिन का फ़ायदा उठाओ।
+ch.intro.skewer = स्क्यूअर। {n:position}: किसी क़ीमती मोहरे पर हमला करो, और उसके पीछे जो है, उसे जीत लो।
+ch.intro.discovered = डिस्कवर्ड अटैक। {n:position}: एक मोहरे को हटाकर दूसरे मोहरे का हमला खोलो।
+ch.intro.deflection = डिफ़्लेक्शन और डिकॉय। {n:position}: किसी रक्षक को दूर भटकाओ, या उसे किसी घातक खाने पर खींच लाओ।
+ch.intro.intermezzo = बीच की चालें। {n:position}: ज़ाहिर चाल से पहले, उससे ज़्यादा ताक़तवर चाल ढूँढो।
+ch.intro.trapped = फँसे हुए मोहरे। {n:position}: मेरे एक मोहरे के पास जाने को कोई सुरक्षित खाना नहीं है। उसे जीत लो।
+ch.intro.promotion = प्रमोशन। {n:position}, जहाँ आगे बढ़ा हुआ प्यादा बाज़ी का फ़ैसला करता है।
+ch.intro.quiet = शांत चालें। {n:position}: जीतने वाली चाल न शह देती है, न कुछ काटती है।
+ch.intro.opening = ओपनिंग के जाल। {n:position}, असली बाज़ियों की शुरुआती चालों से। मेरी ग़लती की सज़ा दो।
+ch.intro.escape = बचने का रास्ता खोजें। {n:position}: तुम्हारा राजा ख़तरे में है, और सिर्फ़ एक चाल उसे बचाती है।
+ch.intro.defend = बचाव की चालें। {n:position}: वह एक चाल ढूँढो, जो तुम्हारी स्थिति को सँभाले रखे।
+ch.intro.kq = वज़ीर और राजा बनाम राजा। {n:position}: मेरे राजा को मात दो। स्टेलमेट से सावधान।
+ch.intro.kr = हाथी और राजा बनाम राजा। {n:position}: मेरे राजा को क़दम-दर-क़दम मात दो।
+ch.intro.kp = राजा और प्यादा बनाम राजा। {n:position}: प्यादे को वज़ीर बनाओ। अपने राजा को आगे रखो।
+ch.intro.kp_hold = प्यादे को रोकें। {n:position}: तुम्हारे पास सिर्फ़ राजा है। ड्रॉ बचाओ।
+ch.intro.rook = हाथी के एंडगेम। {n:position}: प्रमोशन के लिए पुल बनाओ, और फ़िलिडोर के बचाव से ड्रॉ बचाओ।
+ch.intro.endgame = एंडगेम टैक्टिक्स। कम मोहरों और तीखे विचारों वाली {n:position}।
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = {n:move_obl} में मात।
+ch.task.mate.2 = {n:move_obl} में मात ढूँढो।
+ch.task.hanging = कुछ असुरक्षित छूटा हुआ है।
+ch.task.hanging.2 = मुफ़्त में क्या काटा जा सकता है?
+ch.task.fork = फ़ोर्क ढूँढो।
+ch.task.fork.2 = कोई फ़ोर्क तलाशो।
+ch.task.pin = यहाँ पिन ही कुंजी है।
+ch.task.skewer = यहाँ स्क्यूअर से जीत मिलती है।
+ch.task.discovered = यहाँ डिस्कवर्ड अटैक से जीत मिलती है।
+ch.task.deflection = किसी रक्षक पर ज़्यादा बोझ डालो, या उसे लालच देकर फँसाओ।
+ch.task.intermezzo = बीच की कोई चाल तलाशो।
+ch.task.trapped = मेरा एक मोहरा भाग नहीं सकता। उसे जीत लो।
+ch.task.promotion = अपने आगे बढ़े हुए प्यादे का इस्तेमाल करो।
+ch.task.quiet = जीतने वाली चाल एक शांत चाल है।
+ch.task.opening = मेरी पिछली चाल की सज़ा दो।
+ch.task.escape = अपने राजा को बचाओ: सिर्फ़ एक चाल काम करती है।
+ch.task.defend = एकमात्र अच्छी चाल ढूँढो।
+ch.task.endgame = सबसे अच्छी चाल ढूँढो।
+ch.task.default = सबसे अच्छी चाल ढूँढो।
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = मेरे राजा को मात दो। मैं जितना हो सके, अच्छा बचाव करूँगा।
+ch.task.play.promote = अपने प्यादे का प्रमोशन करो, और जीत बनाए रखो। मैं तुम्हें रोकने की कोशिश करूँगा।
+ch.task.play.hold = {n:move_obl} तक ड्रॉ बचाए रखो। मैं जीतने की कोशिश करूँगा।
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = ये स्थितियाँ असली बाज़ियों से ली गई हैं। आख़िरी चाल मैं चलता हूँ, फिर तुम्हारी बारी।
+ch.lead.first.2 = हर स्थिति किसी असली बाज़ी से है: मैं वह चाल चलता हूँ, जिससे यह स्थिति बनी, फिर तुम खेलो।
+ch.next = अगली स्थिति।
+ch.next.2 = यह रही अगली।
+ch.next.3 = चलो, अगली की ओर।
+ch.last = आख़िरी स्थिति।
+ch.last.2 = और अब आख़िरी।
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = अच्छा।
+ch.good.2 = हाँ।
+ch.good.3 = सही।
+ch.good.4 = बिल्कुल।
+# The position is solved.
+ch.solved = यही है! शाबाश।
+ch.solved.2 = बिल्कुल सही।
+ch.solved.3 = बहुत बढ़िया।
+ch.solved.mate = शह और मात! शाबाश।
+ch.solved.mate.2 = और यह मात है। बहुत बढ़िया।
+ch.solved.mate.3 = शह और मात। बहुत ख़ूब।
+ch.solved.promote = नया वज़ीर, और जीत पक्की। शाबाश।
+ch.solved.hold = ड्रॉ बच गया। बढ़िया बचाव!
+ch.solved.draw = बोर्ड पर ड्रॉ। बढ़िया बचाव!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = यह चाल नहीं। मैं जवाब देता: {move}।
+ch.wrong.reply.2 = पूरी तरह सही नहीं। मैं जवाब में खेलता: {move}।
+ch.wrong.reply.3 = तब मैं खेलता: {move}।
+ch.wrong.mate = सावधान: {move:nomate}, और यह मात होती।
+ch.wrong.mate.2 = संभलकर! मेरा जवाब होता: {move:nomate}, और यह मात है।
+ch.wrong.mated = सावधान: {move}, और उसके बाद मैं {m:move_obl} में मात पक्की कर सकता हूँ।
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = इससे भी मात होती है, पर इसमें ज़्यादा चालें लगती हैं। एक तेज़ रास्ता है।
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = इससे भी मात होती है, पर मेरे मन में कोई और चाल है। फिर से देखो।
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = बुरा नहीं, पर इससे भी ज़ोरदार चाल है। फिर से देखो।
+ch.wrong.weaker.2 = यह चाल खेली जा सकती है, पर इससे बेहतर खेला जा सकता है।
+ch.wrong.stalemate = स्टेलमेट! मेरा राजा चल नहीं सकता, और यह सिर्फ़ ड्रॉ है।
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = यह चाल नहीं: {move}, और मैं ड्रॉ बचा सकता हूँ।
+ch.wrong.loses = सावधान: {move}, और फिर बाज़ी मेरे हाथ में होती।
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = यह वह चाल नहीं है।
+ch.try_again = फिर से कोशिश करो।
+ch.try_again.2 = एक बार और देखो।
+ch.try_again.3 = फिर से देखो।
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = संकेत चाहिए?
+ch.offer.2 = क्या मैं कोई संकेत दूँ?
+ch.no_hint = ठीक है। ढूँढते रहो।
+ch.no_hint.2 = अच्छा, आराम से सोचो।
+ch.hint.piece = {your:refl_ko} देखो।
+ch.hint.piece.2 = {your:refl_ke} बारे में सोचो।
+ch.hint.square = {sq} खाने को देखो।
+ch.hint.square.2 = सबसे अहम खाना {sq} है।
+ch.hint.square.3 = {sq} पर नज़र रखो।
+ch.hint.show = यह रही चाल। देखो।
+ch.hint.show.2 = मैं दिखाता हूँ। देखो।
+ch.hint.now = अब तुम यह चाल चलो।
+ch.hint.now.2 = तुम्हारी बारी: यही चाल चलो।
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = पूरी चुनौती हल हो गई। शाबाश!
+ch.complete.2 = हर स्थिति हल हो गई। शाबाश!

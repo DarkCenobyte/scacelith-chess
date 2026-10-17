@@ -1,0 +1,111 @@
+# Coach speech (Finnish): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# Register: standard Finnish, the coach says "sinä" (glossary/fi.md). Finnish has no grammatical
+# gender, so nothing agrees with the player's or the coach's sex. "Let's" is the passive
+# ("Pelataan", "Jatketaan"); White / Black as sides: "valkeat", "mustat" (pelaat valkeilla).
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Hei! Pelataan yhdessä leppoisa peli. Autan sinua aina, kun jokin menee pieleen.
+event.greet.l1.2 = Hei! Pelaan lempeästi ja näytän, mitä kannattaa varoa.
+event.greet.l1.3 = Tervetuloa! Mieti rauhassa: kerron, kun jokin nappula on vaarassa.
+event.greet.l2 = Hei! Pelataan. Kun laudalle tulee haarukka tai kiinnitys, näytän sen sinulle.
+event.greet.l2.2 = Hei! Kehitä upseerisi ja pidä kuninkaasi turvassa. Autan matkan varrella.
+event.greet.l2.3 = Tervetuloa takaisin laudan ääreen! Pidä silmällä haarukoita ja kiinnityksiä: niillä voitetaan pelejä.
+event.greet.l3 = Hei! Pelataan oikea peli. Kommentoin suunnitelmiasi ja isompia virheitä.
+event.greet.l3.2 = Hei! Mieti nappuloillesi suunnitelma. Kerron, kun siirto jättää jotain huomiotta.
+event.greet.l3.3 = Pelataan! Kerron, milloin on vain yksi hyvä siirto ja milloin siirto menee pieleen.
+event.greet.l4 = Hei! Tällä kertaa annan asema-arvioita ja näytän paremmat ehdokassiirrot.
+event.greet.l4.2 = Pelataan. Virheen jälkeen kerron, mikä olisi ollut tarkempaa.
+event.greet.l4.3 = Valmis kerhopeliin? Kommentoin, kun arvio muuttuu.
+event.greet.l5 = Pelataan. Pidän kommenttini lyhyinä.
+event.greet.l5.2 = Aloitetaan, kun olet valmis. Vain lyhyitä kommentteja.
+event.greet.l5.3 = Onnea peliin. Puhun vain, kun sillä on merkitystä.
+event.greet.l6 = Onnea.
+event.greet.l6.2 = Pelataan.
+event.greet.l6.3 = Olen valmis. Kommentoin vain kriittisiä hetkiä.
+
+# Who starts (said after the greeting).
+event.colour.white = Sinulla on valkeat nappulat, joten sinä aloitat.
+event.colour.white.2 = Pelaat valkeilla: sinä siirrät ensin.
+event.colour.black = Minulla on valkeat, joten minä aloitan.
+event.colour.black.2 = Pelaat tällä kertaa mustilla: minä siirrän ensin.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (coach.level.<n>.name in assets/i18n/fi.lang):
+# Ensiaskeleet, Aloittelija, Edistyvä, Kerhopelaaja, Vahva kerhopelaaja, Asiantuntija.
+event.level.l1 = Ensiaskeleet: pelaan lempeästi ja selitän jokaisen virheen yksinkertaisin sanoin.
+event.level.l2 = Aloittelija: pelaan hieman vahvemmin ja nimeän yksinkertaiset taktiset keinot, kuten haarukat ja kiinnitykset.
+event.level.l3 = Edistyvä: puhun suunnitelmista ja sotilasrakenteesta sekä näytän lyhyitä muunnelmia.
+event.level.l4 = Kerhopelaaja: annan arviot sotilasyksikköinä ja ehdotan ehdokassiirtoja.
+event.level.l5 = Vahva kerhopelaaja: lyhyitä kommentteja ja pidempiä muunnelmia silloin, kun sillä on väliä.
+event.level.l6 = Asiantuntija: pelaan parhaani mukaan ja kommentoin vain kriittisiä hetkiä.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Sinun siirtosi.
+event.your_move.2 = Sinun vuorosi.
+event.your_move.3 = Ole hyvä.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Mieti rauhassa.
+event.take_time.2 = Ei kiirettä: meidän peleissämme ei ole kelloa.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Katsotaanpa.
+event.filler.3 = Hetkinen, katson.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Selvä, perutaan siirto.
+event.takeback.taken.2 = Hyvä ajatus. Katso asemaa vielä kerran.
+event.takeback.taken.3 = Siirto peruttu. Yritä uudelleen.
+# The player declined the offer and played on.
+event.takeback.declined = Selvä, jatketaan peliä.
+event.takeback.declined.2 = Hyvä on, peli jatkuu.
+event.takeback.declined.3 = Sinä päätät. Jatketaan.
+# After an explanation without an offer.
+event.play_on = Jatketaan peliä.
+event.play_on.2 = Jatketaan.
+event.play_on.3 = No niin, takaisin peliimme.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Tällaisia virheitä sattuu kaikille. Tärkeintä on huomata ne.
+event.encourage.mistake.2 = Ei hätää. Katso, mitä viimeinen siirtoni uhkaa, niin löydät sen.
+event.encourage.mistake.3 = Näin käy jokaiselle pelaajalle. Jatketaan.
+# The player is behind (material or evaluation).
+event.encourage.behind = Älä anna periksi: etsi mahdollisuuksia ja pakota minut tekemään töitä voiton eteen.
+event.encourage.behind.2 = Taistele edelleen. Tällaiset asemat voivat vielä kääntyä.
+event.encourage.behind.3 = Pysy rauhallisena ja etsi heikkouksiani.
+# The player has played several good moves in a row.
+event.encourage.well = Tarkistat uhkani ennen kuin siirrät. Hienoa.
+event.encourage.well.2 = Huolellisia, vankkoja siirtoja. Jatka samaan malliin.
+event.encourage.well.3 = Ajatus kulkee tänään hyvin.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Hyväksyn. Tasapeli siis.
+event.draw.accepted.2 = Sovittu: peli päättyy tasapeliin.
+event.draw.declined = Ei kiitos, jatketaan peliä.
+event.draw.declined.2 = Jatkaisin mieluummin.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Hyvin pelattu. Onnittelut!
+event.end.win.2 = Ansaitsit voiton. Hienoa!
+event.end.win.3 = Onnittelut: voitit minut reilusti.
+event.end.loss = Hyvä peli. Ensi kerralla otat minusta mittaa.
+event.end.loss.2 = Kiitos pelistä. Jokainen tappio opettaa jotakin.
+event.end.loss.3 = Hyvä taistelu. Katsotaan, mitä tapahtui.
+event.end.draw = Tasapeli. Hyvä peli!
+event.end.draw.2 = Tällä kertaa kumpikaan ei voittanut. Hyvin taisteltu.
+event.end.draw.3 = Reilu tulos. Hyvä peli.
+event.end.resigned = Luovutit. Hyvä taistelu silti.
+event.end.resigned.2 = Selvä. Kiitos pelistä.
+event.end.handshake = Kätellään.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it
+# stands after a colon, or in quotes after "kohtaan" (a quoted title keeps its nominative).
+event.lesson.resume = Tervetuloa takaisin! Jatketaan oppituntia: {chapter}.
+event.lesson.resume.2 = Hei taas! Viimeksi jäimme kohtaan ”{chapter}”.
+event.lesson.next = Seuraavaksi: {chapter}.
+event.lesson.next.2 = Nyt vuorossa: {chapter}.

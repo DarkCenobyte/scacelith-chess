@@ -157,7 +157,10 @@ TEST(coach_catalog_speech_language) {
     CHECK_EQ(coach::speechLanguage("ar"), std::string("ar"));
     CHECK_EQ(coach::speechLanguage("zh-Hans"), std::string("en"));
     CHECK_EQ(coach::speechLanguage("zh-Hant"), std::string("en"));
-    CHECK_EQ(coach::speechLanguage("pt"), std::string("en"));
+    CHECK_EQ(coach::speechLanguage("pt"), std::string("pt"));
+    CHECK_EQ(coach::speechLanguage("pt-BR"), std::string("pt-BR"));   // its own lines, the Portuguese voice
+    CHECK_EQ(coach::speechLanguage("hi"), std::string("hi"));
+    CHECK_EQ(coach::speechLanguage("xx"), std::string("en"));
     CHECK(!coach::speechSupported("zh-Hans"));
 }
 
@@ -171,7 +174,9 @@ TEST(coach_catalog_speech_supported_is_the_voice_list) {
         CHECK_EQ(coach::speechSupported(c), tts::languageSupported(c));
         spoken += coach::speechSupported(c) ? 1 : 0;
     }
-    CHECK_EQ(spoken, 8);   // en fr de es ru uk ar ja: every interface language but the two Chinese
+    // Every interface language but the two Chinese, "pt" and "en-GB" (a regional code speaks its
+    // language); not "EN" (codes are lower case).
+    CHECK_EQ(spoken, int(i18n::languages().size()) - 2 + 2);
 }
 
 TEST(coach_catalog_loads_every_topic) {
@@ -278,6 +283,19 @@ TEST(coach_catalog_pieces_squares_numbers) {
     Line lit = line("t");
     lit.with("x", Arg::ofText("anything else"));
     CHECK_EQ(written(c, lit), std::string("Next: anything else."));
+}
+
+TEST(coach_catalog_greek_question_mark_starts_a_sentence) {
+    // Greek writes its question mark as ';' (U+037E is normalised to it): a piece after it starts a
+    // sentence. In other languages ';' is a semicolon, so the piece after it stays lowercase.
+    Catalog c;
+    testCatalog(c, "q = Why; {my} attacks.\n");
+    c.addFile("el", "common", realFile("el", "common"));
+    c.addFile("el", "test", "q = Γιατί; {my} επιτίθεται.\n");
+    Line l = line("q");
+    l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false));
+    CHECK_EQ(written(c, l, "el"), std::string("Γιατί; Ο πύργος μου επιτίθεται."));
+    CHECK_EQ(written(c, l), std::string("Why; my rook attacks."));
 }
 
 TEST(coach_catalog_moves_and_lines) {

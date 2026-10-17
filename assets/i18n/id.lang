@@ -1,0 +1,1439 @@
+# Scacelith - Bahasa Indonesia
+#
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: Indonesian has a single form
+# (a noun after a number stays singular: "3 langkah"), so plural values have one form and no '|'.
+# Register: formal "Anda" (always capitalised) and imperatives without a pronoun on buttons, as in
+# Indonesian software. Chess terms follow the Indonesian glossary (glossary/id.md): menteri, benteng,
+# gajah, kuda, remis, skakmat, pat, rokade; piece letters R M B G K. Units: "dtk" (detik) and "mnt"
+# (menit) as Indonesian software abbreviates them; ms, MB, m/s and Elo stay as they are.
+# Titles are in capitals (the title face is an inscriptional capital face).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Aktif
+common.off = Nonaktif
+common.back = Kembali
+common.apply = Terapkan
+common.discard = Buang
+common.cancel = Batal
+common.white = Putih
+common.black = Hitam
+common.main_menu = Menu utama
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Permainan Para Raja
+menu.new_game = Permainan Baru
+menu.options = Opsi
+menu.credits = Kredit
+menu.quit = Keluar
+menu.version = Versi {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPSI
+options.tab.display = Tampilan
+options.tab.graphics = Grafis
+options.tab.audio = Audio
+options.tab.gameplay = Permainan
+options.tab.player = Pemain
+options.tab.controls = Kontrol
+options.pending = Perubahan berlaku setelah diterapkan.
+options.unsaved.title = PERUBAHAN BELUM DISIMPAN
+options.unsaved.text = Beberapa opsi telah diubah. Terapkan sebelum keluar?
+
+options.language = Bahasa
+options.language.help = Bahasa untuk menu dan pesan. Perubahan langsung berlaku.
+options.language.not_adapted = Bahasa ini belum sepenuhnya disesuaikan: suara pelatih mungkin salah mengucapkan beberapa kata, dan beberapa teks mungkin masih terasa janggal.
+options.display_mode = Mode tampilan
+options.display_mode.help = Layar penuh: jendela tanpa bingkai yang menutupi seluruh layar, dengan resolusi desktop. Berjendela: jendela dengan ukuran di bawah ini.
+options.fullscreen = Layar penuh
+options.windowed = Berjendela
+options.window_size = Ukuran jendela
+options.window_size.help = Ukuran jendela dalam mode berjendela. Layar penuh selalu memakai resolusi desktop.
+options.vsync = Sinkronisasi vertikal
+options.vsync.help = Menyinkronkan frame dengan layar untuk mencegah gambar robek (tearing).
+options.render_scale = Skala render
+options.render_scale.help = Resolusi internal gambar 3D. Makin rendah makin cepat, makin tinggi makin tajam.
+
+options.quality = Kualitas
+options.quality.very_low = Sangat rendah
+options.quality.low = Rendah
+options.quality.medium = Sedang
+options.quality.high = Tinggi
+options.quality.ultra = Ultra
+options.quality.custom = Kustom
+options.quality.help = Mengatur semua opsi di bawah ini sekaligus: Sangat rendah mematikan semua efek, Ultra menyetel semuanya ke maksimum. Mengubah satu opsi secara terpisah menjadikannya Kustom. Pada kartu grafis yang sederhana, menurunkan skala render (Tampilan) juga sangat membantu.
+options.shadows = Bayangan
+options.shadows.help = Detail bayangan matahari dan kelembutan tepinya. Rendah: tepi biasa, cepat digambar.
+options.reflections = Pantulan
+options.reflections.help = Lantai, meja, dan papan memantulkan ruangan (ruangan digambar sekali lagi untuk masing-masing: salah satu opsi yang paling berat); mulai dari Sedang, buah catur dan benda-benda yang mengilap juga memantulkan sekelilingnya.
+options.ambient_occlusion = Oklusi ambien
+options.ambient_occlusion.help = Bayangan lembut di tempat benda-benda bertemu dan di cekungan, tempat cahaya lebih sedikit masuk.
+options.indirect_light = Cahaya tidak langsung
+options.indirect_light.help = Cahaya siang yang memantul dari dinding, lantai, dan langit-langit. Rendah: cahaya ambien yang merata sebagai gantinya. Pengaruhnya terutama pada waktu pemuatan.
+options.volumetric_light = Berkas cahaya
+options.volumetric_light.help = Sorot sinar matahari yang menembus udara berdebu di aula, dengan butiran debu yang berkilau di dalamnya.
+options.tessellation = Teselasi
+options.tessellation.help = Garis luar yang halus pada lengkungan buah catur yang dilihat dari dekat.
+options.tessellation.unavailable = Tidak tersedia: driver grafis ini tidak mendukung teselasi.
+options.antialiasing = Penghalusan tepi
+options.antialiasing.help = Menghaluskan tepi bergerigi dan kilau yang berkedip. Nonaktif: lebih tajam tetapi bergerigi, dan beberapa efek tampak berbintik.
+options.depth_of_field = Ruang tajam
+options.depth_of_field.help = Mengaburkan apa yang berada jauh di depan atau di belakang apa yang Anda lihat, seperti lensa kamera.
+options.motion_blur = Buram gerak
+options.motion_blur.help = Mengaburkan gerakan cepat kamera dan lengan, seperti kamera film.
+options.bloom = Pendar cahaya
+options.bloom.help = Pendar lembut di sekitar sorotan yang paling terang, seperti pada lensa kamera.
+options.brightness = Kecerahan
+options.brightness.neutral = Netral
+options.brightness.value = {0} EV
+options.brightness.help = Kompensasi eksposur kamera. Kalibrasi saat permainan pertama kali dijalankan mengaturnya sehingga bayangan paling gelap nyaris tidak terlihat.
+
+options.master_volume = Volume utama
+options.effects = Efek
+options.ambience = Suasana
+options.ambience.help = Gumam suasana aula: api, langkah kaki di kejauhan, jam tua.
+options.ambience_volume = Volume suasana
+options.voice_volume = Volume suara pelatih
+options.voice_volume.help = Volume suara pelatih dalam mode Pelatih.
+options.subtitles = Subtitel
+options.subtitles.auto = Otomatis
+options.subtitles.help = Ucapan pelatih, ditulis di bagian bawah layar. Otomatis: ditampilkan jika pelatih tidak berbicara dalam bahasa menu (dengan menu berbahasa Tionghoa, pelatih berbicara dalam bahasa Inggris). Selalu ditampilkan jika suaranya belum terpasang.
+
+options.legal_moves = Tampilkan langkah sah
+options.legal_moves.help = Menyorot petak yang dapat dicapai buah yang disentuh. Jika nonaktif, tidak ada yang memberi tahu apakah suatu langkah sah: langkah ilegal dikenai sanksi oleh wasit begitu Anda menekan jam.
+options.coordinates = Koordinat papan
+options.auto_press = Tekan jam otomatis
+options.auto_press.help = Robot Anda menekan jam dengan sendirinya begitu langkah Anda ada di papan. Dalam permainan online, server yang menentukan, dan dalam pertandingan langsung, pemain yang menjadi tuan rumah.
+options.thinking_time = Waktu berpikir realistis
+options.thinking_time.help = Lawan Anda meluangkan waktu seperti pemain manusia alih-alih melangkah seketika.
+options.ignore_head = Abaikan gerakan kepala lawan
+options.ignore_head.help = Dalam permainan online dan pertandingan langsung, robot lawan melihat ke arah yang dilihat pemainnya. Jika aktif, robot itu menggerakkan kepalanya sendiri, seperti saat melawan Stockfish.
+options.mouse_sensitivity = Sensitivitas mouse
+options.invert_look = Balik pandangan vertikal
+options.handover = Peralihan antarpemain
+options.handover.cut = Pindah seketika
+options.handover.flight = Terbang, {0} dtk
+options.handover.help = Dua pemain di satu PC: cara pandangan berpindah dari mata satu pemain ke mata pemain lainnya setelah setiap langkah. Pindah seketika menghindari gerakan kamera.
+options.game_cursor = Penunjuk permainan
+options.game_cursor.help = Di meja, permainan menggambar penunjuknya sendiri, yang memperlihatkan apa yang akan terjadi jika Anda mengklik. Nonaktif: panah sistem yang biasa.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nama
+player.name.help = Nama Anda seperti yang tertulis di bagian atas formulir notasi, dalam aksara apa pun.
+player.default_name = Manusia
+player.handwriting = Tulisan tangan
+player.handwriting.help = Tangan yang menulis langkah-langkah Anda. Aksara Arab, Jepang, dan Tionghoa ditulis dengan tulisan tangan tersendiri.
+player.preview = DI FORMULIR NOTASI ANDA
+hand.caveat = Santai
+hand.marck = Bersambung
+hand.badscript = Miring
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Klik kiri
+controls.touch = Sentuh buah, lalu jalankan
+controls.clock.keys = Spasi  atau  klik jam
+controls.clock = Tekan jam
+controls.look.keys = Tahan tombol kanan mouse
+controls.look = Lihat sekeliling
+controls.sheet.keys = S
+controls.sheet = Lihat formulir notasi Anda, lalu kembali
+controls.stand.keys = ↑
+controls.stand = Berdiri di depan kursi Anda
+controls.side.keys = ←  /  →
+controls.side = Berdiri di ujung kiri / kanan meja
+controls.sit.keys = ↓
+controls.sit = Duduk kembali (Anda hanya bermain sambil duduk)
+controls.moves.keys = Tab
+controls.moves = Tampilkan atau sembunyikan daftar langkah
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Spasi
+controls.coach_skip = Pelatih: lewati ucapan pelatih
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Pelatih: ambil kembali langkah saat ditawarkan
+controls.coach_hint.keys = H
+controls.coach_hint = Tantangan pelatih: minta petunjuk
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = KECERAHAN
+calibration.text = Geser penggeser hingga kuda di petak hitam nyaris tidak terlihat, atau tidak terlihat lagi.
+calibration.later = Anda dapat mengubahnya nanti di Opsi > Grafis.
+calibration.continue = Lanjutkan
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = PERMAINAN BARU
+newgame.opponent = LAWAN
+newgame.time_control = KONTROL WAKTU
+newgame.start = Mulai
+newgame.elo = ~{0} Elo
+newgame.you_white = Anda akan bermain sebagai Putih.
+newgame.you_black = Anda akan bermain sebagai Hitam.
+newgame.colour_lot = Warna diundi untuk permainan pertama.
+newgame.colour_alternate = Selanjutnya, warna bergantian dari satu permainan ke permainan berikutnya.
+newgame.opponent_kind = Lawan
+newgame.opponent_kind.help = Bermain melawan Stockfish, atau melawan teman yang duduk di komputer ini: Anda bergiliran, masing-masing dari sisi papan sendiri.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Manusia, PC yang sama
+
+# Custom opponent: Stockfish parameters
+engine.skill = Tingkat keahlian
+engine.skill.help = Opsi “Skill Level” Stockfish (0–20). Diabaikan selama kekuatannya dibatasi dengan Elo.
+engine.limit_elo = Batasi kekuatan (Elo)
+engine.limit_elo.help = UCI_LimitStrength: mesin menargetkan rating Elo di bawah ini.
+engine.elo = Elo
+engine.depth = Kedalaman pencarian
+engine.plies = {0} setengah langkah
+engine.move_time = Waktu per langkah
+engine.nodes = Batas node
+engine.no_limit = Nonaktif
+engine.thousand = {0} ribu
+engine.million = {0} juta
+engine.dynamic_elo = Elo dinamis sesuai waktu
+engine.dynamic_elo.help = Seperti pemain manusia, Stockfish bermain lebih lemah saat waktunya menipis: sedikit lebih lemah pada menit terakhir (lebih awal dalam permainan cepat dan blitz), jauh lebih lemah saat terdesak waktu. Hanya untuk permainan berwaktu.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish meluangkan waktu seperti manusia yang setingkat dengannya. Untuk melewati jeda ini: Opsi > Permainan > Waktu berpikir realistis.
+engine.pace.instant = Stockfish melangkah begitu selesai menghitung. Untuk jeda seperti manusia: Opsi > Permainan > Waktu berpikir realistis.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Tanpa batas
+tc.no_clock = Tanpa jam
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Cepat
+tc.classical = Klasik
+tc.custom = Kustom
+tc.your_own = Atur sendiri
+tc.base_time = Waktu dasar
+tc.base_time.help = Waktu awal di setiap jam (menit : detik).
+tc.increment = Tambahan waktu
+tc.increment.help = Tambahan waktu Fischer yang diberikan setelah setiap langkah.
+tc.delay = Penundaan
+tc.delay.help = Penundaan Bronstein: waktu yang terpakai hingga batas penundaan ini dikembalikan setelah setiap langkah.
+tc.no_delay = Nonaktif
+tc.seconds = {0} dtk
+tc.minutes = {0} mnt
+tc.summary_increment = {0} + {1} dtk
+tc.summary_delay = {0}, tunda {1} dtk
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Baru Belajar
+preset.novice.desc = Baru tahu cara buah melangkah: membiarkan buah tak terlindungi dan melewatkan ancaman sederhana.
+preset.beginner.name = Pemula
+preset.beginner.desc = Menguasai dasar-dasarnya, tetapi masih sering kehilangan materi karena blunder.
+preset.casual.name = Santai
+preset.casual.desc = Lawan santai untuk malam yang tenang: langkahnya masuk akal, tetapi sering keliru.
+preset.club_player.name = Pemain Klub
+preset.club_player.desc = Pemain klub yang solid dan menghukum blunder yang jelas.
+preset.advanced.name = Mahir
+preset.advanced.desc = Pemain klub kuat dengan visi taktis yang baik.
+preset.expert.name = Ahli
+preset.expert.desc = Ahli turnamen: jarang keliru, mampu mengubah keunggulan menjadi kemenangan.
+preset.master.name = Master
+preset.master.desc = Kekuatan master: perhitungan yang dalam dan permainan posisional yang halus.
+preset.grandmaster.name = Grandmaster
+preset.grandmaster.desc = Tingkat grandmaster: sangat sulit dikalahkan.
+preset.stockfish_max.name = Stockfish Maks
+preset.stockfish_max.desc = Stockfish 19 dengan kekuatan penuh. Semoga berhasil.
+preset.custom.name = Kustom
+preset.custom.desc = Pengaturan mesin buatan Anda sendiri.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = KREDIT
+credits.game.head = SCACELITH
+credits.game = Permainan catur di sebuah aula kerajaan, dengan mesin OpenGL 4.6 buatan sendiri.
+credits.engine.head = MESIN CATUR
+credits.engine = Stockfish 19, oleh para pengembang Stockfish.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Jaringan sarafnya dilatih dengan data dari proyek Leela Chess Zero, yang tersedia di bawah Open Database License (ODbL).
+credits.voice.head = SUARA PELATIH
+credits.voice = Suara sintetis yang dihasilkan oleh Supertonic 3 untuk mode Pelatih.
+credits.voice.licence = Supertonic 3 adalah model buatan Supertone, digunakan di bawah lisensi OpenRAIL-M, yang batasan penggunaannya berlaku bagi siapa pun yang menggunakannya (lihat Lisensi).
+credits.openings.head = PEMBUKAAN
+credits.openings = Nama-nama pembukaan dari basis data chess-openings milik lichess.org, yang didedikasikan untuk domain publik (CC0).
+credits.fonts.head = JENIS HURUF
+credits.fonts = EB Garamond karya Georg Duffner dan Cinzel karya Natanael Gama; Amiri karya Khaled Hosny.
+credits.fonts.hand = Tulisan tangan: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figur catur dari GNU FreeFont (GPL v3 dengan pengecualian font).
+credits.quote = “Catur adalah seni analisis.”  — Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Lisensi
+licences.title = LISENSI
+licences.note = Lisensi ditampilkan dalam teks aslinya yang berbahasa Inggris.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = DIJEDA
+pause.resume = Lanjutkan
+pause.offer_draw = Tawarkan remis
+pause.claim_draw = Klaim remis
+pause.claim_draw.help = Pengulangan posisi tiga kali atau aturan 50 langkah.
+pause.resign = Menyerah
+confirm.resign.title = MENYERAH
+confirm.resign.text = Menyerah dalam permainan ini? Lawan Anda akan dinyatakan sebagai pemenang.
+confirm.resign.draw = Menyerah dalam permainan ini? Lawan Anda tidak dapat lagi memberi skakmat: permainan akan berakhir remis.
+confirm.resign.ok = Menyerah
+confirm.leave.title = TINGGALKAN
+confirm.leave.text = Kembali ke menu utama? Permainan yang sedang berlangsung akan ditinggalkan.
+confirm.leave.ok = Tinggalkan
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOSI MENJADI
+piece.queen = Menteri
+piece.rook = Benteng
+piece.bishop = Gajah
+piece.knight = Kuda
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Permainan berakhir remis.
+gameover.draw_moves = Permainan berakhir remis setelah {0} langkah.
+gameover.win = Permainan yang bagus — Anda menang.
+gameover.win_moves = Permainan yang bagus — Anda menang dalam {0} langkah.
+gameover.loss = Lawan Anda menang.
+gameover.loss_moves = Lawan Anda menang dalam {0} langkah.
+gameover.rematch = Tanding ulang
+gameover.view_board = Lihat papan
+gameover.show = Tampilkan
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Skakmat
+reason.resignation = Menyerah
+reason.timeout = Kalah waktu
+reason.illegal_moves = Langkah ilegal kedua (dinyatakan kalah)
+reason.stalemate = Pat
+reason.insufficient = Posisi mati (materi tidak cukup)
+reason.timeout_vs_insufficient = Waktu habis, tetapi lawan tidak dapat memberi skakmat
+reason.fivefold = Pengulangan posisi lima kali
+reason.75_moves = Aturan 75 langkah
+reason.threefold_claim = Pengulangan posisi tiga kali (diklaim)
+reason.50_moves_claim = Aturan 50 langkah (diklaim)
+reason.agreement = Remis atas kesepakatan
+reason.illegal_vs_insufficient = Langkah ilegal kedua, tetapi lawan tidak dapat memberi skakmat
+reason.resignation_vs_insufficient = Menyerah, tetapi lawan tidak dapat memberi skakmat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = LANGKAH
+movelist.empty = Belum ada langkah.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Menyiapkan bahan-bahan
+loading.hall = Mendirikan aula
+loading.furniture = Memahat meja dan kursi
+loading.board = Memoles papan
+loading.pieces = Membubut buah catur
+loading.clock = Merakit jam
+loading.porcelain = Membakar porselen
+loading.ready = Siap
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Remis tidak dapat diklaim dalam posisi ini.
+notify.flag_you = Waktu Anda telah habis.
+notify.flag_opponent = Waktu lawan Anda telah habis.
+notify.touched.pawn = Sentuh-jalan: pion yang Anda sentuh harus dijalankan.
+notify.touched.knight = Sentuh-jalan: kuda yang Anda sentuh harus dijalankan.
+notify.touched.bishop = Sentuh-jalan: gajah yang Anda sentuh harus dijalankan.
+notify.touched.rook = Sentuh-jalan: benteng yang Anda sentuh harus dijalankan.
+notify.touched.queen = Sentuh-jalan: menteri yang Anda sentuh harus dijalankan.
+notify.touched.king = Sentuh-jalan: raja yang Anda sentuh harus dijalankan.
+notify.touched.piece = Sentuh-jalan: buah yang Anda sentuh harus dijalankan.
+notify.touched_square = Sentuh-jalan: Anda harus menjalankan buah di petak {0}.
+notify.press_clock = Tekan jam untuk menyelesaikan langkah Anda (Spasi).
+notify.manual_clock = Dalam permainan ini, tekan sendiri jam setelah setiap langkah.
+notify.illegal = Langkah ilegal.
+notify.cannot_move = Langkah itu tidak dapat dilakukan.
+notify.move_first = Jalankan langkah Anda sebelum menekan jam.
+notify.stance.sit_to_play = Duduk kembali untuk bermain (tombol panah bawah).
+notify.stance.first = Jam tetap berjalan selama Anda berdiri. Tombol panah bawah: duduk kembali.
+notify.stance.first_untimed = Anda hanya bermain dari kursi Anda. Tombol panah bawah: duduk kembali.
+notify.stance.finish_move = Selesaikan langkah Anda terlebih dahulu.
+notify.draw_already_offered = Anda sudah menawarkan remis pada langkah ini.
+notify.draw_accepted = Lawan Anda menerima remis.
+notify.draw_declined = Lawan Anda menolak tawaran remis.
+notify.draw_claimed = Lawan Anda mengklaim remis.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Wasit: jam ditekan tanpa melangkah, dan ini dihitung sebagai langkah ilegal.
+arbiter.unpromoted = Wasit: langkah ilegal, pion tidak diganti dengan buah baru sebelum jam ditekan.
+arbiter.illegal = Wasit: langkah ilegal.
+arbiter.second_loses.white = Ini adalah langkah ilegal kedua Putih: Putih kalah dalam permainan ini.
+arbiter.second_loses.black = Ini adalah langkah ilegal kedua Hitam: Hitam kalah dalam permainan ini.
+arbiter.second_draw.white = Ini adalah langkah ilegal kedua Putih, tetapi Hitam tidak dapat memberi skakmat: permainan berakhir remis.
+arbiter.second_draw.black = Ini adalah langkah ilegal kedua Hitam, tetapi Putih tidak dapat memberi skakmat: permainan berakhir remis.
+arbiter.queen = Pion menjadi menteri.
+arbiter.queen_one_minute.white = Pion menjadi menteri dan Putih mendapat tambahan waktu satu menit.
+arbiter.queen_one_minute.black = Pion menjadi menteri dan Hitam mendapat tambahan waktu satu menit.
+arbiter.queen_two_minutes.white = Pion menjadi menteri dan Putih mendapat tambahan waktu dua menit.
+arbiter.queen_two_minutes.black = Pion menjadi menteri dan Hitam mendapat tambahan waktu dua menit.
+arbiter.restored = Posisi dikembalikan.
+arbiter.restored_one_minute.white = Posisi dikembalikan dan Putih mendapat tambahan waktu satu menit.
+arbiter.restored_one_minute.black = Posisi dikembalikan dan Hitam mendapat tambahan waktu satu menit.
+arbiter.restored_two_minutes.white = Posisi dikembalikan dan Putih mendapat tambahan waktu dua menit.
+arbiter.restored_two_minutes.black = Posisi dikembalikan dan Hitam mendapat tambahan waktu dua menit.
+arbiter.one_minute.white = Putih mendapat tambahan waktu satu menit.
+arbiter.one_minute.black = Hitam mendapat tambahan waktu satu menit.
+arbiter.two_minutes.white = Putih mendapat tambahan waktu dua menit.
+arbiter.two_minutes.black = Hitam mendapat tambahan waktu dua menit.
+arbiter.second_loses = Langkah ilegal kedua berarti kalah.
+arbiter.touched.white = Putih harus menjalankan buah yang disentuh.
+arbiter.touched.black = Hitam harus menjalankan buah yang disentuh.
+arbiter.game_over = Permainan telah berakhir.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Tonton Permainan
+
+viewer.title = TONTON PERMAINAN
+viewer.white = PUTIH
+viewer.black = HITAM
+viewer.time_control = KONTROL WAKTU
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Tukar warna
+viewer.note = Kedua pemain adalah Stockfish. Terbanglah dengan bebas di sekeliling aula selama mereka bermain: tidak ada yang akan melihat Anda.
+viewer.summary = {0} lawan {1}
+viewer.custom = Kustom
+viewer.tc.custom = Atur sendiri
+viewer.base_time = Waktu dasar
+viewer.increment = Tambahan waktu
+viewer.delay = Penundaan
+viewer.off = Nonaktif
+viewer.minutes = {0} mnt
+viewer.seconds = {0} dtk
+viewer.delay_summary = tunda {0} dtk
+viewer.back = Kembali
+viewer.start = Mulai
+
+viewer.paused = DIJEDA
+viewer.resume = Lanjutkan
+viewer.options = Opsi
+viewer.main_menu = Menu utama
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = KONTROL
+viewer.keys.move = W A S D  ·  Z Q S D  ·  tombol panah
+viewer.controls.move = Bergerak
+viewer.keys.updown = E, Spasi  /  C, Ctrl
+viewer.controls.updown = Naik / turun
+viewer.keys.fast = Shift
+viewer.controls.fast = Lebih cepat
+viewer.keys.look = Tombol kanan mouse
+viewer.controls.look = Lihat sekeliling
+viewer.keys.speed = Roda mouse
+viewer.controls.speed = Kecepatan
+viewer.keys.views = 1 – 9
+viewer.controls.views = Sudut pandang
+viewer.keys.eyes = 0
+viewer.controls.eyes = Melalui mata pemain yang mendapat giliran
+viewer.keys.moves = Tab
+viewer.controls.moves = Daftar langkah
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Sembunyikan panel ini
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Jeda / lanjutkan
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Mundur / maju satu langkah
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Lebih lambat / lebih cepat
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Awal / akhir permainan
+viewer.speed = Kecepatan {0} m/s
+viewer.view.0 = Melalui mata para pemain
+viewer.view.1 = Di samping meja
+viewer.view.2 = Di atas papan
+viewer.view.3 = Aula
+viewer.view.4 = Jam
+viewer.view.5 = Wajah Putih
+viewer.view.6 = Wajah Hitam
+viewer.view.7 = Duel
+viewer.view.8 = Jendela
+viewer.view.9 = Permadani
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Putih
+viewer.side.black = Hitam
+viewer.flag.white = Waktu Putih telah habis.
+viewer.flag.black = Waktu Hitam telah habis.
+viewer.claims_draw = {0} mengklaim remis.
+viewer.offer_accepted = {0} menawarkan remis, {1} menerima.
+viewer.offer_declined = {0} menawarkan remis, {1} menolak.
+viewer.gameover.white_wins = Putih menang setelah langkah ke-{0}.
+viewer.gameover.black_wins = Hitam menang setelah langkah ke-{0}.
+viewer.gameover.draw = Permainan berakhir remis setelah langkah ke-{0}.
+viewer.gameover.players = {0} melawan {1}
+viewer.watch_again = Tonton lagi
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Belum ada permainan yang dinilai
+elo.provisional = Rating sementara
+elo.peak = Puncak {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Elo Anda {0}
+elo.expected = skor harapan {0}%
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · permainan ini tidak dinilai
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Formulir notasi
+scoresheet.event = Acara
+scoresheet.date = Tanggal
+scoresheet.round = Babak
+scoresheet.board = Papan
+scoresheet.page = Halaman
+scoresheet.white = Putih
+scoresheet.black = Hitam
+scoresheet.elo = Elo
+scoresheet.result = Hasil
+scoresheet.move_no = No.
+scoresheet.sign_white = Tanda tangan Putih
+scoresheet.sign_black = Tanda tangan Hitam
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = R M B G K
+scoresheet.date_format = {0}/{1}/{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Main Online
+online.title = MAIN ONLINE
+online.continue = Lanjutkan
+online.retry = Coba lagi
+online.copy = Salin
+online.copied = Tersalin
+online.copy.unavailable = Penyalinan tidak tersedia di sini: silakan catat secara manual.
+online.rated = Dinilai
+online.casual = Santai
+online.casual_only = Hanya santai
+online.color.random = Diundi
+online.ping = {0} ms
+online.conn.online = Terhubung
+online.conn.connecting = Menghubungkan…
+online.conn.reconnecting = Menghubungkan ulang…
+online.conn.offline = Tidak terhubung
+online.conn.incompatible = Versi berbeda
+online.no_server.text = Permainan online memerlukan server Scacelith. Masukkan alamat server di opsi, atau bermainlah melawan teman lewat pertandingan langsung.
+online.no_server.settings = Pengaturan server
+
+# Options > Online server
+options.tab.online = Server online
+options.online.server = Server
+options.online.server.help = Server resmi, atau server kustom (komunitas) yang dijalankan orang lain, diakses melalui API web aman dan WebSocket aman miliknya. Anda masuk secara terpisah di setiap server: akun dan sesi masuknya tidak pernah dibagikan antarserver.
+options.online.official = Server resmi — {0}
+options.online.community = Server kustom
+options.online.host = Nama host
+options.online.host.hint = nama domain atau alamat IP
+options.online.host.help = Nama domain atau alamat IP server kustom, sesuai yang diberikan pemiliknya.
+options.online.api_port = Port HTTPS / API
+options.online.api_port.help = Port API web aman milik server (443 pada server Scacelith).
+options.online.ws_port = Port WSS
+options.online.ws_port.hint = sama dengan port API
+options.online.ws_port.help = Port WebSocket aman milik server. Biarkan kosong jika sama dengan port API.
+options.online.pin = Sidik jari sertifikat (SHA-256)
+options.online.pin.hint = opsional
+options.online.pin.help = Untuk server dengan sertifikat yang ditandatangani sendiri: sidik jari SHA-256 yang diberikan pemiliknya (64 karakter heksadesimal, titik dua diperbolehkan). Biarkan kosong untuk memercayai sertifikat sistem.
+options.online.pin.invalid = Sidik jari terdiri atas 64 karakter heksadesimal (titik dua diperbolehkan).
+options.online.test = Uji koneksi
+options.online.test_ok = {0}: terhubung, kompatibel dengan versi ini.
+options.online.test_incompatible = {0}: terhubung, tetapi memerlukan versi Scacelith yang lain.
+options.online.in_game = Server tidak dapat diubah selama permainan online.
+options.online.remember_session = Ingat sesi masuk saya jika keyring sistem tidak tersedia
+options.online.remember_session.help = Jika tidak ada keyring sistem (GNOME Keyring, KWallet…) yang dapat menyimpan sesi Anda, sesi itu disimpan dalam file yang hanya dapat dibaca oleh akun pengguna Anda. Siapa pun yang dapat membaca file Anda, atau salinannya seperti cadangan, dapat menggunakan sesi tersebut. Nonaktif: Anda tetap masuk hingga permainan ditutup. Anda dapat mengeluarkan perangkat mana pun melalui Perangkat yang masuk, di akun Anda.
+
+# Sign in, create an account
+online.signin.lead = Masuk ke {0} untuk bermain melawan orang lain secara online.
+online.field.user = Nama pengguna atau email
+online.field.user.hint = nama atau alamat
+online.field.password = Kata sandi
+online.field.password.hint = minimal 10 karakter
+online.field.password2 = Konfirmasi kata sandi
+online.field.current_password = Kata sandi saat ini
+online.field.new_password = Kata sandi baru
+online.field.username = Nama pengguna
+online.field.username.hint = 3 hingga 24 huruf, angka, _ atau -
+online.field.email = Email
+online.field.new_email = Email baru
+online.field.code = Kode
+online.field.code.hint = 6 digit atau kode pemulihan
+online.field.code6 = Kode dari aplikasi
+online.field.code6.hint = 6 digit
+online.signin.button = Masuk
+online.signin.google = Lanjutkan dengan Google
+online.signin.register = Buat akun
+online.signin.forgot = Lupa kata sandi?
+online.mfa.title = KODE DUA FAKTOR
+online.mfa.lead = Masukkan kode 6 digit yang ditampilkan aplikasi autentikator Anda, atau salah satu kode pemulihan Anda.
+online.mfa.verify = Verifikasi
+online.register.title = BUAT AKUN
+online.register.lead = Akun gratis di {0}: nama, rating, dan permainan Anda hanya tersimpan di server ini.
+online.register.button = Buat akun
+online.register.working = Membuat akun Anda… ini dapat memakan waktu beberapa detik.
+online.register.ready = Akun Anda sudah siap. Masuk untuk bermain.
+online.password.mismatch = Kedua kata sandi tidak sama.
+online.check_email.title = PERIKSA EMAIL ANDA
+online.check_email.text = Kami telah mengirim tautan ke {0}. Buka tautan itu untuk mengaktifkan akun Anda, lalu masuk di sini.
+online.check_email.ask = Masukkan alamat akun Anda untuk menerima tautan aktivasi lagi.
+online.check_email.resend = Kirim ulang email
+online.check_email.resent = Email telah dikirim ulang. Mungkin perlu beberapa menit; periksa juga folder spam Anda.
+online.forgot.title = LUPA KATA SANDI
+online.forgot.lead = Masukkan alamat email akun Anda: kami akan mengirimkan tautan untuk memilih kata sandi baru.
+online.forgot.button = Kirim tautan
+online.forgot.sent = Jika ada akun yang menggunakan alamat ini, tautan sedang dikirim ke sana.
+online.sso.title = MASUK DENGAN GOOGLE
+online.sso.wait = Lanjutkan di browser web Anda: pilih akun Google Anda di jendela yang terbuka. Scacelith akan mengambil alih begitu Google mengarahkan Anda kembali.
+online.sso.name_title = PILIH NAMA ANDA
+online.sso.name_lead = Ini pertama kalinya Anda masuk ke sini dengan Google. Pilih nama yang akan dilihat pemain lain.
+online.sso.continue = Lanjutkan
+online.sso.finishing = Google telah mengarahkan Anda kembali. Menyelesaikan proses masuk…
+online.sso.link_title = TAMBAHKAN MASUK DENGAN GOOGLE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Akun {0} di {1} sudah menggunakan alamat email akun Google ini. Masukkan kata sandi akun ini untuk menambahkan opsi masuk dengan Google ke akun tersebut. Anda hanya perlu melakukannya sekali.
+online.sso.link_button = Tambahkan masuk dengan Google
+online.sso.link_mfa = Opsi masuk dengan Google ditambahkan ke akun ini setelah kode diterima.
+online.sso.not_mine = Ini bukan akun saya
+online.sso.not_mine_note = Opsi masuk dengan Google tidak ditambahkan. Jika alamat email ini milik Anda, gunakan "Lupa kata sandi?" dengan alamat itu: tautannya dikirim ke kotak surat tersebut. Jika akun itu juga meminta kode dua faktor yang tidak Anda miliki, hubungi operator server.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: masuk dengan Google
+online.sso.page.done_heading = Kembali ke Scacelith
+online.sso.page.done = Google telah mengarahkan Anda kembali ke Scacelith. Kembalilah ke permainan untuk menyelesaikan proses masuk; Anda dapat menutup tab ini.
+online.sso.page.cancelled_heading = Proses masuk dibatalkan
+online.sso.page.cancelled = Proses masuk dengan Google dibatalkan. Anda dapat menutup tab ini dan kembali ke Scacelith.
+online.sso.page.foreign_heading = Halaman ini bukan untuk Anda
+online.sso.page.foreign = Halaman ini tidak cocok dengan proses masuk yang sedang ditunggu Scacelith di komputer ini. Jika Anda tidak baru saja memulai proses masuk dengan Google di Scacelith, mungkin seseorang mengirimkan tautan ini kepada Anda: tutup tab ini.
+
+# Account
+online.account.button = Akun
+online.account.title = AKUN
+online.account.section = AKUN
+online.account.username = NAMA PENGGUNA
+online.account.email = EMAIL
+online.account.unverified = (belum diverifikasi)
+online.account.mfa = AUTENTIKASI DUA FAKTOR
+online.account.mfa_on = Aktif
+online.account.mfa_off = Nonaktif
+online.account.google = GOOGLE
+online.account.google_linked = Tertaut ke akun Google
+online.account.change_password = Ubah kata sandi
+online.account.mfa_setup = Aktifkan dua faktor
+online.account.mfa_disable = Nonaktifkan dua faktor
+online.account.recovery = Kode pemulihan baru
+online.account.sign_out = Keluar
+online.account.sign_out_all = Keluar di mana-mana
+online.account.sign_out_all.help = Mengeluarkan akun ini dari semua komputer, termasuk komputer ini.
+online.account.signed_out = Anda telah keluar.
+online.account.signed_out_all = Anda telah keluar dari semua komputer.
+online.account.signing_out_all = Mengeluarkan akun dari semua komputer…
+online.account.sign_out_all_failed = Komputer Anda yang lain mungkin masih masuk: masuklah lagi, lalu keluarkan komputer-komputer itu melalui Perangkat yang masuk. {0}
+online.account.sign_out_all_retry = Komputer Anda yang lain mungkin masih masuk. Coba lagi "Keluar di mana-mana". {0}
+online.account.ratings = RATING
+online.account.col.tc = KONTROL WAKTU
+online.account.col.rating = RATING
+online.account.col.games = PERMAINAN
+online.account.col.record = M / R / K
+online.account.provisional = Tanda tanya menandai rating sementara (baru sedikit permainan yang dimainkan).
+online.password.title = UBAH KATA SANDI
+online.password.button = Ubah kata sandi
+online.password.changed = Kata sandi Anda telah diubah.
+online.password.other_sessions = Komputer Anda yang lain harus masuk lagi.
+online.mfa_setup.title = AUTENTIKASI DUA FAKTOR
+online.mfa_setup.lead = Autentikasi dua faktor meminta kode dari aplikasi di ponsel Anda setiap kali Anda masuk. Masukkan kata sandi Anda untuk memulai.
+online.mfa_setup.scan = 1. Pindai kode ini dengan aplikasi autentikator, atau ketikkan kunci ini ke dalamnya:
+online.mfa_setup.enter = 2. Masukkan kode 6 digit yang ditampilkan aplikasi:
+online.mfa_setup.enable = Aktifkan
+online.mfa_setup.done = Autentikasi dua faktor telah diaktifkan.
+online.mfa_off.title = NONAKTIFKAN DUA FAKTOR
+online.mfa_off.lead = Masukkan kata sandi Anda dan kode dari aplikasi Anda (atau kode pemulihan).
+online.mfa_off.button = Nonaktifkan
+online.mfa.off_done = Autentikasi dua faktor telah dinonaktifkan.
+online.recovery.title = KODE PEMULIHAN
+online.recovery.lead = Setiap kode dapat dipakai satu kali untuk masuk jika ponsel Anda hilang. Simpan di tempat yang aman: kode-kode ini hanya ditampilkan sekarang.
+online.recovery.saved = Sudah saya simpan
+online.recovery.new_title = KODE PEMULIHAN BARU
+online.recovery.new_lead = Kode baru menggantikan kode lama. Masukkan kata sandi Anda dan kode dari aplikasi Anda.
+online.recovery.button = Kode baru
+online.account.manage = KEAMANAN DAN DATA
+online.account.pending_email = Menunggu konfirmasi: {0}
+online.account.accept_challenges = Terima tantangan
+online.account.accept_challenges.help = Pemain lain dapat menantang Anda melalui nama pengguna Anda. Nonaktif: tantangan mereka ditolak.
+online.account.history = Riwayat permainan
+online.account.devices = Perangkat yang masuk
+online.account.change_email = Ubah email
+online.account.export = Unduh data saya
+online.account.delete = Hapus akun
+
+# Play
+online.play.signed_in = Masuk sebagai {0}
+online.session.file = Tidak ada keyring sistem yang dapat menyimpan sesi masuk Anda: sesi itu diingat dalam file yang hanya dapat dibaca oleh akun pengguna Anda (Opsi > Server online).
+online.session.memory = Tidak ada keyring sistem yang dapat menyimpan sesi masuk Anda, dan sesi itu tidak disimpan dalam file: Anda tetap masuk hingga permainan ditutup (Opsi > Server online).
+online.play.find_section = CARI LAWAN
+online.play.friend_section = MAIN DENGAN TEMAN
+online.play.mode = Permainan
+online.play.mode.help = Permainan dinilai mengubah rating Anda dalam kontrol waktu ini; permainan santai tidak.
+online.play.find = Cari lawan
+online.play.connecting = Menghubungkan ke server…
+online.play.cooldown = Anda dapat mencari lawan lagi pukul {0}.
+online.play.banned = Akun ini ditangguhkan hingga {0}.
+online.play.challenge = Tantang pemain
+online.play.challenge.desc = Undang seseorang yang sedang online melalui nama penggunanya.
+online.play.private = Permainan pribadi
+online.play.private.desc = Buat kode untuk diberikan ke teman, atau gabung dengan kode dari teman.
+online.play.direct = Pertandingan langsung
+online.play.direct.desc = Tanpa server: terhubung langsung ke komputer teman.
+online.search.title = MENCARI
+online.search.window = Rentang rating {0}
+online.search.queued = {0} pemain sedang mencari
+online.search.wait = Mencari lawan yang setingkat dengan Anda…
+online.outgoing.challenge = TANTANGAN TERKIRIM
+online.outgoing.waiting = menunggu jawaban
+online.outgoing.private = PERMAINAN PRIBADI
+online.outgoing.private_hint = Berikan kode ini kepada teman Anda: permainan dimulai saat ia bergabung.
+online.challenge.title = TANTANG PEMAIN
+online.challenge.opponent = LAWAN
+online.field.opponent = Nama pengguna
+online.field.opponent.hint = siapa yang ditantang
+online.challenge.note = Lawan Anda melihat tantangan di mana pun ia berada dalam menu, dan punya waktu satu menit untuk menjawab.
+online.challenge.send = Kirim tantangan
+online.terms.rated = Dinilai
+online.terms.rated.help = Hanya kontrol waktu resmi yang dapat dinilai.
+online.terms.color = Warna Anda
+online.private.title = PERMAINAN PRIBADI
+online.private.create_section = BUAT
+online.private.create_note = Anda mendapat kode pendek: siapa pun yang memasukkannya akan bermain melawan Anda.
+online.private.create = Buat permainan
+online.private.join_section = GABUNG
+online.field.private_code = Kode
+online.private.join = Gabung
+online.private.joining = Bergabung ke permainan…
+online.challenge.received = TANTANGAN
+online.challenge.accept = Terima
+online.challenge.decline = Tolak
+online.challenge.you_white = Anda bermain sebagai Putih
+online.challenge.you_black = Anda bermain sebagai Hitam
+online.challenge.you_random = warna diundi
+online.challenge.declined = {0} menolak tantangan Anda.
+online.challenge.expired = Tantangan Anda kedaluwarsa tanpa jawaban.
+online.challenge.unavailable = {0} sedang tidak tersedia.
+online.challenge.lost = Koneksi terputus: tantangan Anda dibatalkan.
+
+# At the table
+online.pause.clock_runs = Permainan terus berlanjut: jam Anda tetap berjalan.
+online.pause.abort = Batalkan permainan
+online.pause.abort.help = Sebelum langkah pertama Anda, permainan dapat dibatalkan; permainan itu tidak dihitung.
+online.pause.leave = Tinggalkan permainan
+online.confirm.resign.text = Menyerah dalam permainan ini? Lawan Anda akan memenangkannya.
+online.confirm.leave.text = Meninggalkan permainan berarti menyerah: lawan Anda memenangkannya.
+online.confirm.leave.ok = Menyerah dan keluar
+online.confirm.leave_abort.text = Keluar sebelum langkah pertama Anda? Permainan dibatalkan dan tidak dihitung.
+online.confirm.leave_abort.ok = Batalkan dan keluar
+online.draw.card_title = TAWARAN REMIS
+online.draw.card_text = Lawan Anda menawarkan remis.
+online.draw.accept = Terima
+online.draw.decline = Tolak
+online.draw.offered = Lawan Anda menawarkan remis.
+online.opponent_back = Lawan Anda telah kembali.
+online.opponent_away = Lawan terputus — sisa {0} untuk kembali
+online.first_move = Langkah pertama Anda · {0}
+online.reconnecting = MENGHUBUNGKAN ULANG…
+online.reconnecting.text = Permainan terus berlanjut di server dan jam Anda tetap berjalan.
+online.gameover.aborted = Permainan dibatalkan: tidak dihitung.
+online.rating.casual = Permainan santai: rating tidak berubah.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Terima tanding ulang
+online.rematch.offered = Lawan Anda menawarkan tanding ulang.
+online.rematch.waiting = Tawaran terkirim…
+online.rematch.gone = Tanpa tanding ulang
+online.rematch.declined = Tidak ada tanding ulang kali ini.
+online.report.button = Laporkan lawan
+online.report.title = LAPORKAN
+online.report.lead = Laporan dikirim ke moderator server beserta permainan ini. Terima kasih telah membantu menjaga permainan tetap adil.
+online.report.category = Alasan
+online.report.cheating = Curang
+online.report.abuse = Perilaku kasar
+online.report.other = Lainnya
+online.report.comment = Komentar
+online.report.comment.hint = opsional
+online.report.send = Kirim laporan
+online.report.sent = Laporan terkirim. Terima kasih.
+online.report.queued = Laporan Anda akan dikirim saat permainan berakhir.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = dinilai
+online.sheet.casual = santai
+online.sheet.game = Permainan {0}
+# End reasons of online games
+reason.online.abandonment = Lawan meninggalkan permainan
+reason.online.abandonment_vs_insufficient = Meninggalkan permainan, tetapi lawan tidak dapat memberi skakmat
+reason.online.aborted = Permainan dibatalkan
+reason.online.no_show = Langkah pertama terlambat (dibatalkan)
+reason.online.forfeit = Dinyatakan kalah
+reason.online.server_aborted = Dibatalkan oleh server
+reason.online.both_disconnected = Kedua pemain terputus
+# Server notices
+online.notice.shutdown = Server akan dimulai ulang dalam {0}. Permainan yang sedang berlangsung disimpan.
+online.notice.revoked = Anda telah dikeluarkan dari server ini.
+online.notice.replaced = Akun Anda terhubung dari jendela lain; jendela ini sekarang tidak terhubung.
+online.notice.rating_restored = Rating Anda dipulihkan sebanyak {0} poin: seorang lawan diblokir karena curang.
+# Errors
+online.err.rate_limited_for = Terlalu banyak percobaan. Coba lagi dalam {0}.
+online.err.rate_limited = Terlalu banyak percobaan. Coba lagi sebentar lagi.
+online.err.server_busy_for = Server sedang sibuk. Coba lagi dalam {0}.
+online.err.server_busy = Server sedang sibuk. Coba lagi sebentar lagi.
+online.err.banned_until = Akun ini ditangguhkan hingga {0}.
+online.err.banned = Akun ini ditangguhkan.
+online.err.invalid_credentials = Nama pengguna atau kata sandi salah.
+online.err.invalid_credentials_pending = Nama pengguna atau kata sandi salah. Jika Anda baru saja mendaftar, buka dulu tautan yang kami kirimkan.
+online.err.email_unverified = Alamat email Anda belum diverifikasi: buka tautan yang kami kirimkan.
+online.err.network = Server tidak dapat dijangkau. Periksa koneksi Anda dan alamat server.
+online.err.tls = Koneksi aman ke server tidak dapat dibuat.
+online.err.certificate = Sertifikat server tidak tepercaya (atau tidak cocok dengan sidik jari di opsi).
+online.err.incompatible = Server ini memerlukan versi Scacelith yang lain.
+online.err.unauthorized = Sesi Anda telah berakhir: silakan masuk lagi.
+online.err.username_taken = Nama pengguna ini sudah dipakai.
+online.err.email_taken = Sudah ada akun yang menggunakan alamat email ini.
+online.err.invalid_username = Nama pengguna terdiri atas 3 hingga 24 huruf, angka, _ atau -.
+online.err.invalid_email = Alamat email ini tidak valid.
+online.err.weak_password = Kata sandi ini terlalu lemah: gunakan minimal 10 karakter.
+online.err.invalid_code = Kode ini salah.
+online.err.expired = Permintaan ini telah kedaluwarsa: silakan mulai lagi.
+online.err.registration_closed = Server ini tidak menerima akun baru.
+online.err.sso_cancelled = Proses masuk dengan Google dibatalkan.
+online.err.sso_expired = Proses masuk dengan Google memakan waktu terlalu lama atau sudah pernah digunakan. Silakan mulai lagi.
+online.err.sso_failed = Proses masuk dengan Google tidak berhasil. Silakan coba lagi.
+online.err.sso_listen = Scacelith tidak dapat menerima jawaban Google di komputer ini. Silakan coba lagi.
+online.err.sso_origin = Masuk dengan Google tidak berfungsi melalui alamat server ini. Tambahkan server dengan nama publik yang diberikan operatornya, lalu coba lagi.
+online.err.browser = Browser web tidak dapat dibuka.
+online.err.sso_email_unverified = Google belum mengonfirmasi alamat email akun Google ini.
+online.err.sso_account_exists = Sudah ada akun yang menggunakan alamat email ini, dan akun itu tidak dapat ditautkan ke opsi masuk dengan Google: masuklah dengan kata sandinya, atau gunakan "Lupa kata sandi?".
+online.err.sso_already_linked = Akun Google ini sudah ditautkan ke akun lain.
+online.err.account_disabled = Akun ini tidak dapat digunakan lagi.
+online.err.server_error = Server mengalami masalah. Silakan coba lagi.
+online.err.timeout = Server tidak menjawab tepat waktu.
+online.err.offline = Tidak terhubung ke server: coba lagi setelah terhubung.
+online.err.other = Server menolak ({0}).
+online.err.code = Server menolak (kesalahan {0}).
+online.err.slow_down = Harap sedikit lebih pelan.
+online.err.server_full = Server penuh. Coba lagi nanti.
+online.err.restarting = Server sedang dimulai ulang. Coba lagi sebentar lagi.
+online.err.move_refused = Server menolak langkah itu: papan dikembalikan.
+online.err.game_over = Permainan ini sudah berakhir.
+online.err.already_in_game = Anda sudah berada dalam sebuah permainan.
+online.err.invalid_category = Kontrol waktu ini tidak tersedia di sini.
+online.err.draw_offer_limit = Untuk saat ini Anda tidak dapat menawarkan remis lagi.
+online.err.abort_not_allowed = Permainan tidak dapat dibatalkan lagi.
+online.err.no_pending_offer = Tidak ada tawaran yang perlu dijawab.
+online.err.flag_fell = Waktu Anda habis.
+online.err.queue_not_allowed = Anda tidak dapat mencari lawan saat ini.
+online.err.challenge_not_found = Tantangan ini sudah tidak ada.
+online.err.user_unavailable = Pemain ini tidak tersedia.
+online.err.challenge_limit = Terlalu banyak tantangan untuk saat ini. Coba lagi nanti.
+online.err.challenge_self = Anda tidak dapat menantang diri sendiri.
+online.err.code_invalid = Tidak ada permainan dengan kode ini.
+online.err.rated_official_tc = Hanya kontrol waktu resmi yang dapat dinilai.
+online.err.cooldown = Pencarian lawan dijeda sejenak untuk Anda.
+online.err.invalid_tc = Kontrol waktu ini tidak diizinkan.
+online.err.rematch_unavailable = Tanding ulang sudah tidak memungkinkan.
+online.err.rated_repeat_limit = Untuk saat ini Anda sudah cukup banyak memainkan permainan yang dinilai melawan pemain ini. Mainkan permainan santai, atau coba lagi nanti.
+online.err.cheat_detected = Permainan dihentikan oleh pemeriksaan fair play server.
+online.err.invalid_password = Kata sandi salah.
+online.err.mfa_code_required = Masukkan kode dari aplikasi autentikator Anda (atau kode pemulihan).
+online.err.password_not_set = Akun ini masuk dengan Google dan belum memiliki kata sandi. Buat kata sandi terlebih dahulu dengan "Lupa kata sandi?" di halaman masuk.
+online.err.too_many_attempts = Terlalu banyak percobaan yang salah. Coba lagi nanti.
+online.err.too_many_attempts_for = Terlalu banyak percobaan yang salah. Coba lagi dalam {0}.
+online.err.same_email = Ini sudah alamat email Anda.
+online.err.not_found = Tidak ditemukan di server.
+online.err.invalid_response = Jawaban server tidak dapat dibaca.
+online.err.storage = Sesi tidak dapat disimpan di komputer ini.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = RIWAYAT PERMAINAN
+online.history.filter.games = Permainan
+online.history.filter.result = Hasil
+online.history.filter.all = Semua
+online.history.filter.won = Menang
+online.history.filter.lost = Kalah
+online.history.filter.drawn = Remis
+online.history.col.date = TANGGAL
+online.history.col.opponent = LAWAN
+online.history.col.result = HASIL
+online.history.col.tc = KONTROL WAKTU
+online.history.col.kind = JENIS
+online.history.col.rating = RATING
+online.history.won = Menang
+online.history.lost = Kalah
+online.history.drawn = Remis
+online.history.aborted = Dibatalkan
+online.history.page = Halaman {0} dari {1}
+online.history.total = {0} permainan
+online.history.previous = Sebelumnya
+online.history.next = Berikutnya
+online.history.empty.title = BELUM ADA PERMAINAN
+online.history.empty = Permainan Anda di server ini tercantum di sini setelah selesai.
+online.history.empty_filter.title = TIDAK ADA PERMAINAN
+online.history.empty_filter = Tidak ada permainan yang cocok dengan filter ini.
+online.history.error = RIWAYAT TIDAK DAPAT DIMUAT
+online.history.unavailable = SERVER INI TIDAK MENYEDIAKAN RIWAYAT PERMAINAN
+online.game.title = PERMAINAN
+online.game.players = PEMAIN
+online.game.you = ANDA
+online.game.unrated = Tanpa rating
+online.game.you_won = Anda menang
+online.game.you_lost = Anda kalah
+online.game.draw = Remis
+online.game.you_left = Anda meninggalkan permainan
+online.game.date = TANGGAL
+online.game.time_control = KONTROL WAKTU
+online.game.moves = LANGKAH
+online.game.move_count = {0} langkah
+online.game.no_moves = Tidak ada langkah yang dimainkan.
+online.game.moves_incomplete = Beberapa langkah tidak dapat dibaca: daftar berhenti sebelum akhir permainan.
+online.game.save = Simpan permainan
+online.game.saved_button = Tersimpan
+online.game.saved = Permainan ini ada di daftar permainan tersimpan Anda.
+online.game.already_saved = Permainan ini sudah ada di daftar permainan tersimpan Anda.
+online.game.save_failed = Permainan tidak dapat disimpan.
+online.game.invalid = Server mengirim catatan permainan yang tidak dapat dibaca.
+online.game.replay = Putar ulang
+online.game.not_found = PERMAINAN TIDAK DITEMUKAN
+online.game.error = PERMAINAN TIDAK DAPAT DIMUAT
+online.devices.title = PERANGKAT YANG MASUK
+online.devices.lead = Perangkat tempat akun ini sedang masuk. Jika ada yang tidak Anda kenali, keluarkan perangkat itu dan ubah kata sandi Anda.
+online.devices.unknown = Perangkat tidak dikenal
+online.devices.this = PERANGKAT INI
+online.devices.signed_in = Masuk pada {0}
+online.devices.last_active = terakhir aktif {0}
+online.devices.active_now = sedang digunakan
+online.devices.sign_out = Keluarkan
+online.devices.signed_out = Perangkat itu telah dikeluarkan.
+online.devices.error = PERANGKAT TIDAK DAPAT DIMUAT
+online.devices.all.title = KELUAR DI MANA-MANA
+online.email.title = UBAH EMAIL
+online.email.current = Alamat saat ini: {0}
+online.email.button = Ubah email
+online.email.sent = Tautan konfirmasi telah dikirim ke {0}.
+online.email.sent.hint = Alamat berubah setelah tautan dibuka. Sampai saat itu, alamat Anda saat ini tetap digunakan.
+online.email.done = Selesai
+online.email.changed = Alamat email Anda telah diubah.
+online.export.title = UNDUH DATA SAYA
+online.export.lead = Semua yang disimpan server ini tentang akun Anda (profil, rating, permainan, perangkat, peristiwa keamanan) disimpan sebagai file JSON di komputer ini. Masukkan kata sandi Anda untuk mengonfirmasi.
+online.export.button = Unduh
+online.export.saved = Data Anda telah disimpan di komputer ini.
+online.export.failed = File tidak dapat ditulis.
+online.delete.title = HAPUS AKUN
+online.delete.warning = Akun Anda akan dihapus dari server ini: alamat email, kata sandi, autentikasi dua faktor, dan perangkat Anda dihapus, dan Anda tidak dapat masuk lagi. Tindakan ini tidak dapat dibatalkan.
+online.delete.games = Permainan dan rating Anda tetap ada di server dengan nama anonim {0}.
+online.delete.confirm_name = Untuk mengonfirmasi, masukkan nama pengguna dan kata sandi Anda.
+online.delete.button = Hapus akun saya
+online.delete.done = Akun Anda telah dihapus.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Pertandingan langsung
+online.direct.title = PERTANDINGAN LANGSUNG
+online.direct.lead = Permainan persahabatan langsung antara dua komputer: tanpa server, tanpa akun, tidak pernah dinilai.
+online.direct.host = Jadi tuan rumah
+online.direct.host.desc = Teman Anda terhubung ke Anda: Anda memberinya alamat dan kode Anda.
+online.direct.join = Gabung ke permainan
+online.direct.join.desc = Terhubung ke teman yang menjadi tuan rumah.
+online.direct.host_title = MENJADI TUAN RUMAH
+online.direct.your_color = Warna Anda
+online.direct.auto_press.help = Kedua robot menekan jam dengan sendirinya begitu langkah ada di papan. Nonaktif: setiap pemain menekan jam setelah setiap langkah.
+online.direct.unrated = Pertandingan langsung adalah permainan persahabatan: tidak pernah dinilai.
+online.direct.connection = KONEKSI
+online.direct.port = Port
+online.direct.port.help = Port TCP tempat teman Anda terhubung (47100, kecuali sudah dipakai).
+online.direct.port_range = Pilih port antara 1024 dan 65535.
+online.direct.upnp = Buka port di router saya (UPnP)
+online.direct.upnp.help = Meminta router rumah untuk meneruskan port ke komputer ini, dan menutupnya setelah permainan.
+online.direct.host_note_upnp = Permainan meminta router Anda membuka port. Jika tidak bisa, Anda akan diberi tahu port mana yang perlu diteruskan secara manual.
+online.direct.host_note_manual = Teruskan port TCP ke komputer ini di router Anda, atau bermainlah di jaringan yang sama.
+online.direct.host_button = Mulai
+online.direct.wait_title = MENUNGGU TEMAN ANDA
+online.direct.opening = Membuka port {0} di router Anda…
+online.direct.give = Berikan kepada teman Anda:
+online.direct.cap_address = ALAMAT
+online.direct.cap_port = PORT
+online.direct.cap_code = KODE
+online.direct.lan = Di jaringan yang sama: {0}
+online.direct.router = router Anda
+online.direct.upnp_searching = Mencari router Anda…
+online.direct.upnp_mapped = Port dibuka di {0}.
+online.direct.upnp_none = Tidak ada router UPnP yang menjawab: teruskan port TCP {0} ke komputer ini secara manual.
+online.direct.upnp_failed = Router menolak membuka port: teruskan port TCP {0} ke komputer ini secara manual.
+online.direct.upnp_off = Teruskan port TCP {0} ke komputer ini di router Anda.
+online.direct.upnp_cgnat = Penyedia internet Anda kemungkinan besar membagi alamat internet Anda dengan pelanggan lain (CGNAT): coba IPv6 atau VPN.
+online.direct.firewall = Jika Windows bertanya apakah Scacelith boleh menerima koneksi, izinkan.
+online.direct.waiting = Menunggu teman Anda…
+online.direct.connecting_friend = Teman Anda sedang terhubung…
+online.direct.starting = Menyiapkan papan…
+online.direct.join_title = GABUNG KE PERMAINAN
+online.direct.join_lead = Masukkan apa yang dibacakan teman Anda: alamatnya, port, dan kode.
+online.direct.address = Alamat
+online.direct.address.hint = IPv4, IPv6 atau nama
+online.direct.code = Kode
+online.direct.join_button = Gabung
+online.direct.connecting_to = Menghubungkan ke {0}…
+online.direct.securing = Mengamankan koneksi dengan {0}…
+direct.event = Pertandingan persahabatan
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Langsung, {0}
+direct.err.refused = Tidak ada yang menjadi tuan rumah di alamat dan port ini.
+direct.err.timeout = Tidak ada jawaban: periksa alamat dan port, dan pastikan router teman Anda mengizinkan permainan masuk.
+direct.err.wrong_code = Kodenya salah.
+direct.err.invalid_code = Kode terdiri atas 12 karakter (XXXX-XXXX-XXXX).
+direct.err.incompatible = Teman Anda memakai versi Scacelith yang lain.
+direct.err.port_in_use = Port ini sudah dipakai di komputer ini: pilih port lain.
+direct.err.network = Jaringan tidak dapat digunakan.
+direct.err.too_many_attempts = Terlalu banyak kode yang salah: sesi tuan rumah dihentikan. Jadilah tuan rumah lagi untuk mendapatkan kode baru.
+direct.err.bad_address = Alamat ini tidak valid.
+direct.err.not_found = Nama ini tidak ditemukan.
+direct.err.unreachable = Alamat ini tidak dapat dijangkau dari sini.
+direct.err.reset = Koneksi terputus.
+direct.err.closed = Koneksi ditutup.
+direct.err.host_left = Teman Anda berhenti menjadi tuan rumah.
+direct.err.other = Koneksi gagal ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Pemain 2
+hotseat.white_player = Putih
+hotseat.black_player = Hitam
+hotseat.name.help = Nama yang ditulis di kedua formulir notasi, dalam aksara apa pun.
+hotseat.swap = Tukar warna
+hotseat.left_hand = {0} bermain dengan tangan kiri: jam berada di sebelah kirinya.
+hotseat.rated = Permainan dinilai
+hotseat.rated.help = Setiap nama memiliki rating dua pemainnya sendiri di komputer ini. Rating Anda melawan Stockfish tidak pernah berubah.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Rating dua pemain: {0} {1} · {2} {3}
+hotseat.new_rating = (baru)
+hotseat.friendly_note = Permainan persahabatan: rating tidak berubah.
+hotseat.colours = {0} bermain sebagai Putih, {1} sebagai Hitam.
+hotseat.colours_swap = Warna bertukar di setiap tanding ulang.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, giliran Anda
+hotseat.flag = Waktu {0} telah habis.
+hotseat.confirm.resign = Menyerah atas nama {0}? {1} akan dinyatakan sebagai pemenang.
+hotseat.confirm.resign_draw = Menyerah atas nama {0}? {1} tidak dapat lagi memberi skakmat: permainan akan berakhir remis.
+hotseat.draw.offer_noted = Tawaran remis Anda menyertai langkah Anda: {0} akan melihatnya setelah Anda menekan jam.
+hotseat.draw.card_title = TAWARAN REMIS
+hotseat.draw.offered = {0} menawarkan remis.
+hotseat.draw.card_hint = Menyentuh buah berarti menolaknya.
+hotseat.draw.accept = Terima
+hotseat.draw.decline = Tolak
+hotseat.draw.accepted = {0} menerima remis yang ditawarkan {1}.
+hotseat.draw.declined = {0} menolak remis yang ditawarkan {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Permainan dinilai
+hotseat.sheet.friendly = Permainan persahabatan
+# Game over card
+hotseat.gameover.wins = {0} menang dalam {1} langkah.
+hotseat.gameover.wins_now = {0} menang.
+hotseat.gameover.friendly = {0} melawan {1} · permainan persahabatan
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Permainan ini tidak dinilai.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Pelatih
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Suara sintetis yang dihasilkan oleh {0} untuk mode Pelatih
+# Coach page
+coach.title = PELATIH
+coach.section.level = TINGKAT
+coach.section.lesson = BERSAMA PELATIH
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Untuk pemain dengan rating {0}
+coach.completed = Selesai
+coach.recommended = Disarankan
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Aturan catur
+coach.level.0.desc = Pelajaran interaktif, aturan demi aturan.
+coach.level.0.detail = Pelatih menyiapkan posisi-posisi kecil dan menunjukkan cara setiap buah bergerak dan memakan, lalu rokade, promosi, skak, dan skakmat. Anda mencoba sendiri setiap gagasan di papan.
+coach.level.1.name = Langkah awal
+coach.level.1.desc = Apa yang diserang, apa yang tak terlindungi.
+coach.level.1.detail = Pelatih bermain dengan lembut dan berbicara dengan sederhana: buah Anda mana saja yang diserang, mana yang dibiarkan tanpa perlindungan, dan cara menjaganya.
+coach.level.2.name = Pemula
+coach.level.2.desc = Taktik sederhana, pengembangan buah, keamanan raja.
+coach.level.2.detail = Garpu dan kunci disebut dengan namanya. Pelatih membahas cara mengeluarkan buah-buah Anda dan menjaga raja Anda tetap aman.
+coach.level.3.name = Menengah
+coach.level.3.desc = Rencana, struktur pion, langkah satu-satunya.
+coach.level.3.detail = Pelatih menjelaskan rencana dan struktur pion, dan memperingatkan Anda ketika hanya ada satu langkah yang dapat mempertahankan posisi.
+coach.level.4.name = Pemain klub
+coach.level.4.desc = Langkah kandidat, evaluasi dalam satuan pion.
+coach.level.4.detail = Pelatih menimbang langkah-langkah kandidat dan memberikan evaluasi dalam satuan pion, seperti yang dilakukan pelatih klub.
+coach.level.5.name = Pemain klub kuat
+coach.level.5.desc = Variasi ringkas, istilah posisional.
+coach.level.5.detail = Komentar singkat, variasi konkret, dan kosakata permainan posisional.
+coach.level.6.name = Ahli
+coach.level.6.desc = Komentar sangat ringkas, variasi dalam, angka evaluasi.
+coach.level.6.detail = Sedikit kata, seperti di antara pemain kuat: variasi sedalam beberapa langkah dan angka evaluasi.
+coach.note.clock = Tanpa jam: gunakan waktu sebanyak yang Anda perlukan.
+coach.note.takeback = Setelah blunder, pelatih menunjukkan letak kesalahannya dan menawarkan untuk mengambil kembali langkah itu.
+coach.note.lesson = Anda bermain sebagai Putih; pelatih menyiapkan setiap latihan di papan.
+coach.note.unrated = Permainan dengan pelatih tidak dinilai.
+coach.note.fallible = Pelatih tidak selalu benar: terkadang ia bisa salah menilai sebuah langkah.
+coach.colour = Warna Anda
+coach.colour.help = Warna yang Anda mainkan melawan pelatih. Bergantian: Putih, lalu Hitam, dari satu permainan ke permainan berikutnya. Pelajaran tentang aturan selalu dimainkan dengan Putih.
+coach.colour.alternate = Bergantian
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Suara pelatih belum terpasang atau dinonaktifkan (Opsi > Audio): ucapannya akan ditulis di layar.
+# At the table
+coach.speaker = PELATIH
+coach.skip = Lewati
+coach.offer.title = AMBIL KEMBALI LANGKAH?
+coach.offer.text = Pelatih menawarkan untuk mengambil kembali langkah terakhir Anda, agar Anda dapat mencari langkah yang lebih baik.
+coach.offer.hint = Backspace mengambilnya kembali. Menyentuh buah berarti melanjutkan permainan.
+coach.offer.accept = Ambil kembali
+coach.offer.decline = Lanjut main
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Sisa kesempatan ambil kembali: {0}
+coach.pause.take_back = Ambil kembali langkah
+coach.pause.take_back.help = Mengambil kembali langkah terakhir Anda, beserta balasan pelatih jika ia sudah melangkah.
+coach.confirm.resign = Menyerah dalam permainan ini? Pelatih akan dinyatakan sebagai pemenang.
+coach.confirm.resign_draw = Menyerah dalam permainan ini? Pelatih tidak dapat lagi memberi skakmat: permainan akan berakhir remis.
+coach.confirm.leave = Kembali ke menu utama? Permainan dengan pelatih ini akan ditinggalkan.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Main lagi
+coach.gameover.unrated = Permainan dengan pelatih ini tidak dinilai.
+coach.lesson.done = BAGUS SEKALI
+coach.lesson.done.line = Sekarang Anda sudah mengetahui aturan catur.
+coach.lesson.next = Permainan pertama
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Latihan
+coach.tab.challenges = Tantangan
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = SKAKMAT
+challenge.group.tactics = TAKTIK
+challenge.group.defence = PERTAHANAN
+challenge.group.endgames = PERMAINAN AKHIR
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat dalam satu langkah
+challenge.mate1.desc = Satu langkah, dan itu skakmat.
+challenge.mate1.detail = Periksa dulu setiap skak: salah satunya tidak menyisakan petak bagi raja, tidak dapat dihalangi, dan buah pemberi skaknya tidak dapat dimakan.
+challenge.mate2.name = Mat dalam dua langkah
+challenge.mate2.desc = Satu langkah yang tak menyisakan pertahanan, lalu mat.
+challenge.mate2.detail = Langkah pertama sering kali berupa skak atau pengorbanan yang merampas satu petak dari raja. Pelatih bertahan sebaik mungkin.
+challenge.mate3.name = Mat dalam tiga langkah
+challenge.mate3.desc = Variasi paksa yang lebih panjang.
+challenge.mate3.detail = Skak, makan, dan ancaman, sedalam tiga langkah. Hitung jawaban terbaik pelatih di setiap langkah sebelum Anda menyentuh buah.
+challenge.backrank.name = Mat baris belakang
+challenge.backrank.desc = Raja yang terkurung di balik pion-pionnya sendiri.
+challenge.backrank.detail = Jika pion-pion di depan raja yang sudah rokade belum bergerak, benteng atau menteri di baris terakhir bisa memberi skakmat. Singkirkan atau alihkan para pelindung terlebih dahulu.
+challenge.patterns.name = Pola mat
+challenge.patterns.desc = Mat tercekik, mat Anastasia, mat Arab, dan pola klasik lainnya.
+challenge.patterns.detail = Jaring mat terkenal yang muncul berulang kali. Belajarlah mengenali susunan buahnya dan pukulan terakhirnya.
+challenge.hanging.name = Buah gratis
+challenge.hanging.desc = Temukan apa yang dibiarkan tak terlindungi.
+challenge.hanging.detail = Buah atau pion yang tidak dilindungi apa pun bisa langsung dimakan. Periksa apa saja yang melindungi setiap buah pelatih.
+challenge.fork.name = Garpu
+challenge.fork.desc = Satu buah menyerang dua buah sekaligus.
+challenge.fork.detail = Kuda, pion, menteri, bahkan raja bisa melakukan garpu. Lawan hanya bisa menyelamatkan salah satu dari dua sasaran.
+challenge.pin.name = Kunci
+challenge.pin.desc = Buah yang tidak dapat bergerak tanpa kehilangan apa yang ada di belakangnya.
+challenge.pin.detail = Kunci sebuah buah ke rajanya atau ke buah yang lebih berharga, lalu serang lagi buah itu, atau manfaatkan kenyataan bahwa buah itu tidak dapat bergerak.
+challenge.skewer.name = Tusuk sate
+challenge.skewer.desc = Serang buah yang berharga dan menangkan buah di belakangnya.
+challenge.skewer.detail = Kebalikan dari kunci: buah yang lebih berharga berada di depan, harus menyingkir, dan membuka buah di belakangnya.
+challenge.discovered.name = Serangan tersingkap
+challenge.discovered.desc = Gerakkan satu buah untuk melepaskan serangan buah lain.
+challenge.discovered.detail = Ketika sebuah buah keluar dari suatu garis, buah di belakangnya menyerang. Dengan skak, atau dengan skak ganda, lawan tidak punya waktu untuk menjawab kedua ancaman.
+challenge.deflection.name = Pembelokan dan pancingan
+challenge.deflection.desc = Alihkan pelindung, atau pancing buah ke petak yang fatal.
+challenge.deflection.detail = Pelindung yang punya dua tugas tidak dapat melakukan keduanya. Serang pelindung itu, tawarkan sesuatu kepadanya, atau paksa sebuah buah ke petak tempat buah itu akan hilang.
+challenge.intermezzo.name = Langkah sela
+challenge.intermezzo.desc = Jangan langsung memakan kembali: ada yang lebih kuat.
+challenge.intermezzo.detail = Sebelum langkah yang diharapkan, sebuah skak atau ancaman yang lebih besar yang diselipkan di antaranya mengubah segalanya.
+challenge.trapped.name = Buah terjebak
+challenge.trapped.desc = Buah yang tidak lagi punya petak aman.
+challenge.trapped.detail = Rampas petak pelarian terakhir sebuah buah, lalu menangkan buah itu.
+challenge.promotion.name = Promosi
+challenge.promotion.desc = Majukan pion hingga ke baris terakhir.
+challenge.promotion.detail = Pion yang sudah maju jauh sangat berharga. Bersihkan jalannya, singkirkan para penghadang, dan buat menteri baru.
+challenge.quiet.name = Langkah tenang
+challenge.quiet.desc = Langkah yang menang bukanlah skak, bukan pula memakan.
+challenge.quiet.detail = Terkadang langkah terkuat hanya menyiapkan ancaman yang tidak dapat ditangkis. Jenis yang paling sulit dilihat.
+challenge.opening.name = Jebakan pembukaan
+challenge.opening.desc = Hukum kesalahan di awal permainan.
+challenge.opening.detail = Posisi dari langkah-langkah pertama permainan sungguhan, tempat satu langkah ceroboh bisa langsung dimanfaatkan.
+challenge.escape.name = Temukan jalan keluar
+challenge.escape.desc = Raja Anda dalam bahaya: satu langkah menyelamatkannya.
+challenge.escape.detail = Semua langkah lain kalah. Periksa semua skak dan ancaman terhadap raja Anda, lalu temukan satu-satunya jalan keluar.
+challenge.defend.name = Langkah bertahan
+challenge.defend.desc = Tangkis ancaman tanpa kehilangan materi.
+challenge.defend.detail = Pelatih mengancam sesuatu. Temukan langkah tepat yang menjaga semuanya tetap utuh.
+challenge.kq.name = Menteri dan raja melawan raja
+challenge.kq.desc = Skakmat dengan menteri.
+challenge.kq.detail = Desak raja yang sendirian ke tepi dengan menteri Anda, dekatkan raja Anda sendiri, dan waspadai pat. Pelatih bertahan dengan langkah-langkah terbaiknya.
+challenge.kr.name = Benteng dan raja melawan raja
+challenge.kr.desc = Skakmat dengan benteng.
+challenge.kr.detail = Benteng memotong jalan raja, baris demi baris; raja Anda mengambil oposisi. Pelatih bertahan dengan langkah-langkah terbaiknya.
+challenge.kp.name = Raja dan pion melawan raja
+challenge.kp.desc = Rebut oposisi dan lakukan promosi.
+challenge.kp.detail = Majulah dengan raja Anda di depan, bukan pionnya. Ambil oposisi dan buat menteri yang tidak dapat dikejar pelatih.
+challenge.kp_hold.name = Hentikan pion
+challenge.kp_hold.desc = Raja sendirian melawan raja dan pion: pertahankan remis.
+challenge.kp_hold.detail = Berdirilah di depan pion dan pertahankan oposisi. Bertahanlah selama sepuluh langkah.
+challenge.rook.name = Permainan akhir benteng
+challenge.rook.desc = Jembatan Lucena dan pertahanan Philidor.
+challenge.rook.detail = Dua posisi yang wajib diketahui setiap pemain: cara menang dengan pion di baris ketujuh, dan cara bertahan dengan benteng di baris ketiga.
+challenge.endgame.name = Taktik permainan akhir
+challenge.endgame.desc = Sedikit buah, ide tajam.
+challenge.endgame.detail = Adu cepat pion, terobosan, dan permainan akhir benteng dari permainan sungguhan.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} posisi
+coach.challenge.done = Selesai
+coach.challenge.start = Mulai
+coach.challenge.note.white = Anda bermain sebagai Putih; pelatih menyiapkan setiap posisi di papan.
+coach.challenge.note.hint = Buntu? Tekan H untuk petunjuk. Setelah beberapa percobaan, pelatih akan menawarkannya.
+coach.challenge.note.unsaved = Tantangan tidak dinilai atau disimpan; tanda centang menunjukkan tantangan yang sudah Anda selesaikan.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = TANTANGAN SELESAI
+coach.challenge.complete.line = Anda telah memecahkan semua posisi.
+coach.challenge.next = Tantangan berikutnya
+coach.challenge.again = Ulangi
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = PETUNJUK?
+coach.hint.text = Pelatih menawarkan petunjuk kepada Anda.
+coach.hint.hint = H memberikan petunjuk. Menyentuh buah berarti terus mencari sendiri.
+coach.hint.accept = Petunjuk
+coach.hint.decline = Tidak usah
+coach.hint.key = Petunjuk
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Suara pelatih
+options.coach_voice.help = Dalam mode Pelatih, ucapan pelatih dibacakan dengan suara. Model suaranya diunduh saat pertama kali diperlukan (sekitar 399 MB). Nonaktif: ucapan pelatih hanya ditulis di layar.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Model suara
+options.voice_update.help = Pelatih masih berbicara dengan model suara versi 8-bit yang lama. Pembaruan ini mengunduh versi resmi Supertonic 3, yang diterbitkan oleh Supertone, dan menghapus file lama terlebih dahulu.
+options.voice_update.button = Perbarui ({0} MB)
+options.voice_update.running = Pengunduhan sedang berlangsung.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Kualitas suara
+options.voice_quality.help = Jumlah tahap penyempurnaan yang dijalankan sintesis suara pelatih untuk setiap kalimat, dari Rendah (4) hingga Maksimum (9); bawaannya Sedang (5). Tingkat yang lebih tinggi menghasilkan suara yang sedikit lebih jernih tetapi butuh waktu komputasi lebih lama, sehingga pelatih mulai berbicara sedikit lebih lambat. Opsi ini dapat diatur setelah model suara terpasang, dengan Suara pelatih aktif.
+options.voice_quality.low = Rendah
+options.voice_quality.medium = Sedang
+options.voice_quality.high = Tinggi
+options.voice_quality.very_high = Sangat tinggi
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimum
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Suara Pelatih
+coach.download.text = Pelatih berbicara dengan Supertonic 3, model sintesis suara buatan Supertone. Model ini tidak disertakan bersama Scacelith: permainan dapat mengunduhnya sekarang dari Hugging Face ({0} MB, sekali saja). Tanpa model ini, pelatih menuliskan ucapannya di layar.
+coach.download.licence = Model ini diterbitkan di bawah lisensi OpenRAIL-M, yang melarang penggunaan tertentu atas suara yang dihasilkannya, seperti menampilkannya sebagai suara manusia atau meniru orang sungguhan.
+coach.download.read_licence = Baca lisensi
+coach.download.accept = Dengan memilih Unduh, Anda menyetujui ketentuan lisensi ini.
+# {0} = a folder
+coach.download.folder = Disimpan di: {0}
+coach.download.not_now = Nanti saja
+# {0} = the size in megabytes
+coach.download.download = Unduh ({0} MB)
+coach.download.licence_title = LISENSI OPENRAIL-M
+coach.download.back = Kembali
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Suara Baru untuk Pelatih
+coach.update.text = Suara pelatih kini menggunakan versi resmi Supertonic 3, yang diterbitkan oleh Supertone, sebagai pengganti konversi 8-bit yang terpasang selama ini. Permainan dapat mengunduhnya sekarang dari Hugging Face ({0} MB, sekali saja); file lama ({1} MB) dihapus terlebih dahulu. Jika Anda menolak, pelatih tetap memakai suaranya saat ini, dan pembaruan tetap tersedia di Opsi > Audio.
+coach.update.download = Perbarui ({0} MB)
+coach.update.accept = Dengan memilih Perbarui, Anda menyetujui ketentuan lisensi ini.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = SUARA PELATIH
+coach.download.removing = Menghapus versi lama…
+coach.download.checking = Memeriksa file…
+coach.download.downloading = Mengunduh…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Dari Hugging Face
+coach.download.from_archive = Dari Hugging Face (salinan arsip)
+coach.download.cancel = Batal
+coach.download.failed = Pengunduhan gagal.
+coach.download.error.network = Server tidak dapat dijangkau. Silakan periksa koneksi internet Anda dan coba lagi.
+# {0} = a folder
+coach.download.error.disk = File tidak dapat ditulis di {0}. Silakan periksa ruang kosong dan coba lagi.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Server mengirim jawaban yang tidak terduga ({0}). Silakan coba lagi nanti.
+coach.download.retry = Coba lagi
+coach.download.close = Tutup
+# Notices
+coach.download.done = Suara pelatih telah terpasang.
+coach.download.cancelled = Pengunduhan dibatalkan: lain kali akan dilanjutkan dari titik terakhir.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Permainan Tersimpan
+options.save_games = Simpan permainan saya
+options.save_games.help = Saat selesai, permainan Anda melawan Stockfish, bersama pelatih, antara dua pemain di komputer ini, serta pertandingan langsung Anda disimpan sebagai file PGN, yang dapat ditemukan kembali di Permainan Tersimpan. Permainan online disimpan oleh server.
+library.title = PERMAINAN TERSIMPAN
+library.section.games = PERMAINAN
+library.section.details = PERMAINAN INI
+library.section.tags = TAG
+library.section.moves = LANGKAH
+library.count = {0} permainan
+library.filter = Tampilkan
+library.filter.all = Semua permainan
+library.filter.play = Melawan Stockfish
+library.filter.coach = Bersama pelatih
+library.filter.hotseat = Dua pemain
+library.filter.direct = Pertandingan langsung
+library.filter.server = Permainan online
+library.filter.imported = Diimpor
+library.mode.play = Melawan Stockfish
+library.mode.coach = Bersama pelatih
+library.mode.hotseat = Dua pemain
+library.mode.direct = Pertandingan langsung
+library.mode.server = Permainan online
+library.mode.imported = Diimpor
+library.coach_level = Tingkat {0}
+library.unknown_player = Tidak dikenal
+library.unfinished = Belum selesai
+library.unreadable = Permainan ini tidak dapat dibaca.
+library.moves = {0} langkah
+library.opening_variation = {0}: {1}
+library.file = File: {0}
+library.file_game = File: {0}, permainan {1} dari {2}
+library.no_moves = Tidak ada langkah yang dimainkan.
+library.none_selected = Pilih permainan di daftar.
+library.reading = Membaca permainan tersimpan
+library.empty.title = Belum ada permainan tersimpan
+library.empty.text = Permainan Anda melawan Stockfish, bersama pelatih, antara dua pemain di komputer ini, serta pertandingan langsung Anda muncul di sini setelah selesai. Anda juga dapat menaruh file PGN di folder ini: permainan yang diekspor dari program atau situs web lain akan tercantum bersama permainan Anda.
+library.empty.filter = Tidak ada permainan jenis ini.
+library.error.folder = Folder permainan tersimpan tidak dapat dibaca
+library.error.game = Permainan ini tidak dapat dibaca: {0}
+library.folder = Folder: {0}
+library.open_folder = Buka Folder
+library.open_failed = Folder tidak dapat dibuka.
+library.replay = Putar ulang
+library.delete = Hapus
+library.delete.title = HAPUS PERMAINAN
+library.delete.text = Permainan {0} akan dihapus dari komputer ini, beserta filenya. Tindakan ini tidak dapat dibatalkan.
+library.delete.ok = Hapus
+library.delete.several = File ini berisi {0} permainan: file ini hanya dapat dihapus dari folder.
+library.deleted = Permainan telah dihapus.
+library.delete.failed = Permainan tidak dapat dihapus.
+library.delete.changed = File telah berubah: daftar telah diperbarui.
+library.truncated = Folder ini berisi terlalu banyak permainan: hanya {0} permainan terbaru yang ditampilkan.
+library.tag.Event = Acara
+library.tag.Site = Tempat
+library.tag.Date = Tanggal
+library.tag.Time = Waktu
+library.tag.Round = Babak
+library.tag.White = Putih
+library.tag.Black = Hitam
+library.tag.Result = Hasil
+library.tag.WhiteElo = Elo Putih
+library.tag.BlackElo = Elo Hitam
+library.tag.TimeControl = Kontrol waktu
+library.tag.Termination = Cara berakhir
+library.tag.Opening = Pembukaan
+library.tag.Variation = Varian
+library.tag.PlyCount = Setengah langkah
+library.tag.FEN = Posisi awal
+library.tag.ScacelithMode = Mode
+library.tag.CoachLevel = Tingkat pelatih
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Nomor permainan
+library.tag.UTCDate = Tanggal (UTC)
+library.tag.UTCTime = Waktu (UTC)
+library.tag.WhiteRatingDiff = Perubahan rating Putih
+library.tag.BlackRatingDiff = Perubahan rating Hitam
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analisis
+analysis.menu.title = ANALISIS
+analysis.menu.analyse = Analisis
+analysis.menu.paste = Tempel PGN
+analysis.menu.online = Permainan online
+analysis.menu.folder = Taruh file PGN di folder ini untuk menganalisisnya: {0}
+analysis.menu.empty.title = Belum ada permainan tersimpan
+analysis.menu.empty.text = Permainan Anda muncul di sini setelah selesai, begitu pula file PGN yang ditaruh di folder di bawah ini. Anda juga dapat menempelkan permainan yang disalin sebagai teks PGN.
+analysis.menu.empty.no_folder = Tempelkan permainan yang disalin sebagai teks PGN untuk menganalisisnya.
+analysis.menu.paste.empty = Papan klip kosong: salin dulu permainan sebagai teks PGN.
+analysis.menu.paste.none = Tidak ditemukan permainan catur di papan klip.
+analysis.menu.paste.several = Papan klip berisi beberapa permainan: hanya permainan pertama yang dianalisis.
+analysis.menu.gameover = Analisis permainan
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Langkah {0} dari {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Instan
+replay.again = Putar ulang lagi
+replay.gameover.unfinished = Permainan berhenti setelah langkah ke-{0}, tanpa hasil.
+replay.tip.start = Awal permainan (Home)
+replay.tip.back = Mundur satu langkah (J)
+replay.tip.pause = Jeda (K)
+replay.tip.resume = Lanjutkan (K)
+replay.tip.forward = Maju satu langkah (L)
+replay.tip.end = Akhir permainan (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMENTAR
+analysis.hud.accuracy = AKURASI
+analysis.hud.reviewing = Stockfish sedang mengulas permainan… {0}
+analysis.hud.no_engine = Tidak ada mesin catur: langkah-langkah ditampilkan tanpa analisis.
+analysis.hud.no_moves = Permainan ini tidak memiliki langkah.
+analysis.hud.tip.play = Putar langkah-langkahnya (K)
+analysis.hud.tip.comments_off = Sembunyikan komentar pada momen-momen penting (N)
+analysis.hud.tip.comments_on = Tampilkan komentar pada momen-momen penting (N)
+analysis.hud.tip.voice_off = Matikan suara komentator (M)
+analysis.hud.tip.voice_on = Dengarkan komentar yang diucapkan (M)
+analysis.hud.tip.voice_missing = Suara tidak dapat didengar: filenya belum terpasang, atau Opsi > Audio > Suara pelatih nonaktif. Komentar hanya ditulis di layar.
+analysis.hud.tip.arrows_off = Sembunyikan panah langkah-langkah yang lebih baik (B)
+analysis.hud.tip.arrows_on = Tampilkan panah langkah-langkah yang lebih baik (B)
+analysis.hud.controls.play = Putar / jeda
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Tampilkan / sembunyikan komentar
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Suara komentator aktif / nonaktif
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Tampilkan / sembunyikan panah
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Simpan sebagai GIF
+gif.making = Membuat GIF: server sedang menggambar permainan…
+gif.saved = GIF telah disimpan:
+gif.saved_as = GIF tersimpan: {0}
+gif.sign_in_first = Masuk ke server online untuk membuat GIF: server yang menggambarnya.
+gif.busy_other = GIF lain sedang dibuat. Silakan tunggu hingga selesai.
+gif.err.rate_limited_for = Anda telah membuat banyak GIF dalam waktu singkat. Anda dapat membuat GIF berikutnya dalam {0}.
+gif.err.rate_limited = Anda telah membuat banyak GIF dalam waktu singkat. Silakan coba lagi nanti.
+gif.err.server_busy_for = Server sedang sibuk menggambar GIF lain. Silakan coba lagi dalam {0}.
+gif.err.server_busy = Server sedang sibuk menggambar GIF lain. Silakan coba lagi sebentar lagi.
+gif.err.signed_out = Sesi Anda telah berakhir. Silakan masuk lagi untuk membuat GIF.
+gif.err.game_too_long = Permainan ini terlalu panjang untuk dijadikan GIF.
+gif.err.pgn_too_large = Permainan ini terlalu panjang untuk dijadikan GIF.
+gif.err.invalid_pgn = Server tidak dapat membaca permainan ini.
+gif.err.render_failed = Server tidak dapat membuat GIF ini. Silakan coba lagi.
+gif.err.gif_disabled = Server ini tidak membuat GIF.
+gif.err.write_failed = GIF tidak dapat disimpan di komputer ini.
+gif.err.not_found = Permainan ini sudah tidak ada di server.
+gif.wait.seconds = {0} detik
+gif.wait.minutes = {0} menit
+gif.wait.both = {0} dan {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Tidak dapat memulai OpenGL 4.6. Silakan perbarui driver grafis Anda.
+error.opengl_macos = Tidak dapat memulai OpenGL 4.6 di Mac ini. Scacelith memerlukan Apple silicon (M1 atau yang lebih baru) dan macOS 26 atau yang lebih baru, serta tidak dapat berjalan di mesin virtual.
+error.renderer = Mesin render tidak dapat dimulai.
+error.scene = Adegan 3D tidak dapat dimuat.
+error.log_file = Rincian ada di file log: {0}

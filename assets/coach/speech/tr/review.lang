@@ -1,0 +1,985 @@
+# Coach speech (Turkish): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "sen" ("Bak.", "Dikkat et!", "kaçırdın"); Turkish has no grammatical gender,
+# so nothing agrees with the coach or the player.
+# Pieces ({your} {my} {your2} {my2} {t1} {t2}) carry their possessive ("atın", "atım"); every case comes
+# from common.lang: {your:acc} atını, {t1:dat} vezirine, {my:gen} filimin, {your:ins} kalenle,
+# {your:abl}, {my:loc}, {your:nom_mi} "atın mı", {your:pron_acc} "onu".
+# Never a suffix after {sq} {move} {best} {reply} {line} {eval} {n} {n2} {m} {text}: the ending goes on
+# a noun ("{sq} karesine", "{best} hamlesi", "{reply} çatalına", "{reply} hamlesinden sonra") or a
+# separate word follows ("{best} ile", "{line} sonrasında", "{sq} gibi", "{best} idi").
+# Counted: {m:move} "2 hamle" ("{m:move}de mat" = "2 hamlede mat"), {pts:point} "3 puan"
+# ("{n2:point}lık bir taş"), {n:time} "3 kez", {n2:piece} "2 taş", {n:square} "3 kare"; a bare {n} may
+# be followed by a noun ("{n} hamlede", "{n} taşımla").
+# Tenses: the position now in -Iyor, what a better move would have done in -ArdI ("kazanırdı"), what
+# happened in -DI. Terms as in the glossary: büyük hata, hata, kusurlu hamle, çatal, açmaz, şiş,
+# açarak saldırı, askıda / korumasız taş, son yatay (b1-b2 "en arka sıra"), geçer piyon, opozisyon.
+# {text} = a mate pattern name (name.pattern.*), nominative without "bir": "Bu kalıba {text} denir."
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Şah! Şahım saldırı altında.
+ann.check.human.b1.2 = Şah! Şahıma saldırıyorsun.
+ann.check.human.b1.3 = Şah çektin! Şahımı kurtarmam gerek.
+ann.check.human = Şah.
+ann.check.human.2 = Şah!
+ann.check.human.3 = İşte şah.
+# The coach gives check.
+ann.check.coach = Şah!
+ann.check.coach.2 = Şah.
+ann.check.coach.3 = Ve şah!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Bu, {your:gen} saldırı altında olduğu anlamına gelir. {your:pron_acc} şahtan kurtarman gerek.
+ann.check.coach.first.2 = Şah, {your:gen} saldırı altında olması demek. {your:pron_acc} kaçır, araya bir taş koy ya da taşımı al.
+ann.double_check.coach = Çifte şah! İki taşım aynı anda şahına saldırıyor; şahın kaçmak zorunda.
+ann.double_check.coach.2 = Bu bir çifte şah: artık seni ancak bir şah hamlesi kurtarır.
+ann.double_check.human = Çifte şah! İki taşın aynı anda şahıma saldırıyor; şahım kaçmak zorunda.
+ann.double_check.human.2 = Çifte şah! Artık beni ancak bir şah hamlesi kurtarabilir.
+# The player checkmates the coach.
+ann.mate.human.b1 = Şah mat! Kazandın! Şahım kaçamıyor.
+ann.mate.human.b1.2 = Bu şah mat! Bravo, oyunu kazandın!
+ann.mate.human.b1.3 = Şah mat! Şahım kapana kısıldı. Tebrikler!
+ann.mate.human = Şah mat. İyi oynadın.
+ann.mate.human.2 = Bu mat. Tebrikler.
+ann.mate.human.3 = Şah mat! Çok güzel.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Bu şah mat. Şahının kaçacak yeri yok.
+ann.mate.coach.b1.2 = Şah mat. Şahın saldırı altında ve kaçamıyor.
+ann.mate.coach.b1.3 = Maalesef bu şah mat. Şahın kaçamıyor.
+ann.mate.coach = Şah mat.
+ann.mate.coach.2 = İşte mat.
+ann.mate.coach.3 = Şah mat, maalesef.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Hay aksi! Bu hamle bana bir şey kazandırıyor.
+ex.verdict.blunder.b1.2 = Dikkat! Bu hamle sana pahalıya mal olabilir.
+ex.verdict.blunder.b1.3 = Ah, dur. Bu hamlede bir sorun var.
+ex.verdict.blunder.b2 = Hımm, bu hamlede bir sorun var.
+ex.verdict.blunder.b2.2 = Bu büyük bir hata.
+ex.verdict.blunder.b2.3 = Dikkat, bu hamle sana bir şey kaybettiriyor.
+ex.verdict.blunder.b3 = Bu büyük bir hata.
+ex.verdict.blunder.b3.2 = {move} gerçekten hatalı bir hamle.
+ex.verdict.blunder.b3.3 = Of, {move} büyük bir hata.
+ex.verdict.blunder.b4 = {move} büyük bir hata.
+ex.verdict.blunder.b4.2 = {move} ciddi bir hata.
+ex.verdict.blunder.b4.3 = Maalesef bu büyük bir hata.
+ex.verdict.blunder.b5 = {move} ciddi bir hata.
+ex.verdict.blunder.b5.2 = {move} büyük bir hata.
+ex.verdict.blunder.b5.3 = {move} pahalıya mal olan bir hata.
+ex.verdict.blunder.b6 = {move} ağır bir hata.
+ex.verdict.blunder.b6.2 = {move} büyük bir hata.
+ex.verdict.blunder.b6.3 = {move}? Büyük hata.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Hay aksi! Tehdidime cevap vermedin.
+ex.verdict.ignored.b1.2 = Dikkat! Tehdidim hâlâ duruyordu.
+ex.verdict.ignored.b1.3 = Ah, dur. Tehdidimi unuttun.
+ex.verdict.ignored.b2 = Hımm, tehdidim hâlâ duruyordu.
+ex.verdict.ignored.b2.2 = Tehdidimi cevapsız bıraktın.
+ex.verdict.ignored.b2.3 = Dikkat, tehdidime cevap vermedin.
+ex.verdict.mistake.b3 = Bu iyi bir hamle değil.
+ex.verdict.mistake.b3.2 = Hımm, {move} hamlesinde bir sorun var.
+ex.verdict.mistake.b3.3 = Bu bir hata.
+ex.verdict.mistake.b4 = {move} bir hata.
+ex.verdict.mistake.b4.2 = {move} iyi değil.
+ex.verdict.mistake.b4.3 = Bu bir hata.
+ex.verdict.mistake.b5 = {move} açık bir hata.
+ex.verdict.mistake.b5.2 = {move} bir hata.
+ex.verdict.mistake.b5.3 = {move} iyi değil.
+ex.verdict.mistake.b6 = {move} hatalı.
+ex.verdict.mistake.b6.2 = {move}? Hata.
+ex.verdict.mistake.b6.3 = {move} olmaz.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Fena değil, ama {best} biraz daha iyiydi.
+ex.verdict.inaccuracy.b3.2 = {best} biraz daha isabetliydi.
+ex.verdict.inaccuracy.b3.3 = Küçük bir kusur: burada {best} daha iyiydi.
+ex.verdict.inaccuracy.b4 = Kusurlu bir hamle: {best} daha isabetliydi.
+ex.verdict.inaccuracy.b4.2 = Ufak bir kusur. {best} biraz daha iyiydi.
+ex.verdict.inaccuracy.b4.3 = Tam en iyisi değil: {best} daha isabetliydi.
+ex.verdict.inaccuracy.b5 = {move} kusurlu; {best} daha güçlüydü.
+ex.verdict.inaccuracy.b5.2 = Biraz kusurlu. Ben {best} hamlesini oynardım.
+ex.verdict.inaccuracy.b5.3 = {best}, {move} hamlesinden daha isabetliydi.
+ex.verdict.inaccuracy.b6 = {move} kusurlu; {best}.
+ex.verdict.inaccuracy.b6.2 = Kusurlu. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} daha iyiydi.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = {best} biraz daha isabetli olabilirdi.
+ex.verdict.inaccuracy.maybe.2 = Ben {best} hamlesini oynayabilirdim.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Bu hamle şüpheli görünüyor.
+ex.verdict.dubious.2 = Bu hamle bana şüpheli geliyor.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ah, dur! İyi bir şeyi kaçırdın.
+ex.verdict.missed.b1.2 = Tekrar bak! Daha iyi bir şey vardı.
+ex.verdict.missed.b1.3 = Dur bakalım, orada bir fırsatın vardı!
+ex.verdict.missed.b2 = Orada bir fırsatı kaçırdın.
+ex.verdict.missed.b2.2 = Hımm, daha iyi bir şey vardı.
+ex.verdict.missed.b2.3 = Dur, orada harika bir hamlen vardı.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Daha iyisi {best} hamlesiydi.
+ex.better.b3.2 = {best} daha iyi bir hamleydi.
+ex.better.b3.3 = Bunun yerine {best} iyiydi.
+ex.better.b4 = {best} daha güçlüydü.
+ex.better.b4.2 = Doğru hamle {best} idi.
+ex.better.b4.3 = Daha iyisi {best} hamlesiydi.
+ex.better.b5 = {best}, {line} fikriyle.
+ex.better.b5.2 = Doğru hamle {best} idi: {line}.
+ex.better.b5.3 = Daha iyisi {best}, ardından {line} idi.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Bunun yerine {best}, {eval}.
+ex.better.b6.3 = {best} hamlesiyle {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = {your:ins} daha iyi bir hamle vardı.
+ex.hint.b1.2 = {your:gen} daha iyi bir hamlesi vardı.
+ex.hint.b2 = {your:gen} daha iyi bir hamlesi vardı.
+ex.hint.b2.2 = {your:ins} daha iyi bir hamle vardı.
+ex.hint.b3 = {your:gen} daha iyi bir hamlesi vardı.
+ex.hint.b3.2 = {your:ins} daha iyi bir şey vardı.
+ex.hint.b4 = {your:gen} daha iyi bir hamlesi vardı.
+ex.hint.b4.2 = {your:dat} tekrar bak: daha iyi bir hamlesi vardı.
+ex.hint.b5 = {your:gen} daha güçlü bir hamlesi vardı.
+ex.hint.b5.2 = {your:ins} daha güçlü bir hamle vardı.
+ex.hint.b6 = {your:gen} daha iyisi vardı.
+ex.hint.b6.2 = {your:dat} tekrar bak.
+ex.hint.move = Daha iyi bir hamle vardı.
+ex.hint.move.2 = Orada daha iyi bir hamlen vardı.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your:gen} daha iyi bir hamlesi vardı. O hamle materyal kazanıyor.
+ex.hint.gain.b1.2 = {your:ins} daha iyi bir hamle vardı. O hamle materyal kazanıyor.
+ex.hint.gain.b2 = {your:gen} daha iyi bir hamlesi vardı. O hamle materyal kazanıyor.
+ex.hint.gain.b2.2 = {your:ins} materyal kazanan bir hamle vardı.
+ex.hint.gain.b3 = {your:gen} daha iyi bir hamlesi vardı: materyal kazanan bir hamle.
+ex.hint.gain.b3.2 = {your:ins} materyal kazanan bir hamle vardı.
+ex.hint.gain.b4 = {your:gen} materyal kazanan bir hamlesi vardı.
+ex.hint.gain.b4.2 = {your:dat} tekrar bak: materyal kazanan bir hamlesi vardı.
+ex.hint.gain.b5 = {your:gen} daha güçlü bir hamlesi vardı: materyal kazanan bir hamle.
+ex.hint.gain.b5.2 = {your:ins} materyal kazanan bir hamle vardı.
+ex.hint.gain.b6 = {your:gen} materyal kazanan bir hamlesi vardı.
+ex.hint.gain.b6.2 = {your:dat} tekrar bak: kazanılacak materyal vardı.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = Daha iyisi, {your:acc} {sq} karesine oynamaktı.
+ex.reveal.b1.2 = {your} {sq} karesine gidebilirdi. Bu daha iyiydi.
+ex.reveal.b2 = {your:acc} {sq} karesine oynamak daha iyiydi.
+ex.reveal.b2.2 = Daha iyi hamle, {your:acc} {sq} karesine oynamaktı.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Taşları yerine koyalım.
+ex.rewind.b1.2 = Şimdi her şeyi eski yerine koyuyorum.
+ex.rewind.b1.3 = Taşları yerlerine geri koyayım.
+ex.rewind.b2 = Her şeyi yerine koyalım.
+ex.rewind.b2.2 = Kaldığımız yere dönelim.
+ex.rewind.b2.3 = Taşları yerine koyuyorum.
+ex.rewind.b3 = Oyuna dönelim.
+ex.rewind.b3.2 = Geri dönelim.
+ex.rewind.b3.3 = Pozisyona dönelim.
+ex.rewind.b4 = Oyuna dönüyoruz.
+ex.rewind.b4.2 = Geri dönüyoruz.
+ex.rewind.b4.3 = Geri dönelim.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Başka bir hamle denemek ister misin?
+ex.offer.b1.2 = O hamleyi geri alıp yeniden denemek ister misin?
+ex.offer.b1.3 = Farklı bir hamle deneyelim mi?
+ex.offer.b2 = Başka bir hamle denemek ister misin?
+ex.offer.b2.2 = Geri almak ister misin?
+ex.offer.b2.3 = Bir daha dener misin?
+ex.offer.b3 = Geri almak ister misin?
+ex.offer.b3.2 = Tekrar denemek ister misin?
+ex.offer.b3.3 = Geri alalım mı?
+ex.offer.b4 = Geri alalım mı?
+ex.offer.b4.2 = Geri almak ister misin?
+ex.offer.b4.3 = Başka bir hamle dener misin?
+ex.offer.b5 = Geri alınsın mı?
+ex.offer.b5.2 = Geri almak ister misin?
+ex.offer.b5.3 = Geri alalım mı?
+ex.offer.b6 = Geri alınsın mı?
+ex.offer.b6.2 = Geri alalım mı?
+ex.offer.b6.3 = Yeniden denensin mi?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Bu hamle şüpheli. Daha iyisini yapabilir misin acaba?
+ex.dubious.b1.2 = Bu hamle şüpheli. Daha iyi bir hamle bulabilir misin acaba?
+ex.dubious.b2 = Şüpheli bir hamle. Daha iyisini yapabilir misin acaba?
+ex.dubious.b2.2 = Bu hamle şüpheli. Daha iyi bir şey var mı acaba?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Sonra {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} {sq} karesine gidiyor.
+demo.my.move.2 = {my:acc} {sq} karesine oynuyorum.
+demo.my.move.3 = Sonra {my} {sq} karesine gidiyor.
+demo.my.take = {your:acc} alıyorum.
+demo.my.take.2 = {my} {your:acc} alıyor.
+demo.my.take.3 = Ve {your:acc} alıyorum.
+demo.my.check = {my} {sq} karesine gidiyor. Şah.
+demo.my.check.2 = {my:ins} {sq} karesinden şah.
+demo.my.check.3 = {my} {sq} karesine, şah!
+demo.my.mate = {my} {sq} karesine gidiyor. Şah mat.
+demo.my.mate.2 = Ve {my} {sq} karesine gelince şah mat.
+demo.my.mate.3 = {my} {sq} karesine. Bu şah mat.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Önce {my} {your:acc} alıyor. {t1} bekleyebilir.
+demo.my.first.take.2 = {my} önce {your:acc} alıyor. {t1} nasılsa orada kalacak.
+demo.my.first.check = {my} {your:acc} alıyor, üstelik şah! {t1} bekleyebilir.
+demo.my.first.check.2 = Önce {my} şah çekerek {your:acc} alıyor. {t1} nasılsa orada kalacak.
+demo.my.first.check_move = Önce {my:ins} {sq} karesinden şah. {t1} bekleyebilir.
+demo.my.first.check_move.2 = {my} {sq} karesine gidiyor: önce şah! {t1} nasılsa orada kalacak.
+demo.my.first.move = Önce {my} {sq} karesine gidiyor. {t1} bekleyebilir.
+demo.my.first.move.2 = Önce {my} {sq} karesine. {t1} nasılsa orada kalacak.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} saldırı altında, bu yüzden önce {your:acc} alıyor.
+demo.my.first.attacked.2 = {my} tehdit altında: önce {your:acc} kapıyor.
+# Levels 4-6, the same in-between move.
+demo.first = Önce {move}: {t1} bekleyebilir.
+demo.first.2 = Önce {move}. {t1} nasılsa orada kalacak.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Şimdi kendi hamlemi oynuyorum.
+demo.play_on.2 = İşte asıl hamlem.
+demo.play_on.3 = Ve şimdi gerçek hamlem.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = {your:acc} {sq} karesine oynardın.
+demo.your.move.2 = Diyelim ki {your:acc} {sq} karesine oynuyorsun.
+demo.your.move.3 = Sonra {your} {sq} karesine gidiyor.
+demo.your.take = {my:acc} alırdın.
+demo.your.take.2 = {your:ins} {my:acc} alıyorsun.
+demo.your.take.3 = Sonra {my:acc} alıyorsun.
+demo.your.back = Geri alıyorsun.
+demo.your.back.2 = {sq} karesinde geri alıyorsun.
+demo.your.back.3 = Ve sen de geri alıyorsun.
+demo.your.king = Şahın kaçmak zorunda.
+demo.your.king.2 = Şah {sq} karesine çekilmek zorunda.
+demo.your.king.3 = Şahın {sq} karesine kaçıyor.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Artık {t1} kurtulamaz.
+ex.point.piece.2 = Ve {t1} elden gidiyor.
+ex.point.piece.3 = Sonra {t1} düşüyor.
+ex.point.two = {t1} ve {t2} aynı anda saldırı altında: biri düşecek.
+ex.point.two.2 = Şimdi {t1:dat} ve {t2:dat} saldırıyorum. İkisini birden kurtaramazsın.
+ex.point.mate = Ve şimdi {reply:nomate} ile şah mat.
+ex.point.mate.2 = Sırada {reply:nomate} var ve bu şah mat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Gördün mü? Şimdi {pts:point} kaybettin.
+ex.result.b1.2 = İşte böyle {pts:point} kaybediyorsun.
+ex.result.b2 = Sonunda {pts:point} kaybettin.
+ex.result.b2.2 = Şimdi {pts:point} gerideysin.
+ex.result.b3 = Bu sana {pts:point} kaybettiriyor.
+ex.result.b3.2 = Sonunda {pts:point} geride kalıyorsun.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Bir şey geri alabilirsin, ama yine de {pts:point} gerideysin.
+ex.result_back.b1.2 = Biraz geri kazanabilirsin, ama yine de {pts:point} kaybettin.
+ex.result_back.b2 = Bir kısmını geri alabilirsin, ama yine de {pts:point} gerideysin.
+ex.result_back.b2.2 = Geri alsan bile {pts:point} kaybetmiş oluyorsun.
+ex.result_back.b3 = Geri alsan bile {pts:point} gerideysin.
+ex.result_back.b3.2 = Bir şey geri kazanıyorsun, ama bu yine de sana {pts:point} kaybettiriyor.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = {your2} geri alırsa, {my} {your:acc} alır.
+ex.retake.b1.2 = {your2:ins} geri alamazsın: o zaman {my} {your:acc} alır.
+ex.retake.b2 = {your2} geri alırsa, {my} {your:acc} alır.
+ex.retake.b2.2 = {your2:ins} geri almak işe yaramaz: {my} {your:acc} alır.
+ex.retake.b3 = {move} ile geri alırsan, {reply} ile {your:acc} alırım.
+ex.retake.b3.2 = {move} ile geri almak işe yaramaz: {reply} ile {your:acc} alırım.
+ex.retake.b4 = {move} işe yaramaz: {reply} ile {your:acc} alırım.
+ex.retake.b4.2 = Ve {move} gelirse, {reply} ile {your:acc} alırım.
+ex.retake.b5 = {move} ile geri almak {reply} cevabına takılıyor ve {your} düşüyor.
+ex.retake.b5.2 = {move}, {reply} cevabıyla çürütülüyor: {your} düşüyor.
+ex.retake.b6 = {move}? {reply} ile {your} gider.
+ex.retake.b6.2 = {move} olmaz: {reply} ile {your} gider.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = Ve burada, {sq} karesinde yeni bir vezirin olurdu.
+demo.promote.2 = Sonra {your} {sq} karesine ulaşıp vezir oluyor.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Dikkat: {my} {sq} karesine gidebilir ve bu şah mat olur.
+ex.mate_allowed.b1.2 = Şimdi {my} {sq} karesine gidebilir. Bu şah mat olurdu!
+ex.mate_allowed.b1.3 = Dikkat! {my} {sq} karesine giderse şah mat.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Bu hamleden sonra {your:acc} {m:move}de mat edebilirim.
+ex.mate_allowed.b2.2 = Şimdi {your:acc} {m:move}de mat edebilirim. Bak.
+ex.mate_allowed.b2.3 = Dikkat! {your} tehlikede: {m:move}de mat.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Bu hamle {m:move}de mata izin veriyor: {line:nomate}.
+ex.mate_allowed.b3.2 = Bundan sonra {m:move}de matım var: {line:nomate}.
+ex.mate_allowed.b3.3 = Şahın mat oluyor: {line:nomate}.
+ex.mate_allowed.b4 = {move} zorunlu bir mata izin veriyor: {line:nomate}.
+ex.mate_allowed.b4.2 = Bu hamleyle {m:move}de mata giriyorsun: {line:nomate}.
+ex.mate_allowed.b4.3 = {move} hamlesinden sonra {line:nomate} ile mat.
+ex.mate_allowed.b5 = {move}, {m:move}de zorunlu mata izin veriyor.
+ex.mate_allowed.b5.2 = Bu hamleyle {m:move}de mata giriyorsun.
+ex.mate_allowed.b5.3 = Artık {m:move}de zorunlu mat var.
+ex.mate_allowed.b6 = {m} hamlede mat: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = {line:nomate} sonrasında mat.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Bak: {your:gen} kaçabileceği kare kalmadı.
+ex.mate_allowed.tail.b1.2 = Gördün mü? {your} saldırı altında ve kaçamıyor.
+ex.mate_allowed.tail.b1.3 = {your:gen} gidecek yeri yok. Bu şah mat.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below
+# (nominative, without "bir": "Bu kalıba koridor matı denir.").
+ex.mate_allowed.pattern = Bu kalıba {text} denir.
+ex.mate_allowed.pattern.2 = Bunu aklında tut: bu bir {text}.
+ex.mate_allowed.tip.b3 = Her hamleden önce şahının hâlâ güvende olup olmadığını kontrol et.
+ex.mate_allowed.tip.b3.2 = Kendine hep şunu sor: hamlemden sonra şahım mat olabilir mi?
+
+name.pattern.back_rank = koridor matı
+name.pattern.smothered = boğulmuş mat
+name.pattern.support = destekli vezir matı
+name.pattern.ladder = merdiven matı
+name.pattern.epaulette = apolet matı
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = {best:nomate} ile {my:acc} mat edebilirdin!
+ex.mate_missed.b1.2 = {best:nomate} hamlesi şah mattı! {my} kaçamazdı.
+ex.mate_missed.b1.3 = Bak! {best:nomate} hamlesi {my:acc} mat ederdi.
+ex.mate_missed.b2 = {best:nomate} ile başlayıp {m:move}de mat edebilirdin.
+ex.mate_missed.b2.2 = {best:nomate} ile {m:move}de şah mat vardı!
+ex.mate_missed.b2.3 = {best:nomate} ile beni mat edebilirdin.
+ex.mate_missed.b3 = {m:move}de matı kaçırdın: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate}, {m:move}de mat ediyor: {line:nomate}.
+ex.mate_missed.b3.3 = {m:move}de bir mat vardı, ilk hamlesi {best:nomate}.
+ex.mate_missed.b4 = Kaçan mat: {line:nomate}, ilk hamle {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} ile {m:move}de zorunlu mat vardı.
+ex.mate_missed.b4.3 = {best:nomate} ile {m:move}de matın vardı.
+ex.mate_missed.b5 = {best:nomate}, {m:move}de mat ediyor: {line:nomate}.
+ex.mate_missed.b5.2 = {m:move}de mat kaçtı; ilk hamle {best:nomate}.
+ex.mate_missed.b5.3 = Zorunlu bir mat vardı: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} mat ediyor: {line:nomate}.
+ex.mate_missed.b6.2 = {best:nomate} ile {m} hamlede mat.
+ex.mate_missed.b6.3 = {best:nomate}, {m} hamlede mat.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Daha hızlısı {best:nomate} idi: {m:move}de mat.
+ex.mate_delayed.b5.2 = {best:nomate} daha erken, {m:move}de mat ediyordu.
+ex.mate_delayed.b6 = {best:nomate}, {m} hamlede mat eder.
+ex.mate_delayed.b6.2 = Daha hızlısı: {best:nomate}, {m} hamlede mat.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Eyvah! {my} oynayamıyor ve şah tehdidi altında değil. Bu pat: oyun berabere.
+ex.stalemate.b1.2 = Bak: {my:gen} güvenli karesi yok, ama şah tehdidi altında da değil. Oyun berabere!
+ex.stalemate.b1.3 = Bu pat. {my} oynayamıyor, bu yüzden oyun berabere.
+ex.stalemate.b2 = Pat! {my:gen} yasal hamlesi yok ve şah tehdidi altında değil. Berabere.
+ex.stalemate.b2.2 = Eyvah, pat: {my} sıkıştı ama şah tehdidi altında değil.
+ex.stalemate.b2.3 = Bu, patla beraberlik. {my} oynayamıyor.
+ex.stalemate.b3 = Bu pat: {my:gen} yasal hamlesi yok. Oysa kazanıyordun!
+ex.stalemate.b3.2 = Pat! {my} sıkıştı ve kazanılmış oyun beraberliğe dönüyor.
+ex.stalemate.b3.3 = {my:gen} hamlesi yok, şah da yok: pat.
+ex.stalemate.b4 = Pat: {my:gen} yasal hamlesi yok. Böylece galibiyet elden gidiyor.
+ex.stalemate.b4.2 = {move} ile {my} pat oluyor. Kazanılmış bir pozisyondan beraberlik.
+ex.stalemate.b4.3 = Bu pat; {my} hapsoldu.
+ex.stalemate.b5 = {move} ile {my} pat oluyor. Galibiyet gitti.
+ex.stalemate.b5.2 = Pat: {my:gen} hiç karesi yok.
+ex.stalemate.b5.3 = Bu pat, {my} sıkışıp kaldı.
+ex.stalemate.b6 = Pat. {my:gen} hamlesi yok.
+ex.stalemate.b6.2 = {move}, pat: {my} hapsoldu.
+ex.stalemate.b6.3 = Pat; {my} oynayamıyor.
+ex.stalemate.tip.b1 = Kazanırken şahıma her zaman gidebileceği bir kare bırak.
+ex.stalemate.tip.b1.2 = Unutma: öndeyken şahıma biraz yer bırak.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Dikkat! Taşlarımı verebilirim, sonra {my:gen} hamlesi kalmaz: pat.
+ex.stalemate_trick.b1.2 = Dikkat: {my} neredeyse sıkıştı. Oyunu berabereye çevirebilirim.
+ex.stalemate_trick.b2 = Dikkat: feda edebilirim ve {my} pat olur.
+ex.stalemate_trick.b2.2 = {my:gen} neredeyse hiç karesi yok. Patı zorlayabilirim!
+ex.stalemate_trick.b3 = Bu, patla kurtulmamı sağlıyor: {my:gen} hamlesi kalmıyor.
+ex.stalemate_trick.b3.2 = Dikkat: {line} sonrasında {my} pat oluyor.
+ex.stalemate_trick.b4 = {move} bir pat tuzağına izin veriyor: {line} ve {my} oynayamıyor.
+ex.stalemate_trick.b4.2 = Şimdi {my} pata sığınabilir: {line}.
+ex.stalemate_trick.b5 = {move} pata izin veriyor: {line}; {my} hapsoluyor.
+ex.stalemate_trick.b5.2 = Pat tuzağı: {line} ve {my:gen} hamlesi yok.
+ex.stalemate_trick.b6 = {line}, pat: {my} hapsoldu.
+ex.stalemate_trick.b6.2 = {line} sonrasında pat; {my} sıkıştı.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} {sq} karesine gidip {t1:dat} ve {t2:dat} saldırabilir.
+ex.fork.b1.2 = {my} {sq} karesine gidiyor ve iki taşa saldırıyor: {t1} ve {t2}.
+ex.fork.b1.3 = {my:dat} dikkat et: {sq} karesinden {t1:dat} ve {t2:dat} aynı anda saldırıyor.
+ex.fork.b2 = Çatal! {sq} karesindeki {my} {t1:dat} ve {t2:dat} aynı anda saldırıyor.
+ex.fork.b2.2 = Hamlenden sonra {my}, {sq} karesinden {t1:acc} ve {t2:acc} çatala alabilir.
+ex.fork.b2.3 = {my} {sq} karesine gidiyor: {t1:dat} ve {t2:dat} çifte saldırı.
+ex.fork.b3 = {move}, {reply} çatalına izin veriyor: {t1} ve {t2}.
+ex.fork.b3.2 = {reply} hamlesinden sonra {t1:dat} ve {t2:dat} aynı anda saldırıyorum.
+ex.fork.b3.3 = {reply} bir çatal: {t1} ve {t2} saldırı altında.
+ex.fork.b4 = {reply}, {t1:acc} ve {t2:acc} çatala alıyor; {line} sonrasında {pts:point} kaybetmiş oluyorsun.
+ex.fork.b4.2 = {reply}, {t1:dat} ve {t2:dat} aynı anda saldırıyor.
+ex.fork.b4.3 = {move}, {t1:dat} ve {t2:dat} karşı {reply} çatalına izin veriyor.
+ex.fork.b5 = {move} ile {reply} çatalına yakalanıyorsun: {t1} ve {t2}.
+ex.fork.b5.2 = {reply}, {t1:acc} ve {t2:acc} çatala alıyor.
+ex.fork.b5.3 = {reply} hamlesinden sonra {t1} ve {t2} saldırı altında.
+ex.fork.b6 = {reply} çatala alıyor.
+ex.fork.b6.2 = {move}, {reply} çatalına izin veriyor.
+ex.fork.b6.3 = {reply}, çatal.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Sadece birini kurtarabilirsin: {t1} ya da {t2}.
+ex.fork.tail.b1.2 = Şimdi iki taşa birden saldırıyorum: {t1} ve {t2}. Buna çatal denir!
+ex.fork.tail.b1.3 = Gördün mü? {t1} ve {t2} saldırı altında. Biri düşecek.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} şahtan kurtulmak zorunda, bu yüzden {t1:acc} alıyorum.
+ex.fork.tail_king.2 = Şah! {your} kaçmak zorunda ve {t1} düşüyor.
+ex.fork.more.b3 = Oynamadan önce {sq} karesini kontrol et: orası {my} için bir çatal karesi.
+ex.fork.more.b3.2 = {sq} karesine dikkat et. {my} oradan çatal yapar.
+ex.fork.tip.knight = Şahının ve vezirinin yakınındaki at sıçrayışlarına dikkat et!
+ex.fork.tip.knight.2 = Atlar aynı anda iki taşa saldırmayı sever. Nereye sıçrayabileceklerine bak.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = {my} çekilince {my2} {t1:dat} saldırıyor!
+ex.discovered.b1.2 = Bak: {my} yolu kapatıyor. O çekilirse {my2} {t1:dat} saldırır.
+ex.discovered.b1.3 = {my} kenara çekilebilir, sonra {my2} {t1:dat} saldırır.
+ex.discovered.b2 = Gizli bir saldırı: {my} oynuyor ve {my2} {t1:dat} saldırıyor.
+ex.discovered.b2.2 = Dikkat: {my} çekilebilir ve {my2} {t1:dat} saldırır.
+ex.discovered.b2.3 = {my} kenara çekilerek {t1:dat} karşı {my2:gen} önünü açıyor.
+ex.discovered.b3 = {reply} hamlesinden sonra {t1} açarak saldırıya uğruyor.
+ex.discovered.b3.2 = {reply} ile {t1:dat} açarak saldırı geliyor.
+ex.discovered.b3.3 = {move}, {reply} hamlesine izin veriyor: {t1:dat} açarak saldırı.
+ex.discovered.b4 = {reply}, {t1:dat} giden hattı açıyor: açarak saldırı.
+ex.discovered.b4.2 = {move}, {t1:acc} kazanan {reply} açarak saldırısına izin veriyor.
+ex.discovered.b4.3 = {reply} hamlesinden sonra {t1} açarak saldırıyla düşüyor.
+ex.discovered.b5 = {move}, {reply} açarak saldırısına izin veriyor.
+ex.discovered.b5.2 = {reply} bir açarak saldırı.
+ex.discovered.b5.3 = {reply} gizli bir saldırıyı açığa çıkarıyor.
+ex.discovered.b6 = {reply}, {t1:dat} açarak saldırı.
+ex.discovered.b6.2 = {reply} ve {t1} düşer.
+ex.discovered.b6.3 = Açarak saldırı: {reply}, hedef {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} {t1:dat} saldırıyor. O kaçınca arkasındaki {t2:acc} alıyorum.
+ex.skewer.b1.2 = Bak: {my} {t1:dat} saldırıyor ve {t2} hemen arkasında.
+ex.skewer.b1.3 = {my} {t1:acc} hedef alıyor. O kaçmak zorunda, sonra {t2} düşüyor.
+ex.skewer.b2 = Şiş: {my} {t1:dat} saldırıyor ve {t2} onun arkasında.
+ex.skewer.b2.2 = {my}, {t1:acc} ve {t2:acc} aynı hatta yakalıyor. Öndeki kaçınca arkadakini alıyorum.
+ex.skewer.b2.3 = Dikkat: {t1} ve {t2} aynı hatta. {my} ikisini şişe geçirebilir.
+ex.skewer.b3 = {reply}, {t1:acc} ve {t2:acc} şişe geçiriyor.
+ex.skewer.b3.2 = {reply} hamlesinden sonra {t1} kaçmak zorunda ve {t2} düşüyor.
+ex.skewer.b3.3 = {move}, {reply} şişine izin veriyor: {t1} ve {t2}.
+ex.skewer.b4 = {reply} {t1:acc} şişe geçiriyor; arkasındaki {t2} gidiyor.
+ex.skewer.b4.2 = {move} hamlesinden sonra {t1} ve {t2} aynı hatta: {reply}.
+ex.skewer.b4.3 = {reply} hamlesinden sonra {t1} kaçıyor ve {t2} düşüyor.
+ex.skewer.b5 = {reply}, {t1:acc} ve {t2:acc} şişe geçiriyor.
+ex.skewer.b5.2 = {move}, {t1:gen} arkasından {t2:dat} uzanan {reply} şişine izin veriyor.
+ex.skewer.b6 = {reply} şişe geçiriyor.
+ex.skewer.b6.2 = {reply}, şiş.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} {sq} karesine gidebilir. O zaman {your}, {t1:gen} önünde sıkışır.
+ex.pin.b1.2 = {my} {sq} karesine gelince dikkat: {your}, {t1:gen} önünde sıkışıp kalıyor.
+ex.pin.b1.3 = {my}, {your:acc} {t1:gen} önünde açmaza alabilir. Sonra onu kazanırım.
+ex.pin.b2 = Açmaz: {your}, {t1:gen} önünde sıkışmış durumda.
+ex.pin.b2.2 = {your}, {t1:gen} önünde açmazda. Sonra onu kazanabilirim.
+ex.pin.b2.3 = Şimdi {your}, {t1:gen} önünde sıkıştı. Buna açmaz denir.
+ex.pin.b3 = {your}, {t1:gen} önünde açmaza giriyor ve onu kazanıyorum.
+ex.pin.b3.2 = Bundan sonra {your}, {t1:gen} önünde açmazda.
+ex.pin.b3.3 = {your} açmazda ve bu materyal kaybettiriyor: arkasında {t1} var.
+ex.pin.b4 = {reply} açmaza alıyor ve materyal kazanıyor.
+ex.pin.b4.2 = {move} ile {reply} açmazına yakalanıyorsun.
+ex.pin.b4.3 = {reply} hamlesinden sonra açmazdaki taş düşüyor.
+ex.pin.b5 = {move}, {reply} açmazına izin veriyor.
+ex.pin.b5.2 = {reply} açmaza alıyor ve taş gidiyor.
+ex.pin.b6 = {reply} açmaza alıyor.
+ex.pin.b6.2 = {reply}, açmaz.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} açmazda, bu yüzden {sq} karesini koruyamaz. Arkasında {t1} var.
+ex.pin_defender.b1.2 = Bak: {your} aslında {sq} karesini savunamıyor, çünkü arkasında {t1} var.
+ex.pin_defender.b2 = {your}, {t1:gen} önünde açmazda; bu yüzden {sq} karesinin gerçek bir savunucusu yok.
+ex.pin_defender.b2.2 = Açmazdaki taş kötü bir savunucudur. {your} {sq} karesini koruyamaz: arkasında {t1} var.
+ex.pin_defender.b3 = {your}, {t1:gen} önünde açmazda; {sq} karesini gerçekten savunmuyor.
+ex.pin_defender.b3.2 = {sq} karesi korunuyor gibi görünüyor, ama {your}, {t1:gen} önünde açmazda.
+ex.pin_defender.b4 = {your} açmazda, yani {sq} karesi aslında korunmuyor.
+ex.pin_defender.b4.2 = Açmazdaki {your} {sq} karesini koruyamaz.
+ex.pin_defender.b5 = {your} açmazda; {sq} karesi korumasız.
+ex.pin_defender.b5.2 = {sq} karesi elden gidiyor: {your} açmazda.
+ex.pin_defender.b6 = {your} açmazda; {sq} karesi elden gider.
+ex.pin_defender.b6.2 = Açmazdaki {your}, korumasız {sq} karesi.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} kapana kısıldı. Gidebileceği her kare saldırı altında.
+ex.trapped.b1.2 = {your:dat} bak: kaçabileceği güvenli bir kare yok.
+ex.trapped.b1.3 = {your} sıkıştı. Ona saldırabilirim ve kaçamaz.
+ex.trapped.b2 = {your:gen} güvenli karesi yok. Onu kazanabilirim.
+ex.trapped.b2.2 = {your} kapana kısıldı: nereye giderse gitsin onu alırım.
+ex.trapped.b2.3 = Dikkat, {your:gen} gidecek karesi kalmıyor.
+ex.trapped.b3 = {your} kapana kısılıyor: güvenli kare kalmadı.
+ex.trapped.b3.2 = Bundan sonra {your} kapana kısılıyor ve elden gidiyor.
+ex.trapped.b3.3 = {your} bir tuzağa girdi: çıkamıyor.
+ex.trapped.b4 = {move}, {your:acc} kapanda bırakıyor.
+ex.trapped.b4.2 = {your:gen} geri çekilecek yeri yok; onu kazanıyorum.
+ex.trapped.b4.3 = {reply} hamlesinden sonra {your} kapana kısılıyor.
+ex.trapped.b5 = {your} sonunda kapana kısılıyor: {line}.
+ex.trapped.b5.2 = {move}, {your:acc} mahsur bırakıyor.
+ex.trapped.b6 = {your} kapanda.
+ex.trapped.b6.2 = {line}, {your:acc} kapana kıstırıyor.
+ex.trapped.tip.b1 = Bir taşı oynamadan önce geri çıkabileceğinden emin ol.
+ex.trapped.tip.b1.2 = Benim tarafımın derinlerine giren taşlar sıkışabilir. Bir çıkış yolu bırak.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# Levels 1-2 say "en arka sıra" (the back row), as English says "back row" there; "son yatay" elsewhere.
+ex.back_rank.b1 = {your} kendi piyonlarının arkasında sıkıştı. {my} ona en arka sırada şah çekebilir.
+ex.back_rank.b1.2 = Dikkat: {your:gen} kaçış karesi yok ve {my} {sq} karesine ulaşabilir.
+ex.back_rank.b1.3 = {my} {sq} karesine gidebilir. {your} kendi piyonları yüzünden kapalı kaldı.
+ex.back_rank.b2 = Son yatay tehlikesi: {your:gen} kaçış karesi yok. {my} {sq} karesinden şah çekebilir.
+ex.back_rank.b2.2 = {your} kapalı kaldı. {my} {sq} karesine gidip materyal kazanıyor.
+ex.back_rank.b2.3 = En arka sıran zayıf: {my} {sq} karesinden {your:dat} şah çekebilir.
+ex.back_rank.b3 = Son yatayın zayıf: {line}. {your:gen} kaçış karesi yok.
+ex.back_rank.b3.2 = {your:gen} kaçış karesi yok, bu yüzden {line} materyal kazanıyor.
+ex.back_rank.b3.3 = {line} sonrasında son yatay belirleyici oluyor: {your} hapsolmuş durumda.
+ex.back_rank.b4 = Son yatay: {line} ve {your:gen} kaçış karesi yok.
+ex.back_rank.b4.2 = {line}, {your:gen} çevresindeki zayıf son yatayı kullanıyor.
+ex.back_rank.b4.3 = {your:gen} kaçış karesi yok: {line}.
+ex.back_rank.b5 = {your:gen} çevresinde son yatay zayıflığı: {line}.
+ex.back_rank.b5.2 = {line}; {your:gen} kaçış karesi yok.
+ex.back_rank.b6 = {line}, son yatay; {your} hapsolmuş.
+ex.back_rank.b6.2 = Son yatay: {line} ({your}).
+ex.back_rank.tip.b1 = Şahına küçük bir pencere aç: önündeki piyonlardan birini ilerlet.
+ex.back_rank.tip.b1.2 = Üç piyonun arkasındaki şah en arka sırada mat olabilir. Ona biraz yer aç.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {sq} karesindeki {your:gen} koruyucusu yok. {my} onu bedavaya alabilir.
+ex.hanging.b1.2 = {your:dat} bak: onu hiçbir şey korumuyor ve {my} ona saldırıyor.
+ex.hanging.b1.3 = {your} korunmuyor. {my} onu kolayca alabilir.
+ex.hanging.b2 = {sq} karesindeki {your} askıda. {my} onu alıyor ve sen geri alamıyorsun.
+ex.hanging.b2.2 = {my}, {your:acc} bedavaya alabilir. Onu hiçbir şey korumuyor.
+ex.hanging.b2.3 = {your}, {sq} karesinde yalnız kaldı ve {my} onu alıyor.
+ex.hanging.b3 = {move}, {your:acc} korumasız bırakıyor: {reply} ve geri alan yok.
+ex.hanging.b3.2 = {sq} karesindeki {your}, {reply} ile bedavaya gidiyor.
+ex.hanging.b3.3 = {reply} hamlesinden sonra {your} karşılıksız gidiyor.
+ex.hanging.b4 = {move}, {your:acc} askıda bırakıyor: {reply} hamlesi {pts:point} kazanıyor.
+ex.hanging.b4.2 = {reply}, {your:acc} bedavaya topluyor.
+ex.hanging.b4.3 = {your} korumasız; {reply} onu alıyor.
+ex.hanging.b5 = {move}, {your:acc} korumasız bırakıyor; {reply} onu kazanıyor.
+ex.hanging.b5.2 = {sq} karesindeki {your}, {reply} ile düşüyor.
+ex.hanging.b5.3 = {reply}, {your:acc} kazanıyor.
+ex.hanging.b6 = {move}? {reply} ve {your} düşer.
+ex.hanging.b6.2 = {reply}, {your:acc} kazanır.
+ex.hanging.b6.3 = {your} askıda: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2}, {your:acc} koruyordu. Şimdi {my} onu alabilir.
+ex.hanging_guard.b1.2 = {your2} uzaklaştı ve şimdi {your} yalnız. {my} onu alıyor.
+ex.hanging_guard.b2 = {your2} eskiden {your:acc} koruyordu. Şimdi o yalnız ve {my} onu alıyor.
+ex.hanging_guard.b2.2 = {your2:acc} oynayarak {your:acc} {my:dat} karşı korumasız bıraktın.
+ex.hanging_guard.b3 = {your2}, {your:acc} koruyordu. Onu oynayınca korunan taş {reply} ile gidiyor.
+ex.hanging_guard.b3.2 = {your2} olmadan {your} korumasız: {reply}.
+ex.hanging_guard.b4 = {move} koruyucuyu ortadan kaldırıyor: {your2} {your:acc} bıraktı ve {reply} onu topluyor.
+ex.hanging_guard.b4.2 = {your2}, {your:gen} tek savunucusuydu; {reply} onu kazanıyor.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} zaten {your:dat} saldırıyordu. Hamlemin neyi tehdit ettiğine her zaman bak.
+ex.hanging_threat.b1.2 = Tehdidimi görmedin: {my} {your:dat} saldırıyor.
+ex.hanging_threat.b2 = Son hamlemde {my:ins} {your:dat} saldırdım. Tehditlerime her zaman bak.
+ex.hanging_threat.b2.2 = {my} {your:acc} tehdit ediyordu ve şimdi onu alabilirim.
+ex.hanging_threat.b3 = Tehdidimi kaçırdın: {my} {your:dat} saldırıyordu.
+ex.hanging_threat.b3.2 = {my}, baştan beri {your:acc} gözüne kestirmişti.
+ex.hanging.tip.b1 = Her hamleden önce kendine sor: bütün taşlarım güvende mi?
+ex.hanging.tip.b1.2 = İyi bir alışkanlık: her hamleden sonra hangi taşlarının korunduğuna bak.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} bir taş aldı, ama {my} geri alıyor. Bu değişim puan kaybettiriyor.
+ex.exchange_capture.b1.2 = {my} geri alıyor. {your} {n:point} değerinde, ama sen sadece {n2:point} kazandın.
+ex.exchange_capture.b1.3 = Dikkat: {my} {your:acc} geri alabilir. Bu kötü bir değişim.
+ex.exchange_capture.b2 = Değişimlerde dikkatli ol: {your} {n:point} değerinde. {my} geri alıyor ve sen sadece {n2:point} kazandın.
+ex.exchange_capture.b2.2 = {my} {your:acc} geri alıyor. {n:point} kaybedip sadece {n2:point} kazanıyorsun.
+ex.exchange_capture.b3 = {sq} karesinde alma işe yaramıyor: {line} sonrasında {your} gidiyor.
+ex.exchange_capture.b3.2 = {your} {sq} karesinde alıyor, ama {line} sonrasında {pts:point} kaybetmiş oluyorsun.
+ex.exchange_capture.b4 = {move} ile {sq} karesinde hesap yanlış: {line} sonrasında {your} gidiyor.
+ex.exchange_capture.b4.2 = {sq} karesinde almak {your:dat} mal oluyor: {line}.
+ex.exchange_capture.b5 = {move}, {sq} karesindeki değişimlerde {your:acc} kaybettiriyor: {line}.
+ex.exchange_capture.b5.2 = {sq} karesinde {your} gidiyor: {line}.
+ex.exchange_capture.b6 = {move}, {line} sonrasında {sq} karesinde {your:acc} kaybettiriyor.
+ex.exchange_capture.b6.2 = {sq} karesinde {line} ve {your} gitti.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Say bakalım: {sq} karesine {n:time} saldırıyorum, sen onu {n2:time} savunuyorsun.
+ex.exchange_count.b1.2 = {sq} karesine {n} taşımla saldırıyorum, sen ise {n2:piece}la savunuyorsun. Orayı ben kazanırım.
+ex.exchange_count.b2 = {sq} karesine {n:time} saldırılıyor ve kare {n2:time} savunuluyor. Orada materyal kaybedeceksin.
+ex.exchange_count.b2.2 = {sq} karesinde say: {n} saldıran taşa karşı savunan {n2:piece}.
+ex.exchange_count.b3 = {sq} karesindeki saldıranları ve savunanları say: benimkiler daha fazla.
+ex.exchange_count.b3.2 = {sq} karesindeki değişim işe yaramıyor: {line} sonrasında {pts:point} kaybetmiş oluyorsun.
+ex.exchange_count.b4 = {move} ile {sq} karesinde hesap yanlış: {line} ve {pts:point} kaybetmiş oluyorsun.
+ex.exchange_count.b4.2 = {sq} karesine savunulduğundan daha çok saldırılıyor: {line}.
+ex.exchange_count.b5 = {sq} karesinde {n} saldıran taş, savunan {n2:piece} karşısında üstün: {line}.
+ex.exchange_count.b5.2 = {move} ile {sq} karesindeki hesabı kaybediyorsun.
+ex.exchange_count.b6 = {sq} karesinde {line} ve {pts:point} kazandım.
+ex.exchange_count.b6.2 = {sq}: {n} saldıran, {n2} savunan.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my}, {your:abl} daha az değerli. Alırsam puan kaybedersin.
+ex.exchange_cheap.b1.2 = {my} {your:dat} saldırıyor. Bunları değişmek senin için kötü.
+ex.exchange_cheap.b2 = {your} {n:point} değerinde, {my} ise sadece {n2:point}. Bu değişim sana kaybettirir.
+ex.exchange_cheap.b2.2 = {my}, {your:abl} daha ucuz, bu yüzden saldırı materyal kazandırıyor.
+ex.exchange_cheap.b3 = {sq} karesindeki {your:dat} daha ucuz bir taş saldırıyor.
+ex.exchange_cheap.b3.2 = {n2:point}lık bir taş {sq} karesindeki {your:dat} saldırıyor: {line}.
+ex.exchange_cheap.b4 = {sq} karesindeki {your:dat} daha ucuz bir taş saldırıyor; {reply} materyal kazanıyor.
+ex.exchange_cheap.b4.2 = {reply}, {sq} karesindeki {your:dat} daha ucuz bir taşla saldırıyor.
+ex.exchange_cheap.b5 = {sq} karesindeki {your}, daha ucuz bir saldırgana açık: {line}.
+ex.exchange_cheap.b5.2 = {reply}, {sq} karesinde {your:dat} karşı materyal kazanıyor.
+ex.exchange_cheap.b6 = {reply}, {sq} karesindeki {your:acc} kazanıyor.
+ex.exchange_cheap.b6.2 = {line}: {sq} karesindeki {your} gidiyor.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Dikkat: şimdi {t1:acc} kazanabilirim.
+ex.material.b1.2 = Bu hamle {t1:acc} zor durumda bırakıyor. Onu kazanabilirim.
+ex.material.b2 = Bu hamle {t1:acc} kazanmama izin veriyor.
+ex.material.b2.2 = Şimdi {t1} zor duruma düşüyor ve onu kazanıyorum.
+ex.material.b3 = {move} materyal kaybettiriyor: {line} sonrasında {pts:point} kaybetmiş oluyorsun.
+ex.material.b3.2 = {line} sonrasında {pts:point} gerideysin.
+ex.material.b4 = {move} materyal kaybettiriyor: {line} ve {pts:point} kaybetmiş oluyorsun.
+ex.material.b4.2 = {line} sonrasında {pts:point} geride kalıyorsun.
+ex.material.b5 = {move} materyal veriyor: {line}.
+ex.material.b5.2 = {line} bana {pts:point} kazandırıyor.
+ex.material.b6 = {line} ve {pts:point} kazandım.
+ex.material.b6.2 = {move} hamlesi {pts:point} kaybettiriyor: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Gördün mü? {sq} karesindeki {my} bedavaydı. {your} onu alabilirdi.
+ex.missed_capture.b1.2 = Bak: {my:gen} savunucusu yoktu. {your} onu alabilirdi.
+ex.missed_capture.b1.3 = {sq} karesindeki {my} korunmuyordu. {your} onu kapabilirdi!
+ex.missed_capture.b2 = Bedava bir taşı kaçırdın: {best}, {my:acc} kazanıyor.
+ex.missed_capture.b2.2 = {my}, {sq} karesinde askıdaydı. {best} onu alıyor. Bir dahaki sefere kap onu!
+ex.missed_capture.b2.3 = {best}, {my:acc} bedavaya kazanırdı.
+ex.missed_capture.b3 = {best}, {my:acc} karşılıksız kazanırdı.
+ex.missed_capture.b3.2 = {sq} karesindeki {my} korumasızdı: {best}. Her hamlede korumasız taşlara bak.
+ex.missed_capture.b3.3 = {best} ile {my:acc} alabilirdin.
+ex.missed_capture.b4 = Kaçan fırsat: {best}, {sq} karesindeki {my:acc} topluyor.
+ex.missed_capture.b4.2 = {best}, korumasız olan {my:acc} kazanıyor.
+ex.missed_capture.b4.3 = {my} askıdaydı: {best}.
+ex.missed_capture.b5 = {best}, {my:acc} kazanıyor; {move} ise onun kaçmasına izin veriyor.
+ex.missed_capture.b5.2 = {sq} karesindeki {my} korumasızdı: {best}.
+ex.missed_capture.b6 = {best}! {sq} karesindeki {my} korumasızdı.
+ex.missed_capture.b6.2 = {best}, {my:acc} kazanırdı.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Çifte saldırın vardı: {best} hem {t1:dat} hem {t2:dat} saldırıyor!
+ex.missed_fork.b1.2 = Bak! {best} aynı anda {t1:dat} ve {t2:dat} saldırırdı.
+ex.missed_fork.b1.3 = {best} bir çataldı: hem {t1} hem {t2} saldırı altındaydı.
+ex.missed_fork.b2 = {best} bir çataldı: {t1} ve {t2}.
+ex.missed_fork.b2.2 = Bir çifte saldırıyı kaçırdın: {best}, {t1:dat} ve {t2:dat} saldırıyordu.
+ex.missed_fork.b2.3 = {best} aynı anda {t1:dat} ve {t2:dat} saldırıyor. Çatal!
+ex.missed_fork.b3 = {best} bir çataldı: {t1} ve {t2}.
+ex.missed_fork.b3.2 = Elinde {best} vardı: {t1} ve {t2} çatalda.
+ex.missed_fork.b3.3 = {best} ile {t1:acc} ve {t2:acc} çatala alabilirdin.
+ex.missed_fork.b4 = {best}, {t1:acc} ve {t2:acc} çatala alırdı.
+ex.missed_fork.b4.2 = Kaçan çatal: {best}, hedefte {t1} ve {t2}.
+ex.missed_fork.b5 = {best} ile {t1} ve {t2} çatala düşerdi.
+ex.missed_fork.b5.2 = {best}, {t1:dat} ve {t2:dat} saldırırdı.
+ex.missed_fork.b6 = {best}, {t1:acc} ve {t2:acc} çatala alırdı.
+ex.missed_fork.b6.2 = {best}: {t1} ve {t2} çatalda.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# "Outside the square" is said with the rule of the square ("kare kuralı", "piyonun karesi").
+ex.promotion.b1 = {my} {sq} karesine koşup vezir olabilir. {your} çok uzakta.
+ex.promotion.b1.2 = Bak: {my:gen} {sq} karesine ulaşmasını hiçbir şey durduramaz. {your} onu yakalayamaz.
+ex.promotion.b1.3 = {my}, {sq} karesine {n:square} uzaklıkta ve {your} çok yavaş.
+ex.promotion.b2 = {my} {sq} karesine koşuyor ve {your} onu yakalayamıyor.
+ex.promotion.b2.2 = {my} {sq} karesine {n:move}de ulaşıyor, {your} ise {n2} hamlede. Çok yavaş.
+ex.promotion.b2.3 = Dikkat: {my} {sq} karesinde vezir oluyor ve {your} çok uzakta.
+ex.promotion.b3 = Kare kuralı: {your}, {sq} karesinden önce {my:acc} yakalayamaz.
+ex.promotion.b3.2 = Yarış kaybedildi: {my}, {your:abl} önce {sq} karesine ulaşıyor.
+ex.promotion.b4 = {your} piyonun karesinin dışında; piyon {sq} karesinde vezir oluyor.
+ex.promotion.b4.2 = {my} {sq} karesinde terfi ediyor; {your} bir hamle geç kalıyor.
+ex.promotion.b5 = Piyon yarışı kaybedildi: {your} karenin dışında, hedef {sq}.
+ex.promotion.b5.2 = {line}: {sq} karesinde vezir çıkarıyorum ve {your} geç kalıyor.
+ex.promotion.b6 = {your} karenin dışında; {sq} karesinde vezir çıkarıyorum.
+ex.promotion.b6.2 = {line}, {sq} karesinde vezir ({your} geç kaldı).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Piyonun {sq} karesine koşup vezir olabilirdi!
+ex.promotion_missed.b1.2 = {sq} karesine bak! Piyonun oraya koşabilirdi.
+ex.promotion_missed.b2 = Piyonun {sq} karesine koşabilirdi. Geçer piyonları ilerlet!
+ex.promotion_missed.b2.2 = Piyonunu {sq} karesine giden yolda hiçbir şey durdurmuyordu.
+ex.promotion_missed.b3 = {best}, {sq} karesine giden yarışı kazanıyor.
+ex.promotion_missed.b3.2 = Piyonun daha hızlıydı: {best} ve piyon {sq} karesinde vezir oluyor.
+ex.promotion_missed.b4 = {best}, {sq} karesine giden piyon yarışını kazanıyor.
+ex.promotion_missed.b4.2 = {best}! Piyon {sq} karesinde vezir oluyor.
+ex.promotion_missed.b5 = {best} ile {sq} karesinde önce sen vezir çıkarıyorsun.
+ex.promotion_missed.b5.2 = {best} ve {sq} karesi senin.
+ex.promotion_missed.b6 = {best}, {sq} karesine giden yarışı kazanıyor.
+ex.promotion_missed.b6.2 = {best}; {sq} karesine önce sen.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = O piyon {your:acc} koruyordu. Şimdi {your} daha açıkta.
+ex.king_shield.b1.2 = {sq} karesinden oynayan piyon {your} için bir kalkandı. Şimdi taşlarım içeri girebilir.
+ex.king_shield.b2 = Piyonu {sq} karesinden oynamak {your:acc} zayıflatıyor. Taşlarım artık ona saldırabilir.
+ex.king_shield.b2.2 = {your} bir koruyucusunu kaybetti: {sq} karesindeki piyon onun kalkanıydı.
+ex.king_shield.b3 = Bu piyon hamlesi {your:acc} saldırıma açıyor.
+ex.king_shield.b3.2 = {your} piyon siperini kaybediyor ve taşlarım içeri giriyor.
+ex.king_shield.b4 = {move}, {your:gen} çevresindeki piyonları zayıflatıyor; saldırım içeri giriyor.
+ex.king_shield.b4.2 = {move} hamlesinden sonra {your:gen} etrafındaki kalkan kırıldı.
+ex.king_shield.b5 = {move}, {your:gen} siperini gevşetiyor: {line}.
+ex.king_shield.b5.2 = {move} hamlesinden sonra {your} açıkta: {line}.
+ex.king_shield.b6 = {move}, {your:acc} zayıflatıyor: {line}.
+ex.king_shield.b6.2 = {line}; {your} fazla açık.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} tehlikede. Taşlarım ona doğru geliyor.
+ex.king_exposed.b1.2 = Bak, {your} ne kadar açıkta. Onu piyonlarının arkasında güvende tut.
+ex.king_exposed.b2 = {your} fazla açıkta. Şimdi bir sürü şah çekebilirim.
+ex.king_exposed.b2.2 = Dikkat: {your:gen} sığınağı yok ve taşlarım ona saldırıyor.
+ex.king_exposed.b3 = {your} açıkta; taşlarım şah çekerek ona saldırabilir.
+ex.king_exposed.b3.2 = Bundan sonra {your:gen} sığınağı kalmıyor.
+ex.king_exposed.b4 = {your} açığa çıkıyor: {line}.
+ex.king_exposed.b4.2 = {move}, {your:acc} saldırıya açık bırakıyor.
+ex.king_exposed.b5 = {your} fazla açıkta: {line}.
+ex.king_exposed.b5.2 = {move}, {your:acc} açıkta bırakıyor.
+ex.king_exposed.b6 = {line}; {your} açıkta.
+ex.king_exposed.b6.2 = {your} fazla açık: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Bu değişim, benim kazandığım bir piyon oyun sonuna götürüyor.
+ex.bad_trade.b3.2 = {line} sonrasında sadece piyonlar kalıyor ve benim şahım daha iyi.
+ex.bad_trade.b4 = Değişimler kaybedilmiş bir piyon oyun sonuna götürüyor: {line}.
+ex.bad_trade.b4.2 = Değişip bu piyon oyun sonuna girmek kaybettiriyor.
+ex.bad_trade.b5 = Yanlış değişim: {line} sonrasındaki piyon oyun sonu kaybedilmiş.
+ex.bad_trade.b5.2 = Piyon oyun sonu kaybedilmiş; taşları tahtada tut.
+ex.bad_trade.b6 = {line} sonrasındaki piyon oyun sonu kayıp.
+ex.bad_trade.b6.2 = Kayıp piyon oyun sonu: {line}.
+ex.bishop_pair.b5 = Bu değişimle fil çiftini kaybediyorsun.
+ex.bishop_pair.b5.2 = Bu değişimle fil çiftinden vazgeçiyorsun; benimki duruyor.
+ex.bishop_pair.b6 = Fil çifti gidiyor.
+ex.bishop_pair.b6.2 = Fil çifti verildi.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} opozisyonu alıyor: şahlar arada bir kare kalacak şekilde karşı karşıya geliyor.
+ex.opposition.b3.2 = Şahlar! {best} opozisyonu alırdı.
+ex.opposition.b4 = {best} opozisyonu alıyor: işin anahtarı bu.
+ex.opposition.b4.2 = Opozisyon belirleyici: {best}.
+ex.opposition.b5 = {best}, opozisyonu alarak.
+ex.opposition.b5.2 = Opozisyon: {best}.
+ex.opposition.b6 = {best}, opozisyon.
+ex.opposition.b6.2 = {best}: opozisyon.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Piyonun {sq} karesine koşabilirdi. Geçer piyonlar ilerlemek ister!
+ex.push_passed.b1.2 = Önü açık piyonunu ilerlet! {sq} karesine ulaşmak istiyor.
+ex.push_passed.b1.3 = Geçer piyonun {sq} karesine yürümek istiyor. İlerlet onu!
+ex.push_passed.b2 = {best}: geçer piyonu {sq} karesine doğru ilerlet.
+ex.push_passed.b2.2 = Geçer piyonun güçlü. {best} onu ilerletiyor.
+ex.push_passed.b2.3 = İlerlet onu! {best}, piyonu {sq} karesine yaklaştırıyor.
+ex.push_passed.b3 = {best} geçer piyonu ilerletiyor.
+ex.push_passed.b3.2 = Geçer piyonlar ilerletilmeli: {best}.
+ex.push_passed.b3.3 = Doğru yol {best} idi: piyon {sq} karesine koşuyor.
+ex.push_passed.b4 = {best}: geçer piyon belirleyici.
+ex.push_passed.b4.2 = İlerlet: {best}.
+ex.push_passed.b5 = {best}, geçer piyonu ilerleterek: {eval}.
+ex.push_passed.b5.2 = Geçer piyon: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, geçer piyon.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = {your:acc} öne getir! Oyun sonunda şah güçlü bir taştır.
+ex.king_active.b1.2 = Artık {your} savaşa katılabilir. Onu ortaya yürüt.
+ex.king_active.b1.3 = Az taş kaldığında {your} dışarı çıkıp yardım etmeli.
+ex.king_active.b2 = Oyun sonunda {your:acc} kullan: onu merkeze getir.
+ex.king_active.b2.2 = {your} artık aktif olmalı. Onu ileri yürüt.
+ex.king_active.b3 = {best} şahı aktifleştiriyor. Oyun sonlarında şah da savaşır.
+ex.king_active.b3.2 = {best}: şahın yeri artık merkez.
+ex.king_active.b4 = {best} şahı merkeze getiriyor.
+ex.king_active.b4.2 = Şah öne çıkmalı: {best}.
+ex.king_active.b5 = {best}, şahı aktifleştirerek: {line}.
+ex.king_active.b5.2 = Şah aktivitesi: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, şah öne.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} daha iyi bir pozisyonu koruyor.
+ex.positional.b4.2 = Burada {best} daha güçlüydü.
+ex.positional.b4.3 = Ben {best} hamlesini tercih ederdim.
+ex.positional.b5 = {best} daha güçlüydü: {line}.
+ex.positional.b5.2 = {best}, {line} fikriyle.
+ex.positional.b5.3 = {best} hamlesini düşün: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} çok erken çıktı. Önce atlarını ve fillerini çıkar.
+tip.early_queen.b1.2 = {your:ins} bu kadar erken oynarken dikkatli ol: taşlarım onu kovalayabilir.
+tip.early_queen.b1.3 = {your:acc} oynamak eğlenceli, ama önce atları ve filleri geliştir.
+tip.early_queen.b2 = {your:acc} bu kadar erken oynamak, ona saldırıp zaman kazanmamı sağlıyor.
+tip.early_queen.b2.2 = {your} şimdiden dışarıda mı? Önce atlar ve filler!
+tip.early_queen.b3 = {your:gen} erken çıkışı bana ona karşı tempo kazandıran hamleler veriyor.
+tip.early_queen.b3.2 = Bu kadar erken {your:acc} kovalamak kolay. Önce gelişim.
+tip.queen_grab.b1 = {your} uzaktaki bir piyonu aldı, şimdi başı derde girebilir.
+tip.queen_grab.b1.2 = {your:ins} piyon toplamak zaman kaybettirir. Önce taşlarını geliştir!
+tip.queen_grab.b2 = {your} kenarda piyon toplamaya gitti. Bu çok zaman kaybettiriyor.
+tip.queen_grab.b2.2 = {your:acc} uzaktaki piyonların peşine gönderirken dikkatli ol.
+tip.queen_grab.b3 = Bu kadar erken {your:ins} piyon toplamak zaman kaybettirir.
+tip.queen_grab.b3.2 = {your} artık evinden uzakta; gelişimim fark yaratacak.
+tip.queen_grab.b4 = {your} bir piyon alıyor ama çok fazla zaman kaybediyor.
+tip.queen_grab.b4.2 = {your:ins} kenarda piyon toplamak tempo kaybettiriyor.
+tip.same_piece.b1 = {your:acc} iki kez oynadın. Her hamlede yeni bir taş çıkarmaya çalış.
+tip.same_piece.b1.2 = Yine {your:nom_mi}? Diğer taşlarını da çıkar.
+tip.same_piece.b1.3 = Her hamlede yeni bir taş geliştirmeye çalış, yine {your:acc} değil.
+tip.same_piece.b2 = Açılışta {your:acc} iki kez oynamak zaman kaybettirir.
+tip.same_piece.b2.2 = {your} yine oynadı; diğer taşların hâlâ yerinde.
+tip.same_piece.b3 = {your:acc} iki kez oynamak gelişimi geciktiriyor.
+tip.same_piece.b3.2 = {your:ins} bir hamle daha; ordunun geri kalanı bekliyor.
+tip.castle.b1 = {your} hâlâ ortada. Rok onu güvende tutar.
+tip.castle.b1.2 = Rok zamanı! {your} köşede daha güvende.
+tip.castle.b1.3 = Yakında rok atmayı düşün. {your} açıkta.
+tip.castle.b2 = {your} hâlâ merkezde. Yakında rok at!
+tip.castle.b2.2 = Rok, {your:acc} güvenli bir yere saklar.
+tip.castle.b3 = Merkez açılırken {your:acc} rokla güvenceye almalısın.
+tip.castle.b3.2 = {your} hâlâ merkezde; rok zamanı çoktan gelmişti.
+tip.knight_rim.b1 = Kenardaki {your} pek bir şey yapmıyor. Atlar ortayı sever.
+tip.knight_rim.b1.2 = Kenardaki at zayıf kalır! {your} orada daha az kareyi kontrol ediyor.
+tip.knight_rim.b2 = Kenardaki {your} az kare kontrol ediyor. Merkezi hedefle.
+tip.knight_rim.b2.2 = Kenardaki at zayıf kalır: {your} merkezi istiyor.
+tip.knight_rim.b3 = {your} kenarda, oyunun dışında.
+tip.knight_rim.b3.2 = Kenar, {your} için kötü bir yer.
+tip.flank.b1 = Önce ortadaki piyonları oynamaya çalış. Kenar piyonları pek işe yaramaz.
+tip.flank.b1.2 = Kenardaki piyonlar taşlarının çıkmasına yardım etmez. Ortadakileri kullan.
+tip.flank.b2 = Kenar piyonu hamleleri hiçbir taşı geliştirmez. Merkez piyonlarını kullan.
+tip.flank.b2.2 = Çok fazla kenar piyonu hamlesi. Taşlarını geliştir!
+tip.flank.b3 = Açılışta kanat piyonu hamleleri gelişimi geciktirir.
+tip.flank.b3.2 = Kenar piyonları bekleyebilir; taşlarını geliştir ve merkez için savaş.
+tip.centre.b1 = Tahtanın ortasını kontrol etmeye çalış, mesela {sq} karesini.
+tip.centre.b1.2 = Merkez önemlidir. {sq} karesinin yakınına bir piyon ya da taş koy.
+tip.centre.b1.3 = Ortadaki taşlar güçlüdür. {sq} gibi kareleri hedefle.
+tip.centre.b2 = Merkez için savaş: {sq} gibi kareler önemli.
+tip.centre.b2.2 = Merkezi bana bırakıyorsun. {sq} karesine bak.
+tip.centre.b3 = Merkez için mücadele etmiyorsun; {sq} karesi benim.
+tip.centre.b3.2 = Merkez için mücadele et, {sq} karesinin çevresinde.
+# Endgame technique tips.
+tip.mate_technique.b1 = Tek başına bir şah kaldığında onu kenara it, sonra mat et.
+tip.mate_technique.b1.2 = İpucu: şahımı kenara doğru sıkıştır. Kendi şahını da yakın tut.
+tip.fifty.b1 = Dikkat: alma ya da piyon hamlesi olmadan elli hamle geçerse oyun berabere.
+tip.fifty.b1.2 = Zaman daralıyor: alma ya da piyon hamlesi olmadan elli hamle beraberliktir.
+tip.repetition.b1 = Dikkat! Aynı pozisyon üçüncü kez gelirse oyun berabere.
+tip.repetition.b1.2 = Hamleleri tekrarlamaktan kaçın: üçüncü tekrar beraberliktir ve sen kazanıyorsun.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Vay, bir taş verdin ve işe yarıyor!
+praise.sacrifice.2 = Zekice bir feda! Çok iyi oynadın.
+praise.brilliant.b3 = Parlak! Gerçek bir feda.
+praise.brilliant.b3.2 = Vay, {move} harika bir feda!
+praise.brilliant.b4 = {move}! Parlak bir feda.
+praise.brilliant.b4.2 = Parlak. Bunu beklemiyordum.
+praise.brilliant.b5 = {move}!! Parlak.
+praise.brilliant.b5.spoken = {move}. Parlak!
+praise.brilliant.b5.2 = Parlak bir feda.
+praise.brilliant.b6 = {move}!! Mükemmel.
+praise.brilliant.b6.spoken = {move}. Mükemmel!
+praise.brilliant.b6.2 = Parlak.
+praise.great.b2 = Harika hamle! Karşılık vermenin yolunu buldun.
+praise.great.b2.2 = Bu harika bir hamle. İyi buldun!
+praise.great.b3 = Harika hamle! Tek iyi fikri buldun.
+praise.great.b3.2 = Mükemmel, {move} işleri tersine çeviriyor.
+praise.great.b4 = {move}! Harika bir buluş.
+praise.great.b4.2 = Harika hamle.
+praise.great.b5 = {move}! İyi buldun.
+praise.great.b5.2 = Güçlü: {move}.
+praise.great.b6 = {move}! Harika.
+praise.great.b6.2 = Harika buluş.
+praise.only.b2 = Güzel! Tek iyi hamle buydu.
+praise.only.b2.2 = Aferin, işe yarayan tek hamleyi buldun.
+praise.only.b3 = Tek hamle ve onu buldun.
+praise.only.b3.2 = Aynen! Burada başka hiçbir şey işe yaramıyordu.
+praise.only.b4 = Tek hamle. Bravo.
+praise.only.b4.2 = Tek hamle, bulundu.
+praise.only.b5 = Tek hamle. Güzel.
+praise.only.b5.2 = {move}, tek hamle.
+praise.only.b6 = Tek hamle.
+praise.only.b6.2 = İsabetli: tek hamle.
+praise.fork.b2 = Çifte saldırı! Aferin.
+praise.fork.b2.2 = Aynı anda iki taşa saldırıyorsun! Harika.
+praise.fork.b2.3 = Güzel! Bu bir çatal.
+praise.fork.b3 = Güzel çatal.
+praise.fork.b3.2 = İyi çatal!
+praise.fork.b3.3 = Bir çatal. İyi oynadın.
+praise.capture.b1 = Aferin! {my:acc} bedavaya aldın.
+praise.capture.b1.2 = İyi gördün! {my} korunmuyordu.
+praise.capture.b1.3 = Evet! {my:acc} kazandın.
+praise.capture.b2 = İyi aldın! {my} korumasızdı.
+praise.capture.b2.2 = Güzel, {my:acc} topladın.
+praise.capture.b2.3 = İyi fark ettin: {my} askıdaydı.
+praise.best.b1 = İyi hamle!
+praise.best.b1.2 = Çok iyi!
+praise.best.b1.3 = İyi oynadın!
+praise.best.b2 = İyi hamle.
+praise.best.b2.2 = Çok güzel.
+praise.best.b2.3 = İyi oynadın.
+praise.best.b3 = İyi hamle: bulması kolay değil.
+praise.best.b3.2 = Güzel buldun.
+praise.best.b3.3 = {move} burada en iyi hamle. Güzel.
+praise.trade.b1 = Güzel! Öndeyken taş değişmek işine yarar.
+praise.trade.b1.2 = Güzel değişim. Öndesin, bu yüzden daha az taş senin için iyi.
+praise.trade.b2 = İyi değişim: öndesin, taşları değiş.
+praise.trade.b2.2 = Öndeyken {my:acc} değişmek akıllıca.
+praise.trade.b3 = Güzel: öndeyken değiş.
+praise.trade.b3.2 = Mantıklı bir değişim.
+praise.excellent.b3 = Mükemmel hamle.
+praise.excellent.b3.2 = Bu güçlü bir hamle.
+praise.excellent.b3.3 = Çok isabetli.
+praise.excellent.b4 = İsabetli.
+praise.excellent.b4.2 = Mükemmel.
+praise.excellent.b4.3 = Güzel, {move} isabetli.
+praise.castle.b1 = Güzel! Rok attın. Şahın artık daha güvende.
+praise.castle.b1.2 = Güzel rok! Şahın güvenli bir köşeye saklandı.
+praise.saved.b1 = Güzel! Taşını kurtardın.
+praise.saved.b1.2 = Aferin, onu güvenli bir yere çektin.
+praise.book.b1 = Güzel, bu bilinen bir açılış hamlesi.
+praise.book.b1.2 = Güzel, güçlü oyuncular da böyle başlar.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Dikkat! {sq} karesinde şah mat tehdidim var.
+threat.mate.b1.2 = Dikkat et: {my} {sq} karesine gitmek istiyor. Bu şah mat olurdu.
+threat.mate.b1.3 = {sq} karesine bak. Oraya ulaşırsam şah mat!
+threat.mate.b2 = Dikkat, mat tehdidim var.
+threat.mate.b2.2 = Dikkat et: {sq} karesinde bir mat tehdidi var.
+threat.mate.b2.3 = İyi bak: şah mat tehdidim var.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Bak: {my} {your:dat} saldırıyor.
+threat.piece.b1.2 = Dikkat! {your}, {my:gen} saldırısı altında.
+threat.piece.b1.3 = Dikkat et, {my} {your:acc} almak istiyor.
+threat.piece.b2 = {your:dat} dikkat et.
+threat.piece.b2.2 = {your} saldırı altında.
+threat.piece.b2.3 = {your:dat} göz kulak ol.
+threat.punish.b1 = Son hamlem bir hataydı. Bunu cezalandırabilir misin?
+threat.punish.b1.2 = Hımm, sanırım bir hata yaptım. Bulabilir misin?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Bu sefer {your:acc} düşün.
+tb.hint.b1.2 = {your:dat} göz kulak ol.
+tb.hint.king.b1 = {your:gen} güvenliğini düşün.
+tb.hint.king.b1.2 = Önce {your:dat} bak. Güvende mi?
+tb.hint.missed.b1 = Bedava alabileceğin taşları ara.
+tb.hint.missed.b1.2 = Dikkatli bak: alabileceğin bir şey var mı?
+tb.hint.mate_missed.b1 = Şahıma bak. Onu mat edebilir misin?
+tb.hint.mate_missed.b1.2 = Önce şah çeken hamleleri dene. Belki bir şah mat vardır!
+tb.hint.general.b1 = Acele etme ve bütün tahtaya bak.
+tb.hint.general.b1.2 = Daha güvenli bir hamle bulmaya çalış.
+# The retry.
+tb.fixed.b1 = Çok daha iyi!
+tb.fixed.b1.2 = Evet, bu daha iyi!
+tb.fixed.b1.3 = Güzel, bu çok daha iyi oldu.
+tb.fixed = Bu daha iyi.
+tb.fixed.2 = Daha iyi.
+tb.fixed.3 = İyi düzeltme.
+tb.same = Yine aynı hamle mi? Peki, görelim.
+tb.same.2 = Bu hamleyi seviyorsun. Oynayıp görelim.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Evet! Aklımdaki hamle buydu.
+tb.found.b1.2 = Buldun! Daha iyi hamle bu.
+tb.found = Aklımdaki hamle buydu.
+tb.found.2 = Aynen, işte bu.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Maalesef bu oyunda geri alma hakkın kalmadı.
+tb.none_left.2 = Bu oyunda hiç geri alma hakkın kalmadı.

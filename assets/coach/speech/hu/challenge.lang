@@ -1,0 +1,138 @@
+# Coach speech (Hungarian): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 állás", count.position in
+#            common.lang); the mate distance is "{n:move_ine}" ("2 lépésben": "Matt 2 lépésben."),
+#            "{m:move_ine}" likewise; "{n:move_sup} át" = "10 lépésen át"
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "matt" (the line says it). Never a suffix
+#            on it: it stands alone ("Erre ezt lépném: {move}.") or before "után"
+#   {your}   one of the player's pieces WITH article and possessive ("a huszárod"; {your:acc}
+#            "a huszárodat", {your:sub} "a huszárodra"); the coach points at it on that word
+#   {sq}     a square; never a suffix or an article on it ("ezt a mezőt: {sq}"); the coach points at
+#            it on that word
+# The player always has the white pieces. The coach says "te" to the player.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matt egy lépésben. {n:position}, és mindegyikben egyetlen lépés ad mattot. Nézz meg minden sakkot.
+ch.intro.mate2 = Matt két lépésben. {n:position}: az első lépéseddel vedd el minden védekezésemet, aztán adj mattot.
+ch.intro.mate3 = Matt három lépésben. {n:position}. Sakkok, ütések és fenyegetések: mindig számold ki a legjobb válaszomat.
+ch.intro.backrank = Alapsormattok. {n:position}, ahol a király beszorult a saját gyalogjai mögé.
+ch.intro.patterns = Mattképek. {n:position} klasszikus matthálókkal. Ismerd fel a mintát, aztán csapj le!
+ch.intro.hanging = Védtelen bábuk. {n:position}: valamit védtelenül hagytam. Keresd meg, és üsd le!
+ch.intro.fork = Villák. {n:position}: keresd meg a lépést, amely egyszerre két célpontot támad.
+ch.intro.pin = Kötések. {n:position}: köss le egy bábut, vagy használj ki egy kötést.
+ch.intro.skewer = Nyársak. {n:position}: támadj meg egy értékes bábut, és nyerd meg, ami mögötte áll.
+ch.intro.discovered = Felfedett támadások. {n:position}: lépj el egy bábuval, hogy utat nyiss egy másiknak.
+ch.intro.deflection = Eltérítés és odacsalás. {n:position}: csald el a védőt, vagy csalogasd egy végzetes mezőre.
+ch.intro.intermezzo = Közbeiktatott lépések. {n:position}: a kézenfekvő lépés előtt találj egy erősebbet.
+ch.intro.trapped = Csapdába esett bábuk. {n:position}: az egyik bábumnak nincs hová biztonságosan lépnie. Nyerd meg!
+ch.intro.promotion = Átváltozás. {n:position}, ahol egy előretört gyalog dönti el a játszmát.
+ch.intro.quiet = Csendes lépések. {n:position}: a nyerő lépés se nem sakk, se nem ütés.
+ch.intro.opening = Megnyitási csapdák. {n:position} valódi játszmák első lépéseiből. Büntesd meg a hibámat!
+ch.intro.escape = Kiút keresése. {n:position}: a királyod veszélyben van, és csak egyetlen lépés menti meg.
+ch.intro.defend = Védekező lépések. {n:position}: keresd meg azt az egy lépést, amely egyben tartja az állásodat.
+ch.intro.kq = Vezér és király a magányos király ellen. {n:position}: adj mattot a királyomnak. Vigyázz a pattra!
+ch.intro.kr = Bástya és király a magányos király ellen. {n:position}: adj mattot a királyomnak, lépésről lépésre.
+ch.intro.kp = Király és gyalog a magányos király ellen. {n:position}: szerezz új vezért. A királyod menjen elöl.
+ch.intro.kp_hold = A gyalog megállítása. {n:position}: csak a királyod van. Tartsd a döntetlent.
+ch.intro.rook = Bástyavégjátékok. {n:position}: építs hidat az átváltozáshoz, és tartsd a döntetlent a Philidor-védelemmel.
+ch.intro.rook.spoken = Bástyavégjátékok. {n:position}: építs hidat az átváltozáshoz, és tartsd a döntetlent a Filidor-védelemmel.
+ch.intro.endgame = Végjátéktaktika. {n:position} kevés bábuval és éles ötletekkel.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_ine}: "2 lépésben").
+ch.task.mate = Matt {n:move_ine}.
+ch.task.mate.2 = Keresd meg a mattot {n:move_ine}.
+ch.task.hanging = Valami védtelenül maradt.
+ch.task.hanging.2 = Mit üthetsz le ingyen?
+ch.task.fork = Keresd meg a villát.
+ch.task.fork.2 = Keress egy villát.
+ch.task.pin = Itt egy kötés a kulcs.
+ch.task.skewer = Itt egy nyárs nyer.
+ch.task.discovered = Itt egy felfedett támadás nyer.
+ch.task.deflection = Terheld túl a védőt, vagy csald rossz mezőre.
+ch.task.intermezzo = Keress egy közbeiktatott lépést.
+ch.task.trapped = Az egyik bábum nem tud elmenekülni. Nyerd meg!
+ch.task.promotion = Használd ki az előretört gyalogodat.
+ch.task.quiet = A nyerő lépés egy csendes lépés.
+ch.task.opening = Büntesd meg az utolsó lépésemet.
+ch.task.escape = Mentsd meg a királyodat: csak egy lépés működik.
+ch.task.defend = Keresd meg az egyetlen jó lépést.
+ch.task.endgame = Keresd meg a legjobb lépést.
+ch.task.default = Keresd meg a legjobb lépést.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Adj mattot a királyomnak. A legjobb tudásom szerint védekezem.
+ch.task.play.promote = Változtasd át a gyalogodat, és őrizd meg a nyerést. Megpróbállak megállítani.
+ch.task.play.hold = Tartsd a döntetlent {n:move_sup} át. Megpróbálok nyerni.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Ezek az állások valódi játszmákból származnak. Én lépem meg az utolsó lépést, aztán te jössz.
+ch.lead.first.2 = Minden állás valódi játszmából való: én lépem meg azt a lépést, amely oda vezetett, aztán te lépsz.
+ch.next = Következő állás.
+ch.next.2 = Itt a következő.
+ch.next.3 = Jöjjön a következő.
+ch.last = Az utolsó állás.
+ch.last.2 = És most az utolsó.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Jó.
+ch.good.2 = Igen.
+ch.good.3 = Helyes.
+ch.good.4 = Pontosan.
+# The position is solved.
+ch.solved = Ez az! Szép munka.
+ch.solved.2 = Pontosan így.
+ch.solved.3 = Nagyon jó.
+ch.solved.mate = Matt! Szép munka.
+ch.solved.mate.2 = És ez matt. Nagyon jó.
+ch.solved.mate.3 = Matt. Szépen megoldottad.
+ch.solved.promote = Új vezér, és a győzelem biztos. Szép munka.
+ch.solved.hold = Megvan a döntetlen. Jól védekeztél!
+ch.solved.draw = Döntetlen a táblán. Jól védekeztél!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Nem ez: {move} lenne a válaszom.
+ch.wrong.reply.2 = Nem egészen. Erre így felelnék: {move}.
+ch.wrong.reply.3 = Akkor ezt lépném: {move}.
+ch.wrong.mate = Vigyázz: {move:nomate} matt lenne.
+ch.wrong.mate.2 = Figyelj! Erre ezt lépném: {move:nomate}, és az matt.
+ch.wrong.mated = Vigyázz: {move} után kikényszeríthetem a mattot {m:move_ine}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Ez is mattot ad, de tovább tart. Van gyorsabb út.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Ez is mattot ad, de én egy másik lépésre gondolok. Nézd meg újra.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Nem rossz, de van erősebb. Nézd meg újra.
+ch.wrong.weaker.2 = Ez játszható, de tudsz jobbat is.
+ch.wrong.stalemate = Patt! A királyom nem tud lépni, és ez csak döntetlen.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Nem ez: {move} után tartani tudom a döntetlent.
+ch.wrong.loses = Vigyázz: {move} után én állnék nyerésre.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Nem ez az.
+ch.try_again = Próbáld újra.
+ch.try_again.2 = Nézd meg még egyszer.
+ch.try_again.3 = Nézd meg újra.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Kérsz egy tippet?
+ch.offer.2 = Adjak egy tippet?
+ch.no_hint = Rendben. Keresgélj tovább.
+ch.no_hint.2 = Jó, nyugodtan gondolkodj.
+ch.hint.piece = Nézd meg {your:acc}.
+ch.hint.piece.2 = Gondolj {your:sub}.
+ch.hint.square = Nézd meg ezt a mezőt: {sq}.
+ch.hint.square.2 = A kulcsmező: {sq}.
+ch.hint.square.3 = Tartsd szemmel ezt a mezőt: {sq}.
+ch.hint.show = Itt a lépés. Figyelj.
+ch.hint.show.2 = Megmutatom. Figyelj.
+ch.hint.now = Most te lépd meg.
+ch.hint.now.2 = Te jössz: lépd meg.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Ezzel a kihívás végére értünk. Szép munka!
+ch.complete.2 = Minden állást megoldottál. Szép volt!

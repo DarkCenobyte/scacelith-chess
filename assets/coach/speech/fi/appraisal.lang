@@ -1,0 +1,445 @@
+# Coach speech (Finnish): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "sinä" (standard Finnish, no colloquial forms);
+# Finnish has no gender, so nothing agrees with the player's or the coach's sex.
+#
+# Names inserted by {text}, {theme}, {level}, {opening} are always said in the nominative (no case
+# forms exist for them), so each sentence puts them where the nominative fits:
+#   appraisal.phase.*   nominative nouns ("avaus", "keskipeli", "loppupeli"): as the subject or
+#                       predicate ("{text} sujui parhaiten", "Paras vaiheesi oli {text}") or after a colon.
+#   appraisal.reason.*  an adverbial right after "Tasapeli" ("Tasapeli sopimuksella.").
+#   theme.*             a verbal-noun phrase in -minen ("koko laudan katsominen ennen siirtoa"),
+#                       always after a colon ("Harjoiteltavaa: {theme}.").
+#   appraisal.level.*   the coach page's level name in quotation marks, after "taso" in any case:
+#                       "tasolle ”Kerhopelaaja”", "tasolla ”Aloittelija”".
+#   {opening:def}       the opening name as a nominative predicate ("Avaus oli {opening:def}.") or
+#                       after a colon; {opening} alone as a whole sentence.
+# Move numbers: the number after the noun, no ordinal: "siirrolla {n}" (at move n), "siirto {n}",
+# "siirtoon {crit_no} asti" (until move n). Never a case ending on {move}, {n}, {eval}...
+# Accuracy: "{acc} prosenttia" (nominative) or "{acc:gen} prosentin tarkkuudella" (count.gen says
+# the number in the genitive). Counted nouns: "{n:piece_acc}" as an object, "{n:mistake}" as a
+# subject or in an existential sentence ("pelissä oli 2 virhettä").
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = avaus
+appraisal.phase.middlegame = keskipeli
+appraisal.phase.endgame = loppupeli
+appraisal.reason.stalemate = patin vuoksi
+appraisal.reason.material = riittämättömän materiaalin vuoksi
+appraisal.reason.repetition = aseman toistumisen vuoksi
+appraisal.reason.fifty = viidenkymmenen siirron säännön perusteella
+appraisal.reason.agreement = sopimuksella
+appraisal.reason.other = sääntöjen mukaan
+# The level names (coach.level.<n>.name of the UI), in Finnish quotation marks.
+appraisal.level.l1 = ”Ensiaskeleet”
+appraisal.level.l2 = ”Aloittelija”
+appraisal.level.l3 = ”Edistyvä”
+appraisal.level.l4 = ”Kerhopelaaja”
+appraisal.level.l5 = ”Vahva kerhopelaaja”
+appraisal.level.l6 = ”Asiantuntija”
+# What to practise, after a colon (a verbal-noun phrase in -minen, no full stop).
+theme.general = koko laudan katsominen ennen siirtoa
+theme.mate_allowed = kuninkaasi turvallisuuden tarkistaminen ennen jokaista siirtoa
+theme.mate_missed = mattien etsiminen shakeista aloittaen
+theme.stalemate = vapaan ruudun jättäminen kuninkaalleni, kun olet voitolla
+theme.fork = kaksoisuhkien varominen
+theme.discovered = nappuloideni takana piilevien hyökkäysten varominen
+theme.skewer = arvokkaiden nappuloiden pitäminen poissa samalta linjalta, riviltä tai diagonaalilta
+theme.pin = kiinnitysten huomaaminen ennen kuin ne syntyvät
+theme.trapped = pakotien jättäminen nappuloillesi
+theme.back_rank = pakoruudun avaaminen kuninkaallesi
+theme.hanging = nappuloidesi pitäminen suojattuina
+theme.exchange = hyökkääjien ja puolustajien laskeminen ennen vaihtoa
+theme.missed_capture = ilmaiseksi lyötävien nappuloiden etsiminen ensin
+theme.missed_fork = omien kaksoisuhkiesi etsiminen
+theme.promotion = sotilaiden kilpajuoksut ja neliösääntö
+theme.king_safety = kuninkaasi pitäminen turvassa sotilaiden takana
+theme.bad_trade = vaihdettavien nappuloiden valitseminen
+theme.opening = upseeriesi kehittäminen ja linnoittautuminen ajoissa
+theme.endgame = kuninkaasi käyttäminen ja vapaasotilaiden työntäminen
+theme.positional = huonoimman nappulasi parantaminen
+theme.material = sen tarkistaminen ennen siirtoasi, mitä seuraavat siirtoni voivat voittaa
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Matti! Voitit. Hyvin pelattu!
+appraisal.open.win.b1.2 = Voitit! Hienoa, että veit pelin loppuun asti.
+appraisal.open.win.b1.3 = Voitit minut! Se oli todella hyvä peli.
+appraisal.open.win.b2 = Hyvin pelattu! Voitit {moves:move_ine}.
+appraisal.open.win.b2.2 = Onnittelut, voitit!
+appraisal.open.win.b2.3 = Voitto {moves:move_ine}. Hienosti tehty!
+appraisal.open.win.b3 = Onnittelut, hyvin ansaittu voitto.
+appraisal.open.win.b3.2 = Hyvin pelattu. Ansaitsit voiton.
+appraisal.open.win.b3.3 = Hyvä voitto. Onnittelut.
+appraisal.open.win.b4 = Hieno voitto.
+appraisal.open.win.b4.2 = Hyvin pelattu, ansaittu voitto.
+appraisal.open.win.b4.3 = Hyvä voitto.
+appraisal.open.win.b5 = Hyvin pelattu.
+appraisal.open.win.b5.2 = Kauniisti voitettu.
+appraisal.open.win.b5.3 = Hyvä peli, ansaittu voitto.
+appraisal.open.win.b6 = Hyvin pelattu.
+appraisal.open.win.b6.2 = Hyvä voitto.
+appraisal.open.win.b6.3 = Hyvä peli.
+appraisal.open.draw.b1 = Tasapeli! Kumpikaan ei pystynyt voittamaan tätä peliä.
+appraisal.open.draw.b1.2 = Tasapeli. Se oli tiukka peli!
+appraisal.open.draw.b1.3 = Tasapeli: jaamme pisteen. Hyvin pelattu!
+appraisal.open.draw.b2 = Tasapeli: oikeudenmukainen tulos.
+appraisal.open.draw.b2.2 = Pelasimme tasapelin. Hyvä taistelu!
+appraisal.open.draw.b2.3 = Tasapeli – ja hyvä peli.
+appraisal.open.draw.b3 = Tasapeli. Molemmilla osapuolilla oli mahdollisuuksia.
+appraisal.open.draw.b3.2 = Oikeudenmukainen tasapeli.
+appraisal.open.draw.b3.3 = Tasapeli {text}. Hyvä taistelu.
+appraisal.open.draw.b4 = Tasapeli {text}.
+appraisal.open.draw.b4.2 = Peli päättyi tasapeliin {text}.
+appraisal.open.draw.b4.3 = Tulos: tasapeli {text}.
+appraisal.open.draw.b5 = Tasapeli.
+appraisal.open.draw.b5.2 = Tasapeli {text}.
+appraisal.open.draw.b5.3 = Peli päättyi tasan.
+appraisal.open.draw.b6 = Tasapeli.
+appraisal.open.draw.b6.2 = Tasapeli {text}.
+appraisal.open.draw.b6.3 = Peli päättyi tasan.
+appraisal.open.stalemate.b1 = Tasapeli patin vuoksi, ja voitto oli niin lähellä! Jätä ensi kerralla kuninkaalleni vapaa ruutu.
+appraisal.open.stalemate.b1.2 = Patti, joten peli päättyi tasapeliin. Olit jo melkein perillä!
+appraisal.open.stalemate.b2 = Tasapeli patin vuoksi. Olit niin lähellä voittoa!
+appraisal.open.stalemate.b2.2 = Patti: tasapeli, vaikka olit voitolla.
+appraisal.open.stalemate.b3 = Tasapeli patin vuoksi voittoasemasta.
+appraisal.open.stalemate.b3.2 = Patti. Voitto lipsui käsistä aivan lopussa.
+appraisal.open.stalemate.b4 = Tasapeli patin vuoksi.
+appraisal.open.stalemate.b4.2 = Patti: tasapeli.
+appraisal.open.stalemate.b5 = Patti.
+appraisal.open.stalemate.b5.2 = Tasapeli: patti.
+appraisal.open.stalemate.b6 = Patti.
+appraisal.open.stalemate.b6.2 = Tasapeli, patti.
+appraisal.open.loss.b1 = Voitin tällä kertaa, mutta pelasit muutamia todella hyviä siirtoja.
+appraisal.open.loss.b1.2 = Hyvä peli! Jouduin todella tekemään töitä voiton eteen.
+appraisal.open.loss.b1.3 = Tuo oli hauskaa! Voitin tämän pelin, mutta opit nopeasti.
+appraisal.open.loss.b2 = Hyvä peli! Katsotaan, mikä meni hyvin, ja mietitään yksi asia, jota voit kokeilla.
+appraisal.open.loss.b2.2 = Kiitos pelistä! Sinulla oli hyviä ideoita.
+appraisal.open.loss.b2.3 = Hyvä peli. Katsotaan, mitä siitä voi oppia.
+appraisal.open.loss.b3 = Hyvä peli.
+appraisal.open.loss.b3.2 = Kiitos pelistä.
+appraisal.open.loss.b3.3 = Hyvä peli. Katsotaanpa.
+appraisal.open.loss_close.b3 = Hyvä taistelu. Peli oli pitkään tasaväkinen.
+appraisal.open.loss_close.b3.2 = Hyvä taistelu: asema oli pitkään tasapainossa.
+appraisal.open.loss.b4 = Hyvä peli. Tässä se, mikä ratkaisi pelin.
+appraisal.open.loss.b4.2 = Hyvä peli. Yksi hetki ratkaisi sen.
+appraisal.open.loss.b4.3 = Kiitos pelistä. Katsotaan, missä peli kääntyi.
+appraisal.open.loss_close.b4 = Pitkään tasainen taistelu. Tässä se, mikä ratkaisi pelin.
+appraisal.open.loss_close.b4.2 = Hyvä peli, pitkään tasapainossa.
+appraisal.open.loss.b5 = Hyvä peli.
+appraisal.open.loss.b5.2 = Kiitos pelistä.
+appraisal.open.loss.b5.3 = Hyvä taistelu.
+appraisal.open.loss.b6 = Hyvä peli.
+appraisal.open.loss.b6.2 = Kiitos pelistä.
+appraisal.open.loss.b6.3 = Hyvä taistelu.
+appraisal.open.resigned.b1 = Luovuttaminen kuuluu shakkiin, ja se vaatii rohkeutta. Hyvä peli!
+appraisal.open.resigned.b1.2 = Ei hätää. Shakkiin kuuluu myös sen tietäminen, milloin on aika luovuttaa.
+appraisal.open.resigned.b2 = Luovuttaminen kuuluu shakkiin, ja se vaatii rohkeutta.
+appraisal.open.resigned.b2.2 = Ymmärrettävää. Luovuttaminenkin vaatii rohkeutta.
+appraisal.open.resigned.b3 = Luovuttaminen kuuluu shakkiin. Hyvä peli.
+appraisal.open.resigned.b3.2 = Ymmärrettävää. Kiitos pelistä.
+appraisal.open.resigned.b4 = Hyvä peli.
+appraisal.open.resigned.b4.2 = Kiitos pelistä.
+appraisal.open.resigned.b5 = Hyvä peli.
+appraisal.open.resigned.b5.2 = Kiitos pelistä.
+appraisal.open.resigned.b6 = Hyvä peli.
+appraisal.open.resigned.b6.2 = Kiitos.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Peli ei ollut vielä ohi, tiedäthän: noin {eval}.
+appraisal.resign_early.b3.2 = Itse asiassa sinulla oli vielä mahdollisuuksia: noin {eval}.
+appraisal.resign_early.b4 = Peli ei ollut vielä ohi: noin {eval}.
+appraisal.resign_early.b4.2 = Pelattavaa oli vielä: noin {eval}.
+appraisal.resign_early.b5 = Peli ei ollut ohi: {eval}.
+appraisal.resign_early.b5.2 = Vielä pelattava asema, noin {eval}.
+appraisal.resign_early.b6 = Ei ohi: {eval}.
+appraisal.resign_early.b6.2 = Asema oli {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Avauksena oli {opening:def}.
+appraisal.opening.b3.2 = Avaus oli {opening:def}.
+appraisal.opening.b4 = Meillä oli avauksena {opening:def}.
+appraisal.opening.b4.2 = Avaus: {opening:def}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Avaus: {opening:def}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Avaus: {opening:def}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+# A move placeholder never stands right after a number ("siirrolla 12 Rf3"): the line puts a word
+# between them ("Siirrolla {n} pelaamasi {move}") or names the move first ("{move} siirrolla {n}").
+appraisal.best.brilliant.b1 = Mikä uhraus siirrolla {n}: {move}!
+appraisal.best.brilliant.b1.2 = Lempihetkeni: {move}. Uhrasit nappulan, ja se toimi!
+appraisal.best.brilliant.b2 = Paras hetkesi: uhraus {move} siirrolla {n}.
+appraisal.best.brilliant.b2.2 = Siirrolla {n} pelaamasi {move} oli rohkea uhraus. Hienoa!
+appraisal.best.brilliant.b3 = Loistava uhraus: {move}.
+appraisal.best.brilliant.b3.2 = Kohokohta: {move}, todellinen uhraus, siirrolla {n}.
+appraisal.best.brilliant.b4 = Paras hetki: {move}, siirto {n}. Loistava uhraus.
+appraisal.best.brilliant.b4.2 = {move} siirrolla {n} oli loistava.
+appraisal.best.brilliant.b5 = {move} siirrolla {n} oli loistava.
+appraisal.best.brilliant.b5.2 = Siirto {n}, {move}: loistava.
+appraisal.best.brilliant.b6 = {move}!! siirrolla {n}.
+appraisal.best.brilliant.b6.spoken = {move} siirrolla {n}: loistava siirto.
+appraisal.best.brilliant.b6.2 = Siirto {n}: {move}, loistava.
+appraisal.best.great.b1 = Lempihetkeni: {move}. Se oli hieno siirto!
+appraisal.best.great.b1.2 = Muistatko siirron {move}? Se oli hieno löytö.
+appraisal.best.great.b2 = Paras hetkesi: {move} siirrolla {n}. Se käänsi pelin suunnan.
+appraisal.best.great.b2.2 = Siirrolla {n} pelaamasi {move} oli hieno siirto.
+appraisal.best.great.b3 = Avainsiirto oli {move} siirrolla {n}: se käänsi tilanteen.
+appraisal.best.great.b3.2 = Hieno löytö: {move} siirrolla {n}.
+appraisal.best.great.b4 = Rankaisit virheestäni heti siirrolla {move}.
+appraisal.best.great.b4.2 = Paras hetki: {move}, siirto {n}.
+appraisal.best.great.b5 = {move} siirrolla {n}. Hyvä löytö.
+appraisal.best.great.b5.2 = Siirto {n}, {move}: hieno löytö.
+appraisal.best.great.b6 = {move} siirrolla {n}. Hyvä löytö.
+appraisal.best.great.b6.2 = Siirto {n}: {move}!
+appraisal.best.only.b1 = Lempihetkeni: {move}. Se oli ainoa hyvä siirto!
+appraisal.best.only.b1.2 = Siirrolla {n} löysit ainoan hyvän siirron: {move}. Erinomaista!
+appraisal.best.only.b2 = Paras hetkesi: {move}, ainoa hyvä siirto siinä asemassa.
+appraisal.best.only.b2.2 = Siirrolla {n} ainoa siirto oli {move}, ja löysit sen.
+appraisal.best.only.b3 = Avainsiirto oli {move} siirrolla {n}: ainoa siirto, joka piti aseman.
+appraisal.best.only.b3.2 = Siirrolla {n} vain {move} piti aseman, ja löysit sen.
+appraisal.best.only.b4 = Paras hetki: {move}, siirto {n}. Ainoa siirto.
+appraisal.best.only.b4.2 = Siirto {n}: {move}, ainoa siirto.
+appraisal.best.only.b5 = {move} siirrolla {n} oli ainoa siirto. Hyvä löytö.
+appraisal.best.only.b5.2 = Siirrolla {n} ainoa siirto: {move}.
+appraisal.best.only.b6 = {move} siirrolla {n} oli ainoa siirto. Hyvä löytö.
+appraisal.best.only.b6.2 = Siirto {n}: {move}, ainoa siirto.
+appraisal.best.won.b1 = Lempihetkeni: {move}. Se voitti {pts:point_acc}!
+appraisal.best.won.b1.2 = Muistatko siirron {move}? Sillä voitit {pts:point_acc}. Hienoa!
+appraisal.best.won.b2 = Paras hetkesi: {move} siirrolla {n}. Se voitti {pts:point_acc}.
+appraisal.best.won.b2.2 = {move} siirrolla {n} voitti materiaalia. Hienoa!
+appraisal.best.won.b3 = Avainsiirto oli {move} siirrolla {n}: se voitti {pts:point_acc}.
+appraisal.best.won.b3.2 = {move} siirrolla {n} voitti materiaalia puhtaasti.
+appraisal.best.won.b4 = Paras hetki: {move}, siirto {n}, joka voitti materiaalia.
+appraisal.best.won.b4.2 = {move} siirrolla {n} voitti {pts:point_acc}.
+appraisal.best.won.b5 = {move} siirrolla {n} voitti materiaalia.
+appraisal.best.won.b5.2 = Siirto {n}: {move} voitti materiaalia.
+appraisal.best.won.b6 = {move} siirrolla {n} voitti materiaalia.
+appraisal.best.won.b6.2 = Siirto {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Siirto {n}: {move}, plus {pts}.
+# A streak is at least 5 moves: "{n} parasta siirtoa" (partitive) is always right.
+appraisal.best.streak.b1 = Löysit parhaan siirron {n:time} peräkkäin. Erinomaista!
+appraisal.best.streak.b1.2 = {n} parasta siirtoa peräkkäin! Tuo on hienoa shakkia.
+appraisal.best.streak.b2 = Löysit parhaan siirron {n:time} peräkkäin.
+appraisal.best.streak.b2.2 = {n} parasta siirtoa peräkkäin. Todella hyvää!
+appraisal.best.streak.b3 = {n:gen} parhaan siirron sarja. Erittäin varmaa peliä.
+appraisal.best.streak.b3.2 = {n} huippusiirtoa peräkkäin. Hyvin pelattu.
+appraisal.best.streak.b4 = {n} parasta siirtoa peräkkäin.
+appraisal.best.streak.b4.2 = {n:gen} huippusiirron sarja.
+appraisal.best.streak.b5 = {n} huippusiirtoa peräkkäin.
+appraisal.best.streak.b5.2 = {n:gen} parhaan siirron sarja.
+appraisal.best.streak.b6 = {n} huippusiirtoa peräkkäin.
+appraisal.best.streak.b6.2 = Sarja: {n} parasta siirtoa.
+appraisal.best.capture.b1 = Lempihetkeni: {move}. Löit {my:acc} ilmaiseksi!
+appraisal.best.capture.b1.2 = Muistatko siirron {move}? Huomasit, että {my} oli lyötävissä ilmaiseksi!
+appraisal.best.capture.b2 = Paras hetkesi: {move}, jolla voitit {my:acc}.
+appraisal.best.capture.b2.2 = Hieno lyönti siirrolla {n}: {move}.
+appraisal.best.capture.b3 = Hyvä huomio siirrolla {n}: {move} voitti {my:acc}.
+appraisal.best.capture.b3.2 = {move} siirrolla {n} nappasi {my:acc}.
+appraisal.best.capture.b4 = Paras hetki: {move}, siirto {n}, joka voitti {my:acc}.
+appraisal.best.capture.b4.2 = {move} siirrolla {n} voitti materiaalia.
+appraisal.best.capture.b5 = {move} siirrolla {n} voitti {my:acc}.
+appraisal.best.capture.b5.2 = Siirto {n}: {move}.
+appraisal.best.capture.b6 = {move} siirrolla {n}.
+appraisal.best.capture.b6.2 = Siirto {n}: {move} voitti materiaalia.
+appraisal.best.phase.b1 = {text} sujui sinulta todella hyvin.
+appraisal.best.phase.b1.2 = {text} oli pelisi paras osa.
+appraisal.best.phase.b2 = Vahvin vaiheesi oli {text}.
+appraisal.best.phase.b2.2 = {text} meni sinulta erittäin hyvin.
+appraisal.best.phase.b3 = Paras pelivaiheesi oli {text}: {acc} prosenttia.
+appraisal.best.phase.b3.2 = {text} sujui parhaiten: tarkkuus {acc} prosenttia.
+appraisal.best.phase.b4 = Vahvin vaihe: {text}, {acc} prosenttia.
+appraisal.best.phase.b4.2 = {text} oli paras vaiheesi, {acc} prosenttia.
+appraisal.best.phase.b5 = Paras vaihe: {text}, {acc}.
+appraisal.best.phase.b5.2 = {text}: {acc}.
+appraisal.best.phase.b6 = {text}: {acc}.
+appraisal.best.phase.b6.2 = Paras vaihe: {text}, {acc}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns come from count.<noun> in common.lang: "{n:piece_acc}" is the object ("1 nappulan" /
+# "3 nappulaa"), "{n:mistake}" the subject form ("1 virhe" / "3 virhettä"), "{m:acc}" a number alone
+# as an object (spoken "yhden" / "kolme"). The short levels give bare numbers after a label
+# ("Lyödyt nappulat: 3"), which stay in the nominative.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = Löit minulta {n:piece_acc} ja shakkasit {m:time}.
+appraisal.num.material.b1.2 = Löit {n:piece_acc} ja shakkasit kuningastani {m:time}.
+appraisal.num.material.b2 = Löit {n:piece_acc} ja annoit shakin {m:time}.
+appraisal.num.material.b2.2 = Veit minulta {n:piece_acc} ja shakkasit {m:time}.
+appraisal.num.material.b3 = Löit {n:piece_acc} ja annoit shakin {m:time}.
+appraisal.num.material.b3.2 = Lyödyt nappulat: {n}. Annetut shakit: {m}.
+appraisal.num.material.b4 = Lyödyt nappulat: {n}, annetut shakit: {m}.
+appraisal.num.material.b4.2 = Löit {n:piece_acc} ja shakkasit {m:time}.
+appraisal.num.material.b5 = Lyödyt nappulat: {n}; shakit: {m}.
+appraisal.num.material.b5.2 = Lyöntejä: {n}; shakkeja: {m}.
+appraisal.num.material.b6 = Lyönnit: {n}, shakit: {m}.
+appraisal.num.material.b6.2 = Lyöntejä {n}, shakkeja {m}.
+appraisal.num.material_nochecks.b1 = Löit minulta {n:piece_acc}.
+appraisal.num.material_nochecks.b1.2 = Löit tässä pelissä {n:piece_acc}.
+appraisal.num.material_nochecks.b2 = Löit {n:piece_acc}.
+appraisal.num.material_nochecks.b2.2 = Veit minulta tässä pelissä {n:piece_acc}.
+appraisal.num.material_nochecks.b3 = Löit {n:piece_acc}.
+appraisal.num.material_nochecks.b3.2 = Lyödyt nappulat: {n}.
+appraisal.num.material_nochecks.b4 = Lyödyt nappulat: {n}.
+appraisal.num.material_nochecks.b4.2 = Löit {n:piece_acc}.
+appraisal.num.material_nochecks.b5 = Lyödyt nappulat: {n}.
+appraisal.num.material_nochecks.b5.2 = Lyöntejä: {n}.
+appraisal.num.material_nochecks.b6 = Lyönnit: {n}.
+appraisal.num.material_nochecks.b6.2 = Lyöntejä {n}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = Peruit {n:move_acc} ja korjasit niistä {m:acc}. Juuri näin opitaan!
+appraisal.num.takebacks.b1.2 = Peruit {n:move_acc}, ja {m:time} löysit paremman siirron. Hienoa!
+appraisal.num.takebacks.b2 = Peruit {n:move_acc} ja korjasit niistä {m:acc}. Näin opitaan.
+appraisal.num.takebacks.b2.2 = Perumiasi siirtoja oli {n}, ja niistä korjasit {m:acc}. Hienoa oppimista!
+appraisal.num.takebacks.b3 = Peruit {n:move_acc} ja korjasit niistä {m:acc}.
+appraisal.num.takebacks.b3.2 = Peruttuja siirtoja {n}, niistä korjattuja {m}. Hyvä.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Ei yhtään isoa virhettä: hienoa!
+appraisal.num.clean.b2.2 = Ei ainuttakaan isoa virhettä tässä pelissä. Erinomaista!
+appraisal.num.clean.b2.3 = Et tehnyt yhtään isoa virhettä. Todella hyvä!
+appraisal.num.few.b2 = Vain {n:mistake} tässä pelissä.
+appraisal.num.few.b2.2 = Koko pelissä vain {n:mistake}. Hyvä!
+appraisal.num.few.b2.3 = Mainittavia virheitä vain {n}. Hienosti tehty.
+appraisal.num.best.b2 = Löysit parhaan siirron {n:time}.
+appraisal.num.best.b2.2 = Pelasit kaikkein parhaan siirron {n:time}.
+appraisal.num.best.b2.3 = Parhaan siirron löysit {n:time}.
+appraisal.num.acc.b3 = Tarkkuutesi oli {acc} prosenttia, ja pelissä oli {n:mistake} ja {m:blunder}.
+appraisal.num.acc.b3.2 = Tarkkuus {acc} prosenttia: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Pelasit {acc:gen} prosentin tarkkuudella, ja teit {n:mistake_acc} ja {m:blunder_acc}.
+appraisal.num.acc_explain.b3 = Tarkkuus vertaa siirtojasi kunkin aseman parhaaseen siirtoon: sata on täydellinen.
+appraisal.num.acc_explain.b3.2 = Tarkkuus mittaa, kuinka lähellä siirtosi olivat parhaita siirtoja. Sata on täydellinen.
+appraisal.num.acc.b4 = Tarkkuus {acc} prosenttia.
+appraisal.num.acc.b4.2 = Pelasit {acc:gen} prosentin tarkkuudella.
+appraisal.num.acc.b4.3 = {acc:gen} prosentin tarkkuus.
+appraisal.num.acc_phase.b4 = Tarkkuus {acc}; vahvin vaiheesi oli {text}, {acc_phase}.
+appraisal.num.acc_phase.b4.2 = Kokonaistarkkuus {acc} prosenttia; {text}: {acc_phase}.
+appraisal.num.acc_phase.b4.3 = Pelasit {acc:gen} prosentin tarkkuudella; parhaiten sujui {text}, {acc_phase}.
+appraisal.num.coach.b4 = Minä pelasin {acc_coach:gen} prosentin tarkkuudella.
+appraisal.num.coach.b4.2 = Oma tarkkuuteni oli {acc_coach}.
+appraisal.num.acc.b5 = Tarkkuus {acc}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Tarkkuus {acc}: {n:inaccuracy} ja {m:mistake}.
+appraisal.num.acc.b5.3 = {acc} prosenttia: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Teoria loppui siirrolla {k}.
+appraisal.num.book.b5.2 = Poistuimme teoriasta siirrolla {k}.
+appraisal.num.acc.b6 = Sinulla {acc}, minulla {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc} vastaan {acc_coach}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Tarkkuus {acc}, omani {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Tarkkuus {acc}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Tarkkuus {acc}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Yksi harjoiteltava asia: {theme}.
+appraisal.improve.theme.b1.2 = Vinkki ensi kertaan: {theme}.
+appraisal.improve.theme.b1.3 = Tätä kannattaa harjoitella: {theme}.
+appraisal.improve.theme.b2 = Harjoiteltavaa: {theme}.
+appraisal.improve.theme.b2.2 = Yksi ajatus ensi kertaan: {theme}.
+appraisal.improve.theme.b2.3 = Hyvä asia harjoiteltavaksi: {theme}.
+appraisal.improve.theme.b3 = Tämän pelin teema: {theme}.
+appraisal.improve.theme.b3.2 = Kannattaa harjoitella: {theme}.
+appraisal.improve.theme.b4 = Pelissä toistui sama teema: {theme}.
+appraisal.improve.theme.b4.2 = Tämä tuli vastaan useammin kuin kerran: {theme}.
+appraisal.improve.theme.b5 = Toistuva teema: {theme}.
+appraisal.improve.theme.b5.2 = Pelin teema: {theme}.
+appraisal.improve.theme.b6 = Toistuva teema: {theme}.
+appraisal.improve.theme.b6.2 = Teema: {theme}.
+# The critical moment (levels 2-6). {crit_best} kept the advantage only if it had been played: the
+# Finnish lines use the conditional ("olisi säilyttänyt").
+appraisal.improve.critical.b2 = Peli kääntyi siirrolla {crit_no}. Ensi kerralla harjoittele tätä: {theme}.
+appraisal.improve.critical.b2.2 = Ratkaiseva hetki oli siirto {crit_no}, {crit_move}. Harjoiteltavaa: {theme}.
+appraisal.improve.critical.b3 = Kriittinen hetki oli siirto {crit_no}. {crit_best} oli parempi kuin {crit_move}.
+appraisal.improve.critical.b3.2 = Siirrolla {crit_no} parempi siirto oli {crit_best}, ei {crit_move}. Tarkista ensin pakottavat siirtoni.
+appraisal.improve.critical.b4 = Kriittinen hetki: siirto {crit_no}, {crit_move}. {crit_best} oli parempi siirto.
+appraisal.improve.critical.b4.2 = Ratkaiseva hetki oli siirto {crit_no}: mieluummin {crit_best} kuin {crit_move}.
+appraisal.improve.critical.b5 = Siirto {crit_no}: mieluummin {crit_best} kuin {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Kriittinen oli siirto {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Siirto {crit_no}: mieluummin {crit_best} kuin {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, ei {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Siirto {crit_no}: {crit_best}, ei {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = Olit voitolla siirtoon {crit_no} asti. Vinkki: {theme}.
+appraisal.improve.was_winning.b1.2 = Pelisi sujui hienosti siirtoon {crit_no} asti. Muistettavaa: {theme}.
+appraisal.improve.was_winning.b2 = Olit voitolla siirtoon {crit_no} asti. Ensi kertaa varten: {theme}.
+appraisal.improve.was_winning.b2.2 = Siirtoon {crit_no} asti olit voitolla. Harjoiteltavaa: {theme}.
+appraisal.improve.was_winning.b3 = Olit voitolla siirtoon {crit_no} asti. {crit_best} olisi säilyttänyt etusi.
+appraisal.improve.was_winning.b3.2 = Siirtoon {crit_no} asti olit voitolla; {crit_best} olisi säilyttänyt voittoaseman.
+appraisal.improve.was_winning.b4 = Olit voitolla siirtoon {crit_no} asti. {crit_best} olisi säilyttänyt etusi.
+appraisal.improve.was_winning.b4.2 = Voittoasema siirtoon {crit_no} asti; {crit_best} olisi säilyttänyt sen.
+appraisal.improve.was_winning.b5 = Voittoasema siirtoon {crit_no} asti: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Siirto {crit_no}: {crit_best} olisi säilyttänyt voiton, {eval}.
+appraisal.improve.was_winning.b6 = Siirto {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} siirrolla {crit_no} olisi säilyttänyt voiton: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Vinkki: kun olet voitolla, jätä kuninkaalleni aina ruutu, johon se voi siirtyä.
+appraisal.improve.stalemate.b1.2 = Muista: tarkista pelin lopussa ennen jokaista siirtoa, että kuninkaani pääsee vielä liikkumaan.
+appraisal.improve.stalemate.b2 = Kun olet voitolla, jätä kuninkaalleni aina vapaa ruutu, muuten tulee patti.
+appraisal.improve.stalemate.b2.2 = Tarkista ensi kerralla ennen siirtoasi, että kuninkaani pääsee vielä liikkumaan.
+appraisal.improve.stalemate.b3 = Voittoasemassa tarkista joka siirrolla, että kuninkaallani on vielä vapaa ruutu.
+appraisal.improve.stalemate.b3.2 = Varo pattia voitetuissa loppupeleissä: anna kuninkaalleni tilaa.
+appraisal.improve.stalemate.b4 = Voitetuissa loppupeleissä tarkista aina patin mahdollisuus.
+appraisal.improve.stalemate.b4.2 = Varo pattia: se maksoi tässä voiton.
+appraisal.improve.stalemate.b5 = Voitetuissa loppupeleissä varo pattia.
+appraisal.improve.stalemate.b5.2 = Patti maksoi voiton.
+appraisal.improve.stalemate.b6 = Varo pattia.
+appraisal.improve.stalemate.b6.2 = Patti vei voiton.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = {my} oli suojaton siirrolla {n}. Huomasitko sen?
+appraisal.improve.coach_hung.b1.2 = Siirrolla {n} {my} oli lyötävissä ilmaiseksi. Etsi aina nappuloita, jotka voit lyödä ilmaiseksi!
+appraisal.improve.coach_hung.b2 = {my} oli suojaton siirrolla {n}. Huomasitko sen?
+appraisal.improve.coach_hung.b2.2 = Siirrolla {n} olisit voinut lyödä {my:acc} ilmaiseksi.
+appraisal.improve.coach_hung.b3 = {my} jäi siirrolla {n} ilman suojaa. Huomasitko sen?
+appraisal.improve.coach_hung.b3.2 = {my} oli suojaton siirrolla {n}. Etsi suojattomia nappuloita joka siirrolla.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Tarkista jatkossakin, että nappulasi ovat turvassa, kuten tänään.
+appraisal.improve.clean.b1.2 = Katso jatkossakin ennen jokaista siirtoa, mitä uhkaan. Se toimii!
+appraisal.improve.clean.b1.3 = Jatka yhtä huolellista peliä!
+appraisal.improve.clean.b2 = Puhtaasti pelattu. Tarkista uhkani jatkossakin samaan tapaan.
+appraisal.improve.clean.b2.2 = Jatka samaan tapaan kuin tänään: nappulat turvassa, hyviä siirtoja.
+appraisal.improve.clean.b3 = Puhtaasti pelattu. Tarkista jatkossakin ensin pakottavat siirrot.
+appraisal.improve.clean.b3.2 = Ei isoja virheitä: jatka samaan malliin.
+appraisal.improve.clean.b4 = Puhtaasti pelattu. Ei mitään isompaa korjattavaa.
+appraisal.improve.clean.b4.2 = Ei kriittisiä virheitä.
+appraisal.improve.clean.b5 = Ei kriittisiä virheitä.
+appraisal.improve.clean.b5.2 = Puhtaasti pelattu.
+appraisal.improve.clean.b6 = Puhtaasti pelattu.
+appraisal.improve.clean.b6.2 = Ei ratkaisevia virheitä.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = ”Aloittelija” ...: always after "taso" in the case the sentence needs.
+appraisal.end.b1 = Kehityt pelistä peliin. Pelataanko vielä yksi?
+appraisal.end.b1.2 = Tuo oli hauskaa! Pelataanko uudestaan?
+appraisal.end.b1.3 = Hienoa työtä. Haluatko pelata vielä yhden pelin?
+appraisal.end.b2 = Kehityt pelistä peliin. Pelataanko vielä yksi?
+appraisal.end.b2.2 = Hyvä peli. Pelataanko uudestaan?
+appraisal.end.b2.3 = Hyvin pelattu. Vielä yksi peli?
+appraisal.end.b3 = Vankka peli. Oletko valmis seuraavaan?
+appraisal.end.b3.2 = Hyvä peli. Vielä yksi?
+appraisal.end.b3.3 = Hyvin pelattu. Uusi peli?
+appraisal.end.b4 = Vankka peli. Oletko valmis seuraavaan?
+appraisal.end.b4.2 = Vielä yksi peli?
+appraisal.end.b4.3 = Hyvä peli. Seuraava?
+appraisal.end.b5 = Vielä yksi?
+appraisal.end.b5.2 = Seuraava peli?
+appraisal.end.b5.3 = Uudestaan?
+appraisal.end.b6 = Vielä yksi?
+appraisal.end.b6.2 = Seuraava peli?
+appraisal.end.b6.3 = Uudestaan?
+appraisal.end.up.b1 = Olet valmis tasolle {level}. Haluatko kokeilla sitä?
+appraisal.end.up.b1.2 = Luulen, että olet valmis tasolle {level}. Kokeillaanko?
+appraisal.end.up.b2 = Olet valmis tasolle {level}. Haluatko kokeilla sitä?
+appraisal.end.up.b2.2 = Entä seuraavaksi taso {level}? Luulen, että olet valmis.
+appraisal.end.up.b3 = Tämä taso on sinulle jo liian helppo: kokeile tasoa {level}.
+appraisal.end.up.b3.2 = Oletko valmis tasolle {level}? Uskon, että olet.
+appraisal.end.up.b4 = Tämä taso on sinulle jo liian helppo: kokeile tasoa {level}.
+appraisal.end.up.b4.2 = Aika siirtyä tasolle {level}?
+appraisal.end.up.b5 = Kokeile seuraavaksi tasoa {level}.
+appraisal.end.up.b5.2 = Seuraavaksi taso {level}?
+appraisal.end.up.b6 = Kokeile seuraavaksi tasoa {level}.
+appraisal.end.up.b6.2 = Seuraavaksi taso {level}?
+appraisal.end.down.b2 = Pelataan yksi peli tasolla {level} ja harjoitellaan näitä ideoita.
+appraisal.end.down.b2.2 = Entä peli tasolla {level} harjoituksen vuoksi?
+appraisal.end.down.b3 = Haluatko pelata yhden pelin tasolla {level} ja harjoitella näitä ideoita?
+appraisal.end.down.b3.2 = Peli tasolla {level} voisi auttaa harjoittelemaan näitä ideoita.
+appraisal.end.down.b4 = Peli tasolla {level} saattaisi auttaa harjoittelemaan näitä ideoita.
+appraisal.end.down.b4.2 = Ehkä yksi peli tasolla {level} harjoitukseksi?
+appraisal.end.down.b5 = Ehkä yksi peli tasolla {level}?
+appraisal.end.down.b5.2 = Taso {level} harjoitukseksi?
+appraisal.end.down.b6 = Ehkä yksi peli tasolla {level}?
+appraisal.end.down.b6.2 = Taso {level} harjoitukseksi?

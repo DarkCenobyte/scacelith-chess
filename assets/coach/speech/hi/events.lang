@@ -1,0 +1,111 @@
+# Coach speech (Hindi): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "तुम" and is male ("मैं मदद करूँगा", "मैं तैयार हूँ"). The player's gender is unknown: no
+# verb agrees with "तुम" except the imperative, the subjunctive and the copula "हो"; otherwise a noun is the
+# subject ("तुम्हारी सोच बढ़िया चल रही है", "बाज़ी के लिए शुक्रिया") or "तुमने" + a transitive verb.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = नमस्ते! चलो, एक दोस्ताना बाज़ी खेलते हैं। जब भी कुछ गड़बड़ होगी, मैं तुम्हारी मदद करूँगा।
+event.greet.l1.2 = हैलो! मैं नरमी से खेलूँगा और तुम्हें दिखाऊँगा कि किन बातों का ध्यान रखना है।
+event.greet.l1.3 = स्वागत है! आराम से सोचो: जब कोई मोहरा ख़तरे में होगा, मैं तुम्हें बता दूँगा।
+event.greet.l2 = नमस्ते! चलो, खेलते हैं। जब भी कोई फ़ोर्क या पिन बनेगा, मैं तुम्हें दिखाऊँगा।
+event.greet.l2.2 = हैलो! अपने मोहरे बाहर निकालो और अपने राजा को सुरक्षित रखो। मैं साथ-साथ मदद करता रहूँगा।
+event.greet.l2.3 = बोर्ड पर फिर से स्वागत है! फ़ोर्क और पिन पर नज़र रखो: इनसे बाज़ियाँ जीती जाती हैं।
+event.greet.l3 = नमस्ते! चलो, एक असली बाज़ी खेलते हैं। मैं तुम्हारी योजनाओं और बड़ी ग़लतियों पर टिप्पणी करूँगा।
+event.greet.l3.2 = हैलो! अपने मोहरों के लिए कोई योजना सोचो। जब किसी चाल में कुछ छूट रहा होगा, मैं बता दूँगा।
+event.greet.l3.3 = चलो, खेलते हैं! मैं बताऊँगा कि कब सिर्फ़ एक ही चाल काम करती है, और कौन-सी चालें ग़लत पड़ती हैं।
+event.greet.l4 = नमस्ते! इस बार मैं मूल्यांकन बताऊँगा और तुम्हें बेहतर संभावित चालें दिखाऊँगा।
+event.greet.l4.2 = चलो, खेलते हैं। किसी ग़लती के बाद मैं बताऊँगा कि ज़्यादा सटीक क्या था।
+event.greet.l4.3 = क्लब जैसी एक बाज़ी के लिए तैयार हो? मूल्यांकन बदलने पर मैं टिप्पणी करूँगा।
+event.greet.l5 = चलो, खेलते हैं। मैं अपनी टिप्पणियाँ छोटी रखूँगा।
+event.greet.l5.2 = तुम तैयार हो, तो मैं भी तैयार हूँ। टिप्पणियाँ बस छोटी।
+event.greet.l5.3 = शुभकामनाएँ। मैं तभी बोलूँगा, जब ज़रूरी होगा।
+event.greet.l6 = शुभकामनाएँ।
+event.greet.l6.2 = खेलते हैं।
+event.greet.l6.3 = तैयार हूँ। सिर्फ़ निर्णायक पलों पर टिप्पणी करूँगा।
+
+# Who starts (said after the greeting).
+event.colour.white = तुम्हारे पास सफ़ेद मोहरे हैं, इसलिए पहली चाल तुम्हारी है।
+event.colour.white.2 = सफ़ेद मोहरे तुम्हारे हैं: पहली चाल तुम्हारी।
+event.colour.black = सफ़ेद मोहरे मेरे पास हैं, इसलिए शुरुआत मैं करूँगा।
+event.colour.black.2 = इस बार काले मोहरे तुम्हारे हैं: पहली चाल मैं चलूँगा।
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names (coach.level.<n>.name of assets/i18n/hi.lang): पहले क़दम, शुरुआती, उभरता खिलाड़ी,
+# क्लब खिलाड़ी, मज़बूत क्लब खिलाड़ी, विशेषज्ञ.
+event.level.l1 = पहले क़दम: मैं नरमी से खेलता हूँ और हर ग़लती आसान शब्दों में समझाता हूँ।
+event.level.l2 = शुरुआती: मैं थोड़ा मज़बूत खेलता हूँ, और आसान टैक्टिक्स को उनके नाम से बताता हूँ, जैसे फ़ोर्क और पिन।
+event.level.l3 = उभरता खिलाड़ी: मैं योजनाओं और प्यादों की संरचना की बात करता हूँ, और चालों की छोटी लाइनें दिखाता हूँ।
+event.level.l4 = क्लब खिलाड़ी: मैं प्यादों में मूल्यांकन बताता हूँ और संभावित चालें सुझाता हूँ।
+event.level.l5 = मज़बूत क्लब खिलाड़ी: छोटी टिप्पणियाँ, और ज़रूरत पड़ने पर लंबी लाइनें।
+event.level.l6 = विशेषज्ञ: मैं पूरी ताक़त से खेलता हूँ और सिर्फ़ निर्णायक पलों पर टिप्पणी करता हूँ।
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = तुम्हारी चाल।
+event.your_move.2 = तुम्हारी बारी।
+event.your_move.3 = अब तुम खेलो।
+# The player has been thinking for a while (never during the first minute).
+event.take_time = आराम से सोचो।
+event.take_time.2 = कोई जल्दी नहीं: हमारी बाज़ियों में घड़ी नहीं चलती।
+# Short filler while the coach is still looking at the position.
+event.filler = हम्म।
+event.filler.2 = देखते हैं।
+event.filler.3 = ज़रा देखने दो।
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = ठीक है, चाल वापस लेते हैं।
+event.takeback.taken.2 = अच्छा विचार है। एक बार फिर देखो।
+event.takeback.taken.3 = चाल वापस। फिर से कोशिश करो।
+# The player declined the offer and played on.
+event.takeback.declined = ठीक है, हम खेल जारी रखते हैं।
+event.takeback.declined.2 = अच्छा, बाज़ी जारी है।
+event.takeback.declined.3 = जैसी तुम्हारी मर्ज़ी। चलो, आगे खेलते हैं।
+# After an explanation without an offer.
+event.play_on = चलो, खेल जारी रखें।
+event.play_on.2 = चलो, आगे बढ़ते हैं।
+event.play_on.3 = अब, अपनी बाज़ी पर लौटते हैं।
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = ऐसी ग़लतियाँ हर किसी से होती हैं। ज़रूरी है उन्हें पहचानना।
+event.encourage.mistake.2 = चिंता मत करो। देखो कि मेरी पिछली चाल किस पर हमला करती है, तो जवाब मिल जाएगा।
+event.encourage.mistake.3 = ऐसा हर खिलाड़ी के साथ होता है। चलो, आगे बढ़ते हैं।
+# The player is behind (material or evaluation).
+event.encourage.behind = हार मत मानो: मौक़े ढूँढो, और मुझे आसानी से जीतने मत दो।
+event.encourage.behind.2 = लड़ते रहो। ऐसी स्थितियाँ अब भी पलट सकती हैं।
+event.encourage.behind.3 = शांत रहो और मेरी कमज़ोरियाँ ढूँढो।
+# The player has played several good moves in a row.
+event.encourage.well = चाल चलने से पहले मेरे ख़तरों पर तुम्हारी नज़र रहती है। शाबाश।
+event.encourage.well.2 = सोची-समझी, ठोस चालें। ऐसे ही खेलते रहो।
+event.encourage.well.3 = आज तुम्हारी सोच बढ़िया चल रही है।
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = मुझे मंज़ूर है। तो फिर, ड्रॉ।
+event.draw.accepted.2 = तय रहा: बाज़ी ड्रॉ।
+event.draw.declined = नहीं, शुक्रिया, खेल जारी रखते हैं।
+event.draw.declined.2 = मैं खेल जारी रखना चाहूँगा।
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = बहुत बढ़िया खेल। बधाई हो!
+event.end.win.2 = तुम इस जीत के हक़दार हो। शाबाश!
+event.end.win.3 = बधाई हो: तुमने मुझे साफ़-साफ़ हराया।
+event.end.loss = अच्छी बाज़ी रही। अगली बार जीत तुम्हारी होगी।
+event.end.loss.2 = बाज़ी के लिए शुक्रिया। हर हार कुछ न कुछ सिखाती है।
+event.end.loss.3 = अच्छा मुक़ाबला था। चलो, देखते हैं क्या हुआ।
+event.end.draw = ड्रॉ। अच्छी बाज़ी रही!
+event.end.draw.2 = इस बार कोई नहीं जीता। अच्छा मुक़ाबला रहा।
+event.end.draw.3 = उचित नतीजा रहा। अच्छी बाज़ी।
+event.end.resigned = तुमने हार मान ली। फिर भी, अच्छा मुक़ाबला रहा।
+event.end.resigned.2 = ठीक है। बाज़ी के लिए शुक्रिया।
+event.end.handshake = आओ, हाथ मिलाएँ।
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang): a Hindi noun would change before a
+# postposition, so the title always comes after a colon.
+event.lesson.resume = फिर से स्वागत है! चलो, पाठ आगे बढ़ाते हैं: {chapter}।
+event.lesson.resume.2 = फिर से नमस्ते! हम यहाँ रुके थे: {chapter}।
+event.lesson.next = अगला विषय: {chapter}।
+event.lesson.next.2 = अब: {chapter}।

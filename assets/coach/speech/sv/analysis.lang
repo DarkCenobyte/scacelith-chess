@@ -1,0 +1,156 @@
+# Coach speech (Swedish): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Swedish:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "du" or "jag" here: the players are "vit" and "svart", lowercase in running text as
+#   Swedish chess books write them, capitalised at the start of a sentence ("Vit vinner partiet.",
+#   "så vit vinner"). A piece comes with its side: {piece} {t1} {t2} = "vits springare", "svarts
+#   torn" (common.lang, owner.white / owner.black); the pronoun for it is {piece:den} (den / det),
+#   an agreeing participle takes {piece:d_t} ("oskydda{piece:d_t}" = oskyddad / oskyddat).
+# - Adjectives about a move agree with "drag" (neuter): "{best} var mer exakt", "onoggrant".
+# - Counted numbers (common.lang): {m:move} "matt i 3 drag", {pts:point} "3 poäng", {n:mistake}
+#   "2 misstag", {m:blunder} "1 blunder" (spoken "en blunder"), {acc_white:percent} "85 %" (spoken
+#   "åttiofem procent"). "Matt" is a common-gender noun: "en forcerad matt".
+# - {opening:def} is the opening's name in the form the openings fragment gives for running text
+#   (it stands after "är").
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Vi tittar tillbaka på det här partiet tillsammans.
+an.start.2 = Vi går igenom partiet drag för drag.
+an.start.3 = Här är partiet. Nu ska vi se hur det gick.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Det här partiet börjar från en uppställd ställning. Vi går igenom det.
+an.start.setup.2 = Ett parti från en uppställd ställning. Nu ska vi se hur det gick.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Öppningen är {opening:def}.
+an.opening.2 = Det här är {opening:def}.
+an.book_exit = Med {move} lämnar partiet den kända öppningsteorin.
+an.book_exit.2 = {move} är det första draget utanför öppningsboken.
+an.book_exit.3 = Här tar öppningsteorin slut, med {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} är en blunder.
+an.blunder.2 = Här är {move} ett allvarligt misstag.
+an.blunder.3 = En blunder: {move}.
+an.mistake = {move} är ett misstag.
+an.mistake.2 = {move} är inte rätt drag här.
+an.mistake.3 = Ett misstag: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} missar chansen att straffa det misstaget.
+an.missed_chance.2 = Med {move} går chansen förlorad.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Nu är {reply:nomate} schackmatt.
+an.mate_allowed.one.2 = Draget tillåter {reply:nomate}, och det är schackmatt.
+an.mate_allowed = Draget tillåter en forcerad matt i {m:move}, som börjar med {reply:nomate}.
+an.mate_allowed.2 = Nu finns det en forcerad matt i {m:move}, som inleds med {reply:nomate}.
+an.fork = Nu ger {reply} gaffel på {t1} och {t2}.
+an.fork.2 = Draget tillåter {reply}, som angriper {t1} och {t2} samtidigt.
+an.fork.3 = {reply} angriper {t1} och {t2} på en gång.
+an.hanging = Draget lämnar {piece} oskydda{piece:d_t}, och {reply} slår {piece:den}.
+an.hanging.2 = {piece} står utan försvarare: {reply} vinner {piece:den}.
+an.hanging.3 = {reply} slår helt enkelt {piece}, som saknade försvarare.
+an.material = Svaret blir {line}, och det vinner material värt {pts:point}.
+an.material.2 = Sedan följer {line}, som vinner {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} var schackmatt.
+an.mate_missed.one.2 = {best:nomate} hade varit schackmatt.
+an.mate_missed = {best:nomate} hade tvingat fram matt i {m:move}.
+an.mate_missed.2 = Det fanns en forcerad matt i {m:move}, som började med {best:nomate}.
+an.missed_capture = {best} hade vunnit {piece} gratis.
+an.missed_capture.2 = {piece} saknade försvarare: {best} hade slagit {piece:den}.
+an.missed_fork = {best} hade gett gaffel på {t1} och {t2}.
+an.missed_fork.2 = {best} var en gaffel som angrep {t1} och {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} var starkare.
+an.better.2 = Bättre var {best}.
+an.better.3 = {best} var mer exakt.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} är briljant: draget offrar {piece}!
+an.brilliant.2 = Ett briljant offer! {move} ger bort {piece}.
+an.brilliant.3 = {move}! Ett briljant drag som offrar {piece}.
+an.brilliant.mate = Det leder till en forcerad matt i {m:move}.
+an.brilliant.mate.2 = Och det tvingar fram matt i {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} är det enda draget som behåller fördelen.
+an.only.win.2 = Bara {move} behåller övertaget här. Bra hittat.
+an.only.hold = {move} är det enda draget som behåller jämvikten.
+an.only.hold.2 = Bara {move} håller ställningen här.
+an.only.defend = {move} är det enda draget som håller kampen igång.
+an.only.defend.2 = Bara {move} håller partiet vid liv här. Bra försvar.
+an.only.best = {move} är överlägset det starkaste draget här.
+an.only.best.2 = Exakt: {move} är mycket starkare än allt annat.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} är lite onoggrant: {best} var mer exakt.
+an.inaccuracy.2 = Inte riktigt bäst: {best} var mer exakt än {move}.
+an.interesting = {move} är en intressant idé: draget offrar {piece}.
+an.interesting.2 = Ett intressant försök: {move} ger bort {piece}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Vit har nu en forcerad matt i {m:move}.
+an.mate_on.white.2 = Härifrån kan vit tvinga fram matt i {m:move}.
+an.mate_on.black = Svart har nu en forcerad matt i {m:move}.
+an.mate_on.black.2 = Härifrån kan svart tvinga fram matt i {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Schackmatt. Vit vinner partiet.
+an.end.mate.white.2 = Och det är schackmatt: vit vinner.
+an.end.mate.black = Schackmatt. Svart vinner partiet.
+an.end.mate.black.2 = Och det är schackmatt: svart vinner.
+an.end.resigned.white = Svart gav upp, så vit vinner partiet.
+an.end.resigned.white.2 = Partiet slutar här: svart gav upp, och vit vinner.
+an.end.resigned.black = Vit gav upp, så svart vinner partiet.
+an.end.resigned.black.2 = Partiet slutar här: vit gav upp, och svart vinner.
+an.end.timeout.white = Svarts tid tog slut, så vit vinner.
+an.end.timeout.white.2 = Vit vinner på tid.
+an.end.timeout.black = Vits tid tog slut, så svart vinner.
+an.end.timeout.black.2 = Svart vinner på tid.
+an.end.win.white = Partiet slutar med vinst för vit.
+an.end.win.white.2 = Vit vinner partiet.
+an.end.win.black = Partiet slutar med vinst för svart.
+an.end.win.black.2 = Svart vinner partiet.
+an.end.stalemate = Patt: partiet blir remi.
+an.end.stalemate.2 = Det är patt, så partiet slutar remi.
+an.end.draw.agreement = Spelarna kom överens om remi.
+an.end.draw.agreement.2 = Partiet slutar med överenskommen remi.
+an.end.draw.repetition = Partiet slutar remi genom upprepning.
+an.end.draw.repetition.2 = Samma ställning kom tillbaka igen: remi.
+an.end.draw.fifty = Partiet slutar remi enligt 50-dragsregeln.
+an.end.draw.fifty.spoken = Partiet slutar remi enligt femtiodragsregeln.
+an.end.draw.fifty.2 = Femtio drag utan slag eller bondedrag: remi.
+an.end.draw.seventy_five = Partiet slutar remi enligt 75-dragsregeln.
+an.end.draw.seventy_five.spoken = Partiet slutar remi enligt sjuttiofemdragsregeln.
+an.end.draw.seventy_five.2 = Sjuttiofem drag utan slag eller bondedrag: remi.
+an.end.draw.material = Det går inte längre att sätta matt: partiet slutar remi.
+an.end.draw.material.2 = Ingen av sidorna kan sätta matt längre, så det blir remi.
+an.end.draw = Partiet slutar remi.
+an.end.draw.2 = Remi.
+an.end.unfinished = Här tar partiet slut, utan att vara färdigspelat.
+an.end.unfinished.2 = Där slutar partiet: det spelades aldrig färdigt.
+an.end.accuracy = Noggrannhet: {acc_white:percent} för vit, {acc_black:percent} för svart.
+an.end.accuracy.2 = Vit spelade med {acc_white:percent} noggrannhet, svart med {acc_black:percent}.
+an.end.clean.white = Vit gjorde inga misstag eller blundrar.
+an.end.clean.white.2 = Vits spel var fritt från allvarliga fel.
+an.end.clean.black = Svart gjorde inga misstag eller blundrar.
+an.end.clean.black.2 = Svarts spel var fritt från allvarliga fel.
+an.end.mistakes.white = Vit gjorde {n:mistake} och ingen blunder.
+an.end.mistakes.white.2 = För vit: {n:mistake}, ingen blunder.
+an.end.mistakes.black = Svart gjorde {n:mistake} och ingen blunder.
+an.end.mistakes.black.2 = För svart: {n:mistake}, ingen blunder.
+an.end.blunders.white = Vit gjorde {m:blunder}.
+an.end.blunders.white.2 = För vit: {m:blunder}.
+an.end.blunders.black = Svart gjorde {m:blunder}.
+an.end.blunders.black.2 = För svart: {m:blunder}.
+an.end.errors.white = Vit gjorde {n:mistake} och {m:blunder}.
+an.end.errors.white.2 = För vit: {n:mistake} och {m:blunder}.
+an.end.errors.black = Svart gjorde {n:mistake} och {m:blunder}.
+an.end.errors.black.2 = För svart: {n:mistake} och {m:blunder}.

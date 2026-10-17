@@ -1,0 +1,1023 @@
+# Coach speech (Czech): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Czech needs.
+# Register: the coach says "ty" to the player (the game menus use the formal "vy"). The coach is
+# male ("jsem rád", "nechal jsem"); the player's gender is unknown: no second-person past tense or
+# conditional ("udělal jsi", "mohl bys"), no adjective or participle agreeing with the player
+# ("připravený", "rád"): present or future tense, the imperative, impersonal phrasing ("šlo by",
+# "bylo lepší", "podařilo se ti") and nouns instead.
+# Words as in the glossary: král, dáma, věž, střelec, jezdec, pěšec; figura (a piece in general),
+# tah, šach, mat, pat, remíza, rošáda, braní mimochodem, proměna, partie.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: pěšec, jezdec, střelec, král (masculine ANIMATE: accusative = genitive, "vezmi mého
+# jezdce", "vidím tvého krále"), věž, dáma (feminine). Gender "m" below always means masculine
+# animate.
+# Forms (every one defined for all six pieces and the owners your, my, white and black):
+#   nom       tvůj jezdec / tvoje věž               "{your} takhle netáhne."
+#   gen       tvého jezdce / tvé věže               "{t1} stojí hned vedle {my:gen}."
+#   dat       tvému jezdci / tvé věži               "Přibliž se králem k {my:dat}."
+#   acc       tvého jezdce / tvou věž               "Vezmi {my:acc}!"
+#   voc       tvůj jezdče / tvoje věži              (direct address; no line needs it so far)
+#   loc       tvém jezdci / tvé věži                "Na {your:loc} teď všechno záleží."
+#   ins       tvým jezdcem / tvou věží              "Za {your:ins} stojí {t1}."
+#   bare_nom, bare_gen, bare_dat, bare_acc, bare_voc, bare_loc, bare_ins: the noun alone, no
+#             possessive (jezdec, jezdce, jezdci, jezdce, jezdče, jezdci, jezdcem)
+#                                                   "Táhni {your:bare_ins}." ("Táhni jezdcem.")
+#   refl_gen, refl_dat, refl_acc, refl_loc, refl_ins: "svůj", for a piece owned by the subject of
+#             its own clause, where Czech never says "tvůj"/"můj" (svého jezdce / své věže, svému /
+#             své, svého / svou, svém / své, svým / svou; "svůj" has no nominative use here)
+#                                                   "Použij {your:refl_acc}.", "Nechal jsem
+#                                                   {my:refl_acc} bez krytí."
+#   pron      on / ona (the piece as subject; Czech usually drops it: only for clarity or contrast)
+#                                                   "To je {your}. {your:pron} táhne šikmo."
+#   pron_gen  ho / jí (unstressed)                  "Neboj se {my:pron_gen}."
+#   pron_dat  mu / jí (unstressed)                  "{t1} je v bezpečí, nic {t1:pron_dat} nehrozí."
+#   pron_acc  ho / ji (unstressed)                  "Vezmi {my:pron_acc}!"
+#   pron_ins  jím / jí                              "Táhni {your:pron_ins} dopředu."
+#   spron_gen, spron_dat, spron_acc  jeho / jí, jemu / jí, jeho / ji: stressed, for contrast or at
+#             the start of a clause                 "Pěšce nech, {my:spron_acc} vezmi!"
+#   npron_gen něj / ní (after a preposition)        "Bez {your:npron_gen} se neubráníš."
+#   npron_dat němu / ní                             "Jdi králem blíž k {my:npron_dat}."
+#   npron_acc něj / ni                              "Moje figury útočí na {your:npron_acc}."
+#   npron_loc něm / ní                              "Na {your:npron_loc} teď visí celá obrana."
+#   npron_ins ním / ní                              "Za {your:npron_ins} stojí {t1}."
+#   dem, dem_gen, dem_dat, dem_acc, dem_loc, dem_ins: ten / ta, toho / té, tomu / té, toho / tu,
+#             tom / té, tím / tou: "that one", the spoken way of pointing back at the piece
+#                                                   "{your} visí a {your:dem_acc} už nezachráníš."
+#   alone     sám / sama                            "{your} zůstává {your:alone}."
+#   poss      jeho / její ("its"): before a feminine noun in any case, and before a masculine
+#             inanimate or neuter noun in the nominative or accusative
+#                                                   "Vstup na {my:poss} pole."
+#   poss_gen  jeho / jejího (masculine/neuter genitive, masculine animate accusative)
+#                                                   "Odejdi z {my:poss_gen} dosahu."
+#   poss_dat  jeho / jejímu                         "Králem k {my:poss_dat} poli!"
+#   poss_loc  jeho / jejím                          "Na {my:poss_loc} poli teď stojí tvůj jezdec."
+#   poss_ins  jeho / jejím                          "Pěšec na {sq} byl {your:poss_ins} štítem."
+#   poss_pl_gen, poss_pl_dat, poss_pl_loc, poss_pl_ins: jeho / jejích, jejím, jejích, jejími
+#             before a plural noun (nominative and accusative plural: poss)
+#                                                   "za {your:poss_pl_ins} pěšci"
+#   past      "" / "a": the ending of a past tense, a conditional or a short participle agreeing
+#             with the piece (empty for the masculine pieces)
+#                                                   "{my} visel{my:past} bez krytí." (visel/visela)
+#   adj       ý / á: the nominative ending of a hard adjective or of "který" agreeing with the piece
+#                                           "{piece}, kter{piece:adj} neměl{piece:past} obránce"
+#   adj_gen, adj_dat, adj_acc, adj_loc, adj_ins: ého / é, ému / é, ého / ou, ém / é, ým / ou
+#                                                   "{t1}, kter{t1:adj_acc} nikdo nekryje"
+# Write the ending forms right after a word stem, never in place of the piece placeholder itself
+# (the coach points at the board on the first one), and after it when the word order allows.
+# A preposition right before a possessive form is never vocalized ("s tvým", "k mému", "v bílém",
+# "z černého"); before refl_* it always is ("se svým", "ke svému", "ve svém", "ze svého"); before
+# bare_* it depends on the noun ("ke králi", "se střelcem", "ve věži"): never put v, s, z or k right
+# before a bare_* form, use a possessive form or rephrase.
+# The Analysis mode names a piece by its side ("bílý jezdec", "černá věž", "bílého střelce" ...):
+# the same forms, every one defined for the owners white and black too.
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = f
+piece.king.gender = m
+piece.pawn.nom = pěšec
+piece.pawn.gen = pěšce
+piece.pawn.dat = pěšci
+piece.pawn.acc = pěšce
+piece.pawn.voc = pěšče
+piece.pawn.loc = pěšci
+piece.pawn.ins = pěšcem
+piece.knight.nom = jezdec
+piece.knight.gen = jezdce
+piece.knight.dat = jezdci
+piece.knight.acc = jezdce
+piece.knight.voc = jezdče
+piece.knight.loc = jezdci
+piece.knight.ins = jezdcem
+piece.bishop.nom = střelec
+piece.bishop.gen = střelce
+piece.bishop.dat = střelci
+piece.bishop.acc = střelce
+piece.bishop.voc = střelče
+piece.bishop.loc = střelci
+piece.bishop.ins = střelcem
+piece.rook.nom = věž
+piece.rook.gen = věže
+piece.rook.dat = věži
+piece.rook.acc = věž
+piece.rook.voc = věži
+piece.rook.loc = věži
+piece.rook.ins = věží
+piece.queen.nom = dáma
+piece.queen.gen = dámy
+piece.queen.dat = dámě
+piece.queen.acc = dámu
+piece.queen.voc = dámo
+piece.queen.loc = dámě
+piece.queen.ins = dámou
+piece.king.nom = král
+piece.king.gen = krále
+piece.king.dat = králi
+piece.king.acc = krále
+piece.king.voc = králi
+piece.king.loc = králi
+piece.king.ins = králem
+# Possessives: tvůj / tvoje, můj / moje, by case and gender (tvoje, moje: the usual spoken forms).
+owner.your.nom.m = tvůj {piece}
+owner.your.nom.f = tvoje {piece}
+owner.your.gen.m = tvého {piece}
+owner.your.gen.f = tvé {piece}
+owner.your.dat.m = tvému {piece}
+owner.your.dat.f = tvé {piece}
+owner.your.acc.m = tvého {piece}
+owner.your.acc.f = tvou {piece}
+owner.your.voc.m = tvůj {piece}
+owner.your.voc.f = tvoje {piece}
+owner.your.loc.m = tvém {piece}
+owner.your.loc.f = tvé {piece}
+owner.your.ins.m = tvým {piece}
+owner.your.ins.f = tvou {piece}
+owner.my.nom.m = můj {piece}
+owner.my.nom.f = moje {piece}
+owner.my.gen.m = mého {piece}
+owner.my.gen.f = mé {piece}
+owner.my.dat.m = mému {piece}
+owner.my.dat.f = mé {piece}
+owner.my.acc.m = mého {piece}
+owner.my.acc.f = mou {piece}
+owner.my.voc.m = můj {piece}
+owner.my.voc.f = moje {piece}
+owner.my.loc.m = mém {piece}
+owner.my.loc.f = mé {piece}
+owner.my.ins.m = mým {piece}
+owner.my.ins.f = mou {piece}
+# The English keys (every language defines them); Czech uses the gendered patterns above.
+owner.your.nom = tvůj {piece}
+owner.my.nom = můj {piece}
+# The Analysis mode names a piece by its side, nobody being "ty" or "já" there: "bílý jezdec",
+# "černá věž", by case and gender (an animate piece's accusative is its genitive, as above).
+owner.white.nom.m = bílý {piece}
+owner.white.nom.f = bílá {piece}
+owner.white.gen.m = bílého {piece}
+owner.white.gen.f = bílé {piece}
+owner.white.dat.m = bílému {piece}
+owner.white.dat.f = bílé {piece}
+owner.white.acc.m = bílého {piece}
+owner.white.acc.f = bílou {piece}
+owner.white.voc.m = bílý {piece}
+owner.white.voc.f = bílá {piece}
+owner.white.loc.m = bílém {piece}
+owner.white.loc.f = bílé {piece}
+owner.white.ins.m = bílým {piece}
+owner.white.ins.f = bílou {piece}
+owner.black.nom.m = černý {piece}
+owner.black.nom.f = černá {piece}
+owner.black.gen.m = černého {piece}
+owner.black.gen.f = černé {piece}
+owner.black.dat.m = černému {piece}
+owner.black.dat.f = černé {piece}
+owner.black.acc.m = černého {piece}
+owner.black.acc.f = černou {piece}
+owner.black.voc.m = černý {piece}
+owner.black.voc.f = černá {piece}
+owner.black.loc.m = černém {piece}
+owner.black.loc.f = černé {piece}
+owner.black.ins.m = černým {piece}
+owner.black.ins.f = černou {piece}
+owner.white.nom = bílý {piece}
+owner.black.nom = černý {piece}
+# Forms without a possessive: the noun alone (bare_*), the same for every owner.
+piece.pawn.bare_nom = pěšec
+piece.pawn.bare_gen = pěšce
+piece.pawn.bare_dat = pěšci
+piece.pawn.bare_acc = pěšce
+piece.pawn.bare_voc = pěšče
+piece.pawn.bare_loc = pěšci
+piece.pawn.bare_ins = pěšcem
+piece.knight.bare_nom = jezdec
+piece.knight.bare_gen = jezdce
+piece.knight.bare_dat = jezdci
+piece.knight.bare_acc = jezdce
+piece.knight.bare_voc = jezdče
+piece.knight.bare_loc = jezdci
+piece.knight.bare_ins = jezdcem
+piece.bishop.bare_nom = střelec
+piece.bishop.bare_gen = střelce
+piece.bishop.bare_dat = střelci
+piece.bishop.bare_acc = střelce
+piece.bishop.bare_voc = střelče
+piece.bishop.bare_loc = střelci
+piece.bishop.bare_ins = střelcem
+piece.rook.bare_nom = věž
+piece.rook.bare_gen = věže
+piece.rook.bare_dat = věži
+piece.rook.bare_acc = věž
+piece.rook.bare_voc = věži
+piece.rook.bare_loc = věži
+piece.rook.bare_ins = věží
+piece.queen.bare_nom = dáma
+piece.queen.bare_gen = dámy
+piece.queen.bare_dat = dámě
+piece.queen.bare_acc = dámu
+piece.queen.bare_voc = dámo
+piece.queen.bare_loc = dámě
+piece.queen.bare_ins = dámou
+piece.king.bare_nom = král
+piece.king.bare_gen = krále
+piece.king.bare_dat = králi
+piece.king.bare_acc = krále
+piece.king.bare_voc = králi
+piece.king.bare_loc = králi
+piece.king.bare_ins = králem
+owner.your.bare_nom = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_voc = {piece}
+owner.your.bare_loc = {piece}
+owner.your.bare_ins = {piece}
+owner.my.bare_nom = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_voc = {piece}
+owner.my.bare_loc = {piece}
+owner.my.bare_ins = {piece}
+owner.white.bare_nom = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_voc = {piece}
+owner.white.bare_loc = {piece}
+owner.white.bare_ins = {piece}
+owner.black.bare_nom = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_voc = {piece}
+owner.black.bare_loc = {piece}
+owner.black.bare_ins = {piece}
+# The reflexive possessive "svůj" (refl_*), the same words for every owner.
+piece.pawn.refl_gen = pěšce
+piece.pawn.refl_dat = pěšci
+piece.pawn.refl_acc = pěšce
+piece.pawn.refl_loc = pěšci
+piece.pawn.refl_ins = pěšcem
+piece.knight.refl_gen = jezdce
+piece.knight.refl_dat = jezdci
+piece.knight.refl_acc = jezdce
+piece.knight.refl_loc = jezdci
+piece.knight.refl_ins = jezdcem
+piece.bishop.refl_gen = střelce
+piece.bishop.refl_dat = střelci
+piece.bishop.refl_acc = střelce
+piece.bishop.refl_loc = střelci
+piece.bishop.refl_ins = střelcem
+piece.rook.refl_gen = věže
+piece.rook.refl_dat = věži
+piece.rook.refl_acc = věž
+piece.rook.refl_loc = věži
+piece.rook.refl_ins = věží
+piece.queen.refl_gen = dámy
+piece.queen.refl_dat = dámě
+piece.queen.refl_acc = dámu
+piece.queen.refl_loc = dámě
+piece.queen.refl_ins = dámou
+piece.king.refl_gen = krále
+piece.king.refl_dat = králi
+piece.king.refl_acc = krále
+piece.king.refl_loc = králi
+piece.king.refl_ins = králem
+owner.your.refl_gen.m = svého {piece}
+owner.your.refl_gen.f = své {piece}
+owner.your.refl_dat.m = svému {piece}
+owner.your.refl_dat.f = své {piece}
+owner.your.refl_acc.m = svého {piece}
+owner.your.refl_acc.f = svou {piece}
+owner.your.refl_loc.m = svém {piece}
+owner.your.refl_loc.f = své {piece}
+owner.your.refl_ins.m = svým {piece}
+owner.your.refl_ins.f = svou {piece}
+owner.my.refl_gen.m = svého {piece}
+owner.my.refl_gen.f = své {piece}
+owner.my.refl_dat.m = svému {piece}
+owner.my.refl_dat.f = své {piece}
+owner.my.refl_acc.m = svého {piece}
+owner.my.refl_acc.f = svou {piece}
+owner.my.refl_loc.m = svém {piece}
+owner.my.refl_loc.f = své {piece}
+owner.my.refl_ins.m = svým {piece}
+owner.my.refl_ins.f = svou {piece}
+owner.white.refl_gen.m = svého {piece}
+owner.white.refl_gen.f = své {piece}
+owner.white.refl_dat.m = svému {piece}
+owner.white.refl_dat.f = své {piece}
+owner.white.refl_acc.m = svého {piece}
+owner.white.refl_acc.f = svou {piece}
+owner.white.refl_loc.m = svém {piece}
+owner.white.refl_loc.f = své {piece}
+owner.white.refl_ins.m = svým {piece}
+owner.white.refl_ins.f = svou {piece}
+owner.black.refl_gen.m = svého {piece}
+owner.black.refl_gen.f = své {piece}
+owner.black.refl_dat.m = svému {piece}
+owner.black.refl_dat.f = své {piece}
+owner.black.refl_acc.m = svého {piece}
+owner.black.refl_acc.f = svou {piece}
+owner.black.refl_loc.m = svém {piece}
+owner.black.refl_loc.f = své {piece}
+owner.black.refl_ins.m = svým {piece}
+owner.black.refl_ins.f = svou {piece}
+# Pronouns (pron*, spron*, npron*, dem*), "alone", "its" (poss*) and agreement endings (past, adj*):
+# words that only depend on the piece's gender, the same for every owner. "past" is empty for the
+# masculine pieces.
+piece.pawn.pron = on
+piece.knight.pron = on
+piece.bishop.pron = on
+piece.rook.pron = ona
+piece.queen.pron = ona
+piece.king.pron = on
+piece.pawn.pron_gen = ho
+piece.knight.pron_gen = ho
+piece.bishop.pron_gen = ho
+piece.rook.pron_gen = jí
+piece.queen.pron_gen = jí
+piece.king.pron_gen = ho
+piece.pawn.pron_dat = mu
+piece.knight.pron_dat = mu
+piece.bishop.pron_dat = mu
+piece.rook.pron_dat = jí
+piece.queen.pron_dat = jí
+piece.king.pron_dat = mu
+piece.pawn.pron_acc = ho
+piece.knight.pron_acc = ho
+piece.bishop.pron_acc = ho
+piece.rook.pron_acc = ji
+piece.queen.pron_acc = ji
+piece.king.pron_acc = ho
+piece.pawn.pron_ins = jím
+piece.knight.pron_ins = jím
+piece.bishop.pron_ins = jím
+piece.rook.pron_ins = jí
+piece.queen.pron_ins = jí
+piece.king.pron_ins = jím
+piece.pawn.spron_gen = jeho
+piece.knight.spron_gen = jeho
+piece.bishop.spron_gen = jeho
+piece.rook.spron_gen = jí
+piece.queen.spron_gen = jí
+piece.king.spron_gen = jeho
+piece.pawn.spron_dat = jemu
+piece.knight.spron_dat = jemu
+piece.bishop.spron_dat = jemu
+piece.rook.spron_dat = jí
+piece.queen.spron_dat = jí
+piece.king.spron_dat = jemu
+piece.pawn.spron_acc = jeho
+piece.knight.spron_acc = jeho
+piece.bishop.spron_acc = jeho
+piece.rook.spron_acc = ji
+piece.queen.spron_acc = ji
+piece.king.spron_acc = jeho
+piece.pawn.npron_gen = něj
+piece.knight.npron_gen = něj
+piece.bishop.npron_gen = něj
+piece.rook.npron_gen = ní
+piece.queen.npron_gen = ní
+piece.king.npron_gen = něj
+piece.pawn.npron_dat = němu
+piece.knight.npron_dat = němu
+piece.bishop.npron_dat = němu
+piece.rook.npron_dat = ní
+piece.queen.npron_dat = ní
+piece.king.npron_dat = němu
+piece.pawn.npron_acc = něj
+piece.knight.npron_acc = něj
+piece.bishop.npron_acc = něj
+piece.rook.npron_acc = ni
+piece.queen.npron_acc = ni
+piece.king.npron_acc = něj
+piece.pawn.npron_loc = něm
+piece.knight.npron_loc = něm
+piece.bishop.npron_loc = něm
+piece.rook.npron_loc = ní
+piece.queen.npron_loc = ní
+piece.king.npron_loc = něm
+piece.pawn.npron_ins = ním
+piece.knight.npron_ins = ním
+piece.bishop.npron_ins = ním
+piece.rook.npron_ins = ní
+piece.queen.npron_ins = ní
+piece.king.npron_ins = ním
+piece.pawn.dem = ten
+piece.knight.dem = ten
+piece.bishop.dem = ten
+piece.rook.dem = ta
+piece.queen.dem = ta
+piece.king.dem = ten
+piece.pawn.dem_gen = toho
+piece.knight.dem_gen = toho
+piece.bishop.dem_gen = toho
+piece.rook.dem_gen = té
+piece.queen.dem_gen = té
+piece.king.dem_gen = toho
+piece.pawn.dem_dat = tomu
+piece.knight.dem_dat = tomu
+piece.bishop.dem_dat = tomu
+piece.rook.dem_dat = té
+piece.queen.dem_dat = té
+piece.king.dem_dat = tomu
+piece.pawn.dem_acc = toho
+piece.knight.dem_acc = toho
+piece.bishop.dem_acc = toho
+piece.rook.dem_acc = tu
+piece.queen.dem_acc = tu
+piece.king.dem_acc = toho
+piece.pawn.dem_loc = tom
+piece.knight.dem_loc = tom
+piece.bishop.dem_loc = tom
+piece.rook.dem_loc = té
+piece.queen.dem_loc = té
+piece.king.dem_loc = tom
+piece.pawn.dem_ins = tím
+piece.knight.dem_ins = tím
+piece.bishop.dem_ins = tím
+piece.rook.dem_ins = tou
+piece.queen.dem_ins = tou
+piece.king.dem_ins = tím
+piece.pawn.alone = sám
+piece.knight.alone = sám
+piece.bishop.alone = sám
+piece.rook.alone = sama
+piece.queen.alone = sama
+piece.king.alone = sám
+piece.pawn.poss = jeho
+piece.knight.poss = jeho
+piece.bishop.poss = jeho
+piece.rook.poss = její
+piece.queen.poss = její
+piece.king.poss = jeho
+piece.pawn.poss_gen = jeho
+piece.knight.poss_gen = jeho
+piece.bishop.poss_gen = jeho
+piece.rook.poss_gen = jejího
+piece.queen.poss_gen = jejího
+piece.king.poss_gen = jeho
+piece.pawn.poss_dat = jeho
+piece.knight.poss_dat = jeho
+piece.bishop.poss_dat = jeho
+piece.rook.poss_dat = jejímu
+piece.queen.poss_dat = jejímu
+piece.king.poss_dat = jeho
+piece.pawn.poss_loc = jeho
+piece.knight.poss_loc = jeho
+piece.bishop.poss_loc = jeho
+piece.rook.poss_loc = jejím
+piece.queen.poss_loc = jejím
+piece.king.poss_loc = jeho
+piece.pawn.poss_ins = jeho
+piece.knight.poss_ins = jeho
+piece.bishop.poss_ins = jeho
+piece.rook.poss_ins = jejím
+piece.queen.poss_ins = jejím
+piece.king.poss_ins = jeho
+piece.pawn.poss_pl_gen = jeho
+piece.knight.poss_pl_gen = jeho
+piece.bishop.poss_pl_gen = jeho
+piece.rook.poss_pl_gen = jejích
+piece.queen.poss_pl_gen = jejích
+piece.king.poss_pl_gen = jeho
+piece.pawn.poss_pl_dat = jeho
+piece.knight.poss_pl_dat = jeho
+piece.bishop.poss_pl_dat = jeho
+piece.rook.poss_pl_dat = jejím
+piece.queen.poss_pl_dat = jejím
+piece.king.poss_pl_dat = jeho
+piece.pawn.poss_pl_loc = jeho
+piece.knight.poss_pl_loc = jeho
+piece.bishop.poss_pl_loc = jeho
+piece.rook.poss_pl_loc = jejích
+piece.queen.poss_pl_loc = jejích
+piece.king.poss_pl_loc = jeho
+piece.pawn.poss_pl_ins = jeho
+piece.knight.poss_pl_ins = jeho
+piece.bishop.poss_pl_ins = jeho
+piece.rook.poss_pl_ins = jejími
+piece.queen.poss_pl_ins = jejími
+piece.king.poss_pl_ins = jeho
+piece.pawn.past =
+piece.knight.past =
+piece.bishop.past =
+piece.rook.past = a
+piece.queen.past = a
+piece.king.past =
+piece.pawn.adj = ý
+piece.knight.adj = ý
+piece.bishop.adj = ý
+piece.rook.adj = á
+piece.queen.adj = á
+piece.king.adj = ý
+piece.pawn.adj_gen = ého
+piece.knight.adj_gen = ého
+piece.bishop.adj_gen = ého
+piece.rook.adj_gen = é
+piece.queen.adj_gen = é
+piece.king.adj_gen = ého
+piece.pawn.adj_dat = ému
+piece.knight.adj_dat = ému
+piece.bishop.adj_dat = ému
+piece.rook.adj_dat = é
+piece.queen.adj_dat = é
+piece.king.adj_dat = ému
+piece.pawn.adj_acc = ého
+piece.knight.adj_acc = ého
+piece.bishop.adj_acc = ého
+piece.rook.adj_acc = ou
+piece.queen.adj_acc = ou
+piece.king.adj_acc = ého
+piece.pawn.adj_loc = ém
+piece.knight.adj_loc = ém
+piece.bishop.adj_loc = ém
+piece.rook.adj_loc = é
+piece.queen.adj_loc = é
+piece.king.adj_loc = ém
+piece.pawn.adj_ins = ým
+piece.knight.adj_ins = ým
+piece.bishop.adj_ins = ým
+piece.rook.adj_ins = ou
+piece.queen.adj_ins = ou
+piece.king.adj_ins = ým
+owner.your.pron = {piece}
+owner.my.pron = {piece}
+owner.white.pron = {piece}
+owner.black.pron = {piece}
+owner.your.pron_gen = {piece}
+owner.my.pron_gen = {piece}
+owner.white.pron_gen = {piece}
+owner.black.pron_gen = {piece}
+owner.your.pron_dat = {piece}
+owner.my.pron_dat = {piece}
+owner.white.pron_dat = {piece}
+owner.black.pron_dat = {piece}
+owner.your.pron_acc = {piece}
+owner.my.pron_acc = {piece}
+owner.white.pron_acc = {piece}
+owner.black.pron_acc = {piece}
+owner.your.pron_ins = {piece}
+owner.my.pron_ins = {piece}
+owner.white.pron_ins = {piece}
+owner.black.pron_ins = {piece}
+owner.your.spron_gen = {piece}
+owner.my.spron_gen = {piece}
+owner.white.spron_gen = {piece}
+owner.black.spron_gen = {piece}
+owner.your.spron_dat = {piece}
+owner.my.spron_dat = {piece}
+owner.white.spron_dat = {piece}
+owner.black.spron_dat = {piece}
+owner.your.spron_acc = {piece}
+owner.my.spron_acc = {piece}
+owner.white.spron_acc = {piece}
+owner.black.spron_acc = {piece}
+owner.your.npron_gen = {piece}
+owner.my.npron_gen = {piece}
+owner.white.npron_gen = {piece}
+owner.black.npron_gen = {piece}
+owner.your.npron_dat = {piece}
+owner.my.npron_dat = {piece}
+owner.white.npron_dat = {piece}
+owner.black.npron_dat = {piece}
+owner.your.npron_acc = {piece}
+owner.my.npron_acc = {piece}
+owner.white.npron_acc = {piece}
+owner.black.npron_acc = {piece}
+owner.your.npron_loc = {piece}
+owner.my.npron_loc = {piece}
+owner.white.npron_loc = {piece}
+owner.black.npron_loc = {piece}
+owner.your.npron_ins = {piece}
+owner.my.npron_ins = {piece}
+owner.white.npron_ins = {piece}
+owner.black.npron_ins = {piece}
+owner.your.dem = {piece}
+owner.my.dem = {piece}
+owner.white.dem = {piece}
+owner.black.dem = {piece}
+owner.your.dem_gen = {piece}
+owner.my.dem_gen = {piece}
+owner.white.dem_gen = {piece}
+owner.black.dem_gen = {piece}
+owner.your.dem_dat = {piece}
+owner.my.dem_dat = {piece}
+owner.white.dem_dat = {piece}
+owner.black.dem_dat = {piece}
+owner.your.dem_acc = {piece}
+owner.my.dem_acc = {piece}
+owner.white.dem_acc = {piece}
+owner.black.dem_acc = {piece}
+owner.your.dem_loc = {piece}
+owner.my.dem_loc = {piece}
+owner.white.dem_loc = {piece}
+owner.black.dem_loc = {piece}
+owner.your.dem_ins = {piece}
+owner.my.dem_ins = {piece}
+owner.white.dem_ins = {piece}
+owner.black.dem_ins = {piece}
+owner.your.alone = {piece}
+owner.my.alone = {piece}
+owner.white.alone = {piece}
+owner.black.alone = {piece}
+owner.your.poss = {piece}
+owner.my.poss = {piece}
+owner.white.poss = {piece}
+owner.black.poss = {piece}
+owner.your.poss_gen = {piece}
+owner.my.poss_gen = {piece}
+owner.white.poss_gen = {piece}
+owner.black.poss_gen = {piece}
+owner.your.poss_dat = {piece}
+owner.my.poss_dat = {piece}
+owner.white.poss_dat = {piece}
+owner.black.poss_dat = {piece}
+owner.your.poss_loc = {piece}
+owner.my.poss_loc = {piece}
+owner.white.poss_loc = {piece}
+owner.black.poss_loc = {piece}
+owner.your.poss_ins = {piece}
+owner.my.poss_ins = {piece}
+owner.white.poss_ins = {piece}
+owner.black.poss_ins = {piece}
+owner.your.poss_pl_gen = {piece}
+owner.my.poss_pl_gen = {piece}
+owner.white.poss_pl_gen = {piece}
+owner.black.poss_pl_gen = {piece}
+owner.your.poss_pl_dat = {piece}
+owner.my.poss_pl_dat = {piece}
+owner.white.poss_pl_dat = {piece}
+owner.black.poss_pl_dat = {piece}
+owner.your.poss_pl_loc = {piece}
+owner.my.poss_pl_loc = {piece}
+owner.white.poss_pl_loc = {piece}
+owner.black.poss_pl_loc = {piece}
+owner.your.poss_pl_ins = {piece}
+owner.my.poss_pl_ins = {piece}
+owner.white.poss_pl_ins = {piece}
+owner.black.poss_pl_ins = {piece}
+owner.your.past = {piece}
+owner.my.past = {piece}
+owner.white.past = {piece}
+owner.black.past = {piece}
+owner.your.adj = {piece}
+owner.my.adj = {piece}
+owner.white.adj = {piece}
+owner.black.adj = {piece}
+owner.your.adj_gen = {piece}
+owner.my.adj_gen = {piece}
+owner.white.adj_gen = {piece}
+owner.black.adj_gen = {piece}
+owner.your.adj_dat = {piece}
+owner.my.adj_dat = {piece}
+owner.white.adj_dat = {piece}
+owner.black.adj_dat = {piece}
+owner.your.adj_acc = {piece}
+owner.my.adj_acc = {piece}
+owner.white.adj_acc = {piece}
+owner.black.adj_acc = {piece}
+owner.your.adj_loc = {piece}
+owner.my.adj_loc = {piece}
+owner.white.adj_loc = {piece}
+owner.black.adj_loc = {piece}
+owner.your.adj_ins = {piece}
+owner.my.adj_ins = {piece}
+owner.white.adj_ins = {piece}
+owner.black.adj_ins = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Czech reads a square as the letter's name and the rank number: e4 = "é čtyři", f3 = "ef tři",
+# a8 = "á osm", h1 = "há jedna" (ranks counted as "jedna, dva, tři ...", the counting forms).
+square.spoken = {file} {rank}
+file.a.spoken = á
+file.b.spoken = bé
+file.c.spoken = cé
+file.d.spoken = dé
+file.e.spoken = é
+file.f.spoken = ef
+file.g.spoken = gé
+file.h.spoken = há
+rank.1.spoken = jedna
+rank.2.spoken = dva
+rank.3.spoken = tři
+rank.4.spoken = čtyři
+rank.5.spoken = pět
+rank.6.spoken = šest
+rank.7.spoken = sedm
+rank.8.spoken = osm
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Czech scoresheet letters: K(rál) D(áma) V(ěž) S(třelec) J(ezdec): "Jf3", "Vad1", "Kxe2".
+move.letters = K D V S J
+# Spoken as Czech players read notation: "jezdec ef tři", "jezdec bere é pět", "jezdec bé dé sedm",
+# "é bere dé pět", "pěšec bere zpět" (a recapture), "malá rošáda" (O-O), "velká rošáda" (O-O-O),
+# "dáma gé čtyři, šach". {piece} is always the nominative here, so the promotion says "é osm,
+# z pěšce je dáma" ("proměna v" would need the accusative "v dámu").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} bere {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} bere {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} bere {to}
+move.recapture.spoken = {piece} bere zpět
+move.castle_short.spoken = malá rošáda
+move.castle_long.spoken = velká rošáda
+move.promotion.spoken = {move}, z pěšce je {piece}
+move.check.spoken = {move}, šach
+move.mate.spoken = {move}, mat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
+# pronunciation pass.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. 21-99 are said the inverted way, one word: "dvaadvacet", "pětatřicet",
+# "jedenadvacet" (21, 31 ... 91 are listed): with a noun Czech then takes the genitive plural for
+# every number from 5 up ("dvaadvacet tahů", "jedenadvacet chyb"), which is the plural rule of
+# assets/i18n (one: 1 | few: 2-4 | other: 0, 5+), where "dvacet dva" would need "dvacet dva tahy".
+# 101-999 compose as "{hundreds} {rest}" ("sto dvaadvacet"); every hundred is listed.
+# Forms (a number without its own form falls back to the plain word):
+#   m     masculine "jeden" ("jeden tah", "jeden pěšec")
+#   f     feminine "jedna", "dvě" ("jedna chyba", "dvě chyby")
+#   neut  neuter "jedno", "dvě" ("jedno pole", "dvě pole")
+#   ma    masculine animate accusative "jednoho" ("vzít jednoho pěšce")
+#   fa    feminine accusative "jednu", "dvě" ("udělat jednu chybu")
+# The plain words are the counting forms ("jedna, dva, tři"). Only 1 and 2 change; in counted nouns
+# the forms are used for 1-4 only (21, 22 ... are inverted words that never change).
+number.0.spoken = nula
+number.1.spoken = jedna
+number.1.m.spoken = jeden
+number.1.f.spoken = jedna
+number.1.neut.spoken = jedno
+number.1.ma.spoken = jednoho
+number.1.fa.spoken = jednu
+number.2.spoken = dva
+number.2.f.spoken = dvě
+number.2.neut.spoken = dvě
+number.2.fa.spoken = dvě
+number.3.spoken = tři
+number.4.spoken = čtyři
+number.5.spoken = pět
+number.6.spoken = šest
+number.7.spoken = sedm
+number.8.spoken = osm
+number.9.spoken = devět
+number.10.spoken = deset
+number.11.spoken = jedenáct
+number.12.spoken = dvanáct
+number.13.spoken = třináct
+number.14.spoken = čtrnáct
+number.15.spoken = patnáct
+number.16.spoken = šestnáct
+number.17.spoken = sedmnáct
+number.18.spoken = osmnáct
+number.19.spoken = devatenáct
+number.20.spoken = dvacet
+number.30.spoken = třicet
+number.40.spoken = čtyřicet
+number.50.spoken = padesát
+number.60.spoken = šedesát
+number.70.spoken = sedmdesát
+number.80.spoken = osmdesát
+number.90.spoken = devadesát
+number.21.spoken = jedenadvacet
+number.31.spoken = jedenatřicet
+number.41.spoken = jedenačtyřicet
+number.51.spoken = jedenapadesát
+number.61.spoken = jedenašedesát
+number.71.spoken = jedenasedmdesát
+number.81.spoken = jedenaosmdesát
+number.91.spoken = jedenadevadesát
+number.100.spoken = sto
+number.200.spoken = dvě stě
+number.300.spoken = tři sta
+number.400.spoken = čtyři sta
+number.500.spoken = pět set
+number.600.spoken = šest set
+number.700.spoken = sedm set
+number.800.spoken = osm set
+number.900.spoken = devět set
+# 22-99 (except the x1 above): "{units}a{tens}" = "dva" + "a" + "dvacet" = "dvaadvacet".
+number.tens.spoken = {units}a{tens}
+# Unused (every hundred is listed above), kept because English defines it; right for 5-9 hundreds.
+number.hundreds.spoken = {n} set
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Czech writes a decimal comma ("1,3") and says it with "čárka" ("plus jedna čárka
+# tři"): the bookish "jedna celá tři" would need agreement ("dvě celé", "pět celých") that the
+# integer word cannot carry.
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} čárka {frac}
+# Ordinals in the instrumental, masculine ("{n:ord_ins}", see count.ord_ins): "mat 3. tahem" = "mat
+# třetím tahem", the Czech way of saying "mate in 3" (as Czech problem books and Lichess write it).
+# Compound ordinals put both words in the ordinal form ("dvacátým prvním"), so 1-99 are all listed;
+# from 101 the hundreds stay cardinal ("sto dvacátým prvním").
+number.1.ord_ins.spoken = prvním
+number.2.ord_ins.spoken = druhým
+number.3.ord_ins.spoken = třetím
+number.4.ord_ins.spoken = čtvrtým
+number.5.ord_ins.spoken = pátým
+number.6.ord_ins.spoken = šestým
+number.7.ord_ins.spoken = sedmým
+number.8.ord_ins.spoken = osmým
+number.9.ord_ins.spoken = devátým
+number.10.ord_ins.spoken = desátým
+number.11.ord_ins.spoken = jedenáctým
+number.12.ord_ins.spoken = dvanáctým
+number.13.ord_ins.spoken = třináctým
+number.14.ord_ins.spoken = čtrnáctým
+number.15.ord_ins.spoken = patnáctým
+number.16.ord_ins.spoken = šestnáctým
+number.17.ord_ins.spoken = sedmnáctým
+number.18.ord_ins.spoken = osmnáctým
+number.19.ord_ins.spoken = devatenáctým
+number.20.ord_ins.spoken = dvacátým
+number.21.ord_ins.spoken = dvacátým prvním
+number.22.ord_ins.spoken = dvacátým druhým
+number.23.ord_ins.spoken = dvacátým třetím
+number.24.ord_ins.spoken = dvacátým čtvrtým
+number.25.ord_ins.spoken = dvacátým pátým
+number.26.ord_ins.spoken = dvacátým šestým
+number.27.ord_ins.spoken = dvacátým sedmým
+number.28.ord_ins.spoken = dvacátým osmým
+number.29.ord_ins.spoken = dvacátým devátým
+number.30.ord_ins.spoken = třicátým
+number.31.ord_ins.spoken = třicátým prvním
+number.32.ord_ins.spoken = třicátým druhým
+number.33.ord_ins.spoken = třicátým třetím
+number.34.ord_ins.spoken = třicátým čtvrtým
+number.35.ord_ins.spoken = třicátým pátým
+number.36.ord_ins.spoken = třicátým šestým
+number.37.ord_ins.spoken = třicátým sedmým
+number.38.ord_ins.spoken = třicátým osmým
+number.39.ord_ins.spoken = třicátým devátým
+number.40.ord_ins.spoken = čtyřicátým
+number.41.ord_ins.spoken = čtyřicátým prvním
+number.42.ord_ins.spoken = čtyřicátým druhým
+number.43.ord_ins.spoken = čtyřicátým třetím
+number.44.ord_ins.spoken = čtyřicátým čtvrtým
+number.45.ord_ins.spoken = čtyřicátým pátým
+number.46.ord_ins.spoken = čtyřicátým šestým
+number.47.ord_ins.spoken = čtyřicátým sedmým
+number.48.ord_ins.spoken = čtyřicátým osmým
+number.49.ord_ins.spoken = čtyřicátým devátým
+number.50.ord_ins.spoken = padesátým
+number.51.ord_ins.spoken = padesátým prvním
+number.52.ord_ins.spoken = padesátým druhým
+number.53.ord_ins.spoken = padesátým třetím
+number.54.ord_ins.spoken = padesátým čtvrtým
+number.55.ord_ins.spoken = padesátým pátým
+number.56.ord_ins.spoken = padesátým šestým
+number.57.ord_ins.spoken = padesátým sedmým
+number.58.ord_ins.spoken = padesátým osmým
+number.59.ord_ins.spoken = padesátým devátým
+number.60.ord_ins.spoken = šedesátým
+number.61.ord_ins.spoken = šedesátým prvním
+number.62.ord_ins.spoken = šedesátým druhým
+number.63.ord_ins.spoken = šedesátým třetím
+number.64.ord_ins.spoken = šedesátým čtvrtým
+number.65.ord_ins.spoken = šedesátým pátým
+number.66.ord_ins.spoken = šedesátým šestým
+number.67.ord_ins.spoken = šedesátým sedmým
+number.68.ord_ins.spoken = šedesátým osmým
+number.69.ord_ins.spoken = šedesátým devátým
+number.70.ord_ins.spoken = sedmdesátým
+number.71.ord_ins.spoken = sedmdesátým prvním
+number.72.ord_ins.spoken = sedmdesátým druhým
+number.73.ord_ins.spoken = sedmdesátým třetím
+number.74.ord_ins.spoken = sedmdesátým čtvrtým
+number.75.ord_ins.spoken = sedmdesátým pátým
+number.76.ord_ins.spoken = sedmdesátým šestým
+number.77.ord_ins.spoken = sedmdesátým sedmým
+number.78.ord_ins.spoken = sedmdesátým osmým
+number.79.ord_ins.spoken = sedmdesátým devátým
+number.80.ord_ins.spoken = osmdesátým
+number.81.ord_ins.spoken = osmdesátým prvním
+number.82.ord_ins.spoken = osmdesátým druhým
+number.83.ord_ins.spoken = osmdesátým třetím
+number.84.ord_ins.spoken = osmdesátým čtvrtým
+number.85.ord_ins.spoken = osmdesátým pátým
+number.86.ord_ins.spoken = osmdesátým šestým
+number.87.ord_ins.spoken = osmdesátým sedmým
+number.88.ord_ins.spoken = osmdesátým osmým
+number.89.ord_ins.spoken = osmdesátým devátým
+number.90.ord_ins.spoken = devadesátým
+number.91.ord_ins.spoken = devadesátým prvním
+number.92.ord_ins.spoken = devadesátým druhým
+number.93.ord_ins.spoken = devadesátým třetím
+number.94.ord_ins.spoken = devadesátým čtvrtým
+number.95.ord_ins.spoken = devadesátým pátým
+number.96.ord_ins.spoken = devadesátým šestým
+number.97.ord_ins.spoken = devadesátým sedmým
+number.98.ord_ins.spoken = devadesátým osmým
+number.99.ord_ins.spoken = devadesátým devátým
+number.100.ord_ins.spoken = stým
+number.200.ord_ins.spoken = dvoustým
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Czech plural rule (assets/i18n): one (1) | few (2-4) | other (0, 5 and up, 21 and 22 included).
+# Nominative forms; for "tah", "bod", "šach", "pole", "braní" the accusative is the same ("za tři
+# tahy", "ztratit pět bodů"). The feminine nouns and "pěšec" (animate) have their own accusative
+# keys below (count.<noun>_acc). Never put a preposition that changes with the next sound (v/ve,
+# s/se, z/ze, k/ke) right before a number: "v pěti tazích" but "ve dvou tazích".
+count.move = {n:m} tah|{n} tahy|{n} tahů
+count.point = {n:m} bod|{n} body|{n} bodů
+count.pawn = {n:m} pěšec|{n} pěšci|{n} pěšců
+count.piece = {n:f} figura|{n:f} figury|{n} figur
+count.mistake = {n:f} chyba|{n:f} chyby|{n} chyb
+count.blunder = {n:f} hrubá chyba|{n:f} hrubé chyby|{n} hrubých chyb
+count.inaccuracy = {n:f} nepřesnost|{n:f} nepřesnosti|{n} nepřesností
+count.game = {n:f} partie|{n:f} partie|{n} partií
+# "Jednou", "dvakrát", "pětkrát": written "2krát", spoken as one word ("dva" + "krát").
+count.time = jednou|{n}krát|{n}krát
+count.square = {n:neut} pole|{n:neut} pole|{n} polí
+count.position = {n:f} pozice|{n:f} pozice|{n} pozic
+# "{n:m}", "{n:f}", "{n:neut}", "{n:ma}", "{n:fa}" in a line say a bare number in that form; they
+# are count keys so that the same forms also work outside the counted nouns (and the form check
+# knows them).
+count.m = {n:m}|{n}|{n}
+count.f = {n:f}|{n:f}|{n}
+count.neut = {n:neut}|{n:neut}|{n}
+count.ma = {n:ma}|{n}|{n}
+count.fa = {n:fa}|{n:f}|{n}
+# Accusatives that differ from the nominative ("sebral jsem ti {n:pawn_acc}" = "jednoho pěšce").
+count.pawn_acc = {n:ma} pěšce|{n} pěšce|{n} pěšců
+count.piece_acc = {n:fa} figuru|{n:f} figury|{n} figur
+count.mistake_acc = {n:fa} chybu|{n:f} chyby|{n} chyb
+count.blunder_acc = {n:fa} hrubou chybu|{n:f} hrubé chyby|{n} hrubých chyb
+count.inaccuracy_acc = {n:fa} nepřesnost|{n:f} nepřesnosti|{n} nepřesností
+count.game_acc = {n:fa} partii|{n:f} partie|{n} partií
+count.position_acc = {n:fa} pozici|{n:f} pozice|{n} pozic
+# More counted nouns for the review and the appraisal: attackers and defenders of a square ("mám tam
+# {n:attacker_acc}, ty {n2:defender_acc}"), checks, captures (pawns included, unlike "figura"),
+# best moves in a row, moves taken back.
+count.attacker = {n:m} útočník|{n} útočníci|{n} útočníků
+count.attacker_acc = {n:ma} útočníka|{n} útočníky|{n} útočníků
+count.defender = {n:m} obránce|{n} obránci|{n} obránců
+count.defender_acc = {n:ma} obránce|{n} obránce|{n} obránců
+count.check = {n:m} šach|{n} šachy|{n} šachů
+count.capture = {n:neut} braní|{n:neut} braní|{n} braní
+count.best_move = {n:m} nejlepší tah|{n} nejlepší tahy|{n} nejlepších tahů
+count.takeback = {n:m} vrácený tah|{n} vrácené tahy|{n} vrácených tahů
+# Percentages (accuracy): "{acc:percent}" = "85 %" in the subtitles (Czech puts a space before %),
+# "pětaosmdesát procent" spoken ("jedno procento", "dvě procenta", "pět procent").
+count.percent = {n} %|{n} %|{n} %
+count.percent.spoken = {n:neut} procento|{n:neut} procenta|{n} procent
+# Ordinal instrumental: "{m:ord_ins} tahem" = "3. tahem" in the subtitles, "třetím tahem" spoken
+# ("mat {m:ord_ins} tahem" = "mate in {m}").
+count.ord_ins = {n}.|{n}.|{n}.
+count.ord_ins.spoken = {n:ord_ins}|{n:ord_ins}|{n:ord_ins}
+# Declares the form "in" of the phase names below ("{text:in}" = "ve střední hře"); for a number it
+# would say the bare number.
+count.in = {n}|{n}|{n}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# "Mate in 4" is "mat 4. tahem" (spoken "mat čtvrtým tahem"); being mated, "dostaneš mat 4. tahem"
+# (a clause: use {eval} after a colon or a comma). The written lines keep the dot of the ordinal,
+# the spoken ones drop it (.spoken), or the voice would stop there.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = vyrovnáno
+eval.mate_win = mat {n:ord_ins}. tahem
+eval.mate_win.spoken = mat {n:ord_ins} tahem
+eval.mate_loss = dostaneš mat {n:ord_ins}. tahem
+eval.mate_loss.spoken = dostaneš mat {n:ord_ins} tahem
+
+# ---- Forms of names from other files -------------------------------------------------------------
+# The game phases (appraisal.lang appraisal.phase.*: "zahájení" n, "střední hra" f, "koncovka" f)
+# in the other cases, for "{text:<form>}": gen dat acc loc ins; "in" with its preposition ("v
+# zahájení", "ve střední hře", "v koncovce": the preposition changes with the word); "past" and
+# "adj" as for the pieces ("{text} se ti povedl{text:past}" = "povedlo" / "povedla").
+appraisal.phase.opening.gen = zahájení
+appraisal.phase.opening.dat = zahájení
+appraisal.phase.opening.acc = zahájení
+appraisal.phase.opening.loc = zahájení
+appraisal.phase.opening.ins = zahájením
+appraisal.phase.opening.in = v zahájení
+appraisal.phase.opening.past = o
+appraisal.phase.opening.adj = é
+appraisal.phase.middlegame.gen = střední hry
+appraisal.phase.middlegame.dat = střední hře
+appraisal.phase.middlegame.acc = střední hru
+appraisal.phase.middlegame.loc = střední hře
+appraisal.phase.middlegame.ins = střední hrou
+appraisal.phase.middlegame.in = ve střední hře
+appraisal.phase.middlegame.past = a
+appraisal.phase.middlegame.adj = á
+appraisal.phase.endgame.gen = koncovky
+appraisal.phase.endgame.dat = koncovce
+appraisal.phase.endgame.acc = koncovku
+appraisal.phase.endgame.loc = koncovce
+appraisal.phase.endgame.ins = koncovkou
+appraisal.phase.endgame.in = v koncovce
+appraisal.phase.endgame.past = a
+appraisal.phase.endgame.adj = á

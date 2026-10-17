@@ -747,7 +747,10 @@ void GameScene::startCoachGame() {
     if (!rt.prewarmedLanguages.count(ui)) {
         rt.prewarmedLanguages.insert(ui);
         std::vector<std::pair<int, uint32_t>> glyphs;
-        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) glyphs.push_back({ui::font::FACE_TEXT, cp});
+        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) {
+            const int face = ui::font::resolveFace(ui::font::FACE_TEXT, cp);   // the face that will draw it
+            if (face >= 0) glyphs.push_back({face, cp});
+        }
         for (char32_t cp : uni::decode(i18n::tr("coach.speaker"))) glyphs.push_back({ui::font::FACE_TITLE, uint32_t(cp)});
         ui::font::prewarm(glyphs);
     }

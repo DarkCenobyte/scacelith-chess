@@ -1,0 +1,444 @@
+# Coach speech (Hindi): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+#
+# Always positive, never blaming. The coach says "तुम". The player's gender is unknown, and a Hindi verb agrees
+# with its subject: never "तुम जीत गए", "तुम जीत रहे थे", "देखते रहो" (the participle agrees too). Instead:
+# transitive perfectives with ने, which agree with the object ("तुमने बाज़ी जीत ली", "तुमने मुझे हरा दिया"),
+# dative subjects ("तुम्हें बेहतर चाल मिली"), nouns ("तुम्हारी जीत"), "बाज़ी तुम्हारे हाथ में थी" for "you were
+# winning", the passive, and "... जारी रखो" for "keep doing".
+# A verb never agrees with a counted noun ("1 ग़लती हुई" / "3 ग़लतियाँ हुईं"): counts stand in nominal phrases,
+# after a colon, or as an object with को ("तुमने {n:piece_obl} को काटा").
+# Forms from common.lang: "{n:moveno}" = a move number ("चाल 21" written, "इक्कीसवीं चाल" spoken: "{n:moveno} पर" =
+# "at move 21", "{crit_no:moveno} तक" = "until move 21"); "{acc:percent}" = "85%" (spoken "पचासी प्रतिशत");
+# "{moves:move_obl} में" = "in 30 moves"; "{pts:point_obl} का फ़ायदा" = "a gain of 3 points";
+# "{n:best_move}" = "5 सबसे अच्छी चालें".
+# Moves ({move}, {crit_move}, {crit_best}), {eval} and {opening} are quoted names: after a colon, or before a comma,
+# never before a postposition, a copula or a verb.
+#
+# Names inserted by {text}, {theme}, {level}:
+#   appraisal.phase.*   bare nouns (ओपनिंग is feminine, मिडिलगेम and एंडगेम masculine): the lines never make a
+#                       verb or adjective agree with them; "{text} में" is fine (they do not change before a
+#                       postposition).
+#   appraisal.reason.*  an adverbial phrase said after "ड्रॉ, " ("ड्रॉ, आपसी सहमति से।").
+#   theme.*             an infinitive (-ना) or noun phrase, said after a colon; "अपना" for the player's own pieces (the
+#                       player is the doer of the infinitive).
+#   appraisal.level.*   the coach level names of the menus (coach.level.N.name), quoted “...” by the lines and
+#                       followed by "स्तर" where the sentence needs a noun.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = ओपनिंग
+appraisal.phase.middlegame = मिडिलगेम
+appraisal.phase.endgame = एंडगेम
+appraisal.reason.stalemate = स्टेलमेट से
+appraisal.reason.material = क्योंकि किसी के लिए भी मात देना संभव नहीं था
+appraisal.reason.repetition = स्थिति के दोहराव से
+appraisal.reason.fifty = पचास चालों के नियम से
+appraisal.reason.agreement = आपसी सहमति से
+appraisal.reason.other = बिना हार-जीत के
+appraisal.level.l1 = पहले क़दम
+appraisal.level.l2 = शुरुआती
+appraisal.level.l3 = उभरता खिलाड़ी
+appraisal.level.l4 = क्लब खिलाड़ी
+appraisal.level.l5 = मज़बूत क्लब खिलाड़ी
+appraisal.level.l6 = विशेषज्ञ
+# What to practise, after "अभ्यास के लिए एक बात:" and similar (an infinitive or noun phrase, no full stop).
+theme.general = चाल चलने से पहले पूरे बोर्ड पर नज़र डालना
+theme.mate_allowed = हर चाल से पहले अपने राजा की सुरक्षा जाँचना
+theme.mate_missed = मात के मौक़े ढूँढना, और शुरुआत शह वाली चालों से करना
+theme.stalemate = जीत की स्थिति में मेरे राजा के लिए एक खाना खुला छोड़ना
+theme.fork = दोहरे हमलों पर नज़र रखना
+theme.discovered = मेरे मोहरों के पीछे छिपे हमलों पर नज़र रखना
+theme.skewer = क़ीमती मोहरों को एक ही सीध में न रखना
+theme.pin = पिन होने से पहले ही उसका ख़तरा भाँप लेना
+theme.trapped = अपने मोहरों के लिए बच निकलने का रास्ता खुला रखना
+theme.back_rank = अपने राजा को साँस लेने की थोड़ी जगह देना
+theme.hanging = अपने मोहरों को सुरक्षित रखना
+theme.exchange = अदला-बदली से पहले हमलावर और रक्षक गिनना
+theme.missed_capture = सबसे पहले मुफ़्त में मिलने वाले मोहरे ढूँढना
+theme.missed_fork = अपने ख़ुद के दोहरे हमले ढूँढना
+theme.promotion = प्यादों की दौड़, और प्यादे के वर्ग का नियम
+theme.king_safety = अपने राजा को प्यादों की आड़ में सुरक्षित रखना
+theme.bad_trade = यह चुनना कि किन मोहरों की अदला-बदली करनी है
+theme.opening = अपने मोहरे बाहर निकालना और जल्दी कैसलिंग करना
+theme.endgame = अपने राजा को काम में लाना और पास्ड प्यादों को आगे बढ़ाना
+theme.positional = अपने सबसे कमज़ोर मोहरे की स्थिति सुधारना
+theme.material = चाल चलने से पहले देखना कि मेरी अगली चालें क्या जीत सकती हैं
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = शह और मात! तुमने बाज़ी जीत ली। बहुत अच्छा खेला!
+appraisal.open.win.b1.2 = तुम्हारी जीत हुई! बाज़ी को अंजाम तक पहुँचाया, शाबाश।
+appraisal.open.win.b1.3 = तुमने मुझे हरा दिया! सचमुच बहुत अच्छी बाज़ी थी।
+appraisal.open.win.b2 = बहुत अच्छा खेला! तुमने {moves:move_obl} में बाज़ी जीत ली।
+appraisal.open.win.b2.2 = बधाई हो, तुमने बाज़ी जीत ली!
+appraisal.open.win.b2.3 = {moves:move_obl} में जीत। बहुत ख़ूब!
+appraisal.open.win.b3 = बधाई हो, पूरी तरह मेहनत से कमाई हुई जीत।
+appraisal.open.win.b3.2 = बहुत अच्छा खेला। यह जीत तुम्हारा हक़ थी।
+appraisal.open.win.b3.3 = अच्छी जीत। बधाई हो।
+appraisal.open.win.b4 = बढ़िया जीत।
+appraisal.open.win.b4.2 = अच्छा खेला, हक़ की जीत।
+appraisal.open.win.b4.3 = अच्छी जीत।
+appraisal.open.win.b5 = अच्छा खेला।
+appraisal.open.win.b5.2 = सलीक़े से जीती बाज़ी।
+appraisal.open.win.b5.3 = अच्छी बाज़ी, और जीत भी साफ़।
+appraisal.open.win.b6 = अच्छा खेला।
+appraisal.open.win.b6.2 = साफ़ जीत।
+appraisal.open.win.b6.3 = अच्छी बाज़ी।
+appraisal.open.draw.b1 = ड्रॉ! इस बाज़ी में किसी की जीत नहीं हुई।
+appraisal.open.draw.b1.2 = बाज़ी ड्रॉ रही। बहुत कड़ा मुक़ाबला था!
+appraisal.open.draw.b1.3 = ड्रॉ: दोनों को आधा-आधा अंक। अच्छा खेला!
+appraisal.open.draw.b2 = ड्रॉ: उचित नतीजा।
+appraisal.open.draw.b2.2 = बाज़ी बराबरी पर छूटी। अच्छा मुक़ाबला!
+appraisal.open.draw.b2.3 = ड्रॉ, और अच्छी बाज़ी।
+appraisal.open.draw.b3 = ड्रॉ। दोनों तरफ़ मौक़े थे।
+appraisal.open.draw.b3.2 = उचित ड्रॉ।
+appraisal.open.draw.b3.3 = बाज़ी ड्रॉ रही, {text}। अच्छा मुक़ाबला।
+appraisal.open.draw.b4 = ड्रॉ, {text}।
+appraisal.open.draw.b4.2 = बाज़ी ड्रॉ, {text}।
+appraisal.open.draw.b4.3 = बाज़ी ड्रॉ रही, {text}।
+appraisal.open.draw.b5 = ड्रॉ।
+appraisal.open.draw.b5.2 = ड्रॉ, {text}।
+appraisal.open.draw.b5.3 = बाज़ी ड्रॉ।
+appraisal.open.draw.b6 = ड्रॉ।
+appraisal.open.draw.b6.2 = ड्रॉ, {text}।
+appraisal.open.draw.b6.3 = बाज़ी ड्रॉ।
+appraisal.open.stalemate.b1 = स्टेलमेट से ड्रॉ: जीत बस हाथ भर दूर थी! अगली बार मेरे राजा के लिए एक खाना खुला छोड़ना।
+appraisal.open.stalemate.b1.2 = स्टेलमेट, यानी ड्रॉ। जीत बस एक क़दम दूर थी!
+appraisal.open.stalemate.b2 = स्टेलमेट से ड्रॉ। जीत बिल्कुल पास थी!
+appraisal.open.stalemate.b2.2 = स्टेलमेट: ड्रॉ, जबकि बाज़ी तुम्हारे हाथ में थी।
+appraisal.open.stalemate.b3 = स्टेलमेट से ड्रॉ, वह भी जीत की स्थिति से।
+appraisal.open.stalemate.b3.2 = स्टेलमेट। जीत बिल्कुल आख़िर में हाथ से निकल गई।
+appraisal.open.stalemate.b4 = स्टेलमेट से ड्रॉ।
+appraisal.open.stalemate.b4.2 = स्टेलमेट: ड्रॉ।
+appraisal.open.stalemate.b5 = स्टेलमेट।
+appraisal.open.stalemate.b5.2 = ड्रॉ, स्टेलमेट से।
+appraisal.open.stalemate.b6 = स्टेलमेट।
+appraisal.open.stalemate.b6.2 = ड्रॉ, स्टेलमेट।
+appraisal.open.loss.b1 = इस बार मैं जीत गया, पर तुमने कुछ सचमुच बहुत अच्छी चालें चलीं।
+appraisal.open.loss.b1.2 = अच्छी बाज़ी! तुमने मुझसे ख़ूब मेहनत करवाई।
+appraisal.open.loss.b1.3 = मज़ा आया! यह बाज़ी मैंने जीती, पर तुम्हारे सीखने की रफ़्तार बहुत तेज़ है।
+appraisal.open.loss.b2 = अच्छी बाज़ी! चलो देखते हैं क्या अच्छा रहा, और आज़माने के लिए एक बात।
+appraisal.open.loss.b2.2 = बाज़ी के लिए शुक्रिया! तुम्हारे कुछ विचार बहुत अच्छे थे।
+appraisal.open.loss.b2.3 = अच्छी बाज़ी। चलो देखते हैं, इससे क्या सीखा जा सकता है।
+appraisal.open.loss.b3 = अच्छी बाज़ी।
+appraisal.open.loss.b3.2 = बाज़ी के लिए शुक्रिया।
+appraisal.open.loss.b3.3 = अच्छी बाज़ी। आओ, एक नज़र डालें।
+appraisal.open.loss_close.b3 = अच्छा मुक़ाबला। बाज़ी काफ़ी देर तक बराबरी की रही।
+appraisal.open.loss_close.b3.2 = अच्छा मुक़ाबला: काफ़ी देर तक पलड़ा बराबर रहा।
+appraisal.open.loss.b4 = अच्छी बाज़ी। देखो, फ़ैसला किस बात से हुआ।
+appraisal.open.loss.b4.2 = अच्छी बाज़ी। फ़ैसला एक ही पल में हुआ।
+appraisal.open.loss.b4.3 = बाज़ी के लिए शुक्रिया। चलो देखते हैं, बाज़ी कहाँ पलटी।
+appraisal.open.loss_close.b4 = काफ़ी देर तक कड़ा मुक़ाबला रहा। देखो, फ़ैसला किस बात से हुआ।
+appraisal.open.loss_close.b4.2 = अच्छी बाज़ी, काफ़ी देर तक बराबरी की।
+appraisal.open.loss.b5 = अच्छी बाज़ी।
+appraisal.open.loss.b5.2 = बाज़ी के लिए शुक्रिया।
+appraisal.open.loss.b5.3 = अच्छा मुक़ाबला।
+appraisal.open.loss.b6 = अच्छी बाज़ी।
+appraisal.open.loss.b6.2 = बाज़ी के लिए शुक्रिया।
+appraisal.open.loss.b6.3 = अच्छा मुक़ाबला।
+appraisal.open.resigned.b1 = हार मानना भी शतरंज का हिस्सा है; इसके लिए हिम्मत चाहिए। अच्छी बाज़ी!
+appraisal.open.resigned.b1.2 = कोई बात नहीं। कब हार माननी है, यह जानना भी शतरंज का हिस्सा है।
+appraisal.open.resigned.b2 = हार मानना शतरंज का हिस्सा है; इसमें हिम्मत लगती है।
+appraisal.open.resigned.b2.2 = ठीक है। हार मानने में भी हिम्मत लगती है।
+appraisal.open.resigned.b3 = हार मानना शतरंज का हिस्सा है। अच्छी बाज़ी।
+appraisal.open.resigned.b3.2 = ठीक है। बाज़ी के लिए शुक्रिया।
+appraisal.open.resigned.b4 = अच्छी बाज़ी।
+appraisal.open.resigned.b4.2 = बाज़ी के लिए शुक्रिया।
+appraisal.open.resigned.b5 = अच्छी बाज़ी।
+appraisal.open.resigned.b5.2 = बाज़ी के लिए शुक्रिया।
+appraisal.open.resigned.b6 = अच्छी बाज़ी।
+appraisal.open.resigned.b6.2 = शुक्रिया।
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = वैसे, बाज़ी अभी ख़त्म नहीं हुई थी: लगभग {eval}।
+appraisal.resign_early.b3.2 = दरअसल, तुम्हारे पास अभी मौक़े थे: लगभग {eval}।
+appraisal.resign_early.b4 = बाज़ी अभी ख़त्म नहीं हुई थी: लगभग {eval}।
+appraisal.resign_early.b4.2 = अभी खेल बाक़ी था: लगभग {eval}।
+appraisal.resign_early.b5 = बाज़ी ख़त्म नहीं हुई थी: {eval}।
+appraisal.resign_early.b5.2 = स्थिति अभी खेलने लायक़ थी, लगभग {eval}।
+appraisal.resign_early.b6 = बाज़ी बाक़ी थी: {eval}।
+appraisal.resign_early.b6.2 = मूल्यांकन था: {eval}।
+# The opening played (levels 3-6): the name always follows a colon.
+appraisal.opening.b3 = हमने यह ओपनिंग खेली: {opening}।
+appraisal.opening.b3.2 = बाज़ी की ओपनिंग थी: {opening}।
+appraisal.opening.b4 = हमारी ओपनिंग: {opening}।
+appraisal.opening.b4.2 = ओपनिंग: {opening}।
+appraisal.opening.b5 = {opening}।
+appraisal.opening.b5.2 = ओपनिंग: {opening}।
+appraisal.opening.b6 = {opening}।
+appraisal.opening.b6.2 = ओपनिंग: {opening}।
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+# {n} is the move number here ("{n:moveno}"), except in the streak lines, where it counts moves.
+appraisal.best.brilliant.b1 = {n:moveno} पर क्या बलिदान था: {move}!
+appraisal.best.brilliant.b1.2 = मेरा पसंदीदा पल: {move}। तुमने एक मोहरे का बलिदान दिया, और वह काम कर गया!
+appraisal.best.brilliant.b2 = तुम्हारा सबसे अच्छा पल: {n:moveno} पर बलिदान, {move}।
+appraisal.best.brilliant.b2.2 = {n:moveno} पर एक साहसी बलिदान: {move}। शाबाश!
+appraisal.best.brilliant.b3 = शानदार बलिदान: {move}।
+appraisal.best.brilliant.b3.2 = सबसे यादगार पल: {move}, {n:moveno} पर एक असली बलिदान।
+appraisal.best.brilliant.b4 = सबसे अच्छा पल: {move}, {n:moveno}। शानदार बलिदान।
+appraisal.best.brilliant.b4.2 = {n:moveno} पर शानदार चाल: {move}।
+appraisal.best.brilliant.b5 = {move}, {n:moveno} पर: शानदार।
+appraisal.best.brilliant.b5.2 = {n:moveno}, {move}: शानदार।
+appraisal.best.brilliant.b6 = {n:moveno}: {move}!!
+appraisal.best.brilliant.b6.spoken = {n:moveno}: {move}, शानदार चाल।
+appraisal.best.brilliant.b6.2 = {n:moveno}: {move}, शानदार।
+appraisal.best.great.b1 = मेरा पसंदीदा पल: {move}। वह बेहतरीन चाल थी!
+appraisal.best.great.b1.2 = याद है, {move}? वह कमाल की खोज थी।
+appraisal.best.great.b2 = तुम्हारा सबसे अच्छा पल: {move}, {n:moveno} पर। उसी चाल ने बाज़ी पलट दी।
+appraisal.best.great.b2.2 = {n:moveno} पर बेहतरीन चाल: {move}।
+appraisal.best.great.b3 = अहम चाल: {move}, {n:moveno} पर। उसने हालात पलट दिए।
+appraisal.best.great.b3.2 = बेहतरीन खोज: {move}, {n:moveno} पर।
+appraisal.best.great.b4 = तुमने मेरी ग़लती की सज़ा फ़ौरन दी: {move}।
+appraisal.best.great.b4.2 = सबसे अच्छा पल: {move}, {n:moveno}।
+appraisal.best.great.b5 = {move}, {n:moveno} पर। बढ़िया खोज।
+appraisal.best.great.b5.2 = {n:moveno}, {move}: बेहतरीन खोज।
+appraisal.best.great.b6 = {move}, {n:moveno} पर। बढ़िया खोज।
+appraisal.best.great.b6.2 = {n:moveno}: {move}!
+appraisal.best.only.b1 = मेरा पसंदीदा पल: {move}। वही एकमात्र अच्छी चाल थी!
+appraisal.best.only.b1.2 = {n:moveno} पर तुमने एकमात्र अच्छी चाल ढूँढ ली: {move}। बहुत ख़ूब!
+appraisal.best.only.b2 = तुम्हारा सबसे अच्छा पल: {move}, उस समय की एकमात्र अच्छी चाल।
+appraisal.best.only.b2.2 = {n:moveno} पर बस एक ही सही रास्ता था, और तुमने उसे ढूँढ लिया: {move}।
+appraisal.best.only.b3 = अहम चाल: {move}, {n:moveno} पर। सिर्फ़ इसी चाल से स्थिति बची रही।
+appraisal.best.only.b3.2 = {n:moveno} पर सिर्फ़ एक चाल स्थिति बचा सकती थी, और तुमने उसे ढूँढ लिया: {move}।
+appraisal.best.only.b4 = सबसे अच्छा पल: {move}, {n:moveno}। एकमात्र चाल।
+appraisal.best.only.b4.2 = {n:moveno}: {move}, एकमात्र चाल।
+appraisal.best.only.b5 = {n:moveno} पर एकमात्र चाल: {move}। बढ़िया खोज।
+appraisal.best.only.b5.2 = {n:moveno} पर एकमात्र चाल: {move}।
+appraisal.best.only.b6 = {n:moveno} पर एकमात्र चाल: {move}। बढ़िया खोज।
+appraisal.best.only.b6.2 = {n:moveno}: {move}, एकमात्र चाल।
+appraisal.best.won.b1 = मेरा पसंदीदा पल: {move}। इस चाल से {pts:point_obl} का फ़ायदा हुआ!
+appraisal.best.won.b1.2 = याद है, {move}? उससे तुम्हें {pts:point_obl} का फ़ायदा मिला। शाबाश!
+appraisal.best.won.b2 = तुम्हारा सबसे अच्छा पल: {move}, {n:moveno} पर; इससे {pts:point_obl} का फ़ायदा हुआ।
+appraisal.best.won.b2.2 = {n:moveno} पर {move}, और मोहरों का फ़ायदा। बढ़िया!
+appraisal.best.won.b3 = अहम चाल: {move}, {n:moveno} पर। इससे {pts:point_obl} का फ़ायदा हुआ।
+appraisal.best.won.b3.2 = {move}, {n:moveno} पर: साफ़-सुथरे ढंग से मटीरियल की जीत।
+appraisal.best.won.b4 = सबसे अच्छा पल: {move}, {n:moveno}, मटीरियल का फ़ायदा।
+appraisal.best.won.b4.2 = {move}, {n:moveno} पर: {pts:point_obl} का फ़ायदा।
+appraisal.best.won.b5 = {move}, {n:moveno} पर: मटीरियल का फ़ायदा।
+appraisal.best.won.b5.2 = {n:moveno}: {move}, मटीरियल का फ़ायदा।
+appraisal.best.won.b6 = {move}, {n:moveno} पर: मटीरियल का फ़ायदा।
+appraisal.best.won.b6.2 = {n:moveno}: {move}, +{pts}।
+appraisal.best.won.b6.2.spoken = {n:moveno}: {move}, प्लस {pts}।
+appraisal.best.streak.b1 = तुमने लगातार {n:time} सबसे अच्छी चाल ढूँढी। बहुत ख़ूब!
+appraisal.best.streak.b1.2 = लगातार {n:best_move}! यह है शानदार शतरंज।
+appraisal.best.streak.b2 = तुमने लगातार {n:time} सबसे अच्छी चाल ढूँढी।
+appraisal.best.streak.b2.2 = लगातार {n:best_move}। बहुत अच्छा!
+appraisal.best.streak.b3 = लगातार {n:best_move}। बहुत ठोस खेल।
+appraisal.best.streak.b3.2 = एक के बाद एक {n:best_move}। अच्छा खेला।
+appraisal.best.streak.b4 = लगातार {n:best_move}।
+appraisal.best.streak.b4.2 = {n:best_move_obl} का सिलसिला।
+appraisal.best.streak.b5 = लगातार {n:best_move}।
+appraisal.best.streak.b5.2 = {n:best_move_obl} का सिलसिला।
+appraisal.best.streak.b6 = लगातार {n:best_move}।
+appraisal.best.streak.b6.2 = सिलसिला: {n:best_move}।
+appraisal.best.capture.b1 = मेरा पसंदीदा पल: {move}। तुमने {my} मुफ़्त में काट लिया!
+appraisal.best.capture.b1.2 = याद है, {move}? तुमने देख लिया कि {my} मुफ़्त में मिल सकता था!
+appraisal.best.capture.b2 = तुम्हारा सबसे अच्छा पल: {move}, जिससे {my} हाथ आया।
+appraisal.best.capture.b2.2 = {n:moveno} पर मोहरा काटने की बढ़िया चाल: {move}।
+appraisal.best.capture.b3 = {n:moveno} पर पैनी नज़र: {move}, और {my} हाथ आया।
+appraisal.best.capture.b3.2 = {move}, {n:moveno} पर, और {my} तुम्हारे हाथ लगा।
+appraisal.best.capture.b4 = सबसे अच्छा पल: {move}, {n:moveno}; {my} हाथ आया।
+appraisal.best.capture.b4.2 = {move}, {n:moveno} पर: मटीरियल का फ़ायदा।
+appraisal.best.capture.b5 = {move}, {n:moveno} पर: {my} हाथ आया।
+appraisal.best.capture.b5.2 = {n:moveno}: {move}।
+appraisal.best.capture.b6 = {move}, {n:moveno} पर।
+appraisal.best.capture.b6.2 = {n:moveno}: {move}, मटीरियल का फ़ायदा।
+appraisal.best.phase.b1 = {text} में तुमने बहुत अच्छा खेला।
+appraisal.best.phase.b1.2 = तुम्हारा सबसे अच्छा खेल {text} में दिखा।
+appraisal.best.phase.b2 = बाज़ी का तुम्हारा सबसे मज़बूत हिस्सा: {text}।
+appraisal.best.phase.b2.2 = {text} में तुमने बहुत बढ़िया खेल दिखाया।
+appraisal.best.phase.b3 = तुम्हारा सबसे अच्छा चरण: {text}, {acc:percent} सटीकता।
+appraisal.best.phase.b3.2 = सबसे अच्छा खेल {text} में रहा: {acc:percent} सटीकता।
+appraisal.best.phase.b4 = सबसे मज़बूत चरण: {text}, {acc:percent}।
+appraisal.best.phase.b4.2 = तुम्हारा सबसे अच्छा चरण, {text}: {acc:percent}।
+appraisal.best.phase.b5 = सबसे अच्छा चरण: {text}, {acc:percent}।
+appraisal.best.phase.b5.2 = {text}: {acc:percent}।
+appraisal.best.phase.b6 = {text}: {acc:percent}।
+appraisal.best.phase.b6.2 = सबसे अच्छा चरण: {text}, {acc:percent}।
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 मोहरा" / "3 मोहरे") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included: मोहरा covers them) and checks given ({m}); also the fallback without the
+# engine. "तुमने {n:piece_obl} को काटा" keeps the verb the same for every count; the short levels give the number
+# after a label ("काटे गए मोहरे: 3"). "शह दी" agrees with शह (feminine), not with the player.
+appraisal.num.material.b1 = तुमने मेरे {n:piece_obl} को काटा और {m:time} शह दी।
+appraisal.num.material.b1.2 = तुमने {n:piece_obl} को काटा और मेरे राजा को {m:time} शह दी।
+appraisal.num.material.b2 = तुमने {n:piece_obl} को काटा और {m:time} शह दी।
+appraisal.num.material.b2.2 = तुमने मेरे {n:piece_obl} को काटा और मुझे {m:time} शह दी।
+appraisal.num.material.b3 = तुमने {n:piece_obl} को काटा और {m:time} शह दी।
+appraisal.num.material.b3.2 = काटे गए मोहरे: {n}; शह: {m:time}।
+appraisal.num.material.b4 = काटे गए मोहरे: {n}, शह: {m:time}।
+appraisal.num.material.b4.2 = तुमने {n:piece_obl} को काटा और {m:time} शह दी।
+appraisal.num.material.b5 = काटे गए मोहरे: {n}; शह: {m:time}।
+appraisal.num.material.b5.2 = कटे मोहरे: {n}; शह: {m:time}।
+appraisal.num.material.b6 = काटे गए मोहरे: {n}, शह: {m}।
+appraisal.num.material.b6.2 = कटे मोहरे: {n}; शह: {m:time}।
+appraisal.num.material_nochecks.b1 = तुमने मेरे {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b1.2 = इस बाज़ी में तुमने {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b2 = तुमने {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b2.2 = इस बाज़ी में तुमने मेरे {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b3 = तुमने {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b3.2 = काटे गए मोहरे: {n}।
+appraisal.num.material_nochecks.b4 = काटे गए मोहरे: {n}।
+appraisal.num.material_nochecks.b4.2 = तुमने {n:piece_obl} को काटा।
+appraisal.num.material_nochecks.b5 = काटे गए मोहरे: {n}।
+appraisal.num.material_nochecks.b5.2 = कटे मोहरे: {n}।
+appraisal.num.material_nochecks.b6 = काटे गए मोहरे: {n}।
+appraisal.num.material_nochecks.b6.2 = कटे मोहरे: {n}।
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = तुमने {n:move_obl} को वापस लिया और उनमें से {m} को सुधारा। ऐसे ही तो सीखा जाता है!
+appraisal.num.takebacks.b1.2 = तुमने {n:move_obl} को वापस लिया, और {m:time} तुम्हें बेहतर चाल मिल गई। शानदार!
+appraisal.num.takebacks.b2 = तुमने {n:move_obl} को वापस लिया और उनमें से {m} को सुधारा। सीखने का यही तरीक़ा है।
+appraisal.num.takebacks.b2.2 = वापस ली गई {n:move_obl} में से तुमने {m} को सुधारा। अच्छी सीख मिली!
+appraisal.num.takebacks.b3 = तुमने {n:move_obl} को वापस लिया और उनमें से {m} को सुधारा।
+appraisal.num.takebacks.b3.2 = वापस ली गई चालें: {n}, सुधारी गईं: {m}। अच्छा।
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = एक भी बड़ी ग़लती नहीं: शानदार!
+appraisal.num.clean.b2.2 = इस बाज़ी में एक भी बड़ी ग़लती नहीं हुई। बहुत ख़ूब!
+appraisal.num.clean.b2.3 = तुमसे कोई बड़ी ग़लती नहीं हुई। बहुत अच्छा!
+appraisal.num.few.b2 = इस बाज़ी में बस {n:mistake}।
+appraisal.num.few.b2.2 = पूरी बाज़ी में सिर्फ़ {n:mistake}। बढ़िया!
+appraisal.num.few.b2.3 = ज़िक्र करने लायक़ बस {n:mistake}। शाबाश।
+appraisal.num.best.b2 = तुमने {n:time} सबसे अच्छी चाल ढूँढी।
+appraisal.num.best.b2.2 = तुमने {n:time} बिल्कुल सबसे अच्छी चाल चली।
+appraisal.num.best.b2.3 = {n:time} तुम्हें सबसे अच्छी चाल मिली।
+appraisal.num.acc.b3 = तुम्हारी सटीकता {acc:percent} रही; साथ में {n:mistake} और {m:blunder}।
+appraisal.num.acc.b3.2 = {acc:percent} सटीकता: {n:mistake}, {m:blunder}।
+appraisal.num.acc.b3.3 = तुमने {acc:percent} सटीकता से खेला, {n:mistake_obl} और {m:blunder_obl} के साथ।
+appraisal.num.acc_explain.b3 = सटीकता तुम्हारी हर चाल की तुलना उस स्थिति की सबसे अच्छी चाल से करती है: सौ प्रतिशत यानी एकदम सटीक खेल।
+appraisal.num.acc_explain.b3.2 = सटीकता बताती है कि तुम्हारी चालें सबसे अच्छी चालों के कितने क़रीब थीं। सौ प्रतिशत यानी एकदम सटीक।
+appraisal.num.acc.b4 = सटीकता: {acc:percent}।
+appraisal.num.acc.b4.2 = तुमने {acc:percent} सटीकता से खेला।
+appraisal.num.acc.b4.3 = {acc:percent} सटीकता।
+appraisal.num.acc_phase.b4 = सटीकता {acc:percent}; सबसे मज़बूत चरण: {text}, {acc_phase:percent}।
+appraisal.num.acc_phase.b4.2 = कुल मिलाकर {acc:percent}, {text} में {acc_phase:percent}।
+appraisal.num.acc_phase.b4.3 = तुमने {acc:percent} सटीकता से खेला; सबसे अच्छा {text} में, {acc_phase:percent}।
+appraisal.num.coach.b4 = मैंने {acc_coach:percent} सटीकता से खेला।
+appraisal.num.coach.b4.2 = मेरी सटीकता {acc_coach:percent} रही।
+appraisal.num.acc.b5 = {acc:percent} सटीकता; {n:inaccuracy}, {m:mistake}।
+appraisal.num.acc.b5.2 = सटीकता {acc:percent}, {n:inaccuracy_obl} और {m:mistake_obl} के साथ।
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}।
+appraisal.num.book.b5 = {k:moveno} पर ओपनिंग थ्योरी से बाहर।
+appraisal.num.book.b5.2 = {k:moveno} पर हमने ओपनिंग थ्योरी छोड़ दी।
+appraisal.num.acc.b6 = तुम्हारी सटीकता {acc:percent}, मेरी {acc_coach:percent}। {n:inaccuracy}, {m:mistake}, {k:blunder}।
+appraisal.num.acc.b6.2 = {acc:percent} बनाम {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}।
+appraisal.num.acc.b6.3 = सटीकता {acc:percent}, मेरी {acc_coach:percent}। {n:inaccuracy}, {m:mistake}, {k:blunder}।
+appraisal.num.acc_solo.b6 = {acc:percent} सटीकता। {n:inaccuracy}, {m:mistake}, {k:blunder}।
+appraisal.num.acc_solo.b6.2 = सटीकता {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}।
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = अभ्यास के लिए एक बात: {theme}।
+appraisal.improve.theme.b1.2 = अगली बार के लिए एक सुझाव: {theme}।
+appraisal.improve.theme.b1.3 = इस पर काम करो: {theme}।
+appraisal.improve.theme.b2 = अभ्यास के लिए: {theme}।
+appraisal.improve.theme.b2.2 = अगली बार के लिए एक विचार: {theme}।
+appraisal.improve.theme.b2.3 = इस पर काम करना फ़ायदेमंद रहेगा: {theme}।
+appraisal.improve.theme.b3 = इस बाज़ी का एक अहम पहलू: {theme}।
+appraisal.improve.theme.b3.2 = अभ्यास के लायक़: {theme}।
+appraisal.improve.theme.b4 = बार-बार सामने आई बात: {theme}।
+appraisal.improve.theme.b4.2 = यह एक से ज़्यादा बार सामने आया: {theme}।
+appraisal.improve.theme.b5 = बार-बार: {theme}।
+appraisal.improve.theme.b5.2 = बाज़ी का मुख्य विषय: {theme}।
+appraisal.improve.theme.b6 = बार-बार: {theme}।
+appraisal.improve.theme.b6.2 = विषय: {theme}।
+# The critical moment (levels 2-6). "{crit_best}, न कि {crit_move}" = "{crit_best} instead of {crit_move}".
+appraisal.improve.critical.b2 = बाज़ी {crit_no:moveno} पर पलटी। अगली बार इस पर काम करना: {theme}।
+appraisal.improve.critical.b2.2 = अहम पल: {crit_no:moveno}, {crit_move}। अभ्यास के लिए: {theme}।
+appraisal.improve.critical.b3 = निर्णायक पल: {crit_no:moveno}। वहाँ बेहतर चाल थी: {crit_best}, न कि {crit_move}।
+appraisal.improve.critical.b3.2 = {crit_no:moveno} पर बेहतर चाल थी: {crit_best}, न कि {crit_move}। पहले मेरी मजबूर करने वाली चालें जाँचो।
+appraisal.improve.critical.b4 = निर्णायक पल: {crit_no:moveno}, {crit_move}। बेहतर चाल थी: {crit_best}।
+appraisal.improve.critical.b4.2 = अहम पल {crit_no:moveno} पर आया: {crit_best}, न कि {crit_move}।
+appraisal.improve.critical.b5 = {crit_no:moveno}: {crit_best}, न कि {crit_move}; {eval}।
+appraisal.improve.critical.b5.2 = निर्णायक मोड़ {crit_no:moveno} पर: {crit_best}, {eval}।
+appraisal.improve.critical.b6 = {crit_no:moveno}: {crit_best}, न कि {crit_move}; {eval}।
+appraisal.improve.critical.b6.2 = {crit_no:moveno}। {crit_best}, न कि {crit_move}: {eval}।
+# A winning game lost to one mistake: no blame words. "You were winning" = "बाज़ी तुम्हारे हाथ में थी".
+appraisal.improve.was_winning.b1 = {crit_no:moveno} तक बाज़ी तुम्हारे हाथ में थी। एक सुझाव: {theme}।
+appraisal.improve.was_winning.b1.2 = {crit_no:moveno} तक सब कुछ बहुत बढ़िया चल रहा था। याद रखना: {theme}।
+appraisal.improve.was_winning.b2 = {crit_no:moveno} तक जीत तुम्हारी तरफ़ थी। अगली बार: {theme}।
+appraisal.improve.was_winning.b2.2 = {crit_no:moveno} तक तुम्हारी स्थिति जीत की थी। अभ्यास के लिए: {theme}।
+appraisal.improve.was_winning.b3 = {crit_no:moveno} तक बाज़ी तुम्हारे हाथ में थी। बढ़त बनाए रखने वाली चाल थी: {crit_best}।
+appraisal.improve.was_winning.b3.2 = {crit_no:moveno} तक बाज़ी तुम्हारे हाथ में थी; यह चाल बढ़त बनाए रखती: {crit_best}।
+appraisal.improve.was_winning.b4 = {crit_no:moveno} तक बाज़ी तुम्हारे हाथ में थी। बढ़त बनाए रखने वाली चाल थी: {crit_best}।
+appraisal.improve.was_winning.b4.2 = {crit_no:moveno} तक जीत की स्थिति; उसे बचाने वाली चाल: {crit_best}।
+appraisal.improve.was_winning.b5 = {crit_no:moveno} तक जीत की स्थिति: {crit_best}, {eval}।
+appraisal.improve.was_winning.b5.2 = {crit_no:moveno}: जीत बचाए रखने वाली चाल थी {crit_best}, {eval}।
+appraisal.improve.was_winning.b6 = {crit_no:moveno}: {crit_best}, {eval}।
+appraisal.improve.was_winning.b6.2 = {crit_best}, {crit_no:moveno} पर, जीत बचाए रखती: {eval}।
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = एक सुझाव: जब बाज़ी तुम्हारे हाथ में हो, तो मेरे राजा के लिए हमेशा चलने का एक खाना छोड़ो।
+appraisal.improve.stalemate.b1.2 = याद रखना: बाज़ी के आख़िरी दौर में हर चाल से पहले जाँच लो कि मेरा राजा अब भी चल सकता है।
+appraisal.improve.stalemate.b2 = जब बाज़ी तुम्हारे हाथ में हो, तो मेरे राजा के लिए हमेशा एक खाना छोड़ो, वरना स्टेलमेट हो जाता है।
+appraisal.improve.stalemate.b2.2 = अगली बार, चाल चलने से पहले जाँच लेना कि मेरा राजा अब भी चल सकता है।
+appraisal.improve.stalemate.b3 = जीत की स्थिति में हर चाल पर जाँचो कि मेरे राजा के पास अब भी एक खाना है।
+appraisal.improve.stalemate.b3.2 = जीते हुए एंडगेम में स्टेलमेट से सावधान रहो: मेरे राजा को साँस लेने की जगह दो।
+appraisal.improve.stalemate.b4 = जीते हुए एंडगेम में हमेशा स्टेलमेट की जाँच करो।
+appraisal.improve.stalemate.b4.2 = स्टेलमेट पर ध्यान: यहाँ इसकी क़ीमत जीत गँवाकर चुकानी पड़ी।
+appraisal.improve.stalemate.b5 = जीते हुए एंडगेम में स्टेलमेट जाँचो।
+appraisal.improve.stalemate.b5.2 = स्टेलमेट से जीत हाथ से निकल गई।
+appraisal.improve.stalemate.b6 = स्टेलमेट से सावधान।
+appraisal.improve.stalemate.b6.2 = स्टेलमेट ने जीत छीन ली।
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = {n:moveno} पर {my} असुरक्षित था। क्या तुमने उसे देखा?
+appraisal.improve.coach_hung.b1.2 = {n:moveno} पर {my} तुम्हारे लिए मुफ़्त था। हमेशा मुफ़्त में मिलने वाले मोहरे ढूँढो!
+appraisal.improve.coach_hung.b2 = {n:moveno} पर {my} असुरक्षित था। क्या तुम्हारी नज़र उस पर पड़ी?
+appraisal.improve.coach_hung.b2.2 = {n:moveno} पर {my} मुफ़्त में काटा जा सकता था।
+appraisal.improve.coach_hung.b3 = {n:moveno} पर {my} बिना रक्षक के था। क्या तुमने यह भाँपा?
+appraisal.improve.coach_hung.b3.2 = {n:moveno} पर {my} असुरक्षित था। हर चाल पर बिना रक्षक वाले मोहरे ढूँढो।
+# A clean game: keep doing it ("... जारी रखो": "जाँचते रहो" would agree with the player).
+appraisal.improve.clean.b1 = आज की तरह, यह जाँचना जारी रखो कि तुम्हारे मोहरे सुरक्षित हैं।
+appraisal.improve.clean.b1.2 = हर चाल से पहले यह देखना जारी रखो कि मैं किस पर हमला कर रहा हूँ। यह तरीक़ा काम करता है!
+appraisal.improve.clean.b1.3 = ऐसे ही सावधानी से खेलो!
+appraisal.improve.clean.b2 = साफ़-सुथरी बाज़ी। मेरे ख़तरों को ऐसे ही जाँचना जारी रखो।
+appraisal.improve.clean.b2.2 = जो आज किया, वही आगे भी करो: सुरक्षित मोहरे, अच्छी चालें।
+appraisal.improve.clean.b3 = साफ़-सुथरी बाज़ी। पहले मजबूर करने वाली चालें जाँचने की आदत बनाए रखो।
+appraisal.improve.clean.b3.2 = कोई बड़ी ग़लती नहीं: ऐसे ही खेलो।
+appraisal.improve.clean.b4 = साफ़-सुथरी बाज़ी। सुधारने को कुछ बड़ा नहीं।
+appraisal.improve.clean.b4.2 = कोई गंभीर ग़लती नहीं।
+appraisal.improve.clean.b5 = कोई गंभीर ग़लती नहीं।
+appraisal.improve.clean.b5.2 = साफ़-सुथरी बाज़ी।
+appraisal.improve.clean.b6 = साफ़ बाज़ी।
+appraisal.improve.clean.b6.2 = कोई गंभीर ग़लती नहीं।
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = a coach level name, quoted: "“शुरुआती” स्तर".
+appraisal.end.b1 = हर बाज़ी के साथ तुम्हारा खेल बेहतर हो रहा है। एक और?
+appraisal.end.b1.2 = मज़ा आया! फिर से खेलें?
+appraisal.end.b1.3 = बहुत बढ़िया कोशिश। एक और बाज़ी हो जाए?
+appraisal.end.b2 = हर बाज़ी के साथ तुम्हारा खेल बेहतर हो रहा है। एक और?
+appraisal.end.b2.2 = अच्छी बाज़ी। फिर से खेलें?
+appraisal.end.b2.3 = अच्छा खेला। एक और बाज़ी?
+appraisal.end.b3 = ठोस बाज़ी। अगली के लिए तैयार हो?
+appraisal.end.b3.2 = अच्छी बाज़ी। एक और?
+appraisal.end.b3.3 = अच्छा खेला। फिर से हो जाए?
+appraisal.end.b4 = ठोस बाज़ी। अगली के लिए तैयार हो?
+appraisal.end.b4.2 = एक और बाज़ी?
+appraisal.end.b4.3 = अच्छी बाज़ी। अगली?
+appraisal.end.b5 = एक और?
+appraisal.end.b5.2 = अगली बाज़ी?
+appraisal.end.b5.3 = फिर से?
+appraisal.end.b6 = एक और?
+appraisal.end.b6.2 = अगली बाज़ी?
+appraisal.end.b6.3 = फिर से?
+appraisal.end.up.b1 = तुम “{level}” स्तर के लिए तैयार हो। आज़माकर देखें?
+appraisal.end.up.b1.2 = मुझे लगता है, तुम “{level}” स्तर के लिए तैयार हो। उसे आज़माएँ?
+appraisal.end.up.b2 = तुम “{level}” स्तर के लिए तैयार हो। आज़माकर देखें?
+appraisal.end.up.b2.2 = अब “{level}” स्तर कैसा रहेगा? मुझे लगता है, तुम तैयार हो।
+appraisal.end.up.b3 = यह स्तर अब तुम्हारे लिए छोटा पड़ गया है: “{level}” आज़माओ।
+appraisal.end.up.b3.2 = “{level}” के लिए तैयार हो? मेरे ख़याल से हाँ।
+appraisal.end.up.b4 = यह स्तर अब तुम्हारे लिए छोटा पड़ गया है: “{level}” आज़माओ।
+appraisal.end.up.b4.2 = अब “{level}” की बारी?
+appraisal.end.up.b5 = अगली बार “{level}” आज़माओ।
+appraisal.end.up.b5.2 = अब “{level}”?
+appraisal.end.up.b6 = अगली बार “{level}” आज़माओ।
+appraisal.end.up.b6.2 = अब “{level}”?
+appraisal.end.down.b2 = चलो, इन विचारों के अभ्यास के लिए एक बाज़ी “{level}” स्तर पर खेलते हैं।
+appraisal.end.down.b2.2 = अभ्यास के लिए “{level}” स्तर पर एक बाज़ी कैसी रहेगी?
+appraisal.end.down.b3 = इन विचारों के अभ्यास के लिए “{level}” स्तर पर एक बाज़ी हो जाए?
+appraisal.end.down.b3.2 = “{level}” स्तर पर एक बाज़ी इन विचारों के अभ्यास में मदद कर सकती है।
+appraisal.end.down.b4 = “{level}” स्तर पर एक बाज़ी शायद इन विचारों के अभ्यास में मदद करे।
+appraisal.end.down.b4.2 = अभ्यास के लिए शायद एक बाज़ी “{level}” स्तर पर?
+appraisal.end.down.b5 = शायद एक बाज़ी “{level}” स्तर पर?
+appraisal.end.down.b5.2 = अभ्यास के लिए “{level}”?
+appraisal.end.down.b6 = शायद एक बाज़ी “{level}” स्तर पर?
+appraisal.end.down.b6.2 = अभ्यास के लिए “{level}”?

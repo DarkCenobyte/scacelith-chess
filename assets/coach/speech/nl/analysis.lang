@@ -1,0 +1,150 @@
+# Coach speech (Dutch): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Dutch:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "je" or "ik" here: the players are "Wit" and "Zwart" (capitalised, as players). A piece
+#   comes with its side: {piece} {t1} {t2} = "het witte paard", "de zwarte dame" (common.lang,
+#   owner.white / owner.black); a pronoun pointing back at one takes its form ({piece:obj} = hem /
+#   het / haar, {piece:rel} = die / dat).
+# - Counted numbers (common.lang): {pts:point} "3 punten", {n:mistake} "2 fouten", {m:blunder}
+#   "1 blunder". "Mat in {m}" needs no noun ("mat in drie", as eval.mate_win).
+# - {opening:def} is the opening's name with its article (the openings fragment): "het Siciliaans".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Laten we samen op deze partij terugkijken.
+an.start.2 = Laten we deze partij zet voor zet doornemen.
+an.start.3 = Hier is de partij. Laten we kijken hoe die verliep.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Deze partij begint vanuit een opgezette stelling. Laten we de partij doornemen.
+an.start.setup.2 = Een partij vanuit een opgezette stelling. Laten we kijken hoe die verliep.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = De opening is {opening:def}.
+an.opening.2 = Dit is {opening:def}.
+an.book_exit = Met {move} verlaat de partij de bekende openingstheorie.
+an.book_exit.2 = {move} is de eerste zet buiten het openingsboek.
+an.book_exit.3 = Hier eindigt de openingstheorie, met {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} is een blunder.
+an.blunder.2 = Hier is {move} een zware fout.
+an.blunder.3 = Een blunder: {move}.
+an.mistake = {move} is een fout.
+an.mistake.2 = {move} is hier niet de juiste zet.
+an.mistake.3 = Een fout: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} laat de kans liggen om die fout af te straffen.
+an.missed_chance.2 = Met {move} glipt de kans weg.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Nu is {reply:nomate} schaakmat.
+an.mate_allowed.one.2 = Dit laat {reply:nomate} toe, en dat is schaakmat.
+an.mate_allowed = Dit laat een geforceerd mat in {m} toe, te beginnen met {reply:nomate}.
+an.mate_allowed.2 = Nu is er een geforceerd mat in {m}, beginnend met {reply:nomate}.
+an.fork = Nu volgt {reply}, een vork op {t1} en {t2}.
+an.fork.2 = Dit laat {reply} toe, met een aanval op {t1} en {t2} tegelijk.
+an.fork.3 = {reply} valt {t1} en {t2} tegelijk aan.
+an.hanging = Dit laat {piece} ongedekt staan, en {reply} slaat {piece:obj}.
+an.hanging.2 = {piece} heeft geen verdediger meer: {reply} wint {piece:obj}.
+an.hanging.3 = {reply} slaat gewoon {piece}, {piece:rel} geen verdediger had.
+an.material = Het antwoord {line} wint {pts:point} aan materiaal.
+an.material.2 = {line} wint dan {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} was schaakmat.
+an.mate_missed.one.2 = {best:nomate} was schaakmat geweest.
+an.mate_missed = {best:nomate} had mat in {m} geforceerd.
+an.mate_missed.2 = Er was een geforceerd mat in {m}, te beginnen met {best:nomate}.
+an.missed_capture = {best} had {piece} gratis gewonnen.
+an.missed_capture.2 = {piece} had geen verdediger: {best} had {piece:obj} geslagen.
+an.missed_fork = {best} had een vork gezet op {t1} en {t2}.
+an.missed_fork.2 = {best} was een vork, met een aanval op {t1} en {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} was sterker.
+an.better.2 = Beter was {best}.
+an.better.3 = {best} was nauwkeuriger.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} is briljant: de zet geeft {piece} weg!
+an.brilliant.2 = Een briljant offer! {move} offert {piece}.
+an.brilliant.3 = {move}! Een briljante zet, die {piece} offert.
+an.brilliant.mate = Die zet leidt tot een geforceerd mat in {m}.
+an.brilliant.mate.2 = En hij forceert mat in {m}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} is de enige zet die het voordeel behoudt.
+an.only.win.2 = Alleen {move} houdt hier het voordeel vast. Goed gevonden.
+an.only.hold = {move} is de enige zet die het evenwicht bewaart.
+an.only.hold.2 = Alleen {move} houdt de stelling hier overeind.
+an.only.defend = {move} is de enige zet die de strijd gaande houdt.
+an.only.defend.2 = Alleen {move} houdt de partij hier in leven. Goed verdedigd.
+an.only.best = {move} is hier verreweg de sterkste zet.
+an.only.best.2 = Nauwkeurig: {move} is veel sterker dan al het andere.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} is wat onnauwkeurig: {best} was nauwkeuriger.
+an.inaccuracy.2 = Niet helemaal de beste: {best} was preciezer dan {move}.
+an.interesting = {move} is een interessant idee, dat {piece} offert.
+an.interesting.2 = Een interessante poging: {move} geeft {piece} weg.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Wit heeft nu een geforceerd mat in {m}.
+an.mate_on.white.2 = Vanaf hier kan Wit mat in {m} forceren.
+an.mate_on.black = Zwart heeft nu een geforceerd mat in {m}.
+an.mate_on.black.2 = Vanaf hier kan Zwart mat in {m} forceren.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Schaakmat. Wit wint de partij.
+an.end.mate.white.2 = En dat is schaakmat: Wit wint.
+an.end.mate.black = Schaakmat. Zwart wint de partij.
+an.end.mate.black.2 = En dat is schaakmat: Zwart wint.
+an.end.resigned.white = Zwart heeft opgegeven, dus Wit wint de partij.
+an.end.resigned.white.2 = De partij eindigt hier: Zwart geeft op, en Wit wint.
+an.end.resigned.black = Wit heeft opgegeven, dus Zwart wint de partij.
+an.end.resigned.black.2 = De partij eindigt hier: Wit geeft op, en Zwart wint.
+an.end.timeout.white = De tijd van Zwart is op, dus Wit wint.
+an.end.timeout.white.2 = Wit wint op tijd.
+an.end.timeout.black = De tijd van Wit is op, dus Zwart wint.
+an.end.timeout.black.2 = Zwart wint op tijd.
+an.end.win.white = De partij eindigt met een overwinning voor Wit.
+an.end.win.white.2 = Wit wint de partij.
+an.end.win.black = De partij eindigt met een overwinning voor Zwart.
+an.end.win.black.2 = Zwart wint de partij.
+an.end.stalemate = Pat: de partij is remise.
+an.end.stalemate.2 = Het is pat, dus de partij eindigt in remise.
+an.end.draw.agreement = De spelers spraken remise af.
+an.end.draw.agreement.2 = De partij eindigt in remise, in onderling overleg.
+an.end.draw.repetition = De partij is remise door zetherhaling.
+an.end.draw.repetition.2 = Dezelfde stelling kwam opnieuw op het bord: remise.
+an.end.draw.fifty = De partij is remise volgens de vijftigzettenregel.
+an.end.draw.fifty.2 = Vijftig zetten zonder slaan of pionzet: remise.
+an.end.draw.seventy_five = De partij is remise volgens de vijfenzeventigzettenregel.
+an.end.draw.seventy_five.2 = Vijfenzeventig zetten zonder slaan of pionzet: remise.
+an.end.draw.material = Mat zetten is niet meer mogelijk: de partij is remise.
+an.end.draw.material.2 = Geen van beide kanten kan nog mat zetten, dus het is remise.
+an.end.draw = De partij eindigt in remise.
+an.end.draw.2 = Remise.
+an.end.unfinished = De partij stopt hier, niet uitgespeeld.
+an.end.unfinished.2 = Hier stopt de partij: ze was nog niet afgelopen.
+an.end.accuracy = Nauwkeurigheid: {acc_white} procent voor Wit, {acc_black} voor Zwart.
+an.end.accuracy.2 = Wit speelde met {acc_white} procent nauwkeurigheid, Zwart met {acc_black}.
+an.end.clean.white = Wit maakte geen fouten of blunders.
+an.end.clean.white.2 = Het spel van Wit bleef vrij van ernstige fouten.
+an.end.clean.black = Zwart maakte geen fouten of blunders.
+an.end.clean.black.2 = Het spel van Zwart bleef vrij van ernstige fouten.
+an.end.mistakes.white = Wit maakte {n:mistake}, en geen blunder.
+an.end.mistakes.white.2 = Voor Wit: {n:mistake}, geen blunder.
+an.end.mistakes.black = Zwart maakte {n:mistake}, en geen blunder.
+an.end.mistakes.black.2 = Voor Zwart: {n:mistake}, geen blunder.
+an.end.blunders.white = Wit maakte {m:blunder}.
+an.end.blunders.white.2 = Voor Wit: {m:blunder}.
+an.end.blunders.black = Zwart maakte {m:blunder}.
+an.end.blunders.black.2 = Voor Zwart: {m:blunder}.
+an.end.errors.white = Wit maakte {n:mistake} en {m:blunder}.
+an.end.errors.white.2 = Voor Wit: {n:mistake} en {m:blunder}.
+an.end.errors.black = Zwart maakte {n:mistake} en {m:blunder}.
+an.end.errors.black.2 = Voor Zwart: {n:mistake} en {m:blunder}.

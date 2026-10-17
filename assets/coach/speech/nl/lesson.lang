@@ -1,0 +1,268 @@
+# Coach speech (Dutch): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("je toren", "mijn paard"), with
+# the forms of common.lang: {your:subj} = hij / het / ze, {my:obj} = hem / het / haar, {my:poss} =
+# zijn / haar, so that every sentence fits whatever piece the program passes.
+# {sq}, {sq2}, {to}, {esc} = squares; {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach
+# points at something while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: the letters a, e, h and L said by their names).
+# Terms: file = lijn, rank = rij, back rank = achterste rij (KNSB usage, as the glossary).
+
+# ---- Chapter titles (said inside "We gaan verder met {chapter}.") ------------------------------------
+# Lower-case noun phrases that fit after "met", "bij" and a colon (event.lesson.* in events.lang).
+lesson.title.welcome = het schaakbord
+lesson.title.pieces = de gang van de stukken
+lesson.title.safety = veilig en onveilig slaan
+lesson.title.check = schaak geven
+lesson.title.mate = mat zetten
+lesson.title.castling = de rokade
+lesson.title.en_passant = en passant slaan
+lesson.title.promotion = promotie
+lesson.title.draws = pat en remise
+lesson.title.etiquette = echte partijen: rating, klok en omgangsvormen
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Probeer het nu zelf.
+lesson.now_you.2 = Nu is het jouw beurt.
+lesson.now_you.3 = Nu jij.
+# Another wrong move after the demonstration.
+lesson.almost = Bijna! Speel de zet die ik je liet zien.
+lesson.almost.2 = Niet helemaal. Probeer de zet uit mijn voorbeeld.
+lesson.almost.3 = Dichtbij. Denk aan wat ik je net liet zien.
+# A wrong move without a line of its own.
+lesson.try_again = Dat is het niet. Probeer het nog eens.
+lesson.try_again.2 = Deze niet. Probeer het opnieuw.
+lesson.try_again.3 = Laten we het nog een keer proberen.
+lesson.use_your = Gebruik {your}.
+lesson.use_your.2 = Probeer het met {your}.
+lesson.watch = Kijk goed.
+lesson.like_this = Zo gaat dat.
+lesson.and_back = En weer terug.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Schaak, maar mijn koning ontsnapt naar {esc}.
+lesson.check_takes = Schaak, maar mijn koning slaat gewoon {your}.
+lesson.check_block = Schaak, maar ik kan er een stuk tussen zetten.
+lesson.stalemate = Pat! Mijn koning kan niet bewegen en staat niet schaak. Remise, terwijl je gewonnen stond!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Niet naar {sq}: {my} valt dat veld aan. Een koning gaat nooit naar een aangevallen veld.
+why.PathBlocked = Er staat iets in de {@}weg: stukken kunnen niet springen, behalve het paard.
+why.WrongGeometry = Zo beweegt {your} niet.
+why.MustAnswerCheck = Je staat {@}schaak: dat moet je eerst opheffen.
+why.CastlingThroughCheck = Je koning zou over {sq} gaan, en {my} valt dat veld aan.
+why.CastlingNoRights = Die koning of die toren heeft al bewogen: rokeren mag niet meer.
+why.CastlingBlocked = Voor de rokade moeten de velden tussen de koning en de toren leeg zijn.
+why.CastlingOutOfCheck = Je mag niet rokeren als je schaak staat.
+why.PawnForwardBlocked = Pionnen kunnen niet recht vooruit slaan: dat veld is {@}geblokkeerd.
+why.LeavesKingInCheck = {your} staat gepend: als je {your:obj} verplaatst, staat je koning schaak door {my}.
+why.OwnPieceOnTarget = Je kunt niet op je eigen stuk gaan staan.
+why.PawnCaptureNeedsVictim = Een pion gaat alleen schuin als hij slaat.
+why.EnPassantExpired = En passant slaan mag alleen direct na de dubbele stap van de pion.
+why.NotYourTurn = Wacht even: ik ben aan zet.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Hallo! Ik ben je coach. Laten we samen de schaakregels leren, stap voor stap.
+lesson.welcome.board = Dit is het schaakbord: vierenzestig velden, licht en donker, acht bij acht.
+lesson.welcome.light = Het hoekveld aan je {@}rechterkant is altijd een licht veld. Onthoud: rechtsonder licht.
+# Dutch "rij" is already the plain word for a row, so the lines say what the ranks are, not what
+# they are called.
+lesson.welcome.files = De kolommen heten lijnen. Ze hebben letters, van {@}a tot {@2}h.
+lesson.welcome.files.spoken = De kolommen heten lijnen. Ze hebben letters, van {@}aa tot {@2}ha.
+lesson.welcome.ranks = De rijen lopen van links naar rechts. Ze hebben cijfers, van {@}één tot {@2}acht, te beginnen aan jouw kant.
+lesson.welcome.square = Elk veld heeft een naam: eerst de letter, dan het cijfer. Dit veld is {sq}.
+lesson.welcome.square2 = En dit is {sq}.
+lesson.welcome.kings = Dit zijn de twee koningen. De jouwe staat op {sq}, de mijne op {sq2}.
+lesson.welcome.ask = Jouw beurt: zet je koning één veld vooruit, naar {sq}.
+lesson.welcome.wrong = Dat is {to}. We moeten naar {sq}: letter e, cijfer twee.
+lesson.welcome.wrong.spoken = Dat is {to}. We moeten naar {sq}: letter ee, cijfer twee.
+lesson.welcome.ok = Perfect. Je koning staat op {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Dit is {your}. {your:subj} beweegt in rechte banen, over lijnen en rijen, zo ver als je wilt.
+lesson.rook.lines = Omhoog over de lijn, {@}of opzij over de rij.
+lesson.rook.capture = Slaan doe je door op het veld van een {@}vijandelijk stuk te gaan staan. Dat stuk gaat dan van het bord.
+lesson.rook.ask = Sla {my} met je toren!
+lesson.rook.short = Goede richting! Ga verder de lijn op, helemaal tot {my}.
+lesson.rook.rank = Dat gaat over de rij. {my} staat hogerop, op de lijn.
+lesson.rook.king = Dat is je koning. Gebruik {your}, in de hoek.
+lesson.rook.ok = Geslagen! {my} gaat van het bord.
+# Pieces don't jump
+lesson.jump.blocked = Stukken kunnen niet over andere stukken heen springen. Je pion op {sq} verspert de toren de weg.
+lesson.jump.knight = Alleen het paard kan springen. Dat leer je zo kennen.
+# Bishop
+lesson.bishop.intro = Dit is {your}. {your:subj} beweegt schuin, zo ver als je wilt.
+lesson.bishop.colour = Een loper blijft altijd op velden van dezelfde kleur.
+lesson.bishop.ask = {my} staat op de diagonaal van je loper. Sla {my:obj}!
+lesson.bishop.short = Goede diagonaal! Ga verder, tot je bij {my} bent.
+lesson.bishop.other = Dat is de andere diagonaal. Kijk in de richting van {my}.
+lesson.bishop.ok = Uitstekend. Lopers houden van lange diagonalen.
+# Queen
+lesson.queen.intro = Dit is {your}, het sterkste stuk. {your:subj} beweegt als een toren en een loper samen.
+lesson.queen.ask = Zoek {my} en sla {my:obj} met je dame.
+lesson.queen.wrong = Je dame kan {my} in één zet bereiken, over een diagonaal.
+lesson.queen.ok = Goed gedaan! Houd je dame veilig: ze is veel waard.
+# King
+lesson.king.intro = De koning beweegt maar één veld, in alle richtingen.
+lesson.king.important = De koning is het belangrijkste stuk. Als hij gevangen zit, is de partij verloren.
+lesson.king.ask = De koning kan ook slaan. Sla {my}!
+lesson.king.wrong = Je koning staat vlak naast {my}. Ga op {my:poss} veld staan om {my:obj} te slaan.
+lesson.king.ok = Goed! De koning is langzaam, maar van dichtbij sterk.
+# Knight
+lesson.knight.intro = Dit is {your}. {your:subj} beweegt in de vorm van een L: twee velden rechtdoor, dan één opzij.
+lesson.knight.intro.spoken = Dit is {your}. {your:subj} beweegt in de vorm van een el: twee velden rechtdoor, dan één opzij.
+lesson.knight.l = Op {@}deze manier. Het paard komt altijd terecht op een veld van de andere kleur.
+lesson.knight.jump = Het paard is het enige stuk dat over andere stukken heen kan springen.
+lesson.knight.ask = Sla {my} met je paard!
+lesson.knight.wrong = Dat is een echte paardenzet, maar die komt niet bij {my}. Probeer een andere L.
+lesson.knight.wrong.spoken = Dat is een echte paardenzet, maar die komt niet bij {my}. Probeer een andere el.
+lesson.knight.ok = Mooie sprong!
+# Pawn: moving
+lesson.pawn.intro = Nu {your}. {your:subj} gaat recht vooruit, één veld per keer, en nooit achteruit.
+lesson.pawn.first = Bij zijn eerste zet mag een pion één of twee velden vooruit.
+lesson.pawn.ask = Zet je pion twee velden vooruit.
+lesson.pawn.one = Dat is één veld: dat mag, maar ga deze keer twee velden vooruit.
+lesson.pawn.use = Gebruik de pion.
+lesson.pawn.ok = Goed.
+# Pawn: capturing
+lesson.pawncap.blocked = Mijn pion blokkeert de jouwe. Pionnen kunnen niet recht vooruit slaan.
+lesson.pawncap.diagonal = Maar een pion slaat schuin, één veld vooruit.
+lesson.pawncap.ask = Sla {my} met je pion.
+lesson.pawncap.use = Gebruik {your}: {your:subj} slaat schuin vooruit.
+lesson.pawncap.ok = Ja! Rechtdoor om te lopen, schuin om te slaan.
+# Values, set-up and the first moves
+lesson.values.pawn = Elk stuk heeft een waarde in punten. Een pion is één punt waard.
+lesson.values.pieces = Een paard of een {@}loper: drie. Een {@2}toren: vijf. De {@3}dame: negen.
+lesson.values.king = De koning is onbetaalbaar: die kun je nooit weggeven.
+lesson.values.trade = Probeer nooit een stuk weg te geven voor minder dan het waard is.
+lesson.setup.corners = Elke partij begint zo: de torens in de {@}hoeken, dan de {@2}paarden, dan de {@3}lopers.
+lesson.setup.queen = De dame staat op haar eigen kleur: je dame staat op een licht veld.
+lesson.setup.king = De koning staat naast haar. Wit begint altijd.
+lesson.first.ask = Begin de partij: zet de pion voor je koning twee velden vooruit, naar {sq}.
+lesson.first.wrong = Dat is ook een legale zet! Maar speel nu even je koningspion naar {sq}.
+lesson.first.ok = Een prima eerste zet: hij maakt de weg vrij voor je dame en je loper.
+lesson.first.reply = Ik antwoord op dezelfde manier. Breng nu een paard in het spel: spring van {sq} naar {sq2}.
+lesson.first.knight_wrong = Paarden springen over de pionnen heen. Probeer het van {sq} naar {sq2}.
+lesson.first.knight_ok = Perfect. Paarden en lopers komen vroeg in het spel.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Een stuk is gedekt als een eigen stuk kan terugslaan.
+lesson.safety.pawn = Mijn {@}pion dekt {my}.
+lesson.safety.free = Maar {my} heeft geen verdediger. Je dame valt beide stukken aan.
+lesson.safety.ask = Sla het ongedekte stuk!
+lesson.safety.watch = Kijk wat er gebeurt.
+lesson.safety.gave = Je hebt je dame, die negen waard is, gegeven voor mijn paard, dat drie waard is.
+lesson.safety.other = Probeer het andere stuk.
+lesson.safety.look = Zoek het stuk dat door niets gedekt wordt.
+lesson.safety.ok = Uitstekend! Vraag je altijd af: is dat stuk gedekt?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+# "Het schaak opheffen" is the Dutch term for getting out of check.
+lesson.danger.rank = Mijn toren beheerst de hele tweede rij.
+lesson.danger.rule = Een koning mag nooit naar een veld waar hij geslagen kan worden.
+lesson.danger.ask = Zet je koning op een veilig veld.
+lesson.danger.ok = Juist. Daar staat je koning veilig.
+lesson.check.what = Mijn toren valt je koning aan. Dat heet schaak.
+lesson.check.must = Als je schaak staat, moet je het schaak meteen opheffen.
+lesson.check.ways = Dat kan op drie manieren: {@}de koning verplaatsen, {@2}de aanval blokkeren, of {@3}de aanvaller slaan.
+lesson.check.ask = Breng je koning hier uit het schaak.
+lesson.check.file = {to} ligt nog op de lijn van {@}mijn toren. Stap van die lijn af.
+lesson.check.ok = Goed: je staat niet meer schaak.
+lesson.block.again = Weer schaak! Deze keer heeft je koning geen vrij veld.
+lesson.block.ask = Blokkeer dan de aanval: zet er een stuk tussen.
+lesson.block.queen = Dat blokkeert! Maar mijn toren zou je dame kunnen slaan. Blokkeer met een goedkoper stuk.
+lesson.block.queen_ok = Het werkt. Onthoud: blokkeer met je goedkoopste stuk.
+lesson.block.ok = Perfect. Blokkeer met je minst waardevolle stuk.
+lesson.capture.check = Mijn dame geeft schaak, vlak naast je koning.
+lesson.capture.ask = Sla de aanvaller!
+lesson.capture.king_ok = Ja! Mijn dame had geen verdediger, dus je koning kon haar slaan.
+lesson.capture.knight_ok = Ja! Je paard heeft de aanvaller uitgeschakeld.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Schaakmat: de koning staat schaak en heeft geen uitweg. Daarmee is de partij gewonnen.
+lesson.mate1.stuck = Mijn koning zit vast achter zijn {@}eigen pionnen.
+lesson.mate1.ask = Zet me mat in één zet!
+lesson.mate1.wrong = Bijna! Geef schaak op mijn achterste rij, waar mijn koning niet kan ontsnappen.
+lesson.mate1.ok = Schaakmat! Dat is mat op de achterste rij. Onthoud het goed!
+lesson.mate2.ask = Je koning en je dame werken samen. Zet me mat in één zet.
+lesson.mate2.wrong = Zoek een schaak dat mijn koning geen enkel veld laat.
+lesson.mate2.ok = Schaakmat! Je koning dekt de dame, dus de mijne kan haar niet slaan.
+lesson.mate2.ok_rank = Schaakmat op de achterste rij! Je koning bewaakt alle velden vóór de mijne.
+lesson.mate3.edge = Je toren op de zevende rij houdt mijn koning aan de rand.
+lesson.mate3.ask = Gebruik nu {your} om mat te zetten.
+lesson.mate3.free = Schaak, maar nu is de zevende rij vrij, en mijn koning ontsnapt.
+lesson.mate3.takes = Mijn koning slaat gewoon je toren.
+lesson.mate3.hint = Geef schaak op de achterste rij met de toren die de zevende rij niet bewaakt.
+lesson.mate3.ok = Schaakmat! De twee torens werkten samen als een ladder.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Rokeren is een speciale zet die je koning in veiligheid brengt. Koning en toren bewegen samen.
+lesson.castle.how = De {@}koning gaat twee velden naar een toren toe, en de {@2}toren springt naar de andere kant van de koning.
+lesson.castle.ask = Raak altijd eerst de koning aan. Nu jij: doe de korte rokade, aan de koningskant.
+lesson.castle.rook = Zo beweeg je alleen de toren. Om te rokeren zet je de koning twee velden naar de toren toe.
+lesson.castle.long = Dat is de lange rokade, die mag ook! Rokeer deze keer naar de dichtstbijzijnde toren.
+lesson.castle.one = Eén veld is een gewone koningszet. Bij het rokeren gaat de koning twee velden.
+lesson.castle.other = Om te rokeren zet je de koning twee velden naar de toren op {sq}.
+lesson.castle.ok = Gerokeerd! Je koning zit veilig weggestopt, en je toren staat klaar om mee te doen.
+lesson.castle2.moved = Je kunt niet rokeren als je koning of die toren al eerder heeft bewogen.
+lesson.castle2.attacked = Ook niet als je schaak staat, of als je koning over een aangevallen veld gaat of erop terechtkomt.
+lesson.castle2.bishop = Mijn loper valt {sq} aan. Daarom mag je aan deze kant nu niet rokeren.
+lesson.castle2.ask = Rokeer naar de andere kant.
+lesson.castle2.other = Rokeer naar je andere toren, aan de damekant.
+lesson.castle2.ok = Goed zo! Met de lange rokade komt je koning op {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Er is een speciale manier waarop een pion kan slaan: en passant. Dat betekent "in het voorbijgaan".
+lesson.ep.watch = Kijk naar mijn pion: hij gaat twee velden vooruit en komt vlak naast de jouwe te staan.
+lesson.ep.how = Jouw pion mag hem slaan alsof hij maar één veld vooruit was gegaan: naar {sq}.
+lesson.ep.now = Maar alleen nu meteen, bij deze zet. Sla en passant!
+lesson.ep.gone = De kans is voorbij: en passant kan alleen meteen. Laten we het opnieuw proberen.
+lesson.ep.ok = En passant! Mijn pion op {sq} gaat van het bord.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Als een pion de laatste rij bereikt, promoveert hij: hij wordt een dame, toren, loper of paard.
+lesson.promo.ask = Kies bijna altijd een dame. Promoveer nu je pion!
+lesson.promo.under = Dat mag! Maar een dame is sterker. Laten we de dame kiezen.
+lesson.promo.under_ok = Prima. Toch kiezen de meeste spelers de dame.
+lesson.promo.push = Schuif je pion naar de laatste rij, naar {sq}.
+lesson.promo.ok = Een nieuwe dame! Je kunt zelfs twee dames tegelijk hebben.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Ik ben aan zet. Mijn koning staat niet schaak, maar {@}elk veld eromheen wordt aangevallen.
+lesson.stale.draw = Ik heb geen enkele legale zet. Dat is pat, en de partij is remise.
+lesson.stale2.ask = Pas op voor pat als je gewonnen staat. Zet me mat in één zet, zonder pat!
+lesson.stale2.wrong = Geef schaak op mijn achterste rij, waar mijn koning niet kan ontsnappen.
+lesson.stale2.ok = Schaakmat! Laat de vijandelijke koning altijd een zet over, tenzij je mat zet.
+lesson.draws.kings = Andere remises: als niemand nog mat kan zetten, zoals bij twee koningen alleen, is de partij remise.
+lesson.draws.agree = Spelers kunnen ook samen remise afspreken.
+lesson.draws.repeat = Ook bij drie keer dezelfde stelling, of na vijftig zetten zonder slaan of pionzet, is remise mogelijk.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Je kent nu alle schaakregels. Goed gedaan!
+lesson.talk.real = Ik vertel je hoe echte partijen gespeeld worden.
+lesson.talk.elo = Spelers hebben een rating, die Elo heet. Die gaat omhoog als je wint en omlaag als je verliest.
+lesson.talk.elo_gap = Winnen van een sterkere speler levert meer punten op; verliezen van een zwakkere kost er meer.
+lesson.talk.elo_start = Je rating verschijnt na vijf partijen met rating. Partijen met de coach zijn oefening, dus die tellen niet voor de rating.
+lesson.talk.clock = Dit is een {@}schaakklok. Elke speler heeft een eigen bedenktijd, die alleen loopt als die speler aan zet is.
+lesson.talk.press = Na je zet druk je de klok in met dezelfde hand. Dan begint mijn tijd te lopen.
+lesson.talk.flag = Als je tijd op is, verlies je, tenzij ik je onmogelijk nog mat kan zetten.
+lesson.talk.increment = Vijf plus drie betekent vijf minuten per speler, plus drie seconden na elke zet.
+lesson.talk.speeds = Korte partijen heten blitz, langere rapid, en de langste klassiek.
+lesson.talk.no_clock = Bij mij staat de klok uit. Neem alle tijd die je nodig hebt om na te denken.
+lesson.talk.touch = Als je in een echte partij een van je stukken aanraakt, moet je dat stuk ook zetten.
+lesson.talk.touch_mine = Raak je een van mijn stukken aan, dan moet je dat slaan, als dat kan.
+lesson.talk.adjust = Wil je een stuk rechtzetten zonder ermee te spelen, zeg dan eerst "ik zet recht".
+lesson.talk.release = Zodra je een stuk op een nieuw veld loslaat, is de zet gedaan.
+lesson.talk.sheet = Op toernooien schrijven beide spelers elke zet op een {@}notatieformulier.
+# {move:letters} shows the Dutch scoresheet letters ("Pf3"), which is what this line teaches.
+lesson.talk.notation = We schrijven de letter van het stuk en het veld, zoals {move:letters}. Bij een pion alleen het veld.
+lesson.talk.robot = Je robot noteert je zetten voor je. Bij snelle partijen hoef je niet te noteren.
+lesson.talk.handshake = Partijen beginnen en eindigen met een handdruk. Die betekent: goede partij, en bedankt.
+lesson.talk.polite = Of je nu wint of verliest: blijf beleefd, en stoor je tegenstander nooit terwijl die nadenkt.
+lesson.talk.tips = Drie tips voor je partijen: {@}beheers het centrum, {@2}breng je paarden en lopers in het spel, en {@3}rokeer vroeg.
+lesson.talk.next = Als je er klaar voor bent, kies dan Eerste stappen. Ik speel rustig en help je na elke fout.
+lesson.talk.welcome = Welkom in de wereld van het schaken! Laten we elkaar de hand schudden.

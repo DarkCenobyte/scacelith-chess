@@ -1,0 +1,999 @@
+# Coach speech (Brazilian Portuguese): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register (glossary/pt-BR): the coach says "você" (never "tu" or "o senhor"), "seu / sua"; the coach is
+# male. The player's gender is unknown: no adjective or participle agrees with the player (verbs are
+# fine: "você perdeu", "você tinha"); "em vantagem", "sob ataque", "sem saída" instead.
+# Pieces ({your} {your2} {my} {my2} {t1} {t2}) carry their possessive ("seu cavalo", "minha torre").
+# Forms from common.lang: {x:art} after com, para, contra, sem ("com o seu cavalo"); {x:do} {x:no}
+# {x:pelo} for de / em / por + the piece ("na frente do seu rei", "garfo no seu rei e na sua dama");
+# {x:ele} {x:dele} {x:nele} = ele / ela, dele / dela, nele / nela; {x:o} = the object pronoun before
+# a verb ("nada o defende") or after a hyphen ("Mova-o"), and the ending of a participle or adjective
+# that agrees with the piece ("cravad{your:o}", "pres{your:o}", "pendurad{your:o}"); {x:lo} after an
+# infinitive ("tomá-{your:lo}"). Two pieces together agree with "peças" ("uma das peças") or with
+# nothing ("estão sob ataque").
+# Squares take no article: "para {sq}", "em {sq}", "a casa {sq}".
+# Counted numbers: {m:move} "2 lances", {pts:point} "3 pontos", {n:time} "duas vezes", {n:attacker}
+# "3 atacantes", {n2:defender} "2 defensores", {n:square} "3 casas". A few English bare numbers take
+# their noun here ("{your} vale {n:point}"), where Portuguese needs the noun or its agreement.
+# Terms: lance, xeque, xeque-mate / mate, afogamento, garfo, ataque duplo, cravada, espeto, ataque
+# descoberto, peça pendurada / solta, peça presa, primeira fileira ("fileira de trás" at levels 1-2),
+# casa de fuga, oposição, peão passado, final de peões, par de bispos, voltar o lance.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Xeque! Meu rei está sob ataque.
+ann.check.human.b1.2 = Xeque! Você está atacando o meu rei.
+ann.check.human.b1.3 = É xeque! Meu rei precisa escapar.
+ann.check.human = Xeque.
+ann.check.human.2 = Xeque!
+ann.check.human.3 = E é xeque.
+# The coach gives check.
+ann.check.coach = Xeque!
+ann.check.coach.2 = Xeque.
+ann.check.coach.3 = E xeque!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Isso quer dizer que {your} está sob ataque. Você precisa tirá-{your:lo} do xeque.
+ann.check.coach.first.2 = Xeque quer dizer que {your} está sob ataque. Mova-{your:o}, bloqueie o xeque ou capture a minha peça.
+ann.double_check.coach = Xeque duplo! Duas peças minhas atacam o seu rei ao mesmo tempo, então ele tem que se mover.
+ann.double_check.coach.2 = É um xeque duplo: agora só um lance de rei pode ajudar você.
+ann.double_check.human = Xeque duplo! Duas peças suas atacam o meu rei ao mesmo tempo, então ele tem que se mover.
+ann.double_check.human.2 = Um xeque duplo! Agora só um lance de rei pode me salvar.
+# The player checkmates the coach.
+ann.mate.human.b1 = Xeque-mate! Você venceu! Meu rei não tem como escapar.
+ann.mate.human.b1.2 = É xeque-mate! Muito bem, você ganhou a partida!
+ann.mate.human.b1.3 = Xeque-mate! Meu rei está encurralado. Parabéns!
+ann.mate.human = Xeque-mate. Bem jogado.
+ann.mate.human.2 = É mate. Parabéns.
+ann.mate.human.3 = Xeque-mate! Belo trabalho.
+# The coach checkmates the player.
+ann.mate.coach.b1 = É xeque-mate. Seu rei não tem saída.
+ann.mate.coach.b1.2 = Xeque-mate. Seu rei está sob ataque e não pode escapar.
+ann.mate.coach.b1.3 = Sinto muito, mas é xeque-mate. Seu rei não tem como fugir.
+ann.mate.coach = Xeque-mate.
+ann.mate.coach.2 = E é mate.
+ann.mate.coach.3 = Xeque-mate, sinto muito.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Opa! Esse lance entrega alguma coisa.
+ex.verdict.blunder.b1.2 = Cuidado! Esse lance pode custar caro.
+ex.verdict.blunder.b1.3 = Ah, espere. Esse lance tem um problema.
+ex.verdict.blunder.b2 = Hum, esse lance tem um problema.
+ex.verdict.blunder.b2.2 = Esse é um erro grave.
+ex.verdict.blunder.b2.3 = Cuidado, esse lance tem um preço.
+ex.verdict.blunder.b3 = Isso é um erro grave.
+ex.verdict.blunder.b3.2 = {move} é um erro de verdade.
+ex.verdict.blunder.b3.3 = Ai, {move} é um erro grave.
+ex.verdict.blunder.b4 = {move} é um erro grave.
+ex.verdict.blunder.b4.2 = {move} é um erro sério.
+ex.verdict.blunder.b4.3 = Sinto dizer, mas isso é um erro grave.
+ex.verdict.blunder.b5 = {move} é um erro sério.
+ex.verdict.blunder.b5.2 = {move} é um erro grave.
+ex.verdict.blunder.b5.3 = {move} é um erro que custa caro.
+ex.verdict.blunder.b6 = {move} é um erro sério.
+ex.verdict.blunder.b6.2 = {move} é um erro grave.
+ex.verdict.blunder.b6.3 = {move}? Erro grave.
+# A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
+# coach's last move is what the reply carries out).
+ex.verdict.ignored.b1 = Opa! Você não respondeu à minha ameaça.
+ex.verdict.ignored.b1.2 = Cuidado! Minha ameaça ainda estava lá.
+ex.verdict.ignored.b1.3 = Ah, espere. Você esqueceu a minha ameaça.
+ex.verdict.ignored.b2 = Hum, minha ameaça ainda estava lá.
+ex.verdict.ignored.b2.2 = Você deixou a minha ameaça sem resposta.
+ex.verdict.ignored.b2.3 = Cuidado, você não respondeu à minha ameaça.
+ex.verdict.mistake.b3 = Esse não é um bom lance.
+ex.verdict.mistake.b3.2 = Hum, {move} tem um problema.
+ex.verdict.mistake.b3.3 = Isso é um erro.
+ex.verdict.mistake.b4 = {move} é um erro.
+ex.verdict.mistake.b4.2 = {move} não é bom.
+ex.verdict.mistake.b4.3 = Isso é um erro.
+ex.verdict.mistake.b5 = {move} é um erro claro.
+ex.verdict.mistake.b5.2 = {move} é um erro.
+ex.verdict.mistake.b5.3 = {move} não é bom.
+ex.verdict.mistake.b6 = {move} é um erro.
+ex.verdict.mistake.b6.2 = {move}? Um erro.
+ex.verdict.mistake.b6.3 = {move}, não.
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Nada mal, mas {best} era um pouco melhor.
+ex.verdict.inaccuracy.b3.2 = {best} era um pouco mais preciso.
+ex.verdict.inaccuracy.b3.3 = Um pequeno deslize: {best} era melhor aqui.
+ex.verdict.inaccuracy.b4 = Uma imprecisão: {best} era mais preciso.
+ex.verdict.inaccuracy.b4.2 = Uma pequena imprecisão. {best} era um pouco melhor.
+ex.verdict.inaccuracy.b4.3 = Não foi o melhor: {best} era mais exato.
+ex.verdict.inaccuracy.b5 = {move} é impreciso; {best} era mais forte.
+ex.verdict.inaccuracy.b5.2 = Um pouco impreciso. Eu teria jogado {best}.
+ex.verdict.inaccuracy.b5.3 = {best} era mais preciso que {move}.
+ex.verdict.inaccuracy.b6 = {move} é impreciso; {best}.
+ex.verdict.inaccuracy.b6.2 = Impreciso. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} era melhor.
+# Level 6, an inaccuracy at the bottom of its class (deeper searches often clear it): a hedged word.
+ex.verdict.inaccuracy.maybe = Talvez {best} fosse um pouco mais preciso.
+ex.verdict.inaccuracy.maybe.2 = Eu talvez tivesse jogado {best}.
+# A dubious move that loses material (levels 3-6): the remark alone, never "a bit better" (at level 6
+# under 6 points, the hedged word above unless a piece is lost).
+ex.verdict.dubious = Esse lance parece duvidoso.
+ex.verdict.dubious.2 = Esse lance me parece duvidoso.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ah, espere! Você deixou passar uma coisa boa.
+ex.verdict.missed.b1.2 = Olhe de novo! Havia algo melhor.
+ex.verdict.missed.b1.3 = Espere aí, você tinha uma chance!
+ex.verdict.missed.b2 = Você deixou passar uma chance aí.
+ex.verdict.missed.b2.2 = Hum, havia algo melhor.
+ex.verdict.missed.b2.3 = Espere, você tinha um ótimo lance aí.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = Melhor era {best}.
+ex.better.b3.2 = {best} era o melhor lance.
+ex.better.b3.3 = Em vez disso, {best} era bom.
+ex.better.b4 = {best} era mais forte.
+ex.better.b4.2 = {best} era o lance certo.
+ex.better.b4.3 = Melhor era {best}.
+ex.better.b5 = {best}, com a ideia {line}.
+ex.better.b5.2 = O lance era {best}: {line}.
+ex.better.b5.3 = Melhor era {best}, seguido de {line}.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Em vez disso, {best}: {eval}.
+ex.better.b6.3 = {best} dava {eval}.
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at), said before the takeback offer; the move
+# itself is not named. ex.hint.move: the same without the piece.
+ex.hint.b1 = Havia um lance melhor com {your:art}.
+ex.hint.b1.2 = {your} tinha um lance melhor.
+ex.hint.b2 = {your} tinha um lance melhor.
+ex.hint.b2.2 = Havia um lance melhor com {your:art}.
+ex.hint.b3 = {your} tinha um lance melhor.
+ex.hint.b3.2 = Havia algo melhor com {your:art}.
+ex.hint.b4 = {your} tinha um lance melhor.
+ex.hint.b4.2 = Olhe de novo para {your:art}: {your:ele} tinha algo melhor.
+ex.hint.b5 = {your} tinha um lance mais forte.
+ex.hint.b5.2 = Havia um lance mais forte com {your:art}.
+ex.hint.b6 = {your} tinha coisa melhor.
+ex.hint.b6.2 = Olhe de novo para {your:art}.
+ex.hint.move = Havia um lance melhor.
+ex.hint.move.2 = Você tinha um lance melhor aí.
+# The same when the better move plainly wins material for good (the move played wins and loses
+# none); the move is still not named.
+ex.hint.gain.b1 = {your} tinha um lance melhor. Esse lance ganha material.
+ex.hint.gain.b1.2 = Havia um lance melhor com {your:art}. Esse lance ganha material.
+ex.hint.gain.b2 = {your} tinha um lance melhor. Esse lance ganha material.
+ex.hint.gain.b2.2 = Havia um lance com {your:art} que ganha material.
+ex.hint.gain.b3 = {your} tinha um lance melhor, que ganha material.
+ex.hint.gain.b3.2 = Havia um lance com {your:art} que ganha material.
+ex.hint.gain.b4 = {your} tinha um lance que ganha material.
+ex.hint.gain.b4.2 = Olhe de novo para {your:art}: {your:ele} tinha um lance que ganha material.
+ex.hint.gain.b5 = {your} tinha um lance mais forte, que ganha material.
+ex.hint.gain.b5.2 = Havia um lance com {your:art} que ganha material.
+ex.hint.gain.b6 = {your} tinha um lance que ganha material.
+ex.hint.gain.b6.2 = Olhe de novo para {your:art}: havia material para ganhar.
+# Levels 1-2: the better move as the piece and its square, said when the offer is declined (or
+# when none can be made); levels 3-6 say ex.better.
+ex.reveal.b1 = O melhor lance era levar {your:art} para {sq}.
+ex.reveal.b1.2 = {your} podia ir para {sq}. Isso era melhor.
+ex.reveal.b2 = Levar {your:art} para {sq} era o melhor lance.
+ex.reveal.b2.2 = O melhor lance era jogar {your:art} para {sq}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Vamos colocar as peças de volta.
+ex.rewind.b1.2 = Agora vou colocar tudo de volta onde estava.
+ex.rewind.b1.3 = Vou recolocar as peças no lugar.
+ex.rewind.b2 = Vamos colocar tudo de volta.
+ex.rewind.b2.2 = De volta para onde estávamos.
+ex.rewind.b2.3 = Vou colocar as peças de volta.
+ex.rewind.b3 = De volta à partida.
+ex.rewind.b3.2 = Vamos voltar.
+ex.rewind.b3.3 = De volta à posição.
+ex.rewind.b4 = De volta à partida.
+ex.rewind.b4.2 = Voltando.
+ex.rewind.b4.3 = Vamos voltar.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Você quer tentar outro lance?
+ex.offer.b1.2 = Quer voltar esse lance e tentar de novo?
+ex.offer.b1.3 = Vamos tentar um lance diferente?
+ex.offer.b2 = Gostaria de tentar outro lance?
+ex.offer.b2.2 = Quer voltar o lance?
+ex.offer.b2.3 = Quer tentar de novo?
+ex.offer.b3 = Gostaria de voltar o lance?
+ex.offer.b3.2 = Quer tentar de novo?
+ex.offer.b3.3 = Voltar o lance?
+ex.offer.b4 = Voltar o lance?
+ex.offer.b4.2 = Quer voltar o lance?
+ex.offer.b4.3 = Quer tentar outro lance?
+ex.offer.b5 = Voltar?
+ex.offer.b5.2 = Quer voltar o lance?
+ex.offer.b5.3 = Voltar o lance?
+ex.offer.b6 = Voltar?
+ex.offer.b6.2 = Voltar o lance?
+ex.offer.b6.3 = Tentar de novo?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = Esse lance é duvidoso. Será que você consegue algo melhor?
+ex.dubious.b1.2 = Esse lance é duvidoso. Será que você encontra um melhor?
+ex.dubious.b2 = Um lance duvidoso. Será que dá para fazer melhor?
+ex.dubious.b2.2 = Esse lance é duvidoso. Será que existe algo melhor?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Depois, {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} vai para {sq}.
+demo.my.move.2 = Eu jogo {my} para {sq}.
+demo.my.move.3 = Depois, {my} vai para {sq}.
+demo.my.take = Eu capturo {your}.
+demo.my.take.2 = {my} toma {your}.
+demo.my.take.3 = E eu capturo {your}.
+demo.my.check = {my} vai para {sq}. Xeque.
+demo.my.check.2 = Xeque, com {my:art} em {sq}.
+demo.my.check.3 = {my} para {sq}, xeque!
+demo.my.mate = {my} vai para {sq}. Xeque-mate.
+demo.my.mate.2 = E {my} vai para {sq}: xeque-mate.
+demo.my.mate.3 = {my} para {sq}. Isso é xeque-mate.
+# Levels 1-3, the coach's in-between move: a capture, a check or a quiet move played first while a
+# bigger piece of the player's ({t1}) is attacked; the next move of the coach's takes it.
+demo.my.first.take = Primeiro, {my} toma {your}. {t1} pode esperar.
+demo.my.first.take.2 = {my} toma {your} primeiro. {t1} vai continuar lá.
+demo.my.first.check = {my} toma {your}, e é xeque! {t1} pode esperar.
+demo.my.first.check.2 = Primeiro {my} toma {your}, com xeque. {t1} vai continuar lá.
+demo.my.first.check_move = Primeiro, xeque com {my:art} em {sq}. {t1} pode esperar.
+demo.my.first.check_move.2 = {my} vai para {sq}: primeiro o xeque! {t1} vai continuar lá.
+demo.my.first.move = Primeiro, {my} vai para {sq}. {t1} pode esperar.
+demo.my.first.move.2 = {my} para {sq} primeiro. {t1} vai continuar lá.
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my} está sob ataque, então {my:ele} toma {your} primeiro.
+demo.my.first.attacked.2 = {my} está sendo atacad{my:o}: {my:ele} pega {your} antes.
+# Levels 4-6, the same in-between move.
+demo.first = {move} primeiro: {t1} pode esperar.
+demo.first.2 = Primeiro, {move}. {t1} vai continuar lá.
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = Agora eu jogo o meu lance.
+demo.play_on.2 = Aqui está o meu lance de verdade.
+demo.play_on.3 = E agora, o meu lance para valer.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Você levaria {your:art} para {sq}.
+demo.your.move.2 = Digamos que você leve {your:art} para {sq}.
+demo.your.move.3 = Depois, {your} vai para {sq}.
+demo.your.take = Você capturaria {my}.
+demo.your.take.2 = Você toma {my} com {your:art}.
+demo.your.take.3 = Depois, você captura {my}.
+demo.your.back = Você retoma.
+demo.your.back.2 = Você retoma em {sq}.
+demo.your.back.3 = E você retoma.
+demo.your.king = Seu rei tem que se mover.
+demo.your.king.2 = O rei precisa sair dali, para {sq}.
+demo.your.king.3 = Seu rei foge para {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Agora {t1} não tem mais salvação.
+ex.point.piece.2 = E {t1} está perdid{t1:o}.
+ex.point.piece.3 = {t1} cai em seguida.
+ex.point.two = {t1} e {t2} estão sob ataque: uma das duas peças vai cair.
+ex.point.two.2 = Agora eu ataco {t1} e {t2}. Você não consegue salvar as duas peças.
+ex.point.mate = E agora {reply:nomate} é xeque-mate.
+ex.point.mate.2 = Em seguida vem {reply:nomate}, e é xeque-mate.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Viu? Agora você perdeu {pts:point}.
+ex.result.b1.2 = É assim que você perde {pts:point}.
+ex.result.b2 = No fim, você perdeu {pts:point}.
+ex.result.b2.2 = Agora você está com {pts:point} a menos.
+ex.result.b3 = Isso custa {pts:point} para você.
+ex.result.b3.2 = Você termina com {pts:point} a menos.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Você pode tomar algo de volta, mas ainda fica com {pts:point} a menos.
+ex.result_back.b1.2 = Você pode recuperar um pouco, mas ainda assim perdeu {pts:point}.
+ex.result_back.b2 = Você pode recuperar uma parte, mas ainda fica com {pts:point} a menos.
+ex.result_back.b2.2 = Mesmo depois de retomar, você perdeu {pts:point}.
+ex.result_back.b3 = Mesmo depois da sua retomada, você está com {pts:point} a menos.
+ex.result_back.b3.2 = Você recupera alguma coisa, mas isso ainda custa {pts:point}.
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}. Levels 1-2 name the pieces,
+# from level 3 the moves.
+ex.retake.b1 = Se {your2} retomar, {my} toma {your}.
+ex.retake.b1.2 = Você não pode retomar com {your2:art}: aí {my} toma {your}.
+ex.retake.b2 = Se {your2} retomar, {my} toma {your}.
+ex.retake.b2.2 = Retomar com {your2:art} não funciona: {my} toma {your}.
+ex.retake.b3 = Se você retomar com {move}, {reply} toma {your}.
+ex.retake.b3.2 = Retomar com {move} não dá certo: {reply} toma {your}.
+ex.retake.b4 = {move} falha por causa de {reply}, que toma {your}.
+ex.retake.b4.2 = E se {move}, vem {reply}, que toma {your}.
+ex.retake.b5 = A retomada {move} esbarra em {reply}, e {your} cai.
+ex.retake.b5.2 = {move} falha diante de {reply}: {your} cai.
+ex.retake.b6 = {move}? {reply} toma {your}.
+ex.retake.b6.2 = {move} falha: {reply} toma {your}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = E aqui, em {sq}, você ganharia uma nova dama.
+demo.promote.2 = Depois {your} chega à casa {sq} e vira dama.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Cuidado: {my} pode ir para {sq}, e isso é xeque-mate.
+ex.mate_allowed.b1.2 = Agora {my} pode ir para {sq}. Seria xeque-mate!
+ex.mate_allowed.b1.3 = Cuidado! Se {my} for para {sq}, é xeque-mate.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Esse lance me permite dar mate {your:no} em {m:move}.
+ex.mate_allowed.b2.2 = Agora eu posso dar mate {your:no} em {m:move}. Veja.
+ex.mate_allowed.b2.3 = Cuidado! {your} está em perigo: mate em {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Isso permite mate em {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = Depois disso, eu tenho mate em {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = Seu rei leva mate: {line:nomate}.
+ex.mate_allowed.b4 = {move} permite um mate forçado: {line:nomate}.
+ex.mate_allowed.b4.2 = Isso leva direto a um mate em {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = Depois de {move}, {line:nomate} é mate.
+ex.mate_allowed.b5 = {move} permite um mate forçado em {m:move}.
+ex.mate_allowed.b5.2 = Isso leva direto a um mate em {m:move}.
+ex.mate_allowed.b5.3 = Agora há um mate forçado em {m:move}.
+ex.mate_allowed.b6 = Mate em {m}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mate.
+ex.mate_allowed.b6.3 = É mate depois de {line:nomate}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Veja: {your} não tem mais nenhuma casa para escapar.
+ex.mate_allowed.tail.b1.2 = Viu? {your} está sob ataque e não pode fugir.
+ex.mate_allowed.tail.b1.3 = {your} não tem para onde ir. Isso é xeque-mate.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below. Every
+# name starts with the masculine "mate" and has no article: the second line supplies "o".
+ex.mate_allowed.pattern = Esse padrão se chama {text}.
+ex.mate_allowed.pattern.2 = Guarde bem este: é o {text}.
+ex.mate_allowed.tip.b3 = Antes de cada lance, verifique se o seu rei continua seguro.
+ex.mate_allowed.tip.b3.2 = Pergunte sempre: depois do meu lance, meu rei pode levar mate?
+
+name.pattern.back_rank = mate do corredor
+name.pattern.smothered = mate sufocado
+name.pattern.support = mate da dama protegida
+name.pattern.ladder = mate da escada
+name.pattern.epaulette = mate da dragona
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Com {best:nomate}, você podia ter dado xeque-mate {my:no}!
+ex.mate_missed.b1.2 = {best:nomate} era xeque-mate! {my} não teria como escapar.
+ex.mate_missed.b1.3 = Olhe! {best:nomate} teria dado xeque-mate {my:no}.
+ex.mate_missed.b2 = Você tinha mate em {m:move}, começando com {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} era xeque-mate em {m:move}!
+ex.mate_missed.b2.3 = Você podia ter me dado mate com {best:nomate}.
+ex.mate_missed.b3 = Você deixou passar um mate em {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} dá mate em {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = Havia um mate em {m:move}, começando com {best:nomate}.
+ex.mate_missed.b4 = Mate perdido: {line:nomate}, começando com {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} forçava mate em {m:move}.
+ex.mate_missed.b4.3 = Você tinha mate em {m:move} com {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} dá mate em {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = Mate em {m:move} perdido, começando com {best:nomate}.
+ex.mate_missed.b5.3 = Havia um mate forçado: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} dá mate: {line:nomate}.
+ex.mate_missed.b6.2 = Mate em {m} com {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mate em {m}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Mais rápido era {best:nomate}: mate em {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} dava mate antes, em {m:move}.
+ex.mate_delayed.b6 = {best:nomate} dá mate em {m}.
+ex.mate_delayed.b6.2 = Mais rápido: {best:nomate}, mate em {m}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ah, não! {my} não pode se mover e não está em xeque. Isso é afogamento: empate.
+ex.stalemate.b1.2 = Veja: {my} não tem nenhuma casa segura, mas não está em xeque. É empate!
+ex.stalemate.b1.3 = Isso é afogamento. {my} não pode se mover, então a partida é empate.
+ex.stalemate.b2 = Afogamento! {my} não tem lance legal, e não é xeque. Empate.
+ex.stalemate.b2.2 = Ah, não, afogamento: {my} está sem saída, mas não está em xeque.
+ex.stalemate.b2.3 = Isso é empate por afogamento. {my} não pode se mover.
+ex.stalemate.b3 = Isso é afogamento: {my} não tem lance legal. Você estava ganhando!
+ex.stalemate.b3.2 = Afogamento! {my} está sem saída, e uma partida ganha vira empate.
+ex.stalemate.b3.3 = {my} não tem lances nem está em xeque: afogamento.
+ex.stalemate.b4 = Afogamento: {my} não tem lance legal. Isso joga fora a vitória.
+ex.stalemate.b4.2 = {move} afoga {my}. Empate numa posição ganha.
+ex.stalemate.b4.3 = Isso é afogamento; {my} está encurralad{my:o}.
+ex.stalemate.b5 = {move} afoga {my}. A vitória escapou.
+ex.stalemate.b5.2 = Afogamento: {my} não tem casas.
+ex.stalemate.b5.3 = Isso é afogamento, {my} está sem saída.
+ex.stalemate.b6 = Afogamento. {my} não tem lances.
+ex.stalemate.b6.2 = {move}, afogamento: {my} está encurralad{my:o}.
+ex.stalemate.b6.3 = Afogamento; {my} não pode se mover.
+ex.stalemate.tip.b1 = Quando estiver ganhando, deixe sempre uma casa livre para o meu rei.
+ex.stalemate.tip.b1.2 = Lembre-se: quando estiver em vantagem, dê espaço para o meu rei.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Cuidado! Eu posso entregar as minhas peças, e aí {my} fica sem lances: afogamento.
+ex.stalemate_trick.b1.2 = Atenção: {my} está quase sem saída. Eu consigo empatar.
+ex.stalemate_trick.b2 = Cuidado: eu posso sacrificar, e {my} ficaria afogad{my:o}.
+ex.stalemate_trick.b2.2 = {my} quase não tem casas. Eu posso forçar o afogamento!
+ex.stalemate_trick.b3 = Isso me deixa escapar com um afogamento: {my} fica sem lances.
+ex.stalemate_trick.b3.2 = Cuidado: depois de {line}, {my} fica afogad{my:o}.
+ex.stalemate_trick.b4 = {move} permite um truque de afogamento: {line}, e {my} não pode se mover.
+ex.stalemate_trick.b4.2 = Agora {my} pode se refugiar no afogamento: {line}.
+ex.stalemate_trick.b5 = {move} permite o afogamento: {line}; {my} fica encurralad{my:o}.
+ex.stalemate_trick.b5.2 = Truque de afogamento: {line}, e {my} fica sem lances.
+ex.stalemate_trick.b6 = {line}, afogamento: {my} está encurralad{my:o}.
+ex.stalemate_trick.b6.2 = Afogamento depois de {line}; {my} está sem saída.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} pode ir para {sq} e atacar {t1} e {t2}.
+ex.fork.b1.2 = {my} vai para {sq} e ataca duas peças: {t1} e {t2}.
+ex.fork.b1.3 = Fique de olho {my:no}: de {sq}, {my:ele} ataca {t1} e {t2} ao mesmo tempo.
+ex.fork.b2 = Garfo! {my} em {sq} ataca {t1} e {t2} ao mesmo tempo.
+ex.fork.b2.2 = Depois do seu lance, {my} pode dar garfo {t1:no} e {t2:no} a partir de {sq}.
+ex.fork.b2.3 = {my} vai para {sq}: ataque duplo contra {t1:art} e {t2:art}.
+ex.fork.b3 = {move} permite {reply}, com garfo {t1:no} e {t2:no}.
+ex.fork.b3.2 = Depois de {reply}, eu ataco {t1} e {t2} ao mesmo tempo.
+ex.fork.b3.3 = {reply} é um garfo: {t1} e {t2} estão sob ataque.
+ex.fork.b4 = {reply} dá garfo {t1:no} e {t2:no}; depois de {line}, você perdeu {pts:point}.
+ex.fork.b4.2 = {reply} ataca {t1} e {t2} de uma vez.
+ex.fork.b4.3 = {move} permite o garfo {reply} contra {t1:art} e {t2:art}.
+ex.fork.b5 = {move} cai no garfo {reply}, que ataca {t1} e {t2}.
+ex.fork.b5.2 = {reply} dá garfo {t1:no} e {t2:no}.
+ex.fork.b5.3 = Depois de {reply}, {t1} e {t2} estão sob ataque.
+ex.fork.b6 = {reply} dá garfo.
+ex.fork.b6.2 = {move} permite {reply}, um garfo.
+ex.fork.b6.3 = {reply}, garfo.
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = Você só pode salvar uma das peças: {t1} ou {t2}.
+ex.fork.tail.b1.2 = Agora eu ataco duas peças ao mesmo tempo: {t1} e {t2}. Isso é um garfo!
+ex.fork.tail.b1.3 = Viu? {t1} e {t2} estão sob ataque. Uma das peças vai cair.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} precisa sair do xeque, então eu tomo {t1}.
+ex.fork.tail_king.2 = Xeque! {your} tem que se mover, e {t1} cai.
+ex.fork.more.b3 = Antes de jogar, confira a casa {sq}: é uma casa de garfo para {my:art}.
+ex.fork.more.b3.2 = Fique de olho na casa {sq}. Dali, {my} dá garfo.
+ex.fork.tip.knight = Cuidado com os saltos de cavalo perto do seu rei e da sua dama!
+ex.fork.tip.knight.2 = Os cavalos adoram atacar duas peças de uma vez. Veja para onde eles podem saltar.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Quando {my} sai do caminho, {my2} ataca {t1}!
+ex.discovered.b1.2 = Veja: {my} está no caminho. Se {my:ele} se mover, {my2} ataca {t1}.
+ex.discovered.b1.3 = {my} pode sair do caminho, e aí {my2} ataca {t1}.
+ex.discovered.b2 = Um ataque escondido: {my} se move, e {my2} ataca {t1}.
+ex.discovered.b2.2 = Cuidado: {my} pode sair, e {my2} ataca {t1}.
+ex.discovered.b2.3 = {my} sai do caminho e descobre {my2} contra {t1:art}.
+ex.discovered.b3 = Depois de {reply}, um ataque descoberto atinge {t1}.
+ex.discovered.b3.2 = {reply} descobre um ataque contra {t1:art}.
+ex.discovered.b3.3 = {move} permite {reply}, um ataque descoberto contra {t1:art}.
+ex.discovered.b4 = {reply} abre uma linha até {t1:art}: um ataque descoberto.
+ex.discovered.b4.2 = {move} permite o ataque descoberto {reply}, que ganha {t1}.
+ex.discovered.b4.3 = Depois de {reply}, {t1} cai num ataque descoberto.
+ex.discovered.b5 = {move} permite o ataque descoberto {reply}.
+ex.discovered.b5.2 = {reply} é um ataque descoberto.
+ex.discovered.b5.3 = {reply} descobre um ataque escondido.
+ex.discovered.b6 = {reply}, ataque descoberto contra {t1:art}.
+ex.discovered.b6.2 = {reply}, e {t1} cai.
+ex.discovered.b6.3 = Ataque descoberto: {reply}, atingindo {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} ataca {t1}. Quando {t1:ele} sair, eu tomo {t2}, que está atrás.
+ex.skewer.b1.2 = Veja: {my} ataca {t1}, e {t2} está logo atrás.
+ex.skewer.b1.3 = {my} vai atrás {t1:do}. {t1:ele} precisa sair, e aí {t2} cai.
+ex.skewer.b2 = Um espeto: {my} ataca {t1}, e {t2} está atrás.
+ex.skewer.b2.2 = {my} alinha {t1} e {t2}. Quando a primeira peça sair, eu tomo a segunda.
+ex.skewer.b2.3 = Cuidado: {t1} e {t2} estão na mesma linha. {my} pode fazer um espeto.
+ex.skewer.b3 = {reply} pega {t1} e {t2} num espeto.
+ex.skewer.b3.2 = Depois de {reply}, {t1} precisa sair e {t2} cai.
+ex.skewer.b3.3 = {move} permite {reply}, um espeto contra {t1:art} e {t2:art}.
+ex.skewer.b4 = {reply} ataca {t1} num espeto; {t2}, atrás, está perdid{t2:o}.
+ex.skewer.b4.2 = Depois de {move}, {t1} e {t2} ficam na mesma linha: {reply}.
+ex.skewer.b4.3 = Depois de {reply}, {t1} sai e {t2} cai.
+ex.skewer.b5 = {reply} pega {t1} e {t2} num espeto.
+ex.skewer.b5.2 = {move} permite o espeto {reply}, {t1:do} {t2:ao}.
+ex.skewer.b6 = {reply} dá um espeto.
+ex.skewer.b6.2 = {reply}, espeto.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} pode ir para {sq}. Aí {your} fica pres{your:o} na frente {t1:do}.
+ex.pin.b1.2 = Olhe {my:art} em {sq}: {your} fica pres{your:o} na frente {t1:do}.
+ex.pin.b1.3 = {my} pode cravar {your} {t1:no}. Aí eu ganho {your:the}.
+ex.pin.b2 = Uma cravada: {your} está pres{your:o} na frente {t1:do}.
+ex.pin.b2.2 = {your} está cravad{your:o} {t1:no}. Aí eu posso ganhá-{your:lo}.
+ex.pin.b2.3 = Agora {your} está pres{your:o} na frente {t1:do}. Isso é uma cravada.
+ex.pin.b3 = {your} fica cravad{your:o} {t1:no}, e eu ganho {your:the}.
+ex.pin.b3.2 = Depois disso, {your} fica cravad{your:o} {t1:no}.
+ex.pin.b3.3 = A cravada {your:do} custa material: {t1} está atrás.
+ex.pin.b4 = {reply} crava e ganha material.
+ex.pin.b4.2 = {move} cai na cravada {reply}.
+ex.pin.b4.3 = Depois de {reply}, a peça cravada cai.
+ex.pin.b5 = {move} permite a cravada {reply}.
+ex.pin.b5.2 = {reply} crava, e a peça está perdida.
+ex.pin.b6 = {reply} crava.
+ex.pin.b6.2 = {reply}, cravando.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} está cravad{your:o}, então não pode proteger a casa {sq}. {t1} está atrás.
+ex.pin_defender.b1.2 = Veja: {your} não pode defender a casa {sq} de verdade, porque {t1} está atrás.
+ex.pin_defender.b2 = {your} está cravad{your:o} {t1:no}, então a casa {sq} não tem um defensor de verdade.
+ex.pin_defender.b2.2 = Uma peça cravada defende mal. {your} não pode proteger {sq}: {t1} está atrás.
+ex.pin_defender.b3 = {your} está cravad{your:o} {t1:no}; {your:ele} não defende {sq} de verdade.
+ex.pin_defender.b3.2 = A casa {sq} parece defendida, mas {your} está cravad{your:o} na frente {t1:do}.
+ex.pin_defender.b4 = {your} está cravad{your:o}, então a casa {sq} não está defendida de verdade.
+ex.pin_defender.b4.2 = {your}, cravad{your:o}, não pode proteger {sq}.
+ex.pin_defender.b5 = {your} está cravad{your:o}; a casa {sq} fica sem defesa.
+ex.pin_defender.b5.2 = O ponto {sq} cai: {your} está cravad{your:o}.
+ex.pin_defender.b6 = {your} está cravad{your:o}; o ponto {sq} cai.
+ex.pin_defender.b6.2 = {your} cravad{your:o}, {sq} sem defesa.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} está pres{your:o}. Toda casa para onde {your:ele} pode ir está atacada.
+ex.trapped.b1.2 = Veja {your:art}: {your:ele} não tem nenhuma casa segura para fugir.
+ex.trapped.b1.3 = {your} está sem saída. Eu posso atacá-{your:lo}, e {your:ele} não consegue escapar.
+ex.trapped.b2 = {your} não tem casas seguras. Eu posso ganhá-{your:lo}.
+ex.trapped.b2.2 = {your} está pres{your:o}: para onde {your:ele} for, eu {your:o} tomo.
+ex.trapped.b2.3 = Cuidado, {your} está ficando sem casas.
+ex.trapped.b3 = {your} fica pres{your:o}: não sobra nenhuma casa segura.
+ex.trapped.b3.2 = Depois disso, {your} fica pres{your:o} e está perdid{your:o}.
+ex.trapped.b3.3 = {your} caiu numa armadilha: {your:ele} não consegue sair.
+ex.trapped.b4 = {move} deixa {your} pres{your:o}.
+ex.trapped.b4.2 = {your} não tem retirada; eu ganho {your:the}.
+ex.trapped.b4.3 = {your} fica pres{your:o} depois de {reply}.
+ex.trapped.b5 = {your} acaba pres{your:o}: {line}.
+ex.trapped.b5.2 = {move} deixa {your} sem saída.
+ex.trapped.b6 = {your} está pres{your:o}.
+ex.trapped.b6.2 = {line} prende {your}.
+ex.trapped.tip.b1 = Antes de mover uma peça, veja se ela vai conseguir sair de lá depois.
+ex.trapped.tip.b1.2 = Peças no fundo do meu campo podem ficar presas. Deixe sempre uma saída.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} está pres{your:o} atrás dos próprios peões. {my} pode dar xeque {your:nele} na fileira de trás.
+ex.back_rank.b1.2 = Cuidado: {your} não tem casa de fuga, e {my} pode chegar a {sq}.
+ex.back_rank.b1.3 = {my} pode ir para {sq}. {your} está trancad{your:o} pelos próprios peões.
+ex.back_rank.b2 = Perigo na fileira de trás: {your} não tem casa de fuga. {my} pode dar xeque em {sq}.
+ex.back_rank.b2.2 = {your} está trancad{your:o}. {my} vai para {sq} e ganha material.
+ex.back_rank.b2.3 = Sua fileira de trás está fraca: {my} pode dar xeque {your:no} em {sq}.
+ex.back_rank.b3 = Sua primeira fileira está fraca: {line}. {your} não tem casa de fuga.
+ex.back_rank.b3.2 = {your} não tem casa de fuga, então {line} ganha material.
+ex.back_rank.b3.3 = Depois de {line}, a primeira fileira decide: {your} está encurralad{your:o}.
+ex.back_rank.b4 = A primeira fileira: {line}, e {your} não tem casa de fuga.
+ex.back_rank.b4.2 = {line} explora a primeira fileira fraca em volta {your:do}.
+ex.back_rank.b4.3 = Falta uma casa de fuga para {your:art}: {line}.
+ex.back_rank.b5 = Fraqueza da primeira fileira em volta {your:do}: {line}.
+ex.back_rank.b5.2 = {line}; {your} não tem casa de fuga.
+ex.back_rank.b6 = {line}, primeira fileira; {your} está encurralad{your:o}.
+ex.back_rank.b6.2 = Primeira fileira: {line} ({your}).
+ex.back_rank.tip.b1 = Dê uma janelinha para o seu rei: avance um dos peões que estão na frente dele.
+ex.back_rank.tip.b1.2 = Um rei atrás de três peões pode levar mate na fileira de trás. Abra espaço para ele.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} em {sq} não tem defensor. {my} pode tomá-{your:lo} de graça.
+ex.hanging.b1.2 = Veja {your:art}: nada {your:o} defende, e {my} {your:o} ataca.
+ex.hanging.b1.3 = {your} não está protegid{your:o}. {my} pode simplesmente tomá-{your:lo}.
+ex.hanging.b2 = {your} em {sq} está pendurad{your:o}. {my} {your:o} toma, e você não pode retomar.
+ex.hanging.b2.2 = {my} pode capturar {your} de graça. Nada {your:o} protege.
+ex.hanging.b2.3 = {your} ficou sozinh{your:o} em {sq}, e {my} {your:o} toma.
+ex.hanging.b3 = {move} deixa {your} desprotegid{your:o}: {reply}, e nada retoma.
+ex.hanging.b3.2 = {your} em {sq} está pendurad{your:o}: {reply}.
+ex.hanging.b3.3 = Depois de {reply}, {your} se perde a troco de nada.
+ex.hanging.b4 = {move} deixa {your} pendurad{your:o}: {reply} ganha {pts:point}.
+ex.hanging.b4.2 = {reply} leva {your} de graça.
+ex.hanging.b4.3 = {your} está solt{your:o}; {reply} {your:o} toma.
+ex.hanging.b5 = {move} deixa {your} solt{your:o}; {reply} ganha {your:the}.
+ex.hanging.b5.2 = {your} em {sq} cai com {reply}.
+ex.hanging.b5.3 = {reply} ganha {your}.
+ex.hanging.b6 = {move}? {reply}, e {your} cai.
+ex.hanging.b6.2 = {reply} ganha {your}.
+ex.hanging.b6.3 = {your} está pendurad{your:o}: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} protegia {your}. Agora {my} pode tomá-{your:lo}.
+ex.hanging_guard.b1.2 = {your2} saiu, e agora {your} está sozinh{your:o}. {my} {your:o} toma.
+ex.hanging_guard.b2 = {your2} protegia {your}. Agora {your:ele} está sozinh{your:o}, e {my} {your:o} toma.
+ex.hanging_guard.b2.2 = Ao mover {your2}, você deixou {your} sem proteção, à mercê {my:do}.
+ex.hanging_guard.b3 = {your2} defendia {your}. Ao movê-{your2:lo}, você entrega {your:the} para {reply}.
+ex.hanging_guard.b3.2 = Sem {your2:art}, {your} fica solt{your:o}: {reply}.
+ex.hanging_guard.b4 = {move} tira o defensor: {your2} se afastou {your:do}, e {reply} leva {your:the}.
+ex.hanging_guard.b4.2 = {your2} era o único defensor {your:do}; {reply} ganha {your:the}.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} já estava atacando {your}. Sempre veja o que o meu lance ameaça.
+ex.hanging_threat.b1.2 = Você não viu a minha ameaça: {my} ataca {your}.
+ex.hanging_threat.b2 = Meu último lance atacou {your} com {my:art}. Sempre olhe as minhas ameaças.
+ex.hanging_threat.b2.2 = {my} estava ameaçando {your}, e agora eu posso tomá-{your:lo}.
+ex.hanging_threat.b3 = Você não viu a minha ameaça: {my} estava atacando {your}.
+ex.hanging_threat.b3.2 = {my} estava de olho {your:no} o tempo todo.
+ex.hanging.tip.b1 = Antes de cada lance, pergunte-se: todas as minhas peças estão seguras?
+ex.hanging.tip.b1.2 = Um bom hábito: depois de cada lance, confira quais das suas peças estão protegidas.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} capturou, mas {my} retoma. Essa troca perde pontos.
+ex.exchange_capture.b1.2 = {my} retoma. {your} vale {n:point}, mas você só ganhou {n2:point}.
+ex.exchange_capture.b1.3 = Cuidado: {my} pode tomar {your} de volta. Essa troca é ruim.
+ex.exchange_capture.b2 = Cuidado com as trocas: {your} vale {n:point}. {my} retoma, e você só ganhou {n2:point}.
+ex.exchange_capture.b2.2 = {my} recaptura {your}. Você perde {n:point} e só ganha {n2:point}.
+ex.exchange_capture.b3 = A captura em {sq} não funciona: {your} se perde depois de {line}.
+ex.exchange_capture.b3.2 = {your} toma em {sq}, mas depois de {line} você perdeu {pts:point}.
+ex.exchange_capture.b4 = {move} erra a conta em {sq}: {line}, e {your} está perdid{your:o}.
+ex.exchange_capture.b4.2 = Tomar em {sq} custa {your:art}: {line}.
+ex.exchange_capture.b5 = {move} perde {your:art} na sequência em {sq}: {line}.
+ex.exchange_capture.b5.2 = Em {sq}, {your} se perde: {line}.
+ex.exchange_capture.b6 = {move} entrega {your:art} em {sq} depois de {line}.
+ex.exchange_capture.b6.2 = {line} em {sq}, e {your} se foi.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Conte: eu ataco a casa {sq} {n:time}, e você a defende {n2:time}.
+ex.exchange_count.b1.2 = Em {sq}, eu tenho {n:attacker} e você tem {n2:defender}. Eu levo a melhor.
+ex.exchange_count.b2 = Eu ataco a casa {sq} {n:time}, e ela é defendida {n2:time}. Você vai perder material ali.
+ex.exchange_count.b2.2 = Conte em {sq}: {n:attacker} contra {n2:defender}.
+ex.exchange_count.b3 = Conte atacantes e defensores em {sq}: eu tenho mais.
+ex.exchange_count.b3.2 = A troca em {sq} não funciona: depois de {line}, você perdeu {pts:point}.
+ex.exchange_count.b4 = {move} erra a conta em {sq}: {line}, e você perdeu {pts:point}.
+ex.exchange_count.b4.2 = Há mais ataques do que defesas na casa {sq}: {line}.
+ex.exchange_count.b5 = Em {sq}, {n:attacker} vencem {n2:defender}: {line}.
+ex.exchange_count.b5.2 = {move} perde na contagem em {sq}.
+ex.exchange_count.b6 = {line} em {sq}, e eu ganhei {pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n} contra {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} vale menos que {your}. Se eu tomar, você perde pontos.
+ex.exchange_cheap.b1.2 = {my} ataca {your}. Trocar essas peças é ruim para você.
+ex.exchange_cheap.b2 = {your} vale {n:point}, e {my} só {n2:point}. Essa troca sai cara para você.
+ex.exchange_cheap.b2.2 = {my} vale menos que {your}, então o ataque ganha material.
+ex.exchange_cheap.b3 = Uma peça de menor valor ataca {your} em {sq}.
+ex.exchange_cheap.b3.2 = Uma peça de {n2:point} ataca {your} em {sq}: {line}.
+ex.exchange_cheap.b4 = Uma peça de menor valor ataca {your} em {sq}; {reply} ganha material.
+ex.exchange_cheap.b4.2 = {reply} ataca {your} em {sq} com uma peça de menor valor.
+ex.exchange_cheap.b5 = {your} em {sq} fica expost{your:o} a um atacante de menor valor: {line}.
+ex.exchange_cheap.b5.2 = {reply} ganha material em {sq} contra {your:art}.
+ex.exchange_cheap.b6 = {reply} ganha {your} em {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} em {sq} está perdid{your:o}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Cuidado: agora eu posso ganhar {t1}.
+ex.material.b1.2 = Esse lance deixa {t1} em apuros. Eu posso ganhá-{t1:lo}.
+ex.material.b2 = Esse lance me permite ganhar {t1}.
+ex.material.b2.2 = Agora {t1} fica em apuros, e eu ganho {t1:the}.
+ex.material.b3 = {move} perde material: depois de {line}, você perdeu {pts:point}.
+ex.material.b3.2 = Depois de {line}, você está com {pts:point} a menos.
+ex.material.b4 = {move} perde material: {line}, e você perdeu {pts:point}.
+ex.material.b4.2 = Depois de {line}, você fica com {pts:point} a menos.
+ex.material.b5 = {move} entrega material: {line}.
+ex.material.b5.2 = {line} ganha {pts:point} para mim.
+ex.material.b6 = {line}, e eu ganhei {pts:point}.
+ex.material.b6.2 = {move} perde {pts:point}: {line}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Você viu? {my} em {sq} estava de graça. {your} podia tomá-{my:lo}.
+ex.missed_capture.b1.2 = Veja: {my} não tinha defensor. {your} podia capturá-{my:lo}.
+ex.missed_capture.b1.3 = {my} em {sq} não estava protegid{my:o}. {your} podia pegá-{my:lo}!
+ex.missed_capture.b2 = Você deixou passar uma captura de graça: {best} ganha {my}.
+ex.missed_capture.b2.2 = {my} estava pendurad{my:o} em {sq}. {best} toma {my:the}. Da próxima vez, aproveite!
+ex.missed_capture.b2.3 = {best} teria ganhado {my} de graça.
+ex.missed_capture.b3 = {best} teria ganhado {my} a troco de nada.
+ex.missed_capture.b3.2 = {my} em {sq} estava desprotegid{my:o}: {best}. Procure peças soltas a cada lance.
+ex.missed_capture.b3.3 = Você podia ter tomado {my} com {best}.
+ex.missed_capture.b4 = Passou despercebido: {best} leva {my} em {sq}.
+ex.missed_capture.b4.2 = {best} ganha {my}, que estava solt{my:o}.
+ex.missed_capture.b4.3 = {my} estava pendurad{my:o}: {best}.
+ex.missed_capture.b5 = {best} ganha {my}; com {move}, {my:ele} escapa.
+ex.missed_capture.b5.2 = {my} em {sq} estava solt{my:o}: {best}.
+ex.missed_capture.b6 = {best}! {my} em {sq} estava solt{my:o}.
+ex.missed_capture.b6.2 = {best} ganhava {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = Você tinha um ataque duplo: {best} ataca {t1} e {t2}!
+ex.missed_fork.b1.2 = Veja! {best} atacaria {t1} e {t2} ao mesmo tempo.
+ex.missed_fork.b1.3 = {best} era um garfo: {t1} e {t2} sob ataque.
+ex.missed_fork.b2 = {best} era um garfo: {t1} e {t2}.
+ex.missed_fork.b2.2 = Você deixou passar um ataque duplo: {best}, atacando {t1} e {t2}.
+ex.missed_fork.b2.3 = {best} ataca {t1} e {t2} ao mesmo tempo. Um garfo!
+ex.missed_fork.b3 = {best} era um garfo: {t1} e {t2}.
+ex.missed_fork.b3.2 = Você tinha {best}, com garfo {t1:no} e {t2:no}.
+ex.missed_fork.b3.3 = {best} teria dado garfo {t1:no} e {t2:no}.
+ex.missed_fork.b4 = {best} dava garfo {t1:no} e {t2:no}.
+ex.missed_fork.b4.2 = Garfo perdido: {best} contra {t1:art} e {t2:art}.
+ex.missed_fork.b5 = {best} dava garfo {t1:no} e {t2:no}.
+ex.missed_fork.b5.2 = {best} atacava {t1} e {t2}.
+ex.missed_fork.b6 = {best} dava garfo {t1:no} e {t2:no}.
+ex.missed_fork.b6.2 = {best}: garfo {t1:no} e {t2:no}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+# Spoken "até a casa {sq}" here and in ex.promotion_missed, ex.push_passed: right after "até" the
+# file letter melts into its é ("até éh quatro" heard "até quatro" or "até a quatro", right 2 times
+# in 9; "até a casa éh quatro" 6 in 9).
+ex.promotion.b1 = {my} pode correr até {sq} e virar dama. {your} está longe demais.
+ex.promotion.b1.spoken = {my} pode correr até a casa {sq} e virar dama. {your} está longe demais.
+ex.promotion.b1.2 = Veja: nada impede {my:art} de chegar à casa {sq}. {your} não consegue alcançá-{my:lo}.
+ex.promotion.b1.3 = {my} está a {n:square} de {sq}, e {your} é lent{your:o} demais.
+ex.promotion.b2 = {my} corre até {sq}, e {your} não consegue alcançá-{my:lo}.
+ex.promotion.b2.spoken = {my} corre até a casa {sq}, e {your} não consegue alcançá-{my:lo}.
+ex.promotion.b2.2 = {my} precisa de {n:move} para chegar a {sq}; {your} precisa de {n2:move}. Não dá tempo.
+ex.promotion.b2.3 = Cuidado: {my} vira dama em {sq}, e {your} está longe demais.
+ex.promotion.b3 = {my} está fora do quadrado: {your} não consegue alcançá-{my:lo} antes de {sq}.
+ex.promotion.b3.2 = A corrida está perdida: {my} chega a {sq} antes {your:do}.
+ex.promotion.b4 = {your} está fora do quadrado do peão; o peão vira dama em {sq}.
+ex.promotion.b4.2 = {my} promove em {sq}; {your} chega um lance atrasado.
+ex.promotion.b5 = A corrida de peões está perdida: {your} está fora do quadrado ({sq}).
+ex.promotion.b5.2 = {line}: eu faço dama em {sq}, e {your} chega tarde demais.
+ex.promotion.b6 = {your} está fora do quadrado; eu faço dama em {sq}.
+ex.promotion.b6.2 = {line}, dama em {sq} ({your} tarde demais).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Seu peão podia correr até {sq} e virar dama!
+ex.promotion_missed.b1.spoken = Seu peão podia correr até a casa {sq} e virar dama!
+ex.promotion_missed.b1.2 = Olhe a casa {sq}! Seu peão podia ter corrido até lá.
+ex.promotion_missed.b2 = Seu peão podia ter corrido até {sq}. Avance os peões passados!
+ex.promotion_missed.b2.spoken = Seu peão podia ter corrido até a casa {sq}. Avance os peões passados!
+ex.promotion_missed.b2.2 = Nada parava o seu peão a caminho de {sq}.
+ex.promotion_missed.b3 = {best} vence a corrida até {sq}.
+ex.promotion_missed.b3.spoken = {best} vence a corrida até a casa {sq}.
+ex.promotion_missed.b3.2 = Seu peão era mais rápido: {best}, e ele vira dama em {sq}.
+ex.promotion_missed.b4 = {best} vence a corrida de peões até {sq}.
+ex.promotion_missed.b4.spoken = {best} vence a corrida de peões até a casa {sq}.
+ex.promotion_missed.b4.2 = {best}! O peão vira dama em {sq}.
+ex.promotion_missed.b5 = {best} faz dama primeiro, em {sq}.
+ex.promotion_missed.b5.2 = {best}, e você fica com a casa {sq}.
+ex.promotion_missed.b6 = {best} vence a corrida até {sq}.
+ex.promotion_missed.b6.spoken = {best} vence a corrida até a casa {sq}.
+ex.promotion_missed.b6.2 = {best}; primeiro em {sq}.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Aquele peão protegia {your}. Agora {your:ele} tem menos proteção.
+ex.king_shield.b1.2 = O peão de {sq} era um escudo para {your:art}. Agora as minhas peças podem entrar.
+ex.king_shield.b2 = Mover o peão de {sq} enfraquece a proteção {your:do}. Minhas peças já podem atacá-{your:lo}.
+ex.king_shield.b2.2 = {your} perdeu um guarda: o peão de {sq} era o escudo {your:dele}.
+ex.king_shield.b3 = Esse lance de peão expõe {your:art} ao meu ataque.
+ex.king_shield.b3.2 = {your} perde a proteção dos peões, e as minhas peças entram.
+ex.king_shield.b4 = {move} enfraquece os peões em volta {your:do}; meu ataque entra.
+ex.king_shield.b4.2 = O escudo em volta {your:do} se rompe depois de {move}.
+ex.king_shield.b5 = {move} afrouxa a proteção {your:do}: {line}.
+ex.king_shield.b5.2 = Depois de {move}, {your} fica expost{your:o}: {line}.
+ex.king_shield.b6 = {move} enfraquece {your:art}: {line}.
+ex.king_shield.b6.2 = {line}; {your} fica expost{your:o} demais.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} está em perigo. Minhas peças estão vindo atrás {your:dele}.
+ex.king_exposed.b1.2 = Veja como {your} está expost{your:o}. Deixe-{your:o} protegid{your:o} atrás dos peões.
+ex.king_exposed.b2 = {your} está expost{your:o} demais. Agora eu posso dar muitos xeques.
+ex.king_exposed.b2.2 = Cuidado: {your} não tem abrigo, e as minhas peças {your:o} atacam.
+ex.king_exposed.b3 = {your} está expost{your:o}; minhas peças podem atacá-{your:lo} com xeques.
+ex.king_exposed.b3.2 = Depois disso, {your} fica sem abrigo.
+ex.king_exposed.b4 = {your} fica expost{your:o}: {line}.
+ex.king_exposed.b4.2 = {move} deixa {your} vulnerável ao ataque.
+ex.king_exposed.b5 = {your} está expost{your:o} demais: {line}.
+ex.king_exposed.b5.2 = {move} deixa {your} sem abrigo.
+ex.king_exposed.b6 = {line}; {your} está expost{your:o}.
+ex.king_exposed.b6.2 = {your} está desprotegid{your:o} demais: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Essa troca leva a um final de peões que eu ganho.
+ex.bad_trade.b3.2 = Depois de {line}, só sobram peões, e o meu rei está melhor.
+ex.bad_trade.b4 = As trocas levam a um final de peões perdido: {line}.
+ex.bad_trade.b4.2 = Trocar para esse final de peões perde.
+ex.bad_trade.b5 = Troca errada: o final de peões depois de {line} está perdido.
+ex.bad_trade.b5.2 = O final de peões está perdido; mantenha peças no tabuleiro.
+ex.bad_trade.b6 = O final de peões depois de {line} está perdido.
+ex.bad_trade.b6.2 = Final de peões perdido: {line}.
+ex.bishop_pair.b5 = Essa troca custa o seu par de bispos.
+ex.bishop_pair.b5.2 = Essa troca entrega o seu par de bispos; o meu continua.
+ex.bishop_pair.b6 = Lá se vai o par de bispos.
+ex.bishop_pair.b6.2 = Par de bispos entregue.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} toma a oposição: os reis ficam frente a frente, com uma casa entre eles.
+ex.opposition.b3.2 = Os reis! {best} teria tomado a oposição.
+ex.opposition.b4 = {best} toma a oposição: essa é a chave.
+ex.opposition.b4.2 = A oposição decide: {best}.
+ex.opposition.b5 = {best}, tomando a oposição.
+ex.opposition.b5.2 = Oposição: {best}.
+ex.opposition.b6 = {best}, oposição.
+ex.opposition.b6.2 = {best}: a oposição.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Seu peão podia correr até {sq}. Peões passados querem avançar!
+ex.push_passed.b1.spoken = Seu peão podia correr até a casa {sq}. Peões passados querem avançar!
+ex.push_passed.b1.2 = Avance o seu peão livre! Ele quer chegar à casa {sq}.
+ex.push_passed.b1.3 = Seu peão passado quer marchar até {sq}. Avance-o!
+ex.push_passed.b1.3.spoken = Seu peão passado quer marchar até a casa {sq}. Avance-o!
+ex.push_passed.b2 = {best}: avance o peão passado rumo a {sq}.
+ex.push_passed.b2.2 = Seu peão passado é forte. {best} avança esse peão.
+ex.push_passed.b2.3 = Avance! {best} leva o peão para mais perto de {sq}.
+ex.push_passed.b3 = {best} avança o peão passado.
+ex.push_passed.b3.2 = Peões passados devem avançar: {best}.
+ex.push_passed.b3.3 = O caminho era {best}: o peão corre até {sq}.
+ex.push_passed.b3.3.spoken = O caminho era {best}: o peão corre até a casa {sq}.
+ex.push_passed.b4 = {best}: o peão passado decide.
+ex.push_passed.b4.2 = Avance: {best}.
+ex.push_passed.b5 = {best}, avançando o peão passado: {eval}.
+ex.push_passed.b5.2 = O peão passado: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, o peão passado.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Avance {your:art}! No final, o rei é uma peça forte.
+ex.king_active.b1.2 = Agora {your} pode entrar na luta. Leve-{your:o} para o meio.
+ex.king_active.b1.3 = Com poucas peças no tabuleiro, {your} deve sair e ajudar.
+ex.king_active.b2 = No final, use {your:art}: leve-{your:o} para o centro.
+ex.king_active.b2.2 = {your} precisa entrar em ação agora. Leve-{your:o} para a frente.
+ex.king_active.b3 = {best} ativa o rei. Nos finais, o rei luta.
+ex.king_active.b3.2 = {best}: agora o lugar do rei é no centro.
+ex.king_active.b4 = {best} centraliza o rei.
+ex.king_active.b4.2 = O rei deve avançar: {best}.
+ex.king_active.b5 = {best}, ativando o rei: {line}.
+ex.king_active.b5.2 = Atividade do rei: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, rei para a frente.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} mantém uma posição melhor.
+ex.positional.b4.2 = {best} era mais forte aqui.
+ex.positional.b4.3 = Eu teria preferido {best}.
+ex.positional.b5 = {best} era mais forte: {line}.
+ex.positional.b5.2 = {best}, com a ideia {line}.
+ex.positional.b5.3 = Considere {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} saiu muito cedo. Desenvolva primeiro os cavalos e os bispos.
+tip.early_queen.b1.2 = Cuidado com {your:art} tão cedo: minhas peças podem persegui-{your:lo} pelo tabuleiro.
+tip.early_queen.b1.3 = É divertido jogar com {your:art}, mas desenvolva primeiro as peças menores.
+tip.early_queen.b2 = Mover {your:art} tão cedo me deixa atacá-{your:lo} e ganhar tempo.
+tip.early_queen.b2.2 = {your} já fora de casa? Cavalos e bispos primeiro!
+tip.early_queen.b3 = Uma saída precoce {your:do} me permite ganhar tempos atacando-{your:o}.
+tip.early_queen.b3.2 = {your} é fácil de perseguir tão cedo. Desenvolva primeiro.
+tip.queen_grab.b1 = {your} tomou um peão lá longe, e agora pode ficar em apuros.
+tip.queen_grab.b1.2 = Caçar peões com {your:art} custa tempo. Desenvolva primeiro!
+tip.queen_grab.b2 = {your} foi caçar peões na lateral. Isso custa muito tempo.
+tip.queen_grab.b2.2 = Cuidado ao mandar {your:art} atrás de peões distantes.
+tip.queen_grab.b3 = Caçar peões com {your:art} tão cedo perde tempo.
+tip.queen_grab.b3.2 = {your} está longe de casa agora; o meu desenvolvimento vai pesar.
+tip.queen_grab.b4 = {your} pega um peão, mas perde tempo demais.
+tip.queen_grab.b4.2 = A caça ao peão na lateral com {your:art} custa tempos.
+tip.same_piece.b1 = Você moveu {your} duas vezes. Tente colocar uma peça nova em jogo a cada lance.
+tip.same_piece.b1.2 = {your} de novo? Coloque as outras peças em jogo também.
+tip.same_piece.b1.3 = A cada lance, tente desenvolver uma peça nova, e não {your:art} de novo.
+tip.same_piece.b2 = Mover {your:art} duas vezes na abertura perde tempo.
+tip.same_piece.b2.2 = {your} se moveu de novo; as suas outras peças ainda estão em casa.
+tip.same_piece.b3 = Mover {your:art} duas vezes atrasa o desenvolvimento.
+tip.same_piece.b3.2 = Outro lance com {your:art}; o resto do seu exército espera.
+tip.castle.b1 = {your} ainda está no meio. Com o roque, {your:ele} fica em segurança.
+tip.castle.b1.2 = Hora de rocar! {your} fica mais segur{your:o} no canto.
+tip.castle.b1.3 = Pense em rocar logo. {your} está expost{your:o}.
+tip.castle.b2 = {your} ainda está no centro. Faça o roque logo!
+tip.castle.b2.2 = Com o roque, {your} ficaria bem guardad{your:o}.
+tip.castle.b3 = Com o centro se abrindo, {your} deveria rocar.
+tip.castle.b3.2 = {your} ainda está no centro; já era hora de rocar.
+tip.knight_rim.b1 = {your} na borda não faz muita coisa. Cavalos gostam do meio.
+tip.knight_rim.b1.2 = Cavalo na borda é cavalo fraco! {your} controla menos casas ali.
+tip.knight_rim.b2 = {your} na borda controla poucas casas. Mire o centro.
+tip.knight_rim.b2.2 = Cavalo na borda é cavalo fraco: {your} quer o centro.
+tip.knight_rim.b3 = {your} está fora de jogo na borda.
+tip.knight_rim.b3.2 = A borda é um lugar ruim para {your:art}.
+tip.flank.b1 = Tente mover primeiro os peões do meio. Os peões da borda não ajudam muito.
+tip.flank.b1.2 = Peões nas laterais não ajudam as suas peças a sair. Use os do meio.
+tip.flank.b2 = Lances de peões da borda não desenvolvem nada. Use os peões centrais.
+tip.flank.b2.2 = Lances demais de peões laterais. Desenvolva as suas peças!
+tip.flank.b3 = Lances de peões das alas na abertura atrasam o desenvolvimento.
+tip.flank.b3.2 = Os peões da borda podem esperar; desenvolva e lute pelo centro.
+tip.centre.b1 = Tente controlar o meio do tabuleiro, como a casa {sq}.
+tip.centre.b1.2 = O centro é importante. Coloque um peão ou uma peça perto de {sq}.
+tip.centre.b1.3 = Peças no meio são fortes. Mire casas como {sq}.
+tip.centre.b2 = Lute pelo centro: casas como {sq} são importantes.
+tip.centre.b2.2 = Você está me dando o centro. Olhe a casa {sq}.
+tip.centre.b3 = Você não está disputando o centro; eu domino a casa {sq}.
+tip.centre.b3.2 = Dispute o centro, em torno de {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Contra um rei sozinho, empurre-o para a borda e depois dê xeque-mate.
+tip.mate_technique.b1.2 = Dica: empurre o meu rei para a borda. Mantenha o seu rei por perto também.
+tip.fifty.b1 = Cuidado: depois de cinquenta lances sem captura nem lance de peão, é empate.
+tip.fifty.b1.2 = O tempo está acabando: cinquenta lances sem capturas nem lances de peão dão empate.
+tip.repetition.b1 = Cuidado! Se a mesma posição aparecer pela terceira vez, é empate.
+tip.repetition.b1.2 = Evite repetir lances: a terceira repetição é empate, e você está ganhando.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Uau, você entregou uma peça, e funciona!
+praise.sacrifice.2 = Um sacrifício esperto! Muito bem jogado.
+praise.brilliant.b3 = Brilhante! Um sacrifício de verdade.
+praise.brilliant.b3.2 = Uau, {move} é um grande sacrifício!
+praise.brilliant.b4 = {move}! Um sacrifício brilhante.
+praise.brilliant.b4.2 = Brilhante. Eu não esperava por isso.
+praise.brilliant.b5 = {move}!! Brilhante.
+praise.brilliant.b5.spoken = {move}. Brilhante!
+praise.brilliant.b5.2 = Um sacrifício brilhante.
+praise.brilliant.b6 = {move}!! Excelente.
+praise.brilliant.b6.spoken = {move}. Excelente!
+praise.brilliant.b6.2 = Brilhante.
+praise.great.b2 = Ótimo lance! Você achou o jeito de reagir.
+praise.great.b2.2 = Que ótimo lance. Bem encontrado!
+praise.great.b3 = Ótimo lance! Você encontrou a única boa ideia.
+praise.great.b3.2 = Excelente, {move} muda a situação.
+praise.great.b4 = {move}! Ótimo achado.
+praise.great.b4.2 = Ótimo lance.
+praise.great.b5 = {move}! Bem encontrado.
+praise.great.b5.2 = Forte: {move}.
+praise.great.b6 = {move}! Ótimo.
+praise.great.b6.2 = Ótimo achado.
+praise.only.b2 = Boa! Esse era o único lance bom.
+praise.only.b2.2 = Muito bem, você achou o único lance que funciona.
+praise.only.b3 = O lance único, e você o encontrou.
+praise.only.b3.2 = Exatamente! Nada mais funcionava aqui.
+praise.only.b4 = Lance único. Muito bem.
+praise.only.b4.2 = Lance único, encontrado.
+praise.only.b5 = Lance único. Bom.
+praise.only.b5.2 = {move}, o lance único.
+praise.only.b6 = Lance único.
+praise.only.b6.2 = Exato: o lance único.
+praise.fork.b2 = Um ataque duplo! Muito bem.
+praise.fork.b2.2 = Você ataca duas peças ao mesmo tempo! Ótimo.
+praise.fork.b2.3 = Boa! Isso é um garfo.
+praise.fork.b3 = Belo garfo.
+praise.fork.b3.2 = Bom garfo!
+praise.fork.b3.3 = Um garfo. Bem jogado.
+praise.capture.b1 = Muito bem! Você tomou {my} de graça.
+praise.capture.b1.2 = Bom olho! {my} não estava protegid{my:o}.
+praise.capture.b1.3 = Isso! Você ganhou {my}.
+praise.capture.b2 = Boa captura! {my} estava solt{my:o}.
+praise.capture.b2.2 = Boa, você pegou {my}.
+praise.capture.b2.3 = Bem visto: {my} estava pendurad{my:o}.
+praise.best.b1 = Bom lance!
+praise.best.b1.2 = Muito bom!
+praise.best.b1.3 = Bem jogado!
+praise.best.b2 = Bom lance.
+praise.best.b2.2 = Muito bom.
+praise.best.b2.3 = Bem jogado.
+praise.best.b3 = Bom lance: não era fácil de achar.
+praise.best.b3.2 = Bem encontrado.
+praise.best.b3.3 = {move} é o melhor lance aqui. Bom.
+praise.trade.b1 = Boa! Quando você está em vantagem, trocar peças ajuda.
+praise.trade.b1.2 = Boa troca. Você está em vantagem, então menos peças é bom para você.
+praise.trade.b2 = Boa troca: você está em vantagem, então troque peças.
+praise.trade.b2.2 = Trocar {my} quando você está em vantagem é inteligente.
+praise.trade.b3 = Bom: com vantagem, troque.
+praise.trade.b3.2 = Troca sensata.
+praise.excellent.b3 = Excelente lance.
+praise.excellent.b3.2 = Esse é um lance forte.
+praise.excellent.b3.3 = Muito preciso.
+praise.excellent.b4 = Lance preciso.
+praise.excellent.b4.2 = Excelente.
+praise.excellent.b4.3 = Bom, {move} é preciso.
+praise.castle.b1 = Boa! Você rocou. Seu rei está mais seguro agora.
+praise.castle.b1.2 = Belo roque! Seu rei está bem guardado.
+praise.saved.b1 = Boa! Você salvou a sua peça.
+praise.saved.b1.2 = Muito bem, você tirou a peça do perigo.
+praise.book.b1 = Boa, esse é um lance de abertura bem conhecido.
+praise.book.b1.2 = Legal, é assim que os jogadores fortes também começam.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Cuidado! Estou ameaçando xeque-mate em {sq}.
+threat.mate.b1.2 = Atenção: {my} quer ir para {sq}. Isso seria xeque-mate.
+threat.mate.b1.3 = Olhe a casa {sq}. Se eu chegar lá, é xeque-mate!
+threat.mate.b2 = Cuidado, estou ameaçando mate.
+threat.mate.b2.2 = Atenção: há uma ameaça de mate em {sq}.
+threat.mate.b2.3 = Olhe com atenção: estou ameaçando xeque-mate.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Veja: {my} está atacando {your}.
+threat.piece.b1.2 = Cuidado! {your} está sendo atacad{your:o} {my:pelo}.
+threat.piece.b1.3 = Atenção, {my} quer tomar {your}.
+threat.piece.b2 = Cuidado com {your:art}.
+threat.piece.b2.2 = {your} está sob ataque.
+threat.piece.b2.3 = Fique de olho {your:no}.
+threat.punish.b1 = Meu último lance foi um erro. Você consegue aproveitar?
+threat.punish.b1.2 = Hum, acho que eu errei. Você consegue achar o erro?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Desta vez, pense {your:no}.
+tb.hint.b1.2 = Fique de olho {your:no}.
+tb.hint.king.b1 = Pense na segurança {your:do}.
+tb.hint.king.b1.2 = Olhe primeiro para {your:art}. {your:ele} está em segurança?
+tb.hint.missed.b1 = Procure peças que você pode tomar de graça.
+tb.hint.missed.b1.2 = Olhe com atenção: há alguma coisa que você possa capturar?
+tb.hint.mate_missed.b1 = Olhe para o meu rei. Você consegue dar xeque-mate nele?
+tb.hint.mate_missed.b1.2 = Tente os xeques primeiro. Talvez haja um xeque-mate!
+tb.hint.general.b1 = Com calma, olhe o tabuleiro inteiro.
+tb.hint.general.b1.2 = Tente achar um lance mais seguro.
+# The retry.
+tb.fixed.b1 = Muito melhor!
+tb.fixed.b1.2 = Isso, assim está melhor!
+tb.fixed.b1.3 = Boa, isso funciona muito melhor.
+tb.fixed = Assim está melhor.
+tb.fixed.2 = Melhor.
+tb.fixed.3 = Boa correção.
+tb.same = O mesmo lance de novo? Tudo bem, vamos ver.
+tb.same.2 = Você gosta desse lance. Vamos ver no que dá.
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = Isso! Esse é o lance em que eu estava pensando.
+tb.found.b1.2 = Você achou! Esse é o lance melhor.
+tb.found = Esse é o lance que eu tinha em mente.
+tb.found.2 = Exatamente, é esse.
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time (said
+# where the offer would have been).
+tb.none_left = Sinto muito, mas você não pode mais voltar lances nesta partida.
+tb.none_left.2 = Você não tem mais lances para voltar nesta partida.

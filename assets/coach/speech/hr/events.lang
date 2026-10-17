@@ -1,0 +1,111 @@
+# Coach speech (Croatian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "ti"; the player's gender is unknown: no "dobro došao", "spreman si", "predao si",
+# "ostani smiren" (present or future tense, impersonal phrases, nouns). The coach is male:
+# "spreman sam", "radije bih nastavio".
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Bok! Odigrajmo prijateljsku partiju. Pomoći ću ti kad god nešto pođe po zlu.
+event.greet.l1.2 = Pozdrav! Igrat ću lagano i pokazati ti na što treba paziti.
+event.greet.l1.3 = Drago mi je što si tu! Ne žuri: reći ću ti kad je neka figura u opasnosti.
+event.greet.l2 = Bok! Igrajmo. Kad se pojavi vilica ili vezanje, pokazat ću ti to.
+event.greet.l2.2 = Pozdrav! Razvij figure i drži kralja na sigurnom. Pomagat ću ti usput.
+event.greet.l2.3 = Opet za pločom! Pazi na vilice i vezanja: njima se dobivaju partije.
+event.greet.l3 = Bok! Odigrajmo pravu partiju. Komentirat ću tvoje planove i veće pogreške.
+event.greet.l3.2 = Pozdrav! Smisli plan za svoje figure. Reći ću ti kad neki potez nešto propušta.
+event.greet.l3.3 = Igrajmo! Upozorit ću te kad je neki potez jedini i kad neki potez ne valja.
+event.greet.l4 = Bok! Ovaj put davat ću procjene i pokazivati ti bolje poteze kandidate.
+event.greet.l4.2 = Igrajmo. Nakon pogreške reći ću ti što je bilo točnije.
+event.greet.l4.3 = Može partija kao u klubu? Komentirat ću kad se procjena promijeni.
+event.greet.l5 = Igrajmo. Bit ću kratak u komentarima.
+event.greet.l5.2 = Ja sam spreman, počni kad želiš. Samo kratki komentari.
+event.greet.l5.3 = Sretno. Javljat ću se samo kad je važno.
+event.greet.l6 = Sretno.
+event.greet.l6.2 = Igrajmo.
+event.greet.l6.3 = Spreman sam. Komentirat ću samo kritične trenutke.
+
+# Who starts (said after the greeting).
+event.colour.white = Imaš bijele figure, pa ti počinješ.
+event.colour.white.2 = Igraš bijelima: prvi potez je tvoj.
+event.colour.black = Ja imam bijele, pa ja počinjem.
+event.colour.black.2 = Ovaj put igraš crnima: ja povlačim prvi potez.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names (coach.level.<n>.name) chosen for assets/i18n/hr.lang: Prvi koraci, Početnik,
+# Napredni početnik, Klupski igrač, Jak klupski igrač, Stručnjak.
+event.level.l1 = Prvi koraci: igram lagano i svaku pogrešku objašnjavam jednostavnim riječima.
+event.level.l2 = Početnik: igram malo jače i imenujem jednostavne taktičke motive poput vilica i vezanja.
+event.level.l3 = Napredni početnik: govorim o planovima i pješačkoj strukturi i pokazujem kratke varijante.
+event.level.l4 = Klupski igrač: dajem procjene u pješacima i predlažem poteze kandidate.
+event.level.l5 = Jak klupski igrač: kratki komentari, a dulje varijante kad je važno.
+event.level.l6 = Stručnjak: igram najbolje što mogu i komentiram samo kritične trenutke.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Tvoj potez.
+event.your_move.2 = Ti si na potezu.
+event.your_move.3 = Sad je na tebi.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Ne žuri.
+event.take_time.2 = Nema žurbe: u našim partijama nema sata.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Da vidimo.
+event.filler.3 = Daj da pogledam.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = U redu, vratimo potez.
+event.takeback.taken.2 = Dobra ideja. Pogledaj još jednom.
+event.takeback.taken.3 = Potez je vraćen. Pokušaj ponovno.
+# The player declined the offer and played on.
+event.takeback.declined = U redu, igramo dalje.
+event.takeback.declined.2 = Dobro, partija se nastavlja.
+event.takeback.declined.3 = Kako želiš. Nastavimo.
+# After an explanation without an offer.
+event.play_on = Igrajmo dalje.
+event.play_on.2 = Nastavimo.
+event.play_on.3 = A sad se vratimo našoj partiji.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Ovakve pogreške rade svi. Važno je naučiti ih uočavati.
+event.encourage.mistake.2 = Ne brini. Provjeri što napada moj zadnji potez i naći ćeš.
+event.encourage.mistake.3 = To se događa svakom igraču. Idemo dalje.
+# The player is behind (material or evaluation).
+event.encourage.behind = Ne odustaj: traži šanse i nemoj mi olakšati posao.
+event.encourage.behind.2 = Bori se dalje. Ovakve se pozicije još mogu preokrenuti.
+event.encourage.behind.3 = Samo mirno, i traži slabosti u mojoj poziciji.
+# The player has played several good moves in a row.
+event.encourage.well = Provjeravaš moje prijetnje prije nego što povučeš potez. Bravo.
+event.encourage.well.2 = Pažljivi, solidni potezi. Samo tako nastavi.
+event.encourage.well.3 = Danas dobro razmišljaš.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Prihvaćam. Onda remi.
+event.draw.accepted.2 = Dogovoreno: remi.
+event.draw.declined = Ne, hvala, igrajmo dalje.
+event.draw.declined.2 = Radije bih nastavio.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Dobro odigrano. Čestitam!
+event.end.win.2 = Zaslužena pobjeda. Bravo!
+event.end.win.3 = Čestitam: pobjeda je tvoja, i to posve poštena.
+event.end.loss = Dobra partija. Idući put ćeš me pobijediti.
+event.end.loss.2 = Hvala na partiji. Svaki te poraz nečemu nauči.
+event.end.loss.3 = Dobra borba. Pogledajmo što se dogodilo.
+event.end.draw = Remi. Dobra partija!
+event.end.draw.2 = Ovaj put nema pobjednika. Bila je to dobra borba.
+event.end.draw.3 = Pošten rezultat. Dobra partija.
+event.end.resigned = Partija je predana. Ipak, bila je to dobra borba.
+event.end.resigned.2 = U redu. Hvala na partiji.
+event.end.handshake = Rukujmo se.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lower-case nominative: it always
+# comes after a colon, so it never needs a case.
+event.lesson.resume = Evo nas opet! Nastavljamo lekciju: {chapter}.
+event.lesson.resume.2 = Opet pozdrav! Stali smo kod teme: {chapter}.
+event.lesson.next = Sljedeća tema: {chapter}.
+event.lesson.next.2 = A sada: {chapter}.

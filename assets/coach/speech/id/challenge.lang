@@ -1,0 +1,135 @@
+# Coach speech (Indonesian): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 posisi", count.position in
+#            common.lang), "{n:move}" likewise ("2 langkah"): "Mat dalam {n:move}"
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "skakmat" (the line says it)
+#   {your}   one of the player's pieces ("kudamu"); the coach points at it on that word
+#   {sq}     a square ("petak {sq}": nothing glued to it); the coach points at it on that word
+# The player always has the white pieces. The coach says "kamu" and "aku" (glossary/id.md).
+# "Mate in N" uses "mat" ("mat dalam 2 langkah"), as Indonesian puzzle books do; a mate given on
+# the board is "skakmat".
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat dalam satu langkah. {n:position}, dan di setiap posisi ada satu langkah yang langsung memberi skakmat. Periksa semua skak.
+ch.intro.mate2 = Mat dalam dua langkah. {n:position}: langkah pertamamu harus membuatku tak bisa bertahan, lalu kamu memberi skakmat.
+ch.intro.mate3 = Mat dalam tiga langkah. {n:position}. Skak, makan, dan ancaman: perhitungkan balasan terbaikku setiap kali.
+ch.intro.backrank = Mat baris belakang. {n:position} dengan raja yang terkurung di belakang pion-pionnya sendiri.
+ch.intro.patterns = Pola mat. {n:position} dengan jaring mat klasik. Kenali polanya, lalu serang.
+ch.intro.hanging = Buah gratis. {n:position}: ada buahku yang dibiarkan tak terlindungi. Temukan, lalu makan.
+ch.intro.fork = Garpu. {n:position}: temukan langkah yang menyerang dua sasaran sekaligus.
+ch.intro.pin = Kunci. {n:position}: kunci sebuah buah, atau manfaatkan buah yang terkunci.
+ch.intro.skewer = Tusuk sate. {n:position}: serang buah yang berharga, lalu rebut apa yang ada di belakangnya.
+ch.intro.discovered = Serangan tersingkap. {n:position}: pindahkan satu buah untuk melepaskan serangan buah lain.
+ch.intro.deflection = Pembelokan dan pancingan. {n:position}: pancing pelindung menjauh, atau ke petak yang mematikan.
+ch.intro.intermezzo = Langkah sela. {n:position}: sebelum langkah yang sudah jelas, temukan langkah yang lebih kuat.
+ch.intro.trapped = Buah terjebak. {n:position}: salah satu buahku tidak punya petak aman untuk dituju. Rebut buah itu.
+ch.intro.promotion = Promosi. {n:position} dengan pion yang sudah jauh maju dan menentukan hasil permainan.
+ch.intro.quiet = Langkah tenang. {n:position}: langkah yang menang bukan skak, juga bukan memakan buah.
+ch.intro.opening = Jebakan pembukaan. {n:position} dari langkah-langkah awal permainan sungguhan. Hukum kesalahanku.
+ch.intro.escape = Temukan jalan keluar. {n:position}: rajamu dalam bahaya, dan hanya satu langkah yang bisa menyelamatkannya.
+ch.intro.defend = Langkah bertahan. {n:position}: temukan satu-satunya langkah yang menjaga posisimu tetap utuh.
+ch.intro.kq = Menteri dan raja melawan raja. {n:position}: skakmat rajaku. Awas pat.
+ch.intro.kr = Benteng dan raja melawan raja. {n:position}: skakmat rajaku, selangkah demi selangkah.
+ch.intro.kp = Raja dan pion melawan raja. {n:position}: promosikan pionmu menjadi menteri. Biarkan rajamu memimpin jalan.
+ch.intro.kp_hold = Hentikan pion. {n:position}: kamu hanya punya raja. Pertahankan remis.
+ch.intro.rook = Permainan akhir benteng. {n:position}: bangun jembatan untuk promosi, dan pertahankan remis dengan pertahanan Philidor.
+ch.intro.endgame = Taktik permainan akhir. {n:position} dengan sedikit buah dan ide-ide tajam.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 langkah").
+ch.task.mate = Mat dalam {n:move}.
+ch.task.mate.2 = Temukan mat dalam {n:move}.
+ch.task.hanging = Ada yang dibiarkan tak terlindungi.
+ch.task.hanging.2 = Apa yang bisa kamu makan secara gratis?
+ch.task.fork = Temukan garpunya.
+ch.task.fork.2 = Cari serangan garpu.
+ch.task.pin = Di sini, jawabannya adalah mengunci buah.
+ch.task.skewer = Di sini, tusuk sate membawa kemenangan.
+ch.task.discovered = Di sini, serangan tersingkap membawa kemenangan.
+ch.task.deflection = Bebani pelindung dengan tugas berlebih, atau pancing pelindung itu.
+ch.task.intermezzo = Cari langkah sela.
+ch.task.trapped = Salah satu buahku tidak bisa lolos. Rebut buah itu.
+ch.task.promotion = Manfaatkan pionmu yang sudah maju.
+ch.task.quiet = Langkah yang menang adalah langkah tenang.
+ch.task.opening = Hukum langkah terakhirku.
+ch.task.escape = Selamatkan rajamu: hanya satu langkah yang berhasil.
+ch.task.defend = Temukan satu-satunya langkah yang bagus.
+ch.task.endgame = Temukan langkah terbaik.
+ch.task.default = Temukan langkah terbaik.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Skakmat rajaku. Aku akan bertahan sebisa mungkin.
+ch.task.play.promote = Promosikan pionmu, dan pertahankan kemenangan. Aku akan berusaha menghentikanmu.
+ch.task.play.hold = Pertahankan remis selama {n:move}. Aku akan berusaha menang.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Posisi-posisi ini berasal dari permainan sungguhan. Aku memainkan langkah terakhirnya, lalu giliranmu.
+ch.lead.first.2 = Setiap posisi berasal dari permainan sungguhan: aku memainkan langkah yang menuju ke sana, lalu kamu yang bermain.
+ch.next = Posisi berikutnya.
+ch.next.2 = Ini posisi berikutnya.
+ch.next.3 = Lanjut ke posisi berikutnya.
+ch.last = Posisi terakhir.
+ch.last.2 = Dan sekarang yang terakhir.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Bagus.
+ch.good.2 = Ya.
+ch.good.3 = Benar.
+ch.good.4 = Tepat.
+# The position is solved.
+ch.solved = Itu dia! Bagus sekali.
+ch.solved.2 = Tepat sekali.
+ch.solved.3 = Sangat bagus.
+ch.solved.mate = Skakmat! Bagus sekali.
+ch.solved.mate.2 = Dan itu skakmat. Sangat bagus.
+ch.solved.mate.3 = Skakmat. Rapi sekali.
+ch.solved.promote = Menteri baru, dan kemenangan sudah aman. Bagus sekali.
+ch.solved.hold = Remis berhasil dipertahankan. Pertahanan yang bagus!
+ch.solved.draw = Remis di papan. Pertahanan yang bagus!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Bukan yang ini: aku akan menjawab {move}.
+ch.wrong.reply.2 = Belum tepat: aku akan membalas {move}.
+ch.wrong.reply.3 = Lalu aku akan memainkan {move}.
+ch.wrong.mate = Hati-hati: {move:nomate} akan menjadi skakmat.
+ch.wrong.mate.2 = Awas: aku akan menjawab {move:nomate}, dan itu skakmat.
+ch.wrong.mated = Hati-hati: setelah {move}, aku bisa memaksakan mat dalam {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Itu juga berujung skakmat, tapi butuh lebih lama. Ada cara yang lebih cepat.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Itu juga berujung skakmat, tapi aku memikirkan langkah lain. Lihat lagi.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Lumayan, tapi ada yang lebih kuat. Lihat lagi.
+ch.wrong.weaker.2 = Itu bisa dimainkan, tapi kamu bisa lebih baik lagi.
+ch.wrong.stalemate = Pat! Rajaku tidak bisa bergerak, dan hasilnya hanya remis.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Bukan yang ini: setelah {move}, aku bisa mempertahankan remis.
+ch.wrong.loses = Hati-hati: setelah {move}, posisiku akan menang.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Bukan itu.
+ch.try_again = Coba lagi.
+ch.try_again.2 = Coba lihat sekali lagi.
+ch.try_again.3 = Lihat lagi.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Mau petunjuk?
+ch.offer.2 = Perlu kuberi petunjuk?
+ch.no_hint = Baiklah. Terus cari.
+ch.no_hint.2 = Baik, tidak perlu terburu-buru.
+ch.hint.piece = Lihat {your}.
+ch.hint.piece.2 = Coba pikirkan {your}.
+ch.hint.square = Lihat petak {sq}.
+ch.hint.square.2 = Petak kuncinya adalah {sq}.
+ch.hint.square.3 = Awasi petak {sq}.
+ch.hint.show = Ini langkahnya. Perhatikan.
+ch.hint.show.2 = Biar kutunjukkan. Perhatikan.
+ch.hint.now = Sekarang kamu yang memainkannya.
+ch.hint.now.2 = Giliranmu: mainkan langkah itu.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Seluruh tantangan sudah selesai. Bagus sekali!
+ch.complete.2 = Semua posisi berhasil dipecahkan. Bagus sekali!

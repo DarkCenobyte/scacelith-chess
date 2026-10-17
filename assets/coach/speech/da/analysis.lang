@@ -1,0 +1,156 @@
+# Coach speech (Danish): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Danish:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "du" or "jeg" here: the players are "hvid" and "sort", lower case in running text as
+#   Danish chess books write them, capitalised at the start of a sentence. A piece comes with its
+#   side: {piece} {t1} {t2} = "den hvide springer", "det sorte tårn" (common.lang, owner.white /
+#   owner.black); a pronoun pointing back at one takes its form ({piece:den} = den / det).
+# - Adjectives about a move agree with "træk" (neuter): "{best} var mere præcist", "genialt".
+# - Counted numbers (common.lang): {pts:point} "3 point", {n:mistake} "2 fejl", {m:blunder}
+#   "1 brøler" (spoken "én brøler"). "Mat i {m}" needs no noun ("mat i tre", as eval.mate_win).
+#   "Mat" is common gender: "en tvungen mat".
+# - {opening:def} is the opening's name in the form the openings fragment gives for running text.
+# - Commas as the glossary says: no comma before a restrictive subordinate clause that follows its
+#   main clause.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Lad os se tilbage på dette parti sammen.
+an.start.2 = Lad os gå partiet igennem træk for træk.
+an.start.3 = Her er partiet. Lad os se hvordan det gik.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Dette parti begynder fra en opstillet stilling. Lad os gå det igennem.
+an.start.setup.2 = Et parti fra en opstillet stilling. Lad os se hvordan det gik.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Åbningen er {opening:def}.
+an.opening.2 = Det her er {opening:def}.
+an.book_exit = Med {move} forlader partiet den kendte åbningsteori.
+an.book_exit.2 = {move} er det første træk uden for den kendte teori.
+an.book_exit.3 = Åbningsteorien slutter her, med {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} er en brøler.
+an.blunder.2 = Her er {move} en alvorlig fejl.
+an.blunder.3 = En brøler: {move}.
+an.mistake = {move} er en fejl.
+an.mistake.2 = {move} er ikke det rigtige træk her.
+an.mistake.3 = En fejl: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} forpasser chancen for at straffe den fejl.
+an.missed_chance.2 = Med {move} glider chancen væk.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Nu er {reply:nomate} skakmat.
+an.mate_allowed.one.2 = Det tillader {reply:nomate}, og det er skakmat.
+an.mate_allowed = Det tillader en tvungen mat i {m}, med {reply:nomate} som første træk.
+an.mate_allowed.2 = Nu er der en tvungen mat i {m}, og den begynder med {reply:nomate}.
+an.fork = Nu giver {reply} gaffel på {t1} og {t2}.
+an.fork.2 = Det tillader {reply}, som angriber {t1} og {t2} på én gang.
+an.fork.3 = {reply} angriber {t1} og {t2} på samme tid.
+an.hanging = Det lader {piece} stå udækket, og {reply} slår {piece:den}.
+an.hanging.2 = {piece} står uden forsvarer: {reply} vinder {piece:den}.
+an.hanging.3 = {reply} slår simpelthen {piece}, som ikke havde nogen forsvarer.
+an.material = Svaret {line} vinder {pts:point} i materiale.
+an.material.2 = Så følger {line}, som vinder {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = {best:nomate} var skakmat.
+an.mate_missed.one.2 = {best:nomate} ville have været skakmat.
+an.mate_missed = {best:nomate} ville have gennemtvunget mat i {m}.
+an.mate_missed.2 = Der var en tvungen mat i {m}, med {best:nomate} som første træk.
+an.missed_capture = {best} ville have vundet {piece} gratis.
+an.missed_capture.2 = {piece} havde ingen forsvarer: {best} ville have slået {piece:den}.
+an.missed_fork = {best} ville have givet gaffel på {t1} og {t2}.
+an.missed_fork.2 = {best} var en gaffel med angreb på både {t1} og {t2}.
+
+# The better move, when nothing above named it.
+an.better = {best} var stærkere.
+an.better.2 = Bedre var {best}.
+an.better.3 = {best} var mere præcist.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} er genialt: det ofrer {piece}!
+an.brilliant.2 = Et genialt offer! {move} ofrer {piece}.
+an.brilliant.3 = {move}! Et genialt træk, som ofrer {piece}.
+an.brilliant.mate = Det fører til en tvungen mat i {m}.
+an.brilliant.mate.2 = Og det gennemtvinger mat i {m}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} er det eneste træk der bevarer fordelen.
+an.only.win.2 = Kun {move} holder fast i fordelen her. Godt fundet.
+an.only.hold = {move} er det eneste træk der bevarer ligevægten.
+an.only.hold.2 = Kun {move} holder stillingen her.
+an.only.defend = {move} er det eneste træk der holder kampen i gang.
+an.only.defend.2 = Kun {move} holder liv i partiet her. Godt forsvaret.
+an.only.best = {move} er langt det stærkeste træk her.
+an.only.best.2 = Præcist: {move} er meget stærkere end alt andet.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} er en smule unøjagtigt: {best} var mere præcist.
+an.inaccuracy.2 = Ikke helt det bedste: {best} var mere præcist end {move}.
+an.interesting = {move} er en interessant idé: trækket ofrer {piece}.
+an.interesting.2 = Et interessant forsøg: {move} giver {piece} væk.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Hvid har nu en tvungen mat i {m}.
+an.mate_on.white.2 = Herfra kan hvid gennemtvinge mat i {m}.
+an.mate_on.black = Sort har nu en tvungen mat i {m}.
+an.mate_on.black.2 = Herfra kan sort gennemtvinge mat i {m}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Skakmat. Hvid vinder partiet.
+an.end.mate.white.2 = Og det er skakmat: hvid vinder.
+an.end.mate.black = Skakmat. Sort vinder partiet.
+an.end.mate.black.2 = Og det er skakmat: sort vinder.
+an.end.resigned.white = Sort opgav, så hvid vinder partiet.
+an.end.resigned.white.2 = Partiet slutter her: sort opgav, og hvid vinder.
+an.end.resigned.black = Hvid opgav, så sort vinder partiet.
+an.end.resigned.black.2 = Partiet slutter her: hvid opgav, og sort vinder.
+an.end.timeout.white = Sorts tid løb ud, så hvid vinder.
+an.end.timeout.white.2 = Hvid vinder på tid.
+an.end.timeout.black = Hvids tid løb ud, så sort vinder.
+an.end.timeout.black.2 = Sort vinder på tid.
+an.end.win.white = Partiet ender med sejr til hvid.
+an.end.win.white.2 = Hvid vinder partiet.
+an.end.win.black = Partiet ender med sejr til sort.
+an.end.win.black.2 = Sort vinder partiet.
+an.end.stalemate = Pat: partiet er remis.
+an.end.stalemate.2 = Det er pat, så partiet ender remis.
+an.end.draw.agreement = Spillerne aftalte remis.
+an.end.draw.agreement.2 = Partiet ender remis efter aftale.
+an.end.draw.repetition = Partiet er remis ved gentagelse af stillingen.
+an.end.draw.repetition.2 = Den samme stilling kom igen: remis.
+an.end.draw.fifty = Partiet er remis efter 50-træksreglen.
+an.end.draw.fifty.spoken = Partiet er remis efter reglen om halvtreds træk.
+an.end.draw.fifty.2 = Halvtreds træk uden slag eller bondetræk: remis.
+an.end.draw.seventy_five = Partiet er remis efter 75-træksreglen.
+an.end.draw.seventy_five.spoken = Partiet er remis efter reglen om femoghalvfjerds træk.
+an.end.draw.seventy_five.2 = Femoghalvfjerds træk uden slag eller bondetræk: remis.
+an.end.draw.material = Skakmat er ikke længere muligt: partiet er remis.
+an.end.draw.material.2 = Ingen af siderne kan længere sætte mat, så det er remis.
+an.end.draw = Partiet ender remis.
+an.end.draw.2 = Remis.
+an.end.unfinished = Partiet stopper her, uafsluttet.
+an.end.unfinished.2 = Her stopper partiet: det blev ikke spillet færdigt.
+an.end.accuracy = Præcision: {acc_white} procent for hvid, {acc_black} for sort.
+an.end.accuracy.2 = Hvid spillede med en præcision på {acc_white} procent, sort med {acc_black}.
+an.end.clean.white = Hvid lavede hverken fejl eller brølere.
+an.end.clean.white.2 = Hvids spil var frit for alvorlige fejl.
+an.end.clean.black = Sort lavede hverken fejl eller brølere.
+an.end.clean.black.2 = Sorts spil var frit for alvorlige fejl.
+an.end.mistakes.white = Hvid lavede {n:mistake} og ingen brølere.
+an.end.mistakes.white.2 = For hvid: {n:mistake}, ingen brølere.
+an.end.mistakes.black = Sort lavede {n:mistake} og ingen brølere.
+an.end.mistakes.black.2 = For sort: {n:mistake}, ingen brølere.
+an.end.blunders.white = Hvid lavede {m:blunder}.
+an.end.blunders.white.2 = For hvid: {m:blunder}.
+an.end.blunders.black = Sort lavede {m:blunder}.
+an.end.blunders.black.2 = For sort: {m:blunder}.
+an.end.errors.white = Hvid lavede {n:mistake} og {m:blunder}.
+an.end.errors.white.2 = For hvid: {n:mistake} og {m:blunder}.
+an.end.errors.black = Sort lavede {n:mistake} og {m:blunder}.
+an.end.errors.black.2 = For sort: {n:mistake} og {m:blunder}.

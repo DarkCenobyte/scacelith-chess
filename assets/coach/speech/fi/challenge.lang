@@ -1,0 +1,139 @@
+# Coach speech (Finnish): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 asemaa", count.position in
+#            common.lang), "{n:move_ade}" in the adessive ("matti 3 siirrolla", spoken "kolmella
+#            siirrolla", as the challenge names "Matti kahdella siirrolla"), "{n:move_gen}" in the
+#            genitive ("10 siirron ajan")
+#   {move}   one of the coach's moves, played on the board while the line is said; never inflected:
+#            "siirrolla {move}", "siirron {move} jälkeen". "{move:nomate}" says a mating move
+#            without "matti" (the line says it)
+#   {your}   one of the player's pieces ("ratsusi", {your:part} "ratsuasi"); the coach points at it
+#   {sq}     a square, never inflected: "ruutua {sq}", "ruutu {sq}"; the coach points at it
+# The player always has the white pieces. The coach says "sinä" to the player.
+# A line that names {n:position} keeps the next sentence apart (no "joissa" / "jossa" after it), so
+# that it reads right for one position as for several.
+# The challenge names at the start of each intro are those of the challenge page (challenge.*.name
+# in assets/i18n/fi.lang).
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matti yhdellä siirrolla. {n:position}, ja joka kerta yksi siirto tekee matin. Käy läpi kaikki shakit.
+ch.intro.mate2 = Matti kahdella siirrolla. {n:position}: ensimmäisen siirtosi jälkeen minulla ei saa olla puolustusta, ja sitten teet matin.
+ch.intro.mate3 = Matti kolmella siirrolla. {n:position}. Shakit, lyönnit ja uhat: laske joka kerta paras vastaukseni.
+ch.intro.backrank = Takarivimatit. {n:position}. Kuningas on ansassa omien sotilaidensa takana.
+ch.intro.patterns = Mattikuviot. {n:position}. Klassisia mattiverkkoja: tunnista kuvio ja iske.
+ch.intro.hanging = Ilmaiset nappulat. {n:position}: jokin nappulani on jäänyt ilman suojaa. Etsi se ja lyö se.
+ch.intro.fork = Haarukat. {n:position}: etsi siirto, joka uhkaa kahta kohdetta yhtä aikaa.
+ch.intro.pin = Kiinnitykset. {n:position}: kiinnitä nappula tai hyödynnä kiinnitystä.
+ch.intro.skewer = Vartaat. {n:position}: uhkaa arvokasta nappulaa ja voita se, mikä on sen takana.
+ch.intro.discovered = Paljastetut hyökkäykset. {n:position}: siirrä yhtä nappulaa ja avaa tie toiselle.
+ch.intro.deflection = Harhautus ja houkutus. {n:position}: houkuttele puolustaja pois paikaltaan tai kohtalokkaaseen ruutuun.
+ch.intro.intermezzo = Välisiirrot. {n:position}: ennen ilmeistä siirtoa löydä vahvempi.
+ch.intro.trapped = Ansaan jääneet nappulat. {n:position}: yhdellä nappulallani ei ole turvallista ruutua. Voita se.
+ch.intro.promotion = Korotus. {n:position}. Pitkälle edennyt sotilas ratkaisee pelin.
+ch.intro.quiet = Hiljaiset siirrot. {n:position}: voittava siirto ei ole shakki eikä lyönti.
+ch.intro.opening = Avausansat. {n:position} oikeiden pelien ensimmäisistä siirroista. Rankaise virheestäni.
+ch.intro.escape = Löydä pelastus. {n:position}: kuninkaasi on vaarassa, ja vain yksi siirto pelastaa sen.
+ch.intro.defend = Puolustussiirrot. {n:position}: löydä se ainoa siirto, joka pitää asemasi koossa.
+ch.intro.kq = Kuningatar ja kuningas kuningasta vastaan. {n:position}: tee kuninkaalleni matti. Varo pattia.
+ch.intro.kr = Torni ja kuningas kuningasta vastaan. {n:position}: tee kuninkaalleni matti, askel kerrallaan.
+ch.intro.kp = Kuningas ja sotilas kuningasta vastaan. {n:position}: korota sotilas kuningattareksi. Anna kuninkaasi kulkea edellä.
+ch.intro.kp_hold = Pysäytä sotilas. {n:position}: sinulla on vain kuningas. Pidä tasapeli.
+ch.intro.rook = Torniloppupelit. {n:position}: rakenna silta korottaaksesi ja pidä tasapeli Philidorin puolustuksella.
+ch.intro.endgame = Loppupelin taktiikka. {n:position}: vähän nappuloita, teräviä ideoita.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_ade}: "3 siirrolla").
+ch.task.mate = Matti {n:move_ade}.
+ch.task.mate.2 = Etsi matti {n:move_ade}.
+ch.task.hanging = Jokin on jäänyt ilman suojaa.
+ch.task.hanging.2 = Mitä voit lyödä ilmaiseksi?
+ch.task.fork = Etsi haarukka.
+ch.task.fork.2 = Etsi haarukkaa.
+ch.task.pin = Kiinnitys on tässä avain.
+ch.task.skewer = Tässä voittaa varras.
+ch.task.discovered = Tässä voittaa paljastettu hyökkäys.
+ch.task.deflection = Ylikuormita puolustaja tai houkuttele se ansaan.
+ch.task.intermezzo = Etsi välisiirtoa.
+ch.task.trapped = Yksi nappulani ei pääse pakoon. Voita se.
+ch.task.promotion = Hyödynnä pitkälle edennyttä sotilastasi.
+ch.task.quiet = Voittava siirto on hiljainen siirto.
+ch.task.opening = Rankaise viimeisestä siirrostani.
+ch.task.escape = Pelasta kuninkaasi: vain yksi siirto toimii.
+ch.task.defend = Löydä ainoa hyvä siirto.
+ch.task.endgame = Löydä paras siirto.
+ch.task.default = Löydä paras siirto.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Tee kuninkaalleni matti. Puolustan niin hyvin kuin pystyn.
+ch.task.play.promote = Korota sotilaasi ja pidä voitto. Yritän estää sinua.
+ch.task.play.hold = Pidä tasapeli {n:move_gen} ajan. Yritän voittaa.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Nämä asemat ovat oikeista peleistä. Pelaan viimeisen siirron, ja sitten on sinun vuorosi.
+ch.lead.first.2 = Jokainen asema on oikeasta pelistä: pelaan siirron, joka johti siihen, ja sitten sinä pelaat.
+ch.next = Seuraava asema.
+ch.next.2 = Tässä seuraava.
+ch.next.3 = Siirrytään seuraavaan.
+ch.last = Viimeinen asema.
+ch.last.2 = Ja nyt viimeinen.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Hyvä.
+ch.good.2 = Kyllä.
+ch.good.3 = Oikein.
+ch.good.4 = Juuri niin.
+# The position is solved.
+ch.solved = Siinä se! Hienoa.
+ch.solved.2 = Täsmälleen oikein.
+ch.solved.3 = Erittäin hyvä.
+ch.solved.mate = Matti! Hienoa.
+ch.solved.mate.2 = Ja se on matti. Erittäin hyvä.
+ch.solved.mate.3 = Matti. Hienosti tehty.
+ch.solved.promote = Uusi kuningatar, ja voitto on varma. Hienoa.
+ch.solved.hold = Tasapeli säilyi. Hyvin puolustettu!
+ch.solved.draw = Laudalla on tasapeli. Hyvin puolustettu!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Ei tämä: vastaisin siirrolla {move}.
+ch.wrong.reply.2 = Ei aivan: vastaukseni olisi {move}.
+ch.wrong.reply.3 = Silloin pelaisin {move}.
+ch.wrong.mate = Varovasti: {move:nomate} olisi matti.
+ch.wrong.mate.2 = Varo: vastaisin siirrolla {move:nomate}, ja se on matti.
+ch.wrong.mated = Varovasti: siirron {move} jälkeen voin pakottaa matin {m:move_ade}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Sekin johtaa mattiin, mutta hitaammin. Nopeampikin tie on olemassa.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Sekin tekee matin, mutta minulla on mielessä toinen siirto. Katso uudelleen.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Ei huono, mutta on jotain vahvempaa. Katso uudelleen.
+ch.wrong.weaker.2 = Sitä voi pelata, mutta pystyt parempaan.
+ch.wrong.stalemate = Patti! Kuninkaani ei voi liikkua, ja patti on vain tasapeli.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Ei tämä: siirron {move} jälkeen pystyn pitämään tasapelin.
+ch.wrong.loses = Varovasti: siirron {move} jälkeen olisin voitolla.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Tuo ei ole se.
+ch.try_again = Yritä uudelleen.
+ch.try_again.2 = Katso vielä kerran.
+ch.try_again.3 = Katso uudelleen.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Haluatko vihjeen?
+ch.offer.2 = Annanko vihjeen?
+ch.no_hint = Selvä. Jatka etsimistä.
+ch.no_hint.2 = Hyvä on, mieti rauhassa.
+ch.hint.piece = Katso {your:part}.
+ch.hint.piece.2 = Entä {your}?
+ch.hint.square = Katso ruutua {sq}.
+ch.hint.square.2 = Avainruutu on {sq}.
+ch.hint.square.3 = Pidä silmällä ruutua {sq}.
+ch.hint.show = Tässä on siirto. Katso.
+ch.hint.show.2 = Näytän sinulle. Katso.
+ch.hint.now = Pelaa se nyt itse.
+ch.hint.now.2 = Sinun vuorosi: pelaa se.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Siinä oli koko haaste. Hienoa!
+ch.complete.2 = Kaikki asemat on ratkaistu. Hienoa!

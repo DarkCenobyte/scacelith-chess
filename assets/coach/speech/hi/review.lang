@@ -1,0 +1,974 @@
+# Coach speech (Hindi): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Register: the coach says "तुम" and is male ("मैं काट लेता हूँ", "मैं सोच रहा था"). The player's gender is unknown:
+# with तुम as the subject the lines use only the imperative, the subjunctive, the present copula "हो" and transitive
+# perfectives with "ने" ("तुमने बाज़ी जीत ली"); otherwise "तुम्हें ... चाहिए / मिला", "तुमसे ... छूट गया", nouns
+# ("तुम्हारी जीत", "{pts:point_obl} का नुक़सान") or the passive ("काटा जा सकता था"). Every piece is masculine, so a
+# verb agreeing with {your} {my} {t1} is masculine ("{your} फँस गया है", "{your} उसे काट सकता था").
+# Forms from common.lang: nom obl ko se par ne ka ke ki; refl_* when the owner is the subject of the clause (also the
+# implied तुम of an imperative: "{your:refl_ko} आगे लाओ!"); two targets before a postposition are both oblique:
+# "{t1:obl} और {t2:obl} पर फ़ोर्क". Spoken moves ({move} {best} {reply} {line}) may end with a verb ("... पर काटता
+# है"), so they stand after a colon or before a comma, never before a postposition, a copula or a verb.
+# Counts: {pts:point} "3 अंक" ("तुम {pts:point} पीछे हो"), {pts:point_obl} before a postposition, {m:move_obl}
+# "3 चालों में मात", {n:time} "3 बार", {n:attacker} / {n2:defender}, {n:square}. A verb never agrees with a count.
+# Terms: blunder ब्लंडर, mistake ग़लती, inaccuracy चूक, dubious संदिग्ध, trade अदला-बदली, material मटीरियल
+# (levels 1-2: "मोहरों का फ़ायदा / नुक़सान"), passed pawn पास्ड प्यादा, opposition ऑपोज़िशन, rule of the square वर्ग,
+# forced mate पक्की मात. Levels 1-2: simple words, short sentences; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = शह! मेरे राजा पर हमला है।
+ann.check.human.b1.2 = शह! मेरे राजा पर तुम्हारा हमला है।
+ann.check.human.b1.3 = यह शह है! मेरे राजा को शह से बचना होगा।
+ann.check.human = शह।
+ann.check.human.2 = शह!
+ann.check.human.3 = और यह शह है।
+# The coach gives check.
+ann.check.coach = शह!
+ann.check.coach.2 = शह।
+ann.check.coach.3 = और शह!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = इसका मतलब है कि {your:par} हमला है। तुम्हें उसे शह से बचाना होगा।
+ann.check.coach.first.2 = शह का मतलब है कि {your:par} हमला है। उसे हटाओ, बीच में कोई मोहरा लाओ, या मेरा मोहरा काट लो।
+ann.double_check.coach = दोहरी शह! मेरे दो मोहरे एक साथ तुम्हारे राजा पर हमला कर रहे हैं, इसलिए उसे हटना ही होगा।
+ann.double_check.coach.2 = यह दोहरी शह है: अब सिर्फ़ राजा की चाल ही काम आएगी।
+ann.double_check.human = दोहरी शह! तुम्हारे दो मोहरे एक साथ मेरे राजा पर हमला कर रहे हैं, इसलिए उसे हटना ही होगा।
+ann.double_check.human.2 = दोहरी शह! अब सिर्फ़ राजा की चाल ही मुझे बचा सकती है।
+# The player checkmates the coach.
+ann.mate.human.b1 = शह और मात! तुम्हारी जीत हुई! मेरा राजा कहीं नहीं भाग सकता।
+ann.mate.human.b1.2 = यह शह और मात है! शाबाश, तुमने बाज़ी जीत ली!
+ann.mate.human.b1.3 = शह और मात! मेरा राजा फँस गया है। बधाई हो!
+ann.mate.human = शह और मात। बहुत अच्छा खेला।
+ann.mate.human.2 = यह मात है। बधाई हो।
+ann.mate.human.3 = शह और मात! बहुत बढ़िया।
+# The coach checkmates the player.
+ann.mate.coach.b1 = यह शह और मात है। तुम्हारे राजा के पास बचने का कोई रास्ता नहीं।
+ann.mate.coach.b1.2 = शह और मात। तुम्हारे राजा पर हमला है, और वह बच नहीं सकता।
+ann.mate.coach.b1.3 = अफ़सोस, यह शह और मात है। तुम्हारा राजा बचकर नहीं निकल सकता।
+ann.mate.coach = शह और मात।
+ann.mate.coach.2 = और यह मात है।
+ann.mate.coach.3 = अफ़सोस, शह और मात।
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = उफ़! यह चाल कुछ गँवा देती है।
+ex.verdict.blunder.b1.2 = सावधान! यह चाल तुम्हें महँगी पड़ सकती है।
+ex.verdict.blunder.b1.3 = अरे, रुको। इस चाल में एक समस्या है।
+ex.verdict.blunder.b2 = हम्म, इस चाल में एक समस्या है।
+ex.verdict.blunder.b2.2 = यह बड़ी ग़लती है।
+ex.verdict.blunder.b2.3 = सावधान, इस चाल से तुम्हारा कुछ नुक़सान होता है।
+ex.verdict.blunder.b3 = यह ब्लंडर है।
+ex.verdict.blunder.b3.2 = {move}, यह सचमुच एक ग़लती है।
+ex.verdict.blunder.b3.3 = उफ़! {move}, यह बड़ी ग़लती है।
+ex.verdict.blunder.b4 = {move}, यह ब्लंडर है।
+ex.verdict.blunder.b4.2 = {move}, यह गंभीर ग़लती है।
+ex.verdict.blunder.b4.3 = अफ़सोस, यह ब्लंडर है।
+ex.verdict.blunder.b5 = {move}, यह गंभीर ग़लती है।
+ex.verdict.blunder.b5.2 = {move}, यह ब्लंडर है।
+ex.verdict.blunder.b5.3 = {move}, यह महँगी ग़लती है।
+ex.verdict.blunder.b6 = {move}: गंभीर ग़लती।
+ex.verdict.blunder.b6.2 = {move}: ब्लंडर।
+ex.verdict.blunder.b6.3 = {move}? ब्लंडर।
+# A blunder that leaves the coach's threat standing.
+ex.verdict.ignored.b1 = उफ़! तुमने मेरे ख़तरे का जवाब नहीं दिया।
+ex.verdict.ignored.b1.2 = सावधान! मेरा ख़तरा अभी भी बना हुआ था।
+ex.verdict.ignored.b1.3 = अरे, रुको। तुम्हें मेरे ख़तरे का ध्यान नहीं रहा।
+ex.verdict.ignored.b2 = हम्म, मेरा ख़तरा अभी भी बना हुआ था।
+ex.verdict.ignored.b2.2 = तुमने मेरे ख़तरे को बिना जवाब के छोड़ दिया।
+ex.verdict.ignored.b2.3 = सावधान, तुमने मेरे ख़तरे का जवाब नहीं दिया।
+ex.verdict.mistake.b3 = यह अच्छी चाल नहीं है।
+ex.verdict.mistake.b3.2 = हम्म, {move}: इस चाल में एक समस्या है।
+ex.verdict.mistake.b3.3 = यह ग़लती है।
+ex.verdict.mistake.b4 = {move}, यह ग़लती है।
+ex.verdict.mistake.b4.2 = {move}, यह चाल अच्छी नहीं है।
+ex.verdict.mistake.b4.3 = यह एक ग़लती है।
+ex.verdict.mistake.b5 = {move}, यह साफ़ ग़लती है।
+ex.verdict.mistake.b5.2 = {move}, यह ग़लती है।
+ex.verdict.mistake.b5.3 = {move}, यह अच्छा नहीं है।
+ex.verdict.mistake.b6 = {move}: ग़लती।
+ex.verdict.mistake.b6.2 = {move}? ग़लती।
+ex.verdict.mistake.b6.3 = {move}? नहीं।
+# A dubious move (an inaccuracy): only the better move is named ({best} is pointed at).
+ex.verdict.inaccuracy.b3 = बुरा नहीं, पर थोड़ा बेहतर था: {best}।
+ex.verdict.inaccuracy.b3.2 = थोड़ी ज़्यादा सटीक चाल थी: {best}।
+ex.verdict.inaccuracy.b3.3 = छोटी-सी चूक। यहाँ बेहतर चाल थी: {best}।
+ex.verdict.inaccuracy.b4 = चूक। ज़्यादा सटीक चाल थी: {best}।
+ex.verdict.inaccuracy.b4.2 = छोटी-सी चूक। थोड़ा बेहतर था: {best}।
+ex.verdict.inaccuracy.b4.3 = सबसे अच्छी चाल से थोड़ी कम। ज़्यादा सटीक चाल थी: {best}।
+ex.verdict.inaccuracy.b5 = {move}, यह सटीक नहीं है। ज़्यादा मज़बूत चाल थी: {best}।
+ex.verdict.inaccuracy.b5.2 = थोड़ी-सी चूक। मैं यह चाल खेलता: {best}।
+ex.verdict.inaccuracy.b5.3 = {move}, इससे ज़्यादा सटीक चाल थी: {best}।
+ex.verdict.inaccuracy.b6 = {move}: चूक; {best}।
+ex.verdict.inaccuracy.b6.2 = चूक। {best}।
+ex.verdict.inaccuracy.b6.3 = बेहतर था: {best}।
+# Level 6, an inaccuracy at the bottom of its class: a hedged word.
+ex.verdict.inaccuracy.maybe = शायद थोड़ा ज़्यादा सटीक होता: {best}।
+ex.verdict.inaccuracy.maybe.2 = मैं शायद यह खेलता: {best}।
+# A dubious move that loses material (levels 3-6): the remark alone.
+ex.verdict.dubious = यह चाल संदिग्ध दिखती है।
+ex.verdict.dubious.2 = यह चाल संदिग्ध लगती है।
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = अरे, रुको! तुमसे कुछ अच्छा छूट गया।
+ex.verdict.missed.b1.2 = फिर से देखो! कुछ बेहतर था।
+ex.verdict.missed.b1.3 = रुको, वहाँ तुम्हारे पास एक मौक़ा था!
+ex.verdict.missed.b2 = वहाँ तुमसे एक मौक़ा छूट गया।
+ex.verdict.missed.b2.2 = हम्म, इससे बेहतर कुछ था।
+ex.verdict.missed.b2.3 = रुको, वहाँ तुम्हारे पास एक बेहतरीन चाल थी।
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
+ex.better.b3 = बेहतर था: {best}।
+ex.better.b3.2 = बेहतर चाल थी: {best}।
+ex.better.b3.3 = इसके बजाय यह अच्छी चाल थी: {best}।
+ex.better.b4 = ज़्यादा मज़बूत था: {best}।
+ex.better.b4.2 = सही चाल थी: {best}।
+ex.better.b4.3 = इससे बेहतर था: {best}।
+ex.better.b5 = {best}, इस विचार के साथ: {line}।
+ex.better.b5.2 = सही चाल थी {best}: {line}।
+ex.better.b5.3 = बेहतर था {best}, और फिर {line}।
+ex.better.b6 = {best}: {eval}।
+ex.better.b6.2 = इसके बजाय {best}, {eval}।
+ex.better.b6.3 = {best}: मूल्यांकन {eval}।
+
+# ---- A blunder without a reason the coach can give reliably --------------------------------------
+# The piece that had the better move ({your}, pointed at); the move itself is not named.
+ex.hint.b1 = {your:ki} एक बेहतर चाल मौजूद थी।
+ex.hint.b1.2 = {your:ke} पास एक बेहतर चाल थी।
+ex.hint.b2 = {your:ke} पास एक बेहतर चाल थी।
+ex.hint.b2.2 = {your:ki} एक बेहतर चाल मौजूद थी।
+ex.hint.b3 = {your:ke} पास एक बेहतर चाल थी।
+ex.hint.b3.2 = {your:se} कुछ बेहतर किया जा सकता था।
+ex.hint.b4 = {your:ke} पास एक बेहतर चाल थी।
+ex.hint.b4.2 = {your:refl_par} फिर से नज़र डालो: उसके पास कुछ बेहतर था।
+ex.hint.b5 = {your:ke} पास एक ज़्यादा मज़बूत चाल थी।
+ex.hint.b5.2 = {your:ki} एक ज़्यादा मज़बूत चाल मौजूद थी।
+ex.hint.b6 = {your:ke} पास बेहतर चाल थी।
+ex.hint.b6.2 = {your:refl_ko} फिर से देखो।
+ex.hint.move = एक बेहतर चाल मौजूद थी।
+ex.hint.move.2 = वहाँ तुम्हारे पास एक बेहतर चाल थी।
+# The same when the better move plainly wins material for good; the move is still not named.
+ex.hint.gain.b1 = {your:ke} पास एक बेहतर चाल थी। उससे मोहरों का फ़ायदा होता है।
+ex.hint.gain.b1.2 = {your:ki} एक बेहतर चाल मौजूद थी। उससे मोहरों का फ़ायदा होता है।
+ex.hint.gain.b2 = {your:ke} पास एक बेहतर चाल थी। उससे मोहरों का फ़ायदा होता है।
+ex.hint.gain.b2.2 = {your:ki} एक ऐसी चाल थी जिससे मोहरों का फ़ायदा होता है।
+ex.hint.gain.b3 = {your:ke} पास एक बेहतर चाल थी, जो मटीरियल जीतती है।
+ex.hint.gain.b3.2 = {your:ki} एक ऐसी चाल थी जो मटीरियल जीतती है।
+ex.hint.gain.b4 = {your:ke} पास एक ऐसी चाल थी जो मटीरियल जीतती है।
+ex.hint.gain.b4.2 = {your:refl_par} फिर से नज़र डालो: उसके पास मटीरियल जीतने वाली चाल थी।
+ex.hint.gain.b5 = {your:ke} पास एक ज़्यादा मज़बूत चाल थी, जो मटीरियल जीतती है।
+ex.hint.gain.b5.2 = {your:ki} एक ऐसी चाल थी जो मटीरियल जीतती है।
+ex.hint.gain.b6 = {your:ke} पास मटीरियल जीतने वाली चाल थी।
+ex.hint.gain.b6.2 = {your:refl_ko} फिर से देखो: मटीरियल जीता जा सकता था।
+# Levels 1-2: the better move as the piece and its square.
+ex.reveal.b1 = बेहतर चाल थी: {your} {sq} पर।
+ex.reveal.b1.2 = {your} {sq} पर जा सकता था। वह बेहतर होता।
+ex.reveal.b2 = {your:refl_ko} {sq} पर ले जाना बेहतर था।
+ex.reveal.b2.2 = बेहतर चाल थी: {your} {sq} पर।
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = चलो, मोहरों को वापस रखते हैं।
+ex.rewind.b1.2 = अब मैं सब कुछ वापस वहीं रख देता हूँ, जहाँ पहले था।
+ex.rewind.b1.3 = मैं मोहरे वापस लगा देता हूँ।
+ex.rewind.b2 = चलो, सब कुछ वापस रखते हैं।
+ex.rewind.b2.2 = वापस पहले वाली स्थिति पर।
+ex.rewind.b2.3 = मैं मोहरे वापस रख देता हूँ।
+ex.rewind.b3 = वापस बाज़ी पर।
+ex.rewind.b3.2 = चलो, वापस चलते हैं।
+ex.rewind.b3.3 = वापस उसी स्थिति पर।
+ex.rewind.b4 = वापस बाज़ी पर।
+ex.rewind.b4.2 = वापस।
+ex.rewind.b4.3 = चलो, वापस चलते हैं।
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+# No "चाहते हो" (it agrees with the player's gender): "... लेनी है?", "... आज़माएँ?" (let's), the noun "चाल वापसी".
+ex.offer.b1 = क्या तुम्हें कोई दूसरी चाल आज़मानी है?
+ex.offer.b1.2 = वह चाल वापस लेकर फिर से कोशिश करें?
+ex.offer.b1.3 = कोई दूसरी चाल आज़माएँ?
+ex.offer.b2 = तुम्हें कोई और चाल आज़मानी है?
+ex.offer.b2.2 = क्या यह चाल वापस लेनी है?
+ex.offer.b2.3 = फिर से कोशिश करें?
+ex.offer.b3 = चाल वापस लेनी है?
+ex.offer.b3.2 = क्या फिर से कोशिश करनी है?
+ex.offer.b3.3 = चाल वापस लें?
+ex.offer.b4 = वापस लेनी है?
+ex.offer.b4.2 = क्या चाल वापस लेनी है?
+ex.offer.b4.3 = कोई दूसरी चाल आज़माएँ?
+ex.offer.b5 = चाल वापसी?
+ex.offer.b5.2 = चाल वापस लेनी है?
+ex.offer.b5.3 = वापस लेनी है?
+ex.offer.b6 = चाल वापसी?
+ex.offer.b6.2 = वापस लेनी है?
+ex.offer.b6.3 = दोबारा कोशिश?
+# A dubious move at levels 1-2, said with the takeback card; the better move is not named.
+ex.dubious.b1 = यह चाल कुछ ठीक नहीं लगती। शायद कोई बेहतर चाल मिल जाए?
+ex.dubious.b1.2 = यह चाल कुछ ठीक नहीं लगती। शायद तुम्हें इससे अच्छी चाल मिल जाए?
+ex.dubious.b2 = संदिग्ध चाल। शायद इससे बेहतर कुछ मिल जाए?
+ex.dubious.b2.2 = यह चाल संदिग्ध है। शायद कुछ बेहतर हो?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}।
+demo.move.2 = {move}।
+demo.move.3 = फिर {move}।
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} {sq} पर जाता है।
+demo.my.move.2 = मैं {my:refl_ko} {sq} पर ले जाता हूँ।
+demo.my.move.3 = फिर {my} {sq} पर जाता है।
+demo.my.take = मैं {your} काट लेता हूँ।
+demo.my.take.2 = {my} {your:ko} काटता है।
+demo.my.take.3 = और मैं {your:ko} काट लेता हूँ।
+demo.my.check = {my} {sq} पर जाता है। शह।
+demo.my.check.2 = शह: {my} {sq} पर।
+demo.my.check.3 = {my} {sq} पर, शह!
+demo.my.mate = {my} {sq} पर जाता है। शह और मात।
+demo.my.mate.2 = और {my} {sq} पर: शह और मात।
+demo.my.mate.3 = {my} {sq} पर। यह शह और मात है।
+# Levels 1-3, the coach's in-between move while a bigger piece of the player's ({t1}) is attacked.
+demo.my.first.take = पहले {my} {your:ko} काटता है। {t1} इंतज़ार कर सकता है।
+demo.my.first.take.2 = {my} पहले {your:ko} काटता है। {t1} तो वहीं रहेगा।
+demo.my.first.check = {my} {your:ko} काटता है, और यह शह है! {t1} इंतज़ार कर सकता है।
+demo.my.first.check.2 = पहले {my} शह देते हुए {your:ko} काटता है। {t1} तो वहीं रहेगा।
+demo.my.first.check_move = पहले {my:se} {sq} पर शह। {t1} इंतज़ार कर सकता है।
+demo.my.first.check_move.2 = {my} {sq} पर जाता है: पहले शह! {t1} तो वहीं रहेगा।
+demo.my.first.move = पहले {my} {sq} पर जाता है। {t1} इंतज़ार कर सकता है।
+demo.my.first.move.2 = पहले {my} {sq} पर। {t1} तो वहीं रहेगा।
+# The piece that moves was attacked itself: it takes something before it can be taken.
+demo.my.first.attacked = {my:par} हमला है, इसलिए वह पहले {your:ko} काटता है।
+demo.my.first.attacked.2 = {my:par} हमला है: वह पहले {your:ko} झपट लेता है।
+# Levels 4-6, the same in-between move.
+demo.first = पहले {move}: {t1} इंतज़ार कर सकता है।
+demo.first.2 = पहले {move}। {t1} तो वहीं रहेगा।
+# After the rewind when no takeback is offered: the coach's real move comes next.
+demo.play_on = अब मैं अपनी चाल चलता हूँ।
+demo.play_on.2 = यह रही मेरी असली चाल।
+demo.play_on.3 = और अब मैं सच में अपनी चाल चलता हूँ।
+# Levels 1-3, the player's moves (what they would play): no verb with तुम as its subject.
+demo.your.move = तुम्हारी चाल: {your} {sq} पर।
+demo.your.move.2 = मान लो, तुम {your:refl_ko} {sq} पर ले जाओ।
+demo.your.move.3 = फिर {your} {sq} पर जाता है।
+demo.your.take = तब तुम्हारी ओर से {my} कटता है।
+demo.your.take.2 = {your} {my:ko} काटता है।
+demo.your.take.3 = फिर {my} कट जाता है।
+demo.your.back = तुम्हारा जवाब: वापस काटना।
+demo.your.back.2 = तुम्हारी ओर से {sq} पर वापस काटा जाता है।
+demo.your.back.3 = और फिर तुम्हारी ओर से भी वापस काटा जाता है।
+demo.your.king = तुम्हारे राजा को हटना होगा।
+demo.your.king.2 = राजा को हटना होगा, {sq} पर।
+demo.your.king.3 = तुम्हारा राजा भागकर {sq} पर जाता है।
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands ({t1} {t2} = the pieces that fall; {reply} = the mating move).
+ex.point.piece = अब {t1:ko} बचाया नहीं जा सकता।
+ex.point.piece.2 = और {t1} हाथ से गया।
+ex.point.piece.3 = इसके बाद {t1} कटेगा।
+ex.point.two = {t1:obl} और {t2:obl} दोनों पर हमला है: इनमें से एक कटेगा।
+ex.point.two.2 = अब मैं {t1:obl} और {t2:obl} पर हमला करता हूँ। दोनों को बचाया नहीं जा सकता।
+ex.point.mate = और अब {reply:nomate}: शह और मात।
+ex.point.mate.2 = इसके बाद {reply:nomate}, और यह शह और मात है।
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost.
+ex.result.b1 = देखा? अब तुम्हें {pts:point_obl} का नुक़सान हो गया।
+ex.result.b1.2 = ऐसे {pts:point_obl} का नुक़सान होता है।
+ex.result.b2 = आख़िर में तुम्हें {pts:point_obl} का नुक़सान हुआ।
+ex.result.b2.2 = अब तुम {pts:point} पीछे हो।
+ex.result.b3 = इसकी क़ीमत: {pts:point}।
+ex.result.b3.2 = आख़िर में तुम {pts:point} पीछे हो।
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = कुछ वापस काटा जा सकता है, पर फिर भी तुम {pts:point} पीछे हो।
+ex.result_back.b1.2 = थोड़ा वापस जीता जा सकता है, पर फिर भी {pts:point_obl} का नुक़सान है।
+ex.result_back.b2 = कुछ वापस मिल सकता है, पर फिर भी तुम {pts:point} पीछे हो।
+ex.result_back.b2.2 = वापस काटने के बाद भी {pts:point_obl} का नुक़सान है।
+ex.result_back.b3 = वापस काटने के बाद भी तुम {pts:point} पीछे हो।
+ex.result_back.b3.2 = कुछ वापस मिलता है, पर फिर भी {pts:point_obl} का नुक़सान होता है।
+# Why the player cannot take back where the sequence stops: the take-back ({move}, by {your2}) runs
+# into a capture of the coach's ({reply}, by {my}) that takes {your}.
+ex.retake.b1 = अगर {your2} वापस काटे, तो {my} {your:ko} काट लेगा।
+ex.retake.b1.2 = {your2:refl_se} वापस काटना ठीक नहीं: तब {my} {your:ko} काट लेगा।
+ex.retake.b2 = अगर {your2} वापस काटे, तो {my} {your:ko} काट लेगा।
+ex.retake.b2.2 = {your2:refl_se} वापस काटना काम नहीं करता: {my} {your:ko} काट लेता है।
+ex.retake.b3 = अगर तुम वापस काटो, {move}, तो {reply}, और {your} कट जाता है।
+ex.retake.b3.2 = वापस काटना, {move}, काम नहीं करता: {reply}, और {your} कट जाता है।
+ex.retake.b4 = {move}? इसका जवाब {reply}, और {your} कट जाता है।
+ex.retake.b4.2 = और अगर {move}, तो {reply}, और {your} कट जाता है।
+ex.retake.b5 = वापस काटने पर, {move}, जवाब है {reply}, और {your} कट जाता है।
+ex.retake.b5.2 = {move}, पर {reply}: {your} कट जाता है।
+ex.retake.b6 = {move}? {reply}, और {your} गया।
+ex.retake.b6.2 = {move}: नाकाम। {reply}, और {your} कटता है।
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = और यहाँ, {sq} पर, तुम्हें नया वज़ीर मिल जाता।
+demo.promote.2 = फिर {your} {sq} पर पहुँचकर वज़ीर बन जाता है।
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = सावधान: {my} {sq} पर जा सकता है, और वह शह और मात है।
+ex.mate_allowed.b1.2 = अब {my} {sq} पर जा सकता है। वह शह और मात होगी!
+ex.mate_allowed.b1.3 = सावधान! अगर {my} {sq} पर गया, तो शह और मात है।
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = इस चाल के बाद मैं {m:move_obl} में {your:ko} मात दे सकता हूँ।
+ex.mate_allowed.b2.2 = अब मैं {m:move_obl} में {your:ko} मात दे सकता हूँ। देखो।
+ex.mate_allowed.b2.3 = सावधान! {your} ख़तरे में है: {m:move_obl} में मात।
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = इस चाल से {m:move_obl} में मात का रास्ता खुलता है: {line:nomate}।
+ex.mate_allowed.b3.2 = इसके बाद मेरे पास {m:move_obl} में मात है: {line:nomate}।
+ex.mate_allowed.b3.3 = तुम्हारा राजा मात हो जाता है: {line:nomate}।
+ex.mate_allowed.b4 = {move}, यह चाल पक्की मात का रास्ता खोल देती है: {line:nomate}।
+ex.mate_allowed.b4.2 = यह चाल सीधे {m:move_obl} में मात की ओर ले जाती है: {line:nomate}।
+ex.mate_allowed.b4.3 = {move}, और फिर {line:nomate}: मात।
+ex.mate_allowed.b5 = {move}, और अब {m:move_obl} में पक्की मात है।
+ex.mate_allowed.b5.2 = यह सीधे {m:move_obl} में मात की ओर ले जाता है।
+ex.mate_allowed.b5.3 = अब {m:move_obl} में पक्की मात है।
+ex.mate_allowed.b6 = {m:move_obl} में मात: {line:nomate}।
+ex.mate_allowed.b6.2 = {line:nomate}, मात।
+ex.mate_allowed.b6.3 = {line:nomate}, और मात।
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = देखो: {your:ke} पास भागने के लिए कोई खाना नहीं बचा।
+ex.mate_allowed.tail.b1.2 = देखा? {your:par} हमला है, और वह भाग नहीं सकता।
+ex.mate_allowed.tail.b1.3 = {your} कहीं नहीं जा सकता। यह शह और मात है।
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = इस तरह की मात को {text} कहते हैं।
+ex.mate_allowed.pattern.2 = इसे याद रखो: यह {text} है।
+ex.mate_allowed.tip.b3 = हर चाल से पहले जाँच लो कि तुम्हारा राजा अब भी सुरक्षित है या नहीं।
+ex.mate_allowed.tip.b3.2 = हमेशा ख़ुद से पूछो: मेरी चाल के बाद क्या मेरे राजा को मात दी जा सकती है?
+
+# Pattern names: Hindi words where they are clear (back rank = पिछली रैंक, ladder = सीढ़ी), the players' English
+# names in Devanagari otherwise. Each is said inside a sentence ("... को {text} कहते हैं", "यह {text} है").
+name.pattern.back_rank = पिछली रैंक पर मात
+name.pattern.smothered = स्मदर्ड मात
+name.pattern.support = सुरक्षित वज़ीर से मात
+name.pattern.ladder = सीढ़ी वाली मात
+name.pattern.epaulette = एपॉलेट मात
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = {best:nomate}: इस चाल से {my:ko} मात दी जा सकती थी!
+ex.mate_missed.b1.2 = {best:nomate}: यह शह और मात थी! {my} बच नहीं सकता था।
+ex.mate_missed.b1.3 = देखो! {best:nomate}, और {my} मात हो जाता।
+ex.mate_missed.b2 = तुम्हारे पास {m:move_obl} में मात थी, पहली चाल: {best:nomate}।
+ex.mate_missed.b2.2 = {best:nomate}: {m:move_obl} में मात थी!
+ex.mate_missed.b2.3 = मुझे मात दी जा सकती थी: {best:nomate}।
+ex.mate_missed.b3 = तुमसे {m:move_obl} में मात छूट गई: {best:nomate}।
+ex.mate_missed.b3.2 = {best:nomate}: {m:move_obl} में मात, {line:nomate}।
+ex.mate_missed.b3.3 = {m:move_obl} में मात थी, जिसकी पहली चाल थी: {best:nomate}।
+ex.mate_missed.b4 = छूटी हुई मात: {line:nomate}; पहली चाल: {best:nomate}।
+ex.mate_missed.b4.2 = {best:nomate}: {m:move_obl} में पक्की मात थी।
+ex.mate_missed.b4.3 = तुम्हारे पास {m:move_obl} में मात थी: {best:nomate}।
+ex.mate_missed.b5 = {best:nomate}: {m:move_obl} में मात, {line:nomate}।
+ex.mate_missed.b5.2 = {m:move_obl} में मात छूट गई; पहली चाल: {best:nomate}।
+ex.mate_missed.b5.3 = पक्की मात थी: {best:nomate}।
+ex.mate_missed.b6 = {best:nomate}, और मात: {line:nomate}।
+ex.mate_missed.b6.2 = {m:move_obl} में मात: {best:nomate}।
+ex.mate_missed.b6.3 = {best:nomate}, {m:move_obl} में मात।
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = ज़्यादा तेज़ था {best:nomate}: {m:move_obl} में मात।
+ex.mate_delayed.b5.2 = {best:nomate}: इससे मात जल्दी होती, {m:move_obl} में।
+ex.mate_delayed.b6 = {best:nomate}: {m:move_obl} में मात।
+ex.mate_delayed.b6.2 = ज़्यादा तेज़: {best:nomate}, {m:move_obl} में मात।
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = अरे नहीं! {my} चल नहीं सकता, और उस पर शह भी नहीं है। यह स्टेलमेट है: बाज़ी ड्रॉ।
+ex.stalemate.b1.2 = देखो: {my:ke} पास कोई सुरक्षित खाना नहीं, पर उस पर शह नहीं है। बाज़ी ड्रॉ!
+ex.stalemate.b1.3 = यह स्टेलमेट है। {my} चल नहीं सकता, इसलिए बाज़ी ड्रॉ है।
+ex.stalemate.b2 = स्टेलमेट! {my:ke} पास कोई वैध चाल नहीं, और शह भी नहीं है। ड्रॉ।
+ex.stalemate.b2.2 = अरे नहीं, स्टेलमेट: {my} फँसा है, पर शह में नहीं है।
+ex.stalemate.b2.3 = स्टेलमेट से बाज़ी ड्रॉ। {my} चल नहीं सकता।
+ex.stalemate.b3 = यह स्टेलमेट है: {my:ke} पास कोई वैध चाल नहीं। बाज़ी तुम्हारे हाथ में थी!
+ex.stalemate.b3.2 = स्टेलमेट! {my} फँस गया है, और जीती हुई बाज़ी ड्रॉ हो जाती है।
+ex.stalemate.b3.3 = {my:ke} पास न कोई चाल है, न शह: स्टेलमेट।
+ex.stalemate.b4 = स्टेलमेट: {my:ke} पास कोई वैध चाल नहीं। जीत हाथ से निकल गई।
+ex.stalemate.b4.2 = {move}, और {my} स्टेलमेट हो जाता है। जीती हुई स्थिति से ड्रॉ।
+ex.stalemate.b4.3 = यह स्टेलमेट है; {my} चारों ओर से घिरा है।
+ex.stalemate.b5 = {move}, और {my} स्टेलमेट। जीत हाथ से गई।
+ex.stalemate.b5.2 = स्टेलमेट: {my:ke} पास कोई खाना नहीं।
+ex.stalemate.b5.3 = यह स्टेलमेट है, {my} फँसा हुआ है।
+ex.stalemate.b6 = स्टेलमेट। {my:ke} पास कोई चाल नहीं।
+ex.stalemate.b6.2 = {move}, स्टेलमेट: {my} घिरा हुआ है।
+ex.stalemate.b6.3 = स्टेलमेट; {my} चल नहीं सकता।
+ex.stalemate.tip.b1 = जब बाज़ी तुम्हारे हाथ में हो, मेरे राजा के लिए हमेशा एक खाना ख़ाली छोड़ो।
+ex.stalemate.tip.b1.2 = याद रखो: जब तुम आगे हो, मेरे राजा को थोड़ी जगह दो।
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = सावधान! मैं अपने मोहरे दे सकता हूँ, और फिर {my:ke} पास कोई चाल नहीं रहेगी: स्टेलमेट।
+ex.stalemate_trick.b1.2 = ध्यान दो: {my} लगभग फँस चुका है। मैं बाज़ी ड्रॉ करा सकता हूँ।
+ex.stalemate_trick.b2 = सावधान: मैं बलिदान दे सकता हूँ, और {my} स्टेलमेट हो जाएगा।
+ex.stalemate_trick.b2.2 = {my:ke} पास लगभग कोई खाना नहीं। मैं ज़बरदस्ती स्टेलमेट करा सकता हूँ!
+ex.stalemate_trick.b3 = इससे मुझे स्टेलमेट के सहारे बच निकलने का मौक़ा मिलता है: {my:ke} पास चालें ख़त्म हो जाती हैं।
+ex.stalemate_trick.b3.2 = सावधान: {line}, और {my} स्टेलमेट हो जाता है।
+ex.stalemate_trick.b4 = {move}, यह चाल स्टेलमेट के जाल का मौक़ा देती है: {line}, और {my} चल नहीं सकता।
+ex.stalemate_trick.b4.2 = अब {my} स्टेलमेट में छिप सकता है: {line}।
+ex.stalemate_trick.b5 = {move}, और स्टेलमेट संभव है: {line}; {my} घिरा हुआ है।
+ex.stalemate_trick.b5.2 = स्टेलमेट का जाल: {line}, और {my:ke} पास कोई चाल नहीं।
+ex.stalemate_trick.b6 = {line}, स्टेलमेट: {my} घिरा हुआ है।
+ex.stalemate_trick.b6.2 = {line}, फिर स्टेलमेट; {my} फँसा है।
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} {sq} पर जाकर {t1:obl} और {t2:obl} पर हमला कर सकता है।
+ex.fork.b1.2 = {my} {sq} पर जाकर दो चीज़ों पर हमला करता है: {t1} और {t2}।
+ex.fork.b1.3 = {my:par} नज़र रखो: {sq} से वह {t1:obl} और {t2:obl} पर एक साथ हमला करता है।
+ex.fork.b2 = फ़ोर्क! {sq} पर {my} एक साथ {t1:obl} और {t2:obl} पर हमला करता है।
+ex.fork.b2.2 = तुम्हारी चाल के बाद {my} {sq} से {t1:obl} और {t2:obl} पर फ़ोर्क कर सकता है।
+ex.fork.b2.3 = {my} {sq} पर जाता है: {t1:obl} और {t2:obl} पर दोहरा हमला।
+ex.fork.b3 = {move}, और जवाब में {reply}: {t1:obl} और {t2:obl} पर फ़ोर्क।
+ex.fork.b3.2 = {reply}, और मैं एक साथ {t1:obl} और {t2:obl} पर हमला करता हूँ।
+ex.fork.b3.3 = {reply}, यह फ़ोर्क है: {t1:obl} और {t2:obl} दोनों पर हमला।
+ex.fork.b4 = {reply}: {t1:obl} और {t2:obl} पर फ़ोर्क; {line}, और तुम्हें {pts:point_obl} का नुक़सान।
+ex.fork.b4.2 = {reply}: एक ही वार में {t1:obl} और {t2:obl} पर हमला।
+ex.fork.b4.3 = {move}, और अब {t1:obl} और {t2:obl} पर फ़ोर्क संभव है: {reply}।
+ex.fork.b5 = {move}, और सीधे फ़ोर्क में: {reply}, {t1:obl} और {t2:obl} पर।
+ex.fork.b5.2 = {reply}: {t1:obl} और {t2:obl} पर फ़ोर्क।
+ex.fork.b5.3 = {reply}, फिर {t1:obl} और {t2:obl} दोनों पर हमला है।
+ex.fork.b6 = {reply}: फ़ोर्क।
+ex.fork.b6.2 = {move}, फिर {reply}: फ़ोर्क।
+ex.fork.b6.3 = {reply}, फ़ोर्क के साथ।
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
+ex.fork.tail.b1 = इनमें से सिर्फ़ एक ही बचाया जा सकता है: {t1} या {t2}।
+ex.fork.tail.b1.2 = अब मैं एक साथ दो चीज़ों पर हमला करता हूँ: {t1} और {t2}। यह फ़ोर्क है!
+ex.fork.tail.b1.3 = देखा? {t1:obl} और {t2:obl} दोनों पर हमला है। इनमें से एक कटेगा।
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your:ko} शह से बचना होगा, इसलिए मैं {t1} काट लेता हूँ।
+ex.fork.tail_king.2 = शह! {your:ko} हटना होगा, और {t1} कट जाता है।
+ex.fork.more.b3 = चाल चलने से पहले {sq} पर ध्यान दो: वहाँ से {my} फ़ोर्क कर सकता है।
+ex.fork.more.b3.2 = {sq} पर नज़र रखो। वहाँ से {my} फ़ोर्क करता है।
+ex.fork.tip.knight = अपने राजा और वज़ीर के पास घोड़े की छलाँगों से सावधान!
+ex.fork.tip.knight.2 = घोड़ों को एक साथ दो मोहरों पर हमला करना बहुत पसंद है। देखो, वे कहाँ कूद सकते हैं।
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = जब {my} हटता है, तो {my2} {t1:par} हमला करता है!
+ex.discovered.b1.2 = देखो: {my} रास्ते में है। अगर वह हटे, तो {my2} {t1:par} वार करता है।
+ex.discovered.b1.3 = {my} एक तरफ़ हट सकता है, और फिर {my2} {t1:par} हमला करता है।
+ex.discovered.b2 = छिपा हुआ हमला: {my} हटता है, और {my2} {t1:par} हमला करता है।
+ex.discovered.b2.2 = सावधान: {my} हट सकता है, और तब {my2} {t1:par} वार करता है।
+ex.discovered.b2.3 = {my} हटता है, और {t1:ki} ओर {my2:ka} रास्ता खुल जाता है।
+ex.discovered.b3 = {reply}, और {t1:par} डिस्कवर्ड अटैक होता है।
+ex.discovered.b3.2 = {reply}: इससे {t1:par} छिपा हमला खुल जाता है।
+ex.discovered.b3.3 = {move}, और जवाब में {reply}: {t1:par} डिस्कवर्ड अटैक।
+ex.discovered.b4 = {reply}: {t1:ki} ओर रास्ता खुलता है, यह डिस्कवर्ड अटैक है।
+ex.discovered.b4.2 = {move}, और अब डिस्कवर्ड अटैक: {reply}, और {t1} हाथ से जाता है।
+ex.discovered.b4.3 = {reply}, और डिस्कवर्ड अटैक से {t1} कट जाता है।
+ex.discovered.b5 = {move}, और अब डिस्कवर्ड अटैक संभव है: {reply}।
+ex.discovered.b5.2 = {reply}, यह डिस्कवर्ड अटैक है।
+ex.discovered.b5.3 = {reply}: इससे एक छिपा हमला खुल जाता है।
+ex.discovered.b6 = {reply}, {t1:par} डिस्कवर्ड अटैक।
+ex.discovered.b6.2 = {reply}, और {t1} कटता है।
+ex.discovered.b6.3 = डिस्कवर्ड अटैक: {reply}, निशाने पर {t1}।
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} {t1:par} हमला करता है। जब वह हटेगा, तो मैं {t2} काट लूँगा, जो उसके पीछे है।
+ex.skewer.b1.2 = देखो: {my} {t1:par} वार करता है, और {t2} ठीक उसके पीछे है।
+ex.skewer.b1.3 = {my} {t1:ko} निशाना बनाता है। उसे हटना होगा, और फिर {t2} कट जाता है।
+ex.skewer.b2 = स्क्यूअर: {my} {t1:par} हमला करता है, और {t2} उसके पीछे है।
+ex.skewer.b2.2 = {my} एक ही सीध में {t1:obl} और {t2:obl} पर निशाना साधता है। जब पहला हटेगा, मैं दूसरा काट लूँगा।
+ex.skewer.b2.3 = सावधान: {t1} और {t2} एक ही सीध में हैं। {my} उन पर स्क्यूअर कर सकता है।
+ex.skewer.b3 = {reply}: {t1:obl} और {t2:obl} पर स्क्यूअर।
+ex.skewer.b3.2 = {reply}, और {t1:ko} हटना होगा, फिर {t2} कट जाता है।
+ex.skewer.b3.3 = {move}, और जवाब में {reply}: {t1:obl} और {t2:obl} पर स्क्यूअर।
+ex.skewer.b4 = {reply}: {t1:par} स्क्यूअर; उसके पीछे {t2} हाथ से जाता है।
+ex.skewer.b4.2 = {move}, और अब {t1} और {t2} एक ही सीध में हैं: {reply}।
+ex.skewer.b4.3 = {reply}, फिर {t1} हटता है और {t2} कट जाता है।
+ex.skewer.b5 = {reply}: {t1:obl} और {t2:obl} पर स्क्यूअर।
+ex.skewer.b5.2 = {move}, और स्क्यूअर संभव है: {reply}, {t1:ke} आर-पार {t2:obl} तक।
+ex.skewer.b6 = {reply}: स्क्यूअर।
+ex.skewer.b6.2 = {reply}, स्क्यूअर।
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it ("{t1:ke} आगे" = in front of it).
+ex.pin.b1 = {my} {sq} पर जा सकता है। तब {your} {t1:ke} आगे फँस जाता है।
+ex.pin.b1.2 = {my:par} नज़र रखो: {sq} पर उसके पहुँचते ही {your} {t1:ke} आगे फँस जाता है।
+ex.pin.b1.3 = {my} {your:ko} {t1:ke} आगे पिन कर सकता है। फिर मैं उसे जीत लेता हूँ।
+ex.pin.b2 = पिन: {your} {t1:ke} आगे फँसा है।
+ex.pin.b2.2 = {your} {t1:ke} आगे पिन है। तब मैं उसे जीत सकता हूँ।
+ex.pin.b2.3 = अब {your} {t1:ke} आगे फँसा है। इसे पिन कहते हैं।
+ex.pin.b3 = {your} {t1:ke} आगे पिन हो जाता है, और मैं उसे जीत लेता हूँ।
+ex.pin.b3.2 = इसके बाद {your} {t1:ke} आगे पिन है।
+ex.pin.b3.3 = {your:par} पिन से मटीरियल का नुक़सान होता है: उसके पीछे {t1} है।
+ex.pin.b4 = {reply}: यह पिन मटीरियल जीतता है।
+ex.pin.b4.2 = {move}, और सीधे पिन में: {reply}।
+ex.pin.b4.3 = {reply}, और पिन हुआ मोहरा कट जाता है।
+ex.pin.b5 = {move}, और अब पिन संभव है: {reply}।
+ex.pin.b5.2 = {reply}: पिन, और मोहरा हाथ से जाता है।
+ex.pin.b6 = {reply}: पिन।
+ex.pin.b6.2 = {reply}, पिन के साथ।
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} पिन है, इसलिए वह {sq} की रक्षा नहीं कर सकता। उसके पीछे {t1} है।
+ex.pin_defender.b1.2 = देखो: {your} असल में {sq} का बचाव नहीं कर सकता, क्योंकि उसके पीछे {t1} है।
+ex.pin_defender.b2 = {your} {t1:ke} आगे पिन है, इसलिए {sq} का कोई असली रक्षक नहीं।
+ex.pin_defender.b2.2 = पिन हुआ मोहरा अच्छा रक्षक नहीं होता। {your} {sq} की रक्षा नहीं कर सकता: उसके पीछे {t1} है।
+ex.pin_defender.b3 = {your} {t1:ke} आगे पिन है; वह असल में {sq} का बचाव नहीं करता।
+ex.pin_defender.b3.2 = लगता है कि {sq} की रक्षा हो रही है, पर {your} {t1:ke} आगे पिन है।
+ex.pin_defender.b4 = {your} पिन है, इसलिए {sq} की असल में रक्षा नहीं हो रही।
+ex.pin_defender.b4.2 = {your} पिन है, वह {sq} की रक्षा नहीं कर सकता।
+ex.pin_defender.b5 = {your} पिन है; {sq} असुरक्षित है।
+ex.pin_defender.b5.2 = {sq} नहीं बचता: {your} पिन है।
+ex.pin_defender.b6 = {your} पिन है; {sq} नहीं बचता।
+ex.pin_defender.b6.2 = {your} पिन, {sq} असुरक्षित।
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} फँस गया है। वह जिस भी खाने पर जा सकता है, उस पर हमला है।
+ex.trapped.b1.2 = {your:refl_ko} देखो: उसके पास भागने के लिए कोई सुरक्षित खाना नहीं।
+ex.trapped.b1.3 = {your} फँसा हुआ है। मैं उस पर हमला कर सकता हूँ, और वह बच नहीं सकता।
+ex.trapped.b2 = {your:ke} पास कोई सुरक्षित खाना नहीं। मैं उसे जीत सकता हूँ।
+ex.trapped.b2.2 = {your} फँस गया है: वह जहाँ भी जाए, मैं उसे काट लूँगा।
+ex.trapped.b2.3 = सावधान, {your:ke} पास खाने ख़त्म हो रहे हैं।
+ex.trapped.b3 = {your} फँस जाता है: कोई सुरक्षित खाना नहीं बचा।
+ex.trapped.b3.2 = इसके बाद {your} फँसकर हाथ से जाता है।
+ex.trapped.b3.3 = {your} जाल में फँस गया है: वह निकल नहीं सकता।
+ex.trapped.b4 = {move}, और {your} फँस जाता है।
+ex.trapped.b4.2 = {your:ke} पास पीछे हटने का रास्ता नहीं; मैं उसे जीत लेता हूँ।
+ex.trapped.b4.3 = {reply}, और {your} फँस जाता है।
+ex.trapped.b5 = आख़िर में {your} फँस जाता है: {line}।
+ex.trapped.b5.2 = {move}, और {your} खेल से बाहर अटक जाता है।
+ex.trapped.b6 = {your} फँसा है।
+ex.trapped.b6.2 = {line}: {your} फँस जाता है।
+ex.trapped.tip.b1 = किसी मोहरे को चलाने से पहले देख लो कि वह वापस निकल सके।
+ex.trapped.tip.b1.2 = मेरे इलाक़े में अंदर तक गए मोहरे फँस सकते हैं। निकलने का रास्ता रखो।
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} अपने प्यादों के पीछे फँसा है। {my} पिछली रैंक पर उसे शह दे सकता है।
+ex.back_rank.b1.2 = सावधान: {your:ke} पास बचने का कोई खाना नहीं, और {my} {sq} तक पहुँच सकता है।
+ex.back_rank.b1.3 = {my} {sq} पर जा सकता है। {your} अपने ही प्यादों में बंद है।
+ex.back_rank.b2 = पिछली रैंक का ख़तरा: {your:ke} पास साँस लेने की जगह नहीं। {my} {sq} पर शह दे सकता है।
+ex.back_rank.b2.2 = {your} बंद है। {my} {sq} पर जाता है, और मुझे मोहरों का फ़ायदा होता है।
+ex.back_rank.b2.3 = तुम्हारी पिछली रैंक कमज़ोर है: {my} {sq} पर {your:ko} शह दे सकता है।
+ex.back_rank.b3 = तुम्हारी पिछली रैंक कमज़ोर है: {line}। {your:ke} पास बचने का कोई खाना नहीं।
+ex.back_rank.b3.2 = {your:ke} पास साँस लेने की जगह नहीं, इसलिए यह क्रम मटीरियल जीतता है: {line}।
+ex.back_rank.b3.3 = {line}, और पिछली रैंक फ़ैसला कर देती है: {your} घिरा हुआ है।
+ex.back_rank.b4 = पिछली रैंक: {line}, और {your:ke} पास निकलने का खाना नहीं।
+ex.back_rank.b4.2 = {line}: यह क्रम {your:ke} पास की कमज़ोर पिछली रैंक का फ़ायदा उठाता है।
+ex.back_rank.b4.3 = {your:ke} पास बचने का खाना नहीं: {line}।
+ex.back_rank.b5 = {your:ke} आसपास पिछली रैंक की कमज़ोरी: {line}।
+ex.back_rank.b5.2 = {line}; {your:ke} पास निकलने का खाना नहीं।
+ex.back_rank.b6 = {line}, पिछली रैंक; {your} घिरा है।
+ex.back_rank.b6.2 = पिछली रैंक: {line} ({your})।
+ex.back_rank.tip.b1 = अपने राजा को थोड़ी हवा दो: उसके आगे का एक प्यादा आगे बढ़ाओ।
+ex.back_rank.tip.b1.2 = तीन प्यादों के पीछे खड़े राजा को पिछली रैंक पर मात दी जा सकती है। उसके लिए थोड़ी जगह बनाओ।
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {sq} पर {your:ka} कोई रक्षक नहीं। {my} उसे मुफ़्त में काट सकता है।
+ex.hanging.b1.2 = {your:refl_ko} देखो: उसे कोई नहीं बचा रहा, और {my} उस पर हमला कर रहा है।
+ex.hanging.b1.3 = {your} सुरक्षित नहीं है। {my} उसे आराम से काट सकता है।
+ex.hanging.b2 = {sq} पर {your} असुरक्षित है। {my} उसे काट लेता है, और वापस नहीं काटा जा सकता।
+ex.hanging.b2.2 = {my} {your:ko} मुफ़्त में काट सकता है। उसे कोई नहीं बचा रहा।
+ex.hanging.b2.3 = {your} {sq} पर अकेला छूट गया है, और {my} उसे काट लेता है।
+ex.hanging.b3 = {move}, और {your} असुरक्षित रह जाता है: {reply}, और वापस काटने वाला कोई नहीं।
+ex.hanging.b3.2 = {sq} पर {your} असुरक्षित है: {reply}।
+ex.hanging.b3.3 = {reply}, और {your} बेकार में चला जाता है।
+ex.hanging.b4 = {move}, और {your} असुरक्षित: {reply}, और {pts:point_obl} का फ़ायदा मुझे।
+ex.hanging.b4.2 = {reply}: {your} मुफ़्त में गया।
+ex.hanging.b4.3 = {your} असुरक्षित है; {reply}, और वह कट जाता है।
+ex.hanging.b5 = {move}, और {your} असुरक्षित रह जाता है; {reply}, और वह मेरा।
+ex.hanging.b5.2 = {sq} पर {your} हाथ से जाता है: {reply}।
+ex.hanging.b5.3 = {reply}: {your} हाथ से गया।
+ex.hanging.b6 = {move}? {reply}, और {your} गया।
+ex.hanging.b6.2 = {reply}, {your} गया।
+ex.hanging.b6.3 = {your} असुरक्षित: {reply}।
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} {your:ki} रक्षा कर रहा था। अब {my} उसे काट सकता है।
+ex.hanging_guard.b1.2 = {your2} हट गया, और अब {your} अकेला है। {my} उसे काट लेता है।
+ex.hanging_guard.b2 = {your2} {your:ki} रक्षा करता था। अब {your} अकेला है, और {my} उसे काट लेता है।
+ex.hanging_guard.b2.2 = {your2:refl_ko} हटाकर तुमने {your:refl_ko} {my:ke} सामने असुरक्षित छोड़ दिया।
+ex.hanging_guard.b3 = {your2} {your:ki} रक्षा कर रहा था। उसे हटाने से {your} हाथ से जाता है: {reply}।
+ex.hanging_guard.b3.2 = {your2:ke} बिना {your} असुरक्षित है: {reply}।
+ex.hanging_guard.b4 = {move}: रक्षक हट गया। {your2:ne} {your:ko} अकेला छोड़ दिया, और {reply}: वह कट जाता है।
+ex.hanging_guard.b4.2 = {your2} ही {your:ka} अकेला रक्षक था; {reply}, और वह हाथ से गया।
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} पहले से ही {your:par} हमला कर रहा था। हमेशा देखो कि मेरी चाल से क्या ख़तरा बनता है।
+ex.hanging_threat.b1.2 = तुमने मेरा ख़तरा नहीं देखा: {my} {your:par} हमला कर रहा है।
+ex.hanging_threat.b2 = मेरी पिछली चाल में {my:ne} {your:par} हमला किया। हमेशा मेरे ख़तरों पर नज़र रखो।
+ex.hanging_threat.b2.2 = {my} {your:ke} लिए ख़तरा बना हुआ था, और अब मैं उसे काट सकता हूँ।
+ex.hanging_threat.b3 = तुमसे मेरा ख़तरा छूट गया: {my} {your:par} हमला कर रहा था।
+ex.hanging_threat.b3.2 = {my} शुरू से ही {your:ko} निशाने पर रखे हुए था।
+ex.hanging.tip.b1 = हर चाल से पहले ख़ुद से पूछो: क्या मेरे सारे मोहरे सुरक्षित हैं?
+ex.hanging.tip.b1.2 = एक अच्छी आदत: हर चाल के बाद देखो कि तुम्हारे किन मोहरों का बचाव हो रहा है।
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured ("{n:point_obl} का" = "worth 3 points").
+ex.exchange_capture.b1 = {your:ne} काटा, पर {my} वापस काटता है। इस अदला-बदली में अंकों का नुक़सान है।
+ex.exchange_capture.b1.2 = {my} वापस काटता है। {your} {n:point_obl} का है, पर बदले में सिर्फ़ {n2:point}।
+ex.exchange_capture.b1.3 = सावधान: {my} बदले में {your:ko} काट सकता है। यह घाटे की अदला-बदली है।
+ex.exchange_capture.b2 = अदला-बदली में सावधान रहो: {your} {n:point_obl} का है। {my} वापस काटता है, और तुम्हारी कमाई सिर्फ़ {n2:point}।
+ex.exchange_capture.b2.2 = {my} वापस {your:ko} काटता है। नुक़सान {n:point}, फ़ायदा सिर्फ़ {n2:point}।
+ex.exchange_capture.b3 = {sq} पर काटना काम नहीं करता: {line}, और {your} हाथ से जाता है।
+ex.exchange_capture.b3.2 = {your} {sq} पर काटता है, पर फिर {line}, और तुम्हें {pts:point_obl} का नुक़सान।
+ex.exchange_capture.b4 = {move}: {sq} पर गिनती ग़लत है; {line}, और {your} हाथ से जाता है।
+ex.exchange_capture.b4.2 = {sq} पर काटने की क़ीमत {your} है: {line}।
+ex.exchange_capture.b5 = {move}, और {sq} पर अदला-बदली में {your} हाथ से जाता है: {line}।
+ex.exchange_capture.b5.2 = {sq} पर {your} हाथ से जाता है: {line}।
+ex.exchange_capture.b6 = {move}: {line}, और {sq} पर {your} गया।
+ex.exchange_capture.b6.2 = {sq} पर {line}, और {your} गया।
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = गिनो: {sq} पर मेरी ओर से {n:time} हमला, तुम्हारी ओर से {n2:time} बचाव।
+ex.exchange_count.b1.2 = {sq} पर मेरी ओर से {n:attacker}, तुम्हारी ओर से {n2:defender}। यह लड़ाई मेरी है।
+ex.exchange_count.b2 = {sq} पर {n:time} हमला है और {n2:time} बचाव। वहाँ तुम्हें मोहरों का नुक़सान होगा।
+ex.exchange_count.b2.2 = {sq} पर गिनो: {n:attacker} बनाम {n2:defender}।
+ex.exchange_count.b3 = {sq} पर हमलावर और रक्षक गिनो: मेरे ज़्यादा हैं।
+ex.exchange_count.b3.2 = {sq} पर अदला-बदली काम नहीं करती: {line}, और तुम्हें {pts:point_obl} का नुक़सान।
+ex.exchange_count.b4 = {move}: {sq} पर ग़लत गिनती; {line}, और {pts:point_obl} का नुक़सान।
+ex.exchange_count.b4.2 = {sq} पर बचाव से ज़्यादा हमले हैं: {line}।
+ex.exchange_count.b5 = {sq} पर {n:attacker} बनाम {n2:defender}, और हमलावर जीतते हैं: {line}।
+ex.exchange_count.b5.2 = {move}: {sq} पर गिनती में हार।
+ex.exchange_count.b6 = {sq} पर {line}, और मुझे {pts:point_obl} का फ़ायदा।
+ex.exchange_count.b6.2 = {sq}: {n} बनाम {n2}।
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} {your:se} सस्ता है। अगर मैं काटूँ, तो तुम्हें अंकों का नुक़सान होगा।
+ex.exchange_cheap.b1.2 = {my} {your:par} हमला करता है। इनकी अदला-बदली तुम्हारे लिए बुरी है।
+ex.exchange_cheap.b2 = {your} {n:point_obl} का है, और {my} सिर्फ़ {n2:point_obl} का। यह अदला-बदली तुम्हें महँगी पड़ती है।
+ex.exchange_cheap.b2.2 = {my} {your:se} सस्ता है, इसलिए इस हमले से मोहरों का फ़ायदा होता है।
+ex.exchange_cheap.b3 = {sq} पर खड़े {your:par} एक सस्ते मोहरे का हमला है।
+ex.exchange_cheap.b3.2 = {n2:point_obl} वाला मोहरा {sq} पर खड़े {your:par} हमला करता है: {line}।
+ex.exchange_cheap.b4 = {sq} पर खड़े {your:par} सस्ते मोहरे का हमला है; {reply}, और मटीरियल का फ़ायदा।
+ex.exchange_cheap.b4.2 = {reply}: {sq} पर खड़े {your:par} सस्ते मोहरे से वार।
+ex.exchange_cheap.b5 = {sq} पर {your} एक सस्ते हमलावर के सामने खुला है: {line}।
+ex.exchange_cheap.b5.2 = {reply}: {sq} पर {your:ke} ख़िलाफ़ मटीरियल का फ़ायदा।
+ex.exchange_cheap.b6 = {reply}: {sq} पर {your} गया।
+ex.exchange_cheap.b6.2 = {line}: {sq} पर {your} गया।
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = सावधान: अब मैं {t1} जीत सकता हूँ।
+ex.material.b1.2 = इस चाल से {t1} मुश्किल में पड़ जाता है। मैं उसे जीत सकता हूँ।
+ex.material.b2 = इस चाल के बाद मैं {t1} जीत सकता हूँ।
+ex.material.b2.2 = अब {t1} मुश्किल में है, और मैं उसे जीत लेता हूँ।
+ex.material.b3 = {move}: इससे मटीरियल जाता है; {line}, और तुम्हें {pts:point_obl} का नुक़सान।
+ex.material.b3.2 = {line}, और तुम {pts:point} पीछे हो।
+ex.material.b4 = {move}, इससे मटीरियल जाता है: {line}, और {pts:point_obl} का नुक़सान।
+ex.material.b4.2 = {line}, और अब तुम {pts:point} पीछे हो।
+ex.material.b5 = {move}, मटीरियल गया: {line}।
+ex.material.b5.2 = {line}: मुझे {pts:point_obl} का फ़ायदा।
+ex.material.b6 = {line}, और मुझे {pts:point_obl} का फ़ायदा।
+ex.material.b6.2 = {move}: {pts:point_obl} का नुक़सान, {line}।
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = देखा? {sq} पर {my} मुफ़्त था। {your} उसे काट सकता था।
+ex.missed_capture.b1.2 = देखो: {my:ka} कोई रक्षक नहीं था। {your} उसे काट सकता था।
+ex.missed_capture.b1.3 = {sq} पर {my} असुरक्षित था। {your} उसे झपट सकता था!
+ex.missed_capture.b2 = तुमसे एक मुफ़्त शिकार छूट गया: {best}, और {my} तुम्हारा।
+ex.missed_capture.b2.2 = {sq} पर {my} असुरक्षित था। उसे काटने वाली चाल: {best}। अगली बार झपट लेना!
+ex.missed_capture.b2.3 = {best}: इससे {my} मुफ़्त में मिल जाता।
+ex.missed_capture.b3 = {best}, और {my} बिना किसी क़ीमत के तुम्हारा होता।
+ex.missed_capture.b3.2 = {sq} पर {my} असुरक्षित था: {best}। हर चाल पर असुरक्षित मोहरे ढूँढो।
+ex.missed_capture.b3.3 = {my:ko} काटा जा सकता था: {best}।
+ex.missed_capture.b4 = छूट गया: {best}, और {sq} पर {my} तुम्हारा।
+ex.missed_capture.b4.2 = {best}: {my} असुरक्षित था, और उसे जीता जा सकता था।
+ex.missed_capture.b4.3 = {my} असुरक्षित था: {best}।
+ex.missed_capture.b5 = {best}, और {my} तुम्हारा; पर {move}, और वह बच निकलता है।
+ex.missed_capture.b5.2 = {sq} पर {my} असुरक्षित था: {best}।
+ex.missed_capture.b6 = {best}! {sq} पर {my} असुरक्षित था।
+ex.missed_capture.b6.2 = {best}: {my} जीता जा सकता था।
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = तुम्हारे पास दोहरा हमला था: {best}, जिससे {t1:obl} और {t2:obl} पर हमला होता!
+ex.missed_fork.b1.2 = देखो! {best}: इससे एक साथ {t1:obl} और {t2:obl} पर हमला होता।
+ex.missed_fork.b1.3 = {best}, यह फ़ोर्क था: {t1:obl} और {t2:obl} दोनों पर हमला।
+ex.missed_fork.b2 = {best}, यह फ़ोर्क था: {t1} और {t2}।
+ex.missed_fork.b2.2 = तुमसे एक दोहरा हमला छूट गया: {best}, {t1:obl} और {t2:obl} पर।
+ex.missed_fork.b2.3 = {best}: एक साथ {t1:obl} और {t2:obl} पर हमला। फ़ोर्क!
+ex.missed_fork.b3 = {best}: {t1:obl} और {t2:obl} पर फ़ोर्क था।
+ex.missed_fork.b3.2 = तुम्हारे पास यह चाल थी: {best}, {t1:obl} और {t2:obl} पर फ़ोर्क।
+ex.missed_fork.b3.3 = {best}: इससे {t1:obl} और {t2:obl} पर फ़ोर्क होता।
+ex.missed_fork.b4 = {best}: {t1:obl} और {t2:obl} पर फ़ोर्क।
+ex.missed_fork.b4.2 = छूटा हुआ फ़ोर्क: {best}, {t1:obl} और {t2:obl} पर।
+ex.missed_fork.b5 = {best}, {t1:obl} और {t2:obl} पर फ़ोर्क।
+ex.missed_fork.b5.2 = {best}: {t1:obl} और {t2:obl} पर वार।
+ex.missed_fork.b6 = {best}: फ़ोर्क, {t1} और {t2}।
+ex.missed_fork.b6.2 = {best}: {t1:obl} और {t2:obl} पर फ़ोर्क।
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} दौड़कर {sq} तक पहुँच सकता है और वज़ीर बन सकता है। {your} बहुत दूर है।
+ex.promotion.b1.2 = देखो: {my:ko} {sq} तक पहुँचने से कोई नहीं रोक सकता। {your} उसे पकड़ नहीं सकता।
+ex.promotion.b1.3 = {my} {sq} से {n:square} दूर है, और {your} बहुत धीमा है।
+ex.promotion.b2 = {my} {sq} की ओर दौड़ता है, और {your} उसे पकड़ नहीं सकता।
+ex.promotion.b2.2 = {my:ko} {sq} तक पहुँचने के लिए {n:move} चाहिए; {your:ko} {n2:move}। बहुत धीमा।
+ex.promotion.b2.3 = सावधान: {my} {sq} पर वज़ीर बनता है, और {your} बहुत दूर है।
+ex.promotion.b3 = {your} प्यादे के वर्ग से बाहर है: वह {sq} से पहले {my:ko} नहीं पकड़ सकता।
+ex.promotion.b3.2 = दौड़ में हार: {my} {your:se} पहले {sq} पर पहुँचता है।
+ex.promotion.b4 = {your} प्यादे के वर्ग से बाहर है; प्यादा {sq} पर वज़ीर बनता है।
+ex.promotion.b4.2 = {my} {sq} पर वज़ीर बनता है; {your} एक चाल पीछे है।
+ex.promotion.b5 = प्यादों की दौड़ हाथ से गई: {your} वर्ग से बाहर है, और मैं {sq} पर वज़ीर बनाता हूँ।
+ex.promotion.b5.2 = {line}: मैं {sq} पर वज़ीर बनाता हूँ, और {your} देर से पहुँचता है।
+ex.promotion.b6 = {your} वर्ग से बाहर; मैं {sq} पर वज़ीर बनाता हूँ।
+ex.promotion.b6.2 = {line}, {sq} पर नया वज़ीर ({your} देर से)।
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = तुम्हारा प्यादा दौड़कर {sq} तक जा सकता था और वज़ीर बन सकता था!
+ex.promotion_missed.b1.2 = {sq} को देखो! तुम्हारा प्यादा दौड़कर वहाँ पहुँच सकता था।
+ex.promotion_missed.b2 = तुम्हारा प्यादा {sq} तक दौड़ सकता था। पास्ड प्यादों को आगे बढ़ाओ!
+ex.promotion_missed.b2.2 = तुम्हारे प्यादे को {sq} तक जाने से कोई नहीं रोक रहा था।
+ex.promotion_missed.b3 = {best}: {sq} तक की दौड़ में जीत।
+ex.promotion_missed.b3.2 = तुम्हारा प्यादा तेज़ था: {best}, और वह {sq} पर वज़ीर बनता है।
+ex.promotion_missed.b4 = {best}: {sq} तक प्यादों की दौड़ में जीत।
+ex.promotion_missed.b4.2 = {best}! प्यादा {sq} पर वज़ीर बनता है।
+ex.promotion_missed.b5 = {best}, और {sq} पर पहले तुम्हारा वज़ीर।
+ex.promotion_missed.b5.2 = {best}, और {sq} तुम्हारा।
+ex.promotion_missed.b6 = {best}: {sq} तक की दौड़ तुम्हारी।
+ex.promotion_missed.b6.2 = {best}; {sq} पर पहले तुम।
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = वह प्यादा {your:ki} रक्षा करता था। अब {your} कम सुरक्षित है।
+ex.king_shield.b1.2 = {sq} वाला प्यादा {your:ke} लिए ढाल था। अब मेरे मोहरे अंदर घुस सकते हैं।
+ex.king_shield.b2 = {sq} वाले प्यादे को हटाने से {your} कमज़ोर हो जाता है। अब मेरे मोहरे उस पर हमला कर सकते हैं।
+ex.king_shield.b2.2 = {your:ne} एक पहरेदार खो दिया: {sq} वाला प्यादा उसकी ढाल था।
+ex.king_shield.b3 = प्यादे की इस चाल से {your} मेरे हमले के लिए खुल जाता है।
+ex.king_shield.b3.2 = {your:ki} प्यादों वाली ढाल टूट जाती है, और मेरे मोहरे अंदर आते हैं।
+ex.king_shield.b4 = {move}: इससे {your:ke} आसपास के प्यादे कमज़ोर होते हैं; मेरा हमला अंदर पहुँचता है।
+ex.king_shield.b4.2 = {move}, और {your:ke} आसपास की ढाल टूट जाती है।
+ex.king_shield.b5 = {move}, और {your:ki} ढाल ढीली पड़ जाती है: {line}।
+ex.king_shield.b5.2 = {move}, और {your} खुला है: {line}।
+ex.king_shield.b6 = {move}: {your} कमज़ोर, {line}।
+ex.king_shield.b6.2 = {line}; {your} बहुत खुला है।
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} ख़तरे में है। मेरे मोहरे उसकी ओर आ रहे हैं।
+ex.king_exposed.b1.2 = देखो, {your} कितना खुला है। उसे अपने प्यादों के पीछे सुरक्षित रखो।
+ex.king_exposed.b2 = {your} बहुत खुला है। अब मैं कई शह दे सकता हूँ।
+ex.king_exposed.b2.2 = सावधान: {your:ke} पास कोई आड़ नहीं, और मेरे मोहरे उस पर हमला करते हैं।
+ex.king_exposed.b3 = {your} खुला है; मेरे मोहरे शह देकर उस पर हमला कर सकते हैं।
+ex.king_exposed.b3.2 = इसके बाद {your:ke} पास कोई आड़ नहीं।
+ex.king_exposed.b4 = {your} खुल जाता है: {line}।
+ex.king_exposed.b4.2 = {move}, और {your} हमले के लिए खुला रह जाता है।
+ex.king_exposed.b5 = {your} बहुत खुला है: {line}।
+ex.king_exposed.b5.2 = {move}, और {your} बिना आड़ के रह जाता है।
+ex.king_exposed.b6 = {line}; {your} खुला है।
+ex.king_exposed.b6.2 = {your} बहुत खुला है: {line}।
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = यह अदला-बदली प्यादों के एंडगेम तक ले जाती है, जिसे मैं जीतता हूँ।
+ex.bad_trade.b3.2 = {line}: सिर्फ़ प्यादे बचते हैं, और मेरा राजा बेहतर जगह पर है।
+ex.bad_trade.b4 = ये अदला-बदलियाँ प्यादों के हारे हुए एंडगेम तक ले जाती हैं: {line}।
+ex.bad_trade.b4.2 = अदला-बदली करके प्यादों के इस एंडगेम में जाना हार है।
+ex.bad_trade.b5 = ग़लत अदला-बदली: {line}, और प्यादों का एंडगेम हारा हुआ है।
+ex.bad_trade.b5.2 = प्यादों का एंडगेम हारा हुआ है; मोहरे बोर्ड पर रहने दो।
+ex.bad_trade.b6 = {line}, और प्यादों का एंडगेम हारा हुआ।
+ex.bad_trade.b6.2 = प्यादों का हारा हुआ एंडगेम: {line}।
+ex.bishop_pair.b5 = इस अदला-बदली में तुम्हारी ऊँटों की जोड़ी चली जाती है।
+ex.bishop_pair.b5.2 = इस अदला-बदली से तुम्हारी ऊँटों की जोड़ी टूटती है; मेरी बनी रहती है।
+ex.bishop_pair.b6 = ऊँटों की जोड़ी गई।
+ex.bishop_pair.b6.2 = ऊँटों की जोड़ी छोड़ दी गई।
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best}: ऑपोज़िशन, यानी दोनों राजा आमने-सामने, बीच में एक खाना।
+ex.opposition.b3.2 = राजाओं को देखो! {best}: इससे ऑपोज़िशन मिल जाती।
+ex.opposition.b4 = {best}: ऑपोज़िशन लेना, यही कुंजी है।
+ex.opposition.b4.2 = ऑपोज़िशन फ़ैसला करती है: {best}।
+ex.opposition.b5 = {best}, ऑपोज़िशन लेते हुए।
+ex.opposition.b5.2 = ऑपोज़िशन: {best}।
+ex.opposition.b6 = {best}, ऑपोज़िशन।
+ex.opposition.b6.2 = {best}: ऑपोज़िशन।
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = तुम्हारा प्यादा {sq} की ओर दौड़ सकता था। पास्ड प्यादे आगे बढ़ना चाहते हैं!
+ex.push_passed.b1.2 = अपने आज़ाद प्यादे को आगे बढ़ाओ! वह {sq} तक पहुँचना चाहता है।
+ex.push_passed.b1.3 = तुम्हारा पास्ड प्यादा {sq} तक बढ़ना चाहता है। उसे आगे बढ़ाओ!
+ex.push_passed.b2 = {best}: पास्ड प्यादे को {sq} की ओर बढ़ाओ।
+ex.push_passed.b2.2 = तुम्हारा पास्ड प्यादा मज़बूत है। उसे आगे बढ़ाने वाली चाल: {best}।
+ex.push_passed.b2.3 = उसे आगे बढ़ाओ! {best}, और प्यादा {sq} के क़रीब पहुँचता है।
+ex.push_passed.b3 = {best}: पास्ड प्यादा आगे बढ़ता है।
+ex.push_passed.b3.2 = पास्ड प्यादों को आगे बढ़ाना चाहिए: {best}।
+ex.push_passed.b3.3 = रास्ता यह था: {best}, और प्यादा {sq} की ओर दौड़ता है।
+ex.push_passed.b4 = {best}: पास्ड प्यादा फ़ैसला करता है।
+ex.push_passed.b4.2 = आगे बढ़ाओ: {best}।
+ex.push_passed.b5 = {best}, पास्ड प्यादे को बढ़ाते हुए: {eval}।
+ex.push_passed.b5.2 = पास्ड प्यादा: {best}।
+ex.push_passed.b6 = {best}: {eval}।
+ex.push_passed.b6.2 = {best}, पास्ड प्यादा।
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = {your:refl_ko} आगे लाओ! एंडगेम में राजा एक मज़बूत मोहरा है।
+ex.king_active.b1.2 = अब {your} भी लड़ाई में शामिल हो सकता है। उसे बीच में ले चलो।
+ex.king_active.b1.3 = अब कम मोहरे बचे हैं, इसलिए {your:ko} बाहर आकर मदद करनी चाहिए।
+ex.king_active.b2 = एंडगेम में {your:refl_ka} इस्तेमाल करो: उसे केंद्र में लाओ।
+ex.king_active.b2.2 = अब {your:ko} सक्रिय होना चाहिए। उसे आगे बढ़ाओ।
+ex.king_active.b3 = {best}: राजा सक्रिय होता है। एंडगेम में राजा भी लड़ता है।
+ex.king_active.b3.2 = {best}: अब राजा की जगह केंद्र में है।
+ex.king_active.b4 = {best}: राजा केंद्र में आता है।
+ex.king_active.b4.2 = राजा को आगे आना चाहिए: {best}।
+ex.king_active.b5 = {best}, राजा को सक्रिय करते हुए: {line}।
+ex.king_active.b5.2 = राजा की सक्रियता: {best}।
+ex.king_active.b6 = {best}: {eval}।
+ex.king_active.b6.2 = {best}, राजा आगे।
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best}: इससे बेहतर स्थिति बनी रहती है।
+ex.positional.b4.2 = यहाँ ज़्यादा मज़बूत था: {best}।
+ex.positional.b4.3 = मैं यह चाल पसंद करता: {best}।
+ex.positional.b5 = ज़्यादा मज़बूत था {best}: {line}।
+ex.positional.b5.2 = {best}, इस विचार के साथ: {line}।
+ex.positional.b5.3 = सोचकर देखो: {best}, {line}।
+ex.positional.b6 = {best}: {eval}।
+ex.positional.b6.2 = {best}, {eval}।
+ex.positional.b6.3 = {best} ({eval})।
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} बहुत जल्दी बाहर आ गया। पहले अपने घोड़े और ऊँट बाहर निकालो।
+tip.early_queen.b1.2 = इतनी जल्दी {your:refl_ke} साथ सावधान रहो: मेरे मोहरे उसे इधर-उधर दौड़ा सकते हैं।
+tip.early_queen.b1.3 = {your:refl_ko} चलाना मज़ेदार है, पर पहले छोटे मोहरे बाहर निकालो।
+tip.early_queen.b2 = इतनी जल्दी {your:refl_ko} चलाने से मुझे उस पर हमला करके समय जीतने का मौक़ा मिलता है।
+tip.early_queen.b2.2 = {your} इतनी जल्दी बाहर? पहले घोड़े और ऊँट!
+tip.early_queen.b3 = {your:ka} जल्दी बाहर आना मुझे उसके ख़िलाफ़ टेम्पो वाली चालें देता है।
+tip.early_queen.b3.2 = इतनी जल्दी {your:ko} खदेड़ना आसान है। पहले मोहरे बाहर निकालो।
+tip.queen_grab.b1 = {your:ne} दूर का एक प्यादा लिया, और अब वह मुश्किल में पड़ सकता है।
+tip.queen_grab.b1.2 = {your:refl_se} प्यादे बटोरने में समय लगता है। पहले मोहरे बाहर निकालो!
+tip.queen_grab.b2 = {your} किनारे पर प्यादे बटोरने चला गया। इसमें बहुत समय जाता है।
+tip.queen_grab.b2.2 = {your:refl_ko} दूर के प्यादों के पीछे भेजने में सावधानी रखो।
+tip.queen_grab.b3 = इतनी जल्दी {your:refl_se} प्यादे बटोरने में समय बर्बाद होता है।
+tip.queen_grab.b3.2 = {your} अब घर से दूर है; मेरे पहले से बाहर निकले मोहरे अपना असर दिखाएँगे।
+tip.queen_grab.b4 = {your} एक प्यादा तो लेता है, पर बहुत ज़्यादा समय गँवाता है।
+tip.queen_grab.b4.2 = किनारे पर {your:refl_se} प्यादा लेने में टेम्पो जाता है।
+tip.same_piece.b1 = तुमने {your:refl_ko} दो बार चलाया। हर चाल में नया मोहरा बाहर लाने की कोशिश करो।
+tip.same_piece.b1.2 = फिर से {your}? अपने दूसरे मोहरे भी बाहर निकालो।
+tip.same_piece.b1.3 = हर चाल में नया मोहरा बाहर लाने की कोशिश करो, फिर से {your:refl_ko} नहीं।
+tip.same_piece.b2 = ओपनिंग में {your:refl_ko} दो बार चलाने से समय बर्बाद होता है।
+tip.same_piece.b2.2 = {your} फिर से चला; तुम्हारे बाक़ी मोहरे अभी भी घर पर हैं।
+tip.same_piece.b3 = {your:refl_ko} दो बार चलाने से मोहरे निकालने में देरी होती है।
+tip.same_piece.b3.2 = {your:ki} एक और चाल; तुम्हारी बाक़ी सेना इंतज़ार कर रही है।
+tip.castle.b1 = {your} अभी भी बीच में है। कैसलिंग से वह सुरक्षित हो जाता।
+tip.castle.b1.2 = कैसलिंग का समय है! कोने में {your} ज़्यादा सुरक्षित है।
+tip.castle.b1.3 = जल्दी कैसलिंग के बारे में सोचो। {your} खुले में है।
+tip.castle.b2 = {your} अभी भी केंद्र में है। जल्दी कैसलिंग करो!
+tip.castle.b2.2 = कैसलिंग से {your} आराम से सुरक्षित जगह पहुँच जाता।
+tip.castle.b3 = केंद्र खुल रहा है, इसलिए {your:ko} कैसलिंग करनी चाहिए।
+tip.castle.b3.2 = {your} अभी भी केंद्र में है; कैसलिंग का समय हो चुका था।
+# "A knight on the rim is dim": a rhyming Hindi saying of the same meaning ("a knight on the edge is of little use").
+tip.knight_rim.b1 = किनारे पर {your} ज़्यादा कुछ नहीं करता। घोड़ों को बीच की जगह पसंद है।
+tip.knight_rim.b1.2 = किनारे का घोड़ा, काम का थोड़ा! वहाँ {your} कम खानों पर नियंत्रण रखता है।
+tip.knight_rim.b2 = किनारे पर {your} कम खानों को नियंत्रित करता है। केंद्र को निशाना बनाओ।
+tip.knight_rim.b2.2 = किनारे का घोड़ा, काम का थोड़ा: {your:ko} केंद्र चाहिए।
+tip.knight_rim.b3 = किनारे पर {your} खेल से बाहर है।
+tip.knight_rim.b3.2 = किनारा {your:ke} लिए अच्छी जगह नहीं है।
+tip.flank.b1 = पहले बीच के प्यादे चलाने की कोशिश करो। किनारे के प्यादे ज़्यादा मदद नहीं करते।
+tip.flank.b1.2 = किनारे के प्यादे तुम्हारे मोहरों को बाहर आने में मदद नहीं करते। बीच वाले प्यादे चलाओ।
+tip.flank.b2 = किनारे के प्यादों की चालों से कोई मोहरा बाहर नहीं आता। केंद्र के प्यादे चलाओ।
+tip.flank.b2.2 = किनारे के प्यादों की बहुत ज़्यादा चालें। अपने मोहरे बाहर निकालो!
+tip.flank.b3 = ओपनिंग में किनारे के प्यादों की चालें मोहरों के विकास में देरी करती हैं।
+tip.flank.b3.2 = किनारे के प्यादे इंतज़ार कर सकते हैं; मोहरे निकालो और केंद्र के लिए लड़ो।
+tip.centre.b1 = बोर्ड के बीच पर नियंत्रण रखने की कोशिश करो, जैसे {sq}।
+tip.centre.b1.2 = केंद्र ज़रूरी है। {sq} के पास कोई प्यादा या मोहरा रखो।
+tip.centre.b1.3 = बीच के मोहरे मज़बूत होते हैं। {sq} जैसे खानों को निशाना बनाओ।
+tip.centre.b2 = केंद्र के लिए लड़ो: {sq} जैसे खाने अहम हैं।
+tip.centre.b2.2 = तुम्हारी चालें केंद्र मुझे सौंप रही हैं। {sq} को देखो।
+tip.centre.b3 = केंद्र पर तुम्हारी कोई चुनौती नहीं; {sq} मेरा है।
+tip.centre.b3.2 = {sq} के आसपास केंद्र को चुनौती दो।
+# Endgame technique tips.
+tip.mate_technique.b1 = जब सिर्फ़ अकेला राजा बचे, तो उसे किनारे की ओर धकेलो, फिर मात दो।
+tip.mate_technique.b1.2 = सुझाव: मेरे राजा को किनारे की ओर दबाओ। अपने राजा को भी पास रखो।
+tip.fifty.b1 = सावधान: अगर पचास चालों तक न कोई मोहरा कटे, न कोई प्यादा चले, तो बाज़ी ड्रॉ हो जाती है।
+tip.fifty.b1.2 = समय निकल रहा है: पचास चालों तक न कोई मोहरा कटे, न प्यादा चले, तो ड्रॉ है।
+tip.repetition.b1 = सावधान! अगर वही स्थिति तीसरी बार आए, तो बाज़ी ड्रॉ है।
+tip.repetition.b1.2 = चालें दोहराने से बचो: तीसरी बार दोहराव ड्रॉ है, और बाज़ी तुम्हारे हाथ में है।
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = वाह, तुमने एक मोहरा दे दिया, और यह काम कर गया!
+praise.sacrifice.2 = चतुर बलिदान! बहुत बढ़िया खेला।
+praise.brilliant.b3 = शानदार! एक सच्चा बलिदान।
+praise.brilliant.b3.2 = वाह, {move}, क्या बढ़िया बलिदान है!
+praise.brilliant.b4 = {move}! शानदार बलिदान।
+praise.brilliant.b4.2 = शानदार। मुझे इसकी उम्मीद नहीं थी।
+praise.brilliant.b5 = {move}!! शानदार।
+praise.brilliant.b5.spoken = {move}। शानदार!
+praise.brilliant.b5.2 = शानदार बलिदान।
+praise.brilliant.b6 = {move}!! उत्कृष्ट।
+praise.brilliant.b6.spoken = {move}। उत्कृष्ट!
+praise.brilliant.b6.2 = शानदार।
+praise.great.b2 = बेहतरीन चाल! तुमने पलटवार का रास्ता ढूँढ लिया।
+praise.great.b2.2 = यह बेहतरीन चाल है। बढ़िया खोज!
+praise.great.b3 = बेहतरीन चाल! तुमने इकलौता अच्छा विचार ढूँढ लिया।
+praise.great.b3.2 = उत्कृष्ट, {move}: इससे हालात पलट जाते हैं।
+praise.great.b4 = {move}! बढ़िया खोज।
+praise.great.b4.2 = बेहतरीन चाल।
+praise.great.b5 = {move}! अच्छी खोज।
+praise.great.b5.2 = मज़बूत चाल: {move}।
+praise.great.b6 = {move}! बेहतरीन।
+praise.great.b6.2 = बढ़िया खोज।
+praise.only.b2 = अच्छा! यही एकमात्र अच्छी चाल थी।
+praise.only.b2.2 = शाबाश, तुमने वह इकलौती चाल ढूँढ ली जो काम करती है।
+praise.only.b3 = एकमात्र चाल, और तुमने उसे ढूँढ लिया।
+praise.only.b3.2 = बिल्कुल! यहाँ और कुछ काम नहीं करता था।
+praise.only.b4 = एकमात्र चाल। शाबाश।
+praise.only.b4.2 = एकमात्र चाल, मिल गई।
+praise.only.b5 = एकमात्र चाल। अच्छा।
+praise.only.b5.2 = {move}, एकमात्र चाल।
+praise.only.b6 = एकमात्र चाल।
+praise.only.b6.2 = सटीक: एकमात्र चाल।
+praise.fork.b2 = दोहरा हमला! शाबाश।
+praise.fork.b2.2 = एक साथ दो मोहरों पर तुम्हारा हमला! बहुत बढ़िया।
+praise.fork.b2.3 = बढ़िया! यह फ़ोर्क है।
+praise.fork.b3 = अच्छा फ़ोर्क।
+praise.fork.b3.2 = बढ़िया फ़ोर्क!
+praise.fork.b3.3 = फ़ोर्क। अच्छा खेला।
+praise.capture.b1 = शाबाश! तुमने {my} मुफ़्त में ले लिया।
+praise.capture.b1.2 = अच्छी नज़र! {my} सुरक्षित नहीं था।
+praise.capture.b1.3 = हाँ! तुमने {my} जीत लिया।
+praise.capture.b2 = अच्छी पकड़! {my} असुरक्षित था।
+praise.capture.b2.2 = बढ़िया, तुमने {my} उठा लिया।
+praise.capture.b2.3 = ख़ूब पहचाना: {my} असुरक्षित था।
+praise.best.b1 = अच्छी चाल!
+praise.best.b1.2 = बहुत बढ़िया!
+praise.best.b1.3 = अच्छा खेला!
+praise.best.b2 = अच्छी चाल।
+praise.best.b2.2 = बहुत बढ़िया।
+praise.best.b2.3 = अच्छा खेला।
+praise.best.b3 = अच्छी चाल: इसे ढूँढना आसान नहीं था।
+praise.best.b3.2 = अच्छी खोज।
+praise.best.b3.3 = {move}, यहाँ यही सबसे अच्छी चाल है। बढ़िया।
+praise.trade.b1 = अच्छा! जब तुम आगे हो, तो मोहरों की अदला-बदली से तुम्हें फ़ायदा होता है।
+praise.trade.b1.2 = बढ़िया अदला-बदली। तुम आगे हो, इसलिए कम मोहरे तुम्हारे लिए अच्छे हैं।
+praise.trade.b2 = अच्छी अदला-बदली: तुम आगे हो, इसलिए मोहरे बदलो।
+praise.trade.b2.2 = आगे होने पर {my:ki} अदला-बदली करना समझदारी है।
+praise.trade.b3 = अच्छा: आगे हो तो अदला-बदली करो।
+praise.trade.b3.2 = समझदारी भरी अदला-बदली।
+praise.excellent.b3 = उत्कृष्ट चाल।
+praise.excellent.b3.2 = यह मज़बूत चाल है।
+praise.excellent.b3.3 = बहुत सटीक।
+praise.excellent.b4 = सटीक।
+praise.excellent.b4.2 = उत्कृष्ट।
+praise.excellent.b4.3 = बढ़िया, {move}, यह सटीक है।
+praise.castle.b1 = अच्छा! तुमने कैसलिंग की। अब तुम्हारा राजा ज़्यादा सुरक्षित है।
+praise.castle.b1.2 = बढ़िया कैसलिंग! तुम्हारा राजा अब सुरक्षित कोने में है।
+praise.saved.b1 = अच्छा! तुमने अपना मोहरा बचा लिया।
+praise.saved.b1.2 = शाबाश, तुमने उसे सुरक्षित जगह पहुँचा दिया।
+praise.book.b1 = अच्छा, यह ओपनिंग की एक जानी-मानी चाल है।
+praise.book.b1.2 = बढ़िया, मज़बूत खिलाड़ी भी ऐसे ही शुरू करते हैं।
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = सावधान! मैं {sq} पर मात की धमकी दे रहा हूँ।
+threat.mate.b1.2 = ध्यान दो: {my} {sq} पर जाना चाहता है। वह शह और मात होगी।
+threat.mate.b1.3 = {sq} को देखो। अगर मैं वहाँ पहुँच गया, तो शह और मात है!
+threat.mate.b2 = सावधान, मैं मात की धमकी दे रहा हूँ।
+threat.mate.b2.2 = ध्यान दो: {sq} पर मात का ख़तरा है।
+threat.mate.b2.3 = ध्यान से देखो: मैं मात की धमकी दे रहा हूँ।
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = देखो: {my} {your:par} हमला कर रहा है।
+threat.piece.b1.2 = सावधान! {your:par} {my:ka} हमला है।
+threat.piece.b1.3 = ध्यान दो, {my} {your:ko} काटना चाहता है।
+threat.piece.b2 = {your:refl_ka} ध्यान रखो।
+threat.piece.b2.2 = {your:par} हमला है।
+threat.piece.b2.3 = {your:refl_par} नज़र रखो।
+threat.punish.b1 = मेरी पिछली चाल ग़लती थी। क्या तुम्हें इसका फ़ायदा उठाने का रास्ता दिखता है?
+threat.punish.b1.2 = हम्म, लगता है मुझसे ग़लती हो गई। क्या तुम्हें वह दिखती है?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = इस बार {your:refl_ke} बारे में सोचो।
+tb.hint.b1.2 = {your:refl_par} नज़र रखो।
+tb.hint.king.b1 = {your:refl_ki} सुरक्षा के बारे में सोचो।
+tb.hint.king.b1.2 = पहले {your:refl_ko} देखो। क्या वह सुरक्षित है?
+tb.hint.missed.b1 = ऐसे मोहरे ढूँढो जो मुफ़्त में काटे जा सकें।
+tb.hint.missed.b1.2 = ध्यान से देखो: क्या कुछ काटा जा सकता है?
+tb.hint.mate_missed.b1 = मेरे राजा को देखो। क्या उसे मात दी जा सकती है?
+tb.hint.mate_missed.b1.2 = पहले शह वाली चालें आज़माओ। शायद मात मिल जाए!
+tb.hint.general.b1 = जल्दी मत करो, पूरे बोर्ड को देखो।
+tb.hint.general.b1.2 = कोई ज़्यादा सुरक्षित चाल ढूँढने की कोशिश करो।
+# The retry.
+tb.fixed.b1 = बहुत बेहतर!
+tb.fixed.b1.2 = हाँ, यह बेहतर है!
+tb.fixed.b1.3 = अच्छा, यह कहीं ज़्यादा अच्छा काम करता है।
+tb.fixed = यह बेहतर है।
+tb.fixed.2 = बेहतर।
+tb.fixed.3 = अच्छा सुधार।
+tb.same = फिर वही चाल? ठीक है, देखते हैं।
+tb.same.2 = तुम्हें यह चाल पसंद है। चलो, खेलकर देखते हैं।
+# The retry after a hint-only offer is the move the coach had in mind.
+tb.found.b1 = हाँ! मैं इसी चाल के बारे में सोच रहा था।
+tb.found.b1.2 = तुमने ढूँढ ली! यही बेहतर चाल है।
+tb.found = यही चाल मेरे मन में थी।
+tb.found.2 = बिल्कुल, यही वाली।
+# Levels 4-6, once per game: the level's takebacks are used up, so no offer this time.
+tb.none_left = अफ़सोस, इस बाज़ी में अब कोई चाल वापसी नहीं बची।
+tb.none_left.2 = इस बाज़ी में तुम्हारे पास कोई चाल वापसी नहीं बची।

@@ -924,6 +924,8 @@ bool OpeningTexts::load(std::string* error) {
     for (const auto& m : root["components"].members()) components_[m.first] = m.second.asString();
     for (const auto& m : root["eponyms"].members()) eponyms_[m.first] = m.second.asString();
     for (const std::string& w : stringList(root["common_words"])) commonWords_.insert(w);
+    for (const std::string& l : stringList(root["proper_name_languages"])) properLanguages_.insert(l);
+    for (const std::string& l : stringList(root["name_dash_languages"])) nameDashLanguages_.insert(l);
     return ok;
 }
 
@@ -1027,7 +1029,7 @@ std::string OpeningTexts::compose(const std::string& component, const std::strin
                     x = *n;
                     xgen = *g;
                 }
-            } else if ((lang == "fr" || lang == "de" || lang == "es") && properName(proper)) {
+            } else if (properLanguages_.count(lang) && properName(proper)) {
                 x = xgen = proper;
             }
             if (!x.empty()) {
@@ -1039,7 +1041,7 @@ std::string OpeningTexts::compose(const std::string& component, const std::strin
     }
     // Chinese subtitles keep the English words rather than lose the name (the voice speaks English anyway).
     if (out.empty() && (lang == "zh-Hans" || lang == "zh-Hant")) out = component;
-    if (spoken && (lang == "ru" || lang == "uk")) out = fixNameDashesForSpeech(out);
+    if (spoken && nameDashLanguages_.count(lang)) out = fixNameDashesForSpeech(out);
     return out;
 }
 
@@ -1091,7 +1093,7 @@ std::string OpeningTexts::render(const OpeningLine& line, const std::string& lan
         out += v;
         i = close;
     }
-    if (spoken && (lang == "ru" || lang == "uk")) out = fixNameDashesForSpeech(out);
+    if (spoken && nameDashLanguages_.count(lang)) out = fixNameDashesForSpeech(out);
     return out;
 }
 

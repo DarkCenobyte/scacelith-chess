@@ -1,0 +1,550 @@
+# Coach speech (European Portuguese): the building blocks every line uses (src/coach/catalog.cpp
+# renders them). Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms
+# Portuguese needs. Portugal's usage and spelling (AO90): see the glossary of the translation.
+# Register: the coach says "tu" to the player (the game menus stay formal: "o seu", "Selecione");
+# the coach is male ("estou contente", "obrigado"). The player's gender is unknown: no adjective or
+# participle agreeing with the player ("pronto", "atento", "bem-vindo"); verbs never agree with
+# gender, so every tense is fine ("ganhaste", "jogaste"). Portuguese of Portugal: "estar a" +
+# infinitive (never the gerund), enclitic pronouns ("Toma-o", "Mostro-te").
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders: o peão, o cavalo, o bispo, o rei (m); a torre, a dama (f).
+# European Portuguese puts the definite article before a possessive ("o teu cavalo", "a minha
+# torre"), so every piece placeholder carries its article, and the prepositions de, a, em and por
+# merge with that article ("do teu cavalo", "à tua torre", "no meu bispo", "pela minha dama").
+# Never write one of these four prepositions before a plain placeholder ("de {your}" would say
+# "de o teu cavalo"): ask for the form that contains it. The renderer capitalises a placeholder
+# that starts a sentence ("O teu cavalo...", "Este é...").
+# Owners: your = "o teu cavalo / a tua torre", my = "o meu cavalo / a minha torre"; the Analysis
+# mode: white = "o cavalo branco / a torre branca", black = "o cavalo preto / a torre preta".
+# Every form below is defined for all six pieces and all four owners (examples with your / my):
+#   nom   o teu cavalo / a tua torre       subject or object, and after the prepositions that do
+#                                          not merge (com, para, contra, sem, sobre, entre, como):
+#                                          "{your} não se move assim.", "Toma {my} com a tua torre!"
+#                                          Also after "de" before an infinitive, which Portugal
+#                                          keeps apart: "antes de {your} se mexer".
+#   de    do teu cavalo / da tua torre     "{t2} está mesmo atrás {t1:de}.", "a segurança {your:de}"
+#   a     ao teu cavalo / à tua torre      "Dás xeque {my:a}.", "até {my:a}", "um garfo {t1:a} e {t2:a}"
+#   em    no teu cavalo / na tua torre     "Pensa {your:em}.", "Repara {my:em}."
+#   por   pelo teu cavalo / pela tua torre "{your} está atacad{your:o} {my:por}."
+#   bare  cavalo / torre                   the noun alone, without article or owner, after a word
+#                                          of the line that agrees with it: "{your:um} {your:bare}"
+#                                          (see "um" below)
+# Forms that stand for the piece without naming it: pronouns, the article alone, endings. A line
+# still names the piece in full ({your}, {my:de}...): the coach points at it where its placeholder
+# first appears.
+#   ele   ele / ela      after a preposition that does not merge: "com {my:ele}", "sem {your:ele}";
+#                        as a subject only for emphasis (Portuguese drops it: "Move-se na diagonal.")
+#   dele  dele / dela    "{my} ataca {t1}, e {t2} está mesmo atrás {t1:dele}." ("its" is more often
+#                        "o seu / a sua", which agrees with the thing owned and needs no form:
+#                        "a sua casa", "a sua diagonal")
+#   nele  nele / nela    "Não toques {your:nele}."
+#   o     o / a          the object pronoun: "Toma-{my:o}!", "para {my:o} capturar", "Não {your:o}
+#                        percas."; the article alone: "{t1:o} primeir{t1:o}" = "o primeiro / a
+#                        primeira"; the -o / -a ending of an adjective or participle written after
+#                        the piece it agrees with: "{your} está cravad{your:o}." = "cravado /
+#                        cravada" (also "sozinh{your:o}", "pres{your:o}", "protegid{your:o}")
+#   lo    lo / la        after a verb form that drops its final -r, -s or -z: "Podes capturá-{my:lo}.",
+#                        "para tomá-{my:lo}", "defendê-{your:lo}"
+#   no    no / na        after a verb form ending in a nasal sound: "As minhas peças atacam-{your:no}.",
+#                        "põe-{your:no}"
+#   um    um / uma       with bare, for a statement about that kind of piece: "{your:um} {your:bare}
+#                        pres{your:o} acaba perdid{your:o}." = "Um bispo preso..." / "Uma torre presa..."
+#   este  este / esta    "{your:este} é {your}." = "Este é o teu cavalo." / "Esta é a tua torre."
+#   esse  esse / essa    "Olha para {your}: {your:esse} é o problema."
+# Two pieces together ("{t1} e {t2}") would need a plural agreeing with both (masculine unless both
+# are feminine): no form can give it, so rephrase with "peça(s)" ("as duas peças", "uma das duas
+# peças") or with a verb ("atacas {t1} e {t2} ao mesmo tempo").
+# Each piece: its gender, the noun for the forms that name it (the owner patterns below add the
+# article, possessive or colour), then its pronouns, article and endings.
+piece.pawn.gender = m
+piece.pawn.nom = peão
+piece.pawn.de = peão
+piece.pawn.a = peão
+piece.pawn.em = peão
+piece.pawn.por = peão
+piece.pawn.bare = peão
+piece.pawn.ele = ele
+piece.pawn.dele = dele
+piece.pawn.nele = nele
+piece.pawn.o = o
+piece.pawn.lo = lo
+piece.pawn.no = no
+piece.pawn.um = um
+piece.pawn.este = este
+piece.pawn.esse = esse
+piece.knight.gender = m
+piece.knight.nom = cavalo
+piece.knight.de = cavalo
+piece.knight.a = cavalo
+piece.knight.em = cavalo
+piece.knight.por = cavalo
+piece.knight.bare = cavalo
+piece.knight.ele = ele
+piece.knight.dele = dele
+piece.knight.nele = nele
+piece.knight.o = o
+piece.knight.lo = lo
+piece.knight.no = no
+piece.knight.um = um
+piece.knight.este = este
+piece.knight.esse = esse
+piece.bishop.gender = m
+piece.bishop.nom = bispo
+piece.bishop.de = bispo
+piece.bishop.a = bispo
+piece.bishop.em = bispo
+piece.bishop.por = bispo
+piece.bishop.bare = bispo
+piece.bishop.ele = ele
+piece.bishop.dele = dele
+piece.bishop.nele = nele
+piece.bishop.o = o
+piece.bishop.lo = lo
+piece.bishop.no = no
+piece.bishop.um = um
+piece.bishop.este = este
+piece.bishop.esse = esse
+piece.rook.gender = f
+piece.rook.nom = torre
+piece.rook.de = torre
+piece.rook.a = torre
+piece.rook.em = torre
+piece.rook.por = torre
+piece.rook.bare = torre
+piece.rook.ele = ela
+piece.rook.dele = dela
+piece.rook.nele = nela
+piece.rook.o = a
+piece.rook.lo = la
+piece.rook.no = na
+piece.rook.um = uma
+piece.rook.este = esta
+piece.rook.esse = essa
+piece.queen.gender = f
+piece.queen.nom = dama
+piece.queen.de = dama
+piece.queen.a = dama
+piece.queen.em = dama
+piece.queen.por = dama
+piece.queen.bare = dama
+piece.queen.ele = ela
+piece.queen.dele = dela
+piece.queen.nele = nela
+piece.queen.o = a
+piece.queen.lo = la
+piece.queen.no = na
+piece.queen.um = uma
+piece.queen.este = esta
+piece.queen.esse = essa
+piece.king.gender = m
+piece.king.nom = rei
+piece.king.de = rei
+piece.king.a = rei
+piece.king.em = rei
+piece.king.por = rei
+piece.king.bare = rei
+piece.king.ele = ele
+piece.king.dele = dele
+piece.king.nele = nele
+piece.king.o = o
+piece.king.lo = lo
+piece.king.no = no
+piece.king.um = um
+piece.king.este = este
+piece.king.esse = esse
+# Owner patterns of the forms that name the piece: article + possessive (+ colour in the Analysis
+# mode), merged with de / a / em / por.
+owner.your.nom.m = o teu {piece}
+owner.your.nom.f = a tua {piece}
+owner.your.de.m = do teu {piece}
+owner.your.de.f = da tua {piece}
+owner.your.a.m = ao teu {piece}
+owner.your.a.f = à tua {piece}
+owner.your.em.m = no teu {piece}
+owner.your.em.f = na tua {piece}
+owner.your.por.m = pelo teu {piece}
+owner.your.por.f = pela tua {piece}
+owner.my.nom.m = o meu {piece}
+owner.my.nom.f = a minha {piece}
+owner.my.de.m = do meu {piece}
+owner.my.de.f = da minha {piece}
+owner.my.a.m = ao meu {piece}
+owner.my.a.f = à minha {piece}
+owner.my.em.m = no meu {piece}
+owner.my.em.f = na minha {piece}
+owner.my.por.m = pelo meu {piece}
+owner.my.por.f = pela minha {piece}
+# The English keys (every language defines them); Portuguese uses the gendered patterns above.
+owner.your.nom = o teu {piece}
+owner.my.nom = o meu {piece}
+# The Analysis mode names a piece by its side, nobody being "tu" or "eu" there: "o cavalo branco",
+# "a dama preta" (article and adjective agree with the piece), with the same forms.
+owner.white.nom.m = o {piece} branco
+owner.white.nom.f = a {piece} branca
+owner.white.de.m = do {piece} branco
+owner.white.de.f = da {piece} branca
+owner.white.a.m = ao {piece} branco
+owner.white.a.f = à {piece} branca
+owner.white.em.m = no {piece} branco
+owner.white.em.f = na {piece} branca
+owner.white.por.m = pelo {piece} branco
+owner.white.por.f = pela {piece} branca
+owner.black.nom.m = o {piece} preto
+owner.black.nom.f = a {piece} preta
+owner.black.de.m = do {piece} preto
+owner.black.de.f = da {piece} preta
+owner.black.a.m = ao {piece} preto
+owner.black.a.f = à {piece} preta
+owner.black.em.m = no {piece} preto
+owner.black.em.f = na {piece} preta
+owner.black.por.m = pelo {piece} preto
+owner.black.por.f = pela {piece} preta
+owner.white.nom = o {piece} branco
+owner.black.nom = o {piece} preto
+# The noun alone, and the pronouns, articles and endings (piece.<type>.<form> above): the same
+# word for every owner.
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+owner.white.bare = {piece}
+owner.black.bare = {piece}
+owner.your.ele = {piece}
+owner.my.ele = {piece}
+owner.white.ele = {piece}
+owner.black.ele = {piece}
+owner.your.dele = {piece}
+owner.my.dele = {piece}
+owner.white.dele = {piece}
+owner.black.dele = {piece}
+owner.your.nele = {piece}
+owner.my.nele = {piece}
+owner.white.nele = {piece}
+owner.black.nele = {piece}
+owner.your.o = {piece}
+owner.my.o = {piece}
+owner.white.o = {piece}
+owner.black.o = {piece}
+owner.your.lo = {piece}
+owner.my.lo = {piece}
+owner.white.lo = {piece}
+owner.black.lo = {piece}
+owner.your.no = {piece}
+owner.my.no = {piece}
+owner.white.no = {piece}
+owner.black.no = {piece}
+owner.your.um = {piece}
+owner.my.um = {piece}
+owner.white.um = {piece}
+owner.black.um = {piece}
+owner.your.este = {piece}
+owner.my.este = {piece}
+owner.white.este = {piece}
+owner.black.este = {piece}
+owner.your.esse = {piece}
+owner.my.esse = {piece}
+owner.white.esse = {piece}
+owner.black.esse = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# File letters are said by their Portuguese names: "á quatro", "bê cinco", "é quatro", "efe três",
+# "agá sete". The "a" carries its accent so that the voice says the letter, not the unstressed
+# article or preposition "a" ("a quatro"). A bare "é" melts into the word before it ("toma em é
+# cinco" is said "toma em cinco", "para é quatro" adds 10 ms to "para quatro"): "éh" is the same
+# letter, held a little longer, and is heard far more often (82 times in 111 against 55).
+square.spoken = {file} {rank}
+file.a.spoken = á
+file.b.spoken = bê
+file.c.spoken = cê
+file.d.spoken = dê
+file.e.spoken = éh
+file.f.spoken = efe
+file.g.spoken = gê
+file.h.spoken = agá
+rank.1.spoken = um
+rank.2.spoken = dois
+rank.3.spoken = três
+rank.4.spoken = quatro
+rank.5.spoken = cinco
+rank.6.spoken = seis
+rank.7.spoken = sete
+rank.8.spoken = oito
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Portuguese scoresheet letters: R(ei) D(ama) T(orre) B(ispo) C(avalo): "Cf3", "Txd1", "Bb5+".
+move.letters = R D T B C
+# Spoken as Portuguese players read notation: "cavalo efe três", "cavalo toma em é cinco",
+# "cavalo bê dê sete", "peão é toma em dê cinco", "peão retoma" (a recapture on the same square),
+# "roque pequeno", "é oito, promoção a dama", "dama gê quatro, xeque". {piece} is the bare noun.
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} toma em {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} toma em {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = peão {file} toma em {to}
+move.recapture.spoken = {piece} retoma
+move.castle_short.spoken = roque pequeno
+move.castle_long.spoken = roque grande
+move.promotion.spoken = {move}, promoção a {piece}
+move.check.spoken = {move}, xeque
+move.mate.spoken = {move}, xeque-mate
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). An initial "x"
+# is unstable: right in "xeque" alone, but "s" in "xeque-mate" ("seque-mate"), "xeques" and half the
+# time "xadrez" ("sadrez"): "ch" is the same sound, always read right ("xeque" in "xeque-mate" is a
+# word of its own, so one key covers both). "en passant" the French way (the voice says "em
+# passante", with the t). "troco" in "a troco de nada" is read with the open o of the verb ("eu
+# troco"): every line has the noun; a line with the verb would need its own .spoken line.
+respell.xeque = cheque
+respell.xeques = cheques
+respell.xadrez = chadrez
+respell.en = ã
+respell.passant = passã
+respell.troco = trôco
+# Eponyms: the voice reads a w as in English and a j as in "jogo" ("Nimzouitch", "Uinauer",
+# "Najedorf", "Bogojubou"): spelled as Portuguese players say them, stressed as the names are.
+respell.fajarowicz = faiaróvitch
+respell.najdorf = naidorf
+respell.nimzowitsch = nimzóvitch
+respell.winawer = vináver
+respell.bogoljubow = bogoliúbov
+respell.tartakower = tartakóver
+respell.janowski = ianóvski
+respell.horwitz = hórvitz
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words, as Portugal says them (catorze, dezasseis, dezassete, dezanove). 21-99
+# compose as "{tens} e {units}" ("vinte e três"), 201-999 as "{hundreds} e {rest}" ("duzentos e
+# cinco", "trezentos e quarenta e dois"). 100 is "cem" alone but "cento" before the rest ("cento e
+# um"), so 101-199 are listed. A bare number is masculine ("um lance", "dois pontos", "vinte e um
+# lances"); the form "f" is the feminine ("{n:f}": "uma casa", "duas peças", "vinte e uma vezes",
+# "duzentas"), used by the feminine counted nouns below. Known limit: the composer cannot make the
+# hundreds of 201-999 feminine ("duzentas e uma" comes out "duzentos e uma"); no line counts a
+# feminine noun that high.
+number.0.spoken = zero
+number.1.spoken = um
+number.1.f.spoken = uma
+number.2.spoken = dois
+number.2.f.spoken = duas
+number.3.spoken = três
+number.4.spoken = quatro
+number.5.spoken = cinco
+number.6.spoken = seis
+number.7.spoken = sete
+number.8.spoken = oito
+number.9.spoken = nove
+number.10.spoken = dez
+number.11.spoken = onze
+number.12.spoken = doze
+number.13.spoken = treze
+number.14.spoken = catorze
+number.15.spoken = quinze
+number.16.spoken = dezasseis
+number.17.spoken = dezassete
+number.18.spoken = dezoito
+number.19.spoken = dezanove
+number.20.spoken = vinte
+number.30.spoken = trinta
+number.40.spoken = quarenta
+number.50.spoken = cinquenta
+number.60.spoken = sessenta
+number.70.spoken = setenta
+number.80.spoken = oitenta
+number.90.spoken = noventa
+number.100.spoken = cem
+number.101.spoken = cento e um
+number.101.f.spoken = cento e uma
+number.102.spoken = cento e dois
+number.102.f.spoken = cento e duas
+number.103.spoken = cento e três
+number.104.spoken = cento e quatro
+number.105.spoken = cento e cinco
+number.106.spoken = cento e seis
+number.107.spoken = cento e sete
+number.108.spoken = cento e oito
+number.109.spoken = cento e nove
+number.110.spoken = cento e dez
+number.111.spoken = cento e onze
+number.112.spoken = cento e doze
+number.113.spoken = cento e treze
+number.114.spoken = cento e catorze
+number.115.spoken = cento e quinze
+number.116.spoken = cento e dezasseis
+number.117.spoken = cento e dezassete
+number.118.spoken = cento e dezoito
+number.119.spoken = cento e dezanove
+number.120.spoken = cento e vinte
+number.121.spoken = cento e vinte e um
+number.121.f.spoken = cento e vinte e uma
+number.122.spoken = cento e vinte e dois
+number.122.f.spoken = cento e vinte e duas
+number.123.spoken = cento e vinte e três
+number.124.spoken = cento e vinte e quatro
+number.125.spoken = cento e vinte e cinco
+number.126.spoken = cento e vinte e seis
+number.127.spoken = cento e vinte e sete
+number.128.spoken = cento e vinte e oito
+number.129.spoken = cento e vinte e nove
+number.130.spoken = cento e trinta
+number.131.spoken = cento e trinta e um
+number.131.f.spoken = cento e trinta e uma
+number.132.spoken = cento e trinta e dois
+number.132.f.spoken = cento e trinta e duas
+number.133.spoken = cento e trinta e três
+number.134.spoken = cento e trinta e quatro
+number.135.spoken = cento e trinta e cinco
+number.136.spoken = cento e trinta e seis
+number.137.spoken = cento e trinta e sete
+number.138.spoken = cento e trinta e oito
+number.139.spoken = cento e trinta e nove
+number.140.spoken = cento e quarenta
+number.141.spoken = cento e quarenta e um
+number.141.f.spoken = cento e quarenta e uma
+number.142.spoken = cento e quarenta e dois
+number.142.f.spoken = cento e quarenta e duas
+number.143.spoken = cento e quarenta e três
+number.144.spoken = cento e quarenta e quatro
+number.145.spoken = cento e quarenta e cinco
+number.146.spoken = cento e quarenta e seis
+number.147.spoken = cento e quarenta e sete
+number.148.spoken = cento e quarenta e oito
+number.149.spoken = cento e quarenta e nove
+number.150.spoken = cento e cinquenta
+number.151.spoken = cento e cinquenta e um
+number.151.f.spoken = cento e cinquenta e uma
+number.152.spoken = cento e cinquenta e dois
+number.152.f.spoken = cento e cinquenta e duas
+number.153.spoken = cento e cinquenta e três
+number.154.spoken = cento e cinquenta e quatro
+number.155.spoken = cento e cinquenta e cinco
+number.156.spoken = cento e cinquenta e seis
+number.157.spoken = cento e cinquenta e sete
+number.158.spoken = cento e cinquenta e oito
+number.159.spoken = cento e cinquenta e nove
+number.160.spoken = cento e sessenta
+number.161.spoken = cento e sessenta e um
+number.161.f.spoken = cento e sessenta e uma
+number.162.spoken = cento e sessenta e dois
+number.162.f.spoken = cento e sessenta e duas
+number.163.spoken = cento e sessenta e três
+number.164.spoken = cento e sessenta e quatro
+number.165.spoken = cento e sessenta e cinco
+number.166.spoken = cento e sessenta e seis
+number.167.spoken = cento e sessenta e sete
+number.168.spoken = cento e sessenta e oito
+number.169.spoken = cento e sessenta e nove
+number.170.spoken = cento e setenta
+number.171.spoken = cento e setenta e um
+number.171.f.spoken = cento e setenta e uma
+number.172.spoken = cento e setenta e dois
+number.172.f.spoken = cento e setenta e duas
+number.173.spoken = cento e setenta e três
+number.174.spoken = cento e setenta e quatro
+number.175.spoken = cento e setenta e cinco
+number.176.spoken = cento e setenta e seis
+number.177.spoken = cento e setenta e sete
+number.178.spoken = cento e setenta e oito
+number.179.spoken = cento e setenta e nove
+number.180.spoken = cento e oitenta
+number.181.spoken = cento e oitenta e um
+number.181.f.spoken = cento e oitenta e uma
+number.182.spoken = cento e oitenta e dois
+number.182.f.spoken = cento e oitenta e duas
+number.183.spoken = cento e oitenta e três
+number.184.spoken = cento e oitenta e quatro
+number.185.spoken = cento e oitenta e cinco
+number.186.spoken = cento e oitenta e seis
+number.187.spoken = cento e oitenta e sete
+number.188.spoken = cento e oitenta e oito
+number.189.spoken = cento e oitenta e nove
+number.190.spoken = cento e noventa
+number.191.spoken = cento e noventa e um
+number.191.f.spoken = cento e noventa e uma
+number.192.spoken = cento e noventa e dois
+number.192.f.spoken = cento e noventa e duas
+number.193.spoken = cento e noventa e três
+number.194.spoken = cento e noventa e quatro
+number.195.spoken = cento e noventa e cinco
+number.196.spoken = cento e noventa e seis
+number.197.spoken = cento e noventa e sete
+number.198.spoken = cento e noventa e oito
+number.199.spoken = cento e noventa e nove
+number.200.spoken = duzentos
+number.200.f.spoken = duzentas
+number.300.spoken = trezentos
+number.300.f.spoken = trezentas
+number.400.spoken = quatrocentos
+number.400.f.spoken = quatrocentas
+number.500.spoken = quinhentos
+number.500.f.spoken = quinhentas
+number.600.spoken = seiscentos
+number.600.f.spoken = seiscentas
+number.700.spoken = setecentos
+number.700.f.spoken = setecentas
+number.800.spoken = oitocentos
+number.800.f.spoken = oitocentas
+number.900.spoken = novecentos
+number.900.f.spoken = novecentas
+number.tens.spoken = {tens} e {units}
+# Never used (every hundred from 100 to 900 is listed above); kept because English defines it.
+number.hundreds.spoken = {n} centenas
+number.hundreds_rest.spoken = {hundreds} e {rest}
+number.minus.spoken = menos {n}
+# A decimal number: Portugal writes a decimal comma ("1,3") and says "um vírgula três".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} vírgula {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Portuguese plural rule (assets/i18n): one (exactly 1) | other (0 included: "zero lances").
+# Feminine nouns say their number with the form "f" ("uma peça", "duas vezes", "vinte e uma casas").
+count.move = {n} lance|{n} lances
+count.point = {n} ponto|{n} pontos
+count.pawn = {n} peão|{n} peões
+count.piece = {n:f} peça|{n:f} peças
+count.mistake = {n} erro|{n} erros
+count.blunder = {n} erro grave|{n} erros graves
+count.inaccuracy = {n:f} imprecisão|{n:f} imprecisões
+count.game = {n:f} partida|{n:f} partidas
+count.time = {n:f} vez|{n:f} vezes
+count.square = {n:f} casa|{n:f} casas
+count.position = {n:f} posição|{n:f} posições
+# "{n:f}" in a line says a bare number in the feminine, before a feminine noun the line writes
+# itself ("{n:f} casas"); it is a count key so that the form also works outside the counted nouns
+# (and the form check knows it). A bare "{n}" is masculine.
+count.f = {n:f}|{n:f}
+# More counted nouns for the review and the appraisal: "{n:attacker}" = "3 atacantes",
+# "{n2:defender}" = "1 defensor", "{m:check}" = "2 xeques", "{n:capture}" = "4 capturas",
+# "{n:captured}" = "3 peças capturadas" (the participle agrees with the number, which a line
+# cannot do around "{n:piece}"), "{n:best_move}" = "5 melhores lances" (a streak).
+count.attacker = {n} atacante|{n} atacantes
+count.defender = {n} defensor|{n} defensores
+count.check = {n} xeque|{n} xeques
+count.capture = {n:f} captura|{n:f} capturas
+count.captured = {n:f} peça capturada|{n:f} peças capturadas
+count.best_move = {n} melhor lance|{n} melhores lances
+# Percentages (accuracy): "{acc:percent}" = "85%" in the subtitles, "oitenta e cinco por cento" spoken.
+count.percent = {n}%|{n}%
+count.percent.spoken = {n} por cento|{n} por cento
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = mais {x}
+eval.down = −{x}
+eval.down.spoken = menos {x}
+eval.even = 0,0
+eval.even.spoken = igualdade
+eval.mate_win = mate em {n}
+eval.mate_loss = mate em {n} contra ti
+
+# ---- Names used in the lines of other files ---------------------------------------------------------
+# The phases of the game (appraisal.lang: appraisal.phase.* = "a abertura", "o meio-jogo",
+# "o final", with their article) merged with "em" and "de": "{text:em}" = "na abertura"
+# ("Jogaste muito bem {text:em}."), "{text:de}" = "da abertura".
+appraisal.phase.opening.em = na abertura
+appraisal.phase.opening.de = da abertura
+appraisal.phase.middlegame.em = no meio-jogo
+appraisal.phase.middlegame.de = do meio-jogo
+appraisal.phase.endgame.em = no final
+appraisal.phase.endgame.de = do final

@@ -1,0 +1,110 @@
+# Coach speech (Estonian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "sina" to the player (glossary/et.md). Estonian has no grammatical gender: nothing
+# agrees with the sex of the coach or of the player.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Tere! Mängime ühe sõbraliku partii. Ma aitan sind alati, kui midagi viltu läheb.
+event.greet.l1.2 = Hei! Ma mängin leebelt ja näitan sulle, millele tähelepanu pöörata.
+event.greet.l1.3 = Tere tulemast! Võta aega: ma ütlen sulle, kui mõni malend on ohus.
+event.greet.l2 = Tere! Mängime. Kui laual tekib kahvel või sidumine, näitan seda sulle.
+event.greet.l2.2 = Hei! Too oma nupud mängu ja hoia oma kuningas ohust eemal. Ma aitan sind mängu ajal.
+event.greet.l2.3 = Tere tulemast tagasi malelaua taha! Jälgi kahvleid ja sidumisi: nendega võidetakse partiisid.
+event.greet.l3 = Tere! Mängime päris partii. Ma kommenteerin sinu plaane ja suuremaid vigu.
+event.greet.l3.2 = Hei! Mõtle välja plaan oma nuppudele. Ma ütlen, kui mõni käik jätab midagi tähelepanuta.
+event.greet.l3.3 = Mängime! Ma näitan sulle ainsaid käike ja käike, mis lähevad viltu.
+event.greet.l4 = Tere! Seekord annan seisule hinnanguid ja näitan paremaid kandidaatkäike.
+event.greet.l4.2 = Mängime. Pärast viga ütlen, mis oleks olnud täpsem.
+event.greet.l4.3 = Kas oled valmis klubipartiiks? Kommenteerin, kui hinnang muutub.
+event.greet.l5 = Mängime. Hoian oma kommentaarid lühikesed.
+event.greet.l5.2 = Olen valmis, kui sina oled. Ainult lühikesed kommentaarid.
+event.greet.l5.3 = Edu. Räägin ainult siis, kui see on oluline.
+event.greet.l6 = Edu.
+event.greet.l6.2 = Mängime.
+event.greet.l6.3 = Valmis. Kommenteerin ainult kriitilisi hetki.
+
+# Who starts (said after the greeting).
+event.colour.white = Sul on valged malendid, nii et alustad sina.
+event.colour.white.2 = Sa mängid valgetega: esimene käik on sinu.
+event.colour.black = Minul on valged, nii et alustan mina.
+event.colour.black.2 = Seekord mängid sa mustadega: mina käin esimesena.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/et.lang coach.level.<n>.name): Esimesed
+# sammud, Algaja, Edasijõudnu, Klubimängija, Tugev klubimängija, Ekspert.
+event.level.l1 = Esimesed sammud: ma mängin leebelt ja selgitan iga viga lihtsate sõnadega.
+event.level.l2 = Algaja: ma mängin veidi tugevamalt ja nimetan lihtsaid taktikalisi võtteid, nagu kahvel ja sidumine.
+event.level.l3 = Edasijõudnu: ma räägin plaanidest ja etturistruktuurist ning näitan lühikesi variante.
+event.level.l4 = Klubimängija: ma annan hinnangu etturites ja pakun välja kandidaatkäike.
+event.level.l5 = Tugev klubimängija: lühikesed kommentaarid ja pikemad variandid, kui see on oluline.
+event.level.l6 = Ekspert: ma mängin täie jõuga ja kommenteerin ainult kriitilisi hetki.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Sinu käik.
+event.your_move.2 = Sinu kord.
+event.your_move.3 = Nüüd sina.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Võta aega.
+event.take_time.2 = Pole kiiret: meie partiides kella ei ole.
+# Short filler while the coach is still looking at the position.
+event.filler = Hmm.
+event.filler.2 = Vaatame.
+event.filler.3 = Las ma vaatan.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Hästi, võtame käigu tagasi.
+event.takeback.taken.2 = Hea mõte. Vaata veel kord.
+event.takeback.taken.3 = Käik on tagasi võetud. Proovi uuesti.
+# The player declined the offer and played on.
+event.takeback.declined = Hästi, mängime edasi.
+event.takeback.declined.2 = Olgu, partii jätkub.
+event.takeback.declined.3 = Sinu valik. Jätkame.
+# After an explanation without an offer.
+event.play_on = Mängime edasi.
+event.play_on.2 = Jätkame.
+event.play_on.3 = Ja nüüd tagasi meie partii juurde.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Selliseid vigu teevad kõik. Peaasi on neid märgata.
+event.encourage.mistake.2 = Ära muretse. Vaata, mida mu viimane käik ründab, ja sa leiad selle üles.
+event.encourage.mistake.3 = Seda juhtub iga mängijaga. Lähme edasi.
+# The player is behind (material or evaluation).
+event.encourage.behind = Ära anna alla: otsi võimalusi ja pane mind pingutama.
+event.encourage.behind.2 = Võitle edasi. Sellised seisud võivad veel pöörde võtta.
+event.encourage.behind.3 = Jää rahulikuks ja otsi minu nõrkusi.
+# The player has played several good moves in a row.
+event.encourage.well = Sa kontrollid enne käiku minu ähvardusi. Tubli.
+event.encourage.well.2 = Ettevaatlikud, kindlad käigud. Jätka samas vaimus.
+event.encourage.well.3 = Sa mõtled täna hästi.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Nõustun. Siis on viik.
+event.draw.accepted.2 = Kokku lepitud: viik.
+event.draw.declined = Ei, aitäh, mängime edasi.
+event.draw.declined.2 = Ma jätkaksin pigem.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Hästi mängitud. Palju õnne!
+event.end.win.2 = Sa väärisid seda. Tubli!
+event.end.win.3 = Palju õnne: sa võitsid mind täiesti ausalt.
+event.end.loss = Hea partii. Järgmine kord võidad sina.
+event.end.loss.2 = Aitäh partii eest. Iga kaotus õpetab sulle midagi.
+event.end.loss.3 = Hea võitlus. Vaatame, mis juhtus.
+event.end.draw = Viik. Hea partii!
+event.end.draw.2 = Seekord ei võitnud keegi. Hästi võideldud.
+event.end.draw.3 = Õiglane tulemus. Hea partii.
+event.end.resigned = Sa andsid alla. Hea võitlus sellegipoolest.
+event.end.resigned.2 = Olgu. Aitäh partii eest.
+event.end.handshake = Surume kätt.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a lowercase nominative: it stands
+# after a colon, or in quotes after "teemaga" / "teema" (a quoted title keeps its nominative).
+event.lesson.resume = Tere tulemast tagasi! Jätkame teemaga „{chapter}“.
+event.lesson.resume.2 = Tere jälle! Jäime pidama teema „{chapter}“ juures.
+event.lesson.next = Järgmisena: {chapter}.
+event.lesson.next.2 = Nüüd: {chapter}.

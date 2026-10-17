@@ -1,0 +1,1127 @@
+# Coach speech (Slovenian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Slovenian needs.
+# Standard Slovenian and the words of Slovenian chess books: kralj, dama, trdnjava, lovec, skakač,
+# kmet; šah, mat, pat, remi, rokada; poteza (feminine!), polje, linija (file), vrsta (rank).
+# Register: the coach says "ti" to the player (the game menus say "vi"). The coach is male ("pokazal
+# sem", "vesel sem"). The player's gender is unknown, and every Slovenian past tense ("si vzel"),
+# future ("boš vzel") and conditional ("bi vzel") shows it, as do adjectives ("pripravljen"): for the
+# player use only the present (the perfective present for what comes next: "Če vzameš kmeta, ..."),
+# the imperative, infinitives, impersonal turns ("uspelo ti je najti", "bilo je mogoče vzeti", "treba
+# je") and noun subjects ("tvoja poteza je bila odlična"). Coach and player together are the dual
+# "midva": "Poglejva", "Ponoviva"; "sva igrala" is always right (a pair with a man in it is masculine).
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: kmet, skakač, lovec, kralj (m, animate: accusative = genitive, "vzemi mojega lovca"),
+# trdnjava, dama (f). piece.<type>.gender is m or f; an owner pattern without a gender is the
+# masculine one, ".f" the feminine one. Owners: your = tvoj, my = moj, and in the Analysis mode (nobody
+# being "ti" or "jaz" there) white = beli, black = črni ("beli skakač", "črno damo").
+# EVERY form below is defined for all six pieces and all four owners, so it works the same for
+# {your} {your2} {my} {my2} {t1} {t2} and the Analysis {piece}. Never write tvoj, moj, svoj, beli, črni
+# or ta before a piece placeholder: the form says it. The coach points at the piece on the FIRST
+# placeholder of that piece in the line: name the piece (a case form) before its pronouns and endings.
+#
+# With the possessive, the six cases, and "with" (s / z + instrumental):
+#   nom        tvoj skakač / tvoja dama            "{your} je pod napadom."  (the default, {your})
+#   gen        tvojega skakača / tvoje dame        "Do {my:gen} imaš prosto pot."
+#   dat        tvojemu skakaču / tvoji dami        "{my} grozi {your:dat}."
+#   acc        tvojega skakača / tvojo damo        "Vzamem {your:acc}."  (animate: = genitive)
+#   loc        tvojem skakaču / tvoji dami         "Razmisli o {my:loc}."
+#   ins        tvojim skakačem / tvojo damo        "Za {your:ins} stoji {t1}."  (za + ins: behind)
+#   with       s tvojim skakačem / z mojo damo     "Menjava {your:gen} {my:with} je zate slaba."
+#              (the preposition is in the form: s tvojim, z mojim, z belim, s črnim; never write s/z)
+# "svoj" when the owner of the piece is the subject of the clause (the player of an imperative or of
+# a "ti" verb, the coach saying "jaz", a side, or the piece itself): Slovenian then says "svoj", never
+# "tvoj" / "moj" ("Razvij svojega lovca", not "tvojega"). There is no nominative.
+#   refl_gen   svojega skakača / svoje dame        "Pazi na varnost {your:refl_gen}."
+#   refl_dat   svojemu skakaču / svoji dami        "Pomagaj {your:refl_dat}."
+#   refl_acc   svojega skakača / svojo damo        "Razvij {your:refl_acc}.", "Izgubim {my:refl_acc}."
+#   refl_loc   svojem skakaču / svoji dami         "Razmisli o {your:refl_loc}."
+#   refl_ins   svojim skakačem / svojo damo        "Pred {your:refl_ins} imaš prosto pot."
+#   refl_with  s svojim skakačem / s svojo damo    "Vzemi {my:acc} {your:refl_with}."
+# Without a possessive (the kind of piece; "Vzemi ga s skakačem!" is often more natural):
+#   bare       skakač / dama                       "{your:bare} se premika v obliki črke L."
+#   bare_gen   skakača / dame                      "Pazi se {my:bare_gen}!"
+#   bare_dat   skakaču / dami                      "Približaj se {my:bare_dat}."
+#   bare_acc   skakača / damo                      "Vzemi {my:bare_acc}!"
+#   bare_loc   skakaču / dami                      "Pri {your:bare_loc} pazi na vezavo."
+#   bare_ins   skakačem / damo                     "Za {my:bare_ins} stoji {t1}."
+#   bare_with  s skakačem / z damo (s / z included) "Vzemi {my:acc} {your:bare_with}!"
+# Pronouns for the piece, the same words for every owner. Subject pronouns only for stress; the
+# clitics (ga, je, jo, mu, ji) stand second in their clause; after a preposition the full forms:
+#   pron       on / ona                            "Samo {your:pron} brani to polje."
+#   pron_gen   njega / nje                         "Do {my:pron_gen} imaš prosto pot."
+#   pron_dat   njemu / njej                        "Proti {my:pron_dat} nimaš obrambe."
+#   pron_acc   njega / njo (stressed)              "Pazi na {your:pron_acc}, ne na {t1:acc}."
+#   pron_loc   njem / njej                         "Na {my:pron_loc} sloni vsa obramba."
+#   pron_ins   njim / njo                          "{your} je vezan{your:ag}: za {your:pron_ins} je {t1}."
+#   cl_gen     ga / je (clitic, negation)          "{your} visi in ne moreš {your:cl_gen} rešiti."
+#   cl_dat     mu / ji (clitic)                    "{your} je v nevarnosti: {my} {your:cl_dat} grozi."
+#   cl_acc     ga / jo (clitic)                    "{my} visi. Vzemi {my:cl_acc}!"
+#   pron_na    nanj / nanjo (= na + acc)           "{your} visi in {my} meri {your:pron_na}."
+#   pron_za    zanj / zanjo (= za + acc)           "{my} je zastonj: nič ne daš {my:pron_za}."
+#   pron_v     vanj / vanjo (= v + acc)            "{t1} je tarča: {my} udari {t1:pron_v}."
+#   poss       njegov / njen: the stem of "its"; glue the ending of the possessed noun ("{your:poss}o
+#              polje" = njegovo / njeno polje, "{your:poss}i kmeti", "{your:poss}ih kmetov"):
+#              "{your} je zaprt{your:ag}: {your:poss}a polja so vsa napadena." When the piece is the
+#              subject, "svoj" instead: "{your} je zaprt{your:ag} za svojimi kmeti."
+# The relative "which" agreeing with the piece, after a preposition (plain "ki" + a clitic
+# otherwise: "{my}, ki ga napadaš, ..."; "rel" itself is rare):
+#   rel        kateri / katera                     (rare: the nominative is "ki": "{my}, ki brani {sq}")
+#   rel_gen    katerega / katere                   "{my}, brez {my:rel_gen} se obramba sesuje, ..."
+#   rel_dat    kateremu / kateri                   "{my}, proti {my:rel_dat} nimaš obrambe, ..."
+#   rel_acc    katerega / katero                   "{your}, na {your:rel_acc} meri {my}, ..."
+#   rel_loc    katerem / kateri                    "{my}, na {my:rel_loc} sloni obramba, ..."
+#   rel_ins    katerim / katero                    "{t1}, za {t1:rel_ins} stoji {t2}, ..."
+# Agreement endings (masculine / feminine piece): glue one to a word that agrees with the piece (a past
+# tense, a predicate adjective or participle), after the piece itself has been named:
+#   ag         "" / "a"   words that keep their stem: bil, imel, stal, ostal, visel, videl, branil,
+#                         napadal, vzel; vezan, napaden, zaščiten, nezaščiten, izgubljen, ogrožen,
+#                         ujet, zaprt, odprt, izpostavljen, prost, sam:
+#                         "{my} je bil{my:ag} nezaščiten{my:ag}." = "Moj lovec je bil nezaščiten." /
+#                         "Moja dama je bila nezaščitena."
+#   ag_el      "el" / "la"  past tenses with a fleeting e: pad-, š-, priš-, uš-, mog-, napad-, rek-:
+#                         "{t1} je pad{t1:ag_el}." = "padel" / "padla"
+#   ag_en      "en" / "na"  adjectives in -en with a fleeting e: var-, vred-, nevar-, moč-, nemoč-,
+#                         aktiv-, pasiv-, pomemb-: "{your} je vred{your:ag_en} {n:point_gen}."
+#   ag_ek      "ek" / "ka"  adjectives in -ek: šib-, krat-, niz-: "{your} je šib{your:ag_ek}."
+#   agi        "i" / "a"  definite adjectives and comparatives (cenejši, močnejši, vrednejši):
+#                         "{my} je cenejš{my:agi} od {your:gen}." = "cenejši" / "cenejša"
+#   Anything else (dober / dobra ...): rephrase, use the present ("{t1} pade", "{my} visi") or a
+#   noun phrase ("{your} je brez zaščite", "je v vezavi", "je v pasti", "je na varnem").
+# Two pieces at once ({t1} and {t2}, {your} and {your2}) take the dual. Present-tense dual verbs show
+# no gender ("{t1} in {t2} sta pod napadom", "padeta"), but dual participles and adjectives do
+# ("napadena" / "napadeni"), and so do "oba / obe" and "eden / ena": no form can agree with two
+# different pieces. Say "sta pod napadom", "napadam {t1:acc} in {t2:acc} hkrati", or let a noun carry
+# the agreement ("obe figuri sta napadeni: {t1} in {t2}", "ena od obeh figur pade"). Referring back to
+# the pair needs no form: ju / njiju (acc), njiju / obeh (gen), jima / njima / obema (dat, ins), the
+# same for every gender: "Ne moreš rešiti obeh."
+piece.pawn.gender = m
+piece.pawn.nom = kmet
+piece.pawn.gen = kmeta
+piece.pawn.dat = kmetu
+piece.pawn.acc = kmeta
+piece.pawn.loc = kmetu
+piece.pawn.ins = kmetom
+piece.pawn.with = kmetom
+piece.pawn.refl_gen = kmeta
+piece.pawn.refl_dat = kmetu
+piece.pawn.refl_acc = kmeta
+piece.pawn.refl_loc = kmetu
+piece.pawn.refl_ins = kmetom
+piece.pawn.refl_with = kmetom
+piece.pawn.bare = kmet
+piece.pawn.bare_gen = kmeta
+piece.pawn.bare_dat = kmetu
+piece.pawn.bare_acc = kmeta
+piece.pawn.bare_loc = kmetu
+piece.pawn.bare_ins = kmetom
+piece.pawn.bare_with = s kmetom
+piece.pawn.pron = on
+piece.pawn.pron_gen = njega
+piece.pawn.pron_dat = njemu
+piece.pawn.pron_acc = njega
+piece.pawn.pron_loc = njem
+piece.pawn.pron_ins = njim
+piece.pawn.cl_gen = ga
+piece.pawn.cl_dat = mu
+piece.pawn.cl_acc = ga
+piece.pawn.pron_na = nanj
+piece.pawn.pron_za = zanj
+piece.pawn.pron_v = vanj
+piece.pawn.poss = njegov
+piece.pawn.rel = kateri
+piece.pawn.rel_gen = katerega
+piece.pawn.rel_dat = kateremu
+piece.pawn.rel_acc = katerega
+piece.pawn.rel_loc = katerem
+piece.pawn.rel_ins = katerim
+piece.pawn.ag =
+piece.pawn.ag_el = el
+piece.pawn.ag_en = en
+piece.pawn.ag_ek = ek
+piece.pawn.agi = i
+piece.knight.gender = m
+piece.knight.nom = skakač
+piece.knight.gen = skakača
+piece.knight.dat = skakaču
+piece.knight.acc = skakača
+piece.knight.loc = skakaču
+piece.knight.ins = skakačem
+piece.knight.with = skakačem
+piece.knight.refl_gen = skakača
+piece.knight.refl_dat = skakaču
+piece.knight.refl_acc = skakača
+piece.knight.refl_loc = skakaču
+piece.knight.refl_ins = skakačem
+piece.knight.refl_with = skakačem
+piece.knight.bare = skakač
+piece.knight.bare_gen = skakača
+piece.knight.bare_dat = skakaču
+piece.knight.bare_acc = skakača
+piece.knight.bare_loc = skakaču
+piece.knight.bare_ins = skakačem
+piece.knight.bare_with = s skakačem
+piece.knight.pron = on
+piece.knight.pron_gen = njega
+piece.knight.pron_dat = njemu
+piece.knight.pron_acc = njega
+piece.knight.pron_loc = njem
+piece.knight.pron_ins = njim
+piece.knight.cl_gen = ga
+piece.knight.cl_dat = mu
+piece.knight.cl_acc = ga
+piece.knight.pron_na = nanj
+piece.knight.pron_za = zanj
+piece.knight.pron_v = vanj
+piece.knight.poss = njegov
+piece.knight.rel = kateri
+piece.knight.rel_gen = katerega
+piece.knight.rel_dat = kateremu
+piece.knight.rel_acc = katerega
+piece.knight.rel_loc = katerem
+piece.knight.rel_ins = katerim
+piece.knight.ag =
+piece.knight.ag_el = el
+piece.knight.ag_en = en
+piece.knight.ag_ek = ek
+piece.knight.agi = i
+piece.bishop.gender = m
+piece.bishop.nom = lovec
+piece.bishop.gen = lovca
+piece.bishop.dat = lovcu
+piece.bishop.acc = lovca
+piece.bishop.loc = lovcu
+piece.bishop.ins = lovcem
+piece.bishop.with = lovcem
+piece.bishop.refl_gen = lovca
+piece.bishop.refl_dat = lovcu
+piece.bishop.refl_acc = lovca
+piece.bishop.refl_loc = lovcu
+piece.bishop.refl_ins = lovcem
+piece.bishop.refl_with = lovcem
+piece.bishop.bare = lovec
+piece.bishop.bare_gen = lovca
+piece.bishop.bare_dat = lovcu
+piece.bishop.bare_acc = lovca
+piece.bishop.bare_loc = lovcu
+piece.bishop.bare_ins = lovcem
+piece.bishop.bare_with = z lovcem
+piece.bishop.pron = on
+piece.bishop.pron_gen = njega
+piece.bishop.pron_dat = njemu
+piece.bishop.pron_acc = njega
+piece.bishop.pron_loc = njem
+piece.bishop.pron_ins = njim
+piece.bishop.cl_gen = ga
+piece.bishop.cl_dat = mu
+piece.bishop.cl_acc = ga
+piece.bishop.pron_na = nanj
+piece.bishop.pron_za = zanj
+piece.bishop.pron_v = vanj
+piece.bishop.poss = njegov
+piece.bishop.rel = kateri
+piece.bishop.rel_gen = katerega
+piece.bishop.rel_dat = kateremu
+piece.bishop.rel_acc = katerega
+piece.bishop.rel_loc = katerem
+piece.bishop.rel_ins = katerim
+piece.bishop.ag =
+piece.bishop.ag_el = el
+piece.bishop.ag_en = en
+piece.bishop.ag_ek = ek
+piece.bishop.agi = i
+piece.rook.gender = f
+piece.rook.nom = trdnjava
+piece.rook.gen = trdnjave
+piece.rook.dat = trdnjavi
+piece.rook.acc = trdnjavo
+piece.rook.loc = trdnjavi
+piece.rook.ins = trdnjavo
+piece.rook.with = trdnjavo
+piece.rook.refl_gen = trdnjave
+piece.rook.refl_dat = trdnjavi
+piece.rook.refl_acc = trdnjavo
+piece.rook.refl_loc = trdnjavi
+piece.rook.refl_ins = trdnjavo
+piece.rook.refl_with = trdnjavo
+piece.rook.bare = trdnjava
+piece.rook.bare_gen = trdnjave
+piece.rook.bare_dat = trdnjavi
+piece.rook.bare_acc = trdnjavo
+piece.rook.bare_loc = trdnjavi
+piece.rook.bare_ins = trdnjavo
+piece.rook.bare_with = s trdnjavo
+piece.rook.pron = ona
+piece.rook.pron_gen = nje
+piece.rook.pron_dat = njej
+piece.rook.pron_acc = njo
+piece.rook.pron_loc = njej
+piece.rook.pron_ins = njo
+piece.rook.cl_gen = je
+piece.rook.cl_dat = ji
+piece.rook.cl_acc = jo
+piece.rook.pron_na = nanjo
+piece.rook.pron_za = zanjo
+piece.rook.pron_v = vanjo
+piece.rook.poss = njen
+piece.rook.rel = katera
+piece.rook.rel_gen = katere
+piece.rook.rel_dat = kateri
+piece.rook.rel_acc = katero
+piece.rook.rel_loc = kateri
+piece.rook.rel_ins = katero
+piece.rook.ag = a
+piece.rook.ag_el = la
+piece.rook.ag_en = na
+piece.rook.ag_ek = ka
+piece.rook.agi = a
+piece.queen.gender = f
+piece.queen.nom = dama
+piece.queen.gen = dame
+piece.queen.dat = dami
+piece.queen.acc = damo
+piece.queen.loc = dami
+piece.queen.ins = damo
+piece.queen.with = damo
+piece.queen.refl_gen = dame
+piece.queen.refl_dat = dami
+piece.queen.refl_acc = damo
+piece.queen.refl_loc = dami
+piece.queen.refl_ins = damo
+piece.queen.refl_with = damo
+piece.queen.bare = dama
+piece.queen.bare_gen = dame
+piece.queen.bare_dat = dami
+piece.queen.bare_acc = damo
+piece.queen.bare_loc = dami
+piece.queen.bare_ins = damo
+piece.queen.bare_with = z damo
+piece.queen.pron = ona
+piece.queen.pron_gen = nje
+piece.queen.pron_dat = njej
+piece.queen.pron_acc = njo
+piece.queen.pron_loc = njej
+piece.queen.pron_ins = njo
+piece.queen.cl_gen = je
+piece.queen.cl_dat = ji
+piece.queen.cl_acc = jo
+piece.queen.pron_na = nanjo
+piece.queen.pron_za = zanjo
+piece.queen.pron_v = vanjo
+piece.queen.poss = njen
+piece.queen.rel = katera
+piece.queen.rel_gen = katere
+piece.queen.rel_dat = kateri
+piece.queen.rel_acc = katero
+piece.queen.rel_loc = kateri
+piece.queen.rel_ins = katero
+piece.queen.ag = a
+piece.queen.ag_el = la
+piece.queen.ag_en = na
+piece.queen.ag_ek = ka
+piece.queen.agi = a
+piece.king.gender = m
+piece.king.nom = kralj
+piece.king.gen = kralja
+piece.king.dat = kralju
+piece.king.acc = kralja
+piece.king.loc = kralju
+piece.king.ins = kraljem
+piece.king.with = kraljem
+piece.king.refl_gen = kralja
+piece.king.refl_dat = kralju
+piece.king.refl_acc = kralja
+piece.king.refl_loc = kralju
+piece.king.refl_ins = kraljem
+piece.king.refl_with = kraljem
+piece.king.bare = kralj
+piece.king.bare_gen = kralja
+piece.king.bare_dat = kralju
+piece.king.bare_acc = kralja
+piece.king.bare_loc = kralju
+piece.king.bare_ins = kraljem
+piece.king.bare_with = s kraljem
+piece.king.pron = on
+piece.king.pron_gen = njega
+piece.king.pron_dat = njemu
+piece.king.pron_acc = njega
+piece.king.pron_loc = njem
+piece.king.pron_ins = njim
+piece.king.cl_gen = ga
+piece.king.cl_dat = mu
+piece.king.cl_acc = ga
+piece.king.pron_na = nanj
+piece.king.pron_za = zanj
+piece.king.pron_v = vanj
+piece.king.poss = njegov
+piece.king.rel = kateri
+piece.king.rel_gen = katerega
+piece.king.rel_dat = kateremu
+piece.king.rel_acc = katerega
+piece.king.rel_loc = katerem
+piece.king.rel_ins = katerim
+piece.king.ag =
+piece.king.ag_el = el
+piece.king.ag_en = en
+piece.king.ag_ek = ek
+piece.king.agi = i
+# tvoj (your). The key without a gender is the masculine pattern (the English key owner.your.nom
+# among them), ".f" the feminine one.
+owner.your.nom = tvoj {piece}
+owner.your.nom.f = tvoja {piece}
+owner.your.gen = tvojega {piece}
+owner.your.gen.f = tvoje {piece}
+owner.your.dat = tvojemu {piece}
+owner.your.dat.f = tvoji {piece}
+owner.your.acc = tvojega {piece}
+owner.your.acc.f = tvojo {piece}
+owner.your.loc = tvojem {piece}
+owner.your.loc.f = tvoji {piece}
+owner.your.ins = tvojim {piece}
+owner.your.ins.f = tvojo {piece}
+owner.your.with = s tvojim {piece}
+owner.your.with.f = s tvojo {piece}
+owner.your.refl_gen = svojega {piece}
+owner.your.refl_gen.f = svoje {piece}
+owner.your.refl_dat = svojemu {piece}
+owner.your.refl_dat.f = svoji {piece}
+owner.your.refl_acc = svojega {piece}
+owner.your.refl_acc.f = svojo {piece}
+owner.your.refl_loc = svojem {piece}
+owner.your.refl_loc.f = svoji {piece}
+owner.your.refl_ins = svojim {piece}
+owner.your.refl_ins.f = svojo {piece}
+owner.your.refl_with = s svojim {piece}
+owner.your.refl_with.f = s svojo {piece}
+# your: the forms without a possessive (bare, pronouns, rel, endings) are the piece word alone.
+owner.your.bare = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_loc = {piece}
+owner.your.bare_ins = {piece}
+owner.your.bare_with = {piece}
+owner.your.pron = {piece}
+owner.your.pron_gen = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_acc = {piece}
+owner.your.pron_loc = {piece}
+owner.your.pron_ins = {piece}
+owner.your.cl_gen = {piece}
+owner.your.cl_dat = {piece}
+owner.your.cl_acc = {piece}
+owner.your.pron_na = {piece}
+owner.your.pron_za = {piece}
+owner.your.pron_v = {piece}
+owner.your.poss = {piece}
+owner.your.rel = {piece}
+owner.your.rel_gen = {piece}
+owner.your.rel_dat = {piece}
+owner.your.rel_acc = {piece}
+owner.your.rel_loc = {piece}
+owner.your.rel_ins = {piece}
+owner.your.ag = {piece}
+owner.your.ag_el = {piece}
+owner.your.ag_en = {piece}
+owner.your.ag_ek = {piece}
+owner.your.agi = {piece}
+# moj (my).
+owner.my.nom = moj {piece}
+owner.my.nom.f = moja {piece}
+owner.my.gen = mojega {piece}
+owner.my.gen.f = moje {piece}
+owner.my.dat = mojemu {piece}
+owner.my.dat.f = moji {piece}
+owner.my.acc = mojega {piece}
+owner.my.acc.f = mojo {piece}
+owner.my.loc = mojem {piece}
+owner.my.loc.f = moji {piece}
+owner.my.ins = mojim {piece}
+owner.my.ins.f = mojo {piece}
+owner.my.with = z mojim {piece}
+owner.my.with.f = z mojo {piece}
+owner.my.refl_gen = svojega {piece}
+owner.my.refl_gen.f = svoje {piece}
+owner.my.refl_dat = svojemu {piece}
+owner.my.refl_dat.f = svoji {piece}
+owner.my.refl_acc = svojega {piece}
+owner.my.refl_acc.f = svojo {piece}
+owner.my.refl_loc = svojem {piece}
+owner.my.refl_loc.f = svoji {piece}
+owner.my.refl_ins = svojim {piece}
+owner.my.refl_ins.f = svojo {piece}
+owner.my.refl_with = s svojim {piece}
+owner.my.refl_with.f = s svojo {piece}
+# my: the forms without a possessive (bare, pronouns, rel, endings) are the piece word alone.
+owner.my.bare = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_loc = {piece}
+owner.my.bare_ins = {piece}
+owner.my.bare_with = {piece}
+owner.my.pron = {piece}
+owner.my.pron_gen = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_acc = {piece}
+owner.my.pron_loc = {piece}
+owner.my.pron_ins = {piece}
+owner.my.cl_gen = {piece}
+owner.my.cl_dat = {piece}
+owner.my.cl_acc = {piece}
+owner.my.pron_na = {piece}
+owner.my.pron_za = {piece}
+owner.my.pron_v = {piece}
+owner.my.poss = {piece}
+owner.my.rel = {piece}
+owner.my.rel_gen = {piece}
+owner.my.rel_dat = {piece}
+owner.my.rel_acc = {piece}
+owner.my.rel_loc = {piece}
+owner.my.rel_ins = {piece}
+owner.my.ag = {piece}
+owner.my.ag_el = {piece}
+owner.my.ag_en = {piece}
+owner.my.ag_ek = {piece}
+owner.my.agi = {piece}
+# beli (white) and črni (black): the Analysis mode, declined as adjectives ("beli skakač", "belega
+# skakača", "črno damo"); "svoj" when the side or the piece is the subject ("beli izgubi svojo damo").
+owner.white.nom = beli {piece}
+owner.white.nom.f = bela {piece}
+owner.white.gen = belega {piece}
+owner.white.gen.f = bele {piece}
+owner.white.dat = belemu {piece}
+owner.white.dat.f = beli {piece}
+owner.white.acc = belega {piece}
+owner.white.acc.f = belo {piece}
+owner.white.loc = belem {piece}
+owner.white.loc.f = beli {piece}
+owner.white.ins = belim {piece}
+owner.white.ins.f = belo {piece}
+owner.white.with = z belim {piece}
+owner.white.with.f = z belo {piece}
+owner.white.refl_gen = svojega {piece}
+owner.white.refl_gen.f = svoje {piece}
+owner.white.refl_dat = svojemu {piece}
+owner.white.refl_dat.f = svoji {piece}
+owner.white.refl_acc = svojega {piece}
+owner.white.refl_acc.f = svojo {piece}
+owner.white.refl_loc = svojem {piece}
+owner.white.refl_loc.f = svoji {piece}
+owner.white.refl_ins = svojim {piece}
+owner.white.refl_ins.f = svojo {piece}
+owner.white.refl_with = s svojim {piece}
+owner.white.refl_with.f = s svojo {piece}
+# white: the forms without a possessive (bare, pronouns, rel, endings) are the piece word alone.
+owner.white.bare = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_loc = {piece}
+owner.white.bare_ins = {piece}
+owner.white.bare_with = {piece}
+owner.white.pron = {piece}
+owner.white.pron_gen = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_acc = {piece}
+owner.white.pron_loc = {piece}
+owner.white.pron_ins = {piece}
+owner.white.cl_gen = {piece}
+owner.white.cl_dat = {piece}
+owner.white.cl_acc = {piece}
+owner.white.pron_na = {piece}
+owner.white.pron_za = {piece}
+owner.white.pron_v = {piece}
+owner.white.poss = {piece}
+owner.white.rel = {piece}
+owner.white.rel_gen = {piece}
+owner.white.rel_dat = {piece}
+owner.white.rel_acc = {piece}
+owner.white.rel_loc = {piece}
+owner.white.rel_ins = {piece}
+owner.white.ag = {piece}
+owner.white.ag_el = {piece}
+owner.white.ag_en = {piece}
+owner.white.ag_ek = {piece}
+owner.white.agi = {piece}
+# črni (black).
+owner.black.nom = črni {piece}
+owner.black.nom.f = črna {piece}
+owner.black.gen = črnega {piece}
+owner.black.gen.f = črne {piece}
+owner.black.dat = črnemu {piece}
+owner.black.dat.f = črni {piece}
+owner.black.acc = črnega {piece}
+owner.black.acc.f = črno {piece}
+owner.black.loc = črnem {piece}
+owner.black.loc.f = črni {piece}
+owner.black.ins = črnim {piece}
+owner.black.ins.f = črno {piece}
+owner.black.with = s črnim {piece}
+owner.black.with.f = s črno {piece}
+owner.black.refl_gen = svojega {piece}
+owner.black.refl_gen.f = svoje {piece}
+owner.black.refl_dat = svojemu {piece}
+owner.black.refl_dat.f = svoji {piece}
+owner.black.refl_acc = svojega {piece}
+owner.black.refl_acc.f = svojo {piece}
+owner.black.refl_loc = svojem {piece}
+owner.black.refl_loc.f = svoji {piece}
+owner.black.refl_ins = svojim {piece}
+owner.black.refl_ins.f = svojo {piece}
+owner.black.refl_with = s svojim {piece}
+owner.black.refl_with.f = s svojo {piece}
+# black: the forms without a possessive (bare, pronouns, rel, endings) are the piece word alone.
+owner.black.bare = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_loc = {piece}
+owner.black.bare_ins = {piece}
+owner.black.bare_with = {piece}
+owner.black.pron = {piece}
+owner.black.pron_gen = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_acc = {piece}
+owner.black.pron_loc = {piece}
+owner.black.pron_ins = {piece}
+owner.black.cl_gen = {piece}
+owner.black.cl_dat = {piece}
+owner.black.cl_acc = {piece}
+owner.black.pron_na = {piece}
+owner.black.pron_za = {piece}
+owner.black.pron_v = {piece}
+owner.black.poss = {piece}
+owner.black.rel = {piece}
+owner.black.rel_gen = {piece}
+owner.black.rel_dat = {piece}
+owner.black.rel_acc = {piece}
+owner.black.rel_loc = {piece}
+owner.black.rel_ins = {piece}
+owner.black.ag = {piece}
+owner.black.ag_el = {piece}
+owner.black.ag_en = {piece}
+owner.black.ag_ek = {piece}
+owner.black.agi = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The Slovenian letter names, as players read squares: e4 = "e štiri", f3 = "ef tri", c5 = "ce pet",
+# h7 = "ha sedem", g1 = "ge ena".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = ef
+file.g.spoken = ge
+file.h.spoken = ha
+rank.1.spoken = ena
+rank.2.spoken = dva
+rank.3.spoken = tri
+rank.4.spoken = štiri
+rank.5.spoken = pet
+rank.6.spoken = šest
+rank.7.spoken = sedem
+rank.8.spoken = osem
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Slovenian scoresheet letters: K(ralj) D(ama) T(rdnjava) L(ovec) S(kakač): "Sf3", "Lxb5", "Tad1".
+move.letters = K D T L S
+# Spoken as Slovenian players read notation: "skakač ef tri", "skakač vzame na e pet", "skakač be de
+# sedem", "e vzame na de pet", "kmet vzame nazaj" (a recapture in a line), "kratka rokada" (O-O),
+# "dolga rokada" (O-O-O), "dama ge štiri, šah". {piece} is always the nominative here, so the
+# promotion says "in postane dama" ("promocija v" would need the accusative "v damo").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} vzame na {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} vzame na {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} vzame na {to}
+move.recapture.spoken = {piece} vzame nazaj
+move.castle_short.spoken = kratka rokada
+move.castle_long.spoken = dolga rokada
+move.promotion.spoken = {move} in postane {piece}
+move.check.spoken = {move}, šah
+move.mate.spoken = {move}, mat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
+# pronunciation pass.
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. Slovenian says the units before the tens, in one word: 21 = "enaindvajset",
+# 47 = "sedeminštirideset". Every number 0-99 is listed (the forms below must not reach the units of
+# a compound: 21 stays "enaindvajset" for every gender), and every hundred; 101-999 compose as
+# "{hundreds} {rest}" ("sto enaindvajset", "dvesto pet"), the rest taking the form.
+# The plain word is the counting form: 1 = "ena", 2 = "dva", 3 = "tri", 4 = "štiri".
+number.0.spoken = nič
+number.1.spoken = ena
+number.2.spoken = dva
+number.3.spoken = tri
+number.4.spoken = štiri
+number.5.spoken = pet
+number.6.spoken = šest
+number.7.spoken = sedem
+number.8.spoken = osem
+number.9.spoken = devet
+number.10.spoken = deset
+number.11.spoken = enajst
+number.12.spoken = dvanajst
+number.13.spoken = trinajst
+number.14.spoken = štirinajst
+number.15.spoken = petnajst
+number.16.spoken = šestnajst
+number.17.spoken = sedemnajst
+number.18.spoken = osemnajst
+number.19.spoken = devetnajst
+number.20.spoken = dvajset
+number.21.spoken = enaindvajset
+number.22.spoken = dvaindvajset
+number.23.spoken = triindvajset
+number.24.spoken = štiriindvajset
+number.25.spoken = petindvajset
+number.26.spoken = šestindvajset
+number.27.spoken = sedemindvajset
+number.28.spoken = osemindvajset
+number.29.spoken = devetindvajset
+number.30.spoken = trideset
+number.31.spoken = enaintrideset
+number.32.spoken = dvaintrideset
+number.33.spoken = triintrideset
+number.34.spoken = štiriintrideset
+number.35.spoken = petintrideset
+number.36.spoken = šestintrideset
+number.37.spoken = sedemintrideset
+number.38.spoken = osemintrideset
+number.39.spoken = devetintrideset
+number.40.spoken = štirideset
+number.41.spoken = enainštirideset
+number.42.spoken = dvainštirideset
+number.43.spoken = triinštirideset
+number.44.spoken = štiriinštirideset
+number.45.spoken = petinštirideset
+number.46.spoken = šestinštirideset
+number.47.spoken = sedeminštirideset
+number.48.spoken = oseminštirideset
+number.49.spoken = devetinštirideset
+number.50.spoken = petdeset
+number.51.spoken = enainpetdeset
+number.52.spoken = dvainpetdeset
+number.53.spoken = triinpetdeset
+number.54.spoken = štiriinpetdeset
+number.55.spoken = petinpetdeset
+number.56.spoken = šestinpetdeset
+number.57.spoken = sedeminpetdeset
+number.58.spoken = oseminpetdeset
+number.59.spoken = devetinpetdeset
+number.60.spoken = šestdeset
+number.61.spoken = enainšestdeset
+number.62.spoken = dvainšestdeset
+number.63.spoken = triinšestdeset
+number.64.spoken = štiriinšestdeset
+number.65.spoken = petinšestdeset
+number.66.spoken = šestinšestdeset
+number.67.spoken = sedeminšestdeset
+number.68.spoken = oseminšestdeset
+number.69.spoken = devetinšestdeset
+number.70.spoken = sedemdeset
+number.71.spoken = enainsedemdeset
+number.72.spoken = dvainsedemdeset
+number.73.spoken = triinsedemdeset
+number.74.spoken = štiriinsedemdeset
+number.75.spoken = petinsedemdeset
+number.76.spoken = šestinsedemdeset
+number.77.spoken = sedeminsedemdeset
+number.78.spoken = oseminsedemdeset
+number.79.spoken = devetinsedemdeset
+number.80.spoken = osemdeset
+number.81.spoken = enainosemdeset
+number.82.spoken = dvainosemdeset
+number.83.spoken = triinosemdeset
+number.84.spoken = štiriinosemdeset
+number.85.spoken = petinosemdeset
+number.86.spoken = šestinosemdeset
+number.87.spoken = sedeminosemdeset
+number.88.spoken = oseminosemdeset
+number.89.spoken = devetinosemdeset
+number.90.spoken = devetdeset
+number.91.spoken = enaindevetdeset
+number.92.spoken = dvaindevetdeset
+number.93.spoken = triindevetdeset
+number.94.spoken = štiriindevetdeset
+number.95.spoken = petindevetdeset
+number.96.spoken = šestindevetdeset
+number.97.spoken = sedemindevetdeset
+number.98.spoken = osemindevetdeset
+number.99.spoken = devetindevetdeset
+number.100.spoken = sto
+number.200.spoken = dvesto
+number.300.spoken = tristo
+number.400.spoken = štiristo
+number.500.spoken = petsto
+number.600.spoken = šeststo
+number.700.spoken = sedemsto
+number.800.spoken = osemsto
+number.900.spoken = devetsto
+# Gender and case forms of a number. Only 1-4 change (and 101-104 ..., through their rest); every
+# other number falls back to the plain word, which is right for it in the nominative and accusative.
+#   m      en, dva, trije, štirje          masculine nominative ("trije kmetje")
+#   f      ena, dve, tri, štiri            feminine nominative and accusative 2-4 ("dve potezi")
+#   neut   eno, dve, tri, štiri            neuter ("eno polje", "dve polji")
+#   m_acc  enega                           masculine animate accusative ("enega kmeta"; then dva, tri)
+#   f_acc  eno                             feminine accusative ("eno napako")
+#   m_gen  enega   f_gen ene   m_loc enem   f_loc eni: genitive and locative of 1 (m_ also neuter)
+#   obl    dveh, treh, štirih              genitive and locative of 2-4, every gender
+#   stem   prv, drug, tretj, četrt, sedm, osm, stot, dvestot ...: the stem of the ordinal and of the
+#          oblique cases. Glued to an ending: "{n:stem}ih" = petih, sedmih, enaindvajsetih (genitive /
+#          locative of 5 and more), "{n:stem}i" = prvi, peti, sedmi, enaindvajseti (ordinal). For the
+#          other numbers the stem is the plain word ("pet" + "ih"). Only inside the .spoken count keys
+#          below: written, the digits would get the ending ("5ih").
+number.1.m.spoken = en
+number.1.f.spoken = ena
+number.1.neut.spoken = eno
+number.1.m_acc.spoken = enega
+number.1.f_acc.spoken = eno
+number.1.m_gen.spoken = enega
+number.1.f_gen.spoken = ene
+number.1.m_loc.spoken = enem
+number.1.f_loc.spoken = eni
+number.2.f.spoken = dve
+number.2.neut.spoken = dve
+number.2.obl.spoken = dveh
+number.3.m.spoken = trije
+number.3.obl.spoken = treh
+number.4.m.spoken = štirje
+number.4.obl.spoken = štirih
+number.1.stem.spoken = prv
+number.2.stem.spoken = drug
+number.3.stem.spoken = tretj
+number.4.stem.spoken = četrt
+number.7.stem.spoken = sedm
+number.8.stem.spoken = osm
+number.100.stem.spoken = stot
+number.200.stem.spoken = dvestot
+number.300.stem.spoken = tristot
+number.400.stem.spoken = štiristot
+number.500.stem.spoken = petstot
+number.600.stem.spoken = šeststot
+number.700.stem.spoken = sedemstot
+number.800.stem.spoken = osemstot
+number.900.stem.spoken = devetstot
+# Unused (every number 21-99 and every hundred is listed above), kept because English defines them.
+number.tens.spoken = {units}in{tens}
+number.hundreds.spoken = {n}sto
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = minus {n}
+# A decimal number: Slovenian writes a decimal comma ("1,3") and reads an evaluation "ena vejica tri"
+# ("cela" would have to agree with the number: ena cela, dve celi, pet celih).
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} vejica {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Slovenian plural rule (assets/i18n): one (1, 101, 201 ...) | two (2, 102 ...) | few (3, 4, 103, 104
+# ...) | other (0, 5-100, and 21, 22, 23 ...: "enaindvajset potez"). The noun follows the dual after
+# 2: "dve potezi", "dva kmeta". The base key is the nominative; every noun also has:
+#   _acc   accusative ("Beli je naredil {n:mistake_acc}." = "eno napako / dve napaki / pet napak";
+#          "pridobiš {pts:point_acc}"); the masculine animate ones (kmet, napadalec, branilec): "enega
+#          kmeta, dva kmeta, tri kmete, pet kmetov"
+#   _gen   genitive (after do, od, brez, blizu, a negation: "brez {n:mistake_gen}" = "brez ene napake /
+#          dveh napak / petih napak")
+#   _loc   locative (after v, na, o, pri: "mat v {m:move_loc}" = "mat v eni potezi / dveh potezah /
+#          petih potezah", the Slovenian "mate in N")
+# There is no dative or instrumental ("z dvema napakama", "s tremi"): rephrase ("imaš dve napaki in eno
+# grobo napako", or a list after a colon). The written forms show the digits ("v 3 potezah"). The
+# _gen / _loc keys are for counts of 1 or more (0 would be said "ničih").
+# "figura" counts every chessman, pawns included.
+count.move = {n:f} poteza|{n:f} potezi|{n:f} poteze|{n} potez
+count.move_acc = {n:f_acc} potezo|{n:f} potezi|{n:f} poteze|{n} potez
+count.move_gen = {n} poteze|{n} potez|{n} potez|{n} potez
+count.move_gen.spoken = {n:f_gen} poteze|{n:obl} potez|{n:obl} potez|{n:stem}ih potez
+count.move_loc = {n} potezi|{n} potezah|{n} potezah|{n} potezah
+count.move_loc.spoken = {n:f_loc} potezi|{n:obl} potezah|{n:obl} potezah|{n:stem}ih potezah
+count.point = {n:f} točka|{n:f} točki|{n:f} točke|{n} točk
+count.point_acc = {n:f_acc} točko|{n:f} točki|{n:f} točke|{n} točk
+count.point_gen = {n} točke|{n} točk|{n} točk|{n} točk
+count.point_gen.spoken = {n:f_gen} točke|{n:obl} točk|{n:obl} točk|{n:stem}ih točk
+count.point_loc = {n} točki|{n} točkah|{n} točkah|{n} točkah
+count.point_loc.spoken = {n:f_loc} točki|{n:obl} točkah|{n:obl} točkah|{n:stem}ih točkah
+count.pawn = {n:m} kmet|{n:m} kmeta|{n:m} kmetje|{n} kmetov
+count.pawn_acc = {n:m_acc} kmeta|{n:m} kmeta|{n} kmete|{n} kmetov
+count.pawn_gen = {n} kmeta|{n} kmetov|{n} kmetov|{n} kmetov
+count.pawn_gen.spoken = {n:m_gen} kmeta|{n:obl} kmetov|{n:obl} kmetov|{n:stem}ih kmetov
+count.pawn_loc = {n} kmetu|{n} kmetih|{n} kmetih|{n} kmetih
+count.pawn_loc.spoken = {n:m_loc} kmetu|{n:obl} kmetih|{n:obl} kmetih|{n:stem}ih kmetih
+count.piece = {n:f} figura|{n:f} figuri|{n:f} figure|{n} figur
+count.piece_acc = {n:f_acc} figuro|{n:f} figuri|{n:f} figure|{n} figur
+count.piece_gen = {n} figure|{n} figur|{n} figur|{n} figur
+count.piece_gen.spoken = {n:f_gen} figure|{n:obl} figur|{n:obl} figur|{n:stem}ih figur
+count.piece_loc = {n} figuri|{n} figurah|{n} figurah|{n} figurah
+count.piece_loc.spoken = {n:f_loc} figuri|{n:obl} figurah|{n:obl} figurah|{n:stem}ih figurah
+count.mistake = {n:f} napaka|{n:f} napaki|{n:f} napake|{n} napak
+count.mistake_acc = {n:f_acc} napako|{n:f} napaki|{n:f} napake|{n} napak
+count.mistake_gen = {n} napake|{n} napak|{n} napak|{n} napak
+count.mistake_gen.spoken = {n:f_gen} napake|{n:obl} napak|{n:obl} napak|{n:stem}ih napak
+count.mistake_loc = {n} napaki|{n} napakah|{n} napakah|{n} napakah
+count.mistake_loc.spoken = {n:f_loc} napaki|{n:obl} napakah|{n:obl} napakah|{n:stem}ih napakah
+count.blunder = {n:f} groba napaka|{n:f} grobi napaki|{n:f} grobe napake|{n} grobih napak
+count.blunder_acc = {n:f_acc} grobo napako|{n:f} grobi napaki|{n:f} grobe napake|{n} grobih napak
+count.blunder_gen = {n} grobe napake|{n} grobih napak|{n} grobih napak|{n} grobih napak
+count.blunder_gen.spoken = {n:f_gen} grobe napake|{n:obl} grobih napak|{n:obl} grobih napak|{n:stem}ih grobih napak
+count.blunder_loc = {n} grobi napaki|{n} grobih napakah|{n} grobih napakah|{n} grobih napakah
+count.blunder_loc.spoken = {n:f_loc} grobi napaki|{n:obl} grobih napakah|{n:obl} grobih napakah|{n:stem}ih grobih napakah
+count.inaccuracy = {n:f} nenatančnost|{n:f} nenatančnosti|{n:f} nenatančnosti|{n} nenatančnosti
+count.inaccuracy_acc = {n:f_acc} nenatančnost|{n:f} nenatančnosti|{n:f} nenatančnosti|{n} nenatančnosti
+count.inaccuracy_gen = {n} nenatančnosti|{n} nenatančnosti|{n} nenatančnosti|{n} nenatančnosti
+count.inaccuracy_gen.spoken = {n:f_gen} nenatančnosti|{n:obl} nenatančnosti|{n:obl} nenatančnosti|{n:stem}ih nenatančnosti
+count.inaccuracy_loc = {n} nenatančnosti|{n} nenatančnostih|{n} nenatančnostih|{n} nenatančnostih
+count.inaccuracy_loc.spoken = {n:f_loc} nenatančnosti|{n:obl} nenatančnostih|{n:obl} nenatančnostih|{n:stem}ih nenatančnostih
+count.game = {n:f} partija|{n:f} partiji|{n:f} partije|{n} partij
+count.game_acc = {n:f_acc} partijo|{n:f} partiji|{n:f} partije|{n} partij
+count.game_gen = {n} partije|{n} partij|{n} partij|{n} partij
+count.game_gen.spoken = {n:f_gen} partije|{n:obl} partij|{n:obl} partij|{n:stem}ih partij
+count.game_loc = {n} partiji|{n} partijah|{n} partijah|{n} partijah
+count.game_loc.spoken = {n:f_loc} partiji|{n:obl} partijah|{n:obl} partijah|{n:stem}ih partijah
+# "N times": written "3-krat", spoken as one word ("enkrat", "dvakrat", "trikrat", "enaindvajsetkrat").
+count.time = {n}-krat|{n}-krat|{n}-krat|{n}-krat
+count.time.spoken = {n:m}krat|{n}krat|{n}krat|{n}krat
+count.square = {n:neut} polje|{n:neut} polji|{n:neut} polja|{n} polj
+count.square_acc = {n:neut} polje|{n:neut} polji|{n:neut} polja|{n} polj
+count.square_gen = {n} polja|{n} polj|{n} polj|{n} polj
+count.square_gen.spoken = {n:m_gen} polja|{n:obl} polj|{n:obl} polj|{n:stem}ih polj
+count.square_loc = {n} polju|{n} poljih|{n} poljih|{n} poljih
+count.square_loc.spoken = {n:m_loc} polju|{n:obl} poljih|{n:obl} poljih|{n:stem}ih poljih
+count.position = {n:f} pozicija|{n:f} poziciji|{n:f} pozicije|{n} pozicij
+count.position_acc = {n:f_acc} pozicijo|{n:f} poziciji|{n:f} pozicije|{n} pozicij
+count.position_gen = {n} pozicije|{n} pozicij|{n} pozicij|{n} pozicij
+count.position_gen.spoken = {n:f_gen} pozicije|{n:obl} pozicij|{n:obl} pozicij|{n:stem}ih pozicij
+count.position_loc = {n} poziciji|{n} pozicijah|{n} pozicijah|{n} pozicijah
+count.position_loc.spoken = {n:f_loc} poziciji|{n:obl} pozicijah|{n:obl} pozicijah|{n:stem}ih pozicijah
+# More counted nouns for the review and the appraisal: "{m:check}" = "trije šahi" (acc "tri šahe"),
+# "{n:capture}" = "dve jemanji" (pawns included), "{n:best_move}" = "pet najboljših potez" (a streak:
+# "{n:best_move} zapored"), "{n:attacker}" / "{n:defender}" = attackers and defenders of a square
+# ("Na {sq} imam {n:attacker_acc}, ti pa le {n2:defender_acc}."), "{n:takeback}" = "dve vrnjeni potezi".
+count.check = {n:m} šah|{n:m} šaha|{n:m} šahi|{n} šahov
+count.check_acc = {n:m} šah|{n:m} šaha|{n} šahe|{n} šahov
+count.check_gen = {n} šaha|{n} šahov|{n} šahov|{n} šahov
+count.check_gen.spoken = {n:m_gen} šaha|{n:obl} šahov|{n:obl} šahov|{n:stem}ih šahov
+count.check_loc = {n} šahu|{n} šahih|{n} šahih|{n} šahih
+count.check_loc.spoken = {n:m_loc} šahu|{n:obl} šahih|{n:obl} šahih|{n:stem}ih šahih
+count.capture = {n:neut} jemanje|{n:neut} jemanji|{n:neut} jemanja|{n} jemanj
+count.capture_acc = {n:neut} jemanje|{n:neut} jemanji|{n:neut} jemanja|{n} jemanj
+count.capture_gen = {n} jemanja|{n} jemanj|{n} jemanj|{n} jemanj
+count.capture_gen.spoken = {n:m_gen} jemanja|{n:obl} jemanj|{n:obl} jemanj|{n:stem}ih jemanj
+count.capture_loc = {n} jemanju|{n} jemanjih|{n} jemanjih|{n} jemanjih
+count.capture_loc.spoken = {n:m_loc} jemanju|{n:obl} jemanjih|{n:obl} jemanjih|{n:stem}ih jemanjih
+count.best_move = {n:f} najboljša poteza|{n:f} najboljši potezi|{n:f} najboljše poteze|{n} najboljših potez
+count.best_move_acc = {n:f_acc} najboljšo potezo|{n:f} najboljši potezi|{n:f} najboljše poteze|{n} najboljših potez
+count.best_move_gen = {n} najboljše poteze|{n} najboljših potez|{n} najboljših potez|{n} najboljših potez
+count.best_move_gen.spoken = {n:f_gen} najboljše poteze|{n:obl} najboljših potez|{n:obl} najboljših potez|{n:stem}ih najboljših potez
+count.best_move_loc = {n} najboljši potezi|{n} najboljših potezah|{n} najboljših potezah|{n} najboljših potezah
+count.best_move_loc.spoken = {n:f_loc} najboljši potezi|{n:obl} najboljših potezah|{n:obl} najboljših potezah|{n:stem}ih najboljših potezah
+count.attacker = {n:m} napadalec|{n:m} napadalca|{n:m} napadalci|{n} napadalcev
+count.attacker_acc = {n:m_acc} napadalca|{n:m} napadalca|{n} napadalce|{n} napadalcev
+count.attacker_gen = {n} napadalca|{n} napadalcev|{n} napadalcev|{n} napadalcev
+count.attacker_gen.spoken = {n:m_gen} napadalca|{n:obl} napadalcev|{n:obl} napadalcev|{n:stem}ih napadalcev
+count.attacker_loc = {n} napadalcu|{n} napadalcih|{n} napadalcih|{n} napadalcih
+count.attacker_loc.spoken = {n:m_loc} napadalcu|{n:obl} napadalcih|{n:obl} napadalcih|{n:stem}ih napadalcih
+count.defender = {n:m} branilec|{n:m} branilca|{n:m} branilci|{n} branilcev
+count.defender_acc = {n:m_acc} branilca|{n:m} branilca|{n} branilce|{n} branilcev
+count.defender_gen = {n} branilca|{n} branilcev|{n} branilcev|{n} branilcev
+count.defender_gen.spoken = {n:m_gen} branilca|{n:obl} branilcev|{n:obl} branilcev|{n:stem}ih branilcev
+count.defender_loc = {n} branilcu|{n} branilcih|{n} branilcih|{n} branilcih
+count.defender_loc.spoken = {n:m_loc} branilcu|{n:obl} branilcih|{n:obl} branilcih|{n:stem}ih branilcih
+count.takeback = {n:f} vrnjena poteza|{n:f} vrnjeni potezi|{n:f} vrnjene poteze|{n} vrnjenih potez
+count.takeback_acc = {n:f_acc} vrnjeno potezo|{n:f} vrnjeni potezi|{n:f} vrnjene poteze|{n} vrnjenih potez
+count.takeback_gen = {n} vrnjene poteze|{n} vrnjenih potez|{n} vrnjenih potez|{n} vrnjenih potez
+count.takeback_gen.spoken = {n:f_gen} vrnjene poteze|{n:obl} vrnjenih potez|{n:obl} vrnjenih potez|{n:stem}ih vrnjenih potez
+count.takeback_loc = {n} vrnjeni potezi|{n} vrnjenih potezah|{n} vrnjenih potezah|{n} vrnjenih potezah
+count.takeback_loc.spoken = {n:f_loc} vrnjeni potezi|{n:obl} vrnjenih potezah|{n:obl} vrnjenih potezah|{n:stem}ih vrnjenih potezah
+# Percentages (accuracy): "{acc:percent}" = "85 %" in the subtitles (a space before %, as Slovenian
+# writes it), "petinosemdeset odstotkov" spoken; "dva odstotka", "trije odstotki", "en odstotek".
+count.percent = {n} %|{n} %|{n} %|{n} %
+count.percent.spoken = {n:m} odstotek|{n:m} odstotka|{n:m} odstotki|{n} odstotkov
+count.percent_acc = {n} %|{n} %|{n} %|{n} %
+count.percent_acc.spoken = {n:m} odstotek|{n:m} odstotka|{n} odstotke|{n} odstotkov
+count.percent_gen = {n} %|{n} %|{n} %|{n} %
+count.percent_gen.spoken = {n:m_gen} odstotka|{n:obl} odstotkov|{n:obl} odstotkov|{n:stem}ih odstotkov
+count.percent_loc = {n} %|{n} %|{n} %|{n} %
+count.percent_loc.spoken = {n:m_loc} odstotku|{n:obl} odstotkih|{n:obl} odstotkih|{n:stem}ih odstotkih
+# "Mate in N" with the number alone in the subtitles: "mat v {m:mv}" = "mat v 3" written, "mat v treh
+# potezah" spoken (the same words as {m:move_loc}, which writes "mat v 3 potezah").
+count.mv = {n}|{n}|{n}|{n}
+count.mv.spoken = {n:f_loc} potezi|{n:obl} potezah|{n:obl} potezah|{n:stem}ih potezah
+# Move numbers as ordinals, feminine (poteza, partija, vrsta): "v {n:ord_loc} potezi" = "v 21. potezi"
+# written, "v enaindvajseti potezi" spoken; "{n:ord} poteza" = "21. poteza" / "enaindvajseta poteza";
+# "do {n:ord_gen} poteze"; "{n:ord_acc} potezo". The dot is part of the form: always follow it with
+# its noun ("{n:ord_loc} potezi", never "{n:ord_loc}." nor a placeholder right after it).
+count.ord = {n}.|{n}.|{n}.|{n}.
+count.ord.spoken = {n:stem}a|{n:stem}a|{n:stem}a|{n:stem}a
+count.ord_gen = {n}.|{n}.|{n}.|{n}.
+count.ord_gen.spoken = {n:stem}e|{n:stem}e|{n:stem}e|{n:stem}e
+count.ord_acc = {n}.|{n}.|{n}.|{n}.
+count.ord_acc.spoken = {n:stem}o|{n:stem}o|{n:stem}o|{n:stem}o
+count.ord_loc = {n}.|{n}.|{n}.|{n}.
+count.ord_loc.spoken = {n:stem}i|{n:stem}i|{n:stem}i|{n:stem}i
+# A bare number in a gender or case ("{n:f}", "{n:m}" usable in any line: "{m:f} od njih"); they are
+# count keys so that the form check knows them; the subtitles show the digits. obl and stem are the
+# building blocks of the keys above: in a line, use a counted noun instead.
+count.m = {n:m}|{n:m}|{n:m}|{n:m}
+count.f = {n:f}|{n:f}|{n:f}|{n:f}
+count.neut = {n:neut}|{n:neut}|{n:neut}|{n:neut}
+count.m_acc = {n:m_acc}|{n:m_acc}|{n:m_acc}|{n:m_acc}
+count.f_acc = {n:f_acc}|{n:f_acc}|{n:f_acc}|{n:f_acc}
+count.m_gen = {n:m_gen}|{n:m_gen}|{n:m_gen}|{n:m_gen}
+count.f_gen = {n:f_gen}|{n:f_gen}|{n:f_gen}|{n:f_gen}
+count.m_loc = {n:m_loc}|{n:m_loc}|{n:m_loc}|{n:m_loc}
+count.f_loc = {n:f_loc}|{n:f_loc}|{n:f_loc}|{n:f_loc}
+count.obl = {n:obl}|{n:obl}|{n:obl}|{n:obl}
+count.stem = {n:stem}|{n:stem}|{n:stem}|{n:stem}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = izenačeno
+# "mat v 3" in the subtitles, "mat v treh potezah" spoken. {n} here is a bare number (count keys do
+# not apply to it): the form "mv" below says it with "poteza" in the locative; 1-99 and every hundred
+# are listed (one-word compounds take the ending at their end), 101-999 compose ("sto petih potezah").
+eval.mate_win = mat v {n}
+eval.mate_win.spoken = mat v {n:mv}
+eval.mate_loss = mat v {n} proti tebi
+eval.mate_loss.spoken = mat v {n:mv} proti tebi
+number.1.mv.spoken = eni potezi
+number.2.mv.spoken = dveh potezah
+number.3.mv.spoken = treh potezah
+number.4.mv.spoken = štirih potezah
+number.5.mv.spoken = petih potezah
+number.6.mv.spoken = šestih potezah
+number.7.mv.spoken = sedmih potezah
+number.8.mv.spoken = osmih potezah
+number.9.mv.spoken = devetih potezah
+number.10.mv.spoken = desetih potezah
+number.11.mv.spoken = enajstih potezah
+number.12.mv.spoken = dvanajstih potezah
+number.13.mv.spoken = trinajstih potezah
+number.14.mv.spoken = štirinajstih potezah
+number.15.mv.spoken = petnajstih potezah
+number.16.mv.spoken = šestnajstih potezah
+number.17.mv.spoken = sedemnajstih potezah
+number.18.mv.spoken = osemnajstih potezah
+number.19.mv.spoken = devetnajstih potezah
+number.20.mv.spoken = dvajsetih potezah
+number.21.mv.spoken = enaindvajsetih potezah
+number.22.mv.spoken = dvaindvajsetih potezah
+number.23.mv.spoken = triindvajsetih potezah
+number.24.mv.spoken = štiriindvajsetih potezah
+number.25.mv.spoken = petindvajsetih potezah
+number.26.mv.spoken = šestindvajsetih potezah
+number.27.mv.spoken = sedemindvajsetih potezah
+number.28.mv.spoken = osemindvajsetih potezah
+number.29.mv.spoken = devetindvajsetih potezah
+number.30.mv.spoken = tridesetih potezah
+number.31.mv.spoken = enaintridesetih potezah
+number.32.mv.spoken = dvaintridesetih potezah
+number.33.mv.spoken = triintridesetih potezah
+number.34.mv.spoken = štiriintridesetih potezah
+number.35.mv.spoken = petintridesetih potezah
+number.36.mv.spoken = šestintridesetih potezah
+number.37.mv.spoken = sedemintridesetih potezah
+number.38.mv.spoken = osemintridesetih potezah
+number.39.mv.spoken = devetintridesetih potezah
+number.40.mv.spoken = štiridesetih potezah
+number.41.mv.spoken = enainštiridesetih potezah
+number.42.mv.spoken = dvainštiridesetih potezah
+number.43.mv.spoken = triinštiridesetih potezah
+number.44.mv.spoken = štiriinštiridesetih potezah
+number.45.mv.spoken = petinštiridesetih potezah
+number.46.mv.spoken = šestinštiridesetih potezah
+number.47.mv.spoken = sedeminštiridesetih potezah
+number.48.mv.spoken = oseminštiridesetih potezah
+number.49.mv.spoken = devetinštiridesetih potezah
+number.50.mv.spoken = petdesetih potezah
+number.51.mv.spoken = enainpetdesetih potezah
+number.52.mv.spoken = dvainpetdesetih potezah
+number.53.mv.spoken = triinpetdesetih potezah
+number.54.mv.spoken = štiriinpetdesetih potezah
+number.55.mv.spoken = petinpetdesetih potezah
+number.56.mv.spoken = šestinpetdesetih potezah
+number.57.mv.spoken = sedeminpetdesetih potezah
+number.58.mv.spoken = oseminpetdesetih potezah
+number.59.mv.spoken = devetinpetdesetih potezah
+number.60.mv.spoken = šestdesetih potezah
+number.61.mv.spoken = enainšestdesetih potezah
+number.62.mv.spoken = dvainšestdesetih potezah
+number.63.mv.spoken = triinšestdesetih potezah
+number.64.mv.spoken = štiriinšestdesetih potezah
+number.65.mv.spoken = petinšestdesetih potezah
+number.66.mv.spoken = šestinšestdesetih potezah
+number.67.mv.spoken = sedeminšestdesetih potezah
+number.68.mv.spoken = oseminšestdesetih potezah
+number.69.mv.spoken = devetinšestdesetih potezah
+number.70.mv.spoken = sedemdesetih potezah
+number.71.mv.spoken = enainsedemdesetih potezah
+number.72.mv.spoken = dvainsedemdesetih potezah
+number.73.mv.spoken = triinsedemdesetih potezah
+number.74.mv.spoken = štiriinsedemdesetih potezah
+number.75.mv.spoken = petinsedemdesetih potezah
+number.76.mv.spoken = šestinsedemdesetih potezah
+number.77.mv.spoken = sedeminsedemdesetih potezah
+number.78.mv.spoken = oseminsedemdesetih potezah
+number.79.mv.spoken = devetinsedemdesetih potezah
+number.80.mv.spoken = osemdesetih potezah
+number.81.mv.spoken = enainosemdesetih potezah
+number.82.mv.spoken = dvainosemdesetih potezah
+number.83.mv.spoken = triinosemdesetih potezah
+number.84.mv.spoken = štiriinosemdesetih potezah
+number.85.mv.spoken = petinosemdesetih potezah
+number.86.mv.spoken = šestinosemdesetih potezah
+number.87.mv.spoken = sedeminosemdesetih potezah
+number.88.mv.spoken = oseminosemdesetih potezah
+number.89.mv.spoken = devetinosemdesetih potezah
+number.90.mv.spoken = devetdesetih potezah
+number.91.mv.spoken = enaindevetdesetih potezah
+number.92.mv.spoken = dvaindevetdesetih potezah
+number.93.mv.spoken = triindevetdesetih potezah
+number.94.mv.spoken = štiriindevetdesetih potezah
+number.95.mv.spoken = petindevetdesetih potezah
+number.96.mv.spoken = šestindevetdesetih potezah
+number.97.mv.spoken = sedemindevetdesetih potezah
+number.98.mv.spoken = osemindevetdesetih potezah
+number.99.mv.spoken = devetindevetdesetih potezah
+number.100.mv.spoken = stotih potezah
+number.200.mv.spoken = dvestotih potezah
+number.300.mv.spoken = tristotih potezah
+number.400.mv.spoken = štiristotih potezah
+number.500.mv.spoken = petstotih potezah
+number.600.mv.spoken = šeststotih potezah
+number.700.mv.spoken = sedemstotih potezah
+number.800.mv.spoken = osemstotih potezah
+number.900.mv.spoken = devetstotih potezah
+
+# ---- The phases of the game (appraisal.lang appraisal.phase.*) -------------------------------------
+# The nominatives in appraisal.lang are "otvoritev", "središčnica", "končnica" (all feminine). Their
+# cases for "{text:<case>}": "v {text:loc}" = "v otvoritvi / središčnici / končnici", "{text:gen}",
+# "{text:dat}", "{text:acc}", "{text:ins}", "{text:with}" ("z otvoritvijo", "s končnico").
+appraisal.phase.opening.gen = otvoritve
+appraisal.phase.opening.dat = otvoritvi
+appraisal.phase.opening.acc = otvoritev
+appraisal.phase.opening.loc = otvoritvi
+appraisal.phase.opening.ins = otvoritvijo
+appraisal.phase.opening.with = z otvoritvijo
+appraisal.phase.middlegame.gen = središčnice
+appraisal.phase.middlegame.dat = središčnici
+appraisal.phase.middlegame.acc = središčnico
+appraisal.phase.middlegame.loc = središčnici
+appraisal.phase.middlegame.ins = središčnico
+appraisal.phase.middlegame.with = s središčnico
+appraisal.phase.endgame.gen = končnice
+appraisal.phase.endgame.dat = končnici
+appraisal.phase.endgame.acc = končnico
+appraisal.phase.endgame.loc = končnici
+appraisal.phase.endgame.ins = končnico
+appraisal.phase.endgame.with = s končnico

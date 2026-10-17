@@ -1,0 +1,154 @@
+# Coach speech (Latvian): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Latvian:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "tu" or "es" here: the players are "baltie" and "melnie" (plural, lowercase inside a
+#   sentence): "baltie uzvar", "baltajiem ir forsēts mats", "balto uzvara". A piece comes with its
+#   side: {piece} {t1} {t2} = "balto zirgs", "melno dāma" (common.lang, owner.white / owner.black),
+#   with the forms acc dat pron_acc ("to"): "uzbrūk {t1:dat}", "paņem {piece:acc}".
+# - A move is never declined: "{move} ir kļūda", "ar {move}", "pēc {move}". A move that was not
+#   played is the subject of a conditional ("Gājiens {best} pieteiktu matu"), so that no participle
+#   has to agree with it.
+# - Counted numbers (common.lang): "mats {m:move_loc}" (mats 3 gājienos), {pts:point_gen} "3 punktu"
+#   ("materiālu 3 punktu vērtībā"), {n:mistake} "2 kļūdas", {m:blunder} "1 rupja kļūda", with _acc
+#   after "pieļāva"; {acc_white:percent} "85%" (spoken "astoņdesmit pieci procenti").
+# - {opening:def} always follows a colon, so that its form never depends on the sentence.
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Atskatīsimies uz šo partiju kopā.
+an.start.2 = Apskatīsim šo partiju gājienu pēc gājiena.
+an.start.3 = Lūk, partija. Paskatīsimies, kā tā noritēja.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Šī partija sākas no sastādītas pozīcijas. Apskatīsim to.
+an.start.setup.2 = Partija no sastādītas pozīcijas. Paskatīsimies, kā tā noritēja.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Atklātne: {opening:def}.
+an.opening.2 = Spēlētā atklātne: {opening:def}.
+an.book_exit = Ar gājienu {move} partija iziet ārpus zināmās atklātņu teorijas.
+an.book_exit.2 = {move} ir pirmais gājiens ārpus atklātņu teorijas.
+an.book_exit.3 = Atklātnes teorija beidzas šeit, ar gājienu {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = {move} ir rupja kļūda.
+an.blunder.2 = Šeit {move} ir nopietna kļūda.
+an.blunder.3 = Rupja kļūda: {move}.
+an.mistake = {move} ir kļūda.
+an.mistake.2 = {move} šeit nav pareizais gājiens.
+an.mistake.3 = Kļūda: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = {move} palaiž garām iespēju sodīt par šo kļūdu.
+an.missed_chance.2 = Ar gājienu {move} iespēja tiek palaista garām.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Tagad {reply:nomate} ir mats.
+an.mate_allowed.one.2 = Tas ļauj atbildēt ar {reply:nomate}, un tas ir mats.
+an.mate_allowed = Tas pieļauj forsētu matu {m:move_loc}, sākot ar {reply:nomate}.
+an.mate_allowed.2 = Tagad ir forsēts mats {m:move_loc}, kas sākas ar {reply:nomate}.
+an.fork = Tagad {reply} ar dakšu uzbrūk {t1:dat} un {t2:dat}.
+an.fork.2 = Tas ļauj atbildēt ar {reply}, kas vienlaikus uzbrūk {t1:dat} un {t2:dat}.
+an.fork.3 = {reply} vienlaikus uzbrūk {t1:dat} un {t2:dat}.
+an.hanging = Tas atstāj {piece:acc} bez aizsardzības, un {reply} {piece:pron_acc} paņem.
+an.hanging.2 = {piece} paliek bez aizsarga: {reply} {piece:pron_acc} iegūst.
+an.hanging.3 = {reply} vienkārši paņem {piece:acc}, kam nebija aizsarga.
+an.material = Atbilde {line} iegūst materiālu {pts:point_gen} vērtībā.
+an.material.2 = Tad seko {line}, un materiāla ieguvums ir {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Gājiens {best:nomate} pieteiktu matu.
+an.mate_missed.one.2 = Ar {best:nomate} varēja pieteikt matu.
+an.mate_missed = Gājiens {best:nomate} ļautu forsēt matu {m:move_loc}.
+an.mate_missed.2 = Bija forsēts mats {m:move_loc}, sākot ar {best:nomate}.
+an.missed_capture = Gājiens {best} ļautu par velti iegūt {piece:acc}.
+an.missed_capture.2 = {piece:dat} nebija aizsarga: gājiens {best} {piece:pron_acc} paņemtu.
+an.missed_fork = Gājiens {best} ar dakšu uzbruktu {t1:dat} un {t2:dat}.
+an.missed_fork.2 = Gājiens {best} bija dakša: uzbrukums gan {t1:dat}, gan {t2:dat}.
+
+# The better move, when nothing above named it.
+an.better = Spēcīgāks bija gājiens {best}.
+an.better.2 = Labāks bija gājiens {best}.
+an.better.3 = Precīzāks bija gājiens {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = {move} ir izcils gājiens: tas upurē {piece:acc}!
+an.brilliant.2 = Izcils upuris! {move} atdod {piece:acc}.
+an.brilliant.3 = {move}! Izcils gājiens, kas upurē {piece:acc}.
+an.brilliant.mate = Tas noved pie forsēta mata {m:move_loc}.
+an.brilliant.mate.2 = Un tas forsē matu {m:move_loc}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = {move} ir vienīgais gājiens, kas saglabā pārsvaru.
+an.only.win.2 = Šeit pārsvaru saglabā tikai {move}. Labi atrasts.
+an.only.hold = {move} ir vienīgais gājiens, kas saglabā līdzsvaru.
+an.only.hold.2 = Šeit pozīciju notur tikai {move}.
+an.only.defend = {move} ir vienīgais gājiens, kas ļauj turpināt cīņu.
+an.only.defend.2 = Šeit cīņu uztur tikai {move}. Laba aizsardzība.
+an.only.best = {move} šeit ir krietni spēcīgāks par jebkuru citu gājienu.
+an.only.best.2 = Precīzi: {move} ir daudz spēcīgāks par visu pārējo.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = {move} ir neliela neprecizitāte: {best} bija precīzāks.
+an.inaccuracy.2 = Ne gluži labākais gājiens: {best} bija precīzāks par {move}.
+an.interesting = {move} ir interesanta ideja, kas piedāvā {piece:acc}.
+an.interesting.2 = Interesants mēģinājums: {move} atdod {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Baltajiem tagad ir forsēts mats {m:move_loc}.
+an.mate_on.white.2 = No šejienes baltie var forsēt matu {m:move_loc}.
+an.mate_on.black = Melnajiem tagad ir forsēts mats {m:move_loc}.
+an.mate_on.black.2 = No šejienes melnie var forsēt matu {m:move_loc}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Mats. Partijā uzvar baltie.
+an.end.mate.white.2 = Un tas ir mats: baltie uzvar.
+an.end.mate.black = Mats. Partijā uzvar melnie.
+an.end.mate.black.2 = Un tas ir mats: melnie uzvar.
+an.end.resigned.white = Melnie padevās, tāpēc partijā uzvar baltie.
+an.end.resigned.white.2 = Partija beidzas šeit: melnie padodas, un baltie uzvar.
+an.end.resigned.black = Baltie padevās, tāpēc partijā uzvar melnie.
+an.end.resigned.black.2 = Partija beidzas šeit: baltie padodas, un melnie uzvar.
+an.end.timeout.white = Melnajiem beidzās laiks, tāpēc uzvar baltie.
+an.end.timeout.white.2 = Baltie uzvar: melnie pārsniedza laiku.
+an.end.timeout.black = Baltajiem beidzās laiks, tāpēc uzvar melnie.
+an.end.timeout.black.2 = Melnie uzvar: baltie pārsniedza laiku.
+an.end.win.white = Partija beidzas ar balto uzvaru.
+an.end.win.white.2 = Baltie uzvar partijā.
+an.end.win.black = Partija beidzas ar melno uzvaru.
+an.end.win.black.2 = Melnie uzvar partijā.
+an.end.stalemate = Pats: partija beidzas neizšķirti.
+an.end.stalemate.2 = Tas ir pats, tāpēc partija beidzas neizšķirti.
+an.end.draw.agreement = Spēlētāji vienojās par neizšķirtu.
+an.end.draw.agreement.2 = Partija beidzas neizšķirti pēc vienošanās.
+an.end.draw.repetition = Partija beidzas neizšķirti, jo pozīcija atkārtojās.
+an.end.draw.repetition.2 = Tā pati pozīcija atkārtojās vēlreiz: neizšķirts.
+an.end.draw.fifty = Partija beidzas neizšķirti saskaņā ar piecdesmit gājienu noteikumu.
+an.end.draw.fifty.2 = Piecdesmit gājieni bez ņemšanas un bandinieka gājiena: neizšķirts.
+an.end.draw.seventy_five = Partija beidzas neizšķirti saskaņā ar septiņdesmit piecu gājienu noteikumu.
+an.end.draw.seventy_five.2 = Septiņdesmit pieci gājieni bez ņemšanas un bandinieka gājiena: neizšķirts.
+an.end.draw.material = Mats vairs nav iespējams: partija beidzas neizšķirti.
+an.end.draw.material.2 = Neviena puse vairs nevar pieteikt matu, tāpēc ir neizšķirts.
+an.end.draw = Partija beidzas neizšķirti.
+an.end.draw.2 = Neizšķirts.
+an.end.unfinished = Partija šeit apstājas, tā nav pabeigta.
+an.end.unfinished.2 = Šeit partija pārtrūkst: tā netika pabeigta.
+an.end.accuracy = Precizitāte: baltajiem {acc_white:percent}, melnajiem {acc_black:percent}.
+an.end.accuracy.2 = Balto precizitāte bija {acc_white:percent}, melno {acc_black:percent}.
+an.end.clean.white = Baltie nepieļāva ne kļūdas, ne rupjas kļūdas.
+an.end.clean.white.2 = Balto spēle bija bez nopietnām kļūdām.
+an.end.clean.black = Melnie nepieļāva ne kļūdas, ne rupjas kļūdas.
+an.end.clean.black.2 = Melno spēle bija bez nopietnām kļūdām.
+an.end.mistakes.white = Baltie pieļāva {n:mistake_acc} un nevienu rupju kļūdu.
+an.end.mistakes.white.2 = Baltie: {n:mistake}, bez rupjām kļūdām.
+an.end.mistakes.black = Melnie pieļāva {n:mistake_acc} un nevienu rupju kļūdu.
+an.end.mistakes.black.2 = Melnie: {n:mistake}, bez rupjām kļūdām.
+an.end.blunders.white = Baltie pieļāva {m:blunder_acc}.
+an.end.blunders.white.2 = Baltie: {m:blunder}.
+an.end.blunders.black = Melnie pieļāva {m:blunder_acc}.
+an.end.blunders.black.2 = Melnie: {m:blunder}.
+an.end.errors.white = Baltie pieļāva {n:mistake_acc} un {m:blunder_acc}.
+an.end.errors.white.2 = Baltie: {n:mistake} un {m:blunder}.
+an.end.errors.black = Melnie pieļāva {n:mistake_acc} un {m:blunder_acc}.
+an.end.errors.black.2 = Melnie: {n:mistake} un {m:blunder}.

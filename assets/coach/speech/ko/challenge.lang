@@ -1,0 +1,138 @@
+# Coach speech (Korean): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Register: warm polite 해요체, as the other ko files; the coach is 저 / 제가.
+# Placeholders (see the English header):
+#   {n:position}  "포지션 6개" (count.position, spoken "포지션 여섯 개"): ends in 개, so "{n:position}예요"
+#   {n:move}      "3수" (spoken "세 수"): "Mate in {n}" = "{n:move} 메이트", as eval.mate_win
+#   {m:move}      the same for the mate the coach can force: "{m:move} 만에"
+#   {move}        one of the coach's moves: never a particle after it; "{move}, 이렇게 받아요"
+#   {your}        one of the player's pieces, the bare noun with its forms ({your:obj} "나이트를")
+#   {sq}          a square: "{sq} 칸을 보세요"
+# Challenge names as on the challenge page (assets/i18n/ko.lang challenge.<id>.name); mates in N are
+# written "1수 메이트" (spoken "한 수 메이트"), as Korean puzzle books write them.
+# The player always has the white pieces.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = 1수 메이트예요. 모두 {n:position}예요. 매번 단 한 수로 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
+ch.intro.mate1.spoken = 한 수 메이트예요. 모두 {n:position}예요. 매번 단 한 수로 체크메이트할 수 있어요. 체크를 전부 살펴보세요.
+ch.intro.mate2 = 2수 메이트예요. 모두 {n:position}예요. 첫 수로 제가 막을 방법을 없애고, 그다음에 메이트하세요.
+ch.intro.mate2.spoken = 두 수 메이트예요. 모두 {n:position}예요. 첫 수로 제가 막을 방법을 없애고, 그다음에 메이트하세요.
+ch.intro.mate3 = 3수 메이트예요. 모두 {n:position}예요. 체크, 잡기, 위협. 매번 제 최선의 응수를 읽어 보세요.
+ch.intro.mate3.spoken = 세 수 메이트예요. 모두 {n:position}예요. 체크, 잡기, 위협. 매번 제 최선의 응수를 읽어 보세요.
+ch.intro.backrank = 뒷줄 메이트예요. 킹이 자기 폰들 뒤에 갇힌 {n:position}예요.
+ch.intro.patterns = 메이트 패턴이에요. 고전적인 메이트 그물이 숨은 {n:position}예요. 패턴을 알아보고, 결정타를 날리세요.
+ch.intro.hanging = 공짜 기물이에요. 모두 {n:position}예요. 제 기물 하나가 지켜지지 않은 채 남아 있어요. 찾아서 잡으세요.
+ch.intro.fork = 포크예요. 모두 {n:position}예요. 두 가지를 동시에 공격하는 수를 찾으세요.
+ch.intro.pin = 핀이에요. 모두 {n:position}예요. 기물에 핀을 걸거나, 걸려 있는 핀을 활용하세요.
+ch.intro.skewer = 스큐어예요. 모두 {n:position}예요. 값진 기물을 공격해서, 그 뒤에 있는 것을 잡으세요.
+ch.intro.discovered = 디스커버드 어택이에요. 모두 {n:position}예요. 한 기물을 움직여서 다른 기물의 공격을 열어 주세요.
+ch.intro.deflection = 디플렉션과 디코이예요. 모두 {n:position}예요. 수비 기물을 다른 곳으로 꾀어내거나, 치명적인 칸으로 끌어들이세요.
+ch.intro.intermezzo = 중간 수예요. 모두 {n:position}예요. 뻔한 수를 두기 전에 더 강한 수를 찾으세요.
+ch.intro.trapped = 갇힌 기물이에요. 모두 {n:position}예요. 제 기물 하나가 안전하게 갈 곳이 없어요. 그 기물을 잡으세요.
+ch.intro.promotion = 프로모션이에요. 전진한 폰이 승부를 가르는 {n:position}예요.
+ch.intro.quiet = 조용한 수예요. 모두 {n:position}예요. 이기는 수는 체크도 아니고 잡기도 아니에요.
+ch.intro.opening = 오프닝 함정이에요. 실전 게임의 초반에서 나온 {n:position}예요. 제 실수를 응징하세요.
+ch.intro.escape = 탈출구 찾기예요. 모두 {n:position}예요. 킹이 위험하고, 살릴 수 있는 수는 하나뿐이에요.
+ch.intro.defend = 방어 수예요. 모두 {n:position}예요. 포지션이 무너지지 않게 지켜 줄 단 하나의 수를 찾으세요.
+ch.intro.kq = 퀸과 킹 대 킹이에요. 모두 {n:position}예요. 제 킹을 체크메이트하세요. 스테일메이트는 조심하세요.
+ch.intro.kr = 룩과 킹 대 킹이에요. 모두 {n:position}예요. 한 걸음씩 제 킹을 체크메이트하세요.
+ch.intro.kp = 킹과 폰 대 킹이에요. 모두 {n:position}예요. 퀸을 만드세요. 킹이 앞장서야 해요.
+ch.intro.kp_hold = 폰 막기예요. 모두 {n:position}예요. 남은 건 킹뿐이에요. 무승부를 지켜 내세요.
+ch.intro.rook = 룩 엔드게임이에요. 모두 {n:position}예요. 다리를 놓아 프로모션하고, 필리도르 방어로 무승부를 지켜 내세요.
+ch.intro.endgame = 엔드게임 전술이에요. 기물은 적어도 날카로운 아이디어가 담긴 {n:position}예요.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = {n:move} 메이트예요.
+ch.task.mate.2 = {n:move} 메이트를 찾으세요.
+ch.task.hanging = 지켜지지 않은 기물이 있어요.
+ch.task.hanging.2 = 공짜로 잡을 수 있는 게 뭘까요?
+ch.task.fork = 포크를 찾으세요.
+ch.task.fork.2 = 포크를 노려 보세요.
+ch.task.pin = 여기서는 핀이 열쇠예요.
+ch.task.skewer = 여기서는 스큐어로 이길 수 있어요.
+ch.task.discovered = 여기서는 디스커버드 어택으로 이길 수 있어요.
+ch.task.deflection = 수비 기물에 과부하를 걸거나, 꾀어내세요.
+ch.task.intermezzo = 중간 수를 찾아보세요.
+ch.task.trapped = 제 기물 하나가 도망갈 수 없어요. 그 기물을 잡으세요.
+ch.task.promotion = 전진한 폰을 활용하세요.
+ch.task.quiet = 이기는 수는 조용한 수예요.
+ch.task.opening = 제 마지막 수를 응징하세요.
+ch.task.escape = 킹을 구하세요. 통하는 수는 하나뿐이에요.
+ch.task.defend = 유일하게 좋은 수를 찾으세요.
+ch.task.endgame = 최선의 수를 찾으세요.
+ch.task.default = 최선의 수를 찾으세요.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = 제 킹을 체크메이트하세요. 저는 최선을 다해 막을게요.
+ch.task.play.promote = 폰을 프로모션하고, 승리를 지켜 내세요. 저는 막아 볼게요.
+ch.task.play.hold = {n:move} 동안 무승부를 지켜 내세요. 저는 이기려고 해 볼게요.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = 이 포지션들은 실전 게임에서 나왔어요. 제가 마지막 수를 두면, 그다음에 두실 차례예요.
+ch.lead.first.2 = 포지션은 모두 실전 게임에서 가져왔어요. 그 포지션으로 이어진 수를 제가 두면, 그다음에 두세요.
+ch.next = 다음 포지션이에요.
+ch.next.2 = 자, 다음이에요.
+ch.next.3 = 다음으로 넘어가요.
+ch.last = 마지막 포지션이에요.
+ch.last.2 = 이제 마지막이에요.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = 좋아요.
+ch.good.2 = 그렇죠.
+ch.good.3 = 맞아요.
+ch.good.4 = 바로 그거예요.
+# The position is solved.
+ch.solved = 정답이에요! 잘하셨어요.
+ch.solved.2 = 완벽하게 맞히셨어요.
+ch.solved.3 = 아주 좋아요.
+ch.solved.mate = 체크메이트! 잘하셨어요.
+ch.solved.mate.2 = 이걸로 메이트예요. 아주 좋아요.
+ch.solved.mate.3 = 체크메이트예요. 깔끔했어요.
+ch.solved.promote = 새 퀸이 나왔고, 승리도 굳히셨어요. 잘하셨어요.
+ch.solved.hold = 무승부를 지켜 내셨어요. 잘 막으셨어요!
+ch.solved.draw = 체스판 위에서 무승부가 나왔어요. 잘 막으셨어요!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = 이 수는 아니에요. 그러면 저는 {move}, 이렇게 받아요.
+ch.wrong.reply.2 = 조금 달라요. 저는 {move}, 이렇게 응수할 거예요.
+ch.wrong.reply.3 = 그러면 제가 {move}, 이렇게 둬요.
+ch.wrong.mate = 조심하세요. 제가 {move:nomate}, 이렇게 두면 체크메이트예요.
+ch.wrong.mate.2 = 조심하세요. 저는 {move:nomate}, 이렇게 받아요. 그러면 메이트예요.
+ch.wrong.mated = 조심하세요. {move}, 이 수 다음에는 제가 {m:move} 만에 강제로 메이트할 수 있어요.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = 그 수로도 메이트할 수 있지만, 더 오래 걸려요. 더 빠른 방법이 있어요.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = 그 수로도 메이트가 되지만, 제가 생각한 수는 따로 있어요. 다시 보세요.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = 나쁘지 않지만, 더 강한 수가 있어요. 다시 보세요.
+ch.wrong.weaker.2 = 둘 만한 수지만, 더 잘 두실 수 있어요.
+ch.wrong.stalemate = 스테일메이트예요! 제 킹이 움직일 수 없으니, 무승부밖에 안 돼요.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = 이 수는 아니에요. {move}, 이 수 다음에는 제가 무승부를 지킬 수 있어요.
+ch.wrong.loses = 조심하세요. {move}, 이 수 다음에는 제가 이기는 형세예요.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = 그 수가 아니에요.
+ch.try_again = 다시 해 보세요.
+ch.try_again.2 = 다시 한번 보세요.
+ch.try_again.3 = 다시 살펴보세요.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = 힌트가 필요하세요?
+ch.offer.2 = 힌트 드릴까요?
+ch.no_hint = 알겠어요. 계속 찾아보세요.
+ch.no_hint.2 = 좋아요, 천천히 하세요.
+ch.hint.piece = {your:obj} 보세요.
+ch.hint.piece.2 = {your:obj} 잘 생각해 보세요.
+ch.hint.square = {sq} 칸을 보세요.
+ch.hint.square.2 = 핵심 칸은 {sq} 칸이에요.
+ch.hint.square.3 = {sq} 칸을 눈여겨보세요.
+ch.hint.show = 이 수예요. 잘 보세요.
+ch.hint.show.2 = 제가 보여 드릴게요. 잘 보세요.
+ch.hint.now = 이제 직접 두세요.
+ch.hint.now.2 = 두실 차례예요. 그 수를 두세요.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = 챌린지를 모두 마쳤어요. 잘하셨어요!
+ch.complete.2 = 모든 포지션을 푸셨어요. 잘하셨어요!

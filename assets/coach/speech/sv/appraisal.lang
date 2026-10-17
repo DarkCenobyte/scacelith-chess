@@ -1,0 +1,442 @@
+# Coach speech (Swedish): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# Always positive, never blaming. The coach says "du" to the player and "jag" of himself; nothing in
+# Swedish agrees with a person's gender ("redo", "nära" are the same for everyone).
+#
+# Names inserted by {text}, {theme}, {level} (written to fit every sentence that inserts them):
+#   appraisal.phase.*   definite nouns ("öppningen", "mittspelet", "slutspelet"): "i {text}",
+#                       "{text} gick bäst", "Du spelade {text} mycket bra".
+#   appraisal.reason.*  a complement right after "remi", no comma: "Remi {text}." ("Remi genom
+#                       upprepning.", "Partiet slutade remi efter överenskommelse.").
+#   theme.*             an infinitive phrase WITH "att", lower case, no full stop: said after a colon
+#                       ("Tema: att hålla dina pjäser skyddade.") or after "öva på", "tänk på", "kom
+#                       ihåg" ("Kom ihåg att ge din kung lite luft.").
+#   appraisal.level.*   the coach level names of the menus (coach.level.N.name) in ”…”, said after
+#                       "nivån": "redo för nivån ”Klubbspelare”".
+# {opening:def} inside a sentence, {opening} alone after a colon or as the whole line.
+# Move numbers: "i drag {n}" (cardinal after the noun, glossary). Accuracy: {acc:percent} = "85 %"
+# (spoken "åttiofem procent") where English says "percent" or a bare number would be unclear; the
+# bare number after the label "Noggrannhet" and in the terse lines, as English.
+# Material won: "material värt {pts:point}" ("material worth 3 points"), never a bare "3 poäng".
+# A better move that was not played takes the counterfactual "hade behållit" (English "kept").
+# Never start a sentence with {n:time}: "en gång" would stay lowercase.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = öppningen
+appraisal.phase.middlegame = mittspelet
+appraisal.phase.endgame = slutspelet
+appraisal.reason.stalemate = genom patt
+appraisal.reason.material = eftersom ingen av oss kunde sätta matt
+appraisal.reason.repetition = genom upprepning
+appraisal.reason.fifty = enligt 50-dragsregeln
+appraisal.reason.fifty.spoken = enligt femtiodragsregeln
+appraisal.reason.agreement = efter överenskommelse
+appraisal.reason.other = enligt reglerna
+appraisal.level.l1 = ”Första stegen”
+appraisal.level.l2 = ”Nybörjare”
+appraisal.level.l3 = ”Fortsättare”
+appraisal.level.l4 = ”Klubbspelare”
+appraisal.level.l5 = ”Stark klubbspelare”
+appraisal.level.l6 = ”Expert”
+# What to practise: an infinitive phrase with "att" (a phrase, no full stop).
+theme.general = att titta på hela brädet innan du gör ditt drag
+theme.mate_allowed = att kontrollera din kungs säkerhet före varje drag
+theme.mate_missed = att leta efter matt och titta på alla schackar först
+theme.stalemate = att lämna en ruta åt min kung när du står på vinst
+theme.fork = att se upp för dubbelangrepp
+theme.discovered = att se upp för dolda angrepp bakom mina pjäser
+theme.skewer = att inte ställa värdefulla pjäser i linje med varandra
+theme.pin = att se bindningar i förväg
+theme.trapped = att hålla en reträttväg öppen för dina pjäser
+theme.back_rank = att ge din kung lite luft
+theme.hanging = att hålla dina pjäser skyddade
+theme.exchange = att räkna angripare och försvarare innan du byter
+theme.missed_capture = att först leta efter pjäser som du kan ta gratis
+theme.missed_fork = att leta efter dina egna dubbelangrepp
+theme.promotion = att räkna på bondekapplöpningar och använda bondens kvadrat
+theme.king_safety = att hålla din kung i säkerhet bakom bönderna
+theme.bad_trade = att välja vilka pjäser du ska byta av
+theme.opening = att utveckla dina pjäser och rockera tidigt
+theme.endgame = att använda din kung och driva fram fribönder
+theme.positional = att förbättra din sämsta pjäs
+theme.material = att kontrollera vad mina nästa drag kan vinna innan du spelar
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Schackmatt! Du vann. Bra spelat!
+appraisal.open.win.b1.2 = Du vann! Bra jobbat att föra partiet ända i mål.
+appraisal.open.win.b1.3 = Du slog mig! Det var ett riktigt bra parti.
+appraisal.open.win.b2 = Bra spelat! Du vann på {moves:move}.
+appraisal.open.win.b2.2 = Grattis, du vann!
+appraisal.open.win.b2.3 = En vinst på {moves:move}. Snyggt gjort!
+appraisal.open.win.b3 = Grattis till en välförtjänt seger.
+appraisal.open.win.b3.2 = Bra spelat. Du förtjänade den segern.
+appraisal.open.win.b3.3 = En fin seger. Grattis.
+appraisal.open.win.b4 = Snygg vinst.
+appraisal.open.win.b4.2 = Bra spelat, en förtjänt seger.
+appraisal.open.win.b4.3 = Bra vinst.
+appraisal.open.win.b5 = Bra spelat.
+appraisal.open.win.b5.2 = Snyggt vunnet.
+appraisal.open.win.b5.3 = Bra parti, en välförtjänt vinst.
+appraisal.open.win.b6 = Bra spelat.
+appraisal.open.win.b6.2 = Välförtjänt vinst.
+appraisal.open.win.b6.3 = Bra parti.
+appraisal.open.draw.b1 = Remi! Ingen av oss kunde vinna det här partiet.
+appraisal.open.draw.b1.2 = Det blev remi. Det var ett jämnt parti!
+appraisal.open.draw.b1.3 = Remi: vi delar på poängen. Bra spelat!
+appraisal.open.draw.b2 = Remi – ett rättvist resultat.
+appraisal.open.draw.b2.2 = Vi spelade remi. Bra kämpat!
+appraisal.open.draw.b2.3 = Remi, och ett bra parti.
+appraisal.open.draw.b3 = Remi. Båda sidor hade chanser.
+appraisal.open.draw.b3.2 = En rättvis remi.
+appraisal.open.draw.b3.3 = Remi {text}. En bra kamp.
+appraisal.open.draw.b4 = Remi {text}.
+appraisal.open.draw.b4.2 = Det blev remi {text}.
+appraisal.open.draw.b4.3 = Partiet slutade remi {text}.
+appraisal.open.draw.b5 = Remi.
+appraisal.open.draw.b5.2 = Remi {text}.
+appraisal.open.draw.b5.3 = Det blev remi.
+appraisal.open.draw.b6 = Remi.
+appraisal.open.draw.b6.2 = Remi {text}.
+appraisal.open.draw.b6.3 = Det blev remi.
+appraisal.open.stalemate.b1 = Remi genom patt – så nära! Lämna en ruta åt min kung nästa gång.
+appraisal.open.stalemate.b1.2 = Patt, så det blir remi. Du var nästan i mål!
+appraisal.open.stalemate.b2 = Remi genom patt. Du var så nära att vinna!
+appraisal.open.stalemate.b2.2 = Patt: remi, trots att du stod på vinst.
+appraisal.open.stalemate.b3 = Remi genom patt, från en vunnen ställning.
+appraisal.open.stalemate.b3.2 = Patt. Vinsten gled undan i allra sista stund.
+appraisal.open.stalemate.b4 = Remi genom patt.
+appraisal.open.stalemate.b4.2 = Patt: remi.
+appraisal.open.stalemate.b5 = Patt.
+appraisal.open.stalemate.b5.2 = Remi – patt.
+appraisal.open.stalemate.b6 = Patt.
+appraisal.open.stalemate.b6.2 = Remi, patt.
+appraisal.open.loss.b1 = Jag vann den här gången, men du gjorde några riktigt bra drag.
+appraisal.open.loss.b1.2 = Bra parti! Du gjorde det inte lätt för mig.
+appraisal.open.loss.b1.3 = Det var roligt! Jag vann det här partiet, men du lär dig snabbt.
+appraisal.open.loss.b2 = Bra parti! Nu tittar vi på vad som gick bra, och på en sak du kan prova.
+appraisal.open.loss.b2.2 = Tack för partiet! Du hade några bra idéer.
+appraisal.open.loss.b2.3 = Bra parti. Nu ska vi se vad vi kan lära oss av det.
+appraisal.open.loss.b3 = Bra parti.
+appraisal.open.loss.b3.2 = Tack för partiet.
+appraisal.open.loss.b3.3 = Bra parti. Vi tar en titt på det.
+appraisal.open.loss_close.b3 = Bra kämpat. Partiet var jämnt länge.
+appraisal.open.loss_close.b3.2 = Bra kämpat: ställningen var i balans länge.
+appraisal.open.loss.b4 = Bra parti. Här är det som avgjorde.
+appraisal.open.loss.b4.2 = Bra parti. Ett ögonblick avgjorde det.
+appraisal.open.loss.b4.3 = Tack för partiet. Nu ska vi se var det vände.
+appraisal.open.loss_close.b4 = Länge en jämn kamp. Här är det som avgjorde.
+appraisal.open.loss_close.b4.2 = Bra parti, länge i balans.
+appraisal.open.loss.b5 = Bra parti.
+appraisal.open.loss.b5.2 = Tack för partiet.
+appraisal.open.loss.b5.3 = Bra kämpat.
+appraisal.open.loss.b6 = Bra parti.
+appraisal.open.loss.b6.2 = Tack för partiet.
+appraisal.open.loss.b6.3 = Bra kämpat.
+appraisal.open.resigned.b1 = Att ge upp hör till schack; det kräver mod. Bra parti!
+appraisal.open.resigned.b1.2 = Det gör ingenting. Att veta när man ska ge upp hör till schack.
+appraisal.open.resigned.b2 = Att ge upp hör till schack; det kräver mod.
+appraisal.open.resigned.b2.2 = Det förstår jag. Att ge upp kräver också mod.
+appraisal.open.resigned.b3 = Att ge upp hör till schack. Bra parti.
+appraisal.open.resigned.b3.2 = Det förstår jag. Tack för partiet.
+appraisal.open.resigned.b4 = Bra parti.
+appraisal.open.resigned.b4.2 = Tack för partiet.
+appraisal.open.resigned.b5 = Bra parti.
+appraisal.open.resigned.b5.2 = Tack för partiet.
+appraisal.open.resigned.b6 = Bra parti.
+appraisal.open.resigned.b6.2 = Tack.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Det var inte över än, ska du veta: ungefär {eval}.
+appraisal.resign_early.b3.2 = Faktiskt hade du fortfarande chanser: ungefär {eval}.
+appraisal.resign_early.b4 = Det var inte över än: ungefär {eval}.
+appraisal.resign_early.b4.2 = Det fanns fortfarande spel kvar: ungefär {eval}.
+appraisal.resign_early.b5 = Det var inte över: {eval}.
+appraisal.resign_early.b5.2 = Fortfarande spelbart, ungefär {eval}.
+appraisal.resign_early.b6 = Inte över: {eval}.
+appraisal.resign_early.b6.2 = Det var {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Vi spelade {opening:def}.
+appraisal.opening.b3.2 = Öppningen var {opening:def}.
+appraisal.opening.b4 = Det blev {opening:def}.
+appraisal.opening.b4.2 = Öppningen: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Öppning: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Öppning: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Vilket offer i drag {n}: {move}!
+appraisal.best.brilliant.b1.2 = Mitt favoritögonblick: {move}. Du offrade en pjäs, och det gick vägen!
+appraisal.best.brilliant.b2 = Ditt bästa ögonblick: offret {move} i drag {n}.
+appraisal.best.brilliant.b2.2 = {move} i drag {n} var ett modigt offer. Bra gjort!
+appraisal.best.brilliant.b3 = Briljant offer med {move}.
+appraisal.best.brilliant.b3.2 = Höjdpunkten: {move}, ett äkta offer, i drag {n}.
+appraisal.best.brilliant.b4 = Bästa ögonblicket: {move}, drag {n}. Ett briljant offer.
+appraisal.best.brilliant.b4.2 = {move} i drag {n} var briljant.
+appraisal.best.brilliant.b5 = {move} i drag {n} var briljant.
+appraisal.best.brilliant.b5.2 = Drag {n}, {move}: briljant.
+appraisal.best.brilliant.b6 = {move}!! i drag {n}.
+appraisal.best.brilliant.b6.spoken = {move} i drag {n}: ett briljant drag.
+appraisal.best.brilliant.b6.2 = Drag {n}: {move}, briljant.
+appraisal.best.great.b1 = Mitt favoritögonblick: {move}. Det var ett utmärkt drag!
+appraisal.best.great.b1.2 = Minns du {move}? Det var ett riktigt fint fynd.
+appraisal.best.great.b2 = Ditt bästa ögonblick: {move} i drag {n}. Det draget vände partiet.
+appraisal.best.great.b2.2 = {move} i drag {n} var ett utmärkt drag.
+appraisal.best.great.b3 = Nyckeldraget var {move} i drag {n}: det vände på steken.
+appraisal.best.great.b3.2 = Fint fynd: {move}, i drag {n}.
+appraisal.best.great.b4 = Du straffade mitt misstag direkt med {move}.
+appraisal.best.great.b4.2 = Bästa ögonblicket: {move}, drag {n}.
+appraisal.best.great.b5 = {move} i drag {n}. Bra hittat.
+appraisal.best.great.b5.2 = Drag {n}, {move}: ett fint fynd.
+appraisal.best.great.b6 = {move} i drag {n}. Bra hittat.
+appraisal.best.great.b6.2 = Drag {n}: {move}!
+appraisal.best.only.b1 = Mitt favoritögonblick: {move}. Det var det enda bra draget!
+appraisal.best.only.b1.2 = I drag {n} hittade du {move}, det enda bra draget. Utmärkt!
+appraisal.best.only.b2 = Ditt bästa ögonblick: {move}, det enda bra draget i den ställningen.
+appraisal.best.only.b2.2 = {move} i drag {n} var det enda draget, och du hittade det.
+appraisal.best.only.b3 = Nyckeldraget var {move} i drag {n}: det enda draget som höll.
+appraisal.best.only.b3.2 = I drag {n} höll bara {move}, och du hittade det.
+appraisal.best.only.b4 = Bästa ögonblicket: {move}, drag {n}. Enda draget.
+appraisal.best.only.b4.2 = Drag {n}: {move}, det enda draget.
+appraisal.best.only.b5 = {move} i drag {n} var enda draget. Bra hittat.
+appraisal.best.only.b5.2 = Enda draget i drag {n}: {move}.
+appraisal.best.only.b6 = {move} i drag {n} var enda draget. Bra hittat.
+appraisal.best.only.b6.2 = Drag {n}: {move}, enda draget.
+appraisal.best.won.b1 = Mitt favoritögonblick: {move}. Det vann material värt {pts:point}!
+appraisal.best.won.b1.2 = Minns du {move}? Där vann du material värt {pts:point}. Bra gjort!
+appraisal.best.won.b2 = Ditt bästa ögonblick: {move} i drag {n}, som vann material värt {pts:point}.
+appraisal.best.won.b2.2 = {move} i drag {n} vann material. Snyggt!
+appraisal.best.won.b3 = Nyckeldraget var {move} i drag {n}: det vann material värt {pts:point}.
+appraisal.best.won.b3.2 = {move} i drag {n} vann material helt rent.
+appraisal.best.won.b4 = Bästa ögonblicket: {move}, drag {n}, som vann material.
+appraisal.best.won.b4.2 = {move} i drag {n} vann material värt {pts:point}.
+appraisal.best.won.b5 = {move} i drag {n} vann material.
+appraisal.best.won.b5.2 = Drag {n}: {move}, materialvinst.
+appraisal.best.won.b6 = {move} i drag {n} vann material.
+appraisal.best.won.b6.2 = Drag {n}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Drag {n}: {move}, plus {pts}.
+appraisal.best.streak.b1 = Du hittade bästa draget {n:time} i rad. Utmärkt!
+appraisal.best.streak.b1.2 = Bästa draget {n:time} i rad! Det är riktigt bra schack.
+appraisal.best.streak.b2 = Du hittade bästa draget {n:time} i rad.
+appraisal.best.streak.b2.2 = Bästa draget {n:time} i rad. Mycket bra!
+appraisal.best.streak.b3 = En svit på {n:move}, alla de bästa. Mycket stabilt.
+appraisal.best.streak.b3.2 = Bästa draget {n:time} i rad. Bra spelat.
+appraisal.best.streak.b4 = Bästa draget {n:time} i rad.
+appraisal.best.streak.b4.2 = En svit på {n:move}, alla de bästa.
+appraisal.best.streak.b5 = Bästa draget {n:time} i rad.
+appraisal.best.streak.b5.2 = En svit på {n:move}, alla de bästa.
+appraisal.best.streak.b6 = Bästa draget {n:time} i rad.
+appraisal.best.streak.b6.2 = Svit: {n:move}, alla de bästa.
+appraisal.best.capture.b1 = Mitt favoritögonblick: {move}. Du tog {my} gratis!
+appraisal.best.capture.b1.2 = Minns du {move}? Du såg att du kunde ta {my} gratis!
+appraisal.best.capture.b2 = Ditt bästa ögonblick: {move}, som vann {my}.
+appraisal.best.capture.b2.2 = Snyggt slag i drag {n}: {move}.
+appraisal.best.capture.b3 = Bra sett i drag {n}: {move} vann {my}.
+appraisal.best.capture.b3.2 = {move} i drag {n} plockade {my}.
+appraisal.best.capture.b4 = Bästa ögonblicket: {move}, drag {n}, som vann {my}.
+appraisal.best.capture.b4.2 = {move} i drag {n} vann material.
+appraisal.best.capture.b5 = {move} i drag {n} vann {my}.
+appraisal.best.capture.b5.2 = Drag {n}: {move}.
+appraisal.best.capture.b6 = {move} i drag {n}.
+appraisal.best.capture.b6.2 = Drag {n}: {move}, materialvinst.
+appraisal.best.phase.b1 = Du spelade mycket bra i {text}.
+appraisal.best.phase.b1.2 = Det var i {text} som du spelade bäst.
+appraisal.best.phase.b2 = Din starkaste del av partiet var {text}.
+appraisal.best.phase.b2.2 = Du spelade {text} mycket bra.
+appraisal.best.phase.b3 = Din bästa fas var {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = {text} gick bäst: {acc:percent} noggrannhet.
+appraisal.best.phase.b4 = Starkaste fasen: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} var din bästa fas, med {acc:percent}.
+appraisal.best.phase.b5 = Bästa fasen: {text}, {acc}.
+appraisal.best.phase.b5.2 = {text}: {acc}.
+appraisal.best.phase.b6 = {text}: {acc}.
+appraisal.best.phase.b6.2 = Bästa fasen: {text}, {acc}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 pjäs" / "3 pjäser") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+# The short levels give the bare count after a label ("Slagna pjäser: 3", "Schackar: 2"; "slag" =
+# captures): a participle next to a counted noun would have to agree with its number ("1 pjäs
+# slagen", "3 pjäser slagna").
+appraisal.num.material.b1 = Du tog {n:piece} av mig och gav schack {m:time}.
+appraisal.num.material.b1.2 = Du slog {n:piece} och gav min kung schack {m:time}.
+appraisal.num.material.b2 = Du slog {n:piece} och gav schack {m:time}.
+appraisal.num.material.b2.2 = Du tog {n:piece} och gav mig schack {m:time}.
+appraisal.num.material.b3 = Du slog {n:piece} och gav schack {m:time}.
+appraisal.num.material.b3.2 = Slagna pjäser: {n}. Schackar: {m}.
+appraisal.num.material.b4 = Slagna pjäser: {n}, schackar: {m}.
+appraisal.num.material.b4.2 = Du tog {n:piece} och gav schack {m:time}.
+appraisal.num.material.b5 = Slagna pjäser: {n}; schackar: {m}.
+appraisal.num.material.b5.2 = Slag: {n}; schackar: {m}.
+appraisal.num.material.b6 = Slagna pjäser: {n}, schackar: {m}.
+appraisal.num.material.b6.2 = Slag: {n}; schackar: {m}.
+appraisal.num.material_nochecks.b1 = Du tog {n:piece} av mig.
+appraisal.num.material_nochecks.b1.2 = Du slog {n:piece} i det här partiet.
+appraisal.num.material_nochecks.b2 = Du slog {n:piece}.
+appraisal.num.material_nochecks.b2.2 = Du tog {n:piece} i det här partiet.
+appraisal.num.material_nochecks.b3 = Du slog {n:piece}.
+appraisal.num.material_nochecks.b3.2 = Slagna pjäser: {n}.
+appraisal.num.material_nochecks.b4 = Slagna pjäser: {n}.
+appraisal.num.material_nochecks.b4.2 = Du tog {n:piece}.
+appraisal.num.material_nochecks.b5 = Slagna pjäser: {n}.
+appraisal.num.material_nochecks.b5.2 = Slag: {n}.
+appraisal.num.material_nochecks.b6 = Slagna pjäser: {n}.
+appraisal.num.material_nochecks.b6.2 = Slag: {n}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = Du tog tillbaka {n:move} och rättade {m} av dem. Det är så man lär sig!
+appraisal.num.takebacks.b1.2 = Du tog tillbaka {n:move}, och {m:time} hittade du ett bättre. Toppen!
+appraisal.num.takebacks.b2 = Du tog tillbaka {n:move} och rättade {m} av dem. Det är så man lär sig.
+appraisal.num.takebacks.b2.2 = Du tog tillbaka {n:move}, och {m} av dem blev bättre andra gången. Bra jobbat!
+appraisal.num.takebacks.b3 = Du tog tillbaka {n:move} och rättade {m} av dem.
+appraisal.num.takebacks.b3.2 = Tillbakatagna drag: {n}, varav {m} blev bättre. Bra.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Inga stora misstag alls – toppen!
+appraisal.num.clean.b2.2 = Inte ett enda stort misstag i det här partiet. Utmärkt!
+appraisal.num.clean.b2.3 = Du gjorde inga stora misstag. Mycket bra!
+appraisal.num.few.b2 = Bara {n:mistake} i det här partiet.
+appraisal.num.few.b2.2 = Bara {n:mistake} under hela partiet. Bra!
+appraisal.num.few.b2.3 = Bara {n:mistake} att tala om. Bra gjort.
+appraisal.num.best.b2 = Du hittade bästa draget {n:time}.
+appraisal.num.best.b2.2 = Du spelade det allra bästa draget {n:time}.
+appraisal.num.best.b2.3 = Bästa draget hittade du {n:time}.
+appraisal.num.acc.b3 = Din noggrannhet var {acc:percent}, med {n:mistake} och {m:blunder}.
+appraisal.num.acc.b3.2 = {acc:percent} noggrannhet: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Du spelade med {acc:percent} noggrannhet och gjorde {n:mistake} och {m:blunder}.
+appraisal.num.acc_explain.b3 = Noggrannheten jämför dina drag med det bästa draget i varje ställning: hundra är perfekt.
+appraisal.num.acc_explain.b3.2 = Noggrannheten mäter hur nära dina drag kom de bästa. Hundra är perfekt.
+appraisal.num.acc.b4 = Noggrannhet: {acc:percent}.
+appraisal.num.acc.b4.2 = Du låg på {acc:percent}.
+appraisal.num.acc.b4.3 = {acc:percent} noggrannhet.
+appraisal.num.acc_phase.b4 = Noggrannhet {acc:percent}: {acc_phase:percent} i {text}, din starkaste fas.
+appraisal.num.acc_phase.b4.2 = {acc:percent} totalt, {acc_phase:percent} i {text}.
+appraisal.num.acc_phase.b4.3 = Du låg på {acc:percent}; bäst i {text}, med {acc_phase:percent}.
+appraisal.num.coach.b4 = Jag låg på {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Min noggrannhet var {acc_coach:percent}.
+appraisal.num.acc.b5 = Noggrannhet {acc}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Noggrannhet {acc}, med {n:inaccuracy} och {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Ur teorin i drag {k}.
+appraisal.num.book.b5.2 = Vi lämnade teorin i drag {k}.
+appraisal.num.acc.b6 = {acc} mot mina {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc} mot {acc_coach}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Noggrannhet {acc}, min {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Noggrannhet {acc}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Noggrannhet {acc}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = En sak att öva på: {theme}.
+appraisal.improve.theme.b1.2 = Ett tips till nästa gång: tänk på {theme}.
+appraisal.improve.theme.b1.3 = Något att jobba på: {theme}.
+appraisal.improve.theme.b2 = Något att öva på: {theme}.
+appraisal.improve.theme.b2.2 = En idé till nästa gång: {theme}.
+appraisal.improve.theme.b2.3 = Något bra att träna på: {theme}.
+appraisal.improve.theme.b3 = Ett tema i det här partiet: {theme}.
+appraisal.improve.theme.b3.2 = Värt att öva på: {theme}.
+appraisal.improve.theme.b4 = Ett återkommande tema: {theme}.
+appraisal.improve.theme.b4.2 = Det dök upp mer än en gång: {theme}.
+appraisal.improve.theme.b5 = Återkommande: {theme}.
+appraisal.improve.theme.b5.2 = Partiets tema: {theme}.
+appraisal.improve.theme.b6 = Återkommande: {theme}.
+appraisal.improve.theme.b6.2 = Tema: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = Partiet vände i drag {crit_no}. Till nästa gång: öva på {theme}.
+appraisal.improve.critical.b2.2 = Det avgörande ögonblicket var drag {crit_no}, {crit_move}. Något att öva på: {theme}.
+appraisal.improve.critical.b3 = Det kritiska ögonblicket var drag {crit_no}. I stället för {crit_move} var {crit_best} bättre.
+appraisal.improve.critical.b3.2 = I drag {crit_no} var {crit_best} bättre än {crit_move}. Titta först på mina forcerande drag.
+appraisal.improve.critical.b4 = Kritiskt ögonblick: drag {crit_no}, {crit_move}. {crit_best} var det bättre draget.
+appraisal.improve.critical.b4.2 = Drag {crit_no} var nyckelögonblicket: {crit_best} i stället för {crit_move}.
+appraisal.improve.critical.b5 = Drag {crit_no}: {crit_best} i stället för {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Det kritiska draget var nummer {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Drag {crit_no}: {crit_best} i stället för {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, inte {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = Drag {crit_no}: {crit_best}, inte {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words. "stå på vinst" = to have a winning position.
+appraisal.improve.was_winning.b1 = Du stod på vinst fram till drag {crit_no}. Ett tips: tänk på {theme}.
+appraisal.improve.was_winning.b1.2 = Det gick jättebra för dig fram till drag {crit_no}. Kom ihåg {theme}.
+appraisal.improve.was_winning.b2 = Du stod på vinst fram till drag {crit_no}. Tänk nästa gång på {theme}.
+appraisal.improve.was_winning.b2.2 = Fram till drag {crit_no} stod du på vinst. Något att öva på: {theme}.
+appraisal.improve.was_winning.b3 = Du stod på vinst fram till drag {crit_no}. {crit_best} hade behållit din fördel.
+appraisal.improve.was_winning.b3.2 = Fram till drag {crit_no} stod du på vinst; {crit_best} hade behållit vinsten.
+appraisal.improve.was_winning.b4 = Du stod på vinst fram till drag {crit_no}. {crit_best} hade behållit din fördel.
+appraisal.improve.was_winning.b4.2 = På vinst fram till drag {crit_no}; {crit_best} hade behållit vinsten.
+appraisal.improve.was_winning.b5 = På vinst fram till drag {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Drag {crit_no}: {crit_best} hade behållit vinsten, {eval}.
+appraisal.improve.was_winning.b6 = Drag {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} i drag {crit_no} hade behållit vinsten: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Ett tips: när du står på vinst, lämna alltid en ruta som min kung kan gå till.
+appraisal.improve.stalemate.b1.2 = Kom ihåg: mot slutet av partiet ska du före varje drag kolla att min kung fortfarande kan röra sig.
+appraisal.improve.stalemate.b2 = När du står på vinst, lämna alltid en ruta åt min kung, annars blir det patt.
+appraisal.improve.stalemate.b2.2 = Kolla nästa gång att min kung fortfarande kan röra sig innan du spelar.
+appraisal.improve.stalemate.b3 = När du står på vinst, kontrollera vid varje drag att min kung fortfarande har en ruta.
+appraisal.improve.stalemate.b3.2 = Se upp för patt i vunna slutspel: ge min kung luft.
+appraisal.improve.stalemate.b4 = I vunna slutspel: se alltid upp för patt.
+appraisal.improve.stalemate.b4.2 = Se upp för patt: det kostade vinsten här.
+appraisal.improve.stalemate.b5 = Se upp för patt i vunna slutspel.
+appraisal.improve.stalemate.b5.2 = Pattet kostade vinsten.
+appraisal.improve.stalemate.b6 = Se upp för patt.
+appraisal.improve.stalemate.b6.2 = Pattet kostade vinsten.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = I drag {n} hängde {my}. Såg du {my:den}?
+appraisal.improve.coach_hung.b1.2 = I drag {n} kunde du ta {my} gratis. Leta alltid efter pjäser som du kan ta gratis!
+appraisal.improve.coach_hung.b2 = I drag {n} hängde {my}. Såg du {my:den}?
+appraisal.improve.coach_hung.b2.2 = I drag {n} kunde du ha tagit {my} gratis.
+appraisal.improve.coach_hung.b3 = I drag {n} stod {my} oskydda{my:d_t}. Upptäckte du {my:den}?
+appraisal.improve.coach_hung.b3.2 = {my} hängde i drag {n}. Leta efter oskyddade pjäser i varje drag.
+# A clean game: keep doing it. "Ett rent parti" = a game without big mistakes.
+appraisal.improve.clean.b1 = Fortsätt att kolla att dina pjäser står säkert, som i dag.
+appraisal.improve.clean.b1.2 = Fortsätt att titta på vad jag angriper före varje drag. Det fungerar!
+appraisal.improve.clean.b1.3 = Fortsätt att spela lika noggrant!
+appraisal.improve.clean.b2 = Ett parti utan stora misstag. Fortsätt att hålla koll på mina hot så där.
+appraisal.improve.clean.b2.2 = Fortsätt som i dag: säkra pjäser, bra drag.
+appraisal.improve.clean.b3 = Ett rent parti. Fortsätt att titta på forcerande drag först.
+appraisal.improve.clean.b3.2 = Inga stora misstag: fortsätt så.
+appraisal.improve.clean.b4 = Ett rent parti. Inget större att rätta till.
+appraisal.improve.clean.b4.2 = Inga kritiska misstag.
+appraisal.improve.clean.b5 = Inga kritiska misstag.
+appraisal.improve.clean.b5.2 = Ett rent parti.
+appraisal.improve.clean.b6 = Ett rent parti.
+appraisal.improve.clean.b6.2 = Inga kritiska fel.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = ”Nybörjare” ...: always after "nivån".
+appraisal.end.b1 = Du blir bättre för varje parti. Ett till?
+appraisal.end.b1.2 = Det var roligt! Ska vi spela igen?
+appraisal.end.b1.3 = Bra kämpat! Vill du spela ett parti till?
+appraisal.end.b2 = Du blir bättre för varje parti. Ett till?
+appraisal.end.b2.2 = Bra parti. Ska vi spela igen?
+appraisal.end.b2.3 = Bra spelat. Ett parti till?
+appraisal.end.b3 = Ett stabilt parti. Redo för nästa?
+appraisal.end.b3.2 = Bra parti. Ett till?
+appraisal.end.b3.3 = Bra spelat. Ska vi köra en gång till?
+appraisal.end.b4 = Ett stabilt parti. Redo för nästa?
+appraisal.end.b4.2 = Ett parti till?
+appraisal.end.b4.3 = Bra parti. Nästa?
+appraisal.end.b5 = Ett till?
+appraisal.end.b5.2 = Nästa parti?
+appraisal.end.b5.3 = Igen?
+appraisal.end.b6 = Ett till?
+appraisal.end.b6.2 = Nästa parti?
+appraisal.end.b6.3 = Igen?
+appraisal.end.up.b1 = Du är redo för nivån {level}. Vill du prova den?
+appraisal.end.up.b1.2 = Jag tror att du är redo för nivån {level}. Ska vi prova den?
+appraisal.end.up.b2 = Du är redo för nivån {level}. Vill du prova den?
+appraisal.end.up.b2.2 = Vad sägs om nivån {level} nästa gång? Jag tror att du är redo.
+appraisal.end.up.b3 = Du har vuxit ifrån den här nivån: prova nivån {level}.
+appraisal.end.up.b3.2 = Redo för nivån {level}? Jag tror det.
+appraisal.end.up.b4 = Du har vuxit ifrån den här nivån: prova nivån {level}.
+appraisal.end.up.b4.2 = Dags för nivån {level}?
+appraisal.end.up.b5 = Prova nivån {level} nästa gång.
+appraisal.end.up.b5.2 = Nivån {level} härnäst?
+appraisal.end.up.b6 = Prova nivån {level} nästa gång.
+appraisal.end.up.b6.2 = Nivån {level} härnäst?
+appraisal.end.down.b2 = Vi tar ett parti på nivån {level} och övar på idéerna.
+appraisal.end.down.b2.2 = Vad sägs om ett parti på nivån {level}, för att öva?
+appraisal.end.down.b3 = Vill du spela ett parti på nivån {level} och öva på idéerna?
+appraisal.end.down.b3.2 = Ett parti på nivån {level} skulle kunna hjälpa dig att öva på de här idéerna.
+appraisal.end.down.b4 = Ett parti på nivån {level} kan hjälpa dig att öva på de här idéerna.
+appraisal.end.down.b4.2 = Kanske ett parti på nivån {level}, för att öva?
+appraisal.end.down.b5 = Kanske ett parti på nivån {level}?
+appraisal.end.down.b5.2 = Nivån {level}, för att öva?
+appraisal.end.down.b6 = Kanske ett parti på nivån {level}?
+appraisal.end.down.b6.2 = Nivån {level}, för att öva?

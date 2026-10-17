@@ -1,0 +1,157 @@
+# Coach speech (Greek): the commentary of the Analysis mode (src/analysis/commentary.cpp), said by
+# the voice and shown as subtitles while a finished game is replayed. Same keys and variants as
+# assets/coach/speech/en/analysis.lang (its header documents every placeholder: read it first).
+#
+# Notes for Greek:
+# - The tone: a calm, warm commentator going through the game. Short sentences (subtitles too).
+# - Nobody is "εσύ" or "εγώ" here: the players are "τα Λευκά" and "τα Μαύρα" (neuter plural,
+#   capitalised, plural verb: "Τα Λευκά κερδίζουν"). A piece comes with its side: {piece} {t1} {t2} =
+#   "ο λευκός ίππος", "τη μαύρη βασίλισσα" (common.lang owner.white / owner.black), with the forms
+#   acc (object), se (σε + article: "κάνει πιρούνι {t1:se}") and pron_acc ("{piece:pron_acc}
+#   παίρνει"). Never an article or a colour next to them.
+# - A move as subject or object is "η κίνηση {move}" / "η απάντηση {reply}" (feminine, so adjectives
+#   agree with "κίνηση"); a line of moves is "η συνέχεια {line}"; the commentators' neuter "το {best}"
+#   only in short comparisons. Nothing is glued to a move.
+# - Counted numbers (common.lang): {m:move} "ματ σε 3 κινήσεις", {pts:point} "3 μονάδες",
+#   {n:mistake} "2 λάθη", {m:blunder} "1 σοβαρό λάθος", {acc_white:percent} "87%".
+# - {opening:def} is the name with its nominative article ("η Σικελική Άμυνα"), so it stands as a
+#   subject ("Παίζεται {opening:def}.").
+# - A draw "by repetition" may be a threefold claim or a fivefold repetition: "με επανάληψη θέσης",
+#   not "τριπλή".
+
+# ---- The start ------------------------------------------------------------------------------------
+an.start = Ας ξαναδούμε μαζί αυτή την παρτίδα.
+an.start.2 = Ας δούμε αυτή την παρτίδα κίνηση προς κίνηση.
+an.start.3 = Ορίστε η παρτίδα. Ας δούμε πώς εξελίχθηκε.
+# The game starts from a position set up on the board, not from the usual start.
+an.start.setup = Αυτή η παρτίδα ξεκινά από μια θέση στημένη στη σκακιέρα. Ας τη δούμε.
+an.start.setup.2 = Μια παρτίδα από στημένη θέση. Ας δούμε πώς εξελίχθηκε.
+
+# ---- The opening (said where the game leaves the opening book) ------------------------------------
+an.opening = Παίζεται {opening:def}.
+an.opening.2 = Το άνοιγμα της παρτίδας είναι {opening:def}.
+an.book_exit = Με την κίνηση {move}, η παρτίδα βγαίνει από τη γνωστή θεωρία.
+an.book_exit.2 = Η κίνηση {move} είναι η πρώτη εκτός θεωρίας ανοιγμάτων.
+an.book_exit.3 = Η θεωρία των ανοιγμάτων τελειώνει εδώ, με την κίνηση {move}.
+
+# ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
+an.blunder = Η κίνηση {move} είναι σοβαρό λάθος.
+an.blunder.2 = Εδώ, η κίνηση {move} είναι σοβαρό σφάλμα.
+an.blunder.3 = Σοβαρό λάθος: {move}.
+an.mistake = Η κίνηση {move} είναι λάθος.
+an.mistake.2 = Η κίνηση {move} δεν είναι η σωστή εδώ.
+an.mistake.3 = Λάθος: {move}.
+# The other side had just made a mistake, and this move does not punish it.
+an.missed_chance = Η κίνηση {move} χάνει την ευκαιρία να τιμωρήσει αυτό το λάθος.
+an.missed_chance.2 = Με την κίνηση {move}, η ευκαιρία χάνεται.
+
+# What it allows ({reply} is the other side's answer).
+an.mate_allowed.one = Τώρα η απάντηση {reply:nomate} είναι ματ.
+an.mate_allowed.one.2 = Επιτρέπει την απάντηση {reply:nomate}, που είναι ματ.
+an.mate_allowed = Επιτρέπει αναγκαστικό ματ σε {m:move}, με πρώτη κίνηση {reply:nomate}.
+an.mate_allowed.2 = Τώρα υπάρχει αναγκαστικό ματ σε {m:move}, που αρχίζει με την κίνηση {reply:nomate}.
+an.fork = Τώρα η απάντηση {reply} κάνει πιρούνι {t1:se} και {t2:se}.
+an.fork.2 = Επιτρέπει την απάντηση {reply}, που απειλεί ταυτόχρονα {t1:acc} και {t2:acc}.
+an.fork.3 = Η απάντηση {reply} επιτίθεται ταυτόχρονα {t1:se} και {t2:se}.
+an.hanging = Αφήνει {piece:acc} χωρίς προστασία, και η απάντηση {reply} {piece:pron_acc} παίρνει.
+an.hanging.2 = {piece} μένει χωρίς υπερασπιστή: η απάντηση {reply} {piece:pron_acc} κερδίζει.
+an.hanging.3 = Η απάντηση {reply} απλώς παίρνει {piece:acc}, που δεν είχε υπερασπιστή.
+an.material = Η συνέχεια {line} κερδίζει {pts:point} υλικού.
+an.material.2 = Μετά, η συνέχεια {line} κερδίζει {pts:point}.
+
+# What it misses ({best} is the better move).
+an.mate_missed.one = Η κίνηση {best:nomate} ήταν ματ.
+an.mate_missed.one.2 = Με την κίνηση {best:nomate} θα ήταν ματ.
+an.mate_missed = Η κίνηση {best:nomate} θα έδινε αναγκαστικό ματ σε {m:move}.
+an.mate_missed.2 = Υπήρχε αναγκαστικό ματ σε {m:move}, με πρώτη κίνηση {best:nomate}.
+an.missed_capture = Η κίνηση {best} θα κέρδιζε {piece:acc} χωρίς αντάλλαγμα.
+an.missed_capture.2 = {piece} δεν είχε υπερασπιστή: η κίνηση {best} θα {piece:pron_acc} έπαιρνε.
+an.missed_fork = Η κίνηση {best} θα έκανε πιρούνι {t1:se} και {t2:se}.
+an.missed_fork.2 = Η κίνηση {best} ήταν πιρούνι, που απειλούσε {t1:acc} και {t2:acc}.
+
+# The better move, when nothing above named it.
+an.better = Η κίνηση {best} ήταν πιο δυνατή.
+an.better.2 = Καλύτερη ήταν η κίνηση {best}.
+an.better.3 = Πιο ακριβής ήταν η κίνηση {best}.
+
+# ---- Good moves -------------------------------------------------------------------------------------
+# A brilliant move gives material away ({piece} is the piece offered) and stands.
+an.brilliant = Η κίνηση {move} είναι λαμπρή: θυσιάζει {piece:acc}!
+an.brilliant.2 = Λαμπρή θυσία! Η κίνηση {move} προσφέρει {piece:acc}.
+an.brilliant.3 = {move}! Λαμπρή κίνηση, που προσφέρει {piece:acc}.
+an.brilliant.mate = Οδηγεί σε αναγκαστικό ματ σε {m:move}.
+an.brilliant.mate.2 = Και επιβάλλει ματ σε {m:move}.
+# The only good move: keeping a winning position, keeping the balance, staying in a difficult game,
+# or simply far better than anything else.
+an.only.win = Η κίνηση {move} είναι η μόνη που διατηρεί το πλεονέκτημα.
+an.only.win.2 = Μόνο η κίνηση {move} κρατά εδώ το πλεονέκτημα. Ωραίο εύρημα.
+an.only.hold = Η κίνηση {move} είναι η μόνη που διατηρεί την ισορροπία.
+an.only.hold.2 = Μόνο η κίνηση {move} κρατά εδώ τη θέση.
+an.only.defend = Η κίνηση {move} είναι η μόνη που συνεχίζει τη μάχη.
+an.only.defend.2 = Μόνο η κίνηση {move} κρατά εδώ την παρτίδα ζωντανή. Καλή άμυνα.
+an.only.best = Η κίνηση {move} είναι εδώ με διαφορά η πιο δυνατή.
+an.only.best.2 = Ακριβές παιχνίδι: η κίνηση {move} είναι πολύ πιο δυνατή από κάθε άλλη.
+
+# ---- Smaller remarks, in quiet moments -------------------------------------------------------------
+an.inaccuracy = Η κίνηση {move} είναι λίγο ανακριβής: πιο ακριβής ήταν η κίνηση {best}.
+an.inaccuracy.2 = Όχι ακριβώς η καλύτερη κίνηση: το {best} ήταν πιο ακριβές από το {move}.
+an.interesting = Η κίνηση {move} είναι μια ενδιαφέρουσα ιδέα, που προσφέρει {piece:acc}.
+an.interesting.2 = Ενδιαφέρουσα απόπειρα: η κίνηση {move} θυσιάζει {piece:acc}.
+
+# ---- A forced mate appears -----------------------------------------------------------------------------
+an.mate_on.white = Τα Λευκά έχουν τώρα αναγκαστικό ματ σε {m:move}.
+an.mate_on.white.2 = Από εδώ και πέρα, τα Λευκά μπορούν να επιβάλουν ματ σε {m:move}.
+an.mate_on.black = Τα Μαύρα έχουν τώρα αναγκαστικό ματ σε {m:move}.
+an.mate_on.black.2 = Από εδώ και πέρα, τα Μαύρα μπορούν να επιβάλουν ματ σε {m:move}.
+
+# ---- The end: how the game ended, then the accuracy and the errors of each side --------------------
+an.end.mate.white = Ματ. Τα Λευκά κερδίζουν την παρτίδα.
+an.end.mate.white.2 = Και αυτό είναι ματ: κερδίζουν τα Λευκά.
+an.end.mate.black = Ματ. Τα Μαύρα κερδίζουν την παρτίδα.
+an.end.mate.black.2 = Και αυτό είναι ματ: κερδίζουν τα Μαύρα.
+an.end.resigned.white = Τα Μαύρα εγκατέλειψαν, οπότε τα Λευκά κερδίζουν την παρτίδα.
+an.end.resigned.white.2 = Η παρτίδα τελειώνει εδώ: τα Μαύρα εγκαταλείπουν και τα Λευκά κερδίζουν.
+an.end.resigned.black = Τα Λευκά εγκατέλειψαν, οπότε τα Μαύρα κερδίζουν την παρτίδα.
+an.end.resigned.black.2 = Η παρτίδα τελειώνει εδώ: τα Λευκά εγκαταλείπουν και τα Μαύρα κερδίζουν.
+an.end.timeout.white = Ο χρόνος των Μαύρων τελείωσε, οπότε κερδίζουν τα Λευκά.
+an.end.timeout.white.2 = Τα Λευκά κερδίζουν στον χρόνο.
+an.end.timeout.black = Ο χρόνος των Λευκών τελείωσε, οπότε κερδίζουν τα Μαύρα.
+an.end.timeout.black.2 = Τα Μαύρα κερδίζουν στον χρόνο.
+an.end.win.white = Η παρτίδα τελειώνει με νίκη των Λευκών.
+an.end.win.white.2 = Τα Λευκά κερδίζουν την παρτίδα.
+an.end.win.black = Η παρτίδα τελειώνει με νίκη των Μαύρων.
+an.end.win.black.2 = Τα Μαύρα κερδίζουν την παρτίδα.
+an.end.stalemate = Πατ: η παρτίδα λήγει ισόπαλη.
+an.end.stalemate.2 = Είναι πατ, οπότε η παρτίδα τελειώνει ισόπαλη.
+an.end.draw.agreement = Οι παίκτες συμφώνησαν σε ισοπαλία.
+an.end.draw.agreement.2 = Η παρτίδα λήγει ισόπαλη με κοινή συμφωνία.
+an.end.draw.repetition = Η παρτίδα λήγει ισόπαλη με επανάληψη θέσης.
+an.end.draw.repetition.2 = Η ίδια θέση επανήλθε ξανά: ισοπαλία.
+an.end.draw.fifty = Η παρτίδα λήγει ισόπαλη με τον κανόνα των πενήντα κινήσεων.
+an.end.draw.fifty.2 = Πενήντα κινήσεις χωρίς αιχμαλωσία ή κίνηση πιονιού: ισοπαλία.
+an.end.draw.seventy_five = Η παρτίδα λήγει ισόπαλη με τον κανόνα των εβδομήντα πέντε κινήσεων.
+an.end.draw.seventy_five.2 = Εβδομήντα πέντε κινήσεις χωρίς αιχμαλωσία ή κίνηση πιονιού: ισοπαλία.
+an.end.draw.material = Το ματ δεν είναι πια δυνατό: η παρτίδα λήγει ισόπαλη.
+an.end.draw.material.2 = Καμία πλευρά δεν μπορεί πια να κάνει ματ, οπότε είναι ισοπαλία.
+an.end.draw = Η παρτίδα τελειώνει ισόπαλη.
+an.end.draw.2 = Ισοπαλία.
+an.end.unfinished = Η παρτίδα σταματά εδώ, χωρίς να έχει τελειώσει.
+an.end.unfinished.2 = Εδώ σταματά η παρτίδα: δεν είχε ολοκληρωθεί.
+an.end.accuracy = Ακρίβεια: {acc_white:percent} για τα Λευκά, {acc_black:percent} για τα Μαύρα.
+an.end.accuracy.2 = Τα Λευκά έπαιξαν με ακρίβεια {acc_white:percent}, τα Μαύρα με {acc_black:percent}.
+an.end.clean.white = Τα Λευκά δεν έκαναν ούτε λάθη ούτε σοβαρά λάθη.
+an.end.clean.white.2 = Το παιχνίδι των Λευκών δεν είχε σοβαρά σφάλματα.
+an.end.clean.black = Τα Μαύρα δεν έκαναν ούτε λάθη ούτε σοβαρά λάθη.
+an.end.clean.black.2 = Το παιχνίδι των Μαύρων δεν είχε σοβαρά σφάλματα.
+an.end.mistakes.white = Τα Λευκά έκαναν {n:mistake} και κανένα σοβαρό λάθος.
+an.end.mistakes.white.2 = Για τα Λευκά: {n:mistake}, κανένα σοβαρό λάθος.
+an.end.mistakes.black = Τα Μαύρα έκαναν {n:mistake} και κανένα σοβαρό λάθος.
+an.end.mistakes.black.2 = Για τα Μαύρα: {n:mistake}, κανένα σοβαρό λάθος.
+an.end.blunders.white = Τα Λευκά έκαναν {m:blunder}.
+an.end.blunders.white.2 = Για τα Λευκά: {m:blunder}.
+an.end.blunders.black = Τα Μαύρα έκαναν {m:blunder}.
+an.end.blunders.black.2 = Για τα Μαύρα: {m:blunder}.
+an.end.errors.white = Τα Λευκά έκαναν {n:mistake} και {m:blunder}.
+an.end.errors.white.2 = Για τα Λευκά: {n:mistake} και {m:blunder}.
+an.end.errors.black = Τα Μαύρα έκαναν {n:mistake} και {m:blunder}.
+an.end.errors.black.2 = Για τα Μαύρα: {n:mistake} και {m:blunder}.

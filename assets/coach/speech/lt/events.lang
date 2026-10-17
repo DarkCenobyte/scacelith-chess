@@ -1,0 +1,111 @@
+# Coach speech (Lithuanian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "tu" and is male ("aš pasiruošęs"); the player's gender is unknown: no adjective or
+# participle about the player. Greetings are "Labas!", "Sveikinu!", "Malonu tave matyti!", "Su
+# sugrįžimu!" (never "Sveikas!" / "Sveika!", "Sveikas sugrįžęs", "tu pasiruošęs", "būk ramus").
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Labas! Sužaiskime draugišką partiją. Kai tik kas nors nepasiseks, aš padėsiu.
+event.greet.l1.2 = Sveikinu! Žaisiu švelniai ir parodysiu, į ką atkreipti dėmesį.
+event.greet.l1.3 = Malonu tave matyti! Neskubėk: pasakysiu, kai kuriai nors figūrai grės pavojus.
+event.greet.l2 = Labas! Žaiskime. Kai atsiras šakutė ar surišimas, aš tau parodysiu.
+event.greet.l2.2 = Sveikinu! Vystyk figūras ir saugok savo karalių. Padėsiu tau partijos eigoje.
+event.greet.l2.3 = Vėl prie lentos! Atidžiai sek šakutes ir surišimus: jais laimimos partijos.
+event.greet.l3 = Labas! Sužaiskime tikrą partiją. Komentuosiu tavo planus ir didesnes klaidas.
+event.greet.l3.2 = Sveikinu! Pagalvok apie planą savo figūroms. Pasakysiu, kai ėjimu ką nors praleisi.
+event.greet.l3.3 = Žaiskime! Atkreipsiu tavo dėmesį į vienintelius ėjimus ir į klaidingus ėjimus.
+event.greet.l4 = Labas! Šį kartą pateiksiu įvertinimus ir parodysiu geresnius ėjimus kandidatus.
+event.greet.l4.2 = Žaiskime. Po klaidos pasakysiu, kas būtų buvę tiksliau.
+event.greet.l4.3 = Sužaidžiame kaip klube? Komentuosiu, kai pasikeis įvertinimas.
+event.greet.l5 = Žaiskime. Komentuosiu trumpai.
+event.greet.l5.2 = Aš pasiruošęs: pradėk, kai norėsi. Tik trumpi komentarai.
+event.greet.l5.3 = Sėkmės. Kalbėsiu tik tada, kai tai svarbu.
+event.greet.l6 = Sėkmės.
+event.greet.l6.2 = Žaidžiame.
+event.greet.l6.3 = Aš pasiruošęs. Komentuosiu tik kritinius momentus.
+
+# Who starts (said after the greeting).
+event.colour.white = Tu žaidi baltosiomis figūromis, tad pradedi tu.
+event.colour.white.2 = Tau tenka baltosios: pirmasis ėjimas tavo.
+event.colour.black = Aš žaidžiu baltosiomis, tad pradėsiu aš.
+event.colour.black.2 = Šį kartą tu žaidi juodosiomis: pirmas einu aš.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names (coach.level.<n>.name) chosen for assets/i18n/lt.lang: Pirmieji žingsniai,
+# Pradedantysis, Mėgėjas, Klubo žaidėjas, Stiprus klubo žaidėjas, Ekspertas.
+event.level.l1 = Pirmieji žingsniai: žaidžiu švelniai ir kiekvieną klaidą paaiškinu paprastais žodžiais.
+event.level.l2 = Pradedantysis: žaidžiu kiek stipriau ir įvardiju paprastus taktinius motyvus, pavyzdžiui, šakutes ir surišimus.
+event.level.l3 = Mėgėjas: kalbu apie planus ir pėstininkų struktūrą, rodau trumpus variantus.
+event.level.l4 = Klubo žaidėjas: įvertinimus pateikiu pėstininkais ir siūlau ėjimus kandidatus.
+event.level.l5 = Stiprus klubo žaidėjas: trumpi komentarai, o kai svarbu, ir ilgesni variantai.
+event.level.l6 = Ekspertas: žaidžiu iš visų jėgų ir komentuoju tik kritinius momentus.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Tavo ėjimas.
+event.your_move.2 = Tavo eilė.
+event.your_move.3 = Dabar tu.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Neskubėk.
+event.take_time.2 = Skubėti nėra kur: mūsų partijose laikrodžio nėra.
+# Short filler while the coach is still looking at the position.
+event.filler = Hm.
+event.filler.2 = Pažiūrėkime.
+event.filler.3 = Leisk man pažiūrėti.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Gerai, atšaukiame ėjimą.
+event.takeback.taken.2 = Gera mintis. Pažiūrėk dar kartą.
+event.takeback.taken.3 = Grąžiname atgal. Pabandyk dar kartą.
+# The player declined the offer and played on.
+event.takeback.declined = Gerai, žaidžiame toliau.
+event.takeback.declined.2 = Sutarta, partija tęsiasi.
+event.takeback.declined.3 = Tavo sprendimas. Tęskime.
+# After an explanation without an offer.
+event.play_on = Žaiskime toliau.
+event.play_on.2 = Tęskime.
+event.play_on.3 = O dabar grįžkime prie mūsų partijos.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Tokių klaidų pasitaiko visiems. Svarbu jas pastebėti.
+event.encourage.mistake.2 = Nesijaudink. Patikrink, ką puola mano paskutinis ėjimas, ir rasi.
+event.encourage.mistake.3 = Taip nutinka kiekvienam žaidėjui. Tęskime.
+# The player is behind (material or evaluation).
+event.encourage.behind = Nepasiduok: ieškok galimybių ir priversk mane paplušėti.
+event.encourage.behind.2 = Kovok toliau. Tokiose pozicijose dar viskas gali pasikeisti.
+event.encourage.behind.3 = Neprarask ramybės ir ieškok mano silpnybių.
+# The player has played several good moves in a row.
+event.encourage.well = Prieš ėjimą tikrini mano grėsmes. Šaunu.
+event.encourage.well.2 = Atsargūs, tvirti ėjimai. Taip ir toliau.
+event.encourage.well.3 = Šiandien gerai mąstai.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Sutinku. Vadinasi, lygiosios.
+event.draw.accepted.2 = Sutarta: lygiosios.
+event.draw.declined = Ne, ačiū, žaiskime toliau.
+event.draw.declined.2 = Mieliau tęsčiau.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Gerai sužaista. Sveikinu!
+event.end.win.2 = Pelnyta pergalė. Šaunu!
+event.end.win.3 = Sveikinu: įveikei mane sąžiningai.
+event.end.loss = Gera partija. Kitą kartą atsigriebsi.
+event.end.loss.2 = Ačiū už partiją. Kiekvienas pralaimėjimas ko nors pamoko.
+event.end.loss.3 = Gera kova. Pažiūrėkime, kas nutiko.
+event.end.draw = Lygiosios. Gera partija!
+event.end.draw.2 = Šį kartą nugalėtojo nėra. Gerai pakovojome.
+event.end.draw.3 = Teisingas rezultatas. Gera partija.
+event.end.resigned = Pasidavei. Vis tiek kova buvo gera.
+event.end.resigned.2 = Gerai. Ačiū už partiją.
+event.end.handshake = Paspauskime rankas.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it comes
+# after a colon or a dash, or in quotes after "tema" (a quoted title keeps its nominative).
+event.lesson.resume = Su sugrįžimu! Tęskime pamoką: {chapter}.
+event.lesson.resume.2 = Vėl labas! Sustojome ties tema „{chapter}“.
+event.lesson.next = Toliau: {chapter}.
+event.lesson.next.2 = Dabar – {chapter}.

@@ -1,0 +1,270 @@
+# Coach speech (Italian): the rules lesson (level 0, src/coach/lesson.cpp).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach with its article and possessive
+# ("la tua torre", "il mio cavallo"), with the forms of common.lang ({your:con} "con il tuo...",
+# {my:a} "al mio...", {my:lo} "lo" / "la", {your:o} the ending that agrees with the piece);
+# {sq}, {sq2}, {to}, {esc} = squares ("in {sq}", "la casa {sq}": never an article right before
+# them); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at something while
+# saying the word right after the mark. A ".spoken" key is what the voice says instead (here: file
+# letters spelled for the voice).
+# The player's gender is unknown: no adjective or participle agrees with the player ("occhio allo
+# stallo", "comportati con educazione", never "attento", "educato"). "muovere" with avere ("ha già
+# mosso") keeps the castling lines free of agreement with the king or rook.
+
+# ---- Chapter titles (said inside "Continuiamo con {chapter}.": with their article) ---------------------
+lesson.title.welcome = la scacchiera
+lesson.title.pieces = il movimento dei pezzi
+lesson.title.safety = le catture sicure e quelle rischiose
+lesson.title.check = lo scacco
+lesson.title.mate = lo scacco matto
+lesson.title.castling = l’arrocco
+lesson.title.en_passant = la presa en passant
+lesson.title.promotion = la promozione
+lesson.title.draws = lo stallo e la patta
+lesson.title.etiquette = le partite vere: punteggio, orologio e buone maniere
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Ora prova tu.
+lesson.now_you.2 = Adesso tocca a te.
+lesson.now_you.3 = Ora tu.
+# Another wrong move after the demonstration.
+lesson.almost = Quasi! Gioca la mossa che ti ho mostrato.
+lesson.almost.2 = Non proprio. Prova la mossa della mia dimostrazione.
+lesson.almost.3 = Ci sei quasi. Ricorda quello che ti ho appena mostrato.
+# A wrong move without a line of its own.
+lesson.try_again = Non è questa. Riprova.
+lesson.try_again.2 = Non questa. Fai un altro tentativo.
+lesson.try_again.3 = Proviamo ancora una volta.
+lesson.use_your = Usa {your}.
+lesson.use_your.2 = Prova {your:con}.
+lesson.watch = Guarda.
+lesson.like_this = Così.
+lesson.and_back = E torniamo indietro.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Scacco, ma il mio re scappa in {esc}.
+lesson.check_takes = Scacco, ma il mio re prende semplicemente {your}.
+lesson.check_block = Scacco, ma posso mettere un pezzo in mezzo.
+lesson.stalemate = Stallo! Il mio re non può muoversi e non è sotto scacco. È patta, anche se stavi vincendo!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Non in {sq}: {my} attacca quella casa. Il re non va mai incontro al pericolo.
+why.PathBlocked = C’è qualcosa in {@}mezzo: i pezzi non possono saltare, tranne il cavallo.
+why.WrongGeometry = {your} non si muove così.
+why.MustAnswerCheck = Sei sotto {@}scacco: prima devi pararlo.
+why.CastlingThroughCheck = Il tuo re passerebbe per la casa {sq}, e {my} la attacca.
+why.CastlingNoRights = Quel re o quella torre ha già mosso: niente arrocco.
+why.CastlingBlocked = Per arroccare, le case tra il re e la torre devono essere libere.
+why.CastlingOutOfCheck = Non puoi arroccare quando sei sotto scacco.
+why.PawnForwardBlocked = Un pedone non può catturare dritto davanti a sé: quella casa è {@}bloccata.
+why.LeavesKingInCheck = {your} è inchiodat{your:o}: se {your:lo} muovi, esponi il tuo re {my:a}.
+why.OwnPieceOnTarget = Non puoi andare su una casa occupata da un tuo pezzo.
+why.PawnCaptureNeedsVictim = Un pedone si muove in diagonale solo per catturare.
+why.EnPassantExpired = La presa en passant è possibile solo subito dopo il doppio passo del pedone.
+why.NotYourTurn = Aspetta: tocca a me.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Ciao! Sono il tuo allenatore. Impariamo insieme le regole degli scacchi, un piccolo passo alla volta.
+lesson.welcome.board = Questa è la scacchiera: sessantaquattro case, chiare e scure, otto righe da otto.
+lesson.welcome.light = La casa d’angolo alla tua {@}destra è sempre una casa chiara. Ricorda: chiara a destra.
+# Italian has no separate everyday word for "column": the line says "vertical lines are called files".
+lesson.welcome.files = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a alla {@2}h.
+# Spoken: the letter a melts into "dalla" (heard "dalla lacca" 6 times in 6); a pause after it lets it
+# through (heard 2 times in 3).
+lesson.welcome.files.spoken = Le righe verticali si chiamano colonne. Hanno una lettera, dalla {@}a, fino all’{@2}acca.
+lesson.welcome.ranks = Le righe orizzontali si chiamano traverse. Hanno un numero, da {@}uno a {@2}otto, a partire dal tuo lato.
+lesson.welcome.square = Ogni casa si indica con la sua lettera e poi con il suo numero. Questa è la casa {sq}.
+lesson.welcome.square2 = E questa è {sq}.
+lesson.welcome.kings = Questi sono i due re. Il tuo è in {sq}, il mio in {sq2}.
+lesson.welcome.ask = Tocca a te: muovi il tuo re di una casa in avanti, in {sq}.
+lesson.welcome.wrong = Questa è la casa {to}. Cerchiamo la casa {sq}: lettera e, numero due.
+lesson.welcome.ok = Perfetto. Il tuo re è in {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Ecco {your}. Si muove in linea retta, lungo colonne e traverse, di quante case vuole.
+lesson.rook.lines = Su per la colonna, {@}oppure lungo la traversa.
+lesson.rook.capture = Per catturare, un pezzo va sulla casa di un pezzo {@}avversario, che esce dalla scacchiera.
+lesson.rook.ask = Cattura {my} con la tua torre!
+lesson.rook.short = Direzione giusta! Continua a salire lungo la colonna, fino {my:a}.
+lesson.rook.rank = Così vai lungo la traversa. {my} è più su, sulla colonna.
+lesson.rook.king = Quello è il tuo re. Usa {your}, nell’angolo.
+lesson.rook.ok = Cattura riuscita! {my} esce dalla scacchiera.
+# Pieces don't jump
+lesson.jump.blocked = I pezzi non possono saltare sopra gli altri. Il tuo pedone in {sq} sbarra la strada alla torre.
+lesson.jump.knight = Solo il cavallo può saltare. Lo conosceremo presto.
+# Bishop
+lesson.bishop.intro = Ecco {your}. Si muove in diagonale, di quante case vuole.
+lesson.bishop.colour = Un alfiere resta sempre su case dello stesso colore.
+lesson.bishop.ask = {my} è sulla diagonale del tuo alfiere. Cattura{my:lo}!
+lesson.bishop.short = Diagonale giusta! Vai più avanti, fino {my:a}.
+lesson.bishop.other = Quella è l’altra diagonale. Guarda verso {my}.
+lesson.bishop.ok = Ottimo. Gli alfieri adorano le lunghe diagonali.
+# Queen
+lesson.queen.intro = Ecco {your}, il pezzo più forte. Si muove come una torre e un alfiere messi insieme.
+lesson.queen.ask = Trova {my} e cattura{my:lo} con la tua donna.
+lesson.queen.wrong = La tua donna può raggiungere {my} in una sola mossa, lungo una diagonale.
+lesson.queen.ok = Ben fatto! Tieni al sicuro la tua donna: vale moltissimo.
+# King
+lesson.king.intro = Il re si muove di una sola casa, in qualsiasi direzione.
+lesson.king.important = Il re è il pezzo più importante. Se resta in trappola, la partita è persa.
+lesson.king.ask = Anche il re può catturare. Prendi {my}!
+lesson.king.wrong = Il tuo re è proprio accanto {my:a}. Spostati sulla sua casa per catturar{my:lo}.
+lesson.king.ok = Bene! Il re è lento, ma da vicino è forte.
+# Knight
+lesson.knight.intro = Ecco {your}. Si muove a L: due case dritto, poi una di lato.
+lesson.knight.intro.spoken = Ecco {your}. Si muove a elle: due case dritto, poi una di lato.
+lesson.knight.l = {@}Così. Finisce sempre su una casa dell’altro colore.
+lesson.knight.jump = Il cavallo è l’unico pezzo che può saltare sopra gli altri.
+lesson.knight.ask = Cattura {my} con il tuo cavallo!
+lesson.knight.wrong = È una vera mossa di cavallo, ma non raggiunge {my}. Prova un’altra L.
+lesson.knight.wrong.spoken = È una vera mossa di cavallo, ma non raggiunge {my}. Prova un’altra elle.
+lesson.knight.ok = Gran bel salto!
+# Pawn: moving
+lesson.pawn.intro = Ora passiamo {your:a}. Va dritto in avanti, una casa alla volta, e non torna mai indietro.
+lesson.pawn.first = Alla sua prima mossa, un pedone può avanzare di una o di due case.
+lesson.pawn.ask = Muovi il tuo pedone di due case in avanti.
+lesson.pawn.one = Questa è una casa sola: è una mossa legale, ma stavolta avanza di due.
+lesson.pawn.use = Usa il pedone.
+lesson.pawn.ok = Bene.
+# Pawn: capturing
+lesson.pawncap.blocked = Il mio pedone blocca il tuo. I pedoni non possono catturare dritto davanti a sé.
+lesson.pawncap.diagonal = Però un pedone cattura in diagonale, una casa in avanti.
+lesson.pawncap.ask = Cattura {my} con il tuo pedone.
+lesson.pawncap.use = Usa {your}: cattura in diagonale, in avanti.
+lesson.pawncap.ok = Sì! Dritto per muovere, in diagonale per catturare.
+# Values, set-up and the first moves
+lesson.values.pawn = Ogni pezzo ha un valore in punti. Un pedone vale uno.
+lesson.values.pieces = Un cavallo o un {@}alfiere, tre. Una {@2}torre, cinque. La {@3}donna, nove.
+lesson.values.king = Il re non ha prezzo: non puoi mai darlo via.
+lesson.values.trade = Cerca di non dare mai via un pezzo per meno di quanto vale.
+lesson.setup.corners = Ogni partita comincia così: le torri negli {@}angoli, poi i {@2}cavalli, poi gli {@3}alfieri.
+lesson.setup.queen = La donna sta sul suo colore: la tua donna è su una casa chiara.
+lesson.setup.king = Il re le sta accanto. Il Bianco muove sempre per primo.
+lesson.first.ask = Comincia la partita: muovi di due case il pedone davanti al tuo re, in {sq}.
+lesson.first.wrong = Anche questa è una mossa legale! Per ora, però, gioca il pedone del tuo re in {sq}, per favore.
+lesson.first.ok = Un’ottima prima mossa: apre delle linee alla tua donna e al tuo alfiere.
+lesson.first.reply = Rispondo allo stesso modo. Ora fai uscire un cavallo: salta da {sq} a {sq2}.
+lesson.first.knight_wrong = I cavalli saltano sopra i pedoni. Prova da {sq} a {sq2}.
+lesson.first.knight_ok = Perfetto. Cavalli e alfieri escono presto.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Un pezzo è difeso quando un pezzo amico può riprendere.
+lesson.safety.pawn = Il mio {@}pedone difende {my}.
+lesson.safety.free = Ma {my} non ha difensori. La tua donna attacca entrambi i pezzi.
+lesson.safety.ask = Cattura il pezzo indifeso!
+lesson.safety.watch = Guarda cosa succede.
+lesson.safety.gave = Hai dato la tua donna, che vale nove, per il mio cavallo, che vale tre.
+lesson.safety.other = Prova con l’altro pezzo.
+lesson.safety.look = Cerca il pezzo che nessuno difende.
+lesson.safety.ok = Ottimo! Chiediti sempre: quel pezzo è difeso?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = La mia torre controlla tutta la seconda traversa.
+lesson.danger.rule = Il re non può mai andare su una casa dove potrebbe essere catturato.
+lesson.danger.ask = Porta il tuo re su una casa sicura.
+lesson.danger.ok = Giusto. Lì il tuo re è al sicuro.
+lesson.check.what = La mia torre attacca il tuo re. Questo si chiama scacco.
+lesson.check.must = Quando sei sotto scacco, devi uscirne subito.
+lesson.check.ways = Ci sono tre modi: {@}muovere il re, {@2}bloccare l’attacco o {@3}catturare l’attaccante.
+lesson.check.ask = Qui, porta il tuo re fuori dallo scacco.
+lesson.check.file = La casa {to} è ancora sulla colonna della {@}mia torre. Togliti da quella linea.
+lesson.check.ok = Bene: non sei più sotto scacco.
+lesson.block.again = Di nuovo scacco! Stavolta il tuo re non ha case libere.
+lesson.block.ask = Allora blocca l’attacco: metti un pezzo in mezzo.
+lesson.block.queen = Così blocchi! Ma la mia torre potrebbe prendere la tua donna. Blocca con un pezzo che vale meno.
+lesson.block.queen_ok = Funziona. Ma ricorda: si blocca con il pezzo che vale meno.
+lesson.block.ok = Perfetto. Blocca con il pezzo di minor valore.
+lesson.capture.check = La mia donna dà scacco, proprio accanto al tuo re.
+lesson.capture.ask = Cattura l’attaccante!
+lesson.capture.king_ok = Sì! La mia donna non era difesa, quindi il tuo re poteva prenderla.
+lesson.capture.knight_ok = Sì! Il tuo cavallo ha eliminato l’attaccante.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Scacco matto: il re è sotto scacco e non ha via di scampo. Così si vince la partita.
+lesson.mate1.stuck = Il mio re è bloccato dietro i {@}propri pedoni.
+lesson.mate1.ask = Dammi scacco matto in una mossa!
+lesson.mate1.wrong = Ci sei quasi! Dai scacco sulla mia ultima traversa, dove il mio re non può scappare.
+lesson.mate1.ok = Scacco matto! Questo è il matto del corridoio. Ricordalo!
+lesson.mate2.ask = Il tuo re e la tua donna lavorano in squadra. Dammi scacco matto in una mossa.
+lesson.mate2.wrong = Trova uno scacco che non lasci al mio re nessuna casa.
+lesson.mate2.ok = Scacco matto! Il tuo re protegge la donna, quindi il mio non può prenderla.
+lesson.mate2.ok_rank = Scacco matto sull’ultima traversa! Il tuo re controlla tutte le case davanti al mio.
+lesson.mate3.edge = La tua torre sulla settima traversa tiene il mio re sul bordo.
+lesson.mate3.ask = Ora usa {your} per dare scacco matto.
+lesson.mate3.free = Scacco, ma ora la settima traversa è libera e il mio re scappa.
+lesson.mate3.takes = Il mio re prende semplicemente la tua torre.
+lesson.mate3.hint = Dai scacco sull’ultima traversa con la torre che non controlla la settima.
+lesson.mate3.ok = Scacco matto! Le due torri hanno lavorato come una scala.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = L’arrocco è una mossa speciale che mette al sicuro il tuo re. Re e torre si muovono insieme.
+lesson.castle.how = Il {@}re si sposta di due case verso una torre, e la {@2}torre salta dall’altra parte del re.
+lesson.castle.ask = Tocca sempre prima il re. Ora tu: arrocca sull’ala di re.
+lesson.castle.rook = Così muovi solo la torre. Per arroccare, sposta il re di due case verso la torre.
+lesson.castle.long = Questo è l’arrocco lungo: è legale anche questo! Stavolta arrocca verso la torre più vicina.
+lesson.castle.one = Una casa sola è una normale mossa di re. Per arroccare, il re si sposta di due case.
+lesson.castle.other = Per arroccare, sposta il re di due case verso la torre in {sq}.
+lesson.castle.ok = Arrocco fatto! Il tuo re è al riparo e la tua torre è pronta a entrare in gioco.
+lesson.castle2.moved = Non puoi arroccare se il tuo re o quella torre hanno già mosso.
+lesson.castle2.attacked = Né quando sei sotto scacco, né se il tuo re attraversa una casa attaccata o ci finisce sopra.
+lesson.castle2.bishop = Il mio alfiere attacca la casa {sq}. Quindi, per ora, l’arrocco da questo lato è vietato.
+lesson.castle2.ask = Arrocca dall’altro lato.
+lesson.castle2.other = Arrocca verso l’altra torre, sull’ala di donna.
+lesson.castle2.ok = Esatto! Con l’arrocco lungo il tuo re va in {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = C’è una cattura speciale del pedone che si chiama en passant. Vuol dire «di passaggio».
+lesson.ep.watch = Guarda il mio pedone: avanza di due case e finisce proprio accanto al tuo.
+lesson.ep.how = Il tuo pedone può catturarlo come se fosse avanzato di una sola casa: in {sq}.
+lesson.ep.now = Ma solo adesso, a questa mossa. Cattura en passant!
+lesson.ep.gone = L’occasione è sfumata: l’en passant si può fare solo subito. Riproviamo.
+lesson.ep.ok = En passant! Il mio pedone in {sq} esce dalla scacchiera.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Quando un pedone raggiunge l’ultima traversa, viene promosso: diventa donna, torre, alfiere o cavallo.
+lesson.promo.ask = Quasi sempre si sceglie la donna. Ora promuovi il tuo pedone!
+lesson.promo.under = Si può fare! Ma la donna è più forte. Scegliamo la donna.
+lesson.promo.under_ok = Va bene. Però quasi tutti i giocatori scelgono la donna.
+lesson.promo.push = Spingi il tuo pedone fino all’ultima traversa, in {sq}.
+lesson.promo.ok = Una nuova donna! Puoi avere perfino due donne contemporaneamente.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Tocca a me. Il mio re non è sotto scacco, ma {@}tutte le case intorno a lui sono attaccate.
+lesson.stale.draw = Non ho mosse legali. Questo è stallo, e la partita è patta.
+lesson.stale2.ask = Quando stai vincendo, occhio allo stallo. Dammi scacco matto in una mossa, senza stallo!
+lesson.stale2.wrong = Dai scacco sulla mia ultima traversa, dove il mio re non può scappare.
+lesson.stale2.ok = Scacco matto! Lascia sempre una mossa al re avversario, a meno che tu non gli stia dando matto.
+lesson.draws.kings = Altre patte: quando nessuno può dare scacco matto, come con due re soli, la partita è patta.
+lesson.draws.agree = I giocatori possono anche accordarsi per la patta.
+lesson.draws.repeat = Anche ripetere tre volte la stessa posizione, o fare cinquanta mosse senza catture né mosse di pedone, permette la patta.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Ora conosci tutte le regole degli scacchi. Ben fatto!
+lesson.talk.real = Lascia che ti racconti come si giocano le partite vere.
+lesson.talk.elo = I giocatori hanno un punteggio, chiamato Elo. Sale quando vinci e scende quando perdi.
+lesson.talk.elo_gap = Battere un giocatore più forte fa guadagnare più punti; perdere contro uno più debole ne fa perdere di più.
+lesson.talk.elo_start = Il tuo punteggio compare dopo cinque partite classificate. Le partite con me sono un allenamento, quindi non sono classificate.
+lesson.talk.clock = Questo è un {@}orologio da scacchi. Ogni giocatore ha il suo tempo, che scorre solo durante il suo turno.
+lesson.talk.press = Dopo la tua mossa, premi l’orologio con la stessa mano. Così fai partire il mio tempo.
+lesson.talk.flag = Se il tuo tempo finisce, perdi, a meno che io non abbia alcun modo di darti scacco matto.
+lesson.talk.increment = Cinque più tre significa cinque minuti a testa, più tre secondi dopo ogni mossa.
+lesson.talk.speeds = Secondo la durata, si parla di cadenza blitz per le partite brevi, rapid per quelle più lunghe e classica per le più lunghe di tutte.
+lesson.talk.no_clock = Con me l’orologio è spento. Prenditi tutto il tempo che ti serve per pensare.
+lesson.talk.touch = In una partita vera, se tocchi uno dei tuoi pezzi, devi muoverlo.
+lesson.talk.touch_mine = Se tocchi uno dei miei pezzi, devi catturarlo, se puoi.
+# "Acconcio" is the Italian word (FSI) for "j'adoube".
+lesson.talk.adjust = Per sistemare un pezzo senza muoverlo, prima di’ «acconcio».
+lesson.talk.release = Quando lasci un pezzo su una nuova casa, la mossa è fatta.
+lesson.talk.sheet = Nei tornei, entrambi i giocatori scrivono ogni mossa su un {@}formulario.
+# {move:letters} shows the Italian scoresheet letters ("Cf3"), which is what this line teaches.
+lesson.talk.notation = Si scrive la lettera del pezzo e la casa, come {move:letters}. Per i pedoni basta la casa.
+lesson.talk.robot = Il tuo robot scrive le mosse al posto tuo. Nelle partite veloci non è obbligatorio scriverle.
+lesson.talk.handshake = Le partite cominciano e finiscono con una stretta di mano. Vuol dire: bella partita, e grazie.
+lesson.talk.polite = Che tu vinca o che tu perda, comportati sempre con educazione e non disturbare mai l’avversario mentre pensa.
+lesson.talk.tips = Tre consigli per le tue partite: {@}controlla il centro, {@2}sviluppa cavalli e alfieri e {@3}arrocca presto.
+lesson.talk.next = Quando vuoi, scegli «Primi passi». Ci andrò piano e ti aiuterò dopo ogni errore.
+lesson.talk.welcome = Ti do il benvenuto nel mondo degli scacchi! Stringiamoci la mano.

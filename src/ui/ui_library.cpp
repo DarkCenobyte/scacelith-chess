@@ -363,6 +363,7 @@ struct Details {
     std::string opening, reason;
     std::vector<TagLine> tags;         // fitted to tagsWidth
     float tagsWidth = -1.0f;
+    float tagsNameWidth = 0.0f;        // the names' column
 };
 
 struct LibraryState {
@@ -649,17 +650,24 @@ float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const R
     // Every tag: its name (translated when common), its value.
     im::sectionLabel(T("library.section.tags"), x, y, w);
     y += 34.0f;
-    const float nameW = std::min(210.0f, w * 0.36f);
     TextStyle ns = style(font::FACE_TITLE, 15.0f, withAlpha(gold, 0.85f), im::startAlign(), 0.12f);
     TextStyle vs = style(font::FACE_TEXT, 21.0f, ivoryDim, im::startAlign());
-    // Fitted once per game and column width: a game can carry 128 tags of 2 KB each.
+    // Fitted once per game and column width: a game can carry 128 tags of 2 KB each. The names'
+    // column is 210 wide (36 % of a narrow one), wider, up to half the width, when a translated
+    // name needs it at 75 % of its size.
     if (d.tagsWidth != w) {
         d.tags.clear();
         d.tagsWidth = w;
+        const float base = std::min(210.0f, w * 0.36f);
+        float widest = 0.0f;
+        for (const chess::pgn::Tag& t : d.record.tags)
+            if (t.name != "ScacelithEnd") widest = std::max(widest, gfx::textWidth(uni::toUpper(tagLabel(t.name), i18n::language()), ns));
+        d.tagsNameWidth = std::clamp(widest * 0.75f + 14.0f, base, std::max(base, w * 0.5f));
+        const float nameW = d.tagsNameWidth;
         for (const chess::pgn::Tag& t : d.record.tags) {
             if (t.name == "ScacelithEnd") continue;  // shown as the reason
             TagLine line;
-            line.label = uni::toUpper(tagLabel(t.name));
+            line.label = uni::toUpper(tagLabel(t.name), i18n::language());
             TextStyle n = ns;
             n.size = gfx::fitSize(line.label, n, nameW - 14.0f, 0.75f);
             line.label = elide(line.label, n, nameW - 14.0f);
@@ -678,7 +686,7 @@ float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const R
             d.tags.push_back(std::move(line));
         }
     }
-    const float rowH = 29.0f;
+    const float rowH = 29.0f, nameW = d.tagsNameWidth;
     for (const TagLine& line : d.tags) {
         if (y + rowH > area.y && y - rowH < area.b()) {  // only the rows in view are drawn
             TextStyle n = ns;
@@ -703,7 +711,7 @@ void message(const Rect& area, const std::string& head, const std::string& text,
     int lines = text.empty() ? 0 : gfx::wrapLineCount(text, w, ts);
     float h = 34.0f + float(lines) * lineH;
     float y = area.y + std::max(40.0f, (area.h - h) * 0.42f);
-    std::string hd = uni::toUpper(head);
+    std::string hd = uni::toUpper(head, i18n::language());
     hs.size = gfx::fitSize(hd, hs, w);
     gfx::text(hd, area.cx(), y, hs);
     gfx::diamond(vec2(area.cx(), y + 26.0f), 3.5f, withAlpha(gold, 0.7f));

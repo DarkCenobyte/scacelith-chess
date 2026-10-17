@@ -1,0 +1,953 @@
+# Coach speech (Slovak): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Slovak needs.
+# Register: the coach says "ty" to the player (the game menus use the formal "vy"). The coach is male
+# ("som rád", "zahral som"); the player's gender is unknown: no second-person past tense or
+# conditional ("vyhral si", "mohol by si"), no adjective or participle agreeing with the player
+# ("pripravený", "rád", "sám"): present or future tense, the neuter impersonal past ("podarilo sa ti",
+# "stačilo vziať", "dalo sa vziať") and noun phrases instead.
+# Words as in assets/i18n/sk.lang: pešiak, jazdec, strelec, veža, dáma, kráľ; šach, mat, pat, remíza,
+# rošáda (malá / veľká), branie mimochodom, premena, ťah, pole, stĺpec, rad, partiár, hodiny, Elo.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: pešiak, jazdec, strelec, kráľ (masculine animate, gender "m": accusative = genitive, "vezmi
+# môjho jazdca"), veža, dáma (feminine, gender "f"). owner.<owner>.<form> is the masculine pattern
+# (also the default), owner.<owner>.<form>.f the feminine one. Every form below is defined for all six
+# pieces and the four owners: your = tvoj, my = môj, and in the Analysis mode white = biely, black =
+# čierny ("biely jazdec", "čiernu dámu"), with the same pronoun and agreement forms.
+# Forms with the owner's word, the six cases:
+#   nom    tvoj jazdec / tvoja veža          "{your} sa takto nepohybuje."
+#   gen    tvojho jazdca / tvojej veže        "Môj kráľ stojí hneď vedľa {your:gen}."
+#   dat    tvojmu jazdcovi / tvojej veži      "{my:dat} už nič nehrozí."
+#   acc    tvojho jazdca / tvoju vežu         "Vezmi {my:acc}!"
+#   loc    tvojom jazdcovi / tvojej veži      "Pri {my:loc} nestojí žiadny obranca."
+#   ins    tvojím jazdcom / tvojou vežou       "S {your:ins} bol lepší ťah."
+# "svoj" forms, when the subject of the clause owns the piece (Slovak never says "tvoj" / "môj" there):
+#   refl_gen  svojho jazdca / svojej veže      "Mysli na bezpečnosť {your:refl_gen}."
+#   refl_dat  svojmu kráľovi / svojej veži      "Daj {your:refl_dat} okienko."
+#   refl_acc  svojho jazdca / svoju vežu        "Použi {your:refl_acc}.",
+#                                              "Nechávam {my:refl_acc} bez ochrany."
+#   refl_loc  svojom kráľovi / svojej dáme      "Premýšľaj o {your:refl_loc}."
+#   refl_ins  svojím jazdcom / svojou vežou     "Potiahni {your:refl_ins}."
+# The noun alone, no possessive (where "svoj" is heavy, or after an adjective of one's own):
+#   bare_nom bare_gen bare_dat bare_acc bare_loc bare_ins   jazdec, jazdca, jazdcovi, jazdca, jazdcovi,
+#   jazdcom: "Ťahaj {your:bare_ins}.", "Viazan{your:adj} {your:bare_nom} nekryje pole {sq}."
+# Pronouns standing for the piece (masculine / feminine, the same for every owner):
+#   pron       on / ona      the subject, only for emphasis (Slovak drops it): "{t1:pron} môže ustúpiť."
+#   pron_gen   ho / jej      unstressed genitive: "Netreba sa {my:pron_gen} báť."
+#   pron_dat   mu / jej      unstressed dative: "Nič {your:pron_dat} nehrozí."
+#   pron_acc   ho / ju       unstressed object: "Vezmi {my:pron_acc}!" (second place in its clause)
+#   spron_gen  jeho / jej    stressed genitive: "{my:spron_gen} sa neboj, sleduj {t1:acc}."
+#   spron_dat  jemu / jej    stressed dative: "{t1:spron_dat} nič nehrozí, ale {t2:dat} áno."
+#   spron_acc  jeho / ju     stressed object: "Vezmem {t2:spron_acc}, nie {t1:acc}."
+#   npron_gen  neho / nej    after a preposition with the genitive: "Okolo {your:npron_gen} nie je ani
+#                            jeden pešiak." (bez, do, od, z, u, okolo, vedľa)
+#   npron_dat  nemu / nej    after k, proti: "Moje figúry sa blížia k {your:npron_dat}."
+#   npron_acc  neho / ňu     after na, za, cez, pre: "Útočím na {your:npron_acc}."
+#   npron_loc  ňom / nej     after na, v, o, pri, po: "Pri {my:npron_loc} nestojí žiadny obranca."
+#   npron_ins  ním / ňou     after za, pred, s, nad, pod: "Za {your:npron_ins} stojí {t1}."
+#   poss       jeho / jej    "its", of something the subject does not own (else "svoj"): "{your} je
+#                            chyten{your:adj}: všetky {your:poss} únikové polia sú napadnuté."
+# Agreement endings: the piece's gender in a word that agrees with it, glued to the stem (masculine /
+# feminine). Put the piece placeholder itself first in the line: the coach points at the board on the
+# first one.
+#   adj        ý / á         "{your} je viazan{your:adj}." (viazaný / viazaná), "{t1}, ktor{t1:adj} ..."
+#   adj_short  y / a         after a long syllable: "{your} musí byť aktívn{your:adj_short}."
+#   adj_soft   í / ia        "{my} je lacnejš{my:adj_soft} ako {your}." (lacnejší / lacnejšia)
+#   adj_gen    ého / ej      "{t1}, bez ktor{t1:adj_gen} ..."
+#   adj_dat    ému / ej      "{t1}, ktor{t1:adj_dat} nič nehrozí"
+#   adj_acc    ého / ú       "{reply} nechá {piece:acc} nekryt{piece:adj_acc}." (nekrytého / nekrytú)
+#   adj_loc    om / ej       "{your}, o ktor{your:adj_loc} hovorím"
+#   adj_ins    ým / ou       "{your}, za ktor{your:adj_ins} stojí {t1}"
+#                            (the oblique endings are long: use them after a short syllable, as in
+#                            ktor-, nekryt-, chránen-, viazan-)
+#   past       - / a         past tense in -l: "{my} bol{my:past} nekryt{my:adj}." (bol / bola),
+#                            "{your} mal{your:past} lepší ťah.", visel / visela, zostal / zostala
+#   past_ol    ol / la       "{your} moh{your:past_ol} ísť na pole {sq}." (mohol / mohla), padol / padla
+#   past_iel   iel / la      "{my} uš{my:past_iel}." (ušiel / ušla), odišiel / odišla, prišiel / prišla
+# A piece as subject is never followed by a past tense, an adjective or a participle without one of
+# these endings (the present tense needs none: "{my} napáda {your:acc}"). Two pieces together ("{t1} a
+# {t2}") would need a plural depending on both: rephrase ("obe figúry sú napadnuté", "napádam {t1:acc}
+# aj {t2:acc}").
+# Prepositions s, z, k, v become so, zo, ku, vo before some words ("so strelcom", "ku kráľovi", "vo
+# veži"): never put them before bare_* forms. Before the other forms they are fixed: "s {your:ins}",
+# "k {my:dat}", "v {your:loc}", "z {my:gen}", but "so {your:refl_ins}", "zo {your:refl_gen}" (svoj-),
+# and "s {my:npron_ins}", "k {my:npron_dat}", "z {my:npron_gen}" (ním, nemu, neho).
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = f
+piece.king.gender = m
+piece.pawn.nom = pešiak
+piece.pawn.gen = pešiaka
+piece.pawn.dat = pešiakovi
+piece.pawn.acc = pešiaka
+piece.pawn.loc = pešiakovi
+piece.pawn.ins = pešiakom
+piece.knight.nom = jazdec
+piece.knight.gen = jazdca
+piece.knight.dat = jazdcovi
+piece.knight.acc = jazdca
+piece.knight.loc = jazdcovi
+piece.knight.ins = jazdcom
+piece.bishop.nom = strelec
+piece.bishop.gen = strelca
+piece.bishop.dat = strelcovi
+piece.bishop.acc = strelca
+piece.bishop.loc = strelcovi
+piece.bishop.ins = strelcom
+piece.rook.nom = veža
+piece.rook.gen = veže
+piece.rook.dat = veži
+piece.rook.acc = vežu
+piece.rook.loc = veži
+piece.rook.ins = vežou
+piece.queen.nom = dáma
+piece.queen.gen = dámy
+piece.queen.dat = dáme
+piece.queen.acc = dámu
+piece.queen.loc = dáme
+piece.queen.ins = dámou
+piece.king.nom = kráľ
+piece.king.gen = kráľa
+piece.king.dat = kráľovi
+piece.king.acc = kráľa
+piece.king.loc = kráľovi
+piece.king.ins = kráľom
+owner.your.nom = tvoj {piece}
+owner.your.nom.f = tvoja {piece}
+owner.your.gen = tvojho {piece}
+owner.your.gen.f = tvojej {piece}
+owner.your.dat = tvojmu {piece}
+owner.your.dat.f = tvojej {piece}
+owner.your.acc = tvojho {piece}
+owner.your.acc.f = tvoju {piece}
+owner.your.loc = tvojom {piece}
+owner.your.loc.f = tvojej {piece}
+owner.your.ins = tvojím {piece}
+owner.your.ins.f = tvojou {piece}
+owner.my.nom = môj {piece}
+owner.my.nom.f = moja {piece}
+owner.my.gen = môjho {piece}
+owner.my.gen.f = mojej {piece}
+owner.my.dat = môjmu {piece}
+owner.my.dat.f = mojej {piece}
+owner.my.acc = môjho {piece}
+owner.my.acc.f = moju {piece}
+owner.my.loc = mojom {piece}
+owner.my.loc.f = mojej {piece}
+owner.my.ins = mojím {piece}
+owner.my.ins.f = mojou {piece}
+owner.white.nom = biely {piece}
+owner.white.nom.f = biela {piece}
+owner.white.gen = bieleho {piece}
+owner.white.gen.f = bielej {piece}
+owner.white.dat = bielemu {piece}
+owner.white.dat.f = bielej {piece}
+owner.white.acc = bieleho {piece}
+owner.white.acc.f = bielu {piece}
+owner.white.loc = bielom {piece}
+owner.white.loc.f = bielej {piece}
+owner.white.ins = bielym {piece}
+owner.white.ins.f = bielou {piece}
+owner.black.nom = čierny {piece}
+owner.black.nom.f = čierna {piece}
+owner.black.gen = čierneho {piece}
+owner.black.gen.f = čiernej {piece}
+owner.black.dat = čiernemu {piece}
+owner.black.dat.f = čiernej {piece}
+owner.black.acc = čierneho {piece}
+owner.black.acc.f = čiernu {piece}
+owner.black.loc = čiernom {piece}
+owner.black.loc.f = čiernej {piece}
+owner.black.ins = čiernym {piece}
+owner.black.ins.f = čiernou {piece}
+# "svoj" (refl_*): the noun in its case, "svoj" for every owner.
+piece.pawn.refl_gen = pešiaka
+piece.pawn.refl_dat = pešiakovi
+piece.pawn.refl_acc = pešiaka
+piece.pawn.refl_loc = pešiakovi
+piece.pawn.refl_ins = pešiakom
+piece.knight.refl_gen = jazdca
+piece.knight.refl_dat = jazdcovi
+piece.knight.refl_acc = jazdca
+piece.knight.refl_loc = jazdcovi
+piece.knight.refl_ins = jazdcom
+piece.bishop.refl_gen = strelca
+piece.bishop.refl_dat = strelcovi
+piece.bishop.refl_acc = strelca
+piece.bishop.refl_loc = strelcovi
+piece.bishop.refl_ins = strelcom
+piece.rook.refl_gen = veže
+piece.rook.refl_dat = veži
+piece.rook.refl_acc = vežu
+piece.rook.refl_loc = veži
+piece.rook.refl_ins = vežou
+piece.queen.refl_gen = dámy
+piece.queen.refl_dat = dáme
+piece.queen.refl_acc = dámu
+piece.queen.refl_loc = dáme
+piece.queen.refl_ins = dámou
+piece.king.refl_gen = kráľa
+piece.king.refl_dat = kráľovi
+piece.king.refl_acc = kráľa
+piece.king.refl_loc = kráľovi
+piece.king.refl_ins = kráľom
+owner.your.refl_gen = svojho {piece}
+owner.your.refl_gen.f = svojej {piece}
+owner.your.refl_dat = svojmu {piece}
+owner.your.refl_dat.f = svojej {piece}
+owner.your.refl_acc = svojho {piece}
+owner.your.refl_acc.f = svoju {piece}
+owner.your.refl_loc = svojom {piece}
+owner.your.refl_loc.f = svojej {piece}
+owner.your.refl_ins = svojím {piece}
+owner.your.refl_ins.f = svojou {piece}
+owner.my.refl_gen = svojho {piece}
+owner.my.refl_gen.f = svojej {piece}
+owner.my.refl_dat = svojmu {piece}
+owner.my.refl_dat.f = svojej {piece}
+owner.my.refl_acc = svojho {piece}
+owner.my.refl_acc.f = svoju {piece}
+owner.my.refl_loc = svojom {piece}
+owner.my.refl_loc.f = svojej {piece}
+owner.my.refl_ins = svojím {piece}
+owner.my.refl_ins.f = svojou {piece}
+owner.white.refl_gen = svojho {piece}
+owner.white.refl_gen.f = svojej {piece}
+owner.white.refl_dat = svojmu {piece}
+owner.white.refl_dat.f = svojej {piece}
+owner.white.refl_acc = svojho {piece}
+owner.white.refl_acc.f = svoju {piece}
+owner.white.refl_loc = svojom {piece}
+owner.white.refl_loc.f = svojej {piece}
+owner.white.refl_ins = svojím {piece}
+owner.white.refl_ins.f = svojou {piece}
+owner.black.refl_gen = svojho {piece}
+owner.black.refl_gen.f = svojej {piece}
+owner.black.refl_dat = svojmu {piece}
+owner.black.refl_dat.f = svojej {piece}
+owner.black.refl_acc = svojho {piece}
+owner.black.refl_acc.f = svoju {piece}
+owner.black.refl_loc = svojom {piece}
+owner.black.refl_loc.f = svojej {piece}
+owner.black.refl_ins = svojím {piece}
+owner.black.refl_ins.f = svojou {piece}
+# The noun alone (bare_*).
+piece.pawn.bare_nom = pešiak
+piece.pawn.bare_gen = pešiaka
+piece.pawn.bare_dat = pešiakovi
+piece.pawn.bare_acc = pešiaka
+piece.pawn.bare_loc = pešiakovi
+piece.pawn.bare_ins = pešiakom
+piece.knight.bare_nom = jazdec
+piece.knight.bare_gen = jazdca
+piece.knight.bare_dat = jazdcovi
+piece.knight.bare_acc = jazdca
+piece.knight.bare_loc = jazdcovi
+piece.knight.bare_ins = jazdcom
+piece.bishop.bare_nom = strelec
+piece.bishop.bare_gen = strelca
+piece.bishop.bare_dat = strelcovi
+piece.bishop.bare_acc = strelca
+piece.bishop.bare_loc = strelcovi
+piece.bishop.bare_ins = strelcom
+piece.rook.bare_nom = veža
+piece.rook.bare_gen = veže
+piece.rook.bare_dat = veži
+piece.rook.bare_acc = vežu
+piece.rook.bare_loc = veži
+piece.rook.bare_ins = vežou
+piece.queen.bare_nom = dáma
+piece.queen.bare_gen = dámy
+piece.queen.bare_dat = dáme
+piece.queen.bare_acc = dámu
+piece.queen.bare_loc = dáme
+piece.queen.bare_ins = dámou
+piece.king.bare_nom = kráľ
+piece.king.bare_gen = kráľa
+piece.king.bare_dat = kráľovi
+piece.king.bare_acc = kráľa
+piece.king.bare_loc = kráľovi
+piece.king.bare_ins = kráľom
+owner.your.bare_nom = {piece}
+owner.your.bare_gen = {piece}
+owner.your.bare_dat = {piece}
+owner.your.bare_acc = {piece}
+owner.your.bare_loc = {piece}
+owner.your.bare_ins = {piece}
+owner.my.bare_nom = {piece}
+owner.my.bare_gen = {piece}
+owner.my.bare_dat = {piece}
+owner.my.bare_acc = {piece}
+owner.my.bare_loc = {piece}
+owner.my.bare_ins = {piece}
+owner.white.bare_nom = {piece}
+owner.white.bare_gen = {piece}
+owner.white.bare_dat = {piece}
+owner.white.bare_acc = {piece}
+owner.white.bare_loc = {piece}
+owner.white.bare_ins = {piece}
+owner.black.bare_nom = {piece}
+owner.black.bare_gen = {piece}
+owner.black.bare_dat = {piece}
+owner.black.bare_acc = {piece}
+owner.black.bare_loc = {piece}
+owner.black.bare_ins = {piece}
+# Pronouns.
+piece.pawn.pron = on
+piece.pawn.pron_gen = ho
+piece.pawn.pron_dat = mu
+piece.pawn.pron_acc = ho
+piece.pawn.spron_gen = jeho
+piece.pawn.spron_dat = jemu
+piece.pawn.spron_acc = jeho
+piece.pawn.npron_gen = neho
+piece.pawn.npron_dat = nemu
+piece.pawn.npron_acc = neho
+piece.pawn.npron_loc = ňom
+piece.pawn.npron_ins = ním
+piece.pawn.poss = jeho
+piece.knight.pron = on
+piece.knight.pron_gen = ho
+piece.knight.pron_dat = mu
+piece.knight.pron_acc = ho
+piece.knight.spron_gen = jeho
+piece.knight.spron_dat = jemu
+piece.knight.spron_acc = jeho
+piece.knight.npron_gen = neho
+piece.knight.npron_dat = nemu
+piece.knight.npron_acc = neho
+piece.knight.npron_loc = ňom
+piece.knight.npron_ins = ním
+piece.knight.poss = jeho
+piece.bishop.pron = on
+piece.bishop.pron_gen = ho
+piece.bishop.pron_dat = mu
+piece.bishop.pron_acc = ho
+piece.bishop.spron_gen = jeho
+piece.bishop.spron_dat = jemu
+piece.bishop.spron_acc = jeho
+piece.bishop.npron_gen = neho
+piece.bishop.npron_dat = nemu
+piece.bishop.npron_acc = neho
+piece.bishop.npron_loc = ňom
+piece.bishop.npron_ins = ním
+piece.bishop.poss = jeho
+piece.rook.pron = ona
+piece.rook.pron_gen = jej
+piece.rook.pron_dat = jej
+piece.rook.pron_acc = ju
+piece.rook.spron_gen = jej
+piece.rook.spron_dat = jej
+piece.rook.spron_acc = ju
+piece.rook.npron_gen = nej
+piece.rook.npron_dat = nej
+piece.rook.npron_acc = ňu
+piece.rook.npron_loc = nej
+piece.rook.npron_ins = ňou
+piece.rook.poss = jej
+piece.queen.pron = ona
+piece.queen.pron_gen = jej
+piece.queen.pron_dat = jej
+piece.queen.pron_acc = ju
+piece.queen.spron_gen = jej
+piece.queen.spron_dat = jej
+piece.queen.spron_acc = ju
+piece.queen.npron_gen = nej
+piece.queen.npron_dat = nej
+piece.queen.npron_acc = ňu
+piece.queen.npron_loc = nej
+piece.queen.npron_ins = ňou
+piece.queen.poss = jej
+piece.king.pron = on
+piece.king.pron_gen = ho
+piece.king.pron_dat = mu
+piece.king.pron_acc = ho
+piece.king.spron_gen = jeho
+piece.king.spron_dat = jemu
+piece.king.spron_acc = jeho
+piece.king.npron_gen = neho
+piece.king.npron_dat = nemu
+piece.king.npron_acc = neho
+piece.king.npron_loc = ňom
+piece.king.npron_ins = ním
+piece.king.poss = jeho
+owner.your.pron = {piece}
+owner.your.pron_gen = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_acc = {piece}
+owner.your.spron_gen = {piece}
+owner.your.spron_dat = {piece}
+owner.your.spron_acc = {piece}
+owner.your.npron_gen = {piece}
+owner.your.npron_dat = {piece}
+owner.your.npron_acc = {piece}
+owner.your.npron_loc = {piece}
+owner.your.npron_ins = {piece}
+owner.your.poss = {piece}
+owner.my.pron = {piece}
+owner.my.pron_gen = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_acc = {piece}
+owner.my.spron_gen = {piece}
+owner.my.spron_dat = {piece}
+owner.my.spron_acc = {piece}
+owner.my.npron_gen = {piece}
+owner.my.npron_dat = {piece}
+owner.my.npron_acc = {piece}
+owner.my.npron_loc = {piece}
+owner.my.npron_ins = {piece}
+owner.my.poss = {piece}
+owner.white.pron = {piece}
+owner.white.pron_gen = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_acc = {piece}
+owner.white.spron_gen = {piece}
+owner.white.spron_dat = {piece}
+owner.white.spron_acc = {piece}
+owner.white.npron_gen = {piece}
+owner.white.npron_dat = {piece}
+owner.white.npron_acc = {piece}
+owner.white.npron_loc = {piece}
+owner.white.npron_ins = {piece}
+owner.white.poss = {piece}
+owner.black.pron = {piece}
+owner.black.pron_gen = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_acc = {piece}
+owner.black.spron_gen = {piece}
+owner.black.spron_dat = {piece}
+owner.black.spron_acc = {piece}
+owner.black.npron_gen = {piece}
+owner.black.npron_dat = {piece}
+owner.black.npron_acc = {piece}
+owner.black.npron_loc = {piece}
+owner.black.npron_ins = {piece}
+owner.black.poss = {piece}
+# Agreement endings (empty for the masculine past tense).
+piece.pawn.adj = ý
+piece.pawn.adj_short = y
+piece.pawn.adj_soft = í
+piece.pawn.adj_gen = ého
+piece.pawn.adj_dat = ému
+piece.pawn.adj_acc = ého
+piece.pawn.adj_loc = om
+piece.pawn.adj_ins = ým
+piece.pawn.past =
+piece.pawn.past_ol = ol
+piece.pawn.past_iel = iel
+piece.knight.adj = ý
+piece.knight.adj_short = y
+piece.knight.adj_soft = í
+piece.knight.adj_gen = ého
+piece.knight.adj_dat = ému
+piece.knight.adj_acc = ého
+piece.knight.adj_loc = om
+piece.knight.adj_ins = ým
+piece.knight.past =
+piece.knight.past_ol = ol
+piece.knight.past_iel = iel
+piece.bishop.adj = ý
+piece.bishop.adj_short = y
+piece.bishop.adj_soft = í
+piece.bishop.adj_gen = ého
+piece.bishop.adj_dat = ému
+piece.bishop.adj_acc = ého
+piece.bishop.adj_loc = om
+piece.bishop.adj_ins = ým
+piece.bishop.past =
+piece.bishop.past_ol = ol
+piece.bishop.past_iel = iel
+piece.rook.adj = á
+piece.rook.adj_short = a
+piece.rook.adj_soft = ia
+piece.rook.adj_gen = ej
+piece.rook.adj_dat = ej
+piece.rook.adj_acc = ú
+piece.rook.adj_loc = ej
+piece.rook.adj_ins = ou
+piece.rook.past = a
+piece.rook.past_ol = la
+piece.rook.past_iel = la
+piece.queen.adj = á
+piece.queen.adj_short = a
+piece.queen.adj_soft = ia
+piece.queen.adj_gen = ej
+piece.queen.adj_dat = ej
+piece.queen.adj_acc = ú
+piece.queen.adj_loc = ej
+piece.queen.adj_ins = ou
+piece.queen.past = a
+piece.queen.past_ol = la
+piece.queen.past_iel = la
+piece.king.adj = ý
+piece.king.adj_short = y
+piece.king.adj_soft = í
+piece.king.adj_gen = ého
+piece.king.adj_dat = ému
+piece.king.adj_acc = ého
+piece.king.adj_loc = om
+piece.king.adj_ins = ým
+piece.king.past =
+piece.king.past_ol = ol
+piece.king.past_iel = iel
+owner.your.adj = {piece}
+owner.your.adj_short = {piece}
+owner.your.adj_soft = {piece}
+owner.your.adj_gen = {piece}
+owner.your.adj_dat = {piece}
+owner.your.adj_acc = {piece}
+owner.your.adj_loc = {piece}
+owner.your.adj_ins = {piece}
+owner.your.past = {piece}
+owner.your.past_ol = {piece}
+owner.your.past_iel = {piece}
+owner.my.adj = {piece}
+owner.my.adj_short = {piece}
+owner.my.adj_soft = {piece}
+owner.my.adj_gen = {piece}
+owner.my.adj_dat = {piece}
+owner.my.adj_acc = {piece}
+owner.my.adj_loc = {piece}
+owner.my.adj_ins = {piece}
+owner.my.past = {piece}
+owner.my.past_ol = {piece}
+owner.my.past_iel = {piece}
+owner.white.adj = {piece}
+owner.white.adj_short = {piece}
+owner.white.adj_soft = {piece}
+owner.white.adj_gen = {piece}
+owner.white.adj_dat = {piece}
+owner.white.adj_acc = {piece}
+owner.white.adj_loc = {piece}
+owner.white.adj_ins = {piece}
+owner.white.past = {piece}
+owner.white.past_ol = {piece}
+owner.white.past_iel = {piece}
+owner.black.adj = {piece}
+owner.black.adj_short = {piece}
+owner.black.adj_soft = {piece}
+owner.black.adj_gen = {piece}
+owner.black.adj_dat = {piece}
+owner.black.adj_acc = {piece}
+owner.black.adj_loc = {piece}
+owner.black.adj_ins = {piece}
+owner.black.past = {piece}
+owner.black.past_ol = {piece}
+owner.black.past_iel = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares are always "e4". The voice says the Slovak letter names (á, bé, cé, dé, é, ef, gé,
+# há: "a" alone would be the conjunction "a") and the rank as a plain number: e4 = "é štyri", f3 = "ef
+# tri", a1 = "á jeden", h7 = "há sedem".
+square.spoken = {file} {rank}
+file.a.spoken = á
+file.b.spoken = bé
+file.c.spoken = cé
+file.d.spoken = dé
+file.e.spoken = é
+file.f.spoken = ef
+file.g.spoken = gé
+file.h.spoken = há
+rank.1.spoken = jeden
+rank.2.spoken = dva
+rank.3.spoken = tri
+rank.4.spoken = štyri
+rank.5.spoken = päť
+rank.6.spoken = šesť
+rank.7.spoken = sedem
+rank.8.spoken = osem
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Slovak scoresheet letters: K(ráľ) D(áma) V(eža) S(trelec) J(azdec): "Jf3", "Vad1", "Kxe2".
+move.letters = K D V S J
+# Spoken as Slovak players read notation: "jazdec ef tri", "jazdec berie na é päť", "jazdec bé dé
+# sedem", "dé berie na é päť", "pešiak berie späť" (a recapture in a line), "malá rošáda", "dáma gé
+# štyri, šach". {piece} is always the nominative here, so the promotion says "z pešiaka sa stáva dáma"
+# ("premena na" would need the accusative "na dámu").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} berie na {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} berie na {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} berie na {to}
+move.recapture.spoken = {piece} berie späť
+move.castle_short.spoken = malá rošáda
+move.castle_long.spoken = veľká rošáda
+move.promotion.spoken = {move} a z pešiaka sa stáva {piece}
+move.check.spoken = {move}, šach
+move.mate.spoken = {move}, mat
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: Slovak says
+# "branie mimochodom", not "en passant" (the pronunciation pass adds respellings later).
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words; the plain word is the masculine inanimate nominative ("jeden ťah", "dva body").
+# Slovak writes 21-99 and 101-999 as one word ("dvadsaťjeden", "stodvadsaťpäť"): the voice gets them
+# as separate words ("dvadsať jeden", "sto dvadsať päť"), which it reads more reliably and which sound
+# the same. Every hundred is listed. Forms ("{n:f}" looks up number.<n>.f.spoken first, a number
+# without its own form says the plain word):
+#   f     feminine 1-2: jedna, dve           ("jedna chyba", "dve figúry")
+#   neut  neuter 1-2: jedno, dve             ("jedno pole", "dve percentá")
+#   fa    feminine accusative 1: jednu       ("vzal som jednu figúru")
+#   an    masculine animate 2-4: dvaja, traja, štyria   ("dvaja pešiaci", "traja útočníci")
+#   ma    masculine animate accusative 1-4: jedného, dvoch, troch, štyroch   ("jedného pešiaka")
+# Compounds ending in 1-4 (21, 32, 103 ...) never take these forms: the noun after them is in the
+# genitive plural with the plain compound ("dvadsaťjeden ťahov", "dvadsaťdva chýb"), which is the
+# plural rule's "other" form, where every count.* key below says the plain {n}.
+number.0.spoken = nula
+number.1.spoken = jeden
+number.1.f.spoken = jedna
+number.1.neut.spoken = jedno
+number.1.fa.spoken = jednu
+number.1.ma.spoken = jedného
+number.2.spoken = dva
+number.2.f.spoken = dve
+number.2.neut.spoken = dve
+number.2.an.spoken = dvaja
+number.2.ma.spoken = dvoch
+number.3.spoken = tri
+number.3.an.spoken = traja
+number.3.ma.spoken = troch
+number.4.spoken = štyri
+number.4.an.spoken = štyria
+number.4.ma.spoken = štyroch
+number.5.spoken = päť
+number.6.spoken = šesť
+number.7.spoken = sedem
+number.8.spoken = osem
+number.9.spoken = deväť
+number.10.spoken = desať
+number.11.spoken = jedenásť
+number.12.spoken = dvanásť
+number.13.spoken = trinásť
+number.14.spoken = štrnásť
+number.15.spoken = pätnásť
+number.16.spoken = šestnásť
+number.17.spoken = sedemnásť
+number.18.spoken = osemnásť
+number.19.spoken = devätnásť
+number.20.spoken = dvadsať
+number.30.spoken = tridsať
+number.40.spoken = štyridsať
+number.50.spoken = päťdesiat
+number.60.spoken = šesťdesiat
+number.70.spoken = sedemdesiat
+number.80.spoken = osemdesiat
+number.90.spoken = deväťdesiat
+number.100.spoken = sto
+number.200.spoken = dvesto
+number.300.spoken = tristo
+number.400.spoken = štyristo
+number.500.spoken = päťsto
+number.600.spoken = šesťsto
+number.700.spoken = sedemsto
+number.800.spoken = osemsto
+number.900.spoken = deväťsto
+number.tens.spoken = {tens} {units}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n}sto
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = mínus {n}
+# A decimal number: Slovak writes a decimal comma ("1,3") and says an engine evaluation the way players
+# talk, "plus jeden koma tri", "mínus nula koma päť" (the bookish "jedna celá tri" changes with the
+# number: "dve celé", "päť celých").
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} koma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Slovak plural rule (assets/i18n): one (1) | few (2, 3, 4) | other (0, 5 and more, and every
+# compound: 21, 22, 102 ...). Written with digits ("3 ťahy"), spoken with the number word in the noun's
+# gender. These are nominative forms, also the accusative of the inanimate masculine and neuter nouns
+# ("potrebuješ tri ťahy", "stratil som dva body"). Feminine and animate nouns have accusative keys
+# (<noun>_acc: "vzal som ti {n:piece_acc}" = "jednu figúru / dve figúry / päť figúr"). Other cases of
+# a counted noun do not exist: rephrase with the nominative or accusative ("Vrátené ťahy: {n:move}").
+# A counted noun as the subject changes the verb with the number ("stačí jeden ťah", "stačia dva ťahy",
+# "stačí päť ťahov"): keep counted nouns as objects or after a colon.
+count.move = {n} ťah|{n} ťahy|{n} ťahov
+count.point = {n} bod|{n} body|{n} bodov
+count.pawn = {n} pešiak|{n:an} pešiaci|{n} pešiakov
+count.piece = {n:f} figúra|{n:f} figúry|{n} figúr
+count.mistake = {n:f} chyba|{n:f} chyby|{n} chýb
+count.blunder = {n:f} hrubá chyba|{n:f} hrubé chyby|{n} hrubých chýb
+count.inaccuracy = {n:f} nepresnosť|{n:f} nepresnosti|{n} nepresností
+count.game = {n:f} partia|{n:f} partie|{n} partií
+# Written "raz, 2-krát, 5-krát", spoken "raz, dvakrát, päťkrát".
+count.time = raz|{n}-krát|{n}-krát
+count.time.spoken = raz|{n}krát|{n}krát
+count.square = {n:neut} pole|{n:neut} polia|{n} polí
+count.position = {n:f} pozícia|{n:f} pozície|{n} pozícií
+# Accusatives that differ from the nominative ("jednu chybu", "jedného pešiaka", "dvoch pešiakov").
+count.pawn_acc = {n:ma} pešiaka|{n:ma} pešiakov|{n} pešiakov
+count.piece_acc = {n:fa} figúru|{n:f} figúry|{n} figúr
+count.mistake_acc = {n:fa} chybu|{n:f} chyby|{n} chýb
+count.blunder_acc = {n:fa} hrubú chybu|{n:f} hrubé chyby|{n} hrubých chýb
+count.inaccuracy_acc = {n:fa} nepresnosť|{n:f} nepresnosti|{n} nepresností
+count.game_acc = {n:fa} partiu|{n:f} partie|{n} partií
+count.position_acc = {n:fa} pozíciu|{n:f} pozície|{n} pozícií
+# More counted nouns: checks given ("{m:check}" = "2 šachy"), best moves in a row ("{n:best_move}" =
+# "3 najlepšie ťahy"), attackers and defenders of a square ("{n:attacker}" = "dvaja útočníci",
+# "{n2:defender_acc}" = "jedného obrancu"), percent ("{acc:percent}" = "85 %" in the subtitles,
+# "osemdesiat päť percent" spoken; nominative = accusative).
+count.check = {n} šach|{n} šachy|{n} šachov
+count.best_move = {n} najlepší ťah|{n} najlepšie ťahy|{n} najlepších ťahov
+count.attacker = {n} útočník|{n:an} útočníci|{n} útočníkov
+count.attacker_acc = {n:ma} útočníka|{n:ma} útočníkov|{n} útočníkov
+count.defender = {n} obranca|{n:an} obrancovia|{n} obrancov
+count.defender_acc = {n:ma} obrancu|{n:ma} obrancov|{n} obrancov
+count.percent = {n} %|{n} %|{n} %
+count.percent.spoken = {n:neut} percento|{n:neut} percentá|{n} percent
+# "{n:f}", "{n:neut}", "{n:fa}", "{n:an}", "{n:ma}" in a line say a bare number in that form (the
+# subtitles write the digits); they are count keys so that the form check knows them.
+count.f = {n:f}|{n:f}|{n}
+count.neut = {n:neut}|{n:neut}|{n}
+count.fa = {n:fa}|{n:f}|{n}
+count.an = {n}|{n:an}|{n}
+count.ma = {n:ma}|{n:ma}|{n}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = mínus {x}
+eval.even = 0,0
+eval.even.spoken = vyrovnané
+# "Mate in 3" as Slovak problem books and Lichess say it: "mat 3. ťahom", spoken "mat tretím ťahom"
+# ({n} here is a bare number: count keys do not apply to it, the form "ord_ins" says the ordinal).
+eval.mate_win = mat {n}. ťahom
+eval.mate_win.spoken = mat {n:ord_ins} ťahom
+eval.mate_loss = mat proti tebe {n}. ťahom
+eval.mate_loss.spoken = mat proti tebe {n:ord_ins} ťahom
+
+# ---- Move numbers: ordinals -----------------------------------------------------------------------
+# A move number is an ordinal, written with its period and spoken as a word, in the case the sentence
+# needs: "{n:ord} ťah" = "12. ťah" / "dvanásty ťah" (nominative and accusative), "do {n:ord_gen} ťahu"
+# = "do 12. ťahu" / "do dvanásteho ťahu", "k {n:ord_dat} ťahu", "v {n:ord_loc} ťahu" = "v 12. ťahu" /
+# "v dvanástom ťahu", "{n:ord_ins} ťahom" = "12. ťahom" / "dvanástym ťahom" ("mat 3. ťahom"). Always
+# put the noun ("ťah") right after it: the written period would otherwise end the sentence. Never "s"
+# or "z" right before it ("so štvrtým", "zo šiesteho" depend on the number): use v, do, od, po, k.
+# Above 20 the voice composes "dvadsať prvom" (= "dvadsaťprvom", the accepted short form of
+# "dvadsiatom prvom") and "sto dvadsiatom". 0 is "nultý".
+count.ord = {n}.|{n}.|{n}.
+count.ord.spoken = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n}.|{n}.|{n}.
+count.ord_gen.spoken = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_dat = {n}.|{n}.|{n}.
+count.ord_dat.spoken = {n:ord_dat}|{n:ord_dat}|{n:ord_dat}
+count.ord_loc = {n}.|{n}.|{n}.
+count.ord_loc.spoken = {n:ord_loc}|{n:ord_loc}|{n:ord_loc}
+count.ord_ins = {n}.|{n}.|{n}.
+count.ord_ins.spoken = {n:ord_ins}|{n:ord_ins}|{n:ord_ins}
+number.0.ord.spoken = nultý
+number.1.ord.spoken = prvý
+number.2.ord.spoken = druhý
+number.3.ord.spoken = tretí
+number.4.ord.spoken = štvrtý
+number.5.ord.spoken = piaty
+number.6.ord.spoken = šiesty
+number.7.ord.spoken = siedmy
+number.8.ord.spoken = ôsmy
+number.9.ord.spoken = deviaty
+number.10.ord.spoken = desiaty
+number.11.ord.spoken = jedenásty
+number.12.ord.spoken = dvanásty
+number.13.ord.spoken = trinásty
+number.14.ord.spoken = štrnásty
+number.15.ord.spoken = pätnásty
+number.16.ord.spoken = šestnásty
+number.17.ord.spoken = sedemnásty
+number.18.ord.spoken = osemnásty
+number.19.ord.spoken = devätnásty
+number.20.ord.spoken = dvadsiaty
+number.30.ord.spoken = tridsiaty
+number.40.ord.spoken = štyridsiaty
+number.50.ord.spoken = päťdesiaty
+number.60.ord.spoken = šesťdesiaty
+number.70.ord.spoken = sedemdesiaty
+number.80.ord.spoken = osemdesiaty
+number.90.ord.spoken = deväťdesiaty
+number.100.ord.spoken = stý
+number.200.ord.spoken = dvojstý
+number.300.ord.spoken = trojstý
+number.400.ord.spoken = štvorstý
+number.500.ord.spoken = päťstý
+number.600.ord.spoken = šesťstý
+number.700.ord.spoken = sedemstý
+number.800.ord.spoken = osemstý
+number.900.ord.spoken = deväťstý
+
+number.0.ord_gen.spoken = nultého
+number.1.ord_gen.spoken = prvého
+number.2.ord_gen.spoken = druhého
+number.3.ord_gen.spoken = tretieho
+number.4.ord_gen.spoken = štvrtého
+number.5.ord_gen.spoken = piateho
+number.6.ord_gen.spoken = šiesteho
+number.7.ord_gen.spoken = siedmeho
+number.8.ord_gen.spoken = ôsmeho
+number.9.ord_gen.spoken = deviateho
+number.10.ord_gen.spoken = desiateho
+number.11.ord_gen.spoken = jedenásteho
+number.12.ord_gen.spoken = dvanásteho
+number.13.ord_gen.spoken = trinásteho
+number.14.ord_gen.spoken = štrnásteho
+number.15.ord_gen.spoken = pätnásteho
+number.16.ord_gen.spoken = šestnásteho
+number.17.ord_gen.spoken = sedemnásteho
+number.18.ord_gen.spoken = osemnásteho
+number.19.ord_gen.spoken = devätnásteho
+number.20.ord_gen.spoken = dvadsiateho
+number.30.ord_gen.spoken = tridsiateho
+number.40.ord_gen.spoken = štyridsiateho
+number.50.ord_gen.spoken = päťdesiateho
+number.60.ord_gen.spoken = šesťdesiateho
+number.70.ord_gen.spoken = sedemdesiateho
+number.80.ord_gen.spoken = osemdesiateho
+number.90.ord_gen.spoken = deväťdesiateho
+number.100.ord_gen.spoken = stého
+number.200.ord_gen.spoken = dvojstého
+number.300.ord_gen.spoken = trojstého
+number.400.ord_gen.spoken = štvorstého
+number.500.ord_gen.spoken = päťstého
+number.600.ord_gen.spoken = šesťstého
+number.700.ord_gen.spoken = sedemstého
+number.800.ord_gen.spoken = osemstého
+number.900.ord_gen.spoken = deväťstého
+
+number.0.ord_dat.spoken = nultému
+number.1.ord_dat.spoken = prvému
+number.2.ord_dat.spoken = druhému
+number.3.ord_dat.spoken = tretiemu
+number.4.ord_dat.spoken = štvrtému
+number.5.ord_dat.spoken = piatemu
+number.6.ord_dat.spoken = šiestemu
+number.7.ord_dat.spoken = siedmemu
+number.8.ord_dat.spoken = ôsmemu
+number.9.ord_dat.spoken = deviatemu
+number.10.ord_dat.spoken = desiatemu
+number.11.ord_dat.spoken = jedenástemu
+number.12.ord_dat.spoken = dvanástemu
+number.13.ord_dat.spoken = trinástemu
+number.14.ord_dat.spoken = štrnástemu
+number.15.ord_dat.spoken = pätnástemu
+number.16.ord_dat.spoken = šestnástemu
+number.17.ord_dat.spoken = sedemnástemu
+number.18.ord_dat.spoken = osemnástemu
+number.19.ord_dat.spoken = devätnástemu
+number.20.ord_dat.spoken = dvadsiatemu
+number.30.ord_dat.spoken = tridsiatemu
+number.40.ord_dat.spoken = štyridsiatemu
+number.50.ord_dat.spoken = päťdesiatemu
+number.60.ord_dat.spoken = šesťdesiatemu
+number.70.ord_dat.spoken = sedemdesiatemu
+number.80.ord_dat.spoken = osemdesiatemu
+number.90.ord_dat.spoken = deväťdesiatemu
+number.100.ord_dat.spoken = stému
+number.200.ord_dat.spoken = dvojstému
+number.300.ord_dat.spoken = trojstému
+number.400.ord_dat.spoken = štvorstému
+number.500.ord_dat.spoken = päťstému
+number.600.ord_dat.spoken = šesťstému
+number.700.ord_dat.spoken = sedemstému
+number.800.ord_dat.spoken = osemstému
+number.900.ord_dat.spoken = deväťstému
+
+number.0.ord_loc.spoken = nultom
+number.1.ord_loc.spoken = prvom
+number.2.ord_loc.spoken = druhom
+number.3.ord_loc.spoken = treťom
+number.4.ord_loc.spoken = štvrtom
+number.5.ord_loc.spoken = piatom
+number.6.ord_loc.spoken = šiestom
+number.7.ord_loc.spoken = siedmom
+number.8.ord_loc.spoken = ôsmom
+number.9.ord_loc.spoken = deviatom
+number.10.ord_loc.spoken = desiatom
+number.11.ord_loc.spoken = jedenástom
+number.12.ord_loc.spoken = dvanástom
+number.13.ord_loc.spoken = trinástom
+number.14.ord_loc.spoken = štrnástom
+number.15.ord_loc.spoken = pätnástom
+number.16.ord_loc.spoken = šestnástom
+number.17.ord_loc.spoken = sedemnástom
+number.18.ord_loc.spoken = osemnástom
+number.19.ord_loc.spoken = devätnástom
+number.20.ord_loc.spoken = dvadsiatom
+number.30.ord_loc.spoken = tridsiatom
+number.40.ord_loc.spoken = štyridsiatom
+number.50.ord_loc.spoken = päťdesiatom
+number.60.ord_loc.spoken = šesťdesiatom
+number.70.ord_loc.spoken = sedemdesiatom
+number.80.ord_loc.spoken = osemdesiatom
+number.90.ord_loc.spoken = deväťdesiatom
+number.100.ord_loc.spoken = stom
+number.200.ord_loc.spoken = dvojstom
+number.300.ord_loc.spoken = trojstom
+number.400.ord_loc.spoken = štvorstom
+number.500.ord_loc.spoken = päťstom
+number.600.ord_loc.spoken = šesťstom
+number.700.ord_loc.spoken = sedemstom
+number.800.ord_loc.spoken = osemstom
+number.900.ord_loc.spoken = deväťstom
+
+number.0.ord_ins.spoken = nultým
+number.1.ord_ins.spoken = prvým
+number.2.ord_ins.spoken = druhým
+number.3.ord_ins.spoken = tretím
+number.4.ord_ins.spoken = štvrtým
+number.5.ord_ins.spoken = piatym
+number.6.ord_ins.spoken = šiestym
+number.7.ord_ins.spoken = siedmym
+number.8.ord_ins.spoken = ôsmym
+number.9.ord_ins.spoken = deviatym
+number.10.ord_ins.spoken = desiatym
+number.11.ord_ins.spoken = jedenástym
+number.12.ord_ins.spoken = dvanástym
+number.13.ord_ins.spoken = trinástym
+number.14.ord_ins.spoken = štrnástym
+number.15.ord_ins.spoken = pätnástym
+number.16.ord_ins.spoken = šestnástym
+number.17.ord_ins.spoken = sedemnástym
+number.18.ord_ins.spoken = osemnástym
+number.19.ord_ins.spoken = devätnástym
+number.20.ord_ins.spoken = dvadsiatym
+number.30.ord_ins.spoken = tridsiatym
+number.40.ord_ins.spoken = štyridsiatym
+number.50.ord_ins.spoken = päťdesiatym
+number.60.ord_ins.spoken = šesťdesiatym
+number.70.ord_ins.spoken = sedemdesiatym
+number.80.ord_ins.spoken = osemdesiatym
+number.90.ord_ins.spoken = deväťdesiatym
+number.100.ord_ins.spoken = stým
+number.200.ord_ins.spoken = dvojstým
+number.300.ord_ins.spoken = trojstým
+number.400.ord_ins.spoken = štvorstým
+number.500.ord_ins.spoken = päťstým
+number.600.ord_ins.spoken = šesťstým
+number.700.ord_ins.spoken = sedemstým
+number.800.ord_ins.spoken = osemstým
+number.900.ord_ins.spoken = deväťstým
+
+# ---- The phases of the game (appraisal.lang appraisal.phase.*) in other cases --------------------
+# appraisal.lang says them in the nominative: otvorenie (neuter), stredná hra, koncovka (feminine).
+# "{text:loc}" = "v otvorení / v strednej hre / v koncovke"; also gen, dat, acc, ins. The genders
+# differ: no verb or adjective agreeing with {text} ("najlepšie sa ti darilo v {text:loc}").
+appraisal.phase.opening.gen = otvorenia
+appraisal.phase.opening.dat = otvoreniu
+appraisal.phase.opening.acc = otvorenie
+appraisal.phase.opening.loc = otvorení
+appraisal.phase.opening.ins = otvorením
+appraisal.phase.middlegame.gen = strednej hry
+appraisal.phase.middlegame.dat = strednej hre
+appraisal.phase.middlegame.acc = strednú hru
+appraisal.phase.middlegame.loc = strednej hre
+appraisal.phase.middlegame.ins = strednou hrou
+appraisal.phase.endgame.gen = koncovky
+appraisal.phase.endgame.dat = koncovke
+appraisal.phase.endgame.acc = koncovku
+appraisal.phase.endgame.loc = koncovke
+appraisal.phase.endgame.ins = koncovkou

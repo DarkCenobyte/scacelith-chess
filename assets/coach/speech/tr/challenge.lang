@@ -1,0 +1,137 @@
+# Coach speech (Turkish): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 pozisyon", count.position in
+#            common.lang), "{n:move}" likewise ("2 hamle"); a bare {n} or {m} is followed by its noun
+#            ("{n} hamlede mat"): a noun after a number stays singular in Turkish
+#   {move}   one of the coach's moves, played on the board while the line is said; never a suffix
+#            after it: "{move} hamlemden sonra", "{move} ile", "cevabım {move} olurdu";
+#            "{move:nomate}" says a mating move without "şah mat" (the line says it)
+#   {your}   one of the player's pieces ("atın"), with the forms of common.lang ({your:dat} atına);
+#            the coach points at it on that word
+#   {sq}     a square, never followed by a suffix ("{sq} karesine"); the coach points at it
+# The player always has the white pieces. The coach says "sen" to the player.
+# Theme names follow the usual Turkish puzzle terms: çatal, açmaz, şiş, açarak saldırı, saptırma,
+# cezbetme, ara hamle, sessiz hamle, koridor matı.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Tek hamlede mat. {n:position} var ve her birinde tek bir hamle mat ediyor. Şah çeken bütün hamlelere bak.
+ch.intro.mate2 = İki hamlede mat. {n:position}: ilk hamlen bana hiçbir savunma bırakmamalı, sonra mat edersin.
+ch.intro.mate3 = Üç hamlede mat. {n:position}. Şah çekmeler, taş almalar ve tehditler: her seferinde en iyi cevabımı hesapla.
+ch.intro.backrank = Koridor matları. Bir şahın kendi piyonlarının arkasında sıkıştığı {n:position}.
+ch.intro.patterns = Mat kalıpları. Klasik mat ağları içeren {n:position}. Kalıbı tanı, sonra vur.
+ch.intro.hanging = Bedava taşlar. {n:position}: taşlarımdan biri korumasız kalmış. Onu bul ve al.
+ch.intro.fork = Çatallar. {n:position}: aynı anda iki şeye saldıran hamleyi bul.
+ch.intro.pin = Açmazlar. {n:position}: bir taşı açmaza al ya da bir açmazdan yararlan.
+ch.intro.skewer = Şişler. {n:position}: değerli bir taşa saldır ve arkasındakini kazan.
+ch.intro.discovered = Açarak saldırılar. {n:position}: bir taşı oynayarak başka bir taşın önünü aç.
+ch.intro.deflection = Saptırma ve cezbetme. {n:position}: bir savunucuyu görevinden uzaklaştır ya da ölümcül bir kareye çek.
+ch.intro.intermezzo = Ara hamleler. {n:position}: bariz hamleden önce daha güçlüsünü bul.
+ch.intro.trapped = Kapana kısılmış taşlar. {n:position}: taşlarımdan birinin gidecek güvenli yeri yok. Onu kazan.
+ch.intro.promotion = Terfi. İlerlemiş bir piyonun oyunu belirlediği {n:position}.
+ch.intro.quiet = Sessiz hamleler. {n:position}: kazandıran hamle ne şah ne de taş alma.
+ch.intro.opening = Açılış tuzakları. Gerçek oyunların ilk hamlelerinden {n:position}. Hatamı cezalandır.
+ch.intro.escape = Kaçış yolunu bul. {n:position}: şahın tehlikede ve onu yalnızca tek bir hamle kurtarıyor.
+ch.intro.defend = Savunma hamleleri. {n:position}: pozisyonunu ayakta tutan tek hamleyi bul.
+ch.intro.kq = Vezir ve şah, şaha karşı. {n:position}: şahımı mat et. Pata dikkat!
+ch.intro.kr = Kale ve şah, şaha karşı. {n:position}: şahımı adım adım mat et.
+ch.intro.kp = Şah ve piyon, şaha karşı. {n:position}: vezir çıkar. Yolu şahınla aç.
+ch.intro.kp_hold = Piyonu durdur. {n:position}: elinde yalnızca şahın var. Beraberliği koru.
+ch.intro.rook = Kale oyun sonları. {n:position}: terfi için köprü kur ve Philidor savunmasıyla beraberliği koru.
+ch.intro.endgame = Oyun sonu taktikleri. Az taşlı ve keskin fikirli {n:position}.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = {n} hamlede mat.
+ch.task.mate.2 = {n} hamlede matı bul.
+ch.task.hanging = Bir şey korumasız kalmış.
+ch.task.hanging.2 = Neyi bedavaya alabilirsin?
+ch.task.fork = Çatalı bul.
+ch.task.fork.2 = Bir çatal ara.
+ch.task.pin = Burada kilit nokta bir açmaz.
+ch.task.skewer = Burada bir şiş kazandırıyor.
+ch.task.discovered = Burada açarak saldırı kazandırıyor.
+ch.task.deflection = Bir savunucuya fazla iş yükle ya da onu yanlış kareye çek.
+ch.task.intermezzo = Bir ara hamle var mı, bak.
+ch.task.trapped = Taşlarımdan biri kaçamıyor. Onu kazan.
+ch.task.promotion = İlerlemiş piyonunu kullan.
+ch.task.quiet = Kazandıran hamle sessiz bir hamle.
+ch.task.opening = Son hamlemi cezalandır.
+ch.task.escape = Şahını kurtar: yalnızca tek bir hamle işe yarıyor.
+ch.task.defend = Tek iyi hamleyi bul.
+ch.task.endgame = En iyi hamleyi bul.
+ch.task.default = En iyi hamleyi bul.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Şahımı mat et. Elimden geldiğince savunacağım.
+ch.task.play.promote = Piyonunu terfi ettir ve galibiyeti elden kaçırma. Seni durdurmaya çalışacağım.
+ch.task.play.hold = {n:move} boyunca beraberliği koru. Ben kazanmaya çalışacağım.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Bu pozisyonlar gerçek oyunlardan. Son hamleyi ben oynarım, sonra sıra sende.
+ch.lead.first.2 = Her pozisyon gerçek bir oyundan alındı: o pozisyona götüren hamleyi ben oynarım, sonra sen oynarsın.
+ch.next = Sıradaki pozisyon.
+ch.next.2 = İşte sıradaki.
+ch.next.3 = Sıradakine geçelim.
+ch.last = Son pozisyon.
+ch.last.2 = Ve şimdi sonuncusu.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Güzel.
+ch.good.2 = Evet.
+ch.good.3 = Doğru.
+ch.good.4 = Aynen öyle.
+# The position is solved.
+ch.solved = İşte bu! Çok iyi.
+ch.solved.2 = Tam isabet.
+ch.solved.3 = Çok güzel.
+ch.solved.mate = Şah mat! Bravo.
+ch.solved.mate.2 = Ve mat. Çok iyi.
+ch.solved.mate.3 = Şah mat. Güzel iş.
+ch.solved.promote = Yeni bir vezir ve galibiyet garanti. Tebrikler.
+ch.solved.hold = Beraberlik korundu. İyi savundun!
+ch.solved.draw = Tahtada beraberlik. İyi savundun!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Bu değil: buna cevabım {move} olurdu.
+ch.wrong.reply.2 = Tam olmadı: {move} ile karşılık verirdim.
+ch.wrong.reply.3 = O zaman ben {move} oynardım.
+ch.wrong.mate = Dikkat: {move:nomate} ile mat ederdim.
+ch.wrong.mate.2 = Dikkat et: {move:nomate} ile cevap verirdim, bu da mat.
+ch.wrong.mated = Dikkat: {move} hamlemden sonra seni {m} hamlede zorla mat edebilirim.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Bu da mat eder, ama daha uzun sürer. Daha hızlı bir yol var.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Bu da mat eder, ama benim aklımda başka bir hamle var. Tekrar bak.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Fena değil, ama daha güçlü bir şey var. Tekrar bak.
+ch.wrong.weaker.2 = Oynanabilir, ama daha iyisini yapabilirsin.
+ch.wrong.stalemate = Pat! Şahım hareket edemiyor ve bu yalnızca beraberlik.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Bu değil: {move} hamlemden sonra beraberliği koruyabilirim.
+ch.wrong.loses = Dikkat: {move} hamlemden sonra ben kazanan durumda olurdum.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Bu değil.
+ch.try_again = Tekrar dene.
+ch.try_again.2 = Bir daha bak.
+ch.try_again.3 = Yeniden bak.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = İpucu ister misin?
+ch.offer.2 = Sana bir ipucu vereyim mi?
+ch.no_hint = Peki. Aramaya devam et.
+ch.no_hint.2 = Tamam, acele etme.
+ch.hint.piece = {your:dat} bak.
+ch.hint.piece.2 = {your:acc} düşün.
+ch.hint.square = {sq} karesine bak.
+ch.hint.square.2 = Kilit kare {sq}.
+ch.hint.square.3 = {sq} karesini gözden kaçırma.
+ch.hint.show = İşte hamle. İzle.
+ch.hint.show.2 = Sana göstereyim. İzle.
+ch.hint.now = Şimdi sen oyna.
+ch.hint.now.2 = Sıra sende: bu hamleyi oyna.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Meydan okumanın sonuna geldik. Tebrikler!
+ch.complete.2 = Bütün pozisyonlar çözüldü. Bravo!

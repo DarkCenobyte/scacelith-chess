@@ -1,0 +1,754 @@
+# Coach speech (Bulgarian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Bulgarian needs.
+# Register: the coach says "ти" to the player (the game menus use the polite "вие"). The coach is
+# male ("доволен съм", "бих взел"). The player's gender is unknown: never a form that agrees with the
+# player: no "ти си готов/готова", no l-participle ("ти си направил", "би взел", "беше пропуснал"),
+# no adjective or past passive participle about the player. Use the aorist ("ти взе", "пропусна"),
+# the imperfect ("можеше да вземеш", "щеше да спечелиш"), present, future, nouns or impersonal phrasing.
+# Terms: the standard Bulgarian chess words (шах, мат, пат, реми, рокада, ан пасан, произвеждане,
+# дебют, мителшпил, ендшпил, вилица, свръзка, линеен удар, открита атака, груба грешка, неточност).
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: пешка (f), кон (m), офицер (m), топ (m), дама (f), цар (m). Bulgarian has no cases but a
+# definite article, which has two forms on a masculine noun: the FULL article (конят, офицерът, топът,
+# царят) for the subject and after "е" ("Това е конят ти"), the SHORT one (коня, офицера, топа, царя)
+# everywhere else (direct object, after any preposition). Feminine nouns have one: пешката, дамата.
+# The possessive is normally the clitic after the article ("конят ти", "дамата ми"); the full
+# possessive ("твоят кон", "моята дама") stresses the owner (contrast, "Това е твоят кон").
+# When the owner is the subject of the clause (an imperative to the player, "I" moving my own piece,
+# "Белите" in Analysis), Bulgarian uses the reflexive "си", never "ти"/"ми": "Премести коня си",
+# "Местя офицера си", "Белите изтеглят коня си".
+# Forms (each defined for all six pieces and the owners your, my, white, black; the same for {your},
+# {your2}, {my}, {my2}, {t1}, {t2} and the Analysis {piece}, which already hold their owner: never
+# write твой, мой, ти, ми next to them):
+#   nom        конят ти / пешката ти, конят ми; белият кон / бялата пешка, черният кон / черната
+#              The subject, or the predicate after "е" ("Това е {your}." = "Това е конят ти.").
+#              "{your} е под удар." = "Конят ти е под удар."
+#   obj        коня ти / пешката ти, коня ми; белия кон / бялата пешка, черния кон / черната
+#              Object and after every preposition. "Офицерът ми напада {your:obj}." = "... коня ти.",
+#              "Вземи {my:obj} с {your:refl}!" = "Вземи офицера ми с коня си!"
+#   full       твоят кон / твоята пешка, моят кон / моята пешка; white/black as nom
+#              Subject with the stressed possessive. "Това е {your:full}." = "Това е твоят кон."
+#   full_obj   твоя кон / твоята пешка, моя кон / моята пешка; white/black as obj
+#              Object with the stressed possessive. "Вземам {your:full_obj}, не пешката." = "... твоя кон ..."
+#   refl       коня си / пешката си (every owner)
+#              The owner is the subject. "Погледни {your:refl}." = "Погледни коня си.",
+#              "Изтеглям {my:refl}." = "Изтеглям офицера си." Never the subject itself.
+#   refl_full  своя кон / своята пешка (every owner)
+#              Stressed reflexive. "Пази {your:refl_full}!" = "Пази своя цар!" After "с" write "със":
+#              "със {your:refl_full}" = "със своя кон".
+#   def        конят / пешката (no owner; every owner, so never in Analysis lines: the side is lost)
+#              Subject. "{your:def} се движи като буквата Г." = "Конят се движи като буквата Г."
+#   def_obj    коня / пешката (no owner, as def)
+#              Object. "Играй с {your:def_obj}." = "Играй с коня."
+#   bare       кон / пешка (no article, no owner, as def)
+#              "Това е {your:bare}, не офицер." = "Това е кон, не офицер."
+#   pron       той / тя: the piece as a subject pronoun (Bulgarian usually drops it: the verb is enough)
+#              "Това е {your}. {your:pron} се движи по диагонал." = "... Той се движи по диагонал."
+#   pron_obj   го / я: object clitic. "Мога да {your:pron_obj} взема." = "Мога да го взема."
+#   pron_dat   му / ѝ: dative clitic, also "its" after an articled noun. "{my} може да {your:pron_dat}
+#              даде шах." = "... може да му даде шах.", "полето {your:pron_dat}" = "полето му" (its square)
+#              The clitics go, as always in Bulgarian, right before the verb ("да го взема", "не я пази"),
+#              or right after it when the verb starts the clause ("Вземи го!"), never first in a clause.
+#   pron_full  него / нея: the stressed pronoun, after a preposition. "{t2} е точно зад {t1:pron_full}."
+#              = "Топът ти е точно зад него."
+#   rel        който / която: the relative pronoun. "{your2}, {your2:rel} пазеше {your:obj}, се
+#              премести." = "Офицерът ти, който пазеше коня ти, се премести."
+#   a          "" / "а": the ending of a past passive participle or adjective after the piece, whose
+#              feminine adds "а": "{your} е свързан{your:a}." = "Конят ти е свързан." / "Пешката ти е
+#              свързана." Only for words of that kind (свързан, нападнат, защитен, заклещен, хванат,
+#              оставен, изгубен, открит, сам); rephrase the others ("беззащитен" -> "без защита").
+# Verbs in the present, the aorist and the imperfect do not agree with gender: prefer them to
+# participles ("Конят ти виси", "Пешката ти падна"). Never put an adjective before a piece
+# placeholder ("the pinned {your}"): the article and the clitic would move to the adjective; rephrase.
+# Spoken moves use piece.<type>.nom: the bare noun ("кон еф три"), hence the phrases for nom below.
+piece.pawn.gender = f
+piece.pawn.nom = пешка
+piece.pawn.obj = пешката
+piece.pawn.full = пешка
+piece.pawn.full_obj = пешка
+piece.pawn.refl = пешката
+piece.pawn.refl_full = пешка
+piece.pawn.def = пешката
+piece.pawn.def_obj = пешката
+piece.pawn.bare = пешка
+piece.pawn.pron = тя
+piece.pawn.pron_obj = я
+piece.pawn.pron_dat = ѝ
+piece.pawn.pron_full = нея
+piece.pawn.rel = която
+piece.pawn.a = а
+piece.knight.gender = m
+piece.knight.nom = кон
+piece.knight.obj = коня
+piece.knight.full = кон
+piece.knight.full_obj = кон
+piece.knight.refl = коня
+piece.knight.refl_full = кон
+piece.knight.def = конят
+piece.knight.def_obj = коня
+piece.knight.bare = кон
+piece.knight.pron = той
+piece.knight.pron_obj = го
+piece.knight.pron_dat = му
+piece.knight.pron_full = него
+piece.knight.rel = който
+piece.knight.a =
+piece.bishop.gender = m
+piece.bishop.nom = офицер
+piece.bishop.obj = офицера
+piece.bishop.full = офицер
+piece.bishop.full_obj = офицер
+piece.bishop.refl = офицера
+piece.bishop.refl_full = офицер
+piece.bishop.def = офицерът
+piece.bishop.def_obj = офицера
+piece.bishop.bare = офицер
+piece.bishop.pron = той
+piece.bishop.pron_obj = го
+piece.bishop.pron_dat = му
+piece.bishop.pron_full = него
+piece.bishop.rel = който
+piece.bishop.a =
+piece.rook.gender = m
+piece.rook.nom = топ
+piece.rook.obj = топа
+piece.rook.full = топ
+piece.rook.full_obj = топ
+piece.rook.refl = топа
+piece.rook.refl_full = топ
+piece.rook.def = топът
+piece.rook.def_obj = топа
+piece.rook.bare = топ
+piece.rook.pron = той
+piece.rook.pron_obj = го
+piece.rook.pron_dat = му
+piece.rook.pron_full = него
+piece.rook.rel = който
+piece.rook.a =
+piece.queen.gender = f
+piece.queen.nom = дама
+piece.queen.obj = дамата
+piece.queen.full = дама
+piece.queen.full_obj = дама
+piece.queen.refl = дамата
+piece.queen.refl_full = дама
+piece.queen.def = дамата
+piece.queen.def_obj = дамата
+piece.queen.bare = дама
+piece.queen.pron = тя
+piece.queen.pron_obj = я
+piece.queen.pron_dat = ѝ
+piece.queen.pron_full = нея
+piece.queen.rel = която
+piece.queen.a = а
+piece.king.gender = m
+piece.king.nom = цар
+piece.king.obj = царя
+piece.king.full = цар
+piece.king.full_obj = цар
+piece.king.refl = царя
+piece.king.refl_full = цар
+piece.king.def = царят
+piece.king.def_obj = царя
+piece.king.bare = цар
+piece.king.pron = той
+piece.king.pron_obj = го
+piece.king.pron_dat = му
+piece.king.pron_full = него
+piece.king.rel = който
+piece.king.a =
+# nom with the clitic possessive: whole phrases, piece.<type>.nom being the bare noun of the spoken moves.
+phrase.your.pawn.nom = пешката ти
+phrase.your.knight.nom = конят ти
+phrase.your.bishop.nom = офицерът ти
+phrase.your.rook.nom = топът ти
+phrase.your.queen.nom = дамата ти
+phrase.your.king.nom = царят ти
+phrase.my.pawn.nom = пешката ми
+phrase.my.knight.nom = конят ми
+phrase.my.bishop.nom = офицерът ми
+phrase.my.rook.nom = топът ми
+phrase.my.queen.nom = дамата ми
+phrase.my.king.nom = царят ми
+# The English keys (every language defines them); the phrases above take precedence for your and my.
+owner.your.nom = твоят {piece}
+owner.my.nom = моят {piece}
+# obj: the short-article noun (piece.<type>.obj) and the clitic.
+owner.your.obj = {piece} ти
+owner.my.obj = {piece} ми
+# full / full_obj: the stressed possessive pronoun, by gender (full article on the masculine subject).
+owner.your.full.m = твоят {piece}
+owner.your.full.f = твоята {piece}
+owner.your.full_obj.m = твоя {piece}
+owner.your.full_obj.f = твоята {piece}
+owner.my.full.m = моят {piece}
+owner.my.full.f = моята {piece}
+owner.my.full_obj.m = моя {piece}
+owner.my.full_obj.f = моята {piece}
+# The Analysis mode names a piece by its side, nobody being "ти" or "аз" there: the colour adjective
+# takes the article ("белият кон", "белия кон", "бялата пешка"; "черният кон", "черния кон",
+# "черната пешка"). The players themselves are "белите" / "черните" (plural): "Белите печелят".
+owner.white.nom = белият {piece}
+owner.white.nom.m = белият {piece}
+owner.white.nom.f = бялата {piece}
+owner.black.nom = черният {piece}
+owner.black.nom.m = черният {piece}
+owner.black.nom.f = черната {piece}
+phrase.white.pawn.obj = бялата пешка
+phrase.white.knight.obj = белия кон
+phrase.white.bishop.obj = белия офицер
+phrase.white.rook.obj = белия топ
+phrase.white.queen.obj = бялата дама
+phrase.white.king.obj = белия цар
+phrase.black.pawn.obj = черната пешка
+phrase.black.knight.obj = черния кон
+phrase.black.bishop.obj = черния офицер
+phrase.black.rook.obj = черния топ
+phrase.black.queen.obj = черната дама
+phrase.black.king.obj = черния цар
+owner.white.full.m = белият {piece}
+owner.white.full.f = бялата {piece}
+owner.white.full_obj.m = белия {piece}
+owner.white.full_obj.f = бялата {piece}
+owner.black.full.m = черният {piece}
+owner.black.full.f = черната {piece}
+owner.black.full_obj.m = черния {piece}
+owner.black.full_obj.f = черната {piece}
+# The same words for every owner: the reflexive, the forms without an owner, the pronouns.
+owner.your.refl = {piece} си
+owner.your.refl_full.m = своя {piece}
+owner.your.refl_full.f = своята {piece}
+owner.your.def = {piece}
+owner.your.def_obj = {piece}
+owner.your.bare = {piece}
+owner.your.pron = {piece}
+owner.your.pron_obj = {piece}
+owner.your.pron_dat = {piece}
+owner.your.pron_full = {piece}
+owner.your.rel = {piece}
+owner.your.a = {piece}
+owner.my.refl = {piece} си
+owner.my.refl_full.m = своя {piece}
+owner.my.refl_full.f = своята {piece}
+owner.my.def = {piece}
+owner.my.def_obj = {piece}
+owner.my.bare = {piece}
+owner.my.pron = {piece}
+owner.my.pron_obj = {piece}
+owner.my.pron_dat = {piece}
+owner.my.pron_full = {piece}
+owner.my.rel = {piece}
+owner.my.a = {piece}
+owner.white.refl = {piece} си
+owner.white.refl_full.m = своя {piece}
+owner.white.refl_full.f = своята {piece}
+owner.white.def = {piece}
+owner.white.def_obj = {piece}
+owner.white.bare = {piece}
+owner.white.pron = {piece}
+owner.white.pron_obj = {piece}
+owner.white.pron_dat = {piece}
+owner.white.pron_full = {piece}
+owner.white.rel = {piece}
+owner.white.a = {piece}
+owner.black.refl = {piece} си
+owner.black.refl_full.m = своя {piece}
+owner.black.refl_full.f = своята {piece}
+owner.black.def = {piece}
+owner.black.def_obj = {piece}
+owner.black.bare = {piece}
+owner.black.pron = {piece}
+owner.black.pron_obj = {piece}
+owner.black.pron_dat = {piece}
+owner.black.pron_full = {piece}
+owner.black.rel = {piece}
+owner.black.a = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares are "e4" (Latin letters, as in Bulgarian notation). The voice says the letter names
+# Bulgarian players use for the files, in Cyrillic so that the voice reads them as Bulgarian:
+# "е четири", "еф три", "же седем", "аш осем". Ranks are the neutral counting numbers ("а едно").
+# The file a is said with a stress mark ("а́"): a bare "а" melts into the word before it ("на а три" heard
+# "на три"); see docs/PRONUNCIATION.md.
+square.spoken = {file} {rank}
+file.a.spoken = а́
+file.b.spoken = бе
+file.c.spoken = це
+file.d.spoken = де
+file.e.spoken = е
+file.f.spoken = еф
+file.g.spoken = же
+file.h.spoken = аш
+rank.1.spoken = едно
+rank.2.spoken = две
+rank.3.spoken = три
+rank.4.spoken = четири
+rank.5.spoken = пет
+rank.6.spoken = шест
+rank.7.spoken = седем
+rank.8.spoken = осем
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Bulgarian scoresheet letters: Цр (цар), Д (дама), Т (топ), О (офицер), К (кон): "Кf3", "Цр:e2".
+move.letters = Цр Д Т О К
+# Spoken as Bulgarian players read notation: "кон еф три", "кон взема на е пет", "кон бе де две",
+# "е взема на де пет", "пешка взема обратно", "малка рокада", "дама же четири, шах". {piece} is the
+# bare noun, so the promotion says "произвеждане в дама" (no article after "в").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} взема на {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} взема на {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} взема на {to}
+move.recapture.spoken = {piece} взема обратно
+move.castle_short.spoken = малка рокада
+move.castle_long.spoken = голяма рокада
+move.promotion.spoken = {move}, произвеждане в {piece}
+move.check.spoken = {move}, шах
+move.mate.spoken = {move}, мат
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h; docs/PRONUNCIATION.md).
+# The voice guesses the stress (Bulgarian writes none); a stress mark (U+0301 after the vowel) sets it.
+# One entry per form: a new form of these words needs its own. Homographs are fixed per line (.spoken).
+respell.пасан = паса́н
+respell.пропусна = пропусна́
+respell.дъската = дъска́та
+respell.царя = ца́ря
+respell.полета = полета́
+respell.мароци = ма́роци
+respell.единадесет = едина́десет
+respell.дванадесет = двана́десет
+respell.тринадесет = трина́десет
+respell.четиринадесет = четирина́десет
+respell.петнадесет = петна́десет
+respell.шестнадесет = шестна́десет
+respell.седемнадесет = седемна́десет
+respell.осемнадесет = осемна́десет
+respell.деветнадесет = деветна́десет
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. The plain word is the neutral counting form (also the neuter): "едно", "две"
+# ("едно поле", "две полета", ranks, "ход двадесет и едно"). Forms: "m" = masculine ("един ход", "два
+# хода", "двадесет и един процента"), "f" = feminine ("една пешка", "двадесет и една грешки"; "две" is
+# already the plain word). 21-99 compose as "{tens} и {units}" ("двадесет и три"); after a hundred,
+# Bulgarian puts "и" only before the last word: "сто двадесет и три" (composed: "{hundreds} {rest}"),
+# but "сто и три", "сто и дванадесет", "сто и двадесет", listed below for every hundred, with their
+# "m" and "f" forms. Every hundred is listed (двеста, триста, четиристотин...).
+number.0.spoken = нула
+number.1.spoken = едно
+number.1.m.spoken = един
+number.1.f.spoken = една
+number.2.spoken = две
+number.2.m.spoken = два
+number.3.spoken = три
+number.4.spoken = четири
+number.5.spoken = пет
+number.6.spoken = шест
+number.7.spoken = седем
+number.8.spoken = осем
+number.9.spoken = девет
+number.10.spoken = десет
+number.11.spoken = единадесет
+number.12.spoken = дванадесет
+number.13.spoken = тринадесет
+number.14.spoken = четиринадесет
+number.15.spoken = петнадесет
+number.16.spoken = шестнадесет
+number.17.spoken = седемнадесет
+number.18.spoken = осемнадесет
+number.19.spoken = деветнадесет
+number.20.spoken = двадесет
+number.30.spoken = тридесет
+number.40.spoken = четиридесет
+number.50.spoken = петдесет
+number.60.spoken = шестдесет
+number.70.spoken = седемдесет
+number.80.spoken = осемдесет
+number.90.spoken = деветдесет
+number.100.spoken = сто
+number.200.spoken = двеста
+number.300.spoken = триста
+number.400.spoken = четиристотин
+number.500.spoken = петстотин
+number.600.spoken = шестстотин
+number.700.spoken = седемстотин
+number.800.spoken = осемстотин
+number.900.spoken = деветстотин
+# Numbers with "ход" for the mate distances ("{n:mv}", eval.mate_win): "един ход", "два хода",
+# "двадесет и един хода" (after a compound number the noun is plural). 22-99 compose ("двадесет и" +
+# "два хода"). Mates beyond 100 moves are not said with "хода" (they do not occur).
+number.1.mv.spoken = един ход
+number.2.mv.spoken = два хода
+number.3.mv.spoken = три хода
+number.4.mv.spoken = четири хода
+number.5.mv.spoken = пет хода
+number.6.mv.spoken = шест хода
+number.7.mv.spoken = седем хода
+number.8.mv.spoken = осем хода
+number.9.mv.spoken = девет хода
+number.10.mv.spoken = десет хода
+number.11.mv.spoken = единадесет хода
+number.12.mv.spoken = дванадесет хода
+number.13.mv.spoken = тринадесет хода
+number.14.mv.spoken = четиринадесет хода
+number.15.mv.spoken = петнадесет хода
+number.16.mv.spoken = шестнадесет хода
+number.17.mv.spoken = седемнадесет хода
+number.18.mv.spoken = осемнадесет хода
+number.19.mv.spoken = деветнадесет хода
+number.20.mv.spoken = двадесет хода
+number.21.mv.spoken = двадесет и един хода
+number.30.mv.spoken = тридесет хода
+number.31.mv.spoken = тридесет и един хода
+number.40.mv.spoken = четиридесет хода
+number.41.mv.spoken = четиридесет и един хода
+number.50.mv.spoken = петдесет хода
+number.51.mv.spoken = петдесет и един хода
+number.60.mv.spoken = шестдесет хода
+number.61.mv.spoken = шестдесет и един хода
+number.70.mv.spoken = седемдесет хода
+number.71.mv.spoken = седемдесет и един хода
+number.80.mv.spoken = осемдесет хода
+number.81.mv.spoken = осемдесет и един хода
+number.90.mv.spoken = деветдесет хода
+number.91.mv.spoken = деветдесет и един хода
+number.100.mv.spoken = сто хода
+number.200.mv.spoken = двеста хода
+number.300.mv.spoken = триста хода
+number.400.mv.spoken = четиристотин хода
+number.500.mv.spoken = петстотин хода
+number.600.mv.spoken = шестстотин хода
+number.700.mv.spoken = седемстотин хода
+number.800.mv.spoken = осемстотин хода
+number.900.mv.spoken = деветстотин хода
+number.tens.spoken = {tens} и {units}
+# Unused (every hundred is listed), kept because English defines it.
+number.hundreds.spoken = {n}стотин
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = минус {n}
+# A decimal number: Bulgarian writes a decimal comma ("1,3") and reads it "едно цяло и три".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} цяло и {frac}
+# 101-999 whose last part is 1-20 or a round ten take "и" after the hundred: "сто и едно", "двеста и
+# петнадесет", "триста и четиридесет" (with "m" / "f" forms for 1 and 2).
+number.101.spoken = сто и едно
+number.101.m.spoken = сто и един
+number.101.f.spoken = сто и една
+number.102.spoken = сто и две
+number.102.m.spoken = сто и два
+number.103.spoken = сто и три
+number.104.spoken = сто и четири
+number.105.spoken = сто и пет
+number.106.spoken = сто и шест
+number.107.spoken = сто и седем
+number.108.spoken = сто и осем
+number.109.spoken = сто и девет
+number.110.spoken = сто и десет
+number.111.spoken = сто и единадесет
+number.112.spoken = сто и дванадесет
+number.113.spoken = сто и тринадесет
+number.114.spoken = сто и четиринадесет
+number.115.spoken = сто и петнадесет
+number.116.spoken = сто и шестнадесет
+number.117.spoken = сто и седемнадесет
+number.118.spoken = сто и осемнадесет
+number.119.spoken = сто и деветнадесет
+number.120.spoken = сто и двадесет
+number.130.spoken = сто и тридесет
+number.140.spoken = сто и четиридесет
+number.150.spoken = сто и петдесет
+number.160.spoken = сто и шестдесет
+number.170.spoken = сто и седемдесет
+number.180.spoken = сто и осемдесет
+number.190.spoken = сто и деветдесет
+number.201.spoken = двеста и едно
+number.201.m.spoken = двеста и един
+number.201.f.spoken = двеста и една
+number.202.spoken = двеста и две
+number.202.m.spoken = двеста и два
+number.203.spoken = двеста и три
+number.204.spoken = двеста и четири
+number.205.spoken = двеста и пет
+number.206.spoken = двеста и шест
+number.207.spoken = двеста и седем
+number.208.spoken = двеста и осем
+number.209.spoken = двеста и девет
+number.210.spoken = двеста и десет
+number.211.spoken = двеста и единадесет
+number.212.spoken = двеста и дванадесет
+number.213.spoken = двеста и тринадесет
+number.214.spoken = двеста и четиринадесет
+number.215.spoken = двеста и петнадесет
+number.216.spoken = двеста и шестнадесет
+number.217.spoken = двеста и седемнадесет
+number.218.spoken = двеста и осемнадесет
+number.219.spoken = двеста и деветнадесет
+number.220.spoken = двеста и двадесет
+number.230.spoken = двеста и тридесет
+number.240.spoken = двеста и четиридесет
+number.250.spoken = двеста и петдесет
+number.260.spoken = двеста и шестдесет
+number.270.spoken = двеста и седемдесет
+number.280.spoken = двеста и осемдесет
+number.290.spoken = двеста и деветдесет
+number.301.spoken = триста и едно
+number.301.m.spoken = триста и един
+number.301.f.spoken = триста и една
+number.302.spoken = триста и две
+number.302.m.spoken = триста и два
+number.303.spoken = триста и три
+number.304.spoken = триста и четири
+number.305.spoken = триста и пет
+number.306.spoken = триста и шест
+number.307.spoken = триста и седем
+number.308.spoken = триста и осем
+number.309.spoken = триста и девет
+number.310.spoken = триста и десет
+number.311.spoken = триста и единадесет
+number.312.spoken = триста и дванадесет
+number.313.spoken = триста и тринадесет
+number.314.spoken = триста и четиринадесет
+number.315.spoken = триста и петнадесет
+number.316.spoken = триста и шестнадесет
+number.317.spoken = триста и седемнадесет
+number.318.spoken = триста и осемнадесет
+number.319.spoken = триста и деветнадесет
+number.320.spoken = триста и двадесет
+number.330.spoken = триста и тридесет
+number.340.spoken = триста и четиридесет
+number.350.spoken = триста и петдесет
+number.360.spoken = триста и шестдесет
+number.370.spoken = триста и седемдесет
+number.380.spoken = триста и осемдесет
+number.390.spoken = триста и деветдесет
+number.401.spoken = четиристотин и едно
+number.401.m.spoken = четиристотин и един
+number.401.f.spoken = четиристотин и една
+number.402.spoken = четиристотин и две
+number.402.m.spoken = четиристотин и два
+number.403.spoken = четиристотин и три
+number.404.spoken = четиристотин и четири
+number.405.spoken = четиристотин и пет
+number.406.spoken = четиристотин и шест
+number.407.spoken = четиристотин и седем
+number.408.spoken = четиристотин и осем
+number.409.spoken = четиристотин и девет
+number.410.spoken = четиристотин и десет
+number.411.spoken = четиристотин и единадесет
+number.412.spoken = четиристотин и дванадесет
+number.413.spoken = четиристотин и тринадесет
+number.414.spoken = четиристотин и четиринадесет
+number.415.spoken = четиристотин и петнадесет
+number.416.spoken = четиристотин и шестнадесет
+number.417.spoken = четиристотин и седемнадесет
+number.418.spoken = четиристотин и осемнадесет
+number.419.spoken = четиристотин и деветнадесет
+number.420.spoken = четиристотин и двадесет
+number.430.spoken = четиристотин и тридесет
+number.440.spoken = четиристотин и четиридесет
+number.450.spoken = четиристотин и петдесет
+number.460.spoken = четиристотин и шестдесет
+number.470.spoken = четиристотин и седемдесет
+number.480.spoken = четиристотин и осемдесет
+number.490.spoken = четиристотин и деветдесет
+number.501.spoken = петстотин и едно
+number.501.m.spoken = петстотин и един
+number.501.f.spoken = петстотин и една
+number.502.spoken = петстотин и две
+number.502.m.spoken = петстотин и два
+number.503.spoken = петстотин и три
+number.504.spoken = петстотин и четири
+number.505.spoken = петстотин и пет
+number.506.spoken = петстотин и шест
+number.507.spoken = петстотин и седем
+number.508.spoken = петстотин и осем
+number.509.spoken = петстотин и девет
+number.510.spoken = петстотин и десет
+number.511.spoken = петстотин и единадесет
+number.512.spoken = петстотин и дванадесет
+number.513.spoken = петстотин и тринадесет
+number.514.spoken = петстотин и четиринадесет
+number.515.spoken = петстотин и петнадесет
+number.516.spoken = петстотин и шестнадесет
+number.517.spoken = петстотин и седемнадесет
+number.518.spoken = петстотин и осемнадесет
+number.519.spoken = петстотин и деветнадесет
+number.520.spoken = петстотин и двадесет
+number.530.spoken = петстотин и тридесет
+number.540.spoken = петстотин и четиридесет
+number.550.spoken = петстотин и петдесет
+number.560.spoken = петстотин и шестдесет
+number.570.spoken = петстотин и седемдесет
+number.580.spoken = петстотин и осемдесет
+number.590.spoken = петстотин и деветдесет
+number.601.spoken = шестстотин и едно
+number.601.m.spoken = шестстотин и един
+number.601.f.spoken = шестстотин и една
+number.602.spoken = шестстотин и две
+number.602.m.spoken = шестстотин и два
+number.603.spoken = шестстотин и три
+number.604.spoken = шестстотин и четири
+number.605.spoken = шестстотин и пет
+number.606.spoken = шестстотин и шест
+number.607.spoken = шестстотин и седем
+number.608.spoken = шестстотин и осем
+number.609.spoken = шестстотин и девет
+number.610.spoken = шестстотин и десет
+number.611.spoken = шестстотин и единадесет
+number.612.spoken = шестстотин и дванадесет
+number.613.spoken = шестстотин и тринадесет
+number.614.spoken = шестстотин и четиринадесет
+number.615.spoken = шестстотин и петнадесет
+number.616.spoken = шестстотин и шестнадесет
+number.617.spoken = шестстотин и седемнадесет
+number.618.spoken = шестстотин и осемнадесет
+number.619.spoken = шестстотин и деветнадесет
+number.620.spoken = шестстотин и двадесет
+number.630.spoken = шестстотин и тридесет
+number.640.spoken = шестстотин и четиридесет
+number.650.spoken = шестстотин и петдесет
+number.660.spoken = шестстотин и шестдесет
+number.670.spoken = шестстотин и седемдесет
+number.680.spoken = шестстотин и осемдесет
+number.690.spoken = шестстотин и деветдесет
+number.701.spoken = седемстотин и едно
+number.701.m.spoken = седемстотин и един
+number.701.f.spoken = седемстотин и една
+number.702.spoken = седемстотин и две
+number.702.m.spoken = седемстотин и два
+number.703.spoken = седемстотин и три
+number.704.spoken = седемстотин и четири
+number.705.spoken = седемстотин и пет
+number.706.spoken = седемстотин и шест
+number.707.spoken = седемстотин и седем
+number.708.spoken = седемстотин и осем
+number.709.spoken = седемстотин и девет
+number.710.spoken = седемстотин и десет
+number.711.spoken = седемстотин и единадесет
+number.712.spoken = седемстотин и дванадесет
+number.713.spoken = седемстотин и тринадесет
+number.714.spoken = седемстотин и четиринадесет
+number.715.spoken = седемстотин и петнадесет
+number.716.spoken = седемстотин и шестнадесет
+number.717.spoken = седемстотин и седемнадесет
+number.718.spoken = седемстотин и осемнадесет
+number.719.spoken = седемстотин и деветнадесет
+number.720.spoken = седемстотин и двадесет
+number.730.spoken = седемстотин и тридесет
+number.740.spoken = седемстотин и четиридесет
+number.750.spoken = седемстотин и петдесет
+number.760.spoken = седемстотин и шестдесет
+number.770.spoken = седемстотин и седемдесет
+number.780.spoken = седемстотин и осемдесет
+number.790.spoken = седемстотин и деветдесет
+number.801.spoken = осемстотин и едно
+number.801.m.spoken = осемстотин и един
+number.801.f.spoken = осемстотин и една
+number.802.spoken = осемстотин и две
+number.802.m.spoken = осемстотин и два
+number.803.spoken = осемстотин и три
+number.804.spoken = осемстотин и четири
+number.805.spoken = осемстотин и пет
+number.806.spoken = осемстотин и шест
+number.807.spoken = осемстотин и седем
+number.808.spoken = осемстотин и осем
+number.809.spoken = осемстотин и девет
+number.810.spoken = осемстотин и десет
+number.811.spoken = осемстотин и единадесет
+number.812.spoken = осемстотин и дванадесет
+number.813.spoken = осемстотин и тринадесет
+number.814.spoken = осемстотин и четиринадесет
+number.815.spoken = осемстотин и петнадесет
+number.816.spoken = осемстотин и шестнадесет
+number.817.spoken = осемстотин и седемнадесет
+number.818.spoken = осемстотин и осемнадесет
+number.819.spoken = осемстотин и деветнадесет
+number.820.spoken = осемстотин и двадесет
+number.830.spoken = осемстотин и тридесет
+number.840.spoken = осемстотин и четиридесет
+number.850.spoken = осемстотин и петдесет
+number.860.spoken = осемстотин и шестдесет
+number.870.spoken = осемстотин и седемдесет
+number.880.spoken = осемстотин и осемдесет
+number.890.spoken = осемстотин и деветдесет
+number.901.spoken = деветстотин и едно
+number.901.m.spoken = деветстотин и един
+number.901.f.spoken = деветстотин и една
+number.902.spoken = деветстотин и две
+number.902.m.spoken = деветстотин и два
+number.903.spoken = деветстотин и три
+number.904.spoken = деветстотин и четири
+number.905.spoken = деветстотин и пет
+number.906.spoken = деветстотин и шест
+number.907.spoken = деветстотин и седем
+number.908.spoken = деветстотин и осем
+number.909.spoken = деветстотин и девет
+number.910.spoken = деветстотин и десет
+number.911.spoken = деветстотин и единадесет
+number.912.spoken = деветстотин и дванадесет
+number.913.spoken = деветстотин и тринадесет
+number.914.spoken = деветстотин и четиринадесет
+number.915.spoken = деветстотин и петнадесет
+number.916.spoken = деветстотин и шестнадесет
+number.917.spoken = деветстотин и седемнадесет
+number.918.spoken = деветстотин и осемнадесет
+number.919.spoken = деветстотин и деветнадесет
+number.920.spoken = деветстотин и двадесет
+number.930.spoken = деветстотин и тридесет
+number.940.spoken = деветстотин и четиридесет
+number.950.spoken = деветстотин и петдесет
+number.960.spoken = деветстотин и шестдесет
+number.970.spoken = деветстотин и седемдесет
+number.980.spoken = деветстотин и осемдесет
+number.990.spoken = деветстотин и деветдесет
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Bulgarian plural rule (assets/i18n): one (1 only) | other (0, 2-999..., 21 included: "двадесет и една
+# грешки"). Masculine nouns take their count form after a number ("два хода", "пет пъти") and say the
+# number with the form "m"; feminine nouns with the form "f"; neuter nouns with the plain word.
+# One time is "веднъж" (written and spoken).
+count.move = {n:m} ход|{n:m} хода
+count.point = {n:f} точка|{n:f} точки
+count.pawn = {n:f} пешка|{n:f} пешки
+count.piece = {n:f} фигура|{n:f} фигури
+count.mistake = {n:f} грешка|{n:f} грешки
+count.blunder = {n:f} груба грешка|{n:f} груби грешки
+count.inaccuracy = {n:f} неточност|{n:f} неточности
+count.game = {n:f} партия|{n:f} партии
+count.time = веднъж|{n:m} пъти
+count.square = {n} поле|{n} полета
+count.position = {n:f} позиция|{n:f} позиции
+# "{n:m}" / "{n:f}" in a line say a bare number in the masculine / feminine ("един", "една"), digits in
+# writing; "{n:mv}" says the number with "ход" ("три хода"), digits alone in writing. They are count
+# keys so that the form check knows them.
+count.m = {n:m}|{n:m}
+count.f = {n:f}|{n:f}
+count.mv = {n:mv}|{n:mv}
+# More counted nouns for the other files: "{acc:percent}" = "85%" written, "осемдесет и пет процента"
+# spoken (a bare {acc} would say "двадесет и едно", not "двадесет и един процента"); "{m:check}" = "2
+# шаха"; "{n:capture}" = "3 вземания" (pawns included, unlike "фигура"); "{n:best_move}" = "5 най-добри
+# хода"; "{n:attacker}" / "{n:defender}" = "3 нападащи фигури" / "2 защитаващи фигури".
+count.percent = {n}%|{n}%
+count.percent.spoken = {n:m} процент|{n:m} процента
+count.check = {n:m} шах|{n:m} шаха
+count.capture = {n} вземане|{n} вземания
+count.best_move = {n:m} най-добър ход|{n:m} най-добри хода
+count.attacker = {n:f} нападаща фигура|{n:f} нападащи фигури
+count.defender = {n:f} защитаваща фигура|{n:f} защитаващи фигури
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = плюс {x}
+eval.down = −{x}
+eval.down.spoken = минус {x}
+eval.even = 0,0
+eval.even.spoken = равенство
+# {n} here is a bare number (count keys do not apply to it): the form "mv" says the number with "ход"
+# in the voice ("мат в три хода"); the subtitles keep the short "мат в 3". The listener being mated:
+# "мат срещу теб в 3" (a noun phrase, so that it fits "около {eval}", "{best}: {eval}").
+eval.mate_win = мат в {n:mv}
+eval.mate_loss = мат срещу теб в {n:mv}

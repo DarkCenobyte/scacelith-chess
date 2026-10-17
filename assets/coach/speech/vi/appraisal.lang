@@ -1,0 +1,444 @@
+# Coach speech (Vietnamese): the appraisal after the game (src/coach/appraisal.cpp).
+# Same keys and variants as assets/coach/speech/en/appraisal.lang (its header documents every placeholder).
+# The appraisal is always positive and never blames. The coach calls himself "tôi" and the player
+# "bạn", "we / let's" = "chúng ta" (glossary/vi.md); Vietnamese has no gender agreement, so nothing
+# depends on the player's or the coach's gender.
+# Forms from common.lang: a move number is "{n:moveno}" = "nước thứ 12" (spoken "nước thứ mười hai"),
+# always after "ở" ("ở {n:moveno}") or standing alone inside a sentence. The program capitalises no
+# number, so a line that starts with the move number says "Nước {n:ord}" ("Nước thứ 12", spoken "Nước
+# thứ mười hai"). An accuracy is "{acc:percent}" = "85%" (spoken "... phần trăm"), also where English
+# writes a bare {acc}; counts use count.* ("{n:piece}" = "3 quân", "{m:time}" = "2 lần",
+# "{n:best_move}" = "5 nước đi tốt nhất", "{m:check}" = "2 nước chiếu").
+# "Won {pts} points" is said as material: "giành được {pts:point} lực lượng" at every level ({pts} is a
+# net gain, e.g. 4 for a queen won against a rook: never "a piece worth {pts}").
+# "Good move" is "nước đi hay", never "nước đi tốt" (heard as a pawn move).
+# Names inserted by {text}, {theme}, {level} (written to fit every sentence that inserts them):
+#   appraisal.phase.*   bare lower-case nouns ("trung cuộc"): after "giai đoạn", "ở", "riêng", or
+#                       starting a sentence (the program capitalises it).
+#   appraisal.reason.*  a complement said right after "hòa", no comma ("Hòa do lặp lại thế cờ.").
+#   theme.*             a verb phrase, no full stop, said after a colon or after "hãy tập".
+#   appraisal.level.*   the level name of the coach page (coach.level.<n>.name, as events.lang
+#                       says them) in quotes, always after "cấp độ": "cấp độ “Người mới chơi”".
+# {opening:def} inside a sentence, {opening} when the name stands alone or after a label.
+# Forcing moves are named by what they are ("các nước chiếu, bắt quân và đe dọa"): clearer for a
+# player than a calque.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = khai cuộc
+appraisal.phase.middlegame = trung cuộc
+appraisal.phase.endgame = tàn cuộc
+appraisal.reason.stalemate = do hết nước đi
+appraisal.reason.material = vì không bên nào đủ lực lượng để chiếu hết
+appraisal.reason.repetition = do lặp lại thế cờ
+appraisal.reason.fifty = theo luật 50 nước
+appraisal.reason.fifty.spoken = theo luật năm mươi nước
+appraisal.reason.agreement = theo thỏa thuận
+appraisal.reason.other = theo luật
+appraisal.level.l1 = “Bước đầu”
+appraisal.level.l2 = “Người mới chơi”
+appraisal.level.l3 = “Đang tiến bộ”
+appraisal.level.l4 = “Kỳ thủ câu lạc bộ”
+appraisal.level.l5 = “Kỳ thủ câu lạc bộ mạnh”
+appraisal.level.l6 = “Chuyên gia”
+# What to practise, after "Một điều nên luyện tập:" and "hãy tập" (a verb phrase, no full stop).
+# The player's own pieces are "của mình" (the player is the one who practises), the coach's "của tôi".
+theme.general = quan sát toàn bộ bàn cờ trước khi đi
+theme.mate_allowed = kiểm tra xem con Vua của mình có an toàn không trước mỗi nước đi
+theme.mate_missed = tìm nước chiếu hết, bắt đầu từ các nước chiếu
+theme.stalemate = chừa cho con Vua của tôi một ô để đi khi bạn đang thắng
+theme.fork = để ý các đòn tấn công kép
+theme.discovered = để ý các đòn tấn công ẩn sau quân của tôi
+theme.skewer = tránh để các quân giá trị cao nằm trên cùng một đường
+theme.pin = nhận ra đòn ghim trước khi nó xảy ra
+theme.trapped = giữ đường thoát cho các quân của mình
+theme.back_rank = mở một ô thoát cho con Vua của mình
+theme.hanging = giữ cho các quân của mình luôn được bảo vệ
+theme.exchange = đếm số quân tấn công và quân bảo vệ trước khi đổi quân
+theme.missed_capture = tìm những quân cho không trước tiên
+theme.missed_fork = tìm những đòn tấn công kép của chính mình
+theme.promotion = tính các cuộc đua Tốt và áp dụng quy tắc hình vuông
+theme.king_safety = giữ con Vua của mình an toàn sau lá chắn Tốt
+theme.bad_trade = chọn đúng những quân nên đổi
+theme.opening = phát triển quân và nhập thành sớm
+theme.endgame = tận dụng con Vua và đẩy Tốt thông
+theme.positional = cải thiện vị trí của quân kém nhất
+theme.material = kiểm tra xem các nước tiếp theo của tôi có thể ăn được gì trước khi bạn đi
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Chiếu hết! Bạn thắng rồi. Chơi hay lắm!
+appraisal.open.win.b1.2 = Bạn thắng rồi! Dứt điểm ván cờ như vậy là giỏi lắm.
+appraisal.open.win.b1.3 = Bạn đã thắng tôi! Đó là một ván cờ thật sự hay.
+appraisal.open.win.b2 = Chơi hay lắm! Bạn đã thắng sau {moves:move}.
+appraisal.open.win.b2.2 = Chúc mừng, bạn đã thắng!
+appraisal.open.win.b2.3 = Thắng sau {moves:move}. Giỏi lắm!
+appraisal.open.win.b3 = Chúc mừng bạn, một chiến thắng xứng đáng.
+appraisal.open.win.b3.2 = Bạn chơi hay lắm. Bạn xứng đáng với chiến thắng này.
+appraisal.open.win.b3.3 = Một ván thắng hay. Chúc mừng bạn.
+appraisal.open.win.b4 = Thắng đẹp.
+appraisal.open.win.b4.2 = Chơi hay, chiến thắng xứng đáng.
+appraisal.open.win.b4.3 = Một ván thắng hay.
+appraisal.open.win.b5 = Chơi hay.
+appraisal.open.win.b5.2 = Thắng đẹp.
+appraisal.open.win.b5.3 = Ván cờ hay, thắng xứng đáng.
+appraisal.open.win.b6 = Chơi hay.
+appraisal.open.win.b6.2 = Thắng gọn.
+appraisal.open.win.b6.3 = Ván cờ hay.
+appraisal.open.draw.b1 = Hòa rồi! Ván này không ai thắng được.
+appraisal.open.draw.b1.2 = Ván cờ hòa. Một ván rất giằng co!
+appraisal.open.draw.b1.3 = Hòa: chúng ta chia điểm. Chơi hay lắm!
+appraisal.open.draw.b2 = Hòa: một kết quả công bằng.
+appraisal.open.draw.b2.2 = Chúng ta hòa nhau. Một cuộc đấu hay!
+appraisal.open.draw.b2.3 = Hòa, và là một ván cờ hay.
+appraisal.open.draw.b3 = Hòa. Cả hai bên đều có cơ hội.
+appraisal.open.draw.b3.2 = Một ván hòa hợp lý.
+appraisal.open.draw.b3.3 = Hòa {text}. Một cuộc đấu hay.
+appraisal.open.draw.b4 = Hòa {text}.
+appraisal.open.draw.b4.2 = Ván cờ hòa {text}.
+appraisal.open.draw.b4.3 = Kết quả hòa {text}.
+appraisal.open.draw.b5 = Hòa.
+appraisal.open.draw.b5.2 = Hòa {text}.
+appraisal.open.draw.b5.3 = Ván hòa.
+appraisal.open.draw.b6 = Hòa.
+appraisal.open.draw.b6.2 = Hòa {text}.
+appraisal.open.draw.b6.3 = Ván hòa.
+appraisal.open.stalemate.b1 = Hòa do hết nước đi: suýt nữa thì thắng rồi! Lần sau, nhớ chừa cho con Vua của tôi một ô để đi nhé.
+appraisal.open.stalemate.b1.2 = Hết nước đi, nên ván cờ hòa. Bạn đã gần thắng rồi!
+appraisal.open.stalemate.b2 = Hòa do hết nước đi. Bạn đã rất gần chiến thắng!
+appraisal.open.stalemate.b2.2 = Hết nước đi: ván cờ hòa, dù bạn đang ở thế thắng.
+appraisal.open.stalemate.b3 = Hòa do hết nước đi, khi bạn đang ở thế thắng.
+appraisal.open.stalemate.b3.2 = Hết nước đi. Chiến thắng đã tuột mất vào phút cuối.
+appraisal.open.stalemate.b4 = Hòa do hết nước đi.
+appraisal.open.stalemate.b4.2 = Hết nước đi: hòa.
+appraisal.open.stalemate.b5 = Hết nước đi.
+appraisal.open.stalemate.b5.2 = Hòa, do hết nước đi.
+appraisal.open.stalemate.b6 = Hết nước đi.
+appraisal.open.stalemate.b6.2 = Hòa, hết nước đi.
+appraisal.open.loss.b1 = Lần này tôi thắng, nhưng bạn đã có những nước đi rất hay.
+appraisal.open.loss.b1.2 = Ván cờ hay lắm! Bạn khiến tôi phải vất vả mới thắng được.
+appraisal.open.loss.b1.3 = Vui quá! Ván này tôi thắng, nhưng bạn học nhanh lắm.
+appraisal.open.loss.b2 = Ván cờ hay! Chúng ta cùng xem những gì bạn đã làm tốt, và một điều nên thử nhé.
+appraisal.open.loss.b2.2 = Cảm ơn bạn đã chơi cùng tôi! Bạn đã có vài ý tưởng hay.
+appraisal.open.loss.b2.3 = Ván cờ hay. Chúng ta cùng xem có thể học được gì từ ván này nhé.
+appraisal.open.loss.b3 = Ván cờ hay.
+appraisal.open.loss.b3.2 = Cảm ơn bạn đã chơi cùng tôi.
+appraisal.open.loss.b3.3 = Ván cờ hay. Chúng ta cùng xem lại nào.
+appraisal.open.loss_close.b3 = Một cuộc đấu hay. Ván cờ giằng co trong một thời gian dài.
+appraisal.open.loss_close.b3.2 = Một cuộc đấu hay: thế cờ đã cân bằng trong một thời gian dài.
+appraisal.open.loss.b4 = Ván cờ hay. Đây là điều đã quyết định kết quả.
+appraisal.open.loss.b4.2 = Ván cờ hay. Một khoảnh khắc đã quyết định ván cờ.
+appraisal.open.loss.b4.3 = Cảm ơn bạn đã chơi cùng tôi. Chúng ta cùng xem bước ngoặt nằm ở đâu.
+appraisal.open.loss_close.b4 = Một cuộc đấu giằng co trong thời gian dài. Đây là điều đã quyết định kết quả.
+appraisal.open.loss_close.b4.2 = Ván cờ hay, cân bằng trong một thời gian dài.
+appraisal.open.loss.b5 = Ván cờ hay.
+appraisal.open.loss.b5.2 = Cảm ơn bạn đã chơi.
+appraisal.open.loss.b5.3 = Cuộc đấu hay.
+appraisal.open.loss.b6 = Ván cờ hay.
+appraisal.open.loss.b6.2 = Cảm ơn bạn đã chơi.
+appraisal.open.loss.b6.3 = Cuộc đấu hay.
+appraisal.open.resigned.b1 = Xin thua cũng là một phần của cờ vua; việc đó cần can đảm. Ván cờ hay!
+appraisal.open.resigned.b1.2 = Không sao đâu. Biết lúc nào nên xin thua cũng là một phần của cờ vua.
+appraisal.open.resigned.b2 = Xin thua cũng là một phần của cờ vua; việc đó cần lòng can đảm.
+appraisal.open.resigned.b2.2 = Cũng dễ hiểu thôi. Xin thua cũng cần can đảm.
+appraisal.open.resigned.b3 = Xin thua là một phần của cờ vua. Ván cờ hay.
+appraisal.open.resigned.b3.2 = Cũng dễ hiểu thôi. Cảm ơn bạn đã chơi cùng tôi.
+appraisal.open.resigned.b4 = Ván cờ hay.
+appraisal.open.resigned.b4.2 = Cảm ơn bạn đã chơi cùng tôi.
+appraisal.open.resigned.b5 = Ván cờ hay.
+appraisal.open.resigned.b5.2 = Cảm ơn bạn đã chơi.
+appraisal.open.resigned.b6 = Ván cờ hay.
+appraisal.open.resigned.b6.2 = Cảm ơn.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = Thật ra lúc đó ván cờ chưa kết thúc đâu: điểm đánh giá khoảng {eval}.
+appraisal.resign_early.b3.2 = Thật ra bạn vẫn còn cơ hội: khoảng {eval}.
+appraisal.resign_early.b4 = Lúc đó ván cờ chưa kết thúc: khoảng {eval}.
+appraisal.resign_early.b4.2 = Thế cờ vẫn còn chơi được: khoảng {eval}.
+appraisal.resign_early.b5 = Chưa kết thúc: {eval}.
+appraisal.resign_early.b5.2 = Vẫn chơi được, khoảng {eval}.
+appraisal.resign_early.b6 = Chưa hết: {eval}.
+appraisal.resign_early.b6.2 = Thế cờ lúc đó: {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = Chúng ta đã chơi {opening:def}.
+appraisal.opening.b3.2 = Ván cờ mở đầu bằng {opening:def}.
+appraisal.opening.b4 = Ván này đi theo {opening:def}.
+appraisal.opening.b4.2 = Khai cuộc: {opening}.
+appraisal.opening.b5 = {opening}.
+appraisal.opening.b5.2 = Khai cuộc: {opening}.
+appraisal.opening.b6 = {opening}.
+appraisal.opening.b6.2 = Khai cuộc: {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = Pha thí quân ở {n:moveno} hay quá: {move}!
+appraisal.best.brilliant.b1.2 = Khoảnh khắc tôi thích nhất: {move}. Bạn đã thí một quân, và đòn đó đã thành công!
+appraisal.best.brilliant.b2 = Khoảnh khắc hay nhất của bạn: nước thí quân {move} ở {n:moveno}.
+appraisal.best.brilliant.b2.2 = {move} ở {n:moveno} là một pha thí quân dũng cảm. Giỏi lắm!
+appraisal.best.brilliant.b3 = Pha thí quân xuất sắc bằng nước {move}.
+appraisal.best.brilliant.b3.2 = Điểm nhấn: {move}, một pha thí quân thực sự, ở {n:moveno}.
+appraisal.best.brilliant.b4 = Khoảnh khắc hay nhất: {move}, {n:moveno}. Một pha thí quân xuất sắc.
+appraisal.best.brilliant.b4.2 = {move} ở {n:moveno} là một nước đi xuất sắc.
+appraisal.best.brilliant.b5 = {move} ở {n:moveno} thật xuất sắc.
+appraisal.best.brilliant.b5.2 = Nước {n:ord}, {move}: xuất sắc.
+appraisal.best.brilliant.b6 = {move}!! ở {n:moveno}.
+appraisal.best.brilliant.b6.spoken = {move}, một nước đi xuất sắc, ở {n:moveno}.
+appraisal.best.brilliant.b6.2 = Nước {n:ord}: {move}, xuất sắc.
+appraisal.best.great.b1 = Khoảnh khắc tôi thích nhất: {move}. Đó là một nước đi rất hay!
+appraisal.best.great.b1.2 = Bạn còn nhớ nước {move} không? Tìm ra nước đó thật là giỏi.
+appraisal.best.great.b2 = Khoảnh khắc hay nhất của bạn: {move} ở {n:moveno}. Nước đó đã xoay chuyển ván cờ.
+appraisal.best.great.b2.2 = {move} ở {n:moveno} là một nước đi rất hay.
+appraisal.best.great.b3 = Nước then chốt là {move} ở {n:moveno}: nó đã xoay chuyển tình thế.
+appraisal.best.great.b3.2 = Một phát hiện rất hay: {move}, ở {n:moveno}.
+appraisal.best.great.b4 = Bạn đã trừng phạt sai lầm của tôi ngay lập tức bằng nước {move}.
+appraisal.best.great.b4.2 = Khoảnh khắc hay nhất: {move}, {n:moveno}.
+appraisal.best.great.b5 = {move} ở {n:moveno}. Phát hiện hay.
+appraisal.best.great.b5.2 = Nước {n:ord}, {move}: một phát hiện rất hay.
+appraisal.best.great.b6 = {move} ở {n:moveno}. Phát hiện hay.
+appraisal.best.great.b6.2 = Nước {n:ord}: {move}!
+appraisal.best.only.b1 = Khoảnh khắc tôi thích nhất: {move}. Đó là nước đi đúng duy nhất!
+appraisal.best.only.b1.2 = Ở {n:moveno}, bạn đã tìm ra {move}, nước đi đúng duy nhất. Xuất sắc!
+appraisal.best.only.b2 = Khoảnh khắc hay nhất của bạn: {move}, nước đi đúng duy nhất lúc đó.
+appraisal.best.only.b2.2 = {move} ở {n:moveno} là nước đi duy nhất, và bạn đã tìm ra nó.
+appraisal.best.only.b3 = Nước then chốt là {move} ở {n:moveno}: nước duy nhất giữ được thế cờ.
+appraisal.best.only.b3.2 = Ở {n:moveno}, chỉ có {move} giữ được thế cờ, và bạn đã tìm ra.
+appraisal.best.only.b4 = Khoảnh khắc hay nhất: {move}, {n:moveno}. Nước đi duy nhất.
+appraisal.best.only.b4.2 = Nước {n:ord}: {move}, nước đi duy nhất.
+appraisal.best.only.b5 = {move} ở {n:moveno} là nước đi duy nhất. Phát hiện hay.
+appraisal.best.only.b5.2 = Nước đi duy nhất ở {n:moveno}: {move}.
+appraisal.best.only.b6 = {move} ở {n:moveno} là nước đi duy nhất. Phát hiện hay.
+appraisal.best.only.b6.2 = Nước {n:ord}: {move}, nước duy nhất.
+appraisal.best.won.b1 = Khoảnh khắc tôi thích nhất: {move}. Nước đó giúp bạn giành được {pts:point} lực lượng!
+appraisal.best.won.b1.2 = Bạn còn nhớ nước {move} không? Nó giúp bạn giành được {pts:point} lực lượng. Giỏi lắm!
+appraisal.best.won.b2 = Khoảnh khắc hay nhất của bạn: {move} ở {n:moveno}, giành được {pts:point} lực lượng.
+appraisal.best.won.b2.2 = {move} ở {n:moveno} đã giúp bạn ăn quân. Hay lắm!
+appraisal.best.won.b3 = Nước then chốt là {move} ở {n:moveno}: nó giành được {pts:point} lực lượng.
+appraisal.best.won.b3.2 = {move} ở {n:moveno} đã ăn quân một cách gọn gàng.
+appraisal.best.won.b4 = Khoảnh khắc hay nhất: {move}, {n:moveno}, giành lợi thế lực lượng.
+appraisal.best.won.b4.2 = {move} ở {n:moveno} giành được {pts:point} lực lượng.
+appraisal.best.won.b5 = {move} ở {n:moveno} đã ăn quân.
+appraisal.best.won.b5.2 = Nước {n:ord}: {move}, ăn quân.
+appraisal.best.won.b6 = {move} ở {n:moveno} đã ăn quân.
+appraisal.best.won.b6.2 = Nước {n:ord}: {move}, +{pts}.
+appraisal.best.won.b6.2.spoken = Nước {n:ord}: {move}, cộng {pts}.
+appraisal.best.streak.b1 = Bạn đã tìm ra nước đi tốt nhất {n:time} liên tiếp. Xuất sắc!
+appraisal.best.streak.b1.2 = {n:best_move} liên tiếp! Bạn chơi cờ hay thật đấy.
+appraisal.best.streak.b2 = Bạn đã tìm ra nước đi tốt nhất {n:time} liên tiếp.
+appraisal.best.streak.b2.2 = {n:best_move} liên tiếp. Rất giỏi!
+appraisal.best.streak.b3 = Một chuỗi {n:best_move} liên tiếp. Rất chắc chắn.
+appraisal.best.streak.b3.2 = {n:best_move} liên tiếp. Chơi hay.
+appraisal.best.streak.b4 = {n:best_move} liên tiếp.
+appraisal.best.streak.b4.2 = Một chuỗi {n:best_move}.
+appraisal.best.streak.b5 = {n:best_move} liên tiếp.
+appraisal.best.streak.b5.2 = Chuỗi {n:best_move}.
+appraisal.best.streak.b6 = {n:best_move} liên tiếp.
+appraisal.best.streak.b6.2 = Chuỗi liên tiếp: {n:best_move}.
+appraisal.best.capture.b1 = Khoảnh khắc tôi thích nhất: {move}. Bạn đã bắt {my} mà không mất gì!
+appraisal.best.capture.b1.2 = Bạn còn nhớ nước {move} không? Bạn đã nhận ra {my} là quân cho không!
+appraisal.best.capture.b2 = Khoảnh khắc hay nhất của bạn: {move}, ăn được {my}.
+appraisal.best.capture.b2.2 = Một nước bắt quân đẹp ở {n:moveno}: {move}.
+appraisal.best.capture.b3 = Tinh mắt đấy: ở {n:moveno}, {move} đã ăn được {my}.
+appraisal.best.capture.b3.2 = {move} ở {n:moveno} đã bắt gọn {my}.
+appraisal.best.capture.b4 = Khoảnh khắc hay nhất: {move}, {n:moveno}, ăn được {my}.
+appraisal.best.capture.b4.2 = {move} ở {n:moveno} đã ăn quân.
+appraisal.best.capture.b5 = {move} ở {n:moveno} đã ăn được {my}.
+appraisal.best.capture.b5.2 = Nước {n:ord}: {move}.
+appraisal.best.capture.b6 = {move} ở {n:moveno}.
+appraisal.best.capture.b6.2 = Nước {n:ord}: {move}, ăn quân.
+appraisal.best.phase.b1 = Bạn đã chơi rất hay trong giai đoạn {text}.
+appraisal.best.phase.b1.2 = Giai đoạn {text} là phần bạn chơi hay nhất.
+appraisal.best.phase.b2 = Phần bạn chơi mạnh nhất là {text}.
+appraisal.best.phase.b2.2 = Bạn đã chơi {text} rất hay.
+appraisal.best.phase.b3 = Giai đoạn bạn chơi hay nhất là {text}: {acc:percent}.
+appraisal.best.phase.b3.2 = Bạn chơi tốt nhất ở {text}: độ chính xác {acc:percent}.
+appraisal.best.phase.b4 = Giai đoạn mạnh nhất: {text}, {acc:percent}.
+appraisal.best.phase.b4.2 = {text} là giai đoạn hay nhất của bạn, với {acc:percent}.
+appraisal.best.phase.b5 = Giai đoạn hay nhất: {text}, {acc:percent}.
+appraisal.best.phase.b5.2 = {text}: {acc:percent}.
+appraisal.best.phase.b6 = {text}: {acc:percent}.
+appraisal.best.phase.b6.2 = Giai đoạn hay nhất: {text}, {acc:percent}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 quân" / "3 quân") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = Bạn đã ăn {n:piece} của tôi và chiếu Vua {m:time}.
+appraisal.num.material.b1.2 = Bạn đã bắt {n:piece} và chiếu con Vua của tôi {m:time}.
+appraisal.num.material.b2 = Bạn đã bắt {n:piece} và chiếu Vua {m:time}.
+appraisal.num.material.b2.2 = Bạn đã ăn {n:piece} và chiếu tôi {m:time}.
+appraisal.num.material.b3 = Bạn đã bắt {n:piece} và chiếu Vua {m:time}.
+appraisal.num.material.b3.2 = Đã bắt {n:piece}, đã chiếu {m:time}.
+appraisal.num.material.b4 = Bắt {n:piece}, chiếu {m:time}.
+appraisal.num.material.b4.2 = Bạn đã ăn {n:piece} và chiếu Vua {m:time}.
+appraisal.num.material.b5 = Bắt {n:piece}; chiếu {m:time}.
+appraisal.num.material.b5.2 = Đã bắt {n:piece}; đã chiếu {m:time}.
+appraisal.num.material.b6 = Bắt {n:piece}, {m:check}.
+appraisal.num.material.b6.2 = Đã bắt {n:piece}; đã chiếu {m:time}.
+appraisal.num.material_nochecks.b1 = Bạn đã ăn {n:piece} của tôi.
+appraisal.num.material_nochecks.b1.2 = Trong ván này, bạn đã bắt được {n:piece}.
+appraisal.num.material_nochecks.b2 = Bạn đã bắt {n:piece}.
+appraisal.num.material_nochecks.b2.2 = Ván này bạn đã ăn {n:piece}.
+appraisal.num.material_nochecks.b3 = Bạn đã bắt {n:piece}.
+appraisal.num.material_nochecks.b3.2 = Đã bắt {n:piece}.
+appraisal.num.material_nochecks.b4 = Đã bắt {n:piece}.
+appraisal.num.material_nochecks.b4.2 = Bạn đã ăn {n:piece}.
+appraisal.num.material_nochecks.b5 = Đã bắt {n:piece}.
+appraisal.num.material_nochecks.b5.2 = Đã bắt: {n:piece}.
+appraisal.num.material_nochecks.b6 = Bắt {n:piece}.
+appraisal.num.material_nochecks.b6.2 = Đã bắt {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = Bạn đã đi lại {n:move} và sửa được {m:move} trong số đó. Đó chính là cách chúng ta học!
+appraisal.num.takebacks.b1.2 = Bạn đã đi lại {n:move}, và có {m:time} bạn tìm ra nước hay hơn. Tuyệt lắm!
+appraisal.num.takebacks.b2 = Bạn đã đi lại {n:move} và sửa được {m:move} trong số đó. Đó chính là cách chúng ta học.
+appraisal.num.takebacks.b2.2 = Trong {n:move} bạn đã đi lại, bạn sửa được {m:move}. Học như vậy là rất tốt!
+appraisal.num.takebacks.b3 = Bạn đã đi lại {n:move} và sửa được {m:move} trong số đó.
+appraisal.num.takebacks.b3.2 = Đi lại {n:move}, sửa được {m:move}. Được đấy.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = Không có sai lầm lớn nào: tuyệt lắm!
+appraisal.num.clean.b2.2 = Ván này không có một sai lầm lớn nào. Xuất sắc!
+appraisal.num.clean.b2.3 = Bạn không mắc sai lầm lớn nào. Rất giỏi!
+appraisal.num.few.b2 = Ván này chỉ có {n:mistake}.
+appraisal.num.few.b2.2 = Cả ván chỉ có {n:mistake}. Tốt lắm!
+appraisal.num.few.b2.3 = Chỉ có {n:mistake} đáng nói đến. Giỏi lắm.
+appraisal.num.best.b2 = Bạn đã tìm ra nước đi tốt nhất {n:time}.
+appraisal.num.best.b2.2 = Có {n:time} bạn đã đi đúng nước đi tốt nhất.
+appraisal.num.best.b2.3 = Đã có {n:time} bạn tìm ra nước đi tốt nhất.
+appraisal.num.acc.b3 = Độ chính xác của bạn là {acc:percent}, có {n:mistake} và {m:blunder}.
+appraisal.num.acc.b3.2 = Độ chính xác {acc:percent}: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = Bạn đã chơi với độ chính xác {acc:percent}, có {n:mistake} và {m:blunder}.
+appraisal.num.acc_explain.b3 = Độ chính xác so sánh các nước đi của bạn với nước đi tốt nhất trong từng thế cờ: 100% là hoàn hảo.
+appraisal.num.acc_explain.b3.spoken = Độ chính xác so sánh các nước đi của bạn với nước đi tốt nhất trong từng thế cờ: một trăm phần trăm là hoàn hảo.
+appraisal.num.acc_explain.b3.2 = Độ chính xác đo xem các nước đi của bạn gần với các nước tốt nhất đến mức nào. 100% là hoàn hảo.
+appraisal.num.acc_explain.b3.2.spoken = Độ chính xác đo xem các nước đi của bạn gần với các nước tốt nhất đến mức nào. Một trăm phần trăm là hoàn hảo.
+appraisal.num.acc.b4 = Độ chính xác {acc:percent}.
+appraisal.num.acc.b4.2 = Bạn đã chơi ở mức {acc:percent}.
+appraisal.num.acc.b4.3 = Độ chính xác: {acc:percent}.
+appraisal.num.acc_phase.b4 = Độ chính xác {acc:percent}; riêng {text}, giai đoạn mạnh nhất của bạn, đạt {acc_phase:percent}.
+appraisal.num.acc_phase.b4.2 = Cả ván {acc:percent}, riêng {text} đạt {acc_phase:percent}.
+appraisal.num.acc_phase.b4.3 = Bạn đã chơi ở mức {acc:percent}; hay nhất ở {text}, với {acc_phase:percent}.
+appraisal.num.coach.b4 = Tôi đã chơi ở mức {acc_coach:percent}.
+appraisal.num.coach.b4.2 = Độ chính xác của tôi là {acc_coach:percent}.
+appraisal.num.acc.b5 = Độ chính xác {acc:percent}; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Độ chính xác {acc:percent}, có {n:inaccuracy} và {m:mistake}.
+appraisal.num.acc.b5.3 = {acc:percent}: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Ra khỏi lý thuyết khai cuộc ở {k:moveno}.
+appraisal.num.book.b5.2 = Chúng ta rời lý thuyết khai cuộc ở {k:moveno}.
+appraisal.num.acc.b6 = {acc:percent}, so với {acc_coach:percent} của tôi. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = Bạn {acc:percent}, tôi {acc_coach:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Độ chính xác {acc:percent}, của tôi {acc_coach:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = Độ chính xác {acc:percent}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Độ chính xác: {acc:percent}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = Một điều nên luyện tập: {theme}.
+appraisal.improve.theme.b1.2 = Một lời khuyên cho lần sau: {theme}.
+appraisal.improve.theme.b1.3 = Một điều cần rèn luyện: {theme}.
+appraisal.improve.theme.b2 = Điều nên luyện tập: {theme}.
+appraisal.improve.theme.b2.2 = Một ý cho lần sau: {theme}.
+appraisal.improve.theme.b2.3 = Một điều đáng để rèn luyện: {theme}.
+appraisal.improve.theme.b3 = Một chủ đề của ván này: {theme}.
+appraisal.improve.theme.b3.2 = Đáng luyện tập: {theme}.
+appraisal.improve.theme.b4 = Một chủ đề lặp lại: {theme}.
+appraisal.improve.theme.b4.2 = Điều này đã xuất hiện hơn một lần: {theme}.
+appraisal.improve.theme.b5 = Chủ đề lặp lại: {theme}.
+appraisal.improve.theme.b5.2 = Chủ đề của ván: {theme}.
+appraisal.improve.theme.b6 = Chủ đề lặp lại: {theme}.
+appraisal.improve.theme.b6.2 = Chủ đề: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = Bước ngoặt của ván cờ là ở {crit_no:moveno}. Lần sau, hãy tập {theme}.
+appraisal.improve.critical.b2.2 = Thời điểm then chốt là {crit_no:moveno}, {crit_move}. Điều nên luyện tập: {theme}.
+appraisal.improve.critical.b3 = Thời điểm quyết định là {crit_no:moveno}. Thay vì {crit_move}, {crit_best} là nước hay hơn.
+appraisal.improve.critical.b3.2 = Ở {crit_no:moveno}, {crit_best} hay hơn {crit_move}. Hãy xem trước các nước chiếu, bắt quân và đe dọa của tôi.
+appraisal.improve.critical.b4 = Thời điểm quyết định: {crit_no:moveno}, {crit_move}. {crit_best} là nước hay hơn.
+appraisal.improve.critical.b4.2 = Nước {crit_no:ord} là thời điểm then chốt: {crit_best} thay vì {crit_move}.
+appraisal.improve.critical.b5 = Nước {crit_no:ord}: {crit_best} thay vì {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = Thời điểm quyết định, {crit_no:moveno}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Nước {crit_no:ord}: {crit_best} thay vì {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, không phải {crit_move}: {eval}.
+appraisal.improve.critical.b6.2.spoken = {crit_no:moveno}: {crit_best}, không phải {crit_move}. {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = Bạn đã ở thế thắng cho đến {crit_no:moveno}. Một lời khuyên: {theme}.
+appraisal.improve.was_winning.b1.2 = Bạn đã chơi rất hay cho đến {crit_no:moveno}. Hãy nhớ: {theme}.
+appraisal.improve.was_winning.b2 = Bạn đã ở thế thắng cho đến {crit_no:moveno}. Lần sau: {theme}.
+appraisal.improve.was_winning.b2.2 = Đến {crit_no:moveno}, bạn vẫn đang ở thế thắng. Điều nên luyện tập: {theme}.
+appraisal.improve.was_winning.b3 = Bạn đã ở thế thắng cho đến {crit_no:moveno}. {crit_best} lẽ ra đã giữ được ưu thế cho bạn.
+appraisal.improve.was_winning.b3.2 = Đến {crit_no:moveno}, bạn vẫn ở thế thắng; {crit_best} lẽ ra đã giữ được thế đó.
+appraisal.improve.was_winning.b4 = Bạn đã ở thế thắng cho đến {crit_no:moveno}. {crit_best} lẽ ra đã giữ được ưu thế cho bạn.
+appraisal.improve.was_winning.b4.2 = Thế thắng đến {crit_no:moveno}; {crit_best} lẽ ra đã giữ được thế đó.
+appraisal.improve.was_winning.b5 = Thế thắng đến {crit_no:moveno}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Nước {crit_no:ord}: {crit_best} lẽ ra đã giữ được thế thắng, {eval}.
+appraisal.improve.was_winning.b6 = Nước {crit_no:ord}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} ở {crit_no:moveno} lẽ ra đã giữ được thế thắng: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = Một lời khuyên: khi bạn đang thắng, hãy luôn chừa cho con Vua của tôi một ô để đi.
+appraisal.improve.stalemate.b1.2 = Hãy nhớ: gần cuối ván, trước mỗi nước đi, hãy kiểm tra xem con Vua của tôi còn đi được không.
+appraisal.improve.stalemate.b2 = Khi đang thắng, hãy luôn chừa cho con Vua của tôi một ô, nếu không sẽ thành thế hết nước đi.
+appraisal.improve.stalemate.b2.2 = Lần sau, trước khi đi, hãy kiểm tra xem con Vua của tôi còn đi được không.
+appraisal.improve.stalemate.b3 = Khi đang thắng, ở mỗi nước hãy kiểm tra xem con Vua của tôi còn ô để đi không.
+appraisal.improve.stalemate.b3.2 = Cẩn thận với thế hết nước đi trong tàn cuộc đã thắng: hãy chừa chỗ thở cho con Vua của tôi.
+appraisal.improve.stalemate.b4 = Trong tàn cuộc đã thắng, hãy luôn để ý thế hết nước đi.
+appraisal.improve.stalemate.b4.2 = Cảnh giác với thế hết nước đi: lần này nó đã làm mất chiến thắng.
+appraisal.improve.stalemate.b5 = Kiểm tra thế hết nước đi trong tàn cuộc đã thắng.
+appraisal.improve.stalemate.b5.2 = Thế hết nước đi đã làm mất chiến thắng.
+appraisal.improve.stalemate.b6 = Coi chừng hết nước đi.
+appraisal.improve.stalemate.b6.2 = Hết nước đi: mất chiến thắng.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = Ở {n:moveno}, {my} không được bảo vệ. Bạn có thấy không?
+appraisal.improve.coach_hung.b1.2 = Ở {n:moveno}, bạn có thể bắt {my} mà không mất gì. Hãy luôn tìm những quân cho không!
+appraisal.improve.coach_hung.b2 = Ở {n:moveno}, {my} không được bảo vệ. Bạn có nhìn thấy không?
+appraisal.improve.coach_hung.b2.2 = Ở {n:moveno}, bạn đã có thể bắt {my} mà không mất gì.
+appraisal.improve.coach_hung.b3 = Ở {n:moveno}, {my} bị treo. Bạn có nhận ra không?
+appraisal.improve.coach_hung.b3.2 = {my} bị treo ở {n:moveno}. Ở mỗi nước, hãy tìm những quân bị treo.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Hãy tiếp tục kiểm tra xem các quân của bạn có an toàn không, như hôm nay nhé.
+appraisal.improve.clean.b1.2 = Hãy tiếp tục xem tôi đang tấn công gì trước mỗi nước đi. Cách đó hiệu quả đấy!
+appraisal.improve.clean.b1.3 = Hãy tiếp tục chơi cẩn thận như vậy nhé!
+appraisal.improve.clean.b2 = Một ván cờ không có sai lầm lớn. Hãy tiếp tục để ý các đe dọa của tôi như thế.
+appraisal.improve.clean.b2.2 = Hãy tiếp tục như hôm nay: quân an toàn, nước đi hay.
+appraisal.improve.clean.b3 = Một ván cờ không có sai lầm lớn. Hãy tiếp tục xem trước các nước chiếu, bắt quân và đe dọa.
+appraisal.improve.clean.b3.2 = Không có sai lầm lớn: cứ tiếp tục như vậy nhé.
+appraisal.improve.clean.b4 = Một ván cờ không có sai sót lớn. Không có gì quan trọng cần sửa.
+appraisal.improve.clean.b4.2 = Không có sai lầm nghiêm trọng.
+appraisal.improve.clean.b5 = Không có sai lầm nghiêm trọng.
+appraisal.improve.clean.b5.2 = Không có sai sót lớn.
+appraisal.improve.clean.b6 = Không có sai sót lớn.
+appraisal.improve.clean.b6.2 = Không có lỗi nghiêm trọng.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# {level} = “Người mới chơi” ...: always after "cấp độ".
+appraisal.end.b1 = Bạn tiến bộ hơn sau mỗi ván. Chơi thêm ván nữa không?
+appraisal.end.b1.2 = Vui thật! Chúng ta chơi lại nhé?
+appraisal.end.b1.3 = Bạn đã rất cố gắng. Chơi thêm một ván nữa không?
+appraisal.end.b2 = Bạn tiến bộ hơn sau mỗi ván. Chơi thêm ván nữa không?
+appraisal.end.b2.2 = Ván cờ hay. Chúng ta chơi lại nhé?
+appraisal.end.b2.3 = Chơi hay lắm. Thêm một ván nữa không?
+appraisal.end.b3 = Một ván cờ chắc chắn. Sẵn sàng cho ván tiếp theo chưa?
+appraisal.end.b3.2 = Ván cờ hay. Thêm ván nữa không?
+appraisal.end.b3.3 = Chơi hay. Chúng ta đấu tiếp nhé?
+appraisal.end.b4 = Một ván cờ chắc chắn. Sẵn sàng cho ván tiếp theo chưa?
+appraisal.end.b4.2 = Thêm một ván nữa?
+appraisal.end.b4.3 = Ván cờ hay. Ván tiếp theo nhé?
+appraisal.end.b5 = Ván nữa?
+appraisal.end.b5.2 = Ván tiếp theo?
+appraisal.end.b5.3 = Chơi lại?
+appraisal.end.b6 = Ván nữa?
+appraisal.end.b6.2 = Ván tiếp theo?
+appraisal.end.b6.3 = Chơi lại?
+appraisal.end.up.b1 = Bạn đã sẵn sàng cho cấp độ {level}. Muốn thử không?
+appraisal.end.up.b1.2 = Tôi nghĩ bạn đã sẵn sàng cho cấp độ {level}. Chúng ta thử nhé?
+appraisal.end.up.b2 = Bạn đã sẵn sàng cho cấp độ {level}. Muốn thử không?
+appraisal.end.up.b2.2 = Lần tới thử cấp độ {level} nhé? Tôi nghĩ bạn đã sẵn sàng.
+appraisal.end.up.b3 = Bạn đã vượt qua cấp độ này rồi: hãy thử cấp độ {level}.
+appraisal.end.up.b3.2 = Sẵn sàng cho cấp độ {level} chưa? Tôi nghĩ là rồi.
+appraisal.end.up.b4 = Bạn đã vượt qua cấp độ này rồi: hãy thử cấp độ {level}.
+appraisal.end.up.b4.2 = Đã đến lúc lên cấp độ {level}?
+appraisal.end.up.b5 = Lần tới hãy thử cấp độ {level}.
+appraisal.end.up.b5.2 = Tiếp theo là cấp độ {level}?
+appraisal.end.up.b6 = Lần tới hãy thử cấp độ {level}.
+appraisal.end.up.b6.2 = Tiếp theo là cấp độ {level}?
+appraisal.end.down.b2 = Chúng ta chơi một ván ở cấp độ {level} để luyện tập những ý tưởng này nhé.
+appraisal.end.down.b2.2 = Chơi một ván ở cấp độ {level} để luyện tập nhé?
+appraisal.end.down.b3 = Bạn có muốn chơi một ván ở cấp độ {level} để luyện tập những ý tưởng này không?
+appraisal.end.down.b3.2 = Một ván ở cấp độ {level} có thể giúp luyện tập những ý tưởng này.
+appraisal.end.down.b4 = Một ván ở cấp độ {level} có lẽ sẽ giúp luyện những ý tưởng này.
+appraisal.end.down.b4.2 = Hay là một ván ở cấp độ {level} để luyện tập?
+appraisal.end.down.b5 = Hay là một ván ở cấp độ {level}?
+appraisal.end.down.b5.2 = Cấp độ {level} để luyện tập?
+appraisal.end.down.b6 = Hay là một ván ở cấp độ {level}?
+appraisal.end.down.b6.2 = Cấp độ {level} để luyện tập?

@@ -1,0 +1,137 @@
+# Coach speech (Greek): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang (its header documents every placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 θέσεις", count.position in
+#            common.lang), "{n:move}" likewise: a mate distance is "ματ σε {n:move}" ("ματ σε 2
+#            κινήσεις", spoken "ματ σε δύο κινήσεις"), never a bare {n} (it would be spoken neuter)
+#   {move}   one of the coach's moves, played on the board while the line is said; it stands alone
+#            ("θα απαντούσα {move}"), after "η απάντηση" or after the neuter "μετά το {move}";
+#            "{move:nomate}" says a mating move without "ματ" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word ({your:acc} as an object)
+#   {sq}     a square, "το τετράγωνο {sq}"; the coach points at it on that word
+# The player always has the white pieces. The coach says "εσύ" to the player and is male; the
+# player's gender is unknown: no adjective or participle agrees with the player.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+# Each line starts with the challenge's name (assets/i18n/el.lang challenge.<id>.name); the two names
+# that are imperatives there in the polite plural ("Βρείτε", "Σταματήστε") take the coach's "εσύ".
+ch.intro.mate1 = Ματ σε μία. {n:position}, και κάθε φορά μία μόνο κίνηση κάνει ματ. Κοίτα κάθε σαχ.
+ch.intro.mate2 = Ματ σε δύο. {n:position}: η πρώτη σου κίνηση πρέπει να με αφήνει χωρίς άμυνα, και μετά κάνεις ματ.
+ch.intro.mate3 = Ματ σε τρεις. {n:position}. Σαχ, αιχμαλωσίες και απειλές: υπολόγιζε κάθε φορά την καλύτερή μου απάντηση.
+ch.intro.backrank = Ματ στην τελευταία γραμμή. {n:position} όπου ένας βασιλιάς είναι κλεισμένος πίσω από τα δικά του πιόνια.
+ch.intro.patterns = Μοτίβα ματ. {n:position} με κλασικά δίχτυα ματ. Αναγνώρισε το μοτίβο και χτύπα.
+ch.intro.hanging = Ακάλυπτα κομμάτια. {n:position}: κάτι δικό μου έχει μείνει απροστάτευτο. Βρες το και πάρ’ το.
+ch.intro.fork = Πιρούνια. {n:position}: βρες την κίνηση που απειλεί δύο πράγματα ταυτόχρονα.
+ch.intro.pin = Καρφώματα. {n:position}: κάρφωσε ένα κομμάτι ή εκμεταλλέψου ένα κάρφωμα.
+ch.intro.skewer = Σουβλίσματα. {n:position}: απείλησε ένα πολύτιμο κομμάτι και κέρδισε ό,τι βρίσκεται πίσω του.
+ch.intro.discovered = Αποκαλυπτόμενες επιθέσεις. {n:position}: κίνησε ένα κομμάτι για να απελευθερώσεις ένα άλλο.
+ch.intro.deflection = Εκτροπή και προσέλκυση. {n:position}: απομάκρυνε έναν υπερασπιστή ή τράβηξέ τον σε μοιραίο τετράγωνο.
+ch.intro.intermezzo = Ενδιάμεσες κινήσεις. {n:position}: πριν από την προφανή κίνηση, βρες μια πιο δυνατή.
+ch.intro.trapped = Παγιδευμένα κομμάτια. {n:position}: ένα από τα κομμάτια μου δεν έχει πού να πάει με ασφάλεια. Κέρδισέ το.
+ch.intro.promotion = Προαγωγή. {n:position} όπου ένα προχωρημένο πιόνι κρίνει την παρτίδα.
+ch.intro.quiet = Ήσυχες κινήσεις. {n:position}: η κίνηση που κερδίζει δεν είναι ούτε σαχ ούτε αιχμαλωσία.
+ch.intro.opening = Παγίδες στο άνοιγμα. {n:position} από τις πρώτες κινήσεις πραγματικών παρτίδων. Τιμώρησε το λάθος μου.
+ch.intro.escape = Βρες τη διαφυγή. {n:position}: ο βασιλιάς σου κινδυνεύει, και μόνο μία κίνηση τον σώζει.
+ch.intro.defend = Αμυντικές κινήσεις. {n:position}: βρες τη μόνη κίνηση που κρατά τη θέση σου όρθια.
+ch.intro.kq = Βασίλισσα και βασιλιάς εναντίον βασιλιά. {n:position}: κάνε ματ στον βασιλιά μου. Πρόσεχε το πατ.
+ch.intro.kr = Πύργος και βασιλιάς εναντίον βασιλιά. {n:position}: κάνε ματ στον βασιλιά μου, βήμα βήμα.
+ch.intro.kp = Βασιλιάς και πιόνι εναντίον βασιλιά. {n:position}: κάνε βασίλισσα. Να προπορεύεται ο βασιλιάς σου.
+ch.intro.kp_hold = Σταμάτησε το πιόνι. {n:position}: έχεις μόνο τον βασιλιά σου. Κράτα την ισοπαλία.
+ch.intro.rook = Φινάλε πύργων. {n:position}: χτίσε τη γέφυρα για να κάνεις προαγωγή, και κράτα την ισοπαλία με την άμυνα Φιλιντόρ.
+ch.intro.endgame = Τακτική στο φινάλε. {n:position} με λίγα κομμάτια και οξείες ιδέες.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 κινήσεις").
+ch.task.mate = Ματ σε {n:move}.
+ch.task.mate.2 = Βρες το ματ σε {n:move}.
+ch.task.hanging = Κάτι έχει μείνει απροστάτευτο.
+ch.task.hanging.2 = Τι μπορείς να πάρεις χωρίς αντάλλαγμα;
+ch.task.fork = Βρες το πιρούνι.
+ch.task.fork.2 = Ψάξε για πιρούνι.
+ch.task.pin = Εδώ το κλειδί είναι ένα κάρφωμα.
+ch.task.skewer = Εδώ κερδίζει ένα σούβλισμα.
+ch.task.discovered = Εδώ κερδίζει μια αποκαλυπτόμενη επίθεση.
+ch.task.deflection = Υπερφόρτωσε ή παρέσυρε έναν υπερασπιστή.
+ch.task.intermezzo = Ψάξε για μια ενδιάμεση κίνηση.
+ch.task.trapped = Ένα από τα κομμάτια μου δεν μπορεί να ξεφύγει. Κέρδισέ το.
+ch.task.promotion = Χρησιμοποίησε το προχωρημένο πιόνι σου.
+ch.task.quiet = Η κίνηση που κερδίζει είναι μια ήσυχη κίνηση.
+ch.task.opening = Τιμώρησε την τελευταία μου κίνηση.
+ch.task.escape = Σώσε τον βασιλιά σου: μόνο μία κίνηση πετυχαίνει.
+ch.task.defend = Βρες τη μόνη καλή κίνηση.
+ch.task.endgame = Βρες την καλύτερη κίνηση.
+ch.task.default = Βρες την καλύτερη κίνηση.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Κάνε ματ στον βασιλιά μου. Θα αμυνθώ όσο καλύτερα μπορώ.
+ch.task.play.promote = Κάνε προαγωγή στο πιόνι σου και κράτα τη νίκη. Θα προσπαθήσω να σε σταματήσω.
+ch.task.play.hold = Κράτα την ισοπαλία για {n:move}. Θα προσπαθήσω να κερδίσω.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Αυτές οι θέσεις προέρχονται από πραγματικές παρτίδες. Παίζω την τελευταία κίνηση και μετά είναι η σειρά σου.
+ch.lead.first.2 = Κάθε θέση προέρχεται από πραγματική παρτίδα: παίζω την κίνηση που οδήγησε σε αυτήν και μετά παίζεις εσύ.
+ch.next = Επόμενη θέση.
+ch.next.2 = Ορίστε η επόμενη.
+ch.next.3 = Πάμε στην επόμενη.
+ch.last = Η τελευταία θέση.
+ch.last.2 = Και τώρα η τελευταία.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Ωραία.
+ch.good.2 = Ναι.
+ch.good.3 = Σωστά.
+ch.good.4 = Ακριβώς.
+# The position is solved.
+ch.solved = Αυτό είναι! Μπράβο.
+ch.solved.2 = Απολύτως σωστά.
+ch.solved.3 = Πολύ καλά.
+ch.solved.mate = Ματ! Μπράβο.
+ch.solved.mate.2 = Και αυτό είναι ματ. Πολύ καλά.
+ch.solved.mate.3 = Ματ. Ωραία δουλειά.
+ch.solved.promote = Καινούργια βασίλισσα, και η νίκη είναι εξασφαλισμένη. Μπράβο.
+ch.solved.hold = Η ισοπαλία κρατάει. Ωραία άμυνα!
+ch.solved.draw = Ισοπαλία στη σκακιέρα. Ωραία άμυνα!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Όχι αυτή: θα απαντούσα {move}.
+ch.wrong.reply.2 = Όχι ακριβώς: θα έπαιζα {move}.
+ch.wrong.reply.3 = Τότε θα έπαιζα {move}.
+ch.wrong.mate = Προσοχή: η απάντηση {move:nomate} θα ήταν ματ.
+ch.wrong.mate.2 = Πρόσεχε: θα απαντούσα {move:nomate}, και αυτό είναι ματ.
+ch.wrong.mated = Προσοχή: μετά το {move}, έχω αναγκαστικό ματ σε {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Κι αυτή κάνει ματ, αλλά αργεί περισσότερο. Υπάρχει πιο γρήγορος δρόμος.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Κι αυτή κάνει ματ, αλλά έχω άλλη κίνηση στο μυαλό μου. Ξανακοίτα.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Όχι κακή, αλλά υπάρχει κάτι πιο δυνατό. Ξανακοίτα.
+ch.wrong.weaker.2 = Παίζεται, αλλά μπορείς και καλύτερα.
+ch.wrong.stalemate = Πατ! Ο βασιλιάς μου δεν μπορεί να κινηθεί, και αυτό είναι μόνο ισοπαλία.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Όχι αυτή: μετά το {move}, μπορώ να κρατήσω την ισοπαλία.
+ch.wrong.loses = Προσοχή: μετά το {move}, θα είχα κερδισμένη θέση.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Όχι αυτό.
+ch.try_again = Δοκίμασε ξανά.
+ch.try_again.2 = Ξανακοίτα τη θέση.
+ch.try_again.3 = Κοίτα πάλι.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Θέλεις μια υπόδειξη;
+ch.offer.2 = Να σου δώσω μια υπόδειξη;
+ch.no_hint = Εντάξει. Συνέχισε να ψάχνεις.
+ch.no_hint.2 = Καλά, με την ησυχία σου.
+ch.hint.piece = Κοίτα {your:acc}.
+ch.hint.piece.2 = Σκέψου {your:acc}.
+ch.hint.square = Κοίτα το τετράγωνο {sq}.
+ch.hint.square.2 = Το τετράγωνο-κλειδί είναι το {sq}.
+ch.hint.square.3 = Έχε τον νου σου στο τετράγωνο {sq}.
+ch.hint.show = Αυτή είναι η κίνηση. Κοίτα.
+ch.hint.show.2 = Θα σου δείξω. Κοίτα.
+ch.hint.now = Τώρα παίξ’ την εσύ.
+ch.hint.now.2 = Σειρά σου: παίξ’ την.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Αυτή ήταν όλη η πρόκληση. Μπράβο!
+ch.complete.2 = Έλυσες όλες τις θέσεις. Μπράβο!

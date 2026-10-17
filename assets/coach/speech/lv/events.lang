@@ -1,0 +1,112 @@
+# Coach speech (Latvian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "tu"; the player's gender is unknown: finite verbs only ("tu uzvarēji", "tu nolēmi
+# padoties"), never "esi gatavs", "sveiks / sveika", "laipni lūgts", "malacis": the greetings are
+# "Sveiki!", "Čau!", "Laipni lūdzam!", the praise "Labi padarīts!", "Apsveicu!". The coach is male
+# ("esmu gatavs", "es eju pirmais").
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Sveiki! Uzspēlēsim draudzīgu partiju. Es palīdzēšu ikreiz, kad kaut kas noies greizi.
+event.greet.l1.2 = Čau! Es spēlēšu saudzīgi un parādīšu, kam jāpievērš uzmanība.
+event.greet.l1.3 = Laipni lūdzam! Nesteidzies: es pateikšu, kad kāda figūra būs briesmās.
+event.greet.l2 = Sveiki! Spēlēsim. Kad radīsies dakša vai piesaiste, es tev to parādīšu.
+event.greet.l2.2 = Čau! Attīsti savas figūras un sargā savu karali. Es palīdzēšu pa ceļam.
+event.greet.l2.3 = Atkal pie galdiņa! Seko līdzi dakšām un piesaistēm: ar tām uzvar partijas.
+event.greet.l3 = Sveiki! Uzspēlēsim īstu partiju. Es komentēšu tavus plānus un lielākās kļūdas.
+event.greet.l3.2 = Čau! Izdomā plānu savām figūrām. Es pateikšu, ja kāds gājiens kaut ko palaiž garām.
+event.greet.l3.3 = Spēlēsim! Es norādīšu uz vienīgajiem gājieniem un uz gājieniem, kas ir kļūdaini.
+event.greet.l4 = Sveiki! Šoreiz es došu novērtējumus un parādīšu labākos kandidātgājienus.
+event.greet.l4.2 = Spēlēsim. Pēc kļūdas es pateikšu, kas būtu bijis precīzāk.
+event.greet.l4.3 = Uzspēlēsim kā klubā? Es komentēšu, kad mainīsies novērtējums.
+event.greet.l5 = Spēlēsim. Mani komentāri būs īsi.
+event.greet.l5.2 = Esmu gatavs — sāc, kad vēlies. Tikai īsi komentāri.
+event.greet.l5.3 = Veiksmi! Runāšu tikai tad, kad tas būs svarīgi.
+event.greet.l6 = Veiksmi.
+event.greet.l6.2 = Sākam.
+event.greet.l6.3 = Esmu gatavs. Komentēšu tikai kritiskos brīžus.
+
+# Who starts (said after the greeting).
+event.colour.white = Tev ir baltās figūras, tāpēc tu sāc.
+event.colour.white.2 = Tu spēlē ar baltajām: pirmais gājiens ir tavs.
+event.colour.black = Man ir baltās, tāpēc sākšu es.
+event.colour.black.2 = Šoreiz tu spēlē ar melnajām: es eju pirmais.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names (coach.level.<n>.name of assets/i18n/lv.lang): Pirmie soļi, Iesācējs, Turpinātājs,
+# Kluba spēlētājs, Spēcīgs kluba spēlētājs, Eksperts.
+event.level.l1 = Pirmie soļi: es spēlēju saudzīgi un katru kļūdu izskaidroju vienkāršiem vārdiem.
+event.level.l2 = Iesācējs: es spēlēju mazliet spēcīgāk un nosaucu vienkāršus taktiskus paņēmienus, piemēram, dakšas un piesaistes.
+event.level.l3 = Turpinātājs: es runāju par plāniem un bandinieku struktūru un rādu īsus variantus.
+event.level.l4 = Kluba spēlētājs: es novērtēju pozīciju bandiniekos un iesaku kandidātgājienus.
+event.level.l5 = Spēcīgs kluba spēlētājs: īsi komentāri un garāki varianti, kad tas ir svarīgi.
+event.level.l6 = Eksperts: es spēlēju no visa spēka un komentēju tikai kritiskos brīžus.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Tavs gājiens.
+event.your_move.2 = Tava kārta.
+event.your_move.3 = Tagad tu.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Nesteidzies.
+event.take_time.2 = Nav kur steigties: mūsu partijās nav pulksteņa.
+# Short filler while the coach is still looking at the position.
+event.filler = Hm.
+event.filler.2 = Paskatīsimies.
+event.filler.3 = Ļauj man paskatīties.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Labi, atsauksim gājienu.
+event.takeback.taken.2 = Laba doma. Paskaties vēlreiz.
+event.takeback.taken.3 = Gājiens atsaukts. Mēģini vēlreiz.
+# The player declined the offer and played on.
+event.takeback.declined = Labi, spēlējam tālāk.
+event.takeback.declined.2 = Labi, partija turpinās.
+event.takeback.declined.3 = Tava izvēle. Turpināsim.
+# After an explanation without an offer.
+event.play_on = Spēlēsim tālāk.
+event.play_on.2 = Turpināsim.
+event.play_on.3 = Nu, atgriezīsimies pie mūsu partijas.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Šādas kļūdas pieļauj visi. Galvenais ir tās pamanīt.
+event.encourage.mistake.2 = Neuztraucies. Paskaties, kam uzbrūk mans pēdējais gājiens, un tu to atradīsi.
+event.encourage.mistake.3 = Tā gadās ar katru spēlētāju. Turpināsim.
+# The player is behind (material or evaluation).
+event.encourage.behind = Nepadodies: meklē iespējas un neatdod man uzvaru viegli.
+event.encourage.behind.2 = Cīnies tālāk. Šādās pozīcijās viss vēl var mainīties.
+event.encourage.behind.3 = Saglabā mieru un meklē manas vājās vietas.
+# The player has played several good moves in a row.
+event.encourage.well = Tu pārbaudi manus draudus, pirms izdari gājienu. Labi padarīts.
+event.encourage.well.2 = Uzmanīgi, stabili gājieni. Tā turpināt!
+event.encourage.well.3 = Tu šodien labi domā.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Piekrītu. Tātad neizšķirts.
+event.draw.accepted.2 = Norunāts: neizšķirts.
+event.draw.declined = Nē, paldies, spēlēsim tālāk.
+event.draw.declined.2 = Es labāk turpinātu.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Labi nospēlēts. Apsveicu!
+event.end.win.2 = Pelnīta uzvara. Labi padarīts!
+event.end.win.3 = Apsveicu: tu mani uzvarēji godīgā cīņā.
+event.end.loss = Laba partija. Nākamreiz tu mani uzvarēsi.
+event.end.loss.2 = Paldies par partiju. Katrs zaudējums kaut ko iemāca.
+event.end.loss.3 = Laba cīņa. Paskatīsimies, kas notika.
+event.end.draw = Neizšķirts. Laba partija!
+event.end.draw.2 = Šoreiz neuzvar neviens. Cīņa bija laba.
+event.end.draw.3 = Taisnīgs rezultāts. Laba partija.
+event.end.resigned = Tu nolēmi padoties. Tomēr cīņa bija laba.
+event.end.resigned.2 = Labi. Paldies par partiju.
+event.end.handshake = Paspiedīsim rokas.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang): a capitalised nominative, always
+# in quotes after the noun "tēma" (topic), which takes the case.
+event.lesson.resume = Prieks tevi atkal redzēt! Turpināsim ar tēmu „{chapter}”.
+event.lesson.resume.2 = Sveiki atkal! Mēs apstājāmies pie tēmas „{chapter}”.
+event.lesson.next = Nākamā tēma: „{chapter}”.
+event.lesson.next.2 = Tagad pievērsīsimies tēmai „{chapter}”.

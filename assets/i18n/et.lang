@@ -1,0 +1,1439 @@
+# Scacelith - Eesti
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other ("1 käik|5 käiku").
+# Register: formal "te" (lowercase) in sentences; buttons, menu entries and short commands use the bare
+# imperative ("Salvesta", "Anna alla") or a noun. Chess terms follow the Estonian glossary (lipp, vanker,
+# oda, ratsu, ettur; tuli, matt, patt, viik; piece letters K L V O R). Titles in capitals.
+# A placeholder never takes a case ending: a clock time ("4:59") follows "pärast" ("{0} pärast"), a
+# duration in words ("5 minutit") follows "oodake" ("Oodake {0}"), a player's name follows "mängija"
+# ("mängija {0} kellal"), a server's name follows "serveris / serverisse" ("serverisse {0}").
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Sees
+common.off = Väljas
+common.back = Tagasi
+common.apply = Rakenda
+common.discard = Hülga
+common.cancel = Loobu
+common.white = Valge
+common.black = Must
+common.main_menu = Peamenüü
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Kuninglik mäng
+menu.new_game = Uus partii
+menu.options = Seaded
+menu.credits = Tegijad
+menu.quit = Välju
+menu.version = Versioon {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = SEADED
+options.tab.display = Ekraan
+options.tab.graphics = Graafika
+options.tab.audio = Heli
+options.tab.gameplay = Mäng
+options.tab.player = Mängija
+options.tab.controls = Juhtimine
+options.pending = Muudatused jõustuvad pärast rakendamist.
+options.unsaved.title = SALVESTAMATA MUUDATUSED
+options.unsaved.text = Mõningaid seadeid on muudetud. Kas rakendada need enne lahkumist?
+
+options.language = Keel
+options.language.help = Menüüde ja teadete keel. Muutub kohe.
+options.language.not_adapted = See keel pole veel täielikult kohandatud: treeneri hääl võib mõnda sõna valesti hääldada ja mõni tekst võib veel kohmakalt kõlada.
+options.display_mode = Kuvarežiim
+options.display_mode.help = Täisekraan: ääristeta aken üle kogu ekraani, töölaua eraldusvõimega. Aknas: allpool määratud suurusega aken.
+options.fullscreen = Täisekraan
+options.windowed = Aknas
+options.window_size = Akna suurus
+options.window_size.help = Akna suurus aknarežiimis. Täisekraan kasutab alati töölaua eraldusvõimet.
+options.vsync = Vertikaalsünkroonimine
+options.vsync.help = Sünkroonib kaadrid ekraaniga, et vältida pildi rebenemist.
+options.render_scale = Renderdusskaala
+options.render_scale.help = 3D-pildi sisemine eraldusvõime. Madalam on kiirem, kõrgem teravam.
+
+options.quality = Kvaliteet
+options.quality.very_low = Väga madal
+options.quality.low = Madal
+options.quality.medium = Keskmine
+options.quality.high = Kõrge
+options.quality.ultra = Ultra
+options.quality.custom = Kohandatud
+options.quality.help = Määrab kõik allolevad seaded korraga: „Väga madal“ lülitab kõik efektid välja, „Ultra“ seab need kõik maksimumile. Kui muudate mõnda seadet eraldi, saab väärtuseks „Kohandatud“. Tagasihoidliku graafikakaardi puhul aitab palju ka renderdusskaala vähendamine (Ekraan).
+options.shadows = Varjud
+options.shadows.help = Päikesevarjude detailsus ja nende servade pehmus. Madal: lihtsad servad, kiiresti joonistatavad.
+options.reflections = Peegeldused
+options.reflections.help = Põrand, laud ja malelaud peegeldavad ruumi (ruum joonistatakse igaühe jaoks veel kord: see on üks nõudlikumaid seadeid); alates tasemest „Keskmine“ peegeldavad ka läikivad malendid ja esemed seda, mis on nende ümber.
+options.ambient_occlusion = Ümbritsev varjestus
+options.ambient_occlusion.help = Pehme varjutus kohtades, kus esemed kokku puutuvad, ja süvendites, kuhu jõuab vähem valgust.
+options.indirect_light = Kaudne valgus
+options.indirect_light.help = Päevavalgus, mis peegeldub seintelt, põrandalt ja laest. Madal: selle asemel ühtlane hajuvalgus. Mõjutab peamiselt laadimisaega.
+options.volumetric_light = Valguskiired
+options.volumetric_light.help = Päikesekiired läbi saali tolmuse õhu ja neis helkivad tolmukübemed.
+options.tessellation = Tessellatsioon
+options.tessellation.help = Sujuvad piirjooned malendite kumerustel, kui neid lähedalt vaadata.
+options.tessellation.unavailable = Pole saadaval: see graafikadraiver ei toeta tessellatsiooni.
+options.antialiasing = Servade silumine
+options.antialiasing.help = Silub sakilisi servi ja virvendavaid helke. Väljas: teravam, kuid sakiline pilt ja mõni efekt paistab teraline.
+options.depth_of_field = Teravussügavus
+options.depth_of_field.help = Hägustab seda, mis jääb vaadatavast tublisti ette või taha, nagu kaameraobjektiiv.
+options.motion_blur = Liikumishägu
+options.motion_blur.help = Hägustab kaamera ja käte kiireid liigutusi, nagu filmikaamera.
+options.bloom = Kuma
+options.bloom.help = Pehme kuma eredaimate helkide ümber, nagu kaameraobjektiivis.
+options.brightness = Heledus
+options.brightness.neutral = Neutraalne
+options.brightness.value = {0} EV
+options.brightness.help = Kaamera särikompensatsioon. Esimesel käivitamisel tehtud kalibreerimine seab selle nii, et kõige tumedamad varjud on vaevu nähtavad.
+
+options.master_volume = Üldhelitugevus
+options.effects = Efektid
+options.ambience = Taustahelid
+options.ambience.help = Saali sumin: tule praksumine, kauged sammud, vana kell.
+options.ambience_volume = Taustahelide tugevus
+options.voice_volume = Hääle tugevus
+options.voice_volume.help = Treeneri hääle tugevus treenerirežiimis.
+options.subtitles = Subtiitrid
+options.subtitles.auto = Automaatne
+options.subtitles.help = Treeneri sõnad kirjas ekraani allservas. Automaatne: kuvatakse siis, kui treener ei räägi menüüde keelt (hiinakeelsete menüüde korral räägib ta inglise keelt). Kuvatakse alati, kui tema hääl pole installitud.
+
+options.legal_moves = Näita lubatud käike
+options.legal_moves.help = Tõstab esile väljad, kuhu puudutatud malend saab käia. Kui see on väljas, ei näita miski, kas käik on reeglipärane: reeglivastase käigu eest karistab kohtunik siis, kui olete kella vajutanud.
+options.coordinates = Laua koordinaadid
+options.auto_press = Automaatne kellavajutus
+options.auto_press.help = Teie robot vajutab kella ise, kui teie käik on laual. Võrgupartiides otsustab seda server ja otsemängus partii võõrustaja.
+options.thinking_time = Realistlik mõtlemisaeg
+options.thinking_time.help = Vastane mõtleb nagu inimmängija, selle asemel et kohe käia.
+options.ignore_head = Eira vastase pealiigutusi
+options.ignore_head.help = Võrgupartiides ja otsemängudes vaatab vastase robot sinna, kuhu vaatab tema mängija. Kui see on sees, liigutab robot pead ise, nagu Stockfishi vastu mängides.
+options.mouse_sensitivity = Hiire tundlikkus
+options.invert_look = Pööra vertikaalvaade ümber
+options.handover = Mängijavahetus
+options.handover.cut = Kohene üleminek
+options.handover.flight = Lend, {0} s
+options.handover.help = Kaks mängijat ühes arvutis: kuidas vaade liigub pärast iga käiku ühe mängija silmist teise omadesse. Kohene üleminek väldib kaamera liikumist.
+options.game_cursor = Mängu kursor
+options.game_cursor.help = Laua taga joonistab mäng oma kursori, mis näitab, mida klõps teeb. Väljas: tavaline süsteemi nool.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nimi
+player.name.help = Teie nimi, nagu see kirjutatakse partiiblankettide päisesse, mis tahes tähestikus.
+player.default_name = Inimene
+player.handwriting = Käekiri
+player.handwriting.help = Käsi, mis kirjutab teie käigud. Araabia, jaapani ja hiina keele jaoks on eraldi käekirjad.
+player.preview = TEIE PARTIIBLANKETIL
+hand.caveat = Vaba
+hand.marck = Sidekiri
+hand.badscript = Kaldkiri
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Vasak klõps
+controls.touch = Puuduta malendit, seejärel liiguta seda
+controls.clock.keys = Tühik  või  klõps kellal
+controls.clock = Vajuta kella
+controls.look.keys = Hoia paremat hiireklahvi
+controls.look = Vaata ringi
+controls.sheet.keys = S
+controls.sheet = Vaata oma partiiblanketti ja tagasi
+controls.stand.keys = ↑
+controls.stand = Tõuse tooli ees püsti
+controls.side.keys = ←  /  →
+controls.side = Seisa laua vasakus / paremas otsas
+controls.sit.keys = ↓
+controls.sit = Istu tagasi (mängida saab ainult istudes)
+controls.moves.keys = Tab
+controls.moves = Näita või peida käikude loetelu
+controls.menu.keys = Esc
+controls.menu = Menüü
+controls.coach_skip.keys = Tühik
+controls.coach_skip = Treener: jäta treeneri jutt vahele
+controls.coach_takeback.keys = Tagasilüke
+controls.coach_takeback = Treener: võta käik tagasi, kui ta seda pakub
+controls.coach_hint.keys = H
+controls.coach_hint = Treeneri väljakutsed: küsi vihjet
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = HELEDUS
+calibration.text = Liigutage liugurit, kuni mustal väljal seisev ratsu on vaevu nähtav või pole enam üldse näha.
+calibration.later = Seda saab hiljem muuta: Seaded > Graafika.
+calibration.continue = Jätka
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = UUS PARTII
+newgame.opponent = VASTANE
+newgame.time_control = AJAKONTROLL
+newgame.start = Alusta
+newgame.elo = ~{0} Elo
+newgame.you_white = Te mängite valgetega.
+newgame.you_black = Te mängite mustadega.
+newgame.colour_lot = Esimeses partiis loositakse värvid.
+newgame.colour_alternate = Seejärel vahetuvad värvid partiist partiisse.
+newgame.opponent_kind = Vastane
+newgame.opponent_kind.help = Mängige Stockfishi vastu või sõbraga, kes istub selle arvuti taga: käite kordamööda, kumbki oma laua poolelt.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Inimene, sama arvuti
+
+# Custom opponent: Stockfish parameters
+engine.skill = Oskustase
+engine.skill.help = Stockfishi „Skill Level“ (0–20). Seda ei arvestata, kui tugevust piiratakse Elo järgi.
+engine.limit_elo = Piira tugevust (Elo)
+engine.limit_elo.help = UCI_LimitStrength: mootor püüab mängida allpool määratud Elo-reitingu tasemel.
+engine.elo = Elo
+engine.depth = Otsingusügavus
+engine.plies = {0} poolkäik|{0} poolkäiku
+engine.move_time = Aeg käigu kohta
+engine.nodes = Sõlmede piirang
+engine.no_limit = Väljas
+engine.thousand = {0} tuhat
+engine.million = {0} mln
+engine.dynamic_elo = Dünaamiline Elo aja järgi
+engine.dynamic_elo.help = Nagu inimmängija mängib ka Stockfish nõrgemalt, kui tema kellal hakkab aega nappima: veidi nõrgemalt viimasel minutil (kiir- ja välkmales varem), palju nõrgemalt ajahädas. Ainult kellaga partiides.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish mõtleb nagu tema tasemel inimene. Selle pausi vahelejätmiseks: Seaded > Mäng > Realistlik mõtlemisaeg.
+engine.pace.instant = Stockfish käib kohe, kui on arvutamise lõpetanud. Inimlike pauside jaoks: Seaded > Mäng > Realistlik mõtlemisaeg.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Piiramatu
+tc.no_clock = Kellata
+tc.bullet = Bullet
+tc.blitz = Välkmale
+tc.rapid = Kiirmale
+tc.classical = Klassikaline
+tc.custom = Kohandatud
+tc.your_own = Oma valik
+tc.base_time = Põhiaeg
+tc.base_time.help = Algaeg kummagi mängija kellal (minutid : sekundid).
+tc.increment = Lisaaeg
+tc.increment.help = Fischeri lisaaeg, mis lisandub pärast iga käiku.
+tc.delay = Viivitus
+tc.delay.help = Bronsteini viivitus: viivituse piires kulunud aeg antakse pärast iga käiku tagasi.
+tc.no_delay = Väljas
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, viivitus {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Uustulnuk
+preset.novice.desc = Õppis just käigud selgeks: jätab malendeid kaitseta ega märka lihtsaid ähvardusi.
+preset.beginner.name = Algaja
+preset.beginner.desc = Tunneb põhitõdesid, kuid kaotab jämedate vigadega ikka sageli materjali.
+preset.casual.name = Hobimängija
+preset.casual.desc = Rahulik õhtune vastane: mõistlikud käigud, sagedased vead.
+preset.club_player.name = Klubimängija
+preset.club_player.desc = Kindel klubimängija, kes karistab ilmsete jämedate vigade eest.
+preset.advanced.name = Kogenud
+preset.advanced.desc = Tugev klubimängija hea taktikalise nägemisega.
+preset.expert.name = Ekspert
+preset.expert.desc = Turniiriekspert: eksib harva, realiseerib eelise.
+preset.master.name = Meister
+preset.master.desc = Meistri tugevus: sügav arvutus ja peen positsiooniline mäng.
+preset.grandmaster.name = Suurmeister
+preset.grandmaster.desc = Suurmeistri tase: äärmiselt raske võita.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 19 täie jõuga. Edu!
+preset.custom.name = Kohandatud
+preset.custom.desc = Teie enda mootoriseaded.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = TEGIJAD
+credits.game.head = SCACELITH
+credits.game = Malemäng kuninglikus saalis, omaloodud OpenGL 4.6 mootoril.
+credits.engine.head = MALEMOOTOR
+credits.engine = Stockfish 19, Stockfishi arendajatelt.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Selle närvivõrk on treenitud Leela Chess Zero projekti pakutud andmetel, mis on kättesaadavad Open Database License'i (ODbL) alusel.
+credits.voice.head = TREENERI HÄÄL
+credits.voice = Treenerirežiimi sünteeskõne on loodud mudeliga Supertonic 3.
+credits.voice.licence = Supertonic 3 on Supertone'i mudel, mida kasutatakse OpenRAIL-M litsentsi alusel; selle kasutuspiirangud kehtivad kõigile, kes seda kasutavad (vt „Litsentsid“).
+credits.openings.head = AVANGUD
+credits.openings = Avangute nimed pärinevad lichess.org-i avanguandmebaasist (chess-openings), mis on antud üldsuse omandisse (CC0).
+credits.fonts.head = KIRJATÜÜBID
+credits.fonts = EB Garamond (Georg Duffner) ja Cinzel (Natanael Gama); Amiri (Khaled Hosny).
+credits.fonts.hand = Käekirjad: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Malefiguurid: GNU FreeFont (GPL v3 fondierandiga).
+credits.quote = „Male on analüüsi kunst.“  – Mihhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Litsentsid
+licences.title = LITSENTSID
+licences.note = Litsentse näidatakse nende ingliskeelses originaaltekstis.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUS
+pause.resume = Jätka
+pause.offer_draw = Paku viiki
+pause.claim_draw = Nõua viiki
+pause.claim_draw.help = Kolmekordne kordus või 50 käigu reegel.
+pause.resign = Anna alla
+confirm.resign.title = ALLAANDMINE
+confirm.resign.text = Kas annate selle partii alla? Võitjaks kuulutatakse teie vastane.
+confirm.resign.draw = Kas annate selle partii alla? Teie vastane ei saa enam matti panna: partii lõpeb viigiga.
+confirm.resign.ok = Anna alla
+confirm.leave.title = PARTIIST LAHKUMINE
+confirm.leave.text = Kas naasta peamenüüsse? Käimasolev partii katkestatakse.
+confirm.leave.ok = Lahku
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = MUUNDUMINE
+piece.queen = Lipp
+piece.rook = Vanker
+piece.bishop = Oda
+piece.knight = Ratsu
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partii lõppes viigiga.
+gameover.draw_moves = Partii lõppes viigiga pärast {0} käiku.|Partii lõppes viigiga pärast {0} käiku.
+gameover.win = Hästi mängitud – te võitsite.
+gameover.win_moves = Hästi mängitud – te võitsite {0} käiguga.|Hästi mängitud – te võitsite {0} käiguga.
+gameover.loss = Teie vastane võitis.
+gameover.loss_moves = Teie vastane võitis {0} käiguga.|Teie vastane võitis {0} käiguga.
+gameover.rematch = Revanš
+gameover.view_board = Vaata lauda
+gameover.show = Näita
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Matt
+reason.resignation = Allaandmine
+reason.timeout = Aja ületamine
+reason.illegal_moves = Teine reeglivastane käik (kaotus)
+reason.stalemate = Patt
+reason.insufficient = Surnud seis (ebapiisav materjal)
+reason.timeout_vs_insufficient = Aja ületamine, kuid vastane ei saa matti panna
+reason.fivefold = Viiekordne kordus
+reason.75_moves = 75 käigu reegel
+reason.threefold_claim = Kolmekordne kordus (nõutud)
+reason.50_moves_claim = 50 käigu reegel (nõutud)
+reason.agreement = Kokkuleppeline viik
+reason.illegal_vs_insufficient = Teine reeglivastane käik, kuid vastane ei saa matti panna
+reason.resignation_vs_insufficient = Allaandmine, kuid vastane ei saa matti panna
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = KÄIGUD
+movelist.empty = Käike veel pole.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Materjalide ettevalmistamine
+loading.hall = Saali püstitamine
+loading.furniture = Laua ja toolide nikerdamine
+loading.board = Malelaua poleerimine
+loading.pieces = Malendite treimine
+loading.clock = Kella kokkupanek
+loading.porcelain = Portselani põletamine
+loading.ready = Valmis
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Selles seisus ei saa viiki nõuda.
+notify.flag_you = Teie kellal langes lipp.
+notify.flag_opponent = Vastase kellal langes lipp.
+notify.touched.pawn = Puudutatud – käidud: puudutatud etturiga tuleb käia.
+notify.touched.knight = Puudutatud – käidud: puudutatud ratsuga tuleb käia.
+notify.touched.bishop = Puudutatud – käidud: puudutatud odaga tuleb käia.
+notify.touched.rook = Puudutatud – käidud: puudutatud vankriga tuleb käia.
+notify.touched.queen = Puudutatud – käidud: puudutatud lipuga tuleb käia.
+notify.touched.king = Puudutatud – käidud: puudutatud kuningaga tuleb käia.
+notify.touched.piece = Puudutatud – käidud: puudutatud malendiga tuleb käia.
+notify.touched_square = Puudutatud – käidud: peate käima malendiga, mis seisab väljal {0}.
+notify.press_clock = Käigu lõpetamiseks vajutage kella (tühik).
+notify.manual_clock = Selles partiis vajutage pärast iga käiku kella ise.
+notify.illegal = Reeglivastane käik.
+notify.cannot_move = Seda käiku ei saa teha.
+notify.move_first = Tehke oma käik enne kella vajutamist.
+notify.stance.sit_to_play = Mängimiseks istuge tagasi (allanool).
+notify.stance.first = Kell käib edasi ka siis, kui seisate. Allanool: istuge tagasi.
+notify.stance.first_untimed = Mängida saab ainult toolil istudes. Allanool: istuge tagasi.
+notify.stance.finish_move = Lõpetage kõigepealt oma käik.
+notify.draw_already_offered = Olete selle käigu jooksul juba viiki pakkunud.
+notify.draw_accepted = Teie vastane võtab viigi vastu.
+notify.draw_declined = Teie vastane lükkab viigipakkumise tagasi.
+notify.draw_claimed = Teie vastane nõuab viiki.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Kohtunik: kella vajutati käiku tegemata ja see loetakse reeglivastaseks käiguks.
+arbiter.unpromoted = Kohtunik: reeglivastane käik, etturit ei asendatud enne kella vajutamist uue malendiga.
+arbiter.illegal = Kohtunik: reeglivastane käik.
+arbiter.second_loses.white = See on valge teine reeglivastane käik: valge kaotab partii.
+arbiter.second_loses.black = See on musta teine reeglivastane käik: must kaotab partii.
+arbiter.second_draw.white = See on valge teine reeglivastane käik, kuid must ei saa matti panna: partii lõpeb viigiga.
+arbiter.second_draw.black = See on musta teine reeglivastane käik, kuid valge ei saa matti panna: partii lõpeb viigiga.
+arbiter.queen = Etturist saab lipp.
+arbiter.queen_one_minute.white = Etturist saab lipp ja valge saab ühe lisaminuti.
+arbiter.queen_one_minute.black = Etturist saab lipp ja must saab ühe lisaminuti.
+arbiter.queen_two_minutes.white = Etturist saab lipp ja valge saab kaks lisaminutit.
+arbiter.queen_two_minutes.black = Etturist saab lipp ja must saab kaks lisaminutit.
+arbiter.restored = Seis taastatakse.
+arbiter.restored_one_minute.white = Seis taastatakse ja valge saab ühe lisaminuti.
+arbiter.restored_one_minute.black = Seis taastatakse ja must saab ühe lisaminuti.
+arbiter.restored_two_minutes.white = Seis taastatakse ja valge saab kaks lisaminutit.
+arbiter.restored_two_minutes.black = Seis taastatakse ja must saab kaks lisaminutit.
+arbiter.one_minute.white = Valge saab ühe lisaminuti.
+arbiter.one_minute.black = Must saab ühe lisaminuti.
+arbiter.two_minutes.white = Valge saab kaks lisaminutit.
+arbiter.two_minutes.black = Must saab kaks lisaminutit.
+arbiter.second_loses = Teine reeglivastane käik tähendab partii kaotust.
+arbiter.touched.white = Valge peab käima puudutatud malendiga.
+arbiter.touched.black = Must peab käima puudutatud malendiga.
+arbiter.game_over = Partii on lõppenud.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Vaata partiid
+
+viewer.title = VAATA PARTIID
+viewer.white = VALGE
+viewer.black = MUST
+viewer.time_control = AJAKONTROLL
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Vaheta värvid
+viewer.note = Mõlemad mängijad on Stockfish. Lennake nende mängu ajal vabalt mööda saali ringi: keegi ei näe teid.
+viewer.summary = {0} – {1}
+viewer.custom = Kohandatud
+viewer.tc.custom = Oma valik
+viewer.base_time = Põhiaeg
+viewer.increment = Lisaaeg
+viewer.delay = Viivitus
+viewer.off = Väljas
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = viivitus {0} s
+viewer.back = Tagasi
+viewer.start = Alusta
+
+viewer.paused = PAUS
+viewer.resume = Jätka
+viewer.options = Seaded
+viewer.main_menu = Peamenüü
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = JUHTIMINE
+viewer.keys.move = W A S D  ·  Z Q S D  ·  nooleklahvid
+viewer.controls.move = Liigu
+viewer.keys.updown = E, tühik  /  C, Ctrl
+viewer.controls.updown = Üles / alla
+viewer.keys.fast = Shift
+viewer.controls.fast = Kiiremini
+viewer.keys.look = Parem hiireklahv
+viewer.controls.look = Vaata ringi
+viewer.keys.speed = Hiireratas
+viewer.controls.speed = Kiirus
+viewer.keys.views = 1 – 9
+viewer.controls.views = Vaatekohad
+viewer.keys.eyes = 0
+viewer.controls.eyes = Käigul oleva mängija silmade läbi
+viewer.keys.moves = Tab
+viewer.controls.moves = Käikude loetelu
+viewer.keys.menu = Esc
+viewer.controls.menu = Menüü
+viewer.keys.hide = H
+viewer.controls.hide = Peida see ülekate
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Paus / jätka
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Üks käik tagasi / edasi
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Aeglasemalt / kiiremini
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partii algus / lõpp
+viewer.speed = Kiirus {0} m/s
+viewer.view.0 = Mängijate silmade läbi
+viewer.view.1 = Laua kõrval
+viewer.view.2 = Malelaua kohal
+viewer.view.3 = Saal
+viewer.view.4 = Kell
+viewer.view.5 = Valge nägu
+viewer.view.6 = Musta nägu
+viewer.view.7 = Duell
+viewer.view.8 = Aknad
+viewer.view.9 = Seinavaibad
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Valge
+viewer.side.black = Must
+viewer.flag.white = Valge kellal langes lipp.
+viewer.flag.black = Musta kellal langes lipp.
+viewer.claims_draw = {0} nõuab viiki.
+viewer.offer_accepted = {0} pakub viiki, {1} nõustub.
+viewer.offer_declined = {0} pakub viiki, {1} keeldub.
+viewer.gameover.white_wins = Valge võidab pärast {0}. käiku.
+viewer.gameover.black_wins = Must võidab pärast {0}. käiku.
+viewer.gameover.draw = Partii lõppes viigiga pärast {0}. käiku.
+viewer.gameover.players = {0} – {1}
+viewer.watch_again = Vaata uuesti
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Reitinguga partiisid veel pole
+elo.provisional = Esialgne reiting
+elo.peak = Tipp {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Teie Elo {0}
+elo.expected = oodatav tulemus {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · see partii ei mõjuta reitingut
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partiiblankett
+scoresheet.event = Võistlus
+scoresheet.date = Kuupäev
+scoresheet.round = Voor
+scoresheet.board = Laud
+scoresheet.page = Leht
+scoresheet.white = Valge
+scoresheet.black = Must
+scoresheet.elo = Elo
+scoresheet.result = Tulemus
+scoresheet.move_no = Nr
+scoresheet.sign_white = Valge allkiri
+scoresheet.sign_black = Musta allkiri
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K L V O R
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Mängi võrgus
+online.title = MÄNGI VÕRGUS
+online.continue = Jätka
+online.retry = Proovi uuesti
+online.copy = Kopeeri
+online.copied = Kopeeritud
+online.copy.unavailable = Kopeerimine pole siin võimalik: kirjutage see üles.
+online.rated = Reitinguga
+online.casual = Reitinguta
+online.casual_only = Ainult reitinguta
+online.color.random = Loosiga
+online.ping = {0} ms
+online.conn.online = Ühendatud
+online.conn.connecting = Ühendamine…
+online.conn.reconnecting = Taasühendamine…
+online.conn.offline = Pole ühendatud
+online.conn.incompatible = Teine versioon
+online.no_server.text = Võrgus mängimiseks on vaja Scacelithi serverit. Sisestage seadetes serveri aadress või mängige sõbraga otsemängus.
+online.no_server.settings = Serveri seaded
+
+# Options > Online server
+options.tab.online = Võrguserver
+options.online.server = Server
+options.online.server.help = Ametlik server või kohandatud (kogukonna) server, mida haldab keegi teine; ühendus käib selle turvalise veebi-API ja turvalise WebSocketi kaudu. Igasse serverisse logite sisse eraldi: kontot ja selle sisselogimist ei jagata kunagi serverite vahel.
+options.online.official = Ametlik server – {0}
+options.online.community = Kohandatud server
+options.online.host = Host
+options.online.host.hint = domeeninimi või IP-aadress
+options.online.host.help = Kohandatud serveri domeeninimi või IP-aadress, nagu serveri omanik selle teile andis.
+options.online.api_port = HTTPS-/API-port
+options.online.api_port.help = Serveri turvalise veebi-API port (Scacelithi serverites 443).
+options.online.ws_port = WSS-port
+options.online.ws_port.hint = sama mis API-port
+options.online.ws_port.help = Serveri turvalise WebSocketi port. Jätke tühjaks, kui see on sama mis API-port.
+options.online.pin = Sertifikaadi sõrmejälg (SHA-256)
+options.online.pin.hint = valikuline
+options.online.pin.help = Isesigneeritud sertifikaadiga serveri puhul: SHA-256 sõrmejälg, mille annab selle omanik (64 kuueteistkümnendsüsteemi märki, koolonid on lubatud). Jätke tühjaks, et usaldada süsteemi sertifikaate.
+options.online.pin.invalid = Sõrmejälg koosneb 64 kuueteistkümnendsüsteemi märgist (koolonid on lubatud).
+options.online.test = Testi ühendust
+options.online.test_ok = {0}: ühendatud, ühildub selle versiooniga.
+options.online.test_incompatible = {0}: ühendatud, kuid vajab teist Scacelithi versiooni.
+options.online.in_game = Võrgupartii ajal ei saa serverit muuta.
+options.online.remember_session = Jäta sisselogimine meelde, kui süsteemi võtmehoidja pole saadaval
+options.online.remember_session.help = Kui ükski süsteemi võtmehoidja (GNOME Keyring, KWallet…) ei saa teie seanssi hoida, salvestatakse see faili, mida saab lugeda ainult teie kasutajakonto. Igaüks, kes saab lugeda teie faile või nende koopiat (näiteks varukoopiat), võiks seda seanssi kasutada. Väljas: jääte sisselogituks, kuni mäng suletakse. Iga seadme saate välja logida oma konto jaotises „Sisselogitud seadmed“.
+
+# Sign in, create an account
+online.signin.lead = Logige sisse serverisse {0}, et mängida võrgus teiste inimestega.
+online.field.user = Kasutajanimi või e-post
+online.field.user.hint = nimi või aadress
+online.field.password = Parool
+online.field.password.hint = vähemalt 10 märki
+online.field.password2 = Parooli kinnitus
+online.field.current_password = Praegune parool
+online.field.new_password = Uus parool
+online.field.username = Kasutajanimi
+online.field.username.hint = 3–24 tähte, numbrit, _ või -
+online.field.email = E-post
+online.field.new_email = Uus e-post
+online.field.code = Kood
+online.field.code.hint = 6 numbrit või taastekood
+online.field.code6 = Rakenduse kood
+online.field.code6.hint = 6 numbrit
+online.signin.button = Logi sisse
+online.signin.google = Jätka Google'iga
+online.signin.register = Loo konto
+online.signin.forgot = Unustasite parooli?
+online.mfa.title = AUTENTIMISKOOD
+online.mfa.lead = Sisestage autentimisrakenduse näidatud 6-kohaline kood või üks oma taastekoodidest.
+online.mfa.verify = Kinnita
+online.register.title = KONTO LOOMINE
+online.register.lead = Tasuta konto serveris {0}: teie nimi, reitingud ja partiid on ainult selles serveris.
+online.register.button = Loo konto
+online.register.working = Konto loomine… see võib võtta mõne sekundi.
+online.register.ready = Teie konto on valmis. Mängimiseks logige sisse.
+online.password.mismatch = Paroolid ei kattu.
+online.check_email.title = KONTROLLIGE OMA E-POSTI
+online.check_email.text = Saatsime lingi aadressile {0}. Avage see, et konto aktiveerida, ja logige seejärel siin sisse.
+online.check_email.ask = Sisestage oma konto aadress, et saada aktiveerimislink uuesti.
+online.check_email.resend = Saada e-kiri uuesti
+online.check_email.resent = E-kiri saadeti uuesti. Selleks võib kuluda mõni minut; kontrollige ka rämpsposti kausta.
+online.forgot.title = UNUSTATUD PAROOL
+online.forgot.lead = Sisestage oma konto e-posti aadress: saadame teile lingi, et saaksite valida uue parooli.
+online.forgot.button = Saada link
+online.forgot.sent = Kui mõni konto kasutab seda aadressi, on link teel.
+online.sso.title = GOOGLE'IGA SISSELOGIMINE
+online.sso.wait = Jätkake veebibrauseris: valige avanenud aknas oma Google'i konto. Scacelith jätkab kohe, kui Google teid tagasi saadab.
+online.sso.name_title = VALIGE OMA NIMI
+online.sso.name_lead = Olete siin Google'iga esimest korda. Valige nimi, mida teised mängijad näevad.
+online.sso.continue = Jätka
+online.sso.finishing = Google saatis teid tagasi. Sisselogimise lõpetamine…
+online.sso.link_title = LISA GOOGLE'IGA SISSELOGIMINE
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Konto {0} serveris {1} kasutab juba selle Google'i konto e-posti aadressi. Sisestage selle konto parool, et lisada sellele Google'iga sisselogimine. Seda tuleb teha ainult üks kord.
+online.sso.link_button = Lisa Google'iga sisselogimine
+online.sso.link_mfa = Google'iga sisselogimine lisatakse sellele kontole, kui kood on vastu võetud.
+online.sso.not_mine = See pole minu konto
+online.sso.not_mine_note = Google'iga sisselogimist ei lisatud. Kui see e-posti aadress on teie oma, kasutage sellega valikut „Unustasite parooli?“: link läheb sellesse postkasti. Kui konto küsib ka kaheastmelise autentimise koodi, mida teil pole, võtke ühendust serveri haldajaga.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google'iga sisselogimine
+online.sso.page.done_heading = Tagasi Scacelithi
+online.sso.page.done = Google saatis teid tagasi Scacelithi. Sisselogimise lõpetamiseks naaske mängu; selle vahekaardi võite sulgeda.
+online.sso.page.cancelled_heading = Sisselogimine tühistati
+online.sso.page.cancelled = Google'iga sisselogimine tühistati. Võite selle vahekaardi sulgeda ja Scacelithi naasta.
+online.sso.page.foreign_heading = See leht pole teie jaoks
+online.sso.page.foreign = See leht ei vasta sisselogimisele, mida Scacelith selles arvutis ootab. Kui te ei alustanud just Scacelithis Google'iga sisselogimist, võis keegi teile selle lingi saata: sulgege see vahekaart.
+
+# Account
+online.account.button = Konto
+online.account.title = KONTO
+online.account.section = KONTO
+online.account.username = KASUTAJANIMI
+online.account.email = E-POST
+online.account.unverified = (kinnitamata)
+online.account.mfa = KAHEASTMELINE AUTENTIMINE
+online.account.mfa_on = Sees
+online.account.mfa_off = Väljas
+online.account.google = GOOGLE
+online.account.google_linked = Seotud Google'i kontoga
+online.account.change_password = Muuda parooli
+online.account.mfa_setup = Lülita kaheastmeline sisse
+online.account.mfa_disable = Lülita kaheastmeline välja
+online.account.recovery = Uued taastekoodid
+online.account.sign_out = Logi välja
+online.account.sign_out_all = Logi kõikjal välja
+online.account.sign_out_all.help = Logib selle konto välja kõigis arvutites, ka selles.
+online.account.signed_out = Olete välja logitud.
+online.account.signed_out_all = Olete kõigis arvutites välja logitud.
+online.account.signing_out_all = Kõigist arvutitest väljalogimine…
+online.account.sign_out_all_failed = Teie teised arvutid võivad olla endiselt sisse logitud: logige uuesti sisse ja logige need siis välja jaotises „Sisselogitud seadmed“. {0}
+online.account.sign_out_all_retry = Teie teised arvutid võivad olla endiselt sisse logitud. Proovige uuesti valikut „Logi kõikjal välja“. {0}
+online.account.ratings = REITINGUD
+online.account.col.tc = AJAKONTROLL
+online.account.col.rating = REITING
+online.account.col.games = PARTIID
+online.account.col.record = + / = / −
+online.account.provisional = Küsimärk tähistab esialgset reitingut (mängitud on veel vähe partiisid).
+online.password.title = PAROOLI MUUTMINE
+online.password.button = Muuda parooli
+online.password.changed = Teie parool on muudetud.
+online.password.other_sessions = Teie teistes arvutites tuleb uuesti sisse logida.
+online.mfa_setup.title = KAHEASTMELINE AUTENTIMINE
+online.mfa_setup.lead = Kaheastmeline autentimine küsib igal sisselogimisel koodi teie telefoni rakendusest. Alustamiseks sisestage oma parool.
+online.mfa_setup.scan = 1. Skannige see kood autentimisrakendusega või sisestage sinna see võti:
+online.mfa_setup.enter = 2. Sisestage rakenduse näidatud 6-kohaline kood:
+online.mfa_setup.enable = Lülita sisse
+online.mfa_setup.done = Kaheastmeline autentimine on sisse lülitatud.
+online.mfa_off.title = LÜLITA KAHEASTMELINE VÄLJA
+online.mfa_off.lead = Sisestage oma parool ja rakenduse kood (või taastekood).
+online.mfa_off.button = Lülita välja
+online.mfa.off_done = Kaheastmeline autentimine on välja lülitatud.
+online.recovery.title = TAASTEKOODID
+online.recovery.lead = Kui kaotate oma telefoni, saate iga koodiga ühe korra sisse logida. Hoidke neid kindlas kohas: neid näidatakse ainult praegu.
+online.recovery.saved = Salvestasin need
+online.recovery.new_title = UUED TAASTEKOODID
+online.recovery.new_lead = Uued koodid asendavad vanad. Sisestage oma parool ja rakenduse kood.
+online.recovery.button = Uued koodid
+online.account.manage = TURVALISUS JA ANDMED
+online.account.pending_email = Ootab kinnitamist: {0}
+online.account.accept_challenges = Võta väljakutseid vastu
+online.account.accept_challenges.help = Teised mängijad saavad teid kasutajanime järgi välja kutsuda. Väljas: nende väljakutsed lükatakse tagasi.
+online.account.history = Partiide ajalugu
+online.account.devices = Sisselogitud seadmed
+online.account.change_email = Muuda e-posti
+online.account.export = Laadi minu andmed alla
+online.account.delete = Kustuta konto
+
+# Play
+online.play.signed_in = Sisse logitud: {0}
+online.session.file = Ükski süsteemi võtmehoidja ei saanud teie sisselogimist hoida: see on salvestatud faili, mida saab lugeda ainult teie kasutajakonto (Seaded > Võrguserver).
+online.session.memory = Ükski süsteemi võtmehoidja ei saanud teie sisselogimist hoida ja seda ei salvestata faili: jääte sisselogituks, kuni mäng suletakse (Seaded > Võrguserver).
+online.play.find_section = VASTASE OTSIMINE
+online.play.friend_section = MÄNGI SÕBRAGA
+online.play.mode = Partii
+online.play.mode.help = Reitinguga partiid muudavad teie reitingut selles ajakontrollis, reitinguta partiid mitte.
+online.play.find = Otsi vastast
+online.play.connecting = Serveriga ühendamine…
+online.play.cooldown = Vastast saate uuesti otsida kell {0}.
+online.play.banned = See konto on peatatud kuni {0}.
+online.play.challenge = Kutsu mängija välja
+online.play.challenge.desc = Kutsuge kasutajanime järgi mängima keegi, kes on võrgus.
+online.play.private = Privaatpartii
+online.play.private.desc = Looge kood, mille annate sõbrale, või liituge tema koodiga.
+online.play.direct = Otsemäng
+online.play.direct.desc = Ilma serverita: mängige otse sõbra arvutiga.
+online.search.title = OTSIMINE
+online.search.window = Reitinguvahemik {0}
+online.search.queued = {0} mängija otsib|{0} mängijat otsib
+online.search.wait = Otsime teie tasemele vastavat vastast…
+online.outgoing.challenge = VÄLJAKUTSE SAADETUD
+online.outgoing.waiting = ootab vastust
+online.outgoing.private = PRIVAATPARTII
+online.outgoing.private_hint = Andke see kood oma sõbrale: partii algab, kui ta liitub.
+online.challenge.title = MÄNGIJA VÄLJAKUTSUMINE
+online.challenge.opponent = VASTANE
+online.field.opponent = Kasutajanimi
+online.field.opponent.hint = keda välja kutsuda
+online.challenge.note = Teie vastane näeb väljakutset, ükskõik kus menüüdes ta parajasti on, ja tal on vastamiseks minut aega.
+online.challenge.send = Saada väljakutse
+online.terms.rated = Reitinguga
+online.terms.rated.help = Reitinguga saavad olla ainult ametlike ajakontrollidega partiid.
+online.terms.color = Teie värv
+online.private.title = PRIVAATPARTII
+online.private.create_section = LOO
+online.private.create_note = Saate lühikese koodi: kes selle sisestab, mängib teiega.
+online.private.create = Loo partii
+online.private.join_section = LIITU
+online.field.private_code = Kood
+online.private.join = Liitu
+online.private.joining = Partiiga liitumine…
+online.challenge.received = VÄLJAKUTSE
+online.challenge.accept = Võta vastu
+online.challenge.decline = Keeldu
+online.challenge.you_white = mängite valgetega
+online.challenge.you_black = mängite mustadega
+online.challenge.you_random = värvid loositakse
+online.challenge.declined = {0} keeldus teie väljakutsest.
+online.challenge.expired = Teie väljakutse aegus vastuseta.
+online.challenge.unavailable = {0} pole praegu saadaval.
+online.challenge.lost = Ühendus katkes: teie väljakutse tühistati.
+
+# At the table
+online.pause.clock_runs = Partii jätkub: teie kell käib edasi.
+online.pause.abort = Katkesta partii
+online.pause.abort.help = Enne teie esimest käiku saab partii katkestada; seda ei arvestata.
+online.pause.leave = Lahku partiist
+online.confirm.resign.text = Kas annate selle partii alla? Teie vastane võidab selle.
+online.confirm.leave.text = Lahkumine tähendab selle partii allaandmist: teie vastane võidab selle.
+online.confirm.leave.ok = Anna alla ja lahku
+online.confirm.leave_abort.text = Kas lahkuda enne oma esimest käiku? Partii katkestatakse ja seda ei arvestata.
+online.confirm.leave_abort.ok = Katkesta ja lahku
+online.draw.card_title = VIIGIPAKKUMINE
+online.draw.card_text = Teie vastane pakub viiki.
+online.draw.accept = Võta vastu
+online.draw.decline = Keeldu
+online.draw.offered = Teie vastane pakub viiki.
+online.opponent_back = Teie vastane on tagasi.
+online.opponent_away = Vastase ühendus katkes – tal on naasmiseks {0}
+online.first_move = Teie esimene käik · {0}
+online.reconnecting = TAASÜHENDAMINE…
+online.reconnecting.text = Partii jätkub serveris ja teie kell käib edasi.
+online.gameover.aborted = Partii katkestati: seda ei arvestata.
+online.rating.casual = Reitinguta partii: reitingud ei muutunud.
+online.rating.change = Reiting {0} → {1} ({2})
+online.rating.pending = Reiting: …
+online.rematch.accept = Võta revanš vastu
+online.rematch.offered = Teie vastane pakub revanši.
+online.rematch.waiting = Revanš pakutud…
+online.rematch.gone = Revanši pole
+online.rematch.declined = Seekord revanši ei tule.
+online.report.button = Teata vastasest
+online.report.title = TEATAMINE
+online.report.lead = Teated saadetakse koos selle partiiga serveri moderaatoritele. Täname, et aitate hoida mängu ausana.
+online.report.category = Põhjus
+online.report.cheating = Sohitegemine
+online.report.abuse = Solvav käitumine
+online.report.other = Muu
+online.report.comment = Kommentaar
+online.report.comment.hint = valikuline
+online.report.send = Saada teade
+online.report.sent = Teade saadetud. Aitäh!
+online.report.queued = Teie teade saadetakse, kui partii lõpeb.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Võrgus, {0} {1}
+online.sheet.rated = reitinguga
+online.sheet.casual = reitinguta
+online.sheet.game = Partii {0}
+# End reasons of online games
+reason.online.abandonment = Vastane lahkus partiist
+reason.online.abandonment_vs_insufficient = Lahkus partiist, kuid vastane ei saa matti panna
+reason.online.aborted = Partii katkestati
+reason.online.no_show = Esimest käiku ei tehtud õigel ajal (katkestatud)
+reason.online.forfeit = Loobumiskaotus
+reason.online.server_aborted = Server katkestas partii
+reason.online.both_disconnected = Mõlema mängija ühendus katkes
+# Server notices
+online.notice.shutdown = Server taaskäivitub {0} pärast. Käimasolevad partiid salvestatakse.
+online.notice.revoked = Teid logiti sellest serverist välja.
+online.notice.replaced = Teie kontoga loodi ühendus teisest aknast; see aken pole enam ühendatud.
+online.notice.rating_restored = Teie reitingut taastati {0} punkti võrra: üks teie vastane blokeeriti sohitegemise eest.|Teie reitingut taastati {0} punkti võrra: üks teie vastane blokeeriti sohitegemise eest.
+# Errors
+online.err.rate_limited_for = Liiga palju katseid. Proovige uuesti {0} pärast.
+online.err.rate_limited = Liiga palju katseid. Proovige hetke pärast uuesti.
+online.err.server_busy_for = Server on hõivatud. Proovige uuesti {0} pärast.
+online.err.server_busy = Server on hõivatud. Proovige hetke pärast uuesti.
+online.err.banned_until = See konto on peatatud kuni {0}.
+online.err.banned = See konto on peatatud.
+online.err.invalid_credentials = Vale kasutajanimi või parool.
+online.err.invalid_credentials_pending = Vale kasutajanimi või parool. Kui just registreerusite, avage kõigepealt link, mille teile saatsime.
+online.err.email_unverified = Teie e-posti aadress pole veel kinnitatud: avage link, mille teile saatsime.
+online.err.network = Serveriga ei saa ühendust. Kontrollige oma võrguühendust ja serveri aadressi.
+online.err.tls = Serveriga ei õnnestunud turvalist ühendust luua.
+online.err.certificate = Serveri sertifikaati ei usaldata (või see ei vasta seadetes määratud sõrmejäljele).
+online.err.incompatible = See server vajab teist Scacelithi versiooni.
+online.err.unauthorized = Teie seanss on lõppenud: logige uuesti sisse.
+online.err.username_taken = See kasutajanimi on juba võetud.
+online.err.email_taken = Seda e-posti aadressi kasutab juba mõni konto.
+online.err.invalid_username = Kasutajanimes on 3–24 tähte, numbrit, _ või -.
+online.err.invalid_email = See e-posti aadress pole kehtiv.
+online.err.weak_password = See parool on liiga nõrk: kasutage vähemalt 10 märki.
+online.err.invalid_code = See kood pole õige.
+online.err.expired = See taotlus on aegunud: alustage uuesti.
+online.err.registration_closed = See server ei võta uusi kontosid vastu.
+online.err.sso_cancelled = Google'iga sisselogimine tühistati.
+online.err.sso_expired = Google'iga sisselogimine võttis liiga kaua aega või oli juba kasutatud. Alustage uuesti.
+online.err.sso_failed = Google'iga sisselogimine ei õnnestunud. Proovige uuesti.
+online.err.sso_listen = Scacelith ei saanud selles arvutis Google'i vastust kätte. Proovige uuesti.
+online.err.sso_origin = Google'iga sisselogimine ei tööta selle serveriaadressi kaudu. Lisage server avaliku nime all, mille selle haldaja annab, ja proovige siis uuesti.
+online.err.browser = Veebibrauserit ei õnnestunud avada.
+online.err.sso_email_unverified = Google ei ole selle Google'i konto e-posti aadressi kinnitanud.
+online.err.sso_account_exists = Seda e-posti aadressi kasutab juba konto, mida ei saa Google'iga sisselogimisega siduda: logige sisse selle parooliga või kasutage valikut „Unustasite parooli?“.
+online.err.sso_already_linked = See Google'i konto on juba seotud teise kontoga.
+online.err.account_disabled = Seda kontot ei saa enam kasutada.
+online.err.server_error = Serveris tekkis probleem. Proovige uuesti.
+online.err.timeout = Server ei vastanud õigel ajal.
+online.err.offline = Serveriga pole ühendust: proovige uuesti, kui ühendus on loodud.
+online.err.other = Server keeldus ({0}).
+online.err.code = Server keeldus (viga {0}).
+online.err.slow_down = Palun veidi aeglasemalt.
+online.err.server_full = Server on täis. Proovige hiljem uuesti.
+online.err.restarting = Server taaskäivitub. Proovige hetke pärast uuesti.
+online.err.move_refused = Server keeldus sellest käigust: laual on taastatud eelmine seis.
+online.err.game_over = See partii on juba lõppenud.
+online.err.already_in_game = Te juba mängite partiid.
+online.err.invalid_category = Seda ajakontrolli siin ei pakuta.
+online.err.draw_offer_limit = Rohkem viigipakkumisi praegu teha ei saa.
+online.err.abort_not_allowed = Partiid ei saa enam katkestada.
+online.err.no_pending_offer = Pole ühtki pakkumist, millele vastata.
+online.err.flag_fell = Teie aeg sai otsa.
+online.err.queue_not_allowed = Te ei saa praegu vastast otsida.
+online.err.challenge_not_found = Seda väljakutset pole enam olemas.
+online.err.user_unavailable = See mängija pole saadaval.
+online.err.challenge_limit = Praegu on liiga palju väljakutseid. Proovige hiljem uuesti.
+online.err.challenge_self = Te ei saa iseendale väljakutset esitada.
+online.err.code_invalid = Selle koodiga partiid pole.
+online.err.rated_official_tc = Reitinguga saavad olla ainult ametlike ajakontrollidega partiid.
+online.err.cooldown = Vastase otsimine on teie jaoks hetkeks peatatud.
+online.err.invalid_tc = See ajakontroll pole lubatud.
+online.err.rematch_unavailable = Revanš pole enam võimalik.
+online.err.rated_repeat_limit = Olete selle mängija vastu praeguseks piisavalt reitinguga partiisid mänginud. Mängige reitinguta partii või proovige hiljem uuesti.
+online.err.cheat_detected = Server peatas partii ausa mängu kontrolli tõttu.
+online.err.invalid_password = Vale parool.
+online.err.mfa_code_required = Sisestage autentimisrakenduse kood (või taastekood).
+online.err.password_not_set = See konto logib sisse Google'iga ja sellel pole veel parooli. Määrake see kõigepealt sisselogimislehel valikuga „Unustasite parooli?“.
+online.err.too_many_attempts = Liiga palju valesid katseid. Proovige hiljem uuesti.
+online.err.too_many_attempts_for = Liiga palju valesid katseid. Proovige uuesti {0} pärast.
+online.err.same_email = See on juba teie e-posti aadress.
+online.err.not_found = Serverist ei leitud.
+online.err.invalid_response = Serveri vastust ei õnnestunud lugeda.
+online.err.storage = Seanssi ei õnnestunud selles arvutis salvestada.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PARTIIDE AJALUGU
+online.history.filter.games = Partiid
+online.history.filter.result = Tulemus
+online.history.filter.all = Kõik
+online.history.filter.won = Võidud
+online.history.filter.lost = Kaotused
+online.history.filter.drawn = Viigid
+online.history.col.date = KUUPÄEV
+online.history.col.opponent = VASTANE
+online.history.col.result = TULEMUS
+online.history.col.tc = AJAKONTROLL
+online.history.col.kind = TÜÜP
+online.history.col.rating = REITING
+online.history.won = Võit
+online.history.lost = Kaotus
+online.history.drawn = Viik
+online.history.aborted = Katkestatud
+online.history.page = Lehekülg {0}/{1}
+online.history.total = {0} partii|{0} partiid
+online.history.previous = Eelmine
+online.history.next = Järgmine
+online.history.empty.title = PARTIISID VEEL POLE
+online.history.empty = Teie partiid selles serveris kuvatakse siin pärast nende lõppu.
+online.history.empty_filter.title = PARTIISID POLE
+online.history.empty_filter = Nendele filtritele ei vasta ükski partii.
+online.history.error = AJALUGU EI ÕNNESTUNUD LAADIDA
+online.history.unavailable = SEE SERVER EI PAKU PARTIIDE AJALUGU
+online.game.title = PARTII
+online.game.players = MÄNGIJAD
+online.game.you = TEIE
+online.game.unrated = Reitinguta
+online.game.you_won = Te võitsite
+online.game.you_lost = Te kaotasite
+online.game.draw = Viik
+online.game.you_left = Te lahkusite partiist
+online.game.date = KUUPÄEV
+online.game.time_control = AJAKONTROLL
+online.game.moves = KÄIGUD
+online.game.move_count = {0} käik|{0} käiku
+online.game.no_moves = Ühtki käiku ei tehtud.
+online.game.moves_incomplete = Mõnda käiku ei õnnestunud lugeda: loend lõpeb enne partii lõppu.
+online.game.save = Salvesta partii
+online.game.saved_button = Salvestatud
+online.game.saved = Partii on teie salvestatud partiide hulgas.
+online.game.already_saved = See partii on juba teie salvestatud partiide hulgas.
+online.game.save_failed = Partiid ei õnnestunud salvestada.
+online.game.invalid = Server saatis partii kirje, mida ei saa lugeda.
+online.game.replay = Taasesita
+online.game.not_found = PARTIID EI LEITUD
+online.game.error = PARTIID EI ÕNNESTUNUD LAADIDA
+online.devices.title = SISSELOGITUD SEADMED
+online.devices.lead = Seadmed, kus see konto on sisse logitud. Kui te mõnda neist ei tunne, logige see välja ja muutke oma parooli.
+online.devices.unknown = Tundmatu seade
+online.devices.this = SEE SEADE
+online.devices.signed_in = Sisse logitud {0}
+online.devices.last_active = viimati aktiivne {0}
+online.devices.active_now = praegu kasutusel
+online.devices.sign_out = Logi välja
+online.devices.signed_out = Seade on välja logitud.
+online.devices.error = SEADMEID EI ÕNNESTUNUD LAADIDA
+online.devices.all.title = KÕIKJAL VÄLJALOGIMINE
+online.email.title = E-POSTI MUUTMINE
+online.email.current = Praegune aadress: {0}
+online.email.button = Muuda e-posti
+online.email.sent = Kinnituslink saadeti aadressile {0}.
+online.email.sent.hint = Aadress muutub, kui link on avatud. Seni jääb kasutusse teie praegune aadress.
+online.email.done = Valmis
+online.email.changed = Teie e-posti aadress on muudetud.
+online.export.title = MINU ANDMETE ALLALAADIMINE
+online.export.lead = Kõik, mida see server teie konto kohta säilitab (profiil, reitingud, partiid, seadmed, turvasündmused), salvestatakse JSON-failina sellesse arvutisse. Kinnitamiseks sisestage oma parool.
+online.export.button = Laadi alla
+online.export.saved = Teie andmed on sellesse arvutisse salvestatud.
+online.export.failed = Faili ei õnnestunud kirjutada.
+online.delete.title = KONTO KUSTUTAMINE
+online.delete.warning = Teie konto kustutatakse sellest serverist: teie e-posti aadress, parool, kaheastmeline autentimine ja seadmed kustutatakse ning te ei saa enam sisse logida. Seda ei saa tagasi võtta.
+online.delete.games = Teie partiid ja reitingud jäävad serverisse anonüümse nime {0} all.
+online.delete.confirm_name = Kinnitamiseks sisestage oma kasutajanimi ja parool.
+online.delete.button = Kustuta minu konto
+online.delete.done = Teie konto on kustutatud.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Otsemäng
+online.direct.title = OTSEMÄNG
+online.direct.lead = Sõbralik partii otse kahe arvuti vahel: ei serverit ega kontot, alati reitinguta.
+online.direct.host = Võõrusta partiid
+online.direct.host.desc = Teie sõber ühendub teiega: annate talle oma aadressi ja koodi.
+online.direct.join = Liitu partiiga
+online.direct.join.desc = Ühenduge sõbraga, kes partiid võõrustab.
+online.direct.host_title = PARTII VÕÕRUSTAMINE
+online.direct.your_color = Teie värv
+online.direct.auto_press.help = Mõlemad robotid vajutavad kella ise, kui käik on laual. Väljas: kumbki mängija vajutab pärast iga käiku kella ise.
+online.direct.unrated = Otsemängud on sõpruspartiid: alati reitinguta.
+online.direct.connection = ÜHENDUS
+online.direct.port = Port
+online.direct.port.help = TCP-port, mille kaudu teie sõber ühendub (47100, kui see pole hõivatud).
+online.direct.port_range = Valige port vahemikus 1024–65535.
+online.direct.upnp = Ava port minu ruuteris (UPnP)
+online.direct.upnp.help = Palub koduruuteril suunata pordi sellesse arvutisse ja sulgeb selle pärast partiid.
+online.direct.host_note_upnp = Mäng palub teie ruuteril pordi avada. Kui see ei õnnestu, öeldakse teile, milline port tuleb käsitsi edasi suunata.
+online.direct.host_note_manual = Suunake ruuteris TCP-port sellesse arvutisse või mängige samas võrgus.
+online.direct.host_button = Võõrusta
+online.direct.wait_title = SÕBRA OOTAMINE
+online.direct.opening = Pordi {0} avamine teie ruuteris…
+online.direct.give = Andke oma sõbrale:
+online.direct.cap_address = AADRESS
+online.direct.cap_port = PORT
+online.direct.cap_code = KOOD
+online.direct.lan = Samas võrgus: {0}
+online.direct.router = teie ruuter
+online.direct.upnp_searching = Ruuteri otsimine…
+online.direct.upnp_mapped = Port on avatud ({0}).
+online.direct.upnp_none = Ükski UPnP-ruuter ei vastanud: suunake TCP-port {0} käsitsi sellesse arvutisse.
+online.direct.upnp_failed = Ruuter keeldus porti avamast: suunake TCP-port {0} käsitsi sellesse arvutisse.
+online.direct.upnp_off = Suunake ruuteris TCP-port {0} sellesse arvutisse.
+online.direct.upnp_cgnat = Teie teenusepakkuja jagab tõenäoliselt teie internetiaadressi teistega (CGNAT): proovige IPv6 või VPN-i.
+online.direct.firewall = Kui Windows küsib, kas Scacelith tohib ühendusi vastu võtta, lubage see.
+online.direct.waiting = Sõbra ootamine…
+online.direct.connecting_friend = Teie sõber ühendub…
+online.direct.starting = Laua ettevalmistamine…
+online.direct.join_title = PARTIIGA LIITUMINE
+online.direct.join_lead = Sisestage, mida teie sõber teile ette loeb: tema aadress, port ja kood.
+online.direct.address = Aadress
+online.direct.address.hint = IPv4, IPv6 või nimi
+online.direct.code = Kood
+online.direct.join_button = Liitu
+online.direct.connecting_to = Ühendamine: {0}…
+online.direct.securing = Ühenduse turvamine: {0}…
+direct.event = Sõpruspartii
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Otsemäng, {0}
+direct.err.refused = Sellel aadressil ja pordil ei võõrusta keegi partiid.
+direct.err.timeout = Vastust pole: kontrollige aadressi ja porti ning seda, kas teie sõbra ruuter laseb mängu läbi.
+direct.err.wrong_code = Kood pole õige.
+direct.err.invalid_code = Koodis on 12 märki (XXXX-XXXX-XXXX).
+direct.err.incompatible = Teie sõbral on teine Scacelithi versioon.
+direct.err.port_in_use = See port on selles arvutis juba kasutusel: valige mõni teine.
+direct.err.network = Võrku ei saanud kasutada.
+direct.err.too_many_attempts = Liiga palju valesid koode: võõrustamine peatati. Uue koodi saamiseks võõrustage uuesti.
+direct.err.bad_address = See aadress pole kehtiv.
+direct.err.not_found = Seda nime ei leitud.
+direct.err.unreachable = See aadress pole siit kättesaadav.
+direct.err.reset = Ühendus katkes.
+direct.err.closed = Ühendus suleti.
+direct.err.host_left = Teie sõber lõpetas võõrustamise.
+direct.err.other = Ühendus ebaõnnestus ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Mängija 2
+hotseat.white_player = Valge
+hotseat.black_player = Must
+hotseat.name.help = Nimi, mis kirjutatakse mõlemale partiiblanketile, mis tahes tähestikus.
+hotseat.swap = Vaheta värvid
+hotseat.left_hand = {0} mängib vasaku käega: kell seisab tema vasakul pool.
+hotseat.rated = Reitinguga partii
+hotseat.rated.help = Igal nimel on selles arvutis oma kahe mängija reiting. Teie reiting Stockfishi vastu ei muutu kunagi.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Kahe mängija reitingud: {0} {1} · {2} {3}
+hotseat.new_rating = (uus)
+hotseat.friendly_note = Sõpruspartii: reitingud ei muutu.
+hotseat.colours = {0} mängib valgetega, {1} mustadega.
+hotseat.colours_swap = Igal revanšil vahetuvad värvid.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, teie käik
+hotseat.flag = Mängija {0} kellal langes lipp.
+hotseat.confirm.resign = Kas anda alla mängija {0} eest? Võitjaks kuulutatakse {1}.
+hotseat.confirm.resign_draw = Kas anda alla mängija {0} eest? {1} ei saa enam matti panna: partii lõpeb viigiga.
+hotseat.draw.offer_noted = Teie viigipakkumine läheb koos teie käiguga: {0} näeb seda, kui olete kella vajutanud.
+hotseat.draw.card_title = VIIGIPAKKUMINE
+hotseat.draw.offered = {0} pakub viiki.
+hotseat.draw.card_hint = Malendi puudutamine lükkab selle tagasi.
+hotseat.draw.accept = Võta vastu
+hotseat.draw.decline = Keeldu
+hotseat.draw.accepted = {0} võtab vastu mängija {1} viigipakkumise.
+hotseat.draw.declined = {0} lükkab tagasi mängija {1} viigipakkumise.
+# Scoresheet header note
+hotseat.sheet.rated = Reitinguga partii
+hotseat.sheet.friendly = Sõpruspartii
+# Game over card
+hotseat.gameover.wins = {0} võidab {1} käiguga.|{0} võidab {1} käiguga.
+hotseat.gameover.wins_now = {0} võidab.
+hotseat.gameover.friendly = {0} – {1} · sõpruspartii
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = See partii ei mõjuta reitingut.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Treener
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Treenerirežiimi sünteeskõne on loodud mudeliga {0}
+# Coach page
+coach.title = TREENER
+coach.section.level = TASE
+coach.section.lesson = KOOS TREENERIGA
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Mängijatele reitinguga {0}
+coach.completed = Läbitud
+coach.recommended = Soovitatud
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Malereeglid
+coach.level.0.desc = Interaktiivne õppetund, üks reegel korraga.
+coach.level.0.detail = Treener seab üles väikesed seisud ja näitab, kuidas iga malend käib ja lööb, seejärel vangerdust, muundumist, tuld ja matti. Iga ideed proovite laual ise järele.
+coach.level.1.name = Esimesed sammud
+coach.level.1.desc = Mis on rünnaku all, mis on jäänud kaitseta.
+coach.level.1.detail = Treener mängib leebelt ja räägib lihtsalt: millised teie malendid on rünnaku all, millised on jäänud kaitseta ja kuidas neid hoida.
+coach.level.2.name = Algaja
+coach.level.2.desc = Lihtne taktika, arendamine, kuninga julgeolek.
+coach.level.2.detail = Kahvleid ja sidumisi nimetatakse nimepidi. Treener räägib malendite mängu toomisest ja kuninga kaitsmisest.
+coach.level.3.name = Edasijõudnu
+coach.level.3.desc = Plaanid, etturistruktuur, ainsad käigud.
+coach.level.3.detail = Treener selgitab plaane ja etturistruktuure ning hoiatab teid, kui seisu hoiab ainult üks käik.
+coach.level.4.name = Klubimängija
+coach.level.4.desc = Kandidaatkäigud, hinnang etturites.
+coach.level.4.detail = Treener kaalub kandidaatkäike ja annab seisule hinnangu etturites, nagu teeks seda klubitreener.
+coach.level.5.name = Tugev klubimängija
+coach.level.5.desc = Lühikesed variandid, positsioonilised mõisted.
+coach.level.5.detail = Lühikesed märkused, konkreetsed variandid ja positsioonilise mängu sõnavara.
+coach.level.6.name = Ekspert
+coach.level.6.desc = Napid märkused, sügavad variandid, hinnangud numbritena.
+coach.level.6.detail = Vähe sõnu, nagu tugevate mängijate vahel: mitme käigu sügavused variandid ja hinnangud numbritena.
+coach.note.clock = Kellata: võtke nii palju aega, kui vajate.
+coach.note.takeback = Pärast jämedat viga näitab treener, mis läks valesti, ja pakub käigu tagasivõtmist.
+coach.note.lesson = Te mängite valgetega; treener seab iga harjutuse lauale üles.
+coach.note.unrated = Partiid treeneriga ei mõjuta reitingut.
+coach.note.fallible = Treener ei ole eksimatu: ta võib mõnikord käiku valesti hinnata.
+coach.colour = Teie värv
+coach.colour.help = Värv, millega mängite treeneri vastu. Vaheldumisi: partiist partiisse kord valgetega, kord mustadega. Reeglite õppetunnis mängite alati valgetega.
+coach.colour.alternate = Vaheldumisi
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Treeneri hääl pole installitud või on välja lülitatud (Seaded > Heli): tema sõnad kuvatakse ekraanil.
+# At the table
+coach.speaker = TREENER
+coach.skip = Jäta vahele
+coach.offer.title = KAS VÕTTA KÄIK TAGASI?
+coach.offer.text = Treener pakub teie viimase käigu tagasivõtmist, et saaksite otsida paremat.
+coach.offer.hint = Tagasilüke võtab käigu tagasi. Malendi puudutamine jätkab mängu.
+coach.offer.accept = Võta tagasi
+coach.offer.decline = Mängi edasi
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Tagasivõtmisi alles: {0}
+coach.pause.take_back = Võta käik tagasi
+coach.pause.take_back.help = Võtab tagasi teie viimase käigu ja treeneri vastuse, kui ta on selle juba teinud.
+coach.confirm.resign = Kas annate selle partii alla? Võitjaks kuulutatakse treener.
+coach.confirm.resign_draw = Kas annate selle partii alla? Treener ei saa enam matti panna: partii lõpeb viigiga.
+coach.confirm.leave = Kas naasta peamenüüsse? See partii treeneriga katkestatakse.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Mängi uuesti
+coach.gameover.unrated = See partii treeneriga ei mõjuta reitingut.
+coach.lesson.done = HÄSTI TEHTUD
+coach.lesson.done.line = Nüüd te tunnete malereegleid.
+coach.lesson.next = Esimene partii
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Treening
+coach.tab.challenges = Väljakutsed
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATID
+challenge.group.tactics = TAKTIKA
+challenge.group.defence = KAITSE
+challenge.group.endgames = LÕPPMÄNGUD
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Matt ühe käiguga
+challenge.mate1.desc = Üks käik ja ongi matt.
+challenge.mate1.detail = Vaadake kõigepealt läbi kõik tuled: üks neist ei jäta kuningale vaba välja ega võimalust tuld katta või tuld andvat malendit lüüa.
+challenge.mate2.name = Matt kahe käiguga
+challenge.mate2.desc = Käik, mille vastu pole kaitset, ja siis matt.
+challenge.mate2.detail = Esimene käik on sageli tuli või ohverdus, mis võtab kuningalt ühe välja. Treener kaitseb end nii hästi, kui oskab.
+challenge.mate3.name = Matt kolme käiguga
+challenge.mate3.desc = Pikemad sundvariandid.
+challenge.mate3.detail = Tuled, löömised ja ähvardused kolm käiku ette. Arvutage igal sammul välja treeneri parim vastus, enne kui malendit puudutate.
+challenge.backrank.name = Tagumise rea matid
+challenge.backrank.desc = Kuningas on lõksus oma etturite taga.
+challenge.backrank.detail = Kui vangerdanud kuninga ees olevad etturid pole liikunud, võib vanker või lipp viimasel horisontaalil matti panna. Kõigepealt kõrvaldage kaitsjad või tõrjuge need eemale.
+challenge.patterns.name = Matipildid
+challenge.patterns.desc = Umbmatt, Anastasia matt, araabia matt ja muud klassikalised matid.
+challenge.patterns.detail = Kuulsad mativõrgud, mis korduvad ikka ja jälle. Õppige ära tundma malendite paigutust ja lõpplööki.
+challenge.hanging.name = Kaitseta malendid
+challenge.hanging.desc = Märgake, mis on jäänud kaitseta.
+challenge.hanging.detail = Nupu või etturi, mida keegi ei kaitse, saab lihtsalt ära lüüa. Kontrollige, mis kaitseb treeneri iga malendit.
+challenge.fork.name = Kahvlid
+challenge.fork.desc = Üks malend ründab korraga kahte.
+challenge.fork.detail = Kahvlit saavad teha ratsud, etturid, lipud ja isegi kuningad. Vastane suudab päästa ainult ühe kahest sihtmärgist.
+challenge.pin.name = Sidumised
+challenge.pin.desc = Malend, mis ei saa liikuda, ilma et selle taga seisev kaotsi läheks.
+challenge.pin.detail = Siduge malend, mille taga on kuningas või väärtuslikum malend, seejärel rünnake seda veel kord või kasutage ära seda, et see ei saa liikuda.
+challenge.skewer.name = Läbilöögid
+challenge.skewer.desc = Rünnake väärtuslikku malendit ja võitke selle taga olev.
+challenge.skewer.detail = Sidumise vastand: väärtuslikum malend seisab ees, peab eest ära minema ja jätab oma taga oleva malendi löögi alla.
+challenge.discovered.name = Avatud rünnakud
+challenge.discovered.desc = Liigutage üht malendit ja vabastage teine.
+challenge.discovered.detail = Kui malend astub liinilt kõrvale, ründab selle taga olev malend. Kui sellega kaasneb tuli või kahekordne tuli, pole vastasel aega mõlemale ähvardusele vastata.
+challenge.deflection.name = Eemaletõrjumine ja meelitus
+challenge.deflection.desc = Meelitage kaitsja eemale või saatuslikule väljale.
+challenge.deflection.detail = Kahe ülesandega kaitsja ei suuda mõlemat täita. Rünnake seda, pakkuge talle midagi või sundige malend väljale, kus see läheb kaotsi.
+challenge.intermezzo.name = Vahekäigud
+challenge.intermezzo.desc = Ärge lööge kohe tagasi: on midagi tugevamat.
+challenge.intermezzo.detail = Enne oodatud käiku muudab vahepealne tuli või suurem ähvardus kõik.
+challenge.trapped.name = Lõksus malendid
+challenge.trapped.desc = Malend, millel pole enam ühtki ohutut välja.
+challenge.trapped.detail = Võtke malendilt viimased põgenemisväljad ja võitke see siis.
+challenge.promotion.name = Muundumine
+challenge.promotion.desc = Viige ettur läbi viimasele horisontaalile.
+challenge.promotion.detail = Kaugele edenenud etturid on palju väärt. Tehke tee vabaks, tõrjuge blokeerijad eemale ja tehke uus lipp.
+challenge.quiet.name = Vaiksed käigud
+challenge.quiet.desc = Võitev käik pole tuli ega löömine.
+challenge.quiet.detail = Mõnikord valmistab tugevaim käik lihtsalt ette ähvarduse, mille vastu pole kaitset. Seda liiki on kõige raskem märgata.
+challenge.opening.name = Avangulõksud
+challenge.opening.desc = Karistage varajaste vigade eest.
+challenge.opening.detail = Seisud päris partiide esimestest käikudest, kus ühte hooletut käiku saab kohe ära kasutada.
+challenge.escape.name = Leia pääsetee
+challenge.escape.desc = Teie kuningas on ohus: üks käik päästab ta.
+challenge.escape.detail = Kõik teised käigud kaotavad. Vaadake läbi kõik oma kuningale suunatud tuled ja ähvardused ning leidke ainus pääsetee.
+challenge.defend.name = Kaitsekäigud
+challenge.defend.desc = Tõrjuge ähvardus materjali kaotamata.
+challenge.defend.detail = Treener ähvardab midagi. Leidke täpne käik, mis hoiab kõik koos.
+challenge.kq.name = Lipp ja kuningas kuninga vastu
+challenge.kq.desc = Matt lipuga.
+challenge.kq.detail = Suruge üksik kuningas lipuga laua servale, tooge oma kuningas lähemale ja hoiduge patist. Treener kaitseb end parimate käikudega.
+challenge.kr.name = Vanker ja kuningas kuninga vastu
+challenge.kr.desc = Matt vankriga.
+challenge.kr.detail = Vanker lõikab kuninga ära, horisontaal horisontaali järel; teie kuningas võtab opositsiooni. Treener kaitseb end parimate käikudega.
+challenge.kp.name = Kuningas ja ettur kuninga vastu
+challenge.kp.desc = Võitke opositsioon ja muundage ettur.
+challenge.kp.detail = Ees peab käima kuningas, mitte ettur. Võtke opositsioon ja tehke lipp, mida treener ei suuda kinni püüda.
+challenge.kp_hold.name = Peata ettur
+challenge.kp_hold.desc = Üksik kuningas kuninga ja etturi vastu: hoidke viiki.
+challenge.kp_hold.detail = Seiske etturi ees ja hoidke opositsiooni. Pidage vastu kümme käiku.
+challenge.rook.name = Vankrilõppmängud
+challenge.rook.desc = Lucena sild ja Philidori kaitse.
+challenge.rook.detail = Kaks seisu, mida iga mängija peaks teadma: kuidas võita, kui ettur on seitsmendal horisontaalil, ja kuidas kaitsta vankriga kolmandal horisontaalil.
+challenge.endgame.name = Lõppmängutaktika
+challenge.endgame.desc = Vähe malendeid, teravad ideed.
+challenge.endgame.detail = Etturite võidujooksud, läbimurded ja vankrilõppmängud päris partiidest.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} seis|{0} seisu
+coach.challenge.done = Läbitud
+coach.challenge.start = Alusta
+coach.challenge.note.white = Te mängite valgetega; treener seab iga seisu lauale üles.
+coach.challenge.note.hint = Jäite toppama? Vihje saamiseks vajutage H. Mõne katse järel pakub treener ise vihjet.
+coach.challenge.note.unsaved = Väljakutsed ei mõjuta reitingut ja neid ei salvestata; linnuke märgib need, mille olete läbinud.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = VÄLJAKUTSE LÄBITUD
+coach.challenge.complete.line = Lahendasite kõik seisud.
+coach.challenge.next = Järgmine väljakutse
+coach.challenge.again = Uuesti
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = VIHJE?
+coach.hint.text = Treener pakub teile vihjet.
+coach.hint.hint = H annab vihje. Malendi puudutamine jätkab otsimist.
+coach.hint.accept = Vihje
+coach.hint.decline = Ei, aitäh
+coach.hint.key = Vihje
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Treeneri hääl
+options.coach_voice.help = Treenerirežiimis räägib treener valjusti. Tema häälemudel laaditakse alla siis, kui seda esimest korda vaja läheb (umbes 399 MB). Väljas: treeneri sõnad kuvatakse ainult ekraanil.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Häälemudel
+options.voice_update.help = Treener räägib veel oma häälemudeli vana 8-bitise versiooniga. Uuendus laadib alla Supertone'i avaldatud Supertonic 3 ametliku versiooni ja kustutab enne seda vanad failid.
+options.voice_update.button = Uuenda ({0} MB)
+options.voice_update.running = Allalaadimine on käimas.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Hääle kvaliteet
+options.voice_quality.help = Mitu täpsustussammu teeb treeneri kõnesüntees iga lause jaoks, alates tasemest „Madal“ (4) kuni tasemeni „Maksimaalne“ (9); vaikimisi „Keskmine“ (5). Kõrgem tase annab veidi puhtama hääle, kuid arvutamine võtab kauem aega, nii et treener hakkab rääkima veidi hiljem. Seda saab seadistada, kui häälemudel on installitud ja treeneri hääl on sisse lülitatud.
+options.voice_quality.low = Madal
+options.voice_quality.medium = Keskmine
+options.voice_quality.high = Kõrge
+options.voice_quality.very_high = Väga kõrge
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimaalne
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Treeneri hääl
+coach.download.text = Treener räägib mudeliga Supertonic 3, mis on Supertone'i kõnesünteesimudel. See ei kuulu Scacelithi koosseisu: mäng saab selle kohe Hugging Face'ist alla laadida ({0} MB, ühekordselt). Ilma selleta kirjutab treener oma sõnad ekraanile.
+coach.download.licence = Mudel on avaldatud OpenRAIL-M litsentsi alusel, mis keelab mudeli loodud hääle teatud kasutusviisid, näiteks selle esitamise inimhäälena või päris inimese jäljendamise.
+coach.download.read_licence = Loe litsentsi
+coach.download.accept = Valides „Laadi alla“, nõustute selle litsentsi tingimustega.
+# {0} = a folder
+coach.download.folder = Salvestuskoht: {0}
+coach.download.not_now = Mitte praegu
+# {0} = the size in megabytes
+coach.download.download = Laadi alla ({0} MB)
+coach.download.licence_title = OPENRAIL-M LITSENTS
+coach.download.back = Tagasi
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = Treenerile uus hääl
+coach.update.text = Treeneri hääl kasutab nüüd seni installitud 8-bitise teisenduse asemel Supertone'i avaldatud Supertonic 3 ametlikku versiooni. Mäng saab selle kohe Hugging Face'ist alla laadida ({0} MB, ühekordselt); enne seda kustutatakse vanad failid ({1} MB). Kui keeldute, jääb treenerile tema praegune hääl ja uuendus jääb kättesaadavaks menüüs Seaded > Heli.
+coach.update.download = Uuenda ({0} MB)
+coach.update.accept = Valides „Uuenda“, nõustute selle litsentsi tingimustega.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TREENERI HÄÄL
+coach.download.removing = Vana versiooni eemaldamine…
+coach.download.checking = Failide kontrollimine…
+coach.download.downloading = Allalaadimine…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Allikas: Hugging Face
+coach.download.from_archive = Allikas: Hugging Face (arhiivikoopia)
+coach.download.cancel = Loobu
+coach.download.failed = Allalaadimine ebaõnnestus.
+coach.download.error.network = Serveritega ei saanud ühendust. Kontrollige oma internetiühendust ja proovige uuesti.
+# {0} = a folder
+coach.download.error.disk = Faile ei õnnestunud kirjutada kausta {0}. Kontrollige vaba ruumi ja proovige uuesti.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serverid saatsid ootamatu vastuse ({0}). Proovige hiljem uuesti.
+coach.download.retry = Proovi uuesti
+coach.download.close = Sulge
+# Notices
+coach.download.done = Treeneri hääl on installitud.
+coach.download.cancelled = Allalaadimine tühistati: järgmisel korral jätkub see sealt, kus pooleli jäi.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Salvestatud partiid
+options.save_games = Salvesta minu partiid
+options.save_games.help = Kui teie partiid Stockfishi vastu, treeneriga, kahe mängija vahel selles arvutis ja teie otsemängud lõpevad, salvestatakse need PGN-failidena ning need leiate hiljem jaotisest „Salvestatud partiid“. Võrgupartiisid hoiab server.
+library.title = SALVESTATUD PARTIID
+library.section.games = PARTIID
+library.section.details = PARTII
+library.section.tags = SILDID
+library.section.moves = KÄIGUD
+library.count = {0} partii|{0} partiid
+library.filter = Näita
+library.filter.all = Kõik partiid
+library.filter.play = Stockfishi vastu
+library.filter.coach = Treeneriga
+library.filter.hotseat = Kaks mängijat
+library.filter.direct = Otsemängud
+library.filter.server = Võrgupartiid
+library.filter.imported = Imporditud
+library.mode.play = Stockfishi vastu
+library.mode.coach = Treeneriga
+library.mode.hotseat = Kaks mängijat
+library.mode.direct = Otsemäng
+library.mode.server = Võrgupartii
+library.mode.imported = Imporditud
+library.coach_level = Tase {0}
+library.unknown_player = Tundmatu
+library.unfinished = Lõpetamata
+library.unreadable = Seda partiid ei saa lugeda.
+library.moves = {0} käik|{0} käiku
+library.opening_variation = {0}: {1}
+library.file = Fail: {0}
+library.file_game = Fail: {0}, partii {1}/{2}
+library.no_moves = Ühtki käiku ei tehtud.
+library.none_selected = Valige loendist partii.
+library.reading = Salvestatud partiide lugemine
+library.empty.title = Salvestatud partiisid veel pole
+library.empty.text = Teie partiid Stockfishi vastu, treeneriga, kahe mängija vahel selles arvutis ja teie otsemängud ilmuvad siia, kui need on lõppenud. Sellesse kausta võite panna ka PGN-faile: teistest programmidest või veebisaitidelt eksporditud partiid kuvatakse koos teie omadega.
+library.empty.filter = Seda liiki partiisid pole.
+library.error.folder = Salvestatud partiide kausta ei saa lugeda
+library.error.game = Seda partiid ei saa lugeda: {0}
+library.folder = Kaust: {0}
+library.open_folder = Ava kaust
+library.open_failed = Kausta ei õnnestunud avada.
+library.replay = Taasesita
+library.delete = Kustuta
+library.delete.title = PARTII KUSTUTAMINE
+library.delete.text = Partii {0} kustutatakse sellest arvutist koos selle failiga. Seda ei saa tagasi võtta.
+library.delete.ok = Kustuta
+library.delete.several = Selles failis on {0} partii: selle saab kustutada ainult kaustast.|Selles failis on {0} partiid: partii saab kustutada ainult kaustast.
+library.deleted = Partii on kustutatud.
+library.delete.failed = Partiid ei õnnestunud kustutada.
+library.delete.changed = Fail on muutunud: loendit on värskendatud.
+library.truncated = Selles kaustas on liiga palju partiisid: loendis on ainult {0} viimast.
+library.tag.Event = Võistlus
+library.tag.Site = Koht
+library.tag.Date = Kuupäev
+library.tag.Time = Kellaaeg
+library.tag.Round = Voor
+library.tag.White = Valge
+library.tag.Black = Must
+library.tag.Result = Tulemus
+library.tag.WhiteElo = Valge Elo
+library.tag.BlackElo = Musta Elo
+library.tag.TimeControl = Ajakontroll
+library.tag.Termination = Lõpu põhjus
+library.tag.Opening = Avang
+library.tag.Variation = Variant
+library.tag.PlyCount = Poolkäigud
+library.tag.FEN = Algseis
+library.tag.ScacelithMode = Režiim
+library.tag.CoachLevel = Treeneri tase
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Partii number
+library.tag.UTCDate = Kuupäev (UTC)
+library.tag.UTCTime = Kellaaeg (UTC)
+library.tag.WhiteRatingDiff = Valge reitingu muutus
+library.tag.BlackRatingDiff = Musta reitingu muutus
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analüüs
+analysis.menu.title = ANALÜÜS
+analysis.menu.analyse = Analüüsi
+analysis.menu.paste = Kleebi PGN
+analysis.menu.online = Minu võrgupartiid
+analysis.menu.folder = Analüüsimiseks pange PGN-failid sellesse kausta: {0}
+analysis.menu.empty.title = Salvestatud partiisid veel pole
+analysis.menu.empty.text = Teie partiid ilmuvad siia, kui need on lõppenud, ja samuti allolevasse kausta pandud PGN-failid. Võite ka kleepida PGN-tekstina kopeeritud partii.
+analysis.menu.empty.no_folder = Analüüsimiseks kleepige PGN-tekstina kopeeritud partii.
+analysis.menu.paste.empty = Lõikelaud on tühi: kopeerige kõigepealt partii PGN-tekstina.
+analysis.menu.paste.none = Lõikelaualt ei leitud ühtki malepartiid.
+analysis.menu.paste.several = Lõikelaual on mitu partiid: analüüsitakse esimest.
+analysis.menu.gameover = Analüüsi partiid
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Käik {0}/{1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Kohe
+replay.again = Vaata uuesti
+replay.gameover.unfinished = Partii lõpeb pärast {0}. käiku ilma tulemuseta.
+replay.tip.start = Partii algus (Home)
+replay.tip.back = Üks käik tagasi (J)
+replay.tip.pause = Paus (K)
+replay.tip.resume = Jätka (K)
+replay.tip.forward = Üks käik edasi (L)
+replay.tip.end = Partii lõpp (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAAR
+analysis.hud.accuracy = TÄPSUS
+analysis.hud.reviewing = Stockfish vaatab partii läbi… {0}
+analysis.hud.no_engine = Malemootorit pole: käigud kuvatakse ilma analüüsita.
+analysis.hud.no_moves = Selles partiis pole käike.
+analysis.hud.tip.play = Mängi käigud läbi (K)
+analysis.hud.tip.comments_off = Peida võtmehetkede kommentaarid (N)
+analysis.hud.tip.comments_on = Näita võtmehetkede kommentaare (N)
+analysis.hud.tip.voice_off = Vaigista kommentaatori hääl (M)
+analysis.hud.tip.voice_on = Kuula kommentaare (M)
+analysis.hud.tip.voice_missing = Häält pole kuulda: selle failid pole installitud või Seaded > Heli > Treeneri hääl on välja lülitatud. Kommentaarid on ainult ekraanil kirjas.
+analysis.hud.tip.arrows_off = Peida paremate käikude nooled (B)
+analysis.hud.tip.arrows_on = Näita paremate käikude nooli (B)
+analysis.hud.controls.play = Mängi / paus
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Näita / peida kommentaarid
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Kommentaatori hääl sisse / välja
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Näita / peida nooled
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Salvesta GIF-ina
+gif.making = GIF-i loomine: server joonistab partiid…
+gif.saved = GIF on salvestatud:
+gif.saved_as = GIF salvestatud: {0}
+gif.sign_in_first = GIF-ide tegemiseks logige sisse võrguserverisse: server joonistab need.
+gif.busy_other = Parajasti tehakse teist GIF-i. Oodake, kuni see valmib.
+gif.err.rate_limited_for = Olete lühikese aja jooksul teinud palju GIF-e. Järgmise tegemiseks oodake {0}.
+gif.err.rate_limited = Olete lühikese aja jooksul teinud palju GIF-e. Proovige hiljem uuesti.
+gif.err.server_busy_for = Server joonistab parajasti teisi GIF-e. Oodake {0} ja proovige siis uuesti.
+gif.err.server_busy = Server joonistab parajasti teisi GIF-e. Proovige hetke pärast uuesti.
+gif.err.signed_out = Teie seanss on lõppenud. GIF-i tegemiseks logige uuesti sisse.
+gif.err.game_too_long = See partii on GIF-i tegemiseks liiga pikk.
+gif.err.pgn_too_large = See partii on GIF-i tegemiseks liiga pikk.
+gif.err.invalid_pgn = Server ei suutnud seda partiid lugeda.
+gif.err.render_failed = Server ei suutnud seda GIF-i teha. Proovige uuesti.
+gif.err.gif_disabled = See server ei tee GIF-e.
+gif.err.write_failed = GIF-i ei õnnestunud selles arvutis salvestada.
+gif.err.not_found = Seda partiid pole enam serveris.
+gif.wait.seconds = {0} sekund|{0} sekundit
+gif.wait.minutes = {0} minut|{0} minutit
+gif.wait.both = {0} ja {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 käivitamine ebaõnnestus. Uuendage oma graafikadraiverit.
+error.opengl_macos = OpenGL 4.6 käivitamine selles Macis ebaõnnestus. Scacelith vajab Apple'i kiibiga (M1 või uuem) Maci ja macOS 26 või uuemat ning ei tööta virtuaalmasinas.
+error.renderer = Renderdajat ei õnnestunud käivitada.
+error.scene = Stseeni ei õnnestunud laadida.
+error.log_file = Üksikasjad on logifailis: {0}

@@ -1,0 +1,109 @@
+# Coach speech (Greek): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "εσύ" and is male ("Είμαι έτοιμος"); the player's gender is unknown: no adjective
+# about the player ("έτοιμος", "ψύχραιμος", "σύμφωνοι"), verbs instead ("Κράτα την ψυχραιμία σου").
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Γεια σου! Ας παίξουμε μια φιλική παρτίδα. Θα σε βοηθάω κάθε φορά που κάτι πηγαίνει στραβά.
+event.greet.l1.2 = Γεια! Θα παίζω χαλαρά και θα σου δείχνω τι πρέπει να προσέχεις.
+event.greet.l1.3 = Καλώς ήρθες! Με την ησυχία σου: θα σου λέω πότε κάποιο κομμάτι κινδυνεύει.
+event.greet.l2 = Γεια σου! Πάμε να παίξουμε. Όταν εμφανιστεί πιρούνι ή κάρφωμα, θα σου το δείξω.
+event.greet.l2.2 = Γεια! Βγάλε τα κομμάτια σου και κράτα τον βασιλιά σου ασφαλή. Θα σε βοηθάω στην πορεία.
+event.greet.l2.3 = Καλώς ήρθες πάλι στη σκακιέρα! Πρόσεχε τα πιρούνια και τα καρφώματα: αυτά κερδίζουν παρτίδες.
+event.greet.l3 = Γεια σου! Ας παίξουμε μια κανονική παρτίδα. Θα σχολιάζω τα σχέδιά σου και τα μεγαλύτερα λάθη.
+event.greet.l3.2 = Γεια! Σκέψου ένα σχέδιο για τα κομμάτια σου. Θα σου λέω πότε μια κίνηση παραβλέπει κάτι.
+event.greet.l3.3 = Πάμε! Θα σου επισημαίνω πότε υπάρχει μόνο μία καλή κίνηση και ποιες κινήσεις πηγαίνουν στραβά.
+event.greet.l4 = Γεια σου! Αυτή τη φορά θα δίνω αξιολογήσεις και θα σου δείχνω τις καλύτερες υποψήφιες κινήσεις.
+event.greet.l4.2 = Πάμε να παίξουμε. Μετά από ένα λάθος θα σου λέω τι ήταν πιο ακριβές.
+event.greet.l4.3 = Μια παρτίδα όπως στον σύλλογο; Θα σχολιάζω όταν αλλάζει η αξιολόγηση.
+event.greet.l5 = Πάμε να παίξουμε. Θα κρατάω τα σχόλιά μου σύντομα.
+event.greet.l5.2 = Είμαι έτοιμος όποτε θέλεις. Μόνο σύντομα σχόλια.
+event.greet.l5.3 = Καλή επιτυχία. Θα μιλάω μόνο όταν έχει σημασία.
+event.greet.l6 = Καλή επιτυχία.
+event.greet.l6.2 = Πάμε.
+event.greet.l6.3 = Είμαι έτοιμος. Θα σχολιάζω μόνο τις κρίσιμες στιγμές.
+
+# Who starts (said after the greeting).
+event.colour.white = Έχεις τα λευκά κομμάτια, οπότε ξεκινάς εσύ.
+event.colour.white.2 = Παίζεις με τα λευκά: η πρώτη κίνηση είναι δική σου.
+event.colour.black = Εγώ έχω τα λευκά, οπότε ξεκινάω εγώ.
+event.colour.black.2 = Αυτή τη φορά παίζεις με τα μαύρα: παίζω πρώτος εγώ.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the coach page (assets/i18n/el.lang coach.level.<n>.name).
+event.level.l1 = Πρώτα βήματα: παίζω χαλαρά και εξηγώ κάθε λάθος με απλά λόγια.
+event.level.l2 = Αρχάριος: παίζω λίγο πιο δυνατά και λέω με το όνομά τους απλά τακτικά μοτίβα, όπως το πιρούνι και το κάρφωμα.
+event.level.l3 = Ανερχόμενος: μιλάω για σχέδια και για τη δομή των πιονιών, και δείχνω σύντομες συνέχειες.
+event.level.l4 = Παίκτης συλλόγου: δίνω την αξιολόγηση σε πιόνια και προτείνω υποψήφιες κινήσεις.
+event.level.l5 = Δυνατός παίκτης συλλόγου: σύντομα σχόλια, και μεγαλύτερες συνέχειες όταν χρειάζεται.
+event.level.l6 = Ειδικός: παίζω όσο καλύτερα μπορώ και σχολιάζω μόνο τις κρίσιμες στιγμές.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Παίζεις εσύ.
+event.your_move.2 = Σειρά σου.
+event.your_move.3 = Τώρα εσύ.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Με την ησυχία σου.
+event.take_time.2 = Δεν βιαζόμαστε: στις παρτίδες μας δεν υπάρχει ρολόι.
+# Short filler while the coach is still looking at the position.
+event.filler = Χμμ.
+event.filler.2 = Για να δούμε.
+event.filler.3 = Να ρίξω μια ματιά.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Εντάξει, ας την πάρουμε πίσω.
+event.takeback.taken.2 = Καλή ιδέα. Ξανακοίτα τη θέση.
+event.takeback.taken.3 = Πίσω λοιπόν. Δοκίμασε ξανά.
+# The player declined the offer and played on.
+event.takeback.declined = Εντάξει, συνεχίζουμε.
+event.takeback.declined.2 = Καλά, η παρτίδα συνεχίζεται.
+event.takeback.declined.3 = Όπως θέλεις. Ας συνεχίσουμε.
+# After an explanation without an offer.
+event.play_on = Ας συνεχίσουμε την παρτίδα.
+event.play_on.2 = Ας προχωρήσουμε.
+event.play_on.3 = Και τώρα, πίσω στην παρτίδα μας.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Τέτοια λάθη τα κάνουν όλοι. Αυτό που μετράει είναι να τα εντοπίζεις.
+event.encourage.mistake.2 = Μην ανησυχείς. Κοίτα τι απειλεί η τελευταία μου κίνηση και θα το βρεις.
+event.encourage.mistake.3 = Αυτό συμβαίνει σε κάθε σκακιστή. Ας συνεχίσουμε.
+# The player is behind (material or evaluation).
+event.encourage.behind = Μην τα παρατάς: ψάξε για ευκαιρίες και δυσκόλεψέ με.
+event.encourage.behind.2 = Συνέχισε να παλεύεις. Θέσεις σαν αυτή μπορούν ακόμα να αλλάξουν.
+event.encourage.behind.3 = Κράτα την ψυχραιμία σου και ψάξε τις αδυναμίες μου.
+# The player has played several good moves in a row.
+event.encourage.well = Ελέγχεις τις απειλές μου πριν παίξεις. Μπράβο.
+event.encourage.well.2 = Προσεκτικές, σταθερές κινήσεις. Συνέχισε έτσι.
+event.encourage.well.3 = Σκέφτεσαι καλά σήμερα.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Δέχομαι. Ισοπαλία, λοιπόν.
+event.draw.accepted.2 = Συμφωνώ: ισοπαλία.
+event.draw.declined = Όχι, ευχαριστώ. Ας συνεχίσουμε.
+event.draw.declined.2 = Προτιμώ να συνεχίσουμε.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Έπαιξες πολύ ωραία. Συγχαρητήρια!
+event.end.win.2 = Το άξιζες. Μπράβο!
+event.end.win.3 = Συγχαρητήρια: με κέρδισες με το σπαθί σου.
+event.end.loss = Καλή παρτίδα. Την επόμενη φορά θα με κερδίσεις.
+event.end.loss.2 = Ευχαριστώ για την παρτίδα. Κάθε ήττα κάτι σου διδάσκει.
+event.end.loss.3 = Ωραία μάχη. Ας δούμε τι έγινε.
+event.end.draw = Ισοπαλία. Καλή παρτίδα!
+event.end.draw.2 = Κανείς δεν κερδίζει αυτή τη φορά. Καλή μάχη.
+event.end.draw.3 = Δίκαιο αποτέλεσμα. Καλή παρτίδα.
+event.end.resigned = Εγκατέλειψες. Πάντως πάλεψες καλά.
+event.end.resigned.2 = Εντάξει. Ευχαριστώ για την παρτίδα.
+event.end.handshake = Ας δώσουμε τα χέρια.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a heading that starts with a capital
+# letter: it is always quoted after the noun "κεφάλαιο", so no article or case has to agree with it.
+event.lesson.resume = Καλώς ήρθες πάλι! Ας συνεχίσουμε με το κεφάλαιο «{chapter}».
+event.lesson.resume.2 = Γεια σου ξανά! Είχαμε σταματήσει στο κεφάλαιο «{chapter}».
+event.lesson.next = Επόμενο κεφάλαιο: «{chapter}».
+event.lesson.next.2 = Και τώρα, το κεφάλαιο «{chapter}».

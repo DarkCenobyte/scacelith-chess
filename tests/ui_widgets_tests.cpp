@@ -9,6 +9,7 @@
 #include "ui_driver.h"
 #include "i18n/i18n.h"
 #include "ui/ui_draw.h"
+#include "ui/ui_theme.h"
 #include "ui/ui_screens_online.h"
 #include <cmath>
 #include <string>
@@ -495,6 +496,23 @@ TEST(ui_widgets_confirm_dialog) {
     CHECK(sounds.count(ui::Sound::Confirm) >= 1);
     CHECK(sounds.count(ui::Sound::Back) >= 1);
     CHECK_EQ(behind, 0);
+}
+
+// A confirmation dialog is 760 wide, wider for a title that needs it (titles do not wrap), and no
+// wider than the screen less 40 on each side.
+TEST(ui_widgets_confirm_dialog_width_fits_its_title) {
+    REQUIRE(uitest::app());
+    ui::gfx::TextStyle st;
+    st.face = ui::font::FACE_TITLE;
+    st.size = ui::theme::kPageTitle;
+    st.tracking = 0.2f;
+    CHECK_EQ(dialogWidth("RESIGN?", 1920.0f), 760.0f);
+    const std::string longTitle = "UNGESPEICHERTE \xC3\x84NDERUNGEN";   // UNGESPEICHERTE ÄNDERUNGEN
+    const float tw = ui::gfx::textWidth(longTitle, st);
+    CHECK(tw > 640.0f);
+    CHECK(std::fabs(dialogWidth(longTitle, 1920.0f) - (tw + 160.0f)) < 0.01f);
+    CHECK_EQ(dialogWidth(longTitle + " " + longTitle, 1280.0f), 1200.0f);
+    CHECK_EQ(dialogWidth(longTitle, 600.0f), 760.0f);
 }
 
 // A disabled button with a reason never activates; the mouse resting on it shows the reason.

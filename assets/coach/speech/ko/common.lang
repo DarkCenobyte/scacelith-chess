@@ -1,0 +1,503 @@
+# Coach speech (Korean): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the particle forms and number forms Korean needs.
+# Register: the coach speaks warm polite 해요체 (-요 endings; requests in -세요 / -어 보세요, suggestions
+# in -ㄹ까요?), with the honorific -시- for the player's own actions where a polite teacher uses it
+# (잘 찾으셨어요, 보셨어요?), never for pieces or for himself. He calls himself 저 (제가; "my" = 제) and
+# never names the player: no 당신, 너 or 네. Korean has no gender: nothing agrees with the coach, the
+# player or a piece.
+# Chess words as in the game UI (assets/i18n/ko.lang): 폰 나이트 비숍 룩 퀸 킹, 기물 (a piece), 수 (a move),
+# 칸 (a square), 체크, 체크메이트, 스테일메이트, 무승부, 캐슬링, 앙파상, 프로모션, 기보, 시계, 레이팅.
+# Spoken values are Hangul only: no Latin letter, digit or symbol reaches the voice.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Owners: {your} is the bare noun, "나이트": Korean leaves the listener's possessive implicit, and the
+# coach's pieces always carry 제, so the two never mix up. {my} = "제 나이트". The Analysis mode names
+# a piece by its side: "백 나이트", "흑 퀸" (owner.white / owner.black).
+# Particles follow the sound of the noun's last syllable: 폰 비숍 룩 퀸 킹 end in a consonant
+# (이 은 을 과 이랑 으로 이에요), 나이트 in a vowel (가 는 를 와 랑 로 예요). NEVER write such a particle
+# after a piece placeholder: ask for the form that carries it. Particles that never change (의 에 에게
+# 한테 에서 도 만 까지 부터 보다 처럼 하고 마다, and the adnominal copula 인) follow the placeholder
+# directly: "{my}에게", "{your}도", "{t1}의 뒤". More particles may follow a form: "{t1:ins}는" =
+# "퀸으로는", "{t1:and}도" = "퀸과도".
+# Forms (every one defined for the six pieces and the owners your, my, white and black):
+#   nom        나이트 / 제 나이트 / 백 룩 (no particle)  "{your}도 공격받고 있어요."
+#   subj       제 나이트가 / 제 룩이               "{my:subj} {sq} 칸으로 갈 수 있어요."
+#   top        나이트는 / 룩은                     "{your:top} 핀에 걸려 있어요."
+#   obj        제 나이트를 / 제 룩을               "{my:obj} 잡으세요!"
+#   and        퀸과 / 나이트와 (and, with)          "{t1:and} {t2:obj} 동시에 공격해요."
+#   rang       퀸이랑 / 나이트랑 (spoken and/with)  "{t1:rang} {t2:subj} 둘 다 위험해요."
+#   ins        룩으로 / 나이트로 (with, by, toward, as)  "{your:ins} 잡아 보세요."
+#   cop        룩이에요 / 나이트예요 (it is ...)    "이게 {your:cop}."
+#   was        제 룩이었 / 제 나이트였 + an ending (the past copula: 어요, 죠, 는데, 다면)
+#                                                  "제일 위험한 기물은 {my:was}어요."
+#   stem       룩이 / 나이트: the copula stem before an ending that starts with a consonant (고 지만
+#              라서 라도 라고 라는 면 니까 나 든지 네요 죠): "{t1:stem}나 {t2:obj} 잃게 돼요." (퀸이나 룩을)
+#              It is not a subject form: 나이트 + 라서 = 나이트라서, 룩 + 이라서 = 룩이라서.
+# The bare forms: the same without the owner word (제, 백, 흑), when the sentence already says whose
+# piece it is, or after 그 / 이 in place of a pronoun. For {your} they equal the forms above.
+#   bare       나이트 / 룩                         "{t1:and} {t2:bare}, 둘 다 위험해요." (백 퀸과 룩)
+#   bare_subj  나이트가 / 룩이                     "그 {my:bare_subj} 문제예요."
+#   bare_top   나이트는 / 룩은                     "{t1:and} {t2:bare_top} 한 줄에 있어요."
+#   bare_obj   나이트를 / 룩을                     "그 {my:bare_obj} 잡으세요!"
+#   bare_and   나이트와 / 룩과                     "제가 {my:bare_and} {my2:bare_obj} 함께 움직일게요."
+#   bare_rang  나이트랑 / 룩이랑                   "제가 {my:bare_rang} {my2:bare_ins} 공격해요."
+#   bare_ins   나이트로 / 룩으로                   "제가 {my:bare_ins} 잡을게요."
+#   bare_cop   나이트예요 / 룩이에요               "제가 움직일 기물은 {my:bare_cop}."
+#   bare_was   나이트였 / 룩이었 + an ending       "제가 잃은 기물은 {my:bare_was}어요."
+#   bare_stem  나이트 / 룩이 + an ending           "제 기물 중에 위험한 건 {my:bare_stem}죠."
+# Pronouns ("it", "she") are left out, as Korean does ("잡으세요!"), or said with 그 + a bare form.
+piece.pawn.nom = 폰
+piece.knight.nom = 나이트
+piece.bishop.nom = 비숍
+piece.rook.nom = 룩
+piece.queen.nom = 퀸
+piece.king.nom = 킹
+piece.pawn.subj = 폰이
+piece.pawn.top = 폰은
+piece.pawn.obj = 폰을
+piece.pawn.and = 폰과
+piece.pawn.rang = 폰이랑
+piece.pawn.ins = 폰으로
+piece.pawn.cop = 폰이에요
+piece.pawn.was = 폰이었
+piece.pawn.stem = 폰이
+piece.pawn.bare = 폰
+piece.pawn.bare_subj = 폰이
+piece.pawn.bare_top = 폰은
+piece.pawn.bare_obj = 폰을
+piece.pawn.bare_and = 폰과
+piece.pawn.bare_rang = 폰이랑
+piece.pawn.bare_ins = 폰으로
+piece.pawn.bare_cop = 폰이에요
+piece.pawn.bare_was = 폰이었
+piece.pawn.bare_stem = 폰이
+piece.knight.subj = 나이트가
+piece.knight.top = 나이트는
+piece.knight.obj = 나이트를
+piece.knight.and = 나이트와
+piece.knight.rang = 나이트랑
+piece.knight.ins = 나이트로
+piece.knight.cop = 나이트예요
+piece.knight.was = 나이트였
+piece.knight.stem = 나이트
+piece.knight.bare = 나이트
+piece.knight.bare_subj = 나이트가
+piece.knight.bare_top = 나이트는
+piece.knight.bare_obj = 나이트를
+piece.knight.bare_and = 나이트와
+piece.knight.bare_rang = 나이트랑
+piece.knight.bare_ins = 나이트로
+piece.knight.bare_cop = 나이트예요
+piece.knight.bare_was = 나이트였
+piece.knight.bare_stem = 나이트
+piece.bishop.subj = 비숍이
+piece.bishop.top = 비숍은
+piece.bishop.obj = 비숍을
+piece.bishop.and = 비숍과
+piece.bishop.rang = 비숍이랑
+piece.bishop.ins = 비숍으로
+piece.bishop.cop = 비숍이에요
+piece.bishop.was = 비숍이었
+piece.bishop.stem = 비숍이
+piece.bishop.bare = 비숍
+piece.bishop.bare_subj = 비숍이
+piece.bishop.bare_top = 비숍은
+piece.bishop.bare_obj = 비숍을
+piece.bishop.bare_and = 비숍과
+piece.bishop.bare_rang = 비숍이랑
+piece.bishop.bare_ins = 비숍으로
+piece.bishop.bare_cop = 비숍이에요
+piece.bishop.bare_was = 비숍이었
+piece.bishop.bare_stem = 비숍이
+piece.rook.subj = 룩이
+piece.rook.top = 룩은
+piece.rook.obj = 룩을
+piece.rook.and = 룩과
+piece.rook.rang = 룩이랑
+piece.rook.ins = 룩으로
+piece.rook.cop = 룩이에요
+piece.rook.was = 룩이었
+piece.rook.stem = 룩이
+piece.rook.bare = 룩
+piece.rook.bare_subj = 룩이
+piece.rook.bare_top = 룩은
+piece.rook.bare_obj = 룩을
+piece.rook.bare_and = 룩과
+piece.rook.bare_rang = 룩이랑
+piece.rook.bare_ins = 룩으로
+piece.rook.bare_cop = 룩이에요
+piece.rook.bare_was = 룩이었
+piece.rook.bare_stem = 룩이
+piece.queen.subj = 퀸이
+piece.queen.top = 퀸은
+piece.queen.obj = 퀸을
+piece.queen.and = 퀸과
+piece.queen.rang = 퀸이랑
+piece.queen.ins = 퀸으로
+piece.queen.cop = 퀸이에요
+piece.queen.was = 퀸이었
+piece.queen.stem = 퀸이
+piece.queen.bare = 퀸
+piece.queen.bare_subj = 퀸이
+piece.queen.bare_top = 퀸은
+piece.queen.bare_obj = 퀸을
+piece.queen.bare_and = 퀸과
+piece.queen.bare_rang = 퀸이랑
+piece.queen.bare_ins = 퀸으로
+piece.queen.bare_cop = 퀸이에요
+piece.queen.bare_was = 퀸이었
+piece.queen.bare_stem = 퀸이
+piece.king.subj = 킹이
+piece.king.top = 킹은
+piece.king.obj = 킹을
+piece.king.and = 킹과
+piece.king.rang = 킹이랑
+piece.king.ins = 킹으로
+piece.king.cop = 킹이에요
+piece.king.was = 킹이었
+piece.king.stem = 킹이
+piece.king.bare = 킹
+piece.king.bare_subj = 킹이
+piece.king.bare_top = 킹은
+piece.king.bare_obj = 킹을
+piece.king.bare_and = 킹과
+piece.king.bare_rang = 킹이랑
+piece.king.bare_ins = 킹으로
+piece.king.bare_cop = 킹이에요
+piece.king.bare_was = 킹이었
+piece.king.bare_stem = 킹이
+# The owners: the English keys first, then every form (the bare forms never carry the owner).
+owner.your.nom = {piece}
+owner.my.nom = 제 {piece}
+owner.white.nom = 백 {piece}
+owner.black.nom = 흑 {piece}
+owner.your.subj = {piece}
+owner.your.top = {piece}
+owner.your.obj = {piece}
+owner.your.and = {piece}
+owner.your.rang = {piece}
+owner.your.ins = {piece}
+owner.your.cop = {piece}
+owner.your.was = {piece}
+owner.your.stem = {piece}
+owner.your.bare = {piece}
+owner.your.bare_subj = {piece}
+owner.your.bare_top = {piece}
+owner.your.bare_obj = {piece}
+owner.your.bare_and = {piece}
+owner.your.bare_rang = {piece}
+owner.your.bare_ins = {piece}
+owner.your.bare_cop = {piece}
+owner.your.bare_was = {piece}
+owner.your.bare_stem = {piece}
+owner.my.subj = 제 {piece}
+owner.my.top = 제 {piece}
+owner.my.obj = 제 {piece}
+owner.my.and = 제 {piece}
+owner.my.rang = 제 {piece}
+owner.my.ins = 제 {piece}
+owner.my.cop = 제 {piece}
+owner.my.was = 제 {piece}
+owner.my.stem = 제 {piece}
+owner.my.bare = {piece}
+owner.my.bare_subj = {piece}
+owner.my.bare_top = {piece}
+owner.my.bare_obj = {piece}
+owner.my.bare_and = {piece}
+owner.my.bare_rang = {piece}
+owner.my.bare_ins = {piece}
+owner.my.bare_cop = {piece}
+owner.my.bare_was = {piece}
+owner.my.bare_stem = {piece}
+owner.white.subj = 백 {piece}
+owner.white.top = 백 {piece}
+owner.white.obj = 백 {piece}
+owner.white.and = 백 {piece}
+owner.white.rang = 백 {piece}
+owner.white.ins = 백 {piece}
+owner.white.cop = 백 {piece}
+owner.white.was = 백 {piece}
+owner.white.stem = 백 {piece}
+owner.white.bare = {piece}
+owner.white.bare_subj = {piece}
+owner.white.bare_top = {piece}
+owner.white.bare_obj = {piece}
+owner.white.bare_and = {piece}
+owner.white.bare_rang = {piece}
+owner.white.bare_ins = {piece}
+owner.white.bare_cop = {piece}
+owner.white.bare_was = {piece}
+owner.white.bare_stem = {piece}
+owner.black.subj = 흑 {piece}
+owner.black.top = 흑 {piece}
+owner.black.obj = 흑 {piece}
+owner.black.and = 흑 {piece}
+owner.black.rang = 흑 {piece}
+owner.black.ins = 흑 {piece}
+owner.black.cop = 흑 {piece}
+owner.black.was = 흑 {piece}
+owner.black.stem = 흑 {piece}
+owner.black.bare = {piece}
+owner.black.bare_subj = {piece}
+owner.black.bare_top = {piece}
+owner.black.bare_obj = {piece}
+owner.black.bare_and = {piece}
+owner.black.bare_rang = {piece}
+owner.black.bare_ins = {piece}
+owner.black.bare_cop = {piece}
+owner.black.bare_was = {piece}
+owner.black.bare_stem = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares stay "e4". Spoken: the Korean names of the Latin letters, then the rank as a
+# Sino-Korean number, as Korean players read coordinates: e4 = "이 사", f3 = "에프 삼", a8 = "에이 팔",
+# h7 = "에이치 칠", c6 = "씨 육". A square ends in a varying sound: never write a particle after {sq},
+# put it on the noun 칸 instead ("{sq} 칸으로", "{sq} 칸에", "{sq} 칸의 제 나이트").
+square.spoken = {file} {rank}
+file.a.spoken = 에이
+file.b.spoken = 비
+file.c.spoken = 씨
+file.d.spoken = 디
+file.e.spoken = 이
+file.f.spoken = 에프
+file.g.spoken = 지
+file.h.spoken = 에이치
+rank.1.spoken = 일
+rank.2.spoken = 이
+rank.3.spoken = 삼
+rank.4.spoken = 사
+rank.5.spoken = 오
+rank.6.spoken = 육
+rank.7.spoken = 칠
+rank.8.spoken = 팔
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Korean scoresheets use the English letters K Q R B N (assets/i18n/ko.lang scoresheet.pieces).
+move.letters = K Q R B N
+# Spoken as Korean players read notation, without particles ({piece} is the bare noun, whose last
+# sound varies): "나이트 에프 삼" (Nf3), "나이트 이 오 잡기" (Nxe5), "비 나이트 디 이" (Nbd2: the b-file
+# knight), "이 폰 디 오 잡기" (exd5: the e-pawn), "폰 되잡기" (a recapture), "킹사이드 캐슬링",
+# "이 팔, 퀸 프로모션" (e8=Q), "퀸 지 사, 체크". A move ends in a varying sound too: never attach a
+# particle to {move} {best} {reply} {line}; write "{best}, 이 수가 더 좋았어요", "{line} 수순 뒤에".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} {to} 잡기
+move.piece_from.spoken = {from} {piece} {to}
+move.piece_from_capture.spoken = {from} {piece} {to} 잡기
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} 폰 {to} 잡기
+move.recapture.spoken = {piece} 되잡기
+move.castle_short.spoken = 킹사이드 캐슬링
+move.castle_long.spoken = 퀸사이드 캐슬링
+move.promotion.spoken = {move}, {piece} 프로모션
+move.check.spoken = {move}, 체크
+move.mate.spoken = {move}, 체크메이트
+moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ------------------------------------------------------------------------
+# The voice assimilates a final ㄴ to the velar that follows (퀸과 said 큉과): "퀸과", "퀸까지" are heard
+# 킹과, 킹까지, the king. The spoken text gives 퀸 a vowel or ㅎ after it: 퀸하고 (and/with, the same
+# meaning), 퀸에까지 (as far as). "퀸 근처" across a space does it too: ex.fork.tip.knight.spoken.
+# In a new line, avoid 퀸 right before ㄱ ㄲ ㅋ. See docs/PRONUNCIATION.md (Korean).
+respell.퀸과 = 퀸하고
+respell.퀸까지 = 퀸에까지
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Sino-Korean numbers (일 이 삼 ...) are the default: ranks, points (점), percentages, move numbers
+# (수째), evaluations ("일 점 삼"). 21-99 compose as "{tens}{units}" (이십 + 일 = 이십일), 200-900 as
+# "{n}백" (100 = 백), 101-999 as "{hundreds}{rest}" (백이십삼), all written without spaces.
+# The form "nat" (number.<n>.nat.spoken) is the native number that goes before a native counter: 한 두
+# 세 네 다섯 ... 열한 열두 ... 스무 스물한 ... 아흔아홉. All of 1-99 are listed, since the native tens
+# differ too (스물, 서른, 마흔...); 100 and up say 백 + the native rest (백한 수, 백스무 개); 0 stays 영.
+# The counted nouns below use it (세 수, 두 칸, 폰 한 개, 세 번, 두 판); count.nat lets a line put
+# another native counter after a bare number: "{n:nat}명" = written "3명", spoken "세명".
+number.0.spoken = 영
+number.1.spoken = 일
+number.2.spoken = 이
+number.3.spoken = 삼
+number.4.spoken = 사
+number.5.spoken = 오
+number.6.spoken = 육
+number.7.spoken = 칠
+number.8.spoken = 팔
+number.9.spoken = 구
+number.10.spoken = 십
+number.11.spoken = 십일
+number.12.spoken = 십이
+number.13.spoken = 십삼
+number.14.spoken = 십사
+number.15.spoken = 십오
+number.16.spoken = 십육
+number.17.spoken = 십칠
+number.18.spoken = 십팔
+number.19.spoken = 십구
+number.20.spoken = 이십
+number.30.spoken = 삼십
+number.40.spoken = 사십
+number.50.spoken = 오십
+number.60.spoken = 육십
+number.70.spoken = 칠십
+number.80.spoken = 팔십
+number.90.spoken = 구십
+number.100.spoken = 백
+number.1.nat.spoken = 한
+number.2.nat.spoken = 두
+number.3.nat.spoken = 세
+number.4.nat.spoken = 네
+number.5.nat.spoken = 다섯
+number.6.nat.spoken = 여섯
+number.7.nat.spoken = 일곱
+number.8.nat.spoken = 여덟
+number.9.nat.spoken = 아홉
+number.10.nat.spoken = 열
+number.11.nat.spoken = 열한
+number.12.nat.spoken = 열두
+number.13.nat.spoken = 열세
+number.14.nat.spoken = 열네
+number.15.nat.spoken = 열다섯
+number.16.nat.spoken = 열여섯
+number.17.nat.spoken = 열일곱
+number.18.nat.spoken = 열여덟
+number.19.nat.spoken = 열아홉
+number.20.nat.spoken = 스무
+number.21.nat.spoken = 스물한
+number.22.nat.spoken = 스물두
+number.23.nat.spoken = 스물세
+number.24.nat.spoken = 스물네
+number.25.nat.spoken = 스물다섯
+number.26.nat.spoken = 스물여섯
+number.27.nat.spoken = 스물일곱
+number.28.nat.spoken = 스물여덟
+number.29.nat.spoken = 스물아홉
+number.30.nat.spoken = 서른
+number.31.nat.spoken = 서른한
+number.32.nat.spoken = 서른두
+number.33.nat.spoken = 서른세
+number.34.nat.spoken = 서른네
+number.35.nat.spoken = 서른다섯
+number.36.nat.spoken = 서른여섯
+number.37.nat.spoken = 서른일곱
+number.38.nat.spoken = 서른여덟
+number.39.nat.spoken = 서른아홉
+number.40.nat.spoken = 마흔
+number.41.nat.spoken = 마흔한
+number.42.nat.spoken = 마흔두
+number.43.nat.spoken = 마흔세
+number.44.nat.spoken = 마흔네
+number.45.nat.spoken = 마흔다섯
+number.46.nat.spoken = 마흔여섯
+number.47.nat.spoken = 마흔일곱
+number.48.nat.spoken = 마흔여덟
+number.49.nat.spoken = 마흔아홉
+number.50.nat.spoken = 쉰
+number.51.nat.spoken = 쉰한
+number.52.nat.spoken = 쉰두
+number.53.nat.spoken = 쉰세
+number.54.nat.spoken = 쉰네
+number.55.nat.spoken = 쉰다섯
+number.56.nat.spoken = 쉰여섯
+number.57.nat.spoken = 쉰일곱
+number.58.nat.spoken = 쉰여덟
+number.59.nat.spoken = 쉰아홉
+number.60.nat.spoken = 예순
+number.61.nat.spoken = 예순한
+number.62.nat.spoken = 예순두
+number.63.nat.spoken = 예순세
+number.64.nat.spoken = 예순네
+number.65.nat.spoken = 예순다섯
+number.66.nat.spoken = 예순여섯
+number.67.nat.spoken = 예순일곱
+number.68.nat.spoken = 예순여덟
+number.69.nat.spoken = 예순아홉
+number.70.nat.spoken = 일흔
+number.71.nat.spoken = 일흔한
+number.72.nat.spoken = 일흔두
+number.73.nat.spoken = 일흔세
+number.74.nat.spoken = 일흔네
+number.75.nat.spoken = 일흔다섯
+number.76.nat.spoken = 일흔여섯
+number.77.nat.spoken = 일흔일곱
+number.78.nat.spoken = 일흔여덟
+number.79.nat.spoken = 일흔아홉
+number.80.nat.spoken = 여든
+number.81.nat.spoken = 여든한
+number.82.nat.spoken = 여든두
+number.83.nat.spoken = 여든세
+number.84.nat.spoken = 여든네
+number.85.nat.spoken = 여든다섯
+number.86.nat.spoken = 여든여섯
+number.87.nat.spoken = 여든일곱
+number.88.nat.spoken = 여든여덟
+number.89.nat.spoken = 여든아홉
+number.90.nat.spoken = 아흔
+number.91.nat.spoken = 아흔한
+number.92.nat.spoken = 아흔두
+number.93.nat.spoken = 아흔세
+number.94.nat.spoken = 아흔네
+number.95.nat.spoken = 아흔다섯
+number.96.nat.spoken = 아흔여섯
+number.97.nat.spoken = 아흔일곱
+number.98.nat.spoken = 아흔여덟
+number.99.nat.spoken = 아흔아홉
+number.tens.spoken = {tens}{units}
+number.hundreds.spoken = {n}백
+number.hundreds_rest.spoken = {hundreds}{rest}
+number.minus.spoken = 마이너스 {n}
+# A decimal number: {int} and {frac} (one digit); Korean writes a point and says 점: "일 점 삼",
+# "영 점 오".
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int} 점 {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Korean has a single form. Native counters (수 개 번 칸 판) say the number with the form "nat" in
+# speech; Sino-Korean ones (점, 퍼센트, 수째) the plain number. Written: digits joined to the counter
+# ("3수", "폰 2개", "85%"). A counted value ends in a fixed syllable, so a particle may follow the
+# placeholder: V = vowel-final (가 는 를 와 로 예요), C = consonant-final (이 은 을 과 으로 이에요).
+#   move V ("{m:move} 만에", "{n:move}를 무르셨어요"), point C, pawn V, piece V, mistake C, blunder C,
+#   inaccuracy C, game C, time C, square C, position V; moveno V, percent V (spoken 퍼센트).
+# Mistakes are counted as times (실수 두 번); a line may also write "실수를 {n:time} 했어요".
+count.move = {n}수
+count.move.spoken = {n:nat} 수
+count.point = {n}점
+count.point.spoken = {n} 점
+count.pawn = 폰 {n}개
+count.pawn.spoken = 폰 {n:nat} 개
+count.piece = 기물 {n}개
+count.piece.spoken = 기물 {n:nat} 개
+count.mistake = 실수 {n}번
+count.mistake.spoken = 실수 {n:nat} 번
+count.blunder = 블런더 {n}번
+count.blunder.spoken = 블런더 {n:nat} 번
+count.inaccuracy = 부정확한 수 {n}번
+count.inaccuracy.spoken = 부정확한 수 {n:nat} 번
+count.game = {n}판
+count.game.spoken = {n:nat} 판
+count.time = {n}번
+count.time.spoken = {n:nat} 번
+count.square = {n}칸
+count.square.spoken = {n:nat} 칸
+count.position = 포지션 {n}개
+count.position.spoken = 포지션 {n:nat} 개
+# Korean additions, for the other coach files:
+#   moveno   a move NUMBER, Sino-Korean: "{n:moveno}에" = "23수째에" ("이십삼 수째에"); "{n:move}" is a
+#            count of moves ("세 수"), never a move number.
+#   percent  an accuracy: "{acc:percent}" = "85%" / "팔십오 퍼센트".
+#   nat      the bare native number, to put before another native counter (see Numbers).
+count.moveno = {n}수째
+count.moveno.spoken = {n} 수째
+count.percent = {n}%
+count.percent.spoken = {n} 퍼센트
+count.nat = {n:nat}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# "플러스 일 점 삼", "균형" (level); mates count moves as Korean puzzle books write them: "3수 메이트"
+# (spoken "세 수 메이트"), and "3수 뒤 메이트당함" when the listener gets mated. Never attach a
+# particle to {eval}.
+eval.up = +{x}
+eval.up.spoken = 플러스 {x}
+eval.down = −{x}
+eval.down.spoken = 마이너스 {x}
+eval.even = 0.0
+eval.even.spoken = 균형
+eval.mate_win = {n:move} 메이트
+eval.mate_loss = {n:move} 뒤 메이트당함

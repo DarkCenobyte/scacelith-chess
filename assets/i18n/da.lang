@@ -1,0 +1,1438 @@
+# Scacelith - Dansk
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
+# Register: informal "du", as in all Danish software; buttons are imperatives or nouns. Titles are
+# in capitals (title face). Chess terms follow the Danish glossary (parti, træk, skak, mat, remis,
+# pat, rokade, noteringsblanket, betænkningstid). Quotation marks »…«; decimal comma.
+# "Thinking time" (Stockfish's pause before a move) is "tænketid", so that "betænkningstid" always
+# means the time control. The coach is "træneren" and "han" (a male teacher, as in the coach files).
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Til
+common.off = Fra
+common.back = Tilbage
+common.apply = Anvend
+common.discard = Kassér
+common.cancel = Annuller
+common.white = Hvid
+common.black = Sort
+common.main_menu = Hovedmenu
+# Decimal separator of numbers ("2.5 s").
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Det kongelige spil
+menu.new_game = Nyt parti
+menu.options = Indstillinger
+menu.credits = Medvirkende
+menu.quit = Afslut
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = INDSTILLINGER
+options.tab.display = Skærm
+options.tab.graphics = Grafik
+options.tab.audio = Lyd
+options.tab.gameplay = Spil
+options.tab.player = Spiller
+options.tab.controls = Styring
+options.pending = Ændringerne træder i kraft, når de er anvendt.
+options.unsaved.title = IKKE ANVENDTE ÆNDRINGER
+options.unsaved.text = Nogle indstillinger er ændret. Vil du anvende dem, før du går?
+
+options.language = Sprog
+options.language.help = Sproget i menuer og meddelelser. Det skifter med det samme.
+options.language.not_adapted = Dette sprog er endnu ikke helt tilpasset: trænerens stemme kan udtale nogle ord forkert, og nogle tekster kan stadig lyde lidt mærkelige.
+options.display_mode = Visningstilstand
+options.display_mode.help = Fuld skærm: et vindue uden kant over hele skærmen i skrivebordets opløsning. Vindue: et vindue i størrelsen nedenfor.
+options.fullscreen = Fuld skærm
+options.windowed = Vindue
+options.window_size = Vinduesstørrelse
+options.window_size.help = Vinduets størrelse i vinduestilstand. Fuld skærm bruger altid skrivebordets opløsning.
+options.vsync = Lodret synkronisering
+options.vsync.help = Synkroniserer billederne med skærmen for at undgå, at billedet rives over (tearing).
+options.render_scale = Renderingsskala
+options.render_scale.help = Den interne opløsning af 3D-billedet. Lavere er hurtigere, højere er skarpere.
+
+options.quality = Kvalitet
+options.quality.very_low = Meget lav
+options.quality.low = Lav
+options.quality.medium = Middel
+options.quality.high = Høj
+options.quality.ultra = Ultra
+options.quality.custom = Tilpasset
+options.quality.help = Sætter alle indstillingerne nedenfor på én gang: Meget lav slår alle effekter fra, Ultra sætter dem alle til maksimum. Ændrer du en enkelt indstilling, skifter kvaliteten til Tilpasset. På et beskedent grafikkort hjælper det også meget at sænke renderingsskalaen (Skærm).
+options.shadows = Skygger
+options.shadows.help = Detaljegraden af solens skygger og blødheden af deres kanter. Lav: enkle kanter, hurtige at tegne.
+options.reflections = Refleksioner
+options.reflections.help = Gulvet, bordet og brættet spejler rummet (det tegnes én gang mere for hver af dem: blandt de mest krævende indstillinger); fra Middel spejler de blanke brikker og genstande også deres omgivelser.
+options.ambient_occlusion = Omgivende okklusion
+options.ambient_occlusion.help = Blød skyggelægning, hvor genstande mødes, og i fordybninger, hvor der kommer mindre lys ind.
+options.indirect_light = Indirekte lys
+options.indirect_light.help = Dagslys, der kastes tilbage fra væggene, gulvet og loftet. Lav: et jævnt omgivende lys i stedet. Påvirker mest indlæsningstiden.
+options.volumetric_light = Lysstråler
+options.volumetric_light.help = Solstråler gennem salens støvede luft og de støvkorn, der glimter i dem.
+options.tessellation = Tessellering
+options.tessellation.help = Bløde konturer på brikkernes kurver, når de ses tæt på.
+options.tessellation.unavailable = Ikke tilgængelig: denne grafikdriver understøtter ikke tessellering.
+options.antialiasing = Kantudjævning
+options.antialiasing.help = Udjævner takkede kanter og flimrende højlys. Fra: skarpere, men takket, og nogle effekter ser kornede ud.
+options.depth_of_field = Dybdeskarphed
+options.depth_of_field.help = Slører det, der ligger et godt stykke foran eller bag det, du ser på, som et kameraobjektiv gør.
+options.motion_blur = Bevægelsessløring
+options.motion_blur.help = Slører kameraets og armenes hurtige bevægelser, som et filmkamera gør.
+options.bloom = Glød
+options.bloom.help = Et blødt skær omkring de klareste højlys, som i et kameraobjektiv.
+options.brightness = Lysstyrke
+options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
+options.brightness.help = Kameraets eksponeringskompensation. Kalibreringen ved første start indstiller den, så de mørkeste skygger lige netop er synlige.
+
+options.master_volume = Samlet lydstyrke
+options.effects = Effekter
+options.ambience = Baggrundslyde
+options.ambience.help = Salens mumlen: ilden, fjerne fodtrin, det gamle ur.
+options.ambience_volume = Baggrundslydstyrke
+options.voice_volume = Stemmens lydstyrke
+options.voice_volume.help = Lydstyrken af trænerens stemme i trænertilstand.
+options.subtitles = Undertekster
+options.subtitles.auto = Automatisk
+options.subtitles.help = Trænerens ord, skrevet nederst på skærmen. Automatisk: vises, når træneren ikke taler menuernes sprog (med kinesiske menuer taler han engelsk). Vises altid, når hans stemme ikke er installeret.
+
+options.legal_moves = Vis lovlige træk
+options.legal_moves.help = Fremhæver de felter, en rørt brik kan nå. Når indstillingen er slået fra, er der intet, der fortæller dig, om et træk er lovligt: et ulovligt træk straffes af dommeren, når du trykker på uret.
+options.coordinates = Koordinater på brættet
+options.auto_press = Tryk automatisk på uret
+options.auto_press.help = Din robot trykker selv på uret, så snart dit træk står på brættet. I onlinepartier bestemmer serveren, og i et direkte parti den spiller, der er vært.
+options.thinking_time = Realistisk tænketid
+options.thinking_time.help = Din modstander tager sig tid som en menneskelig spiller i stedet for at trække med det samme.
+options.ignore_head = Ignorér modstanderens hovedbevægelser
+options.ignore_head.help = I onlinepartier og direkte partier kigger modstanderens robot derhen, hvor dens spiller kigger. Når indstillingen er slået til, bevæger den selv hovedet, som mod Stockfish.
+options.mouse_sensitivity = Musefølsomhed
+options.invert_look = Invertér lodret kig
+options.handover = Spillerskift
+options.handover.cut = Øjeblikkeligt klip
+options.handover.flight = Flyvning, {0} s
+options.handover.help = To spillere ved én pc: hvordan synsvinklen går fra den ene spillers øjne til den andens efter hvert træk. Det øjeblikkelige klip undgår kamerabevægelsen.
+options.game_cursor = Spilmarkør
+options.game_cursor.help = Ved bordet tegner spillet sin egen markør, som viser, hvad et klik vil gøre. Fra: systemets almindelige pil.
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Navn
+player.name.help = Dit navn, sådan som det står øverst på noteringsblanketterne, i et hvilket som helst alfabet.
+player.default_name = Menneske
+player.handwriting = Håndskrift
+player.handwriting.help = Den hånd, der skriver dine træk. Arabisk, japansk og kinesisk skrives med en hånd for sig.
+player.preview = PÅ DIN NOTERINGSBLANKET
+hand.caveat = Uformel
+hand.marck = Sammenhængende
+hand.badscript = Skrå
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Venstreklik
+controls.touch = Rør en brik, og flyt den så
+controls.clock.keys = Mellemrum  eller  klik på uret
+controls.clock = Tryk på uret
+controls.look.keys = Hold højre museknap nede
+controls.look = Se dig omkring
+controls.sheet.keys = S
+controls.sheet = Se på din noteringsblanket og tilbage igen
+controls.stand.keys = ↑
+controls.stand = Rejs dig op foran din stol
+controls.side.keys = ←  /  →
+controls.side = Stil dig ved bordets venstre / højre ende
+controls.sit.keys = ↓
+controls.sit = Sæt dig ned igen (du spiller kun siddende)
+controls.moves.keys = Tab
+controls.moves = Vis eller skjul træklisten
+controls.menu.keys = Esc
+controls.menu = Menu
+controls.coach_skip.keys = Mellemrum
+controls.coach_skip = Træner: spring over det, træneren siger
+controls.coach_takeback.keys = Tilbage
+controls.coach_takeback = Træner: tag trækket tilbage, når det tilbydes
+controls.coach_hint.keys = H
+controls.coach_hint = Trænerens udfordringer: bed om et hint
+
+# ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
+calibration.title = LYSSTYRKE
+calibration.text = Flyt skyderen, indtil springeren på det sorte felt knap er synlig eller slet ikke kan ses længere.
+calibration.later = Du kan ændre det senere under Indstillinger > Grafik.
+calibration.continue = Fortsæt
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NYT PARTI
+newgame.opponent = MODSTANDER
+newgame.time_control = BETÆNKNINGSTID
+newgame.start = Start
+newgame.elo = ~{0} Elo
+newgame.you_white = Du spiller med hvid.
+newgame.you_black = Du spiller med sort.
+newgame.colour_lot = Der trækkes lod om farverne i det første parti.
+newgame.colour_alternate = Derefter skifter farverne fra parti til parti.
+newgame.opponent_kind = Modstander
+newgame.opponent_kind.help = Spil mod Stockfish eller mod en ven, der sidder ved denne computer: I trækker på skift, hver fra sin side af brættet.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Menneske, samme pc
+
+# Custom opponent: Stockfish parameters
+engine.skill = Færdighedsniveau
+engine.skill.help = »Skill Level« i Stockfish (0–20). Ignoreres, så længe styrken er begrænset af Elo.
+engine.limit_elo = Begræns styrken (Elo)
+engine.limit_elo.help = UCI_LimitStrength: motoren sigter efter Elo-ratingen nedenfor.
+engine.elo = Elo
+engine.depth = Søgedybde
+engine.plies = {0} halvtræk|{0} halvtræk
+engine.move_time = Tid pr. træk
+engine.nodes = Knudegrænse
+engine.no_limit = Fra
+engine.thousand = {0} tusind
+engine.million = {0} mio.
+engine.dynamic_elo = Dynamisk Elo efter tid
+engine.dynamic_elo.help = Ligesom et menneske spiller Stockfish svagere, når tiden på uret bliver knap: lidt i det sidste minut (tidligere i hurtigskak og lynskak), meget svagere i tidsnød. Kun partier med ur.
+# New Game and Watch a Game: how long Stockfish takes over a move, with Options > Gameplay >
+# Realistic thinking time on (realistic) or off (instant).
+engine.pace.realistic = Stockfish tager sig tid som et menneske på samme niveau. Pausen kan slås fra under Indstillinger > Spil > Realistisk tænketid.
+engine.pace.instant = Stockfish trækker, så snart den har regnet færdig. Menneskelige pauser kan slås til under Indstillinger > Spil > Realistisk tænketid.
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Ubegrænset
+tc.no_clock = Uden ur
+tc.bullet = Bullet
+tc.blitz = Lynskak
+tc.rapid = Hurtigskak
+tc.classical = Klassisk
+tc.custom = Tilpasset
+tc.your_own = Efter eget valg
+tc.base_time = Grundtid
+tc.base_time.help = Starttiden på hver side af uret (minutter : sekunder).
+tc.increment = Tillæg
+tc.increment.help = Fischer-tillæg, der lægges til efter hvert træk.
+tc.delay = Forsinkelse
+tc.delay.help = Bronstein-forsinkelse: tid, der bruges op til denne forsinkelse, gives tilbage efter hvert træk.
+tc.no_delay = Fra
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, forsinkelse {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Nybegynder
+preset.novice.desc = Har lige lært trækkene: lader brikker hænge og overser simple trusler.
+preset.beginner.name = Begynder
+preset.beginner.desc = Kender det grundlæggende, men laver stadig jævnligt brølere, der koster materiale.
+preset.casual.name = Hyggespiller
+preset.casual.desc = En afslappet modstander til en hyggeaften: fornuftige træk, hyppige fejl.
+preset.club_player.name = Klubspiller
+preset.club_player.desc = Solid klubspiller, der straffer åbenlyse brølere.
+preset.advanced.name = Avanceret
+preset.advanced.desc = Stærk klubspiller med godt taktisk blik.
+preset.expert.name = Ekspert
+preset.expert.desc = Turneringsekspert: fejler sjældent og omsætter fordele til gevinst.
+preset.master.name = Mester
+preset.master.desc = Mesterstyrke: dybe beregninger og fint positionsspil.
+preset.grandmaster.name = Stormester
+preset.grandmaster.desc = Stormesterniveau: ekstremt svær at slå.
+preset.stockfish_max.name = Stockfish Maks
+preset.stockfish_max.desc = Stockfish 19 i fuld styrke. Held og lykke.
+preset.custom.name = Tilpasset
+preset.custom.desc = Dine egne motorindstillinger.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = MEDVIRKENDE
+credits.game.head = SCACELITH
+credits.game = Et skakparti i en kongelig sal, på en egenudviklet OpenGL 4.6-motor.
+credits.engine.head = SKAKMOTOR
+credits.engine = Stockfish 19, af Stockfish-udviklerne.
+credits.engine.licence = GNU General Public License v3.
+credits.engine.data = Motorens neurale netværk er trænet på data, som projektet Leela Chess Zero stiller til rådighed under Open Database License (ODbL).
+credits.voice.head = TRÆNERENS STEMME
+credits.voice = Syntetisk tale genereret med Supertonic 3 til trænertilstanden.
+credits.voice.licence = Supertonic 3 er en model fra Supertone, som bruges under OpenRAIL-M-licensen, hvis brugsbegrænsninger gælder for alle, der bruger den (se Licenser).
+credits.openings.head = ÅBNINGER
+credits.openings = Åbningernes navne stammer fra databasen chess-openings på lichess.org, der er frigivet til det offentlige domæne (CC0).
+credits.fonts.head = SKRIFTTYPER
+credits.fonts = EB Garamond af Georg Duffner og Cinzel af Natanael Gama; Amiri af Khaled Hosny.
+credits.fonts.hand = Håndskrift: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Skakfigurer fra GNU FreeFont (GPL v3 med skrifttypeundtagelse).
+credits.quote = »Skak er analysens kunst.«  – Mikhail Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licenser
+licences.title = LICENSER
+licences.note = Licenserne vises i deres oprindelige engelske tekst.
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSE
+pause.resume = Fortsæt
+pause.offer_draw = Tilbyd remis
+pause.claim_draw = Kræv remis
+pause.claim_draw.help = Trefoldig gentagelse eller 50-træksreglen.
+pause.resign = Opgiv
+confirm.resign.title = OPGIV
+confirm.resign.text = Vil du opgive partiet? Din modstander erklæres som vinder.
+confirm.resign.draw = Vil du opgive partiet? Din modstander kan ikke længere sætte mat: partiet bliver remis.
+confirm.resign.ok = Opgiv
+confirm.leave.title = FORLAD PARTIET
+confirm.leave.text = Vil du vende tilbage til hovedmenuen? Det igangværende parti bliver afbrudt.
+confirm.leave.ok = Forlad
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = FORVANDL TIL
+piece.queen = Dronning
+piece.rook = Tårn
+piece.bishop = Løber
+piece.knight = Springer
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Partiet er remis.
+gameover.draw_moves = Partiet er remis efter {0} træk.|Partiet er remis efter {0} træk.
+gameover.win = Godt spillet – du vinder.
+gameover.win_moves = Godt spillet – du vinder i {0} træk.|Godt spillet – du vinder i {0} træk.
+gameover.loss = Din modstander vinder.
+gameover.loss_moves = Din modstander vinder i {0} træk.|Din modstander vinder i {0} træk.
+gameover.rematch = Revanche
+gameover.view_board = Se brættet
+gameover.show = Vis
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Skakmat
+reason.resignation = Opgivelse
+reason.timeout = Tab på tid
+reason.illegal_moves = Andet ulovlige træk (partiet tabt)
+reason.stalemate = Pat
+reason.insufficient = Død stilling (utilstrækkeligt materiale)
+reason.timeout_vs_insufficient = Flaget faldt, men modstanderen kan ikke sætte mat
+reason.fivefold = Femfoldig gentagelse
+reason.75_moves = 75-træksreglen
+reason.threefold_claim = Trefoldig gentagelse (krævet)
+reason.50_moves_claim = 50-træksreglen (krævet)
+reason.agreement = Remis efter aftale
+reason.illegal_vs_insufficient = Andet ulovlige træk, men modstanderen kan ikke sætte mat
+reason.resignation_vs_insufficient = Opgivelse, men modstanderen kan ikke sætte mat
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = TRÆK
+movelist.empty = Ingen træk endnu.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Forbereder materialerne
+loading.hall = Rejser salen
+loading.furniture = Udskærer bordet og stolene
+loading.board = Polerer brættet
+loading.pieces = Drejer skakbrikkerne
+loading.clock = Samler uret
+loading.porcelain = Brænder porcelænet
+loading.ready = Klar
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = Der kan ikke kræves remis i denne stilling.
+notify.flag_you = Dit flag er faldet.
+notify.flag_opponent = Din modstanders flag er faldet.
+notify.touched.pawn = Rørt brik: du skal flytte den bonde, du rørte.
+notify.touched.knight = Rørt brik: du skal flytte den springer, du rørte.
+notify.touched.bishop = Rørt brik: du skal flytte den løber, du rørte.
+notify.touched.rook = Rørt brik: du skal flytte det tårn, du rørte.
+notify.touched.queen = Rørt brik: du skal flytte den dronning, du rørte.
+notify.touched.king = Rørt brik: du skal flytte den konge, du rørte.
+notify.touched.piece = Rørt brik: du skal flytte den brik, du rørte.
+notify.touched_square = Rørt brik: du skal flytte brikken på {0}.
+notify.press_clock = Tryk på uret for at fuldføre dit træk (Mellemrum).
+notify.manual_clock = Tryk selv på uret efter hvert træk i dette parti.
+notify.illegal = Ulovligt træk.
+notify.cannot_move = Det træk kan ikke udføres.
+notify.move_first = Udfør dit træk, før du trykker på uret.
+notify.stance.sit_to_play = Sæt dig ned igen for at spille (Pil ned).
+notify.stance.first = Uret kører videre, mens du står. Pil ned: sæt dig ned igen.
+notify.stance.first_untimed = Du spiller kun fra din stol. Pil ned: sæt dig ned igen.
+notify.stance.finish_move = Gør dit træk færdigt først.
+notify.draw_already_offered = Du har allerede tilbudt remis i dette træk.
+notify.draw_accepted = Din modstander tager imod remis.
+notify.draw_declined = Din modstander afslår remistilbuddet.
+notify.draw_claimed = Din modstander kræver remis.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Dommer: der blev trykket på uret uden at udføre et træk, hvilket tæller som et ulovligt træk.
+arbiter.unpromoted = Dommer: ulovligt træk, bonden blev ikke erstattet af en ny brik, før der blev trykket på uret.
+arbiter.illegal = Dommer: ulovligt træk.
+arbiter.second_loses.white = Det er hvids andet ulovlige træk: hvid taber partiet.
+arbiter.second_loses.black = Det er sorts andet ulovlige træk: sort taber partiet.
+arbiter.second_draw.white = Det er hvids andet ulovlige træk, men sort kan ikke sætte mat: partiet er remis.
+arbiter.second_draw.black = Det er sorts andet ulovlige træk, men hvid kan ikke sætte mat: partiet er remis.
+arbiter.queen = Bonden bliver en dronning.
+arbiter.queen_one_minute.white = Bonden bliver en dronning, og hvid får ét minut ekstra.
+arbiter.queen_one_minute.black = Bonden bliver en dronning, og sort får ét minut ekstra.
+arbiter.queen_two_minutes.white = Bonden bliver en dronning, og hvid får to minutter ekstra.
+arbiter.queen_two_minutes.black = Bonden bliver en dronning, og sort får to minutter ekstra.
+arbiter.restored = Stillingen genoprettes.
+arbiter.restored_one_minute.white = Stillingen genoprettes, og hvid får ét minut ekstra.
+arbiter.restored_one_minute.black = Stillingen genoprettes, og sort får ét minut ekstra.
+arbiter.restored_two_minutes.white = Stillingen genoprettes, og hvid får to minutter ekstra.
+arbiter.restored_two_minutes.black = Stillingen genoprettes, og sort får to minutter ekstra.
+arbiter.one_minute.white = Hvid får ét minut ekstra.
+arbiter.one_minute.black = Sort får ét minut ekstra.
+arbiter.two_minutes.white = Hvid får to minutter ekstra.
+arbiter.two_minutes.black = Sort får to minutter ekstra.
+arbiter.second_loses = Et andet ulovligt træk taber partiet.
+arbiter.touched.white = Hvid skal flytte den rørte brik.
+arbiter.touched.black = Sort skal flytte den rørte brik.
+arbiter.game_over = Partiet er slut.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Se et parti
+
+viewer.title = SE ET PARTI
+viewer.white = HVID
+viewer.black = SORT
+viewer.time_control = BETÆNKNINGSTID
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Byt farver
+viewer.note = Begge spillere er Stockfish. Flyv frit rundt i salen, mens de spiller: ingen kan se dig.
+viewer.summary = {0} mod {1}
+viewer.custom = Tilpasset
+viewer.tc.custom = Efter eget valg
+viewer.base_time = Grundtid
+viewer.increment = Tillæg
+viewer.delay = Forsinkelse
+viewer.off = Fra
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = forsinkelse {0} s
+viewer.back = Tilbage
+viewer.start = Start
+
+viewer.paused = PAUSE
+viewer.resume = Fortsæt
+viewer.options = Indstillinger
+viewer.main_menu = Hovedmenu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = STYRING
+viewer.keys.move = W A S D  ·  Z Q S D  ·  piletaster
+viewer.controls.move = Bevæg dig
+viewer.keys.updown = E, Mellemrum  /  C, Ctrl
+viewer.controls.updown = Op / ned
+viewer.keys.fast = Skift
+viewer.controls.fast = Hurtigere
+viewer.keys.look = Højre museknap
+viewer.controls.look = Se dig omkring
+viewer.keys.speed = Musehjul
+viewer.controls.speed = Hastighed
+viewer.keys.views = 1 – 9
+viewer.controls.views = Synsvinkler
+viewer.keys.eyes = 0
+viewer.controls.eyes = Gennem øjnene på den spiller, der er i trækket
+viewer.keys.moves = Tab
+viewer.controls.moves = Trækliste
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Skjul denne oversigt
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pause / fortsæt
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Ét træk tilbage / frem
+viewer.keys.replay_speed = Skift + J  /  L
+viewer.controls.replay_speed = Langsommere / hurtigere
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Partiets start / slutning
+viewer.speed = Hastighed {0} m/s
+viewer.view.0 = Gennem spillernes øjne
+viewer.view.1 = Ved siden af bordet
+viewer.view.2 = Over brættet
+viewer.view.3 = Salen
+viewer.view.4 = Uret
+viewer.view.5 = Hvids ansigt
+viewer.view.6 = Sorts ansigt
+viewer.view.7 = Duellen
+viewer.view.8 = Vinduerne
+viewer.view.9 = Vægtæpperne
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Hvid
+viewer.side.black = Sort
+viewer.flag.white = Hvids flag er faldet.
+viewer.flag.black = Sorts flag er faldet.
+viewer.claims_draw = {0} kræver remis.
+viewer.offer_accepted = {0} tilbyder remis, og {1} tager imod.
+viewer.offer_declined = {0} tilbyder remis, men {1} afslår.
+viewer.gameover.white_wins = Hvid vinder efter træk {0}.
+viewer.gameover.black_wins = Sort vinder efter træk {0}.
+viewer.gameover.draw = Partiet er remis efter træk {0}.
+viewer.gameover.players = {0} mod {1}
+viewer.watch_again = Se igen
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Endnu intet ratet parti
+elo.provisional = Foreløbig rating
+elo.peak = Højeste {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Din Elo {0}
+elo.expected = forventet score {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · dette parti er ikke ratet
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Noteringsblanket
+scoresheet.event = Turnering
+scoresheet.date = Dato
+scoresheet.round = Runde
+scoresheet.board = Bræt
+scoresheet.page = Side
+scoresheet.white = Hvid
+scoresheet.black = Sort
+scoresheet.elo = Elo
+scoresheet.result = Resultat
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Hvids underskrift
+scoresheet.sign_black = Sorts underskrift
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {0}.{1}.{2}
+
+# ---- Online play (src/ui/ui_screens_online.cpp, ui_online_hud.cpp, src/game/online_session.cpp) ---
+menu.online = Spil online
+online.title = SPIL ONLINE
+online.continue = Fortsæt
+online.retry = Prøv igen
+online.copy = Kopiér
+online.copied = Kopieret
+online.copy.unavailable = Kopiering er ikke mulig her: skriv det venligst ned.
+online.rated = Ratet
+online.casual = Uratet
+online.casual_only = Kun uratet
+online.color.random = Lodtrækning
+online.ping = {0} ms
+online.conn.online = Forbundet
+online.conn.connecting = Forbinder…
+online.conn.reconnecting = Genopretter forbindelsen…
+online.conn.offline = Ikke forbundet
+online.conn.incompatible = Anden version
+online.no_server.text = Onlinespil kræver en Scacelith-server. Angiv adressen på en server i indstillingerne, eller spil mod en ven i et direkte parti.
+online.no_server.settings = Serverindstillinger
+
+# Options > Online server
+options.tab.online = Onlineserver
+options.online.server = Server
+options.online.server.help = Den officielle server eller en tilpasset server (fællesskabsserver), der drives af en anden og nås via sin sikre web-API og sin sikre WebSocket. Du logger ind separat på hver server: en konto og dens login deles aldrig mellem servere.
+options.online.official = Officiel server – {0}
+options.online.community = Tilpasset server
+options.online.host = Vært
+options.online.host.hint = domænenavn eller IP-adresse
+options.online.host.help = Domænenavn eller IP-adresse på den tilpassede server, sådan som dens ejer har oplyst det.
+options.online.api_port = HTTPS-/API-port
+options.online.api_port.help = Port til serverens sikre web-API (443 på Scacelith-servere).
+options.online.ws_port = WSS-port
+options.online.ws_port.hint = samme som API-porten
+options.online.ws_port.help = Port til serverens sikre WebSocket. Lad feltet stå tomt, når det er API-porten.
+options.online.pin = Certifikatets fingeraftryk (SHA-256)
+options.online.pin.hint = valgfrit
+options.online.pin.help = Til en server med et selvsigneret certifikat: det SHA-256-fingeraftryk, som dens ejer oplyser (64 hexadecimale tegn, koloner tilladt). Lad feltet stå tomt for at stole på systemets certifikater.
+options.online.pin.invalid = Et fingeraftryk består af 64 hexadecimale tegn (koloner tilladt).
+options.online.test = Test forbindelsen
+options.online.test_ok = {0}: forbundet, kompatibel med denne version.
+options.online.test_incompatible = {0}: forbundet, men serveren kræver en anden version af Scacelith.
+options.online.in_game = Serveren kan ikke skiftes under et onlineparti.
+options.online.remember_session = Husk mit login, når systemets nøglering ikke er tilgængelig
+options.online.remember_session.help = Når ingen nøglering i systemet (GNOME Keyring, KWallet…) kan gemme din session, gemmes den i en fil, som kun din brugerkonto kan læse. Alle, der kan læse dine filer eller en kopi af dem, fx en sikkerhedskopi, vil kunne bruge den session. Fra: du forbliver logget ind, indtil spillet lukkes. Du kan logge enhver enhed ud under Indloggede enheder på din konto.
+
+# Sign in, create an account
+online.signin.lead = Log ind på {0} for at spille mod andre online.
+online.field.user = Brugernavn eller e-mail
+online.field.user.hint = navn eller adresse
+online.field.password = Adgangskode
+online.field.password.hint = mindst 10 tegn
+online.field.password2 = Bekræft adgangskode
+online.field.current_password = Nuværende adgangskode
+online.field.new_password = Ny adgangskode
+online.field.username = Brugernavn
+online.field.username.hint = 3 til 24 bogstaver, cifre, _ eller -
+online.field.email = E-mail
+online.field.new_email = Ny e-mail
+online.field.code = Kode
+online.field.code.hint = 6 cifre eller en gendannelseskode
+online.field.code6 = Kode fra appen
+online.field.code6.hint = 6 cifre
+online.signin.button = Log ind
+online.signin.google = Fortsæt med Google
+online.signin.register = Opret en konto
+online.signin.forgot = Glemt adgangskode?
+online.mfa.title = TOTRINSKODE
+online.mfa.lead = Indtast den 6-cifrede kode, som din godkendelsesapp viser, eller en af dine gendannelseskoder.
+online.mfa.verify = Bekræft
+online.register.title = OPRET EN KONTO
+online.register.lead = En gratis konto på {0}: dit navn, dine ratinger og dine partier findes kun på denne server.
+online.register.button = Opret konto
+online.register.working = Opretter din konto… det kan tage et par sekunder.
+online.register.ready = Din konto er klar. Log ind for at spille.
+online.password.mismatch = De to adgangskoder er forskellige.
+online.check_email.title = TJEK DIN E-MAIL
+online.check_email.text = Vi har sendt et link til {0}. Åbn det for at aktivere din konto, og log derefter ind her.
+online.check_email.ask = Indtast din kontos adresse for at få aktiveringslinket igen.
+online.check_email.resend = Send e-mailen igen
+online.check_email.resent = E-mailen er sendt igen. Det kan tage et par minutter; tjek også din spammappe.
+online.forgot.title = GLEMT ADGANGSKODE
+online.forgot.lead = Indtast e-mailadressen på din konto: vi sender dig et link, så du kan vælge en ny adgangskode.
+online.forgot.button = Send linket
+online.forgot.sent = Hvis en konto bruger denne adresse, er et link på vej.
+online.sso.title = LOG IND MED GOOGLE
+online.sso.wait = Fortsæt i din webbrowser: vælg din Google-konto i det vindue, der blev åbnet. Scacelith tager over, så snart Google sender dig tilbage.
+online.sso.name_title = VÆLG DIT NAVN
+online.sso.name_lead = Det er første gang, du er her med Google. Vælg det navn, andre spillere skal se.
+online.sso.continue = Fortsæt
+online.sso.finishing = Google har sendt dig tilbage. Afslutter login…
+online.sso.link_title = TILFØJ GOOGLE-LOGIN
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = Kontoen {0} på {1} bruger allerede denne Google-kontos e-mailadresse. Indtast kontoens adgangskode for at tilføje Google-login til den. Det skal du kun gøre én gang.
+online.sso.link_button = Tilføj Google-login
+online.sso.link_mfa = Google-login føjes til kontoen, så snart koden er godkendt.
+online.sso.not_mine = Det er ikke min konto
+online.sso.not_mine_note = Google-login blev ikke tilføjet. Hvis denne e-mailadresse er din, så brug »Glemt adgangskode?« med den: linket sendes til den pågældende indbakke. Hvis kontoen også beder om en totrinskode, som du ikke har, så kontakt serverens administrator.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google-login
+online.sso.page.done_heading = Tilbage til Scacelith
+online.sso.page.done = Google har sendt dig tilbage til Scacelith. Gå tilbage til spillet for at gøre login færdigt; du kan lukke denne fane.
+online.sso.page.cancelled_heading = Login annulleret
+online.sso.page.cancelled = Google-login blev annulleret. Du kan lukke denne fane og gå tilbage til Scacelith.
+online.sso.page.foreign_heading = Denne side er ikke til dig
+online.sso.page.foreign = Denne side passer ikke til det login, som Scacelith venter på her på computeren. Hvis du ikke lige har startet et Google-login i Scacelith, har nogen måske sendt dig dette link: luk denne fane.
+
+# Account
+online.account.button = Konto
+online.account.title = KONTO
+online.account.section = KONTO
+online.account.username = BRUGERNAVN
+online.account.email = E-MAIL
+online.account.unverified = (ikke bekræftet)
+online.account.mfa = TOTRINSGODKENDELSE
+online.account.mfa_on = Til
+online.account.mfa_off = Fra
+online.account.google = GOOGLE
+online.account.google_linked = Knyttet til en Google-konto
+online.account.change_password = Skift adgangskode
+online.account.mfa_setup = Slå totrinsgodkendelse til
+online.account.mfa_disable = Slå totrinsgodkendelse fra
+online.account.recovery = Nye gendannelseskoder
+online.account.sign_out = Log ud
+online.account.sign_out_all = Log ud overalt
+online.account.sign_out_all.help = Logger kontoen ud på alle computere, også denne.
+online.account.signed_out = Du er logget ud.
+online.account.signed_out_all = Du er logget ud på alle computere.
+online.account.signing_out_all = Logger alle computere ud…
+online.account.sign_out_all_failed = Dine andre computere er måske stadig logget ind: log ind igen, og log dem derefter ud under Indloggede enheder. {0}
+online.account.sign_out_all_retry = Dine andre computere er måske stadig logget ind. Prøv Log ud overalt igen. {0}
+online.account.ratings = RATINGER
+online.account.col.tc = BETÆNKNINGSTID
+online.account.col.rating = RATING
+online.account.col.games = PARTIER
+online.account.col.record = V / R / T
+online.account.provisional = Et spørgsmålstegn markerer en foreløbig rating (endnu kun få spillede partier).
+online.password.title = SKIFT ADGANGSKODE
+online.password.button = Skift adgangskode
+online.password.changed = Din adgangskode er ændret.
+online.password.other_sessions = Dine andre computere skal logge ind igen.
+online.mfa_setup.title = TOTRINSGODKENDELSE
+online.mfa_setup.lead = Med totrinsgodkendelse skal du angive en kode fra en app på din telefon, hver gang du logger ind. Indtast din adgangskode for at begynde.
+online.mfa_setup.scan = 1. Scan denne kode med en godkendelsesapp, eller indtast denne nøgle i den:
+online.mfa_setup.enter = 2. Indtast den 6-cifrede kode, som appen viser:
+online.mfa_setup.enable = Slå til
+online.mfa_setup.done = Totrinsgodkendelse er slået til.
+online.mfa_off.title = SLÅ TOTRINSGODKENDELSE FRA
+online.mfa_off.lead = Indtast din adgangskode og en kode fra din app (eller en gendannelseskode).
+online.mfa_off.button = Slå fra
+online.mfa.off_done = Totrinsgodkendelse er slået fra.
+online.recovery.title = GENDANNELSESKODER
+online.recovery.lead = Hver kode logger dig ind én gang, hvis du mister din telefon. Opbevar dem et sikkert sted: de vises kun nu.
+online.recovery.saved = Jeg har gemt dem
+online.recovery.new_title = NYE GENDANNELSESKODER
+online.recovery.new_lead = Nye koder erstatter de gamle. Indtast din adgangskode og en kode fra din app.
+online.recovery.button = Nye koder
+online.account.manage = SIKKERHED OG DATA
+online.account.pending_email = Venter på bekræftelse: {0}
+online.account.accept_challenges = Modtag udfordringer
+online.account.accept_challenges.help = Andre spillere kan udfordre dig via dit brugernavn. Fra: deres udfordringer afvises.
+online.account.history = Partihistorik
+online.account.devices = Indloggede enheder
+online.account.change_email = Skift e-mail
+online.account.export = Download mine data
+online.account.delete = Slet konto
+
+# Play
+online.play.signed_in = Logget ind som {0}
+online.session.file = Ingen nøglering i systemet kunne gemme dit login: det huskes i en fil, som kun din brugerkonto kan læse (Indstillinger > Onlineserver).
+online.session.memory = Ingen nøglering i systemet kunne gemme dit login, og det gemmes ikke i en fil: du forbliver logget ind, indtil spillet lukkes (Indstillinger > Onlineserver).
+online.play.find_section = FIND EN MODSTANDER
+online.play.friend_section = SPIL MOD EN VEN
+online.play.mode = Partitype
+online.play.mode.help = Ratede partier ændrer din rating i denne betænkningstid; uratede partier gør ikke.
+online.play.find = Find modstander
+online.play.connecting = Opretter forbindelse til serveren…
+online.play.cooldown = Du kan søge efter en modstander igen fra {0}.
+online.play.banned = Denne konto er suspenderet indtil {0}.
+online.play.challenge = Udfordr en spiller
+online.play.challenge.desc = Invitér en, der er online, via vedkommendes brugernavn.
+online.play.private = Privat parti
+online.play.private.desc = Opret en kode, du kan give til en ven, eller deltag med vennens kode.
+online.play.direct = Direkte parti
+online.play.direct.desc = Ingen server: spil direkte mod en vens computer.
+online.search.title = SØGER
+online.search.window = Ratinginterval {0}
+online.search.queued = {0} spiller søger|{0} spillere søger
+online.search.wait = Søger efter en modstander på dit niveau…
+online.outgoing.challenge = UDFORDRING SENDT
+online.outgoing.waiting = venter på svar
+online.outgoing.private = PRIVAT PARTI
+online.outgoing.private_hint = Giv denne kode til din ven: partiet starter, når vennen deltager.
+online.challenge.title = UDFORDR EN SPILLER
+online.challenge.opponent = MODSTANDER
+online.field.opponent = Brugernavn
+online.field.opponent.hint = hvem du vil udfordre
+online.challenge.note = Din modstander ser udfordringen, uanset hvor i menuerne vedkommende er, og har et minut til at svare.
+online.challenge.send = Send udfordring
+online.terms.rated = Ratet
+online.terms.rated.help = Kun de officielle betænkningstider kan rates.
+online.terms.color = Din farve
+online.private.title = PRIVAT PARTI
+online.private.create_section = OPRET
+online.private.create_note = Du får en kort kode: den, der indtaster den, spiller mod dig.
+online.private.create = Opret partiet
+online.private.join_section = DELTAG
+online.field.private_code = Kode
+online.private.join = Deltag
+online.private.joining = Går ind i partiet…
+online.challenge.received = UDFORDRING
+online.challenge.accept = Acceptér
+online.challenge.decline = Afslå
+online.challenge.you_white = du spiller med hvid
+online.challenge.you_black = du spiller med sort
+online.challenge.you_random = farver ved lodtrækning
+online.challenge.declined = {0} afslog din udfordring.
+online.challenge.expired = Din udfordring udløb uden svar.
+online.challenge.unavailable = {0} er ikke tilgængelig lige nu.
+online.challenge.lost = Forbindelsen blev afbrudt: din udfordring blev annulleret.
+
+# At the table
+online.pause.clock_runs = Partiet fortsætter: dit ur kører videre.
+online.pause.abort = Afbryd partiet
+online.pause.abort.help = Før dit første træk kan et parti afbrydes; det tæller ikke.
+online.pause.leave = Forlad partiet
+online.confirm.resign.text = Vil du opgive partiet? Din modstander vinder det.
+online.confirm.leave.text = Hvis du forlader partiet, opgiver du det: din modstander vinder.
+online.confirm.leave.ok = Opgiv og forlad
+online.confirm.leave_abort.text = Vil du forlade partiet før dit første træk? Partiet afbrydes og tæller ikke.
+online.confirm.leave_abort.ok = Afbryd og forlad
+online.draw.card_title = REMISTILBUD
+online.draw.card_text = Din modstander tilbyder remis.
+online.draw.accept = Acceptér
+online.draw.decline = Afslå
+online.draw.offered = Din modstander tilbyder remis.
+online.opponent_back = Din modstander er tilbage.
+online.opponent_away = Modstanderen har mistet forbindelsen – {0} til at vende tilbage
+online.first_move = Dit første træk · {0}
+online.reconnecting = GENOPRETTER FORBINDELSEN…
+online.reconnecting.text = Partiet fortsætter på serveren, og dit ur kører videre.
+online.gameover.aborted = Partiet blev afbrudt: det tæller ikke.
+online.rating.casual = Uratet parti: ratingerne er uændrede.
+online.rating.change = Rating {0} → {1} ({2})
+online.rating.pending = Rating: …
+online.rematch.accept = Acceptér revanche
+online.rematch.offered = Din modstander tilbyder revanche.
+online.rematch.waiting = Revanche tilbudt…
+online.rematch.gone = Ingen revanche
+online.rematch.declined = Ingen revanche denne gang.
+online.report.button = Anmeld modstander
+online.report.title = ANMELD
+online.report.lead = Anmeldelser sendes til serverens moderatorer sammen med dette parti. Tak, fordi du hjælper med at holde spillet fair.
+online.report.category = Årsag
+online.report.cheating = Snyd
+online.report.abuse = Krænkende opførsel
+online.report.other = Andet
+online.report.comment = Kommentar
+online.report.comment.hint = valgfrit
+online.report.send = Send anmeldelse
+online.report.sent = Anmeldelsen er sendt. Tak.
+online.report.queued = Din anmeldelse sendes, når partiet er slut.
+# Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
+online.sheet.note = Online, {0} {1}
+online.sheet.rated = ratet
+online.sheet.casual = uratet
+online.sheet.game = Parti {0}
+# End reasons of online games
+reason.online.abandonment = Modstanderen forlod partiet
+reason.online.abandonment_vs_insufficient = Forlod partiet, men modstanderen kan ikke sætte mat
+reason.online.aborted = Partiet afbrudt
+reason.online.no_show = Intet første træk i tide (afbrudt)
+reason.online.forfeit = Erklæret tabt
+reason.online.server_aborted = Afbrudt af serveren
+reason.online.both_disconnected = Begge spillere mistede forbindelsen
+# Server notices
+online.notice.shutdown = Serveren genstarter om {0}. Igangværende partier gemmes.
+online.notice.revoked = Du er blevet logget ud af denne server.
+online.notice.replaced = Din konto har nu forbindelse fra et andet vindue; dette vindue er offline.
+online.notice.rating_restored = Du har fået {0} ratingpoint tilbage: en modstander blev udelukket for snyd.|Du har fået {0} ratingpoint tilbage: en modstander blev udelukket for snyd.
+# Errors
+online.err.rate_limited_for = For mange forsøg. Prøv igen om {0}.
+online.err.rate_limited = For mange forsøg. Prøv igen om lidt.
+online.err.server_busy_for = Serveren er optaget. Prøv igen om {0}.
+online.err.server_busy = Serveren er optaget. Prøv igen om lidt.
+online.err.banned_until = Denne konto er suspenderet indtil {0}.
+online.err.banned = Denne konto er suspenderet.
+online.err.invalid_credentials = Forkert brugernavn eller adgangskode.
+online.err.invalid_credentials_pending = Forkert brugernavn eller adgangskode. Hvis du lige har oprettet en konto, skal du først åbne det link, vi har sendt dig.
+online.err.email_unverified = Din e-mailadresse er endnu ikke bekræftet: åbn det link, vi har sendt dig.
+online.err.network = Serveren kan ikke nås. Tjek din forbindelse og serverens adresse.
+online.err.tls = Der kunne ikke oprettes en sikker forbindelse til serveren.
+online.err.certificate = Der er ikke tillid til serverens certifikat (eller det passer ikke til fingeraftrykket i indstillingerne).
+online.err.incompatible = Denne server kræver en anden version af Scacelith.
+online.err.unauthorized = Din session er udløbet: log venligst ind igen.
+online.err.username_taken = Dette brugernavn er optaget.
+online.err.email_taken = En konto bruger allerede denne e-mailadresse.
+online.err.invalid_username = Brugernavne har 3 til 24 bogstaver, cifre, _ eller -.
+online.err.invalid_email = Denne e-mailadresse er ugyldig.
+online.err.weak_password = Denne adgangskode er for svag: brug mindst 10 tegn.
+online.err.invalid_code = Denne kode er forkert.
+online.err.expired = Denne anmodning er udløbet: start venligst forfra.
+online.err.registration_closed = Denne server modtager ikke nye konti.
+online.err.sso_cancelled = Google-login blev annulleret.
+online.err.sso_expired = Google-login tog for lang tid eller er allerede brugt. Start venligst forfra.
+online.err.sso_failed = Google-login virkede ikke. Prøv venligst igen.
+online.err.sso_listen = Scacelith kunne ikke modtage Googles svar på denne computer. Prøv venligst igen.
+online.err.sso_origin = Google-login virker ikke via denne serveradresse. Tilføj serveren under det offentlige navn, som dens administrator oplyser, og prøv så igen.
+online.err.browser = Webbrowseren kunne ikke åbnes.
+online.err.sso_email_unverified = Google har ikke bekræftet denne Google-kontos e-mailadresse.
+online.err.sso_account_exists = En konto bruger allerede denne e-mailadresse og kan ikke knyttes til Google-login: log ind med kontoens adgangskode, eller brug »Glemt adgangskode?«.
+online.err.sso_already_linked = Denne Google-konto er allerede knyttet til en anden konto.
+online.err.account_disabled = Denne konto kan ikke længere bruges.
+online.err.server_error = Der opstod et problem på serveren. Prøv venligst igen.
+online.err.timeout = Serveren svarede ikke i tide.
+online.err.offline = Ikke forbundet til serveren: prøv igen, når der er forbindelse.
+online.err.other = Serveren afviste ({0}).
+online.err.code = Serveren afviste (fejl {0}).
+online.err.slow_down = Sæt tempoet lidt ned.
+online.err.server_full = Serveren er fuld. Prøv igen senere.
+online.err.restarting = Serveren genstarter. Prøv igen om lidt.
+online.err.move_refused = Serveren afviste trækket: brættet er stillet tilbage.
+online.err.game_over = Dette parti er allerede slut.
+online.err.already_in_game = Du er allerede i gang med et parti.
+online.err.invalid_category = Denne betænkningstid tilbydes ikke her.
+online.err.draw_offer_limit = Ikke flere remistilbud lige nu.
+online.err.abort_not_allowed = Partiet kan ikke længere afbrydes.
+online.err.no_pending_offer = Der er intet tilbud at svare på.
+online.err.flag_fell = Din tid er udløbet.
+online.err.queue_not_allowed = Du kan ikke søge efter en modstander lige nu.
+online.err.challenge_not_found = Denne udfordring findes ikke længere.
+online.err.user_unavailable = Denne spiller er ikke tilgængelig.
+online.err.challenge_limit = For mange udfordringer lige nu. Prøv igen senere.
+online.err.challenge_self = Du kan ikke udfordre dig selv.
+online.err.code_invalid = Intet parti har denne kode.
+online.err.rated_official_tc = Kun de officielle betænkningstider kan rates.
+online.err.cooldown = Søgningen efter modstandere er sat på pause for dig et øjeblik.
+online.err.invalid_tc = Denne betænkningstid er ikke tilladt.
+online.err.rematch_unavailable = Revanche er ikke længere mulig.
+online.err.rated_repeat_limit = Du har spillet nok ratede partier mod denne spiller for nu. Spil et uratet parti, eller prøv igen senere.
+online.err.cheat_detected = Partiet blev stoppet af serverens fair play-kontrol.
+online.err.invalid_password = Forkert adgangskode.
+online.err.mfa_code_required = Indtast en kode fra din godkendelsesapp (eller en gendannelseskode).
+online.err.password_not_set = Denne konto logger ind med Google og har endnu ingen adgangskode. Opret først en med »Glemt adgangskode?« på login-siden.
+online.err.too_many_attempts = For mange forkerte forsøg. Prøv igen senere.
+online.err.too_many_attempts_for = For mange forkerte forsøg. Prøv igen om {0}.
+online.err.same_email = Det er allerede din e-mailadresse.
+online.err.not_found = Ikke fundet på serveren.
+online.err.invalid_response = Serverens svar kunne ikke læses.
+online.err.storage = Sessionen kunne ikke gemmes på denne computer.
+
+# ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
+online.history.title = PARTIHISTORIK
+online.history.filter.games = Partier
+online.history.filter.result = Resultat
+online.history.filter.all = Alle
+online.history.filter.won = Vundne
+online.history.filter.lost = Tabte
+online.history.filter.drawn = Remis
+online.history.col.date = DATO
+online.history.col.opponent = MODSTANDER
+online.history.col.result = RESULTAT
+online.history.col.tc = BETÆNKNINGSTID
+online.history.col.kind = TYPE
+online.history.col.rating = RATING
+online.history.won = Vundet
+online.history.lost = Tabt
+online.history.drawn = Remis
+online.history.aborted = Afbrudt
+online.history.page = Side {0} af {1}
+online.history.total = {0} parti|{0} partier
+online.history.previous = Forrige
+online.history.next = Næste
+online.history.empty.title = ENDNU INGEN PARTIER
+online.history.empty = Dine partier på denne server vises her, når de er slut.
+online.history.empty_filter.title = INGEN PARTIER
+online.history.empty_filter = Intet parti passer til disse filtre.
+online.history.error = HISTORIKKEN KUNNE IKKE INDLÆSES
+online.history.unavailable = DENNE SERVER TILBYDER INGEN PARTIHISTORIK
+online.game.title = PARTI
+online.game.players = SPILLERE
+online.game.you = DIG
+online.game.unrated = Ingen rating
+online.game.you_won = Du vandt
+online.game.you_lost = Du tabte
+online.game.draw = Remis
+online.game.you_left = Du forlod partiet
+online.game.date = DATO
+online.game.time_control = BETÆNKNINGSTID
+online.game.moves = TRÆK
+online.game.move_count = {0} træk|{0} træk
+online.game.no_moves = Der blev ikke spillet noget træk.
+online.game.moves_incomplete = Nogle træk kunne ikke læses: listen stopper før slutningen.
+online.game.save = Gem parti
+online.game.saved_button = Gemt
+online.game.saved = Partiet ligger nu blandt dine gemte partier.
+online.game.already_saved = Dette parti ligger allerede blandt dine gemte partier.
+online.game.save_failed = Partiet kunne ikke gemmes.
+online.game.invalid = Serveren sendte en partifil, der ikke kan læses.
+online.game.replay = Afspil
+online.game.not_found = PARTIET BLEV IKKE FUNDET
+online.game.error = PARTIET KUNNE IKKE INDLÆSES
+online.devices.title = INDLOGGEDE ENHEDER
+online.devices.lead = De enheder, hvor denne konto er logget ind. Hvis du ikke kan genkende en af dem, så log den ud, og skift din adgangskode.
+online.devices.unknown = Ukendt enhed
+online.devices.this = DENNE ENHED
+online.devices.signed_in = Logget ind den {0}
+online.devices.last_active = sidst aktiv den {0}
+online.devices.active_now = i brug nu
+online.devices.sign_out = Log ud
+online.devices.signed_out = Enheden er logget ud.
+online.devices.error = ENHEDERNE KUNNE IKKE INDLÆSES
+online.devices.all.title = LOG UD OVERALT
+online.email.title = SKIFT E-MAIL
+online.email.current = Nuværende adresse: {0}
+online.email.button = Skift e-mail
+online.email.sent = Der er sendt et bekræftelseslink til {0}.
+online.email.sent.hint = Adressen ændres, når linket er åbnet. Indtil da bruges din nuværende adresse fortsat.
+online.email.done = Færdig
+online.email.changed = Din e-mailadresse er ændret.
+online.export.title = DOWNLOAD MINE DATA
+online.export.lead = Alt, hvad denne server gemmer om din konto (profil, ratinger, partier, enheder, sikkerhedshændelser), gemmes som en JSON-fil på denne computer. Indtast din adgangskode for at bekræfte.
+online.export.button = Download
+online.export.saved = Dine data er gemt på denne computer.
+online.export.failed = Filen kunne ikke skrives.
+online.delete.title = SLET KONTO
+online.delete.warning = Din konto slettes fra denne server: din e-mailadresse, din adgangskode, din totrinsgodkendelse og dine enheder slettes, og du kan ikke længere logge ind. Det kan ikke fortrydes.
+online.delete.games = Dine partier og ratinger bliver på serveren under det anonyme navn {0}.
+online.delete.confirm_name = Indtast dit brugernavn og din adgangskode for at bekræfte.
+online.delete.button = Slet min konto
+online.delete.done = Din konto er slettet.
+
+# ---- Direct match (no server) ----------------------------------------------------------------------
+online.direct.button = Direkte parti
+online.direct.title = DIREKTE PARTI
+online.direct.lead = Et venskabsparti direkte mellem to computere: ingen server, ingen konto, aldrig ratet.
+online.direct.host = Vær vært for et parti
+online.direct.host.desc = Din ven opretter forbindelse til dig: du giver vennen din adresse og en kode.
+online.direct.join = Deltag i et parti
+online.direct.join.desc = Opret forbindelse til en ven, der er vært.
+online.direct.host_title = VÆR VÆRT FOR ET PARTI
+online.direct.your_color = Din farve
+online.direct.auto_press.help = Begge robotter trykker selv på uret, så snart et træk står på brættet. Fra: hver spiller trykker på uret efter hvert træk.
+online.direct.unrated = Direkte partier er venskabspartier: de rates aldrig.
+online.direct.connection = FORBINDELSE
+online.direct.port = Port
+online.direct.port.help = Den TCP-port, din ven opretter forbindelse til (47100, medmindre den er optaget).
+online.direct.port_range = Vælg en port mellem 1024 og 65535.
+online.direct.upnp = Åbn porten på min router (UPnP)
+online.direct.upnp.help = Beder hjemmerouteren om at videresende porten til denne computer og lukker den igen efter partiet.
+online.direct.host_note_upnp = Spillet beder din router om at åbne porten. Hvis det ikke kan lade sig gøre, får du at vide, hvilken port du skal videresende manuelt.
+online.direct.host_note_manual = Videresend TCP-porten til denne computer på din router, eller spil på samme netværk.
+online.direct.host_button = Vær vært
+online.direct.wait_title = VENTER PÅ DIN VEN
+online.direct.opening = Åbner port {0} på din router…
+online.direct.give = Giv din ven:
+online.direct.cap_address = ADRESSE
+online.direct.cap_port = PORT
+online.direct.cap_code = KODE
+online.direct.lan = På samme netværk: {0}
+online.direct.router = din router
+online.direct.upnp_searching = Leder efter din router…
+online.direct.upnp_mapped = Porten er åbnet på {0}.
+online.direct.upnp_none = Ingen UPnP-router svarede: videresend TCP-port {0} til denne computer manuelt.
+online.direct.upnp_failed = Routeren nægtede at åbne porten: videresend TCP-port {0} til denne computer manuelt.
+online.direct.upnp_off = Videresend TCP-port {0} til denne computer på din router.
+online.direct.upnp_cgnat = Din udbyder deler sandsynligvis din internetadresse (CGNAT): prøv IPv6 eller en VPN.
+online.direct.firewall = Hvis Windows spørger, om Scacelith må modtage forbindelser, så tillad det.
+online.direct.waiting = Venter på din ven…
+online.direct.connecting_friend = Din ven opretter forbindelse…
+online.direct.starting = Stiller brættet op…
+online.direct.join_title = DELTAG I ET PARTI
+online.direct.join_lead = Indtast det, din ven læser op for dig: vennens adresse, porten og koden.
+online.direct.address = Adresse
+online.direct.address.hint = IPv4, IPv6 eller navn
+online.direct.code = Kode
+online.direct.join_button = Deltag
+online.direct.connecting_to = Opretter forbindelse til {0}…
+online.direct.securing = Sikrer forbindelsen med {0}…
+direct.event = Venskabskamp
+# Scoresheet header of a direct match: Site and time control.
+direct.sheet.note = Direkte, {0}
+direct.err.refused = Ingen er vært på denne adresse og port.
+direct.err.timeout = Intet svar: tjek adressen og porten, og at din vens router lukker spillet ind.
+direct.err.wrong_code = Koden er forkert.
+direct.err.invalid_code = En kode har 12 tegn (XXXX-XXXX-XXXX).
+direct.err.incompatible = Din ven har en anden version af Scacelith.
+direct.err.port_in_use = Denne port er allerede i brug på denne computer: vælg en anden.
+direct.err.network = Netværket kunne ikke bruges.
+direct.err.too_many_attempts = For mange forkerte koder: du er ikke længere vært. Vær vært igen for at få en ny kode.
+direct.err.bad_address = Denne adresse er ugyldig.
+direct.err.not_found = Navnet blev ikke fundet.
+direct.err.unreachable = Denne adresse kan ikke nås herfra.
+direct.err.reset = Forbindelsen blev afbrudt.
+direct.err.closed = Forbindelsen blev lukket.
+direct.err.host_left = Din ven er holdt op med at være vært.
+direct.err.other = Forbindelsen mislykkedes ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Spiller 2
+hotseat.white_player = Hvid
+hotseat.black_player = Sort
+hotseat.name.help = Navnet, der skrives på begge noteringsblanketter, i et hvilket som helst alfabet.
+hotseat.swap = Byt farver
+hotseat.left_hand = {0} spiller med venstre hånd: uret står på vedkommendes venstre side.
+hotseat.rated = Ratet parti
+hotseat.rated.help = Hvert navn har sin egen tospillerrating på denne computer. Din rating mod Stockfish ændres aldrig.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Tospillerratinger: {0} {1} · {2} {3}
+hotseat.new_rating = (ny)
+hotseat.friendly_note = Et venskabsparti: ingen ratingændringer.
+hotseat.colours = {0} spiller med hvid, {1} spiller med sort.
+hotseat.colours_swap = Farverne byttes ved hver revanche.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+# Danish: no genitive -s glued to a name placeholder (a name ending in s takes an apostrophe).
+hotseat.your_move = {0}, det er din tur
+hotseat.flag = Flaget er faldet for {0}.
+hotseat.confirm.resign = Vil du opgive på vegne af {0}? {1} erklæres som vinder.
+hotseat.confirm.resign_draw = Vil du opgive på vegne af {0}? {1} kan ikke længere sætte mat: partiet bliver remis.
+hotseat.draw.offer_noted = Dit remistilbud følger med dit træk: {0} ser det, når du har trykket på uret.
+hotseat.draw.card_title = REMISTILBUD
+hotseat.draw.offered = {0} tilbyder remis.
+hotseat.draw.card_hint = Rører du en brik, afslår du tilbuddet.
+hotseat.draw.accept = Acceptér
+hotseat.draw.decline = Afslå
+hotseat.draw.accepted = {0} accepterer remistilbuddet fra {1}.
+hotseat.draw.declined = {0} afslår remistilbuddet fra {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Ratet parti
+hotseat.sheet.friendly = Venskabsparti
+# Game over card
+hotseat.gameover.wins = {0} vinder i {1} træk.|{0} vinder i {1} træk.
+hotseat.gameover.wins_now = {0} vinder.
+hotseat.gameover.friendly = {0} mod {1} · venskabsparti
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = Dette parti er ikke ratet.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Træner
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Syntetisk tale genereret med {0} til trænertilstanden
+# Coach page
+coach.title = TRÆNER
+coach.section.level = NIVEAU
+coach.section.lesson = MED TRÆNEREN
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Til spillere med en rating på {0}
+coach.completed = Gennemført
+coach.recommended = Anbefalet
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Skakkens regler
+coach.level.0.desc = En interaktiv lektion, én regel ad gangen.
+coach.level.0.detail = Træneren stiller små stillinger op og viser, hvordan hver brik går og slår, derefter rokade, forvandling, skak og skakmat. Du afprøver selv hver idé på brættet.
+coach.level.1.name = Første skridt
+coach.level.1.desc = Hvad der er angrebet, og hvad der står udækket.
+coach.level.1.detail = Træneren spiller blidt og taler et enkelt sprog: hvilke af dine brikker der er angrebet, hvilke der står uden dækning, og hvordan du undgår at miste dem.
+coach.level.2.name = Begynder
+coach.level.2.desc = Enkel taktik, udvikling, kongens sikkerhed.
+coach.level.2.detail = Gafler og bindinger bliver kaldt ved navn. Træneren taler om at få dine brikker i spil og holde din konge i sikkerhed.
+coach.level.3.name = Let øvet
+coach.level.3.desc = Planer, bondestruktur, eneste træk.
+coach.level.3.detail = Træneren forklarer planer og bondestrukturer og advarer dig, når kun ét træk holder stillingen.
+coach.level.4.name = Klubspiller
+coach.level.4.desc = Kandidattræk, vurdering i bønder.
+coach.level.4.detail = Træneren vejer kandidattrækkene og giver vurderingen i bønder, som en klubtræner ville gøre.
+coach.level.5.name = Stærk klubspiller
+coach.level.5.desc = Korte varianter, positionelle begreber.
+coach.level.5.detail = Korte bemærkninger, konkrete varianter og positionsspillets ordforråd.
+coach.level.6.name = Ekspert
+coach.level.6.desc = Knappe bemærkninger, dybe varianter, vurderingstal.
+coach.level.6.detail = Få ord, som mellem stærke spillere: varianter flere træk dybt og vurderinger i tal.
+coach.note.clock = Intet ur: tag al den tid, du har brug for.
+coach.note.takeback = Efter en brøler viser træneren, hvad der gik galt, og tilbyder at tage trækket tilbage.
+coach.note.lesson = Du spiller med hvid; træneren stiller hver øvelse op på brættet.
+coach.note.unrated = Partier med træneren er ikke ratede.
+coach.note.fallible = Træneren er ikke ufejlbarlig: han kan af og til bedømme et træk forkert.
+coach.colour = Din farve
+coach.colour.help = Den farve, du spiller med mod træneren. Skiftevis: hvid og derefter sort, fra det ene parti til det næste. Lektionen om reglerne spilles altid med hvid.
+coach.colour.alternate = Skiftevis
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Trænerens stemme er ikke installeret eller er slået fra (Indstillinger > Lyd): hans ord bliver skrevet på skærmen.
+# At the table
+coach.speaker = TRÆNER
+coach.skip = Spring over
+coach.offer.title = TAG TRÆKKET TILBAGE?
+coach.offer.text = Træneren tilbyder at tage dit sidste træk tilbage, så du kan lede efter et bedre.
+coach.offer.hint = Tasten Tilbage tager trækket tilbage. Rører du en brik, spiller du videre.
+coach.offer.accept = Tag tilbage
+coach.offer.decline = Spil videre
+# Levels 4-6: the coach's takeback offers the player may still accept this game (bottom corner
+# of the screen, and on the takeback card)
+coach.takebacks_left = Resterende tilbagetagninger: {0}
+coach.pause.take_back = Tag mit træk tilbage
+coach.pause.take_back.help = Tager dit sidste træk tilbage og trænerens svar, hvis han allerede har trukket.
+coach.confirm.resign = Vil du opgive partiet? Træneren erklæres som vinder.
+coach.confirm.resign_draw = Vil du opgive partiet? Træneren kan ikke længere sætte mat: partiet bliver remis.
+coach.confirm.leave = Vil du vende tilbage til hovedmenuen? Dette parti med træneren bliver afbrudt.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Spil igen
+coach.gameover.unrated = Dette parti med træneren er ikke ratet.
+coach.lesson.done = GODT KLARET
+coach.lesson.done.line = Nu kender du skakkens regler.
+coach.lesson.next = Første parti
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Træning
+coach.tab.challenges = Udfordringer
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = SKAKMAT
+challenge.group.tactics = TAKTIK
+challenge.group.defence = FORSVAR
+challenge.group.endgames = SLUTSPIL
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat i ét træk
+challenge.mate1.desc = Ét træk, og det er skakmat.
+challenge.mate1.detail = Se først på alle de træk, der giver skak: et af dem efterlader kongen uden flugtfelt, uden mulighed for at sætte en brik imellem og uden noget at slå.
+challenge.mate2.name = Mat i to træk
+challenge.mate2.desc = Et træk, der ikke efterlader noget forsvar, og så mat.
+challenge.mate2.detail = Det første træk er ofte en skak eller et offer, der tager et felt fra kongen. Træneren forsvarer sig så godt, han kan.
+challenge.mate3.name = Mat i tre træk
+challenge.mate3.desc = Længere tvingende varianter.
+challenge.mate3.detail = Skaktræk, slag og trusler, tre træk dybt. Beregn trænerens bedste svar ved hvert skridt, før du rører en brik.
+challenge.backrank.name = Grundrækkemat
+challenge.backrank.desc = En konge, der er spærret inde bag sine egne bønder.
+challenge.backrank.detail = Når bønderne foran en rokeret konge ikke har flyttet sig, kan et tårn eller en dronning på grundrækken give skakmat. Fjern eller afled forsvarerne først.
+challenge.patterns.name = Matmønstre
+challenge.patterns.desc = Kvælningsmat, Anastasias mat, arabisk mat og andre klassikere.
+challenge.patterns.detail = Berømte matnet, der dukker op igen og igen. Lær at genkende brikkernes opstilling og det afgørende slag.
+challenge.hanging.name = Gratis brikker
+challenge.hanging.desc = Find det, der står udækket.
+challenge.hanging.detail = En brik eller en bonde, som ingen forsvarer, kan simpelthen slås. Tjek, hvad hver af trænerens brikker er dækket af.
+challenge.fork.name = Gafler
+challenge.fork.desc = Én brik angriber to på én gang.
+challenge.fork.detail = Springere, bønder, dronninger og selv konger kan give gaffel. Modstanderen kan kun redde det ene af de to mål.
+challenge.pin.name = Bindinger
+challenge.pin.desc = En brik, der ikke kan flytte uden at miste det, der står bag den.
+challenge.pin.detail = Bind en brik til dens konge eller til en mere værdifuld brik, og angrib den så igen, eller udnyt, at den ikke kan flytte.
+challenge.skewer.name = Spid
+challenge.skewer.desc = Angrib en værdifuld brik, og vind den, der står bag den.
+challenge.skewer.detail = Det omvendte af en binding: den mere værdifulde brik står forrest, må flytte væk og blotter brikken bag sig.
+challenge.discovered.name = Afdækkede angreb
+challenge.discovered.desc = Flyt én brik for at slippe en anden løs.
+challenge.discovered.detail = Når en brik træder ud af en linje, angriber brikken bag den. Med skak eller med dobbeltskak har modstanderen ikke tid til at besvare begge trusler.
+challenge.deflection.name = Afledning og tiltrækning
+challenge.deflection.desc = Lok en forsvarer væk eller ind på et skæbnesvangert felt.
+challenge.deflection.detail = En forsvarer med to opgaver kan ikke klare begge. Angrib den, tilbyd den noget, eller tving en brik ind på det felt, hvor den går tabt.
+challenge.intermezzo.name = Mellemtræk
+challenge.intermezzo.desc = Slå ikke tilbage med det samme: der er noget stærkere.
+challenge.intermezzo.detail = En skak eller en større trussel, der skydes ind før det forventede træk, ændrer alt.
+challenge.trapped.name = Fangede brikker
+challenge.trapped.desc = En brik uden noget sikkert felt tilbage.
+challenge.trapped.detail = Tag de sidste flugtfelter fra en brik, og vind den så.
+challenge.promotion.name = Forvandling
+challenge.promotion.desc = Før en bonde igennem til sidste række.
+challenge.promotion.detail = Fremskudte bønder er meget værd. Ryd vejen, afled de blokerende brikker, og skaf dig en ny dronning.
+challenge.quiet.name = Stille træk
+challenge.quiet.desc = Det vindende træk er hverken en skak eller et slag.
+challenge.quiet.detail = Nogle gange forbereder det stærkeste træk blot en trussel, der ikke kan pareres. Den sværeste slags at få øje på.
+challenge.opening.name = Åbningsfælder
+challenge.opening.desc = Straf tidlige fejl.
+challenge.opening.detail = Stillinger fra de første træk i rigtige partier, hvor ét skødesløst træk straks kan udnyttes.
+challenge.escape.name = Find udvejen
+challenge.escape.desc = Din konge er i fare: ét træk redder den.
+challenge.escape.detail = Alle andre træk taber. Se på alle skaktræk og trusler mod din konge, og find så den eneste udvej.
+challenge.defend.name = Forsvarstræk
+challenge.defend.desc = Parér truslen uden at tabe materiale.
+challenge.defend.detail = Træneren truer med noget. Find det præcise træk, der holder sammen på det hele.
+challenge.kq.name = Dronning og konge mod konge
+challenge.kq.desc = Sæt mat med dronningen.
+challenge.kq.detail = Pres den ensomme konge ud til kanten med din dronning, før din egen konge nærmere, og pas på pat. Træneren forsvarer sig med sine bedste træk.
+challenge.kr.name = Tårn og konge mod konge
+challenge.kr.desc = Sæt mat med tårnet.
+challenge.kr.detail = Tårnet skærer kongen af, række for række; din konge tager oppositionen. Træneren forsvarer sig med sine bedste træk.
+challenge.kp.name = Konge og bonde mod konge
+challenge.kp.desc = Vind oppositionen, og forvandl bonden.
+challenge.kp.detail = Gå foran med din konge, ikke med bonden. Tag oppositionen, og skaf dig en dronning, som træneren ikke kan nå.
+challenge.kp_hold.name = Stop bonden
+challenge.kp_hold.desc = En ensom konge mod konge og bonde: hold remis.
+challenge.kp_hold.detail = Stil dig foran bonden, og bevar oppositionen. Hold stillingen i ti træk.
+challenge.rook.name = Tårnslutspil
+challenge.rook.desc = Lucenas brobygning og Philidors forsvar.
+challenge.rook.detail = De to stillinger, enhver spiller bør kende: hvordan man vinder med en bonde på syvende række, og hvordan man forsvarer sig med tårnet på tredje.
+challenge.endgame.name = Slutspilstaktik
+challenge.endgame.desc = Få brikker, skarpe idéer.
+challenge.endgame.detail = Bondeløb, gennembrud og tårnslutspil fra rigtige partier.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} stilling|{0} stillinger
+coach.challenge.done = Gennemført
+coach.challenge.start = Start
+coach.challenge.note.white = Du spiller med hvid; træneren stiller hver stilling op på brættet.
+coach.challenge.note.hint = Sidder du fast? Tryk på H for at få et hint. Efter nogle forsøg tilbyder træneren dig et.
+coach.challenge.note.unsaved = Udfordringer bliver hverken ratet eller gemt; et flueben viser dem, du har gennemført.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = UDFORDRING GENNEMFØRT
+coach.challenge.complete.line = Du har løst alle stillingerne.
+coach.challenge.next = Næste udfordring
+coach.challenge.again = Igen
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ET HINT?
+coach.hint.text = Træneren tilbyder dig et hint.
+coach.hint.hint = H giver hintet. Rører du en brik, leder du videre.
+coach.hint.accept = Hint
+coach.hint.decline = Nej tak
+coach.hint.key = Hint
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Trænerens stemme
+options.coach_voice.help = Træneren taler højt i trænertilstand. Stemmemodellen downloades første gang, der er brug for den (ca. 399 MB). Fra: trænerens ord bliver kun skrevet på skærmen.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Stemmemodel
+options.voice_update.help = Træneren taler stadig med den gamle 8-bit-version af sin stemmemodel. Opdateringen downloader den officielle version af Supertonic 3, udgivet af Supertone, og sletter først de gamle filer.
+options.voice_update.button = Opdatér ({0} MB)
+options.voice_update.running = Downloaden er i gang.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
+options.voice_quality = Stemmekvalitet
+options.voice_quality.help = Hvor mange forfiningstrin trænerens talesyntese bruger på hver replik, fra Lav (4) til Maksimum (9); Middel (5) som standard. Et højere niveau giver en lidt renere stemme, men tager længere tid at beregne, så træneren begynder at tale lidt senere. Kan indstilles, når stemmemodellen er installeret, og Trænerens stemme er slået til.
+options.voice_quality.low = Lav
+options.voice_quality.medium = Middel
+options.voice_quality.high = Høj
+options.voice_quality.very_high = Meget høj
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maksimum
+# The prompt. {0} = the size in megabytes ("398.7")
+coach.download.title = Trænerens stemme
+coach.download.text = Træneren taler med Supertonic 3, en talesyntesemodel fra Supertone. Den følger ikke med Scacelith: spillet kan downloade den nu fra Hugging Face ({0} MB, én gang). Uden den skriver træneren sine ord på skærmen.
+coach.download.licence = Modellen er udgivet under OpenRAIL-M-licensen, som forbyder visse anvendelser af den stemme, den frembringer, fx at give den ud for at være en menneskestemme eller at efterligne en virkelig person.
+coach.download.read_licence = Læs licensen
+coach.download.accept = Ved at vælge Download accepterer du betingelserne i denne licens.
+# {0} = a folder
+coach.download.folder = Gemmes i: {0}
+coach.download.not_now = Ikke nu
+# {0} = the size in megabytes
+coach.download.download = Download ({0} MB)
+coach.download.licence_title = OPENRAIL-M-LICENS
+coach.download.back = Tilbage
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = En ny stemme til træneren
+coach.update.text = Trænerens stemme bruger nu den officielle version af Supertonic 3, udgivet af Supertone, i stedet for den 8-bit-konvertering, der hidtil har været installeret. Spillet kan downloade den nu fra Hugging Face ({0} MB, én gang); de gamle filer ({1} MB) slettes først. Hvis du siger nej, beholder træneren sin nuværende stemme, og opdateringen forbliver tilgængelig under Indstillinger > Lyd.
+coach.update.download = Opdatér ({0} MB)
+coach.update.accept = Ved at vælge Opdatér accepterer du betingelserne i denne licens.
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = TRÆNERENS STEMME
+coach.download.removing = Fjerner den gamle version…
+coach.download.checking = Kontrollerer filerne…
+coach.download.downloading = Downloader…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Fra Hugging Face
+coach.download.from_archive = Fra Hugging Face (arkivkopi)
+coach.download.cancel = Annuller
+coach.download.failed = Downloaden mislykkedes.
+coach.download.error.network = Serverne kunne ikke nås. Tjek din internetforbindelse, og prøv igen.
+# {0} = a folder
+coach.download.error.disk = Filerne kunne ikke skrives i {0}. Tjek, om der er plads nok, og prøv igen.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Serverne sendte et uventet svar ({0}). Prøv igen senere.
+coach.download.retry = Prøv igen
+coach.download.close = Luk
+# Notices
+coach.download.done = Trænerens stemme er installeret.
+coach.download.cancelled = Downloaden er annulleret: den fortsætter, hvor den slap, næste gang.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Gemte partier
+options.save_games = Gem mine partier
+options.save_games.help = Når de er slut, gemmes dine partier mod Stockfish, med træneren og mellem to spillere ved denne computer samt dine direkte partier som PGN-filer, som du kan finde igen under Gemte partier. Onlinepartier gemmes af serveren.
+library.title = GEMTE PARTIER
+library.section.games = PARTIER
+library.section.details = PARTIET
+library.section.tags = OPLYSNINGER
+library.section.moves = TRÆK
+library.count = {0} parti|{0} partier
+library.filter = Vis
+library.filter.all = Alle partier
+library.filter.play = Mod Stockfish
+library.filter.coach = Med træneren
+library.filter.hotseat = To spillere
+library.filter.direct = Direkte partier
+library.filter.server = Onlinepartier
+library.filter.imported = Importerede
+library.mode.play = Mod Stockfish
+library.mode.coach = Med træneren
+library.mode.hotseat = To spillere
+library.mode.direct = Direkte parti
+library.mode.server = Onlineparti
+library.mode.imported = Importeret
+library.coach_level = Niveau {0}
+library.unknown_player = Ukendt
+library.unfinished = Ikke afsluttet
+library.unreadable = Dette parti kan ikke læses.
+library.moves = {0} træk|{0} træk
+library.opening_variation = {0}: {1}
+library.file = Fil: {0}
+library.file_game = Fil: {0}, parti {1} af {2}
+library.no_moves = Der blev ikke spillet noget træk.
+library.none_selected = Vælg et parti på listen.
+library.reading = Læser de gemte partier
+library.empty.title = Endnu ingen gemte partier
+library.empty.text = Dine partier mod Stockfish, med træneren og mellem to spillere ved denne computer samt dine direkte partier vises her, når de er slut. Du kan også lægge PGN-filer i denne mappe: partier eksporteret fra andre programmer eller websteder vises sammen med dine.
+library.empty.filter = Ingen partier af denne slags.
+library.error.folder = Mappen med gemte partier kan ikke læses
+library.error.game = Dette parti kan ikke læses: {0}
+library.folder = Mappe: {0}
+library.open_folder = Åbn mappe
+library.open_failed = Mappen kunne ikke åbnes.
+library.replay = Afspil
+library.delete = Slet
+library.delete.title = SLET PARTIET
+library.delete.text = Partiet {0} slettes fra denne computer sammen med sin fil. Det kan ikke fortrydes.
+library.delete.ok = Slet
+library.delete.several = Denne fil indeholder {0} parti: den kan kun slettes fra mappen.|Denne fil indeholder {0} partier: den kan kun slettes fra mappen.
+library.deleted = Partiet er slettet.
+library.delete.failed = Partiet kunne ikke slettes.
+library.delete.changed = Filen er ændret: listen er blevet opdateret.
+library.truncated = Denne mappe indeholder for mange partier: kun de {0} nyeste vises.
+library.tag.Event = Turnering
+library.tag.Site = Sted
+library.tag.Date = Dato
+library.tag.Time = Tidspunkt
+library.tag.Round = Runde
+library.tag.White = Hvid
+library.tag.Black = Sort
+library.tag.Result = Resultat
+library.tag.WhiteElo = Hvids Elo
+library.tag.BlackElo = Sorts Elo
+library.tag.TimeControl = Betænkningstid
+library.tag.Termination = Afslutning
+library.tag.Opening = Åbning
+library.tag.Variation = Variant
+library.tag.PlyCount = Halvtræk
+library.tag.FEN = Startstilling
+library.tag.ScacelithMode = Tilstand
+library.tag.CoachLevel = Trænerniveau
+library.tag.ScacelithServer = Server
+library.tag.ScacelithGameId = Partinummer
+library.tag.UTCDate = Dato (UTC)
+library.tag.UTCTime = Tidspunkt (UTC)
+library.tag.WhiteRatingDiff = Hvids ratingændring
+library.tag.BlackRatingDiff = Sorts ratingændring
+
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analyse
+analysis.menu.title = ANALYSE
+analysis.menu.analyse = Analysér
+analysis.menu.paste = Indsæt en PGN
+analysis.menu.online = Mine onlinepartier
+analysis.menu.folder = Læg PGN-filer i denne mappe for at analysere dem: {0}
+analysis.menu.empty.title = Endnu ingen gemte partier
+analysis.menu.empty.text = Dine partier vises her, når de er slut, og det samme gør PGN-filer, der lægges i mappen nedenfor. Du kan også indsætte et parti, der er kopieret som PGN-tekst.
+analysis.menu.empty.no_folder = Indsæt et parti, der er kopieret som PGN-tekst, for at analysere det.
+analysis.menu.paste.empty = Udklipsholderen er tom: kopiér først et parti som PGN-tekst.
+analysis.menu.paste.none = Der blev ikke fundet noget skakparti i udklipsholderen.
+analysis.menu.paste.several = Udklipsholderen indeholder flere partier: det første analyseres.
+analysis.menu.gameover = Analysér partiet
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Træk {0} af {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Øjeblikkelig
+replay.again = Afspil igen
+replay.gameover.unfinished = Partiet stopper efter træk {0} uden et resultat.
+replay.tip.start = Partiets start (Home)
+replay.tip.back = Ét træk tilbage (J)
+replay.tip.pause = Pause (K)
+replay.tip.resume = Fortsæt (K)
+replay.tip.forward = Ét træk frem (L)
+replay.tip.end = Partiets slutning (End)
+
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAR
+analysis.hud.accuracy = PRÆCISION
+analysis.hud.reviewing = Stockfish gennemgår partiet… {0}
+analysis.hud.no_engine = Ingen skakmotor: trækkene vises uden analyse.
+analysis.hud.no_moves = Dette parti har ingen træk.
+analysis.hud.tip.play = Afspil trækkene (K)
+analysis.hud.tip.comments_off = Skjul kommentarerne til nøgleøjeblikkene (N)
+analysis.hud.tip.comments_on = Vis kommentarerne til nøgleøjeblikkene (N)
+analysis.hud.tip.voice_off = Slå kommentatorens stemme fra (M)
+analysis.hud.tip.voice_on = Hør kommentarerne læst op (M)
+analysis.hud.tip.voice_missing = Stemmen kan ikke høres: dens filer er ikke installeret, eller Indstillinger > Lyd > Trænerens stemme er slået fra. Kommentarerne vises kun som tekst på skærmen.
+analysis.hud.tip.arrows_off = Skjul pilene for de bedre træk (B)
+analysis.hud.tip.arrows_on = Vis pilene for de bedre træk (B)
+analysis.hud.controls.play = Afspil / pause
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Vis / skjul kommentarerne
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Kommentatorens stemme til / fra
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Vis / skjul pilene
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Gem som GIF
+gif.making = Laver GIF'en: serveren tegner partiet…
+gif.saved = GIF'en er gemt:
+gif.saved_as = GIF gemt: {0}
+gif.sign_in_first = Log ind på en onlineserver for at lave GIF'er: serveren tegner dem.
+gif.busy_other = En anden GIF er ved at blive lavet. Vent venligst, til den er klar.
+gif.err.rate_limited_for = Du har lavet mange GIF'er på kort tid. Du kan lave den næste om {0}.
+gif.err.rate_limited = Du har lavet mange GIF'er på kort tid. Prøv igen senere.
+gif.err.server_busy_for = Serveren har travlt med at tegne andre GIF'er. Prøv igen om {0}.
+gif.err.server_busy = Serveren har travlt med at tegne andre GIF'er. Prøv igen om lidt.
+gif.err.signed_out = Din session er udløbet. Log ind igen for at lave en GIF.
+gif.err.game_too_long = Dette parti er for langt til at blive lavet om til en GIF.
+gif.err.pgn_too_large = Dette parti er for langt til at blive lavet om til en GIF.
+gif.err.invalid_pgn = Serveren kunne ikke læse dette parti.
+gif.err.render_failed = Serveren kunne ikke lave denne GIF. Prøv igen.
+gif.err.gif_disabled = Denne server laver ikke GIF'er.
+gif.err.write_failed = GIF'en kunne ikke gemmes på denne computer.
+gif.err.not_found = Dette parti findes ikke længere på serveren.
+gif.wait.seconds = {0} sekund|{0} sekunder
+gif.wait.minutes = {0} minut|{0} minutter
+gif.wait.both = {0} og {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 kunne ikke startes. Opdatér din grafikdriver.
+error.opengl_macos = OpenGL 4.6 kunne ikke startes på denne Mac. Scacelith kræver Apple silicon (M1 eller nyere) og macOS 26 eller nyere og kører ikke i en virtuel maskine.
+error.renderer = Rendereren kunne ikke startes.
+error.scene = Scenen kunne ikke indlæses.
+error.log_file = Detaljerne står i logfilen: {0}
