@@ -241,9 +241,9 @@ this game the same way. The Windows executable and the macOS disk image of each 
 Coverage workflow (`.github/workflows/coverage.yml`) measures the test coverage
 ([Test coverage](#test-coverage)); it is not one of the checks master requires.
 
-The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.2`) and, for a
+The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.3`) and, for a
 pre-release only, `SCACELITH_VERSION_PRERELEASE` (empty for a release, `rc.1` for instance);
-`cmake -P cmake/version.cmake` prints it in full. Pushing the tag `v` + that version (`v1.0.2`)
+`cmake -P cmake/version.cmake` prints it in full. Pushing the tag `v` + that version (`v1.0.3`)
 publishes a release: the release
 workflow (`.github/workflows/release.yml`) checks that the tag matches the version, runs the CI
 again on the tagged commit, builds the game from scratch (no compiler cache) for Windows x64, for
@@ -264,7 +264,7 @@ workflow builds the same files and keeps them as workflow artifacts without publ
 unless it runs on a tag with "Publish" ticked. To check a downloaded file with the GitHub CLI:
 
 ```sh
-gh attestation verify Scacelith-1.0.2-windows-x64.zip --repo DarkCenobyte/scacelith-chess
+gh attestation verify Scacelith-1.0.3-windows-x64.zip --repo DarkCenobyte/scacelith-chess
 ```
 
 Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by
