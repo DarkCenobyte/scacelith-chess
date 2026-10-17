@@ -608,8 +608,14 @@ move.mate.spoken = {move}, matti
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: Finnish says "ohestalyönti" for en passant, so the English respellings of "en passant"
-# do not apply. The pronunciation pass adds respell.* keys here for the words the voice misreads.
+# Words the voice misreads, respelled in every spoken line, opening texts included (src/coach/catalog.h;
+# docs/PRONUNCIATION.md has the evidence). Finnish says "ohestalyönti" for en passant, so the English
+# respellings of "en passant" do not apply.
+# "Aljehin" loses its j ("Alihin", probe and round trip): a double l keeps it ("Aljehin" heard 6 in 6).
+respell.aljehin = Alljehin
+respell.aljehinin = Alljehinin
+# "Pircin" is read with an s ("Pirsin", probe): the Slovenian c is ts.
+respell.pircin = Pirtsin
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Finnish writes a number under a thousand as one word: 21-99 as "{tens}{units}"

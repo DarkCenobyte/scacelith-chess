@@ -636,3 +636,39 @@ voice's sake.
   alike (ι/η/υ/ει/οι, ο/ω, ε/αι: "ήπος" for ίππος, "μια" for μία, "και" for κι). It drops the first consonant
   of a cluster (σκακιέρα as "κακιέρα", βαθμολογία as "βασμολογία"), writes loanwords in English ("Bleach",
   "final", "classic chess"), and pads a short line with a repeated phrase ("Τι έχεις; Τι έχεις; ...").
+
+## Finnish
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| Aljehin, Aljehinin | the j dropped: "Alihinin" (probe: nearest of the candidates), heard "Alihinin", "Alihin", "alihene" 8 times in 9 | `Alljehin`, `Alljehinin` (respell.*): the j heard 7 times in 9 ("Aljehin" 6 in 6 in a short line), against 1 in 9 |
+| Pircin | with an s: "Pirsin" (probe), heard "piirsin" 2 times in 3 in a short line | `Pirtsin` (respell.pircin): "Pirtsin" 6 in 6, against 4 in 6 |
+
+- Parakeet missed most words; the round trips are Whisper medium set to `fi`: the main one stopped after 111 of
+  its 300 lines (seed 0, 1,035 words, 42 % of words missed: Whisper's Finnish, long lines end in loops), then
+  3 seeds on 80 lines (the reviewers' list, the file letters in squares and compounds, numbers 11 to 120,
+  decimals, the inflected 21 and 71, 75 opening names and eponyms in "Tänään pelattiin X ja Y.", the words
+  missed most), 14 lines of A/B variants and 6 of the fixes in game lines; probes (4 seeds) on 24 names and words.
+- Checked and fine: the file letters aa, bee, see, dee, ee, äf, gee, hoo (heard as notation; also in "äf-linja",
+  "dee-sotilas"), `äl` for the L ("äl-kirjaimen", "äl-hyppyä": "L-kirjaimen", "älyhyppyä"), aasta, hoohon,
+  kirjain ee, the numbers (yksitoista to sata, kaksikymmentä, "plus kaksi pilkku kolme", "miinus yksi pilkku
+  viisi", kahdellakymmenelläyhdellä, seitsemänkymmenenyhden as the right digits), Hmm (hummed), Auts, Hups
+  (probe: nearest "Hhups"; heard "Ops", "Vaps"), shakki (probe: `šakki`, as it should; the recogniser writes
+  "sakki"), Elo-luvuksi, epolettimatti, oppositio, valkea, siirrolla, ratsu, torni, lähetti, kuningatar,
+  linnoittautua, Caro-Kann, Philidorin, Owenin (probe: "Ouenin"), Horwitzin, Grünfeldin, Rétin ("Reetin"),
+  Ponzianin, Tarraschin and Marshallin (š, probe), Schliemannin, Tšigorinin, Nimzowitschin, Nimzo, Bogo,
+  Miesesin (long i, probe), Zaragozan, Jobava, Stonewall, Richter-Veresov, Smith-Morra, Grand Prix, Najdorfin
+  ("Naidorf" 6 in 6; `Naidorfin` heard no better), Svešnikovin, Kanin, Winawerin, Rubinsteinin, Fegatello,
+  Traxlerin, Morphyn, Parhamin (h silent, probe), Halloween, Semi-Tarrasch, Meranin, Sämischin (probe:
+  "Sämišin"), Falkbeerin, Englundin, Benkon, Rossolimon, Taimanovin, Alapinin, Panovin, Evansin, Staffordin,
+  Grobin, Borgin, Pterodaktyyli, Fianketto, Carlsbad, Fajarowiczin, Maróczy, Breyerin, Zaitsevin (probe:
+  "Zajtsevin"), Richter-Rauzer, Milesin, Lucenan, Anastasian, Bullet, Petrovin.
+- Left as is: Giuoco is read "gi-uoko" (probe), but Whisper writes "Juoko" either way and `Džuoko`, `Djuoko`
+  were heard no better. Birdin is read with the Finnish i ("Birrdin", probe); `Bördin` was heard "pöydän",
+  no better. Zukertortin is said with an s (probe: "Sukertortin"), as many Finnish players say it. Scheveningenin
+  and Van Geetin are heard badly, with no candidate clearly closer. The file letter aa melts into a word ending
+  in a vowel before it ("Paras oli aa neljä" heard "Parasolja 4" 2 times in 3, "Torni aa kahdeksan" "tornia
+  8"), but the probe puts the line nearest "oli aaa neljä", the aa said: the recogniser, as in Polish.
+- Recogniser habits: squares and numbers as notation ("E4", "21"); shakki written "sakki", "sähkö" or "Chuck";
+  valkealla as "valkeilla", siirrolla as "siirralla", "siirolla"; English spellings for loanwords
+  ("Gambit", "Halloween"); a long line ends in a loop of one word ("pelaimasta pelaimasta...").
