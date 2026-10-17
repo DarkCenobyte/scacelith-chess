@@ -672,3 +672,38 @@ voice's sake.
 - Recogniser habits: squares and numbers as notation ("E4", "21"); shakki written "sakki", "sähkö" or "Chuck";
   valkealla as "valkeilla", siirrolla as "siirralla", "siirolla"; English spellings for loanwords
   ("Gambit", "Halloween"); a long line ends in a loop of one word ("pelaimasta pelaimasta...").
+
+## Dutch
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetteert | the ch said s or sj: "fiansetteert" (probe), heard "fianceteert", "fiansteert", never with a k in 15 | `fianketteert` (respell): a k heard 7 times in 15 |
+| Grand Prix | d and x said: "grant priks" (probe), heard "grondbricks", "krant op riks" | `gran`, `prie` (respell.grand, respell.prix): "Grand Prix" 7 in 9 against 1 in 6 |
+| Winawer | the aw said like au: "winauer" (probe), heard "Wienauer" 9 in 9 | `winaver` (respell): "Wienhaver", no au in 6; `wienaawer` still "Wienauer" |
+| Fajarowicz | heard "Firewix" 4 in 4 | `fajarovitsj` (respell): "Vajarovits" 2 in 3 |
+| coach | the t lost: "koosj" (probe), heard "kosh", "koorts", "koos", "course" | `kootsj` (respell): "coach" 3 in 9 against 1 in 6, otherwise "koots", "codes" (with a t) |
+| eenentwintig (21) | first syllable lost: "enentwintig" (probe), heard "in twintig" | `éénentwintig` (number.21.spoken): 21 eleven times in 12 against 7 in 12 |
+| Hm. (event.filler, said alone) | with a vowel: "hem" (probe, heard so 2 in 3) | `Hmm.` (event.filler.spoken): "Hmm" 2 in 3. In a sentence "Hm," is fine (3 in 3) and "Hmm." is dropped |
+
+- Parakeet does not do this voice's Dutch: the round trip used Whisper medium set to `nl` (300 lines,
+  seed 0), then 3 seeds on about 130 lines (the reviewers' list, file letters, numbers, every eponym in
+  "Ik antwoordde met ..., en jij koos voor ...", every fix), and probes. Whisper hallucinates on a word
+  alone ("Remise." heard "Mijn meeste", "Pat." "Bakker"): check a name in a sentence.
+- Checked and fine: remise ("remieze"; `remieze` heard worse), mat (like "mad"), pat (like "pad"), dame
+  ("daame"), gambiet (Dutch g, like "chambiet"), zwart (short a), Au (like "Auw"), Elo, rating, blitz,
+  rapid, blunder, super, Perfect, el (the L), aa, ee, Halfgevorderd, vóór, the -zettenregel compounds, 31
+  and 71 (accents did no better), Tarrasch and Sämisch (final sch said sj, probe), Aljechin ("aljechien"),
+  Réti ("reetie"), Pirc ("pirts"), Miles ("majls"), Caro-Kann, Philidor, Nimzowitsch, Grünfeld, Bogo,
+  Owen, Horwitz, Van 't Kruijs, Englund, Benoni, Benko, Bird, Ponziani, Blackmar-Diemer, Trompowsky,
+  Torre, Colle, Tsjigorin, Albin, Larsen, Grob, Mieses, Saragossa, Rapport-Jobava, Stonewall, Richter,
+  Bongcloud, Alapin, Smith-Morra, Rossolimo, Najdorf, Svesjnikov, Tajmanov, Rubinstein, Panov, Giuoco,
+  Evans, Fegatello, Traxler, Morphy, Marshall, Schliemann, Stafford, Parham, Halloween, Falkbeer, Meraner,
+  Pterodactylus, Breyer, Zajtsev, Rauzer, Sozin, Maróczy, Karlsbad, Karpov, Botvinnik.
+- Left as is: "en passant" is said with the t (probe), but `an passan` and `en passan` were heard no
+  better; "en" must not be respelled (the word "and"). "fianchetto" is a close call between k and s
+  (probe); `fianketto` was heard worse ("fianket"), as was `fiankettovariant`. "trucs" is read with a
+  short u ("truks"); `truuks` was heard the same ("trucks"). "epauletmat" is heard badly either way
+  (`epooletmat` no better). `haa` for the h did no better than `ha`. Zukertort keeps its z.
+- Recogniser habits: zwart as "zwaard", wit as "het", "dit", "met", zet as "z" (the letter's name), koning
+  as "coding", dame as "daam", "duim"; ee as "de", "een"; ha as "A" (A8); gambiet as "gambit", "come
+  beat"; Tarrasch as "Taras", -isch as "-ies" (right in Dutch); "min" as "met" after "ongeveer".

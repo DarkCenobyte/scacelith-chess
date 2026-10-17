@@ -235,8 +235,21 @@ move.mate.spoken = {move}, schaakmat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds them after listening to the voice. Never respell "en" (the
-# English file does, for "en passant"): in Dutch it is the word "and".
+# Words the voice misreads, respelled in every spoken line, opening texts included (src/coach/catalog.h;
+# the findings are in docs/PRONUNCIATION.md). Whole words only: a compound is a word of its own. Never
+# respell "en" (the English file does, for "en passant"): in Dutch it is the word "and".
+# "coach" is said without its t ("koosj"; heard "kosh", "koorts", "koos"): spelled as Dutch says it.
+respell.coach = kootsj
+# "fianchetteert": the ch is said s or sj ("fiansetteert"); Italian ch is a k. "fianchetto" itself is a
+# close call and was heard no better as "fianketto" (heard "fianket"): left as written.
+respell.fianchetteert = fianketteert
+# "Grand Prix": the d and the x are said ("grant priks"); French, as Dutch players say it.
+respell.grand = gran
+respell.prix = prie
+# "Winawer": the aw is said like au ("wienauer"); the Polish w is a v.
+respell.winawer = winaver
+# "Fajarowicz": heard "firewix"; Polish w = v, cz = tsj.
+respell.fajarowicz = fajarovitsj
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Dutch says the units before the tens, joined by "en": 21-99 compose as "{units}en{tens}"
@@ -267,7 +280,9 @@ number.17.spoken = zeventien
 number.18.spoken = achttien
 number.19.spoken = negentien
 number.20.spoken = twintig
-number.21.spoken = eenentwintig
+# 21 only: "eenentwintig" loses its first syllable ("enentwintig", heard "in twintig"); with the
+# accents it is heard 21. 31 and 71 were heard no better with them, so the others stay unaccented.
+number.21.spoken = éénentwintig
 number.22.spoken = tweeëntwintig
 number.23.spoken = drieëntwintig
 number.30.spoken = dertig

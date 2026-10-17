@@ -49,6 +49,8 @@ event.take_time = Neem rustig de tijd.
 event.take_time.2 = Geen haast: in onze partijen loopt er geen klok.
 # Short filler while the coach is still looking at the position.
 event.filler = Hm.
+# Alone, "Hm." is said with a vowel ("hem", heard so 2 times in 3); "Hmm." is heard as a hum.
+event.filler.spoken = Hmm.
 event.filler.2 = Eens kijken.
 event.filler.3 = Even kijken.
 
