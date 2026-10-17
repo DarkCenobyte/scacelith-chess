@@ -51,7 +51,7 @@
     "stockfish": "Stockfish 19 integriert",
     "rules": "FIDE-Regeln",
     "online": "Online-Spiel",
-    "languages": "Zehn Sprachen"
+    "languages": "34 Sprachen"
   },
   "experience": {
     "eyebrow": "Das Erlebnis",
@@ -78,8 +78,8 @@
       "text": "Eine von Grund auf neu geschriebene Engine: physikalisch basiertes Licht, Marmor, gewachstes Holz, Porzellan und Messing, Sonnenlicht durch die Fenster, weiche Schatten und Spiegelungen. Qualitätsstufen von „Sehr niedrig“ bis „Ultra“ passen sie an Ihre Grafikkarte an."
     },
     "languages": {
-      "title": "Zehn Sprachen",
-      "text": "Englisch, Französisch, Deutsch, Spanisch, Ukrainisch, Russisch, Arabisch, Japanisch sowie Chinesisch in vereinfachter und traditioneller Schrift. Arabisch wird von rechts nach links dargestellt."
+      "title": "34 Sprachen",
+      "text": "Englisch, Französisch, Deutsch, Spanisch, Portugiesisch aus Portugal und Brasilien, Italienisch, Niederländisch, Schwedisch, Dänisch, Finnisch, Estnisch, Lettisch, Litauisch, Polnisch, Tschechisch, Slowakisch, Slowenisch, Kroatisch, Ungarisch, Rumänisch, Bulgarisch, Griechisch, Türkisch, Ukrainisch, Russisch, Arabisch, Hindi, Indonesisch, Vietnamesisch, Koreanisch, Japanisch sowie Chinesisch in vereinfachter und traditioneller Schrift. Arabisch wird von rechts nach links dargestellt, und der Trainer spricht in jeder Sprache laut, außer auf Chinesisch, wo seine Worte als Untertitel erscheinen."
     }
   },
   "modes": {

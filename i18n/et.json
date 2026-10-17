@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith – fotorealistlik male esimese isiku vaates",
+      "description": "Tasuta fotorealistlik male esimese isiku vaates Windowsile, Linuxile ja macOS-ile: Stockfish 19, treener, partiide analüüs ja võrgumäng kuninglikus saalis."
+    },
+    "players": {
+      "title": "Edetabel ja mängijad – Scacelith",
+      "description": "Scacelithi ametliku serveri parimad mängijad igas reitinguga ajakontrollis, nende reitingud ja viimased partiid."
+    },
+    "account": {
+      "title": "Teie konto – Scacelith",
+      "description": "Logige oma Scacelithi kontosse sisse: reitingud, partiide ajalugu, PGN- ja GIF-failide allalaadimine, sisselogitud seadmed ja seaded."
+    },
+    "gif": {
+      "title": "Animeeritud GIF – Scacelith",
+      "description": "Scacelithi partii animeeritud GIF."
+    },
+    "legal": {
+      "title": "Õiguslik teave, privaatsus ja kasutustingimused – Scacelith",
+      "description": "Kes Scacelithi avaldab ja majutab, mida teevad isikuandmetega veebisait, mäng ja ametlik server, millised on teie õigused ja ametliku serveri reeglid."
+    }
+  },
+  "brand": {
+    "tagline": "Kuninglik mäng"
+  },
+  "nav": {
+    "skip": "Liigu sisu juurde",
+    "home": "Avaleht",
+    "label": "Peamenüü",
+    "game": "Mäng",
+    "modes": "Mänguviisid",
+    "gallery": "Galerii",
+    "trailer": "Treiler",
+    "online": "Võrgumäng",
+    "players": "Edetabel",
+    "account": "Konto",
+    "language": "Keel",
+    "menu": "Menüü",
+    "download": "Laadi alla"
+  },
+  "hero": {
+    "image_alt": "Kaks portselanrobotit mängivad päikesepaistelises marmorsaalis pähklipuust laua taga malet.",
+    "lead": "Võtke istet vahatatud pähklipuust laua taga päikesepaistelises kuninglikus saalis. Laua teisel pool ootab Stockfishi juhitud portselanrobot teie esimest käiku.",
+    "watch": "Vaata treilerit",
+    "meta": "Vaba tarkvara · Windows, Linux, macOS (katseline) · OpenGL 4.6 toega graafikakaart",
+    "caption": "Jäädvustatud mängus: kuninglik saal"
+  },
+  "highlights": {
+    "engine": "Omaloodud OpenGL 4.6 mootor",
+    "stockfish": "Sisseehitatud Stockfish 19",
+    "rules": "FIDE reeglid",
+    "online": "Võrgumäng",
+    "languages": "34 keelt"
+  },
+  "experience": {
+    "eyebrow": "Elamus",
+    "title": "Mitte malelaud ekraanil.<br><em>Vaid koht laua taga.</em>",
+    "lead": "Scacelith toob tagasi selle, mis teeb partii päriseks: saali, vaikuse, kella, vastase, kes teid vaatab, ja turniiri rituaalid.",
+    "presence": {
+      "title": "Esimese isiku vaates",
+      "text": "Näete kõike oma roboti silmadega: vaadake saalis ringi, kummarduge laua kohale, tõstke silmad vastasele, heitke pilk oma partiiblanketile või tõusge püsti ja kõndige laua otsa juurde."
+    },
+    "ritual": {
+      "title": "Turniirireeglid",
+      "text": "Puudutatud malendiga tuleb käia ja käigu lõpetamiseks vajutab teie käsi kella. Kui lubatud käikude näitamine on välja lülitatud, karistab kohtunik reeglivastase käigu eest ja teine selline käik tähendab partii kaotust."
+    },
+    "scoresheet": {
+      "title": "Käsitsi kirjutatud",
+      "text": "Mõlemad mängijad kirjutavad iga käigu oma partiiblanketile, kumbki oma käekirjaga, ja pööravad iga neljakümne käigu järel lehte. On kuulda, kuidas sulg paberil krabiseb."
+    },
+    "opponent": {
+      "title": "Väärikas vastane",
+      "text": "Stockfish 19 teie tasemel, alates tasemest „Uustulnuk“ (800) kuni tasemeni „Stockfish Max“ (3500), ning reiting, mis arvutatakse pärast iga partiid FIDE reeglite järgi."
+    },
+    "engine": {
+      "title": "Loodud selle mängu jaoks",
+      "text": "Nullist kirjutatud mootor: füüsikaliselt põhinev valgustus, marmor, vahatatud puit, portselan ja messing, aknast paistev päike, pehmed varjud ja peegeldused. Kvaliteeditasemed „Väga madal“ kuni „Ultra“ kohandavad selle teie graafikakaardile."
+    },
+    "languages": {
+      "title": "34 keelt",
+      "text": "Inglise, prantsuse, saksa, hispaania, portugali (Portugali ja Brasiilia), itaalia, hollandi, rootsi, taani, soome, eesti, läti, leedu, poola, tšehhi, slovaki, sloveeni, horvaadi, ungari, rumeenia, bulgaaria, kreeka, türgi, ukraina, vene, araabia, hindi, indoneesia, vietnami, korea, jaapani ning lihtsustatud ja traditsiooniline hiina keel. Araabiakeelne tekst kulgeb paremalt vasakule ning treener räägib valjusti kõigis keeltes peale hiina keele, milles tema sõnad kuvatakse subtiitritena."
+    }
+  },
+  "modes": {
+    "eyebrow": "Mänguviisid",
+    "title": "Igal partiil<br><em>on oma laud.</em>",
+    "lead": "Kõike mängitakse samas saalis, otse avakuvalt. Võrguühenduseta on Stockfish alati partiiks valmis.",
+    "new_game": {
+      "name": "Uus partii",
+      "text": "Mängige Stockfishi vastu, kelle tugevuse valite ise, ajakontrolliga alates bulletist kuni klassikalise maleni, või sõbra vastu samas arvutis, kumbki oma roboti silmadega."
+    },
+    "coach": {
+      "name": "Treener",
+      "text": "Teie vastas istub õpetaja, kes mängib teie tasemel ja kommenteerib teile partiid: ähvardused, head käigud, vead – ja oma käega mängib ta ette, mida viga maksma läheb. Malereeglitest kuni eksperditasemeni, häälega, mis sünteesitakse teie arvutis."
+    },
+    "challenges": {
+      "name": "Treeneri väljakutsed",
+      "text": "Lühikesed seisukomplektid, millest igaüks harjutab üht oskust: matid ühe kuni kolme käiguga, kahvlid, sidumised ja muu taktika, kaitse ning põhilised lõppmängud treeneri vastu. Vihjeid ainult siis, kui neid küsite, ja roheline linnuke iga läbitud komplekti juures."
+    },
+    "analysis": {
+      "name": "Analüüs",
+      "text": "Stockfish vaatab läbi teie salvestatud partiid, võrgupartiid või mis tahes PGN-i: hinnanguriba, võtmekäikude hinnangud hiilgavast käigust jämeda veani, parem käik noolena laual ning kommentaarid nii valjusti kui ka subtiitritena. Kui te partiis edasi liigute, mängivad robotite käed käigud läbi."
+    },
+    "online": {
+      "name": "Mängi võrgus",
+      "text": "Päris vastased Scacelithi serveri kaudu: reitinguga partiid, vastase otsimine, väljakutsed ja privaatpartiid või otsemäng kahe arvuti vahel. Teie vastase robot liigub reaalajas koos temaga."
+    },
+    "watch": {
+      "name": "Vaata partiid",
+      "text": "Kaks Stockfishi mängivad teineteise vastu, samal ajal kui teie liigute nähtamatuna vabalt mööda saali ühest vaatepunktist teise."
+    },
+    "saved": {
+      "name": "Salvestatud partiid",
+      "text": "Teie partiid säilitatakse PGN-failidena. Taasesitage neid saalis tegelike mõtlemisaegade ja kellanäitudega või importige partiisid teistest programmidest."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerii",
+    "title": "Vaade <em>saali seest</em>",
+    "lead": "Iga pilt on jäädvustatud mängus, reaalajas, mängu enda mootoriga.",
+    "title_screen": {
+      "alt": "Avakuva: Scacelithi menüü kahe roboti kõrval, kes saalis malet mängivad.",
+      "caption": "Avakuva"
+    },
+    "coach": {
+      "alt": "Treener, portselanrobot, mille rinnal on kiri „COACH“, tervitab teid üle laua; tema sõnad ilmuvad ka subtiitrina.",
+      "caption": "Treener"
+    },
+    "challenges": {
+      "alt": "Treeneri väljakutsete menüü: matiülesannete ja taktika komplektid koos raskusastme ja juba läbitud komplektidega, valitud komplekti kirjelduse kõrval.",
+      "caption": "Treeneri väljakutsed"
+    },
+    "analysis": {
+      "alt": "Analüüsirežiim: hinnanguriba, lauale joonistatud nool, märkustega käigud koos mõlema poole täpsusega ja juhtklahvide loend.",
+      "caption": "Analüüs"
+    },
+    "game": {
+      "alt": "Külgvaade: üks robot sirutab käe üle laua, et malendiga käia, teine aga ootab; löödud malendid seisavad laua kõrval.",
+      "caption": "Vaata partiid"
+    },
+    "hall": {
+      "alt": "Kaks robotit istuvad punastes sametitoolides malelaua taga vastamisi, kõrgete akende all.",
+      "caption": "Kuninglik saal"
+    },
+    "opponent": {
+      "alt": "Lähivõte vastasest, portselanrobotist, kelle pea on laua poole langetatud.",
+      "caption": "Teie vastane"
+    },
+    "scoresheet": {
+      "alt": "Roboti käsi kirjutab täitesulega käike partiiblanketile.",
+      "caption": "Partiiblankett"
+    },
+    "note": "Versioon 1.0.0. Nendel piltidel on kasutajaliides inglise keeles.",
+    "viewer": "Pildivaatur",
+    "close": "Sulge",
+    "previous": "Eelmine pilt",
+    "next": "Järgmine pilt"
+  },
+  "trailer": {
+    "eyebrow": "Treiler",
+    "title": "Scacelith <em>liikumises</em>",
+    "soon_title": "Treiler on peagi tulekul",
+    "soon_text": "Seni võtke istet: mäng on allalaadimiseks valmis.",
+    "privacy": "YouTube'ist ei laadita midagi, enne kui nõustute selle pleieriga.",
+    "open_youtube": "Vaata YouTube'is"
+  },
+  "online": {
+    "eyebrow": "Võrgumäng",
+    "title": "Päris vastased,<br><em>sama saal.</em>",
+    "lead": "Logige mängust ametlikku serverisse sisse ja mängige inimestega üle kogu maailma – endiselt esimese isiku vaates.",
+    "point_rated": "Reitinguga partiid igas ametlikus ajakontrollis, igaühel oma reiting, mis arvutatakse FIDE reeglite järgi.",
+    "point_match": "Vastase otsimine, väljakutsed nime järgi ja privaatpartiid koodiga või otsemäng kahe arvuti vahel, ilma serveri ja kontota.",
+    "point_fair": "Aus mäng: automaatsed kontrollid, lõppenud partiide mootorianalüüs ja mängijate teated.",
+    "point_history": "Teie partiide ajalugu sellel saidil: laadige iga partii alla PGN-ina või animeeritud GIF-ina.",
+    "point_open": "Kogukonna serverit võib käitada igaüks: server on vaba tarkvara ja selle API on dokumenteeritud.",
+    "create": "Loo konto",
+    "signin": "Logi sisse",
+    "server_title": "Ametlik server",
+    "status_checking": "Kontrollimine…",
+    "address": "Aadress",
+    "registration": "Registreerumine",
+    "categories": "Reitinguga ajakontrollid",
+    "top_players": "Parimad mängijad",
+    "category": "Ajakontroll",
+    "board_loading": "Edetabeli laadimine…",
+    "full_board": "Kogu edetabel"
+  },
+  "download": {
+    "button": "Laadi alla",
+    "choose": "Valige oma süsteem",
+    "see_release": "Vaata väljalaset GitHubis",
+    "latest": "Scacelith",
+    "all_releases": "Kõik väljalasked",
+    "experimental": "Katseline",
+    "source": "Lähtekood",
+    "source_zip": "ZIP-arhiiv",
+    "eyebrow": "Allalaadimine",
+    "title": "Võtke istet.<br><em>Tasuta ja avatud lähtekoodiga.</em>",
+    "lead": "Pakkige lahti ja mängige: Windowsis ja Linuxis pole paigaldusprogrammi vaja, Macis piisab lohistamisest kausta Rakendused. Iga fail ehitatakse GitHub Actionsis vastava sildiga lähtekoodist ja selle koostamise päritolu on tõendatud.",
+    "notes": "Väljalaskemärkmed",
+    "macos_note": "Apple Siliconiga Macidele (M1 või uuem), kus töötab macOS 26 või uuem, mitte virtuaalmasinas; uuem ja vähem testitud kui teised versioonid. Rakendust pole allkirjastanud registreeritud Apple'i arendaja: avage see esimesel korral menüüst Süsteemiseaded › Privaatsus ja turvalisus › Ava siiski.",
+    "req_system": "Süsteem",
+    "req_system_value": "64-bitine Windows (x64); 64-bitine Linux (x86-64 või aarch64), milles on glibc 2.34, OpenSSL 3 ning X11 või XWayland, näiteks Ubuntu 22.04 või Debian 12; macOS 26 või uuem Apple Siliconiga arvutis (katseline)",
+    "req_gpu": "Graafika",
+    "req_gpu_value": "OpenGL 4.6 toega graafikakaart ja ajakohane draiver (Macis on mängul oma OpenGL kaasas)",
+    "req_included": "Kaasas",
+    "req_included_value": "Stockfish 19 ja selle närvivõrk: saate kohe võrguühenduseta mängida",
+    "req_network": "Võrguühendus",
+    "req_network_value": "Võrgumänguks, GIF-ide jaoks ning treeneri ja analüüsi hääle jaoks (valikuline allalaadimine, umbes 399 MB)",
+    "req_licence": "Litsents",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Kontrollige allalaaditud faili",
+    "verify_text": "GitHub tõendab iga faili koostamise päritolu. GitHub CLI abil:",
+    "checksums": "SHA-256 kontrollsummad (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Tegijad",
+    "title": "Tegijad ja <em>tänusõnad</em>",
+    "engine_head": "Malemootor",
+    "engine": "Stockfish 19, Stockfishi arendajatelt (GNU GPL v3). Selle närvivõrk on treenitud Leela Chess Zero projekti pakutud andmetel (Open Database License).",
+    "voice_head": "Hääl",
+    "voice": "Supertone'i Supertonic 3, BigScience Open RAIL-M litsentsi alusel: see laaditakse alla teie soovil ja annab teie arvutis hääle treenerile ja analüüsile.",
+    "fonts_head": "Kirjatüübid",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) ja Amiri (Khaled Hosny); käekirjad Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One ja LXGW WenKai (kõik SIL Open Font License'i alusel); malefiguurid GNU FreeFontist.",
+    "openings_head": "Avangud ja ülesanded",
+    "openings": "Avangute nimed pärinevad lichess.org-i avanguandmebaasist chess-openings ja treeneri väljakutsete ülesanded Lichessi ülesandeandmebaasist; mõlemad on antud üldsuse omandisse (CC0).",
+    "quote": "„Male on analüüsi kunst.“",
+    "quote_author": "Mihhail Botvinnik"
+  },
+  "footer": {
+    "about": "Fotorealistlik malemäng esimese isiku vaates, omaloodud OpenGL 4.6 mootoril. Vaba tarkvara GNU GPL v3 litsentsi alusel.",
+    "game": "Mäng",
+    "online": "Võrgumäng",
+    "api_docs": "Serveri API dokumentatsioon",
+    "source": "Lähtekood",
+    "game_source": "Mäng GitHubis",
+    "server_source": "Server GitHubis",
+    "releases": "Väljalasked",
+    "licence": "Litsents (GPL v3)",
+    "credits": "Stockfish on selle arendajate kaubamärk. YouTube on Google LLC kaubamärk. Windows on Microsoft Corporationi kaubamärk. macOS on Apple Inc. kaubamärk. Linux on Linus Torvaldsi registreeritud kaubamärk. OpenGL on Hewlett Packard Enterprise'i registreeritud kaubamärk.",
+    "legal": "Scacelith",
+    "made": "See sait ei kasuta küpsiseid ega jälgimisvahendeid; YouTube'i pleier laaditakse ainult siis, kui te sellega nõustute.",
+    "legal_link": "Õiguslik teave, privaatsus ja tingimused"
+  },
+  "common": {
+    "copy": "Kopeeri",
+    "loading": "Laadimine…",
+    "noscript": "See leht vajab Scacelithi serveriga suhtlemiseks JavaScripti."
+  },
+  "players": {
+    "title": "Edetabel ja mängijad",
+    "lead": "Ametliku serveri parimad mängijad igas reitinguga ajakontrollis. Otsige üles mis tahes mängija, et näha tema reitinguid ja viimaseid partiisid.",
+    "search_label": "Otsi mängijat",
+    "search_placeholder": "Kasutajanimi",
+    "search_button": "Otsi",
+    "back": "Tagasi edetabelisse",
+    "recent_games": "Viimased partiid",
+    "board_title": "Edetabel",
+    "category": "Ajakontroll",
+    "col_rank": "Koht",
+    "col_player": "Mängija",
+    "col_rating": "Reiting",
+    "col_peak": "Kõrgeim",
+    "col_games": "Partiid",
+    "col_wdl": "+ / = / −",
+    "loading": "Laadimine…"
+  },
+  "account": {
+    "title": "Teie konto",
+    "auth_foot": "Üks konto ametlikus serveris nii mängu kui ka selle saidi jaoks. Lõite konto mängus Google'iga? Parooli määramiseks kasutage valikut „Unustasite parooli?“.",
+    "common": {
+      "back": "Tagasi sisselogimise juurde"
+    },
+    "fields": {
+      "login": "Kasutajanimi või e-post",
+      "password": "Parool",
+      "show_password": "Näita parooli",
+      "username": "Kasutajanimi",
+      "email": "E-post",
+      "confirm_password": "Parooli kinnitus",
+      "current_password": "Praegune parool",
+      "new_password": "Uus parool",
+      "new_email": "Uus e-posti aadress",
+      "mfa_code": "Autentimiskood (või taastekood)"
+    },
+    "signin": {
+      "tab": "Logi sisse",
+      "title": "Tere tulemast tagasi",
+      "remember": "Jää selles seadmes sisselogituks",
+      "submit": "Logi sisse",
+      "forgot": "Unustasite parooli?",
+      "resend": "Saada kinnituskiri uuesti"
+    },
+    "mfa": {
+      "title": "Kaheastmeline autentimine",
+      "text": "Sisestage autentimisrakenduse näidatud 6-kohaline kood.",
+      "code": "Rakenduse kood",
+      "use_recovery": "Kasuta hoopis taastekoodi",
+      "submit": "Kinnita"
+    },
+    "google": {
+      "or": "või",
+      "button": "Logi sisse Google'iga",
+      "username_title": "Valige oma kasutajanimi",
+      "username_text": "Teie Google'i konto on selles serveris uus. Valige nimi, mida teised mängijad näevad: seda ei saa hiljem muuta.",
+      "username_submit": "Loo minu konto",
+      "link_title": "Siduge oma Google'i konto",
+      "link_submit": "Seo ja logi sisse",
+      "returning": "Google'iga sisselogimine…"
+    },
+    "register": {
+      "tab": "Loo konto",
+      "title": "Tasuta konto",
+      "closed": "Server ei võta praegu uusi kontosid vastu.",
+      "username_hint": "Tähed, numbrid, _ ja -; esimene märk peab olema täht või number.",
+      "password_hint": "Vähemalt 10 märki, ilma teie kasutajanime või e-posti aadressita.",
+      "pow_note": "Robotite tõrjumiseks lahendab teie brauser registreerumisel väikese ülesande. See võtab mõne sekundi.",
+      "submit": "Loo konto",
+      "done_title": "Kontrollige oma e-posti",
+      "done_text": "Saatsime teie aadressile kinnituslingi. Avage see, et konto luua, ja logige seejärel sisse.",
+      "done_hint": "Link kehtib 24 tundi. Postkastis pole midagi? Kontrollige rämpsposti kausta või küsige e-kirja uuesti.",
+      "go_signin": "Mine sisse logima",
+      "legal_note": "Teie kasutajanimi, reitingud ja partiid on avalikud. Kontot luues nõustute kasutustingimustega.",
+      "legal_link": "Privaatsus ja kasutustingimused"
+    },
+    "forgot": {
+      "title": "Unustatud parool",
+      "text": "Sisestage oma konto e-posti aadress. Kui mõni konto kasutab seda aadressi, saadame teile lingi uue parooli valimiseks; link kehtib üks tund.",
+      "submit": "Saada link"
+    },
+    "resend": {
+      "title": "Kinnitage oma e-post",
+      "text": "Kas kinnituskiri jäi saamata või on link aegunud? Sisestage oma aadress, et saada uus.",
+      "submit": "Saada uuesti"
+    },
+    "dash": {
+      "public_profile": "Avalik profiil",
+      "signout": "Logi välja",
+      "tab_overview": "Ülevaade",
+      "tab_games": "Partiid",
+      "tab_devices": "Seadmed",
+      "tab_settings": "Seaded"
+    },
+    "overview": {
+      "info": "Teie andmed",
+      "ratings": "Teie reitingud",
+      "sanctions": "Karistused",
+      "recent": "Viimased partiid",
+      "all_games": "Kõik teie partiid"
+    },
+    "games": {
+      "filter_category": "Ajakontroll",
+      "all": "Kõik",
+      "custom": "Kohandatud",
+      "filter_rated": "Tüüp",
+      "rated": "Reitinguga",
+      "casual": "Reitinguta",
+      "filter_result": "Tulemus",
+      "wins": "Võidud",
+      "losses": "Kaotused",
+      "draws": "Viigid"
+    },
+    "devices": {
+      "title": "Sisselogitud seadmed",
+      "signout_all": "Logi kõikjal välja",
+      "text": "Iga sisselogimine, olgu mängus või sellel saidil, on üks seade. Logige välja need, mida te ei tunne."
+    },
+    "settings": {
+      "challenges_title": "Väljakutsed",
+      "challenges_text": "Teised mängijad saavad teid mängus nime järgi välja kutsuda.",
+      "challenges_label": "Võta väljakutseid vastu",
+      "mfa_title": "Kaheastmeline autentimine",
+      "mfa_text": "Selle sisse- ja väljalülitamine ning uute taastekoodide loomine käib mängu kontolehel.",
+      "password_title": "Parooli muutmine",
+      "password_text": "Teie teised seadmed logitakse välja, see seade jääb sisselogituks.",
+      "password_submit": "Muuda parooli",
+      "email_title": "E-posti aadressi muutmine",
+      "email_submit": "Saada kinnituslink",
+      "export_title": "Minu andmete allalaadimine",
+      "export_text": "Kõik, mida server teie konto kohta säilitab, ühes JSON-failis.",
+      "export_submit": "Laadi minu andmed alla",
+      "delete_title": "Konto kustutamine",
+      "delete_text": "Seda ei saa tagasi võtta. Teie partiid ja reitingud jäävad alles anonüümse nime all; teie e-posti aadress, parool ja seadmed kustutatakse.",
+      "delete_confirm": "Kinnitamiseks sisestage oma kasutajanimi",
+      "delete_submit": "Kustuta minu konto"
+    }
+  },
+  "gif": {
+    "title": "Animeeritud GIF",
+    "preparing": "GIF-i ettevalmistamine…",
+    "download": "Laadi GIF alla",
+    "make": "Loo GIF",
+    "pause": "Peata animatsioon",
+    "back": "Tagasi partiide juurde",
+    "options": "Seaded",
+    "size": "Suurus",
+    "size_small": "Väike (284 × 350)",
+    "size_medium": "Keskmine (424 × 515)",
+    "size_large": "Suur (628 × 762)",
+    "orientation": "Laud vaadatuna",
+    "orientation_white": "Valgete poolelt",
+    "orientation_black": "Mustade poolelt",
+    "speed": "Kiirus",
+    "speed_fast": "Kiire (0,25 s käigu kohta)",
+    "speed_normal": "Tavaline (0,5 s käigu kohta)",
+    "speed_slow": "Aeglane (1 s käigu kohta)",
+    "speed_very_slow": "Väga aeglane (2 s käigu kohta)",
+    "coords": "Näita koordinaate",
+    "regenerate": "Loo uuesti",
+    "note": "Iga GIF-i joonistab server. Varem tehtud GIF on kohe olemas; uusi saab teha vaid mõne minutis."
+  },
+  "notfound": {
+    "title": "Lehte ei leitud",
+    "text": "See väli on tühi. Leht võib olla teisaldatud.",
+    "home": "Tagasi Scacelithi"
+  },
+  "js": {
+    "common": {
+      "loading": "Laadimine…",
+      "retry": "Proovi uuesti",
+      "close": "Sulge",
+      "copy": "Kopeeri",
+      "copied": "Kopeeritud lõikelauale.",
+      "copy_failed": "Kopeerimine ei õnnestunud. Valige tekst ja kopeerige see käsitsi.",
+      "load_more": "Näita rohkem",
+      "show_password": "Näita parooli",
+      "hide_password": "Peida parool",
+      "signin_needed": "Jätkamiseks logige sisse.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Serveriga ei saa ühendust. Kontrollige oma võrguühendust ja proovige uuesti.",
+      "timeout": "Serveri vastus viibis liiga kaua. Proovige uuesti.",
+      "server_busy": "Server on hõivatud. Proovige hetke pärast uuesti.",
+      "rate_limited": "Liiga palju päringuid. Oodake {time} ja proovige siis uuesti.",
+      "rate_limited_short": "Liiga palju päringuid. Proovige hetke pärast uuesti.",
+      "internal_error": "Serveris tekkis ootamatu viga. Proovige hiljem uuesti.",
+      "invalid_token": "Teie seanss on lõppenud. Logige uuesti sisse.",
+      "unauthorized": "Logige sisse.",
+      "not_found": "Ei leitud.",
+      "unknown": "Midagi läks valesti ({code}).",
+      "invalid_credentials": "Vale kasutajanimi, e-posti aadress või parool.",
+      "too_many_attempts": "Liiga palju katseid. Oodake {time} ja proovige siis uuesti.",
+      "banned": "See konto on peatatud kuni {date}.",
+      "banned_permanent": "See konto on peatatud.",
+      "email_unverified": "Teie e-posti aadress pole veel kinnitatud. Avage link, mille teile saatsime, või küsige uut.",
+      "invalid_mfa_token": "See sisselogimise samm on aegunud. Logige uuesti sisse.",
+      "invalid_code": "Vale või juba kasutatud kood.",
+      "mfa_code_required": "Sisestage oma autentimiskood.",
+      "invalid_password": "Vale parool.",
+      "password_not_set": "Sellel kontol pole veel parooli: selle määramiseks kasutage sisselogimislehel valikut „Unustasite parooli?“.",
+      "registration_closed": "Server ei võta praegu uusi kontosid vastu.",
+      "invalid_username": "See kasutajanimi pole lubatud.",
+      "username_taken": "See kasutajanimi on juba võetud.",
+      "invalid_email": "See e-posti aadress pole kehtiv.",
+      "email_taken": "Seda e-posti aadressi kasutab juba teine konto.",
+      "same_email": "See on juba teie e-posti aadress.",
+      "weak_password": "See parool on liiga nõrk.",
+      "weak_too_short": "Parool on liiga lühike (vähemalt {min} märki).",
+      "weak_too_long": "Parool on liiga pikk.",
+      "weak_contains_username": "Parool ei tohi sisaldada teie kasutajanime.",
+      "weak_contains_email": "Parool ei tohi sisaldada teie e-posti aadressi.",
+      "weak_too_common": "See parool on liiga levinud. Valige mõni muu.",
+      "pow_failed": "Robotikontroll ebaõnnestus. Proovige uuesti.",
+      "passwords_differ": "Paroolid ei kattu.",
+      "required": "Täitke see väli.",
+      "email_format": "Sisestage kehtiv e-posti aadress.",
+      "username_format": "{min}–{max} märki: tähed, numbrid, _ ja -; esimene märk peab olema täht või number.",
+      "password_length": "Vähemalt {min} märki.",
+      "confirm_name": "Sisestage oma kasutajanimi täpselt nii, nagu see on näidatud.",
+      "game_too_long": "See partii on GIF-i tegemiseks liiga pikk.",
+      "gif_disabled": "See server ei tee GIF-e.",
+      "render_failed": "Server ei suutnud seda GIF-i joonistada.",
+      "invalid_game": "Seda partiid pole olemas.",
+      "invalid_player": "Sisestage kasutajanimi: 2–24 tähte, numbrit, _, . või -.",
+      "player_not_found": "Sellise nimega mängijat pole.",
+      "sso_cancelled": "Google'iga sisselogimine tühistati.",
+      "sso_mismatch": "Seda Google'iga sisselogimist ei alustatud sellel vahekaardil või on see juba kasutatud. Proovige uuesti.",
+      "sso_expired": "See Google'iga sisselogimine on aegunud. Proovige uuesti.",
+      "invalid_verifier": "Seda Google'iga sisselogimist alustati teisel vahekaardil või teises brauseris. Alustage uuesti sellelt lehelt.",
+      "sso_email_unverified": "Google ei ole selle Google'i konto e-posti aadressi kinnitanud.",
+      "sso_account_exists": "Seda e-posti aadressi kasutab juba üks konto, kuid sellel pole parooli, mille abil seda Google'iga siduda. Määrake sellele parool valikuga „Unustasite parooli?“ ja logige seejärel uuesti Google'iga sisse.",
+      "sso_failed": "Google'iga sisselogimist ei õnnestunud lõpule viia. Proovige uuesti.",
+      "sso_disabled": "Google'iga sisselogimine pole selles serveris saadaval.",
+      "sso_already_linked": "See Google'i konto on juba seotud teise kontoga.",
+      "account_disabled": "Seda kontot ei saa enam kasutada.",
+      "sso_storage": "Teie brauser blokeerib selle saidi andmesalvestuse, mida Google'iga sisselogimine vajab. Lubage see või logige sisse parooliga.",
+      "sso_url": "Server vastas ootamatu Google'i aadressiga, seetõttu peatati Google'iga sisselogimine."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekund",
+        "other": "{count} sekundit"
+      },
+      "minutes": {
+        "one": "{count} minut",
+        "other": "{count} minutit"
+      }
+    },
+    "download": {
+      "exe": "Käivitusfail",
+      "zip": "ZIP-arhiiv",
+      "dmg": "Kettatõmmis",
+      "archive": "Arhiiv",
+      "file": "Fail",
+      "unavailable": "Pole saadaval",
+      "your_system": "Teie süsteem",
+      "eyebrow_release": "Versioon {version}",
+      "published": "Avaldatud: {date}",
+      "unreachable": "GitHubiga ei saa praegu ühendust: vaadake väljalasete lehte.",
+      "available": "Saadaval",
+      "verify_file": "fail",
+      "no_build": "Mängust pole praegu süsteemile {os} ühtki versiooni.",
+      "x64": "64-bitine (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bitine, Intel / AMD või Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 või uuem",
+      "experimental": "Katseline"
+    },
+    "server": {
+      "online": "Võrgus",
+      "offline": "Kättesaamatu",
+      "busy": "Hõivatud",
+      "open": "Avatud",
+      "closed": "Suletud",
+      "updated": "Uuendatud {time}",
+      "min_games": "Mängijad, kellel on selles ajakontrollis vähemalt {count} reitinguga partiid.",
+      "empty": "Selles ajakontrollis pole edetabelis veel ühtki mängijat.",
+      "error": "Edetabelit ei saa praegu laadida."
+    },
+    "game": {
+      "number": "Partii nr {id}",
+      "white": "Valge",
+      "black": "Must",
+      "you": "teie",
+      "vs": "–",
+      "outcome_win": "Võit",
+      "outcome_loss": "Kaotus",
+      "outcome_draw": "Viik",
+      "outcome_aborted": "Katkestatud",
+      "result_white": "Valge võit",
+      "result_black": "Musta võit",
+      "result_draw": "Viik",
+      "result_aborted": "Katkestatud",
+      "rated": "Reitinguga",
+      "casual": "Reitinguta",
+      "custom": "Kohandatud",
+      "moves": {
+        "one": "{count} käik",
+        "other": "{count} käiku"
+      },
+      "duration": "Kestus {time}",
+      "rating_diff": "Reitingu muutus {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Laadi partii alla PGN-ina",
+      "copy_pgn": "Kopeeri",
+      "copy_pgn_title": "Kopeeri PGN",
+      "gif": "GIF",
+      "gif_title": "Loo animeeritud GIF (avaneb uuel vahekaardil)",
+      "gif_signin": "GIF-ide tegemiseks logige sisse",
+      "pgn_copied": "PGN kopeeriti lõikelauale.",
+      "pgn_saved": "PGN laaditi alla.",
+      "none": "Partiisid veel pole. Teie võrgupartiid ilmuvad siia.",
+      "none_filtered": "Nendele filtritele ei vasta ükski partii.",
+      "none_public": "Partiisid veel pole.",
+      "total": {
+        "one": "{count} partii",
+        "other": "{count} partiid"
+      },
+      "termination_unknown": "Partii on lõppenud",
+      "reason": {
+        "1": "Matt",
+        "2": "Allaandmine",
+        "3": "Aja ületamine",
+        "4": "Teine reeglivastane käik (kaotus)",
+        "5": "Patt",
+        "6": "Surnud seis (ebapiisav materjal)",
+        "7": "Aja ületamine, kuid vastane ei saa matti panna",
+        "8": "Viiekordne kordus",
+        "9": "75 käigu reegel",
+        "10": "Kolmekordne kordus (nõutud)",
+        "11": "50 käigu reegel (nõutud)",
+        "12": "Kokkuleppeline viik",
+        "13": "Teine reeglivastane käik, kuid vastane ei saa matti panna",
+        "14": "Allaandmine, kuid vastane ei saa matti panna",
+        "20": "Partiist lahkumine (ühendus oli liiga kaua katkenud)",
+        "21": "Partiist lahkumine, kuid vastane ei saa matti panna",
+        "22": "Partii katkestati",
+        "23": "Esimest käiku ei tehtud õigel ajal (katkestatud)",
+        "24": "Loobumiskaotus (ausa mängu reeglite rikkumine)",
+        "25": "Server katkestas partii",
+        "26": "Mõlema mängija ühendus katkes"
+      }
+    },
+    "ratings": {
+      "category": "Ajakontroll",
+      "rating": "Reiting",
+      "peak": "Kõrgeim",
+      "games": "Partiid",
+      "wdl": "+ / = / −",
+      "provisional": "Esialgne reiting",
+      "none": "Reitinguga partiisid veel pole.",
+      "unrated_hint": "Küsimärk tähistab esialgset reitingut (mängitud on veel vähe partiisid)."
+    },
+    "account": {
+      "member_since": "Liitunud: {date}",
+      "last_login": "Viimane sisselogimine",
+      "created": "Loodud",
+      "email": "E-post",
+      "pending_email": "Ootab kinnitamist: {email}",
+      "verified": "Kinnitatud",
+      "unverified": "Kinnitamata",
+      "mfa": "Kaheastmeline autentimine",
+      "mfa_on": "Sees",
+      "mfa_off": "Väljas",
+      "google": "Google'iga sisselogimine",
+      "google_on": "Seotud",
+      "google_off": "Sidumata",
+      "password": "Parool",
+      "password_set": "Määratud",
+      "password_unset": "Pole veel määratud",
+      "challenges": "Väljakutsed",
+      "challenges_all": "Võetakse vastu",
+      "challenges_none": "Lükatakse tagasi",
+      "badge_verified": "E-post kinnitatud",
+      "badge_mfa": "Kaheastmeline sees",
+      "badge_google": "Google",
+      "ban_until": "Teie konto on peatatud kuni {date}.",
+      "ban_permanent": "Teie konto on peatatud.",
+      "sanction_ban": "Konto peatamine",
+      "sanction_mm_block": "Vastase otsimine blokeeritud",
+      "sanction_warning": "Hoiatus",
+      "sanction_until": "kuni {date}",
+      "sanction_permanent": "alaline",
+      "devices_current": "See seade",
+      "devices_unknown": "Nimeta seade",
+      "devices_signed_in": "Sisse logitud: {date}",
+      "devices_seen": "Viimati kasutatud {time}",
+      "devices_expires": "Aegub: {date}",
+      "devices_revoke": "Logi välja",
+      "devices_revoked": "Seade on välja logitud.",
+      "devices_none": "Teisi seadmeid pole.",
+      "signout_all_confirm": "Kas logida välja kõik seadmed, ka see?",
+      "signed_out": "Olete välja logitud.",
+      "signed_in": "Tere tulemast, {name}!",
+      "prefs_saved": "Salvestatud.",
+      "password_changed": "Teie parool on muudetud. Teie teised seadmed on välja logitud.",
+      "email_sent": "Uuele aadressile saadeti kinnituslink. Teie aadress muutub, kui selle avate.",
+      "email_changed": "Teie e-posti aadress on nüüd {email}.",
+      "email_current": "Praegune aadress: {email}.",
+      "email_pending": "Aadressi muutmine ({email}) ootab kinnituslingi avamist.",
+      "export_done": "Teie andmed on alla laaditud.",
+      "deleted": "Teie konto on kustutatud.",
+      "delete_confirm_label": "Kinnitamiseks sisestage {name}",
+      "register_done": "Saatsime aadressile {email} kinnituslingi. Avage see, et konto luua, ja logige seejärel sisse.",
+      "register_ready": "Teie konto on valmis. Võite sisse logida.",
+      "forgot_done": "Kui mõni konto kasutab seda aadressi, on link uue parooli valimiseks teel.",
+      "resend_done": "Kui see aadress ootab kinnitamist, on uus link teel.",
+      "pow_solving": "Robotikontrolli ülesande lahendamine…",
+      "mfa_recovery": "Taastekood",
+      "mfa_recovery_text": "Sisestage üks oma taastekoodidest. Iga koodi saab kasutada ainult ühe korra.",
+      "mfa_app": "Rakenduse kood",
+      "mfa_app_text": "Sisestage autentimisrakenduse näidatud 6-kohaline kood.",
+      "mfa_state_on": "Selle konto kaheastmeline autentimine on sisse lülitatud.",
+      "mfa_state_off": "Selle konto kaheastmeline autentimine on välja lülitatud.",
+      "client_label": "Scacelithi veebisait ({browser})",
+      "username": "Kasutajanimi",
+      "password_rules": "Vähemalt {min} märki, ilma teie kasutajanime või e-posti aadressita.",
+      "password_note": "Teie teised seadmed logitakse välja, see seade jääb sisselogituks.",
+      "signin_label": "Logi sisse",
+      "google_link_text": "Konto {name} kasutab juba seda e-posti aadressi. Sisestage üks kord selle parool, et siduda see Google'iga; edaspidi piisab valikust „Logi sisse Google'iga“.",
+      "auth_foot_google": "Üks konto ametlikus serveris nii mängu kui ka selle saidi jaoks. Lõite selle mängus Google'iga? Logige ka siin sisse Google'iga."
+    },
+    "players": {
+      "since": "Liitunud: {date}",
+      "games": "Partiid",
+      "rated": "Reitinguga",
+      "wins": "Võidud",
+      "draws": "Viigid",
+      "losses": "Kaotused",
+      "view": "Vaata mängija {name} profiili",
+      "you": "Teie",
+      "board": "Edetabel"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partii nr {id} · {date}",
+      "preparing": "GIF-i ettevalmistamine…",
+      "rendering": "Server joonistab GIF-i. Pika partii puhul võib see võtta mõne sekundi…",
+      "ready": "Teie GIF on valmis. Allalaadimine algas.",
+      "ready_again": "Teie GIF on valmis.",
+      "signin": "Oma partiidest GIF-ide tegemiseks logige sisse.",
+      "signin_button": "Logi sisse",
+      "missing": "Ühtki partiid pole valitud.",
+      "retry_in": "Oodake {time} ja proovige siis uuesti.",
+      "confirm": "Vajutage „Loo GIF“, et server joonistaks selle partii teie konto nimel.",
+      "retry_now": "Nüüd võite uuesti proovida."
+    },
+    "home": {
+      "create_account": "Loo konto",
+      "my_account": "Minu konto",
+      "my_games": "Minu partiid",
+      "signin": "Logi sisse"
+    },
+    "trailer": {
+      "title": "Scacelithi treiler",
+      "notice": "Seda videot majutab YouTube. Selle siin esitamine laadib Google'i pleieri, mis saab teie IP-aadressi ning võib salvestada teie seadmesse küpsiseid või muid jälgimisvahendeid.",
+      "accept": "Nõustu ja esita",
+      "google_privacy": "Google'i privaatsuspoliitika"
+    }
+  },
+  "legal": {
+    "eyebrow": "Juriidiline teave",
+    "title": "Õiguslik teave, privaatsus ja kasutus\u00adtingimused",
+    "lead": "Kes Scacelithi avaldab ja majutab, mis juhtub teie andmetega sellel veebisaidil, mängus ja ametlikus serveris ning millised reeglid seal mängides kehtivad.",
+    "updated": "Viimati uuendatud: 11. oktoober 2026",
+    "toc": "Sellel lehel",
+    "notice": {
+      "title": "Õiguslik teave",
+      "publisher_label": "Väljaandja",
+      "publisher": "Scacelithi annab välja eraisik, mitte kutsetegevuse raames. Nagu Prantsuse seadus lubab (21. juuni 2004. aasta seaduse nr 2004-575 artikkel 1-1 II), ei avaldata siin väljaandja isikut; see on teada majutusteenuse pakkujale.",
+      "contact_label": "Kontakt",
+      "contact": "Kõigi küsimuste korral selle veebisaidi, ametliku serveri või teie andmete kohta.",
+      "host_server": "Ametlik mänguserver ja kontoandmed",
+      "host_server_note": "Serverid asuvad Prantsusmaal.",
+      "host_site": "See veebisait ja API dokumentatsioon (GitHub Pages)",
+      "host_domain": "Domeeninime registripidaja",
+      "licence_label": "Litsents",
+      "licence": "Mäng ja selle server on vaba tarkvara GNU General Public License v3 litsentsi alusel ning nende lähtekood on avalik:",
+      "game_source": "mäng",
+      "server_source": "server",
+      "phone": "Telefon"
+    },
+    "privacy": {
+      "title": "Privaatsus",
+      "intro": "Scacelith ei näita reklaame, ei müü andmeid ega mõõda külastatavust. Isikuandmeid kasutatakse ainult selle veebisaidi ja ametliku serveri käitamiseks, nagu allpool kirjeldatud. Vastutav töötleja on väljaandja, kellega saab ühendust ülaltoodud kontaktaadressil.",
+      "site_title": "Sellel veebisaidil",
+      "site_hosting": "Saiti majutab GitHub, mis nagu iga veebimajutaja salvestab turvalisuse eesmärgil külastajate IP-aadresse.",
+      "github_privacy": "GitHubi privaatsusteatis",
+      "site_requests": "Uusima väljalaske näitamiseks pöördub teie brauser GitHubi API poole (api.github.com); serveri oleku, edetabeli, mängijate ja teie konto näitamiseks pöördub see ametliku serveri poole (caissa.scacelith.com). Mõlemad saavad nagu iga päringu puhul teie IP-aadressi.",
+      "site_storage": "Sait ei kasuta küpsiseid ega analüütikat. Teie brauseris säilitab see ainult teie keelevaliku ja pärast sisselogimist teie seansi: ainult praeguse vahekaardi jaoks või selles seadmes, kui märgite valiku „Jää selles seadmes sisselogituks“. Google'iga sisselogimine hoiab praegusel vahekaardil ka oma ühekordseid koode, kuni neid kasutatakse. Kõik see on saidi toimimiseks vajalik ning seansi ja koodid saab ainult ametlik server.",
+      "site_trailer": "Treiler on YouTube'i video. YouTube'ist ei laadita midagi enne, kui vajutate „Nõustu ja esita“; seejärel saab YouTube (Google) teie IP-aadressi ning võib salvestada teie seadmesse küpsiseid või muid jälgimisvahendeid. Teie vastust ei jäeta meelde: järgmisel külastusel küsitakse uuesti.",
+      "site_google": "Lehel „Konto“ olev nupp „Logi sisse Google'iga“ ei laadi Google'ist midagi enne, kui sellele vajutate. Seejärel suundub teie brauser Google'i sisselogimislehele (accounts.google.com) ja Google saadab selle tagasi sellele saidile koos ühekordse koodiga, mille sait edastab ametlikule serverile. Google saab teie IP-aadressi ja selle, mida tema lehel sisestate, oma poliitika alusel.",
+      "google_privacy": "Google'i privaatsuspoliitika",
+      "game_title": "Mängus",
+      "game_local": "Mäng hoiab oma seadeid, teie kohalikke tulemusi ja teie sisselogimist teie arvutis. Sisselogimist hoitakse süsteemi turvalises hoidlas: Windowsis DPAPI-s, macOS-is Keychainis, Linuxis Secret Service'i võtmehoidjas või muul juhul failis, mida saab lugeda ainult teie kasutajakonto.",
+      "game_network": "Omal algatusel ei saada see midagi: ei telemeetriat ega uuenduste kontrolli. Ametliku serveriga ühendub see ainult siis, kui avate lehe „Mängi võrgus“, Hugging Face'iga ainult siis, kui laadite alla treeneri hääle, ning otsemängu puhul teie vastase arvutiga, mis saab seejärel teada teie IP-aadressi (mäng võib ka UPnP abil teie ruuteris pordi avada).",
+      "account_title": "Teie konto ametlikus serveris",
+      "account_intro": "Konto loomisel, olgu mängus või sellel veebisaidil, ja võrgus mängimisel saadetakse ametlikku serverisse, mida majutab OVH Prantsusmaal, järgmised andmed:",
+      "data_account": "<strong>Konto:</strong> kasutajanimi, e-posti aadress, parool (salvestatakse ainult Argon2id-räsina), kaheastmelise autentimise salavõti (krüpteeritud) ja taastekoodid (räsitud), registreerumise kuupäev ja viimase sisselogimise kuupäev.",
+      "data_google": "<strong>Google'iga sisselogimine:</strong> Google saadab teie Google'i konto identifikaatori, teie e-posti aadressi ja teie nime. Server säilitab identifikaatori ja aadressi ning kasutab nime ainult kasutajanime soovitamiseks.",
+      "data_sessions": "<strong>Sisselogitud seadmed:</strong> iga sisselogimise kohta seadme nimi (mängu versioon ja süsteem, näiteks „Scacelith/1.0.0 win64“, või selle veebisaidi puhul brauser ja süsteem), IP-aadress ja kasutamise ajad.",
+      "data_games": "<strong>Partiid ja reitingud:</strong> iga võrgupartii (mängijad, käigud, igale käigule kulunud aeg, tulemus, kuupäevad) ja teie reitingud. Partii ajal edastatakse teie pea ja käe liigutused reaalajas teie vastasele ning neid ei salvestata kunagi.",
+      "data_security": "<strong>Turvalogi:</strong> sisselogimised, ebaõnnestunud katsed ja kontomuudatused koos IP-aadressiga.",
+      "data_fairplay": "<strong>Aus mäng:</strong> teie esitatud või teid puudutavad teated koos nende kommentaariga; pooleli jäetud ja vahele jäänud partiid; karistused; ning partiidele tehtud kontrollid, alates võltsitud või võimatutest käikudest kuni Stockfishi mootori statistikani.",
+      "basis_title": "Miks ja millisel õiguslikul alusel",
+      "basis_contract": "Teie konto ja võrgumängu toimimine (sisselogimine, partiid, reitingud, partiide kirjed, teenuse saadetavad e-kirjad): teenus, mille kasutajaks te registreerute (isikuandmete kaitse üldmääruse ehk IKÜMi art 6 lg 1 p b).",
+      "basis_security": "Kontode ja serveri kaitsmine ning partiide aususe tagamine (turvalogi, IP-aadressid, ausa mängu kontrollid, karistused): väljaandja ja mängijate õigustatud huvi (IKÜM art 6 lg 1 p f).",
+      "basis_trailer": "Treileri esitamine YouTube'ist: teie nupuga antud nõusolek (IKÜM art 6 lg 1 p a).",
+      "public_title": "Mida kõik näevad",
+      "public": "Teie kasutajanimi, registreerumise kuupäev, reitingud ja partiide täielik loend koos kõigi käikudega on avalikud: sellel veebisaidil, serveri API kaudu ja iga partii PGN-is. Teie e-posti aadressi, seadmeid, sisselogimisi, karistusi ega ausa mängu kirjeid ei näidata kunagi. Otseväljakutsetest võite keelduda, kuid partiisid ei saa peita.",
+      "auto_title": "Automaatsed otsused",
+      "auto": "Mõned mänguprotokolli rikkumised, näiteks võltsitud sõnum või seisus võimatu käik, on kindel tõend sohitegemisest: sel juhul määrab server partiis loobumiskaotuse, blokeerib konto 24 tunniks, eemaldab selle edetabelist ja tagastab punktid, mille selle vastased on viimase 60 päeva jooksul selle vastu kaotanud. Kolm 24 tunni jooksul pooleli jäetud, katkestatud või vahele jäänud partiid peatavad reitinguga partiide vastase otsimise 15 minutiks, seejärel kauemaks. Mootori statistika ei too kunagi iseenesest kaasa karistust: otsuse teeb inimene. Võite kontaktaadressil taotleda mis tahes otsuse läbivaatamist.",
+      "recipients_title": "Kes teie andmeid saab",
+      "recipient_ovh": "OVH SAS majutab serverit ja selle andmeid Prantsusmaal.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) saadab serveri e-kirju: see saab teie aadressi, teie kasutajanime ja sõnumi.",
+      "recipient_google": "Google saab oma privaatsuspoliitika alusel selle, mida teie brauser talle saadab, kui otsustate Google'iga sisse logida.",
+      "recipient_staff": "Serveri administraator ja moderaatorid näevad teenuse käitamiseks konto- ja ausa mängu andmeid.",
+      "recipient_players": "Teised mängijad näevad seda, mis on avalik, ja teie vastane näeb partii ajal teie käike ja liigutusi.",
+      "recipient_none": "Mitte keegi teine: andmeid ei müüda, rendita ega kasutata reklaamiks.",
+      "transfers": "Kontoandmed jäävad Prantsusmaale. GitHub, Google ja Porkbun (mis edastab kontaktaadressile saadetud sõnumid) asuvad Ameerika Ühendriikides: see, mida nad saavad, kuulub nende enda poliitikate ning Euroopa Liidust väljapoole edastamise kaitsemeetmete alla.",
+      "retention_title": "Kui kaua andmeid säilitatakse",
+      "ret_account": "<strong>Konto:</strong> kuni selle kustutate. Registreerumine, mille aadressi kunagi ei kinnitata, kustutatakse 24 tunni pärast.",
+      "ret_sessions": "<strong>Sisselogitud seadmed:</strong> kuni välja logite, kuni 30 päeva ilma kasutamiseta ja kõige kauem 90 päeva.",
+      "ret_ip": "<strong>IP-aadressid:</strong> kustutatakse 30 päeva pärast. Serveri logides säilitatakse ainult lühendatud aadressid.",
+      "ret_security": "<strong>Turvalogi:</strong> 90 päeva.",
+      "ret_conduct": "<strong>Pooleli jäetud ja vahele jäänud partiid:</strong> 30 päeva.",
+      "ret_games": "<strong>Partiid ja reitingud:</strong> nii kaua, kui server säilitab oma partiide kirjeid, mis on ühtlasi teie vastaste kirjed. Pärast teie konto kustutamist asendatakse teie nimi neis tekstiga „deleted#“ ja numbriga.",
+      "ret_fairplay": "<strong>Karistused, teated ja ausa mängu kontrollide tulemused:</strong> säilitatakse, et blokeeritud mängijad ei saaks lihtsalt tagasi tulla ja teised mängijad oleksid kaitstud. Pärast teie konto kustutamist on need seotud ainult selle numbriga.",
+      "ret_backups": "<strong>Varukoopiad:</strong> kustutatud andmed võivad lühikest aega säilida serveri varukoopias, kuni see asendatakse.",
+      "ret_contact": "<strong>Kontaktaadressile saadetud sõnumid:</strong> nii kaua, kui on vaja neile vastamiseks.",
+      "rights_title": "Teie õigused",
+      "rights": "Teil on õigus oma andmetega tutvuda, neid parandada, kustutada ja eksportida, piirata nende kasutamist ning esitada nende kasutamise kohta vastuväiteid (IKÜM art 15–21).",
+      "rights_self": "Suurema osa sellest saate teha oma kontol, mängus või selle veebisaidi lehel „Konto“: laadida oma kontoandmed alla JSON-failina, muuta oma e-posti aadressi või parooli, logida välja teisi seadmeid või kustutada konto kohe.",
+      "rights_google": "Google'iga loodud kontol pole parooli: selle eksportimiseks või kustutamiseks määrake sellele kõigepealt parool valikuga „Unustasite parooli?“.",
+      "rights_mail": "Kõige muu puhul, sealhulgas andmete kohta, mida eksport ei sisalda (ausa mängu kontrollid, teid puudutavad teated), kirjutage kontaktaadressile. Vastuse saate ühe kuu jooksul.",
+      "rights_cnil": "Kui leiate, et teie õigusi ei austata, võite esitada kaebuse CNIL-ile (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) või oma riigi andmekaitseasutusele.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Kasutustingimused",
+      "intro": "Need tingimused kehtivad ametlikule serverile (caissa.scacelith.com) ja selle veebisaidi kontolehtedele. Konto loomine või ametlikus serveris mängimine tähendab nendega nõustumist.",
+      "service": "<strong>Tasuta teenus.</strong> Mäng on vaba tarkvara ja tasuta. Ametlikku serverit pakutakse tasuta ja sellisena, nagu see on, ilma kättesaadavuse garantiita: see võib muutuda, ajutiselt seiskuda või sulguda.",
+      "account": "<strong>Teie konto.</strong> Te vastutate selle eest, mida sellega tehakse, ja selle parooli saladuses hoidmise eest. Kui arvate, et keegi teine seda kasutab, kirjutage kohe kontaktaadressile.",
+      "username": "<strong>Teie kasutajanimi</strong> on avalik: see ei tohi olla solvav ega vihkamist õhutav, jäljendada kedagi teist ega avaldada kellegi isikuandmeid.",
+      "fair": "<strong>Aus mäng.</strong> Reitinguga partii ajal ei tohi kasutada malemootori, teise inimese ega ühegi muu vahendi abi. Keelatud on muudetud mänguklient, võltsitud sõnumid ja serveri tahtlik ülekoormamine.",
+      "conduct": "<strong>Mängige oma partiid lõpuni.</strong> Kui jätate 24 tunni jooksul kolm korda partii pooleli, katkestate partii või ei tule partiile, mille jaoks teile vastane leiti, peatatakse reitinguga partiide vastase otsimine mõneks ajaks.",
+      "reports": "<strong>Teated</strong> tuleb esitada heas usus. Mängijast või ebaseaduslikust sisust, näiteks solvavast kasutajanimest, teatamiseks kasutage partii ajal nuppu „Teata vastasest“ või kirjutage kontaktaadressile.",
+      "sanctions": "<strong>Karistused.</strong> Nende reeglite rikkumine võib kaasa tuua loobumiskaotuse, hoiatuse, blokeerimise ja edetabelist eemaldamise; sohitegijale kaotatud punktid tagastatakse tema vastastele. Automaatselt karistatakse ainult kindlalt tõendatud sohitegemise eest; kõige muu üle otsustab inimene. Karistuse saate vaidlustada kontaktaadressil.",
+      "liability": "<strong>Vastutus.</strong> Seadusega lubatud piires ei vastuta väljaandja teenuse katkestuste ega partiide, reitingute või andmete kaotsimineku eest.",
+      "end": "<strong>Lõpetamine.</strong> Võite oma konto igal ajal kustutada. Neid tingimusi rikkuva konto võib blokeerida.",
+      "changes": "<strong>Muudatused.</strong> Need tingimused võivad muutuda; selle lehe ülaosas olev kuupäev näitab kehtivat versiooni ning muudatuse järel mängimise jätkamine tähendab sellega nõustumist.",
+      "law": "<strong>Kohaldatav õigus.</strong> Nendele tingimustele kohaldatakse Prantsusmaa õigust. Vaidluse korral kirjutage esmalt kontaktaadressile, et leida koos lahendus."
+    },
+    "version_note": "See leht on olemas mitmes keeles; erinevuste korral kehtib prantsuskeelne versioon."
+  }
+}

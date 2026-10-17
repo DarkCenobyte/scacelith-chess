@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotorealistista shakkia ensimmäisen persoonan näkökulmasta",
+      "description": "Ilmainen fotorealistinen shakkipeli ensimmäisen persoonan näkökulmasta Windowsille, Linuxille ja macOS:lle: Stockfish 19, valmentaja, pelien analyysi ja verkkopeli kuninkaallisessa salissa."
+    },
+    "players": {
+      "title": "Tulostaulukko ja pelaajat — Scacelith",
+      "description": "Virallisen Scacelith-palvelimen parhaat pelaajat jokaisessa pisteytetyssä peliajassa, heidän vahvuuslukunsa ja viimeisimmät pelinsä."
+    },
+    "account": {
+      "title": "Oma tili — Scacelith",
+      "description": "Kirjaudu Scacelith-tilillesi: vahvuusluvut, pelihistoria, PGN- ja GIF-lataukset, kirjautuneet laitteet ja asetukset."
+    },
+    "gif": {
+      "title": "Animoitu GIF — Scacelith",
+      "description": "Animoitu GIF-kuva Scacelith-pelistä."
+    },
+    "legal": {
+      "title": "Oikeudelliset tiedot, tietosuoja ja käyttöehdot — Scacelith",
+      "description": "Kuka julkaisee ja isännöi Scacelithia, mitä verkkosivusto, peli ja virallinen palvelin tekevät henkilötiedoilla, oikeutesi sekä virallisen palvelimen säännöt."
+    }
+  },
+  "brand": {
+    "tagline": "Kuninkaallinen peli"
+  },
+  "nav": {
+    "skip": "Siirry sisältöön",
+    "home": "Etusivu",
+    "label": "Päävalikko",
+    "game": "Peli",
+    "modes": "Pelimuodot",
+    "gallery": "Galleria",
+    "trailer": "Traileri",
+    "online": "Verkkopeli",
+    "players": "Tulostaulukko",
+    "account": "Tili",
+    "language": "Kieli",
+    "menu": "Valikko",
+    "download": "Lataa"
+  },
+  "hero": {
+    "image_alt": "Kaksi posliinirobottia pelaa shakkia pähkinäpuupöydän ääressä auringon valaisemassa marmorisalissa.",
+    "lead": "Istuudu vahatun pähkinäpuupöydän ääreen auringon valaisemassa kuninkaallisessa salissa. Laudan toisella puolella Stockfishin ohjaama posliinirobotti odottaa ensimmäistä siirtoasi.",
+    "watch": "Katso traileri",
+    "meta": "Vapaa ohjelmisto · Windows, Linux, macOS (kokeellinen) · Näytönohjain, jossa on OpenGL 4.6 -tuki",
+    "caption": "Kuvattu pelissä: kuninkaallinen sali"
+  },
+  "highlights": {
+    "engine": "Oma OpenGL 4.6 -pelimoottori",
+    "stockfish": "Sisäänrakennettu Stockfish 19",
+    "rules": "FIDEn säännöt",
+    "online": "Verkkopeli",
+    "languages": "34 kieltä"
+  },
+  "experience": {
+    "eyebrow": "Kokemus",
+    "title": "Ei lauta ruudulla.<br><em>Paikka pöydän ääressä.</em>",
+    "lead": "Scacelith tuo takaisin sen, mikä tekee pelistä todellisen: salin, hiljaisuuden, kellon, vastustajan, joka katsoo sinua, ja turnauksen rituaalit.",
+    "presence": {
+      "title": "Ensimmäisen persoonan näkökulma",
+      "text": "Näet kaiken robottisi silmin: katsele ympäri salia, kumarru laudan ylle, nosta katseesi vastustajaasi, vilkaise pöytäkirjaasi tai nouse seisomaan ja kävele pöydän päätyyn."
+    },
+    "ritual": {
+      "title": "Turnaussäännöt",
+      "text": "Koskettamasi nappula on siirrettävä, ja kätesi painaa kelloa siirron päätteeksi. Kun sallittuja siirtoja ei näytetä, tuomari rankaisee laittomasta siirrosta, ja toinen laiton siirto merkitsee pelin häviämistä."
+    },
+    "scoresheet": {
+      "title": "Käsin kirjoitettu",
+      "text": "Kumpikin pelaaja kirjaa jokaisen siirron omaan pöytäkirjaansa omalla käsialallaan ja kääntää sivua 40 siirron välein. Kuulet kynän rapinan paperilla."
+    },
+    "opponent": {
+      "title": "Veroisesi vastustaja",
+      "text": "Stockfish 19 sinun tasollasi, tasosta Vasta-alkaja (800) tasoon Stockfish Max (3500), ja vahvuuslukusi lasketaan FIDEn sääntöjen mukaan jokaisen pelin jälkeen."
+    },
+    "engine": {
+      "title": "Rakennettu tätä peliä varten",
+      "text": "Tyhjästä kirjoitettu pelimoottori: fysiikkaan perustuva valaistus, marmori, vahattu puu, posliini ja messinki, ikkunoista paistava aurinko, pehmeät varjot ja heijastukset. Laatutasot Erittäin matalasta Ultraan sovittavat sen näytönohjaimesi tehoon."
+    },
+    "languages": {
+      "title": "34 kieltä",
+      "text": "Englanti, ranska, saksa, espanja, Portugalin ja Brasilian portugali, italia, hollanti, ruotsi, tanska, suomi, viro, latvia, liettua, puola, tšekki, slovakki, sloveeni, kroatia, unkari, romania, bulgaria, kreikka, turkki, ukraina, venäjä, arabia, hindi, indonesia, vietnam, korea, japani sekä yksinkertaistettu ja perinteinen kiina. Arabiankielinen näkymä asettuu oikealta vasemmalle, ja valmentaja puhuu ääneen kaikilla kielillä paitsi kiinaksi, jolloin sen sanat näkyvät tekstityksenä."
+    }
+  },
+  "modes": {
+    "eyebrow": "Pelimuodot",
+    "title": "Jokaisella pelillä<br><em>on pöytänsä.</em>",
+    "lead": "Kaikki pelataan samassa salissa, ja kaikki alkaa aloitusruudulta. Ilman verkkoyhteyttäkin Stockfish on aina valmis peliin.",
+    "new_game": {
+      "name": "Uusi peli",
+      "text": "Pelaa Stockfishia vastaan valitsemallasi vahvuudella ja peliajalla bulletista klassiseen tai pelaa ystävää vastaan samalla tietokoneella, kumpikin oman robottinsa silmin."
+    },
+    "coach": {
+      "name": "Valmentaja",
+      "text": "Opettaja istuu vastapäätäsi, pelaa sinun tasollasi ja opastaa sinua pelin aikana: se kertoo uhista, hyvistä siirroista ja virheistä ja näyttää omalla kädellään laudalla, mitä virhe maksaa. Shakin säännöistä asiantuntijatasolle, ja ääni syntetisoidaan omalla tietokoneellasi."
+    },
+    "challenges": {
+      "name": "Valmentajan haasteet",
+      "text": "Lyhyitä asemasarjoja, joista kukin harjoittaa yhtä taitoa: matit yhdellä, kahdella tai kolmella siirrolla, haarukat, kiinnitykset ja muu taktiikka, puolustus sekä perusloppupelit valmentajaa vastaan. Vihjeitä vain pyydettäessä ja vihreä valintamerkki jokaisesta suoritetusta sarjasta."
+    },
+    "analysis": {
+      "name": "Analyysi",
+      "text": "Stockfish käy läpi tallennetut pelisi, verkkopelisi tai minkä tahansa PGN-tiedoston: arviopalkki, avainsiirrot merkittyinä loistavasta siirrosta vakavaan virheeseen, parempi siirto nuolena sekä kommentit ääneen ja tekstityksenä. Robottien kädet pelaavat siirrot, kun selaat peliä."
+    },
+    "online": {
+      "name": "Pelaa verkossa",
+      "text": "Oikeita vastustajia Scacelith-palvelimen kautta: pisteytetyt pelit, vastustajan haku, haasteet ja yksityiset pelit tai suora ottelu kahden tietokoneen välillä. Vastustajasi robotti liikkuu hänen mukanaan reaaliajassa."
+    },
+    "watch": {
+      "name": "Katso peliä",
+      "text": "Kaksi Stockfishia pelaa toisiaan vastaan, kun liikut näkymättömänä vapaasti ympäri salia kuvakulmasta toiseen."
+    },
+    "saved": {
+      "name": "Tallennetut pelit",
+      "text": "Pelisi tallennetaan PGN-tiedostoina. Toista ne salissa todellisine miettimisaikoineen ja kelloineen tai tuo pelejä muista ohjelmista."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galleria",
+    "title": "<em>Salin sisältä</em> nähtynä",
+    "lead": "Jokainen kuva on otettu pelissä reaaliajassa, pelin oman moottorin piirtämänä.",
+    "title_screen": {
+      "alt": "Aloitusruutu: Scacelithin valikko kahden salissa shakkia pelaavan robotin vieressä.",
+      "caption": "Aloitusruutu"
+    },
+    "coach": {
+      "alt": "Valmentaja, posliinirobotti, jonka rinnassa lukee ”COACH”, tervehtii sinua laudan toiselta puolelta; sen sanat näkyvät myös tekstityksenä.",
+      "caption": "Valmentaja"
+    },
+    "challenges": {
+      "alt": "Valmentajan haasteet -valikko: matti- ja taktiikkasarjat vaikeustasoineen ja jo suoritetut sarjat sekä valitun sarjan kuvaus.",
+      "caption": "Valmentajan haasteet"
+    },
+    "analysis": {
+      "alt": "Analyysitila: arviopalkki, laudalle piirretty nuoli, kommentoidut siirrot ja kummankin osapuolen tarkkuus sekä ohjausnäppäinten luettelo.",
+      "caption": "Analyysi"
+    },
+    "game": {
+      "alt": "Sivulta nähtynä toinen robotti kurottaa pöydän yli siirtämään nappulaa toisen odottaessa; lyödyt nappulat seisovat laudan vieressä.",
+      "caption": "Katso peliä"
+    },
+    "hall": {
+      "alt": "Kaksi robottia istuu vastakkain shakkilaudan ääressä punaisissa samettituoleissa korkeiden ikkunoiden alla.",
+      "caption": "Kuninkaallinen sali"
+    },
+    "opponent": {
+      "alt": "Lähikuva posliinisesta robottivastustajasta, jonka pää on painunut kohti lautaa.",
+      "caption": "Vastustajasi"
+    },
+    "scoresheet": {
+      "alt": "Robotin käsi kirjoittaa siirrot pöytäkirjaan täytekynällä.",
+      "caption": "Pöytäkirja"
+    },
+    "note": "Versio 1.0.0. Kuvissa näkyvä käyttöliittymä on englanninkielinen.",
+    "viewer": "Kuvien katselu",
+    "close": "Sulje",
+    "previous": "Edellinen kuva",
+    "next": "Seuraava kuva"
+  },
+  "trailer": {
+    "eyebrow": "Traileri",
+    "title": "Scacelith <em>liikkeessä</em>",
+    "soon_title": "Traileri julkaistaan pian",
+    "soon_text": "Sillä välin voit käydä istumaan: peli on valmiina ladattavaksi.",
+    "privacy": "YouTubesta ei ladata mitään ennen kuin hyväksyt sen soittimen.",
+    "open_youtube": "Katso YouTubessa"
+  },
+  "online": {
+    "eyebrow": "Verkkopeli",
+    "title": "Oikeat vastustajat,<br><em>sama sali.</em>",
+    "lead": "Kirjaudu pelistä viralliselle palvelimelle ja pelaa ihmisiä vastaan eri puolilta maailmaa – yhä ensimmäisen persoonan näkökulmasta.",
+    "point_rated": "Pisteytetyt pelit kaikissa virallisissa peliajoissa, kussakin oma vahvuuslukunsa, joka lasketaan FIDEn sääntöjen mukaan.",
+    "point_match": "Vastustajan haku, haasteet nimellä ja yksityiset pelit koodilla – tai suora ottelu kahden tietokoneen välillä ilman palvelinta ja tiliä.",
+    "point_fair": "Reilu peli: automaattiset tarkistukset, päättyneiden pelien moottorianalyysi ja pelaajien ilmoitukset.",
+    "point_history": "Pelihistoriasi tällä sivustolla: lataa jokainen peli PGN-tiedostona tai animoituna GIF-kuvana.",
+    "point_open": "Kuka tahansa voi ylläpitää yhteisöpalvelinta: palvelin on vapaa ohjelmisto, ja sen rajapinta on dokumentoitu.",
+    "create": "Luo tili",
+    "signin": "Kirjaudu sisään",
+    "server_title": "Virallinen palvelin",
+    "status_checking": "Tarkistetaan…",
+    "address": "Osoite",
+    "registration": "Rekisteröityminen",
+    "categories": "Pisteytetyt peliajat",
+    "top_players": "Parhaat pelaajat",
+    "category": "Peliaika",
+    "board_loading": "Ladataan tulostaulukkoa…",
+    "full_board": "Koko tulostaulukko"
+  },
+  "download": {
+    "button": "Lataa",
+    "choose": "Valitse järjestelmäsi",
+    "see_release": "Katso julkaisu GitHubissa",
+    "latest": "Scacelith",
+    "all_releases": "Kaikki julkaisut",
+    "experimental": "Kokeellinen",
+    "source": "Lähdekoodi",
+    "source_zip": "ZIP-arkisto",
+    "eyebrow": "Lataus",
+    "title": "Käy istumaan.<br><em>Ilmainen ja avointa lähdekoodia.</em>",
+    "lead": "Pura ja pelaa: Windowsissa ja Linuxissa ei tarvita asennusohjelmaa, ja Macissa riittää, että vedät pelin Apit-kansioon. GitHub Actions kääntää jokaisen tiedoston sen versiotunnisteen mukaisesta lähdekoodista, ja käännöksen alkuperä on todennettu.",
+    "notes": "Julkaisutiedot",
+    "macos_note": "Apple silicon -Maceille (M1 tai uudempi), joissa on macOS 26 tai uudempi, ei virtuaalikoneisiin. Tämä versio on uudempi ja vähemmän testattu kuin muut. Sovellusta ei ole allekirjoittanut rekisteröity Apple-kehittäjä: avaa se ensimmäisellä kerralla kohdasta Järjestelmäasetukset › Tietosuoja ja turvallisuus › Avaa silti.",
+    "req_system": "Järjestelmä",
+    "req_system_value": "64-bittinen Windows (x64); 64-bittinen Linux (x86-64 tai aarch64), jossa on glibc 2.34, OpenSSL 3 sekä X11 tai XWayland, esimerkiksi Ubuntu 22.04 tai Debian 12; macOS 26 tai uudempi Apple siliconilla (kokeellinen)",
+    "req_gpu": "Grafiikka",
+    "req_gpu_value": "Näytönohjain, jossa on OpenGL 4.6 -tuki ja ajantasainen ajuri (Macissa peli tuo oman OpenGL:nsä)",
+    "req_included": "Mukana",
+    "req_included_value": "Stockfish 19 ja sen neuroverkko: voit pelata heti ilman verkkoyhteyttä",
+    "req_network": "Internetyhteys",
+    "req_network_value": "Verkkopeliin, GIF-kuviin sekä valmentajan ja analyysin ääneen (valinnainen, noin 399 MB:n lataus)",
+    "req_licence": "Lisenssi",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Tarkista latauksesi",
+    "verify_text": "GitHub todentaa jokaisen tiedoston käännöksen alkuperän. GitHub CLI -työkalulla:",
+    "checksums": "SHA-256-tarkistussummat (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Tekijät",
+    "title": "Tekijät ja <em>kiitokset</em>",
+    "engine_head": "Shakkimoottori",
+    "engine": "Stockfish 19, tekijöinä Stockfishin kehittäjät (GNU GPL v3). Sen neuroverkko on koulutettu Leela Chess Zero -projektin tarjoamalla datalla (Open Database License).",
+    "voice_head": "Ääni",
+    "voice": "Supertonen Supertonic 3, BigScience Open RAIL-M -lisenssillä: se ladataan pyynnöstäsi, ja se antaa äänen valmentajalle ja analyysille omalla tietokoneellasi.",
+    "fonts_head": "Kirjasimet",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) ja Amiri (Khaled Hosny); käsialat Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One ja LXGW WenKai (kaikki SIL Open Font License); shakkinappuloiden symbolit GNU FreeFont -kirjasimesta.",
+    "openings_head": "Avaukset ja tehtävät",
+    "openings": "Avausten nimet ovat lichess.org-sivuston chess-openings-tietokannasta ja valmentajan haasteiden tehtävät Lichessin tehtävätietokannasta; kumpikin on luovutettu vapaaseen käyttöön (CC0).",
+    "quote": "”Shakki on analyysin taidetta.”",
+    "quote_author": "Mihail Botvinnik"
+  },
+  "footer": {
+    "about": "Fotorealistinen shakkipeli ensimmäisen persoonan näkökulmasta, omalla OpenGL 4.6 -pelimoottorilla. Vapaa ohjelmisto GNU GPL v3 -lisenssillä.",
+    "game": "Peli",
+    "online": "Verkkopeli",
+    "api_docs": "Palvelimen API-dokumentaatio",
+    "source": "Lähdekoodi",
+    "game_source": "Peli GitHubissa",
+    "server_source": "Palvelin GitHubissa",
+    "releases": "Julkaisut",
+    "licence": "Lisenssi (GPL v3)",
+    "credits": "Stockfish on kehittäjiensä tavaramerkki. YouTube on Google LLC:n tavaramerkki. Windows on Microsoft Corporationin tavaramerkki. macOS on Apple Inc:n tavaramerkki. Linux on Linus Torvaldsin rekisteröity tavaramerkki. OpenGL on Hewlett Packard Enterprisen rekisteröity tavaramerkki.",
+    "legal": "Scacelith",
+    "made": "Tämä sivusto ei käytä evästeitä eikä seurantaa; YouTuben soitin latautuu vain, jos hyväksyt sen.",
+    "legal_link": "Oikeudelliset tiedot, tietosuoja ja käyttöehdot"
+  },
+  "common": {
+    "copy": "Kopioi",
+    "loading": "Ladataan…",
+    "noscript": "Tämä sivu tarvitsee JavaScriptiä voidakseen viestiä Scacelith-palvelimen kanssa."
+  },
+  "players": {
+    "title": "Tulostaulukko ja pelaajat",
+    "lead": "Virallisen palvelimen parhaat pelaajat kussakin pisteytetyssä peliajassa. Hae kuka tahansa pelaaja nähdäksesi hänen vahvuuslukunsa ja viimeisimmät pelinsä.",
+    "search_label": "Etsi pelaaja",
+    "search_placeholder": "Käyttäjänimi",
+    "search_button": "Hae",
+    "back": "Takaisin tulostaulukkoon",
+    "recent_games": "Viimeisimmät pelit",
+    "board_title": "Tulostaulukko",
+    "category": "Peliaika",
+    "col_rank": "Sija",
+    "col_player": "Pelaaja",
+    "col_rating": "Vahvuusluku",
+    "col_peak": "Huippu",
+    "col_games": "Pelit",
+    "col_wdl": "V / T / H",
+    "loading": "Ladataan…"
+  },
+  "account": {
+    "title": "Oma tili",
+    "auth_foot": "Yksi tili virallisella palvelimella sekä peliin että tälle sivustolle. Loitko tilisi pelissä Googlella? Anna sille salasana toiminnolla ”Unohditko salasanan?”.",
+    "common": {
+      "back": "Takaisin kirjautumiseen"
+    },
+    "fields": {
+      "login": "Käyttäjänimi tai sähköposti",
+      "password": "Salasana",
+      "show_password": "Näytä salasana",
+      "username": "Käyttäjänimi",
+      "email": "Sähköposti",
+      "confirm_password": "Vahvista salasana",
+      "current_password": "Nykyinen salasana",
+      "new_password": "Uusi salasana",
+      "new_email": "Uusi sähköpostiosoite",
+      "mfa_code": "Vahvistuskoodi (tai palautuskoodi)"
+    },
+    "signin": {
+      "tab": "Kirjaudu sisään",
+      "title": "Tervetuloa takaisin",
+      "remember": "Pidä minut kirjautuneena tällä laitteella",
+      "submit": "Kirjaudu sisään",
+      "forgot": "Unohditko salasanan?",
+      "resend": "Lähetä vahvistusviesti uudelleen"
+    },
+    "mfa": {
+      "title": "Kaksivaiheinen vahvistus",
+      "text": "Anna todennussovelluksesi näyttämä 6-numeroinen koodi.",
+      "code": "Sovelluksen koodi",
+      "use_recovery": "Käytä sen sijaan palautuskoodia",
+      "submit": "Vahvista"
+    },
+    "google": {
+      "or": "tai",
+      "button": "Kirjaudu Googlella",
+      "username_title": "Valitse käyttäjänimesi",
+      "username_text": "Google-tilisi on uusi tällä palvelimella. Valitse nimi, jonka muut pelaajat näkevät: sitä ei voi muuttaa myöhemmin.",
+      "username_submit": "Luo tilini",
+      "link_title": "Linkitä Google-tilisi",
+      "link_submit": "Linkitä ja kirjaudu sisään",
+      "returning": "Kirjaudutaan Googlella…"
+    },
+    "register": {
+      "tab": "Luo tili",
+      "title": "Ilmainen tili",
+      "closed": "Palvelin ei ota tällä hetkellä vastaan uusia tilejä.",
+      "username_hint": "Kirjaimia, numeroita, _ ja -; ensimmäisen merkin on oltava kirjain tai numero.",
+      "password_hint": "Vähintään 10 merkkiä, eikä siinä saa olla käyttäjänimeäsi tai sähköpostiosoitettasi.",
+      "pow_note": "Robottien torjumiseksi selaimesi ratkaisee pienen tehtävän, kun rekisteröidyt. Se kestää muutaman sekunnin.",
+      "submit": "Luo tili",
+      "done_title": "Tarkista sähköpostisi",
+      "done_text": "Lähetimme vahvistuslinkin osoitteeseesi. Luo tilisi avaamalla linkki ja kirjaudu sitten sisään.",
+      "done_hint": "Linkki on voimassa 24 tuntia. Eikö viestiä näy? Tarkista roskapostikansio tai pyydä viesti uudelleen.",
+      "go_signin": "Siirry kirjautumaan",
+      "legal_note": "Käyttäjänimesi, vahvuuslukusi ja pelisi ovat julkisia. Luomalla tilin hyväksyt käyttöehdot.",
+      "legal_link": "Tietosuoja ja käyttöehdot"
+    },
+    "forgot": {
+      "title": "Unohtunut salasana",
+      "text": "Anna tilisi sähköpostiosoite. Jos osoitteelle löytyy tili, lähetämme sinulle linkin, jolla voit valita uuden salasanan. Linkki on voimassa tunnin.",
+      "submit": "Lähetä linkki"
+    },
+    "resend": {
+      "title": "Vahvista sähköpostisi",
+      "text": "Etkö saanut vahvistusviestiä, vai vanhentuiko linkki? Anna osoitteesi, niin saat uuden.",
+      "submit": "Lähetä uudelleen"
+    },
+    "dash": {
+      "public_profile": "Julkinen profiili",
+      "signout": "Kirjaudu ulos",
+      "tab_overview": "Yleiskatsaus",
+      "tab_games": "Pelit",
+      "tab_devices": "Laitteet",
+      "tab_settings": "Asetukset"
+    },
+    "overview": {
+      "info": "Tietosi",
+      "ratings": "Vahvuuslukusi",
+      "sanctions": "Seuraamukset",
+      "recent": "Viimeisimmät pelit",
+      "all_games": "Kaikki pelisi"
+    },
+    "games": {
+      "filter_category": "Peliaika",
+      "all": "Kaikki",
+      "custom": "Mukautettu",
+      "filter_rated": "Tyyppi",
+      "rated": "Pisteytetty",
+      "casual": "Pisteyttämätön",
+      "filter_result": "Tulos",
+      "wins": "Voitetut",
+      "losses": "Hävityt",
+      "draws": "Tasapelit"
+    },
+    "devices": {
+      "title": "Kirjautuneet laitteet",
+      "signout_all": "Kirjaudu ulos kaikkialta",
+      "text": "Jokainen kirjautuminen pelissä tai tällä sivustolla näkyy omana laitteenaan. Kirjaa ulos ne, joita et tunnista."
+    },
+    "settings": {
+      "challenges_title": "Haasteet",
+      "challenges_text": "Muut pelaajat voivat haastaa sinut pelissä käyttäjänimelläsi.",
+      "challenges_label": "Hyväksy haasteet",
+      "mfa_title": "Kaksivaiheinen vahvistus",
+      "mfa_text": "Ota se käyttöön tai poista se käytöstä ja luo uudet palautuskoodit pelin tilisivulla.",
+      "password_title": "Vaihda salasana",
+      "password_text": "Muut laitteesi kirjataan ulos, ja tämä laite pysyy kirjautuneena.",
+      "password_submit": "Vaihda salasana",
+      "email_title": "Vaihda sähköpostiosoite",
+      "email_submit": "Lähetä vahvistuslinkki",
+      "export_title": "Lataa tietoni",
+      "export_text": "Kaikki tiedot, joita palvelin säilyttää tilistäsi, yhtenä JSON-tiedostona.",
+      "export_submit": "Lataa tietoni",
+      "delete_title": "Poista tili",
+      "delete_text": "Tätä ei voi perua. Pelisi ja vahvuuslukusi säilyvät anonyymillä nimellä; sähköpostiosoitteesi, salasanasi ja laitteesi poistetaan.",
+      "delete_confirm": "Vahvista kirjoittamalla käyttäjänimesi",
+      "delete_submit": "Poista tilini"
+    }
+  },
+  "gif": {
+    "title": "Animoitu GIF",
+    "preparing": "Valmistellaan GIF-kuvaa…",
+    "download": "Lataa GIF",
+    "make": "Tee GIF",
+    "pause": "Keskeytä animaatio",
+    "back": "Takaisin peleihini",
+    "options": "Asetukset",
+    "size": "Koko",
+    "size_small": "Pieni (284 × 350)",
+    "size_medium": "Keskikokoinen (424 × 515)",
+    "size_large": "Suuri (628 × 762)",
+    "orientation": "Lauta nähtynä",
+    "orientation_white": "Valkean puolelta",
+    "orientation_black": "Mustan puolelta",
+    "speed": "Nopeus",
+    "speed_fast": "Nopea (0,25 s siirtoa kohden)",
+    "speed_normal": "Normaali (0,5 s siirtoa kohden)",
+    "speed_slow": "Hidas (1 s siirtoa kohden)",
+    "speed_very_slow": "Erittäin hidas (2 s siirtoa kohden)",
+    "coords": "Näytä koordinaatit",
+    "regenerate": "Tee uudelleen",
+    "note": "Palvelin piirtää jokaisen GIF-kuvan. Aiemmin tekemäsi GIF saadaan heti; uusia voi tehdä vain muutaman minuutissa."
+  },
+  "notfound": {
+    "title": "Sivua ei löytynyt",
+    "text": "Tämä ruutu on tyhjä. Sivu on ehkä siirretty.",
+    "home": "Takaisin Scacelithiin"
+  },
+  "js": {
+    "common": {
+      "loading": "Ladataan…",
+      "retry": "Yritä uudelleen",
+      "close": "Sulje",
+      "copy": "Kopioi",
+      "copied": "Kopioitu leikepöydälle.",
+      "copy_failed": "Kopiointi ei onnistunut. Valitse teksti ja kopioi se käsin.",
+      "load_more": "Näytä lisää",
+      "show_password": "Näytä salasana",
+      "hide_password": "Piilota salasana",
+      "signin_needed": "Jatka kirjautumalla sisään.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Palvelimeen ei saada yhteyttä. Tarkista verkkoyhteytesi ja yritä uudelleen.",
+      "timeout": "Palvelin vastasi liian hitaasti. Yritä uudelleen.",
+      "server_busy": "Palvelin on ruuhkautunut. Yritä hetken kuluttua uudelleen.",
+      "rate_limited": "Liian monta pyyntöä. Yritä uudelleen {time} kuluttua.",
+      "rate_limited_short": "Liian monta pyyntöä. Yritä hetken kuluttua uudelleen.",
+      "internal_error": "Palvelimella tapahtui odottamaton virhe. Yritä myöhemmin uudelleen.",
+      "invalid_token": "Istuntosi on päättynyt. Kirjaudu uudelleen sisään.",
+      "unauthorized": "Kirjaudu sisään.",
+      "not_found": "Ei löytynyt.",
+      "unknown": "Jokin meni vikaan ({code}).",
+      "invalid_credentials": "Väärä käyttäjänimi, sähköposti tai salasana.",
+      "too_many_attempts": "Liian monta yritystä. Yritä uudelleen {time} kuluttua.",
+      "banned": "Tämä tili on jäädytetty {date} asti.",
+      "banned_permanent": "Tämä tili on jäädytetty.",
+      "email_unverified": "Sähköpostiosoitettasi ei ole vielä vahvistettu. Avaa lähettämämme linkki tai pyydä uusi.",
+      "invalid_mfa_token": "Tämä kirjautumisvaihe on vanhentunut. Kirjaudu uudelleen sisään.",
+      "invalid_code": "Koodi on väärä tai jo käytetty.",
+      "mfa_code_required": "Anna vahvistuskoodisi.",
+      "invalid_password": "Väärä salasana.",
+      "password_not_set": "Tällä tilillä ei ole vielä salasanaa: aseta se kirjautumissivun toiminnolla ”Unohditko salasanan?”.",
+      "registration_closed": "Palvelin ei ota tällä hetkellä vastaan uusia tilejä.",
+      "invalid_username": "Tämä käyttäjänimi ei ole sallittu.",
+      "username_taken": "Tämä käyttäjänimi on jo varattu.",
+      "invalid_email": "Tämä sähköpostiosoite ei kelpaa.",
+      "email_taken": "Tämä sähköpostiosoite on jo toisen tilin käytössä.",
+      "same_email": "Tämä on jo sähköpostiosoitteesi.",
+      "weak_password": "Salasana on liian heikko.",
+      "weak_too_short": "Salasana on liian lyhyt (vähintään {min} merkkiä).",
+      "weak_too_long": "Salasana on liian pitkä.",
+      "weak_contains_username": "Salasanassa ei saa olla käyttäjänimeäsi.",
+      "weak_contains_email": "Salasanassa ei saa olla sähköpostiosoitettasi.",
+      "weak_too_common": "Tämä salasana on liian yleinen. Valitse toinen.",
+      "pow_failed": "Robottitarkistus epäonnistui. Yritä uudelleen.",
+      "passwords_differ": "Salasanat eivät täsmää.",
+      "required": "Täytä tämä kenttä.",
+      "email_format": "Anna kelvollinen sähköpostiosoite.",
+      "username_format": "{min}–{max} merkkiä: kirjaimia, numeroita, _ ja -; ensimmäisen merkin on oltava kirjain tai numero.",
+      "password_length": "Vähintään {min} merkkiä.",
+      "confirm_name": "Kirjoita käyttäjänimesi täsmälleen näytetyssä muodossa.",
+      "game_too_long": "Tämä peli on liian pitkä GIF-kuvaksi.",
+      "gif_disabled": "Tämä palvelin ei tee GIF-kuvia.",
+      "render_failed": "Palvelin ei voinut piirtää tätä GIF-kuvaa.",
+      "invalid_game": "Tätä peliä ei ole olemassa.",
+      "invalid_player": "Anna käyttäjänimi: 2–24 merkkiä, kirjaimia, numeroita, _, . tai -.",
+      "player_not_found": "Tällä nimellä ei löytynyt pelaajaa.",
+      "sso_cancelled": "Google-kirjautuminen peruttiin.",
+      "sso_mismatch": "Tätä Google-kirjautumista ei aloitettu tässä välilehdessä, tai se on jo käytetty. Yritä uudelleen.",
+      "sso_expired": "Tämä Google-kirjautuminen on vanhentunut. Yritä uudelleen.",
+      "invalid_verifier": "Tämä Google-kirjautuminen aloitettiin toisessa välilehdessä tai selaimessa. Aloita uudelleen tältä sivulta.",
+      "sso_email_unverified": "Google ei ole vahvistanut tämän Google-tilin sähköpostiosoitetta.",
+      "sso_account_exists": "Tätä sähköpostiosoitetta käyttää jo tili, mutta sillä ei ole salasanaa, jolla Google voitaisiin linkittää siihen. Anna sille salasana toiminnolla ”Unohditko salasanan?” ja kirjaudu sitten uudelleen Googlella.",
+      "sso_failed": "Google-kirjautumista ei voitu viedä loppuun. Yritä uudelleen.",
+      "sso_disabled": "Google-kirjautuminen ei ole käytettävissä tällä palvelimella.",
+      "sso_already_linked": "Tämä Google-tili on jo linkitetty toiseen tiliin.",
+      "account_disabled": "Tätä tiliä ei voi enää käyttää.",
+      "sso_storage": "Selaimesi estää tämän sivuston tallennustilan, jota Google-kirjautuminen tarvitsee. Salli se tai kirjaudu salasanallasi.",
+      "sso_url": "Palvelin vastasi odottamattomalla Google-osoitteella, joten Google-kirjautuminen keskeytettiin."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekunnin",
+        "other": "{count} sekunnin"
+      },
+      "minutes": {
+        "one": "{count} minuutin",
+        "other": "{count} minuutin"
+      }
+    },
+    "download": {
+      "exe": "Suoritettava tiedosto",
+      "zip": "ZIP-arkisto",
+      "dmg": "Levykuva",
+      "archive": "Arkisto",
+      "file": "Tiedosto",
+      "unavailable": "Ei saatavilla",
+      "your_system": "Järjestelmäsi",
+      "eyebrow_release": "Versio {version}",
+      "published": "Julkaistu {date}",
+      "unreachable": "GitHubiin ei juuri nyt saada yhteyttä: katso julkaisusivu.",
+      "available": "Saatavilla",
+      "verify_file": "tiedosto",
+      "no_build": "Järjestelmälle {os} ei ole tällä hetkellä pelin versiota.",
+      "x64": "64-bittinen (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bittinen, Intel / AMD tai Arm",
+      "macos_arm64": "Apple silicon, macOS 26 tai uudempi",
+      "experimental": "Kokeellinen"
+    },
+    "server": {
+      "online": "Verkossa",
+      "offline": "Ei tavoitettavissa",
+      "busy": "Ruuhkautunut",
+      "open": "Avoinna",
+      "closed": "Suljettu",
+      "updated": "Päivitetty {time}",
+      "min_games": "Pelaajat, joilla on vähintään {count} pisteytettyä peliä tässä peliajassa.",
+      "empty": "Tässä peliajassa ei ole vielä sijoitettuja pelaajia.",
+      "error": "Tulostaulukkoa ei voi ladata juuri nyt."
+    },
+    "game": {
+      "number": "Peli nro {id}",
+      "white": "Valkea",
+      "black": "Musta",
+      "you": "sinä",
+      "vs": "vastaan",
+      "outcome_win": "Voitto",
+      "outcome_loss": "Häviö",
+      "outcome_draw": "Tasapeli",
+      "outcome_aborted": "Peruttu",
+      "result_white": "Valkea voitti",
+      "result_black": "Musta voitti",
+      "result_draw": "Tasapeli",
+      "result_aborted": "Peruttu",
+      "rated": "Pisteytetty",
+      "casual": "Pisteyttämätön",
+      "custom": "Mukautettu",
+      "moves": {
+        "one": "{count} siirto",
+        "other": "{count} siirtoa"
+      },
+      "duration": "Kesto {time}",
+      "rating_diff": "Vahvuusluvun muutos {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Lataa peli PGN-tiedostona",
+      "copy_pgn": "Kopioi",
+      "copy_pgn_title": "Kopioi PGN",
+      "gif": "GIF",
+      "gif_title": "Tee animoitu GIF (avautuu uuteen välilehteen)",
+      "gif_signin": "Kirjaudu sisään, niin voit tehdä GIF-kuvia",
+      "pgn_copied": "PGN kopioitu leikepöydälle.",
+      "pgn_saved": "PGN ladattu.",
+      "none": "Ei vielä pelejä. Verkkopelisi näkyvät tässä.",
+      "none_filtered": "Mikään peli ei vastaa näitä suodattimia.",
+      "none_public": "Ei vielä pelejä.",
+      "total": {
+        "one": "{count} peli",
+        "other": "{count} peliä"
+      },
+      "termination_unknown": "Peli päättyi",
+      "reason": {
+        "1": "Shakkimatti",
+        "2": "Luovutus",
+        "3": "Aika loppui",
+        "4": "Toinen laiton siirto (tuomittu häviö)",
+        "5": "Patti",
+        "6": "Kuollut asema (riittämätön materiaali)",
+        "7": "Lippu putosi, mutta vastustaja ei voi tehdä mattia",
+        "8": "Viidesti toistunut asema",
+        "9": "75 siirron sääntö",
+        "10": "Kolmesti toistunut asema (vaadittu)",
+        "11": "50 siirron sääntö (vaadittu)",
+        "12": "Sovittu tasapeli",
+        "13": "Toinen laiton siirto, mutta vastustaja ei voi tehdä mattia",
+        "14": "Luovutus, mutta vastustaja ei voi tehdä mattia",
+        "20": "Jätetty kesken (yhteys poikki liian kauan)",
+        "21": "Jätetty kesken, mutta vastustaja ei voi tehdä mattia",
+        "22": "Peli peruttu",
+        "23": "Ensimmäistä siirtoa ei tehty ajoissa (peruttu)",
+        "24": "Tuomittu häviö (reilun pelin rikkomus)",
+        "25": "Palvelin perui pelin",
+        "26": "Kummankin pelaajan yhteys katkesi"
+      }
+    },
+    "ratings": {
+      "category": "Peliaika",
+      "rating": "Vahvuusluku",
+      "peak": "Huippu",
+      "games": "Pelit",
+      "wdl": "V / T / H",
+      "provisional": "Alustava vahvuusluku",
+      "none": "Ei vielä pisteytettyjä pelejä.",
+      "unrated_hint": "Kysymysmerkki tarkoittaa alustavaa vahvuuslukua (pelattuja pelejä on vielä vähän)."
+    },
+    "account": {
+      "member_since": "Jäsen {date} alkaen",
+      "last_login": "Viimeisin kirjautuminen",
+      "created": "Luotu",
+      "email": "Sähköposti",
+      "pending_email": "Odottaa vahvistusta: {email}",
+      "verified": "Vahvistettu",
+      "unverified": "Ei vahvistettu",
+      "mfa": "Kaksivaiheinen vahvistus",
+      "mfa_on": "Päällä",
+      "mfa_off": "Pois",
+      "google": "Google-kirjautuminen",
+      "google_on": "Linkitetty",
+      "google_off": "Ei linkitetty",
+      "password": "Salasana",
+      "password_set": "Asetettu",
+      "password_unset": "Ei vielä asetettu",
+      "challenges": "Haasteet",
+      "challenges_all": "Hyväksytään",
+      "challenges_none": "Hylätään",
+      "badge_verified": "Sähköposti vahvistettu",
+      "badge_mfa": "2FA päällä",
+      "badge_google": "Google",
+      "ban_until": "Tilisi on jäädytetty {date} asti.",
+      "ban_permanent": "Tilisi on jäädytetty.",
+      "sanction_ban": "Jäädytys",
+      "sanction_mm_block": "Vastustajan haku estetty",
+      "sanction_warning": "Varoitus",
+      "sanction_until": "{date} asti",
+      "sanction_permanent": "pysyvä",
+      "devices_current": "Tämä laite",
+      "devices_unknown": "Nimetön laite",
+      "devices_signed_in": "Kirjautunut {date}",
+      "devices_seen": "Viimeksi käytetty {time}",
+      "devices_expires": "Vanhenee {date}",
+      "devices_revoke": "Kirjaa ulos",
+      "devices_revoked": "Laite on kirjattu ulos.",
+      "devices_none": "Ei muita laitteita.",
+      "signout_all_confirm": "Kirjataanko kaikki laitteet ulos, myös tämä?",
+      "signed_out": "Olet kirjautunut ulos.",
+      "signed_in": "Tervetuloa, {name}.",
+      "prefs_saved": "Tallennettu.",
+      "password_changed": "Salasanasi on vaihdettu. Muut laitteesi on kirjattu ulos.",
+      "email_sent": "Vahvistuslinkki on lähetetty uuteen osoitteeseen. Osoitteesi vaihtuu, kun avaat linkin.",
+      "email_changed": "Sähköpostiosoitteesi on nyt {email}.",
+      "email_current": "Nykyinen osoite: {email}.",
+      "email_pending": "Vaihto osoitteeseen {email} odottaa vahvistuslinkin avaamista.",
+      "export_done": "Tietosi on ladattu.",
+      "deleted": "Tilisi on poistettu.",
+      "delete_confirm_label": "Vahvista kirjoittamalla {name}",
+      "register_done": "Lähetimme vahvistuslinkin osoitteeseen {email}. Luo tilisi avaamalla linkki ja kirjaudu sitten sisään.",
+      "register_ready": "Tilisi on valmis. Voit kirjautua sisään.",
+      "forgot_done": "Jos jokin tili käyttää tätä osoitetta, linkki uuden salasanan valitsemiseen on matkalla.",
+      "resend_done": "Jos tämä osoite odottaa vahvistusta, uusi linkki on matkalla.",
+      "pow_solving": "Ratkaistaan robottitarkistuksen tehtävää…",
+      "mfa_recovery": "Palautuskoodi",
+      "mfa_recovery_text": "Anna yksi palautuskoodeistasi. Kukin koodi toimii vain kerran.",
+      "mfa_app": "Sovelluksen koodi",
+      "mfa_app_text": "Anna todennussovelluksesi näyttämä 6-numeroinen koodi.",
+      "mfa_state_on": "Kaksivaiheinen vahvistus on käytössä tällä tilillä.",
+      "mfa_state_off": "Kaksivaiheinen vahvistus ei ole käytössä tällä tilillä.",
+      "client_label": "Scacelith-verkkosivusto ({browser})",
+      "username": "Käyttäjänimi",
+      "password_rules": "Vähintään {min} merkkiä, eikä siinä saa olla käyttäjänimeäsi tai sähköpostiosoitettasi.",
+      "password_note": "Muut laitteesi kirjataan ulos, ja tämä laite pysyy kirjautuneena.",
+      "signin_label": "Kirjaudu sisään",
+      "google_link_text": "Tili {name} käyttää jo tätä sähköpostiosoitetta. Linkitä se Googleen antamalla tilin salasana kerran; sen jälkeen ”Kirjaudu Googlella” riittää.",
+      "auth_foot_google": "Yksi tili virallisella palvelimella sekä peliin että tälle sivustolle. Loitko sen pelissä Googlella? Kirjaudu Googlella myös täällä."
+    },
+    "players": {
+      "since": "Jäsen {date} alkaen",
+      "games": "Pelit",
+      "rated": "Pisteytetyt",
+      "wins": "Voitot",
+      "draws": "Tasapelit",
+      "losses": "Häviöt",
+      "view": "Katso pelaajan {name} profiili",
+      "you": "Sinä",
+      "board": "Tulostaulukko"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Peli nro {id} · {date}",
+      "preparing": "Valmistellaan GIF-kuvaa…",
+      "rendering": "Palvelin piirtää GIF-kuvaa. Pitkässä pelissä tämä voi kestää muutaman sekunnin…",
+      "ready": "GIF-kuvasi on valmis. Lataus on alkanut.",
+      "ready_again": "GIF-kuvasi on valmis.",
+      "signin": "Kirjaudu sisään, niin voit tehdä peleistäsi GIF-kuvia.",
+      "signin_button": "Kirjaudu sisään",
+      "missing": "Peliä ei valittu.",
+      "retry_in": "Voit yrittää uudelleen {time} kuluttua.",
+      "confirm": "Paina ”Tee GIF”, niin palvelin piirtää tämän pelin tililläsi.",
+      "retry_now": "Voit yrittää nyt uudelleen."
+    },
+    "home": {
+      "create_account": "Luo tili",
+      "my_account": "Oma tili",
+      "my_games": "Omat pelit",
+      "signin": "Kirjaudu sisään"
+    },
+    "trailer": {
+      "title": "Scacelithin traileri",
+      "notice": "Tämä video on YouTubessa. Jos toistat sen täällä, Googlen soitin latautuu, ja se saa IP-osoitteesi ja voi tallentaa laitteellesi evästeitä tai muita seurantatekniikoita.",
+      "accept": "Hyväksy ja toista",
+      "google_privacy": "Googlen tietosuojakäytäntö"
+    }
+  },
+  "legal": {
+    "eyebrow": "Lakiasiat",
+    "title": "Oikeudelliset tiedot, tietosuoja ja käyttöehdot",
+    "lead": "Kuka julkaisee ja isännöi Scacelithia, mitä tiedoillesi tapahtuu tällä verkkosivustolla, pelissä ja virallisella palvelimella, sekä siellä pelaamisen säännöt.",
+    "updated": "Päivitetty viimeksi: 11.10.2026",
+    "toc": "Tällä sivulla",
+    "notice": {
+      "title": "Oikeudelliset tiedot",
+      "publisher_label": "Julkaisija",
+      "publisher": "Scacelithin julkaisee yksityishenkilö muuna kuin ammatillisena toimintana. Ranskan lain sallimalla tavalla (21.6.2004 annetun lain nro 2004-575 artikla 1-1 II) julkaisijan henkilöllisyyttä ei ilmoiteta tässä; se on isännöintipalvelun tarjoajan tiedossa.",
+      "contact_label": "Yhteystiedot",
+      "contact": "Kaikissa tätä verkkosivustoa, virallista palvelinta tai tietojasi koskevissa kysymyksissä.",
+      "host_server": "Virallinen pelipalvelin ja tilitiedot",
+      "host_server_note": "Palvelimet sijaitsevat Ranskassa.",
+      "host_site": "Tämä verkkosivusto ja API-dokumentaatio (GitHub Pages)",
+      "host_domain": "Verkkotunnus\u00advälittäjä",
+      "licence_label": "Lisenssi",
+      "licence": "Peli ja sen palvelin ovat vapaita ohjelmistoja GNU General Public License v3 -lisenssillä, ja niiden lähdekoodi on julkinen:",
+      "game_source": "peli",
+      "server_source": "palvelin",
+      "phone": "Puhelin"
+    },
+    "privacy": {
+      "title": "Tietosuoja",
+      "intro": "Scacelith ei näytä mainoksia, ei myy tietoja eikä mittaa kävijämääriä. Henkilötietoja käytetään vain tämän verkkosivuston ja virallisen palvelimen toimintaan alla kuvatulla tavalla. Rekisterinpitäjä on julkaisija, jonka tavoittaa yllä olevasta yhteysosoitteesta.",
+      "site_title": "Tällä verkkosivustolla",
+      "site_hosting": "GitHub isännöi sivustoa ja tallentaa kaikkien verkkosivustojen isännöijien tavoin kävijöiden IP-osoitteet tietoturvasyistä.",
+      "github_privacy": "GitHubin tietosuojaseloste",
+      "site_requests": "Uusimman julkaisun näyttämiseksi selaimesi hakee tiedot GitHubin rajapinnasta (api.github.com); palvelimen tilan, tulostaulukon, pelaajien ja tilisi näyttämiseksi se hakee tiedot viralliselta palvelimelta (caissa.scacelith.com). Kumpikin saa IP-osoitteesi, kuten minkä tahansa pyynnön yhteydessä.",
+      "site_storage": "Sivusto ei käytä evästeitä eikä analytiikkaa. Se tallentaa selaimeesi vain kielivalintasi ja, kun kirjaudut sisään, istuntosi: vain nykyiseen välilehteen tai tälle laitteelle, jos valitset ”Pidä minut kirjautuneena”. Google-kirjautuminen säilyttää lisäksi kertakäyttöiset koodinsa nykyisessä välilehdessä, kunnes ne on käytetty. Kaikki tämä on välttämätöntä sivuston toiminnalle, ja vain virallinen palvelin saa istunnon ja koodit.",
+      "site_trailer": "Traileri on YouTube-video. YouTubesta ei ladata mitään ennen kuin painat ”Hyväksy ja toista”; sen jälkeen YouTube (Google) saa IP-osoitteesi ja voi tallentaa laitteellesi evästeitä tai muita seurantatekniikoita. Vastaustasi ei muisteta: kysymys esitetään uudelleen seuraavalla käynnilläsi.",
+      "site_google": "Tili-sivun painike ”Kirjaudu Googlella” ei lataa Googlelta mitään ennen kuin painat sitä. Sen jälkeen selaimesi siirtyy Googlen kirjautumissivulle (accounts.google.com), ja Google ohjaa sen takaisin tälle sivustolle kertakäyttöisen koodin kanssa, jonka sivusto välittää viralliselle palvelimelle. Google saa IP-osoitteesi ja sen, mitä syötät sen sivulle, omien käytäntöjensä mukaisesti.",
+      "google_privacy": "Googlen tietosuojakäytäntö",
+      "game_title": "Pelissä",
+      "game_local": "Peli säilyttää asetuksensa, paikalliset tuloksesi ja kirjautumisesi tietokoneellasi. Kirjautuminen säilytetään järjestelmän suojatussa tallennustilassa: Windowsissa DPAPI, macOS:ssä Avainnippu, Linuxissa Secret Service -avainnippu tai muuten tiedosto, jota vain käyttäjätilisi voi lukea.",
+      "game_network": "Se ei lähetä mitään omin päin: ei telemetriaa eikä päivitysten tarkistusta. Se ottaa yhteyden viralliseen palvelimeen vain, kun avaat Pelaa verkossa -sivun, Hugging Face -palveluun vain, kun lataat valmentajan äänen, ja suorassa ottelussa vastustajasi tietokoneeseen, joka saa silloin tietää IP-osoitteesi (peli voi myös avata portin reitittimeesi UPnP:llä).",
+      "account_title": "Tilisi virallisella palvelimella",
+      "account_intro": "Kun luot tilin pelissä tai tällä verkkosivustolla ja pelaat verkossa, seuraavat tiedot lähetetään viralliselle palvelimelle, jota OVH isännöi Ranskassa:",
+      "data_account": "<strong>Tili:</strong> käyttäjänimi, sähköpostiosoite, salasana (tallennetaan vain Argon2id-tiivisteenä), kaksivaiheisen vahvistuksen salainen avain (salattuna) ja palautuskoodit (tiivisteinä), rekisteröitymispäivä ja viimeisimmän kirjautumisen päivämäärä.",
+      "data_google": "<strong>Kirjautuminen Googlella:</strong> Google lähettää Google-tilisi tunnisteen, sähköpostiosoitteesi ja nimesi. Palvelin säilyttää tunnisteen ja osoitteen ja käyttää nimeä vain käyttäjänimen ehdottamiseen.",
+      "data_sessions": "<strong>Kirjautuneet laitteet:</strong> kunkin kirjautumisen osalta laitteen nimi (pelin versio ja järjestelmä, esimerkiksi ”Scacelith/1.0.0 win64”, tai tällä verkkosivustolla selain ja järjestelmä), IP-osoite ja käyttöpäivät.",
+      "data_games": "<strong>Pelit ja vahvuusluvut:</strong> jokainen verkkopeli (pelaajat, siirrot, kuhunkin siirtoon käytetty aika, tulos, päivämäärät) ja vahvuuslukusi. Pelin aikana pääsi ja kätesi liikkeet välitetään reaaliajassa vastustajallesi, eikä niitä koskaan tallenneta.",
+      "data_security": "<strong>Tietoturvaloki:</strong> kirjautumiset, epäonnistuneet yritykset ja tilin muutokset IP-osoitteineen.",
+      "data_fairplay": "<strong>Reilu peli:</strong> sinun tekemäsi tai sinusta tehdyt ilmoitukset kommentteineen; kesken jätetyt ja väliin jääneet pelit; seuraamukset; sekä peleille tehdyt tarkistukset väärennetyistä tai mahdottomista siirroista Stockfish-moottorin tilastoihin.",
+      "basis_title": "Miksi ja millä oikeusperusteella",
+      "basis_contract": "Tilisi ja verkkopelin ylläpito (kirjautuminen, vastustajan haku, vahvuusluvut, pelitallenteet, palvelun lähettämät sähköpostit): palvelu, johon rekisteröidyt (GDPR:n 6 artiklan 1 kohdan b alakohta).",
+      "basis_security": "Tilien ja palvelimen suojaaminen sekä pelien reiluuden turvaaminen (tietoturvaloki, IP-osoitteet, reilun pelin tarkistukset, seuraamukset): julkaisijan ja pelaajien oikeutettu etu (GDPR:n 6 artiklan 1 kohdan f alakohta).",
+      "basis_trailer": "Trailerin toistaminen YouTubesta: suostumuksesi, jonka annat painikkeella (GDPR:n 6 artiklan 1 kohdan a alakohta).",
+      "public_title": "Mitä kaikki voivat nähdä",
+      "public": "Käyttäjänimesi, rekisteröitymispäiväsi, vahvuuslukusi ja täydellinen pelilistasi kaikkine siirtoineen ovat julkisia: tällä verkkosivustolla, palvelimen rajapinnan kautta ja kunkin pelin PGN-tiedostossa. Sähköpostiosoitettasi, laitteitasi, kirjautumisiasi, seuraamuksiasi ja reilun pelin tietojasi ei koskaan näytetä. Voit kieltäytyä suorista haasteista, mutta pelejä ei voi piilottaa.",
+      "auto_title": "Automaattiset päätökset",
+      "auto": "Jotkin pelin protokollan rikkomukset, kuten väärennetty viesti tai asemassa mahdoton siirto, ovat varma todiste huijaamisesta: palvelin tuomitsee silloin pelin hävityksi, asettaa tilille 24 tunnin porttikiellon, poistaa sen tulostaulukosta ja palauttaa pisteet, jotka sen vastustajat ovat menettäneet sille viimeisten 60 päivän aikana. Kun 24 tunnin sisällä on kolme kesken jätettyä, peruttua tai väliin jäänyttä peliä, pisteytetty vastustajan haku keskeytetään 15 minuutiksi ja sen jälkeen pidemmäksi aikaa. Moottoritilastot eivät koskaan yksinään johda seuraamukseen: päätöksen tekee ihminen. Voit pyytää minkä tahansa päätöksen uudelleenkäsittelyä kirjoittamalla yhteysosoitteeseen.",
+      "recipients_title": "Kuka saa tietosi",
+      "recipient_ovh": "OVH SAS isännöi palvelinta ja sen tietoja Ranskassa.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) lähettää palvelimen sähköpostit: se saa osoitteesi, käyttäjänimesi ja viestin.",
+      "recipient_google": "Google saa sen, mitä selaimesi lähettää sille, kun valitset kirjautumisen Googlella, Googlen oman tietosuojakäytännön mukaisesti.",
+      "recipient_staff": "Palvelimen ylläpitäjä ja moderaattorit näkevät tili- ja reilun pelin tiedot palvelun ylläpitämiseksi.",
+      "recipient_players": "Muut pelaajat näkevät julkiset tiedot, ja vastustajasi näkee siirtosi ja liikkeesi pelin aikana.",
+      "recipient_none": "Ei kukaan muu: tietoja ei myydä, vuokrata eikä käytetä mainontaan.",
+      "transfers": "Tilitiedot pysyvät Ranskassa. GitHub, Google ja Porkbun (joka välittää yhteysosoitteeseen lähetetyt viestit) sijaitsevat Yhdysvalloissa: niiden saamiin tietoihin sovelletaan niiden omia käytäntöjä ja suojatoimia, joita ne käyttävät siirtäessään tietoja Euroopan unionin ulkopuolelle.",
+      "retention_title": "Kuinka kauan tietoja säilytetään",
+      "ret_account": "<strong>Tili:</strong> kunnes poistat sen. Rekisteröityminen, jonka osoitetta ei koskaan vahvisteta, poistetaan 24 tunnin kuluttua.",
+      "ret_sessions": "<strong>Kirjautuneet laitteet:</strong> kunnes kirjaudut ulos tai laitetta ei ole käytetty 30 päivään, ja enintään 90 päivää.",
+      "ret_ip": "<strong>IP-osoitteet:</strong> poistetaan 30 päivän kuluttua. Palvelimen lokeihin tallennetaan vain lyhennettyjä osoitteita.",
+      "ret_security": "<strong>Tietoturvaloki:</strong> 90 päivää.",
+      "ret_conduct": "<strong>Kesken jätetyt ja väliin jääneet pelit:</strong> 30 päivää.",
+      "ret_games": "<strong>Pelit ja vahvuusluvut:</strong> niin kauan kuin palvelin säilyttää pelitallenteensa, jotka ovat myös vastustajiesi tallenteita. Kun tilisi on poistettu, nimesi korvataan niissä merkinnällä ”deleted#” ja numerolla.",
+      "ret_fairplay": "<strong>Seuraamukset, ilmoitukset ja reilun pelin tulokset:</strong> säilytetään, jotta porttikiellon saaneet pelaajat eivät voi yksinkertaisesti palata ja muut pelaajat pysyvät suojattuina. Kun tilisi on poistettu, ne liittyvät enää vain tilin numeroon.",
+      "ret_backups": "<strong>Varmuuskopiot:</strong> poistetut tiedot voivat säilyä lyhyen aikaa palvelimen varmuuskopiossa, kunnes se korvataan uudella.",
+      "ret_contact": "<strong>Yhteysosoitteeseen lähetetyt viestit:</strong> niin kauan kuin niihin vastaaminen edellyttää.",
+      "rights_title": "Oikeutesi",
+      "rights": "Voit tarkastaa tietosi, oikaista, poistaa ja viedä ne, rajoittaa niiden käyttöä ja vastustaa sitä (GDPR:n 15–21 artikla).",
+      "rights_self": "Suurin osa tästä onnistuu tililläsi, pelissä tai tämän verkkosivuston Tili-sivulla: lataa tilitietosi JSON-tiedostona, vaihda sähköpostiosoitteesi tai salasanasi, kirjaa muut laitteet ulos tai poista tili saman tien.",
+      "rights_google": "Googlella luodulla tilillä ei ole salasanaa: jos haluat viedä tilin tiedot tai poistaa tilin, anna sille ensin salasana toiminnolla ”Unohditko salasanan?”.",
+      "rights_mail": "Kaikissa muissa asioissa, myös tiedoissa, joita vienti ei sisällä (reilun pelin tarkistukset, sinusta tehdyt ilmoitukset), kirjoita yhteysosoitteeseen. Saat vastauksen kuukauden kuluessa.",
+      "rights_cnil": "Jos katsot, ettei oikeuksiasi kunnioiteta, voit tehdä valituksen CNIL:lle (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) tai oman maasi tietosuojaviranomaiselle.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Käyttöehdot",
+      "intro": "Nämä ehdot koskevat virallista palvelinta (caissa.scacelith.com) ja tämän verkkosivuston tilisivuja. Luomalla tilin tai pelaamalla virallisella palvelimella hyväksyt ne.",
+      "service": "<strong>Maksuton palvelu.</strong> Peli on vapaa ja maksuton ohjelmisto. Virallinen palvelin tarjotaan maksutta ja sellaisenaan ilman takuuta sen saatavuudesta: se voi muuttua, olla välillä poissa käytöstä tai lopettaa toimintansa.",
+      "account": "<strong>Tilisi.</strong> Olet vastuussa siitä, mitä tililläsi tehdään, ja sen salasanan pitämisestä salassa. Kirjoita heti yhteysosoitteeseen, jos epäilet, että joku muu käyttää tiliäsi.",
+      "username": "<strong>Käyttäjänimesi</strong> on julkinen: se ei saa olla loukkaava eikä vihamielinen, eikä sillä saa esiintyä toisena henkilönä tai paljastaa kenenkään henkilötietoja.",
+      "fair": "<strong>Reilu peli.</strong> Pisteytetyn pelin aikana ei saa käyttää apuna shakkimoottoria, toista henkilöä eikä mitään muuta välinettä. Muokatut peliohjelmat, väärennetyt viestit ja palvelimen tahallinen ylikuormittaminen ovat kiellettyjä.",
+      "conduct": "<strong>Pelaa pelisi loppuun.</strong> Jos 24 tunnin sisällä jätät kolme kertaa pelin kesken, perut sen tai jätät väliin pelin, johon sinulle on löydetty vastustaja, pisteytetty vastustajan haku keskeytyy joksikin aikaa.",
+      "reports": "<strong>Ilmoitukset</strong> on tehtävä vilpittömässä mielessä. Ilmoita pelaajasta tai laittomasta sisällöstä, kuten loukkaavasta käyttäjänimestä, pelin ilmoituspainikkeella tai kirjoittamalla yhteysosoitteeseen.",
+      "sanctions": "<strong>Seuraamukset.</strong> Näiden sääntöjen rikkominen voi johtaa tuomittuun häviöön, varoitukseen, porttikieltoon ja poistamiseen tulostaulukosta; huijarille menetetyt pisteet palautetaan hänen vastustajilleen. Vain varma todiste huijaamisesta johtaa automaattiseen seuraamukseen; kaikesta muusta päättää ihminen. Voit riitauttaa seuraamuksen kirjoittamalla yhteysosoitteeseen.",
+      "liability": "<strong>Vastuu.</strong> Lain sallimissa rajoissa julkaisija ei ole vastuussa palvelun katkoksista eikä pelien, vahvuuslukujen tai tietojen menetyksestä.",
+      "end": "<strong>Päättyminen.</strong> Voit poistaa tilisi milloin tahansa. Tili, joka rikkoo näitä ehtoja, voidaan asettaa porttikieltoon.",
+      "changes": "<strong>Muutokset.</strong> Näitä ehtoja voidaan muuttaa; tämän sivun yläreunan päivämäärä osoittaa voimassa olevan version, ja pelaamisen jatkaminen muutoksen jälkeen tarkoittaa muutoksen hyväksymistä.",
+      "law": "<strong>Sovellettava laki.</strong> Näihin ehtoihin sovelletaan Ranskan lakia. Riitatilanteessa kirjoita ensin yhteysosoitteeseen, jotta voimme etsiä ratkaisun yhdessä."
+    },
+    "version_note": "Tämä sivu on saatavilla useilla kielillä; jos kieliversiot poikkeavat toisistaan, ranskankielinen versio on ratkaiseva."
+  }
+}

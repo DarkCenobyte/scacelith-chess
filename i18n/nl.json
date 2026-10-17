@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotorealistisch schaken in de eerste persoon",
+      "description": "Gratis fotorealistisch schaken in de eerste persoon voor Windows, Linux en macOS: Stockfish 19, een coach, partijanalyse en online spelen in een koninklijke zaal."
+    },
+    "players": {
+      "title": "Ranglijst en spelers — Scacelith",
+      "description": "De beste spelers van de officiële Scacelith-server in elk speeltempo met rating, hun ratings en hun laatste partijen."
+    },
+    "account": {
+      "title": "Je account — Scacelith",
+      "description": "Log in op je Scacelith-account: ratings, partijgeschiedenis, PGN- en GIF-downloads, ingelogde apparaten en instellingen."
+    },
+    "gif": {
+      "title": "Geanimeerde GIF — Scacelith",
+      "description": "Een geanimeerde GIF van een Scacelith-partij."
+    },
+    "legal": {
+      "title": "Wettelijke vermeldingen, privacy en gebruiksvoorwaarden — Scacelith",
+      "description": "Wie Scacelith uitgeeft en host, wat de website, het spel en de officiële server met persoonsgegevens doen, je rechten, en de regels van de officiële server."
+    }
+  },
+  "brand": {
+    "tagline": "Het koninklijke spel"
+  },
+  "nav": {
+    "skip": "Direct naar de inhoud",
+    "home": "Startpagina",
+    "label": "Hoofdmenu",
+    "game": "Het spel",
+    "modes": "Speelwijzen",
+    "gallery": "Galerij",
+    "trailer": "Trailer",
+    "online": "Online",
+    "players": "Ranglijst",
+    "account": "Account",
+    "language": "Taal",
+    "menu": "Menu",
+    "download": "Downloaden"
+  },
+  "hero": {
+    "image_alt": "Twee porseleinen robots schaken aan een notenhouten tafel in een zonovergoten marmeren zaal.",
+    "lead": "Neem plaats aan een gewaxte notenhouten tafel in een zonovergoten koninklijke zaal. Aan de andere kant van het bord wacht een porseleinen robot, aangestuurd door Stockfish, op je eerste zet.",
+    "watch": "Trailer bekijken",
+    "meta": "Vrije software · Windows, Linux, macOS (experimenteel) · Grafische kaart met OpenGL 4.6",
+    "caption": "Beeld uit het spel: de koninklijke zaal"
+  },
+  "highlights": {
+    "engine": "Eigen OpenGL 4.6-engine",
+    "stockfish": "Stockfish 19 ingebouwd",
+    "rules": "FIDE-regels",
+    "online": "Online spelen",
+    "languages": "34 talen"
+  },
+  "experience": {
+    "eyebrow": "De beleving",
+    "title": "Geen bord op een scherm.<br><em>Een plaats aan tafel.</em>",
+    "lead": "Scacelith brengt terug wat een echte partij maakt: de zaal, de stilte, de klok, een tegenstander die je aankijkt, en de rituelen van het toernooi.",
+    "presence": {
+      "title": "In de eerste persoon",
+      "text": "Je kijkt door de ogen van je robot: kijk rond in de zaal, buig je over het bord, kijk op naar je tegenstander, werp een blik op je notatieformulier, of sta op en loop naar een uiteinde van de tafel."
+    },
+    "ritual": {
+      "title": "Toernooiregels",
+      "text": "Een stuk dat je aanraakt, moet je ook spelen, en je hand drukt de klok in om de zet af te ronden. Staat het tonen van legale zetten uit, dan bestraft de arbiter een illegale zet, en kost een tweede je de partij."
+    },
+    "scoresheet": {
+      "title": "Met de hand geschreven",
+      "text": "Beide spelers noteren elke zet op hun eigen notatieformulier, elk in een eigen handschrift, en slaan na elke veertig zetten de bladzijde om. Je hoort de pen over het papier gaan."
+    },
+    "opponent": {
+      "title": "Een waardige tegenstander",
+      "text": "Stockfish 19 op jouw niveau, van Nieuweling (800) tot Stockfish Max (3500), met een rating die na elke partij volgens de FIDE-regels wordt berekend."
+    },
+    "engine": {
+      "title": "Gebouwd voor dit spel",
+      "text": "Een engine die vanaf nul is geschreven: fysiek gebaseerd licht, marmer, gewaxt hout, porselein en messing, de zon door de ramen, zachte schaduwen en reflecties. Kwaliteitsinstellingen, van Zeer laag tot Ultra, stemmen hem af op je grafische kaart."
+    },
+    "languages": {
+      "title": "34 talen",
+      "text": "Engels, Frans, Duits, Spaans, Portugees uit Portugal en Brazilië, Italiaans, Nederlands, Zweeds, Deens, Fins, Ests, Lets, Litouws, Pools, Tsjechisch, Slowaaks, Sloveens, Kroatisch, Hongaars, Roemeens, Bulgaars, Grieks, Turks, Oekraïens, Russisch, Arabisch, Hindi, Indonesisch, Vietnamees, Koreaans, Japans en Chinees, vereenvoudigd en traditioneel. Arabisch wordt van rechts naar links weergegeven, en de coach spreekt hardop in elke taal behalve het Chinees, waar zijn woorden als ondertitels verschijnen."
+    }
+  },
+  "modes": {
+    "eyebrow": "Speelwijzen",
+    "title": "Voor elke partij<br><em>een eigen tafel.</em>",
+    "lead": "Alles wordt in dezelfde zaal gespeeld, vanaf het titelscherm. Offline staat Stockfish altijd klaar voor een partij.",
+    "new_game": {
+      "name": "Nieuwe partij",
+      "text": "Speel tegen Stockfish op de sterkte die je kiest, met een speeltempo van bullet tot klassiek, of speel tegen een vriend op dezelfde computer, ieder door de ogen van de eigen robot."
+    },
+    "coach": {
+      "name": "Coach",
+      "text": "Tegenover je zit een leraar die op jouw niveau speelt en je door de partij loodst: dreigingen, goede zetten, fouten, en met zijn eigen hand speelt hij uit wat een fout kost. Van de schaakregels tot expertniveau, met een stem die op je eigen computer wordt gesynthetiseerd."
+    },
+    "challenges": {
+      "name": "Uitdagingen van de coach",
+      "text": "Korte reeksen stellingen, die elk één vaardigheid trainen: mat in één tot drie, vorken, penningen en andere tactiek, verdediging, en de elementaire eindspelen tegen de coach. Hints alleen als je erom vraagt, en een groen vinkje voor elke reeks die je voltooit."
+    },
+    "analysis": {
+      "name": "Analyse",
+      "text": "Stockfish analyseert je opgeslagen partijen, je onlinepartijen of elke andere PGN: een evaluatiebalk, de belangrijkste zetten gemarkeerd van briljant tot blunder, de betere zet als pijl getekend, en commentaar hardop en in ondertitels. De handen van de robots spelen de zetten terwijl je de partij doorloopt."
+    },
+    "online": {
+      "name": "Online spelen",
+      "text": "Echte tegenstanders via een Scacelith-server: partijen met rating, automatisch een tegenstander zoeken, uitdagingen en privépartijen, of een directe partij tussen twee computers. De robot van je tegenstander beweegt live mee."
+    },
+    "watch": {
+      "name": "Partij bekijken",
+      "text": "Twee Stockfish-spelers nemen het tegen elkaar op, terwijl jij je onzichtbaar en vrij door de zaal beweegt, van het ene gezichtspunt naar het andere."
+    },
+    "saved": {
+      "name": "Opgeslagen partijen",
+      "text": "Je partijen worden bewaard als PGN-bestanden. Speel ze na in de zaal, met de echte bedenktijden en klokken, of haal partijen uit andere programma's binnen."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerij",
+    "title": "Gezien <em>vanuit de zaal</em>",
+    "lead": "Elk beeld is in het spel vastgelegd, in realtime, door de eigen engine van het spel.",
+    "title_screen": {
+      "alt": "Het titelscherm: het menu van Scacelith naast twee robots die in de zaal schaken.",
+      "caption": "Het titelscherm"
+    },
+    "coach": {
+      "alt": "De coach, een porseleinen robot met “COACH” op zijn borst, begroet je aan de andere kant van het bord; wat hij zegt, verschijnt ook als ondertitel.",
+      "caption": "Coach"
+    },
+    "challenges": {
+      "alt": "Het menu Uitdagingen van de coach: reeksen matzetten en tactiek met hun moeilijkheidsgraad en de al voltooide reeksen, naast de beschrijving van de geselecteerde reeks.",
+      "caption": "Uitdagingen van de coach"
+    },
+    "analysis": {
+      "alt": "De analysemodus: de evaluatiebalk, een pijl op het bord, de geannoteerde zetten met de nauwkeurigheid van beide kanten, en het overzicht van de besturing.",
+      "caption": "Analyse"
+    },
+    "game": {
+      "alt": "Van opzij gezien reikt een robot over de tafel om een stuk te verplaatsen, terwijl de andere wacht; de geslagen stukken staan naast het bord.",
+      "caption": "Partij bekijken"
+    },
+    "hall": {
+      "alt": "Twee robots zitten tegenover elkaar aan het schaakbord, in roodfluwelen stoelen, onder hoge ramen.",
+      "caption": "De koninklijke zaal"
+    },
+    "opponent": {
+      "alt": "Close-up van de porseleinen robottegenstander, met het hoofd naar het bord gebogen.",
+      "caption": "Je tegenstander"
+    },
+    "scoresheet": {
+      "alt": "De hand van een robot noteert de zetten met een vulpen op het notatieformulier.",
+      "caption": "Het notatieformulier"
+    },
+    "note": "Versie 1.0.0. De interface op deze beelden is in het Engels.",
+    "viewer": "Afbeeldingsviewer",
+    "close": "Sluiten",
+    "previous": "Vorige afbeelding",
+    "next": "Volgende afbeelding"
+  },
+  "trailer": {
+    "eyebrow": "Trailer",
+    "title": "Scacelith <em>in beweging</em>",
+    "soon_title": "De trailer komt binnenkort",
+    "soon_text": "Neem in de tussentijd alvast plaats: het spel staat klaar om te downloaden.",
+    "privacy": "Er wordt niets van YouTube geladen totdat je de speler ervan accepteert.",
+    "open_youtube": "Bekijken op YouTube"
+  },
+  "online": {
+    "eyebrow": "Online spelen",
+    "title": "Echte tegenstanders,<br><em>dezelfde zaal.</em>",
+    "lead": "Log vanuit het spel in op de officiële server en speel tegen mensen van overal ter wereld, nog altijd in de eerste persoon.",
+    "point_rated": "Partijen met rating in elk officieel speeltempo, elk met een eigen rating, berekend volgens de FIDE-regels.",
+    "point_match": "Automatisch een tegenstander zoeken, uitdagingen op naam en privépartijen met een code; of een directe partij tussen twee computers, zonder server of account.",
+    "point_fair": "Fair play: automatische controles, engineanalyse van afgelopen partijen en meldingen van spelers.",
+    "point_history": "Je partijgeschiedenis op deze site: download elke partij als PGN of als geanimeerde GIF.",
+    "point_open": "Iedereen kan een communityserver draaien: de server is vrije software en de API ervan is gedocumenteerd.",
+    "create": "Account aanmaken",
+    "signin": "Inloggen",
+    "server_title": "De officiële server",
+    "status_checking": "Controleren…",
+    "address": "Adres",
+    "registration": "Registratie",
+    "categories": "Speeltempo's met rating",
+    "top_players": "Topspelers",
+    "category": "Speeltempo",
+    "board_loading": "Ranglijst laden…",
+    "full_board": "Volledige ranglijst"
+  },
+  "download": {
+    "button": "Downloaden",
+    "choose": "Kies je systeem",
+    "see_release": "Bekijk de release op GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Alle releases",
+    "experimental": "Experimenteel",
+    "source": "Broncode",
+    "source_zip": "ZIP-archief",
+    "eyebrow": "Downloaden",
+    "title": "Neem plaats.<br><em>Gratis en open source.</em>",
+    "lead": "Uitpakken en spelen: geen installatieprogramma op Windows of Linux, en op een Mac sleep je het spel naar Programma's. Elk bestand wordt door GitHub Actions gebouwd uit de broncode van de bijbehorende tag, met een geattesteerde buildherkomst.",
+    "notes": "Releaseopmerkingen",
+    "macos_note": "Voor Macs met Apple Silicon (M1 of nieuwer) met macOS 26 of nieuwer, niet in een virtuele machine; nieuwer en minder getest dan de andere builds. De app is niet ondertekend door een geregistreerde Apple-ontwikkelaar: open hem de eerste keer via Systeeminstellingen › Privacy en beveiliging › Open toch.",
+    "req_system": "Systeem",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 of aarch64) met glibc 2.34, OpenSSL 3 en X11 of XWayland, zoals Ubuntu 22.04 of Debian 12; macOS 26 of nieuwer op Apple Silicon (experimenteel)",
+    "req_gpu": "Grafische kaart",
+    "req_gpu_value": "Een grafische kaart met OpenGL 4.6 en een actueel stuurprogramma (op een Mac brengt het spel zijn eigen OpenGL mee)",
+    "req_included": "Inbegrepen",
+    "req_included_value": "Stockfish 19 en zijn neurale netwerk: meteen offline spelen",
+    "req_network": "Internet",
+    "req_network_value": "Voor online spelen, GIF's, en de stem van de coach en van de analyse (een optionele download van ongeveer 399 MB)",
+    "req_licence": "Licentie",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Controleer je download",
+    "verify_text": "De buildherkomst van elk bestand is door GitHub geattesteerd. Met de GitHub CLI:",
+    "checksums": "SHA-256-controlesommen (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Credits",
+    "title": "Credits en <em>dank</em>",
+    "engine_head": "Schaakengine",
+    "engine": "Stockfish 19, door de Stockfish-ontwikkelaars (GNU GPL v3). Het neurale netwerk is getraind op gegevens van het project Leela Chess Zero (Open Database License).",
+    "voice_head": "Stem",
+    "voice": "Supertonic 3 van Supertone, onder de licentie BigScience Open RAIL-M: het wordt op jouw verzoek gedownload en spreekt voor de coach en de analyse, op je eigen computer.",
+    "fonts_head": "Lettertypen",
+    "fonts": "EB Garamond van Georg Duffner, Cinzel van Natanael Gama en Amiri van Khaled Hosny; handschrift in Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One en LXGW WenKai (allemaal SIL Open Font License); schaakfiguren uit GNU FreeFont.",
+    "openings_head": "Openingen en puzzels",
+    "openings": "Openingsnamen uit de chess-openings-database van lichess.org, en de puzzels van de uitdagingen van de coach uit de puzzeldatabase van Lichess, beide in het publieke domein geplaatst (CC0).",
+    "quote": "“Schaken is de kunst van de analyse.”",
+    "quote_author": "Michail Botvinnik"
+  },
+  "footer": {
+    "about": "Een fotorealistisch schaakspel in de eerste persoon, op een eigen OpenGL 4.6-engine. Vrije software onder de GNU GPL v3.",
+    "game": "Het spel",
+    "online": "Online",
+    "api_docs": "API-documentatie van de server",
+    "source": "Broncode",
+    "game_source": "Het spel op GitHub",
+    "server_source": "De server op GitHub",
+    "releases": "Releases",
+    "licence": "Licentie (GPL v3)",
+    "credits": "Stockfish is een handelsmerk van zijn ontwikkelaars. YouTube is een handelsmerk van Google LLC. Windows is een handelsmerk van Microsoft Corporation. macOS is een handelsmerk van Apple Inc. Linux is het geregistreerde handelsmerk van Linus Torvalds. OpenGL is een geregistreerd handelsmerk van Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Deze site plaatst geen cookies en gebruikt geen trackers; de speler van YouTube wordt alleen geladen als je die accepteert.",
+    "legal_link": "Wettelijke vermeldingen, privacy en voorwaarden"
+  },
+  "common": {
+    "copy": "Kopiëren",
+    "loading": "Laden…",
+    "noscript": "Deze pagina heeft JavaScript nodig om met de Scacelith-server te communiceren."
+  },
+  "players": {
+    "title": "Ranglijst en spelers",
+    "lead": "De beste spelers van de officiële server in elk speeltempo met rating. Zoek een speler op om de ratings en laatste partijen van die speler te zien.",
+    "search_label": "Speler zoeken",
+    "search_placeholder": "Gebruikersnaam",
+    "search_button": "Zoeken",
+    "back": "Terug naar de ranglijst",
+    "recent_games": "Laatste partijen",
+    "board_title": "Ranglijst",
+    "category": "Speeltempo",
+    "col_rank": "Plaats",
+    "col_player": "Speler",
+    "col_rating": "Rating",
+    "col_peak": "Hoogste",
+    "col_games": "Partijen",
+    "col_wdl": "W / R / V",
+    "loading": "Laden…"
+  },
+  "account": {
+    "title": "Je account",
+    "auth_foot": "Eén account op de officiële server, voor het spel en voor deze site. Heb je je account in het spel met Google aangemaakt? Gebruik dan “Wachtwoord vergeten?” om er een wachtwoord voor in te stellen.",
+    "common": {
+      "back": "Terug naar inloggen"
+    },
+    "fields": {
+      "login": "Gebruikersnaam of e-mailadres",
+      "password": "Wachtwoord",
+      "show_password": "Wachtwoord tonen",
+      "username": "Gebruikersnaam",
+      "email": "E-mailadres",
+      "confirm_password": "Wachtwoord bevestigen",
+      "current_password": "Huidig wachtwoord",
+      "new_password": "Nieuw wachtwoord",
+      "new_email": "Nieuw e-mailadres",
+      "mfa_code": "Verificatiecode (of een herstelcode)"
+    },
+    "signin": {
+      "tab": "Inloggen",
+      "title": "Welkom terug",
+      "remember": "Ingelogd blijven op dit apparaat",
+      "submit": "Inloggen",
+      "forgot": "Wachtwoord vergeten?",
+      "resend": "Bevestigingsmail opnieuw sturen"
+    },
+    "mfa": {
+      "title": "Tweestaps\u00adverificatie",
+      "text": "Voer de 6-cijferige code uit je authenticator-app in.",
+      "code": "Code uit de app",
+      "use_recovery": "Een herstelcode gebruiken",
+      "submit": "Bevestigen"
+    },
+    "google": {
+      "or": "of",
+      "button": "Inloggen met Google",
+      "username_title": "Kies je gebruikersnaam",
+      "username_text": "Je Google-account is nieuw op deze server. Kies de naam die andere spelers te zien krijgen: die kan later niet meer worden gewijzigd.",
+      "username_submit": "Mijn account aanmaken",
+      "link_title": "Je Google-account koppelen",
+      "link_submit": "Koppelen en inloggen",
+      "returning": "Inloggen met Google…"
+    },
+    "register": {
+      "tab": "Account aanmaken",
+      "title": "Een gratis account",
+      "closed": "De server accepteert op dit moment geen nieuwe accounts.",
+      "username_hint": "Letters, cijfers, _ en -, beginnend met een letter of een cijfer.",
+      "password_hint": "Minstens 10 tekens, zonder je gebruikersnaam of e-mailadres.",
+      "pow_note": "Om robots buiten de deur te houden, lost je browser bij het registreren een kleine puzzel op. Dat duurt een paar seconden.",
+      "submit": "Account aanmaken",
+      "done_title": "Controleer je e-mail",
+      "done_text": "We hebben een bevestigingslink naar je adres gestuurd. Open die om je account aan te maken en log daarna in.",
+      "done_hint": "De link is 24 uur geldig. Niets in je inbox? Kijk in je spammap, of vraag de e-mail opnieuw aan.",
+      "go_signin": "Naar inloggen",
+      "legal_note": "Je gebruikersnaam, ratings en partijen worden openbaar. Door een account aan te maken, ga je akkoord met de gebruiksvoorwaarden.",
+      "legal_link": "Privacy en gebruiksvoorwaarden"
+    },
+    "forgot": {
+      "title": "Wachtwoord vergeten",
+      "text": "Voer het e-mailadres van je account in. Hoort er een account bij dit adres, dan sturen we je een link om een nieuw wachtwoord te kiezen. Die link is een uur geldig.",
+      "submit": "Link versturen"
+    },
+    "resend": {
+      "title": "Bevestig je e-mailadres",
+      "text": "Geen bevestigingsmail ontvangen, of is de link verlopen? Voer je adres in om een nieuwe te krijgen.",
+      "submit": "Opnieuw versturen"
+    },
+    "dash": {
+      "public_profile": "Openbaar profiel",
+      "signout": "Uitloggen",
+      "tab_overview": "Overzicht",
+      "tab_games": "Partijen",
+      "tab_devices": "Apparaten",
+      "tab_settings": "Instellingen"
+    },
+    "overview": {
+      "info": "Je gegevens",
+      "ratings": "Je ratings",
+      "sanctions": "Sancties",
+      "recent": "Laatste partijen",
+      "all_games": "Al je partijen"
+    },
+    "games": {
+      "filter_category": "Speeltempo",
+      "all": "Alle",
+      "custom": "Aangepast",
+      "filter_rated": "Soort",
+      "rated": "Met rating",
+      "casual": "Vrijblijvend",
+      "filter_result": "Uitslag",
+      "wins": "Gewonnen",
+      "losses": "Verloren",
+      "draws": "Remise"
+    },
+    "devices": {
+      "title": "Ingelogde apparaten",
+      "signout_all": "Overal uitloggen",
+      "text": "Elke keer dat je inlogt, in het spel of op deze site, telt als een apparaat. Log de apparaten uit die je niet herkent."
+    },
+    "settings": {
+      "challenges_title": "Uitdagingen",
+      "challenges_text": "Andere spelers kunnen je vanuit het spel op naam uitdagen.",
+      "challenges_label": "Uitdagingen accepteren",
+      "mfa_title": "Tweestapsverificatie",
+      "mfa_text": "Zet die aan of uit, en maak nieuwe herstelcodes aan, via de accountpagina in het spel.",
+      "password_title": "Wachtwoord wijzigen",
+      "password_text": "Je andere apparaten worden uitgelogd; dit apparaat blijft ingelogd.",
+      "password_submit": "Wachtwoord wijzigen",
+      "email_title": "E-mailadres wijzigen",
+      "email_submit": "Bevestigingslink versturen",
+      "export_title": "Mijn gegevens downloaden",
+      "export_text": "Alles wat de server over je account bewaart, in één JSON-bestand.",
+      "export_submit": "Mijn gegevens downloaden",
+      "delete_title": "Account verwijderen",
+      "delete_text": "Dit kan niet ongedaan worden gemaakt. Je partijen en ratings blijven bestaan, onder een anonieme naam; je e-mailadres, wachtwoord en apparaten worden gewist.",
+      "delete_confirm": "Typ je gebruikersnaam ter bevestiging",
+      "delete_submit": "Mijn account verwijderen"
+    }
+  },
+  "gif": {
+    "title": "Geanimeerde GIF",
+    "preparing": "GIF voorbereiden…",
+    "download": "GIF downloaden",
+    "make": "GIF maken",
+    "pause": "Animatie pauzeren",
+    "back": "Naar mijn partijen",
+    "options": "Opties",
+    "size": "Formaat",
+    "size_small": "Klein (284 × 350)",
+    "size_medium": "Gemiddeld (424 × 515)",
+    "size_large": "Groot (628 × 762)",
+    "orientation": "Bord gezien vanuit",
+    "orientation_white": "Wit",
+    "orientation_black": "Zwart",
+    "speed": "Snelheid",
+    "speed_fast": "Snel (0,25 s per zet)",
+    "speed_normal": "Normaal (0,5 s per zet)",
+    "speed_slow": "Langzaam (1 s per zet)",
+    "speed_very_slow": "Zeer langzaam (2 s per zet)",
+    "coords": "Coördinaten tonen",
+    "regenerate": "Opnieuw maken",
+    "note": "De server tekent elke GIF. Een GIF die je al hebt gemaakt, komt meteen terug; nieuwe zijn beperkt tot een paar per minuut."
+  },
+  "notfound": {
+    "title": "Pagina niet gevonden",
+    "text": "Dit veld is leeg. De pagina is misschien verplaatst.",
+    "home": "Terug naar Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Laden…",
+      "retry": "Opnieuw proberen",
+      "close": "Sluiten",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd naar het klembord.",
+      "copy_failed": "Kopiëren is mislukt. Selecteer de tekst en kopieer die handmatig.",
+      "load_more": "Meer tonen",
+      "show_password": "Wachtwoord tonen",
+      "hide_password": "Wachtwoord verbergen",
+      "signin_needed": "Log in om verder te gaan.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "De server is niet bereikbaar. Controleer je verbinding en probeer het opnieuw.",
+      "timeout": "De server deed er te lang over om te antwoorden. Probeer het opnieuw.",
+      "server_busy": "De server is druk bezet. Probeer het zo meteen opnieuw.",
+      "rate_limited": "Te veel verzoeken. Probeer het over {time} opnieuw.",
+      "rate_limited_short": "Te veel verzoeken. Probeer het zo meteen opnieuw.",
+      "internal_error": "Er is een onverwachte fout opgetreden op de server. Probeer het later opnieuw.",
+      "invalid_token": "Je sessie is beëindigd. Log opnieuw in.",
+      "unauthorized": "Log eerst in.",
+      "not_found": "Niet gevonden.",
+      "unknown": "Er is iets misgegaan ({code}).",
+      "invalid_credentials": "Gebruikersnaam, e-mailadres of wachtwoord onjuist.",
+      "too_many_attempts": "Te veel pogingen. Probeer het over {time} opnieuw.",
+      "banned": "Dit account is geschorst tot {date}.",
+      "banned_permanent": "Dit account is geschorst.",
+      "email_unverified": "Je e-mailadres is nog niet bevestigd. Open de link die we je hebben gestuurd, of vraag een nieuwe aan.",
+      "invalid_mfa_token": "Deze inlogstap is verlopen. Log opnieuw in.",
+      "invalid_code": "Onjuiste of al gebruikte code.",
+      "mfa_code_required": "Voer je verificatiecode in.",
+      "invalid_password": "Onjuist wachtwoord.",
+      "password_not_set": "Dit account heeft nog geen wachtwoord: gebruik “Wachtwoord vergeten?” op de inlogpagina om er een in te stellen.",
+      "registration_closed": "De server accepteert op dit moment geen nieuwe accounts.",
+      "invalid_username": "Deze gebruikersnaam is niet toegestaan.",
+      "username_taken": "Deze gebruikersnaam is al in gebruik.",
+      "invalid_email": "Dit e-mailadres is niet geldig.",
+      "email_taken": "Dit e-mailadres wordt al door een ander account gebruikt.",
+      "same_email": "Dit is al je e-mailadres.",
+      "weak_password": "Dit wachtwoord is te zwak.",
+      "weak_too_short": "Het wachtwoord is te kort (minstens {min} tekens).",
+      "weak_too_long": "Het wachtwoord is te lang.",
+      "weak_contains_username": "Het wachtwoord mag je gebruikersnaam niet bevatten.",
+      "weak_contains_email": "Het wachtwoord mag je e-mailadres niet bevatten.",
+      "weak_too_common": "Dit wachtwoord komt te vaak voor. Kies een ander.",
+      "pow_failed": "De controle tegen robots is mislukt. Probeer het opnieuw.",
+      "passwords_differ": "De twee wachtwoorden komen niet overeen.",
+      "required": "Vul dit veld in.",
+      "email_format": "Voer een geldig e-mailadres in.",
+      "username_format": "{min} tot {max} tekens: letters, cijfers, _ en -, beginnend met een letter of een cijfer.",
+      "password_length": "Minstens {min} tekens.",
+      "confirm_name": "Typ je gebruikersnaam precies zoals die wordt weergegeven.",
+      "game_too_long": "Deze partij is te lang om er een GIF van te maken.",
+      "gif_disabled": "Deze server maakt geen GIF's.",
+      "render_failed": "De server kon deze GIF niet tekenen.",
+      "invalid_game": "Deze partij bestaat niet.",
+      "invalid_player": "Voer een gebruikersnaam in: 2 tot 24 letters, cijfers, _, . of -.",
+      "player_not_found": "Geen speler met deze naam.",
+      "sso_cancelled": "Inloggen met Google is geannuleerd.",
+      "sso_mismatch": "Deze Google-inlogpoging is niet in dit tabblad gestart, of is al gebruikt. Probeer het opnieuw.",
+      "sso_expired": "Deze Google-inlogpoging is verlopen. Probeer het opnieuw.",
+      "invalid_verifier": "Deze Google-inlogpoging is in een ander tabblad of een andere browser gestart. Begin opnieuw vanaf deze pagina.",
+      "sso_email_unverified": "Google heeft het e-mailadres van dit Google-account niet bevestigd.",
+      "sso_account_exists": "Er bestaat al een account met dit e-mailadres, maar het heeft geen wachtwoord waarmee Google kan worden gekoppeld. Stel er een in met “Wachtwoord vergeten?” en log daarna opnieuw in met Google.",
+      "sso_failed": "Inloggen met Google kon niet worden voltooid. Probeer het opnieuw.",
+      "sso_disabled": "Inloggen met Google is niet beschikbaar op deze server.",
+      "sso_already_linked": "Dit Google-account is al aan een ander account gekoppeld.",
+      "account_disabled": "Dit account kan niet meer worden gebruikt.",
+      "sso_storage": "Je browser blokkeert de opslag van deze site, die nodig is om met Google in te loggen. Sta die opslag toe, of log in met je wachtwoord.",
+      "sso_url": "De server antwoordde met een onverwacht Google-adres, dus is het inloggen met Google gestopt."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} seconde",
+        "other": "{count} seconden"
+      },
+      "minutes": {
+        "one": "{count} minuut",
+        "other": "{count} minuten"
+      }
+    },
+    "download": {
+      "exe": "Uitvoerbaar bestand",
+      "zip": "ZIP-archief",
+      "dmg": "Schijfkopie",
+      "archive": "Archief",
+      "file": "Bestand",
+      "unavailable": "Niet beschikbaar",
+      "your_system": "Jouw systeem",
+      "eyebrow_release": "Versie {version}",
+      "published": "Gepubliceerd op {date}",
+      "unreachable": "GitHub is nu niet bereikbaar: zie de pagina met releases.",
+      "available": "Beschikbaar",
+      "verify_file": "het bestand",
+      "no_build": "Op dit moment is er geen build van het spel voor {os}.",
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD of Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 of nieuwer",
+      "experimental": "Experimenteel"
+    },
+    "server": {
+      "online": "Bereikbaar",
+      "offline": "Onbereikbaar",
+      "busy": "Druk",
+      "open": "Open",
+      "closed": "Gesloten",
+      "updated": "Bijgewerkt {time}",
+      "min_games": "Spelers met minstens {count} partijen met rating in dit speeltempo.",
+      "empty": "Nog geen spelers in de ranglijst van dit speeltempo.",
+      "error": "De ranglijst kan nu niet worden geladen."
+    },
+    "game": {
+      "number": "Partij nr. {id}",
+      "white": "Wit",
+      "black": "Zwart",
+      "you": "jij",
+      "vs": "tegen",
+      "outcome_win": "Gewonnen",
+      "outcome_loss": "Verloren",
+      "outcome_draw": "Remise",
+      "outcome_aborted": "Afgebroken",
+      "result_white": "Wit wint",
+      "result_black": "Zwart wint",
+      "result_draw": "Remise",
+      "result_aborted": "Afgebroken",
+      "rated": "Met rating",
+      "casual": "Vrijblijvend",
+      "custom": "Aangepast",
+      "moves": {
+        "one": "{count} zet",
+        "other": "{count} zetten"
+      },
+      "duration": "Duur {time}",
+      "rating_diff": "Ratingwijziging {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Partij downloaden als PGN",
+      "copy_pgn": "Kopiëren",
+      "copy_pgn_title": "PGN kopiëren",
+      "gif": "GIF",
+      "gif_title": "Geanimeerde GIF maken (opent een nieuw tabblad)",
+      "gif_signin": "Log in om GIF's te maken",
+      "pgn_copied": "PGN gekopieerd naar het klembord.",
+      "pgn_saved": "PGN gedownload.",
+      "none": "Nog geen partijen. Je onlinepartijen verschijnen hier.",
+      "none_filtered": "Geen enkele partij voldoet aan deze filters.",
+      "none_public": "Nog geen partijen.",
+      "total": {
+        "one": "{count} partij",
+        "other": "{count} partijen"
+      },
+      "termination_unknown": "Partij afgelopen",
+      "reason": {
+        "1": "Schaakmat",
+        "2": "Opgave",
+        "3": "Verlies op tijd",
+        "4": "Tweede illegale zet (reglementair verlies)",
+        "5": "Pat",
+        "6": "Dode stelling (onvoldoende materiaal)",
+        "7": "Vlag gevallen, maar de tegenstander kan niet mat zetten",
+        "8": "Vijfvoudige herhaling",
+        "9": "75-zettenregel",
+        "10": "Drievoudige herhaling (geclaimd)",
+        "11": "50-zettenregel (geclaimd)",
+        "12": "Remise in onderling overleg",
+        "13": "Tweede illegale zet, maar de tegenstander kan niet mat zetten",
+        "14": "Opgave, maar de tegenstander kan niet mat zetten",
+        "20": "Partij verlaten (te lang zonder verbinding)",
+        "21": "Partij verlaten, maar de tegenstander kan niet mat zetten",
+        "22": "Partij afgebroken",
+        "23": "Geen eerste zet op tijd (afgebroken)",
+        "24": "Reglementair verlies (overtreding van de fairplayregels)",
+        "25": "Afgebroken door de server",
+        "26": "Verbinding met beide spelers verbroken"
+      }
+    },
+    "ratings": {
+      "category": "Speeltempo",
+      "rating": "Rating",
+      "peak": "Hoogste",
+      "games": "Partijen",
+      "wdl": "W / R / V",
+      "provisional": "Voorlopige rating",
+      "none": "Nog geen partijen met rating.",
+      "unrated_hint": "Een vraagteken geeft een voorlopige rating aan (nog weinig partijen gespeeld)."
+    },
+    "account": {
+      "member_since": "Lid sinds {date}",
+      "last_login": "Laatst ingelogd",
+      "created": "Aangemaakt",
+      "email": "E-mailadres",
+      "pending_email": "In afwachting van bevestiging: {email}",
+      "verified": "Bevestigd",
+      "unverified": "Niet bevestigd",
+      "mfa": "Tweestapsverificatie",
+      "mfa_on": "Aan",
+      "mfa_off": "Uit",
+      "google": "Inloggen met Google",
+      "google_on": "Gekoppeld",
+      "google_off": "Niet gekoppeld",
+      "password": "Wachtwoord",
+      "password_set": "Ingesteld",
+      "password_unset": "Nog niet ingesteld",
+      "challenges": "Uitdagingen",
+      "challenges_all": "Geaccepteerd",
+      "challenges_none": "Geweigerd",
+      "badge_verified": "E-mail bevestigd",
+      "badge_mfa": "Tweestapsverificatie aan",
+      "badge_google": "Google",
+      "ban_until": "Je account is geschorst tot {date}.",
+      "ban_permanent": "Je account is geschorst.",
+      "sanction_ban": "Schorsing",
+      "sanction_mm_block": "Tegenstander zoeken geblokkeerd",
+      "sanction_warning": "Waarschuwing",
+      "sanction_until": "tot {date}",
+      "sanction_permanent": "blijvend",
+      "devices_current": "Dit apparaat",
+      "devices_unknown": "Naamloos apparaat",
+      "devices_signed_in": "Ingelogd op {date}",
+      "devices_seen": "Laatst gebruikt {time}",
+      "devices_expires": "Verloopt op {date}",
+      "devices_revoke": "Uitloggen",
+      "devices_revoked": "Het apparaat is uitgelogd.",
+      "devices_none": "Geen andere apparaten.",
+      "signout_all_confirm": "Alle apparaten uitloggen, ook dit apparaat?",
+      "signed_out": "Je bent uitgelogd.",
+      "signed_in": "Welkom, {name}.",
+      "prefs_saved": "Opgeslagen.",
+      "password_changed": "Je wachtwoord is gewijzigd. Je andere apparaten zijn uitgelogd.",
+      "email_sent": "Er is een bevestigingslink naar het nieuwe adres gestuurd. Je adres verandert zodra je die link opent.",
+      "email_changed": "Je e-mailadres is nu {email}.",
+      "email_current": "Huidig adres: {email}.",
+      "email_pending": "Een wijziging naar {email} wacht op de bevestigingslink.",
+      "export_done": "Je gegevens zijn gedownload.",
+      "deleted": "Je account is verwijderd.",
+      "delete_confirm_label": "Typ {name} ter bevestiging",
+      "register_done": "We hebben een bevestigingslink naar {email} gestuurd. Open die om je account aan te maken en log daarna in.",
+      "register_ready": "Je account is klaar. Je kunt inloggen.",
+      "forgot_done": "Als er een account met dit adres bestaat, is er een link onderweg om een nieuw wachtwoord te kiezen.",
+      "resend_done": "Als dit adres nog op bevestiging wacht, is er een nieuwe link onderweg.",
+      "pow_solving": "De puzzel tegen robots wordt opgelost…",
+      "mfa_recovery": "Herstelcode",
+      "mfa_recovery_text": "Voer een van je herstelcodes in. Elke code werkt één keer.",
+      "mfa_app": "Code uit de app",
+      "mfa_app_text": "Voer de 6-cijferige code uit je authenticator-app in.",
+      "mfa_state_on": "Tweestapsverificatie staat aan voor dit account.",
+      "mfa_state_off": "Tweestapsverificatie staat uit voor dit account.",
+      "client_label": "Scacelith-website ({browser})",
+      "username": "Gebruikersnaam",
+      "password_rules": "Minstens {min} tekens, zonder je gebruikersnaam of e-mailadres.",
+      "password_note": "Je andere apparaten worden uitgelogd; dit apparaat blijft ingelogd.",
+      "signin_label": "Inloggen",
+      "google_link_text": "Het account {name} gebruikt dit e-mailadres al. Voer één keer het wachtwoord ervan in om het aan Google te koppelen; daarna is “Inloggen met Google” genoeg.",
+      "auth_foot_google": "Eén account op de officiële server, voor het spel en voor deze site. Heb je het in het spel met Google aangemaakt? Log dan ook hier in met Google."
+    },
+    "players": {
+      "since": "Lid sinds {date}",
+      "games": "Partijen",
+      "rated": "Met rating",
+      "wins": "Winst",
+      "draws": "Remise",
+      "losses": "Verlies",
+      "view": "Profiel van {name} bekijken",
+      "you": "Jij",
+      "board": "Ranglijst"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partij nr. {id} · {date}",
+      "preparing": "GIF voorbereiden…",
+      "rendering": "De server tekent de GIF. Bij een lange partij kan dat een paar seconden duren…",
+      "ready": "Je GIF is klaar. De download is gestart.",
+      "ready_again": "Je GIF is klaar.",
+      "signin": "Log in om GIF's van je partijen te maken.",
+      "signin_button": "Inloggen",
+      "missing": "Er is geen partij gekozen.",
+      "retry_in": "Je kunt het over {time} opnieuw proberen.",
+      "confirm": "Druk op “GIF maken” om de server deze partij met je account te laten tekenen.",
+      "retry_now": "Je kunt het nu opnieuw proberen."
+    },
+    "home": {
+      "create_account": "Account aanmaken",
+      "my_account": "Mijn account",
+      "my_games": "Mijn partijen",
+      "signin": "Inloggen"
+    },
+    "trailer": {
+      "title": "Trailer van Scacelith",
+      "notice": "Deze video wordt gehost door YouTube. Als je hem hier afspeelt, wordt de speler van Google geladen, die je IP-adres ontvangt en cookies of andere trackers op je apparaat kan opslaan.",
+      "accept": "Accepteren en afspelen",
+      "google_privacy": "Privacybeleid van Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Juridisch",
+    "title": "Wettelijke vermeldingen, privacy en gebruiks\u00advoorwaarden",
+    "lead": "Wie Scacelith uitgeeft en host, wat er met je gegevens gebeurt op deze website, in het spel en op de officiële server, en de regels voor het spelen op die server.",
+    "updated": "Laatst bijgewerkt: 11 oktober 2026",
+    "toc": "Op deze pagina",
+    "notice": {
+      "title": "Wettelijke vermeldingen",
+      "publisher_label": "Uitgever",
+      "publisher": "Scacelith wordt uitgegeven door een particulier, op niet-professionele basis. Zoals de Franse wet toestaat (artikel 1-1 II van wet nr. 2004-575 van 21 juni 2004), wordt de identiteit van de uitgever hier niet vermeld; die is bekend bij de hostingprovider.",
+      "contact_label": "Contact",
+      "contact": "Voor elke vraag over deze website, de officiële server of je gegevens.",
+      "host_server": "Officiële spelserver en accountgegevens",
+      "host_server_note": "Servers in Frankrijk.",
+      "host_site": "Deze website en de API-documentatie (GitHub Pages)",
+      "host_domain": "Registrar van de domeinnaam",
+      "licence_label": "Licentie",
+      "licence": "Het spel en de server ervan zijn vrije software onder de GNU General Public License v3, met openbare broncode:",
+      "game_source": "het spel",
+      "server_source": "de server",
+      "phone": "Tel."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "intro": "Scacelith toont geen advertenties, verkoopt geen gegevens en meet geen bezoekersaantallen. Persoonsgegevens worden alleen gebruikt om deze website en de officiële server te laten werken, zoals hieronder beschreven. De verwerkingsverantwoordelijke is de uitgever, bereikbaar op het contactadres hierboven.",
+      "site_title": "Op deze website",
+      "site_hosting": "GitHub host de site en registreert, zoals elke webhost, de IP-adressen van bezoekers voor beveiligingsdoeleinden.",
+      "github_privacy": "Privacyverklaring van GitHub",
+      "site_requests": "Om de nieuwste release te tonen, raadpleegt je browser de API van GitHub (api.github.com); om de status van de server, de ranglijst, spelers en je account te tonen, raadpleegt hij de officiële server (caissa.scacelith.com). Beide ontvangen je IP-adres, zoals bij elk verzoek.",
+      "site_storage": "De site plaatst geen cookies en gebruikt geen analysetools. In je browser worden alleen je taalkeuze bewaard en, zodra je inlogt, je sessie: alleen voor het huidige tabblad, of op dit apparaat als je “Ingelogd blijven” aanvinkt. Bij inloggen met Google worden ook de eenmalige codes in het huidige tabblad bewaard tot ze zijn gebruikt. Dit alles is nodig om de site te laten werken, en alleen de officiële server ontvangt de sessie en de codes.",
+      "site_trailer": "De trailer is een YouTube-video. Er wordt niets van YouTube geladen totdat je op “Accepteren en afspelen” drukt; YouTube (Google) ontvangt dan je IP-adres en kan cookies of andere trackers op je apparaat opslaan. Je antwoord wordt niet onthouden: de vraag komt bij je volgende bezoek terug.",
+      "site_google": "“Inloggen met Google” op de pagina Account laadt niets van Google totdat je erop drukt. Je browser gaat dan naar de inlogpagina van Google (accounts.google.com), en Google stuurt hem terug naar deze site met een eenmalige code die de site aan de officiële server doorgeeft. Google ontvangt je IP-adres en wat je op zijn pagina invoert, volgens zijn eigen beleid.",
+      "google_privacy": "Privacybeleid van Google",
+      "game_title": "In het spel",
+      "game_local": "Het spel bewaart zijn instellingen, je lokale resultaten en je inlogsessie op je computer. De inlogsessie wordt bewaard in de beveiligde opslag van het systeem: DPAPI op Windows, de sleutelhanger op macOS, de Secret Service-sleutelbos op Linux, of anders een bestand dat alleen je gebruikersaccount kan lezen.",
+      "game_network": "Het spel verstuurt uit zichzelf niets: geen telemetrie, geen controle op updates. Het maakt alleen verbinding met de officiële server als je de onlinepagina opent, met Hugging Face alleen als je de stem van de coach downloadt, en, bij een directe partij, met de computer van je tegenstander, die dan je IP-adres kent (het spel kan ook met UPnP een poort op je router openen).",
+      "account_title": "Je account op de officiële server",
+      "account_intro": "Als je een account aanmaakt, in het spel of op deze website, en als je online speelt, worden de volgende gegevens naar de officiële server gestuurd, die door OVH in Frankrijk wordt gehost:",
+      "data_account": "<strong>Account:</strong> gebruikersnaam, e-mailadres, wachtwoord (alleen opgeslagen als Argon2id-hash), geheime sleutel voor tweestapsverificatie (versleuteld) en herstelcodes (gehasht), registratiedatum en datum waarop je het laatst bent ingelogd.",
+      "data_google": "<strong>Inloggen met Google:</strong> Google stuurt de identificatiecode van je Google-account, je e-mailadres en je naam. De server bewaart de identificatiecode en het adres, en gebruikt de naam alleen om een gebruikersnaam voor te stellen.",
+      "data_sessions": "<strong>Ingelogde apparaten:</strong> voor elke keer dat je inlogt, de naam van het apparaat (de versie en het systeem van het spel, zoals “Scacelith/1.0.0 win64”, of de browser en het systeem voor deze website), het IP-adres en de datums van gebruik.",
+      "data_games": "<strong>Partijen en ratings:</strong> elke onlinepartij (spelers, zetten, bedenktijd per zet, uitslag, datums) en je ratings. Tijdens een partij worden de bewegingen van je hoofd en hand live aan je tegenstander doorgegeven en nooit opgeslagen.",
+      "data_security": "<strong>Beveiligingslogboek:</strong> inlogbeurten, mislukte pogingen en wijzigingen aan het account, met het IP-adres.",
+      "data_fairplay": "<strong>Fair play:</strong> meldingen die door jou of over jou zijn ingediend, met hun opmerking; verlaten en gemiste partijen; sancties; en de controles die op partijen worden uitgevoerd, van vervalste of onmogelijke zetten tot statistieken van de Stockfish-engine.",
+      "basis_title": "Waarom, en op welke rechtsgrond",
+      "basis_contract": "Het beheer van je account en het online spelen (inloggen, partijen, ratings, partijgegevens, de e-mails die de dienst verstuurt): de dienst waarvoor je je aanmeldt (artikel 6, lid 1, onder b, AVG).",
+      "basis_security": "De bescherming van de accounts en de server, en het eerlijk houden van de partijen (beveiligingslogboek, IP-adressen, fairplaycontroles, sancties): het gerechtvaardigd belang van de uitgever en van de spelers (artikel 6, lid 1, onder f, AVG).",
+      "basis_trailer": "Het afspelen van de trailer via YouTube: je toestemming, gegeven met de knop (artikel 6, lid 1, onder a, AVG).",
+      "public_title": "Wat iedereen kan zien",
+      "public": "Je gebruikersnaam, registratiedatum, ratings en volledige lijst van partijen, met elke zet, zijn openbaar: op deze website, via de API van de server en in de PGN van elke partij. Je e-mailadres, apparaten, inlogbeurten, sancties en fairplaygegevens worden nooit getoond. Je kunt directe uitdagingen weigeren, maar partijen kunnen niet worden verborgen.",
+      "auto_title": "Geautomatiseerde beslissingen",
+      "auto": "Sommige schendingen van het protocol van het spel, zoals een vervalst bericht of een zet die in de stelling onmogelijk is, zijn een zeker bewijs van valsspelen: de server verklaart de partij dan reglementair verloren, schorst het account voor 24 uur, verwijdert het uit de ranglijst en geeft de tegenstanders de punten terug die ze er in de afgelopen 60 dagen tegen hebben verloren. Na drie partijen die binnen 24 uur zijn verlaten, afgebroken of gemist, wordt het zoeken naar tegenstanders voor partijen met rating 15 minuten gepauzeerd, daarna langer. Enginestatistieken leiden nooit op zichzelf tot een sanctie: een mens beslist. Je kunt via het contactadres vragen om elke beslissing opnieuw te laten beoordelen.",
+      "recipients_title": "Wie je gegevens ontvangt",
+      "recipient_ovh": "OVH SAS host de server en de gegevens ervan, in Frankrijk.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, Frankrijk) verstuurt de e-mails van de server: het ontvangt je adres, je gebruikersnaam en het bericht.",
+      "recipient_google": "Google ontvangt wat je browser het stuurt als je ervoor kiest om met Google in te loggen, volgens zijn eigen privacybeleid.",
+      "recipient_staff": "De beheerder en de moderators van de server zien account- en fairplaygegevens om de dienst te laten draaien.",
+      "recipient_players": "Andere spelers zien wat openbaar is, en je tegenstander ziet tijdens een partij je zetten en bewegingen.",
+      "recipient_none": "Verder niemand: er worden geen gegevens verkocht, verhuurd of voor reclame gebruikt.",
+      "transfers": "Accountgegevens blijven in Frankrijk. GitHub, Google en Porkbun (dat berichten aan het contactadres doorstuurt) zijn gevestigd in de Verenigde Staten: wat zij ontvangen, valt onder hun eigen beleid en hun waarborgen voor doorgiften buiten de Europese Unie.",
+      "retention_title": "Hoe lang gegevens worden bewaard",
+      "ret_account": "<strong>Account:</strong> totdat je het verwijdert. Een registratie waarvan het adres nooit wordt bevestigd, wordt na 24 uur verwijderd.",
+      "ret_sessions": "<strong>Ingelogde apparaten:</strong> totdat je uitlogt of na 30 dagen zonder gebruik, en hoogstens 90 dagen.",
+      "ret_ip": "<strong>IP-adressen:</strong> gewist na 30 dagen. De logboeken van de server bewaren alleen ingekorte adressen.",
+      "ret_security": "<strong>Beveiligingslogboek:</strong> 90 dagen.",
+      "ret_conduct": "<strong>Verlaten en gemiste partijen:</strong> 30 dagen.",
+      "ret_games": "<strong>Partijen en ratings:</strong> zolang de server zijn partijgegevens bewaart, die ook de partijgegevens van je tegenstanders zijn. Zodra je account is verwijderd, wordt je naam daarin vervangen door “deleted#” en een nummer.",
+      "ret_fairplay": "<strong>Sancties, meldingen en fairplayresultaten:</strong> bewaard, zodat geschorste spelers niet zomaar kunnen terugkomen en andere spelers beschermd blijven. Zodra je account is verwijderd, blijven ze alleen aan het nummer ervan gekoppeld.",
+      "ret_backups": "<strong>Back-ups:</strong> verwijderde gegevens kunnen nog korte tijd in de back-up van de server staan, totdat die wordt vervangen.",
+      "ret_contact": "<strong>Berichten aan het contactadres:</strong> zolang dat nodig is om ze te beantwoorden.",
+      "rights_title": "Je rechten",
+      "rights": "Je kunt je gegevens inzien, corrigeren, wissen en exporteren, het gebruik ervan beperken en er bezwaar tegen maken (artikelen 15 tot en met 21 AVG).",
+      "rights_self": "Het meeste daarvan regel je zelf in je account, in het spel of op de pagina Account van deze website: download je accountgegevens als JSON-bestand, wijzig je e-mailadres of wachtwoord, log andere apparaten uit, of verwijder het account meteen.",
+      "rights_google": "Een account dat met Google is aangemaakt, heeft geen wachtwoord: om het te exporteren of te verwijderen, stel je er eerst een in met “Wachtwoord vergeten?”.",
+      "rights_mail": "Voor al het andere, waaronder gegevens die niet in de export staan (fairplaycontroles, meldingen over jou), schrijf je naar het contactadres. Je krijgt binnen een maand antwoord.",
+      "rights_cnil": "Als je vindt dat je rechten niet worden gerespecteerd, kun je een klacht indienen bij de CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, Frankrijk) of bij de gegevensbeschermingsautoriteit van je land.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Gebruiksvoorwaarden",
+      "intro": "Deze voorwaarden gelden voor de officiële server (caissa.scacelith.com) en voor de accountpagina's van deze website. Wie een account aanmaakt of op de officiële server speelt, aanvaardt ze.",
+      "service": "<strong>Een gratis dienst.</strong> Het spel is vrije software en gratis. De officiële server wordt gratis en zoals hij is aangeboden, zonder garantie op beschikbaarheid: hij kan veranderen, tijdelijk stoppen of sluiten.",
+      "account": "<strong>Je account.</strong> Je bent verantwoordelijk voor wat ermee wordt gedaan en voor het geheimhouden van het wachtwoord. Schrijf meteen naar het contactadres als je denkt dat iemand anders het gebruikt.",
+      "username": "<strong>Je gebruikersnaam</strong> is openbaar: die mag niet beledigend of haatdragend zijn, niet de indruk wekken dat je iemand anders bent en geen persoonsgegevens van wie dan ook prijsgeven.",
+      "fair": "<strong>Fair play.</strong> Tijdens een partij met rating geen hulp van een schaakengine, een andere persoon of enig ander hulpmiddel. Geen aangepaste spelclient, vervalste berichten of opzettelijke overbelasting van de server.",
+      "conduct": "<strong>Speel je partijen uit.</strong> Wie binnen 24 uur drie keer een partij verlaat of afbreekt, of een partij mist waarvoor een tegenstander was gevonden, kan een tijdje geen tegenstander voor een partij met rating zoeken.",
+      "reports": "<strong>Meldingen</strong> moeten te goeder trouw worden gedaan. Om een speler of illegale inhoud te melden, zoals een beledigende gebruikersnaam, gebruik je de meldknop in een partij of schrijf je naar het contactadres.",
+      "sanctions": "<strong>Sancties.</strong> Het overtreden van deze regels kan leiden tot reglementair verlies, een waarschuwing, een schorsing en verwijdering uit de ranglijst; punten die tegen een valsspeler zijn verloren, worden aan diens tegenstanders teruggegeven. Alleen een zeker bewijs van valsspelen wordt automatisch bestraft; over al het andere beslist een mens. Je kunt een sanctie aanvechten via het contactadres.",
+      "liability": "<strong>Aansprakelijkheid.</strong> Binnen de grenzen die de wet toestaat, is de uitgever niet aansprakelijk voor onderbrekingen van de dienst of voor het verlies van partijen, ratings of gegevens.",
+      "end": "<strong>Beëindiging.</strong> Je kunt je account op elk moment verwijderen. Een account dat deze voorwaarden overtreedt, kan worden geschorst.",
+      "changes": "<strong>Wijzigingen.</strong> Deze voorwaarden kunnen veranderen; de datum bovenaan deze pagina geeft de huidige versie aan, en als je na een wijziging blijft spelen, aanvaard je die.",
+      "law": "<strong>Toepasselijk recht.</strong> Op deze voorwaarden is het Franse recht van toepassing. Schrijf bij een geschil eerst naar het contactadres om samen een oplossing te vinden."
+    },
+    "version_note": "Deze pagina bestaat in meerdere talen; als ze van elkaar verschillen, heeft de Franse versie voorrang."
+  }
+}

@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith – fotorealistické šachy z pohledu první osoby",
+      "description": "Bezplatné fotorealistické šachy z pohledu první osoby pro Windows, Linux a macOS: Stockfish 19, trenér, analýza partií a hra online v královském sále."
+    },
+    "players": {
+      "title": "Žebříček a hráči – Scacelith",
+      "description": "Nejlepší hráči oficiálního serveru Scacelith ve všech tempech hry na rating, jejich ratingy a poslední partie."
+    },
+    "account": {
+      "title": "Váš účet – Scacelith",
+      "description": "Přihlaste se ke svému účtu Scacelith: ratingy, historie partií, stahování PGN a GIF, přihlášená zařízení a nastavení."
+    },
+    "gif": {
+      "title": "Animovaný GIF – Scacelith",
+      "description": "Animovaný GIF partie ze Scacelithu."
+    },
+    "legal": {
+      "title": "Údaje o vydavateli, ochrana soukromí a podmínky použití – Scacelith",
+      "description": "Kdo Scacelith vydává a hostuje, co web, hra a oficiální server dělají s osobními údaji, vaše práva a pravidla oficiálního serveru."
+    }
+  },
+  "brand": {
+    "tagline": "Královská hra"
+  },
+  "nav": {
+    "skip": "Přejít na obsah",
+    "home": "Domů",
+    "label": "Hlavní nabídka",
+    "game": "Hra",
+    "modes": "Herní režimy",
+    "gallery": "Galerie",
+    "trailer": "Upoutávka",
+    "online": "Hra online",
+    "players": "Žebříček",
+    "account": "Účet",
+    "language": "Jazyk",
+    "menu": "Nabídka",
+    "download": "Stáhnout"
+  },
+  "hero": {
+    "image_alt": "Dva porcelánoví roboti hrají šachy u ořechového stolu v prosluněném mramorovém sále.",
+    "lead": "Usaďte se u voskovaného ořechového stolu v prosluněném královském sále. Na druhé straně šachovnice čeká na váš první tah porcelánový robot řízený Stockfishem.",
+    "watch": "Přehrát upoutávku",
+    "meta": "Svobodný software · Windows, Linux, macOS (experimentálně) · Grafická karta s OpenGL 4.6",
+    "caption": "Zachyceno ve hře: královský sál"
+  },
+  "highlights": {
+    "engine": "Vlastní engine na OpenGL 4.6",
+    "stockfish": "Vestavěný Stockfish 19",
+    "rules": "Pravidla FIDE",
+    "online": "Hra online",
+    "languages": "34 jazyků"
+  },
+  "experience": {
+    "eyebrow": "Zážitek",
+    "title": "Ne šachovnice na obrazovce.<br><em>Místo u stolu.</em>",
+    "lead": "Scacelith vrací to, co tvoří skutečnou partii: sál, ticho, hodiny, soupeře, který se na vás dívá, a turnajové rituály.",
+    "presence": {
+      "title": "Z pohledu první osoby",
+      "text": "Díváte se očima svého robota: rozhlédněte se po sále, nakloňte se nad šachovnici, pohlédněte na soupeře, mrkněte do svého partiáře, nebo vstaňte a přejděte k čelu stolu."
+    },
+    "ritual": {
+      "title": "Turnajová pravidla",
+      "text": "Figurou, které se dotknete, musíte táhnout, a tah dokončíte tím, že vaše ruka stiskne hodiny. Když je zobrazení přípustných tahů vypnuté, rozhodčí nepřípustný tah potrestá a druhý takový tah znamená prohru partie."
+    },
+    "scoresheet": {
+      "title": "Psáno rukou",
+      "text": "Oba hráči zapisují každý tah do svého partiáře, každý vlastním rukopisem, a po každých čtyřiceti tazích obracejí list. Slyšíte, jak pero šustí po papíře."
+    },
+    "opponent": {
+      "title": "Důstojný soupeř",
+      "text": "Stockfish 19 na vaší úrovni, od úrovně Nováček (800) po Stockfish Max (3500), s ratingem, který se po každé partii počítá podle pravidel FIDE."
+    },
+    "engine": {
+      "title": "Postaveno pro tuto hru",
+      "text": "Engine napsaný od nuly: fyzikálně věrné světlo, mramor, voskované dřevo, porcelán a mosaz, slunce v oknech, měkké stíny a odrazy. Předvolby kvality od „Velmi nízká“ po „Ultra“ ho přizpůsobí vaší grafické kartě."
+    },
+    "languages": {
+      "title": "34 jazyků",
+      "text": "Angličtina, francouzština, němčina, španělština, portugalština z Portugalska i Brazílie, italština, nizozemština, švédština, dánština, finština, estonština, lotyština, litevština, polština, čeština, slovenština, slovinština, chorvatština, maďarština, rumunština, bulharština, řečtina, turečtina, ukrajinština, ruština, arabština, hindština, indonéština, vietnamština, korejština, japonština a čínština, zjednodušená i tradiční. Arabština se zobrazuje zprava doleva a trenér mluví nahlas ve všech jazycích kromě čínštiny, kde se jeho slova zobrazují jako titulky."
+    }
+  },
+  "modes": {
+    "eyebrow": "Herní režimy",
+    "title": "Každá partie<br><em>má svůj stůl.</em>",
+    "lead": "Vše se hraje ve stejném sále, přímo z titulní obrazovky. Offline je Stockfish vždy připraven k partii.",
+    "new_game": {
+      "name": "Nová partie",
+      "text": "Utkejte se se Stockfishem v síle, kterou si zvolíte, a v tempu od bulletu po klasické, nebo si zahrajte s přítelem u jednoho počítače, každý očima svého robota."
+    },
+    "coach": {
+      "name": "Trenér",
+      "text": "Naproti vám sedí učitel, hraje na vaší úrovni a provází vás partií: upozorní na hrozby, dobré tahy i chyby a vlastní rukou přehraje, co chyba stojí. Od pravidel šachu až po úroveň Expert, s hlasem syntetizovaným přímo ve vašem počítači."
+    },
+    "challenges": {
+      "name": "Výzvy trenéra",
+      "text": "Krátké sady pozic, každá trénuje jednu dovednost: maty 1. až 3. tahem, vidličky, vazby a další taktické motivy, obranu a základní koncovky proti trenérovi. Nápověda jen na požádání a zelená fajfka za každou dokončenou sadu."
+    },
+    "analysis": {
+      "name": "Analýza",
+      "text": "Stockfish rozebere vaše uložené partie, vaše online partie nebo jakoukoli partii v PGN: lišta hodnocení, klíčové tahy označené od brilantních po hrubé chyby, lepší tah zakreslený šipkou a komentáře nahlas i v titulcích. Když tahy procházíte, ruce robotů je hrají na šachovnici."
+    },
+    "online": {
+      "name": "Hrát online",
+      "text": "Skuteční soupeři přes server Scacelith: partie na rating, hledání soupeře, výzvy a soukromé partie, nebo přímý zápas mezi dvěma počítači. Robot vašeho soupeře se hýbe spolu s ním, v reálném čase."
+    },
+    "watch": {
+      "name": "Sledovat partii",
+      "text": "Proti sobě hrají dva hráči Stockfish a vy mezitím volně procházíte sálem, aniž by vás kdo viděl, od jednoho úhlu pohledu k dalšímu."
+    },
+    "saved": {
+      "name": "Uložené partie",
+      "text": "Vaše partie se ukládají jako soubory PGN. Přehrajte si je v sále se skutečnými časy na přemýšlení i stavem hodin, nebo si načtěte partie z jiných programů."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerie",
+    "title": "Pohled <em>zevnitř sálu</em>",
+    "lead": "Každý snímek je zachycen ve hře, v reálném čase, jejím vlastním enginem.",
+    "title_screen": {
+      "alt": "Titulní obrazovka: nabídka Scacelithu vedle dvou robotů, kteří v sále hrají šachy.",
+      "caption": "Titulní obrazovka"
+    },
+    "coach": {
+      "alt": "Trenér, porcelánový robot s nápisem „COACH“ na hrudi, vás přes šachovnici zdraví; co říká, se zobrazuje i jako titulek.",
+      "caption": "Trenér"
+    },
+    "challenges": {
+      "alt": "Nabídka Výzvy trenéra: sady matů a taktických úloh s jejich obtížností a vyznačením již dokončených, vedle popisu vybrané sady.",
+      "caption": "Výzvy trenéra"
+    },
+    "analysis": {
+      "alt": "Režim analýzy: lišta hodnocení, šipka zakreslená na šachovnici, okomentované tahy s přesností obou stran a přehled ovládání.",
+      "caption": "Analýza"
+    },
+    "game": {
+      "alt": "Pohled z boku: jeden robot se natahuje přes stůl, aby táhl figurou, zatímco druhý čeká; sebrané figury stojí vedle šachovnice.",
+      "caption": "Sledovat partii"
+    },
+    "hall": {
+      "alt": "Dva roboti sedí proti sobě u šachovnice v křeslech z červeného sametu pod vysokými okny.",
+      "caption": "Královský sál"
+    },
+    "opponent": {
+      "alt": "Detail soupeře, porcelánového robota, s hlavou skloněnou k šachovnici.",
+      "caption": "Váš soupeř"
+    },
+    "scoresheet": {
+      "alt": "Ruka robota zapisuje plnicím perem tahy do partiáře.",
+      "caption": "Partiář"
+    },
+    "note": "Verze 1.0.0. Rozhraní na těchto snímcích je v angličtině.",
+    "viewer": "Prohlížeč obrázků",
+    "close": "Zavřít",
+    "previous": "Předchozí obrázek",
+    "next": "Další obrázek"
+  },
+  "trailer": {
+    "eyebrow": "Upoutávka",
+    "title": "Scacelith <em>v pohybu</em>",
+    "soon_title": "Upoutávka už brzy",
+    "soon_text": "Mezitím se posaďte: hra je připravena ke stažení.",
+    "privacy": "Z YouTube se nic nenačte, dokud nepřijmete jeho přehrávač.",
+    "open_youtube": "Sledovat na YouTube"
+  },
+  "online": {
+    "eyebrow": "Hra online",
+    "title": "Skuteční soupeři,<br><em>stejný sál.</em>",
+    "lead": "Přihlaste se ve hře k oficiálnímu serveru a hrajte s lidmi z celého světa, stále z pohledu první osoby.",
+    "point_rated": "Partie na rating ve všech oficiálních tempech hry, v každém s vlastním ratingem vypočítaným podle pravidel FIDE.",
+    "point_match": "Hledání soupeře, výzvy podle jména a soukromé partie s kódem; nebo přímý zápas mezi dvěma počítači, bez serveru a bez účtu.",
+    "point_fair": "Fair play: automatické kontroly, analýza dohraných partií šachovým programem a hlášení od hráčů.",
+    "point_history": "Historie vašich partií na tomto webu: každou partii si můžete stáhnout jako PGN nebo jako animovaný GIF.",
+    "point_open": "Komunitní server může provozovat kdokoli: server je svobodný software a jeho API je zdokumentované.",
+    "create": "Vytvořit účet",
+    "signin": "Přihlásit se",
+    "server_title": "Oficiální server",
+    "status_checking": "Zjišťování stavu…",
+    "address": "Adresa",
+    "registration": "Registrace",
+    "categories": "Tempa hry na rating",
+    "top_players": "Nejlepší hráči",
+    "category": "Tempo hry",
+    "board_loading": "Načítání žebříčku…",
+    "full_board": "Celý žebříček"
+  },
+  "download": {
+    "button": "Stáhnout",
+    "choose": "Vyberte svůj systém",
+    "see_release": "Zobrazit vydání na GitHubu",
+    "latest": "Scacelith",
+    "all_releases": "Všechna vydání",
+    "experimental": "Experimentální",
+    "source": "Zdrojový kód",
+    "source_zip": "Archiv ZIP",
+    "eyebrow": "Ke stažení",
+    "title": "Posaďte se.<br><em>Zdarma a s otevřeným kódem.</em>",
+    "lead": "Rozbalte a hrajte: ve Windows ani v Linuxu žádný instalátor, na Macu stačí přetáhnout aplikaci do složky Aplikace. Každý soubor sestavuje GitHub Actions ze zdrojového kódu označeného tagem verze, s ověřitelnou atestací původu sestavení.",
+    "notes": "Poznámky k vydání",
+    "macos_note": "Pro Macy s čipem Apple Silicon (M1 nebo novější) se systémem macOS 26 nebo novějším, ne ve virtuálním počítači; toto sestavení je novější a méně otestované než ostatní. Aplikace není podepsána registrovaným vývojářem Apple: při prvním spuštění ji otevřete přes Nastavení systému › Soukromí a zabezpečení › Přesto otevřít.",
+    "req_system": "Systém",
+    "req_system_value": "64bitové Windows (x64); 64bitový Linux (x86-64 nebo aarch64) s glibc 2.34, OpenSSL 3 a X11 nebo XWayland, například Ubuntu 22.04 nebo Debian 12; macOS 26 nebo novější na Apple Silicon (experimentálně)",
+    "req_gpu": "Grafika",
+    "req_gpu_value": "Grafická karta s OpenGL 4.6 a aktuálním ovladačem (na Macu si hra přináší vlastní OpenGL)",
+    "req_included": "V balíčku",
+    "req_included_value": "Stockfish 19 a jeho neuronová síť: hrát offline můžete hned",
+    "req_network": "Připojení k internetu",
+    "req_network_value": "Pro hru online, GIFy a hlas trenéra a analýzy (volitelné stažení o velikosti asi 399 MB)",
+    "req_licence": "Licence",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Ověřte si stažený soubor",
+    "verify_text": "Původ sestavení každého souboru je atestován GitHubem. S nástrojem GitHub CLI:",
+    "checksums": "Kontrolní součty SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Tvůrci",
+    "title": "Tvůrci a <em>poděkování</em>",
+    "engine_head": "Šachový program",
+    "engine": "Stockfish 19 od vývojářů Stockfishe (GNU GPL v3). Jeho neuronová síť byla natrénována na datech, která poskytl projekt Leela Chess Zero (Open Database License).",
+    "voice_head": "Hlas",
+    "voice": "Supertonic 3 od společnosti Supertone pod licencí BigScience Open RAIL-M: stáhne se na vaši žádost a propůjčuje hlas trenérovi i analýze, přímo ve vašem počítači.",
+    "fonts_head": "Písma",
+    "fonts": "EB Garamond od Georga Duffnera, Cinzel od Natanaela Gamy a Amiri od Khaleda Hosnyho; rukopis v písmech Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One a LXGW WenKai (všechna pod licencí SIL Open Font License); šachové figury z GNU FreeFont.",
+    "openings_head": "Zahájení a úlohy",
+    "openings": "Názvy zahájení z databáze chess-openings webu lichess.org a úlohy výzev trenéra z databáze úloh Lichess, obojí uvolněné jako volné dílo (CC0).",
+    "quote": "„Šachy jsou umění analýzy.“",
+    "quote_author": "Michail Botvinnik"
+  },
+  "footer": {
+    "about": "Fotorealistická šachová hra z pohledu první osoby na vlastním enginu postaveném na OpenGL 4.6. Svobodný software pod licencí GNU GPL v3.",
+    "game": "Hra",
+    "online": "Hra online",
+    "api_docs": "Dokumentace API serveru",
+    "source": "Zdrojový kód",
+    "game_source": "Hra na GitHubu",
+    "server_source": "Server na GitHubu",
+    "releases": "Vydání",
+    "licence": "Licence (GPL v3)",
+    "credits": "Stockfish je ochranná známka svých vývojářů. YouTube je ochranná známka společnosti Google LLC. Windows je ochranná známka společnosti Microsoft Corporation. macOS je ochranná známka společnosti Apple Inc. Linux je registrovaná ochranná známka Linuse Torvaldse. OpenGL je registrovaná ochranná známka společnosti Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Tento web neukládá žádné cookies a nepoužívá žádné sledovací nástroje; přehrávač YouTube se načte, jen pokud ho přijmete.",
+    "legal_link": "Údaje o vydavateli, soukromí a podmínky"
+  },
+  "common": {
+    "copy": "Kopírovat",
+    "loading": "Načítání…",
+    "noscript": "Tato stránka potřebuje JavaScript, aby mohla komunikovat se serverem Scacelith."
+  },
+  "players": {
+    "title": "Žebříček a hráči",
+    "lead": "Nejlepší hráči oficiálního serveru v každém tempu hry na rating. Vyhledejte libovolného hráče a zobrazte si jeho ratingy a poslední partie.",
+    "search_label": "Najít hráče",
+    "search_placeholder": "Uživatelské jméno",
+    "search_button": "Hledat",
+    "back": "Zpět na žebříček",
+    "recent_games": "Poslední partie",
+    "board_title": "Žebříček",
+    "category": "Tempo hry",
+    "col_rank": "Pořadí",
+    "col_player": "Hráč",
+    "col_rating": "Rating",
+    "col_peak": "Maximum",
+    "col_games": "Partie",
+    "col_wdl": "V / R / P",
+    "loading": "Načítání…"
+  },
+  "account": {
+    "title": "Váš účet",
+    "auth_foot": "Jeden účet na oficiálním serveru, pro hru i pro tento web. Vznikl váš účet ve hře přes Google? Nastavte mu heslo pomocí „Zapomenuté heslo?“.",
+    "common": {
+      "back": "Zpět na přihlášení"
+    },
+    "fields": {
+      "login": "Uživatelské jméno nebo e-mail",
+      "password": "Heslo",
+      "show_password": "Zobrazit heslo",
+      "username": "Uživatelské jméno",
+      "email": "E-mail",
+      "confirm_password": "Potvrzení hesla",
+      "current_password": "Současné heslo",
+      "new_password": "Nové heslo",
+      "new_email": "Nová e-mailová adresa",
+      "mfa_code": "Kód dvoufázového ověření (nebo záložní kód)"
+    },
+    "signin": {
+      "tab": "Přihlásit se",
+      "title": "Vítejte zpět",
+      "remember": "Pamatovat si přihlášení na tomto zařízení",
+      "submit": "Přihlásit se",
+      "forgot": "Zapomenuté heslo?",
+      "resend": "Znovu poslat potvrzovací e-mail"
+    },
+    "mfa": {
+      "title": "Dvoufázové ověření",
+      "text": "Zadejte šestimístný kód z ověřovací aplikace.",
+      "code": "Kód z aplikace",
+      "use_recovery": "Použít raději záložní kód",
+      "submit": "Potvrdit"
+    },
+    "google": {
+      "or": "nebo",
+      "button": "Přihlásit se přes Google",
+      "username_title": "Zvolte si uživatelské jméno",
+      "username_text": "Váš účet Google je na tomto serveru nový. Zvolte si jméno, které uvidí ostatní hráči: později ho nelze změnit.",
+      "username_submit": "Vytvořit můj účet",
+      "link_title": "Propojte svůj účet Google",
+      "link_submit": "Propojit a přihlásit se",
+      "returning": "Přihlašování přes Google…"
+    },
+    "register": {
+      "tab": "Vytvořit účet",
+      "title": "Bezplatný účet",
+      "closed": "Server momentálně nepřijímá nové účty.",
+      "username_hint": "Písmena, číslice, _ a -, na začátku písmeno nebo číslice.",
+      "password_hint": "Alespoň 10 znaků, bez vašeho uživatelského jména nebo e-mailu.",
+      "pow_note": "Aby se sem nedostali roboti, váš prohlížeč při registraci vyřeší malou úlohu. Trvá to několik sekund.",
+      "submit": "Vytvořit účet",
+      "done_title": "Zkontrolujte e-mail",
+      "done_text": "Na vaši adresu jsme poslali potvrzovací odkaz. Jeho otevřením vytvoříte účet; poté se přihlaste.",
+      "done_hint": "Odkaz platí 24 hodin. Nic vám nepřišlo? Podívejte se do složky se spamem, nebo si e-mail vyžádejte znovu.",
+      "go_signin": "Přejít na přihlášení",
+      "legal_note": "Vaše uživatelské jméno, ratingy a partie budou veřejné. Vytvořením účtu přijímáte podmínky použití.",
+      "legal_link": "Soukromí a podmínky použití"
+    },
+    "forgot": {
+      "title": "Zapomenuté heslo",
+      "text": "Zadejte e-mailovou adresu svého účtu. Pokud nějaký účet tuto adresu má, pošleme vám odkaz pro volbu nového hesla, platný jednu hodinu.",
+      "submit": "Poslat odkaz"
+    },
+    "resend": {
+      "title": "Potvrďte svůj e-mail",
+      "text": "Nepřišel vám potvrzovací e-mail, nebo vypršela platnost odkazu? Zadejte svou adresu a dostanete nový.",
+      "submit": "Poslat znovu"
+    },
+    "dash": {
+      "public_profile": "Veřejný profil",
+      "signout": "Odhlásit se",
+      "tab_overview": "Přehled",
+      "tab_games": "Partie",
+      "tab_devices": "Zařízení",
+      "tab_settings": "Nastavení"
+    },
+    "overview": {
+      "info": "Vaše údaje",
+      "ratings": "Vaše ratingy",
+      "sanctions": "Sankce",
+      "recent": "Poslední partie",
+      "all_games": "Všechny vaše partie"
+    },
+    "games": {
+      "filter_category": "Tempo hry",
+      "all": "Vše",
+      "custom": "Vlastní",
+      "filter_rated": "Typ",
+      "rated": "Na rating",
+      "casual": "Bez ratingu",
+      "filter_result": "Výsledek",
+      "wins": "Výhry",
+      "losses": "Prohry",
+      "draws": "Remízy"
+    },
+    "devices": {
+      "title": "Přihlášená zařízení",
+      "signout_all": "Odhlásit všude",
+      "text": "Každé přihlášení, ve hře nebo na tomto webu, je jedno zařízení. Odhlaste ta, která nepoznáváte."
+    },
+    "settings": {
+      "challenges_title": "Výzvy",
+      "challenges_text": "Ostatní hráči vás mohou ze hry vyzvat podle jména.",
+      "challenges_label": "Přijímat výzvy",
+      "mfa_title": "Dvoufázové ověření",
+      "mfa_text": "Zapnout nebo vypnout ho a vytvořit nové záložní kódy můžete na stránce účtu ve hře.",
+      "password_title": "Změnit heslo",
+      "password_text": "Vaše ostatní zařízení se odhlásí a toto zůstane přihlášené.",
+      "password_submit": "Změnit heslo",
+      "email_title": "Změnit e-mailovou adresu",
+      "email_submit": "Poslat potvrzovací odkaz",
+      "export_title": "Stáhnout moje data",
+      "export_text": "Vše, co server o vašem účtu uchovává, v jednom souboru JSON.",
+      "export_submit": "Stáhnout moje data",
+      "delete_title": "Smazat účet",
+      "delete_text": "Tuto akci nelze vrátit zpět. Vaše partie a ratingy zůstanou pod anonymním jménem; vaše e-mailová adresa, heslo a zařízení se vymažou.",
+      "delete_confirm": "Pro potvrzení zadejte své uživatelské jméno",
+      "delete_submit": "Smazat můj účet"
+    }
+  },
+  "gif": {
+    "title": "Animovaný GIF",
+    "preparing": "Příprava GIFu…",
+    "download": "Stáhnout GIF",
+    "make": "Vytvořit GIF",
+    "pause": "Pozastavit animaci",
+    "back": "Zpět na moje partie",
+    "options": "Možnosti",
+    "size": "Velikost",
+    "size_small": "Malá (284 × 350)",
+    "size_medium": "Střední (424 × 515)",
+    "size_large": "Velká (628 × 762)",
+    "orientation": "Orientace šachovnice",
+    "orientation_white": "Z pohledu bílého",
+    "orientation_black": "Z pohledu černého",
+    "speed": "Rychlost",
+    "speed_fast": "Rychlá (0,25 s na tah)",
+    "speed_normal": "Normální (0,5 s na tah)",
+    "speed_slow": "Pomalá (1 s na tah)",
+    "speed_very_slow": "Velmi pomalá (2 s na tah)",
+    "coords": "Zobrazit souřadnice",
+    "regenerate": "Vytvořit znovu",
+    "note": "Každý GIF kreslí server. Již vytvořený GIF se vrátí okamžitě; nových lze vytvořit jen několik za minutu."
+  },
+  "notfound": {
+    "title": "Stránka nenalezena",
+    "text": "Toto pole je prázdné. Stránka se možná přesunula.",
+    "home": "Zpět na Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Načítání…",
+      "retry": "Zkusit znovu",
+      "close": "Zavřít",
+      "copy": "Kopírovat",
+      "copied": "Zkopírováno do schránky.",
+      "copy_failed": "Kopírování se nezdařilo. Označte text a zkopírujte ho ručně.",
+      "load_more": "Zobrazit další",
+      "show_password": "Zobrazit heslo",
+      "hide_password": "Skrýt heslo",
+      "signin_needed": "Pro pokračování se přihlaste.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Server není dostupný. Zkontrolujte připojení a zkuste to znovu.",
+      "timeout": "Server odpovídal příliš dlouho. Zkuste to znovu.",
+      "server_busy": "Server je zaneprázdněn. Zkuste to znovu za chvíli.",
+      "rate_limited": "Příliš mnoho požadavků. Zkuste to znovu za {time}.",
+      "rate_limited_short": "Příliš mnoho požadavků. Zkuste to znovu za chvíli.",
+      "internal_error": "Na serveru došlo k neočekávané chybě. Zkuste to později.",
+      "invalid_token": "Vaše relace skončila. Přihlaste se prosím znovu.",
+      "unauthorized": "Přihlaste se prosím.",
+      "not_found": "Nenalezeno.",
+      "unknown": "Něco se pokazilo ({code}).",
+      "invalid_credentials": "Nesprávné uživatelské jméno, e-mail nebo heslo.",
+      "too_many_attempts": "Příliš mnoho pokusů. Zkuste to znovu za {time}.",
+      "banned": "Tento účet je pozastaven do {date}.",
+      "banned_permanent": "Tento účet je pozastaven.",
+      "email_unverified": "Vaše e-mailová adresa ještě není potvrzená. Otevřete odkaz, který jsme vám poslali, nebo si vyžádejte nový.",
+      "invalid_mfa_token": "Platnost tohoto kroku přihlášení vypršela. Přihlaste se prosím znovu.",
+      "invalid_code": "Nesprávný nebo již použitý kód.",
+      "mfa_code_required": "Zadejte kód dvoufázového ověření.",
+      "invalid_password": "Nesprávné heslo.",
+      "password_not_set": "Tento účet zatím nemá heslo: nastavíte ho pomocí „Zapomenuté heslo?“ na přihlašovací stránce.",
+      "registration_closed": "Server momentálně nepřijímá nové účty.",
+      "invalid_username": "Toto uživatelské jméno není povoleno.",
+      "username_taken": "Toto uživatelské jméno je už obsazené.",
+      "invalid_email": "Tato e-mailová adresa není platná.",
+      "email_taken": "Tuto e-mailovou adresu už používá jiný účet.",
+      "same_email": "Tohle už je vaše e-mailová adresa.",
+      "weak_password": "Toto heslo je příliš slabé.",
+      "weak_too_short": "Heslo je příliš krátké (musí mít alespoň {min} znaků).",
+      "weak_too_long": "Heslo je příliš dlouhé.",
+      "weak_contains_username": "Heslo nesmí obsahovat vaše uživatelské jméno.",
+      "weak_contains_email": "Heslo nesmí obsahovat vaši e-mailovou adresu.",
+      "weak_too_common": "Toto heslo je příliš běžné. Zvolte jiné.",
+      "pow_failed": "Kontrola proti robotům selhala. Zkuste to znovu.",
+      "passwords_differ": "Hesla se neshodují.",
+      "required": "Vyplňte toto pole.",
+      "email_format": "Zadejte platnou e-mailovou adresu.",
+      "username_format": "{min} až {max} znaků: písmena, číslice, _ a -, na začátku písmeno nebo číslice.",
+      "password_length": "Alespoň {min} znaků.",
+      "confirm_name": "Zadejte své uživatelské jméno přesně tak, jak je zobrazeno.",
+      "game_too_long": "Tato partie je na GIF příliš dlouhá.",
+      "gif_disabled": "Tento server GIFy nevytváří.",
+      "render_failed": "Server tento GIF nedokázal vytvořit.",
+      "invalid_game": "Tato partie neexistuje.",
+      "invalid_player": "Zadejte uživatelské jméno: 2 až 24 písmen, číslic, _, . nebo -.",
+      "player_not_found": "Hráč s tímto jménem neexistuje.",
+      "sso_cancelled": "Přihlášení přes Google bylo zrušeno.",
+      "sso_mismatch": "Toto přihlášení přes Google nebylo zahájeno v této kartě, nebo už bylo použito. Zkuste to znovu.",
+      "sso_expired": "Platnost tohoto přihlášení přes Google vypršela. Zkuste to znovu.",
+      "invalid_verifier": "Toto přihlášení přes Google bylo zahájeno v jiné kartě nebo v jiném prohlížeči. Začněte znovu z této stránky.",
+      "sso_email_unverified": "Google nepotvrdil e-mailovou adresu tohoto účtu Google.",
+      "sso_account_exists": "Tuto e-mailovou adresu už používá účet, který ale nemá heslo, přes které by se dal propojit s Googlem. Nastavte mu heslo pomocí „Zapomenuté heslo?“ a pak se znovu přihlaste přes Google.",
+      "sso_failed": "Přihlášení přes Google se nepodařilo dokončit. Zkuste to znovu.",
+      "sso_disabled": "Přihlášení přes Google není na tomto serveru k dispozici.",
+      "sso_already_linked": "Tento účet Google je už propojen s jiným účtem.",
+      "account_disabled": "Tento účet už nelze používat.",
+      "sso_storage": "Váš prohlížeč blokuje úložiště tohoto webu, které přihlášení přes Google potřebuje. Povolte ho, nebo se přihlaste heslem.",
+      "sso_url": "Server odpověděl neočekávanou adresou Googlu, proto bylo přihlášení přes Google zastaveno."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekundu",
+        "few": "{count} sekundy",
+        "other": "{count} sekund"
+      },
+      "minutes": {
+        "one": "{count} minutu",
+        "few": "{count} minuty",
+        "other": "{count} minut"
+      }
+    },
+    "download": {
+      "exe": "Spustitelný soubor",
+      "zip": "Archiv ZIP",
+      "dmg": "Obraz disku",
+      "archive": "Archiv",
+      "file": "Soubor",
+      "unavailable": "Není k dispozici",
+      "your_system": "Váš systém",
+      "eyebrow_release": "Verze {version}",
+      "published": "Vydáno {date}",
+      "unreachable": "GitHub je teď nedostupný: podívejte se na stránku s vydáními.",
+      "available": "K dispozici",
+      "verify_file": "soubor",
+      "no_build": "Pro {os} momentálně není k dispozici žádné sestavení hry.",
+      "x64": "64bitová verze (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64bitové verze, Intel / AMD nebo Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 nebo novější",
+      "experimental": "Experimentální"
+    },
+    "server": {
+      "online": "V provozu",
+      "offline": "Nedostupný",
+      "busy": "Vytížený",
+      "open": "Otevřená",
+      "closed": "Uzavřená",
+      "updated": "Aktualizováno {time}",
+      "min_games": "Hráči s dostatkem partií na rating v tomto tempu hry (alespoň {count}).",
+      "empty": "V tomto tempu hry zatím v žebříčku není žádný hráč.",
+      "error": "Žebříček teď nelze načíst."
+    },
+    "game": {
+      "number": "Partie č. {id}",
+      "white": "Bílý",
+      "black": "Černý",
+      "you": "vy",
+      "vs": "proti",
+      "outcome_win": "Výhra",
+      "outcome_loss": "Prohra",
+      "outcome_draw": "Remíza",
+      "outcome_aborted": "Zrušeno",
+      "result_white": "Výhra bílého",
+      "result_black": "Výhra černého",
+      "result_draw": "Remíza",
+      "result_aborted": "Zrušeno",
+      "rated": "Na rating",
+      "casual": "Bez ratingu",
+      "custom": "Vlastní",
+      "moves": {
+        "one": "{count} tah",
+        "few": "{count} tahy",
+        "other": "{count} tahů"
+      },
+      "duration": "Trvání {time}",
+      "rating_diff": "Změna ratingu {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Stáhnout partii jako PGN",
+      "copy_pgn": "Kopírovat",
+      "copy_pgn_title": "Kopírovat PGN",
+      "gif": "GIF",
+      "gif_title": "Vytvořit animovaný GIF (otevře novou kartu)",
+      "gif_signin": "Pro vytváření GIFů se přihlaste",
+      "pgn_copied": "PGN zkopírováno do schránky.",
+      "pgn_saved": "PGN staženo.",
+      "none": "Zatím žádné partie. Zobrazí se tu vaše online partie.",
+      "none_filtered": "Těmto filtrům neodpovídá žádná partie.",
+      "none_public": "Zatím žádné partie.",
+      "total": {
+        "one": "{count} partie",
+        "few": "{count} partie",
+        "other": "{count} partií"
+      },
+      "termination_unknown": "Konec partie",
+      "reason": {
+        "1": "Mat",
+        "2": "Vzdání se",
+        "3": "Prohra na čas",
+        "4": "Druhý nepřípustný tah (kontumace)",
+        "5": "Pat",
+        "6": "Mrtvá pozice (nedostatečný materiál)",
+        "7": "Překročení času, ale soupeř nemůže dát mat",
+        "8": "Pětinásobné opakování pozice",
+        "9": "Pravidlo 75 tahů",
+        "10": "Trojí opakování pozice (reklamováno)",
+        "11": "Pravidlo 50 tahů (reklamováno)",
+        "12": "Remíza dohodou",
+        "13": "Druhý nepřípustný tah, ale soupeř nemůže dát mat",
+        "14": "Vzdání se, ale soupeř nemůže dát mat",
+        "20": "Opuštění partie (příliš dlouhé odpojení)",
+        "21": "Opuštění partie, ale soupeř nemůže dát mat",
+        "22": "Partie zrušena",
+        "23": "První tah nebyl zahrán včas (zrušeno)",
+        "24": "Kontumace (porušení fair play)",
+        "25": "Zrušeno serverem",
+        "26": "Oba hráči se odpojili"
+      }
+    },
+    "ratings": {
+      "category": "Tempo hry",
+      "rating": "Rating",
+      "peak": "Maximum",
+      "games": "Partie",
+      "wdl": "V / R / P",
+      "provisional": "Prozatímní rating",
+      "none": "Zatím žádná partie na rating.",
+      "unrated_hint": "Otazník označuje prozatímní rating (zatím odehráno málo partií)."
+    },
+    "account": {
+      "member_since": "Na serveru od {date}",
+      "last_login": "Poslední přihlášení",
+      "created": "Vytvořeno",
+      "email": "E-mail",
+      "pending_email": "Čeká na potvrzení: {email}",
+      "verified": "Potvrzeno",
+      "unverified": "Nepotvrzeno",
+      "mfa": "Dvoufázové ověření",
+      "mfa_on": "Zapnuto",
+      "mfa_off": "Vypnuto",
+      "google": "Přihlášení přes Google",
+      "google_on": "Propojeno",
+      "google_off": "Nepropojeno",
+      "password": "Heslo",
+      "password_set": "Nastaveno",
+      "password_unset": "Zatím nenastaveno",
+      "challenges": "Výzvy",
+      "challenges_all": "Přijímají se",
+      "challenges_none": "Odmítají se",
+      "badge_verified": "E-mail potvrzen",
+      "badge_mfa": "2FA zapnuto",
+      "badge_google": "Google",
+      "ban_until": "Váš účet je pozastaven do {date}.",
+      "ban_permanent": "Váš účet je pozastaven.",
+      "sanction_ban": "Pozastavení účtu",
+      "sanction_mm_block": "Zablokované hledání soupeře",
+      "sanction_warning": "Varování",
+      "sanction_until": "do {date}",
+      "sanction_permanent": "trvale",
+      "devices_current": "Toto zařízení",
+      "devices_unknown": "Nepojmenované zařízení",
+      "devices_signed_in": "Přihlášeno {date}",
+      "devices_seen": "Naposledy použito {time}",
+      "devices_expires": "Vyprší {date}",
+      "devices_revoke": "Odhlásit",
+      "devices_revoked": "Zařízení bylo odhlášeno.",
+      "devices_none": "Žádné další zařízení.",
+      "signout_all_confirm": "Odhlásit všechna zařízení, včetně tohoto?",
+      "signed_out": "Odhlášení proběhlo.",
+      "signed_in": "Vítejte, {name}.",
+      "prefs_saved": "Uloženo.",
+      "password_changed": "Vaše heslo bylo změněno. Ostatní zařízení byla odhlášena.",
+      "email_sent": "Na novou adresu byl odeslán potvrzovací odkaz. Adresa se změní, jakmile ho otevřete.",
+      "email_changed": "Vaše e-mailová adresa je teď {email}.",
+      "email_current": "Současná adresa: {email}.",
+      "email_pending": "Změna na {email} čeká na potvrzovací odkaz.",
+      "export_done": "Vaše data byla stažena.",
+      "deleted": "Váš účet byl smazán.",
+      "delete_confirm_label": "Pro potvrzení zadejte {name}",
+      "register_done": "Na adresu {email} jsme poslali potvrzovací odkaz. Jeho otevřením vytvoříte účet; poté se přihlaste.",
+      "register_ready": "Váš účet je připraven. Můžete se přihlásit.",
+      "forgot_done": "Pokud tuto adresu používá nějaký účet, odkaz pro volbu nového hesla je na cestě.",
+      "resend_done": "Pokud tato adresa čeká na potvrzení, nový odkaz je na cestě.",
+      "pow_solving": "Řešení úlohy proti robotům…",
+      "mfa_recovery": "Záložní kód",
+      "mfa_recovery_text": "Zadejte jeden ze svých záložních kódů. Každý kód funguje jen jednou.",
+      "mfa_app": "Kód z aplikace",
+      "mfa_app_text": "Zadejte šestimístný kód z ověřovací aplikace.",
+      "mfa_state_on": "Dvoufázové ověření je pro tento účet zapnuto.",
+      "mfa_state_off": "Dvoufázové ověření je pro tento účet vypnuto.",
+      "client_label": "Web Scacelith ({browser})",
+      "username": "Uživatelské jméno",
+      "password_rules": "Alespoň {min} znaků, bez vašeho uživatelského jména nebo e-mailu.",
+      "password_note": "Vaše ostatní zařízení se odhlásí a toto zůstane přihlášené.",
+      "signin_label": "Přihlásit se",
+      "google_link_text": "Účet {name} už tuto e-mailovou adresu používá. Zadejte jednou jeho heslo a propojte ho s Googlem; potom už stačí „Přihlásit se přes Google“.",
+      "auth_foot_google": "Jeden účet na oficiálním serveru, pro hru i pro tento web. Vznikl váš účet ve hře přes Google? Přihlaste se přes Google i tady."
+    },
+    "players": {
+      "since": "Na serveru od {date}",
+      "games": "Partie",
+      "rated": "Na rating",
+      "wins": "Výhry",
+      "draws": "Remízy",
+      "losses": "Prohry",
+      "view": "Zobrazit profil hráče {name}",
+      "you": "Vy",
+      "board": "Žebříček"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partie č. {id} · {date}",
+      "preparing": "Příprava GIFu…",
+      "rendering": "Server kreslí GIF. U dlouhé partie to může trvat několik sekund…",
+      "ready": "Váš GIF je připraven. Stahování začalo.",
+      "ready_again": "Váš GIF je připraven.",
+      "signin": "Chcete-li vytvářet GIFy svých partií, přihlaste se.",
+      "signin_button": "Přihlásit se",
+      "missing": "Nebyla vybrána žádná partie.",
+      "retry_in": "Znovu to můžete zkusit za {time}.",
+      "confirm": "Stiskněte „Vytvořit GIF“ a server tuto partii nakreslí pod vaším účtem.",
+      "retry_now": "Teď to můžete zkusit znovu."
+    },
+    "home": {
+      "create_account": "Vytvořit účet",
+      "my_account": "Můj účet",
+      "my_games": "Moje partie",
+      "signin": "Přihlásit se"
+    },
+    "trailer": {
+      "title": "Upoutávka na Scacelith",
+      "notice": "Toto video hostuje YouTube. Když ho přehrajete zde, načte se přehrávač Googlu, který obdrží vaši IP adresu a může do vašeho zařízení ukládat cookies nebo jiné sledovací prvky.",
+      "accept": "Přijmout a přehrát",
+      "google_privacy": "Zásady ochrany soukromí společnosti Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Právní informace",
+    "title": "Údaje o vydavateli, ochrana soukromí a podmínky použití",
+    "lead": "Kdo Scacelith vydává a hostuje, co se děje s vašimi daty na tomto webu, ve hře a na oficiálním serveru, a pravidla pro hraní na něm.",
+    "updated": "Poslední aktualizace: 11. října 2026",
+    "toc": "Na této stránce",
+    "notice": {
+      "title": "Údaje o vydavateli",
+      "publisher_label": "Vydavatel",
+      "publisher": "Scacelith vydává soukromá osoba, a to neprofesionálně. Jak umožňuje francouzský zákon (článek 1-1 II zákona č. 2004-575 ze dne 21. června 2004), totožnost vydavatele zde není uvedena; je známa poskytovateli hostingu.",
+      "contact_label": "Kontakt",
+      "contact": "Pro jakékoli dotazy k tomuto webu, oficiálnímu serveru nebo vašim datům.",
+      "host_server": "Oficiální herní server a data účtů",
+      "host_server_note": "Servery ve Francii.",
+      "host_site": "Tento web a dokumentace API (GitHub Pages)",
+      "host_domain": "Registrátor doménového jména",
+      "licence_label": "Licence",
+      "licence": "Hra i její server jsou svobodný software pod licencí GNU General Public License v3 s veřejným zdrojovým kódem:",
+      "game_source": "hra",
+      "server_source": "server",
+      "phone": "Tel."
+    },
+    "privacy": {
+      "title": "Ochrana soukromí",
+      "intro": "Scacelith nezobrazuje žádnou reklamu, neprodává žádná data a neměří návštěvnost. Osobní údaje se používají jen k provozu tohoto webu a oficiálního serveru, jak je popsáno níže. Správcem je vydavatel, kterého zastihnete na kontaktní adrese uvedené výše.",
+      "site_title": "Na tomto webu",
+      "site_hosting": "GitHub web hostuje a jako každý poskytovatel webového hostingu zaznamenává z bezpečnostních důvodů IP adresy návštěvníků.",
+      "github_privacy": "Prohlášení GitHubu o ochraně soukromí",
+      "site_requests": "Kvůli zobrazení nejnovějšího vydání se váš prohlížeč dotazuje API GitHubu (api.github.com); kvůli zobrazení stavu serveru, žebříčku, hráčů a vašeho účtu se dotazuje oficiálního serveru (caissa.scacelith.com). Oba obdrží vaši IP adresu, jako při každém požadavku.",
+      "site_storage": "Web neukládá žádné cookies a nepoužívá žádnou analytiku. Ve vašem prohlížeči uchovává jen zvolený jazyk a po přihlášení vaši relaci: jen pro aktuální kartu, nebo na tomto zařízení, pokud zaškrtnete „Pamatovat si přihlášení“. Přihlášení přes Google v aktuální kartě uchovává také své jednorázové kódy, dokud nejsou použity. To vše je nutné pro fungování webu a relaci i kódy dostává jen oficiální server.",
+      "site_trailer": "Upoutávka je video na YouTube. Dokud nestisknete „Přijmout a přehrát“, z YouTube se nic nenačte; YouTube (Google) pak obdrží vaši IP adresu a může do vašeho zařízení ukládat cookies nebo jiné sledovací prvky. Vaše odpověď se nepamatuje: otázka se objeví znovu při vaší příští návštěvě.",
+      "site_google": "Tlačítko „Přihlásit se přes Google“ na stránce Účet z Googlu nic nenačítá, dokud ho nestisknete. Váš prohlížeč pak přejde na přihlašovací stránku Googlu (accounts.google.com) a Google ho pošle zpět na tento web s jednorázovým kódem, který web předá oficiálnímu serveru. Google obdrží vaši IP adresu a to, co na jeho stránce zadáte, podle svých vlastních zásad.",
+      "google_privacy": "Zásady ochrany soukromí společnosti Google",
+      "game_title": "Ve hře",
+      "game_local": "Hra uchovává svá nastavení, vaše místní výsledky a vaše přihlášení ve vašem počítači. Přihlášení je uloženo v zabezpečeném úložišti systému: v DPAPI ve Windows, v Klíčence v macOS, v klíčence Secret Service v Linuxu, nebo jinak v souboru, který může číst jen váš uživatelský účet.",
+      "game_network": "Hra sama od sebe nic neodesílá: žádnou telemetrii, žádnou kontrolu aktualizací. K oficiálnímu serveru se připojuje, jen když otevřete stránku hry online, k Hugging Face, jen když stahujete hlas trenéra, a při přímém zápase k počítači vašeho soupeře, který se tak dozví vaši IP adresu (hra může také otevřít port na vašem routeru pomocí UPnP).",
+      "account_title": "Váš účet na oficiálním serveru",
+      "account_intro": "Vytvořením účtu, ve hře nebo na tomto webu, a hraním online se na oficiální server, který hostuje společnost OVH ve Francii, odesílají tyto údaje:",
+      "data_account": "<strong>Účet:</strong> uživatelské jméno, e-mailová adresa, heslo (uložené jen jako hash Argon2id), tajný klíč dvoufázového ověření (šifrovaný) a záložní kódy (hashované), datum registrace a datum posledního přihlášení.",
+      "data_google": "<strong>Přihlášení přes Google:</strong> Google posílá identifikátor vašeho účtu Google, vaši e-mailovou adresu a vaše jméno. Server si uchovává identifikátor a adresu a jméno používá jen k návrhu uživatelského jména.",
+      "data_sessions": "<strong>Přihlášená zařízení:</strong> u každého přihlášení název zařízení (verze hry a systém, například „Scacelith/1.0.0 win64“, nebo u tohoto webu prohlížeč a systém), IP adresa a data používání.",
+      "data_games": "<strong>Partie a ratingy:</strong> každá online partie (hráči, tahy, čas strávený nad každým tahem, výsledek, data) a vaše ratingy. Během partie se pohyby vaší hlavy a ruky živě přenášejí soupeři a nikdy se neukládají.",
+      "data_security": "<strong>Bezpečnostní záznamy:</strong> přihlášení, neúspěšné pokusy a změny účtu, s IP adresou.",
+      "data_fairplay": "<strong>Fair play:</strong> hlášení podaná vámi nebo na vás, s jejich komentářem; opuštěné a zmeškané partie; sankce; a kontroly prováděné u partií, od podvržených nebo nemožných tahů po statistiky šachového programu Stockfish.",
+      "basis_title": "Proč a na jakém právním základě",
+      "basis_contract": "Provoz vašeho účtu a hry online (přihlášení, zápasy, ratingy, záznamy partií, e-maily, které služba odesílá): služba, ke které se registrujete (čl. 6 odst. 1 písm. b) GDPR).",
+      "basis_security": "Ochrana účtů a serveru a zajištění férových partií (bezpečnostní záznamy, IP adresy, kontroly fair play, sankce): oprávněný zájem vydavatele a hráčů (čl. 6 odst. 1 písm. f) GDPR).",
+      "basis_trailer": "Přehrání upoutávky z YouTube: váš souhlas, udělený tlačítkem (čl. 6 odst. 1 písm. a) GDPR).",
+      "public_title": "Co může vidět každý",
+      "public": "Vaše uživatelské jméno, datum registrace, ratingy a úplný seznam partií se všemi tahy jsou veřejné: na tomto webu, přes API serveru a v PGN každé partie. Vaše e-mailová adresa, zařízení, přihlášení, sankce a záznamy fair play se nikdy nezobrazují. Přímé výzvy můžete odmítat, ale partie skrýt nelze.",
+      "auto_title": "Automatizovaná rozhodnutí",
+      "auto": "Některá porušení protokolu hry, například podvržená zpráva nebo tah, který je v dané pozici nemožný, jsou jistým důkazem podvádění: server pak partii kontumuje, zablokuje účet na 24 hodin, odstraní ho ze žebříčku a vrátí soupeřům body, které proti němu za posledních 60 dní ztratili. Tři opuštěné, zrušené nebo zmeškané partie během 24 hodin pozastaví hledání soupeře pro partie na rating na 15 minut, poté na déle. Statistiky šachového programu samy o sobě nikdy k sankci nevedou: rozhoduje člověk. O přezkoumání jakéhokoli rozhodnutí můžete požádat na kontaktní adrese.",
+      "recipients_title": "Kdo vaše data dostává",
+      "recipient_ovh": "OVH SAS hostuje server a jeho data ve Francii.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) odesílá e-maily serveru: obdrží vaši adresu, vaše uživatelské jméno a zprávu.",
+      "recipient_google": "Google obdrží to, co mu váš prohlížeč pošle, když se rozhodnete přihlásit přes Google, podle svých vlastních zásad ochrany soukromí.",
+      "recipient_staff": "Administrátor serveru a moderátoři vidí data účtů a záznamy fair play, aby mohli službu provozovat.",
+      "recipient_players": "Ostatní hráči vidí to, co je veřejné, a váš soupeř během partie vidí vaše tahy a pohyby.",
+      "recipient_none": "Nikdo jiný: žádná data se neprodávají, nepronajímají ani nepoužívají k reklamě.",
+      "transfers": "Data účtů zůstávají ve Francii. GitHub, Google a Porkbun (který přeposílá zprávy zaslané na kontaktní adresu) sídlí ve Spojených státech: to, co obdrží, se řídí jejich vlastními zásadami a jejich zárukami pro předávání dat mimo Evropskou unii.",
+      "retention_title": "Jak dlouho se data uchovávají",
+      "ret_account": "<strong>Účet:</strong> dokud ho nesmažete. Registrace, jejíž adresa není nikdy potvrzena, se po 24 hodinách smaže.",
+      "ret_sessions": "<strong>Přihlášená zařízení:</strong> do odhlášení, nebo do uplynutí 30 dnů bez použití, nejdéle však 90 dnů.",
+      "ret_ip": "<strong>IP adresy:</strong> po 30 dnech se mažou. Protokoly serveru uchovávají jen zkrácené adresy.",
+      "ret_security": "<strong>Bezpečnostní záznamy:</strong> 90 dnů.",
+      "ret_conduct": "<strong>Opuštěné a zmeškané partie:</strong> 30 dnů.",
+      "ret_games": "<strong>Partie a ratingy:</strong> po dobu, po kterou server uchovává záznamy partií, které jsou zároveň záznamy vašich soupeřů. Po smazání vašeho účtu se vaše jméno v nich nahradí textem „deleted#“ a číslem.",
+      "ret_fairplay": "<strong>Sankce, hlášení a výsledky kontrol fair play:</strong> uchovávají se, aby se zablokovaní hráči nemohli jednoduše vrátit a ostatní hráči zůstali chráněni. Po smazání vašeho účtu zůstanou spojené už jen s jeho číslem.",
+      "ret_backups": "<strong>Zálohy:</strong> smazaná data mohou krátce přetrvat v záložní kopii serveru, dokud není nahrazena.",
+      "ret_contact": "<strong>Zprávy na kontaktní adresu:</strong> po dobu nutnou k jejich vyřízení.",
+      "rights_title": "Vaše práva",
+      "rights": "Ke svým datům můžete získat přístup, můžete je opravit, vymazat a exportovat, omezit jejich používání a vznést proti němu námitku (články 15 až 21 GDPR).",
+      "rights_self": "Většinu z toho zařídíte ve svém účtu, ve hře nebo na stránce Účet tohoto webu: stáhnete si data účtu jako soubor JSON, změníte e-mailovou adresu nebo heslo, odhlásíte ostatní zařízení nebo účet okamžitě smažete.",
+      "rights_google": "Účet vytvořený přes Google nemá heslo: chcete-li ho exportovat nebo smazat, nejprve mu nastavte heslo pomocí „Zapomenuté heslo?“.",
+      "rights_mail": "Se vším ostatním, včetně dat, která export neobsahuje (kontroly fair play, hlášení na vás), se obraťte na kontaktní adresu. Odpověď dostanete do jednoho měsíce.",
+      "rights_cnil": "Pokud se domníváte, že vaše práva nejsou dodržována, můžete podat stížnost u CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) nebo u úřadu pro ochranu osobních údajů ve své zemi.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Podmínky použití",
+      "intro": "Tyto podmínky platí pro oficiální server (caissa.scacelith.com) a pro stránky účtu na tomto webu. Vytvořením účtu nebo hraním na oficiálním serveru je přijímáte.",
+      "service": "<strong>Bezplatná služba.</strong> Hra je svobodný software a je zdarma. Oficiální server se nabízí zdarma a tak, jak je, bez záruky dostupnosti: může se změnit, na čas přestat fungovat nebo být ukončen.",
+      "account": "<strong>Váš účet.</strong> Odpovídáte za to, co se s ním děje, a za utajení jeho hesla. Pokud máte podezření, že ho používá někdo jiný, napište okamžitě na kontaktní adresu.",
+      "username": "<strong>Vaše uživatelské jméno</strong> je veřejné: nesmí být urážlivé ani nenávistné, nesmí sloužit k vydávání se za jinou osobu ani prozrazovat něčí osobní údaje.",
+      "fair": "<strong>Fair play.</strong> Během partie na rating žádná pomoc šachového programu, jiné osoby ani jakéhokoli jiného nástroje. Žádný upravený herní klient, podvržené zprávy ani úmyslné přetěžování serveru.",
+      "conduct": "<strong>Dohrávejte své partie.</strong> Když třikrát během 24 hodin opustíte nebo zrušíte partii, nebo zmeškáte partii, ke které vám byl přidělen soupeř, hledání soupeře pro partie na rating se na čas pozastaví.",
+      "reports": "<strong>Hlášení</strong> musí být podávána v dobré víře. Chcete-li nahlásit hráče nebo nezákonný obsah, například urážlivé uživatelské jméno, použijte tlačítko pro nahlášení u partie nebo napište na kontaktní adresu.",
+      "sanctions": "<strong>Sankce.</strong> Porušení těchto pravidel může vést ke kontumaci, varování, zablokování a odstranění ze žebříčku; body ztracené proti podvodníkovi se vracejí jeho soupeřům. Automaticky se trestá jen jistý důkaz podvádění; o všem ostatním rozhoduje člověk. Proti sankci se můžete odvolat na kontaktní adrese.",
+      "liability": "<strong>Odpovědnost.</strong> V mezích, které připouští zákon, vydavatel neodpovídá za přerušení služby ani za ztrátu partií, ratingů nebo dat.",
+      "end": "<strong>Ukončení.</strong> Svůj účet můžete kdykoli smazat. Účet, který tyto podmínky porušuje, může být zablokován.",
+      "changes": "<strong>Změny.</strong> Tyto podmínky se mohou změnit; datum v horní části této stránky udává platnou verzi a pokračování ve hraní po změně znamená její přijetí.",
+      "law": "<strong>Rozhodné právo.</strong> Tyto podmínky se řídí francouzským právem. V případě sporu nejprve napište na kontaktní adresu, abychom společně našli řešení."
+    },
+    "version_note": "Tato stránka existuje v několika jazycích; pokud se znění liší, rozhodující je francouzská verze."
+  }
+}

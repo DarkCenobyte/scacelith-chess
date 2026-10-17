@@ -1,0 +1,813 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith – fotorealistiški šachmatai, žaidžiami pirmuoju asmeniu",
+      "description": "Nemokami fotorealistiški šachmatai pirmuoju asmeniu Windows, Linux ir macOS sistemoms: Stockfish 19, treneris, partijų analizė ir žaidimas internetu karališkoje salėje."
+    },
+    "players": {
+      "title": "Lyderių lentelė ir žaidėjai – Scacelith",
+      "description": "Geriausi oficialaus Scacelith serverio žaidėjai kiekvienoje reitinginių partijų laiko kontrolėje, jų reitingai ir naujausios partijos."
+    },
+    "account": {
+      "title": "Jūsų paskyra – Scacelith",
+      "description": "Prisijunkite prie savo Scacelith paskyros: reitingai, partijų istorija, PGN ir GIF atsisiuntimai, prisijungę įrenginiai ir nustatymai."
+    },
+    "gif": {
+      "title": "Animuotas GIF – Scacelith",
+      "description": "Animuotas Scacelith partijos GIF."
+    },
+    "legal": {
+      "title": "Teisinė informacija, privatumas ir naudojimo sąlygos – Scacelith",
+      "description": "Kas yra Scacelith leidėjas ir prieglobos paslaugų teikėjas, ką svetainė, žaidimas ir oficialus serveris daro su asmens duomenimis, jūsų teisės ir oficialaus serverio taisyklės."
+    }
+  },
+  "brand": {
+    "tagline": "Karališkasis žaidimas"
+  },
+  "nav": {
+    "skip": "Pereiti prie turinio",
+    "home": "Pradžia",
+    "label": "Pagrindinis meniu",
+    "game": "Žaidimas",
+    "modes": "Režimai",
+    "gallery": "Galerija",
+    "trailer": "Anonsas",
+    "online": "Internetu",
+    "players": "Lyderių lentelė",
+    "account": "Paskyra",
+    "language": "Kalba",
+    "menu": "Meniu",
+    "download": "Atsisiųsti"
+  },
+  "hero": {
+    "image_alt": "Du porcelianiniai robotai žaidžia šachmatais prie riešutmedžio stalo saulės nutviekstoje marmuro salėje.",
+    "lead": "Užimkite vietą prie vaškuoto riešutmedžio stalo saulės nutviekstoje karališkoje salėje. Kitoje lentos pusėje jūsų pirmojo ėjimo laukia porcelianinis robotas, kurį valdo Stockfish.",
+    "watch": "Žiūrėti anonsą",
+    "meta": "Laisvoji programinė įranga · Windows, Linux, macOS (eksperimentinė versija) · Vaizdo plokštė su OpenGL 4.6",
+    "caption": "Užfiksuota žaidime: karališkoji salė"
+  },
+  "highlights": {
+    "engine": "Nuosavas OpenGL 4.6 variklis",
+    "stockfish": "Integruotas Stockfish 19",
+    "rules": "FIDE taisyklės",
+    "online": "Žaidimas internetu",
+    "languages": "34 kalbos"
+  },
+  "experience": {
+    "eyebrow": "Patirtis",
+    "title": "Ne lenta ekrane.<br><em>Vieta prie stalo.</em>",
+    "lead": "Scacelith sugrąžina tai, kas sukuria tikrą partiją: salę, tylą, laikrodį, į jus žiūrintį varžovą ir turnyro ritualus.",
+    "presence": {
+      "title": "Pirmuoju asmeniu",
+      "text": "Matote savo roboto akimis: apsidairykite po salę, pasilenkite virš lentos, pakelkite akis į varžovą, žvilgtelėkite į savo partijos blanką arba atsistokite ir nueikite į stalo galą."
+    },
+    "ritual": {
+      "title": "Turnyro taisyklės",
+      "text": "Kurią figūrą palietėte, ta ir turite eiti, o jūsų ranka paspaudžia laikrodį ir taip užbaigia ėjimą. Kai galimi ėjimai nerodomi, teisėjas baudžia už neleistiną ėjimą, o antrasis neleistinas ėjimas reiškia pralaimėjimą."
+    },
+    "scoresheet": {
+      "title": "Rašoma ranka",
+      "text": "Abu žaidėjai užrašo kiekvieną ėjimą savo partijos blanke, kiekvienas savo rašysena, ir kas keturiasdešimt ėjimų verčia puslapį. Girdite, kaip plunksna braukia per popierių."
+    },
+    "opponent": {
+      "title": "Vertas varžovas",
+      "text": "Stockfish 19 jūsų lygiu – nuo „Naujokas“ (800) iki „Stockfish Max“ (3500), o po kiekvienos partijos jūsų reitingas apskaičiuojamas pagal FIDE taisykles."
+    },
+    "engine": {
+      "title": "Sukurtas šiam žaidimui",
+      "text": "Nuo nulio parašytas variklis: fiziškai pagrįstas apšvietimas, marmuras, vaškuota mediena, porcelianas ir žalvaris, saulė pro langus, minkšti šešėliai ir atspindžiai. Kokybės lygiai nuo „Labai žema“ iki „Ultra“ pritaiko jį prie jūsų vaizdo plokštės."
+    },
+    "languages": {
+      "title": "34 kalbos",
+      "text": "Anglų, prancūzų, vokiečių, ispanų, Portugalijos ir Brazilijos portugalų, italų, nyderlandų, švedų, danų, suomių, estų, latvių, lietuvių, lenkų, čekų, slovakų, slovėnų, kroatų, vengrų, rumunų, bulgarų, graikų, turkų, ukrainiečių, rusų, arabų, hindi, indoneziečių, vietnamiečių, korėjiečių ir japonų kalbos, taip pat kinų kalba supaprastintąja ir tradicine rašyba. Arabų kalbos sąsaja išdėstyta iš dešinės į kairę, o treneris garsiai kalba visomis kalbomis, išskyrus kinų: šia kalba jo žodžiai rodomi subtitrais."
+    }
+  },
+  "modes": {
+    "eyebrow": "Žaidimo režimai",
+    "title": "Kiekvienai partijai –<br><em>savas stalas.</em>",
+    "lead": "Viskas žaidžiama toje pačioje salėje, o režimas pasirenkamas pradiniame ekrane. Ir be interneto Stockfish visada pasiruošęs partijai.",
+    "new_game": {
+      "name": "Nauja partija",
+      "text": "Žaiskite su pasirinkto stiprumo Stockfish bet kokia laiko kontrole – nuo kulkos iki klasikinių šachmatų – arba su draugu prie to paties kompiuterio, kiekvienas savo roboto akimis."
+    },
+    "coach": {
+      "name": "Treneris",
+      "text": "Priešais jus atsisėda mokytojas, žaidžia jūsų lygiu ir komentuoja partiją: grėsmes, gerus ėjimus, klaidas, o ką kainuoja klaida, parodo lentoje savo ranka. Nuo šachmatų taisyklių iki eksperto lygio, balsu, kuris sintetinamas jūsų kompiuteryje."
+    },
+    "challenges": {
+      "name": "Trenerio iššūkiai",
+      "text": "Trumpi pozicijų rinkiniai, kurių kiekvienas lavina vieną įgūdį: matai per 1–3 ėjimus, šakutės, surišimai ir kiti taktiniai smūgiai, gynyba ir pagrindiniai endšpiliai prieš trenerį. Užuominos – tik kai jų paprašote, o kiekvienas įveiktas rinkinys pažymimas žalia varnele."
+    },
+    "analysis": {
+      "name": "Analizė",
+      "text": "Stockfish peržiūri jūsų įrašytas partijas, partijas internetu ar bet kurį PGN: įvertinimo juosta, svarbiausi ėjimai, įvertinti nuo genialaus ėjimo iki šiurkščios klaidos, geresnis ėjimas, nubrėžtas rodykle, ir komentarai garsu bei subtitrais. Kai einate per partiją ėjimas po ėjimo, robotų rankos atlieka ėjimus lentoje."
+    },
+    "online": {
+      "name": "Žaisti internetu",
+      "text": "Tikri varžovai per Scacelith serverį: reitinginės partijos, varžovų paieška, iššūkiai ir privačios partijos arba tiesioginis mačas tarp dviejų kompiuterių. Varžovo robotas realiuoju laiku atkartoja jo judesius."
+    },
+    "watch": {
+      "name": "Stebėti partiją",
+      "text": "Du Stockfish žaidėjai kovoja tarpusavyje, o jūs nematomai ir laisvai judate po salę nuo vieno stebėjimo taško prie kito."
+    },
+    "saved": {
+      "name": "Įrašytos partijos",
+      "text": "Jūsų partijos saugomos PGN failais. Peržiūrėkite jas salėje su tikru mąstymo laiku ir laikrodžių parodymais arba įkelkite partijas iš kitų programų."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerija",
+    "title": "Vaizdai <em>iš salės vidaus</em>",
+    "lead": "Kiekvienas vaizdas užfiksuotas žaidime realiuoju laiku, paties žaidimo varikliu.",
+    "title_screen": {
+      "alt": "Pradinis ekranas: Scacelith meniu šalia dviejų salėje šachmatais žaidžiančių robotų.",
+      "caption": "Pradinis ekranas"
+    },
+    "coach": {
+      "alt": "Treneris – porcelianinis robotas su užrašu „COACH“ ant krūtinės – sveikina jus kitoje lentos pusėje; jo žodžiai rodomi ir subtitrais.",
+      "caption": "Treneris"
+    },
+    "challenges": {
+      "alt": "Trenerio iššūkių meniu: matų ir taktikos rinkiniai su sunkumo lygiu ir jau įveiktais rinkiniais, šalia – pasirinkto rinkinio aprašymas.",
+      "caption": "Trenerio iššūkiai"
+    },
+    "analysis": {
+      "alt": "Analizės režimas: įvertinimo juosta, ant lentos nubrėžta rodyklė, anotuoti ėjimai su kiekvienos pusės tikslumu ir valdymo klavišų sąrašas.",
+      "caption": "Analizė"
+    },
+    "game": {
+      "alt": "Vaizdas iš šono: vienas robotas tiesia ranką per stalą, kad perkeltų figūrą, o kitas laukia; kirstos figūros stovi šalia lentos.",
+      "caption": "Stebėti partiją"
+    },
+    "hall": {
+      "alt": "Du robotai raudono aksomo krėsluose sėdi vienas priešais kitą prie šachmatų lentos po aukštais langais.",
+      "caption": "Karališkoji salė"
+    },
+    "opponent": {
+      "alt": "Varžovo, porcelianinio roboto, stambus planas: jo galva palenkta prie lentos.",
+      "caption": "Jūsų varžovas"
+    },
+    "scoresheet": {
+      "alt": "Roboto ranka plunksnakočiu užrašo ėjimus partijos blanke.",
+      "caption": "Partijos blankas"
+    },
+    "note": "Versija 1.0.0. Šiuose vaizduose žaidimo sąsaja yra anglų kalba.",
+    "viewer": "Vaizdų peržiūra",
+    "close": "Uždaryti",
+    "previous": "Ankstesnis vaizdas",
+    "next": "Kitas vaizdas"
+  },
+  "trailer": {
+    "eyebrow": "Anonsas",
+    "title": "Scacelith <em>judesyje</em>",
+    "soon_title": "Anonsas netrukus",
+    "soon_text": "O kol kas užimkite vietą: žaidimą jau galima atsisiųsti.",
+    "privacy": "Kol nesutinkate įkelti YouTube grotuvo, iš YouTube nieko neįkeliama.",
+    "open_youtube": "Žiūrėti YouTube svetainėje"
+  },
+  "online": {
+    "eyebrow": "Internetu",
+    "title": "Tikri varžovai,<br><em>ta pati salė.</em>",
+    "lead": "Prisijunkite prie oficialaus serverio iš žaidimo ir žaiskite su žmonėmis iš viso pasaulio – vis dar pirmuoju asmeniu.",
+    "point_rated": "Reitinginės partijos kiekvienoje oficialioje laiko kontrolėje, kiekvienoje – atskiras reitingas, apskaičiuojamas pagal FIDE taisykles.",
+    "point_match": "Varžovų paieška, iššūkiai pagal vardą ir privačios partijos su kodu arba tiesioginis mačas tarp dviejų kompiuterių – be serverio ir be paskyros.",
+    "point_fair": "Sąžiningas žaidimas: automatinės patikros, baigtų partijų analizė šachmatų varikliu ir žaidėjų pranešimai.",
+    "point_history": "Jūsų partijų istorija šioje svetainėje: atsisiųskite bet kurią partiją PGN formatu arba kaip animuotą GIF.",
+    "point_open": "Bendruomenės serverį gali paleisti kiekvienas: serveris yra laisvoji programinė įranga, o jo API dokumentuota.",
+    "create": "Sukurti paskyrą",
+    "signin": "Prisijungti",
+    "server_title": "Oficialus serveris",
+    "status_checking": "Tikrinama…",
+    "address": "Adresas",
+    "registration": "Registracija",
+    "categories": "Reitinginių partijų laiko kontrolės",
+    "top_players": "Geriausi žaidėjai",
+    "category": "Laiko kontrolė",
+    "board_loading": "Įkeliama lyderių lentelė…",
+    "full_board": "Visa lyderių lentelė"
+  },
+  "download": {
+    "button": "Atsisiųsti",
+    "choose": "Pasirinkite sistemą",
+    "see_release": "Žiūrėti versiją GitHub svetainėje",
+    "latest": "Scacelith",
+    "all_releases": "Visos versijos",
+    "experimental": "Eksperimentinė",
+    "source": "Išeities kodas",
+    "source_zip": "ZIP archyvas",
+    "eyebrow": "Atsisiuntimas",
+    "title": "Užimkite vietą.<br><em>Nemokamas ir atvirojo kodo.</em>",
+    "lead": "Išpakuokite ir žaiskite: Windows ir Linux sistemose diegimo programos nereikia, o Mac kompiuteryje tereikia nutempti programą į aplanką „Applications“. Kiekvieną failą iš pažymėtos išeities kodo versijos sukuria GitHub Actions, o jo kūrimo kilmė patvirtinta.",
+    "notes": "Versijos aprašas",
+    "macos_note": "Skirta Mac kompiuteriams su Apple Silicon (M1 ar naujesniu) procesoriumi ir macOS 26 ar naujesne sistema, ne virtualioje mašinoje; ši versija naujesnė ir mažiau išbandyta nei kitos. Programos nepasirašė registruotas Apple kūrėjas: pirmą kartą atidarykite ją per System Settings › Privacy & Security › Open Anyway.",
+    "req_system": "Sistema",
+    "req_system_value": "64 bitų Windows (x64); 64 bitų Linux (x86-64 arba aarch64) su glibc 2.34, OpenSSL 3 ir X11 arba XWayland, pvz., Ubuntu 22.04 arba Debian 12; macOS 26 ar naujesnė su Apple Silicon (eksperimentinė versija)",
+    "req_gpu": "Grafika",
+    "req_gpu_value": "Vaizdo plokštė su OpenGL 4.6 ir naujausia tvarkykle (Mac kompiuteryje žaidimas naudoja savo OpenGL)",
+    "req_included": "Įtraukta",
+    "req_included_value": "Stockfish 19 ir jo neuroninis tinklas: be interneto žaisti galite iš karto",
+    "req_network": "Internetas",
+    "req_network_value": "Žaidimui internetu, GIF ir trenerio bei analizės balsui (nebūtinas maždaug 399 MB atsisiuntimas)",
+    "req_licence": "Licencija",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Patikrinkite atsisiųstą failą",
+    "verify_text": "Kiekvieno failo kūrimo kilmę patvirtina GitHub. Su GitHub CLI:",
+    "checksums": "SHA-256 kontrolinės sumos (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Kūrėjai",
+    "title": "Kūrėjai ir <em>padėkos</em>",
+    "engine_head": "Šachmatų variklis",
+    "engine": "Stockfish 19, kurį sukūrė Stockfish kūrėjai (GNU GPL v3). Jo neuroninis tinklas apmokytas naudojant Leela Chess Zero projekto pateiktus duomenis (Open Database License).",
+    "voice_head": "Balsas",
+    "voice": "Supertone sukurtas Supertonic 3, platinamas pagal BigScience Open RAIL-M licenciją: jis atsisiunčiamas jūsų prašymu ir jūsų kompiuteryje įgarsina trenerį bei analizę.",
+    "fonts_head": "Šriftai",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) ir Amiri (Khaled Hosny); rašysena – Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One ir LXGW WenKai (visi pagal SIL Open Font License); šachmatų figūros iš GNU FreeFont.",
+    "openings_head": "Debiutai ir uždaviniai",
+    "openings": "Debiutų pavadinimai paimti iš lichess.org debiutų duomenų bazės chess-openings, o trenerio iššūkių uždaviniai – iš Lichess uždavinių duomenų bazės; abi perduotos į viešąją sritį (CC0).",
+    "quote": "„Šachmatai – analizės menas.“",
+    "quote_author": "Michailas Botvinikas"
+  },
+  "footer": {
+    "about": "Fotorealistiškas šachmatų žaidimas pirmuoju asmeniu, sukurtas nuosavu OpenGL 4.6 varikliu. Laisvoji programinė įranga pagal GNU GPL v3.",
+    "game": "Žaidimas",
+    "online": "Internetu",
+    "api_docs": "Serverio API dokumentacija",
+    "source": "Išeities kodas",
+    "game_source": "Žaidimas GitHub platformoje",
+    "server_source": "Serveris GitHub platformoje",
+    "releases": "Versijos",
+    "licence": "Licencija (GPL v3)",
+    "credits": "Stockfish yra jo kūrėjų prekių ženklas. YouTube yra Google LLC prekių ženklas. Windows yra Microsoft Corporation prekių ženklas. macOS yra Apple Inc. prekių ženklas. Linux yra registruotasis Linuso Torvaldso prekių ženklas. OpenGL yra registruotasis Hewlett Packard Enterprise prekių ženklas.",
+    "legal": "Scacelith",
+    "made": "Ši svetainė nenaudoja slapukų ir sekiklių; YouTube grotuvas įkeliamas tik jums sutikus.",
+    "legal_link": "Teisinė informacija, privatumas ir sąlygos"
+  },
+  "common": {
+    "copy": "Kopijuoti",
+    "loading": "Įkeliama…",
+    "noscript": "Šiam puslapiui reikia JavaScript, kad jis galėtų bendrauti su Scacelith serveriu."
+  },
+  "players": {
+    "title": "Lyderių lentelė ir žaidėjai",
+    "lead": "Geriausi oficialaus serverio žaidėjai kiekvienoje reitinginių partijų laiko kontrolėje. Suraskite bet kurį žaidėją ir pamatysite jo reitingus bei naujausias partijas.",
+    "search_label": "Rasti žaidėją",
+    "search_placeholder": "Naudotojo vardas",
+    "search_button": "Ieškoti",
+    "back": "Atgal į lyderių lentelę",
+    "recent_games": "Naujausios partijos",
+    "board_title": "Lyderių lentelė",
+    "category": "Laiko kontrolė",
+    "col_rank": "Vieta",
+    "col_player": "Žaidėjas",
+    "col_rating": "Reitingas",
+    "col_peak": "Aukščiausias",
+    "col_games": "Partijos",
+    "col_wdl": "+ / = / −",
+    "loading": "Įkeliama…"
+  },
+  "account": {
+    "title": "Jūsų paskyra",
+    "auth_foot": "Viena paskyra oficialiame serveryje – ir žaidimui, ir šiai svetainei. Paskyrą žaidime sukūrėte su Google? Pasinaudokite funkcija „Pamiršote slaptažodį?“ ir nustatykite jai slaptažodį.",
+    "common": {
+      "back": "Atgal į prisijungimą"
+    },
+    "fields": {
+      "login": "Naudotojo vardas arba el. paštas",
+      "password": "Slaptažodis",
+      "show_password": "Rodyti slaptažodį",
+      "username": "Naudotojo vardas",
+      "email": "El. paštas",
+      "confirm_password": "Pakartokite slaptažodį",
+      "current_password": "Dabartinis slaptažodis",
+      "new_password": "Naujas slaptažodis",
+      "new_email": "Naujas el. pašto adresas",
+      "mfa_code": "Dviejų veiksnių kodas (arba atkūrimo kodas)"
+    },
+    "signin": {
+      "tab": "Prisijungti",
+      "title": "Su sugrįžimu",
+      "remember": "Likti prisijungus šiame įrenginyje",
+      "submit": "Prisijungti",
+      "forgot": "Pamiršote slaptažodį?",
+      "resend": "Siųsti patvirtinimo laišką dar kartą"
+    },
+    "mfa": {
+      "title": "Dviejų veiksnių autentifikavimas",
+      "text": "Įveskite 6 skaitmenų kodą iš autentifikavimo programėlės.",
+      "code": "Programėlės kodas",
+      "use_recovery": "Naudoti atkūrimo kodą",
+      "submit": "Patvirtinti"
+    },
+    "google": {
+      "or": "arba",
+      "button": "Prisijungti su Google",
+      "username_title": "Pasirinkite naudotojo vardą",
+      "username_text": "Jūsų Google paskyra šiame serveryje nauja. Pasirinkite vardą, kurį matys kiti žaidėjai: vėliau jo pakeisti nebus galima.",
+      "username_submit": "Sukurti mano paskyrą",
+      "link_title": "Susiekite savo Google paskyrą",
+      "link_submit": "Susieti ir prisijungti",
+      "returning": "Prisijungiama su Google…"
+    },
+    "register": {
+      "tab": "Sukurti paskyrą",
+      "title": "Nemokama paskyra",
+      "closed": "Šiuo metu serveris naujų paskyrų nepriima.",
+      "username_hint": "Raidės, skaitmenys, _ ir -; pirmasis simbolis – raidė arba skaitmuo.",
+      "password_hint": "Ne mažiau kaip 10 simbolių, be jūsų naudotojo vardo ir el. pašto adreso.",
+      "pow_note": "Kad apsisaugotume nuo robotų, registruojantis jūsų naršyklė išsprendžia nedidelį galvosūkį. Tai užtrunka kelias sekundes.",
+      "submit": "Sukurti paskyrą",
+      "done_title": "Patikrinkite el. paštą",
+      "done_text": "Jūsų adresu išsiuntėme patvirtinimo nuorodą. Atidarykite ją, kad sukurtumėte paskyrą, tada prisijunkite.",
+      "done_hint": "Nuoroda galioja 24 valandas. Pašto dėžutėje nieko nėra? Patikrinkite šlamšto aplanką arba paprašykite laiško dar kartą.",
+      "go_signin": "Eiti į prisijungimą",
+      "legal_note": "Jūsų naudotojo vardas, reitingai ir partijos bus vieši. Sukurti paskyrą reiškia sutikti su naudojimo sąlygomis.",
+      "legal_link": "Privatumas ir naudojimo sąlygos"
+    },
+    "forgot": {
+      "title": "Pamiršote slaptažodį",
+      "text": "Įveskite savo paskyros el. pašto adresą. Jei toks adresas priskirtas paskyrai, atsiųsime nuorodą naujam slaptažodžiui pasirinkti; ji galios vieną valandą.",
+      "submit": "Siųsti nuorodą"
+    },
+    "resend": {
+      "title": "Patvirtinkite el. paštą",
+      "text": "Negavote patvirtinimo laiško arba baigėsi nuorodos galiojimas? Įveskite savo adresą ir gausite naują.",
+      "submit": "Siųsti dar kartą"
+    },
+    "dash": {
+      "public_profile": "Viešas profilis",
+      "signout": "Atsijungti",
+      "tab_overview": "Apžvalga",
+      "tab_games": "Partijos",
+      "tab_devices": "Įrenginiai",
+      "tab_settings": "Nustatymai"
+    },
+    "overview": {
+      "info": "Jūsų informacija",
+      "ratings": "Jūsų reitingai",
+      "sanctions": "Sankcijos",
+      "recent": "Naujausios partijos",
+      "all_games": "Visos jūsų partijos"
+    },
+    "games": {
+      "filter_category": "Laiko kontrolė",
+      "all": "Visos",
+      "custom": "Pasirinktinė",
+      "filter_rated": "Tipas",
+      "rated": "Reitinginės",
+      "casual": "Draugiškos",
+      "filter_result": "Rezultatas",
+      "wins": "Laimėtos",
+      "losses": "Pralaimėtos",
+      "draws": "Lygiosios"
+    },
+    "devices": {
+      "title": "Prisijungę įrenginiai",
+      "signout_all": "Atsijungti visur",
+      "text": "Kiekvienas prisijungimas žaidime ar šioje svetainėje yra įrenginys. Atjunkite tuos, kurių neatpažįstate."
+    },
+    "settings": {
+      "challenges_title": "Iššūkiai",
+      "challenges_text": "Kiti žaidėjai gali iš žaidimo mesti jums iššūkį pagal jūsų vardą.",
+      "challenges_label": "Priimti iššūkius",
+      "mfa_title": "Dviejų veiksnių autentifikavimas",
+      "mfa_text": "Įjungti ar išjungti jį ir sukurti naujus atkūrimo kodus galite žaidimo paskyros puslapyje.",
+      "password_title": "Keisti slaptažodį",
+      "password_text": "Kiti jūsų įrenginiai bus atjungti, o šis liks prisijungęs.",
+      "password_submit": "Keisti slaptažodį",
+      "email_title": "Keisti el. pašto adresą",
+      "email_submit": "Siųsti nuorodą",
+      "export_title": "Atsisiųsti mano duomenis",
+      "export_text": "Viskas, ką serveris saugo apie jūsų paskyrą, viename JSON faile.",
+      "export_submit": "Atsisiųsti mano duomenis",
+      "delete_title": "Ištrinti paskyrą",
+      "delete_text": "Šio veiksmo atšaukti negalima. Jūsų partijos ir reitingai liks, bet su anoniminiu vardu; el. pašto adresas, slaptažodis ir įrenginiai bus panaikinti.",
+      "delete_confirm": "Kad patvirtintumėte, įveskite savo naudotojo vardą",
+      "delete_submit": "Ištrinti mano paskyrą"
+    }
+  },
+  "gif": {
+    "title": "Animuotas GIF",
+    "preparing": "Ruošiamas GIF…",
+    "download": "Atsisiųsti GIF",
+    "make": "Sukurti GIF",
+    "pause": "Pristabdyti",
+    "back": "Atgal į mano partijas",
+    "options": "Parinktys",
+    "size": "Dydis",
+    "size_small": "Mažas (284 × 350)",
+    "size_medium": "Vidutinis (424 × 515)",
+    "size_large": "Didelis (628 × 762)",
+    "orientation": "Lentos vaizdas",
+    "orientation_white": "Iš baltųjų pusės",
+    "orientation_black": "Iš juodųjų pusės",
+    "speed": "Greitis",
+    "speed_fast": "Greitas (0,25 s ėjimui)",
+    "speed_normal": "Įprastas (0,5 s ėjimui)",
+    "speed_slow": "Lėtas (1 s ėjimui)",
+    "speed_very_slow": "Labai lėtas (2 s ėjimui)",
+    "coords": "Rodyti koordinates",
+    "regenerate": "Sukurti iš naujo",
+    "note": "Kiekvieną GIF piešia serveris. Jau sukurtas GIF grąžinamas iš karto, o naujų per minutę galima sukurti tik kelis."
+  },
+  "notfound": {
+    "title": "Puslapis nerastas",
+    "text": "Šis langelis tuščias. Galbūt puslapis perkeltas.",
+    "home": "Grįžti į Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Įkeliama…",
+      "retry": "Bandyti dar kartą",
+      "close": "Uždaryti",
+      "copy": "Kopijuoti",
+      "copied": "Nukopijuota į iškarpinę.",
+      "copy_failed": "Nepavyko nukopijuoti. Pažymėkite tekstą ir nukopijuokite jį rankiniu būdu.",
+      "load_more": "Rodyti daugiau",
+      "show_password": "Rodyti slaptažodį",
+      "hide_password": "Slėpti slaptažodį",
+      "signin_needed": "Prisijunkite, kad galėtumėte tęsti.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Nepavyko pasiekti serverio. Patikrinkite ryšį ir bandykite dar kartą.",
+      "timeout": "Serveris per ilgai neatsakė. Bandykite dar kartą.",
+      "server_busy": "Serveris užimtas. Po akimirkos bandykite dar kartą.",
+      "rate_limited": "Per daug užklausų. Bandykite dar kartą po {time}.",
+      "rate_limited_short": "Per daug užklausų. Po akimirkos bandykite dar kartą.",
+      "internal_error": "Serveryje įvyko netikėta klaida. Bandykite dar kartą vėliau.",
+      "invalid_token": "Jūsų seansas baigėsi. Prisijunkite iš naujo.",
+      "unauthorized": "Prisijunkite.",
+      "not_found": "Nerasta.",
+      "unknown": "Kažkas nepavyko ({code}).",
+      "invalid_credentials": "Neteisingas naudotojo vardas, el. pašto adresas arba slaptažodis.",
+      "too_many_attempts": "Per daug bandymų. Bandykite dar kartą po {time}.",
+      "banned": "Ši paskyra sustabdyta iki {date}.",
+      "banned_permanent": "Ši paskyra sustabdyta.",
+      "email_unverified": "Jūsų el. pašto adresas dar nepatvirtintas. Atidarykite jums atsiųstą nuorodą arba paprašykite naujos.",
+      "invalid_mfa_token": "Šio prisijungimo veiksmo galiojimas baigėsi. Prisijunkite iš naujo.",
+      "invalid_code": "Neteisingas arba jau panaudotas kodas.",
+      "mfa_code_required": "Įveskite dviejų veiksnių kodą.",
+      "invalid_password": "Neteisingas slaptažodis.",
+      "password_not_set": "Ši paskyra dar neturi slaptažodžio: prisijungimo puslapyje pasinaudokite funkcija „Pamiršote slaptažodį?“ ir jį nustatykite.",
+      "registration_closed": "Šiuo metu serveris naujų paskyrų nepriima.",
+      "invalid_username": "Toks naudotojo vardas neleidžiamas.",
+      "username_taken": "Šis naudotojo vardas jau užimtas.",
+      "invalid_email": "Šis el. pašto adresas netinkamas.",
+      "email_taken": "Šį el. pašto adresą jau naudoja kita paskyra.",
+      "same_email": "Tai jau yra jūsų el. pašto adresas.",
+      "weak_password": "Šis slaptažodis per silpnas.",
+      "weak_too_short": "Slaptažodis per trumpas (reikia bent {min} simbolių).",
+      "weak_too_long": "Slaptažodis per ilgas.",
+      "weak_contains_username": "Slaptažodyje negali būti jūsų naudotojo vardo.",
+      "weak_contains_email": "Slaptažodyje negali būti jūsų el. pašto adreso.",
+      "weak_too_common": "Šis slaptažodis per daug paplitęs. Pasirinkite kitą.",
+      "pow_failed": "Apsaugos nuo robotų patikra nepavyko. Bandykite dar kartą.",
+      "passwords_differ": "Slaptažodžiai nesutampa.",
+      "required": "Užpildykite šį lauką.",
+      "email_format": "Įveskite tinkamą el. pašto adresą.",
+      "username_format": "Nuo {min} iki {max} simbolių: raidės, skaitmenys, _ ir -; pirmasis simbolis – raidė arba skaitmuo.",
+      "password_length": "Reikia bent {min} simbolių.",
+      "confirm_name": "Įveskite savo naudotojo vardą tiksliai taip, kaip parodyta.",
+      "game_too_long": "Ši partija per ilga, kad iš jos būtų galima sukurti GIF.",
+      "gif_disabled": "Šis serveris GIF nekuria.",
+      "render_failed": "Serveriui nepavyko nupiešti šio GIF.",
+      "invalid_game": "Tokios partijos nėra.",
+      "invalid_player": "Įveskite naudotojo vardą: nuo 2 iki 24 raidžių, skaitmenų, _, . arba -.",
+      "player_not_found": "Žaidėjo tokiu vardu nėra.",
+      "sso_cancelled": "Prisijungimas su Google atšauktas.",
+      "sso_mismatch": "Šis prisijungimas su Google buvo pradėtas ne šiame skirtuke arba jau panaudotas. Bandykite dar kartą.",
+      "sso_expired": "Šio prisijungimo su Google galiojimas baigėsi. Bandykite dar kartą.",
+      "invalid_verifier": "Šis prisijungimas su Google buvo pradėtas kitame skirtuke ar kitoje naršyklėje. Pradėkite iš naujo šiame puslapyje.",
+      "sso_email_unverified": "Google nepatvirtino šios Google paskyros el. pašto adreso.",
+      "sso_account_exists": "Šį el. pašto adresą jau naudoja paskyra, tačiau ji neturi slaptažodžio, kurio reikia susiejant ją su Google. Nustatykite slaptažodį funkcija „Pamiršote slaptažodį?“, tada vėl prisijunkite su Google.",
+      "sso_failed": "Nepavyko užbaigti prisijungimo su Google. Bandykite dar kartą.",
+      "sso_disabled": "Šiame serveryje prisijungti su Google negalima.",
+      "sso_already_linked": "Ši Google paskyra jau susieta su kita paskyra.",
+      "account_disabled": "Šios paskyros nebegalima naudoti.",
+      "sso_storage": "Jūsų naršyklė blokuoja šios svetainės saugyklą, kurios reikia prisijungimui su Google. Leiskite ją naudoti arba prisijunkite slaptažodžiu.",
+      "sso_url": "Serveris atsakė netikėtu Google adresu, todėl prisijungimas su Google sustabdytas."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekundės",
+        "few": "{count} sekundžių",
+        "other": "{count} sekundžių"
+      },
+      "minutes": {
+        "one": "{count} minutės",
+        "few": "{count} minučių",
+        "other": "{count} minučių"
+      }
+    },
+    "download": {
+      "exe": "Vykdomasis failas",
+      "zip": "ZIP archyvas",
+      "dmg": "Disko atvaizdas",
+      "archive": "Archyvas",
+      "file": "Failas",
+      "unavailable": "Neprieinama",
+      "your_system": "Jūsų sistema",
+      "eyebrow_release": "Versija {version}",
+      "published": "Išleista {date}",
+      "unreachable": "Šiuo metu GitHub nepasiekiamas: žr. versijų puslapį.",
+      "available": "Prieinama",
+      "verify_file": "failas",
+      "no_build": "Šiuo metu nėra žaidimo versijos sistemai {os}.",
+      "x64": "64 bitų (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bitų, Intel / AMD arba Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 ar naujesnė",
+      "experimental": "Eksperimentinė"
+    },
+    "server": {
+      "online": "Veikia",
+      "offline": "Nepasiekiamas",
+      "busy": "Perkrautas",
+      "open": "Atvira",
+      "closed": "Uždaryta",
+      "updated": "Atnaujinta {time}",
+      "min_games": "Žaidėjai, kurių reitinginių partijų skaičius šioje laiko kontrolėje – ne mažesnis kaip {count}.",
+      "empty": "Šioje laiko kontrolėje reitinguojamų žaidėjų dar nėra.",
+      "error": "Šiuo metu nepavyksta įkelti lyderių lentelės."
+    },
+    "game": {
+      "number": "Partija Nr. {id}",
+      "white": "Baltieji",
+      "black": "Juodieji",
+      "you": "jūs",
+      "vs": "prieš",
+      "outcome_win": "Pergalė",
+      "outcome_loss": "Pralaimėjimas",
+      "outcome_draw": "Lygiosios",
+      "outcome_aborted": "Nutraukta",
+      "result_white": "Laimėjo baltieji",
+      "result_black": "Laimėjo juodieji",
+      "result_draw": "Lygiosios",
+      "result_aborted": "Nutraukta",
+      "rated": "Reitinginė",
+      "casual": "Draugiška",
+      "custom": "Pasirinktinė",
+      "moves": {
+        "one": "{count} ėjimas",
+        "few": "{count} ėjimai",
+        "other": "{count} ėjimų"
+      },
+      "duration": "Trukmė: {time}",
+      "rating_diff": "Reitingo pokytis: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Atsisiųsti partiją PGN formatu",
+      "copy_pgn": "Kopijuoti",
+      "copy_pgn_title": "Kopijuoti PGN",
+      "gif": "GIF",
+      "gif_title": "Sukurti animuotą GIF (atsidarys naujame skirtuke)",
+      "gif_signin": "Prisijunkite, kad galėtumėte kurti GIF",
+      "pgn_copied": "PGN nukopijuotas į iškarpinę.",
+      "pgn_saved": "PGN atsisiųstas.",
+      "none": "Partijų dar nėra. Čia bus rodomos jūsų partijos internetu.",
+      "none_filtered": "Pagal šiuos filtrus partijų nerasta.",
+      "none_public": "Partijų dar nėra.",
+      "total": {
+        "one": "{count} partija",
+        "few": "{count} partijos",
+        "other": "{count} partijų"
+      },
+      "termination_unknown": "Partija baigta",
+      "reason": {
+        "1": "Matas",
+        "2": "Pasidavimas",
+        "3": "Pralaimėjimas dėl laiko",
+        "4": "Antrasis neleistinas ėjimas (techninis pralaimėjimas)",
+        "5": "Patas",
+        "6": "Negyva pozicija (nepakanka medžiagos)",
+        "7": "Baigėsi laikas, bet varžovas negali paskelbti mato",
+        "8": "Penkiagubas pozicijos pasikartojimas",
+        "9": "75 ėjimų taisyklė",
+        "10": "Trigubas pozicijos pasikartojimas (pareikalauta)",
+        "11": "50 ėjimų taisyklė (pareikalauta)",
+        "12": "Lygiosios susitarus",
+        "13": "Antrasis neleistinas ėjimas, bet varžovas negali paskelbti mato",
+        "14": "Pasidavimas, bet varžovas negali paskelbti mato",
+        "20": "Partija palikta (per ilgai nebuvo ryšio)",
+        "21": "Partija palikta, bet varžovas negali paskelbti mato",
+        "22": "Partija nutraukta",
+        "23": "Laiku nepadarytas pirmasis ėjimas (nutraukta)",
+        "24": "Techninis pralaimėjimas (sąžiningo žaidimo pažeidimas)",
+        "25": "Nutraukė serveris",
+        "26": "Abu žaidėjai atsijungė"
+      }
+    },
+    "ratings": {
+      "category": "Laiko kontrolė",
+      "rating": "Reitingas",
+      "peak": "Aukščiausias",
+      "games": "Partijos",
+      "wdl": "Pergalės / lygiosios / pralaimėjimai",
+      "provisional": "Preliminarus reitingas",
+      "none": "Reitinginių partijų dar nėra.",
+      "unrated_hint": "Klaustukas žymi preliminarų reitingą (sužaista dar nedaug partijų)."
+    },
+    "account": {
+      "member_since": "Užsiregistravote {date}",
+      "last_login": "Paskutinis prisijungimas",
+      "created": "Sukurta",
+      "email": "El. paštas",
+      "pending_email": "Laukiama patvirtinimo: {email}",
+      "verified": "Patvirtintas",
+      "unverified": "Nepatvirtintas",
+      "mfa": "Dviejų veiksnių autentifikavimas",
+      "mfa_on": "Įjungta",
+      "mfa_off": "Išjungta",
+      "google": "Prisijungimas su Google",
+      "google_on": "Susieta",
+      "google_off": "Nesusieta",
+      "password": "Slaptažodis",
+      "password_set": "Nustatytas",
+      "password_unset": "Dar nenustatytas",
+      "challenges": "Iššūkiai",
+      "challenges_all": "Priimami",
+      "challenges_none": "Atmetami",
+      "badge_verified": "El. paštas patvirtintas",
+      "badge_mfa": "2FA įjungtas",
+      "badge_google": "Google",
+      "ban_until": "Jūsų paskyra sustabdyta iki {date}.",
+      "ban_permanent": "Jūsų paskyra sustabdyta.",
+      "sanction_ban": "Paskyros sustabdymas",
+      "sanction_mm_block": "Varžovų paieška užblokuota",
+      "sanction_warning": "Įspėjimas",
+      "sanction_until": "iki {date}",
+      "sanction_permanent": "visam laikui",
+      "devices_current": "Šis įrenginys",
+      "devices_unknown": "Įrenginys be pavadinimo",
+      "devices_signed_in": "Prisijungta {date}",
+      "devices_seen": "Paskutinį kartą naudotas {time}",
+      "devices_expires": "Galioja iki {date}",
+      "devices_revoke": "Atjungti",
+      "devices_revoked": "Įrenginys atjungtas.",
+      "devices_none": "Kitų įrenginių nėra.",
+      "signout_all_confirm": "Atjungti visus įrenginius, įskaitant šį?",
+      "signed_out": "Atsijungta.",
+      "signed_in": "Sveiki, {name}.",
+      "prefs_saved": "Įrašyta.",
+      "password_changed": "Slaptažodis pakeistas. Kiti jūsų įrenginiai atjungti.",
+      "email_sent": "Patvirtinimo nuoroda išsiųsta naujuoju adresu. Adresas pasikeis, kai ją atidarysite.",
+      "email_changed": "Jūsų el. pašto adresas dabar yra {email}.",
+      "email_current": "Dabartinis adresas: {email}.",
+      "email_pending": "Adresas bus pakeistas į {email}, kai atidarysite patvirtinimo nuorodą.",
+      "export_done": "Jūsų duomenys atsisiųsti.",
+      "deleted": "Jūsų paskyra ištrinta.",
+      "delete_confirm_label": "Kad patvirtintumėte, įveskite {name}",
+      "register_done": "Adresu {email} išsiuntėme patvirtinimo nuorodą. Atidarykite ją, kad sukurtumėte paskyrą, tada prisijunkite.",
+      "register_ready": "Jūsų paskyra paruošta. Galite prisijungti.",
+      "forgot_done": "Jei šį adresą naudoja kuri nors paskyra, nuoroda naujam slaptažodžiui pasirinkti jau siunčiama.",
+      "resend_done": "Jei šis adresas laukia patvirtinimo, nauja nuoroda jau siunčiama.",
+      "pow_solving": "Sprendžiamas apsaugos nuo robotų galvosūkis…",
+      "mfa_recovery": "Atkūrimo kodas",
+      "mfa_recovery_text": "Įveskite vieną iš savo atkūrimo kodų. Kiekvienas kodas veikia tik kartą.",
+      "mfa_app": "Programėlės kodas",
+      "mfa_app_text": "Įveskite 6 skaitmenų kodą iš autentifikavimo programėlės.",
+      "mfa_state_on": "Šioje paskyroje dviejų veiksnių autentifikavimas įjungtas.",
+      "mfa_state_off": "Šioje paskyroje dviejų veiksnių autentifikavimas išjungtas.",
+      "client_label": "Scacelith svetainė ({browser})",
+      "username": "Naudotojo vardas",
+      "password_rules": "Reikia bent {min} simbolių; slaptažodyje negali būti jūsų naudotojo vardo ar el. pašto adreso.",
+      "password_note": "Kiti jūsų įrenginiai bus atjungti, o šis liks prisijungęs.",
+      "signin_label": "Prisijungti",
+      "google_link_text": "Paskyra {name} jau naudoja šį el. pašto adresą. Vieną kartą įveskite jos slaptažodį, kad susietumėte ją su Google; vėliau užteks mygtuko „Prisijungti su Google“.",
+      "auth_foot_google": "Viena paskyra oficialiame serveryje – ir žaidimui, ir šiai svetainei. Sukūrėte ją žaidime su Google? Ir čia prisijunkite su Google."
+    },
+    "players": {
+      "since": "Užsiregistravo {date}",
+      "games": "Partijos",
+      "rated": "Reitinginės",
+      "wins": "Pergalės",
+      "draws": "Lygiosios",
+      "losses": "Pralaimėjimai",
+      "view": "Žiūrėti žaidėjo {name} profilį",
+      "you": "Jūs",
+      "board": "Lyderių lentelė"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partija Nr. {id} · {date}",
+      "preparing": "Ruošiamas GIF…",
+      "rendering": "Serveris piešia GIF. Ilga partija gali užtrukti kelias sekundes…",
+      "ready": "Jūsų GIF paruoštas. Atsisiuntimas pradėtas.",
+      "ready_again": "Jūsų GIF paruoštas.",
+      "signin": "Prisijunkite, kad galėtumėte kurti savo partijų GIF.",
+      "signin_button": "Prisijungti",
+      "missing": "Nepasirinkta jokia partija.",
+      "retry_in": "Bandyti dar kartą galėsite po {time}.",
+      "confirm": "Paspauskite „Sukurti GIF“ ir serveris jūsų paskyros vardu nupieš šią partiją.",
+      "retry_now": "Jau galite bandyti dar kartą."
+    },
+    "home": {
+      "create_account": "Sukurti paskyrą",
+      "my_account": "Mano paskyra",
+      "my_games": "Mano partijos",
+      "signin": "Prisijungti"
+    },
+    "trailer": {
+      "title": "Scacelith anonsas",
+      "notice": "Šis vaizdo įrašas talpinamas YouTube platformoje. Paleidus jį čia įkeliamas Google grotuvas, kuris gauna jūsų IP adresą ir gali įrašyti slapukus ar kitus sekiklius jūsų įrenginyje.",
+      "accept": "Sutikti ir paleisti",
+      "google_privacy": "Google privatumo politika"
+    }
+  },
+  "legal": {
+    "eyebrow": "Teisinė informacija",
+    "title": "Teisinė informacija, privatumas ir naudojimo sąlygos",
+    "lead": "Kas yra Scacelith leidėjas ir prieglobos paslaugų teikėjas, kas nutinka jūsų duomenims šioje svetainėje, žaidime ir oficialiame serveryje ir kokios ten galioja žaidimo taisyklės.",
+    "updated": "Paskutinį kartą atnaujinta: 2026 m. spalio 11 d.",
+    "toc": "Šiame puslapyje",
+    "notice": {
+      "title": "Teisinė informacija",
+      "publisher_label": "Leidėjas",
+      "publisher": "Scacelith leidžia privatus asmuo, neprofesiniu pagrindu. Kaip leidžia Prancūzijos teisė (2004 m. birželio 21 d. įstatymo Nr. 2004-575 1-1 straipsnio II dalis), leidėjo tapatybė čia neskelbiama; ji žinoma prieglobos paslaugų teikėjui.",
+      "contact_label": "Kontaktai",
+      "contact": "Visais klausimais dėl šios svetainės, oficialaus serverio ar jūsų duomenų.",
+      "host_server": "Oficialus žaidimo serveris ir paskyrų duomenys",
+      "host_server_note": "Serveriai Prancūzijoje.",
+      "host_site": "Ši svetainė ir API dokumentacija (GitHub Pages)",
+      "host_domain": "Domeno vardo registratorius",
+      "licence_label": "Licencija",
+      "licence": "Žaidimas ir jo serveris yra laisvoji programinė įranga, platinama pagal GNU General Public License v3; jų išeities kodas viešas:",
+      "game_source": "žaidimas",
+      "server_source": "serveris",
+      "phone": "Tel."
+    },
+    "privacy": {
+      "title": "Privatumas",
+      "intro": "Scacelith nerodo reklamos, neparduoda duomenų ir nematuoja lankomumo. Asmens duomenys naudojami tik šiai svetainei ir oficialiam serveriui veikti, kaip aprašyta toliau. Duomenų valdytojas yra leidėjas, su kuriuo galima susisiekti pirmiau nurodytu kontaktiniu adresu.",
+      "site_title": "Šioje svetainėje",
+      "site_hosting": "Svetainės prieglobą teikia GitHub, kuris, kaip ir bet kuris prieglobos paslaugų teikėjas, saugumo tikslais registruoja lankytojų IP adresus.",
+      "github_privacy": "GitHub privatumo pareiškimas",
+      "site_requests": "Kad parodytų naujausią versiją, jūsų naršyklė kreipiasi į GitHub API (api.github.com); kad parodytų serverio būseną, lyderių lentelę, žaidėjus ir jūsų paskyrą, ji kreipiasi į oficialų serverį (caissa.scacelith.com). Abu, kaip ir per bet kurią užklausą, gauna jūsų IP adresą.",
+      "site_storage": "Svetainė nenaudoja slapukų ir analitikos įrankių. Jūsų naršyklėje ji saugo tik pasirinktą kalbą ir, kai prisijungiate, jūsų seansą: tik dabartiniame skirtuke arba šiame įrenginyje, jei pažymite „Likti prisijungus“. Prisijungiant su Google, dabartiniame skirtuke taip pat saugomi vienkartiniai kodai, kol jie panaudojami. Visa tai būtina, kad svetainė veiktų, o seansą ir kodus gauna tik oficialus serveris.",
+      "site_trailer": "Anonsas yra YouTube vaizdo įrašas. Kol nepaspaudžiate „Sutikti ir paleisti“, iš YouTube nieko neįkeliama; po to YouTube (Google) gauna jūsų IP adresą ir gali įrašyti slapukus ar kitus sekiklius jūsų įrenginyje. Jūsų atsakymas neįsimenamas: per kitą apsilankymą klausimas vėl bus užduotas.",
+      "site_google": "Mygtukas „Prisijungti su Google“ puslapyje „Paskyra“ nieko neįkelia iš Google, kol jo nepaspaudžiate. Tada jūsų naršyklė pereina į Google prisijungimo puslapį (accounts.google.com), o Google grąžina ją į šią svetainę su vienkartiniu kodu, kurį svetainė perduoda oficialiam serveriui. Google gauna jūsų IP adresą ir tai, ką įvedate Google puslapyje, ir tvarko šiuos duomenis pagal savo politiką.",
+      "google_privacy": "Google privatumo politika",
+      "game_title": "Žaidime",
+      "game_local": "Žaidimas jūsų kompiuteryje saugo savo nustatymus, jūsų vietinius rezultatus ir prisijungimo duomenis. Prisijungimo duomenys laikomi apsaugotoje sistemos saugykloje: DPAPI sistemoje Windows, Keychain sistemoje macOS, Secret Service raktinėje sistemoje Linux, o jei jos nėra – faile, kurį gali skaityti tik jūsų naudotojo paskyra.",
+      "game_network": "Savo iniciatyva žaidimas nieko nesiunčia: jokios telemetrijos, jokio naujinių tikrinimo. Prie oficialaus serverio jis jungiasi tik tada, kai atidarote žaidimo internetu puslapį, prie Hugging Face – tik kai atsisiunčiate trenerio balsą, o tiesioginio mačo metu – prie varžovo kompiuterio, kuris tada sužino jūsų IP adresą (žaidimas taip pat gali atidaryti prievadą jūsų maršrutizatoriuje per UPnP).",
+      "account_title": "Jūsų paskyra oficialiame serveryje",
+      "account_intro": "Kuriant paskyrą žaidime ar šioje svetainėje ir žaidžiant internetu, oficialiam serveriui, kurio prieglobą Prancūzijoje teikia OVH, siunčiami šie duomenys:",
+      "data_account": "<strong>Paskyra:</strong> naudotojo vardas, el. pašto adresas, slaptažodis (saugoma tik jo Argon2id maiša), dviejų veiksnių patvirtinimo slaptasis raktas (užšifruotas) ir atkūrimo kodai (maišos pavidalu), registracijos data ir paskutinio prisijungimo data.",
+      "data_google": "<strong>Prisijungimas su Google:</strong> Google atsiunčia jūsų Google paskyros identifikatorių, el. pašto adresą ir vardą. Serveris saugo identifikatorių ir adresą, o vardą naudoja tik naudotojo vardui pasiūlyti.",
+      "data_sessions": "<strong>Prisijungę įrenginiai:</strong> kiekvienam prisijungimui – įrenginio pavadinimas (žaidimo versija ir sistema, pvz., „Scacelith/1.0.0 win64“, arba šios svetainės atveju naršyklė ir sistema), IP adresas ir naudojimo datos.",
+      "data_games": "<strong>Partijos ir reitingai:</strong> kiekviena internetu sužaista partija (žaidėjai, ėjimai, kiekvienam ėjimui sugaištas laikas, rezultatas, datos) ir jūsų reitingai. Partijos metu jūsų galvos ir rankos judesiai realiuoju laiku perduodami varžovui ir niekada nesaugomi.",
+      "data_security": "<strong>Saugos žurnalas:</strong> prisijungimai, nesėkmingi bandymai ir paskyros pakeitimai su IP adresu.",
+      "data_fairplay": "<strong>Sąžiningas žaidimas:</strong> jūsų pateikti ar apie jus pateikti pranešimai su jų komentaru; paliktos ir praleistos partijos; sankcijos; partijų patikros – nuo suklastotų ar neįmanomų ėjimų iki Stockfish variklio statistikos.",
+      "basis_title": "Kodėl ir kokiu teisiniu pagrindu",
+      "basis_contract": "Jūsų paskyros ir žaidimo internetu veikimas (prisijungimas, partijos, reitingai, partijų įrašai, paslaugos siunčiami el. laiškai): paslauga, kuria užsiregistruojate naudotis (BDAR 6 straipsnio 1 dalies b punktas).",
+      "basis_security": "Paskyrų ir serverio apsauga bei partijų sąžiningumo užtikrinimas (saugos žurnalas, IP adresai, sąžiningo žaidimo patikros, sankcijos): teisėtas leidėjo ir žaidėjų interesas (BDAR 6 straipsnio 1 dalies f punktas).",
+      "basis_trailer": "Anonso paleidimas iš YouTube: jūsų sutikimas, duodamas mygtuku (BDAR 6 straipsnio 1 dalies a punktas).",
+      "public_title": "Ką mato visi",
+      "public": "Jūsų naudotojo vardas, registracijos data, reitingai ir visas partijų sąrašas su visais ėjimais yra vieši: šioje svetainėje, per serverio API ir kiekvienos partijos PGN faile. Jūsų el. pašto adresas, įrenginiai, prisijungimai, sankcijos ir sąžiningo žaidimo įrašai niekada nerodomi. Galite atsisakyti tiesioginių iššūkių, tačiau partijų paslėpti negalima.",
+      "auto_title": "Automatiniai sprendimai",
+      "auto": "Kai kurie žaidimo protokolo pažeidimai, pavyzdžiui, suklastotas pranešimas arba pozicijoje neįmanomas ėjimas, yra neabejotinas sukčiavimo įrodymas: tada serveris skiria techninį pralaimėjimą, 24 valandoms užblokuoja paskyrą, pašalina ją iš lyderių lentelės ir grąžina jos varžovams taškus, kuriuos šie prarado žaisdami su ja per paskutines 60 dienų. Jei per 24 valandas trys partijos paliekamos, nutraukiamos arba praleidžiamos, reitinginių partijų varžovų paieška sustabdoma 15 minučių, vėliau – ilgiau. Vien variklio statistika niekada nelemia sankcijos: sprendžia žmogus. Kontaktiniu adresu galite paprašyti peržiūrėti bet kurį sprendimą.",
+      "recipients_title": "Kas gauna jūsų duomenis",
+      "recipient_ovh": "OVH SAS Prancūzijoje teikia serverio ir jo duomenų prieglobą.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) siunčia serverio el. laiškus: ši bendrovė gauna jūsų adresą, naudotojo vardą ir laiško turinį.",
+      "recipient_google": "Kai pasirenkate prisijungti su Google, Google gauna jūsų naršyklės siunčiamus duomenis; jiems taikoma Google privatumo politika.",
+      "recipient_staff": "Serverio administratorius ir moderatoriai mato paskyrų ir sąžiningo žaidimo duomenis, kad galėtų teikti paslaugą.",
+      "recipient_players": "Kiti žaidėjai mato tai, kas vieša, o partijos metu varžovas mato jūsų ėjimus ir judesius.",
+      "recipient_none": "Niekas kitas: jokie duomenys neparduodami, nenuomojami ir nenaudojami reklamai.",
+      "transfers": "Paskyrų duomenys lieka Prancūzijoje. Bendrovės GitHub, Google ir Porkbun (pastaroji persiunčia kontaktiniu adresu siunčiamus laiškus) įsikūrusios Jungtinėse Valstijose: tai, ką jos gauna, reglamentuoja jų pačių politika ir jų taikomos duomenų perdavimo už Europos Sąjungos ribų apsaugos priemonės.",
+      "retention_title": "Kiek laiko duomenys saugomi",
+      "ret_account": "<strong>Paskyra:</strong> kol ją ištrinate. Registracija, kurios adresas taip ir nepatvirtinamas, ištrinama po 24 valandų.",
+      "ret_sessions": "<strong>Prisijungę įrenginiai:</strong> kol atsijungiate, bet ne ilgiau kaip 30 dienų nuo paskutinio naudojimo ir ne ilgiau kaip 90 dienų iš viso.",
+      "ret_ip": "<strong>IP adresai:</strong> ištrinami po 30 dienų. Serverio žurnaluose saugomi tik sutrumpinti adresai.",
+      "ret_security": "<strong>Saugos žurnalas:</strong> 90 dienų.",
+      "ret_conduct": "<strong>Paliktos ir praleistos partijos:</strong> 30 dienų.",
+      "ret_games": "<strong>Partijos ir reitingai:</strong> tol, kol serveris saugo savo partijų įrašus, kurie kartu yra ir jūsų varžovų įrašai. Ištrynus jūsų paskyrą, jūsų vardas juose pakeičiamas į „deleted#“ ir numerį.",
+      "ret_fairplay": "<strong>Sankcijos, pranešimai ir sąžiningo žaidimo patikrų rezultatai:</strong> saugomi, kad užblokuoti žaidėjai negalėtų tiesiog sugrįžti, o kiti žaidėjai liktų apsaugoti. Ištrynus jūsų paskyrą, jie lieka susieti tik su jos numeriu.",
+      "ret_backups": "<strong>Atsarginės kopijos:</strong> ištrinti duomenys trumpai gali likti serverio atsarginėje kopijoje, kol ji pakeičiama nauja.",
+      "ret_contact": "<strong>Laiškai kontaktiniu adresu:</strong> tiek, kiek reikia į juos atsakyti.",
+      "rights_title": "Jūsų teisės",
+      "rights": "Galite susipažinti su savo duomenimis, juos ištaisyti, ištrinti ir eksportuoti, apriboti jų naudojimą ir jam prieštarauti (BDAR 15–21 straipsniai).",
+      "rights_self": "Daugumą šių veiksmų galite atlikti savo paskyroje – žaidime arba šios svetainės puslapyje „Paskyra“: atsisiųsti paskyros duomenis JSON failu, pakeisti el. pašto adresą ar slaptažodį, atjungti kitus įrenginius arba iš karto ištrinti paskyrą.",
+      "rights_google": "Su Google sukurta paskyra neturi slaptažodžio: norint ją eksportuoti ar ištrinti, pirmiausia funkcija „Pamiršote slaptažodį?“ nustatykite jai slaptažodį.",
+      "rights_mail": "Dėl visų kitų dalykų, įskaitant duomenis, kurių nėra eksporto faile (sąžiningo žaidimo patikros, pranešimai apie jus), rašykite kontaktiniu adresu. Atsakymą gausite per vieną mėnesį.",
+      "rights_cnil": "Jei manote, kad jūsų teisės nepaisomos, galite pateikti skundą CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) arba savo šalies duomenų apsaugos priežiūros institucijai.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Naudojimo sąlygos",
+      "intro": "Šios sąlygos taikomos oficialiam serveriui (caissa.scacelith.com) ir šios svetainės paskyros puslapiams. Sukurti paskyrą ar žaisti oficialiame serveryje reiškia priimti šias sąlygas.",
+      "service": "<strong>Nemokama paslauga.</strong> Žaidimas yra laisvoji ir nemokama programinė įranga. Oficialus serveris teikiamas nemokamai ir toks, koks yra, be jokių pasiekiamumo garantijų: jis gali keistis, laikinai nustoti veikti arba būti uždarytas.",
+      "account": "<strong>Jūsų paskyra.</strong> Jūs atsakote už tai, kas daroma naudojant jūsų paskyrą, ir už tai, kad jos slaptažodis liktų slaptas. Jei manote, kad ja naudojasi kažkas kitas, nedelsiant parašykite kontaktiniu adresu.",
+      "username": "<strong>Jūsų naudotojo vardas</strong> yra viešas: jis negali būti įžeidžiantis ar kurstantis neapykantą, juo negalima apsimesti kitu asmeniu ar atskleisti kieno nors asmens duomenų.",
+      "fair": "<strong>Sąžiningas žaidimas.</strong> Reitinginės partijos metu draudžiama naudotis šachmatų variklio, kito asmens ar bet kokio kito įrankio pagalba. Draudžiama naudoti modifikuotą žaidimo klientą, siųsti suklastotus pranešimus ar tyčia perkrauti serverį.",
+      "conduct": "<strong>Baikite savo partijas.</strong> Jei per 24 valandas tris kartus paliekate ar nutraukiate partiją arba praleidžiate partiją, kuriai jums buvo parinktas varžovas, reitinginių partijų varžovų paieška kuriam laikui sustabdoma.",
+      "reports": "<strong>Pranešimai</strong> turi būti teikiami sąžiningai. Apie žaidėją ar neteisėtą turinį, pavyzdžiui, įžeidų naudotojo vardą, praneškite partijos pranešimo mygtuku arba parašykite kontaktiniu adresu.",
+      "sanctions": "<strong>Sankcijos.</strong> Už šių taisyklių pažeidimą gali būti skiriamas techninis pralaimėjimas, įspėjimas, blokavimas ir pašalinimas iš lyderių lentelės; sukčiautojui prarasti taškai grąžinami jo varžovams. Automatiškai baudžiama tik už neabejotinai įrodytą sukčiavimą; visa kita sprendžia žmogus. Sankciją galite užginčyti kontaktiniu adresu.",
+      "liability": "<strong>Atsakomybė.</strong> Kiek leidžia įstatymai, leidėjas neatsako už paslaugos pertrūkius ar partijų, reitingų ar duomenų praradimą.",
+      "end": "<strong>Nutraukimas.</strong> Savo paskyrą galite ištrinti bet kada. Šias sąlygas pažeidžianti paskyra gali būti užblokuota.",
+      "changes": "<strong>Pakeitimai.</strong> Šios sąlygos gali keistis; šio puslapio viršuje nurodyta data rodo galiojančią versiją, o tolesnis žaidimas po pakeitimo reiškia jo priėmimą.",
+      "law": "<strong>Taikytina teisė.</strong> Šioms sąlygoms taikoma Prancūzijos teisė. Kilus ginčui, pirmiausia parašykite kontaktiniu adresu, kad kartu rastume sprendimą."
+    },
+    "version_note": "Šis puslapis yra keliomis kalbomis; jei jų tekstai skiriasi, viršenybę turi versija prancūzų kalba."
+  }
+}

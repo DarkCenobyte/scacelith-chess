@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotorealistisk skak i førstepersonsperspektiv",
+      "description": "Gratis fotorealistisk skak i førstepersonsperspektiv til Windows, Linux og macOS: Stockfish 19, en træner, partianalyse og onlinespil i en kongelig sal."
+    },
+    "players": {
+      "title": "Rangliste og spillere — Scacelith",
+      "description": "De bedste spillere på den officielle Scacelith-server i hver af de ratede betænkningstider, deres ratinger og deres seneste partier."
+    },
+    "account": {
+      "title": "Din konto — Scacelith",
+      "description": "Log ind på din Scacelith-konto: ratinger, partihistorik, download af PGN og GIF, indloggede enheder og indstillinger."
+    },
+    "gif": {
+      "title": "Animeret GIF — Scacelith",
+      "description": "En animeret GIF af et Scacelith-parti."
+    },
+    "legal": {
+      "title": "Juridiske oplysninger, privatliv og brugsvilkår — Scacelith",
+      "description": "Hvem der udgiver og hoster Scacelith, hvad hjemmesiden, spillet og den officielle server gør med personoplysninger, dine rettigheder og reglerne på den officielle server."
+    }
+  },
+  "brand": {
+    "tagline": "Det kongelige spil"
+  },
+  "nav": {
+    "skip": "Spring til indholdet",
+    "home": "Forside",
+    "label": "Hovedmenu",
+    "game": "Spillet",
+    "modes": "Spilformer",
+    "gallery": "Galleri",
+    "trailer": "Trailer",
+    "online": "Online",
+    "players": "Rangliste",
+    "account": "Konto",
+    "language": "Sprog",
+    "menu": "Menu",
+    "download": "Download"
+  },
+  "hero": {
+    "image_alt": "To porcelænsrobotter spiller skak ved et valnøddebord i en solbeskinnet marmorsal.",
+    "lead": "Tag plads ved et vokset valnøddebord i en solbeskinnet kongelig sal. På den anden side af brættet venter en porcelænsrobot, styret af Stockfish, på dit første træk.",
+    "watch": "Se traileren",
+    "meta": "Fri software · Windows, Linux, macOS (eksperimentel) · Grafikkort med OpenGL 4.6",
+    "caption": "Optaget i spillet: den kongelige sal"
+  },
+  "highlights": {
+    "engine": "Egenudviklet OpenGL 4.6-motor",
+    "stockfish": "Stockfish 19 indbygget",
+    "rules": "FIDE-regler",
+    "online": "Onlinespil",
+    "languages": "34 sprog"
+  },
+  "experience": {
+    "eyebrow": "Oplevelsen",
+    "title": "Ikke et bræt på en skærm.<br><em>En plads ved bordet.</em>",
+    "lead": "Scacelith bringer det tilbage der gør et parti virkeligt: salen, stilheden, uret, en modstander der ser på dig, og turneringens ritualer.",
+    "presence": {
+      "title": "I første person",
+      "text": "Du ser gennem din robots øjne: kig rundt i salen, læn dig ind over brættet, se op på din modstander, kast et blik på din noteringsblanket, eller rejs dig, og gå hen til en af bordets ender."
+    },
+    "ritual": {
+      "title": "Turneringsregler",
+      "text": "Rørt brik skal flyttes, og din hånd trykker på uret for at fuldføre trækket. Når »Vis lovlige træk« er slået fra, straffer dommeren et ulovligt træk, og et andet ulovligt træk taber partiet."
+    },
+    "scoresheet": {
+      "title": "Skrevet i hånden",
+      "text": "Begge spillere noterer hvert træk på deres egen noteringsblanket, hver med sin egen håndskrift, og vender siden for hver fyrre træk. Du kan høre pennen mod papiret."
+    },
+    "opponent": {
+      "title": "En værdig modstander",
+      "text": "Stockfish 19 på dit niveau, fra Nybegynder (800) til Stockfish Maks (3500), med en rating der beregnes efter FIDE's regler efter hvert parti."
+    },
+    "engine": {
+      "title": "Bygget til dette spil",
+      "text": "En motor skrevet fra bunden: fysisk baseret lys, marmor, vokset træ, porcelæn og messing, solen gennem vinduerne, bløde skygger og refleksioner. Kvalitetsniveauer fra »Meget lav« til »Ultra« tilpasser den til dit grafikkort."
+    },
+    "languages": {
+      "title": "34 sprog",
+      "text": "Engelsk, fransk, tysk, spansk, portugisisk fra Portugal og Brasilien, italiensk, nederlandsk, svensk, dansk, finsk, estisk, lettisk, litauisk, polsk, tjekkisk, slovakisk, slovensk, kroatisk, ungarsk, rumænsk, bulgarsk, græsk, tyrkisk, ukrainsk, russisk, arabisk, hindi, indonesisk, vietnamesisk, koreansk, japansk samt kinesisk, forenklet og traditionelt. Arabisk vises fra højre mod venstre, og træneren taler højt på alle sprog undtagen kinesisk, hvor hans ord vises som undertekster."
+    }
+  },
+  "modes": {
+    "eyebrow": "Spilformer",
+    "title": "Hvert parti<br><em>har sit bord.</em>",
+    "lead": "Alt spilles i den samme sal, direkte fra titelskærmen. Offline er Stockfish altid klar til et parti.",
+    "new_game": {
+      "name": "Nyt parti",
+      "text": "Mød Stockfish i den styrke du vælger, med en betænkningstid fra bullet til klassisk, eller spil mod en ven ved den samme computer, hver gennem sin egen robots øjne."
+    },
+    "coach": {
+      "name": "Træner",
+      "text": "En lærer sidder over for dig, spiller på dit niveau og fører dig gennem partiet: trusler, gode træk og fejl, og med sin egen hånd viser han på brættet hvad en fejl koster. Fra skakkens regler til ekspertniveau, med en stemme der syntetiseres på din computer."
+    },
+    "challenges": {
+      "name": "Trænerens udfordringer",
+      "text": "Korte serier af stillinger, der hver træner én færdighed: mat i ét til tre træk, gafler, bindinger og anden taktik, forsvar og de grundlæggende slutspil mod træneren. Hint kun når du beder om det, og et grønt flueben for hver serie du gennemfører."
+    },
+    "analysis": {
+      "name": "Analyse",
+      "text": "Stockfish gennemgår dine gemte partier, dine onlinepartier eller en hvilken som helst PGN: en vurderingsbjælke, nøgletrækkene markeret fra genialt træk til brøler, det bedre træk tegnet som en pil og kommentarer, både læst højt og vist som undertekster. Robotternes hænder spiller trækkene mens du går partiet igennem."
+    },
+    "online": {
+      "name": "Spil online",
+      "text": "Rigtige modstandere via en Scacelith-server: ratede partier, søgning efter modstandere, udfordringer og private partier eller et direkte parti mellem to computere. Din modstanders robot følger modstanderens bevægelser live."
+    },
+    "watch": {
+      "name": "Se et parti",
+      "text": "To Stockfish-spillere møder hinanden mens du bevæger dig frit og usynligt rundt i salen fra den ene synsvinkel til den anden."
+    },
+    "saved": {
+      "name": "Gemte partier",
+      "text": "Dine partier gemmes som PGN-filer. Genspil dem i salen med de faktiske tænketider og ure, eller importér partier fra andre programmer."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galleri",
+    "title": "Set <em>inde fra salen</em>",
+    "lead": "Hvert billede er optaget i spillet, i realtid, af spillets egen motor.",
+    "title_screen": {
+      "alt": "Titelskærmen: Scacelith-menuen ved siden af to robotter der spiller skak i salen.",
+      "caption": "Titelskærmen"
+    },
+    "coach": {
+      "alt": "Træneren, en porcelænsrobot med »COACH« på brystet, hilser på dig fra den anden side af brættet; det han siger, vises også som undertekst.",
+      "caption": "Træner"
+    },
+    "challenges": {
+      "alt": "Menuen Trænerens udfordringer: serier af mat- og taktikopgaver med deres sværhedsgrad og markering af dem der allerede er gennemført, ved siden af beskrivelsen af den valgte serie.",
+      "caption": "Trænerens udfordringer"
+    },
+    "analysis": {
+      "alt": "Analysetilstand: vurderingsbjælken, en pil tegnet på brættet, de kommenterede træk med begge siders præcision og oversigten over styringen.",
+      "caption": "Analyse"
+    },
+    "game": {
+      "alt": "Set fra siden rækker den ene robot ind over bordet for at flytte en brik mens den anden venter; de slåede brikker står ved siden af brættet.",
+      "caption": "Se et parti"
+    },
+    "hall": {
+      "alt": "To robotter sidder over for hinanden ved skakbrættet i røde fløjlsstole under høje vinduer.",
+      "caption": "Den kongelige sal"
+    },
+    "opponent": {
+      "alt": "Nærbillede af modstanderen, porcelænsrobotten, med hovedet bøjet mod brættet.",
+      "caption": "Din modstander"
+    },
+    "scoresheet": {
+      "alt": "En robots hånd skriver trækkene på noteringsblanketten med en fyldepen.",
+      "caption": "Noteringsblanketten"
+    },
+    "note": "Version 1.0.0. Brugerfladen på disse billeder er på engelsk.",
+    "viewer": "Billedfremviser",
+    "close": "Luk",
+    "previous": "Forrige billede",
+    "next": "Næste billede"
+  },
+  "trailer": {
+    "eyebrow": "Trailer",
+    "title": "Scacelith <em>i bevægelse</em>",
+    "soon_title": "Traileren kommer snart",
+    "soon_text": "Tag plads i mellemtiden: spillet er klar til download.",
+    "privacy": "Intet indlæses fra YouTube før du accepterer YouTubes afspiller.",
+    "open_youtube": "Se på YouTube"
+  },
+  "online": {
+    "eyebrow": "Online",
+    "title": "Rigtige modstandere,<br><em>den samme sal.</em>",
+    "lead": "Log ind på den officielle server fra spillet, og spil mod folk fra hele verden, stadig i førstepersonsperspektiv.",
+    "point_rated": "Ratede partier i alle officielle betænkningstider, hver med sin egen rating, beregnet efter FIDE's regler.",
+    "point_match": "Søgning efter modstandere, udfordringer via brugernavn og private partier med en kode; eller et direkte parti mellem to computere, uden server og uden konto.",
+    "point_fair": "Fair play: automatiske kontroller, motoranalyse af afsluttede partier og anmeldelser fra spillere.",
+    "point_history": "Din partihistorik på denne hjemmeside: download hvert parti som PGN eller som animeret GIF.",
+    "point_open": "Alle kan drive en fællesskabsserver: serveren er fri software, og dens API er dokumenteret.",
+    "create": "Opret en konto",
+    "signin": "Log ind",
+    "server_title": "Den officielle server",
+    "status_checking": "Kontrollerer…",
+    "address": "Adresse",
+    "registration": "Tilmelding",
+    "categories": "Ratede betænkningstider",
+    "top_players": "Bedste spillere",
+    "category": "Betænkningstid",
+    "board_loading": "Indlæser ranglisten…",
+    "full_board": "Hele ranglisten"
+  },
+  "download": {
+    "button": "Download",
+    "choose": "Vælg dit system",
+    "see_release": "Se udgivelsen på GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Alle udgivelser",
+    "experimental": "Eksperimentel",
+    "source": "Kildekode",
+    "source_zip": "ZIP-arkiv",
+    "eyebrow": "Download",
+    "title": "Tag plads.<br><em>Gratis og open source.</em>",
+    "lead": "Pak ud og spil: intet installationsprogram på Windows eller Linux, og på en Mac trækker du blot appen over i Programmer. Hver fil bygges af GitHub Actions ud fra sin taggede kildekode, med attesteret byggeoprindelse.",
+    "notes": "Udgivelsesnoter",
+    "macos_note": "Til Mac-computere med Apple Silicon (M1 eller nyere) og macOS 26 eller nyere, ikke i en virtuel maskine; nyere og mindre testet end de andre udgaver. Appen er ikke signeret af en registreret Apple-udvikler: første gang skal du åbne den via Systemindstillinger › Anonymitet og sikkerhed › Åbn alligevel.",
+    "req_system": "System",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 eller aarch64) med glibc 2.34, OpenSSL 3 og X11 eller XWayland, f.eks. Ubuntu 22.04 eller Debian 12; macOS 26 eller nyere på Apple Silicon (eksperimentel)",
+    "req_gpu": "Grafik",
+    "req_gpu_value": "Et grafikkort med OpenGL 4.6 og en opdateret driver (på en Mac har spillet sin egen OpenGL med)",
+    "req_included": "Inkluderet",
+    "req_included_value": "Stockfish 19 og dens neurale netværk: spil offline med det samme",
+    "req_network": "Internet",
+    "req_network_value": "Til onlinespil, GIF'er og stemmen til træneren og analysen (en valgfri download på ca. 399 MB)",
+    "req_licence": "Licens",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Kontrollér din download",
+    "verify_text": "Byggeoprindelsen for hver fil er attesteret af GitHub. Med GitHub CLI:",
+    "checksums": "SHA-256-kontrolsummer (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Medvirkende",
+    "title": "Medvirkende og <em>tak</em>",
+    "engine_head": "Skakmotor",
+    "engine": "Stockfish 19, af Stockfish-udviklerne (GNU GPL v3). Dens neurale netværk er trænet på data fra projektet Leela Chess Zero (Open Database License).",
+    "voice_head": "Stemme",
+    "voice": "Supertonic 3 fra Supertone, under licensen BigScience Open RAIL-M: den downloades når du beder om det, og lægger stemme til træneren og analysen på din computer.",
+    "fonts_head": "Skrifttyper",
+    "fonts": "EB Garamond af Georg Duffner, Cinzel af Natanael Gama og Amiri af Khaled Hosny; håndskrift i Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One og LXGW WenKai (alle under SIL Open Font License); skakfigurer fra GNU FreeFont.",
+    "openings_head": "Åbninger og opgaver",
+    "openings": "Åbningsnavne fra databasen chess-openings på lichess.org og opgaverne i trænerens udfordringer fra Lichess' opgavedatabase, begge frigivet til det offentlige domæne (CC0).",
+    "quote": "»Skak er analysens kunst.«",
+    "quote_author": "Mikhail Botvinnik"
+  },
+  "footer": {
+    "about": "Et fotorealistisk skakspil i førstepersonsperspektiv på en egenudviklet OpenGL 4.6-motor. Fri software under GNU GPL v3.",
+    "game": "Spillet",
+    "online": "Online",
+    "api_docs": "Dokumentation af serverens API",
+    "source": "Kildekode",
+    "game_source": "Spillet på GitHub",
+    "server_source": "Serveren på GitHub",
+    "releases": "Udgivelser",
+    "licence": "Licens (GPL v3)",
+    "credits": "Stockfish er et varemærke tilhørende dens udviklere. YouTube er et varemærke tilhørende Google LLC. Windows er et varemærke tilhørende Microsoft Corporation. macOS er et varemærke tilhørende Apple Inc. Linux er et registreret varemærke tilhørende Linus Torvalds. OpenGL er et registreret varemærke tilhørende Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Denne hjemmeside sætter ingen cookies og bruger ingen sporingsværktøjer; YouTubes afspiller indlæses kun hvis du accepterer den.",
+    "legal_link": "Juridiske oplysninger, privatliv og vilkår"
+  },
+  "common": {
+    "copy": "Kopiér",
+    "loading": "Indlæser…",
+    "noscript": "Denne side kræver JavaScript for at kunne kommunikere med Scacelith-serveren."
+  },
+  "players": {
+    "title": "Rangliste og spillere",
+    "lead": "De bedste spillere på den officielle server i hver af de ratede betænkningstider. Slå en spiller op for at se vedkommendes ratinger og seneste partier.",
+    "search_label": "Find en spiller",
+    "search_placeholder": "Brugernavn",
+    "search_button": "Søg",
+    "back": "Tilbage til ranglisten",
+    "recent_games": "Seneste partier",
+    "board_title": "Rangliste",
+    "category": "Betænkningstid",
+    "col_rank": "Plads",
+    "col_player": "Spiller",
+    "col_rating": "Rating",
+    "col_peak": "Højeste",
+    "col_games": "Partier",
+    "col_wdl": "V / R / T",
+    "loading": "Indlæser…"
+  },
+  "account": {
+    "title": "Din konto",
+    "auth_foot": "Én konto på den officielle server, til spillet og til denne hjemmeside. Har du oprettet din konto med Google i spillet? Brug »Glemt adgangskode?« for at give den en adgangskode.",
+    "common": {
+      "back": "Tilbage til login"
+    },
+    "fields": {
+      "login": "Brugernavn eller e-mail",
+      "password": "Adgangskode",
+      "show_password": "Vis adgangskoden",
+      "username": "Brugernavn",
+      "email": "E-mail",
+      "confirm_password": "Bekræft adgangskoden",
+      "current_password": "Nuværende adgangskode",
+      "new_password": "Ny adgangskode",
+      "new_email": "Ny e-mailadresse",
+      "mfa_code": "Totrinskode (eller en gendannelseskode)"
+    },
+    "signin": {
+      "tab": "Log ind",
+      "title": "Velkommen tilbage",
+      "remember": "Forbliv logget ind på denne enhed",
+      "submit": "Log ind",
+      "forgot": "Glemt adgangskode?",
+      "resend": "Send bekræftelsesmailen igen"
+    },
+    "mfa": {
+      "title": "Totrins\u00adgodkendelse",
+      "text": "Indtast den 6-cifrede kode fra din godkendelsesapp.",
+      "code": "Kode fra appen",
+      "use_recovery": "Brug en gendannelseskode i stedet",
+      "submit": "Bekræft"
+    },
+    "google": {
+      "or": "eller",
+      "button": "Log ind med Google",
+      "username_title": "Vælg dit brugernavn",
+      "username_text": "Din Google-konto er ny på denne server. Vælg det navn andre spillere skal se: det kan ikke ændres senere.",
+      "username_submit": "Opret min konto",
+      "link_title": "Tilknyt din Google-konto",
+      "link_submit": "Tilknyt og log ind",
+      "returning": "Logger ind med Google…"
+    },
+    "register": {
+      "tab": "Opret en konto",
+      "title": "En gratis konto",
+      "closed": "Serveren modtager ikke nye konti i øjeblikket.",
+      "username_hint": "Bogstaver, cifre, _ og -, begyndende med et bogstav eller et ciffer.",
+      "password_hint": "Mindst 10 tegn, uden dit brugernavn eller din e-mail.",
+      "pow_note": "For at holde robotter ude løser din browser en lille opgave når du opretter en konto. Det tager et par sekunder.",
+      "submit": "Opret konto",
+      "done_title": "Tjek din e-mail",
+      "done_text": "Vi har sendt et bekræftelseslink til din adresse. Åbn det for at oprette din konto, og log derefter ind.",
+      "done_hint": "Linket er gyldigt i 24 timer. Intet i din indbakke? Tjek din spammappe, eller bed om at få e-mailen igen.",
+      "go_signin": "Gå til login",
+      "legal_note": "Dit brugernavn, dine ratinger og dine partier bliver offentlige. Ved at oprette en konto accepterer du brugsvilkårene.",
+      "legal_link": "Privatliv og brugsvilkår"
+    },
+    "forgot": {
+      "title": "Glemt adgangskode",
+      "text": "Indtast e-mailadressen på din konto. Hvis der findes en konto med den adresse, sender vi dig et link til at vælge en ny adgangskode. Linket er gyldigt i en time.",
+      "submit": "Send linket"
+    },
+    "resend": {
+      "title": "Bekræft din e-mail",
+      "text": "Har du ikke fået bekræftelsesmailen, eller er linket udløbet? Indtast din adresse for at få en ny.",
+      "submit": "Send igen"
+    },
+    "dash": {
+      "public_profile": "Offentlig profil",
+      "signout": "Log ud",
+      "tab_overview": "Oversigt",
+      "tab_games": "Partier",
+      "tab_devices": "Enheder",
+      "tab_settings": "Indstillinger"
+    },
+    "overview": {
+      "info": "Dine oplysninger",
+      "ratings": "Dine ratinger",
+      "sanctions": "Sanktioner",
+      "recent": "Seneste partier",
+      "all_games": "Alle dine partier"
+    },
+    "games": {
+      "filter_category": "Betænkningstid",
+      "all": "Alle",
+      "custom": "Tilpasset",
+      "filter_rated": "Type",
+      "rated": "Ratede",
+      "casual": "Uratede",
+      "filter_result": "Resultat",
+      "wins": "Vundne",
+      "losses": "Tabte",
+      "draws": "Remis"
+    },
+    "devices": {
+      "title": "Indloggede enheder",
+      "signout_all": "Log ud overalt",
+      "text": "Hvert login, i spillet eller på denne hjemmeside, er en enhed. Log de enheder ud som du ikke genkender."
+    },
+    "settings": {
+      "challenges_title": "Udfordringer",
+      "challenges_text": "Andre spillere kan udfordre dig i spillet via dit brugernavn.",
+      "challenges_label": "Modtag udfordringer",
+      "mfa_title": "Totrinsgodkendelse",
+      "mfa_text": "Slå den til eller fra, og lav nye gendannelseskoder, på spillets kontoside.",
+      "password_title": "Skift adgangskode",
+      "password_text": "Dine andre enheder bliver logget ud, og denne enhed forbliver logget ind.",
+      "password_submit": "Skift adgangskode",
+      "email_title": "Skift e-mailadresse",
+      "email_submit": "Send bekræftelseslinket",
+      "export_title": "Download mine data",
+      "export_text": "Alt hvad serveren gemmer om din konto, i én JSON-fil.",
+      "export_submit": "Download mine data",
+      "delete_title": "Slet konto",
+      "delete_text": "Dette kan ikke fortrydes. Dine partier og ratinger bliver liggende under et anonymt navn; din e-mailadresse, din adgangskode og dine enheder slettes.",
+      "delete_confirm": "Skriv dit brugernavn for at bekræfte",
+      "delete_submit": "Slet min konto"
+    }
+  },
+  "gif": {
+    "title": "Animeret GIF",
+    "preparing": "Forbereder GIF'en…",
+    "download": "Download GIF'en",
+    "make": "Lav GIF'en",
+    "pause": "Sæt på pause",
+    "back": "Til mine partier",
+    "options": "Indstillinger",
+    "size": "Størrelse",
+    "size_small": "Lille (284 × 350)",
+    "size_medium": "Mellem (424 × 515)",
+    "size_large": "Stor (628 × 762)",
+    "orientation": "Brættet set fra",
+    "orientation_white": "Hvid",
+    "orientation_black": "Sort",
+    "speed": "Hastighed",
+    "speed_fast": "Hurtig (0,25 s pr. træk)",
+    "speed_normal": "Normal (0,5 s pr. træk)",
+    "speed_slow": "Langsom (1 s pr. træk)",
+    "speed_very_slow": "Meget langsom (2 s pr. træk)",
+    "coords": "Vis koordinaterne",
+    "regenerate": "Lav den igen",
+    "note": "Serveren tegner hver GIF. En GIF du allerede har lavet, kommer straks tilbage; nye er begrænset til nogle få i minuttet."
+  },
+  "notfound": {
+    "title": "Siden blev ikke fundet",
+    "text": "Dette felt er tomt. Siden er måske blevet flyttet.",
+    "home": "Tilbage til Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Indlæser…",
+      "retry": "Prøv igen",
+      "close": "Luk",
+      "copy": "Kopiér",
+      "copied": "Kopieret til udklipsholderen.",
+      "copy_failed": "Kunne ikke kopiere. Markér teksten, og kopiér den manuelt.",
+      "load_more": "Vis flere",
+      "show_password": "Vis adgangskoden",
+      "hide_password": "Skjul adgangskoden",
+      "signin_needed": "Log ind for at fortsætte.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Serveren kan ikke nås. Tjek din forbindelse, og prøv igen.",
+      "timeout": "Serveren var for længe om at svare. Prøv igen.",
+      "server_busy": "Serveren har travlt. Prøv igen om lidt.",
+      "rate_limited": "For mange forespørgsler. Prøv igen om {time}.",
+      "rate_limited_short": "For mange forespørgsler. Prøv igen om lidt.",
+      "internal_error": "Serveren stødte på en uventet fejl. Prøv igen senere.",
+      "invalid_token": "Din session er udløbet. Log venligst ind igen.",
+      "unauthorized": "Log venligst ind.",
+      "not_found": "Ikke fundet.",
+      "unknown": "Noget gik galt ({code}).",
+      "invalid_credentials": "Forkert brugernavn, e-mail eller adgangskode.",
+      "too_many_attempts": "For mange forsøg. Prøv igen om {time}.",
+      "banned": "Denne konto er suspenderet indtil {date}.",
+      "banned_permanent": "Denne konto er suspenderet.",
+      "email_unverified": "Din e-mailadresse er endnu ikke bekræftet. Åbn det link vi har sendt dig, eller bed om et nyt.",
+      "invalid_mfa_token": "Dette trin i login er udløbet. Log venligst ind igen.",
+      "invalid_code": "Forkert eller allerede brugt kode.",
+      "mfa_code_required": "Indtast din totrinskode.",
+      "invalid_password": "Forkert adgangskode.",
+      "password_not_set": "Denne konto har endnu ingen adgangskode: brug »Glemt adgangskode?« på login-siden for at oprette en.",
+      "registration_closed": "Serveren modtager ikke nye konti i øjeblikket.",
+      "invalid_username": "Dette brugernavn er ikke tilladt.",
+      "username_taken": "Dette brugernavn er allerede optaget.",
+      "invalid_email": "Denne e-mailadresse er ugyldig.",
+      "email_taken": "Denne e-mailadresse bruges allerede af en anden konto.",
+      "same_email": "Det er allerede din e-mailadresse.",
+      "weak_password": "Denne adgangskode er for svag.",
+      "weak_too_short": "Adgangskoden er for kort (mindst {min} tegn).",
+      "weak_too_long": "Adgangskoden er for lang.",
+      "weak_contains_username": "Adgangskoden må ikke indeholde dit brugernavn.",
+      "weak_contains_email": "Adgangskoden må ikke indeholde din e-mailadresse.",
+      "weak_too_common": "Denne adgangskode er for almindelig. Vælg en anden.",
+      "pow_failed": "Antirobotkontrollen mislykkedes. Prøv igen.",
+      "passwords_differ": "De to adgangskoder er forskellige.",
+      "required": "Udfyld dette felt.",
+      "email_format": "Indtast en gyldig e-mailadresse.",
+      "username_format": "{min} til {max} tegn: bogstaver, cifre, _ og -, begyndende med et bogstav eller et ciffer.",
+      "password_length": "Mindst {min} tegn.",
+      "confirm_name": "Skriv dit brugernavn nøjagtigt som det vises.",
+      "game_too_long": "Dette parti er for langt til at blive lavet om til en GIF.",
+      "gif_disabled": "Denne server laver ikke GIF'er.",
+      "render_failed": "Serveren kunne ikke tegne denne GIF.",
+      "invalid_game": "Dette parti findes ikke.",
+      "invalid_player": "Indtast et brugernavn: 2 til 24 bogstaver, cifre, _, . eller -.",
+      "player_not_found": "Ingen spiller med dette navn.",
+      "sso_cancelled": "Google-login blev annulleret.",
+      "sso_mismatch": "Dette Google-login blev ikke startet i denne fane eller er allerede brugt. Prøv igen.",
+      "sso_expired": "Dette Google-login er udløbet. Prøv igen.",
+      "invalid_verifier": "Dette Google-login blev startet i en anden fane eller browser. Start forfra på denne side.",
+      "sso_email_unverified": "Google har ikke bekræftet denne Google-kontos e-mailadresse.",
+      "sso_account_exists": "En konto bruger allerede denne e-mailadresse, men den har ingen adgangskode at knytte Google til. Giv den en med »Glemt adgangskode?«, og log så ind med Google igen.",
+      "sso_failed": "Google-login kunne ikke gennemføres. Prøv igen.",
+      "sso_disabled": "Google-login er ikke tilgængeligt på denne server.",
+      "sso_already_linked": "Denne Google-konto er allerede knyttet til en anden konto.",
+      "account_disabled": "Denne konto kan ikke længere bruges.",
+      "sso_storage": "Din browser blokerer denne hjemmesides lager, som Google-login har brug for. Tillad det, eller log ind med din adgangskode.",
+      "sso_url": "Serveren svarede med en uventet Google-adresse, så Google-login blev stoppet."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} sekund",
+        "other": "{count} sekunder"
+      },
+      "minutes": {
+        "one": "{count} minut",
+        "other": "{count} minutter"
+      }
+    },
+    "download": {
+      "exe": "Programfil",
+      "zip": "ZIP-arkiv",
+      "dmg": "Diskbillede",
+      "archive": "Arkiv",
+      "file": "Fil",
+      "unavailable": "Ikke tilgængelig",
+      "your_system": "Dit system",
+      "eyebrow_release": "Version {version}",
+      "published": "Udgivet den {date}",
+      "unreachable": "GitHub kan ikke nås lige nu: se siden med udgivelser.",
+      "available": "Tilgængelig",
+      "verify_file": "filen",
+      "no_build": "Ingen udgave af spillet til {os} i øjeblikket.",
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD eller Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 eller nyere",
+      "experimental": "Eksperimentel"
+    },
+    "server": {
+      "online": "Online",
+      "offline": "Kan ikke nås",
+      "busy": "Har travlt",
+      "open": "Åben",
+      "closed": "Lukket",
+      "updated": "Opdateret {time}",
+      "min_games": "Spillere med mindst {count} ratede partier i denne betænkningstid.",
+      "empty": "Endnu ingen spillere på ranglisten i denne betænkningstid.",
+      "error": "Ranglisten kan ikke indlæses lige nu."
+    },
+    "game": {
+      "number": "Parti nr. {id}",
+      "white": "Hvid",
+      "black": "Sort",
+      "you": "dig",
+      "vs": "mod",
+      "outcome_win": "Vundet",
+      "outcome_loss": "Tabt",
+      "outcome_draw": "Remis",
+      "outcome_aborted": "Afbrudt",
+      "result_white": "Hvid vinder",
+      "result_black": "Sort vinder",
+      "result_draw": "Remis",
+      "result_aborted": "Afbrudt",
+      "rated": "Ratet",
+      "casual": "Uratet",
+      "custom": "Tilpasset",
+      "moves": {
+        "one": "{count} træk",
+        "other": "{count} træk"
+      },
+      "duration": "Varighed {time}",
+      "rating_diff": "Ratingændring {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Download partiet som PGN",
+      "copy_pgn": "Kopiér",
+      "copy_pgn_title": "Kopiér PGN'en",
+      "gif": "GIF",
+      "gif_title": "Lav en animeret GIF (åbner en ny fane)",
+      "gif_signin": "Log ind for at lave GIF'er",
+      "pgn_copied": "PGN kopieret til udklipsholderen.",
+      "pgn_saved": "PGN downloadet.",
+      "none": "Endnu ingen partier. Dine onlinepartier vises her.",
+      "none_filtered": "Intet parti passer til disse filtre.",
+      "none_public": "Endnu ingen partier.",
+      "total": {
+        "one": "{count} parti",
+        "other": "{count} partier"
+      },
+      "termination_unknown": "Partiet er slut",
+      "reason": {
+        "1": "Skakmat",
+        "2": "Opgivelse",
+        "3": "Tab på tid",
+        "4": "Andet ulovlige træk (partiet tabt)",
+        "5": "Pat",
+        "6": "Død stilling (utilstrækkeligt materiale)",
+        "7": "Flaget faldt, men modstanderen kan ikke sætte mat",
+        "8": "Femfoldig gentagelse",
+        "9": "75-træksreglen",
+        "10": "Trefoldig gentagelse (krævet)",
+        "11": "50-træksreglen (krævet)",
+        "12": "Remis efter aftale",
+        "13": "Andet ulovlige træk, men modstanderen kan ikke sætte mat",
+        "14": "Opgivelse, men modstanderen kan ikke sætte mat",
+        "20": "Forlod partiet (for længe uden forbindelse)",
+        "21": "Forlod partiet, men modstanderen kan ikke sætte mat",
+        "22": "Partiet afbrudt",
+        "23": "Intet første træk i tide (afbrudt)",
+        "24": "Erklæret tabt (brud på fair play)",
+        "25": "Afbrudt af serveren",
+        "26": "Begge spillere mistede forbindelsen"
+      }
+    },
+    "ratings": {
+      "category": "Betænkningstid",
+      "rating": "Rating",
+      "peak": "Højeste",
+      "games": "Partier",
+      "wdl": "V / R / T",
+      "provisional": "Foreløbig rating",
+      "none": "Endnu intet ratet parti.",
+      "unrated_hint": "Et spørgsmålstegn markerer en foreløbig rating (endnu kun få spillede partier)."
+    },
+    "account": {
+      "member_since": "Medlem siden {date}",
+      "last_login": "Seneste login",
+      "created": "Oprettet",
+      "email": "E-mail",
+      "pending_email": "Afventer bekræftelse: {email}",
+      "verified": "Bekræftet",
+      "unverified": "Ikke bekræftet",
+      "mfa": "Totrinsgodkendelse",
+      "mfa_on": "Til",
+      "mfa_off": "Fra",
+      "google": "Google-login",
+      "google_on": "Tilknyttet",
+      "google_off": "Ikke tilknyttet",
+      "password": "Adgangskode",
+      "password_set": "Oprettet",
+      "password_unset": "Endnu ikke oprettet",
+      "challenges": "Udfordringer",
+      "challenges_all": "Modtages",
+      "challenges_none": "Afvises",
+      "badge_verified": "E-mail bekræftet",
+      "badge_mfa": "Totrinsgodkendelse til",
+      "badge_google": "Google",
+      "ban_until": "Din konto er suspenderet indtil {date}.",
+      "ban_permanent": "Din konto er suspenderet.",
+      "sanction_ban": "Suspendering",
+      "sanction_mm_block": "Søgning efter modstandere blokeret",
+      "sanction_warning": "Advarsel",
+      "sanction_until": "indtil {date}",
+      "sanction_permanent": "permanent",
+      "devices_current": "Denne enhed",
+      "devices_unknown": "Unavngiven enhed",
+      "devices_signed_in": "Logget ind den {date}",
+      "devices_seen": "Sidst brugt {time}",
+      "devices_expires": "Udløber den {date}",
+      "devices_revoke": "Log ud",
+      "devices_revoked": "Enheden er logget ud.",
+      "devices_none": "Ingen andre enheder.",
+      "signout_all_confirm": "Vil du logge alle enheder ud, også denne?",
+      "signed_out": "Du er logget ud.",
+      "signed_in": "Velkommen, {name}.",
+      "prefs_saved": "Gemt.",
+      "password_changed": "Din adgangskode er ændret. Dine andre enheder er logget ud.",
+      "email_sent": "Der er sendt et bekræftelseslink til den nye adresse. Din adresse ændres når du åbner det.",
+      "email_changed": "Din e-mailadresse er nu {email}.",
+      "email_current": "Nuværende adresse: {email}.",
+      "email_pending": "En ændring til {email} afventer bekræftelse via linket.",
+      "export_done": "Dine data er downloadet.",
+      "deleted": "Din konto er slettet.",
+      "delete_confirm_label": "Skriv {name} for at bekræfte",
+      "register_done": "Vi har sendt et bekræftelseslink til {email}. Åbn det for at oprette din konto, og log derefter ind.",
+      "register_ready": "Din konto er klar. Du kan logge ind.",
+      "forgot_done": "Hvis en konto bruger denne adresse, er et link til at vælge en ny adgangskode på vej.",
+      "resend_done": "Hvis denne adresse afventer bekræftelse, er et nyt link på vej.",
+      "pow_solving": "Løser antirobotopgaven…",
+      "mfa_recovery": "Gendannelseskode",
+      "mfa_recovery_text": "Indtast en af dine gendannelseskoder. Hver kode virker én gang.",
+      "mfa_app": "Kode fra appen",
+      "mfa_app_text": "Indtast den 6-cifrede kode fra din godkendelsesapp.",
+      "mfa_state_on": "Totrinsgodkendelse er slået til for denne konto.",
+      "mfa_state_off": "Totrinsgodkendelse er slået fra for denne konto.",
+      "client_label": "Scacelith-hjemmesiden ({browser})",
+      "username": "Brugernavn",
+      "password_rules": "Mindst {min} tegn, uden dit brugernavn eller din e-mail.",
+      "password_note": "Dine andre enheder bliver logget ud, og denne enhed forbliver logget ind.",
+      "signin_label": "Log ind",
+      "google_link_text": "Kontoen {name} bruger allerede denne e-mailadresse. Indtast kontoens adgangskode én gang for at knytte den til Google; derefter er »Log ind med Google« nok.",
+      "auth_foot_google": "Én konto på den officielle server, til spillet og til denne hjemmeside. Har du oprettet den med Google i spillet? Så log også ind med Google her."
+    },
+    "players": {
+      "since": "Medlem siden {date}",
+      "games": "Partier",
+      "rated": "Ratede",
+      "wins": "Gevinster",
+      "draws": "Remiser",
+      "losses": "Nederlag",
+      "view": "Se profilen for {name}",
+      "you": "Dig",
+      "board": "Rangliste"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Parti nr. {id} · {date}",
+      "preparing": "Forbereder GIF'en…",
+      "rendering": "Serveren tegner GIF'en. Et langt parti kan tage et par sekunder…",
+      "ready": "Din GIF er klar. Downloaden er startet.",
+      "ready_again": "Din GIF er klar.",
+      "signin": "Log ind for at lave GIF'er af dine partier.",
+      "signin_button": "Log ind",
+      "missing": "Der er ikke valgt noget parti.",
+      "retry_in": "Du kan prøve igen om {time}.",
+      "confirm": "Tryk på »Lav GIF'en« for at få serveren til at tegne dette parti med din konto.",
+      "retry_now": "Du kan prøve igen nu."
+    },
+    "home": {
+      "create_account": "Opret en konto",
+      "my_account": "Min konto",
+      "my_games": "Mine partier",
+      "signin": "Log ind"
+    },
+    "trailer": {
+      "title": "Trailer til Scacelith",
+      "notice": "Denne video ligger på YouTube. Hvis du afspiller den her, indlæses Googles afspiller, som modtager din IP-adresse og kan gemme cookies eller andre sporingsværktøjer på din enhed.",
+      "accept": "Acceptér og afspil",
+      "google_privacy": "Googles privatlivspolitik"
+    }
+  },
+  "legal": {
+    "eyebrow": "Juridisk",
+    "title": "Juridiske oplysninger, privatliv og brugsvilkår",
+    "lead": "Hvem der udgiver og hoster Scacelith, hvad der sker med dine data på denne hjemmeside, i spillet og på den officielle server, og reglerne for at spille dér.",
+    "updated": "Senest opdateret: 11. oktober 2026",
+    "toc": "På denne side",
+    "notice": {
+      "title": "Juridiske oplysninger",
+      "publisher_label": "Udgiver",
+      "publisher": "Scacelith udgives af en privatperson, på ikke-erhvervsmæssig basis. Som fransk lov tillader det (artikel 1-1 II i lov nr. 2004-575 af 21. juni 2004), oplyses udgiverens identitet ikke her; den er kendt af hostingudbyderen.",
+      "contact_label": "Kontakt",
+      "contact": "Ved alle spørgsmål om denne hjemmeside, den officielle server eller dine data.",
+      "host_server": "Officiel spilserver og kontodata",
+      "host_server_note": "Servere i Frankrig.",
+      "host_site": "Denne hjemmeside og API-dokumentationen (GitHub Pages)",
+      "host_domain": "Domæneregistrator",
+      "licence_label": "Licens",
+      "licence": "Spillet og dets server er fri software under GNU General Public License v3, med offentlig kildekode:",
+      "game_source": "spillet",
+      "server_source": "serveren",
+      "phone": "Tlf."
+    },
+    "privacy": {
+      "title": "Privatliv",
+      "intro": "Scacelith viser ingen reklamer, sælger ingen data og foretager ingen besøgsmåling. Personoplysninger bruges kun til at drive denne hjemmeside og den officielle server, som beskrevet nedenfor. Den dataansvarlige er udgiveren, som kan kontaktes på kontaktadressen ovenfor.",
+      "site_title": "På denne hjemmeside",
+      "site_hosting": "GitHub hoster hjemmesiden og registrerer, som enhver webhost, de besøgendes IP-adresser af sikkerhedshensyn.",
+      "github_privacy": "GitHubs privatlivserklæring",
+      "site_requests": "For at vise den nyeste udgivelse sender din browser en forespørgsel til GitHubs API (api.github.com); for at vise serverens status, ranglisten, spillerne og din konto sender den en forespørgsel til den officielle server (caissa.scacelith.com). Begge modtager din IP-adresse, som ved enhver forespørgsel.",
+      "site_storage": "Hjemmesiden sætter ingen cookies og har ingen statistikværktøjer. I din browser gemmer den kun dit valg af sprog og, når du er logget ind, din session: kun for den aktuelle fane, eller på denne enhed hvis du sætter flueben ved »Forbliv logget ind på denne enhed«. Et Google-login gemmer også sine engangskoder i den aktuelle fane indtil de er brugt. Alt dette er nødvendigt for at hjemmesiden kan fungere, og kun den officielle server modtager sessionen og koderne.",
+      "site_trailer": "Traileren er en YouTube-video. Intet indlæses fra YouTube før du trykker på »Acceptér og afspil«; derefter modtager YouTube (Google) din IP-adresse og kan gemme cookies eller andre sporingsværktøjer på din enhed. Dit svar huskes ikke: spørgsmålet kommer igen ved dit næste besøg.",
+      "site_google": "»Log ind med Google« på siden Konto indlæser intet fra Google før du trykker på knappen. Din browser går derefter til Googles login-side (accounts.google.com), og Google sender den tilbage til denne hjemmeside med en engangskode som hjemmesiden giver videre til den officielle server. Google modtager din IP-adresse og det du indtaster på Googles side, under Googles egen politik.",
+      "google_privacy": "Googles privatlivspolitik",
+      "game_title": "I spillet",
+      "game_local": "Spillet gemmer sine indstillinger, dine lokale resultater og dit login på din computer. Dit login gemmes i systemets sikre lager: DPAPI på Windows, nøgleringen på macOS, Secret Service-nøgleringen på Linux eller ellers en fil som kun din brugerkonto kan læse.",
+      "game_network": "Det sender intet af sig selv: ingen telemetri, ingen søgning efter opdateringer. Det opretter kun forbindelse til den officielle server når du åbner onlinesiden, til Hugging Face kun når du downloader trænerens stemme, og ved et direkte parti til din modstanders computer, som derved kender din IP-adresse (spillet kan også åbne en port på din router med UPnP).",
+      "account_title": "Din konto på den officielle server",
+      "account_intro": "Når du opretter en konto, i spillet eller på denne hjemmeside, og når du spiller online, sendes følgende data til den officielle server, som hostes af OVH i Frankrig:",
+      "data_account": "<strong>Konto:</strong> brugernavn, e-mailadresse, adgangskode (kun gemt som Argon2id-hash), hemmelig nøgle til totrinsgodkendelse (krypteret) og gendannelseskoder (hashede), oprettelsesdato og dato for seneste login.",
+      "data_google": "<strong>Log ind med Google:</strong> Google sender id'et for din Google-konto, din e-mailadresse og dit navn. Serveren gemmer id'et og adressen og bruger kun navnet til at foreslå et brugernavn.",
+      "data_sessions": "<strong>Indloggede enheder:</strong> for hvert login enhedens navn (spillets version og system, f.eks. »Scacelith/1.0.0 win64«, eller browser og system for denne hjemmeside), IP-adressen og datoerne for brug.",
+      "data_games": "<strong>Partier og ratinger:</strong> hvert onlineparti (spillere, træk, tid brugt på hvert træk, resultat, datoer) og dine ratinger. Under et parti videresendes bevægelserne af dit hoved og din hånd live til din modstander og gemmes aldrig.",
+      "data_security": "<strong>Sikkerhedslog:</strong> login, mislykkede forsøg og ændringer af kontoen, med IP-adressen.",
+      "data_fairplay": "<strong>Fair play:</strong> anmeldelser indgivet af dig eller om dig, med deres kommentar; forladte og missede partier; sanktioner; og de kontroller der køres på partierne, fra forfalskede eller umulige træk til statistik fra skakmotoren Stockfish.",
+      "basis_title": "Hvorfor, og på hvilket retsgrundlag",
+      "basis_contract": "Drift af din konto og af onlinespil (login, parringer, ratinger, partiarkiv, de e-mails tjenesten sender): den tjeneste du tilmelder dig (artikel 6, stk. 1, litra b, i GDPR).",
+      "basis_security": "Beskyttelse af konti og server og sikring af fair partier (sikkerhedslog, IP-adresser, fair play-kontroller, sanktioner): udgiverens og spillernes legitime interesse (artikel 6, stk. 1, litra f, i GDPR).",
+      "basis_trailer": "Afspilning af traileren fra YouTube: dit samtykke, givet med knappen (artikel 6, stk. 1, litra a, i GDPR).",
+      "public_title": "Hvad alle kan se",
+      "public": "Dit brugernavn, din oprettelsesdato, dine ratinger og din fulde liste over partier, med hvert træk, er offentlige: på denne hjemmeside, via serverens API og i hvert partis PGN. Din e-mailadresse, dine enheder, din loginhistorik, dine sanktioner og dine fair play-oplysninger vises aldrig. Du kan afvise direkte udfordringer, men partier kan ikke skjules.",
+      "auto_title": "Automatiske afgørelser",
+      "auto": "Visse brud på spillets protokol, f.eks. en forfalsket meddelelse eller et træk der er umuligt i stillingen, er et sikkert bevis på snyd: serveren erklærer så partiet tabt, spærrer kontoen i 24 timer, fjerner den fra ranglisten og giver kontoens modstandere de point tilbage som de har tabt til den inden for de seneste 60 dage. Tre forladte, afbrudte eller missede partier inden for 24 timer sætter den ratede søgning efter modstandere på pause i 15 minutter, derefter længere. Motorstatistik fører aldrig alene til en sanktion: et menneske træffer afgørelsen. Du kan bede om at få enhver afgørelse taget op til fornyet vurdering via kontaktadressen.",
+      "recipients_title": "Hvem modtager dine data",
+      "recipient_ovh": "OVH SAS hoster serveren og dens data i Frankrig.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) sender serverens e-mails: den modtager din adresse, dit brugernavn og meddelelsen.",
+      "recipient_google": "Når du vælger at logge ind med Google, modtager Google det din browser sender, under Googles egen privatlivspolitik.",
+      "recipient_staff": "Serverens administrator og moderatorer ser konto- og fair play-data for at kunne drive tjenesten.",
+      "recipient_players": "Andre spillere ser det der er offentligt, og din modstander ser dine træk og bevægelser under et parti.",
+      "recipient_none": "Ingen andre: ingen data sælges, udlejes eller bruges til reklame.",
+      "transfers": "Kontodata forbliver i Frankrig. GitHub, Google og Porkbun (som videresender meddelelser sendt til kontaktadressen) har hjemsted i USA: det de modtager, er underlagt deres egne politikker og deres garantier for overførsler ud af Den Europæiske Union.",
+      "retention_title": "Hvor længe de opbevares",
+      "ret_account": "<strong>Konto:</strong> indtil du sletter den. En tilmelding hvis adresse aldrig bliver bekræftet, slettes efter 24 timer.",
+      "ret_sessions": "<strong>Indloggede enheder:</strong> indtil du logger ud, eller indtil enheden har været ubrugt i 30 dage, og højst i 90 dage.",
+      "ret_ip": "<strong>IP-adresser:</strong> slettes efter 30 dage. Serverens logfiler gemmer kun forkortede adresser.",
+      "ret_security": "<strong>Sikkerhedslog:</strong> 90 dage.",
+      "ret_conduct": "<strong>Forladte og missede partier:</strong> 30 dage.",
+      "ret_games": "<strong>Partier og ratinger:</strong> så længe serveren opbevarer sit partiarkiv, som også er dine modstanderes arkiv. Når din konto er slettet, erstattes dit navn i det af »deleted#« og et nummer.",
+      "ret_fairplay": "<strong>Sanktioner, anmeldelser og fair play-resultater:</strong> opbevares for at spærrede spillere ikke bare kan vende tilbage og andre spillere forbliver beskyttet. Når din konto er slettet, er de kun knyttet til dens nummer.",
+      "ret_backups": "<strong>Sikkerhedskopier:</strong> slettede data kan blive liggende i kort tid i serverens sikkerhedskopi indtil den erstattes.",
+      "ret_contact": "<strong>Meddelelser til kontaktadressen:</strong> så længe det er nødvendigt for at besvare dem.",
+      "rights_title": "Dine rettigheder",
+      "rights": "Du kan få indsigt i dine data, berigtige, slette og eksportere dem, begrænse brugen af dem og gøre indsigelse mod den (artikel 15 til 21 i GDPR).",
+      "rights_self": "Det meste af dette finder du på din konto, i spillet eller på denne hjemmesides side Konto: download dine kontodata som en JSON-fil, skift din e-mailadresse eller adgangskode, log andre enheder ud, eller slet kontoen med det samme.",
+      "rights_google": "En konto der er oprettet med Google, har ingen adgangskode: for at eksportere eller slette den skal du først give den en med »Glemt adgangskode?«.",
+      "rights_mail": "For alt andet, herunder data som eksporten ikke indeholder (fair play-kontroller, anmeldelser om dig), skal du skrive til kontaktadressen. Du får svar inden for en måned.",
+      "rights_cnil": "Hvis du mener at dine rettigheder ikke bliver respekteret, kan du indgive en klage til CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) eller til databeskyttelsesmyndigheden i dit land.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Brugsvilkår",
+      "intro": "Disse vilkår gælder for den officielle server (caissa.scacelith.com) og for kontosiderne på denne hjemmeside. Ved at oprette en konto eller spille på den officielle server accepterer du dem.",
+      "service": "<strong>En gratis tjeneste.</strong> Spillet er fri software og gratis. Den officielle server tilbydes gratis og som den er, uden garanti for tilgængelighed: den kan ændres, stoppe i en periode eller lukke.",
+      "account": "<strong>Din konto.</strong> Du er ansvarlig for alt der foretages med den, og for at holde dens adgangskode hemmelig. Skriv straks til kontaktadressen hvis du tror at en anden bruger den.",
+      "username": "<strong>Dit brugernavn</strong> er offentligt: det må ikke være stødende eller hadefuldt, udgive sig for at være en anden eller afsløre nogens personoplysninger.",
+      "fair": "<strong>Fair play.</strong> Under et ratet parti: ingen hjælp fra en skakmotor, en anden person eller noget andet værktøj. Ingen modificeret spilklient, ingen forfalskede meddelelser og ingen bevidst overbelastning af serveren.",
+      "conduct": "<strong>Spil dine partier færdig.</strong> Hvis du tre gange inden for 24 timer forlader eller afbryder et parti eller udebliver fra et parti du er blevet parret til, sættes den ratede søgning efter modstandere på pause et stykke tid.",
+      "reports": "<strong>Anmeldelser</strong> skal ske i god tro. For at anmelde en spiller eller ulovligt indhold, f.eks. et stødende brugernavn, skal du bruge anmeldelsesknappen i et parti eller skrive til kontaktadressen.",
+      "sanctions": "<strong>Sanktioner.</strong> Brud på disse regler kan føre til tab af partiet, en advarsel, en spærring og fjernelse fra ranglisten; point der er tabt til en snyder, gives tilbage til snyderens modstandere. Kun sikre beviser på snyd sanktioneres automatisk; alt andet afgøres af et menneske. Du kan klage over en sanktion via kontaktadressen.",
+      "liability": "<strong>Ansvar.</strong> Inden for de grænser loven tillader, er udgiveren ikke ansvarlig for afbrydelser af tjenesten eller for tab af partier, ratinger eller data.",
+      "end": "<strong>Ophør.</strong> Du kan til enhver tid slette din konto. En konto der overtræder disse vilkår, kan blive spærret.",
+      "changes": "<strong>Ændringer.</strong> Disse vilkår kan ændres; datoen øverst på denne side viser den gældende version, og fortsætter du med at spille efter en ændring, accepterer du den.",
+      "law": "<strong>Lovvalg.</strong> Disse vilkår er underlagt fransk ret. Ved en tvist skal du først skrive til kontaktadressen for at vi sammen kan finde en løsning."
+    },
+    "version_note": "Denne side findes på flere sprog; hvis de afviger fra hinanden, har den franske version forrang."
+  }
+}

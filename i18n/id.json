@@ -1,0 +1,805 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — catur fotorealistis dari sudut pandang orang pertama",
+      "description": "Catur fotorealistis gratis dari sudut pandang orang pertama untuk Windows, Linux, dan macOS: Stockfish 19, pelatih, analisis permainan, dan permainan online di sebuah aula kerajaan."
+    },
+    "players": {
+      "title": "Papan peringkat dan pemain — Scacelith",
+      "description": "Pemain terbaik di server resmi Scacelith dalam setiap kontrol waktu yang dinilai, beserta rating dan permainan terbaru mereka."
+    },
+    "account": {
+      "title": "Akun Anda — Scacelith",
+      "description": "Masuk ke akun Scacelith Anda: rating, riwayat permainan, unduhan PGN dan GIF, perangkat yang masuk, dan pengaturan."
+    },
+    "gif": {
+      "title": "GIF animasi — Scacelith",
+      "description": "GIF animasi dari sebuah permainan Scacelith."
+    },
+    "legal": {
+      "title": "Informasi hukum, privasi, dan ketentuan penggunaan — Scacelith",
+      "description": "Siapa penerbit dan penyedia hosting Scacelith, apa yang dilakukan situs web, game, dan server resmi dengan data pribadi, hak-hak Anda, serta aturan server resmi."
+    }
+  },
+  "brand": {
+    "tagline": "Permainan Para Raja"
+  },
+  "nav": {
+    "skip": "Langsung ke konten",
+    "home": "Beranda",
+    "label": "Menu utama",
+    "game": "Tentang game",
+    "modes": "Mode bermain",
+    "gallery": "Galeri",
+    "trailer": "Cuplikan",
+    "online": "Main online",
+    "players": "Papan peringkat",
+    "account": "Akun",
+    "language": "Bahasa",
+    "menu": "Menu",
+    "download": "Unduh"
+  },
+  "hero": {
+    "image_alt": "Dua robot porselen bermain catur di meja kayu walnut dalam aula marmer yang bermandikan sinar matahari.",
+    "lead": "Duduklah di meja kayu walnut berlapis lilin di sebuah aula kerajaan yang bermandikan sinar matahari. Di seberang papan, robot porselen yang digerakkan oleh Stockfish menunggu langkah pertama Anda.",
+    "watch": "Tonton cuplikan",
+    "meta": "Perangkat lunak bebas · Windows, Linux, macOS (eksperimental) · Kartu grafis dengan OpenGL 4.6",
+    "caption": "Diambil di dalam game: aula kerajaan"
+  },
+  "highlights": {
+    "engine": "Mesin OpenGL 4.6 buatan sendiri",
+    "stockfish": "Stockfish 19 bawaan",
+    "rules": "Aturan FIDE",
+    "online": "Bermain online",
+    "languages": "34 bahasa"
+  },
+  "experience": {
+    "eyebrow": "Pengalaman",
+    "title": "Bukan papan di layar.<br><em>Melainkan kursi di meja.</em>",
+    "lead": "Scacelith menghadirkan kembali apa yang membuat sebuah permainan terasa nyata: aula, keheningan, jam, lawan yang menatap Anda, dan ritual turnamen.",
+    "presence": {
+      "title": "Dari sudut pandang orang pertama",
+      "text": "Anda melihat melalui mata robot Anda: lihat ke sekeliling aula, condongkan badan ke atas papan, tatap lawan Anda, lirik formulir notasi Anda, atau berdiri dan berjalan ke salah satu ujung meja."
+    },
+    "ritual": {
+      "title": "Aturan turnamen",
+      "text": "Buah yang Anda sentuh harus dijalankan, dan tangan Anda menekan jam untuk menyelesaikan langkah. Jika penanda langkah sah dimatikan, wasit memberi sanksi atas langkah ilegal, dan langkah ilegal kedua berarti kalah."
+    },
+    "scoresheet": {
+      "title": "Ditulis tangan",
+      "text": "Kedua pemain mencatat setiap langkah di formulir notasi masing-masing, dengan tulisan tangannya sendiri, dan membalik halaman setiap empat puluh langkah. Anda mendengar goresan pena di atas kertas."
+    },
+    "opponent": {
+      "title": "Lawan yang sepadan",
+      "text": "Stockfish 19 sesuai tingkat Anda, dari Baru Belajar (800) hingga Stockfish Maks (3500), dengan rating yang dihitung menurut aturan FIDE setelah setiap permainan."
+    },
+    "engine": {
+      "title": "Dibuat khusus untuk game ini",
+      "text": "Mesin yang ditulis dari nol: pencahayaan berbasis fisika, marmer, kayu berlapis lilin, porselen, dan kuningan, sinar matahari yang masuk lewat jendela, bayangan lembut, dan pantulan. Preset kualitas, dari Sangat rendah hingga Ultra, menyesuaikannya dengan kartu grafis Anda."
+    },
+    "languages": {
+      "title": "34 bahasa",
+      "text": "Bahasa Inggris, Prancis, Jerman, Spanyol, Portugis (Portugal dan Brasil), Italia, Belanda, Swedia, Denmark, Finlandia, Estonia, Latvia, Lituania, Polandia, Ceko, Slowakia, Slovenia, Kroasia, Hungaria, Rumania, Bulgaria, Yunani, Turki, Ukraina, Rusia, Arab, Hindi, Indonesia, Vietnam, Korea, Jepang, serta Tionghoa sederhana dan tradisional. Bahasa Arab ditata dari kanan ke kiri, dan pelatih berbicara dengan suara dalam semua bahasa kecuali Tionghoa; dalam bahasa itu, ucapannya ditampilkan sebagai subtitel."
+    }
+  },
+  "modes": {
+    "eyebrow": "Mode bermain",
+    "title": "Setiap permainan<br><em>punya mejanya sendiri.</em>",
+    "lead": "Semuanya dimainkan di aula yang sama, langsung dari layar judul. Tanpa koneksi internet pun, Stockfish selalu siap bermain.",
+    "new_game": {
+      "name": "Permainan Baru",
+      "text": "Hadapi Stockfish dengan kekuatan pilihan Anda, dengan kontrol waktu dari bullet hingga klasik, atau bermainlah melawan teman di komputer yang sama, masing-masing melalui mata robotnya sendiri."
+    },
+    "coach": {
+      "name": "Pelatih",
+      "text": "Seorang guru duduk di hadapan Anda, bermain sesuai tingkat Anda, dan membimbing Anda sepanjang permainan: ancaman, langkah bagus, kesalahan, serta memperagakan dengan tangannya sendiri akibat dari sebuah kesalahan. Dari aturan catur hingga tingkat ahli, dengan suara yang disintesis di komputer Anda."
+    },
+    "challenges": {
+      "name": "Tantangan Pelatih",
+      "text": "Kumpulan posisi singkat, masing-masing melatih satu keterampilan: mat dalam 1 sampai 3 langkah, garpu, kunci, dan taktik lainnya, pertahanan, serta permainan akhir dasar melawan pelatih. Petunjuk hanya diberikan jika Anda memintanya, dan ada tanda centang hijau untuk setiap tantangan yang Anda selesaikan."
+    },
+    "analysis": {
+      "name": "Analisis",
+      "text": "Stockfish mengulas permainan tersimpan Anda, permainan online Anda, atau PGN apa pun: bilah evaluasi, langkah-langkah penting yang ditandai dari brilian hingga blunder, langkah yang lebih baik digambar sebagai panah, serta komentar yang diucapkan dan ditampilkan sebagai subtitel. Tangan para robot menjalankan setiap langkah saat Anda menelusuri permainan."
+    },
+    "online": {
+      "name": "Main Online",
+      "text": "Lawan sungguhan melalui server Scacelith: permainan dinilai, pencarian lawan, tantangan, dan permainan pribadi, atau pertandingan langsung antara dua komputer. Robot lawan Anda bergerak mengikuti gerakan lawan, secara langsung."
+    },
+    "watch": {
+      "name": "Tonton Permainan",
+      "text": "Dua pemain Stockfish saling berhadapan sementara Anda bergerak bebas di sekitar aula, tanpa terlihat, dari satu sudut pandang ke sudut pandang lain."
+    },
+    "saved": {
+      "name": "Permainan Tersimpan",
+      "text": "Permainan Anda disimpan sebagai file PGN. Putar ulang di aula, dengan waktu berpikir dan jam yang sebenarnya, atau impor permainan dari program lain."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galeri",
+    "title": "Dilihat dari <em>dalam aula</em>",
+    "lead": "Setiap gambar diambil di dalam game, dalam waktu nyata, oleh mesinnya sendiri.",
+    "title_screen": {
+      "alt": "Layar judul: menu Scacelith di samping dua robot yang bermain catur di aula.",
+      "caption": "Layar judul"
+    },
+    "coach": {
+      "alt": "Pelatih, robot porselen dengan tulisan “COACH” di dadanya, menyapa Anda dari seberang papan; ucapannya juga muncul sebagai subtitel.",
+      "caption": "Pelatih"
+    },
+    "challenges": {
+      "alt": "Menu Tantangan Pelatih: tantangan skakmat dan taktik beserta tingkat kesulitannya dan yang sudah diselesaikan, di samping deskripsi tantangan yang dipilih.",
+      "caption": "Tantangan Pelatih"
+    },
+    "analysis": {
+      "alt": "Mode Analisis: bilah evaluasi, panah yang digambar di papan, langkah-langkah beranotasi dengan akurasi masing-masing pihak, dan daftar kontrol.",
+      "caption": "Analisis"
+    },
+    "game": {
+      "alt": "Dilihat dari samping, satu robot menjangkau ke seberang meja untuk menjalankan buah sementara robot lainnya menunggu; buah-buah yang dimakan berdiri di samping papan.",
+      "caption": "Tonton Permainan"
+    },
+    "hall": {
+      "alt": "Dua robot saling berhadapan di seberang papan catur, di kursi beludru merah, di bawah jendela-jendela tinggi.",
+      "caption": "Aula kerajaan"
+    },
+    "opponent": {
+      "alt": "Tampilan dekat robot porselen lawan, kepalanya tertunduk ke arah papan.",
+      "caption": "Lawan Anda"
+    },
+    "scoresheet": {
+      "alt": "Tangan robot menulis langkah-langkah di formulir notasi dengan pena tinta.",
+      "caption": "Formulir notasi"
+    },
+    "note": "Versi 1.0.0. Antarmuka pada gambar-gambar ini berbahasa Inggris.",
+    "viewer": "Penampil gambar",
+    "close": "Tutup",
+    "previous": "Gambar sebelumnya",
+    "next": "Gambar berikutnya"
+  },
+  "trailer": {
+    "eyebrow": "Cuplikan",
+    "title": "Scacelith <em>beraksi</em>",
+    "soon_title": "Cuplikan segera hadir",
+    "soon_text": "Sementara itu, silakan duduk: game ini sudah siap diunduh.",
+    "privacy": "Tidak ada yang dimuat dari YouTube sampai Anda menerima pemutarnya.",
+    "open_youtube": "Tonton di YouTube"
+  },
+  "online": {
+    "eyebrow": "Main online",
+    "title": "Lawan sungguhan,<br><em>aula yang sama.</em>",
+    "lead": "Masuk ke server resmi dari dalam game dan bermainlah melawan orang-orang dari seluruh dunia, tetap dari sudut pandang orang pertama.",
+    "point_rated": "Permainan dinilai di setiap kontrol waktu resmi, masing-masing dengan rating tersendiri yang dihitung menurut aturan FIDE.",
+    "point_match": "Pencarian lawan, tantangan melalui nama, dan permainan pribadi dengan kode; atau pertandingan langsung antara dua komputer, tanpa server maupun akun.",
+    "point_fair": "Fair play: pemeriksaan otomatis, analisis mesin atas permainan yang telah selesai, dan laporan dari pemain.",
+    "point_history": "Riwayat permainan Anda di situs ini: unduh setiap permainan sebagai PGN atau GIF animasi.",
+    "point_open": "Siapa pun dapat menjalankan server komunitas: servernya adalah perangkat lunak bebas, dan API-nya terdokumentasi.",
+    "create": "Buat akun",
+    "signin": "Masuk",
+    "server_title": "Server resmi",
+    "status_checking": "Memeriksa…",
+    "address": "Alamat",
+    "registration": "Pendaftaran",
+    "categories": "Kontrol waktu yang dinilai",
+    "top_players": "Pemain teratas",
+    "category": "Kontrol waktu",
+    "board_loading": "Memuat papan peringkat…",
+    "full_board": "Papan peringkat lengkap"
+  },
+  "download": {
+    "button": "Unduh",
+    "choose": "Pilih sistem Anda",
+    "see_release": "Lihat rilis di GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Semua rilis",
+    "experimental": "Eksperimental",
+    "source": "Kode sumber",
+    "source_zip": "Arsip ZIP",
+    "eyebrow": "Unduh",
+    "title": "Silakan duduk.<br><em>Gratis dan bersumber terbuka.</em>",
+    "lead": "Ekstrak dan mainkan: tanpa penginstal di Windows maupun Linux, dan cukup seret ke folder Aplikasi di Mac. Setiap file dibuat dari kode sumber bertag oleh GitHub Actions, dengan atestasi asal-usul build.",
+    "notes": "Catatan rilis",
+    "macos_note": "Untuk Mac Apple Silicon (M1 atau lebih baru) yang menjalankan macOS 26 atau lebih baru, bukan di mesin virtual; versi ini lebih baru dan kurang teruji dibandingkan build lainnya. Aplikasi ini tidak ditandatangani oleh pengembang Apple terdaftar: saat pertama kali, buka aplikasi melalui Pengaturan Sistem › Privasi & Keamanan › Tetap Buka.",
+    "req_system": "Sistem",
+    "req_system_value": "Windows 64-bit (x64); Linux 64-bit (x86-64 atau aarch64) dengan glibc 2.34, OpenSSL 3, dan X11 atau XWayland, seperti Ubuntu 22.04 atau Debian 12; macOS 26 atau lebih baru di Apple Silicon (eksperimental)",
+    "req_gpu": "Grafis",
+    "req_gpu_value": "Kartu grafis dengan OpenGL 4.6 dan driver terbaru (di Mac, game ini membawa OpenGL-nya sendiri)",
+    "req_included": "Sudah termasuk",
+    "req_included_value": "Stockfish 19 beserta jaringan sarafnya: langsung bisa bermain tanpa internet",
+    "req_network": "Koneksi internet",
+    "req_network_value": "Untuk bermain online, GIF, serta suara pelatih dan analisis (unduhan opsional sekitar 399 MB)",
+    "req_licence": "Lisensi",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Periksa unduhan Anda",
+    "verify_text": "Asal-usul build setiap file diatestasi oleh GitHub. Dengan GitHub CLI:",
+    "checksums": "Checksum SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Kredit",
+    "title": "Kredit dan <em>ucapan terima kasih</em>",
+    "engine_head": "Mesin catur",
+    "engine": "Stockfish 19, oleh para pengembang Stockfish (GNU GPL v3). Jaringan sarafnya dilatih dengan data dari proyek Leela Chess Zero (Open Database License).",
+    "voice_head": "Suara",
+    "voice": "Supertonic 3 karya Supertone, di bawah lisensi BigScience Open RAIL-M: diunduh atas permintaan Anda, model ini menyuarakan pelatih dan analisis, di komputer Anda.",
+    "fonts_head": "Jenis huruf",
+    "fonts": "EB Garamond karya Georg Duffner, Cinzel karya Natanael Gama, dan Amiri karya Khaled Hosny; tulisan tangan dalam Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, dan LXGW WenKai (semuanya SIL Open Font License); figur catur dari GNU FreeFont.",
+    "openings_head": "Pembukaan dan teka-teki",
+    "openings": "Nama-nama pembukaan dari basis data chess-openings milik lichess.org, dan teka-teki untuk tantangan pelatih dari basis data teka-teki Lichess, keduanya didedikasikan untuk domain publik (CC0).",
+    "quote": "“Catur adalah seni analisis.”",
+    "quote_author": "Mikhail Botvinnik"
+  },
+  "footer": {
+    "about": "Game catur fotorealistis yang dimainkan dari sudut pandang orang pertama, dengan mesin OpenGL 4.6 buatan sendiri. Perangkat lunak bebas di bawah GNU GPL v3.",
+    "game": "Tentang game",
+    "online": "Main online",
+    "api_docs": "Dokumentasi API server",
+    "source": "Kode sumber",
+    "game_source": "Game di GitHub",
+    "server_source": "Server di GitHub",
+    "releases": "Rilis",
+    "licence": "Lisensi (GPL v3)",
+    "credits": "Stockfish adalah merek dagang para pengembangnya. YouTube adalah merek dagang Google LLC. Windows adalah merek dagang Microsoft Corporation. macOS adalah merek dagang Apple Inc. Linux adalah merek dagang terdaftar milik Linus Torvalds. OpenGL adalah merek dagang terdaftar Hewlett Packard Enterprise.",
+    "legal": "Scacelith",
+    "made": "Situs ini tidak memasang cookie dan tidak menggunakan pelacak; pemutar YouTube hanya dimuat jika Anda menerimanya.",
+    "legal_link": "Informasi hukum, privasi, dan ketentuan"
+  },
+  "common": {
+    "copy": "Salin",
+    "loading": "Memuat…",
+    "noscript": "Halaman ini memerlukan JavaScript untuk berkomunikasi dengan server Scacelith."
+  },
+  "players": {
+    "title": "Papan peringkat dan pemain",
+    "lead": "Pemain terbaik di server resmi dalam setiap kontrol waktu yang dinilai. Cari pemain mana pun untuk melihat rating dan permainan terbarunya.",
+    "search_label": "Cari pemain",
+    "search_placeholder": "Nama pengguna",
+    "search_button": "Cari",
+    "back": "Kembali ke papan peringkat",
+    "recent_games": "Permainan terbaru",
+    "board_title": "Papan peringkat",
+    "category": "Kontrol waktu",
+    "col_rank": "Peringkat",
+    "col_player": "Pemain",
+    "col_rating": "Rating",
+    "col_peak": "Puncak",
+    "col_games": "Permainan",
+    "col_wdl": "M / R / K",
+    "loading": "Memuat…"
+  },
+  "account": {
+    "title": "Akun Anda",
+    "auth_foot": "Satu akun di server resmi, untuk game dan situs ini. Membuat akun dengan Google di dalam game? Gunakan “Lupa kata sandi?” untuk memberinya kata sandi.",
+    "common": {
+      "back": "Kembali ke halaman masuk"
+    },
+    "fields": {
+      "login": "Nama pengguna atau email",
+      "password": "Kata sandi",
+      "show_password": "Tampilkan kata sandi",
+      "username": "Nama pengguna",
+      "email": "Email",
+      "confirm_password": "Konfirmasi kata sandi",
+      "current_password": "Kata sandi saat ini",
+      "new_password": "Kata sandi baru",
+      "new_email": "Alamat email baru",
+      "mfa_code": "Kode dua faktor (atau kode pemulihan)"
+    },
+    "signin": {
+      "tab": "Masuk",
+      "title": "Selamat datang kembali",
+      "remember": "Tetap masuk di perangkat ini",
+      "submit": "Masuk",
+      "forgot": "Lupa kata sandi?",
+      "resend": "Kirim ulang email konfirmasi"
+    },
+    "mfa": {
+      "title": "Autentikasi dua faktor",
+      "text": "Masukkan kode 6 digit dari aplikasi autentikator Anda.",
+      "code": "Kode dari aplikasi",
+      "use_recovery": "Gunakan kode pemulihan",
+      "submit": "Konfirmasi"
+    },
+    "google": {
+      "or": "atau",
+      "button": "Masuk dengan Google",
+      "username_title": "Pilih nama pengguna Anda",
+      "username_text": "Akun Google Anda baru di server ini. Pilih nama yang akan dilihat pemain lain: nama ini tidak dapat diubah nanti.",
+      "username_submit": "Buat akun saya",
+      "link_title": "Tautkan akun Google Anda",
+      "link_submit": "Tautkan dan masuk",
+      "returning": "Sedang masuk dengan Google…"
+    },
+    "register": {
+      "tab": "Buat akun",
+      "title": "Akun gratis",
+      "closed": "Server tidak menerima akun baru saat ini.",
+      "username_hint": "Huruf, angka, _ dan -, diawali huruf atau angka.",
+      "password_hint": "Minimal 10 karakter, tanpa nama pengguna atau email Anda.",
+      "pow_note": "Untuk mencegah robot, browser Anda memecahkan teka-teki kecil saat Anda mendaftar. Ini memakan waktu beberapa detik.",
+      "submit": "Buat akun",
+      "done_title": "Periksa email Anda",
+      "done_text": "Kami telah mengirim tautan konfirmasi ke alamat Anda. Buka tautan itu untuk membuat akun Anda, lalu masuk.",
+      "done_hint": "Tautan berlaku selama 24 jam. Tidak ada apa-apa di kotak masuk Anda? Periksa folder spam, atau minta email itu dikirim lagi.",
+      "go_signin": "Ke halaman masuk",
+      "legal_note": "Nama pengguna, rating, dan permainan Anda akan bersifat publik. Dengan membuat akun, Anda menyetujui ketentuan penggunaan.",
+      "legal_link": "Privasi dan ketentuan penggunaan"
+    },
+    "forgot": {
+      "title": "Lupa kata sandi",
+      "text": "Masukkan alamat email akun Anda. Jika ada akun dengan alamat itu, kami akan mengirimkan tautan untuk memilih kata sandi baru, yang berlaku selama satu jam.",
+      "submit": "Kirim tautan"
+    },
+    "resend": {
+      "title": "Konfirmasi email Anda",
+      "text": "Tidak menerima email konfirmasi, atau tautannya sudah kedaluwarsa? Masukkan alamat Anda untuk mendapatkan tautan baru.",
+      "submit": "Kirim lagi"
+    },
+    "dash": {
+      "public_profile": "Profil publik",
+      "signout": "Keluar",
+      "tab_overview": "Ringkasan",
+      "tab_games": "Permainan",
+      "tab_devices": "Perangkat",
+      "tab_settings": "Pengaturan"
+    },
+    "overview": {
+      "info": "Informasi Anda",
+      "ratings": "Rating Anda",
+      "sanctions": "Sanksi",
+      "recent": "Permainan terbaru",
+      "all_games": "Semua permainan Anda"
+    },
+    "games": {
+      "filter_category": "Kontrol waktu",
+      "all": "Semua",
+      "custom": "Kustom",
+      "filter_rated": "Jenis",
+      "rated": "Dinilai",
+      "casual": "Santai",
+      "filter_result": "Hasil",
+      "wins": "Menang",
+      "losses": "Kalah",
+      "draws": "Remis"
+    },
+    "devices": {
+      "title": "Perangkat yang masuk",
+      "signout_all": "Keluar dari semuanya",
+      "text": "Setiap proses masuk, di dalam game atau di situs ini, dihitung sebagai satu perangkat. Keluarkan perangkat yang tidak Anda kenali."
+    },
+    "settings": {
+      "challenges_title": "Tantangan",
+      "challenges_text": "Pemain lain dapat menantang Anda melalui nama Anda dari dalam game.",
+      "challenges_label": "Terima tantangan",
+      "mfa_title": "Autentikasi dua faktor",
+      "mfa_text": "Aktifkan atau nonaktifkan, dan buat kode pemulihan baru, dari halaman akun di dalam game.",
+      "password_title": "Ubah kata sandi",
+      "password_text": "Perangkat Anda yang lain akan dikeluarkan, dan perangkat ini tetap masuk.",
+      "password_submit": "Ubah kata sandi",
+      "email_title": "Ubah alamat email",
+      "email_submit": "Kirim tautan konfirmasi",
+      "export_title": "Unduh data saya",
+      "export_text": "Semua yang disimpan server tentang akun Anda, dalam satu file JSON.",
+      "export_submit": "Unduh data saya",
+      "delete_title": "Hapus akun",
+      "delete_text": "Tindakan ini tidak dapat dibatalkan. Permainan dan rating Anda tetap ada, dengan nama anonim; alamat email, kata sandi, dan perangkat Anda dihapus.",
+      "delete_confirm": "Ketik nama pengguna Anda untuk mengonfirmasi",
+      "delete_submit": "Hapus akun saya"
+    }
+  },
+  "gif": {
+    "title": "GIF animasi",
+    "preparing": "Menyiapkan GIF…",
+    "download": "Unduh GIF",
+    "make": "Buat GIF",
+    "pause": "Jeda animasi",
+    "back": "Kembali ke permainan",
+    "options": "Opsi",
+    "size": "Ukuran",
+    "size_small": "Kecil (284 × 350)",
+    "size_medium": "Sedang (424 × 515)",
+    "size_large": "Besar (628 × 762)",
+    "orientation": "Papan dilihat dari sisi",
+    "orientation_white": "Putih",
+    "orientation_black": "Hitam",
+    "speed": "Kecepatan",
+    "speed_fast": "Cepat (0,25 detik per langkah)",
+    "speed_normal": "Normal (0,5 detik per langkah)",
+    "speed_slow": "Lambat (1 detik per langkah)",
+    "speed_very_slow": "Sangat lambat (2 detik per langkah)",
+    "coords": "Tampilkan koordinat",
+    "regenerate": "Buat ulang",
+    "note": "Server menggambar setiap GIF. GIF yang sudah pernah Anda buat langsung tersedia kembali; pembuatan GIF baru dibatasi beberapa per menit."
+  },
+  "notfound": {
+    "title": "Halaman tidak ditemukan",
+    "text": "Petak ini kosong. Halaman ini mungkin telah dipindahkan.",
+    "home": "Kembali ke Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Memuat…",
+      "retry": "Coba lagi",
+      "close": "Tutup",
+      "copy": "Salin",
+      "copied": "Disalin ke papan klip.",
+      "copy_failed": "Tidak dapat menyalin. Pilih teksnya dan salin secara manual.",
+      "load_more": "Tampilkan lebih banyak",
+      "show_password": "Tampilkan kata sandi",
+      "hide_password": "Sembunyikan kata sandi",
+      "signin_needed": "Masuk untuk melanjutkan.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Server tidak dapat dijangkau. Periksa koneksi Anda dan coba lagi.",
+      "timeout": "Server terlalu lama merespons. Coba lagi.",
+      "server_busy": "Server sedang sibuk. Coba lagi dalam beberapa saat.",
+      "rate_limited": "Terlalu banyak permintaan. Coba lagi dalam {time}.",
+      "rate_limited_short": "Terlalu banyak permintaan. Coba lagi dalam beberapa saat.",
+      "internal_error": "Server mengalami kesalahan tak terduga. Coba lagi nanti.",
+      "invalid_token": "Sesi Anda telah berakhir. Silakan masuk lagi.",
+      "unauthorized": "Silakan masuk.",
+      "not_found": "Tidak ditemukan.",
+      "unknown": "Terjadi kesalahan ({code}).",
+      "invalid_credentials": "Nama pengguna, email, atau kata sandi salah.",
+      "too_many_attempts": "Terlalu banyak percobaan. Coba lagi dalam {time}.",
+      "banned": "Akun ini ditangguhkan hingga {date}.",
+      "banned_permanent": "Akun ini ditangguhkan.",
+      "email_unverified": "Alamat email Anda belum dikonfirmasi. Buka tautan yang kami kirimkan, atau minta tautan baru.",
+      "invalid_mfa_token": "Langkah masuk ini telah kedaluwarsa. Silakan masuk lagi.",
+      "invalid_code": "Kode salah atau sudah digunakan.",
+      "mfa_code_required": "Masukkan kode dua faktor Anda.",
+      "invalid_password": "Kata sandi salah.",
+      "password_not_set": "Akun ini belum memiliki kata sandi: gunakan “Lupa kata sandi?” di halaman masuk untuk membuatnya.",
+      "registration_closed": "Server tidak menerima akun baru saat ini.",
+      "invalid_username": "Nama pengguna ini tidak diizinkan.",
+      "username_taken": "Nama pengguna ini sudah dipakai.",
+      "invalid_email": "Alamat email ini tidak valid.",
+      "email_taken": "Alamat email ini sudah digunakan oleh akun lain.",
+      "same_email": "Ini sudah merupakan alamat email Anda.",
+      "weak_password": "Kata sandi ini terlalu lemah.",
+      "weak_too_short": "Kata sandi terlalu pendek (minimal {min} karakter).",
+      "weak_too_long": "Kata sandi terlalu panjang.",
+      "weak_contains_username": "Kata sandi tidak boleh berisi nama pengguna Anda.",
+      "weak_contains_email": "Kata sandi tidak boleh berisi alamat email Anda.",
+      "weak_too_common": "Kata sandi ini terlalu umum. Pilih kata sandi lain.",
+      "pow_failed": "Pemeriksaan anti-robot gagal. Coba lagi.",
+      "passwords_differ": "Kedua kata sandi tidak sama.",
+      "required": "Isi kolom ini.",
+      "email_format": "Masukkan alamat email yang valid.",
+      "username_format": "{min} hingga {max} karakter: huruf, angka, _ dan -, diawali huruf atau angka.",
+      "password_length": "Minimal {min} karakter.",
+      "confirm_name": "Ketik nama pengguna Anda persis seperti yang ditampilkan.",
+      "game_too_long": "Permainan ini terlalu panjang untuk dijadikan GIF.",
+      "gif_disabled": "Server ini tidak membuat GIF.",
+      "render_failed": "Server tidak dapat menggambar GIF ini.",
+      "invalid_game": "Permainan ini tidak ada.",
+      "invalid_player": "Masukkan nama pengguna: 2 hingga 24 huruf, angka, _, . atau -.",
+      "player_not_found": "Tidak ada pemain dengan nama ini.",
+      "sso_cancelled": "Proses masuk dengan Google dibatalkan.",
+      "sso_mismatch": "Proses masuk dengan Google ini tidak dimulai di tab ini, atau sudah digunakan. Coba lagi.",
+      "sso_expired": "Proses masuk dengan Google ini telah kedaluwarsa. Coba lagi.",
+      "invalid_verifier": "Proses masuk dengan Google ini dimulai di tab atau browser lain. Mulai lagi dari halaman ini.",
+      "sso_email_unverified": "Google belum mengonfirmasi alamat email akun Google ini.",
+      "sso_account_exists": "Sebuah akun sudah menggunakan alamat email ini, tetapi akun itu tidak memiliki kata sandi untuk ditautkan dengan Google. Berikan kata sandi melalui “Lupa kata sandi?”, lalu masuk dengan Google lagi.",
+      "sso_failed": "Proses masuk dengan Google tidak dapat diselesaikan. Coba lagi.",
+      "sso_disabled": "Masuk dengan Google tidak tersedia di server ini.",
+      "sso_already_linked": "Akun Google ini sudah ditautkan ke akun lain.",
+      "account_disabled": "Akun ini tidak dapat digunakan lagi.",
+      "sso_storage": "Browser Anda memblokir penyimpanan situs ini, yang diperlukan untuk masuk dengan Google. Izinkan penyimpanan itu, atau masuk dengan kata sandi Anda.",
+      "sso_url": "Server merespons dengan alamat Google yang tidak terduga, sehingga proses masuk dengan Google dihentikan."
+    },
+    "time": {
+      "seconds": {
+        "other": "{count} detik"
+      },
+      "minutes": {
+        "other": "{count} menit"
+      }
+    },
+    "download": {
+      "exe": "Aplikasi",
+      "zip": "Arsip ZIP",
+      "dmg": "Image disk",
+      "archive": "Arsip",
+      "file": "Berkas",
+      "unavailable": "Tidak tersedia",
+      "your_system": "Sistem Anda",
+      "eyebrow_release": "Versi {version}",
+      "published": "Diterbitkan pada {date}",
+      "unreachable": "GitHub tidak dapat dijangkau saat ini: lihat halaman rilis.",
+      "available": "Tersedia",
+      "verify_file": "file tersebut",
+      "no_build": "Saat ini belum ada build game untuk {os}.",
+      "x64": "64-bit (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64-bit, Intel / AMD atau Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 atau lebih baru",
+      "experimental": "Eksperimental"
+    },
+    "server": {
+      "online": "Aktif",
+      "offline": "Tidak terjangkau",
+      "busy": "Sibuk",
+      "open": "Dibuka",
+      "closed": "Ditutup",
+      "updated": "Diperbarui {time}",
+      "min_games": "Pemain dengan minimal {count} permainan dinilai dalam kontrol waktu ini.",
+      "empty": "Belum ada pemain yang masuk peringkat dalam kontrol waktu ini.",
+      "error": "Papan peringkat tidak dapat dimuat saat ini."
+    },
+    "game": {
+      "number": "Permainan #{id}",
+      "white": "Putih",
+      "black": "Hitam",
+      "you": "Anda",
+      "vs": "melawan",
+      "outcome_win": "Menang",
+      "outcome_loss": "Kalah",
+      "outcome_draw": "Remis",
+      "outcome_aborted": "Dibatalkan",
+      "result_white": "Putih menang",
+      "result_black": "Hitam menang",
+      "result_draw": "Remis",
+      "result_aborted": "Dibatalkan",
+      "rated": "Dinilai",
+      "casual": "Santai",
+      "custom": "Kustom",
+      "moves": {
+        "other": "{count} langkah"
+      },
+      "duration": "Durasi {time}",
+      "rating_diff": "Perubahan rating {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Unduh permainan sebagai PGN",
+      "copy_pgn": "Salin",
+      "copy_pgn_title": "Salin PGN",
+      "gif": "GIF",
+      "gif_title": "Buat GIF animasi (membuka tab baru)",
+      "gif_signin": "Masuk untuk membuat GIF",
+      "pgn_copied": "PGN disalin ke papan klip.",
+      "pgn_saved": "PGN telah diunduh.",
+      "none": "Belum ada permainan. Permainan online Anda akan muncul di sini.",
+      "none_filtered": "Tidak ada permainan yang cocok dengan filter ini.",
+      "none_public": "Belum ada permainan.",
+      "total": {
+        "other": "{count} permainan"
+      },
+      "termination_unknown": "Permainan selesai",
+      "reason": {
+        "1": "Skakmat",
+        "2": "Menyerah",
+        "3": "Kalah waktu",
+        "4": "Langkah ilegal kedua (dinyatakan kalah)",
+        "5": "Pat",
+        "6": "Posisi mati (materi tidak cukup)",
+        "7": "Waktu habis, tetapi lawan tidak dapat memberi skakmat",
+        "8": "Pengulangan posisi lima kali",
+        "9": "Aturan 75 langkah",
+        "10": "Pengulangan posisi tiga kali (diklaim)",
+        "11": "Aturan 50 langkah (diklaim)",
+        "12": "Remis atas kesepakatan",
+        "13": "Langkah ilegal kedua, tetapi lawan tidak dapat memberi skakmat",
+        "14": "Menyerah, tetapi lawan tidak dapat memberi skakmat",
+        "20": "Ditinggalkan (terputus terlalu lama)",
+        "21": "Ditinggalkan, tetapi lawan tidak dapat memberi skakmat",
+        "22": "Permainan dibatalkan",
+        "23": "Langkah pertama tidak dijalankan tepat waktu (dibatalkan)",
+        "24": "Dinyatakan kalah (pelanggaran fair play)",
+        "25": "Dibatalkan oleh server",
+        "26": "Kedua pemain terputus"
+      }
+    },
+    "ratings": {
+      "category": "Kontrol waktu",
+      "rating": "Rating",
+      "peak": "Puncak",
+      "games": "Permainan",
+      "wdl": "M / R / K",
+      "provisional": "Rating sementara",
+      "none": "Belum ada permainan yang dinilai.",
+      "unrated_hint": "Tanda tanya menandai rating sementara (baru sedikit permainan yang dimainkan)."
+    },
+    "account": {
+      "member_since": "Anggota sejak {date}",
+      "last_login": "Terakhir masuk",
+      "created": "Dibuat",
+      "email": "Email",
+      "pending_email": "Menunggu konfirmasi: {email}",
+      "verified": "Dikonfirmasi",
+      "unverified": "Belum dikonfirmasi",
+      "mfa": "Autentikasi dua faktor",
+      "mfa_on": "Aktif",
+      "mfa_off": "Nonaktif",
+      "google": "Masuk dengan Google",
+      "google_on": "Tertaut",
+      "google_off": "Tidak tertaut",
+      "password": "Kata sandi",
+      "password_set": "Sudah diatur",
+      "password_unset": "Belum diatur",
+      "challenges": "Tantangan",
+      "challenges_all": "Diterima",
+      "challenges_none": "Ditolak",
+      "badge_verified": "Email dikonfirmasi",
+      "badge_mfa": "Dua faktor aktif",
+      "badge_google": "Google",
+      "ban_until": "Akun Anda ditangguhkan hingga {date}.",
+      "ban_permanent": "Akun Anda ditangguhkan.",
+      "sanction_ban": "Penangguhan",
+      "sanction_mm_block": "Pencarian lawan diblokir",
+      "sanction_warning": "Peringatan",
+      "sanction_until": "hingga {date}",
+      "sanction_permanent": "permanen",
+      "devices_current": "Perangkat ini",
+      "devices_unknown": "Perangkat tanpa nama",
+      "devices_signed_in": "Masuk pada {date}",
+      "devices_seen": "Terakhir digunakan {time}",
+      "devices_expires": "Berakhir pada {date}",
+      "devices_revoke": "Keluarkan",
+      "devices_revoked": "Perangkat telah dikeluarkan.",
+      "devices_none": "Tidak ada perangkat lain.",
+      "signout_all_confirm": "Keluarkan semua perangkat, termasuk perangkat ini?",
+      "signed_out": "Anda telah keluar.",
+      "signed_in": "Selamat datang, {name}.",
+      "prefs_saved": "Tersimpan.",
+      "password_changed": "Kata sandi Anda telah diubah. Perangkat Anda yang lain telah dikeluarkan.",
+      "email_sent": "Tautan konfirmasi telah dikirim ke alamat baru. Alamat Anda berubah setelah Anda membuka tautan itu.",
+      "email_changed": "Alamat email Anda sekarang {email}.",
+      "email_current": "Alamat saat ini: {email}.",
+      "email_pending": "Perubahan ke {email} sedang menunggu tautan konfirmasinya dibuka.",
+      "export_done": "Data Anda telah diunduh.",
+      "deleted": "Akun Anda telah dihapus.",
+      "delete_confirm_label": "Ketik {name} untuk mengonfirmasi",
+      "register_done": "Kami telah mengirim tautan konfirmasi ke {email}. Buka tautan itu untuk membuat akun Anda, lalu masuk.",
+      "register_ready": "Akun Anda sudah siap. Anda dapat masuk.",
+      "forgot_done": "Jika ada akun yang menggunakan alamat ini, tautan untuk memilih kata sandi baru sedang dikirim.",
+      "resend_done": "Jika alamat ini sedang menunggu konfirmasi, tautan baru sedang dikirim.",
+      "pow_solving": "Memecahkan teka-teki anti-robot…",
+      "mfa_recovery": "Kode pemulihan",
+      "mfa_recovery_text": "Masukkan salah satu kode pemulihan Anda. Setiap kode hanya dapat digunakan sekali.",
+      "mfa_app": "Kode dari aplikasi",
+      "mfa_app_text": "Masukkan kode 6 digit dari aplikasi autentikator Anda.",
+      "mfa_state_on": "Autentikasi dua faktor aktif untuk akun ini.",
+      "mfa_state_off": "Autentikasi dua faktor nonaktif untuk akun ini.",
+      "client_label": "Situs web Scacelith ({browser})",
+      "username": "Nama pengguna",
+      "password_rules": "Minimal {min} karakter, tanpa nama pengguna atau email Anda.",
+      "password_note": "Perangkat Anda yang lain akan dikeluarkan, dan perangkat ini tetap masuk.",
+      "signin_label": "Masuk",
+      "google_link_text": "Akun {name} sudah menggunakan alamat email ini. Masukkan kata sandinya sekali untuk menautkannya ke Google; setelah itu, “Masuk dengan Google” sudah cukup.",
+      "auth_foot_google": "Satu akun di server resmi, untuk game dan situs ini. Membuat akun dengan Google di dalam game? Masuk dengan Google di sini juga."
+    },
+    "players": {
+      "since": "Anggota sejak {date}",
+      "games": "Permainan",
+      "rated": "Dinilai",
+      "wins": "Menang",
+      "draws": "Remis",
+      "losses": "Kalah",
+      "view": "Lihat profil {name}",
+      "you": "Anda",
+      "board": "Papan peringkat"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Permainan #{id} · {date}",
+      "preparing": "Menyiapkan GIF…",
+      "rendering": "Server sedang menggambar GIF. Permainan yang panjang dapat memakan waktu beberapa detik…",
+      "ready": "GIF Anda sudah siap. Pengunduhan telah dimulai.",
+      "ready_again": "GIF Anda sudah siap.",
+      "signin": "Masuk untuk membuat GIF dari permainan Anda.",
+      "signin_button": "Masuk",
+      "missing": "Tidak ada permainan yang dipilih.",
+      "retry_in": "Anda dapat mencoba lagi dalam {time}.",
+      "confirm": "Tekan “Buat GIF” agar server menggambar permainan ini dengan akun Anda.",
+      "retry_now": "Anda dapat mencoba lagi sekarang."
+    },
+    "home": {
+      "create_account": "Buat akun",
+      "my_account": "Akun saya",
+      "my_games": "Permainan saya",
+      "signin": "Masuk"
+    },
+    "trailer": {
+      "title": "Cuplikan Scacelith",
+      "notice": "Video ini tersimpan di YouTube. Memutarnya di sini akan memuat pemutar Google, yang menerima alamat IP Anda dan dapat menyimpan cookie atau pelacak lain di perangkat Anda.",
+      "accept": "Terima dan putar",
+      "google_privacy": "Kebijakan privasi Google"
+    }
+  },
+  "legal": {
+    "eyebrow": "Hukum",
+    "title": "Informasi hukum, privasi, dan ketentuan penggunaan",
+    "lead": "Siapa penerbit dan penyedia hosting Scacelith, apa yang terjadi pada data Anda di situs web ini, di dalam game, dan di server resmi, serta aturan untuk bermain di sana.",
+    "updated": "Terakhir diperbarui: 11 Oktober 2026",
+    "toc": "Di halaman ini",
+    "notice": {
+      "title": "Informasi hukum",
+      "publisher_label": "Penerbit",
+      "publisher": "Scacelith diterbitkan oleh perseorangan, secara nonprofesional. Sebagaimana diizinkan oleh hukum Prancis (pasal 1-1 II undang-undang no. 2004-575 tanggal 21 Juni 2004), identitas penerbit tidak ditampilkan di sini; identitas tersebut diketahui oleh penyedia hosting.",
+      "contact_label": "Kontak",
+      "contact": "Untuk pertanyaan apa pun tentang situs web ini, server resmi, atau data Anda.",
+      "host_server": "Server game resmi dan data akun",
+      "host_server_note": "Server berada di Prancis.",
+      "host_site": "Situs web ini dan dokumentasi API (GitHub Pages)",
+      "host_domain": "Registrar nama domain",
+      "licence_label": "Lisensi",
+      "licence": "Game dan servernya adalah perangkat lunak bebas di bawah GNU General Public License v3, dengan kode sumber publik:",
+      "game_source": "game",
+      "server_source": "server",
+      "phone": "Telepon"
+    },
+    "privacy": {
+      "title": "Privasi",
+      "intro": "Scacelith tidak menampilkan iklan, tidak menjual data, dan tidak mengukur audiens. Data pribadi hanya digunakan untuk menjalankan situs web ini dan server resmi, sebagaimana dijelaskan di bawah. Pengendali data adalah penerbit, yang dapat dihubungi melalui alamat kontak di atas.",
+      "site_title": "Di situs web ini",
+      "site_hosting": "GitHub menyediakan hosting untuk situs ini dan, seperti penyedia hosting web mana pun, mencatat alamat IP pengunjung untuk keperluan keamanan.",
+      "github_privacy": "Pernyataan privasi GitHub",
+      "site_requests": "Untuk menampilkan rilis terbaru, browser Anda mengirim permintaan ke API GitHub (api.github.com); untuk menampilkan status server, papan peringkat, pemain, dan akun Anda, browser Anda mengirim permintaan ke server resmi (caissa.scacelith.com). Keduanya menerima alamat IP Anda, seperti pada setiap permintaan.",
+      "site_storage": "Situs ini tidak memasang cookie dan tidak menggunakan analitik. Situs ini hanya menyimpan di browser Anda pilihan bahasa Anda dan, setelah Anda masuk, sesi Anda: hanya untuk tab saat ini, atau di perangkat ini jika Anda mencentang “Tetap masuk di perangkat ini”. Proses masuk dengan Google juga menyimpan kode sekali pakainya di tab saat ini sampai kode itu digunakan. Semua ini diperlukan agar situs dapat berfungsi, dan hanya server resmi yang menerima sesi dan kode tersebut.",
+      "site_trailer": "Cuplikan ini adalah video YouTube. Tidak ada yang dimuat dari YouTube sampai Anda menekan “Terima dan putar”; setelah itu, YouTube (Google) menerima alamat IP Anda dan dapat menyimpan cookie atau pelacak lain di perangkat Anda. Jawaban Anda tidak diingat: pertanyaan itu muncul lagi pada kunjungan Anda berikutnya.",
+      "site_google": "“Masuk dengan Google” di halaman Akun tidak memuat apa pun dari Google sampai Anda menekannya. Browser Anda kemudian membuka halaman masuk Google (accounts.google.com), dan Google mengarahkannya kembali ke situs ini dengan kode sekali pakai yang diteruskan situs ke server resmi. Google menerima alamat IP Anda dan apa yang Anda masukkan di halamannya, sesuai kebijakannya sendiri.",
+      "google_privacy": "Kebijakan privasi Google",
+      "game_title": "Di dalam game",
+      "game_local": "Game menyimpan pengaturannya, hasil permainan lokal Anda, dan sesi masuk Anda di komputer Anda. Sesi masuk disimpan di penyimpanan aman sistem: DPAPI di Windows, Keychain di macOS, keyring Secret Service di Linux, atau jika tidak ada, sebuah file yang hanya dapat dibaca oleh akun pengguna Anda.",
+      "game_network": "Game tidak mengirim apa pun atas inisiatifnya sendiri: tanpa telemetri, tanpa pemeriksaan pembaruan. Game hanya terhubung ke server resmi saat Anda membuka halaman online, ke Hugging Face hanya saat Anda mengunduh suara pelatih, dan, untuk pertandingan langsung, ke komputer lawan Anda, yang kemudian mengetahui alamat IP Anda (game juga dapat membuka port di router Anda dengan UPnP).",
+      "account_title": "Akun Anda di server resmi",
+      "account_intro": "Membuat akun, di dalam game atau di situs web ini, dan bermain online akan mengirimkan data berikut ke server resmi, yang di-hosting oleh OVH di Prancis:",
+      "data_account": "<strong>Akun:</strong> nama pengguna, alamat email, kata sandi (hanya disimpan sebagai hash Argon2id), rahasia verifikasi dua langkah (terenkripsi) dan kode pemulihan (dalam bentuk hash), tanggal pendaftaran, dan tanggal terakhir masuk.",
+      "data_google": "<strong>Masuk dengan Google:</strong> Google mengirimkan pengenal akun Google Anda, alamat email Anda, dan nama Anda. Server menyimpan pengenal dan alamat tersebut, dan hanya menggunakan nama untuk menyarankan nama pengguna.",
+      "data_sessions": "<strong>Perangkat yang masuk:</strong> untuk setiap kali masuk, nama perangkat (versi dan sistem game, seperti “Scacelith/1.0.0 win64”, atau browser dan sistem untuk situs web ini), alamat IP, dan tanggal penggunaan.",
+      "data_games": "<strong>Permainan dan rating:</strong> setiap permainan online (pemain, langkah, waktu yang digunakan untuk setiap langkah, hasil, tanggal) dan rating Anda. Selama permainan, gerakan kepala dan tangan Anda diteruskan secara langsung ke lawan Anda dan tidak pernah disimpan.",
+      "data_security": "<strong>Log keamanan:</strong> proses masuk, percobaan yang gagal, dan perubahan pada akun, beserta alamat IP.",
+      "data_fairplay": "<strong>Fair play:</strong> laporan yang Anda ajukan atau yang diajukan tentang Anda, beserta komentarnya; permainan yang ditinggalkan dan yang terlewat; sanksi; serta pemeriksaan yang dijalankan pada permainan, mulai dari langkah palsu atau mustahil hingga statistik dari mesin Stockfish.",
+      "basis_title": "Mengapa, dan atas dasar hukum apa",
+      "basis_contract": "Menjalankan akun Anda dan permainan online (proses masuk, pertandingan, rating, catatan permainan, email yang dikirim oleh layanan): layanan tempat Anda mendaftar (pasal 6(1)(b) GDPR).",
+      "basis_security": "Melindungi akun dan server, serta menjaga permainan tetap adil (log keamanan, alamat IP, pemeriksaan fair play, sanksi): kepentingan sah penerbit dan para pemain (pasal 6(1)(f) GDPR).",
+      "basis_trailer": "Memutar cuplikan dari YouTube: persetujuan Anda, yang diberikan melalui tombol (pasal 6(1)(a) GDPR).",
+      "public_title": "Apa yang dapat dilihat semua orang",
+      "public": "Nama pengguna, tanggal pendaftaran, rating, dan daftar lengkap permainan Anda, beserta setiap langkahnya, bersifat publik: di situs web ini, melalui API server, dan di PGN setiap permainan. Alamat email, perangkat, riwayat masuk, sanksi, dan catatan fair play Anda tidak pernah ditampilkan. Anda dapat menolak tantangan langsung, tetapi permainan tidak dapat disembunyikan.",
+      "auto_title": "Keputusan otomatis",
+      "auto": "Beberapa pelanggaran protokol game, seperti pesan palsu atau langkah yang mustahil dalam posisi tersebut, merupakan bukti pasti kecurangan: server kemudian menyatakan akun itu kalah dalam permainan tersebut, memblokir akun selama 24 jam, menghapusnya dari papan peringkat, dan mengembalikan poin yang hilang dari lawan-lawannya saat melawan akun itu dalam 60 hari terakhir. Tiga permainan yang ditinggalkan, dibatalkan, atau terlewat dalam 24 jam akan menjeda pencarian lawan untuk permainan dinilai selama 15 menit, lalu lebih lama. Statistik mesin tidak pernah dengan sendirinya berujung pada sanksi: manusialah yang memutuskan. Anda dapat meminta peninjauan atas keputusan apa pun melalui alamat kontak.",
+      "recipients_title": "Siapa yang menerima data Anda",
+      "recipient_ovh": "OVH SAS menyediakan hosting untuk server beserta datanya, di Prancis.",
+      "recipient_scaleway": "Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) mengirimkan email server: Scaleway menerima alamat Anda, nama pengguna Anda, dan isi pesan.",
+      "recipient_google": "Google menerima apa yang dikirim browser Anda saat Anda memilih masuk dengan Google, sesuai kebijakan privasinya sendiri.",
+      "recipient_staff": "Administrator dan moderator server melihat data akun dan fair play untuk menjalankan layanan.",
+      "recipient_players": "Pemain lain melihat apa yang bersifat publik, dan lawan Anda melihat langkah dan gerakan Anda selama permainan.",
+      "recipient_none": "Tidak ada pihak lain: tidak ada data yang dijual, disewakan, atau digunakan untuk iklan.",
+      "transfers": "Data akun tetap berada di Prancis. GitHub, Google, dan Porkbun (yang meneruskan pesan yang dikirim ke alamat kontak) berbasis di Amerika Serikat: apa yang mereka terima tunduk pada kebijakan mereka sendiri dan jaminan perlindungan mereka untuk transfer data ke luar Uni Eropa.",
+      "retention_title": "Berapa lama data disimpan",
+      "ret_account": "<strong>Akun:</strong> sampai Anda menghapusnya. Pendaftaran yang alamatnya tidak pernah dikonfirmasi dihapus setelah 24 jam.",
+      "ret_sessions": "<strong>Perangkat yang masuk:</strong> sampai Anda keluar, atau setelah 30 hari tidak digunakan, dan paling lama 90 hari.",
+      "ret_ip": "<strong>Alamat IP:</strong> dihapus setelah 30 hari. Log server hanya menyimpan alamat yang dipersingkat.",
+      "ret_security": "<strong>Log keamanan:</strong> 90 hari.",
+      "ret_conduct": "<strong>Permainan yang ditinggalkan dan terlewat:</strong> 30 hari.",
+      "ret_games": "<strong>Permainan dan rating:</strong> selama server menyimpan catatan permainannya, yang juga merupakan catatan milik lawan-lawan Anda. Setelah akun Anda dihapus, nama Anda di dalamnya diganti dengan “deleted#” dan sebuah nomor.",
+      "ret_fairplay": "<strong>Sanksi, laporan, dan hasil fair play:</strong> tetap disimpan, agar pemain yang diblokir tidak bisa begitu saja kembali dan pemain lain tetap terlindungi. Setelah akun Anda dihapus, data tersebut hanya terkait dengan nomor akun itu.",
+      "ret_backups": "<strong>Cadangan:</strong> data yang dihapus dapat tetap ada untuk waktu singkat dalam salinan cadangan server, sampai salinan itu diganti.",
+      "ret_contact": "<strong>Pesan ke alamat kontak:</strong> selama diperlukan untuk menjawabnya.",
+      "rights_title": "Hak-hak Anda",
+      "rights": "Anda dapat mengakses, memperbaiki, menghapus, dan mengekspor data Anda, membatasi penggunaannya, serta menyatakan keberatan atasnya (pasal 15 sampai 21 GDPR).",
+      "rights_self": "Sebagian besar dapat dilakukan di akun Anda, di dalam game atau di halaman Akun situs web ini: unduh data akun Anda sebagai file JSON, ubah alamat email atau kata sandi Anda, keluarkan perangkat lain, atau hapus akun seketika.",
+      "rights_google": "Akun yang dibuat dengan Google tidak memiliki kata sandi: untuk mengekspor atau menghapusnya, berikan kata sandi terlebih dahulu melalui “Lupa kata sandi?”.",
+      "rights_mail": "Untuk hal lainnya, termasuk data yang tidak tercakup dalam ekspor (pemeriksaan fair play, laporan tentang Anda), tulislah ke alamat kontak. Anda akan mendapat jawaban dalam waktu satu bulan.",
+      "rights_cnil": "Jika Anda merasa hak-hak Anda tidak dihormati, Anda dapat mengajukan pengaduan kepada CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) atau kepada otoritas perlindungan data di negara Anda.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Ketentuan penggunaan",
+      "intro": "Ketentuan ini berlaku untuk server resmi (caissa.scacelith.com) dan halaman akun di situs web ini. Membuat akun atau bermain di server resmi berarti menyetujuinya.",
+      "service": "<strong>Layanan gratis.</strong> Game ini adalah perangkat lunak bebas dan gratis. Server resmi ditawarkan secara gratis dan apa adanya, tanpa jaminan ketersediaan: server dapat berubah, berhenti untuk sementara, atau ditutup.",
+      "account": "<strong>Akun Anda.</strong> Anda bertanggung jawab atas apa yang dilakukan dengan akun Anda dan atas kerahasiaan kata sandinya. Segera tulis ke alamat kontak jika Anda menduga ada orang lain yang menggunakannya.",
+      "username": "<strong>Nama pengguna Anda</strong> bersifat publik: nama itu tidak boleh bersifat menyinggung atau mengandung kebencian, meniru identitas seseorang, atau mengungkapkan data pribadi siapa pun.",
+      "fair": "<strong>Fair play.</strong> Selama permainan dinilai, tidak boleh ada bantuan dari mesin catur, orang lain, atau alat lain apa pun. Tidak boleh ada klien game yang dimodifikasi, pesan palsu, atau upaya sengaja membebani server.",
+      "conduct": "<strong>Selesaikan permainan Anda.</strong> Meninggalkan atau membatalkan permainan, atau melewatkan permainan yang telah dipasangkan untuk Anda, sebanyak tiga kali dalam 24 jam akan menjeda pencarian lawan untuk permainan dinilai selama beberapa waktu.",
+      "reports": "<strong>Laporan</strong> harus dibuat dengan iktikad baik. Untuk melaporkan pemain atau konten ilegal, seperti nama pengguna yang menyinggung, gunakan tombol lapor pada permainan atau tulis ke alamat kontak.",
+      "sanctions": "<strong>Sanksi.</strong> Pelanggaran terhadap aturan ini dapat mengakibatkan Anda dinyatakan kalah, diberi peringatan, diblokir, dan dihapus dari papan peringkat; poin yang hilang saat melawan pemain curang dikembalikan kepada lawan-lawannya. Hanya bukti pasti kecurangan yang dikenai sanksi secara otomatis; hal lainnya diputuskan oleh manusia. Anda dapat menyanggah sanksi melalui alamat kontak.",
+      "liability": "<strong>Tanggung jawab.</strong> Dalam batas yang diizinkan oleh hukum, penerbit tidak bertanggung jawab atas gangguan layanan atau atas hilangnya permainan, rating, atau data.",
+      "end": "<strong>Pengakhiran.</strong> Anda dapat menghapus akun Anda kapan saja. Akun yang melanggar ketentuan ini dapat diblokir.",
+      "changes": "<strong>Perubahan.</strong> Ketentuan ini dapat berubah; tanggal di bagian atas halaman ini menunjukkan versi yang berlaku, dan terus bermain setelah suatu perubahan berarti menyetujuinya.",
+      "law": "<strong>Hukum yang berlaku.</strong> Ketentuan ini diatur oleh hukum Prancis. Jika terjadi sengketa, tulislah terlebih dahulu ke alamat kontak untuk mencari solusi bersama."
+    },
+    "version_note": "Halaman ini tersedia dalam beberapa bahasa; jika terdapat perbedaan, versi bahasa Prancis yang berlaku."
+  }
+}

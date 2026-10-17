@@ -4,7 +4,7 @@ The official website of Scacelith, published by GitHub Pages at <https://scaceli
 branch. It presents the game, offers the downloads of the newest release, and talks to the official
 server's HTTPS API (`https://caissa.scacelith.com/api/v1`, documented at <https://docs.scacelith.com/>)
 so that players can sign in, see their account and ratings, browse their game history, and download
-each game as PGN or as an animated GIF. It is translated into the ten languages of the game.
+each game as PGN or as an animated GIF. It is translated into the 34 languages of the game.
 
 Static files only: no framework, no runtime dependency, no cookie, no tracker. The pages are
 generated once per language by `tools/build.py` (Python 3.9+, standard library only) and committed.
@@ -64,12 +64,17 @@ description (`gallery` in `i18n/<lang>.json`) and run `python3 tools/build.py`.
 | `assets/js/` | One module per page (`home.js`, `players.js`, `account.js`, `gif.js`, `legal.js`), the shared `site.js`, and `lib/` |
 | `assets/vendor/iframemanager/` | The trailer's consent notice (iframemanager 1.3.0, MIT, unmodified) |
 | `assets/js/pow-worker.js` | The proof-of-work solver of the sign-up (SHA-256, in a worker) |
-| `assets/fonts/` | The game's typefaces (Cinzel, EB Garamond, Amiri, SIL OFL 1.1) and its chess figures (GNU FreeFont), subset to woff2, with their licences |
+| `assets/fonts/` | The game's typefaces (Cinzel, EB Garamond with its Greek and Latin Extended subsets, Amiri, SIL OFL 1.1) and its chess figures (GNU FreeFont), subset to woff2, with their licences; Korean and Hindi use the visitor's system fonts |
 | `assets/img/`, `assets/icons/` | Screenshots captured in the game, and the game's icon |
 
-Languages: English (`en`), French (`fr`), German (`de`), Spanish (`es`), Ukrainian (`uk`),
-Russian (`ru`), Arabic (`ar`, right to left), Japanese (`ja`), Simplified Chinese (`zh-Hans`) and
-Traditional Chinese (`zh-Hant`), the languages of the game and of the API documentation.
+Languages: the 34 of the game and of the API documentation, in the order of `tools/site.json`:
+English (`en`), Indonesian (`id`), Czech (`cs`), Danish (`da`), German (`de`), Estonian (`et`),
+Spanish (`es`), French (`fr`), Croatian (`hr`), Italian (`it`), Latvian (`lv`), Lithuanian (`lt`),
+Hungarian (`hu`), Dutch (`nl`), Polish (`pl`), Brazilian Portuguese (`pt-BR`), European Portuguese
+(`pt`), Romanian (`ro`), Slovak (`sk`), Slovenian (`sl`), Finnish (`fi`), Swedish (`sv`), Vietnamese
+(`vi`), Turkish (`tr`), Greek (`el`), Bulgarian (`bg`), Russian (`ru`), Ukrainian (`uk`), Arabic
+(`ar`, right to left), Hindi (`hi`), Korean (`ko`), Japanese (`ja`), Simplified Chinese (`zh-Hans`)
+and Traditional Chinese (`zh-Hant`).
 
 ## Changing the text or the pages
 

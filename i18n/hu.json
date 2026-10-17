@@ -1,0 +1,809 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — fotorealisztikus sakk, első személyű nézetben",
+      "description": "Ingyenes, fotorealisztikus sakk első személyű nézetben Windowsra, Linuxra és macOS-re: Stockfish 19, edző, játszmaelemzés és online játék egy királyi teremben."
+    },
+    "players": {
+      "title": "Ranglista és játékosok — Scacelith",
+      "description": "A hivatalos Scacelith-szerver legjobb játékosai minden értékelt játékidőben, az értékszámaik és a legutóbbi játszmáik."
+    },
+    "account": {
+      "title": "Saját fiók — Scacelith",
+      "description": "Jelentkezzen be a Scacelith-fiókjába: értékszámok, korábbi játszmák, PGN- és GIF-letöltések, bejelentkezett eszközök és beállítások."
+    },
+    "gif": {
+      "title": "Animált GIF — Scacelith",
+      "description": "Egy Scacelith-játszma animált GIF-je."
+    },
+    "legal": {
+      "title": "Impresszum, adatvédelem és felhasználási feltételek — Scacelith",
+      "description": "Ki a Scacelith kiadója és tárhelyszolgáltatója, mit tesz a személyes adatokkal a webhely, a játék és a hivatalos szerver, milyen jogai vannak, és mik a hivatalos szerver szabályai."
+    }
+  },
+  "brand": {
+    "tagline": "A királyi játék"
+  },
+  "nav": {
+    "skip": "Ugrás a tartalomra",
+    "home": "Kezdőlap",
+    "label": "Főmenü",
+    "game": "A játék",
+    "modes": "Játékmódok",
+    "gallery": "Galéria",
+    "trailer": "Előzetes",
+    "online": "Online játék",
+    "players": "Ranglista",
+    "account": "Fiók",
+    "language": "Nyelv",
+    "menu": "Menü",
+    "download": "Letöltés"
+  },
+  "hero": {
+    "image_alt": "Két porcelánrobot sakkozik egy diófa asztalnál, egy napfényes márványteremben.",
+    "lead": "Foglaljon helyet egy viaszolt diófa asztalnál, egy napfényes királyi teremben. A tábla túloldalán egy Stockfish által irányított porcelánrobot várja az első lépését.",
+    "watch": "Előzetes megtekintése",
+    "meta": "Szabad szoftver · Windows, Linux, macOS (kísérleti) · OpenGL 4.6-ot támogató videokártya",
+    "caption": "A játékban készült kép: a királyi terem"
+  },
+  "highlights": {
+    "engine": "Saját fejlesztésű, OpenGL 4.6 alapú motor",
+    "stockfish": "Beépített Stockfish 19",
+    "rules": "FIDE-szabályok",
+    "online": "Online játék",
+    "languages": "34 nyelv"
+  },
+  "experience": {
+    "eyebrow": "Az élmény",
+    "title": "Nem egy tábla a képernyőn.<br><em>Egy hely az asztalnál.</em>",
+    "lead": "A Scacelith visszahozza mindazt, amitől egy játszma igazi: a termet, a csendet, az órát, az ellenfelet, aki a szemébe néz, és a versenyek rituáléit.",
+    "presence": {
+      "title": "Első személyű nézetben",
+      "text": "A robotja szemével lát: körülnézhet a teremben, a tábla fölé hajolhat, felnézhet az ellenfelére, rápillanthat a jegyzőlapjára, vagy felállhat, és az asztal végéhez sétálhat."
+    },
+    "ritual": {
+      "title": "Versenyszabályok",
+      "text": "A megérintett bábuval lépni kell, a lépést pedig a keze fejezi be az óra megnyomásával. Ha a szabályos lépések mutatása ki van kapcsolva, a versenybíró bünteti a szabálytalan lépést, a második pedig a játszma elvesztésével jár."
+    },
+    "scoresheet": {
+      "title": "Kézzel írva",
+      "text": "Mindkét játékos minden lépést feljegyez a saját jegyzőlapjára, mindegyik a maga kézírásával, és negyven lépésenként lapoz. Hallja a toll sercegését a papíron."
+    },
+    "opponent": {
+      "title": "Méltó ellenfél",
+      "text": "A Stockfish 19 az Ön szintjén, az Újonc (800) szinttől a Stockfish Max (3500) szintig, minden játszma után a FIDE szabályai szerint számított értékszámmal."
+    },
+    "engine": {
+      "title": "Ehhez a játékhoz készült",
+      "text": "Az alapoktól megírt motor: fizikai alapú fények, márvány, viaszolt fa, porcelán és sárgaréz, az ablakokon besütő nap, lágy árnyékok és tükröződések. A Nagyon alacsony és az Ultra közötti minőségi előbeállításokkal a videokártyájához igazítható."
+    },
+    "languages": {
+      "title": "34 nyelv",
+      "text": "Angol, francia, német, spanyol, portugáliai és brazíliai portugál, olasz, holland, svéd, dán, finn, észt, lett, litván, lengyel, cseh, szlovák, szlovén, horvát, magyar, román, bolgár, görög, török, ukrán, orosz, arab, hindi, indonéz, vietnámi, koreai, japán, valamint egyszerűsített és hagyományos kínai. Az arab nyelvű felület jobbról balra olvasható, és az edző minden nyelven hangosan beszél, kivéve kínaiul: ott a szavai feliratként jelennek meg."
+    }
+  },
+  "modes": {
+    "eyebrow": "Játékmódok",
+    "title": "Minden játszmának<br><em>megvan a maga asztala.</em>",
+    "lead": "Minden ugyanabban a teremben játszódik, és mindent a címképernyőről indíthat. Internet nélkül is mindig kész egy játszmára a Stockfish.",
+    "new_game": {
+      "name": "Új játszma",
+      "text": "Játsszon a választott erősségű Stockfish ellen, a bullettől a klasszikusig bármilyen játékidővel, vagy egy barátja ellen ugyanazon a számítógépen, mindketten a saját robotjuk szemével."
+    },
+    "coach": {
+      "name": "Edző",
+      "text": "Önnel szemben egy tanár ül: az Ön szintjén játszik, és szóban végigvezeti a játszmán – fenyegetések, jó lépések, hibák –, a saját kezével pedig lejátssza, mibe kerül egy hiba. A sakk szabályaitól a szakértői szintig, a számítógépén előállított beszédhanggal."
+    },
+    "challenges": {
+      "name": "Edzői kihívások",
+      "text": "Rövid állássorozatok, mindegyik egy-egy képességet fejleszt: matt egy, kettő vagy három lépésben, villák, kötések és más taktikák, védekezés, valamint az alapvető végjátékok az edző ellen. Tipp csak kérésre, és zöld pipa minden teljesített sorozatért."
+    },
+    "analysis": {
+      "name": "Elemzés",
+      "text": "A Stockfish áttekinti a mentett játszmáit, az online játszmáit vagy bármilyen PGN-t: értékelősáv, a kulcslépések jelölése a briliánstól a baklövésig, a jobb lépés nyíllal a táblán, valamint hangos és feliratozott megjegyzések. Ahogy lépésről lépésre halad, a robotok keze megteszi a lépéseket."
+    },
+    "online": {
+      "name": "Online játék",
+      "text": "Valódi ellenfelek egy Scacelith-szerveren keresztül: értékelt játszmák, párosítás, kihívások és privát játszmák, vagy közvetlen mérkőzés két számítógép között. Az ellenfél robotja élőben követi a játékosa mozdulatait."
+    },
+    "watch": {
+      "name": "Játszma megtekintése",
+      "text": "Két Stockfish játszik egymás ellen, miközben Ön láthatatlanul, szabadon mozog a teremben, nézőpontról nézőpontra."
+    },
+    "saved": {
+      "name": "Mentett játszmák",
+      "text": "A játszmái PGN-fájlként maradnak meg. Visszajátszhatja őket a teremben, a valódi gondolkodási időkkel és órákkal, vagy más programok játszmáit is megnyithatja."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galéria",
+    "title": "<em>A teremből</em> nézve",
+    "lead": "Minden kép a játékban készült, valós időben, a játék saját motorjával.",
+    "title_screen": {
+      "alt": "A címképernyő: a Scacelith menüje két, a teremben sakkozó robot mellett.",
+      "caption": "A címképernyő"
+    },
+    "coach": {
+      "alt": "Az edző, egy mellkasán „COACH” feliratot viselő porcelánrobot, a tábla túloldaláról üdvözli a játékost; amit mond, feliratként is megjelenik.",
+      "caption": "Edző"
+    },
+    "challenges": {
+      "alt": "Az Edzői kihívások menüje: matt- és taktikai sorozatok a nehézségükkel és a már teljesítettek jelölésével, mellettük a kiválasztott sorozat leírása.",
+      "caption": "Edzői kihívások"
+    },
+    "analysis": {
+      "alt": "Elemzés mód: az értékelősáv, egy nyíl a táblán, a kommentált lépések mindkét fél pontosságával, és a billentyűparancsok listája.",
+      "caption": "Elemzés"
+    },
+    "game": {
+      "alt": "Oldalnézetből: az egyik robot átnyúl az asztal fölött, hogy lépjen egy bábuval, a másik vár; a leütött bábuk a tábla mellett állnak.",
+      "caption": "Játszma megtekintése"
+    },
+    "hall": {
+      "alt": "Két robot ül egymással szemben a sakktábla két oldalán, vörös bársonyszékekben, magas ablakok alatt.",
+      "caption": "A királyi terem"
+    },
+    "opponent": {
+      "alt": "Közeli kép a porcelánrobot ellenfélről, amint a tábla felé hajtja a fejét.",
+      "caption": "Az ellenfél"
+    },
+    "scoresheet": {
+      "alt": "Egy robot keze töltőtollal írja a lépéseket a jegyzőlapra.",
+      "caption": "A jegyzőlap"
+    },
+    "note": "Verzió: 1.0.0. A képeken látható felület angol nyelvű.",
+    "viewer": "Képnézegető",
+    "close": "Bezárás",
+    "previous": "Előző kép",
+    "next": "Következő kép"
+  },
+  "trailer": {
+    "eyebrow": "Előzetes",
+    "title": "A Scacelith <em>mozgásban</em>",
+    "soon_title": "Az előzetes hamarosan érkezik",
+    "soon_text": "Addig is foglaljon helyet: a játék már letölthető.",
+    "privacy": "A YouTube-ról semmi sem töltődik be, amíg el nem fogadja a lejátszóját.",
+    "open_youtube": "Megtekintés a YouTube-on"
+  },
+  "online": {
+    "eyebrow": "Online játék",
+    "title": "Valódi ellenfelek,<br><em>ugyanaz a terem.</em>",
+    "lead": "Jelentkezzen be a játékból a hivatalos szerverre, és játsszon a világ minden tájáról érkező játékosokkal, továbbra is első személyű nézetben.",
+    "point_rated": "Értékelt játszmák minden hivatalos játékidőben, mindegyikben külön, a FIDE szabályai szerint számított értékszámmal.",
+    "point_match": "Párosítás, kihívás név alapján és privát játszmák kóddal; vagy közvetlen mérkőzés két számítógép között, szerver és fiók nélkül.",
+    "point_fair": "Fair play: automatikus ellenőrzések, a befejezett játszmák gépi elemzése és a játékosok jelentései.",
+    "point_history": "Korábbi játszmái ezen a webhelyen: bármelyik játszmát letöltheti PGN-ként vagy animált GIF-ként.",
+    "point_open": "Bárki üzemeltethet közösségi szervert: a szerver szabad szoftver, az API-ja pedig dokumentált.",
+    "create": "Fiók létrehozása",
+    "signin": "Bejelentkezés",
+    "server_title": "A hivatalos szerver",
+    "status_checking": "Ellenőrzés…",
+    "address": "Cím",
+    "registration": "Regisztráció",
+    "categories": "Értékelt játékidők",
+    "top_players": "Legjobb játékosok",
+    "category": "Játékidő",
+    "board_loading": "A ranglista betöltése…",
+    "full_board": "Teljes ranglista"
+  },
+  "download": {
+    "button": "Letöltés",
+    "choose": "Válassza ki a rendszerét",
+    "see_release": "A kiadás megtekintése a GitHubon",
+    "latest": "Scacelith",
+    "all_releases": "Összes kiadás",
+    "experimental": "Kísérleti",
+    "source": "Forráskód",
+    "source_zip": "ZIP-archívum",
+    "eyebrow": "Letöltés",
+    "title": "Foglaljon helyet.<br><em>Ingyenes és nyílt forráskódú.</em>",
+    "lead": "Csomagolja ki, és játsszon: Windowson és Linuxon nincs telepítő, Macen pedig elég az Alkalmazások mappába húzni. Minden fájlt a GitHub Actions állít elő a címkézett forráskódból, igazolt build-eredettel.",
+    "notes": "Kiadási megjegyzések",
+    "macos_note": "Apple Silicon processzoros Mac gépekre (M1 vagy újabb), macOS 26 vagy újabb rendszerrel, virtuális gépen kívül; ez a build újabb és kevésbé tesztelt, mint a többi. Az alkalmazást nem regisztrált Apple-fejlesztő írta alá: első alkalommal a Rendszerbeállítások › Adatvédelem és biztonság › Megnyitás mindenképp lehetőséggel nyissa meg.",
+    "req_system": "Rendszer",
+    "req_system_value": "64 bites Windows (x64); 64 bites Linux (x86-64 vagy aarch64) glibc 2.34, OpenSSL 3 és X11 vagy XWayland mellett, például Ubuntu 22.04 vagy Debian 12; macOS 26 vagy újabb Apple Silicon processzoron (kísérleti)",
+    "req_gpu": "Grafika",
+    "req_gpu_value": "OpenGL 4.6-ot támogató videokártya naprakész illesztőprogrammal (Macen a játék saját OpenGL-megvalósítást hoz magával)",
+    "req_included": "Mellékelve",
+    "req_included_value": "Stockfish 19 és a neurális hálózata: azonnal játszhat, internet nélkül is",
+    "req_network": "Internet",
+    "req_network_value": "Az online játékhoz, a GIF-ekhez, valamint az edző és az elemzés hangjához (nem kötelező, kb. 399 MB-os letöltés)",
+    "req_licence": "Licenc",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "A letöltés ellenőrzése",
+    "verify_text": "Minden fájl build-eredetét a GitHub igazolja. A GitHub CLI segítségével:",
+    "checksums": "SHA-256 ellenőrzőösszegek (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Készítők",
+    "title": "Készítők és <em>köszönetnyilvánítás</em>",
+    "engine_head": "Sakkmotor",
+    "engine": "Stockfish 19, a Stockfish fejlesztőitől (GNU GPL v3). Neurális hálózatát a Leela Chess Zero projekt által biztosított adatokon tanították (Open Database License).",
+    "voice_head": "Hang",
+    "voice": "Supertonic 3 (Supertone), a BigScience Open RAIL-M licenc alapján: a kérésére letöltve ez adja az edző és az elemzés hangját, a saját számítógépén.",
+    "fonts_head": "Betűtípusok",
+    "fonts": "EB Garamond (Georg Duffner), Cinzel (Natanael Gama) és Amiri (Khaled Hosny); kézírás: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One és LXGW WenKai (mind SIL Open Font License alatt); sakkfigurák: GNU FreeFont.",
+    "openings_head": "Megnyitások és feladványok",
+    "openings": "A megnyitások nevei a lichess.org chess-openings adatbázisából, az edzői kihívások feladványai pedig a Lichess feladványadatbázisából származnak; mindkettőt közkinccsé nyilvánították (CC0).",
+    "quote": "„A sakk az elemzés művészete.”",
+    "quote_author": "Mihail Botvinnik"
+  },
+  "footer": {
+    "about": "Fotorealisztikus sakkjáték első személyű nézetben, saját fejlesztésű, OpenGL 4.6 alapú motoron. Szabad szoftver a GNU GPL v3 licenc alatt.",
+    "game": "A játék",
+    "online": "Online játék",
+    "api_docs": "A szerver API-dokumentációja",
+    "source": "Forráskód",
+    "game_source": "A játék a GitHubon",
+    "server_source": "A szerver a GitHubon",
+    "releases": "Kiadások",
+    "licence": "Licenc (GPL v3)",
+    "credits": "A Stockfish a fejlesztőinek védjegye. A YouTube a Google LLC védjegye. A Windows a Microsoft Corporation védjegye. A macOS az Apple Inc. védjegye. A Linux Linus Torvalds bejegyzett védjegye. Az OpenGL a Hewlett Packard Enterprise bejegyzett védjegye.",
+    "legal": "Scacelith",
+    "made": "Ez a webhely sem sütiket, sem nyomkövetőket nem használ; a YouTube lejátszója csak akkor töltődik be, ha elfogadja.",
+    "legal_link": "Impresszum, adatvédelem és feltételek"
+  },
+  "common": {
+    "copy": "Másolás",
+    "loading": "Betöltés…",
+    "noscript": "Ennek az oldalnak JavaScriptre van szüksége a Scacelith-szerverrel való kommunikációhoz."
+  },
+  "players": {
+    "title": "Ranglista és játékosok",
+    "lead": "A hivatalos szerver legjobb játékosai értékelt játékidőnként. Keressen rá bármelyik játékosra, hogy lássa az értékszámait és a legutóbbi játszmáit.",
+    "search_label": "Játékos keresése",
+    "search_placeholder": "Felhasználónév",
+    "search_button": "Keresés",
+    "back": "Vissza a ranglistához",
+    "recent_games": "Legutóbbi játszmák",
+    "board_title": "Ranglista",
+    "category": "Játékidő",
+    "col_rank": "Helyezés",
+    "col_player": "Játékos",
+    "col_rating": "Értékszám",
+    "col_peak": "Csúcs",
+    "col_games": "Játszmák",
+    "col_wdl": "Gy / D / V",
+    "loading": "Betöltés…"
+  },
+  "account": {
+    "title": "Saját fiók",
+    "auth_foot": "Egyetlen fiók a hivatalos szerveren, a játékhoz és ehhez a webhelyhez is. A játékban Google-fiókkal hozta létre a fiókját? Az „Elfelejtette a jelszavát?” lehetőséggel adhat meg hozzá jelszót.",
+    "common": {
+      "back": "Vissza a bejelentkezéshez"
+    },
+    "fields": {
+      "login": "Felhasználónév vagy e-mail-cím",
+      "password": "Jelszó",
+      "show_password": "Jelszó megjelenítése",
+      "username": "Felhasználónév",
+      "email": "E-mail-cím",
+      "confirm_password": "Jelszó megerősítése",
+      "current_password": "Jelenlegi jelszó",
+      "new_password": "Új jelszó",
+      "new_email": "Új e-mail-cím",
+      "mfa_code": "Hitelesítő kód (vagy helyreállító kód)"
+    },
+    "signin": {
+      "tab": "Bejelentkezés",
+      "title": "Üdvözöljük újra",
+      "remember": "Maradjak bejelentkezve ezen az eszközön",
+      "submit": "Bejelentkezés",
+      "forgot": "Elfelejtette a jelszavát?",
+      "resend": "Megerősítő e-mail újraküldése"
+    },
+    "mfa": {
+      "title": "Kétlépcsős azonosítás",
+      "text": "Adja meg a hitelesítő alkalmazása által mutatott 6 jegyű kódot.",
+      "code": "Kód az alkalmazásból",
+      "use_recovery": "Helyreállító kód használata helyette",
+      "submit": "Megerősítés"
+    },
+    "google": {
+      "or": "vagy",
+      "button": "Belépés Google-fiókkal",
+      "username_title": "Felhasználónév választása",
+      "username_text": "A Google-fiókja még új ezen a szerveren. Válassza ki a nevet, amelyet a többi játékos látni fog: később nem módosítható.",
+      "username_submit": "Fiókom létrehozása",
+      "link_title": "Google-fiók összekapcsolása",
+      "link_submit": "Összekapcsolás és belépés",
+      "returning": "Bejelentkezés Google-fiókkal…"
+    },
+    "register": {
+      "tab": "Új fiók",
+      "title": "Ingyenes fiók",
+      "closed": "A szerver jelenleg nem fogad új fiókokat.",
+      "username_hint": "Betűk, számjegyek, _ és -, betűvel vagy számjeggyel kezdve.",
+      "password_hint": "Legalább 10 karakter, amely nem tartalmazza a felhasználónevét és az e-mail-címét.",
+      "pow_note": "A robotok kiszűrésére a böngészője regisztrációkor megold egy kis feladványt. Ez néhány másodpercig tart.",
+      "submit": "Fiók létrehozása",
+      "done_title": "Ellenőrizze a postafiókját",
+      "done_text": "Megerősítő linket küldtünk az e-mail-címére. Nyissa meg a fiókja létrehozásához, majd jelentkezzen be.",
+      "done_hint": "A link 24 óráig érvényes. Nem érkezett meg? Nézze meg a levélszemét mappát, vagy kérje újra az e-mailt.",
+      "go_signin": "Tovább a belépéshez",
+      "legal_note": "A felhasználóneve, az értékszámai és a játszmái nyilvánosak lesznek. A fiók létrehozásával elfogadja a felhasználási feltételeket.",
+      "legal_link": "Adatvédelem és felhasználási feltételek"
+    },
+    "forgot": {
+      "title": "Elfelejtett jelszó",
+      "text": "Adja meg a fiókja e-mail-címét. Ha van ilyen című fiók, küldünk egy linket, amellyel új jelszót választhat; a link egy óráig érvényes.",
+      "submit": "Link küldése"
+    },
+    "resend": {
+      "title": "E-mail-cím megerősítése",
+      "text": "Nem kapta meg a megerősítő e-mailt, vagy lejárt a link? Adja meg a címét, és újat küldünk.",
+      "submit": "Újraküldés"
+    },
+    "dash": {
+      "public_profile": "Nyilvános profil",
+      "signout": "Kijelentkezés",
+      "tab_overview": "Áttekintés",
+      "tab_games": "Játszmák",
+      "tab_devices": "Eszközök",
+      "tab_settings": "Beállítások"
+    },
+    "overview": {
+      "info": "Fiókadatok",
+      "ratings": "Értékszámok",
+      "sanctions": "Szankciók",
+      "recent": "Legutóbbi játszmák",
+      "all_games": "Az összes játszmája"
+    },
+    "games": {
+      "filter_category": "Játékidő",
+      "all": "Mind",
+      "custom": "Egyéni",
+      "filter_rated": "Típus",
+      "rated": "Értékelt",
+      "casual": "Barátságos",
+      "filter_result": "Eredmény",
+      "wins": "Nyert",
+      "losses": "Vesztett",
+      "draws": "Döntetlen"
+    },
+    "devices": {
+      "title": "Bejelentkezett eszközök",
+      "signout_all": "Kijelentkezés mindenhol",
+      "text": "Minden bejelentkezés – a játékban vagy ezen a webhelyen – egy eszköznek számít. Jelentkeztesse ki azokat, amelyeket nem ismer fel."
+    },
+    "settings": {
+      "challenges_title": "Kihívások",
+      "challenges_text": "Más játékosok a játékból, a felhasználóneve alapján kihívhatják Önt.",
+      "challenges_label": "Kihívások fogadása",
+      "mfa_title": "Kétlépcsős azonosítás",
+      "mfa_text": "Be- és kikapcsolni, valamint új helyreállító kódokat készíteni a játék fiókoldalán lehet.",
+      "password_title": "Jelszó módosítása",
+      "password_text": "A többi eszköze kijelentkezik, ez az eszköz bejelentkezve marad.",
+      "password_submit": "Jelszó módosítása",
+      "email_title": "E-mail-cím módosítása",
+      "email_submit": "Megerősítő link küldése",
+      "export_title": "Adataim letöltése",
+      "export_text": "Mindaz, amit a szerver a fiókjáról tárol, egyetlen JSON-fájlban.",
+      "export_submit": "Adataim letöltése",
+      "delete_title": "Fiók törlése",
+      "delete_text": "Ez nem vonható vissza. A játszmái és az értékszámai anonim néven megmaradnak; az e-mail-címe, a jelszava és az eszközei törlődnek.",
+      "delete_confirm": "A megerősítéshez írja be a felhasználónevét",
+      "delete_submit": "Fiókom törlése"
+    }
+  },
+  "gif": {
+    "title": "Animált GIF",
+    "preparing": "A GIF előkészítése…",
+    "download": "GIF letöltése",
+    "make": "GIF készítése",
+    "pause": "Szüneteltetés",
+    "back": "Vissza a játszmáimhoz",
+    "options": "Beállítások",
+    "size": "Méret",
+    "size_small": "Kicsi (284 × 350)",
+    "size_medium": "Közepes (424 × 515)",
+    "size_large": "Nagy (628 × 762)",
+    "orientation": "Nézőpont",
+    "orientation_white": "Világos",
+    "orientation_black": "Sötét",
+    "speed": "Sebesség",
+    "speed_fast": "Gyors (0,25 mp lépésenként)",
+    "speed_normal": "Normál (0,5 mp lépésenként)",
+    "speed_slow": "Lassú (1 mp lépésenként)",
+    "speed_very_slow": "Nagyon lassú (2 mp lépésenként)",
+    "coords": "Koordináták megjelenítése",
+    "regenerate": "Újragenerálás",
+    "note": "Minden GIF-et a szerver rajzol meg. A már elkészített GIF azonnal megérkezik; új GIF-ből percenként csak néhány készíthető."
+  },
+  "notfound": {
+    "title": "Az oldal nem található",
+    "text": "Ez a mező üres. Lehet, hogy az oldal máshová került.",
+    "home": "Vissza a kezdőlapra"
+  },
+  "js": {
+    "common": {
+      "loading": "Betöltés…",
+      "retry": "Újra",
+      "close": "Bezárás",
+      "copy": "Másolás",
+      "copied": "Vágólapra másolva.",
+      "copy_failed": "A másolás nem sikerült. Jelölje ki a szöveget, és másolja ki kézzel.",
+      "load_more": "Továbbiak megjelenítése",
+      "show_password": "Jelszó megjelenítése",
+      "hide_password": "Jelszó elrejtése",
+      "signin_needed": "A folytatáshoz jelentkezzen be.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "A szerver nem érhető el. Ellenőrizze az internetkapcsolatát, és próbálja újra.",
+      "timeout": "A szerver túl sokáig nem válaszolt. Próbálja újra.",
+      "server_busy": "A szerver jelenleg túlterhelt. Próbálja újra egy kis idő múlva.",
+      "rate_limited": "Túl sok kérés. Próbálja újra {time} múlva.",
+      "rate_limited_short": "Túl sok kérés. Próbálja újra egy kis idő múlva.",
+      "internal_error": "Váratlan hiba történt a szerveren. Próbálja újra később.",
+      "invalid_token": "A munkamenete lejárt. Jelentkezzen be újra.",
+      "unauthorized": "Kérjük, jelentkezzen be.",
+      "not_found": "Nem található.",
+      "unknown": "Hiba történt ({code}).",
+      "invalid_credentials": "Hibás felhasználónév, e-mail-cím vagy jelszó.",
+      "too_many_attempts": "Túl sok próbálkozás. Próbálja újra {time} múlva.",
+      "banned": "Ez a fiók fel van függesztve. A felfüggesztés vége: {date}.",
+      "banned_permanent": "Ez a fiók fel van függesztve.",
+      "email_unverified": "Az e-mail-címe még nincs megerősítve. Nyissa meg a linket, amelyet küldtünk, vagy kérjen újat.",
+      "invalid_mfa_token": "Ez a bejelentkezési lépés lejárt. Jelentkezzen be újra.",
+      "invalid_code": "Hibás vagy már felhasznált kód.",
+      "mfa_code_required": "Adja meg a hitelesítő kódot.",
+      "invalid_password": "Hibás jelszó.",
+      "password_not_set": "Ehhez a fiókhoz még nincs jelszó: a bejelentkezési oldalon az „Elfelejtette a jelszavát?” lehetőséggel állíthat be egyet.",
+      "registration_closed": "A szerver jelenleg nem fogad új fiókokat.",
+      "invalid_username": "Ez a felhasználónév nem engedélyezett.",
+      "username_taken": "Ez a felhasználónév már foglalt.",
+      "invalid_email": "Ez az e-mail-cím érvénytelen.",
+      "email_taken": "Ezt az e-mail-címet már egy másik fiók használja.",
+      "same_email": "Jelenleg is ez az e-mail-címe.",
+      "weak_password": "Ez a jelszó túl gyenge.",
+      "weak_too_short": "A jelszó túl rövid (legalább {min} karakter szükséges).",
+      "weak_too_long": "A jelszó túl hosszú.",
+      "weak_contains_username": "A jelszó nem tartalmazhatja a felhasználónevét.",
+      "weak_contains_email": "A jelszó nem tartalmazhatja az e-mail-címét.",
+      "weak_too_common": "Ez a jelszó túl gyakori. Válasszon másikat.",
+      "pow_failed": "A robotok elleni ellenőrzés nem sikerült. Próbálja újra.",
+      "passwords_differ": "A két jelszó nem egyezik.",
+      "required": "Töltse ki ezt a mezőt.",
+      "email_format": "Adjon meg érvényes e-mail-címet.",
+      "username_format": "{min}–{max} karakter: betűk, számjegyek, _ és -, betűvel vagy számjeggyel kezdve.",
+      "password_length": "Legalább {min} karakter.",
+      "confirm_name": "Írja be a felhasználónevét pontosan úgy, ahogy látható.",
+      "game_too_long": "Ez a játszma túl hosszú ahhoz, hogy GIF készüljön belőle.",
+      "gif_disabled": "Ez a szerver nem készít GIF-eket.",
+      "render_failed": "A szerver nem tudta megrajzolni ezt a GIF-et.",
+      "invalid_game": "Ez a játszma nem létezik.",
+      "invalid_player": "Adjon meg egy felhasználónevet: 2–24 betű, számjegy, _, . vagy -.",
+      "player_not_found": "Nincs ilyen nevű játékos.",
+      "sso_cancelled": "A Google-bejelentkezés megszakadt.",
+      "sso_mismatch": "Ezt a Google-bejelentkezést nem ezen a lapon indították, vagy már felhasználták. Próbálja újra.",
+      "sso_expired": "Ez a Google-bejelentkezés lejárt. Próbálja újra.",
+      "invalid_verifier": "Ezt a Google-bejelentkezést egy másik lapon vagy böngészőben indították. Kezdje újra erről az oldalról.",
+      "sso_email_unverified": "A Google nem erősítette meg ennek a Google-fióknak az e-mail-címét.",
+      "sso_account_exists": "Ezt az e-mail-címet már egy fiók használja, de nincs jelszava, amellyel a Google-fiókot össze lehetne kapcsolni. Adjon meg hozzá jelszót az „Elfelejtette a jelszavát?” lehetőséggel, majd jelentkezzen be újra Google-fiókkal.",
+      "sso_failed": "A Google-bejelentkezést nem sikerült befejezni. Próbálja újra.",
+      "sso_disabled": "Ezen a szerveren nem érhető el a Google-bejelentkezés.",
+      "sso_already_linked": "Ez a Google-fiók már egy másik fiókhoz van kapcsolva.",
+      "account_disabled": "Ez a fiók már nem használható.",
+      "sso_storage": "A böngészője letiltja a helyi tárolást ezen a webhelyen, pedig a Google-bejelentkezéshez szükség van rá. Engedélyezze, vagy jelentkezzen be a jelszavával.",
+      "sso_url": "A szerver váratlan Google-címmel válaszolt, ezért a Google-bejelentkezés leállt."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} másodperc",
+        "other": "{count} másodperc"
+      },
+      "minutes": {
+        "one": "{count} perc",
+        "other": "{count} perc"
+      }
+    },
+    "download": {
+      "exe": "Futtatható fájl",
+      "zip": "ZIP-archívum",
+      "dmg": "Lemezkép",
+      "archive": "Archívum",
+      "file": "Fájl",
+      "unavailable": "Nem érhető el",
+      "your_system": "Az Ön rendszere",
+      "eyebrow_release": "Verzió: {version}",
+      "published": "Megjelent: {date}",
+      "unreachable": "A GitHub jelenleg nem érhető el: nézze meg a kiadások oldalát.",
+      "available": "Elérhető",
+      "verify_file": "fájl",
+      "no_build": "Jelenleg nincs a játéknak {os} rendszerre készült változata.",
+      "x64": "64 bites (x64)",
+      "arch_x64": "Intel / AMD (x86-64)",
+      "arch_arm64": "Arm (aarch64)",
+      "several_arches": "64 bites, Intel / AMD vagy Arm",
+      "macos_arm64": "Apple Silicon, macOS 26 vagy újabb",
+      "experimental": "Kísérleti"
+    },
+    "server": {
+      "online": "Elérhető",
+      "offline": "Nem érhető el",
+      "busy": "Túlterhelt",
+      "open": "Nyitva",
+      "closed": "Zárva",
+      "updated": "Frissítve: {time}",
+      "min_games": "Azok a játékosok szerepelnek, akik ebben a játékidőben legalább {count} értékelt játszmát játszottak.",
+      "empty": "Ebben a játékidőben még nincs rangsorolt játékos.",
+      "error": "A ranglista most nem tölthető be."
+    },
+    "game": {
+      "number": "Játszma #{id}",
+      "white": "Világos",
+      "black": "Sötét",
+      "you": "Ön",
+      "vs": "–",
+      "outcome_win": "Nyert",
+      "outcome_loss": "Vesztett",
+      "outcome_draw": "Döntetlen",
+      "outcome_aborted": "Megszakítva",
+      "result_white": "Világos nyert",
+      "result_black": "Sötét nyert",
+      "result_draw": "Döntetlen",
+      "result_aborted": "Megszakítva",
+      "rated": "Értékelt",
+      "casual": "Barátságos",
+      "custom": "Egyéni",
+      "moves": {
+        "one": "{count} lépés",
+        "other": "{count} lépés"
+      },
+      "duration": "Időtartam: {time}",
+      "rating_diff": "Értékszám-változás: {diff}",
+      "pgn": "PGN",
+      "pgn_title": "A játszma letöltése PGN-ként",
+      "copy_pgn": "Másolás",
+      "copy_pgn_title": "PGN másolása",
+      "gif": "GIF",
+      "gif_title": "Animált GIF készítése (új lapon nyílik meg)",
+      "gif_signin": "GIF készítéséhez jelentkezzen be",
+      "pgn_copied": "A PGN a vágólapra került.",
+      "pgn_saved": "PGN letöltve.",
+      "none": "Még nincs játszma. Az online játszmái itt jelennek meg.",
+      "none_filtered": "Egy játszma sem felel meg ezeknek a szűrőknek.",
+      "none_public": "Még nincs játszma.",
+      "total": {
+        "one": "{count} játszma",
+        "other": "{count} játszma"
+      },
+      "termination_unknown": "Vége a játszmának",
+      "reason": {
+        "1": "Matt",
+        "2": "Feladás",
+        "3": "Időtúllépés",
+        "4": "Második szabálytalan lépés (játszmavesztés)",
+        "5": "Patt",
+        "6": "Holt állás (elégtelen anyag)",
+        "7": "Lejárt az idő, de az ellenfél nem tud mattot adni",
+        "8": "Ötszöri lépésismétlés",
+        "9": "75 lépéses szabály",
+        "10": "Háromszori lépésismétlés (igénylésre)",
+        "11": "50 lépéses szabály (igénylésre)",
+        "12": "Döntetlen megegyezéssel",
+        "13": "Második szabálytalan lépés, de az ellenfél nem tud mattot adni",
+        "14": "Feladás, de az ellenfél nem tud mattot adni",
+        "20": "Elhagyott játszma (túl sokáig megszakadt a kapcsolat)",
+        "21": "Elhagyott játszma, de az ellenfél nem tud mattot adni",
+        "22": "Megszakított játszma",
+        "23": "Elmaradt az első lépés (megszakítva)",
+        "24": "Játszmavesztés (a fair play megsértése)",
+        "25": "A szerver megszakította",
+        "26": "Mindkét játékos kapcsolata megszakadt"
+      }
+    },
+    "ratings": {
+      "category": "Játékidő",
+      "rating": "Értékszám",
+      "peak": "Csúcs",
+      "games": "Játszmák",
+      "wdl": "Gy / D / V",
+      "provisional": "Ideiglenes értékszám",
+      "none": "Még nincs értékelt játszma.",
+      "unrated_hint": "A kérdőjel ideiglenes értékszámot jelöl (még kevés lejátszott játszma)."
+    },
+    "account": {
+      "member_since": "Tag {date} óta",
+      "last_login": "Utolsó bejelentkezés",
+      "created": "Létrehozva",
+      "email": "E-mail-cím",
+      "pending_email": "Megerősítésre vár: {email}",
+      "verified": "Megerősítve",
+      "unverified": "Nincs megerősítve",
+      "mfa": "Kétlépcsős azonosítás",
+      "mfa_on": "Bekapcsolva",
+      "mfa_off": "Kikapcsolva",
+      "google": "Google-bejelentkezés",
+      "google_on": "Összekapcsolva",
+      "google_off": "Nincs összekapcsolva",
+      "password": "Jelszó",
+      "password_set": "Beállítva",
+      "password_unset": "Még nincs beállítva",
+      "challenges": "Kihívások",
+      "challenges_all": "Engedélyezve",
+      "challenges_none": "Elutasítva",
+      "badge_verified": "E-mail-cím megerősítve",
+      "badge_mfa": "2FA bekapcsolva",
+      "badge_google": "Google",
+      "ban_until": "A fiókja fel van függesztve. A felfüggesztés vége: {date}.",
+      "ban_permanent": "A fiókja fel van függesztve.",
+      "sanction_ban": "Felfüggesztés",
+      "sanction_mm_block": "Párosítás letiltva",
+      "sanction_warning": "Figyelmeztetés",
+      "sanction_until": "lejár: {date}",
+      "sanction_permanent": "végleges",
+      "devices_current": "Ez az eszköz",
+      "devices_unknown": "Névtelen eszköz",
+      "devices_signed_in": "Bejelentkezés: {date}",
+      "devices_seen": "Utoljára használva: {time}",
+      "devices_expires": "Lejár: {date}",
+      "devices_revoke": "Kijelentkeztetés",
+      "devices_revoked": "Az eszköz kijelentkeztetve.",
+      "devices_none": "Nincs más eszköz.",
+      "signout_all_confirm": "Kijelentkezteti az összes eszközt, ezt is beleértve?",
+      "signed_out": "Kijelentkezett.",
+      "signed_in": "Üdvözöljük, {name}!",
+      "prefs_saved": "Mentve.",
+      "password_changed": "A jelszava megváltozott. A többi eszköze kijelentkezett.",
+      "email_sent": "Megerősítő linket küldtünk az új címre. A címe akkor változik meg, amikor megnyitja a linket.",
+      "email_changed": "Az új e-mail-címe: {email}.",
+      "email_current": "Jelenlegi cím: {email}.",
+      "email_pending": "Az e-mail-cím módosítása a megerősítő linkre vár. Új cím: {email}.",
+      "export_done": "Az adatai letöltődtek.",
+      "deleted": "A fiókját töröltük.",
+      "delete_confirm_label": "A megerősítéshez írja be: {name}",
+      "register_done": "Megerősítő linket küldtünk erre a címre: {email}. Nyissa meg a fiókja létrehozásához, majd jelentkezzen be.",
+      "register_ready": "A fiókja elkészült. Most már bejelentkezhet.",
+      "forgot_done": "Ha ezt a címet használja egy fiók, úton van egy link, amellyel új jelszót választhat.",
+      "resend_done": "Ha ez a cím megerősítésre vár, úton van egy új link.",
+      "pow_solving": "A robotok elleni feladvány megoldása…",
+      "mfa_recovery": "Helyreállító kód",
+      "mfa_recovery_text": "Adja meg az egyik helyreállító kódját. Mindegyik kód csak egyszer használható.",
+      "mfa_app": "Kód az alkalmazásból",
+      "mfa_app_text": "Adja meg a hitelesítő alkalmazása által mutatott 6 jegyű kódot.",
+      "mfa_state_on": "Ennél a fióknál a kétlépcsős azonosítás be van kapcsolva.",
+      "mfa_state_off": "Ennél a fióknál a kétlépcsős azonosítás ki van kapcsolva.",
+      "client_label": "Scacelith-webhely ({browser})",
+      "username": "Felhasználónév",
+      "password_rules": "Legalább {min} karakter, amely nem tartalmazza a felhasználónevét és az e-mail-címét.",
+      "password_note": "A többi eszköze kijelentkezik, ez az eszköz bejelentkezve marad.",
+      "signin_label": "Bejelentkezés",
+      "google_link_text": "Ezt az e-mail-címet már használja egy fiók: {name}. Adja meg egyszer a jelszavát, hogy összekapcsolja a Google-fiókkal; utána elég a „Bejelentkezés Google-fiókkal” gomb.",
+      "auth_foot_google": "Egyetlen fiók a hivatalos szerveren, a játékhoz és ehhez a webhelyhez is. A játékban Google-fiókkal hozta létre? Itt is jelentkezzen be Google-fiókkal."
+    },
+    "players": {
+      "since": "Tag {date} óta",
+      "games": "Játszmák",
+      "rated": "Értékelt",
+      "wins": "Győzelmek",
+      "draws": "Döntetlenek",
+      "losses": "Vereségek",
+      "view": "Profil megtekintése: {name}",
+      "you": "Ön",
+      "board": "Ranglista"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Játszma #{id} · {date}",
+      "preparing": "A GIF előkészítése…",
+      "rendering": "A szerver rajzolja a GIF-et. Egy hosszú játszma néhány másodpercig is eltarthat…",
+      "ready": "A GIF elkészült. A letöltés elindult.",
+      "ready_again": "A GIF elkészült.",
+      "signin": "Jelentkezzen be, hogy GIF-et készíthessen a játszmáiról.",
+      "signin_button": "Bejelentkezés",
+      "missing": "Nincs kiválasztott játszma.",
+      "retry_in": "{time} múlva próbálkozhat újra.",
+      "confirm": "Nyomja meg a „GIF készítése” gombot, és a szerver a fiókjával megrajzolja ezt a játszmát.",
+      "retry_now": "Most már újra próbálkozhat."
+    },
+    "home": {
+      "create_account": "Fiók létrehozása",
+      "my_account": "Fiókom",
+      "my_games": "Játszmáim",
+      "signin": "Bejelentkezés"
+    },
+    "trailer": {
+      "title": "A Scacelith előzetese",
+      "notice": "Ezt a videót a YouTube tárolja. Lejátszásakor betöltődik a Google lejátszója, amely megkapja az IP-címét, és sütiket vagy más nyomkövetőket tárolhat az eszközén.",
+      "accept": "Elfogadás és lejátszás",
+      "google_privacy": "A Google adatvédelmi irányelvei"
+    }
+  },
+  "legal": {
+    "eyebrow": "Jogi információk",
+    "title": "Impresszum, adatvédelem és felhasználási feltételek",
+    "lead": "Ki a Scacelith kiadója és tárhelyszolgáltatója, mi történik az adataival ezen a webhelyen, a játékban és a hivatalos szerveren, és milyen szabályok szerint lehet ott játszani.",
+    "updated": "Utolsó frissítés: 2026. október 11.",
+    "toc": "Ezen az oldalon",
+    "notice": {
+      "title": "Impresszum",
+      "publisher_label": "Kiadó",
+      "publisher": "A Scacelith kiadója egy magánszemély, aki nem hivatásszerűen végzi ezt a tevékenységet. A francia jog által megengedett módon (a 2004. június 21-i 2004-575. számú törvény 1-1. cikkének II. pontja) a kiadó személyazonossága itt nem szerepel; azt a tárhelyszolgáltató ismeri.",
+      "contact_label": "Kapcsolat",
+      "contact": "Bármilyen, ezzel a webhellyel, a hivatalos szerverrel vagy az adataival kapcsolatos kérdés esetén.",
+      "host_server": "Hivatalos játékszerver és fiókadatok",
+      "host_server_note": "A szerverek Franciaországban találhatók.",
+      "host_site": "Ez a webhely és az API-dokumentáció (GitHub Pages)",
+      "host_domain": "Domainnév-regisztrátor",
+      "licence_label": "Licenc",
+      "licence": "A játék és a szervere szabad szoftver a GNU General Public License v3 alatt, nyilvános forráskóddal:",
+      "game_source": "a játék",
+      "server_source": "a szerver",
+      "phone": "Tel."
+    },
+    "privacy": {
+      "title": "Adatvédelem",
+      "intro": "A Scacelith nem jelenít meg hirdetéseket, nem ad el adatokat, és nem végez látogatottságmérést. A személyes adatokat kizárólag ennek a webhelynek és a hivatalos szervernek a működtetésére használjuk, az alábbiak szerint. Az adatkezelő a kiadó, aki a fenti kapcsolattartási címen érhető el.",
+      "site_title": "Ezen a webhelyen",
+      "site_hosting": "A webhelyet a GitHub tárolja, és mint minden tárhelyszolgáltató, biztonsági célból rögzíti a látogatók IP-címét.",
+      "github_privacy": "A GitHub adatvédelmi nyilatkozata",
+      "site_requests": "A legújabb kiadás megjelenítéséhez a böngészője a GitHub API-jához fordul (api.github.com); a szerver állapotának, a ranglistának, a játékosoknak és a fiókjának megjelenítéséhez pedig a hivatalos szerverhez (caissa.scacelith.com). Mint minden kérésnél, mindkettő megkapja az IP-címét.",
+      "site_storage": "A webhely sem sütiket, sem analitikai eszközöket nem használ. A böngészőjében csak a választott nyelvet, bejelentkezés után pedig a munkamenetét tárolja: csak az aktuális lapon, vagy ezen az eszközön, ha bejelöli a „Maradjak bejelentkezve” lehetőséget. A Google-bejelentkezés egyszer használatos kódjai is az aktuális lapon maradnak, amíg fel nem használják őket. Mindez a webhely működéséhez szükséges, a munkamenetet és a kódokat pedig csak a hivatalos szerver kapja meg.",
+      "site_trailer": "Az előzetes egy YouTube-videó. A YouTube-ról semmi sem töltődik be, amíg meg nem nyomja az „Elfogadás és lejátszás” gombot; ekkor a YouTube (Google) megkapja az IP-címét, és sütiket vagy más nyomkövetőket tárolhat az eszközén. A webhely nem jegyzi meg a válaszát: a következő látogatáskor újra megkérdezi.",
+      "site_google": "A Fiók oldalon található „Bejelentkezés Google-fiókkal” gomb semmit sem tölt be a Google-tól, amíg meg nem nyomja. Ekkor a böngészője a Google bejelentkezési oldalára lép (accounts.google.com), a Google pedig egy egyszer használatos kóddal küldi vissza erre a webhelyre, amely a kódot átadja a hivatalos szervernek. A Google a saját irányelvei szerint megkapja az IP-címét és mindazt, amit az oldalán megad.",
+      "google_privacy": "A Google adatvédelmi irányelvei",
+      "game_title": "A játékban",
+      "game_local": "A játék a beállításait, a helyi eredményeit és a bejelentkezését a számítógépén tárolja. A bejelentkezés a rendszer biztonságos tárolójába kerül: ez Windowson a DPAPI, macOS-en a Kulcskarika, Linuxon a Secret Service kulcstartó, ezek hiányában pedig egy fájl, amelyet csak az Ön felhasználói fiókja olvashat.",
+      "game_network": "A játék magától semmit sem küld: nincs telemetria, nincs frissítéskeresés. A hivatalos szerverhez csak akkor csatlakozik, amikor megnyitja az Online játék oldalt, a Hugging Face szervereihez csak akkor, amikor letölti az edző hangját, közvetlen mérkőzésnél pedig az ellenfele számítógépéhez, amely így megismeri az IP-címét (a játék UPnP segítségével portot is nyithat a routerén).",
+      "account_title": "A fiókja a hivatalos szerveren",
+      "account_intro": "Fiók létrehozásakor (a játékban vagy ezen a webhelyen) és online játék közben a következő adatok jutnak el a hivatalos szerverre, amelynek tárhelyét az OVH biztosítja Franciaországban:",
+      "data_account": "<strong>Fiók:</strong> felhasználónév, e-mail-cím, jelszó (csak Argon2id-hash formájában tárolva), a kétlépcsős azonosítás titkos kulcsa (titkosítva) és a helyreállító kódok (hash formájában), a regisztráció és az utolsó bejelentkezés dátuma.",
+      "data_google": "<strong>Bejelentkezés Google-fiókkal:</strong> a Google elküldi a Google-fiókja azonosítóját, az e-mail-címét és a nevét. A szerver az azonosítót és a címet megőrzi, a nevet pedig csak felhasználónév javaslására használja.",
+      "data_sessions": "<strong>Bejelentkezett eszközök:</strong> minden bejelentkezésnél az eszköz neve (a játék verziója és a rendszer, például „Scacelith/1.0.0 win64”, ezen a webhelyen pedig a böngésző és a rendszer), az IP-cím és a használat időpontjai.",
+      "data_games": "<strong>Játszmák és értékszámok:</strong> minden online játszma (játékosok, lépések, az egyes lépésekre fordított idő, eredmény, időpontok) és az értékszámai. Játszma közben a feje és a keze mozgását élőben továbbítjuk az ellenfelének, és soha nem tároljuk.",
+      "data_security": "<strong>Biztonsági napló:</strong> bejelentkezések, sikertelen próbálkozások és a fiók módosításai, az IP-címmel együtt.",
+      "data_fairplay": "<strong>Fair play:</strong> az Ön által vagy az Önről tett jelentések a hozzájuk fűzött megjegyzéssel; az elhagyott és elmulasztott játszmák; a szankciók; valamint a játszmákon végzett ellenőrzések, a hamisított vagy lehetetlen lépésektől a Stockfish motor statisztikáiig.",
+      "basis_title": "Milyen célból és milyen jogalapon",
+      "basis_contract": "A fiókja és az online játék működtetése (bejelentkezés, mérkőzések, értékszámok, a játszmák nyilvántartása, a szolgáltatás által küldött e-mailek): az a szolgáltatás, amelyre regisztrál (GDPR 6. cikk (1) bekezdés b) pont).",
+      "basis_security": "A fiókok és a szerver védelme, valamint a játszmák tisztaságának megőrzése (biztonsági napló, IP-címek, fair play-ellenőrzések, szankciók): a kiadó és a játékosok jogos érdeke (GDPR 6. cikk (1) bekezdés f) pont).",
+      "basis_trailer": "Az előzetes lejátszása a YouTube-ról: az Ön hozzájárulása, amelyet a gombbal ad meg (GDPR 6. cikk (1) bekezdés a) pont).",
+      "public_title": "Amit mindenki láthat",
+      "public": "A felhasználóneve, a regisztráció dátuma, az értékszámai és a játszmái teljes listája minden lépéssel együtt nyilvános: ezen a webhelyen, a szerver API-ján keresztül és az egyes játszmák PGN-jében. Az e-mail-címe, az eszközei, a bejelentkezései, a szankciói és a fair play-nyilvántartása soha nem jelenik meg. A névre szóló kihívásokat elutasíthatja, de a játszmákat nem lehet elrejteni.",
+      "auto_title": "Automatikus döntések",
+      "auto": "A játék protokolljának bizonyos megsértései, például egy hamisított üzenet vagy az adott állásban lehetetlen lépés, a csalás egyértelmű bizonyítékai: ilyenkor a szerver játszmavesztéssel zárja le a játszmát, 24 órára kitiltja a fiókot, eltávolítja a ranglistáról, és az ellenfeleinek visszaadja azokat a pontokat, amelyeket az elmúlt 60 napban ellene elveszítettek. Ha egy fiók 24 órán belül három játszmát elhagy, megszakít vagy elmulaszt, az értékelt párosítás 15 percre, majd hosszabb időre szünetel. A motorstatisztikák önmagukban soha nem vezetnek szankcióhoz: arról ember dönt. Bármely döntés felülvizsgálatát kérheti a kapcsolattartási címen.",
+      "recipients_title": "Kik kapják meg az adatait",
+      "recipient_ovh": "Az OVH SAS Franciaországban tárolja a szervert és annak adatait.",
+      "recipient_scaleway": "A Scaleway SAS (8 rue de la Ville-l'Évêque, 75008 Paris, France) küldi a szerver e-mailjeit: megkapja az e-mail-címét, a felhasználónevét és az üzenetet.",
+      "recipient_google": "A Google a saját adatvédelmi irányelvei szerint megkapja mindazt, amit a böngészője küld neki, ha a Google-fiókos bejelentkezést választja.",
+      "recipient_staff": "A szerver adminisztrátora és moderátorai a szolgáltatás működtetése érdekében látják a fiók- és fair play-adatokat.",
+      "recipient_players": "A többi játékos a nyilvános adatokat látja, az ellenfele pedig játszma közben a lépéseit és a mozdulatait.",
+      "recipient_none": "Rajtuk kívül senki: semmilyen adatot nem adunk el, nem adunk bérbe, és nem használunk hirdetésekhez.",
+      "transfers": "A fiókadatok Franciaországban maradnak. A GitHub, a Google és a Porkbun (amely a kapcsolattartási címre küldött üzeneteket továbbítja) az Egyesült Államokban működik: a hozzájuk kerülő adatokra a saját irányelveik és az Európai Unión kívülre történő adattovábbításra vonatkozó garanciáik érvényesek.",
+      "retention_title": "Meddig őrizzük meg",
+      "ret_account": "<strong>Fiók:</strong> amíg nem törli. Az a regisztráció, amelynek e-mail-címét soha nem erősítik meg, 24 óra után törlődik.",
+      "ret_sessions": "<strong>Bejelentkezett eszközök:</strong> a kijelentkezésig, illetve 30 nap használaton kívüli idő elteltéig, de legfeljebb 90 napig.",
+      "ret_ip": "<strong>IP-címek:</strong> 30 nap után törlődnek. A szerver naplói csak rövidített címeket őriznek meg.",
+      "ret_security": "<strong>Biztonsági napló:</strong> 90 nap.",
+      "ret_conduct": "<strong>Elhagyott és elmulasztott játszmák:</strong> 30 nap.",
+      "ret_games": "<strong>Játszmák és értékszámok:</strong> amíg a szerver megőrzi a játszmák nyilvántartását, amely az ellenfelei nyilvántartása is. A fiókja törlése után a neve helyére „deleted#” és egy szám kerül.",
+      "ret_fairplay": "<strong>Szankciók, jelentések és fair play-eredmények:</strong> megőrizzük őket, hogy a kitiltott játékosok ne térhessenek vissza egyszerűen, és a többi játékos védelme megmaradjon. A fiókja törlése után már csak a fiók számához kapcsolódnak.",
+      "ret_backups": "<strong>Biztonsági mentések:</strong> a törölt adatok rövid ideig a szerver biztonsági másolatában maradhatnak, amíg azt le nem cserélik.",
+      "ret_contact": "<strong>A kapcsolattartási címre küldött üzenetek:</strong> amíg a megválaszolásukhoz szükséges.",
+      "rights_title": "Az Ön jogai",
+      "rights": "Hozzáférhet az adataihoz, helyesbítheti, törölheti és exportálhatja őket, korlátozhatja a felhasználásukat, és tiltakozhat ellene (GDPR 15–21. cikk).",
+      "rights_self": "Ezek többségét a fiókjában intézheti, a játékban vagy ennek a webhelynek a Fiók oldalán: letöltheti a fiókadatait JSON-fájlként, módosíthatja az e-mail-címét vagy a jelszavát, kijelentkeztetheti a többi eszközt, vagy azonnal törölheti a fiókot.",
+      "rights_google": "A Google-fiókkal létrehozott fióknak nincs jelszava: az exportálásához vagy törléséhez előbb adjon meg hozzá jelszót az „Elfelejtette a jelszavát?” lehetőséggel.",
+      "rights_mail": "Minden más ügyben, beleértve az exportban nem szereplő adatokat (fair play-ellenőrzések, az Önről szóló jelentések), írjon a kapcsolattartási címre. Egy hónapon belül választ kap.",
+      "rights_cnil": "Ha úgy véli, hogy jogait nem tartják tiszteletben, panaszt nyújthat be a CNIL-nél (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, France) vagy országa adatvédelmi hatóságánál.",
+      "cnil_link": "cnil.fr"
+    },
+    "terms": {
+      "title": "Felhasználási feltételek",
+      "intro": "Ezek a feltételek a hivatalos szerverre (caissa.scacelith.com) és ennek a webhelynek a fiókoldalaira vonatkoznak. Fiók létrehozásával vagy a hivatalos szerveren való játékkal elfogadja őket.",
+      "service": "<strong>Ingyenes szolgáltatás.</strong> A játék szabad szoftver, és díjmentes. A hivatalos szervert díjmentesen, „ahogy van” alapon kínáljuk, a rendelkezésre állás garanciája nélkül: változhat, egy időre leállhat vagy megszűnhet.",
+      "account": "<strong>Az Ön fiókja.</strong> Ön felel azért, ami a fiókjával történik, és a jelszava titokban tartásáért. Ha úgy gondolja, hogy más is használja, azonnal írjon a kapcsolattartási címre.",
+      "username": "<strong>A felhasználóneve</strong> nyilvános: nem lehet sértő vagy gyűlöletkeltő, nem szolgálhat más személy megszemélyesítésére, és senkinek a személyes adatait nem fedheti fel.",
+      "fair": "<strong>Fair play.</strong> Értékelt játszma közben tilos sakkmotor, más személy vagy bármilyen más eszköz segítségét igénybe venni. Tilos a módosított játékkliens, a hamisított üzenetek és a szerver szándékos túlterhelése.",
+      "conduct": "<strong>Fejezze be a játszmáit.</strong> Ha 24 órán belül háromszor fordul elő, hogy elhagy vagy megszakít egy játszmát, vagy elmulaszt egy játszmát, amelyre párosították, az értékelt párosítás egy időre szünetel.",
+      "reports": "<strong>A jelentéseket</strong> jóhiszeműen kell megtenni. Játékos vagy jogellenes tartalom (például sértő felhasználónév) jelentéséhez használja a játszmában található jelentés gombot, vagy írjon a kapcsolattartási címre.",
+      "sanctions": "<strong>Szankciók.</strong> E szabályok megszegése játszmavesztéssel, figyelmeztetéssel, kitiltással és a ranglistáról való eltávolítással járhat; a csalóval szemben elveszített pontokat az ellenfelei visszakapják. Automatikusan csak a csalás egyértelmű bizonyítéka von maga után szankciót; minden másról ember dönt. A szankciót a kapcsolattartási címen vitathatja.",
+      "liability": "<strong>Felelősség.</strong> A jogszabályok által megengedett keretek között a kiadó nem felel a szolgáltatás kimaradásaiért, illetve játszmák, értékszámok vagy adatok elvesztéséért.",
+      "end": "<strong>Megszűnés.</strong> A fiókját bármikor törölheti. Az e feltételeket megszegő fiók kitiltható.",
+      "changes": "<strong>Módosítások.</strong> Ezek a feltételek változhatnak; az oldal tetején lévő dátum a hatályos változatot jelzi, és ha egy módosítás után tovább játszik, azzal elfogadja azt.",
+      "law": "<strong>Irányadó jog.</strong> Ezekre a feltételekre a francia jog az irányadó. Vita esetén először írjon a kapcsolattartási címre, hogy közösen találjunk megoldást."
+    },
+    "version_note": "Ez az oldal több nyelven is elérhető; eltérés esetén a francia változat az irányadó."
+  }
+}

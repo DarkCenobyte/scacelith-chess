@@ -2,7 +2,7 @@
 // browser's languages that the site speaks. "/#choose" shows the list instead.
 (function () {
   "use strict";
-  var LANGS = ["en", "fr", "de", "es", "uk", "ru", "ar", "ja", "zh-Hans", "zh-Hant"];
+  var LANGS = ["en", "id", "cs", "da", "de", "et", "es", "fr", "hr", "it", "lv", "lt", "hu", "nl", "pl", "pt-BR", "pt", "ro", "sk", "sl", "fi", "sv", "vi", "tr", "el", "bg", "ru", "uk", "ar", "hi", "ko", "ja", "zh-Hans", "zh-Hant"];
 
   function stored() {
     try {
@@ -19,7 +19,9 @@
       var w = String(wanted[i]).toLowerCase();
       if (/^zh-(tw|hk|mo)|^zh-hant/.test(w)) return "zh-Hant";
       if (/^zh/.test(w)) return "zh-Hans";
+      if (/^pt-br/.test(w)) return "pt-BR";
       var base = w.split("-")[0];
+      if (base === "in") base = "id";   // the former code of Indonesian
       if (LANGS.indexOf(base) >= 0) return base;
     }
     return null;
