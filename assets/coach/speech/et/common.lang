@@ -546,8 +546,21 @@ move.mate.spoken = {move}, matt
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the voice misreads. Estonian says "möödaminnes
-# löömine" for en passant, so the French words need no respelling here.
+# Estonian says "möödaminnes löömine" for en passant, so the French words need no respelling here.
+# The voice reads foreign names letter by letter, the Estonian way: the names below are respelled as
+# Estonian players say them (see docs/PRONUNCIATION.md, Estonian).
+respell.prix = prii
+respell.giuoco = džuoko
+respell.milesi = mailsi
+respell.birdi = bördi
+respell.breyer = braier
+respell.breyeri = braieri
+respell.parhami = paarami
+respell.sämisch = sämiš
+respell.sämischi = sämiši
+respell.nimzo = nimtso
+respell.nimzowitsch = nimtsovitš
+respell.nimzowitschi = nimtsovitši
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, written apart as Estonian writes them: 21-99 compose as "{tens} {units}"

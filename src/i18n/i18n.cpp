@@ -79,7 +79,7 @@ const std::vector<Language>& languages() {
         {"cs", "\xC4\x8C" "e\xC5\xA1tina", false, false},                                   // Čeština
         {"da", "Dansk", false},
         {"de", "Deutsch", false},
-        {"et", "Eesti", false, false},
+        {"et", "Eesti", false},
         {"es", "Espa\xC3\xB1ol", false},
         {"fr", "Fran\xC3\xA7" "ais", false},
         {"hr", "Hrvatski", false, false},

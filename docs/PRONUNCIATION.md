@@ -551,3 +551,44 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   "beraber", piyonu as "piyano"); eponyms in English spellings; short lines garbled.
 - The opening texts said "dört'e" in the round trip's renderings (an older openings file); the repository's
   `assets/coach/openings/tr.lang` already says "dörde", "beşe" (tools/gen_opening_lang.py, TR_SQUARE_SUFFIX_RE).
+
+## Estonian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| Grand Prix' (rünnak) | the x said: "Priks" (probe: Priks +0.47, Prii +9.18) | `prii` (respell.prix): read "Prii" (probe), no x in 3 renderings of the game line ("prii", "prüü") |
+| Giuoco (piano, pianissimo) | the g of "gaas", as written: heard "kiuoko" 3 times in 6 (probe: Džuoko +2.23, the farthest) | `džuoko` (respell): heard "juoko", "jooko", "Joko" 6 times in 6 |
+| Milesi (variant) | "Mi-lesi", as written: heard "millesi" 3 times in 3 | `mailsi` (respell): heard "mailsi", "mäilsi" 3 in 3, "mails" 2 in 3 in the game line |
+| Birdi (avang) | "Birdi", as written: heard "pirdi", "püüdi" (probe: neither Bördi nor Beerdi close) | `bördi` (respell): heard "pöördi" 2 times in 3 |
+| Breyer, Breyeri | "Brejeri": heard "prejeri" 2 times in 3 (probe: Brejeri -0.36, Braieri +1.13) | `braier`, `braieri` (respell): heard "brajeri", "prajeri" 4 times in 6 |
+| Parhami (rünnak) | the h said: heard "parhami", "parhaami" 2 times in 3 | `paarami` (respell): heard "paarami" 2 in 3, "paarame" in the game line |
+| Sämisch, Sämischi | the sch as "s" (probe: Sämissi +0.07, Sämiši +0.39): heard "semisi", "missi", once "samishi" | `sämiš`, `sämiši` (respell): "sh" heard 4 times in 6 against 1 in 3 |
+| Nimzo-, Nimzowitsch, Nimzowitschi | the z as "s" (probe: Nimsovitši closest): heard "nimsu", "nimse vitsi", never a ts in 9 | `nimtso`, `nimtsovitš`, `nimtsovitši` (respell): "ts" heard 4 times in 9 ("nimtsu", "nimtsavits") |
+
+- Parakeet could not do Estonian; the main round trip is Whisper medium set to `et`, 300 lines (seed 0, the first 195
+  before the 30 s padding), with half the words missed: the voice's Estonian is understandable, the recogniser's
+  Estonian weak. Then 3 seeds on 48 lines (the reviewers' coach words, the file letters in carriers, the numbers),
+  30 lines naming 60 openings and eponyms ("See on X, mitte Y.") with 15 respelled variants, 51 lines of game text
+  (the fixes and the most missed words), and probes (4 seeds) on 50 readings.
+- Checked and fine: the file letters aa, bee, tsee, dee, eff, gee, haa (heard as letters or notation); `ee` alone
+  is said long (probe: "täht ee" nearest "täht eee", far from "täht"); `ell` (heard "el" 6 in 6); Hmm (hummed, probe,
+  heard "Hmm" 6 in 6), Vau, Oi-oi, Hei, Tuli!, Elo (heard "elo"), Ekspert, kandidaatkäike, forsseeritud, parandan, kella;
+  the numbers (üksteist ... üheksateist, 21-99, sada, sada viiskümmend, koma, protsent, miinus, ordinals: mostly
+  written as the right digits); ettur, lipp, ratsu, vanker, oda, matt, viik, tuld in game lines. Names read well
+  as written: Philidori ("filidori"), Caro-Kanni, Tarraschi (heard "tarashi" 3 in 3: the probe had it wrong),
+  Marshalli, Rubinsteini, Scheveningeni, Oweni, Horwitzi, Réti, Ponziani, Trompowsky, Torre, Colle, Miesesi,
+  Zaragoza, Richter, Bongcloudi, Fromi, Karlsbadi, Smith-Morra, Najdorfi, Rauzeri, Sozini, Winaweri, Traxleri,
+  Morphy, Zaitsevi, Staffordi, Aljehhini, Grünfeldi, Pirci, Tšigorini, Svešnikovi, Evansi, Falkbeeri, Pterodaktüli,
+  Fiankettovariant.
+- Left as is (respelled variant heard no better): Zukertorti ("Sukertorti", the z as s; `Tsukertorti` was heard
+  "sugertorti" all the same), Kruijsi (`Kröisi` heard "kreisi", "kruisi" as before), Jobava (`Džobava` heard
+  "jobava"), Stonewalli (`Stounvolli` no clearer), Fajarowiczi, Schliemanni (`Šliimanni` the same), Halloweeni
+  (read "Halloveeni", recognised anyway), Maróczy (heard "maroks", no candidate close in the probe), Van Geeti (g
+  as k), Blackmar-Diemeri. "ee neli" after "välja" or at the start of a line is heard "enel", "lenneli": the
+  letter is said (probe), "neli" is what the recogniser loses; "tähtedega aa" melts a little ("tähtetegaa"), but
+  the probe keeps the aa (without it +0.71). "reitinguks" is a close call between "reetinguks" and "räitinguks".
+- Recogniser habits: squares and numbers as notation ("A6", "F7", "86%"); final -u as -o (sinu "sino", käiku
+  "käikoo"; the probe cannot tell them apart); geminates and quantity lost or added (etturi "eturi", lipu "lippu",
+  käik "keik"); v as b or p ("palge", "Banker"); words joined across a space ("valgeselitab", "partiikestis"),
+  the v of "väljale" lost after "läheb"; English words for names ("Gambit", "Crazy", "Prix" whatever is said);
+  "neli" after a vowel written "nedi", "lii".

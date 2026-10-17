@@ -498,13 +498,17 @@ TEST(ui_screens_options_language_list) {
     d.press(plat::KEY_ENTER);
     d.frame();
     const int de = i18n::languageIndex("de");
-    const i18n::Language& next = i18n::languages()[size_t(de + 1)];
-    CHECK_EQ(i18n::language(), std::string(next.code));
+    CHECK_EQ(i18n::language(), std::string(i18n::languages()[size_t(de + 1)].code));
     CHECK(ui::optionsOpen());
-    // Estonian, not adapted yet: the page draws the note that explains the asterisk, in Estonian.
-    CHECK(!next.adapted);
-    CHECK(T("options.language.not_adapted") != std::string(i18n::english("options.language.not_adapted")));
-    d.frame();
+    // A language not adapted yet: the page draws the note that explains the asterisk, in that
+    // language.
+    for (const i18n::Language& l : i18n::languages())
+        if (!l.adapted) {
+            i18n::setLanguage(l.code);
+            CHECK(T("options.language.not_adapted") != std::string(i18n::english("options.language.not_adapted")));
+            d.frame();
+            break;
+        }
 }
 
 // Leaving Options with changes asks first: Discard (or Esc) drops them, Apply stores them.
