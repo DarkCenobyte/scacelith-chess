@@ -1767,6 +1767,15 @@ TEST(tts_text_preprocess) {
     CHECK(!tts::text::modelLanguage("zh"));
 }
 
+// Greek question marks (';' and U+037E) are spoken as '?'; other languages keep their ';'.
+TEST(tts_text_spoken_punctuation) {
+    using tts::text::spokenPunctuation;
+    CHECK(spokenPunctuation("Πάλι την ίδια κίνηση; Εντάξει.", "el") == "Πάλι την ίδια κίνηση? Εντάξει.");
+    CHECK(spokenPunctuation("Γιατί\u037E Δες.", "el") == "Γιατί? Δες.");
+    CHECK(spokenPunctuation("Le cavalier va en f3 ; échec.", "fr") == "Le cavalier va en f3 ; échec.");
+    CHECK(tts::text::chunk(spokenPunctuation("Πάλι; Εντάξει.", "el"), 8).size() == 2u);
+}
+
 TEST(tts_text_frontend_matches_reference) {
     tts::Synthesizer* s = model();
     if (!s) SKIP_WITHOUT(kModel, "no model files in " + modelDir());

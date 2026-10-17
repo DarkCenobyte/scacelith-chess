@@ -18,6 +18,11 @@ bool modelLanguage(const std::string& lang);
 // The official normalisation, including its wrapper: "<lang>text</lang>". Input is UTF-8.
 std::u32string preprocess(const std::string& utf8, const std::string& lang);
 
+// Punctuation the model misreads in one language, fixed before chunking (not part of the official
+// normalisation). Greek writes its question mark as ';' (U+037E normalises to it): the model reads
+// ';' as a semicolon and runs straight into the next sentence, so Greek text speaks it as '?'.
+std::string spokenPunctuation(const std::string& utf8, const std::string& lang);
+
 // Model ids of a preprocessed text through the 65536-entry indexer. Code points the indexer does
 // not know (or outside the BMP) are dropped and counted in 'dropped'.
 std::vector<int64_t> indices(const std::u32string& s, const int32_t* indexer, int* dropped = nullptr);

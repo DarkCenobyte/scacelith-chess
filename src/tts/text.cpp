@@ -154,6 +154,23 @@ std::u32string preprocess(const std::string& utf8, const std::string& lang) {
     return U"<" + tag + U">" + t + U"</" + tag + U">";
 }
 
+std::string spokenPunctuation(const std::string& utf8, const std::string& lang) {
+    if (lang != "el") return utf8;
+    std::string out;
+    out.reserve(utf8.size());
+    for (size_t i = 0; i < utf8.size(); ++i) {
+        if (utf8[i] == ';') {
+            out.push_back('?');
+        } else if (utf8[i] == '\xCD' && i + 1 < utf8.size() && utf8[i + 1] == '\xBE') {   // U+037E
+            out.push_back('?');
+            ++i;
+        } else {
+            out.push_back(utf8[i]);
+        }
+    }
+    return out;
+}
+
 std::vector<int64_t> indices(const std::u32string& s, const int32_t* indexer, int* dropped) {
     std::vector<int64_t> ids;
     ids.reserve(s.size());

@@ -299,8 +299,8 @@ ex.retake.b4 = Στο {move} απαντώ με το {reply}, που παίρνε
 ex.retake.b4.2 = Κι αν {move}, τότε με το {reply} παίρνω {your:acc}.
 ex.retake.b5 = Αν ξαναπάρεις με το {move}, ακολουθεί το {reply} και πέφτει {your}.
 ex.retake.b5.2 = Στο {move} απαντώ με το {reply}: πέφτει {your}.
-ex.retake.b6 = {move}; Το {reply} παίρνει {your:acc}.
-ex.retake.b6.2 = Το {move} δεν δουλεύει: το {reply} παίρνει {your:acc}.
+ex.retake.b6 = {move}; Η απάντηση {reply} κερδίζει {your:acc}.
+ex.retake.b6.2 = Η κίνηση {move} δεν δουλεύει: η απάντηση {reply} κερδίζει {your:acc}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = Και εδώ, στο {sq}, θα έπαιρνες νέα βασίλισσα.
 demo.promote.2 = Μετά {your} φτάνει στο {sq} και γίνεται βασίλισσα.

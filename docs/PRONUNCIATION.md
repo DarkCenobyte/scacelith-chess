@@ -592,3 +592,47 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
   käik "keik"); v as b or p ("palge", "Banker"); words joined across a space ("valgeselitab", "partiikestis"),
   the v of "väljale" lost after "läheb"; English words for names ("Gambit", "Crazy", "Prix" whatever is said);
   "neli" after a vowel written "nedi", "lii".
+
+## Greek
+
+No word needed respelling: `common.lang` has no respell.* entry, and no `.spoken` line was added for the
+voice's sake.
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e after "το", "στο", "κίνηση" ("το ε τέσσερα") | often swallowed: no e in about 35 of the 53 e-squares of the 300-line round trip ("το 4"), and no e in 5 of 12 renderings of 4 test lines | left `ε`: with `έ` the e was missing in 7 of 12, and `εε` / `έε` garbled other words of the line. In new lines, put the square after a consonant ("στον", "με") |
+| a question mark ";" inside a line ("Πάλι την ίδια κίνηση; Εντάξει...") | read like a semicolon: a short pause, or none at all | fixed in code: the voice front end speaks every Greek ";" as "?" (`tts::text::spokenPunctuation`, see below) |
+
+- Round trip: Parakeet missed 93 % of the words, so the round trip is Whisper medium set to `el`. It covered
+  300 lines (seed 0), then 3 seeds on about 60 lines: the reviewers' list, words missed in more than a third of
+  their uses (in short carrier sentences), the file letters, and the variants tried for ε.
+- Checked and fine: έιτς (two vowels, "έι τς"), α and μπι said alone, γάμμα, Έλο, αν πασάν inside a sentence,
+  μπλιτς, ράπιντ, Σερί, ρομπότ, τουρνουά, Ωχ, Ωπ, Αχ, Πω πω, κανόνες, στήλες, Αρχάριος. The elisions are each
+  said as one word ("Πάρ’ τον" heard "Πάρτον", "στ’ αλήθεια" heard "σταλήθεια", "Γι’ αυτό"). The voice keeps
+  the dialytika: Ταϊμάνοφ, Νιμτσοϊνδική and Μπογκοϊνδική sit next to "Ταημάνοφ", "Νιμτσοηνδική" and "Μπογκο
+  ινδική", and far from the digraph readings "Τεμάνοφ" and "Νιμτσιντική" (probe in context, 4 seeds).
+  Όιβε is said "Ό-ι-βε", ΜακΚάτσον "Μακ Κάτσον" (not spelled out), and Μπόνγκκλαουντ and Στόουνγουολ come out
+  as two syllable groups. επιτίθενται sits next to "επιτίθεντε" (+0.05) and far from "επιτίθεται" (+1.42), and
+  the voice says the σ of σκακιέρα, even though Whisper drops both.
+- Left as is (close calls; the probe cannot settle stress): φινάλε (Whisper writes "final"), Γκαμπί
+  (heard "Γαμπί"; the probe puts "γαμπί" +0.5 against "γκάμπι" +0.95), πτέρυγα (heard "τέρυγα" in 16 of 17
+  renderings, though in "στην πτέρυγα" no variant is close), παγίδες (heard "παγιέδες" 3 times in 3; in
+  context "πάγιδες" and "παγέδες" are as close as each other). Τζιόκο leans to "Τζι-όκο" over "Τζόκο".
+  Μπογκολιούμποφ, Σεβενίνγκεν and Φαγιαρόβιτς came out as ties between stresses. Said alone, "Πατ." is heard
+  "Ματ" 3 times in 3, and `Πάτ.` did no better; inside a sentence it is heard right. Χμ and Χμμ get a vowel
+  ("Χαμέ", "Καμ"); `Μμ` too ("Μεμ").
+- Greek ";" (U+003B, or U+037E, which NFKD folds to U+003B before the voice sees it): at the end of a line the
+  voice reads it like "." or "?", with no difference the probe can measure. Inside a line, it reads it as a
+  semicolon. The pause after it is 0.01 to 0.19 s, against 0.21 to 0.36 s for "?" or ".", over 5 sentences and
+  4 seeds. In "Πάλι την ίδια κίνηση; Εντάξει, ας δούμε." it ran straight into the next sentence in 4 seeds of
+  4, and that rendering is closest to the comma version. "?" gives a sentence pause there. 17 catalog lines
+  have a ";" inside the line. Greek has no semicolon of its own (it uses the ano teleia ·), so
+  `tts::text::spokenPunctuation` turns every ";" and U+037E of Greek text into "?" before chunking. Left as is:
+  src/coach/pacing.cpp counts only U+037E as a sentence end, not U+003B, which the Greek catalog uses; it still
+  finds the pause there, only with a comma's weight.
+- Grammar found on the way: `ex.retake.b6` said "Το ίππος παίρνει στο ε5 παίρνει..." when the reply is a piece
+  move. It now follows the analysis convention "η απάντηση {reply}" and uses κερδίζει.
+- Recogniser habits: Whisper writes squares as notation (E4, f7, "το 4"), and confuses the letters that sound
+  alike (ι/η/υ/ει/οι, ο/ω, ε/αι: "ήπος" for ίππος, "μια" for μία, "και" for κι). It drops the first consonant
+  of a cluster (σκακιέρα as "κακιέρα", βαθμολογία as "βασμολογία"), writes loanwords in English ("Bleach",
+  "final", "classic chess"), and pads a short line with a repeated phrase ("Τι έχεις; Τι έχεις; ...").

@@ -206,7 +206,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
     std::string err;
     auto cancelled = [cancel] { return cancel && cancel->load(std::memory_order_relaxed); };
 
-    for (const std::string& piece : text::chunk(textIn, text::chunkLength(tag))) {
+    for (const std::string& piece : text::chunk(text::spokenPunctuation(textIn, tag), text::chunkLength(tag))) {
         if (cancelled()) return {};
         int dropped = 0;
         std::vector<int64_t> ids = text::indices(text::preprocess(piece, tag), eng.indexer(), &dropped);
