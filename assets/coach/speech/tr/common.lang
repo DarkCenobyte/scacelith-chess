@@ -682,8 +682,26 @@ move.mate.spoken = {move}, şah mat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet for Turkish (the pronunciation pass adds the words the voice misreads). En passant is
-# "geçerken alma", so the English respellings are not needed.
+# The voice reads every word with Turkish letter values, foreign names too: c is "dj" (Caro, Pirc),
+# j is "zh" (Najdorf), ch is "ç" (Richter), sch is "sç" (Tarrasch), ie two vowels (Mieses), x said
+# (Prix). These names are said as Turkish chess players say them (docs/PRONUNCIATION.md, Turkish).
+# En passant is "geçerken alma", so the English respellings are not needed.
+respell.caro = karo
+respell.kann = kan
+respell.pirc = pirts
+respell.alekhine = alehin
+respell.nimzowitsch = nimzoviç
+respell.kruijs = kröys
+respell.diemer = dimer
+respell.najdorf = naydorf
+respell.giuoco = cuoko
+respell.richter = rihter
+respell.mieses = mizes
+respell.tarrasch = tarraş
+respell.prix = pri
+respell.maróczy = maroçi
+respell.fajarowicz = fayaroviç
+respell.colle = kol
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. 11-19 and 21-99 are "{tens} {units}" ("on bir", "yirmi üç"), 100 is "yüz" (not

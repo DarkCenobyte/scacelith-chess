@@ -499,3 +499,55 @@ European vowel is left as it is. Most findings of the European Portuguese pass h
 - Recogniser habits: it writes "piąka" for pionka (the same sound: [pʲɔŋka]), splits "skoczka" as "z koczka",
   writes gońca as "końca", final -ę as -e and -e as -y ("czarny", "matę"), roszada as "rozsada", squares as
   notation (A6, E4), and garbles short lines and lines of names.
+
+## Turkish
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| Caro-Kann | the Turkish c ("dj"): heard "Jarokan", "Çarokan" 3 times in 3 (probe: nearest "Çaro-Kan") | `Karo-Kan` (respell.caro, respell.kann): "karokan" 3 in 3, and in opening.say.transposed |
+| Pirc | the Turkish c: heard "peş", "pirse" (probe: nearest "Pirç") | `Pirts` (respell): "Pirç", "pırtis", "pırt" in opening lines, no "dj" |
+| Alekhine | "Alekine", the e said (probe; heard "Aleki'ne", "ailekine") | `Alehin` (respell): "aleyhin", "Alehint" |
+| Nimzowitsch | heard "Nemzowic'i", "nemsobit" | `Nimzoviç` (respell): "Nemzovic" 2 in 3, "nebzeviç" |
+| Van't Kruijs | "Kruiys" (probe), heard "Crease", "Screech", "Cruise" | `Kröys` (respell.kruijs): "Krois", "Cray's" |
+| Diemer (Blackmar-Diemer) | "Diyemer" (probe), heard "Marbeam Er-", "Marley" | `Dimer` (respell): "Mardine" 3 in 3, the d heard |
+| Najdorf | the Turkish j ("zh"): heard "Neisdorf", "Ajdorf" | `Naydorf` (respell): "Naidorf" 3 in 3 |
+| Giuoco (Piano, Pianissimo) | "Giyuoko" (probe), heard "Gyoza", "güvo ko" | `Cuoko` (respell): "Joko", "Choco", "çok o" |
+| Richter (Richter-Veresov, Richter-Rauzer) | ch as "ç": heard "Lister", "dekleri", "Richter" once in 3 | `Rihter` (respell): "Richter" 3 in 3, and 3 in 3 in classical_sicilian.advanced |
+| Mieses | "Miyeses" (probe), heard "mss" twice, "mesele" | `Mizes` (respell): "Mises", "mizas" |
+| Tarrasch (also Yarı Tarrasch) | "Tarrasç" (probe), heard "tarif", "tarah" | `Tarraş` (respell): "taraş", "taraj" 3 in 3 |
+| Grand Prix | the x said (probe: nearest "Priks"), heard "predicts" once in 3 | `Pri` (respell.prix): "Grand Prix" 3 in 3 |
+| Maróczy | no candidate close (probe), heard "Maroti", "Maroxi", "Marauder" | `Maroçi` (respell): "Maroç", "Marocca", and "maroç" in accelerated_dragon.advanced |
+| Fajarowicz | heard "fajarobik", "frontrager" | `Fayaroviç` (respell): "Fyarovich", "Fayyarovic", "Fajarović" 3 in 3 in budapest.advanced |
+| Colle | two syllables: "koalya", "kola", "koal et" | `Kol` (respell): one syllable, "kual" 2 in 3 |
+| L ("Başka bir L dene", lesson.knight.wrong) | "le" melts after "bir": "birader ne", "bir nedeni", "bile deme" (probe: nearest "bir ne") | `lee` (.spoken): "leydene", "Leyden'i" 2 in 3 |
+
+- The voice reads every word with Turkish letter values, foreign names too (c "dj", j "zh", ch "ç", ie two
+  vowels, w as v). A new eponym needs checking for these letters first.
+- The main round trip (300 lines, Whisper medium set to `tr`, seed 0) covered few opening names. Then 3 seeds on
+  99 lines (file letters, numbers, ordinals, decimals, the reviewers' list, 60 opening names and eponyms in "Bu X,
+  Y değil.", the words missed most), 43 lines of A/B variants in "Bugün X çalışacağız.", 7 real lines with the
+  fixes, and probes (4 seeds).
+- Checked and fine: the numbers (11 to 98, "yüzde yetmiş bir", "artı bir virgül beş", "eksi iki virgül sıfır",
+  the ordinals: heard right 3 in 3, mostly as digits), the file letters a, ce, de, e, he (heard as the letter or as
+  notation), "Le şeklinde" (2 in 3), Elo, Of, Vay, Hımm (hummed or dropped), Philidor (probe: read "Filidor"; "pide
+  dör" is the recogniser), berabere (probe: the final e said; Whisper writes "beraber"), mattı, buluştu, gambiti
+  (probe: as written; Whisper writes "gamete"), fil (probe: not "film"), vezir (probe: not "bezir"/"mezir"), piyonu
+  (probe: no candidate better; Whisper writes "piyano", "pion"), kâğıdına, imkânsızsa, Kalem, Owen ("Oven"), Horwitz,
+  Réti, Ponziani, Trompowsky, Elephant, Saragossa, Stonewall, Bongcloud, Scheveningen, Rubinstein,
+  Evans, Traxler, Morphy, Marshall, Schliemann, Stafford, Parham, Halloween, Sämisch, Falkbeer, Zukertort,
+  Sveşnikov, Taymanov, Alapin, Benoni, Benko, Pterodaktil, Nimzo-Hint, Bogo-Hint, Nimzo-Larsen, Grob, Çigorin,
+  Petrov, Englund, Borg, Torre, Panov, Sicilya, Slav, Rauzer, Botvinnik, Karpov, Miles, Breyer.
+- Left as is: hâlâ and hâlde are read like hala and halde, short vowels and a hard l (probe; "haalaa" is farther,
+  and the recogniser cannot tell them apart), as many speakers say them. Bird is read with the Turkish i (probe:
+  `Börd` differs) but neither was heard right ("bir de", "bir arada"). Jobava is read with the Turkish j;
+  `Cobava` was heard worse ("Cobaba" once, "kopağ"). Aziz George was heard "George" 3 in 3 though the probe finds no
+  close candidate; `Corc` was heard "Kord", "Korkut". Winawer and `Vinaver` were heard alike badly ("WinAware",
+  "binavar"; probe: close). Carlsbad leans to "Çarlsbad" (probe) but plain and `Karlsbad` were heard the same
+  ("CarSpot"). The file letter a after a vowel melts into it ("kale a üç" heard "kala üç"), and fe and be run into
+  their rank ("bebeş", "otwcb"), as with any letter before a number. Unclear, no candidate tried: Smith-Morra
+  ("Smithmore'a" once in 3), Van Geet ("van-git", "OneGate"), Rossolimo ("Rosoliman").
+- Recogniser habits: squares and numbers as notation; v heard as b or m ("Bezir", "mezir", "ve zirve"); "hamlesi"
+  heard "hamilesi"; "hâlâ" written "hala"; a word's final vowel swallowed into a frequent word (berabere as
+  "beraber", piyonu as "piyano"); eponyms in English spellings; short lines garbled.
+- The opening texts said "dört'e" in the round trip's renderings (an older openings file); the repository's
+  `assets/coach/openings/tr.lang` already says "dörde", "beşe" (tools/gen_opening_lang.py, TR_SQUARE_SUFFIX_RE).

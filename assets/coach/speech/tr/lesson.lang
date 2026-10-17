@@ -118,7 +118,7 @@ lesson.knight.l = {@}Böyle. Her zaman öbür renkteki bir kareye konar.
 lesson.knight.jump = At, başka taşların üzerinden atlayabilen tek taştır.
 lesson.knight.ask = Atınla {my:acc} al!
 lesson.knight.wrong = Bu gerçek bir at hamlesi, ama {my:dat} ulaşmıyor. Başka bir L dene.
-lesson.knight.wrong.spoken = Bu gerçek bir at hamlesi, ama {my:dat} ulaşmıyor. Başka bir le dene.
+lesson.knight.wrong.spoken = Bu gerçek bir at hamlesi, ama {my:dat} ulaşmıyor. Başka bir lee dene.
 lesson.knight.ok = Harika bir sıçrayış!
 # Pawn: moving
 lesson.pawn.intro = Şimdi {your}. Dümdüz ileri gider, her seferinde bir kare; asla geri gitmez.
