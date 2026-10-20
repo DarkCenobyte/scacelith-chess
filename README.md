@@ -284,6 +284,12 @@ at the player's request. It has its own licence (BigScience Open RAIL-M), whose 
 the download prompt shows; see
 `third_party/supertonic3/README.scacelith.md`.
 
+## 🙏 Special Thanks
+
+A special thanks to the following community members for their valuable contributions to the project:
+
+- **Maria Lobo** — For reviewing and improving the Brazilian Portuguese (pt-BR) translation.
+
 ## Links
 
 - Official website: [scacelith.com](https://scacelith.com)
