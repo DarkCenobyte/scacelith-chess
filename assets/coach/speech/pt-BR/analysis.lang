@@ -21,10 +21,10 @@
 # ---- The start ------------------------------------------------------------------------------------
 an.start = Vamos rever esta partida juntos.
 an.start.2 = Vamos percorrer esta partida, lance a lance.
-an.start.3 = Aqui está a partida. Vamos ver como ela foi.
+an.start.3 = Aqui está a partida. Vamos ver o que aconteceu.
 # The game starts from a position set up on the board, not from the usual start.
 an.start.setup = Esta partida começa a partir de uma posição montada no tabuleiro. Vamos percorrê-la.
-an.start.setup.2 = Uma partida a partir de uma posição montada. Vamos ver como ela foi.
+an.start.setup.2 = Uma partida iniciada em uma posição personalizada. Vamos ver o que aconteceu.
 
 # ---- The opening (said where the game leaves the opening book) ------------------------------------
 an.opening = A abertura é {opening:def}.
@@ -124,7 +124,7 @@ an.end.win.black = A partida termina com a vitória das Pretas.
 an.end.win.black.2 = As Pretas vencem a partida.
 an.end.stalemate = Afogamento: a partida termina empatada.
 an.end.stalemate.2 = O rei está afogado, então a partida termina em empate.
-an.end.draw.agreement = Os jogadores combinaram o empate.
+an.end.draw.agreement = Os jogadores concordaram com o empate.
 an.end.draw.agreement.2 = A partida termina empatada por acordo.
 an.end.draw.repetition = A partida termina empatada por repetição.
 an.end.draw.repetition.2 = A mesma posição voltou a aparecer: empate.
@@ -144,9 +144,9 @@ an.end.unfinished.2.spoken = É aqui que a partida pára: ela não foi concluíd
 an.end.accuracy = Precisão: {acc_white:percent} para as Brancas, {acc_black:percent} para as Pretas.
 an.end.accuracy.2 = As Brancas jogaram com {acc_white:percent} de precisão, e as Pretas, com {acc_black:percent}.
 an.end.clean.white = As Brancas não cometeram nenhum erro, nem simples nem grave.
-an.end.clean.white.2 = O jogo das Brancas não teve erros sérios.
+an.end.clean.white.2 = As Brancas jogaram sem cometer erros graves.
 an.end.clean.black = As Pretas não cometeram nenhum erro, nem simples nem grave.
-an.end.clean.black.2 = O jogo das Pretas não teve erros sérios.
+an.end.clean.black.2 = As Pretas jogaram sem cometer erros graves.
 an.end.mistakes.white = As Brancas cometeram {n:mistake} e nenhum erro grave.
 an.end.mistakes.white.2 = Para as Brancas: {n:mistake}, nenhum erro grave.
 an.end.mistakes.black = As Pretas cometeram {n:mistake} e nenhum erro grave.
