@@ -323,7 +323,7 @@ jobs:
       # A test build of the game for this commit (the official builds come from the release
       # workflow, built without any cache).
       - name: Upload the game
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Scacelith-windows-x64-${{ github.sha }}
           path: build-win/Scacelith.exe
@@ -472,7 +472,7 @@ jobs:
 
       - name: Upload the smoke run's screenshot and log
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Scacelith-macos-smoke-${{ github.sha }}
           path: smoke/
@@ -482,7 +482,7 @@ jobs:
       # A test build of the disk image for this commit, as for Windows (the official one comes
       # from the release workflow).
       - name: Upload the disk image
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Scacelith-macos-arm64-${{ github.sha }}
           path: dist/*.dmg
@@ -587,7 +587,7 @@ jobs:
           persist-credentials: false
 
       - name: Install actionlint and zizmor
-        uses: taiki-e/install-action@183e4297cca2404691e9380e1307288dced5c82a # v2.87.25
+        uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
         with:
           tool: zizmor@1.30.1
 
