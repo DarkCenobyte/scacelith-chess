@@ -11,8 +11,8 @@
 #   conditional comes after "ruch", which carries the agreement: "Ruch {best} był silniejszy",
 #   "Ruch {best:nomate} dałby mata".
 # - Counted numbers (common.lang): {m:move_loc} "mat w 3 ruchach", {pts:point_acc} "3 punkty",
-#   {n:mistake} / {n:mistake_acc} "2 błędy", {m:blunder} "1 poważny błąd", {acc_white:percent} "87%"
-#   (spoken "osiemdziesiąt siedem procent"). Mistake = błąd, blunder = poważny błąd (glossary).
+#   {n:mistake} / {n:mistake_acc} "2 błędy", {m:blunder} "1 gruby błąd", {acc_white:percent} "87%"
+#   (spoken "osiemdziesiąt siedem procent"). Mistake = błąd, blunder = gruby błąd (glossary).
 # - {opening:def} is the nominative of the opening's name (openings fragment): it only follows "to".
 
 # ---- The start ------------------------------------------------------------------------------------
@@ -31,8 +31,8 @@ an.book_exit.2 = {move} to pierwszy ruch spoza teorii debiutowej.
 an.book_exit.3 = Teoria debiutowa kończy się tutaj, na ruchu {move}.
 
 # ---- A mistake or a blunder: the verdict, then what it allows or misses, then the better move ------
-an.blunder = {move} to poważny błąd.
-an.blunder.2 = Tutaj {move} jest poważnym błędem.
+an.blunder = {move} to gruby błąd.
+an.blunder.2 = Tutaj {move} jest grubym błędem.
 an.blunder.3 = Poważny błąd: {move}.
 an.mistake = {move} to błąd.
 an.mistake.2 = {move} nie jest tu właściwym ruchem.
@@ -139,10 +139,10 @@ an.end.clean.white = Białe nie popełniły żadnego błędu.
 an.end.clean.white.2 = Gra białych obyła się bez błędów.
 an.end.clean.black = Czarne nie popełniły żadnego błędu.
 an.end.clean.black.2 = Gra czarnych obyła się bez błędów.
-an.end.mistakes.white = Białe popełniły {n:mistake_acc}, ale obyło się bez poważnych błędów.
-an.end.mistakes.white.2 = Białe: {n:mistake}, poważnych błędów brak.
-an.end.mistakes.black = Czarne popełniły {n:mistake_acc}, ale obyło się bez poważnych błędów.
-an.end.mistakes.black.2 = Czarne: {n:mistake}, poważnych błędów brak.
+an.end.mistakes.white = Białe popełniły {n:mistake_acc}, ale obyło się bez grubych błędów.
+an.end.mistakes.white.2 = Białe: {n:mistake}, grubych błędów brak.
+an.end.mistakes.black = Czarne popełniły {n:mistake_acc}, ale obyło się bez grubych błędów.
+an.end.mistakes.black.2 = Czarne: {n:mistake}, grubych błędów brak.
 an.end.blunders.white = Białe popełniły {m:blunder_acc}.
 an.end.blunders.white.2 = Białe: {m:blunder}.
 an.end.blunders.black = Czarne popełniły {m:blunder_acc}.

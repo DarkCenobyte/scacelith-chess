@@ -1564,7 +1564,7 @@ number.900.ord_loc.spoken = dziewięćsetnym
 # "jedną bierkę / dwie bierki / pięć bierek", "z {n:mistake_ins}" = "z dwoma błędami".
 # Nouns: ruch, punkt (m); pionek, szach (m, animate accusative "jednego pionka", "dać szacha"); bierka
 # (f: any chessman, pawns included), niedokładność, partia, pozycja (f); pole, bicie (n); raz (m);
-# "poważny błąd" (blunder), "najlepszy ruch" (a run of best moves), "atakująca bierka" (attacker) and
+# "gruby błąd" (blunder), "najlepszy ruch" (a run of best moves), "atakująca bierka" (attacker) and
 # "broniąca bierka" (defender; "obrońca" is the word for one defending piece, but counted it would
 # need the personal forms "dwóch obrońców").
 count.move = {n} ruch|{n} ruchy|{n} ruchów
@@ -1597,12 +1597,12 @@ count.mistake_gen = {n:gen} błędu|{n:gen} błędów|{n:gen} błędów
 count.mistake_dat = {n:dat} błędowi|{n:dat} błędom|{n:dat} błędom
 count.mistake_ins = {n:ins} błędem|{n:ins} błędami|{n:ins} błędami
 count.mistake_loc = {n:loc} błędzie|{n:loc} błędach|{n:loc} błędach
-count.blunder = {n} poważny błąd|{n} poważne błędy|{n} poważnych błędów
-count.blunder_acc = {n} poważny błąd|{n} poważne błędy|{n} poważnych błędów
-count.blunder_gen = {n:gen} poważnego błędu|{n:gen} poważnych błędów|{n:gen} poważnych błędów
-count.blunder_dat = {n:dat} poważnemu błędowi|{n:dat} poważnym błędom|{n:dat} poważnym błędom
-count.blunder_ins = {n:ins} poważnym błędem|{n:ins} poważnymi błędami|{n:ins} poważnymi błędami
-count.blunder_loc = {n:loc} poważnym błędzie|{n:loc} poważnych błędach|{n:loc} poważnych błędach
+count.blunder = {n} gruby błąd|{n} grube błędy|{n} grubych błędów
+count.blunder_acc = {n} gruby błąd|{n} grube błędy|{n} grubych błędów
+count.blunder_gen = {n:gen} grubego błędu|{n:gen} grubych błędów|{n:gen} grubych błędów
+count.blunder_dat = {n:dat} grubemu błędowi|{n:dat} grubym błędom|{n:dat} grubym błędom
+count.blunder_ins = {n:ins} grubym błędem|{n:ins} grubymi błędami|{n:ins} grubymi błędami
+count.blunder_loc = {n:loc} grubym błędzie|{n:loc} grubych błędach|{n:loc} grubych błędach
 count.inaccuracy = {n:f} niedokładność|{n:f} niedokładności|{n} niedokładności
 count.inaccuracy_acc = {n:acc_f} niedokładność|{n:f} niedokładności|{n} niedokładności
 count.inaccuracy_gen = {n:gen_f} niedokładności|{n:gen} niedokładności|{n:gen} niedokładności
