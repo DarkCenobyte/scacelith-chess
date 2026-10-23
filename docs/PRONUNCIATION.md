@@ -941,3 +941,54 @@ voice's sake.
   tones, tr/ch and d/gi/r merged ("trừ" as "chứ", "giành" as "dành"), "bắc cầu" as "bắt cầu", short lines and
   interjections dropped or replaced, loops on long lines ("tượng tượng tượng"), names in English spellings
   ("Civilization" for Scheveningen).
+
+## Slovak
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e (squares, "pešiak e", "písmeno e") | runs into the word before it: "Toto pole je é štyri" heard "je štyri" 3 times in 3, "ťah é štyri" heard "ťa 4", "ďahe 4" | `éé` (respell.é, so that the opening texts say it too): heard as the e-file 25 times in 36 over 12 contexts, against 18 for "é" (a capital `E` 19 in 24 on the first 8) |
+| Hm, (before a sentence) | lost, or with a vowel ("Hehm", "Chm"): hummed 2 times in 9 | `hmm` (respell.hm): hummed 15 times in 15. "Hm." alone is heard "Hmm" either way |
+| rating | as written, "ratink" (probe +0.55, `rejting` +1.36) | `rejting`, as Slovak players say it (Whisper writes "rating" either way) |
+| fianchetto, fianchetta, fianchettom, fianchettami | the Italian ch as č: "fiančeto" (probe +0.19, `fianketo` +0.81) | `fianketo`... (one respell.* per form): k heard 9 times in 9 ("fianketom", "Sianketo") |
+| Giuoco, Ponzianiho, Zukertortovo | "gi-uo-co" with c = ts (probe +0.02); z as z (probe: c +1.0) | `džuoko`, `poncianiho`, `cukertortovo`: no g 6 in 6 ("džuoko", "Jouko"), c 3 in 3 and 6 in 6 |
+| Grecov(a), Capablancov(a) | c as ts: "Gretsova" (probe +0.25, `grekova` +1.14), "Kapablantsova" (−0.09) | `grekova`, `kapablankova`...: k 6 in 6 |
+| Steinitzov(a), Rubinsteinov(a), Spielmannov(a), Tarraschov(a, -ej), Polotarraschova, Schliemannov(a), Schlechterov(a), scheveningenský(-á) | letter by letter: "Steinicova", "Rubinstejnov", "Spijelmanova", "Taraschova", "Schlimanova", "Slechterov", "Sceveningenský" (probe) | `štajnicova`, `rubinštajnov`, `špílmanova`, `tarašova`, `polotarašova`, `šlímanova`, `šlechterov`, `ševeningenský`...: š heard 6 in 6 (Štajnic), 5 in 6 (Šliman, Ševeningen), 3 in 3 (Rubinštajn, Šlechter), but 1 in 3 (Špílman) and 3 in 9 (Taraš): Whisper writes "Spielman", "Tarasova" |
+| Sämischov(a), Miesesovo, Kieseritzkého, Jaenischov(a) | "Semischov", "Mjesesovo", "Kieseritského" (probe); Jaenisch heard "Janis Hauk", "jajný schop" | `zémišov`, `mízesovo`, `kízerického`, `jénišov`: z 6 in 6, "mízesovo" 3 in 3, "Kizerického" 6 in 6, "Jenišov" 5 in 6 |
+| Grünfeldov(a, -ou) | ü near ö (probe); heard "Grunfeldová" 3 in 3 | `grínfeldova`...: "Grimfeldová", "Greenfieldova", no u 9 in 9 |
+| Falkbeerov(a) | ee as two vowels: heard "Falk Biero", "fagbjero" | `falkbérov`...: one e 6 in 6 ("Falkbergov", "Falkberou") |
+| Fajarowiczov | heard "Fajarovico" 3 in 3 | `fajarovičov`: č 3 in 6 ("Fajarovichov", "Fire Witch Show"), c otherwise |
+| Philidorov(a) | ph as p: heard "Pilidorová", "Pčilidorová", "Pylidorová" | `filidorova`...: f 6 in 6 (ch.intro.rook already said "Filidorovou") |
+| Owenova, Smithov, McCutcheonov(a) | w as v ("Ovenová" 2 in 3); th not t (probe: `smitov` +0.83); McCutcheon letter by letter ("makočený", "Makarčinov") | `ouenova`, `smitov`, `mekačenov`: "Owenová" 6 in 6 (the English name), "smito" 4 in 6, "mekačenou", "MechaChenov" 6 in 6 |
+| Milesova, halloweenský, Prix, Euweho | as Slovak letters: "Mílesova", "Haloveenský", "Priks", "Euveho" (probe) | `majlsova`, `helouvínsky`, `prí`, `éveho` ("Grand" keeps its d): Whisper writes "Milesova", "Halloweensky", "Grand Prix" for them, "Éveho" as "EVEho" |
+| Van Geetovo, Van't Kruijsovo | "Gétovo" (probe −0.49), "Kruisovo" (+0.26); heard "Vanguitovo", "Cruisové" | `chétovo`, `krajsovo`: no g 6 in 6 ("vanchetová", "Khetovou"), no u 6 in 6 ("Kreisová", "Krijsovou") |
+
+- Parakeet missed 79 % of the words on this voice; the main round trip is Whisper medium set to `sk`, 300 lines
+  (seed 0, 41 % of 4,482 words missed). Then 3 seeds on 60 lines (8 contexts of the file letter e with `é`, `éé`
+  and `E`, Hm against Hmm, the reviewers' coach lines, the L, the numbers), on 32 lines of names (the plain and the
+  respelled form in separate lines: with both in one line Whisper repeats its first transcription), on 23 lines of
+  the fixes in the game's lines and opening.say sentences, and on 4 of them with the plain "é"; probes (4 seeds) on
+  about 95 readings. The synthesis is the same for the same text and seed: a line already run is not worth running
+  again.
+- Checked and fine (probe or round trip): biely ("bieli"), ťah, kráľ, stĺpec (the syllabic ĺ), môj ("muoj"),
+  mat and pat (a hard t: `mať` +1.69), partia (a hard t), joj, ef, strelec, jednu, dopredu, bielopoľného; the
+  loanwords keep a hard d, t, n (probe against `ďiagonála`, `takťika`...): materiál, teória, téma, diagonála,
+  indická, systém, moderný, taktika, kritický, tempo, aktivita, etiketa, motívy, iniciatíva, kandidátske, Benoni;
+  and tento, jeden stay hard. The L (`el`, heard "L" 6 in 6), "od á po há", the numbers (64, 75, 50, 71 %, 12,
+  13, 19, 122, "plus jeden koma tri", "mínus nula koma päť"), "v štvrtom ťahu" (6 in 6: "vo" is not needed), Ups,
+  Ojoj, Fíha, Ó, Elo, Expert, rapid, „upravujem“ (the quotes are not read), epoletový. Names read well as
+  written: Caro-Kann ("Karokán" 3 in 3), Rétiho (`rétyho` no better), Maróczyho ("Marocího" 3 in 3), Winawer
+  ("Vináverov"), Morphyho ("morfiho"), Colleho ("koleho"), Horwitz ("horvic"), Trompowského, Janowského, Breyer
+  ("Brejer", as in Hungarian), Staunton, Blackmar, Bongcloud ("bongklaud"), pianissimo, Fegatello. The
+  Russian names are already in Slovak spelling (Aljechin, Čigorin, Nimcovič).
+- Left as is (close calls, the respelling heard no better): Diemer (`dímerov`), Tartakower (`tartakoverov`),
+  Fischer (`fišerov`), Marshall (nearest "Marschalov" in the probe, but heard "maršálov" in the main round trip; Whisper
+  writes "Marshallov" for both forms). Stonewall is said letter by letter ("Stonevall", probe), but `stounvol`
+  was heard "útok z Tom-Vol" (the s joins "útok"): no better. Bird ("Bírdovo") is read as written. The file letter
+  at the start of a line is lost with `é`, `éé` and `E` alike (Whisper drops a line's first word). The h-file after
+  a vowel melts into the word ("pole há osem" heard "poleha 8"), as in Czech; "od á po há" is written "apoha".
+- Recogniser habits: Whisper writes Czech forms and vowel lengths (bielý, čierný, král, figura, solidná, začíná,
+  sicilská, tvojej as "svojej"), ť as č or "ti" (tiach, čah), ľ as l, ĺ as "stolpec" or "stúpec", mat as "mať",
+  pat as "pac", final -ou as -ov (dámov), voicing assimilation as heard (zaz získava), squares and numbers as
+  notation ("dp5", "cp5" for dé päť, cé päť), "ef sedem" as "Epsedem", splits and joins (do predu, na miesto), and
+  known names in their own spelling (Marshallov, Fischerová, Stonewall, Grand Prix, Halloween) whatever the voice
+  says: check a name with the probe.

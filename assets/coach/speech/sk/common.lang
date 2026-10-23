@@ -581,8 +581,76 @@ move.mate.spoken = {move}, mat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: Slovak says
-# "branie mimochodom", not "en passant" (the pronunciation pass adds respellings later).
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
+# pronunciation pass (docs/PRONUNCIATION.md, Slovak). The voice reads foreign names letter by letter
+# as Slovak: they are spelled as Slovak players say them. Every form that occurs needs its own entry.
+# The file letter e (squares, "pešiak é", "písmeno é"): a lone "é" runs into the word before it ("Toto
+# pole je é štyri" heard "je štyri" 3 times in 3); "éé" is heard as the e-file. Here rather than in
+# file.e.spoken so that the opening texts say it too:
+respell.é = éé
+# "Hm," got lost before a sentence (3 times in 3); "Hmm," is hummed:
+respell.hm = hmm
+# The English loan is said "rejting" (it read the letters, "ratink"):
+respell.rating = rejting
+# Italian: ch = k (it said "fiančeto"), gi = dž (it said "gi-uo-co"), z = c:
+respell.fianchetto = fianketo
+respell.fianchetta = fianketa
+respell.fianchettom = fianketom
+respell.fianchettami = fianketami
+respell.giuoco = džuoko
+respell.ponzianiho = poncianiho
+respell.grecov = grekov
+respell.grecova = grekova
+# Spanish c = k (it said "Kapablancova"):
+respell.capablancov = kapablankov
+respell.capablancova = kapablankova
+# German: z = c, st = št, ei = aj, sch = š, ie = í, ä and ae = é (it read them as Slovak letters):
+respell.zukertortovo = cukertortovo
+respell.steinitzov = štajnicov
+respell.steinitzova = štajnicova
+respell.rubinsteinov = rubinštajnov
+respell.rubinsteinova = rubinštajnova
+respell.spielmannov = špílmanov
+respell.spielmannova = špílmanova
+respell.tarraschov = tarašov
+respell.tarraschova = tarašova
+respell.tarraschovej = tarašovej
+respell.polotarraschova = polotarašova
+respell.schliemannov = šlímanov
+respell.schliemannova = šlímanova
+respell.sämischov = zémišov
+respell.sämischova = zémišova
+respell.miesesovo = mízesovo
+respell.kieseritzkého = kízerického
+respell.jaenischov = jénišov
+respell.jaenischova = jénišova
+respell.schlechterov = šlechterov
+respell.schlechterova = šlechterova
+respell.scheveningenský = ševeningenský
+respell.scheveningenská = ševeningenská
+# ü = í (it said "Grunfeld"), ee = é (it said "Falkbe-ero"):
+respell.grünfeldov = grínfeldov
+respell.grünfeldova = grínfeldova
+respell.grünfeldovou = grínfeldovou
+respell.falkbeerov = falkbérov
+respell.falkbeerova = falkbérova
+# Polish cz = č:
+respell.fajarowiczov = fajarovičov
+# English and French: ph = f (it said "Pilidorova"), th = t, ow = ou (it said "Ovenova"), i = aj,
+# ee = í, final x silent:
+respell.philidorov = filidorov
+respell.philidorova = filidorova
+respell.smithov = smitov
+respell.owenova = ouenova
+respell.mccutcheonov = mekačenov
+respell.mccutcheonova = mekačenova
+respell.milesova = majlsova
+respell.halloweenský = helouvínsky
+respell.prix = prí
+# Dutch: eu = é, g = ch, ui = aj:
+respell.euweho = éveho
+respell.geetovo = chétovo
+respell.kruijsovo = krajsovo
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words; the plain word is the masculine inanimate nominative ("jeden ťah", "dva body").

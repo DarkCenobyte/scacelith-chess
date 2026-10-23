@@ -92,7 +92,7 @@ const std::vector<Language>& languages() {
         {"pt-BR", "Portugu\xC3\xAAs (Brasil)", false},
         {"pt", "Portugu\xC3\xAAs (Portugal)", false},
         {"ro", "Rom\xC3\xA2n\xC4\x83", false},                                        // Română
-        {"sk", "Sloven\xC4\x8Dina", false, false},                                           // Slovenčina
+        {"sk", "Sloven\xC4\x8Dina", false},                                           // Slovenčina
         {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false, false},                                   // Slovenščina
         {"fi", "Suomi", false},
         {"sv", "Svenska", false},
