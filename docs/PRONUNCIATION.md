@@ -808,3 +808,60 @@ voice's sake.
   "Dama" as "Da, ma" (the probe has "Dáma"), "dama ta" as "damata", "Hopa" as "Opa", regele as "regile", Albul as
   "Arbul", squares and numbers as notation ("F7", "30 și 4"); it drops a line's first words and loops on some long lines
   ("adesea adesea ...").
+
+## Hungarian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetto, fianchettóba, fianchettókkal, fianchettós, fianchettót, fianchettóval | the Italian ch as cs: "fiancsetto" (probe −0.63); heard with a k 0 times in 8 ("fiancettóba", "fjancsettóba") | `fianketto`, `fiankettóba`... (respell.*, one per form): k heard 15 times in 21 |
+| en passant | the t said: nearest "en passzant" (probe); heard "Postant", "Passont", "paszont" (a t 6 or 7 times in 9), "en" as "M" or "nem" | `an`, `passzan` (respell.en, respell.passant): a t 2 times in 18 ("Ampaszan", "Azon passzan") |
+| Giuoco | gi as gy: "gijuoko" (probe); heard "gyózó" 3 in 3 | `dzsuokó`: "csókó", "Tsuoko" 6 in 6, never gy |
+| Ponziani | z as z: "Ponziáni" (probe −0.62); heard "pontzéni", "Ponziani" | `ponciáni`: c heard 6 in 6 ("Ponciányi") |
+| Aljechin | ch as k: "Aljekin" (probe, in a sentence); heard "a jekin", "aljekhinn" (k 2 in 3) | `aljehin`: h 5 in 6, never k |
+| Maróczy | cz as cs: heard "Marocsa", "Marócző" | `maróci`: "maró ci" 4 in 6, never cs |
+| Winawer, Euwe | w as u: "Vinauer", "Euve" (probe); heard "au" 2 in 3, "EU", "Új" | `vinaver`, `őve`: "au" 1 in 6; "őve" or "öve" 5 in 6 |
+| Mieses, Diemer, Kieseritzky, Schliemann | ie as i-je: "Mijeses", "Dijemer", "Kiesericki", "Slieman" (probe); heard "miéses", "miásos", garbled 3 in 3 | `mízesz`, `dímer`, `kízericki`, `slíman`: one i 6 in 6, 4 in 6, 6 in 6, 4 in 6 |
+| Larsen, Anderssen, Janowski, Trompowsky, Veresov, Saragossa, Rossolimo, Hippopotamus, Evans | s as the Hungarian s [ʃ] (probe: "Andersen", "Janovski", "Verezsov", "Saragosza", "Hipopotamus", "Evanzs"); heard "saragos a", "hip-hop-ot a most" | `larszen`, `anderszen`, `janovszki`, `trompovszki`, `vereszov`, `szaragossza`, `rosszolimo`, `hippopotamusz`, `evansz`: sz heard 5 in 6 (Larsen, Anderssen, Janowski against 1 in 3, Veresov), 2 in 3 (Saragossa, Trompowsky); Whisper writes "Evans", "Rosso Limo" either way |
+| Capablanca | the final c as c: "Kapablanca" (probe); heard 3 in 3 | `kapablanka`: k 3 in 6 |
+| Kruijs (Van't Kruijs), Bird | "Kruijsz", "Bírd" (probe); heard "Cruysz", "Cluis", "birt" | `kröjsz`, `börd`: "Kroisz", "Kreuz"; ö 3 in 6 |
+| Staunton, McCutcheon | "au" said ("Staunt on" 2 in 3); McCutcheon letter by letter ("Magcsottson") | `sztonton`, `mekkacsen`: no "au" ("Stonton", "Stanton"); "Mekacsen", "Megkacsen" |
+| Grand Prix | d and x said: "Grand Priksz" (probe +0.32, `gran pri` +4.94); once heard "Grand Prix Twix" | `gran`, `pri` (respell.grand, respell.prix): Whisper writes "Grand Prix" either way |
+
+- Parakeet missed 59 % of the words on this voice. The main round trip is Whisper medium set to `hu`: 300 lines
+  (seed 0), with 28 % of 4,560 words missed. Then 3 seeds on 108 lines: the reviewers' list, the plain form
+  beside each respelling, file letters, numbers and coach lines. Then 3 seeds on 20 lines of opening names in the
+  game's own sentences, and 3 seeds on 6 lines of üt against `űt`. About 100 readings were probed.
+- Checked and fine (probe or round trip): Philidor ("Filidor"), Caro–Kann (the dash makes no pause), Tarrasch
+  ("Taras"), Richter ("Rihter"), Morphy ("Morfi"), Fischer ("Fiser"), Schlechter ("Slehter"), Horwitz ("Horvic"),
+  Bongcloud ("Bongklaud"), Marshall, Rubinstein, Tartakower, Steinitz, Breyer, Paulsen, Max Lange, Parham, Smith,
+  Traxler, Fegatello, Pterodactyl, Colle ("Kolle"), Geet ("Gét"), Scheveningen, scheveningeni, karlsbadi, and
+  pianissimo ("pianiszimo"). Lasker and Keres keep the Hungarian s, as players say them. Also fine: rapid,
+  Hmm (hummed), El alakban, atól háig, Élő-pontszám, oppozíció, kontra, Filidor-védelemmel, „igazítok”
+  (the quotes are not read), tartsd (said "tarcsd", the native assimilation), the file letters C6 D7 G2,
+  h-vonal, g-gyalog, the numbers 71 %, 92 %, −1,5, 2,3, 34., 112, 12., 21., and 11 to 99 heard as digits.
+- Respellings that were tried and dropped, each heard no better or worse than the plain word:
+  - Zukertort as `cukertort`: heard "Kukertort" 3 in 3; the plain word is heard "Zukertolt".
+  - Nimzowitsch as `nimcovics`: garbled 6 in 6; the plain word is heard "Nimzovics".
+  - Fajarowicz as `fajarovics`: heard "Fire Robics".
+  - Spielmann as `spílman`: heard "Spirma".
+  - Sämisch as `zémis`: the z joins the article, heard "az émis"; the plain word is heard "szem is".
+  - Miles as `májlz`: the plain word is heard "Myles" 3 in 3.
+  - Stonewall as `sztónvol`, Blackmar as `blekmár`, Greco, Jaenisch: no better than the plain word.
+- Left as is:
+  - sakk is heard "sok", "shot", "sők" in every round (24 in 24). The probe puts it apart from "Sokk" and
+    "Säkk", and there is no other way to spell it.
+  - "Van" (Van't Kruijs, Van Geet) comes from the shared opening names and is also the verb "van" (143 lines),
+    so it cannot be respelled.
+  - üt and ütök are heard "öt" and "ötök". `űt` was heard as "visszaült" or "visszaölt" (rt3), so it was not
+    better.
+  - The voice's r is heard as l at times ("vezélet").
+  - A short u is heard as o ("centromot", "bábo"); the probe shows a tie.
+  - mögötte is heard "megötte".
+  - áll at a pause is heard "el"; the probe shows a tie.
+  - The file letter a melts into the word before it when that word ends in a consonant ("huszár a hat" heard
+    "huszára halt"). Writing á would name the wrong letter.
+- Recogniser habits: Whisper writes squares and numbers as notation, ty as tj ("bástják"), and doubles or drops
+  consonants ("husszár", "szillárd", "opozíció"). It gets í/i and ú/u length wrong. It writes known names in
+  their own spelling whatever is said (Evans, Trompowsky, Grand Prix, Halloween, Stafford, Saragossa), so check
+  a name with the probe. It hears "a Sz…" as "az" and splits words ("veszi célba" as "veszít szélba"). It often
+  loses the first word of a short line.
