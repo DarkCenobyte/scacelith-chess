@@ -733,7 +733,59 @@ moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
 # Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
-# pronunciation pass.
+# pronunciation pass (docs/PRONUNCIATION.md, Czech). The voice reads foreign names letter by letter
+# as Czech: they are spelled as Czech players say them.
+# "Hm," got a vowel ("hem") or was lost before a sentence; "Hmm" is hummed:
+respell.hm = hmm
+# Italian: ch = k (it said "fiančeto"), gi = dž, z = c:
+respell.fianchetto = fianketo
+respell.fianchetta = fianketa
+respell.fianchettem = fianketem
+respell.fianchetty = fiankety
+respell.giuoco = džuoko
+respell.ponzianiho = poncianiho
+respell.grecova = grekova
+respell.grecův = grekův
+# Spanish c = k (it said "Kapablancova"):
+respell.capablancova = kapablankova
+respell.capablancův = kapablankův
+# German: z = c, st = št, ei = aj, sch = š, ie = í, ä = é, ü = ý:
+respell.zukertortovo = cukertortovo
+respell.steinitzova = štajnicova
+respell.steinitzův = štajnicův
+respell.rubinsteinova = rubinštajnova
+respell.rubinsteinův = rubinštajnův
+respell.spielmannova = špílmanova
+respell.spielmannův = špílmanův
+respell.tarraschova = tarašova
+respell.tarraschovy = tarašovy
+respell.tarraschův = tarašův
+respell.polotarraschova = polotarašova
+respell.schliemannova = šlímanova
+respell.schliemannův = šlímanův
+respell.sämischova = zémišova
+respell.sämischův = zémišův
+respell.miesesovo = mízesovo
+respell.kieseritzkého = kízerického
+respell.grünfeldova = grýnfeldova
+respell.grünfeldův = grýnfeldův
+# Polish cz = č:
+respell.fajarowiczova = fajarovičova
+# English and French: ph = f (it said "Pilidorova"), sh = š, i = aj, ee = í; Grand Prix with its d
+# and x said:
+respell.philidorova = filidorova
+respell.philidorovou = filidorovou
+respell.philidorův = filidorův
+respell.marshallova = maršalova
+respell.marshallovu = maršalovu
+respell.marshallův = maršalův
+respell.milesova = majlsova
+respell.halloweenský = helouvínský
+respell.grand = gran
+respell.prix = prí
+# Dutch eu = é ("Euveho"); Réti with a hard t (it said "Réťiho"):
+respell.euweho = éveho
+respell.rétiho = rétyho
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. 21-99 are said the inverted way, one word: "dvaadvacet", "pětatřicet",

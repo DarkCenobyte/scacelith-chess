@@ -707,3 +707,59 @@ voice's sake.
 - Recogniser habits: zwart as "zwaard", wit as "het", "dit", "met", zet as "z" (the letter's name), koning
   as "coding", dame as "daam", "duim"; ee as "de", "een"; ha as "A" (A8); gambiet as "gambit", "come
   beat"; Tarrasch as "Taras", -isch as "-ies" (right in Dutch); "min" as "met" after "ongeveer".
+
+## Czech
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| Hm, (before a sentence: "Hm, moje hrozba...") | a vowel: heard "Hem", "Hehm", "Hn", or lost (0 hums in 5); the probe puts it nearest "Hem" | `hmm` (respell.hm): hummed 7 times in 9. "Hm." alone was heard as a hum either way |
+| fianchetto, fianchetta, fianchettem, fianchetty | the Italian ch as č: "fiančeto" (probe: +0.34, `fianketo` +1.34) | `fianketo`, `fianketa`, `fianketem`, `fiankety` (respell.*): heard with a k 12 times in 12 (Whisper writes "fianchetto" for the plain word whatever is said) |
+| Giuoco | the g said: heard "gyuoko", "Geoxo", "Guoko" | `džuoko` (respell): "Djoko", "Duoko", "džuoko", "Jouko" |
+| Ponzianiho, Zukertortovo | the z as z or s ("Ponsianiho", "Sukertortovo", probe) | `poncianiho`, `cukertortovo`: c heard 5 in 6 and 6 in 6 |
+| Grecova, Grecův, Capablancova, Capablancův | c as ts: "Gretsův" (probe +0.01, `Grekův` +2.18), "Kapablancova" (heard "kapablancová" 3 in 3) | `grekova`, `grekův`, `kapablankova`, `kapablankův`: k heard 6 in 6 and 5 in 6 |
+| Steinitzova, Rubinsteinova, Spielmannova (and -ův) | as Czech letters: "Stajnicova", "Rubinstejnova", "Spijelmanova" (probe); heard "stejnicová" 3 in 3 | `štajnicova`, `rubinštajnova`, `špílmanova`...: š heard 6 in 6, 8 in 9, 2 in 6 |
+| Tarraschova, Tarraschovy, Tarraschův, Polotarraschova | s + ch: nearest "Tarasova" (probe +0.68, `Tarašova` +1.74) | `tarašova`...: š heard 6 times in 9 ("Tarašova", "starášovi") |
+| Schliemannova, Schliemannův, Sämischova, Sämischův | "Schlijeman", "Semischova" (probe); heard "Shrebanov", "škri manu", "semisková" | `šlímanův`, `zémišova`...: "šlimanův" 6 in 6, "zemišová" 6 in 6 |
+| Miesesovo, Kieseritzkého | ie as i-je: "Mijesesovo", "Kijeserického" (probe); heard "měsíce o", "k jezerického" | `mízesovo`, `kízerického`: "Mises" 6 in 6, "kízerického" 6 in 6 |
+| Grünfeldova, Grünfeldův | "Grunfeldova" (probe +0.01, `Grýnfeldova` +1.10); heard "Grunfeld" 4 in 6 | `grýnfeldova`, `grýnfeldův`: "Greenfeld" 6 in 6, no u |
+| Fajarowiczova | "Fajarovicova" (probe +0.03, `Fajarovičova` +0.40); heard "fajarovicevá" 2 in 3 | `fajarovičova`: no extra syllable in 6 (Whisper writes c or č) |
+| Philidorova, Philidorovou, Philidorův | ph as p: "Pilidorova" (probe +0.07, `Filidorova` +0.79); heard "Pjolidorová", "Pylidorová" | `filidorova`...: f heard 9 in 9 |
+| Marshallova, Marshallovu, Marshallův | s + ch: "Marschalův" (probe +0.17, `Maršalův` +0.51) | `maršalova`...: Whisper writes "Marshal" either way |
+| Milesova (výhra nad Karpovem) | "Mi-le-sova": heard "Melesová", "malasová" | `majlsova`: "Milesová" 3 in 3 in a short line, "Majasová" 3 in 3 in the opening text |
+| Halloweenský | "Haloveenský" (probe +0.18, `Helouvínský` +1.05); heard "halověnský", "halobjenský" | `helouvínský`: "Halloweenský" 5 in 6, against 4 in 6 |
+| Grand Prix | d and x said: "Grand Priks" (probe +0.09) | `gran`, `prí` (respell.grand, respell.prix): no x; Whisper writes "Grand Prix" either way |
+| Euweho | "Euveho" (probe); heard "uvehlo", "EUV", "EU-vehla" | `éveho`: "éveho" 5 in 6 |
+| Rétiho | soft t: "Réťiho" (probe −0.16, `Rétyho` +0.48) | `rétyho`: heard "Rétyho" 6 in 9 (Whisper's y for a hard t) |
+
+- Parakeet missed 73 % of the words on this voice; the main round trip is Whisper medium set to `cs`, 300 lines
+  (seed 0, 28 % of 4,519 words missed), then 3 seeds on 97 lines (the reviewers' list, 24 A/B pairs of eponyms in
+  "Tohle je X a tohle Y.", 53 more opening names and eponyms in lists, the file letters in squares, the L, numbers,
+  the words missed most), and 3 seeds on 30 lines of the fixes in the game's own lines and in opening.say
+  sentences, with the plain form beside the doubtful ones; probes (4 to 6 seeds) on about 90 readings.
+- Checked and fine: the file letters á bé cé dé é ef gé há (heard as notation), the L (`el`, probe; heard "L"),
+  Elo, blitz ("blic"), rapid ("rapit"), rating ("rejting"), Ouha ("ou-ha"), an pasan, „upravuji“, mat (the t said;
+  "Mat třetím" merges the two t), tah ("tach"), the numbers (92 %, 12, 13, 17, 19, 21krát, 34, 122, "plus jedna
+  čárka tři", "minus nula čárka pět", ordinals). The loanwords keep a hard d, t, n (probe): diagonála, aktivní,
+  etiketa, taktika, indická, motivy, tip, Benoni, Poncianiho, Štajnic, pianissimo. Names read well as written:
+  Caro-Kann ("Karo"), Fischer ("Fišer"), Schlechter (š), Falkbeer ("Falkbér"), Smith ("Smit"), Bongcloud
+  ("Bongklaud"), Breyer ("Brejer", as in Hungarian), Morphy (heard with an f 6 in 6, though the probe leans to a
+  p), Owen (heard "Owen" 4 in 6; `Ouenova` 5 in 6, a tie in the probe), Diemer ("Deemer" 3 in 3), Stonewall,
+  Trompowského, Horwitz, Torre, Maróczy, Staunton, Evans, Stafford, Parham, Janowski, Botvinnik, Najdorf,
+  Svešnikov, Rossolimo, Traxler, Englund, Jobava, Richter-Veresov, Rauzer, Sozin, Pterodaktylí, Bogoljubov,
+  Tartakower, Paulsen, Anderssen, Keres, Lasker, Lange, Nimcovič, Čigorin, Zajcev, Alapin, Aljechin, Petrosjan,
+  Spasskij, Kasparov, Karpov, Averbach, Bronštejn, Saragosa, Leningrad, Meran, From, Pirc, Borg, Grob, Sokolskij,
+  Albin, Tajmanov, Kan, Smyslov, Tal, Petrov, Panov, Winawer, Benko, Fegatello.
+- Left as is: partie, partii, partiích lean to a soft t alone and in "Dobrá partie!" but are ties or hard in other
+  contexts (probe, 7 contexts); `partyje` was heard "partie je" once in 3. kandidátní and kritický are ties
+  between hard and soft. Colle is said "Koleův" (the e said; probe −0.97), and `Kolův` was heard no better.
+  Jaenisch ("Ja-eniš"), McCutcheon ("Mekučeon"), Van't Kruijs ("Krujs"), Van Geet ("Gét"), Bird ("Birdovo"),
+  Scheveningen (near "Sceveningenská") and Blackmar are read as spelled: `Jénišův`, `Mekačenova`, `Krajsovo`,
+  `Chétovo`, `Bérdovo`, `Ševeningenská` and `Blekmar` were heard no better. The h-file after a vowel melts
+  into the word ("pole há osm" heard "polehá osm", "polená 8"): Czech h is voiced, as said; "tah á tři" is heard
+  "tahá tři" the same way.
+- Recogniser habits: Whisper writes voicing assimilation as heard (jezdcem "jestcem", zpět "z pět", then "z 5"),
+  Slovak and colloquial forms (pěšec "piešec", jezdci "jazdci", rychlý "rychlej", navrhuju "navrhuji"), the
+  wrong vowel length (pružné "průžné", pořadí "pořádí") and y for i (figurami "figurámy"), tvůj as "svůj" or
+  "tvoj", squares and numbers as notation ("D5", "polehá 8"), splits and joins ("proti gambit", "hra je", "boju
+  je"), and known names in their own spelling ("Halloween", "Grand Prix", "Marshal", "Steinitz") whatever the
+  voice says: check a name with the probe. A line's first word after a colon is often lost.
