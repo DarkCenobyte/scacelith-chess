@@ -82,7 +82,7 @@ const std::vector<Language>& languages() {
         {"et", "Eesti", false},
         {"es", "Espa\xC3\xB1ol", false},
         {"fr", "Fran\xC3\xA7" "ais", false},
-        {"hr", "Hrvatski", false, false},
+        {"hr", "Hrvatski", false},
         {"it", "Italiano", false},
         {"lv", "Latvie\xC5\xA1u", false, false},                                             // Latviešu
         {"lt", "Lietuvi\xC5\xB3", false, false},                                             // Lietuvių

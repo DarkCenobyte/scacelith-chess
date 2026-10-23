@@ -992,3 +992,55 @@ voice's sake.
   notation ("dp5", "cp5" for dé päť, cé päť), "ef sedem" as "Epsedem", splits and joins (do predu, na miesto), and
   known names in their own spelling (Marshallov, Fischerová, Stonewall, Grand Prix, Halloween) whatever the voice
   says: check a name with the probe.
+
+## Croatian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares) | runs into the word before it: "To je a šest" heard "To je šest" 3 times in 3, "na a šest" heard "na šest" 3 in 3 (the probe puts "na a šest" next to "naa šest") | `aa` (file.a.spoken): heard as the a-file 8 times in 21 against 3 in 15 ("To je aa šest" 3 in 3; after "na" still often "na šest"); the probe puts "na aa šest" far from "na šest" (+1.06, "na a šest" +0.43) |
+| Ups! | heard "Ips" 3 times in 6; no candidate near in the probe | `uups` (respell): "Ups" 6 in 6 |
+| en passant | "en pasant", the t said (probe; heard with a t 11 times in 12) | `pasan` (respell.passant): a t 1 time in 12. "an" for "en" was swallowed more often (heard 4 in 9), so "en" stays |
+| obrnutim | the long u said like an o: "obrnotim" (probe), heard with o or a 7 times in 9 | `obrnuutim`: u 6 in 6 |
+| Šah znači (ann.check.coach.first.2) | runs together: heard "Šak znači" 6 times in 6 (the probe puts it near "Šag", "Šak") | `Šah, znači` (.spoken): "Šah" 3 in 3 |
+| Zukertortovo, Ponzianijevo | z said as z (probe), heard "Zucker...", "Ponziani..." | `cukertortovo`, `poncijanijevo`: c 6 in 6 against 0 |
+| Nimzowitsch, -ev, -eva | "Nimzovitševa" (probe), heard "Nimzovićskeva", "Njimsovicka" | `nimcovič`, `nimcovičev`...: "Nimcovićeva" 3 in 3 |
+| Steinitz, Rubinstein, Bronstein, Spielmann (and -ov, -ova, -ovo) | s and ej: "Stejnic", "Rubinstejnova", "Spilman" (probe and round trip) | `štajnic`, `rubinštajn`, `bronštajn`, `špilman`...: š 6 in 6, 3 in 3, 5 in 6, 5 in 6 |
+| Tarrasch, Sämisch, Jaenisch (and their forms) | sch as "sk" or s + h: "Taraskova", "samizkova", "ja je neskog" | `taraš`, `zemiš`, `jeniš`...: no k in 15, against 5 in 9 |
+| Miesesovo, Diemerov, Kieseritzky(jev), Falkbeer(ov) | ie and ee as je: "Mjesecovo", "Kjeseretski", "Falkbjerov", 16 times in 18 (probe: "Dijemerov") | `mizesovo`, `dimerov`, `kizericki`, `falkberov`...: no je in 21 (Whisper hears "Fogbear" for Falkber 6 times in 9) |
+| Grünfeld, -ov, -ova, -ove, -ovo | u: "Grunfeldova" 3 in 3 (probe −0.01) | `grinfeld`...: i 6 in 6 |
+| Giuoco | the g said: "Gioco", "Giozofiano" | `đuoko`: "Duoco", "duoko" 6 in 6 |
+| Greco(v), Capablanca, Capablancin | c as ts: "Gretsov", "kapablancin" (probe: `Greko` +1.93) | `greko`, `grekov`, `kapablanka`, `kapablankin`: k 5 in 6 and 3 in 3 |
+| Maróczy, -jev, -jeva | cz as c: "Marocijave" 3 in 3 | `maroči`...: č or ć 6 in 6 |
+| Euwe, Euweov | "E-U-ov" 3 in 3 | `eve`, `eveov`: "evo ov", "EVOv" 2 in 3 |
+| Colle, Colleov, Colleovog | the e said: "Koleov" (probe), heard "Coleov", "Kole of" | `kol`, `kolov`, `kolovog`: no e in 6 |
+| Birdovo, Milesova, McCutcheon(ov) | as Croatian letters (probe: "Bird", "Milesova", "Makkačon") | `berdovo`, `majlsova`, `mekačon`: heard "berdovo", "Melsova", "mekačan" 2 in 3 each |
+| Stonewall, Stonewalla, Grand Prix | the e said ("Stonevala", probe); the d and the x said ("Priks", probe) | `stounvol(a)`, `gran`, `pri`: two syllables ("ston vol", "Stonvola"); no x 2 in 3 (Whisper writes "Stonewall", "Grand Prix" for both) |
+
+- Parakeet missed 84 % of the words on this voice: the main round trip is Whisper medium set to `hr`, 300 lines (seed 0,
+  15 % of 4,488 words missed), then 3 seeds on 80 lines (the reviewers' list, 18 A/B pairs of opening names in "Na
+  ploči je X, a zatim Y.", the file letters in hard positions with A/B variants, the L, numbers, the words missed
+  most), and on 53 lines of fixes in the game's own lines with the plain form beside the doubtful ones; probes (4
+  seeds) on about 150 readings. Eponyms get every possessive form the composed opening names make ("{X:gen}a
+  varijanta", "{X:gen}o otvaranje").
+- Checked and fine: the letters be ce de ef ge (heard as notation), ha ("poljeha osam" 5 in 6; `haa` 6 in 6,
+  too close to call), el, Hmm (hummed), Vau, Oh, Joj, Bravo, Elo, rejting ("rating"), šah alone and "Daj šah" (probe:
+  `šak` +3.24), crni, bijeli (the ije diphthong, probe near "bjeli", as spoken Croatian has it), žrtva, the numbers
+  (jedanaest to devetnaest, 34., 47., 64, 68, 92 and 100 posto, plus jedan zarez pet, minus nula zarez tri). Names
+  read well as written: Caro-Kann ("Karo", probe), Philidor and Morphy (f), Owen ("Ouenova", probe), Horwitz (c),
+  Réti, Winawer and Tartakower (v), Marshall, Traxler (ks), Scheveningenska (š), Schliemann (heard "Šlimanova"),
+  Richter (h), Rauzer, Bongcloud ("Bongklaud"), Trompowsky, Torre ("Torijov", the glide), Fischer, Schlechter,
+  Stafford, Smith-Morrin ("Smit"), Breyer ("Brejer"), Janowski, Staunton, Max Lange, Anderssen, Paulsen, Fegatello,
+  Najdorf, and the Russian names in Croatian spelling.
+- Left as is: the file letter e after a vowel gets a glide ("polje e četiri" heard "polje je četiri"; `ee` heard as
+  e 2 times in 9). Nimzo-Larsenov (`Nimco` heard "Nimko" 3 in 3) and nimzoindijska keep the z. Van't Kruijsovo and
+  Van Geetovo (`Krajsovo` heard "Christ'o", "Crysovo"; `Hetovo` "Hat'o"), Halloween (`Helovin` heard "Helving",
+  "hell of a"), Fajarowiczeva and Blackmar (`Fajarovičeva`, `Blekmar`) were heard no better than as written.
+  pogreška and its forms are close calls: heard "pograšku", "pogroške" 7 times in 18, 4 of them on one seed (probe:
+  `pograške` −0.18). napadnut(a) has the same o-like u (probe), but `napadnuuta` did no better (o 2 in 3). "Damin
+  gambit" is heard "Damien", "damning" (probe near "Damen"); `Damiin` the same. epoletni after "zove" loses its e
+  ("zove poletni"), the vowels meeting. "{move}, šah" before a word was not judged.
+- Recogniser habits: Whisper writes ije and je loosely (bjeli, pobijeda, svjetla), Italian and English spellings
+  ("variante", "fianchetto", "rating", "Remy", "Halloween", "Grand Prix", "Stonewall", "Capablanca"), č for ć and back,
+  m as b ("daba", "pobakni"), a final u as o now and then (napadnot, otvoreno), squares and numbers as notation
+  ("na a šest" as "na 6", "e" after a vowel as "je"), and a known name in its own spelling whatever the voice says:
+  check a name with the probe.

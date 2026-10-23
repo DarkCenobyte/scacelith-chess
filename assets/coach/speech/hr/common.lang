@@ -496,9 +496,10 @@ owner.black.pt2 = {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The Croatian letter names, as players read squares: e4 = "e četiri", f3 = "ef tri", h7 = "ha sedam",
-# c5 = "ce pet".
+# c5 = "ce pet". The a is said "aa": a lone "a" ran into the word before it ("To je a šest" heard
+# "To je šest", "na a šest" heard "na šest"; docs/PRONUNCIATION.md, Croatian).
 square.spoken = {file} {rank}
-file.a.spoken = a
+file.a.spoken = aa
 file.b.spoken = be
 file.c.spoken = ce
 file.d.spoken = de
@@ -538,7 +539,103 @@ moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
 # Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
-# pronunciation pass.
+# pronunciation pass (docs/PRONUNCIATION.md, Croatian). Foreign names are spelled as Croatian players
+# say them; an eponym's possessive forms each need their own entry, the composed opening names
+# included ("{X:gen}a varijanta", "{X:gen}o otvaranje": assets/coach/openings/hr.lang).
+# "Ups!" was heard "Ips"; the u of "obrnutim" (long in "obrnūt") was said like an o; "en passant" was
+# said with its t ("an" for "en" ran into the word before it, so "en" stays):
+respell.ups = uups
+respell.obrnutim = obrnuutim
+respell.passant = pasan
+# German and Latvian: z = c, st = št, ei = aj, sch = š, tsch = č, ie = i, ee = e, ä = e, ü = i (it
+# said "Zukertortovo" with a z, "Rubinstejnova", "Taraskova", "Mijesesovo", "Falkbjerov", "Grunfeldova"):
+respell.zukertortovo = cukertortovo
+respell.nimzowitsch = nimcovič
+respell.nimzowitschev = nimcovičev
+respell.nimzowitscheva = nimcovičeva
+respell.nimzowitschevo = nimcovičevo
+respell.steinitz = štajnic
+respell.steinitzov = štajnicov
+respell.steinitzova = štajnicova
+respell.steinitzovo = štajnicovo
+respell.rubinstein = rubinštajn
+respell.rubinsteinov = rubinštajnov
+respell.rubinsteinova = rubinštajnova
+respell.rubinsteinovo = rubinštajnovo
+respell.bronstein = bronštajn
+respell.bronsteinov = bronštajnov
+respell.bronsteinova = bronštajnova
+respell.bronsteinovo = bronštajnovo
+respell.spielmann = špilman
+respell.spielmannov = špilmanov
+respell.spielmannova = špilmanova
+respell.spielmannovo = špilmanovo
+respell.tarrasch = taraš
+respell.tarraschov = tarašov
+respell.tarraschova = tarašova
+respell.tarraschove = tarašove
+respell.tarraschovo = tarašovo
+respell.sämisch = zemiš
+respell.sämischov = zemišov
+respell.sämischova = zemišova
+respell.sämischovo = zemišovo
+respell.jaenisch = jeniš
+respell.jaenischov = jenišov
+respell.jaenischova = jenišova
+respell.jaenischovo = jenišovo
+respell.miesesovo = mizesovo
+respell.diemerov = dimerov
+respell.falkbeer = falkber
+respell.falkbeerov = falkberov
+respell.falkbeerova = falkberova
+respell.falkbeerovo = falkberovo
+respell.kieseritzky = kizericki
+respell.kieseritzkyjev = kizerickijev
+respell.kieseritzkyjeva = kizerickijeva
+respell.kieseritzkyjevo = kizerickijevo
+respell.grünfeld = grinfeld
+respell.grünfeldov = grinfeldov
+respell.grünfeldova = grinfeldova
+respell.grünfeldove = grinfeldove
+respell.grünfeldovo = grinfeldovo
+# Italian: z = c, gi = đ, c = k before o (it said "Ponzijanijevo", "Gi-uoko", "Gretsov"); Spanish
+# c = k ("Kapablancin" with a c):
+respell.ponzianijevo = poncijanijevo
+respell.giuoco = đuoko
+respell.greco = greko
+respell.grecov = grekov
+respell.grecova = grekova
+respell.grecovo = grekovo
+respell.capablanca = kapablanka
+respell.capablancin = kapablankin
+respell.capablancina = kapablankina
+respell.capablancino = kapablankino
+# Hungarian and Dutch: cz = č ("Marocijeva"), eu = e ("E-U-ov"):
+respell.maróczy = maroči
+respell.maróczyjev = maročijev
+respell.maróczyjeva = maročijeva
+respell.maróczyjevo = maročijevo
+respell.euwe = eve
+respell.euweov = eveov
+respell.euweova = eveova
+respell.euweovo = eveovo
+# English and French, the letters said as Croatian ones: Bird, Miles, McCutcheon, Stonewall ("Stonevol",
+# the e said), Colle (the e said: "Koleov"), Grand Prix (the d and the x said):
+respell.birdovo = berdovo
+respell.milesova = majlsova
+respell.mccutcheon = mekačon
+respell.mccutcheonov = mekačonov
+respell.mccutcheonova = mekačonova
+respell.mccutcheonovo = mekačonovo
+respell.stonewall = stounvol
+respell.stonewalla = stounvola
+respell.colle = kol
+respell.colleov = kolov
+respell.colleova = kolova
+respell.colleovo = kolovo
+respell.colleovog = kolovog
+respell.grand = gran
+respell.prix = pri
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words (masculine nominative). 21-99 compose as "{tens} {units}" ("dvadeset jedan";
