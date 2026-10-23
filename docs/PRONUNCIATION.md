@@ -763,3 +763,48 @@ voice's sake.
   "tvoj", squares and numbers as notation ("D5", "polehá 8"), splits and joins ("proti gambit", "hra je", "boju
   je"), and known names in their own spelling ("Halloween", "Grand Prix", "Marshal", "Steinitz") whatever the
   voice says: check a name with the probe. A line's first word after a colon is often lost.
+
+## Romanian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| en passant | "ien pasant", with the t: heard "Ien pasant", "pasand", "pasunt", a t 5 times in 6 | `an pasan` (respell.en, respell.passant): no t 8 times in 9 ("an pasan", "anpasan") |
+| Pirc | "pirk" (probe: Pirk +0.03, Pirț +3.20), heard "PIRC" 3 times in 3 | `pirț` (respell): "Pirtz", "pierți" 2 in 3 |
+| Najdorf, Fajarowicz | the j of "joc" (probe: nearest "Nadjdorf", "Fajarovicz"), heard "na H2", "fajarovics", "fără JaroX" | `naidorf`, `faiarovici` (respell): "Naidorf", "n-ai dor" 2 in 3; "-vici"/"-vic" 3 in 3 |
+| Winawer | "winauer" (probe), heard "Wienauer", "win hour" 3 times in 3 | `vinaver` (respell): "vinăver", "Vinavar", no au in 3 |
+| Kruijs (Van't Kruijs) | "kru-ijs", heard "creas", "Crease", "cruijs" | `crăis` (respell): "Crais", "Creis" 3 in 3 |
+| Geet (Van Geet) | the g of "ger" (probe: nearest "Djeet"), heard "ghid", "Jeet" | `heet` (respell): "Hit" 3 in 3 |
+| Mieses, Diemer (Blackmar-Diemer) | "mi-e-ses", "di-e-mer": heard "miestes", "de Emer" | `mizes`, `dimer` (respell): "mizes", "Mises" 3 in 3; "Dimer" 2 in 3 |
+| Bird | as written (probe: Börd, Bărd far), heard "bieurde", "biurt" | `bărd` (respell): "bărdă", "băt", "Bird" |
+| Ponziani | with a z (probe: Ponțiani +0.96), heard "Ponsiani", "ponzian" | `ponțiani` (respell): "Pontian", "Pontiani" 3 in 3 |
+| Lange (Max Lange) | the g of "ger" (probe: nearest "Lanje"), heard "Lunge" 2 times in 3 | `langhe` (respell): "Langa" 3 in 3 |
+| Grand Prix, Halloween | the d and the x (probe: nearest "Gran Prics", +5 from "Gran Pri"); w as v ("Haloveen") | `gran`, `pri`, `helouin` (respell): Whisper writes "Grand Prix", "Halloween" 3 times in 3 either way |
+
+- Parakeet missed 73% of the words; the round trips are Whisper medium set to `ro`: 300 lines (seed 0; a third of the
+  words come back wrong even with the diacritics ignored), then 3 seeds on 35 lines (the reviewers' list, file letters,
+  the L, numbers, the words missed most, A/B variants) and on 9 pairs of lines of eponyms with their respellings, 1 seed
+  on 19 lines holding the other opening names and eponyms, and probes (4 seeds) for every name and doubtful word.
+- Checked and fine: regele (probe: the g of "ger"; "regile" is the recogniser's), "litera e" and "pe e patru" (probe:
+  nearest "é", not "ie"), a be ce de ef ge haș (C4, D5 3 in 3, "a trei" 3 in 3), le for the L, the numbers (11, 14, 34,
+  "șaptezeci și una", "nouăzeci și nouă", "plus unu virgulă cinci", written as the right digits), Hm (probe: "Hmm"),
+  Uau (one syllable, probe), Elo (one word, not "ie-lo" nor letters), blitz, tempo, Mut-o, Câștig-o (probe:
+  "Muto", "Câștigo"), Hopa (h said), o sută, Philidor ("Filidor"), Grünfeld ("Grünfelt"), Schliemann ("Șliman" in
+  context), Tarrasch ("Taraș"), Trompowsky, Owen ("Ouen"), Horwitz, Réti, Richter ("Rihter"), Smith ("Smit"), Morphy
+  ("Morfi"), Maróczy (heard "Maroții" 3 in 3), Sämisch ("Semiș"), Bongcloud, Traxler, Carlsbad, Steinitz, Rubinstein,
+  Marshall, and in the round trip Caro-Kann, Alehin, Alapin, Taimanov, Sveșnikov, Rossolimo, Meran, Evans, Richter-Rauzer,
+  Sozin, From, Zaițev, Cigorin, Botvinnik, Bogoliubov, Richter-Veresov, Pterodactil, Hipopotam, Torre, Englund.
+- Left as is: fianchetto leans to "fiancetto" in the probe (alone and in "face fianchetto cu"), but was heard with a k
+  ("anchetă") and `fianketto` did no better (one "fianchetto" in 3 each). Scheveningen is read "skeveningen" (probe);
+  `Șeveninghen` was heard the same ("cheveningă"). Stonewall is read "stonevall", but heard "Stonewall" 2 in 3 and
+  `Stounuol` worse; Jobava (the j of "joc") and Miles ("mi-les") were heard no better as `Giobava` and `Mails`.
+  Nimzowitsch and Zukertort keep a z (heard "nimzovic", "zucărtort"), as many Romanian players say them; Colle keeps its
+  e ("Cole", probe); Breyer is a close call ("Breier"). A line-initial "Șah" before a word loses its h ("Șah dublu" near
+  "Șa dublu", probe; heard "Dacă dublu", "Ce-a înseamnă" 5 times in 6), with no other spelling; inside a line and in
+  "Șah mat" the h is said. The u of "mutare" is heard "o" about one time in three ("motare"); the probe cannot tell u from
+  o, and `muutare` did no better. "pioni" ends with a vowel heard (probe near "pionă"), heard "pion" or "pionii";
+  "partide", "partidele" are heard "partii de", "partitele" nearly always (a tie in the probe). câmp is said close to
+  "cămp" (probe); "cîmp" is read otherwise.
+- Recogniser habits: it drops the diacritics (ș, ț, â, ă; ş with a cedilla), writes Negrul as "Negru-l", a line-initial
+  "Dama" as "Da, ma" (the probe has "Dáma"), "dama ta" as "damata", "Hopa" as "Opa", regele as "regile", Albul as
+  "Arbul", squares and numbers as notation ("F7", "30 și 4"); it drops a line's first words and loops on some long lines
+  ("adesea adesea ...").
