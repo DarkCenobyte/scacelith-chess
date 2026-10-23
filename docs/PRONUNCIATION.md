@@ -865,3 +865,45 @@ voice's sake.
   their own spelling whatever is said (Evans, Trompowsky, Grand Prix, Halloween, Stafford, Saragossa), so check
   a name with the probe. It hears "a Sz…" as "az" and splits words ("veszi célba" as "veszít szélba"). It often
   loses the first word of a short line.
+
+## Indonesian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetto (and Varian Fianchetto) | the c of "cari": heard "Vian Ceto", "fianceto", "Vian C-37" 3 times in 3, "viancetto", "sian chetel" in the first round trip (probe: nearest "fiancetto", "fiansyetto") | `fianketo` (respell.fianchetto): "fianketo", "Vian Keto", a k 9 times in 9 (`fianketto` the same) |
+| Capablanca | the same c: heard "capa belanja", "pencapa belanca" 3 times in 3 (probe: nearest "Capablanka") | `kapablanka` (respell): "kapa belangka", "Kampablanka" 3 in 3 |
+| Giuoco (Piano, Pianissimo) | a syllable too many, "ji-u-o-ko" (probe: nearest "Jiuoco"), heard "dua kopiano", "diwaku piano" | `juoko` (respell): "Joko Piano", "Joko Pianissimo" 5 in 6 |
+| blunder | as written, "blun-der": heard "blunder" 4 times in 9, "belum dah", once "Blender" (probe: far from "blander"), where Indonesian players say the English word | `blander` (respell): "blander" 5 in 9, "blender" 3, never "blunder" |
+| Elephant (Gambit Elephant) | the t said, the ph once a p: "Elefant", "elepant" | `elefan` (respell): "elefan" 3 in 3, "Elephant" 3 in 3 in "Aku membuka dengan Gambit Elefan" |
+| Grand Prix | the x said (probe: nearest "Gran Priks", +5 from "Gran Pri") | `pri` (respell.prix): Whisper writes "Grand Prix" 3 times in 3 either way |
+| huruf e (lesson.welcome.wrong) | the letter alone: heard "ini", "I", "rofi", "E" once in 6 | `huruf é` (.spoken): "huruf E" 4 in 6 |
+
+- Round trip over 300 lines (Whisper medium set to `id`, seed 0), then 3 seeds on about 120 lines: the words
+  missed in more than a third of their uses, the reviewers' list, the file letters and the L, the numbers, A/B
+  variants of every candidate, 8 opening names in carrier sentences, and every fix in real lines; 1 seed on
+  32 lines holding 95 other opening names and eponyms; probes (3-4 seeds) for 70 names and the doubtful words.
+  The voice reads Latin letters with their Indonesian values (c is "ch", j "dj"), but it knows
+  most chess names: check a new eponym with a c, ch, gi or x first.
+- Checked and fine: skak (probe: "ska(k)", no vowel added; Whisper writes "sekak", "Ska", "Scott"), skakmat, en
+  passant (said without the t: "enpasan", "empasan" 6 in 6; `ang pasang`, `an pasan` no better), pat (probe:
+  nearest "Pet", "Pad"), el for the L ("huruf L" 5 in 6; `él` the same), a and ha said alone, the numbers (64, 11,
+  19, 37, 99, 118, langkah ke-12, ke-34, ke-19, plus dua koma tiga, minus satu koma lima, 92 persen: written as the
+  right digits), Elo, rating, blitz, tempo, momen, epolet, remis, rokade (the final é said: "Rokadeh"; `rokadé` no
+  better), lho, Hmm, "saya rapikan", "Lima plus tiga" (5+3). Names: Caro (probe: = "Karo"), Colle ("Kol"), Greco,
+  Chigorin, Philidor ("Filidor"), Morphy ("Morfi"), Bird ("Berd"), Diemer, Mieses ("Mises"), Richter ("Rikhter"),
+  Alekhine (heard "Alehin" 3 in 3; `Alekhin` no better), Najdorf ("Night Dwarf", "Najdorf"; `Naidorf` no better),
+  Carlsbad ("Karlsbad"), Sveshnikov, Scheveningen ("Syeveningen"), Schliemann, Schlechter, Steinitz, Rubinstein,
+  Kieseritzky, Zaitsev, Averbakh, Petrosian, Smyslov, Spassky, Kasparov, Paulsen, Zukertort, Horwitz, Trompowsky,
+  Ponziani, Blackmar, Traxler, Falkbeer, Stafford, Evans, Owen, Pterodaktil (p silent), Ruy Lopez, Bongcloud,
+  Stonewall, Saint George, Staunton, Max Lange, Breyer, Janowski, Grünfeld, Leningrad, Fajarowicz, Miles.
+- Left as is: the file letter e is weak before "empat" (heard "yang empat", "Y4", "I4"): E heard 7 times in 42,
+  the letter lost twice; `é` was heard E 7 times in 36 but lost 9 times, `è` 9 in 36 (lost 4), `E` 2 in 12. After
+  "pion" it comes through ("pion e lima" 2 in 3). Ups is said "aps" (heard "Aps" 6 in 6; probe unstable over
+  seeds); `Uups` was heard "Waps". Kruijs is read "Kruis" (probe), but `Krais` was heard no better ("pancris"
+  against "pancruise"). Fried Liver ("Fraid", heard "Fright Lever"; `Fraid Lifer` no better), Tarrasch (no
+  candidate close; heard "Taras"), Sämisch ("Samis", heard "semis"), Winawer (w said, "win hour"), Parham (h
+  said), Maróczy ("Marochi", a close call with "Marotsi"), Euwe, Bogoljubow and Jaenisch (garbled, no candidate).
+- Recogniser habits: it writes squares and numbers as notation and a lone e as "yang" ("yang 4"); it splits -ku
+  and -mu ("kuda ku", "langkah mu"), writes tahu as "tau", lho as "loh", klub as "club", Sisilia as "Sicilia",
+  pat as "empat" or "But", skak as "sekak" or "sekar"; it garbles the first word of a line on some seeds ("Putih"
+  as "Hoti", "Butuh") and invents text for one-word lines (an eponym alone).

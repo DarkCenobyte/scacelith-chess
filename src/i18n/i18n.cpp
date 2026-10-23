@@ -75,7 +75,7 @@ void ensureEnglish() {
 const std::vector<Language>& languages() {
     static const std::vector<Language> list = {
         {"en", "English", false},
-        {"id", "Bahasa Indonesia", false, false},
+        {"id", "Bahasa Indonesia", false},
         {"cs", "\xC4\x8C" "e\xC5\xA1tina", false},                                   // Čeština
         {"da", "Dansk", false},
         {"de", "Deutsch", false},
