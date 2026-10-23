@@ -7,7 +7,8 @@
 # while saying the word right after the mark.
 # Pieces written by hand are capitalised (Vua, Hậu, Xe, Tượng, Mã, Tốt). Numbers and ranks are
 # written in words ("hàng thứ bảy"), so only the lines with a file letter or the letter L need a
-# ".spoken" line (h = "hát", L = "e-lờ", as Vietnamese spells Latin letters).
+# ".spoken" line (h = "hát", L = "e-lờ", as Vietnamese spells Latin letters; a = "A" in capital, which
+# the voice says as a full letter after a vowel, as file.a.spoken does).
 
 # ---- Chapter titles (said inside "Chúng ta tiếp tục với phần {chapter}.") ------------------------------
 # Lowercase noun phrases (see event.lesson.* in events.lang).
@@ -69,7 +70,7 @@ lesson.welcome.hello = Xin chào! Tôi là huấn luyện viên của bạn. Ch�
 lesson.welcome.board = Đây là bàn cờ: sáu mươi tư ô sáng và tối, gồm tám hàng, mỗi hàng tám ô.
 lesson.welcome.light = Ô ở góc phía tay {@}phải của bạn luôn là ô sáng màu. Hãy nhớ: bên phải là ô sáng.
 lesson.welcome.files = Các đường dọc được gọi là cột. Mỗi cột mang một chữ cái, từ {@}a đến {@2}h.
-lesson.welcome.files.spoken = Các đường dọc được gọi là cột. Mỗi cột mang một chữ cái, từ {@}a đến {@2}hát.
+lesson.welcome.files.spoken = Các đường dọc được gọi là cột. Mỗi cột mang một chữ cái, từ {@}A đến {@2}hát.
 lesson.welcome.ranks = Các đường ngang được gọi là hàng. Mỗi hàng mang một con số, từ {@}một đến {@2}tám, bắt đầu từ phía bạn.
 lesson.welcome.square = Tên của mỗi ô gồm chữ cái trước, con số sau. Ô này là ô {sq}.
 lesson.welcome.square2 = Còn ô này là ô {sq}.

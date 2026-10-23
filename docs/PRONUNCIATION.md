@@ -907,3 +907,37 @@ voice's sake.
   and -mu ("kuda ku", "langkah mu"), writes tahu as "tau", lho as "loh", klub as "club", Sisilia as "Sicilia",
   pat as "empat" or "But", skak as "sekak" or "sekar"; it garbles the first word of a line on some seeds ("Putih"
   as "Hoti", "Butuh") and invents text for one-word lines (an eponym alone).
+
+## Vietnamese
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter g (squares: "giê bảy") | inside a sentence, the diphthong of "giết": "Tượng ở dia bảy", "Mã diễn năm" (probe: "Tượng ở giê bảy" nearest "di bảy", "dê bảy" farthest); heard "dìa", "diễn", "giới", "yên" 12 times in 33 | `dê` (respell.giê), how the letter's name sounds: 3 times in 33 |
+| the file letter a (squares, "từ a đến hát") | after a vowel it melts into it: "Đen đi a sáu" heard "Đen đìa sáu", "ô a sáu" heard "O6", "ra a năm" heard "ra à năm" | `A` in capital (file.a.spoken, lesson.welcome.files.spoken): the letter heard 23 times in 33 against 11; the probe puts "A" next to a long "a a", not "ây" |
+| Winawer | the English w: "Wienauer", "Weenauer", "WeNower" (8 of 9) | `Vinaver` (respell): "V-never", "Viennese", "B-never", a v or b 4 times in 6 |
+| Bogoljubow | the English j: "Bogo Jubo", "Bokojubo" (5 of 6) | `Bogoliubov` (respell): "Bogo Liu Bof", "Bogolyubov", the l 3 times in 3 |
+| Bird | "biết", "biệt", "bước", never the vowel ơ in 9 (probe: nearest "Biết") | `Bớt` (respell): "bớt" 4 times in 6 |
+| Grand Prix | the x said (probe: nearest "Priks", "Pri" far) | `Pri` (respell.prix): still heard "Grand Prix" 3 times in 3 |
+
+- Main round trip: 300 lines (Whisper medium set to `vi`, seed 0), 36% of the words missed, most of them in lines
+  the recogniser garbled or replaced with a phrase of its own ("Cảm ơn các bạn đã xem video"). Then 3 seeds on 144
+  lines: the file letters in two contexts each, the L, the numbers, ordinals, decimals and percentages, the
+  reviewers' list, 113 opening names and eponyms in "Hôm nay chúng ta học X, Y và Z.", the coach lines missed most,
+  A/B variants of each fix; and probes (4 seeds). The opening texts take the capital A when
+  tools/gen_opening_lang.py runs again (respell.* apply to them already).
+- Checked and fine: e, bê, ép, hát (as notation: E4, B5, F7, H8), xê (heard "xe" 5 times in 6, the probe puts it
+  next to "sê"), đê (heard "đây", "đề", D1), "e-lờ" (L 6 times in 6), Elo, Philidor ("Philido", no r, 6 in 6),
+  Robot, Hừm ("Hừng", "Ừm"), Ối ("Ôi"), the quote marks (not said), 11 to 98, "thứ nhất", "thứ hai mươi tư",
+  "phần trăm", "cộng hai phẩy ba", "trừ một phẩy năm", gambit (probe: "gam bít"), fianchetto (probe: nearest
+  "fianketto"), Grünfeld ("Grunfeld"), Vienna (probe: "Viên-na"; the recogniser writes "Việt Nam"), Tal ("Ta",
+  "Tan"), Giuoco ("Joko"), Caro-Kann, Zukertort ("du-kơ-tốt"), Trompowsky ("Chom-", the Vietnamese tr), Réti
+  (the Vietnamese r: "Jetty"), and the other names of the list, heard close to their spelling.
+- Left as is: Tartakower, Nimzowitsch, Trompowsky, Horwitz (the w: close calls in the probe, "Tartakover" heard
+  "TataCover" both ways), Fajarowicz (garbled either way), "ghim" (heard "game" 3 times in 3; no candidate closer
+  in the probe), the tones the recogniser hears otherwise (Mã as "má", Hậu as "hầu", cộng as "cổng"), "mươi"
+  heard as "mười" now and then ("bảy mươi mốt" as "bảy 11"), "Tượng" starting a sentence heard "Tựa". Some long
+  lines come out garbled at some seeds (lines with ":" or ";" lose 40-46% of their words against 28-30%).
+- Recogniser habits: squares as notation ("ô e bốn" as "OE4"), ê as e ("êm đềm" as "em đềm", xê as "xe"), the
+  tones, tr/ch and d/gi/r merged ("trừ" as "chứ", "giành" as "dành"), "bắc cầu" as "bắt cầu", short lines and
+  interjections dropped or replaced, loops on long lines ("tượng tượng tượng"), names in English spellings
+  ("Civilization" for Scheveningen).
