@@ -648,7 +648,104 @@ moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
 # Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): added by the
-# pronunciation pass.
+# pronunciation pass (docs/PRONUNCIATION.md, Slovenian). The voice reads foreign names letter by
+# letter as Slovenian: they are spelled as Slovenian players say them. Every form that occurs needs
+# its own entry (an eponym's possessive also takes -a and -o in the composed names: "{X:gen}a
+# varianta", "{X:gen}o nadaljevanje").
+# The file letter e (squares, "kmeta e", "črka e"): a lone "e" after a vowel melts into it or is heard
+# as "je" ("na polju e štiri" heard "na polju je štiri"); "ee", the long letter name, is heard as the
+# e-file more often. Here rather than in file.e.spoken so that the opening texts say it too:
+respell.e = ee
+# "Hm," before a sentence was said as a syllable (heard "Kom", "Komen"); "Hmm," is hummed:
+respell.hm = hmm
+# English and French loans: "rating" is said "rejting" (it read the letters); the t of "passant" is
+# silent (it said "pasant"; the lines with "en passant" say "an pasan" in their .spoken form):
+respell.rating = rejting
+respell.passant = pasan
+# Spanish and Italian: c = k before a, o (it said "Caro" and "Greco" with c = ts), gi = dž:
+respell.caro = karo
+respell.capablanca = kapablanka
+respell.capablancov = kapablankov
+respell.capablancova = kapablankova
+respell.capablancovo = kapablankovo
+respell.greco = greko
+respell.grecov = grekov
+respell.grecova = grekova
+respell.grecovo = grekovo
+respell.giuoco = džuoko
+# German: z = c, st and sp = št and šp, ei = aj, sch = š, ie = i, ä = e, ü = i, ee = e (it read them
+# as Slovenian letters: "Zukertortova", "Stejnic", "Rubinstejn", "Taras-heva", "Mijesesova",
+# "Falkbe-er"):
+respell.zukertortova = cukertortova
+respell.steinitz = štajnic
+respell.steinitzev = štajnicev
+respell.steinitzeva = štajniceva
+respell.steinitzevo = štajnicevo
+respell.rubinstein = rubinštajn
+respell.rubinsteinov = rubinštajnov
+respell.rubinsteinova = rubinštajnova
+respell.rubinsteinovo = rubinštajnovo
+respell.spielmann = špilman
+respell.spielmannov = špilmanov
+respell.spielmannova = špilmanova
+respell.spielmannovo = špilmanovo
+respell.tarrasch = taraš
+respell.tarraschev = tarašev
+respell.tarrascheva = taraševa
+respell.tarrascheve = taraševe
+respell.tarraschevo = taraševo
+respell.schliemann = šliman
+respell.schliemannov = šlimanov
+respell.schliemannova = šlimanova
+respell.schliemannovo = šlimanovo
+respell.sämisch = zemiš
+respell.sämischev = zemišev
+respell.sämischeva = zemiševa
+respell.sämischevo = zemiševo
+respell.fischer = fišer
+respell.fischerjev = fišerjev
+respell.fischerjeva = fišerjeva
+respell.fischerjevo = fišerjevo
+respell.jaenisch = jeniš
+respell.jaenischev = jenišev
+respell.jaenischeva = jeniševa
+respell.jaenischevo = jeniševo
+respell.miesesova = mizesova
+respell.diemerjev = dimerjev
+respell.kieseritzky = kizericki
+respell.kieseritzkyjev = kizerickijev
+respell.kieseritzkyjeva = kizerickijeva
+respell.kieseritzkyjevo = kizerickijevo
+respell.grünfeld = grinfeld
+respell.grünfeldov = grinfeldov
+respell.grünfeldova = grinfeldova
+respell.grünfeldovo = grinfeldovo
+respell.falkbeer = falkber
+respell.falkbeerjev = falkberjev
+respell.falkbeerjeva = falkberjeva
+respell.falkbeerjevo = falkberjevo
+# Polish cz = č:
+respell.fajarowiczeva = fajarovičeva
+# English and French names (it said "Ovenova", "Birdova", "Mi-le-sova", "Sta-unton", "Haloveen",
+# "Stonevall", "Grant Priks"):
+respell.owenova = ouenova
+respell.birdova = berdova
+respell.milesova = majlsova
+respell.staunton = stonton
+respell.stauntonov = stontonov
+respell.stauntonova = stontonova
+respell.stauntonovo = stontonovo
+respell.mccutcheon = mekačen
+respell.mccutcheonov = mekačenov
+respell.mccutcheonova = mekačenova
+respell.mccutcheonovo = mekačenovo
+respell.halloween = helovin
+respell.stonewall = stounvol
+respell.grand = gran
+respell.prix = pri
+# Dutch: ui = aj, g = h:
+respell.kruijsova = krajsova
+respell.geetova = hetova
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. Slovenian says the units before the tens, in one word: 21 = "enaindvajset",
