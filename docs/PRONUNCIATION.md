@@ -707,3 +707,482 @@ voice's sake.
 - Recogniser habits: zwart as "zwaard", wit as "het", "dit", "met", zet as "z" (the letter's name), koning
   as "coding", dame as "daam", "duim"; ee as "de", "een"; ha as "A" (A8); gambiet as "gambit", "come
   beat"; Tarrasch as "Taras", -isch as "-ies" (right in Dutch); "min" as "met" after "ongeveer".
+
+## Czech
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| Hm, (before a sentence: "Hm, moje hrozba...") | a vowel: heard "Hem", "Hehm", "Hn", or lost (0 hums in 5); the probe puts it nearest "Hem" | `hmm` (respell.hm): hummed 7 times in 9. "Hm." alone was heard as a hum either way |
+| fianchetto, fianchetta, fianchettem, fianchetty | the Italian ch as č: "fiančeto" (probe: +0.34, `fianketo` +1.34) | `fianketo`, `fianketa`, `fianketem`, `fiankety` (respell.*): heard with a k 12 times in 12 (Whisper writes "fianchetto" for the plain word whatever is said) |
+| Giuoco | the g said: heard "gyuoko", "Geoxo", "Guoko" | `džuoko` (respell): "Djoko", "Duoko", "džuoko", "Jouko" |
+| Ponzianiho, Zukertortovo | the z as z or s ("Ponsianiho", "Sukertortovo", probe) | `poncianiho`, `cukertortovo`: c heard 5 in 6 and 6 in 6 |
+| Grecova, Grecův, Capablancova, Capablancův | c as ts: "Gretsův" (probe +0.01, `Grekův` +2.18), "Kapablancova" (heard "kapablancová" 3 in 3) | `grekova`, `grekův`, `kapablankova`, `kapablankův`: k heard 6 in 6 and 5 in 6 |
+| Steinitzova, Rubinsteinova, Spielmannova (and -ův) | as Czech letters: "Stajnicova", "Rubinstejnova", "Spijelmanova" (probe); heard "stejnicová" 3 in 3 | `štajnicova`, `rubinštajnova`, `špílmanova`...: š heard 6 in 6, 8 in 9, 2 in 6 |
+| Tarraschova, Tarraschovy, Tarraschův, Polotarraschova | s + ch: nearest "Tarasova" (probe +0.68, `Tarašova` +1.74) | `tarašova`...: š heard 6 times in 9 ("Tarašova", "starášovi") |
+| Schliemannova, Schliemannův, Sämischova, Sämischův | "Schlijeman", "Semischova" (probe); heard "Shrebanov", "škri manu", "semisková" | `šlímanův`, `zémišova`...: "šlimanův" 6 in 6, "zemišová" 6 in 6 |
+| Miesesovo, Kieseritzkého | ie as i-je: "Mijesesovo", "Kijeserického" (probe); heard "měsíce o", "k jezerického" | `mízesovo`, `kízerického`: "Mises" 6 in 6, "kízerického" 6 in 6 |
+| Grünfeldova, Grünfeldův | "Grunfeldova" (probe +0.01, `Grýnfeldova` +1.10); heard "Grunfeld" 4 in 6 | `grýnfeldova`, `grýnfeldův`: "Greenfeld" 6 in 6, no u |
+| Fajarowiczova | "Fajarovicova" (probe +0.03, `Fajarovičova` +0.40); heard "fajarovicevá" 2 in 3 | `fajarovičova`: no extra syllable in 6 (Whisper writes c or č) |
+| Philidorova, Philidorovou, Philidorův | ph as p: "Pilidorova" (probe +0.07, `Filidorova` +0.79); heard "Pjolidorová", "Pylidorová" | `filidorova`...: f heard 9 in 9 |
+| Marshallova, Marshallovu, Marshallův | s + ch: "Marschalův" (probe +0.17, `Maršalův` +0.51) | `maršalova`...: Whisper writes "Marshal" either way |
+| Milesova (výhra nad Karpovem) | "Mi-le-sova": heard "Melesová", "malasová" | `majlsova`: "Milesová" 3 in 3 in a short line, "Majasová" 3 in 3 in the opening text |
+| Halloweenský | "Haloveenský" (probe +0.18, `Helouvínský` +1.05); heard "halověnský", "halobjenský" | `helouvínský`: "Halloweenský" 5 in 6, against 4 in 6 |
+| Grand Prix | d and x said: "Grand Priks" (probe +0.09) | `gran`, `prí` (respell.grand, respell.prix): no x; Whisper writes "Grand Prix" either way |
+| Euweho | "Euveho" (probe); heard "uvehlo", "EUV", "EU-vehla" | `éveho`: "éveho" 5 in 6 |
+| Rétiho | soft t: "Réťiho" (probe −0.16, `Rétyho` +0.48) | `rétyho`: heard "Rétyho" 6 in 9 (Whisper's y for a hard t) |
+
+- Parakeet missed 73 % of the words on this voice; the main round trip is Whisper medium set to `cs`, 300 lines
+  (seed 0, 28 % of 4,519 words missed), then 3 seeds on 97 lines (the reviewers' list, 24 A/B pairs of eponyms in
+  "Tohle je X a tohle Y.", 53 more opening names and eponyms in lists, the file letters in squares, the L, numbers,
+  the words missed most), and 3 seeds on 30 lines of the fixes in the game's own lines and in opening.say
+  sentences, with the plain form beside the doubtful ones; probes (4 to 6 seeds) on about 90 readings.
+- Checked and fine: the file letters á bé cé dé é ef gé há (heard as notation), the L (`el`, probe; heard "L"),
+  Elo, blitz ("blic"), rapid ("rapit"), rating ("rejting"), Ouha ("ou-ha"), an pasan, „upravuji“, mat (the t said;
+  "Mat třetím" merges the two t), tah ("tach"), the numbers (92 %, 12, 13, 17, 19, 21krát, 34, 122, "plus jedna
+  čárka tři", "minus nula čárka pět", ordinals). The loanwords keep a hard d, t, n (probe): diagonála, aktivní,
+  etiketa, taktika, indická, motivy, tip, Benoni, Poncianiho, Štajnic, pianissimo. Names read well as written:
+  Caro-Kann ("Karo"), Fischer ("Fišer"), Schlechter (š), Falkbeer ("Falkbér"), Smith ("Smit"), Bongcloud
+  ("Bongklaud"), Breyer ("Brejer", as in Hungarian), Morphy (heard with an f 6 in 6, though the probe leans to a
+  p), Owen (heard "Owen" 4 in 6; `Ouenova` 5 in 6, a tie in the probe), Diemer ("Deemer" 3 in 3), Stonewall,
+  Trompowského, Horwitz, Torre, Maróczy, Staunton, Evans, Stafford, Parham, Janowski, Botvinnik, Najdorf,
+  Svešnikov, Rossolimo, Traxler, Englund, Jobava, Richter-Veresov, Rauzer, Sozin, Pterodaktylí, Bogoljubov,
+  Tartakower, Paulsen, Anderssen, Keres, Lasker, Lange, Nimcovič, Čigorin, Zajcev, Alapin, Aljechin, Petrosjan,
+  Spasskij, Kasparov, Karpov, Averbach, Bronštejn, Saragosa, Leningrad, Meran, From, Pirc, Borg, Grob, Sokolskij,
+  Albin, Tajmanov, Kan, Smyslov, Tal, Petrov, Panov, Winawer, Benko, Fegatello.
+- Left as is: partie, partii, partiích lean to a soft t alone and in "Dobrá partie!" but are ties or hard in other
+  contexts (probe, 7 contexts); `partyje` was heard "partie je" once in 3. kandidátní and kritický are ties
+  between hard and soft. Colle is said "Koleův" (the e said; probe −0.97), and `Kolův` was heard no better.
+  Jaenisch ("Ja-eniš"), McCutcheon ("Mekučeon"), Van't Kruijs ("Krujs"), Van Geet ("Gét"), Bird ("Birdovo"),
+  Scheveningen (near "Sceveningenská") and Blackmar are read as spelled: `Jénišův`, `Mekačenova`, `Krajsovo`,
+  `Chétovo`, `Bérdovo`, `Ševeningenská` and `Blekmar` were heard no better. The h-file after a vowel melts
+  into the word ("pole há osm" heard "polehá osm", "polená 8"): Czech h is voiced, as said; "tah á tři" is heard
+  "tahá tři" the same way.
+- Recogniser habits: Whisper writes voicing assimilation as heard (jezdcem "jestcem", zpět "z pět", then "z 5"),
+  Slovak and colloquial forms (pěšec "piešec", jezdci "jazdci", rychlý "rychlej", navrhuju "navrhuji"), the
+  wrong vowel length (pružné "průžné", pořadí "pořádí") and y for i (figurami "figurámy"), tvůj as "svůj" or
+  "tvoj", squares and numbers as notation ("D5", "polehá 8"), splits and joins ("proti gambit", "hra je", "boju
+  je"), and known names in their own spelling ("Halloween", "Grand Prix", "Marshal", "Steinitz") whatever the
+  voice says: check a name with the probe. A line's first word after a colon is often lost.
+
+## Romanian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| en passant | "ien pasant", with the t: heard "Ien pasant", "pasand", "pasunt", a t 5 times in 6 | `an pasan` (respell.en, respell.passant): no t 8 times in 9 ("an pasan", "anpasan") |
+| Pirc | "pirk" (probe: Pirk +0.03, Pirț +3.20), heard "PIRC" 3 times in 3 | `pirț` (respell): "Pirtz", "pierți" 2 in 3 |
+| Najdorf, Fajarowicz | the j of "joc" (probe: nearest "Nadjdorf", "Fajarovicz"), heard "na H2", "fajarovics", "fără JaroX" | `naidorf`, `faiarovici` (respell): "Naidorf", "n-ai dor" 2 in 3; "-vici"/"-vic" 3 in 3 |
+| Winawer | "winauer" (probe), heard "Wienauer", "win hour" 3 times in 3 | `vinaver` (respell): "vinăver", "Vinavar", no au in 3 |
+| Kruijs (Van't Kruijs) | "kru-ijs", heard "creas", "Crease", "cruijs" | `crăis` (respell): "Crais", "Creis" 3 in 3 |
+| Geet (Van Geet) | the g of "ger" (probe: nearest "Djeet"), heard "ghid", "Jeet" | `heet` (respell): "Hit" 3 in 3 |
+| Mieses, Diemer (Blackmar-Diemer) | "mi-e-ses", "di-e-mer": heard "miestes", "de Emer" | `mizes`, `dimer` (respell): "mizes", "Mises" 3 in 3; "Dimer" 2 in 3 |
+| Bird | as written (probe: Börd, Bărd far), heard "bieurde", "biurt" | `bărd` (respell): "bărdă", "băt", "Bird" |
+| Ponziani | with a z (probe: Ponțiani +0.96), heard "Ponsiani", "ponzian" | `ponțiani` (respell): "Pontian", "Pontiani" 3 in 3 |
+| Lange (Max Lange) | the g of "ger" (probe: nearest "Lanje"), heard "Lunge" 2 times in 3 | `langhe` (respell): "Langa" 3 in 3 |
+| Grand Prix, Halloween | the d and the x (probe: nearest "Gran Prics", +5 from "Gran Pri"); w as v ("Haloveen") | `gran`, `pri`, `helouin` (respell): Whisper writes "Grand Prix", "Halloween" 3 times in 3 either way |
+
+- Parakeet missed 73% of the words; the round trips are Whisper medium set to `ro`: 300 lines (seed 0; a third of the
+  words come back wrong even with the diacritics ignored), then 3 seeds on 35 lines (the reviewers' list, file letters,
+  the L, numbers, the words missed most, A/B variants) and on 9 pairs of lines of eponyms with their respellings, 1 seed
+  on 19 lines holding the other opening names and eponyms, and probes (4 seeds) for every name and doubtful word.
+- Checked and fine: regele (probe: the g of "ger"; "regile" is the recogniser's), "litera e" and "pe e patru" (probe:
+  nearest "é", not "ie"), a be ce de ef ge haș (C4, D5 3 in 3, "a trei" 3 in 3), le for the L, the numbers (11, 14, 34,
+  "șaptezeci și una", "nouăzeci și nouă", "plus unu virgulă cinci", written as the right digits), Hm (probe: "Hmm"),
+  Uau (one syllable, probe), Elo (one word, not "ie-lo" nor letters), blitz, tempo, Mut-o, Câștig-o (probe:
+  "Muto", "Câștigo"), Hopa (h said), o sută, Philidor ("Filidor"), Grünfeld ("Grünfelt"), Schliemann ("Șliman" in
+  context), Tarrasch ("Taraș"), Trompowsky, Owen ("Ouen"), Horwitz, Réti, Richter ("Rihter"), Smith ("Smit"), Morphy
+  ("Morfi"), Maróczy (heard "Maroții" 3 in 3), Sämisch ("Semiș"), Bongcloud, Traxler, Carlsbad, Steinitz, Rubinstein,
+  Marshall, and in the round trip Caro-Kann, Alehin, Alapin, Taimanov, Sveșnikov, Rossolimo, Meran, Evans, Richter-Rauzer,
+  Sozin, From, Zaițev, Cigorin, Botvinnik, Bogoliubov, Richter-Veresov, Pterodactil, Hipopotam, Torre, Englund.
+- Left as is: fianchetto leans to "fiancetto" in the probe (alone and in "face fianchetto cu"), but was heard with a k
+  ("anchetă") and `fianketto` did no better (one "fianchetto" in 3 each). Scheveningen is read "skeveningen" (probe);
+  `Șeveninghen` was heard the same ("cheveningă"). Stonewall is read "stonevall", but heard "Stonewall" 2 in 3 and
+  `Stounuol` worse; Jobava (the j of "joc") and Miles ("mi-les") were heard no better as `Giobava` and `Mails`.
+  Nimzowitsch and Zukertort keep a z (heard "nimzovic", "zucărtort"), as many Romanian players say them; Colle keeps its
+  e ("Cole", probe); Breyer is a close call ("Breier"). A line-initial "Șah" before a word loses its h ("Șah dublu" near
+  "Șa dublu", probe; heard "Dacă dublu", "Ce-a înseamnă" 5 times in 6), with no other spelling; inside a line and in
+  "Șah mat" the h is said. The u of "mutare" is heard "o" about one time in three ("motare"); the probe cannot tell u from
+  o, and `muutare` did no better. "pioni" ends with a vowel heard (probe near "pionă"), heard "pion" or "pionii";
+  "partide", "partidele" are heard "partii de", "partitele" nearly always (a tie in the probe). câmp is said close to
+  "cămp" (probe); "cîmp" is read otherwise.
+- Recogniser habits: it drops the diacritics (ș, ț, â, ă; ş with a cedilla), writes Negrul as "Negru-l", a line-initial
+  "Dama" as "Da, ma" (the probe has "Dáma"), "dama ta" as "damata", "Hopa" as "Opa", regele as "regile", Albul as
+  "Arbul", squares and numbers as notation ("F7", "30 și 4"); it drops a line's first words and loops on some long lines
+  ("adesea adesea ...").
+
+## Hungarian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetto, fianchettóba, fianchettókkal, fianchettós, fianchettót, fianchettóval | the Italian ch as cs: "fiancsetto" (probe −0.63); heard with a k 0 times in 8 ("fiancettóba", "fjancsettóba") | `fianketto`, `fiankettóba`... (respell.*, one per form): k heard 15 times in 21 |
+| en passant | the t said: nearest "en passzant" (probe); heard "Postant", "Passont", "paszont" (a t 6 or 7 times in 9), "en" as "M" or "nem" | `an`, `passzan` (respell.en, respell.passant): a t 2 times in 18 ("Ampaszan", "Azon passzan") |
+| Giuoco | gi as gy: "gijuoko" (probe); heard "gyózó" 3 in 3 | `dzsuokó`: "csókó", "Tsuoko" 6 in 6, never gy |
+| Ponziani | z as z: "Ponziáni" (probe −0.62); heard "pontzéni", "Ponziani" | `ponciáni`: c heard 6 in 6 ("Ponciányi") |
+| Aljechin | ch as k: "Aljekin" (probe, in a sentence); heard "a jekin", "aljekhinn" (k 2 in 3) | `aljehin`: h 5 in 6, never k |
+| Maróczy | cz as cs: heard "Marocsa", "Marócző" | `maróci`: "maró ci" 4 in 6, never cs |
+| Winawer, Euwe | w as u: "Vinauer", "Euve" (probe); heard "au" 2 in 3, "EU", "Új" | `vinaver`, `őve`: "au" 1 in 6; "őve" or "öve" 5 in 6 |
+| Mieses, Diemer, Kieseritzky, Schliemann | ie as i-je: "Mijeses", "Dijemer", "Kiesericki", "Slieman" (probe); heard "miéses", "miásos", garbled 3 in 3 | `mízesz`, `dímer`, `kízericki`, `slíman`: one i 6 in 6, 4 in 6, 6 in 6, 4 in 6 |
+| Larsen, Anderssen, Janowski, Trompowsky, Veresov, Saragossa, Rossolimo, Hippopotamus, Evans | s as the Hungarian s [ʃ] (probe: "Andersen", "Janovski", "Verezsov", "Saragosza", "Hipopotamus", "Evanzs"); heard "saragos a", "hip-hop-ot a most" | `larszen`, `anderszen`, `janovszki`, `trompovszki`, `vereszov`, `szaragossza`, `rosszolimo`, `hippopotamusz`, `evansz`: sz heard 5 in 6 (Larsen, Anderssen, Janowski against 1 in 3, Veresov), 2 in 3 (Saragossa, Trompowsky); Whisper writes "Evans", "Rosso Limo" either way |
+| Capablanca | the final c as c: "Kapablanca" (probe); heard 3 in 3 | `kapablanka`: k 3 in 6 |
+| Kruijs (Van't Kruijs), Bird | "Kruijsz", "Bírd" (probe); heard "Cruysz", "Cluis", "birt" | `kröjsz`, `börd`: "Kroisz", "Kreuz"; ö 3 in 6 |
+| Staunton, McCutcheon | "au" said ("Staunt on" 2 in 3); McCutcheon letter by letter ("Magcsottson") | `sztonton`, `mekkacsen`: no "au" ("Stonton", "Stanton"); "Mekacsen", "Megkacsen" |
+| Grand Prix | d and x said: "Grand Priksz" (probe +0.32, `gran pri` +4.94); once heard "Grand Prix Twix" | `gran`, `pri` (respell.grand, respell.prix): Whisper writes "Grand Prix" either way |
+
+- Parakeet missed 59 % of the words on this voice. The main round trip is Whisper medium set to `hu`: 300 lines
+  (seed 0), with 28 % of 4,560 words missed. Then 3 seeds on 108 lines: the reviewers' list, the plain form
+  beside each respelling, file letters, numbers and coach lines. Then 3 seeds on 20 lines of opening names in the
+  game's own sentences, and 3 seeds on 6 lines of üt against `űt`. About 100 readings were probed.
+- Checked and fine (probe or round trip): Philidor ("Filidor"), Caro–Kann (the dash makes no pause), Tarrasch
+  ("Taras"), Richter ("Rihter"), Morphy ("Morfi"), Fischer ("Fiser"), Schlechter ("Slehter"), Horwitz ("Horvic"),
+  Bongcloud ("Bongklaud"), Marshall, Rubinstein, Tartakower, Steinitz, Breyer, Paulsen, Max Lange, Parham, Smith,
+  Traxler, Fegatello, Pterodactyl, Colle ("Kolle"), Geet ("Gét"), Scheveningen, scheveningeni, karlsbadi, and
+  pianissimo ("pianiszimo"). Lasker and Keres keep the Hungarian s, as players say them. Also fine: rapid,
+  Hmm (hummed), El alakban, atól háig, Élő-pontszám, oppozíció, kontra, Filidor-védelemmel, „igazítok”
+  (the quotes are not read), tartsd (said "tarcsd", the native assimilation), the file letters C6 D7 G2,
+  h-vonal, g-gyalog, the numbers 71 %, 92 %, −1,5, 2,3, 34., 112, 12., 21., and 11 to 99 heard as digits.
+- Respellings that were tried and dropped, each heard no better or worse than the plain word:
+  - Zukertort as `cukertort`: heard "Kukertort" 3 in 3; the plain word is heard "Zukertolt".
+  - Nimzowitsch as `nimcovics`: garbled 6 in 6; the plain word is heard "Nimzovics".
+  - Fajarowicz as `fajarovics`: heard "Fire Robics".
+  - Spielmann as `spílman`: heard "Spirma".
+  - Sämisch as `zémis`: the z joins the article, heard "az émis"; the plain word is heard "szem is".
+  - Miles as `májlz`: the plain word is heard "Myles" 3 in 3.
+  - Stonewall as `sztónvol`, Blackmar as `blekmár`, Greco, Jaenisch: no better than the plain word.
+- Left as is:
+  - sakk is heard "sok", "shot", "sők" in every round (24 in 24). The probe puts it apart from "Sokk" and
+    "Säkk", and there is no other way to spell it.
+  - "Van" (Van't Kruijs, Van Geet) comes from the shared opening names and is also the verb "van" (143 lines),
+    so it cannot be respelled.
+  - üt and ütök are heard "öt" and "ötök". `űt` was heard as "visszaült" or "visszaölt" (rt3), so it was not
+    better.
+  - The voice's r is heard as l at times ("vezélet").
+  - A short u is heard as o ("centromot", "bábo"); the probe shows a tie.
+  - mögötte is heard "megötte".
+  - áll at a pause is heard "el"; the probe shows a tie.
+  - The file letter a melts into the word before it when that word ends in a consonant ("huszár a hat" heard
+    "huszára halt"). Writing á would name the wrong letter.
+- Recogniser habits: Whisper writes squares and numbers as notation, ty as tj ("bástják"), and doubles or drops
+  consonants ("husszár", "szillárd", "opozíció"). It gets í/i and ú/u length wrong. It writes known names in
+  their own spelling whatever is said (Evans, Trompowsky, Grand Prix, Halloween, Stafford, Saragossa), so check
+  a name with the probe. It hears "a Sz…" as "az" and splits words ("veszi célba" as "veszít szélba"). It often
+  loses the first word of a short line.
+
+## Indonesian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| fianchetto (and Varian Fianchetto) | the c of "cari": heard "Vian Ceto", "fianceto", "Vian C-37" 3 times in 3, "viancetto", "sian chetel" in the first round trip (probe: nearest "fiancetto", "fiansyetto") | `fianketo` (respell.fianchetto): "fianketo", "Vian Keto", a k 9 times in 9 (`fianketto` the same) |
+| Capablanca | the same c: heard "capa belanja", "pencapa belanca" 3 times in 3 (probe: nearest "Capablanka") | `kapablanka` (respell): "kapa belangka", "Kampablanka" 3 in 3 |
+| Giuoco (Piano, Pianissimo) | a syllable too many, "ji-u-o-ko" (probe: nearest "Jiuoco"), heard "dua kopiano", "diwaku piano" | `juoko` (respell): "Joko Piano", "Joko Pianissimo" 5 in 6 |
+| blunder | as written, "blun-der": heard "blunder" 4 times in 9, "belum dah", once "Blender" (probe: far from "blander"), where Indonesian players say the English word | `blander` (respell): "blander" 5 in 9, "blender" 3, never "blunder" |
+| Elephant (Gambit Elephant) | the t said, the ph once a p: "Elefant", "elepant" | `elefan` (respell): "elefan" 3 in 3, "Elephant" 3 in 3 in "Aku membuka dengan Gambit Elefan" |
+| Grand Prix | the x said (probe: nearest "Gran Priks", +5 from "Gran Pri") | `pri` (respell.prix): Whisper writes "Grand Prix" 3 times in 3 either way |
+| huruf e (lesson.welcome.wrong) | the letter alone: heard "ini", "I", "rofi", "E" once in 6 | `huruf é` (.spoken): "huruf E" 4 in 6 |
+
+- Round trip over 300 lines (Whisper medium set to `id`, seed 0), then 3 seeds on about 120 lines: the words
+  missed in more than a third of their uses, the reviewers' list, the file letters and the L, the numbers, A/B
+  variants of every candidate, 8 opening names in carrier sentences, and every fix in real lines; 1 seed on
+  32 lines holding 95 other opening names and eponyms; probes (3-4 seeds) for 70 names and the doubtful words.
+  The voice reads Latin letters with their Indonesian values (c is "ch", j "dj"), but it knows
+  most chess names: check a new eponym with a c, ch, gi or x first.
+- Checked and fine: skak (probe: "ska(k)", no vowel added; Whisper writes "sekak", "Ska", "Scott"), skakmat, en
+  passant (said without the t: "enpasan", "empasan" 6 in 6; `ang pasang`, `an pasan` no better), pat (probe:
+  nearest "Pet", "Pad"), el for the L ("huruf L" 5 in 6; `él` the same), a and ha said alone, the numbers (64, 11,
+  19, 37, 99, 118, langkah ke-12, ke-34, ke-19, plus dua koma tiga, minus satu koma lima, 92 persen: written as the
+  right digits), Elo, rating, blitz, tempo, momen, epolet, remis, rokade (the final é said: "Rokadeh"; `rokadé` no
+  better), lho, Hmm, "saya rapikan", "Lima plus tiga" (5+3). Names: Caro (probe: = "Karo"), Colle ("Kol"), Greco,
+  Chigorin, Philidor ("Filidor"), Morphy ("Morfi"), Bird ("Berd"), Diemer, Mieses ("Mises"), Richter ("Rikhter"),
+  Alekhine (heard "Alehin" 3 in 3; `Alekhin` no better), Najdorf ("Night Dwarf", "Najdorf"; `Naidorf` no better),
+  Carlsbad ("Karlsbad"), Sveshnikov, Scheveningen ("Syeveningen"), Schliemann, Schlechter, Steinitz, Rubinstein,
+  Kieseritzky, Zaitsev, Averbakh, Petrosian, Smyslov, Spassky, Kasparov, Paulsen, Zukertort, Horwitz, Trompowsky,
+  Ponziani, Blackmar, Traxler, Falkbeer, Stafford, Evans, Owen, Pterodaktil (p silent), Ruy Lopez, Bongcloud,
+  Stonewall, Saint George, Staunton, Max Lange, Breyer, Janowski, Grünfeld, Leningrad, Fajarowicz, Miles.
+- Left as is: the file letter e is weak before "empat" (heard "yang empat", "Y4", "I4"): E heard 7 times in 42,
+  the letter lost twice; `é` was heard E 7 times in 36 but lost 9 times, `è` 9 in 36 (lost 4), `E` 2 in 12. After
+  "pion" it comes through ("pion e lima" 2 in 3). Ups is said "aps" (heard "Aps" 6 in 6; probe unstable over
+  seeds); `Uups` was heard "Waps". Kruijs is read "Kruis" (probe), but `Krais` was heard no better ("pancris"
+  against "pancruise"). Fried Liver ("Fraid", heard "Fright Lever"; `Fraid Lifer` no better), Tarrasch (no
+  candidate close; heard "Taras"), Sämisch ("Samis", heard "semis"), Winawer (w said, "win hour"), Parham (h
+  said), Maróczy ("Marochi", a close call with "Marotsi"), Euwe, Bogoljubow and Jaenisch (garbled, no candidate).
+- Recogniser habits: it writes squares and numbers as notation and a lone e as "yang" ("yang 4"); it splits -ku
+  and -mu ("kuda ku", "langkah mu"), writes tahu as "tau", lho as "loh", klub as "club", Sisilia as "Sicilia",
+  pat as "empat" or "But", skak as "sekak" or "sekar"; it garbles the first word of a line on some seeds ("Putih"
+  as "Hoti", "Butuh") and invents text for one-word lines (an eponym alone).
+
+## Vietnamese
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter g (squares: "giê bảy") | inside a sentence, the diphthong of "giết": "Tượng ở dia bảy", "Mã diễn năm" (probe: "Tượng ở giê bảy" nearest "di bảy", "dê bảy" farthest); heard "dìa", "diễn", "giới", "yên" 12 times in 33 | `dê` (respell.giê), how the letter's name sounds: 3 times in 33 |
+| the file letter a (squares, "từ a đến hát") | after a vowel it melts into it: "Đen đi a sáu" heard "Đen đìa sáu", "ô a sáu" heard "O6", "ra a năm" heard "ra à năm" | `A` in capital (file.a.spoken, lesson.welcome.files.spoken): the letter heard 23 times in 33 against 11; the probe puts "A" next to a long "a a", not "ây" |
+| Winawer | the English w: "Wienauer", "Weenauer", "WeNower" (8 of 9) | `Vinaver` (respell): "V-never", "Viennese", "B-never", a v or b 4 times in 6 |
+| Bogoljubow | the English j: "Bogo Jubo", "Bokojubo" (5 of 6) | `Bogoliubov` (respell): "Bogo Liu Bof", "Bogolyubov", the l 3 times in 3 |
+| Bird | "biết", "biệt", "bước", never the vowel ơ in 9 (probe: nearest "Biết") | `Bớt` (respell): "bớt" 4 times in 6 |
+| Grand Prix | the x said (probe: nearest "Priks", "Pri" far) | `Pri` (respell.prix): still heard "Grand Prix" 3 times in 3 |
+
+- Main round trip: 300 lines (Whisper medium set to `vi`, seed 0), 36% of the words missed, most of them in lines
+  the recogniser garbled or replaced with a phrase of its own ("Cảm ơn các bạn đã xem video"). Then 3 seeds on 144
+  lines: the file letters in two contexts each, the L, the numbers, ordinals, decimals and percentages, the
+  reviewers' list, 113 opening names and eponyms in "Hôm nay chúng ta học X, Y và Z.", the coach lines missed most,
+  A/B variants of each fix; and probes (4 seeds). The opening texts take the capital A when
+  tools/gen_opening_lang.py runs again (respell.* apply to them already).
+- Checked and fine: e, bê, ép, hát (as notation: E4, B5, F7, H8), xê (heard "xe" 5 times in 6, the probe puts it
+  next to "sê"), đê (heard "đây", "đề", D1), "e-lờ" (L 6 times in 6), Elo, Philidor ("Philido", no r, 6 in 6),
+  Robot, Hừm ("Hừng", "Ừm"), Ối ("Ôi"), the quote marks (not said), 11 to 98, "thứ nhất", "thứ hai mươi tư",
+  "phần trăm", "cộng hai phẩy ba", "trừ một phẩy năm", gambit (probe: "gam bít"), fianchetto (probe: nearest
+  "fianketto"), Grünfeld ("Grunfeld"), Vienna (probe: "Viên-na"; the recogniser writes "Việt Nam"), Tal ("Ta",
+  "Tan"), Giuoco ("Joko"), Caro-Kann, Zukertort ("du-kơ-tốt"), Trompowsky ("Chom-", the Vietnamese tr), Réti
+  (the Vietnamese r: "Jetty"), and the other names of the list, heard close to their spelling.
+- Left as is: Tartakower, Nimzowitsch, Trompowsky, Horwitz (the w: close calls in the probe, "Tartakover" heard
+  "TataCover" both ways), Fajarowicz (garbled either way), "ghim" (heard "game" 3 times in 3; no candidate closer
+  in the probe), the tones the recogniser hears otherwise (Mã as "má", Hậu as "hầu", cộng as "cổng"), "mươi"
+  heard as "mười" now and then ("bảy mươi mốt" as "bảy 11"), "Tượng" starting a sentence heard "Tựa". Some long
+  lines come out garbled at some seeds (lines with ":" or ";" lose 40-46% of their words against 28-30%).
+- Recogniser habits: squares as notation ("ô e bốn" as "OE4"), ê as e ("êm đềm" as "em đềm", xê as "xe"), the
+  tones, tr/ch and d/gi/r merged ("trừ" as "chứ", "giành" as "dành"), "bắc cầu" as "bắt cầu", short lines and
+  interjections dropped or replaced, loops on long lines ("tượng tượng tượng"), names in English spellings
+  ("Civilization" for Scheveningen).
+
+## Slovak
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e (squares, "pešiak e", "písmeno e") | runs into the word before it: "Toto pole je é štyri" heard "je štyri" 3 times in 3, "ťah é štyri" heard "ťa 4", "ďahe 4" | `éé` (respell.é, so that the opening texts say it too): heard as the e-file 25 times in 36 over 12 contexts, against 18 for "é" (a capital `E` 19 in 24 on the first 8) |
+| Hm, (before a sentence) | lost, or with a vowel ("Hehm", "Chm"): hummed 2 times in 9 | `hmm` (respell.hm): hummed 15 times in 15. "Hm." alone is heard "Hmm" either way |
+| rating | as written, "ratink" (probe +0.55, `rejting` +1.36) | `rejting`, as Slovak players say it (Whisper writes "rating" either way) |
+| fianchetto, fianchetta, fianchettom, fianchettami | the Italian ch as č: "fiančeto" (probe +0.19, `fianketo` +0.81) | `fianketo`... (one respell.* per form): k heard 9 times in 9 ("fianketom", "Sianketo") |
+| Giuoco, Ponzianiho, Zukertortovo | "gi-uo-co" with c = ts (probe +0.02); z as z (probe: c +1.0) | `džuoko`, `poncianiho`, `cukertortovo`: no g 6 in 6 ("džuoko", "Jouko"), c 3 in 3 and 6 in 6 |
+| Grecov(a), Capablancov(a) | c as ts: "Gretsova" (probe +0.25, `grekova` +1.14), "Kapablantsova" (−0.09) | `grekova`, `kapablankova`...: k 6 in 6 |
+| Steinitzov(a), Rubinsteinov(a), Spielmannov(a), Tarraschov(a, -ej), Polotarraschova, Schliemannov(a), Schlechterov(a), scheveningenský(-á) | letter by letter: "Steinicova", "Rubinstejnov", "Spijelmanova", "Taraschova", "Schlimanova", "Slechterov", "Sceveningenský" (probe) | `štajnicova`, `rubinštajnov`, `špílmanova`, `tarašova`, `polotarašova`, `šlímanova`, `šlechterov`, `ševeningenský`...: š heard 6 in 6 (Štajnic), 5 in 6 (Šliman, Ševeningen), 3 in 3 (Rubinštajn, Šlechter), but 1 in 3 (Špílman) and 3 in 9 (Taraš): Whisper writes "Spielman", "Tarasova" |
+| Sämischov(a), Miesesovo, Kieseritzkého, Jaenischov(a) | "Semischov", "Mjesesovo", "Kieseritského" (probe); Jaenisch heard "Janis Hauk", "jajný schop" | `zémišov`, `mízesovo`, `kízerického`, `jénišov`: z 6 in 6, "mízesovo" 3 in 3, "Kizerického" 6 in 6, "Jenišov" 5 in 6 |
+| Grünfeldov(a, -ou) | ü near ö (probe); heard "Grunfeldová" 3 in 3 | `grínfeldova`...: "Grimfeldová", "Greenfieldova", no u 9 in 9 |
+| Falkbeerov(a) | ee as two vowels: heard "Falk Biero", "fagbjero" | `falkbérov`...: one e 6 in 6 ("Falkbergov", "Falkberou") |
+| Fajarowiczov | heard "Fajarovico" 3 in 3 | `fajarovičov`: č 3 in 6 ("Fajarovichov", "Fire Witch Show"), c otherwise |
+| Philidorov(a) | ph as p: heard "Pilidorová", "Pčilidorová", "Pylidorová" | `filidorova`...: f 6 in 6 (ch.intro.rook already said "Filidorovou") |
+| Owenova, Smithov, McCutcheonov(a) | w as v ("Ovenová" 2 in 3); th not t (probe: `smitov` +0.83); McCutcheon letter by letter ("makočený", "Makarčinov") | `ouenova`, `smitov`, `mekačenov`: "Owenová" 6 in 6 (the English name), "smito" 4 in 6, "mekačenou", "MechaChenov" 6 in 6 |
+| Milesova, halloweenský, Prix, Euweho | as Slovak letters: "Mílesova", "Haloveenský", "Priks", "Euveho" (probe) | `majlsova`, `helouvínsky`, `prí`, `éveho` ("Grand" keeps its d): Whisper writes "Milesova", "Halloweensky", "Grand Prix" for them, "Éveho" as "EVEho" |
+| Van Geetovo, Van't Kruijsovo | "Gétovo" (probe −0.49), "Kruisovo" (+0.26); heard "Vanguitovo", "Cruisové" | `chétovo`, `krajsovo`: no g 6 in 6 ("vanchetová", "Khetovou"), no u 6 in 6 ("Kreisová", "Krijsovou") |
+
+- Parakeet missed 79 % of the words on this voice; the main round trip is Whisper medium set to `sk`, 300 lines
+  (seed 0, 41 % of 4,482 words missed). Then 3 seeds on 60 lines (8 contexts of the file letter e with `é`, `éé`
+  and `E`, Hm against Hmm, the reviewers' coach lines, the L, the numbers), on 32 lines of names (the plain and the
+  respelled form in separate lines: with both in one line Whisper repeats its first transcription), on 23 lines of
+  the fixes in the game's lines and opening.say sentences, and on 4 of them with the plain "é"; probes (4 seeds) on
+  about 95 readings. The synthesis is the same for the same text and seed: a line already run is not worth running
+  again.
+- Checked and fine (probe or round trip): biely ("bieli"), ťah, kráľ, stĺpec (the syllabic ĺ), môj ("muoj"),
+  mat and pat (a hard t: `mať` +1.69), partia (a hard t), joj, ef, strelec, jednu, dopredu, bielopoľného; the
+  loanwords keep a hard d, t, n (probe against `ďiagonála`, `takťika`...): materiál, teória, téma, diagonála,
+  indická, systém, moderný, taktika, kritický, tempo, aktivita, etiketa, motívy, iniciatíva, kandidátske, Benoni;
+  and tento, jeden stay hard. The L (`el`, heard "L" 6 in 6), "od á po há", the numbers (64, 75, 50, 71 %, 12,
+  13, 19, 122, "plus jeden koma tri", "mínus nula koma päť"), "v štvrtom ťahu" (6 in 6: "vo" is not needed), Ups,
+  Ojoj, Fíha, Ó, Elo, Expert, rapid, „upravujem“ (the quotes are not read), epoletový. Names read well as
+  written: Caro-Kann ("Karokán" 3 in 3), Rétiho (`rétyho` no better), Maróczyho ("Marocího" 3 in 3), Winawer
+  ("Vináverov"), Morphyho ("morfiho"), Colleho ("koleho"), Horwitz ("horvic"), Trompowského, Janowského, Breyer
+  ("Brejer", as in Hungarian), Staunton, Blackmar, Bongcloud ("bongklaud"), pianissimo, Fegatello. The
+  Russian names are already in Slovak spelling (Aljechin, Čigorin, Nimcovič).
+- Left as is (close calls, the respelling heard no better): Diemer (`dímerov`), Tartakower (`tartakoverov`),
+  Fischer (`fišerov`), Marshall (nearest "Marschalov" in the probe, but heard "maršálov" in the main round trip; Whisper
+  writes "Marshallov" for both forms). Stonewall is said letter by letter ("Stonevall", probe), but `stounvol`
+  was heard "útok z Tom-Vol" (the s joins "útok"): no better. Bird ("Bírdovo") is read as written. The file letter
+  at the start of a line is lost with `é`, `éé` and `E` alike (Whisper drops a line's first word). The h-file after
+  a vowel melts into the word ("pole há osem" heard "poleha 8"), as in Czech; "od á po há" is written "apoha".
+- Recogniser habits: Whisper writes Czech forms and vowel lengths (bielý, čierný, král, figura, solidná, začíná,
+  sicilská, tvojej as "svojej"), ť as č or "ti" (tiach, čah), ľ as l, ĺ as "stolpec" or "stúpec", mat as "mať",
+  pat as "pac", final -ou as -ov (dámov), voicing assimilation as heard (zaz získava), squares and numbers as
+  notation ("dp5", "cp5" for dé päť, cé päť), "ef sedem" as "Epsedem", splits and joins (do predu, na miesto), and
+  known names in their own spelling (Marshallov, Fischerová, Stonewall, Grand Prix, Halloween) whatever the voice
+  says: check a name with the probe.
+
+## Croatian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares) | runs into the word before it: "To je a šest" heard "To je šest" 3 times in 3, "na a šest" heard "na šest" 3 in 3 (the probe puts "na a šest" next to "naa šest") | `aa` (file.a.spoken): heard as the a-file 8 times in 21 against 3 in 15 ("To je aa šest" 3 in 3; after "na" still often "na šest"); the probe puts "na aa šest" far from "na šest" (+1.06, "na a šest" +0.43) |
+| Ups! | heard "Ips" 3 times in 6; no candidate near in the probe | `uups` (respell): "Ups" 6 in 6 |
+| en passant | "en pasant", the t said (probe; heard with a t 11 times in 12) | `pasan` (respell.passant): a t 1 time in 12. "an" for "en" was swallowed more often (heard 4 in 9), so "en" stays |
+| obrnutim | the long u said like an o: "obrnotim" (probe), heard with o or a 7 times in 9 | `obrnuutim`: u 6 in 6 |
+| Šah znači (ann.check.coach.first.2) | runs together: heard "Šak znači" 6 times in 6 (the probe puts it near "Šag", "Šak") | `Šah, znači` (.spoken): "Šah" 3 in 3 |
+| Zukertortovo, Ponzianijevo | z said as z (probe), heard "Zucker...", "Ponziani..." | `cukertortovo`, `poncijanijevo`: c 6 in 6 against 0 |
+| Nimzowitsch, -ev, -eva | "Nimzovitševa" (probe), heard "Nimzovićskeva", "Njimsovicka" | `nimcovič`, `nimcovičev`...: "Nimcovićeva" 3 in 3 |
+| Steinitz, Rubinstein, Bronstein, Spielmann (and -ov, -ova, -ovo) | s and ej: "Stejnic", "Rubinstejnova", "Spilman" (probe and round trip) | `štajnic`, `rubinštajn`, `bronštajn`, `špilman`...: š 6 in 6, 3 in 3, 5 in 6, 5 in 6 |
+| Tarrasch, Sämisch, Jaenisch (and their forms) | sch as "sk" or s + h: "Taraskova", "samizkova", "ja je neskog" | `taraš`, `zemiš`, `jeniš`...: no k in 15, against 5 in 9 |
+| Miesesovo, Diemerov, Kieseritzky(jev), Falkbeer(ov) | ie and ee as je: "Mjesecovo", "Kjeseretski", "Falkbjerov", 16 times in 18 (probe: "Dijemerov") | `mizesovo`, `dimerov`, `kizericki`, `falkberov`...: no je in 21 (Whisper hears "Fogbear" for Falkber 6 times in 9) |
+| Grünfeld, -ov, -ova, -ove, -ovo | u: "Grunfeldova" 3 in 3 (probe −0.01) | `grinfeld`...: i 6 in 6 |
+| Giuoco | the g said: "Gioco", "Giozofiano" | `đuoko`: "Duoco", "duoko" 6 in 6 |
+| Greco(v), Capablanca, Capablancin | c as ts: "Gretsov", "kapablancin" (probe: `Greko` +1.93) | `greko`, `grekov`, `kapablanka`, `kapablankin`: k 5 in 6 and 3 in 3 |
+| Maróczy, -jev, -jeva | cz as c: "Marocijave" 3 in 3 | `maroči`...: č or ć 6 in 6 |
+| Euwe, Euweov | "E-U-ov" 3 in 3 | `eve`, `eveov`: "evo ov", "EVOv" 2 in 3 |
+| Colle, Colleov, Colleovog | the e said: "Koleov" (probe), heard "Coleov", "Kole of" | `kol`, `kolov`, `kolovog`: no e in 6 |
+| Birdovo, Milesova, McCutcheon(ov) | as Croatian letters (probe: "Bird", "Milesova", "Makkačon") | `berdovo`, `majlsova`, `mekačon`: heard "berdovo", "Melsova", "mekačan" 2 in 3 each |
+| Stonewall, Stonewalla, Grand Prix | the e said ("Stonevala", probe); the d and the x said ("Priks", probe) | `stounvol(a)`, `gran`, `pri`: two syllables ("ston vol", "Stonvola"); no x 2 in 3 (Whisper writes "Stonewall", "Grand Prix" for both) |
+
+- Parakeet missed 84 % of the words on this voice: the main round trip is Whisper medium set to `hr`, 300 lines (seed 0,
+  15 % of 4,488 words missed), then 3 seeds on 80 lines (the reviewers' list, 18 A/B pairs of opening names in "Na
+  ploči je X, a zatim Y.", the file letters in hard positions with A/B variants, the L, numbers, the words missed
+  most), and on 53 lines of fixes in the game's own lines with the plain form beside the doubtful ones; probes (4
+  seeds) on about 150 readings. Eponyms get every possessive form the composed opening names make ("{X:gen}a
+  varijanta", "{X:gen}o otvaranje").
+- Checked and fine: the letters be ce de ef ge (heard as notation), ha ("poljeha osam" 5 in 6; `haa` 6 in 6,
+  too close to call), el, Hmm (hummed), Vau, Oh, Joj, Bravo, Elo, rejting ("rating"), šah alone and "Daj šah" (probe:
+  `šak` +3.24), crni, bijeli (the ije diphthong, probe near "bjeli", as spoken Croatian has it), žrtva, the numbers
+  (jedanaest to devetnaest, 34., 47., 64, 68, 92 and 100 posto, plus jedan zarez pet, minus nula zarez tri). Names
+  read well as written: Caro-Kann ("Karo", probe), Philidor and Morphy (f), Owen ("Ouenova", probe), Horwitz (c),
+  Réti, Winawer and Tartakower (v), Marshall, Traxler (ks), Scheveningenska (š), Schliemann (heard "Šlimanova"),
+  Richter (h), Rauzer, Bongcloud ("Bongklaud"), Trompowsky, Torre ("Torijov", the glide), Fischer, Schlechter,
+  Stafford, Smith-Morrin ("Smit"), Breyer ("Brejer"), Janowski, Staunton, Max Lange, Anderssen, Paulsen, Fegatello,
+  Najdorf, and the Russian names in Croatian spelling.
+- Left as is: the file letter e after a vowel gets a glide ("polje e četiri" heard "polje je četiri"; `ee` heard as
+  e 2 times in 9). Nimzo-Larsenov (`Nimco` heard "Nimko" 3 in 3) and nimzoindijska keep the z. Van't Kruijsovo and
+  Van Geetovo (`Krajsovo` heard "Christ'o", "Crysovo"; `Hetovo` "Hat'o"), Halloween (`Helovin` heard "Helving",
+  "hell of a"), Fajarowiczeva and Blackmar (`Fajarovičeva`, `Blekmar`) were heard no better than as written.
+  pogreška and its forms are close calls: heard "pograšku", "pogroške" 7 times in 18, 4 of them on one seed (probe:
+  `pograške` −0.18). napadnut(a) has the same o-like u (probe), but `napadnuuta` did no better (o 2 in 3). "Damin
+  gambit" is heard "Damien", "damning" (probe near "Damen"); `Damiin` the same. epoletni after "zove" loses its e
+  ("zove poletni"), the vowels meeting. "{move}, šah" before a word was not judged.
+- Recogniser habits: Whisper writes ije and je loosely (bjeli, pobijeda, svjetla), Italian and English spellings
+  ("variante", "fianchetto", "rating", "Remy", "Halloween", "Grand Prix", "Stonewall", "Capablanca"), č for ć and back,
+  m as b ("daba", "pobakni"), a final u as o now and then (napadnot, otvoreno), squares and numbers as notation
+  ("na a šest" as "na 6", "e" after a vowel as "je"), and a known name in its own spelling whatever the voice says:
+  check a name with the probe.
+
+## Slovenian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter e (squares, "kmeta e", "črka e") | at the start of a line heard "in štiri", "en štiri" (4 times in 6); after a vowel heard "je" or lost ("polja e štiri" nearest "polja štiri" in the probe, "potezo e pet" nearest "potezo je pet") | `ee`, the long letter name (respell.e, so that the opening texts say it too): heard as the e-file 36 times in 63 over 20 lines said both ways, against 28 for "e"; 6 in 6 at the start of a line (2 for "e"), but 2 in 9 after "vzame na" (6 for "e"). "é" did no better (1 in 9) |
+| Hm, (before a sentence) | a syllable: heard "Kom", "Komen", "Kaj se" (hummed 1 time in 4) | `hmm` (respell.hm): hummed 7 times in 9 |
+| en passant | "en pasant", the t said (heard with a t 15 times in 15) | `an pasan` (.spoken of the six lines with it; lesson.title.en_passant.spoken also reaches event.lesson.*; respell.passant = `pasan` for any other): no t 15 in 15, "an" / "am" 12 in 15 |
+| rating | the letters: "ra-ting" (probe: `rejting` +1.03, `ratink` +1.14) | `rejting` (respell): heard "rejting" 3 times in 15, never in 9 for "rating" (Whisper writes "rating" for both) |
+| Caro, Greco, Capablanca (and -ov, -ova, -ovo) | c = ts: "Tsaro" (probe +0.65, `karo` +1.39), "Gretso" (+0.47), "Kapablantsa" (+0.61) | `karo`, `greko`, `kapablanka`...: "Karokanova" 6 in 6 (plain heard "Carro", "Cáro"), "grekov" 3 in 3 in an opening.say line ("Greco" in the other), k 3 in 6 |
+| Giuoco | g said: nearest "giuoko" (+1.30); heard "veki voce", "Giozzo", "Jagi Voco" | `džuoko`: "džuoko", "Djoko" 9 in 9 |
+| Zukertortova | z as z: "Zukertortov" 3 in 3 | `cukertortova`: c 3 in 3 |
+| Steinitz, Rubinstein, Spielmann (and -ev / -ov, -eva / -ova, -evo / -ovo) | st, sp, ei as Slovenian letters: "stejnicjeva", "Rubinstejnova", "Spirmanova" | `štajnic`, `rubinštajn`, `špilman`...: š 6 in 6, 6 in 6, 3 in 3 |
+| Tarrasch, Schliemann, Sämisch, Fischer, Jaenisch (and forms) | sch as s + h, ie as i-je, ä as a, ae as a-e: "ta razheva", "taraskeva", "šljemanova", "sem izševa", "Fischer"/"fisher" (probe), "je enisvi" | `taraš`..., `šliman`..., `zemiš`..., `fišer`..., `jeniš`...: š 5 in 6 ("tara ševe"), "šli" 2 in 3, z 3 in 3, š 4 in 6, "je niš" 2 in 3 |
+| Miesesova, Diemerjev, Kieseritzky (and forms) | ie as i-je: "mi je sesova" 2 in 3, "ki je sritski", probe "dijemerjev" (+0.23) | `mizesova`, `dimerjev`, `kizericki`...: "mi zesava" 3 in 3, "Kiziricki" 4 in 6 |
+| Grünfeld, Falkbeer (and forms) | "Grunfeldova" (probe +0.77, heard 1 in 3); "Falkbe-er" (probe −0.02), heard "faktbjerjo" | `grinfeld`..., `falkber`...: no u 5 in 5, one e 5 in 6 |
+| Fajarowiczeva | cz as c (probe "fajarovitseva" −0.43) | `fajarovičeva`: č 4 in 6 |
+| Owenova, Birdova, Milesova, Staunton, McCutcheon (and forms) | as Slovenian letters: "Ovenova" (probe −0.23), "Birdova", "mi lesmaga", "sta ontono", "makačanava" | `ouenova`, `berdova`, `majlsova`, `stonton`..., `mekačen`...: "Uen", "Olenova" 2 in 3, "Berdova" 3 in 3, "majesova" 6 in 6, o 4 in 6, "mekačenova" 5 in 6 |
+| Halloween, Stonewall, Grand Prix | "Haloveen" (probe +0.01), "Stonevall" ("sta ono vol"), "Grant Priks" (probe −0.27, +0.49) | `helovin`, `stounvol`, `gran`, `pri` (respell.grand, respell.prix): "Helloween", "hellevine" 3 in 6, two syllables 3 in 3; Whisper writes "Grand Prix" either way |
+| Van't Kruijsova, Van Geetova | ui as u-i ("Krujsova"), g and ee as written ("Vangitova", probe "gejetova") | `krajsova`, `hetova`: "Kraisov" 3 in 3, h 2 in 3 |
+
+- Parakeet missed 97 % of the words on this voice; the main round trip is Whisper medium set to `sl`, 300 lines
+  (seed 0, 45 % of 4,555 words missed). Then 3 seeds on 52 lines (the words missed most, the file letters in 13
+  squares, the L, numbers, the reviewers' coach lines, "e" / "é" / "ee" in 3 contexts), on 50 lines (17 pairs of
+  opening names in "Tvoja otvoritev je X, moj odgovor pa Y.", plain and respelled in separate lines, "an pasan" /
+  "en pasan", "Hmm", 4 more contexts of "e" / "ee"), on 37 lines of the fixes in the game's lines and in
+  opening.say sentences, and on 12 lines of "e" / "ee" after "na"; probes (4 seeds) on 80 readings, LPC
+  formants of "beli".
+- Checked and fine: kadar (the r said: `kadarr` −0.10, `kada` +0.95; Whisper writes the Croatian "kada"), kjer,
+  ničesar, skakači (č, not t), išči, manj ("man", as said), jemanja, trdnjava ("tərdnjava"), remijem, remi (stress
+  on the i: `remí` −0.32), lovec, mata, pat, tvoj, the file letters a be ce de ef ge ha (heard as notation), the L
+  (`el`, heard "L"), the numbers (92 %, 71 %, 75, "plus dva vejica tri", "minus ena vejica pet"), Elo, Vau,
+  raženj, epoletni ("Poletni": the first vowel melts into "je"), Briljantno. Names read well as written:
+  Philidor (f, `filidorjeva` +0.13), Ponziani (c: `poncianijeva` −0.25), Horwitz, Van't ("vant"), Trompowsky,
+  Colle / Collov (k: "kolov" 3 in 3), Richter (`rihter` +0.12), Bongcloud (`bongklaud` +0.06), Smith (`smit`),
+  Winawer (v), Traxler (ks), Morphy (f), Stafford, Maróczy, Breyer ("Brejer", as in Hungarian), Tartakower,
+  Janowski, Max, Réti, and the Russian names, already in Slovenian spelling (Aljehin, Čigorin, Nimcovič,
+  Svešnikov, Bronštejn).
+- Left as is: beli, belega, meri are heard "bili", "miri" (28 times in 37 for beli in the main round trip; the
+  probe ties `bili` and `béli`): the first vowel of "beli" has F1 about 290 Hz, against 230 for "bili" and 550 for
+  an open "bèli", the high closed e of standard Slovenian, and no spelling lies between. tokrat (closed o, the
+  probe ties `tukrat`) likewise. Marshall (probe: `marshalov` +0.31, `maršalov` +0.55; heard "Marshalo" either
+  way), Scheveningen and Schlechter (the probe leans to "sč" and "s", but Whisper hears "ševeningenska" and
+  "šlikter" with or without the respelling), Euwe ("evjeva" either way, `evejeva` no better), Blackmar
+  (`blakmar` +0.24, an accepted reading; Whisper writes "Black" for both), Parham (said with its h; no candidate
+  near). The file letter stays a close call: "ee" is heard better overall and at the start of a line (where the
+  moves of the review lines stand), "e" after "vzame na" ("skakač vzame na ee pet" heard "v zamena je 5"); both
+  are heard "je" after "polje", "polju", "kmeta".
+- Recogniser habits: Whisper writes Croatian forms (kada, centar, lovac, uzame for vzame, prejde for preide,
+  potes, bili), the syllabic r with a vowel (černi, žertev, tərdnjava as "trnjava"), squares and numbers as
+  notation and joined ("E4", "depet", "apet", "je 4" for "e štiri" after a vowel), splits and joins ("po meni",
+  "na mestu", "na tačnost"), known names in their own spelling ("Greco", "Fischer", "Halloween", "Grand Prix",
+  "Stonewall", "rating") whatever the voice says: check a name with the probe. A line's first word is often lost
+  or misheard ("Pat." heard "Vat", "Bat").
+
+## Latvian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letters e and a said alone (squares, "no a līdz h", "burts e", the opening texts) | short, melting into the word before them: "Pēc e četri" heard "Pēc četri" 3 times in 3, "Dāma no a pieci" heard "Dāma no pieci" 3 in 3 (probe: "ar a seši" nearest "ara seši", "aizsargāt e pieci" nearest "aizsargātē pieci") | `ē`, `ā` (respell.e, respell.a), the long vowel Latvians use to name the letters: e heard 25 times in 33 over 10 contexts against 12, a 33 in 33 over 11 contexts against 25. Every lone "a" and "e" of a spoken line is a file letter |
+| Hm. (event.filler) | with a vowel: probe nearest "Hem" (+0.37, "Hmm" +1.06); heard "Hamam", "Tiem", "M." | `Hmm.` (event.filler.spoken): heard "Hmm" 3 times in 3. "Hmm," in the other lines was hummed already |
+| Grand Prix (uzbrukums) | the d and the x said: "Grand Priks" (probe +0.20, `Grān Prī` +2.26) | `grān`, `prī` (respell.grand, respell.prix): read like "Gran Prī" (probe −0.33); Whisper writes "Grand Prix" for the plain form, "Grānu prī", "Grāmbrī" for this one |
+
+- Parakeet missed 99 % of the words on this voice. The main round trip is Whisper medium set to `lv`: 300 lines (seed 0).
+  It missed 60 % of the words, or 19 % once diacritics, doubled letters and notation are ignored. Then 3 seeds on 56
+  lines: A/B pairs of the file letters in 18 contexts, the reviewers' coach lines, Hm against Hmm, and the words
+  missed most. Then 1 seed on 34 lines naming every opening name and eponym, and 3 seeds on 18 lines of the fixes in
+  the game's own lines and the numbers. About 30 readings were probed (4 seeds).
+- Checked and fine: the letters bē, cē, dē, gā (heard as notation) and ef ("F7"; "ef septiņi" heard "epseptiņi",
+  the assimilation as said); hā (heard "kā" or "H8": the velar Latvian h); `el` for the L (probe: nearest "l";
+  heard "el", "elu" or joined to "burta" 5 times in 6). Also fine:
+  - šahs and šaha: probe nearest "šaka", "šaga" in "Šis ir šaha pulkstenis", the velar h. Whisper writes "šaks".
+  - dubultšahs, kandidātgājienus, nosmacētais, epoletu (probe: near "epaletu").
+  - pats ("pats" 6 in 6), Ups (3 in 3), Ai (probe "Aj"), Oho, Čau (probe "Čao" +0.02).
+  - Elo (probe: nearest "elu", not letters; heard "elo" 2 in 3), „Es pielaboju” (the quotes are not read).
+  - the numbers: 21, 34, 71 %, 92 %, 12., 21., 34., "mīnus viens komats pieci", "simt divdesmit divi",
+    "numur divpadsmit". Each is heard right, as words or digits, in at least 2 renderings of 3.
+  - The names are in Latvian spelling and are read as written: Karo-Kanna, Filidora, Cukertorta, Nimcoviča,
+    Aļehīna, Grīnfelda, Ponciāni, Blekmāra-Dīmera, Trompovska, Kolles, Taraša, Džobavas, Rihtera-Veresova,
+    Bongklauda, Šēveningenas, Svešņikova, Najdorfa, Fegatello, Trakslera, Māršala, Šlīmaņa, Helovīna, Zēmiša,
+    Falkbēra, Kīzerickis, Maroci, Mailza, Džuoko, Eive, Makkačens and the rest.
+- Left as is:
+  - piano and pianissimo (Džuoko) are read "pi-a-no", "pianisimo" (probe −0.93), as Latvian reads them. `pjāno` was
+    heard "pijāno" 2 times in 3, no better.
+  - Ouena is read "Auena" (probe −0.39; "Oena" +0.36); no Latvian spelling gives "ou".
+  - Pterodaktiļa ties with and without its p (probe: "Terodaktiļa" −0.11, "Ptterodaktiļa" −0.07); it was heard
+    "terodāk ceļu" once.
+  - Van 't Kreisa is said "Vant Kreisa", as in Dutch (probe: "Van et" and "Vant" +0.32, "Van tē" +0.88).
+  - After a word ending in a vowel ("bija ē četri", "vajag ē"), the long e still runs into that word 1 or 2
+    times in 3.
+- Recogniser habits: Whisper writes the voicing assimilation as heard (zirgs "zirks", tavs "taus"). Other habits:
+  - "šaks" for šahs, "kā" for hā;
+  - baltie as "Baltija", melnie as "mēlnie", gājiens as "gājens" or "gājienes";
+  - the diphthong o as "uo" (noved "nuovēt", atdod "atduot", as said);
+  - ņem joined to the next word ("zirgsņemēs"), and squares and numbers as notation;
+  - English spellings for names (Fischer's, Fogbears, Grand Prix);
+  - it often loses or garbles the first words of a line.
+
+## Lithuanian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares, "nuo a iki h") | after a vowel the short a melts into it: "valdove į a penki" heard "valdovėjo penki", "valdovėje 5" 3 times in 3, "nuo a iki ha" heard "nuo iki ha", "nuo ICH" 3 in 3 (the probe puts it next to "nuo iki ha") | `aa` (file.a.spoken, lesson.welcome.files.spoken), the long a of the letter's name: heard as the a-file 13 times in 18 over 6 contexts, against 10 in 21 (after "į" 4 in 6, against 0 in 6); "nuo aa iki ha" 2 in 3 |
+| the file letter h (squares) | "ha" after a vowel loses its h: "langelio ha aštuoni" heard "langelio 8" 3 times in 3, "valdovė ha penki" heard "valdovė a penki" (probe: "langelio ha aštuoni" nearest "langelio a aštuoni", −0.02) | `haa` (file.h.spoken, lesson.welcome.files.spoken): the h heard 26 times in 33 over 10 contexts, against 10 in 30; `cha` did 11 in 15 but names the letter Ch |
+| Hm, (before a sentence) | a vowel: heard "Ham", "Kam", "Hammasiu" (hummed 5 times in 12) | `hmm` (respell.hm): hummed 8 times in 12 |
+| Nimco-indų | before the hyphen the c is read as k: nearest "Nimko-indų" (probe −0.00; −0.73 in a sentence), heard "nimko", "Niemko", "nebko" 6 times in 9. "Nimco" alone and "Nimco indų" keep ts | `nimtso` (respell.nimco): no k in 9 ("nems", "Niemcų-Indų"); the probe puts "Nimtso-indų" next to "Nimtso indų" (−0.02) |
+| Grand Prix (ataka) | the d and the x said: in a sentence nearest "grand priks" (probe +1.15, `gran pri` +2.59); alone the name lasts 4 s, said in pieces | `gran`, `pri` (respell.grand, respell.prix), French as players say it: Whisper writes "Grand Prix" either way |
+
+- Parakeet missed 95 % of the words on this voice; the main round trip is Whisper medium set to `lt`, 300 lines
+  (seed 0, 50 % of 4,052 words missed even with the diacritics and y/i folded). Then 3 seeds on 93 lines (the
+  reviewers' list, Hm against Hmm, 60 opening names in 30 pairs "Tavo debiutas – X, o mano atsakas – Y.", 36
+  eponyms in lists, the file letters, the L, numbers), on 23 and 21 lines of A/B variants of the file letters
+  a, e and h in 16 contexts and of Nimco, and on 8 lines of Torės and Trompovskio; probes (4 seeds) on about 90
+  readings. The catalog already spells the foreign names the Lithuanian way (Šteinicas, Tarašas, Naidorfas,
+  Džiuoko piano, Karo-Kano, Eivė, Mailso), so few needed anything.
+- Checked and fine: Elo ("elo" 3 in 3), an pasan, mitelšpilis, endšpilis (the d melts into š, as in speech:
+  "enšpilis"), el for the L ("raidę L", "el"), raidė e (probe: next to the long `ę`, the letter's name), Oi,
+  Oho (probe: "O ho" −0.16), Matai (6 in 6), taisau, the letters cė and ef (heard C3, F6 3 in 3), bė, dė, gė (said, often run into the next word),
+  the numbers (71 %, 92 %, 21, 11, 19, 122, 34-asis, 12-asis, "plius du kablelis trys", "minus vienas kablelis
+  penki": the right digits). Džiuoko piano is read "pjano" (probe −0.16; `pjano` heard the same), Benoni with the
+  stress on no (probe: `Benòni` −0.30). Pirco, Cukertorto, Horvico, Poncianio keep ts (probe: `Pirtso` +0.26,
+  `Tsukertorto` +0.11, `Horvitso` +0.09) and Richterio, Aliochino, Šlechteris, šachas a fricative ch (probe
+  nearest `Rihterio`, `šahas`; Aliochino far from `Aliokino`). Names heard as written: Karo-Kano, Blekmaro-Dimerio,
+  Smito-Moros, Van Kruiso, Van Geto, Retio, Bongklaudo, Džobavos, Parhamo, Filidoro, Šventojo Jurgio, Helovino,
+  Stafordo, Trakslerio, Zemišo, Ševeningeno, Šlimano, Kolės, Morfio, Naidorfo, Oveno, Rosolimo, Saragosos,
+  Sokolskio, Svešnikovo, Taimanovo, Tarašo, Vinaverio, Čigorino, Griunfeldo, Hipopotamo, Falkbėro, Englundo,
+  Evanso, Berdo, Borgo, Grobo, Alapino, Albino, Bogoliubovo, Benko, Maršalo, Merano, Panovo, Leningrado, Kano,
+  Mailso, Fegatelo, and the eponyms (Šteinicas ... Botvinikas; Stauntonas is heard "Tontonas").
+- Left as is: the file letter e is said (probe: "keturi" alone far) with the open Lithuanian e, which Whisper often
+  writes "a" ("Akieturi" for "e keturi"); `ee` was heard worse ("ir katuri", "Jai"). ankstyvas, anksti, anksčiau
+  are said with a g-like k (probe: `angstyvas` −0.37; heard "angstyvas", "angsti" every time): the voicing of a stop
+  in a cluster, no other spelling. Torės and Trompovskio lean to u in the probe (`Turės` −0.02, `Trumpovskio`
+  −0.42), but the probe does as much for Kolės (`Kulės` −0.03), which Whisper hears right; Torės is heard with an
+  o 4 times in 6 outside "Tavo debiutas – Torės", `Toorės` was heard no better, and `Troompovskio` hardly
+  (an o 3 times in 6, against 1 in 6): too few to keep. A word-initial r is weak ("Retis" heard "Lietis", "Vietis").
+- Recogniser habits: Whisper writes ė as e or ie (ėjimas "ejimas", "eimas"; pėstininkas "piestininkas"), y as i
+  (gynyba "ginyba"), ie as ė (juodieji "juodėjai", baltieji "baltėjai"), rikis as "reikis", "reikia", Sicilijos
+  as "Sicilios", debiutas as "debütas", splits compounds ("balta laukis", "šiuo laikinė"), squares and numbers as
+  notation, known names in their own spelling (Grand Prix, Marshall, Stafford, Traxler, Miles) and common words
+  for rare names ("pirko" for Pirco, "turės" for Torės, "Trump" for Trompovskio), and drops or garbles a line's
+  first word. The probe puts rikis, juodieji, ėjimas, šachas, langelyje, stovi, Sicilijos, siekia, lėta, laimi,
+  italų, erdvės next to their written form.

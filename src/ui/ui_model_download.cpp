@@ -373,7 +373,8 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
         gfx::text(last.sourceLabel, x, r.y + 174.0f, us);
         gfx::popClip();
         // Cancel, mouse only (the keyboard stays with the menus and the game).
-        float bw = 170.0f, bh = 42.0f;
+        // As wide as its label needs (170 px at least), within half the panel.
+        float bw = std::min(innerW * 0.5f, std::max(170.0f, im::buttonWidthFor(L("coach.download.cancel")))), bh = 42.0f;
         if (im::button(L("coach.download.cancel"), im::flip(r, Rect(r.r() - 24.0f - bw, r.b() - 18.0f - bh, bw, bh)), im::ButtonKind::Quiet,
                        true, im::ITEM_MOUSE_ONLY))
             act = ModelPanelAction::Cancel;
@@ -390,11 +391,20 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
         gfx::pushClip(Rect(r.x + 24.0f, r.y + 104.0f, w - 48.0f, 28.0f * float(errLines) + 16.0f));
         gfx::textWrapped(last.error, x, r.y + 130.0f, innerW, es, 28.0f);
         gfx::popClip();
-        float bw = 170.0f, bh = 44.0f, gap = 14.0f, by = r.b() - 20.0f - bh;
-        if (im::button(L("coach.download.close"), im::flip(r, Rect(r.r() - 24.0f - 2.0f * bw - gap, by, bw, bh)), im::ButtonKind::Secondary,
+        // Each button as wide as its label needs (170 px at least), both within the panel
+        // ("Tentar novamente", "Erneut versuchen").
+        float cw = std::max(170.0f, im::buttonWidthFor(L("coach.download.close")));
+        float rw = std::max(170.0f, im::buttonWidthFor(L("coach.download.retry")));
+        float bh = 44.0f, gap = 14.0f, by = r.b() - 20.0f - bh;
+        if (cw + rw > innerW - gap) {
+            const float k = (innerW - gap) / (cw + rw);
+            cw *= k;
+            rw *= k;
+        }
+        if (im::button(L("coach.download.close"), im::flip(r, Rect(r.r() - 24.0f - rw - gap - cw, by, cw, bh)), im::ButtonKind::Secondary,
                        true, im::ITEM_MOUSE_ONLY))
             act = ModelPanelAction::Close;
-        if (im::button(L("coach.download.retry"), im::flip(r, Rect(r.r() - 24.0f - bw, by, bw, bh)), im::ButtonKind::Primary, true,
+        if (im::button(L("coach.download.retry"), im::flip(r, Rect(r.r() - 24.0f - rw, by, rw, bh)), im::ButtonKind::Primary, true,
                        im::ITEM_MOUSE_ONLY))
             act = ModelPanelAction::Retry;
     }

@@ -15,7 +15,7 @@
 # - {opening:def} is the opening's name with its article ("a Defesa Siciliana", "o Gambito da
 #   Dama"): the lines put it after a verb, never after de, em, a or por, and agree with nothing.
 # - Counted numbers (common.lang): {m:move} "mate em 3 lances", {pts:point} "3 pontos",
-#   {n:mistake} "2 erros", {m:blunder} "1 erro grave", {acc_white:percent} "87%" (spoken
+#   {n:mistake} "2 erros", {m:blunder} "1 gafe" (feminine: "uma gafe"), {acc_white:percent} "87%" (spoken
 #   "oitenta e sete por cento").
 
 # ---- The start ------------------------------------------------------------------------------------

@@ -116,8 +116,11 @@ owner.black.pron = {piece}
 # The files are said by the names Vietnamese gives Latin letters when spelling (as in "DVD" = "đê vê
 # đê"), the ranks as number words: e4 = "e bốn", f3 = "ép ba", c6 = "xê sáu", d5 = "đê năm",
 # g7 = "giê bảy", h8 = "hát tám", b1 = "bê một".
+# The a is written in capital: a lowercase "a" after a vowel melts into it ("Đen đi a sáu" heard
+# "Đen đìa sáu", "ra a năm" heard "ra à năm"); the voice says "A" as a full letter. "giê" is said "dê"
+# (respell.giê below).
 square.spoken = {file} {rank}
-file.a.spoken = a
+file.a.spoken = A
 file.b.spoken = bê
 file.c.spoken = xê
 file.d.spoken = đê
@@ -155,7 +158,16 @@ move.mate.spoken = {move}, chiếu hết
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the respell.* words the Vietnamese voice misreads.
+# Words the Vietnamese voice misreads, said otherwise in every spoken line, opening texts included (see
+# docs/PRONUNCIATION.md). The file letter g: "giê" inside a sentence is read with the diphthong of
+# "giết" ("Tượng ở dia bảy", "Mã diễn năm"); "dê" is how the letter's name sounds.
+respell.giê = dê
+# Foreign names read with the voice's English or Vietnamese letter values: Winawer and Bogoljubow with
+# the English w and j ("Wienauer", "Bogo Jubo"), Bird as "biết", Grand Prix with the x said.
+respell.winawer = Vinaver
+respell.bogoljubow = Bogoliubov
+respell.bird = Bớt
+respell.prix = Pri
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. 0-20 and the tens are listed (10 = "mười", 20-90 = "<n> mươi"); 21-99 compose

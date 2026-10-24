@@ -987,8 +987,48 @@ move.mate.spoken = {move}, matt
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: the
-# pronunciation pass adds them (docs/PRONUNCIATION.md).
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h), found by the
+# pronunciation pass (docs/PRONUNCIATION.md, Hungarian). The voice reads foreign names letter by letter
+# as Hungarian (s = [ʃ], c = [ts], ch = cs, ie = i-e, w = v): they are spelled as Hungarian players say
+# them. One entry per written form (a respelling replaces whole words).
+# Italian: ch = k (it said "fiancsetto"), gi = dzs, z = c:
+respell.fianchetto = fianketto
+respell.fianchettóba = fiankettóba
+respell.fianchettókkal = fiankettókkal
+respell.fianchettós = fiankettós
+respell.fianchettót = fiankettót
+respell.fianchettóval = fiankettóval
+respell.giuoco = dzsuokó
+respell.ponziani = ponciáni
+# French: "en passant" was said with the t ("en passzont"):
+respell.en = an
+respell.passant = passzan
+# s = sz (it said "Larsen", "Evans" with the Hungarian s):
+respell.larsen = larszen
+respell.evans = evansz
+respell.trompowsky = trompovszki
+respell.janowski = janovszki
+respell.saragossa = szaragossza
+respell.rossolimo = rosszolimo
+respell.veresov = vereszov
+respell.hippopotamus = hippopotamusz
+respell.anderssen = anderszen
+# ie = í, ch = h, cz = c, c = k, and the English and Dutch names:
+respell.mieses = mízesz
+respell.diemer = dímer
+respell.kieseritzky = kízericki
+respell.schliemann = slíman
+respell.aljechin = aljehin
+respell.maróczy = maróci
+respell.capablanca = kapablanka
+respell.winawer = vinaver
+respell.euwe = őve
+respell.kruijs = kröjsz
+respell.bird = börd
+respell.staunton = sztonton
+respell.mccutcheon = mekkacsen
+respell.grand = gran
+respell.prix = pri
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Hungarian writes numbers under 2000 as one word: 21-99 compose as "{tens}{units}" ("harminchárom"),

@@ -36,6 +36,8 @@ ann.check.coach.3 = I šah!
 # Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
 ann.check.coach.first = To znači da je {your} napadnut{your:ag}. Moraš {your:pron_acc} izvući iz šaha.
 ann.check.coach.first.2 = Šah znači da je {your} napadnut{your:ag}. Pomakni {your:pron_acc}, zakloni {your:pron_acc} ili uzmi moju figuru.
+# Spoken with a comma: "Šah znači" ran together and was heard "Šak znači" (docs/PRONUNCIATION.md, Croatian).
+ann.check.coach.first.2.spoken = Šah, znači da je {your} napadnut{your:ag}. Pomakni {your:pron_acc}, zakloni {your:pron_acc} ili uzmi moju figuru.
 ann.double_check.coach = Dvostruki šah! Dvije moje figure odjednom napadaju tvog kralja, pa se kralj mora pomaknuti.
 ann.double_check.coach.2 = To je dvostruki šah: sad pomaže samo potez kraljem.
 ann.double_check.human = Dvostruki šah! Dvije tvoje figure odjednom napadaju mog kralja, pa se kralj mora pomaknuti.

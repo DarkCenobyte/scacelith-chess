@@ -398,7 +398,28 @@ move.mate.spoken = {move}, șah mat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the voice misreads.
+# Words the voice misreads, said otherwise in every spoken line (opening texts included); see
+# docs/PRONUNCIATION.md. "en passant" as written is said "ien pasant", with the t: French "an pasan".
+respell.en = an
+respell.passant = pasan
+# Names read by the Romanian spelling where their own language says them otherwise (round trip and
+# probe): Pirc with a k, Najdorf, Fajarowicz with the j of "joc", Winawer with "au", Kruijs as "kru-ijs",
+# Geet with the g of "ger", Mieses as "mi-e-ses", Diemer as "di-e-mer", Bird as written, Ponziani with
+# a z, Lange with the g of "ger", Grand Prix with the d and the x, Halloween with a v.
+respell.pirc = pirț
+respell.najdorf = naidorf
+respell.fajarowicz = faiarovici
+respell.winawer = vinaver
+respell.kruijs = crăis
+respell.geet = heet
+respell.mieses = mizes
+respell.diemer = dimer
+respell.bird = bărd
+respell.ponziani = ponțiani
+respell.lange = langhe
+respell.grand = gran
+respell.prix = pri
+respell.halloween = helouin
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. The plain word is the counting and masculine form ("unu", "doi", "doisprezece",

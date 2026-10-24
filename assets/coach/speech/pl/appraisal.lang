@@ -297,7 +297,7 @@ appraisal.num.takebacks.b2 = Cofnęliśmy {n:move_acc}, a {m} z nich udało ci s
 appraisal.num.takebacks.b2.2 = Cofnięte ruchy: {n}, poprawione: {m}. Tak się robi postępy!
 appraisal.num.takebacks.b3 = Cofnięte ruchy: {n}, z tego poprawione: {m}.
 appraisal.num.takebacks.b3.2 = Cofnięcia: {n}, poprawki: {m}. Dobrze.
-# Level 2: big mistakes ({n} = mistakes and blunders: "większy błąd", not "poważny błąd", which is
+# Level 2: big mistakes ({n} = mistakes and blunders: "większy błąd", not "gruby błąd", which is
 # the blunder alone), or the best moves found ({n}).
 appraisal.num.clean.b2 = Ani jednego większego błędu: świetnie!
 appraisal.num.clean.b2.2 = W całej partii ani jednego większego błędu. Doskonale!
@@ -308,7 +308,7 @@ appraisal.num.few.b2.3 = Błędy warte uwagi: tylko {n}. Brawo.
 appraisal.num.best.b2 = Najlepszy ruch udało ci się znaleźć {n:time}.
 appraisal.num.best.b2.2 = Najlepszy możliwy ruch padł z twojej strony {n:time}.
 appraisal.num.best.b2.3 = {n:time} udało ci się znaleźć najlepszy ruch.
-appraisal.num.acc.b3 = Twoja dokładność wyniosła {acc:percent}. Błędy: {n}, poważne błędy: {m}.
+appraisal.num.acc.b3 = Twoja dokładność wyniosła {acc:percent}. Błędy: {n}, grube błędy: {m}.
 appraisal.num.acc.b3.2 = Dokładność {acc:percent}: {n:mistake}, {m:blunder}.
 appraisal.num.acc.b3.3 = Dokładność twojej gry to {acc:percent}; {n:mistake} i {m:blunder}.
 appraisal.num.acc_explain.b3 = Dokładność porównuje twoje ruchy z najlepszym ruchem w każdej pozycji: sto oznacza grę idealną.

@@ -58,7 +58,8 @@ owner.black.milik = {piece} milik Hitam
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The files are said by the Indonesian names of their letters (a, be, ce, de, e, ef, ge, ha), the
-# ranks as number words: e4 = "e empat", f3 = "ef tiga", h8 = "ha delapan".
+# ranks as number words: e4 = "e empat", f3 = "ef tiga", h8 = "ha delapan". The lone "e" is weak
+# before "empat" (heard "yang empat"), but "é" and "è" were lost more often still: it stays "e".
 square.spoken = {file} {rank}
 file.a.spoken = a
 file.b.spoken = be
@@ -98,7 +99,16 @@ move.mate.spoken = {move}, skakmat
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the respell.* words the Indonesian voice misreads.
+# Words the voice misreads (docs/PRONUNCIATION.md, Indonesian). It reads Latin letters with their
+# Indonesian values: the c or ch of a foreign word is "c" (fianchetto as "fiancetto", Capablanca as
+# "Capa-"), Giuoco has a syllable too many ("ji-u-o-ko"), the x of Prix and the t of Elephant are
+# said. "blunder" is said as written ("blun-der"); Indonesian players say the English "blander".
+respell.fianchetto = fianketo
+respell.capablanca = kapablanka
+respell.giuoco = juoko
+respell.prix = pri
+respell.elephant = elefan
+respell.blunder = blander
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. "se-" means one in sepuluh (10), sebelas (11) and seratus (100), listed with

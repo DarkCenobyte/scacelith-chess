@@ -6,7 +6,7 @@
 #
 # Included by CMakeLists.txt before project(); `cmake -P cmake/version.cmake` prints
 # SCACELITH_VERSION.
-set(SCACELITH_VERSION_CORE 1.0.3)
+set(SCACELITH_VERSION_CORE 1.0.4)
 set(SCACELITH_VERSION_PRERELEASE "")
 
 if(SCACELITH_VERSION_PRERELEASE)

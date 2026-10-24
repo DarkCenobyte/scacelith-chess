@@ -76,6 +76,8 @@ lesson.welcome.square2 = Dan yang ini petak {sq}.
 lesson.welcome.kings = Ini kedua raja. Rajamu ada di {sq}, rajaku di {sq2}.
 lesson.welcome.ask = Giliranmu: majukan rajamu satu petak, ke petak {sq}.
 lesson.welcome.wrong = Itu petak {to}. Yang kita mau petak {sq}: huruf e, angka dua.
+# The letter said alone: "huruf e" is heard "ini" or "I", "huruf é" (the letter's name) comes through.
+lesson.welcome.wrong.spoken = Itu petak {to}. Yang kita mau petak {sq}: huruf é, angka dua.
 lesson.welcome.ok = Sempurna. Rajamu sekarang di {sq}.
 
 # ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------

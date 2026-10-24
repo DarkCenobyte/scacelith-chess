@@ -58,17 +58,17 @@ ex.verdict.blunder.b1.3 = Oj, chwileczkę. Z tym ruchem jest kłopot.
 ex.verdict.blunder.b2 = Hmm, z tym ruchem jest problem.
 ex.verdict.blunder.b2.2 = To duży błąd.
 ex.verdict.blunder.b2.3 = Uwaga, na tym ruchu coś tracisz.
-ex.verdict.blunder.b3 = To poważny błąd.
+ex.verdict.blunder.b3 = To gruby błąd.
 ex.verdict.blunder.b3.2 = {move} to prawdziwy błąd.
 ex.verdict.blunder.b3.3 = Auć, {move} to duży błąd.
-ex.verdict.blunder.b4 = {move} to poważny błąd.
+ex.verdict.blunder.b4 = {move} to gruby błąd.
 ex.verdict.blunder.b4.2 = {move} to ciężki błąd.
-ex.verdict.blunder.b4.3 = Niestety, to poważny błąd.
+ex.verdict.blunder.b4.3 = Niestety, to gruby błąd.
 ex.verdict.blunder.b5 = {move} to ciężki błąd.
-ex.verdict.blunder.b5.2 = {move} to poważny błąd.
+ex.verdict.blunder.b5.2 = {move} to gruby błąd.
 ex.verdict.blunder.b5.3 = {move} to kosztowny błąd.
 ex.verdict.blunder.b6 = {move} to ciężki błąd.
-ex.verdict.blunder.b6.2 = {move} to poważny błąd.
+ex.verdict.blunder.b6.2 = {move} to gruby błąd.
 ex.verdict.blunder.b6.3 = {move}? Poważny błąd.
 # A blunder that leaves the coach's threat standing (levels 1-2: the threat the engine found after the
 # coach's last move is what the reply carries out).

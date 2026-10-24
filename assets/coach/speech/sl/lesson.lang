@@ -22,6 +22,8 @@ lesson.title.check = šah
 lesson.title.mate = mat
 lesson.title.castling = rokada
 lesson.title.en_passant = jemanje en passant
+# Said "an pasan", as the French (the voice read "en pasant"); every line with en passant does the same.
+lesson.title.en_passant.spoken = jemanje an pasan
 lesson.title.promotion = promocija
 lesson.title.draws = pat in remi
 lesson.title.etiquette = rating, ura in olika v pravih partijah
@@ -66,6 +68,7 @@ why.LeavesKingInCheck = {your} je vezan{your:ag}: če {your:cl_acc} premakneš, 
 why.OwnPieceOnTarget = Ne moreš stopiti na polje, kjer že stoji tvoja figura.
 why.PawnCaptureNeedsVictim = Kmet gre diagonalno samo takrat, ko jemlje.
 why.EnPassantExpired = Jemanje en passant je dovoljeno samo takoj po tem, ko gre kmet za dve polji naprej.
+why.EnPassantExpired.spoken = Jemanje an pasan je dovoljeno samo takoj po tem, ko gre kmet za dve polji naprej.
 why.NotYourTurn = Počakaj: na potezi sem jaz.
 
 # ---- Chapter 0: welcome and the board -------------------------------------------------------------------
@@ -217,11 +220,15 @@ lesson.castle2.ok = Pravilno! Po dolgi rokadi stoji tvoj kralj na polju {sq}.
 
 # ---- Chapter 6: en passant ------------------------------------------------------------------------------------
 lesson.ep.what = Posebnemu jemanju s kmetom pravimo en passant. To pomeni »mimogrede«.
+lesson.ep.what.spoken = Posebnemu jemanju s kmetom pravimo an pasan. To pomeni »mimogrede«.
 lesson.ep.watch = Glej mojega kmeta: premakne se za dve polji in pristane tik ob tvojem.
 lesson.ep.how = Tvoj kmet ga lahko vzame, kot da bi se ta premaknil samo za eno polje: na polje {sq}.
 lesson.ep.now = A samo zdaj, s to potezo. Vzemi en passant!
+lesson.ep.now.spoken = A samo zdaj, s to potezo. Vzemi an pasan!
 lesson.ep.gone = Priložnost je mimo: jemanje en passant je mogoče samo takoj. Poskusiva znova.
+lesson.ep.gone.spoken = Priložnost je mimo: jemanje an pasan je mogoče samo takoj. Poskusiva znova.
 lesson.ep.ok = En passant! Moj kmet na polju {sq} je odstranjen.
+lesson.ep.ok.spoken = An pasan! Moj kmet na polju {sq} je odstranjen.
 
 # ---- Chapter 7: promotion -------------------------------------------------------------------------------------
 lesson.promo.what = Ko kmet doseže zadnjo vrsto, se promovira: postane dama, trdnjava, lovec ali skakač.

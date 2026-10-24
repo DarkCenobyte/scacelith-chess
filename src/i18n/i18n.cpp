@@ -75,28 +75,28 @@ void ensureEnglish() {
 const std::vector<Language>& languages() {
     static const std::vector<Language> list = {
         {"en", "English", false},
-        {"id", "Bahasa Indonesia", false, false},
-        {"cs", "\xC4\x8C" "e\xC5\xA1tina", false, false},                                   // Čeština
+        {"id", "Bahasa Indonesia", false},
+        {"cs", "\xC4\x8C" "e\xC5\xA1tina", false},                                   // Čeština
         {"da", "Dansk", false},
         {"de", "Deutsch", false},
         {"et", "Eesti", false},
         {"es", "Espa\xC3\xB1ol", false},
         {"fr", "Fran\xC3\xA7" "ais", false},
-        {"hr", "Hrvatski", false, false},
+        {"hr", "Hrvatski", false},
         {"it", "Italiano", false},
-        {"lv", "Latvie\xC5\xA1u", false, false},                                             // Latviešu
-        {"lt", "Lietuvi\xC5\xB3", false, false},                                             // Lietuvių
-        {"hu", "Magyar", false, false},
+        {"lv", "Latvie\xC5\xA1u", false},                                             // Latviešu
+        {"lt", "Lietuvi\xC5\xB3", false},                                             // Lietuvių
+        {"hu", "Magyar", false},
         {"nl", "Nederlands", false},
         {"pl", "Polski", false},
         {"pt-BR", "Portugu\xC3\xAAs (Brasil)", false},
         {"pt", "Portugu\xC3\xAAs (Portugal)", false},
-        {"ro", "Rom\xC3\xA2n\xC4\x83", false, false},                                        // Română
-        {"sk", "Sloven\xC4\x8Dina", false, false},                                           // Slovenčina
-        {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false, false},                                   // Slovenščina
+        {"ro", "Rom\xC3\xA2n\xC4\x83", false},                                        // Română
+        {"sk", "Sloven\xC4\x8Dina", false},                                           // Slovenčina
+        {"sl", "Sloven\xC5\xA1\xC4\x8Dina", false},                                   // Slovenščina
         {"fi", "Suomi", false},
         {"sv", "Svenska", false},
-        {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false, false},                            // Tiếng Việt
+        {"vi", "Ti\xE1\xBA\xBFng Vi\xE1\xBB\x87t", false},                            // Tiếng Việt
         {"tr", "T\xC3\xBCrk\xC3\xA7" "e", false},                                     // Türkçe
         {"el", "\xCE\x95\xCE\xBB\xCE\xBB\xCE\xB7\xCE\xBD\xCE\xB9\xCE\xBA\xCE\xAC", false},  // Ελληνικά
         {"bg", "\xD0\x91\xD1\x8A\xD0\xBB\xD0\xB3\xD0\xB0\xD1\x80\xD1\x81\xD0\xBA\xD0\xB8", false},  // Български
