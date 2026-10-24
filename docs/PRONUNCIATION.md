@@ -1141,3 +1141,48 @@ voice's sake.
   - ņem joined to the next word ("zirgsņemēs"), and squares and numbers as notation;
   - English spellings for names (Fischer's, Fogbears, Grand Prix);
   - it often loses or garbles the first words of a line.
+
+## Lithuanian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letter a (squares, "nuo a iki h") | after a vowel the short a melts into it: "valdove į a penki" heard "valdovėjo penki", "valdovėje 5" 3 times in 3, "nuo a iki ha" heard "nuo iki ha", "nuo ICH" 3 in 3 (the probe puts it next to "nuo iki ha") | `aa` (file.a.spoken, lesson.welcome.files.spoken), the long a of the letter's name: heard as the a-file 13 times in 18 over 6 contexts, against 10 in 21 (after "į" 4 in 6, against 0 in 6); "nuo aa iki ha" 2 in 3 |
+| the file letter h (squares) | "ha" after a vowel loses its h: "langelio ha aštuoni" heard "langelio 8" 3 times in 3, "valdovė ha penki" heard "valdovė a penki" (probe: "langelio ha aštuoni" nearest "langelio a aštuoni", −0.02) | `haa` (file.h.spoken, lesson.welcome.files.spoken): the h heard 26 times in 33 over 10 contexts, against 10 in 30; `cha` did 11 in 15 but names the letter Ch |
+| Hm, (before a sentence) | a vowel: heard "Ham", "Kam", "Hammasiu" (hummed 5 times in 12) | `hmm` (respell.hm): hummed 8 times in 12 |
+| Nimco-indų | before the hyphen the c is read as k: nearest "Nimko-indų" (probe −0.00; −0.73 in a sentence), heard "nimko", "Niemko", "nebko" 6 times in 9. "Nimco" alone and "Nimco indų" keep ts | `nimtso` (respell.nimco): no k in 9 ("nems", "Niemcų-Indų"); the probe puts "Nimtso-indų" next to "Nimtso indų" (−0.02) |
+| Grand Prix (ataka) | the d and the x said: in a sentence nearest "grand priks" (probe +1.15, `gran pri` +2.59); alone the name lasts 4 s, said in pieces | `gran`, `pri` (respell.grand, respell.prix), French as players say it: Whisper writes "Grand Prix" either way |
+
+- Parakeet missed 95 % of the words on this voice; the main round trip is Whisper medium set to `lt`, 300 lines
+  (seed 0, 50 % of 4,052 words missed even with the diacritics and y/i folded). Then 3 seeds on 93 lines (the
+  reviewers' list, Hm against Hmm, 60 opening names in 30 pairs "Tavo debiutas – X, o mano atsakas – Y.", 36
+  eponyms in lists, the file letters, the L, numbers), on 23 and 21 lines of A/B variants of the file letters
+  a, e and h in 16 contexts and of Nimco, and on 8 lines of Torės and Trompovskio; probes (4 seeds) on about 90
+  readings. The catalog already spells the foreign names the Lithuanian way (Šteinicas, Tarašas, Naidorfas,
+  Džiuoko piano, Karo-Kano, Eivė, Mailso), so few needed anything.
+- Checked and fine: Elo ("elo" 3 in 3), an pasan, mitelšpilis, endšpilis (the d melts into š, as in speech:
+  "enšpilis"), el for the L ("raidę L", "el"), raidė e (probe: next to the long `ę`, the letter's name), Oi,
+  Oho (probe: "O ho" −0.16), Matai (6 in 6), taisau, the letters cė and ef (heard C3, F6 3 in 3), bė, dė, gė (said, often run into the next word),
+  the numbers (71 %, 92 %, 21, 11, 19, 122, 34-asis, 12-asis, "plius du kablelis trys", "minus vienas kablelis
+  penki": the right digits). Džiuoko piano is read "pjano" (probe −0.16; `pjano` heard the same), Benoni with the
+  stress on no (probe: `Benòni` −0.30). Pirco, Cukertorto, Horvico, Poncianio keep ts (probe: `Pirtso` +0.26,
+  `Tsukertorto` +0.11, `Horvitso` +0.09) and Richterio, Aliochino, Šlechteris, šachas a fricative ch (probe
+  nearest `Rihterio`, `šahas`; Aliochino far from `Aliokino`). Names heard as written: Karo-Kano, Blekmaro-Dimerio,
+  Smito-Moros, Van Kruiso, Van Geto, Retio, Bongklaudo, Džobavos, Parhamo, Filidoro, Šventojo Jurgio, Helovino,
+  Stafordo, Trakslerio, Zemišo, Ševeningeno, Šlimano, Kolės, Morfio, Naidorfo, Oveno, Rosolimo, Saragosos,
+  Sokolskio, Svešnikovo, Taimanovo, Tarašo, Vinaverio, Čigorino, Griunfeldo, Hipopotamo, Falkbėro, Englundo,
+  Evanso, Berdo, Borgo, Grobo, Alapino, Albino, Bogoliubovo, Benko, Maršalo, Merano, Panovo, Leningrado, Kano,
+  Mailso, Fegatelo, and the eponyms (Šteinicas ... Botvinikas; Stauntonas is heard "Tontonas").
+- Left as is: the file letter e is said (probe: "keturi" alone far) with the open Lithuanian e, which Whisper often
+  writes "a" ("Akieturi" for "e keturi"); `ee` was heard worse ("ir katuri", "Jai"). ankstyvas, anksti, anksčiau
+  are said with a g-like k (probe: `angstyvas` −0.37; heard "angstyvas", "angsti" every time): the voicing of a stop
+  in a cluster, no other spelling. Torės and Trompovskio lean to u in the probe (`Turės` −0.02, `Trumpovskio`
+  −0.42), but the probe does as much for Kolės (`Kulės` −0.03), which Whisper hears right; Torės is heard with an
+  o 4 times in 6 outside "Tavo debiutas – Torės", `Toorės` was heard no better, and `Troompovskio` hardly
+  (an o 3 times in 6, against 1 in 6): too few to keep. A word-initial r is weak ("Retis" heard "Lietis", "Vietis").
+- Recogniser habits: Whisper writes ė as e or ie (ėjimas "ejimas", "eimas"; pėstininkas "piestininkas"), y as i
+  (gynyba "ginyba"), ie as ė (juodieji "juodėjai", baltieji "baltėjai"), rikis as "reikis", "reikia", Sicilijos
+  as "Sicilios", debiutas as "debütas", splits compounds ("balta laukis", "šiuo laikinė"), squares and numbers as
+  notation, known names in their own spelling (Grand Prix, Marshall, Stafford, Traxler, Miles) and common words
+  for rare names ("pirko" for Pirco, "turės" for Torės, "Trump" for Trompovskio), and drops or garbles a line's
+  first word. The probe puts rikis, juodieji, ėjimas, šachas, langelyje, stovi, Sicilijos, siekia, lėta, laimi,
+  italų, erdvės next to their written form.

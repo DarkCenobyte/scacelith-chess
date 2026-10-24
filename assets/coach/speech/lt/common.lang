@@ -452,16 +452,19 @@ owner.black.agr_is_e = {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The voice says a square as Lithuanian players read it: the file's letter name, then the rank as a
-# cardinal number: e4 = "e keturi", f3 = "ef trys", b5 = "bė penki", h7 = "ha septyni".
+# cardinal number: e4 = "e keturi", f3 = "ef trys", b5 = "bė penki", h7 = "ha septyni". The a and the h
+# are written "aa" and "haa" (a long a, as the letter names are said): a short "a" melts into a vowel
+# before it ("į a penki" heard "į penki") and "ha" loses its h there ("langelio ha aštuoni" heard
+# "langelio aštuoni"); see docs/PRONUNCIATION.md.
 square.spoken = {file} {rank}
-file.a.spoken = a
+file.a.spoken = aa
 file.b.spoken = bė
 file.c.spoken = cė
 file.d.spoken = dė
 file.e.spoken = e
 file.f.spoken = ef
 file.g.spoken = gė
-file.h.spoken = ha
+file.h.spoken = haa
 rank.1.spoken = vienas
 rank.2.spoken = du
 rank.3.spoken = trys
@@ -494,8 +497,16 @@ move.mate.spoken = {move}, matas
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# None yet: the pronunciation pass adds the words the voice misreads. Lithuanian names en passant
-# "kirtimas prasilenkiant"; a line that keeps the French words gets its respelling in that pass.
+# Words the voice misreads, said otherwise in every spoken line (opening lines included); see
+# docs/PRONUNCIATION.md. Lithuanian names en passant "kirtimas prasilenkiant"; lesson.ep.what says the
+# French words as "an pasan" in its .spoken line.
+# "Hm," before a sentence is read with a vowel ("Ham", "Kam"): "hmm" is hummed.
+respell.hm = hmm
+# Grand Prix (ataka): the voice says the d and the x ("grand priks"); French, as players say it.
+respell.grand = gran
+respell.prix = pri
+# Nimco-indų: before the hyphen the c is read as k ("Nimko-indų"); "Nimtso" keeps the ts.
+respell.nimco = nimtso
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words; the plain word is the masculine nominative. 21-99 compose as "{tens} {units}"

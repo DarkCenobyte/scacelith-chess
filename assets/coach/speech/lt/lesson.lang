@@ -6,7 +6,8 @@
 # {your:refl_ins} ...); {sq}, {sq2}, {to}, {esc} = squares, never inflected ("į {sq}", "langelyje
 # {sq}"); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at something while
 # saying the word right after the mark. A ".spoken" key is what the voice says instead (here: letters
-# said by their Lithuanian names, "ha", "el", and the French "en passant" said "an pasan").
+# said by their Lithuanian names, "aa", "haa" (long, as in file.*.spoken), "el", and the French
+# "en passant" said "an pasan").
 # Rules the lines follow: no adjective, participle or half-participle about the player ("norėdamas",
 # "būk mandagus" -> "Rokiruotei paeik...", "elkis mandagiai"); "savo" when the player acts with
 # their own piece ({your:refl_ins}); files = vertikalės, ranks = horizontalės, back rank = paskutinė
@@ -73,7 +74,7 @@ lesson.welcome.hello = Labas! Aš tavo treneris. Kartu išmokime šachmatų tais
 lesson.welcome.board = Tai šachmatų lenta: šešiasdešimt keturi langeliai, šviesūs ir tamsūs, aštuonios eilės po aštuonis langelius.
 lesson.welcome.light = Kampinis langelis tavo {@}dešinėje visada šviesus. Įsimink: dešinėje – šviesus.
 lesson.welcome.files = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}h.
-lesson.welcome.files.spoken = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}a iki {@2}ha.
+lesson.welcome.files.spoken = Stulpeliai vadinami vertikalėmis. Jos žymimos raidėmis nuo {@}aa iki {@2}haa.
 lesson.welcome.ranks = Eilės vadinamos horizontalėmis. Jos žymimos skaičiais nuo {@}vieno iki {@2}aštuonių, pradedant nuo tavo pusės.
 lesson.welcome.square = Langelio pavadinimas – pirma raidė, paskui skaičius. Šis langelis – {sq}.
 lesson.welcome.square2 = O šis – {sq}.
