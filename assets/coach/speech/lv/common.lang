@@ -346,7 +346,8 @@ owner.black.is = {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # The file letters are said with their Latvian letter names, as when spelling: e4 = "e četri",
-# b5 = "bē pieci", f3 = "ef trīs", g7 = "gā septiņi", h8 = "hā astoņi".
+# b5 = "bē pieci", f3 = "ef trīs", g7 = "gā septiņi", h8 = "hā astoņi"; a and e are said long ("ā", "ē")
+# by respell.a and respell.e below.
 square.spoken = {file} {rank}
 file.a.spoken = a
 file.b.spoken = bē
@@ -387,8 +388,15 @@ move.mate.spoken = {move}, mats
 moves.join.spoken = {a}, {b}
 
 # ---- Respellings (spoken) ------------------------------------------------------------------------
-# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h). None yet: "ņemšana
-# garāmejot" (en passant) is Latvian; the pronunciation pass adds respell.* keys when the voice needs them.
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h; docs/PRONUNCIATION.md).
+# The file letters a and e said alone are short and melt into the word before them ("no a pieci" heard
+# "no pieci", "Pēc e četri" heard "Pēc četri"): said long, as Latvians name the letters. Every lone "a"
+# and "e" of a spoken line is a file letter (squares, "no a līdz hā", "burts e", the opening texts).
+respell.a = ā
+respell.e = ē
+# Grand Prix (opening name) is read "Grand Priks": said the French way.
+respell.grand = grān
+respell.prix = prī
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words, masculine nominative by default ("viens", "divi"). 21-99 compose as

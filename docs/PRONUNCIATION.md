@@ -1098,3 +1098,46 @@ voice's sake.
   "na mestu", "na tačnost"), known names in their own spelling ("Greco", "Fischer", "Halloween", "Grand Prix",
   "Stonewall", "rating") whatever the voice says: check a name with the probe. A line's first word is often lost
   or misheard ("Pat." heard "Vat", "Bat").
+
+## Latvian
+
+| Written | Voice said | Spoken spelling |
+| --- | --- | --- |
+| the file letters e and a said alone (squares, "no a līdz h", "burts e", the opening texts) | short, melting into the word before them: "Pēc e četri" heard "Pēc četri" 3 times in 3, "Dāma no a pieci" heard "Dāma no pieci" 3 in 3 (probe: "ar a seši" nearest "ara seši", "aizsargāt e pieci" nearest "aizsargātē pieci") | `ē`, `ā` (respell.e, respell.a), the long vowel Latvians use to name the letters: e heard 25 times in 33 over 10 contexts against 12, a 33 in 33 over 11 contexts against 25. Every lone "a" and "e" of a spoken line is a file letter |
+| Hm. (event.filler) | with a vowel: probe nearest "Hem" (+0.37, "Hmm" +1.06); heard "Hamam", "Tiem", "M." | `Hmm.` (event.filler.spoken): heard "Hmm" 3 times in 3. "Hmm," in the other lines was hummed already |
+| Grand Prix (uzbrukums) | the d and the x said: "Grand Priks" (probe +0.20, `Grān Prī` +2.26) | `grān`, `prī` (respell.grand, respell.prix): read like "Gran Prī" (probe −0.33); Whisper writes "Grand Prix" for the plain form, "Grānu prī", "Grāmbrī" for this one |
+
+- Parakeet missed 99 % of the words on this voice. The main round trip is Whisper medium set to `lv`: 300 lines (seed 0).
+  It missed 60 % of the words, or 19 % once diacritics, doubled letters and notation are ignored. Then 3 seeds on 56
+  lines: A/B pairs of the file letters in 18 contexts, the reviewers' coach lines, Hm against Hmm, and the words
+  missed most. Then 1 seed on 34 lines naming every opening name and eponym, and 3 seeds on 18 lines of the fixes in
+  the game's own lines and the numbers. About 30 readings were probed (4 seeds).
+- Checked and fine: the letters bē, cē, dē, gā (heard as notation) and ef ("F7"; "ef septiņi" heard "epseptiņi",
+  the assimilation as said); hā (heard "kā" or "H8": the velar Latvian h); `el` for the L (probe: nearest "l";
+  heard "el", "elu" or joined to "burta" 5 times in 6). Also fine:
+  - šahs and šaha: probe nearest "šaka", "šaga" in "Šis ir šaha pulkstenis", the velar h. Whisper writes "šaks".
+  - dubultšahs, kandidātgājienus, nosmacētais, epoletu (probe: near "epaletu").
+  - pats ("pats" 6 in 6), Ups (3 in 3), Ai (probe "Aj"), Oho, Čau (probe "Čao" +0.02).
+  - Elo (probe: nearest "elu", not letters; heard "elo" 2 in 3), „Es pielaboju” (the quotes are not read).
+  - the numbers: 21, 34, 71 %, 92 %, 12., 21., 34., "mīnus viens komats pieci", "simt divdesmit divi",
+    "numur divpadsmit". Each is heard right, as words or digits, in at least 2 renderings of 3.
+  - The names are in Latvian spelling and are read as written: Karo-Kanna, Filidora, Cukertorta, Nimcoviča,
+    Aļehīna, Grīnfelda, Ponciāni, Blekmāra-Dīmera, Trompovska, Kolles, Taraša, Džobavas, Rihtera-Veresova,
+    Bongklauda, Šēveningenas, Svešņikova, Najdorfa, Fegatello, Trakslera, Māršala, Šlīmaņa, Helovīna, Zēmiša,
+    Falkbēra, Kīzerickis, Maroci, Mailza, Džuoko, Eive, Makkačens and the rest.
+- Left as is:
+  - piano and pianissimo (Džuoko) are read "pi-a-no", "pianisimo" (probe −0.93), as Latvian reads them. `pjāno` was
+    heard "pijāno" 2 times in 3, no better.
+  - Ouena is read "Auena" (probe −0.39; "Oena" +0.36); no Latvian spelling gives "ou".
+  - Pterodaktiļa ties with and without its p (probe: "Terodaktiļa" −0.11, "Ptterodaktiļa" −0.07); it was heard
+    "terodāk ceļu" once.
+  - Van 't Kreisa is said "Vant Kreisa", as in Dutch (probe: "Van et" and "Vant" +0.32, "Van tē" +0.88).
+  - After a word ending in a vowel ("bija ē četri", "vajag ē"), the long e still runs into that word 1 or 2
+    times in 3.
+- Recogniser habits: Whisper writes the voicing assimilation as heard (zirgs "zirks", tavs "taus"). Other habits:
+  - "šaks" for šahs, "kā" for hā;
+  - baltie as "Baltija", melnie as "mēlnie", gājiens as "gājens" or "gājienes";
+  - the diphthong o as "uo" (noved "nuovēt", atdod "atduot", as said);
+  - ņem joined to the next word ("zirgsņemēs"), and squares and numbers as notation;
+  - English spellings for names (Fischer's, Fogbears, Grand Prix);
+  - it often loses or garbles the first words of a line.

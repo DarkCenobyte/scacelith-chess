@@ -52,6 +52,8 @@ event.take_time = Nesteidzies.
 event.take_time.2 = Nav kur steigties: mūsu partijās nav pulksteņa.
 # Short filler while the coach is still looking at the position.
 event.filler = Hm.
+# "Hm." alone is said with a vowel ("Hem", heard "Hamam", "Tiem"); "Hmm." is hummed (docs/PRONUNCIATION.md).
+event.filler.spoken = Hmm.
 event.filler.2 = Paskatīsimies.
 event.filler.3 = Ļauj man paskatīties.
 
